@@ -334,25 +334,24 @@ The following attributes are exported:
 
 ## Resource Configuration `sakuracloud_simple_monitor`
 
-Provides a SakuraCloud DNS resource. This can be used to create,
-modify, and delete DNS records.
+Provides a SakuraCloud SimpleMonitor resource. This can be used to create,
+modify, and delete SimpleMonitor records.
 
 ### Example Usage
 
 ```
-# Create a new DNS zone and add two A records
-resource "sakuracloud_dns" "dns" {
-    zone = "example.com"
-    records = {
-        name = "test1"
-        type = "A"
-        value = "192.168.0.1"
+# Create a new Simple Monitor
+resource "sakuracloud_simple_monitor" "mymonitor" {
+    target = "${sakuracloud_server.myserver.shared_nw_ipaddress}"
+    health_check = {
+        protocol = "http"
+        delay_loop = 60
+        path = "/"
+        status = "200"
     }
-    records = {
-        name = "test2"
-        type = "A"
-        value = "192.168.0.2"
-    }
+    notify_email_enabled = true
+    notify_slack_enabled = true
+    notify_slack_webhook = "https://hooks.slack.com/services/XXXXXXXXX/XXXXXXXXX/XXXXXXXXXXXXXXXXXXXXXXXX"
 }
 ```
 
@@ -360,15 +359,21 @@ resource "sakuracloud_dns" "dns" {
 
 The following arguments are supported:
 
-* `zone` - (Required) The DNS target zone name
-* `description` - (Required) The region to start in
-* `tags` - (Required) The instance size to start
-* `records` - (Optional) The records of target zone
-  * `name` - (Required) The name of the record
-  * `type` - (Required) The type of the record
-  * `value` - (Required) The value of the record
-  * `ttl` - (Optional) The TTL of the record . default `3600`
-  * `priority` - (Optional) (Only type is MX) The priority of the record
+* `target` - (Required) The monitor target IP or domain name.
+* `health_check` - (Required) The health_check rule of SimpleMonitor.
+  * `protocol` - (Required) The protocol to use for health check. Must be in [`http`,`https`,`tcp`,`ping`,`ssh`,`dns`]
+  * `dalay_loop` - (Optional) The delay_loop of health check. Must be between `60` and `3600`. default is `60`
+  * `path` - (Only when protocol is `http` or `https`) The request path to use for health check.
+  * `status` - (Only when protocol is `http` or `https`) The response code of health check request.
+  * `port` - (Only when protocol is `tcp` or `ssh`) The port number to use for health check.
+  * `qname` - (Only when protocol is `dns`) The port number to use for health check.
+  * `expected_data` - (Only when protocol is `dns`) The port number to use for health check.
+* `description` - (Optional) The descripton of SimpleMonitor.
+* `tags` - (Optional) The tags of SimpleMonitor.
+* `notify_email_enabled` - (Optional) The flag of enabled email.
+* `notify_slack_enabled` - (Optional) The flag of enabled slack.
+* `notify_slack_webhook` - (Optional) The URL of slack webhook.
+* `enabled` - (Optional) The flag of enabled SimpleMonitor.
 
 
 
@@ -377,16 +382,21 @@ The following arguments are supported:
 The following attributes are exported:
 
 * `id` - The ID of the DNS
-* `zone`- The domain name of the target zone
-* `dns_servers` - The name servers of the target zone
-* `description` - The description of target zone
-* `tags` - The description of target zone
-* `records` - The records of target zone
-  * `name` - The name of the record
-  * `type` - The type of the record
-  * `value` - The value of the record
-  * `ttl` - The TTL of the record
-  * `priority` - (Only type is MX) The priority of the record
+* `target` - The monitor target IP or domain name.
+* `health_check` - The health_check rule of SimpleMonitor.
+  * `protocol` - The protocol to use for health check. Must be in [`http`,`https`,`tcp`,`ping`,`ssh`,`dns`]
+  * `dalay_loop` - The delay_loop of health check. Must be between `60` and `3600`. default is `60`
+  * `path` - (Only when protocol is `http` or `https`) The request path to use for health check.
+  * `status` - (Only when protocol is `http` or `https`) The response code of health check request.
+  * `port` - (Only when protocol is `tcp` or `ssh`) The port number to use for health check.
+  * `qname` - (Only when protocol is `dns`) The port number to use for health check.
+  * `expected_data` - (Only when protocol is `dns`) The port number to use for health check.
+* `description` - The descripton of SimpleMonitor.
+* `tags` - The tags of SimpleMonitor.
+* `notify_email_enabled` - The flag of enabled email.
+* `notify_slack_enabled` - The flag of enabled slack.
+* `notify_slack_webhook` - The URL of slack webhook.
+* `enabled` - The flag of enabled SimpleMonitor.
 
 
 ## Samples
