@@ -34,6 +34,12 @@ func NewClient(token, tokenSecret, zone string) *Client {
 	return c
 }
 
+func (c *Client) Clone() *Client {
+	n := &Client{AccessToken: c.AccessToken, AccessTokenSecret: c.AccessTokenSecret, Zone: c.Zone, TraceMode: c.TraceMode}
+	n.api = newAPI(n)
+	return n
+}
+
 type api struct {
 	Archive       *ArchiveAPI
 	Bridge        *BridgeAPI

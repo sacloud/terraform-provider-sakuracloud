@@ -169,13 +169,13 @@
 		},
 		{
 			"ImportPath": "github.com/yamamoto-febc/libsacloud/api",
-			"Comment": "v0.0.1-20-g3549d48",
-			"Rev": "3549d489a9d9ede341efa83ee60e6006936cb651"
+			"Comment": "v0.0.1-21-gca4a5c0",
+			"Rev": "ca4a5c08ed7aef06d2d7ed9cc840b2050c0e6060"
 		},
 		{
 			"ImportPath": "github.com/yamamoto-febc/libsacloud/sacloud",
-			"Comment": "v0.0.1-20-g3549d48",
-			"Rev": "3549d489a9d9ede341efa83ee60e6006936cb651"
+			"Comment": "v0.0.1-21-gca4a5c0",
+			"Rev": "ca4a5c08ed7aef06d2d7ed9cc840b2050c0e6060"
 		}
 	]
 }

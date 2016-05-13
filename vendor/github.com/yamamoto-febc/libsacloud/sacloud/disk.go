@@ -1,6 +1,7 @@
 package sacloud
 
 import (
+	"encoding/json"
 	"time"
 )
 
@@ -18,9 +19,9 @@ type Disk struct {
 	MigratedMB int             `json:",omitempty"`
 	Plan       *NumberResource `json:",omitempty"`
 	Storage    struct {
-		*Resource
-		MountIndex string `json:",omitempty"`
-		Class      string `json:",omitempty"`
+		*NumberResource
+		MountIndex json.Number `json:",omitempty"`
+		Class      string      `json:",omitempty"`
 	}
 	SourceArchive *Archive            `json:",omitempty"`
 	SourceDisk    *Disk               `json:",omitempty"`

@@ -123,12 +123,11 @@ func resourceSakuraCloudDisk() *schema.Resource {
 }
 
 func resourceSakuraCloudDiskCreate(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*api.Client)
+	c := meta.(*api.Client)
+	client := c.Clone()
 	zone, ok := d.GetOk("zone")
 	if ok {
-		originalZone := client.Zone
 		client.Zone = zone.(string)
-		defer func() { client.Zone = originalZone }()
 	}
 
 	opts := client.Disk.New()
@@ -222,12 +221,11 @@ func resourceSakuraCloudDiskCreate(d *schema.ResourceData, meta interface{}) err
 }
 
 func resourceSakuraCloudDiskRead(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*api.Client)
+	c := meta.(*api.Client)
+	client := c.Clone()
 	zone, ok := d.GetOk("zone")
 	if ok {
-		originalZone := client.Zone
 		client.Zone = zone.(string)
-		defer func() { client.Zone = originalZone }()
 	}
 
 	disk, err := client.Disk.Read(d.Id())
@@ -252,12 +250,11 @@ func resourceSakuraCloudDiskRead(d *schema.ResourceData, meta interface{}) error
 }
 
 func resourceSakuraCloudDiskUpdate(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*api.Client)
+	c := meta.(*api.Client)
+	client := c.Clone()
 	zone, ok := d.GetOk("zone")
 	if ok {
-		originalZone := client.Zone
 		client.Zone = zone.(string)
-		defer func() { client.Zone = originalZone }()
 	}
 
 	disk, err := client.Disk.Read(d.Id())
@@ -372,12 +369,11 @@ func resourceSakuraCloudDiskUpdate(d *schema.ResourceData, meta interface{}) err
 }
 
 func resourceSakuraCloudDiskDelete(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*api.Client)
+	c := meta.(*api.Client)
+	client := c.Clone()
 	zone, ok := d.GetOk("zone")
 	if ok {
-		originalZone := client.Zone
 		client.Zone = zone.(string)
-		defer func() { client.Zone = originalZone }()
 	}
 
 	disk, err := client.Disk.Read(d.Id())

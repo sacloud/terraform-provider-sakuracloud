@@ -96,12 +96,11 @@ func resourceSakuraCloudServer() *schema.Resource {
 }
 
 func resourceSakuraCloudServerCreate(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*api.Client)
+	c := meta.(*api.Client)
+	client := c.Clone()
 	zone, ok := d.GetOk("zone")
 	if ok {
-		originalZone := client.Zone
 		client.Zone = zone.(string)
-		defer func() { client.Zone = originalZone }()
 	}
 
 	opts := client.Server.New()
@@ -184,12 +183,11 @@ func resourceSakuraCloudServerCreate(d *schema.ResourceData, meta interface{}) e
 }
 
 func resourceSakuraCloudServerRead(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*api.Client)
+	c := meta.(*api.Client)
+	client := c.Clone()
 	zone, ok := d.GetOk("zone")
 	if ok {
-		originalZone := client.Zone
 		client.Zone = zone.(string)
-		defer func() { client.Zone = originalZone }()
 	}
 
 	server, err := client.Server.Read(d.Id())
@@ -232,16 +230,14 @@ func resourceSakuraCloudServerRead(d *schema.ResourceData, meta interface{}) err
 }
 
 func resourceSakuraCloudServerUpdate(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*api.Client)
-
-	shutdownFunc := client.Server.Stop
-
+	c := meta.(*api.Client)
+	client := c.Clone()
 	zone, ok := d.GetOk("zone")
 	if ok {
-		originalZone := client.Zone
 		client.Zone = zone.(string)
-		defer func() { client.Zone = originalZone }()
 	}
+
+	shutdownFunc := client.Server.Stop
 
 	server, err := client.Server.Read(d.Id())
 	if err != nil {
@@ -432,13 +428,13 @@ func resourceSakuraCloudServerUpdate(d *schema.ResourceData, meta interface{}) e
 }
 
 func resourceSakuraCloudServerDelete(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*api.Client)
+	c := meta.(*api.Client)
+	client := c.Clone()
 	zone, ok := d.GetOk("zone")
 	if ok {
-		originalZone := client.Zone
 		client.Zone = zone.(string)
-		defer func() { client.Zone = originalZone }()
 	}
+
 	server, err := client.Server.Read(d.Id())
 	if err != nil {
 		return fmt.Errorf("Couldn't find SakuraCloud Server resource: %s", err)
