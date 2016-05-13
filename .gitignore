@@ -1,0 +1,8 @@
+bin/terraform-provider-sakuracloud*
+Godeps/_workspace
+Godeps/README
+vendor/
+plugin.log
+terraform-provider-sakuracloud
+terraform.tfstate
+terraform.tfstate.backup
