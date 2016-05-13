@@ -336,7 +336,6 @@ The following attributes are exported:
 
 Provides a SakuraCloud SimpleMonitor resource. This can be used to create,
 modify, and delete SimpleMonitor records.
-
 ### Example Usage
 
 ```
@@ -376,7 +375,6 @@ The following arguments are supported:
 * `enabled` - (Optional) The flag of enabled SimpleMonitor.
 
 
-
 ### Attributes Reference
 
 The following attributes are exported:
@@ -397,7 +395,6 @@ The following attributes are exported:
 * `notify_slack_enabled` - The flag of enabled slack.
 * `notify_slack_webhook` - The URL of slack webhook.
 * `enabled` - The flag of enabled SimpleMonitor.
-
 
 ## Samples
 

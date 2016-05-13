@@ -14,6 +14,7 @@ echo "VERSION terraform '$ver'"
 
 rm -Rf bin/
 mkdir bin/
+
 for GOOS in $OS; do
     for GOARCH in $ARCH; do
         arch="$GOOS-$GOARCH"
