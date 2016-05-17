@@ -15,6 +15,7 @@ Terraform provider for SakuraCloud. - `Terraform for さくらのクラウド`
     - [sakuracloud_server](#resource-configuration-sakuracloud_server)
     - [sakuracloud_disk](#resource-configuration-sakuracloud_disk)
     - [sakuracloud_ssh_key](#resource-configuration-sakuracloud_ssh_key)
+    - [sakuracloud_switch](#resource-configuration-sakuracloud_switch)
     - [sakuracloud_dns](#resource-configuration-sakuracloud_dns)
     - [sakuracloud_gslb](#resource-configuration-sakuracloud_gslb)
     - [sakuracloud_simple_monitor](#resource-configuration-sakuracloud_simple_monitor)
@@ -166,6 +167,40 @@ The following attributes are exported:
 * `disable_pw_auth` - The flag that to disable SSH login with password authentication / challenge-response.
 * `note_ids` - The ID list of Note.
 
+## Resource Configuration `sakuracloud_switch`
+
+Provides a SakuraCloud Switch resource. This can be used to create, modify,
+and delete Switch.
+
+### Example Usage
+
+```
+resource "sakuracloud_switch" "myswitch" {
+    name = "mykey"
+    description = "Switch from terraform for SAKURA CLOUD"
+    tags = ["hoge1" , "hoge2"]
+}
+```
+
+### Argument Reference
+
+The following arguments are supported:
+
+* `name` - (Required) The name of the switch.
+* `description` - (Optional) The description of the switch.
+* `tags` - (Optional) The tags of the switch.
+* `zone` - (Optional) The zone of the switch.
+
+### Attributes Reference
+
+The following attributes are exported:
+
+* `id` - The ID of the switch.
+* `name`- The name of the switch.
+* `description` - The description of the switch.
+* `tags` - The tags of the switch.
+* `zone` - The zone of the switch.
+* `server_ids` - The ID list of connected server.
 
 ## Resource Configuration `sakuracloud_ssh_key`
 

@@ -1,6 +1,9 @@
 package api
 
-import "fmt"
+import (
+	"fmt"
+	"github.com/yamamoto-febc/libsacloud/sacloud"
+)
 
 type SwitchAPI struct {
 	*baseAPI
@@ -31,4 +34,17 @@ func (api *SwitchAPI) ConnectToBridge(switchID string, bridgeID string) (bool, e
 		uri    = fmt.Sprintf("%s/%s/to/bridge/%s", api.getResourceURL(), switchID, bridgeID)
 	)
 	return api.modify(method, uri, nil)
+}
+
+func (api *SwitchAPI) GetServers(switchID string) ([]sacloud.Server, error) {
+	var (
+		method = "GET"
+		uri    = fmt.Sprintf("%s/%s/server", api.getResourceURL(), switchID)
+		res    = &sacloud.SearchResponse{}
+	)
+	err := api.baseAPI.request(method, uri, nil, res)
+	if err != nil {
+		return nil, err
+	}
+	return res.Servers, nil
 }

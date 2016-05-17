@@ -33,7 +33,7 @@ func resourceSakuraCloudServer() *schema.Resource {
 			},
 			"disks": &schema.Schema{
 				Type:     schema.TypeList,
-				Required: true,
+				Optional: true,
 				Elem:     &schema.Schema{Type: schema.TypeString},
 			},
 			"shared_interface": {
@@ -131,41 +131,45 @@ func resourceSakuraCloudServerCreate(d *schema.ResourceData, meta interface{}) e
 	if description, ok := d.GetOk("description"); ok {
 		opts.Description = description.(string)
 	}
-	rawTags := d.Get("tags").([]interface{})
-	if rawTags != nil {
-		opts.Tags = expandStringList(rawTags)
-	}
 
+	if rawTags, ok := d.GetOk("tags"); ok {
+		if rawTags != nil {
+			opts.Tags = expandStringList(rawTags.([]interface{}))
+		}
+	}
 	server, err := client.Server.Create(opts)
 	if err != nil {
 		return fmt.Errorf("Failed to create SakuraCloud Server resource: %s", err)
 	}
 
 	//connect disk to server
-	rawDisks := d.Get("disks").([]interface{})
-	if rawDisks != nil {
-		diskIDs := expandStringList(rawDisks)
-		for i, diskID := range diskIDs {
-			_, err := client.Disk.ConnectToServer(diskID, server.ID)
-			if err != nil {
-				return fmt.Errorf("Failed to connect SakuraCloud Disk to Server: %s", err)
-			}
-
-			// edit disk if server is connected the shared segment
-			if i == 0 && len(server.Interfaces) > 0 && server.Interfaces[0].Switch != nil && server.Interfaces[0].Switch.Scope == sacloud.ESCopeShared {
-				diskEditConfig := client.Disk.NewCondig()
-				diskEditConfig.SetUserIPAddress(server.Interfaces[0].IPAddress)
-				diskEditConfig.SetDefaultRoute(server.Interfaces[0].Switch.Subnet.DefaultRoute)
-				diskEditConfig.SetNetworkMaskLen(fmt.Sprintf("%d", server.Interfaces[0].Switch.Subnet.NetworkMaskLen))
-
-				_, err := client.Disk.Config(diskID, diskEditConfig)
+	if _, ok := d.GetOk("disks"); ok {
+		rawDisks := d.Get("disks").([]interface{})
+		if rawDisks != nil {
+			diskIDs := expandStringList(rawDisks)
+			for i, diskID := range diskIDs {
+				_, err := client.Disk.ConnectToServer(diskID, server.ID)
 				if err != nil {
-					return fmt.Errorf("Error editting SakuraCloud DiskConfig: %s", err)
+					return fmt.Errorf("Failed to connect SakuraCloud Disk to Server: %s", err)
 				}
-			}
 
+				// edit disk if server is connected the shared segment
+				if i == 0 && len(server.Interfaces) > 0 && server.Interfaces[0].Switch != nil && server.Interfaces[0].Switch.Scope == sacloud.ESCopeShared {
+					diskEditConfig := client.Disk.NewCondig()
+					diskEditConfig.SetUserIPAddress(server.Interfaces[0].IPAddress)
+					diskEditConfig.SetDefaultRoute(server.Interfaces[0].Switch.Subnet.DefaultRoute)
+					diskEditConfig.SetNetworkMaskLen(fmt.Sprintf("%d", server.Interfaces[0].Switch.Subnet.NetworkMaskLen))
+
+					_, err := client.Disk.Config(diskID, diskEditConfig)
+					if err != nil {
+						return fmt.Errorf("Error editting SakuraCloud DiskConfig: %s", err)
+					}
+				}
+
+			}
 		}
 	}
+
 	d.SetId(server.ID)
 
 	//boot

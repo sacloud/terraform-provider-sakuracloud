@@ -39,6 +39,15 @@ func flattenDisks(disks []sacloud.Disk) []string {
 	return ids
 }
 
+func flattenServers(servers []sacloud.Server) []string {
+	var ids []string
+	for _, d := range servers {
+		ids = append(ids, d.ID)
+	}
+	return ids
+
+}
+
 func flattenInterfaces(interfaces []sacloud.Interface) []interface{} {
 	var ret []interface{}
 	for index, i := range interfaces {
