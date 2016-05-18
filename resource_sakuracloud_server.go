@@ -36,10 +36,10 @@ func resourceSakuraCloudServer() *schema.Resource {
 				Optional: true,
 				Elem:     &schema.Schema{Type: schema.TypeString},
 			},
-			"shared_interface": {
-				Type:     schema.TypeBool,
+			"shared_interface": &schema.Schema{
+				Type:     schema.TypeString,
 				Optional: true,
-				Default:  true,
+				Default:  "shared",
 			},
 
 			"switched_interfaces": &schema.Schema{
@@ -112,8 +112,16 @@ func resourceSakuraCloudServerCreate(d *schema.ResourceData, meta interface{}) e
 	}
 	opts.SetServerPlanByID(planID.ID.String())
 
-	if hasSharedInterface, ok := d.GetOk("shared_interface"); ok && hasSharedInterface.(bool) {
-		opts.AddPublicNWConnectedParam()
+	if hasSharedInterface, ok := d.GetOk("shared_interface"); ok {
+		switch forceString(hasSharedInterface) {
+		case "shared":
+			opts.AddPublicNWConnectedParam()
+		case "":
+			opts.AddEmptyConnectedParam()
+		default:
+			opts.AddExistsSwitchConnectedParam(forceString(hasSharedInterface))
+		}
+
 	} else {
 		opts.AddEmptyConnectedParam()
 	}
@@ -304,11 +312,13 @@ func resourceSakuraCloudServerUpdate(d *schema.ResourceData, meta interface{}) e
 
 	// NIC
 	if d.HasChange("shared_interface") {
-		hasSharedNIC := d.Get("shared_interface").(bool)
-		if hasSharedNIC {
+		sharedNICCon := d.Get("shared_interface").(string)
+		if sharedNICCon == "shared" {
 			client.Interface.ConnectToSharedSegment(server.Interfaces[0].ID)
-		} else {
+		} else if sharedNICCon == "" {
 			client.Interface.DisconnectFromSwitch(server.Interfaces[0].ID)
+		} else {
+			client.Interface.ConnectToSwitch(server.Interfaces[0].ID, sharedNICCon)
 		}
 	}
 	if d.HasChange("switched_interfaces") {

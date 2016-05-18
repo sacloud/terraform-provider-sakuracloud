@@ -74,3 +74,11 @@ func flattenMacAddresses(interfaces []sacloud.Interface) []string {
 	}
 	return ret
 }
+
+func forceString(target interface{}) string {
+	if target == nil {
+		return ""
+	}
+
+	return target.(string)
+}
