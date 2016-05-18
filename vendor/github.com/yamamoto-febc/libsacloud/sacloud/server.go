@@ -17,7 +17,7 @@ type Server struct {
 	Icon              *NumberResource `json:",omitempty"`
 	ServerPlan        *ProductServer  `json:",omitempty"`
 	Zone              *Zone           `json:",omitempty"`
-	Tags              []string        `json:",omitempty"`
+	Tags              []string        //`json:",omitempty"`
 	ConnectedSwitches []interface{}   `json:",omitempty" libsacloud:"requestOnly"`
 	//InterfaceNum      int            `json:",omitempty" libsacloud:"requestOnly"` !Not support! ConnectedSwitchesで代替
 	Disks      []Disk      `json:",omitempty"`

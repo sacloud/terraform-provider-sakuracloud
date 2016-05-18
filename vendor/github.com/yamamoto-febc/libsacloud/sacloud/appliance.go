@@ -21,7 +21,7 @@ type Appliance struct {
 	Icon         *Icon       `json:",omitempty"`
 	Switch       *Switch     `json:",omitempty"`
 	Interfaces   []Interface `json:",omitempty"`
-	Tags         []string    `json:",omitempty"`
+	Tags         []string    //`json:",omitempty"`
 }
 
 //HACK Appliance:Zone.IDがRoute/LoadBalancerの場合でデータ型が異なるため
