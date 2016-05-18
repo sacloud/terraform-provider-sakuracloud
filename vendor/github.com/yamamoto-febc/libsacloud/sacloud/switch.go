@@ -63,3 +63,24 @@ func (s *Switch) GetDefaultIPAddressesForVPCRouter() (string, string, string, er
 
 	return baseAddress.String(), address1.String(), address2.String(), nil
 }
+
+func (s *Switch) GetIPAddressList() ([]string, error) {
+	if s.Subnets == nil || len(s.Subnets) < 1 {
+		return nil, fmt.Errorf("switch[%s].Subnets is nil", s.ID)
+	}
+
+	//さくらのクラウドの仕様上/24までしか割り当てできないためこのロジックでOK
+	baseIP := net.ParseIP(s.Subnets[0].IPAddresses.Min).To4()
+	min := baseIP[3]
+	max := net.ParseIP(s.Subnets[0].IPAddresses.Max).To4()[3]
+
+	var i byte
+	ret := []string{}
+	for (min + i) <= max { //境界含む
+		ip := net.IPv4(baseIP[0], baseIP[1], baseIP[2], baseIP[3]+i)
+		ret = append(ret, ip.String())
+		i++
+	}
+
+	return ret, nil
+}
