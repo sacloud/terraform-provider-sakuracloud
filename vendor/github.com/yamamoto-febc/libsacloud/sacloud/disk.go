@@ -30,7 +30,7 @@ type Disk struct {
 	Server    *Server    `json:",omitempty"`
 	CreatedAt *time.Time `json:",omitempty"`
 	Icon      *Icon      `json:",omitempty"`
-	Tags      []string   `json:",omitempty"`
+	Tags      []string   //`json:",omitempty"`
 }
 
 var (

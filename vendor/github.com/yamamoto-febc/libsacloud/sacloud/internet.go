@@ -17,5 +17,5 @@ type Internet struct {
 	Icon           *Icon      `json:",omitempty"`
 	Zone           *Zone      `json:",omitempty"`
 	Switch         *Switch    `json:",omitempty"`
-	Tags           []string   `json:",omitempty"`
+	Tags           []string   //`json:",omitempty"`
 }

@@ -12,7 +12,7 @@ type Icon struct {
 	*EAvailability
 	CreatedAt  *time.Time `json:",omitempty"`
 	ModifiedAt *time.Time `json:",omitempty"`
-	Tags       []string   `json:",omitempty"`
+	Tags       []string   //`json:",omitempty"`
 }
 
 type Image string

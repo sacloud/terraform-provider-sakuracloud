@@ -14,9 +14,10 @@ Terraform provider for SakuraCloud. - `Terraform for さくらのクラウド`
   - Resource Configuration
     - [sakuracloud_server](#resource-configuration-sakuracloud_server)
     - [sakuracloud_disk](#resource-configuration-sakuracloud_disk)
-    - [sakuracloud_ssh_key](#resource-configuration-sakuracloud_ssh_key)
     - [sakuracloud_switch](#resource-configuration-sakuracloud_switch)
     - [sakuracloud_internet](#resource-configuration-sakuracloud_internet)
+    - [sakuracloud_note](#resource-configuration-sakuracloud_note)
+    - [sakuracloud_ssh_key](#resource-configuration-sakuracloud_ssh_key)
     - [sakuracloud_dns](#resource-configuration-sakuracloud_dns)
     - [sakuracloud_gslb](#resource-configuration-sakuracloud_gslb)
     - [sakuracloud_simple_monitor](#resource-configuration-sakuracloud_simple_monitor)
@@ -171,40 +172,6 @@ The following attributes are exported:
 * `disable_pw_auth` - The flag that to disable SSH login with password authentication / challenge-response.
 * `note_ids` - The ID list of Note.
 
-## Resource Configuration `sakuracloud_ssh_key`
-
-Provides a SakuraCloud SSHKey resource. This can be used to create, modify,
-and delete SSHKey.
-
-### Example Usage
-
-```
-resource "sakuracloud_ssh_key" "mykey" {
-    name = "mykey"
-    public_key = "ssh-rsa XXXXXXXXX....."
-    # or
-    #public_key = "${file("./id_rsa.pub")}"
-}
-```
-
-### Argument Reference
-
-The following arguments are supported:
-
-* `name` - (Required) The name of the SSHKey.
-* `public_key` - (Required) The value of the SSHKey.
-* `description` - (Optional) The description of the SSHKey.
-
-### Attributes Reference
-
-The following attributes are exported:
-
-* `id` - The ID of the SSHKey.
-* `name`- The name of the SSHKey.
-* `public_key` - The value of the SSHKey.
-* `description` - The description of the SSHKey.
-* `fingerprint` - The FingerPrint of the SSHKey.
-
 ## Resource Configuration `sakuracloud_switch`
 
 Provides a SakuraCloud Switch resource. This can be used to create, modify,
@@ -285,6 +252,77 @@ The following attributes are exported:
 * `nw_min_ipaddress` - The min ipaddress of alocated to the internet.
 * `nw_max_ipaddress` - The max ipaddress of alocated to the internet.
 * `nw_ipaddresses` - The ipaddress list of alocated to the internet..
+
+## Resource Configuration `sakuracloud_ssh_key`
+
+Provides a SakuraCloud SSHKey resource. This can be used to create, modify,
+and delete SSHKey.
+
+### Example Usage
+
+```
+resource "sakuracloud_ssh_key" "mykey" {
+    name = "mykey"
+    public_key = "ssh-rsa XXXXXXXXX....."
+    # or
+    #public_key = "${file("./id_rsa.pub")}"
+}
+```
+
+### Argument Reference
+
+The following arguments are supported:
+
+* `name` - (Required) The name of the SSHKey.
+* `public_key` - (Required) The value of the SSHKey.
+* `description` - (Optional) The description of the SSHKey.
+
+### Attributes Reference
+
+The following attributes are exported:
+
+* `id` - The ID of the SSHKey.
+* `name`- The name of the SSHKey.
+* `public_key` - The value of the SSHKey.
+* `description` - The description of the SSHKey.
+* `fingerprint` - The FingerPrint of the SSHKey.
+
+## Resource Configuration `sakuracloud_note`
+
+Provides a SakuraCloud Note resource. This can be used to create, modify,
+and delete Note.
+
+### Example Usage
+
+```
+resource "sakuracloud_note" "mynote" {
+    name = "mynote"
+    content = "#!/bin/sh ,,,,"
+    # or
+    #content = "${file("./example.sh")}"
+}
+```
+
+### Argument Reference
+
+The following arguments are supported:
+
+* `name` - (Required) The name of the note.
+* `content` - (Required) The value of the note.
+* `description` - (Optional) The description of the note.
+* `tags` - (Optional) The tags of the note.
+
+### Attributes Reference
+
+The following attributes are exported:
+
+* `id` - The ID of the note.
+* `name`- The name of the note.
+* `content` - The content of the note.
+* `description` - The description of the note.
+* `tags` - The tags of the note.
+
+
 
 ## Resource Configuration `sakuracloud_dns`
 
