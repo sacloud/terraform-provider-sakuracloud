@@ -254,7 +254,22 @@ func resourceSakuraCloudPacketFilterDelete(d *schema.ResourceData, meta interfac
 		client.Zone = zone.(string)
 	}
 
-	_, err := client.PacketFilter.Delete(d.Id())
+	servers, err := client.Server.Find()
+	if err != nil {
+		return fmt.Errorf("Couldn't find SakuraCloud Server resource: %s", err)
+	}
+	for _, server := range servers.Servers {
+		for _, i := range server.Interfaces {
+			if i.PacketFilter != nil && i.PacketFilter.ID == d.Id() {
+				_, err := client.Interface.DisconnectFromPacketFilter(i.ID)
+				if err != nil {
+					return fmt.Errorf("Error disconnecting SakuraCloud PacketFilter : %s", err)
+				}
+			}
+		}
+	}
+
+	_, err = client.PacketFilter.Delete(d.Id())
 	if err != nil {
 		return fmt.Errorf("Error deleting SakuraCloud PacketFilter resource: %s", err)
 	}

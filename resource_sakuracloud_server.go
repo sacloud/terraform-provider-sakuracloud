@@ -48,6 +48,12 @@ func resourceSakuraCloudServer() *schema.Resource {
 				MaxItems: 3,
 				Elem:     &schema.Schema{Type: schema.TypeString},
 			},
+			"packet_filter_ids": &schema.Schema{
+				Type:     schema.TypeList,
+				Optional: true,
+				MaxItems: 4,
+				Elem:     &schema.Schema{Type: schema.TypeString},
+			},
 			"description": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
@@ -145,6 +151,7 @@ func resourceSakuraCloudServerCreate(d *schema.ResourceData, meta interface{}) e
 			opts.Tags = expandStringList(rawTags.([]interface{}))
 		}
 	}
+
 	server, err := client.Server.Create(opts)
 	if err != nil {
 		return fmt.Errorf("Failed to create SakuraCloud Server resource: %s", err)
@@ -178,10 +185,26 @@ func resourceSakuraCloudServerCreate(d *schema.ResourceData, meta interface{}) e
 		}
 	}
 
+	if rawPacketFilterIDs, ok := d.GetOk("packet_filter_ids"); ok {
+		packetFilterIDs := rawPacketFilterIDs.([]interface{})
+		for i, filterID := range packetFilterIDs {
+			strFilterID := ""
+			if filterID != nil {
+				strFilterID = filterID.(string)
+			}
+			if server.Interfaces != nil && len(server.Interfaces) > i && strFilterID != "" {
+				_, err := client.Interface.ConnectToPacketFilter(server.Interfaces[i].ID, strFilterID)
+				if err != nil {
+					return fmt.Errorf("Error connecting packet filter: %s", err)
+				}
+			}
+		}
+	}
 	d.SetId(server.ID)
 
 	//boot
 	_, err = client.Server.Boot(d.Id())
+
 	if err != nil {
 		return fmt.Errorf("Failed to boot SakuraCloud Server resource: %s", err)
 	}
@@ -220,6 +243,8 @@ func resourceSakuraCloudServerRead(d *schema.ResourceData, meta interface{}) err
 
 	d.Set("description", server.Description)
 	d.Set("tags", server.Tags)
+
+	d.Set("packet_filter_ids", flattenPacketFilters(server.Interfaces))
 
 	//readonly values
 	d.Set("mac_addresses", flattenMacAddresses(server.Interfaces))
@@ -423,6 +448,44 @@ func resourceSakuraCloudServerUpdate(d *schema.ResourceData, meta interface{}) e
 		return fmt.Errorf("Error updating SakuraCloud Server resource: %s", err)
 	}
 	d.SetId(server.ID)
+
+	if d.HasChange("packet_filter_ids") {
+		if rawPacketFilterIDs, ok := d.GetOk("packet_filter_ids"); ok {
+			packetFilterIDs := rawPacketFilterIDs.([]interface{})
+			for i, filterID := range packetFilterIDs {
+				strFilterID := ""
+				if filterID != nil {
+					strFilterID = filterID.(string)
+				}
+				if server.Interfaces != nil && len(server.Interfaces) > i {
+					if server.Interfaces[i].PacketFilter != nil {
+						_, err := client.Interface.DisconnectFromPacketFilter(server.Interfaces[i].ID)
+						if err != nil {
+							return fmt.Errorf("Error disconnecting packet filter: %s", err)
+						}
+					}
+
+					if strFilterID != "" {
+						_, err := client.Interface.ConnectToPacketFilter(server.Interfaces[i].ID, filterID.(string))
+						if err != nil {
+							return fmt.Errorf("Error connecting packet filter: %s", err)
+						}
+					}
+				}
+			}
+		} else {
+			if server.Interfaces != nil {
+				for _, i := range server.Interfaces {
+					if i.PacketFilter != nil {
+						_, err := client.Interface.DisconnectFromPacketFilter(i.ID)
+						if err != nil {
+							return fmt.Errorf("Error disconnecting packet filter: %s", err)
+						}
+					}
+				}
+			}
+		}
+	}
 
 	if isNeedRestart && isRunning {
 		_, err := client.Server.Boot(d.Id())

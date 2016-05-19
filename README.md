@@ -85,6 +85,7 @@ The following arguments are supported:
    When `""` , it creates a NIC with empty connection.
 * `switched_interfaces` - (Optional) The ID list of to create a NIC to connect to switch.
    If `""` is specified , it creates a NIC with empty connection.
+* `packet_filter_ids` - (Optional) The ID list of the packet filter.
 * `description` - (Optional) The description of the server.
 * `tags` - (Optional) The tags of the server.
 * `zone` - (Optional) The zone of to create server.
@@ -103,6 +104,7 @@ The following attributes are exported:
 * `description` - The description of the server.
 * `tags` - The tags of the server.
 * `zone` - The zone of the server.
+* `packet_filter_ids` - The ID list of the packet filter.
 * `mac_addresses` - The MAC address list of the server.
 * `shared_nw_ipaddress` - The IP address that are connected to the shared segment.
 * `shared_nw_dns_servers` - The IP address list of server's region on.
@@ -196,6 +198,7 @@ The following arguments are supported:
 * `name` - (Required) The name of the switch.
 * `description` - (Optional) The description of the switch.
 * `tags` - (Optional) The tags of the switch.
+* `bridge_id` - (Optional) The ID of the bridge.
 * `zone` - (Optional) The zone of the switch.
 
 ### Attributes Reference
@@ -205,6 +208,7 @@ The following attributes are exported:
 * `id` - The ID of the switch.
 * `name`- The name of the switch.
 * `description` - The description of the switch.
+* `bridge_id` - The ID of the bridge.
 * `tags` - The tags of the switch.
 * `zone` - The zone of the switch.
 * `server_ids` - The ID list of connected server.

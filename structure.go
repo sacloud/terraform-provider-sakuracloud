@@ -75,6 +75,23 @@ func flattenInterfaces(interfaces []sacloud.Interface) []interface{} {
 	return ret
 }
 
+func flattenPacketFilters(interfaces []sacloud.Interface) []string {
+	var ret []string
+	var isExists = false
+	for _, i := range interfaces {
+		id := ""
+		if i.PacketFilter != nil {
+			id = i.PacketFilter.ID
+			isExists = true
+		}
+		ret = append(ret, id)
+	}
+	if !isExists {
+		return []string{}
+	}
+	return ret
+}
+
 func flattenMacAddresses(interfaces []sacloud.Interface) []string {
 	var ret []string
 	for _, i := range interfaces {
