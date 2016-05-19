@@ -80,7 +80,7 @@ func resourceSakuraCloudBridgeRead(d *schema.ResourceData, meta interface{}) err
 	d.Set("description", bridge.Description)
 
 	if bridge.Info != nil && bridge.Info.Switches != nil && len(bridge.Info.Switches) > 0 {
-		d.Set("server_ids", flattenSwitches(bridge.Info.Switches))
+		d.Set("switch_ids", flattenSwitches(bridge.Info.Switches))
 	} else {
 		d.Set("switch_ids", []string{})
 	}
@@ -131,7 +131,21 @@ func resourceSakuraCloudBridgeDelete(d *schema.ResourceData, meta interface{}) e
 		client.Zone = zone.(string)
 	}
 
-	_, err := client.Bridge.Delete(d.Id())
+	br, err := client.Bridge.Read(d.Id())
+	if err != nil {
+		return fmt.Errorf("Couldn't find SakuraCloud Bridge resource: %s", err)
+	}
+
+	if br.Info != nil && br.Info.Switches != nil && len(br.Info.Switches) > 0 {
+		for _, s := range br.Info.Switches {
+			_, err = client.Switch.DisconnectFromBridge(s.ID)
+		}
+		if err != nil {
+			return fmt.Errorf("Error disconnecting Bridge resource: %s", err)
+		}
+	}
+
+	_, err = client.Bridge.Delete(d.Id())
 	if err != nil {
 		return fmt.Errorf("Error deleting SakuraCloud Bridge resource: %s", err)
 	}

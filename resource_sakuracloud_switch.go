@@ -28,6 +28,10 @@ func resourceSakuraCloudSwitch() *schema.Resource {
 				Optional: true,
 				Elem:     &schema.Schema{Type: schema.TypeString},
 			},
+			"bridge_id": &schema.Schema{
+				Type:     schema.TypeString,
+				Optional: true,
+			},
 			"server_ids": &schema.Schema{
 				Type:     schema.TypeList,
 				Computed: true,
@@ -46,6 +50,9 @@ func resourceSakuraCloudSwitch() *schema.Resource {
 }
 
 func resourceSakuraCloudSwitchCreate(d *schema.ResourceData, meta interface{}) error {
+
+	d.Partial(true)
+
 	c := meta.(*api.Client)
 	client := c.Clone()
 	zone, ok := d.GetOk("zone")
@@ -69,7 +76,24 @@ func resourceSakuraCloudSwitchCreate(d *schema.ResourceData, meta interface{}) e
 		return fmt.Errorf("Failed to create SakuraCloud Switch resource: %s", err)
 	}
 
+	d.SetPartial("name")
+	d.SetPartial("tag")
+	d.SetPartial("description")
+
+	if bridgeID, ok := d.GetOk("bridge_id"); ok {
+		brID := bridgeID.(string)
+		if brID != "" {
+			_, err := client.Switch.ConnectToBridge(sw.ID, brID)
+			if err != nil {
+				return fmt.Errorf("Failed to create SakuraCloud Switch resource: %s", err)
+			}
+		}
+		d.SetPartial("bridge_id")
+	}
+
 	d.SetId(sw.ID)
+
+	d.Partial(false)
 	return resourceSakuraCloudSwitchRead(d, meta)
 }
 
@@ -101,12 +125,19 @@ func resourceSakuraCloudSwitchRead(d *schema.ResourceData, meta interface{}) err
 		d.Set("server_ids", []string{})
 	}
 
+	if sw.Bridge != nil {
+		d.Set("bridge_id", sw.Bridge.ID)
+	} else {
+		d.Set("bridge_id", "")
+	}
+
 	d.Set("zone", client.Zone)
 
 	return nil
 }
 
 func resourceSakuraCloudSwitchUpdate(d *schema.ResourceData, meta interface{}) error {
+	d.Partial(true)
 	c := meta.(*api.Client)
 	client := c.Clone()
 	zone, ok := d.GetOk("zone")
@@ -141,7 +172,38 @@ func resourceSakuraCloudSwitchUpdate(d *schema.ResourceData, meta interface{}) e
 		return fmt.Errorf("Error updating SakuraCloud Switch resource: %s", err)
 	}
 
+	d.SetPartial("name")
+	d.SetPartial("description")
+	d.SetPartial("tags")
+
+	if d.HasChange("bridge_id") {
+		if bridgeID, ok := d.GetOk("bridge_id"); ok {
+			brID := bridgeID.(string)
+			if brID == "" && sw.Bridge != nil {
+				_, err := client.Switch.DisconnectFromBridge(sw.ID)
+				if err != nil {
+					return fmt.Errorf("Failed to disconnect bridge: %s", err)
+				}
+			} else {
+				_, err := client.Switch.ConnectToBridge(sw.ID, brID)
+				if err != nil {
+					return fmt.Errorf("Failed to connect bridge: %s", err)
+				}
+			}
+			d.SetPartial("bridge_id")
+		} else {
+			if sw.Bridge != nil {
+				_, err := client.Switch.DisconnectFromBridge(sw.ID)
+				if err != nil {
+					return fmt.Errorf("Failed to disconnect bridge: %s", err)
+				}
+			}
+		}
+	}
+
 	d.SetId(sw.ID)
+	d.Partial(false)
+
 	return resourceSakuraCloudSwitchRead(d, meta)
 }
 
@@ -172,6 +234,18 @@ func resourceSakuraCloudSwitchDelete(d *schema.ResourceData, meta interface{}) e
 				return fmt.Errorf("Error stopping SakuraCloud Server resource: %s", err)
 			}
 		}
+	}
+
+	sw, err := client.Switch.Read(d.Id())
+	if err != nil {
+		return fmt.Errorf("Couldn't find SakuraCloud Servers: %s", err)
+	}
+	if sw.Bridge != nil {
+		_, err = client.Switch.DisconnectFromBridge(sw.ID)
+		if err != nil {
+			return fmt.Errorf("Couldn't disconnect from bridge: %s", err)
+		}
+
 	}
 
 	_, err = client.Switch.Delete(d.Id())
