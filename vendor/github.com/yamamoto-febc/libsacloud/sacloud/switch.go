@@ -20,7 +20,7 @@ type Switch struct {
 	ServerClass string     `json:",omitempty"`
 	CreatedAt   *time.Time `json:",omitempty"`
 	Icon        *Icon      `json:",omitempty"`
-	Tags        []string   `json:",omitempty"`
+	Tags        []string   //`json:",omitempty"`
 	Subnets     []Subnet   `json:",omitempty"`
 	IPv6Nets    []IPv6Net  `json:",omitempty"`
 	Internet    *Internet  `json:",omitempty"`

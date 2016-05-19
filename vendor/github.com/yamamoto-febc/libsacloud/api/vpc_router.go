@@ -106,6 +106,128 @@ func (api *VPCRouterAPI) Delete(id string) (*sacloud.VPCRouter, error) {
 	})
 }
 
+func (api *VPCRouterAPI) Config(id string) (bool, error) {
+	var (
+		method = "PUT"
+		uri    = fmt.Sprintf("%s/%s/config", api.getResourceURL(), id)
+	)
+	return api.modify(method, uri, nil)
+}
+
+func (api *VPCRouterAPI) ConnectToSwitch(id string, switchID string, nicIndex int) (bool, error) {
+	var (
+		method = "PUT"
+		uri    = fmt.Sprintf("%s/%s/interface/%d/to/switch/%s", api.getResourceURL(), id, nicIndex, switchID)
+	)
+	return api.modify(method, uri, nil)
+}
+
+func (api *VPCRouterAPI) DisconnectFromSwitch(id string, switchID string, nicIndex int) (bool, error) {
+	var (
+		method = "DELETE"
+		uri    = fmt.Sprintf("%s/%s/interface/%d/to/switch/%s", api.getResourceURL(), id, nicIndex, switchID)
+	)
+	return api.modify(method, uri, nil)
+}
+
+func (api *VPCRouterAPI) IsUp(id string) (bool, error) {
+	router, err := api.Read(id)
+	if err != nil {
+		return false, err
+	}
+	return router.Instance.IsUp(), nil
+}
+
+func (api *VPCRouterAPI) IsDown(id string) (bool, error) {
+	router, err := api.Read(id)
+	if err != nil {
+		return false, err
+	}
+	return router.Instance.IsDown(), nil
+}
+
+// Boot power on
+func (api *VPCRouterAPI) Boot(id string) (bool, error) {
+	var (
+		method = "PUT"
+		uri    = fmt.Sprintf("%s/%s/power", api.getResourceURL(), id)
+	)
+	return api.modify(method, uri, nil)
+}
+
+// Shutdown power off
+func (api *VPCRouterAPI) Shutdown(id string) (bool, error) {
+	var (
+		method = "DELETE"
+		uri    = fmt.Sprintf("%s/%s/power", api.getResourceURL(), id)
+	)
+
+	return api.modify(method, uri, nil)
+}
+
+// Stop force shutdown
+func (api *VPCRouterAPI) Stop(id string) (bool, error) {
+	var (
+		method = "DELETE"
+		uri    = fmt.Sprintf("%s/%s/power", api.getResourceURL(), id)
+	)
+
+	return api.modify(method, uri, map[string]bool{"Force": true})
+}
+
+func (api *VPCRouterAPI) RebootForce(id string) (bool, error) {
+	var (
+		method = "PUT"
+		uri    = fmt.Sprintf("%s/%s/reset", api.getResourceURL(), id)
+	)
+
+	return api.modify(method, uri, nil)
+}
+
+func (api *VPCRouterAPI) SleepUntilUp(routerID string, timeout time.Duration) error {
+	current := 0 * time.Second
+	interval := 5 * time.Second
+	for {
+
+		up, err := api.IsUp(routerID)
+		if err != nil {
+			return err
+		}
+
+		if up {
+			return nil
+		}
+		time.Sleep(interval)
+		current += interval
+
+		if timeout > 0 && current > timeout {
+			return fmt.Errorf("Timeout: WaitforAvailable")
+		}
+	}
+}
+
+func (api *VPCRouterAPI) SleepUntilDown(routerID string, timeout time.Duration) error {
+	current := 0 * time.Second
+	interval := 5 * time.Second
+	for {
+
+		down, err := api.IsDown(routerID)
+		if err != nil {
+			return err
+		}
+
+		if down {
+			return nil
+		}
+		time.Sleep(interval)
+		current += interval
+
+		if timeout > 0 && current > timeout {
+			return fmt.Errorf("Timeout: WaitforAvailable")
+		}
+	}
+}
+
 // SleepWhileCopying wait until became to available
 func (api *VPCRouterAPI) SleepWhileCopying(vpcRouterID string, timeout time.Duration) error {
 	current := 0 * time.Second
@@ -127,3 +249,53 @@ func (api *VPCRouterAPI) SleepWhileCopying(vpcRouterID string, timeout time.Dura
 		}
 	}
 }
+
+//func (api *VPCRouterAPI) AddStandardInterface(routerID string, switchID string, ipaddress string, maskLen int) error {
+//	return api.addInterface(routerID, switchID, &sacloud.VPCRouterInterface{
+//		IPAddress:        []string{ipaddress},
+//		NetworkMaskLen:   maskLen,
+//		VirtualIPAddress: "",
+//	})
+//}
+//
+//func (api *VPCRouterAPI) AddPremiumInterface(routerID string, switchID string, ipaddresses []string, maskLen int, virtualIP string) error {
+//	return api.addInterface(routerID, switchID, &sacloud.VPCRouterInterface{
+//		IPAddress:        ipaddresses,
+//		NetworkMaskLen:   maskLen,
+//		VirtualIPAddress: virtualIP,
+//	})
+//}
+//
+//func (api *VPCRouterAPI) addInterface(routerID string, switchID string, routerNIC *sacloud.VPCRouterInterface) error {
+//	router, err := api.Read(routerID)
+//	if err != nil {
+//		return err
+//	}
+//
+//	req := &sacloud.VPCRouter{Settings: &sacloud.VPCRouterSettings{}}
+//
+//	if router.Settings == nil {
+//		req.Settings = &sacloud.VPCRouterSettings{
+//			Router: &sacloud.VPCRouterSetting{
+//				Interfaces: []*sacloud.VPCRouterInterface{nil},
+//			},
+//		}
+//	} else {
+//		req.Settings.Router = router.Settings.Router
+//	}
+//
+//	//connect to switch
+//	//_, err = api.ConnectToSwitch(routerID, switchID, len(req.Settings.Router.Interfaces)+1)
+//	//if err != nil {
+//	//	return err
+//	//}
+//
+//	req.Settings.Router.Interfaces = append(req.Settings.Router.Interfaces, routerNIC)
+//
+//	_, err = api.Update(routerID, req)
+//	if err != nil {
+//		return err
+//	}
+//
+//	return nil
+//}

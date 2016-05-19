@@ -55,3 +55,19 @@ func (api *InterfaceAPI) DisconnectFromSwitch(interfaceID string) (bool, error) 
 func (api *InterfaceAPI) Monitor(id string, body *sacloud.ResourceMonitorRequest) (*sacloud.MonitorValues, error) {
 	return api.baseAPI.monitor(id, body)
 }
+
+func (api *PacketFilterAPI) ConnectToPacketFilter(interfaceID string, packetFilterID string) (bool, error) {
+	var (
+		method = "PUT"
+		uri    = fmt.Sprintf("/%s/%s/to/packetfilter/%s", api.getResourceURL(), interfaceID, packetFilterID)
+	)
+	return api.modify(method, uri, nil)
+}
+
+func (api *PacketFilterAPI) DisconnectFromPacketFilter(interfaceID string) (bool, error) {
+	var (
+		method = "DELTE"
+		uri    = fmt.Sprintf("/%s/%s/to/packetfilter", api.getResourceURL(), interfaceID)
+	)
+	return api.modify(method, uri, nil)
+}

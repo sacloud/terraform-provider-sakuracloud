@@ -17,6 +17,7 @@ Terraform provider for SakuraCloud. - `Terraform for さくらのクラウド`
     - [sakuracloud_ssh_key](#resource-configuration-sakuracloud_ssh_key)
     - [sakuracloud_switch](#resource-configuration-sakuracloud_switch)
     - [sakuracloud_internet](#resource-configuration-sakuracloud_internet)
+    - [sakuracloud_bridge](#resource-configuration-sakuracloud_bridge)
     - [sakuracloud_dns](#resource-configuration-sakuracloud_dns)
     - [sakuracloud_gslb](#resource-configuration-sakuracloud_gslb)
     - [sakuracloud_simple_monitor](#resource-configuration-sakuracloud_simple_monitor)
@@ -284,7 +285,42 @@ The following attributes are exported:
 * `nw_gateway` - The ipaddress of gateway.
 * `nw_min_ipaddress` - The min ipaddress of alocated to the internet.
 * `nw_max_ipaddress` - The max ipaddress of alocated to the internet.
-* `nw_ipaddresses` - The ipaddress list of alocated to the internet..
+* `nw_ipaddresses` - The ipaddress list of alocated to the internet.
+
+## Resource Configuration `sakuracloud_bridge`
+
+Provides a SakuraCloud Bridge resource. This can be used to create, modify,
+and delete Bridge.
+
+### Example Usage
+
+```
+resource "sakuracloud_bridge" "mybridge" {
+    name = "mybridge"
+    description = "BRIDGE from terraform for SAKURA CLOUD"
+    zone = "is1a"
+}
+```
+
+### Argument Reference
+
+The following arguments are supported:
+
+* `name` - (Required) The name of the bridge.
+* `description` - (Optional) The description of the bridge.
+* `zone` - (Optional) The zone of the bridge.
+
+
+### Attributes Reference
+
+The following attributes are exported:
+
+* `id` - The ID of the bridge.
+* `name`- The name of the bridge.
+* `description` - The description of the bridge.
+* `zone` - The zone of the bridge.
+* `switch_ids` - The ID list of connected switches.
+
 
 ## Resource Configuration `sakuracloud_dns`
 

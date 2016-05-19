@@ -16,7 +16,7 @@ type SimpleMonitor struct {
 	ModifiedAt   *time.Time             `json:",omitempty"`
 	Provider     *SimpleMonitorProvider `json:",omitempty"`
 	Icon         *Icon                  `json:",omitempty"`
-	Tags         []string               `json:",omitempty"`
+	Tags         []string               //`json:",omitempty"`
 }
 
 // SimpleMonitorSettings type of SimpleMonitorSettings

@@ -93,7 +93,7 @@ func (api *PacketFilterAPI) SortByName(reverse bool) *PacketFilterAPI {
 ************************************************/
 
 func (api *PacketFilterAPI) New() *sacloud.PacketFilter {
-	return &sacloud.PacketFilter{}
+	return sacloud.CreateNewPacketFilter()
 }
 
 func (api *PacketFilterAPI) Create(value *sacloud.PacketFilter) (*sacloud.PacketFilter, error) {

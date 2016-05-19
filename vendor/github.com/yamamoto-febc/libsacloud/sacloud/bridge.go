@@ -6,20 +6,13 @@ type Bridge struct {
 	*Resource
 	Name        string `json:",omitempty"`
 	Description string `json:",omitempty"`
-	Info        struct {
-		Switched []struct {
-			*Resource
-			Name string `json:",omitempty"`
-			Zone []struct {
-				*NumberResource
-				Name string `json:",omitempty"`
-			}
-		}
+	Info        *struct {
+		Switches []Switch
 	}
 	ServiceClass string     `json:",omitempty"`
 	CreatedAt    *time.Time `json:",omitempty"`
 	Region       *Region    `json:",omitempty"`
-	SwitchInZone struct {
+	SwitchInZone *struct {
 		*Resource
 		Name           string `json:",omitempty"`
 		ServerCount    int    `json:",omitempty"`

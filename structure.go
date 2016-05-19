@@ -48,6 +48,14 @@ func flattenServers(servers []sacloud.Server) []string {
 
 }
 
+func flattenSwitches(switches []sacloud.Switch) []string {
+	var ids []string
+	for _, d := range switches {
+		ids = append(ids, d.ID)
+	}
+	return ids
+}
+
 func flattenInterfaces(interfaces []sacloud.Interface) []interface{} {
 	var ret []interface{}
 	for index, i := range interfaces {

@@ -12,16 +12,13 @@ type Appliance struct {
 	SettingHash string `json:",omitempty"`
 	//Remark      *ApplianceRemark `json:",omitempty"`
 	*EAvailability
-	Instance *struct {
-		Status          string     `json:",omitempty"`
-		StatusChangedAt *time.Time `json:",omitempty"`
-	} `json:",omitempty"`
-	ServiceClass string      `json:",omitempty"`
-	CreatedAt    *time.Time  `json:",omitempty"`
-	Icon         *Icon       `json:",omitempty"`
-	Switch       *Switch     `json:",omitempty"`
-	Interfaces   []Interface `json:",omitempty"`
-	Tags         []string    `json:",omitempty"`
+	Instance     *EServerInstanceStatus `json:",omitempty"`
+	ServiceClass string                 `json:",omitempty"`
+	CreatedAt    *time.Time             `json:",omitempty"`
+	Icon         *Icon                  `json:",omitempty"`
+	Switch       *Switch                `json:",omitempty"`
+	Interfaces   []Interface            `json:",omitempty"`
+	Tags         []string               //`json:",omitempty"`
 }
 
 //HACK Appliance:Zone.IDがRoute/LoadBalancerの場合でデータ型が異なるため

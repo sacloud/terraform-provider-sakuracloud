@@ -35,6 +35,7 @@ func Provider() terraform.ResourceProvider {
 			},
 		},
 		ResourcesMap: map[string]*schema.Resource{
+			"sakuracloud_bridge":         resourceSakuraCloudBridge(),
 			"sakuracloud_disk":           resourceSakuraCloudDisk(),
 			"sakuracloud_dns":            resourceSakuraCloudDNS(),
 			"sakuracloud_gslb":           resourceSakuraCloudGSLB(),
