@@ -20,6 +20,10 @@ type PacketFilter struct {
 	Expression []*PacketFilterExpression `json:",omitempty"`
 }
 
+func AllowPacketFilterProtocol() []string {
+	return []string{"tcp", "udp", "icmp", "fragment", "ip"}
+}
+
 type PacketFilterExpression struct {
 	Protocol        string `json:",omitempty"`
 	SourceNetwork   string `json:",omitempty"`

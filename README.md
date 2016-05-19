@@ -16,6 +16,7 @@ Terraform provider for SakuraCloud. - `Terraform for さくらのクラウド`
     - [sakuracloud_disk](#resource-configuration-sakuracloud_disk)
     - [sakuracloud_switch](#resource-configuration-sakuracloud_switch)
     - [sakuracloud_internet](#resource-configuration-sakuracloud_internet)
+    - [sakuracloud_packet_filter](#resource-configuration-sakuracloud_packet_filter)
     - [sakuracloud_bridge](#resource-configuration-sakuracloud_bridge)
     - [sakuracloud_note](#resource-configuration-sakuracloud_note)
     - [sakuracloud_ssh_key](#resource-configuration-sakuracloud_ssh_key)
@@ -253,6 +254,65 @@ The following attributes are exported:
 * `nw_min_ipaddress` - The min ipaddress of alocated to the internet.
 * `nw_max_ipaddress` - The max ipaddress of alocated to the internet.
 * `nw_ipaddresses` - The ipaddress list of alocated to the internet.
+
+## Resource Configuration `sakuracloud_packet_filter`
+
+Provides a SakuraCloud PacketFilter resource. This can be used to create, modify,
+and delete PacketFilter.
+
+### Example Usage
+
+```
+resource "sakuracloud_packet_filter" "myfilter" {
+    name = "myfilter"
+    description = "PacketFilter from terraform for SAKURA CLOUD"
+    exprettions = {
+        protocol = "tcp"
+        source_nw = "192.168.2.0/24"
+        source_port = "0-65535"
+        dest_port = "80"
+        allow = true
+    }
+    exprettions = {
+        protocol = "ip"
+        source_nw = "0.0.0.0"
+        allow = false
+        description = "Deny all"
+    }
+}
+```
+
+### Argument Reference
+
+The following arguments are supported:
+
+* `name` - (Required) The name of the packet filter.
+* `description` - (Optional) The description of the packet filter.
+* `zone` - (Optional) The zone of the packet filter.
+* `exprettions` - (Required) The expression list of filter.
+  * `protocol` - (Required) The protocol of the expression. Following values is allowed [`tcp`,`udp`,`icmp`,`fragment`,`ip`].
+  * `source_nw` - (Required) The source network address of the expression.
+  * `source_port` - (Required) The source port of the expression.
+  * `dest_port` - (Required) The destination port of the expression.
+  * `allow` - (Required) The allow flag of athe expression.
+  * `description` - (Required) The description of the expression.
+
+### Attributes Reference
+
+The following attributes are exported:
+
+* `id` - The ID of the packet filter.
+* `name`- The name of the packet filter.
+* `description` - The description of the packet filter.
+* `zone` - The zone of the packet filter.
+* `exprettions` - The expression list of filter.
+  * `protocol` - The protocol of the expression.
+  * `source_nw` - The source network address of the expression.
+  * `source_port` - The source port of the expression.
+  * `dest_port` - The destination port of the expression.
+  * `allow` - The allow flag of athe expression.
+  * `description` - The description of the expression.
+
 
 ## Resource Configuration `sakuracloud_bridge`
 

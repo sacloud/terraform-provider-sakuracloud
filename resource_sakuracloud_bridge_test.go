@@ -71,7 +71,7 @@ func testAccCheckSakuraCloudBridgeExists(n string, bridge *sacloud.Bridge) resou
 
 		client := testAccProvider.Meta().(*api.Client)
 		originalZone := client.Zone
-		client.Zone = "tk1v"
+		client.Zone = "is1a"
 		defer func() { client.Zone = originalZone }()
 
 		foundBridge, err := client.Bridge.Read(rs.Primary.ID)
@@ -93,7 +93,7 @@ func testAccCheckSakuraCloudBridgeExists(n string, bridge *sacloud.Bridge) resou
 func testAccCheckSakuraCloudBridgeDestroy(s *terraform.State) error {
 	client := testAccProvider.Meta().(*api.Client)
 	originalZone := client.Zone
-	client.Zone = "tk1v"
+	client.Zone = "is1a"
 	defer func() { client.Zone = originalZone }()
 
 	for _, rs := range s.RootModule().Resources {
