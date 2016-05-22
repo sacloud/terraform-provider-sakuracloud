@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"github.com/yamamoto-febc/libsacloud/sacloud"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -188,7 +189,15 @@ func (c *Client) newRequest(method, uri string, body interface{}) ([]byte, error
 		log.Printf("[libsacloud:Client#response] : %s", string(data))
 	}
 	if !c.isOkStatus(resp.StatusCode) {
-		return nil, fmt.Errorf("Error in response: %s", data)
+
+		errResponse := &sacloud.ResultErrorValue{}
+		err := json.Unmarshal(data, errResponse)
+
+		if err != nil {
+			return nil, fmt.Errorf("Error in response: %s", string(data))
+		}
+		return nil, fmt.Errorf("Error in response: %#v", errResponse)
+
 	}
 	if err != nil {
 		return nil, err

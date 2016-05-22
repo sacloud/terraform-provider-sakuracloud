@@ -192,9 +192,17 @@ resource "sakuracloud_internet" "foobar" {
 var testAccCheckSakuraCloudInternetConfig_with_server = `
 resource "sakuracloud_server" "foobar" {
     name = "myserver"
+    disks = ["${sakuracloud_disk.foobar.id}"]
     description = "Server from TerraForm for SAKURA CLOUD"
     tags = ["@virtio-net-pci"]
-    shared_interface = "${sakuracloud_internet.foobar.switch_id}"
+    base_interface = "${sakuracloud_internet.foobar.switch_id}"
+    base_nw_ipaddress = "${sakuracloud_internet.foobar.nw_ipaddresses.0}"
+    base_nw_gateway = "${sakuracloud_internet.foobar.nw_gateway}"
+    base_nw_mask_len = "${sakuracloud_internet.foobar.nw_mask_len}"
+    zone = "tk1v"
+}
+resource "sakuracloud_disk" "foobar"{
+    name = "mydisk"
     zone = "tk1v"
 }
 resource "sakuracloud_internet" "foobar" {

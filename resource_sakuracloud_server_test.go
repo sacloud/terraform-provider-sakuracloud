@@ -28,9 +28,9 @@ func TestAccSakuraCloudServer_Basic(t *testing.T) {
 					resource.TestCheckResourceAttr(
 						"sakuracloud_server.foobar", "disks.#", "1"),
 					resource.TestCheckResourceAttr(
-						"sakuracloud_server.foobar", "shared_interface", "shared"),
+						"sakuracloud_server.foobar", "base_interface", "shared"),
 					resource.TestCheckResourceAttr(
-						"sakuracloud_server.foobar", "switched_interfaces.#", "0"),
+						"sakuracloud_server.foobar", "additional_interfaces.#", "0"),
 					resource.TestCheckResourceAttr(
 						"sakuracloud_server.foobar", "mac_addresses.#", "1"),
 				),
@@ -58,9 +58,9 @@ func TestAccSakuraCloudServer_Update(t *testing.T) {
 					resource.TestCheckResourceAttr(
 						"sakuracloud_server.foobar", "disks.#", "1"),
 					resource.TestCheckResourceAttr(
-						"sakuracloud_server.foobar", "shared_interface", "shared"),
+						"sakuracloud_server.foobar", "base_interface", "shared"),
 					resource.TestCheckResourceAttr(
-						"sakuracloud_server.foobar", "switched_interfaces.#", "0"),
+						"sakuracloud_server.foobar", "additional_interfaces.#", "0"),
 					resource.TestCheckResourceAttr(
 						"sakuracloud_server.foobar", "mac_addresses.#", "1"),
 				),
@@ -77,9 +77,9 @@ func TestAccSakuraCloudServer_Update(t *testing.T) {
 					resource.TestCheckResourceAttr(
 						"sakuracloud_server.foobar", "disks.#", "1"),
 					resource.TestCheckResourceAttr(
-						"sakuracloud_server.foobar", "shared_interface", "shared"),
+						"sakuracloud_server.foobar", "base_interface", "shared"),
 					resource.TestCheckResourceAttr(
-						"sakuracloud_server.foobar", "switched_interfaces.#", "0"),
+						"sakuracloud_server.foobar", "additional_interfaces.#", "0"),
 					resource.TestCheckResourceAttr(
 						"sakuracloud_server.foobar", "mac_addresses.#", "1"),
 				),
@@ -101,9 +101,9 @@ func TestAccSakuraCloudServer_EditConnections(t *testing.T) {
 					testAccCheckSakuraCloudServerExists("sakuracloud_server.foobar", &server),
 					testAccCheckSakuraCloudServerAttributes(&server),
 					resource.TestCheckResourceAttr(
-						"sakuracloud_server.foobar", "shared_interface", "shared"),
+						"sakuracloud_server.foobar", "base_interface", "shared"),
 					resource.TestCheckResourceAttr(
-						"sakuracloud_server.foobar", "switched_interfaces.#", "0"),
+						"sakuracloud_server.foobar", "additional_interfaces.#", "0"),
 					resource.TestCheckResourceAttr(
 						"sakuracloud_server.foobar", "mac_addresses.#", "1"),
 				),
@@ -114,9 +114,9 @@ func TestAccSakuraCloudServer_EditConnections(t *testing.T) {
 					testAccCheckSakuraCloudServerExists("sakuracloud_server.foobar", &server),
 					testAccCheckSakuraCloudServerAttributes(&server),
 					resource.TestCheckResourceAttr(
-						"sakuracloud_server.foobar", "shared_interface", "shared"),
+						"sakuracloud_server.foobar", "base_interface", "shared"),
 					resource.TestCheckResourceAttr(
-						"sakuracloud_server.foobar", "switched_interfaces.#", "1"),
+						"sakuracloud_server.foobar", "additional_interfaces.#", "1"),
 					resource.TestCheckResourceAttr(
 						"sakuracloud_server.foobar", "mac_addresses.#", "2"),
 				),
@@ -127,9 +127,9 @@ func TestAccSakuraCloudServer_EditConnections(t *testing.T) {
 					testAccCheckSakuraCloudServerExists("sakuracloud_server.foobar", &server),
 					testAccCheckSakuraCloudServerAttributes(&server),
 					resource.TestCheckResourceAttr(
-						"sakuracloud_server.foobar", "shared_interface", "shared"),
+						"sakuracloud_server.foobar", "base_interface", "shared"),
 					resource.TestCheckResourceAttr(
-						"sakuracloud_server.foobar", "switched_interfaces.#", "3"),
+						"sakuracloud_server.foobar", "additional_interfaces.#", "3"),
 					resource.TestCheckResourceAttr(
 						"sakuracloud_server.foobar", "mac_addresses.#", "4"),
 				),
@@ -140,9 +140,9 @@ func TestAccSakuraCloudServer_EditConnections(t *testing.T) {
 					testAccCheckSakuraCloudServerExists("sakuracloud_server.foobar", &server),
 					testAccCheckSakuraCloudServerAttributesWithoutSharedInterface(&server),
 					resource.TestCheckResourceAttr(
-						"sakuracloud_server.foobar", "shared_interface", ""),
+						"sakuracloud_server.foobar", "base_interface", ""),
 					resource.TestCheckResourceAttr(
-						"sakuracloud_server.foobar", "switched_interfaces.#", "0"),
+						"sakuracloud_server.foobar", "additional_interfaces.#", "0"),
 					resource.TestCheckResourceAttr(
 						"sakuracloud_server.foobar", "mac_addresses.#", "1"),
 				),
@@ -317,7 +317,7 @@ resource "sakuracloud_server" "foobar" {
     name = "myserver"
     disks = ["${sakuracloud_disk.foobar.id}"]
     description = "Server from TerraForm for SAKURA CLOUD"
-    switched_interfaces = [""]
+    additional_interfaces = [""]
     tags = ["@virtio-net-pci"]
     zone = "tk1v"
 }
@@ -333,7 +333,7 @@ resource "sakuracloud_server" "foobar" {
     name = "myserver"
     disks = ["${sakuracloud_disk.foobar.id}"]
     description = "Server from TerraForm for SAKURA CLOUD"
-    switched_interfaces = ["","",""]
+    additional_interfaces = ["","",""]
     tags = ["@virtio-net-pci"]
     zone = "tk1v"
 }
@@ -350,7 +350,7 @@ resource "sakuracloud_server" "foobar" {
     name = "myserver"
     disks = ["${sakuracloud_disk.foobar.id}"]
     description = "Server from TerraForm for SAKURA CLOUD"
-    shared_interface = ""
+    base_interface = ""
     tags = ["@virtio-net-pci"]
     zone = "tk1v"
 }
@@ -370,8 +370,8 @@ resource "sakuracloud_packet_filter" "foobar2" {
 }
 resource "sakuracloud_server" "foobar" {
     name = "myserver"
-    shared_interface = "shared"
-    switched_interfaces = [""]
+    base_interface = "shared"
+    additional_interfaces = [""]
     packet_filter_ids = ["" , "${sakuracloud_packet_filter.foobar2.id}"]
     zone = "is1a"
 }
@@ -404,8 +404,8 @@ resource "sakuracloud_packet_filter" "foobar2" {
 }
 resource "sakuracloud_server" "foobar" {
     name = "myserver_upd"
-    shared_interface = "shared"
-    switched_interfaces = [""]
+    base_interface = "shared"
+    additional_interfaces = [""]
     packet_filter_ids = ["${sakuracloud_packet_filter.foobar1.id}" , "${sakuracloud_packet_filter.foobar2.id}"]
     zone = "is1a"
 }
@@ -415,8 +415,8 @@ resource "sakuracloud_server" "foobar" {
 const testAccCheckSakuraCloudServerConfig_with_packet_filter_del = `
 resource "sakuracloud_server" "foobar" {
     name = "myserver_upd"
-    shared_interface = "shared"
-    switched_interfaces = [""]
+    base_interface = "shared"
+    additional_interfaces = [""]
     zone = "is1a"
 }
 

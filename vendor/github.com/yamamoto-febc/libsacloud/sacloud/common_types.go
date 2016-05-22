@@ -184,6 +184,14 @@ type Response struct {
 	*SakuraCloudResources
 }
 
+type ResultErrorValue struct {
+	IsFatal      bool   `json:"is_fatal,omitempty"`
+	Serial       string `json:"serial,omitempty"`
+	Status       string `json:"status,omitempty"`
+	ErrorCode    string `json:"error_code,omitempty"`
+	ErrorMessage string `json:"error_msg,omitempty"`
+}
+
 type MigrationJobStatus struct {
 	Status string `json:",omitempty"`
 	Delays *struct {

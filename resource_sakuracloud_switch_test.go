@@ -158,7 +158,7 @@ resource "sakuracloud_server" "foobar" {
     name = "myserver"
     description = "Server from TerraForm for SAKURA CLOUD"
     tags = ["@virtio-net-pci"]
-    switched_interfaces = ["${sakuracloud_switch.foobar.id}"]
+    additional_interfaces = ["${sakuracloud_switch.foobar.id}"]
     zone = "tk1v"
 }
 resource "sakuracloud_switch" "foobar" {

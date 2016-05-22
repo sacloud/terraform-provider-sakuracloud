@@ -65,7 +65,7 @@ and delete Server.
 resource "sakuracloud_server" "myserver" {
     name = "myserver"
     disks = ["${sakuracloud_disk.mydisk.id}"]
-    switched_interfaces = [""]
+    additional_interfaces = [""]
     description = "Server from TerraForm for SAKURA CLOUD"
     tags = ["@virtio-net-pci"]
 }
@@ -79,11 +79,11 @@ The following arguments are supported:
 * `disks` - (Required) The ID list of the disk to connect server.
 * `core` - (Optional) The number of CPU core. default `1`.
 * `memory` - (Optional) The size of memory(GB). default `1`.
-* `shared_interface` - (Optional) The ID of to create a NIC to connect to a shared segment.
+* `base_interface` - (Optional) The ID of to create a NIC to connect to a shared segment.
    When `shared`,it connect to the shared segment.
    When `switch_id` , it connect to the switch+router.
    When `""` , it creates a NIC with empty connection.
-* `switched_interfaces` - (Optional) The ID list of to create a NIC to connect to switch.
+* `additional_interfaces` - (Optional) The ID list of to create a NIC to connect to switch.
    If `""` is specified , it creates a NIC with empty connection.
 * `packet_filter_ids` - (Optional) The ID list of the packet filter.
 * `description` - (Optional) The description of the server.
@@ -99,18 +99,18 @@ The following attributes are exported:
 * `disks`- The ID list of the disks.
 * `core` - The number of the CPU core.
 * `memory` - The size(MB) of the memory.
-* `shared_interface` - The flag of has NIC to connect to a shared segment.
-* `switched_interfaces` - The ID list of the connected switch.
+* `base_interface` - The ID of NIC to connect to a shared segment.
+* `additional_interfaces` - The ID list of the connected switch.
 * `description` - The description of the server.
 * `tags` - The tags of the server.
 * `zone` - The zone of the server.
 * `packet_filter_ids` - The ID list of the packet filter.
 * `mac_addresses` - The MAC address list of the server.
-* `shared_nw_ipaddress` - The IP address that are connected to the shared segment.
-* `shared_nw_dns_servers` - The IP address list of server's region on.
-* `shared_nw_gateway` - The IP address of default route.
-* `shared_nw_address` - The network address of the shared segment.
-* `shared_nw_mask_len` - The length of network mask of the shared segment.
+* `base_nw_ipaddress` - The IP address that are connected to the shared segment.
+* `base_nw_dns_servers` - The IP address list of server's region on.
+* `base_nw_gateway` - The IP address of default route.
+* `base_nw_address` - The network address of the shared segment.
+* `base_nw_mask_len` - The length of network mask of the shared segment.
 
 
 ## Resource Configuration `sakuracloud_disk`
@@ -564,7 +564,7 @@ modify, and delete SimpleMonitor records.
 ```
 # Create a new Simple Monitor
 resource "sakuracloud_simple_monitor" "mymonitor" {
-    target = "${sakuracloud_server.myserver.shared_nw_ipaddress}"
+    target = "${sakuracloud_server.myserver.base_nw_ipaddress}"
     health_check = {
         protocol = "http"
         delay_loop = 60
@@ -677,7 +677,7 @@ resource "sakuracloud_ssh_key" "mykey" {
  SimpleMonitor
 ************************/
 resource "sakuracloud_simple_monitor" "mymonitor" {
-    target = "${sakuracloud_server.myserver.shared_nw_ipaddress}"
+    target = "${sakuracloud_server.myserver.base_nw_ipaddress}"
     health_check = {
         protocol = "ping"
     }
@@ -696,7 +696,7 @@ resource "sakuracloud_dns" "foobar" {
     records = {
         name = "terraform-sample"
         type = "A"
-        value = "${sakuracloud_server.myserver.shared_nw_ipaddress}"
+        value = "${sakuracloud_server.myserver.base_nw_ipaddress}"
     }
 }
 ```

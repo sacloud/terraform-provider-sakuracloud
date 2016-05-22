@@ -36,13 +36,13 @@ func resourceSakuraCloudServer() *schema.Resource {
 				Optional: true,
 				Elem:     &schema.Schema{Type: schema.TypeString},
 			},
-			"shared_interface": &schema.Schema{
+			"base_interface": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				Default:  "shared",
 			},
 
-			"switched_interfaces": &schema.Schema{
+			"additional_interfaces": &schema.Schema{
 				Type:     schema.TypeList,
 				Optional: true,
 				MaxItems: 3,
@@ -76,25 +76,28 @@ func resourceSakuraCloudServer() *schema.Resource {
 				Computed: true,
 				Elem:     &schema.Schema{Type: schema.TypeString},
 			},
-			"shared_nw_ipaddress": &schema.Schema{
+			"base_nw_ipaddress": &schema.Schema{
 				Type:     schema.TypeString,
+				Optional: true,
 				Computed: true,
 			},
-			"shared_nw_dns_servers": &schema.Schema{
+			"base_nw_dns_servers": &schema.Schema{
 				Type:     schema.TypeList,
 				Computed: true,
 				Elem:     &schema.Schema{Type: schema.TypeString},
 			},
-			"shared_nw_gateway": &schema.Schema{
+			"base_nw_gateway": &schema.Schema{
+				Type:     schema.TypeString,
+				Optional: true,
+				Computed: true,
+			},
+			"base_nw_address": &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
 			},
-			"shared_nw_address": &schema.Schema{
+			"base_nw_mask_len": &schema.Schema{
 				Type:     schema.TypeString,
-				Computed: true,
-			},
-			"shared_nw_mask_len": &schema.Schema{
-				Type:     schema.TypeString,
+				Optional: true,
 				Computed: true,
 			},
 		},
@@ -118,7 +121,7 @@ func resourceSakuraCloudServerCreate(d *schema.ResourceData, meta interface{}) e
 	}
 	opts.SetServerPlanByID(planID.ID.String())
 
-	if hasSharedInterface, ok := d.GetOk("shared_interface"); ok {
+	if hasSharedInterface, ok := d.GetOk("base_interface"); ok {
 		switch forceString(hasSharedInterface) {
 		case "shared":
 			opts.AddPublicNWConnectedParam()
@@ -132,7 +135,7 @@ func resourceSakuraCloudServerCreate(d *schema.ResourceData, meta interface{}) e
 		opts.AddEmptyConnectedParam()
 	}
 
-	if interfaces, ok := d.GetOk("switched_interfaces"); ok {
+	if interfaces, ok := d.GetOk("additional_interfaces"); ok {
 		for _, switchID := range interfaces.([]interface{}) {
 			if switchID == nil {
 				opts.AddEmptyConnectedParam()
@@ -169,16 +172,33 @@ func resourceSakuraCloudServerCreate(d *schema.ResourceData, meta interface{}) e
 				}
 
 				// edit disk if server is connected the shared segment
-				if i == 0 && len(server.Interfaces) > 0 && server.Interfaces[0].Switch != nil && server.Interfaces[0].Switch.Scope == sacloud.ESCopeShared {
+				if i == 0 && len(server.Interfaces) > 0 && server.Interfaces[0].Switch != nil {
+					isNeedEditDisk := false
 					diskEditConfig := client.Disk.NewCondig()
-					diskEditConfig.SetUserIPAddress(server.Interfaces[0].IPAddress)
-					diskEditConfig.SetDefaultRoute(server.Interfaces[0].Switch.Subnet.DefaultRoute)
-					diskEditConfig.SetNetworkMaskLen(fmt.Sprintf("%d", server.Interfaces[0].Switch.Subnet.NetworkMaskLen))
+					if server.Interfaces[0].Switch.Scope == sacloud.ESCopeShared {
+						diskEditConfig.SetUserIPAddress(server.Interfaces[0].IPAddress)
+						diskEditConfig.SetDefaultRoute(server.Interfaces[0].Switch.Subnet.DefaultRoute)
+						diskEditConfig.SetNetworkMaskLen(fmt.Sprintf("%d", server.Interfaces[0].Switch.Subnet.NetworkMaskLen))
+						isNeedEditDisk = true
+					} else {
+						baseIP := forceString(d.Get("base_nw_ipaddress"))
+						baseGateway := forceString(d.Get("base_nw_gateway"))
+						baseMaskLen := forceString(d.Get("base_nw_mask_len"))
 
-					_, err := client.Disk.Config(diskID, diskEditConfig)
-					if err != nil {
-						return fmt.Errorf("Error editting SakuraCloud DiskConfig: %s", err)
+						diskEditConfig.SetUserIPAddress(baseIP)
+						diskEditConfig.SetDefaultRoute(baseGateway)
+						diskEditConfig.SetNetworkMaskLen(baseMaskLen)
+
+						isNeedEditDisk = baseIP != "" || baseGateway != "" || baseMaskLen != ""
 					}
+
+					if isNeedEditDisk {
+						_, err := client.Disk.Config(diskID, diskEditConfig)
+						if err != nil {
+							return fmt.Errorf("Error editting SakuraCloud DiskConfig: %s", err)
+						}
+					}
+
 				}
 
 			}
@@ -235,11 +255,9 @@ func resourceSakuraCloudServerRead(d *schema.ResourceData, meta interface{}) err
 	d.Set("memory", server.ServerPlan.MemoryMB*units.MiB/units.GiB)
 	d.Set("disks", flattenDisks(server.Disks))
 
-	hasSharedInterface := len(server.Interfaces) > 0 &&
-		server.Interfaces[0].Switch != nil &&
-		server.Interfaces[0].Switch.Scope == sacloud.ESCopeShared
-	d.Set("shared_interface", hasSharedInterface)
-	d.Set("switched_interfaces", flattenInterfaces(server.Interfaces))
+	hasSharedInterface := len(server.Interfaces) > 0 && server.Interfaces[0].Switch != nil
+	d.Set("base_interface", hasSharedInterface)
+	d.Set("additional_interfaces", flattenInterfaces(server.Interfaces))
 
 	d.Set("description", server.Description)
 	d.Set("tags", server.Tags)
@@ -249,17 +267,21 @@ func resourceSakuraCloudServerRead(d *schema.ResourceData, meta interface{}) err
 	//readonly values
 	d.Set("mac_addresses", flattenMacAddresses(server.Interfaces))
 	if hasSharedInterface {
-		d.Set("shared_nw_ipaddress", server.Interfaces[0].IPAddress)
-		d.Set("shared_nw_dns_servers", server.Zone.Region.NameServers)
-		d.Set("shared_nw_gateway", server.Interfaces[0].Switch.Subnet.DefaultRoute)
-		d.Set("shared_nw_address", server.Interfaces[0].Switch.Subnet.NetworkAddress)
-		d.Set("shared_nw_mask_len", fmt.Sprintf("%d", server.Interfaces[0].Switch.Subnet.NetworkMaskLen))
+		if server.Interfaces[0].Switch.Scope == sacloud.ESCopeShared {
+			d.Set("base_nw_ipaddress", server.Interfaces[0].IPAddress)
+		} else {
+			d.Set("base_nw_ipaddress", server.Interfaces[0].UserIPAddress)
+		}
+		d.Set("base_nw_dns_servers", server.Zone.Region.NameServers)
+		d.Set("base_nw_gateway", server.Interfaces[0].Switch.Subnet.DefaultRoute)
+		d.Set("base_nw_address", server.Interfaces[0].Switch.Subnet.NetworkAddress)
+		d.Set("base_nw_mask_len", fmt.Sprintf("%d", server.Interfaces[0].Switch.Subnet.NetworkMaskLen))
 	} else {
-		d.Set("shared_nw_ipaddress", "")
-		d.Set("shared_nw_dns_servers", []string{})
-		d.Set("shared_nw_gateway", "")
-		d.Set("shared_nw_address", "")
-		d.Set("shared_nw_mask_len", "")
+		d.Set("base_nw_ipaddress", "")
+		d.Set("base_nw_dns_servers", []string{})
+		d.Set("base_nw_gateway", "")
+		d.Set("base_nw_address", "")
+		d.Set("base_nw_mask_len", "")
 	}
 	d.Set("zone", client.Zone)
 
@@ -294,7 +316,7 @@ func resourceSakuraCloudServerUpdate(d *schema.ResourceData, meta interface{}) e
 		isNeedRestart = true
 	}
 
-	if d.HasChange("disks") || d.HasChange("shared_interface") || d.HasChange("switched_interfaces") {
+	if d.HasChange("disks") || d.HasChange("base_interface") || d.HasChange("additional_interfaces") {
 		isNeedRestart = true
 	}
 
@@ -336,8 +358,8 @@ func resourceSakuraCloudServerUpdate(d *schema.ResourceData, meta interface{}) e
 	}
 
 	// NIC
-	if d.HasChange("shared_interface") {
-		sharedNICCon := d.Get("shared_interface").(string)
+	if d.HasChange("base_interface") {
+		sharedNICCon := d.Get("base_interface").(string)
 		if sharedNICCon == "shared" {
 			client.Interface.ConnectToSharedSegment(server.Interfaces[0].ID)
 		} else if sharedNICCon == "" {
@@ -346,8 +368,8 @@ func resourceSakuraCloudServerUpdate(d *schema.ResourceData, meta interface{}) e
 			client.Interface.ConnectToSwitch(server.Interfaces[0].ID, sharedNICCon)
 		}
 	}
-	if d.HasChange("switched_interfaces") {
-		if conf, ok := d.GetOk("switched_interfaces"); ok {
+	if d.HasChange("additional_interfaces") {
+		if conf, ok := d.GetOk("additional_interfaces"); ok {
 			newNICCount := len(conf.([]interface{}))
 			for i, nic := range server.Interfaces {
 				if i == 0 {
