@@ -382,10 +382,19 @@ func resourceSakuraCloudDiskDelete(d *schema.ResourceData, meta interface{}) err
 	}
 
 	if disk.Server != nil {
+
+		if disk.Server.Instance.IsUp() {
+			_, err := client.Server.Stop(disk.Server.ID)
+			if err != nil {
+				return fmt.Errorf("Error stopping Server: %s", err)
+			}
+		}
+
 		_, err := client.Disk.DisconnectFromServer(d.Id())
 		if err != nil {
 			return fmt.Errorf("Error disconnecting Disk from SakuraCloud Server: %s", err)
 		}
+
 	}
 
 	_, err = client.Disk.Delete(d.Id())
