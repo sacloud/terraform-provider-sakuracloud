@@ -47,7 +47,7 @@ The following arguments are supported:
 * `secret` - (Required) This is the SakuraCloud API secret. This can also be specified
   with the `SAKURACLOUD_ACCESS_TOKEN_SECRET` shell environment variable.
 
-* `zone` - (Required) This is the SakuraCloud zone. This can also be specified
+* `zone` - (Optional) This is the SakuraCloud zone. This can also be specified
   with the `SAKURACLOUD_ZONE` shell environment variable.
 
 * `trace` - (Optional) Flag of trace mode. This can also be specified
