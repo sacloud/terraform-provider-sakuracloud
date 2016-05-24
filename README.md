@@ -124,7 +124,7 @@ and delete Disk .
 # Create a new disk with source archive named "Ubuntu Server 14.04"
 resource "sakuracloud_disk" "mydisk"{
     name = "mydisk"
-    size = 20480
+    size = 20
     source_archive_name = "Ubuntu Server 14.04"
     description = "Disk from terraform for SAKURA CLOUD"
     tags = ["hoge1" , "hoge2"]
