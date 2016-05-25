@@ -89,8 +89,7 @@ func (d *DNS) AddRecord(record *DNSRecordSet) {
 	var recordSet = d.Settings.DNS.ResourceRecordSets
 	var isExist = false
 	for i := range recordSet {
-		if recordSet[i].Name == record.Name && recordSet[i].Type == record.Type {
-			d.Settings.DNS.ResourceRecordSets[i].RData = record.RData
+		if recordSet[i].Name == record.Name && recordSet[i].Type == record.Type && recordSet[i].RData == record.RData {
 			d.Settings.DNS.ResourceRecordSets[i].TTL = record.TTL
 			isExist = true
 		}
