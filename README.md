@@ -270,14 +270,14 @@ and delete PacketFilter.
 resource "sakuracloud_packet_filter" "myfilter" {
     name = "myfilter"
     description = "PacketFilter from terraform for SAKURA CLOUD"
-    exprettions = {
+    expressions = {
         protocol = "tcp"
         source_nw = "192.168.2.0/24"
         source_port = "0-65535"
         dest_port = "80"
         allow = true
     }
-    exprettions = {
+    expressions = {
         protocol = "ip"
         source_nw = "0.0.0.0"
         allow = false
@@ -293,7 +293,7 @@ The following arguments are supported:
 * `name` - (Required) The name of the packet filter.
 * `description` - (Optional) The description of the packet filter.
 * `zone` - (Optional) The zone of the packet filter.
-* `exprettions` - (Required) The expression list of filter.
+* `expressions` - (Required) The expression list of filter.
   * `protocol` - (Required) The protocol of the expression. Following values is allowed [`tcp`,`udp`,`icmp`,`fragment`,`ip`].
   * `source_nw` - (Required) The source network address of the expression.
   * `source_port` - (Required) The source port of the expression.
@@ -309,7 +309,7 @@ The following attributes are exported:
 * `name`- The name of the packet filter.
 * `description` - The description of the packet filter.
 * `zone` - The zone of the packet filter.
-* `exprettions` - The expression list of filter.
+* `expressions` - The expression list of filter.
   * `protocol` - The protocol of the expression.
   * `source_nw` - The source network address of the expression.
   * `source_port` - The source port of the expression.
