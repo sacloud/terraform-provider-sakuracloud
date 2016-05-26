@@ -176,6 +176,13 @@ func TestAccSakuraCloudServer_ConnectPacketFilters(t *testing.T) {
 				),
 			},
 			resource.TestStep{
+				Config: testAccCheckSakuraCloudServerConfig_with_packet_filter_upd,
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr(
+						"sakuracloud_server.foobar", "packet_filter_ids.#", "1"),
+				),
+			},
+			resource.TestStep{
 				Config: testAccCheckSakuraCloudServerConfig_with_packet_filter_del,
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttr(
@@ -407,6 +414,41 @@ resource "sakuracloud_server" "foobar" {
     base_interface = "shared"
     additional_interfaces = [""]
     packet_filter_ids = ["${sakuracloud_packet_filter.foobar1.id}" , "${sakuracloud_packet_filter.foobar2.id}"]
+    zone = "is1a"
+}
+
+`
+
+const testAccCheckSakuraCloudServerConfig_with_packet_filter_upd = `
+resource "sakuracloud_packet_filter" "foobar1" {
+    name = "mypacket_filter1"
+    description = "PacketFilter from TerraForm for SAKURA CLOUD"
+    expressions = {
+    	protocol = "tcp"
+    	source_nw = "0.0.0.0"
+    	source_port = "0-65535"
+    	dest_port = "80"
+    	allow = true
+    }
+    zone = "is1a"
+}
+resource "sakuracloud_packet_filter" "foobar2" {
+    name = "mypacket_filter2"
+    description = "PacketFilter from TerraForm for SAKURA CLOUD"
+    expressions = {
+    	protocol = "tcp"
+    	source_nw = "0.0.0.0"
+    	source_port = "0-65535"
+    	dest_port = "80"
+    	allow = true
+    }
+    zone = "is1a"
+}
+resource "sakuracloud_server" "foobar" {
+    name = "myserver_upd"
+    base_interface = "shared"
+    additional_interfaces = [""]
+    packet_filter_ids = ["${sakuracloud_packet_filter.foobar1.id}"]
     zone = "is1a"
 }
 

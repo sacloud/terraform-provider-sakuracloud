@@ -495,6 +495,22 @@ func resourceSakuraCloudServerUpdate(d *schema.ResourceData, meta interface{}) e
 					}
 				}
 			}
+
+			if len(server.Interfaces) > len(packetFilterIDs) {
+				i := len(packetFilterIDs)
+				for i < len(server.Interfaces) {
+					if server.Interfaces[i].PacketFilter != nil {
+						_, err := client.Interface.DisconnectFromPacketFilter(server.Interfaces[i].ID)
+						if err != nil {
+							return fmt.Errorf("Error disconnecting packet filter: %s", err)
+						}
+					}
+
+					i++
+				}
+
+			}
+
 		} else {
 			if server.Interfaces != nil {
 				for _, i := range server.Interfaces {

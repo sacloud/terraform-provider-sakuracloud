@@ -78,13 +78,15 @@ func flattenInterfaces(interfaces []sacloud.Interface) []interface{} {
 func flattenPacketFilters(interfaces []sacloud.Interface) []string {
 	var ret []string
 	var isExists = false
-	for _, i := range interfaces {
+	for index, i := range interfaces {
 		id := ""
 		if i.PacketFilter != nil {
 			id = i.PacketFilter.ID
 			isExists = true
 		}
-		ret = append(ret, id)
+		if index == 0 || (len(interfaces)-1 == index && id != "") {
+			ret = append(ret, id)
+		}
 	}
 	if !isExists {
 		return []string{}
