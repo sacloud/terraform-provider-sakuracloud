@@ -108,11 +108,11 @@ func resourceSakuraCloudPacketFilterCreate(d *schema.ResourceData, meta interfac
 			case "udp":
 				err = opts.AddUDPRule(sourceNW, sourcePort, destPort, desc, allow)
 			case "icmp":
-				err = opts.AddICMPRule(sourceNW, destPort, allow)
+				err = opts.AddICMPRule(sourceNW, desc, allow)
 			case "fragment":
-				err = opts.AddFragmentRule(sourceNW, destPort, allow)
+				err = opts.AddFragmentRule(sourceNW, desc, allow)
 			case "ip":
-				err = opts.AddIPRule(sourceNW, destPort, allow)
+				err = opts.AddIPRule(sourceNW, desc, allow)
 			}
 
 			if err != nil {
@@ -221,11 +221,11 @@ func resourceSakuraCloudPacketFilterUpdate(d *schema.ResourceData, meta interfac
 				case "udp":
 					err = filter.AddUDPRule(sourceNW, sourcePort, destPort, desc, allow)
 				case "icmp":
-					err = filter.AddICMPRule(sourceNW, destPort, allow)
+					err = filter.AddICMPRule(sourceNW, desc, allow)
 				case "fragment":
-					err = filter.AddFragmentRule(sourceNW, destPort, allow)
+					err = filter.AddFragmentRule(sourceNW, desc, allow)
 				case "ip":
-					err = filter.AddIPRule(sourceNW, destPort, allow)
+					err = filter.AddIPRule(sourceNW, desc, allow)
 				}
 
 				if err != nil {
