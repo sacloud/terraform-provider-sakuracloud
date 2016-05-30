@@ -53,6 +53,9 @@ type SimpleMonitorHealthCheck struct {
 	Status       string `json:",omitempty"`
 	QName        string `json:",omitempty"`
 	ExpectedData string `json:",omitempty"`
+	Community    string `json:",omitempty"`
+	SNMPVersion  string `json:",omitempty"`
+	OID          string `json:",omitempty"`
 }
 
 type SimpleMonitorNotify struct {
@@ -89,7 +92,7 @@ func CreateNewSimpleMonitor(target string) *SimpleMonitor {
 }
 
 func AllowSimpleMonitorHealthCheckProtocol() []string {
-	return []string{"http", "https", "ping", "tcp", "dns", "ssh"}
+	return []string{"http", "https", "ping", "tcp", "dns", "ssh", "smtp", "pop3", "snmp"}
 }
 
 func createSimpleMonitorNotifyEmail() *SimpleMonitorNotify {
@@ -154,6 +157,29 @@ func (s *SimpleMonitor) SetHealthCheckSSH(port string) {
 	s.Settings.SimpleMonitor.HealthCheck = &SimpleMonitorHealthCheck{
 		Protocol: "ssh",
 		Port:     port,
+	}
+}
+
+func (s *SimpleMonitor) SetHealthCheckSMTP(port string) {
+	s.Settings.SimpleMonitor.HealthCheck = &SimpleMonitorHealthCheck{
+		Protocol: "smtp",
+		Port:     port,
+	}
+}
+func (s *SimpleMonitor) SetHealthCheckPOP3(port string) {
+	s.Settings.SimpleMonitor.HealthCheck = &SimpleMonitorHealthCheck{
+		Protocol: "pop3",
+		Port:     port,
+	}
+}
+
+func (s *SimpleMonitor) SetHealthCheckSNMP(community string, version string, oid string, expectedData string) {
+	s.Settings.SimpleMonitor.HealthCheck = &SimpleMonitorHealthCheck{
+		Protocol:     "snmp",
+		Community:    community,
+		SNMPVersion:  version,
+		OID:          oid,
+		ExpectedData: expectedData,
 	}
 }
 

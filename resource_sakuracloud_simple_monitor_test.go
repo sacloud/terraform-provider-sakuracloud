@@ -22,9 +22,9 @@ func TestAccSakuraCloudSimpleMonitor_Basic(t *testing.T) {
 					testAccCheckSakuraCloudSimpleMonitorExists("sakuracloud_simple_monitor.foobar", &monitor),
 					testAccCheckSakuraCloudSimpleMonitorAttributes(&monitor),
 					resource.TestCheckResourceAttr(
-						"sakuracloud_simple_monitor.foobar", "health_check.4235249223.protocol", "http"),
+						"sakuracloud_simple_monitor.foobar", "health_check.1245524278.protocol", "http"),
 					resource.TestCheckResourceAttr(
-						"sakuracloud_simple_monitor.foobar", "health_check.4235249223.delay_loop", "60"),
+						"sakuracloud_simple_monitor.foobar", "health_check.1245524278.delay_loop", "60"),
 					resource.TestCheckResourceAttr(
 						"sakuracloud_simple_monitor.foobar", "target", "terraform.io"),
 					resource.TestCheckResourceAttr(
@@ -50,9 +50,9 @@ func TestAccSakuraCloudSimpleMonitor_Update(t *testing.T) {
 					testAccCheckSakuraCloudSimpleMonitorExists("sakuracloud_simple_monitor.foobar", &monitor),
 					testAccCheckSakuraCloudSimpleMonitorAttributes(&monitor),
 					resource.TestCheckResourceAttr(
-						"sakuracloud_simple_monitor.foobar", "health_check.4235249223.protocol", "http"),
+						"sakuracloud_simple_monitor.foobar", "health_check.1245524278.protocol", "http"),
 					resource.TestCheckResourceAttr(
-						"sakuracloud_simple_monitor.foobar", "health_check.4235249223.delay_loop", "60"),
+						"sakuracloud_simple_monitor.foobar", "health_check.1245524278.delay_loop", "60"),
 					resource.TestCheckResourceAttr(
 						"sakuracloud_simple_monitor.foobar", "target", "terraform.io"),
 					resource.TestCheckResourceAttr(

@@ -583,13 +583,16 @@ The following arguments are supported:
 
 * `target` - (Required) The monitor target IP or domain name.
 * `health_check` - (Required) The health_check rule of SimpleMonitor.
-  * `protocol` - (Required) The protocol to use for health check. Must be in [`http`,`https`,`tcp`,`ping`,`ssh`,`dns`]
+  * `protocol` - (Required) The protocol to use for health check. Must be in [`http`,`https`,`tcp`,`ping`,`ssh`,`dns`,`smtp`,`pop3`,`snmp`]
   * `dalay_loop` - (Optional) The delay_loop of health check. Must be between `60` and `3600`. default is `60`
   * `path` - (Only when protocol is `http` or `https`) The request path to use for health check.
   * `status` - (Only when protocol is `http` or `https`) The response code of health check request.
-  * `port` - (Only when protocol is `tcp` or `ssh`) The port number to use for health check.
+  * `port` - (Only when protocol is `tcp` or `ssh` or `smtp` or `pop3`) The port number to use for health check.
   * `qname` - (Only when protocol is `dns`) The port number to use for health check.
-  * `expected_data` - (Only when protocol is `dns`) The port number to use for health check.
+  * `expected_data` - (Only when protocol is `dns` or `snmp`) The port number to use for health check.
+  * `community` - (Only when protocol is `snmp`) The name of SNMP community to use for health check.
+  * `snmp_version` - (Only when protocol is `snmp`) The version of SNMP to use for health check. Must be in [`1`,`2c`]
+  * `oid` - (Only when protocol is `snmp`) The oid to use for health check.
 * `description` - (Optional) The descripton of SimpleMonitor.
 * `tags` - (Optional) The tags of SimpleMonitor.
 * `notify_email_enabled` - (Optional) The flag of enabled email.

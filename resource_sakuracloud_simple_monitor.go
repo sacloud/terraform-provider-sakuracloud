@@ -63,6 +63,19 @@ func resourceSakuraCloudSimpleMonitor() *schema.Resource {
 							Type:     schema.TypeString,
 							Optional: true,
 						},
+						"community": &schema.Schema{
+							Type:     schema.TypeString,
+							Optional: true,
+						},
+						"snmp_version": &schema.Schema{
+							Type:         schema.TypeString,
+							ValidateFunc: validateStringInWord([]string{"1", "2c"}),
+							Optional:     true,
+						},
+						"oid": &schema.Schema{
+							Type:     schema.TypeString,
+							Optional: true,
+						},
 					},
 				},
 			},
@@ -121,7 +134,16 @@ func resourceSakuraCloudSimpleMonitorCreate(d *schema.ResourceData, meta interfa
 				QName:        conf["qname"].(string),
 				ExpectedData: conf["expected_data"].(string),
 			}
-		case "tcp", "ssh":
+		case "snmp":
+			opts.Settings.SimpleMonitor.HealthCheck = &sacloud.SimpleMonitorHealthCheck{
+				Protocol:     protocol,
+				Community:    conf["community"].(string),
+				SNMPVersion:  conf["snmp_version"].(string),
+				OID:          conf["oid"].(string),
+				ExpectedData: conf["expected_data"].(string),
+			}
+
+		case "tcp", "ssh", "smtp", "pop3":
 			opts.Settings.SimpleMonitor.HealthCheck = &sacloud.SimpleMonitorHealthCheck{
 				Protocol: protocol,
 				Port:     fmt.Sprintf("%d", conf["port"].(int)),
@@ -185,8 +207,13 @@ func resourceSakuraCloudSimpleMonitorRead(d *schema.ResourceData, meta interface
 	case "http", "https":
 		healthCheck["path"] = simpleMonitor.Settings.SimpleMonitor.HealthCheck.Path
 		healthCheck["status"] = simpleMonitor.Settings.SimpleMonitor.HealthCheck.Status
-	case "tcp", "ssh":
+	case "tcp", "ssh", "smtp", "pop3":
 		healthCheck["port"] = simpleMonitor.Settings.SimpleMonitor.HealthCheck.Port
+	case "snmp":
+		healthCheck["community"] = simpleMonitor.Settings.SimpleMonitor.HealthCheck.Community
+		healthCheck["snmp_version"] = simpleMonitor.Settings.SimpleMonitor.HealthCheck.SNMPVersion
+		healthCheck["oid"] = simpleMonitor.Settings.SimpleMonitor.HealthCheck.OID
+		healthCheck["expected_data"] = simpleMonitor.Settings.SimpleMonitor.HealthCheck.ExpectedData
 	case "dns":
 		healthCheck["qname"] = simpleMonitor.Settings.SimpleMonitor.HealthCheck.QName
 		healthCheck["expected_data"] = simpleMonitor.Settings.SimpleMonitor.HealthCheck.ExpectedData
@@ -238,7 +265,15 @@ func resourceSakuraCloudSimpleMonitorUpdate(d *schema.ResourceData, meta interfa
 					QName:        conf["qname"].(string),
 					ExpectedData: conf["expected_data"].(string),
 				}
-			case "tcp", "ssh":
+			case "snmp":
+				simpleMonitor.Settings.SimpleMonitor.HealthCheck = &sacloud.SimpleMonitorHealthCheck{
+					Protocol:     protocol,
+					Community:    conf["community"].(string),
+					SNMPVersion:  conf["snmp_version"].(string),
+					OID:          conf["oid"].(string),
+					ExpectedData: conf["expected_data"].(string),
+				}
+			case "tcp", "ssh", "smtp", "pop3":
 				simpleMonitor.Settings.SimpleMonitor.HealthCheck = &sacloud.SimpleMonitorHealthCheck{
 					Protocol: protocol,
 					Port:     fmt.Sprintf("%d", conf["port"].(int)),
@@ -319,20 +354,28 @@ func healthCheckSimpleMonitorHash(v interface{}) int {
 	port := ""
 	qname := ""
 	ed := ""
+	community := ""
+	snmpVersion := ""
+	oid := ""
 
 	switch protocol {
 	case "http", "https":
 		path = target["path"].(string)
 		status = target["status"].(string)
-	case "tcp", "ssh":
+	case "tcp", "ssh", "smtp", "pop3":
 		port = target["port"].(string)
 	case "dns":
 		qname = target["qname"].(string)
+		ed = target["expected_data"].(string)
+	case "snmp":
+		community = target["community"].(string)
+		snmpVersion = target["snmp_version"].(string)
+		oid = target["oid"].(string)
 		ed = target["expected_data"].(string)
 	}
 
 	delay_loop := target["delay_loop"].(int)
 
-	hk := fmt.Sprintf("%s:%d:%s:%s:%s:%s:%s", protocol, delay_loop, path, status, port, qname, ed)
+	hk := fmt.Sprintf("%s:%d:%s:%s:%s:%s:%s:%s:%s:%s", protocol, delay_loop, path, status, port, qname, ed, community, snmpVersion, oid)
 	return hashcode.String(hk)
 }
