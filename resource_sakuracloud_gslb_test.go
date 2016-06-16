@@ -28,12 +28,6 @@ func TestAccSakuraCloudGSLB_Basic(t *testing.T) {
 						"sakuracloud_gslb.foobar", "health_check.1802742300.delay_loop", "10"),
 					resource.TestCheckResourceAttr(
 						"sakuracloud_gslb.foobar", "health_check.1802742300.host_header", "terraform.io"),
-					resource.TestCheckResourceAttr(
-						"sakuracloud_gslb.foobar", "servers.#", "2"),
-					resource.TestCheckResourceAttr(
-						"sakuracloud_gslb.foobar", "servers.0.ipaddress", "8.8.8.8"),
-					resource.TestCheckResourceAttr(
-						"sakuracloud_gslb.foobar", "servers.1.ipaddress", "8.8.4.4"),
 				),
 			},
 		},
@@ -59,12 +53,6 @@ func TestAccSakuraCloudGSLB_Update(t *testing.T) {
 						"sakuracloud_gslb.foobar", "health_check.1802742300.delay_loop", "10"),
 					resource.TestCheckResourceAttr(
 						"sakuracloud_gslb.foobar", "health_check.1802742300.host_header", "terraform.io"),
-					resource.TestCheckResourceAttr(
-						"sakuracloud_gslb.foobar", "servers.#", "2"),
-					resource.TestCheckResourceAttr(
-						"sakuracloud_gslb.foobar", "servers.0.ipaddress", "8.8.8.8"),
-					resource.TestCheckResourceAttr(
-						"sakuracloud_gslb.foobar", "servers.1.ipaddress", "8.8.4.4"),
 				),
 			},
 			resource.TestStep{
@@ -79,12 +67,6 @@ func TestAccSakuraCloudGSLB_Update(t *testing.T) {
 						"sakuracloud_gslb.foobar", "health_check.755645870.delay_loop", "20"),
 					resource.TestCheckResourceAttr(
 						"sakuracloud_gslb.foobar", "health_check.755645870.host_header", "update.terraform.io"),
-					resource.TestCheckResourceAttr(
-						"sakuracloud_gslb.foobar", "servers.#", "2"),
-					resource.TestCheckResourceAttr(
-						"sakuracloud_gslb.foobar", "servers.0.ipaddress", "8.8.8.8"),
-					resource.TestCheckResourceAttr(
-						"sakuracloud_gslb.foobar", "servers.1.ipaddress", "8.8.4.4"),
 				),
 			},
 			resource.TestStep{
@@ -99,16 +81,6 @@ func TestAccSakuraCloudGSLB_Update(t *testing.T) {
 						"sakuracloud_gslb.foobar", "health_check.755645870.delay_loop", "20"),
 					resource.TestCheckResourceAttr(
 						"sakuracloud_gslb.foobar", "health_check.755645870.host_header", "update.terraform.io"),
-					resource.TestCheckResourceAttr(
-						"sakuracloud_gslb.foobar", "servers.#", "4"),
-					resource.TestCheckResourceAttr(
-						"sakuracloud_gslb.foobar", "servers.0.ipaddress", "8.8.8.8"),
-					resource.TestCheckResourceAttr(
-						"sakuracloud_gslb.foobar", "servers.1.ipaddress", "8.8.4.4"),
-					resource.TestCheckResourceAttr(
-						"sakuracloud_gslb.foobar", "servers.2.ipaddress", "208.67.222.123"),
-					resource.TestCheckResourceAttr(
-						"sakuracloud_gslb.foobar", "servers.3.ipaddress", "208.67.220.123"),
 				),
 			},
 		},
@@ -175,12 +147,6 @@ resource "sakuracloud_gslb" "foobar" {
     }
     description = "GSLB from TerraForm for SAKURA CLOUD"
     tags = ["hoge1", "hoge2"]
-    servers = {
-      ipaddress = "8.8.8.8"
-    }
-    servers = {
-      ipaddress = "8.8.4.4"
-    }
 }`
 
 var testAccCheckSakuraCloudGSLBConfig_update = `
@@ -195,12 +161,6 @@ resource "sakuracloud_gslb" "foobar" {
     }
     description = "GSLB from TerraForm for SAKURA CLOUD"
     tags = ["hoge1", "hoge2"]
-    servers = {
-      ipaddress = "8.8.8.8"
-    }
-    servers = {
-      ipaddress = "8.8.4.4"
-    }
 }`
 
 var testAccCheckSakuraCloudGSLBConfig_added = `
@@ -215,16 +175,4 @@ resource "sakuracloud_gslb" "foobar" {
     }
     description = "GSLB from TerraForm for SAKURA CLOUD"
     tags = ["hoge1", "hoge2"]
-    servers = {
-      ipaddress = "8.8.8.8"
-    }
-    servers = {
-      ipaddress = "8.8.4.4"
-    }
-    servers = {
-      ipaddress = "208.67.222.123"
-    }
-    servers = {
-      ipaddress = "208.67.220.123"
-    }
 }`
