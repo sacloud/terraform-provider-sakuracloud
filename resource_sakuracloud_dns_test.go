@@ -22,14 +22,6 @@ func TestAccSakuraCloudDNS_Basic(t *testing.T) {
 					testAccCheckSakuraCloudDNSExists("sakuracloud_dns.foobar", &dns),
 					resource.TestCheckResourceAttr(
 						"sakuracloud_dns.foobar", "zone", "terraform.io"),
-					resource.TestCheckResourceAttr(
-						"sakuracloud_dns.foobar", "records.#", "1"),
-					resource.TestCheckResourceAttr(
-						"sakuracloud_dns.foobar", "records.0.name", "test1"),
-					resource.TestCheckResourceAttr(
-						"sakuracloud_dns.foobar", "records.0.type", "A"),
-					resource.TestCheckResourceAttr(
-						"sakuracloud_dns.foobar", "records.0.value", "192.168.0.11"),
 				),
 			},
 		},
@@ -49,14 +41,6 @@ func TestAccSakuraCloudDNS_Update(t *testing.T) {
 					testAccCheckSakuraCloudDNSExists("sakuracloud_dns.foobar", &dns),
 					resource.TestCheckResourceAttr(
 						"sakuracloud_dns.foobar", "zone", "terraform.io"),
-					resource.TestCheckResourceAttr(
-						"sakuracloud_dns.foobar", "records.#", "1"),
-					resource.TestCheckResourceAttr(
-						"sakuracloud_dns.foobar", "records.0.name", "test1"),
-					resource.TestCheckResourceAttr(
-						"sakuracloud_dns.foobar", "records.0.type", "A"),
-					resource.TestCheckResourceAttr(
-						"sakuracloud_dns.foobar", "records.0.value", "192.168.0.11"),
 				),
 			},
 			resource.TestStep{
@@ -65,36 +49,6 @@ func TestAccSakuraCloudDNS_Update(t *testing.T) {
 					testAccCheckSakuraCloudDNSExists("sakuracloud_dns.foobar", &dns),
 					resource.TestCheckResourceAttr(
 						"sakuracloud_dns.foobar", "zone", "terraform.io"),
-					resource.TestCheckResourceAttr(
-						"sakuracloud_dns.foobar", "records.#", "1"),
-					resource.TestCheckResourceAttr(
-						"sakuracloud_dns.foobar", "records.0.name", "test1"),
-					resource.TestCheckResourceAttr(
-						"sakuracloud_dns.foobar", "records.0.type", "A"),
-					resource.TestCheckResourceAttr(
-						"sakuracloud_dns.foobar", "records.0.value", "192.168.0.12"),
-				),
-			},
-			resource.TestStep{
-				Config: testAccCheckSakuraCloudDNSConfig_added,
-				Check: resource.ComposeTestCheckFunc(
-					testAccCheckSakuraCloudDNSExists("sakuracloud_dns.foobar", &dns),
-					resource.TestCheckResourceAttr(
-						"sakuracloud_dns.foobar", "zone", "terraform.io"),
-					resource.TestCheckResourceAttr(
-						"sakuracloud_dns.foobar", "records.#", "2"),
-					resource.TestCheckResourceAttr(
-						"sakuracloud_dns.foobar", "records.0.name", "test1"),
-					resource.TestCheckResourceAttr(
-						"sakuracloud_dns.foobar", "records.0.type", "A"),
-					resource.TestCheckResourceAttr(
-						"sakuracloud_dns.foobar", "records.0.value", "192.168.0.11"),
-					resource.TestCheckResourceAttr(
-						"sakuracloud_dns.foobar", "records.1.name", "test2"),
-					resource.TestCheckResourceAttr(
-						"sakuracloud_dns.foobar", "records.1.type", "A"),
-					resource.TestCheckResourceAttr(
-						"sakuracloud_dns.foobar", "records.1.value", "192.168.0.12"),
 				),
 			},
 		},
@@ -153,39 +107,12 @@ var testAccCheckSakuraCloudDNSConfig_basic = `
 resource "sakuracloud_dns" "foobar" {
     zone = "terraform.io"
     description = "DNS from TerraForm for SAKURA CLOUD"
-    tags = ["hoge1" , "hoge2"]
-    records = {
-        name = "test1"
-        type = "A"
-        value = "192.168.0.11"
-    }
+    tags = ["hoge1"]
 }`
 
 var testAccCheckSakuraCloudDNSConfig_update = `
 resource "sakuracloud_dns" "foobar" {
     zone = "terraform.io"
-    description = "DNS from TerraForm for SAKURA CLOUD"
+    description = "DNS from TerraForm for SAKURA CLOUD_upd"
     tags = ["hoge1" , "hoge2"]
-    records = {
-        name = "test1"
-        type = "A"
-        value = "192.168.0.12"
-    }
-}`
-
-var testAccCheckSakuraCloudDNSConfig_added = `
-resource "sakuracloud_dns" "foobar" {
-    zone = "terraform.io"
-    description = "DNS from TerraForm for SAKURA CLOUD"
-    tags = ["hoge1" , "hoge2"]
-    records = {
-        name = "test1"
-        type = "A"
-        value = "192.168.0.11"
-    }
-    records = {
-        name = "test2"
-        type = "A"
-        value = "192.168.0.12"
-    }
 }`
