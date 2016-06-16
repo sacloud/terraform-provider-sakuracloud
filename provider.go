@@ -41,6 +41,7 @@ func Provider() terraform.ResourceProvider {
 			"sakuracloud_dns":            resourceSakuraCloudDNS(),
 			"sakuracloud_dns_record":     resourceSakuraCloudDNSRecord(),
 			"sakuracloud_gslb":           resourceSakuraCloudGSLB(),
+			"sakuracloud_gslb_server":    resourceSakuraCloudGSLBServer(),
 			"sakuracloud_internet":       resourceSakuraCloudInternet(),
 			"sakuracloud_note":           resourceSakuraCloudNote(),
 			"sakuracloud_packet_filter":  resourceSakuraCloudPacketFilter(),

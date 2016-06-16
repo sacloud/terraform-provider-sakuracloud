@@ -76,31 +76,6 @@ func resourceSakuraCloudGSLB() *schema.Resource {
 				Optional: true,
 				Elem:     &schema.Schema{Type: schema.TypeString},
 			},
-
-			"servers": &schema.Schema{
-				Type:     schema.TypeList,
-				Required: true,
-				MaxItems: 6,
-				Elem: &schema.Resource{
-					Schema: map[string]*schema.Schema{
-						"ipaddress": &schema.Schema{
-							Type:     schema.TypeString,
-							Required: true,
-						},
-						"enabled": &schema.Schema{
-							Type:     schema.TypeBool,
-							Optional: true,
-							Default:  true,
-						},
-						"weight": &schema.Schema{
-							Type:         schema.TypeInt,
-							Optional:     true,
-							ValidateFunc: validateIntegerInRange(1, 10000),
-							Default:      1,
-						},
-					},
-				},
-			},
 		},
 	}
 }
@@ -149,17 +124,6 @@ func resourceSakuraCloudGSLBCreate(d *schema.ResourceData, meta interface{}) err
 		opts.Tags = expandStringList(rawTags)
 	}
 
-	servers := d.Get("servers").([]interface{})
-	for _, r := range servers {
-		serverConf := r.(map[string]interface{})
-		server := opts.CreateGSLBServer(serverConf["ipaddress"].(string))
-		if !serverConf["enabled"].(bool) {
-			server.Enabled = "False"
-		}
-		server.Weight = fmt.Sprintf("%d", serverConf["weight"].(int))
-		opts.AddGSLBServer(server)
-	}
-
 	gslb, err := client.GSLB.Create(opts)
 	if err != nil {
 		return fmt.Errorf("Failed to create SakuraCloud GSLB resource: %s", err)
@@ -197,18 +161,6 @@ func resourceSakuraCloudGSLBRead(d *schema.ResourceData, meta interface{}) error
 	d.Set("description", gslb.Description)
 	d.Set("tags", gslb.Tags)
 	d.Set("weighted", gslb.Settings.GSLB.Weighted == "True")
-
-	var servers []interface{}
-	for _, server := range gslb.Settings.GSLB.Servers {
-		s := map[string]interface{}{
-			"ipaddress": server.IPAddress,
-			"enabled":   server.Enabled,
-			"weight":    server.Weight,
-		}
-
-		servers = append(servers, s)
-	}
-	d.Set("servers", servers)
 
 	return nil
 }
@@ -269,21 +221,6 @@ func resourceSakuraCloudGSLBUpdate(d *schema.ResourceData, meta interface{}) err
 		gslb.Tags = expandStringList(rawTags)
 	}
 
-	if d.HasChange("servers") {
-		servers := d.Get("servers").([]interface{})
-
-		// Servers will set by DELETE-INSERT
-		gslb.ClearGSLBServer()
-		for _, r := range servers {
-			serverConf := r.(map[string]interface{})
-			server := gslb.CreateGSLBServer(serverConf["ipaddress"].(string))
-			if !serverConf["enabled"].(bool) {
-				server.Enabled = "False"
-			}
-			server.Weight = fmt.Sprintf("%d", serverConf["weight"].(int))
-			gslb.AddGSLBServer(server)
-		}
-	}
 	gslb, err = client.GSLB.Update(gslb.ID, gslb)
 	if err != nil {
 		return fmt.Errorf("Failed to create SakuraCloud GSLB resource: %s", err)

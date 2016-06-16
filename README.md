@@ -23,6 +23,7 @@ Terraform provider for SakuraCloud. - `Terraform for さくらのクラウド`
     - [sakuracloud_dns](#resource-configuration-sakuracloud_dns)
     - [sakuracloud_dns_record](#resource-configuration-sakuracloud_dns_record)
     - [sakuracloud_gslb](#resource-configuration-sakuracloud_gslb)
+    - [sakuracloud_gslb_server](#resource-configuration-sakuracloud_gslb_server)
     - [sakuracloud_simple_monitor](#resource-configuration-sakuracloud_simple_monitor)
   - [Samples](#samples)
 
@@ -516,13 +517,6 @@ resource "sakuracloud_gslb" "mygslb" {
     }
     description = "GSLB from terraform for SAKURA CLOUD"
     tags = ["hoge1" , "hoge2" ]
-    servers = {
-      ipaddress = "192.0.2.1"
-    }
-    servers = {
-      ipaddress = "192.0.2.2"
-    }
-
 }
 ```
 
@@ -541,10 +535,6 @@ The following arguments are supported:
 * `weighted` - (Optional)The flag of enabling to weighted balancing. default `false`
 * `description` - (Optional) The description of GSLB.
 * `tags` - (Required) The tags of GSLB.
-* `servers` (Optional) The target servers of GSLB.
-  * `ipaddress` - The IPAddress of target server.
-  * `enabled` - The flag of enabling to target server.
-  * `weight` - (Only when `weighted` is true)The weight of target server.
 
 
 ### Attributes Reference
@@ -563,11 +553,40 @@ The following attributes are exported:
 * `weighted` - The flag of enabling to weighted balancing.
 * `description` - The description of GSLB.
 * `tags` - The tags of GSLB.
-* `servers` - The target servers of GSLB.
-  * `ipaddress` - The IPAddress of target server.
-  * `enabled` - The flag of enabling to target server.
-  * `weight` - The weight of target server.
 * `FQDN` - The FQDN of GSLB.
+
+## Resource Configuration `sakuracloud_gslb_server`
+
+Provides a SakuraCloud GSLB(Global Site Load Balancing)Server resource. This can be used to create and delete GSLBServer.
+
+### Example Usage
+
+```
+resource "sakuracloud_gslb_server" "foobar" {
+    gslb_id = "${sakuracloud_gslb.mygslb.id}"
+    ipaddress = "192.0.2.1"
+}
+```
+
+### Argument Reference
+
+The following arguments are supported:
+
+* `gslb_id` - (Required) The ID of GSLB.
+* `ipaddress` - (Required)The IPAddress of target server.
+* `enabled` - (Optional)The flag of enabling to target server.
+* `weight` - (Optional)The weight of target server.
+
+
+### Attributes Reference
+
+The following attributes are exported:
+
+* `id` - The ID of the GSLBServer.
+* `gslb_id` - The ID of the GSLB.
+* `ipaddress` - The IPAddress of target server.
+* `enabled` - The flag of enabling to target server.
+* `weight` - The weight of target server.
 
 
 ## Resource Configuration `sakuracloud_simple_monitor`
@@ -620,7 +639,7 @@ The following arguments are supported:
 
 The following attributes are exported:
 
-* `id` - The ID of the DNS
+* `id` - The ID of the SimpleMonitor.
 * `target` - The monitor target IP or domain name.
 * `health_check` - The health_check rule of SimpleMonitor.
   * `protocol` - The protocol to use for health check. Must be in [`http`,`https`,`tcp`,`ping`,`ssh`,`dns`]
