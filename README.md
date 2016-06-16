@@ -711,11 +711,12 @@ resource "sakuracloud_simple_monitor" "mymonitor" {
 resource "sakuracloud_dns" "foobar" {
     zone = "example.com"
     description = "DNS from terraform for SAKURA CLOUD"
-    records = {
-        name = "terraform-sample"
-        type = "A"
-        value = "${sakuracloud_server.myserver.base_nw_ipaddress}"
-    }
+}
+resource "sakuracloud_dns_record" "foobar" {
+    dns_id = "${sakuracloud_dns.foobar.id}"
+    name = "terraform-sample"
+    type = "A"
+    value = "${sakuracloud_server.myserver.base_nw_ipaddress}"
 }
 ```
 
