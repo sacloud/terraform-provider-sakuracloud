@@ -21,6 +21,7 @@ Terraform provider for SakuraCloud. - `Terraform for さくらのクラウド`
     - [sakuracloud_note](#resource-configuration-sakuracloud_note)
     - [sakuracloud_ssh_key](#resource-configuration-sakuracloud_ssh_key)
     - [sakuracloud_dns](#resource-configuration-sakuracloud_dns)
+    - [sakuracloud_dns_record](#resource-configuration-sakuracloud_dns_record)
     - [sakuracloud_gslb](#resource-configuration-sakuracloud_gslb)
     - [sakuracloud_simple_monitor](#resource-configuration-sakuracloud_simple_monitor)
   - [Samples](#samples)
@@ -435,16 +436,6 @@ modify, and delete DNS records.
 # Create a new DNS zone and add two A records.
 resource "sakuracloud_dns" "dns" {
     zone = "example.com"
-    records = {
-        name = "test1"
-        type = "A"
-        value = "192.168.0.1"
-    }
-    records = {
-        name = "test2"
-        type = "A"
-        value = "192.168.0.2"
-    }
 }
 ```
 
@@ -453,16 +444,8 @@ resource "sakuracloud_dns" "dns" {
 The following arguments are supported:
 
 * `zone` - (Required) The DNS target zone name.
-* `description` - (Required) The description of DNS.
-* `tags` - (Required) The tags of DNS.
-* `records` - (Optional) The records of target zone.
-  * `name` - (Required) The name of the record.
-  * `type` - (Required) The type of the record.
-  * `value` - (Required) The value of the record.
-  * `ttl` - (Optional) The TTL of the record . default `3600`.
-  * `priority` - (Optional) (Only type is MX) The priority of the record.
-
-
+* `description` - (Optional) The description of DNS.
+* `tags` - (Optional) The tags of DNS.
 
 ### Attributes Reference
 
@@ -473,12 +456,44 @@ The following attributes are exported:
 * `dns_servers` - The name servers of the target zone.
 * `description` - The description of target zone.
 * `tags` - The description of target zone.
-* `records` - The records of target zone.
-  * `name` - The name of the record.
-  * `type` - The type of the record.
-  * `value` - The value of the record.
-  * `ttl` - The TTL of the record.
-  * `priority` - (Only type is MX) The priority of the record.
+
+## Resource Configuration `sakuracloud_dns_record`
+
+Provides a SakuraCloud DNSRecord resource. This can be used to create and delete DNS records.
+
+### Example Usage
+
+```
+resource "sakuracloud_dns_record" "foobar" {
+    dns_id = "${sakuracloud_dns.dns.id}"
+    name = "test1"
+    type = "A"
+    value = "192.168.0.1"
+}
+```
+
+### Argument Reference
+
+The following arguments are supported:
+
+* `dns_id` - (Required) The ID of the DNS.
+* `name` - (Required) The name of the record.
+* `type` - (Required) The type of the record.
+* `value` - (Required) The value of the record.
+* `ttl` - (Optional) The TTL of the record . default `3600`.
+* `priority` - (Optional) (Only type is MX) The priority of the record.
+
+### Attributes Reference
+
+The following attributes are exported:
+
+* `id` - The ID of the DNSRecord.
+* `dns_id`- The ID of the DNS.
+* `name` - The name of the record.
+* `type` - The type of the record.
+* `value` - The value of the record.
+* `ttl` - The TTL of the record.
+* `priority` - (Only type is MX) The priority of the record.
 
 
 ## Resource Configuration `sakuracloud_gslb`

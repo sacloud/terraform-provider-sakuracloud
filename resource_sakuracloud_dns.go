@@ -5,8 +5,6 @@ import (
 
 	"github.com/hashicorp/terraform/helper/schema"
 	"github.com/yamamoto-febc/libsacloud/api"
-	"github.com/yamamoto-febc/libsacloud/sacloud"
-	"strings"
 )
 
 func resourceSakuraCloudDNS() *schema.Resource {
@@ -37,43 +35,6 @@ func resourceSakuraCloudDNS() *schema.Resource {
 				Optional: true,
 				Elem:     &schema.Schema{Type: schema.TypeString},
 			},
-			"records": &schema.Schema{
-				Type:     schema.TypeList,
-				Required: true,
-				Elem: &schema.Resource{
-					Schema: map[string]*schema.Schema{
-						"name": &schema.Schema{
-							Type:     schema.TypeString,
-							Required: true,
-						},
-
-						"type": &schema.Schema{
-							Type:         schema.TypeString,
-							Required:     true,
-							ForceNew:     true,
-							ValidateFunc: validateStringInWord(sacloud.AllowDNSTypes()),
-						},
-
-						"value": &schema.Schema{
-							Type:     schema.TypeString,
-							Required: true,
-						},
-
-						"ttl": &schema.Schema{
-							Type:     schema.TypeInt,
-							Optional: true,
-							Default:  3600,
-						},
-
-						"priority": &schema.Schema{
-							Type:     schema.TypeInt,
-							Optional: true,
-						},
-					},
-				},
-				//https://github.com/hashicorp/terraform/pull/4348
-				//ValidateFunc: validateDNSRecordValue(),
-			},
 		},
 	}
 }
@@ -88,32 +49,6 @@ func resourceSakuraCloudDNSCreate(d *schema.ResourceData, meta interface{}) erro
 	rawTags := d.Get("tags").([]interface{})
 	if rawTags != nil {
 		opts.Tags = expandStringList(rawTags)
-	}
-	records := d.Get("records").([]interface{})
-
-	for _, r := range records {
-		recordConf := r.(map[string]interface{})
-		rtype := recordConf["type"].(string)
-		if rtype == "MX" {
-			pr := 10
-			if recordConf["priority"] == nil {
-				pr = recordConf["priority"].(int)
-			}
-			opts.AddRecord(
-				opts.CreateNewMXRecord(
-					recordConf["name"].(string),
-					recordConf["value"].(string),
-					recordConf["ttl"].(int),
-					pr))
-		} else {
-			opts.AddRecord(
-				opts.CreateNewRecord(
-					recordConf["name"].(string),
-					recordConf["type"].(string),
-					recordConf["value"].(string),
-					recordConf["ttl"].(int)))
-
-		}
 	}
 
 	dns, err := client.DNS.Create(opts)
@@ -137,25 +72,6 @@ func resourceSakuraCloudDNSRead(d *schema.ResourceData, meta interface{}) error 
 	d.Set("description", dns.Description)
 	d.Set("tags", dns.Tags)
 	d.Set("dns_servers", dns.Status.NS)
-	var records []interface{}
-	for _, record := range dns.Settings.DNS.ResourceRecordSets {
-		r := map[string]interface{}{
-			"name":  record.Name,
-			"type":  record.Type,
-			"value": record.RData,
-			"ttl":   record.TTL,
-		}
-
-		if record.Type == "MX" {
-			// ex. record.RData = "10 example.com."
-			values := strings.SplitN(record.RData, " ", 2)
-			r["value"] = values[1]
-			r["priority"] = values[0]
-		}
-
-		records = append(records, r)
-	}
-	d.Set("records", records)
 
 	return nil
 }
@@ -183,34 +99,6 @@ func resourceSakuraCloudDNSUpdate(d *schema.ResourceData, meta interface{}) erro
 			opts.Tags = expandStringList(rawTags)
 		}
 
-	}
-
-	// records will set by DELETE-INSERT
-	opts.ClearRecords()
-	records := d.Get("records").([]interface{})
-	for _, r := range records {
-		recordConf := r.(map[string]interface{})
-		rtype := recordConf["type"].(string)
-		if rtype == "MX" {
-			pr := 10
-			if recordConf["priority"] == nil {
-				pr = recordConf["priority"].(int)
-			}
-			opts.AddRecord(
-				opts.CreateNewMXRecord(
-					recordConf["name"].(string),
-					recordConf["value"].(string),
-					recordConf["ttl"].(int),
-					pr))
-		} else {
-			opts.AddRecord(
-				opts.CreateNewRecord(
-					recordConf["name"].(string),
-					recordConf["type"].(string),
-					recordConf["value"].(string),
-					recordConf["ttl"].(int)))
-
-		}
 	}
 
 	dns, err := client.DNS.Update(opts.ID, opts)

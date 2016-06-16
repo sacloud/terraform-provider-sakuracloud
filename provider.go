@@ -1,6 +1,7 @@
 package sakuracloud
 
 import (
+	"github.com/hashicorp/terraform/helper/mutexkv"
 	"github.com/hashicorp/terraform/helper/schema"
 	"github.com/hashicorp/terraform/terraform"
 )
@@ -38,6 +39,7 @@ func Provider() terraform.ResourceProvider {
 			"sakuracloud_bridge":         resourceSakuraCloudBridge(),
 			"sakuracloud_disk":           resourceSakuraCloudDisk(),
 			"sakuracloud_dns":            resourceSakuraCloudDNS(),
+			"sakuracloud_dns_record":     resourceSakuraCloudDNSRecord(),
 			"sakuracloud_gslb":           resourceSakuraCloudGSLB(),
 			"sakuracloud_internet":       resourceSakuraCloudInternet(),
 			"sakuracloud_note":           resourceSakuraCloudNote(),
@@ -61,3 +63,5 @@ func providerConfigure(d *schema.ResourceData) (interface{}, error) {
 
 	return config.NewClient(), nil
 }
+
+var sakuraMutexKV = mutexkv.NewMutexKV()
