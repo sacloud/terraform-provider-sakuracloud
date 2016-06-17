@@ -4,44 +4,27 @@ Terraformでさくらのクラウドを操作するためのプラグイン
 
 ## クイックスタート
 
+#### 前提条件
+
+  - Dockerをインストールしておく
+  - さくらのクラウドAPIキーを取得しておく
+
+Dockerがない場合は[Installation / インストール](https://github.com/yamamoto-febc/terraform-provider-sakuracloud/wiki/Installation)を参考にインストールを実施してください。
+
+さくらのクラウドAPIキーの取得方法は[こちら](https://github.com/yamamoto-febc/terraform-provider-sakuracloud/wiki/Installation#さくらのクラウドapiキーの取得)を参照してください。
+
 ```bash
-$ TERRAFORM_URL="https://releases.hashicorp.com/terraform/0.6.16/terraform_0.6.16_darwin_amd64.zip"
-$ TERRAFORM_SAKURA_URL="https://github.com/yamamoto-febc/terraform-provider-sakuracloud/releases/download/v0.3.4-RC/terraform-provider-sakuracloud_linux-amd64.zip"
-
-#################################################
-# Terraform インストール
-#################################################
-$ mkdir -p ~/terraform ; cd ~/terraform
-$ curl -L $TERRAFORM_URL > terraform.zip
-$ unzip terraform.zip
-$ export PATH=$PATH:~/terraform/
-
-#################################################
-# Terraform for さくらのクラウド インストール
-#################################################
-$ curl -L $TERRAFORM_SAKURA_URL > terraform-provider-sakuracloud.zip
-$ unzip terraform-provider-sakuracloud.zip
-
-#################################################
-# APIキー設定(コントロールパネルで取得しておいてください)
-#################################################
-$ export SAKURACLOUD_ACCESS_TOKEN="さくらのクラウド APIトークン"
-$ export SAKURACLOUD_ACCESS_TOKEN_SECRET="さくらのクラウド APIシークレット"
-
 #################################################
 # Terraform定義ファイル作成
 #################################################
-$ mkdir work; cd work
+$ mkdir ~/work; cd ~/work
 $ ssh-keygen -C "" -P "" -f id_rsa   # サーバーへのSSH用キーペア生成
 $ tee sakura.tf <<-'EOF'
-
-# 公開鍵
 resource "sakuracloud_ssh_key" "key"{
     name = "sshkey"
     public_key = "${file("id_rsa.pub")}"
 }
 
-# ディスク
 resource "sakuracloud_disk" "disk01"{
     name = "disk01"
     source_archive_name = "CentOS 7.2 64bit"
@@ -50,20 +33,22 @@ resource "sakuracloud_disk" "disk01"{
     zone = "is1b"
 }
 
-#サーバー
 resource "sakuracloud_server" "server01" {
     name = "server01"
     disks = ["${sakuracloud_disk.disk01.id}"]
     tags = ["@virtio-net-pci"]
     zone = "is1b"
 }
-
 EOF
 
 #################################################
 # Terraformでインフラ作成
 #################################################
-$ terraform apply
+$ docker run -it --rm \
+         -e SAKURACLOUD_ACCESS_TOKEN=[さくらのクラウド APIトークン] \
+         -e SAKURACLOUD_ACCESS_TOKEN_SECRET=[さくらのクラウド APIシークレット] \
+         -v $PWD:/work \
+         sacloud/terraform apply         
 ```
 
 ## インストール
