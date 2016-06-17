@@ -54,6 +54,7 @@ func resourceSakuraCloudPacketFilter() *schema.Resource {
 						"allow": &schema.Schema{
 							Type:     schema.TypeBool,
 							Optional: true,
+							Default:  true,
 						},
 						"description": &schema.Schema{
 							Type:     schema.TypeString,
