@@ -6,7 +6,7 @@ Terraformでさくらのクラウドを操作するためのプラグイン
 
 ```bash
 $ TERRAFORM_URL="https://releases.hashicorp.com/terraform/0.6.16/terraform_0.6.16_darwin_amd64.zip"
-$ TERRAFORM_SAKURA_URL="https://github.com/yamamoto-febc/terraform-provider-sakuracloud/releases/download/v0.3.3-RC/terraform-provider-sakuracloud_linux-amd64.zip"
+$ TERRAFORM_SAKURA_URL="https://github.com/yamamoto-febc/terraform-provider-sakuracloud/releases/download/v0.3.4-RC/terraform-provider-sakuracloud_linux-amd64.zip"
 
 #################################################
 # Terraform インストール
