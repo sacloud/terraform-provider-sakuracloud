@@ -48,7 +48,7 @@ $ docker run -it --rm \
          -e SAKURACLOUD_ACCESS_TOKEN=[さくらのクラウド APIトークン] \
          -e SAKURACLOUD_ACCESS_TOKEN_SECRET=[さくらのクラウド APIシークレット] \
          -v $PWD:/work \
-         sacloud/terraform apply         
+         sacloud/terraform apply
 ```
 
 ## インストール
