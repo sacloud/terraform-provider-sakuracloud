@@ -118,6 +118,11 @@
 			"Rev": "6e586c89394f5474b6c5f3217a4a75ce80c3fd6c"
 		},
 		{
+			"ImportPath": "github.com/hashicorp/terraform/helper/mutexkv",
+			"Comment": "v0.6.16",
+			"Rev": "6e586c89394f5474b6c5f3217a4a75ce80c3fd6c"
+		},
+		{
 			"ImportPath": "github.com/hashicorp/terraform/helper/resource",
 			"Comment": "v0.6.16",
 			"Rev": "6e586c89394f5474b6c5f3217a4a75ce80c3fd6c"
