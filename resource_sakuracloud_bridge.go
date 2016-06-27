@@ -12,6 +12,9 @@ func resourceSakuraCloudBridge() *schema.Resource {
 		Read:   resourceSakuraCloudBridgeRead,
 		Update: resourceSakuraCloudBridgeUpdate,
 		Delete: resourceSakuraCloudBridgeDelete,
+		Importer: &schema.ResourceImporter{
+			State: schema.ImportStatePassthrough,
+		},
 
 		Schema: map[string]*schema.Schema{
 			"name": &schema.Schema{

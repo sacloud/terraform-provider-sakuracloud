@@ -13,6 +13,9 @@ func resourceSakuraCloudPacketFilter() *schema.Resource {
 		Read:   resourceSakuraCloudPacketFilterRead,
 		Update: resourceSakuraCloudPacketFilterUpdate,
 		Delete: resourceSakuraCloudPacketFilterDelete,
+		Importer: &schema.ResourceImporter{
+			State: schema.ImportStatePassthrough,
+		},
 
 		Schema: map[string]*schema.Schema{
 			"name": &schema.Schema{
@@ -25,7 +28,7 @@ func resourceSakuraCloudPacketFilter() *schema.Resource {
 			},
 			"expressions": &schema.Schema{
 				Type:     schema.TypeList,
-				Required: true,
+				Optional: true,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
 						"protocol": &schema.Schema{

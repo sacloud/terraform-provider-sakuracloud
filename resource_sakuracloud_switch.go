@@ -13,6 +13,9 @@ func resourceSakuraCloudSwitch() *schema.Resource {
 		Read:   resourceSakuraCloudSwitchRead,
 		Update: resourceSakuraCloudSwitchUpdate,
 		Delete: resourceSakuraCloudSwitchDelete,
+		Importer: &schema.ResourceImporter{
+			State: schema.ImportStatePassthrough,
+		},
 
 		Schema: map[string]*schema.Schema{
 			"name": &schema.Schema{

@@ -13,6 +13,9 @@ func resourceSakuraCloudDNS() *schema.Resource {
 		Read:   resourceSakuraCloudDNSRead,
 		Update: resourceSakuraCloudDNSUpdate,
 		Delete: resourceSakuraCloudDNSDelete,
+		Importer: &schema.ResourceImporter{
+			State: schema.ImportStatePassthrough,
+		},
 
 		Schema: map[string]*schema.Schema{
 			"zone": &schema.Schema{

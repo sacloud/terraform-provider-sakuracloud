@@ -15,6 +15,9 @@ func resourceSakuraCloudGSLB() *schema.Resource {
 		Read:   resourceSakuraCloudGSLBRead,
 		Update: resourceSakuraCloudGSLBUpdate,
 		Delete: resourceSakuraCloudGSLBDelete,
+		Importer: &schema.ResourceImporter{
+			State: schema.ImportStatePassthrough,
+		},
 
 		Schema: map[string]*schema.Schema{
 			"name": &schema.Schema{

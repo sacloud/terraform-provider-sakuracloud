@@ -13,6 +13,9 @@ func resourceSakuraCloudInternet() *schema.Resource {
 		Read:   resourceSakuraCloudInternetRead,
 		Update: resourceSakuraCloudInternetUpdate,
 		Delete: resourceSakuraCloudInternetDelete,
+		Importer: &schema.ResourceImporter{
+			State: schema.ImportStatePassthrough,
+		},
 
 		Schema: map[string]*schema.Schema{
 			"name": &schema.Schema{

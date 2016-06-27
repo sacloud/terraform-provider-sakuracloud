@@ -15,6 +15,9 @@ func resourceSakuraCloudDisk() *schema.Resource {
 		Read:   resourceSakuraCloudDiskRead,
 		Update: resourceSakuraCloudDiskUpdate,
 		Delete: resourceSakuraCloudDiskDelete,
+		Importer: &schema.ResourceImporter{
+			State: schema.ImportStatePassthrough,
+		},
 
 		Schema: map[string]*schema.Schema{
 			"name": &schema.Schema{

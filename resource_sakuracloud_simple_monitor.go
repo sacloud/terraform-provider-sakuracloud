@@ -15,6 +15,9 @@ func resourceSakuraCloudSimpleMonitor() *schema.Resource {
 		Read:   resourceSakuraCloudSimpleMonitorRead,
 		Update: resourceSakuraCloudSimpleMonitorUpdate,
 		Delete: resourceSakuraCloudSimpleMonitorDelete,
+		Importer: &schema.ResourceImporter{
+			State: schema.ImportStatePassthrough,
+		},
 
 		Schema: map[string]*schema.Schema{
 			"target": &schema.Schema{

@@ -12,6 +12,9 @@ func resourceSakuraCloudSSHKey() *schema.Resource {
 		Read:   resourceSakuraCloudSSHKeyRead,
 		Update: resourceSakuraCloudSSHKeyUpdate,
 		Delete: resourceSakuraCloudSSHKeyDelete,
+		Importer: &schema.ResourceImporter{
+			State: schema.ImportStatePassthrough,
+		},
 
 		Schema: map[string]*schema.Schema{
 			"name": &schema.Schema{
