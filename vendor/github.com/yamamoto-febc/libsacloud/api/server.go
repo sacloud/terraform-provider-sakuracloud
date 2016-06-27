@@ -49,40 +49,10 @@ func (api *ServerAPI) SortByMemory(reverse bool) *ServerAPI {
 	return api
 }
 
-// CreateWithAdditionalIP create server
-func (api *ServerAPI) CreateWithAdditionalIP(spec *sacloud.Server, addIPAddress string) (*sacloud.Server, error) {
-	//TODO 高レベルAPIへ移動
-
-	server, err := api.Create(spec)
-	if err != nil {
-		return nil, err
-	}
-
-	if addIPAddress != "" && len(server.Interfaces) > 1 {
-		if err := api.updateIPAddress(server, addIPAddress); err != nil {
-			return nil, err
-		}
-	}
-
-	return server, nil
-}
-
-func (api *ServerAPI) updateIPAddress(server *sacloud.Server, ip string) error {
-	//TODO 高レベルAPIへ移動
-	var (
-		method = "PUT"
-		uri    = fmt.Sprintf("interface/%s", server.Interfaces[1].ID)
-		body   = sacloud.Request{}
-	)
-	body.Interface = &sacloud.Interface{UserIPAddress: ip}
-
-	_, err := api.client.newRequest(method, uri, body)
-	if err != nil {
-		return err
-	}
-
-	return nil
-
+func (api *ServerAPI) DeleteWithDisk(id string, disks []string) (*sacloud.Server, error) {
+	return api.request(func(res *sacloud.Response) error {
+		return api.delete(id, map[string]interface{}{"WithDisk": disks}, res)
+	})
 }
 
 // State get server state

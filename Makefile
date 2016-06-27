@@ -8,7 +8,7 @@ clean:
 	rm -Rf $(CURDIR)/bin/*
 
 build: clean vet
-	godep go build -o $(CURDIR)/bin/terraform-provider-sakuracloud $(CURDIR)/builtin/bins/provider-sakuracloud/main.go
+	govendor build -o $(CURDIR)/bin/terraform-provider-sakuracloud $(CURDIR)/builtin/bins/provider-sakuracloud/main.go
 
 build-x: clean vet
 	sh -c "'$(CURDIR)/scripts/build.sh'"
@@ -17,10 +17,10 @@ docker-build: clean vet
 	sh -c "'$(CURDIR)/scripts/build_on_docker.sh' 'build-x'"
 
 test: vet
-	TF_ACC= go test $(TEST) $(TESTARGS) -timeout=30s -parallel=4
+	TF_ACC= govendor test $(TEST) $(TESTARGS) -timeout=30s -parallel=4
 
 testacc: vet
-	TF_ACC=1 godep go test $(TEST) -v $(TESTARGS) -timeout 120m
+	TF_ACC=1 govendor test . -v $(TESTARGS) -timeout 120m
 
 vet: fmt
 	@echo "go tool vet $(VETARGS) ."
@@ -35,4 +35,4 @@ fmt:
 	gofmt -w $(GOFMT_FILES)
 
 
-.PHONY: default test vet fmt fmtcheck
+.PHONY: default test vet testacc fmt fmtcheck

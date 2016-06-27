@@ -141,7 +141,7 @@ names := cfg.Section("").KeyStrings()
 To get a clone hash of keys and corresponding values:
 
 ```go
-hash := cfg.GetSection("").KeysHash()
+hash := cfg.Section("").KeysHash()
 ```
 
 ### Working with values
@@ -393,6 +393,12 @@ CLONE_URL = https://%(IMPORT_PATH)s
 
 ```go
 cfg.Section("package.sub").Key("CLONE_URL").String()	// https://gopkg.in/ini.v1
+```
+
+#### Retrieve parent keys available to a child section
+
+```go
+cfg.Section("package.sub").ParentKeys() // ["CLONE_URL"]
 ```
 
 ### Auto-increment Key Names

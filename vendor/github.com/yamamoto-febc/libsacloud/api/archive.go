@@ -1,14 +1,9 @@
 package api
 
 import (
-	"errors"
 	"fmt"
 	"github.com/yamamoto-febc/libsacloud/sacloud"
 	"time"
-)
-
-const (
-	sakuraCloudPublicImageSearchWords = "Ubuntu Server 14.04.4 LTS 64bit"
 )
 
 type ArchiveAPI struct {
@@ -24,28 +19,6 @@ func NewArchiveAPI(client *Client) *ArchiveAPI {
 			},
 		},
 	}
-}
-
-// GetUbuntuArchiveID get ubuntu archive id
-func (api *ArchiveAPI) GetUbuntuArchiveID() (string, error) {
-
-	res, err := api.
-		WithNameLike(sakuraCloudPublicImageSearchWords).
-		WithSharedScope().
-		Include("ID").
-		Include("Name").
-		Find()
-
-	if err != nil {
-		return "", err
-	}
-
-	//すでに登録されている場合
-	if res.Count > 0 {
-		return res.Archives[0].ID, nil
-	}
-
-	return "", errors.New("Archive'Ubuntu Server 14.04 LTS 64bit' not found.")
 }
 
 func (api *ArchiveAPI) OpenFTP(id string, reset bool) (*sacloud.FTPServer, error) {

@@ -50,7 +50,7 @@ func NewDNSAPI(client *Client) *DNSAPI {
 	}
 }
 
-func (api *DNSAPI) Find(condition *sacloud.Request) (*SearchDNSResponse, error) {
+func (api *DNSAPI) Find() (*SearchDNSResponse, error) {
 
 	data, err := api.client.newRequest("GET", api.getResourceURL(), api.getSearchState())
 	if err != nil {
@@ -158,9 +158,7 @@ func (api *DNSAPI) DeleteDNSRecord(zoneName string, hostName string, ip string) 
 
 func (api *DNSAPI) findOrCreateBy(zoneName string) (*sacloud.DNS, error) {
 
-	req := &sacloud.Request{}
-	req.AddFilter("Name", zoneName)
-	res, err := api.Find(req)
+	res, err := api.WithNameLike(zoneName).Limit(1).Find()
 	if err != nil {
 		return nil, err
 	}
