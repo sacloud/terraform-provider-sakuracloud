@@ -94,6 +94,7 @@ type GSLBRecordSets struct {
 	HealthCheck GSLBHealthCheck `json:",omitempty"`
 	Weighted    string          `json:",omitempty"`
 	Servers     []GSLBServer    `json:",omitempty"`
+	SorryServer string          `json:",omitempty"`
 }
 
 // AddServer Add server to GSLB

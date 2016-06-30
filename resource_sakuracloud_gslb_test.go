@@ -23,6 +23,8 @@ func TestAccSakuraCloudGSLB_Basic(t *testing.T) {
 					resource.TestCheckResourceAttr(
 						"sakuracloud_gslb.foobar", "name", "terraform.io"),
 					resource.TestCheckResourceAttr(
+						"sakuracloud_gslb.foobar", "sorry_server", "8.8.8.8"),
+					resource.TestCheckResourceAttr(
 						"sakuracloud_gslb.foobar", "health_check.1802742300.protocol", "http"),
 					resource.TestCheckResourceAttr(
 						"sakuracloud_gslb.foobar", "health_check.1802742300.delay_loop", "10"),
@@ -48,6 +50,8 @@ func TestAccSakuraCloudGSLB_Update(t *testing.T) {
 					resource.TestCheckResourceAttr(
 						"sakuracloud_gslb.foobar", "name", "terraform.io"),
 					resource.TestCheckResourceAttr(
+						"sakuracloud_gslb.foobar", "sorry_server", "8.8.8.8"),
+					resource.TestCheckResourceAttr(
 						"sakuracloud_gslb.foobar", "health_check.1802742300.protocol", "http"),
 					resource.TestCheckResourceAttr(
 						"sakuracloud_gslb.foobar", "health_check.1802742300.delay_loop", "10"),
@@ -62,6 +66,8 @@ func TestAccSakuraCloudGSLB_Update(t *testing.T) {
 					resource.TestCheckResourceAttr(
 						"sakuracloud_gslb.foobar", "name", "terraform.io"),
 					resource.TestCheckResourceAttr(
+						"sakuracloud_gslb.foobar", "sorry_server", "8.8.4.4"),
+					resource.TestCheckResourceAttr(
 						"sakuracloud_gslb.foobar", "health_check.755645870.protocol", "https"),
 					resource.TestCheckResourceAttr(
 						"sakuracloud_gslb.foobar", "health_check.755645870.delay_loop", "20"),
@@ -75,6 +81,8 @@ func TestAccSakuraCloudGSLB_Update(t *testing.T) {
 					testAccCheckSakuraCloudGSLBExists("sakuracloud_gslb.foobar", &gslb),
 					resource.TestCheckResourceAttr(
 						"sakuracloud_gslb.foobar", "name", "terraform.io"),
+					resource.TestCheckResourceAttr(
+						"sakuracloud_gslb.foobar", "sorry_server", "8.8.4.4"),
 					resource.TestCheckResourceAttr(
 						"sakuracloud_gslb.foobar", "health_check.755645870.protocol", "https"),
 					resource.TestCheckResourceAttr(
@@ -145,6 +153,7 @@ resource "sakuracloud_gslb" "foobar" {
         path = "/"
         status = "200"
     }
+    sorry_server = "8.8.8.8"
     description = "GSLB from TerraForm for SAKURA CLOUD"
     tags = ["hoge1", "hoge2"]
 }`
@@ -159,6 +168,7 @@ resource "sakuracloud_gslb" "foobar" {
         path = "/"
         status = "200"
     }
+    sorry_server = "8.8.4.4"
     description = "GSLB from TerraForm for SAKURA CLOUD"
     tags = ["hoge1", "hoge2"]
 }`
@@ -173,6 +183,7 @@ resource "sakuracloud_gslb" "foobar" {
         path = "/"
         status = "200"
     }
+    sorry_server = "8.8.4.4"
     description = "GSLB from TerraForm for SAKURA CLOUD"
     tags = ["hoge1", "hoge2"]
 }`

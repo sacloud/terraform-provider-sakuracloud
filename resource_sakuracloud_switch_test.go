@@ -83,10 +83,28 @@ func TestAccSakuraCloudSwitch_WithServer(t *testing.T) {
 	})
 }
 
+//func TestAccSakuraCloudSwitch_Import(t *testing.T) {
+//	resourceName := "sakuracloud_switch.foobar"
+//	resource.Test(t, resource.TestCase{
+//		PreCheck:     func() { testAccPreCheck(t) },
+//		Providers:    testAccProviders,
+//		CheckDestroy: testAccCheckSakuraCloudSwitchDestroy,
+//		Steps: []resource.TestStep{
+//			resource.TestStep{
+//				Config: testAccCheckSakuraCloudSwitchConfig_basic,
+//			},
+//			resource.TestStep{
+//				ResourceName:      resourceName,
+//				ImportState:       true,
+//				ImportStateVerify: true,
+//			},
+//		},
+//	})
+//}
+
 func testAccCheckSakuraCloudSwitchExists(n string, sw *sacloud.Switch) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
 		rs, ok := s.RootModule().Resources[n]
-
 		if !ok {
 			return fmt.Errorf("Not found: %s", n)
 		}

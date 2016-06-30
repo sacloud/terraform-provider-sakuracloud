@@ -49,9 +49,22 @@ func resourceSakuraCloudDNSRecord() *schema.Resource {
 			},
 
 			"priority": &schema.Schema{
-				Type:     schema.TypeInt,
-				Optional: true,
-				ForceNew: true,
+				Type:         schema.TypeInt,
+				Optional:     true,
+				ForceNew:     true,
+				ValidateFunc: validateIntegerInRange(0, 65535),
+			},
+			"weight": &schema.Schema{
+				Type:         schema.TypeInt,
+				Optional:     true,
+				ForceNew:     true,
+				ValidateFunc: validateIntegerInRange(0, 65535),
+			},
+			"port": &schema.Schema{
+				Type:         schema.TypeInt,
+				Optional:     true,
+				ForceNew:     true,
+				ValidateFunc: validateIntegerInRange(1, 65535),
 			},
 		},
 	}
@@ -108,6 +121,13 @@ func resourceSakuraCloudDNSRecordRead(d *schema.ResourceData, meta interface{}) 
 		values := strings.SplitN(record.RData, " ", 2)
 		d.Set("value", values[1])
 		d.Set("priority", values[0])
+	} else if record.Type == "SRV" {
+		values := strings.SplitN(record.RData, " ", 4)
+		d.Set("value", values[3])
+		d.Set("priority", values[0])
+		d.Set("weight", values[1])
+		d.Set("port", values[2])
+
 	}
 
 	return nil
@@ -181,6 +201,26 @@ func expandDNSRecord(d *schema.ResourceData) *sacloud.DNSRecordSet {
 			d.Get("value").(string),
 			d.Get("ttl").(int),
 			pr)
+	} else if t == "SRV" {
+		pr := 0
+		if p, ok := d.GetOk("priority"); ok {
+			pr = p.(int)
+		}
+		weight := 0
+		if w, ok := d.GetOk("weight"); ok {
+			weight = w.(int)
+		}
+		port := 1
+		if po, ok := d.GetOk("port"); ok {
+			port = po.(int)
+		}
+
+		return dns.CreateNewSRVRecord(
+			d.Get("name").(string),
+			d.Get("value").(string),
+			d.Get("ttl").(int),
+			pr, weight, port)
+
 	} else {
 		return dns.CreateNewRecord(
 			d.Get("name").(string),

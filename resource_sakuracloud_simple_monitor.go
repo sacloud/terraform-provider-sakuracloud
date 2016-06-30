@@ -7,6 +7,7 @@ import (
 	"github.com/hashicorp/terraform/helper/schema"
 	"github.com/yamamoto-febc/libsacloud/api"
 	"github.com/yamamoto-febc/libsacloud/sacloud"
+	"strconv"
 )
 
 func resourceSakuraCloudSimpleMonitor() *schema.Resource {
@@ -42,10 +43,10 @@ func resourceSakuraCloudSimpleMonitor() *schema.Resource {
 							ValidateFunc: validateIntegerInRange(60, 3600),
 							Default:      60,
 						},
-						//"host_header": &schema.Schema{
-						//	Type:     schema.TypeString,
-						//	Optional: true,
-						//},
+						"host_header": &schema.Schema{
+							Type:     schema.TypeString,
+							Optional: true,
+						},
 						"path": &schema.Schema{
 							Type:     schema.TypeString,
 							Optional: true,
@@ -124,37 +125,60 @@ func resourceSakuraCloudSimpleMonitorCreate(d *schema.ResourceData, meta interfa
 	for _, c := range healthCheckConf.List() {
 		conf := c.(map[string]interface{})
 		protocol := conf["protocol"].(string)
-		switch protocol {
-		case "http", "https":
-			opts.Settings.SimpleMonitor.HealthCheck = &sacloud.SimpleMonitorHealthCheck{
-				Protocol: protocol,
-				Path:     conf["path"].(string),
-				Status:   conf["status"].(string),
+		port := ""
+		if _, ok := conf["port"]; ok {
+			port = strconv.Itoa(conf["port"].(int))
+			if port == "0" {
+				port = ""
 			}
-		case "dns":
-			opts.Settings.SimpleMonitor.HealthCheck = &sacloud.SimpleMonitorHealthCheck{
-				Protocol:     protocol,
-				QName:        conf["qname"].(string),
-				ExpectedData: conf["expected_data"].(string),
-			}
-		case "snmp":
-			opts.Settings.SimpleMonitor.HealthCheck = &sacloud.SimpleMonitorHealthCheck{
-				Protocol:     protocol,
-				Community:    conf["community"].(string),
-				SNMPVersion:  conf["snmp_version"].(string),
-				OID:          conf["oid"].(string),
-				ExpectedData: conf["expected_data"].(string),
-			}
+		}
 
-		case "tcp", "ssh", "smtp", "pop3":
-			opts.Settings.SimpleMonitor.HealthCheck = &sacloud.SimpleMonitorHealthCheck{
-				Protocol: protocol,
-				Port:     fmt.Sprintf("%d", conf["port"].(int)),
+		switch protocol {
+		case "http":
+			if port == "" {
+				port = "80"
 			}
+			opts.SetHealthCheckHTTP(port,
+				forceString(conf["path"]),
+				forceString(conf["status"]),
+				forceString(conf["host_header"]))
+		case "https":
+			if port == "" {
+				port = "443"
+			}
+			opts.SetHealthCheckHTTPS(port,
+				forceString(conf["path"]),
+				forceString(conf["status"]),
+				forceString(conf["host_header"]))
+
+		case "dns":
+			opts.SetHealthCheckDNS(forceString(conf["qname"]),
+				forceString(conf["expected_data"]))
+		case "snmp":
+			opts.SetHealthCheckSNMP(forceString(conf["community"]),
+				forceString(conf["snmp_version"]),
+				forceString(conf["oid"]),
+				forceString(conf["expected_data"]))
+		case "tcp":
+			opts.SetHealthCheckTCP(port)
+		case "ssh":
+			if port == "" {
+				port = "22"
+			}
+			opts.SetHealthCheckSSH(port)
+		case "smtp":
+			if port == "" {
+				port = "25"
+			}
+			opts.SetHealthCheckSMTP(port)
+		case "pop3":
+			if port == "" {
+				port = "110"
+			}
+			opts.SetHealthCheckPOP3(port)
+
 		case "ping":
-			opts.Settings.SimpleMonitor.HealthCheck = &sacloud.SimpleMonitorHealthCheck{
-				Protocol: protocol,
-			}
+			opts.SetHealthCheckPing()
 		}
 
 		opts.Settings.SimpleMonitor.DelayLoop = conf["delay_loop"].(int)
@@ -206,21 +230,49 @@ func resourceSakuraCloudSimpleMonitorRead(d *schema.ResourceData, meta interface
 	d.Set("target", simpleMonitor.Status.Target)
 
 	healthCheck := map[string]interface{}{}
+	readHealthCheck := simpleMonitor.Settings.SimpleMonitor.HealthCheck
 	switch simpleMonitor.Settings.SimpleMonitor.HealthCheck.Protocol {
-	case "http", "https":
-		healthCheck["path"] = simpleMonitor.Settings.SimpleMonitor.HealthCheck.Path
-		healthCheck["status"] = simpleMonitor.Settings.SimpleMonitor.HealthCheck.Status
-	case "tcp", "ssh", "smtp", "pop3":
-		healthCheck["port"] = simpleMonitor.Settings.SimpleMonitor.HealthCheck.Port
+	case "http":
+
+		healthCheck["path"] = readHealthCheck.Path
+		healthCheck["status"] = readHealthCheck.Status
+		healthCheck["host_header"] = readHealthCheck.Host
+		if readHealthCheck.Port != "80" {
+			healthCheck["port"] = readHealthCheck.Port
+		}
+	case "https":
+		healthCheck["path"] = readHealthCheck.Path
+		healthCheck["status"] = readHealthCheck.Status
+		healthCheck["host_header"] = readHealthCheck.Host
+		if readHealthCheck.Port != "443" {
+			healthCheck["port"] = readHealthCheck.Port
+		}
+
+	case "tcp":
+		healthCheck["port"] = readHealthCheck.Port
+	case "ssh":
+		if readHealthCheck.Port != "22" {
+			healthCheck["port"] = readHealthCheck.Port
+		}
+	case "smtp":
+		if readHealthCheck.Port != "25" {
+			healthCheck["port"] = readHealthCheck.Port
+		}
+	case "pop3":
+		if readHealthCheck.Port != "110" {
+			healthCheck["port"] = readHealthCheck.Port
+		}
+
 	case "snmp":
-		healthCheck["community"] = simpleMonitor.Settings.SimpleMonitor.HealthCheck.Community
-		healthCheck["snmp_version"] = simpleMonitor.Settings.SimpleMonitor.HealthCheck.SNMPVersion
-		healthCheck["oid"] = simpleMonitor.Settings.SimpleMonitor.HealthCheck.OID
-		healthCheck["expected_data"] = simpleMonitor.Settings.SimpleMonitor.HealthCheck.ExpectedData
+		healthCheck["community"] = readHealthCheck.Community
+		healthCheck["snmp_version"] = readHealthCheck.SNMPVersion
+		healthCheck["oid"] = readHealthCheck.OID
+		healthCheck["expected_data"] = readHealthCheck.ExpectedData
 	case "dns":
-		healthCheck["qname"] = simpleMonitor.Settings.SimpleMonitor.HealthCheck.QName
-		healthCheck["expected_data"] = simpleMonitor.Settings.SimpleMonitor.HealthCheck.ExpectedData
+		healthCheck["qname"] = readHealthCheck.QName
+		healthCheck["expected_data"] = readHealthCheck.ExpectedData
 	}
+
 	healthCheck["protocol"] = simpleMonitor.Settings.SimpleMonitor.HealthCheck.Protocol
 	healthCheck["delay_loop"] = simpleMonitor.Settings.SimpleMonitor.DelayLoop
 	d.Set("health_check", schema.NewSet(healthCheckSimpleMonitorHash, []interface{}{healthCheck}))
@@ -255,37 +307,62 @@ func resourceSakuraCloudSimpleMonitorUpdate(d *schema.ResourceData, meta interfa
 		for _, c := range healthCheckConf.List() {
 			conf := c.(map[string]interface{})
 			protocol := conf["protocol"].(string)
-			switch protocol {
-			case "http", "https":
-				simpleMonitor.Settings.SimpleMonitor.HealthCheck = &sacloud.SimpleMonitorHealthCheck{
-					Protocol: protocol,
-					Path:     conf["path"].(string),
-					Status:   conf["status"].(string),
-				}
-			case "dns":
-				simpleMonitor.Settings.SimpleMonitor.HealthCheck = &sacloud.SimpleMonitorHealthCheck{
-					Protocol:     protocol,
-					QName:        conf["qname"].(string),
-					ExpectedData: conf["expected_data"].(string),
-				}
-			case "snmp":
-				simpleMonitor.Settings.SimpleMonitor.HealthCheck = &sacloud.SimpleMonitorHealthCheck{
-					Protocol:     protocol,
-					Community:    conf["community"].(string),
-					SNMPVersion:  conf["snmp_version"].(string),
-					OID:          conf["oid"].(string),
-					ExpectedData: conf["expected_data"].(string),
-				}
-			case "tcp", "ssh", "smtp", "pop3":
-				simpleMonitor.Settings.SimpleMonitor.HealthCheck = &sacloud.SimpleMonitorHealthCheck{
-					Protocol: protocol,
-					Port:     fmt.Sprintf("%d", conf["port"].(int)),
-				}
-			case "ping":
-				simpleMonitor.Settings.SimpleMonitor.HealthCheck = &sacloud.SimpleMonitorHealthCheck{
-					Protocol: protocol,
+			port := ""
+			if _, ok := conf["port"]; ok {
+				port = strconv.Itoa(conf["port"].(int))
+				if port == "0" {
+					port = ""
 				}
 			}
+
+			switch protocol {
+			case "http":
+				if port == "" {
+					port = "80"
+				}
+				simpleMonitor.SetHealthCheckHTTP(port,
+					forceString(conf["path"]),
+					forceString(conf["status"]),
+					forceString(conf["host_header"]))
+			case "https":
+				if port == "" {
+					port = "443"
+				}
+				simpleMonitor.SetHealthCheckHTTPS(port,
+					forceString(conf["path"]),
+					forceString(conf["status"]),
+					forceString(conf["host_header"]))
+
+			case "dns":
+				simpleMonitor.SetHealthCheckDNS(forceString(conf["qname"]),
+					forceString(conf["expected_data"]))
+			case "snmp":
+				simpleMonitor.SetHealthCheckSNMP(forceString(conf["community"]),
+					forceString(conf["snmp_version"]),
+					forceString(conf["oid"]),
+					forceString(conf["expected_data"]))
+			case "tcp":
+				simpleMonitor.SetHealthCheckTCP(port)
+			case "ssh":
+				if port == "" {
+					port = "22"
+				}
+				simpleMonitor.SetHealthCheckSSH(port)
+			case "smtp":
+				if port == "" {
+					port = "25"
+				}
+				simpleMonitor.SetHealthCheckSMTP(port)
+			case "pop3":
+				if port == "" {
+					port = "110"
+				}
+				simpleMonitor.SetHealthCheckPOP3(port)
+
+			case "ping":
+				simpleMonitor.SetHealthCheckPing()
+			}
+
 			simpleMonitor.Settings.SimpleMonitor.DelayLoop = conf["delay_loop"].(int)
 		}
 	}

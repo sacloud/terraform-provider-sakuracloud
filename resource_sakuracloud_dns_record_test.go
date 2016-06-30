@@ -104,6 +104,37 @@ func TestAccSakuraCloudDNSRecord_With_Count(t *testing.T) {
 	})
 }
 
+func TestAccSakuraCloudDNSRecord_With_SRV(t *testing.T) {
+	var dns sacloud.DNS
+	resource.Test(t, resource.TestCase{
+		PreCheck:     func() { testAccPreCheck(t) },
+		Providers:    testAccProviders,
+		CheckDestroy: testAccCheckSakuraCloudDNSRecordDestroy,
+		Steps: []resource.TestStep{
+			resource.TestStep{
+				Config: testAccCheckSakuraCloudDNSRecordConfig_srv,
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckSakuraCloudDNSExists("sakuracloud_dns.foobar", &dns),
+					resource.TestCheckResourceAttr(
+						"sakuracloud_dns.foobar", "zone", "terraform.io"),
+					resource.TestCheckResourceAttr(
+						"sakuracloud_dns_record.foobar1", "name", "_sip._tls"),
+					resource.TestCheckResourceAttr(
+						"sakuracloud_dns_record.foobar1", "type", "SRV"),
+					resource.TestCheckResourceAttr(
+						"sakuracloud_dns_record.foobar1", "value", "www.sakura.ne.jp."),
+					resource.TestCheckResourceAttr(
+						"sakuracloud_dns_record.foobar1", "priority", "1"),
+					resource.TestCheckResourceAttr(
+						"sakuracloud_dns_record.foobar1", "weight", "2"),
+					resource.TestCheckResourceAttr(
+						"sakuracloud_dns_record.foobar1", "port", "3"),
+				),
+			},
+		},
+	})
+}
+
 func testAccCheckSakuraCloudDNSRecordDestroy(s *terraform.State) error {
 	client := testAccProvider.Meta().(*api.Client)
 
@@ -166,4 +197,20 @@ resource "sakuracloud_dns_record" "foobar" {
     name = "test"
     type = "A"
     value = "${element(split("," , var.ip_list),count.index)}"
+}`
+
+var testAccCheckSakuraCloudDNSRecordConfig_srv = `
+resource "sakuracloud_dns" "foobar" {
+    zone = "terraform.io"
+    description = "DNS from TerraForm for SAKURA CLOUD"
+    tags = ["hoge1"]
+}
+resource "sakuracloud_dns_record" "foobar1" {
+    dns_id = "${sakuracloud_dns.foobar.id}"
+    name = "_sip._tls"
+    type = "SRV"
+    value = "www.sakura.ne.jp."
+    priority = 1
+    weight = 2
+    port = 3
 }`

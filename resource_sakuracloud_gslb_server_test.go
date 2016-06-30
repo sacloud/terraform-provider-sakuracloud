@@ -125,4 +125,5 @@ resource "sakuracloud_gslb_server" "foobar" {
     count = 4
     gslb_id = "${sakuracloud_gslb.foobar.id}"
     ipaddress = "${element(split("," , var.gslb_ip_list),count.index)}"
+
 }`

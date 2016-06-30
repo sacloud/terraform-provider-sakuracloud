@@ -22,9 +22,11 @@ func TestAccSakuraCloudSimpleMonitor_Basic(t *testing.T) {
 					testAccCheckSakuraCloudSimpleMonitorExists("sakuracloud_simple_monitor.foobar", &monitor),
 					testAccCheckSakuraCloudSimpleMonitorAttributes(&monitor),
 					resource.TestCheckResourceAttr(
-						"sakuracloud_simple_monitor.foobar", "health_check.1245524278.protocol", "http"),
+						"sakuracloud_simple_monitor.foobar", "health_check.109142589.protocol", "http"),
 					resource.TestCheckResourceAttr(
-						"sakuracloud_simple_monitor.foobar", "health_check.1245524278.delay_loop", "60"),
+						"sakuracloud_simple_monitor.foobar", "health_check.109142589.delay_loop", "60"),
+					resource.TestCheckResourceAttr(
+						"sakuracloud_simple_monitor.foobar", "health_check.109142589.host_header", "libsacloud.com"),
 					resource.TestCheckResourceAttr(
 						"sakuracloud_simple_monitor.foobar", "target", "terraform.io"),
 					resource.TestCheckResourceAttr(
@@ -50,9 +52,9 @@ func TestAccSakuraCloudSimpleMonitor_Update(t *testing.T) {
 					testAccCheckSakuraCloudSimpleMonitorExists("sakuracloud_simple_monitor.foobar", &monitor),
 					testAccCheckSakuraCloudSimpleMonitorAttributes(&monitor),
 					resource.TestCheckResourceAttr(
-						"sakuracloud_simple_monitor.foobar", "health_check.1245524278.protocol", "http"),
+						"sakuracloud_simple_monitor.foobar", "health_check.109142589.protocol", "http"),
 					resource.TestCheckResourceAttr(
-						"sakuracloud_simple_monitor.foobar", "health_check.1245524278.delay_loop", "60"),
+						"sakuracloud_simple_monitor.foobar", "health_check.109142589.delay_loop", "60"),
 					resource.TestCheckResourceAttr(
 						"sakuracloud_simple_monitor.foobar", "target", "terraform.io"),
 					resource.TestCheckResourceAttr(
@@ -66,6 +68,8 @@ func TestAccSakuraCloudSimpleMonitor_Update(t *testing.T) {
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckSakuraCloudSimpleMonitorExists("sakuracloud_simple_monitor.foobar", &monitor),
 					testAccCheckSakuraCloudSimpleMonitorAttributesUpdated(&monitor),
+					resource.TestCheckResourceAttr(
+						"sakuracloud_simple_monitor.foobar", "health_check.1187190475.host_header", "libsacloud.com"),
 					resource.TestCheckResourceAttr(
 						"sakuracloud_simple_monitor.foobar", "target", "terraform.io"),
 					resource.TestCheckResourceAttr(
@@ -150,6 +154,7 @@ resource "sakuracloud_simple_monitor" "foobar" {
         delay_loop = 60
         path = "/"
         status = "200"
+        host_header = "libsacloud.com"
     }
     description = "SimpleMonitor from TerraForm for SAKURA CLOUD"
     tags = ["hoge1" , "hoge2"]
@@ -166,6 +171,7 @@ resource "sakuracloud_simple_monitor" "foobar" {
         delay_loop = 120
         path = "/"
         status = "200"
+        host_header = "libsacloud.com"
     }
     description = "SimpleMonitor from TerraForm for SAKURA CLOUD"
     tags = ["hoge1" , "hoge2"]
