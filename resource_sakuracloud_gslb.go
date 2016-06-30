@@ -70,6 +70,10 @@ func resourceSakuraCloudGSLB() *schema.Resource {
 				Optional: true,
 				Default:  false,
 			},
+			"sorry_server": &schema.Schema{
+				Type:     schema.TypeString,
+				Optional: true,
+			},
 			"description": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
@@ -119,6 +123,10 @@ func resourceSakuraCloudGSLBCreate(d *schema.ResourceData, meta interface{}) err
 		opts.Settings.GSLB.Weighted = "False"
 	}
 
+	if sorryServer, ok := d.GetOk("sorry_server"); ok {
+		opts.Settings.GSLB.SorryServer = sorryServer.(string)
+	}
+
 	if description, ok := d.GetOk("description"); ok {
 		opts.Description = description.(string)
 	}
@@ -161,6 +169,7 @@ func resourceSakuraCloudGSLBRead(d *schema.ResourceData, meta interface{}) error
 	healthCheck["delay_loop"] = gslb.Settings.GSLB.DelayLoop
 	d.Set("health_check", schema.NewSet(healthCheckHash, []interface{}{healthCheck}))
 
+	d.Set("sorry_server", gslb.Settings.GSLB.SorryServer)
 	d.Set("description", gslb.Description)
 	d.Set("tags", gslb.Tags)
 	d.Set("weighted", gslb.Settings.GSLB.Weighted == "True")
@@ -210,6 +219,14 @@ func resourceSakuraCloudGSLBUpdate(d *schema.ResourceData, meta interface{}) err
 		gslb.Settings.GSLB.Weighted = "True"
 	} else {
 		gslb.Settings.GSLB.Weighted = "False"
+	}
+
+	if d.HasChange("sorry_server") {
+		if sorryServer, ok := d.GetOk("sorry_server"); ok {
+			gslb.Settings.GSLB.SorryServer = sorryServer.(string)
+		} else {
+			gslb.Settings.GSLB.SorryServer = ""
+		}
 	}
 
 	if d.HasChange("description") {

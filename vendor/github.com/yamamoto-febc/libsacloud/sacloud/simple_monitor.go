@@ -51,6 +51,7 @@ type SimpleMonitorHealthCheck struct {
 	Port         string `json:",omitempty"`
 	Path         string `json:",omitempty"`
 	Status       string `json:",omitempty"`
+	Host         string `json:",omitempty"`
 	QName        string `json:",omitempty"`
 	ExpectedData string `json:",omitempty"`
 	Community    string `json:",omitempty"`
@@ -127,21 +128,23 @@ func (s *SimpleMonitor) SetHealthCheckTCP(port string) {
 	}
 }
 
-func (s *SimpleMonitor) SetHealthCheckHTTP(port string, path string, status string) {
+func (s *SimpleMonitor) SetHealthCheckHTTP(port string, path string, status string, host string) {
 	s.Settings.SimpleMonitor.HealthCheck = &SimpleMonitorHealthCheck{
 		Protocol: "http",
 		Port:     port,
 		Path:     path,
 		Status:   status,
+		Host:     host,
 	}
 }
 
-func (s *SimpleMonitor) SetHealthCheckHTTPS(port string, path string, status string) {
+func (s *SimpleMonitor) SetHealthCheckHTTPS(port string, path string, status string, host string) {
 	s.Settings.SimpleMonitor.HealthCheck = &SimpleMonitorHealthCheck{
 		Protocol: "https",
 		Port:     port,
 		Path:     path,
 		Status:   status,
+		Host:     host,
 	}
 }
 

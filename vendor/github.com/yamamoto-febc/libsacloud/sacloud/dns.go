@@ -54,7 +54,7 @@ func CreateNewDNS(zoneName string) *DNS {
 }
 
 func AllowDNSTypes() []string {
-	return []string{"A", "AAAA", "CNAME", "NS", "MX", "TXT"}
+	return []string{"A", "AAAA", "CNAME", "NS", "MX", "TXT", "SRV"}
 }
 
 func (d *DNS) SetZone(zone string) {
@@ -81,6 +81,15 @@ func (d *DNS) CreateNewMXRecord(name string, rdata string, ttl int, priority int
 		Name:  name,
 		Type:  "MX",
 		RData: fmt.Sprintf("%d %s", priority, rdata),
+		TTL:   ttl,
+	}
+}
+
+func (d *DNS) CreateNewSRVRecord(name string, rdata string, ttl int, priority int, weight int, port int) *DNSRecordSet {
+	return &DNSRecordSet{
+		Name:  name,
+		Type:  "SRV",
+		RData: fmt.Sprintf("%d %d %d %s", priority, weight, port, rdata),
 		TTL:   ttl,
 	}
 }
