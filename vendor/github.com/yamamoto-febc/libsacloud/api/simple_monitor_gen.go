@@ -55,7 +55,7 @@ func (api *SimpleMonitorAPI) WithTag(tag string) *SimpleMonitorAPI {
 	return api.FilterBy("Tags.Name", tag)
 }
 func (api *SimpleMonitorAPI) WithTags(tags []string) *SimpleMonitorAPI {
-	return api.FilterBy("Tags.Name", tags)
+	return api.FilterBy("Tags.Name", []interface{}{tags})
 }
 
 // func (api *SimpleMonitorAPI) WithSizeGib(size int) *SimpleMonitorAPI {

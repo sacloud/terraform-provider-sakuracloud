@@ -55,7 +55,7 @@ func (api *IconAPI) WithTag(tag string) *IconAPI {
 	return api.FilterBy("Tags.Name", tag)
 }
 func (api *IconAPI) WithTags(tags []string) *IconAPI {
-	return api.FilterBy("Tags.Name", tags)
+	return api.FilterBy("Tags.Name", []interface{}{tags})
 }
 
 // func (api *IconAPI) WithSizeGib(size int) *IconAPI {

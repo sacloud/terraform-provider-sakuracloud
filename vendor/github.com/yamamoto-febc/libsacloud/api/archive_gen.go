@@ -55,7 +55,7 @@ func (api *ArchiveAPI) WithTag(tag string) *ArchiveAPI {
 	return api.FilterBy("Tags.Name", tag)
 }
 func (api *ArchiveAPI) WithTags(tags []string) *ArchiveAPI {
-	return api.FilterBy("Tags.Name", tags)
+	return api.FilterBy("Tags.Name", []interface{}{tags})
 }
 
 func (api *ArchiveAPI) WithSizeGib(size int) *ArchiveAPI {

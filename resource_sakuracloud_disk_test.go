@@ -133,18 +133,32 @@ func testAccCheckSakuraCloudDiskDestroy(s *terraform.State) error {
 }
 
 var testAccCheckSakuraCloudDiskConfig_basic = `
+data "sakuracloud_archive" "ubuntu" {
+    filter = {
+	name = "Name"
+	values = ["Ubuntu Server 16"]
+    }
+    zone = "tk1v"
+}
 resource "sakuracloud_disk" "foobar" {
     name = "mydisk"
-    source_archive_name = "Ubuntu Server 14"
+    source_archive_id = "${data.sakuracloud_archive.ubuntu.id}"
     description = "Disk from TerraForm for SAKURA CLOUD"
     tags = ["hoge1" , "hoge2"]
     zone = "tk1v"
 }`
 
 var testAccCheckSakuraCloudDiskConfig_update = `
+data "sakuracloud_archive" "ubuntu" {
+    filter = {
+	name = "Name"
+	values = ["Ubuntu Server 16"]
+    }
+    zone = "tk1v"
+}
 resource "sakuracloud_disk" "foobar" {
     name = "mydisk"
-    source_archive_name = "Ubuntu Server 14"
+    source_archive_id = "${data.sakuracloud_archive.ubuntu.id}"
     description = "Disk from TerraForm for SAKURA CLOUD"
     tags = ["hoge1" , "hoge2"]
     disable_pw_auth = true

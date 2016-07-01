@@ -55,7 +55,7 @@ func (api *DNSAPI) WithTag(tag string) *DNSAPI {
 	return api.FilterBy("Tags.Name", tag)
 }
 func (api *DNSAPI) WithTags(tags []string) *DNSAPI {
-	return api.FilterBy("Tags.Name", tags)
+	return api.FilterBy("Tags.Name", []interface{}{tags})
 }
 
 // func (api *DNSAPI) WithSizeGib(size int) *DNSAPI {

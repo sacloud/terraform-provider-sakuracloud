@@ -55,7 +55,7 @@ func (api *PacketFilterAPI) WithTag(tag string) *PacketFilterAPI {
 	return api.FilterBy("Tags.Name", tag)
 }
 func (api *PacketFilterAPI) WithTags(tags []string) *PacketFilterAPI {
-	return api.FilterBy("Tags.Name", tags)
+	return api.FilterBy("Tags.Name", []interface{}{tags})
 }
 
 // func (api *PacketFilterAPI) WithSizeGib(size int) *PacketFilterAPI {

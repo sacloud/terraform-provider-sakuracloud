@@ -55,7 +55,7 @@ func (api *RegionAPI) WithTag(tag string) *RegionAPI {
 	return api.FilterBy("Tags.Name", tag)
 }
 func (api *RegionAPI) WithTags(tags []string) *RegionAPI {
-	return api.FilterBy("Tags.Name", tags)
+	return api.FilterBy("Tags.Name", []interface{}{tags})
 }
 
 // func (api *RegionAPI) WithSizeGib(size int) *RegionAPI {

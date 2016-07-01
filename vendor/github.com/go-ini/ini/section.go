@@ -140,7 +140,7 @@ func (s *Section) Keys() []*Key {
 }
 
 // ParentKeys returns list of keys of parent section.
-func (s * Section) ParentKeys() []*Key {
+func (s *Section) ParentKeys() []*Key {
 	var parentKeys []*Key
 	sname := s.name
 	for {

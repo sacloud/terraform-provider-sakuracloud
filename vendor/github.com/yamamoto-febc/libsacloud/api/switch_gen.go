@@ -55,7 +55,7 @@ func (api *SwitchAPI) WithTag(tag string) *SwitchAPI {
 	return api.FilterBy("Tags.Name", tag)
 }
 func (api *SwitchAPI) WithTags(tags []string) *SwitchAPI {
-	return api.FilterBy("Tags.Name", tags)
+	return api.FilterBy("Tags.Name", []interface{}{tags})
 }
 
 // func (api *SwitchAPI) WithSizeGib(size int) *SwitchAPI {

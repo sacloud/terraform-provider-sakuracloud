@@ -55,7 +55,7 @@ func (api *VPCRouterAPI) WithTag(tag string) *VPCRouterAPI {
 	return api.FilterBy("Tags.Name", tag)
 }
 func (api *VPCRouterAPI) WithTags(tags []string) *VPCRouterAPI {
-	return api.FilterBy("Tags.Name", tags)
+	return api.FilterBy("Tags.Name", []interface{}{tags})
 }
 
 // func (api *VPCRouterAPI) WithSizeGib(size int) *VPCRouterAPI {

@@ -48,25 +48,13 @@ func resourceSakuraCloudDisk() *schema.Resource {
 				Type:          schema.TypeString,
 				ForceNew:      true,
 				Optional:      true,
-				ConflictsWith: []string{"source_archive_name", "source_disk_name", "source_disk_id"},
-			},
-			"source_archive_name": &schema.Schema{
-				Type:          schema.TypeString,
-				Optional:      true,
-				ForceNew:      true,
-				ConflictsWith: []string{"source_archive_id", "source_disk_name", "source_disk_id"},
+				ConflictsWith: []string{"source_disk_id"},
 			},
 			"source_disk_id": &schema.Schema{
 				Type:          schema.TypeString,
 				ForceNew:      true,
 				Optional:      true,
-				ConflictsWith: []string{"source_disk_name", "source_archive_name", "source_archive_id"},
-			},
-			"source_disk_name": &schema.Schema{
-				Type:          schema.TypeString,
-				Optional:      true,
-				ForceNew:      true,
-				ConflictsWith: []string{"source_disk_id", "source_archive_name", "source_archive_id"},
+				ConflictsWith: []string{"source_archive_id"},
 			},
 			"size": &schema.Schema{
 				Type:     schema.TypeInt,
@@ -143,26 +131,9 @@ func resourceSakuraCloudDiskCreate(d *schema.ResourceData, meta interface{}) err
 	if ok {
 		opts.SetSourceArchive(archiveID.(string))
 	}
-	archiveName, ok := d.GetOk("source_archive_name")
-	if ok {
-		res, err := client.Archive.WithNameLike(archiveName.(string)).Include("ID").Limit(1).Find()
-		if err != nil {
-			return fmt.Errorf("Failed to create SakuraCloud Disk resource - Source archive not found: %s", err)
-		}
-		opts.SetSourceArchive(res.Archives[0].ID)
-	}
-
 	diskID, ok := d.GetOk("source_disk_id")
 	if ok {
 		opts.SetSourceDisk(diskID.(string))
-	}
-	diskName, ok := d.GetOk("source_disk_name")
-	if ok {
-		res, err := client.Disk.WithNameLike(diskName.(string)).Include("ID").Limit(1).Find()
-		if err != nil {
-			return fmt.Errorf("Failed to create SakuraCloud Disk resource - Source disk not found: %s", err)
-		}
-		opts.SetSourceDisk(res.Disks[0].ID)
 	}
 
 	opts.SizeMB = d.Get("size").(int) * units.GiB / units.MiB

@@ -52,7 +52,7 @@ func NewGSLBAPI(client *Client) *GSLBAPI {
 	}
 }
 
-func (api *GSLBAPI) Find(condition *sacloud.Request) (*SearchGSLBResponse, error) {
+func (api *GSLBAPI) Find() (*SearchGSLBResponse, error) {
 
 	data, err := api.client.newRequest("GET", api.getResourceURL(), api.getSearchState())
 	if err != nil {
@@ -155,7 +155,7 @@ func (api *GSLBAPI) findOrCreateBy(gslbName string) (*sacloud.GSLB, error) {
 
 	req := &sacloud.Request{}
 	req.AddFilter("Name", gslbName)
-	res, err := api.Find(req)
+	res, err := api.Find()
 	if err != nil {
 		return nil, err
 	}

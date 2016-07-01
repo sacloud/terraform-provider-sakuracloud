@@ -44,7 +44,10 @@ func resourceSakuraCloudServer() *schema.Resource {
 				Optional: true,
 				Default:  "shared",
 			},
-
+			"cdrom_id": &schema.Schema{
+				Type:     schema.TypeString,
+				Optional: true,
+			},
 			"additional_interfaces": &schema.Schema{
 				Type:     schema.TypeList,
 				Optional: true,
@@ -174,6 +177,15 @@ func resourceSakuraCloudServerCreate(d *schema.ResourceData, meta interface{}) e
 					return fmt.Errorf("Failed to connect SakuraCloud Disk to Server: %s", err)
 				}
 
+				targetDisk, err := client.Disk.Read(diskID)
+				if err != nil {
+					return fmt.Errorf("Failed to read SakuraCloud Disk: %s", err)
+				}
+
+				if targetDisk.SourceArchive == nil && targetDisk.SourceDisk == nil {
+					continue
+				}
+
 				// edit disk if server is connected the shared segment
 				if i == 0 && len(server.Interfaces) > 0 && server.Interfaces[0].Switch != nil {
 					isNeedEditDisk := false
@@ -223,6 +235,15 @@ func resourceSakuraCloudServerCreate(d *schema.ResourceData, meta interface{}) e
 			}
 		}
 	}
+
+	if rawCDROMID, ok := d.GetOk("cdrom_id"); ok {
+		cdromID := rawCDROMID.(string)
+		_, err := client.Server.InsertCDROM(server.ID, cdromID)
+		if err != nil {
+			return fmt.Errorf("Error Inserting CDROM: %s", err)
+		}
+	}
+
 	d.SetId(server.ID)
 
 	//boot
@@ -258,8 +279,20 @@ func resourceSakuraCloudServerRead(d *schema.ResourceData, meta interface{}) err
 	d.Set("memory", server.ServerPlan.MemoryMB*units.MiB/units.GiB)
 	d.Set("disks", flattenDisks(server.Disks))
 
+	if server.Instance.CDROM != nil {
+		d.Set("cdrom_id", server.Instance.CDROM.ID)
+	}
+
 	hasSharedInterface := len(server.Interfaces) > 0 && server.Interfaces[0].Switch != nil
-	d.Set("base_interface", hasSharedInterface)
+	if hasSharedInterface {
+		if server.Interfaces[0].Switch.Scope == sacloud.ESCopeShared {
+			d.Set("base_interface", "shared")
+		} else {
+			d.Set("base_interface", server.Interfaces[0].Switch.ID)
+		}
+	} else {
+		d.Set("base_interface", "")
+	}
 	d.Set("additional_interfaces", flattenInterfaces(server.Interfaces))
 
 	d.Set("description", server.Description)
@@ -524,6 +557,24 @@ func resourceSakuraCloudServerUpdate(d *schema.ResourceData, meta interface{}) e
 						}
 					}
 				}
+			}
+		}
+	}
+
+	if d.HasChange("cdrom_id") {
+
+		if server.Instance.CDROM != nil {
+			_, err := client.Server.EjectCDROM(server.ID, server.Instance.CDROM.ID)
+			if err != nil {
+				return fmt.Errorf("Error Ejecting CDROM: %s", err)
+			}
+		}
+
+		if rawCDROMID, ok := d.GetOk("cdrom_id"); ok {
+			cdromID := rawCDROMID.(string)
+			_, err := client.Server.InsertCDROM(server.ID, cdromID)
+			if err != nil {
+				return fmt.Errorf("Error Inserting CDROM: %s", err)
 			}
 		}
 	}
