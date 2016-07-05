@@ -55,7 +55,7 @@ func (api *SSHKeyAPI) WithTag(tag string) *SSHKeyAPI {
 	return api.FilterBy("Tags.Name", tag)
 }
 func (api *SSHKeyAPI) WithTags(tags []string) *SSHKeyAPI {
-	return api.FilterBy("Tags.Name", tags)
+	return api.FilterBy("Tags.Name", []interface{}{tags})
 }
 
 // func (api *SSHKeyAPI) WithSizeGib(size int) *SSHKeyAPI {

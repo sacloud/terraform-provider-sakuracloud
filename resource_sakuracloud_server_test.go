@@ -280,9 +280,16 @@ func testAccCheckSakuraCloudServerDestroy(s *terraform.State) error {
 }
 
 const testAccCheckSakuraCloudServerConfig_basic = `
+data "sakuracloud_archive" "ubuntu" {
+    filter = {
+	name = "Name"
+	values = ["Ubuntu Server 16"]
+    }
+    zone = "tk1v"
+}
 resource "sakuracloud_disk" "foobar" {
     name = "mydisk"
-    source_archive_name = "Ubuntu Server 14"
+    source_archive_id = "${data.sakuracloud_archive.ubuntu.id}"
     zone = "tk1v"
 }
 
@@ -296,9 +303,17 @@ resource "sakuracloud_server" "foobar" {
 `
 
 const testAccCheckSakuraCloudServerConfig_update = `
+data "sakuracloud_archive" "ubuntu" {
+    filter = {
+	name = "Name"
+	values = ["Ubuntu Server 16"]
+    }
+    zone = "tk1v"
+}
+
 resource "sakuracloud_disk" "foobar" {
     name = "mydisk"
-    source_archive_name = "Ubuntu Server 14"
+    source_archive_id = "${data.sakuracloud_archive.ubuntu.id}"
     zone = "tk1v"
 }
 
@@ -314,9 +329,17 @@ resource "sakuracloud_server" "foobar" {
 `
 
 const testAccCheckSakuraCloudServerConfig_swiched_NIC_added = `
+data "sakuracloud_archive" "ubuntu" {
+    filter = {
+	name = "Name"
+	values = ["Ubuntu Server 16"]
+    }
+    zone = "tk1v"
+}
+
 resource "sakuracloud_disk" "foobar" {
     name = "mydisk"
-    source_archive_name = "Ubuntu Server 14"
+    source_archive_id = "${data.sakuracloud_archive.ubuntu.id}"
     zone = "tk1v"
 }
 
@@ -330,9 +353,17 @@ resource "sakuracloud_server" "foobar" {
 }
 `
 const testAccCheckSakuraCloudServerConfig_swiched_NIC_updated = `
+data "sakuracloud_archive" "ubuntu" {
+    filter = {
+	name = "Name"
+	values = ["Ubuntu Server 16"]
+    }
+    zone = "tk1v"
+}
+
 resource "sakuracloud_disk" "foobar" {
     name = "mydisk"
-    source_archive_name = "Ubuntu Server 14"
+    source_archive_id = "${data.sakuracloud_archive.ubuntu.id}"
     zone = "tk1v"
 }
 
@@ -347,9 +378,17 @@ resource "sakuracloud_server" "foobar" {
 `
 
 const testAccCheckSakuraCloudServerConfig_nw_nothing = `
+data "sakuracloud_archive" "ubuntu" {
+    filter = {
+	name = "Name"
+	values = ["Ubuntu Server 16"]
+    }
+    zone = "tk1v"
+}
+
 resource "sakuracloud_disk" "foobar" {
     name = "mydisk"
-    source_archive_name = "Ubuntu Server 14"
+    source_archive_id = "${data.sakuracloud_archive.ubuntu.id}"
     zone = "tk1v"
 }
 

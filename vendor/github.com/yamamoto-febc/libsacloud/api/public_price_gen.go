@@ -55,7 +55,7 @@ func (api *PublicPriceAPI) WithTag(tag string) *PublicPriceAPI {
 	return api.FilterBy("Tags.Name", tag)
 }
 func (api *PublicPriceAPI) WithTags(tags []string) *PublicPriceAPI {
-	return api.FilterBy("Tags.Name", tags)
+	return api.FilterBy("Tags.Name", []interface{}{tags})
 }
 
 // func (api *PublicPriceAPI) WithSizeGib(size int) *PublicPriceAPI {

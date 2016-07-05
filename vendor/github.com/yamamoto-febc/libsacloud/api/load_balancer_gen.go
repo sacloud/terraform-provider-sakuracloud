@@ -55,7 +55,7 @@ func (api *LoadBalancerAPI) WithTag(tag string) *LoadBalancerAPI {
 	return api.FilterBy("Tags.Name", tag)
 }
 func (api *LoadBalancerAPI) WithTags(tags []string) *LoadBalancerAPI {
-	return api.FilterBy("Tags.Name", tags)
+	return api.FilterBy("Tags.Name", []interface{}{tags})
 }
 
 // func (api *LoadBalancerAPI) WithSizeGib(size int) *LoadBalancerAPI {

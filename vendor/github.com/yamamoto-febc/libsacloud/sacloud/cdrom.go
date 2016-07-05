@@ -15,4 +15,5 @@ type CDROM struct {
 	CreatedAt    *time.Time `json:",omitempty"`
 	Icon         string     `json:",omitempty"`
 	Storage      *Storage   `json:",omitempty"`
+	Tags         []string   //`json:",omitempty"`
 }

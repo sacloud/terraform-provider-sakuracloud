@@ -55,7 +55,7 @@ func (api *DiskAPI) WithTag(tag string) *DiskAPI {
 	return api.FilterBy("Tags.Name", tag)
 }
 func (api *DiskAPI) WithTags(tags []string) *DiskAPI {
-	return api.FilterBy("Tags.Name", tags)
+	return api.FilterBy("Tags.Name", []interface{}{tags})
 }
 
 func (api *DiskAPI) WithSizeGib(size int) *DiskAPI {

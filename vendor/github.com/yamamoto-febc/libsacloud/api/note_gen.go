@@ -55,7 +55,7 @@ func (api *NoteAPI) WithTag(tag string) *NoteAPI {
 	return api.FilterBy("Tags.Name", tag)
 }
 func (api *NoteAPI) WithTags(tags []string) *NoteAPI {
-	return api.FilterBy("Tags.Name", tags)
+	return api.FilterBy("Tags.Name", []interface{}{tags})
 }
 
 // func (api *NoteAPI) WithSizeGib(size int) *NoteAPI {

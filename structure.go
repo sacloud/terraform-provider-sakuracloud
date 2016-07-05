@@ -1,6 +1,7 @@
 package sakuracloud
 
 import (
+	"fmt"
 	"github.com/hashicorp/terraform/helper/schema"
 	"github.com/yamamoto-febc/libsacloud/sacloud"
 )
@@ -108,4 +109,35 @@ func forceString(target interface{}) string {
 	}
 
 	return target.(string)
+}
+
+func expandFilters(filter interface{}) map[string]interface{} {
+
+	ret := map[string]interface{}{}
+	filterSet := filter.(*schema.Set)
+	for _, v := range filterSet.List() {
+		m := v.(map[string]interface{})
+		name := m["name"].(string)
+		if name == "Tags" {
+			var filterValues []string
+			for _, e := range m["values"].([]interface{}) {
+				filterValues = append(filterValues, e.(string))
+			}
+			ret["Tags.Name"] = []interface{}{filterValues}
+
+		} else {
+			var filterValues string
+			for _, e := range m["values"].([]interface{}) {
+				if filterValues == "" {
+					filterValues = e.(string)
+				} else {
+					filterValues = fmt.Sprintf("%s %s", filterValues, e.(string))
+				}
+			}
+			ret[name] = filterValues
+		}
+
+	}
+
+	return ret
 }

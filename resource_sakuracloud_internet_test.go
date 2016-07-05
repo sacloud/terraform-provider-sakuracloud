@@ -201,8 +201,16 @@ resource "sakuracloud_server" "foobar" {
     base_nw_mask_len = "${sakuracloud_internet.foobar.nw_mask_len}"
     zone = "tk1v"
 }
+data "sakuracloud_archive" "ubuntu" {
+    filter = {
+	name = "Name"
+	values = ["Ubuntu Server 16"]
+    }
+    zone = "tk1v"
+}
 resource "sakuracloud_disk" "foobar"{
     name = "mydisk"
+    source_archive_id = "${data.sakuracloud_archive.ubuntu.id}"
     zone = "tk1v"
 }
 resource "sakuracloud_internet" "foobar" {

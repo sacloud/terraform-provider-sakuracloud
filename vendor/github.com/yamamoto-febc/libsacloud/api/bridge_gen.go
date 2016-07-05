@@ -55,7 +55,7 @@ func (api *BridgeAPI) WithTag(tag string) *BridgeAPI {
 	return api.FilterBy("Tags.Name", tag)
 }
 func (api *BridgeAPI) WithTags(tags []string) *BridgeAPI {
-	return api.FilterBy("Tags.Name", tags)
+	return api.FilterBy("Tags.Name", []interface{}{tags})
 }
 
 // func (api *BridgeAPI) WithSizeGib(size int) *BridgeAPI {

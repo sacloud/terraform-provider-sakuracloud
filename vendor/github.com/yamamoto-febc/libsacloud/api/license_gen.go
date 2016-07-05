@@ -55,7 +55,7 @@ func (api *LicenseAPI) WithTag(tag string) *LicenseAPI {
 	return api.FilterBy("Tags.Name", tag)
 }
 func (api *LicenseAPI) WithTags(tags []string) *LicenseAPI {
-	return api.FilterBy("Tags.Name", tags)
+	return api.FilterBy("Tags.Name", []interface{}{tags})
 }
 
 // func (api *LicenseAPI) WithSizeGib(size int) *LicenseAPI {
