@@ -9,9 +9,9 @@ Terraformでさくらのクラウドを操作するためのプラグイン
   - Dockerをインストールしておく
   - さくらのクラウドAPIキーを取得しておく
 
-Dockerがない場合は[Installation / インストール](https://github.com/yamamoto-febc/terraform-provider-sakuracloud/wiki/Installation)を参考にインストールを実施してください。
+Dockerがない場合は[Installation / インストール](docs/instrallation.md)を参考にインストールを実施してください。
 
-さくらのクラウドAPIキーの取得方法は[こちら](https://github.com/yamamoto-febc/terraform-provider-sakuracloud/wiki/Installation#さくらのクラウドapiキーの取得)を参照してください。
+さくらのクラウドAPIキーの取得方法は[こちら](docs/instrallation.md#さくらのクラウドapiキーの取得)を参照してください。
 
 ```bash
 #################################################
@@ -25,9 +25,15 @@ resource "sakuracloud_ssh_key" "key"{
     public_key = "${file("id_rsa.pub")}"
 }
 
+data sakuracloud_archive "centos" {
+    filter = {
+        name   = "Tags"
+        values = ["current-stable", "arch-64bit", "distro-centos"]
+    }
+}
 resource "sakuracloud_disk" "disk01"{
     name = "disk01"
-    source_archive_name = "CentOS 7.2 64bit"
+    source_archive_id = "${data.sakuracloud_archive.centos.id}"
     ssh_key_ids = ["${sakuracloud_ssh_key.key.id}"]
     disable_pw_auth = true
     zone = "is1b"
@@ -56,41 +62,63 @@ $ docker run -it --rm \
 [リリースページ](https://github.com/yamamoto-febc/terraform-provider-sakuracloud/releases/latest)から最新のバイナリを取得し、
 Terraformバイナリと同じディレクトリに展開してください。
 
-詳細は[Installation / インストール](https://github.com/yamamoto-febc/terraform-provider-sakuracloud/wiki/Installation)を参照してください。
+詳細は[Installation / インストール](docs/instrallation.md)を参照してください。
 
 ## 使い方/各リソースの設定方法
 
 Terraform定義ファイル(tfファイル)を作成してご利用ください。
-設定ファイルの記載方法は[Wikiページ](https://github.com/yamamoto-febc/terraform-provider-sakuracloud/wiki)を参照ください。
+
+設定ファイルの記載方法は[リファレンス](docs/configuration.md)を参照ください。
+
 さくらのクラウドの以下のリソースをサポートしています。
 
 ### サポートしているリソース
 
-  - [サーバー](https://github.com/yamamoto-febc/terraform-provider-sakuracloud/wiki/Configuration-Resource-Server)
-  - [ディスク](https://github.com/yamamoto-febc/terraform-provider-sakuracloud/wiki/Configuration-Resource-Disk)
-  - [スイッチ](https://github.com/yamamoto-febc/terraform-provider-sakuracloud/wiki/Configuration-Resource-Switch)
-  - [ルーター](https://github.com/yamamoto-febc/terraform-provider-sakuracloud/wiki/Configuration-Resource-Internet)
-  - [パケットフィルタ](https://github.com/yamamoto-febc/terraform-provider-sakuracloud/wiki/Configuration-Resource-PacketFilter)
-  - [ブリッジ](https://github.com/yamamoto-febc/terraform-provider-sakuracloud/wiki/Configuration-Resource-Bridge)
-  - [スタートアップスクリプト](https://github.com/yamamoto-febc/terraform-provider-sakuracloud/wiki/Configuration-Resource-Note)
-  - [公開鍵](https://github.com/yamamoto-febc/terraform-provider-sakuracloud/wiki/Configuration-Resource-SSHKey)
-  - [DNS](https://github.com/yamamoto-febc/terraform-provider-sakuracloud/wiki/Configuration-Resource-DNS)
-  - [GSLB](https://github.com/yamamoto-febc/terraform-provider-sakuracloud/wiki/Configuration-Resource-GSLB)
-  - [シンプル監視](https://github.com/yamamoto-febc/terraform-provider-sakuracloud/wiki/Configuration-Resource-SimpleMonitor)
+  - [サーバー](docs/configuration/resources/server.md)
+  - [ディスク](docs/configuration/resources/disk.md)
+  - [スイッチ](docs/configuration/resources/switch.md)
+  - [ルーター](docs/configuration/resources/internet.md)
+  - [パケットフィルタ](docs/configuration/resources/packet_filter.md)
+  - [ブリッジ](docs/configuration/resources/bridge.md)
+  - [スタートアップスクリプト](docs/configuration/resources/note.md)
+  - [公開鍵](docs/configuration/resources/ssh_key.md)
+  - [DNS](docs/configuration/resources/dns.md)
+  - [GSLB](docs/configuration/resources/gslb.md)
+  - [シンプル監視](docs/configuration/resources/simple_monitor.md)
 
 
 ## Building/Developing
 
-  `godep get $(go list ./... | grep -v vendor)`
+#### ビルド
 
-  `godep restore`
+    make build
+    
+#### ビルド(クロスコンパイル)
 
-  `godep go test .`
+    make build-x
+    
+#### ビルド(Docker上でのビルド)
 
-  `TF_ACC=1 godep go test -v -timeout=60m .` run acceptance tests. (requires ENV vars)
+    make docker-build
+    
+#### テスト
 
-  `godep go build -o path/to/desired/terraform-provider-sakuracloud bin/terraform-provider-sakuracloud/main.go`
+    make test
+    
+#### 受入テスト(実際のさくらのクラウドAPI呼び出しを伴うテスト)
 
+    make testacc
+    
+#### 依存ライブラリ
+
+    # 一覧表示
+    govendor list
+    
+    # vendor配下のライブラリを一括更新
+    govendor fetch +v
+
+    # vendor配下のライブラリをGOPATH上から更新
+    govendor update +v
 
 ## License
 
