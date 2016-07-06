@@ -9,9 +9,9 @@ Terraformでさくらのクラウドを操作するためのプラグイン
   - Dockerをインストールしておく
   - さくらのクラウドAPIキーを取得しておく
 
-Dockerがない場合は[Installation / インストール](docs/instrallation.md)を参考にインストールを実施してください。
+Dockerがない場合は[Installation / インストール](docs/installation.md)を参考にインストールを実施してください。
 
-さくらのクラウドAPIキーの取得方法は[こちら](docs/instrallation.md#さくらのクラウドapiキーの取得)を参照してください。
+さくらのクラウドAPIキーの取得方法は[こちら](docs/installation.md#さくらのクラウドapiキーの取得)を参照してください。
 
 ```bash
 #################################################
@@ -62,7 +62,7 @@ $ docker run -it --rm \
 [リリースページ](https://github.com/yamamoto-febc/terraform-provider-sakuracloud/releases/latest)から最新のバイナリを取得し、
 Terraformバイナリと同じディレクトリに展開してください。
 
-詳細は[Installation / インストール](docs/instrallation.md)を参照してください。
+詳細は[Installation / インストール](docs/installation.md)を参照してください。
 
 ## 使い方/各リソースの設定方法
 
