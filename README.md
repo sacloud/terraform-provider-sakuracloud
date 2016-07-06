@@ -9,7 +9,8 @@ Terraformでさくらのクラウドを操作するためのプラグイン
   - Dockerをインストールしておく
   - さくらのクラウドAPIキーを取得しておく
 
-Dockerがない場合は[Installation / インストール](docs/installation.md)を参考にインストールを実施してください。
+Dockerがない場合は[Installation / インストール](docs/installation.md)を参考に
+TerraformとTerraform for さくらのクラウドを手元のマシンにインストールしてからご利用ください。
 
 さくらのクラウドAPIキーの取得方法は[こちら](docs/installation.md#さくらのクラウドapiキーの取得)を参照してください。
 
