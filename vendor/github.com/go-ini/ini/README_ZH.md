@@ -23,15 +23,11 @@
 
 	go get github.com/go-ini/ini
 
-如需更新请添加 `-u` 选项。
-
 ### 测试安装
 
 如果您想要在自己的机器上运行测试，请使用 `-t` 标记：
 
 	go get -t gopkg.in/ini.v1
-
-如需更新请添加 `-u` 选项。
 
 ## 开始使用
 
@@ -54,14 +50,6 @@ cfg := ini.Empty()
 ```go
 err := cfg.Append("other file", []byte("other raw data"))
 ```
-
-当您想要加载一系列文件，但是不能够确定其中哪些文件是不存在的，可以通过调用函数 `LooseLoad` 来忽略它们（`Load` 会因为文件不存在而返回错误）：
-
-```go
-cfg, err := ini.LooseLoad("filename", "filename_404")
-```
-
-更牛逼的是，当那些之前不存在的文件在重新调用 `Reload` 方法的时候突然出现了，那么它们会被正常加载。
 
 ### 操作分区（Section）
 
@@ -134,7 +122,7 @@ names := cfg.Section("").KeyStrings()
 获取分区下的所有键值对的克隆：
 
 ```go
-hash := cfg.Section("").KeysHash()
+hash := cfg.GetSection("").KeysHash()
 ```
 
 ### 操作键值（Value）
@@ -285,13 +273,9 @@ vals = cfg.Section("").Key("TIME").RangeTimeFormat(time.RFC3339, time.Now(), min
 vals = cfg.Section("").Key("TIME").RangeTime(time.Now(), minTime, maxTime) // RFC3339
 ```
 
-##### 自动分割键值到切片（slice）
-
-当存在无效输入时，使用零值代替：
+自动分割键值为切片（slice）：
 
 ```go
-// Input: 1.1, 2.2, 3.3, 4.4 -> [1.1 2.2 3.3 4.4]
-// Input: how, 2.2, are, you -> [0.0 2.2 0.0 0.0]
 vals = cfg.Section("").Key("STRINGS").Strings(",")
 vals = cfg.Section("").Key("FLOAT64S").Float64s(",")
 vals = cfg.Section("").Key("INTS").Ints(",")
@@ -299,32 +283,6 @@ vals = cfg.Section("").Key("INT64S").Int64s(",")
 vals = cfg.Section("").Key("UINTS").Uints(",")
 vals = cfg.Section("").Key("UINT64S").Uint64s(",")
 vals = cfg.Section("").Key("TIMES").Times(",")
-```
-
-从结果切片中剔除无效输入：
-
-```go
-// Input: 1.1, 2.2, 3.3, 4.4 -> [1.1 2.2 3.3 4.4]
-// Input: how, 2.2, are, you -> [2.2]
-vals = cfg.Section("").Key("FLOAT64S").ValidFloat64s(",")
-vals = cfg.Section("").Key("INTS").ValidInts(",")
-vals = cfg.Section("").Key("INT64S").ValidInt64s(",")
-vals = cfg.Section("").Key("UINTS").ValidUints(",")
-vals = cfg.Section("").Key("UINT64S").ValidUint64s(",")
-vals = cfg.Section("").Key("TIMES").ValidTimes(",")
-```
-
-当存在无效输入时，直接返回错误：
-
-```go
-// Input: 1.1, 2.2, 3.3, 4.4 -> [1.1 2.2 3.3 4.4]
-// Input: how, 2.2, are, you -> error
-vals = cfg.Section("").Key("FLOAT64S").StrictFloat64s(",")
-vals = cfg.Section("").Key("INTS").StrictInts(",")
-vals = cfg.Section("").Key("INT64S").StrictInt64s(",")
-vals = cfg.Section("").Key("UINTS").StrictUints(",")
-vals = cfg.Section("").Key("UINT64S").StrictUint64s(",")
-vals = cfg.Section("").Key("TIMES").StrictTimes(",")
 ```
 
 ### 保存配置
@@ -386,12 +344,6 @@ CLONE_URL = https://%(IMPORT_PATH)s
 
 ```go
 cfg.Section("package.sub").Key("CLONE_URL").String()	// https://gopkg.in/ini.v1
-```
-
-#### 获取上级父分区下的所有键名
-
-```go
-cfg.Section("package.sub").ParentKeys() // ["CLONE_URL"]
 ```
 
 #### 读取自增键名
