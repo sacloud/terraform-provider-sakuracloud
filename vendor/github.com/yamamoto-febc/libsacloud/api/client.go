@@ -42,6 +42,7 @@ func (c *Client) Clone() *Client {
 }
 
 type api struct {
+	AutoBackup    *AutoBackupAPI
 	Archive       *ArchiveAPI
 	Bridge        *BridgeAPI
 	CDROM         *CDROMAPI
@@ -78,11 +79,12 @@ type facilityAPI struct {
 
 func newAPI(client *Client) *api {
 	return &api{
-		Archive: NewArchiveAPI(client),
-		Bridge:  NewBridgeAPI(client),
-		CDROM:   NewCDROMAPI(client),
-		Disk:    NewDiskAPI(client),
-		DNS:     NewDNSAPI(client),
+		AutoBackup: NewAutoBackupAPI(client),
+		Archive:    NewArchiveAPI(client),
+		Bridge:     NewBridgeAPI(client),
+		CDROM:      NewCDROMAPI(client),
+		Disk:       NewDiskAPI(client),
+		DNS:        NewDNSAPI(client),
 		Facility: &facilityAPI{
 			Region: NewRegionAPI(client),
 			Zone:   NewZoneAPI(client),
