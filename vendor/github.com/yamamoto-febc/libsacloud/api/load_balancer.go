@@ -78,9 +78,9 @@ func (api *LoadBalancerAPI) createRequest(value *sacloud.LoadBalancer) *loadBala
 	return &loadBalanderResponse{LoadBalancer: value}
 }
 
-func (api *LoadBalancerAPI) New() *sacloud.LoadBalancer {
-	return sacloud.CreateNewLoadBalancer()
-}
+//func (api *LoadBalancerAPI) New() *sacloud.LoadBalancer {
+//	return sacloud.CreateNewLoadBalancer()
+//}
 
 func (api *LoadBalancerAPI) Create(value *sacloud.LoadBalancer) (*sacloud.LoadBalancer, error) {
 	return api.request(func(res *loadBalanderResponse) error {
@@ -106,12 +106,119 @@ func (api *LoadBalancerAPI) Delete(id string) (*sacloud.LoadBalancer, error) {
 	})
 }
 
-// SleepWhileCopying wait until became to available
-func (api *LoadBalancerAPI) SleepWhileCopying(loadBalancerID string, timeout time.Duration) error {
+func (api *LoadBalancerAPI) IsUp(id string) (bool, error) {
+	lb, err := api.Read(id)
+	if err != nil {
+		return false, err
+	}
+	return lb.Instance.IsUp(), nil
+}
+
+func (api *LoadBalancerAPI) IsDown(id string) (bool, error) {
+	lb, err := api.Read(id)
+	if err != nil {
+		return false, err
+	}
+	return lb.Instance.IsDown(), nil
+}
+
+// Boot power on
+func (api *LoadBalancerAPI) Boot(id string) (bool, error) {
+	var (
+		method = "PUT"
+		uri    = fmt.Sprintf("%s/%s/power", api.getResourceURL(), id)
+	)
+	return api.modify(method, uri, nil)
+}
+
+// Shutdown power off
+func (api *LoadBalancerAPI) Shutdown(id string) (bool, error) {
+	var (
+		method = "DELETE"
+		uri    = fmt.Sprintf("%s/%s/power", api.getResourceURL(), id)
+	)
+
+	return api.modify(method, uri, nil)
+}
+
+// Stop force shutdown
+func (api *LoadBalancerAPI) Stop(id string) (bool, error) {
+	var (
+		method = "DELETE"
+		uri    = fmt.Sprintf("%s/%s/power", api.getResourceURL(), id)
+	)
+
+	return api.modify(method, uri, map[string]bool{"Force": true})
+}
+
+func (api *LoadBalancerAPI) RebootForce(id string) (bool, error) {
+	var (
+		method = "PUT"
+		uri    = fmt.Sprintf("%s/%s/reset", api.getResourceURL(), id)
+	)
+
+	return api.modify(method, uri, nil)
+}
+
+func (api *LoadBalancerAPI) ResetForce(id string, recycleProcess bool) (bool, error) {
+	var (
+		method = "PUT"
+		uri    = fmt.Sprintf("%s/%s/reset", api.getResourceURL(), id)
+	)
+
+	return api.modify(method, uri, map[string]bool{"RecycleProcess": recycleProcess})
+}
+
+func (api *LoadBalancerAPI) SleepUntilUp(id string, timeout time.Duration) error {
 	current := 0 * time.Second
 	interval := 5 * time.Second
 	for {
-		loadBalancer, err := api.Read(loadBalancerID)
+
+		up, err := api.IsUp(id)
+		if err != nil {
+			return err
+		}
+
+		if up {
+			return nil
+		}
+		time.Sleep(interval)
+		current += interval
+
+		if timeout > 0 && current > timeout {
+			return fmt.Errorf("Timeout: WaitforAvailable")
+		}
+	}
+}
+
+func (api *LoadBalancerAPI) SleepUntilDown(id string, timeout time.Duration) error {
+	current := 0 * time.Second
+	interval := 5 * time.Second
+	for {
+
+		down, err := api.IsDown(id)
+		if err != nil {
+			return err
+		}
+
+		if down {
+			return nil
+		}
+		time.Sleep(interval)
+		current += interval
+
+		if timeout > 0 && current > timeout {
+			return fmt.Errorf("Timeout: WaitforAvailable")
+		}
+	}
+}
+
+// SleepWhileCopying wait until became to available
+func (api *LoadBalancerAPI) SleepWhileCopying(id string, timeout time.Duration) error {
+	current := 0 * time.Second
+	interval := 5 * time.Second
+	for {
+		loadBalancer, err := api.Read(id)
 		if err != nil {
 			return err
 		}

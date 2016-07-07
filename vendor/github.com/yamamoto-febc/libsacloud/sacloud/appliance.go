@@ -33,6 +33,10 @@ type ApplianceRemarkBase struct {
 	//Plan    *NumberResource
 }
 
+//type ApplianceServer struct {
+//	IPAddress string `json:",omitempty"`
+//}
+
 type ApplianceRemarkSwitch struct {
 	ID    string `json:",omitempty"`
 	Scope string `json:",omitempty"`

@@ -42,7 +42,9 @@ var (
 
 func CreateNewDisk() *Disk {
 	return &Disk{
-		Plan: &NumberResource{ID: ""},
+		Plan:       DiskPlanSSD,
+		Connection: DiskConnectionVirtio,
+		SizeMB:     20480,
 	}
 }
 

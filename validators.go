@@ -68,6 +68,22 @@ func validateIntInWord(allowWords []string) schema.SchemaValidateFunc {
 	}
 }
 
+func validateIntInList(allowList []int) schema.SchemaValidateFunc {
+	return func(v interface{}, k string) (ws []string, errors []error) {
+		var found bool
+		for _, t := range allowList {
+			if v.(int) == t {
+				found = true
+			}
+		}
+		if !found {
+			errors = append(errors, fmt.Errorf("%q must be one of [%s]", k, "0/6/12/18"))
+
+		}
+		return
+	}
+}
+
 func validateDNSRecordValue() schema.SchemaValidateFunc {
 	return func(v interface{}, k string) (ws []string, errors []error) {
 		var rtype, value string
