@@ -17,6 +17,7 @@
   - [DNS(`sakuracloud_dns`)](configuration/resources/dns.md)
   - [GSLB(`sakuracloud_gslb`)](configuration/resources/gslb.md)
   - [シンプル監視(`sakuracloud_simple_monitor`)](configuration/resources/simple_monitor.md)
+  - [自動バックアップ(`sakuracloud_auto_backup`)](configuration/resources/auto_backup.md)
   
 ## データソース
 

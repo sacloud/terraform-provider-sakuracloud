@@ -86,6 +86,7 @@ Terraform定義ファイル(tfファイル)を作成してご利用ください�
   - [DNS](docs/configuration/resources/dns.md)
   - [GSLB](docs/configuration/resources/gslb.md)
   - [シンプル監視](docs/configuration/resources/simple_monitor.md)
+  - [自動バックアップ](docs/configuration/resources/auto_backup.md)
 
 
 ## Building/Developing
