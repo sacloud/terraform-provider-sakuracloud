@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/hashicorp/terraform/helper/schema"
 	"github.com/yamamoto-febc/libsacloud/sacloud"
+	"strings"
 )
 
 // Takes the result of flatmap.Expand for an array of strings
@@ -14,6 +15,25 @@ func expandStringList(configured []interface{}) []string {
 		vs = append(vs, string(v.(string)))
 	}
 	return vs
+}
+
+func expandStringListWithValidateInList(fieldName string, configured []interface{}, allowWords []string) ([]string, error) {
+	vs := make([]string, 0, len(configured))
+	for _, v := range configured {
+		var found bool
+		for _, t := range allowWords {
+			if string(v.(string)) == t {
+				found = true
+				break
+			}
+		}
+		if !found {
+			return nil, fmt.Errorf("%q must be one of [%s]", fieldName, strings.Join(allowWords, "/"))
+		}
+
+		vs = append(vs, string(v.(string)))
+	}
+	return vs, nil
 }
 
 // Takes the result of schema.Set of strings and returns a []*string

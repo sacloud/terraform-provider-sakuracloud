@@ -51,6 +51,7 @@ func Provider() terraform.ResourceProvider {
 			"sakuracloud_switch":         dataSourceSakuraCloudSwitch(),
 		},
 		ResourcesMap: map[string]*schema.Resource{
+			"sakuracloud_auto_backup":    resourceSakuraCloudAutoBackup(),
 			"sakuracloud_bridge":         resourceSakuraCloudBridge(),
 			"sakuracloud_disk":           resourceSakuraCloudDisk(),
 			"sakuracloud_dns":            resourceSakuraCloudDNS(),
