@@ -1,0 +1,8 @@
+sudo: required
+language: bash
+services: docker
+
+script:
+  - make docker-test
+  - make docker-testacc
+  - make docker-build

@@ -13,9 +13,6 @@ build: clean vet
 build-x: clean vet
 	sh -c "'$(CURDIR)/scripts/build.sh'"
 
-docker-build: clean vet
-	sh -c "'$(CURDIR)/scripts/build_on_docker.sh' 'build-x'"
-
 test: vet
 	TF_ACC= govendor test $(TEST) $(TESTARGS) -timeout=30s -parallel=4
 
@@ -33,6 +30,15 @@ vet: fmt
 
 fmt:
 	gofmt -w $(GOFMT_FILES)
+
+docker-test:
+	sh -c "'$(CURDIR)/scripts/build_on_docker.sh' 'test'"
+
+docker-testacc:
+	sh -c "'$(CURDIR)/scripts/build_on_docker.sh' 'testacc'"
+
+docker-build: clean
+	sh -c "'$(CURDIR)/scripts/build_on_docker.sh' 'build-x'"
 
 
 .PHONY: default test vet testacc fmt fmtcheck
