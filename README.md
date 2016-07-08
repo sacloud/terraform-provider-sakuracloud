@@ -1,6 +1,10 @@
 # Terraform for さくらのクラウド
 
+[![Build Status](https://travis-ci.org/yamamoto-febc/terraform-provider-sakuracloud.svg?branch=master)](https://travis-ci.org/yamamoto-febc/terraform-provider-sakuracloud)
+
 Terraformでさくらのクラウドを操作するためのプラグイン
+
+
 
 ## クイックスタート
 
