@@ -1,0 +1,196 @@
+package sakuracloud
+
+import (
+	"fmt"
+	"github.com/hashicorp/terraform/helper/resource"
+	"github.com/hashicorp/terraform/terraform"
+	"github.com/yamamoto-febc/libsacloud/api"
+	"github.com/yamamoto-febc/libsacloud/sacloud"
+	"testing"
+)
+
+func TestAccSakuraCloudLoadBalancerVIP_Basic(t *testing.T) {
+	var loadBalancer sacloud.LoadBalancer
+	resource.Test(t, resource.TestCase{
+		PreCheck:     func() { testAccPreCheck(t) },
+		Providers:    testAccProviders,
+		CheckDestroy: testAccCheckSakuraCloudLoadBalancerVIPDestroy,
+		Steps: []resource.TestStep{
+			resource.TestStep{
+				Config: testAccCheckSakuraCloudLoadBalancerVIPConfig_basic,
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckSakuraCloudLoadBalancerExists("sakuracloud_load_balancer.foobar", &loadBalancer),
+					resource.TestCheckResourceAttr(
+						"sakuracloud_load_balancer_vip.vip1", "vip", "192.168.11.201"),
+					resource.TestCheckResourceAttr(
+						"sakuracloud_load_balancer_vip.vip1", "port", "80"),
+					resource.TestCheckResourceAttr(
+						"sakuracloud_load_balancer_vip.vip1", "delay_loop", "100"),
+					resource.TestCheckResourceAttr(
+						"sakuracloud_load_balancer_vip.vip1", "sorry_server", "192.168.11.11"),
+					resource.TestCheckResourceAttr(
+						"sakuracloud_load_balancer_vip.vip1", "servers.#", "0"),
+					resource.TestCheckResourceAttr(
+						"sakuracloud_load_balancer_vip.vip2", "vip", "192.168.11.202"),
+				),
+			},
+		},
+	})
+}
+
+func TestAccSakuraCloudLoadBalancerVIP_Update(t *testing.T) {
+	var loadBalancer sacloud.LoadBalancer
+	resource.Test(t, resource.TestCase{
+		PreCheck:     func() { testAccPreCheck(t) },
+		Providers:    testAccProviders,
+		CheckDestroy: testAccCheckSakuraCloudLoadBalancerVIPDestroy,
+		Steps: []resource.TestStep{
+			resource.TestStep{
+				Config: testAccCheckSakuraCloudLoadBalancerVIPConfig_basic,
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckSakuraCloudLoadBalancerExists("sakuracloud_load_balancer.foobar", &loadBalancer),
+					resource.TestCheckResourceAttr(
+						"sakuracloud_load_balancer_vip.vip1", "vip", "192.168.11.201"),
+					resource.TestCheckResourceAttr(
+						"sakuracloud_load_balancer_vip.vip1", "port", "80"),
+					resource.TestCheckResourceAttr(
+						"sakuracloud_load_balancer_vip.vip1", "delay_loop", "100"),
+					resource.TestCheckResourceAttr(
+						"sakuracloud_load_balancer_vip.vip1", "sorry_server", "192.168.11.11"),
+					resource.TestCheckResourceAttr(
+						"sakuracloud_load_balancer_vip.vip2", "vip", "192.168.11.202"),
+				),
+			},
+			resource.TestStep{
+				Config: testAccCheckSakuraCloudLoadBalancerVIPConfig_basic,
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr(
+						"sakuracloud_load_balancer.foobar", "vip_ids.#", "2"),
+				),
+			},
+			resource.TestStep{
+				Config: testAccCheckSakuraCloudLoadBalancerVIPConfig_update,
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckSakuraCloudLoadBalancerExists("sakuracloud_load_balancer.foobar", &loadBalancer),
+					resource.TestCheckResourceAttr(
+						"sakuracloud_load_balancer_vip.vip1", "vip", "192.168.11.201"),
+					resource.TestCheckResourceAttr(
+						"sakuracloud_load_balancer_vip.vip1", "port", "80"),
+					resource.TestCheckResourceAttr(
+						"sakuracloud_load_balancer_vip.vip1", "delay_loop", "50"),
+					resource.TestCheckResourceAttr(
+						"sakuracloud_load_balancer_vip.vip1", "sorry_server", "192.168.11.22"),
+					resource.TestCheckResourceAttr(
+						"sakuracloud_load_balancer_vip.vip2", "vip", "192.168.11.202"),
+					resource.TestCheckResourceAttr(
+						"sakuracloud_load_balancer_vip.vip3", "vip", "192.168.11.203"),
+					resource.TestCheckResourceAttr(
+						"sakuracloud_load_balancer_vip.vip4", "vip", "192.168.11.204"),
+				),
+			},
+			resource.TestStep{
+				Config: testAccCheckSakuraCloudLoadBalancerVIPConfig_update,
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr(
+						"sakuracloud_load_balancer.foobar", "vip_ids.#", "4"),
+				),
+			},
+		},
+	})
+}
+
+func testAccCheckSakuraCloudLoadBalancerVIPDestroy(s *terraform.State) error {
+	client := testAccProvider.Meta().(*api.Client)
+
+	for _, rs := range s.RootModule().Resources {
+		if rs.Type != "sakuracloud_load_balancer" {
+			continue
+		}
+
+		_, err := client.LoadBalancer.Read(rs.Primary.ID)
+
+		if err == nil {
+			return fmt.Errorf("LoadBalancer still exists")
+		}
+	}
+
+	return nil
+}
+
+var testAccCheckSakuraCloudLoadBalancerVIPConfig_basic = `
+resource "sakuracloud_switch" "sw" {
+    name = "sw"
+    zone = "tk1v"
+}
+resource "sakuracloud_load_balancer" "foobar" {
+    switch_id = "${sakuracloud_switch.sw.id}"
+    VRID = 1
+    ipaddress1 = "192.168.11.101"
+    nw_mask_len = 24
+    default_route = "192.168.11.1"
+
+    name = "name"
+    description = "description"
+    tags = ["hoge1" , "hoge2"]
+    zone = "tk1v"
+}
+resource "sakuracloud_load_balancer_vip" "vip1" {
+    load_balancer_id = "${sakuracloud_load_balancer.foobar.id}"
+    vip = "192.168.11.201"
+    port = 80
+    delay_loop = 100
+    sorry_server = "192.168.11.11"
+    zone = "tk1v"
+}
+resource "sakuracloud_load_balancer_vip" "vip2" {
+    load_balancer_id = "${sakuracloud_load_balancer.foobar.id}"
+    vip = "192.168.11.202"
+    port = 80
+    zone = "tk1v"
+}
+`
+
+var testAccCheckSakuraCloudLoadBalancerVIPConfig_update = `
+resource "sakuracloud_switch" "sw" {
+    name = "sw"
+    zone = "tk1v"
+}
+resource "sakuracloud_load_balancer" "foobar" {
+    switch_id = "${sakuracloud_switch.sw.id}"
+    VRID = 1
+    ipaddress1 = "192.168.11.101"
+    nw_mask_len = 24
+    default_route = "192.168.11.1"
+
+    name = "name"
+    description = "description"
+    tags = ["hoge1" , "hoge2"]
+    zone = "tk1v"
+}
+resource "sakuracloud_load_balancer_vip" "vip1" {
+    load_balancer_id = "${sakuracloud_load_balancer.foobar.id}"
+    vip = "192.168.11.201"
+    port = 80
+    delay_loop = 50
+    sorry_server = "192.168.11.22"
+    zone = "tk1v"
+}
+resource "sakuracloud_load_balancer_vip" "vip2" {
+    load_balancer_id = "${sakuracloud_load_balancer.foobar.id}"
+    vip = "192.168.11.202"
+    port = 80
+    zone = "tk1v"
+}
+resource "sakuracloud_load_balancer_vip" "vip3" {
+    load_balancer_id = "${sakuracloud_load_balancer.foobar.id}"
+    vip = "192.168.11.203"
+    port = 80
+    zone = "tk1v"
+}
+resource "sakuracloud_load_balancer_vip" "vip4" {
+    load_balancer_id = "${sakuracloud_load_balancer.foobar.id}"
+    vip = "192.168.11.204"
+    port = 80
+    zone = "tk1v"
+}
+`

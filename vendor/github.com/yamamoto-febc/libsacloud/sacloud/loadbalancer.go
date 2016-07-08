@@ -126,3 +126,33 @@ func (l *LoadBalancer) AddLoadBalancerSetting(setting *LoadBalancerSetting) {
 	}
 	l.Settings.LoadBalancer = append(l.Settings.LoadBalancer, setting)
 }
+
+func (l *LoadBalancer) DeleteLoadBalancerSetting(vip string, port string) {
+	res := []*LoadBalancerSetting{}
+	for _, l := range l.Settings.LoadBalancer {
+		if l.VirtualIPAddress != vip || l.Port != port {
+			res = append(res, l)
+		}
+	}
+
+	l.Settings.LoadBalancer = res
+}
+
+func (s *LoadBalancerSetting) AddServer(server *LoadBalancerServer) {
+	if s.Servers == nil {
+		s.Servers = []*LoadBalancerServer{}
+	}
+	s.Servers = append(s.Servers, server)
+}
+
+func (s *LoadBalancerSetting) DeleteServer(ip string, port string) {
+	res := []*LoadBalancerServer{}
+	for _, server := range s.Servers {
+		if server.IPAddress != ip || server.Port != port {
+			res = append(res, server)
+		}
+	}
+
+	s.Servers = res
+
+}

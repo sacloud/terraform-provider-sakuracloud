@@ -106,6 +106,14 @@ func (api *LoadBalancerAPI) Delete(id string) (*sacloud.LoadBalancer, error) {
 	})
 }
 
+func (api *LoadBalancerAPI) Config(id string) (bool, error) {
+	var (
+		method = "PUT"
+		uri    = fmt.Sprintf("%s/%s/config", api.getResourceURL(), id)
+	)
+	return api.modify(method, uri, nil)
+}
+
 func (api *LoadBalancerAPI) IsUp(id string) (bool, error) {
 	lb, err := api.Read(id)
 	if err != nil {
