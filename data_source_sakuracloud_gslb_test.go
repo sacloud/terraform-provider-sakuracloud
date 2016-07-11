@@ -87,9 +87,6 @@ func testAccCheckSakuraCloudGSLBDataSourceNotExists(n string) resource.TestCheck
 
 func testAccCheckSakuraCloudGSLBDataSourceDestroy(s *terraform.State) error {
 	client := testAccProvider.Meta().(*api.Client)
-	originalZone := client.Zone
-	client.Zone = "tk1v"
-	defer func() { client.Zone = originalZone }()
 
 	for _, rs := range s.RootModule().Resources {
 		if rs.Type != "sakuracloud_gslb" {

@@ -25,7 +25,6 @@ func TestAccSakuraCloudServerDataSource_Basic(t *testing.T) {
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckSakuraCloudServerDataSourceID("data.sakuracloud_server.foobar"),
 					resource.TestCheckResourceAttr("data.sakuracloud_server.foobar", "name", "name_test"),
-					resource.TestCheckResourceAttr("data.sakuracloud_server.foobar", "zone", "tk1v"),
 					resource.TestCheckResourceAttr("data.sakuracloud_server.foobar", "description", "description_test"),
 					resource.TestCheckResourceAttr("data.sakuracloud_server.foobar", "tags.#", "3"),
 					resource.TestCheckResourceAttr("data.sakuracloud_server.foobar", "tags.0", "tag1"),
@@ -90,9 +89,6 @@ func testAccCheckSakuraCloudServerDataSourceNotExists(n string) resource.TestChe
 
 func testAccCheckSakuraCloudServerDataSourceDestroy(s *terraform.State) error {
 	client := testAccProvider.Meta().(*api.Client)
-	originalZone := client.Zone
-	client.Zone = "tk1v"
-	defer func() { client.Zone = originalZone }()
 
 	for _, rs := range s.RootModule().Resources {
 		if rs.Type != "sakuracloud_server" {
@@ -119,19 +115,16 @@ data "sakuracloud_archive" "ubuntu" {
 	name = "Name"
 	values = ["Ubuntu Server 16"]
     }
-    zone = "tk1v"
 }
 resource "sakuracloud_disk" "foobar" {
     name = "mydisk"
     source_archive_id = "${data.sakuracloud_archive.ubuntu.id}"
-    zone = "tk1v"
 }
 resource "sakuracloud_server" "foobar" {
     name = "name_test"
     disks = ["${sakuracloud_disk.foobar.id}"]
     description = "description_test"
     tags = ["tag1","tag2","tag3"]
-    zone = "tk1v"
 }`
 
 var testAccCheckSakuraCloudDataSourceServerConfig = fmt.Sprintf(`
@@ -141,7 +134,6 @@ data "sakuracloud_server" "foobar" {
 	name = "Name"
 	values = ["name_test"]
     }
-    zone = "tk1v"
 }`, testAccCheckSakuraCloudDataSourceServerBase)
 
 var testAccCheckSakuraCloudDataSourceServerConfig_With_Tag = fmt.Sprintf(`
@@ -151,7 +143,6 @@ data "sakuracloud_server" "foobar" {
 	name = "Tags"
 	values = ["tag1","tag3"]
     }
-    zone = "tk1v"
 }`, testAccCheckSakuraCloudDataSourceServerBase)
 
 var testAccCheckSakuraCloudDataSourceServerConfig_With_NotExists_Tag = fmt.Sprintf(`
@@ -161,7 +152,6 @@ data "sakuracloud_server" "foobar" {
 	name = "Tags"
 	values = ["tag1-xxxxxxx","tag3-xxxxxxxx"]
     }
-    zone = "tk1v"
 }`, testAccCheckSakuraCloudDataSourceServerBase)
 
 var testAccCheckSakuraCloudDataSourceServerConfig_NotExists = fmt.Sprintf(`
@@ -171,5 +161,4 @@ data "sakuracloud_server" "foobar" {
 	name = "Name"
 	values = ["xxxxxxxxxxxxxxxxxx"]
     }
-    zone = "tk1v"
 }`, testAccCheckSakuraCloudDataSourceServerBase)

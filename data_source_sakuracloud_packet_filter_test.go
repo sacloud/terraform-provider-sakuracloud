@@ -71,9 +71,6 @@ func testAccCheckSakuraCloudPacketFilterDataSourceNotExists(n string) resource.T
 
 func testAccCheckSakuraCloudPacketFilterDataSourceDestroy(s *terraform.State) error {
 	client := testAccProvider.Meta().(*api.Client)
-	originalZone := client.Zone
-	client.Zone = "tk1v"
-	defer func() { client.Zone = originalZone }()
 
 	for _, rs := range s.RootModule().Resources {
 		if rs.Type != "sakuracloud_packet_filter" {
@@ -112,7 +109,6 @@ resource "sakuracloud_packet_filter" "foobar" {
     	dest_port = "80"
     	allow = true
     }
-    zone = "tk1v"
 }
 `
 
@@ -134,14 +130,12 @@ resource "sakuracloud_packet_filter" "foobar" {
     	dest_port = "80"
     	allow = true
     }
-    zone = "tk1v"
 }
 data "sakuracloud_packet_filter" "foobar" {
     filter = {
 	name = "Name"
 	values = ["name_test"]
     }
-    zone = "tk1v"
 }`
 
 var testAccCheckSakuraCloudDataSourcePacketFilterConfig_NotExists = `
@@ -162,12 +156,10 @@ resource "sakuracloud_packet_filter" "foobar" {
     	dest_port = "80"
     	allow = true
     }
-    zone = "tk1v"
 }
 data "sakuracloud_packet_filter" "foobar" {
     filter = {
 	name = "Name"
 	values = ["xxxxxxxxxxxxxxxxxx"]
     }
-    zone = "tk1v"
 }`

@@ -25,7 +25,7 @@ func Provider() terraform.ResourceProvider {
 			"zone": &schema.Schema{
 				Type:         schema.TypeString,
 				Optional:     true,
-				DefaultFunc:  schema.EnvDefaultFunc("SAKURACLOUD_ZONE", "is1a"),
+				DefaultFunc:  schema.EnvDefaultFunc("SAKURACLOUD_ZONE", "is1b"),
 				Description:  "default target SakuraCloud zone",
 				ValidateFunc: validateStringInWord([]string{"is1a", "is1b", "tk1a", "tk1v"}),
 			},

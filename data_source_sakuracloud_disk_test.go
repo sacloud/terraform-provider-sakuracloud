@@ -31,7 +31,6 @@ func TestAccSakuraCloudDiskDataSource_Basic(t *testing.T) {
 					resource.TestCheckResourceAttr("data.sakuracloud_disk.foobar", "connection", "virtio"),
 					resource.TestCheckResourceAttr("data.sakuracloud_disk.foobar", "size", "20"),
 					resource.TestCheckResourceAttr("data.sakuracloud_disk.foobar", "description", "source_disk_description"),
-					resource.TestCheckResourceAttr("data.sakuracloud_disk.foobar", "zone", "tk1v"),
 					resource.TestCheckResourceAttr("data.sakuracloud_disk.foobar", "tags.#", "3"),
 					resource.TestCheckResourceAttr("data.sakuracloud_disk.foobar", "tags.0", "tag1"),
 					resource.TestCheckResourceAttr("data.sakuracloud_disk.foobar", "tags.1", "tag2"),
@@ -89,9 +88,6 @@ func testAccCheckSakuraCloudDiskDataSourceNotExists(n string) resource.TestCheck
 
 func testAccCheckSakuraCloudDiskDataSourceDestroy(s *terraform.State) error {
 	client := testAccProvider.Meta().(*api.Client)
-	originalZone := client.Zone
-	client.Zone = "tk1v"
-	defer func() { client.Zone = originalZone }()
 
 	for _, rs := range s.RootModule().Resources {
 		if rs.Type != "sakuracloud_disk" {
@@ -117,7 +113,6 @@ resource "sakuracloud_disk" "disk01"{
     name = "hoge_Ubuntu_fuga"
     tags = ["tag1","tag2","tag3"]
     description = "source_disk_description"
-    zone = "tk1v"
 }
 `
 
@@ -126,7 +121,6 @@ resource "sakuracloud_disk" "disk01"{
     name = "hoge_Ubuntu_fuga"
     tags = ["tag1","tag2","tag3"]
     description = "source_disk_description"
-    zone = "tk1v"
 }
 
 data "sakuracloud_disk" "foobar" {
@@ -134,7 +128,6 @@ data "sakuracloud_disk" "foobar" {
 	name = "Name"
 	values = ["Ubuntu"]
     }
-    zone = "tk1v"
 }`
 
 var testAccCheckSakuraCloudDataSourceDiskConfig_With_Tag = `
@@ -142,7 +135,6 @@ resource "sakuracloud_disk" "disk01"{
     name = "hoge_Ubuntu_fuga"
     tags = ["tag1","tag2","tag3"]
     description = "source_disk_description"
-    zone = "tk1v"
 }
 
 data "sakuracloud_disk" "foobar" {
@@ -150,7 +142,6 @@ data "sakuracloud_disk" "foobar" {
 	name = "Tags"
 	values = ["tag2","tag3"]
     }
-    zone = "tk1v"
 }`
 
 var testAccCheckSakuraCloudDataSourceDiskConfig_With_NotExists_Tag = `
@@ -158,7 +149,6 @@ resource "sakuracloud_disk" "disk01"{
     name = "hoge_Ubuntu_fuga"
     tags = ["tag1","tag2","tag3"]
     description = "source_disk_description"
-    zone = "tk1v"
 }
 
 data "sakuracloud_disk" "foobar" {
@@ -166,7 +156,6 @@ data "sakuracloud_disk" "foobar" {
 	name = "Tags"
 	values = ["tag2","tag4"]
     }
-    zone = "tk1v"
 }`
 
 var testAccCheckSakuraCloudDataSourceDiskConfig_NotExists = `
@@ -174,7 +163,6 @@ resource "sakuracloud_disk" "disk01"{
     name = "hoge_Ubuntu_fuga"
     tags = ["tag1","tag2","tag3"]
     description = "source_disk_description"
-    zone = "tk1v"
 }
 
 data "sakuracloud_disk" "foobar" {
@@ -182,5 +170,4 @@ data "sakuracloud_disk" "foobar" {
 	name = "Name"
 	values = ["xxxxxxxxxxxxxxxxxx"]
     }
-    zone = "tk1v"
 }`

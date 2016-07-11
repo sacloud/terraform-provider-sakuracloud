@@ -206,9 +206,6 @@ func testAccCheckSakuraCloudServerExists(n string, server *sacloud.Server) resou
 		}
 
 		client := testAccProvider.Meta().(*api.Client)
-		originalZone := client.Zone
-		client.Zone = "tk1v"
-		defer func() { client.Zone = originalZone }()
 
 		foundServer, err := client.Server.Read(rs.Primary.ID)
 
@@ -260,9 +257,6 @@ func testAccCheckSakuraCloudServerAttributesWithoutSharedInterface(server *saclo
 
 func testAccCheckSakuraCloudServerDestroy(s *terraform.State) error {
 	client := testAccProvider.Meta().(*api.Client)
-	originalZone := client.Zone
-	client.Zone = "tk1v"
-	defer func() { client.Zone = originalZone }()
 
 	for _, rs := range s.RootModule().Resources {
 		if rs.Type != "sakuracloud_server" {
@@ -285,12 +279,10 @@ data "sakuracloud_archive" "ubuntu" {
 	name = "Name"
 	values = ["Ubuntu Server 16"]
     }
-    zone = "tk1v"
 }
 resource "sakuracloud_disk" "foobar" {
     name = "mydisk"
     source_archive_id = "${data.sakuracloud_archive.ubuntu.id}"
-    zone = "tk1v"
 }
 
 resource "sakuracloud_server" "foobar" {
@@ -298,7 +290,6 @@ resource "sakuracloud_server" "foobar" {
     disks = ["${sakuracloud_disk.foobar.id}"]
     description = "Server from TerraForm for SAKURA CLOUD"
     tags = ["@virtio-net-pci"]
-    zone = "tk1v"
 }
 `
 
@@ -308,13 +299,11 @@ data "sakuracloud_archive" "ubuntu" {
 	name = "Name"
 	values = ["Ubuntu Server 16"]
     }
-    zone = "tk1v"
 }
 
 resource "sakuracloud_disk" "foobar" {
     name = "mydisk"
     source_archive_id = "${data.sakuracloud_archive.ubuntu.id}"
-    zone = "tk1v"
 }
 
 resource "sakuracloud_server" "foobar" {
@@ -324,7 +313,6 @@ resource "sakuracloud_server" "foobar" {
     memory = 2
     description = "Server from TerraForm for SAKURA CLOUD"
     tags = ["@virtio-net-pci"]
-    zone = "tk1v"
 }
 `
 
@@ -334,13 +322,11 @@ data "sakuracloud_archive" "ubuntu" {
 	name = "Name"
 	values = ["Ubuntu Server 16"]
     }
-    zone = "tk1v"
 }
 
 resource "sakuracloud_disk" "foobar" {
     name = "mydisk"
     source_archive_id = "${data.sakuracloud_archive.ubuntu.id}"
-    zone = "tk1v"
 }
 
 resource "sakuracloud_server" "foobar" {
@@ -349,7 +335,6 @@ resource "sakuracloud_server" "foobar" {
     description = "Server from TerraForm for SAKURA CLOUD"
     additional_interfaces = [""]
     tags = ["@virtio-net-pci"]
-    zone = "tk1v"
 }
 `
 const testAccCheckSakuraCloudServerConfig_swiched_NIC_updated = `
@@ -358,13 +343,11 @@ data "sakuracloud_archive" "ubuntu" {
 	name = "Name"
 	values = ["Ubuntu Server 16"]
     }
-    zone = "tk1v"
 }
 
 resource "sakuracloud_disk" "foobar" {
     name = "mydisk"
     source_archive_id = "${data.sakuracloud_archive.ubuntu.id}"
-    zone = "tk1v"
 }
 
 resource "sakuracloud_server" "foobar" {
@@ -373,7 +356,6 @@ resource "sakuracloud_server" "foobar" {
     description = "Server from TerraForm for SAKURA CLOUD"
     additional_interfaces = ["","",""]
     tags = ["@virtio-net-pci"]
-    zone = "tk1v"
 }
 `
 
@@ -383,13 +365,11 @@ data "sakuracloud_archive" "ubuntu" {
 	name = "Name"
 	values = ["Ubuntu Server 16"]
     }
-    zone = "tk1v"
 }
 
 resource "sakuracloud_disk" "foobar" {
     name = "mydisk"
     source_archive_id = "${data.sakuracloud_archive.ubuntu.id}"
-    zone = "tk1v"
 }
 
 resource "sakuracloud_server" "foobar" {
@@ -398,7 +378,6 @@ resource "sakuracloud_server" "foobar" {
     description = "Server from TerraForm for SAKURA CLOUD"
     base_interface = ""
     tags = ["@virtio-net-pci"]
-    zone = "tk1v"
 }
 `
 
@@ -412,14 +391,12 @@ resource "sakuracloud_packet_filter" "foobar2" {
     	dest_port = "80"
     	allow = true
     }
-    zone = "is1a"
 }
 resource "sakuracloud_server" "foobar" {
     name = "myserver"
     base_interface = "shared"
     additional_interfaces = [""]
     packet_filter_ids = ["" , "${sakuracloud_packet_filter.foobar2.id}"]
-    zone = "is1a"
 }
 `
 
@@ -434,7 +411,6 @@ resource "sakuracloud_packet_filter" "foobar1" {
     	dest_port = "80"
     	allow = true
     }
-    zone = "is1a"
 }
 resource "sakuracloud_packet_filter" "foobar2" {
     name = "mypacket_filter2"
@@ -446,14 +422,12 @@ resource "sakuracloud_packet_filter" "foobar2" {
     	dest_port = "80"
     	allow = true
     }
-    zone = "is1a"
 }
 resource "sakuracloud_server" "foobar" {
     name = "myserver_upd"
     base_interface = "shared"
     additional_interfaces = [""]
     packet_filter_ids = ["${sakuracloud_packet_filter.foobar1.id}" , "${sakuracloud_packet_filter.foobar2.id}"]
-    zone = "is1a"
 }
 
 `
@@ -469,7 +443,6 @@ resource "sakuracloud_packet_filter" "foobar1" {
     	dest_port = "80"
     	allow = true
     }
-    zone = "is1a"
 }
 resource "sakuracloud_packet_filter" "foobar2" {
     name = "mypacket_filter2"
@@ -481,14 +454,12 @@ resource "sakuracloud_packet_filter" "foobar2" {
     	dest_port = "80"
     	allow = true
     }
-    zone = "is1a"
 }
 resource "sakuracloud_server" "foobar" {
     name = "myserver_upd"
     base_interface = "shared"
     additional_interfaces = [""]
     packet_filter_ids = ["${sakuracloud_packet_filter.foobar1.id}"]
-    zone = "is1a"
 }
 
 `
@@ -498,7 +469,4 @@ resource "sakuracloud_server" "foobar" {
     name = "myserver_upd"
     base_interface = "shared"
     additional_interfaces = [""]
-    zone = "is1a"
-}
-
-`
+}`

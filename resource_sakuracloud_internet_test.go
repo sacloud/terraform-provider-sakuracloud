@@ -135,9 +135,6 @@ func testAccCheckSakuraCloudInternetExists(n string, internet *sacloud.Internet)
 		}
 
 		client := testAccProvider.Meta().(*api.Client)
-		originalZone := client.Zone
-		client.Zone = "tk1v"
-		defer func() { client.Zone = originalZone }()
 
 		foundInternet, err := client.Internet.Read(rs.Primary.ID)
 
@@ -157,9 +154,6 @@ func testAccCheckSakuraCloudInternetExists(n string, internet *sacloud.Internet)
 
 func testAccCheckSakuraCloudInternetDestroy(s *terraform.State) error {
 	client := testAccProvider.Meta().(*api.Client)
-	originalZone := client.Zone
-	client.Zone = "tk1v"
-	defer func() { client.Zone = originalZone }()
 
 	for _, rs := range s.RootModule().Resources {
 		if rs.Type != "sakuracloud_internet" {
@@ -179,14 +173,12 @@ func testAccCheckSakuraCloudInternetDestroy(s *terraform.State) error {
 var testAccCheckSakuraCloudInternetConfig_basic = `
 resource "sakuracloud_internet" "foobar" {
     name = "myinternet"
-    zone = "tk1v"
 }`
 
 var testAccCheckSakuraCloudInternetConfig_update = `
 resource "sakuracloud_internet" "foobar" {
     name = "myinternet_upd"
     band_width = 500
-    zone = "tk1v"
 }`
 
 var testAccCheckSakuraCloudInternetConfig_with_server = `
@@ -199,22 +191,18 @@ resource "sakuracloud_server" "foobar" {
     base_nw_ipaddress = "${sakuracloud_internet.foobar.nw_ipaddresses.0}"
     base_nw_gateway = "${sakuracloud_internet.foobar.nw_gateway}"
     base_nw_mask_len = "${sakuracloud_internet.foobar.nw_mask_len}"
-    zone = "tk1v"
 }
 data "sakuracloud_archive" "ubuntu" {
     filter = {
 	name = "Name"
 	values = ["Ubuntu Server 16"]
     }
-    zone = "tk1v"
 }
 resource "sakuracloud_disk" "foobar"{
     name = "mydisk"
     source_archive_id = "${data.sakuracloud_archive.ubuntu.id}"
-    zone = "tk1v"
 }
 resource "sakuracloud_internet" "foobar" {
     name = "myinternet"
-    zone = "tk1v"
 }
 `

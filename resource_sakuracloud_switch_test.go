@@ -114,9 +114,6 @@ func testAccCheckSakuraCloudSwitchExists(n string, sw *sacloud.Switch) resource.
 		}
 
 		client := testAccProvider.Meta().(*api.Client)
-		originalZone := client.Zone
-		client.Zone = "tk1v"
-		defer func() { client.Zone = originalZone }()
 
 		foundSwitch, err := client.Switch.Read(rs.Primary.ID)
 
@@ -136,9 +133,6 @@ func testAccCheckSakuraCloudSwitchExists(n string, sw *sacloud.Switch) resource.
 
 func testAccCheckSakuraCloudSwitchDestroy(s *terraform.State) error {
 	client := testAccProvider.Meta().(*api.Client)
-	originalZone := client.Zone
-	client.Zone = "tk1v"
-	defer func() { client.Zone = originalZone }()
 
 	for _, rs := range s.RootModule().Resources {
 		if rs.Type != "sakuracloud_switch" {
@@ -160,7 +154,6 @@ resource "sakuracloud_switch" "foobar" {
     name = "myswitch"
     description = "Switch from TerraForm for SAKURA CLOUD"
     tags = ["hoge1" , "hoge2"]
-    zone = "tk1v"
 }`
 
 var testAccCheckSakuraCloudSwitchConfig_update = `
@@ -168,7 +161,6 @@ resource "sakuracloud_switch" "foobar" {
     name = "myswitch_upd"
     description = "Switch from TerraForm for SAKURA CLOUD"
     tags = ["hoge1" , "hoge2"]
-    zone = "tk1v"
 }`
 
 var testAccCheckSakuraCloudSwitchConfig_with_server = `
@@ -177,12 +169,10 @@ resource "sakuracloud_server" "foobar" {
     description = "Server from TerraForm for SAKURA CLOUD"
     tags = ["@virtio-net-pci"]
     additional_interfaces = ["${sakuracloud_switch.foobar.id}"]
-    zone = "tk1v"
 }
 resource "sakuracloud_switch" "foobar" {
     name = "myswitch"
     description = "Switch from TerraForm for SAKURA CLOUD"
     tags = ["hoge1" , "hoge2"]
-    zone = "tk1v"
 }
 `

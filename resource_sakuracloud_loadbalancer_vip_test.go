@@ -120,7 +120,6 @@ func testAccCheckSakuraCloudLoadBalancerVIPDestroy(s *terraform.State) error {
 var testAccCheckSakuraCloudLoadBalancerVIPConfig_basic = `
 resource "sakuracloud_switch" "sw" {
     name = "sw"
-    zone = "tk1v"
 }
 resource "sakuracloud_load_balancer" "foobar" {
     switch_id = "${sakuracloud_switch.sw.id}"
@@ -132,7 +131,6 @@ resource "sakuracloud_load_balancer" "foobar" {
     name = "name"
     description = "description"
     tags = ["hoge1" , "hoge2"]
-    zone = "tk1v"
 }
 resource "sakuracloud_load_balancer_vip" "vip1" {
     load_balancer_id = "${sakuracloud_load_balancer.foobar.id}"
@@ -140,20 +138,17 @@ resource "sakuracloud_load_balancer_vip" "vip1" {
     port = 80
     delay_loop = 100
     sorry_server = "192.168.11.11"
-    zone = "tk1v"
 }
 resource "sakuracloud_load_balancer_vip" "vip2" {
     load_balancer_id = "${sakuracloud_load_balancer.foobar.id}"
     vip = "192.168.11.202"
     port = 80
-    zone = "tk1v"
 }
 `
 
 var testAccCheckSakuraCloudLoadBalancerVIPConfig_update = `
 resource "sakuracloud_switch" "sw" {
     name = "sw"
-    zone = "tk1v"
 }
 resource "sakuracloud_load_balancer" "foobar" {
     switch_id = "${sakuracloud_switch.sw.id}"
@@ -165,7 +160,6 @@ resource "sakuracloud_load_balancer" "foobar" {
     name = "name"
     description = "description"
     tags = ["hoge1" , "hoge2"]
-    zone = "tk1v"
 }
 resource "sakuracloud_load_balancer_vip" "vip1" {
     load_balancer_id = "${sakuracloud_load_balancer.foobar.id}"
@@ -173,24 +167,20 @@ resource "sakuracloud_load_balancer_vip" "vip1" {
     port = 80
     delay_loop = 50
     sorry_server = "192.168.11.22"
-    zone = "tk1v"
 }
 resource "sakuracloud_load_balancer_vip" "vip2" {
     load_balancer_id = "${sakuracloud_load_balancer.foobar.id}"
     vip = "192.168.11.202"
     port = 80
-    zone = "tk1v"
 }
 resource "sakuracloud_load_balancer_vip" "vip3" {
     load_balancer_id = "${sakuracloud_load_balancer.foobar.id}"
     vip = "192.168.11.203"
     port = 80
-    zone = "tk1v"
 }
 resource "sakuracloud_load_balancer_vip" "vip4" {
     load_balancer_id = "${sakuracloud_load_balancer.foobar.id}"
     vip = "192.168.11.204"
     port = 80
-    zone = "tk1v"
 }
 `
