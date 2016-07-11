@@ -12,6 +12,7 @@
   - [ルーター(`sakuracloud_internet`)](configuration/resources/internet.md)
   - [パケットフィルタ(`sakuracloud_packet_filter`)](configuration/resources/packet_filter.md)
   - [ブリッジ(`sakuracloud_bridge`)](configuration/resources/bridge.md)
+  - [ロードバランサー(`sakuracloud_load_balancer`)](configuration/resources/load_balancer.md)
   - [スタートアップスクリプト(`sakuracloud_note`)](configuration/resources/note.md)
   - [公開鍵(`sakuracloud_ssh_key`)](configuration/resources/ssh_key.md)
   - [DNS(`sakuracloud_dns`)](configuration/resources/dns.md)

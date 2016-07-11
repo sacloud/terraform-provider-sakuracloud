@@ -15,16 +15,6 @@ type VPCRouterSettings struct {
 	Router *VPCRouterSetting `json:",omitempty"`
 }
 
-type VPCRouterSetting struct {
-	Interfaces []*VPCRouterInterface `json:",omitempty"`
-	VRID       int                   `json:",omitempty"`
-}
-type VPCRouterInterface struct {
-	IPAddress        []string `json:",omitempty"`
-	NetworkMaskLen   int      `json:",omitempty"`
-	VirtualIPAddress string   `json:",omitempty"`
-}
-
 func CreateNewVPCRouter() *VPCRouter {
 	return &VPCRouter{
 		Appliance: &Appliance{
@@ -37,6 +27,15 @@ func CreateNewVPCRouter() *VPCRouter {
 				Switch:  &ApplianceRemarkSwitch{},
 			},
 		},
+		Settings: &VPCRouterSettings{
+			Router: &VPCRouterSetting{},
+		},
+	}
+}
+
+func (v *VPCRouter) InitVPCRouterSetting() {
+	v.Settings = &VPCRouterSettings{
+		Router: &VPCRouterSetting{},
 	}
 }
 
@@ -79,7 +78,7 @@ func (v *VPCRouter) setPremiumServices(switchID string, virtualIPAddress string,
 					NetworkMaskLen:   networkMaskLen,
 				},
 			},
-			VRID: vrid,
+			VRID: &vrid,
 		},
 	}
 

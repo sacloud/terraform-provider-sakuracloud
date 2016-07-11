@@ -31,13 +31,13 @@ vet: fmt
 fmt:
 	gofmt -w $(GOFMT_FILES)
 
-docker-test:
+docker-test: 
 	sh -c "'$(CURDIR)/scripts/build_on_docker.sh' 'test'"
 
-docker-testacc:
+docker-testacc: 
 	sh -c "'$(CURDIR)/scripts/build_on_docker.sh' 'testacc'"
 
-docker-build: clean
+docker-build: clean 
 	sh -c "'$(CURDIR)/scripts/build_on_docker.sh' 'build-x'"
 
 
