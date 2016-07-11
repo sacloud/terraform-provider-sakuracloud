@@ -114,9 +114,6 @@ func testAccCheckSakuraCloudLoadBalancerExists(n string, loadBalancer *sacloud.L
 		}
 
 		client := testAccProvider.Meta().(*api.Client)
-		originalZone := client.Zone
-		client.Zone = "tk1v"
-		defer func() { client.Zone = originalZone }()
 
 		foundLoadBalancer, err := client.LoadBalancer.Read(rs.Primary.ID)
 
@@ -136,9 +133,6 @@ func testAccCheckSakuraCloudLoadBalancerExists(n string, loadBalancer *sacloud.L
 
 func testAccCheckSakuraCloudLoadBalancerDestroy(s *terraform.State) error {
 	client := testAccProvider.Meta().(*api.Client)
-	originalZone := client.Zone
-	client.Zone = "tk1v"
-	defer func() { client.Zone = originalZone }()
 
 	for _, rs := range s.RootModule().Resources {
 		if rs.Type != "sakuracloud_load_balancer" {
@@ -158,7 +152,6 @@ func testAccCheckSakuraCloudLoadBalancerDestroy(s *terraform.State) error {
 const testAccCheckSakuraCloudLoadBalancerConfig_basic = `
 resource "sakuracloud_switch" "sw" {
     name = "sw"
-    zone = "tk1v"
 }
 resource "sakuracloud_load_balancer" "foobar" {
     switch_id = "${sakuracloud_switch.sw.id}"
@@ -170,13 +163,11 @@ resource "sakuracloud_load_balancer" "foobar" {
     name = "name_before"
     description = "description_before"
     tags = ["hoge1" , "hoge2"]
-    zone = "tk1v"
 }`
 
 const testAccCheckSakuraCloudLoadBalancerConfig_update = `
 resource "sakuracloud_switch" "sw" {
     name = "sw"
-    zone = "tk1v"
 }
 resource "sakuracloud_load_balancer" "foobar" {
     switch_id = "${sakuracloud_switch.sw.id}"
@@ -188,13 +179,11 @@ resource "sakuracloud_load_balancer" "foobar" {
     name = "name_after"
     description = "description_after"
     tags = ["hoge1_after" , "hoge2_after"]
-    zone = "tk1v"
 }`
 
 const testAccCheckSakuraCloudLoadBalancerConfig_WithRouter = `
 resource "sakuracloud_internet" "router" {
     name = "sw"
-    zone = "tk1v"
 }
 resource "sakuracloud_load_balancer" "foobar" {
     switch_id = "${sakuracloud_internet.router.switch_id}"
@@ -209,5 +198,4 @@ resource "sakuracloud_load_balancer" "foobar" {
     name = "name_before"
     description = "description_before"
     tags = ["hoge1" , "hoge2"]
-    zone = "tk1v"
 }`

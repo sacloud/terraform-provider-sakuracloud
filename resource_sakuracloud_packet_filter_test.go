@@ -107,9 +107,6 @@ func testAccCheckSakuraCloudPacketFilterExists(n string, filter *sacloud.PacketF
 		}
 
 		client := testAccProvider.Meta().(*api.Client)
-		originalZone := client.Zone
-		client.Zone = "tk1v"
-		defer func() { client.Zone = originalZone }()
 
 		foundPacketFilter, err := client.PacketFilter.Read(rs.Primary.ID)
 
@@ -129,9 +126,6 @@ func testAccCheckSakuraCloudPacketFilterExists(n string, filter *sacloud.PacketF
 
 func testAccCheckSakuraCloudPacketFilterDestroy(s *terraform.State) error {
 	client := testAccProvider.Meta().(*api.Client)
-	originalZone := client.Zone
-	client.Zone = "tk1v"
-	defer func() { client.Zone = originalZone }()
 
 	for _, rs := range s.RootModule().Resources {
 		if rs.Type != "sakuracloud_packet_filter" {
@@ -166,7 +160,6 @@ resource "sakuracloud_packet_filter" "foobar" {
     	dest_port = "80"
     	allow = true
     }
-    zone = "tk1v"
 }`
 
 var testAccCheckSakuraCloudPacketFilterConfig_update = `
@@ -202,5 +195,4 @@ resource "sakuracloud_packet_filter" "foobar" {
     	source_nw = "0.0.0.0"
     	allow = true
     }
-    zone = "is1a"
 }`

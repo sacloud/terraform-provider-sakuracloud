@@ -116,7 +116,7 @@ func testAccCheckSakuraCloudBridgeExists(n string, bridge *sacloud.Bridge) resou
 
 		client := testAccProvider.Meta().(*api.Client)
 		originalZone := client.Zone
-		client.Zone = "is1a"
+		client.Zone = "is1b"
 		defer func() { client.Zone = originalZone }()
 
 		foundBridge, err := client.Bridge.Read(rs.Primary.ID)
@@ -138,7 +138,7 @@ func testAccCheckSakuraCloudBridgeExists(n string, bridge *sacloud.Bridge) resou
 func testAccCheckSakuraCloudBridgeDestroy(s *terraform.State) error {
 	client := testAccProvider.Meta().(*api.Client)
 	originalZone := client.Zone
-	client.Zone = "is1a"
+	client.Zone = "is1b"
 	defer func() { client.Zone = originalZone }()
 
 	for _, rs := range s.RootModule().Resources {
@@ -160,39 +160,39 @@ var testAccCheckSakuraCloudBridgeConfig_basic = `
 resource "sakuracloud_bridge" "foobar" {
     name = "mybridge"
     description = "Bridge from TerraForm for SAKURA CLOUD"
-    zone = "is1a"
+    zone = "is1b"
 }`
 
 var testAccCheckSakuraCloudBridgeConfig_update = `
 resource "sakuracloud_bridge" "foobar" {
     name = "mybridge_upd"
     description = "Bridge from TerraForm for SAKURA CLOUD"
-    zone = "is1a"
+    zone = "is1b"
 }`
 
 var testAccCheckSakuraCloudBridgeConfig_withSwitch = `
 resource "sakuracloud_switch" "foobar" {
     name = "myswitch"
     description = "Switch from TerraForm for SAKURA CLOUD"
-    zone = "is1a"
+    zone = "is1b"
     bridge_id = "${sakuracloud_bridge.foobar.id}"
     depends_on = ["sakuracloud_bridge.foobar"]
 }
 resource "sakuracloud_bridge" "foobar" {
     name = "mybridge"
     description = "Bridge from TerraForm for SAKURA CLOUD"
-    zone = "is1a"
+    zone = "is1b"
 }`
 
 var testAccCheckSakuraCloudBridgeConfig_withSwitchDisconnect = `
 resource "sakuracloud_switch" "foobar" {
     name = "myswitch_upd"
     description = "Switch from TerraForm for SAKURA CLOUD"
-    zone = "is1a"
+    zone = "is1b"
     depends_on = ["sakuracloud_bridge.foobar"]
 }
 resource "sakuracloud_bridge" "foobar" {
     name = "mybridge_upd"
     description = "Bridge from TerraForm for SAKURA CLOUD"
-    zone = "is1a"
+    zone = "is1b"
 }`

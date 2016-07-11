@@ -10,12 +10,17 @@ import (
 
 var testAccProviders map[string]terraform.ResourceProvider
 var testAccProvider *schema.Provider
+var testTargetZone = "is1b"
 
 func init() {
+	if v := os.Getenv("SAKURACLOUD_TEST_ZONE"); v != "" {
+		os.Setenv("SAKURACLOUD_ZONE", v)
+	}
 	testAccProvider = Provider().(*schema.Provider)
 	testAccProviders = map[string]terraform.ResourceProvider{
 		"sakuracloud": testAccProvider,
 	}
+
 }
 
 func TestProvider(t *testing.T) {

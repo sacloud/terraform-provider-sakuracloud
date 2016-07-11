@@ -116,7 +116,6 @@ func testAccCheckSakuraCloudLoadBalancerServerDestroy(s *terraform.State) error 
 var testAccCheckSakuraCloudLoadBalancerServerConfig_basic = `
 resource "sakuracloud_switch" "sw" {
     name = "sw"
-    zone = "tk1v"
 }
 resource "sakuracloud_load_balancer" "foobar" {
     switch_id = "${sakuracloud_switch.sw.id}"
@@ -124,13 +123,11 @@ resource "sakuracloud_load_balancer" "foobar" {
     ipaddress1 = "192.168.11.101"
     nw_mask_len = 24
     name = "name"
-    zone = "tk1v"
 }
 resource "sakuracloud_load_balancer_vip" "vip1" {
     load_balancer_id = "${sakuracloud_load_balancer.foobar.id}"
     vip = "192.168.11.201"
     port = 80
-    zone = "tk1v"
 }
 resource "sakuracloud_load_balancer_server" "server01"{
     load_balancer_vip_id = "${sakuracloud_load_balancer_vip.vip1.id}"
@@ -138,14 +135,12 @@ resource "sakuracloud_load_balancer_server" "server01"{
     check_protocol = "http"
     check_path = "/"
     check_status = "200"
-    zone = "tk1v"
 }
 `
 
 var testAccCheckSakuraCloudLoadBalancerServerConfig_update = `
 resource "sakuracloud_switch" "sw" {
     name = "sw"
-    zone = "tk1v"
 }
 resource "sakuracloud_load_balancer" "foobar" {
     switch_id = "${sakuracloud_switch.sw.id}"
@@ -153,24 +148,20 @@ resource "sakuracloud_load_balancer" "foobar" {
     ipaddress1 = "192.168.11.101"
     nw_mask_len = 24
     name = "name"
-    zone = "tk1v"
 }
 resource "sakuracloud_load_balancer_vip" "vip1" {
     load_balancer_id = "${sakuracloud_load_balancer.foobar.id}"
     vip = "192.168.11.201"
     port = 80
-    zone = "tk1v"
 }
 resource "sakuracloud_load_balancer_server" "server01"{
     load_balancer_vip_id = "${sakuracloud_load_balancer_vip.vip1.id}"
     ipaddress = "192.168.11.51"
     check_protocol = "ping"
-    zone = "tk1v"
 }
 resource "sakuracloud_load_balancer_server" "server02"{
     load_balancer_vip_id = "${sakuracloud_load_balancer_vip.vip1.id}"
     ipaddress = "192.168.11.52"
     check_protocol = "ping"
-    zone = "tk1v"
 }
 `

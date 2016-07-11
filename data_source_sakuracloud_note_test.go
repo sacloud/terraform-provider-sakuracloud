@@ -84,9 +84,6 @@ func testAccCheckSakuraCloudNoteDataSourceNotExists(n string) resource.TestCheck
 
 func testAccCheckSakuraCloudNoteDataSourceDestroy(s *terraform.State) error {
 	client := testAccProvider.Meta().(*api.Client)
-	originalZone := client.Zone
-	client.Zone = "tk1v"
-	defer func() { client.Zone = originalZone }()
 
 	for _, rs := range s.RootModule().Resources {
 		if rs.Type != "sakuracloud_note" {

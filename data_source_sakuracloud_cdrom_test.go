@@ -22,7 +22,6 @@ func TestAccSakuraCloudCDROMDataSource_Basic(t *testing.T) {
 					testAccCheckSakuraCloudCDROMDataSourceID("data.sakuracloud_cdrom.foobar"),
 					resource.TestCheckResourceAttr("data.sakuracloud_cdrom.foobar", "name", "Ubuntu server 16.04 LTS 64bit"),
 					resource.TestCheckResourceAttr("data.sakuracloud_cdrom.foobar", "size", "5"),
-					resource.TestCheckResourceAttr("data.sakuracloud_cdrom.foobar", "zone", "tk1v"),
 					resource.TestCheckResourceAttr("data.sakuracloud_cdrom.foobar", "tags.#", "5"),
 					resource.TestCheckResourceAttr("data.sakuracloud_cdrom.foobar", "tags.0", "arch-64bit"),
 					resource.TestCheckResourceAttr("data.sakuracloud_cdrom.foobar", "tags.1", "current-stable"),
@@ -82,9 +81,6 @@ func testAccCheckSakuraCloudCDROMDataSourceNotExists(n string) resource.TestChec
 
 func testAccCheckSakuraCloudCDROMDataSourceDestroy(s *terraform.State) error {
 	client := testAccProvider.Meta().(*api.Client)
-	originalZone := client.Zone
-	client.Zone = "tk1v"
-	defer func() { client.Zone = originalZone }()
 
 	for _, rs := range s.RootModule().Resources {
 		if rs.Type != "sakuracloud_cdrom" {
@@ -111,7 +107,6 @@ data "sakuracloud_cdrom" "foobar" {
 	name = "Name"
 	values = ["Ubuntu Server 16"]
     }
-    zone = "tk1v"
 }`
 
 var testAccCheckSakuraCloudDataSourceCDROMConfig_With_Tag = `
@@ -120,7 +115,6 @@ data "sakuracloud_cdrom" "foobar" {
 	name = "Tags"
 	values = ["distro-ubuntu","os-linux"]
     }
-    zone = "tk1v"
 }`
 
 var testAccCheckSakuraCloudDataSourceCDROMConfig_With_NotExists_Tag = `
@@ -129,7 +123,6 @@ data "sakuracloud_cdrom" "foobar" {
 	name = "Tags"
 	values = ["distro-ubuntu-xxxxxxxxxxx","os-linux-xxxxxxxx"]
     }
-    zone = "tk1v"
 }`
 
 var testAccCheckSakuraCloudDataSourceCDROMConfig_NotExists = `
@@ -138,5 +131,4 @@ data "sakuracloud_cdrom" "foobar" {
 	name = "Name"
 	values = ["xxxxxxxxxxxxxxxxxx"]
     }
-    zone = "tk1v"
 }`

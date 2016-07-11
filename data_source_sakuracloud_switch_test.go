@@ -25,7 +25,6 @@ func TestAccSakuraCloudSwitchDataSource_Basic(t *testing.T) {
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckSakuraCloudSwitchDataSourceID("data.sakuracloud_switch.foobar"),
 					resource.TestCheckResourceAttr("data.sakuracloud_switch.foobar", "name", "name_test"),
-					resource.TestCheckResourceAttr("data.sakuracloud_switch.foobar", "zone", "tk1v"),
 					resource.TestCheckResourceAttr("data.sakuracloud_switch.foobar", "description", "description_test"),
 					resource.TestCheckResourceAttr("data.sakuracloud_switch.foobar", "tags.#", "3"),
 					resource.TestCheckResourceAttr("data.sakuracloud_switch.foobar", "tags.0", "tag1"),
@@ -84,9 +83,6 @@ func testAccCheckSakuraCloudSwitchDataSourceNotExists(n string) resource.TestChe
 
 func testAccCheckSakuraCloudSwitchDataSourceDestroy(s *terraform.State) error {
 	client := testAccProvider.Meta().(*api.Client)
-	originalZone := client.Zone
-	client.Zone = "tk1v"
-	defer func() { client.Zone = originalZone }()
 
 	for _, rs := range s.RootModule().Resources {
 		if rs.Type != "sakuracloud_switch" {
@@ -111,7 +107,6 @@ var testAccCheckSakuraCloudDataSourceSwitchBase = `
 resource "sakuracloud_switch" "foobar" {
     name = "name_test"
     description = "description_test"
-    zone = "tk1v"
     tags = ["tag1","tag2","tag3"]
 }
 `
@@ -120,7 +115,6 @@ var testAccCheckSakuraCloudDataSourceSwitchConfig = `
 resource "sakuracloud_switch" "foobar" {
     name = "name_test"
     description = "description_test"
-    zone = "tk1v"
     tags = ["tag1","tag2","tag3"]
 }
 data "sakuracloud_switch" "foobar" {
@@ -128,14 +122,12 @@ data "sakuracloud_switch" "foobar" {
 	name = "Name"
 	values = ["name_test"]
     }
-    zone = "tk1v"
 }`
 
 var testAccCheckSakuraCloudDataSourceSwitchConfig_With_Tag = `
 resource "sakuracloud_switch" "foobar" {
     name = "name_test"
     description = "description_test"
-    zone = "tk1v"
     tags = ["tag1","tag2","tag3"]
 }
 data "sakuracloud_switch" "foobar" {
@@ -143,14 +135,12 @@ data "sakuracloud_switch" "foobar" {
 	name = "Tags"
 	values = ["tag1","tag3"]
     }
-    zone = "tk1v"
 }`
 
 var testAccCheckSakuraCloudDataSourceSwitchConfig_With_NotExists_Tag = `
 resource "sakuracloud_switch" "foobar" {
     name = "name_test"
     description = "description_test"
-    zone = "tk1v"
     tags = ["tag1","tag2","tag3"]
 }
 data "sakuracloud_switch" "foobar" {
@@ -158,14 +148,12 @@ data "sakuracloud_switch" "foobar" {
 	name = "Tags"
 	values = ["tag1-xxxxxxx","tag3-xxxxxxxx"]
     }
-    zone = "tk1v"
 }`
 
 var testAccCheckSakuraCloudDataSourceSwitchConfig_NotExists = `
 resource "sakuracloud_switch" "foobar" {
     name = "name_test"
     description = "description_test"
-    zone = "tk1v"
     tags = ["tag1","tag2","tag3"]
 }
 data "sakuracloud_switch" "foobar" {
@@ -173,5 +161,4 @@ data "sakuracloud_switch" "foobar" {
 	name = "Name"
 	values = ["xxxxxxxxxxxxxxxxxx"]
     }
-    zone = "tk1v"
 }`
