@@ -35,7 +35,7 @@ func resourceSakuraCloudLoadBalancerVIP() *schema.Resource {
 			"delay_loop": &schema.Schema{
 				Type:         schema.TypeInt,
 				Optional:     true,
-				ValidateFunc: validateIntegerInRange(10, 9223372036854775807),
+				ValidateFunc: validateIntegerInRange(10, 2147483647),
 				Default:      10,
 			},
 			"sorry_server": &schema.Schema{
