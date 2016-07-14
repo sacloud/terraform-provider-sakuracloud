@@ -118,7 +118,7 @@ resource "sakuracloud_dns" "foobar" {
 }
 data "sakuracloud_dns" "foobar" {
     filter = {
-	name = "Zone"
+	name = "Name"
 	values = ["test-terraform-sakuracloud.com"]
     }
 }`
@@ -157,7 +157,7 @@ resource "sakuracloud_dns" "foobar" {
 }
 data "sakuracloud_dns" "foobar" {
     filter = {
-	name = "Zone"
+	name = "Name"
 	values = ["xxxxxxxxxxxxxxxxxx"]
     }
 }`
