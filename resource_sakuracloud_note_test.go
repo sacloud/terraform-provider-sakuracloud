@@ -9,7 +9,7 @@ import (
 	"testing"
 )
 
-func TestAccSakuraCloudNote_Basic(t *testing.T) {
+func TestAccResourceSakuraCloudNote_Basic(t *testing.T) {
 	var note sacloud.Note
 	resource.Test(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
@@ -32,7 +32,7 @@ func TestAccSakuraCloudNote_Basic(t *testing.T) {
 	})
 }
 
-func TestAccSakuraCloudNote_Update(t *testing.T) {
+func TestAccResourceSakuraCloudNote_Update(t *testing.T) {
 	var note sacloud.Note
 	resource.Test(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },

@@ -9,7 +9,7 @@ import (
 	"testing"
 )
 
-func TestAccSakuraCloudDNSRecord_Basic(t *testing.T) {
+func TestAccResourceSakuraCloudDNSRecord_Basic(t *testing.T) {
 	var dns sacloud.DNS
 	resource.Test(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
@@ -34,7 +34,7 @@ func TestAccSakuraCloudDNSRecord_Basic(t *testing.T) {
 	})
 }
 
-func TestAccSakuraCloudDNSRecord_Update(t *testing.T) {
+func TestAccResourceSakuraCloudDNSRecord_Update(t *testing.T) {
 	var dns sacloud.DNS
 	resource.Test(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
@@ -73,7 +73,7 @@ func TestAccSakuraCloudDNSRecord_Update(t *testing.T) {
 	})
 }
 
-func TestAccSakuraCloudDNSRecord_With_Count(t *testing.T) {
+func TestAccResourceSakuraCloudDNSRecord_With_Count(t *testing.T) {
 	var dns sacloud.DNS
 	resource.Test(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
@@ -104,7 +104,7 @@ func TestAccSakuraCloudDNSRecord_With_Count(t *testing.T) {
 	})
 }
 
-func TestAccSakuraCloudDNSRecord_With_SRV(t *testing.T) {
+func TestAccResourceSakuraCloudDNSRecord_With_SRV(t *testing.T) {
 	var dns sacloud.DNS
 	resource.Test(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },

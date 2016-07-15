@@ -9,7 +9,7 @@ import (
 	"testing"
 )
 
-func TestAccSakuraCloudLoadBalancer_Basic(t *testing.T) {
+func TestAccResourceSakuraCloudLoadBalancer_Basic(t *testing.T) {
 	var loadBalancer sacloud.LoadBalancer
 	resource.Test(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
@@ -36,7 +36,7 @@ func TestAccSakuraCloudLoadBalancer_Basic(t *testing.T) {
 	})
 }
 
-func TestAccSakuraCloudLoadBalancer_Update(t *testing.T) {
+func TestAccResourceSakuraCloudLoadBalancer_Update(t *testing.T) {
 	var loadBalancer sacloud.LoadBalancer
 	resource.Test(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
@@ -79,7 +79,7 @@ func TestAccSakuraCloudLoadBalancer_Update(t *testing.T) {
 	})
 }
 
-func TestAccSakuraCloudLoadBalancer_WithRouter(t *testing.T) {
+func TestAccResourceSakuraCloudLoadBalancer_WithRouter(t *testing.T) {
 	var loadBalancer sacloud.LoadBalancer
 	resource.Test(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },

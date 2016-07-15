@@ -9,7 +9,7 @@ import (
 	"testing"
 )
 
-func TestAccSakuraCloudDisk_Basic(t *testing.T) {
+func TestAccResourceSakuraCloudDisk_Basic(t *testing.T) {
 	var disk sacloud.Disk
 	resource.Test(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
@@ -31,7 +31,7 @@ func TestAccSakuraCloudDisk_Basic(t *testing.T) {
 	})
 }
 
-func TestAccSakuraCloudDisk_Update(t *testing.T) {
+func TestAccResourceSakuraCloudDisk_Update(t *testing.T) {
 	var disk sacloud.Disk
 	resource.Test(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },

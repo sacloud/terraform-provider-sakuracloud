@@ -9,7 +9,7 @@ import (
 	"testing"
 )
 
-func TestAccSakuraCloudBridge_Basic(t *testing.T) {
+func TestAccResourceSakuraCloudBridge_Basic(t *testing.T) {
 	var bridge sacloud.Bridge
 	resource.Test(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
@@ -30,7 +30,7 @@ func TestAccSakuraCloudBridge_Basic(t *testing.T) {
 	})
 }
 
-func TestAccSakuraCloudBridge_Update(t *testing.T) {
+func TestAccResourceSakuraCloudBridge_Update(t *testing.T) {
 	var bridge sacloud.Bridge
 	resource.Test(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
@@ -57,7 +57,7 @@ func TestAccSakuraCloudBridge_Update(t *testing.T) {
 	})
 }
 
-func TestAccSakuraCloudBridge_WithSwitch(t *testing.T) {
+func TestAccResourceSakuraCloudBridge_WithSwitch(t *testing.T) {
 	var bridge sacloud.Bridge
 	resource.Test(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },

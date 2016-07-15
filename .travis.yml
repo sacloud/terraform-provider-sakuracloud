@@ -3,4 +3,4 @@ language: bash
 services: docker
 
 script:
-  - make docker-testacc
+  - make docker-testacc-resource

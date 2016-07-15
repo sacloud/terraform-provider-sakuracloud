@@ -9,7 +9,7 @@ import (
 	"testing"
 )
 
-func TestAccSakuraCloudDNS_Basic(t *testing.T) {
+func TestAccResourceSakuraCloudDNS_Basic(t *testing.T) {
 	var dns sacloud.DNS
 	resource.Test(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
@@ -28,7 +28,7 @@ func TestAccSakuraCloudDNS_Basic(t *testing.T) {
 	})
 }
 
-func TestAccSakuraCloudDNS_Update(t *testing.T) {
+func TestAccResourceSakuraCloudDNS_Update(t *testing.T) {
 	var dns sacloud.DNS
 	resource.Test(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },

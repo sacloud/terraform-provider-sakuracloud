@@ -9,7 +9,7 @@ import (
 	"testing"
 )
 
-func TestAccSakuraCloudGSLBServer_Basic(t *testing.T) {
+func TestAccResourceSakuraCloudGSLBServer_Basic(t *testing.T) {
 	var gslb sacloud.GSLB
 	resource.Test(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
@@ -30,7 +30,7 @@ func TestAccSakuraCloudGSLBServer_Basic(t *testing.T) {
 	})
 }
 
-func TestAccSakuraCloudGSLBServer_Update(t *testing.T) {
+func TestAccResourceSakuraCloudGSLBServer_Update(t *testing.T) {
 	var gslb sacloud.GSLB
 	resource.Test(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },

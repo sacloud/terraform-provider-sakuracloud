@@ -9,7 +9,7 @@ import (
 	"testing"
 )
 
-func TestAccSakuraCloudInternet_Basic(t *testing.T) {
+func TTestAccResourceSakuraCloudInternet_Basic(t *testing.T) {
 	var internet sacloud.Internet
 	resource.Test(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
@@ -36,7 +36,7 @@ func TestAccSakuraCloudInternet_Basic(t *testing.T) {
 	})
 }
 
-func TestAccSakuraCloudInternet_Update(t *testing.T) {
+func TTestAccResourceSakuraCloudInternet_Update(t *testing.T) {
 	var internet sacloud.Internet
 	resource.Test(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
@@ -79,7 +79,7 @@ func TestAccSakuraCloudInternet_Update(t *testing.T) {
 	})
 }
 
-func TestAccSakuraCloudInternet_WithServer(t *testing.T) {
+func TTestAccResourceSakuraCloudInternet_WithServer(t *testing.T) {
 	var internet sacloud.Internet
 	resource.Test(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },

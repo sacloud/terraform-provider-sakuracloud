@@ -9,7 +9,7 @@ import (
 	"testing"
 )
 
-func TestAccSakuraCloudSSHKey_Basic(t *testing.T) {
+func TestAccResourceSakuraCloudSSHKey_Basic(t *testing.T) {
 	var ssh_key sacloud.SSHKey
 	resource.Test(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
@@ -32,7 +32,7 @@ func TestAccSakuraCloudSSHKey_Basic(t *testing.T) {
 	})
 }
 
-func TestAccSakuraCloudSSHKey_Update(t *testing.T) {
+func TestAccResourceSakuraCloudSSHKey_Update(t *testing.T) {
 	var ssh_key sacloud.SSHKey
 	resource.Test(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },

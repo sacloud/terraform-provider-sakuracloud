@@ -19,6 +19,9 @@ test: vet
 testacc: vet
 	TF_ACC=1 govendor test . -v $(TESTARGS) -timeout 120m
 
+testacc-resource: vet
+	TF_ACC=1 govendor test . -v $(TESTARGS) -run="^TestAccResource" -timeout 120m
+
 vet: fmt
 	@echo "go tool vet $(VETARGS) ."
 	@go tool vet $(VETARGS) $$(ls -d */ | grep -v vendor) ; if [ $$? -eq 1 ]; then \
@@ -36,6 +39,9 @@ docker-test:
 
 docker-testacc: 
 	sh -c "'$(CURDIR)/scripts/build_on_docker.sh' 'testacc'"
+
+docker-testacc-resource:
+	sh -c "'$(CURDIR)/scripts/build_on_docker.sh' 'testacc-resource'"
 
 docker-build: clean 
 	sh -c "'$(CURDIR)/scripts/build_on_docker.sh' 'build-x'"

@@ -9,7 +9,7 @@ import (
 	"testing"
 )
 
-func TestAccSakuraCloudServer_Basic(t *testing.T) {
+func TestAccResourceSakuraCloudServer_Basic(t *testing.T) {
 	var server sacloud.Server
 	resource.Test(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
@@ -39,7 +39,7 @@ func TestAccSakuraCloudServer_Basic(t *testing.T) {
 	})
 }
 
-func TestAccSakuraCloudServer_Update(t *testing.T) {
+func TestAccResourceSakuraCloudServer_Update(t *testing.T) {
 	var server sacloud.Server
 	resource.Test(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
@@ -88,7 +88,7 @@ func TestAccSakuraCloudServer_Update(t *testing.T) {
 	})
 }
 
-func TestAccSakuraCloudServer_EditConnections(t *testing.T) {
+func TestAccResourceSakuraCloudServer_EditConnections(t *testing.T) {
 	var server sacloud.Server
 	resource.Test(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
@@ -151,7 +151,7 @@ func TestAccSakuraCloudServer_EditConnections(t *testing.T) {
 	})
 }
 
-func TestAccSakuraCloudServer_ConnectPacketFilters(t *testing.T) {
+func TestAccResourceSakuraCloudServer_ConnectPacketFilters(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
 		Providers:    testAccProviders,

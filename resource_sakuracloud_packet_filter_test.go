@@ -9,7 +9,7 @@ import (
 	"testing"
 )
 
-func TestAccSakuraCloudPacketFilter_Basic(t *testing.T) {
+func TestAccResourceSakuraCloudPacketFilter_Basic(t *testing.T) {
 	var filter sacloud.PacketFilter
 	resource.Test(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
@@ -40,7 +40,7 @@ func TestAccSakuraCloudPacketFilter_Basic(t *testing.T) {
 	})
 }
 
-func TestAccSakuraCloudPacketFilter_Update(t *testing.T) {
+func TestAccResourceSakuraCloudPacketFilter_Update(t *testing.T) {
 	var filter sacloud.PacketFilter
 	resource.Test(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },

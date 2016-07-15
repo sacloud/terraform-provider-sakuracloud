@@ -9,7 +9,7 @@ import (
 	"testing"
 )
 
-func TestAccSakuraCloudSimpleMonitor_Basic(t *testing.T) {
+func TestAccResourceSakuraCloudSimpleMonitor_Basic(t *testing.T) {
 	var monitor sacloud.SimpleMonitor
 	resource.Test(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
@@ -39,7 +39,7 @@ func TestAccSakuraCloudSimpleMonitor_Basic(t *testing.T) {
 	})
 }
 
-func TestAccSakuraCloudSimpleMonitor_Update(t *testing.T) {
+func TestAccResourceSakuraCloudSimpleMonitor_Update(t *testing.T) {
 	var monitor sacloud.SimpleMonitor
 	resource.Test(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },

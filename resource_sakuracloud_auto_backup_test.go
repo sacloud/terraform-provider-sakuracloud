@@ -9,7 +9,7 @@ import (
 	"testing"
 )
 
-func TestAccSakuraCloudAutoBackup_Basic(t *testing.T) {
+func TestAccResourceSakuraCloudAutoBackup_Basic(t *testing.T) {
 	var autoBackup sacloud.AutoBackup
 	resource.Test(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
@@ -38,7 +38,7 @@ func TestAccSakuraCloudAutoBackup_Basic(t *testing.T) {
 	})
 }
 
-func TestAccSakuraCloudAutoBackup_Update(t *testing.T) {
+func TestAccResourceSakuraCloudAutoBackup_Update(t *testing.T) {
 	var autoBackup sacloud.AutoBackup
 	resource.Test(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },

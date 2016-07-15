@@ -9,7 +9,7 @@ import (
 	"testing"
 )
 
-func TestAccSakuraCloudSwitch_Basic(t *testing.T) {
+func TestAccResourceSakuraCloudSwitch_Basic(t *testing.T) {
 	var sw sacloud.Switch
 	resource.Test(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
@@ -30,7 +30,7 @@ func TestAccSakuraCloudSwitch_Basic(t *testing.T) {
 	})
 }
 
-func TestAccSakuraCloudSwitch_Update(t *testing.T) {
+func TestAccResourceSakuraCloudSwitch_Update(t *testing.T) {
 	var sw sacloud.Switch
 	resource.Test(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
@@ -57,7 +57,7 @@ func TestAccSakuraCloudSwitch_Update(t *testing.T) {
 	})
 }
 
-func TestAccSakuraCloudSwitch_WithServer(t *testing.T) {
+func TestAccResourceSakuraCloudSwitch_WithServer(t *testing.T) {
 	var sw sacloud.Switch
 	resource.Test(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
@@ -83,7 +83,7 @@ func TestAccSakuraCloudSwitch_WithServer(t *testing.T) {
 	})
 }
 
-//func TestAccSakuraCloudSwitch_Import(t *testing.T) {
+//func TestAccResourceSakuraCloudSwitch_Import(t *testing.T) {
 //	resourceName := "sakuracloud_switch.foobar"
 //	resource.Test(t, resource.TestCase{
 //		PreCheck:     func() { testAccPreCheck(t) },
