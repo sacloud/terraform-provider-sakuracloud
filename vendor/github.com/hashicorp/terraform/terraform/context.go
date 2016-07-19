@@ -45,7 +45,7 @@ type ContextOpts struct {
 	Providers          map[string]ResourceProviderFactory
 	Provisioners       map[string]ResourceProvisionerFactory
 	Targets            []string
-	Variables          map[string]string
+	Variables          map[string]interface{}
 
 	UIInput UIInput
 }
@@ -68,7 +68,7 @@ type Context struct {
 	stateLock    sync.RWMutex
 	targets      []string
 	uiInput      UIInput
-	variables    map[string]string
+	variables    map[string]interface{}
 
 	l                   sync.Mutex // Lock acquired during any task
 	parallelSem         Semaphore
@@ -121,7 +121,7 @@ func NewContext(opts *ContextOpts) (*Context, error) {
 
 	// Setup the variables. We first take the variables given to us.
 	// We then merge in the variables set in the environment.
-	variables := make(map[string]string)
+	variables := make(map[string]interface{})
 	for _, v := range os.Environ() {
 		if !strings.HasPrefix(v, VarEnvPrefix) {
 			continue
@@ -313,10 +313,15 @@ func (c *Context) Apply() (*State, error) {
 	}
 
 	// Do the walk
+	var walker *ContextGraphWalker
 	if c.destroy {
-		_, err = c.walk(graph, walkDestroy)
+		walker, err = c.walk(graph, walkDestroy)
 	} else {
-		_, err = c.walk(graph, walkApply)
+		walker, err = c.walk(graph, walkApply)
+	}
+
+	if len(walker.ValidationErrors) > 0 {
+		err = multierror.Append(err, walker.ValidationErrors...)
 	}
 
 	// Clean out any unused things
@@ -377,7 +382,8 @@ func (c *Context) Plan() (*Plan, error) {
 	}
 
 	// Do the walk
-	if _, err := c.walk(graph, operation); err != nil {
+	walker, err := c.walk(graph, operation)
+	if err != nil {
 		return nil, err
 	}
 	p.Diff = c.diff
@@ -387,8 +393,11 @@ func (c *Context) Plan() (*Plan, error) {
 	if _, err := c.Graph(&ContextGraphOpts{Validate: true}); err != nil {
 		return nil, err
 	}
-
-	return p, nil
+	var errs error
+	if len(walker.ValidationErrors) > 0 {
+		errs = multierror.Append(errs, walker.ValidationErrors...)
+	}
+	return p, errs
 }
 
 // Refresh goes through all the resources in the state and refreshes them
@@ -497,12 +506,12 @@ func (c *Context) Module() *module.Tree {
 // Variables will return the mapping of variables that were defined
 // for this Context. If Input was called, this mapping may be different
 // than what was given.
-func (c *Context) Variables() map[string]string {
+func (c *Context) Variables() map[string]interface{} {
 	return c.variables
 }
 
 // SetVariable sets a variable after a context has already been built.
-func (c *Context) SetVariable(k, v string) {
+func (c *Context) SetVariable(k string, v interface{}) {
 	c.variables[k] = v
 }
 
