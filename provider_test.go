@@ -40,4 +40,7 @@ func testAccPreCheck(t *testing.T) {
 	if v := os.Getenv("SAKURACLOUD_ACCESS_TOKEN_SECRET"); v == "" {
 		t.Fatal("SAKURACLOUD_ACCESS_TOKEN_SECRET must be set for acceptance tests")
 	}
+	if v := os.Getenv("SAKURACLOUD_ZONE"); v == "" {
+		t.Fatal("SAKURACLOUD_ZONE must be set for acceptance tests")
+	}
 }
