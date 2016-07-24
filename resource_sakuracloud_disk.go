@@ -102,7 +102,6 @@ func resourceSakuraCloudDisk() *schema.Resource {
 			"disable_pw_auth": &schema.Schema{
 				Type:     schema.TypeBool,
 				Optional: true,
-				Default:  false,
 			},
 			"note_ids": &schema.Schema{
 				Type:     schema.TypeList,
@@ -168,7 +167,9 @@ func resourceSakuraCloudDiskCreate(d *schema.ResourceData, meta interface{}) err
 		diskEditCondig.SetSSHKeys(ids)
 	}
 
-	diskEditCondig.SetDisablePWAuth(d.Get("disable_pw_auth").(bool))
+	if disablePasswordAuth, ok := d.GetOk("disable_pw_auth"); ok {
+		diskEditCondig.SetDisablePWAuth(disablePasswordAuth.(bool))
+	}
 
 	if noteIDs, ok := d.GetOk("note_ids"); ok {
 		ids := expandStringList(noteIDs.([]interface{}))
