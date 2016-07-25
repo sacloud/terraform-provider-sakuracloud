@@ -35,7 +35,7 @@ func TestAccSakuraCloudServerDataSource_Basic(t *testing.T) {
 					//resource.TestCheckResourceAttr("data.sakuracloud_server.foobar", "disks.#", "1"),
 					resource.TestCheckResourceAttr("data.sakuracloud_server.foobar", "base_interface", "shared"),
 					resource.TestCheckResourceAttr("data.sakuracloud_server.foobar", "additional_interfaces.#", "0"),
-					resource.TestCheckResourceAttr("data.sakuracloud_server.foobar", "mac_addresses.#", "1"),
+					resource.TestCheckResourceAttr("data.sakuracloud_server.foobar", "macaddresses.#", "1"),
 				),
 			},
 			resource.TestStep{

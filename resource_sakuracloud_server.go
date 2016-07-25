@@ -77,7 +77,7 @@ func resourceSakuraCloudServer() *schema.Resource {
 				Description:  "target SakuraCloud zone",
 				ValidateFunc: validateStringInWord([]string{"is1a", "is1b", "tk1a", "tk1v"}),
 			},
-			"mac_addresses": &schema.Schema{
+			"macaddresses": &schema.Schema{
 				Type:     schema.TypeList,
 				Computed: true,
 				Elem:     &schema.Schema{Type: schema.TypeString},
@@ -301,8 +301,7 @@ func resourceSakuraCloudServerRead(d *schema.ResourceData, meta interface{}) err
 	d.Set("packet_filter_ids", flattenPacketFilters(server.Interfaces))
 
 	//readonly values
-	d.Set("mac_addresses", flattenMacAddresses(server.Interfaces))
-
+	d.Set("macaddresses", flattenMacAddresses(server.Interfaces))
 	d.Set("base_nw_ipaddress", "")
 	d.Set("base_nw_dns_servers", []string{})
 	d.Set("base_nw_gateway", "")
@@ -361,6 +360,7 @@ func resourceSakuraCloudServerUpdate(d *schema.ResourceData, meta interface{}) e
 
 	if isNeedRestart && isRunning {
 		// shudown server
+		time.Sleep(2 * time.Second)
 		_, err := shutdownFunc(d.Id())
 		if err != nil {
 			return fmt.Errorf("Error stopping SakuraCloud Server resource: %s", err)
@@ -613,6 +613,7 @@ func resourceSakuraCloudServerDelete(d *schema.ResourceData, meta interface{}) e
 	}
 
 	if server.Instance.IsUp() {
+		time.Sleep(2 * time.Second)
 		_, err := client.Server.Stop(d.Id())
 		if err != nil {
 			return fmt.Errorf("Error stopping SakuraCloud Server resource: %s", err)

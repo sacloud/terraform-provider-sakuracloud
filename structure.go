@@ -118,7 +118,7 @@ func flattenPacketFilters(interfaces []sacloud.Interface) []string {
 func flattenMacAddresses(interfaces []sacloud.Interface) []string {
 	var ret []string
 	for _, i := range interfaces {
-		ret = append(ret, i.MACAddress)
+		ret = append(ret, strings.ToLower(i.MACAddress))
 	}
 	return ret
 }

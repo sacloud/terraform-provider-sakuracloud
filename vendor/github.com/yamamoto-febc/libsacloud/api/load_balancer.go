@@ -222,16 +222,21 @@ func (api *LoadBalancerAPI) SleepUntilDown(id string, timeout time.Duration) err
 }
 
 // SleepWhileCopying wait until became to available
-func (api *LoadBalancerAPI) SleepWhileCopying(id string, timeout time.Duration) error {
+func (api *LoadBalancerAPI) SleepWhileCopying(id string, timeout time.Duration, maxRetryCount int) error {
 	current := 0 * time.Second
 	interval := 5 * time.Second
+	errCount := 0
+
 	for {
 		loadBalancer, err := api.Read(id)
 		if err != nil {
-			return err
+			errCount++
+			if errCount > maxRetryCount {
+				return err
+			}
 		}
 
-		if loadBalancer.IsAvailable() {
+		if loadBalancer != nil && loadBalancer.IsAvailable() {
 			return nil
 		}
 		time.Sleep(interval)

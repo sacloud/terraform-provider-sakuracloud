@@ -169,7 +169,7 @@ func resourceSakuraCloudLoadBalancerCreate(d *schema.ResourceData, meta interfac
 	d.SetId(loadBalancer.ID)
 
 	//wait
-	err = client.LoadBalancer.SleepWhileCopying(loadBalancer.ID, 20*time.Minute)
+	err = client.LoadBalancer.SleepWhileCopying(loadBalancer.ID, 20*time.Minute, 5)
 	if err != nil {
 		return fmt.Errorf("Failed to wait SakuraCloud LoadBalancer copy: %s", err)
 	}
@@ -269,6 +269,7 @@ func resourceSakuraCloudLoadBalancerDelete(d *schema.ResourceData, meta interfac
 		client.Zone = zone.(string)
 	}
 
+	time.Sleep(2 * time.Second)
 	_, err := client.LoadBalancer.Stop(d.Id())
 	if err != nil {
 		return fmt.Errorf("Error stopping SakuraCloud LoadBalancer resource: %s", err)
