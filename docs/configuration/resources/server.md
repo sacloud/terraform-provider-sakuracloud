@@ -42,7 +42,7 @@ resource "sakuracloud_server" "myserver" {
 | `description`           | 説明                     | -                                         |
 | `tags`                  | タグ                     | -                                         |
 | `zone`                  | ゾーン                    | -                                         |
-| `mac_addresses`         | MACアドレス               | MACアドレスのリスト(NICの個数分のリスト)        |
+| `macaddresses`         | MACアドレス               | MACアドレスのリスト(NICの個数分のリスト)        |
 | `base_nw_ipaddress`     | 基本NIC-IPアドレス         | eth0のIPアドレス                            |
 | `base_nw_dns_servers`   | 基本NIC-DNSサーバー        | eth0の属するセグメントの推奨ネームサーバーのリスト|
 | `base_nw_gateway`       | 基本NIC-ゲートウェイ        | eth0の属するセグメントのゲートウェイIPアドレス   |

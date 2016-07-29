@@ -32,7 +32,7 @@ func TestAccResourceSakuraCloudServer_Basic(t *testing.T) {
 					resource.TestCheckResourceAttr(
 						"sakuracloud_server.foobar", "additional_interfaces.#", "0"),
 					resource.TestCheckResourceAttr(
-						"sakuracloud_server.foobar", "mac_addresses.#", "1"),
+						"sakuracloud_server.foobar", "macaddresses.#", "1"),
 				),
 			},
 		},
@@ -62,7 +62,7 @@ func TestAccResourceSakuraCloudServer_Update(t *testing.T) {
 					resource.TestCheckResourceAttr(
 						"sakuracloud_server.foobar", "additional_interfaces.#", "0"),
 					resource.TestCheckResourceAttr(
-						"sakuracloud_server.foobar", "mac_addresses.#", "1"),
+						"sakuracloud_server.foobar", "macaddresses.#", "1"),
 				),
 			},
 			resource.TestStep{
@@ -81,7 +81,7 @@ func TestAccResourceSakuraCloudServer_Update(t *testing.T) {
 					resource.TestCheckResourceAttr(
 						"sakuracloud_server.foobar", "additional_interfaces.#", "0"),
 					resource.TestCheckResourceAttr(
-						"sakuracloud_server.foobar", "mac_addresses.#", "1"),
+						"sakuracloud_server.foobar", "macaddresses.#", "1"),
 				),
 			},
 		},
@@ -105,7 +105,7 @@ func TestAccResourceSakuraCloudServer_EditConnections(t *testing.T) {
 					resource.TestCheckResourceAttr(
 						"sakuracloud_server.foobar", "additional_interfaces.#", "0"),
 					resource.TestCheckResourceAttr(
-						"sakuracloud_server.foobar", "mac_addresses.#", "1"),
+						"sakuracloud_server.foobar", "macaddresses.#", "1"),
 				),
 			},
 			resource.TestStep{
@@ -118,7 +118,7 @@ func TestAccResourceSakuraCloudServer_EditConnections(t *testing.T) {
 					resource.TestCheckResourceAttr(
 						"sakuracloud_server.foobar", "additional_interfaces.#", "1"),
 					resource.TestCheckResourceAttr(
-						"sakuracloud_server.foobar", "mac_addresses.#", "2"),
+						"sakuracloud_server.foobar", "macaddresses.#", "2"),
 				),
 			},
 			resource.TestStep{
@@ -131,7 +131,7 @@ func TestAccResourceSakuraCloudServer_EditConnections(t *testing.T) {
 					resource.TestCheckResourceAttr(
 						"sakuracloud_server.foobar", "additional_interfaces.#", "3"),
 					resource.TestCheckResourceAttr(
-						"sakuracloud_server.foobar", "mac_addresses.#", "4"),
+						"sakuracloud_server.foobar", "macaddresses.#", "4"),
 				),
 			},
 			resource.TestStep{
@@ -144,7 +144,7 @@ func TestAccResourceSakuraCloudServer_EditConnections(t *testing.T) {
 					resource.TestCheckResourceAttr(
 						"sakuracloud_server.foobar", "additional_interfaces.#", "0"),
 					resource.TestCheckResourceAttr(
-						"sakuracloud_server.foobar", "mac_addresses.#", "1"),
+						"sakuracloud_server.foobar", "macaddresses.#", "1"),
 				),
 			},
 		},

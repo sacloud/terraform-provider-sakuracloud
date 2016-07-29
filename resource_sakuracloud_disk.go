@@ -359,6 +359,7 @@ func resourceSakuraCloudDiskDelete(d *schema.ResourceData, meta interface{}) err
 	if disk.Server != nil {
 
 		if disk.Server.Instance.IsUp() {
+			time.Sleep(2 * time.Second)
 			_, err := client.Server.Stop(disk.Server.ID)
 			if err != nil {
 				return fmt.Errorf("Error stopping Server: %s", err)

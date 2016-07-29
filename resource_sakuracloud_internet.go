@@ -251,6 +251,7 @@ func resourceSakuraCloudInternetDelete(d *schema.ResourceData, meta interface{})
 		if s.Instance.IsUp() {
 			isRunning = append(isRunning, s.ID)
 			//stop server
+			time.Sleep(2 * time.Second)
 			_, err = client.Server.Stop(s.ID)
 			if err != nil {
 				return fmt.Errorf("Error stopping SakuraCloud Server resource: %s", err)
