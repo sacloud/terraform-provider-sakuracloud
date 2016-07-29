@@ -302,22 +302,25 @@ func resourceSakuraCloudServerRead(d *schema.ResourceData, meta interface{}) err
 
 	//readonly values
 	d.Set("mac_addresses", flattenMacAddresses(server.Interfaces))
+
+	d.Set("base_nw_ipaddress", "")
+	d.Set("base_nw_dns_servers", []string{})
+	d.Set("base_nw_gateway", "")
+	d.Set("base_nw_address", "")
+	d.Set("base_nw_mask_len", "")
 	if hasSharedInterface {
 		if server.Interfaces[0].Switch.Scope == sacloud.ESCopeShared {
 			d.Set("base_nw_ipaddress", server.Interfaces[0].IPAddress)
 		} else {
 			d.Set("base_nw_ipaddress", server.Interfaces[0].UserIPAddress)
 		}
-		d.Set("base_nw_dns_servers", server.Zone.Region.NameServers)
-		d.Set("base_nw_gateway", server.Interfaces[0].Switch.Subnet.DefaultRoute)
-		d.Set("base_nw_address", server.Interfaces[0].Switch.Subnet.NetworkAddress)
-		d.Set("base_nw_mask_len", fmt.Sprintf("%d", server.Interfaces[0].Switch.Subnet.NetworkMaskLen))
-	} else {
-		d.Set("base_nw_ipaddress", "")
-		d.Set("base_nw_dns_servers", []string{})
-		d.Set("base_nw_gateway", "")
-		d.Set("base_nw_address", "")
-		d.Set("base_nw_mask_len", "")
+
+		if server.Interfaces[0].Switch.Subnet != nil {
+			d.Set("base_nw_dns_servers", server.Zone.Region.NameServers)
+			d.Set("base_nw_gateway", server.Interfaces[0].Switch.Subnet.DefaultRoute)
+			d.Set("base_nw_address", server.Interfaces[0].Switch.Subnet.NetworkAddress)
+			d.Set("base_nw_mask_len", fmt.Sprintf("%d", server.Interfaces[0].Switch.Subnet.NetworkMaskLen))
+		}
 	}
 	d.Set("zone", client.Zone)
 
