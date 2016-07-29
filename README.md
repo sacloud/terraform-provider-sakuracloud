@@ -86,6 +86,7 @@ Terraform定義ファイル(tfファイル)を作成してご利用ください�
   - [パケットフィルタ](docs/configuration/resources/packet_filter.md)
   - [ブリッジ](docs/configuration/resources/bridge.md)
   - [ロードバランサー](docs/configuration/resources/load_balancer.md)
+  - [VPCルーター](docs/configuration/resources/vpc_router.md)
   - [スタートアップスクリプト](docs/configuration/resources/note.md)
   - [公開鍵](docs/configuration/resources/ssh_key.md)
   - [DNS](docs/configuration/resources/dns.md)
