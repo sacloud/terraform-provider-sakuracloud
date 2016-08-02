@@ -31,7 +31,7 @@ func TestAccResourceSakuraCloudAutoBackup_Basic(t *testing.T) {
 					resource.TestCheckResourceAttr("sakuracloud_auto_backup.foobar", "tags.#", "2"),
 					resource.TestCheckResourceAttr("sakuracloud_auto_backup.foobar", "tags.0", "hoge1"),
 					resource.TestCheckResourceAttr("sakuracloud_auto_backup.foobar", "tags.1", "hoge2"),
-					resource.TestCheckResourceAttr("sakuracloud_auto_backup.foobar", "zone", "is1b"),
+					resource.TestCheckResourceAttr("sakuracloud_auto_backup.foobar", "zone", "tk1a"),
 				),
 			},
 		},
@@ -60,7 +60,7 @@ func TestAccResourceSakuraCloudAutoBackup_Update(t *testing.T) {
 					resource.TestCheckResourceAttr("sakuracloud_auto_backup.foobar", "tags.#", "2"),
 					resource.TestCheckResourceAttr("sakuracloud_auto_backup.foobar", "tags.0", "hoge1"),
 					resource.TestCheckResourceAttr("sakuracloud_auto_backup.foobar", "tags.1", "hoge2"),
-					resource.TestCheckResourceAttr("sakuracloud_auto_backup.foobar", "zone", "is1b"),
+					resource.TestCheckResourceAttr("sakuracloud_auto_backup.foobar", "zone", "tk1a"),
 				),
 			},
 			resource.TestStep{
@@ -77,7 +77,7 @@ func TestAccResourceSakuraCloudAutoBackup_Update(t *testing.T) {
 					resource.TestCheckResourceAttr("sakuracloud_auto_backup.foobar", "tags.#", "2"),
 					resource.TestCheckResourceAttr("sakuracloud_auto_backup.foobar", "tags.0", "hoge1_after"),
 					resource.TestCheckResourceAttr("sakuracloud_auto_backup.foobar", "tags.1", "hoge2_after"),
-					resource.TestCheckResourceAttr("sakuracloud_auto_backup.foobar", "zone", "is1b"),
+					resource.TestCheckResourceAttr("sakuracloud_auto_backup.foobar", "zone", "tk1a"),
 				),
 			},
 		},
@@ -98,7 +98,7 @@ func testAccCheckSakuraCloudAutoBackupExists(n string, auto_backup *sacloud.Auto
 
 		client := testAccProvider.Meta().(*api.Client)
 		originalZone := client.Zone
-		client.Zone = "is1b"
+		client.Zone = "tk1a"
 		defer func() { client.Zone = originalZone }()
 
 		foundAutoBackup, err := client.AutoBackup.Read(rs.Primary.ID)
@@ -120,7 +120,7 @@ func testAccCheckSakuraCloudAutoBackupExists(n string, auto_backup *sacloud.Auto
 func testAccCheckSakuraCloudAutoBackupDestroy(s *terraform.State) error {
 	client := testAccProvider.Meta().(*api.Client)
 	originalZone := client.Zone
-	client.Zone = "is1b"
+	client.Zone = "tk1a"
 	defer func() { client.Zone = originalZone }()
 
 	for _, rs := range s.RootModule().Resources {
@@ -141,7 +141,7 @@ func testAccCheckSakuraCloudAutoBackupDestroy(s *terraform.State) error {
 var testAccCheckSakuraCloudAutoBackupConfig_basic = `
 resource "sakuracloud_disk" "disk" {
     name = "disk01"
-    zone = "is1b"
+    zone = "tk1a"
 }
 resource "sakuracloud_auto_backup" "foobar" {
     name = "name_before"
@@ -151,13 +151,13 @@ resource "sakuracloud_auto_backup" "foobar" {
     max_backup_num = 1
     description = "description_before"
     tags = ["hoge1", "hoge2"]
-    zone = "is1b"
+    zone = "tk1a"
 }`
 
 var testAccCheckSakuraCloudAutoBackupConfig_update = `
 resource "sakuracloud_disk" "disk" {
     name = "disk01"
-    zone = "is1b"
+    zone = "tk1a"
 }
 resource "sakuracloud_auto_backup" "foobar" {
     name = "name_after"
@@ -167,5 +167,5 @@ resource "sakuracloud_auto_backup" "foobar" {
     max_backup_num = 2
     description = "description_after"
     tags = ["hoge1_after", "hoge2_after"]
-    zone = "is1b"
+    zone = "tk1a"
 }`
