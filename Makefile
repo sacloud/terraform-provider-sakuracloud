@@ -1,4 +1,5 @@
-TEST?=$$(go list ./... | grep -v '/vendor/')
+TEST1?=./builtin/bins/provider-sakuracloud
+TEST2?=./builtin/providers/sakuracloud
 VETARGS?=-all
 GOFMT_FILES?=$$(find . -name '*.go' | grep -v vendor)
 
@@ -14,13 +15,16 @@ build-x: clean vet
 	sh -c "'$(CURDIR)/scripts/build.sh'"
 
 test: vet
-	TF_ACC= govendor test $(TEST) $(TESTARGS) -timeout=30s -parallel=4
+	TF_ACC= govendor test $(TEST1) $(TESTARGS) -timeout=30s -parallel=4 ; \
+	TF_ACC= govendor test $(TEST2) $(TESTARGS) -timeout=30s -parallel=4
 
 testacc: vet
-	TF_ACC=1 govendor test $(TEST) -v $(TESTARGS) -timeout 120m
+	TF_ACC=1 govendor test $(TEST1) -v $(TESTARGS) -timeout 120m ; \
+	TF_ACC=1 govendor test $(TEST2) -v $(TESTARGS) -timeout 120m
 
 testacc-resource: vet
-	TF_ACC=1 govendor test $(TEST) -v $(TESTARGS) -run="^TestAccResource" -timeout 120m
+	TF_ACC=1 govendor test $(TEST1) -v $(TESTARGS) -run="^TestAccResource" -timeout 120m ; \
+	TF_ACC=1 govendor test $(TEST2) -v $(TESTARGS) -run="^TestAccResource" -timeout 120m
 
 vet: fmt
 	@echo "go tool vet $(VETARGS) ."
