@@ -17,10 +17,10 @@ test: vet
 	TF_ACC= govendor test $(TEST) $(TESTARGS) -timeout=30s -parallel=4
 
 testacc: vet
-	TF_ACC=1 govendor test . -v $(TESTARGS) -timeout 120m
+	TF_ACC=1 govendor test $(TEST) -v $(TESTARGS) -timeout 120m
 
 testacc-resource: vet
-	TF_ACC=1 govendor test . -v $(TESTARGS) -run="^TestAccResource" -timeout 120m
+	TF_ACC=1 govendor test $(TEST) -v $(TESTARGS) -run="^TestAccResource" -timeout 120m
 
 vet: fmt
 	@echo "go tool vet $(VETARGS) ."
