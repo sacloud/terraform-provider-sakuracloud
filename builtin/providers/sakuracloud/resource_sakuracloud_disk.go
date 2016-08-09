@@ -356,9 +356,11 @@ func resourceSakuraCloudDiskDelete(d *schema.ResourceData, meta interface{}) err
 		return fmt.Errorf("Couldn't find SakuraCloud Disk resource: %s", err)
 	}
 
+	isRunning := false
 	if disk.Server != nil {
 
 		if disk.Server.Instance.IsUp() {
+			isRunning = true
 			time.Sleep(2 * time.Second)
 			_, err := client.Server.Stop(disk.Server.ID)
 			if err != nil {
@@ -381,6 +383,18 @@ func resourceSakuraCloudDiskDelete(d *schema.ResourceData, meta interface{}) err
 
 	if err != nil {
 		return fmt.Errorf("Error deleting SakuraCloud Disk resource: %s", err)
+	}
+
+	if isRunning {
+		_, err := client.Server.Boot(disk.Server.ID)
+		if err != nil {
+			return fmt.Errorf("Error booting Server: %s", err)
+		}
+		err = client.Server.SleepUntilUp(disk.Server.ID, 10*time.Minute)
+		if err != nil {
+			return fmt.Errorf("Error booting Server: %s", err)
+		}
+
 	}
 
 	return nil

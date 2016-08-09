@@ -393,7 +393,40 @@ func resourceSakuraCloudServerUpdate(d *schema.ResourceData, meta interface{}) e
 			}
 
 		}
+		updatedServer, err := client.Server.Read(d.Id())
+		if err != nil {
+			return fmt.Errorf("Couldn't find SakuraCloud Server resource: %s", err)
+		}
 
+		// edit disk if server is connected the shared segment
+		if len(updatedServer.Disks) > 0 && len(updatedServer.Interfaces) > 0 && updatedServer.Interfaces[0].Switch != nil {
+			isNeedEditDisk := false
+			diskEditConfig := client.Disk.NewCondig()
+			if updatedServer.Interfaces[0].Switch.Scope == sacloud.ESCopeShared {
+				diskEditConfig.SetUserIPAddress(updatedServer.Interfaces[0].IPAddress)
+				diskEditConfig.SetDefaultRoute(updatedServer.Interfaces[0].Switch.Subnet.DefaultRoute)
+				diskEditConfig.SetNetworkMaskLen(fmt.Sprintf("%d", updatedServer.Interfaces[0].Switch.Subnet.NetworkMaskLen))
+				isNeedEditDisk = true
+			} else {
+				baseIP := forceString(d.Get("base_nw_ipaddress"))
+				baseGateway := forceString(d.Get("base_nw_gateway"))
+				baseMaskLen := forceString(d.Get("base_nw_mask_len"))
+
+				diskEditConfig.SetUserIPAddress(baseIP)
+				diskEditConfig.SetDefaultRoute(baseGateway)
+				diskEditConfig.SetNetworkMaskLen(baseMaskLen)
+
+				isNeedEditDisk = baseIP != "" || baseGateway != "" || baseMaskLen != ""
+			}
+
+			if isNeedEditDisk {
+				_, err := client.Disk.Config(updatedServer.Disks[0].ID, diskEditConfig)
+				if err != nil {
+					return fmt.Errorf("Error editting SakuraCloud DiskConfig: %s", err)
+				}
+			}
+
+		}
 	}
 
 	// NIC
