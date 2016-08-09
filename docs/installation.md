@@ -21,7 +21,7 @@
 # ~/terraformディレクトリ作成
 $ mkdir -p ~/terraform ; cd ~/terraform
 # ダウンロード
-$ curl -L https://releases.hashicorp.com/terraform/0.6.16/terraform_0.6.16_darwin_amd64.zip > terraform.zip
+$ curl -L https://releases.hashicorp.com/terraform/0.7.0/terraform_0.7.0_darwin_amd64.zip > terraform.zip
 # 展開
 $ unzip terraform.zip
 # パスを通す
@@ -67,7 +67,7 @@ Available commands are:
 ```bash
 $ cd ~/terraform
 # ダウンロード
-$ curl -L https://github.com/yamamoto-febc/terraform-provider-sakuracloud/releases/download/v0.3.4-RC/terraform-provider-sakuracloud_darwin-amd64.zip > terraform-provider-sakuracloud.zip
+$ curl -L https://github.com/yamamoto-febc/terraform-provider-sakuracloud/releases/download/v0.3.6/terraform-provider-sakuracloud_darwin-amd64.zip > terraform-provider-sakuracloud.zip
 # 展開
 $ unzip terraform-provider-sakuracloud.zip
 
