@@ -216,9 +216,21 @@ func resourceSakuraCloudVPCRouterFirewallDelete(d *schema.ResourceData, meta int
 		return fmt.Errorf("Couldn't find SakuraCloud VPCRouter resource: %s", err)
 	}
 
-	if vpcRouter.Settings.Router.Firewall != nil {
-		vpcRouter.Settings.Router.Firewall.Config = []*sacloud.VPCRouterFirewallSetting{}
-		vpcRouter.Settings.Router.Firewall.Enabled = "False"
+	direction := d.Get("direction").(string)
+	if vpcRouter.Settings != nil && vpcRouter.Settings.Router != nil && vpcRouter.Settings.Router.Firewall != nil &&
+		vpcRouter.Settings.Router.Firewall.Config != nil {
+
+		switch direction {
+		case "send":
+			vpcRouter.Settings.Router.Firewall.Config[0].Send = nil
+		case "receive":
+			vpcRouter.Settings.Router.Firewall.Config[0].Receive = nil
+		}
+
+		if vpcRouter.Settings.Router.Firewall.Config[0].Send == nil && vpcRouter.Settings.Router.Firewall.Config[0].Receive == nil {
+			vpcRouter.Settings.Router.Firewall.Config = nil
+			vpcRouter.Settings.Router.Firewall.Enabled = "False"
+		}
 
 		vpcRouter, err = client.VPCRouter.UpdateSetting(routerID, vpcRouter)
 		if err != nil {
