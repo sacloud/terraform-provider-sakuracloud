@@ -31,6 +31,9 @@ resource "sakuracloud_disk" "disk01"{
 | `password`        | -   | パスワード               | - | 文字列 | ディスク修正機能で設定されるOS管理者パスワード [注2](#注2)|
 | `ssh_key_ids`     | -   | SSH公開鍵ID             | - | リスト(文字列) | ディスク修正機能で設定されるSSH認証用の公開鍵ID [注2](#注2)|
 | `disable_pw_auth` | -   | パスワードでの認証無効化   | - | `true`<br />`false` | SSH接続でのパスワード/チャレンジレスポンス認証の無効化 [注2](#注2)|
+| `user_ip_address` | -   | IPアドレス | - | 文字列 | eth0のIPアドレス [注2](#注2)|
+| `default_route`   | -   | デフォルトゲートウェイ | - | 文字列 | eth0のデフォルトゲートウェイ（user_ip_addressと同時指定時のみ有効） [注2](#注2)|
+| `network_mask_len`| -   | ネットワークマスク長 | - | 数値 | eth0のネットワークマスク長（user_ip_addressと同時指定時のみ有効） [注2](#注2)|
 | `note_ids`        | -   | スタートアップスクリプトID | - | リスト(文字列) | スタートアップスクリプトのID |
 | `description`     | -   | 説明  | - | 文字列 | - |
 | `tags`            | -   | タグ | - | リスト(文字列) | - |
@@ -63,6 +66,9 @@ OSによりディスク修正機能に対応していない場合があります
 | `password`          | パスワード               | -                                          |
 | `ssh_key_ids`       | SSH公開鍵ID             | -                                          |
 | `disable_pw_auth`   | パスワードでの認証無効化   | -                                          |
+| `user_ip_address`   | IPアドレス                 | -                                          |
+| `default_route`     | デフォルトゲートウェイ     | -                                          |
+| `network_mask_len`  | ネットワークマスク長       | -                                          |
 | `note_ids`          | スタートアップスクリプトID | -                                          |
 | `description`       | 説明                    | -                                          |
 | `tags`              | タグ                    | -                                          |

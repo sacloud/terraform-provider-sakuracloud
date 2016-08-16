@@ -103,6 +103,18 @@ func resourceSakuraCloudDisk() *schema.Resource {
 				Type:     schema.TypeBool,
 				Optional: true,
 			},
+			"user_ip_address": &schema.Schema{
+				Type:     schema.TypeString,
+				Optional: true,
+			},
+			"default_route": &schema.Schema{
+				Type:     schema.TypeString,
+				Optional: true,
+			},
+			"network_mask_len": &schema.Schema{
+				Type:     schema.TypeInt,
+				Optional: true,
+			},
 			"note_ids": &schema.Schema{
 				Type:     schema.TypeList,
 				Optional: true,
@@ -176,6 +188,18 @@ func resourceSakuraCloudDiskCreate(d *schema.ResourceData, meta interface{}) err
 		diskEditCondig.SetNotes(ids)
 	}
 
+	if userIPAddress, ok := d.GetOk("user_ip_address"); ok {
+		diskEditCondig.SetUserIPAddress(userIPAddress.(string))
+	}
+
+	if defaultRoute, ok := d.GetOk("default_route"); ok {
+		diskEditCondig.SetDefaultRoute(defaultRoute.(string))
+	}
+
+	if networkMaskLen, ok := d.GetOk("network_mask_len"); ok {
+		diskEditCondig.SetNetworkMaskLen(fmt.Sprint(networkMaskLen.(int)))
+	}
+
 	// call disk edit API
 	_, err = client.Disk.Config(disk.ID, diskEditCondig)
 	if err != nil {
@@ -241,7 +265,7 @@ func resourceSakuraCloudDiskUpdate(d *schema.ResourceData, meta interface{}) err
 	isRunning := disk.Server != nil && disk.Server.Instance.IsUp()
 	isDiskConfigChanged := false
 
-	if d.HasChange("passowrd") || d.HasChange("ssh_key_ids") || d.HasChange("disable_pw_auth") || d.HasChange("note_ids") {
+	if d.HasChange("passowrd") || d.HasChange("ssh_key_ids") || d.HasChange("disable_pw_auth") || d.HasChange("note_ids") || d.HasChange("user_ip_address") || d.HasChange("default_route") || d.HasChange("network_mask_len") {
 		isDiskConfigChanged = true
 	}
 
@@ -286,6 +310,12 @@ func resourceSakuraCloudDiskUpdate(d *schema.ResourceData, meta interface{}) err
 
 		if d.HasChange("disable_pw_auth") {
 			diskEditCondig.SetDisablePWAuth(d.Get("disable_pw_auth").(bool))
+		}
+
+		if d.HasChange("user_ip_address") || d.HasChange("default_route") || d.HasChange("network_mask_len") {
+			diskEditCondig.SetUserIPAddress(d.Get("user_ip_address").(string))
+			diskEditCondig.SetDefaultRoute(d.Get("default_route").(string))
+			diskEditCondig.SetNetworkMaskLen(fmt.Sprint(d.Get("network_mask_len").(int)))
 		}
 
 		if d.HasChange("note_ids") {
