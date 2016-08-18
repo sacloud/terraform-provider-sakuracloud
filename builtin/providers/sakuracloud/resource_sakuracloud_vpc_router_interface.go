@@ -128,6 +128,10 @@ func resourceSakuraCloudVPCRouterInterfaceCreate(d *schema.ResourceData, meta in
 			return err
 		}
 	}
+	_, err = client.VPCRouter.Config(vpcRouter.ID)
+	if err != nil {
+		return fmt.Errorf("Couldn'd apply SakuraCloud VPCRouter config: %s", err)
+	}
 
 	if isNeedRestart {
 		_, err = client.VPCRouter.Boot(vpcRouter.ID)
