@@ -18,7 +18,7 @@ type SearchLoadBalancerResponse struct {
 }
 
 type loadBalancerRequest struct {
-	LoadBalander *sacloud.LoadBalancer  `json:"Appliance,omitempty"`
+	LoadBalancer *sacloud.LoadBalancer  `json:"Appliance,omitempty"`
 	From         int                    `json:",omitempty"`
 	Count        int                    `json:",omitempty"`
 	Sort         []string               `json:",omitempty"`
@@ -27,7 +27,7 @@ type loadBalancerRequest struct {
 	Include      []string               `json:",omitempty"`
 }
 
-type loadBalanderResponse struct {
+type loadBalancerResponse struct {
 	*sacloud.ResultFlagValue
 	*sacloud.LoadBalancer `json:"Appliance,omitempty"`
 	Success               interface{} `json:",omitempty"` //HACK: さくらのAPI側仕様: 戻り値:Successがbool値へ変換できないためinterface{}
@@ -65,8 +65,8 @@ func (api *LoadBalancerAPI) Find() (*SearchLoadBalancerResponse, error) {
 	return &res, nil
 }
 
-func (api *LoadBalancerAPI) request(f func(*loadBalanderResponse) error) (*sacloud.LoadBalancer, error) {
-	res := &loadBalanderResponse{}
+func (api *LoadBalancerAPI) request(f func(*loadBalancerResponse) error) (*sacloud.LoadBalancer, error) {
+	res := &loadBalancerResponse{}
 	err := f(res)
 	if err != nil {
 		return nil, err
@@ -74,8 +74,8 @@ func (api *LoadBalancerAPI) request(f func(*loadBalanderResponse) error) (*saclo
 	return res.LoadBalancer, nil
 }
 
-func (api *LoadBalancerAPI) createRequest(value *sacloud.LoadBalancer) *loadBalanderResponse {
-	return &loadBalanderResponse{LoadBalancer: value}
+func (api *LoadBalancerAPI) createRequest(value *sacloud.LoadBalancer) *loadBalancerResponse {
+	return &loadBalancerResponse{LoadBalancer: value}
 }
 
 //func (api *LoadBalancerAPI) New() *sacloud.LoadBalancer {
@@ -83,25 +83,25 @@ func (api *LoadBalancerAPI) createRequest(value *sacloud.LoadBalancer) *loadBala
 //}
 
 func (api *LoadBalancerAPI) Create(value *sacloud.LoadBalancer) (*sacloud.LoadBalancer, error) {
-	return api.request(func(res *loadBalanderResponse) error {
+	return api.request(func(res *loadBalancerResponse) error {
 		return api.create(api.createRequest(value), res)
 	})
 }
 
 func (api *LoadBalancerAPI) Read(id string) (*sacloud.LoadBalancer, error) {
-	return api.request(func(res *loadBalanderResponse) error {
+	return api.request(func(res *loadBalancerResponse) error {
 		return api.read(id, nil, res)
 	})
 }
 
 func (api *LoadBalancerAPI) Update(id string, value *sacloud.LoadBalancer) (*sacloud.LoadBalancer, error) {
-	return api.request(func(res *loadBalanderResponse) error {
+	return api.request(func(res *loadBalancerResponse) error {
 		return api.update(id, api.createRequest(value), res)
 	})
 }
 
 func (api *LoadBalancerAPI) Delete(id string) (*sacloud.LoadBalancer, error) {
-	return api.request(func(res *loadBalanderResponse) error {
+	return api.request(func(res *loadBalancerResponse) error {
 		return api.delete(id, nil, res)
 	})
 }
