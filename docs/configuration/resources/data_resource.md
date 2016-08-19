@@ -47,6 +47,7 @@ resource sakuracloud_disk "disk01"{
 | `sakuracloud_archive`        | アーカイブ               | -                                          |
 | `sakuracloud_bridge`         | ブリッジ                | -                                          |
 | `sakuracloud_cdrom`          | ISOイメージ             | -                                          |
+| `sakuracloud_database`       | データベース            | -                                          |
 | `sakuracloud_disk`           | ディスク                | -                                          |
 | `sakuracloud_dns`            | DNS                    | -                                          |
 | `sakuracloud_gslb`           | GSLB                   | -                                          |

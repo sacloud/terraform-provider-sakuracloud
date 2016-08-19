@@ -14,6 +14,7 @@
   - [ブリッジ(`sakuracloud_bridge`)](configuration/resources/bridge.md)
   - [ロードバランサー(`sakuracloud_load_balancer`)](configuration/resources/load_balancer.md)
   - [VPCルーター(`sakuracloud_vpc_router`)](configuration/resources/vpc_router.md)
+  - [データベース(`sakuracloud_database`)](configuration/resources/database.md)
   - [スタートアップスクリプト(`sakuracloud_note`)](configuration/resources/note.md)
   - [公開鍵(`sakuracloud_ssh_key`)](configuration/resources/ssh_key.md)
   - [DNS(`sakuracloud_dns`)](configuration/resources/dns.md)
