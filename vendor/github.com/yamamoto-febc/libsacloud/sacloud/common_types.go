@@ -40,6 +40,10 @@ func (a *EAvailability) IsAvailable() bool {
 	return a.Availability == "available"
 }
 
+func (a *EAvailability) IsFailed() bool {
+	return a.Availability == "failed"
+}
+
 //EServerInstanceStatus Enum [up / cleaning / down]
 type EServerInstanceStatus struct {
 	Status       string `json:",omitempty"`

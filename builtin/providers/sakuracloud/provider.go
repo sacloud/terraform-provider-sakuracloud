@@ -40,6 +40,7 @@ func Provider() terraform.ResourceProvider {
 			"sakuracloud_archive":        dataSourceSakuraCloudArchive(),
 			"sakuracloud_bridge":         dataSourceSakuraCloudBridge(),
 			"sakuracloud_cdrom":          dataSourceSakuraCloudCDROM(),
+			"sakuracloud_database":       dataSourceSakuraCloudDatabase(),
 			"sakuracloud_disk":           dataSourceSakuraCloudDisk(),
 			"sakuracloud_dns":            dataSourceSakuraCloudDNS(),
 			"sakuracloud_gslb":           dataSourceSakuraCloudGSLB(),
@@ -55,6 +56,7 @@ func Provider() terraform.ResourceProvider {
 		ResourcesMap: map[string]*schema.Resource{
 			"sakuracloud_auto_backup":                    resourceSakuraCloudAutoBackup(),
 			"sakuracloud_bridge":                         resourceSakuraCloudBridge(),
+			"sakuracloud_database":                       resourceSakuraCloudDatabase(),
 			"sakuracloud_disk":                           resourceSakuraCloudDisk(),
 			"sakuracloud_dns":                            resourceSakuraCloudDNS(),
 			"sakuracloud_dns_record":                     resourceSakuraCloudDNSRecord(),

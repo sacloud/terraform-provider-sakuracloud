@@ -106,3 +106,18 @@ func validateDNSRecordValue() schema.SchemaValidateFunc {
 	}
 
 }
+
+func validateBackupTime() schema.SchemaValidateFunc {
+	timeStrings := []string{}
+
+	minutes := []int{0, 15, 30, 45}
+
+	// create list [00:00 ,,, 23:45]
+	for hour := 0; hour <= 23; hour++ {
+		for _, minute := range minutes {
+			timeStrings = append(timeStrings, fmt.Sprintf("%02d:%02d", hour, minute))
+		}
+	}
+
+	return validateStringInWord(timeStrings)
+}

@@ -46,6 +46,7 @@ type api struct {
 	Archive       *ArchiveAPI
 	Bridge        *BridgeAPI
 	CDROM         *CDROMAPI
+	Database      *DatabaseAPI
 	Disk          *DiskAPI
 	DNS           *DNSAPI
 	Facility      *facilityAPI
@@ -83,6 +84,7 @@ func newAPI(client *Client) *api {
 		Archive:    NewArchiveAPI(client),
 		Bridge:     NewBridgeAPI(client),
 		CDROM:      NewCDROMAPI(client),
+		Database:   NewDatabaseAPI(client),
 		Disk:       NewDiskAPI(client),
 		DNS:        NewDNSAPI(client),
 		Facility: &facilityAPI{
