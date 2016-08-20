@@ -202,39 +202,12 @@ func resourceSakuraCloudDatabaseRead(d *schema.ResourceData, meta interface{}) e
 		client.Zone = zone.(string)
 	}
 
-	database, err := client.Database.Read(d.Id())
+	data, err := client.Database.Read(d.Id())
 	if err != nil {
 		return fmt.Errorf("Couldn't find SakuraCloud Database resource: %s", err)
 	}
 
-	d.Set("name", database.Name)
-	d.Set("admin_password", database.Settings.DBConf.Common.AdminPassword)
-	d.Set("user_password", database.Settings.DBConf.Common.DefaultUser)
-	d.Set("user_password", database.Settings.DBConf.Common.UserPassword)
-
-	d.Set("allow_networks", database.Settings.DBConf.Common.SourceNetwork)
-	d.Set("port", database.Settings.DBConf.Common.ServicePort)
-
-	d.Set("backup_rotate", database.Settings.DBConf.Backup.Rotate)
-	d.Set("backup_time", database.Settings.DBConf.Backup.Time)
-
-	if database.Interfaces[0].Switch.Scope == sacloud.ESCopeShared {
-		d.Set("switch_id", "shared")
-		d.Set("nw_mask_len", nil)
-		d.Set("default_route", nil)
-		d.Set("ipaddress1", database.Interfaces[0].IPAddress)
-	} else {
-		d.Set("switch_id", database.Interfaces[0].Switch.ID)
-		d.Set("nw_mask_len", database.Remark.Network.NetworkMaskLen)
-		d.Set("default_route", database.Remark.Network.DefaultRoute)
-		d.Set("ipaddress1", database.Remark.Servers[0].(map[string]interface{})["IPAddress"])
-	}
-
-	d.Set("description", database.Description)
-	d.Set("tags", database.Tags)
-
-	d.Set("zone", client.Zone)
-	return nil
+	return setDatabaseResourceData(d, client, data)
 }
 
 func resourceSakuraCloudDatabaseUpdate(d *schema.ResourceData, meta interface{}) error {
@@ -334,5 +307,38 @@ func resourceSakuraCloudDatabaseDelete(d *schema.ResourceData, meta interface{})
 		return fmt.Errorf("Error deleting SakuraCloud Database resource: %s", err)
 	}
 
+	return nil
+}
+
+func setDatabaseResourceData(d *schema.ResourceData, client *api.Client, data *sacloud.Database) error {
+
+	d.Set("name", data.Name)
+	d.Set("admin_password", data.Settings.DBConf.Common.AdminPassword)
+	d.Set("user_password", data.Settings.DBConf.Common.DefaultUser)
+	d.Set("user_password", data.Settings.DBConf.Common.UserPassword)
+
+	d.Set("allow_networks", data.Settings.DBConf.Common.SourceNetwork)
+	d.Set("port", data.Settings.DBConf.Common.ServicePort)
+
+	d.Set("backup_rotate", data.Settings.DBConf.Backup.Rotate)
+	d.Set("backup_time", data.Settings.DBConf.Backup.Time)
+
+	if data.Interfaces[0].Switch.Scope == sacloud.ESCopeShared {
+		d.Set("switch_id", "shared")
+		d.Set("nw_mask_len", nil)
+		d.Set("default_route", nil)
+		d.Set("ipaddress1", data.Interfaces[0].IPAddress)
+	} else {
+		d.Set("switch_id", data.Interfaces[0].Switch.ID)
+		d.Set("nw_mask_len", data.Remark.Network.NetworkMaskLen)
+		d.Set("default_route", data.Remark.Network.DefaultRoute)
+		d.Set("ipaddress1", data.Remark.Servers[0].(map[string]interface{})["IPAddress"])
+	}
+
+	d.Set("description", data.Description)
+	d.Set("tags", data.Tags)
+
+	d.Set("zone", client.Zone)
+	d.SetId(data.ID)
 	return nil
 }

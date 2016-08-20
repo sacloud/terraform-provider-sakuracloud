@@ -111,36 +111,5 @@ func dataSourceSakuraCloudPacketFilterRead(d *schema.ResourceData, meta interfac
 	}
 	pf := res.PacketFilters[0]
 
-	d.SetId(pf.ID)
-	d.Set("name", pf.Name)
-	d.Set("description", pf.Description)
-
-	if pf.Expression != nil && len(pf.Expression) > 0 {
-		expressions := []interface{}{}
-		for _, exp := range pf.Expression {
-			expression := map[string]interface{}{}
-			protocol := exp.Protocol
-			switch protocol {
-			case "tcp", "udp":
-				expression["source_nw"] = exp.SourceNetwork
-				expression["source_port"] = exp.SourcePort
-				expression["dest_port"] = exp.DestinationPort
-			case "icmp", "fragment", "ip":
-				expression["source_nw"] = exp.SourceNetwork
-			}
-
-			expression["protocol"] = exp.Protocol
-			expression["allow"] = (exp.Action == "allow")
-			expression["description"] = exp.Description
-
-			expressions = append(expressions, expression)
-		}
-		d.Set("expressions", expressions)
-	} else {
-		d.Set("expressions", []interface{}{})
-	}
-
-	d.Set("zone", client.Zone)
-
-	return nil
+	return setPacketFilterResourceData(d, client, &pf)
 }

@@ -73,11 +73,5 @@ func dataSourceSakuraCloudNoteRead(d *schema.ResourceData, meta interface{}) err
 	}
 	note := res.Notes[0]
 
-	d.SetId(note.ID)
-	d.Set("name", note.Name)
-	d.Set("content", note.Content)
-	d.Set("description", note.Description)
-	d.Set("tags", note.Tags)
-
-	return nil
+	return setNoteResourceData(d, client, &note)
 }

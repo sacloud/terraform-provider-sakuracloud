@@ -274,56 +274,7 @@ func resourceSakuraCloudServerRead(d *schema.ResourceData, meta interface{}) err
 		return fmt.Errorf("Couldn't find SakuraCloud Server resource: %s", err)
 	}
 
-	d.Set("name", server.Name)
-	d.Set("core", server.ServerPlan.CPU)
-	d.Set("memory", server.ServerPlan.MemoryMB*units.MiB/units.GiB)
-	d.Set("disks", flattenDisks(server.Disks))
-
-	if server.Instance.CDROM != nil {
-		d.Set("cdrom_id", server.Instance.CDROM.ID)
-	}
-
-	hasSharedInterface := len(server.Interfaces) > 0 && server.Interfaces[0].Switch != nil
-	if hasSharedInterface {
-		if server.Interfaces[0].Switch.Scope == sacloud.ESCopeShared {
-			d.Set("base_interface", "shared")
-		} else {
-			d.Set("base_interface", server.Interfaces[0].Switch.ID)
-		}
-	} else {
-		d.Set("base_interface", "")
-	}
-	d.Set("additional_interfaces", flattenInterfaces(server.Interfaces))
-
-	d.Set("description", server.Description)
-	d.Set("tags", server.Tags)
-
-	d.Set("packet_filter_ids", flattenPacketFilters(server.Interfaces))
-
-	//readonly values
-	d.Set("macaddresses", flattenMacAddresses(server.Interfaces))
-	d.Set("base_nw_ipaddress", "")
-	d.Set("base_nw_dns_servers", []string{})
-	d.Set("base_nw_gateway", "")
-	d.Set("base_nw_address", "")
-	d.Set("base_nw_mask_len", "")
-	if hasSharedInterface {
-		if server.Interfaces[0].Switch.Scope == sacloud.ESCopeShared {
-			d.Set("base_nw_ipaddress", server.Interfaces[0].IPAddress)
-		} else {
-			d.Set("base_nw_ipaddress", server.Interfaces[0].UserIPAddress)
-		}
-
-		if server.Interfaces[0].Switch.Subnet != nil {
-			d.Set("base_nw_dns_servers", server.Zone.Region.NameServers)
-			d.Set("base_nw_gateway", server.Interfaces[0].Switch.Subnet.DefaultRoute)
-			d.Set("base_nw_address", server.Interfaces[0].Switch.Subnet.NetworkAddress)
-			d.Set("base_nw_mask_len", fmt.Sprintf("%d", server.Interfaces[0].Switch.Subnet.NetworkMaskLen))
-		}
-	}
-	d.Set("zone", client.Zone)
-
-	return nil
+	return setServerResourceData(d, client, server)
 }
 
 func resourceSakuraCloudServerUpdate(d *schema.ResourceData, meta interface{}) error {
@@ -666,4 +617,59 @@ func resourceSakuraCloudServerDelete(d *schema.ResourceData, meta interface{}) e
 
 	return nil
 
+}
+
+func setServerResourceData(d *schema.ResourceData, client *api.Client, data *sacloud.Server) error {
+
+	d.Set("name", data.Name)
+	d.Set("core", data.ServerPlan.CPU)
+	d.Set("memory", data.ServerPlan.MemoryMB*units.MiB/units.GiB)
+	d.Set("disks", flattenDisks(data.Disks))
+
+	if data.Instance.CDROM != nil {
+		d.Set("cdrom_id", data.Instance.CDROM.ID)
+	}
+
+	hasSharedInterface := len(data.Interfaces) > 0 && data.Interfaces[0].Switch != nil
+	if hasSharedInterface {
+		if data.Interfaces[0].Switch.Scope == sacloud.ESCopeShared {
+			d.Set("base_interface", "shared")
+		} else {
+			d.Set("base_interface", data.Interfaces[0].Switch.ID)
+		}
+	} else {
+		d.Set("base_interface", "")
+	}
+	d.Set("additional_interfaces", flattenInterfaces(data.Interfaces))
+
+	d.Set("description", data.Description)
+	d.Set("tags", data.Tags)
+
+	d.Set("packet_filter_ids", flattenPacketFilters(data.Interfaces))
+
+	//readonly values
+	d.Set("macaddresses", flattenMacAddresses(data.Interfaces))
+	d.Set("base_nw_ipaddress", "")
+	d.Set("base_nw_dns_servers", []string{})
+	d.Set("base_nw_gateway", "")
+	d.Set("base_nw_address", "")
+	d.Set("base_nw_mask_len", "")
+	if hasSharedInterface {
+		if data.Interfaces[0].Switch.Scope == sacloud.ESCopeShared {
+			d.Set("base_nw_ipaddress", data.Interfaces[0].IPAddress)
+		} else {
+			d.Set("base_nw_ipaddress", data.Interfaces[0].UserIPAddress)
+		}
+
+		if data.Interfaces[0].Switch.Subnet != nil {
+			d.Set("base_nw_dns_servers", data.Zone.Region.NameServers)
+			d.Set("base_nw_gateway", data.Interfaces[0].Switch.Subnet.DefaultRoute)
+			d.Set("base_nw_address", data.Interfaces[0].Switch.Subnet.NetworkAddress)
+			d.Set("base_nw_mask_len", fmt.Sprintf("%d", data.Interfaces[0].Switch.Subnet.NetworkMaskLen))
+		}
+	}
+
+	d.Set("zone", client.Zone)
+	d.SetId(data.ID)
+	return nil
 }

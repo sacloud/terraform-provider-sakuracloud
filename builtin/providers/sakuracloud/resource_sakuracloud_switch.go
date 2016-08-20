@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/hashicorp/terraform/helper/schema"
 	"github.com/yamamoto-febc/libsacloud/api"
+	"github.com/yamamoto-febc/libsacloud/sacloud"
 	"time"
 )
 
@@ -113,30 +114,7 @@ func resourceSakuraCloudSwitchRead(d *schema.ResourceData, meta interface{}) err
 		return fmt.Errorf("Couldn't find SakuraCloud Switch resource: %s", err)
 	}
 
-	d.Set("name", sw.Name)
-	d.Set("description", sw.Description)
-	d.Set("tags", sw.Tags)
-
-	if sw.ServerCount > 0 {
-		servers, err := client.Switch.GetServers(d.Id())
-		if err != nil {
-			return fmt.Errorf("Couldn't find SakuraCloud Servers( is connected Switch): %s", err)
-		}
-
-		d.Set("server_ids", flattenServers(servers))
-	} else {
-		d.Set("server_ids", []string{})
-	}
-
-	if sw.Bridge != nil {
-		d.Set("bridge_id", sw.Bridge.ID)
-	} else {
-		d.Set("bridge_id", "")
-	}
-
-	d.Set("zone", client.Zone)
-
-	return nil
+	return setSwitchResourceData(d, client, sw)
 }
 
 func resourceSakuraCloudSwitchUpdate(d *schema.ResourceData, meta interface{}) error {
@@ -269,5 +247,33 @@ func resourceSakuraCloudSwitchDelete(d *schema.ResourceData, meta interface{}) e
 
 	}
 
+	return nil
+}
+
+func setSwitchResourceData(d *schema.ResourceData, client *api.Client, data *sacloud.Switch) error {
+
+	d.Set("name", data.Name)
+	d.Set("description", data.Description)
+	d.Set("tags", data.Tags)
+
+	if data.ServerCount > 0 {
+		servers, err := client.Switch.GetServers(d.Id())
+		if err != nil {
+			return fmt.Errorf("Couldn't find SakuraCloud Servers( is connected Switch): %s", err)
+		}
+
+		d.Set("server_ids", flattenServers(servers))
+	} else {
+		d.Set("server_ids", []string{})
+	}
+
+	if data.Bridge != nil {
+		d.Set("bridge_id", data.Bridge.ID)
+	} else {
+		d.Set("bridge_id", "")
+	}
+
+	d.Set("zone", client.Zone)
+	d.SetId(data.ID)
 	return nil
 }

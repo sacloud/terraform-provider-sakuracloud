@@ -113,24 +113,5 @@ func dataSourceSakuraCloudLoadBalancerRead(d *schema.ResourceData, meta interfac
 	}
 	loadBalancer := res.LoadBalancers[0]
 
-	d.SetId(loadBalancer.ID)
-	d.Set("switch_id", loadBalancer.Switch.ID)
-	d.Set("VRID", loadBalancer.Remark.VRRP.VRID)
-	if len(loadBalancer.Remark.Servers) > 1 {
-		d.Set("is_double", true)
-		d.Set("ipaddress1", loadBalancer.Remark.Servers[0].(map[string]interface{})["IPAddress"])
-		d.Set("ipaddress2", loadBalancer.Remark.Servers[1].(map[string]interface{})["IPAddress"])
-	} else {
-		d.Set("is_double", false)
-		d.Set("ipaddress1", loadBalancer.Remark.Servers[0].(map[string]interface{})["IPAddress"])
-	}
-	d.Set("nw_mask_len", loadBalancer.Remark.Network.NetworkMaskLen)
-	d.Set("default_route", loadBalancer.Remark.Network.DefaultRoute)
-
-	d.Set("name", loadBalancer.Name)
-	d.Set("description", loadBalancer.Description)
-	d.Set("tags", loadBalancer.Tags)
-	d.Set("zone", client.Zone)
-
-	return nil
+	return setLoadBalancerResourceData(d, client, &loadBalancer)
 }

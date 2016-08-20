@@ -2,7 +2,6 @@ package sakuracloud
 
 import (
 	"fmt"
-	"github.com/docker/go-units"
 	"github.com/hashicorp/terraform/helper/schema"
 	"github.com/yamamoto-febc/libsacloud/api"
 )
@@ -97,21 +96,7 @@ func dataSourceSakuraCloudDiskRead(d *schema.ResourceData, meta interface{}) err
 		return nil
 		//return fmt.Errorf("Your query returned no results. Please change your filters and try again.")
 	}
-	disk := res.Disks[0]
+	data := res.Disks[0]
 
-	d.SetId(disk.ID)
-	d.Set("name", disk.Name)
-	d.Set("plan", disk.Plan.ID.String())
-	d.Set("connection", fmt.Sprintf("%s", disk.Connection))
-	d.Set("size", disk.SizeMB*units.MiB/units.GiB)
-	d.Set("description", disk.Description)
-	d.Set("tags", disk.Tags)
-
-	if disk.Server != nil {
-		d.Set("server_id", disk.Server.ID)
-	}
-
-	d.Set("zone", client.Zone)
-
-	return nil
+	return setDiskResourceData(d, client, &data)
 }

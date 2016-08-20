@@ -72,11 +72,5 @@ func dataSourceSakuraCloudSSHKeyRead(d *schema.ResourceData, meta interface{}) e
 	}
 	key := res.SSHKeys[0]
 
-	d.SetId(key.ID)
-	d.Set("name", key.Name)
-	d.Set("public_key", key.PublicKey)
-	d.Set("fingerprint", key.Fingerprint)
-	d.Set("description", key.Description)
-
-	return nil
+	return setSSHKeyResourceData(d, client, &key)
 }

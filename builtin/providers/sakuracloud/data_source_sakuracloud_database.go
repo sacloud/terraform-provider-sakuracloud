@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"github.com/hashicorp/terraform/helper/schema"
 	"github.com/yamamoto-febc/libsacloud/api"
-	"github.com/yamamoto-febc/libsacloud/sacloud"
 )
 
 func dataSourceSakuraCloudDatabase() *schema.Resource {
@@ -127,35 +126,6 @@ func dataSourceSakuraCloudDatabaseRead(d *schema.ResourceData, meta interface{})
 		return nil
 		//return fmt.Errorf("Your query returned no results. Please change your filters and try again.")
 	}
-	database := res.Databases[0]
-
-	d.SetId(database.ID)
-	d.Set("name", database.Name)
-	d.Set("admin_password", database.Settings.DBConf.Common.AdminPassword)
-	d.Set("user_password", database.Settings.DBConf.Common.DefaultUser)
-	d.Set("user_password", database.Settings.DBConf.Common.UserPassword)
-
-	d.Set("allow_networks", database.Settings.DBConf.Common.SourceNetwork)
-	d.Set("port", database.Settings.DBConf.Common.ServicePort)
-
-	d.Set("backup_rotate", database.Settings.DBConf.Backup.Rotate)
-	d.Set("backup_time", database.Settings.DBConf.Backup.Time)
-
-	if database.Interfaces[0].Switch.Scope == sacloud.ESCopeShared {
-		d.Set("switch_id", "shared")
-		d.Set("nw_mask_len", nil)
-		d.Set("default_route", nil)
-		d.Set("ipaddress1", database.Interfaces[0].IPAddress)
-	} else {
-		d.Set("switch_id", database.Interfaces[0].Switch.ID)
-		d.Set("nw_mask_len", database.Remark.Network.NetworkMaskLen)
-		d.Set("default_route", database.Remark.Network.DefaultRoute)
-		d.Set("ipaddress1", database.Remark.Servers[0].(map[string]interface{})["IPAddress"])
-	}
-
-	d.Set("description", database.Description)
-	d.Set("tags", database.Tags)
-
-	d.Set("zone", client.Zone)
-	return nil
+	data := res.Databases[0]
+	return setDatabaseResourceData(d, client, &data)
 }

@@ -91,29 +91,5 @@ func dataSourceSakuraCloudSwitchRead(d *schema.ResourceData, meta interface{}) e
 	}
 	sw := res.Switches[0]
 
-	d.SetId(sw.ID)
-	d.Set("name", sw.Name)
-	d.Set("description", sw.Description)
-	d.Set("tags", sw.Tags)
-
-	if sw.ServerCount > 0 {
-		servers, err := client.Switch.GetServers(d.Id())
-		if err != nil {
-			return fmt.Errorf("Couldn't find SakuraCloud Servers( is connected Switch): %s", err)
-		}
-
-		d.Set("server_ids", flattenServers(servers))
-	} else {
-		d.Set("server_ids", []string{})
-	}
-
-	if sw.Bridge != nil {
-		d.Set("bridge_id", sw.Bridge.ID)
-	} else {
-		d.Set("bridge_id", "")
-	}
-
-	d.Set("zone", client.Zone)
-
-	return nil
+	return setSwitchResourceData(d, client, &sw)
 }

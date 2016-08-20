@@ -152,29 +152,7 @@ func resourceSakuraCloudGSLBRead(d *schema.ResourceData, meta interface{}) error
 		return fmt.Errorf("Couldn't find SakuraCloud GSLB resource: %s", err)
 	}
 
-	d.Set("name", gslb.Name)
-	d.Set("FQDN", gslb.Status.FQDN)
-
-	//health_check
-	healthCheck := map[string]interface{}{}
-	switch gslb.Settings.GSLB.HealthCheck.Protocol {
-	case "http", "https":
-		healthCheck["host_header"] = gslb.Settings.GSLB.HealthCheck.Host
-		healthCheck["path"] = gslb.Settings.GSLB.HealthCheck.Path
-		healthCheck["status"] = gslb.Settings.GSLB.HealthCheck.Status
-	case "tcp":
-		healthCheck["port"] = gslb.Settings.GSLB.HealthCheck.Port
-	}
-	healthCheck["protocol"] = gslb.Settings.GSLB.HealthCheck.Protocol
-	healthCheck["delay_loop"] = gslb.Settings.GSLB.DelayLoop
-	d.Set("health_check", schema.NewSet(healthCheckHash, []interface{}{healthCheck}))
-
-	d.Set("sorry_server", gslb.Settings.GSLB.SorryServer)
-	d.Set("description", gslb.Description)
-	d.Set("tags", gslb.Tags)
-	d.Set("weighted", gslb.Settings.GSLB.Weighted == "True")
-
-	return nil
+	return setGSLBResourceData(d, client, gslb)
 }
 
 func resourceSakuraCloudGSLBUpdate(d *schema.ResourceData, meta interface{}) error {
@@ -285,4 +263,32 @@ func healthCheckHash(v interface{}) int {
 
 	hk := fmt.Sprintf("%s:%d:%s:%s:%s:%s", protocol, delay_loop, host_header, path, status, port)
 	return hashcode.String(hk)
+}
+
+func setGSLBResourceData(d *schema.ResourceData, client *api.Client, data *sacloud.GSLB) error {
+
+	d.Set("name", data.Name)
+	d.Set("FQDN", data.Status.FQDN)
+
+	//health_check
+	healthCheck := map[string]interface{}{}
+	switch data.Settings.GSLB.HealthCheck.Protocol {
+	case "http", "https":
+		healthCheck["host_header"] = data.Settings.GSLB.HealthCheck.Host
+		healthCheck["path"] = data.Settings.GSLB.HealthCheck.Path
+		healthCheck["status"] = data.Settings.GSLB.HealthCheck.Status
+	case "tcp":
+		healthCheck["port"] = data.Settings.GSLB.HealthCheck.Port
+	}
+	healthCheck["protocol"] = data.Settings.GSLB.HealthCheck.Protocol
+	healthCheck["delay_loop"] = data.Settings.GSLB.DelayLoop
+	d.Set("health_check", schema.NewSet(healthCheckHash, []interface{}{healthCheck}))
+
+	d.Set("sorry_server", data.Settings.GSLB.SorryServer)
+	d.Set("description", data.Description)
+	d.Set("tags", data.Tags)
+	d.Set("weighted", data.Settings.GSLB.Weighted == "True")
+
+	d.SetId(data.ID)
+	return nil
 }

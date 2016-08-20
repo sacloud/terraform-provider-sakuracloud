@@ -227,71 +227,7 @@ func resourceSakuraCloudSimpleMonitorRead(d *schema.ResourceData, meta interface
 		return fmt.Errorf("Couldn't find SakuraCloud SimpleMonitor resource: %s", err)
 	}
 
-	d.Set("target", simpleMonitor.Status.Target)
-
-	healthCheck := map[string]interface{}{}
-	readHealthCheck := simpleMonitor.Settings.SimpleMonitor.HealthCheck
-	switch simpleMonitor.Settings.SimpleMonitor.HealthCheck.Protocol {
-	case "http":
-
-		healthCheck["path"] = readHealthCheck.Path
-		healthCheck["status"] = readHealthCheck.Status
-		healthCheck["host_header"] = readHealthCheck.Host
-		if readHealthCheck.Port != "80" {
-			healthCheck["port"] = readHealthCheck.Port
-		}
-	case "https":
-		healthCheck["path"] = readHealthCheck.Path
-		healthCheck["status"] = readHealthCheck.Status
-		healthCheck["host_header"] = readHealthCheck.Host
-		if readHealthCheck.Port != "443" {
-			healthCheck["port"] = readHealthCheck.Port
-		}
-
-	case "tcp":
-		healthCheck["port"] = readHealthCheck.Port
-	case "ssh":
-		if readHealthCheck.Port != "22" {
-			healthCheck["port"] = readHealthCheck.Port
-		}
-	case "smtp":
-		if readHealthCheck.Port != "25" {
-			healthCheck["port"] = readHealthCheck.Port
-		}
-	case "pop3":
-		if readHealthCheck.Port != "110" {
-			healthCheck["port"] = readHealthCheck.Port
-		}
-
-	case "snmp":
-		healthCheck["community"] = readHealthCheck.Community
-		healthCheck["snmp_version"] = readHealthCheck.SNMPVersion
-		healthCheck["oid"] = readHealthCheck.OID
-		healthCheck["expected_data"] = readHealthCheck.ExpectedData
-	case "dns":
-		healthCheck["qname"] = readHealthCheck.QName
-		healthCheck["expected_data"] = readHealthCheck.ExpectedData
-	}
-
-	healthCheck["protocol"] = simpleMonitor.Settings.SimpleMonitor.HealthCheck.Protocol
-	healthCheck["delay_loop"] = simpleMonitor.Settings.SimpleMonitor.DelayLoop
-	d.Set("health_check", schema.NewSet(healthCheckSimpleMonitorHash, []interface{}{healthCheck}))
-
-	d.Set("description", simpleMonitor.Description)
-	d.Set("tags", simpleMonitor.Tags)
-
-	d.Set("enabled", simpleMonitor.Settings.SimpleMonitor.Enabled)
-
-	d.Set("notify_email_enabled", simpleMonitor.Settings.SimpleMonitor.NotifyEmail.Enabled == "True")
-	enableSlack := simpleMonitor.Settings.SimpleMonitor.NotifySlack.Enabled == "True"
-	d.Set("notify_slack_enabled", enableSlack)
-	if enableSlack {
-		d.Set("notify_slack_webhook", simpleMonitor.Settings.SimpleMonitor.NotifySlack.IncomingWebhooksURL)
-	} else {
-		d.Set("nofity_slack_webhook", "")
-	}
-
-	return nil
+	return setSimpleMonitorResourceData(d, client, simpleMonitor)
 }
 
 func resourceSakuraCloudSimpleMonitorUpdate(d *schema.ResourceData, meta interface{}) error {
@@ -458,4 +394,74 @@ func healthCheckSimpleMonitorHash(v interface{}) int {
 
 	hk := fmt.Sprintf("%s:%d:%s:%s:%s:%s:%s:%s:%s:%s", protocol, delay_loop, path, status, port, qname, ed, community, snmpVersion, oid)
 	return hashcode.String(hk)
+}
+
+func setSimpleMonitorResourceData(d *schema.ResourceData, client *api.Client, data *sacloud.SimpleMonitor) error {
+
+	d.Set("target", data.Status.Target)
+
+	healthCheck := map[string]interface{}{}
+	readHealthCheck := data.Settings.SimpleMonitor.HealthCheck
+	switch data.Settings.SimpleMonitor.HealthCheck.Protocol {
+	case "http":
+
+		healthCheck["path"] = readHealthCheck.Path
+		healthCheck["status"] = readHealthCheck.Status
+		healthCheck["host_header"] = readHealthCheck.Host
+		if readHealthCheck.Port != "80" {
+			healthCheck["port"] = readHealthCheck.Port
+		}
+	case "https":
+		healthCheck["path"] = readHealthCheck.Path
+		healthCheck["status"] = readHealthCheck.Status
+		healthCheck["host_header"] = readHealthCheck.Host
+		if readHealthCheck.Port != "443" {
+			healthCheck["port"] = readHealthCheck.Port
+		}
+
+	case "tcp":
+		healthCheck["port"] = readHealthCheck.Port
+	case "ssh":
+		if readHealthCheck.Port != "22" {
+			healthCheck["port"] = readHealthCheck.Port
+		}
+	case "smtp":
+		if readHealthCheck.Port != "25" {
+			healthCheck["port"] = readHealthCheck.Port
+		}
+	case "pop3":
+		if readHealthCheck.Port != "110" {
+			healthCheck["port"] = readHealthCheck.Port
+		}
+
+	case "snmp":
+		healthCheck["community"] = readHealthCheck.Community
+		healthCheck["snmp_version"] = readHealthCheck.SNMPVersion
+		healthCheck["oid"] = readHealthCheck.OID
+		healthCheck["expected_data"] = readHealthCheck.ExpectedData
+	case "dns":
+		healthCheck["qname"] = readHealthCheck.QName
+		healthCheck["expected_data"] = readHealthCheck.ExpectedData
+	}
+
+	healthCheck["protocol"] = data.Settings.SimpleMonitor.HealthCheck.Protocol
+	healthCheck["delay_loop"] = data.Settings.SimpleMonitor.DelayLoop
+	d.Set("health_check", schema.NewSet(healthCheckSimpleMonitorHash, []interface{}{healthCheck}))
+
+	d.Set("description", data.Description)
+	d.Set("tags", data.Tags)
+
+	d.Set("enabled", data.Settings.SimpleMonitor.Enabled)
+
+	d.Set("notify_email_enabled", data.Settings.SimpleMonitor.NotifyEmail.Enabled == "True")
+	enableSlack := data.Settings.SimpleMonitor.NotifySlack.Enabled == "True"
+	d.Set("notify_slack_enabled", enableSlack)
+	if enableSlack {
+		d.Set("notify_slack_webhook", data.Settings.SimpleMonitor.NotifySlack.IncomingWebhooksURL)
+	} else {
+		d.Set("nofity_slack_webhook", "")
+	}
+
+	d.SetId(data.ID)
+	return nil
 }
