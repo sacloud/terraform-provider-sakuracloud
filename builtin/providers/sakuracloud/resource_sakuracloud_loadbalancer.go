@@ -189,36 +189,7 @@ func resourceSakuraCloudLoadBalancerRead(d *schema.ResourceData, meta interface{
 		return fmt.Errorf("Couldn't find SakuraCloud LoadBalancer resource: %s", err)
 	}
 
-	d.Set("switch_id", loadBalancer.Switch.ID)
-	d.Set("VRID", loadBalancer.Remark.VRRP.VRID)
-	if len(loadBalancer.Remark.Servers) > 1 {
-		d.Set("is_double", true)
-		d.Set("ipaddress1", loadBalancer.Remark.Servers[0].(map[string]interface{})["IPAddress"])
-		d.Set("ipaddress2", loadBalancer.Remark.Servers[1].(map[string]interface{})["IPAddress"])
-	} else {
-		d.Set("is_double", false)
-		d.Set("ipaddress1", loadBalancer.Remark.Servers[0].(map[string]interface{})["IPAddress"])
-	}
-	d.Set("nw_mask_len", loadBalancer.Remark.Network.NetworkMaskLen)
-	d.Set("default_route", loadBalancer.Remark.Network.DefaultRoute)
-
-	d.Set("name", loadBalancer.Name)
-	d.Set("description", loadBalancer.Description)
-	d.Set("tags", loadBalancer.Tags)
-
-	d.Set("vip_ids", []string{})
-	if loadBalancer.Settings != nil && loadBalancer.Settings.LoadBalancer != nil {
-		var vipIDs []string
-		for _, s := range loadBalancer.Settings.LoadBalancer {
-			vipIDs = append(vipIDs, loadBalancerVIPIDHash(loadBalancer.ID, s))
-		}
-		if len(vipIDs) > 0 {
-			d.Set("vip_ids", vipIDs)
-		}
-	}
-
-	d.Set("zone", client.Zone)
-	return nil
+	return setLoadBalancerResourceData(d, client, loadBalancer)
 }
 
 func resourceSakuraCloudLoadBalancerUpdate(d *schema.ResourceData, meta interface{}) error {
@@ -285,5 +256,40 @@ func resourceSakuraCloudLoadBalancerDelete(d *schema.ResourceData, meta interfac
 		return fmt.Errorf("Error deleting SakuraCloud LoadBalancer resource: %s", err)
 	}
 
+	return nil
+}
+
+func setLoadBalancerResourceData(d *schema.ResourceData, client *api.Client, data *sacloud.LoadBalancer) error {
+
+	d.Set("switch_id", data.Switch.ID)
+	d.Set("VRID", data.Remark.VRRP.VRID)
+	if len(data.Remark.Servers) > 1 {
+		d.Set("is_double", true)
+		d.Set("ipaddress1", data.Remark.Servers[0].(map[string]interface{})["IPAddress"])
+		d.Set("ipaddress2", data.Remark.Servers[1].(map[string]interface{})["IPAddress"])
+	} else {
+		d.Set("is_double", false)
+		d.Set("ipaddress1", data.Remark.Servers[0].(map[string]interface{})["IPAddress"])
+	}
+	d.Set("nw_mask_len", data.Remark.Network.NetworkMaskLen)
+	d.Set("default_route", data.Remark.Network.DefaultRoute)
+
+	d.Set("name", data.Name)
+	d.Set("description", data.Description)
+	d.Set("tags", data.Tags)
+
+	d.Set("vip_ids", []string{})
+	if data.Settings != nil && data.Settings.LoadBalancer != nil {
+		var vipIDs []string
+		for _, s := range data.Settings.LoadBalancer {
+			vipIDs = append(vipIDs, loadBalancerVIPIDHash(data.ID, s))
+		}
+		if len(vipIDs) > 0 {
+			d.Set("vip_ids", vipIDs)
+		}
+	}
+
+	d.Set("zone", client.Zone)
+	d.SetId(data.ID)
 	return nil
 }

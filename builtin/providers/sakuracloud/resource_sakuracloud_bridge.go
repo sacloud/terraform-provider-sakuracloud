@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/hashicorp/terraform/helper/schema"
 	"github.com/yamamoto-febc/libsacloud/api"
+	"github.com/yamamoto-febc/libsacloud/sacloud"
 )
 
 func resourceSakuraCloudBridge() *schema.Resource {
@@ -79,18 +80,7 @@ func resourceSakuraCloudBridgeRead(d *schema.ResourceData, meta interface{}) err
 		return fmt.Errorf("Couldn't find SakuraCloud Bridge resource: %s", err)
 	}
 
-	d.Set("name", bridge.Name)
-	d.Set("description", bridge.Description)
-
-	if bridge.Info != nil && bridge.Info.Switches != nil && len(bridge.Info.Switches) > 0 {
-		d.Set("switch_ids", flattenSwitches(bridge.Info.Switches))
-	} else {
-		d.Set("switch_ids", []string{})
-	}
-
-	d.Set("zone", client.Zone)
-
-	return nil
+	return setBridgeResourceData(d, client, bridge)
 }
 
 func resourceSakuraCloudBridgeUpdate(d *schema.ResourceData, meta interface{}) error {
@@ -152,5 +142,20 @@ func resourceSakuraCloudBridgeDelete(d *schema.ResourceData, meta interface{}) e
 	if err != nil {
 		return fmt.Errorf("Error deleting SakuraCloud Bridge resource: %s", err)
 	}
+	return nil
+}
+
+func setBridgeResourceData(d *schema.ResourceData, client *api.Client, data *sacloud.Bridge) error {
+	d.Set("name", data.Name)
+	d.Set("description", data.Description)
+
+	if data.Info != nil && data.Info.Switches != nil && len(data.Info.Switches) > 0 {
+		d.Set("switch_ids", flattenSwitches(data.Info.Switches))
+	} else {
+		d.Set("switch_ids", []string{})
+	}
+
+	d.Set("zone", client.Zone)
+	d.SetId(data.ID)
 	return nil
 }

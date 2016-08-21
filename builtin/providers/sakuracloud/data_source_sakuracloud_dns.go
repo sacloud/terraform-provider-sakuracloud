@@ -79,11 +79,5 @@ func dataSourceSakuraCloudDNSRead(d *schema.ResourceData, meta interface{}) erro
 	}
 	dns := res.CommonServiceDNSItems[0]
 
-	d.SetId(dns.ID)
-	d.Set("zone", dns.Name)
-	d.Set("description", dns.Description)
-	d.Set("tags", dns.Tags)
-	d.Set("dns_servers", dns.Status.NS)
-
-	return nil
+	return setDNSResourceData(d, client, &dns)
 }

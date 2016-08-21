@@ -208,20 +208,7 @@ func resourceSakuraCloudDiskRead(d *schema.ResourceData, meta interface{}) error
 		return fmt.Errorf("Couldn't find SakuraCloud Disk resource: %s", err)
 	}
 
-	d.Set("name", disk.Name)
-	d.Set("plan", disk.Plan.ID.String())
-	d.Set("connection", fmt.Sprintf("%s", disk.Connection))
-	d.Set("size", disk.SizeMB*units.MiB/units.GiB)
-	d.Set("description", disk.Description)
-	d.Set("tags", disk.Tags)
-
-	if disk.Server != nil {
-		d.Set("server_id", disk.Server.ID)
-	}
-
-	d.Set("zone", client.Zone)
-
-	return nil
+	return setDiskResourceData(d, client, disk)
 }
 
 func resourceSakuraCloudDiskUpdate(d *schema.ResourceData, meta interface{}) error {
@@ -397,5 +384,23 @@ func resourceSakuraCloudDiskDelete(d *schema.ResourceData, meta interface{}) err
 
 	}
 
+	return nil
+}
+
+func setDiskResourceData(d *schema.ResourceData, client *api.Client, data *sacloud.Disk) error {
+
+	d.Set("name", data.Name)
+	d.Set("plan", data.Plan.ID.String())
+	d.Set("connection", fmt.Sprintf("%s", data.Connection))
+	d.Set("size", data.SizeMB*units.MiB/units.GiB)
+	d.Set("description", data.Description)
+	d.Set("tags", data.Tags)
+
+	if data.Server != nil {
+		d.Set("server_id", data.Server.ID)
+	}
+
+	d.Set("zone", client.Zone)
+	d.SetId(data.ID)
 	return nil
 }

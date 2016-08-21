@@ -80,19 +80,6 @@ func dataSourceSakuraCloudBridgeRead(d *schema.ResourceData, meta interface{}) e
 		return nil
 		//return fmt.Errorf("Your query returned no results. Please change your filters and try again.")
 	}
-	bridge := res.Bridges[0]
-
-	d.SetId(bridge.ID)
-	d.Set("name", bridge.Name)
-	d.Set("description", bridge.Description)
-
-	if bridge.Info != nil && bridge.Info.Switches != nil && len(bridge.Info.Switches) > 0 {
-		d.Set("switch_ids", flattenSwitches(bridge.Info.Switches))
-	} else {
-		d.Set("switch_ids", []string{})
-	}
-
-	d.Set("zone", client.Zone)
-
-	return nil
+	data := res.Bridges[0]
+	return setBridgeResourceData(d, client, &data)
 }

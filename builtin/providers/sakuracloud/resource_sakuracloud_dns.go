@@ -5,6 +5,7 @@ import (
 
 	"github.com/hashicorp/terraform/helper/schema"
 	"github.com/yamamoto-febc/libsacloud/api"
+	"github.com/yamamoto-febc/libsacloud/sacloud"
 )
 
 func resourceSakuraCloudDNS() *schema.Resource {
@@ -71,12 +72,7 @@ func resourceSakuraCloudDNSRead(d *schema.ResourceData, meta interface{}) error 
 		return fmt.Errorf("Couldn't find SakuraCloud DNS resource: %s", err)
 	}
 
-	d.Set("zone", dns.Name)
-	d.Set("description", dns.Description)
-	d.Set("tags", dns.Tags)
-	d.Set("dns_servers", dns.Status.NS)
-
-	return nil
+	return setDNSResourceData(d, client, dns)
 }
 
 func resourceSakuraCloudDNSUpdate(d *schema.ResourceData, meta interface{}) error {
@@ -122,5 +118,16 @@ func resourceSakuraCloudDNSDelete(d *schema.ResourceData, meta interface{}) erro
 		return fmt.Errorf("Error deleting SakuraCloud DNS resource: %s", err)
 	}
 
+	return nil
+}
+
+func setDNSResourceData(d *schema.ResourceData, client *api.Client, data *sacloud.DNS) error {
+
+	d.Set("zone", data.Name)
+	d.Set("description", data.Description)
+	d.Set("tags", data.Tags)
+	d.Set("dns_servers", data.Status.NS)
+
+	d.SetId(data.ID)
 	return nil
 }

@@ -148,37 +148,7 @@ func resourceSakuraCloudPacketFilterRead(d *schema.ResourceData, meta interface{
 		return fmt.Errorf("Couldn't find SakuraCloud PacketFilter resource: %s", err)
 	}
 
-	d.Set("name", filter.Name)
-	d.Set("description", filter.Description)
-
-	if filter.Expression != nil && len(filter.Expression) > 0 {
-		expressions := []interface{}{}
-		for _, exp := range filter.Expression {
-			expression := map[string]interface{}{}
-			protocol := exp.Protocol
-			switch protocol {
-			case "tcp", "udp":
-				expression["source_nw"] = exp.SourceNetwork
-				expression["source_port"] = exp.SourcePort
-				expression["dest_port"] = exp.DestinationPort
-			case "icmp", "fragment", "ip":
-				expression["source_nw"] = exp.SourceNetwork
-			}
-
-			expression["protocol"] = exp.Protocol
-			expression["allow"] = (exp.Action == "allow")
-			expression["description"] = exp.Description
-
-			expressions = append(expressions, expression)
-		}
-		d.Set("expressions", expressions)
-	} else {
-		d.Set("expressions", []interface{}{})
-	}
-
-	d.Set("zone", client.Zone)
-
-	return nil
+	return setPacketFilterResourceData(d, client, filter)
 }
 
 func resourceSakuraCloudPacketFilterUpdate(d *schema.ResourceData, meta interface{}) error {
@@ -277,5 +247,39 @@ func resourceSakuraCloudPacketFilterDelete(d *schema.ResourceData, meta interfac
 	if err != nil {
 		return fmt.Errorf("Error deleting SakuraCloud PacketFilter resource: %s", err)
 	}
+	return nil
+}
+
+func setPacketFilterResourceData(d *schema.ResourceData, client *api.Client, data *sacloud.PacketFilter) error {
+	d.Set("name", data.Name)
+	d.Set("description", data.Description)
+
+	if data.Expression != nil && len(data.Expression) > 0 {
+		expressions := []interface{}{}
+		for _, exp := range data.Expression {
+			expression := map[string]interface{}{}
+			protocol := exp.Protocol
+			switch protocol {
+			case "tcp", "udp":
+				expression["source_nw"] = exp.SourceNetwork
+				expression["source_port"] = exp.SourcePort
+				expression["dest_port"] = exp.DestinationPort
+			case "icmp", "fragment", "ip":
+				expression["source_nw"] = exp.SourceNetwork
+			}
+
+			expression["protocol"] = exp.Protocol
+			expression["allow"] = (exp.Action == "allow")
+			expression["description"] = exp.Description
+
+			expressions = append(expressions, expression)
+		}
+		d.Set("expressions", expressions)
+	} else {
+		d.Set("expressions", []interface{}{})
+	}
+
+	d.Set("zone", client.Zone)
+	d.SetId(data.ID)
 	return nil
 }

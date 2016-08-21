@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/hashicorp/terraform/helper/schema"
 	"github.com/yamamoto-febc/libsacloud/api"
+	"github.com/yamamoto-febc/libsacloud/sacloud"
 )
 
 func resourceSakuraCloudSSHKey() *schema.Resource {
@@ -65,12 +66,7 @@ func resourceSakuraCloudSSHKeyRead(d *schema.ResourceData, meta interface{}) err
 		return fmt.Errorf("Couldn't find SakuraCloud SSHKey resource: %s", err)
 	}
 
-	d.Set("name", key.Name)
-	d.Set("public_key", key.PublicKey)
-	d.Set("fingerprint", key.Fingerprint)
-	d.Set("description", key.Description)
-
-	return nil
+	return setSSHKeyResourceData(d, client, key)
 }
 
 func resourceSakuraCloudSSHKeyUpdate(d *schema.ResourceData, meta interface{}) error {
@@ -112,5 +108,16 @@ func resourceSakuraCloudSSHKeyDelete(d *schema.ResourceData, meta interface{}) e
 		return fmt.Errorf("Error deleting SakuraCloud SSHKey resource: %s", err)
 	}
 
+	return nil
+}
+
+func setSSHKeyResourceData(d *schema.ResourceData, client *api.Client, data *sacloud.SSHKey) error {
+
+	d.Set("name", data.Name)
+	d.Set("public_key", data.PublicKey)
+	d.Set("fingerprint", data.Fingerprint)
+	d.Set("description", data.Description)
+
+	d.SetId(data.ID)
 	return nil
 }

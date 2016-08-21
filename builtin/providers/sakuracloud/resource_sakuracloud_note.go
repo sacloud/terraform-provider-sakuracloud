@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/hashicorp/terraform/helper/schema"
 	"github.com/yamamoto-febc/libsacloud/api"
+	"github.com/yamamoto-febc/libsacloud/sacloud"
 )
 
 func resourceSakuraCloudNote() *schema.Resource {
@@ -70,12 +71,7 @@ func resourceSakuraCloudNoteRead(d *schema.ResourceData, meta interface{}) error
 		return fmt.Errorf("Couldn't find SakuraCloud Note resource: %s", err)
 	}
 
-	d.Set("name", note.Name)
-	d.Set("content", note.Content)
-	d.Set("description", note.Description)
-	d.Set("tags", note.Tags)
-
-	return nil
+	return setNoteResourceData(d, client, note)
 }
 
 func resourceSakuraCloudNoteUpdate(d *schema.ResourceData, meta interface{}) error {
@@ -126,5 +122,16 @@ func resourceSakuraCloudNoteDelete(d *schema.ResourceData, meta interface{}) err
 		return fmt.Errorf("Error deleting SakuraCloud Note resource: %s", err)
 	}
 
+	return nil
+}
+
+func setNoteResourceData(d *schema.ResourceData, client *api.Client, data *sacloud.Note) error {
+
+	d.Set("name", data.Name)
+	d.Set("content", data.Content)
+	d.Set("description", data.Description)
+	d.Set("tags", data.Tags)
+
+	d.SetId(data.ID)
 	return nil
 }

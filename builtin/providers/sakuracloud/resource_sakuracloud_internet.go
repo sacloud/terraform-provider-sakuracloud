@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/hashicorp/terraform/helper/schema"
 	"github.com/yamamoto-febc/libsacloud/api"
+	"github.com/yamamoto-febc/libsacloud/sacloud"
 	"time"
 )
 
@@ -144,42 +145,7 @@ func resourceSakuraCloudInternetRead(d *schema.ResourceData, meta interface{}) e
 		return fmt.Errorf("Couldn't find SakuraCloud Internet resource: %s", err)
 	}
 
-	d.Set("name", internet.Name)
-	d.Set("description", internet.Description)
-	d.Set("tags", internet.Tags)
-	d.Set("zone", client.Zone)
-
-	d.Set("nw_mask_len", internet.NetworkMaskLen)
-	d.Set("band_width", internet.BandWidthMbps)
-
-	sw, err := client.Switch.Read(internet.Switch.ID)
-	if err != nil {
-		return fmt.Errorf("Couldn't find SakuraCloud Switch resource: %s", err)
-	}
-
-	d.Set("switch_id", sw.ID)
-	d.Set("nw_address", sw.Subnets[0].NetworkAddress)
-	d.Set("nw_gateway", sw.Subnets[0].DefaultRoute)
-	d.Set("nw_min_ipaddress", sw.Subnets[0].IPAddresses.Min)
-	d.Set("nw_max_ipaddress", sw.Subnets[0].IPAddresses.Max)
-
-	ipList, err := sw.GetIPAddressList()
-	if err != nil {
-		return fmt.Errorf("Error reading Switch resource(IPAddresses): %s", err)
-	}
-	d.Set("nw_ipaddresses", ipList)
-
-	if sw.ServerCount > 0 {
-		servers, err := client.Switch.GetServers(sw.ID)
-		if err != nil {
-			return fmt.Errorf("Couldn't find SakuraCloud Servers( is connected Switch): %s", err)
-		}
-		d.Set("server_ids", flattenServers(servers))
-	} else {
-		d.Set("server_ids", []string{})
-	}
-
-	return nil
+	return setInternetResourceData(d, client, internet)
 }
 
 func resourceSakuraCloudInternetUpdate(d *schema.ResourceData, meta interface{}) error {
@@ -290,5 +256,46 @@ func resourceSakuraCloudInternetDelete(d *schema.ResourceData, meta interface{})
 
 	}
 
+	return nil
+}
+
+func setInternetResourceData(d *schema.ResourceData, client *api.Client, data *sacloud.Internet) error {
+
+	d.Set("name", data.Name)
+	d.Set("description", data.Description)
+	d.Set("tags", data.Tags)
+
+	d.Set("nw_mask_len", data.NetworkMaskLen)
+	d.Set("band_width", data.BandWidthMbps)
+
+	sw, err := client.Switch.Read(data.Switch.ID)
+	if err != nil {
+		return fmt.Errorf("Couldn't find SakuraCloud Switch resource: %s", err)
+	}
+
+	d.Set("switch_id", sw.ID)
+	d.Set("nw_address", sw.Subnets[0].NetworkAddress)
+	d.Set("nw_gateway", sw.Subnets[0].DefaultRoute)
+	d.Set("nw_min_ipaddress", sw.Subnets[0].IPAddresses.Min)
+	d.Set("nw_max_ipaddress", sw.Subnets[0].IPAddresses.Max)
+
+	ipList, err := sw.GetIPAddressList()
+	if err != nil {
+		return fmt.Errorf("Error reading Switch resource(IPAddresses): %s", err)
+	}
+	d.Set("nw_ipaddresses", ipList)
+
+	if sw.ServerCount > 0 {
+		servers, err := client.Switch.GetServers(sw.ID)
+		if err != nil {
+			return fmt.Errorf("Couldn't find SakuraCloud Servers( is connected Switch): %s", err)
+		}
+		d.Set("server_ids", flattenServers(servers))
+	} else {
+		d.Set("server_ids", []string{})
+	}
+
+	d.Set("zone", client.Zone)
+	d.SetId(data.ID)
 	return nil
 }
