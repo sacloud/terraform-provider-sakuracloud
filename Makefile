@@ -9,7 +9,7 @@ clean:
 	rm -Rf $(CURDIR)/bin/*
 
 build: clean vet
-	govendor build -o $(CURDIR)/bin/terraform-provider-sakuracloud $(CURDIR)/builtin/bins/provider-sakuracloud/main.go
+	govendor build -ldflags "-s -w" -o $(CURDIR)/bin/terraform-provider-sakuracloud $(CURDIR)/builtin/bins/provider-sakuracloud/main.go
 
 build-x: clean vet
 	sh -c "'$(CURDIR)/scripts/build.sh'"
