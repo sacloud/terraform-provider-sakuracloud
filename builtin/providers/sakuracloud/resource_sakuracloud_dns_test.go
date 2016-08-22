@@ -9,7 +9,7 @@ import (
 	"testing"
 )
 
-func TestAccResourceSakuraCloudDNS_Basic(t *testing.T) {
+func TestAccResourceSakuraCloudDNS(t *testing.T) {
 	var dns sacloud.DNS
 	resource.Test(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
@@ -22,25 +22,8 @@ func TestAccResourceSakuraCloudDNS_Basic(t *testing.T) {
 					testAccCheckSakuraCloudDNSExists("sakuracloud_dns.foobar", &dns),
 					resource.TestCheckResourceAttr(
 						"sakuracloud_dns.foobar", "zone", "terraform.io"),
-				),
-			},
-		},
-	})
-}
-
-func TestAccResourceSakuraCloudDNS_Update(t *testing.T) {
-	var dns sacloud.DNS
-	resource.Test(t, resource.TestCase{
-		PreCheck:     func() { testAccPreCheck(t) },
-		Providers:    testAccProviders,
-		CheckDestroy: testAccCheckSakuraCloudDNSDestroy,
-		Steps: []resource.TestStep{
-			resource.TestStep{
-				Config: testAccCheckSakuraCloudDNSConfig_basic,
-				Check: resource.ComposeTestCheckFunc(
-					testAccCheckSakuraCloudDNSExists("sakuracloud_dns.foobar", &dns),
 					resource.TestCheckResourceAttr(
-						"sakuracloud_dns.foobar", "zone", "terraform.io"),
+						"sakuracloud_dns.foobar", "description", "DNS from TerraForm for SAKURA CLOUD"),
 				),
 			},
 			resource.TestStep{
@@ -49,6 +32,8 @@ func TestAccResourceSakuraCloudDNS_Update(t *testing.T) {
 					testAccCheckSakuraCloudDNSExists("sakuracloud_dns.foobar", &dns),
 					resource.TestCheckResourceAttr(
 						"sakuracloud_dns.foobar", "zone", "terraform.io"),
+					resource.TestCheckResourceAttr(
+						"sakuracloud_dns.foobar", "description", "DNS from TerraForm for SAKURA CLOUD_upd"),
 				),
 			},
 		},

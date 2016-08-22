@@ -9,36 +9,7 @@ import (
 	"testing"
 )
 
-func TestAccResourceSakuraCloudAutoBackup_Basic(t *testing.T) {
-	var autoBackup sacloud.AutoBackup
-	resource.Test(t, resource.TestCase{
-		PreCheck:     func() { testAccPreCheck(t) },
-		Providers:    testAccProviders,
-		CheckDestroy: testAccCheckSakuraCloudAutoBackupDestroy,
-		Steps: []resource.TestStep{
-			resource.TestStep{
-				Config: testAccCheckSakuraCloudAutoBackupConfig_basic,
-				Check: resource.ComposeTestCheckFunc(
-					testAccCheckSakuraCloudAutoBackupExists("sakuracloud_auto_backup.foobar", &autoBackup),
-					resource.TestCheckResourceAttr("sakuracloud_auto_backup.foobar", "name", "name_before"),
-					resource.TestCheckResourceAttr("sakuracloud_auto_backup.foobar", "backup_hour", "0"),
-					resource.TestCheckResourceAttr("sakuracloud_auto_backup.foobar", "weekdays.#", "3"),
-					resource.TestCheckResourceAttr("sakuracloud_auto_backup.foobar", "weekdays.0", "mon"),
-					resource.TestCheckResourceAttr("sakuracloud_auto_backup.foobar", "weekdays.1", "tue"),
-					resource.TestCheckResourceAttr("sakuracloud_auto_backup.foobar", "weekdays.2", "wed"),
-					resource.TestCheckResourceAttr("sakuracloud_auto_backup.foobar", "max_backup_num", "1"),
-					resource.TestCheckResourceAttr("sakuracloud_auto_backup.foobar", "description", "description_before"),
-					resource.TestCheckResourceAttr("sakuracloud_auto_backup.foobar", "tags.#", "2"),
-					resource.TestCheckResourceAttr("sakuracloud_auto_backup.foobar", "tags.0", "hoge1"),
-					resource.TestCheckResourceAttr("sakuracloud_auto_backup.foobar", "tags.1", "hoge2"),
-					resource.TestCheckResourceAttr("sakuracloud_auto_backup.foobar", "zone", "tk1a"),
-				),
-			},
-		},
-	})
-}
-
-func TestAccResourceSakuraCloudAutoBackup_Update(t *testing.T) {
+func TestAccResourceSakuraCloudAutoBackup(t *testing.T) {
 	var autoBackup sacloud.AutoBackup
 	resource.Test(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },

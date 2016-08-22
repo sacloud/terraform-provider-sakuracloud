@@ -9,36 +9,7 @@ import (
 	"testing"
 )
 
-func TestAccResourceSakuraCloudLoadBalancerVIP_Basic(t *testing.T) {
-	var loadBalancer sacloud.LoadBalancer
-	resource.Test(t, resource.TestCase{
-		PreCheck:     func() { testAccPreCheck(t) },
-		Providers:    testAccProviders,
-		CheckDestroy: testAccCheckSakuraCloudLoadBalancerVIPDestroy,
-		Steps: []resource.TestStep{
-			resource.TestStep{
-				Config: testAccCheckSakuraCloudLoadBalancerVIPConfig_basic,
-				Check: resource.ComposeTestCheckFunc(
-					testAccCheckSakuraCloudLoadBalancerExists("sakuracloud_load_balancer.foobar", &loadBalancer),
-					resource.TestCheckResourceAttr(
-						"sakuracloud_load_balancer_vip.vip1", "vip", "192.168.11.201"),
-					resource.TestCheckResourceAttr(
-						"sakuracloud_load_balancer_vip.vip1", "port", "80"),
-					resource.TestCheckResourceAttr(
-						"sakuracloud_load_balancer_vip.vip1", "delay_loop", "100"),
-					resource.TestCheckResourceAttr(
-						"sakuracloud_load_balancer_vip.vip1", "sorry_server", "192.168.11.11"),
-					resource.TestCheckResourceAttr(
-						"sakuracloud_load_balancer_vip.vip1", "servers.#", "0"),
-					resource.TestCheckResourceAttr(
-						"sakuracloud_load_balancer_vip.vip2", "vip", "192.168.11.202"),
-				),
-			},
-		},
-	})
-}
-
-func TestAccResourceSakuraCloudLoadBalancerVIP_Update(t *testing.T) {
+func TestAccSakuraCloudLoadBalancerVIP(t *testing.T) {
 	var loadBalancer sacloud.LoadBalancer
 	resource.Test(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },

@@ -9,34 +9,7 @@ import (
 	"testing"
 )
 
-func TestAccResourceSakuraCloudGSLB_Basic(t *testing.T) {
-	var gslb sacloud.GSLB
-	resource.Test(t, resource.TestCase{
-		PreCheck:     func() { testAccPreCheck(t) },
-		Providers:    testAccProviders,
-		CheckDestroy: testAccCheckSakuraCloudGSLBDestroy,
-		Steps: []resource.TestStep{
-			resource.TestStep{
-				Config: testAccCheckSakuraCloudGSLBConfig_basic,
-				Check: resource.ComposeTestCheckFunc(
-					testAccCheckSakuraCloudGSLBExists("sakuracloud_gslb.foobar", &gslb),
-					resource.TestCheckResourceAttr(
-						"sakuracloud_gslb.foobar", "name", "terraform.io"),
-					resource.TestCheckResourceAttr(
-						"sakuracloud_gslb.foobar", "sorry_server", "8.8.8.8"),
-					resource.TestCheckResourceAttr(
-						"sakuracloud_gslb.foobar", "health_check.1802742300.protocol", "http"),
-					resource.TestCheckResourceAttr(
-						"sakuracloud_gslb.foobar", "health_check.1802742300.delay_loop", "10"),
-					resource.TestCheckResourceAttr(
-						"sakuracloud_gslb.foobar", "health_check.1802742300.host_header", "terraform.io"),
-				),
-			},
-		},
-	})
-}
-
-func TestAccResourceSakuraCloudGSLB_Update(t *testing.T) {
+func TestAccResourceSakuraCloudGSLB(t *testing.T) {
 	var gslb sacloud.GSLB
 	resource.Test(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },

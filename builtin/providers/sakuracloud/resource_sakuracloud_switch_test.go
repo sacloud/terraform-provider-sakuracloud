@@ -9,28 +9,7 @@ import (
 	"testing"
 )
 
-func TestAccResourceSakuraCloudSwitch_Basic(t *testing.T) {
-	var sw sacloud.Switch
-	resource.Test(t, resource.TestCase{
-		PreCheck:     func() { testAccPreCheck(t) },
-		Providers:    testAccProviders,
-		CheckDestroy: testAccCheckSakuraCloudSwitchDestroy,
-		Steps: []resource.TestStep{
-			resource.TestStep{
-				Config: testAccCheckSakuraCloudSwitchConfig_basic,
-				Check: resource.ComposeTestCheckFunc(
-					testAccCheckSakuraCloudSwitchExists("sakuracloud_switch.foobar", &sw),
-					resource.TestCheckResourceAttr(
-						"sakuracloud_switch.foobar", "name", "myswitch"),
-					resource.TestCheckResourceAttr(
-						"sakuracloud_switch.foobar", "server_ids.#", "0"),
-				),
-			},
-		},
-	})
-}
-
-func TestAccResourceSakuraCloudSwitch_Update(t *testing.T) {
+func TestAccResourceSakuraCloudSwitch(t *testing.T) {
 	var sw sacloud.Switch
 	resource.Test(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
@@ -53,27 +32,8 @@ func TestAccResourceSakuraCloudSwitch_Update(t *testing.T) {
 						"sakuracloud_switch.foobar", "name", "myswitch_upd"),
 				),
 			},
-		},
-	})
-}
-
-func TestAccResourceSakuraCloudSwitch_WithServer(t *testing.T) {
-	var sw sacloud.Switch
-	resource.Test(t, resource.TestCase{
-		PreCheck:     func() { testAccPreCheck(t) },
-		Providers:    testAccProviders,
-		CheckDestroy: testAccCheckSakuraCloudSwitchDestroy,
-		Steps: []resource.TestStep{
 			resource.TestStep{
-				Config: testAccCheckSakuraCloudSwitchConfig_with_server,
-				Check: resource.ComposeTestCheckFunc(
-					testAccCheckSakuraCloudSwitchExists("sakuracloud_switch.foobar", &sw),
-					resource.TestCheckResourceAttr(
-						"sakuracloud_switch.foobar", "name", "myswitch"),
-				),
-			},
-			resource.TestStep{
-				Config: testAccCheckSakuraCloudSwitchConfig_with_server,
+				Config: testAccCheckSakuraCloudSwitchConfig_update,
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttr(
 						"sakuracloud_switch.foobar", "server_ids.#", "1"),
@@ -157,13 +117,6 @@ resource "sakuracloud_switch" "foobar" {
 }`
 
 var testAccCheckSakuraCloudSwitchConfig_update = `
-resource "sakuracloud_switch" "foobar" {
-    name = "myswitch_upd"
-    description = "Switch from TerraForm for SAKURA CLOUD"
-    tags = ["hoge1" , "hoge2"]
-}`
-
-var testAccCheckSakuraCloudSwitchConfig_with_server = `
 resource "sakuracloud_server" "foobar" {
     name = "myserver"
     description = "Server from TerraForm for SAKURA CLOUD"
@@ -171,7 +124,7 @@ resource "sakuracloud_server" "foobar" {
     additional_interfaces = ["${sakuracloud_switch.foobar.id}"]
 }
 resource "sakuracloud_switch" "foobar" {
-    name = "myswitch"
+    name = "myswitch_upd"
     description = "Switch from TerraForm for SAKURA CLOUD"
     tags = ["hoge1" , "hoge2"]
 }

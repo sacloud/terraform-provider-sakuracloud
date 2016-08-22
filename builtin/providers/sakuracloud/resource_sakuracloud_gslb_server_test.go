@@ -9,28 +9,7 @@ import (
 	"testing"
 )
 
-func TestAccResourceSakuraCloudGSLBServer_Basic(t *testing.T) {
-	var gslb sacloud.GSLB
-	resource.Test(t, resource.TestCase{
-		PreCheck:     func() { testAccPreCheck(t) },
-		Providers:    testAccProviders,
-		CheckDestroy: testAccCheckSakuraCloudGSLBServerDestroy,
-		Steps: []resource.TestStep{
-			resource.TestStep{
-				Config: testAccCheckSakuraCloudGSLBServerConfig_basic,
-				Check: resource.ComposeTestCheckFunc(
-					testAccCheckSakuraCloudGSLBExists("sakuracloud_gslb.foobar", &gslb),
-					resource.TestCheckResourceAttr(
-						"sakuracloud_gslb_server.foobar.0", "ipaddress", "8.8.8.8"),
-					resource.TestCheckResourceAttr(
-						"sakuracloud_gslb_server.foobar.1", "ipaddress", "8.8.4.4"),
-				),
-			},
-		},
-	})
-}
-
-func TestAccResourceSakuraCloudGSLBServer_Update(t *testing.T) {
+func TestAccResourceSakuraCloudGSLBServer(t *testing.T) {
 	var gslb sacloud.GSLB
 	resource.Test(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },

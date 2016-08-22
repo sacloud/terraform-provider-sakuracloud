@@ -9,38 +9,7 @@ import (
 	"testing"
 )
 
-func TestAccResourceSakuraCloudPacketFilter_Basic(t *testing.T) {
-	var filter sacloud.PacketFilter
-	resource.Test(t, resource.TestCase{
-		PreCheck:     func() { testAccPreCheck(t) },
-		Providers:    testAccProviders,
-		CheckDestroy: testAccCheckSakuraCloudPacketFilterDestroy,
-		Steps: []resource.TestStep{
-			resource.TestStep{
-				Config: testAccCheckSakuraCloudPacketFilterConfig_basic,
-				Check: resource.ComposeTestCheckFunc(
-					testAccCheckSakuraCloudPacketFilterExists("sakuracloud_packet_filter.foobar", &filter),
-					resource.TestCheckResourceAttr(
-						"sakuracloud_packet_filter.foobar", "name", "mypacket_filter"),
-					resource.TestCheckResourceAttr(
-						"sakuracloud_packet_filter.foobar", "expressions.#", "2"),
-					resource.TestCheckResourceAttr(
-						"sakuracloud_packet_filter.foobar", "expressions.0.protocol", "tcp"),
-					resource.TestCheckResourceAttr(
-						"sakuracloud_packet_filter.foobar", "expressions.0.source_nw", "0.0.0.0"),
-					resource.TestCheckResourceAttr(
-						"sakuracloud_packet_filter.foobar", "expressions.0.source_port", "0-65535"),
-					resource.TestCheckResourceAttr(
-						"sakuracloud_packet_filter.foobar", "expressions.0.dest_port", "80"),
-					resource.TestCheckResourceAttr(
-						"sakuracloud_packet_filter.foobar", "expressions.0.allow", "true"),
-				),
-			},
-		},
-	})
-}
-
-func TestAccResourceSakuraCloudPacketFilter_Update(t *testing.T) {
+func TestAccResourceSakuraCloudPacketFilter(t *testing.T) {
 	var filter sacloud.PacketFilter
 	resource.Test(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },

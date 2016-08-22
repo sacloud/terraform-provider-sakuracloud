@@ -9,37 +9,7 @@ import (
 	"testing"
 )
 
-func TestAccResourceSakuraCloudServer_Basic(t *testing.T) {
-	var server sacloud.Server
-	resource.Test(t, resource.TestCase{
-		PreCheck:     func() { testAccPreCheck(t) },
-		Providers:    testAccProviders,
-		CheckDestroy: testAccCheckSakuraCloudServerDestroy,
-		Steps: []resource.TestStep{
-			resource.TestStep{
-				Config: testAccCheckSakuraCloudServerConfig_basic,
-				Check: resource.ComposeTestCheckFunc(
-					testAccCheckSakuraCloudServerExists("sakuracloud_server.foobar", &server),
-					testAccCheckSakuraCloudServerAttributes(&server),
-					resource.TestCheckResourceAttr(
-						"sakuracloud_server.foobar", "core", "1"),
-					resource.TestCheckResourceAttr(
-						"sakuracloud_server.foobar", "memory", "1"),
-					resource.TestCheckResourceAttr(
-						"sakuracloud_server.foobar", "disks.#", "1"),
-					resource.TestCheckResourceAttr(
-						"sakuracloud_server.foobar", "base_interface", "shared"),
-					resource.TestCheckResourceAttr(
-						"sakuracloud_server.foobar", "additional_interfaces.#", "0"),
-					resource.TestCheckResourceAttr(
-						"sakuracloud_server.foobar", "macaddresses.#", "1"),
-				),
-			},
-		},
-	})
-}
-
-func TestAccResourceSakuraCloudServer_Update(t *testing.T) {
+func TestAccResourceSakuraCloudServer(t *testing.T) {
 	var server sacloud.Server
 	resource.Test(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
@@ -88,7 +58,7 @@ func TestAccResourceSakuraCloudServer_Update(t *testing.T) {
 	})
 }
 
-func TestAccResourceSakuraCloudServer_EditConnections(t *testing.T) {
+func TestAccSakuraCloudServer_EditConnections(t *testing.T) {
 	var server sacloud.Server
 	resource.Test(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
@@ -151,7 +121,7 @@ func TestAccResourceSakuraCloudServer_EditConnections(t *testing.T) {
 	})
 }
 
-func TestAccResourceSakuraCloudServer_ConnectPacketFilters(t *testing.T) {
+func TestAccSakuraCloudServer_ConnectPacketFilters(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
 		Providers:    testAccProviders,

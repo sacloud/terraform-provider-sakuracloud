@@ -9,34 +9,7 @@ import (
 	"testing"
 )
 
-func TestAccResourceSakuraCloudLoadBalancer_Basic(t *testing.T) {
-	var loadBalancer sacloud.LoadBalancer
-	resource.Test(t, resource.TestCase{
-		PreCheck:     func() { testAccPreCheck(t) },
-		Providers:    testAccProviders,
-		CheckDestroy: testAccCheckSakuraCloudLoadBalancerDestroy,
-		Steps: []resource.TestStep{
-			resource.TestStep{
-				Config: testAccCheckSakuraCloudLoadBalancerConfig_basic,
-				Check: resource.ComposeTestCheckFunc(
-					testAccCheckSakuraCloudLoadBalancerExists("sakuracloud_load_balancer.foobar", &loadBalancer),
-					resource.TestCheckResourceAttr("sakuracloud_load_balancer.foobar", "name", "name_before"),
-					resource.TestCheckResourceAttr("sakuracloud_load_balancer.foobar", "description", "description_before"),
-					resource.TestCheckResourceAttr("sakuracloud_load_balancer.foobar", "tags.#", "2"),
-					resource.TestCheckResourceAttr("sakuracloud_load_balancer.foobar", "tags.0", "hoge1"),
-					resource.TestCheckResourceAttr("sakuracloud_load_balancer.foobar", "tags.1", "hoge2"),
-					resource.TestCheckResourceAttr("sakuracloud_load_balancer.foobar", "VRID", "1"),
-					resource.TestCheckResourceAttr("sakuracloud_load_balancer.foobar", "ipaddress1", "192.168.11.101"),
-					resource.TestCheckResourceAttr("sakuracloud_load_balancer.foobar", "ipaddress2", ""),
-					resource.TestCheckResourceAttr("sakuracloud_load_balancer.foobar", "nw_mask_len", "24"),
-					resource.TestCheckResourceAttr("sakuracloud_load_balancer.foobar", "default_route", "192.168.11.1"),
-				),
-			},
-		},
-	})
-}
-
-func TestAccResourceSakuraCloudLoadBalancer_Update(t *testing.T) {
+func TestAccSakuraCloudLoadBalancer(t *testing.T) {
 	var loadBalancer sacloud.LoadBalancer
 	resource.Test(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
@@ -79,7 +52,7 @@ func TestAccResourceSakuraCloudLoadBalancer_Update(t *testing.T) {
 	})
 }
 
-func TestAccResourceSakuraCloudLoadBalancer_WithRouter(t *testing.T) {
+func TestAccSakuraCloudLoadBalancer_WithRouter(t *testing.T) {
 	var loadBalancer sacloud.LoadBalancer
 	resource.Test(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },

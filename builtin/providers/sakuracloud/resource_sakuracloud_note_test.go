@@ -9,30 +9,7 @@ import (
 	"testing"
 )
 
-func TestAccResourceSakuraCloudNote_Basic(t *testing.T) {
-	var note sacloud.Note
-	resource.Test(t, resource.TestCase{
-		PreCheck:     func() { testAccPreCheck(t) },
-		Providers:    testAccProviders,
-		CheckDestroy: testAccCheckSakuraCloudNoteDestroy,
-		Steps: []resource.TestStep{
-			resource.TestStep{
-				Config: testAccCheckSakuraCloudNoteConfig_basic,
-				Check: resource.ComposeTestCheckFunc(
-					testAccCheckSakuraCloudNoteExists("sakuracloud_note.foobar", &note),
-					resource.TestCheckResourceAttr(
-						"sakuracloud_note.foobar", "name", "mynote"),
-					resource.TestCheckResourceAttr(
-						"sakuracloud_note.foobar", "content", "content"),
-					resource.TestCheckResourceAttr(
-						"sakuracloud_note.foobar", "tags.#", "2"),
-				),
-			},
-		},
-	})
-}
-
-func TestAccResourceSakuraCloudNote_Update(t *testing.T) {
+func TestAccResourceSakuraCloudNote(t *testing.T) {
 	var note sacloud.Note
 	resource.Test(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
