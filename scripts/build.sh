@@ -16,7 +16,7 @@ for GOOS in $OS; do
           binary="${binary}.exe"
         fi
         echo "Building $binary $arch"
-        GOOS=$GOOS GOARCH=$GOARCH CGO_ENABLED=0 govendor build -o $binary builtin/bins/provider-sakuracloud/main.go
+        GOOS=$GOOS GOARCH=$GOARCH CGO_ENABLED=0 govendor build -ldflags "-s -w" -o $binary builtin/bins/provider-sakuracloud/main.go
         zip -r "bin/terraform-provider-sakuracloud_$arch" $binary
         rm -f $binary
     done
