@@ -9,30 +9,7 @@ import (
 	"testing"
 )
 
-func TestAccResourceSakuraCloudSSHKey_Basic(t *testing.T) {
-	var ssh_key sacloud.SSHKey
-	resource.Test(t, resource.TestCase{
-		PreCheck:     func() { testAccPreCheck(t) },
-		Providers:    testAccProviders,
-		CheckDestroy: testAccCheckSakuraCloudSSHKeyDestroy,
-		Steps: []resource.TestStep{
-			resource.TestStep{
-				Config: testAccCheckSakuraCloudSSHKeyConfig_basic,
-				Check: resource.ComposeTestCheckFunc(
-					testAccCheckSakuraCloudSSHKeyExists("sakuracloud_ssh_key.foobar", &ssh_key),
-					resource.TestCheckResourceAttr(
-						"sakuracloud_ssh_key.foobar", "name", "mykey"),
-					resource.TestCheckResourceAttr(
-						"sakuracloud_ssh_key.foobar", "public_key", testAccPublicKey),
-					resource.TestCheckResourceAttr(
-						"sakuracloud_ssh_key.foobar", "fingerprint", testAccFingerprint),
-				),
-			},
-		},
-	})
-}
-
-func TestAccResourceSakuraCloudSSHKey_Update(t *testing.T) {
+func TestAccResourceSakuraCloudSSHKey(t *testing.T) {
 	var ssh_key sacloud.SSHKey
 	resource.Test(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },

@@ -9,55 +9,7 @@ import (
 	"testing"
 )
 
-func TestAccResourceSakuraCloudBridge_Basic(t *testing.T) {
-	var bridge sacloud.Bridge
-	resource.Test(t, resource.TestCase{
-		PreCheck:     func() { testAccPreCheck(t) },
-		Providers:    testAccProviders,
-		CheckDestroy: testAccCheckSakuraCloudBridgeDestroy,
-		Steps: []resource.TestStep{
-			resource.TestStep{
-				Config: testAccCheckSakuraCloudBridgeConfig_basic,
-				Check: resource.ComposeTestCheckFunc(
-					testAccCheckSakuraCloudBridgeExists("sakuracloud_bridge.foobar", &bridge),
-					resource.TestCheckResourceAttr(
-						"sakuracloud_bridge.foobar", "name", "mybridge"),
-					resource.TestCheckResourceAttr(
-						"sakuracloud_bridge.foobar", "switch_ids.#", "0"),
-				),
-			},
-		},
-	})
-}
-
-func TestAccResourceSakuraCloudBridge_Update(t *testing.T) {
-	var bridge sacloud.Bridge
-	resource.Test(t, resource.TestCase{
-		PreCheck:     func() { testAccPreCheck(t) },
-		Providers:    testAccProviders,
-		CheckDestroy: testAccCheckSakuraCloudBridgeDestroy,
-		Steps: []resource.TestStep{
-			resource.TestStep{
-				Config: testAccCheckSakuraCloudBridgeConfig_basic,
-				Check: resource.ComposeTestCheckFunc(
-					testAccCheckSakuraCloudBridgeExists("sakuracloud_bridge.foobar", &bridge),
-					resource.TestCheckResourceAttr(
-						"sakuracloud_bridge.foobar", "name", "mybridge"),
-				),
-			},
-			resource.TestStep{
-				Config: testAccCheckSakuraCloudBridgeConfig_update,
-				Check: resource.ComposeTestCheckFunc(
-					testAccCheckSakuraCloudBridgeExists("sakuracloud_bridge.foobar", &bridge),
-					resource.TestCheckResourceAttr(
-						"sakuracloud_bridge.foobar", "name", "mybridge_upd"),
-				),
-			},
-		},
-	})
-}
-
-func TestAccResourceSakuraCloudBridge_WithSwitch(t *testing.T) {
+func TestAccResourceSakuraCloudBridge(t *testing.T) {
 	var bridge sacloud.Bridge
 	resource.Test(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
@@ -156,27 +108,12 @@ func testAccCheckSakuraCloudBridgeDestroy(s *terraform.State) error {
 	return nil
 }
 
-var testAccCheckSakuraCloudBridgeConfig_basic = `
-resource "sakuracloud_bridge" "foobar" {
-    name = "mybridge"
-    description = "Bridge from TerraForm for SAKURA CLOUD"
-    zone = "is1b"
-}`
-
-var testAccCheckSakuraCloudBridgeConfig_update = `
-resource "sakuracloud_bridge" "foobar" {
-    name = "mybridge_upd"
-    description = "Bridge from TerraForm for SAKURA CLOUD"
-    zone = "is1b"
-}`
-
 var testAccCheckSakuraCloudBridgeConfig_withSwitch = `
 resource "sakuracloud_switch" "foobar" {
     name = "myswitch"
     description = "Switch from TerraForm for SAKURA CLOUD"
     zone = "is1b"
     bridge_id = "${sakuracloud_bridge.foobar.id}"
-    depends_on = ["sakuracloud_bridge.foobar"]
 }
 resource "sakuracloud_bridge" "foobar" {
     name = "mybridge"
@@ -189,7 +126,6 @@ resource "sakuracloud_switch" "foobar" {
     name = "myswitch_upd"
     description = "Switch from TerraForm for SAKURA CLOUD"
     zone = "is1b"
-    depends_on = ["sakuracloud_bridge.foobar"]
 }
 resource "sakuracloud_bridge" "foobar" {
     name = "mybridge_upd"

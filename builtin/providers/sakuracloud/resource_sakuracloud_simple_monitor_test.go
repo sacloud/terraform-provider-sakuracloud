@@ -9,37 +9,7 @@ import (
 	"testing"
 )
 
-func TestAccResourceSakuraCloudSimpleMonitor_Basic(t *testing.T) {
-	var monitor sacloud.SimpleMonitor
-	resource.Test(t, resource.TestCase{
-		PreCheck:     func() { testAccPreCheck(t) },
-		Providers:    testAccProviders,
-		CheckDestroy: testAccCheckSakuraCloudSimpleMonitorDestroy,
-		Steps: []resource.TestStep{
-			resource.TestStep{
-				Config: testAccCheckSakuraCloudSimpleMonitorConfig_basic,
-				Check: resource.ComposeTestCheckFunc(
-					testAccCheckSakuraCloudSimpleMonitorExists("sakuracloud_simple_monitor.foobar", &monitor),
-					testAccCheckSakuraCloudSimpleMonitorAttributes(&monitor),
-					resource.TestCheckResourceAttr(
-						"sakuracloud_simple_monitor.foobar", "health_check.109142589.protocol", "http"),
-					resource.TestCheckResourceAttr(
-						"sakuracloud_simple_monitor.foobar", "health_check.109142589.delay_loop", "60"),
-					resource.TestCheckResourceAttr(
-						"sakuracloud_simple_monitor.foobar", "health_check.109142589.host_header", "libsacloud.com"),
-					resource.TestCheckResourceAttr(
-						"sakuracloud_simple_monitor.foobar", "target", "terraform.io"),
-					resource.TestCheckResourceAttr(
-						"sakuracloud_simple_monitor.foobar", "notify_slack_enabled", "true"),
-					resource.TestCheckResourceAttr(
-						"sakuracloud_simple_monitor.foobar", "notify_slack_webhook", testAccSlackWebhook),
-				),
-			},
-		},
-	})
-}
-
-func TestAccResourceSakuraCloudSimpleMonitor_Update(t *testing.T) {
+func TestAccResourceSakuraCloudSimpleMonitor(t *testing.T) {
 	var monitor sacloud.SimpleMonitor
 	resource.Test(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },

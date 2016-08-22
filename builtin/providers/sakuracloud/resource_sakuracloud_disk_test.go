@@ -9,29 +9,7 @@ import (
 	"testing"
 )
 
-func TestAccResourceSakuraCloudDisk_Basic(t *testing.T) {
-	var disk sacloud.Disk
-	resource.Test(t, resource.TestCase{
-		PreCheck:     func() { testAccPreCheck(t) },
-		Providers:    testAccProviders,
-		CheckDestroy: testAccCheckSakuraCloudDiskDestroy,
-		Steps: []resource.TestStep{
-			resource.TestStep{
-				Config: testAccCheckSakuraCloudDiskConfig_basic,
-				Check: resource.ComposeTestCheckFunc(
-					testAccCheckSakuraCloudDiskExists("sakuracloud_disk.foobar", &disk),
-					testAccCheckSakuraCloudDiskAttributes(&disk),
-					resource.TestCheckResourceAttr(
-						"sakuracloud_disk.foobar", "name", "mydisk"),
-					resource.TestCheckResourceAttr(
-						"sakuracloud_disk.foobar", "disable_pw_auth", ""),
-				),
-			},
-		},
-	})
-}
-
-func TestAccResourceSakuraCloudDisk_Update(t *testing.T) {
+func TestAccResourceSakuraCloudDisk(t *testing.T) {
 	var disk sacloud.Disk
 	resource.Test(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },

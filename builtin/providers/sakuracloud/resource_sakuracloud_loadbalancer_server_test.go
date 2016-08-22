@@ -9,41 +9,7 @@ import (
 	"testing"
 )
 
-func TestAccResourceSakuraCloudLoadBalancerServer_Basic(t *testing.T) {
-	var loadBalancer sacloud.LoadBalancer
-	resource.Test(t, resource.TestCase{
-		PreCheck:     func() { testAccPreCheck(t) },
-		Providers:    testAccProviders,
-		CheckDestroy: testAccCheckSakuraCloudLoadBalancerServerDestroy,
-		Steps: []resource.TestStep{
-			resource.TestStep{
-				Config: testAccCheckSakuraCloudLoadBalancerServerConfig_basic,
-				Check: resource.ComposeTestCheckFunc(
-					testAccCheckSakuraCloudLoadBalancerExists("sakuracloud_load_balancer.foobar", &loadBalancer),
-					resource.TestCheckResourceAttr(
-						"sakuracloud_load_balancer_server.server01", "ipaddress", "192.168.11.51"),
-					resource.TestCheckResourceAttr(
-						"sakuracloud_load_balancer_server.server01", "check_protocol", "http"),
-					resource.TestCheckResourceAttr(
-						"sakuracloud_load_balancer_server.server01", "check_path", "/"),
-					resource.TestCheckResourceAttr(
-						"sakuracloud_load_balancer_server.server01", "check_status", "200"),
-					resource.TestCheckResourceAttr(
-						"sakuracloud_load_balancer_server.server01", "enabled", "true"),
-				),
-			},
-			resource.TestStep{
-				Config: testAccCheckSakuraCloudLoadBalancerServerConfig_basic,
-				Check: resource.ComposeTestCheckFunc(
-					resource.TestCheckResourceAttr(
-						"sakuracloud_load_balancer_vip.vip1", "servers.#", "1"),
-				),
-			},
-		},
-	})
-}
-
-func TestAccResourceSakuraCloudLoadBalancerServer_Update(t *testing.T) {
+func TestAccResourceSakuraCloudLoadBalancerServer(t *testing.T) {
 	var loadBalancer sacloud.LoadBalancer
 	resource.Test(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },

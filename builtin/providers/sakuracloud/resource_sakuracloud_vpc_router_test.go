@@ -9,44 +9,7 @@ import (
 	"testing"
 )
 
-func TestAccResourceSakuraCloudVPCRouter_Basic(t *testing.T) {
-	var vpcRouter sacloud.VPCRouter
-	resource.Test(t, resource.TestCase{
-		PreCheck:     func() { testAccPreCheck(t) },
-		Providers:    testAccProviders,
-		CheckDestroy: testAccCheckSakuraCloudVPCRouterDestroy,
-		Steps: []resource.TestStep{
-			resource.TestStep{
-				Config: testAccCheckSakuraCloudVPCRouterConfig_basic,
-				Check: resource.ComposeTestCheckFunc(
-					testAccCheckSakuraCloudVPCRouterExists("sakuracloud_vpc_router.foobar", &vpcRouter),
-					resource.TestCheckResourceAttr(
-						"sakuracloud_vpc_router.foobar", "name", "name_before"),
-					resource.TestCheckResourceAttr(
-						"sakuracloud_vpc_router.foobar", "description", "description_before"),
-					resource.TestCheckResourceAttr(
-						"sakuracloud_vpc_router.foobar", "tags.#", "2"),
-					resource.TestCheckResourceAttr(
-						"sakuracloud_vpc_router.foobar", "tags.0", "hoge1"),
-					resource.TestCheckResourceAttr(
-						"sakuracloud_vpc_router.foobar", "tags.1", "hoge2"),
-					resource.TestCheckResourceAttr(
-						"sakuracloud_vpc_router.foobar", "plan", "standard"),
-					resource.TestCheckResourceAttr(
-						"sakuracloud_vpc_router.foobar", "switch_id", ""),
-					resource.TestCheckResourceAttr(
-						"sakuracloud_vpc_router.foobar", "vip", ""),
-					resource.TestCheckResourceAttr(
-						"sakuracloud_vpc_router.foobar", "ipaddress1", ""),
-					resource.TestCheckResourceAttr(
-						"sakuracloud_vpc_router.foobar", "ipaddress2", ""),
-				),
-			},
-		},
-	})
-}
-
-func TestAccResourceSakuraCloudVPCRouter_Update(t *testing.T) {
+func TestAccResourceSakuraCloudVPCRouter(t *testing.T) {
 	var vpcRouter sacloud.VPCRouter
 	resource.Test(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
