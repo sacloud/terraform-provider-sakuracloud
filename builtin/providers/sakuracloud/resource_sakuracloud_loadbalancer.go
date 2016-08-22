@@ -174,6 +174,11 @@ func resourceSakuraCloudLoadBalancerCreate(d *schema.ResourceData, meta interfac
 		return fmt.Errorf("Failed to wait SakuraCloud LoadBalancer copy: %s", err)
 	}
 
+	err = client.LoadBalancer.SleepUntilUp(loadBalancer.ID, 10*time.Minute)
+	if err != nil {
+		return fmt.Errorf("Failed to wait SakuraCloud LoadBalancer boot: %s", err)
+	}
+
 	return resourceSakuraCloudLoadBalancerRead(d, meta)
 }
 
