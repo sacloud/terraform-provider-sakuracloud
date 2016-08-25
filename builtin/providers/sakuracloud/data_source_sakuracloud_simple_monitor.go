@@ -100,6 +100,10 @@ func dataSourceSakuraCloudSimpleMonitor() *schema.Resource {
 				Type:     schema.TypeBool,
 				Computed: true,
 			},
+			"notify_email_html": &schema.Schema{
+				Type:     schema.TypeBool,
+				Computed: true,
+			},
 			"notify_slack_enabled": &schema.Schema{
 				Type:     schema.TypeBool,
 				Computed: true,

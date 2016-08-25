@@ -28,6 +28,10 @@ func TestAccResourceSakuraCloudSimpleMonitor(t *testing.T) {
 					resource.TestCheckResourceAttr(
 						"sakuracloud_simple_monitor.foobar", "target", "terraform.io"),
 					resource.TestCheckResourceAttr(
+						"sakuracloud_simple_monitor.foobar", "notify_email_enabled", "true"),
+					resource.TestCheckResourceAttr(
+						"sakuracloud_simple_monitor.foobar", "notify_email_html", "true"),
+					resource.TestCheckResourceAttr(
 						"sakuracloud_simple_monitor.foobar", "notify_slack_enabled", "true"),
 					resource.TestCheckResourceAttr(
 						"sakuracloud_simple_monitor.foobar", "notify_slack_webhook", testAccSlackWebhook),
@@ -42,6 +46,10 @@ func TestAccResourceSakuraCloudSimpleMonitor(t *testing.T) {
 						"sakuracloud_simple_monitor.foobar", "health_check.1187190475.host_header", "libsacloud.com"),
 					resource.TestCheckResourceAttr(
 						"sakuracloud_simple_monitor.foobar", "target", "terraform.io"),
+					resource.TestCheckResourceAttr(
+						"sakuracloud_simple_monitor.foobar", "notify_email_enabled", "false"),
+					resource.TestCheckResourceAttr(
+						"sakuracloud_simple_monitor.foobar", "notify_email_html", "false"),
 					resource.TestCheckResourceAttr(
 						"sakuracloud_simple_monitor.foobar", "notify_email_enabled", "false"),
 				),
@@ -129,6 +137,7 @@ resource "sakuracloud_simple_monitor" "foobar" {
     description = "SimpleMonitor from TerraForm for SAKURA CLOUD"
     tags = ["hoge1" , "hoge2"]
     notify_email_enabled = true
+    notify_email_html = true
     notify_slack_enabled = true
     notify_slack_webhook = "%s"
 }`, testAccSlackWebhook)
