@@ -12,6 +12,7 @@ resource "sakuracloud_simple_monitor" "mymonitor" {
         status = "200"
     }
     notify_email_enabled = true
+    notify_email_html = true
     notify_slack_enabled = true
     notify_slack_webhook = "https://hooks.slack.com/services/XXXXXXXXX/XXXXXXXXX/XXXXXXXXXXXXXXXXXXXXXXXX"
 }
@@ -26,6 +27,7 @@ resource "sakuracloud_simple_monitor" "mymonitor" {
 | `description`         | -   | 説明             | -       | 文字列 | - |
 | `tags`                | -   | タグ             | -       | リスト(文字列) | - |
 | `notify_email_enabled`| -   | Eメール通知有効    | `true`  | `true`<br />`false` | - |
+| `notify_email_html`   | -   | HTMLメール有効    | `false`  | `true`<br />`false` | - |
 | `notify_slack_enabled`| -   | Slack通知有効     | `false` | `true`<br />`false` | - |
 | `notify_slack_webhook`| -   | Slack WebhookURL | -       | 文字列 | - |
 | `enabled`             | -   | 有効              | `true` | `true`<br />`false` | - |
@@ -57,6 +59,7 @@ resource "sakuracloud_simple_monitor" "mymonitor" {
 | `description`          | 説明             | -                                          |
 | `tags`                 | タグ             | -                                          |
 | `notify_email_enabled` | Eメール通知有効    | -                                          |
+| `notify_email_html`    | HTMLメール有効    | -                                          |
 | `notify_slack_enabled` | Slack通知有効     | -                                          |
 | `notify_slack_webhook` | Slack WebhookURL| -                                          |
 | `enabled`              | 有効             | -                                          |
