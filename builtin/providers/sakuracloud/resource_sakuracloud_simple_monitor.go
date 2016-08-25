@@ -97,6 +97,11 @@ func resourceSakuraCloudSimpleMonitor() *schema.Resource {
 				Optional: true,
 				Default:  true,
 			},
+			"notify_email_html": &schema.Schema{
+				Type:     schema.TypeBool,
+				Optional: true,
+				Default:  false,
+			},
 			"notify_slack_enabled": &schema.Schema{
 				Type:     schema.TypeBool,
 				Optional: true,
@@ -204,7 +209,7 @@ func resourceSakuraCloudSimpleMonitorCreate(d *schema.ResourceData, meta interfa
 	}
 
 	if notifyEmail {
-		opts.EnableNotifyEmail()
+		opts.EnableNotifyEmail(d.Get("notify_email_html").(bool))
 	}
 	if notifySlack {
 		opts.EnableNofitySlack(d.Get("notify_slack_webhook").(string))
@@ -329,7 +334,7 @@ func resourceSakuraCloudSimpleMonitorUpdate(d *schema.ResourceData, meta interfa
 	}
 
 	if notifyEmail {
-		simpleMonitor.EnableNotifyEmail()
+		simpleMonitor.EnableNotifyEmail(d.Get("notify_email_html").(bool))
 	} else {
 		simpleMonitor.DisableNotifyEmail()
 	}
@@ -454,6 +459,8 @@ func setSimpleMonitorResourceData(d *schema.ResourceData, client *api.Client, da
 	d.Set("enabled", data.Settings.SimpleMonitor.Enabled)
 
 	d.Set("notify_email_enabled", data.Settings.SimpleMonitor.NotifyEmail.Enabled == "True")
+	d.Set("notify_email_html", data.Settings.SimpleMonitor.NotifyEmail.HTML == "True")
+
 	enableSlack := data.Settings.SimpleMonitor.NotifySlack.Enabled == "True"
 	d.Set("notify_slack_enabled", enableSlack)
 	if enableSlack {

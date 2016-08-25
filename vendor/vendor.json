@@ -485,14 +485,14 @@
 		{
 			"checksumSHA1": "BHo58FNxQE51ZrAtbXgFxXdvQNI=",
 			"path": "github.com/yamamoto-febc/libsacloud/api",
-			"revision": "00c5d368f9d52c997fee079c8c545308b39ade92",
-			"revisionTime": "2016-08-19T10:02:33Z"
+			"revision": "7c76d475fcc004136d4b6d4e1f5d02adc54f2455",
+			"revisionTime": "2016-08-25T02:17:52Z"
 		},
 		{
-			"checksumSHA1": "KuH7tRSm/a/59P1SsEHGuF3v5VA=",
+			"checksumSHA1": "DFuJ8mpcysOFn80UhzAe4tp1wEs=",
 			"path": "github.com/yamamoto-febc/libsacloud/sacloud",
-			"revision": "00c5d368f9d52c997fee079c8c545308b39ade92",
-			"revisionTime": "2016-08-19T10:02:33Z"
+			"revision": "7c76d475fcc004136d4b6d4e1f5d02adc54f2455",
+			"revisionTime": "2016-08-25T02:17:52Z"
 		}
 	],
 	"rootPath": "github.com/yamamoto-febc/terraform-provider-sakuracloud"

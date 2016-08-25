@@ -61,6 +61,7 @@ type SimpleMonitorHealthCheck struct {
 
 type SimpleMonitorNotify struct {
 	Enabled             string `json:",omitempty"`
+	HTML                string `json:",omitempty"`
 	IncomingWebhooksURL string `json:",omitempty"`
 }
 
@@ -96,10 +97,17 @@ func AllowSimpleMonitorHealthCheckProtocol() []string {
 	return []string{"http", "https", "ping", "tcp", "dns", "ssh", "smtp", "pop3", "snmp"}
 }
 
-func createSimpleMonitorNotifyEmail() *SimpleMonitorNotify {
-	return &SimpleMonitorNotify{
+func createSimpleMonitorNotifyEmail(withHTML bool) *SimpleMonitorNotify {
+	n := &SimpleMonitorNotify{
 		Enabled: "True",
+		HTML:    "False",
 	}
+
+	if withHTML {
+		n.HTML = "True"
+	}
+
+	return n
 }
 
 func createSimpleMonitorNotifySlack(incomingWebhooksURL string) *SimpleMonitorNotify {
@@ -186,8 +194,8 @@ func (s *SimpleMonitor) SetHealthCheckSNMP(community string, version string, oid
 	}
 }
 
-func (s *SimpleMonitor) EnableNotifyEmail() {
-	s.Settings.SimpleMonitor.NotifyEmail = createSimpleMonitorNotifyEmail()
+func (s *SimpleMonitor) EnableNotifyEmail(withHTML bool) {
+	s.Settings.SimpleMonitor.NotifyEmail = createSimpleMonitorNotifyEmail(withHTML)
 }
 
 func (s *SimpleMonitor) DisableNotifyEmail() {
