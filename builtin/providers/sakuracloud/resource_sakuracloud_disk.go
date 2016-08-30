@@ -84,11 +84,11 @@ func resourceSakuraCloudDisk() *schema.Resource {
 				Description:  "target SakuraCloud zone",
 				ValidateFunc: validateStringInWord([]string{"is1a", "is1b", "tk1a", "tk1v"}),
 			},
-			//"hostname": &schema.Schema{
-			//	Type:         schema.TypeString,
-			//	Optional:     true,
-			//	ValidateFunc: validateMaxLength(1, 64),
-			//},
+			"hostname": &schema.Schema{
+				Type:         schema.TypeString,
+				Optional:     true,
+				ValidateFunc: validateMaxLength(1, 64),
+			},
 			"password": &schema.Schema{
 				Type:         schema.TypeString,
 				Optional:     true,
@@ -156,9 +156,9 @@ func resourceSakuraCloudDiskCreate(d *schema.ResourceData, meta interface{}) err
 
 	//edit disk
 	diskEditCondig := client.Disk.NewCondig()
-	//if hostName, ok := d.GetOk("hostname"); ok {
-	//	diskEditCondig.SetHostName(hostName.(string))
-	//}
+	if hostName, ok := d.GetOk("hostname"); ok {
+		diskEditCondig.SetHostName(hostName.(string))
+	}
 	if password, ok := d.GetOk("password"); ok {
 		diskEditCondig.SetPassword(password.(string))
 	}
@@ -228,7 +228,7 @@ func resourceSakuraCloudDiskUpdate(d *schema.ResourceData, meta interface{}) err
 	isRunning := disk.Server != nil && disk.Server.Instance.IsUp()
 	isDiskConfigChanged := false
 
-	if d.HasChange("passowrd") || d.HasChange("ssh_key_ids") || d.HasChange("disable_pw_auth") || d.HasChange("note_ids") {
+	if d.HasChange("hostname") || d.HasChange("passowrd") || d.HasChange("ssh_key_ids") || d.HasChange("disable_pw_auth") || d.HasChange("note_ids") {
 		isDiskConfigChanged = true
 	}
 
@@ -246,13 +246,13 @@ func resourceSakuraCloudDiskUpdate(d *schema.ResourceData, meta interface{}) err
 
 	if isDiskConfigChanged {
 		diskEditCondig := client.Disk.NewCondig()
-		//if d.HasChange("hostname") {
-		//	if hostName, ok := d.GetOk("hostname"); ok {
-		//		diskEditCondig.SetHostName(hostName.(string))
-		//	} else {
-		//		diskEditCondig.SetHostName("")
-		//	}
-		//}
+		if d.HasChange("hostname") {
+			if hostName, ok := d.GetOk("hostname"); ok {
+				diskEditCondig.SetHostName(hostName.(string))
+			} else {
+				diskEditCondig.HostName = nil
+			}
+		}
 
 		if d.HasChange("password") {
 			if password, ok := d.GetOk("password"); ok {

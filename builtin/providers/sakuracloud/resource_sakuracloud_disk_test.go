@@ -115,6 +115,7 @@ resource "sakuracloud_disk" "foobar" {
     source_archive_id = "${data.sakuracloud_archive.ubuntu.id}"
     description = "Disk from TerraForm for SAKURA CLOUD"
     tags = ["hoge1" , "hoge2"]
+    hostname = "aaaa"
 }`
 
 var testAccCheckSakuraCloudDiskConfig_update = `
@@ -130,4 +131,5 @@ resource "sakuracloud_disk" "foobar" {
     description = "Disk from TerraForm for SAKURA CLOUD"
     tags = ["hoge1" , "hoge2"]
     disable_pw_auth = true
+    hostname = "aaaa"
 }`
