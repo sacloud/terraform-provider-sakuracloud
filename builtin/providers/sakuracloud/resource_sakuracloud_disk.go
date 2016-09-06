@@ -228,7 +228,7 @@ func resourceSakuraCloudDiskUpdate(d *schema.ResourceData, meta interface{}) err
 	isRunning := disk.Server != nil && disk.Server.Instance.IsUp()
 	isDiskConfigChanged := false
 
-	if d.HasChange("hostname") || d.HasChange("passowrd") || d.HasChange("ssh_key_ids") || d.HasChange("disable_pw_auth") || d.HasChange("note_ids") {
+	if d.HasChange("hostname") || d.HasChange("password") || d.HasChange("ssh_key_ids") || d.HasChange("disable_pw_auth") || d.HasChange("note_ids") {
 		isDiskConfigChanged = true
 	}
 
