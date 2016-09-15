@@ -58,7 +58,7 @@ func resourceSakuraCloudVPCRouter() *schema.Resource {
 				Type:     schema.TypeList,
 				Optional: true,
 				Elem:     &schema.Schema{Type: schema.TypeString},
-				MaxItems: 8,
+				MaxItems: 19,
 			},
 			"description": &schema.Schema{
 				Type:     schema.TypeString,
