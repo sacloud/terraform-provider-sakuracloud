@@ -23,7 +23,7 @@ resource "sakuracloud_disk" "disk01"{
 |パラメーター         |必須  |名称                |初期値     |設定値                    |補足                                          |
 |-------------------|:---:|--------------------|:--------:|------------------------|----------------------------------------------|
 | `name`            | ◯   | ディスク名           | -        | 文字列                  | - |
-| `plan`            | -   | ディスクプラン        | `4`(SSD) | `2`(HDD)<br />`4`(SSD) | - |
+| `plan`            | -   | ディスクプラン        | `ssd` | `ssd`<br />`hdd` | - |
 | `connection`      | -   | ディスク接続          | `virtio` | `virtio`<br />`ide`    | - |
 | `size`            | -   | ディスクサイズ(GB単位) | 20       | 数値                    | - |
 |`source_archive_id`| -   | コピー元アーカイブID   | -        | 文字列                | [注1](#注1) |
@@ -39,8 +39,13 @@ resource "sakuracloud_disk" "disk01"{
 
 #### 互換性
 
-`source_archive_name`/`source_disk_name`パラメータはv0.3.6にて廃止されました。
+- `source_archive_name`/`source_disk_name`パラメータはv0.3.6にて廃止されました。
 v0.3.6以降では[DataResource](data_resource.md)を利用してください。
+
+- `plan`パラメータはv0.5.0にて変更されました。
+    - 旧:数値(`2`(HDD) or `4`(SSD))を指定
+    - 新:文字列(`hdd` or `ssd`)を指定
+
 
 #### 注1
 
