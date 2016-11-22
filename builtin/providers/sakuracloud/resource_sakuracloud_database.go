@@ -26,6 +26,7 @@ func resourceSakuraCloudDatabase() *schema.Resource {
 			"database_type": &schema.Schema{
 				Type:         schema.TypeString,
 				Optional:     true,
+				ForceNew:     true,
 				ValidateFunc: validateStringInWord([]string{"postgresql", "mariadb"}),
 				Default:      "postgresql",
 			},
@@ -332,6 +333,15 @@ func resourceSakuraCloudDatabaseDelete(d *schema.ResourceData, meta interface{})
 }
 
 func setDatabaseResourceData(d *schema.ResourceData, client *api.Client, data *sacloud.Database) error {
+
+	switch data.Remark.DBConf.Common.DatabaseName {
+	case "postgres":
+		d.Set("database_type", "postgresql")
+		break
+	case "MariaDB":
+		d.Set("database_type", "mariadb")
+		break
+	}
 
 	d.Set("name", data.Name)
 	d.Set("admin_password", data.Settings.DBConf.Common.AdminPassword)

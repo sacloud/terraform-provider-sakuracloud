@@ -6,6 +6,7 @@
 # データベースの定義
 resource "sakuracloud_database" "foobar" {
 
+    database_type = "postgresql"
     admin_password = "DatabasePasswordAdmin397"
     user_name = "defuser"
     user_password = "DatabasePasswordUser397"
@@ -41,6 +42,7 @@ resource "sakuracloud_database" "foobar" {
 |パラメーター       |必須  |名称           |初期値     |設定値                         |補足                                          |
 |-----------------|:---:|----------------|:--------:|-------------------------------|----------------------------------------------|
 | `name`          | ◯   | データベース名   | -        | 文字列                         | - |
+| `database_type` | -   | データベースタイプ| `postgresql`| `postgresql`<br />`mariadb`  | - |
 | `admin_password`| ◯   | 管理者パスワード  | -        | 文字列                         | - |
 | `user_name`     | ◯   | ユーザー名       | -        | 文字列                         | - |
 | `user_password` | ◯   | パスワード       | -        | 文字列                         | - |
@@ -63,6 +65,7 @@ resource "sakuracloud_database" "foobar" {
 |---------------|------------------|----------------------|
 | `id`            | データベースID | -                    |
 | `name`          | データベース名 | -                    |
+| `database_type`  | データベースタイプ | -                    |
 | `admin_password`| 管理者パスワード | -                    |
 | `user_name`     | ユーザー名       | -                    |
 | `user_password` | パスワード       | -                    |
