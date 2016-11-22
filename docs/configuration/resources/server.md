@@ -20,12 +20,23 @@ resource "sakuracloud_server" "myserver" {
 | `disks`  | ◯   | ディスクID          | -   | リスト(文字列) | サーバーに接続するディスクのID |
 | `core`   | -   | CPUコア数           | 1   | 数値 | 指定可能な値は[こちら](http://cloud.sakura.ad.jp/specification/server-disk/)のプラン一覧を参照ください |
 | `memory` | -   | メモリ(GB単位)       | 1  | 数値 | 指定可能な値は[こちら](http://cloud.sakura.ad.jp/specification/server-disk/)のプラン一覧を参照ください |
-| `base_interface` | - | 基本NIC | `shared` | `shared`(共有セグメント)<br />`switch_id`(スイッチ)<br />`""`(接続なし)|eth0の上流NWとの接続方法を指定する。 |
+| `base_interface` | - | 基本NIC | `shared` | `shared`(共有セグメント)<br />`[switch_id]`(スイッチのID)<br />`""`(接続なし)|eth0の上流NWとの接続方法を指定する。 |
 | `additional_interfaces` | - | 追加NIC | - | リスト(文字列) | 追加で割り当てるNIC。接続するスイッチのID、または空文字を指定する。 |
 | `packet_filter_ids`| - | パケットフィルタID | - | リスト(文字列) | NICに適用するパケットフィルタのIDをリストで指定する。リストの先頭からeth0,eth1の順で適用される |
 | `description` | - | 説明 | - | 文字列 | - |
+| `cdrom_id` | - | CDROM(ISOイメージ)ID | - | 文字列 | - |
+| `base_nw_ipaddress`| - | 基本NIC-IPアドレス | - | 文字列 | [注1](#注1) |
+| `base_nw_gateway`  | - | 基本NIC-ゲートウェイ | - | 文字列 | [注1](#注1) |
+| `base_nw_mask_len` | - | 基本NIC-サブネットマスク長 | - | 文字列 | [注1](#注1) |
+| `description` | - | 説明 | - | 文字列 | - |
 | `tags` | - | タグ | - | リスト(文字列) | サーバーに付与するタグ。@で始まる特殊タグについては[こちら](http://cloud-news.sakura.ad.jp/special-tags/)を参照 |
 | `zone` | - | ゾーン | - | `is1b`<br />`tk1a`<br />`tk1v` | - |
+
+#### 注1
+
+`base_interface`にスイッチのIDが指定されており、かつ`disks`の最初のパラメーターに
+ディスクの修正に対応しているディスクのIDが指定されている場合に有効。
+ディスクの修正は主にLinux系パブリックアーカイブを元にしたディスクの場合にサポートされています。
 
 ### 属性
 
