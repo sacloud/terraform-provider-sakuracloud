@@ -24,7 +24,7 @@ type GraphNodeDynamicExpandable interface {
 // GraphNodeSubgraph is an interface a node can implement if it has
 // a larger subgraph that should be walked.
 type GraphNodeSubgraph interface {
-	Subgraph() dag.Grapher
+	Subgraph() *Graph
 }
 
 // ExpandTransform is a transformer that does a subgraph expansion
@@ -56,7 +56,7 @@ func (n *GraphNodeBasicSubgraph) Name() string {
 	return n.NameValue
 }
 
-func (n *GraphNodeBasicSubgraph) Subgraph() dag.Grapher {
+func (n *GraphNodeBasicSubgraph) Subgraph() *Graph {
 	return n.Graph
 }
 
