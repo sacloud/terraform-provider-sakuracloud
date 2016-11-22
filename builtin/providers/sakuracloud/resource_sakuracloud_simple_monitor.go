@@ -5,8 +5,8 @@ import (
 
 	"github.com/hashicorp/terraform/helper/hashcode"
 	"github.com/hashicorp/terraform/helper/schema"
-	"github.com/yamamoto-febc/libsacloud/api"
-	"github.com/yamamoto-febc/libsacloud/sacloud"
+	"github.com/sacloud/libsacloud/api"
+	"github.com/sacloud/libsacloud/sacloud"
 	"strconv"
 )
 
@@ -220,14 +220,14 @@ func resourceSakuraCloudSimpleMonitorCreate(d *schema.ResourceData, meta interfa
 		return fmt.Errorf("Failed to create SakuraCloud SimpleMonitor resource: %s", err)
 	}
 
-	d.SetId(simpleMonitor.ID)
+	d.SetId(simpleMonitor.GetStrID())
 	return resourceSakuraCloudSimpleMonitorRead(d, meta)
 }
 
 func resourceSakuraCloudSimpleMonitorRead(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*api.Client)
 
-	simpleMonitor, err := client.SimpleMonitor.Read(d.Id())
+	simpleMonitor, err := client.SimpleMonitor.Read(toSakuraCloudID(d.Id()))
 	if err != nil {
 		return fmt.Errorf("Couldn't find SakuraCloud SimpleMonitor resource: %s", err)
 	}
@@ -238,7 +238,7 @@ func resourceSakuraCloudSimpleMonitorRead(d *schema.ResourceData, meta interface
 func resourceSakuraCloudSimpleMonitorUpdate(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*api.Client)
 
-	simpleMonitor, err := client.SimpleMonitor.Read(d.Id())
+	simpleMonitor, err := client.SimpleMonitor.Read(toSakuraCloudID(d.Id()))
 	if err != nil {
 		return fmt.Errorf("Couldn't find SakuraCloud SimpleMonitor resource: %s", err)
 	}
@@ -349,7 +349,7 @@ func resourceSakuraCloudSimpleMonitorUpdate(d *schema.ResourceData, meta interfa
 		return fmt.Errorf("Failed to create SakuraCloud SimpleMonitor resource: %s", err)
 	}
 
-	d.SetId(simpleMonitor.ID)
+	d.SetId(simpleMonitor.GetStrID())
 	return resourceSakuraCloudSimpleMonitorRead(d, meta)
 
 }
@@ -357,7 +357,7 @@ func resourceSakuraCloudSimpleMonitorUpdate(d *schema.ResourceData, meta interfa
 func resourceSakuraCloudSimpleMonitorDelete(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*api.Client)
 
-	_, err := client.SimpleMonitor.Delete(d.Id())
+	_, err := client.SimpleMonitor.Delete(toSakuraCloudID(d.Id()))
 
 	if err != nil {
 		return fmt.Errorf("Error deleting SakuraCloud SimpleMonitor resource: %s", err)
@@ -469,6 +469,6 @@ func setSimpleMonitorResourceData(d *schema.ResourceData, client *api.Client, da
 		d.Set("nofity_slack_webhook", "")
 	}
 
-	d.SetId(data.ID)
+	d.SetId(data.GetStrID())
 	return nil
 }

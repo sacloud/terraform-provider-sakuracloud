@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"github.com/hashicorp/terraform/helper/resource"
 	"github.com/hashicorp/terraform/terraform"
-	"github.com/yamamoto-febc/libsacloud/api"
-	"github.com/yamamoto-febc/libsacloud/sacloud"
+	"github.com/sacloud/libsacloud/api"
+	"github.com/sacloud/libsacloud/sacloud"
 	"testing"
 )
 
@@ -55,13 +55,13 @@ func testAccCheckSakuraCloudDiskExists(n string, disk *sacloud.Disk) resource.Te
 		}
 
 		client := testAccProvider.Meta().(*api.Client)
-		foundDisk, err := client.Disk.Read(rs.Primary.ID)
+		foundDisk, err := client.Disk.Read(toSakuraCloudID(rs.Primary.ID))
 
 		if err != nil {
 			return err
 		}
 
-		if foundDisk.ID != rs.Primary.ID {
+		if foundDisk.ID != toSakuraCloudID(rs.Primary.ID) {
 			return fmt.Errorf("Disk not found")
 		}
 
@@ -78,7 +78,7 @@ func testAccCheckSakuraCloudDiskAttributes(disk *sacloud.Disk) resource.TestChec
 			return fmt.Errorf("Bad disk connection: %v", disk.Connection)
 		}
 
-		if disk.Plan.ID.String() != sacloud.DiskPlanSSD.ID.String() {
+		if disk.Plan.ID != sacloud.DiskPlanSSD.ID {
 			return fmt.Errorf("Bad disk plan: %v", disk.Plan)
 		}
 		return nil
@@ -93,7 +93,7 @@ func testAccCheckSakuraCloudDiskDestroy(s *terraform.State) error {
 			continue
 		}
 
-		_, err := client.Disk.Read(rs.Primary.ID)
+		_, err := client.Disk.Read(toSakuraCloudID(rs.Primary.ID))
 
 		if err == nil {
 			return fmt.Errorf("Disk still exists")

@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"github.com/hashicorp/terraform/helper/resource"
 	"github.com/hashicorp/terraform/terraform"
-	"github.com/yamamoto-febc/libsacloud/api"
-	"github.com/yamamoto-febc/libsacloud/sacloud"
+	"github.com/sacloud/libsacloud/api"
+	"github.com/sacloud/libsacloud/sacloud"
 	"testing"
 )
 
@@ -150,13 +150,13 @@ func testAccCheckSakuraCloudDatabaseExists(n string, database *sacloud.Database)
 		client.Zone = "tk1a"
 		defer func() { client.Zone = originalZone }()
 
-		foundDatabase, err := client.Database.Read(rs.Primary.ID)
+		foundDatabase, err := client.Database.Read(toSakuraCloudID(rs.Primary.ID))
 
 		if err != nil {
 			return err
 		}
 
-		if foundDatabase.ID != rs.Primary.ID {
+		if foundDatabase.ID != toSakuraCloudID(rs.Primary.ID) {
 			return fmt.Errorf("Database not found")
 		}
 
@@ -177,7 +177,7 @@ func testAccCheckSakuraCloudDatabaseDestroy(s *terraform.State) error {
 			continue
 		}
 
-		_, err := client.Database.Read(rs.Primary.ID)
+		_, err := client.Database.Read(toSakuraCloudID(rs.Primary.ID))
 
 		if err == nil {
 			return fmt.Errorf("Database still exists")

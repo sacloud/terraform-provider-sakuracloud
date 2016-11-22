@@ -6,8 +6,8 @@ import (
 	"bytes"
 	"github.com/hashicorp/terraform/helper/hashcode"
 	"github.com/hashicorp/terraform/helper/schema"
-	"github.com/yamamoto-febc/libsacloud/api"
-	"github.com/yamamoto-febc/libsacloud/sacloud"
+	"github.com/sacloud/libsacloud/api"
+	"github.com/sacloud/libsacloud/sacloud"
 )
 
 func resourceSakuraCloudVPCRouterDHCPServer() *schema.Resource {
@@ -17,9 +17,10 @@ func resourceSakuraCloudVPCRouterDHCPServer() *schema.Resource {
 		Delete: resourceSakuraCloudVPCRouterDHCPServerDelete,
 		Schema: map[string]*schema.Schema{
 			"vpc_router_id": &schema.Schema{
-				Type:     schema.TypeString,
-				Required: true,
-				ForceNew: true,
+				Type:         schema.TypeString,
+				Required:     true,
+				ForceNew:     true,
+				ValidateFunc: validateSakuracloudIDType,
 			},
 			"vpc_router_interface_index": &schema.Schema{
 				Type:     schema.TypeInt,
@@ -59,7 +60,7 @@ func resourceSakuraCloudVPCRouterDHCPServerCreate(d *schema.ResourceData, meta i
 	sakuraMutexKV.Lock(routerID)
 	defer sakuraMutexKV.Unlock(routerID)
 
-	vpcRouter, err := client.VPCRouter.Read(routerID)
+	vpcRouter, err := client.VPCRouter.Read(toSakuraCloudID(routerID))
 	if err != nil {
 		return fmt.Errorf("Couldn't find SakuraCloud VPCRouter resource: %s", err)
 	}
@@ -70,11 +71,11 @@ func resourceSakuraCloudVPCRouterDHCPServerCreate(d *schema.ResourceData, meta i
 	}
 
 	vpcRouter.Settings.Router.AddDHCPServer(d.Get("vpc_router_interface_index").(int), dhcpServer.RangeStart, dhcpServer.RangeStop)
-	vpcRouter, err = client.VPCRouter.UpdateSetting(routerID, vpcRouter)
+	vpcRouter, err = client.VPCRouter.UpdateSetting(toSakuraCloudID(routerID), vpcRouter)
 	if err != nil {
 		return fmt.Errorf("Failed to enable SakuraCloud VPCRouterDHCPServer resource: %s", err)
 	}
-	_, err = client.VPCRouter.Config(routerID)
+	_, err = client.VPCRouter.Config(toSakuraCloudID(routerID))
 	if err != nil {
 		return fmt.Errorf("Couldn'd apply SakuraCloud VPCRouter config: %s", err)
 	}
@@ -91,7 +92,7 @@ func resourceSakuraCloudVPCRouterDHCPServerRead(d *schema.ResourceData, meta int
 	}
 
 	routerID := d.Get("vpc_router_id").(string)
-	vpcRouter, err := client.VPCRouter.Read(routerID)
+	vpcRouter, err := client.VPCRouter.Read(toSakuraCloudID(routerID))
 	if err != nil {
 		return fmt.Errorf("Couldn't find SakuraCloud VPCRouter resource: %s", err)
 	}
@@ -120,7 +121,7 @@ func resourceSakuraCloudVPCRouterDHCPServerDelete(d *schema.ResourceData, meta i
 	sakuraMutexKV.Lock(routerID)
 	defer sakuraMutexKV.Unlock(routerID)
 
-	vpcRouter, err := client.VPCRouter.Read(routerID)
+	vpcRouter, err := client.VPCRouter.Read(toSakuraCloudID(routerID))
 	if err != nil {
 		return fmt.Errorf("Couldn't find SakuraCloud VPCRouter resource: %s", err)
 	}
@@ -130,12 +131,12 @@ func resourceSakuraCloudVPCRouterDHCPServerDelete(d *schema.ResourceData, meta i
 		dhcpServer := expandVPCRouterDHCPServer(d)
 		vpcRouter.Settings.Router.RemoveDHCPServer(d.Get("vpc_router_interface_index").(int), dhcpServer.RangeStart, dhcpServer.RangeStop)
 
-		vpcRouter, err = client.VPCRouter.UpdateSetting(routerID, vpcRouter)
+		vpcRouter, err = client.VPCRouter.UpdateSetting(toSakuraCloudID(routerID), vpcRouter)
 		if err != nil {
 			return fmt.Errorf("Failed to delete SakuraCloud VPCRouterDHCPServer resource: %s", err)
 		}
 
-		_, err = client.VPCRouter.Config(routerID)
+		_, err = client.VPCRouter.Config(toSakuraCloudID(routerID))
 		if err != nil {
 			return fmt.Errorf("Couldn'd apply SakuraCloud VPCRouter config: %s", err)
 		}

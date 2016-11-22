@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"github.com/hashicorp/terraform/helper/resource"
 	"github.com/hashicorp/terraform/terraform"
-	"github.com/yamamoto-febc/libsacloud/api"
-	"github.com/yamamoto-febc/libsacloud/sacloud"
+	"github.com/sacloud/libsacloud/api"
+	"github.com/sacloud/libsacloud/sacloud"
 	"testing"
 )
 
@@ -88,13 +88,13 @@ func testAccCheckSakuraCloudLoadBalancerExists(n string, loadBalancer *sacloud.L
 
 		client := testAccProvider.Meta().(*api.Client)
 
-		foundLoadBalancer, err := client.LoadBalancer.Read(rs.Primary.ID)
+		foundLoadBalancer, err := client.LoadBalancer.Read(toSakuraCloudID(rs.Primary.ID))
 
 		if err != nil {
 			return err
 		}
 
-		if foundLoadBalancer.ID != rs.Primary.ID {
+		if foundLoadBalancer.ID != toSakuraCloudID(rs.Primary.ID) {
 			return fmt.Errorf("LoadBalancer not found")
 		}
 
@@ -112,7 +112,7 @@ func testAccCheckSakuraCloudLoadBalancerDestroy(s *terraform.State) error {
 			continue
 		}
 
-		_, err := client.LoadBalancer.Read(rs.Primary.ID)
+		_, err := client.LoadBalancer.Read(toSakuraCloudID(rs.Primary.ID))
 
 		if err == nil {
 			return fmt.Errorf("LoadBalancer still exists")

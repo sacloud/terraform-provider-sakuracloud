@@ -3,8 +3,8 @@ package sakuracloud
 import (
 	"fmt"
 	"github.com/hashicorp/terraform/helper/schema"
-	"github.com/yamamoto-febc/libsacloud/api"
-	"github.com/yamamoto-febc/libsacloud/sacloud"
+	"github.com/sacloud/libsacloud/api"
+	"github.com/sacloud/libsacloud/sacloud"
 	"time"
 )
 
@@ -60,13 +60,16 @@ func resourceSakuraCloudInternet() *schema.Resource {
 				ValidateFunc: validateStringInWord([]string{"is1a", "is1b", "tk1a", "tk1v"}),
 			},
 			"switch_id": &schema.Schema{
-				Type:     schema.TypeString,
-				Computed: true,
+				Type:         schema.TypeString,
+				Computed:     true,
+				ValidateFunc: validateSakuracloudIDType,
 			},
 			"server_ids": &schema.Schema{
 				Type:     schema.TypeList,
 				Computed: true,
 				Elem:     &schema.Schema{Type: schema.TypeString},
+				// ! Current terraform(v0.7) is not support to array validation !
+				// ValidateFunc: validateSakuracloudIDArrayType,
 			},
 			"nw_address": &schema.Schema{
 				Type:     schema.TypeString,
@@ -128,7 +131,7 @@ func resourceSakuraCloudInternetCreate(d *schema.ResourceData, meta interface{})
 		return fmt.Errorf("Failed to create SakuraCloud Internet resource: %s", err)
 	}
 
-	d.SetId(internet.ID)
+	d.SetId(internet.GetStrID())
 	return resourceSakuraCloudInternetRead(d, meta)
 }
 
@@ -140,7 +143,7 @@ func resourceSakuraCloudInternetRead(d *schema.ResourceData, meta interface{}) e
 		client.Zone = zone.(string)
 	}
 
-	internet, err := client.Internet.Read(d.Id())
+	internet, err := client.Internet.Read(toSakuraCloudID(d.Id()))
 	if err != nil {
 		return fmt.Errorf("Couldn't find SakuraCloud Internet resource: %s", err)
 	}
@@ -156,7 +159,7 @@ func resourceSakuraCloudInternetUpdate(d *schema.ResourceData, meta interface{})
 		client.Zone = zone.(string)
 	}
 
-	internet, err := client.Internet.Read(d.Id())
+	internet, err := client.Internet.Read(toSakuraCloudID(d.Id()))
 	if err != nil {
 		return fmt.Errorf("Couldn't find SakuraCloud Internet resource: %s", err)
 	}
@@ -190,7 +193,7 @@ func resourceSakuraCloudInternetUpdate(d *schema.ResourceData, meta interface{})
 		}
 	}
 
-	d.SetId(internet.ID)
+	d.SetId(internet.GetStrID())
 	return resourceSakuraCloudInternetRead(d, meta)
 }
 
@@ -202,7 +205,7 @@ func resourceSakuraCloudInternetDelete(d *schema.ResourceData, meta interface{})
 		client.Zone = zone.(string)
 	}
 
-	internet, err := client.Internet.Read(d.Id())
+	internet, err := client.Internet.Read(toSakuraCloudID(d.Id()))
 	if err != nil {
 		return fmt.Errorf("Couldn't find SakuraCloud Internet resource: %s", err)
 	}
@@ -212,7 +215,7 @@ func resourceSakuraCloudInternetDelete(d *schema.ResourceData, meta interface{})
 		return fmt.Errorf("Couldn't find SakuraCloud Servers: %s", err)
 	}
 
-	isRunning := []string{}
+	isRunning := []int64{}
 	for _, s := range servers {
 		if s.Instance.IsUp() {
 			isRunning = append(isRunning, s.ID)
@@ -239,7 +242,7 @@ func resourceSakuraCloudInternetDelete(d *schema.ResourceData, meta interface{})
 		}
 	}
 
-	_, err = client.Internet.Delete(d.Id())
+	_, err = client.Internet.Delete(toSakuraCloudID(d.Id()))
 	if err != nil {
 		return fmt.Errorf("Error deleting SakuraCloud Internet resource: %s", err)
 	}
@@ -273,7 +276,7 @@ func setInternetResourceData(d *schema.ResourceData, client *api.Client, data *s
 		return fmt.Errorf("Couldn't find SakuraCloud Switch resource: %s", err)
 	}
 
-	d.Set("switch_id", sw.ID)
+	d.Set("switch_id", sw.GetStrID())
 	d.Set("nw_address", sw.Subnets[0].NetworkAddress)
 	d.Set("nw_gateway", sw.Subnets[0].DefaultRoute)
 	d.Set("nw_min_ipaddress", sw.Subnets[0].IPAddresses.Min)
@@ -296,6 +299,6 @@ func setInternetResourceData(d *schema.ResourceData, client *api.Client, data *s
 	}
 
 	d.Set("zone", client.Zone)
-	d.SetId(data.ID)
+	d.SetId(data.GetStrID())
 	return nil
 }

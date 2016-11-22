@@ -6,8 +6,8 @@ import (
 	"bytes"
 	"github.com/hashicorp/terraform/helper/hashcode"
 	"github.com/hashicorp/terraform/helper/schema"
-	"github.com/yamamoto-febc/libsacloud/api"
-	"github.com/yamamoto-febc/libsacloud/sacloud"
+	"github.com/sacloud/libsacloud/api"
+	"github.com/sacloud/libsacloud/sacloud"
 	"strings"
 )
 
@@ -19,9 +19,10 @@ func resourceSakuraCloudDNSRecord() *schema.Resource {
 
 		Schema: map[string]*schema.Schema{
 			"dns_id": &schema.Schema{
-				Type:     schema.TypeString,
-				Required: true,
-				ForceNew: true,
+				Type:         schema.TypeString,
+				Required:     true,
+				ForceNew:     true,
+				ValidateFunc: validateSakuracloudIDType,
 			},
 			"name": &schema.Schema{
 				Type:     schema.TypeString,
@@ -77,7 +78,7 @@ func resourceSakuraCloudDNSRecordCreate(d *schema.ResourceData, meta interface{}
 	sakuraMutexKV.Lock(dnsID)
 	defer sakuraMutexKV.Unlock(dnsID)
 
-	dns, err := client.DNS.Read(dnsID)
+	dns, err := client.DNS.Read(toSakuraCloudID(dnsID))
 	if err != nil {
 		return fmt.Errorf("Couldn't find SakuraCloud DNS resource: %s", err)
 	}
@@ -89,7 +90,7 @@ func resourceSakuraCloudDNSRecordCreate(d *schema.ResourceData, meta interface{}
 	}
 
 	dns.AddRecord(record)
-	dns, err = client.DNS.Update(dnsID, dns)
+	dns, err = client.DNS.Update(toSakuraCloudID(dnsID), dns)
 	if err != nil {
 		return fmt.Errorf("Failed to create SakuraCloud DNSRecord resource: %s", err)
 	}
@@ -101,7 +102,7 @@ func resourceSakuraCloudDNSRecordCreate(d *schema.ResourceData, meta interface{}
 func resourceSakuraCloudDNSRecordRead(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*api.Client)
 
-	dns, err := client.DNS.Read(d.Get("dns_id").(string))
+	dns, err := client.DNS.Read(toSakuraCloudID(d.Get("dns_id").(string)))
 	if err != nil {
 		return fmt.Errorf("Couldn't find SakuraCloud DNS resource: %s", err)
 	}
@@ -140,7 +141,7 @@ func resourceSakuraCloudDNSRecordDelete(d *schema.ResourceData, meta interface{}
 	sakuraMutexKV.Lock(dnsID)
 	defer sakuraMutexKV.Unlock(dnsID)
 
-	dns, err := client.DNS.Read(dnsID)
+	dns, err := client.DNS.Read(toSakuraCloudID(dnsID))
 	if err != nil {
 		return fmt.Errorf("Couldn't find SakuraCloud DNS resource: %s", err)
 	}
@@ -155,7 +156,7 @@ func resourceSakuraCloudDNSRecordDelete(d *schema.ResourceData, meta interface{}
 		}
 	}
 
-	dns, err = client.DNS.Update(dnsID, dns)
+	dns, err = client.DNS.Update(toSakuraCloudID(dnsID), dns)
 	if err != nil {
 		return fmt.Errorf("Failed to delete SakuraCloud DNSRecord resource: %s", err)
 	}

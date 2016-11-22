@@ -95,17 +95,38 @@ func smcUserVariables(c *config.Config, vs map[string]interface{}) []error {
 	}
 
 	// Check that types match up
-	for k, _ := range vs {
-		v, ok := cvs[k]
+	for name, proposedValue := range vs {
+		schema, ok := cvs[name]
 		if !ok {
 			continue
 		}
 
-		if v.Type() != config.VariableTypeString {
-			errs = append(errs, fmt.Errorf(
-				"%s: cannot assign string value to map type",
-				k))
+		declaredType := schema.Type()
+
+		switch declaredType {
+		case config.VariableTypeString:
+			switch proposedValue.(type) {
+			case string:
+				continue
+			}
+		case config.VariableTypeMap:
+			switch v := proposedValue.(type) {
+			case map[string]interface{}:
+				continue
+			case []map[string]interface{}:
+				// if we have a list of 1 map, it will get coerced later as needed
+				if len(v) == 1 {
+					continue
+				}
+			}
+		case config.VariableTypeList:
+			switch proposedValue.(type) {
+			case []interface{}:
+				continue
+			}
 		}
+		errs = append(errs, fmt.Errorf("variable %s should be type %s, got %s",
+			name, declaredType.Printable(), hclTypeName(proposedValue)))
 	}
 
 	// TODO(mitchellh): variables that are unknown

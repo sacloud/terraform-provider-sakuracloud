@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"github.com/hashicorp/terraform/helper/resource"
 	"github.com/hashicorp/terraform/terraform"
-	"github.com/yamamoto-febc/libsacloud/api"
+	"github.com/sacloud/libsacloud/api"
 	"testing"
 )
 
@@ -27,7 +27,7 @@ func TestAccSakuraCloudDiskDataSource_Basic(t *testing.T) {
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckSakuraCloudDiskDataSourceID("data.sakuracloud_disk.foobar"),
 					resource.TestCheckResourceAttr("data.sakuracloud_disk.foobar", "name", "hoge_Ubuntu_fuga"),
-					resource.TestCheckResourceAttr("data.sakuracloud_disk.foobar", "plan", "4"),
+					resource.TestCheckResourceAttr("data.sakuracloud_disk.foobar", "plan", "ssd"),
 					resource.TestCheckResourceAttr("data.sakuracloud_disk.foobar", "connection", "virtio"),
 					resource.TestCheckResourceAttr("data.sakuracloud_disk.foobar", "size", "20"),
 					resource.TestCheckResourceAttr("data.sakuracloud_disk.foobar", "description", "source_disk_description"),
@@ -98,7 +98,7 @@ func testAccCheckSakuraCloudDiskDataSourceDestroy(s *terraform.State) error {
 			continue
 		}
 
-		_, err := client.Disk.Read(rs.Primary.ID)
+		_, err := client.Disk.Read(toSakuraCloudID(rs.Primary.ID))
 
 		if err == nil {
 			return fmt.Errorf("Disk still exists")

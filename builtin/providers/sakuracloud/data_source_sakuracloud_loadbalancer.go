@@ -3,7 +3,7 @@ package sakuracloud
 import (
 	"fmt"
 	"github.com/hashicorp/terraform/helper/schema"
-	"github.com/yamamoto-febc/libsacloud/api"
+	"github.com/sacloud/libsacloud/api"
 )
 
 func dataSourceSakuraCloudLoadBalancer() *schema.Resource {

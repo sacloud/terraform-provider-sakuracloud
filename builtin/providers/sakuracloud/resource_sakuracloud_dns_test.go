@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"github.com/hashicorp/terraform/helper/resource"
 	"github.com/hashicorp/terraform/terraform"
-	"github.com/yamamoto-febc/libsacloud/api"
-	"github.com/yamamoto-febc/libsacloud/sacloud"
+	"github.com/sacloud/libsacloud/api"
+	"github.com/sacloud/libsacloud/sacloud"
 	"testing"
 )
 
@@ -54,13 +54,13 @@ func testAccCheckSakuraCloudDNSExists(n string, dns *sacloud.DNS) resource.TestC
 
 		client := testAccProvider.Meta().(*api.Client)
 
-		foundDNS, err := client.DNS.Read(rs.Primary.ID)
+		foundDNS, err := client.DNS.Read(toSakuraCloudID(rs.Primary.ID))
 
 		if err != nil {
 			return err
 		}
 
-		if foundDNS.ID != rs.Primary.ID {
+		if foundDNS.ID != toSakuraCloudID(rs.Primary.ID) {
 			return fmt.Errorf("Record not found")
 		}
 
@@ -78,7 +78,7 @@ func testAccCheckSakuraCloudDNSDestroy(s *terraform.State) error {
 			continue
 		}
 
-		_, err := client.DNS.Read(rs.Primary.ID)
+		_, err := client.DNS.Read(toSakuraCloudID(rs.Primary.ID))
 
 		if err == nil {
 			return fmt.Errorf("DNS still exists")

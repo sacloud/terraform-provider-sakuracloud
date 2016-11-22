@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"github.com/hashicorp/terraform/helper/resource"
 	"github.com/hashicorp/terraform/terraform"
-	"github.com/yamamoto-febc/libsacloud/api"
+	"github.com/sacloud/libsacloud/api"
 	"testing"
 )
 
@@ -99,7 +99,7 @@ func testAccCheckSakuraCloudServerDataSourceDestroy(s *terraform.State) error {
 			continue
 		}
 
-		_, err := client.Server.Read(rs.Primary.ID)
+		_, err := client.Server.Read(toSakuraCloudID(rs.Primary.ID))
 
 		if err == nil {
 			return fmt.Errorf("Server still exists")

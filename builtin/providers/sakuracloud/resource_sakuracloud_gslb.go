@@ -5,8 +5,8 @@ import (
 
 	"github.com/hashicorp/terraform/helper/hashcode"
 	"github.com/hashicorp/terraform/helper/schema"
-	"github.com/yamamoto-febc/libsacloud/api"
-	"github.com/yamamoto-febc/libsacloud/sacloud"
+	"github.com/sacloud/libsacloud/api"
+	"github.com/sacloud/libsacloud/sacloud"
 )
 
 func resourceSakuraCloudGSLB() *schema.Resource {
@@ -140,14 +140,14 @@ func resourceSakuraCloudGSLBCreate(d *schema.ResourceData, meta interface{}) err
 		return fmt.Errorf("Failed to create SakuraCloud GSLB resource: %s", err)
 	}
 
-	d.SetId(gslb.ID)
+	d.SetId(gslb.GetStrID())
 	return resourceSakuraCloudGSLBRead(d, meta)
 }
 
 func resourceSakuraCloudGSLBRead(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*api.Client)
 
-	gslb, err := client.GSLB.Read(d.Id())
+	gslb, err := client.GSLB.Read(toSakuraCloudID(d.Id()))
 	if err != nil {
 		return fmt.Errorf("Couldn't find SakuraCloud GSLB resource: %s", err)
 	}
@@ -159,7 +159,7 @@ func resourceSakuraCloudGSLBUpdate(d *schema.ResourceData, meta interface{}) err
 
 	client := meta.(*api.Client)
 
-	gslb, err := client.GSLB.Read(d.Id())
+	gslb, err := client.GSLB.Read(toSakuraCloudID(d.Id()))
 	if err != nil {
 		return fmt.Errorf("Couldn't find SakuraCloud GSLB resource: %s", err)
 	}
@@ -224,7 +224,7 @@ func resourceSakuraCloudGSLBUpdate(d *schema.ResourceData, meta interface{}) err
 		return fmt.Errorf("Failed to create SakuraCloud GSLB resource: %s", err)
 	}
 
-	d.SetId(gslb.ID)
+	d.SetId(gslb.GetStrID())
 	return resourceSakuraCloudGSLBRead(d, meta)
 
 }
@@ -232,7 +232,7 @@ func resourceSakuraCloudGSLBUpdate(d *schema.ResourceData, meta interface{}) err
 func resourceSakuraCloudGSLBDelete(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*api.Client)
 
-	_, err := client.GSLB.Delete(d.Id())
+	_, err := client.GSLB.Delete(toSakuraCloudID(d.Id()))
 
 	if err != nil {
 		return fmt.Errorf("Error deleting SakuraCloud GSLB resource: %s", err)
@@ -289,6 +289,6 @@ func setGSLBResourceData(d *schema.ResourceData, client *api.Client, data *saclo
 	d.Set("tags", data.Tags)
 	d.Set("weighted", data.Settings.GSLB.Weighted == "True")
 
-	d.SetId(data.ID)
+	d.SetId(data.GetStrID())
 	return nil
 }

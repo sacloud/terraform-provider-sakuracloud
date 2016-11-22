@@ -8,15 +8,15 @@ import (
 	"github.com/hashicorp/terraform/dag"
 )
 
-// ResourceCountTransformer is a GraphTransformer that expands the count
+// ResourceCountTransformerOld is a GraphTransformer that expands the count
 // out for a specific resource.
-type ResourceCountTransformer struct {
+type ResourceCountTransformerOld struct {
 	Resource *config.Resource
 	Destroy  bool
 	Targets  []ResourceAddress
 }
 
-func (t *ResourceCountTransformer) Transform(g *Graph) error {
+func (t *ResourceCountTransformerOld) Transform(g *Graph) error {
 	// Expand the resource count
 	count, err := t.Resource.Count()
 	if err != nil {
@@ -72,7 +72,7 @@ func (t *ResourceCountTransformer) Transform(g *Graph) error {
 	return nil
 }
 
-func (t *ResourceCountTransformer) nodeIsTargeted(node dag.Vertex) bool {
+func (t *ResourceCountTransformerOld) nodeIsTargeted(node dag.Vertex) bool {
 	// no targets specified, everything stays in the graph
 	if len(t.Targets) == 0 {
 		return true
@@ -418,11 +418,11 @@ func (n *graphNodeExpandedResource) managedResourceEvalNodes(resource *Resource,
 							return true, EvalEarlyExitError{}
 						}
 
-						if diffApply.Destroy && len(diffApply.Attributes) == 0 {
+						if diffApply.GetDestroy() && diffApply.GetAttributesLen() == 0 {
 							return true, EvalEarlyExitError{}
 						}
 
-						diffApply.Destroy = false
+						diffApply.SetDestroy(false)
 						return true, nil
 					},
 					Then: EvalNoop{},
@@ -432,7 +432,7 @@ func (n *graphNodeExpandedResource) managedResourceEvalNodes(resource *Resource,
 					If: func(ctx EvalContext) (bool, error) {
 						destroy := false
 						if diffApply != nil {
-							destroy = diffApply.Destroy || diffApply.RequiresNew()
+							destroy = diffApply.GetDestroy() || diffApply.RequiresNew()
 						}
 
 						createBeforeDestroyEnabled =
@@ -762,7 +762,7 @@ func (n *graphNodeExpandedResource) dataResourceEvalNodes(resource *Resource, in
 							return true, EvalEarlyExitError{}
 						}
 
-						if len(diff.Attributes) == 0 {
+						if diff.GetAttributesLen() == 0 {
 							return true, EvalEarlyExitError{}
 						}
 
@@ -862,6 +862,7 @@ func (n *graphNodeExpandedResourceDestroy) ConfigType() GraphNodeConfigType {
 // GraphNodeEvalable impl.
 func (n *graphNodeExpandedResourceDestroy) EvalTree() EvalNode {
 	info := n.instanceInfo()
+	info.uniqueExtra = "destroy"
 
 	var diffApply *InstanceDiff
 	var provider ResourceProvider
@@ -887,7 +888,7 @@ func (n *graphNodeExpandedResourceDestroy) EvalTree() EvalNode {
 				// If we're not destroying, then compare diffs
 				&EvalIf{
 					If: func(ctx EvalContext) (bool, error) {
-						if diffApply != nil && diffApply.Destroy {
+						if diffApply != nil && diffApply.GetDestroy() {
 							return true, nil
 						}
 
@@ -895,6 +896,9 @@ func (n *graphNodeExpandedResourceDestroy) EvalTree() EvalNode {
 					},
 					Then: EvalNoop{},
 				},
+
+				// Load the instance info so we have the module path set
+				&EvalInstanceInfo{Info: info},
 
 				&EvalGetProvider{
 					Name:   n.ProvidedBy()[0],

@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"github.com/hashicorp/terraform/helper/resource"
 	"github.com/hashicorp/terraform/terraform"
-	"github.com/yamamoto-febc/libsacloud/api"
-	"github.com/yamamoto-febc/libsacloud/sacloud"
+	"github.com/sacloud/libsacloud/api"
+	"github.com/sacloud/libsacloud/sacloud"
 	"testing"
 )
 
@@ -71,13 +71,13 @@ func testAccCheckSakuraCloudBridgeExists(n string, bridge *sacloud.Bridge) resou
 		client.Zone = "is1b"
 		defer func() { client.Zone = originalZone }()
 
-		foundBridge, err := client.Bridge.Read(rs.Primary.ID)
+		foundBridge, err := client.Bridge.Read(toSakuraCloudID(rs.Primary.ID))
 
 		if err != nil {
 			return err
 		}
 
-		if foundBridge.ID != rs.Primary.ID {
+		if foundBridge.ID != toSakuraCloudID(rs.Primary.ID) {
 			return fmt.Errorf("Bridge not found")
 		}
 
@@ -98,7 +98,7 @@ func testAccCheckSakuraCloudBridgeDestroy(s *terraform.State) error {
 			continue
 		}
 
-		_, err := client.Bridge.Read(rs.Primary.ID)
+		_, err := client.Bridge.Read(toSakuraCloudID(rs.Primary.ID))
 
 		if err == nil {
 			return fmt.Errorf("Bridge still exists")

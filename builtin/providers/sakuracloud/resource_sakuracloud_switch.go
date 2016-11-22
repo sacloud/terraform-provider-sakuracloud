@@ -3,8 +3,8 @@ package sakuracloud
 import (
 	"fmt"
 	"github.com/hashicorp/terraform/helper/schema"
-	"github.com/yamamoto-febc/libsacloud/api"
-	"github.com/yamamoto-febc/libsacloud/sacloud"
+	"github.com/sacloud/libsacloud/api"
+	"github.com/sacloud/libsacloud/sacloud"
 	"time"
 )
 
@@ -33,8 +33,9 @@ func resourceSakuraCloudSwitch() *schema.Resource {
 				Elem:     &schema.Schema{Type: schema.TypeString},
 			},
 			"bridge_id": &schema.Schema{
-				Type:     schema.TypeString,
-				Optional: true,
+				Type:         schema.TypeString,
+				Optional:     true,
+				ValidateFunc: validateSakuracloudIDType,
 			},
 			"server_ids": &schema.Schema{
 				Type:     schema.TypeList,
@@ -87,7 +88,7 @@ func resourceSakuraCloudSwitchCreate(d *schema.ResourceData, meta interface{}) e
 	if bridgeID, ok := d.GetOk("bridge_id"); ok {
 		brID := bridgeID.(string)
 		if brID != "" {
-			_, err := client.Switch.ConnectToBridge(sw.ID, brID)
+			_, err := client.Switch.ConnectToBridge(sw.ID, toSakuraCloudID(brID))
 			if err != nil {
 				return fmt.Errorf("Failed to create SakuraCloud Switch resource: %s", err)
 			}
@@ -95,7 +96,7 @@ func resourceSakuraCloudSwitchCreate(d *schema.ResourceData, meta interface{}) e
 		d.SetPartial("bridge_id")
 	}
 
-	d.SetId(sw.ID)
+	d.SetId(sw.GetStrID())
 
 	d.Partial(false)
 	return resourceSakuraCloudSwitchRead(d, meta)
@@ -109,7 +110,7 @@ func resourceSakuraCloudSwitchRead(d *schema.ResourceData, meta interface{}) err
 		client.Zone = zone.(string)
 	}
 
-	sw, err := client.Switch.Read(d.Id())
+	sw, err := client.Switch.Read(toSakuraCloudID(d.Id()))
 	if err != nil {
 		return fmt.Errorf("Couldn't find SakuraCloud Switch resource: %s", err)
 	}
@@ -126,7 +127,7 @@ func resourceSakuraCloudSwitchUpdate(d *schema.ResourceData, meta interface{}) e
 		client.Zone = zone.(string)
 	}
 
-	sw, err := client.Switch.Read(d.Id())
+	sw, err := client.Switch.Read(toSakuraCloudID(d.Id()))
 	if err != nil {
 		return fmt.Errorf("Couldn't find SakuraCloud Switch resource: %s", err)
 	}
@@ -166,7 +167,7 @@ func resourceSakuraCloudSwitchUpdate(d *schema.ResourceData, meta interface{}) e
 					return fmt.Errorf("Failed to disconnect bridge: %s", err)
 				}
 			} else {
-				_, err := client.Switch.ConnectToBridge(sw.ID, brID)
+				_, err := client.Switch.ConnectToBridge(sw.ID, toSakuraCloudID(brID))
 				if err != nil {
 					return fmt.Errorf("Failed to connect bridge: %s", err)
 				}
@@ -182,7 +183,7 @@ func resourceSakuraCloudSwitchUpdate(d *schema.ResourceData, meta interface{}) e
 		}
 	}
 
-	d.SetId(sw.ID)
+	d.SetId(sw.GetStrID())
 	d.Partial(false)
 
 	return resourceSakuraCloudSwitchRead(d, meta)
@@ -196,12 +197,12 @@ func resourceSakuraCloudSwitchDelete(d *schema.ResourceData, meta interface{}) e
 		client.Zone = zone.(string)
 	}
 
-	servers, err := client.Switch.GetServers(d.Id())
+	servers, err := client.Switch.GetServers(toSakuraCloudID(d.Id()))
 	if err != nil {
 		return fmt.Errorf("Couldn't find SakuraCloud Servers: %s", err)
 	}
 
-	isRunning := []string{}
+	isRunning := []int64{}
 	for _, s := range servers {
 		if s.Instance.IsUp() {
 			isRunning = append(isRunning, s.ID)
@@ -218,7 +219,7 @@ func resourceSakuraCloudSwitchDelete(d *schema.ResourceData, meta interface{}) e
 		}
 	}
 
-	sw, err := client.Switch.Read(d.Id())
+	sw, err := client.Switch.Read(toSakuraCloudID(d.Id()))
 	if err != nil {
 		return fmt.Errorf("Couldn't find SakuraCloud Servers: %s", err)
 	}
@@ -230,7 +231,7 @@ func resourceSakuraCloudSwitchDelete(d *schema.ResourceData, meta interface{}) e
 
 	}
 
-	_, err = client.Switch.Delete(d.Id())
+	_, err = client.Switch.Delete(toSakuraCloudID(d.Id()))
 	if err != nil {
 		return fmt.Errorf("Error deleting SakuraCloud Switch resource: %s", err)
 	}
@@ -257,7 +258,7 @@ func setSwitchResourceData(d *schema.ResourceData, client *api.Client, data *sac
 	d.Set("tags", data.Tags)
 
 	if data.ServerCount > 0 {
-		servers, err := client.Switch.GetServers(d.Id())
+		servers, err := client.Switch.GetServers(toSakuraCloudID(d.Id()))
 		if err != nil {
 			return fmt.Errorf("Couldn't find SakuraCloud Servers( is connected Switch): %s", err)
 		}
@@ -268,12 +269,12 @@ func setSwitchResourceData(d *schema.ResourceData, client *api.Client, data *sac
 	}
 
 	if data.Bridge != nil {
-		d.Set("bridge_id", data.Bridge.ID)
+		d.Set("bridge_id", data.Bridge.GetStrID())
 	} else {
 		d.Set("bridge_id", "")
 	}
 
 	d.Set("zone", client.Zone)
-	d.SetId(data.ID)
+	d.SetId(data.GetStrID())
 	return nil
 }

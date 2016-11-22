@@ -1,7 +1,7 @@
 package sakuracloud
 
 import (
-	API "github.com/yamamoto-febc/libsacloud/api"
+	API "github.com/sacloud/libsacloud/api"
 )
 
 type Config struct {
@@ -16,5 +16,6 @@ func (c *Config) NewClient() *API.Client {
 	if c.TraceMode {
 		client.TraceMode = true
 	}
+	client.UserAgent = "Terraform for SakuraCloud/v" + Version
 	return client
 }

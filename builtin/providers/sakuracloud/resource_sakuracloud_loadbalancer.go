@@ -4,8 +4,8 @@ import (
 	"errors"
 	"fmt"
 	"github.com/hashicorp/terraform/helper/schema"
-	"github.com/yamamoto-febc/libsacloud/api"
-	"github.com/yamamoto-febc/libsacloud/sacloud"
+	"github.com/sacloud/libsacloud/api"
+	"github.com/sacloud/libsacloud/sacloud"
 	"time"
 )
 
@@ -25,9 +25,10 @@ func resourceSakuraCloudLoadBalancer() *schema.Resource {
 				Required: true,
 			},
 			"switch_id": &schema.Schema{
-				Type:     schema.TypeString,
-				ForceNew: true,
-				Required: true,
+				Type:         schema.TypeString,
+				ForceNew:     true,
+				Required:     true,
+				ValidateFunc: validateSakuracloudIDType,
 			},
 			"VRID": &schema.Schema{
 				Type:     schema.TypeInt,
@@ -166,7 +167,7 @@ func resourceSakuraCloudLoadBalancerCreate(d *schema.ResourceData, meta interfac
 		return fmt.Errorf("Failed to create SakuraCloud LoadBalancer resource: %s", err)
 	}
 
-	d.SetId(loadBalancer.ID)
+	d.SetId(loadBalancer.GetStrID())
 
 	//wait
 	err = client.LoadBalancer.SleepWhileCopying(loadBalancer.ID, 20*time.Minute, 5)
@@ -189,7 +190,7 @@ func resourceSakuraCloudLoadBalancerRead(d *schema.ResourceData, meta interface{
 		client.Zone = zone.(string)
 	}
 
-	loadBalancer, err := client.LoadBalancer.Read(d.Id())
+	loadBalancer, err := client.LoadBalancer.Read(toSakuraCloudID(d.Id()))
 	if err != nil {
 		return fmt.Errorf("Couldn't find SakuraCloud LoadBalancer resource: %s", err)
 	}
@@ -204,7 +205,7 @@ func resourceSakuraCloudLoadBalancerUpdate(d *schema.ResourceData, meta interfac
 		client.Zone = zone.(string)
 	}
 
-	loadBalancer, err := client.LoadBalancer.Read(d.Id())
+	loadBalancer, err := client.LoadBalancer.Read(toSakuraCloudID(d.Id()))
 	if err != nil {
 		return fmt.Errorf("Couldn't find SakuraCloud LoadBalancer resource: %s", err)
 	}
@@ -233,7 +234,7 @@ func resourceSakuraCloudLoadBalancerUpdate(d *schema.ResourceData, meta interfac
 	if err != nil {
 		return fmt.Errorf("Error updating SakuraCloud LoadBalancer resource: %s", err)
 	}
-	d.SetId(loadBalancer.ID)
+	d.SetId(loadBalancer.GetStrID())
 
 	return resourceSakuraCloudLoadBalancerRead(d, meta)
 }
@@ -245,18 +246,17 @@ func resourceSakuraCloudLoadBalancerDelete(d *schema.ResourceData, meta interfac
 		client.Zone = zone.(string)
 	}
 
-	time.Sleep(2 * time.Second)
-	_, err := client.LoadBalancer.Stop(d.Id())
+	_, err := client.LoadBalancer.Stop(toSakuraCloudID(d.Id()))
 	if err != nil {
 		return fmt.Errorf("Error stopping SakuraCloud LoadBalancer resource: %s", err)
 	}
 
-	err = client.LoadBalancer.SleepUntilDown(d.Id(), 20*time.Minute)
+	err = client.LoadBalancer.SleepUntilDown(toSakuraCloudID(d.Id()), 20*time.Minute)
 	if err != nil {
 		return fmt.Errorf("Error stopping SakuraCloud LoadBalancer resource: %s", err)
 	}
 
-	_, err = client.LoadBalancer.Delete(d.Id())
+	_, err = client.LoadBalancer.Delete(toSakuraCloudID(d.Id()))
 	if err != nil {
 		return fmt.Errorf("Error deleting SakuraCloud LoadBalancer resource: %s", err)
 	}
@@ -266,7 +266,7 @@ func resourceSakuraCloudLoadBalancerDelete(d *schema.ResourceData, meta interfac
 
 func setLoadBalancerResourceData(d *schema.ResourceData, client *api.Client, data *sacloud.LoadBalancer) error {
 
-	d.Set("switch_id", data.Switch.ID)
+	d.Set("switch_id", data.Switch.GetStrID())
 	d.Set("VRID", data.Remark.VRRP.VRID)
 	if len(data.Remark.Servers) > 1 {
 		d.Set("is_double", true)
@@ -287,7 +287,7 @@ func setLoadBalancerResourceData(d *schema.ResourceData, client *api.Client, dat
 	if data.Settings != nil && data.Settings.LoadBalancer != nil {
 		var vipIDs []string
 		for _, s := range data.Settings.LoadBalancer {
-			vipIDs = append(vipIDs, loadBalancerVIPIDHash(data.ID, s))
+			vipIDs = append(vipIDs, loadBalancerVIPIDHash(data.GetStrID(), s))
 		}
 		if len(vipIDs) > 0 {
 			d.Set("vip_ids", vipIDs)
@@ -295,6 +295,6 @@ func setLoadBalancerResourceData(d *schema.ResourceData, client *api.Client, dat
 	}
 
 	d.Set("zone", client.Zone)
-	d.SetId(data.ID)
+	d.SetId(data.GetStrID())
 	return nil
 }

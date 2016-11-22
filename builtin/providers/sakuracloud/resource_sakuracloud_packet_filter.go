@@ -3,8 +3,8 @@ package sakuracloud
 import (
 	"fmt"
 	"github.com/hashicorp/terraform/helper/schema"
-	"github.com/yamamoto-febc/libsacloud/api"
-	"github.com/yamamoto-febc/libsacloud/sacloud"
+	"github.com/sacloud/libsacloud/api"
+	"github.com/sacloud/libsacloud/sacloud"
 )
 
 func resourceSakuraCloudPacketFilter() *schema.Resource {
@@ -131,7 +131,7 @@ func resourceSakuraCloudPacketFilterCreate(d *schema.ResourceData, meta interfac
 		return fmt.Errorf("Failed to create SakuraCloud PacketFilter resource: %s", err)
 	}
 
-	d.SetId(filter.ID)
+	d.SetId(filter.GetStrID())
 	return resourceSakuraCloudPacketFilterRead(d, meta)
 }
 
@@ -143,7 +143,7 @@ func resourceSakuraCloudPacketFilterRead(d *schema.ResourceData, meta interface{
 		client.Zone = zone.(string)
 	}
 
-	filter, err := client.PacketFilter.Read(d.Id())
+	filter, err := client.PacketFilter.Read(toSakuraCloudID(d.Id()))
 	if err != nil {
 		return fmt.Errorf("Couldn't find SakuraCloud PacketFilter resource: %s", err)
 	}
@@ -159,7 +159,7 @@ func resourceSakuraCloudPacketFilterUpdate(d *schema.ResourceData, meta interfac
 		client.Zone = zone.(string)
 	}
 
-	filter, err := client.PacketFilter.Read(d.Id())
+	filter, err := client.PacketFilter.Read(toSakuraCloudID(d.Id()))
 	if err != nil {
 		return fmt.Errorf("Couldn't find SakuraCloud PacketFilter resource: %s", err)
 	}
@@ -216,7 +216,7 @@ func resourceSakuraCloudPacketFilterUpdate(d *schema.ResourceData, meta interfac
 		return fmt.Errorf("Error updating SakuraCloud PacketFilter resource: %s", err)
 	}
 
-	d.SetId(filter.ID)
+	d.SetId(filter.GetStrID())
 	return resourceSakuraCloudPacketFilterRead(d, meta)
 }
 
@@ -234,7 +234,7 @@ func resourceSakuraCloudPacketFilterDelete(d *schema.ResourceData, meta interfac
 	}
 	for _, server := range servers.Servers {
 		for _, i := range server.Interfaces {
-			if i.PacketFilter != nil && i.PacketFilter.ID == d.Id() {
+			if i.PacketFilter != nil && i.PacketFilter.GetStrID() == d.Id() {
 				_, err := client.Interface.DisconnectFromPacketFilter(i.ID)
 				if err != nil {
 					return fmt.Errorf("Error disconnecting SakuraCloud PacketFilter : %s", err)
@@ -243,7 +243,7 @@ func resourceSakuraCloudPacketFilterDelete(d *schema.ResourceData, meta interfac
 		}
 	}
 
-	_, err = client.PacketFilter.Delete(d.Id())
+	_, err = client.PacketFilter.Delete(toSakuraCloudID(d.Id()))
 	if err != nil {
 		return fmt.Errorf("Error deleting SakuraCloud PacketFilter resource: %s", err)
 	}
@@ -280,6 +280,6 @@ func setPacketFilterResourceData(d *schema.ResourceData, client *api.Client, dat
 	}
 
 	d.Set("zone", client.Zone)
-	d.SetId(data.ID)
+	d.SetId(data.GetStrID())
 	return nil
 }

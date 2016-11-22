@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"github.com/hashicorp/terraform/helper/resource"
 	"github.com/hashicorp/terraform/terraform"
-	"github.com/yamamoto-febc/libsacloud/api"
+	"github.com/sacloud/libsacloud/api"
 	"testing"
 )
 
@@ -91,7 +91,7 @@ func testAccCheckSakuraCloudCDROMDataSourceDestroy(s *terraform.State) error {
 			continue
 		}
 
-		_, err := client.CDROM.Read(rs.Primary.ID)
+		_, err := client.CDROM.Read(toSakuraCloudID(rs.Primary.ID))
 
 		if err == nil {
 			return fmt.Errorf("CDROM still exists")

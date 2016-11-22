@@ -3,8 +3,8 @@ package sakuracloud
 import (
 	"fmt"
 	"github.com/hashicorp/terraform/helper/schema"
-	"github.com/yamamoto-febc/libsacloud/api"
-	"github.com/yamamoto-febc/libsacloud/sacloud"
+	"github.com/sacloud/libsacloud/api"
+	"github.com/sacloud/libsacloud/sacloud"
 )
 
 func resourceSakuraCloudNote() *schema.Resource {
@@ -60,13 +60,13 @@ func resourceSakuraCloudNoteCreate(d *schema.ResourceData, meta interface{}) err
 		return fmt.Errorf("Failed to create SakuraCloud Note resource: %s", err)
 	}
 
-	d.SetId(note.ID)
+	d.SetId(note.GetStrID())
 	return resourceSakuraCloudNoteRead(d, meta)
 }
 
 func resourceSakuraCloudNoteRead(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*api.Client)
-	note, err := client.Note.Read(d.Id())
+	note, err := client.Note.Read(toSakuraCloudID(d.Id()))
 	if err != nil {
 		return fmt.Errorf("Couldn't find SakuraCloud Note resource: %s", err)
 	}
@@ -77,7 +77,7 @@ func resourceSakuraCloudNoteRead(d *schema.ResourceData, meta interface{}) error
 func resourceSakuraCloudNoteUpdate(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*api.Client)
 
-	note, err := client.Note.Read(d.Id())
+	note, err := client.Note.Read(toSakuraCloudID(d.Id()))
 	if err != nil {
 		return fmt.Errorf("Couldn't find SakuraCloud Note resource: %s", err)
 	}
@@ -109,7 +109,7 @@ func resourceSakuraCloudNoteUpdate(d *schema.ResourceData, meta interface{}) err
 	if err != nil {
 		return fmt.Errorf("Error updating SakuraCloud Note resource: %s", err)
 	}
-	d.SetId(note.ID)
+	d.SetId(note.GetStrID())
 
 	return resourceSakuraCloudNoteRead(d, meta)
 }
@@ -117,7 +117,7 @@ func resourceSakuraCloudNoteUpdate(d *schema.ResourceData, meta interface{}) err
 func resourceSakuraCloudNoteDelete(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*api.Client)
 
-	_, err := client.Note.Delete(d.Id())
+	_, err := client.Note.Delete(toSakuraCloudID(d.Id()))
 	if err != nil {
 		return fmt.Errorf("Error deleting SakuraCloud Note resource: %s", err)
 	}
@@ -132,6 +132,6 @@ func setNoteResourceData(d *schema.ResourceData, client *api.Client, data *saclo
 	d.Set("description", data.Description)
 	d.Set("tags", data.Tags)
 
-	d.SetId(data.ID)
+	d.SetId(data.GetStrID())
 	return nil
 }
