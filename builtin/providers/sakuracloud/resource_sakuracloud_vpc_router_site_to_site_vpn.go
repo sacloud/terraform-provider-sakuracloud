@@ -6,8 +6,8 @@ import (
 	"bytes"
 	"github.com/hashicorp/terraform/helper/hashcode"
 	"github.com/hashicorp/terraform/helper/schema"
-	"github.com/yamamoto-febc/libsacloud/api"
-	"github.com/yamamoto-febc/libsacloud/sacloud"
+	"github.com/sacloud/libsacloud/api"
+	"github.com/sacloud/libsacloud/sacloud"
 	"strings"
 )
 
@@ -18,9 +18,10 @@ func resourceSakuraCloudVPCRouterSiteToSiteIPsecVPN() *schema.Resource {
 		Delete: resourceSakuraCloudVPCRouterSiteToSiteIPsecVPNDelete,
 		Schema: map[string]*schema.Schema{
 			"vpc_router_id": &schema.Schema{
-				Type:     schema.TypeString,
-				Required: true,
-				ForceNew: true,
+				Type:         schema.TypeString,
+				Required:     true,
+				ForceNew:     true,
+				ValidateFunc: validateSakuracloudIDType,
 			},
 			"peer": &schema.Schema{
 				Type:     schema.TypeString,
@@ -72,7 +73,7 @@ func resourceSakuraCloudVPCRouterSiteToSiteIPsecVPNCreate(d *schema.ResourceData
 	sakuraMutexKV.Lock(routerID)
 	defer sakuraMutexKV.Unlock(routerID)
 
-	vpcRouter, err := client.VPCRouter.Read(routerID)
+	vpcRouter, err := client.VPCRouter.Read(toSakuraCloudID(routerID))
 	if err != nil {
 		return fmt.Errorf("Couldn't find SakuraCloud VPCRouter resource: %s", err)
 	}
@@ -83,11 +84,11 @@ func resourceSakuraCloudVPCRouterSiteToSiteIPsecVPNCreate(d *schema.ResourceData
 	}
 
 	vpcRouter.Settings.Router.AddSiteToSiteIPsecVPN(s2s.LocalPrefix, s2s.Peer, s2s.PreSharedSecret, s2s.RemoteID, s2s.Routes)
-	vpcRouter, err = client.VPCRouter.UpdateSetting(routerID, vpcRouter)
+	vpcRouter, err = client.VPCRouter.UpdateSetting(toSakuraCloudID(routerID), vpcRouter)
 	if err != nil {
 		return fmt.Errorf("Failed to enable SakuraCloud VPCRouterSiteToSiteIPsecVPN resource: %s", err)
 	}
-	_, err = client.VPCRouter.Config(routerID)
+	_, err = client.VPCRouter.Config(toSakuraCloudID(routerID))
 	if err != nil {
 		return fmt.Errorf("Couldn'd apply SakuraCloud VPCRouter config: %s", err)
 	}
@@ -104,7 +105,7 @@ func resourceSakuraCloudVPCRouterSiteToSiteIPsecVPNRead(d *schema.ResourceData, 
 	}
 
 	routerID := d.Get("vpc_router_id").(string)
-	vpcRouter, err := client.VPCRouter.Read(routerID)
+	vpcRouter, err := client.VPCRouter.Read(toSakuraCloudID(routerID))
 	if err != nil {
 		return fmt.Errorf("Couldn't find SakuraCloud VPCRouter resource: %s", err)
 	}
@@ -136,7 +137,7 @@ func resourceSakuraCloudVPCRouterSiteToSiteIPsecVPNDelete(d *schema.ResourceData
 	sakuraMutexKV.Lock(routerID)
 	defer sakuraMutexKV.Unlock(routerID)
 
-	vpcRouter, err := client.VPCRouter.Read(routerID)
+	vpcRouter, err := client.VPCRouter.Read(toSakuraCloudID(routerID))
 	if err != nil {
 		return fmt.Errorf("Couldn't find SakuraCloud VPCRouter resource: %s", err)
 	}
@@ -146,12 +147,12 @@ func resourceSakuraCloudVPCRouterSiteToSiteIPsecVPNDelete(d *schema.ResourceData
 		s2s := expandVPCRouterSiteToSiteIPsecVPN(d)
 		vpcRouter.Settings.Router.RemoveSiteToSiteIPsecVPN(s2s.LocalPrefix, s2s.Peer, s2s.PreSharedSecret, s2s.RemoteID, s2s.Routes)
 
-		vpcRouter, err = client.VPCRouter.UpdateSetting(routerID, vpcRouter)
+		vpcRouter, err = client.VPCRouter.UpdateSetting(toSakuraCloudID(routerID), vpcRouter)
 		if err != nil {
 			return fmt.Errorf("Failed to delete SakuraCloud VPCRouterSiteToSiteIPsecVPN resource: %s", err)
 		}
 
-		_, err = client.VPCRouter.Config(routerID)
+		_, err = client.VPCRouter.Config(toSakuraCloudID(routerID))
 		if err != nil {
 			return fmt.Errorf("Couldn'd apply SakuraCloud VPCRouter config: %s", err)
 		}

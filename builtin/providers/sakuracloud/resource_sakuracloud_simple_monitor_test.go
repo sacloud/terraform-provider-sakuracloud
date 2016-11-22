@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"github.com/hashicorp/terraform/helper/resource"
 	"github.com/hashicorp/terraform/terraform"
-	"github.com/yamamoto-febc/libsacloud/api"
-	"github.com/yamamoto-febc/libsacloud/sacloud"
+	"github.com/sacloud/libsacloud/api"
+	"github.com/sacloud/libsacloud/sacloud"
 	"testing"
 )
 
@@ -72,13 +72,13 @@ func testAccCheckSakuraCloudSimpleMonitorExists(n string, monitor *sacloud.Simpl
 
 		client := testAccProvider.Meta().(*api.Client)
 
-		foundSimpleMonitor, err := client.SimpleMonitor.Read(rs.Primary.ID)
+		foundSimpleMonitor, err := client.SimpleMonitor.Read(toSakuraCloudID(rs.Primary.ID))
 
 		if err != nil {
 			return err
 		}
 
-		if foundSimpleMonitor.ID != rs.Primary.ID {
+		if foundSimpleMonitor.ID != toSakuraCloudID(rs.Primary.ID) {
 			return fmt.Errorf("Record not found")
 		}
 
@@ -114,7 +114,7 @@ func testAccCheckSakuraCloudSimpleMonitorDestroy(s *terraform.State) error {
 			continue
 		}
 
-		_, err := client.SimpleMonitor.Read(rs.Primary.ID)
+		_, err := client.SimpleMonitor.Read(toSakuraCloudID(rs.Primary.ID))
 
 		if err == nil {
 			return fmt.Errorf("SimpleMonitor still exists")

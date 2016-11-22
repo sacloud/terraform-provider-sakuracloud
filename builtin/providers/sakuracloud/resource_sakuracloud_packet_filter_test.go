@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"github.com/hashicorp/terraform/helper/resource"
 	"github.com/hashicorp/terraform/terraform"
-	"github.com/yamamoto-febc/libsacloud/api"
-	"github.com/yamamoto-febc/libsacloud/sacloud"
+	"github.com/sacloud/libsacloud/api"
+	"github.com/sacloud/libsacloud/sacloud"
 	"testing"
 )
 
@@ -77,13 +77,13 @@ func testAccCheckSakuraCloudPacketFilterExists(n string, filter *sacloud.PacketF
 
 		client := testAccProvider.Meta().(*api.Client)
 
-		foundPacketFilter, err := client.PacketFilter.Read(rs.Primary.ID)
+		foundPacketFilter, err := client.PacketFilter.Read(toSakuraCloudID(rs.Primary.ID))
 
 		if err != nil {
 			return err
 		}
 
-		if foundPacketFilter.ID != rs.Primary.ID {
+		if foundPacketFilter.ID != toSakuraCloudID(rs.Primary.ID) {
 			return fmt.Errorf("PacketFilter not found")
 		}
 
@@ -101,7 +101,7 @@ func testAccCheckSakuraCloudPacketFilterDestroy(s *terraform.State) error {
 			continue
 		}
 
-		_, err := client.PacketFilter.Read(rs.Primary.ID)
+		_, err := client.PacketFilter.Read(toSakuraCloudID(rs.Primary.ID))
 
 		if err == nil {
 			return fmt.Errorf("PacketFilter still exists")

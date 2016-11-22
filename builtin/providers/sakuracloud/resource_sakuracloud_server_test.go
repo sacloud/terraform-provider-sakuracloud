@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"github.com/hashicorp/terraform/helper/resource"
 	"github.com/hashicorp/terraform/terraform"
-	"github.com/yamamoto-febc/libsacloud/api"
-	"github.com/yamamoto-febc/libsacloud/sacloud"
+	"github.com/sacloud/libsacloud/api"
+	"github.com/sacloud/libsacloud/sacloud"
 	"testing"
 )
 
@@ -177,13 +177,13 @@ func testAccCheckSakuraCloudServerExists(n string, server *sacloud.Server) resou
 
 		client := testAccProvider.Meta().(*api.Client)
 
-		foundServer, err := client.Server.Read(rs.Primary.ID)
+		foundServer, err := client.Server.Read(toSakuraCloudID(rs.Primary.ID))
 
 		if err != nil {
 			return err
 		}
 
-		if foundServer.ID != rs.Primary.ID {
+		if foundServer.ID != toSakuraCloudID(rs.Primary.ID) {
 			return fmt.Errorf("Server not found")
 		}
 
@@ -233,7 +233,7 @@ func testAccCheckSakuraCloudServerDestroy(s *terraform.State) error {
 			continue
 		}
 
-		_, err := client.Server.Read(rs.Primary.ID)
+		_, err := client.Server.Read(toSakuraCloudID(rs.Primary.ID))
 
 		if err == nil {
 			return fmt.Errorf("Server still exists")
@@ -277,7 +277,7 @@ resource "sakuracloud_disk" "foobar" {
 }
 
 resource "sakuracloud_server" "foobar" {
-    name = "myserver"
+    name = "myserver_after"
     disks = ["${sakuracloud_disk.foobar.id}"]
     core = 2
     memory = 2

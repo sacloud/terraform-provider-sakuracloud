@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"github.com/hashicorp/terraform/helper/resource"
 	"github.com/hashicorp/terraform/terraform"
-	"github.com/yamamoto-febc/libsacloud/api"
+	"github.com/sacloud/libsacloud/api"
 	"testing"
 )
 
@@ -94,7 +94,7 @@ func testAccCheckSakuraCloudNoteDataSourceDestroy(s *terraform.State) error {
 			continue
 		}
 
-		_, err := client.Note.Read(rs.Primary.ID)
+		_, err := client.Note.Read(toSakuraCloudID(rs.Primary.ID))
 
 		if err == nil {
 			return fmt.Errorf("Note still exists")

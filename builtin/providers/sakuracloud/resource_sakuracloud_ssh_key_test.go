@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"github.com/hashicorp/terraform/helper/resource"
 	"github.com/hashicorp/terraform/terraform"
-	"github.com/yamamoto-febc/libsacloud/api"
-	"github.com/yamamoto-febc/libsacloud/sacloud"
+	"github.com/sacloud/libsacloud/api"
+	"github.com/sacloud/libsacloud/sacloud"
 	"testing"
 )
 
@@ -57,13 +57,13 @@ func testAccCheckSakuraCloudSSHKeyExists(n string, ssh_key *sacloud.SSHKey) reso
 		}
 
 		client := testAccProvider.Meta().(*api.Client)
-		foundSSHKey, err := client.SSHKey.Read(rs.Primary.ID)
+		foundSSHKey, err := client.SSHKey.Read(toSakuraCloudID(rs.Primary.ID))
 
 		if err != nil {
 			return err
 		}
 
-		if foundSSHKey.ID != rs.Primary.ID {
+		if foundSSHKey.ID != toSakuraCloudID(rs.Primary.ID) {
 			return fmt.Errorf("SSHKey not found")
 		}
 
@@ -81,7 +81,7 @@ func testAccCheckSakuraCloudSSHKeyDestroy(s *terraform.State) error {
 			continue
 		}
 
-		_, err := client.SSHKey.Read(rs.Primary.ID)
+		_, err := client.SSHKey.Read(toSakuraCloudID(rs.Primary.ID))
 
 		if err == nil {
 			return fmt.Errorf("SSHKey still exists")

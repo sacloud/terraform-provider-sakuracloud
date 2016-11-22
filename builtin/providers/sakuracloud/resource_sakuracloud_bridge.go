@@ -3,8 +3,8 @@ package sakuracloud
 import (
 	"fmt"
 	"github.com/hashicorp/terraform/helper/schema"
-	"github.com/yamamoto-febc/libsacloud/api"
-	"github.com/yamamoto-febc/libsacloud/sacloud"
+	"github.com/sacloud/libsacloud/api"
+	"github.com/sacloud/libsacloud/sacloud"
 )
 
 func resourceSakuraCloudBridge() *schema.Resource {
@@ -30,6 +30,8 @@ func resourceSakuraCloudBridge() *schema.Resource {
 				Type:     schema.TypeList,
 				Computed: true,
 				Elem:     &schema.Schema{Type: schema.TypeString},
+				// ! Current terraform(v0.7) is not support to array validation !
+				// ValidateFunc: validateSakuracloudIDArrayType,
 			},
 			"zone": &schema.Schema{
 				Type:         schema.TypeString,
@@ -63,7 +65,7 @@ func resourceSakuraCloudBridgeCreate(d *schema.ResourceData, meta interface{}) e
 		return fmt.Errorf("Failed to create SakuraCloud Bridge resource: %s", err)
 	}
 
-	d.SetId(bridge.ID)
+	d.SetId(bridge.GetStrID())
 	return resourceSakuraCloudBridgeRead(d, meta)
 }
 
@@ -75,7 +77,7 @@ func resourceSakuraCloudBridgeRead(d *schema.ResourceData, meta interface{}) err
 		client.Zone = zone.(string)
 	}
 
-	bridge, err := client.Bridge.Read(d.Id())
+	bridge, err := client.Bridge.Read(toSakuraCloudID(d.Id()))
 	if err != nil {
 		return fmt.Errorf("Couldn't find SakuraCloud Bridge resource: %s", err)
 	}
@@ -91,7 +93,7 @@ func resourceSakuraCloudBridgeUpdate(d *schema.ResourceData, meta interface{}) e
 		client.Zone = zone.(string)
 	}
 
-	bridge, err := client.Bridge.Read(d.Id())
+	bridge, err := client.Bridge.Read(toSakuraCloudID(d.Id()))
 	if err != nil {
 		return fmt.Errorf("Couldn't find SakuraCloud Bridge resource: %s", err)
 	}
@@ -112,7 +114,7 @@ func resourceSakuraCloudBridgeUpdate(d *schema.ResourceData, meta interface{}) e
 		return fmt.Errorf("Error updating SakuraCloud Bridge resource: %s", err)
 	}
 
-	d.SetId(bridge.ID)
+	d.SetId(bridge.GetStrID())
 	return resourceSakuraCloudBridgeRead(d, meta)
 }
 
@@ -124,7 +126,7 @@ func resourceSakuraCloudBridgeDelete(d *schema.ResourceData, meta interface{}) e
 		client.Zone = zone.(string)
 	}
 
-	br, err := client.Bridge.Read(d.Id())
+	br, err := client.Bridge.Read(toSakuraCloudID(d.Id()))
 	if err != nil {
 		return fmt.Errorf("Couldn't find SakuraCloud Bridge resource: %s", err)
 	}
@@ -138,7 +140,7 @@ func resourceSakuraCloudBridgeDelete(d *schema.ResourceData, meta interface{}) e
 		}
 	}
 
-	_, err = client.Bridge.Delete(d.Id())
+	_, err = client.Bridge.Delete(toSakuraCloudID(d.Id()))
 	if err != nil {
 		return fmt.Errorf("Error deleting SakuraCloud Bridge resource: %s", err)
 	}
@@ -156,6 +158,6 @@ func setBridgeResourceData(d *schema.ResourceData, client *api.Client, data *sac
 	}
 
 	d.Set("zone", client.Zone)
-	d.SetId(data.ID)
+	d.SetId(data.GetStrID())
 	return nil
 }

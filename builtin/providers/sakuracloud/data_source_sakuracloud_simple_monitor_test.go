@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"github.com/hashicorp/terraform/helper/resource"
 	"github.com/hashicorp/terraform/terraform"
-	"github.com/yamamoto-febc/libsacloud/api"
+	"github.com/sacloud/libsacloud/api"
 	"testing"
 )
 
@@ -100,7 +100,7 @@ func testAccCheckSakuraCloudSimpleMonitorDataSourceDestroy(s *terraform.State) e
 			continue
 		}
 
-		_, err := client.SimpleMonitor.Read(rs.Primary.ID)
+		_, err := client.SimpleMonitor.Read(toSakuraCloudID(rs.Primary.ID))
 
 		if err == nil {
 			return fmt.Errorf("SimpleMonitor still exists")

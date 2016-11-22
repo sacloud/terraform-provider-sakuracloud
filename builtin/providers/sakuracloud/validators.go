@@ -3,6 +3,7 @@ package sakuracloud
 import (
 	"fmt"
 	"github.com/hashicorp/terraform/helper/schema"
+	"strconv"
 	"strings"
 )
 
@@ -35,6 +36,31 @@ func validateIntegerInRange(min, max int) schema.SchemaValidateFunc {
 		return
 	}
 }
+
+func validateSakuracloudIDType(v interface{}, k string) (ws []string, errors []error) {
+	value := v.(string)
+	if value == "" {
+		return
+	}
+	_, err := strconv.ParseInt(value, 10, 64)
+	if err != nil {
+		errors = append(errors, fmt.Errorf("%q must be ID string(number only): %s", k, err))
+
+	}
+	return
+}
+
+//func validateSakuracloudIDArrayType(v interface{}, k string) (ws []string, errors []error) {
+//	values := v.([]string)
+//	for _, value := range values {
+//		_, err := strconv.ParseInt(value, 10, 64)
+//		if err != nil {
+//			errors = append(errors, fmt.Errorf("%q must be ID string(number only): %s", k, err))
+//
+//		}
+//	}
+//	return
+//}
 
 func validateStringInWord(allowWords []string) schema.SchemaValidateFunc {
 	return func(v interface{}, k string) (ws []string, errors []error) {

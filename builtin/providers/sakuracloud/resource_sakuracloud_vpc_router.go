@@ -3,7 +3,7 @@ package sakuracloud
 import (
 	"fmt"
 	"github.com/hashicorp/terraform/helper/schema"
-	"github.com/yamamoto-febc/libsacloud/api"
+	"github.com/sacloud/libsacloud/api"
 	"time"
 )
 
@@ -30,9 +30,10 @@ func resourceSakuraCloudVPCRouter() *schema.Resource {
 				ValidateFunc: validateStringInWord([]string{"standard", "premium", "highspec"}),
 			},
 			"switch_id": &schema.Schema{
-				Type:     schema.TypeString,
-				ForceNew: true,
-				Optional: true,
+				Type:         schema.TypeString,
+				ForceNew:     true,
+				Optional:     true,
+				ValidateFunc: validateSakuracloudIDType,
 			},
 			"vip": &schema.Schema{
 				Type:     schema.TypeString,
@@ -180,7 +181,7 @@ func resourceSakuraCloudVPCRouterCreate(d *schema.ResourceData, meta interface{}
 		return fmt.Errorf("Failed to boot SakuraCloud VPCRouter resource: %s", err)
 	}
 
-	d.SetId(vpcRouter.ID)
+	d.SetId(vpcRouter.GetStrID())
 	return resourceSakuraCloudVPCRouterRead(d, meta)
 }
 
@@ -192,7 +193,7 @@ func resourceSakuraCloudVPCRouterRead(d *schema.ResourceData, meta interface{}) 
 		client.Zone = zone.(string)
 	}
 
-	vpcRouter, err := client.VPCRouter.Read(d.Id())
+	vpcRouter, err := client.VPCRouter.Read(toSakuraCloudID(d.Id()))
 	if err != nil {
 		return fmt.Errorf("Couldn't find SakuraCloud VPCRouter resource: %s", err)
 	}
@@ -202,10 +203,7 @@ func resourceSakuraCloudVPCRouterRead(d *schema.ResourceData, meta interface{}) 
 	d.Set("tags", vpcRouter.Tags)
 
 	//plan
-	planID, err := vpcRouter.Plan.ID.Int64()
-	if err != nil {
-		return fmt.Errorf("Failed to read SakuraCloud VPCRouter resource: %s", err)
-	}
+	planID := vpcRouter.Plan.ID
 	switch planID {
 	case 1:
 		d.Set("plan", "standard")
@@ -217,7 +215,7 @@ func resourceSakuraCloudVPCRouterRead(d *schema.ResourceData, meta interface{}) 
 	if planID == 1 {
 		d.Set("global_address", vpcRouter.Interfaces[0].IPAddress)
 	} else {
-		d.Set("switch_id", vpcRouter.Switch.ID)
+		d.Set("switch_id", vpcRouter.Switch.GetStrID())
 		d.Set("vip", vpcRouter.Settings.Router.Interfaces[0].VirtualIPAddress)
 		d.Set("ipaddress1", vpcRouter.Settings.Router.Interfaces[0].IPAddress[0])
 		d.Set("ipaddress2", vpcRouter.Settings.Router.Interfaces[0].IPAddress[1])
@@ -243,7 +241,7 @@ func resourceSakuraCloudVPCRouterUpdate(d *schema.ResourceData, meta interface{}
 	sakuraMutexKV.Lock(d.Id())
 	defer sakuraMutexKV.Unlock(d.Id())
 
-	vpcRouter, err := client.VPCRouter.Read(d.Id())
+	vpcRouter, err := client.VPCRouter.Read(toSakuraCloudID(d.Id()))
 	if err != nil {
 		return fmt.Errorf("Couldn't find SakuraCloud VPCRouter resource: %s", err)
 	}
@@ -270,7 +268,7 @@ func resourceSakuraCloudVPCRouterUpdate(d *schema.ResourceData, meta interface{}
 		return fmt.Errorf("Error updating SakuraCloud VPCRouter resource: %s", err)
 	}
 
-	d.SetId(vpcRouter.ID)
+	d.SetId(vpcRouter.GetStrID())
 
 	return resourceSakuraCloudVPCRouterRead(d, meta)
 }
@@ -286,7 +284,7 @@ func resourceSakuraCloudVPCRouterDelete(d *schema.ResourceData, meta interface{}
 	sakuraMutexKV.Lock(d.Id())
 	defer sakuraMutexKV.Unlock(d.Id())
 
-	vpcRouter, err := client.VPCRouter.Read(d.Id())
+	vpcRouter, err := client.VPCRouter.Read(toSakuraCloudID(d.Id()))
 	if err != nil {
 		return fmt.Errorf("Couldn't find SakuraCloud Servers: %s", err)
 	}
@@ -307,7 +305,7 @@ func resourceSakuraCloudVPCRouterDelete(d *schema.ResourceData, meta interface{}
 		}
 	}
 
-	_, err = client.VPCRouter.Delete(d.Id())
+	_, err = client.VPCRouter.Delete(toSakuraCloudID(d.Id()))
 	if err != nil {
 		return fmt.Errorf("Error deleting SakuraCloud VPCRouter resource: %s", err)
 	}

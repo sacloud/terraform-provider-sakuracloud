@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"github.com/docker/go-units"
 	"github.com/hashicorp/terraform/helper/schema"
-	"github.com/yamamoto-febc/libsacloud/api"
-	"github.com/yamamoto-febc/libsacloud/sacloud"
+	"github.com/sacloud/libsacloud/api"
+	"github.com/sacloud/libsacloud/sacloud"
 	"time"
 )
 
@@ -38,6 +38,8 @@ func resourceSakuraCloudServer() *schema.Resource {
 				Type:     schema.TypeList,
 				Optional: true,
 				Elem:     &schema.Schema{Type: schema.TypeString},
+				// ! Current terraform(v0.7) is not support to array validation !
+				// ValidateFunc: validateSakuracloudIDArrayType,
 			},
 			"base_interface": &schema.Schema{
 				Type:     schema.TypeString,
@@ -45,8 +47,9 @@ func resourceSakuraCloudServer() *schema.Resource {
 				Default:  "shared",
 			},
 			"cdrom_id": &schema.Schema{
-				Type:     schema.TypeString,
-				Optional: true,
+				Type:         schema.TypeString,
+				Optional:     true,
+				ValidateFunc: validateSakuracloudIDType,
 			},
 			"additional_interfaces": &schema.Schema{
 				Type:     schema.TypeList,
@@ -59,6 +62,8 @@ func resourceSakuraCloudServer() *schema.Resource {
 				Optional: true,
 				MaxItems: 4,
 				Elem:     &schema.Schema{Type: schema.TypeString},
+				// ! Current terraform(v0.7) is not support to array validation !
+				// ValidateFunc: validateSakuracloudIDArrayType,
 			},
 			"description": &schema.Schema{
 				Type:     schema.TypeString,
@@ -125,7 +130,7 @@ func resourceSakuraCloudServerCreate(d *schema.ResourceData, meta interface{}) e
 	if err != nil {
 		return fmt.Errorf("Invalid server plan.Please change 'core' or 'memory': %s", err)
 	}
-	opts.SetServerPlanByID(planID.ID.String())
+	opts.SetServerPlanByID(planID.GetStrID())
 
 	if hasSharedInterface, ok := d.GetOk("base_interface"); ok {
 		switch forceString(hasSharedInterface) {
@@ -172,12 +177,12 @@ func resourceSakuraCloudServerCreate(d *schema.ResourceData, meta interface{}) e
 		if rawDisks != nil {
 			diskIDs := expandStringList(rawDisks)
 			for i, diskID := range diskIDs {
-				_, err := client.Disk.ConnectToServer(diskID, server.ID)
+				_, err := client.Disk.ConnectToServer(toSakuraCloudID(diskID), server.ID)
 				if err != nil {
 					return fmt.Errorf("Failed to connect SakuraCloud Disk to Server: %s", err)
 				}
 
-				targetDisk, err := client.Disk.Read(diskID)
+				targetDisk, err := client.Disk.Read(toSakuraCloudID(diskID))
 				if err != nil {
 					return fmt.Errorf("Failed to read SakuraCloud Disk: %s", err)
 				}
@@ -208,7 +213,7 @@ func resourceSakuraCloudServerCreate(d *schema.ResourceData, meta interface{}) e
 					}
 
 					if isNeedEditDisk {
-						_, err := client.Disk.Config(diskID, diskEditConfig)
+						_, err := client.Disk.Config(toSakuraCloudID(diskID), diskEditConfig)
 						if err != nil {
 							return fmt.Errorf("Error editting SakuraCloud DiskConfig: %s", err)
 						}
@@ -228,7 +233,7 @@ func resourceSakuraCloudServerCreate(d *schema.ResourceData, meta interface{}) e
 				strFilterID = filterID.(string)
 			}
 			if server.Interfaces != nil && len(server.Interfaces) > i && strFilterID != "" {
-				_, err := client.Interface.ConnectToPacketFilter(server.Interfaces[i].ID, strFilterID)
+				_, err := client.Interface.ConnectToPacketFilter(server.Interfaces[i].ID, toSakuraCloudID(strFilterID))
 				if err != nil {
 					return fmt.Errorf("Error connecting packet filter: %s", err)
 				}
@@ -238,21 +243,21 @@ func resourceSakuraCloudServerCreate(d *schema.ResourceData, meta interface{}) e
 
 	if rawCDROMID, ok := d.GetOk("cdrom_id"); ok {
 		cdromID := rawCDROMID.(string)
-		_, err := client.Server.InsertCDROM(server.ID, cdromID)
+		_, err := client.Server.InsertCDROM(server.ID, toSakuraCloudID(cdromID))
 		if err != nil {
 			return fmt.Errorf("Error Inserting CDROM: %s", err)
 		}
 	}
 
-	d.SetId(server.ID)
+	d.SetId(server.GetStrID())
 
 	//boot
-	_, err = client.Server.Boot(d.Id())
+	_, err = client.Server.Boot(toSakuraCloudID(d.Id()))
 
 	if err != nil {
 		return fmt.Errorf("Failed to boot SakuraCloud Server resource: %s", err)
 	}
-	err = client.Server.SleepUntilUp(d.Id(), 10*time.Minute)
+	err = client.Server.SleepUntilUp(toSakuraCloudID(d.Id()), 10*time.Minute)
 	if err != nil {
 		return fmt.Errorf("Failed to boot SakuraCloud Server resource: %s", err)
 	}
@@ -269,7 +274,7 @@ func resourceSakuraCloudServerRead(d *schema.ResourceData, meta interface{}) err
 		client.Zone = zone.(string)
 	}
 
-	server, err := client.Server.Read(d.Id())
+	server, err := client.Server.Read(toSakuraCloudID(d.Id()))
 	if err != nil {
 		return fmt.Errorf("Couldn't find SakuraCloud Server resource: %s", err)
 	}
@@ -287,7 +292,7 @@ func resourceSakuraCloudServerUpdate(d *schema.ResourceData, meta interface{}) e
 
 	shutdownFunc := client.Server.Stop
 
-	server, err := client.Server.Read(d.Id())
+	server, err := client.Server.Read(toSakuraCloudID(d.Id()))
 	if err != nil {
 		return fmt.Errorf("Couldn't find SakuraCloud Server resource: %s", err)
 	}
@@ -300,7 +305,7 @@ func resourceSakuraCloudServerUpdate(d *schema.ResourceData, meta interface{}) e
 		if err != nil {
 			return fmt.Errorf("Invalid server plan.Please change 'core' or 'memory': %s", err)
 		}
-		server.SetServerPlanByID(planID.ID.String())
+		server.SetServerPlanByID(planID.GetStrID())
 
 		isNeedRestart = true
 	}
@@ -313,12 +318,12 @@ func resourceSakuraCloudServerUpdate(d *schema.ResourceData, meta interface{}) e
 	if isNeedRestart && isRunning {
 		// shudown server
 		time.Sleep(2 * time.Second)
-		_, err := shutdownFunc(d.Id())
+		_, err := shutdownFunc(toSakuraCloudID(d.Id()))
 		if err != nil {
 			return fmt.Errorf("Error stopping SakuraCloud Server resource: %s", err)
 		}
 
-		err = client.Server.SleepUntilDown(d.Id(), 10*time.Minute)
+		err = client.Server.SleepUntilDown(toSakuraCloudID(d.Id()), 10*time.Minute)
 		if err != nil {
 			return fmt.Errorf("Error stopping SakuraCloud Server resource: %s", err)
 		}
@@ -338,7 +343,7 @@ func resourceSakuraCloudServerUpdate(d *schema.ResourceData, meta interface{}) e
 			newDisks := expandStringList(rawDisks)
 			// connect disks
 			for _, diskID := range newDisks {
-				_, err := client.Disk.ConnectToServer(diskID, server.ID)
+				_, err := client.Disk.ConnectToServer(toSakuraCloudID(diskID), server.ID)
 				if err != nil {
 					return fmt.Errorf("Error connecting disk to SakuraCloud Server resource: %s", err)
 				}
@@ -357,7 +362,7 @@ func resourceSakuraCloudServerUpdate(d *schema.ResourceData, meta interface{}) e
 		if sharedNICCon == "shared" {
 			client.Interface.ConnectToSharedSegment(server.Interfaces[0].ID)
 		} else if sharedNICCon != "" {
-			client.Interface.ConnectToSwitch(server.Interfaces[0].ID, sharedNICCon)
+			client.Interface.ConnectToSwitch(server.Interfaces[0].ID, toSakuraCloudID(sharedNICCon))
 		}
 	}
 	if d.HasChange("additional_interfaces") {
@@ -395,7 +400,7 @@ func resourceSakuraCloudServerUpdate(d *schema.ResourceData, meta interface{}) e
 					nic := client.Interface.New()
 					nic.SetNewServerID(server.ID)
 					if switchID != "" {
-						nic.SetNewSwitchID(switchID)
+						nic.SetNewSwitchID(toSakuraCloudID(switchID))
 					}
 					_, err := client.Interface.Create(nic)
 					if err != nil {
@@ -405,7 +410,7 @@ func resourceSakuraCloudServerUpdate(d *schema.ResourceData, meta interface{}) e
 				} else {
 
 					if switchID != "" {
-						_, err := client.Interface.ConnectToSwitch(server.Interfaces[i+1].ID, switchID)
+						_, err := client.Interface.ConnectToSwitch(server.Interfaces[i+1].ID, toSakuraCloudID(switchID))
 						if err != nil {
 							return fmt.Errorf("Error connecting NIC to SakuraCloud Switch resource: %s", err)
 						}
@@ -431,7 +436,7 @@ func resourceSakuraCloudServerUpdate(d *schema.ResourceData, meta interface{}) e
 	}
 
 	//refresh server(need refresh after disk and nid edit)
-	updatedServer, err := client.Server.Read(d.Id())
+	updatedServer, err := client.Server.Read(toSakuraCloudID(d.Id()))
 	if err != nil {
 		return fmt.Errorf("Couldn't find SakuraCloud Server resource: %s", err)
 	}
@@ -468,11 +473,11 @@ func resourceSakuraCloudServerUpdate(d *schema.ResourceData, meta interface{}) e
 
 	// change Plan
 	if d.HasChange("core") || d.HasChange("memory") {
-		server, err := client.Server.ChangePlan(d.Id(), server.ServerPlan.ID.String())
+		server, err := client.Server.ChangePlan(toSakuraCloudID(d.Id()), server.ServerPlan.GetStrID())
 		if err != nil {
 			return fmt.Errorf("Error changing SakuraCloud ServerPlan : %s", err)
 		}
-		d.SetId(server.ID)
+		d.SetId(server.GetStrID())
 	}
 
 	if d.HasChange("name") {
@@ -493,11 +498,11 @@ func resourceSakuraCloudServerUpdate(d *schema.ResourceData, meta interface{}) e
 		}
 	}
 
-	server, err = client.Server.Update(d.Id(), server)
+	server, err = client.Server.Update(toSakuraCloudID(d.Id()), server)
 	if err != nil {
 		return fmt.Errorf("Error updating SakuraCloud Server resource: %s", err)
 	}
-	d.SetId(server.ID)
+	d.SetId(server.GetStrID())
 
 	if d.HasChange("packet_filter_ids") {
 		if rawPacketFilterIDs, ok := d.GetOk("packet_filter_ids"); ok {
@@ -516,7 +521,7 @@ func resourceSakuraCloudServerUpdate(d *schema.ResourceData, meta interface{}) e
 					}
 
 					if strFilterID != "" {
-						_, err := client.Interface.ConnectToPacketFilter(server.Interfaces[i].ID, filterID.(string))
+						_, err := client.Interface.ConnectToPacketFilter(server.Interfaces[i].ID, toSakuraCloudID(filterID.(string)))
 						if err != nil {
 							return fmt.Errorf("Error connecting packet filter: %s", err)
 						}
@@ -564,7 +569,7 @@ func resourceSakuraCloudServerUpdate(d *schema.ResourceData, meta interface{}) e
 
 		if rawCDROMID, ok := d.GetOk("cdrom_id"); ok {
 			cdromID := rawCDROMID.(string)
-			_, err := client.Server.InsertCDROM(server.ID, cdromID)
+			_, err := client.Server.InsertCDROM(server.ID, toSakuraCloudID(cdromID))
 			if err != nil {
 				return fmt.Errorf("Error Inserting CDROM: %s", err)
 			}
@@ -572,12 +577,12 @@ func resourceSakuraCloudServerUpdate(d *schema.ResourceData, meta interface{}) e
 	}
 
 	if isNeedRestart && isRunning {
-		_, err := client.Server.Boot(d.Id())
+		_, err := client.Server.Boot(toSakuraCloudID(d.Id()))
 		if err != nil {
 			return fmt.Errorf("Error booting SakuraCloud Server resource: %s", err)
 		}
 
-		err = client.Server.SleepUntilUp(d.Id(), 10*time.Minute)
+		err = client.Server.SleepUntilUp(toSakuraCloudID(d.Id()), 10*time.Minute)
 		if err != nil {
 			return fmt.Errorf("Error booting SakuraCloud Server resource: %s", err)
 		}
@@ -596,25 +601,25 @@ func resourceSakuraCloudServerDelete(d *schema.ResourceData, meta interface{}) e
 		client.Zone = zone.(string)
 	}
 
-	server, err := client.Server.Read(d.Id())
+	server, err := client.Server.Read(toSakuraCloudID(d.Id()))
 	if err != nil {
 		return fmt.Errorf("Couldn't find SakuraCloud Server resource: %s", err)
 	}
 
 	if server.Instance.IsUp() {
 		time.Sleep(2 * time.Second)
-		_, err := client.Server.Stop(d.Id())
+		_, err := client.Server.Stop(toSakuraCloudID(d.Id()))
 		if err != nil {
 			return fmt.Errorf("Error stopping SakuraCloud Server resource: %s", err)
 		}
 
-		err = client.Server.SleepUntilDown(d.Id(), 10*time.Minute)
+		err = client.Server.SleepUntilDown(toSakuraCloudID(d.Id()), 10*time.Minute)
 		if err != nil {
 			return fmt.Errorf("Error stopping SakuraCloud Server resource: %s", err)
 		}
 	}
 
-	_, err = client.Server.Delete(d.Id())
+	_, err = client.Server.Delete(toSakuraCloudID(d.Id()))
 
 	if err != nil {
 		return fmt.Errorf("Error deleting SakuraCloud Server resource: %s", err)
@@ -632,7 +637,7 @@ func setServerResourceData(d *schema.ResourceData, client *api.Client, data *sac
 	d.Set("disks", flattenDisks(data.Disks))
 
 	if data.Instance.CDROM != nil {
-		d.Set("cdrom_id", data.Instance.CDROM.ID)
+		d.Set("cdrom_id", data.Instance.CDROM.GetStrID())
 	}
 
 	hasSharedInterface := len(data.Interfaces) > 0 && data.Interfaces[0].Switch != nil
@@ -640,7 +645,7 @@ func setServerResourceData(d *schema.ResourceData, client *api.Client, data *sac
 		if data.Interfaces[0].Switch.Scope == sacloud.ESCopeShared {
 			d.Set("base_interface", "shared")
 		} else {
-			d.Set("base_interface", data.Interfaces[0].Switch.ID)
+			d.Set("base_interface", data.Interfaces[0].Switch.GetStrID())
 		}
 	} else {
 		d.Set("base_interface", "")
@@ -675,6 +680,6 @@ func setServerResourceData(d *schema.ResourceData, client *api.Client, data *sac
 	}
 
 	d.Set("zone", client.Zone)
-	d.SetId(data.ID)
+	d.SetId(data.GetStrID())
 	return nil
 }

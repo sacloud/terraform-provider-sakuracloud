@@ -3,9 +3,15 @@ package sakuracloud
 import (
 	"fmt"
 	"github.com/hashicorp/terraform/helper/schema"
-	"github.com/yamamoto-febc/libsacloud/sacloud"
+	"github.com/sacloud/libsacloud/sacloud"
+	"strconv"
 	"strings"
 )
+
+func toSakuraCloudID(id string) int64 {
+	v, _ := strconv.ParseInt(id, 10, 64)
+	return v
+}
 
 // Takes the result of flatmap.Expand for an array of strings
 // and returns a []*string
@@ -55,7 +61,7 @@ func flattenStringList(list []string) []interface{} {
 func flattenDisks(disks []sacloud.Disk) []string {
 	var ids []string
 	for _, d := range disks {
-		ids = append(ids, d.ID)
+		ids = append(ids, d.GetStrID())
 	}
 	return ids
 }
@@ -63,7 +69,7 @@ func flattenDisks(disks []sacloud.Disk) []string {
 func flattenServers(servers []sacloud.Server) []string {
 	var ids []string
 	for _, d := range servers {
-		ids = append(ids, d.ID)
+		ids = append(ids, d.GetStrID())
 	}
 	return ids
 
@@ -72,7 +78,7 @@ func flattenServers(servers []sacloud.Server) []string {
 func flattenSwitches(switches []sacloud.Switch) []string {
 	var ids []string
 	for _, d := range switches {
-		ids = append(ids, d.ID)
+		ids = append(ids, d.GetStrID())
 	}
 	return ids
 }
@@ -88,7 +94,7 @@ func flattenInterfaces(interfaces []sacloud.Interface) []interface{} {
 		} else {
 			switch i.Switch.Scope {
 			case sacloud.ESCopeUser:
-				ret = append(ret, i.Switch.ID)
+				ret = append(ret, i.Switch.GetStrID())
 			}
 
 		}
@@ -100,9 +106,9 @@ func flattenPacketFilters(interfaces []sacloud.Interface) []string {
 	var ret []string
 	var isExists = false
 	for index, i := range interfaces {
-		id := ""
+		var id string
 		if i.PacketFilter != nil {
-			id = i.PacketFilter.ID
+			id = i.PacketFilter.GetStrID()
 			isExists = true
 		}
 		if index == 0 || (len(interfaces)-1 == index && id != "") {

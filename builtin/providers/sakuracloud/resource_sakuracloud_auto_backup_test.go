@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"github.com/hashicorp/terraform/helper/resource"
 	"github.com/hashicorp/terraform/terraform"
-	"github.com/yamamoto-febc/libsacloud/api"
-	"github.com/yamamoto-febc/libsacloud/sacloud"
+	"github.com/sacloud/libsacloud/api"
+	"github.com/sacloud/libsacloud/sacloud"
 	"testing"
 )
 
@@ -72,13 +72,13 @@ func testAccCheckSakuraCloudAutoBackupExists(n string, auto_backup *sacloud.Auto
 		client.Zone = "tk1a"
 		defer func() { client.Zone = originalZone }()
 
-		foundAutoBackup, err := client.AutoBackup.Read(rs.Primary.ID)
+		foundAutoBackup, err := client.AutoBackup.Read(toSakuraCloudID(rs.Primary.ID))
 
 		if err != nil {
 			return err
 		}
 
-		if foundAutoBackup.ID != rs.Primary.ID {
+		if foundAutoBackup.ID != toSakuraCloudID(rs.Primary.ID) {
 			return fmt.Errorf("Resource not found")
 		}
 
@@ -99,7 +99,7 @@ func testAccCheckSakuraCloudAutoBackupDestroy(s *terraform.State) error {
 			continue
 		}
 
-		_, err := client.AutoBackup.Read(rs.Primary.ID)
+		_, err := client.AutoBackup.Read(toSakuraCloudID(rs.Primary.ID))
 
 		if err == nil {
 			return fmt.Errorf("AutoBackup still exists")

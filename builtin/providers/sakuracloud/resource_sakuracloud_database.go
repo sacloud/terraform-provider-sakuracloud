@@ -3,8 +3,8 @@ package sakuracloud
 import (
 	"fmt"
 	"github.com/hashicorp/terraform/helper/schema"
-	"github.com/yamamoto-febc/libsacloud/api"
-	"github.com/yamamoto-febc/libsacloud/sacloud"
+	"github.com/sacloud/libsacloud/api"
+	"github.com/sacloud/libsacloud/sacloud"
 	"time"
 )
 
@@ -22,6 +22,12 @@ func resourceSakuraCloudDatabase() *schema.Resource {
 			"name": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
+			},
+			"database_type": &schema.Schema{
+				Type:         schema.TypeString,
+				Optional:     true,
+				ValidateFunc: validateStringInWord([]string{"postgresql", "mariadb"}),
+				Default:      "postgresql",
 			},
 			//"is_double": &schema.Schema{
 			//	Type:     schema.TypeBool,
@@ -75,10 +81,11 @@ func resourceSakuraCloudDatabase() *schema.Resource {
 			},
 
 			"switch_id": &schema.Schema{
-				Type:     schema.TypeString,
-				ForceNew: true,
-				Optional: true,
-				Default:  "shared",
+				Type:         schema.TypeString,
+				ForceNew:     true,
+				Optional:     true,
+				Default:      "shared",
+				ValidateFunc: validateSakuracloudIDType,
 			},
 			"ipaddress1": &schema.Schema{
 				Type:     schema.TypeString,
@@ -126,7 +133,18 @@ func resourceSakuraCloudDatabaseCreate(d *schema.ResourceData, meta interface{})
 		client.Zone = zone.(string)
 	}
 
-	opts := sacloud.NewCreatePostgreSQLDatabaseValue()
+	var opts *sacloud.CreateDatabaseValue
+	dbType := d.Get("database_type").(string)
+	switch dbType {
+	case "postgresql":
+		opts = sacloud.NewCreatePostgreSQLDatabaseValue()
+		break
+	case "mariadb":
+		opts = sacloud.NewCreateMariaDBDatabaseValue()
+		break
+	default:
+		return fmt.Errorf("Unknown database_type [%s]", dbType)
+	}
 
 	opts.Name = d.Get("name").(string)
 	opts.AdminPassword = d.Get("admin_password").(string)
@@ -174,13 +192,13 @@ func resourceSakuraCloudDatabaseCreate(d *schema.ResourceData, meta interface{})
 		}
 	}
 
-	createDB := sacloud.CreateNewPostgreSQLDatabase(opts)
+	createDB := sacloud.CreateNewDatabase(opts)
 	database, err := client.Database.Create(createDB)
 	if err != nil {
 		return fmt.Errorf("Failed to create SakuraCloud Database resource: %s", err)
 	}
 
-	d.SetId(database.ID)
+	d.SetId(database.GetStrID())
 
 	//wait
 	err = client.Database.SleepWhileCopying(database.ID, 20*time.Minute, 5)
@@ -202,7 +220,7 @@ func resourceSakuraCloudDatabaseRead(d *schema.ResourceData, meta interface{}) e
 		client.Zone = zone.(string)
 	}
 
-	data, err := client.Database.Read(d.Id())
+	data, err := client.Database.Read(toSakuraCloudID(d.Id()))
 	if err != nil {
 		return fmt.Errorf("Couldn't find SakuraCloud Database resource: %s", err)
 	}
@@ -217,7 +235,7 @@ func resourceSakuraCloudDatabaseUpdate(d *schema.ResourceData, meta interface{})
 		client.Zone = zone.(string)
 	}
 
-	database, err := client.Database.Read(d.Id())
+	database, err := client.Database.Read(toSakuraCloudID(d.Id()))
 	if err != nil {
 		return fmt.Errorf("Couldn't find SakuraCloud Database resource: %s", err)
 	}
@@ -264,7 +282,7 @@ func resourceSakuraCloudDatabaseUpdate(d *schema.ResourceData, meta interface{})
 		database.Settings.DBConf.Common.ServicePort = fmt.Sprintf("%d", d.Get("port").(int))
 	}
 	if d.HasChange("backup_rotate") {
-		database.Settings.DBConf.Backup.Rotate = fmt.Sprintf("%d", d.Get("backup_rotate").(int))
+		database.Settings.DBConf.Backup.Rotate = d.Get("backup_rotate").(int)
 	}
 	if d.HasChange("backup_time") {
 		database.Settings.DBConf.Backup.Time = d.Get("backup_time").(string)
@@ -279,7 +297,7 @@ func resourceSakuraCloudDatabaseUpdate(d *schema.ResourceData, meta interface{})
 		return fmt.Errorf("Error updating SakuraCloud Database resource: %s", err)
 	}
 
-	d.SetId(database.ID)
+	d.SetId(database.GetStrID())
 
 	return resourceSakuraCloudDatabaseRead(d, meta)
 }
@@ -291,18 +309,17 @@ func resourceSakuraCloudDatabaseDelete(d *schema.ResourceData, meta interface{})
 		client.Zone = zone.(string)
 	}
 
-	time.Sleep(2 * time.Second)
-	_, err := client.Database.Stop(d.Id())
+	_, err := client.Database.Stop(toSakuraCloudID(d.Id()))
 	if err != nil {
 		return fmt.Errorf("Error stopping SakuraCloud Database resource: %s", err)
 	}
 
-	err = client.Database.SleepUntilDown(d.Id(), 20*time.Minute)
+	err = client.Database.SleepUntilDown(toSakuraCloudID(d.Id()), 20*time.Minute)
 	if err != nil {
 		return fmt.Errorf("Error stopping SakuraCloud Database resource: %s", err)
 	}
 
-	_, err = client.Database.Delete(d.Id())
+	_, err = client.Database.Delete(toSakuraCloudID(d.Id()))
 	if err != nil {
 		return fmt.Errorf("Error deleting SakuraCloud Database resource: %s", err)
 	}
@@ -329,7 +346,7 @@ func setDatabaseResourceData(d *schema.ResourceData, client *api.Client, data *s
 		d.Set("default_route", nil)
 		d.Set("ipaddress1", data.Interfaces[0].IPAddress)
 	} else {
-		d.Set("switch_id", data.Interfaces[0].Switch.ID)
+		d.Set("switch_id", data.Interfaces[0].Switch.GetStrID())
 		d.Set("nw_mask_len", data.Remark.Network.NetworkMaskLen)
 		d.Set("default_route", data.Remark.Network.DefaultRoute)
 		d.Set("ipaddress1", data.Remark.Servers[0].(map[string]interface{})["IPAddress"])
@@ -339,6 +356,6 @@ func setDatabaseResourceData(d *schema.ResourceData, client *api.Client, data *s
 	d.Set("tags", data.Tags)
 
 	d.Set("zone", client.Zone)
-	d.SetId(data.ID)
+	d.SetId(data.GetStrID())
 	return nil
 }

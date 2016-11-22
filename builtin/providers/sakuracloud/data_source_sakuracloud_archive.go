@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"github.com/docker/go-units"
 	"github.com/hashicorp/terraform/helper/schema"
-	"github.com/yamamoto-febc/libsacloud/api"
+	"github.com/sacloud/libsacloud/api"
 )
 
 func dataSourceSakuraCloudArchive() *schema.Resource {
@@ -86,7 +86,7 @@ func dataSourceSakuraCloudArchiveRead(d *schema.ResourceData, meta interface{}) 
 	}
 	archive := res.Archives[0]
 
-	d.SetId(archive.ID)
+	d.SetId(archive.GetStrID())
 	d.Set("name", archive.Name)
 	d.Set("size", archive.SizeMB*units.MiB/units.GiB)
 	d.Set("description", archive.Description)

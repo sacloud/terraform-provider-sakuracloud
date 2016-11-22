@@ -4,8 +4,8 @@ import (
 	"fmt"
 
 	"github.com/hashicorp/terraform/helper/schema"
-	"github.com/yamamoto-febc/libsacloud/api"
-	"github.com/yamamoto-febc/libsacloud/sacloud"
+	"github.com/sacloud/libsacloud/api"
+	"github.com/sacloud/libsacloud/sacloud"
 )
 
 func resourceSakuraCloudDNS() *schema.Resource {
@@ -60,14 +60,14 @@ func resourceSakuraCloudDNSCreate(d *schema.ResourceData, meta interface{}) erro
 		return fmt.Errorf("Failed to create SakuraCloud DNS resource: %s", err)
 	}
 
-	d.SetId(dns.ID)
+	d.SetId(dns.GetStrID())
 	return resourceSakuraCloudDNSRead(d, meta)
 }
 
 func resourceSakuraCloudDNSRead(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*api.Client)
 
-	dns, err := client.DNS.Read(d.Id())
+	dns, err := client.DNS.Read(toSakuraCloudID(d.Id()))
 	if err != nil {
 		return fmt.Errorf("Couldn't find SakuraCloud DNS resource: %s", err)
 	}
@@ -78,7 +78,7 @@ func resourceSakuraCloudDNSRead(d *schema.ResourceData, meta interface{}) error 
 func resourceSakuraCloudDNSUpdate(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*api.Client)
 
-	opts, err := client.DNS.Read(d.Id())
+	opts, err := client.DNS.Read(toSakuraCloudID(d.Id()))
 	if err != nil {
 		return fmt.Errorf("Couldn't find SakuraCloud DNS resource: %s", err)
 	}
@@ -105,14 +105,14 @@ func resourceSakuraCloudDNSUpdate(d *schema.ResourceData, meta interface{}) erro
 		return fmt.Errorf("Failed to update SakuraCloud DNS resource: %s", err)
 	}
 
-	d.SetId(dns.ID)
+	d.SetId(dns.GetStrID())
 	return resourceSakuraCloudDNSRead(d, meta)
 }
 
 func resourceSakuraCloudDNSDelete(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*api.Client)
 
-	_, err := client.DNS.Delete(d.Id())
+	_, err := client.DNS.Delete(toSakuraCloudID(d.Id()))
 
 	if err != nil {
 		return fmt.Errorf("Error deleting SakuraCloud DNS resource: %s", err)
@@ -128,6 +128,6 @@ func setDNSResourceData(d *schema.ResourceData, client *api.Client, data *saclou
 	d.Set("tags", data.Tags)
 	d.Set("dns_servers", data.Status.NS)
 
-	d.SetId(data.ID)
+	d.SetId(data.GetStrID())
 	return nil
 }

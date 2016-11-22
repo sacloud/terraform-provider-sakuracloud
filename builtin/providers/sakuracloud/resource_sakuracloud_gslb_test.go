@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"github.com/hashicorp/terraform/helper/resource"
 	"github.com/hashicorp/terraform/terraform"
-	"github.com/yamamoto-febc/libsacloud/api"
-	"github.com/yamamoto-febc/libsacloud/sacloud"
+	"github.com/sacloud/libsacloud/api"
+	"github.com/sacloud/libsacloud/sacloud"
 	"testing"
 )
 
@@ -82,13 +82,13 @@ func testAccCheckSakuraCloudGSLBExists(n string, gslb *sacloud.GSLB) resource.Te
 
 		client := testAccProvider.Meta().(*api.Client)
 
-		foundGSLB, err := client.GSLB.Read(rs.Primary.ID)
+		foundGSLB, err := client.GSLB.Read(toSakuraCloudID(rs.Primary.ID))
 
 		if err != nil {
 			return err
 		}
 
-		if foundGSLB.ID != rs.Primary.ID {
+		if foundGSLB.ID != toSakuraCloudID(rs.Primary.ID) {
 			return fmt.Errorf("Resource not found")
 		}
 
@@ -106,7 +106,7 @@ func testAccCheckSakuraCloudGSLBDestroy(s *terraform.State) error {
 			continue
 		}
 
-		_, err := client.GSLB.Read(rs.Primary.ID)
+		_, err := client.GSLB.Read(toSakuraCloudID(rs.Primary.ID))
 
 		if err == nil {
 			return fmt.Errorf("GSLB still exists")

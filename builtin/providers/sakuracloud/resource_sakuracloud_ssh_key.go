@@ -3,8 +3,8 @@ package sakuracloud
 import (
 	"fmt"
 	"github.com/hashicorp/terraform/helper/schema"
-	"github.com/yamamoto-febc/libsacloud/api"
-	"github.com/yamamoto-febc/libsacloud/sacloud"
+	"github.com/sacloud/libsacloud/api"
+	"github.com/sacloud/libsacloud/sacloud"
 )
 
 func resourceSakuraCloudSSHKey() *schema.Resource {
@@ -55,13 +55,13 @@ func resourceSakuraCloudSSHKeyCreate(d *schema.ResourceData, meta interface{}) e
 		return fmt.Errorf("Failed to create SakuraCloud SSHKey resource: %s", err)
 	}
 
-	d.SetId(key.ID)
+	d.SetId(key.GetStrID())
 	return resourceSakuraCloudSSHKeyRead(d, meta)
 }
 
 func resourceSakuraCloudSSHKeyRead(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*api.Client)
-	key, err := client.SSHKey.Read(d.Id())
+	key, err := client.SSHKey.Read(toSakuraCloudID(d.Id()))
 	if err != nil {
 		return fmt.Errorf("Couldn't find SakuraCloud SSHKey resource: %s", err)
 	}
@@ -72,7 +72,7 @@ func resourceSakuraCloudSSHKeyRead(d *schema.ResourceData, meta interface{}) err
 func resourceSakuraCloudSSHKeyUpdate(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*api.Client)
 
-	key, err := client.SSHKey.Read(d.Id())
+	key, err := client.SSHKey.Read(toSakuraCloudID(d.Id()))
 	if err != nil {
 		return fmt.Errorf("Couldn't find SakuraCloud SSHKey resource: %s", err)
 	}
@@ -95,7 +95,7 @@ func resourceSakuraCloudSSHKeyUpdate(d *schema.ResourceData, meta interface{}) e
 	if err != nil {
 		return fmt.Errorf("Error updating SakuraCloud SSHKey resource: %s", err)
 	}
-	d.SetId(key.ID)
+	d.SetId(key.GetStrID())
 
 	return resourceSakuraCloudSSHKeyRead(d, meta)
 }
@@ -103,7 +103,7 @@ func resourceSakuraCloudSSHKeyUpdate(d *schema.ResourceData, meta interface{}) e
 func resourceSakuraCloudSSHKeyDelete(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*api.Client)
 
-	_, err := client.SSHKey.Delete(d.Id())
+	_, err := client.SSHKey.Delete(toSakuraCloudID(d.Id()))
 	if err != nil {
 		return fmt.Errorf("Error deleting SakuraCloud SSHKey resource: %s", err)
 	}
@@ -118,6 +118,6 @@ func setSSHKeyResourceData(d *schema.ResourceData, client *api.Client, data *sac
 	d.Set("fingerprint", data.Fingerprint)
 	d.Set("description", data.Description)
 
-	d.SetId(data.ID)
+	d.SetId(data.GetStrID())
 	return nil
 }

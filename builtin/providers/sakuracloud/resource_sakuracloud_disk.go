@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"github.com/docker/go-units"
 	"github.com/hashicorp/terraform/helper/schema"
-	"github.com/yamamoto-febc/libsacloud/api"
-	"github.com/yamamoto-febc/libsacloud/sacloud"
+	"github.com/sacloud/libsacloud/api"
+	"github.com/sacloud/libsacloud/sacloud"
 	"time"
 )
 
@@ -25,14 +25,11 @@ func resourceSakuraCloudDisk() *schema.Resource {
 				Required: true,
 			},
 			"plan": &schema.Schema{
-				Type:     schema.TypeString,
-				Optional: true,
-				ForceNew: true,
-				Default:  sacloud.DiskPlanSSD.ID.String(),
-				ValidateFunc: validateStringInWord([]string{
-					sacloud.DiskPlanSSD.ID.String(),
-					sacloud.DiskPlanHDD.ID.String(),
-				}),
+				Type:         schema.TypeString,
+				Optional:     true,
+				ForceNew:     true,
+				Default:      "ssd",
+				ValidateFunc: validateStringInWord([]string{"ssd", "hdd"}),
 			},
 			"connection": &schema.Schema{
 				Type:     schema.TypeString,
@@ -49,12 +46,14 @@ func resourceSakuraCloudDisk() *schema.Resource {
 				ForceNew:      true,
 				Optional:      true,
 				ConflictsWith: []string{"source_disk_id"},
+				ValidateFunc:  validateSakuracloudIDType,
 			},
 			"source_disk_id": &schema.Schema{
 				Type:          schema.TypeString,
 				ForceNew:      true,
 				Optional:      true,
 				ConflictsWith: []string{"source_archive_id"},
+				ValidateFunc:  validateSakuracloudIDType,
 			},
 			"size": &schema.Schema{
 				Type:     schema.TypeInt,
@@ -98,6 +97,8 @@ func resourceSakuraCloudDisk() *schema.Resource {
 				Type:     schema.TypeList,
 				Optional: true,
 				Elem:     &schema.Schema{Type: schema.TypeString},
+				// ! Current terraform(v0.7) is not support to array validation !
+				// ValidateFunc: validateSakuracloudIDArrayType,
 			},
 			"disable_pw_auth": &schema.Schema{
 				Type:     schema.TypeBool,
@@ -107,6 +108,8 @@ func resourceSakuraCloudDisk() *schema.Resource {
 				Type:     schema.TypeList,
 				Optional: true,
 				Elem:     &schema.Schema{Type: schema.TypeString},
+				// ! Current terraform(v0.7) is not support to array validation !
+				// ValidateFunc: validateSakuracloudIDArrayType,
 			},
 		},
 	}
@@ -123,16 +126,28 @@ func resourceSakuraCloudDiskCreate(d *schema.ResourceData, meta interface{}) err
 	opts := client.Disk.New()
 
 	opts.Name = d.Get("name").(string)
-	opts.Plan.SetIDByString(d.Get("plan").(string))
+
+	plan := d.Get("plan").(string)
+	switch plan {
+	case "ssd":
+		opts.SetDiskPlanToSSD()
+		break
+	case "hdd":
+		opts.SetDiskPlanToHDD()
+		break
+	default:
+		return fmt.Errorf("invalid disk plan [%s]", plan)
+	}
+
 	opts.Connection = sacloud.EDiskConnection(d.Get("connection").(string))
 
 	archiveID, ok := d.GetOk("source_archive_id")
 	if ok {
-		opts.SetSourceArchive(archiveID.(string))
+		opts.SetSourceArchive(toSakuraCloudID(archiveID.(string)))
 	}
 	diskID, ok := d.GetOk("source_disk_id")
 	if ok {
-		opts.SetSourceDisk(diskID.(string))
+		opts.SetSourceDisk(toSakuraCloudID(diskID.(string)))
 	}
 
 	opts.SizeMB = d.Get("size").(int) * units.GiB / units.MiB
@@ -184,14 +199,14 @@ func resourceSakuraCloudDiskCreate(d *schema.ResourceData, meta interface{}) err
 
 	server_id, ok := d.GetOk("server_id")
 	if ok {
-		_, err = client.Disk.ConnectToServer(disk.ID, server_id.(string))
+		_, err = client.Disk.ConnectToServer(disk.ID, toSakuraCloudID(server_id.(string)))
 
 		if err != nil {
 			return fmt.Errorf("Failed to connect SakuraCloud Disk resource: %s", err)
 		}
 	}
 
-	d.SetId(disk.ID)
+	d.SetId(disk.GetStrID())
 	return resourceSakuraCloudDiskRead(d, meta)
 }
 
@@ -203,7 +218,7 @@ func resourceSakuraCloudDiskRead(d *schema.ResourceData, meta interface{}) error
 		client.Zone = zone.(string)
 	}
 
-	disk, err := client.Disk.Read(d.Id())
+	disk, err := client.Disk.Read(toSakuraCloudID(d.Id()))
 	if err != nil {
 		return fmt.Errorf("Couldn't find SakuraCloud Disk resource: %s", err)
 	}
@@ -219,7 +234,7 @@ func resourceSakuraCloudDiskUpdate(d *schema.ResourceData, meta interface{}) err
 		client.Zone = zone.(string)
 	}
 
-	disk, err := client.Disk.Read(d.Id())
+	disk, err := client.Disk.Read(toSakuraCloudID(d.Id()))
 	if err != nil {
 		return fmt.Errorf("Couldn't find SakuraCloud Disk resource: %s", err)
 	}
@@ -313,7 +328,7 @@ func resourceSakuraCloudDiskUpdate(d *schema.ResourceData, meta interface{}) err
 		return fmt.Errorf("Error updating SakuraCloud Disk resource: %s", err)
 	}
 
-	d.SetId(disk.ID)
+	d.SetId(disk.GetStrID())
 
 	if isRunning && isDiskConfigChanged {
 		_, err := client.Server.Boot(disk.Server.ID)
@@ -338,7 +353,7 @@ func resourceSakuraCloudDiskDelete(d *schema.ResourceData, meta interface{}) err
 		client.Zone = zone.(string)
 	}
 
-	disk, err := client.Disk.Read(d.Id())
+	disk, err := client.Disk.Read(toSakuraCloudID(d.Id()))
 	if err != nil {
 		return fmt.Errorf("Couldn't find SakuraCloud Disk resource: %s", err)
 	}
@@ -359,14 +374,14 @@ func resourceSakuraCloudDiskDelete(d *schema.ResourceData, meta interface{}) err
 			}
 		}
 
-		_, err := client.Disk.DisconnectFromServer(d.Id())
+		_, err := client.Disk.DisconnectFromServer(toSakuraCloudID(d.Id()))
 		if err != nil {
 			return fmt.Errorf("Error disconnecting Disk from SakuraCloud Server: %s", err)
 		}
 
 	}
 
-	_, err = client.Disk.Delete(d.Id())
+	_, err = client.Disk.Delete(toSakuraCloudID(d.Id()))
 
 	if err != nil {
 		return fmt.Errorf("Error deleting SakuraCloud Disk resource: %s", err)
@@ -390,17 +405,27 @@ func resourceSakuraCloudDiskDelete(d *schema.ResourceData, meta interface{}) err
 func setDiskResourceData(d *schema.ResourceData, client *api.Client, data *sacloud.Disk) error {
 
 	d.Set("name", data.Name)
-	d.Set("plan", data.Plan.ID.String())
+
+	switch data.Plan.ID {
+	case sacloud.DiskPlanSSD.ID:
+		d.Set("plan", "ssd")
+		break
+	case sacloud.DiskPlanHDD.ID:
+		d.Set("plan", "hdd")
+		break
+
+	}
+
 	d.Set("connection", fmt.Sprintf("%s", data.Connection))
 	d.Set("size", data.SizeMB*units.MiB/units.GiB)
 	d.Set("description", data.Description)
 	d.Set("tags", data.Tags)
 
 	if data.Server != nil {
-		d.Set("server_id", data.Server.ID)
+		d.Set("server_id", data.Server.GetStrID())
 	}
 
 	d.Set("zone", client.Zone)
-	d.SetId(data.ID)
+	d.SetId(data.GetStrID())
 	return nil
 }

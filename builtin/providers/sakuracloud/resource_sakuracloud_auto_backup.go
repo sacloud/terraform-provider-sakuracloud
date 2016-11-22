@@ -3,8 +3,8 @@ package sakuracloud
 import (
 	"fmt"
 	"github.com/hashicorp/terraform/helper/schema"
-	"github.com/yamamoto-febc/libsacloud/api"
-	"github.com/yamamoto-febc/libsacloud/sacloud"
+	"github.com/sacloud/libsacloud/api"
+	"github.com/sacloud/libsacloud/sacloud"
 )
 
 func resourceSakuraCloudAutoBackup() *schema.Resource {
@@ -24,9 +24,10 @@ func resourceSakuraCloudAutoBackup() *schema.Resource {
 				ForceNew: true,
 			},
 			"disk_id": &schema.Schema{
-				Type:     schema.TypeString,
-				Required: true,
-				ForceNew: true,
+				Type:         schema.TypeString,
+				Required:     true,
+				ForceNew:     true,
+				ValidateFunc: validateSakuracloudIDType,
 			},
 			"backup_hour": &schema.Schema{
 				Type:         schema.TypeInt,
@@ -74,7 +75,8 @@ func resourceSakuraCloudAutoBackupCreate(d *schema.ResourceData, meta interface{
 		client.Zone = zone.(string)
 	}
 
-	opts := client.AutoBackup.New(d.Get("name").(string), d.Get("disk_id").(string))
+	diskID := d.Get("disk_id").(string)
+	opts := client.AutoBackup.New(d.Get("name").(string), toSakuraCloudID(diskID))
 	opts.SetBackupHour(d.Get("backup_hour").(int))
 	opts.SetBackupMaximumNumberOfArchives(d.Get("max_backup_num").(int))
 	rawWeekdays := d.Get("weekdays").([]interface{})
@@ -100,7 +102,7 @@ func resourceSakuraCloudAutoBackupCreate(d *schema.ResourceData, meta interface{
 		return fmt.Errorf("Failed to create SakuraCloud AutoBackup resource: %s", err)
 	}
 
-	d.SetId(autoBackup.ID)
+	d.SetId(autoBackup.GetStrID())
 	return resourceSakuraCloudAutoBackupRead(d, meta)
 }
 
@@ -111,7 +113,7 @@ func resourceSakuraCloudAutoBackupRead(d *schema.ResourceData, meta interface{})
 		client.Zone = zone.(string)
 	}
 
-	autoBackup, err := client.AutoBackup.Read(d.Id())
+	autoBackup, err := client.AutoBackup.Read(toSakuraCloudID(d.Id()))
 	if err != nil {
 		return fmt.Errorf("Couldn't find SakuraCloud AutoBackup resource: %s", err)
 	}
@@ -136,7 +138,7 @@ func resourceSakuraCloudAutoBackupUpdate(d *schema.ResourceData, meta interface{
 		client.Zone = zone.(string)
 	}
 
-	autoBackup, err := client.AutoBackup.Read(d.Id())
+	autoBackup, err := client.AutoBackup.Read(toSakuraCloudID(d.Id()))
 	if err != nil {
 		return fmt.Errorf("Couldn't find SakuraCloud AutoBackup resource: %s", err)
 	}
@@ -169,7 +171,7 @@ func resourceSakuraCloudAutoBackupUpdate(d *schema.ResourceData, meta interface{
 		return fmt.Errorf("Failed to create SakuraCloud AutoBackup resource: %s", err)
 	}
 
-	d.SetId(autoBackup.ID)
+	d.SetId(autoBackup.GetStrID())
 	return resourceSakuraCloudAutoBackupRead(d, meta)
 
 }
@@ -181,8 +183,7 @@ func resourceSakuraCloudAutoBackupDelete(d *schema.ResourceData, meta interface{
 		client.Zone = zone.(string)
 	}
 
-	_, err := client.AutoBackup.Delete(d.Id())
-
+	_, err := client.AutoBackup.Delete(toSakuraCloudID(d.Id()))
 	if err != nil {
 		return fmt.Errorf("Error deleting SakuraCloud AutoBackup resource: %s", err)
 	}
