@@ -24,6 +24,7 @@ resource "sakuracloud_vpc_router" "foobar" {
     ipaddress2 = "${sakuracloud_internet.router1.nw_ipaddresses.2}"  # 実IP2
     aliases = ["${sakuracloud_internet.router1.nw_ipaddresses.3}"]   # IPエイリアス
     VRID = 1
+    syslog_host = "192.168.11.1"                                     # syslog転送先ホスト
 }
 
 # VPCルーター本体の定義(スタンダードプランの場合)
@@ -208,6 +209,7 @@ VPCルーター本体を表します。
 | `ipaddress2`    | △   | IPアドレス2     | -        | 文字列                         | プランが`premium`、`highspec`の場合必須 |
 | `VRID`          | △   | VRID           | -        | 数値                          | プランが`premium`、`highspec`の場合必須 |
 | `aliases`       | -   | IPエイリアス    | -        | リスト(文字列)                  | プランが`premium`、`highspec`の場合のみ有効 |
+| `syslog_host`   | -   | syslog転送先ホスト| -      | 文字列                         | - |
 | `description`   | -   | 説明           | -        | 文字列                         | - |
 | `tags`          | -   | タグ           | -        | リスト(文字列)                  | - |
 | `zone`          | -   | ゾーン          | -        | `is1b`<br />`tk1a`<br />`tk1v` | - |
@@ -226,6 +228,7 @@ VPCルーター本体を表します。
 | `ipaddress2`    | IPアドレス2      | -                    |
 | `VRID`          | VRID           | -                     |
 | `aliases`       | IPエイリアス      | -                   |
+| `syslog_host`   | syslog転送先ホスト | -                   |
 | `description`   | 説明             | -                   |
 | `tags`          | タグ             | -                  |
 | `zone`          | ゾーン           | -                   |

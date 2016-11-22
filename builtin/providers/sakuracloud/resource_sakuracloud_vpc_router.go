@@ -74,6 +74,10 @@ func resourceSakuraCloudVPCRouter() *schema.Resource {
 				Type:     schema.TypeString,
 				Computed: true,
 			},
+			"syslog_host": &schema.Schema{
+				Type:     schema.TypeString,
+				Optional: true,
+			},
 			"zone": &schema.Schema{
 				Type:         schema.TypeString,
 				Optional:     true,
@@ -162,6 +166,11 @@ func resourceSakuraCloudVPCRouterCreate(d *schema.ResourceData, meta interface{}
 		opts.Tags = expandStringList(rawTags)
 	}
 
+	if syslogHost, ok := d.GetOk("syslog_host"); ok {
+		opts.InitVPCRouterSetting()
+		opts.Settings.Router.SyslogHost = syslogHost.(string)
+	}
+
 	vpcRouter, err := client.VPCRouter.Create(opts)
 	if err != nil {
 		return fmt.Errorf("Failed to create SakuraCloud VPCRouter resource: %s", err)
@@ -200,6 +209,7 @@ func resourceSakuraCloudVPCRouterRead(d *schema.ResourceData, meta interface{}) 
 
 	d.Set("name", vpcRouter.Name)
 	d.Set("description", vpcRouter.Description)
+	d.Set("syslog_host", vpcRouter.Settings.Router.SyslogHost)
 	d.Set("tags", vpcRouter.Tags)
 
 	//plan
@@ -260,6 +270,13 @@ func resourceSakuraCloudVPCRouterUpdate(d *schema.ResourceData, meta interface{}
 		rawTags := d.Get("tags").([]interface{})
 		if rawTags != nil {
 			vpcRouter.Tags = expandStringList(rawTags)
+		}
+	}
+	if d.HasChange("syslog_host") {
+		if syslogHost, ok := d.GetOk("syslog_host"); ok {
+			vpcRouter.Settings.Router.SyslogHost = syslogHost.(string)
+		} else {
+			vpcRouter.Settings.Router.SyslogHost = ""
 		}
 	}
 
