@@ -20,6 +20,7 @@ func TestAccSakuraCloudDatabase_Basic(t *testing.T) {
 				Config: testAccCheckSakuraCloudDatabaseConfig_basic,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckSakuraCloudDatabaseExists("sakuracloud_database.foobar", &database),
+					resource.TestCheckResourceAttr("sakuracloud_database.foobar", "database_type", "postgresql"),
 					resource.TestCheckResourceAttr("sakuracloud_database.foobar", "name", "name_before"),
 					resource.TestCheckResourceAttr("sakuracloud_database.foobar", "description", "description_before"),
 					resource.TestCheckResourceAttr("sakuracloud_database.foobar", "tags.#", "2"),
@@ -46,6 +47,7 @@ func TestAccSakuraCloudDatabase_Basic(t *testing.T) {
 				Config: testAccCheckSakuraCloudDatabaseConfig_update,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckSakuraCloudDatabaseExists("sakuracloud_database.foobar", &database),
+					resource.TestCheckResourceAttr("sakuracloud_database.foobar", "database_type", "postgresql"),
 					resource.TestCheckResourceAttr("sakuracloud_database.foobar", "name", "name_after"),
 					resource.TestCheckResourceAttr("sakuracloud_database.foobar", "description", "description_after"),
 					resource.TestCheckResourceAttr("sakuracloud_database.foobar", "tags.#", "2"),
@@ -83,6 +85,7 @@ func TestAccResourceSakuraCloudDatabase_WithSwitch(t *testing.T) {
 				Config: testAccCheckSakuraCloudDatabaseConfig_WithSwitch,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckSakuraCloudDatabaseExists("sakuracloud_database.foobar", &database),
+					resource.TestCheckResourceAttr("sakuracloud_database.foobar", "database_type", "mariadb"),
 					resource.TestCheckResourceAttr("sakuracloud_database.foobar", "name", "name_before"),
 					resource.TestCheckResourceAttr("sakuracloud_database.foobar", "description", "description_before"),
 					resource.TestCheckResourceAttr("sakuracloud_database.foobar", "tags.#", "2"),
@@ -96,7 +99,7 @@ func TestAccResourceSakuraCloudDatabase_WithSwitch(t *testing.T) {
 					resource.TestCheckResourceAttr("sakuracloud_database.foobar", "allow_networks.#", "2"),
 					resource.TestCheckResourceAttr("sakuracloud_database.foobar", "allow_networks.0", "192.168.11.0/24"),
 					resource.TestCheckResourceAttr("sakuracloud_database.foobar", "allow_networks.1", "192.168.12.0/24"),
-					resource.TestCheckResourceAttr("sakuracloud_database.foobar", "port", "54321"),
+					resource.TestCheckResourceAttr("sakuracloud_database.foobar", "port", "33061"),
 					resource.TestCheckResourceAttr("sakuracloud_database.foobar", "backup_rotate", "8"),
 					resource.TestCheckResourceAttr("sakuracloud_database.foobar", "backup_time", "00:00"),
 					resource.TestCheckResourceAttr("sakuracloud_database.foobar", "ipaddress1", "192.168.11.101"),
@@ -108,6 +111,7 @@ func TestAccResourceSakuraCloudDatabase_WithSwitch(t *testing.T) {
 				Config: testAccCheckSakuraCloudDatabaseConfig_WithSwitchUpdate,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckSakuraCloudDatabaseExists("sakuracloud_database.foobar", &database),
+					resource.TestCheckResourceAttr("sakuracloud_database.foobar", "database_type", "mariadb"),
 					resource.TestCheckResourceAttr("sakuracloud_database.foobar", "name", "name_after"),
 					resource.TestCheckResourceAttr("sakuracloud_database.foobar", "description", "description_after"),
 					resource.TestCheckResourceAttr("sakuracloud_database.foobar", "tags.#", "2"),
@@ -121,7 +125,7 @@ func TestAccResourceSakuraCloudDatabase_WithSwitch(t *testing.T) {
 					resource.TestCheckResourceAttr("sakuracloud_database.foobar", "allow_networks.#", "2"),
 					resource.TestCheckResourceAttr("sakuracloud_database.foobar", "allow_networks.0", "192.168.110.0/24"),
 					resource.TestCheckResourceAttr("sakuracloud_database.foobar", "allow_networks.1", "192.168.120.0/24"),
-					resource.TestCheckResourceAttr("sakuracloud_database.foobar", "port", "54322"),
+					resource.TestCheckResourceAttr("sakuracloud_database.foobar", "port", "33062"),
 					resource.TestCheckResourceAttr("sakuracloud_database.foobar", "backup_rotate", "7"),
 					resource.TestCheckResourceAttr("sakuracloud_database.foobar", "backup_time", "00:30"),
 					resource.TestCheckResourceAttr("sakuracloud_database.foobar", "ipaddress1", "192.168.11.101"),
@@ -233,13 +237,15 @@ resource "sakuracloud_switch" "sw" {
 }
 resource "sakuracloud_database" "foobar" {
 
+    database_type = "mariadb"
+
     admin_password = "DatabasePasswordAdmin397"
     user_name = "defuser"
     user_password = "DatabasePasswordUser397"
 
     allow_networks = ["192.168.11.0/24","192.168.12.0/24"]
 
-    port = 54321
+    port = 33061
 
     backup_rotate = 8
     backup_time = "00:00"
@@ -262,6 +268,7 @@ resource "sakuracloud_switch" "sw" {
     zone = "tk1a"
 }
 resource "sakuracloud_database" "foobar" {
+    database_type = "mariadb"
 
     admin_password = "DatabasePasswordAdmin397"
     user_name = "defuser"
@@ -269,7 +276,7 @@ resource "sakuracloud_database" "foobar" {
 
     allow_networks = ["192.168.110.0/24","192.168.120.0/24"]
 
-    port = 54322
+    port = 33062
 
     backup_rotate = 7
     backup_time = "00:30"
