@@ -6,6 +6,7 @@ import (
 	"github.com/hashicorp/terraform/helper/schema"
 	"github.com/sacloud/libsacloud/api"
 	"github.com/sacloud/libsacloud/sacloud"
+	"log"
 	"time"
 )
 
@@ -170,31 +171,39 @@ func resourceSakuraCloudDiskCreate(d *schema.ResourceData, meta interface{}) err
 	}
 
 	//edit disk
-	diskEditCondig := client.Disk.NewCondig()
+	diskEditConfig := client.Disk.NewCondig()
 	if hostName, ok := d.GetOk("hostname"); ok {
-		diskEditCondig.SetHostName(hostName.(string))
+		diskEditConfig.SetHostName(hostName.(string))
 	}
 	if password, ok := d.GetOk("password"); ok {
-		diskEditCondig.SetPassword(password.(string))
+		diskEditConfig.SetPassword(password.(string))
 	}
 	if sshKeyIDs, ok := d.GetOk("ssh_key_ids"); ok {
 		ids := expandStringList(sshKeyIDs.([]interface{}))
-		diskEditCondig.SetSSHKeys(ids)
+		diskEditConfig.SetSSHKeys(ids)
 	}
 
 	if disablePasswordAuth, ok := d.GetOk("disable_pw_auth"); ok {
-		diskEditCondig.SetDisablePWAuth(disablePasswordAuth.(bool))
+		diskEditConfig.SetDisablePWAuth(disablePasswordAuth.(bool))
 	}
 
 	if noteIDs, ok := d.GetOk("note_ids"); ok {
 		ids := expandStringList(noteIDs.([]interface{}))
-		diskEditCondig.SetNotes(ids)
+		diskEditConfig.SetNotes(ids)
 	}
 
 	// call disk edit API
-	_, err = client.Disk.Config(disk.ID, diskEditCondig)
+	res, err := client.Disk.CanEditDisk(disk.ID)
 	if err != nil {
-		return fmt.Errorf("Error editting SakuraCloud DiskConfig: %s", err)
+		return fmt.Errorf("Failed to check CanEditDisk: %s", err)
+	}
+	if res {
+		_, err = client.Disk.Config(disk.ID, diskEditConfig)
+		if err != nil {
+			return fmt.Errorf("Error editting SakuraCloud DiskConfig: %s", err)
+		}
+	} else {
+		log.Printf("[WARN] Disk[%d] does not support modify disk", disk.ID)
 	}
 
 	server_id, ok := d.GetOk("server_id")
@@ -260,48 +269,56 @@ func resourceSakuraCloudDiskUpdate(d *schema.ResourceData, meta interface{}) err
 	}
 
 	if isDiskConfigChanged {
-		diskEditCondig := client.Disk.NewCondig()
+		diskEditConfig := client.Disk.NewCondig()
 		if d.HasChange("hostname") {
 			if hostName, ok := d.GetOk("hostname"); ok {
-				diskEditCondig.SetHostName(hostName.(string))
+				diskEditConfig.SetHostName(hostName.(string))
 			} else {
-				diskEditCondig.HostName = nil
+				diskEditConfig.HostName = nil
 			}
 		}
 
 		if d.HasChange("password") {
 			if password, ok := d.GetOk("password"); ok {
-				diskEditCondig.SetPassword(password.(string))
+				diskEditConfig.SetPassword(password.(string))
 			} else {
-				diskEditCondig.SetPassword("")
+				diskEditConfig.SetPassword("")
 			}
 		}
 
 		if d.HasChange("ssh_key_ids") {
 			if sshKeyIDs, ok := d.GetOk("ssh_key_ids"); ok {
 				ids := expandStringList(sshKeyIDs.([]interface{}))
-				diskEditCondig.SetSSHKeys(ids)
+				diskEditConfig.SetSSHKeys(ids)
 			} else {
-				diskEditCondig.SSHKeys = nil
+				diskEditConfig.SSHKeys = nil
 			}
 		}
 
 		if d.HasChange("disable_pw_auth") {
-			diskEditCondig.SetDisablePWAuth(d.Get("disable_pw_auth").(bool))
+			diskEditConfig.SetDisablePWAuth(d.Get("disable_pw_auth").(bool))
 		}
 
 		if d.HasChange("note_ids") {
 			if noteIDs, ok := d.GetOk("note_ids"); ok {
 				ids := expandStringList(noteIDs.([]interface{}))
-				diskEditCondig.SetNotes(ids)
+				diskEditConfig.SetNotes(ids)
 			} else {
-				diskEditCondig.Notes = nil
+				diskEditConfig.Notes = nil
 			}
 		}
 
-		_, err := client.Disk.Config(disk.ID, diskEditCondig)
+		res, err := client.Disk.CanEditDisk(disk.ID)
 		if err != nil {
-			return fmt.Errorf("Error editting SakuraCloud DiskConfig: %s", err)
+			return fmt.Errorf("Failed to check CanEditDisk: %s", err)
+		}
+		if res {
+			_, err := client.Disk.Config(disk.ID, diskEditConfig)
+			if err != nil {
+				return fmt.Errorf("Error editting SakuraCloud DiskConfig: %s", err)
+			}
+		} else {
+			log.Printf("[WARN] Disk[%d] does not support modify disk", disk.ID)
 		}
 
 	}

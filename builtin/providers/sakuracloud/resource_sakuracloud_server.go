@@ -6,6 +6,7 @@ import (
 	"github.com/hashicorp/terraform/helper/schema"
 	"github.com/sacloud/libsacloud/api"
 	"github.com/sacloud/libsacloud/sacloud"
+	"log"
 	"time"
 )
 
@@ -213,10 +214,20 @@ func resourceSakuraCloudServerCreate(d *schema.ResourceData, meta interface{}) e
 					}
 
 					if isNeedEditDisk {
-						_, err := client.Disk.Config(toSakuraCloudID(diskID), diskEditConfig)
+
+						res, err := client.Disk.CanEditDisk(toSakuraCloudID(diskID))
 						if err != nil {
-							return fmt.Errorf("Error editting SakuraCloud DiskConfig: %s", err)
+							return fmt.Errorf("Failed to check CanEditDisk: %s", err)
 						}
+						if res {
+							_, err := client.Disk.Config(toSakuraCloudID(diskID), diskEditConfig)
+							if err != nil {
+								return fmt.Errorf("Error editting SakuraCloud DiskConfig: %s", err)
+							}
+						} else {
+							log.Printf("[WARN] Disk[%s] does not support modify disk", diskID)
+						}
+
 					}
 
 				}
@@ -463,10 +474,20 @@ func resourceSakuraCloudServerUpdate(d *schema.ResourceData, meta interface{}) e
 			}
 
 			if isNeedEditDisk {
-				_, err := client.Disk.Config(updatedServer.Disks[0].ID, diskEditConfig)
+				diskID := updatedServer.Disks[0].ID
+				res, err := client.Disk.CanEditDisk(diskID)
 				if err != nil {
-					return fmt.Errorf("Error editting SakuraCloud DiskConfig: %s", err)
+					return fmt.Errorf("Failed to check CanEditDisk: %s", err)
 				}
+				if res {
+					_, err := client.Disk.Config(diskID, diskEditConfig)
+					if err != nil {
+						return fmt.Errorf("Error editting SakuraCloud DiskConfig: %s", err)
+					}
+				} else {
+					log.Printf("[WARN] Disk[%s] does not support modify disk", diskID)
+				}
+
 			}
 		}
 	}
