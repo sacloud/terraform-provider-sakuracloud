@@ -12,18 +12,6 @@ import (
 	"github.com/hashicorp/hcl"
 )
 
-// ErrNoConfigsFound is the error returned by LoadDir if no
-// Terraform configuration files were found in the given directory.
-type ErrNoConfigsFound struct {
-	Dir string
-}
-
-func (e ErrNoConfigsFound) Error() string {
-	return fmt.Sprintf(
-		"No Terraform configuration files found in directory: %s",
-		e.Dir)
-}
-
 // LoadJSON loads a single Terraform configuration from a given JSON document.
 //
 // The document must be a complete Terraform configuration. This function will
@@ -81,7 +69,9 @@ func LoadDir(root string) (*Config, error) {
 		return nil, err
 	}
 	if len(files) == 0 {
-		return nil, &ErrNoConfigsFound{Dir: root}
+		return nil, fmt.Errorf(
+			"No Terraform configuration files found in directory: %s",
+			root)
 	}
 
 	// Determine the absolute path to the directory.

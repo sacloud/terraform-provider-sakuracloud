@@ -7,6 +7,7 @@ import (
 	"github.com/hashicorp/terraform/config"
 	"github.com/hashicorp/terraform/config/module"
 	"github.com/hashicorp/terraform/dag"
+	"github.com/hashicorp/terraform/dot"
 )
 
 // GraphNodeConfigModule represents a module within the configuration graph.
@@ -128,14 +129,11 @@ func (n *graphNodeModuleExpanded) DependentOn() []string {
 }
 
 // GraphNodeDotter impl.
-func (n *graphNodeModuleExpanded) DotNode(name string, opts *dag.DotOpts) *dag.DotNode {
-	return &dag.DotNode{
-		Name: name,
-		Attrs: map[string]string{
-			"label": dag.VertexName(n.Original),
-			"shape": "component",
-		},
-	}
+func (n *graphNodeModuleExpanded) DotNode(name string, opts *GraphDotOpts) *dot.Node {
+	return dot.NewNode(name, map[string]string{
+		"label": dag.VertexName(n.Original),
+		"shape": "component",
+	})
 }
 
 // GraphNodeEvalable impl.
@@ -158,7 +156,7 @@ func (n *graphNodeModuleExpanded) EvalTree() EvalNode {
 
 // GraphNodeFlattenable impl.
 func (n *graphNodeModuleExpanded) FlattenGraph() *Graph {
-	graph := n.Subgraph().(*Graph)
+	graph := n.Subgraph()
 	input := n.Original.Module.RawConfig
 
 	// Go over each vertex and do some modifications to the graph for
@@ -191,7 +189,7 @@ func (n *graphNodeModuleExpanded) FlattenGraph() *Graph {
 }
 
 // GraphNodeSubgraph impl.
-func (n *graphNodeModuleExpanded) Subgraph() dag.Grapher {
+func (n *graphNodeModuleExpanded) Subgraph() *Graph {
 	return n.Graph
 }
 
