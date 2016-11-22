@@ -40,6 +40,8 @@ func TestAccResourceSakuraCloudVPCRouter(t *testing.T) {
 						"sakuracloud_vpc_router.foobar", "ipaddress1", ""),
 					resource.TestCheckResourceAttr(
 						"sakuracloud_vpc_router.foobar", "ipaddress2", ""),
+					resource.TestCheckResourceAttr(
+						"sakuracloud_vpc_router.foobar", "syslog_host", "192.168.0.1"),
 				),
 			},
 			resource.TestStep{
@@ -66,6 +68,8 @@ func TestAccResourceSakuraCloudVPCRouter(t *testing.T) {
 						"sakuracloud_vpc_router.foobar", "ipaddress1", ""),
 					resource.TestCheckResourceAttr(
 						"sakuracloud_vpc_router.foobar", "ipaddress2", ""),
+					resource.TestCheckResourceAttr(
+						"sakuracloud_vpc_router.foobar", "syslog_host", "192.168.0.2"),
 					//resource.TestCheckResourceAttr(
 					//	"sakuracloud_vpc_router.foobar", "interfaces.#", "2"),
 					//resource.TestCheckResourceAttr(
@@ -138,6 +142,7 @@ resource "sakuracloud_vpc_router" "foobar" {
     name = "name_before"
     description = "description_before"
     tags = ["hoge1" , "hoge2"]
+    syslog_host = "192.168.0.1"
 }`
 
 var testAccCheckSakuraCloudVPCRouterConfig_update = `
@@ -145,6 +150,7 @@ resource "sakuracloud_vpc_router" "foobar" {
     name = "name_after"
     description = "description_after"
     tags = ["hoge1_after" , "hoge2_after"]
+    syslog_host = "192.168.0.2"
 }`
 
 var testAccCheckSakuraCloudVPCRouterConfig_with_premium = `
