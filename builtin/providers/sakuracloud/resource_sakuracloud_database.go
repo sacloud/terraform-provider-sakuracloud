@@ -209,6 +209,10 @@ func resourceSakuraCloudDatabaseCreate(d *schema.ResourceData, meta interface{})
 	if err != nil {
 		return fmt.Errorf("Failed to wait SakuraCloud Database boot: %s", err)
 	}
+	err = client.Database.SleepUntilDatabaseRunning(database.ID, 20*time.Minute, 10)
+	if err != nil {
+		return fmt.Errorf("Failed to wait SakuraCloud Database start: %s", err)
+	}
 
 	return resourceSakuraCloudDatabaseRead(d, meta)
 }
