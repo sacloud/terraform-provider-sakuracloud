@@ -115,12 +115,6 @@ func (api *ArchiveAPI) CanEditDisk(id int64) (bool, error) {
 		return false, nil
 	}
 
-	// ソースアーカイブ/ソースディスクともに持っていない場合
-	if archive.SourceArchive == nil && archive.SourceDisk == nil {
-		//ブランクディスクがソース
-		return false, nil
-	}
-
 	for _, t := range allowDiskEditTags {
 		if archive.HasTag(t) {
 			// 対応OSインストール済みディスク
@@ -129,10 +123,13 @@ func (api *ArchiveAPI) CanEditDisk(id int64) (bool, error) {
 	}
 
 	// ここまできても判定できないならソースに投げる
-	if archive.SourceDisk != nil {
-		return api.CanEditDisk(archive.SourceDisk.ID)
+	if archive.SourceDisk != nil && archive.SourceDisk.Availability != "discontinued" {
+		return api.client.Disk.CanEditDisk(archive.SourceDisk.ID)
 	}
-	return api.client.Archive.CanEditDisk(archive.SourceArchive.ID)
+	if archive.SourceArchive != nil && archive.SourceArchive.Availability != "discontinued" {
+		return api.client.Archive.CanEditDisk(archive.SourceArchive.ID)
+	}
+	return false, nil
 
 }
 

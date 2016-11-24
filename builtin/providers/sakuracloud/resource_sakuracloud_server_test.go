@@ -163,6 +163,24 @@ func TestAccSakuraCloudServer_ConnectPacketFilters(t *testing.T) {
 	})
 }
 
+func TestAccSakuraCloudServer_With_BlankDisk(t *testing.T) {
+	var server sacloud.Server
+	resource.Test(t, resource.TestCase{
+		PreCheck:     func() { testAccPreCheck(t) },
+		Providers:    testAccProviders,
+		CheckDestroy: testAccCheckSakuraCloudServerDestroy,
+		Steps: []resource.TestStep{
+			resource.TestStep{
+				Config: testAccCheckSakuraCloudServerConfig_with_blank_disk,
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckSakuraCloudServerExists("sakuracloud_server.foobar", &server),
+					testAccCheckSakuraCloudServerAttributes(&server),
+				),
+			},
+		},
+	})
+}
+
 func testAccCheckSakuraCloudServerExists(n string, server *sacloud.Server) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
 		rs, ok := s.RootModule().Resources[n]
@@ -440,3 +458,14 @@ resource "sakuracloud_server" "foobar" {
     base_interface = "shared"
     additional_interfaces = [""]
 }`
+
+const testAccCheckSakuraCloudServerConfig_with_blank_disk = `
+resource "sakuracloud_server" "foobar" {
+    name = "myserver_with_blank"
+    base_interface = "shared"
+    disks = ["${sakuracloud_disk.foobar.id}"]
+}
+resource "sakuracloud_disk" "foobar" {
+    name = "mydisk"
+}
+`
