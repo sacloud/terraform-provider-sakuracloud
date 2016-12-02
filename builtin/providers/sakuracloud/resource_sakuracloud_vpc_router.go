@@ -209,7 +209,9 @@ func resourceSakuraCloudVPCRouterRead(d *schema.ResourceData, meta interface{}) 
 
 	d.Set("name", vpcRouter.Name)
 	d.Set("description", vpcRouter.Description)
-	d.Set("syslog_host", vpcRouter.Settings.Router.SyslogHost)
+	if vpcRouter.Settings != nil && vpcRouter.Settings.Router != nil {
+		d.Set("syslog_host", vpcRouter.Settings.Router.SyslogHost)
+	}
 	d.Set("tags", vpcRouter.Tags)
 
 	//plan
@@ -273,6 +275,11 @@ func resourceSakuraCloudVPCRouterUpdate(d *schema.ResourceData, meta interface{}
 		}
 	}
 	if d.HasChange("syslog_host") {
+
+		if vpcRouter.Settings == nil || vpcRouter.Settings.Router == nil {
+			vpcRouter.InitVPCRouterSetting()
+		}
+
 		if syslogHost, ok := d.GetOk("syslog_host"); ok {
 			vpcRouter.Settings.Router.SyslogHost = syslogHost.(string)
 		} else {
