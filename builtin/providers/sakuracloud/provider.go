@@ -6,6 +6,8 @@ import (
 	"github.com/hashicorp/terraform/terraform"
 )
 
+var DefaultZone = "is1b"
+
 // Provider returns a terraform.ResourceProvider.
 func Provider() terraform.ResourceProvider {
 	return &schema.Provider{
@@ -26,8 +28,8 @@ func Provider() terraform.ResourceProvider {
 				Type:         schema.TypeString,
 				Optional:     true,
 				DefaultFunc:  schema.MultiEnvDefaultFunc([]string{"SAKURACLOUD_ZONE"}, nil),
-				Description:  "Target SakuraCloud Zone(is1a | tk1a | tk1v)",
-				InputDefault: "is1b",
+				Description:  "Target SakuraCloud Zone(is1a | is1b | tk1a | tk1v)",
+				InputDefault: DefaultZone,
 				ValidateFunc: validateStringInWord([]string{"is1a", "is1b", "tk1a", "tk1v"}),
 			},
 			"trace": &schema.Schema{
@@ -90,6 +92,11 @@ func Provider() terraform.ResourceProvider {
 }
 
 func providerConfigure(d *schema.ResourceData) (interface{}, error) {
+
+	if _, ok := d.GetOk("zone"); !ok {
+		d.Set("zone", DefaultZone)
+	}
+
 	config := Config{
 		AccessToken:       d.Get("token").(string),
 		AccessTokenSecret: d.Get("secret").(string),
