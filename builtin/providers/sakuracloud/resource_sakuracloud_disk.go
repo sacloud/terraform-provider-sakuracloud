@@ -165,7 +165,7 @@ func resourceSakuraCloudDiskCreate(d *schema.ResourceData, meta interface{}) err
 		return fmt.Errorf("Failed to create SakuraCloud Disk resource: %s", err)
 	}
 
-	err = client.Disk.SleepWhileCopying(disk.ID, 10*time.Minute)
+	err = client.Disk.SleepWhileCopying(disk.ID, client.DefaultTimeoutDuration)
 	if err != nil {
 		return fmt.Errorf("Failed to create SakuraCloud Disk resource: %s", err)
 	}
@@ -262,7 +262,7 @@ func resourceSakuraCloudDiskUpdate(d *schema.ResourceData, meta interface{}) err
 			return fmt.Errorf("Error stopping SakuraCloud Server resource: %s", err)
 		}
 
-		err = client.Server.SleepUntilDown(disk.Server.ID, 10*time.Minute)
+		err = client.Server.SleepUntilDown(disk.Server.ID, client.DefaultTimeoutDuration)
 		if err != nil {
 			return fmt.Errorf("Error stopping SakuraCloud Server resource: %s", err)
 		}
@@ -353,7 +353,7 @@ func resourceSakuraCloudDiskUpdate(d *schema.ResourceData, meta interface{}) err
 			return fmt.Errorf("Error booting SakuraCloud Server resource: %s", err)
 		}
 
-		err = client.Server.SleepUntilUp(disk.Server.ID, 10*time.Minute)
+		err = client.Server.SleepUntilUp(disk.Server.ID, client.DefaultTimeoutDuration)
 		if err != nil {
 			return fmt.Errorf("Error booting SakuraCloud Server resource: %s", err)
 		}
@@ -385,7 +385,7 @@ func resourceSakuraCloudDiskDelete(d *schema.ResourceData, meta interface{}) err
 			if err != nil {
 				return fmt.Errorf("Error stopping Server: %s", err)
 			}
-			err = client.Server.SleepUntilDown(disk.Server.ID, 10*time.Minute)
+			err = client.Server.SleepUntilDown(disk.Server.ID, client.DefaultTimeoutDuration)
 			if err != nil {
 				return fmt.Errorf("Error stopping Server: %s", err)
 			}
@@ -409,7 +409,7 @@ func resourceSakuraCloudDiskDelete(d *schema.ResourceData, meta interface{}) err
 		if err != nil {
 			return fmt.Errorf("Error booting Server: %s", err)
 		}
-		err = client.Server.SleepUntilUp(disk.Server.ID, 10*time.Minute)
+		err = client.Server.SleepUntilUp(disk.Server.ID, client.DefaultTimeoutDuration)
 		if err != nil {
 			return fmt.Errorf("Error booting Server: %s", err)
 		}

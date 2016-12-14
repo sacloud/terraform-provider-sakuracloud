@@ -212,7 +212,7 @@ func resourceSakuraCloudSwitchDelete(d *schema.ResourceData, meta interface{}) e
 			if err != nil {
 				return fmt.Errorf("Error stopping SakuraCloud Server resource: %s", err)
 			}
-			err = client.Server.SleepUntilDown(s.ID, 10*time.Minute)
+			err = client.Server.SleepUntilDown(s.ID, client.DefaultTimeoutDuration)
 			if err != nil {
 				return fmt.Errorf("Error stopping SakuraCloud Server resource: %s", err)
 			}
@@ -241,7 +241,7 @@ func resourceSakuraCloudSwitchDelete(d *schema.ResourceData, meta interface{}) e
 		if err != nil {
 			return fmt.Errorf("Error booting SakuraCloud Server resource: %s", err)
 		}
-		err = client.Server.SleepUntilUp(id, 10*time.Minute)
+		err = client.Server.SleepUntilUp(id, client.DefaultTimeoutDuration)
 		if err != nil {
 			return fmt.Errorf("Error booting SakuraCloud Server resource: %s", err)
 		}

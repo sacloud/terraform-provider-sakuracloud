@@ -268,7 +268,7 @@ func resourceSakuraCloudServerCreate(d *schema.ResourceData, meta interface{}) e
 	if err != nil {
 		return fmt.Errorf("Failed to boot SakuraCloud Server resource: %s", err)
 	}
-	err = client.Server.SleepUntilUp(toSakuraCloudID(d.Id()), 10*time.Minute)
+	err = client.Server.SleepUntilUp(toSakuraCloudID(d.Id()), client.DefaultTimeoutDuration)
 	if err != nil {
 		return fmt.Errorf("Failed to boot SakuraCloud Server resource: %s", err)
 	}
@@ -334,7 +334,7 @@ func resourceSakuraCloudServerUpdate(d *schema.ResourceData, meta interface{}) e
 			return fmt.Errorf("Error stopping SakuraCloud Server resource: %s", err)
 		}
 
-		err = client.Server.SleepUntilDown(toSakuraCloudID(d.Id()), 10*time.Minute)
+		err = client.Server.SleepUntilDown(toSakuraCloudID(d.Id()), client.DefaultTimeoutDuration)
 		if err != nil {
 			return fmt.Errorf("Error stopping SakuraCloud Server resource: %s", err)
 		}
@@ -603,7 +603,7 @@ func resourceSakuraCloudServerUpdate(d *schema.ResourceData, meta interface{}) e
 			return fmt.Errorf("Error booting SakuraCloud Server resource: %s", err)
 		}
 
-		err = client.Server.SleepUntilUp(toSakuraCloudID(d.Id()), 10*time.Minute)
+		err = client.Server.SleepUntilUp(toSakuraCloudID(d.Id()), client.DefaultTimeoutDuration)
 		if err != nil {
 			return fmt.Errorf("Error booting SakuraCloud Server resource: %s", err)
 		}
@@ -634,7 +634,7 @@ func resourceSakuraCloudServerDelete(d *schema.ResourceData, meta interface{}) e
 			return fmt.Errorf("Error stopping SakuraCloud Server resource: %s", err)
 		}
 
-		err = client.Server.SleepUntilDown(toSakuraCloudID(d.Id()), 10*time.Minute)
+		err = client.Server.SleepUntilDown(toSakuraCloudID(d.Id()), client.DefaultTimeoutDuration)
 		if err != nil {
 			return fmt.Errorf("Error stopping SakuraCloud Server resource: %s", err)
 		}

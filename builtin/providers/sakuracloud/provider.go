@@ -32,6 +32,11 @@ func Provider() terraform.ResourceProvider {
 				InputDefault: DefaultZone,
 				ValidateFunc: validateStringInWord([]string{"is1a", "is1b", "tk1a", "tk1v"}),
 			},
+			"timeout": &schema.Schema{
+				Type:     schema.TypeInt,
+				Optional: true,
+				Default:  20,
+			},
 			"trace": &schema.Schema{
 				Type:        schema.TypeBool,
 				Optional:    true,
@@ -101,6 +106,7 @@ func providerConfigure(d *schema.ResourceData) (interface{}, error) {
 		AccessToken:       d.Get("token").(string),
 		AccessTokenSecret: d.Get("secret").(string),
 		Zone:              d.Get("zone").(string),
+		TimeoutMinute:     d.Get("timeout").(int),
 		TraceMode:         d.Get("trace").(bool),
 	}
 
