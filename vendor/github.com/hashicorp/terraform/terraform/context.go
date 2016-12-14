@@ -92,6 +92,7 @@ type Context struct {
 	parallelSem         Semaphore
 	providerInputConfig map[string]map[string]interface{}
 	runCh               <-chan struct{}
+	stopCh              chan struct{}
 	shadowErr           error
 }
 
@@ -101,6 +102,13 @@ type Context struct {
 // should not be mutated in any way, since the pointers are copied, not
 // the values themselves.
 func NewContext(opts *ContextOpts) (*Context, error) {
+	// Validate the version requirement if it is given
+	if opts.Module != nil {
+		if err := checkRequiredVersion(opts.Module); err != nil {
+			return nil, err
+		}
+	}
+
 	// Copy all the hooks and add our stop hook. We don't append directly
 	// to the Config so that we're not modifying that in-place.
 	sh := new(stopHook)
@@ -154,13 +162,18 @@ func NewContext(opts *ContextOpts) (*Context, error) {
 		}
 	}
 
+	diff := opts.Diff
+	if diff == nil {
+		diff = &Diff{}
+	}
+
 	return &Context{
 		components: &basicComponentFactory{
 			providers:    opts.Providers,
 			provisioners: opts.Provisioners,
 		},
 		destroy:   opts.Destroy,
-		diff:      opts.Diff,
+		diff:      diff,
 		hooks:     hooks,
 		module:    opts.Module,
 		shadow:    opts.Shadow,
@@ -176,13 +189,55 @@ func NewContext(opts *ContextOpts) (*Context, error) {
 }
 
 type ContextGraphOpts struct {
+	// If true, validates the graph structure (checks for cycles).
 	Validate bool
-	Verbose  bool
+
+	// Legacy graphs only: won't prune the graph
+	Verbose bool
 }
 
-// Graph returns the graph for this config.
-func (c *Context) Graph(g *ContextGraphOpts) (*Graph, error) {
-	return c.graphBuilder(g).Build(RootModulePath)
+// Graph returns the graph used for the given operation type.
+//
+// The most extensive or complex graph type is GraphTypePlan.
+func (c *Context) Graph(typ GraphType, opts *ContextGraphOpts) (*Graph, error) {
+	if opts == nil {
+		opts = &ContextGraphOpts{Validate: true}
+	}
+
+	switch typ {
+	case GraphTypeApply:
+		return (&ApplyGraphBuilder{
+			Module:       c.module,
+			Diff:         c.diff,
+			State:        c.state,
+			Providers:    c.components.ResourceProviders(),
+			Provisioners: c.components.ResourceProvisioners(),
+			Destroy:      c.destroy,
+			Validate:     opts.Validate,
+		}).Build(RootModulePath)
+
+	case GraphTypePlan:
+		return (&PlanGraphBuilder{
+			Module:    c.module,
+			State:     c.state,
+			Providers: c.components.ResourceProviders(),
+			Targets:   c.targets,
+			Validate:  opts.Validate,
+		}).Build(RootModulePath)
+
+	case GraphTypePlanDestroy:
+		return (&DestroyPlanGraphBuilder{
+			Module:   c.module,
+			State:    c.state,
+			Targets:  c.targets,
+			Validate: opts.Validate,
+		}).Build(RootModulePath)
+
+	case GraphTypeLegacy:
+		return c.graphBuilder(opts).Build(RootModulePath)
+	}
+
+	return nil, fmt.Errorf("unknown graph type: %s", typ)
 }
 
 // GraphBuilder returns the GraphBuilder that will be used to create
@@ -226,6 +281,21 @@ func (c *Context) graphBuilder(g *ContextGraphOpts) GraphBuilder {
 // running.
 func (c *Context) ShadowError() error {
 	return c.shadowErr
+}
+
+// Interpolater returns an Interpolater built on a copy of the state
+// that can be used to test interpolation values.
+func (c *Context) Interpolater() *Interpolater {
+	var varLock sync.Mutex
+	var stateLock sync.RWMutex
+	return &Interpolater{
+		Operation:          walkApply,
+		Module:             c.module,
+		State:              c.state.DeepCopy(),
+		StateLock:          &stateLock,
+		VariableValues:     c.variables,
+		VariableValuesLock: &varLock,
+	}
 }
 
 // Input asks for input to fill variables and provider configurations.
@@ -332,7 +402,7 @@ func (c *Context) Input(mode InputMode) error {
 
 	if mode&InputModeProvider != 0 {
 		// Build the graph
-		graph, err := c.Graph(&ContextGraphOpts{Validate: true})
+		graph, err := c.Graph(GraphTypeLegacy, nil)
 		if err != nil {
 			return err
 		}
@@ -358,63 +428,17 @@ func (c *Context) Apply() (*State, error) {
 	// Copy our own state
 	c.state = c.state.DeepCopy()
 
-	X_newApply := experiment.Enabled(experiment.X_newApply)
-	X_newDestroy := experiment.Enabled(experiment.X_newDestroy)
-	newGraphEnabled := (c.destroy && X_newDestroy) || (!c.destroy && X_newApply)
+	// Enable the new graph by default
+	X_legacyGraph := experiment.Enabled(experiment.X_legacyGraph)
 
-	// Build the original graph. This is before the new graph builders
-	// coming in 0.8. We do this for shadow graphing.
-	oldGraph, err := c.Graph(&ContextGraphOpts{Validate: true})
-	if err != nil && X_newApply {
-		// If we had an error graphing but we're using the new graph,
-		// just set it to nil and let it go. There are some features that
-		// may work with the new graph that don't with the old.
-		oldGraph = nil
-		err = nil
+	// Build the graph.
+	graphType := GraphTypeLegacy
+	if !X_legacyGraph {
+		graphType = GraphTypeApply
 	}
+	graph, err := c.Graph(graphType, nil)
 	if err != nil {
 		return nil, err
-	}
-
-	// Build the new graph. We do this no matter what so we can shadow it.
-	newGraph, err := (&ApplyGraphBuilder{
-		Module:       c.module,
-		Diff:         c.diff,
-		State:        c.state,
-		Providers:    c.components.ResourceProviders(),
-		Provisioners: c.components.ResourceProvisioners(),
-		Destroy:      c.destroy,
-	}).Build(RootModulePath)
-	if err != nil && !newGraphEnabled {
-		// If we had an error graphing but we're not using this graph, just
-		// set it to nil and record it as a shadow error.
-		c.shadowErr = multierror.Append(c.shadowErr, fmt.Errorf(
-			"Error building new graph: %s", err))
-
-		newGraph = nil
-		err = nil
-	}
-	if err != nil {
-		return nil, err
-	}
-
-	// Determine what is the real and what is the shadow. The logic here
-	// is straightforward though the if statements are not:
-	//
-	//   * Destroy mode - always use original, shadow with nothing because
-	//     we're only testing the new APPLY graph.
-	//   * Apply with new apply - use new graph, shadow is new graph. We can't
-	//     shadow with the old graph because the old graph does a lot more
-	//     that it shouldn't.
-	//   * Apply with old apply - use old graph, shadow with new graph.
-	//
-	real := oldGraph
-	shadow := newGraph
-	if newGraphEnabled {
-		log.Printf("[WARN] terraform: real graph is experiment, shadow is experiment")
-		real = shadow
-	} else {
-		log.Printf("[WARN] terraform: real graph is original, shadow is experiment")
 	}
 
 	// Determine the operation
@@ -423,14 +447,8 @@ func (c *Context) Apply() (*State, error) {
 		operation = walkDestroy
 	}
 
-	// This shouldn't happen, so assert it. This is before any state changes
-	// so it is safe to crash here.
-	if real == nil {
-		panic("nil real graph")
-	}
-
 	// Walk the graph
-	walker, err := c.walk(real, shadow, operation)
+	walker, err := c.walk(graph, graph, operation)
 	if len(walker.ValidationErrors) > 0 {
 		err = multierror.Append(err, walker.ValidationErrors...)
 	}
@@ -487,79 +505,24 @@ func (c *Context) Plan() (*Plan, error) {
 	c.diffLock.Unlock()
 
 	// Used throughout below
-	X_newApply := experiment.Enabled(experiment.X_newApply)
-	X_newDestroy := experiment.Enabled(experiment.X_newDestroy)
-	newGraphEnabled := (c.destroy && X_newDestroy) || (!c.destroy && X_newApply)
+	X_legacyGraph := experiment.Enabled(experiment.X_legacyGraph)
 
-	// Build the original graph. This is before the new graph builders
-	// coming in 0.8. We do this for shadow graphing.
-	oldGraph, err := c.Graph(&ContextGraphOpts{Validate: true})
-	if err != nil && newGraphEnabled {
-		// If we had an error graphing but we're using the new graph,
-		// just set it to nil and let it go. There are some features that
-		// may work with the new graph that don't with the old.
-		oldGraph = nil
-		err = nil
+	// Build the graph.
+	graphType := GraphTypeLegacy
+	if !X_legacyGraph {
+		if c.destroy {
+			graphType = GraphTypePlanDestroy
+		} else {
+			graphType = GraphTypePlan
+		}
 	}
+	graph, err := c.Graph(graphType, nil)
 	if err != nil {
 		return nil, err
-	}
-
-	// Build the new graph. We do this no matter wht so we can shadow it.
-	var newGraph *Graph
-	err = nil
-	if c.destroy {
-		newGraph, err = (&DestroyPlanGraphBuilder{
-			Module:  c.module,
-			State:   c.state,
-			Targets: c.targets,
-		}).Build(RootModulePath)
-	} else {
-		newGraph, err = (&PlanGraphBuilder{
-			Module:    c.module,
-			State:     c.state,
-			Providers: c.components.ResourceProviders(),
-			Targets:   c.targets,
-		}).Build(RootModulePath)
-	}
-	if err != nil && !newGraphEnabled {
-		// If we had an error graphing but we're not using this graph, just
-		// set it to nil and record it as a shadow error.
-		c.shadowErr = multierror.Append(c.shadowErr, fmt.Errorf(
-			"Error building new graph: %s", err))
-
-		newGraph = nil
-		err = nil
-	}
-	if err != nil {
-		return nil, err
-	}
-
-	// Determine what is the real and what is the shadow. The logic here
-	// is straightforward though the if statements are not:
-	//
-	//  * If the new graph, shadow with experiment in both because the
-	//    experiment has less nodes so the original can't shadow.
-	//  * If not the new graph, shadow with the experiment
-	//
-	real := oldGraph
-	shadow := newGraph
-	if newGraphEnabled {
-		log.Printf("[WARN] terraform: real graph is experiment, shadow is experiment")
-		real = shadow
-	} else {
-		log.Printf("[WARN] terraform: real graph is original, shadow is experiment")
-	}
-
-	// Special case here: if we're using destroy don't shadow it because
-	// the new destroy graph behaves a bit differently on purpose by not
-	// setting the module destroy flag.
-	if c.destroy && !newGraphEnabled {
-		shadow = nil
 	}
 
 	// Do the walk
-	walker, err := c.walk(real, shadow, operation)
+	walker, err := c.walk(graph, graph, operation)
 	if err != nil {
 		return nil, err
 	}
@@ -578,10 +541,10 @@ func (c *Context) Plan() (*Plan, error) {
 
 	// We don't do the reverification during the new destroy plan because
 	// it will use a different apply process.
-	if !newGraphEnabled {
+	if X_legacyGraph {
 		// Now that we have a diff, we can build the exact graph that Apply will use
 		// and catch any possible cycles during the Plan phase.
-		if _, err := c.Graph(&ContextGraphOpts{Validate: true}); err != nil {
+		if _, err := c.Graph(GraphTypeLegacy, nil); err != nil {
 			return nil, err
 		}
 	}
@@ -607,7 +570,7 @@ func (c *Context) Refresh() (*State, error) {
 	c.state = c.state.DeepCopy()
 
 	// Build the graph
-	graph, err := c.Graph(&ContextGraphOpts{Validate: true})
+	graph, err := c.Graph(GraphTypeLegacy, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -638,6 +601,9 @@ func (c *Context) Stop() {
 
 	// Tell the hook we want to stop
 	c.sh.Stop()
+
+	// Close the stop channel
+	close(c.stopCh)
 
 	// Wait for us to stop
 	c.l.Unlock()
@@ -675,7 +641,7 @@ func (c *Context) Validate() ([]string, []error) {
 	// We also validate the graph generated here, but this graph doesn't
 	// necessarily match the graph that Plan will generate, so we'll validate the
 	// graph again later after Planning.
-	graph, err := c.Graph(&ContextGraphOpts{Validate: true})
+	graph, err := c.Graph(GraphTypeLegacy, nil)
 	if err != nil {
 		return nil, []error{err}
 	}
@@ -726,6 +692,9 @@ func (c *Context) acquireRun(phase string) chan<- struct{} {
 	ch := make(chan struct{})
 	c.runCh = ch
 
+	// Reset the stop channel so we can watch that
+	c.stopCh = make(chan struct{})
+
 	// Reset the stop hook so we're not stopped
 	c.sh.Reset()
 
@@ -746,6 +715,7 @@ func (c *Context) releaseRun(ch chan<- struct{}) {
 
 	close(ch)
 	c.runCh = nil
+	c.stopCh = nil
 }
 
 func (c *Context) walk(
@@ -776,15 +746,20 @@ func (c *Context) walk(
 
 	log.Printf("[DEBUG] Starting graph walk: %s", operation.String())
 
-	dg, _ := NewDebugGraph("walk", graph, nil)
 	walker := &ContextGraphWalker{
-		Context:    realCtx,
-		Operation:  operation,
-		DebugGraph: dg,
+		Context:   realCtx,
+		Operation: operation,
 	}
+
+	// Watch for a stop so we can call the provider Stop() API.
+	doneCh := make(chan struct{})
+	go c.watchStop(walker, c.stopCh, doneCh)
 
 	// Walk the real graph, this will block until it completes
 	realErr := graph.Walk(walker)
+
+	// Close the done channel so the watcher stops
+	close(doneCh)
 
 	// If we have a shadow graph and we interrupted the real graph, then
 	// we just close the shadow and never verify it. It is non-trivial to
@@ -800,20 +775,13 @@ func (c *Context) walk(
 
 	// If we have a shadow graph, wait for that to complete.
 	if shadowCloser != nil {
-		// create a debug graph for this walk
-		dg, err := NewDebugGraph("walk-shadow", shadow, nil)
-		if err != nil {
-			log.Printf("[ERROR] %v", err)
-		}
-
 		// Build the graph walker for the shadow. We also wrap this in
 		// a panicwrap so that panics are captured. For the shadow graph,
 		// we just want panics to be normal errors rather than to crash
 		// Terraform.
 		shadowWalker := GraphWalkerPanicwrap(&ContextGraphWalker{
-			Context:    shadowCtx,
-			Operation:  operation,
-			DebugGraph: dg,
+			Context:   shadowCtx,
+			Operation: operation,
 		})
 
 		// Kick off the shadow walk. This will block on any operations
@@ -878,6 +846,35 @@ func (c *Context) walk(
 	}
 
 	return walker, realErr
+}
+
+func (c *Context) watchStop(walker *ContextGraphWalker, stopCh, doneCh <-chan struct{}) {
+	// Wait for a stop or completion
+	select {
+	case <-stopCh:
+		// Stop was triggered. Fall out of the select
+	case <-doneCh:
+		// Done, just exit completely
+		return
+	}
+
+	// If we're here, we're stopped, trigger the call.
+
+	// Copy the providers so that a misbehaved blocking Stop doesn't
+	// completely hang Terraform.
+	walker.providerLock.Lock()
+	ps := make([]ResourceProvider, 0, len(walker.providerCache))
+	for _, p := range walker.providerCache {
+		ps = append(ps, p)
+	}
+	defer walker.providerLock.Unlock()
+
+	for _, p := range ps {
+		// We ignore the error for now since there isn't any reasonable
+		// action to take if there is an error here, since the stop is still
+		// advisory: Terraform will exit once the graph node completes.
+		p.Stop()
+	}
 }
 
 // parseVariableAsHCL parses the value of a single variable as would have been specified

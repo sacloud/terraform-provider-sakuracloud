@@ -46,6 +46,10 @@ type InterpolationScope struct {
 func (i *Interpolater) Values(
 	scope *InterpolationScope,
 	vars map[string]config.InterpolatedVariable) (map[string]ast.Variable, error) {
+	if scope == nil {
+		scope = &InterpolationScope{}
+	}
+
 	result := make(map[string]ast.Variable, len(vars))
 
 	// Copy the default variables
@@ -121,9 +125,13 @@ func (i *Interpolater) valueCountVar(
 
 func unknownVariable() ast.Variable {
 	return ast.Variable{
-		Type:  ast.TypeString,
+		Type:  ast.TypeUnknown,
 		Value: config.UnknownVariableValue,
 	}
+}
+
+func unknownValue() string {
+	return hil.UnknownValue
 }
 
 func (i *Interpolater) valueModuleVar(
@@ -152,6 +160,13 @@ func (i *Interpolater) valueModuleVar(
 		// ensure that the module is in the state, so if we reach this
 		// point otherwise it really is a panic.
 		result[n] = unknownVariable()
+
+		// During apply this is always an error
+		if i.Operation == walkApply {
+			return fmt.Errorf(
+				"Couldn't find module %q for var: %s",
+				v.Name, v.FullKey())
+		}
 	} else {
 		// Get the value from the outputs
 		if outputState, ok := mod.Outputs[v.Field]; ok {
@@ -163,6 +178,13 @@ func (i *Interpolater) valueModuleVar(
 		} else {
 			// Same reasons as the comment above.
 			result[n] = unknownVariable()
+
+			// During apply this is always an error
+			if i.Operation == walkApply {
+				return fmt.Errorf(
+					"Couldn't find output %q for module var: %s",
+					v.Field, v.FullKey())
+			}
 		}
 	}
 
@@ -215,10 +237,7 @@ func (i *Interpolater) valueResourceVar(
 	// If we're computing all dynamic fields, then module vars count
 	// and we mark it as computed.
 	if i.Operation == walkValidate {
-		result[n] = ast.Variable{
-			Value: config.UnknownVariableValue,
-			Type:  ast.TypeString,
-		}
+		result[n] = unknownVariable()
 		return nil
 	}
 
@@ -243,10 +262,7 @@ func (i *Interpolater) valueResourceVar(
 		// This applies only to graph nodes that interpolate during the
 		// config walk, e.g. providers.
 		if i.Operation == walkInput {
-			result[n] = ast.Variable{
-				Value: config.UnknownVariableValue,
-				Type:  ast.TypeString,
-			}
+			result[n] = unknownVariable()
 			return nil
 		}
 
@@ -285,12 +301,14 @@ func (i *Interpolater) valueSimpleVar(
 	n string,
 	v *config.SimpleVariable,
 	result map[string]ast.Variable) error {
-	// SimpleVars are never handled by Terraform's interpolator
-	result[n] = ast.Variable{
-		Value: config.UnknownVariableValue,
-		Type:  ast.TypeString,
-	}
-	return nil
+	// This error message includes some information for people who
+	// relied on this for their template_file data sources. We should
+	// remove this at some point but there isn't any rush.
+	return fmt.Errorf(
+		"invalid variable syntax: %q. If this is part of inline `template` parameter\n"+
+			"then you must escape the interpolation with two dollar signs. For\n"+
+			"example: ${a} becomes $${a}.",
+		n)
 }
 
 func (i *Interpolater) valueUserVar(
@@ -369,7 +387,12 @@ func (i *Interpolater) computeResourceVariable(
 	// If we're requesting "count" its a special variable that we grab
 	// directly from the config itself.
 	if v.Field == "count" {
-		count, err := cr.Count()
+		var count int
+		if cr != nil {
+			count, err = cr.Count()
+		} else {
+			count, err = i.resourceCountMax(module, cr, v)
+		}
 		if err != nil {
 			return nil, fmt.Errorf(
 				"Error reading %s count: %s",
@@ -380,31 +403,42 @@ func (i *Interpolater) computeResourceVariable(
 		return &ast.Variable{Type: ast.TypeInt, Value: count}, nil
 	}
 
-	// If we have no module in the state yet or count, return empty
-	if module == nil || len(module.Resources) == 0 {
-		return nil, nil
-	}
-
 	// Get the resource out from the state. We know the state exists
 	// at this point and if there is a state, we expect there to be a
 	// resource with the given name.
-	r, ok := module.Resources[id]
-	if !ok && v.Multi && v.Index == 0 {
-		r, ok = module.Resources[v.ResourceId()]
+	var r *ResourceState
+	if module != nil && len(module.Resources) > 0 {
+		var ok bool
+		r, ok = module.Resources[id]
+		if !ok && v.Multi && v.Index == 0 {
+			r, ok = module.Resources[v.ResourceId()]
+		}
+		if !ok {
+			r = nil
+		}
 	}
-	if !ok {
-		r = nil
-	}
-	if r == nil {
-		goto MISSING
-	}
+	if r == nil || r.Primary == nil {
+		if i.Operation == walkApply || i.Operation == walkPlan {
+			return nil, fmt.Errorf(
+				"Resource '%s' not found for variable '%s'",
+				v.ResourceId(),
+				v.FullKey())
+		}
 
-	if r.Primary == nil {
+		// If we have no module in the state yet or count, return empty.
+		// NOTE(@mitchellh): I actually don't know why this is here. During
+		// a refactor I kept this here to maintain the same behavior, but
+		// I'm not sure why its here.
+		if module == nil || len(module.Resources) == 0 {
+			return nil, nil
+		}
+
 		goto MISSING
 	}
 
 	if attr, ok := r.Primary.Attributes[v.Field]; ok {
-		return &ast.Variable{Type: ast.TypeString, Value: attr}, nil
+		v, err := hil.InterfaceToVariable(attr)
+		return &v, err
 	}
 
 	// computed list or map attribute
@@ -435,13 +469,15 @@ func (i *Interpolater) computeResourceVariable(
 			// Lists and sets make this
 			key := fmt.Sprintf("%s.#", strings.Join(parts[:i], "."))
 			if attr, ok := r.Primary.Attributes[key]; ok {
-				return &ast.Variable{Type: ast.TypeString, Value: attr}, nil
+				v, err := hil.InterfaceToVariable(attr)
+				return &v, err
 			}
 
 			// Maps make this
 			key = fmt.Sprintf("%s", strings.Join(parts[:i], "."))
 			if attr, ok := r.Primary.Attributes[key]; ok {
-				return &ast.Variable{Type: ast.TypeString, Value: attr}, nil
+				v, err := hil.InterfaceToVariable(attr)
+				return &v, err
 			}
 		}
 	}
@@ -551,7 +587,7 @@ func (i *Interpolater) computeResourceMultiVariable(
 		}
 
 		if multiAttr == unknownVariable {
-			return &ast.Variable{Type: ast.TypeString, Value: ""}, nil
+			return &unknownVariable, nil
 		}
 
 		values = append(values, multiAttr)
@@ -668,12 +704,6 @@ func (i *Interpolater) resourceVariableInfo(
 			cr = r
 			break
 		}
-	}
-	if cr == nil {
-		return nil, nil, fmt.Errorf(
-			"Resource '%s' not found for variable '%s'",
-			v.ResourceId(),
-			v.FullKey())
 	}
 
 	// Get the relevant module

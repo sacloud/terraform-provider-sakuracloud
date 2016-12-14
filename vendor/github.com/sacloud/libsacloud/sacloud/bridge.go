@@ -1,6 +1,9 @@
 package sacloud
 
-import "time"
+import (
+	"encoding/json"
+	"time"
+)
 
 // Bridge ブリッジ
 type Bridge struct {
@@ -12,7 +15,10 @@ type Bridge struct {
 	// Info インフォ
 	Info *struct {
 		// Switches 接続スイッチリスト
-		Switches []Switch
+		Switches []*struct {
+			*Switch
+			ID json.Number `json:",omitempty"` // HACK
+		}
 	}
 	// ServiceClass サービスクラス
 	ServiceClass string `json:",omitempty"`

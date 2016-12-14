@@ -19,14 +19,17 @@ type DestroyPlanGraphBuilder struct {
 
 	// Targets are resources to target
 	Targets []string
+
+	// Validate will do structural validation of the graph.
+	Validate bool
 }
 
 // See GraphBuilder
 func (b *DestroyPlanGraphBuilder) Build(path []string) (*Graph, error) {
 	return (&BasicGraphBuilder{
 		Steps:    b.Steps(),
-		Validate: true,
-		Name:     "destroy",
+		Validate: b.Validate,
+		Name:     "DestroyPlanGraphBuilder",
 	}).Build(path)
 }
 
