@@ -268,7 +268,7 @@ func resourceSakuraCloudServerCreate(d *schema.ResourceData, meta interface{}) e
 	if err != nil {
 		return fmt.Errorf("Failed to boot SakuraCloud Server resource: %s", err)
 	}
-	err = client.Server.SleepUntilUp(toSakuraCloudID(d.Id()), 10*time.Minute)
+	err = client.Server.SleepUntilUp(toSakuraCloudID(d.Id()), client.DefaultTimeoutDuration)
 	if err != nil {
 		return fmt.Errorf("Failed to boot SakuraCloud Server resource: %s", err)
 	}
@@ -334,7 +334,7 @@ func resourceSakuraCloudServerUpdate(d *schema.ResourceData, meta interface{}) e
 			return fmt.Errorf("Error stopping SakuraCloud Server resource: %s", err)
 		}
 
-		err = client.Server.SleepUntilDown(toSakuraCloudID(d.Id()), 10*time.Minute)
+		err = client.Server.SleepUntilDown(toSakuraCloudID(d.Id()), client.DefaultTimeoutDuration)
 		if err != nil {
 			return fmt.Errorf("Error stopping SakuraCloud Server resource: %s", err)
 		}
@@ -603,7 +603,7 @@ func resourceSakuraCloudServerUpdate(d *schema.ResourceData, meta interface{}) e
 			return fmt.Errorf("Error booting SakuraCloud Server resource: %s", err)
 		}
 
-		err = client.Server.SleepUntilUp(toSakuraCloudID(d.Id()), 10*time.Minute)
+		err = client.Server.SleepUntilUp(toSakuraCloudID(d.Id()), client.DefaultTimeoutDuration)
 		if err != nil {
 			return fmt.Errorf("Error booting SakuraCloud Server resource: %s", err)
 		}
@@ -634,7 +634,7 @@ func resourceSakuraCloudServerDelete(d *schema.ResourceData, meta interface{}) e
 			return fmt.Errorf("Error stopping SakuraCloud Server resource: %s", err)
 		}
 
-		err = client.Server.SleepUntilDown(toSakuraCloudID(d.Id()), 10*time.Minute)
+		err = client.Server.SleepUntilDown(toSakuraCloudID(d.Id()), client.DefaultTimeoutDuration)
 		if err != nil {
 			return fmt.Errorf("Error stopping SakuraCloud Server resource: %s", err)
 		}
@@ -693,8 +693,10 @@ func setServerResourceData(d *schema.ResourceData, client *api.Client, data *sac
 		}
 
 		d.Set("base_nw_dns_servers", data.Zone.Region.NameServers)
-		d.Set("base_nw_gateway", data.Interfaces[0].Switch.UserSubnet.DefaultRoute)
-		d.Set("base_nw_mask_len", fmt.Sprintf("%d", data.Interfaces[0].Switch.UserSubnet.NetworkMaskLen))
+		if data.Interfaces[0].Switch.UserSubnet != nil {
+			d.Set("base_nw_gateway", data.Interfaces[0].Switch.UserSubnet.DefaultRoute)
+			d.Set("base_nw_mask_len", fmt.Sprintf("%d", data.Interfaces[0].Switch.UserSubnet.NetworkMaskLen))
+		}
 		if data.Interfaces[0].Switch.Subnet != nil {
 			d.Set("base_nw_address", data.Interfaces[0].Switch.Subnet.NetworkAddress) // null if connected switch(not router)
 		}

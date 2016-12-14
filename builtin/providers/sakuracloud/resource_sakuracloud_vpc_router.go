@@ -176,7 +176,7 @@ func resourceSakuraCloudVPCRouterCreate(d *schema.ResourceData, meta interface{}
 		return fmt.Errorf("Failed to create SakuraCloud VPCRouter resource: %s", err)
 	}
 
-	err = client.VPCRouter.SleepWhileCopying(vpcRouter.ID, 30*time.Minute, 10)
+	err = client.VPCRouter.SleepWhileCopying(vpcRouter.ID, client.DefaultTimeoutDuration, 10)
 	if err != nil {
 		return fmt.Errorf("Failed to create SakuraCloud VPCRouter resource: %s", err)
 	}
@@ -185,7 +185,7 @@ func resourceSakuraCloudVPCRouterCreate(d *schema.ResourceData, meta interface{}
 	if err != nil {
 		return fmt.Errorf("Failed to boot SakuraCloud VPCRouter resource: %s", err)
 	}
-	err = client.VPCRouter.SleepUntilUp(vpcRouter.ID, 30*time.Minute)
+	err = client.VPCRouter.SleepUntilUp(vpcRouter.ID, client.DefaultTimeoutDuration)
 	if err != nil {
 		return fmt.Errorf("Failed to boot SakuraCloud VPCRouter resource: %s", err)
 	}

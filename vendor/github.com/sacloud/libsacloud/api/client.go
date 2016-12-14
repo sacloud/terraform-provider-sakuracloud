@@ -49,7 +49,14 @@ func NewClient(token, tokenSecret, zone string) *Client {
 
 // Clone APIクライアント クローン作成
 func (c *Client) Clone() *Client {
-	n := &Client{AccessToken: c.AccessToken, AccessTokenSecret: c.AccessTokenSecret, Zone: c.Zone, TraceMode: c.TraceMode}
+	n := &Client{
+		AccessToken:            c.AccessToken,
+		AccessTokenSecret:      c.AccessTokenSecret,
+		Zone:                   c.Zone,
+		TraceMode:              c.TraceMode,
+		DefaultTimeoutDuration: c.DefaultTimeoutDuration,
+		UserAgent:              c.UserAgent,
+	}
 	n.API = newAPI(n)
 	return n
 }

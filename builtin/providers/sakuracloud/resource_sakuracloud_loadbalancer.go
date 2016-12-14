@@ -6,7 +6,6 @@ import (
 	"github.com/hashicorp/terraform/helper/schema"
 	"github.com/sacloud/libsacloud/api"
 	"github.com/sacloud/libsacloud/sacloud"
-	"time"
 )
 
 func resourceSakuraCloudLoadBalancer() *schema.Resource {
@@ -170,12 +169,12 @@ func resourceSakuraCloudLoadBalancerCreate(d *schema.ResourceData, meta interfac
 	d.SetId(loadBalancer.GetStrID())
 
 	//wait
-	err = client.LoadBalancer.SleepWhileCopying(loadBalancer.ID, 20*time.Minute, 5)
+	err = client.LoadBalancer.SleepWhileCopying(loadBalancer.ID, client.DefaultTimeoutDuration, 5)
 	if err != nil {
 		return fmt.Errorf("Failed to wait SakuraCloud LoadBalancer copy: %s", err)
 	}
 
-	err = client.LoadBalancer.SleepUntilUp(loadBalancer.ID, 10*time.Minute)
+	err = client.LoadBalancer.SleepUntilUp(loadBalancer.ID, client.DefaultTimeoutDuration)
 	if err != nil {
 		return fmt.Errorf("Failed to wait SakuraCloud LoadBalancer boot: %s", err)
 	}
@@ -251,7 +250,7 @@ func resourceSakuraCloudLoadBalancerDelete(d *schema.ResourceData, meta interfac
 		return fmt.Errorf("Error stopping SakuraCloud LoadBalancer resource: %s", err)
 	}
 
-	err = client.LoadBalancer.SleepUntilDown(toSakuraCloudID(d.Id()), 20*time.Minute)
+	err = client.LoadBalancer.SleepUntilDown(toSakuraCloudID(d.Id()), client.DefaultTimeoutDuration)
 	if err != nil {
 		return fmt.Errorf("Error stopping SakuraCloud LoadBalancer resource: %s", err)
 	}

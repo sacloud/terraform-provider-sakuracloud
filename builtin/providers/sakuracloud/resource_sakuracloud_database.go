@@ -5,7 +5,6 @@ import (
 	"github.com/hashicorp/terraform/helper/schema"
 	"github.com/sacloud/libsacloud/api"
 	"github.com/sacloud/libsacloud/sacloud"
-	"time"
 )
 
 func resourceSakuraCloudDatabase() *schema.Resource {
@@ -202,15 +201,15 @@ func resourceSakuraCloudDatabaseCreate(d *schema.ResourceData, meta interface{})
 	d.SetId(database.GetStrID())
 
 	//wait
-	err = client.Database.SleepWhileCopying(database.ID, 20*time.Minute, 5)
+	err = client.Database.SleepWhileCopying(database.ID, client.DefaultTimeoutDuration, 5)
 	if err != nil {
 		return fmt.Errorf("Failed to wait SakuraCloud Database copy: %s", err)
 	}
-	err = client.Database.SleepUntilUp(database.ID, 20*time.Minute)
+	err = client.Database.SleepUntilUp(database.ID, client.DefaultTimeoutDuration)
 	if err != nil {
 		return fmt.Errorf("Failed to wait SakuraCloud Database boot: %s", err)
 	}
-	err = client.Database.SleepUntilDatabaseRunning(database.ID, 20*time.Minute, 10)
+	err = client.Database.SleepUntilDatabaseRunning(database.ID, client.DefaultTimeoutDuration, 5)
 	if err != nil {
 		return fmt.Errorf("Failed to wait SakuraCloud Database start: %s", err)
 	}
@@ -319,7 +318,7 @@ func resourceSakuraCloudDatabaseDelete(d *schema.ResourceData, meta interface{})
 		return fmt.Errorf("Error stopping SakuraCloud Database resource: %s", err)
 	}
 
-	err = client.Database.SleepUntilDown(toSakuraCloudID(d.Id()), 20*time.Minute)
+	err = client.Database.SleepUntilDown(toSakuraCloudID(d.Id()), client.DefaultTimeoutDuration)
 	if err != nil {
 		return fmt.Errorf("Error stopping SakuraCloud Database resource: %s", err)
 	}

@@ -141,7 +141,7 @@ func resourceSakuraCloudVPCRouterInterfaceCreate(d *schema.ResourceData, meta in
 			return fmt.Errorf("Failed to boot SakuraCloud VPCRouterInterface resource: %s", err)
 		}
 
-		err = client.VPCRouter.SleepUntilUp(vpcRouter.ID, 30*time.Minute)
+		err = client.VPCRouter.SleepUntilUp(vpcRouter.ID, client.DefaultTimeoutDuration)
 		if err != nil {
 			return fmt.Errorf("Failed to boot SakuraCloud VPCRouterInterface resource: %s", err)
 		}
@@ -226,7 +226,7 @@ func resourceSakuraCloudVPCRouterInterfaceDelete(d *schema.ResourceData, meta in
 			return fmt.Errorf("Failed to boot SakuraCloud VPCRouterInterface resource: %s", err)
 		}
 
-		err = client.VPCRouter.SleepUntilUp(vpcRouter.ID, 30*time.Minute)
+		err = client.VPCRouter.SleepUntilUp(vpcRouter.ID, client.DefaultTimeoutDuration)
 		if err != nil {
 			return fmt.Errorf("Failed to boot SakuraCloud VPCRouterInterface resource: %s", err)
 		}
