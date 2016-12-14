@@ -133,7 +133,8 @@ func resourceSakuraCloudBridgeDelete(d *schema.ResourceData, meta interface{}) e
 
 	if br.Info != nil && br.Info.Switches != nil && len(br.Info.Switches) > 0 {
 		for _, s := range br.Info.Switches {
-			_, err = client.Switch.DisconnectFromBridge(s.ID)
+			switchID, _ := s.ID.Int64()
+			_, err = client.Switch.DisconnectFromBridge(switchID)
 		}
 		if err != nil {
 			return fmt.Errorf("Error disconnecting Bridge resource: %s", err)
@@ -152,7 +153,13 @@ func setBridgeResourceData(d *schema.ResourceData, client *api.Client, data *sac
 	d.Set("description", data.Description)
 
 	if data.Info != nil && data.Info.Switches != nil && len(data.Info.Switches) > 0 {
-		d.Set("switch_ids", flattenSwitches(data.Info.Switches))
+
+		var ids []string
+		for _, d := range data.Info.Switches {
+			ids = append(ids, d.ID.String())
+		}
+
+		d.Set("switch_ids", ids)
 	} else {
 		d.Set("switch_ids", []string{})
 	}

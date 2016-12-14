@@ -1,6 +1,7 @@
 package sacloud
 
 import (
+	"encoding/json"
 	"fmt"
 	"net"
 	"time"
@@ -38,7 +39,16 @@ type Switch struct {
 	// Internet ルーター
 	Internet *Internet `json:",omitempty"`
 	// Bridge ブリッジ
-	Bridge *Bridge `json:",omitempty"`
+	Bridge *struct {
+		*Bridge
+		Info *struct {
+			// Switches 接続スイッチリスト
+			Switches []struct {
+				*Switch
+				ID json.Number `json:",omitempty"` // HACK
+			}
+		}
+	} `json:",omitempty"`
 }
 
 // SwitchSubnet スイッチサブネット
