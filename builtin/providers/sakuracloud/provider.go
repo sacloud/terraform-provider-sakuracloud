@@ -33,9 +33,9 @@ func Provider() terraform.ResourceProvider {
 				ValidateFunc: validateStringInWord([]string{"is1a", "is1b", "tk1a", "tk1v"}),
 			},
 			"timeout": &schema.Schema{
-				Type:     schema.TypeInt,
-				Optional: true,
-				Default:  20,
+				Type:        schema.TypeInt,
+				Optional:    true,
+				DefaultFunc: schema.MultiEnvDefaultFunc([]string{"SAKURACLOUD_TIMEOUT"}, 20),
 			},
 			"trace": &schema.Schema{
 				Type:        schema.TypeBool,

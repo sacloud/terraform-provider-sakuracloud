@@ -693,8 +693,10 @@ func setServerResourceData(d *schema.ResourceData, client *api.Client, data *sac
 		}
 
 		d.Set("base_nw_dns_servers", data.Zone.Region.NameServers)
-		d.Set("base_nw_gateway", data.Interfaces[0].Switch.UserSubnet.DefaultRoute)
-		d.Set("base_nw_mask_len", fmt.Sprintf("%d", data.Interfaces[0].Switch.UserSubnet.NetworkMaskLen))
+		if data.Interfaces[0].Switch.UserSubnet != nil {
+			d.Set("base_nw_gateway", data.Interfaces[0].Switch.UserSubnet.DefaultRoute)
+			d.Set("base_nw_mask_len", fmt.Sprintf("%d", data.Interfaces[0].Switch.UserSubnet.NetworkMaskLen))
+		}
 		if data.Interfaces[0].Switch.Subnet != nil {
 			d.Set("base_nw_address", data.Interfaces[0].Switch.Subnet.NetworkAddress) // null if connected switch(not router)
 		}
