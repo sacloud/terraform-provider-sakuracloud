@@ -1,5 +1,7 @@
 # Terraform for さくらのクラウド
 
+[![Join the chat at https://gitter.im/terraform-provider-sakuracloud/Lobby](https://badges.gitter.im/terraform-provider-sakuracloud/Lobby.svg)](https://gitter.im/terraform-provider-sakuracloud/Lobby?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
 [![Build Status](https://travis-ci.org/yamamoto-febc/terraform-provider-sakuracloud.svg?branch=master)](https://travis-ci.org/yamamoto-febc/terraform-provider-sakuracloud)
 
 Terraformでさくらのクラウドを操作するためのプラグイン
