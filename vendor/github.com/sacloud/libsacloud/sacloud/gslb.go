@@ -114,7 +114,7 @@ type GSLBRecordSets struct {
 	// Weighted ウェイト
 	Weighted string `json:",omitempty"`
 	// Servers サーバー
-	Servers []GSLBServer `json:",omitempty"`
+	Servers []GSLBServer
 	// SorryServer ソーリーサーバー
 	SorryServer string `json:",omitempty"`
 }
