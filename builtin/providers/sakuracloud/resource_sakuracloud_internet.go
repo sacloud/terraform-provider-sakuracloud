@@ -42,7 +42,7 @@ func resourceSakuraCloudInternet() *schema.Resource {
 			"band_width": &schema.Schema{
 				Type:         schema.TypeInt,
 				Optional:     true,
-				ValidateFunc: validateIntInWord([]string{"100", "500", "1000", "1500", "2000", "2500", "3000"}),
+				ValidateFunc: validateIntInWord([]string{"100", "250", "500", "1000", "1500", "2000", "2500", "3000"}),
 				Default:      100,
 			},
 			//"enable_ipv6": &schema.Schema{
