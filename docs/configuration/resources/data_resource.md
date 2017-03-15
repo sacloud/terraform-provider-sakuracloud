@@ -37,6 +37,45 @@ resource sakuracloud_disk "disk01"{
 
 `filter`の`name`属性に指定可能な値は[さくらのクラウド APIドキュメント](http://developer.sakura.ad.jp/cloud/api/1.1/)を参照ください。
 
+### パラメーター(アーカイブのみ)
+
+アーカイブ(`sakuracloud_archive`)リソースでは、`os_type`パラメーターが利用可能です。
+
+```
+data sakuracloud_archive "ubuntu" {
+    os_type = "ubuntu" # Ubuntuの最新安定版パブリックアーカイブ
+}
+
+data sakuracloud_archive "centos" {
+    os_type = "centos" # CentOSの最新安定版パブリックアーカイブ
+}
+
+```
+
+`os_type`に指定可能な値は以下の通りです。
+
+|値|詳細                                          |
+|---------------------------|--------------------|
+| `centos`                  | CentOS 7|
+| `ubuntu`                  | Ubuntu 16.04|
+| `debian`                  | Debian |
+| `vyos`                    | VyOS|
+| `coreos`                  | CoreOS|
+| `kusanagi`                | Kusanagi(CentOS7)|
+| `site-guard`              | SiteGuard(CentOS7)|
+| `freebsd`                 | FreeBSD|
+| `windows2008`             | Windows 2008|
+| `windows2008-rds`         | Windows 2008(RDS)|
+| `windows2008-rds-office`  | Windows 2008(RDS + Office)|
+| `windows2012`             | Windows 2012|
+| `windows2012-rds`         | Windows 2012(RDS)|
+| `windows2012-rds-office`  | Windows 2012(RDS + Office)|
+| `windows2016`             | Windows 2016|
+| `windows2016-rds`         | Windows 2016(RDS)|
+| `windows2016-rds-office`  | Windows 2016(RDS + Office)|
+
+`os_type`に対応していないパブリックアーカイブについては`filter`パラメーターをご利用ください。
+
 ### サポートしているデータソース
 
 データソースそれぞれの属性はリソースごとに異なります。
