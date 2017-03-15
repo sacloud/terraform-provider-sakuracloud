@@ -45,7 +45,6 @@ resource "sakuracloud_database" "foobar" {
 | `user_password` | ◯   | パスワード       | -        | 文字列                         | - |
 | `allow_networks`| -   | 送信元ネットワーク | -        | リスト(文字列)、`xxx.xxx.xxx.xxx`、または`xxx.xxx.xxx.xxx/nn`形式 | 接続を許可するネットワークアドレスを指定する |
 | `port`          | -   | ポート番号       | `5432`   | `1024`〜`65525`の範囲の整数     | - |
-| `backup_rotate` | ◯   | バックアップ世代数    | `8`   | `1`〜`8`の範囲の整数     | - |
 | `backup_time`   | ◯   | バックアップ開始時刻   | -   | `hh:mm`形式の時刻文字列     | `hh`部分は`00`〜`23`、`mm`部分は`00`/`15`/`30`/`45`のいずれかを指定 |
 | `switch_id`     | ◯   | スイッチID      | - | 文字列                         | - |
 | `ipaddress1`    | ◯   | IPアドレス1     | -        | 文字列                         | - |
