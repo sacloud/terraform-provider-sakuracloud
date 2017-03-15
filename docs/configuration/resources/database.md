@@ -15,15 +15,12 @@ resource "sakuracloud_database" "foobar" {
 
     port = 54321
 
-    backup_rotate = 8
     backup_time = "00:00"
 
-
-    # 接続先スイッチが共有セグメント以外の場合、以下の項目を設定する
-    # switch_id = "${sakuracloud_switch.sw.id}"
-    # ipaddress1 = "192.168.11.101"
-    # nw_mask_len = 24
-    # default_route = "192.168.11.1"
+    switch_id = "${sakuracloud_switch.sw.id}"
+    ipaddress1 = "192.168.11.101"
+    nw_mask_len = 24
+    default_route = "192.168.11.1"
 
     name = "name_before"
     description = "description_before"
@@ -50,10 +47,10 @@ resource "sakuracloud_database" "foobar" {
 | `port`          | -   | ポート番号       | `5432`   | `1024`〜`65525`の範囲の整数     | - |
 | `backup_rotate` | ◯   | バックアップ世代数    | `8`   | `1`〜`8`の範囲の整数     | - |
 | `backup_time`   | ◯   | バックアップ開始時刻   | -   | `hh:mm`形式の時刻文字列     | `hh`部分は`00`〜`23`、`mm`部分は`00`/`15`/`30`/`45`のいずれかを指定 |
-| `switch_id`     | -   | スイッチID      | `shared` | 文字列                         | 共有セグメントに接続する場合は`shared`<br />以外の場合はスイッチのIDを指定する |
-| `ipaddress1`    | △   | IPアドレス1     | -        | 文字列                         | `switch_id`が`shared`以外の場合のみ有効、かつ必須 |
-| `nw_mask_len`   | △   | ネットマスク     | -        | 数値                          | `switch_id`が`shared`以外の場合のみ有効、かつ必須 |
-| `default_route` | -   | ゲートウェイ     | -        | 文字列                        | `switch_id`が`shared`以外の場合のみ有効 |
+| `switch_id`     | ◯   | スイッチID      | - | 文字列                         | - |
+| `ipaddress1`    | ◯   | IPアドレス1     | -        | 文字列                         | - |
+| `nw_mask_len`   | ◯   | ネットマスク     | -        | 数値                          | - |
+| `default_route` | ◯   | ゲートウェイ     | -        | 文字列                        | - |
 | `description`   | -   | 説明           | -        | 文字列                         | - |
 | `tags`          | -   | タグ           | -        | リスト(文字列)                  | - |
 | `zone`          | -   | ゾーン          | -        | `tk1a` | - |
@@ -71,7 +68,6 @@ resource "sakuracloud_database" "foobar" {
 | `user_password` | パスワード       | -                    |
 | `allow_networks`| 送信元ネットワーク       | -                    |
 | `port`          | ポート番号       | -                    |
-| `backup_rotate` | バックアップ世代数       | -                    |
 | `backup_time`   | バックアップ開始時刻       | -                    |
 | `switch_id`     | スイッチID      | -                    |
 | `ipaddress1`    | IPアドレス1      | -                    |
