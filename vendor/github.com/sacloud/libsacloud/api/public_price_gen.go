@@ -48,10 +48,11 @@ func (api *PublicPriceAPI) FilterBy(key string, value interface{}) *PublicPriceA
 	return api
 }
 
-// func (api *PublicPriceAPI) FilterMultiBy(key string, value interface{}) *PublicPriceAPI {
-// 	api.filterBy(key, value, true)
-// 	return api
-// }
+// FilterMultiBy 任意項目でのフィルタ(完全一致 OR条件)
+func (api *PublicPriceAPI) FilterMultiBy(key string, value interface{}) *PublicPriceAPI {
+	api.filterBy(key, value, true)
+	return api
+}
 
 // WithNameLike 名称条件(DisplayName)
 func (api *PublicPriceAPI) WithNameLike(name string) *PublicPriceAPI {
@@ -98,6 +99,84 @@ func (api *PublicPriceAPI) SortByName(reverse bool) *PublicPriceAPI {
 // func (api *PublicPriceAPI) SortBySize(reverse bool) *PublicPriceAPI {
 // 	api.sortBy("SizeMB", reverse)
 // 	return api
+// }
+
+/************************************************
+   To support Setxxx interface for Find()
+************************************************/
+
+// SetEmpty 検索条件のリセット
+func (api *PublicPriceAPI) SetEmpty() {
+	api.reset()
+}
+
+// SetOffset オフセット
+func (api *PublicPriceAPI) SetOffset(offset int) {
+	api.offset(offset)
+}
+
+// SetLimit リミット
+func (api *PublicPriceAPI) SetLimit(limit int) {
+	api.limit(limit)
+}
+
+// SetInclude 取得する項目
+func (api *PublicPriceAPI) SetInclude(key string) {
+	api.include(key)
+}
+
+// SetExclude 除外する項目
+func (api *PublicPriceAPI) SetExclude(key string) {
+	api.exclude(key)
+}
+
+// SetFilterBy 指定キーでのフィルター
+func (api *PublicPriceAPI) SetFilterBy(key string, value interface{}) {
+	api.filterBy(key, value, false)
+}
+
+// SetFilterMultiBy 任意項目でのフィルタ(完全一致 OR条件)
+func (api *PublicPriceAPI) SetFilterMultiBy(key string, value interface{}) {
+	api.filterBy(key, value, true)
+}
+
+// SetNameLike 名称条件(DisplayName)
+func (api *PublicPriceAPI) SetNameLike(name string) {
+	api.FilterBy("DisplayName", name)
+}
+
+//// SetTag
+//func (api *PublicPriceAPI) SetTag(tag string) {
+//}
+
+//// SetTags
+//func (api *PublicPriceAPI) SetTags(tags []string) {
+//}
+
+// func (api *PublicPriceAPI) SetSizeGib(size int) {
+// 	api.FilterBy("SizeMB", size*1024)
+// }
+
+// func (api *PublicPriceAPI) SetSharedScope() {
+// 	api.FilterBy("Scope", "shared")
+// }
+
+// func (api *PublicPriceAPI) SetUserScope() {
+// 	api.FilterBy("Scope", "user")
+// }
+
+// SetSortBy 指定キーでのソート
+func (api *PublicPriceAPI) SetSortBy(key string, reverse bool) {
+	api.sortBy(key, reverse)
+}
+
+// SetSortByName 名称でのソート(DisplayName)
+func (api *PublicPriceAPI) SetSortByName(reverse bool) {
+	api.sortBy("DisplayName", reverse)
+}
+
+// func (api *PublicPriceAPI) SetSortBySize(reverse bool) {
+// 	api.sortBy("SizeMB", reverse)
 // }
 
 /************************************************

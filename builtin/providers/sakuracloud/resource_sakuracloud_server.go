@@ -409,9 +409,9 @@ func resourceSakuraCloudServerUpdate(d *schema.ResourceData, meta interface{}) e
 				if len(server.Interfaces) <= i+1 {
 					//create NIC
 					nic := client.Interface.New()
-					nic.SetNewServerID(server.ID)
+					nic.SetServerID(server.ID)
 					if switchID != "" {
-						nic.SetNewSwitchID(toSakuraCloudID(switchID))
+						nic.SetSwitchID(toSakuraCloudID(switchID))
 					}
 					_, err := client.Interface.Create(nic)
 					if err != nil {

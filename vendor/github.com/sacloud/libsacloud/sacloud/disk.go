@@ -1,54 +1,33 @@
 package sacloud
 
-import (
-	"time"
-)
+import "fmt"
 
 // Disk ディスク
 type Disk struct {
-	*Resource
-	// Name 名称
-	Name string `json:",omitempty"`
-	// Description 説明
-	Description string `json:",omitempty"`
-	// Connection ディスク接続方法
-	Connection EDiskConnection `json:",omitempty"`
-	// ConnectionOrder コネクション順序
-	ConnectionOrder int `json:",omitempty"`
-	// ReinstallCount 再インストール回数
-	ReinstallCount int `json:",omitempty"`
-	*EAvailability
-	// SizeMB ディスクサイズ(MB単位)
-	SizeMB int `json:",omitempty"`
-	// MigratedMB コピー済みサイズ(MB単位)
-	MigratedMB int `json:",omitempty"`
-	// Plan ディスクプラン
-	Plan *Resource `json:",omitempty"`
-	// DistantFrom ストレージ隔離対象ディスク
-	DistantFrom []int64 `json:",omitempty"`
-	// Storage ストレージ
-	Storage struct {
-		*Resource
-		// MountIndex マウント順
-		MountIndex int64 `json:",omitempty"`
-		// Class クラス
-		Class string `json:",omitempty"`
+	*Resource          // ID
+	propAvailability   // 有功状態
+	propName           // 名称
+	propDescription    // 説明
+	propSizeMB         // サイズ(MB単位)
+	propMigratedMB     // コピー済みデータサイズ(MB単位)
+	propCopySource     // コピー元情報
+	propJobStatus      // マイグレーションジョブステータス
+	propBundleInfo     // バンドル情報
+	propServer         // サーバー
+	propIcon           // アイコン
+	propTags           // タグ
+	propCreatedAt      // 作成日時
+	propPlanID         // プランID
+	propDiskConnection // ディスク接続情報
+	propDistantFrom    // ストレージ隔離対象ディスク
+
+	ReinstallCount int `json:",omitempty"` // 再インストール回数
+
+	Storage struct { // ストレージ
+		*Resource         // ID
+		MountIndex int64  `json:",omitempty"` // マウント順
+		Class      string `json:",omitempty"` // クラス
 	}
-	// SourceArchive ソースアーカイブ
-	SourceArchive *Archive `json:",omitempty"`
-	// SourceDisk ソースディスク
-	SourceDisk *Disk `json:",omitempty"`
-	// JobStatus コピージョブステータス
-	JobStatus *MigrationJobStatus `json:",omitempty"`
-	// BundleInfo バンドル情報
-	BundleInfo interface{} `json:",omitempty"`
-	// Server 接続先サーバー
-	Server *Server `json:",omitempty"`
-	// CreatedAt 作成日時
-	CreatedAt *time.Time `json:",omitempty"`
-	// Icon アイコン
-	Icon *Icon `json:",omitempty"`
-	*TagsType
 }
 
 // DiskPlanID ディスクプランID
@@ -80,10 +59,21 @@ func (d DiskPlanID) ToResource() *Resource {
 // CreateNewDisk ディスクの作成
 func CreateNewDisk() *Disk {
 	return &Disk{
-		Plan:       DiskPlanSSD,
-		Connection: DiskConnectionVirtio,
-		SizeMB:     20480,
-		TagsType:   &TagsType{},
+		propPlanID:         propPlanID{Plan: DiskPlanSSD},
+		propDiskConnection: propDiskConnection{Connection: DiskConnectionVirtio},
+		propSizeMB:         propSizeMB{SizeMB: 20480},
+	}
+}
+
+// SetDiskPlan プラン文字列(ssd or sdd)からプラン設定
+func (d *Disk) SetDiskPlan(strPlan string) {
+	switch strPlan {
+	case "ssd":
+		d.Plan = DiskPlanSSD
+	case "hdd":
+		d.Plan = DiskPlanHDD
+	default:
+		panic(fmt.Errorf("Invalid plan:%s", strPlan))
 	}
 }
 
@@ -97,47 +87,21 @@ func (d *Disk) SetDiskPlanToSSD() {
 	d.Plan = DiskPlanSSD
 }
 
-// SetSourceArchive ソースアーカイブ 設定
-func (d *Disk) SetSourceArchive(sourceID int64) {
-	d.SourceArchive = &Archive{
-		// Resource
-		Resource: &Resource{ID: sourceID},
-	}
-}
-
-// SetSourceDisk ソースディスク設定
-func (d *Disk) SetSourceDisk(sourceID int64) {
-	d.SourceDisk = &Disk{
-		// Resource
-		Resource: &Resource{ID: sourceID},
-	}
-}
-
 // DiskEditValue ディスクの修正用パラメータ
 //
-// 設定を行う項目のみ値をセットしてください。値のセットにはセッターを利用してください。
+// 設定を行う項目のみ値をセットする。値のセットにはセッターを利用すること。
 type DiskEditValue struct {
-	// Password パスワード
-	Password *string `json:",omitempty"`
-	// SSHKey 公開鍵(単体)
-	SSHKey *SSHKey `json:",omitempty"`
-	// SSHKeys 公開鍵(複数)
-	SSHKeys []*SSHKey `json:",omitempty"`
-	// DisablePWAuth パスワード認証無効化フラグ
-	DisablePWAuth *bool `json:",omitempty"`
-	// HostName ホスト名
-	HostName *string `json:",omitempty"`
-	// UserIPAddress IPアドレス
-	UserIPAddress *string `json:",omitempty"`
-	// UserSubnet サブネット情報
-	UserSubnet *struct {
-		// DefaultRoute デフォルトルート
-		DefaultRoute string `json:",omitempty"`
-		// NetworkMaskLen ネットワークマスク長
-		NetworkMaskLen string `json:",omitempty"`
+	Password      *string     `json:",omitempty"` // パスワード
+	SSHKey        *SSHKey     `json:",omitempty"` // 公開鍵(単体)
+	SSHKeys       []*SSHKey   `json:",omitempty"` // 公開鍵(複数)
+	DisablePWAuth *bool       `json:",omitempty"` // パスワード認証無効化フラグ
+	HostName      *string     `json:",omitempty"` // ホスト名
+	Notes         []*Resource `json:",omitempty"` // スタートアップスクリプト
+	UserIPAddress *string     `json:",omitempty"` // IPアドレス
+	UserSubnet    *struct {   // サブネット情報
+		DefaultRoute   string `json:",omitempty"` // デフォルトルート
+		NetworkMaskLen string `json:",omitempty"` // ネットワークマスク長
 	} `json:",omitempty"`
-	// Notes スタートアップスクリプト
-	Notes []*Resource `json:",omitempty"`
 }
 
 // SetHostName ホスト名 設定

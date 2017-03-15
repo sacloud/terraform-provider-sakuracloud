@@ -48,10 +48,11 @@ func (api *IPAddressAPI) FilterBy(key string, value interface{}) *IPAddressAPI {
 	return api
 }
 
-// func (api *IPAddressAPI) FilterMultiBy(key string, value interface{}) *IPAddressAPI {
-// 	api.filterBy(key, value, true)
-// 	return api
-// }
+// FilterMultiBy 任意項目でのフィルタ(完全一致 OR条件)
+func (api *IPAddressAPI) FilterMultiBy(key string, value interface{}) *IPAddressAPI {
+	api.filterBy(key, value, true)
+	return api
+}
 
 //func (api *IPAddressAPI) WithNameLike(name string) *IPAddressAPI {
 //	return api.FilterBy("Name", name)
@@ -97,6 +98,82 @@ func (api *IPAddressAPI) SortBy(key string, reverse bool) *IPAddressAPI {
 //}
 
 /************************************************
+   To support Setxxx interface for Find()
+************************************************/
+
+// SetEmpty 検索条件のリセット
+func (api *IPAddressAPI) SetEmpty() {
+	api.reset()
+}
+
+// SetOffset オフセット
+func (api *IPAddressAPI) SetOffset(offset int) {
+	api.offset(offset)
+}
+
+// SetLimit リミット
+func (api *IPAddressAPI) SetLimit(limit int) {
+	api.limit(limit)
+}
+
+// SetInclude 取得する項目
+func (api *IPAddressAPI) SetInclude(key string) {
+	api.include(key)
+}
+
+// SetExclude 除外する項目
+func (api *IPAddressAPI) SetExclude(key string) {
+	api.exclude(key)
+}
+
+// SetFilterBy 指定キーでのフィルタ
+func (api *IPAddressAPI) SetFilterBy(key string, value interface{}) {
+	api.filterBy(key, value, false)
+}
+
+// SetFilterMultiBy 任意項目でのフィルタ(完全一致 OR条件)
+func (api *IPAddressAPI) SetFilterMultiBy(key string, value interface{}) {
+	api.filterBy(key, value, true)
+}
+
+//func (api *IPAddressAPI) SetNameLike(name string)  {
+//	api.FilterBy("Name", name)
+//}
+
+//func (api *IPAddressAPI) SetTag(tag string)  {
+//	api.FilterBy("Tags.Name", tag)
+//}
+//func (api *IPAddressAPI) SetTags(tags []string)  {
+//	api.FilterBy("Tags.Name", []interface{}{tags})
+//}
+//
+//func (api *IPAddressAPI) SetSizeGib(size int)  {
+//	api.FilterBy("SizeMB", size*1024)
+//}
+//
+//func (api *IPAddressAPI) SetSharedScope()  {
+//	api.FilterBy("Scope", "shared")
+//}
+//
+//func (api *IPAddressAPI) SetUserScope()  {
+//	api.FilterBy("Scope", "user")
+//}
+
+// SetSortBy 指定キーでのソート
+func (api *IPAddressAPI) SetSortBy(key string, reverse bool) {
+	api.sortBy(key, reverse)
+}
+
+//// SetSortByName 名称でのソート
+//func (api *IPAddressAPI) SetSortByName(reverse bool)  {
+//	api.sortByName(reverse)
+//}
+
+//func (api *IPAddressAPI) SetSortBySize(reverse bool)  {
+//	api.sortBy("SizeMB", reverse)
+//}
+
+/************************************************
   To support CRUD(Create/Read/Update/Delete)
 ************************************************/
 
@@ -126,7 +203,6 @@ func (api *IPAddressAPI) SortBy(key string, reverse bool) *IPAddressAPI {
 //
 //func (api *IPAddressAPI) New() *sacloud.IPAddress {
 //	return &sacloud.IPAddress{
-//		TagsType: &sacloud.TagsType{},
 //	}
 //}
 

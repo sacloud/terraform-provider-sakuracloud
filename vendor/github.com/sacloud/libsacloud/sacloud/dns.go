@@ -2,58 +2,46 @@ package sacloud
 
 import (
 	"fmt"
-	"time"
 )
 
 // DNS DNS(CommonServiceItem)
 type DNS struct {
-	*Resource
-	// Name ゾーン名
-	Name string
-	// Description 説明
-	Description string `json:",omitempty"`
-	// Status ステータス
-	Status DNSStatus `json:",omitempty"`
-	// Provider プロバイダ
-	Provider DNSProvider `json:",omitempty"`
-	// Settings 設定
-	Settings DNSSettings `json:",omitempty"`
-	// ServiceClass サービスクラス
-	ServiceClass string `json:",omitempty"`
-	// CreatedAt 作成日時
-	CreatedAt *time.Time `json:",omitempty"`
-	// ModifiedAt 変更日時
-	ModifiedAt *time.Time `json:",omitempty"`
-	// Icon アイコン
-	Icon *Icon `json:",omitempty"`
-	*TagsType
+	*Resource        // ID
+	propName         // 名称
+	propDescription  // 説明
+	propServiceClass // サービスクラス
+	propIcon         // アイコン
+	propTags         // タグ
+	propCreatedAt    // 作成日時
+	PropModifiedAt   // 変更日時
+
+	Status   DNSStatus   `json:",omitempty"` // ステータス
+	Provider DNSProvider `json:",omitempty"` // プロバイダ
+	Settings DNSSettings `json:",omitempty"` // 設定
+
 }
 
 // DNSSettings DNS設定リスト
 type DNSSettings struct {
-	// DNS DNSレコード設定リスト
-	DNS DNSRecordSets `json:",omitempty"`
+	DNS DNSRecordSets `json:",omitempty"` // DNSレコード設定リスト
 }
 
 // DNSStatus DNSステータス
 type DNSStatus struct {
-	// Zone 対象ゾーン
-	Zone string `json:",omitempty"`
-	// NS ネームサーバーリスト
-	NS []string `json:",omitempty"`
+	Zone string   `json:",omitempty"` // 対象ゾーン
+	NS   []string `json:",omitempty"` // ネームサーバーリスト
 }
 
 // DNSProvider プロバイダ
 type DNSProvider struct {
-	// Class クラス
-	Class string `json:",omitempty"`
+	Class string `json:",omitempty"` // クラス
 }
 
 // CreateNewDNS DNS作成
 func CreateNewDNS(zoneName string) *DNS {
 	return &DNS{
 		Resource: &Resource{},
-		Name:     zoneName,
+		propName: propName{Name: zoneName},
 		Status: DNSStatus{
 			Zone: zoneName,
 		},
@@ -63,7 +51,6 @@ func CreateNewDNS(zoneName string) *DNS {
 		Settings: DNSSettings{
 			DNS: DNSRecordSets{},
 		},
-		TagsType: &TagsType{},
 	}
 }
 
@@ -191,12 +178,8 @@ func (d *DNSRecordSets) DeleteDNSRecordSet(name string, ip string) {
 
 // DNSRecordSet DNSレコード設定
 type DNSRecordSet struct {
-	// Name ホスト名
-	Name string `json:",omitempty"`
-	// Type レコードタイプ
-	Type string `json:",omitempty"`
-	// RData レコードデータ
-	RData string `json:",omitempty"`
-	// TTL TTL
-	TTL int `json:",omitempty"`
+	Name  string `json:",omitempty"` // ホスト名
+	Type  string `json:",omitempty"` // レコードタイプ
+	RData string `json:",omitempty"` // レコードデータ
+	TTL   int    `json:",omitempty"` // TTL
 }

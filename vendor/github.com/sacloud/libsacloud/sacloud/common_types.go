@@ -8,15 +8,12 @@ import (
 
 // Resource IDを持つ、さくらのクラウド上のリソース
 type Resource struct {
-	// ID ID
-	ID int64 `json:",omitempty"`
+	ID int64 // ID
 }
 
 // ResourceIDHolder ID保持インターフェース
 type ResourceIDHolder interface {
-	// SetID
 	SetID(int64)
-	// GetID
 	GetID() int64
 }
 
@@ -59,27 +56,43 @@ func (n *Resource) GetStrID() string {
 }
 
 // EAvailability 有効状態
-type EAvailability struct {
-	// Availability 有効状態
-	Availability string `json:",omitempty"`
-}
+type EAvailability string
+
+var (
+	// EAAvailable 有効
+	EAAvailable = EAvailability("available")
+	// EAUploading アップロード中
+	EAUploading = EAvailability("uploading")
+	// EAFailed 失敗
+	EAFailed = EAvailability("failed")
+	// EAMigrating マイグレーション中
+	EAMigrating = EAvailability("migrating")
+)
 
 // IsAvailable 有効状態が"有効"か判定
-func (a *EAvailability) IsAvailable() bool {
-	return a.Availability == "available"
+func (e EAvailability) IsAvailable() bool {
+	return e == EAAvailable
+}
+
+// IsUploading 有効状態が"アップロード中"か判定
+func (e EAvailability) IsUploading() bool {
+	return e == EAUploading
 }
 
 // IsFailed 有効状態が"失敗"か判定
-func (a *EAvailability) IsFailed() bool {
-	return a.Availability == "failed"
+func (e EAvailability) IsFailed() bool {
+	return e == EAFailed
+}
+
+// IsMigrating 有効状態が"マイグレーション中"か判定
+func (e EAvailability) IsMigrating() bool {
+	return e == EAMigrating
 }
 
 // EServerInstanceStatus サーバーインスタンスステータス
 type EServerInstanceStatus struct {
-	// Status 現在のステータス
-	Status string `json:",omitempty"`
-	// BeforeStatus 前のステータス
-	BeforeStatus string `json:",omitempty"`
+	Status       string `json:",omitempty"` // 現在のステータス
+	BeforeStatus string `json:",omitempty"` // 前のステータス
 }
 
 // IsUp インスタンスが起動しているか判定
@@ -90,6 +103,16 @@ func (e *EServerInstanceStatus) IsUp() bool {
 // IsDown インスタンスがダウンしているか確認
 func (e *EServerInstanceStatus) IsDown() bool {
 	return e.Status == "down"
+}
+
+// GetStatus ステータス 取得
+func (e *EServerInstanceStatus) GetStatus() string {
+	return e.Status
+}
+
+// GetBeforeStatus 以前のステータス 取得
+func (e *EServerInstanceStatus) GetBeforeStatus() string {
+	return e.BeforeStatus
 }
 
 // EScope スコープ
@@ -107,130 +130,75 @@ type EDiskConnection string
 
 // SakuraCloudResources さくらのクラウド上のリソース種別一覧
 type SakuraCloudResources struct {
-	// Server サーバー
-	Server *Server `json:",omitempty"`
-	// Disk ディスク
-	Disk *Disk `json:",omitempty"`
-	// Note スタートアップスクリプト
-	Note *Note `json:",omitempty"`
-	// Archive アーカイブ
-	Archive *Archive `json:",omitempty"`
-	// PacketFilter パケットフィルタ
-	PacketFilter *PacketFilter `json:",omitempty"`
-	// Bridge ブリッジ
-	Bridge *Bridge `json:",omitempty"`
-	// Icon アイコン
-	Icon *Icon `json:",omitempty"`
-	// Image 画像
-	Image *Image `json:",omitempty"`
-	// Interface インターフェース
-	Interface *Interface `json:",omitempty"`
-	// Internet ルーター
-	Internet *Internet `json:",omitempty"`
-	// IPAddress IPv4アドレス
-	IPAddress *IPAddress `json:",omitempty"`
-	// IPv6Addr IPv6アドレス
-	IPv6Addr *IPv6Addr `json:",omitempty"`
-	// IPv6Net IPv6ネットワーク
-	IPv6Net *IPv6Net `json:",omitempty"`
-	// License ライセンス
-	License *License `json:",omitempty"`
-	// Switch スイッチ
-	Switch *Switch `json:",omitempty"`
-	// CDROM ISOイメージ
-	CDROM *CDROM `json:",omitempty"`
-	// SSHKey 公開鍵
-	SSHKey *SSHKey `json:",omitempty"`
-	// Subnet IPv4ネットワーク
-	Subnet *Subnet `json:",omitempty"`
-	// DiskPlan ディスクプラン
-	DiskPlan *ProductDisk `json:",omitempty"`
-	// InternetPlan ルータープラン
-	InternetPlan *ProductInternet `json:",omitempty"`
-	// LicenseInfo ライセンス情報
-	LicenseInfo *ProductLicense `json:",omitempty"`
-	// ServerPlan サーバープラン
-	ServerPlan *ProductServer `json:",omitempty"`
-	// Region リージョン
-	Region *Region `json:",omitempty"`
-	// Zone ゾーン
-	Zone *Zone `json:",omitempty"`
-	// FTPServer FTPサーバー情報
-	FTPServer *FTPServer `json:",omitempty"`
+	Server       *Server          `json:",omitempty"` // サーバー
+	Disk         *Disk            `json:",omitempty"` // ディスク
+	Note         *Note            `json:",omitempty"` // スタートアップスクリプト
+	Archive      *Archive         `json:",omitempty"` // アーカイブ
+	PacketFilter *PacketFilter    `json:",omitempty"` // パケットフィルタ
+	Bridge       *Bridge          `json:",omitempty"` // ブリッジ
+	Icon         *Icon            `json:",omitempty"` // アイコン
+	Image        *Image           `json:",omitempty"` // 画像
+	Interface    *Interface       `json:",omitempty"` // インターフェース
+	Internet     *Internet        `json:",omitempty"` // ルーター
+	IPAddress    *IPAddress       `json:",omitempty"` // IPv4アドレス
+	IPv6Addr     *IPv6Addr        `json:",omitempty"` // IPv6アドレス
+	IPv6Net      *IPv6Net         `json:",omitempty"` // IPv6ネットワーク
+	License      *License         `json:",omitempty"` // ライセンス
+	Switch       *Switch          `json:",omitempty"` // スイッチ
+	CDROM        *CDROM           `json:",omitempty"` // ISOイメージ
+	SSHKey       *SSHKey          `json:",omitempty"` // 公開鍵
+	Subnet       *Subnet          `json:",omitempty"` // IPv4ネットワーク
+	DiskPlan     *ProductDisk     `json:",omitempty"` // ディスクプラン
+	InternetPlan *ProductInternet `json:",omitempty"` // ルータープラン
+	LicenseInfo  *ProductLicense  `json:",omitempty"` // ライセンス情報
+	ServerPlan   *ProductServer   `json:",omitempty"` // サーバープラン
+	Region       *Region          `json:",omitempty"` // リージョン
+	Zone         *Zone            `json:",omitempty"` // ゾーン
+	FTPServer    *FTPServer       `json:",omitempty"` // FTPサーバー情報
 
 	//REMARK: CommonServiceItemとApplianceはapiパッケージにて別途定義
 }
 
 // SakuraCloudResourceList さくらのクラウド上のリソース種別一覧(複数形)
 type SakuraCloudResourceList struct {
-	// Servers サーバー
-	Servers []Server `json:",omitempty"`
-	// Disks ディスク
-	Disks []Disk `json:",omitempty"`
-	// Notes スタートアップスクリプト
-	Notes []Note `json:",omitempty"`
-	// Archives アーカイブ
-	Archives []Archive `json:",omitempty"`
-	// PacketFilters パケットフィルタ
-	PacketFilters []PacketFilter `json:",omitempty"`
-	// Bridges ブリッジ
-	Bridges []Bridge `json:",omitempty"`
-	// Icons アイコン
-	Icons []Icon `json:",omitempty"`
-	// Interfaces インターフェース
-	Interfaces []Interface `json:",omitempty"`
-	// Internet ルーター
-	Internet []Internet `json:",omitempty"`
-	// IPAddress IPv4アドレス
-	IPAddress []IPAddress `json:",omitempty"`
-	// IPv6Addrs IPv6アドレス
-	IPv6Addrs []IPv6Addr `json:",omitempty"`
-	// IPv6Nets IPv6ネットワーク
-	IPv6Nets []IPv6Net `json:",omitempty"`
-	// Licenses ライセンス
-	Licenses []License `json:",omitempty"`
-	// Switches スイッチ
-	Switches []Switch `json:",omitempty"`
-	// CDROMs ISOイメージ
-	CDROMs []CDROM `json:",omitempty"`
-	// SSHKeys 公開鍵
-	SSHKeys []SSHKey `json:",omitempty"`
-	// Subnets IPv4ネットワーク
-	Subnets []Subnet `json:",omitempty"`
-	// DiskPlans ディスクプラン
-	DiskPlans []ProductDisk `json:",omitempty"`
-	// InternetPlans ルータープラン
-	InternetPlans []ProductInternet `json:",omitempty"`
-	// LicenseInfo ライセンス情報
-	LicenseInfo []ProductLicense `json:",omitempty"`
-	// ServerPlans サーバープラン
-	ServerPlans []ProductServer `json:",omitempty"`
-	// Regions リージョン
-	Regions []Region `json:",omitempty"`
-	// Zones ゾーン
-	Zones []Zone `json:",omitempty"`
-	// ServiceClasses サービスクラス(価格情報)
-	ServiceClasses []PublicPrice `json:",omitempty"` // remark : 単体取得APIは無いため、複数形でのみ定義
+	Servers        []Server          `json:",omitempty"` // サーバー
+	Disks          []Disk            `json:",omitempty"` // ディスク
+	Notes          []Note            `json:",omitempty"` // スタートアップスクリプト
+	Archives       []Archive         `json:",omitempty"` // アーカイブ
+	PacketFilters  []PacketFilter    `json:",omitempty"` // パケットフィルタ
+	Bridges        []Bridge          `json:",omitempty"` // ブリッジ
+	Icons          []Icon            `json:",omitempty"` // アイコン
+	Interfaces     []Interface       `json:",omitempty"` // インターフェース
+	Internet       []Internet        `json:",omitempty"` // ルーター
+	IPAddress      []IPAddress       `json:",omitempty"` // IPv4アドレス
+	IPv6Addrs      []IPv6Addr        `json:",omitempty"` // IPv6アドレス
+	IPv6Nets       []IPv6Net         `json:",omitempty"` // IPv6ネットワーク
+	Licenses       []License         `json:",omitempty"` // ライセンス
+	Switches       []Switch          `json:",omitempty"` // スイッチ
+	CDROMs         []CDROM           `json:",omitempty"` // ISOイメージ
+	SSHKeys        []SSHKey          `json:",omitempty"` // 公開鍵
+	Subnets        []Subnet          `json:",omitempty"` // IPv4ネットワーク
+	DiskPlans      []ProductDisk     `json:",omitempty"` // ディスクプラン
+	InternetPlans  []ProductInternet `json:",omitempty"` // ルータープラン
+	LicenseInfo    []ProductLicense  `json:",omitempty"` // ライセンス情報
+	ServerPlans    []ProductServer   `json:",omitempty"` // サーバープラン
+	Regions        []Region          `json:",omitempty"` // リージョン
+	Zones          []Zone            `json:",omitempty"` // ゾーン
+	ServiceClasses []PublicPrice     `json:",omitempty"` // サービスクラス(価格情報)
 
 	//REMARK:CommonServiceItemとApplianceはapiパッケージにて別途定義
 }
 
 // Request APIリクエスト型
 type Request struct {
-	// SakuraCloudResources さくらのクラウドリソース
-	SakuraCloudResources
-	// From ページング FROM
-	From int `json:",omitempty"`
-	// Count 取得件数
-	Count int `json:",omitempty"`
-	// Sort ソート
-	Sort []string `json:",omitempty"`
-	// Filter フィルタ
-	Filter map[string]interface{} `json:",omitempty"`
-	// Exclude 除外する項目
-	Exclude []string `json:",omitempty"`
-	// Include 取得する項目
-	Include []string `json:",omitempty"`
+	SakuraCloudResources                        // さくらのクラウドリソース
+	From                 int                    `json:",omitempty"` // ページング FROM
+	Count                int                    `json:",omitempty"` // 取得件数
+	Sort                 []string               `json:",omitempty"` // ソート
+	Filter               map[string]interface{} `json:",omitempty"` // フィルタ
+	Exclude              []string               `json:",omitempty"` // 除外する項目
+	Include              []string               `json:",omitempty"` // 取得する項目
+
 }
 
 // AddFilter フィルタの追加
@@ -271,72 +239,50 @@ func (r *Request) AddInclude(keyName string) *Request {
 
 // ResultFlagValue レスポンス値でのフラグ項目
 type ResultFlagValue struct {
-	// IsOk is_ok項目
-	IsOk bool `json:"is_ok,omitempty"`
-	// Success success項目
-	Success bool `json:",omitempty"`
+	IsOk    bool `json:"is_ok,omitempty"` // is_ok項目
+	Success bool `json:",omitempty"`      // success項目
 }
 
 // SearchResponse 検索レスポンス
 type SearchResponse struct {
-	// Total トータル件数
-	Total int `json:",omitempty"`
-	// From ページング開始ページ
-	From int `json:",omitempty"`
-	// Count 件数
-	Count int `json:",omitempty"`
-	*SakuraCloudResourceList
-	// ResponsedAt 応答日時
-	ResponsedAt *time.Time `json:",omitempty"`
+	Total                    int        `json:",omitempty"` // トータル件数
+	From                     int        `json:",omitempty"` // ページング開始ページ
+	Count                    int        `json:",omitempty"` // 件数
+	ResponsedAt              *time.Time `json:",omitempty"` // 応答日時
+	*SakuraCloudResourceList            // さくらのクラウドリソース(複数形)
 }
 
 // Response レスポンス型
 type Response struct {
-	*ResultFlagValue
-	*SakuraCloudResources
+	*ResultFlagValue      // フラグ値
+	*SakuraCloudResources // さくらのクラウドリソース(単数形)
 }
 
 // ResultErrorValue レスポンスエラー型
 type ResultErrorValue struct {
-	// IsFatal
-	IsFatal bool `json:"is_fatal,omitempty"`
-	// Serial
-	Serial string `json:"serial,omitempty"`
-	// Status
-	Status string `json:"status,omitempty"`
-	// ErrorCode
-	ErrorCode string `json:"error_code,omitempty"`
-	// ErrorMessage
-	ErrorMessage string `json:"error_msg,omitempty"`
+	IsFatal      bool   `json:"is_fatal,omitempty"`   // IsFatal
+	Serial       string `json:"serial,omitempty"`     // Serial
+	Status       string `json:"status,omitempty"`     // Status
+	ErrorCode    string `json:"error_code,omitempty"` // ErrorCode
+	ErrorMessage string `json:"error_msg,omitempty"`  // ErrorMessage
+
 }
 
 // MigrationJobStatus マイグレーションジョブステータス
 type MigrationJobStatus struct {
-	// Status ステータス
-	Status string `json:",omitempty"`
-	// Delays Delays
-	Delays *struct {
-		// Start 開始
-		Start *struct {
-			// Max 最大
-			Max int `json:",omitempty"`
-			// Min 最小
-			Min int `json:",omitempty"`
+	Status string `json:",omitempty"` // ステータス
+
+	Delays *struct { // Delays
+		Start *struct { // 開始
+			Max int `json:",omitempty"` // 最大
+			Min int `json:",omitempty"` // 最小
 		} `json:",omitempty"`
-		// Finish 終了
-		Finish *struct {
-			// Max 最大
-			Max int `json:",omitempty"`
-			// Min 最小
-			Min int `json:",omitempty"`
+
+		Finish *struct { // 終了
+			Max int `json:",omitempty"` // 最大
+			Min int `json:",omitempty"` // 最小
 		} `json:",omitempty"`
 	}
-}
-
-// TagsType タグ内包型
-type TagsType struct {
-	// Tags タグ
-	Tags []string
 }
 
 var (
@@ -363,39 +309,3 @@ var (
 	// TagVirtIONetPCI サーバの仮想NICをvirtio-netに変更します
 	TagVirtIONetPCI = "@virtio-net-pci"
 )
-
-// HasTag 指定のタグを持っているか判定
-func (t *TagsType) HasTag(target string) bool {
-
-	for _, tag := range t.Tags {
-		if target == tag {
-			return true
-		}
-	}
-
-	return false
-}
-
-// AppendTag タグを追加
-func (t *TagsType) AppendTag(target string) {
-	if t.HasTag(target) {
-		return
-	}
-
-	t.Tags = append(t.Tags, target)
-}
-
-// RemoveTag タグを削除
-func (t *TagsType) RemoveTag(target string) {
-	if !t.HasTag(target) {
-		return
-	}
-	res := []string{}
-	for _, tag := range t.Tags {
-		if tag != target {
-			res = append(res, tag)
-		}
-	}
-
-	t.Tags = res
-}

@@ -22,7 +22,7 @@ vet: golint
 	go vet ./...
 
 golint: fmt
-	golint ./...
+	golint $(go list ./... | grep -v "_string.go")
 
 fmt:
 	gofmt -s -l -w $(GOFMT_FILES)

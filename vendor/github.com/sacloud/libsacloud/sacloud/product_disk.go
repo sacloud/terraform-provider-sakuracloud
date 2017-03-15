@@ -2,24 +2,19 @@ package sacloud
 
 // ProductDisk ディスクプラン
 type ProductDisk struct {
-	*Resource
-	// StorageClass ストレージクラス
-	StorageClass string `json:",omitempty"`
-	// Name 名称
-	Name string `json:",omitempty"`
-	// Description 説明
-	Description string `json:",omitempty"`
-	*EAvailability
-	// Size サイズ
-	Size []struct {
-		// SizeMB サイズ(MB単位)
-		SizeMB int `json:",omitempty"`
-		// DisplaySize 表示サイズ
-		DisplaySize int `json:",omitempty"`
-		// DisplaySuffix 表示さフィックス
-		DisplaySuffix string `json:",omitempty"`
-		*EAvailability
-		// ServiceClass サービスクラス
-		ServiceClass string `json:",omitempty"`
+	*Resource        // ID
+	propName         // 名称
+	propDescription  // 説明
+	propStorageClass // ストレージクラス
+	propAvailability // 有功状態
+
+	Size []struct { // サイズ
+		propAvailability // 有功状態
+		propSizeMB       // サイズ(MB単位)
+		propServiceClass // サービスクラス
+
+		DisplaySize   int    `json:",omitempty"` // 表示サイズ
+		DisplaySuffix string `json:",omitempty"` // 表示サフィックス
+
 	} `json:",omitempty"`
 }

@@ -4,62 +4,46 @@ import (
 	"encoding/json"
 	"fmt"
 	"net"
-	"time"
 )
 
 // Switch スイッチ
 type Switch struct {
-	*Resource
-	// Name 名称
-	Name string `json:",omitempty"`
-	// Description 説明
-	Description string `json:",omitempty"`
-	// ServerCount 接続サーバー数
-	ServerCount int `json:",omitempty"`
-	// ApplianceCount 接続アプライアンス数
-	ApplianceCount int `json:",omitempty"`
-	// Scope スコープ
-	Scope EScope `json:",omitempty"`
-	// Subnet サブネット
-	Subnet *Subnet `json:",omitempty"`
-	// UserSubnet ユーザー定義サブネット
-	UserSubnet *Subnet `json:",omitempty"`
-	//HybridConnection //REMARK: !!ハイブリッド接続 not support!!
-	// ServerClass サービスクラス
-	ServerClass string `json:",omitempty"`
-	// CreatedAt 作成日時
-	CreatedAt *time.Time `json:",omitempty"`
-	// Icon アイコン
-	Icon *Icon `json:",omitempty"`
-	*TagsType
-	// Subnets サブネット
-	Subnets []SwitchSubnet `json:",omitempty"`
-	// IPv6Nets IPv6サブネットリスト
-	IPv6Nets []IPv6Net `json:",omitempty"`
-	// Internet ルーター
-	Internet *Internet `json:",omitempty"`
-	// Bridge ブリッジ
-	Bridge *struct {
-		*Bridge
-		Info *struct {
-			// Switches 接続スイッチリスト
-			Switches []struct {
-				*Switch
-				ID json.Number `json:",omitempty"` // HACK
+	*Resource        // ID
+	propName         // 名称
+	propDescription  // 説明
+	propServiceClass // サービスクラス
+	propIcon         // アイコン
+	propTags         // タグ
+	propCreatedAt    // 作成日時
+
+	ServerCount    int            `json:",omitempty"` // 接続サーバー数
+	ApplianceCount int            `json:",omitempty"` // 接続アプライアンス数
+	Scope          EScope         `json:",omitempty"` // スコープ
+	Subnet         *Subnet        `json:",omitempty"` // サブネット
+	UserSubnet     *Subnet        `json:",omitempty"` // ユーザー定義サブネット
+	Subnets        []SwitchSubnet `json:",omitempty"` // サブネット
+	IPv6Nets       []IPv6Net      `json:",omitempty"` // IPv6サブネットリスト
+	Internet       *Internet      `json:",omitempty"` // ルーター
+
+	Bridge *struct { // 接続先ブリッジ(Info.Switches配下のIDデータ型HACK)
+		*Bridge // ブリッジ
+		Info    *struct {
+			Switches []struct { // 接続スイッチリスト
+				*Switch             // スイッチ
+				ID      json.Number `json:",omitempty"` // HACK
 			}
 		}
 	} `json:",omitempty"`
+
+	//HybridConnection //REMARK: !!ハイブリッド接続 not support!!
 }
 
 // SwitchSubnet スイッチサブネット
 type SwitchSubnet struct {
 	*Subnet
-	// IPAddresses IPアドレス範囲
-	IPAddresses struct {
-		// Min IPアドレス開始
-		Min string `json:",omitempty"`
-		// Max IPアドレス終了
-		Max string `json:",omitempty"`
+	IPAddresses struct { // IPアドレス範囲
+		Min string `json:",omitempty"` // IPアドレス開始
+		Max string `json:",omitempty"` // IPアドレス終了
 	}
 }
 

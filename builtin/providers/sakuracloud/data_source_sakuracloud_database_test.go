@@ -107,6 +107,10 @@ func testAccCheckSakuraCloudDatabaseDataSourceDestroy(s *terraform.State) error 
 }
 
 var testAccCheckSakuraCloudDataSourceDatabaseBase = `
+resource "sakuracloud_switch" "sw" {
+    name = "sw"
+    zone = "tk1a"
+}
 resource "sakuracloud_database" "foobar" {
     name = "name_test"
     description = "description_test"
@@ -118,14 +122,22 @@ resource "sakuracloud_database" "foobar" {
 
     allow_networks = ["192.168.11.0/24","192.168.12.0/24"]
 
+    switch_id = "${sakuracloud_switch.sw.id}"
+    ipaddress1 = "192.168.11.101"
+    nw_mask_len = 24
+    default_route = "192.168.11.1"
+
     port = 54321
 
-    backup_rotate = 8
     backup_time = "00:00"
     zone = "tk1a"
 }`
 
 var testAccCheckSakuraCloudDataSourceDatabaseConfig = `
+resource "sakuracloud_switch" "sw" {
+    name = "sw"
+    zone = "tk1a"
+}
 resource "sakuracloud_database" "foobar" {
     name = "name_test"
     description = "description_test"
@@ -137,9 +149,13 @@ resource "sakuracloud_database" "foobar" {
 
     allow_networks = ["192.168.11.0/24","192.168.12.0/24"]
 
+    switch_id = "${sakuracloud_switch.sw.id}"
+    ipaddress1 = "192.168.11.101"
+    nw_mask_len = 24
+    default_route = "192.168.11.1"
+
     port = 54321
 
-    backup_rotate = 8
     backup_time = "00:00"
     zone = "tk1a"
 
@@ -153,6 +169,10 @@ data "sakuracloud_database" "foobar" {
 }`
 
 var testAccCheckSakuraCloudDataSourceDatabaseConfig_With_Tag = `
+resource "sakuracloud_switch" "sw" {
+    name = "sw"
+    zone = "tk1a"
+}
 resource "sakuracloud_database" "foobar" {
     name = "name_test"
     description = "description_test"
@@ -164,9 +184,13 @@ resource "sakuracloud_database" "foobar" {
 
     allow_networks = ["192.168.11.0/24","192.168.12.0/24"]
 
+    switch_id = "${sakuracloud_switch.sw.id}"
+    ipaddress1 = "192.168.11.101"
+    nw_mask_len = 24
+    default_route = "192.168.11.1"
+
     port = 54321
 
-    backup_rotate = 8
     backup_time = "00:00"
     zone = "tk1a"
 
@@ -180,6 +204,10 @@ data "sakuracloud_database" "foobar" {
 }`
 
 var testAccCheckSakuraCloudDataSourceDatabaseConfig_With_NotExists_Tag = `
+resource "sakuracloud_switch" "sw" {
+    name = "sw"
+    zone = "tk1a"
+}
 resource "sakuracloud_database" "foobar" {
     name = "name_test"
     description = "description_test"
@@ -191,9 +219,13 @@ resource "sakuracloud_database" "foobar" {
 
     allow_networks = ["192.168.11.0/24","192.168.12.0/24"]
 
+    switch_id = "${sakuracloud_switch.sw.id}"
+    ipaddress1 = "192.168.11.101"
+    nw_mask_len = 24
+    default_route = "192.168.11.1"
+
     port = 54321
 
-    backup_rotate = 8
     backup_time = "00:00"
     zone = "tk1a"
 
@@ -207,6 +239,10 @@ data "sakuracloud_database" "foobar" {
 }`
 
 var testAccCheckSakuraCloudDataSourceDatabaseConfig_NotExists = `
+resource "sakuracloud_switch" "sw" {
+    name = "sw"
+    zone = "tk1a"
+}
 resource "sakuracloud_database" "foobar" {
     name = "name_test"
     description = "description_test"
@@ -218,9 +254,13 @@ resource "sakuracloud_database" "foobar" {
 
     allow_networks = ["192.168.11.0/24","192.168.12.0/24"]
 
+    switch_id = "${sakuracloud_switch.sw.id}"
+    ipaddress1 = "192.168.11.101"
+    nw_mask_len = 24
+    default_route = "192.168.11.1"
+
     port = 54321
 
-    backup_rotate = 8
     backup_time = "00:00"
     zone = "tk1a"
 

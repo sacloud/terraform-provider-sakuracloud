@@ -48,10 +48,11 @@ func (api *InternetAPI) FilterBy(key string, value interface{}) *InternetAPI {
 	return api
 }
 
-// func (api *InternetAPI) FilterMultiBy(key string, value interface{}) *InternetAPI {
-// 	api.filterBy(key, value, true)
-// 	return api
-// }
+// FilterMultiBy 任意項目でのフィルタ(完全一致 OR条件)
+func (api *InternetAPI) FilterMultiBy(key string, value interface{}) *InternetAPI {
+	api.filterBy(key, value, true)
+	return api
+}
 
 // WithNameLike 名称条件
 func (api *InternetAPI) WithNameLike(name string) *InternetAPI {
@@ -101,14 +102,92 @@ func (api *InternetAPI) SortByName(reverse bool) *InternetAPI {
 // }
 
 /************************************************
+   To support Setxxx interface for Find()
+************************************************/
+
+// SetEmpty 検索条件のリセット
+func (api *InternetAPI) SetEmpty() {
+	api.reset()
+}
+
+// SetOffset オフセット
+func (api *InternetAPI) SetOffset(offset int) {
+	api.offset(offset)
+}
+
+// SetLimit リミット
+func (api *InternetAPI) SetLimit(limit int) {
+	api.limit(limit)
+}
+
+// SetInclude 取得する項目
+func (api *InternetAPI) SetInclude(key string) {
+	api.include(key)
+}
+
+// SetExclude 除外する項目
+func (api *InternetAPI) SetExclude(key string) {
+	api.exclude(key)
+}
+
+// SetFilterBy 指定キーでのフィルター
+func (api *InternetAPI) SetFilterBy(key string, value interface{}) {
+	api.filterBy(key, value, false)
+}
+
+// SetFilterMultiBy 任意項目でのフィルタ(完全一致 OR条件)
+func (api *InternetAPI) SetFilterMultiBy(key string, value interface{}) {
+	api.filterBy(key, value, true)
+}
+
+// SetNameLike 名称条件
+func (api *InternetAPI) SetNameLike(name string) {
+	api.FilterBy("Name", name)
+}
+
+// SetTag タグ条件
+func (api *InternetAPI) SetTag(tag string) {
+	api.FilterBy("Tags.Name", tag)
+}
+
+// SetTags タグ(複数)条件
+func (api *InternetAPI) SetTags(tags []string) {
+	api.FilterBy("Tags.Name", []interface{}{tags})
+}
+
+// func (api *InternetAPI) SetSizeGib(size int)  {
+// 	api.FilterBy("SizeMB", size*1024)
+// }
+
+// func (api *InternetAPI) SetSharedScope()  {
+// 	api.FilterBy("Scope", "shared")
+// }
+
+// func (api *InternetAPI) SetUserScope()  {
+// 	api.FilterBy("Scope", "user")
+// }
+
+// SetSortBy 指定キーでのソート
+func (api *InternetAPI) SetSortBy(key string, reverse bool) {
+	api.sortBy(key, reverse)
+}
+
+// SetSortByName 名称でのソート
+func (api *InternetAPI) SetSortByName(reverse bool) {
+	api.sortByName(reverse)
+}
+
+// func (api *InternetAPI) SetSortBySize(reverse bool)  {
+// 	api.sortBy("SizeMB", reverse)
+// }
+
+/************************************************
   To support CRUD(Create/Read/Update/Delete)
 ************************************************/
 
 // New 新規作成用パラメーター作成
 func (api *InternetAPI) New() *sacloud.Internet {
-	return &sacloud.Internet{
-		TagsType: &sacloud.TagsType{},
-	}
+	return &sacloud.Internet{}
 }
 
 // Create 新規作成

@@ -4,36 +4,24 @@ import "time"
 
 // Bill 請求情報
 type Bill struct {
-	// Amount 金額
-	Amount int64 `json:",omitempty"`
-	// BillID 請求ID
-	BillID int64 `json:",omitempty"`
-	// Date 請求日
-	Date *time.Time `json:",omitempty"`
-	// MemberID 会員ID
-	MemberID string `json:",omitempty"`
-	// Paid 支払済フラグ
-	Paid bool `json:",omitempty"`
-	// PayLimit 支払い期限
-	PayLimit *time.Time `json:",omitempty"`
-	// PaymentClassID 支払いクラスID
-	PaymentClassID int `json:",omitempty"`
+	Amount         int64      `json:",omitempty"` // 金額
+	BillID         int64      `json:",omitempty"` // 請求ID
+	Date           *time.Time `json:",omitempty"` // 請求日
+	MemberID       string     `json:",omitempty"` // 会員ID
+	Paid           bool       `json:",omitempty"` // 支払済フラグ
+	PayLimit       *time.Time `json:",omitempty"` // 支払い期限
+	PaymentClassID int        `json:",omitempty"` // 支払いクラスID
+
 }
 
 // BillDetail 支払い明細情報
 type BillDetail struct {
-	// Amount 金額
-	Amount int64 `json:",omitempty"`
-	// ContractID 契約ID
-	ContractID int64 `json:",omitempty"`
-	// Description 説明
-	Description string `json:",omitempty"`
-	// Index インデックス
-	Index int `json:",omitempty"`
-	// ServiceClassID サービスクラスID
-	ServiceClassID int64 `json:",omitempty"`
-	// Usage 秒数
-	Usage int64 `json:",omitempty"`
-	// Zone ゾーン
-	Zone string `json:",omitempty"`
+	Amount         int64  `json:",omitempty"` // 金額
+	ContractID     int64  `json:",omitempty"` // 契約ID
+	Description    string `json:",omitempty"` // 説明
+	Index          int    `json:",omitempty"` // インデックス
+	ServiceClassID int64  `json:",omitempty"` // サービスクラスID
+	Usage          int64  `json:",omitempty"` // 秒数
+	Zone           string `json:",omitempty"` // ゾーン
+
 }

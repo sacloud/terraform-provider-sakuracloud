@@ -48,10 +48,11 @@ func (api *ServerAPI) FilterBy(key string, value interface{}) *ServerAPI {
 	return api
 }
 
-// func (api *ServerAPI) FilterMultiBy(key string, value interface{}) *ServerAPI {
-// 	api.filterBy(key, value, true)
-// 	return api
-// }
+// FilterMultiBy 任意項目でのフィルタ(完全一致 OR条件)
+func (api *ServerAPI) FilterMultiBy(key string, value interface{}) *ServerAPI {
+	api.filterBy(key, value, true)
+	return api
+}
 
 // WithNameLike 名称条件
 func (api *ServerAPI) WithNameLike(name string) *ServerAPI {
@@ -101,15 +102,92 @@ func (api *ServerAPI) SortByName(reverse bool) *ServerAPI {
 // }
 
 /************************************************
+   To support Setxxx interface for Find()
+************************************************/
+
+// SetEmpty 検索条件のリセット
+func (api *ServerAPI) SetEmpty() {
+	api.reset()
+}
+
+// SetOffset オフセット
+func (api *ServerAPI) SetOffset(offset int) {
+	api.offset(offset)
+}
+
+// SetLimit リミット
+func (api *ServerAPI) SetLimit(limit int) {
+	api.limit(limit)
+}
+
+// SetInclude 取得する項目
+func (api *ServerAPI) SetInclude(key string) {
+	api.include(key)
+}
+
+// SetExclude 除外する項目
+func (api *ServerAPI) SetExclude(key string) {
+	api.exclude(key)
+}
+
+// SetFilterBy 指定キーでのフィルター
+func (api *ServerAPI) SetFilterBy(key string, value interface{}) {
+	api.filterBy(key, value, false)
+}
+
+// SetFilterMultiBy 任意項目でのフィルタ(完全一致 OR条件)
+func (api *ServerAPI) SetFilterMultiBy(key string, value interface{}) {
+	api.filterBy(key, value, true)
+}
+
+// SetNameLike 名称条件
+func (api *ServerAPI) SetNameLike(name string) {
+	api.FilterBy("Name", name)
+}
+
+// SetTag タグ条件
+func (api *ServerAPI) SetTag(tag string) {
+	api.FilterBy("Tags.Name", tag)
+}
+
+// SetTags タグ(複数)条件
+func (api *ServerAPI) SetTags(tags []string) {
+	api.FilterBy("Tags.Name", []interface{}{tags})
+}
+
+// func (api *ServerAPI) SetSizeGib(size int) {
+// 	api.FilterBy("SizeMB", size*1024)
+// }
+
+// func (api *ServerAPI) SetSharedScope() {
+// 	api.FilterBy("Scope", "shared")
+// }
+
+// func (api *ServerAPI) SetUserScope() {
+// 	api.FilterBy("Scope", "user")
+// }
+
+// SetSortBy 指定キーでのソート
+func (api *ServerAPI) SetSortBy(key string, reverse bool) {
+	api.sortBy(key, reverse)
+}
+
+// SetSortByName 名称でのソート
+func (api *ServerAPI) SetSortByName(reverse bool) {
+	api.sortByName(reverse)
+}
+
+// func (api *ServerAPI) SetSortBySize(reverse bool) {
+// 	api.sortBy("SizeMB", reverse)
+// }
+
+/************************************************
   To support CRUD(Create/Read/Update/Delete)
 ************************************************/
 
 // New 新規作成用パラメーター作成
 func (api *ServerAPI) New() *sacloud.Server {
-	return &sacloud.Server{
-		// TagsType
-		TagsType: &sacloud.TagsType{},
-	}
+	return &sacloud.Server{}
 }
 
 // Create 新規作成

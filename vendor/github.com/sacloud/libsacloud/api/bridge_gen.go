@@ -48,10 +48,11 @@ func (api *BridgeAPI) FilterBy(key string, value interface{}) *BridgeAPI {
 	return api
 }
 
-// func (api *BridgeAPI) FilterMultiBy(key string, value interface{}) *BridgeAPI {
-// 	api.filterBy(key, value, true)
-// 	return api
-// }
+// FilterMultiBy 任意項目でのフィルタ(完全一致 OR条件)
+func (api *BridgeAPI) FilterMultiBy(key string, value interface{}) *BridgeAPI {
+	api.filterBy(key, value, true)
+	return api
+}
 
 // WithNameLike 名称条件
 func (api *BridgeAPI) WithNameLike(name string) *BridgeAPI {
@@ -98,6 +99,86 @@ func (api *BridgeAPI) SortByName(reverse bool) *BridgeAPI {
 // func (api *BridgeAPI) SortBySize(reverse bool) *BridgeAPI {
 // 	api.sortBy("SizeMB", reverse)
 // 	return api
+// }
+
+/************************************************
+   To support Setxxx interface for Find()
+************************************************/
+
+// SetEmpty 検索条件リセット
+func (api *BridgeAPI) SetEmpty() {
+	api.reset()
+}
+
+// SetOffset オフセット
+func (api *BridgeAPI) SetOffset(offset int) {
+	api.offset(offset)
+}
+
+// SetLimit リミット
+func (api *BridgeAPI) SetLimit(limit int) {
+	api.limit(limit)
+}
+
+// SetInclude 取得する項目
+func (api *BridgeAPI) SetInclude(key string) {
+	api.include(key)
+}
+
+// SetExclude 除外する項目
+func (api *BridgeAPI) SetExclude(key string) {
+	api.exclude(key)
+}
+
+// SetFilterBy 指定キーでのフィルター
+func (api *BridgeAPI) SetFilterBy(key string, value interface{}) {
+	api.filterBy(key, value, false)
+}
+
+// SetFilterMultiBy 任意項目でのフィルタ(完全一致 OR条件)
+func (api *BridgeAPI) SetFilterMultiBy(key string, value interface{}) {
+	api.filterBy(key, value, true)
+}
+
+// SetNameLike 名称条件
+func (api *BridgeAPI) SetNameLike(name string) {
+	api.FilterBy("Name", name)
+}
+
+// SetTag タグ条件
+func (api *BridgeAPI) SetTag(tag string) {
+	api.FilterBy("Tags.Name", tag)
+}
+
+// SetTags タグ(複数)条件
+func (api *BridgeAPI) SetTags(tags []string) {
+	api.FilterBy("Tags.Name", []interface{}{tags})
+}
+
+// func (api *BridgeAPI) SetSizeGib(size int) {
+// 	api.FilterBy("SizeMB", size*1024)
+// }
+
+// func (api *BridgeAPI) SetSharedScope() {
+// 	api.FilterBy("Scope", "shared")
+// }
+
+// func (api *BridgeAPI) SetUserScope() {
+// 	api.FilterBy("Scope", "user")
+// }
+
+// SetSortBy 指定キーでのソート
+func (api *BridgeAPI) SetSortBy(key string, reverse bool) {
+	api.sortBy(key, reverse)
+}
+
+// SetSortByName 名称でのソート
+func (api *BridgeAPI) SetSortByName(reverse bool) {
+	api.sortByName(reverse)
+}
+
+// func (api *BridgeAPI) SortBySize(reverse bool) {
+// 	api.sortBy("SizeMB", reverse)
 // }
 
 /************************************************

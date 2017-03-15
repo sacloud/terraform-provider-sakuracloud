@@ -2,14 +2,11 @@ package sacloud
 
 // IPv6Addr IPアドレス(IPv6)
 type IPv6Addr struct {
-	// HostName ホスト名
-	HostName string `json:",omitempty"`
-	// IPv6Addr IPv6アドレス
-	IPv6Addr string `json:",omitempty"`
-	// Interface インターフェース
-	Interface *Internet `json:",omitempty"`
-	// IPv6Net IPv6サブネット
-	IPv6Net *IPv6Net `json:",omitempty"`
+	HostName  string    `json:",omitempty"` // ホスト名
+	IPv6Addr  string    `json:",omitempty"` // IPv6アドレス
+	Interface *Internet `json:",omitempty"` // インターフェース
+	IPv6Net   *IPv6Net  `json:",omitempty"` // IPv6サブネット
+
 }
 
 // CreateNewIPv6Addr IPv6アドレス作成

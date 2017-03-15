@@ -39,7 +39,7 @@ func TestAccResourceSakuraCloudAutoBackup(t *testing.T) {
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckSakuraCloudAutoBackupExists("sakuracloud_auto_backup.foobar", &autoBackup),
 					resource.TestCheckResourceAttr("sakuracloud_auto_backup.foobar", "name", "name_after"),
-					resource.TestCheckResourceAttr("sakuracloud_auto_backup.foobar", "backup_hour", "18"),
+					resource.TestCheckResourceAttr("sakuracloud_auto_backup.foobar", "backup_hour", "12"),
 					resource.TestCheckResourceAttr("sakuracloud_auto_backup.foobar", "weekdays.#", "2"),
 					resource.TestCheckResourceAttr("sakuracloud_auto_backup.foobar", "weekdays.0", "sat"),
 					resource.TestCheckResourceAttr("sakuracloud_auto_backup.foobar", "weekdays.1", "sun"),
@@ -133,7 +133,7 @@ resource "sakuracloud_disk" "disk" {
 resource "sakuracloud_auto_backup" "foobar" {
     name = "name_after"
     disk_id = "${sakuracloud_disk.disk.id}"
-    backup_hour = 18
+    backup_hour = 12
     weekdays = ["sat","sun"]
     max_backup_num = 2
     description = "description_after"

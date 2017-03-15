@@ -166,6 +166,7 @@ func main() {
 	server, _ = client.Server.Create(server)
 
 	// connect to shared segment
+
 	fmt.Println("connecting the server to shared segment")
 	iface, _ := client.Interface.CreateAndConnectToServer(server.ID)
 	client.Interface.ConnectToSharedSegment(iface.ID)
@@ -179,10 +180,10 @@ func main() {
 
 	// config the disk
 	diskConf := client.Disk.NewCondig()
-	diskConf.HostName = hostName
-	diskConf.Password = password
-	diskConf.SSHKey.PublicKey = sshPublicKey
-	diskConf.AddNote(script.ID)
+	diskConf.SetHostName(hostName)
+	diskConf.SetPassword(password)
+	diskConf.AddSSHKeyByString(sshPublicKey)
+	diskConf.AddNote(script.GetStrID())
 	client.Disk.Config(disk.ID, diskConf)
 
 	// connect to server

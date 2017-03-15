@@ -48,10 +48,11 @@ func (api *DiskAPI) FilterBy(key string, value interface{}) *DiskAPI {
 	return api
 }
 
-// func (api *DiskAPI) FilterMultiBy(key string, value interface{}) *DiskAPI {
-// 	api.filterBy(key, value, true)
-// 	return api
-// }
+// FilterMultiBy 任意項目でのフィルタ(完全一致 OR条件)
+func (api *DiskAPI) FilterMultiBy(key string, value interface{}) *DiskAPI {
+	api.filterBy(key, value, true)
+	return api
+}
 
 // WithNameLike 名称条件
 func (api *DiskAPI) WithNameLike(name string) *DiskAPI {
@@ -90,6 +91,80 @@ func (api *DiskAPI) SortByName(reverse bool) *DiskAPI {
 func (api *DiskAPI) SortBySize(reverse bool) *DiskAPI {
 	api.sortBy("SizeMB", reverse)
 	return api
+}
+
+/************************************************
+   To support fluent interface for Find()
+************************************************/
+
+// SetEmpty 検索条件のリセット
+func (api *DiskAPI) SetEmpty() {
+	api.reset()
+}
+
+// SetOffset オフセット
+func (api *DiskAPI) SetOffset(offset int) {
+	api.offset(offset)
+}
+
+// SetLimit リミット
+func (api *DiskAPI) SetLimit(limit int) {
+	api.limit(limit)
+}
+
+// SetInclude 取得する項目
+func (api *DiskAPI) SetInclude(key string) {
+	api.include(key)
+}
+
+// SetExclude 除外する項目
+func (api *DiskAPI) SetExclude(key string) {
+	api.exclude(key)
+}
+
+// SetFilterBy 指定キーでのフィルター
+func (api *DiskAPI) SetFilterBy(key string, value interface{}) {
+	api.filterBy(key, value, false)
+}
+
+// SetFilterMultiBy 任意項目でのフィルタ(完全一致 OR条件)
+func (api *DiskAPI) SetFilterMultiBy(key string, value interface{}) {
+	api.filterBy(key, value, true)
+}
+
+// SetNameLike 名称条件
+func (api *DiskAPI) SetNameLike(name string) {
+	api.FilterBy("Name", name)
+}
+
+// SetTag タグ条件
+func (api *DiskAPI) SetTag(tag string) {
+	api.FilterBy("Tags.Name", tag)
+}
+
+// SetTags タグ(複数)条件
+func (api *DiskAPI) SetTags(tags []string) {
+	api.FilterBy("Tags.Name", []interface{}{tags})
+}
+
+// SetSizeGib サイズ条件
+func (api *DiskAPI) SetSizeGib(size int) {
+	api.FilterBy("SizeMB", size*1024)
+}
+
+// SetSortBy 指定キーでのソート
+func (api *DiskAPI) SetSortBy(key string, reverse bool) {
+	api.sortBy(key, reverse)
+}
+
+// SetSortByName 名称でのソート
+func (api *DiskAPI) SetSortByName(reverse bool) {
+	api.sortByName(reverse)
+}
+
+// SetSortBySize サイズでのソート
+func (api *DiskAPI) SetSortBySize(reverse bool) {
+	api.sortBy("SizeMB", reverse)
 }
 
 /************************************************

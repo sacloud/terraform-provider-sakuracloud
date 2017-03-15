@@ -48,10 +48,11 @@ func (api *SwitchAPI) FilterBy(key string, value interface{}) *SwitchAPI {
 	return api
 }
 
-// func (api *SwitchAPI) FilterMultiBy(key string, value interface{}) *SwitchAPI {
-// 	api.filterBy(key, value, true)
-// 	return api
-// }
+// FilterMultiBy 任意項目でのフィルタ(完全一致 OR条件)
+func (api *SwitchAPI) FilterMultiBy(key string, value interface{}) *SwitchAPI {
+	api.filterBy(key, value, true)
+	return api
+}
 
 // WithNameLike 名称条件
 func (api *SwitchAPI) WithNameLike(name string) *SwitchAPI {
@@ -101,15 +102,92 @@ func (api *SwitchAPI) SortByName(reverse bool) *SwitchAPI {
 // }
 
 /************************************************
+   To support Setxxx interface for Find()
+************************************************/
+
+// SetEmpty 検索条件のリセット
+func (api *SwitchAPI) SetEmpty() {
+	api.reset()
+}
+
+// SetOffset オフセット
+func (api *SwitchAPI) SetOffset(offset int) {
+	api.offset(offset)
+}
+
+// SetLimit リミット
+func (api *SwitchAPI) SetLimit(limit int) {
+	api.limit(limit)
+}
+
+// SetInclude 取得する項目
+func (api *SwitchAPI) SetInclude(key string) {
+	api.include(key)
+}
+
+// SetExclude 除外する項目
+func (api *SwitchAPI) SetExclude(key string) {
+	api.exclude(key)
+}
+
+// SetFilterBy 指定キーでのフィルター
+func (api *SwitchAPI) SetFilterBy(key string, value interface{}) {
+	api.filterBy(key, value, false)
+}
+
+// SetFilterMultiBy 任意項目でのフィルタ(完全一致 OR条件)
+func (api *SwitchAPI) SetFilterMultiBy(key string, value interface{}) {
+	api.filterBy(key, value, true)
+}
+
+// SetNameLike 名称条件
+func (api *SwitchAPI) SetNameLike(name string) {
+	api.FilterBy("Name", name)
+}
+
+// SetTag タグ条件
+func (api *SwitchAPI) SetTag(tag string) {
+	api.FilterBy("Tags.Name", tag)
+}
+
+// SetTags タグ(複数)条件
+func (api *SwitchAPI) SetTags(tags []string) {
+	api.FilterBy("Tags.Name", []interface{}{tags})
+}
+
+// func (api *SwitchAPI) SetSizeGib(size int) {
+// 	api.FilterBy("SizeMB", size*1024)
+// }
+
+// func (api *SwitchAPI) SetSharedScope() {
+// 	api.FilterBy("Scope", "shared")
+// }
+
+// func (api *SwitchAPI) SetUserScope() {
+// 	api.FilterBy("Scope", "user")
+// }
+
+// SetSortBy 指定キーでのソート
+func (api *SwitchAPI) SetSortBy(key string, reverse bool) {
+	api.sortBy(key, reverse)
+}
+
+// SetSortByName 名称でのソート
+func (api *SwitchAPI) SetSortByName(reverse bool) {
+	api.sortByName(reverse)
+}
+
+// func (api *SwitchAPI) SetSortBySize(reverse bool) {
+// 	api.sortBy("SizeMB", reverse)
+// }
+
+/************************************************
   To support CRUD(Create/Read/Update/Delete)
 ************************************************/
 
 // New 新規作成用パラメーター作成
 func (api *SwitchAPI) New() *sacloud.Switch {
-	return &sacloud.Switch{
-		// TagsType
-		TagsType: &sacloud.TagsType{},
-	}
+	return &sacloud.Switch{}
 }
 
 // Create 新規作成

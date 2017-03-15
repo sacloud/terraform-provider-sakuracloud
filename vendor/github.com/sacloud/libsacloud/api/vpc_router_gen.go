@@ -48,10 +48,11 @@ func (api *VPCRouterAPI) FilterBy(key string, value interface{}) *VPCRouterAPI {
 	return api
 }
 
-// func (api *VPCRouterAPI) FilterMultiBy(key string, value interface{}) *VPCRouterAPI {
-// 	api.filterBy(key, value, true)
-// 	return api
-// }
+// FilterMultiBy 任意項目でのフィルタ(完全一致 OR条件)
+func (api *VPCRouterAPI) FilterMultiBy(key string, value interface{}) *VPCRouterAPI {
+	api.filterBy(key, value, true)
+	return api
+}
 
 // WithNameLike 名称条件
 func (api *VPCRouterAPI) WithNameLike(name string) *VPCRouterAPI {
@@ -98,6 +99,86 @@ func (api *VPCRouterAPI) SortByName(reverse bool) *VPCRouterAPI {
 // func (api *VPCRouterAPI) SortBySize(reverse bool) *VPCRouterAPI {
 // 	api.sortBy("SizeMB", reverse)
 // 	return api
+// }
+
+/************************************************
+   To support Setxxx interface for Find()
+************************************************/
+
+// SetEmpty 検索条件のリセット
+func (api *VPCRouterAPI) SetEmpty() {
+	api.reset()
+}
+
+// SetOffset オフセット
+func (api *VPCRouterAPI) SetOffset(offset int) {
+	api.offset(offset)
+}
+
+// SetLimit リミット
+func (api *VPCRouterAPI) SetLimit(limit int) {
+	api.limit(limit)
+}
+
+// SetInclude 取得する項目
+func (api *VPCRouterAPI) SetInclude(key string) {
+	api.include(key)
+}
+
+// SetExclude 除外する項目
+func (api *VPCRouterAPI) SetExclude(key string) {
+	api.exclude(key)
+}
+
+// SetFilterBy 指定キーでのフィルター
+func (api *VPCRouterAPI) SetFilterBy(key string, value interface{}) {
+	api.filterBy(key, value, false)
+}
+
+// SetFilterMultiBy 任意項目でのフィルタ(完全一致 OR条件)
+func (api *VPCRouterAPI) SetFilterMultiBy(key string, value interface{}) {
+	api.filterBy(key, value, true)
+}
+
+// SetNameLike 名称条件
+func (api *VPCRouterAPI) SetNameLike(name string) {
+	api.FilterBy("Name", name)
+}
+
+// SetTag タグ条件
+func (api *VPCRouterAPI) SetTag(tag string) {
+	api.FilterBy("Tags.Name", tag)
+}
+
+// SetTags タグ(複数)条件
+func (api *VPCRouterAPI) SetTags(tags []string) {
+	api.FilterBy("Tags.Name", []interface{}{tags})
+}
+
+// func (api *VPCRouterAPI) SetSizeGib(size int) {
+// 	api.FilterBy("SizeMB", size*1024)
+// }
+
+// func (api *VPCRouterAPI) SetSharedScope() {
+// 	api.FilterBy("Scope", "shared")
+// }
+
+// func (api *VPCRouterAPI) SetUserScope() {
+// 	api.FilterBy("Scope", "user")
+// }
+
+// SetSortBy 指定キーでのソート
+func (api *VPCRouterAPI) SetSortBy(key string, reverse bool) {
+	api.sortBy(key, reverse)
+}
+
+// SetSortByName 名称でのソート
+func (api *VPCRouterAPI) SetSortByName(reverse bool) {
+	api.sortByName(reverse)
+}
+
+// func (api *VPCRouterAPI) SetSortBySize(reverse bool) {
+// 	api.sortBy("SizeMB", reverse)
 // }
 
 /************************************************

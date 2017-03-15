@@ -48,10 +48,11 @@ func (api *DNSAPI) FilterBy(key string, value interface{}) *DNSAPI {
 	return api
 }
 
-// func (api *DNSAPI) FilterMultiBy(key string, value interface{}) *DNSAPI {
-// 	api.filterBy(key, value, true)
-// 	return api
-// }
+// FilterMultiBy 任意項目でのフィルタ(完全一致 OR条件)
+func (api *DNSAPI) FilterMultiBy(key string, value interface{}) *DNSAPI {
+	api.filterBy(key, value, true)
+	return api
+}
 
 // WithNameLike 名称条件
 func (api *DNSAPI) WithNameLike(name string) *DNSAPI {
@@ -98,6 +99,86 @@ func (api *DNSAPI) SortByName(reverse bool) *DNSAPI {
 // func (api *DNSAPI) SortBySize(reverse bool) *DNSAPI {
 // 	api.sortBy("SizeMB", reverse)
 // 	return api
+// }
+
+/************************************************
+   To support Setxxx interface for Find()
+************************************************/
+
+// SetEmpty 検索条件のリセット
+func (api *DNSAPI) SetEmpty() {
+	api.reset()
+}
+
+// SetOffset オフセット
+func (api *DNSAPI) SetOffset(offset int) {
+	api.offset(offset)
+}
+
+// SetLimit リミット
+func (api *DNSAPI) SetLimit(limit int) {
+	api.limit(limit)
+}
+
+// SetInclude 取得する項目
+func (api *DNSAPI) SetInclude(key string) {
+	api.include(key)
+}
+
+// SetExclude 除外する項目
+func (api *DNSAPI) SetExclude(key string) {
+	api.exclude(key)
+}
+
+// SetFilterBy 指定キーでのフィルター
+func (api *DNSAPI) SetFilterBy(key string, value interface{}) {
+	api.filterBy(key, value, false)
+}
+
+// SetFilterMultiBy 任意項目でのフィルタ(完全一致 OR条件)
+func (api *DNSAPI) SetFilterMultiBy(key string, value interface{}) {
+	api.filterBy(key, value, true)
+}
+
+// SetNameLike 名称条件
+func (api *DNSAPI) SetNameLike(name string) {
+	api.FilterBy("Name", name)
+}
+
+// SetTag タグ条件
+func (api *DNSAPI) SetTag(tag string) {
+	api.FilterBy("Tags.Name", tag)
+}
+
+// SetTags タグ(複数)条件
+func (api *DNSAPI) SetTags(tags []string) {
+	api.FilterBy("Tags.Name", []interface{}{tags})
+}
+
+// func (api *DNSAPI) SetSizeGib(size int)  {
+// 	api.FilterBy("SizeMB", size*1024)
+// }
+
+// func (api *DNSAPI) SetSharedScope()  {
+// 	api.FilterBy("Scope", "shared")
+// }
+
+// func (api *DNSAPI) SetUserScope()  {
+// 	api.FilterBy("Scope", "user")
+// }
+
+// SetSortBy 指定キーでのソート
+func (api *DNSAPI) SetSortBy(key string, reverse bool) {
+	api.sortBy(key, reverse)
+}
+
+// SetSortByName 名称でのソート
+func (api *DNSAPI) SetSortByName(reverse bool) {
+	api.sortByName(reverse)
+}
+
+// func (api *DNSAPI) SetSortBySize(reverse bool)  {
+// 	api.sortBy("SizeMB", reverse)
 // }
 
 /************************************************

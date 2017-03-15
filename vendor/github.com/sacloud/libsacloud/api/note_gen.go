@@ -48,10 +48,11 @@ func (api *NoteAPI) FilterBy(key string, value interface{}) *NoteAPI {
 	return api
 }
 
-// func (api *NoteAPI) FilterMultiBy(key string, value interface{}) *NoteAPI {
-// 	api.filterBy(key, value, true)
-// 	return api
-// }
+// FilterMultiBy 任意項目でのフィルタ(完全一致 OR条件)
+func (api *NoteAPI) FilterMultiBy(key string, value interface{}) *NoteAPI {
+	api.filterBy(key, value, true)
+	return api
+}
 
 // WithNameLike 名称条件
 func (api *NoteAPI) WithNameLike(name string) *NoteAPI {
@@ -103,15 +104,94 @@ func (api *NoteAPI) SortByName(reverse bool) *NoteAPI {
 // }
 
 /************************************************
+   To support Setxxx interface for Find()
+************************************************/
+
+// SetEmpty 検索条件のリセット
+func (api *NoteAPI) SetEmpty() {
+	api.reset()
+}
+
+// SetOffset オフセット
+func (api *NoteAPI) SetOffset(offset int) {
+	api.offset(offset)
+}
+
+// SetLimit リミット
+func (api *NoteAPI) SetLimit(limit int) {
+	api.limit(limit)
+}
+
+// SetInclude 取得する項目
+func (api *NoteAPI) SetInclude(key string) {
+	api.include(key)
+}
+
+// SetExclude 除外する項目
+func (api *NoteAPI) SetExclude(key string) {
+	api.exclude(key)
+}
+
+// SetFilterBy 指定キーでのフィルター
+func (api *NoteAPI) SetFilterBy(key string, value interface{}) {
+	api.filterBy(key, value, false)
+}
+
+// SetFilterMultiBy 任意項目でのフィルタ(完全一致 OR条件)
+func (api *NoteAPI) SetFilterMultiBy(key string, value interface{}) {
+	api.filterBy(key, value, true)
+}
+
+// SetNameLike 名称条件
+func (api *NoteAPI) SetNameLike(name string) {
+	api.FilterBy("Name", name)
+}
+
+// SetTag タグ条件
+func (api *NoteAPI) SetTag(tag string) {
+	api.FilterBy("Tags.Name", tag)
+}
+
+// SetTags タグ(複数)条件
+func (api *NoteAPI) SetTags(tags []string) {
+	api.FilterBy("Tags.Name", []interface{}{tags})
+}
+
+// func (api *NoteAPI) SetSizeGib(size int) {
+// 	api.FilterBy("SizeMB", size*1024)
+// }
+
+// SetSharedScope 公開スコープ条件
+func (api *NoteAPI) SetSharedScope() {
+	api.FilterBy("Scope", "shared")
+}
+
+// SetUserScope ユーザースコープ条件
+func (api *NoteAPI) SetUserScope() {
+	api.FilterBy("Scope", "user")
+}
+
+// SetSortBy 指定キーでのソート
+func (api *NoteAPI) SetSortBy(key string, reverse bool) {
+	api.sortBy(key, reverse)
+}
+
+// SetSortByName 名称でのソート
+func (api *NoteAPI) SetSortByName(reverse bool) {
+	api.sortByName(reverse)
+}
+
+// func (api *NoteAPI) SetSortBySize(reverse bool) {
+// 	api.sortBy("SizeMB", reverse)
+// }
+
+/************************************************
   To support CRUD(Create/Read/Update/Delete)
 ************************************************/
 
 // New 新規作成用パラメーター作成
 func (api *NoteAPI) New() *sacloud.Note {
-	return &sacloud.Note{
-		// TagsType
-		TagsType: &sacloud.TagsType{},
-	}
+	return &sacloud.Note{}
 }
 
 // Create 新規作成

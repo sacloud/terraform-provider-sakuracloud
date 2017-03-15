@@ -1,27 +1,16 @@
 package sacloud
 
-import "time"
-
 // Note スタートアップスクリプト
 type Note struct {
-	*Resource
-	// Name 名称
-	Name string
-	// Class クラス
-	Class string `json:",omitempty"`
-	// Scope スコープ
-	Scope string `json:",omitempty"`
-	// Content スクリプト本体
-	Content string `json:",omitempty"`
-	// Description 説明
-	Description string `json:",omitempty"`
-	*EAvailability
-	// CreatedAt 作成日時
-	CreatedAt *time.Time `json:",omitempty"`
-	// ModifiedAt 変更日時
-	ModifiedAt *time.Time `json:",omitempty"`
-	// Icon アイコン
-	Icon *Icon `json:",omitempty"`
-	*TagsType
-	//TODO Remarkオブジェクトのパース
+	*Resource               // ID
+	propName                // 名称
+	propDescription         // 説明
+	propAvailability        // 有功状態
+	propScope               // スコープ
+	propIcon                // アイコン
+	propTags                // タグ
+	propCreatedAt           // 作成日時
+	PropModifiedAt          // 変更日時
+	Content          string // スクリプト本体
+	Class            string `json:",omitempty"` // クラス
 }

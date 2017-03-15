@@ -341,6 +341,46 @@ func (api *DatabaseAPI) SleepWhileCopying(id int64, timeout time.Duration, maxRe
 	}
 }
 
+// AsyncSleepWhileCopying コピー終了まで待機(非同期)
+func (api *DatabaseAPI) AsyncSleepWhileCopying(id int64, timeout time.Duration, maxRetryCount int) (chan (*sacloud.Database), chan (*sacloud.Database), chan (error)) {
+	complete := make(chan *sacloud.Database)
+	progress := make(chan *sacloud.Database)
+	err := make(chan error)
+	errCount := 0
+
+	go func() {
+		for {
+			select {
+			case <-time.After(5 * time.Second):
+				db, e := api.Read(id)
+				if e != nil {
+					errCount++
+					if errCount > maxRetryCount {
+						err <- e
+						return
+					}
+				}
+
+				progress <- db
+
+				if db.IsAvailable() {
+					complete <- db
+					return
+				}
+				if db.IsFailed() {
+					err <- fmt.Errorf("Failed: Create Database is failed: %#v", db)
+					return
+				}
+
+			case <-time.After(timeout):
+				err <- fmt.Errorf("Timeout: AsyncSleepWhileCopying[ID:%d]", id)
+				return
+			}
+		}
+	}()
+	return complete, progress, err
+}
+
 // MonitorCPU CPUアクティビティーモニター取得
 func (api *DatabaseAPI) MonitorCPU(id int64, body *sacloud.ResourceMonitorRequest) (*sacloud.MonitorValues, error) {
 	return api.baseAPI.applianceMonitorBy(id, "cpu", 0, body)

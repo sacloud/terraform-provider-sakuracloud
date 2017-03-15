@@ -133,7 +133,17 @@ func (api *baseAPI) filterBy(key string, value interface{}, multiple bool) *base
 
 			state.Filter[key] = append(state.Filter[key].([]interface{}), value)
 		} else {
+			// どちらもstring型の場合はスペース区切りで繋げる
+			if f, ok := state.Filter[key]; ok {
+				if s, ok := f.(string); ok && s != "" {
+					if v, ok := value.(string); ok {
+						state.Filter[key] = fmt.Sprintf("%s %s", s, v)
+						return
+					}
+				}
+			}
 			state.Filter[key] = value
+
 		}
 	})
 }
