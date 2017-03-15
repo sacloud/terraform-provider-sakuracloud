@@ -48,10 +48,11 @@ func (api *InterfaceAPI) FilterBy(key string, value interface{}) *InterfaceAPI {
 	return api
 }
 
-// func (api *InterfaceAPI) FilterMultiBy(key string, value interface{}) *InterfaceAPI {
-// 	api.filterBy(key, value, true)
-// 	return api
-// }
+// FilterMultiBy 任意項目でのフィルタ(完全一致 OR条件)
+func (api *InterfaceAPI) FilterMultiBy(key string, value interface{}) *InterfaceAPI {
+	api.filterBy(key, value, true)
+	return api
+}
 
 // WithNameLike 名称条件
 func (api *InterfaceAPI) WithNameLike(name string) *InterfaceAPI {
@@ -98,6 +99,86 @@ func (api *InterfaceAPI) SortByName(reverse bool) *InterfaceAPI {
 // func (api *InterfaceAPI) SortBySize(reverse bool) *InterfaceAPI {
 // 	api.sortBy("SizeMB", reverse)
 // 	return api
+// }
+
+/************************************************
+   To support Setxxx interface for Find()
+************************************************/
+
+// SetEmpty 検索条件のリセット
+func (api *InterfaceAPI) SetEmpty() {
+	api.reset()
+}
+
+// SetOffset オフセット
+func (api *InterfaceAPI) SetOffset(offset int) {
+	api.offset(offset)
+}
+
+// SetLimit リミット
+func (api *InterfaceAPI) SetLimit(limit int) {
+	api.limit(limit)
+}
+
+// SetInclude 取得する項目
+func (api *InterfaceAPI) SetInclude(key string) {
+	api.include(key)
+}
+
+// SetExclude 除外する項目
+func (api *InterfaceAPI) SetExclude(key string) {
+	api.exclude(key)
+}
+
+// SetFilterBy 指定キーでのフィルター
+func (api *InterfaceAPI) SetFilterBy(key string, value interface{}) {
+	api.filterBy(key, value, false)
+}
+
+// SetFilterMultiBy 任意項目でのフィルタ(完全一致 OR条件)
+func (api *InterfaceAPI) SetFilterMultiBy(key string, value interface{}) {
+	api.filterBy(key, value, true)
+}
+
+// SetNameLike 名称条件
+func (api *InterfaceAPI) SetNameLike(name string) {
+	api.FilterBy("Name", name)
+}
+
+// SetTag タグ条件
+func (api *InterfaceAPI) SetTag(tag string) {
+	api.FilterBy("Tags.Name", tag)
+}
+
+// SetTags タグ(複数)条件
+func (api *InterfaceAPI) SetTags(tags []string) {
+	api.FilterBy("Tags.Name", []interface{}{tags})
+}
+
+// func (api *InterfaceAPI) SetSizeGib(size int)  {
+// 	api.FilterBy("SizeMB", size*1024)
+// }
+
+// func (api *InterfaceAPI) SetSharedScope()  {
+// 	api.FilterBy("Scope", "shared")
+// }
+
+// func (api *InterfaceAPI) SetUserScope()  {
+// 	api.FilterBy("Scope", "user")
+// }
+
+// SetSortBy 指定キーでのソート
+func (api *InterfaceAPI) SetSortBy(key string, reverse bool) {
+	api.sortBy(key, reverse)
+}
+
+// SetSortByName 名称でのソート
+func (api *InterfaceAPI) SetSortByName(reverse bool) {
+	api.sortByName(reverse)
+}
+
+// func (api *InterfaceAPI) SetSortBySize(reverse bool)  {
+// 	api.sortBy("SizeMB", reverse)
 // }
 
 /************************************************

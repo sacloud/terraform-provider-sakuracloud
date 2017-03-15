@@ -42,16 +42,17 @@ func (api *ArchiveAPI) Exclude(key string) *ArchiveAPI {
 	return api
 }
 
-// FilterBy 任意項目でのフィルタ
+// FilterBy 任意項目でのフィルタ(部分一致)
 func (api *ArchiveAPI) FilterBy(key string, value interface{}) *ArchiveAPI {
 	api.filterBy(key, value, false)
 	return api
 }
 
-// func (api *ArchiveAPI) FilterMultiBy(key string, value interface{}) *ArchiveAPI {
-// 	api.filterBy(key, value, true)
-// 	return api
-// }
+// FilterMultiBy 任意項目でのフィルタ(完全一致 OR条件)
+func (api *ArchiveAPI) FilterMultiBy(key string, value interface{}) *ArchiveAPI {
+	api.filterBy(key, value, true)
+	return api
+}
 
 // WithNameLike 名称条件
 func (api *ArchiveAPI) WithNameLike(name string) *ArchiveAPI {
@@ -105,6 +106,90 @@ func (api *ArchiveAPI) SortBySize(reverse bool) *ArchiveAPI {
 }
 
 /************************************************
+   To support Setxxx interfaces for Find()
+************************************************/
+
+// SetEmpty 検索条件リセット
+func (api *ArchiveAPI) SetEmpty() {
+	api.reset()
+}
+
+// SetOffset オフセット
+func (api *ArchiveAPI) SetOffset(offset int) {
+	api.offset(offset)
+}
+
+// SetLimit リミット
+func (api *ArchiveAPI) SetLimit(limit int) {
+	api.limit(limit)
+}
+
+// SetInclude 取得する項目
+func (api *ArchiveAPI) SetInclude(key string) {
+	api.include(key)
+}
+
+// SetExclude 除外する項目
+func (api *ArchiveAPI) SetExclude(key string) {
+	api.exclude(key)
+}
+
+// SetFilterBy 任意項目でのフィルタ(部分一致)
+func (api *ArchiveAPI) SetFilterBy(key string, value interface{}) {
+	api.filterBy(key, value, false)
+}
+
+// SetFilterMultiBy 任意項目でのフィルタ(完全一致 OR条件)
+func (api *ArchiveAPI) SetFilterMultiBy(key string, value interface{}) {
+	api.filterBy(key, value, true)
+}
+
+// SetNameLike 名称条件
+func (api *ArchiveAPI) SetNameLike(name string) {
+	api.FilterBy("Name", name)
+}
+
+// SetTag タグ条件
+func (api *ArchiveAPI) SetTag(tag string) {
+	api.FilterBy("Tags.Name", tag)
+}
+
+// SetTags タグ(複数)条件
+func (api *ArchiveAPI) SetTags(tags []string) {
+	api.FilterBy("Tags.Name", []interface{}{tags})
+}
+
+// SetSizeGib アーカイブサイズ条件
+func (api *ArchiveAPI) SetSizeGib(size int) {
+	api.FilterBy("SizeMB", size*1024)
+}
+
+// SetSharedScope 共有スコープ条件
+func (api *ArchiveAPI) SetSharedScope() {
+	api.FilterBy("Scope", "shared")
+}
+
+// SetUserScope ユーザースコープ条件
+func (api *ArchiveAPI) SetUserScope() {
+	api.FilterBy("Scope", "user")
+}
+
+// SetSortBy 任意項目でのソート指定
+func (api *ArchiveAPI) SetSortBy(key string, reverse bool) {
+	api.sortBy(key, reverse)
+}
+
+// SetSortByName 名称でのソート
+func (api *ArchiveAPI) SetSortByName(reverse bool) {
+	api.sortByName(reverse)
+}
+
+// SetSortBySize サイズでのソート
+func (api *ArchiveAPI) SetSortBySize(reverse bool) {
+	api.sortBy("SizeMB", reverse)
+}
+
+/************************************************
   To support CRUD(Create/Read/Update/Delete)
 ************************************************/
 
@@ -138,9 +223,7 @@ func (api *ArchiveAPI) Delete(id int64) (*sacloud.Archive, error) {
 
 // New 作成用パラメータ作成
 func (api *ArchiveAPI) New() *sacloud.Archive {
-	return &sacloud.Archive{
-		TagsType: &sacloud.TagsType{},
-	}
+	return &sacloud.Archive{}
 }
 
 /************************************************

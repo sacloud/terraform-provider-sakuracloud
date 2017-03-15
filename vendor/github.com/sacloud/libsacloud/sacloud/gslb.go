@@ -1,54 +1,44 @@
 package sacloud
 
-import "time"
+import "fmt"
 
 // GSLB GSLB(CommonServiceItem)
 type GSLB struct {
-	*Resource
-	// Name 名称
-	Name string
-	// Description 説明
-	Description string `json:",omitempty"`
-	// Status ステータス
-	Status GSLBStatus `json:",omitempty"`
-	// Provider プロバイダ
-	Provider GSLBProvider `json:",omitempty"`
-	// Settings GSLB設定
-	Settings GSLBSettings `json:",omitempty"`
-	// ServiceClass サービスクラス
-	ServiceClass string `json:",omitempty"`
-	// CreatedAt 作成日時
-	CreatedAt *time.Time `json:",omitempty"`
-	// ModifiedAt 変更日時
-	ModifiedAt *time.Time `json:",omitempty"`
-	// Icon アイコン
-	Icon *Icon `json:",omitempty"`
-	*TagsType
+	*Resource        // ID
+	propName         // 名称
+	propDescription  // 説明
+	propServiceClass // サービスクラス
+	propIcon         // アイコン
+	propTags         // タグ
+	propCreatedAt    // 作成日時
+	PropModifiedAt   // 変更日時
+
+	Status   GSLBStatus   `json:",omitempty"` // ステータス
+	Provider GSLBProvider `json:",omitempty"` // プロバイダ
+	Settings GSLBSettings `json:",omitempty"` // GSLB設定
+
 }
 
 // GSLBSettings GSLB設定
 type GSLBSettings struct {
-	// GSLB GSLBエントリー
-	GSLB GSLBRecordSets `json:",omitempty"`
+	GSLB GSLBRecordSets `json:",omitempty"` // GSLB GSLBエントリー
 }
 
 // GSLBStatus GSLBステータス
 type GSLBStatus struct {
-	// FQDN GSLBのFQDN
-	FQDN string `json:",omitempty"`
+	FQDN string `json:",omitempty"` // GSLBのFQDN
 }
 
 // GSLBProvider プロバイダ
 type GSLBProvider struct {
-	// Class クラス
-	Class string `json:",omitempty"`
+	Class string `json:",omitempty"` // クラス
 }
 
 // CreateNewGSLB GSLB作成
 func CreateNewGSLB(gslbName string) *GSLB {
 	return &GSLB{
 		Resource: &Resource{},
-		Name:     gslbName,
+		propName: propName{Name: gslbName},
 		Provider: GSLBProvider{
 			Class: "gslb",
 		},
@@ -60,7 +50,6 @@ func CreateNewGSLB(gslbName string) *GSLB {
 				Servers:     []GSLBServer{},
 			},
 		},
-		TagsType: &TagsType{},
 	}
 
 }
@@ -107,16 +96,11 @@ func (d *GSLB) ClearGSLBServer() {
 
 // GSLBRecordSets GSLBエントリー
 type GSLBRecordSets struct {
-	// DelayLoop 監視間隔
-	DelayLoop int `json:",omitempty"`
-	// HealthCheck ヘルスチェック
-	HealthCheck GSLBHealthCheck `json:",omitempty"`
-	// Weighted ウェイト
-	Weighted string `json:",omitempty"`
-	// Servers サーバー
-	Servers []GSLBServer
-	// SorryServer ソーリーサーバー
-	SorryServer string `json:",omitempty"`
+	DelayLoop   int             `json:",omitempty"` // 監視間隔
+	HealthCheck GSLBHealthCheck `json:",omitempty"` // ヘルスチェック
+	Weighted    string          `json:",omitempty"` // ウェイト
+	SorryServer string          `json:",omitempty"` // ソーリーサーバー
+	Servers     []GSLBServer    // サーバー
 }
 
 // AddServer GSLB配下のサーバーを追加
@@ -153,26 +137,19 @@ func (g *GSLBRecordSets) DeleteServer(ip string) {
 
 // GSLBServer GSLB配下のサーバー
 type GSLBServer struct {
-	// IPAddress IPアドレス
-	IPAddress string `json:",omitempty"`
-	// Enabled 有効/無効
-	Enabled string `json:",omitempty"`
-	// Weight ウェイト
-	Weight string `json:",omitempty"`
+	IPAddress string `json:",omitempty"` // IPアドレス
+	Enabled   string `json:",omitempty"` // 有効/無効
+	Weight    string `json:",omitempty"` // ウェイト
+
 }
 
 // GSLBHealthCheck ヘルスチェック
 type GSLBHealthCheck struct {
-	// Protocol プロトコル
-	Protocol string `json:",omitempty"`
-	// Host 対象ホスト
-	Host string `json:",omitempty"`
-	// Path HTTP/HTTPSの場合のリクエストパス
-	Path string `json:",omitempty"`
-	// Status 期待するステータスコード
-	Status string `json:",omitempty"`
-	// Port ポート番号
-	Port string `json:",omitempty"`
+	Protocol string `json:",omitempty"` // プロトコル
+	Host     string `json:",omitempty"` // 対象ホスト
+	Path     string `json:",omitempty"` // HTTP/HTTPSの場合のリクエストパス
+	Status   string `json:",omitempty"` // 期待するステータスコード
+	Port     string `json:",omitempty"` // ポート番号
 }
 
 var defaultGSLBHealthCheck = GSLBHealthCheck{
@@ -180,4 +157,60 @@ var defaultGSLBHealthCheck = GSLBHealthCheck{
 	Host:     "",
 	Path:     "/",
 	Status:   "200",
+}
+
+// SetHttpHealthCheck HTTPヘルスチェック 設定
+func (g *GSLB) SetHttpHealthCheck(hostHeader string, path string, responseCode int) {
+	g.Settings.GSLB.HealthCheck.Protocol = "http"
+	g.Settings.GSLB.HealthCheck.Host = hostHeader
+	g.Settings.GSLB.HealthCheck.Path = path
+	g.Settings.GSLB.HealthCheck.Status = fmt.Sprintf("%d", responseCode)
+	g.Settings.GSLB.HealthCheck.Port = ""
+
+}
+
+// SetHttpsHealthCheck HTTPSヘルスチェック 設定
+func (g *GSLB) SetHttpsHealthCheck(hostHeader string, path string, responseCode int) {
+	g.Settings.GSLB.HealthCheck.Protocol = "https"
+	g.Settings.GSLB.HealthCheck.Host = hostHeader
+	g.Settings.GSLB.HealthCheck.Path = path
+	g.Settings.GSLB.HealthCheck.Status = fmt.Sprintf("%d", responseCode)
+	g.Settings.GSLB.HealthCheck.Port = ""
+}
+
+// SetPingHealthCheck Pingヘルスチェック 設定
+func (g *GSLB) SetPingHealthCheck() {
+	g.Settings.GSLB.HealthCheck.Protocol = "ping"
+	g.Settings.GSLB.HealthCheck.Host = ""
+	g.Settings.GSLB.HealthCheck.Path = ""
+	g.Settings.GSLB.HealthCheck.Status = ""
+	g.Settings.GSLB.HealthCheck.Port = ""
+}
+
+// SetTCPHealthCheck TCPヘルスチェック 設定
+func (g *GSLB) SetTCPHealthCheck(port int) {
+	g.Settings.GSLB.HealthCheck.Protocol = "tcp"
+	g.Settings.GSLB.HealthCheck.Host = ""
+	g.Settings.GSLB.HealthCheck.Path = ""
+	g.Settings.GSLB.HealthCheck.Status = ""
+	g.Settings.GSLB.HealthCheck.Port = fmt.Sprintf("%d", port)
+}
+
+// SetDelayLoop 監視間隔秒数 設定
+func (g *GSLB) SetDelayLoop(delayLoop int) {
+	g.Settings.GSLB.DelayLoop = delayLoop
+}
+
+// SetWeightedEnable 重み付け応答 有効/無効 設定
+func (g *GSLB) SetWeightedEnable(enable bool) {
+	v := "True"
+	if !enable {
+		v = "False"
+	}
+	g.Settings.GSLB.Weighted = v
+}
+
+// SetSorryServer ソーリーサーバ 設定
+func (g *GSLB) SetSorryServer(server string) {
+	g.Settings.GSLB.SorryServer = server
 }

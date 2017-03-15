@@ -7,40 +7,25 @@ import (
 
 // MonitorValue アクティビティモニター
 type MonitorValue struct {
-	// CPUTime CPU時間
-	CPUTime *float64 `json:"CPU-TIME,omitempty"`
-	// Write ディスク書き込み
-	Write *float64 `json:",omitempty"`
-	// Read ディスク読み取り
-	Read *float64 `json:",omitempty"`
-	// Receive パケット受信
-	Receive *float64 `json:",omitempty"`
-	// Send パケット送信
-	Send *float64 `json:",omitempty"`
-	// In パケット受信
-	In *float64 `json:",omitempty"`
-	// Out パケット送信
-	Out *float64 `json:",omitempty"`
-	// TotalMemorySize 総メモリサイズ
-	TotalMemorySize *float64 `json:"Total-Memory-Size,omitempty"`
-	// UsedMemorySize 使用済みメモリサイズ
-	UsedMemorySize *float64 `json:"Used-Memory-Size,omitempty"`
-	// TotalDisk1Size 総ディスクサイズ
-	TotalDisk1Size *float64 `json:"Total-Disk1-Size,omitempty"`
-	// UsedDisk1Size 使用済みディスクサイズ
-	UsedDisk1Size *float64 `json:"Used-Disk1-Size,omitempty"`
-	// TotalDisk2Size 総ディスクサイズ
-	TotalDisk2Size *float64 `json:"Total-Disk2-Size,omitempty"`
-	// UsedDisk2Size 使用済みディスクサイズ
-	UsedDisk2Size *float64 `json:"Used-Disk2-Size,omitempty"`
+	CPUTime         *float64 `json:"CPU-TIME,omitempty"`          // CPU時間
+	Write           *float64 `json:",omitempty"`                  // ディスク書き込み
+	Read            *float64 `json:",omitempty"`                  // ディスク読み取り
+	Receive         *float64 `json:",omitempty"`                  // パケット受信
+	Send            *float64 `json:",omitempty"`                  // パケット送信
+	In              *float64 `json:",omitempty"`                  // パケット受信
+	Out             *float64 `json:",omitempty"`                  // パケット送信
+	TotalMemorySize *float64 `json:"Total-Memory-Size,omitempty"` // 総メモリサイズ
+	UsedMemorySize  *float64 `json:"Used-Memory-Size,omitempty"`  // 使用済みメモリサイズ
+	TotalDisk1Size  *float64 `json:"Total-Disk1-Size,omitempty"`  // 総ディスクサイズ
+	UsedDisk1Size   *float64 `json:"Used-Disk1-Size,omitempty"`   // 使用済みディスクサイズ
+	TotalDisk2Size  *float64 `json:"Total-Disk2-Size,omitempty"`  // 総ディスクサイズ
+	UsedDisk2Size   *float64 `json:"Used-Disk2-Size,omitempty"`   // 使用済みディスクサイズ
 }
 
 // ResourceMonitorRequest アクティビティモニター取得リクエスト
 type ResourceMonitorRequest struct {
-	// Start 取得開始時間
-	Start *time.Time `json:",omitempty"`
-	// End 取得終了時間
-	End *time.Time `json:",omitempty"`
+	Start *time.Time `json:",omitempty"` // 取得開始時間
+	End   *time.Time `json:",omitempty"` // 取得終了時間
 }
 
 // NewResourceMonitorRequest アクティビティモニター取得リクエスト作成
@@ -59,39 +44,28 @@ func NewResourceMonitorRequest(start *time.Time, end *time.Time) *ResourceMonito
 
 // ResourceMonitorResponse アクティビティモニターレスポンス
 type ResourceMonitorResponse struct {
-	// Data メトリクス
-	Data *MonitorValues `json:",omitempty"`
+	Data *MonitorValues `json:",omitempty"` // メトリクス
 }
 
 // MonitorSummaryData メトリクスサマリー
 type MonitorSummaryData struct {
-	// Max 最大値
-	Max float64
-	// Min 最小値
-	Min float64
-	// Avg 平均値
-	Avg float64
-	// Count データ個数
-	Count float64
+	Max   float64 // 最大値
+	Min   float64 // 最小値
+	Avg   float64 // 平均値
+	Count float64 // データ個数
+
 }
 
 // MonitorSummary アクティビティーモニター サマリー
 type MonitorSummary struct {
-	// CPU CPU時間サマリー
-	CPU *MonitorSummaryData
-	// Disk ディスク利用サマリー
-	Disk *struct {
-		// Write ディスク書き込みサマリー
-		Write *MonitorSummaryData
-		// Read ディスク読み取りサマリー
-		Read *MonitorSummaryData
+	CPU  *MonitorSummaryData // CPU時間サマリー
+	Disk *struct {           // ディスク利用サマリー
+		Write *MonitorSummaryData // ディスク書き込みサマリー
+		Read  *MonitorSummaryData // ディスク読み取りサマリー
 	}
-	// Interface NIC送受信サマリー
-	Interface *struct {
-		// Receive 受信パケットサマリー
-		Receive *MonitorSummaryData
-		// Send 送信パケットサマリー
-		Send *MonitorSummaryData
+	Interface *struct { // NIC送受信サマリー
+		Receive *MonitorSummaryData // 受信パケットサマリー
+		Send    *MonitorSummaryData // 送信パケットサマリー
 	}
 }
 
@@ -100,10 +74,8 @@ type MonitorValues map[string]*MonitorValue
 
 // FlatMonitorValue フラット化したメトリクス
 type FlatMonitorValue struct {
-	// Time 対象時刻
-	Time time.Time
-	// Value 値
-	Value float64
+	Time  time.Time // 対象時刻
+	Value float64   // 値
 }
 
 // Calc サマリー計算

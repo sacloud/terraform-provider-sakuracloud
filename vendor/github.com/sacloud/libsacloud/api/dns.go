@@ -171,7 +171,7 @@ func (api *DNSAPI) DeleteDNSRecord(zoneName string, hostName string, ip string) 
 
 func (api *DNSAPI) findOrCreateBy(zoneName string) (*sacloud.DNS, error) {
 
-	res, err := api.WithNameLike(zoneName).Limit(1).Find()
+	res, err := api.Reset().WithNameLike(zoneName).Limit(1).Find()
 	if err != nil {
 		return nil, err
 	}

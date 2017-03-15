@@ -2,16 +2,11 @@ package sacloud
 
 // ProductServer サーバープラン
 type ProductServer struct {
-	*Resource
-	// Name 名称
-	Name string `json:",omitempty"`
-	// Description 説明
-	Description string `json:",omitempty"`
-	// CPU CPUコア数
-	CPU int `json:",omitempty"`
-	// MemoryMB メモリ(MB単位)
-	MemoryMB int `json:",omitempty"`
-	// ServiceClass サービスクラス
-	ServiceClass string `json:",omitempty"`
-	*EAvailability
+	*Resource        // ID
+	propName         // 名称
+	propDescription  // 説明
+	propAvailability // 有功状態
+	propCPU          // CPUコア数
+	propMemoryMB     // メモリサイズ(MB単位)
+	propServiceClass // サービスクラス
 }

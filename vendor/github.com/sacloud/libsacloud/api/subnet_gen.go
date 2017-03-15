@@ -48,10 +48,11 @@ func (api *SubnetAPI) FilterBy(key string, value interface{}) *SubnetAPI {
 	return api
 }
 
-// func (api *SubnetAPI) FilterMultiBy(key string, value interface{}) *SubnetAPI {
-// 	api.filterBy(key, value, true)
-// 	return api
-// }
+// FilterMultiBy 任意項目でのフィルタ(完全一致 OR条件)
+func (api *SubnetAPI) FilterMultiBy(key string, value interface{}) *SubnetAPI {
+	api.filterBy(key, value, true)
+	return api
+}
 
 //func (api *SubnetAPI) WithNameLike(name string) *SubnetAPI {
 //	return api.FilterBy("Name", name)
@@ -93,6 +94,81 @@ func (api *SubnetAPI) SortBy(key string, reverse bool) *SubnetAPI {
 // func (api *SubnetAPI) SortBySize(reverse bool) *SubnetAPI {
 // 	api.sortBy("SizeMB", reverse)
 // 	return api
+// }
+
+/************************************************
+   To support Setxxx interface for Find()
+************************************************/
+
+// SetEmpty 検索条件のリセット
+func (api *SubnetAPI) SetEmpty() {
+	api.reset()
+}
+
+// SetOffset オフセット
+func (api *SubnetAPI) SetOffset(offset int) {
+	api.offset(offset)
+}
+
+// SetLimit リミット
+func (api *SubnetAPI) SetLimit(limit int) {
+	api.limit(limit)
+}
+
+// SetInclude 取得する項目
+func (api *SubnetAPI) SetInclude(key string) {
+	api.include(key)
+}
+
+// SetExclude 除外する項目
+func (api *SubnetAPI) SetExclude(key string) {
+	api.exclude(key)
+}
+
+// SetFilterBy 指定キーでのフィルター
+func (api *SubnetAPI) SetFilterBy(key string, value interface{}) {
+	api.filterBy(key, value, false)
+}
+
+// SetFilterMultiBy 任意項目でのフィルタ(完全一致 OR条件)
+func (api *SubnetAPI) SetFilterMultiBy(key string, value interface{}) {
+	api.filterBy(key, value, true)
+}
+
+//func (api *SubnetAPI) SetNameLike(name string) {
+//	api.FilterBy("Name", name)
+//}
+//
+//func (api *SubnetAPI) SetTag(tag string) {
+//	api.FilterBy("Tags.Name", tag)
+//}
+//func (api *SubnetAPI) SetTags(tags []string) {
+//	api.FilterBy("Tags.Name", []interface{}{tags})
+//}
+
+// func (api *SubnetAPI) SetSizeGib(size int) {
+// 	api.FilterBy("SizeMB", size*1024)
+// }
+
+// func (api *SubnetAPI) SetSharedScope() {
+// 	api.FilterBy("Scope", "shared")
+// }
+
+// func (api *SubnetAPI) SetUserScope() {
+// 	api.FilterBy("Scope", "user")
+// }
+
+// SetSortBy 指定キーでのソート
+func (api *SubnetAPI) SetSortBy(key string, reverse bool) {
+	api.sortBy(key, reverse)
+}
+
+//func (api *SubnetAPI) SetSortByName(reverse bool) {
+//	api.sortByName(reverse)
+//}
+
+// func (api *SubnetAPI) SetSortBySize(reverse bool) {
+// 	api.sortBy("SizeMB", reverse)
 // }
 
 /************************************************

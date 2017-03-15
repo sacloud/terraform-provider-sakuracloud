@@ -48,10 +48,11 @@ func (api *SimpleMonitorAPI) FilterBy(key string, value interface{}) *SimpleMoni
 	return api
 }
 
-// func (api *SimpleMonitorAPI) FilterMultiBy(key string, value interface{}) *SimpleMonitorAPI {
-// 	api.filterBy(key, value, true)
-// 	return api
-// }
+// FilterMultiBy 任意項目でのフィルタ(完全一致 OR条件)
+func (api *SimpleMonitorAPI) FilterMultiBy(key string, value interface{}) *SimpleMonitorAPI {
+	api.filterBy(key, value, true)
+	return api
+}
 
 // WithNameLike 名称条件
 func (api *SimpleMonitorAPI) WithNameLike(name string) *SimpleMonitorAPI {
@@ -98,6 +99,86 @@ func (api *SimpleMonitorAPI) SortByName(reverse bool) *SimpleMonitorAPI {
 // func (api *SimpleMonitorAPI) SortBySize(reverse bool) *SimpleMonitorAPI {
 // 	api.sortBy("SizeMB", reverse)
 // 	return api
+// }
+
+/************************************************
+   To support Setxxx interface for Find()
+************************************************/
+
+// SetEmpty 検索条件のリセット
+func (api *SimpleMonitorAPI) SetEmpty() {
+	api.reset()
+}
+
+// SetOffset オフセット
+func (api *SimpleMonitorAPI) SetOffset(offset int) {
+	api.offset(offset)
+}
+
+// SetLimit リミット
+func (api *SimpleMonitorAPI) SetLimit(limit int) {
+	api.limit(limit)
+}
+
+// SetInclude 取得する項目
+func (api *SimpleMonitorAPI) SetInclude(key string) {
+	api.include(key)
+}
+
+// SetExclude 除外する項目
+func (api *SimpleMonitorAPI) SetExclude(key string) {
+	api.exclude(key)
+}
+
+// SetFilterBy 指定キーでのフィルター
+func (api *SimpleMonitorAPI) SetFilterBy(key string, value interface{}) {
+	api.filterBy(key, value, false)
+}
+
+// SetFilterMultiBy 任意項目でのフィルタ(完全一致 OR条件)
+func (api *SimpleMonitorAPI) SetFilterMultiBy(key string, value interface{}) {
+	api.filterBy(key, value, true)
+}
+
+// SetNameLike 名称条件
+func (api *SimpleMonitorAPI) SetNameLike(name string) {
+	api.FilterBy("Name", name)
+}
+
+// SetTag タグ条件
+func (api *SimpleMonitorAPI) SetTag(tag string) {
+	api.FilterBy("Tags.Name", tag)
+}
+
+// SetTags タグ(複数)条件
+func (api *SimpleMonitorAPI) SetTags(tags []string) {
+	api.FilterBy("Tags.Name", []interface{}{tags})
+}
+
+// func (api *SimpleMonitorAPI) SetSizeGib(size int) {
+// 	api.FilterBy("SizeMB", size*1024)
+// }
+
+// func (api *SimpleMonitorAPI) SetSharedScope() {
+// 	api.FilterBy("Scope", "shared")
+// }
+
+// func (api *SimpleMonitorAPI) SetUserScope() {
+// 	api.FilterBy("Scope", "user")
+// }
+
+// SetSortBy 指定キーでのソート
+func (api *SimpleMonitorAPI) SetSortBy(key string, reverse bool) {
+	api.sortBy(key, reverse)
+}
+
+// SetSortByName 名称でのソート
+func (api *SimpleMonitorAPI) SetSortByName(reverse bool) {
+	api.sortByName(reverse)
+}
+
+// func (api *SimpleMonitorAPI) SetSortBySize(reverse bool) {
+// 	api.sortBy("SizeMB", reverse)
 // }
 
 /************************************************

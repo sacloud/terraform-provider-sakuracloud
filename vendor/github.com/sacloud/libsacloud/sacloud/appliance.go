@@ -1,41 +1,22 @@
 package sacloud
 
-import "time"
-
 // Appliance アプライアンス基底クラス
 type Appliance struct {
-	*Resource
-	// Class リソースクラス
-	Class string `json:",omitempty"`
-	// Name 名称
-	Name string `json:",omitempty"`
-	// Description 説明
-	Description string `json:",omitempty"`
-	// Plan プラン
-	Plan *Resource
+	*Resource               // ID
+	propAvailability        // 有功状態
+	propName                // 名称
+	propDescription         // 説明
+	propPlanID              // プラン
+	propServiceClass        // サービスクラス
+	propInstance            // インスタンス
+	propSwitch              // スイッチ
+	propInterfaces          // インターフェース配列
+	propIcon                // アイコン
+	propTags                // タグ
+	propCreatedAt           // 作成日時
+	Class            string `json:",omitempty"` // リソースクラス
+	SettingHash      string `json:",omitempty"` // 設定ハッシュ値
 
-	//Settings
-
-	// SettingHash 設定ハッシュ値
-	SettingHash string `json:",omitempty"`
-
-	//Remark      *ApplianceRemark `json:",omitempty"`
-
-	*EAvailability
-	// Instance インスタンス
-	Instance *EServerInstanceStatus `json:",omitempty"`
-	// ServiceClass サービスクラス
-	ServiceClass string `json:",omitempty"`
-	// CreatedAt 作成日時
-	CreatedAt *time.Time `json:",omitempty"`
-	// Icon アイコン
-	Icon *Icon `json:",omitempty"`
-	// Switch スイッチ
-	Switch *Switch `json:",omitempty"`
-	// Interfaces インターフェース
-	Interfaces []Interface `json:",omitempty"`
-
-	*TagsType
 }
 
 //HACK Appliance:Zone.IDがRoute/LoadBalancerの場合でデータ型が異なるため
@@ -43,17 +24,13 @@ type Appliance struct {
 
 // ApplianceRemarkBase アプライアンス Remark 基底クラス
 type ApplianceRemarkBase struct {
-	// Servers 配下のサーバー群
-	Servers []interface{}
-	// Switch 接続先スイッチ
-	Switch *ApplianceRemarkSwitch `json:",omitempty"`
+	Servers []interface{} // 配下のサーバー群
+
+	Switch  *ApplianceRemarkSwitch  `json:",omitempty"` // 接続先スイッチ
+	VRRP    *ApplianceRemarkVRRP    `json:",omitempty"` // VRRP
+	Network *ApplianceRemarkNetwork `json:",omitempty"` // ネットワーク
+
 	//Zone *Resource `json:",omitempty"`
-
-	// VRRP VRRP
-	VRRP *ApplianceRemarkVRRP `json:",omitempty"`
-	// Network ネットワーク
-	Network *ApplianceRemarkNetwork `json:",omitempty"`
-
 	//Plan    *Resource
 }
 
@@ -63,22 +40,18 @@ type ApplianceRemarkBase struct {
 
 // ApplianceRemarkSwitch スイッチ
 type ApplianceRemarkSwitch struct {
-	// ID リソースID
-	ID string `json:",omitempty"`
-	// Scope スコープ
-	Scope string `json:",omitempty"`
+	ID        string `json:",omitempty"` // リソースID
+	propScope        // スコープ
 }
 
 // ApplianceRemarkVRRP VRRP
 type ApplianceRemarkVRRP struct {
-	// VRID VRID
-	VRID int `json:",omitempty"`
+	VRID int // VRID
 }
 
 // ApplianceRemarkNetwork ネットワーク
 type ApplianceRemarkNetwork struct {
-	// NetworkMaskLen ネットワークマスク長
-	NetworkMaskLen int `json:",omitempty"`
-	// DefaultRoute デフォルトルート
-	DefaultRoute string `json:",omitempty"`
+	NetworkMaskLen int    `json:",omitempty"` // ネットワークマスク長
+	DefaultRoute   string // デフォルトルート
+
 }

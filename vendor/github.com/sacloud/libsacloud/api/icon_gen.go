@@ -48,10 +48,11 @@ func (api *IconAPI) FilterBy(key string, value interface{}) *IconAPI {
 	return api
 }
 
-// func (api *IconAPI) FilterMultiBy(key string, value interface{}) *IconAPI {
-// 	api.filterBy(key, value, true)
-// 	return api
-// }
+// FilterMultiBy 任意項目でのフィルタ(完全一致 OR条件)
+func (api *IconAPI) FilterMultiBy(key string, value interface{}) *IconAPI {
+	api.filterBy(key, value, true)
+	return api
+}
 
 // WithNameLike 名称条件
 func (api *IconAPI) WithNameLike(name string) *IconAPI {
@@ -103,15 +104,94 @@ func (api *IconAPI) SortByName(reverse bool) *IconAPI {
 // }
 
 /************************************************
+   To support Setxxx interface for Find()
+************************************************/
+
+// SetEmpty 検索条件のリセット
+func (api *IconAPI) SetEmpty() {
+	api.reset()
+}
+
+// SetOffset オフセット
+func (api *IconAPI) SetOffset(offset int) {
+	api.offset(offset)
+}
+
+// SetLimit リミット
+func (api *IconAPI) SetLimit(limit int) {
+	api.limit(limit)
+}
+
+// SetInclude 取得する項目
+func (api *IconAPI) SetInclude(key string) {
+	api.include(key)
+}
+
+// SetExclude 除外する項目
+func (api *IconAPI) SetExclude(key string) {
+	api.exclude(key)
+}
+
+// SetFilterBy 指定キーでのフィルター
+func (api *IconAPI) SetFilterBy(key string, value interface{}) {
+	api.filterBy(key, value, false)
+}
+
+// SetFilterMultiBy 任意項目でのフィルタ(完全一致 OR条件)
+func (api *IconAPI) SetFilterMultiBy(key string, value interface{}) {
+	api.filterBy(key, value, true)
+}
+
+// SetNameLike 名称条件
+func (api *IconAPI) SetNameLike(name string) {
+	api.FilterBy("Name", name)
+}
+
+// SetTag タグ条件
+func (api *IconAPI) SetTag(tag string) {
+	api.FilterBy("Tags.Name", tag)
+}
+
+// SetTags タグ(複数)条件
+func (api *IconAPI) SetTags(tags []string) {
+	api.FilterBy("Tags.Name", []interface{}{tags})
+}
+
+// func (api *IconAPI) SetSizeGib(size int) {
+// 	api.FilterBy("SizeMB", size*1024)
+// }
+
+// SetSharedScope 公開スコープ条件
+func (api *IconAPI) SetSharedScope() {
+	api.FilterBy("Scope", "shared")
+}
+
+// SetUserScope ユーザースコープ条件
+func (api *IconAPI) SetUserScope() {
+	api.FilterBy("Scope", "user")
+}
+
+// SetSortBy 指定キーでのソート
+func (api *IconAPI) SetSortBy(key string, reverse bool) {
+	api.sortBy(key, reverse)
+}
+
+// SetSortByName 名称でのソート
+func (api *IconAPI) SetSortByName(reverse bool) {
+	api.sortByName(reverse)
+}
+
+// func (api *IconAPI) SortBySize(reverse bool) {
+// 	api.sortBy("SizeMB", reverse)
+// }
+
+/************************************************
   To support CRUD(Create/Read/Update/Delete)
 ************************************************/
 
 // New 新規作成用パラメーター作成
 func (api *IconAPI) New() *sacloud.Icon {
-	return &sacloud.Icon{
-		// TagsType
-		TagsType: &sacloud.TagsType{},
-	}
+	return &sacloud.Icon{}
 }
 
 // Create 新規作成

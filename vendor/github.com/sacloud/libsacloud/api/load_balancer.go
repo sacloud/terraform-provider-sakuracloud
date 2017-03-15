@@ -267,6 +267,46 @@ func (api *LoadBalancerAPI) SleepWhileCopying(id int64, timeout time.Duration, m
 	}
 }
 
+// AsyncSleepWhileCopying コピー終了まで待機(非同期)
+func (api *LoadBalancerAPI) AsyncSleepWhileCopying(id int64, timeout time.Duration, maxRetryCount int) (chan (*sacloud.LoadBalancer), chan (*sacloud.LoadBalancer), chan (error)) {
+	complete := make(chan *sacloud.LoadBalancer)
+	progress := make(chan *sacloud.LoadBalancer)
+	err := make(chan error)
+	errCount := 0
+
+	go func() {
+		for {
+			select {
+			case <-time.After(5 * time.Second):
+				lb, e := api.Read(id)
+				if e != nil {
+					errCount++
+					if errCount > maxRetryCount {
+						err <- e
+						return
+					}
+				}
+
+				progress <- lb
+
+				if lb.IsAvailable() {
+					complete <- lb
+					return
+				}
+				if lb.IsFailed() {
+					err <- fmt.Errorf("Failed: Create LoadBalancer is failed: %#v", lb)
+					return
+				}
+
+			case <-time.After(timeout):
+				err <- fmt.Errorf("Timeout: AsyncSleepWhileCopying[ID:%d]", id)
+				return
+			}
+		}
+	}()
+	return complete, progress, err
+}
+
 // Monitor アクティビティーモニター取得
 func (api *LoadBalancerAPI) Monitor(id int64, body *sacloud.ResourceMonitorRequest) (*sacloud.MonitorValues, error) {
 	return api.baseAPI.applianceMonitorBy(id, "interface", 0, body)

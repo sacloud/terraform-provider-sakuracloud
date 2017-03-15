@@ -2,11 +2,17 @@ package sacloud
 
 // Region リージョン
 type Region struct {
-	*Resource
-	// Name 名称
-	Name string `json:",omitempty"`
-	// Description 説明
-	Description string `json:",omitempty"`
-	// NameServers ネームサーバー
-	NameServers []string `json:",omitempty"`
+	*Resource       // ID
+	propName        // 名称
+	propDescription // 説明
+
+	NameServers []string `json:",omitempty"` // NameServers ネームサーバー
+}
+
+// GetNameServers リージョン内のネームサーバー取得
+func (r *Region) GetNameServers() []string {
+	if r == nil {
+		return []string{}
+	}
+	return r.NameServers
 }

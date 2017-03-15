@@ -48,10 +48,11 @@ func (api *PacketFilterAPI) FilterBy(key string, value interface{}) *PacketFilte
 	return api
 }
 
-// func (api *PacketFilterAPI) FilterMultiBy(key string, value interface{}) *PacketFilterAPI {
-// 	api.filterBy(key, value, true)
-// 	return api
-// }
+// FilterMultiBy 任意項目でのフィルタ(完全一致 OR条件)
+func (api *PacketFilterAPI) FilterMultiBy(key string, value interface{}) *PacketFilterAPI {
+	api.filterBy(key, value, true)
+	return api
+}
 
 // WithNameLike 名称条件
 func (api *PacketFilterAPI) WithNameLike(name string) *PacketFilterAPI {
@@ -98,6 +99,86 @@ func (api *PacketFilterAPI) SortByName(reverse bool) *PacketFilterAPI {
 // func (api *PacketFilterAPI) SortBySize(reverse bool) *PacketFilterAPI {
 // 	api.sortBy("SizeMB", reverse)
 // 	return api
+// }
+
+/************************************************
+   To support Setxxx interface for Find()
+************************************************/
+
+// SetEmpty 検索条件のリセット
+func (api *PacketFilterAPI) SetEmpty() {
+	api.reset()
+}
+
+// SetOffset オフセット
+func (api *PacketFilterAPI) SetOffset(offset int) {
+	api.offset(offset)
+}
+
+// SetLimit リミット
+func (api *PacketFilterAPI) SetLimit(limit int) {
+	api.limit(limit)
+}
+
+// SetInclude 取得する項目
+func (api *PacketFilterAPI) SetInclude(key string) {
+	api.include(key)
+}
+
+// SetExclude 除外する項目
+func (api *PacketFilterAPI) SetExclude(key string) {
+	api.exclude(key)
+}
+
+// SetFilterBy 指定キーでのフィルター
+func (api *PacketFilterAPI) SetFilterBy(key string, value interface{}) {
+	api.filterBy(key, value, false)
+}
+
+// SetFilterMultiBy 任意項目でのフィルタ(完全一致 OR条件)
+func (api *PacketFilterAPI) SetFilterMultiBy(key string, value interface{}) {
+	api.filterBy(key, value, true)
+}
+
+// SetNameLike 名称条件
+func (api *PacketFilterAPI) SetNameLike(name string) {
+	api.FilterBy("Name", name)
+}
+
+// SetTag タグ条件
+func (api *PacketFilterAPI) SetTag(tag string) {
+	api.FilterBy("Tags.Name", tag)
+}
+
+// SetTags タグ(複数)条件
+func (api *PacketFilterAPI) SetTags(tags []string) {
+	api.FilterBy("Tags.Name", []interface{}{tags})
+}
+
+// func (api *PacketFilterAPI) SetSizeGib(size int) {
+// 	api.FilterBy("SizeMB", size*1024)
+// }
+
+// func (api *PacketFilterAPI) SetSharedScope() {
+// 	api.FilterBy("Scope", "shared")
+// }
+
+// func (api *PacketFilterAPI) SetUserScope() {
+// 	api.FilterBy("Scope", "user")
+// }
+
+// SetSortBy 指定キーでのソート
+func (api *PacketFilterAPI) SetSortBy(key string, reverse bool) {
+	api.sortBy(key, reverse)
+}
+
+// SetSortByName 名称でのソート
+func (api *PacketFilterAPI) SetSortByName(reverse bool) {
+	api.sortByName(reverse)
+}
+
+// func (api *PacketFilterAPI) SetSortBySize(reverse bool) {
+// 	api.sortBy("SizeMB", reverse)
 // }
 
 /************************************************

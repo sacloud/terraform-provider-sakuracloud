@@ -48,10 +48,11 @@ func (api *ProductLicenseAPI) FilterBy(key string, value interface{}) *ProductLi
 	return api
 }
 
-// func (api *ProductLicenseAPI) FilterMultiBy(key string, value interface{}) *ProductLicenseAPI {
-// 	api.filterBy(key, value, true)
-// 	return api
-// }
+// FilterMultiBy 任意項目でのフィルタ(完全一致 OR条件)
+func (api *ProductLicenseAPI) FilterMultiBy(key string, value interface{}) *ProductLicenseAPI {
+	api.filterBy(key, value, true)
+	return api
+}
 
 // WithNameLike 名称条件
 func (api *ProductLicenseAPI) WithNameLike(name string) *ProductLicenseAPI {
@@ -98,6 +99,86 @@ func (api *ProductLicenseAPI) SortByName(reverse bool) *ProductLicenseAPI {
 // func (api *ProductLicenseAPI) SortBySize(reverse bool) *ProductLicenseAPI {
 // 	api.sortBy("SizeMB", reverse)
 // 	return api
+// }
+
+/************************************************
+   To support Setxxx interface for Find()
+************************************************/
+
+// SetEmpty 検索条件のリセット
+func (api *ProductLicenseAPI) SetEmpty() {
+	api.reset()
+}
+
+// SetOffset オフセット
+func (api *ProductLicenseAPI) SetOffset(offset int) {
+	api.offset(offset)
+}
+
+// SetLimit リミット
+func (api *ProductLicenseAPI) SetLimit(limit int) {
+	api.limit(limit)
+}
+
+// SetInclude 取得する項目
+func (api *ProductLicenseAPI) SetInclude(key string) {
+	api.include(key)
+}
+
+// SetExclude 除外する項目
+func (api *ProductLicenseAPI) SetExclude(key string) {
+	api.exclude(key)
+}
+
+// SetFilterBy 指定キーでのフィルター
+func (api *ProductLicenseAPI) SetFilterBy(key string, value interface{}) {
+	api.filterBy(key, value, false)
+}
+
+// SetFilterMultiBy 任意項目でのフィルタ(完全一致 OR条件)
+func (api *ProductLicenseAPI) SetFilterMultiBy(key string, value interface{}) {
+	api.filterBy(key, value, true)
+}
+
+// SetNameLike 名称条件
+func (api *ProductLicenseAPI) SetNameLike(name string) {
+	api.FilterBy("Name", name)
+}
+
+// SetTag タグ条件
+func (api *ProductLicenseAPI) SetTag(tag string) {
+	api.FilterBy("Tags.Name", tag)
+}
+
+// SetTags タグ(複数)条件
+func (api *ProductLicenseAPI) SetTags(tags []string) {
+	api.FilterBy("Tags.Name", []interface{}{tags})
+}
+
+// func (api *ProductLicenseAPI) SetSizeGib(size int) {
+// 	api.FilterBy("SizeMB", size*1024)
+// }
+
+// func (api *ProductLicenseAPI) SetSharedScope() {
+// 	api.FilterBy("Scope", "shared")
+// }
+
+// func (api *ProductLicenseAPI) SetUserScope() {
+// 	api.FilterBy("Scope", "user")
+// }
+
+// SetSortBy 指定キーでのソート
+func (api *ProductLicenseAPI) SetSortBy(key string, reverse bool) {
+	api.sortBy(key, reverse)
+}
+
+// SetSortByName 名称でのソート
+func (api *ProductLicenseAPI) SetSortByName(reverse bool) {
+	api.sortByName(reverse)
+}
+
+// func (api *ProductLicenseAPI) SetSortBySize(reverse bool) {
+// 	api.sortBy("SizeMB", reverse)
 // }
 
 /************************************************

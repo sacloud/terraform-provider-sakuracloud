@@ -289,6 +289,46 @@ func (api *VPCRouterAPI) SleepWhileCopying(vpcRouterID int64, timeout time.Durat
 	}
 }
 
+// AsyncSleepWhileCopying コピー終了まで待機(非同期)
+func (api *VPCRouterAPI) AsyncSleepWhileCopying(id int64, timeout time.Duration, maxRetryCount int) (chan (*sacloud.VPCRouter), chan (*sacloud.VPCRouter), chan (error)) {
+	complete := make(chan *sacloud.VPCRouter)
+	progress := make(chan *sacloud.VPCRouter)
+	err := make(chan error)
+	errCount := 0
+
+	go func() {
+		for {
+			select {
+			case <-time.After(5 * time.Second):
+				router, e := api.Read(id)
+				if e != nil {
+					errCount++
+					if errCount > maxRetryCount {
+						err <- e
+						return
+					}
+				}
+
+				progress <- router
+
+				if router.IsAvailable() {
+					complete <- router
+					return
+				}
+				if router.IsFailed() {
+					err <- fmt.Errorf("Failed: Create VPCRouter is failed: %#v", router)
+					return
+				}
+
+			case <-time.After(timeout):
+				err <- fmt.Errorf("Timeout: AsyncSleepWhileCopying[ID:%d]", id)
+				return
+			}
+		}
+	}()
+	return complete, progress, err
+}
+
 // AddStandardInterface スタンダードプランでのインターフェース追加
 func (api *VPCRouterAPI) AddStandardInterface(routerID int64, switchID int64, ipaddress string, maskLen int) (*sacloud.VPCRouter, error) {
 	return api.addInterface(routerID, switchID, &sacloud.VPCRouterInterface{

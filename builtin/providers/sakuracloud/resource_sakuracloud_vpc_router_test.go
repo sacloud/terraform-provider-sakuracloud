@@ -32,14 +32,14 @@ func TestAccResourceSakuraCloudVPCRouter(t *testing.T) {
 						"sakuracloud_vpc_router.foobar", "tags.1", "hoge2"),
 					resource.TestCheckResourceAttr(
 						"sakuracloud_vpc_router.foobar", "plan", "standard"),
-					resource.TestCheckResourceAttr(
-						"sakuracloud_vpc_router.foobar", "switch_id", ""),
-					resource.TestCheckResourceAttr(
-						"sakuracloud_vpc_router.foobar", "vip", ""),
-					resource.TestCheckResourceAttr(
-						"sakuracloud_vpc_router.foobar", "ipaddress1", ""),
-					resource.TestCheckResourceAttr(
-						"sakuracloud_vpc_router.foobar", "ipaddress2", ""),
+					resource.TestCheckNoResourceAttr(
+						"sakuracloud_vpc_router.foobar", "switch_id"),
+					resource.TestCheckNoResourceAttr(
+						"sakuracloud_vpc_router.foobar", "vip"),
+					resource.TestCheckNoResourceAttr(
+						"sakuracloud_vpc_router.foobar", "ipaddress1"),
+					resource.TestCheckNoResourceAttr(
+						"sakuracloud_vpc_router.foobar", "ipaddress2"),
 				),
 			},
 			resource.TestStep{
@@ -58,14 +58,14 @@ func TestAccResourceSakuraCloudVPCRouter(t *testing.T) {
 						"sakuracloud_vpc_router.foobar", "tags.1", "hoge2_after"),
 					resource.TestCheckResourceAttr(
 						"sakuracloud_vpc_router.foobar", "plan", "standard"),
-					resource.TestCheckResourceAttr(
-						"sakuracloud_vpc_router.foobar", "switch_id", ""),
-					resource.TestCheckResourceAttr(
-						"sakuracloud_vpc_router.foobar", "vip", ""),
-					resource.TestCheckResourceAttr(
-						"sakuracloud_vpc_router.foobar", "ipaddress1", ""),
-					resource.TestCheckResourceAttr(
-						"sakuracloud_vpc_router.foobar", "ipaddress2", ""),
+					resource.TestCheckNoResourceAttr(
+						"sakuracloud_vpc_router.foobar", "switch_id"),
+					resource.TestCheckNoResourceAttr(
+						"sakuracloud_vpc_router.foobar", "vip"),
+					resource.TestCheckNoResourceAttr(
+						"sakuracloud_vpc_router.foobar", "ipaddress1"),
+					resource.TestCheckNoResourceAttr(
+						"sakuracloud_vpc_router.foobar", "ipaddress2"),
 					resource.TestCheckResourceAttr(
 						"sakuracloud_vpc_router.foobar", "syslog_host", "192.168.0.2"),
 					//resource.TestCheckResourceAttr(

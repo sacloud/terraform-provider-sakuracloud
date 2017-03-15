@@ -2,24 +2,15 @@ package sacloud
 
 // AuthStatus 現在の認証状態
 type AuthStatus struct {
-	// Account アカウント
-	Account *Account
-	// AuthClass 認証クラス
-	AuthClass EAuthClass `json:",omitempty"`
-	// AuthMethod 認証方法
-	AuthMethod EAuthMethod `json:",omitempty"`
-	// ExternalPermission 他サービスへのアクセス権
-	ExternalPermission string `json:",omitempty"` // REMARK : +区切り文字列
-	// IsAPIKey APIキーでのアクセスフラグ
-	IsAPIKey bool `json:",omitempty"`
-	// Member 会員情報
-	Member *Member
-	// OperationPenalty オペレーションペナルティ
-	OperationPenalty string `json:",omitempty"` // REMARK : none以外の値が不明なためstringで受けておく
-	// Permission 権限
-	Permission EPermission `json:",omitempty"`
-	// IsOk 結果
-	IsOk bool `json:"is_ok,omitempty"`
+	Account            *Account    // アカウント
+	Member             *Member     // 会員情報
+	AuthClass          EAuthClass  `json:",omitempty"`      // 認証クラス
+	AuthMethod         EAuthMethod `json:",omitempty"`      // 認証方法
+	ExternalPermission string      `json:",omitempty"`      // 他サービスへのアクセス権
+	IsAPIKey           bool        `json:",omitempty"`      // APIキーでのアクセスフラグ
+	OperationPenalty   string      `json:",omitempty"`      // オペレーションペナルティ
+	Permission         EPermission `json:",omitempty"`      // 権限
+	IsOk               bool        `json:"is_ok,omitempty"` // 結果
 
 	// RESTFilter [unknown type] `json:",omitempty"`
 	// User [unknown type] `json:",omitempty"`

@@ -68,12 +68,12 @@ func resourceSakuraCloudDatabase() *schema.Resource {
 				ValidateFunc: validateIntegerInRange(1024, 65535),
 			},
 
-			"backup_rotate": &schema.Schema{
-				Type:         schema.TypeInt,
-				Optional:     true,
-				Default:      8,
-				ValidateFunc: validateIntegerInRange(1, 8),
-			},
+			//"backup_rotate": &schema.Schema{
+			//	Type:         schema.TypeInt,
+			//	Optional:     true,
+			//	Default:      8,
+			//	ValidateFunc: validateIntegerInRange(1, 8),
+			//},
 			"backup_time": &schema.Schema{
 				Type:         schema.TypeString,
 				Required:     true,
@@ -83,26 +83,24 @@ func resourceSakuraCloudDatabase() *schema.Resource {
 			"switch_id": &schema.Schema{
 				Type:         schema.TypeString,
 				ForceNew:     true,
-				Optional:     true,
-				Default:      "shared",
+				Required:     true,
 				ValidateFunc: validateSakuracloudIDType,
 			},
 			"ipaddress1": &schema.Schema{
 				Type:     schema.TypeString,
 				ForceNew: true,
-				Computed: true,
-				Optional: true,
+				Required: true,
 			},
 			"nw_mask_len": &schema.Schema{
 				Type:         schema.TypeInt,
 				ForceNew:     true,
-				Optional:     true,
+				Required:     true,
 				ValidateFunc: validateIntegerInRange(8, 29),
 			},
 			"default_route": &schema.Schema{
 				Type:     schema.TypeString,
 				ForceNew: true,
-				Optional: true,
+				Required: true,
 			},
 			"description": &schema.Schema{
 				Type:     schema.TypeString,
@@ -156,30 +154,20 @@ func resourceSakuraCloudDatabaseCreate(d *schema.ResourceData, meta interface{})
 		}
 	}
 	opts.ServicePort = fmt.Sprintf("%d", d.Get("port").(int))
-	opts.BackupRotate = d.Get("backup_rotate").(int)
+	//opts.BackupRotate = d.Get("backup_rotate").(int)
 	opts.BackupTime = d.Get("backup_time").(string)
 
 	opts.SwitchID = d.Get("switch_id").(string)
-
-	if opts.SwitchID != "shared" {
-		_, ok1 := d.GetOk("ipaddress1")
-		_, ok2 := d.GetOk("nw_mask_len")
-		if !ok1 || !ok2 {
-			msg := "ipaddress1 and nw_mask_len is required when SwitchID is exists"
-			return fmt.Errorf("Faild to create SakuraCloud Database resource %s", msg)
-		}
-
-		ipAddress1 := d.Get("ipaddress1").(string)
-		nwMaskLen := d.Get("nw_mask_len").(int)
-		defaultRoute := ""
-		if df, ok := d.GetOk("default_route"); ok {
-			defaultRoute = df.(string)
-		}
-
-		opts.IPAddress1 = ipAddress1
-		opts.MaskLen = nwMaskLen
-		opts.DefaultRoute = defaultRoute
+	ipAddress1 := d.Get("ipaddress1").(string)
+	nwMaskLen := d.Get("nw_mask_len").(int)
+	defaultRoute := ""
+	if df, ok := d.GetOk("default_route"); ok {
+		defaultRoute = df.(string)
 	}
+
+	opts.IPAddress1 = ipAddress1
+	opts.MaskLen = nwMaskLen
+	opts.DefaultRoute = defaultRoute
 
 	opts.Plan = sacloud.DatabasePlanMini
 
@@ -353,17 +341,10 @@ func setDatabaseResourceData(d *schema.ResourceData, client *api.Client, data *s
 	d.Set("backup_rotate", data.Settings.DBConf.Backup.Rotate)
 	d.Set("backup_time", data.Settings.DBConf.Backup.Time)
 
-	if data.Interfaces[0].Switch.Scope == sacloud.ESCopeShared {
-		d.Set("switch_id", "shared")
-		d.Set("nw_mask_len", nil)
-		d.Set("default_route", nil)
-		d.Set("ipaddress1", data.Interfaces[0].IPAddress)
-	} else {
-		d.Set("switch_id", data.Interfaces[0].Switch.GetStrID())
-		d.Set("nw_mask_len", data.Remark.Network.NetworkMaskLen)
-		d.Set("default_route", data.Remark.Network.DefaultRoute)
-		d.Set("ipaddress1", data.Remark.Servers[0].(map[string]interface{})["IPAddress"])
-	}
+	d.Set("switch_id", data.Interfaces[0].Switch.GetStrID())
+	d.Set("nw_mask_len", data.Remark.Network.NetworkMaskLen)
+	d.Set("default_route", data.Remark.Network.DefaultRoute)
+	d.Set("ipaddress1", data.Remark.Servers[0].(map[string]interface{})["IPAddress"])
 
 	d.Set("description", data.Description)
 	d.Set("tags", data.Tags)

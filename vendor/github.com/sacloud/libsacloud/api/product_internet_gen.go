@@ -9,6 +9,86 @@ import (
 )
 
 /************************************************
+   To support Setxxx interface for Find()
+************************************************/
+
+// SetEmpty 検索条件のリセット
+func (api *ProductInternetAPI) SetEmpty() {
+	api.reset()
+}
+
+// SetOffset オフセット
+func (api *ProductInternetAPI) SetOffset(offset int) {
+	api.offset(offset)
+}
+
+// SetLimit リミット
+func (api *ProductInternetAPI) SetLimit(limit int) {
+	api.limit(limit)
+}
+
+// SetInclude 取得する項目
+func (api *ProductInternetAPI) SetInclude(key string) {
+	api.include(key)
+}
+
+// SetExclude 除外する項目
+func (api *ProductInternetAPI) SetExclude(key string) {
+	api.exclude(key)
+}
+
+// SetFilterBy 指定キーでのフィルター
+func (api *ProductInternetAPI) SetFilterBy(key string, value interface{}) {
+	api.filterBy(key, value, false)
+}
+
+// SetFilterMultiBy 任意項目でのフィルタ(完全一致 OR条件)
+func (api *ProductInternetAPI) SetFilterMultiBy(key string, value interface{}) {
+	api.filterBy(key, value, true)
+}
+
+// SetNameLike 名称条件
+func (api *ProductInternetAPI) SetNameLike(name string) {
+	api.FilterBy("Name", name)
+}
+
+// SetTag タグ条件
+func (api *ProductInternetAPI) SetTag(tag string) {
+	api.FilterBy("Tags.Name", tag)
+}
+
+// SetTags タグ(複数)条件
+func (api *ProductInternetAPI) SetTags(tags []string) {
+	api.FilterBy("Tags.Name", []interface{}{tags})
+}
+
+// func (api *ProductInternetAPI) SetSizeGib(size int) {
+// 	api.FilterBy("SizeMB", size*1024)
+// }
+
+// func (api *ProductInternetAPI) SetSharedScope() {
+// 	api.FilterBy("Scope", "shared")
+// }
+
+// func (api *ProductInternetAPI) SetUserScope() {
+// 	api.FilterBy("Scope", "user")
+// }
+
+// SetSortBy 指定キーでのソート
+func (api *ProductInternetAPI) SetSortBy(key string, reverse bool) {
+	api.sortBy(key, reverse)
+}
+
+// SetSortByName 名称でのソート
+func (api *ProductInternetAPI) SetSortByName(reverse bool) {
+	api.sortByName(reverse)
+}
+
+// func (api *ProductInternetAPI) SetSortBySize(reverse bool) {
+// 	api.sortBy("SizeMB", reverse)
+// }
+
+/************************************************
    To support fluent interface for Find()
 ************************************************/
 
@@ -48,10 +128,11 @@ func (api *ProductInternetAPI) FilterBy(key string, value interface{}) *ProductI
 	return api
 }
 
-// func (api *ProductInternetAPI) FilterMultiBy(key string, value interface{}) *ProductInternetAPI {
-// 	api.filterBy(key, value, true)
-// 	return api
-// }
+// FilterMultiBy 任意項目でのフィルタ(完全一致 OR条件)
+func (api *ProductInternetAPI) FilterMultiBy(key string, value interface{}) *ProductInternetAPI {
+	api.filterBy(key, value, true)
+	return api
+}
 
 // WithNameLike 名称条件
 func (api *ProductInternetAPI) WithNameLike(name string) *ProductInternetAPI {

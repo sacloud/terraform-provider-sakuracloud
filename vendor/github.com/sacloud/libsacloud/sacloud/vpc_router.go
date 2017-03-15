@@ -2,11 +2,10 @@ package sacloud
 
 // VPCRouter VPCルーター
 type VPCRouter struct {
-	*Appliance
-	// Remark リマーク
-	Remark *VPCRouterRemark `json:",omitempty"`
-	// Settings VPCルーター設定リスト
-	Settings *VPCRouterSettings `json:",omitempty"`
+	*Appliance // アプライアンス共通属性
+
+	Remark   *VPCRouterRemark   `json:",omitempty"` // リマーク
+	Settings *VPCRouterSettings `json:",omitempty"` // VPCルーター設定リスト
 }
 
 // VPCRouterRemark リマーク
@@ -18,17 +17,15 @@ type VPCRouterRemark struct {
 
 // VPCRouterSettings VPCルーター設定リスト
 type VPCRouterSettings struct {
-	// Router VPCルーター設定
-	Router *VPCRouterSetting `json:",omitempty"`
+	Router *VPCRouterSetting `json:",omitempty"` // VPCルーター設定
 }
 
 // CreateNewVPCRouter VPCルーター作成
 func CreateNewVPCRouter() *VPCRouter {
 	return &VPCRouter{
 		Appliance: &Appliance{
-			Class:    "vpcrouter",
-			Plan:     &Resource{},
-			TagsType: &TagsType{},
+			Class:      "vpcrouter",
+			propPlanID: propPlanID{Plan: &Resource{}},
 		},
 		Remark: &VPCRouterRemark{
 			ApplianceRemarkBase: &ApplianceRemarkBase{
@@ -63,7 +60,7 @@ func (v *VPCRouter) IsStandardPlan() bool {
 	return v.Plan.ID == 1
 }
 
-// IsPremiumPlan プレミアうプランか判定
+// IsPremiumPlan プレミアムプランか判定
 func (v *VPCRouter) IsPremiumPlan() bool {
 	return v.Plan.ID == 2
 }
@@ -78,7 +75,7 @@ func (v *VPCRouter) SetStandardPlan() {
 	v.Plan.SetID(1)
 	v.Remark.Switch = &ApplianceRemarkSwitch{
 		// Scope
-		Scope: "shared",
+		propScope: propScope{Scope: "shared"},
 	}
 	v.Settings = nil
 }

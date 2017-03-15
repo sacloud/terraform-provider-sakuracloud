@@ -48,10 +48,11 @@ func (api *GSLBAPI) FilterBy(key string, value interface{}) *GSLBAPI {
 	return api
 }
 
-// func (api *GSLBAPI) FilterMultiBy(key string, value interface{}) *GSLBAPI {
-// 	api.filterBy(key, value, true)
-// 	return api
-// }
+// FilterMultiBy 任意項目でのフィルタ(完全一致 OR条件)
+func (api *GSLBAPI) FilterMultiBy(key string, value interface{}) *GSLBAPI {
+	api.filterBy(key, value, true)
+	return api
+}
 
 // WithNameLike 名称条件
 func (api *GSLBAPI) WithNameLike(name string) *GSLBAPI {
@@ -98,6 +99,86 @@ func (api *GSLBAPI) SortByName(reverse bool) *GSLBAPI {
 // func (api *GSLBAPI) SortBySize(reverse bool) *GSLBAPI {
 // 	api.sortBy("SizeMB", reverse)
 // 	return api
+// }
+
+/************************************************
+   To support Setxxx interface for Find()
+************************************************/
+
+// SetEmpty 検索条件のリセット
+func (api *GSLBAPI) SetEmpty() {
+	api.reset()
+}
+
+// SetOffset オフセット
+func (api *GSLBAPI) SetOffset(offset int) {
+	api.offset(offset)
+}
+
+// SetLimit リミット
+func (api *GSLBAPI) SetLimit(limit int) {
+	api.limit(limit)
+}
+
+// SetInclude 取得する項目
+func (api *GSLBAPI) SetInclude(key string) {
+	api.include(key)
+}
+
+// SetExclude 除外する項目
+func (api *GSLBAPI) SetExclude(key string) {
+	api.exclude(key)
+}
+
+// SetFilterBy 指定キーでのフィルター
+func (api *GSLBAPI) SetFilterBy(key string, value interface{}) {
+	api.filterBy(key, value, false)
+}
+
+// SetFilterMultiBy 任意項目でのフィルタ(完全一致 OR条件)
+func (api *GSLBAPI) SetFilterMultiBy(key string, value interface{}) {
+	api.filterBy(key, value, true)
+}
+
+// SetNameLike 名称条件
+func (api *GSLBAPI) SetNameLike(name string) {
+	api.FilterBy("Name", name)
+}
+
+// SetTag タグ条件
+func (api *GSLBAPI) SetTag(tag string) {
+	api.FilterBy("Tags.Name", tag)
+}
+
+// SetTags タグ(複数)条件
+func (api *GSLBAPI) SetTags(tags []string) {
+	api.FilterBy("Tags.Name", []interface{}{tags})
+}
+
+// func (api *GSLBAPI) SetSizeGib(size int)  {
+// 	api.FilterBy("SizeMB", size*1024)
+// }
+
+// func (api *GSLBAPI) SetSharedScope() {
+// 	api.FilterBy("Scope", "shared")
+// }
+
+// func (api *GSLBAPI) SetUserScope()  {
+// 	api.FilterBy("Scope", "user")
+// }
+
+// SetSortBy 指定キーでのソート
+func (api *GSLBAPI) SetSortBy(key string, reverse bool) {
+	api.sortBy(key, reverse)
+}
+
+// SetSortByName 名称でのソート
+func (api *GSLBAPI) SetSortByName(reverse bool) {
+	api.sortByName(reverse)
+}
+
+// func (api *GSLBAPI) SetSortBySize(reverse bool)  {
+// 	api.sortBy("SizeMB", reverse)
 // }
 
 /************************************************

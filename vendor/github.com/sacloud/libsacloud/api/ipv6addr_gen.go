@@ -48,10 +48,11 @@ func (api *IPv6AddrAPI) FilterBy(key string, value interface{}) *IPv6AddrAPI {
 	return api
 }
 
-// func (api *IPv6AddrAPI) FilterMultiBy(key string, value interface{}) *IPv6AddrAPI {
-// 	api.filterBy(key, value, true)
-// 	return api
-// }
+// FilterMultiBy 任意項目でのフィルタ(完全一致 OR条件)
+func (api *IPv6AddrAPI) FilterMultiBy(key string, value interface{}) *IPv6AddrAPI {
+	api.filterBy(key, value, true)
+	return api
+}
 
 //func (api *IPv6AddrAPI) WithNameLike(name string) *IPv6AddrAPI {
 //	return api.FilterBy("Name", name)
@@ -94,6 +95,81 @@ func (api *IPv6AddrAPI) SortBy(key string, reverse bool) *IPv6AddrAPI {
 //func (api *IPv6AddrAPI) SortBySize(reverse bool) *IPv6AddrAPI {
 //	api.sortBy("SizeMB", reverse)
 //	return api
+//}
+
+/************************************************
+   To support Setxxx interface for Find()
+************************************************/
+
+// SetEmpty 検索条件のリセット
+func (api *IPv6AddrAPI) SetEmpty() {
+	api.reset()
+}
+
+// SetOffset オフセット
+func (api *IPv6AddrAPI) SetOffset(offset int) {
+	api.offset(offset)
+}
+
+// SetLimit リミット
+func (api *IPv6AddrAPI) SetLimit(limit int) {
+	api.limit(limit)
+}
+
+// SetInclude 取得する項目
+func (api *IPv6AddrAPI) SetInclude(key string) {
+	api.include(key)
+}
+
+// SetExclude 除外する項目
+func (api *IPv6AddrAPI) SetExclude(key string) {
+	api.exclude(key)
+}
+
+// SetFilterBy 指定キーでのフィルター
+func (api *IPv6AddrAPI) SetFilterBy(key string, value interface{}) {
+	api.filterBy(key, value, false)
+}
+
+// SetFilterMultiBy 任意項目でのフィルタ(完全一致 OR条件)
+func (api *IPv6AddrAPI) SetFilterMultiBy(key string, value interface{}) {
+	api.filterBy(key, value, true)
+}
+
+//func (api *IPv6AddrAPI) SetNameLike(name string)  {
+//}
+
+//func (api *IPv6AddrAPI) SetTag(tag string)  {
+//	api.FilterBy("Tags.Name", tag)
+//}
+//func (api *IPv6AddrAPI) SetTags(tags []string)  {
+//	api.FilterBy("Tags.Name", []interface{}{tags})
+//}
+//
+//func (api *IPv6AddrAPI) SetSizeGib(size int)  {
+//	api.FilterBy("SizeMB", size*1024)
+//}
+//
+//func (api *IPv6AddrAPI) SetSharedScope()  {
+//	api.FilterBy("Scope", "shared")
+//}
+//
+//func (api *IPv6AddrAPI) SetUserScope()  {
+//	api.FilterBy("Scope", "user")
+//}
+
+// SetSortBy 指定キーでのソート
+func (api *IPv6AddrAPI) SetSortBy(key string, reverse bool) {
+	api.sortBy(key, reverse)
+}
+
+//// SetSortByName
+//func (api *IPv6AddrAPI) SetSortByName(reverse bool)  {
+//	api.sortByName(reverse)
+//}
+
+//func (api *IPv6AddrAPI) SetSortBySize(reverse bool)  {
+//	api.sortBy("SizeMB", reverse)
 //}
 
 /************************************************

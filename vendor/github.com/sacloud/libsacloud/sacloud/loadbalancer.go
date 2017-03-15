@@ -2,11 +2,10 @@ package sacloud
 
 // LoadBalancer ロードバランサー
 type LoadBalancer struct {
-	*Appliance
-	// Remark リマーク
-	Remark *LoadBalancerRemark `json:",omitempty"`
-	// Settings ロードバランサー設定
-	Settings *LoadBalancerSettings `json:",omitempty"`
+	*Appliance // アプライアンス共通属性
+
+	Remark   *LoadBalancerRemark   `json:",omitempty"` // リマーク
+	Settings *LoadBalancerSettings `json:",omitempty"` // ロードバランサー設定
 }
 
 // LoadBalancerRemark リマーク
@@ -18,48 +17,33 @@ type LoadBalancerRemark struct {
 
 // LoadBalancerSettings ロードバランサー設定リスト
 type LoadBalancerSettings struct {
-	// LoadBalancer ロードバランサー設定リスト
-	LoadBalancer []*LoadBalancerSetting `json:",omitempty"`
+	LoadBalancer []*LoadBalancerSetting `json:",omitempty"` // ロードバランサー設定リスト
 }
 
 // LoadBalancerSetting ロードバランサー仮想IP設定
 type LoadBalancerSetting struct {
-	// VirtualIPAddress 仮想IPアドレス
-	VirtualIPAddress string `json:",omitempty"`
-	// Port ポート番号
-	Port string `json:",omitempty"`
-	// DelayLoop 監視間隔
-	DelayLoop string `json:",omitempty"`
-	// SorryServer ソーリーサーバー
-	SorryServer string `json:",omitempty"`
-	// Servers 仮想IP配下の実サーバー
-	Servers []*LoadBalancerServer `json:",omitempty"`
+	VirtualIPAddress string                `json:",omitempty"` // 仮想IPアドレス
+	Port             string                `json:",omitempty"` // ポート番号
+	DelayLoop        string                `json:",omitempty"` // 監視間隔
+	SorryServer      string                `json:",omitempty"` // ソーリーサーバー
+	Servers          []*LoadBalancerServer `json:",omitempty"` // 仮想IP配下の実サーバー
 }
 
 // LoadBalancerServer 仮想IP設定配下のサーバー
 type LoadBalancerServer struct {
-	// IPAddress IPアドレス
-	IPAddress string `json:",omitempty"`
-	// Port ポート番号
-	Port string `json:",omitempty"`
-	// HealthCheck ヘルスチェック
-	HealthCheck *LoadBalancerHealthCheck `json:",omitempty"`
-	// Enabled 有効/無効
-	Enabled string `json:",omitempty"`
-	// Status ステータス
-	Status string `json:",omitempty"`
-	// ActiveConn アクティブなコネクション
-	ActiveConn string `json:",omitempty"`
+	IPAddress   string                   `json:",omitempty"` // IPアドレス
+	Port        string                   `json:",omitempty"` // ポート番号
+	HealthCheck *LoadBalancerHealthCheck `json:",omitempty"` // ヘルスチェック
+	Enabled     string                   `json:",omitempty"` // 有効/無効
+	Status      string                   `json:",omitempty"` // ステータス
+	ActiveConn  string                   `json:",omitempty"` // アクティブなコネクション
 }
 
 // LoadBalancerHealthCheck ヘルスチェック
 type LoadBalancerHealthCheck struct {
-	// Protocol プロトコル
-	Protocol string `json:",omitempty"`
-	// Path HTTP/HTTPSの場合のリクエストパス
-	Path string `json:",omitempty"`
-	// Status HTTP/HTTPSの場合の期待するレスポンスコード
-	Status string `json:",omitempty"`
+	Protocol string `json:",omitempty"` // プロトコル
+	Path     string `json:",omitempty"` // HTTP/HTTPSの場合のリクエストパス
+	Status   string `json:",omitempty"` // HTTP/HTTPSの場合の期待するレスポンスコード
 }
 
 // LoadBalancerPlan ロードバランサープラン
@@ -74,33 +58,22 @@ var (
 
 // CreateLoadBalancerValue ロードバランサー作成用パラメーター
 type CreateLoadBalancerValue struct {
-	// SwitchID 接続先スイッチID
-	SwitchID string
-	// VRID VRID
-	VRID int
-	// Plan プラン
-	Plan LoadBalancerPlan
-	// IPAddress1 IPアドレス
-	IPAddress1 string
-	// MaskLen ネットワークマスク長
-	MaskLen int
-	// DefaultRoute デフォルトルート
-	DefaultRoute string
-	// Name 名称
-	Name string
-	// Description 説明
-	Description string
-	// Tags タグ
-	Tags []string
-	// Icon アイコン
-	Icon *Resource
+	SwitchID     string           // 接続先スイッチID
+	VRID         int              // VRID
+	Plan         LoadBalancerPlan // プラン
+	IPAddress1   string           // IPアドレス
+	MaskLen      int              // ネットワークマスク長
+	DefaultRoute string           // デフォルトルート
+	Name         string           // 名称
+	Description  string           // 説明
+	Tags         []string         // タグ
+	Icon         *Resource        // アイコン
 }
 
 // CreateDoubleLoadBalancerValue ロードバランサー(冗長化あり)作成用パラメーター
 type CreateDoubleLoadBalancerValue struct {
 	*CreateLoadBalancerValue
-	// IPAddress2 IPアドレス2
-	IPAddress2 string
+	IPAddress2 string // IPアドレス2
 }
 
 // AllowLoadBalancerHealthCheckProtocol ロードバランサーでのヘルスチェック対応プロトコルリスト
@@ -113,13 +86,15 @@ func CreateNewLoadBalancerSingle(values *CreateLoadBalancerValue, settings []*Lo
 
 	lb := &LoadBalancer{
 		Appliance: &Appliance{
-			Class:       "loadbalancer",
-			Name:        values.Name,
-			Description: values.Description,
-			TagsType:    &TagsType{Tags: values.Tags},
-			Plan:        &Resource{ID: int64(values.Plan)},
-			Icon: &Icon{
-				Resource: values.Icon,
+			Class:           "loadbalancer",
+			propName:        propName{Name: values.Name},
+			propDescription: propDescription{Description: values.Description},
+			propTags:        propTags{Tags: values.Tags},
+			propPlanID:      propPlanID{Plan: &Resource{ID: int64(values.Plan)}},
+			propIcon: propIcon{
+				&Icon{
+					Resource: values.Icon,
+				},
 			},
 		},
 		Remark: &LoadBalancerRemark{

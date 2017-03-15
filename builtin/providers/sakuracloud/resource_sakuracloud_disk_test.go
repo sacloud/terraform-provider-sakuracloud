@@ -23,8 +23,8 @@ func TestAccResourceSakuraCloudDisk(t *testing.T) {
 					testAccCheckSakuraCloudDiskAttributes(&disk),
 					resource.TestCheckResourceAttr(
 						"sakuracloud_disk.foobar", "name", "mydisk"),
-					resource.TestCheckResourceAttr(
-						"sakuracloud_disk.foobar", "disable_pw_auth", ""),
+					resource.TestCheckNoResourceAttr(
+						"sakuracloud_disk.foobar", "disable_pw_auth"),
 				),
 			},
 			resource.TestStep{

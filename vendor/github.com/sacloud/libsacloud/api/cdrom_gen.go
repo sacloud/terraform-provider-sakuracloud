@@ -48,10 +48,11 @@ func (api *CDROMAPI) FilterBy(key string, value interface{}) *CDROMAPI {
 	return api
 }
 
-// func (api *CDROMAPI) FilterMultiBy(key string, value interface{}) *CDROMAPI {
-// 	api.filterBy(key, value, true)
-// 	return api
-// }
+// FilterMultiBy 任意項目でのフィルタ(完全一致 OR条件)
+func (api *CDROMAPI) FilterMultiBy(key string, value interface{}) *CDROMAPI {
+	api.filterBy(key, value, true)
+	return api
+}
 
 // WithNameLike 名称条件
 func (api *CDROMAPI) WithNameLike(name string) *CDROMAPI {
@@ -105,14 +106,96 @@ func (api *CDROMAPI) SortBySize(reverse bool) *CDROMAPI {
 }
 
 /************************************************
+   To support Setxxx interface for Find()
+************************************************/
+
+// SetEmpty 検索条件リセット
+func (api *CDROMAPI) SetEmpty() {
+	api.reset()
+}
+
+// SetOffset オフセット
+func (api *CDROMAPI) SetOffset(offset int) {
+	api.offset(offset)
+}
+
+// SetLimit リミット
+func (api *CDROMAPI) SetLimit(limit int) {
+	api.limit(limit)
+}
+
+// SetInclude 取得する項目
+func (api *CDROMAPI) SetInclude(key string) {
+	api.include(key)
+}
+
+// SetExclude 除外する項目
+func (api *CDROMAPI) SetExclude(key string) {
+	api.exclude(key)
+}
+
+// SetFilterBy 指定キーでのフィルター
+func (api *CDROMAPI) SetFilterBy(key string, value interface{}) {
+	api.filterBy(key, value, false)
+}
+
+// SetFilterMultiBy 任意項目でのフィルタ(完全一致 OR条件)
+func (api *CDROMAPI) SetFilterMultiBy(key string, value interface{}) {
+	api.filterBy(key, value, true)
+}
+
+// SetNameLike 名称条件
+func (api *CDROMAPI) SetNameLike(name string) {
+	api.FilterBy("Name", name)
+}
+
+// SetTag タグ条件
+func (api *CDROMAPI) SetTag(tag string) {
+	api.FilterBy("Tags.Name", tag)
+}
+
+// SetTags タグ(複数)条件
+func (api *CDROMAPI) SetTags(tags []string) {
+	api.FilterBy("Tags.Name", []interface{}{tags})
+}
+
+// SetSizeGib サイズ条件
+func (api *CDROMAPI) SetSizeGib(size int) {
+	api.FilterBy("SizeMB", size*1024)
+}
+
+// SetSharedScope 公開スコープ条件
+func (api *CDROMAPI) SetSharedScope() {
+	api.FilterBy("Scope", "shared")
+}
+
+// SetUserScope ユーザースコープ条件
+func (api *CDROMAPI) SetUserScope() {
+	api.FilterBy("Scope", "user")
+}
+
+// SetSortBy 指定キーでのソート
+func (api *CDROMAPI) SetSortBy(key string, reverse bool) {
+	api.sortBy(key, reverse)
+}
+
+// SetSortByName 名称でのソート
+func (api *CDROMAPI) SetSortByName(reverse bool) {
+	api.sortByName(reverse)
+}
+
+// SetSortBySize サイズでのソート
+func (api *CDROMAPI) SetSortBySize(reverse bool) {
+	api.sortBy("SizeMB", reverse)
+}
+
+/************************************************
   To support CRUD(Create/Read/Update/Delete)
 ************************************************/
 
 // New 新規作成用パラメータ作成
 func (api *CDROMAPI) New() *sacloud.CDROM {
-	return &sacloud.CDROM{
-		TagsType: &sacloud.TagsType{},
-	}
+	return &sacloud.CDROM{}
 }
 
 //func (api *CDROMAPI) Create(value *sacloud.CDROM) (*sacloud.CDROM, error) {

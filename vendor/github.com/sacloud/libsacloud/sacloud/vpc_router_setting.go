@@ -7,44 +7,28 @@ import (
 
 // VPCRouterSetting VPCルーター設定
 type VPCRouterSetting struct {
-	// Interfaces NIC設定
-	Interfaces []*VPCRouterInterface `json:",omitempty"`
-	// StaticNAT スタティックNAT設定
-	StaticNAT *VPCRouterStaticNAT `json:",omitempty"`
-	// PortForwarding ポートフォワーディング設定
-	PortForwarding *VPCRouterPortForwarding `json:",omitempty"`
-	// Firewall ファイアウォール設定
-	Firewall *VPCRouterFirewall `json:",omitempty"`
-	// DHCPServer DHCPサーバー設定
-	DHCPServer *VPCRouterDHCPServer `json:",omitempty"`
-	// DHCPStaticMapping DHCPスタティックマッピング設定
-	DHCPStaticMapping *VPCRouterDHCPStaticMapping `json:",omitempty"`
-	// L2TPIPsecServer L2TP/IPSecサーバー設定
-	L2TPIPsecServer *VPCRouterL2TPIPsecServer `json:",omitempty"`
-	// PPTPServer PPTPサーバー設定
-	PPTPServer *VPCRouterPPTPServer `json:",omitempty"`
-	// RemoteAccessUsers リモートアクセスユーザー設定
-	RemoteAccessUsers *VPCRouterRemoteAccessUsers `json:",omitempty"`
-	// SiteToSiteIPsecVPN サイト間VPN設定
-	SiteToSiteIPsecVPN *VPCRouterSiteToSiteIPsecVPN `json:",omitempty"`
-	// StaticRoutes スタティックルート設定
-	StaticRoutes *VPCRouterStaticRoutes `json:",omitempty"`
-	// VRID VRID
-	VRID *int `json:",omitempty"`
-	// SyslogHost syslog転送先ホスト
-	SyslogHost string `json:",omitempty"`
+	Interfaces         []*VPCRouterInterface        `json:",omitempty"` // NIC設定
+	StaticNAT          *VPCRouterStaticNAT          `json:",omitempty"` // スタティックNAT設定
+	PortForwarding     *VPCRouterPortForwarding     `json:",omitempty"` // ポートフォワーディング設定
+	Firewall           *VPCRouterFirewall           `json:",omitempty"` // ファイアウォール設定
+	DHCPServer         *VPCRouterDHCPServer         `json:",omitempty"` // DHCPサーバー設定
+	DHCPStaticMapping  *VPCRouterDHCPStaticMapping  `json:",omitempty"` // DHCPスタティックマッピング設定
+	L2TPIPsecServer    *VPCRouterL2TPIPsecServer    `json:",omitempty"` // L2TP/IPSecサーバー設定
+	PPTPServer         *VPCRouterPPTPServer         `json:",omitempty"` // PPTPサーバー設定
+	RemoteAccessUsers  *VPCRouterRemoteAccessUsers  `json:",omitempty"` // リモートアクセスユーザー設定
+	SiteToSiteIPsecVPN *VPCRouterSiteToSiteIPsecVPN `json:",omitempty"` // サイト間VPN設定
+	StaticRoutes       *VPCRouterStaticRoutes       `json:",omitempty"` // スタティックルート設定
+	VRID               *int                         `json:",omitempty"` // VRID
+	SyslogHost         string                       `json:",omitempty"` // syslog転送先ホスト
+
 }
 
 // VPCRouterInterface NIC設定
 type VPCRouterInterface struct {
-	// IPAddress IPアドレスリスト
-	IPAddress []string `json:",omitempty"`
-	// NetworkMaskLen ネットワークマスク長
-	NetworkMaskLen int `json:",omitempty"`
-	// VirtualIPAddress 仮想IPアドレス
-	VirtualIPAddress string `json:",omitempty"`
-	// IPAliases IPエイリアス
-	IPAliases []string `json:",omitempty"`
+	IPAddress        []string `json:",omitempty"` // IPアドレスリスト
+	NetworkMaskLen   int      `json:",omitempty"` // ネットワークマスク長
+	VirtualIPAddress string   `json:",omitempty"` // 仮想IPアドレス
+	IPAliases        []string `json:",omitempty"` // IPエイリアス
 }
 
 // AddInterface NIC追加
@@ -61,18 +45,14 @@ func (s *VPCRouterSetting) AddInterface(vip string, ipaddress []string, maskLen 
 
 // VPCRouterStaticNAT スタティックNAT設定
 type VPCRouterStaticNAT struct {
-	// Config スタティックNAT設定
-	Config []*VPCRouterStaticNATConfig `json:",omitempty"`
-	// Enabled 有効/無効
-	Enabled string `json:",omitempty"`
+	Config  []*VPCRouterStaticNATConfig `json:",omitempty"` // スタティックNAT設定
+	Enabled string                      `json:",omitempty"` // 有効/無効
 }
 
 // VPCRouterStaticNATConfig スタティックNAT設定
 type VPCRouterStaticNATConfig struct {
-	// GlobalAddress グローバルIPアドレス
-	GlobalAddress string `json:",omitempty"`
-	// PrivateAddress プライベートIPアドレス
-	PrivateAddress string `json:",omitempty"`
+	GlobalAddress  string `json:",omitempty"` // グローバルIPアドレス
+	PrivateAddress string `json:",omitempty"` // プライベートIPアドレス
 }
 
 // AddStaticNAT スタティックNAT設定 追加
@@ -131,22 +111,16 @@ func (s *VPCRouterSetting) FindStaticNAT(globalAddress string, privateAddress st
 
 // VPCRouterPortForwarding ポートフォワーディング設定
 type VPCRouterPortForwarding struct {
-	// Config ポートフォワーディング設定
-	Config []*VPCRouterPortForwardingConfig `json:",omitempty"`
-	// Enabled 有効/無効
-	Enabled string `json:",omitempty"`
+	Config  []*VPCRouterPortForwardingConfig `json:",omitempty"` // ポートフォワーディング設定
+	Enabled string                           `json:",omitempty"` // 有効/無効
 }
 
 // VPCRouterPortForwardingConfig ポートフォワーディング設定
 type VPCRouterPortForwardingConfig struct {
-	// Protocol プロトコル
-	Protocol string `json:",omitempty"` // tcp/udp only
-	// GlobalPort グローバル側ポート
-	GlobalPort string `json:",omitempty"`
-	// PrivateAddress プライベートIPアドレス
-	PrivateAddress string `json:",omitempty"`
-	// PrivatePort プライベート側ポート
-	PrivatePort string `json:",omitempty"`
+	Protocol       string `json:",omitempty"` // プロトコル(tcp/udp)
+	GlobalPort     string `json:",omitempty"` // グローバル側ポート
+	PrivateAddress string `json:",omitempty"` // プライベートIPアドレス
+	PrivatePort    string `json:",omitempty"` // プライベート側ポート
 }
 
 // AddPortForwarding ポートフォワーディング 追加
@@ -209,34 +183,24 @@ func (s *VPCRouterSetting) FindPortForwarding(protocol string, globalPort string
 
 // VPCRouterFirewall ファイアウォール設定
 type VPCRouterFirewall struct {
-	// Config ファイアウォール設定
-	Config []*VPCRouterFirewallSetting `json:",omitempty"`
-	// Enabled 有効/無効
-	Enabled string `json:",omitempty"`
+	Config  []*VPCRouterFirewallSetting `json:",omitempty"` // ファイアウォール設定
+	Enabled string                      `json:",omitempty"` // 有効/無効
 }
 
 // VPCRouterFirewallSetting ファイアウォール設定
 type VPCRouterFirewallSetting struct {
-	// Receive 受信ルール
-	Receive []*VPCRouterFirewallRule `json:",omitempty"`
-	// Send 送信ルール
-	Send []*VPCRouterFirewallRule `json:",omitempty"`
+	Receive []*VPCRouterFirewallRule `json:",omitempty"` // 受信ルール
+	Send    []*VPCRouterFirewallRule `json:",omitempty"` // 送信ルール
 }
 
 // VPCRouterFirewallRule ファイアウォール ルール
 type VPCRouterFirewallRule struct {
-	// Action 許可/拒否
-	Action string `json:",omitempty"`
-	// Protocol プロトコル
-	Protocol string `json:",omitempty"`
-	// SourceNetwork 送信元ネットワーク
-	SourceNetwork string `json:",omitempty"`
-	// SourcePort 送信元ポート
-	SourcePort string `json:",omitempty"`
-	// DestinationNetwork 宛先ネットワーク
-	DestinationNetwork string `json:",omitempty"`
-	// DestinationPort 宛先ポート
-	DestinationPort string `json:",omitempty"`
+	Action             string `json:",omitempty"` // 許可/拒否
+	Protocol           string `json:",omitempty"` // プロトコル
+	SourceNetwork      string `json:",omitempty"` // 送信元ネットワーク
+	SourcePort         string `json:",omitempty"` // 送信元ポート
+	DestinationNetwork string `json:",omitempty"` // 宛先ネットワーク
+	DestinationPort    string `json:",omitempty"` // 宛先ポート
 }
 
 func (s *VPCRouterSetting) addFirewallRule(direction string, rule *VPCRouterFirewallRule) {
@@ -447,20 +411,15 @@ func (s *VPCRouterSetting) FindFirewallRuleReceive(isAllow bool, protocol string
 
 // VPCRouterDHCPServer DHCPサーバー設定
 type VPCRouterDHCPServer struct {
-	// Config DHCPサーバー設定
-	Config []*VPCRouterDHCPServerConfig `json:",omitempty"`
-	// Enabled 有効/無効
-	Enabled string `json:",omitempty"`
+	Config  []*VPCRouterDHCPServerConfig `json:",omitempty"` // DHCPサーバー設定
+	Enabled string                       `json:",omitempty"` // 有効/無効
 }
 
 // VPCRouterDHCPServerConfig DHCPサーバー設定
 type VPCRouterDHCPServerConfig struct {
-	// Interface 対象NIC
-	Interface string `json:",omitempty"`
-	// RangeStart 割り当て範囲 開始アドレス
-	RangeStart string `json:",omitempty"`
-	// RangeStop 割り当て範囲 終了アドレス
-	RangeStop string `json:",omitempty"`
+	Interface  string `json:",omitempty"` // 対象NIC
+	RangeStart string `json:",omitempty"` // 割り当て範囲 開始アドレス
+	RangeStop  string `json:",omitempty"` // 割り当て範囲 終了アドレス
 }
 
 // AddDHCPServer DHCPサーバー設定追加
@@ -523,18 +482,14 @@ func (s *VPCRouterSetting) FindDHCPServer(nicIndex int, rangeStart string, range
 
 // VPCRouterDHCPStaticMapping DHCPスタティックマッピング設定
 type VPCRouterDHCPStaticMapping struct {
-	// Config DHCPスタティックマッピング設定
-	Config []*VPCRouterDHCPStaticMappingConfig `json:",omitempty"`
-	// Enabled 有効/無効
-	Enabled string `json:",omitempty"`
+	Config  []*VPCRouterDHCPStaticMappingConfig `json:",omitempty"` // DHCPスタティックマッピング設定
+	Enabled string                              `json:",omitempty"` // 有効/無効
 }
 
 // VPCRouterDHCPStaticMappingConfig DHCPスタティックマッピング設定
 type VPCRouterDHCPStaticMappingConfig struct {
-	// IPAddress 割り当てIPアドレス
-	IPAddress string `json:",omitempty"`
-	// MACAddress ソースMACアドレス
-	MACAddress string `json:",omitempty"`
+	IPAddress  string `json:",omitempty"` // 割り当てIPアドレス
+	MACAddress string `json:",omitempty"` // ソースMACアドレス
 }
 
 // AddDHCPStaticMapping DHCPスタティックマッピング設定追加
@@ -594,20 +549,15 @@ func (s *VPCRouterSetting) FindDHCPStaticMapping(ipAddress string, macAddress st
 
 // VPCRouterL2TPIPsecServer L2TP/IPSecサーバー設定
 type VPCRouterL2TPIPsecServer struct {
-	// Config L2TP/IPSecサーバー設定
-	Config *VPCRouterL2TPIPsecServerConfig `json:",omitempty"`
-	// Enabled 有効/無効
-	Enabled string `json:",omitempty"`
+	Config  *VPCRouterL2TPIPsecServerConfig `json:",omitempty"` // L2TP/IPSecサーバー設定
+	Enabled string                          `json:",omitempty"` // 有効/無効
 }
 
 // VPCRouterL2TPIPsecServerConfig L2TP/IPSecサーバー設定
 type VPCRouterL2TPIPsecServerConfig struct {
-	// PreSharedSecret 事前共有シークレット
-	PreSharedSecret string `json:",omitempty"`
-	// RangeStart 割り当て範囲 開始IPアドレス
-	RangeStart string `json:",omitempty"`
-	// RangeStop 割り当て範囲 終了IPアドレス
-	RangeStop string `json:",omitempty"`
+	PreSharedSecret string `json:",omitempty"` // 事前共有シークレット
+	RangeStart      string `json:",omitempty"` // 割り当て範囲 開始IPアドレス
+	RangeStop       string `json:",omitempty"` // 割り当て範囲 終了IPアドレス
 }
 
 // EnableL2TPIPsecServer L2TP/IPSecサーバー設定 有効化
@@ -635,18 +585,14 @@ func (s *VPCRouterSetting) DisableL2TPIPsecServer() {
 
 // VPCRouterPPTPServer PPTPサーバー設定
 type VPCRouterPPTPServer struct {
-	// Config PPTPサーバー設定
-	Config *VPCRouterPPTPServerConfig `json:",omitempty"`
-	// Enabled 有効/無効
-	Enabled string `json:",omitempty"`
+	Config  *VPCRouterPPTPServerConfig `json:",omitempty"` // PPTPサーバー設定
+	Enabled string                     `json:",omitempty"` // 有効/無効
 }
 
 // VPCRouterPPTPServerConfig PPTPサーバー設定
 type VPCRouterPPTPServerConfig struct {
-	// RangeStart 割り当て範囲 開始IPアドレス
-	RangeStart string `json:",omitempty"`
-	// RangeStop 割り当て範囲 終了IPアドレス
-	RangeStop string `json:",omitempty"`
+	RangeStart string `json:",omitempty"` // 割り当て範囲 開始IPアドレス
+	RangeStop  string `json:",omitempty"` // 割り当て範囲 終了IPアドレス
 }
 
 // EnablePPTPServer PPTPサーバー設定 有効化
@@ -673,18 +619,14 @@ func (s *VPCRouterSetting) DisablePPTPServer() {
 
 // VPCRouterRemoteAccessUsers リモートアクセスユーザー設定
 type VPCRouterRemoteAccessUsers struct {
-	// Config リモートアクセスユーザー設定
-	Config []*VPCRouterRemoteAccessUsersConfig `json:",omitempty"`
-	// Enabled 有効/無効
-	Enabled string `json:",omitempty"`
+	Config  []*VPCRouterRemoteAccessUsersConfig `json:",omitempty"` // リモートアクセスユーザー設定
+	Enabled string                              `json:",omitempty"` // 有効/無効
 }
 
 // VPCRouterRemoteAccessUsersConfig リモートアクセスユーザー設定
 type VPCRouterRemoteAccessUsersConfig struct {
-	// UserName ユーザー名
-	UserName string `json:",omitempty"`
-	// Password パスワード
-	Password string `json:",omitempty"`
+	UserName string `json:",omitempty"` // ユーザー名
+	Password string `json:",omitempty"` // パスワード
 }
 
 // AddRemoteAccessUser リモートアクセスユーザー設定 追加
@@ -742,24 +684,17 @@ func (s *VPCRouterSetting) FindRemoteAccessUser(userName string, password string
 
 // VPCRouterSiteToSiteIPsecVPN サイト間VPC設定
 type VPCRouterSiteToSiteIPsecVPN struct {
-	// Config サイト間VPC設定
-	Config []*VPCRouterSiteToSiteIPsecVPNConfig `json:",omitempty"`
-	// Enabled 有効/無効
-	Enabled string `json:",omitempty"`
+	Config  []*VPCRouterSiteToSiteIPsecVPNConfig `json:",omitempty"` // サイト間VPC設定
+	Enabled string                               `json:",omitempty"` // 有効/無効
 }
 
 // VPCRouterSiteToSiteIPsecVPNConfig サイト間VPC設定
 type VPCRouterSiteToSiteIPsecVPNConfig struct {
-	// LocalPrefix ローカルプレフィックス リスト
-	LocalPrefix []string `json:",omitempty"`
-	// Peer 対向IPアドレス
-	Peer string `json:",omitempty"`
-	// PreSharedSecret 事前共有シークレット
-	PreSharedSecret string `json:",omitempty"`
-	// RemoteID 対向ID
-	RemoteID string `json:",omitempty"`
-	// Routes 対向プレフィックス リスト
-	Routes []string `json:",omitempty"`
+	LocalPrefix     []string `json:",omitempty"` // ローカルプレフィックス リスト
+	Peer            string   `json:",omitempty"` // 対向IPアドレス
+	PreSharedSecret string   `json:",omitempty"` // 事前共有シークレット
+	RemoteID        string   `json:",omitempty"` // 対向ID
+	Routes          []string `json:",omitempty"` // 対向プレフィックス リスト
 }
 
 // AddSiteToSiteIPsecVPN サイト間VPC設定 追加
@@ -845,18 +780,14 @@ func (s *VPCRouterSetting) isSameSiteToSiteIPsecVPNConfig(c1 *VPCRouterSiteToSit
 
 // VPCRouterStaticRoutes スタティックルート設定
 type VPCRouterStaticRoutes struct {
-	// Config スタティックルート設定
-	Config []*VPCRouterStaticRoutesConfig `json:",omitempty"`
-	// Enabled 有効/無効
-	Enabled string `json:",omitempty"`
+	Config  []*VPCRouterStaticRoutesConfig `json:",omitempty"` // スタティックルート設定
+	Enabled string                         `json:",omitempty"` // 有効/無効
 }
 
 // VPCRouterStaticRoutesConfig スタティックルート設定
 type VPCRouterStaticRoutesConfig struct {
-	// Prefix プレフィックス
-	Prefix string `json:",omitempty"`
-	// NextHop ネクストホップ
-	NextHop string `json:",omitempty"`
+	Prefix  string `json:",omitempty"` // プレフィックス
+	NextHop string `json:",omitempty"` // ネクストホップ
 }
 
 // AddStaticRoute スタティックルート設定 追加

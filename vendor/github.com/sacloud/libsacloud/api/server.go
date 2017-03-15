@@ -73,7 +73,7 @@ func (api *ServerAPI) State(id int64) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	return server.Availability, nil
+	return string(server.Availability), nil
 }
 
 // IsUp 起動しているか判定

@@ -48,10 +48,11 @@ func (api *LoadBalancerAPI) FilterBy(key string, value interface{}) *LoadBalance
 	return api
 }
 
-// func (api *LoadBalancerAPI) FilterMultiBy(key string, value interface{}) *LoadBalancerAPI {
-// 	api.filterBy(key, value, true)
-// 	return api
-// }
+// FilterMultiBy 任意項目でのフィルタ(完全一致 OR条件)
+func (api *LoadBalancerAPI) FilterMultiBy(key string, value interface{}) *LoadBalancerAPI {
+	api.filterBy(key, value, true)
+	return api
+}
 
 // WithNameLike 名称条件
 func (api *LoadBalancerAPI) WithNameLike(name string) *LoadBalancerAPI {
@@ -98,6 +99,86 @@ func (api *LoadBalancerAPI) SortByName(reverse bool) *LoadBalancerAPI {
 // func (api *LoadBalancerAPI) SortBySize(reverse bool) *LoadBalancerAPI {
 // 	api.sortBy("SizeMB", reverse)
 // 	return api
+// }
+
+/************************************************
+   To support Setxxx interface for Find()
+************************************************/
+
+// SetEmpty 検索条件のリセット
+func (api *LoadBalancerAPI) SetEmpty() {
+	api.reset()
+}
+
+// SetOffset オフセット
+func (api *LoadBalancerAPI) SetOffset(offset int) {
+	api.offset(offset)
+}
+
+// SetLimit リミット
+func (api *LoadBalancerAPI) SetLimit(limit int) {
+	api.limit(limit)
+}
+
+// SetInclude 取得する項目
+func (api *LoadBalancerAPI) SetInclude(key string) {
+	api.include(key)
+}
+
+// SetExclude 除外する項目
+func (api *LoadBalancerAPI) SetExclude(key string) {
+	api.exclude(key)
+}
+
+// SetFilterBy 指定キーでのフィルター
+func (api *LoadBalancerAPI) SetFilterBy(key string, value interface{}) {
+	api.filterBy(key, value, false)
+}
+
+// SetFilterMultiBy 任意項目でのフィルタ(完全一致 OR条件)
+func (api *LoadBalancerAPI) SetFilterMultiBy(key string, value interface{}) {
+	api.filterBy(key, value, true)
+}
+
+// SetNameLike 名称条件
+func (api *LoadBalancerAPI) SetNameLike(name string) {
+	api.FilterBy("Name", name)
+}
+
+// SetTag タグ条件
+func (api *LoadBalancerAPI) SetTag(tag string) {
+	api.FilterBy("Tags.Name", tag)
+}
+
+// SetTags タグ(複数)条件
+func (api *LoadBalancerAPI) SetTags(tags []string) {
+	api.FilterBy("Tags.Name", []interface{}{tags})
+}
+
+// func (api *LoadBalancerAPI) SetSizeGib(size int) {
+// 	api.FilterBy("SizeMB", size*1024)
+// }
+
+// func (api *LoadBalancerAPI) SetSharedScope() {
+// 	api.FilterBy("Scope", "shared")
+// }
+
+// func (api *LoadBalancerAPI) SetUserScope() {
+// 	api.FilterBy("Scope", "user")
+// }
+
+// SetSortBy 指定キーでのソート
+func (api *LoadBalancerAPI) SetSortBy(key string, reverse bool) {
+	api.sortBy(key, reverse)
+}
+
+// SetSortByName 名称でのソート
+func (api *LoadBalancerAPI) SetSortByName(reverse bool) {
+	api.sortByName(reverse)
+}
+
+// func (api *LoadBalancerAPI) SortBySize(reverse bool) {
+// 	api.sortBy("SizeMB", reverse)
 // }
 
 /************************************************

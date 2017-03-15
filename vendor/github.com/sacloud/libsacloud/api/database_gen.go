@@ -48,10 +48,11 @@ func (api *DatabaseAPI) FilterBy(key string, value interface{}) *DatabaseAPI {
 	return api
 }
 
-// func (api *DatabaseAPI) FilterMultiBy(key string, value interface{}) *DatabaseAPI {
-// 	api.filterBy(key, value, true)
-// 	return api
-// }
+// FilterMultiBy 任意項目でのフィルタ(完全一致 OR条件)
+func (api *DatabaseAPI) FilterMultiBy(key string, value interface{}) *DatabaseAPI {
+	api.filterBy(key, value, true)
+	return api
+}
 
 // WithNameLike 名称条件
 func (api *DatabaseAPI) WithNameLike(name string) *DatabaseAPI {
@@ -98,6 +99,86 @@ func (api *DatabaseAPI) SortByName(reverse bool) *DatabaseAPI {
 // func (api *DatabaseAPI) SortBySize(reverse bool) *DatabaseAPI {
 // 	api.sortBy("SizeMB", reverse)
 // 	return api
+// }
+
+/************************************************
+   To support fluent interface for Find()
+************************************************/
+
+// SetEmpty 検索条件のリセット
+func (api *DatabaseAPI) SetEmpty() {
+	api.reset()
+}
+
+// SetOffset オフセット
+func (api *DatabaseAPI) SetOffset(offset int) {
+	api.offset(offset)
+}
+
+// SetLimit リミット
+func (api *DatabaseAPI) SetLimit(limit int) {
+	api.limit(limit)
+}
+
+// SetInclude 取得する項目
+func (api *DatabaseAPI) SetInclude(key string) {
+	api.include(key)
+}
+
+// SetExclude 除外する項目
+func (api *DatabaseAPI) SetExclude(key string) {
+	api.exclude(key)
+}
+
+// SetFilterBy 指定項目でのフィルター
+func (api *DatabaseAPI) SetFilterBy(key string, value interface{}) {
+	api.filterBy(key, value, false)
+}
+
+// SetFilterMultiBy 任意項目でのフィルタ(完全一致 OR条件)
+func (api *DatabaseAPI) SetFilterMultiBy(key string, value interface{}) {
+	api.filterBy(key, value, true)
+}
+
+// SetNameLike 名称条件
+func (api *DatabaseAPI) SetNameLike(name string) {
+	api.FilterBy("Name", name)
+}
+
+// SetTag タグ条件
+func (api *DatabaseAPI) SetTag(tag string) {
+	api.FilterBy("Tags.Name", tag)
+}
+
+// SetTags タグ(複数)条件
+func (api *DatabaseAPI) SetTags(tags []string) {
+	api.FilterBy("Tags.Name", []interface{}{tags})
+}
+
+// func (api *DatabaseAPI) SetSizeGib(size int)  {
+// 	api.FilterBy("SizeMB", size*1024)
+// }
+
+// func (api *DatabaseAPI) SetSharedScope()  {
+// 	api.FilterBy("Scope", "shared")
+// }
+
+// func (api *DatabaseAPI) SetUserScope()  {
+// 	api.FilterBy("Scope", "user")
+// }
+
+// SetSortBy 指定キーでのソート
+func (api *DatabaseAPI) SetSortBy(key string, reverse bool) {
+	api.sortBy(key, reverse)
+}
+
+// SetSortByName 名称でのソート
+func (api *DatabaseAPI) SetSortByName(reverse bool) {
+	api.sortByName(reverse)
+}
+
+// func (api *DatabaseAPI) SetSortBySize(reverse bool)  {
+// 	api.sortBy("SizeMB", reverse)
 // }
 
 /************************************************

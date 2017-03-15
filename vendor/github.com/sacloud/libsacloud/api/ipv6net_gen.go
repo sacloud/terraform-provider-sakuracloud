@@ -48,10 +48,11 @@ func (api *IPv6NetAPI) FilterBy(key string, value interface{}) *IPv6NetAPI {
 	return api
 }
 
-// func (api *IPv6NetAPI) FilterMultiBy(key string, value interface{}) *IPv6NetAPI {
-// 	api.filterBy(key, value, true)
-// 	return api
-// }
+// FilterMultiBy 任意項目でのフィルタ(完全一致 OR条件)
+func (api *IPv6NetAPI) FilterMultiBy(key string, value interface{}) *IPv6NetAPI {
+	api.filterBy(key, value, true)
+	return api
+}
 
 //func (api *IPv6NetAPI) WithNameLike(name string) *IPv6NetAPI {
 //	return api.FilterBy("Name", name)
@@ -93,6 +94,81 @@ func (api *IPv6NetAPI) SortBy(key string, reverse bool) *IPv6NetAPI {
 // func (api *IPv6NetAPI) SortBySize(reverse bool) *IPv6NetAPI {
 // 	api.sortBy("SizeMB", reverse)
 // 	return api
+// }
+
+/************************************************
+   To support Setxxx interface for Find()
+************************************************/
+
+// SetEmpty 検索条件のクリア
+func (api *IPv6NetAPI) SetEmpty() {
+	api.reset()
+}
+
+// SetOffset オフセット
+func (api *IPv6NetAPI) SetOffset(offset int) {
+	api.offset(offset)
+}
+
+// SetLimit リミット
+func (api *IPv6NetAPI) SetLimit(limit int) {
+	api.limit(limit)
+}
+
+// SetInclude 取得する項目
+func (api *IPv6NetAPI) SetInclude(key string) {
+	api.include(key)
+}
+
+// SetExclude 除外する項目
+func (api *IPv6NetAPI) SetExclude(key string) {
+	api.exclude(key)
+}
+
+// SetFilterBy 指定キーでのフィルター
+func (api *IPv6NetAPI) SetFilterBy(key string, value interface{}) {
+	api.filterBy(key, value, false)
+}
+
+// SetFilterMultiBy 任意項目でのフィルタ(完全一致 OR条件)
+func (api *IPv6NetAPI) SetFilterMultiBy(key string, value interface{}) {
+	api.filterBy(key, value, true)
+}
+
+//func (api *IPv6NetAPI) SetNameLike(name string) {
+//	api.FilterBy("Name", name)
+//}
+//
+//func (api *IPv6NetAPI) SetTag(tag string) {
+//	api.FilterBy("Tags.Name", tag)
+//}
+//func (api *IPv6NetAPI) SetTags(tags []string) {
+//	api.FilterBy("Tags.Name", []interface{}{tags})
+//}
+
+// func (api *IPv6NetAPI) SetSizeGib(size int) {
+// 	api.FilterBy("SizeMB", size*1024)
+// }
+
+// func (api *IPv6NetAPI) SetSharedScope() {
+// 	api.FilterBy("Scope", "shared")
+// }
+
+// func (api *IPv6NetAPI) SetUserScope() {
+// 	api.FilterBy("Scope", "user")
+// }
+
+// SetSortBy 指定キーでのソート
+func (api *IPv6NetAPI) SetSortBy(key string, reverse bool) {
+	api.sortBy(key, reverse)
+}
+
+//func (api *IPv6NetAPI) SetSortByName(reverse bool) {
+//	api.sortByName(reverse)
+//}
+
+// func (api *IPv6NetAPI) SetSortBySize(reverse bool) {
+// 	api.sortBy("SizeMB", reverse)
 // }
 
 /************************************************
