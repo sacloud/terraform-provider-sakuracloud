@@ -33,6 +33,12 @@ func TestAccSakuraCloudArchiveDataSource_Basic(t *testing.T) {
 				),
 			},
 			resource.TestStep{
+				Config: testAccCheckSakuraCloudDataSourceArchive_OSType,
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckSakuraCloudArchiveDataSourceID("data.sakuracloud_archive.foobar"),
+				),
+			},
+			resource.TestStep{
 				Destroy: true,
 				Config:  testAccCheckSakuraCloudDataSourceArchiveConfig_With_Tag,
 				Check: resource.ComposeTestCheckFunc(
@@ -141,3 +147,10 @@ data "sakuracloud_archive" "foobar" {
     }
     zone = "tk1v"
 }`
+
+var testAccCheckSakuraCloudDataSourceArchive_OSType = `
+data "sakuracloud_archive" "foobar" {
+    os_type = "centos"
+    zone = "tk1v"
+}
+`

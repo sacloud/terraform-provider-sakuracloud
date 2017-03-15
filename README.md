@@ -31,10 +31,7 @@ resource "sakuracloud_ssh_key" "key"{
 }
 
 data sakuracloud_archive "centos" {
-    filter = {
-        name   = "Tags"
-        values = ["current-stable", "arch-64bit", "distro-centos"]
-    }
+    os_type = "centos"
 }
 resource "sakuracloud_disk" "disk01"{
     name = "disk01"

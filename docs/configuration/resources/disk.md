@@ -4,10 +4,7 @@
 
 ```
 data sakuracloud_archive "centos" {
-    filter = {
-        name   = "Tags"
-        values = ["current-stable", "arch-64bit", "distro-centos"]
-    }
+    os_type = "centos"
 }
 resource "sakuracloud_disk" "disk01"{
     name = "disk01"
@@ -36,6 +33,7 @@ resource "sakuracloud_disk" "disk01"{
 | `description`     | -   | 説明  | - | 文字列 | - |
 | `tags`            | -   | タグ | - | リスト(文字列) | - |
 | `zone`            | -   | ゾーン | - | `is1b`<br />`tk1a`<br />`tk1v` | - |
+
 
 #### 互換性
 
