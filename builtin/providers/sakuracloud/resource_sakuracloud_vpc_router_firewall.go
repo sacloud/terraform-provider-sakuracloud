@@ -66,6 +66,17 @@ func resourceSakuraCloudVPCRouterFirewall() *schema.Resource {
 							Required: true,
 							ForceNew: true,
 						},
+						"logging": &schema.Schema{
+							Type:     schema.TypeBool,
+							Optional: true,
+							ForceNew: true,
+						},
+						"description": &schema.Schema{
+							Type:     schema.TypeString,
+							Optional: true,
+							Default:  "",
+							ForceNew: true,
+						},
 					},
 				},
 			},
@@ -127,12 +138,17 @@ func resourceSakuraCloudVPCRouterFirewallCreate(d *schema.ResourceData, meta int
 			sourcePort := exp["source_port"].(string)
 			destNW := exp["dest_nw"].(string)
 			destPort := exp["dest_port"].(string)
+			logging := exp["logging"].(bool)
+			desc := ""
+			if de, ok := exp["description"]; ok {
+				desc = de.(string)
+			}
 
 			switch direction {
 			case "send":
-				vpcRouter.Settings.Router.AddFirewallRuleSend(allow, protocol, sourceNW, sourcePort, destNW, destPort)
+				vpcRouter.Settings.Router.AddFirewallRuleSend(allow, protocol, sourceNW, sourcePort, destNW, destPort, logging, desc)
 			case "receive":
-				vpcRouter.Settings.Router.AddFirewallRuleReceive(allow, protocol, sourceNW, sourcePort, destNW, destPort)
+				vpcRouter.Settings.Router.AddFirewallRuleReceive(allow, protocol, sourceNW, sourcePort, destNW, destPort, logging, desc)
 			}
 		}
 	}
@@ -187,6 +203,8 @@ func resourceSakuraCloudVPCRouterFirewallRead(d *schema.ResourceData, meta inter
 			expression["dest_port"] = rule.DestinationPort
 			expression["allow"] = (rule.Action == "allow")
 			expression["protocol"] = rule.Protocol
+			expression["logging"] = rule.Logging
+			expression["description"] = rule.Description
 
 			expressions = append(expressions, expression)
 		}

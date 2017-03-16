@@ -50,6 +50,12 @@ func resourceSakuraCloudVPCRouterPortForwarding() *schema.Resource {
 				ForceNew:     true,
 				ValidateFunc: validateIntegerInRange(1, 65535),
 			},
+			"description": &schema.Schema{
+				Type:     schema.TypeString,
+				Optional: true,
+				ForceNew: true,
+				Default:  "",
+			},
 			"zone": &schema.Schema{
 				Type:         schema.TypeString,
 				Optional:     true,
@@ -83,7 +89,7 @@ func resourceSakuraCloudVPCRouterPortForwardingCreate(d *schema.ResourceData, me
 		vpcRouter.InitVPCRouterSetting()
 	}
 
-	vpcRouter.Settings.Router.AddPortForwarding(pf.Protocol, pf.GlobalPort, pf.PrivateAddress, pf.PrivatePort)
+	vpcRouter.Settings.Router.AddPortForwarding(pf.Protocol, pf.GlobalPort, pf.PrivateAddress, pf.PrivatePort, pf.Description)
 	vpcRouter, err = client.VPCRouter.UpdateSetting(toSakuraCloudID(routerID), vpcRouter)
 	if err != nil {
 		return fmt.Errorf("Failed to enable SakuraCloud VPCRouterPortForwarding resource: %s", err)
@@ -117,6 +123,7 @@ func resourceSakuraCloudVPCRouterPortForwardingRead(d *schema.ResourceData, meta
 		d.Set("global_port", pf.GlobalPort)
 		d.Set("private_address", pf.PrivateAddress)
 		d.Set("private_port", pf.PrivatePort)
+		d.Set("description", pf.Description)
 	}
 
 	d.Set("zone", client.Zone)
@@ -168,6 +175,7 @@ func vpcRouterPortForwardingIDHash(routerID string, s *sacloud.VPCRouterPortForw
 	buf.WriteString(fmt.Sprintf("%s-", s.GlobalPort))
 	buf.WriteString(fmt.Sprintf("%s", s.PrivateAddress))
 	buf.WriteString(fmt.Sprintf("%s-", s.PrivatePort))
+	buf.WriteString(fmt.Sprintf("%s-", s.Description))
 
 	return fmt.Sprintf("%d", hashcode.String(buf.String()))
 }
@@ -179,6 +187,10 @@ func expandVPCRouterPortForwarding(d *schema.ResourceData) *sacloud.VPCRouterPor
 		GlobalPort:     fmt.Sprintf("%d", d.Get("global_port").(int)),
 		PrivateAddress: d.Get("private_address").(string),
 		PrivatePort:    fmt.Sprintf("%d", d.Get("private_port").(int)),
+	}
+
+	if desc, ok := d.GetOk("description"); ok {
+		portForwarding.Description = desc.(string)
 	}
 
 	return portForwarding
