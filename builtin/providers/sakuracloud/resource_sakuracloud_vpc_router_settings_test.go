@@ -288,6 +288,7 @@ resource "sakuracloud_vpc_router_static_nat" "staticNAT1" {
 
     global_address = "${sakuracloud_internet.router1.nw_ipaddresses.3}"
     private_address = "192.168.11.11"
+    description = "desc"
 }
 resource "sakuracloud_vpc_router_port_forwarding" "forward1" {
     vpc_router_id = "${sakuracloud_vpc_router.foobar.id}"
@@ -297,6 +298,7 @@ resource "sakuracloud_vpc_router_port_forwarding" "forward1" {
     global_port = 10022
     private_address = "192.168.11.11"
     private_port = 22
+    description = "desc"
 }
 resource "sakuracloud_vpc_router_dhcp_server" "dhcp" {
     vpc_router_id = "${sakuracloud_vpc_router.foobar.id}"
@@ -345,6 +347,8 @@ resource "sakuracloud_vpc_router_firewall" "send_fw" {
         dest_nw = ""
         dest_port = ""
         allow = true
+        logging = true
+        description = "desc"
     }
 
     expressions = {
@@ -354,6 +358,8 @@ resource "sakuracloud_vpc_router_firewall" "send_fw" {
         dest_nw = ""
         dest_port = ""
         allow = false
+        logging = true
+        description = "desc"
     }
 }
 
@@ -367,6 +373,8 @@ resource "sakuracloud_vpc_router_firewall" "receive_fw" {
         dest_nw = ""
         dest_port = "22"
         allow = true
+        logging = true
+        description = "desc"
     }
 
     expressions = {
@@ -376,6 +384,8 @@ resource "sakuracloud_vpc_router_firewall" "receive_fw" {
         dest_nw = ""
         dest_port = ""
         allow = false
+        logging = true
+        description = "desc"
     }
 }
 resource "sakuracloud_vpc_router_static_route" "route" {
@@ -426,6 +436,7 @@ resource "sakuracloud_vpc_router_static_nat" "staticNAT1" {
 
     global_address = "${sakuracloud_internet.router1.nw_ipaddresses.3}"
     private_address = "192.168.11.12"
+    description = "desc"
 }
 resource "sakuracloud_vpc_router_port_forwarding" "forward1" {
     vpc_router_id = "${sakuracloud_vpc_router.foobar.id}"
@@ -435,6 +446,7 @@ resource "sakuracloud_vpc_router_port_forwarding" "forward1" {
     global_port = 10022
     private_address = "192.168.11.11"
     private_port = 22
+    description = "desc"
 }
 resource "sakuracloud_vpc_router_dhcp_server" "dhcp" {
     vpc_router_id = "${sakuracloud_vpc_router.foobar.id}"
@@ -482,6 +494,8 @@ resource "sakuracloud_vpc_router_firewall" "send_fw" {
         dest_nw = ""
         dest_port = ""
         allow = true
+        logging = true
+        description = "desc"
     }
 
     expressions = {
@@ -491,6 +505,8 @@ resource "sakuracloud_vpc_router_firewall" "send_fw" {
         dest_nw = ""
         dest_port = ""
         allow = false
+        logging = true
+        description = "desc"
     }
 }
 
@@ -504,6 +520,8 @@ resource "sakuracloud_vpc_router_firewall" "receive_fw" {
         dest_nw = ""
         dest_port = "22"
         allow = true
+        logging = true
+        description = "desc"
     }
 
     expressions = {
@@ -513,6 +531,8 @@ resource "sakuracloud_vpc_router_firewall" "receive_fw" {
         dest_nw = ""
         dest_port = ""
         allow = false
+        logging = true
+        description = "desc"
     }
 }
 resource "sakuracloud_vpc_router_static_route" "route" {

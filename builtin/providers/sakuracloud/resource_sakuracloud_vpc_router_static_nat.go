@@ -37,6 +37,12 @@ func resourceSakuraCloudVPCRouterStaticNAT() *schema.Resource {
 				Required: true,
 				ForceNew: true,
 			},
+			"description": &schema.Schema{
+				Type:     schema.TypeString,
+				Optional: true,
+				Default:  "",
+				ForceNew: true,
+			},
 			"zone": &schema.Schema{
 				Type:         schema.TypeString,
 				Optional:     true,
@@ -70,7 +76,7 @@ func resourceSakuraCloudVPCRouterStaticNATCreate(d *schema.ResourceData, meta in
 		vpcRouter.InitVPCRouterSetting()
 	}
 
-	vpcRouter.Settings.Router.AddStaticNAT(staticNAT.GlobalAddress, staticNAT.PrivateAddress)
+	vpcRouter.Settings.Router.AddStaticNAT(staticNAT.GlobalAddress, staticNAT.PrivateAddress, staticNAT.Description)
 	vpcRouter, err = client.VPCRouter.UpdateSetting(toSakuraCloudID(routerID), vpcRouter)
 	if err != nil {
 		return fmt.Errorf("Failed to enable SakuraCloud VPCRouterStaticNAT resource: %s", err)
@@ -102,6 +108,7 @@ func resourceSakuraCloudVPCRouterStaticNATRead(d *schema.ResourceData, meta inte
 		vpcRouter.Settings.Router.FindStaticNAT(staticNAT.GlobalAddress, staticNAT.PrivateAddress) != nil {
 		d.Set("global_address", staticNAT.GlobalAddress)
 		d.Set("private_address", staticNAT.PrivateAddress)
+		d.Set("description", staticNAT.Description)
 	}
 
 	d.Set("zone", client.Zone)
@@ -151,6 +158,7 @@ func vpcRouterStaticNATIDHash(routerID string, s *sacloud.VPCRouterStaticNATConf
 	buf.WriteString(fmt.Sprintf("%s-", routerID))
 	buf.WriteString(fmt.Sprintf("%s-", s.GlobalAddress))
 	buf.WriteString(fmt.Sprintf("%s", s.PrivateAddress))
+	buf.WriteString(fmt.Sprintf("%s", s.Description))
 
 	return fmt.Sprintf("%d", hashcode.String(buf.String()))
 }
@@ -160,6 +168,10 @@ func expandVPCRouterStaticNAT(d *schema.ResourceData) *sacloud.VPCRouterStaticNA
 	var staticNAT = &sacloud.VPCRouterStaticNATConfig{
 		GlobalAddress:  d.Get("global_address").(string),
 		PrivateAddress: d.Get("private_address").(string),
+	}
+
+	if desc, ok := d.GetOk("description"); ok {
+		staticNAT.Description = desc.(string)
 	}
 
 	return staticNAT

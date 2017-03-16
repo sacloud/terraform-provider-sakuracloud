@@ -285,6 +285,7 @@ VPCルーターでのスタティックNAT機能を表します。
 | `vpc_router_interface_id` | ◯   | プライベートNIC ID     | -        | 文字列                   | - |
 | `global_address`          | ◯   | グローバル側IPアドレス  | -        | 文字列                   | VPCルーターのIPエイリアスの中のいづれかの値を指定する |
 | `private_address`         | ◯   | プライベート側IPアドレス | -        | 文字列                  | - |
+| `description`             | -   | 説明             | -        | 文字列                  | - |
 | `zone`                    | -   | ゾーン          | -        | `is1b`<br />`tk1a`<br />`tk1v` | - |
 
 
@@ -297,6 +298,7 @@ VPCルーターでのスタティックNAT機能を表します。
 | `vpc_router_interface_id`| プライベートNIC ID | -                    |
 | `global_address`         | グローバル側IPアドレス            | -                    |
 | `private_address`        | プライベート側IPアドレス      | -                     |
+| `description`            | 説明      | -                     |
 | `zone`                   | ゾーン           | -                   |
 
 
@@ -316,6 +318,7 @@ VPCルーターでのポートフォワーディング(Reverse NAT)機能を表�
 | `global_port`             | ◯   | グローバル側ポート番号   | -        | 数値(1〜65535)                   | - |
 | `private_address`         | ◯   | プライベート側IPアドレス | -        | 文字列                          | - |
 | `private_port`            | ◯   | プライベート側ポート番号 | -        | 数値(1〜65535)                  | - |
+| `description`             | -   | 説明             | -        | 文字列                  | - |
 | `zone`                    | -   | ゾーン                 | -        | `is1b`<br />`tk1a`<br />`tk1v` | - |
 
 
@@ -330,6 +333,7 @@ VPCルーターでのポートフォワーディング(Reverse NAT)機能を表�
 | `global_port`            | グローバル側ポート番号   | -                    |
 | `private_address`        | プライベート側IPアドレス  | -                     |
 | `private_port`           | プライベート側ポート番号  | -                     |
+| `description`            | 説明                   | -                     |
 | `zone`                   | ゾーン                 | -                   |
 
 ## `sakuracloud_vpc_router_firewall`
@@ -357,6 +361,8 @@ VPCルーターでのファイアウォール機能を表します。
 | `dest_nw`     | ◯   | 送信元ネットワーク | -       | `xxx.xxx.xxx.xxx`(IP)<br />`xxx.xxx.xxx.xxx/nn`(ネットワーク)<br />`xxx.xxx.xxx.xxx/yyy.yyy.yyy.yyy`(アドレス範囲)  | 空欄の場合はANY |
 | `dest_port`   | ◯   | 宛先ポート        | -        | `0`〜`65535`の整数<br />`xx-yy`(範囲指定)<br />`0xPPPP/0xMMMM`(16進範囲指定) | 空欄の場合はANY |
 | `allow`       | ◯   | アクション        | -        | `true`<br />`false` | `true`の場合ALLOW動作<br />`false`の場合DENY動作 |
+| `logging`     | -   | ログ出力         | -        | `true`<br />`false`    | - |
+| `description` | -   | 説明             | -        | 文字列                  | - |
 
 
 ### 属性
