@@ -53,10 +53,11 @@ type VPCRouterStaticNAT struct {
 type VPCRouterStaticNATConfig struct {
 	GlobalAddress  string `json:",omitempty"` // グローバルIPアドレス
 	PrivateAddress string `json:",omitempty"` // プライベートIPアドレス
+	Description    string `json:",omitempty"` // 説明
 }
 
 // AddStaticNAT スタティックNAT設定 追加
-func (s *VPCRouterSetting) AddStaticNAT(globalAddress string, privateAddress string) {
+func (s *VPCRouterSetting) AddStaticNAT(globalAddress string, privateAddress string, description string) {
 	if s.StaticNAT == nil {
 		s.StaticNAT = &VPCRouterStaticNAT{
 			Enabled: "True",
@@ -70,6 +71,7 @@ func (s *VPCRouterSetting) AddStaticNAT(globalAddress string, privateAddress str
 	s.StaticNAT.Config = append(s.StaticNAT.Config, &VPCRouterStaticNATConfig{
 		GlobalAddress:  globalAddress,
 		PrivateAddress: privateAddress,
+		Description:    description,
 	})
 }
 
@@ -121,10 +123,11 @@ type VPCRouterPortForwardingConfig struct {
 	GlobalPort     string `json:",omitempty"` // グローバル側ポート
 	PrivateAddress string `json:",omitempty"` // プライベートIPアドレス
 	PrivatePort    string `json:",omitempty"` // プライベート側ポート
+	Description    string `json:",omitempty"` // 説明
 }
 
 // AddPortForwarding ポートフォワーディング 追加
-func (s *VPCRouterSetting) AddPortForwarding(protocol string, globalPort string, privateAddress string, privatePort string) {
+func (s *VPCRouterSetting) AddPortForwarding(protocol string, globalPort string, privateAddress string, privatePort string, description string) {
 	if s.PortForwarding == nil {
 		s.PortForwarding = &VPCRouterPortForwarding{
 			Enabled: "True",
@@ -140,6 +143,7 @@ func (s *VPCRouterSetting) AddPortForwarding(protocol string, globalPort string,
 		GlobalPort:     globalPort,
 		PrivateAddress: privateAddress,
 		PrivatePort:    privatePort,
+		Description:    description,
 	})
 }
 
@@ -201,6 +205,8 @@ type VPCRouterFirewallRule struct {
 	SourcePort         string `json:",omitempty"` // 送信元ポート
 	DestinationNetwork string `json:",omitempty"` // 宛先ネットワーク
 	DestinationPort    string `json:",omitempty"` // 宛先ポート
+	Logging            string `json:",omitempty"` // ログ記録
+	Description        string `json:",omitempty"` // 説明
 }
 
 func (s *VPCRouterSetting) addFirewallRule(direction string, rule *VPCRouterFirewallRule) {
@@ -302,11 +308,16 @@ func (s *VPCRouterSetting) isSameRule(r1 *VPCRouterFirewallRule, r2 *VPCRouterFi
 }
 
 // AddFirewallRuleSend 送信ルール 追加
-func (s *VPCRouterSetting) AddFirewallRuleSend(isAllow bool, protocol string, sourceNetwork string, sourcePort string, destNetwork string, destPort string) {
+func (s *VPCRouterSetting) AddFirewallRuleSend(isAllow bool, protocol string, sourceNetwork string, sourcePort string, destNetwork string, destPort string, logging bool, description string) {
 	action := "deny"
 	if isAllow {
 		action = "allow"
 	}
+	strLogging := "False"
+	if logging {
+		strLogging = "True"
+	}
+
 	rule := &VPCRouterFirewallRule{
 		Action:             action,
 		Protocol:           protocol,
@@ -314,6 +325,8 @@ func (s *VPCRouterSetting) AddFirewallRuleSend(isAllow bool, protocol string, so
 		SourcePort:         sourcePort,
 		DestinationNetwork: destNetwork,
 		DestinationPort:    destPort,
+		Logging:            strLogging,
+		Description:        description,
 	}
 
 	s.addFirewallRule("send", rule)
@@ -325,6 +338,7 @@ func (s *VPCRouterSetting) RemoveFirewallRuleSend(isAllow bool, protocol string,
 	if isAllow {
 		action = "allow"
 	}
+
 	rule := &VPCRouterFirewallRule{
 		Action:             action,
 		Protocol:           protocol,
@@ -356,10 +370,14 @@ func (s *VPCRouterSetting) FindFirewallRuleSend(isAllow bool, protocol string, s
 }
 
 // AddFirewallRuleReceive 受信ルール 追加
-func (s *VPCRouterSetting) AddFirewallRuleReceive(isAllow bool, protocol string, sourceNetwork string, sourcePort string, destNetwork string, destPort string) {
+func (s *VPCRouterSetting) AddFirewallRuleReceive(isAllow bool, protocol string, sourceNetwork string, sourcePort string, destNetwork string, destPort string, logging bool, description string) {
 	action := "deny"
 	if isAllow {
 		action = "allow"
+	}
+	strLogging := "False"
+	if logging {
+		strLogging = "True"
 	}
 	rule := &VPCRouterFirewallRule{
 		Action:             action,
@@ -368,6 +386,8 @@ func (s *VPCRouterSetting) AddFirewallRuleReceive(isAllow bool, protocol string,
 		SourcePort:         sourcePort,
 		DestinationNetwork: destNetwork,
 		DestinationPort:    destPort,
+		Logging:            strLogging,
+		Description:        description,
 	}
 
 	s.addFirewallRule("receive", rule)
