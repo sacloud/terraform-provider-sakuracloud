@@ -41,6 +41,10 @@ const (
 	Windows2016RDS
 	// Windows2016RDSOffice OS種別:Windows Server 2016 RDS(Office)
 	Windows2016RDSOffice
+	// Windows2016SQLServerWeb OS種別:Windows Server 2016 SQLServer(Web)
+	Windows2016SQLServerWeb
+	// Windows2016SQLServerStandard OS種別:Windows Server 2016 SQLServer(Standard)
+	Windows2016SQLServerStandard
 	// Custom OS種別:カスタム
 	Custom
 )
@@ -50,7 +54,8 @@ func (o ArchiveOSTypes) IsWindows() bool {
 	switch o {
 	case Windows2008, Windows2008RDS, Windows2008RDSOffice,
 		Windows2012, Windows2012RDS, Windows2012RDSOffice,
-		Windows2016, Windows2016RDS, Windows2016RDSOffice:
+		Windows2016, Windows2016RDS, Windows2016RDSOffice,
+		Windows2016SQLServerWeb, Windows2016SQLServerStandard:
 		return true
 	default:
 		return false
