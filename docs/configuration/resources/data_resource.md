@@ -73,6 +73,8 @@ data sakuracloud_archive "centos" {
 | `windows2016`             | Windows 2016|
 | `windows2016-rds`         | Windows 2016(RDS)|
 | `windows2016-rds-office`  | Windows 2016(RDS + Office)|
+| `windows2016-sql-web`     | Windows 2016 SQLServer(Web)|
+| `windows2016-sql-standard`| Windows 2016 SQLServer(Standard)|
 
 `os_type`に対応していないパブリックアーカイブについては`filter`パラメーターをご利用ください。
 
