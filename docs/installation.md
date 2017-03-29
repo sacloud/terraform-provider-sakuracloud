@@ -6,6 +6,7 @@
 1. [Terraform for さくらのクラウドのセットアップ](#terraform-for-さくらのクラウドのセットアップ)
 1. [さくらのクラウドAPIキーの取得](#さくらのクラウドapiキーの取得)
 1. (付録)[Dockerでの実行](#dockerでの実行)
+1. (付録)[Homebrewでのインストール](#homebrewでのインストール)
 
 ## Terraformのセットアップ
 
@@ -124,3 +125,9 @@ $ docker run -it --rm \
 
 $ docker-compose run --rm terraform apply
 ```
+
+## Homebrewでのインストール
+
+macOSでHomebrewをご利用中の場合、以下のコマンドでTerraform for さくらのクラウドをインストール可能です。
+
+    brew tap sacloud/homebrew-terraform-provider-sakuracloud ; brew install terraform-provider-sakuracloud

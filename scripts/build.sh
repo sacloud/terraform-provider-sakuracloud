@@ -2,11 +2,7 @@
 
 set -e
 
-OS="darwin linux windows"
-ARCH="amd64 386"
-
-rm -Rf bin/
-mkdir bin/
+mkdir -p bin/ 2>/dev/null
 
 for GOOS in $OS; do
     for GOARCH in $ARCH; do
@@ -16,8 +12,14 @@ for GOOS in $OS; do
           binary="${binary}.exe"
         fi
         echo "Building $binary $arch"
-        GOOS=$GOOS GOARCH=$GOARCH CGO_ENABLED=0 govendor build -ldflags "-s -w" -o $binary builtin/bins/provider-sakuracloud/main.go
-        zip -r "bin/terraform-provider-sakuracloud_$arch" $binary
-        rm -f $binary
+        GOOS=$GOOS GOARCH=$GOARCH CGO_ENABLED=0 \
+            go build \
+                -ldflags "$BUILD_LDFLAGS" \
+                -o bin/$binary \
+                builtin/bins/provider-sakuracloud/main.go
+        if [ -n "$ARCHIVE" ]; then
+            (cd bin/; zip -r "terraform-provider-sakuracloud_$arch" $binary)
+            rm -f bin/$binary
+        fi
     done
 done

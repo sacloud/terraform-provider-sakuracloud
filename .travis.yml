@@ -1,6 +1,38 @@
 sudo: required
-language: bash
 services: docker
-
+language: go
+go:
+- 1.8
+env:
+  global:
+  - PATH=/home/travis/gopath/bin:$PATH DEBIAN_FRONTEND=noninteractive
+  - secure: OkhyNJA+v4jwXsWBrOmN6kyt4ld5k+UOU8puRGiyc4NQht8RcBnTla0SZwMXIrZ14XYRcZCv9T8eadtD3nrk5DvDLSGG3byu39Ry7OFpO8YIjfps7wv6h1So9fhud6jmKzMHjRtKt3epO8qa6bCeoQd1XLr6rNRVONnt2wX5i/Y8NbEMFFqFQRXloLXEiqZjIKOYFlx+KAvI/Oq2PEaSsK1CZC4IIZhNvIDdcYVChhauBTPgvHj5zkjLyN9DdAOV5/NzTKp0HVVeJQOt1GxOMGUFjAloFVBbVL6I9wYXPlaGZBVmD7Du/SwyDfNxioIWKjqg5cB6aexM9PiG06RvzA3QudH6fbySVWxHjI5lwqpPl2qBJl0cE89zmHHwSJiiSCrSkOdpWz/7DWyYwsbbSbUW7cuxeWKomy2n7Epa2aHvwq7PmIEe/V+n0e2oUYHBZv7K8suPfRNhlSl3SEb+81+GGYWXQhHU8/u6jKsMv21ByYth38c1QkoO7LYHv7nZaotGHAwRt7KBQPMxgDtzPlmKCA34HwUMp3yHZflRqQt5+KGjRzkjU8T+uLft5JBTuaAinsViZreWDRRPPKrnXmBVy7Sp0dX+0w8EwmhJpOQxaXhi4mgf7dLBmENMbtR7z9uKO6vvJN4PkLsOfPxezsQ2ps7lOB6FrBWdo9TOa74=
+  - secure: rwM26tlLHkxwbJReZA6fUCmsosL3AFexZZOr17wx+7ochNT+zyjTxh34VG2hsCVKzNnTrIpBHJLY+JniV815WVkC0JBlKDGrUkhwLCka2KKZzOzCUVHEJFuZ5zuFgCy1h3mzSiofsWxMMhwCy+Cl756SL8zwhv07vBxrcVSKHHqVlO810yFhNN2d/Cn+mkMkRaQuu3PtbEOKOu2pgW4jeSnl3iLD50rhATAhepKcKsCkvbTNDGsvhcH7xXpmxQL9N4qNDs9EbbpvX2lEFJA+ah9I25LVl/reTQdpYa1W7iFvZEESYhLQ4E3UmrwNEg8txPudkzf9PzkaWxjk6sEBrR88zx1/p0q8dyf2YVTw7HyXXXenkRUtn6eQA2ZrjIjYurfDqxaI6O9sw71ITKJrZjXC9nFxiavEjV1BkhEjU1TOr7k8JLDi3j8d/7NyUTOAA5mmJTPTGYg4VxLoy3QL0akrrjUk9EG60xWAfIU4vg7O6DYUK1ND6J/h8dAR12FBWSqu27xVE+mMhaO3WfOwBQWTliE/Oegkhp/4Qw53dkEgWx4swjINBGBjzv2LKoMgTOCsoz2rTeUFlyjzaP6H4khh8YH7x9uaxcPwg6EJGoKQwnvtcDW7n0qGVd6RMzAh3N7wDB/KaP4hCGUbOY6tyYCExhmuQcW9dad3/sLDPFY=
 script:
-  - make docker-testacc-resource
+- make test
+- make docker-build
+before_deploy:
+- go get github.com/aktau/github-release
+- mkdir -p ~/bin
+- git clone https://github.com/github/hub.git && cd hub && script/build -o ~/bin/hub
+  && cd ..
+- echo $TRAVIS_BRANCH
+- git config --add remote.origin.fetch '+refs/heads/*:refs/remotes/origin/*'
+- git fetch
+- git checkout master || git checkout -b master origin/master
+- git checkout $TRAVIS_BRANCH
+- git fetch --depth=1000
+- git fetch --tags --depth=1000 || true
+deploy:
+- provider: script
+  script: scripts/release.pl --task=upload-to-github-release && scripts/release.pl
+    --task=upload-master-to-github-release && scripts/release_homebrew.sh
+  skip_cleanup: true
+  on:
+    branch: master
+- provider: script
+  script: scripts/release.pl --task=create-pullrequest --current-branch=$TRAVIS_BRANCH
+  skip_cleanup: true
+  on:
+    all_branches: true
+    condition: "$TRAVIS_BRANCH =~ ^bump-version-.*$"

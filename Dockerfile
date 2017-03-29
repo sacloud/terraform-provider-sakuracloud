@@ -1,11 +1,9 @@
-FROM golang:1.8-alpine
+FROM golang:1.8
 LABEL maintainer="Kazumichi Yamamoto <yamamoto.febc@gmail.com>"
 MAINTAINER Kazumichi Yamamoto <yamamoto.febc@gmail.com>
 
-RUN set -x && apk add --no-cache --virtual .build_deps bash git make zip 
-RUN go get -u github.com/kardianos/govendor
+RUN  apt-get update && apt-get -y install bash git make zip && apt-get clean && rm -rf /var/cache/apt/archives/* /var/lib/apt/lists/*
 
 ADD . /go/src/github.com/yamamoto-febc/terraform-provider-sakuracloud
-
 WORKDIR /go/src/github.com/yamamoto-febc/terraform-provider-sakuracloud
 CMD ["make"]
