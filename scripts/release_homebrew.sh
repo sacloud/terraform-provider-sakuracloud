@@ -4,8 +4,8 @@ VERSION=`git log --merges --oneline | perl -ne 'if(m/^.+Merge pull request \#[0-
 SHA256_SRC=`openssl dgst -sha256 bin/terraform-provider-sakuracloud_darwin-amd64.zip | awk '{print $2}'`
 
 # clone
-git clone --depth=50 --branch=master https://github.com/sacloud/homebrew-usacloud.git homebrew-usacloud
-cd homebrew-usacloud
+git clone --depth=50 --branch=master https://github.com/sacloud/homebrew-terraform-provider-sakuracloud.git homebrew-terraform-provider-sakuracloud
+cd homebrew-terraform-provider-sakuracloud
 
 # check version
 CURRENT_VERSION=`git log --oneline | perl -ne 'if(/^.+ v([0-9\.]+)/){print $1;exit}'`
@@ -13,7 +13,7 @@ if [ "$CURRENT_VERSION" = "$VERSION" ] ; then
     exit 0
 fi
 
-cat << EOL > usacloud.rb
+cat << EOL > terraform-provider-sakuracloud.rb
 class TerraformProviderSakuracloud < Formula
 
   _version = "${VERSION}"
