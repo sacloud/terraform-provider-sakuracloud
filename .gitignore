@@ -1,3 +1,4 @@
+.env
 bin/terraform-provider-sakuracloud*
 Godeps/_workspace
 Godeps/README
