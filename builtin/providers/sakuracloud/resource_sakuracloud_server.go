@@ -197,9 +197,6 @@ func resourceSakuraCloudServerCreate(d *schema.ResourceData, meta interface{}) e
 					isNeedEditDisk := false
 					diskEditConfig := client.Disk.NewCondig()
 					if server.Interfaces[0].Switch.Scope == sacloud.ESCopeShared {
-						diskEditConfig.SetUserIPAddress(server.Interfaces[0].IPAddress)
-						diskEditConfig.SetDefaultRoute(server.Interfaces[0].Switch.Subnet.DefaultRoute)
-						diskEditConfig.SetNetworkMaskLen(fmt.Sprintf("%d", server.Interfaces[0].Switch.Subnet.NetworkMaskLen))
 						isNeedEditDisk = true
 					} else {
 						baseIP := forceString(d.Get("base_nw_ipaddress"))
@@ -457,9 +454,6 @@ func resourceSakuraCloudServerUpdate(d *schema.ResourceData, meta interface{}) e
 			isNeedEditDisk := false
 			diskEditConfig := client.Disk.NewCondig()
 			if updatedServer.Interfaces[0].Switch.Scope == sacloud.ESCopeShared {
-				diskEditConfig.SetUserIPAddress(updatedServer.Interfaces[0].IPAddress)
-				diskEditConfig.SetDefaultRoute(updatedServer.Interfaces[0].Switch.Subnet.DefaultRoute)
-				diskEditConfig.SetNetworkMaskLen(fmt.Sprintf("%d", updatedServer.Interfaces[0].Switch.Subnet.NetworkMaskLen))
 				isNeedEditDisk = true
 			} else {
 				baseIP := forceString(d.Get("base_nw_ipaddress"))

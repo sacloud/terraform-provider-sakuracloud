@@ -6,6 +6,7 @@ import (
 	"github.com/hashicorp/terraform/terraform"
 	"github.com/sacloud/libsacloud/api"
 	"github.com/sacloud/libsacloud/sacloud"
+	"regexp"
 	"testing"
 )
 
@@ -33,6 +34,9 @@ func TestAccResourceSakuraCloudServer(t *testing.T) {
 						"sakuracloud_server.foobar", "additional_interfaces.#", "0"),
 					resource.TestCheckResourceAttr(
 						"sakuracloud_server.foobar", "macaddresses.#", "1"),
+					resource.TestMatchResourceAttr("sakuracloud_server.foobar",
+						"base_nw_ipaddress",
+						regexp.MustCompile(".+")), // should be not empty
 				),
 			},
 			resource.TestStep{
@@ -52,6 +56,9 @@ func TestAccResourceSakuraCloudServer(t *testing.T) {
 						"sakuracloud_server.foobar", "additional_interfaces.#", "0"),
 					resource.TestCheckResourceAttr(
 						"sakuracloud_server.foobar", "macaddresses.#", "1"),
+					resource.TestMatchResourceAttr("sakuracloud_server.foobar",
+						"base_nw_ipaddress",
+						regexp.MustCompile(".+")), // should be not empty
 				),
 			},
 		},
