@@ -34,6 +34,10 @@ func dataSourceSakuraCloudDatabase() *schema.Resource {
 				Type:     schema.TypeString,
 				Computed: true,
 			},
+			"plan": &schema.Schema{
+				Type:     schema.TypeString,
+				Computed: true,
+			},
 			"admin_password": &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,

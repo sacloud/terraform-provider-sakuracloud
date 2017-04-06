@@ -82,7 +82,7 @@ func resourceSakuraCloudVPCRouterInterfaceCreate(d *schema.ResourceData, meta in
 	isNeedRestart := vpcRouter.Instance.IsUp()
 
 	if isNeedRestart {
-		for i := 0; i < 3; i++ {
+		for i := 0; i < 30; i++ {
 			if vpcRouter.Instance.IsDown() {
 				break
 			}
@@ -197,7 +197,7 @@ func resourceSakuraCloudVPCRouterInterfaceDelete(d *schema.ResourceData, meta in
 
 	isNeedRestart := vpcRouter.Instance.IsUp()
 	if isNeedRestart {
-		for i := 0; i < 3; i++ {
+		for i := 0; i < 30; i++ {
 			if vpcRouter.Instance.IsDown() {
 				break
 			}
