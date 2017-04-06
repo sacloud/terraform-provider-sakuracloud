@@ -17,7 +17,6 @@ resource "sakuracloud_disk" "disk01" {
 resource "sakuracloud_auto_backup" "foobar" {
     name = "auto_backup"
     disk_id = "${sakuracloud_disk.disk01.id}"
-    backup_hour = 0
     weekdays = ["mon","tue","wed"]
     max_backup_num = 1
     description = "description"
@@ -32,7 +31,6 @@ resource "sakuracloud_auto_backup" "foobar" {
 |-----------------|:---:|--------------------|:--------:|------------------------|----------------------------------------------|
 | `name`          | ◯   | 自動バックアップ名   | -        | 文字列                  | - |
 | `disk_id`       | ◯   | ディスクID         | - | 文字列 | - |
-| `backup_hour`   | -   | バックアップ開始時間 | 0 | `0`<br />`6`<br />`12`<br />`18`<br /> | - |
 | `weekdays`      | ◯   | バックアップ取得曜日 | - | 以下の値のリスト<br />`mon`<br />`tsu`<br />`wed`<br />`thu`<br />`fri`<br />`sat`<br />`sun`|- |
 | `max_backup_num`| -   | 保持世代数         | 1 | 数値 | `1`から`10`までの整数 |
 | `description`   | -   | 説明              | - | 文字列 | - |
@@ -46,7 +44,6 @@ resource "sakuracloud_auto_backup" "foobar" {
 | `id`                | ID               | -                                          |
 | `name`              | 自動バックアップ名               | -                                          |
 | `disk_id`           | ディスクID               | -                                          |
-| `backup_hour`       | バックアップ開始時間               | -                                          |
 | `weekdays`          | バックアップ取得曜日               | -                                          |
 | `max_backup_num`    | 保持世代数               | -                                          |
 | `description`       | 説明               | -                                          |
