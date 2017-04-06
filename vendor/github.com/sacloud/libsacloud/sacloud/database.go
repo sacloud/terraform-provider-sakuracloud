@@ -94,10 +94,26 @@ type DatabaseServer struct {
 type DatabasePlan int
 
 var (
-	// DatabasePlanMini ミニプラン
-	DatabasePlanMini = DatabasePlan(1)
-	// DatabasePlanPremium = DatabasePlan(2)
+	// DatabasePlanMini ミニプラン(後方互換用)
+	DatabasePlanMini = DatabasePlan(10)
+	// DatabasePlan10G
+	DatabasePlan10G = DatabasePlan(10)
+	// DatabasePlan30G
+	DatabasePlan30G = DatabasePlan(30)
+	// DatabasePlan90G
+	DatabasePlan90G = DatabasePlan(90)
+	// DatabasePlan240G
+	DatabasePlan240G = DatabasePlan(240)
 )
+
+func AllowDatabasePlans() []int {
+	return []int{
+		int(DatabasePlan10G),
+		int(DatabasePlan30G),
+		int(DatabasePlan90G),
+		int(DatabasePlan240G),
+	}
+}
 
 // DatabaseBackupSetting バックアップ設定
 type DatabaseBackupSetting struct {
@@ -213,7 +229,7 @@ func CreateNewDatabase(values *CreateDatabaseValue) *Database {
 				},
 			},
 			// Plan
-			propPlanID: propPlanID{Plan: &Resource{ID: int64(values.Plan)}},
+			//propPlanID: propPlanID{Plan: &Resource{ID: int64(values.Plan)}},
 		},
 		// Remark
 		Remark: &DatabaseRemark{
