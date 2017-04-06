@@ -32,6 +32,18 @@ class TerraformProviderSakuracloud < Formula
     bin.install "terraform-provider-sakuracloud"
   end
 
+  def caveats; <<-EOS.undent
+
+    This plugin requires "~/.terraformrc" file.
+    To enable, put following text in "~/.terraformrc":
+
+        providers = {
+            sakuracloud = "terraform-provider-sakuracloud"
+        }
+
+  EOS
+  end
+
   test do
     minimal = testpath/"minimal.tf"
     minimal.write <<-EOS.undent
