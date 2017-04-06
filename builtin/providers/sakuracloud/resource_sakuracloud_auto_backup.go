@@ -29,12 +29,6 @@ func resourceSakuraCloudAutoBackup() *schema.Resource {
 				ForceNew:     true,
 				ValidateFunc: validateSakuracloudIDType,
 			},
-			"backup_hour": &schema.Schema{
-				Type:         schema.TypeInt,
-				Optional:     true,
-				Default:      0,
-				ValidateFunc: validateIntInList(sacloud.AllowAutoBackupHour()),
-			},
 			"weekdays": &schema.Schema{
 				Type:     schema.TypeList,
 				Required: true,
@@ -77,7 +71,6 @@ func resourceSakuraCloudAutoBackupCreate(d *schema.ResourceData, meta interface{
 
 	diskID := d.Get("disk_id").(string)
 	opts := client.AutoBackup.New(d.Get("name").(string), toSakuraCloudID(diskID))
-	opts.SetBackupHour(d.Get("backup_hour").(int))
 	opts.SetBackupMaximumNumberOfArchives(d.Get("max_backup_num").(int))
 	rawWeekdays := d.Get("weekdays").([]interface{})
 	if rawWeekdays != nil {
@@ -120,7 +113,6 @@ func resourceSakuraCloudAutoBackupRead(d *schema.ResourceData, meta interface{})
 
 	d.Set("name", autoBackup.Name)
 	d.Set("disk_id", autoBackup.Status.DiskID)
-	d.Set("backup_hour", autoBackup.Settings.Autobackup.BackupHour)
 	d.Set("max_backup_num", autoBackup.Settings.Autobackup.MaximumNumberOfArchives)
 	d.Set("weekdays", autoBackup.Settings.Autobackup.BackupSpanWeekdays)
 
@@ -143,7 +135,6 @@ func resourceSakuraCloudAutoBackupUpdate(d *schema.ResourceData, meta interface{
 		return fmt.Errorf("Couldn't find SakuraCloud AutoBackup resource: %s", err)
 	}
 
-	autoBackup.SetBackupHour(d.Get("backup_hour").(int))
 	autoBackup.SetBackupMaximumNumberOfArchives(d.Get("max_backup_num").(int))
 	rawWeekdays := d.Get("weekdays").([]interface{})
 	if rawWeekdays != nil {

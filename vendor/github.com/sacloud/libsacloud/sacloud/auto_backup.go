@@ -69,23 +69,12 @@ func AllowAutoBackupWeekdays() []string {
 	return []string{"mon", "tue", "wed", "thu", "fri", "sat", "sun"}
 }
 
-// AllowAutoBackupHour 自動バックアップ実行開始時間リスト
-func AllowAutoBackupHour() []int {
-	return []int{0, 6, 12, 18}
-}
-
 // AutoBackupRecordSets 自動バックアップ定義
 type AutoBackupRecordSets struct {
 	BackupSpanType          string   // バックアップ間隔タイプ
-	BackupHour              int      // バックアップ開始時間
 	BackupSpanWeekdays      []string // バックアップ実施曜日
 	MaximumNumberOfArchives int      // 世代数
 
-}
-
-// SetBackupHour バックアップ開始時間設定
-func (a *AutoBackup) SetBackupHour(hour int) {
-	a.Settings.Autobackup.BackupHour = hour
 }
 
 // SetBackupSpanWeekdays バックアップ実行曜日設定
