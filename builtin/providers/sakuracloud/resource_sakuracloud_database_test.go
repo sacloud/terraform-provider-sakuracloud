@@ -22,11 +22,11 @@ func TestAccResourceSakuraCloudDatabase_WithSwitch(t *testing.T) {
 					testAccCheckSakuraCloudDatabaseExists("sakuracloud_database.foobar", &database),
 					resource.TestCheckResourceAttr("sakuracloud_database.foobar", "database_type", "mariadb"),
 					resource.TestCheckResourceAttr("sakuracloud_database.foobar", "name", "name_before"),
+					resource.TestCheckResourceAttr("sakuracloud_database.foobar", "plan", "30g"),
 					resource.TestCheckResourceAttr("sakuracloud_database.foobar", "description", "description_before"),
 					resource.TestCheckResourceAttr("sakuracloud_database.foobar", "tags.#", "2"),
 					resource.TestCheckResourceAttr("sakuracloud_database.foobar", "tags.0", "hoge1"),
 					resource.TestCheckResourceAttr("sakuracloud_database.foobar", "tags.1", "hoge2"),
-					//resource.TestCheckResourceAttr("sakuracloud_database.foobar", "plan", "mini"),
 					//resource.TestCheckResourceAttr("sakuracloud_database.foobar", "is_double", "false"),
 					resource.TestCheckResourceAttr("sakuracloud_database.foobar", "admin_password", "DatabasePasswordAdmin397"),
 					resource.TestCheckResourceAttr("sakuracloud_database.foobar", "user_name", "defuser"),
@@ -48,11 +48,11 @@ func TestAccResourceSakuraCloudDatabase_WithSwitch(t *testing.T) {
 					testAccCheckSakuraCloudDatabaseExists("sakuracloud_database.foobar", &database),
 					resource.TestCheckResourceAttr("sakuracloud_database.foobar", "database_type", "mariadb"),
 					resource.TestCheckResourceAttr("sakuracloud_database.foobar", "name", "name_after"),
+					resource.TestCheckResourceAttr("sakuracloud_database.foobar", "plan", "30g"),
 					resource.TestCheckResourceAttr("sakuracloud_database.foobar", "description", "description_after"),
 					resource.TestCheckResourceAttr("sakuracloud_database.foobar", "tags.#", "2"),
 					resource.TestCheckResourceAttr("sakuracloud_database.foobar", "tags.0", "hoge1_after"),
 					resource.TestCheckResourceAttr("sakuracloud_database.foobar", "tags.1", "hoge2_after"),
-					//resource.TestCheckResourceAttr("sakuracloud_database.foobar", "plan", "mini"),
 					//resource.TestCheckResourceAttr("sakuracloud_database.foobar", "is_double", "false"),
 					resource.TestCheckResourceAttr("sakuracloud_database.foobar", "admin_password", "DatabasePasswordAdmin397"),
 					resource.TestCheckResourceAttr("sakuracloud_database.foobar", "user_name", "defuser"),
@@ -134,6 +134,7 @@ resource "sakuracloud_switch" "sw" {
 resource "sakuracloud_database" "foobar" {
 
     database_type = "mariadb"
+    plan = "30g"
 
     admin_password = "DatabasePasswordAdmin397"
     user_name = "defuser"
@@ -165,6 +166,7 @@ resource "sakuracloud_switch" "sw" {
 resource "sakuracloud_database" "foobar" {
     database_type = "mariadb"
 
+    plan = "30g"
     admin_password = "DatabasePasswordAdmin397"
     user_name = "defuser"
     user_password = "DatabasePasswordUser397_upd"

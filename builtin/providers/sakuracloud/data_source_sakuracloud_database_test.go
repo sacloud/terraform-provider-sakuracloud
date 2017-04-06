@@ -25,11 +25,9 @@ func TestAccSakuraCloudDatabaseDataSource_Basic(t *testing.T) {
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckSakuraCloudDatabaseDataSourceID("data.sakuracloud_database.foobar"),
 					resource.TestCheckResourceAttr("data.sakuracloud_database.foobar", "name", "name_test"),
+					resource.TestCheckResourceAttr("data.sakuracloud_database.foobar", "plan", "10g"),
 					resource.TestCheckResourceAttr("data.sakuracloud_database.foobar", "description", "description_test"),
 					resource.TestCheckResourceAttr("data.sakuracloud_database.foobar", "tags.#", "3"),
-					resource.TestCheckResourceAttr("data.sakuracloud_database.foobar", "tags.0", "tag1"),
-					resource.TestCheckResourceAttr("data.sakuracloud_database.foobar", "tags.1", "tag2"),
-					resource.TestCheckResourceAttr("data.sakuracloud_database.foobar", "tags.2", "tag3"),
 				),
 			},
 			resource.TestStep{

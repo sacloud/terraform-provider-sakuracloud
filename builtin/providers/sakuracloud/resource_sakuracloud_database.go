@@ -5,6 +5,7 @@ import (
 	"github.com/hashicorp/terraform/helper/schema"
 	"github.com/sacloud/libsacloud/api"
 	"github.com/sacloud/libsacloud/sacloud"
+	"strings"
 )
 
 func resourceSakuraCloudDatabase() *schema.Resource {
@@ -35,13 +36,13 @@ func resourceSakuraCloudDatabase() *schema.Resource {
 			//	Optional: true,
 			//	Default:  false,
 			//},
-			//"plan": &schema.Schema{
-			//	Type:         schema.TypeString,
-			//	ForceNew:     true,
-			//	Optional:     true,
-			//	Default:      "standard",
-			//	ValidateFunc: validateStringInWord([]string{"mini"}),
-			//},
+			"plan": &schema.Schema{
+				Type:         schema.TypeString,
+				ForceNew:     true,
+				Optional:     true,
+				Default:      "10g",
+				ValidateFunc: validateStringInWord([]string{"10g", "30g", "90g", "240g"}),
+			},
 			"admin_password": &schema.Schema{
 				Type:     schema.TypeString,
 				ForceNew: true,
@@ -67,13 +68,6 @@ func resourceSakuraCloudDatabase() *schema.Resource {
 				Default:      5432,
 				ValidateFunc: validateIntegerInRange(1024, 65535),
 			},
-
-			//"backup_rotate": &schema.Schema{
-			//	Type:         schema.TypeInt,
-			//	Optional:     true,
-			//	Default:      8,
-			//	ValidateFunc: validateIntegerInRange(1, 8),
-			//},
 			"backup_time": &schema.Schema{
 				Type:         schema.TypeString,
 				Required:     true,
@@ -169,7 +163,18 @@ func resourceSakuraCloudDatabaseCreate(d *schema.ResourceData, meta interface{})
 	opts.MaskLen = nwMaskLen
 	opts.DefaultRoute = defaultRoute
 
-	opts.Plan = sacloud.DatabasePlanMini
+	//
+	strPlan := d.Get("plan").(string)
+	switch strPlan {
+	case "10g":
+		opts.Plan = sacloud.DatabasePlan10G
+	case "30g":
+		opts.Plan = sacloud.DatabasePlan30G
+	case "90g":
+		opts.Plan = sacloud.DatabasePlan90G
+	case "240g":
+		opts.Plan = sacloud.DatabasePlan240G
+	}
 
 	if description, ok := d.GetOk("description"); ok {
 		opts.Description = description.(string)
@@ -335,6 +340,19 @@ func setDatabaseResourceData(d *schema.ResourceData, client *api.Client, data *s
 	d.Set("user_password", data.Settings.DBConf.Common.DefaultUser)
 	d.Set("user_password", data.Settings.DBConf.Common.UserPassword)
 
+	//plan
+	switch data.Plan.ID {
+	case int64(sacloud.DatabasePlan10G):
+		d.Set("plan", "10g")
+	case int64(sacloud.DatabasePlan30G):
+		d.Set("plan", "30g")
+	case int64(sacloud.DatabasePlan90G):
+		d.Set("plan", "90g")
+	case int64(sacloud.DatabasePlan240G):
+		d.Set("plan", "240g")
+
+	}
+
 	d.Set("allow_networks", data.Settings.DBConf.Common.SourceNetwork)
 	d.Set("port", data.Settings.DBConf.Common.ServicePort)
 
@@ -347,7 +365,13 @@ func setDatabaseResourceData(d *schema.ResourceData, client *api.Client, data *s
 	d.Set("ipaddress1", data.Remark.Servers[0].(map[string]interface{})["IPAddress"])
 
 	d.Set("description", data.Description)
-	d.Set("tags", data.Tags)
+	tags := []string{}
+	for _, t := range data.Tags {
+		if !(strings.HasPrefix(t, "@MariaDB-") || strings.HasPrefix(t, "@postgres-")) {
+			tags = append(tags, t)
+		}
+	}
+	d.Set("tags", tags)
 
 	d.Set("zone", client.Zone)
 	d.SetId(data.GetStrID())
