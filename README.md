@@ -13,10 +13,10 @@ Terraformでさくらのクラウドを操作するためのプラグイン
   - Dockerをインストールしておく
   - さくらのクラウドAPIキーを取得しておく
 
-Dockerがない場合は[Installation / インストール](docs/installation.md)を参考に
+Dockerがない場合は[Installation / インストール](https://yamamoto-febc.github.io/terraform-provider-sakuracloud/installation/)を参考に
 TerraformとTerraform for さくらのクラウドを手元のマシンにインストールしてからご利用ください。
 
-さくらのクラウドAPIキーの取得方法は[こちら](docs/installation.md#さくらのクラウドapiキーの取得)を参照してください。
+さくらのクラウドAPIキーの取得方法は[こちら](https://yamamoto-febc.github.io/terraform-provider-sakuracloud/installation/#api)を参照してください。
 
 ```bash
 #################################################
@@ -59,38 +59,43 @@ $ docker run -it --rm \
          sacloud/terraform apply
 ```
 
+## ドキュメント
+
+* Terraform for さくらのクラウド ドキュメント
+    * https://yamamoto-febc.github.io/terraform-provider-sakuracloud/
+
 ## インストール
 
 [リリースページ](https://github.com/yamamoto-febc/terraform-provider-sakuracloud/releases/latest)から最新のバイナリを取得し、
 Terraformバイナリと同じディレクトリに展開してください。
 
-詳細は[Installation / インストール](docs/installation.md)を参照してください。
+詳細は[Installation / インストール](https://yamamoto-febc.github.io/terraform-provider-sakuracloud/installation/)を参照してください。
 
 ## 使い方/各リソースの設定方法
 
 Terraform定義ファイル(tfファイル)を作成してご利用ください。
 
-設定ファイルの記載方法は[リファレンス](docs/configuration.md)を参照ください。
+設定ファイルの記載方法は[リファレンス](https://yamamoto-febc.github.io/terraform-provider-sakuracloud/#_2)を参照ください。
 
 さくらのクラウドの以下のリソースをサポートしています。
 
 ### サポートしているリソース
 
-  - [サーバー](docs/configuration/resources/server.md)
-  - [ディスク](docs/configuration/resources/disk.md)
-  - [スイッチ](docs/configuration/resources/switch.md)
-  - [ルーター](docs/configuration/resources/internet.md)
-  - [パケットフィルタ](docs/configuration/resources/packet_filter.md)
-  - [ブリッジ](docs/configuration/resources/bridge.md)
-  - [ロードバランサー](docs/configuration/resources/load_balancer.md)
-  - [VPCルーター](docs/configuration/resources/vpc_router.md)
-  - [データベース](docs/configuration/resources/database.md)
-  - [スタートアップスクリプト](docs/configuration/resources/note.md)
-  - [公開鍵](docs/configuration/resources/ssh_key.md)
-  - [DNS](docs/configuration/resources/dns.md)
-  - [GSLB](docs/configuration/resources/gslb.md)
-  - [シンプル監視](docs/configuration/resources/simple_monitor.md)
-  - [自動バックアップ](docs/configuration/resources/auto_backup.md)
+  - [サーバー](https://yamamoto-febc.github.io/terraform-provider-sakuracloud/configuration/resources/server/)
+  - [ディスク](https://yamamoto-febc.github.io/terraform-provider-sakuracloud//configuration/resources/disk/)
+  - [スイッチ](https://yamamoto-febc.github.io/terraform-provider-sakuracloud//configuration/resources/switch/)
+  - [ルーター](https://yamamoto-febc.github.io/terraform-provider-sakuracloud//configuration/resources/internet/)
+  - [パケットフィルタ](https://yamamoto-febc.github.io/terraform-provider-sakuracloud/configuration/resources/packet_filter/)
+  - [ブリッジ](https://yamamoto-febc.github.io/terraform-provider-sakuracloud/configuration/resources/bridge/)
+  - [ロードバランサー](https://yamamoto-febc.github.io/terraform-provider-sakuracloud/configuration/resources/load_balancer/)
+  - [VPCルーター](https://yamamoto-febc.github.io/terraform-provider-sakuracloud/configuration/resources/vpc_router/)
+  - [データベース](https://yamamoto-febc.github.io/terraform-provider-sakuracloud/configuration/resources/database/)
+  - [スタートアップスクリプト](https://yamamoto-febc.github.io/terraform-provider-sakuracloud/configuration/resources/note/)
+  - [公開鍵](https://yamamoto-febc.github.io/terraform-provider-sakuracloud/configuration/resources/ssh_key/)
+  - [DNS](https://yamamoto-febc.github.io/terraform-provider-sakuracloud/configuration/resources/dns/)
+  - [GSLB](https://yamamoto-febc.github.io/terraform-provider-sakuracloud/configuration/resources/gslb/)
+  - [シンプル監視](https://yamamoto-febc.github.io/terraform-provider-sakuracloud/configuration/resources/simple_monitor/)
+  - [自動バックアップ](https://yamamoto-febc.github.io/terraform-provider-sakuracloud/configuration/resources/auto_backup/)
 
 
 ## Building/Developing

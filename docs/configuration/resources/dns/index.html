@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>DNS - Terraform for さくらのクラウド</title>
+  
+
+  <link rel="shortcut icon" href="../../../img/favicon.ico">
+
+  
+  <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
+
+  <link rel="stylesheet" href="../../../css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../css/theme_extra.css" type="text/css" />
+  <link rel="stylesheet" href="../../../css/highlight.css">
+  <link href="../../../css/extra.css" rel="stylesheet">
+
+  
+  <script>
+    // Current page data
+    var mkdocs_page_name = "DNS";
+  </script>
+  
+  <script src="../../../js/jquery-2.1.1.min.js"></script>
+  <script src="../../../js/modernizr-2.8.3.min.js"></script>
+  <script type="text/javascript" src="../../../js/highlight.pack.js"></script>
+  <script src="../../../js/theme.js"></script> 
+
+  
+  <script>
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+      ga('create', 'UA-63739336-5', 'auto');
+      ga('send', 'pageview');
+  </script>
+  
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+      <div class="wy-side-nav-search">
+        <a href="../../.." class="icon icon-home"> Terraform for さくらのクラウド</a>
+        <div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+        <ul class="current">
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="../../..">ホーム</a>
+        
+    </li>
+<li>
+          
+            <li>
+    <ul class="subnav">
+    <li><span>ドキュメント</span></li>
+
+        
+            
+    <li class="toctree-l1 ">
+        <a class="" href="../../../installation/">インストールガイド</a>
+        
+    </li>
+
+        
+            
+    <li class="toctree-l1 ">
+        <a class="" href="../../../articles/">ブログ/記事/読み物</a>
+        
+    </li>
+
+        
+    </ul>
+<li>
+          
+            <li>
+    <ul class="subnav">
+    <li><span>設定リファレンス</span></li>
+
+        
+            
+    <ul class="subnav">
+    <li><span>全体/共通項目</span></li>
+
+        
+            
+    <li class="toctree-l1 ">
+        <a class="" href="../../provider/">プロバイダ</a>
+        
+    </li>
+
+        
+    </ul>
+
+        
+            
+    <ul class="subnav">
+    <li><span>リソース</span></li>
+
+        
+            
+    <li class="toctree-l1 ">
+        <a class="" href="../server/">サーバー</a>
+        
+    </li>
+
+        
+            
+    <li class="toctree-l1 ">
+        <a class="" href="../disk/">ディスク</a>
+        
+    </li>
+
+        
+            
+    <li class="toctree-l1 ">
+        <a class="" href="../switch/">スイッチ</a>
+        
+    </li>
+
+        
+            
+    <li class="toctree-l1 ">
+        <a class="" href="../internet/">ルーター</a>
+        
+    </li>
+
+        
+            
+    <li class="toctree-l1 ">
+        <a class="" href="../packet_filter/">パケットフィルタ</a>
+        
+    </li>
+
+        
+            
+    <li class="toctree-l1 ">
+        <a class="" href="../bridge/">ブリッジ</a>
+        
+    </li>
+
+        
+            
+    <li class="toctree-l1 ">
+        <a class="" href="../load_balancer/">ロードバランサー</a>
+        
+    </li>
+
+        
+            
+    <li class="toctree-l1 ">
+        <a class="" href="../vpc_router/">VPCルーター</a>
+        
+    </li>
+
+        
+            
+    <li class="toctree-l1 ">
+        <a class="" href="../database/">データベース</a>
+        
+    </li>
+
+        
+            
+    <li class="toctree-l1 ">
+        <a class="" href="../note/">スタートアップスクリプト</a>
+        
+    </li>
+
+        
+            
+    <li class="toctree-l1 ">
+        <a class="" href="../ssh_key/">公開鍵</a>
+        
+    </li>
+
+        
+            
+    <li class="toctree-l1 current">
+        <a class="current" href="./">DNS</a>
+        
+            <ul>
+            
+                <li class="toctree-l3"><a href="#dnssakuracloud_dns-record">DNS(sakuracloud_dns / record)</a></li>
+                
+                    <li><a class="toctree-l4" href="#_1">設定例</a></li>
+                
+                    <li><a class="toctree-l4" href="#sakuracloud_dns">sakuracloud_dns</a></li>
+                
+                    <li><a class="toctree-l4" href="#sakuracloud_dns_record">sakuracloud_dns_record</a></li>
+                
+            
+            </ul>
+        
+    </li>
+
+        
+            
+    <li class="toctree-l1 ">
+        <a class="" href="../gslb/">GSLB</a>
+        
+    </li>
+
+        
+            
+    <li class="toctree-l1 ">
+        <a class="" href="../simple_monitor/">シンプル監視</a>
+        
+    </li>
+
+        
+            
+    <li class="toctree-l1 ">
+        <a class="" href="../auto_backup/">自動バックアップ</a>
+        
+    </li>
+
+        
+    </ul>
+
+        
+            
+    <ul class="subnav">
+    <li><span>データソース</span></li>
+
+        
+            
+    <li class="toctree-l1 ">
+        <a class="" href="../data_resource/">データソース</a>
+        
+    </li>
+
+        
+    </ul>
+
+        
+    </ul>
+<li>
+          
+        </ul>
+      </div>
+      &nbsp;
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="../../..">Terraform for さくらのクラウド</a>
+      </nav>
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../../..">Docs</a> &raquo;</li>
+    
+      
+        
+          <li>リソース &raquo;</li>
+        
+      
+    
+    <li>DNS</li>
+    <li class="wy-breadcrumbs-aside">
+      
+        
+      
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main">
+            <div class="section">
+              
+                <h1 id="dnssakuracloud_dns-record">DNS(sakuracloud_dns / record)</h1>
+<hr />
+<p><strong>全ゾーン共通のグローバルリソースです。</strong></p>
+<p><code>sakuracloud_dns</code>がDNSゾーン設定を、<code>sakuracloud_dns_record</code>が対象ゾーン内のレコードを表しています。</p>
+<h3 id="_1">設定例</h3>
+<pre><code class="hcl">resource &quot;sakuracloud_dns&quot; &quot;dns&quot; {
+    zone = &quot;example.com&quot;
+}
+resource &quot;sakuracloud_dns_record&quot; &quot;record01&quot; {
+    dns_id = &quot;${sakuracloud_dns.dns.id}&quot;
+    name = &quot;test1&quot;
+    type = &quot;A&quot;
+    value = &quot;192.168.0.1&quot;
+}
+resource &quot;sakuracloud_dns_record&quot; &quot;record02&quot; {
+    dns_id = &quot;${sakuracloud_dns.dns.id}&quot;
+    name = &quot;test1&quot;
+    type = &quot;A&quot;
+    value = &quot;192.168.0.2&quot;
+}
+</code></pre>
+
+<h2 id="sakuracloud_dns"><code>sakuracloud_dns</code></h2>
+<h3 id="_2">パラメーター</h3>
+<table>
+<thead>
+<tr>
+<th>パラメーター</th>
+<th align="center">必須</th>
+<th>名称</th>
+<th align="center">初期値</th>
+<th>設定値</th>
+<th>補足</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>zone</code></td>
+<td align="center">◯</td>
+<td>対象DNSゾーン</td>
+<td align="center">-</td>
+<td>文字列</td>
+<td>-</td>
+</tr>
+<tr>
+<td><code>description</code></td>
+<td align="center">-</td>
+<td>説明</td>
+<td align="center">-</td>
+<td>文字列</td>
+<td>-</td>
+</tr>
+<tr>
+<td><code>tags</code></td>
+<td align="center">-</td>
+<td>タグ</td>
+<td align="center">-</td>
+<td>リスト(文字列)</td>
+<td>-</td>
+</tr>
+</tbody>
+</table>
+<h3 id="_3">属性</h3>
+<table>
+<thead>
+<tr>
+<th>属性名</th>
+<th>名称</th>
+<th>補足</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>id</code></td>
+<td>ID</td>
+<td>-</td>
+</tr>
+<tr>
+<td><code>zone</code></td>
+<td>対象DNSゾーン</td>
+<td>-</td>
+</tr>
+<tr>
+<td><code>description</code></td>
+<td>説明</td>
+<td>-</td>
+</tr>
+<tr>
+<td><code>tags</code></td>
+<td>タグ</td>
+<td>-</td>
+</tr>
+<tr>
+<td><code>dns_servers</code></td>
+<td>DNSサーバー</td>
+<td>対象DNSゾーンの委譲先となるネームサーバーのリスト</td>
+</tr>
+</tbody>
+</table>
+<h2 id="sakuracloud_dns_record"><code>sakuracloud_dns_record</code></h2>
+<h3 id="_4">パラメーター</h3>
+<table>
+<thead>
+<tr>
+<th>パラメーター</th>
+<th align="center">必須</th>
+<th>名称</th>
+<th align="center">初期値</th>
+<th>設定値</th>
+<th>補足</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>dns_id</code></td>
+<td align="center">◯</td>
+<td>DNSゾーンID</td>
+<td align="center">-</td>
+<td>文字列</td>
+<td>対象DNSゾーンのID</td>
+</tr>
+<tr>
+<td><code>name</code></td>
+<td align="center">◯</td>
+<td>レコード名</td>
+<td align="center">-</td>
+<td><code>ホスト名</code><br /><code>@</code></td>
+<td>英字（小文字）,数字,一部記号（-.@_*）,1～63文字, @は当該ゾーンを示す。</td>
+</tr>
+<tr>
+<td><code>type</code></td>
+<td align="center">◯</td>
+<td>タイプ</td>
+<td align="center">-</td>
+<td><code>A</code><br /><code>AAAA</code><br /><code>NS</code><br /><code>CNAME</code><br /><code>MX</code><br /><code>TXT</code><br /><code>SRV</code></td>
+<td>-</td>
+</tr>
+<tr>
+<td><code>value</code></td>
+<td align="center">◯</td>
+<td>値</td>
+<td align="center">-</td>
+<td>文字列</td>
+<td>タイプ<code>A</code>:IPアドレス<br />タイプ<code>AAAA</code>:IPv6アドレス<br /><code>NS</code>:一部記号（<em>）, 末尾ピリオド, 1～63文字<br />タイプ<code>CNAME</code>:一部記号（</em>）, 末尾ピリオド, 1～63文字<br />タイプ<code>MX</code>:一部記号（<em>）, 末尾ピリオド, 1～63文字<br />タイプ<code>TXT</code>:英字, 数字, 半角スペース, 一部記号, 1～255文字<br />タイプ<code>SRV</code>:一部記号（</em>.-）, 末尾ピリオド, 1～63文字</td>
+</tr>
+<tr>
+<td><code>ttl</code></td>
+<td align="center">-</td>
+<td>TTL</td>
+<td align="center"><code>3600</code></td>
+<td>数値</td>
+<td><code>10</code>～<code>3600000</code>秒</td>
+</tr>
+<tr>
+<td><code>priority</code></td>
+<td align="center">-</td>
+<td>プライオリティ</td>
+<td align="center"><code>10</code></td>
+<td>数値</td>
+<td>タイプが<code>MX</code>、<code>SRV</code>の場合のみ有効。<code>1</code>〜<code>65535</code></td>
+</tr>
+<tr>
+<td><code>weight</code></td>
+<td align="center">-</td>
+<td>重み</td>
+<td align="center">-</td>
+<td>数値</td>
+<td>タイプが<code>SRV</code>の場合のみ有効。<code>0</code>〜<code>65535</code></td>
+</tr>
+<tr>
+<td><code>port</code></td>
+<td align="center">-</td>
+<td>ポート</td>
+<td align="center">-</td>
+<td>数値</td>
+<td>タイプが<code>SRV</code>の場合のみ有効。<code>1</code>〜<code>65535</code></td>
+</tr>
+</tbody>
+</table>
+<h3 id="_5">属性</h3>
+<table>
+<thead>
+<tr>
+<th>属性名</th>
+<th>名称</th>
+<th>補足</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>id</code></td>
+<td>ID</td>
+<td>-</td>
+</tr>
+<tr>
+<td><code>dns_id</code></td>
+<td>DNSゾーンID</td>
+<td>-</td>
+</tr>
+<tr>
+<td><code>name</code></td>
+<td>レコード名</td>
+<td>-</td>
+</tr>
+<tr>
+<td><code>type</code></td>
+<td>タイプ</td>
+<td>-</td>
+</tr>
+<tr>
+<td><code>value</code></td>
+<td>値</td>
+<td>-</td>
+</tr>
+<tr>
+<td><code>ttl</code></td>
+<td>TTL</td>
+<td>-</td>
+</tr>
+<tr>
+<td><code>priority</code></td>
+<td>プライオリティ</td>
+<td>-</td>
+</tr>
+<tr>
+<td><code>weight</code></td>
+<td>重み</td>
+<td>-</td>
+</tr>
+<tr>
+<td><code>port</code></td>
+<td>ポート</td>
+<td>-</td>
+</tr>
+</tbody>
+</table>
+              
+            </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="../gslb/" class="btn btn-neutral float-right" title="GSLB"/>Next <span class="icon icon-circle-arrow-right"></span></a>
+      
+      
+        <a href="../ssh_key/" class="btn btn-neutral" title="公開鍵"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+    
+      <p>Copyright (C) 2017 Kazumichi Yamamoto.</p>
+    
+  </div>
+
+  Built with <a href="http://www.mkdocs.org">MkDocs</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+	  
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+<div class="rst-versions" role="note" style="cursor: pointer">
+    <span class="rst-current-version" data-toggle="rst-current-version">
+      
+      
+        <span><a href="../ssh_key/" style="color: #fcfcfc;">&laquo; Previous</a></span>
+      
+      
+        <span style="margin-left: 15px"><a href="../gslb/" style="color: #fcfcfc">Next &raquo;</a></span>
+      
+    </span>
+</div>
+
+</body>
+</html>

@@ -68,6 +68,13 @@ vet: fmt
 fmt:
 	gofmt -w $(GOFMT_FILES)
 
+.PHONY: build-docs serve-docs
+build-docs:
+	sh -c "'$(CURDIR)/scripts/build_docs.sh'"
+
+serve-docs:
+	sh -c "'$(CURDIR)/scripts/serve_docs.sh'"
+
 docker-test: 
 	sh -c "'$(CURDIR)/scripts/build_on_docker.sh' 'test'"
 

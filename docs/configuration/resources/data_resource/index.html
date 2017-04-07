@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>データソース - Terraform for さくらのクラウド</title>
+  
+
+  <link rel="shortcut icon" href="../../../img/favicon.ico">
+
+  
+  <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
+
+  <link rel="stylesheet" href="../../../css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../css/theme_extra.css" type="text/css" />
+  <link rel="stylesheet" href="../../../css/highlight.css">
+  <link href="../../../css/extra.css" rel="stylesheet">
+
+  
+  <script>
+    // Current page data
+    var mkdocs_page_name = "データソース";
+  </script>
+  
+  <script src="../../../js/jquery-2.1.1.min.js"></script>
+  <script src="../../../js/modernizr-2.8.3.min.js"></script>
+  <script type="text/javascript" src="../../../js/highlight.pack.js"></script>
+  <script src="../../../js/theme.js"></script> 
+
+  
+  <script>
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+      ga('create', 'UA-63739336-5', 'auto');
+      ga('send', 'pageview');
+  </script>
+  
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+      <div class="wy-side-nav-search">
+        <a href="../../.." class="icon icon-home"> Terraform for さくらのクラウド</a>
+        <div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+        <ul class="current">
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="../../..">ホーム</a>
+        
+    </li>
+<li>
+          
+            <li>
+    <ul class="subnav">
+    <li><span>ドキュメント</span></li>
+
+        
+            
+    <li class="toctree-l1 ">
+        <a class="" href="../../../installation/">インストールガイド</a>
+        
+    </li>
+
+        
+            
+    <li class="toctree-l1 ">
+        <a class="" href="../../../articles/">ブログ/記事/読み物</a>
+        
+    </li>
+
+        
+    </ul>
+<li>
+          
+            <li>
+    <ul class="subnav">
+    <li><span>設定リファレンス</span></li>
+
+        
+            
+    <ul class="subnav">
+    <li><span>全体/共通項目</span></li>
+
+        
+            
+    <li class="toctree-l1 ">
+        <a class="" href="../../provider/">プロバイダ</a>
+        
+    </li>
+
+        
+    </ul>
+
+        
+            
+    <ul class="subnav">
+    <li><span>リソース</span></li>
+
+        
+            
+    <li class="toctree-l1 ">
+        <a class="" href="../server/">サーバー</a>
+        
+    </li>
+
+        
+            
+    <li class="toctree-l1 ">
+        <a class="" href="../disk/">ディスク</a>
+        
+    </li>
+
+        
+            
+    <li class="toctree-l1 ">
+        <a class="" href="../switch/">スイッチ</a>
+        
+    </li>
+
+        
+            
+    <li class="toctree-l1 ">
+        <a class="" href="../internet/">ルーター</a>
+        
+    </li>
+
+        
+            
+    <li class="toctree-l1 ">
+        <a class="" href="../packet_filter/">パケットフィルタ</a>
+        
+    </li>
+
+        
+            
+    <li class="toctree-l1 ">
+        <a class="" href="../bridge/">ブリッジ</a>
+        
+    </li>
+
+        
+            
+    <li class="toctree-l1 ">
+        <a class="" href="../load_balancer/">ロードバランサー</a>
+        
+    </li>
+
+        
+            
+    <li class="toctree-l1 ">
+        <a class="" href="../vpc_router/">VPCルーター</a>
+        
+    </li>
+
+        
+            
+    <li class="toctree-l1 ">
+        <a class="" href="../database/">データベース</a>
+        
+    </li>
+
+        
+            
+    <li class="toctree-l1 ">
+        <a class="" href="../note/">スタートアップスクリプト</a>
+        
+    </li>
+
+        
+            
+    <li class="toctree-l1 ">
+        <a class="" href="../ssh_key/">公開鍵</a>
+        
+    </li>
+
+        
+            
+    <li class="toctree-l1 ">
+        <a class="" href="../dns/">DNS</a>
+        
+    </li>
+
+        
+            
+    <li class="toctree-l1 ">
+        <a class="" href="../gslb/">GSLB</a>
+        
+    </li>
+
+        
+            
+    <li class="toctree-l1 ">
+        <a class="" href="../simple_monitor/">シンプル監視</a>
+        
+    </li>
+
+        
+            
+    <li class="toctree-l1 ">
+        <a class="" href="../auto_backup/">自動バックアップ</a>
+        
+    </li>
+
+        
+    </ul>
+
+        
+            
+    <ul class="subnav">
+    <li><span>データソース</span></li>
+
+        
+            
+    <li class="toctree-l1 current">
+        <a class="current" href="./">データソース</a>
+        
+            <ul>
+            
+                <li class="toctree-l3"><a href="#_1">データソース</a></li>
+                
+                    <li><a class="toctree-l4" href="#_2">利用例</a></li>
+                
+                    <li><a class="toctree-l4" href="#_3">パラメーター(全データソース共通)</a></li>
+                
+                    <li><a class="toctree-l4" href="#_4">パラメーター(アーカイブのみ)</a></li>
+                
+                    <li><a class="toctree-l4" href="#_5">サポートしているデータソース</a></li>
+                
+            
+            </ul>
+        
+    </li>
+
+        
+    </ul>
+
+        
+    </ul>
+<li>
+          
+        </ul>
+      </div>
+      &nbsp;
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="../../..">Terraform for さくらのクラウド</a>
+      </nav>
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../../..">Docs</a> &raquo;</li>
+    
+      
+        
+          <li>データソース &raquo;</li>
+        
+      
+    
+    <li>データソース</li>
+    <li class="wy-breadcrumbs-aside">
+      
+        
+      
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main">
+            <div class="section">
+              
+                <h1 id="_1">データソース</h1>
+<hr />
+<p>データソース(Data Resource)とは、読み取り専用のリソースです。
+すでにさくらのクラウド上に存在するリソースの値を参照するために用います。</p>
+<p>以下の例ではディスクのコピー元アーカイブのIDを参照するために
+<code>sakuracloud_archive</code>データソースを利用しています。</p>
+<p>データソースを利用することで<code>sakuracloud_disk</code>の定義中にアーカイブのIDを直接指定しないように出来ます。</p>
+<h3 id="_2">利用例</h3>
+<pre><code class="hcl">data sakuracloud_archive &quot;ubuntu&quot; {
+    filter = {
+        name = &quot;Name&quot;
+        values = [&quot;Ubuntu Server&quot;]
+    }
+    filter = {
+        name = &quot;Tags&quot;
+        values = [&quot;current-stable&quot;,&quot;arch-64bit&quot;,&quot;os-linux&quot;]
+    }
+}
+
+resource sakuracloud_disk &quot;disk01&quot;{
+    name = &quot;disk01&quot;
+    source_archive_id = &quot;${data.sakuracloud_archive.ubuntu.id}&quot;
+}
+</code></pre>
+
+<h3 id="_3">パラメーター(全データソース共通)</h3>
+<table>
+<thead>
+<tr>
+<th>パラメーター</th>
+<th align="center">必須</th>
+<th>名称</th>
+<th align="center">初期値</th>
+<th>設定値</th>
+<th>補足</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>filter</code></td>
+<td align="center">-</td>
+<td>検索条件</td>
+<td align="center">-</td>
+<td>-</td>
+<td><code>name</code>に検索対象の属性名、<code>values</code>に検索値をリストで指定します。<br /><code>values</code>に複数の値が設定されている場合、AND条件となります。</td>
+</tr>
+<tr>
+<td><code>zone</code></td>
+<td align="center">-</td>
+<td>ゾーン</td>
+<td align="center">-</td>
+<td><code>is1b</code><br /><code>tk1a</code><br /><code>tk1v</code></td>
+<td>-</td>
+</tr>
+</tbody>
+</table>
+<p><code>filter</code>の<code>name</code>属性に指定可能な値は<a href="http://developer.sakura.ad.jp/cloud/api/1.1/">さくらのクラウド APIドキュメント</a>を参照ください。</p>
+<h3 id="_4">パラメーター(アーカイブのみ)</h3>
+<p>アーカイブ(<code>sakuracloud_archive</code>)リソースでは、<code>os_type</code>パラメーターが利用可能です。</p>
+<pre><code class="hcl">data sakuracloud_archive &quot;ubuntu&quot; {
+    os_type = &quot;ubuntu&quot; # Ubuntuの最新安定版パブリックアーカイブ
+}
+
+data sakuracloud_archive &quot;centos&quot; {
+    os_type = &quot;centos&quot; # CentOSの最新安定版パブリックアーカイブ
+}
+
+</code></pre>
+
+<p><code>os_type</code>に指定可能な値は以下の通りです。</p>
+<table>
+<thead>
+<tr>
+<th>値</th>
+<th>詳細</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>centos</code></td>
+<td>CentOS 7</td>
+</tr>
+<tr>
+<td><code>ubuntu</code></td>
+<td>Ubuntu 16.04</td>
+</tr>
+<tr>
+<td><code>debian</code></td>
+<td>Debian</td>
+</tr>
+<tr>
+<td><code>vyos</code></td>
+<td>VyOS</td>
+</tr>
+<tr>
+<td><code>coreos</code></td>
+<td>CoreOS</td>
+</tr>
+<tr>
+<td><code>kusanagi</code></td>
+<td>Kusanagi(CentOS7)</td>
+</tr>
+<tr>
+<td><code>site-guard</code></td>
+<td>SiteGuard(CentOS7)</td>
+</tr>
+<tr>
+<td><code>freebsd</code></td>
+<td>FreeBSD</td>
+</tr>
+<tr>
+<td><code>windows2008</code></td>
+<td>Windows 2008</td>
+</tr>
+<tr>
+<td><code>windows2008-rds</code></td>
+<td>Windows 2008(RDS)</td>
+</tr>
+<tr>
+<td><code>windows2008-rds-office</code></td>
+<td>Windows 2008(RDS + Office)</td>
+</tr>
+<tr>
+<td><code>windows2012</code></td>
+<td>Windows 2012</td>
+</tr>
+<tr>
+<td><code>windows2012-rds</code></td>
+<td>Windows 2012(RDS)</td>
+</tr>
+<tr>
+<td><code>windows2012-rds-office</code></td>
+<td>Windows 2012(RDS + Office)</td>
+</tr>
+<tr>
+<td><code>windows2016</code></td>
+<td>Windows 2016</td>
+</tr>
+<tr>
+<td><code>windows2016-rds</code></td>
+<td>Windows 2016(RDS)</td>
+</tr>
+<tr>
+<td><code>windows2016-rds-office</code></td>
+<td>Windows 2016(RDS + Office)</td>
+</tr>
+<tr>
+<td><code>windows2016-sql-web</code></td>
+<td>Windows 2016 SQLServer(Web)</td>
+</tr>
+<tr>
+<td><code>windows2016-sql-standard</code></td>
+<td>Windows 2016 SQLServer(Standard)</td>
+</tr>
+</tbody>
+</table>
+<p><code>os_type</code>に対応していないパブリックアーカイブについては<code>filter</code>パラメーターをご利用ください。</p>
+<h3 id="_5">サポートしているデータソース</h3>
+<p>データソースそれぞれの属性はリソースごとに異なります。
+詳細は各リソースのドキュメントを参照してください。</p>
+<table>
+<thead>
+<tr>
+<th>データソース</th>
+<th>名称</th>
+<th>補足</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>sakuracloud_archive</code></td>
+<td>アーカイブ</td>
+<td>-</td>
+</tr>
+<tr>
+<td><code>sakuracloud_bridge</code></td>
+<td>ブリッジ</td>
+<td>-</td>
+</tr>
+<tr>
+<td><code>sakuracloud_cdrom</code></td>
+<td>ISOイメージ</td>
+<td>-</td>
+</tr>
+<tr>
+<td><code>sakuracloud_database</code></td>
+<td>データベース</td>
+<td>-</td>
+</tr>
+<tr>
+<td><code>sakuracloud_disk</code></td>
+<td>ディスク</td>
+<td>-</td>
+</tr>
+<tr>
+<td><code>sakuracloud_dns</code></td>
+<td>DNS</td>
+<td>-</td>
+</tr>
+<tr>
+<td><code>sakuracloud_gslb</code></td>
+<td>GSLB</td>
+<td>-</td>
+</tr>
+<tr>
+<td><code>sakuracloud_internet</code></td>
+<td>ルーター</td>
+<td>-</td>
+</tr>
+<tr>
+<td><code>sakuracloud_note</code></td>
+<td>スタートアップスクリプト</td>
+<td>-</td>
+</tr>
+<tr>
+<td><code>sakuracloud_packet_filter</code></td>
+<td>パケットフィルタ</td>
+<td>-</td>
+</tr>
+<tr>
+<td><code>sakuracloud_server</code></td>
+<td>サーバー</td>
+<td>-</td>
+</tr>
+<tr>
+<td><code>sakuracloud_simple_monitor</code></td>
+<td>シンプル監視</td>
+<td>-</td>
+</tr>
+<tr>
+<td><code>sakuracloud_ssh_key</code></td>
+<td>公開鍵</td>
+<td>-</td>
+</tr>
+<tr>
+<td><code>sakuracloud_switch</code></td>
+<td>スイッチ</td>
+<td>-</td>
+</tr>
+</tbody>
+</table>
+              
+            </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+      
+        <a href="../auto_backup/" class="btn btn-neutral" title="自動バックアップ"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+    
+      <p>Copyright (C) 2017 Kazumichi Yamamoto.</p>
+    
+  </div>
+
+  Built with <a href="http://www.mkdocs.org">MkDocs</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+	  
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+<div class="rst-versions" role="note" style="cursor: pointer">
+    <span class="rst-current-version" data-toggle="rst-current-version">
+      
+      
+        <span><a href="../auto_backup/" style="color: #fcfcfc;">&laquo; Previous</a></span>
+      
+      
+    </span>
+</div>
+
+</body>
+</html>
