@@ -96,6 +96,7 @@ Terraform定義ファイル(tfファイル)を作成してご利用ください�
   - [GSLB](https://yamamoto-febc.github.io/terraform-provider-sakuracloud/configuration/resources/gslb/)
   - [シンプル監視](https://yamamoto-febc.github.io/terraform-provider-sakuracloud/configuration/resources/simple_monitor/)
   - [自動バックアップ](https://yamamoto-febc.github.io/terraform-provider-sakuracloud/configuration/resources/auto_backup/)
+  - [データソース](http://yamamoto-febc.github.io/terraform-provider-sakuracloud/configuration/resources/data_resource/)
 
 
 ## Building/Developing

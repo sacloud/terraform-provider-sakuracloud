@@ -53,12 +53,12 @@ sub DEBUG() { $ENV{RELEASE_DEBUG} || $verbose }
 
 sub command {
     say('+ '. join ' ', @_) if DEBUG;
-    my @args = (@_ , ("2>&1","> /dev/null"));
+    my @args = (@_ , ("> /dev/null","2>&1"));
     !system("@args") or croak $!;
 }
 sub command_with_exit_code {
     say('+ '. join ' ', @_) if DEBUG;
-    my @args = (@_ , ("2>&1","> /dev/null"));
+    my @args = (@_ , ("> /dev/null","2>&1"));
     system("@args");
 }
 sub _git {
