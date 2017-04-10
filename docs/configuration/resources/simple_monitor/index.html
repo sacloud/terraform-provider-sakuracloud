@@ -1,0 +1,611 @@
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>シンプル監視 - Terraform for さくらのクラウド</title>
+  
+
+  <link rel="shortcut icon" href="../../../img/favicon.ico">
+
+  
+  <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
+
+  <link rel="stylesheet" href="../../../css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../css/theme_extra.css" type="text/css" />
+  <link rel="stylesheet" href="../../../css/highlight.css">
+  <link href="../../../css/extra.css" rel="stylesheet">
+
+  
+  <script>
+    // Current page data
+    var mkdocs_page_name = "シンプル監視";
+  </script>
+  
+  <script src="../../../js/jquery-2.1.1.min.js"></script>
+  <script src="../../../js/modernizr-2.8.3.min.js"></script>
+  <script type="text/javascript" src="../../../js/highlight.pack.js"></script>
+  <script src="../../../js/theme.js"></script> 
+
+  
+  <script>
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+      ga('create', 'UA-63739336-5', 'auto');
+      ga('send', 'pageview');
+  </script>
+  
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+      <div class="wy-side-nav-search">
+        <a href="../../.." class="icon icon-home"> Terraform for さくらのクラウド</a>
+        <div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+        <ul class="current">
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="../../..">ホーム</a>
+        
+    </li>
+<li>
+          
+            <li>
+    <ul class="subnav">
+    <li><span>ドキュメント</span></li>
+
+        
+            
+    <li class="toctree-l1 ">
+        <a class="" href="../../../installation/">インストールガイド</a>
+        
+    </li>
+
+        
+            
+    <li class="toctree-l1 ">
+        <a class="" href="../../../articles/">ブログ/記事/読み物</a>
+        
+    </li>
+
+        
+    </ul>
+<li>
+          
+            <li>
+    <ul class="subnav">
+    <li><span>設定リファレンス</span></li>
+
+        
+            
+    <ul class="subnav">
+    <li><span>全体/共通項目</span></li>
+
+        
+            
+    <li class="toctree-l1 ">
+        <a class="" href="../../provider/">プロバイダ</a>
+        
+    </li>
+
+        
+    </ul>
+
+        
+            
+    <ul class="subnav">
+    <li><span>リソース</span></li>
+
+        
+            
+    <li class="toctree-l1 ">
+        <a class="" href="../server/">サーバー</a>
+        
+    </li>
+
+        
+            
+    <li class="toctree-l1 ">
+        <a class="" href="../disk/">ディスク</a>
+        
+    </li>
+
+        
+            
+    <li class="toctree-l1 ">
+        <a class="" href="../switch/">スイッチ</a>
+        
+    </li>
+
+        
+            
+    <li class="toctree-l1 ">
+        <a class="" href="../internet/">ルーター</a>
+        
+    </li>
+
+        
+            
+    <li class="toctree-l1 ">
+        <a class="" href="../packet_filter/">パケットフィルタ</a>
+        
+    </li>
+
+        
+            
+    <li class="toctree-l1 ">
+        <a class="" href="../bridge/">ブリッジ</a>
+        
+    </li>
+
+        
+            
+    <li class="toctree-l1 ">
+        <a class="" href="../load_balancer/">ロードバランサー</a>
+        
+    </li>
+
+        
+            
+    <li class="toctree-l1 ">
+        <a class="" href="../vpc_router/">VPCルーター</a>
+        
+    </li>
+
+        
+            
+    <li class="toctree-l1 ">
+        <a class="" href="../database/">データベース</a>
+        
+    </li>
+
+        
+            
+    <li class="toctree-l1 ">
+        <a class="" href="../note/">スタートアップスクリプト</a>
+        
+    </li>
+
+        
+            
+    <li class="toctree-l1 ">
+        <a class="" href="../ssh_key/">公開鍵</a>
+        
+    </li>
+
+        
+            
+    <li class="toctree-l1 ">
+        <a class="" href="../dns/">DNS</a>
+        
+    </li>
+
+        
+            
+    <li class="toctree-l1 ">
+        <a class="" href="../gslb/">GSLB</a>
+        
+    </li>
+
+        
+            
+    <li class="toctree-l1 current">
+        <a class="current" href="./">シンプル監視</a>
+        
+            <ul>
+            
+                <li class="toctree-l3"><a href="#sakuracloud_simple_monitor">シンプル監視(sakuracloud_simple_monitor)</a></li>
+                
+                    <li><a class="toctree-l4" href="#_1">設定例</a></li>
+                
+                    <li><a class="toctree-l4" href="#_2">パラメーター</a></li>
+                
+                    <li><a class="toctree-l4" href="#_3">属性</a></li>
+                
+            
+            </ul>
+        
+    </li>
+
+        
+            
+    <li class="toctree-l1 ">
+        <a class="" href="../auto_backup/">自動バックアップ</a>
+        
+    </li>
+
+        
+    </ul>
+
+        
+            
+    <ul class="subnav">
+    <li><span>データソース</span></li>
+
+        
+            
+    <li class="toctree-l1 ">
+        <a class="" href="../data_resource/">データソース</a>
+        
+    </li>
+
+        
+    </ul>
+
+        
+    </ul>
+<li>
+          
+        </ul>
+      </div>
+      &nbsp;
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="../../..">Terraform for さくらのクラウド</a>
+      </nav>
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../../..">Docs</a> &raquo;</li>
+    
+      
+        
+          <li>リソース &raquo;</li>
+        
+      
+    
+    <li>シンプル監視</li>
+    <li class="wy-breadcrumbs-aside">
+      
+        
+      
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main">
+            <div class="section">
+              
+                <h1 id="sakuracloud_simple_monitor">シンプル監視(sakuracloud_simple_monitor)</h1>
+<hr />
+<h3 id="_1">設定例</h3>
+<pre><code class="hcl">resource &quot;sakuracloud_simple_monitor&quot; &quot;mymonitor&quot; {
+    target = &quot;${sakuracloud_server.myserver.base_nw_ipaddress}&quot;
+    health_check = {
+        protocol = &quot;http&quot;
+        delay_loop = 60
+        path = &quot;/&quot;
+        status = &quot;200&quot;
+    }
+    notify_email_enabled = true
+    notify_email_html = true
+    notify_slack_enabled = true
+    notify_slack_webhook = &quot;https://hooks.slack.com/services/XXXXXXXXX/XXXXXXXXX/XXXXXXXXXXXXXXXXXXXXXXXX&quot;
+}
+</code></pre>
+
+<h3 id="_2">パラメーター</h3>
+<table>
+<thead>
+<tr>
+<th>パラメーター</th>
+<th align="center">必須</th>
+<th>名称</th>
+<th align="center">初期値</th>
+<th>設定値</th>
+<th>補足</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>target</code></td>
+<td align="center">◯</td>
+<td>監視対象名(IPアドレス)</td>
+<td align="center">-</td>
+<td>文字列</td>
+<td>監視対象のFQDNまたはIPアドレス</td>
+</tr>
+<tr>
+<td><code>health_check</code></td>
+<td align="center">◯</td>
+<td>監視方法</td>
+<td align="center">-</td>
+<td>マップ</td>
+<td>詳細は<a href="#health_check"><code>health_check</code></a>を参照</td>
+</tr>
+<tr>
+<td><code>description</code></td>
+<td align="center">-</td>
+<td>説明</td>
+<td align="center">-</td>
+<td>文字列</td>
+<td>-</td>
+</tr>
+<tr>
+<td><code>tags</code></td>
+<td align="center">-</td>
+<td>タグ</td>
+<td align="center">-</td>
+<td>リスト(文字列)</td>
+<td>-</td>
+</tr>
+<tr>
+<td><code>notify_email_enabled</code></td>
+<td align="center">-</td>
+<td>Eメール通知有効</td>
+<td align="center"><code>true</code></td>
+<td><code>true</code><br /><code>false</code></td>
+<td>-</td>
+</tr>
+<tr>
+<td><code>notify_email_html</code></td>
+<td align="center">-</td>
+<td>HTMLメール有効</td>
+<td align="center"><code>false</code></td>
+<td><code>true</code><br /><code>false</code></td>
+<td>-</td>
+</tr>
+<tr>
+<td><code>notify_slack_enabled</code></td>
+<td align="center">-</td>
+<td>Slack通知有効</td>
+<td align="center"><code>false</code></td>
+<td><code>true</code><br /><code>false</code></td>
+<td>-</td>
+</tr>
+<tr>
+<td><code>notify_slack_webhook</code></td>
+<td align="center">-</td>
+<td>Slack WebhookURL</td>
+<td align="center">-</td>
+<td>文字列</td>
+<td>-</td>
+</tr>
+<tr>
+<td><code>enabled</code></td>
+<td align="center">-</td>
+<td>有効</td>
+<td align="center"><code>true</code></td>
+<td><code>true</code><br /><code>false</code></td>
+<td>-</td>
+</tr>
+</tbody>
+</table>
+<h4 id="health_check"><code>health_check</code></h4>
+<table>
+<thead>
+<tr>
+<th>パラメーター</th>
+<th align="center">必須</th>
+<th>名称</th>
+<th align="center">初期値</th>
+<th>設定値</th>
+<th>補足</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>protocol</code></td>
+<td align="center">◯</td>
+<td>プロトコル</td>
+<td align="center">-</td>
+<td><code>http</code><br /><code>https</code><br /><code>ping</code><br /><code>tcp</code><br /><code>dns</code><br /><code>ssh</code><br /><code>smtp</code><br /><code>pop3</code><br /><code>snmp</code></td>
+<td>-</td>
+</tr>
+<tr>
+<td><code>dalay_loop</code></td>
+<td align="center">-</td>
+<td>チェック間隔(秒)</td>
+<td align="center"><code>60</code></td>
+<td>数値</td>
+<td><code>60</code>〜<code>3600</code></td>
+</tr>
+<tr>
+<td><code>path</code></td>
+<td align="center">△</td>
+<td>パス</td>
+<td align="center">-</td>
+<td>文字列</td>
+<td>プロトコルが<code>http</code>または<code>https</code>の場合のみ有効かつ必須</td>
+</tr>
+<tr>
+<td><code>host_header</code></td>
+<td align="center">△</td>
+<td>HOSTヘッダ</td>
+<td align="center">-</td>
+<td>文字列</td>
+<td>プロトコルが<code>http</code>または<code>https</code>の場合のみ有効</td>
+</tr>
+<tr>
+<td><code>status</code></td>
+<td align="center">△</td>
+<td>レスポンスコード</td>
+<td align="center">-</td>
+<td>文字列</td>
+<td>プロトコルが<code>http</code>または<code>https</code>の場合のみ有効かつ必須</td>
+</tr>
+<tr>
+<td><code>port</code></td>
+<td align="center">△</td>
+<td>ポート番号</td>
+<td align="center">-</td>
+<td>数値</td>
+<td>プロトコルが<code>tcp</code>,<code>ssh</code>,<code>smtp</code>,<code>pop3</code>の場合のみ有効かつ必須</td>
+</tr>
+<tr>
+<td><code>qname</code></td>
+<td align="center">△</td>
+<td>問合せFQDN</td>
+<td align="center">-</td>
+<td>数値</td>
+<td>プロトコルが<code>dns</code>の場合のみ有効かつ必須</td>
+</tr>
+<tr>
+<td><code>expected_data</code></td>
+<td align="center">△</td>
+<td>期待値</td>
+<td align="center">-</td>
+<td>数値</td>
+<td>プロトコルが<code>dns</code>,<code>snmp</code>の場合のみ有効<br /><code>dns</code>の場合、省略すると、何らかのAレコードの応答があるかのチェックとなる<br /><code>snmp</code>の場合は必須</td>
+</tr>
+<tr>
+<td><code>community</code></td>
+<td align="center">△</td>
+<td>コミュニティ名</td>
+<td align="center">-</td>
+<td>文字列</td>
+<td>プロトコルが<code>snmp</code>の場合のみ有効かつ必須</td>
+</tr>
+<tr>
+<td><code>snmp_version</code></td>
+<td align="center">△</td>
+<td>SNMPバージョン</td>
+<td align="center">-</td>
+<td><code>1</code><br /><code>2c</code></td>
+<td>プロトコルが<code>snmp</code>の場合のみ有効かつ必須</td>
+</tr>
+<tr>
+<td><code>oid</code></td>
+<td align="center">△</td>
+<td>OID</td>
+<td align="center">-</td>
+<td>文字列</td>
+<td>プロトコルが<code>snmp</code>の場合のみ有効かつ必須</td>
+</tr>
+</tbody>
+</table>
+<h3 id="_3">属性</h3>
+<table>
+<thead>
+<tr>
+<th>属性名</th>
+<th>名称</th>
+<th>補足</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>id</code></td>
+<td>ID</td>
+<td>-</td>
+</tr>
+<tr>
+<td><code>target</code></td>
+<td>監視対象名(IPアドレス)</td>
+<td>-</td>
+</tr>
+<tr>
+<td><code>health_check</code></td>
+<td>監視方法</td>
+<td>詳細は<a href="#health_check"><code>health_check</code></a>を参照</td>
+</tr>
+<tr>
+<td><code>description</code></td>
+<td>説明</td>
+<td>-</td>
+</tr>
+<tr>
+<td><code>tags</code></td>
+<td>タグ</td>
+<td>-</td>
+</tr>
+<tr>
+<td><code>notify_email_enabled</code></td>
+<td>Eメール通知有効</td>
+<td>-</td>
+</tr>
+<tr>
+<td><code>notify_email_html</code></td>
+<td>HTMLメール有効</td>
+<td>-</td>
+</tr>
+<tr>
+<td><code>notify_slack_enabled</code></td>
+<td>Slack通知有効</td>
+<td>-</td>
+</tr>
+<tr>
+<td><code>notify_slack_webhook</code></td>
+<td>Slack WebhookURL</td>
+<td>-</td>
+</tr>
+<tr>
+<td><code>enabled</code></td>
+<td>有効</td>
+<td>-</td>
+</tr>
+</tbody>
+</table>
+              
+            </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="../auto_backup/" class="btn btn-neutral float-right" title="自動バックアップ"/>Next <span class="icon icon-circle-arrow-right"></span></a>
+      
+      
+        <a href="../gslb/" class="btn btn-neutral" title="GSLB"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+    
+      <p>Copyright (C) 2017 Kazumichi Yamamoto.</p>
+    
+  </div>
+
+  Built with <a href="http://www.mkdocs.org">MkDocs</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+	  
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+<div class="rst-versions" role="note" style="cursor: pointer">
+    <span class="rst-current-version" data-toggle="rst-current-version">
+      
+      
+        <span><a href="../gslb/" style="color: #fcfcfc;">&laquo; Previous</a></span>
+      
+      
+        <span style="margin-left: 15px"><a href="../auto_backup/" style="color: #fcfcfc">Next &raquo;</a></span>
+      
+    </span>
+</div>
+
+</body>
+</html>
