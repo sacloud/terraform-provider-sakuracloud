@@ -28,13 +28,7 @@ before_deploy:
 deploy:
 - provider: script
   script: scripts/release.pl --task=upload-to-github-release && scripts/release.pl
-    --task=upload-master-to-github-release
-  skip_cleanup: true
-  on:
-    branch: master
-
-- provider: script
-  script: scripts/release_homebrew.sh
+    --task=upload-master-to-github-release && scripts/release_homebrew.sh
   skip_cleanup: true
   on:
     branch: master
