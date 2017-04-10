@@ -142,6 +142,18 @@ Terraform定義ファイル(tfファイル)を作成してご利用ください�
     # vendor配下のライブラリをGOPATH上から更新
     govendor update +v
 
+#### ドキュメント
+
+ドキュメントはGithub Pagesを利用しています。(masterブランチの`docs`ディレクトリ配下)  
+静的ファイルの生成は`mkdocs`コマンドで行なっています。  
+ドキュメントの追加や修正は`build_docs`ディレクトリ以下のファイルの追加/修正を行なった上で`mkdocs`コマンドでファイル生成してコミットしてください。
+
+    # build_docs配下のファイルからドキュメント生成(docsディレクトリ再生成)
+    make build-docs
+    
+    # ドキュメントのプレビュー用サーバー起動(http://localhost/でプレビュー可能)
+    make serve-docs
+
 ## License
 
   This project is published under [Apache 2.0 License](LICENSE).
