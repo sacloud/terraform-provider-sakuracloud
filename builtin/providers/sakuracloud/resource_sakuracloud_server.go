@@ -361,86 +361,85 @@ func resourceSakuraCloudServerUpdate(d *schema.ResourceData, meta interface{}) e
 	}
 
 	// NIC
-	if d.HasChange("base_interface") {
-		sharedNICCon := d.Get("base_interface").(string)
-		if server.Interfaces[0].Switch != nil {
-			client.Interface.DisconnectFromSwitch(server.Interfaces[0].ID)
+	if d.HasChange("base_interface") || d.HasChange("additional_interfaces") {
+
+		var conf []interface{}
+		if c, ok := d.GetOk("additional_interfaces"); ok {
+			conf = c.([]interface{})
 		}
 
-		if sharedNICCon == "shared" {
-			client.Interface.ConnectToSharedSegment(server.Interfaces[0].ID)
-		} else if sharedNICCon != "" {
-			client.Interface.ConnectToSwitch(server.Interfaces[0].ID, toSakuraCloudID(sharedNICCon))
-		}
-	}
-	if d.HasChange("additional_interfaces") {
-		if conf, ok := d.GetOk("additional_interfaces"); ok {
-			newNICCount := len(conf.([]interface{}))
-			for i, nic := range server.Interfaces {
-				if i == 0 {
-					continue
-				}
-
-				// disconnect exists NIC
-				if nic.Switch != nil {
-					_, err := client.Interface.DisconnectFromSwitch(nic.ID)
+		newNICCount := len(conf)
+		for i, nic := range server.Interfaces {
+			if i == 0 {
+				// only when base_interface has change
+				if d.HasChange("base_interface") && server.Interfaces[0].Switch != nil {
+					_, err := client.Interface.DisconnectFromSwitch(server.Interfaces[0].ID)
 					if err != nil {
 						return fmt.Errorf("Error disconnecting NIC from SakuraCloud Switch resource: %s", err)
 					}
 				}
+				continue
+			}
 
-				//delete NIC
-				if i > newNICCount {
-					_, err := client.Interface.Delete(nic.ID)
-					if err != nil {
-						return fmt.Errorf("Error deleting SakuraCloud NIC resource: %s", err)
-					}
+			// disconnect exists NIC
+			if nic.Switch != nil {
+				_, err := client.Interface.DisconnectFromSwitch(nic.ID)
+				if err != nil {
+					return fmt.Errorf("Error disconnecting NIC from SakuraCloud Switch resource: %s", err)
 				}
 			}
 
-			for i, s := range conf.([]interface{}) {
-				switchID := ""
-				if s != nil {
-					switchID = s.(string)
-				}
-				if len(server.Interfaces) <= i+1 {
-					//create NIC
-					nic := client.Interface.New()
-					nic.SetServerID(server.ID)
-					if switchID != "" {
-						nic.SetSwitchID(toSakuraCloudID(switchID))
-					}
-					_, err := client.Interface.Create(nic)
-					if err != nil {
-						return fmt.Errorf("Error creating NIC to SakuraCloud Server resource: %s", err)
-					}
-
-				} else {
-
-					if switchID != "" {
-						_, err := client.Interface.ConnectToSwitch(server.Interfaces[i+1].ID, toSakuraCloudID(switchID))
-						if err != nil {
-							return fmt.Errorf("Error connecting NIC to SakuraCloud Switch resource: %s", err)
-						}
-					}
+			//delete NIC
+			if i > newNICCount {
+				_, err := client.Interface.Delete(nic.ID)
+				if err != nil {
+					return fmt.Errorf("Error deleting SakuraCloud NIC resource: %s", err)
 				}
 			}
-
-		} else {
-			if len(server.Interfaces) > 1 {
-				for i, nic := range server.Interfaces {
-					if i == 0 {
-						continue
-					}
-
-					_, err := client.Interface.Delete(nic.ID)
-					if err != nil {
-						return fmt.Errorf("Error deleting SakuraCloud NIC resource: %s", err)
-					}
+		}
+		// only when base_interface has change
+		if d.HasChange("base_interface") {
+			sharedNICCon := d.Get("base_interface").(string)
+			if sharedNICCon == "shared" {
+				_, err := client.Interface.ConnectToSharedSegment(server.Interfaces[0].ID)
+				if err != nil {
+					return fmt.Errorf("Error connecting NIC to the shared segment: %s", err)
+				}
+			} else if sharedNICCon != "" {
+				_, err := client.Interface.ConnectToSwitch(server.Interfaces[0].ID, toSakuraCloudID(sharedNICCon))
+				if err != nil {
+					return fmt.Errorf("Error connecting NIC to SakuraCloud Switch resource: %s", err)
 				}
 			}
 		}
 
+		for i, s := range conf {
+			switchID := ""
+			if s != nil {
+				switchID = s.(string)
+			}
+			if len(server.Interfaces) <= i+1 {
+				//create NIC
+				nic := client.Interface.New()
+				nic.SetServerID(server.ID)
+				if switchID != "" {
+					nic.SetSwitchID(toSakuraCloudID(switchID))
+				}
+				_, err := client.Interface.Create(nic)
+				if err != nil {
+					return fmt.Errorf("Error creating NIC to SakuraCloud Server resource: %s", err)
+				}
+
+			} else {
+
+				if switchID != "" {
+					_, err := client.Interface.ConnectToSwitch(server.Interfaces[i+1].ID, toSakuraCloudID(switchID))
+					if err != nil {
+						return fmt.Errorf("Error connecting NIC to SakuraCloud Switch resource: %s", err)
+					}
+				}
+			}
+		}
 	}
 
 	//refresh server(need refresh after disk and nid edit)
@@ -665,6 +664,7 @@ func setServerResourceData(d *schema.ResourceData, client *api.Client, data *sac
 	} else {
 		d.Set("base_interface", "")
 	}
+
 	d.Set("additional_interfaces", flattenInterfaces(data.Interfaces))
 
 	d.Set("description", data.Description)
