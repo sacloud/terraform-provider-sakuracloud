@@ -66,9 +66,6 @@ data sakuracloud_archive "centos" {
 | `kusanagi`                | Kusanagi(CentOS7)|
 | `site-guard`              | SiteGuard(CentOS7)|
 | `freebsd`                 | FreeBSD|
-| `windows2008`             | Windows 2008|
-| `windows2008-rds`         | Windows 2008(RDS)|
-| `windows2008-rds-office`  | Windows 2008(RDS + Office)|
 | `windows2012`             | Windows 2012|
 | `windows2012-rds`         | Windows 2012(RDS)|
 | `windows2012-rds-office`  | Windows 2012(RDS + Office)|
