@@ -20,7 +20,6 @@ func dataSourceSakuraCloudArchive() *schema.Resource {
 				ForceNew: true,
 				ValidateFunc: validateStringInWord([]string{
 					"centos", "ubuntu", "debian", "vyos", "coreos", "kusanagi", "site-guard", "freebsd",
-					"windows2008", "windows2008-rds", "windows2008-rds-office",
 					"windows2012", "windows2012-rds", "windows2012-rds-office",
 					"windows2016", "windows2016-rds", "windows2016-rds-office",
 					"windows2016-sql-web", "windows2016-sql-standard",
@@ -149,12 +148,6 @@ func strToOSType(osType string) ostype.ArchiveOSTypes {
 		return ostype.SiteGuard
 	case "freebsd":
 		return ostype.FreeBSD
-	case "windows2008":
-		return ostype.Windows2008
-	case "windows2008-rds":
-		return ostype.Windows2008RDS
-	case "windows2008-rds-office":
-		return ostype.Windows2008RDSOffice
 	case "windows2012":
 		return ostype.Windows2012
 	case "windows2012-rds":
