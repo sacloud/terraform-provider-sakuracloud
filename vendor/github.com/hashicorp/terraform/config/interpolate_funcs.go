@@ -11,6 +11,7 @@ import (
 	"io/ioutil"
 	"math"
 	"net"
+	"path/filepath"
 	"regexp"
 	"sort"
 	"strconv"
@@ -52,16 +53,19 @@ func listVariableValueToStringSlice(values []ast.Variable) ([]string, error) {
 // Funcs is the mapping of built-in functions for configuration.
 func Funcs() map[string]ast.Function {
 	return map[string]ast.Function{
+		"basename":     interpolationFuncBasename(),
 		"base64decode": interpolationFuncBase64Decode(),
 		"base64encode": interpolationFuncBase64Encode(),
 		"base64sha256": interpolationFuncBase64Sha256(),
 		"ceil":         interpolationFuncCeil(),
+		"chomp":        interpolationFuncChomp(),
 		"cidrhost":     interpolationFuncCidrHost(),
 		"cidrnetmask":  interpolationFuncCidrNetmask(),
 		"cidrsubnet":   interpolationFuncCidrSubnet(),
 		"coalesce":     interpolationFuncCoalesce(),
 		"compact":      interpolationFuncCompact(),
 		"concat":       interpolationFuncConcat(),
+		"dirname":      interpolationFuncDirname(),
 		"distinct":     interpolationFuncDistinct(),
 		"element":      interpolationFuncElement(),
 		"file":         interpolationFuncFile(),
@@ -456,6 +460,18 @@ func interpolationFuncCeil() ast.Function {
 	}
 }
 
+// interpolationFuncChomp removes trailing newlines from the given string
+func interpolationFuncChomp() ast.Function {
+	newlines := regexp.MustCompile(`(?:\r\n?|\n)*\z`)
+	return ast.Function{
+		ArgTypes:   []ast.Type{ast.TypeString},
+		ReturnType: ast.TypeString,
+		Callback: func(args []interface{}) (interface{}, error) {
+			return newlines.ReplaceAllString(args[0].(string), ""), nil
+		},
+	}
+}
+
 // interpolationFuncFloorreturns returns the greatest integer value less than or equal to the argument
 func interpolationFuncFloor() ast.Function {
 	return ast.Function{
@@ -596,6 +612,17 @@ func interpolationFuncIndex() ast.Function {
 				}
 			}
 			return nil, fmt.Errorf("Could not find '%s' in '%s'", needle, haystack)
+		},
+	}
+}
+
+// interpolationFuncBasename implements the "dirname" function.
+func interpolationFuncDirname() ast.Function {
+	return ast.Function{
+		ArgTypes:   []ast.Type{ast.TypeString},
+		ReturnType: ast.TypeString,
+		Callback: func(args []interface{}) (interface{}, error) {
+			return filepath.Dir(args[0].(string)), nil
 		},
 	}
 }
@@ -1002,6 +1029,17 @@ func interpolationFuncValues(vs map[string]ast.Variable) ast.Function {
 			}
 
 			return variable.Value, nil
+		},
+	}
+}
+
+// interpolationFuncBasename implements the "basename" function.
+func interpolationFuncBasename() ast.Function {
+	return ast.Function{
+		ArgTypes:   []ast.Type{ast.TypeString},
+		ReturnType: ast.TypeString,
+		Callback: func(args []interface{}) (interface{}, error) {
+			return filepath.Base(args[0].(string)), nil
 		},
 	}
 }
