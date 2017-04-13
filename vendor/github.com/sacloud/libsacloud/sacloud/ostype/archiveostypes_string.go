@@ -4,9 +4,9 @@ package ostype
 
 import "fmt"
 
-const _ArchiveOSTypes_name = "CentOSUbuntuDebianVyOSCoreOSKusanagiSiteGuardFreeBSDWindows2008Windows2008RDSWindows2008RDSOfficeWindows2012Windows2012RDSWindows2012RDSOfficeWindows2016Windows2016RDSWindows2016RDSOfficeCustom"
+const _ArchiveOSTypes_name = "CentOSUbuntuDebianVyOSCoreOSKusanagiSiteGuardFreeBSDWindows2012Windows2012RDSWindows2012RDSOfficeWindows2016Windows2016RDSWindows2016RDSOfficeWindows2016SQLServerWebWindows2016SQLServerStandardCustom"
 
-var _ArchiveOSTypes_index = [...]uint8{0, 6, 12, 18, 22, 28, 36, 45, 52, 63, 77, 97, 108, 122, 142, 153, 167, 187, 193}
+var _ArchiveOSTypes_index = [...]uint8{0, 6, 12, 18, 22, 28, 36, 45, 52, 63, 77, 97, 108, 122, 142, 165, 193, 199}
 
 func (i ArchiveOSTypes) String() string {
 	if i < 0 || i >= ArchiveOSTypes(len(_ArchiveOSTypes_index)-1) {

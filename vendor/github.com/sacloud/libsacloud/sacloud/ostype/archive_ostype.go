@@ -23,12 +23,6 @@ const (
 	SiteGuard
 	// FreeBSD OS種別:FreeBSD
 	FreeBSD
-	// Windows2008 OS種別:Windows Server 2008 R2 Datacenter Edition
-	Windows2008
-	// Windows2008RDS OS種別:Windows Server 2008 R2 for RDS
-	Windows2008RDS
-	// Windows2008RDSOffice OS種別:Windows Server 2008 R2 for RDS(Office)
-	Windows2008RDSOffice
 	// Windows2012 OS種別:Windows Server 2012 R2 Datacenter Edition
 	Windows2012
 	// Windows2012RDS OS種別:Windows Server 2012 R2 for RDS
@@ -52,8 +46,7 @@ const (
 // IsWindows Windowsか
 func (o ArchiveOSTypes) IsWindows() bool {
 	switch o {
-	case Windows2008, Windows2008RDS, Windows2008RDSOffice,
-		Windows2012, Windows2012RDS, Windows2012RDSOffice,
+	case Windows2012, Windows2012RDS, Windows2012RDSOffice,
 		Windows2016, Windows2016RDS, Windows2016RDSOffice,
 		Windows2016SQLServerWeb, Windows2016SQLServerStandard:
 		return true

@@ -23,9 +23,6 @@ var (
 	archiveLatestStableKusanagiTags                 = []string{"current-stable", "pkg-kusanagi"}
 	archiveLatestStableSiteGuardTags                = []string{"current-stable", "pkg-siteguard"}
 	archiveLatestStableFreeBSDTags                  = []string{"current-stable", "distro-freebsd"}
-	archiveLatestStableWindows2008Tags              = []string{"os-windows", "distro-ver-2008.2"}
-	archiveLatestStableWindows2008RDSTags           = []string{"os-windows", "distro-ver-2008.2", "windows-rds"}
-	archiveLatestStableWindows2008RDSOfficeTags     = []string{"os-windows", "distro-ver-2008.2", "windows-rds", "with-office"}
 	archiveLatestStableWindows2012Tags              = []string{"os-windows", "distro-ver-2012.2"}
 	archiveLatestStableWindows2012RDSTags           = []string{"os-windows", "distro-ver-2012.2", "windows-rds"}
 	archiveLatestStableWindows2012RDSOfficeTags     = []string{"os-windows", "distro-ver-2012.2", "windows-rds", "with-office"}
@@ -56,9 +53,6 @@ func NewArchiveAPI(client *Client) *ArchiveAPI {
 		ostype.Kusanagi:                     api.FindLatestStableKusanagi,
 		ostype.SiteGuard:                    api.FindLatestStableSiteGuard,
 		ostype.FreeBSD:                      api.FindLatestStableFreeBSD,
-		ostype.Windows2008:                  api.FindLatestStableWindows2008,
-		ostype.Windows2008RDS:               api.FindLatestStableWindows2008RDS,
-		ostype.Windows2008RDSOffice:         api.FindLatestStableWindows2008RDSOffice,
 		ostype.Windows2012:                  api.FindLatestStableWindows2012,
 		ostype.Windows2012RDS:               api.FindLatestStableWindows2012RDS,
 		ostype.Windows2012RDSOffice:         api.FindLatestStableWindows2012RDSOffice,
@@ -232,27 +226,6 @@ func (api *ArchiveAPI) FindLatestStableSiteGuard() (*sacloud.Archive, error) {
 // FindLatestStableFreeBSD 安定版最新のFreeBSDパブリックアーカイブを取得
 func (api *ArchiveAPI) FindLatestStableFreeBSD() (*sacloud.Archive, error) {
 	return api.findByOSTags(archiveLatestStableFreeBSDTags)
-}
-
-// FindLatestStableWindows2008 安定版最新のWindows2008パブリックアーカイブを取得
-func (api *ArchiveAPI) FindLatestStableWindows2008() (*sacloud.Archive, error) {
-	return api.findByOSTags(archiveLatestStableWindows2008Tags, map[string]interface{}{
-		"Name": "Windows Server 2008 R2 Datacenter Edition",
-	})
-}
-
-// FindLatestStableWindows2008RDS 安定版最新のWindows2008RDSパブリックアーカイブを取得
-func (api *ArchiveAPI) FindLatestStableWindows2008RDS() (*sacloud.Archive, error) {
-	return api.findByOSTags(archiveLatestStableWindows2008RDSTags, map[string]interface{}{
-		"Name": "Windows Server 2008 R2 for RDS",
-	})
-}
-
-// FindLatestStableWindows2008RDSOffice 安定版最新のWindows2008RDS(Office)パブリックアーカイブを取得
-func (api *ArchiveAPI) FindLatestStableWindows2008RDSOffice() (*sacloud.Archive, error) {
-	return api.findByOSTags(archiveLatestStableWindows2008RDSOfficeTags, map[string]interface{}{
-		"Name": "Windows Server 2008 R2 for RDS(MS Office付)",
-	})
 }
 
 // FindLatestStableWindows2012 安定版最新のWindows2012パブリックアーカイブを取得
