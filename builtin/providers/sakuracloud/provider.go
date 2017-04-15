@@ -78,6 +78,7 @@ func Provider() terraform.ResourceProvider {
 			"sakuracloud_simple_monitor":                 resourceSakuraCloudSimpleMonitor(),
 			"sakuracloud_server":                         resourceSakuraCloudServer(),
 			"sakuracloud_ssh_key":                        resourceSakuraCloudSSHKey(),
+			"sakuracloud_ssh_key_gen":                    resourceSakuraCloudSSHKeyGen(),
 			"sakuracloud_switch":                         resourceSakuraCloudSwitch(),
 			"sakuracloud_vpc_router":                     resourceSakuraCloudVPCRouter(),
 			"sakuracloud_vpc_router_interface":           resourceSakuraCloudVPCRouterInterface(),

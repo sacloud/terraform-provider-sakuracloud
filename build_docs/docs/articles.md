@@ -23,3 +23,8 @@
     * [https://github.com/zembutsu/sakura-terraform](https://github.com/zembutsu/sakura-terraform)
 * Terraform for さくらのクラウド入門チュートリアル(@zembutsuさん)
     * [http://qiita.com/zembutsu/items/fb0819e38b4fcda49299](http://qiita.com/zembutsu/items/fb0819e38b4fcda49299)
+
+### サンプルなど
+
+* teratailのさくらのクラウド チュートリアルの構成を「Terraform for さくらのクラウド」で構築するためのtfファイル集
+    * [https://github.com/yamamoto-febc/teratail-sakuracloud-terraform-examples](https://github.com/yamamoto-febc/teratail-sakuracloud-terraform-examples)

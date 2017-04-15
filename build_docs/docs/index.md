@@ -29,6 +29,7 @@
     - [データベース](configuration/resources/database/)
     - [スタートアップスクリプト](configuration/resources/note/)
     - [公開鍵](configuration/resources/ssh_key/)
+    - [公開鍵(生成)](configuration/resources/ssh_key_gen/)
     - [DNS](configuration/resources/dns/)
     - [GSLB](configuration/resources/gslb/)
     - [シンプル監視](configuration/resources/simple_monitor/)

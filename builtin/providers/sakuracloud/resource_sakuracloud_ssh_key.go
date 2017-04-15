@@ -19,8 +19,9 @@ func resourceSakuraCloudSSHKey() *schema.Resource {
 
 		Schema: map[string]*schema.Schema{
 			"name": &schema.Schema{
-				Type:     schema.TypeString,
-				Required: true,
+				Type:         schema.TypeString,
+				Required:     true,
+				ValidateFunc: validateMaxLength(1, 64),
 			},
 			"public_key": &schema.Schema{
 				Type:     schema.TypeString,
@@ -28,8 +29,9 @@ func resourceSakuraCloudSSHKey() *schema.Resource {
 				ForceNew: true,
 			},
 			"description": &schema.Schema{
-				Type:     schema.TypeString,
-				Optional: true,
+				Type:         schema.TypeString,
+				Optional:     true,
+				ValidateFunc: validateMaxLength(1, 512),
 			},
 			"fingerprint": &schema.Schema{
 				Type:     schema.TypeString,

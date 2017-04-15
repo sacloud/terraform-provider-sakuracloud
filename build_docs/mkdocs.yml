@@ -29,6 +29,7 @@ pages:
       - データベース: configuration/resources/database.md
       - スタートアップスクリプト: configuration/resources/note.md
       - 公開鍵: configuration/resources/ssh_key.md
+      - 公開鍵(生成): configuration/resources/ssh_key_gen.md
       - DNS: configuration/resources/dns.md
       - GSLB: configuration/resources/gslb.md
       - シンプル監視: configuration/resources/simple_monitor.md
