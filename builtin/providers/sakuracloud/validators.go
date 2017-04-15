@@ -5,19 +5,30 @@ import (
 	"github.com/hashicorp/terraform/helper/schema"
 	"strconv"
 	"strings"
+	"unicode/utf8"
 )
 
 func validateMaxLength(minLength, maxLength int) schema.SchemaValidateFunc {
 	return func(v interface{}, k string) (ws []string, errors []error) {
 		value := v.(string)
-		if len(value) < minLength {
-			errors = append(errors, fmt.Errorf(
-				"%q cannot be shorter than %d characters: %q", k, minLength, value))
+		// if value is empty, return OK(Use required attr if necessary)
+		if value == "" {
+			return
 		}
-		if len(value) > maxLength {
-			errors = append(errors, fmt.Errorf(
-				"%q cannot be longer than %d characters: %q", k, maxLength, value))
+
+		strlen := utf8.RuneCountInString(value)
+		if maxLength == 0 {
+			if strlen < minLength {
+				errors = append(errors,
+					fmt.Errorf("%q must be shorter then %d characters: %q", k, minLength, value))
+			}
+		} else {
+			if !(minLength <= strlen && strlen <= maxLength) {
+				errors = append(errors,
+					fmt.Errorf("%q must be between %d and %d characters: %q", k, minLength, maxLength, value))
+			}
 		}
+
 		return
 	}
 }
