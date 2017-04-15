@@ -4,59 +4,79 @@
 
 Terraformでさくらのクラウドを操作するためのプラグイン
 
-
-
 ## クイックスタート
 
-#### 準備
+さくらのクラウドに以下の環境を構築します。
 
-  - Dockerをインストールしておく
-  - さくらのクラウドAPIキーを取得しておく
+  - 最新安定版のCentOSを利用
+  - ディスク: SSH/20GB, サーバー: 1core/1GBメモリ(デフォルト値のため定義ファイル上では省略)
+  - SSH接続時のパスワード/チャレンジレスポンス認証を無効化(公開鍵認証のみに)
+  - SSH用の公開鍵はさくらのクラウド上で生成(作成された秘密鍵はローカルマシンへ保存する)
 
-Dockerがない場合は[Installation / インストール](https://yamamoto-febc.github.io/terraform-provider-sakuracloud/installation/)を参考に
-TerraformとTerraform for さくらのクラウドを手元のマシンにインストールしてからご利用ください。
+[Installation / インストール](https://yamamoto-febc.github.io/terraform-provider-sakuracloud/installation/)を参考に
+TerraformとTerraform for さくらのクラウドを手元のマシンにインストールしてください。
 
-さくらのクラウドAPIキーの取得方法は[こちら](https://yamamoto-febc.github.io/terraform-provider-sakuracloud/installation/#api)を参照してください。
+インストール後、以下のコマンドを実行することでインフラ構築が行われます。
 
 ```bash
 #################################################
+# さくらのクラウドAPIキーを環境変数に設定
+#################################################
+export SAKURACLOUD_ACCESS_TOKEN=[さくらのクラウド APIトークン]
+export SAKURACLOUD_ACCESS_TOKEN_SECRET=[さくらのクラウド APIシークレット]
+
+#################################################
 # Terraform定義ファイル作成
 #################################################
-$ mkdir ~/work; cd ~/work
-$ ssh-keygen -C "" -P "" -f id_rsa   # サーバーへのSSH用キーペア生成
-$ tee sakura.tf <<-'EOF'
-resource "sakuracloud_ssh_key" "key"{
-    name = "sshkey"
-    public_key = "${file("id_rsa.pub")}"
+mkdir work; cd work
+tee sakura.tf <<-'EOF'
+
+# サーバーの管理者パスワードの定義
+variable "password" { default = "PUT_YOUR_PASSWORD_HERE" }
+
+# 対象ゾーンを指定
+provider sakuracloud {
+    zone = "tk1a" # 東京第1ゾーン 
 }
 
+# 公開鍵(さくらのクラウド上で生成)
+resource "sakuracloud_ssh_key_gen" "key" {
+    name = "foobar"
+    provisioner "local-exec" {
+      command = "echo \"${self.private_key}\" > id_rsa; chmod 0600 id_rsa"
+    }
+}
+
+# パブリックアーカイブ(OS)のID参照用のデータソース定義
 data sakuracloud_archive "centos" {
     os_type = "centos"
 }
+# ディスク定義
 resource "sakuracloud_disk" "disk01"{
     name = "disk01"
     source_archive_id = "${data.sakuracloud_archive.centos.id}"
-    ssh_key_ids = ["${sakuracloud_ssh_key.key.id}"]
+    ssh_key_ids = ["${sakuracloud_ssh_key_gen.key.id}"]
+    password = "${var.password}"
     disable_pw_auth = true
-    zone = "is1b"
 }
 
+# サーバー定義
 resource "sakuracloud_server" "server01" {
     name = "server01"
     disks = ["${sakuracloud_disk.disk01.id}"]
     tags = ["@virtio-net-pci"]
-    zone = "is1b"
+}
+
+# サーバへのSSH接続を表示するアウトプット定義
+output "ssh_to_server" {
+    value = "ssh -i id_rsa root@${sakuracloud_server.server01.base_nw_ipaddress}"
 }
 EOF
 
 #################################################
-# Terraformでインフラ作成
+# インフラ構築(apply)
 #################################################
-$ docker run -it --rm \
-         -e SAKURACLOUD_ACCESS_TOKEN=[さくらのクラウド APIトークン] \
-         -e SAKURACLOUD_ACCESS_TOKEN_SECRET=[さくらのクラウド APIシークレット] \
-         -v $PWD:/work \
-         sacloud/terraform apply
+terraform apply
 ```
 
 ## ドキュメント
@@ -64,23 +84,9 @@ $ docker run -it --rm \
 * Terraform for さくらのクラウド ドキュメント
     * https://yamamoto-febc.github.io/terraform-provider-sakuracloud/
 
-## インストール
+### サポートしているリソース/データソース
 
-[リリースページ](https://github.com/yamamoto-febc/terraform-provider-sakuracloud/releases/latest)から最新のバイナリを取得し、
-Terraformバイナリと同じディレクトリに展開してください。
-
-詳細は[Installation / インストール](https://yamamoto-febc.github.io/terraform-provider-sakuracloud/installation/)を参照してください。
-
-## 使い方/各リソースの設定方法
-
-Terraform定義ファイル(tfファイル)を作成してご利用ください。
-
-設定ファイルの記載方法は[リファレンス](https://yamamoto-febc.github.io/terraform-provider-sakuracloud/#_2)を参照ください。
-
-さくらのクラウドの以下のリソースをサポートしています。
-
-### サポートしているリソース
-
+#### リソース
   - [サーバー](https://yamamoto-febc.github.io/terraform-provider-sakuracloud/configuration/resources/server/)
   - [ディスク](https://yamamoto-febc.github.io/terraform-provider-sakuracloud//configuration/resources/disk/)
   - [スイッチ](https://yamamoto-febc.github.io/terraform-provider-sakuracloud//configuration/resources/switch/)
@@ -97,6 +103,8 @@ Terraform定義ファイル(tfファイル)を作成してご利用ください�
   - [GSLB](https://yamamoto-febc.github.io/terraform-provider-sakuracloud/configuration/resources/gslb/)
   - [シンプル監視](https://yamamoto-febc.github.io/terraform-provider-sakuracloud/configuration/resources/simple_monitor/)
   - [自動バックアップ](https://yamamoto-febc.github.io/terraform-provider-sakuracloud/configuration/resources/auto_backup/)
+
+#### データソース
   - [データソース](http://yamamoto-febc.github.io/terraform-provider-sakuracloud/configuration/resources/data_resource/)
 
 
