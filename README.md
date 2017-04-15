@@ -92,6 +92,7 @@ Terraform定義ファイル(tfファイル)を作成してご利用ください�
   - [データベース](https://yamamoto-febc.github.io/terraform-provider-sakuracloud/configuration/resources/database/)
   - [スタートアップスクリプト](https://yamamoto-febc.github.io/terraform-provider-sakuracloud/configuration/resources/note/)
   - [公開鍵](https://yamamoto-febc.github.io/terraform-provider-sakuracloud/configuration/resources/ssh_key/)
+  - [公開鍵(生成)](https://yamamoto-febc.github.io/terraform-provider-sakuracloud/configuration/resources/ssh_key_gen/)
   - [DNS](https://yamamoto-febc.github.io/terraform-provider-sakuracloud/configuration/resources/dns/)
   - [GSLB](https://yamamoto-febc.github.io/terraform-provider-sakuracloud/configuration/resources/gslb/)
   - [シンプル監視](https://yamamoto-febc.github.io/terraform-provider-sakuracloud/configuration/resources/simple_monitor/)
