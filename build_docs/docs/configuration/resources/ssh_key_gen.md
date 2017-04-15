@@ -16,7 +16,7 @@ resource "sakuracloud_ssh_key_gen" "key" {
     name = "foobar"
     
     # パスフレーズ(オプション、指定する場合は8〜64文字)
-    # pash_phrase = "your_pass_phrase"
+    # pass_phrase = "your_pass_phrase"
     
     # 説明
     # description = "your description here"
@@ -33,7 +33,7 @@ resource "sakuracloud_ssh_key_gen" "key" {
 |パラメーター         |必須  |名称                |初期値     |設定値                    |補足                                          |
 |-------------------|:---:|--------------------|:--------:|------------------------|----------------------------------------------|
 | `name`            | ◯   | 公開鍵名           | -        | 文字列                  | 64文字まで|
-| `path_phrase`     | -   | パスフレーズ           | -        | 文字列                  | 空文字、または8〜64文字まで|
+| `pass_phrase`     | -   | パスフレーズ           | -        | 文字列                  | 空文字、または8〜64文字まで|
 | `description`     | -   | 説明  | - | 文字列 | 512文字まで |
 
 ### 属性
