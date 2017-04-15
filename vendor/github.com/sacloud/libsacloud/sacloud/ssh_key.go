@@ -16,3 +16,19 @@ type SSHKeyGenerated struct {
 	SSHKey
 	PrivateKey string `json:",omitempty"` // 秘密鍵
 }
+
+func (k *SSHKey) GetPublicKey() string {
+	return k.PublicKey
+}
+
+func (k *SSHKey) SetPublicKey(pKey string) {
+	k.PublicKey = pKey
+}
+
+func (k *SSHKey) GetFingerpinrt() string {
+	return k.Fingerprint
+}
+
+func (k *SSHKeyGenerated) GetPrivateKey() string {
+	return k.PrivateKey
+}
