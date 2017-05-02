@@ -19,8 +19,9 @@ func resourceSakuraCloudVPCRouter() *schema.Resource {
 
 		Schema: map[string]*schema.Schema{
 			"name": &schema.Schema{
-				Type:     schema.TypeString,
-				Required: true,
+				Type:         schema.TypeString,
+				Required:     true,
+				ValidateFunc: validateMaxLength(1, 64),
 			},
 			"plan": &schema.Schema{
 				Type:         schema.TypeString,
@@ -62,8 +63,9 @@ func resourceSakuraCloudVPCRouter() *schema.Resource {
 				MaxItems: 19,
 			},
 			"description": &schema.Schema{
-				Type:     schema.TypeString,
-				Optional: true,
+				Type:         schema.TypeString,
+				Optional:     true,
+				ValidateFunc: validateMaxLength(0, 512),
 			},
 			"tags": &schema.Schema{
 				Type:     schema.TypeList,

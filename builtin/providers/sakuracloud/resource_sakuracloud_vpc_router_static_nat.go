@@ -38,10 +38,11 @@ func resourceSakuraCloudVPCRouterStaticNAT() *schema.Resource {
 				ForceNew: true,
 			},
 			"description": &schema.Schema{
-				Type:     schema.TypeString,
-				Optional: true,
-				Default:  "",
-				ForceNew: true,
+				Type:         schema.TypeString,
+				Optional:     true,
+				Default:      "",
+				ForceNew:     true,
+				ValidateFunc: validateMaxLength(0, 512),
 			},
 			"zone": &schema.Schema{
 				Type:         schema.TypeString,
