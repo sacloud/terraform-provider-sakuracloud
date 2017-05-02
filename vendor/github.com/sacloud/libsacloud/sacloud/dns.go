@@ -2,6 +2,7 @@ package sacloud
 
 import (
 	"fmt"
+	"strings"
 )
 
 // DNS DNS(CommonServiceItem)
@@ -86,6 +87,9 @@ func (d *DNS) CreateNewRecord(name string, rtype string, rdata string, ttl int) 
 
 // CreateNewMXRecord DNSレコード作成(MXレコード)
 func (d *DNS) CreateNewMXRecord(name string, rdata string, ttl int, priority int) *DNSRecordSet {
+	if rdata != "" && !strings.HasSuffix(rdata, ".") {
+		rdata = rdata + "."
+	}
 	return &DNSRecordSet{
 		// Name
 		Name: name,
