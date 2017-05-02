@@ -19,6 +19,9 @@
     * [http://knowledge.sakura.ad.jp/knowledge/7660/](http://knowledge.sakura.ad.jp/knowledge/7660/)
 * Terraform for さくらのクラウド スタートガイド （第4回）〜ネットワークの構築〜
     * [http://knowledge.sakura.ad.jp/knowledge/8248/](http://knowledge.sakura.ad.jp/knowledge/8248/)
+* Terraform for さくらのクラウド スタートガイド （第5回）〜サービス提供用のリソースと応用編〜
+    * [http://knowledge.sakura.ad.jp/knowledge/8581/](http://knowledge.sakura.ad.jp/knowledge/8581/)
+    
 * Terraform for Sakura Cloud ハンズオン資料(@zembutsuさん)
     * [https://github.com/zembutsu/sakura-terraform](https://github.com/zembutsu/sakura-terraform)
 * Terraform for さくらのクラウド入門チュートリアル(@zembutsuさん)

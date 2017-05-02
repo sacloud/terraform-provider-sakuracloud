@@ -56,7 +56,7 @@ resource "sakuracloud_database" "foobar" {
 | `default_route` | ◯   | ゲートウェイ     | -        | 文字列                        | - |
 | `description`   | -   | 説明           | -        | 文字列                         | - |
 | `tags`          | -   | タグ           | -        | リスト(文字列)                  | - |
-| `zone`          | -   | ゾーン          | -        | `tk1a` | - |
+| `zone`          | -   | ゾーン          | -        | `tk1a`<br />`is1b` | - |
 
 
 ### 属性
