@@ -63,6 +63,7 @@ data sakuracloud_archive "centos" {
 | `debian`                  | Debian |
 | `vyos`                    | VyOS|
 | `coreos`                  | CoreOS|
+| `rancheros`               | RancherOS|
 | `kusanagi`                | Kusanagi(CentOS7)|
 | `site-guard`              | SiteGuard(CentOS7)|
 | `freebsd`                 | FreeBSD|
