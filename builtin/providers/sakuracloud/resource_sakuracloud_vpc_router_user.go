@@ -23,14 +23,16 @@ func resourceSakuraCloudVPCRouterRemoteAccessUser() *schema.Resource {
 				ValidateFunc: validateSakuracloudIDType,
 			},
 			"name": &schema.Schema{
-				Type:     schema.TypeString,
-				Required: true,
-				ForceNew: true,
+				Type:         schema.TypeString,
+				Required:     true,
+				ForceNew:     true,
+				ValidateFunc: validateMaxLength(1, 20),
 			},
 			"password": &schema.Schema{
-				Type:     schema.TypeString,
-				Required: true,
-				ForceNew: true,
+				Type:         schema.TypeString,
+				Required:     true,
+				ForceNew:     true,
+				ValidateFunc: validateMaxLength(1, 20),
 			},
 			"zone": &schema.Schema{
 				Type:         schema.TypeString,

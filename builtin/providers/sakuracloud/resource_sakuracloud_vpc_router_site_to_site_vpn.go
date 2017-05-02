@@ -34,9 +34,10 @@ func resourceSakuraCloudVPCRouterSiteToSiteIPsecVPN() *schema.Resource {
 				ForceNew: true,
 			},
 			"pre_shared_secret": &schema.Schema{
-				Type:     schema.TypeString,
-				Required: true,
-				ForceNew: true,
+				Type:         schema.TypeString,
+				Required:     true,
+				ForceNew:     true,
+				ValidateFunc: validateMaxLength(0, 40),
 			},
 			"routes": &schema.Schema{
 				Type:     schema.TypeList,

@@ -51,10 +51,11 @@ func resourceSakuraCloudVPCRouterPortForwarding() *schema.Resource {
 				ValidateFunc: validateIntegerInRange(1, 65535),
 			},
 			"description": &schema.Schema{
-				Type:     schema.TypeString,
-				Optional: true,
-				ForceNew: true,
-				Default:  "",
+				Type:         schema.TypeString,
+				Optional:     true,
+				ForceNew:     true,
+				Default:      "",
+				ValidateFunc: validateMaxLength(0, 512),
 			},
 			"zone": &schema.Schema{
 				Type:         schema.TypeString,
