@@ -20,6 +20,7 @@ var (
 	archiveLatestStableDebianTags                   = []string{"current-stable", "distro-debian"}
 	archiveLatestStableVyOSTags                     = []string{"current-stable", "distro-vyos"}
 	archiveLatestStableCoreOSTags                   = []string{"current-stable", "distro-coreos"}
+	archiveLatestStableRancherOSTags                = []string{"current-stable", "distro-rancheros"}
 	archiveLatestStableKusanagiTags                 = []string{"current-stable", "pkg-kusanagi"}
 	archiveLatestStableSiteGuardTags                = []string{"current-stable", "pkg-siteguard"}
 	archiveLatestStableFreeBSDTags                  = []string{"current-stable", "distro-freebsd"}
@@ -50,6 +51,7 @@ func NewArchiveAPI(client *Client) *ArchiveAPI {
 		ostype.Debian:                       api.FindLatestStableDebian,
 		ostype.VyOS:                         api.FindLatestStableVyOS,
 		ostype.CoreOS:                       api.FindLatestStableCoreOS,
+		ostype.RancherOS:                    api.FindLatestStableRancherOS,
 		ostype.Kusanagi:                     api.FindLatestStableKusanagi,
 		ostype.SiteGuard:                    api.FindLatestStableSiteGuard,
 		ostype.FreeBSD:                      api.FindLatestStableFreeBSD,
@@ -211,6 +213,11 @@ func (api *ArchiveAPI) FindLatestStableVyOS() (*sacloud.Archive, error) {
 // FindLatestStableCoreOS 安定版最新のCoreOSパブリックアーカイブを取得
 func (api *ArchiveAPI) FindLatestStableCoreOS() (*sacloud.Archive, error) {
 	return api.findByOSTags(archiveLatestStableCoreOSTags)
+}
+
+// FindLatestStableRancherOS 安定版最新のRancherOSパブリックアーカイブを取得
+func (api *ArchiveAPI) FindLatestStableRancherOS() (*sacloud.Archive, error) {
+	return api.findByOSTags(archiveLatestStableRancherOSTags)
 }
 
 // FindLatestStableKusanagi 安定版最新のKusanagiパブリックアーカイブを取得

@@ -17,6 +17,8 @@ const (
 	VyOS
 	// CoreOS OS種別:CoreOS
 	CoreOS
+	// RancherOS OS種別:RancherOS
+	RancherOS
 	// Kusanagi OS種別:Kusanagi(CentOS)
 	Kusanagi
 	// SiteGuard OS種別:SiteGuard(CentOS)
@@ -58,7 +60,7 @@ func (o ArchiveOSTypes) IsWindows() bool {
 // IsSupportDiskEdit ディスクの修正機能をフルサポートしているか(Windowsは一部サポートのためfalseを返す)
 func (o ArchiveOSTypes) IsSupportDiskEdit() bool {
 	switch o {
-	case CentOS, Ubuntu, Debian, VyOS, CoreOS, Kusanagi, SiteGuard, FreeBSD:
+	case CentOS, Ubuntu, Debian, VyOS, CoreOS, RancherOS, Kusanagi, SiteGuard, FreeBSD:
 		return true
 	default:
 		return false
