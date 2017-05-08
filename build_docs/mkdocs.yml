@@ -22,6 +22,7 @@ pages:
       - ディスク: configuration/resources/disk.md
       - スイッチ: configuration/resources/switch.md
       - ルーター: configuration/resources/internet.md
+      - サブネット: configuration/resources/subnet.md
       - パケットフィルタ: configuration/resources/packet_filter.md
       - ブリッジ: configuration/resources/bridge.md
       - ロードバランサー: configuration/resources/load_balancer.md

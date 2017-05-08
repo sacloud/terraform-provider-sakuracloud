@@ -12,6 +12,7 @@ type Subnet struct {
 	NetworkMaskLen int          `json:",omitempty"` // ネットワークマスク長
 	ServiceID      int64        `json:",omitempty"` // サービスID
 	StaticRoute    string       `json:",omitempty"` // スタティックルート
+	NextHop        string       `json:",omitempty"` // ネクストホップ
 	Switch         *Switch      `json:",omitempty"` // スイッチ
 	Internet       *Internet    `json:",omitempty"` // ルーター
 }
