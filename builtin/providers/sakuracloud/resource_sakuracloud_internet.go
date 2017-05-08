@@ -45,12 +45,11 @@ func resourceSakuraCloudInternet() *schema.Resource {
 				ValidateFunc: validateIntInWord([]string{"100", "250", "500", "1000", "1500", "2000", "2500", "3000"}),
 				Default:      100,
 			},
-			//"enable_ipv6": &schema.Schema{
-			//	Type:        schema.TypeBool,
-			//	Optional:    true,
-			//	Default:     false,
-			//	Description: "!!Not suppot on current version!!",
-			//},
+			"enable_ipv6": &schema.Schema{
+				Type:     schema.TypeBool,
+				Optional: true,
+				Computed: true,
+			},
 			"zone": &schema.Schema{
 				Type:         schema.TypeString,
 				Optional:     true,
@@ -92,6 +91,18 @@ func resourceSakuraCloudInternet() *schema.Resource {
 				Computed: true,
 				Elem:     &schema.Schema{Type: schema.TypeString},
 			},
+			"ipv6_prefix": &schema.Schema{
+				Type:     schema.TypeString,
+				Computed: true,
+			},
+			"ipv6_prefix_len": &schema.Schema{
+				Type:     schema.TypeInt,
+				Computed: true,
+			},
+			"ipv6_nw_address": &schema.Schema{
+				Type:     schema.TypeString,
+				Computed: true,
+			},
 		},
 	}
 }
@@ -130,6 +141,16 @@ func resourceSakuraCloudInternetCreate(d *schema.ResourceData, meta interface{})
 
 	if err != nil {
 		return fmt.Errorf("Failed to create SakuraCloud Internet resource: %s", err)
+	}
+
+	// handle ipv6 param
+	if ipv6Flag, ok := d.GetOk("enable_ipv6"); ok {
+		if ipv6Flag.(bool) {
+			_, err = client.Internet.EnableIPv6(internet.ID)
+			if err != nil {
+				return fmt.Errorf("Failed to Enable IPv6 address: %s", err)
+			}
+		}
 	}
 
 	d.SetId(internet.GetStrID())
@@ -194,6 +215,27 @@ func resourceSakuraCloudInternetUpdate(d *schema.ResourceData, meta interface{})
 		}
 	}
 
+	// handle ipv6 param
+	if d.HasChange("enable_ipv6") {
+		enableIPv6 := false
+		if ipv6Flag, ok := d.GetOk("enable_ipv6"); ok {
+			if ipv6Flag.(bool) {
+				enableIPv6 = true
+			}
+		}
+
+		if enableIPv6 {
+			_, err = client.Internet.EnableIPv6(internet.ID)
+			if err != nil {
+				return fmt.Errorf("Failed to Enable IPv6 address: %s", err)
+			}
+		} else {
+			if len(internet.Switch.IPv6Nets) > 0 {
+				_, err = client.Internet.DisableIPv6(internet.ID, internet.Switch.IPv6Nets[0].ID)
+			}
+		}
+	}
+
 	d.SetId(internet.GetStrID())
 	return resourceSakuraCloudInternetRead(d, meta)
 }
@@ -240,6 +282,14 @@ func resourceSakuraCloudInternetDelete(d *schema.ResourceData, meta interface{})
 				}
 			}
 
+		}
+	}
+
+	// disable ipv6
+	if len(internet.Switch.IPv6Nets) > 0 {
+		_, err = client.Internet.DisableIPv6(toSakuraCloudID(d.Id()), internet.Switch.IPv6Nets[0].ID)
+		if err != nil {
+			return fmt.Errorf("Error disabling ipv6 addr: %s", err)
 		}
 	}
 
@@ -297,6 +347,22 @@ func setInternetResourceData(d *schema.ResourceData, client *api.Client, data *s
 		d.Set("server_ids", flattenServers(servers))
 	} else {
 		d.Set("server_ids", []string{})
+	}
+
+	if len(data.Switch.IPv6Nets) == 0 {
+		d.Set("enable_ipv6", false)
+		d.Set("ipv6_prefix", nil)
+		d.Set("ipv6_prefix_len", nil)
+		d.Set("ipv6_nw_address", nil)
+	} else {
+		pref := data.Switch.IPv6Nets[0].IPv6Prefix
+		maskLen := data.Switch.IPv6Nets[0].IPv6PrefixLen
+		nwAddress := fmt.Sprintf("%s/%d", pref, maskLen)
+
+		d.Set("enable_ipv6", true)
+		d.Set("ipv6_prefix", pref)
+		d.Set("ipv6_prefix_len", maskLen)
+		d.Set("ipv6_nw_address", nwAddress)
 	}
 
 	d.Set("zone", client.Zone)

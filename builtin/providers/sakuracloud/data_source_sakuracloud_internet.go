@@ -81,7 +81,22 @@ func dataSourceSakuraCloudInternet() *schema.Resource {
 				Computed: true,
 				Elem:     &schema.Schema{Type: schema.TypeString},
 			},
-
+			"enable_ipv6": &schema.Schema{
+				Type:     schema.TypeBool,
+				Computed: true,
+			},
+			"ipv6_prefix": &schema.Schema{
+				Type:     schema.TypeString,
+				Computed: true,
+			},
+			"ipv6_prefix_len": &schema.Schema{
+				Type:     schema.TypeInt,
+				Computed: true,
+			},
+			"ipv6_nw_address": &schema.Schema{
+				Type:     schema.TypeString,
+				Computed: true,
+			},
 			"zone": &schema.Schema{
 				Type:         schema.TypeString,
 				Optional:     true,

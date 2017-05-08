@@ -46,6 +46,10 @@ func TestAccResourceSakuraCloudInternet(t *testing.T) {
 						"sakuracloud_internet.foobar", "server_ids.#", "0"),
 					resource.TestCheckResourceAttr(
 						"sakuracloud_internet.foobar", "nw_ipaddresses.#", "11"),
+					resource.TestCheckResourceAttr(
+						"sakuracloud_internet.foobar", "enable_ipv6", "true"),
+					resource.TestCheckResourceAttr(
+						"sakuracloud_internet.foobar", "ipv6_prefix_len", "64"),
 				),
 			},
 			resource.TestStep{
@@ -62,6 +66,10 @@ func TestAccResourceSakuraCloudInternet(t *testing.T) {
 						"sakuracloud_internet.foobar", "server_ids.#", "1"),
 					resource.TestCheckResourceAttr(
 						"sakuracloud_internet.foobar", "nw_ipaddresses.#", "11"),
+					resource.TestCheckResourceAttr(
+						"sakuracloud_internet.foobar", "enable_ipv6", "true"),
+					resource.TestCheckResourceAttr(
+						"sakuracloud_internet.foobar", "ipv6_prefix_len", "64"),
 				),
 			},
 		},
@@ -146,6 +154,7 @@ resource "sakuracloud_disk" "foobar"{
 resource "sakuracloud_internet" "foobar" {
     name = "myinternet_upd"
     band_width = 500
+    enable_ipv6 = true
 }`
 
 var testAccCheckSakuraCloudInternetConfig_with_server = `
@@ -172,5 +181,6 @@ resource "sakuracloud_disk" "foobar"{
 resource "sakuracloud_internet" "foobar" {
     name = "myinternet_upd"
     band_width = 500
+    enable_ipv6 = true
 }
 `
