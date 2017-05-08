@@ -37,6 +37,58 @@ func (api *InternetAPI) UpdateBandWidth(id int64, bandWidth int) (*sacloud.Inter
 	})
 }
 
+// AddSubnet IPアドレスブロックの追加割り当て
+func (api *InternetAPI) AddSubnet(id int64, nwMaskLen int, nextHop string) (*sacloud.Subnet, error) {
+	var (
+		method = "POST"
+		uri    = fmt.Sprintf("%s/%d/subnet", api.getResourceURL(), id)
+	)
+	body := &map[string]interface{}{
+		"NetworkMaskLen": nwMaskLen,
+		"NextHop":        nextHop,
+	}
+
+	res := &sacloud.Response{}
+	err := api.baseAPI.request(method, uri, body, res)
+	if err != nil {
+		return nil, err
+	}
+	return res.Subnet, nil
+}
+
+// UpdateSubnet IPアドレスブロックの更新
+func (api *InternetAPI) UpdateSubnet(id int64, subnetID int64, nextHop string) (*sacloud.Subnet, error) {
+	var (
+		method = "PUT"
+		uri    = fmt.Sprintf("%s/%d/subnet/%d", api.getResourceURL(), id, subnetID)
+	)
+	body := &map[string]interface{}{
+		"NextHop": nextHop,
+	}
+
+	res := &sacloud.Response{}
+	err := api.baseAPI.request(method, uri, body, res)
+	if err != nil {
+		return nil, err
+	}
+	return res.Subnet, nil
+}
+
+// DeleteSubnet IPアドレスブロックの削除
+func (api *InternetAPI) DeleteSubnet(id int64, subnetID int64) (*sacloud.ResultFlagValue, error) {
+	var (
+		method = "DELETE"
+		uri    = fmt.Sprintf("%s/%d/subnet/%d", api.getResourceURL(), id, subnetID)
+	)
+
+	res := &sacloud.ResultFlagValue{}
+	err := api.baseAPI.request(method, uri, nil, res)
+	if err != nil {
+		return nil, err
+	}
+	return res, nil
+}
+
 // EnableIPv6 IPv6有効化
 func (api *InternetAPI) EnableIPv6(id int64) (*sacloud.IPv6Net, error) {
 	var (
