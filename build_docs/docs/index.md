@@ -22,6 +22,7 @@
     - [ディスク](configuration/resources/disk/)
     - [スイッチ](configuration/resources/switch/)
     - [ルーター](configuration/resources/internet/)
+    - [サブネット](configuration/resources/subnet/)
     - [パケットフィルタ](configuration/resources/packet_filter/)
     - [ブリッジ](configuration/resources/bridge/)
     - [ロードバランサー](configuration/resources/load_balancer/)

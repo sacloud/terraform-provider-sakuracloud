@@ -98,4 +98,5 @@ data sakuracloud_archive "centos" {
 | `sakuracloud_server`         | サーバー                | -                                          |
 | `sakuracloud_simple_monitor` | シンプル監視            | -                                          |
 | `sakuracloud_ssh_key`        | 公開鍵                 | -                                          |
+| `sakuracloud_subnet`         | サブネット              | -                                          |
 | `sakuracloud_switch`         | スイッチ                | -                                          |
