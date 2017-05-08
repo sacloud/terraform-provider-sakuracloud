@@ -58,6 +58,7 @@ func Provider() terraform.ResourceProvider {
 			"sakuracloud_simple_monitor": dataSourceSakuraCloudSimpleMonitor(),
 			"sakuracloud_server":         dataSourceSakuraCloudServer(),
 			"sakuracloud_ssh_key":        dataSourceSakuraCloudSSHKey(),
+			"sakuracloud_subnet":         dataSourceSakuraCloudSubnet(),
 			"sakuracloud_switch":         dataSourceSakuraCloudSwitch(),
 		},
 		ResourcesMap: map[string]*schema.Resource{
@@ -79,6 +80,7 @@ func Provider() terraform.ResourceProvider {
 			"sakuracloud_server":                         resourceSakuraCloudServer(),
 			"sakuracloud_ssh_key":                        resourceSakuraCloudSSHKey(),
 			"sakuracloud_ssh_key_gen":                    resourceSakuraCloudSSHKeyGen(),
+			"sakuracloud_subnet":                         resourceSakuraCloudSubnet(),
 			"sakuracloud_switch":                         resourceSakuraCloudSwitch(),
 			"sakuracloud_vpc_router":                     resourceSakuraCloudVPCRouter(),
 			"sakuracloud_vpc_router_interface":           resourceSakuraCloudVPCRouterInterface(),
