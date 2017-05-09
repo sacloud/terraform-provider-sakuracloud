@@ -93,6 +93,7 @@ func resourceSakuraCloudDisk() *schema.Resource {
 				Type:         schema.TypeString,
 				Optional:     true,
 				ValidateFunc: validateMaxLength(8, 64),
+				Sensitive:    true,
 			},
 			"ssh_key_ids": &schema.Schema{
 				Type:     schema.TypeList,
