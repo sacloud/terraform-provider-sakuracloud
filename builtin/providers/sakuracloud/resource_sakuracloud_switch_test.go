@@ -121,7 +121,7 @@ resource "sakuracloud_server" "foobar" {
     name = "myserver"
     description = "Server from TerraForm for SAKURA CLOUD"
     tags = ["@virtio-net-pci"]
-    additional_interfaces = ["${sakuracloud_switch.foobar.id}"]
+    additional_nics = ["${sakuracloud_switch.foobar.id}"]
 }
 resource "sakuracloud_switch" "foobar" {
     name = "myswitch_upd"

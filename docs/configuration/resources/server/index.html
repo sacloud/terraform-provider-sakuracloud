@@ -311,7 +311,30 @@
 <pre><code class="hcl">resource &quot;sakuracloud_server&quot; &quot;myserver&quot; {
     name = &quot;myserver&quot;
     disks = [&quot;${sakuracloud_disk.mydisk.id}&quot;]
-    additional_interfaces = [&quot;&quot;]
+
+    # コア数
+    # core = 1
+
+    # メモリサイズ(GB)
+    # memory = 1
+
+    # 上流のNWとの接続方法
+    # nic = &quot;shared&quot;
+
+    # 追加NIC
+    # additional_nics = [&quot;${sakuracloud_switch.myswitch.id}&quot;]
+
+    # パケットフィルタ
+    # packet_filter_ids = [&quot;${sakuracloud_packet_filter.myfilter.id}&quot;]
+
+    # ISOイメージ(CD-ROM)
+    # cdrom_id = &quot;${data.sakuracloud_cdrom.mycdrom.id}&quot;
+
+    # ネットワーク設定(nicにスイッチIDが指定されている場合のみ)
+    # ipaddress = &quot;192.168.0.101&quot;
+    # gateway = &quot;192.168.0.1&quot;
+    # nw_mask_len = 24
+
     description = &quot;Server from TerraForm for SAKURA CLOUD&quot;
     tags = [&quot;@virtio-net-pci&quot;]
 }
@@ -363,7 +386,7 @@
 <td>指定可能な値は<a href="http://cloud.sakura.ad.jp/specification/server-disk/">こちら</a>のプラン一覧を参照ください</td>
 </tr>
 <tr>
-<td><code>base_interface</code></td>
+<td><code>nic</code></td>
 <td align="center">-</td>
 <td>基本NIC</td>
 <td align="center"><code>shared</code></td>
@@ -371,7 +394,7 @@
 <td>eth0の上流NWとの接続方法を指定する。</td>
 </tr>
 <tr>
-<td><code>additional_interfaces</code></td>
+<td><code>additional_nics</code></td>
 <td align="center">-</td>
 <td>追加NIC</td>
 <td align="center">-</td>
@@ -403,7 +426,7 @@
 <td>-</td>
 </tr>
 <tr>
-<td><code>base_nw_ipaddress</code></td>
+<td><code>ipaddress</code></td>
 <td align="center">-</td>
 <td>基本NIC-IPアドレス</td>
 <td align="center">-</td>
@@ -411,7 +434,7 @@
 <td><a href="#注1">注1</a></td>
 </tr>
 <tr>
-<td><code>base_nw_gateway</code></td>
+<td><code>gateway</code></td>
 <td align="center">-</td>
 <td>基本NIC-ゲートウェイ</td>
 <td align="center">-</td>
@@ -419,20 +442,12 @@
 <td><a href="#注1">注1</a></td>
 </tr>
 <tr>
-<td><code>base_nw_mask_len</code></td>
+<td><code>nw_mask_len</code></td>
 <td align="center">-</td>
 <td>基本NIC-サブネットマスク長</td>
 <td align="center">-</td>
 <td>文字列</td>
 <td><a href="#注1">注1</a></td>
-</tr>
-<tr>
-<td><code>description</code></td>
-<td align="center">-</td>
-<td>説明</td>
-<td align="center">-</td>
-<td>文字列</td>
-<td>-</td>
 </tr>
 <tr>
 <td><code>tags</code></td>
@@ -453,7 +468,7 @@
 </tbody>
 </table>
 <h4 id="1">注1</h4>
-<p><code>base_interface</code>にスイッチのIDが指定されており、かつ<code>disks</code>の最初のパラメーターに
+<p><code>nic</code>にスイッチのIDが指定されており、かつ<code>disks</code>の最初のパラメーターに
 ディスクの修正に対応しているディスクのIDが指定されている場合に有効。
 ディスクの修正は主にLinux系パブリックアーカイブを元にしたディスクの場合にサポートされています。</p>
 <h3 id="_3">属性</h3>
@@ -492,12 +507,12 @@
 <td>-</td>
 </tr>
 <tr>
-<td><code>base_interface</code></td>
+<td><code>nic</code></td>
 <td>基本NIC</td>
 <td>-</td>
 </tr>
 <tr>
-<td><code>additional_interfaces</code></td>
+<td><code>additional_nics</code></td>
 <td>追加NIC</td>
 <td>-</td>
 </tr>
@@ -527,27 +542,27 @@
 <td>MACアドレスのリスト(NICの個数分のリスト)</td>
 </tr>
 <tr>
-<td><code>base_nw_ipaddress</code></td>
+<td><code>ipaddress</code></td>
 <td>基本NIC-IPアドレス</td>
 <td>eth0のIPアドレス</td>
 </tr>
 <tr>
-<td><code>base_nw_dns_servers</code></td>
+<td><code>dns_servers</code></td>
 <td>基本NIC-DNSサーバー</td>
 <td>eth0の属するセグメントの推奨ネームサーバーのリスト</td>
 </tr>
 <tr>
-<td><code>base_nw_gateway</code></td>
+<td><code>gateway</code></td>
 <td>基本NIC-ゲートウェイ</td>
 <td>eth0の属するセグメントのゲートウェイIPアドレス</td>
 </tr>
 <tr>
-<td><code>base_nw_address</code></td>
+<td><code>nw_address</code></td>
 <td>基本NIC-ネットワークアドレス</td>
 <td>eth0のIPアドレスのネットワークアドレス</td>
 </tr>
 <tr>
-<td><code>base_nw_mask_len</code></td>
+<td><code>nw_mask_len</code></td>
 <td>基本NIC-サブネットマスク長</td>
 <td>eth0のIPアドレスのサブネットマスク長</td>
 </tr>

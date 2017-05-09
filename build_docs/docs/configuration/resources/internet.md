@@ -41,10 +41,10 @@ resource "sakuracloud_internet" "myrouter" {
 | `server_ids`         | サーバーID              | 接続されているサーバーのID(リスト)             |
 | `switch_id`          | スイッチID              | (内部的に)接続されているスイッチID              |
 | `nw_address`         | ネットワークアドレス      | ルーターに割り当てられたグローバルIPのネットワークアドレス |
-| `nw_gateway`         | ゲートウェイ             | ルーターに割り当てられたセグメントのゲートウェイIPアドレス |
-| `nw_min_ipaddress`   | 最小IPアドレス           | ルーターに割り当てられたグローバルIPアドレスのうち、利用可能な先頭IPアドレス [注1](#ルーター-sakuracloud_internet_属性_注1) |
-| `nw_max_ipaddress`   | 最大IPアドレス           | ルーターに割り当てられたグローバルIPアドレスのうち、利用可能な最後尾IPアドレス [注1](#ルーター-sakuracloud_internet_属性_注1) |
-| `nw_ipaddresses`     | IPアドレスリスト         | ルーターに割り当てられたグローバルIPアドレスのうち、利用可能なIPアドレスのリスト [注1](#ルーター-sakuracloud_internet_属性_注1)|
+| `gateway`         | ゲートウェイ             | ルーターに割り当てられたセグメントのゲートウェイIPアドレス |
+| `min_ipaddress`   | 最小IPアドレス           | ルーターに割り当てられたグローバルIPアドレスのうち、利用可能な先頭IPアドレス [注1](#ルーター-sakuracloud_internet_属性_注1) |
+| `max_ipaddress`   | 最大IPアドレス           | ルーターに割り当てられたグローバルIPアドレスのうち、利用可能な最後尾IPアドレス [注1](#ルーター-sakuracloud_internet_属性_注1) |
+| `ipaddresses`     | IPアドレスリスト         | ルーターに割り当てられたグローバルIPアドレスのうち、利用可能なIPアドレスのリスト [注1](#ルーター-sakuracloud_internet_属性_注1)|
 | `ipv6_prefix`        | IPv6アドレスプレフィックス| -              |
 | `ipv6_prefix_len`    | IPv6アドレスプレフィックス長 | -             |
 | `ipv6_nw_address`    | IPv6ネットワークアドレス     | -             |
@@ -55,4 +55,4 @@ resource "sakuracloud_internet" "myrouter" {
 
 詳細は[こちら](http://cloud-news.sakura.ad.jp/faq_top/faq/#H004)を参照ください。
 
-`nw_min_ipaddress`と`nw_max_ipaddress`、`nw_ipaddresses`には利用可能なIPアドレスが設定されています。
+`min_ipaddress`と`max_ipaddress`、`ipaddresses`には利用可能なIPアドレスが設定されています。

@@ -43,9 +43,16 @@ func resourceSakuraCloudServer() *schema.Resource {
 				// ValidateFunc: validateSakuracloudIDArrayType,
 			},
 			"base_interface": &schema.Schema{
-				Type:     schema.TypeString,
-				Optional: true,
-				Default:  "shared",
+				Type:          schema.TypeString,
+				Optional:      true,
+				ConflictsWith: []string{"nic"},
+				Deprecated:    "Use field 'nic' instead",
+			},
+			"nic": &schema.Schema{
+				Type:          schema.TypeString,
+				Optional:      true,
+				ConflictsWith: []string{"base_interface"},
+				Default:       "shared",
 			},
 			"cdrom_id": &schema.Schema{
 				Type:         schema.TypeString,
@@ -53,10 +60,19 @@ func resourceSakuraCloudServer() *schema.Resource {
 				ValidateFunc: validateSakuracloudIDType,
 			},
 			"additional_interfaces": &schema.Schema{
-				Type:     schema.TypeList,
-				Optional: true,
-				MaxItems: 3,
-				Elem:     &schema.Schema{Type: schema.TypeString},
+				Type:          schema.TypeList,
+				Optional:      true,
+				MaxItems:      3,
+				Elem:          &schema.Schema{Type: schema.TypeString},
+				ConflictsWith: []string{"additional_nics"},
+				Deprecated:    "Use field 'additional_nics' instead",
+			},
+			"additional_nics": &schema.Schema{
+				Type:          schema.TypeList,
+				Optional:      true,
+				MaxItems:      3,
+				Elem:          &schema.Schema{Type: schema.TypeString},
+				ConflictsWith: []string{"additional_interfaces"},
 			},
 			"packet_filter_ids": &schema.Schema{
 				Type:     schema.TypeList,
@@ -89,31 +105,89 @@ func resourceSakuraCloudServer() *schema.Resource {
 				Elem:     &schema.Schema{Type: schema.TypeString},
 			},
 			"base_nw_ipaddress": &schema.Schema{
-				Type:     schema.TypeString,
-				Optional: true,
-				Computed: true,
+				Type:          schema.TypeString,
+				Optional:      true,
+				Computed:      true,
+				ConflictsWith: []string{"ipaddress"},
+				Deprecated:    "Use field 'ipaddress' instead",
+			},
+			"ipaddress": &schema.Schema{
+				Type:          schema.TypeString,
+				Optional:      true,
+				Computed:      true,
+				ConflictsWith: []string{"base_nw_ipaddress"},
 			},
 			"base_nw_dns_servers": &schema.Schema{
+				Type:       schema.TypeList,
+				Computed:   true,
+				Elem:       &schema.Schema{Type: schema.TypeString},
+				Deprecated: "Use field 'dns_servers' instead",
+			},
+			"dns_servers": &schema.Schema{
 				Type:     schema.TypeList,
 				Computed: true,
 				Elem:     &schema.Schema{Type: schema.TypeString},
 			},
 			"base_nw_gateway": &schema.Schema{
-				Type:     schema.TypeString,
-				Optional: true,
-				Computed: true,
+				Type:          schema.TypeString,
+				Optional:      true,
+				Computed:      true,
+				ConflictsWith: []string{"gateway"},
+				Deprecated:    "Use field 'gateway' instead",
+			},
+			"gateway": &schema.Schema{
+				Type:          schema.TypeString,
+				Optional:      true,
+				Computed:      true,
+				ConflictsWith: []string{"base_nw_gateway"},
 			},
 			"base_nw_address": &schema.Schema{
+				Type:       schema.TypeString,
+				Computed:   true,
+				Deprecated: "Use field 'nw_address' instead",
+			},
+			"nw_address": &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
 			},
 			"base_nw_mask_len": &schema.Schema{
-				Type:     schema.TypeString,
-				Optional: true,
-				Computed: true,
+				Type:          schema.TypeString,
+				Optional:      true,
+				Computed:      true,
+				ConflictsWith: []string{"nw_mask_len"},
+				Deprecated:    "Use field 'nw_mask_len' instead",
+			},
+			"nw_mask_len": &schema.Schema{
+				Type:          schema.TypeString,
+				Optional:      true,
+				Computed:      true,
+				ConflictsWith: []string{"base_nw_mask_len"},
 			},
 		},
 	}
+}
+
+var serverSchemaMigrateDef = []migrateSchemaDef{
+	{
+		source:      "base_interface",
+		destination: "nic",
+	},
+	{
+		source:      "additional_interfaces",
+		destination: "additional_nics",
+	},
+	{
+		source:      "base_nw_ipaddress",
+		destination: "ipaddress",
+	},
+	{
+		source:      "base_nw_gateway",
+		destination: "gateway",
+	},
+	{
+		source:      "base_nw_mask_len",
+		destination: "nw_mask_len",
+	},
 }
 
 func resourceSakuraCloudServerCreate(d *schema.ResourceData, meta interface{}) error {
@@ -124,6 +198,8 @@ func resourceSakuraCloudServerCreate(d *schema.ResourceData, meta interface{}) e
 		client.Zone = zone.(string)
 	}
 
+	migrateResourceData(d, meta, serverSchemaMigrateDef)
+
 	opts := client.Server.New()
 	opts.Name = d.Get("name").(string)
 
@@ -133,7 +209,7 @@ func resourceSakuraCloudServerCreate(d *schema.ResourceData, meta interface{}) e
 	}
 	opts.SetServerPlanByID(planID.GetStrID())
 
-	if hasSharedInterface, ok := d.GetOk("base_interface"); ok {
+	if hasSharedInterface, ok := d.GetOk("nic"); ok {
 		switch forceString(hasSharedInterface) {
 		case "shared":
 			opts.AddPublicNWConnectedParam()
@@ -142,12 +218,11 @@ func resourceSakuraCloudServerCreate(d *schema.ResourceData, meta interface{}) e
 		default:
 			opts.AddExistsSwitchConnectedParam(forceString(hasSharedInterface))
 		}
-
 	} else {
-		opts.AddEmptyConnectedParam()
+		opts.AddPublicNWConnectedParam()
 	}
 
-	if interfaces, ok := d.GetOk("additional_interfaces"); ok {
+	if interfaces, ok := d.GetOk("additional_nics"); ok {
 		for _, switchID := range interfaces.([]interface{}) {
 			if switchID == nil {
 				opts.AddEmptyConnectedParam()
@@ -199,9 +274,9 @@ func resourceSakuraCloudServerCreate(d *schema.ResourceData, meta interface{}) e
 					if server.Interfaces[0].Switch.Scope == sacloud.ESCopeShared {
 						isNeedEditDisk = true
 					} else {
-						baseIP := forceString(d.Get("base_nw_ipaddress"))
-						baseGateway := forceString(d.Get("base_nw_gateway"))
-						baseMaskLen := forceString(d.Get("base_nw_mask_len"))
+						baseIP := forceString(d.Get("ipaddress"))
+						baseGateway := forceString(d.Get("gateway"))
+						baseMaskLen := forceString(d.Get("nw_mask_len"))
 
 						diskEditConfig.SetUserIPAddress(baseIP)
 						diskEditConfig.SetDefaultRoute(baseGateway)
@@ -281,6 +356,7 @@ func resourceSakuraCloudServerRead(d *schema.ResourceData, meta interface{}) err
 	if ok {
 		client.Zone = zone.(string)
 	}
+	migrateResourceData(d, meta, serverSchemaMigrateDef)
 
 	server, err := client.Server.Read(toSakuraCloudID(d.Id()))
 	if err != nil {
@@ -290,13 +366,14 @@ func resourceSakuraCloudServerRead(d *schema.ResourceData, meta interface{}) err
 	return setServerResourceData(d, client, server)
 }
 
-func resourceSakuraCloudServerUpdate(d *schema.ResourceData, meta interface{}) error {
+func resourceSakuraCloudServerUpdate(r *schema.ResourceData, meta interface{}) error {
 	c := meta.(*api.Client)
 	client := c.Clone()
-	zone, ok := d.GetOk("zone")
+	zone, ok := r.GetOk("zone")
 	if ok {
 		client.Zone = zone.(string)
 	}
+	d := migrateResourceData(r, meta, serverSchemaMigrateDef)
 
 	shutdownFunc := client.Server.Stop
 
@@ -318,8 +395,8 @@ func resourceSakuraCloudServerUpdate(d *schema.ResourceData, meta interface{}) e
 		isNeedRestart = true
 	}
 
-	if d.HasChange("disks") || d.HasChange("base_interface") || d.HasChange("additional_interfaces") ||
-		d.HasChange("base_nw_ipaddress") || d.HasChange("base_nw_gateway") || d.HasChange("base_nw_mask_len") {
+	if d.HasChange("disks") || d.HasChange("nic") || d.HasChange("additional_nics") ||
+		d.HasChange("ipaddress") || d.HasChange("gateway") || d.HasChange("nw_mask_len") {
 		isNeedRestart = true
 	}
 
@@ -361,18 +438,19 @@ func resourceSakuraCloudServerUpdate(d *schema.ResourceData, meta interface{}) e
 	}
 
 	// NIC
-	if d.HasChange("base_interface") || d.HasChange("additional_interfaces") {
+	if d.HasChange("nic") || d.HasChange("additional_nics") {
 
 		var conf []interface{}
-		if c, ok := d.GetOk("additional_interfaces"); ok {
+		if c, ok := d.GetOk("additional_nics"); ok {
 			conf = c.([]interface{})
 		}
 
 		newNICCount := len(conf)
 		for i, nic := range server.Interfaces {
 			if i == 0 {
-				// only when base_interface has change
-				if d.HasChange("base_interface") && server.Interfaces[0].Switch != nil {
+				// only when nic has change
+				if d.HasChange("nic") &&
+					server.Interfaces[0].Switch != nil {
 					_, err := client.Interface.DisconnectFromSwitch(server.Interfaces[0].ID)
 					if err != nil {
 						return fmt.Errorf("Error disconnecting NIC from SakuraCloud Switch resource: %s", err)
@@ -397,9 +475,9 @@ func resourceSakuraCloudServerUpdate(d *schema.ResourceData, meta interface{}) e
 				}
 			}
 		}
-		// only when base_interface has change
-		if d.HasChange("base_interface") {
-			sharedNICCon := d.Get("base_interface").(string)
+		// only when nic has change
+		if d.HasChange("nic") {
+			sharedNICCon := d.Get("nic").(string)
 			if sharedNICCon == "shared" {
 				_, err := client.Interface.ConnectToSharedSegment(server.Interfaces[0].ID)
 				if err != nil {
@@ -448,16 +526,16 @@ func resourceSakuraCloudServerUpdate(d *schema.ResourceData, meta interface{}) e
 		return fmt.Errorf("Couldn't find SakuraCloud Server resource: %s", err)
 	}
 
-	if d.HasChange("base_nw_ipaddress") || d.HasChange("base_nw_gateway") || d.HasChange("base_nw_mask_len") {
+	if d.HasChange("ipaddress") || d.HasChange("gateway") || d.HasChange("nw_mask_len") {
 		if len(updatedServer.Disks) > 0 && len(updatedServer.Interfaces) > 0 && updatedServer.Interfaces[0].Switch != nil {
 			isNeedEditDisk := false
 			diskEditConfig := client.Disk.NewCondig()
 			if updatedServer.Interfaces[0].Switch.Scope == sacloud.ESCopeShared {
 				isNeedEditDisk = true
 			} else {
-				baseIP := forceString(d.Get("base_nw_ipaddress"))
-				baseGateway := forceString(d.Get("base_nw_gateway"))
-				baseMaskLen := forceString(d.Get("base_nw_mask_len"))
+				baseIP := forceString(d.Get("ipaddress"))
+				baseGateway := forceString(d.Get("gateway"))
+				baseMaskLen := forceString(d.Get("nw_mask_len"))
 
 				diskEditConfig.SetUserIPAddress(baseIP)
 				diskEditConfig.SetDefaultRoute(baseGateway)
@@ -603,7 +681,7 @@ func resourceSakuraCloudServerUpdate(d *schema.ResourceData, meta interface{}) e
 
 	}
 
-	return resourceSakuraCloudServerRead(d, meta)
+	return resourceSakuraCloudServerRead(d.RawResourceData(), meta)
 
 }
 
@@ -614,6 +692,7 @@ func resourceSakuraCloudServerDelete(d *schema.ResourceData, meta interface{}) e
 	if ok {
 		client.Zone = zone.(string)
 	}
+	migrateResourceData(d, meta, serverSchemaMigrateDef)
 
 	server, err := client.Server.Read(toSakuraCloudID(d.Id()))
 	if err != nil {
@@ -657,15 +736,27 @@ func setServerResourceData(d *schema.ResourceData, client *api.Client, data *sac
 	hasSharedInterface := len(data.Interfaces) > 0 && data.Interfaces[0].Switch != nil
 	if hasSharedInterface {
 		if data.Interfaces[0].Switch.Scope == sacloud.ESCopeShared {
-			d.Set("base_interface", "shared")
+			if _, ok := d.GetOk("base_interface"); ok {
+				d.Set("base_interface", "shared")
+			}
+			d.Set("nic", "shared")
 		} else {
-			d.Set("base_interface", data.Interfaces[0].Switch.GetStrID())
+			d.Set("nic", data.Interfaces[0].Switch.GetStrID())
+			if _, ok := d.GetOk("base_interface"); ok {
+				d.Set("base_interface", data.Interfaces[0].Switch.GetStrID())
+			}
 		}
 	} else {
-		d.Set("base_interface", "")
+		d.Set("nic", "")
+		if _, ok := d.GetOk("base_interface"); ok {
+			d.Set("base_interface", "")
+		}
 	}
 
-	d.Set("additional_interfaces", flattenInterfaces(data.Interfaces))
+	d.Set("additional_nics", flattenInterfaces(data.Interfaces))
+	if _, ok := d.GetOk("additional_interfaces"); ok {
+		d.Set("additional_interfaces", flattenInterfaces(data.Interfaces))
+	}
 
 	d.Set("description", data.Description)
 	d.Set("tags", data.Tags)
@@ -674,25 +765,42 @@ func setServerResourceData(d *schema.ResourceData, client *api.Client, data *sac
 
 	//readonly values
 	d.Set("macaddresses", flattenMacAddresses(data.Interfaces))
+
+	d.Set("ipaddress", "")
 	d.Set("base_nw_ipaddress", "")
+
 	d.Set("base_nw_dns_servers", []string{})
+	d.Set("dns_servers", []string{})
+
 	d.Set("base_nw_gateway", "")
+	d.Set("gateway", "")
+
 	d.Set("base_nw_address", "")
+	d.Set("nw_address", "")
+
+	d.Set("nw_mask_len", "")
 	d.Set("base_nw_mask_len", "")
 	if hasSharedInterface {
 		if data.Interfaces[0].Switch.Scope == sacloud.ESCopeShared {
+			d.Set("ipaddress", data.Interfaces[0].IPAddress)
 			d.Set("base_nw_ipaddress", data.Interfaces[0].IPAddress)
 		} else {
+			d.Set("ipaddress", data.Interfaces[0].UserIPAddress)
 			d.Set("base_nw_ipaddress", data.Interfaces[0].UserIPAddress)
 		}
 
 		d.Set("base_nw_dns_servers", data.Zone.Region.NameServers)
+		d.Set("dns_servers", data.Zone.Region.NameServers)
 		if data.Interfaces[0].Switch.UserSubnet != nil {
 			d.Set("base_nw_gateway", data.Interfaces[0].Switch.UserSubnet.DefaultRoute)
+			d.Set("gateway", data.Interfaces[0].Switch.UserSubnet.DefaultRoute)
+
 			d.Set("base_nw_mask_len", fmt.Sprintf("%d", data.Interfaces[0].Switch.UserSubnet.NetworkMaskLen))
+			d.Set("nw_mask_len", fmt.Sprintf("%d", data.Interfaces[0].Switch.UserSubnet.NetworkMaskLen))
 		}
 		if data.Interfaces[0].Switch.Subnet != nil {
 			d.Set("base_nw_address", data.Interfaces[0].Switch.Subnet.NetworkAddress) // null if connected switch(not router)
+			d.Set("nw_address", data.Interfaces[0].Switch.Subnet.NetworkAddress)      // null if connected switch(not router)
 		}
 	}
 

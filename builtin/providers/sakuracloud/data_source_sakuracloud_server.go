@@ -48,6 +48,11 @@ func dataSourceSakuraCloudServer() *schema.Resource {
 				Elem:     &schema.Schema{Type: schema.TypeString},
 			},
 			"base_interface": &schema.Schema{
+				Type:       schema.TypeString,
+				Computed:   true,
+				Deprecated: "Use field 'nic' instead",
+			},
+			"nic": &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
 			},
@@ -56,6 +61,12 @@ func dataSourceSakuraCloudServer() *schema.Resource {
 				Computed: true,
 			},
 			"additional_interfaces": &schema.Schema{
+				Type:       schema.TypeList,
+				Computed:   true,
+				Elem:       &schema.Schema{Type: schema.TypeString},
+				Deprecated: "Use field 'additional_nics' instead",
+			},
+			"additional_nics": &schema.Schema{
 				Type:     schema.TypeList,
 				Computed: true,
 				Elem:     &schema.Schema{Type: schema.TypeString},
@@ -88,23 +99,49 @@ func dataSourceSakuraCloudServer() *schema.Resource {
 				Elem:     &schema.Schema{Type: schema.TypeString},
 			},
 			"base_nw_ipaddress": &schema.Schema{
+				Type:       schema.TypeString,
+				Computed:   true,
+				Deprecated: "Use field 'ipaddress' instead",
+			},
+			"ipaddress": &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
 			},
 			"base_nw_dns_servers": &schema.Schema{
+				Type:       schema.TypeList,
+				Computed:   true,
+				Elem:       &schema.Schema{Type: schema.TypeString},
+				Deprecated: "Use field 'dns_servers' instead",
+			},
+			"dns_servers": &schema.Schema{
 				Type:     schema.TypeList,
 				Computed: true,
 				Elem:     &schema.Schema{Type: schema.TypeString},
 			},
 			"base_nw_gateway": &schema.Schema{
+				Type:       schema.TypeString,
+				Computed:   true,
+				Deprecated: "Use field 'gateway' instead",
+			},
+			"gateway": &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
 			},
 			"base_nw_address": &schema.Schema{
+				Type:       schema.TypeString,
+				Computed:   true,
+				Deprecated: "Use field 'nw_address' instead",
+			},
+			"nw_address": &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
 			},
 			"base_nw_mask_len": &schema.Schema{
+				Type:       schema.TypeString,
+				Computed:   true,
+				Deprecated: "Use field 'nw_mask_len' instead",
+			},
+			"nw_mask_len": &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
 			},
