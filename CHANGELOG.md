@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.9.0 (2017-05-09)
+
+* データベースアプライアンス 石狩第2ゾーン対応 #113 (yamamoto-febc)
+* RancherOS パブリックアーカイブ追加 #114 (yamamoto-febc)
+* VPCRouterでの文字列長バリデーション追加 #115 (yamamoto-febc)
+* スイッチ+ルータでの追加IPアドレス(sakuracloud_subnet)追加 #117 (yamamoto-febc)
+* スイッチ+ルータでのIPv6対応 #118 (yamamoto-febc)
+* ネットワーク関連の属性名をシンプル化 #119 (yamamoto-febc)
+* パスワード項目に対してsensitiveフラグ有効化 #120 (yamamoto-febc)
+
+
 ## 0.8.1 (2017-04-15)
 
 - サーバーNIC接続変更時の挙動修正 #104 (yamamoto-febc)
