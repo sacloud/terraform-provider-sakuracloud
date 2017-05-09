@@ -59,9 +59,8 @@ func resourceSakuraCloudInternet() *schema.Resource {
 				ValidateFunc: validateStringInWord([]string{"is1a", "is1b", "tk1a", "tk1v"}),
 			},
 			"switch_id": &schema.Schema{
-				Type:         schema.TypeString,
-				Computed:     true,
-				ValidateFunc: validateSakuracloudIDType,
+				Type:     schema.TypeString,
+				Computed: true,
 			},
 			"server_ids": &schema.Schema{
 				Type:     schema.TypeList,
