@@ -73,22 +73,43 @@ func resourceSakuraCloudInternet() *schema.Resource {
 				Type:     schema.TypeString,
 				Computed: true,
 			},
-			"nw_gateway": &schema.Schema{
+			"gateway": &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
 			},
-			"nw_min_ipaddress": &schema.Schema{
+			"min_ipaddress": &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
 			},
-			"nw_max_ipaddress": &schema.Schema{
+			"max_ipaddress": &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
 			},
-			"nw_ipaddresses": &schema.Schema{
+			"ipaddresses": &schema.Schema{
 				Type:     schema.TypeList,
 				Computed: true,
 				Elem:     &schema.Schema{Type: schema.TypeString},
+			},
+			"nw_gateway": &schema.Schema{
+				Type:       schema.TypeString,
+				Computed:   true,
+				Deprecated: "Use field 'gateway' instead",
+			},
+			"nw_min_ipaddress": &schema.Schema{
+				Type:       schema.TypeString,
+				Computed:   true,
+				Deprecated: "Use field 'min_ipaddress' instead",
+			},
+			"nw_max_ipaddress": &schema.Schema{
+				Type:       schema.TypeString,
+				Computed:   true,
+				Deprecated: "Use field 'max_ipaddress' instead",
+			},
+			"nw_ipaddresses": &schema.Schema{
+				Type:       schema.TypeList,
+				Computed:   true,
+				Elem:       &schema.Schema{Type: schema.TypeString},
+				Deprecated: "Use field 'ipaddresses' instead",
 			},
 			"ipv6_prefix": &schema.Schema{
 				Type:     schema.TypeString,
@@ -329,14 +350,18 @@ func setInternetResourceData(d *schema.ResourceData, client *api.Client, data *s
 	d.Set("switch_id", sw.GetStrID())
 	d.Set("nw_address", sw.Subnets[0].NetworkAddress)
 	d.Set("nw_gateway", sw.Subnets[0].DefaultRoute)
+	d.Set("gateway", sw.Subnets[0].DefaultRoute)
 	d.Set("nw_min_ipaddress", sw.Subnets[0].IPAddresses.Min)
+	d.Set("min_ipaddress", sw.Subnets[0].IPAddresses.Min)
 	d.Set("nw_max_ipaddress", sw.Subnets[0].IPAddresses.Max)
+	d.Set("max_ipaddress", sw.Subnets[0].IPAddresses.Max)
 
 	ipList, err := sw.GetIPAddressList()
 	if err != nil {
 		return fmt.Errorf("Error reading Switch resource(IPAddresses): %s", err)
 	}
 	d.Set("nw_ipaddresses", ipList)
+	d.Set("ipaddresses", ipList)
 
 	if sw.ServerCount > 0 {
 		servers, err := client.Switch.GetServers(sw.ID)

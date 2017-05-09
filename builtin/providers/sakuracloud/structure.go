@@ -3,9 +3,11 @@ package sakuracloud
 import (
 	"fmt"
 	"github.com/hashicorp/terraform/helper/schema"
+	"github.com/hashicorp/terraform/terraform"
 	"github.com/sacloud/libsacloud/sacloud"
 	"strconv"
 	"strings"
+	"time"
 )
 
 func toSakuraCloudID(id string) int64 {
@@ -166,4 +168,65 @@ func expandFilters(filter interface{}) map[string]interface{} {
 	}
 
 	return ret
+}
+
+type migrateSchemaDef struct {
+	source      string
+	destination string
+}
+
+func migrateResourceData(d *schema.ResourceData, meta interface{}, defs []migrateSchemaDef) resourceData {
+
+	// migrate deprecated params
+	for _, def := range defs {
+		if v, ok := d.GetOk(def.source); ok {
+			d.Set(def.destination, v)
+		}
+	}
+
+	return &resourceDataWrapper{
+		ResourceData: d,
+		migrateDefs:  defs,
+	}
+}
+
+type resourceData interface {
+	UnsafeSetFieldRaw(key string, value string)
+	Get(key string) interface{}
+	GetChange(key string) (interface{}, interface{})
+	GetOk(key string) (interface{}, bool)
+	HasChange(key string) bool
+	Partial(on bool)
+	Set(key string, value interface{}) error
+	SetPartial(k string)
+	MarkNewResource()
+	IsNewResource() bool
+	Id() string
+	ConnInfo() map[string]string
+	SetId(v string)
+	SetConnInfo(v map[string]string)
+	SetType(t string)
+	State() *terraform.InstanceState
+	Timeout(key string) time.Duration
+
+	RawResourceData() *schema.ResourceData
+}
+type resourceDataWrapper struct {
+	*schema.ResourceData
+	migrateDefs []migrateSchemaDef
+}
+
+func (d *resourceDataWrapper) HasChange(key string) bool {
+	origFunc := d.ResourceData.HasChange
+
+	for _, def := range d.migrateDefs {
+		if def.source == key || def.destination == key {
+			return origFunc(def.source) || origFunc(def.destination)
+		}
+	}
+	return origFunc(key)
+}
+
+func (d *resourceDataWrapper) RawResourceData() *schema.ResourceData {
+	return d.ResourceData
 }
