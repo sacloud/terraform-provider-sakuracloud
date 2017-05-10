@@ -2,7 +2,8 @@
 
 [![Build Status](https://travis-ci.org/yamamoto-febc/terraform-provider-sakuracloud.svg?branch=master)](https://travis-ci.org/yamamoto-febc/terraform-provider-sakuracloud)
 
-Terraformでさくらのクラウドを操作するためのプラグイン
+Terraformからさくらのクラウドを操作するためのプラグインです。  
+このプラグインは`さくらインターネット公認ツール`としてさくらのクラウドユーザコミュニティによって開発されています。
 
 ## クイックスタート
 
