@@ -150,7 +150,7 @@ data "sakuracloud_archive" "foobar" {
 
 var testAccCheckSakuraCloudDataSourceArchive_OSType = `
 data "sakuracloud_archive" "foobar" {
-    os_type = "centos"
+    os_type = "plesk"
     zone = "tk1v"
 }
 `

@@ -126,6 +126,7 @@ type DatabaseCommonSetting struct {
 	AdminPassword string        `json:",omitempty"` // 管理者パスワード
 	DefaultUser   string        `json:",omitempty"` // ユーザー名
 	UserPassword  string        `json:",omitempty"` // ユーザーパスワード
+	WebUI         string        `json:",omitempty"` // WebUIのIPアドレス or FQDN
 	ServicePort   string        // ポート番号
 	SourceNetwork SourceNetwork // 接続許可ネットワーク
 }
