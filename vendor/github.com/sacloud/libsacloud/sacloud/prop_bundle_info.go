@@ -1,11 +1,15 @@
 package sacloud
 
+type BundleInfo struct {
+	HostClass string `json:",omitempty"`
+}
+
 // propBundleInfo バンドル情報内包型
 type propBundleInfo struct {
-	BundleInfo interface{} `json:",omitempty"` // バンドル情報
+	BundleInfo *BundleInfo `json:",omitempty"` // バンドル情報
 }
 
 // GetBundleInfo バンドル情報 取得
-func (p *propBundleInfo) GetBundleInfo() interface{} {
+func (p *propBundleInfo) GetBundleInfo() *BundleInfo {
 	return p.BundleInfo
 }

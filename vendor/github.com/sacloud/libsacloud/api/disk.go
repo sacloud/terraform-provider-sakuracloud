@@ -12,6 +12,9 @@ var (
 		"os-unix",
 		"os-linux",
 	}
+
+	// bundleInfoWindowsHostClass ディスクの編集可否判定に用いる、BundleInfoでのWindows判定文字列
+	bundleInfoWindowsHostClass = "ms_windows"
 )
 
 // DiskAPI ディスクAPI
@@ -243,7 +246,7 @@ func (api *DiskAPI) CanEditDisk(id int64) (bool, error) {
 	}
 
 	// BundleInfoがあれば編集不可
-	if disk.BundleInfo != nil {
+	if disk.BundleInfo != nil && disk.BundleInfo.HostClass == bundleInfoWindowsHostClass {
 		// Windows
 		return false, nil
 	}

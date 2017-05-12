@@ -23,6 +23,8 @@ const (
 	Kusanagi
 	// SiteGuard OS種別:SiteGuard(CentOS)
 	SiteGuard
+	// Plesk OS種別:Plesk(CentOS)
+	Plesk
 	// FreeBSD OS種別:FreeBSD
 	FreeBSD
 	// Windows2012 OS種別:Windows Server 2012 R2 Datacenter Edition
@@ -60,7 +62,7 @@ func (o ArchiveOSTypes) IsWindows() bool {
 // IsSupportDiskEdit ディスクの修正機能をフルサポートしているか(Windowsは一部サポートのためfalseを返す)
 func (o ArchiveOSTypes) IsSupportDiskEdit() bool {
 	switch o {
-	case CentOS, Ubuntu, Debian, VyOS, CoreOS, RancherOS, Kusanagi, SiteGuard, FreeBSD:
+	case CentOS, Ubuntu, Debian, VyOS, CoreOS, RancherOS, Kusanagi, SiteGuard, Plesk, FreeBSD:
 		return true
 	default:
 		return false
