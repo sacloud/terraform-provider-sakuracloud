@@ -11,18 +11,18 @@ func dataSourceSakuraCloudSimpleMonitor() *schema.Resource {
 		Read: dataSourceSakuraCloudSimpleMonitorRead,
 
 		Schema: map[string]*schema.Schema{
-			"filter": &schema.Schema{
+			"filter": {
 				Type:     schema.TypeSet,
 				Optional: true,
 				ForceNew: true,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
-						"name": &schema.Schema{
+						"name": {
 							Type:     schema.TypeString,
 							Required: true,
 						},
 
-						"values": &schema.Schema{
+						"values": {
 							Type:     schema.TypeList,
 							Required: true,
 							Elem:     &schema.Schema{Type: schema.TypeString},
@@ -30,90 +30,90 @@ func dataSourceSakuraCloudSimpleMonitor() *schema.Resource {
 					},
 				},
 			},
-			"target": &schema.Schema{
+			"target": {
 				Type:     schema.TypeString,
 				Computed: true,
 			},
-			"health_check": &schema.Schema{
+			"health_check": {
 				Type:     schema.TypeSet,
 				Computed: true,
 
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
-						"protocol": &schema.Schema{
+						"protocol": {
 							Type:     schema.TypeString,
 							Computed: true,
 						},
-						"delay_loop": &schema.Schema{
+						"delay_loop": {
 							Type:     schema.TypeInt,
 							Computed: true,
 						},
-						"host_header": &schema.Schema{
+						"host_header": {
 							Type:     schema.TypeString,
 							Computed: true,
 						},
-						"path": &schema.Schema{
+						"path": {
 							Type:     schema.TypeString,
 							Computed: true,
 						},
-						"status": &schema.Schema{
+						"status": {
 							Type:     schema.TypeString,
 							Computed: true,
 						},
-						"port": &schema.Schema{
+						"port": {
 							Type:     schema.TypeInt,
 							Computed: true,
 						},
-						"qname": &schema.Schema{
+						"qname": {
 							Type:     schema.TypeString,
 							Computed: true,
 						},
-						"excepcted_data": &schema.Schema{
+						"excepcted_data": {
 							Type:     schema.TypeString,
 							Computed: true,
 						},
-						"community": &schema.Schema{
+						"community": {
 							Type:     schema.TypeString,
 							Computed: true,
 						},
-						"snmp_version": &schema.Schema{
+						"snmp_version": {
 							Type:     schema.TypeString,
 							Computed: true,
 						},
-						"oid": &schema.Schema{
+						"oid": {
 							Type:     schema.TypeString,
 							Computed: true,
 						},
 					},
 				},
 			},
-			"description": &schema.Schema{
+			"description": {
 				Type:     schema.TypeString,
 				Computed: true,
 			},
-			"tags": &schema.Schema{
+			"tags": {
 				Type:     schema.TypeList,
 				Computed: true,
 				Elem:     &schema.Schema{Type: schema.TypeString},
 			},
-			"notify_email_enabled": &schema.Schema{
+			"notify_email_enabled": {
 				Type:     schema.TypeBool,
 				Computed: true,
 			},
-			"notify_email_html": &schema.Schema{
+			"notify_email_html": {
 				Type:     schema.TypeBool,
 				Computed: true,
 			},
-			"notify_slack_enabled": &schema.Schema{
+			"notify_slack_enabled": {
 				Type:     schema.TypeBool,
 				Computed: true,
 			},
-			"notify_slack_webhook": &schema.Schema{
+			"notify_slack_webhook": {
 				Type:     schema.TypeString,
 				Computed: true,
 			},
 
-			"enabled": &schema.Schema{
+			"enabled": {
 				Type:     schema.TypeBool,
 				Computed: true,
 			},

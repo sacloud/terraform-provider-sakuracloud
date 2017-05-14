@@ -1,6 +1,7 @@
 package sakuracloud
 
 import (
+	"errors"
 	"fmt"
 	"github.com/hashicorp/terraform/helper/resource"
 	"github.com/hashicorp/terraform/terraform"
@@ -17,7 +18,7 @@ func TestAccResourceSakuraCloudServer(t *testing.T) {
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckSakuraCloudServerDestroy,
 		Steps: []resource.TestStep{
-			resource.TestStep{
+			{
 				Config: testAccCheckSakuraCloudServerConfig_basic,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckSakuraCloudServerExists("sakuracloud_server.foobar", &server),
@@ -39,7 +40,7 @@ func TestAccResourceSakuraCloudServer(t *testing.T) {
 						regexp.MustCompile(".+")), // should be not empty
 				),
 			},
-			resource.TestStep{
+			{
 				Config: testAccCheckSakuraCloudServerConfig_update,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckSakuraCloudServerExists("sakuracloud_server.foobar", &server),
@@ -72,7 +73,7 @@ func TestAccSakuraCloudServer_EditConnections(t *testing.T) {
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckSakuraCloudServerDestroy,
 		Steps: []resource.TestStep{
-			resource.TestStep{
+			{
 				Config: testAccCheckSakuraCloudServerConfig_basic,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckSakuraCloudServerExists("sakuracloud_server.foobar", &server),
@@ -85,7 +86,7 @@ func TestAccSakuraCloudServer_EditConnections(t *testing.T) {
 						"sakuracloud_server.foobar", "macaddresses.#", "1"),
 				),
 			},
-			resource.TestStep{
+			{
 				Config: testAccCheckSakuraCloudServerConfig_swiched_NIC_added,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckSakuraCloudServerExists("sakuracloud_server.foobar", &server),
@@ -98,7 +99,7 @@ func TestAccSakuraCloudServer_EditConnections(t *testing.T) {
 						"sakuracloud_server.foobar", "macaddresses.#", "2"),
 				),
 			},
-			resource.TestStep{
+			{
 				Config: testAccCheckSakuraCloudServerConfig_swiched_NIC_updated,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckSakuraCloudServerExists("sakuracloud_server.foobar", &server),
@@ -111,7 +112,7 @@ func TestAccSakuraCloudServer_EditConnections(t *testing.T) {
 						"sakuracloud_server.foobar", "macaddresses.#", "4"),
 				),
 			},
-			resource.TestStep{
+			{
 				Config: testAccCheckSakuraCloudServerConfig_nw_nothing,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckSakuraCloudServerExists("sakuracloud_server.foobar", &server),
@@ -134,7 +135,7 @@ func TestAccSakuraCloudServer_ConnectPacketFilters(t *testing.T) {
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckSakuraCloudServerDestroy,
 		Steps: []resource.TestStep{
-			resource.TestStep{
+			{
 				Config: testAccCheckSakuraCloudServerConfig_with_packet_filter,
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttr(
@@ -143,7 +144,7 @@ func TestAccSakuraCloudServer_ConnectPacketFilters(t *testing.T) {
 						"sakuracloud_server.foobar", "packet_filter_ids.#", "2"),
 				),
 			},
-			resource.TestStep{
+			{
 				Config: testAccCheckSakuraCloudServerConfig_with_packet_filter_add,
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttr(
@@ -152,14 +153,14 @@ func TestAccSakuraCloudServer_ConnectPacketFilters(t *testing.T) {
 						"sakuracloud_server.foobar", "packet_filter_ids.#", "2"),
 				),
 			},
-			resource.TestStep{
+			{
 				Config: testAccCheckSakuraCloudServerConfig_with_packet_filter_upd,
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttr(
 						"sakuracloud_server.foobar", "packet_filter_ids.#", "1"),
 				),
 			},
-			resource.TestStep{
+			{
 				Config: testAccCheckSakuraCloudServerConfig_with_packet_filter_del,
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttr(
@@ -177,7 +178,7 @@ func TestAccSakuraCloudServer_With_BlankDisk(t *testing.T) {
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckSakuraCloudServerDestroy,
 		Steps: []resource.TestStep{
-			resource.TestStep{
+			{
 				Config: testAccCheckSakuraCloudServerConfig_with_blank_disk,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckSakuraCloudServerExists("sakuracloud_server.foobar", &server),
@@ -195,7 +196,7 @@ func TestAccSakuraCloudServer_EditConnect_With_Same_Switch(t *testing.T) {
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckSakuraCloudServerDestroy,
 		Steps: []resource.TestStep{
-			resource.TestStep{
+			{
 				Config: testAccCheckSakuraCloudServerConfig_connect_same_sw_before,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckSakuraCloudServerExists("sakuracloud_server.foobar", &server),
@@ -206,16 +207,16 @@ func TestAccSakuraCloudServer_EditConnect_With_Same_Switch(t *testing.T) {
 						"sakuracloud_server.foobar", "additional_nics.#", "1"),
 					func(s *terraform.State) error {
 						if server.Interfaces[1].GetSwitch() == nil {
-							return fmt.Errorf("Server.Interfaces[1].Switch is nil")
+							return errors.New("Server.Interfaces[1].Switch is nil")
 						}
 						if server.Interfaces[1].GetSwitch().GetID() == 0 {
-							return fmt.Errorf("Server.Interfaces[1].Switch has invalid ID")
+							return errors.New("Server.Interfaces[1].Switch has invalid ID")
 						}
 						return nil
 					},
 				),
 			},
-			resource.TestStep{
+			{
 				Config: testAccCheckSakuraCloudServerConfig_connect_same_sw_after,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckSakuraCloudServerExists("sakuracloud_server.foobar", &server),
@@ -225,13 +226,13 @@ func TestAccSakuraCloudServer_EditConnect_With_Same_Switch(t *testing.T) {
 						"sakuracloud_server.foobar", "additional_nics.0", ""),
 					func(s *terraform.State) error {
 						if server.Interfaces[0].GetSwitch() == nil {
-							return fmt.Errorf("Server.Interfaces[0].Switch is nil")
+							return errors.New("Server.Interfaces[0].Switch is nil")
 						}
 						if server.Interfaces[0].GetSwitch().GetID() == 0 {
-							return fmt.Errorf("Server.Interfaces[0].Switch has invalid ID")
+							return errors.New("Server.Interfaces[0].Switch has invalid ID")
 						}
 						if server.Interfaces[0].GetSwitch().Scope == sacloud.ESCopeShared {
-							return fmt.Errorf("Server.Interfaces[0].Switch is connecting to shared segment")
+							return errors.New("Server.Interfaces[0].Switch is connecting to shared segment")
 						}
 						return nil
 					},
@@ -250,7 +251,7 @@ func testAccCheckSakuraCloudServerExists(n string, server *sacloud.Server) resou
 		}
 
 		if rs.Primary.ID == "" {
-			return fmt.Errorf("No Server ID is set")
+			return errors.New("No Server ID is set")
 		}
 
 		client := testAccProvider.Meta().(*api.Client)
@@ -262,7 +263,7 @@ func testAccCheckSakuraCloudServerExists(n string, server *sacloud.Server) resou
 		}
 
 		if foundServer.ID != toSakuraCloudID(rs.Primary.ID) {
-			return fmt.Errorf("Server not found")
+			return errors.New("Server not found")
 		}
 
 		*server = *foundServer
@@ -314,7 +315,7 @@ func testAccCheckSakuraCloudServerDestroy(s *terraform.State) error {
 		_, err := client.Server.Read(toSakuraCloudID(rs.Primary.ID))
 
 		if err == nil {
-			return fmt.Errorf("Server still exists")
+			return errors.New("Server still exists")
 		}
 	}
 

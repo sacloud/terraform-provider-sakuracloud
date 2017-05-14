@@ -16,34 +16,34 @@ func resourceSakuraCloudLoadBalancerVIP() *schema.Resource {
 		Delete: resourceSakuraCloudLoadBalancerVIPDelete,
 		Update: resourceSakuraCloudLoadBalancerVIPUpdate,
 		Schema: map[string]*schema.Schema{
-			"load_balancer_id": &schema.Schema{
+			"load_balancer_id": {
 				Type:         schema.TypeString,
 				Required:     true,
 				ForceNew:     true,
 				ValidateFunc: validateSakuracloudIDType,
 			},
-			"vip": &schema.Schema{
+			"vip": {
 				Type:     schema.TypeString,
 				ForceNew: true,
 				Required: true,
 			},
-			"port": &schema.Schema{
+			"port": {
 				Type:         schema.TypeInt,
 				Required:     true,
 				ForceNew:     true,
 				ValidateFunc: validateIntegerInRange(1, 65535),
 			},
-			"delay_loop": &schema.Schema{
+			"delay_loop": {
 				Type:         schema.TypeInt,
 				Optional:     true,
 				ValidateFunc: validateIntegerInRange(10, 2147483647),
 				Default:      10,
 			},
-			"sorry_server": &schema.Schema{
+			"sorry_server": {
 				Type:     schema.TypeString,
 				Optional: true,
 			},
-			"zone": &schema.Schema{
+			"zone": {
 				Type:         schema.TypeString,
 				Optional:     true,
 				Computed:     true,
@@ -51,7 +51,7 @@ func resourceSakuraCloudLoadBalancerVIP() *schema.Resource {
 				Description:  "target SakuraCloud zone",
 				ValidateFunc: validateStringInWord([]string{"is1a", "is1b", "tk1a", "tk1v"}),
 			},
-			"servers": &schema.Schema{
+			"servers": {
 				Type:     schema.TypeList,
 				Computed: true,
 				Elem:     &schema.Schema{Type: schema.TypeString},
@@ -110,11 +110,11 @@ func resourceSakuraCloudLoadBalancerVIPRead(d *schema.ResourceData, meta interfa
 	}
 
 	vipSetting := expandLoadBalancerVIP(d)
-	if r := findLoadBalancerVIPMatch(vipSetting, loadBalancer.Settings); r == nil {
+	matchedSetting := findLoadBalancerVIPMatch(vipSetting, loadBalancer.Settings)
+	if matchedSetting == nil {
 		return fmt.Errorf("Couldn't find SakuraCloud LoadBalancerVIP resource: %v", vipSetting)
-	} else {
-		d.Set("servers", expandLoadBalancerServersFromVIP(loadBalancer.GetStrID(), r))
 	}
+	d.Set("servers", expandLoadBalancerServersFromVIP(loadBalancer.GetStrID(), matchedSetting))
 
 	d.Set("delay_loop", vipSetting.DelayLoop)
 	d.Set("sorry_server", vipSetting.SorryServer)

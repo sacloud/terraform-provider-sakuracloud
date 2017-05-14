@@ -19,38 +19,38 @@ func resourceSakuraCloudInternet() *schema.Resource {
 		},
 
 		Schema: map[string]*schema.Schema{
-			"name": &schema.Schema{
+			"name": {
 				Type:     schema.TypeString,
 				Required: true,
 			},
-			"description": &schema.Schema{
+			"description": {
 				Type:     schema.TypeString,
 				Optional: true,
 			},
-			"tags": &schema.Schema{
+			"tags": {
 				Type:     schema.TypeList,
 				Optional: true,
 				Elem:     &schema.Schema{Type: schema.TypeString},
 			},
-			"nw_mask_len": &schema.Schema{
+			"nw_mask_len": {
 				Type:         schema.TypeInt,
 				ForceNew:     true,
 				Optional:     true,
 				ValidateFunc: validateIntInWord([]string{"28", "27", "26"}),
 				Default:      28,
 			},
-			"band_width": &schema.Schema{
+			"band_width": {
 				Type:         schema.TypeInt,
 				Optional:     true,
 				ValidateFunc: validateIntInWord([]string{"100", "250", "500", "1000", "1500", "2000", "2500", "3000"}),
 				Default:      100,
 			},
-			"enable_ipv6": &schema.Schema{
+			"enable_ipv6": {
 				Type:     schema.TypeBool,
 				Optional: true,
 				Computed: true,
 			},
-			"zone": &schema.Schema{
+			"zone": {
 				Type:         schema.TypeString,
 				Optional:     true,
 				Computed:     true,
@@ -58,68 +58,68 @@ func resourceSakuraCloudInternet() *schema.Resource {
 				Description:  "target SakuraCloud zone",
 				ValidateFunc: validateStringInWord([]string{"is1a", "is1b", "tk1a", "tk1v"}),
 			},
-			"switch_id": &schema.Schema{
+			"switch_id": {
 				Type:     schema.TypeString,
 				Computed: true,
 			},
-			"server_ids": &schema.Schema{
+			"server_ids": {
 				Type:     schema.TypeList,
 				Computed: true,
 				Elem:     &schema.Schema{Type: schema.TypeString},
 				// ! Current terraform(v0.7) is not support to array validation !
 				// ValidateFunc: validateSakuracloudIDArrayType,
 			},
-			"nw_address": &schema.Schema{
+			"nw_address": {
 				Type:     schema.TypeString,
 				Computed: true,
 			},
-			"gateway": &schema.Schema{
+			"gateway": {
 				Type:     schema.TypeString,
 				Computed: true,
 			},
-			"min_ipaddress": &schema.Schema{
+			"min_ipaddress": {
 				Type:     schema.TypeString,
 				Computed: true,
 			},
-			"max_ipaddress": &schema.Schema{
+			"max_ipaddress": {
 				Type:     schema.TypeString,
 				Computed: true,
 			},
-			"ipaddresses": &schema.Schema{
+			"ipaddresses": {
 				Type:     schema.TypeList,
 				Computed: true,
 				Elem:     &schema.Schema{Type: schema.TypeString},
 			},
-			"nw_gateway": &schema.Schema{
+			"nw_gateway": {
 				Type:       schema.TypeString,
 				Computed:   true,
 				Deprecated: "Use field 'gateway' instead",
 			},
-			"nw_min_ipaddress": &schema.Schema{
+			"nw_min_ipaddress": {
 				Type:       schema.TypeString,
 				Computed:   true,
 				Deprecated: "Use field 'min_ipaddress' instead",
 			},
-			"nw_max_ipaddress": &schema.Schema{
+			"nw_max_ipaddress": {
 				Type:       schema.TypeString,
 				Computed:   true,
 				Deprecated: "Use field 'max_ipaddress' instead",
 			},
-			"nw_ipaddresses": &schema.Schema{
+			"nw_ipaddresses": {
 				Type:       schema.TypeList,
 				Computed:   true,
 				Elem:       &schema.Schema{Type: schema.TypeString},
 				Deprecated: "Use field 'ipaddresses' instead",
 			},
-			"ipv6_prefix": &schema.Schema{
+			"ipv6_prefix": {
 				Type:     schema.TypeString,
 				Computed: true,
 			},
-			"ipv6_prefix_len": &schema.Schema{
+			"ipv6_prefix_len": {
 				Type:     schema.TypeInt,
 				Computed: true,
 			},
-			"ipv6_nw_address": &schema.Schema{
+			"ipv6_nw_address": {
 				Type:     schema.TypeString,
 				Computed: true,
 			},

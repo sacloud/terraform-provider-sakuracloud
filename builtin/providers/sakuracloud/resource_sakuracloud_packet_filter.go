@@ -18,48 +18,48 @@ func resourceSakuraCloudPacketFilter() *schema.Resource {
 		},
 
 		Schema: map[string]*schema.Schema{
-			"name": &schema.Schema{
+			"name": {
 				Type:     schema.TypeString,
 				Required: true,
 			},
-			"description": &schema.Schema{
+			"description": {
 				Type:     schema.TypeString,
 				Optional: true,
 			},
-			"expressions": &schema.Schema{
+			"expressions": {
 				Type:     schema.TypeList,
 				Optional: true,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
-						"protocol": &schema.Schema{
+						"protocol": {
 							Type:         schema.TypeString,
 							Required:     true,
 							ForceNew:     true,
 							ValidateFunc: validateStringInWord(sacloud.AllowPacketFilterProtocol()),
 						},
 
-						"source_nw": &schema.Schema{
+						"source_nw": {
 							Type:     schema.TypeString,
 							Optional: true,
 							Default:  "",
 						},
 
-						"source_port": &schema.Schema{
+						"source_port": {
 							Type:     schema.TypeString,
 							Optional: true,
 							Default:  "",
 						},
-						"dest_port": &schema.Schema{
+						"dest_port": {
 							Type:     schema.TypeString,
 							Optional: true,
 							Default:  "",
 						},
-						"allow": &schema.Schema{
+						"allow": {
 							Type:     schema.TypeBool,
 							Optional: true,
 							Default:  true,
 						},
-						"description": &schema.Schema{
+						"description": {
 							Type:     schema.TypeString,
 							Optional: true,
 							Default:  "",
@@ -67,7 +67,7 @@ func resourceSakuraCloudPacketFilter() *schema.Resource {
 					},
 				},
 			},
-			"zone": &schema.Schema{
+			"zone": {
 				Type:         schema.TypeString,
 				Optional:     true,
 				Computed:     true,

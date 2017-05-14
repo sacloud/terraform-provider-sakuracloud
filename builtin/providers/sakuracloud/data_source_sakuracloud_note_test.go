@@ -1,6 +1,7 @@
 package sakuracloud
 
 import (
+	"errors"
 	"fmt"
 	"github.com/hashicorp/terraform/helper/resource"
 	"github.com/hashicorp/terraform/terraform"
@@ -16,11 +17,11 @@ func TestAccSakuraCloudNoteDataSource_Basic(t *testing.T) {
 		CheckDestroy:              testAccCheckSakuraCloudNoteDataSourceDestroy,
 
 		Steps: []resource.TestStep{
-			resource.TestStep{
+			{
 				Config: testAccCheckSakuraCloudDataSourceNoteBase,
 				Check:  testAccCheckSakuraCloudNoteDataSourceID("sakuracloud_note.foobar"),
 			},
-			resource.TestStep{
+			{
 				Config: testAccCheckSakuraCloudDataSourceNoteConfig,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckSakuraCloudNoteDataSourceID("data.sakuracloud_note.foobar"),
@@ -33,21 +34,21 @@ func TestAccSakuraCloudNoteDataSource_Basic(t *testing.T) {
 					resource.TestCheckResourceAttr("data.sakuracloud_note.foobar", "tags.2", "tag3"),
 				),
 			},
-			resource.TestStep{
+			{
 				Destroy: true,
 				Config:  testAccCheckSakuraCloudDataSourceNoteConfig_With_Tag,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckSakuraCloudNoteDataSourceID("data.sakuracloud_note.foobar"),
 				),
 			},
-			resource.TestStep{
+			{
 				Destroy: true,
 				Config:  testAccCheckSakuraCloudDataSourceNoteConfig_NotExists,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckSakuraCloudNoteDataSourceNotExists("data.sakuracloud_note.foobar"),
 				),
 			},
-			resource.TestStep{
+			{
 				Destroy: true,
 				Config:  testAccCheckSakuraCloudDataSourceNoteConfig_With_NotExists_Tag,
 				Check: resource.ComposeTestCheckFunc(
@@ -66,7 +67,7 @@ func testAccCheckSakuraCloudNoteDataSourceID(n string) resource.TestCheckFunc {
 		}
 
 		if rs.Primary.ID == "" {
-			return fmt.Errorf("Note data source ID not set")
+			return errors.New("Note data source ID not set")
 		}
 		return nil
 	}
@@ -97,7 +98,7 @@ func testAccCheckSakuraCloudNoteDataSourceDestroy(s *terraform.State) error {
 		_, err := client.Note.Read(toSakuraCloudID(rs.Primary.ID))
 
 		if err == nil {
-			return fmt.Errorf("Note still exists")
+			return errors.New("Note still exists")
 		}
 	}
 

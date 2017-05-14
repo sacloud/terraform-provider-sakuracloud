@@ -17,24 +17,24 @@ func resourceSakuraCloudGSLBServer() *schema.Resource {
 		Delete: resourceSakuraCloudGSLBServerDelete,
 
 		Schema: map[string]*schema.Schema{
-			"gslb_id": &schema.Schema{
+			"gslb_id": {
 				Type:         schema.TypeString,
 				Required:     true,
 				ForceNew:     true,
 				ValidateFunc: validateSakuracloudIDType,
 			},
-			"ipaddress": &schema.Schema{
+			"ipaddress": {
 				Type:     schema.TypeString,
 				ForceNew: true,
 				Required: true,
 			},
-			"enabled": &schema.Schema{
+			"enabled": {
 				Type:     schema.TypeBool,
 				Optional: true,
 				ForceNew: true,
 				Default:  true,
 			},
-			"weight": &schema.Schema{
+			"weight": {
 				Type:         schema.TypeInt,
 				Optional:     true,
 				ValidateFunc: validateIntegerInRange(1, 10000),

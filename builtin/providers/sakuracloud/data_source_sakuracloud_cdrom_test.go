@@ -1,6 +1,7 @@
 package sakuracloud
 
 import (
+	"errors"
 	"fmt"
 	"github.com/hashicorp/terraform/helper/resource"
 	"github.com/hashicorp/terraform/terraform"
@@ -16,7 +17,7 @@ func TestAccSakuraCloudCDROMDataSource_Basic(t *testing.T) {
 		CheckDestroy:              testAccCheckSakuraCloudCDROMDataSourceDestroy,
 
 		Steps: []resource.TestStep{
-			resource.TestStep{
+			{
 				Config: testAccCheckSakuraCloudDataSourceCDROMConfig,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckSakuraCloudCDROMDataSourceID("data.sakuracloud_cdrom.foobar"),
@@ -30,21 +31,21 @@ func TestAccSakuraCloudCDROMDataSource_Basic(t *testing.T) {
 					resource.TestCheckResourceAttr("data.sakuracloud_cdrom.foobar", "tags.4", "os-linux"),
 				),
 			},
-			resource.TestStep{
+			{
 				Destroy: true,
 				Config:  testAccCheckSakuraCloudDataSourceCDROMConfig_With_Tag,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckSakuraCloudCDROMDataSourceID("data.sakuracloud_cdrom.foobar"),
 				),
 			},
-			resource.TestStep{
+			{
 				Destroy: true,
 				Config:  testAccCheckSakuraCloudDataSourceCDROMConfig_NotExists,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckSakuraCloudCDROMDataSourceNotExists("data.sakuracloud_cdrom.foobar"),
 				),
 			},
-			resource.TestStep{
+			{
 				Destroy: true,
 				Config:  testAccCheckSakuraCloudDataSourceCDROMConfig_With_NotExists_Tag,
 				Check: resource.ComposeTestCheckFunc(
@@ -63,7 +64,7 @@ func testAccCheckSakuraCloudCDROMDataSourceID(n string) resource.TestCheckFunc {
 		}
 
 		if rs.Primary.ID == "" {
-			return fmt.Errorf("CDROM data source ID not set")
+			return errors.New("CDROM data source ID not set")
 		}
 		return nil
 	}
@@ -94,7 +95,7 @@ func testAccCheckSakuraCloudCDROMDataSourceDestroy(s *terraform.State) error {
 		_, err := client.CDROM.Read(toSakuraCloudID(rs.Primary.ID))
 
 		if err == nil {
-			return fmt.Errorf("CDROM still exists")
+			return errors.New("CDROM still exists")
 		}
 	}
 

@@ -1,6 +1,7 @@
 package sakuracloud
 
 import (
+	"errors"
 	"fmt"
 	"github.com/hashicorp/terraform/helper/resource"
 	"github.com/hashicorp/terraform/terraform"
@@ -16,7 +17,7 @@ func TestAccSakuraCloudArchiveDataSource_Basic(t *testing.T) {
 		CheckDestroy:              testAccCheckSakuraCloudArchiveDataSourceDestroy,
 
 		Steps: []resource.TestStep{
-			resource.TestStep{
+			{
 				Config: testAccCheckSakuraCloudDataSourceArchiveConfig,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckSakuraCloudArchiveDataSourceID("data.sakuracloud_archive.foobar"),
@@ -32,27 +33,27 @@ func TestAccSakuraCloudArchiveDataSource_Basic(t *testing.T) {
 					resource.TestCheckResourceAttr("data.sakuracloud_archive.foobar", "tags.5", "os-linux"),
 				),
 			},
-			resource.TestStep{
+			{
 				Config: testAccCheckSakuraCloudDataSourceArchive_OSType,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckSakuraCloudArchiveDataSourceID("data.sakuracloud_archive.foobar"),
 				),
 			},
-			resource.TestStep{
+			{
 				Destroy: true,
 				Config:  testAccCheckSakuraCloudDataSourceArchiveConfig_With_Tag,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckSakuraCloudArchiveDataSourceID("data.sakuracloud_archive.foobar"),
 				),
 			},
-			resource.TestStep{
+			{
 				Destroy: true,
 				Config:  testAccCheckSakuraCloudDataSourceArchiveConfig_NotExists,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckSakuraCloudArchiveDataSourceNotExists("data.sakuracloud_archive.foobar"),
 				),
 			},
-			resource.TestStep{
+			{
 				Destroy: true,
 				Config:  testAccCheckSakuraCloudDataSourceArchiveConfig_With_NotExists_Tag,
 				Check: resource.ComposeTestCheckFunc(
@@ -71,7 +72,7 @@ func testAccCheckSakuraCloudArchiveDataSourceID(n string) resource.TestCheckFunc
 		}
 
 		if rs.Primary.ID == "" {
-			return fmt.Errorf("Archive data source ID not set")
+			return errors.New("Archive data source ID not set")
 		}
 		return nil
 	}
@@ -105,7 +106,7 @@ func testAccCheckSakuraCloudArchiveDataSourceDestroy(s *terraform.State) error {
 		_, err := client.Archive.Read(toSakuraCloudID(rs.Primary.ID))
 
 		if err == nil {
-			return fmt.Errorf("Archive still exists")
+			return errors.New("Archive still exists")
 		}
 	}
 

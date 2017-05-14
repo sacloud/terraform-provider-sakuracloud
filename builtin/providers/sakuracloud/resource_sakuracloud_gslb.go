@@ -20,65 +20,65 @@ func resourceSakuraCloudGSLB() *schema.Resource {
 		},
 
 		Schema: map[string]*schema.Schema{
-			"name": &schema.Schema{
+			"name": {
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
-			"FQDN": &schema.Schema{
+			"FQDN": {
 				Type:     schema.TypeString,
 				Computed: true,
 			},
-			"health_check": &schema.Schema{
+			"health_check": {
 				Type:     schema.TypeSet,
 				Required: true,
 
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
-						"protocol": &schema.Schema{
+						"protocol": {
 							Type:         schema.TypeString,
 							Required:     true,
 							ValidateFunc: validateStringInWord(sacloud.AllowGSLBHealthCheckProtocol()),
 						},
-						"delay_loop": &schema.Schema{
+						"delay_loop": {
 							Type:         schema.TypeInt,
 							Optional:     true,
 							ValidateFunc: validateIntegerInRange(10, 60),
 							Default:      10,
 						},
-						"host_header": &schema.Schema{
+						"host_header": {
 							Type:     schema.TypeString,
 							Optional: true,
 						},
-						"path": &schema.Schema{
+						"path": {
 							Type:     schema.TypeString,
 							Optional: true,
 						},
-						"status": &schema.Schema{
+						"status": {
 							Type:     schema.TypeString,
 							Optional: true,
 						},
-						"port": &schema.Schema{
+						"port": {
 							Type:     schema.TypeInt,
 							Optional: true,
 						},
 					},
 				},
 			},
-			"weighted": &schema.Schema{
+			"weighted": {
 				Type:     schema.TypeBool,
 				Optional: true,
 				Default:  false,
 			},
-			"sorry_server": &schema.Schema{
+			"sorry_server": {
 				Type:     schema.TypeString,
 				Optional: true,
 			},
-			"description": &schema.Schema{
+			"description": {
 				Type:     schema.TypeString,
 				Optional: true,
 			},
-			"tags": &schema.Schema{
+			"tags": {
 				Type:     schema.TypeList,
 				Optional: true,
 				Elem:     &schema.Schema{Type: schema.TypeString},
@@ -265,7 +265,7 @@ func healthCheckHash(v interface{}) int {
 	return hashcode.String(hk)
 }
 
-func setGSLBResourceData(d *schema.ResourceData, client *api.Client, data *sacloud.GSLB) error {
+func setGSLBResourceData(d *schema.ResourceData, _ *api.Client, data *sacloud.GSLB) error {
 
 	d.Set("name", data.Name)
 	d.Set("FQDN", data.Status.FQDN)

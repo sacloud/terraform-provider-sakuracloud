@@ -1,6 +1,7 @@
 package sakuracloud
 
 import (
+	"errors"
 	"fmt"
 	"github.com/hashicorp/terraform/helper/resource"
 	"github.com/hashicorp/terraform/terraform"
@@ -16,11 +17,11 @@ func TestAccSakuraCloudSwitchDataSource_Basic(t *testing.T) {
 		CheckDestroy:              testAccCheckSakuraCloudSwitchDataSourceDestroy,
 
 		Steps: []resource.TestStep{
-			resource.TestStep{
+			{
 				Config: testAccCheckSakuraCloudDataSourceSwitchBase,
 				Check:  testAccCheckSakuraCloudSwitchDataSourceID("sakuracloud_switch.foobar"),
 			},
-			resource.TestStep{
+			{
 				Config: testAccCheckSakuraCloudDataSourceSwitchConfig,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckSakuraCloudSwitchDataSourceID("data.sakuracloud_switch.foobar"),
@@ -32,21 +33,21 @@ func TestAccSakuraCloudSwitchDataSource_Basic(t *testing.T) {
 					resource.TestCheckResourceAttr("data.sakuracloud_switch.foobar", "tags.2", "tag3"),
 				),
 			},
-			resource.TestStep{
+			{
 				Destroy: true,
 				Config:  testAccCheckSakuraCloudDataSourceSwitchConfig_With_Tag,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckSakuraCloudSwitchDataSourceID("data.sakuracloud_switch.foobar"),
 				),
 			},
-			resource.TestStep{
+			{
 				Destroy: true,
 				Config:  testAccCheckSakuraCloudDataSourceSwitchConfig_NotExists,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckSakuraCloudSwitchDataSourceNotExists("data.sakuracloud_switch.foobar"),
 				),
 			},
-			resource.TestStep{
+			{
 				Destroy: true,
 				Config:  testAccCheckSakuraCloudDataSourceSwitchConfig_With_NotExists_Tag,
 				Check: resource.ComposeTestCheckFunc(
@@ -65,7 +66,7 @@ func testAccCheckSakuraCloudSwitchDataSourceID(n string) resource.TestCheckFunc 
 		}
 
 		if rs.Primary.ID == "" {
-			return fmt.Errorf("Switch data source ID not set")
+			return errors.New("Switch data source ID not set")
 		}
 		return nil
 	}
@@ -96,7 +97,7 @@ func testAccCheckSakuraCloudSwitchDataSourceDestroy(s *terraform.State) error {
 		_, err := client.Switch.Read(toSakuraCloudID(rs.Primary.ID))
 
 		if err == nil {
-			return fmt.Errorf("Switch still exists")
+			return errors.New("Switch still exists")
 		}
 	}
 

@@ -1,6 +1,7 @@
 package sakuracloud
 
 import (
+	"errors"
 	"fmt"
 	"github.com/hashicorp/terraform/helper/resource"
 	"github.com/hashicorp/terraform/terraform"
@@ -16,7 +17,7 @@ func TestAccResourceSakuraCloudDatabase_WithSwitch(t *testing.T) {
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckSakuraCloudDatabaseDestroy,
 		Steps: []resource.TestStep{
-			resource.TestStep{
+			{
 				Config: testAccCheckSakuraCloudDatabaseConfig_WithSwitch,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckSakuraCloudDatabaseExists("sakuracloud_database.foobar", &database),
@@ -42,7 +43,7 @@ func TestAccResourceSakuraCloudDatabase_WithSwitch(t *testing.T) {
 					resource.TestCheckResourceAttr("sakuracloud_database.foobar", "default_route", "192.168.11.1"),
 				),
 			},
-			resource.TestStep{
+			{
 				Config: testAccCheckSakuraCloudDatabaseConfig_WithSwitchUpdate,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckSakuraCloudDatabaseExists("sakuracloud_database.foobar", &database),
@@ -81,7 +82,7 @@ func testAccCheckSakuraCloudDatabaseExists(n string, database *sacloud.Database)
 		}
 
 		if rs.Primary.ID == "" {
-			return fmt.Errorf("No Database ID is set")
+			return errors.New("No Database ID is set")
 		}
 
 		client := testAccProvider.Meta().(*api.Client)
@@ -96,7 +97,7 @@ func testAccCheckSakuraCloudDatabaseExists(n string, database *sacloud.Database)
 		}
 
 		if foundDatabase.ID != toSakuraCloudID(rs.Primary.ID) {
-			return fmt.Errorf("Database not found")
+			return errors.New("Database not found")
 		}
 
 		*database = *foundDatabase
@@ -119,7 +120,7 @@ func testAccCheckSakuraCloudDatabaseDestroy(s *terraform.State) error {
 		_, err := client.Database.Read(toSakuraCloudID(rs.Primary.ID))
 
 		if err == nil {
-			return fmt.Errorf("Database still exists")
+			return errors.New("Database still exists")
 		}
 	}
 

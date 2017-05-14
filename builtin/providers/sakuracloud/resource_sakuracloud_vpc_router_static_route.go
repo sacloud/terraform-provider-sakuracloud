@@ -16,28 +16,28 @@ func resourceSakuraCloudVPCRouterStaticRoute() *schema.Resource {
 		Read:   resourceSakuraCloudVPCRouterStaticRouteRead,
 		Delete: resourceSakuraCloudVPCRouterStaticRouteDelete,
 		Schema: map[string]*schema.Schema{
-			"vpc_router_id": &schema.Schema{
+			"vpc_router_id": {
 				Type:         schema.TypeString,
 				Required:     true,
 				ForceNew:     true,
 				ValidateFunc: validateSakuracloudIDType,
 			},
-			"vpc_router_interface_id": &schema.Schema{
+			"vpc_router_interface_id": {
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
-			"prefix": &schema.Schema{
+			"prefix": {
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
-			"next_hop": &schema.Schema{
+			"next_hop": {
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
-			"zone": &schema.Schema{
+			"zone": {
 				Type:         schema.TypeString,
 				Optional:     true,
 				Computed:     true,

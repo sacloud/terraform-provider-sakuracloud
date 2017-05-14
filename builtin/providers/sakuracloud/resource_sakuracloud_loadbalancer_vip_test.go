@@ -1,7 +1,7 @@
 package sakuracloud
 
 import (
-	"fmt"
+	"errors"
 	"github.com/hashicorp/terraform/helper/resource"
 	"github.com/hashicorp/terraform/terraform"
 	"github.com/sacloud/libsacloud/api"
@@ -16,7 +16,7 @@ func TestAccSakuraCloudLoadBalancerVIP(t *testing.T) {
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckSakuraCloudLoadBalancerVIPDestroy,
 		Steps: []resource.TestStep{
-			resource.TestStep{
+			{
 				Config: testAccCheckSakuraCloudLoadBalancerVIPConfig_basic,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckSakuraCloudLoadBalancerExists("sakuracloud_load_balancer.foobar", &loadBalancer),
@@ -32,14 +32,14 @@ func TestAccSakuraCloudLoadBalancerVIP(t *testing.T) {
 						"sakuracloud_load_balancer_vip.vip2", "vip", "192.168.11.202"),
 				),
 			},
-			resource.TestStep{
+			{
 				Config: testAccCheckSakuraCloudLoadBalancerVIPConfig_basic,
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttr(
 						"sakuracloud_load_balancer.foobar", "vip_ids.#", "2"),
 				),
 			},
-			resource.TestStep{
+			{
 				Config: testAccCheckSakuraCloudLoadBalancerVIPConfig_update,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckSakuraCloudLoadBalancerExists("sakuracloud_load_balancer.foobar", &loadBalancer),
@@ -59,7 +59,7 @@ func TestAccSakuraCloudLoadBalancerVIP(t *testing.T) {
 						"sakuracloud_load_balancer_vip.vip4", "vip", "192.168.11.204"),
 				),
 			},
-			resource.TestStep{
+			{
 				Config: testAccCheckSakuraCloudLoadBalancerVIPConfig_update,
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttr(
@@ -81,7 +81,7 @@ func testAccCheckSakuraCloudLoadBalancerVIPDestroy(s *terraform.State) error {
 		_, err := client.LoadBalancer.Read(toSakuraCloudID(rs.Primary.ID))
 
 		if err == nil {
-			return fmt.Errorf("LoadBalancer still exists")
+			return errors.New("LoadBalancer still exists")
 		}
 	}
 

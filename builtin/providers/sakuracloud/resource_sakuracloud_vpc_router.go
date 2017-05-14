@@ -18,69 +18,69 @@ func resourceSakuraCloudVPCRouter() *schema.Resource {
 		},
 
 		Schema: map[string]*schema.Schema{
-			"name": &schema.Schema{
+			"name": {
 				Type:         schema.TypeString,
 				Required:     true,
 				ValidateFunc: validateMaxLength(1, 64),
 			},
-			"plan": &schema.Schema{
+			"plan": {
 				Type:         schema.TypeString,
 				ForceNew:     true,
 				Optional:     true,
 				Default:      "standard",
 				ValidateFunc: validateStringInWord([]string{"standard", "premium", "highspec"}),
 			},
-			"switch_id": &schema.Schema{
+			"switch_id": {
 				Type:         schema.TypeString,
 				ForceNew:     true,
 				Optional:     true,
 				ValidateFunc: validateSakuracloudIDType,
 			},
-			"vip": &schema.Schema{
+			"vip": {
 				Type:     schema.TypeString,
 				ForceNew: true,
 				Optional: true,
 			},
-			"ipaddress1": &schema.Schema{
+			"ipaddress1": {
 				Type:     schema.TypeString,
 				ForceNew: true,
 				Optional: true,
 			},
-			"ipaddress2": &schema.Schema{
+			"ipaddress2": {
 				Type:     schema.TypeString,
 				ForceNew: true,
 				Optional: true,
 			},
-			"VRID": &schema.Schema{
+			"VRID": {
 				Type:     schema.TypeInt,
 				ForceNew: true,
 				Optional: true,
 			},
-			"aliases": &schema.Schema{
+			"aliases": {
 				Type:     schema.TypeList,
 				Optional: true,
 				Elem:     &schema.Schema{Type: schema.TypeString},
 				MaxItems: 19,
 			},
-			"description": &schema.Schema{
+			"description": {
 				Type:         schema.TypeString,
 				Optional:     true,
 				ValidateFunc: validateMaxLength(0, 512),
 			},
-			"tags": &schema.Schema{
+			"tags": {
 				Type:     schema.TypeList,
 				Optional: true,
 				Elem:     &schema.Schema{Type: schema.TypeString},
 			},
-			"global_address": &schema.Schema{
+			"global_address": {
 				Type:     schema.TypeString,
 				Computed: true,
 			},
-			"syslog_host": &schema.Schema{
+			"syslog_host": {
 				Type:     schema.TypeString,
 				Optional: true,
 			},
-			"zone": &schema.Schema{
+			"zone": {
 				Type:         schema.TypeString,
 				Optional:     true,
 				Computed:     true,

@@ -18,24 +18,24 @@ func resourceSakuraCloudSubnet() *schema.Resource {
 		},
 
 		Schema: map[string]*schema.Schema{
-			"internet_id": &schema.Schema{
+			"internet_id": {
 				Type:         schema.TypeString,
 				ForceNew:     true,
 				Required:     true,
 				ValidateFunc: validateSakuracloudIDType,
 			},
-			"nw_mask_len": &schema.Schema{
+			"nw_mask_len": {
 				Type:         schema.TypeInt,
 				ForceNew:     true,
 				Optional:     true,
 				ValidateFunc: validateIntInWord([]string{"28", "27", "26"}),
 				Default:      28,
 			},
-			"next_hop": &schema.Schema{
+			"next_hop": {
 				Type:     schema.TypeString,
 				Required: true,
 			},
-			"zone": &schema.Schema{
+			"zone": {
 				Type:         schema.TypeString,
 				Optional:     true,
 				Computed:     true,
@@ -43,23 +43,23 @@ func resourceSakuraCloudSubnet() *schema.Resource {
 				Description:  "target SakuraCloud zone",
 				ValidateFunc: validateStringInWord([]string{"is1a", "is1b", "tk1a", "tk1v"}),
 			},
-			"switch_id": &schema.Schema{
+			"switch_id": {
 				Type:     schema.TypeString,
 				Computed: true,
 			},
-			"nw_address": &schema.Schema{
+			"nw_address": {
 				Type:     schema.TypeString,
 				Computed: true,
 			},
-			"min_ipaddress": &schema.Schema{
+			"min_ipaddress": {
 				Type:     schema.TypeString,
 				Computed: true,
 			},
-			"max_ipaddress": &schema.Schema{
+			"max_ipaddress": {
 				Type:     schema.TypeString,
 				Computed: true,
 			},
-			"ipaddresses": &schema.Schema{
+			"ipaddresses": {
 				Type:     schema.TypeList,
 				Computed: true,
 				Elem:     &schema.Schema{Type: schema.TypeString},

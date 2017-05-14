@@ -21,45 +21,45 @@ func resourceSakuraCloudServer() *schema.Resource {
 		},
 
 		Schema: map[string]*schema.Schema{
-			"name": &schema.Schema{
+			"name": {
 				Type:     schema.TypeString,
 				Required: true,
 			},
-			"core": &schema.Schema{
+			"core": {
 				Type:     schema.TypeInt,
 				Optional: true,
 				Default:  1,
 			},
-			"memory": &schema.Schema{
+			"memory": {
 				Type:     schema.TypeInt,
 				Optional: true,
 				Default:  1,
 			},
-			"disks": &schema.Schema{
+			"disks": {
 				Type:     schema.TypeList,
 				Optional: true,
 				Elem:     &schema.Schema{Type: schema.TypeString},
 				// ! Current terraform(v0.7) is not support to array validation !
 				// ValidateFunc: validateSakuracloudIDArrayType,
 			},
-			"base_interface": &schema.Schema{
+			"base_interface": {
 				Type:          schema.TypeString,
 				Optional:      true,
 				ConflictsWith: []string{"nic"},
 				Deprecated:    "Use field 'nic' instead",
 			},
-			"nic": &schema.Schema{
+			"nic": {
 				Type:          schema.TypeString,
 				Optional:      true,
 				ConflictsWith: []string{"base_interface"},
 				Default:       "shared",
 			},
-			"cdrom_id": &schema.Schema{
+			"cdrom_id": {
 				Type:         schema.TypeString,
 				Optional:     true,
 				ValidateFunc: validateSakuracloudIDType,
 			},
-			"additional_interfaces": &schema.Schema{
+			"additional_interfaces": {
 				Type:          schema.TypeList,
 				Optional:      true,
 				MaxItems:      3,
@@ -67,14 +67,14 @@ func resourceSakuraCloudServer() *schema.Resource {
 				ConflictsWith: []string{"additional_nics"},
 				Deprecated:    "Use field 'additional_nics' instead",
 			},
-			"additional_nics": &schema.Schema{
+			"additional_nics": {
 				Type:          schema.TypeList,
 				Optional:      true,
 				MaxItems:      3,
 				Elem:          &schema.Schema{Type: schema.TypeString},
 				ConflictsWith: []string{"additional_interfaces"},
 			},
-			"packet_filter_ids": &schema.Schema{
+			"packet_filter_ids": {
 				Type:     schema.TypeList,
 				Optional: true,
 				MaxItems: 4,
@@ -82,16 +82,16 @@ func resourceSakuraCloudServer() *schema.Resource {
 				// ! Current terraform(v0.7) is not support to array validation !
 				// ValidateFunc: validateSakuracloudIDArrayType,
 			},
-			"description": &schema.Schema{
+			"description": {
 				Type:     schema.TypeString,
 				Optional: true,
 			},
-			"tags": &schema.Schema{
+			"tags": {
 				Type:     schema.TypeList,
 				Optional: true,
 				Elem:     &schema.Schema{Type: schema.TypeString},
 			},
-			"zone": &schema.Schema{
+			"zone": {
 				Type:         schema.TypeString,
 				Optional:     true,
 				Computed:     true,
@@ -99,65 +99,65 @@ func resourceSakuraCloudServer() *schema.Resource {
 				Description:  "target SakuraCloud zone",
 				ValidateFunc: validateStringInWord([]string{"is1a", "is1b", "tk1a", "tk1v"}),
 			},
-			"macaddresses": &schema.Schema{
+			"macaddresses": {
 				Type:     schema.TypeList,
 				Computed: true,
 				Elem:     &schema.Schema{Type: schema.TypeString},
 			},
-			"base_nw_ipaddress": &schema.Schema{
+			"base_nw_ipaddress": {
 				Type:          schema.TypeString,
 				Optional:      true,
 				Computed:      true,
 				ConflictsWith: []string{"ipaddress"},
 				Deprecated:    "Use field 'ipaddress' instead",
 			},
-			"ipaddress": &schema.Schema{
+			"ipaddress": {
 				Type:          schema.TypeString,
 				Optional:      true,
 				Computed:      true,
 				ConflictsWith: []string{"base_nw_ipaddress"},
 			},
-			"base_nw_dns_servers": &schema.Schema{
+			"base_nw_dns_servers": {
 				Type:       schema.TypeList,
 				Computed:   true,
 				Elem:       &schema.Schema{Type: schema.TypeString},
 				Deprecated: "Use field 'dns_servers' instead",
 			},
-			"dns_servers": &schema.Schema{
+			"dns_servers": {
 				Type:     schema.TypeList,
 				Computed: true,
 				Elem:     &schema.Schema{Type: schema.TypeString},
 			},
-			"base_nw_gateway": &schema.Schema{
+			"base_nw_gateway": {
 				Type:          schema.TypeString,
 				Optional:      true,
 				Computed:      true,
 				ConflictsWith: []string{"gateway"},
 				Deprecated:    "Use field 'gateway' instead",
 			},
-			"gateway": &schema.Schema{
+			"gateway": {
 				Type:          schema.TypeString,
 				Optional:      true,
 				Computed:      true,
 				ConflictsWith: []string{"base_nw_gateway"},
 			},
-			"base_nw_address": &schema.Schema{
+			"base_nw_address": {
 				Type:       schema.TypeString,
 				Computed:   true,
 				Deprecated: "Use field 'nw_address' instead",
 			},
-			"nw_address": &schema.Schema{
+			"nw_address": {
 				Type:     schema.TypeString,
 				Computed: true,
 			},
-			"base_nw_mask_len": &schema.Schema{
+			"base_nw_mask_len": {
 				Type:          schema.TypeString,
 				Optional:      true,
 				Computed:      true,
 				ConflictsWith: []string{"nw_mask_len"},
 				Deprecated:    "Use field 'nw_mask_len' instead",
 			},
-			"nw_mask_len": &schema.Schema{
+			"nw_mask_len": {
 				Type:          schema.TypeString,
 				Optional:      true,
 				Computed:      true,

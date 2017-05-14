@@ -47,6 +47,15 @@ const (
 	Custom
 )
 
+// OSTypeShortNames OSTypeとして利用できる文字列のリスト
+var OSTypeShortNames = []string{
+	"centos", "ubuntu", "debian", "vyos", "coreos", "rancheros",
+	"kusanagi", "site-guard", "plesk", "freebsd",
+	"windows2012", "windows2012-rds", "windows2012-rds-office",
+	"windows2016", "windows2016-rds", "windows2016-rds-office",
+	"windows2016-sql-web", "windows2016-sql-standard",
+}
+
 // IsWindows Windowsか
 func (o ArchiveOSTypes) IsWindows() bool {
 	switch o {
@@ -66,5 +75,48 @@ func (o ArchiveOSTypes) IsSupportDiskEdit() bool {
 		return true
 	default:
 		return false
+	}
+}
+
+func StrToOSType(osType string) ArchiveOSTypes {
+	switch osType {
+	case "centos":
+		return CentOS
+	case "ubuntu":
+		return Ubuntu
+	case "debian":
+		return Debian
+	case "vyos":
+		return VyOS
+	case "coreos":
+		return CoreOS
+	case "rancheros":
+		return RancherOS
+	case "kusanagi":
+		return Kusanagi
+	case "site-guard":
+		return SiteGuard
+	case "plesk":
+		return Plesk
+	case "freebsd":
+		return FreeBSD
+	case "windows2012":
+		return Windows2012
+	case "windows2012-rds":
+		return Windows2012RDS
+	case "windows2012-rds-office":
+		return Windows2012RDSOffice
+	case "windows2016":
+		return Windows2016
+	case "windows2016-rds":
+		return Windows2016RDS
+	case "windows2016-rds-office":
+		return Windows2016RDSOffice
+	case "windows2016-sql-web":
+		return Windows2016SQLServerWeb
+	case "windows2016-sql-standard":
+		return Windows2016SQLServerStandard
+	default:
+		return Custom
 	}
 }

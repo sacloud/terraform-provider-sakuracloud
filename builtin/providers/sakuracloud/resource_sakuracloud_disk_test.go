@@ -1,6 +1,7 @@
 package sakuracloud
 
 import (
+	"errors"
 	"fmt"
 	"github.com/hashicorp/terraform/helper/resource"
 	"github.com/hashicorp/terraform/terraform"
@@ -16,7 +17,7 @@ func TestAccResourceSakuraCloudDisk(t *testing.T) {
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckSakuraCloudDiskDestroy,
 		Steps: []resource.TestStep{
-			resource.TestStep{
+			{
 				Config: testAccCheckSakuraCloudDiskConfig_basic,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckSakuraCloudDiskExists("sakuracloud_disk.foobar", &disk),
@@ -27,7 +28,7 @@ func TestAccResourceSakuraCloudDisk(t *testing.T) {
 						"sakuracloud_disk.foobar", "disable_pw_auth"),
 				),
 			},
-			resource.TestStep{
+			{
 				Config: testAccCheckSakuraCloudDiskConfig_update,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckSakuraCloudDiskExists("sakuracloud_disk.foobar", &disk),
@@ -51,7 +52,7 @@ func testAccCheckSakuraCloudDiskExists(n string, disk *sacloud.Disk) resource.Te
 		}
 
 		if rs.Primary.ID == "" {
-			return fmt.Errorf("No Disk ID is set")
+			return errors.New("No Disk ID is set")
 		}
 
 		client := testAccProvider.Meta().(*api.Client)
@@ -62,7 +63,7 @@ func testAccCheckSakuraCloudDiskExists(n string, disk *sacloud.Disk) resource.Te
 		}
 
 		if foundDisk.ID != toSakuraCloudID(rs.Primary.ID) {
-			return fmt.Errorf("Disk not found")
+			return errors.New("Disk not found")
 		}
 
 		*disk = *foundDisk
@@ -96,7 +97,7 @@ func testAccCheckSakuraCloudDiskDestroy(s *terraform.State) error {
 		_, err := client.Disk.Read(toSakuraCloudID(rs.Primary.ID))
 
 		if err == nil {
-			return fmt.Errorf("Disk still exists")
+			return errors.New("Disk still exists")
 		}
 	}
 

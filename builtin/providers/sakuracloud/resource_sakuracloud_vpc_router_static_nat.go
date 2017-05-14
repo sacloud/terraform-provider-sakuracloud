@@ -16,35 +16,35 @@ func resourceSakuraCloudVPCRouterStaticNAT() *schema.Resource {
 		Read:   resourceSakuraCloudVPCRouterStaticNATRead,
 		Delete: resourceSakuraCloudVPCRouterStaticNATDelete,
 		Schema: map[string]*schema.Schema{
-			"vpc_router_id": &schema.Schema{
+			"vpc_router_id": {
 				Type:         schema.TypeString,
 				Required:     true,
 				ForceNew:     true,
 				ValidateFunc: validateSakuracloudIDType,
 			},
-			"vpc_router_interface_id": &schema.Schema{
+			"vpc_router_interface_id": {
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
-			"global_address": &schema.Schema{
+			"global_address": {
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
-			"private_address": &schema.Schema{
+			"private_address": {
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
-			"description": &schema.Schema{
+			"description": {
 				Type:         schema.TypeString,
 				Optional:     true,
 				Default:      "",
 				ForceNew:     true,
 				ValidateFunc: validateMaxLength(0, 512),
 			},
-			"zone": &schema.Schema{
+			"zone": {
 				Type:         schema.TypeString,
 				Optional:     true,
 				Computed:     true,

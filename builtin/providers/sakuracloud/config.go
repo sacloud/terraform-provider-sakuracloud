@@ -5,6 +5,7 @@ import (
 	"time"
 )
 
+// Config type of SakuraCloud Config
 type Config struct {
 	AccessToken       string
 	AccessTokenSecret string
@@ -13,6 +14,7 @@ type Config struct {
 	TraceMode         bool
 }
 
+// NewClient returns new API Client for SakuraCloud
 func (c *Config) NewClient() *API.Client {
 	client := API.NewClient(c.AccessToken, c.AccessTokenSecret, c.Zone)
 

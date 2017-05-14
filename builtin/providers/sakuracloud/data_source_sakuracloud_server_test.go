@@ -1,6 +1,7 @@
 package sakuracloud
 
 import (
+	"errors"
 	"fmt"
 	"github.com/hashicorp/terraform/helper/resource"
 	"github.com/hashicorp/terraform/terraform"
@@ -16,11 +17,11 @@ func TestAccSakuraCloudServerDataSource_Basic(t *testing.T) {
 		CheckDestroy:              testAccCheckSakuraCloudServerDataSourceDestroy,
 
 		Steps: []resource.TestStep{
-			resource.TestStep{
+			{
 				Config: testAccCheckSakuraCloudDataSourceServerBase,
 				Check:  testAccCheckSakuraCloudServerDataSourceID("sakuracloud_server.foobar"),
 			},
-			resource.TestStep{
+			{
 				Config: testAccCheckSakuraCloudDataSourceServerConfig,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckSakuraCloudServerDataSourceID("data.sakuracloud_server.foobar"),
@@ -38,21 +39,21 @@ func TestAccSakuraCloudServerDataSource_Basic(t *testing.T) {
 					resource.TestCheckResourceAttr("data.sakuracloud_server.foobar", "macaddresses.#", "1"),
 				),
 			},
-			resource.TestStep{
+			{
 				Destroy: true,
 				Config:  testAccCheckSakuraCloudDataSourceServerConfig_With_Tag,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckSakuraCloudServerDataSourceID("data.sakuracloud_server.foobar"),
 				),
 			},
-			resource.TestStep{
+			{
 				Destroy: true,
 				Config:  testAccCheckSakuraCloudDataSourceServerConfig_NotExists,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckSakuraCloudServerDataSourceNotExists("data.sakuracloud_server.foobar"),
 				),
 			},
-			resource.TestStep{
+			{
 				Destroy: true,
 				Config:  testAccCheckSakuraCloudDataSourceServerConfig_With_NotExists_Tag,
 				Check: resource.ComposeTestCheckFunc(
@@ -71,7 +72,7 @@ func testAccCheckSakuraCloudServerDataSourceID(n string) resource.TestCheckFunc 
 		}
 
 		if rs.Primary.ID == "" {
-			return fmt.Errorf("Server data source ID not set")
+			return errors.New("Server data source ID not set")
 		}
 		return nil
 	}
@@ -102,7 +103,7 @@ func testAccCheckSakuraCloudServerDataSourceDestroy(s *terraform.State) error {
 		_, err := client.Server.Read(toSakuraCloudID(rs.Primary.ID))
 
 		if err == nil {
-			return fmt.Errorf("Server still exists")
+			return errors.New("Server still exists")
 		}
 	}
 

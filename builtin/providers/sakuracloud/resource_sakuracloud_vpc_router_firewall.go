@@ -16,62 +16,62 @@ func resourceSakuraCloudVPCRouterFirewall() *schema.Resource {
 		Read:   resourceSakuraCloudVPCRouterFirewallRead,
 		Delete: resourceSakuraCloudVPCRouterFirewallDelete,
 		Schema: map[string]*schema.Schema{
-			"vpc_router_id": &schema.Schema{
+			"vpc_router_id": {
 				Type:         schema.TypeString,
 				Required:     true,
 				ForceNew:     true,
 				ValidateFunc: validateSakuracloudIDType,
 			},
-			"direction": &schema.Schema{
+			"direction": {
 				Type:         schema.TypeString,
 				Required:     true,
 				ForceNew:     true,
 				ValidateFunc: validateStringInWord([]string{"send", "receive"}),
 			},
-			"expressions": &schema.Schema{
+			"expressions": {
 				Type:     schema.TypeList,
 				Required: true,
 				ForceNew: true,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
 
-						"protocol": &schema.Schema{
+						"protocol": {
 							Type:         schema.TypeString,
 							Required:     true,
 							ForceNew:     true,
 							ValidateFunc: validateStringInWord([]string{"tcp", "udp", "icmp", "ip"}),
 						},
-						"source_nw": &schema.Schema{
+						"source_nw": {
 							Type:     schema.TypeString,
 							Required: true,
 							ForceNew: true,
 						},
-						"source_port": &schema.Schema{
+						"source_port": {
 							Type:     schema.TypeString,
 							Required: true,
 							ForceNew: true,
 						},
-						"dest_nw": &schema.Schema{
+						"dest_nw": {
 							Type:     schema.TypeString,
 							Required: true,
 							ForceNew: true,
 						},
-						"dest_port": &schema.Schema{
+						"dest_port": {
 							Type:     schema.TypeString,
 							Required: true,
 							ForceNew: true,
 						},
-						"allow": &schema.Schema{
+						"allow": {
 							Type:     schema.TypeBool,
 							Required: true,
 							ForceNew: true,
 						},
-						"logging": &schema.Schema{
+						"logging": {
 							Type:     schema.TypeBool,
 							Optional: true,
 							ForceNew: true,
 						},
-						"description": &schema.Schema{
+						"description": {
 							Type:         schema.TypeString,
 							Optional:     true,
 							Default:      "",
@@ -82,7 +82,7 @@ func resourceSakuraCloudVPCRouterFirewall() *schema.Resource {
 				},
 			},
 
-			"zone": &schema.Schema{
+			"zone": {
 				Type:         schema.TypeString,
 				Optional:     true,
 				Computed:     true,

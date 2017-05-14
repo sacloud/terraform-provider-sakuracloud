@@ -1,6 +1,7 @@
 package sakuracloud
 
 import (
+	"errors"
 	"fmt"
 	"github.com/hashicorp/terraform/helper/resource"
 	"github.com/hashicorp/terraform/terraform"
@@ -16,11 +17,11 @@ func TestAccSakuraCloudPacketFilterDataSource_Basic(t *testing.T) {
 		CheckDestroy:              testAccCheckSakuraCloudPacketFilterDataSourceDestroy,
 
 		Steps: []resource.TestStep{
-			resource.TestStep{
+			{
 				Config: testAccCheckSakuraCloudDataSourcePacketFilterBase,
 				Check:  testAccCheckSakuraCloudPacketFilterDataSourceID("sakuracloud_packet_filter.foobar"),
 			},
-			resource.TestStep{
+			{
 				Config: testAccCheckSakuraCloudDataSourcePacketFilterConfig,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckSakuraCloudPacketFilterDataSourceID("data.sakuracloud_packet_filter.foobar"),
@@ -34,7 +35,7 @@ func TestAccSakuraCloudPacketFilterDataSource_Basic(t *testing.T) {
 					resource.TestCheckResourceAttr("data.sakuracloud_packet_filter.foobar", "expressions.0.allow", "true"),
 				),
 			},
-			resource.TestStep{
+			{
 				Destroy: true,
 				Config:  testAccCheckSakuraCloudDataSourcePacketFilterConfig_NotExists,
 				Check: resource.ComposeTestCheckFunc(
@@ -53,7 +54,7 @@ func testAccCheckSakuraCloudPacketFilterDataSourceID(n string) resource.TestChec
 		}
 
 		if rs.Primary.ID == "" {
-			return fmt.Errorf("PacketFilter data source ID not set")
+			return errors.New("PacketFilter data source ID not set")
 		}
 		return nil
 	}
@@ -84,7 +85,7 @@ func testAccCheckSakuraCloudPacketFilterDataSourceDestroy(s *terraform.State) er
 		_, err := client.PacketFilter.Read(toSakuraCloudID(rs.Primary.ID))
 
 		if err == nil {
-			return fmt.Errorf("PacketFilter still exists")
+			return errors.New("PacketFilter still exists")
 		}
 	}
 

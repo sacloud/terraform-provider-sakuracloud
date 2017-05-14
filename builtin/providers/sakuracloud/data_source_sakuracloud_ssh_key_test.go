@@ -1,6 +1,7 @@
 package sakuracloud
 
 import (
+	"errors"
 	"fmt"
 	"github.com/hashicorp/terraform/helper/resource"
 	"github.com/hashicorp/terraform/terraform"
@@ -16,11 +17,11 @@ func TestAccSakuraCloudSSHKeyDataSource_Basic(t *testing.T) {
 		CheckDestroy:              testAccCheckSakuraCloudSSHKeyDataSourceDestroy,
 
 		Steps: []resource.TestStep{
-			resource.TestStep{
+			{
 				Config: testAccCheckSakuraCloudDataSourceSSHKeyBase,
 				Check:  testAccCheckSakuraCloudSSHKeyDataSourceID("sakuracloud_ssh_key.foobar"),
 			},
-			resource.TestStep{
+			{
 				Config: testAccCheckSakuraCloudDataSourceSSHKeyConfig,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckSakuraCloudSSHKeyDataSourceID("data.sakuracloud_ssh_key.foobar"),
@@ -30,7 +31,7 @@ func TestAccSakuraCloudSSHKeyDataSource_Basic(t *testing.T) {
 					resource.TestCheckResourceAttr("data.sakuracloud_ssh_key.foobar", "fingerprint", testAccFingerprint),
 				),
 			},
-			resource.TestStep{
+			{
 				Destroy: true,
 				Config:  testAccCheckSakuraCloudDataSourceSSHKeyConfig_NotExists,
 				Check: resource.ComposeTestCheckFunc(
@@ -49,7 +50,7 @@ func testAccCheckSakuraCloudSSHKeyDataSourceID(n string) resource.TestCheckFunc 
 		}
 
 		if rs.Primary.ID == "" {
-			return fmt.Errorf("SSHKey data source ID not set")
+			return errors.New("SSHKey data source ID not set")
 		}
 		return nil
 	}
@@ -80,7 +81,7 @@ func testAccCheckSakuraCloudSSHKeyDataSourceDestroy(s *terraform.State) error {
 		_, err := client.SSHKey.Read(toSakuraCloudID(rs.Primary.ID))
 
 		if err == nil {
-			return fmt.Errorf("SSHKey still exists")
+			return errors.New("SSHKey still exists")
 		}
 	}
 

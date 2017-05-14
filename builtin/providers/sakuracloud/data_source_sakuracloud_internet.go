@@ -11,18 +11,18 @@ func dataSourceSakuraCloudInternet() *schema.Resource {
 		Read: dataSourceSakuraCloudInternetRead,
 
 		Schema: map[string]*schema.Schema{
-			"filter": &schema.Schema{
+			"filter": {
 				Type:     schema.TypeSet,
 				Optional: true,
 				ForceNew: true,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
-						"name": &schema.Schema{
+						"name": {
 							Type:     schema.TypeString,
 							Required: true,
 						},
 
-						"values": &schema.Schema{
+						"values": {
 							Type:     schema.TypeList,
 							Required: true,
 							Elem:     &schema.Schema{Type: schema.TypeString},
@@ -30,74 +30,74 @@ func dataSourceSakuraCloudInternet() *schema.Resource {
 					},
 				},
 			},
-			"name": &schema.Schema{
+			"name": {
 				Type:     schema.TypeString,
 				Computed: true,
 			},
-			"description": &schema.Schema{
+			"description": {
 				Type:     schema.TypeString,
 				Computed: true,
 			},
-			"tags": &schema.Schema{
+			"tags": {
 				Type:     schema.TypeList,
 				Computed: true,
 				Elem:     &schema.Schema{Type: schema.TypeString},
 			},
-			"nw_mask_len": &schema.Schema{
+			"nw_mask_len": {
 				Type:     schema.TypeInt,
 				Computed: true,
 			},
-			"band_width": &schema.Schema{
+			"band_width": {
 				Type:     schema.TypeInt,
 				Computed: true,
 			},
-			"switch_id": &schema.Schema{
+			"switch_id": {
 				Type:     schema.TypeString,
 				Computed: true,
 			},
-			"server_ids": &schema.Schema{
+			"server_ids": {
 				Type:     schema.TypeList,
 				Computed: true,
 				Elem:     &schema.Schema{Type: schema.TypeString},
 			},
-			"nw_address": &schema.Schema{
+			"nw_address": {
 				Type:     schema.TypeString,
 				Computed: true,
 			},
-			"nw_gateway": &schema.Schema{
+			"nw_gateway": {
 				Type:     schema.TypeString,
 				Computed: true,
 			},
-			"nw_min_ipaddress": &schema.Schema{
+			"nw_min_ipaddress": {
 				Type:     schema.TypeString,
 				Computed: true,
 			},
-			"nw_max_ipaddress": &schema.Schema{
+			"nw_max_ipaddress": {
 				Type:     schema.TypeString,
 				Computed: true,
 			},
-			"nw_ipaddresses": &schema.Schema{
+			"nw_ipaddresses": {
 				Type:     schema.TypeList,
 				Computed: true,
 				Elem:     &schema.Schema{Type: schema.TypeString},
 			},
-			"enable_ipv6": &schema.Schema{
+			"enable_ipv6": {
 				Type:     schema.TypeBool,
 				Computed: true,
 			},
-			"ipv6_prefix": &schema.Schema{
+			"ipv6_prefix": {
 				Type:     schema.TypeString,
 				Computed: true,
 			},
-			"ipv6_prefix_len": &schema.Schema{
+			"ipv6_prefix_len": {
 				Type:     schema.TypeInt,
 				Computed: true,
 			},
-			"ipv6_nw_address": &schema.Schema{
+			"ipv6_nw_address": {
 				Type:     schema.TypeString,
 				Computed: true,
 			},
-			"zone": &schema.Schema{
+			"zone": {
 				Type:         schema.TypeString,
 				Optional:     true,
 				Computed:     true,

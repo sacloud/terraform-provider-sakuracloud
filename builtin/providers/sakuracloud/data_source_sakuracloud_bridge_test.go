@@ -1,6 +1,7 @@
 package sakuracloud
 
 import (
+	"errors"
 	"fmt"
 	"github.com/hashicorp/terraform/helper/resource"
 	"github.com/hashicorp/terraform/terraform"
@@ -16,11 +17,11 @@ func TestAccSakuraCloudBridgeDataSource_Basic(t *testing.T) {
 		CheckDestroy:              testAccCheckSakuraCloudBridgeDataSourceDestroy,
 
 		Steps: []resource.TestStep{
-			resource.TestStep{
+			{
 				Config: testAccCheckSakuraCloudDataSourceBridgeBase,
 				Check:  testAccCheckSakuraCloudBridgeDataSourceID("sakuracloud_bridge.foobar"),
 			},
-			resource.TestStep{
+			{
 				Config: testAccCheckSakuraCloudDataSourceBridgeConfig,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckSakuraCloudBridgeDataSourceID("data.sakuracloud_bridge.foobar"),
@@ -28,7 +29,7 @@ func TestAccSakuraCloudBridgeDataSource_Basic(t *testing.T) {
 					resource.TestCheckResourceAttr("data.sakuracloud_bridge.foobar", "description", "description_test"),
 				),
 			},
-			resource.TestStep{
+			{
 				Destroy: true,
 				Config:  testAccCheckSakuraCloudDataSourceBridgeConfig_NotExists,
 				Check: resource.ComposeTestCheckFunc(
@@ -47,7 +48,7 @@ func testAccCheckSakuraCloudBridgeDataSourceID(n string) resource.TestCheckFunc 
 		}
 
 		if rs.Primary.ID == "" {
-			return fmt.Errorf("Bridge data source ID not set")
+			return errors.New("Bridge data source ID not set")
 		}
 		return nil
 	}
@@ -81,7 +82,7 @@ func testAccCheckSakuraCloudBridgeDataSourceDestroy(s *terraform.State) error {
 		_, err := client.Bridge.Read(toSakuraCloudID(rs.Primary.ID))
 
 		if err == nil {
-			return fmt.Errorf("Bridge still exists")
+			return errors.New("Bridge still exists")
 		}
 	}
 

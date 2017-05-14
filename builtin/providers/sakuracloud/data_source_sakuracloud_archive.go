@@ -14,31 +14,25 @@ func dataSourceSakuraCloudArchive() *schema.Resource {
 		Read: dataSourceSakuraCloudArchiveRead,
 
 		Schema: map[string]*schema.Schema{
-			"os_type": &schema.Schema{
-				Type:     schema.TypeString,
-				Optional: true,
-				ForceNew: true,
-				ValidateFunc: validateStringInWord([]string{
-					"centos", "ubuntu", "debian", "vyos", "coreos", "rancheros",
-					"kusanagi", "site-guard", "plesk", "freebsd",
-					"windows2012", "windows2012-rds", "windows2012-rds-office",
-					"windows2016", "windows2016-rds", "windows2016-rds-office",
-					"windows2016-sql-web", "windows2016-sql-standard",
-				}),
+			"os_type": {
+				Type:          schema.TypeString,
+				Optional:      true,
+				ForceNew:      true,
+				ValidateFunc:  validateStringInWord(ostype.OSTypeShortNames),
 				ConflictsWith: []string{"filter"},
 			},
-			"filter": &schema.Schema{
+			"filter": {
 				Type:     schema.TypeSet,
 				Optional: true,
 				ForceNew: true,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
-						"name": &schema.Schema{
+						"name": {
 							Type:     schema.TypeString,
 							Required: true,
 						},
 
-						"values": &schema.Schema{
+						"values": {
 							Type:     schema.TypeList,
 							Required: true,
 							Elem:     &schema.Schema{Type: schema.TypeString},
@@ -47,24 +41,24 @@ func dataSourceSakuraCloudArchive() *schema.Resource {
 				},
 				ConflictsWith: []string{"os_type"},
 			},
-			"name": &schema.Schema{
+			"name": {
 				Type:     schema.TypeString,
 				Computed: true,
 			},
-			"size": &schema.Schema{
+			"size": {
 				Type:     schema.TypeInt,
 				Computed: true,
 			},
-			"description": &schema.Schema{
+			"description": {
 				Type:     schema.TypeString,
 				Computed: true,
 			},
-			"tags": &schema.Schema{
+			"tags": {
 				Type:     schema.TypeList,
 				Computed: true,
 				Elem:     &schema.Schema{Type: schema.TypeString},
 			},
-			"zone": &schema.Schema{
+			"zone": {
 				Type:         schema.TypeString,
 				Optional:     true,
 				Computed:     true,
@@ -131,45 +125,6 @@ func dataSourceSakuraCloudArchiveRead(d *schema.ResourceData, meta interface{}) 
 	return nil
 }
 
-func strToOSType(osType string) ostype.ArchiveOSTypes {
-	switch osType {
-	case "centos":
-		return ostype.CentOS
-	case "ubuntu":
-		return ostype.Ubuntu
-	case "debian":
-		return ostype.Debian
-	case "vyos":
-		return ostype.VyOS
-	case "coreos":
-		return ostype.CoreOS
-	case "rancheros":
-		return ostype.RancherOS
-	case "kusanagi":
-		return ostype.Kusanagi
-	case "site-guard":
-		return ostype.SiteGuard
-	case "plesk":
-		return ostype.Plesk
-	case "freebsd":
-		return ostype.FreeBSD
-	case "windows2012":
-		return ostype.Windows2012
-	case "windows2012-rds":
-		return ostype.Windows2012RDS
-	case "windows2012-rds-office":
-		return ostype.Windows2012RDSOffice
-	case "windows2016":
-		return ostype.Windows2016
-	case "windows2016-rds":
-		return ostype.Windows2016RDS
-	case "windows2016-rds-office":
-		return ostype.Windows2016RDSOffice
-	case "windows2016-sql-web":
-		return ostype.Windows2016SQLServerWeb
-	case "windows2016-sql-standard":
-		return ostype.Windows2016SQLServerStandard
-	default:
-		return ostype.Custom
-	}
+func strToOSType(strType string) ostype.ArchiveOSTypes {
+	return ostype.StrToOSType(strType)
 }

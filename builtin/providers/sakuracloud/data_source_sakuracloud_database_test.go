@@ -1,6 +1,7 @@
 package sakuracloud
 
 import (
+	"errors"
 	"fmt"
 	"github.com/hashicorp/terraform/helper/resource"
 	"github.com/hashicorp/terraform/terraform"
@@ -16,11 +17,11 @@ func TestAccSakuraCloudDatabaseDataSource_Basic(t *testing.T) {
 		CheckDestroy:              testAccCheckSakuraCloudDatabaseDataSourceDestroy,
 
 		Steps: []resource.TestStep{
-			resource.TestStep{
+			{
 				Config: testAccCheckSakuraCloudDataSourceDatabaseBase,
 				Check:  testAccCheckSakuraCloudDatabaseDataSourceID("sakuracloud_database.foobar"),
 			},
-			resource.TestStep{
+			{
 				Config: testAccCheckSakuraCloudDataSourceDatabaseConfig,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckSakuraCloudDatabaseDataSourceID("data.sakuracloud_database.foobar"),
@@ -30,21 +31,21 @@ func TestAccSakuraCloudDatabaseDataSource_Basic(t *testing.T) {
 					resource.TestCheckResourceAttr("data.sakuracloud_database.foobar", "tags.#", "3"),
 				),
 			},
-			resource.TestStep{
+			{
 				Destroy: true,
 				Config:  testAccCheckSakuraCloudDataSourceDatabaseConfig_With_Tag,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckSakuraCloudDatabaseDataSourceID("data.sakuracloud_database.foobar"),
 				),
 			},
-			resource.TestStep{
+			{
 				Destroy: true,
 				Config:  testAccCheckSakuraCloudDataSourceDatabaseConfig_NotExists,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckSakuraCloudDatabaseDataSourceNotExists("data.sakuracloud_database.foobar"),
 				),
 			},
-			resource.TestStep{
+			{
 				Destroy: true,
 				Config:  testAccCheckSakuraCloudDataSourceDatabaseConfig_With_NotExists_Tag,
 				Check: resource.ComposeTestCheckFunc(
@@ -63,7 +64,7 @@ func testAccCheckSakuraCloudDatabaseDataSourceID(n string) resource.TestCheckFun
 		}
 
 		if rs.Primary.ID == "" {
-			return fmt.Errorf("Database data source ID not set")
+			return errors.New("Database data source ID not set")
 		}
 		return nil
 	}
@@ -97,7 +98,7 @@ func testAccCheckSakuraCloudDatabaseDataSourceDestroy(s *terraform.State) error 
 		_, err := client.Database.Read(toSakuraCloudID(rs.Primary.ID))
 
 		if err == nil {
-			return fmt.Errorf("Database still exists")
+			return errors.New("Database still exists")
 		}
 	}
 

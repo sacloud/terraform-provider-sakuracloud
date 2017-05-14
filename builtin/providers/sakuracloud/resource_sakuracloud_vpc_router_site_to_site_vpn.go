@@ -17,41 +17,41 @@ func resourceSakuraCloudVPCRouterSiteToSiteIPsecVPN() *schema.Resource {
 		Read:   resourceSakuraCloudVPCRouterSiteToSiteIPsecVPNRead,
 		Delete: resourceSakuraCloudVPCRouterSiteToSiteIPsecVPNDelete,
 		Schema: map[string]*schema.Schema{
-			"vpc_router_id": &schema.Schema{
+			"vpc_router_id": {
 				Type:         schema.TypeString,
 				Required:     true,
 				ForceNew:     true,
 				ValidateFunc: validateSakuracloudIDType,
 			},
-			"peer": &schema.Schema{
+			"peer": {
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
-			"remote_id": &schema.Schema{
+			"remote_id": {
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
-			"pre_shared_secret": &schema.Schema{
+			"pre_shared_secret": {
 				Type:         schema.TypeString,
 				Required:     true,
 				ForceNew:     true,
 				ValidateFunc: validateMaxLength(0, 40),
 			},
-			"routes": &schema.Schema{
+			"routes": {
 				Type:     schema.TypeList,
 				Required: true,
 				ForceNew: true,
 				Elem:     &schema.Schema{Type: schema.TypeString},
 			},
-			"local_prefix": &schema.Schema{
+			"local_prefix": {
 				Type:     schema.TypeList,
 				Required: true,
 				ForceNew: true,
 				Elem:     &schema.Schema{Type: schema.TypeString},
 			},
-			"zone": &schema.Schema{
+			"zone": {
 				Type:         schema.TypeString,
 				Optional:     true,
 				Computed:     true,

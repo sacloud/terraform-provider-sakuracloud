@@ -1,6 +1,7 @@
 package sakuracloud
 
 import (
+	"errors"
 	"fmt"
 	"github.com/hashicorp/terraform/helper/resource"
 	"github.com/hashicorp/terraform/terraform"
@@ -16,14 +17,14 @@ func TestAccSakuraCloudSubnetDataSource_Basic(t *testing.T) {
 		CheckDestroy:              testAccCheckSakuraCloudSubnetDataSourceDestroy,
 
 		Steps: []resource.TestStep{
-			resource.TestStep{
+			{
 				Config: testAccCheckSakuraCloudDataSourceSubnetBase,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckSakuraCloudSubnetDataSourceID("sakuracloud_subnet.foobar"),
 					testAccCheckSakuraCloudSubnetDataSourceID("sakuracloud_subnet.foobar2"),
 				),
 			},
-			resource.TestStep{
+			{
 				Config: testAccCheckSakuraCloudDataSourceSubnetConfig,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckSakuraCloudSubnetDataSourceID("data.sakuracloud_subnet.foobar"),
@@ -31,7 +32,7 @@ func TestAccSakuraCloudSubnetDataSource_Basic(t *testing.T) {
 				),
 				Destroy: true,
 			},
-			resource.TestStep{
+			{
 				Config: testAccCheckSakuraCloudDataSourceSubnetConfig_NotExists,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckSakuraCloudSubnetDataSourceNotExists("data.sakuracloud_subnet.foobar"),
@@ -50,7 +51,7 @@ func testAccCheckSakuraCloudSubnetDataSourceID(n string) resource.TestCheckFunc 
 		}
 
 		if rs.Primary.ID == "" {
-			return fmt.Errorf("Subnet data source ID not set")
+			return errors.New("Subnet data source ID not set")
 		}
 		return nil
 	}
@@ -81,7 +82,7 @@ func testAccCheckSakuraCloudSubnetDataSourceDestroy(s *terraform.State) error {
 		_, err := client.Subnet.Read(toSakuraCloudID(rs.Primary.ID))
 
 		if err == nil {
-			return fmt.Errorf("Subnet still exists")
+			return errors.New("Subnet still exists")
 		}
 	}
 

@@ -1,6 +1,7 @@
 package sakuracloud
 
 import (
+	"errors"
 	"fmt"
 	"github.com/hashicorp/terraform/helper/resource"
 	"github.com/hashicorp/terraform/terraform"
@@ -16,11 +17,11 @@ func TestAccSakuraCloudSimpleMonitorDataSource_Basic(t *testing.T) {
 		CheckDestroy:              testAccCheckSakuraCloudSimpleMonitorDataSourceDestroy,
 
 		Steps: []resource.TestStep{
-			resource.TestStep{
+			{
 				Config: testAccCheckSakuraCloudDataSourceSimpleMonitorBase,
 				Check:  testAccCheckSakuraCloudSimpleMonitorDataSourceID("sakuracloud_simple_monitor.foobar"),
 			},
-			resource.TestStep{
+			{
 				Config: testAccCheckSakuraCloudDataSourceSimpleMonitorConfig,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckSakuraCloudSimpleMonitorDataSourceID("data.sakuracloud_simple_monitor.foobar"),
@@ -39,21 +40,21 @@ func TestAccSakuraCloudSimpleMonitorDataSource_Basic(t *testing.T) {
 					resource.TestCheckResourceAttr("data.sakuracloud_simple_monitor.foobar", "notify_slack_webhook", testAccSlackWebhook),
 				),
 			},
-			resource.TestStep{
+			{
 				Destroy: true,
 				Config:  testAccCheckSakuraCloudDataSourceSimpleMonitorConfig_With_Tag,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckSakuraCloudSimpleMonitorDataSourceID("data.sakuracloud_simple_monitor.foobar"),
 				),
 			},
-			resource.TestStep{
+			{
 				Destroy: true,
 				Config:  testAccCheckSakuraCloudDataSourceSimpleMonitorConfig_NotExists,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckSakuraCloudSimpleMonitorDataSourceNotExists("data.sakuracloud_simple_monitor.foobar"),
 				),
 			},
-			resource.TestStep{
+			{
 				Destroy: true,
 				Config:  testAccCheckSakuraCloudDataSourceSimpleMonitorConfig_With_NotExists_Tag,
 				Check: resource.ComposeTestCheckFunc(
@@ -72,7 +73,7 @@ func testAccCheckSakuraCloudSimpleMonitorDataSourceID(n string) resource.TestChe
 		}
 
 		if rs.Primary.ID == "" {
-			return fmt.Errorf("SimpleMonitor data source ID not set")
+			return errors.New("SimpleMonitor data source ID not set")
 		}
 		return nil
 	}
@@ -103,7 +104,7 @@ func testAccCheckSakuraCloudSimpleMonitorDataSourceDestroy(s *terraform.State) e
 		_, err := client.SimpleMonitor.Read(toSakuraCloudID(rs.Primary.ID))
 
 		if err == nil {
-			return fmt.Errorf("SimpleMonitor still exists")
+			return errors.New("SimpleMonitor still exists")
 		}
 	}
 

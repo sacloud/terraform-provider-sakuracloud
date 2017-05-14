@@ -13,33 +13,33 @@ func resourceSakuraCloudSSHKeyGen() *schema.Resource {
 		Delete: resourceSakuraCloudSSHKeyGenDelete,
 
 		Schema: map[string]*schema.Schema{
-			"name": &schema.Schema{
+			"name": {
 				Type:         schema.TypeString,
 				Required:     true,
 				ForceNew:     true,
 				ValidateFunc: validateMaxLength(1, 64),
 			},
-			"description": &schema.Schema{
+			"description": {
 				Type:         schema.TypeString,
 				Optional:     true,
 				ForceNew:     true,
 				ValidateFunc: validateMaxLength(1, 512),
 			},
-			"pass_phrase": &schema.Schema{
+			"pass_phrase": {
 				Type:         schema.TypeString,
 				Optional:     true,
 				ForceNew:     true,
 				ValidateFunc: validateMaxLength(8, 64),
 			},
-			"private_key": &schema.Schema{
+			"private_key": {
 				Type:     schema.TypeString,
 				Computed: true,
 			},
-			"public_key": &schema.Schema{
+			"public_key": {
 				Type:     schema.TypeString,
 				Computed: true,
 			},
-			"fingerprint": &schema.Schema{
+			"fingerprint": {
 				Type:     schema.TypeString,
 				Computed: true,
 			},
@@ -90,7 +90,7 @@ func resourceSakuraCloudSSHKeyGenDelete(d *schema.ResourceData, meta interface{}
 	return nil
 }
 
-func setSSHKeyGenResourceData(d *schema.ResourceData, client *api.Client, data interface{}) error {
+func setSSHKeyGenResourceData(d *schema.ResourceData, _ *api.Client, data interface{}) error {
 
 	if key, ok := data.(sshKeyType); ok {
 		d.Set("name", key.GetName())

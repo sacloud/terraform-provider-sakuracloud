@@ -1,7 +1,7 @@
 package sakuracloud
 
 import (
-	"fmt"
+	"errors"
 	"github.com/hashicorp/terraform/helper/resource"
 	"github.com/hashicorp/terraform/terraform"
 	"github.com/sacloud/libsacloud/api"
@@ -16,7 +16,7 @@ func TestAccResourceSakuraCloudDNSRecord_Basic(t *testing.T) {
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckSakuraCloudDNSRecordDestroy,
 		Steps: []resource.TestStep{
-			resource.TestStep{
+			{
 				Config: testAccCheckSakuraCloudDNSRecordConfig_basic,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckSakuraCloudDNSExists("sakuracloud_dns.foobar", &dns),
@@ -42,7 +42,7 @@ func TestAccResourceSakuraCloudDNSRecord_Basic(t *testing.T) {
 						"sakuracloud_dns_record.foobar1", "port", "3"),
 				),
 			},
-			resource.TestStep{
+			{
 				Config: testAccCheckSakuraCloudDNSRecordConfig_update,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckSakuraCloudDNSExists("sakuracloud_dns.foobar", &dns),
@@ -67,7 +67,7 @@ func TestAccResourceSakuraCloudDNSRecord_With_Count(t *testing.T) {
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckSakuraCloudDNSRecordDestroy,
 		Steps: []resource.TestStep{
-			resource.TestStep{
+			{
 				Config: testAccCheckSakuraCloudDNSRecordConfig_with_count,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckSakuraCloudDNSExists("sakuracloud_dns.foobar", &dns),
@@ -102,7 +102,7 @@ func testAccCheckSakuraCloudDNSRecordDestroy(s *terraform.State) error {
 		_, err := client.DNS.Read(toSakuraCloudID(rs.Primary.ID))
 
 		if err == nil {
-			return fmt.Errorf("DNS still exists")
+			return errors.New("DNS still exists")
 		}
 	}
 

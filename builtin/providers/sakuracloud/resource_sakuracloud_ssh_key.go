@@ -18,22 +18,22 @@ func resourceSakuraCloudSSHKey() *schema.Resource {
 		},
 
 		Schema: map[string]*schema.Schema{
-			"name": &schema.Schema{
+			"name": {
 				Type:         schema.TypeString,
 				Required:     true,
 				ValidateFunc: validateMaxLength(1, 64),
 			},
-			"public_key": &schema.Schema{
+			"public_key": {
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
-			"description": &schema.Schema{
+			"description": {
 				Type:         schema.TypeString,
 				Optional:     true,
 				ValidateFunc: validateMaxLength(1, 512),
 			},
-			"fingerprint": &schema.Schema{
+			"fingerprint": {
 				Type:     schema.TypeString,
 				Computed: true,
 			},
@@ -113,7 +113,7 @@ func resourceSakuraCloudSSHKeyDelete(d *schema.ResourceData, meta interface{}) e
 	return nil
 }
 
-func setSSHKeyResourceData(d *schema.ResourceData, client *api.Client, data *sacloud.SSHKey) error {
+func setSSHKeyResourceData(d *schema.ResourceData, _ *api.Client, data *sacloud.SSHKey) error {
 
 	d.Set("name", data.Name)
 	d.Set("public_key", data.PublicKey)

@@ -19,93 +19,93 @@ func resourceSakuraCloudDatabase() *schema.Resource {
 		},
 
 		Schema: map[string]*schema.Schema{
-			"name": &schema.Schema{
+			"name": {
 				Type:     schema.TypeString,
 				Required: true,
 			},
-			"database_type": &schema.Schema{
+			"database_type": {
 				Type:         schema.TypeString,
 				Optional:     true,
 				ForceNew:     true,
 				ValidateFunc: validateStringInWord([]string{"postgresql", "mariadb"}),
 				Default:      "postgresql",
 			},
-			//"is_double": &schema.Schema{
+			//"is_double": {
 			//	Type:     schema.TypeBool,
 			//	ForceNew: true,
 			//	Optional: true,
 			//	Default:  false,
 			//},
-			"plan": &schema.Schema{
+			"plan": {
 				Type:         schema.TypeString,
 				ForceNew:     true,
 				Optional:     true,
 				Default:      "10g",
 				ValidateFunc: validateStringInWord([]string{"10g", "30g", "90g", "240g"}),
 			},
-			"admin_password": &schema.Schema{
+			"admin_password": {
 				Type:     schema.TypeString,
 				ForceNew: true,
 				Required: true,
 			},
-			"user_name": &schema.Schema{
+			"user_name": {
 				Type:     schema.TypeString,
 				ForceNew: true,
 				Required: true,
 			},
-			"user_password": &schema.Schema{
+			"user_password": {
 				Type:     schema.TypeString,
 				Required: true,
 			},
-			"allow_networks": &schema.Schema{
+			"allow_networks": {
 				Type:     schema.TypeList,
 				Optional: true,
 				Elem:     &schema.Schema{Type: schema.TypeString},
 			},
-			"port": &schema.Schema{
+			"port": {
 				Type:         schema.TypeInt,
 				Optional:     true,
 				Default:      5432,
 				ValidateFunc: validateIntegerInRange(1024, 65535),
 			},
-			"backup_time": &schema.Schema{
+			"backup_time": {
 				Type:         schema.TypeString,
 				Required:     true,
 				ValidateFunc: validateBackupTime(),
 			},
 
-			"switch_id": &schema.Schema{
+			"switch_id": {
 				Type:         schema.TypeString,
 				ForceNew:     true,
 				Required:     true,
 				ValidateFunc: validateSakuracloudIDType,
 			},
-			"ipaddress1": &schema.Schema{
+			"ipaddress1": {
 				Type:     schema.TypeString,
 				ForceNew: true,
 				Required: true,
 			},
-			"nw_mask_len": &schema.Schema{
+			"nw_mask_len": {
 				Type:         schema.TypeInt,
 				ForceNew:     true,
 				Required:     true,
 				ValidateFunc: validateIntegerInRange(8, 29),
 			},
-			"default_route": &schema.Schema{
+			"default_route": {
 				Type:     schema.TypeString,
 				ForceNew: true,
 				Required: true,
 			},
-			"description": &schema.Schema{
+			"description": {
 				Type:     schema.TypeString,
 				Optional: true,
 			},
-			"tags": &schema.Schema{
+			"tags": {
 				Type:     schema.TypeList,
 				Optional: true,
 				Elem:     &schema.Schema{Type: schema.TypeString},
 			},
-			"zone": &schema.Schema{
+			"zone": {
 				Type:         schema.TypeString,
 				Optional:     true,
 				Computed:     true,
