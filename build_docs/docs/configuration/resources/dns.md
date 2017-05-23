@@ -44,7 +44,7 @@ resource "sakuracloud_dns_record" "record02" {
 | `zone`        | 対象DNSゾーン     | -                                          |
 | `description` | 説明             | -                                          |
 | `tags`        | タグ             | -                                          |
-| `dns_servers` | DNSサーバー       | 対象DNSゾーンの委譲先となるネームサーバーのリスト  |
+| `dns_servers` | DNSサーバ       | 対象DNSゾーンの委譲先となるネームサーバのリスト  |
 
 ## `sakuracloud_dns_record`
 

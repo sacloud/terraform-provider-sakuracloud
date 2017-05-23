@@ -32,4 +32,4 @@ resource "sakuracloud_switch" "myswitch" {
 | `description`       | 説明                    | -                                          |
 | `tags`              | タグ                    | -                                          |
 | `zone`              | ゾーン                  | -                                          |
-| `server_ids`         | サーバーID               | 接続されているサーバーのID(リスト)             |
+| `server_ids`         | サーバID               | 接続されているサーバのID(リスト)             |

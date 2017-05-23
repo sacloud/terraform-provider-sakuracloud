@@ -1,4 +1,4 @@
-# VPCルーター(sakuracloud_vpc_router)
+# VPCルータ(sakuracloud_vpc_router)
 
 ---
 
@@ -6,17 +6,17 @@
 
 ```hcl
 
-# VPCルーターの上流ルーター(プレミアム以上のプランの場合、ルーターが必須)
+# VPCルータの上流ルータ(プレミアム以上のプランの場合、ルータが必須)
 resource "sakuracloud_internet" "router1" {
     name = "myinternet1"
 }
 
-# VPCルーター配下に接続するスイッチ
+# VPCルータ配下に接続するスイッチ
 resource "sakuracloud_switch" "sw01"{
     name = "sw01"
 }
 
-# VPCルーター本体の定義(プレミアム/ハイスペックプランの場合)
+# VPCルータ本体の定義(プレミアム/ハイスペックプランの場合)
 resource "sakuracloud_vpc_router" "foobar" {
     name = "vpc_router_sample"
     plan = "premium"
@@ -29,13 +29,13 @@ resource "sakuracloud_vpc_router" "foobar" {
     syslog_host = "192.168.11.1"                                     # syslog転送先ホスト
 }
 
-# VPCルーター本体の定義(スタンダードプランの場合)
+# VPCルータ本体の定義(スタンダードプランの場合)
 #resource "sakuracloud_vpc_router" "foobar" {
 #    name = "vpc_router_setting_test"
 #    plan = "standard"
 #}
 
-# VPCルーター配下のプライベートNIC(プレミアム/ハイスペックプランの場合)
+# VPCルータ配下のプライベートNIC(プレミアム/ハイスペックプランの場合)
 resource "sakuracloud_vpc_router_interface" "eth1"{
     vpc_router_id = "${sakuracloud_vpc_router.foobar.id}"
 
@@ -46,7 +46,7 @@ resource "sakuracloud_vpc_router_interface" "eth1"{
     nw_mask_len = 24
 }
 
-# VPCルーター配下のプライベートNIC(スタンダードプランの場合)
+# VPCルータ配下のプライベートNIC(スタンダードプランの場合)
 #resource "sakuracloud_vpc_router_interface" "eth1"{
 #    vpc_router_id = "${sakuracloud_vpc_router.foobar.id}"
 #
@@ -62,7 +62,7 @@ resource "sakuracloud_vpc_router_static_nat" "staticNAT1" {
     vpc_router_id = "${sakuracloud_vpc_router.foobar.id}"
     vpc_router_interface_id = "${sakuracloud_vpc_router_interface.eth1.id}" # 対象プライベートIPが属するNICのID
 
-    global_address = "${sakuracloud_internet.router1.nw_ipaddresses.3}"     # グローバル側IPアドレス(VPCルーター本体に割り当てたIPエイリアス)
+    global_address = "${sakuracloud_internet.router1.nw_ipaddresses.3}"     # グローバル側IPアドレス(VPCルータ本体に割り当てたIPエイリアス)
     private_address = "192.168.11.11"                                       # プライベート側アドレス
 }
 
@@ -82,7 +82,7 @@ resource "sakuracloud_vpc_router_firewall" "send_fw" {
     vpc_router_id = "${sakuracloud_vpc_router.foobar.id}"
     direction = "send"
 
-    # VPC内部のWebサーバーから外部への応答パケットの許可
+    # VPC内部のWebサーバから外部への応答パケットの許可
     expressions = {
         protocol = "tcp"
         source_nw = ""
@@ -108,7 +108,7 @@ resource "sakuracloud_vpc_router_firewall" "receive_fw" {
     vpc_router_id = "${sakuracloud_vpc_router.foobar.id}"
     direction = "receive"
 
-    # VPC内部のWebサーバーへのパケットを許可
+    # VPC内部のWebサーバへのパケットを許可
     expressions = {
         protocol = "tcp"
         source_nw = ""
@@ -129,7 +129,7 @@ resource "sakuracloud_vpc_router_firewall" "receive_fw" {
     }
 }
 
-# DHCPサーバー機能
+# DHCPサーバ機能
 resource "sakuracloud_vpc_router_dhcp_server" "dhcp" {
     vpc_router_id = "${sakuracloud_vpc_router.foobar.id}"
     vpc_router_interface_index = "${sakuracloud_vpc_router_interface.eth1.index}" # 対象プライベートIPが属するNICのインデックス
@@ -141,13 +141,13 @@ resource "sakuracloud_vpc_router_dhcp_server" "dhcp" {
 # DHCPスタティック割り当て
 resource "sakuracloud_vpc_router_dhcp_static_mapping" "dhcp_map" {
     vpc_router_id = "${sakuracloud_vpc_router.foobar.id}"
-    vpc_router_dhcp_server_id = "${sakuracloud_vpc_router_dhcp_server.dhcp.id}" # DHCPサーバーリソースのID
+    vpc_router_dhcp_server_id = "${sakuracloud_vpc_router_dhcp_server.dhcp.id}" # DHCPサーバリソースのID
 
     macaddress = "aa:bb:cc:aa:bb:cc"  # 対象MACアドレス
     ipaddress = "192.168.11.20"       # 割りあてるIPアドレス
 }
 
-# リモートアクセス:PPTPサーバー機能
+# リモートアクセス:PPTPサーバ機能
 resource "sakuracloud_vpc_router_pptp" "pptp"{
     vpc_router_id = "${sakuracloud_vpc_router.foobar.id}"
     vpc_router_interface_id = "${sakuracloud_vpc_router_interface.eth1.id}"
@@ -156,7 +156,7 @@ resource "sakuracloud_vpc_router_pptp" "pptp"{
     range_stop = "192.168.11.150"  # IPアドレス動的割り当て範囲(終了)
 }
 
-# リモートアクセス:L2TP/IPSecサーバー機能
+# リモートアクセス:L2TP/IPSecサーバ機能
 resource "sakuracloud_vpc_router_l2tp" "l2tp" {
     vpc_router_id = "${sakuracloud_vpc_router.foobar.id}"
     vpc_router_interface_id = "${sakuracloud_vpc_router_interface.eth1.id}"
@@ -197,7 +197,7 @@ resource "sakuracloud_vpc_router_static_route" "route1" {
 
 ## `sakuracloud_vpc_router`
 
-VPCルーター本体を表します。
+VPCルータ本体を表します。
 
 ### パラメーター
 
@@ -222,7 +222,7 @@ VPCルーター本体を表します。
 |属性名          | 名称             | 補足                  |
 |---------------|------------------|----------------------|
 | `id`            | ID             | -                    |
-| `name`          | VPCルーター名   | -                    |
+| `name`          | VPCルータ名   | -                    |
 | `plan`          | プラン          | -                    |
 | `switch_id`     | スイッチID      | -                    |
 | `vip`           | VIP            | -                     |
@@ -234,15 +234,15 @@ VPCルーター本体を表します。
 | `description`   | 説明             | -                   |
 | `tags`          | タグ             | -                  |
 | `zone`          | ゾーン           | -                   |
-| `global_address`| グローバルIP     | VPCルーター自身のグローバルIP |
+| `global_address`| グローバルIP     | VPCルータ自身のグローバルIP |
 
 ## `sakuracloud_vpc_router_interface`
 
-VPCルーターが持つプライベートNICを表します。
+VPCルータが持つプライベートNICを表します。
 
-1台のVPCルーターにつき7つまでのプライベートNICを登録できます。
+1台のVPCルータにつき7つまでのプライベートNICを登録できます。
 
-また、プライベートNICの上流には(ルーターでは無い)スイッチを接続する必要があります。
+また、プライベートNICの上流には(ルータでは無い)スイッチを接続する必要があります。
 
 (詳細は[さくらのクラウドのマニュアル](http://cloud-news.sakura.ad.jp/vpc-router/vpc-interface/)を参照ください。)
 
@@ -250,7 +250,7 @@ VPCルーターが持つプライベートNICを表します。
 
 |パラメーター          |必須  |名称           |初期値     |設定値                         |補足                                          |
 |--------------------|:---:|----------------|:--------:|-------------------------------|----------------------------------------------|
-| `vpc_router_id`    | ◯   | VPCルーターID   | -        | 文字列                         | - |
+| `vpc_router_id`    | ◯   | VPCルータID   | -        | 文字列                         | - |
 | `index`            | ◯   | NIC番号        | -        | 数値(1〜7)                     | - |
 | `vip`              | △   | VIP            | -        | 文字列                         | プランが`premium`、`highspec`の場合必須 |
 | `ipaddress`        | ◯   | IPアドレス      | -        | リスト(文字列)                  | プランが`standard`の場合は1つ、`premium`、`highspec`の場合は2つ指定する |
@@ -263,7 +263,7 @@ VPCルーターが持つプライベートNICを表します。
 |属性名          | 名称             | 補足                  |
 |---------------|------------------|----------------------|
 | `id`            | ID             | -                    |
-| `vpc_router_id` | VPCルーターID   | -                    |
+| `vpc_router_id` | VPCルータID   | -                    |
 | `index`         | NIC番号        | -                    |
 | `vip`           | VIP            | -                    |
 | `ipaddress`     | IPアドレス      | -                     |
@@ -273,9 +273,9 @@ VPCルーターが持つプライベートNICを表します。
 
 ## `sakuracloud_vpc_router_static_nat`
 
-VPCルーターでのスタティックNAT機能を表します。
+VPCルータでのスタティックNAT機能を表します。
 
-**このリソースはVPCルーターのプランが`premium`、または`highspec`の場合に利用できます。**
+**このリソースはVPCルータのプランが`premium`、または`highspec`の場合に利用できます。**
 
 (詳細は[さくらのクラウドのマニュアル](http://cloud-news.sakura.ad.jp/vpc-router/vpc-nat/)を参照ください。)
 
@@ -283,9 +283,9 @@ VPCルーターでのスタティックNAT機能を表します。
 
 |パラメーター          |必須  |名称           |初期値     |設定値                         |補足                                          |
 |--------------------|:---:|----------------|:--------:|-------------------------------|----------------------------------------------|
-| `vpc_router_id`           | ◯   | VPCルーターID         | -        | 文字列                   | - |
+| `vpc_router_id`           | ◯   | VPCルータID         | -        | 文字列                   | - |
 | `vpc_router_interface_id` | ◯   | プライベートNIC ID     | -        | 文字列                   | - |
-| `global_address`          | ◯   | グローバル側IPアドレス  | -        | 文字列                   | VPCルーターのIPエイリアスの中のいづれかの値を指定する |
+| `global_address`          | ◯   | グローバル側IPアドレス  | -        | 文字列                   | VPCルータのIPエイリアスの中のいづれかの値を指定する |
 | `private_address`         | ◯   | プライベート側IPアドレス | -        | 文字列                  | - |
 | `description`             | -   | 説明             | -        | 文字列                  | - |
 | `zone`                    | -   | ゾーン          | -        | `is1b`<br />`tk1a`<br />`tk1v` | - |
@@ -296,7 +296,7 @@ VPCルーターでのスタティックNAT機能を表します。
 |属性名                     | 名称             | 補足                  |
 |--------------------------|------------------|----------------------|
 | `id`                     | ID             | -                    |
-| `vpc_router_id`          | VPCルーターID   | -                    |
+| `vpc_router_id`          | VPCルータID   | -                    |
 | `vpc_router_interface_id`| プライベートNIC ID | -                    |
 | `global_address`         | グローバル側IPアドレス            | -                    |
 | `private_address`        | プライベート側IPアドレス      | -                     |
@@ -306,7 +306,7 @@ VPCルーターでのスタティックNAT機能を表します。
 
 ## `sakuracloud_vpc_router_port_forwarding`
 
-VPCルーターでのポートフォワーディング(Reverse NAT)機能を表します。
+VPCルータでのポートフォワーディング(Reverse NAT)機能を表します。
 
 (詳細は[さくらのクラウドのマニュアル](http://cloud-news.sakura.ad.jp/vpc-router/vpc-nat/)を参照ください。)
 
@@ -314,7 +314,7 @@ VPCルーターでのポートフォワーディング(Reverse NAT)機能を表�
 
 |パラメーター                 |必須  |名称                 |初期値     |設定値                         |補足                                          |
 |---------------------------|:---:|----------------------|:--------:|-------------------------------|----------------------------------------------|
-| `vpc_router_id`           | ◯   | VPCルーターID         | -        | 文字列                   | - |
+| `vpc_router_id`           | ◯   | VPCルータID         | -        | 文字列                   | - |
 | `vpc_router_interface_id` | ◯   | プライベートNIC ID     | -        | 文字列                   | - |
 | `protocol`                | ◯   | プロトコル             | -        | `tcp`<br />`udp`       | - |
 | `global_port`             | ◯   | グローバル側ポート番号   | -        | 数値(1〜65535)                   | - |
@@ -329,7 +329,7 @@ VPCルーターでのポートフォワーディング(Reverse NAT)機能を表�
 |属性名                     | 名称             | 補足                  |
 |--------------------------|------------------|----------------------|
 | `id`                     | ID                    | -                    |
-| `vpc_router_id`          | VPCルーターID          | -                    |
+| `vpc_router_id`          | VPCルータID          | -                    |
 | `vpc_router_interface_id`| プライベートNIC ID     | -                    |
 | `protocol`               | プロトコル              | -                    |
 | `global_port`            | グローバル側ポート番号   | -                    |
@@ -340,7 +340,7 @@ VPCルーターでのポートフォワーディング(Reverse NAT)機能を表�
 
 ## `sakuracloud_vpc_router_firewall`
 
-VPCルーターでのファイアウォール機能を表します。
+VPCルータでのファイアウォール機能を表します。
 
 (詳細は[さくらのクラウドのマニュアル](http://cloud-news.sakura.ad.jp/vpc-router/vpc-firewall/)を参照ください。)
 
@@ -348,8 +348,8 @@ VPCルーターでのファイアウォール機能を表します。
 
 |パラメーター                 |必須  |名称                 |初期値     |設定値                         |補足                                          |
 |---------------------------|:---:|----------------------|:--------:|-------------------------------|----------------------------------------------|
-| `vpc_router_id`           | ◯   | VPCルーターID         | -        | 文字列                   | - |
-| `direction`               | ◯   | 通信方向 | -        | `send`<br />`receive`               | VPCルーター内から見た通信方向を指定する |
+| `vpc_router_id`           | ◯   | VPCルータID         | -        | 文字列                   | - |
+| `direction`               | ◯   | 通信方向 | -        | `send`<br />`receive`               | VPCルータ内から見た通信方向を指定する |
 | `expressions`             | ◯   | フィルタルール        | -        | リスト(マップ)           | 詳細は[`expressions`](#expressions)を参照 |
 | `zone`                    | -   | ゾーン                 | -        | `is1b`<br />`tk1a`<br />`tk1v` | - |
 
@@ -372,14 +372,14 @@ VPCルーターでのファイアウォール機能を表します。
 |属性名                     | 名称             | 補足                  |
 |--------------------------|------------------|----------------------|
 | `id`                     | ID                    | -                    |
-| `vpc_router_id`          | VPCルーターID          | -                    |
+| `vpc_router_id`          | VPCルータID          | -                    |
 | `private_port`           | プライベート側ポート番号  | -                     |
 | `expressions`            | フィルタルール    | [`expressions`](#expressions)のリスト |
 | `zone`                   | ゾーン                 | -                   |
 
 ## `sakuracloud_vpc_router_dhcp_server`
 
-VPCルーターでのDHCPサーバー機能を表します。
+VPCルータでのDHCPサーバ機能を表します。
 
 (詳細は[さくらのクラウドのマニュアル](http://cloud-news.sakura.ad.jp/vpc-router/vpc-dhcp/)を参照ください。)
 
@@ -387,7 +387,7 @@ VPCルーターでのDHCPサーバー機能を表します。
 
 |パラメーター                 |必須  |名称                 |初期値     |設定値                         |補足                                          |
 |---------------------------|:---:|----------------------|:--------:|-------------------------------|----------------------------------------------|
-| `vpc_router_id`              | ◯   | VPCルーターID         | -        | 文字列                   | - |
+| `vpc_router_id`              | ◯   | VPCルータID         | -        | 文字列                   | - |
 | `vpc_router_interface_index` | ◯   | プライベートNIC 番号   | -        | 数値                   | - |
 | `range_start`                | ◯   | 動的割り当て範囲(開始) | -        | 文字列                          | - |
 | `range_stop`                 | ◯   | 動的割り当て範囲(終了) | -        | 文字列                          | - |
@@ -399,7 +399,7 @@ VPCルーターでのDHCPサーバー機能を表します。
 |属性名                     | 名称             | 補足                  |
 |--------------------------|------------------|----------------------|
 | `id`                     | ID                    | -                    |
-| `vpc_router_id`          | VPCルーターID          | -                    |
+| `vpc_router_id`          | VPCルータID          | -                    |
 | `vpc_router_interface_index`| プライベートNIC 番号     | -                    |
 | `range_start`            | 動的割り当て範囲(開始) | -                     |
 | `range_stop`             | 動的割り当て範囲(終了)  | -                     |
@@ -407,7 +407,7 @@ VPCルーターでのDHCPサーバー機能を表します。
 
 ## `sakuracloud_vpc_router_dhcp_static_mapping`
 
-VPCルーターでのDHCPスタティック割当機能を表します。
+VPCルータでのDHCPスタティック割当機能を表します。
 
 (詳細は[さくらのクラウドのマニュアル](http://cloud-news.sakura.ad.jp/vpc-router/vpc-dhcp/)を参照ください。)
 
@@ -415,8 +415,8 @@ VPCルーターでのDHCPスタティック割当機能を表します。
 
 |パラメーター                 |必須  |名称                 |初期値     |設定値                         |補足                                          |
 |---------------------------|:---:|----------------------|:--------:|-------------------------------|----------------------------------------------|
-| `vpc_router_id`             | ◯   | VPCルーターID         | -        | 文字列                   | - |
-| `vpc_router_dhcp_server_id` | ◯   | DHCPサーバーID       | -        | 数値                   | - |
+| `vpc_router_id`             | ◯   | VPCルータID         | -        | 文字列                   | - |
+| `vpc_router_dhcp_server_id` | ◯   | DHCPサーバID       | -        | 数値                   | - |
 | `ipaddress`                 | ◯   | IPアドレス | -        | 文字列                          | - |
 | `macaddress`                | ◯   | MACアドレス | -        | 文字列                          | 英字は小文字で入力する |
 | `zone`                      | -   | ゾーン                 | -        | `is1b`<br />`tk1a`<br />`tk1v` | - |
@@ -427,15 +427,15 @@ VPCルーターでのDHCPスタティック割当機能を表します。
 |属性名                     | 名称             | 補足                  |
 |--------------------------|------------------|----------------------|
 | `id`                     | ID                    | -                    |
-| `vpc_router_id`          | VPCルーターID          | -                    |
-| `vpc_router_dhcp_server_id`| DHCPサーバーID     | -                    |
+| `vpc_router_id`          | VPCルータID          | -                    |
+| `vpc_router_dhcp_server_id`| DHCPサーバID     | -                    |
 | `ipaddress`              | IPアドレス | -                     |
 | `macaddress`             | MACアドレス  | -                     |
 | `zone`                   | ゾーン                 | -                   |
 
 ## `sakuracloud_vpc_router_pptp`
 
-VPCルーターでのPPTPサーバー機能を表します。
+VPCルータでのPPTPサーバ機能を表します。
 
 (詳細は[さくらのクラウドのマニュアル](http://cloud-news.sakura.ad.jp/vpc-router/vpc-remoteaccess/)を参照ください。)
 
@@ -443,7 +443,7 @@ VPCルーターでのPPTPサーバー機能を表します。
 
 |パラメーター                 |必須  |名称                 |初期値     |設定値                         |補足                                          |
 |---------------------------|:---:|----------------------|:--------:|-------------------------------|----------------------------------------------|
-| `vpc_router_id`              | ◯   | VPCルーターID         | -        | 文字列                   | - |
+| `vpc_router_id`              | ◯   | VPCルータID         | -        | 文字列                   | - |
 | `vpc_router_interface_id`    | ◯   | プライベートNIC ID     | -        | 文字列                   | - |
 | `range_start`                | ◯   | 動的割り当て範囲(開始) | -        | 文字列                          | - |
 | `range_stop`                 | ◯   | 動的割り当て範囲(終了) | -        | 文字列                          | - |
@@ -455,7 +455,7 @@ VPCルーターでのPPTPサーバー機能を表します。
 |属性名                     | 名称             | 補足                  |
 |--------------------------|------------------|----------------------|
 | `id`                     | ID                    | -                    |
-| `vpc_router_id`          | VPCルーターID          | -                    |
+| `vpc_router_id`          | VPCルータID          | -                    |
 | `vpc_router_interface_id`| プライベートNIC ID     | -                    |
 | `range_start`            | 動的割り当て範囲(開始) | -                     |
 | `range_stop`             | 動的割り当て範囲(終了)  | -                     |
@@ -463,7 +463,7 @@ VPCルーターでのPPTPサーバー機能を表します。
 
 ## `sakuracloud_vpc_router_l2tp`
 
-VPCルーターでのL2TP/IPSecサーバー機能を表します。
+VPCルータでのL2TP/IPSecサーバ機能を表します。
 
 (詳細は[さくらのクラウドのマニュアル](http://cloud-news.sakura.ad.jp/vpc-router/vpc-remoteaccess/)を参照ください。)
 
@@ -471,7 +471,7 @@ VPCルーターでのL2TP/IPSecサーバー機能を表します。
 
 |パラメーター                 |必須  |名称                 |初期値     |設定値                         |補足                                          |
 |---------------------------|:---:|----------------------|:--------:|-------------------------------|----------------------------------------------|
-| `vpc_router_id`              | ◯   | VPCルーターID         | -        | 文字列                   | - |
+| `vpc_router_id`              | ◯   | VPCルータID         | -        | 文字列                   | - |
 | `vpc_router_interface_id`    | ◯   | プライベートNIC ID     | -        | 文字列                   | - |
 | `pre_shared_secret`          | ◯   | 事前共有シークレット   | -        | 文字列                          | - |
 | `range_start`                | ◯   | 動的割り当て範囲(開始) | -        | 文字列                          | - |
@@ -484,7 +484,7 @@ VPCルーターでのL2TP/IPSecサーバー機能を表します。
 |属性名                     | 名称             | 補足                  |
 |--------------------------|------------------|----------------------|
 | `id`                     | ID                    | -                    |
-| `vpc_router_id`          | VPCルーターID          | -                    |
+| `vpc_router_id`          | VPCルータID          | -                    |
 | `vpc_router_interface_id`| プライベートNIC ID     | -                    |
 | `pre_shared_secret`      | 事前共有シークレット   | -                     |
 | `range_start`            | 動的割り当て範囲(開始) | -                     |
@@ -493,7 +493,7 @@ VPCルーターでのL2TP/IPSecサーバー機能を表します。
 
 ## `sakuracloud_vpc_router_user`
 
-VPCルーターでのリモートユーザーを表します。
+VPCルータでのリモートユーザーを表します。
 
 このリソースは100個まで指定することが可能です。
 
@@ -503,7 +503,7 @@ VPCルーターでのリモートユーザーを表します。
 
 |パラメーター                 |必須  |名称                 |初期値     |設定値                         |補足                                          |
 |---------------------------|:---:|----------------------|:--------:|-------------------------------|----------------------------------------------|
-| `vpc_router_id`           | ◯   | VPCルーターID         | -        | 文字列                   | - |
+| `vpc_router_id`           | ◯   | VPCルータID         | -        | 文字列                   | - |
 | `name`                    | ◯   | ユーザー名 | -        | 文字列                          | - |
 | `password`                | ◯   | パスワード | -        | 文字列                          | - |
 | `zone`                    | -   | ゾーン                 | -        | `is1b`<br />`tk1a`<br />`tk1v` | - |
@@ -514,7 +514,7 @@ VPCルーターでのリモートユーザーを表します。
 |属性名                     | 名称             | 補足                  |
 |--------------------------|------------------|----------------------|
 | `id`                     | ID                    | -                    |
-| `vpc_router_id`          | VPCルーターID          | -                    |
+| `vpc_router_id`          | VPCルータID          | -                    |
 | `name`                   | ユーザー名 | -                     |
 | `password`               | パスワード  | -                     |
 | `zone`                   | ゾーン                 | -                   |
@@ -522,7 +522,7 @@ VPCルーターでのリモートユーザーを表します。
 
 ## `sakuracloud_vpc_router_site_to_site_vpn`
 
-VPCルーターでのサイト間VPNを表します。
+VPCルータでのサイト間VPNを表します。
 
 (詳細は[さくらのクラウドのマニュアル](http://cloud-news.sakura.ad.jp/vpc-router/vpc-site-to-site-vpn/)を参照ください。)
 
@@ -530,7 +530,7 @@ VPCルーターでのサイト間VPNを表します。
 
 |パラメーター            |必須  |名称                 |初期値     |設定値                         |補足                                          |
 |----------------------|:---:|----------------------|:--------:|-------------------------------|----------------------------------------------|
-| `vpc_router_id`      | ◯   | VPCルーターID         | -        | 文字列                   | - |
+| `vpc_router_id`      | ◯   | VPCルータID         | -        | 文字列                   | - |
 | `peer`               | ◯   | 対向IPアドレス | -        | 文字列                          | - |
 | `remote_id`          | ◯   | 対向ID | -        | 文字列                          | - |
 | `pre_shared_secret`  | ◯   | 事前共有シークレット | -        | 文字列                          | - |
@@ -544,7 +544,7 @@ VPCルーターでのサイト間VPNを表します。
 |属性名                     | 名称             | 補足                  |
 |--------------------------|------------------|----------------------|
 | `id`                     | ID                    | -                    |
-| `vpc_router_id`          | VPCルーターID          | -                    |
+| `vpc_router_id`          | VPCルータID          | -                    |
 | `peer`                   | 対向IPアドレス | -                     |
 | `remote_id`              | 対向ID | -                     |
 | `pre_shared_secret`      | 事前共有シークレット | -                     |
@@ -554,7 +554,7 @@ VPCルーターでのサイト間VPNを表します。
 
 ## `sakuracloud_vpc_router_static_route`
 
-VPCルーターでのスタティックルート機能を表します。
+VPCルータでのスタティックルート機能を表します。
 
 (詳細は[さくらのクラウドのマニュアル](http://cloud-news.sakura.ad.jp/vpc-router/vpc-static-route/)を参照ください。)
 
@@ -562,7 +562,7 @@ VPCルーターでのスタティックルート機能を表します。
 
 |パラメーター                 |必須  |名称                 |初期値     |設定値                         |補足                                          |
 |---------------------------|:---:|----------------------|:--------:|-------------------------------|----------------------------------------------|
-| `vpc_router_id`              | ◯   | VPCルーターID         | -        | 文字列                   | - |
+| `vpc_router_id`              | ◯   | VPCルータID         | -        | 文字列                   | - |
 | `vpc_router_interface_id`    | ◯   | プライベートNIC ID     | -        | 文字列                   | - |
 | `prefix`                    | ◯   | プリフィックス | -        | 文字列                          | - |
 | `next_hop`                  | ◯   | ネクストホップ | -        | 文字列                          | - |
@@ -574,7 +574,7 @@ VPCルーターでのスタティックルート機能を表します。
 |属性名                     | 名称             | 補足                  |
 |--------------------------|------------------|----------------------|
 | `id`                     | ID                    | -                    |
-| `vpc_router_id`          | VPCルーターID          | -                    |
+| `vpc_router_id`          | VPCルータID          | -                    |
 | `vpc_router_interface_id`| プライベートNIC ID     | -                    |
 | `prefix`                 | プリフィックス | -                     |
 | `next_hop`               | ネクストホップ  | -                     |

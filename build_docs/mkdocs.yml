@@ -18,15 +18,15 @@ pages:
     - 全体/共通項目:
       - プロバイダ: configuration/provider.md
     - リソース:
-      - サーバー: configuration/resources/server.md
+      - サーバ: configuration/resources/server.md
       - ディスク: configuration/resources/disk.md
       - スイッチ: configuration/resources/switch.md
-      - ルーター: configuration/resources/internet.md
+      - ルータ: configuration/resources/internet.md
       - サブネット: configuration/resources/subnet.md
       - パケットフィルタ: configuration/resources/packet_filter.md
       - ブリッジ: configuration/resources/bridge.md
-      - ロードバランサー: configuration/resources/load_balancer.md
-      - VPCルーター: configuration/resources/vpc_router.md
+      - ロードバランサ: configuration/resources/load_balancer.md
+      - VPCルータ: configuration/resources/vpc_router.md
       - データベース: configuration/resources/database.md
       - スタートアップスクリプト: configuration/resources/note.md
       - 公開鍵: configuration/resources/ssh_key.md
