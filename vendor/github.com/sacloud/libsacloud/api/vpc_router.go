@@ -414,14 +414,13 @@ func (api *VPCRouterAPI) addInterfaceAt(routerID int64, switchID int64, routerNI
 		if len(req.Settings.Router.Interfaces) < index {
 			req.Settings.Router.Interfaces = append(req.Settings.Router.Interfaces, nil)
 		}
-
-		if i == index {
-			req.Settings.Router.Interfaces[index] = routerNIC
-		}
-
 	}
 
-	req.Settings.Router.Interfaces = append(req.Settings.Router.Interfaces, routerNIC)
+	if len(req.Settings.Router.Interfaces) < index+1 {
+		req.Settings.Router.Interfaces = append(req.Settings.Router.Interfaces, routerNIC)
+	} else {
+		req.Settings.Router.Interfaces[index] = routerNIC
+	}
 
 	res, err := api.UpdateSetting(routerID, req)
 	if err != nil {

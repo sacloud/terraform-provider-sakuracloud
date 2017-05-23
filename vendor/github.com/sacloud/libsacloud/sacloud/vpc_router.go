@@ -118,3 +118,63 @@ func (v *VPCRouter) setPremiumServices(switchID string, virtualIPAddress string,
 	}
 
 }
+
+// HasSetting VPCルータ設定を保持しているか
+func (v *VPCRouter) HasSetting() bool {
+	return v.Settings != nil && v.Settings.Router != nil
+}
+
+// HasInterfaces NIC設定を保持しているか
+func (v *VPCRouter) HasInterfaces() bool {
+	return v.HasSetting() && v.Settings.Router.HasInterfaces()
+}
+
+// HasStaticNAT スタティックNAT設定を保持しているか
+func (v *VPCRouter) HasStaticNAT() bool {
+	return v.HasSetting() && v.Settings.Router.HasStaticNAT()
+}
+
+// HasPortForwarding ポートフォワーディング設定を保持しているか
+func (v *VPCRouter) HasPortForwarding() bool {
+	return v.HasSetting() && v.Settings.Router.HasPortForwarding()
+}
+
+// HasFirewall ファイアウォール設定を保持しているか
+func (v *VPCRouter) HasFirewall() bool {
+	return v.HasSetting() && v.Settings.Router.HasFirewall()
+}
+
+// HasDHCPServer DHCPサーバー設定を保持しているか
+func (v *VPCRouter) HasDHCPServer() bool {
+	return v.HasSetting() && v.Settings.Router.HasDHCPServer()
+}
+
+// HasDHCPStaticMapping DHCPスタティックマッピング設定を保持しているか
+func (v *VPCRouter) HasDHCPStaticMapping() bool {
+	return v.HasSetting() && v.Settings.Router.HasDHCPStaticMapping()
+}
+
+// HasL2TPIPsecServer L2TP/IPSecサーバを保持しているか
+func (v *VPCRouter) HasL2TPIPsecServer() bool {
+	return v.HasSetting() && v.Settings.Router.HasL2TPIPsecServer()
+}
+
+// HasPPTPServer PPTPサーバを保持しているか
+func (v *VPCRouter) HasPPTPServer() bool {
+	return v.HasSetting() && v.Settings.Router.HasPPTPServer()
+}
+
+// HasRemoteAccessUsers リモートアクセスユーザー設定を保持しているか
+func (v *VPCRouter) HasRemoteAccessUsers() bool {
+	return v.HasSetting() && v.Settings.Router.HasRemoteAccessUsers()
+}
+
+// HasSiteToSiteIPsecVPN サイト間VPN設定を保持しているか
+func (v *VPCRouter) HasSiteToSiteIPsecVPN() bool {
+	return v.HasSetting() && v.Settings.Router.HasSiteToSiteIPsecVPN()
+}
+
+// HasStaticRoutes スタティックルートを保持しているか
+func (v *VPCRouter) HasStaticRoutes() bool {
+	return v.HasSetting() && v.Settings.Router.HasStaticRoutes()
+}

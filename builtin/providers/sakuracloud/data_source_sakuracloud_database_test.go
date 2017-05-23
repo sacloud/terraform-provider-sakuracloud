@@ -115,7 +115,6 @@ resource "sakuracloud_database" "foobar" {
     description = "description_test"
     tags = ["tag1","tag2","tag3"]
 
-    admin_password = "DatabasePasswordAdmin397"
     user_name = "defuser"
     user_password = "DatabasePasswordUser397"
 
@@ -142,7 +141,6 @@ resource "sakuracloud_database" "foobar" {
     description = "description_test"
     tags = ["tag1","tag2","tag3"]
 
-    admin_password = "DatabasePasswordAdmin397"
     user_name = "defuser"
     user_password = "DatabasePasswordUser397"
 
@@ -177,7 +175,6 @@ resource "sakuracloud_database" "foobar" {
     description = "description_test"
     tags = ["tag1","tag2","tag3"]
 
-    admin_password = "DatabasePasswordAdmin397"
     user_name = "defuser"
     user_password = "DatabasePasswordUser397"
 
@@ -212,7 +209,6 @@ resource "sakuracloud_database" "foobar" {
     description = "description_test"
     tags = ["tag1","tag2","tag3"]
 
-    admin_password = "DatabasePasswordAdmin397"
     user_name = "defuser"
     user_password = "DatabasePasswordUser397"
 
@@ -247,7 +243,6 @@ resource "sakuracloud_database" "foobar" {
     description = "description_test"
     tags = ["tag1","tag2","tag3"]
 
-    admin_password = "DatabasePasswordAdmin397"
     user_name = "defuser"
     user_password = "DatabasePasswordUser397"
 

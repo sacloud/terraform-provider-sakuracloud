@@ -16,12 +16,16 @@ type Bill struct {
 
 // BillDetail 支払い明細情報
 type BillDetail struct {
-	Amount         int64  `json:",omitempty"` // 金額
-	ContractID     int64  `json:",omitempty"` // 契約ID
-	Description    string `json:",omitempty"` // 説明
-	Index          int    `json:",omitempty"` // インデックス
-	ServiceClassID int64  `json:",omitempty"` // サービスクラスID
-	Usage          int64  `json:",omitempty"` // 秒数
-	Zone           string `json:",omitempty"` // ゾーン
+	Amount         int64      `json:",omitempty"` // 金額
+	ContractID     int64      `json:",omitempty"` // 契約ID
+	Description    string     `json:",omitempty"` // 説明
+	Index          int        `json:",omitempty"` // インデックス
+	ServiceClassID int64      `json:",omitempty"` // サービスクラスID
+	Usage          int64      `json:",omitempty"` // 秒数
+	Zone           string     `json:",omitempty"` // ゾーン
+	ContractEndAt  *time.Time `json:",omitempty"` // 契約終了日時
+}
 
+func (d *BillDetail) IsContractEnded(t time.Time) bool {
+	return d.ContractEndAt != nil && d.ContractEndAt.Before(t)
 }

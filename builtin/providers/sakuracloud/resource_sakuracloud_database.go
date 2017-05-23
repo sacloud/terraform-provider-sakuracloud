@@ -43,11 +43,6 @@ func resourceSakuraCloudDatabase() *schema.Resource {
 				Default:      "10g",
 				ValidateFunc: validateStringInWord([]string{"10g", "30g", "90g", "240g"}),
 			},
-			"admin_password": {
-				Type:     schema.TypeString,
-				ForceNew: true,
-				Required: true,
-			},
 			"user_name": {
 				Type:     schema.TypeString,
 				ForceNew: true,
@@ -139,7 +134,6 @@ func resourceSakuraCloudDatabaseCreate(d *schema.ResourceData, meta interface{})
 	}
 
 	opts.Name = d.Get("name").(string)
-	opts.AdminPassword = d.Get("admin_password").(string)
 	opts.DefaultUser = d.Get("user_name").(string)
 	opts.UserPassword = d.Get("user_password").(string)
 	if rawNetworks, ok := d.GetOk("allow_networks"); ok {
@@ -336,7 +330,6 @@ func setDatabaseResourceData(d *schema.ResourceData, client *api.Client, data *s
 	}
 
 	d.Set("name", data.Name)
-	d.Set("admin_password", data.Settings.DBConf.Common.AdminPassword)
 	d.Set("user_password", data.Settings.DBConf.Common.DefaultUser)
 	d.Set("user_password", data.Settings.DBConf.Common.UserPassword)
 
