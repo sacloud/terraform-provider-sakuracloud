@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>ロードバランサー - Terraform for さくらのクラウド</title>
+  <title>ロードバランサ - Terraform for さくらのクラウド</title>
   
 
   <link rel="shortcut icon" href="../../../img/favicon.ico">
@@ -21,7 +21,7 @@
   
   <script>
     // Current page data
-    var mkdocs_page_name = "ロードバランサー";
+    var mkdocs_page_name = "ロードバランサ";
   </script>
   
   <script src="../../../js/jquery-2.1.1.min.js"></script>
@@ -116,7 +116,7 @@
         
             
     <li class="toctree-l1 ">
-        <a class="" href="../server/">サーバー</a>
+        <a class="" href="../server/">サーバ</a>
         
     </li>
 
@@ -137,7 +137,7 @@
         
             
     <li class="toctree-l1 ">
-        <a class="" href="../internet/">ルーター</a>
+        <a class="" href="../internet/">ルータ</a>
         
     </li>
 
@@ -165,11 +165,11 @@
         
             
     <li class="toctree-l1 current">
-        <a class="current" href="./">ロードバランサー</a>
+        <a class="current" href="./">ロードバランサ</a>
         
             <ul>
             
-                <li class="toctree-l3"><a href="#sakuracloud_load_balancer">ロードバランサー(sakuracloud_load_balancer)</a></li>
+                <li class="toctree-l3"><a href="#sakuracloud_load_balancer">ロードバランサ(sakuracloud_load_balancer)</a></li>
                 
                     <li><a class="toctree-l4" href="#_1">設定例</a></li>
                 
@@ -187,7 +187,7 @@
         
             
     <li class="toctree-l1 ">
-        <a class="" href="../vpc_router/">VPCルーター</a>
+        <a class="" href="../vpc_router/">VPCルータ</a>
         
     </li>
 
@@ -295,7 +295,7 @@
         
       
     
-    <li>ロードバランサー</li>
+    <li>ロードバランサ</li>
     <li class="wy-breadcrumbs-aside">
       
         
@@ -307,16 +307,16 @@
           <div role="main">
             <div class="section">
               
-                <h1 id="sakuracloud_load_balancer">ロードバランサー(sakuracloud_load_balancer)</h1>
+                <h1 id="sakuracloud_load_balancer">ロードバランサ(sakuracloud_load_balancer)</h1>
 <hr />
 <h3 id="_1">設定例</h3>
-<pre><code class="hcl"># ロードバランサー上流のスイッチ
+<pre><code class="hcl"># ロードバランサ上流のスイッチ
 resource &quot;sakuracloud_switch&quot; &quot;sw&quot; {
     name = &quot;sw&quot;
     zone = &quot;tk1v&quot;
 }
 
-# ロードバランサーの定義
+# ロードバランサの定義
 resource &quot;sakuracloud_load_balancer&quot; &quot;foobar&quot; {
     switch_id = &quot;${sakuracloud_switch.sw.id}&quot;
     VRID = 1
@@ -326,7 +326,7 @@ resource &quot;sakuracloud_load_balancer&quot; &quot;foobar&quot; {
     zone = &quot;tk1v&quot;
 }
 
-# ロードバランサーVIPの定義
+# ロードバランサVIPの定義
 resource &quot;sakuracloud_load_balancer_vip&quot; &quot;vip1&quot; {
     load_balancer_id = &quot;${sakuracloud_load_balancer.foobar.id}&quot;
     vip = &quot;192.168.11.201&quot;
@@ -334,7 +334,7 @@ resource &quot;sakuracloud_load_balancer_vip&quot; &quot;vip1&quot; {
     zone = &quot;tk1v&quot;
 }
 
-# ロードバランサーVIP配下の実サーバーの定義(1台目)
+# ロードバランサVIP配下の実サーバの定義(1台目)
 resource &quot;sakuracloud_load_balancer_server&quot; &quot;server01&quot;{
     load_balancer_vip_id = &quot;${sakuracloud_load_balancer_vip.vip1.id}&quot;
     ipaddress = &quot;192.168.11.51&quot;
@@ -343,7 +343,7 @@ resource &quot;sakuracloud_load_balancer_server&quot; &quot;server01&quot;{
     check_status = &quot;200&quot;
     zone = &quot;tk1v&quot;
 }
-# ロードバランサーVIP配下の実サーバーの定義(2台目)
+# ロードバランサVIP配下の実サーバの定義(2台目)
 resource &quot;sakuracloud_load_balancer_server&quot; &quot;server02&quot;{
     load_balancer_vip_id = &quot;${sakuracloud_load_balancer_vip.vip1.id}&quot;
     ipaddress = &quot;192.168.11.52&quot;
@@ -355,7 +355,7 @@ resource &quot;sakuracloud_load_balancer_server&quot; &quot;server02&quot;{
 </code></pre>
 
 <h2 id="sakuracloud_load_balancer_1"><code>sakuracloud_load_balancer</code></h2>
-<p>ロードバランサー本体を表します。</p>
+<p>ロードバランサ本体を表します。</p>
 <h3 id="_2">パラメーター</h3>
 <table>
 <thead>
@@ -545,13 +545,13 @@ resource &quot;sakuracloud_load_balancer_server&quot; &quot;server02&quot;{
 <tr>
 <td><code>vip_ids</code></td>
 <td>VIP IDリスト</td>
-<td>ロードバランサー配下のVIPのIDリスト</td>
+<td>ロードバランサ配下のVIPのIDリスト</td>
 </tr>
 </tbody>
 </table>
 <h2 id="sakuracloud_load_balancer_vip"><code>sakuracloud_load_balancer_vip</code></h2>
-<p>ロードバランサーが持つVIPを表します。</p>
-<p>1台のロードバランサーにつき4つまでのVIPを登録できます。
+<p>ロードバランサが持つVIPを表します。</p>
+<p>1台のロードバランサにつき4つまでのVIPを登録できます。
 (詳細は<a href="https://help.sakura.ad.jp/app/answers/detail/a_id/2517">さくらのクラウドのマニュアル</a>を参照ください。)</p>
 <h3 id="_4">パラメーター</h3>
 <table>
@@ -601,7 +601,7 @@ resource &quot;sakuracloud_load_balancer_server&quot; &quot;server02&quot;{
 <tr>
 <td><code>sorry_server</code></td>
 <td align="center">-</td>
-<td>ソーリーサーバー</td>
+<td>ソーリーサーバ</td>
 <td align="center">-</td>
 <td>文字列</td>
 <td>VIPに紐づく実サーバがすべてダウンした場合、<br />すべてのアクセスを指定したサーバに誘導します</td>
@@ -653,7 +653,7 @@ resource &quot;sakuracloud_load_balancer_server&quot; &quot;server02&quot;{
 </tr>
 <tr>
 <td><code>sorry_server</code></td>
-<td>ソーリーサーバー</td>
+<td>ソーリーサーバ</td>
 <td>-</td>
 </tr>
 <tr>
@@ -663,14 +663,14 @@ resource &quot;sakuracloud_load_balancer_server&quot; &quot;server02&quot;{
 </tr>
 <tr>
 <td><code>servers</code></td>
-<td>実サーバーIDリスト</td>
-<td>配下の実サーバーのIDリスト</td>
+<td>実サーバIDリスト</td>
+<td>配下の実サーバのIDリスト</td>
 </tr>
 </tbody>
 </table>
 <h2 id="sakuracloud_load_balancer_server"><code>sakuracloud_load_balancer_server</code></h2>
-<p>ロードバランサーが持つVIP配下の実サーバーを表します。</p>
-<p>1つのVIPにつき、40台までの実サーバーを登録できます。
+<p>ロードバランサが持つVIP配下の実サーバを表します。</p>
+<p>1つのVIPにつき、40台までの実サーバを登録できます。
 (詳細は<a href="https://help.sakura.ad.jp/app/answers/detail/a_id/2517">さくらのクラウドのマニュアル</a>を参照ください。)</p>
 <h3 id="_6">パラメーター</h3>
 <table>
@@ -802,7 +802,7 @@ resource &quot;sakuracloud_load_balancer_server&quot; &quot;server02&quot;{
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="../vpc_router/" class="btn btn-neutral float-right" title="VPCルーター"/>Next <span class="icon icon-circle-arrow-right"></span></a>
+        <a href="../vpc_router/" class="btn btn-neutral float-right" title="VPCルータ"/>Next <span class="icon icon-circle-arrow-right"></span></a>
       
       
         <a href="../bridge/" class="btn btn-neutral" title="ブリッジ"><span class="icon icon-circle-arrow-left"></span> Previous</a>
