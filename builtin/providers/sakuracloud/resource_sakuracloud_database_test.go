@@ -29,7 +29,6 @@ func TestAccResourceSakuraCloudDatabase_WithSwitch(t *testing.T) {
 					resource.TestCheckResourceAttr("sakuracloud_database.foobar", "tags.0", "hoge1"),
 					resource.TestCheckResourceAttr("sakuracloud_database.foobar", "tags.1", "hoge2"),
 					//resource.TestCheckResourceAttr("sakuracloud_database.foobar", "is_double", "false"),
-					resource.TestCheckResourceAttr("sakuracloud_database.foobar", "admin_password", "DatabasePasswordAdmin397"),
 					resource.TestCheckResourceAttr("sakuracloud_database.foobar", "user_name", "defuser"),
 					resource.TestCheckResourceAttr("sakuracloud_database.foobar", "user_password", "DatabasePasswordUser397"),
 					resource.TestCheckResourceAttr("sakuracloud_database.foobar", "allow_networks.#", "2"),
@@ -55,7 +54,6 @@ func TestAccResourceSakuraCloudDatabase_WithSwitch(t *testing.T) {
 					resource.TestCheckResourceAttr("sakuracloud_database.foobar", "tags.0", "hoge1_after"),
 					resource.TestCheckResourceAttr("sakuracloud_database.foobar", "tags.1", "hoge2_after"),
 					//resource.TestCheckResourceAttr("sakuracloud_database.foobar", "is_double", "false"),
-					resource.TestCheckResourceAttr("sakuracloud_database.foobar", "admin_password", "DatabasePasswordAdmin397"),
 					resource.TestCheckResourceAttr("sakuracloud_database.foobar", "user_name", "defuser"),
 					resource.TestCheckResourceAttr("sakuracloud_database.foobar", "user_password", "DatabasePasswordUser397_upd"),
 					resource.TestCheckResourceAttr("sakuracloud_database.foobar", "allow_networks.#", "2"),
@@ -137,7 +135,6 @@ resource "sakuracloud_database" "foobar" {
     database_type = "mariadb"
     plan = "30g"
 
-    admin_password = "DatabasePasswordAdmin397"
     user_name = "defuser"
     user_password = "DatabasePasswordUser397"
 
@@ -168,7 +165,6 @@ resource "sakuracloud_database" "foobar" {
     database_type = "mariadb"
 
     plan = "30g"
-    admin_password = "DatabasePasswordAdmin397"
     user_name = "defuser"
     user_password = "DatabasePasswordUser397_upd"
 
