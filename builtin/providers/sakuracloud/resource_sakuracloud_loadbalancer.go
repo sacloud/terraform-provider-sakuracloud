@@ -36,6 +36,11 @@ func resourceSakuraCloudLoadBalancer() *schema.Resource {
 			},
 			"is_double": {
 				Type:     schema.TypeBool,
+				Optional: true,
+				Removed:  "Use field 'high_availability' instead",
+			},
+			"high_availability": {
+				Type:     schema.TypeBool,
 				ForceNew: true,
 				Optional: true,
 				Default:  false,
@@ -107,7 +112,7 @@ func resourceSakuraCloudLoadBalancerCreate(d *schema.ResourceData, meta interfac
 	opts.Name = d.Get("name").(string)
 	opts.SwitchID = d.Get("switch_id").(string)
 	opts.VRID = d.Get("VRID").(int)
-	isDouble := d.Get("is_double").(bool)
+	highAvailability := d.Get("high_availability").(bool)
 	ipAddress1 := d.Get("ipaddress1").(string)
 	ipAddress2 := ""
 	if ip2, ok := d.GetOk("ipaddress2"); ok {
@@ -140,7 +145,7 @@ func resourceSakuraCloudLoadBalancerCreate(d *schema.ResourceData, meta interfac
 
 	var createLb *sacloud.LoadBalancer
 	var err error
-	if isDouble {
+	if highAvailability {
 		if ipAddress2 == "" {
 			return errors.New("ipaddress2 is required")
 		}
@@ -268,11 +273,11 @@ func setLoadBalancerResourceData(d *schema.ResourceData, client *api.Client, dat
 	d.Set("switch_id", data.Switch.GetStrID())
 	d.Set("VRID", data.Remark.VRRP.VRID)
 	if len(data.Remark.Servers) > 1 {
-		d.Set("is_double", true)
+		d.Set("high_availability", true)
 		d.Set("ipaddress1", data.Remark.Servers[0].(map[string]interface{})["IPAddress"])
 		d.Set("ipaddress2", data.Remark.Servers[1].(map[string]interface{})["IPAddress"])
 	} else {
-		d.Set("is_double", false)
+		d.Set("high_availability", false)
 		d.Set("ipaddress1", data.Remark.Servers[0].(map[string]interface{})["IPAddress"])
 	}
 	d.Set("nw_mask_len", data.Remark.Network.NetworkMaskLen)

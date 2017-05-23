@@ -45,6 +45,11 @@ func dataSourceSakuraCloudLoadBalancer() *schema.Resource {
 			"is_double": {
 				Type:     schema.TypeBool,
 				Computed: true,
+				Removed:  "Use field 'high_availability' instead",
+			},
+			"high_availability": {
+				Type:     schema.TypeBool,
+				Computed: true,
 			},
 			"plan": {
 				Type:     schema.TypeString,

@@ -161,7 +161,7 @@ resource "sakuracloud_internet" "router" {
 }
 resource "sakuracloud_load_balancer" "foobar" {
     switch_id = "${sakuracloud_internet.router.switch_id}"
-    is_double = true
+    high_availability = true
     plan = "highspec"
     VRID = 1
     ipaddress1 = "${sakuracloud_internet.router.nw_ipaddresses.0}"
