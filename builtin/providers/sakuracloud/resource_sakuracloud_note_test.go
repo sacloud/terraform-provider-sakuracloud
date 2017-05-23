@@ -1,6 +1,7 @@
 package sakuracloud
 
 import (
+	"errors"
 	"fmt"
 	"github.com/hashicorp/terraform/helper/resource"
 	"github.com/hashicorp/terraform/terraform"
@@ -16,7 +17,7 @@ func TestAccResourceSakuraCloudNote(t *testing.T) {
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckSakuraCloudNoteDestroy,
 		Steps: []resource.TestStep{
-			resource.TestStep{
+			{
 				Config: testAccCheckSakuraCloudNoteConfig_basic,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckSakuraCloudNoteExists("sakuracloud_note.foobar", &note),
@@ -28,7 +29,7 @@ func TestAccResourceSakuraCloudNote(t *testing.T) {
 						"sakuracloud_note.foobar", "tags.#", "2"),
 				),
 			},
-			resource.TestStep{
+			{
 				Config: testAccCheckSakuraCloudNoteConfig_update,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckSakuraCloudNoteExists("sakuracloud_note.foobar", &note),
@@ -53,7 +54,7 @@ func testAccCheckSakuraCloudNoteExists(n string, note *sacloud.Note) resource.Te
 		}
 
 		if rs.Primary.ID == "" {
-			return fmt.Errorf("No Note ID is set")
+			return errors.New("No Note ID is set")
 		}
 
 		client := testAccProvider.Meta().(*api.Client)
@@ -64,7 +65,7 @@ func testAccCheckSakuraCloudNoteExists(n string, note *sacloud.Note) resource.Te
 		}
 
 		if foundNote.ID != toSakuraCloudID(rs.Primary.ID) {
-			return fmt.Errorf("Note not found")
+			return errors.New("Note not found")
 		}
 
 		*note = *foundNote
@@ -84,7 +85,7 @@ func testAccCheckSakuraCloudNoteDestroy(s *terraform.State) error {
 		_, err := client.Note.Read(toSakuraCloudID(rs.Primary.ID))
 
 		if err == nil {
-			return fmt.Errorf("Note still exists")
+			return errors.New("Note still exists")
 		}
 	}
 

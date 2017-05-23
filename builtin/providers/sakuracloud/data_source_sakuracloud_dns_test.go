@@ -1,6 +1,7 @@
 package sakuracloud
 
 import (
+	"errors"
 	"fmt"
 	"github.com/hashicorp/terraform/helper/resource"
 	"github.com/hashicorp/terraform/terraform"
@@ -16,11 +17,11 @@ func TestAccSakuraCloudDNSDataSource_Basic(t *testing.T) {
 		CheckDestroy:              testAccCheckSakuraCloudDNSDataSourceDestroy,
 
 		Steps: []resource.TestStep{
-			resource.TestStep{
+			{
 				Config: testAccCheckSakuraCloudDataSourceDNSBase,
 				Check:  testAccCheckSakuraCloudDNSDataSourceID("sakuracloud_dns.foobar"),
 			},
-			resource.TestStep{
+			{
 				Config: testAccCheckSakuraCloudDataSourceDNSConfig,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckSakuraCloudDNSDataSourceID("data.sakuracloud_dns.foobar"),
@@ -32,21 +33,21 @@ func TestAccSakuraCloudDNSDataSource_Basic(t *testing.T) {
 					resource.TestCheckResourceAttr("data.sakuracloud_dns.foobar", "tags.2", "tag3"),
 				),
 			},
-			resource.TestStep{
+			{
 				Destroy: true,
 				Config:  testAccCheckSakuraCloudDataSourceDNSConfig_With_Tag,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckSakuraCloudDNSDataSourceID("data.sakuracloud_dns.foobar"),
 				),
 			},
-			resource.TestStep{
+			{
 				Destroy: true,
 				Config:  testAccCheckSakuraCloudDataSourceDNSConfig_NotExists,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckSakuraCloudDNSDataSourceNotExists("data.sakuracloud_dns.foobar"),
 				),
 			},
-			resource.TestStep{
+			{
 				Destroy: true,
 				Config:  testAccCheckSakuraCloudDataSourceDNSConfig_With_NotExists_Tag,
 				Check: resource.ComposeTestCheckFunc(
@@ -65,7 +66,7 @@ func testAccCheckSakuraCloudDNSDataSourceID(n string) resource.TestCheckFunc {
 		}
 
 		if rs.Primary.ID == "" {
-			return fmt.Errorf("DNS data source ID not set")
+			return errors.New("DNS data source ID not set")
 		}
 		return nil
 	}
@@ -96,7 +97,7 @@ func testAccCheckSakuraCloudDNSDataSourceDestroy(s *terraform.State) error {
 		_, err := client.DNS.Read(toSakuraCloudID(rs.Primary.ID))
 
 		if err == nil {
-			return fmt.Errorf("DNS still exists")
+			return errors.New("DNS still exists")
 		}
 	}
 

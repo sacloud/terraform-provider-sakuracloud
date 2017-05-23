@@ -16,28 +16,28 @@ func resourceSakuraCloudVPCRouterDHCPStaticMapping() *schema.Resource {
 		Read:   resourceSakuraCloudVPCRouterDHCPStaticMappingRead,
 		Delete: resourceSakuraCloudVPCRouterDHCPStaticMappingDelete,
 		Schema: map[string]*schema.Schema{
-			"vpc_router_id": &schema.Schema{
+			"vpc_router_id": {
 				Type:         schema.TypeString,
 				Required:     true,
 				ForceNew:     true,
 				ValidateFunc: validateSakuracloudIDType,
 			},
-			"vpc_router_dhcp_server_id": &schema.Schema{
+			"vpc_router_dhcp_server_id": {
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
-			"ipaddress": &schema.Schema{
+			"ipaddress": {
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
-			"macaddress": &schema.Schema{
+			"macaddress": {
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
-			"zone": &schema.Schema{
+			"zone": {
 				Type:         schema.TypeString,
 				Optional:     true,
 				Computed:     true,

@@ -1,6 +1,7 @@
 package sakuracloud
 
 import (
+	"errors"
 	"fmt"
 	"github.com/hashicorp/terraform/helper/resource"
 	"github.com/hashicorp/terraform/terraform"
@@ -16,7 +17,7 @@ func TestAccSakuraCloudLoadBalancer(t *testing.T) {
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckSakuraCloudLoadBalancerDestroy,
 		Steps: []resource.TestStep{
-			resource.TestStep{
+			{
 				Config: testAccCheckSakuraCloudLoadBalancerConfig_basic,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckSakuraCloudLoadBalancerExists("sakuracloud_load_balancer.foobar", &loadBalancer),
@@ -32,7 +33,7 @@ func TestAccSakuraCloudLoadBalancer(t *testing.T) {
 					resource.TestCheckResourceAttr("sakuracloud_load_balancer.foobar", "default_route", "192.168.11.1"),
 				),
 			},
-			resource.TestStep{
+			{
 				Config: testAccCheckSakuraCloudLoadBalancerConfig_update,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckSakuraCloudLoadBalancerExists("sakuracloud_load_balancer.foobar", &loadBalancer),
@@ -59,7 +60,7 @@ func TestAccSakuraCloudLoadBalancer_WithRouter(t *testing.T) {
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckSakuraCloudLoadBalancerDestroy,
 		Steps: []resource.TestStep{
-			resource.TestStep{
+			{
 				Config: testAccCheckSakuraCloudLoadBalancerConfig_WithRouter,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckSakuraCloudLoadBalancerExists("sakuracloud_load_balancer.foobar", &loadBalancer),
@@ -83,7 +84,7 @@ func testAccCheckSakuraCloudLoadBalancerExists(n string, loadBalancer *sacloud.L
 		}
 
 		if rs.Primary.ID == "" {
-			return fmt.Errorf("No LoadBalancer ID is set")
+			return errors.New("No LoadBalancer ID is set")
 		}
 
 		client := testAccProvider.Meta().(*api.Client)
@@ -95,7 +96,7 @@ func testAccCheckSakuraCloudLoadBalancerExists(n string, loadBalancer *sacloud.L
 		}
 
 		if foundLoadBalancer.ID != toSakuraCloudID(rs.Primary.ID) {
-			return fmt.Errorf("LoadBalancer not found")
+			return errors.New("LoadBalancer not found")
 		}
 
 		*loadBalancer = *foundLoadBalancer
@@ -115,7 +116,7 @@ func testAccCheckSakuraCloudLoadBalancerDestroy(s *terraform.State) error {
 		_, err := client.LoadBalancer.Read(toSakuraCloudID(rs.Primary.ID))
 
 		if err == nil {
-			return fmt.Errorf("LoadBalancer still exists")
+			return errors.New("LoadBalancer still exists")
 		}
 	}
 

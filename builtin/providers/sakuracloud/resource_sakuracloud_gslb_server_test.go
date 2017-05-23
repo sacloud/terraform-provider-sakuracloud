@@ -1,7 +1,7 @@
 package sakuracloud
 
 import (
-	"fmt"
+	"errors"
 	"github.com/hashicorp/terraform/helper/resource"
 	"github.com/hashicorp/terraform/terraform"
 	"github.com/sacloud/libsacloud/api"
@@ -16,7 +16,7 @@ func TestAccResourceSakuraCloudGSLBServer(t *testing.T) {
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckSakuraCloudGSLBServerDestroy,
 		Steps: []resource.TestStep{
-			resource.TestStep{
+			{
 				Config: testAccCheckSakuraCloudGSLBServerConfig_basic,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckSakuraCloudGSLBExists("sakuracloud_gslb.foobar", &gslb),
@@ -26,7 +26,7 @@ func TestAccResourceSakuraCloudGSLBServer(t *testing.T) {
 						"sakuracloud_gslb_server.foobar.1", "ipaddress", "8.8.4.4"),
 				),
 			},
-			resource.TestStep{
+			{
 				Config: testAccCheckSakuraCloudGSLBServerConfig_update,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckSakuraCloudGSLBExists("sakuracloud_gslb.foobar", &gslb),
@@ -55,7 +55,7 @@ func testAccCheckSakuraCloudGSLBServerDestroy(s *terraform.State) error {
 		_, err := client.GSLB.Read(toSakuraCloudID(rs.Primary.ID))
 
 		if err == nil {
-			return fmt.Errorf("GSLB still exists")
+			return errors.New("GSLB still exists")
 		}
 	}
 

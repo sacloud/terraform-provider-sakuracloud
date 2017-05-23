@@ -1,6 +1,7 @@
 package sakuracloud
 
 import (
+	"errors"
 	"fmt"
 	"github.com/hashicorp/terraform/helper/resource"
 	"github.com/hashicorp/terraform/terraform"
@@ -16,7 +17,7 @@ func TestAccResourceSakuraCloudSimpleMonitor(t *testing.T) {
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckSakuraCloudSimpleMonitorDestroy,
 		Steps: []resource.TestStep{
-			resource.TestStep{
+			{
 				Config: testAccCheckSakuraCloudSimpleMonitorConfig_basic,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckSakuraCloudSimpleMonitorExists("sakuracloud_simple_monitor.foobar", &monitor),
@@ -37,7 +38,7 @@ func TestAccResourceSakuraCloudSimpleMonitor(t *testing.T) {
 						"sakuracloud_simple_monitor.foobar", "notify_slack_webhook", testAccSlackWebhook),
 				),
 			},
-			resource.TestStep{
+			{
 				Config: testAccCheckSakuraCloudSimpleMonitorConfig_update,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckSakuraCloudSimpleMonitorExists("sakuracloud_simple_monitor.foobar", &monitor),
@@ -67,7 +68,7 @@ func testAccCheckSakuraCloudSimpleMonitorExists(n string, monitor *sacloud.Simpl
 		}
 
 		if rs.Primary.ID == "" {
-			return fmt.Errorf("No SimpleMonitor ID is set")
+			return errors.New("No SimpleMonitor ID is set")
 		}
 
 		client := testAccProvider.Meta().(*api.Client)
@@ -79,7 +80,7 @@ func testAccCheckSakuraCloudSimpleMonitorExists(n string, monitor *sacloud.Simpl
 		}
 
 		if foundSimpleMonitor.ID != toSakuraCloudID(rs.Primary.ID) {
-			return fmt.Errorf("Record not found")
+			return errors.New("Record not found")
 		}
 
 		*monitor = *foundSimpleMonitor
@@ -117,7 +118,7 @@ func testAccCheckSakuraCloudSimpleMonitorDestroy(s *terraform.State) error {
 		_, err := client.SimpleMonitor.Read(toSakuraCloudID(rs.Primary.ID))
 
 		if err == nil {
-			return fmt.Errorf("SimpleMonitor still exists")
+			return errors.New("SimpleMonitor still exists")
 		}
 	}
 

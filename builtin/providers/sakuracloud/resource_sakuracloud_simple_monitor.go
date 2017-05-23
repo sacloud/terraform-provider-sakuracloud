@@ -3,6 +3,7 @@ package sakuracloud
 import (
 	"fmt"
 
+	"errors"
 	"github.com/hashicorp/terraform/helper/hashcode"
 	"github.com/hashicorp/terraform/helper/schema"
 	"github.com/sacloud/libsacloud/api"
@@ -21,98 +22,98 @@ func resourceSakuraCloudSimpleMonitor() *schema.Resource {
 		},
 
 		Schema: map[string]*schema.Schema{
-			"target": &schema.Schema{
+			"target": {
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
-			"health_check": &schema.Schema{
+			"health_check": {
 				Type:     schema.TypeSet,
 				Required: true,
 
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
-						"protocol": &schema.Schema{
+						"protocol": {
 							Type:         schema.TypeString,
 							Required:     true,
 							ValidateFunc: validateStringInWord(sacloud.AllowSimpleMonitorHealthCheckProtocol()),
 						},
-						"delay_loop": &schema.Schema{
+						"delay_loop": {
 							Type:         schema.TypeInt,
 							Optional:     true,
 							ValidateFunc: validateIntegerInRange(60, 3600),
 							Default:      60,
 						},
-						"host_header": &schema.Schema{
+						"host_header": {
 							Type:     schema.TypeString,
 							Optional: true,
 						},
-						"path": &schema.Schema{
+						"path": {
 							Type:     schema.TypeString,
 							Optional: true,
 						},
-						"status": &schema.Schema{
+						"status": {
 							Type:     schema.TypeString,
 							Optional: true,
 						},
-						"port": &schema.Schema{
+						"port": {
 							Type:     schema.TypeInt,
 							Optional: true,
 						},
-						"qname": &schema.Schema{
+						"qname": {
 							Type:     schema.TypeString,
 							Optional: true,
 						},
-						"excepcted_data": &schema.Schema{
+						"excepcted_data": {
 							Type:     schema.TypeString,
 							Optional: true,
 						},
-						"community": &schema.Schema{
+						"community": {
 							Type:     schema.TypeString,
 							Optional: true,
 						},
-						"snmp_version": &schema.Schema{
+						"snmp_version": {
 							Type:         schema.TypeString,
 							ValidateFunc: validateStringInWord([]string{"1", "2c"}),
 							Optional:     true,
 						},
-						"oid": &schema.Schema{
+						"oid": {
 							Type:     schema.TypeString,
 							Optional: true,
 						},
 					},
 				},
 			},
-			"description": &schema.Schema{
+			"description": {
 				Type:     schema.TypeString,
 				Optional: true,
 			},
-			"tags": &schema.Schema{
+			"tags": {
 				Type:     schema.TypeList,
 				Optional: true,
 				Elem:     &schema.Schema{Type: schema.TypeString},
 			},
-			"notify_email_enabled": &schema.Schema{
+			"notify_email_enabled": {
 				Type:     schema.TypeBool,
 				Optional: true,
 				Default:  true,
 			},
-			"notify_email_html": &schema.Schema{
+			"notify_email_html": {
 				Type:     schema.TypeBool,
 				Optional: true,
 				Default:  false,
 			},
-			"notify_slack_enabled": &schema.Schema{
+			"notify_slack_enabled": {
 				Type:     schema.TypeBool,
 				Optional: true,
 				Default:  false,
 			},
-			"notify_slack_webhook": &schema.Schema{
+			"notify_slack_webhook": {
 				Type:     schema.TypeString,
 				Optional: true,
 			},
 
-			"enabled": &schema.Schema{
+			"enabled": {
 				Type:     schema.TypeBool,
 				Optional: true,
 				Default:  true,
@@ -205,7 +206,7 @@ func resourceSakuraCloudSimpleMonitorCreate(d *schema.ResourceData, meta interfa
 	notifyEmail := d.Get("notify_email_enabled").(bool)
 	notifySlack := d.Get("notify_slack_enabled").(bool)
 	if !notifyEmail && !notifySlack {
-		return fmt.Errorf("'nofity_email_enabled' and 'notify_slack_enabled' both false")
+		return errors.New("'nofity_email_enabled' and 'notify_slack_enabled' both false")
 	}
 
 	if notifyEmail {
@@ -330,7 +331,7 @@ func resourceSakuraCloudSimpleMonitorUpdate(d *schema.ResourceData, meta interfa
 	notifyEmail := d.Get("notify_email_enabled").(bool)
 	notifySlack := d.Get("notify_slack_enabled").(bool)
 	if !notifyEmail && !notifySlack {
-		return fmt.Errorf("'nofity_email_enabled' and 'notify_slack_enabled' both false")
+		return errors.New("'nofity_email_enabled' and 'notify_slack_enabled' both false")
 	}
 
 	if notifyEmail {
@@ -401,7 +402,7 @@ func healthCheckSimpleMonitorHash(v interface{}) int {
 	return hashcode.String(hk)
 }
 
-func setSimpleMonitorResourceData(d *schema.ResourceData, client *api.Client, data *sacloud.SimpleMonitor) error {
+func setSimpleMonitorResourceData(d *schema.ResourceData, _ *api.Client, data *sacloud.SimpleMonitor) error {
 
 	d.Set("target", data.Status.Target)
 

@@ -11,18 +11,18 @@ func dataSourceSakuraCloudLoadBalancer() *schema.Resource {
 		Read: dataSourceSakuraCloudLoadBalancerRead,
 
 		Schema: map[string]*schema.Schema{
-			"filter": &schema.Schema{
+			"filter": {
 				Type:     schema.TypeSet,
 				Optional: true,
 				ForceNew: true,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
-						"name": &schema.Schema{
+						"name": {
 							Type:     schema.TypeString,
 							Required: true,
 						},
 
-						"values": &schema.Schema{
+						"values": {
 							Type:     schema.TypeList,
 							Required: true,
 							Elem:     &schema.Schema{Type: schema.TypeString},
@@ -30,52 +30,52 @@ func dataSourceSakuraCloudLoadBalancer() *schema.Resource {
 					},
 				},
 			},
-			"name": &schema.Schema{
+			"name": {
 				Type:     schema.TypeString,
 				Computed: true,
 			},
-			"switch_id": &schema.Schema{
+			"switch_id": {
 				Type:     schema.TypeString,
 				Computed: true,
 			},
-			"VRID": &schema.Schema{
+			"VRID": {
 				Type:     schema.TypeInt,
 				Computed: true,
 			},
-			"is_double": &schema.Schema{
+			"is_double": {
 				Type:     schema.TypeBool,
 				Computed: true,
 			},
-			"plan": &schema.Schema{
+			"plan": {
 				Type:     schema.TypeString,
 				Computed: true,
 			},
-			"ipaddress1": &schema.Schema{
+			"ipaddress1": {
 				Type:     schema.TypeString,
 				Computed: true,
 			},
-			"ipaddress2": &schema.Schema{
+			"ipaddress2": {
 				Type:     schema.TypeString,
 				Computed: true,
 			},
-			"nw_mask_len": &schema.Schema{
+			"nw_mask_len": {
 				Type:     schema.TypeInt,
 				Computed: true,
 			},
-			"default_route": &schema.Schema{
+			"default_route": {
 				Type:     schema.TypeString,
 				Computed: true,
 			},
-			"description": &schema.Schema{
+			"description": {
 				Type:     schema.TypeString,
 				Computed: true,
 			},
-			"tags": &schema.Schema{
+			"tags": {
 				Type:     schema.TypeList,
 				Computed: true,
 				Elem:     &schema.Schema{Type: schema.TypeString},
 			},
-			"zone": &schema.Schema{
+			"zone": {
 				Type:         schema.TypeString,
 				Optional:     true,
 				Computed:     true,

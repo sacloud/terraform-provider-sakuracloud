@@ -11,18 +11,18 @@ func dataSourceSakuraCloudDNS() *schema.Resource {
 		Read: dataSourceSakuraCloudDNSRead,
 
 		Schema: map[string]*schema.Schema{
-			"filter": &schema.Schema{
+			"filter": {
 				Type:     schema.TypeSet,
 				Optional: true,
 				ForceNew: true,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
-						"name": &schema.Schema{
+						"name": {
 							Type:     schema.TypeString,
 							Required: true,
 						},
 
-						"values": &schema.Schema{
+						"values": {
 							Type:     schema.TypeList,
 							Required: true,
 							Elem:     &schema.Schema{Type: schema.TypeString},
@@ -30,21 +30,21 @@ func dataSourceSakuraCloudDNS() *schema.Resource {
 					},
 				},
 			},
-			"zone": &schema.Schema{
+			"zone": {
 				Type:     schema.TypeString,
 				Computed: true,
 			},
 
-			"dns_servers": &schema.Schema{
+			"dns_servers": {
 				Type:     schema.TypeList,
 				Computed: true,
 				Elem:     &schema.Schema{Type: schema.TypeString},
 			},
-			"description": &schema.Schema{
+			"description": {
 				Type:     schema.TypeString,
 				Computed: true,
 			},
-			"tags": &schema.Schema{
+			"tags": {
 				Type:     schema.TypeList,
 				Computed: true,
 				Elem:     &schema.Schema{Type: schema.TypeString},

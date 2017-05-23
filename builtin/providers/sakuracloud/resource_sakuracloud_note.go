@@ -18,19 +18,19 @@ func resourceSakuraCloudNote() *schema.Resource {
 		},
 
 		Schema: map[string]*schema.Schema{
-			"name": &schema.Schema{
+			"name": {
 				Type:     schema.TypeString,
 				Required: true,
 			},
-			"content": &schema.Schema{
+			"content": {
 				Type:     schema.TypeString,
 				Required: true,
 			},
-			"description": &schema.Schema{
+			"description": {
 				Type:     schema.TypeString,
 				Optional: true,
 			},
-			"tags": &schema.Schema{
+			"tags": {
 				Type:     schema.TypeList,
 				Optional: true,
 				Elem:     &schema.Schema{Type: schema.TypeString},
@@ -125,7 +125,7 @@ func resourceSakuraCloudNoteDelete(d *schema.ResourceData, meta interface{}) err
 	return nil
 }
 
-func setNoteResourceData(d *schema.ResourceData, client *api.Client, data *sacloud.Note) error {
+func setNoteResourceData(d *schema.ResourceData, _ *api.Client, data *sacloud.Note) error {
 
 	d.Set("name", data.Name)
 	d.Set("content", data.Content)

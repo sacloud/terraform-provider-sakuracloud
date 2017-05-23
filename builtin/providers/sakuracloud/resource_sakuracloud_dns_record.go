@@ -18,50 +18,50 @@ func resourceSakuraCloudDNSRecord() *schema.Resource {
 		Delete: resourceSakuraCloudDNSRecordDelete,
 
 		Schema: map[string]*schema.Schema{
-			"dns_id": &schema.Schema{
+			"dns_id": {
 				Type:         schema.TypeString,
 				Required:     true,
 				ForceNew:     true,
 				ValidateFunc: validateSakuracloudIDType,
 			},
-			"name": &schema.Schema{
+			"name": {
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
-			"type": &schema.Schema{
+			"type": {
 				Type:         schema.TypeString,
 				Required:     true,
 				ForceNew:     true,
 				ValidateFunc: validateStringInWord(sacloud.AllowDNSTypes()),
 			},
 
-			"value": &schema.Schema{
+			"value": {
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
 
-			"ttl": &schema.Schema{
+			"ttl": {
 				Type:     schema.TypeInt,
 				Optional: true,
 				Default:  3600,
 				ForceNew: true,
 			},
 
-			"priority": &schema.Schema{
+			"priority": {
 				Type:         schema.TypeInt,
 				Optional:     true,
 				ForceNew:     true,
 				ValidateFunc: validateIntegerInRange(0, 65535),
 			},
-			"weight": &schema.Schema{
+			"weight": {
 				Type:         schema.TypeInt,
 				Optional:     true,
 				ForceNew:     true,
 				ValidateFunc: validateIntegerInRange(0, 65535),
 			},
-			"port": &schema.Schema{
+			"port": {
 				Type:         schema.TypeInt,
 				Optional:     true,
 				ForceNew:     true,

@@ -1,6 +1,7 @@
 package sakuracloud
 
 import (
+	"errors"
 	"fmt"
 	"github.com/hashicorp/terraform/helper/resource"
 	"github.com/hashicorp/terraform/terraform"
@@ -16,11 +17,11 @@ func TestAccSakuraCloudGSLBDataSource_Basic(t *testing.T) {
 		CheckDestroy:              testAccCheckSakuraCloudGSLBDataSourceDestroy,
 
 		Steps: []resource.TestStep{
-			resource.TestStep{
+			{
 				Config: testAccCheckSakuraCloudDataSourceGSLBBase,
 				Check:  testAccCheckSakuraCloudGSLBDataSourceID("sakuracloud_gslb.foobar"),
 			},
-			resource.TestStep{
+			{
 				Config: testAccCheckSakuraCloudDataSourceGSLBConfig,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckSakuraCloudGSLBDataSourceID("data.sakuracloud_gslb.foobar"),
@@ -36,21 +37,21 @@ func TestAccSakuraCloudGSLBDataSource_Basic(t *testing.T) {
 					resource.TestCheckResourceAttr("data.sakuracloud_gslb.foobar", "tags.2", "tag3"),
 				),
 			},
-			resource.TestStep{
+			{
 				Destroy: true,
 				Config:  testAccCheckSakuraCloudDataSourceGSLBConfig_With_Tag,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckSakuraCloudGSLBDataSourceID("data.sakuracloud_gslb.foobar"),
 				),
 			},
-			resource.TestStep{
+			{
 				Destroy: true,
 				Config:  testAccCheckSakuraCloudDataSourceGSLBConfig_NotExists,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckSakuraCloudGSLBDataSourceNotExists("data.sakuracloud_gslb.foobar"),
 				),
 			},
-			resource.TestStep{
+			{
 				Destroy: true,
 				Config:  testAccCheckSakuraCloudDataSourceGSLBConfig_With_NotExists_Tag,
 				Check: resource.ComposeTestCheckFunc(
@@ -69,7 +70,7 @@ func testAccCheckSakuraCloudGSLBDataSourceID(n string) resource.TestCheckFunc {
 		}
 
 		if rs.Primary.ID == "" {
-			return fmt.Errorf("GSLB data source ID not set")
+			return errors.New("GSLB data source ID not set")
 		}
 		return nil
 	}
@@ -100,7 +101,7 @@ func testAccCheckSakuraCloudGSLBDataSourceDestroy(s *terraform.State) error {
 		_, err := client.GSLB.Read(toSakuraCloudID(rs.Primary.ID))
 
 		if err == nil {
-			return fmt.Errorf("GSLB still exists")
+			return errors.New("GSLB still exists")
 		}
 	}
 

@@ -11,18 +11,18 @@ func dataSourceSakuraCloudPacketFilter() *schema.Resource {
 		Read: dataSourceSakuraCloudPacketFilterRead,
 
 		Schema: map[string]*schema.Schema{
-			"filter": &schema.Schema{
+			"filter": {
 				Type:     schema.TypeSet,
 				Optional: true,
 				ForceNew: true,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
-						"name": &schema.Schema{
+						"name": {
 							Type:     schema.TypeString,
 							Required: true,
 						},
 
-						"values": &schema.Schema{
+						"values": {
 							Type:     schema.TypeList,
 							Required: true,
 							Elem:     &schema.Schema{Type: schema.TypeString},
@@ -30,42 +30,42 @@ func dataSourceSakuraCloudPacketFilter() *schema.Resource {
 					},
 				},
 			},
-			"name": &schema.Schema{
+			"name": {
 				Type:     schema.TypeString,
 				Computed: true,
 			},
-			"description": &schema.Schema{
+			"description": {
 				Type:     schema.TypeString,
 				Computed: true,
 			},
-			"expressions": &schema.Schema{
+			"expressions": {
 				Type:     schema.TypeList,
 				Optional: true,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
-						"protocol": &schema.Schema{
+						"protocol": {
 							Type:     schema.TypeString,
 							Computed: true,
 						},
 
-						"source_nw": &schema.Schema{
+						"source_nw": {
 							Type:     schema.TypeString,
 							Computed: true,
 						},
 
-						"source_port": &schema.Schema{
+						"source_port": {
 							Type:     schema.TypeString,
 							Computed: true,
 						},
-						"dest_port": &schema.Schema{
+						"dest_port": {
 							Type:     schema.TypeString,
 							Computed: true,
 						},
-						"allow": &schema.Schema{
+						"allow": {
 							Type:     schema.TypeBool,
 							Computed: true,
 						},
-						"description": &schema.Schema{
+						"description": {
 							Type:     schema.TypeString,
 							Computed: true,
 						},
@@ -73,7 +73,7 @@ func dataSourceSakuraCloudPacketFilter() *schema.Resource {
 				},
 			},
 
-			"zone": &schema.Schema{
+			"zone": {
 				Type:         schema.TypeString,
 				Optional:     true,
 				Computed:     true,

@@ -1,6 +1,7 @@
 package sakuracloud
 
 import (
+	"errors"
 	"fmt"
 	"github.com/hashicorp/terraform/helper/resource"
 	"github.com/hashicorp/terraform/terraform"
@@ -16,11 +17,11 @@ func TestAccSakuraCloudLoadBalancerDataSource_Basic(t *testing.T) {
 		CheckDestroy:              testAccCheckSakuraCloudLoadBalancerDataSourceDestroy,
 
 		Steps: []resource.TestStep{
-			resource.TestStep{
+			{
 				Config: testAccCheckSakuraCloudDataSourceLoadBalancerBase,
 				Check:  testAccCheckSakuraCloudLoadBalancerDataSourceID("sakuracloud_load_balancer.foobar"),
 			},
-			resource.TestStep{
+			{
 				Config: testAccCheckSakuraCloudDataSourceLoadBalancerConfig,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckSakuraCloudLoadBalancerDataSourceID("data.sakuracloud_load_balancer.foobar"),
@@ -32,21 +33,21 @@ func TestAccSakuraCloudLoadBalancerDataSource_Basic(t *testing.T) {
 					resource.TestCheckResourceAttr("data.sakuracloud_load_balancer.foobar", "tags.2", "tag3"),
 				),
 			},
-			resource.TestStep{
+			{
 				Destroy: true,
 				Config:  testAccCheckSakuraCloudDataSourceLoadBalancerConfig_With_Tag,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckSakuraCloudLoadBalancerDataSourceID("data.sakuracloud_load_balancer.foobar"),
 				),
 			},
-			resource.TestStep{
+			{
 				Destroy: true,
 				Config:  testAccCheckSakuraCloudDataSourceLoadBalancerConfig_NotExists,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckSakuraCloudLoadBalancerDataSourceNotExists("data.sakuracloud_load_balancer.foobar"),
 				),
 			},
-			resource.TestStep{
+			{
 				Destroy: true,
 				Config:  testAccCheckSakuraCloudDataSourceLoadBalancerConfig_With_NotExists_Tag,
 				Check: resource.ComposeTestCheckFunc(
@@ -65,7 +66,7 @@ func testAccCheckSakuraCloudLoadBalancerDataSourceID(n string) resource.TestChec
 		}
 
 		if rs.Primary.ID == "" {
-			return fmt.Errorf("LoadBalancer data source ID not set")
+			return errors.New("LoadBalancer data source ID not set")
 		}
 		return nil
 	}
@@ -96,7 +97,7 @@ func testAccCheckSakuraCloudLoadBalancerDataSourceDestroy(s *terraform.State) er
 		_, err := client.LoadBalancer.Read(toSakuraCloudID(rs.Primary.ID))
 
 		if err == nil {
-			return fmt.Errorf("LoadBalancer still exists")
+			return errors.New("LoadBalancer still exists")
 		}
 	}
 

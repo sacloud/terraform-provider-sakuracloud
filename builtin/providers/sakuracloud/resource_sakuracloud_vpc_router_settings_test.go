@@ -1,7 +1,7 @@
 package sakuracloud
 
 import (
-	"fmt"
+	"errors"
 	"github.com/hashicorp/terraform/helper/resource"
 	"github.com/hashicorp/terraform/terraform"
 	"github.com/sacloud/libsacloud/api"
@@ -16,7 +16,7 @@ func TestAccSakuraCloudVPCRouterSetting_Basic(t *testing.T) {
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckSakuraCloudVPCRouterSettingDestroy,
 		Steps: []resource.TestStep{
-			resource.TestStep{
+			{
 				Config: testAccCheckSakuraCloudVPCRouterSettingConfig_basic,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckSakuraCloudVPCRouterExists("sakuracloud_vpc_router.foobar", &vpcRouter),
@@ -131,7 +131,7 @@ func TestAccSakuraCloudVPCRouterSetting_Update(t *testing.T) {
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckSakuraCloudVPCRouterSettingDestroy,
 		Steps: []resource.TestStep{
-			resource.TestStep{
+			{
 				Config: testAccCheckSakuraCloudVPCRouterSettingConfig_basic,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckSakuraCloudVPCRouterExists("sakuracloud_vpc_router.foobar", &vpcRouter),
@@ -179,7 +179,7 @@ func TestAccSakuraCloudVPCRouterSetting_Update(t *testing.T) {
 						"sakuracloud_vpc_router_site_to_site_vpn.s2s", "local_prefix.0", "192.168.21.0/24"),
 				),
 			},
-			resource.TestStep{
+			{
 				Config: testAccCheckSakuraCloudVPCRouterSettingConfig_update,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckSakuraCloudVPCRouterExists("sakuracloud_vpc_router.foobar", &vpcRouter),
@@ -242,7 +242,7 @@ func testAccCheckSakuraCloudVPCRouterSettingDestroy(s *terraform.State) error {
 		_, err := client.VPCRouter.Read(toSakuraCloudID(rs.Primary.ID))
 
 		if err == nil {
-			return fmt.Errorf("VPCRouter still exists")
+			return errors.New("VPCRouter still exists")
 		}
 	}
 

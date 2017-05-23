@@ -1,6 +1,7 @@
 package sakuracloud
 
 import (
+	"errors"
 	"fmt"
 	"github.com/hashicorp/terraform/helper/resource"
 	"github.com/hashicorp/terraform/terraform"
@@ -16,13 +17,13 @@ func TestAccSakuraCloudDiskDataSource_Basic(t *testing.T) {
 		CheckDestroy:              testAccCheckSakuraCloudDiskDataSourceDestroy,
 
 		Steps: []resource.TestStep{
-			resource.TestStep{
+			{
 				Config: testAccCheckSakuraCloudDataSourceDiskConfigBase,
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttr("sakuracloud_disk.disk01", "name", "hoge_Ubuntu_fuga"),
 				),
 			},
-			resource.TestStep{
+			{
 				Config: testAccCheckSakuraCloudDataSourceDiskConfig,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckSakuraCloudDiskDataSourceID("data.sakuracloud_disk.foobar"),
@@ -37,21 +38,21 @@ func TestAccSakuraCloudDiskDataSource_Basic(t *testing.T) {
 					resource.TestCheckResourceAttr("data.sakuracloud_disk.foobar", "tags.2", "tag3"),
 				),
 			},
-			resource.TestStep{
+			{
 				Destroy: true,
 				Config:  testAccCheckSakuraCloudDataSourceDiskConfig_With_Tag,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckSakuraCloudDiskDataSourceID("data.sakuracloud_disk.foobar"),
 				),
 			},
-			resource.TestStep{
+			{
 				Destroy: true,
 				Config:  testAccCheckSakuraCloudDataSourceDiskConfig_NotExists,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckSakuraCloudDiskDataSourceNotExists("data.sakuracloud_disk.foobar"),
 				),
 			},
-			resource.TestStep{
+			{
 				Destroy: true,
 				Config:  testAccCheckSakuraCloudDataSourceDiskConfig_With_NotExists_Tag,
 				Check: resource.ComposeTestCheckFunc(
@@ -70,7 +71,7 @@ func testAccCheckSakuraCloudDiskDataSourceID(n string) resource.TestCheckFunc {
 		}
 
 		if rs.Primary.ID == "" {
-			return fmt.Errorf("Disk data source ID not set")
+			return errors.New("Disk data source ID not set")
 		}
 		return nil
 	}
@@ -101,7 +102,7 @@ func testAccCheckSakuraCloudDiskDataSourceDestroy(s *terraform.State) error {
 		_, err := client.Disk.Read(toSakuraCloudID(rs.Primary.ID))
 
 		if err == nil {
-			return fmt.Errorf("Disk still exists")
+			return errors.New("Disk still exists")
 		}
 	}
 

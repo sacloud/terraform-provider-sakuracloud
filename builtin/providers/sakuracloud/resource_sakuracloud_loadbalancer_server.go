@@ -17,45 +17,45 @@ func resourceSakuraCloudLoadBalancerServer() *schema.Resource {
 		Read:   resourceSakuraCloudLoadBalancerServerRead,
 		Delete: resourceSakuraCloudLoadBalancerServerDelete,
 		Schema: map[string]*schema.Schema{
-			"load_balancer_vip_id": &schema.Schema{
+			"load_balancer_vip_id": {
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
-			"ipaddress": &schema.Schema{
+			"ipaddress": {
 				Type:     schema.TypeString,
 				ForceNew: true,
 				Required: true,
 			},
-			//"port": &schema.Schema{
+			//"port": {
 			//	Type:         schema.TypeInt,
 			//	Required:     true,
 			//	ForceNew:     true,
 			//	ValidateFunc: validateIntegerInRange(1, 65535),
 			//},
-			"check_protocol": &schema.Schema{
+			"check_protocol": {
 				Type:         schema.TypeString,
 				Required:     true,
 				ForceNew:     true,
 				ValidateFunc: validateStringInWord(sacloud.AllowLoadBalancerHealthCheckProtocol()),
 			},
-			"check_path": &schema.Schema{
+			"check_path": {
 				Type:     schema.TypeString,
 				Optional: true,
 				ForceNew: true,
 			},
-			"check_status": &schema.Schema{
+			"check_status": {
 				Type:     schema.TypeString,
 				Optional: true,
 				ForceNew: true,
 			},
-			"enabled": &schema.Schema{
+			"enabled": {
 				Type:     schema.TypeBool,
 				Optional: true,
 				ForceNew: true,
 				Default:  true,
 			},
-			"zone": &schema.Schema{
+			"zone": {
 				Type:         schema.TypeString,
 				Optional:     true,
 				Computed:     true,

@@ -16,25 +16,25 @@ func resourceSakuraCloudVPCRouterRemoteAccessUser() *schema.Resource {
 		Read:   resourceSakuraCloudVPCRouterRemoteAccessUserRead,
 		Delete: resourceSakuraCloudVPCRouterRemoteAccessUserDelete,
 		Schema: map[string]*schema.Schema{
-			"vpc_router_id": &schema.Schema{
+			"vpc_router_id": {
 				Type:         schema.TypeString,
 				Required:     true,
 				ForceNew:     true,
 				ValidateFunc: validateSakuracloudIDType,
 			},
-			"name": &schema.Schema{
+			"name": {
 				Type:         schema.TypeString,
 				Required:     true,
 				ForceNew:     true,
 				ValidateFunc: validateMaxLength(1, 20),
 			},
-			"password": &schema.Schema{
+			"password": {
 				Type:         schema.TypeString,
 				Required:     true,
 				ForceNew:     true,
 				ValidateFunc: validateMaxLength(1, 20),
 			},
-			"zone": &schema.Schema{
+			"zone": {
 				Type:         schema.TypeString,
 				Optional:     true,
 				Computed:     true,

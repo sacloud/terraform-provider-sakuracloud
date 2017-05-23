@@ -11,18 +11,18 @@ func dataSourceSakuraCloudDatabase() *schema.Resource {
 		Read: dataSourceSakuraCloudDatabaseRead,
 
 		Schema: map[string]*schema.Schema{
-			"filter": &schema.Schema{
+			"filter": {
 				Type:     schema.TypeSet,
 				Optional: true,
 				ForceNew: true,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
-						"name": &schema.Schema{
+						"name": {
 							Type:     schema.TypeString,
 							Required: true,
 						},
 
-						"values": &schema.Schema{
+						"values": {
 							Type:     schema.TypeList,
 							Required: true,
 							Elem:     &schema.Schema{Type: schema.TypeString},
@@ -30,71 +30,71 @@ func dataSourceSakuraCloudDatabase() *schema.Resource {
 					},
 				},
 			},
-			"name": &schema.Schema{
+			"name": {
 				Type:     schema.TypeString,
 				Computed: true,
 			},
-			"plan": &schema.Schema{
+			"plan": {
 				Type:     schema.TypeString,
 				Computed: true,
 			},
-			"admin_password": &schema.Schema{
+			"admin_password": {
 				Type:     schema.TypeString,
 				Computed: true,
 			},
-			"user_name": &schema.Schema{
+			"user_name": {
 				Type:     schema.TypeString,
 				Computed: true,
 			},
-			"user_password": &schema.Schema{
+			"user_password": {
 				Type:     schema.TypeString,
 				Computed: true,
 			},
-			"allow_networks": &schema.Schema{
+			"allow_networks": {
 				Type:     schema.TypeList,
 				Computed: true,
 				Elem:     &schema.Schema{Type: schema.TypeString},
 			},
-			"port": &schema.Schema{
+			"port": {
 				Type:     schema.TypeInt,
 				Computed: true,
 			},
 
-			"backup_rotate": &schema.Schema{
+			"backup_rotate": {
 				Type:     schema.TypeInt,
 				Computed: true,
 			},
-			"backup_time": &schema.Schema{
+			"backup_time": {
 				Type:     schema.TypeString,
 				Computed: true,
 			},
 
-			"switch_id": &schema.Schema{
+			"switch_id": {
 				Type:     schema.TypeString,
 				Computed: true,
 			},
-			"ipaddress1": &schema.Schema{
+			"ipaddress1": {
 				Type:     schema.TypeString,
 				Computed: true,
 			},
-			"nw_mask_len": &schema.Schema{
+			"nw_mask_len": {
 				Type:     schema.TypeInt,
 				Computed: true,
 			},
-			"default_route": &schema.Schema{
+			"default_route": {
 				Type:     schema.TypeString,
 				Computed: true,
 			},
-			"description": &schema.Schema{
+			"description": {
 				Type:     schema.TypeString,
 				Computed: true,
 			},
-			"tags": &schema.Schema{
+			"tags": {
 				Type:     schema.TypeList,
 				Computed: true,
 				Elem:     &schema.Schema{Type: schema.TypeString},
 			},
-			"zone": &schema.Schema{
+			"zone": {
 				Type:         schema.TypeString,
 				Optional:     true,
 				Computed:     true,

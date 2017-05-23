@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"fmt"
 
+	"errors"
 	"github.com/hashicorp/terraform/helper/hashcode"
 	"github.com/hashicorp/terraform/helper/schema"
 	"github.com/sacloud/libsacloud/api"
@@ -17,44 +18,44 @@ func resourceSakuraCloudVPCRouterInterface() *schema.Resource {
 		Delete: resourceSakuraCloudVPCRouterInterfaceDelete,
 
 		Schema: map[string]*schema.Schema{
-			"vpc_router_id": &schema.Schema{
+			"vpc_router_id": {
 				Type:         schema.TypeString,
 				Required:     true,
 				ForceNew:     true,
 				ValidateFunc: validateSakuracloudIDType,
 			},
-			"index": &schema.Schema{
+			"index": {
 				Type:         schema.TypeInt,
 				Required:     true,
 				ForceNew:     true,
 				ValidateFunc: validateIntegerInRange(1, 7),
 			},
-			"switch_id": &schema.Schema{
+			"switch_id": {
 				Type:         schema.TypeString,
 				Required:     true,
 				ForceNew:     true,
 				ValidateFunc: validateSakuracloudIDType,
 			},
-			"vip": &schema.Schema{
+			"vip": {
 				Type:     schema.TypeString,
 				ForceNew: true,
 				Optional: true,
 				Default:  "",
 			},
-			"ipaddress": &schema.Schema{
+			"ipaddress": {
 				Type:     schema.TypeList,
 				ForceNew: true,
 				Required: true,
 				Elem:     &schema.Schema{Type: schema.TypeString},
 				MaxItems: 2,
 			},
-			"nw_mask_len": &schema.Schema{
+			"nw_mask_len": {
 				Type:         schema.TypeInt,
 				ForceNew:     true,
 				Required:     true,
 				ValidateFunc: validateIntegerInRange(16, 28),
 			},
-			"zone": &schema.Schema{
+			"zone": {
 				Type:         schema.TypeString,
 				Optional:     true,
 				Computed:     true,
@@ -116,7 +117,7 @@ func resourceSakuraCloudVPCRouterInterfaceCreate(d *schema.ResourceData, meta in
 	}
 
 	if len(ipaddresses) == 0 {
-		return fmt.Errorf("SakuraCloud VPCRouterInterface: ipaddresses is required ")
+		return errors.New("SakuraCloud VPCRouterInterface: ipaddresses is required ")
 	}
 
 	if vpcRouter.IsStandardPlan() {
@@ -237,6 +238,7 @@ func resourceSakuraCloudVPCRouterInterfaceDelete(d *schema.ResourceData, meta in
 
 func vpcRouterInterfaceIDHash(routerID string, index int) string {
 	var buf bytes.Buffer
+	buf.WriteString(routerID)
 	buf.WriteString(fmt.Sprintf("%d", index))
 	return fmt.Sprintf("interface-%d", hashcode.String(buf.String()))
 }

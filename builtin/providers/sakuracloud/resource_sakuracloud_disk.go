@@ -21,18 +21,18 @@ func resourceSakuraCloudDisk() *schema.Resource {
 		},
 
 		Schema: map[string]*schema.Schema{
-			"name": &schema.Schema{
+			"name": {
 				Type:     schema.TypeString,
 				Required: true,
 			},
-			"plan": &schema.Schema{
+			"plan": {
 				Type:         schema.TypeString,
 				Optional:     true,
 				ForceNew:     true,
 				Default:      "ssd",
 				ValidateFunc: validateStringInWord([]string{"ssd", "hdd"}),
 			},
-			"connection": &schema.Schema{
+			"connection": {
 				Type:     schema.TypeString,
 				Optional: true,
 				ForceNew: true,
@@ -42,41 +42,41 @@ func resourceSakuraCloudDisk() *schema.Resource {
 					fmt.Sprintf("%s", sacloud.DiskConnectionIDE),
 				}),
 			},
-			"source_archive_id": &schema.Schema{
+			"source_archive_id": {
 				Type:          schema.TypeString,
 				ForceNew:      true,
 				Optional:      true,
 				ConflictsWith: []string{"source_disk_id"},
 				ValidateFunc:  validateSakuracloudIDType,
 			},
-			"source_disk_id": &schema.Schema{
+			"source_disk_id": {
 				Type:          schema.TypeString,
 				ForceNew:      true,
 				Optional:      true,
 				ConflictsWith: []string{"source_archive_id"},
 				ValidateFunc:  validateSakuracloudIDType,
 			},
-			"size": &schema.Schema{
+			"size": {
 				Type:     schema.TypeInt,
 				Optional: true,
 				ForceNew: true,
 				Default:  20,
 			},
-			"server_id": &schema.Schema{
+			"server_id": {
 				Type:     schema.TypeString,
 				Computed: true, //ReadOnly
 			},
 
-			"description": &schema.Schema{
+			"description": {
 				Type:     schema.TypeString,
 				Optional: true,
 			},
-			"tags": &schema.Schema{
+			"tags": {
 				Type:     schema.TypeList,
 				Optional: true,
 				Elem:     &schema.Schema{Type: schema.TypeString},
 			},
-			"zone": &schema.Schema{
+			"zone": {
 				Type:         schema.TypeString,
 				Optional:     true,
 				Computed:     true,
@@ -84,29 +84,29 @@ func resourceSakuraCloudDisk() *schema.Resource {
 				Description:  "target SakuraCloud zone",
 				ValidateFunc: validateStringInWord([]string{"is1a", "is1b", "tk1a", "tk1v"}),
 			},
-			"hostname": &schema.Schema{
+			"hostname": {
 				Type:         schema.TypeString,
 				Optional:     true,
 				ValidateFunc: validateMaxLength(1, 64),
 			},
-			"password": &schema.Schema{
+			"password": {
 				Type:         schema.TypeString,
 				Optional:     true,
 				ValidateFunc: validateMaxLength(8, 64),
 				Sensitive:    true,
 			},
-			"ssh_key_ids": &schema.Schema{
+			"ssh_key_ids": {
 				Type:     schema.TypeList,
 				Optional: true,
 				Elem:     &schema.Schema{Type: schema.TypeString},
 				// ! Current terraform(v0.7) is not support to array validation !
 				// ValidateFunc: validateSakuracloudIDArrayType,
 			},
-			"disable_pw_auth": &schema.Schema{
+			"disable_pw_auth": {
 				Type:     schema.TypeBool,
 				Optional: true,
 			},
-			"note_ids": &schema.Schema{
+			"note_ids": {
 				Type:     schema.TypeList,
 				Optional: true,
 				Elem:     &schema.Schema{Type: schema.TypeString},

@@ -11,48 +11,48 @@ func dataSourceSakuraCloudSubnet() *schema.Resource {
 		Read: dataSourceSakuraCloudSubnetRead,
 
 		Schema: map[string]*schema.Schema{
-			"internet_id": &schema.Schema{
+			"internet_id": {
 				Type:         schema.TypeString,
 				Required:     true,
 				ForceNew:     true,
 				ValidateFunc: validateSakuracloudIDType,
 			},
-			"index": &schema.Schema{
+			"index": {
 				Type:     schema.TypeInt,
 				ForceNew: true,
 				Required: true,
 			},
 
-			"nw_mask_len": &schema.Schema{
+			"nw_mask_len": {
 				Type:     schema.TypeInt,
 				Computed: true,
 			},
-			"next_hop": &schema.Schema{
+			"next_hop": {
 				Type:     schema.TypeString,
 				Computed: true,
 			},
-			"switch_id": &schema.Schema{
+			"switch_id": {
 				Type:     schema.TypeString,
 				Computed: true,
 			},
-			"nw_address": &schema.Schema{
+			"nw_address": {
 				Type:     schema.TypeString,
 				Computed: true,
 			},
-			"min_ipaddress": &schema.Schema{
+			"min_ipaddress": {
 				Type:     schema.TypeString,
 				Computed: true,
 			},
-			"max_ipaddress": &schema.Schema{
+			"max_ipaddress": {
 				Type:     schema.TypeString,
 				Computed: true,
 			},
-			"ipaddresses": &schema.Schema{
+			"ipaddresses": {
 				Type:     schema.TypeList,
 				Computed: true,
 				Elem:     &schema.Schema{Type: schema.TypeString},
 			},
-			"zone": &schema.Schema{
+			"zone": {
 				Type:         schema.TypeString,
 				Optional:     true,
 				Computed:     true,

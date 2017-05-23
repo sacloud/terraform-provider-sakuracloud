@@ -19,65 +19,65 @@ func resourceSakuraCloudLoadBalancer() *schema.Resource {
 		},
 
 		Schema: map[string]*schema.Schema{
-			"name": &schema.Schema{
+			"name": {
 				Type:     schema.TypeString,
 				Required: true,
 			},
-			"switch_id": &schema.Schema{
+			"switch_id": {
 				Type:         schema.TypeString,
 				ForceNew:     true,
 				Required:     true,
 				ValidateFunc: validateSakuracloudIDType,
 			},
-			"VRID": &schema.Schema{
+			"VRID": {
 				Type:     schema.TypeInt,
 				ForceNew: true,
 				Required: true,
 			},
-			"is_double": &schema.Schema{
+			"is_double": {
 				Type:     schema.TypeBool,
 				ForceNew: true,
 				Optional: true,
 				Default:  false,
 			},
-			"plan": &schema.Schema{
+			"plan": {
 				Type:         schema.TypeString,
 				ForceNew:     true,
 				Optional:     true,
 				Default:      "standard",
 				ValidateFunc: validateStringInWord([]string{"standard", "highspec"}),
 			},
-			"ipaddress1": &schema.Schema{
+			"ipaddress1": {
 				Type:     schema.TypeString,
 				ForceNew: true,
 				Required: true,
 			},
-			"ipaddress2": &schema.Schema{
+			"ipaddress2": {
 				Type:     schema.TypeString,
 				ForceNew: true,
 				Optional: true,
 			},
-			"nw_mask_len": &schema.Schema{
+			"nw_mask_len": {
 				Type:         schema.TypeInt,
 				ForceNew:     true,
 				Required:     true,
 				ValidateFunc: validateIntegerInRange(8, 29),
 			},
-			"default_route": &schema.Schema{
+			"default_route": {
 				Type:     schema.TypeString,
 				ForceNew: true,
 				Optional: true,
 			},
-			"description": &schema.Schema{
+			"description": {
 				Type:     schema.TypeString,
 				Optional: true,
 			},
-			"tags": &schema.Schema{
+			"tags": {
 				Type:     schema.TypeList,
 				Optional: true,
 				Elem:     &schema.Schema{Type: schema.TypeString},
 			},
-			"zone": &schema.Schema{
+			"zone": {
 				Type:         schema.TypeString,
 				Optional:     true,
 				Computed:     true,
@@ -85,7 +85,7 @@ func resourceSakuraCloudLoadBalancer() *schema.Resource {
 				Description:  "target SakuraCloud zone",
 				ValidateFunc: validateStringInWord([]string{"is1a", "is1b", "tk1a", "tk1v"}),
 			},
-			"vip_ids": &schema.Schema{
+			"vip_ids": {
 				Type:     schema.TypeList,
 				Computed: true,
 				Elem:     &schema.Schema{Type: schema.TypeString},
@@ -142,7 +142,7 @@ func resourceSakuraCloudLoadBalancerCreate(d *schema.ResourceData, meta interfac
 	var err error
 	if isDouble {
 		if ipAddress2 == "" {
-			return errors.New("ipaddress2 is required.")
+			return errors.New("ipaddress2 is required")
 		}
 		//冗長構成
 		createLb, err = sacloud.CreateNewLoadBalancerDouble(&sacloud.CreateDoubleLoadBalancerValue{

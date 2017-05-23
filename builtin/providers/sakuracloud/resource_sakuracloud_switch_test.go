@@ -1,6 +1,7 @@
 package sakuracloud
 
 import (
+	"errors"
 	"fmt"
 	"github.com/hashicorp/terraform/helper/resource"
 	"github.com/hashicorp/terraform/terraform"
@@ -16,7 +17,7 @@ func TestAccResourceSakuraCloudSwitch(t *testing.T) {
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckSakuraCloudSwitchDestroy,
 		Steps: []resource.TestStep{
-			resource.TestStep{
+			{
 				Config: testAccCheckSakuraCloudSwitchConfig_basic,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckSakuraCloudSwitchExists("sakuracloud_switch.foobar", &sw),
@@ -24,7 +25,7 @@ func TestAccResourceSakuraCloudSwitch(t *testing.T) {
 						"sakuracloud_switch.foobar", "name", "myswitch"),
 				),
 			},
-			resource.TestStep{
+			{
 				Config: testAccCheckSakuraCloudSwitchConfig_update,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckSakuraCloudSwitchExists("sakuracloud_switch.foobar", &sw),
@@ -32,7 +33,7 @@ func TestAccResourceSakuraCloudSwitch(t *testing.T) {
 						"sakuracloud_switch.foobar", "name", "myswitch_upd"),
 				),
 			},
-			resource.TestStep{
+			{
 				Config: testAccCheckSakuraCloudSwitchConfig_update,
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttr(
@@ -50,10 +51,10 @@ func TestAccResourceSakuraCloudSwitch(t *testing.T) {
 //		Providers:    testAccProviders,
 //		CheckDestroy: testAccCheckSakuraCloudSwitchDestroy,
 //		Steps: []resource.TestStep{
-//			resource.TestStep{
+//			{
 //				Config: testAccCheckSakuraCloudSwitchConfig_basic,
 //			},
-//			resource.TestStep{
+//			{
 //				ResourceName:      resourceName,
 //				ImportState:       true,
 //				ImportStateVerify: true,
@@ -70,7 +71,7 @@ func testAccCheckSakuraCloudSwitchExists(n string, sw *sacloud.Switch) resource.
 		}
 
 		if rs.Primary.ID == "" {
-			return fmt.Errorf("No Switch ID is set")
+			return errors.New("No Switch ID is set")
 		}
 
 		client := testAccProvider.Meta().(*api.Client)
@@ -82,7 +83,7 @@ func testAccCheckSakuraCloudSwitchExists(n string, sw *sacloud.Switch) resource.
 		}
 
 		if foundSwitch.ID != toSakuraCloudID(rs.Primary.ID) {
-			return fmt.Errorf("Switch not found")
+			return errors.New("Switch not found")
 		}
 
 		*sw = *foundSwitch
@@ -102,7 +103,7 @@ func testAccCheckSakuraCloudSwitchDestroy(s *terraform.State) error {
 		_, err := client.Switch.Read(toSakuraCloudID(rs.Primary.ID))
 
 		if err == nil {
-			return fmt.Errorf("Switch still exists")
+			return errors.New("Switch still exists")
 		}
 	}
 

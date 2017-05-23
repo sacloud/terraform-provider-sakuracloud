@@ -19,22 +19,22 @@ func resourceSakuraCloudDNS() *schema.Resource {
 		},
 
 		Schema: map[string]*schema.Schema{
-			"zone": &schema.Schema{
+			"zone": {
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
 
-			"dns_servers": &schema.Schema{
+			"dns_servers": {
 				Type:     schema.TypeList,
 				Computed: true,
 				Elem:     &schema.Schema{Type: schema.TypeString},
 			},
-			"description": &schema.Schema{
+			"description": {
 				Type:     schema.TypeString,
 				Optional: true,
 			},
-			"tags": &schema.Schema{
+			"tags": {
 				Type:     schema.TypeList,
 				Optional: true,
 				Elem:     &schema.Schema{Type: schema.TypeString},
@@ -121,7 +121,7 @@ func resourceSakuraCloudDNSDelete(d *schema.ResourceData, meta interface{}) erro
 	return nil
 }
 
-func setDNSResourceData(d *schema.ResourceData, client *api.Client, data *sacloud.DNS) error {
+func setDNSResourceData(d *schema.ResourceData, _ *api.Client, data *sacloud.DNS) error {
 
 	d.Set("zone", data.Name)
 	d.Set("description", data.Description)

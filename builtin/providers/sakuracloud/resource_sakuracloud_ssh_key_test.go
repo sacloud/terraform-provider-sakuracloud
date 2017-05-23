@@ -1,6 +1,7 @@
 package sakuracloud
 
 import (
+	"errors"
 	"fmt"
 	"github.com/hashicorp/terraform/helper/resource"
 	"github.com/hashicorp/terraform/terraform"
@@ -16,7 +17,7 @@ func TestAccResourceSakuraCloudSSHKey(t *testing.T) {
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckSakuraCloudSSHKeyDestroy,
 		Steps: []resource.TestStep{
-			resource.TestStep{
+			{
 				Config: testAccCheckSakuraCloudSSHKeyConfig_basic,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckSakuraCloudSSHKeyExists("sakuracloud_ssh_key.foobar", &ssh_key),
@@ -28,7 +29,7 @@ func TestAccResourceSakuraCloudSSHKey(t *testing.T) {
 						"sakuracloud_ssh_key.foobar", "fingerprint", testAccFingerprint),
 				),
 			},
-			resource.TestStep{
+			{
 				Config: testAccCheckSakuraCloudSSHKeyConfig_update,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckSakuraCloudSSHKeyExists("sakuracloud_ssh_key.foobar", &ssh_key),
@@ -53,7 +54,7 @@ func testAccCheckSakuraCloudSSHKeyExists(n string, ssh_key *sacloud.SSHKey) reso
 		}
 
 		if rs.Primary.ID == "" {
-			return fmt.Errorf("No SSHKey ID is set")
+			return errors.New("No SSHKey ID is set")
 		}
 
 		client := testAccProvider.Meta().(*api.Client)
@@ -64,7 +65,7 @@ func testAccCheckSakuraCloudSSHKeyExists(n string, ssh_key *sacloud.SSHKey) reso
 		}
 
 		if foundSSHKey.ID != toSakuraCloudID(rs.Primary.ID) {
-			return fmt.Errorf("SSHKey not found")
+			return errors.New("SSHKey not found")
 		}
 
 		*ssh_key = *foundSSHKey
@@ -84,7 +85,7 @@ func testAccCheckSakuraCloudSSHKeyDestroy(s *terraform.State) error {
 		_, err := client.SSHKey.Read(toSakuraCloudID(rs.Primary.ID))
 
 		if err == nil {
-			return fmt.Errorf("SSHKey still exists")
+			return errors.New("SSHKey still exists")
 		}
 	}
 

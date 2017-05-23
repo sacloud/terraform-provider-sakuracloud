@@ -1,6 +1,7 @@
 package sakuracloud
 
 import (
+	"errors"
 	"fmt"
 	"github.com/hashicorp/terraform/helper/resource"
 	"github.com/hashicorp/terraform/terraform"
@@ -16,7 +17,7 @@ func TestAccResourceSakuraCloudInternet(t *testing.T) {
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckSakuraCloudInternetDestroy,
 		Steps: []resource.TestStep{
-			resource.TestStep{
+			{
 				Config: testAccCheckSakuraCloudInternetConfig_basic,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckSakuraCloudInternetExists("sakuracloud_internet.foobar", &internet),
@@ -32,7 +33,7 @@ func TestAccResourceSakuraCloudInternet(t *testing.T) {
 						"sakuracloud_internet.foobar", "nw_ipaddresses.#", "11"),
 				),
 			},
-			resource.TestStep{
+			{
 				Config: testAccCheckSakuraCloudInternetConfig_update,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckSakuraCloudInternetExists("sakuracloud_internet.foobar", &internet),
@@ -52,7 +53,7 @@ func TestAccResourceSakuraCloudInternet(t *testing.T) {
 						"sakuracloud_internet.foobar", "ipv6_prefix_len", "64"),
 				),
 			},
-			resource.TestStep{
+			{
 				Config: testAccCheckSakuraCloudInternetConfig_with_server,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckSakuraCloudInternetExists("sakuracloud_internet.foobar", &internet),
@@ -85,7 +86,7 @@ func testAccCheckSakuraCloudInternetExists(n string, internet *sacloud.Internet)
 		}
 
 		if rs.Primary.ID == "" {
-			return fmt.Errorf("No Internet ID is set")
+			return errors.New("No Internet ID is set")
 		}
 
 		client := testAccProvider.Meta().(*api.Client)
@@ -97,7 +98,7 @@ func testAccCheckSakuraCloudInternetExists(n string, internet *sacloud.Internet)
 		}
 
 		if foundInternet.ID != toSakuraCloudID(rs.Primary.ID) {
-			return fmt.Errorf("Internet not found")
+			return errors.New("Internet not found")
 		}
 
 		*internet = *foundInternet
@@ -117,7 +118,7 @@ func testAccCheckSakuraCloudInternetDestroy(s *terraform.State) error {
 		_, err := client.Internet.Read(toSakuraCloudID(rs.Primary.ID))
 
 		if err == nil {
-			return fmt.Errorf("Internet still exists")
+			return errors.New("Internet still exists")
 		}
 	}
 

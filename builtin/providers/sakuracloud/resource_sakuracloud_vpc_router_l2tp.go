@@ -16,34 +16,34 @@ func resourceSakuraCloudVPCRouterL2TP() *schema.Resource {
 		Read:   resourceSakuraCloudVPCRouterL2TPRead,
 		Delete: resourceSakuraCloudVPCRouterL2TPDelete,
 		Schema: map[string]*schema.Schema{
-			"vpc_router_id": &schema.Schema{
+			"vpc_router_id": {
 				Type:         schema.TypeString,
 				Required:     true,
 				ForceNew:     true,
 				ValidateFunc: validateSakuracloudIDType,
 			},
-			"vpc_router_interface_id": &schema.Schema{
+			"vpc_router_interface_id": {
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
-			"pre_shared_secret": &schema.Schema{
+			"pre_shared_secret": {
 				Type:         schema.TypeString,
 				Required:     true,
 				ForceNew:     true,
 				ValidateFunc: validateMaxLength(0, 40),
 			},
-			"range_start": &schema.Schema{
+			"range_start": {
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
-			"range_stop": &schema.Schema{
+			"range_stop": {
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
-			"zone": &schema.Schema{
+			"zone": {
 				Type:         schema.TypeString,
 				Optional:     true,
 				Computed:     true,

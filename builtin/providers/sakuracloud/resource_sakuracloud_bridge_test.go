@@ -1,6 +1,7 @@
 package sakuracloud
 
 import (
+	"errors"
 	"fmt"
 	"github.com/hashicorp/terraform/helper/resource"
 	"github.com/hashicorp/terraform/terraform"
@@ -16,7 +17,7 @@ func TestAccResourceSakuraCloudBridge(t *testing.T) {
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckSakuraCloudBridgeDestroy,
 		Steps: []resource.TestStep{
-			resource.TestStep{
+			{
 				Config: testAccCheckSakuraCloudBridgeConfig_withSwitch,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckSakuraCloudBridgeExists("sakuracloud_bridge.foobar", &bridge),
@@ -26,14 +27,14 @@ func TestAccResourceSakuraCloudBridge(t *testing.T) {
 						"sakuracloud_switch.foobar", "name", "myswitch"),
 				),
 			},
-			resource.TestStep{
+			{
 				Config: testAccCheckSakuraCloudBridgeConfig_withSwitch,
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttr(
 						"sakuracloud_bridge.foobar", "switch_ids.#", "1"),
 				),
 			},
-			resource.TestStep{
+			{
 				Config: testAccCheckSakuraCloudBridgeConfig_withSwitchDisconnect,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckSakuraCloudBridgeExists("sakuracloud_bridge.foobar", &bridge),
@@ -43,7 +44,7 @@ func TestAccResourceSakuraCloudBridge(t *testing.T) {
 						"sakuracloud_switch.foobar", "name", "myswitch_upd"),
 				),
 			},
-			resource.TestStep{
+			{
 				Config: testAccCheckSakuraCloudBridgeConfig_withSwitchDisconnect,
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttr(
@@ -63,7 +64,7 @@ func testAccCheckSakuraCloudBridgeExists(n string, bridge *sacloud.Bridge) resou
 		}
 
 		if rs.Primary.ID == "" {
-			return fmt.Errorf("No Bridge ID is set")
+			return errors.New("No Bridge ID is set")
 		}
 
 		client := testAccProvider.Meta().(*api.Client)
@@ -78,7 +79,7 @@ func testAccCheckSakuraCloudBridgeExists(n string, bridge *sacloud.Bridge) resou
 		}
 
 		if foundBridge.ID != toSakuraCloudID(rs.Primary.ID) {
-			return fmt.Errorf("Bridge not found")
+			return errors.New("Bridge not found")
 		}
 
 		*bridge = *foundBridge
@@ -101,7 +102,7 @@ func testAccCheckSakuraCloudBridgeDestroy(s *terraform.State) error {
 		_, err := client.Bridge.Read(toSakuraCloudID(rs.Primary.ID))
 
 		if err == nil {
-			return fmt.Errorf("Bridge still exists")
+			return errors.New("Bridge still exists")
 		}
 	}
 

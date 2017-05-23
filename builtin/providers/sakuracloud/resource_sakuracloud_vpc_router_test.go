@@ -1,6 +1,7 @@
 package sakuracloud
 
 import (
+	"errors"
 	"fmt"
 	"github.com/hashicorp/terraform/helper/resource"
 	"github.com/hashicorp/terraform/terraform"
@@ -16,7 +17,7 @@ func TestAccResourceSakuraCloudVPCRouter(t *testing.T) {
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckSakuraCloudVPCRouterDestroy,
 		Steps: []resource.TestStep{
-			resource.TestStep{
+			{
 				Config: testAccCheckSakuraCloudVPCRouterConfig_basic,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckSakuraCloudVPCRouterExists("sakuracloud_vpc_router.foobar", &vpcRouter),
@@ -42,7 +43,7 @@ func TestAccResourceSakuraCloudVPCRouter(t *testing.T) {
 						"sakuracloud_vpc_router.foobar", "ipaddress2"),
 				),
 			},
-			resource.TestStep{
+			{
 				Config: testAccCheckSakuraCloudVPCRouterConfig_update,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckSakuraCloudVPCRouterExists("sakuracloud_vpc_router.foobar", &vpcRouter),
@@ -68,20 +69,6 @@ func TestAccResourceSakuraCloudVPCRouter(t *testing.T) {
 						"sakuracloud_vpc_router.foobar", "ipaddress2"),
 					resource.TestCheckResourceAttr(
 						"sakuracloud_vpc_router.foobar", "syslog_host", "192.168.0.2"),
-					//resource.TestCheckResourceAttr(
-					//	"sakuracloud_vpc_router.foobar", "interfaces.#", "2"),
-					//resource.TestCheckResourceAttr(
-					//	"sakuracloud_vpc_router.foobar", "interfaces.0.vip", ""),
-					//resource.TestCheckResourceAttr(
-					//	"sakuracloud_vpc_router.foobar", "interfaces.0.ipaddress.0", "192.168.11.1"),
-					//resource.TestCheckResourceAttr(
-					//	"sakuracloud_vpc_router.foobar", "interfaces.0.nw_mask_len", "24"),
-					//resource.TestCheckResourceAttr(
-					//	"sakuracloud_vpc_router.foobar", "interfaces.1.vip", ""),
-					//resource.TestCheckResourceAttr(
-					//	"sakuracloud_vpc_router.foobar", "interfaces.1.ipaddress.0", "192.168.12.1"),
-					//resource.TestCheckResourceAttr(
-					//	"sakuracloud_vpc_router.foobar", "interfaces.1.nw_mask_len", "24"),
 				),
 			},
 		},
@@ -96,7 +83,7 @@ func testAccCheckSakuraCloudVPCRouterExists(n string, vpcRouter *sacloud.VPCRout
 		}
 
 		if rs.Primary.ID == "" {
-			return fmt.Errorf("No VPCRouter ID is set")
+			return errors.New("No VPCRouter ID is set")
 		}
 
 		client := testAccProvider.Meta().(*api.Client)
@@ -108,7 +95,7 @@ func testAccCheckSakuraCloudVPCRouterExists(n string, vpcRouter *sacloud.VPCRout
 		}
 
 		if foundVPCRouter.ID != toSakuraCloudID(rs.Primary.ID) {
-			return fmt.Errorf("VPCRouter not found")
+			return errors.New("VPCRouter not found")
 		}
 
 		*vpcRouter = *foundVPCRouter
@@ -128,7 +115,7 @@ func testAccCheckSakuraCloudVPCRouterDestroy(s *terraform.State) error {
 		_, err := client.VPCRouter.Read(toSakuraCloudID(rs.Primary.ID))
 
 		if err == nil {
-			return fmt.Errorf("VPCRouter still exists")
+			return errors.New("VPCRouter still exists")
 		}
 	}
 
@@ -149,17 +136,3 @@ resource "sakuracloud_vpc_router" "foobar" {
     tags = ["hoge1_after" , "hoge2_after"]
     syslog_host = "192.168.0.2"
 }`
-
-var testAccCheckSakuraCloudVPCRouterConfig_with_premium = `
-resource "sakuracloud_server" "foobar" {
-    name = "myserver"
-    description = "Server from TerraForm for SAKURA CLOUD"
-    tags = ["@virtio-net-pci"]
-    additional_interfaces = ["${sakuracloud_vpc_router.foobar.id}"]
-}
-resource "sakuracloud_vpc_router" "foobar" {
-    name = "myvpc_router"
-    description = "VPCRouter from TerraForm for SAKURA CLOUD"
-    tags = ["hoge1" , "hoge2"]
-}
-`

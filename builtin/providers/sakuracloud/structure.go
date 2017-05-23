@@ -45,20 +45,20 @@ func expandStringListWithValidateInList(fieldName string, configured []interface
 }
 
 // Takes the result of schema.Set of strings and returns a []*string
-func expandStringSet(configured *schema.Set) []string {
-	return expandStringList(configured.List())
-}
+//func expandStringSet(configured *schema.Set) []string {
+//	return expandStringList(configured.List())
+//}
 
 // Takes list of pointers to strings. Expand to an array
 // of raw strings and returns a []interface{}
 // to keep compatibility w/ schema.NewSetschema.NewSet
-func flattenStringList(list []string) []interface{} {
-	vs := make([]interface{}, 0, len(list))
-	for _, v := range list {
-		vs = append(vs, v)
-	}
-	return vs
-}
+//func flattenStringList(list []string) []interface{} {
+//	vs := make([]interface{}, 0, len(list))
+//	for _, v := range list {
+//		vs = append(vs, v)
+//	}
+//	return vs
+//}
 
 func flattenDisks(disks []sacloud.Disk) []string {
 	var ids []string
@@ -75,14 +75,6 @@ func flattenServers(servers []sacloud.Server) []string {
 	}
 	return ids
 
-}
-
-func flattenSwitches(switches []sacloud.Switch) []string {
-	var ids []string
-	for _, d := range switches {
-		ids = append(ids, d.GetStrID())
-	}
-	return ids
 }
 
 func flattenInterfaces(interfaces []sacloud.Interface) []interface{} {
@@ -175,7 +167,7 @@ type migrateSchemaDef struct {
 	destination string
 }
 
-func migrateResourceData(d *schema.ResourceData, meta interface{}, defs []migrateSchemaDef) resourceData {
+func migrateResourceData(d *schema.ResourceData, _ interface{}, defs []migrateSchemaDef) resourceData {
 
 	// migrate deprecated params
 	for _, def := range defs {

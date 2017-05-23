@@ -1,6 +1,7 @@
 package sakuracloud
 
 import (
+	"errors"
 	"fmt"
 	"github.com/hashicorp/terraform/helper/resource"
 	"github.com/hashicorp/terraform/terraform"
@@ -16,11 +17,11 @@ func TestAccSakuraCloudInternetDataSource_Basic(t *testing.T) {
 		CheckDestroy:              testAccCheckSakuraCloudInternetDataSourceDestroy,
 
 		Steps: []resource.TestStep{
-			resource.TestStep{
+			{
 				Config: testAccCheckSakuraCloudDataSourceInternetBase,
 				Check:  testAccCheckSakuraCloudInternetDataSourceID("sakuracloud_internet.foobar"),
 			},
-			resource.TestStep{
+			{
 				Config: testAccCheckSakuraCloudDataSourceInternetConfig,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckSakuraCloudInternetDataSourceID("data.sakuracloud_internet.foobar"),
@@ -36,21 +37,21 @@ func TestAccSakuraCloudInternetDataSource_Basic(t *testing.T) {
 					resource.TestCheckResourceAttr("data.sakuracloud_internet.foobar", "nw_ipaddresses.#", "11"),
 				),
 			},
-			resource.TestStep{
+			{
 				Destroy: true,
 				Config:  testAccCheckSakuraCloudDataSourceInternetConfig_With_Tag,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckSakuraCloudInternetDataSourceID("data.sakuracloud_internet.foobar"),
 				),
 			},
-			resource.TestStep{
+			{
 				Destroy: true,
 				Config:  testAccCheckSakuraCloudDataSourceInternetConfig_NotExists,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckSakuraCloudInternetDataSourceNotExists("data.sakuracloud_internet.foobar"),
 				),
 			},
-			resource.TestStep{
+			{
 				Destroy: true,
 				Config:  testAccCheckSakuraCloudDataSourceInternetConfig_With_NotExists_Tag,
 				Check: resource.ComposeTestCheckFunc(
@@ -69,7 +70,7 @@ func testAccCheckSakuraCloudInternetDataSourceID(n string) resource.TestCheckFun
 		}
 
 		if rs.Primary.ID == "" {
-			return fmt.Errorf("Internet data source ID not set")
+			return errors.New("Internet data source ID not set")
 		}
 		return nil
 	}
@@ -100,7 +101,7 @@ func testAccCheckSakuraCloudInternetDataSourceDestroy(s *terraform.State) error 
 		_, err := client.Internet.Read(toSakuraCloudID(rs.Primary.ID))
 
 		if err == nil {
-			return fmt.Errorf("Internet still exists")
+			return errors.New("Internet still exists")
 		}
 	}
 

@@ -1,6 +1,7 @@
 package sakuracloud
 
 import (
+	"errors"
 	"fmt"
 	"github.com/hashicorp/terraform/helper/resource"
 	"github.com/hashicorp/terraform/terraform"
@@ -16,7 +17,7 @@ func TestAccResourceSakuraCloudPacketFilter(t *testing.T) {
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckSakuraCloudPacketFilterDestroy,
 		Steps: []resource.TestStep{
-			resource.TestStep{
+			{
 				Config: testAccCheckSakuraCloudPacketFilterConfig_basic,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckSakuraCloudPacketFilterExists("sakuracloud_packet_filter.foobar", &filter),
@@ -36,7 +37,7 @@ func TestAccResourceSakuraCloudPacketFilter(t *testing.T) {
 						"sakuracloud_packet_filter.foobar", "expressions.0.allow", "true"),
 				),
 			},
-			resource.TestStep{
+			{
 				Config: testAccCheckSakuraCloudPacketFilterConfig_update,
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttr(
@@ -72,7 +73,7 @@ func testAccCheckSakuraCloudPacketFilterExists(n string, filter *sacloud.PacketF
 		}
 
 		if rs.Primary.ID == "" {
-			return fmt.Errorf("No PacketFilter ID is set")
+			return errors.New("No PacketFilter ID is set")
 		}
 
 		client := testAccProvider.Meta().(*api.Client)
@@ -84,7 +85,7 @@ func testAccCheckSakuraCloudPacketFilterExists(n string, filter *sacloud.PacketF
 		}
 
 		if foundPacketFilter.ID != toSakuraCloudID(rs.Primary.ID) {
-			return fmt.Errorf("PacketFilter not found")
+			return errors.New("PacketFilter not found")
 		}
 
 		*filter = *foundPacketFilter
@@ -104,7 +105,7 @@ func testAccCheckSakuraCloudPacketFilterDestroy(s *terraform.State) error {
 		_, err := client.PacketFilter.Read(toSakuraCloudID(rs.Primary.ID))
 
 		if err == nil {
-			return fmt.Errorf("PacketFilter still exists")
+			return errors.New("PacketFilter still exists")
 		}
 	}
 

@@ -16,48 +16,48 @@ func resourceSakuraCloudVPCRouterPortForwarding() *schema.Resource {
 		Read:   resourceSakuraCloudVPCRouterPortForwardingRead,
 		Delete: resourceSakuraCloudVPCRouterPortForwardingDelete,
 		Schema: map[string]*schema.Schema{
-			"vpc_router_id": &schema.Schema{
+			"vpc_router_id": {
 				Type:         schema.TypeString,
 				Required:     true,
 				ForceNew:     true,
 				ValidateFunc: validateSakuracloudIDType,
 			},
-			"vpc_router_interface_id": &schema.Schema{
+			"vpc_router_interface_id": {
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
-			"protocol": &schema.Schema{
+			"protocol": {
 				Type:         schema.TypeString,
 				Required:     true,
 				ForceNew:     true,
 				ValidateFunc: validateStringInWord([]string{"tcp", "udp"}),
 			},
-			"global_port": &schema.Schema{
+			"global_port": {
 				Type:         schema.TypeInt,
 				Required:     true,
 				ForceNew:     true,
 				ValidateFunc: validateIntegerInRange(1, 65535),
 			},
-			"private_address": &schema.Schema{
+			"private_address": {
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
-			"private_port": &schema.Schema{
+			"private_port": {
 				Type:         schema.TypeInt,
 				Required:     true,
 				ForceNew:     true,
 				ValidateFunc: validateIntegerInRange(1, 65535),
 			},
-			"description": &schema.Schema{
+			"description": {
 				Type:         schema.TypeString,
 				Optional:     true,
 				ForceNew:     true,
 				Default:      "",
 				ValidateFunc: validateMaxLength(0, 512),
 			},
-			"zone": &schema.Schema{
+			"zone": {
 				Type:         schema.TypeString,
 				Optional:     true,
 				Computed:     true,

@@ -1,7 +1,7 @@
 package sakuracloud
 
 import (
-	"fmt"
+	"errors"
 	"github.com/hashicorp/terraform/helper/resource"
 	"github.com/hashicorp/terraform/terraform"
 	"github.com/sacloud/libsacloud/api"
@@ -16,7 +16,7 @@ func TestAccResourceSakuraCloudLoadBalancerServer(t *testing.T) {
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckSakuraCloudLoadBalancerServerDestroy,
 		Steps: []resource.TestStep{
-			resource.TestStep{
+			{
 				Config: testAccCheckSakuraCloudLoadBalancerServerConfig_basic,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckSakuraCloudLoadBalancerExists("sakuracloud_load_balancer.foobar", &loadBalancer),
@@ -32,7 +32,7 @@ func TestAccResourceSakuraCloudLoadBalancerServer(t *testing.T) {
 						"sakuracloud_load_balancer_server.server01", "enabled", "true"),
 				),
 			},
-			resource.TestStep{
+			{
 				Config: testAccCheckSakuraCloudLoadBalancerServerConfig_update,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckSakuraCloudLoadBalancerExists("sakuracloud_load_balancer.foobar", &loadBalancer),
@@ -50,7 +50,7 @@ func TestAccResourceSakuraCloudLoadBalancerServer(t *testing.T) {
 						"sakuracloud_load_balancer_server.server02", "enabled", "true"),
 				),
 			},
-			resource.TestStep{
+			{
 				Config: testAccCheckSakuraCloudLoadBalancerServerConfig_update,
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttr(
@@ -72,7 +72,7 @@ func testAccCheckSakuraCloudLoadBalancerServerDestroy(s *terraform.State) error 
 		_, err := client.LoadBalancer.Read(toSakuraCloudID(rs.Primary.ID))
 
 		if err == nil {
-			return fmt.Errorf("LoadBalancer still exists")
+			return errors.New("LoadBalancer still exists")
 		}
 	}
 

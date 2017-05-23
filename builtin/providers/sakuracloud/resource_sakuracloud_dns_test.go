@@ -1,6 +1,7 @@
 package sakuracloud
 
 import (
+	"errors"
 	"fmt"
 	"github.com/hashicorp/terraform/helper/resource"
 	"github.com/hashicorp/terraform/terraform"
@@ -16,7 +17,7 @@ func TestAccResourceSakuraCloudDNS(t *testing.T) {
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckSakuraCloudDNSDestroy,
 		Steps: []resource.TestStep{
-			resource.TestStep{
+			{
 				Config: testAccCheckSakuraCloudDNSConfig_basic,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckSakuraCloudDNSExists("sakuracloud_dns.foobar", &dns),
@@ -26,7 +27,7 @@ func TestAccResourceSakuraCloudDNS(t *testing.T) {
 						"sakuracloud_dns.foobar", "description", "DNS from TerraForm for SAKURA CLOUD"),
 				),
 			},
-			resource.TestStep{
+			{
 				Config: testAccCheckSakuraCloudDNSConfig_update,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckSakuraCloudDNSExists("sakuracloud_dns.foobar", &dns),
@@ -49,7 +50,7 @@ func testAccCheckSakuraCloudDNSExists(n string, dns *sacloud.DNS) resource.TestC
 		}
 
 		if rs.Primary.ID == "" {
-			return fmt.Errorf("No DNS ID is set")
+			return errors.New("No DNS ID is set")
 		}
 
 		client := testAccProvider.Meta().(*api.Client)
@@ -61,7 +62,7 @@ func testAccCheckSakuraCloudDNSExists(n string, dns *sacloud.DNS) resource.TestC
 		}
 
 		if foundDNS.ID != toSakuraCloudID(rs.Primary.ID) {
-			return fmt.Errorf("Record not found")
+			return errors.New("Record not found")
 		}
 
 		*dns = *foundDNS
@@ -81,7 +82,7 @@ func testAccCheckSakuraCloudDNSDestroy(s *terraform.State) error {
 		_, err := client.DNS.Read(toSakuraCloudID(rs.Primary.ID))
 
 		if err == nil {
-			return fmt.Errorf("DNS still exists")
+			return errors.New("DNS still exists")
 		}
 	}
 
