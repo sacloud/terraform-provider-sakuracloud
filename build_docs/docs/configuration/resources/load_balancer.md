@@ -60,7 +60,7 @@ resource "sakuracloud_load_balancer_server" "server02"{
 | `name`          | ◯   | ロードバランサ名 | -        | 文字列                         | - |
 | `switch_id`     | ◯   | スイッチID      | -        | 文字列                         | - |
 | `VRID`          | ◯   | VRID           | -        | 数値                          | - |
-| `is_double`     | -   | 冗長化          | `false`  | `true`<br />`false`           | - |
+| `high_availability`     | -   | 冗長化          | `false`  | `true`<br />`false`           | - |
 | `plan`          | -   | プラン          |`standard`| `standard`<br />`highspec`    | - |
 | `ipaddress1`    | ◯   | IPアドレス1     | -        | 文字列                         | - |
 | `ipaddress2`    | △   | IPアドレス2     | -        | 文字列                         | 冗長化構成の場合必須 |
@@ -79,7 +79,7 @@ resource "sakuracloud_load_balancer_server" "server02"{
 | `name`          | ロードバランサ名 | -                    |
 | `switch_id`     | スイッチID      | -                    |
 | `VRID`          | VRID           | -                     |
-| `is_double`     | 冗長化          | -                    |
+| `high_availability`     | 冗長化          | -                    |
 | `plan`          | プラン          | -                    |
 | `ipaddress1`    | IPアドレス1      | -                    |
 | `ipaddress2`    | IPアドレス2      | -                    |
