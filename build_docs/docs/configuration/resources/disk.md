@@ -75,5 +75,5 @@ v0.3.6以降では[DataResource](data_resource.md)を利用してください。
 | `description`       | 説明                    | -                                          |
 | `tags`              | タグ                    | -                                          |
 | `zone`              | ゾーン                  | -                                          |
-| `server_id`         | サーバーID               | 接続されているサーバーのID                     |
+| `server_id`         | サーバID               | 接続されているサーバのID                     |
 

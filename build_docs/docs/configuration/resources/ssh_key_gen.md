@@ -75,7 +75,7 @@ resource sakuracloud_disk "foobar" {
     # SSH接続時のパスワード/チャレンジレスポンス認証を無効化
     disable_pw_auth = true
 }
-# サーバーの定義
+# サーバの定義
 resource sakuracloud_server "foobar" {
     name = "foobar"
     disks = ["${sakuracloud_disk.foobar.id}"]

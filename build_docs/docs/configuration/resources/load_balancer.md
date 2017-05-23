@@ -1,17 +1,17 @@
-# ロードバランサー(sakuracloud_load_balancer)
+# ロードバランサ(sakuracloud_load_balancer)
 
 ---
 
 ### 設定例
 
 ```hcl
-# ロードバランサー上流のスイッチ
+# ロードバランサ上流のスイッチ
 resource "sakuracloud_switch" "sw" {
     name = "sw"
     zone = "tk1v"
 }
 
-# ロードバランサーの定義
+# ロードバランサの定義
 resource "sakuracloud_load_balancer" "foobar" {
     switch_id = "${sakuracloud_switch.sw.id}"
     VRID = 1
@@ -21,7 +21,7 @@ resource "sakuracloud_load_balancer" "foobar" {
     zone = "tk1v"
 }
 
-# ロードバランサーVIPの定義
+# ロードバランサVIPの定義
 resource "sakuracloud_load_balancer_vip" "vip1" {
     load_balancer_id = "${sakuracloud_load_balancer.foobar.id}"
     vip = "192.168.11.201"
@@ -29,7 +29,7 @@ resource "sakuracloud_load_balancer_vip" "vip1" {
     zone = "tk1v"
 }
 
-# ロードバランサーVIP配下の実サーバーの定義(1台目)
+# ロードバランサVIP配下の実サーバの定義(1台目)
 resource "sakuracloud_load_balancer_server" "server01"{
     load_balancer_vip_id = "${sakuracloud_load_balancer_vip.vip1.id}"
     ipaddress = "192.168.11.51"
@@ -38,7 +38,7 @@ resource "sakuracloud_load_balancer_server" "server01"{
     check_status = "200"
     zone = "tk1v"
 }
-# ロードバランサーVIP配下の実サーバーの定義(2台目)
+# ロードバランサVIP配下の実サーバの定義(2台目)
 resource "sakuracloud_load_balancer_server" "server02"{
     load_balancer_vip_id = "${sakuracloud_load_balancer_vip.vip1.id}"
     ipaddress = "192.168.11.52"
@@ -51,7 +51,7 @@ resource "sakuracloud_load_balancer_server" "server02"{
 
 ## `sakuracloud_load_balancer`
 
-ロードバランサー本体を表します。
+ロードバランサ本体を表します。
 
 ### パラメーター
 
@@ -88,13 +88,13 @@ resource "sakuracloud_load_balancer_server" "server02"{
 | `description`   | 説明             | -                   |
 | `tags`          | タグ             | -                  |
 | `zone`          | ゾーン           | -                   |
-| `vip_ids`       | VIP IDリスト     | ロードバランサー配下のVIPのIDリスト   |
+| `vip_ids`       | VIP IDリスト     | ロードバランサ配下のVIPのIDリスト   |
 
 ## `sakuracloud_load_balancer_vip`
 
-ロードバランサーが持つVIPを表します。
+ロードバランサが持つVIPを表します。
 
-1台のロードバランサーにつき4つまでのVIPを登録できます。
+1台のロードバランサにつき4つまでのVIPを登録できます。
 (詳細は[さくらのクラウドのマニュアル](https://help.sakura.ad.jp/app/answers/detail/a_id/2517)を参照ください。)
 
 ### パラメーター
@@ -105,7 +105,7 @@ resource "sakuracloud_load_balancer_server" "server02"{
 | `vip`              | ◯   | VIPアドレス     | -        | 文字列                         | - |
 | `port`             | ◯   | ポート番号      | -        | 数値                          | - |
 | `delay_loop`       | -   | チェック間隔秒数  | `10`    | `10`〜`2147483647`の整数           | - |
-| `sorry_server`     | -   | ソーリーサーバー  | -        | 文字列     | VIPに紐づく実サーバがすべてダウンした場合、<br />すべてのアクセスを指定したサーバに誘導します |
+| `sorry_server`     | -   | ソーリーサーバ  | -        | 文字列     | VIPに紐づく実サーバがすべてダウンした場合、<br />すべてのアクセスを指定したサーバに誘導します |
 | `zone`             | -   | ゾーン          | -        | `is1b`<br />`tk1a`<br />`tk1v` | - |
 
 
@@ -118,15 +118,15 @@ resource "sakuracloud_load_balancer_server" "server02"{
 | `vip`              | VIPアドレス      | -                    |
 | `port`             | ポート番号           | -                     |
 | `delay_loop`       | チェック間隔秒数          | -                    |
-| `sorry_server`     | ソーリーサーバー          | -                    |
+| `sorry_server`     | ソーリーサーバ          | -                    |
 | `zone`             | ゾーン           | -                   |
-| `servers`          | 実サーバーIDリスト           | 配下の実サーバーのIDリスト   |
+| `servers`          | 実サーバIDリスト           | 配下の実サーバのIDリスト   |
 
 ## `sakuracloud_load_balancer_server`
 
-ロードバランサーが持つVIP配下の実サーバーを表します。
+ロードバランサが持つVIP配下の実サーバを表します。
 
-1つのVIPにつき、40台までの実サーバーを登録できます。
+1つのVIPにつき、40台までの実サーバを登録できます。
 (詳細は[さくらのクラウドのマニュアル](https://help.sakura.ad.jp/app/answers/detail/a_id/2517)を参照ください。)
 
 ### パラメーター

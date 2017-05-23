@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>ルーター - Terraform for さくらのクラウド</title>
+  <title>ルータ - Terraform for さくらのクラウド</title>
   
 
   <link rel="shortcut icon" href="../../../img/favicon.ico">
@@ -21,7 +21,7 @@
   
   <script>
     // Current page data
-    var mkdocs_page_name = "ルーター";
+    var mkdocs_page_name = "ルータ";
   </script>
   
   <script src="../../../js/jquery-2.1.1.min.js"></script>
@@ -116,7 +116,7 @@
         
             
     <li class="toctree-l1 ">
-        <a class="" href="../server/">サーバー</a>
+        <a class="" href="../server/">サーバ</a>
         
     </li>
 
@@ -137,11 +137,11 @@
         
             
     <li class="toctree-l1 current">
-        <a class="current" href="./">ルーター</a>
+        <a class="current" href="./">ルータ</a>
         
             <ul>
             
-                <li class="toctree-l3"><a href="#sakuracloud_internet">ルーター(sakuracloud_internet)</a></li>
+                <li class="toctree-l3"><a href="#sakuracloud_internet">ルータ(sakuracloud_internet)</a></li>
                 
                     <li><a class="toctree-l4" href="#_1">設定例</a></li>
                 
@@ -178,14 +178,14 @@
         
             
     <li class="toctree-l1 ">
-        <a class="" href="../load_balancer/">ロードバランサー</a>
+        <a class="" href="../load_balancer/">ロードバランサ</a>
         
     </li>
 
         
             
     <li class="toctree-l1 ">
-        <a class="" href="../vpc_router/">VPCルーター</a>
+        <a class="" href="../vpc_router/">VPCルータ</a>
         
     </li>
 
@@ -293,7 +293,7 @@
         
       
     
-    <li>ルーター</li>
+    <li>ルータ</li>
     <li class="wy-breadcrumbs-aside">
       
         
@@ -305,7 +305,7 @@
           <div role="main">
             <div class="section">
               
-                <h1 id="sakuracloud_internet">ルーター(sakuracloud_internet)</h1>
+                <h1 id="sakuracloud_internet">ルータ(sakuracloud_internet)</h1>
 <hr />
 <h3 id="_1">設定例</h3>
 <pre><code class="hcl">resource &quot;sakuracloud_internet&quot; &quot;myrouter&quot; {
@@ -333,7 +333,7 @@
 <tr>
 <td><code>name</code></td>
 <td align="center">◯</td>
-<td>ルーター名</td>
+<td>ルータ名</td>
 <td align="center">-</td>
 <td>文字列</td>
 <td>-</td>
@@ -400,12 +400,12 @@
 <tbody>
 <tr>
 <td><code>id</code></td>
-<td>ルーターID</td>
+<td>ルータID</td>
 <td>-</td>
 </tr>
 <tr>
 <td><code>name</code></td>
-<td>ルーター名</td>
+<td>ルータ名</td>
 <td>-</td>
 </tr>
 <tr>
@@ -440,8 +440,8 @@
 </tr>
 <tr>
 <td><code>server_ids</code></td>
-<td>サーバーID</td>
-<td>接続されているサーバーのID(リスト)</td>
+<td>サーバID</td>
+<td>接続されているサーバのID(リスト)</td>
 </tr>
 <tr>
 <td><code>switch_id</code></td>
@@ -451,27 +451,27 @@
 <tr>
 <td><code>nw_address</code></td>
 <td>ネットワークアドレス</td>
-<td>ルーターに割り当てられたグローバルIPのネットワークアドレス</td>
+<td>ルータに割り当てられたグローバルIPのネットワークアドレス</td>
 </tr>
 <tr>
 <td><code>gateway</code></td>
 <td>ゲートウェイ</td>
-<td>ルーターに割り当てられたセグメントのゲートウェイIPアドレス</td>
+<td>ルータに割り当てられたセグメントのゲートウェイIPアドレス</td>
 </tr>
 <tr>
 <td><code>min_ipaddress</code></td>
 <td>最小IPアドレス</td>
-<td>ルーターに割り当てられたグローバルIPアドレスのうち、利用可能な先頭IPアドレス <a href="#ルーター-sakuracloud_internet_属性_注1">注1</a></td>
+<td>ルータに割り当てられたグローバルIPアドレスのうち、利用可能な先頭IPアドレス <a href="#ルータ-sakuracloud_internet_属性_注1">注1</a></td>
 </tr>
 <tr>
 <td><code>max_ipaddress</code></td>
 <td>最大IPアドレス</td>
-<td>ルーターに割り当てられたグローバルIPアドレスのうち、利用可能な最後尾IPアドレス <a href="#ルーター-sakuracloud_internet_属性_注1">注1</a></td>
+<td>ルータに割り当てられたグローバルIPアドレスのうち、利用可能な最後尾IPアドレス <a href="#ルータ-sakuracloud_internet_属性_注1">注1</a></td>
 </tr>
 <tr>
 <td><code>ipaddresses</code></td>
 <td>IPアドレスリスト</td>
-<td>ルーターに割り当てられたグローバルIPアドレスのうち、利用可能なIPアドレスのリスト <a href="#ルーター-sakuracloud_internet_属性_注1">注1</a></td>
+<td>ルータに割り当てられたグローバルIPアドレスのうち、利用可能なIPアドレスのリスト <a href="#ルータ-sakuracloud_internet_属性_注1">注1</a></td>
 </tr>
 <tr>
 <td><code>ipv6_prefix</code></td>

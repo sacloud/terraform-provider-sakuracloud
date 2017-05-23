@@ -93,10 +93,10 @@ data sakuracloud_archive "centos" {
 | `sakuracloud_disk`           | ディスク                | -                                          |
 | `sakuracloud_dns`            | DNS                    | -                                          |
 | `sakuracloud_gslb`           | GSLB                   | -                                          |
-| `sakuracloud_internet`       | ルーター                | -                                          |
+| `sakuracloud_internet`       | ルータ                | -                                          |
 | `sakuracloud_note`           | スタートアップスクリプト   | -                                          |
 | `sakuracloud_packet_filter`  | パケットフィルタ         | -                                          |
-| `sakuracloud_server`         | サーバー                | -                                          |
+| `sakuracloud_server`         | サーバ                | -                                          |
 | `sakuracloud_simple_monitor` | シンプル監視            | -                                          |
 | `sakuracloud_ssh_key`        | 公開鍵                 | -                                          |
 | `sakuracloud_subnet`         | サブネット              | -                                          |

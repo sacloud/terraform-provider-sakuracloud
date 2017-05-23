@@ -116,7 +116,7 @@
         
             
     <li class="toctree-l1 ">
-        <a class="" href="../server/">サーバー</a>
+        <a class="" href="../server/">サーバ</a>
         
     </li>
 
@@ -137,7 +137,7 @@
         
             
     <li class="toctree-l1 ">
-        <a class="" href="../internet/">ルーター</a>
+        <a class="" href="../internet/">ルータ</a>
         
     </li>
 
@@ -178,14 +178,14 @@
         
             
     <li class="toctree-l1 ">
-        <a class="" href="../load_balancer/">ロードバランサー</a>
+        <a class="" href="../load_balancer/">ロードバランサ</a>
         
     </li>
 
         
             
     <li class="toctree-l1 ">
-        <a class="" href="../vpc_router/">VPCルーター</a>
+        <a class="" href="../vpc_router/">VPCルータ</a>
         
     </li>
 
@@ -307,16 +307,16 @@
               
                 <h1 id="sakuracloud_subnet">サブネット(sakuracloud_subnet)</h1>
 <hr />
-<p>ルーター(<code>sakuracloud_internet</code>)に追加可能なグローバルIPアドレスブロックを表すリソースです。  </p>
+<p>ルータ(<code>sakuracloud_internet</code>)に追加可能なグローバルIPアドレスブロックを表すリソースです。  </p>
 <h3 id="_1">設定例</h3>
-<pre><code class="hcl"># ルーターの定義
+<pre><code class="hcl"># ルータの定義
 resource sakuracloud_internet &quot;foobar&quot; {
     name = &quot;router&quot;
 }
 
-# ルーターに追加するグローバルIPアドレスブロック
+# ルータに追加するグローバルIPアドレスブロック
 resource &quot;sakuracloud_subnet&quot; &quot;foobar&quot; {
-    # ルーターのID
+    # ルータのID
     internet_id = &quot;${sakuracloud_internet.foobar.id}&quot;
     # ネクストホップ
     next_hop = &quot;${sakuracloud_internet.foobar.nw_min_ipaddress}&quot;
@@ -339,7 +339,7 @@ resource &quot;sakuracloud_subnet&quot; &quot;foobar&quot; {
 <tr>
 <td><code>internet_id</code></td>
 <td align="center">◯</td>
-<td>ルーターID</td>
+<td>ルータID</td>
 <td align="center">-</td>
 <td>文字列</td>
 <td>-</td>
@@ -442,7 +442,7 @@ resource &quot;sakuracloud_subnet&quot; &quot;foobar&quot; {
         <a href="../packet_filter/" class="btn btn-neutral float-right" title="パケットフィルタ"/>Next <span class="icon icon-circle-arrow-right"></span></a>
       
       
-        <a href="../internet/" class="btn btn-neutral" title="ルーター"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../internet/" class="btn btn-neutral" title="ルータ"><span class="icon icon-circle-arrow-left"></span> Previous</a>
       
     </div>
   

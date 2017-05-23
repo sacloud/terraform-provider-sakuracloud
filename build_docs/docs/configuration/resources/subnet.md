@@ -2,19 +2,19 @@
 
 ---
 
-ルーター(`sakuracloud_internet`)に追加可能なグローバルIPアドレスブロックを表すリソースです。  
+ルータ(`sakuracloud_internet`)に追加可能なグローバルIPアドレスブロックを表すリソースです。  
 
 ### 設定例
 
 ```hcl
-# ルーターの定義
+# ルータの定義
 resource sakuracloud_internet "foobar" {
     name = "router"
 }
 
-# ルーターに追加するグローバルIPアドレスブロック
+# ルータに追加するグローバルIPアドレスブロック
 resource "sakuracloud_subnet" "foobar" {
-    # ルーターのID
+    # ルータのID
     internet_id = "${sakuracloud_internet.foobar.id}"
     # ネクストホップ
     next_hop = "${sakuracloud_internet.foobar.nw_min_ipaddress}"
@@ -25,7 +25,7 @@ resource "sakuracloud_subnet" "foobar" {
 
 |パラメーター         |必須  |名称                |初期値     |設定値                    |補足                                          |
 |-------------------|:---:|--------------------|:--------:|------------------------|----------------------------------------------|
-| `internet_id`     | ◯   | ルーターID           | -        | 文字列                  | - |
+| `internet_id`     | ◯   | ルータID           | -        | 文字列                  | - |
 | `nw_mask_len`     | -   | ネットワークマスク長  | `28` | `28`<br />`27`<br />`26` | グローバルIPのプリフィックス(ネットワークマスク長) |
 | `next_hop`        | -   | ネクストホップ| - | 文字列 | ネクストホップのIPv4アドレス |
 | `zone`            | -   | ゾーン | - | `is1b`<br />`tk1a`<br />`tk1v` | - |

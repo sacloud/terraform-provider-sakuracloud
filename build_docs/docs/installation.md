@@ -16,7 +16,7 @@
 # ~/terraformディレクトリ作成
 $ mkdir -p ~/terraform ; cd ~/terraform
 # ダウンロード
-$ curl -sL https://releases.hashicorp.com/terraform/0.9.4/terraform_0.9.4_darwin_amd64.zip > terraform.zip
+$ curl -sL https://releases.hashicorp.com/terraform/0.9.5/terraform_0.9.5_darwin_amd64.zip > terraform.zip
 # 展開
 $ unzip terraform.zip
 # パスを通す
