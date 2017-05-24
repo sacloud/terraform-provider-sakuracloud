@@ -7,7 +7,7 @@
 * Terraform
     * [https://www.terraform.io/](https://www.terraform.io/)
 * Terraform for さくらのクラウド
-    * [https://github.com/yamamoto-febc/terraform-provider-sakuracloud](https://github.com/yamamoto-febc/terraform-provider-sakuracloud)
+    * [https://github.com/sacloud/terraform-provider-sakuracloud](https://github.com/sacloud/terraform-provider-sakuracloud)
 
 ---
 

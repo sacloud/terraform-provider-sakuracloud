@@ -511,5 +511,5 @@
 			"revisionTime": "2016-09-27T10:08:44Z"
 		}
 	],
-	"rootPath": "github.com/yamamoto-febc/terraform-provider-sakuracloud"
+	"rootPath": "github.com/sacloud/terraform-provider-sakuracloud"
 }

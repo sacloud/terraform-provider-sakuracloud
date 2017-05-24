@@ -1,6 +1,6 @@
 # Terraform for さくらのクラウド
 
-[![Build Status](https://travis-ci.org/yamamoto-febc/terraform-provider-sakuracloud.svg?branch=master)](https://travis-ci.org/yamamoto-febc/terraform-provider-sakuracloud)
+[![Build Status](https://travis-ci.org/sacloud/terraform-provider-sakuracloud.svg?branch=master)](https://travis-ci.org/sacloud/terraform-provider-sakuracloud)
 
 Terraformからさくらのクラウドを操作するためのプラグインです。  
 このプラグインは`さくらインターネット公認ツール`としてさくらのクラウドユーザコミュニティによって開発されています。
@@ -14,7 +14,7 @@ Terraformからさくらのクラウドを操作するためのプラグイン�
   - SSH接続時のパスワード/チャレンジレスポンス認証を無効化(公開鍵認証のみに)
   - SSH用の公開鍵はさくらのクラウド上で生成(作成された秘密鍵はローカルマシンへ保存する)
 
-[Installation / インストール](https://yamamoto-febc.github.io/terraform-provider-sakuracloud/installation/)を参考に
+[Installation / インストール](https://sacloud.github.io/terraform-provider-sakuracloud/installation/)を参考に
 TerraformとTerraform for さくらのクラウドを手元のマシンにインストールしてください。
 
 インストール後、以下のコマンドを実行することでインフラ構築が行われます。
@@ -83,30 +83,30 @@ terraform apply
 ## ドキュメント
 
 * Terraform for さくらのクラウド ドキュメント
-    * https://yamamoto-febc.github.io/terraform-provider-sakuracloud/
+    * https://sacloud.github.io/terraform-provider-sakuracloud/
 
 ### サポートしているリソース/データソース
 
 #### リソース
-  - [サーバー](https://yamamoto-febc.github.io/terraform-provider-sakuracloud/configuration/resources/server/)
-  - [ディスク](https://yamamoto-febc.github.io/terraform-provider-sakuracloud//configuration/resources/disk/)
-  - [スイッチ](https://yamamoto-febc.github.io/terraform-provider-sakuracloud//configuration/resources/switch/)
-  - [ルーター](https://yamamoto-febc.github.io/terraform-provider-sakuracloud//configuration/resources/internet/)
-  - [パケットフィルタ](https://yamamoto-febc.github.io/terraform-provider-sakuracloud/configuration/resources/packet_filter/)
-  - [ブリッジ](https://yamamoto-febc.github.io/terraform-provider-sakuracloud/configuration/resources/bridge/)
-  - [ロードバランサー](https://yamamoto-febc.github.io/terraform-provider-sakuracloud/configuration/resources/load_balancer/)
-  - [VPCルーター](https://yamamoto-febc.github.io/terraform-provider-sakuracloud/configuration/resources/vpc_router/)
-  - [データベース](https://yamamoto-febc.github.io/terraform-provider-sakuracloud/configuration/resources/database/)
-  - [スタートアップスクリプト](https://yamamoto-febc.github.io/terraform-provider-sakuracloud/configuration/resources/note/)
-  - [公開鍵](https://yamamoto-febc.github.io/terraform-provider-sakuracloud/configuration/resources/ssh_key/)
-  - [公開鍵(生成)](https://yamamoto-febc.github.io/terraform-provider-sakuracloud/configuration/resources/ssh_key_gen/)
-  - [DNS](https://yamamoto-febc.github.io/terraform-provider-sakuracloud/configuration/resources/dns/)
-  - [GSLB](https://yamamoto-febc.github.io/terraform-provider-sakuracloud/configuration/resources/gslb/)
-  - [シンプル監視](https://yamamoto-febc.github.io/terraform-provider-sakuracloud/configuration/resources/simple_monitor/)
-  - [自動バックアップ](https://yamamoto-febc.github.io/terraform-provider-sakuracloud/configuration/resources/auto_backup/)
+  - [サーバー](https://sacloud.github.io/terraform-provider-sakuracloud/configuration/resources/server/)
+  - [ディスク](https://sacloud.github.io/terraform-provider-sakuracloud//configuration/resources/disk/)
+  - [スイッチ](https://sacloud.github.io/terraform-provider-sakuracloud//configuration/resources/switch/)
+  - [ルーター](https://sacloud.github.io/terraform-provider-sakuracloud//configuration/resources/internet/)
+  - [パケットフィルタ](https://sacloud.github.io/terraform-provider-sakuracloud/configuration/resources/packet_filter/)
+  - [ブリッジ](https://sacloud.github.io/terraform-provider-sakuracloud/configuration/resources/bridge/)
+  - [ロードバランサー](https://sacloud.github.io/terraform-provider-sakuracloud/configuration/resources/load_balancer/)
+  - [VPCルーター](https://sacloud.github.io/terraform-provider-sakuracloud/configuration/resources/vpc_router/)
+  - [データベース](https://sacloud.github.io/terraform-provider-sakuracloud/configuration/resources/database/)
+  - [スタートアップスクリプト](https://sacloud.github.io/terraform-provider-sakuracloud/configuration/resources/note/)
+  - [公開鍵](https://sacloud.github.io/terraform-provider-sakuracloud/configuration/resources/ssh_key/)
+  - [公開鍵(生成)](https://sacloud.github.io/terraform-provider-sakuracloud/configuration/resources/ssh_key_gen/)
+  - [DNS](https://sacloud.github.io/terraform-provider-sakuracloud/configuration/resources/dns/)
+  - [GSLB](https://sacloud.github.io/terraform-provider-sakuracloud/configuration/resources/gslb/)
+  - [シンプル監視](https://sacloud.github.io/terraform-provider-sakuracloud/configuration/resources/simple_monitor/)
+  - [自動バックアップ](https://sacloud.github.io/terraform-provider-sakuracloud/configuration/resources/auto_backup/)
 
 #### データソース
-  - [データソース](http://yamamoto-febc.github.io/terraform-provider-sakuracloud/configuration/resources/data_resource/)
+  - [データソース](http://sacloud.github.io/terraform-provider-sakuracloud/configuration/resources/data_resource/)
 
 
 ## Building/Developing
@@ -170,4 +170,4 @@ terraform apply
 
 ## Author
 
-  * Kazumichi Yamamoto ([@yamamoto-febc](https://github.com/yamamoto-febc))
+  * Kazumichi Yamamoto ([@yamamoto-febc](https://github.com/sacloud))

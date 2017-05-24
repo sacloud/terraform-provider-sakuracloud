@@ -20,10 +20,10 @@ class TerraformProviderSakuracloud < Formula
   sha256_src = "${SHA256_SRC}"
 
   desc "Terraform provider plugin for SakuraCloud"
-  homepage "https://github.com/yamamoto-febc/terraform-provider-sakuracloud"
-  url "https://github.com/yamamoto-febc/terraform-provider-sakuracloud/releases/download/v#{_version}/terraform-provider-sakuracloud_darwin-amd64.zip"
+  homepage "https://github.com/sacloud/terraform-provider-sakuracloud"
+  url "https://github.com/sacloud/terraform-provider-sakuracloud/releases/download/v#{_version}/terraform-provider-sakuracloud_darwin-amd64.zip"
   sha256 sha256_src
-  head "https://github.com/yamamoto-febc/terraform-provider-sakuracloud.git"
+  head "https://github.com/sacloud/terraform-provider-sakuracloud.git"
   version _version
 
   depends_on "terraform" => :run
