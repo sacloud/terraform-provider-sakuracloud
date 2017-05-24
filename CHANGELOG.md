@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.10.0 (2017-05-24)
+
+* golint導入 #128 (yamamoto-febc)
+* データベースアプライアンス更新 #129 (yamamoto-febc)
+* ロードバランサでの属性名変更 #130 (yamamoto-febc)
+* ドキュメントでの音引き表記揺れ #131 (yamamoto-febc)
+* sacloud配下へのリポジトリ移転 #132 (yamamoto-febc)
+
+
 ## 0.9.1 (2017-05-12)
 
 * Pleskパブリックアーカイブ追加 #125 (yamamoto-febc)
