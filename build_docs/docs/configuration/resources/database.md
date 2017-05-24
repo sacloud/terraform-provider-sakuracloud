@@ -10,7 +10,6 @@ resource "sakuracloud_database" "foobar" {
 
     database_type = "postgresql"
     plan = "10g"
-    admin_password = "DatabasePasswordAdmin397"
     user_name = "defuser"
     user_password = "DatabasePasswordUser397"
 
@@ -44,7 +43,6 @@ resource "sakuracloud_database" "foobar" {
 | `name`          | ◯   | データベース名   | -        | 文字列                         | - |
 | `database_type` | -   | データベースタイプ| `postgresql`| `postgresql`<br />`mariadb`  | - |
 | `plan`          | -   | プラン           | `10g`| `10g`<br />`30g`<br />`90g`<br />`240g`  | - |
-| `admin_password`| ◯   | 管理者パスワード  | -        | 文字列                         | - |
 | `user_name`     | ◯   | ユーザー名       | -        | 文字列                         | - |
 | `user_password` | ◯   | パスワード       | -        | 文字列                         | - |
 | `allow_networks`| -   | 送信元ネットワーク | -        | リスト(文字列)、`xxx.xxx.xxx.xxx`、または`xxx.xxx.xxx.xxx/nn`形式 | 接続を許可するネットワークアドレスを指定する |
@@ -67,7 +65,6 @@ resource "sakuracloud_database" "foobar" {
 | `name`          | データベース名 | -                    |
 | `database_type`  | データベースタイプ | -                    |
 | `plan`             | プラン| -                    |
-| `admin_password`| 管理者パスワード | -                    |
 | `user_name`     | ユーザー名       | -                    |
 | `user_password` | パスワード       | -                    |
 | `allow_networks`| 送信元ネットワーク       | -                    |
