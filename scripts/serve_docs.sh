@@ -12,7 +12,7 @@ fi
 docker build -t $DOCKER_IMAGE_NAME -f scripts/Dockerfile.docs .
 
 docker run --name $DOCKER_CONTAINER_NAME \
-       -v $PWD/build_docs/:/go/src/github.com/yamamoto-febc/terraform-provider-sakuracloud/build_docs \
+       -v $PWD/build_docs/:/go/src/github.com/sacloud/terraform-provider-sakuracloud/build_docs \
        -p 80:80 \
        $DOCKER_IMAGE_NAME serve --dev-addr=0.0.0.0:80
 

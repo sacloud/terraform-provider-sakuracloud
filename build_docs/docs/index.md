@@ -1,4 +1,4 @@
-# Terraform for さくらのクラウド ドキュメント
+# Terraform for さくらのクラウド
 
 ---
 

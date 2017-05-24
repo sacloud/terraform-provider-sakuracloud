@@ -67,7 +67,7 @@ Available commands are:
 - 2) terraformバイナリと同じディレクトリに展開します。
 
 > Note:  
-Terraform for さくらのクラウドのバイナリーファイルは[GitHub上のリリースページ](https://github.com/yamamoto-febc/terraform-provider-sakuracloud/releases/latest)でも配布しています。
+Terraform for さくらのクラウドのバイナリーファイルは[GitHub上のリリースページ](https://github.com/sacloud/terraform-provider-sakuracloud/releases/latest)でも配布しています。
 
 #### terraform for さくらのクラウド インストール
 
@@ -126,8 +126,8 @@ $ docker run -it --rm \
 #### docker-composeでの実行
 ```bash
 # あらかじめ以下コマンドで必要な設定ファイルをダウンロード/編集しておく
-# curl -LO https://github.com/yamamoto-febc/terraform-for-sakuracloud-docker/raw/master/docker-compose.yml
-# curl -L https://github.com/yamamoto-febc/terraform-for-sakuracloud-docker/raw/master/env-sample > .env
+# curl -LO https://github.com/sacloud/terraform-for-sakuracloud-docker/raw/master/docker-compose.yml
+# curl -L https://github.com/sacloud/terraform-for-sakuracloud-docker/raw/master/env-sample > .env
 
 $ docker-compose run --rm terraform apply
 ```
