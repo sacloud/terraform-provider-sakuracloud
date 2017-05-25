@@ -48,11 +48,12 @@ resource "sakuracloud_server" "myserver" {
 | `nic` | - | 基本NIC | `shared` | `shared`(共有セグメント)<br />`[switch_id]`(スイッチのID)<br />`""`(接続なし)|eth0の上流NWとの接続方法を指定する。 |
 | `additional_nics` | - | 追加NIC | - | リスト(文字列) | 追加で割り当てるNIC。接続するスイッチのID、または空文字を指定する。 |
 | `packet_filter_ids`| - | パケットフィルタID | - | リスト(文字列) | NICに適用するパケットフィルタのIDをリストで指定する。リストの先頭からeth0,eth1の順で適用される |
-| `description` | - | 説明 | - | 文字列 | - |
 | `cdrom_id` | - | CDROM(ISOイメージ)ID | - | 文字列 | - |
+| `private_host_id` | - | 専有ホストID | - | 文字列 | 専有ホストは東京第１ゾーン(tk1a)でのみ利用可能 |
 | `ipaddress`| - | 基本NIC-IPアドレス | - | 文字列 | [注1](#注1) |
 | `gateway`  | - | 基本NIC-ゲートウェイ | - | 文字列 | [注1](#注1) |
 | `nw_mask_len` | - | 基本NIC-サブネットマスク長 | - | 文字列 | [注1](#注1) |
+| `description` | - | 説明 | - | 文字列 | - |
 | `tags` | - | タグ | - | リスト(文字列) | サーバに付与するタグ。@で始まる特殊タグについては[こちら](http://cloud-news.sakura.ad.jp/special-tags/)を参照 |
 | `zone` | - | ゾーン | - | `is1b`<br />`tk1a`<br />`tk1v` | - |
 
@@ -74,6 +75,8 @@ resource "sakuracloud_server" "myserver" {
 | `nic`                   | 基本NIC                  | -                                         |
 | `additional_nics`       | 追加NIC                  | -                                         |
 | `packet_filter_ids`     | パケットフィルタID         | -                                         |
+| `cdrom_id`              | CDROM(ISOイメージ)ID         | -                                         |
+| `private_host_id`       | 専有ホストID              | -                                         |
 | `description`           | 説明                     | -                                         |
 | `tags`                  | タグ                     | -                                         |
 | `zone`                  | ゾーン                    | -                                         |
