@@ -59,6 +59,11 @@ func resourceSakuraCloudServer() *schema.Resource {
 				Optional:     true,
 				ValidateFunc: validateSakuracloudIDType,
 			},
+			"private_host_id": {
+				Type:         schema.TypeString,
+				Optional:     true,
+				ValidateFunc: validateSakuracloudIDType,
+			},
 			"additional_interfaces": {
 				Type:          schema.TypeList,
 				Optional:      true,
@@ -242,6 +247,11 @@ func resourceSakuraCloudServerCreate(d *schema.ResourceData, meta interface{}) e
 		}
 	}
 
+	if rawPrivateHostID, ok := d.GetOk("private_host_id"); ok {
+		privateHostID := rawPrivateHostID.(string)
+		opts.SetPrivateHostByID(toSakuraCloudID(privateHostID))
+	}
+
 	server, err := client.Server.Create(opts)
 	if err != nil {
 		return fmt.Errorf("Failed to create SakuraCloud Server resource: %s", err)
@@ -396,7 +406,8 @@ func resourceSakuraCloudServerUpdate(r *schema.ResourceData, meta interface{}) e
 	}
 
 	if d.HasChange("disks") || d.HasChange("nic") || d.HasChange("additional_nics") ||
-		d.HasChange("ipaddress") || d.HasChange("gateway") || d.HasChange("nw_mask_len") {
+		d.HasChange("ipaddress") || d.HasChange("gateway") || d.HasChange("nw_mask_len") ||
+		d.HasChange("private_host_id") {
 		isNeedRestart = true
 	}
 
@@ -590,6 +601,19 @@ func resourceSakuraCloudServerUpdate(r *schema.ResourceData, meta interface{}) e
 		}
 	}
 
+	if d.HasChange("private_host_id") {
+		if rawPrivateHostID, ok := d.GetOk("private_host_id"); ok {
+			privateHostID := rawPrivateHostID.(string)
+			if privateHostID == "" {
+				server.ClearPrivateHost()
+			} else {
+				server.SetPrivateHostByID(toSakuraCloudID(privateHostID))
+			}
+		} else {
+			server.ClearPrivateHost()
+		}
+	}
+
 	server, err = client.Server.Update(toSakuraCloudID(d.Id()), server)
 	if err != nil {
 		return fmt.Errorf("Error updating SakuraCloud Server resource: %s", err)
@@ -731,6 +755,10 @@ func setServerResourceData(d *schema.ResourceData, client *api.Client, data *sac
 
 	if data.Instance.CDROM != nil {
 		d.Set("cdrom_id", data.Instance.CDROM.GetStrID())
+	}
+
+	if data.PrivateHost != nil && data.PrivateHost.ID > 0 {
+		d.Set("private_host_id", data.PrivateHost.GetStrID())
 	}
 
 	hasSharedInterface := len(data.Interfaces) > 0 && data.Interfaces[0].Switch != nil
