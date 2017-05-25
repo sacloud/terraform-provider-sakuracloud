@@ -8,5 +8,4 @@ type Account struct {
 	ID       string `json:",omitempty"` // リソースID
 	Class    string `json:",omitempty"` // リソースクラス
 	Code     string `json:",omitempty"` // アカウントコード
-
 }

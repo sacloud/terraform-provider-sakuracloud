@@ -166,6 +166,10 @@
                 </li>
                 <li class="toctree-l3">
                     
+    <a class="" href="../private_host/">専有ホスト</a>
+                </li>
+                <li class="toctree-l3">
+                    
     <a class="" href="../dns/">DNS</a>
                 </li>
                 <li class="toctree-l3">
@@ -340,20 +344,20 @@
 <td>NICに適用するパケットフィルタのIDをリストで指定する。リストの先頭からeth0,eth1の順で適用される</td>
 </tr>
 <tr>
-<td><code>description</code></td>
-<td align="center">-</td>
-<td>説明</td>
-<td align="center">-</td>
-<td>文字列</td>
-<td>-</td>
-</tr>
-<tr>
 <td><code>cdrom_id</code></td>
 <td align="center">-</td>
 <td>CDROM(ISOイメージ)ID</td>
 <td align="center">-</td>
 <td>文字列</td>
 <td>-</td>
+</tr>
+<tr>
+<td><code>private_host_id</code></td>
+<td align="center">-</td>
+<td>専有ホストID</td>
+<td align="center">-</td>
+<td>文字列</td>
+<td>専有ホストは東京第１ゾーン(tk1a)でのみ利用可能</td>
 </tr>
 <tr>
 <td><code>ipaddress</code></td>
@@ -378,6 +382,14 @@
 <td align="center">-</td>
 <td>文字列</td>
 <td><a href="#注1">注1</a></td>
+</tr>
+<tr>
+<td><code>description</code></td>
+<td align="center">-</td>
+<td>説明</td>
+<td align="center">-</td>
+<td>文字列</td>
+<td>-</td>
 </tr>
 <tr>
 <td><code>tags</code></td>
@@ -449,6 +461,16 @@
 <tr>
 <td><code>packet_filter_ids</code></td>
 <td>パケットフィルタID</td>
+<td>-</td>
+</tr>
+<tr>
+<td><code>cdrom_id</code></td>
+<td>CDROM(ISOイメージ)ID</td>
+<td>-</td>
+</tr>
+<tr>
+<td><code>private_host_id</code></td>
+<td>専有ホストID</td>
 <td>-</td>
 </tr>
 <tr>

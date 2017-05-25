@@ -14,6 +14,7 @@ type Server struct {
 	propDisks             // ディスク配列
 	propInstance          // インスタンス
 	propInterfaces        // インターフェース配列
+	propPrivateHost       // 専有ホスト
 	propIcon              // アイコン
 	propTags              // タグ
 	propCreatedAt         // 作成日時

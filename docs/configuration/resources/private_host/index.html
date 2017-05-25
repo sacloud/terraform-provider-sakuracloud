@@ -8,7 +8,7 @@
   
   <meta name="author" content="@yamamoto-febc">
   <link rel="shortcut icon" href="../../../img/favicon.ico">
-  <title>DNS - Terraform for さくらのクラウド</title>
+  <title>専有ホスト - Terraform for さくらのクラウド</title>
   <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
 
   <link rel="stylesheet" href="../../../css/theme.css" type="text/css" />
@@ -18,9 +18,9 @@
   
   <script>
     // Current page data
-    var mkdocs_page_name = "DNS";
-    var mkdocs_page_input_path = "configuration/resources/dns.md";
-    var mkdocs_page_url = "/configuration/resources/dns/";
+    var mkdocs_page_name = "\u5c02\u6709\u30db\u30b9\u30c8";
+    var mkdocs_page_input_path = "configuration/resources/private_host.md";
+    var mkdocs_page_url = "/configuration/resources/private_host/";
   </script>
   
   <script src="../../../js/jquery-2.1.1.min.js"></script>
@@ -148,29 +148,29 @@
                     
     <a class="" href="../ssh_key_gen/">公開鍵(生成)</a>
                 </li>
-                <li class="toctree-l3">
-                    
-    <a class="" href="../private_host/">専有ホスト</a>
-                </li>
                 <li class="toctree-l3 current">
                     
-    <a class="current" href="./">DNS</a>
+    <a class="current" href="./">専有ホスト</a>
     <ul class="subnav">
             
-    <li class="toctree-l4"><a href="#dnssakuracloud_dns-record">DNS(sakuracloud_dns / record)</a></li>
+    <li class="toctree-l4"><a href="#sakuracloud_private_host">専有ホスト(sakuracloud_private_host)</a></li>
     
         <ul>
         
             <li><a class="toctree-l5" href="#_1">設定例</a></li>
         
-            <li><a class="toctree-l5" href="#sakuracloud_dns">sakuracloud_dns</a></li>
+            <li><a class="toctree-l5" href="#_2">パラメーター</a></li>
         
-            <li><a class="toctree-l5" href="#sakuracloud_dns_record">sakuracloud_dns_record</a></li>
+            <li><a class="toctree-l5" href="#_3">属性</a></li>
         
         </ul>
     
 
     </ul>
+                </li>
+                <li class="toctree-l3">
+                    
+    <a class="" href="../dns/">DNS</a>
                 </li>
                 <li class="toctree-l3">
                     
@@ -229,7 +229,7 @@
         
       
     
-    <li>DNS</li>
+    <li>専有ホスト</li>
     <li class="wy-breadcrumbs-aside">
       
     </li>
@@ -239,29 +239,16 @@
           <div role="main">
             <div class="section">
               
-                <h1 id="dnssakuracloud_dns-record">DNS(sakuracloud_dns / record)</h1>
+                <h1 id="sakuracloud_private_host">専有ホスト(sakuracloud_private_host)</h1>
 <hr />
-<p><strong>全ゾーン共通のグローバルリソースです。</strong></p>
-<p><code>sakuracloud_dns</code>がDNSゾーン設定を、<code>sakuracloud_dns_record</code>が対象ゾーン内のレコードを表しています。</p>
 <h3 id="_1">設定例</h3>
-<pre><code class="hcl">resource &quot;sakuracloud_dns&quot; &quot;dns&quot; {
-    zone = &quot;example.com&quot;
-}
-resource &quot;sakuracloud_dns_record&quot; &quot;record01&quot; {
-    dns_id = &quot;${sakuracloud_dns.dns.id}&quot;
-    name = &quot;test1&quot;
-    type = &quot;A&quot;
-    value = &quot;192.168.0.1&quot;
-}
-resource &quot;sakuracloud_dns_record&quot; &quot;record02&quot; {
-    dns_id = &quot;${sakuracloud_dns.dns.id}&quot;
-    name = &quot;test1&quot;
-    type = &quot;A&quot;
-    value = &quot;192.168.0.2&quot;
+<pre><code class="hcl">resource &quot;sakuracloud_private_host&quot; &quot;private_host&quot; {
+    name = &quot;private_host&quot;
+    description = &quot;PrivateHost from terraform for SAKURA CLOUD&quot;
+    tags = [&quot;tag1&quot; , &quot;tag2&quot;]
 }
 </code></pre>
 
-<h2 id="sakuracloud_dns"><code>sakuracloud_dns</code></h2>
 <h3 id="_2">パラメーター</h3>
 <table>
 <thead>
@@ -276,9 +263,9 @@ resource &quot;sakuracloud_dns_record&quot; &quot;record02&quot; {
 </thead>
 <tbody>
 <tr>
-<td><code>zone</code></td>
+<td><code>name</code></td>
 <td align="center">◯</td>
-<td>対象DNSゾーン</td>
+<td>専有ホスト名</td>
 <td align="center">-</td>
 <td>文字列</td>
 <td>-</td>
@@ -299,6 +286,14 @@ resource &quot;sakuracloud_dns_record&quot; &quot;record02&quot; {
 <td>リスト(文字列)</td>
 <td>-</td>
 </tr>
+<tr>
+<td><code>zone</code></td>
+<td align="center">-</td>
+<td>ゾーン</td>
+<td align="center">-</td>
+<td><code>is1b</code><br /><code>tk1a</code></td>
+<td>-</td>
+</tr>
 </tbody>
 </table>
 <h3 id="_3">属性</h3>
@@ -313,12 +308,12 @@ resource &quot;sakuracloud_dns_record&quot; &quot;record02&quot; {
 <tbody>
 <tr>
 <td><code>id</code></td>
-<td>ID</td>
+<td>専有ホストID</td>
 <td>-</td>
 </tr>
 <tr>
-<td><code>zone</code></td>
-<td>対象DNSゾーン</td>
+<td><code>name</code></td>
+<td>専有ホスト名</td>
 <td>-</td>
 </tr>
 <tr>
@@ -332,145 +327,18 @@ resource &quot;sakuracloud_dns_record&quot; &quot;record02&quot; {
 <td>-</td>
 </tr>
 <tr>
-<td><code>dns_servers</code></td>
-<td>DNSサーバ</td>
-<td>対象DNSゾーンの委譲先となるネームサーバのリスト</td>
-</tr>
-</tbody>
-</table>
-<h2 id="sakuracloud_dns_record"><code>sakuracloud_dns_record</code></h2>
-<h3 id="_4">パラメーター</h3>
-<table>
-<thead>
-<tr>
-<th>パラメーター</th>
-<th align="center">必須</th>
-<th>名称</th>
-<th align="center">初期値</th>
-<th>設定値</th>
-<th>補足</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>dns_id</code></td>
-<td align="center">◯</td>
-<td>DNSゾーンID</td>
-<td align="center">-</td>
-<td>文字列</td>
-<td>対象DNSゾーンのID</td>
-</tr>
-<tr>
-<td><code>name</code></td>
-<td align="center">◯</td>
-<td>レコード名</td>
-<td align="center">-</td>
-<td><code>ホスト名</code><br /><code>@</code></td>
-<td>英字（小文字）,数字,一部記号（-.@_*）,1～63文字, @は当該ゾーンを示す。</td>
-</tr>
-<tr>
-<td><code>type</code></td>
-<td align="center">◯</td>
-<td>タイプ</td>
-<td align="center">-</td>
-<td><code>A</code><br /><code>AAAA</code><br /><code>NS</code><br /><code>CNAME</code><br /><code>MX</code><br /><code>TXT</code><br /><code>SRV</code></td>
+<td><code>zone</code></td>
+<td>ゾーン</td>
 <td>-</td>
 </tr>
 <tr>
-<td><code>value</code></td>
-<td align="center">◯</td>
-<td>値</td>
-<td align="center">-</td>
-<td>文字列</td>
-<td>タイプ<code>A</code>:IPアドレス<br />タイプ<code>AAAA</code>:IPv6アドレス<br /><code>NS</code>:一部記号（<em>）, 末尾ピリオド, 1～63文字<br />タイプ<code>CNAME</code>:一部記号（</em>）, 末尾ピリオド, 1～63文字<br />タイプ<code>MX</code>:一部記号（<em>）, 末尾ピリオド, 1～63文字<br />タイプ<code>TXT</code>:英字, 数字, 半角スペース, 一部記号, 1～255文字<br />タイプ<code>SRV</code>:一部記号（</em>.-）, 末尾ピリオド, 1～63文字</td>
-</tr>
-<tr>
-<td><code>ttl</code></td>
-<td align="center">-</td>
-<td>TTL</td>
-<td align="center"><code>3600</code></td>
-<td>数値</td>
-<td><code>10</code>～<code>3600000</code>秒</td>
-</tr>
-<tr>
-<td><code>priority</code></td>
-<td align="center">-</td>
-<td>プライオリティ</td>
-<td align="center"><code>10</code></td>
-<td>数値</td>
-<td>タイプが<code>MX</code>、<code>SRV</code>の場合のみ有効。<code>1</code>〜<code>65535</code></td>
-</tr>
-<tr>
-<td><code>weight</code></td>
-<td align="center">-</td>
-<td>重み</td>
-<td align="center">-</td>
-<td>数値</td>
-<td>タイプが<code>SRV</code>の場合のみ有効。<code>0</code>〜<code>65535</code></td>
-</tr>
-<tr>
-<td><code>port</code></td>
-<td align="center">-</td>
-<td>ポート</td>
-<td align="center">-</td>
-<td>数値</td>
-<td>タイプが<code>SRV</code>の場合のみ有効。<code>1</code>〜<code>65535</code></td>
-</tr>
-</tbody>
-</table>
-<h3 id="_5">属性</h3>
-<table>
-<thead>
-<tr>
-<th>属性名</th>
-<th>名称</th>
-<th>補足</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>id</code></td>
-<td>ID</td>
+<td><code>assigned_core</code></td>
+<td>割当済みコア数</td>
 <td>-</td>
 </tr>
 <tr>
-<td><code>dns_id</code></td>
-<td>DNSゾーンID</td>
-<td>-</td>
-</tr>
-<tr>
-<td><code>name</code></td>
-<td>レコード名</td>
-<td>-</td>
-</tr>
-<tr>
-<td><code>type</code></td>
-<td>タイプ</td>
-<td>-</td>
-</tr>
-<tr>
-<td><code>value</code></td>
-<td>値</td>
-<td>-</td>
-</tr>
-<tr>
-<td><code>ttl</code></td>
-<td>TTL</td>
-<td>-</td>
-</tr>
-<tr>
-<td><code>priority</code></td>
-<td>プライオリティ</td>
-<td>-</td>
-</tr>
-<tr>
-<td><code>weight</code></td>
-<td>重み</td>
-<td>-</td>
-</tr>
-<tr>
-<td><code>port</code></td>
-<td>ポート</td>
+<td><code>assigned_memory</code></td>
+<td>割当済みメモリ(GB単位)</td>
 <td>-</td>
 </tr>
 </tbody>
@@ -482,10 +350,10 @@ resource &quot;sakuracloud_dns_record&quot; &quot;record02&quot; {
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="../gslb/" class="btn btn-neutral float-right" title="GSLB">Next <span class="icon icon-circle-arrow-right"></span></a>
+        <a href="../dns/" class="btn btn-neutral float-right" title="DNS">Next <span class="icon icon-circle-arrow-right"></span></a>
       
       
-        <a href="../private_host/" class="btn btn-neutral" title="専有ホスト"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../ssh_key_gen/" class="btn btn-neutral" title="公開鍵(生成)"><span class="icon icon-circle-arrow-left"></span> Previous</a>
       
     </div>
   
@@ -513,10 +381,10 @@ resource &quot;sakuracloud_dns_record&quot; &quot;record02&quot; {
     <span class="rst-current-version" data-toggle="rst-current-version">
       
       
-        <span><a href="../private_host/" style="color: #fcfcfc;">&laquo; Previous</a></span>
+        <span><a href="../ssh_key_gen/" style="color: #fcfcfc;">&laquo; Previous</a></span>
       
       
-        <span style="margin-left: 15px"><a href="../gslb/" style="color: #fcfcfc">Next &raquo;</a></span>
+        <span style="margin-left: 15px"><a href="../dns/" style="color: #fcfcfc">Next &raquo;</a></span>
       
     </span>
 </div>

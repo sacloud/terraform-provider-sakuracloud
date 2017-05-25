@@ -96,6 +96,7 @@ data sakuracloud_archive "centos" {
 | `sakuracloud_internet`       | ルータ                | -                                          |
 | `sakuracloud_note`           | スタートアップスクリプト   | -                                          |
 | `sakuracloud_packet_filter`  | パケットフィルタ         | -                                          |
+| `sakuracloud_private_host`   | 専有ホスト              | -                                          |
 | `sakuracloud_server`         | サーバ                | -                                          |
 | `sakuracloud_simple_monitor` | シンプル監視            | -                                          |
 | `sakuracloud_ssh_key`        | 公開鍵                 | -                                          |
