@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.10.1 (2017-05-29)
+
+* Update database docs #136 (yamamoto-febc)
+* TravisCI上でのgolintインストール #138 (yamamoto-febc)
+* ディスクリソースでの属性名変更 #140 (yamamoto-febc)
+
+
 ## 0.10.0 (2017-05-24)
 
 * golint導入 #128 (yamamoto-febc)
