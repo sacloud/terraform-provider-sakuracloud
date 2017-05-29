@@ -32,7 +32,7 @@ func resourceSakuraCloudDisk() *schema.Resource {
 				Default:      "ssd",
 				ValidateFunc: validateStringInWord([]string{"ssd", "hdd"}),
 			},
-			"connection": {
+			"connector": {
 				Type:     schema.TypeString,
 				Optional: true,
 				ForceNew: true,
@@ -141,7 +141,7 @@ func resourceSakuraCloudDiskCreate(d *schema.ResourceData, meta interface{}) err
 		return fmt.Errorf("invalid disk plan [%s]", plan)
 	}
 
-	opts.Connection = sacloud.EDiskConnection(d.Get("connection").(string))
+	opts.Connection = sacloud.EDiskConnection(d.Get("connector").(string))
 
 	archiveID, ok := d.GetOk("source_archive_id")
 	if ok {
@@ -434,7 +434,7 @@ func setDiskResourceData(d *schema.ResourceData, client *api.Client, data *saclo
 
 	}
 
-	d.Set("connection", fmt.Sprintf("%s", data.Connection))
+	d.Set("connector", fmt.Sprintf("%s", data.Connection))
 	d.Set("size", data.SizeMB*units.MiB/units.GiB)
 	d.Set("description", data.Description)
 	d.Set("tags", data.Tags)

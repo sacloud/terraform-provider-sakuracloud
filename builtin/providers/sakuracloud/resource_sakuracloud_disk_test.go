@@ -24,6 +24,12 @@ func TestAccResourceSakuraCloudDisk(t *testing.T) {
 					testAccCheckSakuraCloudDiskAttributes(&disk),
 					resource.TestCheckResourceAttr(
 						"sakuracloud_disk.foobar", "name", "mydisk"),
+					resource.TestCheckResourceAttr(
+						"sakuracloud_disk.foobar", "plan", "ssd"),
+					resource.TestCheckResourceAttr(
+						"sakuracloud_disk.foobar", "connector", "virtio"),
+					resource.TestCheckResourceAttr(
+						"sakuracloud_disk.foobar", "size", "20"),
 					resource.TestCheckNoResourceAttr(
 						"sakuracloud_disk.foobar", "disable_pw_auth"),
 				),
@@ -35,6 +41,12 @@ func TestAccResourceSakuraCloudDisk(t *testing.T) {
 					testAccCheckSakuraCloudDiskAttributes(&disk),
 					resource.TestCheckResourceAttr(
 						"sakuracloud_disk.foobar", "name", "mydisk"),
+					resource.TestCheckResourceAttr(
+						"sakuracloud_disk.foobar", "plan", "ssd"),
+					resource.TestCheckResourceAttr(
+						"sakuracloud_disk.foobar", "connector", "virtio"),
+					resource.TestCheckResourceAttr(
+						"sakuracloud_disk.foobar", "size", "20"),
 					resource.TestCheckResourceAttr(
 						"sakuracloud_disk.foobar", "disable_pw_auth", "true"),
 				),
@@ -76,7 +88,7 @@ func testAccCheckSakuraCloudDiskAttributes(disk *sacloud.Disk) resource.TestChec
 	return func(s *terraform.State) error {
 
 		if disk.Connection != sacloud.DiskConnectionVirtio {
-			return fmt.Errorf("Bad disk connection: %v", disk.Connection)
+			return fmt.Errorf("Bad disk connector: %v", disk.Connection)
 		}
 
 		if disk.Plan.ID != sacloud.DiskPlanSSD.ID {
@@ -113,6 +125,9 @@ data "sakuracloud_archive" "ubuntu" {
 }
 resource "sakuracloud_disk" "foobar" {
     name = "mydisk"
+    plan = "ssd"
+    connector = "virtio"
+    size = 20
     source_archive_id = "${data.sakuracloud_archive.ubuntu.id}"
     description = "Disk from TerraForm for SAKURA CLOUD"
     tags = ["hoge1" , "hoge2"]
@@ -128,6 +143,9 @@ data "sakuracloud_archive" "ubuntu" {
 }
 resource "sakuracloud_disk" "foobar" {
     name = "mydisk"
+    plan = "ssd"
+    connector = "virtio"
+    size = 20
     source_archive_id = "${data.sakuracloud_archive.ubuntu.id}"
     description = "Disk from TerraForm for SAKURA CLOUD"
     tags = ["hoge1" , "hoge2"]
