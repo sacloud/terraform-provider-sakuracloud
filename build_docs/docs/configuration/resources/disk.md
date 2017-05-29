@@ -23,7 +23,7 @@ resource "sakuracloud_disk" "disk01"{
 |-------------------|:---:|--------------------|:--------:|------------------------|----------------------------------------------|
 | `name`            | ◯   | ディスク名           | -        | 文字列                  | - |
 | `plan`            | -   | ディスクプラン        | `ssd` | `ssd`<br />`hdd` | - |
-| `connection`      | -   | ディスク接続          | `virtio` | `virtio`<br />`ide`    | - |
+| `connector`      | -   | ディスク接続          | `virtio` | `virtio`<br />`ide`    | - |
 | `size`            | -   | ディスクサイズ(GB単位) | 20       | 数値                    | - |
 |`source_archive_id`| -   | コピー元アーカイブID   | -        | 文字列                | [注1](#注1) |
 |`source_disk_id`   | -   | コピー元ディスクID   | -        | 文字列                | [注1](#注1) |
@@ -63,7 +63,7 @@ v0.3.6以降では[DataResource](data_resource.md)を利用してください。
 | `id`                | ディスクID               | -                                          |
 | `name`              | ディスク名               | -                                          |
 | `plan`              | ディスクプラン            | -                                          |
-| `connection`        | ディスク接続             | -                                          |
+| `connector`        | ディスク接続             | -                                          |
 | `size`              | ディスクサイズ(GB単位)    | -                                          |
 |`source_archive_id`  | コピー元アーカイブID      | -                                          |
 |`source_disk_id`     | コピー元ディスクID        | -                                          |

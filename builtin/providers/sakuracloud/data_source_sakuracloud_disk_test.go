@@ -29,7 +29,7 @@ func TestAccSakuraCloudDiskDataSource_Basic(t *testing.T) {
 					testAccCheckSakuraCloudDiskDataSourceID("data.sakuracloud_disk.foobar"),
 					resource.TestCheckResourceAttr("data.sakuracloud_disk.foobar", "name", "hoge_Ubuntu_fuga"),
 					resource.TestCheckResourceAttr("data.sakuracloud_disk.foobar", "plan", "ssd"),
-					resource.TestCheckResourceAttr("data.sakuracloud_disk.foobar", "connection", "virtio"),
+					resource.TestCheckResourceAttr("data.sakuracloud_disk.foobar", "connector", "virtio"),
 					resource.TestCheckResourceAttr("data.sakuracloud_disk.foobar", "size", "20"),
 					resource.TestCheckResourceAttr("data.sakuracloud_disk.foobar", "description", "source_disk_description"),
 					resource.TestCheckResourceAttr("data.sakuracloud_disk.foobar", "tags.#", "3"),

@@ -38,7 +38,7 @@ func dataSourceSakuraCloudDisk() *schema.Resource {
 				Type:     schema.TypeString,
 				Computed: true,
 			},
-			"connection": {
+			"connector": {
 				Type:     schema.TypeString,
 				Computed: true,
 			},
