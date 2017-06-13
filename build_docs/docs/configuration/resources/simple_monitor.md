@@ -44,8 +44,8 @@ resource "sakuracloud_simple_monitor" "mymonitor" {
 | `host_header`  | △   | HOSTヘッダ  | - | 文字列 | プロトコルが`http`または`https`の場合のみ有効 |
 | `status`       | △   | レスポンスコード | - | 文字列 | プロトコルが`http`または`https`の場合のみ有効かつ必須 |
 | `port`         | △   | ポート番号 | - | 数値 | プロトコルが`tcp`,`ssh`,`smtp`,`pop3`の場合のみ有効かつ必須 |
-| `qname`        | △   | 問合せFQDN | - | 数値 | プロトコルが`dns`の場合のみ有効かつ必須 |
-| `expected_data`| △   | 期待値 | - | 数値 | プロトコルが`dns`,`snmp`の場合のみ有効<br />`dns`の場合、省略すると、何らかのAレコードの応答があるかのチェックとなる<br />`snmp`の場合は必須 |
+| `qname`        | △   | 問合せFQDN | - | 文字列 | プロトコルが`dns`の場合のみ有効かつ必須 |
+| `expected_data`| △   | 期待値 | - | 文字列 | プロトコルが`dns`,`snmp`の場合のみ有効<br />`dns`の場合、省略すると、何らかのAレコードの応答があるかのチェックとなる<br />`snmp`の場合は必須 |
 | `community`    | △   | コミュニティ名 | - | 文字列 | プロトコルが`snmp`の場合のみ有効かつ必須 |
 | `snmp_version` | △   | SNMPバージョン | - | `1`<br />`2c` | プロトコルが`snmp`の場合のみ有効かつ必須 |
 | `oid`          | △   | OID | - | 文字列 | プロトコルが`snmp`の場合のみ有効かつ必須 |
