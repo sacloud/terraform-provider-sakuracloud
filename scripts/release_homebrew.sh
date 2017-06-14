@@ -37,7 +37,7 @@ class TerraformProviderSakuracloud < Formula
     This plugin requires "~/.terraformrc" file.
     To enable, put following text in "~/.terraformrc":
 
-        providers = {
+        providers {
             sakuracloud = "terraform-provider-sakuracloud"
         }
 
