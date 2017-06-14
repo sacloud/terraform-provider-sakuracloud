@@ -384,6 +384,9 @@ func healthCheckSimpleMonitorHash(v interface{}) int {
 	case "http", "https":
 		path = target["path"].(string)
 		status = target["status"].(string)
+		if target["port"] != nil {
+			port = target["port"].(string)
+		}
 	case "tcp", "ssh", "smtp", "pop3":
 		port = target["port"].(string)
 	case "dns":
@@ -407,6 +410,19 @@ func setSimpleMonitorResourceData(d *schema.ResourceData, _ *api.Client, data *s
 	d.Set("target", data.Status.Target)
 
 	healthCheck := map[string]interface{}{}
+
+	healthCheckConf := d.Get("health_check").(*schema.Set)
+	port := ""
+	for _, c := range healthCheckConf.List() {
+		conf := c.(map[string]interface{})
+		if _, ok := conf["port"]; ok {
+			port = strconv.Itoa(conf["port"].(int))
+			if port == "0" {
+				port = ""
+			}
+		}
+	}
+
 	readHealthCheck := data.Settings.SimpleMonitor.HealthCheck
 	switch data.Settings.SimpleMonitor.HealthCheck.Protocol {
 	case "http":
@@ -414,29 +430,33 @@ func setSimpleMonitorResourceData(d *schema.ResourceData, _ *api.Client, data *s
 		healthCheck["path"] = readHealthCheck.Path
 		healthCheck["status"] = readHealthCheck.Status
 		healthCheck["host_header"] = readHealthCheck.Host
-		if readHealthCheck.Port != "80" {
+		if port != "" || readHealthCheck.Port != "80" {
 			healthCheck["port"] = readHealthCheck.Port
 		}
 	case "https":
 		healthCheck["path"] = readHealthCheck.Path
 		healthCheck["status"] = readHealthCheck.Status
 		healthCheck["host_header"] = readHealthCheck.Host
-		if readHealthCheck.Port != "443" {
+		healthCheck["port"] = readHealthCheck.Port
+		if port != "" || readHealthCheck.Port != "443" {
 			healthCheck["port"] = readHealthCheck.Port
 		}
 
 	case "tcp":
 		healthCheck["port"] = readHealthCheck.Port
 	case "ssh":
-		if readHealthCheck.Port != "22" {
+		healthCheck["port"] = readHealthCheck.Port
+		if port != "" || readHealthCheck.Port != "22" {
 			healthCheck["port"] = readHealthCheck.Port
 		}
 	case "smtp":
-		if readHealthCheck.Port != "25" {
+		healthCheck["port"] = readHealthCheck.Port
+		if port != "" || readHealthCheck.Port != "25" {
 			healthCheck["port"] = readHealthCheck.Port
 		}
 	case "pop3":
-		if readHealthCheck.Port != "110" {
+		healthCheck["port"] = readHealthCheck.Port
+		if port != "" || readHealthCheck.Port != "110" {
 			healthCheck["port"] = readHealthCheck.Port
 		}
 
