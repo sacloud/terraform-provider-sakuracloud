@@ -28,3 +28,29 @@ func (p *propCopySource) SetSourceDisk(sourceID int64) {
 	}
 	p.SourceArchive = nil
 }
+
+// GetSourceArchive ソースアーカイブ取得
+func (p *propCopySource) GetSourceArchive() *Archive {
+	return p.SourceArchive
+}
+
+// GetSourceDisk ソースディスク取得
+func (p *propCopySource) GetSourceDisk() *Disk {
+	return p.SourceDisk
+}
+
+// GetSourceArchiveID ソースアーカイブID取得
+func (p *propCopySource) GetSourceArchiveID() int64 {
+	if p.SourceArchive != nil {
+		return p.SourceArchive.GetID()
+	}
+	return EmptyID
+}
+
+// GetSourceDiskID ソースディスクID取得
+func (p *propCopySource) GetSourceDiskID() int64 {
+	if p.SourceDisk != nil {
+		return p.SourceDisk.GetID()
+	}
+	return EmptyID
+}

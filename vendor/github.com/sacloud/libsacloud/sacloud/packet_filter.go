@@ -6,9 +6,8 @@ type PacketFilter struct {
 	propName        // 名称
 	propDescription // 説明
 
-	Expression []*PacketFilterExpression // Expression ルール
-
-	Notice string `json:",omitempty"` // Notice
+	Expression []*PacketFilterExpression `json:",omitempty"` // ルール
+	Notice     string                    `json:",omitempty"` // Notice
 
 	//HACK API呼び出しルートにより数字/文字列が混在する
 	// PackerFilterのCREATE時は文字列、以外は数値となる。現状利用しないためコメントとしておく
