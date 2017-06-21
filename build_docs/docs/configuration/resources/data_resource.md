@@ -65,7 +65,6 @@ data sakuracloud_archive "centos" {
 | `coreos`                  | CoreOS|
 | `rancheros`               | RancherOS|
 | `kusanagi`                | Kusanagi(CentOS7)|
-| `site-guard`              | SiteGuard(CentOS7)|
 | `plesk`                   | Plesk(CentOS7)|
 | `freebsd`                 | FreeBSD|
 | `windows2012`             | Windows 2012|

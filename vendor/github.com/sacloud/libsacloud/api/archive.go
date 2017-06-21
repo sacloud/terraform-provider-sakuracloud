@@ -22,7 +22,6 @@ var (
 	archiveLatestStableCoreOSTags                      = []string{"current-stable", "distro-coreos"}
 	archiveLatestStableRancherOSTags                   = []string{"current-stable", "distro-rancheros"}
 	archiveLatestStableKusanagiTags                    = []string{"current-stable", "pkg-kusanagi"}
-	archiveLatestStableSiteGuardTags                   = []string{"current-stable", "pkg-siteguard"}
 	archiveLatestStablePleskTags                       = []string{"current-stable", "pkg-plesk"}
 	archiveLatestStableFreeBSDTags                     = []string{"current-stable", "distro-freebsd"}
 	archiveLatestStableWindows2012Tags                 = []string{"os-windows", "distro-ver-2012.2"}
@@ -55,7 +54,6 @@ func NewArchiveAPI(client *Client) *ArchiveAPI {
 		ostype.CoreOS:                          api.FindLatestStableCoreOS,
 		ostype.RancherOS:                       api.FindLatestStableRancherOS,
 		ostype.Kusanagi:                        api.FindLatestStableKusanagi,
-		ostype.SiteGuard:                       api.FindLatestStableSiteGuard,
 		ostype.Plesk:                           api.FindLatestStablePlesk,
 		ostype.FreeBSD:                         api.FindLatestStableFreeBSD,
 		ostype.Windows2012:                     api.FindLatestStableWindows2012,
@@ -227,11 +225,6 @@ func (api *ArchiveAPI) FindLatestStableRancherOS() (*sacloud.Archive, error) {
 // FindLatestStableKusanagi 安定版最新のKusanagiパブリックアーカイブを取得
 func (api *ArchiveAPI) FindLatestStableKusanagi() (*sacloud.Archive, error) {
 	return api.findByOSTags(archiveLatestStableKusanagiTags)
-}
-
-// FindLatestStableSiteGuard 安定版最新のSiteGuardパブリックアーカイブを取得
-func (api *ArchiveAPI) FindLatestStableSiteGuard() (*sacloud.Archive, error) {
-	return api.findByOSTags(archiveLatestStableSiteGuardTags)
 }
 
 // FindLatestStablePlesk 安定版最新のPleskパブリックアーカイブを取得
