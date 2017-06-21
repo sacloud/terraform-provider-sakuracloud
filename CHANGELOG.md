@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.10.2 (2017-06-21)
+
+* ドキュメントのタイポ修正 #142 (s-shinoda)
+* ドキュメント内のパラメータの型を修正 #143 (s-shinoda)
+* シンプル監視:portのtfstateへの反映処理修正 #145 (yamamoto-febc)
+* Windows2016 SQLServer Standard(RDS+Office)パブリックアーカイブ追加 #146 (yamamoto-febc)
+* SiteGuardパブリックアーカイブ除去 #147 (yamamoto-febc)
+
+
 ## 0.10.1 (2017-05-29)
 
 * Update database docs #136 (yamamoto-febc)
