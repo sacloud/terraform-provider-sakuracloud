@@ -43,9 +43,7 @@ bin/terraform-provider-sakuracloud_linux-386.zip:
 bin/terraform-provider-sakuracloud_linux-amd64.zip:
 	OS="linux"   ARCH="amd64" ARCHIVE=1 BUILD_LDFLAGS=$(BUILD_LDFLAGS) sh -c "'$(CURDIR)/scripts/build.sh'"
 
-
-
-test: vet
+test: vet lint-docs
 	TF_ACC= go test $(TEST1) $(TESTARGS) -timeout=30s -parallel=4 ; \
 	TF_ACC= go test $(TEST2) $(TESTARGS) -timeout=30s -parallel=4
 
@@ -72,12 +70,15 @@ golint: fmt
 fmt:
 	gofmt -w $(GOFMT_FILES)
 
-.PHONY: build-docs serve-docs
+.PHONY: build-docs serve-docs lint-docs
 build-docs:
 	sh -c "'$(CURDIR)/scripts/build_docs.sh'"
 
 serve-docs:
 	sh -c "'$(CURDIR)/scripts/serve_docs.sh'"
+
+lint-docs:
+	sh -c "'$(CURDIR)/scripts/lint_docs.sh'"
 
 docker-test: 
 	sh -c "'$(CURDIR)/scripts/build_on_docker.sh' 'test'"

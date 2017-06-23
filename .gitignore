@@ -1,9 +1,7 @@
 .env
 bin/terraform-provider-sakuracloud*
-Godeps/_workspace
-Godeps/README
 plugin.log
 terraform-provider-sakuracloud
 terraform.tfstate
 terraform.tfstate.backup
-
+build_docs/site
