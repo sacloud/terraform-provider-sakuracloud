@@ -158,11 +158,14 @@ terraform apply
 静的ファイルの生成は`mkdocs`コマンドで行なっています。  
 ドキュメントの追加や修正は`build_docs`ディレクトリ以下のファイルの追加/修正を行なった上で`mkdocs`コマンドでファイル生成してコミットしてください。
 
-    # build_docs配下のファイルからドキュメント生成(docsディレクトリ再生成)
-    make build-docs
-    
     # ドキュメントのプレビュー用サーバー起動(http://localhost/でプレビュー可能)
     make serve-docs
+    
+    # ドキュメントの検証(textlint)
+    make lint-docs
+    
+    # build_docs配下のファイルからドキュメント生成(docsディレクトリ再生成)
+    make build-docs
 
 ## License
 

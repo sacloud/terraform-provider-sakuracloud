@@ -108,7 +108,7 @@ $ unzip terraform-provider-sakuracloud.zip
 
 ## Dockerでの実行
 
-手軽に試せるようにTerraformとTerraform for さくらのクラウドを同梱したDockerイメージを用意しています。
+TerraformとTerraform for さくらのクラウドを同梱したDockerイメージを用意しています。
 
 [Terraform for さくらのクラウド Dockerイメージ](https://hub.docker.com/r/sacloud/terraform/)
 

@@ -49,7 +49,7 @@ v0.3.6以降では[DataResource](data_resource.md)を利用してください。
 
 #### 注1
 
-`source_archive_id`/`source_disk_id`はいずれか一つだけ指定可能です。
+`source_archive_id`/`source_disk_id`はいずれか1つだけ指定可能です。
 
 #### 注2
 
