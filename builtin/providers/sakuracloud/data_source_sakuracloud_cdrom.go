@@ -2,7 +2,6 @@ package sakuracloud
 
 import (
 	"fmt"
-	"github.com/docker/go-units"
 	"github.com/hashicorp/terraform/helper/schema"
 	"github.com/sacloud/libsacloud/api"
 )
@@ -88,7 +87,7 @@ func dataSourceSakuraCloudCDROMRead(d *schema.ResourceData, meta interface{}) er
 
 	d.SetId(cdrom.GetStrID())
 	d.Set("name", cdrom.Name)
-	d.Set("size", cdrom.SizeMB*units.MiB/units.GiB)
+	d.Set("size", toSizeGB(cdrom.SizeMB))
 	d.Set("description", cdrom.Description)
 	d.Set("tags", cdrom.Tags)
 

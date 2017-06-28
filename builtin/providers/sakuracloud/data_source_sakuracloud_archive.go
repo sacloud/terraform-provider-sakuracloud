@@ -2,7 +2,6 @@ package sakuracloud
 
 import (
 	"fmt"
-	"github.com/docker/go-units"
 	"github.com/hashicorp/terraform/helper/schema"
 	"github.com/sacloud/libsacloud/api"
 	"github.com/sacloud/libsacloud/sacloud"
@@ -115,7 +114,7 @@ func dataSourceSakuraCloudArchiveRead(d *schema.ResourceData, meta interface{}) 
 
 		d.SetId(archive.GetStrID())
 		d.Set("name", archive.Name)
-		d.Set("size", archive.SizeMB*units.MiB/units.GiB)
+		d.Set("size", toSizeGB(archive.SizeMB))
 		d.Set("description", archive.Description)
 		d.Set("tags", archive.Tags)
 
