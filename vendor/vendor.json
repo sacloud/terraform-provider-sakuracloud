@@ -175,12 +175,6 @@
 			"revisionTime": "2016-10-29T20:57:26Z"
 		},
 		{
-			"checksumSHA1": "UUsA4pt7ylj/5W8yz36YyePHPKY=",
-			"path": "github.com/docker/go-units",
-			"revision": "e30f1e79f3cd72542f2026ceec18d3bd67ab859c",
-			"revisionTime": "2016-11-30T22:15:31Z"
-		},
-		{
 			"checksumSHA1": "70+TVBeBd1kBT0jD7HdxyGmMxo8=",
 			"path": "github.com/go-ini/ini",
 			"revision": "2ba15ac2dc9cdf88c110ec2dc0ced7fa45f5678c",
