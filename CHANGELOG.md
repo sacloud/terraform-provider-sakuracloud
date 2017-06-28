@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.10.3 (2017-06-28)
+
+* textlint導入 #150 (yamamoto-febc)
+* Linux i386版での数値型パラメータ欠落への対応 #151 (yamamoto-febc)
+
+
 ## 0.10.2 (2017-06-21)
 
 * ドキュメントのタイポ修正 #142 (s-shinoda)
