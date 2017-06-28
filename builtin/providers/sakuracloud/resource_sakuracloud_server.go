@@ -2,7 +2,6 @@ package sakuracloud
 
 import (
 	"fmt"
-	"github.com/docker/go-units"
 	"github.com/hashicorp/terraform/helper/schema"
 	"github.com/sacloud/libsacloud/api"
 	"github.com/sacloud/libsacloud/sacloud"
@@ -726,7 +725,7 @@ func setServerResourceData(d *schema.ResourceData, client *api.Client, data *sac
 
 	d.Set("name", data.Name)
 	d.Set("core", data.ServerPlan.CPU)
-	d.Set("memory", data.ServerPlan.MemoryMB*units.MiB/units.GiB)
+	d.Set("memory", toSizeGB(data.ServerPlan.MemoryMB))
 	d.Set("disks", flattenDisks(data.Disks))
 
 	if data.Instance.CDROM != nil {

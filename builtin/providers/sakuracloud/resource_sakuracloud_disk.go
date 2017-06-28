@@ -2,7 +2,6 @@ package sakuracloud
 
 import (
 	"fmt"
-	"github.com/docker/go-units"
 	"github.com/hashicorp/terraform/helper/schema"
 	"github.com/sacloud/libsacloud/api"
 	"github.com/sacloud/libsacloud/sacloud"
@@ -152,7 +151,7 @@ func resourceSakuraCloudDiskCreate(d *schema.ResourceData, meta interface{}) err
 		opts.SetSourceDisk(toSakuraCloudID(diskID.(string)))
 	}
 
-	opts.SizeMB = d.Get("size").(int) * units.GiB / units.MiB
+	opts.SizeMB = toSizeMB(d.Get("size").(int))
 	if description, ok := d.GetOk("description"); ok {
 		opts.Description = description.(string)
 	}
@@ -435,7 +434,7 @@ func setDiskResourceData(d *schema.ResourceData, client *api.Client, data *saclo
 	}
 
 	d.Set("connector", fmt.Sprintf("%s", data.Connection))
-	d.Set("size", data.SizeMB*units.MiB/units.GiB)
+	d.Set("size", toSizeGB(data.SizeMB))
 	d.Set("description", data.Description)
 	d.Set("tags", data.Tags)
 
