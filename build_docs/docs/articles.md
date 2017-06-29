@@ -13,15 +13,15 @@
 
 ### 紹介記事
 
-* Terraform for さくらのクラウド スタートガイド （第1回） ～インストールから基本操作 ～ 
+* Terraform for さくらのクラウド スタートガイド（第1回）～インストールから基本操作 ～ 
     * [http://knowledge.sakura.ad.jp/knowledge/7230/](http://knowledge.sakura.ad.jp/knowledge/7230/)  
-* Terraform for さくらのクラウド スタートガイド （第2回） ～便利なビルトイン機能～ 
+* Terraform for さくらのクラウド スタートガイド（第2回）～便利なビルトイン機能～ 
     * [http://knowledge.sakura.ad.jp/knowledge/7550/](http://knowledge.sakura.ad.jp/knowledge/7550/)
-* Terraform for さくらのクラウド スタートガイド （第3回）〜さくらのクラウド上にインフラ構築〜
+* Terraform for さくらのクラウド スタートガイド（第3回）〜さくらのクラウド上にインフラ構築〜
     * [http://knowledge.sakura.ad.jp/knowledge/7660/](http://knowledge.sakura.ad.jp/knowledge/7660/)
-* Terraform for さくらのクラウド スタートガイド （第4回）〜ネットワークの構築〜
+* Terraform for さくらのクラウド スタートガイド（第4回）〜ネットワークの構築〜
     * [http://knowledge.sakura.ad.jp/knowledge/8248/](http://knowledge.sakura.ad.jp/knowledge/8248/)
-* Terraform for さくらのクラウド スタートガイド （第5回）〜サービス提供リソースと応用〜
+* Terraform for さくらのクラウド スタートガイド（第5回）〜サービス提供リソースと応用〜
     * [http://knowledge.sakura.ad.jp/knowledge/8581/](http://knowledge.sakura.ad.jp/knowledge/8581/)
 
 ---
