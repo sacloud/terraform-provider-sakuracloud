@@ -50,9 +50,9 @@ resource "sakuracloud_server" "myserver" {
 | `packet_filter_ids`| - | パケットフィルタID | - | リスト(文字列) | NICに適用するパケットフィルタのIDをリストで指定する。リストの先頭からeth0,eth1の順で適用される |
 | `description` | - | 説明 | - | 文字列 | - |
 | `cdrom_id` | - | CDROM(ISOイメージ)ID | - | 文字列 | - |
-| `ipaddress`| - | 基本NIC-IPアドレス | - | 文字列 | [注1](#注1) |
-| `gateway`  | - | 基本NIC-ゲートウェイ | - | 文字列 | [注1](#注1) |
-| `nw_mask_len` | - | 基本NIC-サブネットマスク長 | - | 文字列 | [注1](#注1) |
+| `ipaddress`| - | 基本NIC:IPアドレス | - | 文字列 | [注1](#注1) |
+| `gateway`  | - | 基本NIC:ゲートウェイ | - | 文字列 | [注1](#注1) |
+| `nw_mask_len` | - | 基本NIC:サブネットマスク長 | - | 文字列 | [注1](#注1) |
 | `tags` | - | タグ | - | リスト(文字列) | サーバに付与するタグ。@で始まる特殊タグについては[こちら](http://cloud-news.sakura.ad.jp/special-tags/)を参照 |
 | `zone` | - | ゾーン | - | `is1b`<br />`tk1a`<br />`tk1v` | - |
 
@@ -78,8 +78,8 @@ resource "sakuracloud_server" "myserver" {
 | `tags`                  | タグ                     | -                                         |
 | `zone`                  | ゾーン                    | -                                         |
 | `macaddresses`          | MACアドレス               | MACアドレスのリスト(NICの個数分のリスト)        |
-| `ipaddress`             | 基本NIC-IPアドレス         | eth0のIPアドレス                            |
-| `dns_servers`           | 基本NIC-DNSサーバ        | eth0の属するセグメントの推奨ネームサーバのリスト|
-| `gateway`               | 基本NIC-ゲートウェイ        | eth0の属するセグメントのゲートウェイIPアドレス   |
-| `nw_address`            | 基本NIC-ネットワークアドレス | eth0のIPアドレスのネットワークアドレス          |
-| `nw_mask_len`           | 基本NIC-サブネットマスク長   | eth0のIPアドレスのサブネットマスク長           |
+| `ipaddress`             | 基本NIC:IPアドレス         | eth0のIPアドレス                            |
+| `dns_servers`           | 基本NIC:DNSサーバ        | eth0の属するセグメントの推奨ネームサーバのリスト|
+| `gateway`               | 基本NIC:ゲートウェイ        | eth0の属するセグメントのゲートウェイIPアドレス   |
+| `nw_address`            | 基本NIC:ネットワークアドレス | eth0のIPアドレスのネットワークアドレス          |
+| `nw_mask_len`           | 基本NIC:サブネットマスク長   | eth0のIPアドレスのサブネットマスク長           |

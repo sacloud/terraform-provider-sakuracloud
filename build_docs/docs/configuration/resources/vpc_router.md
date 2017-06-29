@@ -244,7 +244,7 @@ VPCルータが持つプライベートNICを表します。
 
 また、プライベートNICの上流には(ルータでは無い)スイッチを接続する必要があります。
 
-(詳細は[さくらのクラウドのマニュアル](http://cloud-news.sakura.ad.jp/vpc-router/vpc-interface/)を参照ください。)
+(詳細は[さくらのクラウドのマニュアル](http://cloud-news.sakura.ad.jp/vpc-router/vpc-interface/)を参照ください)
 
 ### パラメーター
 
@@ -277,7 +277,7 @@ VPCルータでのスタティックNAT機能を表します。
 
 **このリソースはVPCルータのプランが`premium`、または`highspec`の場合に利用できます。**
 
-(詳細は[さくらのクラウドのマニュアル](http://cloud-news.sakura.ad.jp/vpc-router/vpc-nat/)を参照ください。)
+(詳細は[さくらのクラウドのマニュアル](http://cloud-news.sakura.ad.jp/vpc-router/vpc-nat/)を参照ください)
 
 ### パラメーター
 
@@ -308,7 +308,7 @@ VPCルータでのスタティックNAT機能を表します。
 
 VPCルータでのポートフォワーディング(Reverse NAT)機能を表します。
 
-(詳細は[さくらのクラウドのマニュアル](http://cloud-news.sakura.ad.jp/vpc-router/vpc-nat/)を参照ください。)
+(詳細は[さくらのクラウドのマニュアル](http://cloud-news.sakura.ad.jp/vpc-router/vpc-nat/)を参照ください)
 
 ### パラメーター
 
@@ -342,7 +342,7 @@ VPCルータでのポートフォワーディング(Reverse NAT)機能を表し�
 
 VPCルータでのファイアウォール機能を表します。
 
-(詳細は[さくらのクラウドのマニュアル](http://cloud-news.sakura.ad.jp/vpc-router/vpc-firewall/)を参照ください。)
+(詳細は[さくらのクラウドのマニュアル](http://cloud-news.sakura.ad.jp/vpc-router/vpc-firewall/)を参照ください)
 
 ### パラメーター
 
@@ -381,7 +381,7 @@ VPCルータでのファイアウォール機能を表します。
 
 VPCルータでのDHCPサーバ機能を表します。
 
-(詳細は[さくらのクラウドのマニュアル](http://cloud-news.sakura.ad.jp/vpc-router/vpc-dhcp/)を参照ください。)
+(詳細は[さくらのクラウドのマニュアル](http://cloud-news.sakura.ad.jp/vpc-router/vpc-dhcp/)を参照ください)
 
 ### パラメーター
 
@@ -409,7 +409,7 @@ VPCルータでのDHCPサーバ機能を表します。
 
 VPCルータでのDHCPスタティック割当機能を表します。
 
-(詳細は[さくらのクラウドのマニュアル](http://cloud-news.sakura.ad.jp/vpc-router/vpc-dhcp/)を参照ください。)
+(詳細は[さくらのクラウドのマニュアル](http://cloud-news.sakura.ad.jp/vpc-router/vpc-dhcp/)を参照ください)
 
 ### パラメーター
 
@@ -437,7 +437,7 @@ VPCルータでのDHCPスタティック割当機能を表します。
 
 VPCルータでのPPTPサーバ機能を表します。
 
-(詳細は[さくらのクラウドのマニュアル](http://cloud-news.sakura.ad.jp/vpc-router/vpc-remoteaccess/)を参照ください。)
+(詳細は[さくらのクラウドのマニュアル](http://cloud-news.sakura.ad.jp/vpc-router/vpc-remoteaccess/)を参照ください)
 
 ### パラメーター
 
@@ -465,7 +465,7 @@ VPCルータでのPPTPサーバ機能を表します。
 
 VPCルータでのL2TP/IPSecサーバ機能を表します。
 
-(詳細は[さくらのクラウドのマニュアル](http://cloud-news.sakura.ad.jp/vpc-router/vpc-remoteaccess/)を参照ください。)
+(詳細は[さくらのクラウドのマニュアル](http://cloud-news.sakura.ad.jp/vpc-router/vpc-remoteaccess/)を参照ください)
 
 ### パラメーター
 
@@ -497,7 +497,7 @@ VPCルータでのリモートユーザーを表します。
 
 このリソースは100個まで指定することが可能です。
 
-(詳細は[さくらのクラウドのマニュアル](http://cloud-news.sakura.ad.jp/vpc-router/vpc-remoteaccess/)を参照ください。)
+(詳細は[さくらのクラウドのマニュアル](http://cloud-news.sakura.ad.jp/vpc-router/vpc-remoteaccess/)を参照ください)
 
 ### パラメーター
 
@@ -524,7 +524,7 @@ VPCルータでのリモートユーザーを表します。
 
 VPCルータでのサイト間VPNを表します。
 
-(詳細は[さくらのクラウドのマニュアル](http://cloud-news.sakura.ad.jp/vpc-router/vpc-site-to-site-vpn/)を参照ください。)
+(詳細は[さくらのクラウドのマニュアル](http://cloud-news.sakura.ad.jp/vpc-router/vpc-site-to-site-vpn/)を参照ください)
 
 ### パラメーター
 
@@ -556,7 +556,7 @@ VPCルータでのサイト間VPNを表します。
 
 VPCルータでのスタティックルート機能を表します。
 
-(詳細は[さくらのクラウドのマニュアル](http://cloud-news.sakura.ad.jp/vpc-router/vpc-static-route/)を参照ください。)
+(詳細は[さくらのクラウドのマニュアル](http://cloud-news.sakura.ad.jp/vpc-router/vpc-static-route/)を参照ください)
 
 ### パラメーター
 

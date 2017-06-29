@@ -54,7 +54,7 @@ Available commands are:
 
 ## Terraform for さくらのクラウドのセットアップ
 
-- 1) 以下のリンクから、プラットフォームに応じたzipファイルをダウンロードします。
+- 1) 以下のリンクから、プラットフォームに応じたzipファイルをダウンロードします
     - Windows: 
         - [i386](https://terraform.b.sakurastorage.jp/downloads/terraform-provider-sakuracloud_windows-386.zip)
         - [amd64](https://terraform.b.sakurastorage.jp/downloads/terraform-provider-sakuracloud_windows-amd64.zip)
@@ -64,7 +64,7 @@ Available commands are:
     - Darwin(macOS)
         - [i386](https://terraform.b.sakurastorage.jp/downloads/terraform-provider-sakuracloud_darwin-386.zip)
         - [amd64](https://terraform.b.sakurastorage.jp/downloads/terraform-provider-sakuracloud_darwin-amd64.zip)
-- 2) terraformバイナリと同じディレクトリに展開します。
+- 2) terraformバイナリと同じディレクトリに展開します
 
 > Note:  
 Terraform for さくらのクラウドのバイナリーファイルは[GitHub上のリリースページ](https://github.com/sacloud/terraform-provider-sakuracloud/releases/latest)でも配布しています。

@@ -95,7 +95,7 @@ resource "sakuracloud_load_balancer_server" "server02"{
 ロードバランサが持つVIPを表します。
 
 1台のロードバランサにつき4つまでのVIPを登録できます。
-(詳細は[さくらのクラウドのマニュアル](https://help.sakura.ad.jp/app/answers/detail/a_id/2517)を参照ください。)
+(詳細は[さくらのクラウドのマニュアル](https://help.sakura.ad.jp/app/answers/detail/a_id/2517)を参照ください)
 
 ### パラメーター
 
@@ -127,7 +127,7 @@ resource "sakuracloud_load_balancer_server" "server02"{
 ロードバランサが持つVIP配下の実サーバを表します。
 
 1つのVIPにつき、40台までの実サーバを登録できます。
-(詳細は[さくらのクラウドのマニュアル](https://help.sakura.ad.jp/app/answers/detail/a_id/2517)を参照ください。)
+(詳細は[さくらのクラウドのマニュアル](https://help.sakura.ad.jp/app/answers/detail/a_id/2517)を参照ください)
 
 ### パラメーター
 

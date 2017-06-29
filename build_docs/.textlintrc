@@ -1,6 +1,11 @@
 {
   "rules": {
     "common-misspellings": true,
+    "preset-jtf-style": {
+      "3.1.1.全角文字と半角文字の間": false,
+      "4.2.7.コロン(：)":false,
+      "4.3.1.丸かっこ（）": false
+    },
     "preset-ja-technical-writing": {
       "ja-no-mixed-period": false,
       "sentence-length": {
