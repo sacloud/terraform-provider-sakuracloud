@@ -1,8 +1,8 @@
 #!/bin/bash
 
 VERSION=`git log --merges --oneline | perl -ne 'if(m/^.+Merge pull request \#[0-9]+ from .+\/bump-version-([0-9\.]+)/){print $1;exit}'`
-SHA256_SRC=`openssl dgst -sha256 bin/terraform-provider-sakuracloud_darwin-amd64.zip | awk '{print $2}'`
-
+SHA256_SRC_DARWIN=`openssl dgst -sha256 bin/terraform-provider-sakuracloud_darwin-amd64.zip | awk '{print $2}'`
+SHA256_SRC_LINUX=`openssl dgst -sha256 bin/terraform-provider-sakuracloud_linux-amd64.zip | awk '{print $2}'`
 # clone
 git clone --depth=50 --branch=master https://github.com/sacloud/homebrew-terraform-provider-sakuracloud.git homebrew-terraform-provider-sakuracloud
 cd homebrew-terraform-provider-sakuracloud
@@ -17,14 +17,21 @@ cat << EOL > terraform-provider-sakuracloud.rb
 class TerraformProviderSakuracloud < Formula
 
   _version = "${VERSION}"
-  sha256_src = "${SHA256_SRC}"
+  sha256_src_darwin = "${SHA256_SRC_DARWIN}"
+  sha256_src_linux = "${SHA256_SRC_LINUX}"
 
   desc "Terraform provider plugin for SakuraCloud"
   homepage "https://github.com/sacloud/terraform-provider-sakuracloud"
-  url "https://github.com/sacloud/terraform-provider-sakuracloud/releases/download/v#{_version}/terraform-provider-sakuracloud_darwin-amd64.zip"
-  sha256 sha256_src
   head "https://github.com/sacloud/terraform-provider-sakuracloud.git"
   version _version
+
+  if OS.mac?
+    url "https://github.com/sacloud/terraform-provider-sakuracloud/releases/download/v#{_version}/terraform-provider-sakuracloud_darwin-amd64.zip"
+    sha256 sha256_src_darwin
+  else
+    url "https://github.com/sacloud/terraform-provider-sakuracloud/releases/download/v#{_version}/terraform-provider-sakuracloud_linux-amd64.zip"
+    sha256 sha256_src_linux
+  end
 
   depends_on "terraform" => :run
 

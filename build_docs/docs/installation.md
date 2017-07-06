@@ -132,9 +132,9 @@ $ docker run -it --rm \
 $ docker-compose run --rm terraform apply
 ```
 
-## Homebrewでのインストール
+## Homebrew(Linuxbrew)でのインストール
 
-macOSでHomebrewをご利用中の場合、以下のコマンドでTerraform for さくらのクラウドをインストール可能です。
+Homebrew(Linuxbrew)をご利用中の場合、以下のコマンドでTerraform for さくらのクラウドをインストール可能です。
 
     brew tap sacloud/homebrew-terraform-provider-sakuracloud ; brew install terraform-provider-sakuracloud
 
