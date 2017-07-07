@@ -6,8 +6,9 @@ import (
 	"github.com/sacloud/libsacloud/api"
 	"github.com/sacloud/libsacloud/sacloud"
 	"log"
-	"time"
 )
+
+const serverAPILockKey = "sakuracloud_server.lock"
 
 func resourceSakuraCloudServer() *schema.Resource {
 	return &schema.Resource{
@@ -241,7 +242,8 @@ func resourceSakuraCloudServerCreate(d *schema.ResourceData, meta interface{}) e
 		}
 	}
 
-	server, err := client.Server.Create(opts)
+	//server, err := client.Server.Create(opts)
+	server, err := createServer(client, opts)
 	if err != nil {
 		return fmt.Errorf("Failed to create SakuraCloud Server resource: %s", err)
 	}
@@ -334,7 +336,7 @@ func resourceSakuraCloudServerCreate(d *schema.ResourceData, meta interface{}) e
 	d.SetId(server.GetStrID())
 
 	//boot
-	_, err = client.Server.Boot(toSakuraCloudID(d.Id()))
+	err = bootServer(client, toSakuraCloudID(d.Id()))
 
 	if err != nil {
 		return fmt.Errorf("Failed to boot SakuraCloud Server resource: %s", err)
@@ -374,8 +376,6 @@ func resourceSakuraCloudServerUpdate(r *schema.ResourceData, meta interface{}) e
 	}
 	d := migrateResourceData(r, meta, serverSchemaMigrateDef)
 
-	shutdownFunc := client.Server.Stop
-
 	server, err := client.Server.Read(toSakuraCloudID(d.Id()))
 	if err != nil {
 		return fmt.Errorf("Couldn't find SakuraCloud Server resource: %s", err)
@@ -401,8 +401,7 @@ func resourceSakuraCloudServerUpdate(r *schema.ResourceData, meta interface{}) e
 
 	if isNeedRestart && isRunning {
 		// shudown server
-		time.Sleep(2 * time.Second)
-		_, err := shutdownFunc(toSakuraCloudID(d.Id()))
+		err := stopServer(client, toSakuraCloudID(d.Id()))
 		if err != nil {
 			return fmt.Errorf("Error stopping SakuraCloud Server resource: %s", err)
 		}
@@ -668,7 +667,7 @@ func resourceSakuraCloudServerUpdate(r *schema.ResourceData, meta interface{}) e
 	}
 
 	if isNeedRestart && isRunning {
-		_, err := client.Server.Boot(toSakuraCloudID(d.Id()))
+		err := bootServer(client, toSakuraCloudID(d.Id()))
 		if err != nil {
 			return fmt.Errorf("Error booting SakuraCloud Server resource: %s", err)
 		}
@@ -699,8 +698,7 @@ func resourceSakuraCloudServerDelete(d *schema.ResourceData, meta interface{}) e
 	}
 
 	if server.Instance.IsUp() {
-		time.Sleep(2 * time.Second)
-		_, err := client.Server.Stop(toSakuraCloudID(d.Id()))
+		err := stopServer(client, toSakuraCloudID(d.Id()))
 		if err != nil {
 			return fmt.Errorf("Error stopping SakuraCloud Server resource: %s", err)
 		}
@@ -806,4 +804,27 @@ func setServerResourceData(d *schema.ResourceData, client *api.Client, data *sac
 	d.Set("zone", client.Zone)
 	d.SetId(data.GetStrID())
 	return nil
+}
+
+func createServer(client *api.Client, server *sacloud.Server) (*sacloud.Server, error) {
+	sakuraMutexKV.Lock(serverAPILockKey)
+	defer sakuraMutexKV.Unlock(serverAPILockKey)
+
+	return client.Server.Create(server)
+}
+
+func bootServer(client *api.Client, id int64) error {
+	sakuraMutexKV.Lock(serverAPILockKey)
+	defer sakuraMutexKV.Unlock(serverAPILockKey)
+
+	_, err := client.Server.Boot(id)
+	return err
+}
+
+func stopServer(client *api.Client, id int64) error {
+	sakuraMutexKV.Lock(serverAPILockKey)
+	defer sakuraMutexKV.Unlock(serverAPILockKey)
+
+	_, err := client.Server.Stop(id)
+	return err
 }
