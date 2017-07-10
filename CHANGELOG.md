@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.10.4 (2017-07-10)
+
+* textlintルール追加 #153 (yamamoto-febc)
+* Linuxbrew対応 #155 (yamamoto-febc)
+* クラウドAPI呼び出しへのスロットリング追加 #157 (yamamoto-febc)
+
+
 ## 0.10.3 (2017-06-28)
 
 * textlint導入 #150 (yamamoto-febc)
