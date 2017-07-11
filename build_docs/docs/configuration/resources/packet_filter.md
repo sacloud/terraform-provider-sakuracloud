@@ -17,7 +17,7 @@ resource "sakuracloud_packet_filter" "myfilter" {
     }
     expressions = {
         protocol = "ip"
-        source_nw = "0.0.0.0"
+        source_nw = "0.0.0.0/0"
         allow = false
         description = "Deny all"
     }
