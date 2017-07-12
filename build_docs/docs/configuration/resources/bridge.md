@@ -7,9 +7,24 @@
 ### 設定例
 
 ```hcl
-resource "sakuracloud_bridge" "mybridge" {
-    name = "mybridge"
-    description = "BRIDGE from terraform for SAKURA CLOUD"
+#ブリッジの定義
+resource sakuracloud_bridge "br01" {
+  name        = "br01"
+  description = "BRIDGE from terraform for SAKURA CLOUD"
+}
+
+# ブリッジに接続するスイッチ(東京第1ゾーン)
+resource sakuracloud_switch "sw_tk1a" {
+  name      = "switch_tk1a"
+  bridge_id = "${sakuracloud_bridge.br01.id}"
+  zone      = "tk1a"
+}
+
+# ブリッジに接続するスイッチ(石狩第2ゾーン)
+resource sakuracloud_switch "sw_is1b" {
+  name      = "switch_is1b"
+  bridge_id = "${sakuracloud_bridge.br01.id}"
+  zone      = "is1b"
 }
 ```
 
@@ -25,5 +40,3 @@ resource "sakuracloud_bridge" "mybridge" {
 |属性名                | 名称                    | 補足                                        |
 |---------------------|------------------------|--------------------------------------------|
 | `id`                | ブリッジID               | -                                          |
-| `name`              | ブリッジ名               | -                                          |
-| `description`       | 説明                    | -                                          |

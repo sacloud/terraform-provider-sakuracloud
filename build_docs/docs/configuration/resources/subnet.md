@@ -9,15 +9,19 @@
 ```hcl
 # ルータの定義
 resource sakuracloud_internet "foobar" {
-    name = "router"
+  name = "router"
 }
 
 # ルータに追加するグローバルIPアドレスブロック
-resource "sakuracloud_subnet" "foobar" {
-    # ルータのID
-    internet_id = "${sakuracloud_internet.foobar.id}"
-    # ネクストホップ
-    next_hop = "${sakuracloud_internet.foobar.nw_min_ipaddress}"
+resource sakuracloud_subnet "foobar" {
+  # ルータのID
+  internet_id = "${sakuracloud_internet.foobar.id}"
+
+  # ネクストホップ
+  next_hop = "${sakuracloud_internet.foobar.nw_min_ipaddress}"
+
+  # ネットワークマスク長
+  #nw_mask_len = 28
 }
 ```
 
@@ -35,10 +39,6 @@ resource "sakuracloud_subnet" "foobar" {
 |属性名                | 名称                    | 補足                                        |
 |---------------------|------------------------|--------------------------------------------|
 | `id`                | スイッチID               | -                                          |
-| `internet_id`       | スイッチ名               | -                                          |
-| `nw_mask_len`       | ブリッジID               | -                                          |
-| `next_hop`          | 説明                    | -                                          |
-| `zone`              | ゾーン                  | -                                          |
 | `switch_id`         | スイッチID              | (内部的に)接続されているスイッチID              |
 | `nw_address`        | ネットワークアドレス      | 割り当てられたグローバルIPのネットワークアドレス |
 | `min_ipaddress`  | 最小IPアドレス           | 割り当てられたグローバルIPアドレスのうち、利用可能な先頭IPアドレス |

@@ -5,35 +5,35 @@
 ### 設定例
 
 ```hcl
-resource "sakuracloud_server" "myserver" {
-    name = "myserver"
-    disks = ["${sakuracloud_disk.mydisk.id}"]
-    
-    # コア数
-    # core = 1
-    
-    # メモリサイズ(GB)
-    # memory = 1
+resource sakuracloud_server "myserver" {
+  name  = "myserver"
+  disks = ["${sakuracloud_disk.mydisk.id}"]
 
-    # 上流のNWとの接続方法
-    # nic = "shared"
+  #コア数
+  #core = 1
 
-    # 追加NIC
-    # additional_nics = ["${sakuracloud_switch.myswitch.id}"]
+  #メモリサイズ(GB)
+  #memory = 1
 
-    # パケットフィルタ
-    # packet_filter_ids = ["${sakuracloud_packet_filter.myfilter.id}"]
-    
-    # ISOイメージ(CD-ROM)
-    # cdrom_id = "${data.sakuracloud_cdrom.mycdrom.id}"
+  #上流のNWとの接続方法
+  #nic = "shared"
 
-    # ネットワーク設定(nicにスイッチIDが指定されている場合のみ)
-    # ipaddress = "192.168.0.101"
-    # gateway = "192.168.0.1"
-    # nw_mask_len = 24
+  #追加NIC
+  #additional_nics = ["${sakuracloud_switch.myswitch.id}"]
 
-    description = "Server from TerraForm for SAKURA CLOUD"
-    tags = ["@virtio-net-pci"]
+  #パケットフィルタ
+  #packet_filter_ids = ["${sakuracloud_packet_filter.myfilter.id}"]
+
+  #ISOイメージ(CD-ROM)
+  #cdrom_id = "${data.sakuracloud_cdrom.mycdrom.id}"
+
+  #ネットワーク設定(nicにスイッチIDが指定されている場合のみ)
+  #ipaddress   = "192.168.0.101"
+  #gateway     = "192.168.0.1"
+  #nw_mask_len = 24
+
+  description = "Server from TerraForm for SAKURA CLOUD"
+  tags        = ["@virtio-net-pci"]
 }
 ```
 
@@ -67,19 +67,6 @@ resource "sakuracloud_server" "myserver" {
 |属性名                    | 名称                     | 補足                                        |
 |-------------------------|-------------------------|--------------------------------------------|
 | `id`                    | ID                      | -                                          |
-| `name`                  | サーバ名                | -                                          |
-| `disks`                 | ディスクID                | -                                          |
-| `core`                  | CPUコア数                 | -                                         |
-| `memory`                | メモリ(GB単位)            | -                                          |
-| `nic`                   | 基本NIC                  | -                                         |
-| `additional_nics`       | 追加NIC                  | -                                         |
-| `packet_filter_ids`     | パケットフィルタID         | -                                         |
-| `description`           | 説明                     | -                                         |
-| `tags`                  | タグ                     | -                                         |
-| `zone`                  | ゾーン                    | -                                         |
 | `macaddresses`          | MACアドレス               | MACアドレスのリスト(NICの個数分のリスト)        |
-| `ipaddress`             | 基本NIC:IPアドレス         | eth0のIPアドレス                            |
 | `dns_servers`           | 基本NIC:DNSサーバ        | eth0の属するセグメントの推奨ネームサーバのリスト|
-| `gateway`               | 基本NIC:ゲートウェイ        | eth0の属するセグメントのゲートウェイIPアドレス   |
 | `nw_address`            | 基本NIC:ネットワークアドレス | eth0のIPアドレスのネットワークアドレス          |
-| `nw_mask_len`           | 基本NIC:サブネットマスク長   | eth0のIPアドレスのサブネットマスク長           |

@@ -5,22 +5,25 @@
 ### 設定例
 
 ```hcl
-resource "sakuracloud_packet_filter" "myfilter" {
-    name = "myfilter"
-    description = "PacketFilter from terraform for SAKURA CLOUD"
-    expressions = {
-        protocol = "tcp"
-        source_nw = "192.168.2.0/24"
-        source_port = "0-65535"
-        dest_port = "80"
-        allow = true
-    }
-    expressions = {
-        protocol = "ip"
-        source_nw = "0.0.0.0/0"
-        allow = false
-        description = "Deny all"
-    }
+resource sakuracloud_packet_filter "myfilter" {
+  name = "myfilter"
+
+  expressions = {
+    protocol    = "tcp"
+    source_nw   = "192.168.2.0/24"
+    source_port = "0-65535"
+    dest_port   = "80"
+    allow       = true
+  }
+
+  expressions = {
+    protocol    = "ip"
+    source_nw   = "0.0.0.0/0"
+    allow       = false
+    description = "Deny all"
+  }
+
+  description = "PacketFilter from terraform for SAKURA CLOUD"
 }
 ```
 
@@ -52,8 +55,3 @@ resource "sakuracloud_packet_filter" "myfilter" {
 |属性名          | 名称             | 補足                                        |
 |---------------|-----------------|--------------------------------------------|
 | `id`          | ID              | -                                          |
-| `name`        | パケットフィルタ名 | -                                          |
-| `description` | 説明             | -                                          |
-| `tags`        | タグ             | -                                          |
-| `zone`        | ゾーン           | -                                          |
-| `expressions` | フィルタルール    | [`expressions`](#expressions)のリスト |

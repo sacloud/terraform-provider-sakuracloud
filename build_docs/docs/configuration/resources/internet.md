@@ -5,12 +5,20 @@
 ### 設定例
 
 ```hcl
-resource "sakuracloud_internet" "myrouter" {
-    name = "myrouter"
-    description = "Router from terraform for SAKURA CLOUD"
-    tags = ["hoge1" , "hoge2"]
-    nw_mask_len = 28
-    band_width = 100
+resource sakuracloud_internet "router" {
+  name = "router"
+
+  #ネットワークマスク超
+  #nw_mask_len = 28
+
+  #帯域幅(Mbps単位)
+  #band_width = 100
+
+  #IPv6有効化
+  #enable_ipv6 = false
+
+  description = "Router from terraform for SAKURA CLOUD"
+  tags        = ["tag1", "tag2"]
 }
 ```
 
@@ -31,13 +39,6 @@ resource "sakuracloud_internet" "myrouter" {
 |属性名                | 名称                    | 補足                                        |
 |---------------------|------------------------|--------------------------------------------|
 | `id`                | ルータID               | -                                          |
-| `name`              | ルータ名               | -                                          |
-| `nw_mask_len`       | ネットワークマスク長      | -                                          |
-| `band_width`        | 帯域幅(Mbps単位)         | -                                          |
-| `description`       | 説明                    | -                                          |
-| `enable_ipv6`       | IPv6有効化              | -                                          |
-| `tags`              | タグ                    | -                                          |
-| `zone`              | ゾーン                  | -                                          |
 | `server_ids`         | サーバID              | 接続されているサーバのID(リスト)             |
 | `switch_id`          | スイッチID              | (内部的に)接続されているスイッチID              |
 | `nw_address`         | ネットワークアドレス      | ルータに割り当てられたグローバルIPのネットワークアドレス |

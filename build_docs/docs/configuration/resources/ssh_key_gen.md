@@ -12,19 +12,23 @@ SSH公開鍵をさくらのクラウド側で生成するためのリソース�
 ### 設定例
 
 ```hcl
-resource "sakuracloud_ssh_key_gen" "key" {
-    name = "foobar"
-    
-    # パスフレーズ(オプション、指定する場合は8〜64文字)
-    # pass_phrase = "your_pass_phrase"
-    
-    # 説明
-    # description = "your description here"
-    
-    # local_execを利用してローカルマシンに秘密鍵ファイルを生成する例
-    provisioner "local-exec" {
-        command = "echo \"${self.private_key}\" > id_rsa; chmod 0600 id_rsa"
-    }
+resource sakuracloud_ssh_key_gen "key" {
+  name = "foobar"
+
+  # パスフレーズ(オプション、指定する場合は8〜64文字)
+  # pass_phrase = "your_pass_phrase"
+
+  description = "Description"
+  
+  # local_execを利用してローカルマシンに秘密鍵ファイルを生成する例
+  provisioner "local-exec" {
+    command = "echo \"${self.private_key}\" > id_rsa; chmod 0600 id_rsa"
+  }
+  # terraform destroy実行時にローカルマシン上の秘密鍵ファイルを削除
+  provisioner "local-exec" {
+    when    = "destroy"
+    command = "rm -f id_rsa"
+  }
 }
 ```
 
@@ -41,62 +45,68 @@ resource "sakuracloud_ssh_key_gen" "key" {
 |属性名                | 名称                    | 補足                                        |
 |---------------------|------------------------|--------------------------------------------|
 | `id`                | 公開鍵ID                | -                                          |
-| `name`              | 公開鍵名                 | -                                          |
 | `private_key`       | 秘密鍵                  | 生成された秘密鍵                              |
 | `public_key`        | 公開鍵                  | -                                       |
 | `fingerprint`       | フィンガープリント        | -                                          |
-| `description`       | 説明                    | -                                          |
 
 ### 利用例
 
 #### サーバのプロビジョニング時、SSH接続用に公開鍵(生成)を利用する
 
 ```hcl
-# ssh公開鍵
-resource "sakuracloud_ssh_key_gen" "key" {
-    name = "foobar"
-    provisioner "local-exec" {
-      command = "echo \"${self.private_key}\" > id_rsa; chmod 0600 id_rsa"
-    }
+#SSH公開鍵
+resource sakuracloud_ssh_key_gen "key" {
+  name = "foobar"
+
+  provisioner "local-exec" {
+    command = "echo \"${self.private_key}\" > id_rsa; chmod 0600 id_rsa"
+  }
+
+  provisioner "local-exec" {
+    when    = "destroy"
+    command = "rm -f id_rsa"
+  }
 }
 
-
-# OS(CentOS 7.3)
-data sakuracloud_archive "centos"{
-    os_type = "centos"
+#OS(CentOS)
+data sakuracloud_archive "centos" {
+  os_type = "centos"
 }
-# ディスクの定義
+
+#ディスクの定義
 resource sakuracloud_disk "foobar" {
-    name = "foobar"
-    source_archive_id = "${data.sakuracloud_archive.centos.id}"
-    password = "PUT_YOUR_PASSWORD_HERE"
-    # 生成した公開鍵のIDを指定
-    ssh_key_ids = ["${sakuracloud_ssh_key_gen.key.id}"]
-    # SSH接続時のパスワード/チャレンジレスポンス認証を無効化
-    disable_pw_auth = true
+  name              = "foobar"
+  source_archive_id = "${data.sakuracloud_archive.centos.id}"
+  password          = "PUT_YOUR_PASSWORD_HERE"
+
+  # 生成した公開鍵のIDを指定
+  ssh_key_ids = ["${sakuracloud_ssh_key_gen.key.id}"]
+
+  # SSH接続時のパスワード/チャレンジレスポンス認証を無効化
+  disable_pw_auth = true
 }
-# サーバの定義
+
+#サーバの定義
 resource sakuracloud_server "foobar" {
-    name = "foobar"
-    disks = ["${sakuracloud_disk.foobar.id}"]
-    tags = ["@virtio-net-pci"]
+  name  = "foobar"
+  disks = ["${sakuracloud_disk.foobar.id}"]
+  tags  = ["@virtio-net-pci"]
 
-    # プロビジョニング
-    connection {
-       user = "root"
-       host = "${self.base_nw_ipaddress}"
-       private_key = "${sakuracloud_ssh_key_gen.key.private_key}"
-    }
-    provisioner "remote-exec" {
-        inline = [
-          "hostname" # 実行したいコマンドを指定
-        ]
-   }
+  # プロビジョニング
+  connection {
+    user        = "root"
+    host        = "${self.base_nw_ipaddress}"
+    private_key = "${sakuracloud_ssh_key_gen.key.private_key}"
+  }
+
+  provisioner "remote-exec" {
+    inline = [
+      "hostname",
+    ] # 実行したいコマンドを指定
+  }
 }
 
-# SSH接続用のアウトプット定義
+#SSH接続用のアウトプット定義
 output "ssh_to_server" {
-    value = "ssh -i id_rsa root@${sakuracloud_server.foobar.base_nw_ipaddress}"
+  value = "ssh -i id_rsa root@${sakuracloud_server.foobar.base_nw_ipaddress}"
 }
-
-```

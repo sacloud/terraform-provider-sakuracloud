@@ -5,10 +5,11 @@
 ### 設定例
 
 ```hcl
-resource "sakuracloud_switch" "myswitch" {
-    name = "sw01"
-    description = "Switch from terraform for SAKURA CLOUD"
-    tags = ["hoge1" , "hoge2"]
+resource sakuracloud_switch "myswitch" {
+  name = "sw01"
+  #bridge_id = "${sakuracloud_bridge.br.id}"
+  description = "Switch from terraform for SAKURA CLOUD"
+  tags        = ["tag1", "tag2"]
 }
 ```
 
@@ -27,9 +28,4 @@ resource "sakuracloud_switch" "myswitch" {
 |属性名                | 名称                    | 補足                                        |
 |---------------------|------------------------|--------------------------------------------|
 | `id`                | スイッチID               | -                                          |
-| `name`              | スイッチ名               | -                                          |
-| `bridge_id`         | ブリッジID               | -                                          |
-| `description`       | 説明                    | -                                          |
-| `tags`              | タグ                    | -                                          |
-| `zone`              | ゾーン                  | -                                          |
 | `server_ids`         | サーバID               | 接続されているサーバのID(リスト)             |
