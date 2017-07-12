@@ -4,6 +4,7 @@ import (
 	"os"
 	"testing"
 
+	"fmt"
 	"github.com/hashicorp/terraform/helper/schema"
 	"github.com/hashicorp/terraform/terraform"
 )
@@ -34,12 +35,20 @@ func TestProvider_impl(t *testing.T) {
 }
 
 func testAccPreCheck(t *testing.T) {
-	if v := os.Getenv("SAKURACLOUD_ACCESS_TOKEN"); v == "" {
-		t.Fatal("SAKURACLOUD_ACCESS_TOKEN must be set for acceptance tests")
+
+	requiredEnvs := []string{
+		"SAKURACLOUD_ACCESS_TOKEN",
+		"SAKURACLOUD_ACCESS_TOKEN_SECRET",
+		"SACLOUD_OJS_ACCESS_KEY_ID",
+		"SACLOUD_OJS_SECRET_ACCESS_KEY",
 	}
-	if v := os.Getenv("SAKURACLOUD_ACCESS_TOKEN_SECRET"); v == "" {
-		t.Fatal("SAKURACLOUD_ACCESS_TOKEN_SECRET must be set for acceptance tests")
+
+	for _, env := range requiredEnvs {
+		if v := os.Getenv(env); v == "" {
+			t.Fatal(fmt.Sprintf("%s must be set for acceptance tests", env))
+		}
 	}
+
 	if v := os.Getenv("SAKURACLOUD_ZONE"); v == "" {
 		os.Setenv("SAKURACLOUD_ZONE", testTargetZone)
 	}

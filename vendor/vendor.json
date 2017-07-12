@@ -457,6 +457,18 @@
 			"revisionTime": "2016-12-03T19:45:07Z"
 		},
 		{
+			"checksumSHA1": "NjuwnT9vODlUoOdFMvTgwUlJFdc=",
+			"path": "github.com/mitchellh/goamz/aws",
+			"revision": "caaaea8b30ee15616494ee68abd5d8ebbbef05cf",
+			"revisionTime": "2015-03-17T17:43:35Z"
+		},
+		{
+			"checksumSHA1": "4J6sW5KD2MFC+ApdGVGyM35ZA1Q=",
+			"path": "github.com/mitchellh/goamz/s3",
+			"revision": "caaaea8b30ee15616494ee68abd5d8ebbbef05cf",
+			"revisionTime": "2015-03-17T17:43:35Z"
+		},
+		{
 			"checksumSHA1": "sWdAYPKyaT4SW8hNQNpRS0sU4lU=",
 			"path": "github.com/mitchellh/hashstructure",
 			"revision": "ab25296c0f51f1022f01cd99dfb45f1775de8799",
@@ -503,6 +515,12 @@
 			"path": "github.com/satori/go.uuid",
 			"revision": "b061729afc07e77a8aa4fad0a2fd840958f1942a",
 			"revisionTime": "2016-09-27T10:08:44Z"
+		},
+		{
+			"checksumSHA1": "sFD8LpJPQtWLwGda3edjf5mNUbs=",
+			"path": "github.com/vaughan0/go-ini",
+			"revision": "a98ad7ee00ec53921f08832bc06ecf7fd600e6a1",
+			"revisionTime": "2013-09-23T14:52:12Z"
 		}
 	],
 	"rootPath": "github.com/sacloud/terraform-provider-sakuracloud"

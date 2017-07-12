@@ -88,6 +88,7 @@ data sakuracloud_archive "centos" {
 |------------------------------|------------------------|--------------------------------------------|
 | `sakuracloud_archive`        | アーカイブ               | -                                          |
 | `sakuracloud_bridge`         | ブリッジ                | -                                          |
+| `sakuracloud_bucket_object`  | オブジェクトストレージ    | -                                          |
 | `sakuracloud_cdrom`          | ISOイメージ             | -                                          |
 | `sakuracloud_database`       | データベース            | -                                          |
 | `sakuracloud_disk`           | ディスク                | -                                          |
