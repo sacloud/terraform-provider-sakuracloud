@@ -35,6 +35,7 @@
     - [GSLB](configuration/resources/gslb/)
     - [シンプル監視](configuration/resources/simple_monitor/)
     - [自動バックアップ](configuration/resources/auto_backup/)
+    - [オブジェクトストレージ](configuration/resources/bucket_object/)
 - データソース:
     - [データソース](configuration/resources/data_resource/)
   
