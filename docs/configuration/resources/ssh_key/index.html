@@ -314,11 +314,14 @@
 <hr />
 <p><strong>全ゾーン共通のグローバルリソースです。</strong></p>
 <h3 id="_1">設定例</h3>
-<pre><code class="hcl">resource &quot;sakuracloud_ssh_key&quot; &quot;mykey&quot; {
-    name = &quot;mykey&quot;
-    public_key = &quot;ssh-rsa XXXXXXXXX.....&quot;
-    # or
-    #public_key = &quot;${file(&quot;id_rsa.pub&quot;)}&quot;
+<pre><code class="hcl">resource sakuracloud_ssh_key &quot;mykey&quot; {
+  name       = &quot;mykey&quot;
+
+  public_key = &quot;ssh-rsa XXXXXXXXX.....&quot;
+  # or
+  #public_key = &quot;${file(&quot;id_rsa.pub&quot;)}&quot;
+
+  description = &quot;Description&quot;
 }
 </code></pre>
 
@@ -374,21 +377,6 @@
 <tr>
 <td><code>id</code></td>
 <td>公開鍵ID</td>
-<td>-</td>
-</tr>
-<tr>
-<td><code>name</code></td>
-<td>公開鍵名</td>
-<td>-</td>
-</tr>
-<tr>
-<td><code>public_key</code></td>
-<td>公開鍵</td>
-<td>-</td>
-</tr>
-<tr>
-<td><code>description</code></td>
-<td>説明</td>
 <td>-</td>
 </tr>
 <tr>

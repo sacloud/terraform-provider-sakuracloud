@@ -324,7 +324,7 @@
 </ul>
 <hr />
 <h3 id="_1">設定例</h3>
-<pre><code class="hcl">resource &quot;sakuracloud_bucket_object&quot; &quot;foobar&quot; {
+<pre><code class="hcl">resource sakuracloud_bucket_object &quot;foobar&quot; {
   #アクセスキー(環境変数SACLOUD_OJS_ACCESS_KEY_ID、またはAWS_ACCESS_KEY_IDでも指定可能)  
   #access_key = &quot;&quot;
 
@@ -500,7 +500,7 @@
 </tbody>
 </table>
 <h3 id="_5">データソースの利用例</h3>
-<pre><code class="hcl">data &quot;sakuracloud_bucket_object&quot; &quot;foobar&quot; {
+<pre><code class="hcl">data sakuracloud_bucket_object &quot;foobar&quot; {
   #アクセスキー(環境変数SACLOUD_OJS_ACCESS_KEY_ID、またはAWS_ACCESS_KEY_IDでも指定可能)  
   #access_key = &quot;&quot;
   #シークレットキー(環境変数SACLOUD_OJS_SECRET_ACCESS_KEY、またはAWS_SECRET_ACCESS_KEYでも指定可能)

@@ -314,9 +314,24 @@
 <hr />
 <p><strong>全ゾーン共通のグローバルリソースです。</strong></p>
 <h3 id="_1">設定例</h3>
-<pre><code class="hcl">resource &quot;sakuracloud_bridge&quot; &quot;mybridge&quot; {
-    name = &quot;mybridge&quot;
-    description = &quot;BRIDGE from terraform for SAKURA CLOUD&quot;
+<pre><code class="hcl">#ブリッジの定義
+resource sakuracloud_bridge &quot;br01&quot; {
+  name        = &quot;br01&quot;
+  description = &quot;BRIDGE from terraform for SAKURA CLOUD&quot;
+}
+
+# ブリッジに接続するスイッチ(東京第1ゾーン)
+resource sakuracloud_switch &quot;sw_tk1a&quot; {
+  name      = &quot;switch_tk1a&quot;
+  bridge_id = &quot;${sakuracloud_bridge.br01.id}&quot;
+  zone      = &quot;tk1a&quot;
+}
+
+# ブリッジに接続するスイッチ(石狩第2ゾーン)
+resource sakuracloud_switch &quot;sw_is1b&quot; {
+  name      = &quot;switch_is1b&quot;
+  bridge_id = &quot;${sakuracloud_bridge.br01.id}&quot;
+  zone      = &quot;is1b&quot;
 }
 </code></pre>
 
@@ -364,16 +379,6 @@
 <tr>
 <td><code>id</code></td>
 <td>ブリッジID</td>
-<td>-</td>
-</tr>
-<tr>
-<td><code>name</code></td>
-<td>ブリッジ名</td>
-<td>-</td>
-</tr>
-<tr>
-<td><code>description</code></td>
-<td>説明</td>
 <td>-</td>
 </tr>
 </tbody>

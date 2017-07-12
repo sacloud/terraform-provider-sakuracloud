@@ -313,12 +313,20 @@
                 <h1 id="sakuracloud_internet">ルータ(sakuracloud_internet)</h1>
 <hr />
 <h3 id="_1">設定例</h3>
-<pre><code class="hcl">resource &quot;sakuracloud_internet&quot; &quot;myrouter&quot; {
-    name = &quot;myrouter&quot;
-    description = &quot;Router from terraform for SAKURA CLOUD&quot;
-    tags = [&quot;hoge1&quot; , &quot;hoge2&quot;]
-    nw_mask_len = 28
-    band_width = 100
+<pre><code class="hcl">resource sakuracloud_internet &quot;router&quot; {
+  name = &quot;router&quot;
+
+  #ネットワークマスク超
+  #nw_mask_len = 28
+
+  #帯域幅(Mbps単位)
+  #band_width = 100
+
+  #IPv6有効化
+  #enable_ipv6 = false
+
+  description = &quot;Router from terraform for SAKURA CLOUD&quot;
+  tags        = [&quot;tag1&quot;, &quot;tag2&quot;]
 }
 </code></pre>
 
@@ -406,41 +414,6 @@
 <tr>
 <td><code>id</code></td>
 <td>ルータID</td>
-<td>-</td>
-</tr>
-<tr>
-<td><code>name</code></td>
-<td>ルータ名</td>
-<td>-</td>
-</tr>
-<tr>
-<td><code>nw_mask_len</code></td>
-<td>ネットワークマスク長</td>
-<td>-</td>
-</tr>
-<tr>
-<td><code>band_width</code></td>
-<td>帯域幅(Mbps単位)</td>
-<td>-</td>
-</tr>
-<tr>
-<td><code>description</code></td>
-<td>説明</td>
-<td>-</td>
-</tr>
-<tr>
-<td><code>enable_ipv6</code></td>
-<td>IPv6有効化</td>
-<td>-</td>
-</tr>
-<tr>
-<td><code>tags</code></td>
-<td>タグ</td>
-<td>-</td>
-</tr>
-<tr>
-<td><code>zone</code></td>
-<td>ゾーン</td>
 <td>-</td>
 </tr>
 <tr>

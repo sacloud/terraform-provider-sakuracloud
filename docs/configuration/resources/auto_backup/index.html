@@ -315,21 +315,21 @@
 <p><strong>このリソースは石狩第2、東京第1ゾーンでのみ利用可能です。</strong></p>
 <p>自動バックアップの設定を行うリソースです。</p>
 <h3 id="_1">設定例</h3>
-<pre><code class="hcl"># ディスクの定義
-resource &quot;sakuracloud_disk&quot; &quot;disk01&quot; {
-    name = &quot;disk01&quot;
-    zone = &quot;is1b&quot;
+<pre><code class="hcl">#ディスクの定義
+resource sakuracloud_disk &quot;disk01&quot; {
+  name = &quot;disk01&quot;
+  zone = &quot;is1b&quot;
 }
 
-# 自動バックアップ
-resource &quot;sakuracloud_auto_backup&quot; &quot;foobar&quot; {
-    name = &quot;auto_backup&quot;
-    disk_id = &quot;${sakuracloud_disk.disk01.id}&quot;
-    weekdays = [&quot;mon&quot;,&quot;tue&quot;,&quot;wed&quot;]
-    max_backup_num = 1
-    description = &quot;description&quot;
-    tags = [&quot;hoge1&quot;, &quot;hoge2&quot;]
-    zone = &quot;is1b&quot;
+#自動バックアップ
+resource sakuracloud_auto_backup &quot;foobar&quot; {
+  name           = &quot;auto_backup&quot;
+  disk_id        = &quot;${sakuracloud_disk.disk01.id}&quot;
+  weekdays       = [&quot;mon&quot;, &quot;tue&quot;, &quot;wed&quot;]
+  max_backup_num = 1
+  description    = &quot;description&quot;
+  tags           = [&quot;tag1&quot;, &quot;tag2&quot;]
+  zone           = &quot;is1b&quot;
 }
 </code></pre>
 
@@ -417,41 +417,6 @@ resource &quot;sakuracloud_auto_backup&quot; &quot;foobar&quot; {
 <tr>
 <td><code>id</code></td>
 <td>ID</td>
-<td>-</td>
-</tr>
-<tr>
-<td><code>name</code></td>
-<td>自動バックアップ名</td>
-<td>-</td>
-</tr>
-<tr>
-<td><code>disk_id</code></td>
-<td>ディスクID</td>
-<td>-</td>
-</tr>
-<tr>
-<td><code>weekdays</code></td>
-<td>バックアップ取得曜日</td>
-<td>-</td>
-</tr>
-<tr>
-<td><code>max_backup_num</code></td>
-<td>保持世代数</td>
-<td>-</td>
-</tr>
-<tr>
-<td><code>description</code></td>
-<td>説明</td>
-<td>-</td>
-</tr>
-<tr>
-<td><code>tags</code></td>
-<td>タグ</td>
-<td>-</td>
-</tr>
-<tr>
-<td><code>zone</code></td>
-<td>対象ゾーン</td>
 <td>-</td>
 </tr>
 </tbody>

@@ -314,11 +314,16 @@
 <hr />
 <p><strong>全ゾーン共通のグローバルリソースです。</strong></p>
 <h3 id="_1">設定例</h3>
-<pre><code class="hcl">resource &quot;sakuracloud_note&quot; &quot;mynote&quot; {
-    name = &quot;mynote&quot;
-    content = &quot;#!/bin/sh ...&quot;
-    # or
-    #content = &quot;${file(&quot;example.sh&quot;)}&quot;
+<pre><code class="hcl">resource sakuracloud_note &quot;mynote&quot; {
+  name = &quot;mynote&quot;
+
+  #文字列を直接指定する場合
+  content = &quot;#!/bin/sh ...&quot;
+  #ファイルから読み込む場合
+  #content = &quot;${file(&quot;example.sh&quot;)}&quot;
+
+  description = &quot;Description&quot;
+  tags        = [&quot;tag1&quot;, &quot;tag2&quot;]
 }
 </code></pre>
 
@@ -382,26 +387,6 @@
 <tr>
 <td><code>id</code></td>
 <td>スクリプトID</td>
-<td>-</td>
-</tr>
-<tr>
-<td><code>name</code></td>
-<td>スクリプト名</td>
-<td>-</td>
-</tr>
-<tr>
-<td><code>content</code></td>
-<td>スクリプト内容</td>
-<td>-</td>
-</tr>
-<tr>
-<td><code>description</code></td>
-<td>説明</td>
-<td>-</td>
-</tr>
-<tr>
-<td><code>tags</code></td>
-<td>タグ</td>
 <td>-</td>
 </tr>
 </tbody>

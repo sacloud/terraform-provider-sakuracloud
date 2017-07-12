@@ -9,20 +9,27 @@
 ### 設定例
 
 ```hcl
-resource "sakuracloud_dns" "dns" {
-    zone = "example.com"
+# DNSゾーン登録
+resource sakuracloud_dns "dns" {
+  zone        = "example.com"
+  description = "Description"
+  tags        = ["tag1", "tag2"]
 }
-resource "sakuracloud_dns_record" "record01" {
-    dns_id = "${sakuracloud_dns.dns.id}"
-    name = "test1"
-    type = "A"
-    value = "192.168.0.1"
+
+# Aレコード1(test1.example.com)
+resource sakuracloud_dns_record "record01" {
+  dns_id = "${sakuracloud_dns.dns.id}"
+  name   = "test"
+  type   = "A"
+  value  = "192.168.0.1"
 }
-resource "sakuracloud_dns_record" "record02" {
-    dns_id = "${sakuracloud_dns.dns.id}"
-    name = "test1"
-    type = "A"
-    value = "192.168.0.2"
+
+# Aレコード2(test.example.com)
+resource sakuracloud_dns_record "record02" {
+  dns_id = "${sakuracloud_dns.dns.id}"
+  name   = "test"
+  type   = "A"
+  value  = "192.168.0.2"
 }
 ```
 
@@ -41,9 +48,6 @@ resource "sakuracloud_dns_record" "record02" {
 |属性名          | 名称             | 補足                                        |
 |---------------|-----------------|--------------------------------------------|
 | `id`          | ID              | -                                          |
-| `zone`        | 対象DNSゾーン     | -                                          |
-| `description` | 説明             | -                                          |
-| `tags`        | タグ             | -                                          |
 | `dns_servers` | DNSサーバ       | 対象DNSゾーンの委譲先となるネームサーバのリスト  |
 
 ## `sakuracloud_dns_record`
@@ -61,18 +65,4 @@ resource "sakuracloud_dns_record" "record02" {
 | `weight`   | -   | 重み | -   | 数値 | タイプが`SRV`の場合のみ有効。`0`〜`65535` |
 | `port`     | -   | ポート | -   | 数値 | タイプが`SRV`の場合のみ有効。`1`〜`65535` |
 
-
-### 属性
-
-|属性名       | 名称             | 補足 |
-|------------|-----------------|------|
-| `id`       | ID              | -  |
-| `dns_id`   | DNSゾーンID      | -  |
-| `name`     | レコード名        | -  |
-| `type`     | タイプ            | - |
-| `value`    | 値               | -  |
-| `ttl`      | TTL             | -  |
-| `priority` | プライオリティ    | -  |
-| `weight`   | 重み    | -  |
-| `port`     | ポート    | -  |
 

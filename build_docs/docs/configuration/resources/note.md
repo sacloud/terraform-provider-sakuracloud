@@ -7,11 +7,16 @@
 ### 設定例
 
 ```hcl
-resource "sakuracloud_note" "mynote" {
-    name = "mynote"
-    content = "#!/bin/sh ..."
-    # or
-    #content = "${file("example.sh")}"
+resource sakuracloud_note "mynote" {
+  name = "mynote"
+
+  #文字列を直接指定する場合
+  content = "#!/bin/sh ..."
+  #ファイルから読み込む場合
+  #content = "${file("example.sh")}"
+
+  description = "Description"
+  tags        = ["tag1", "tag2"]
 }
 ```
 
@@ -29,7 +34,3 @@ resource "sakuracloud_note" "mynote" {
 |属性名                | 名称                    | 補足                                        |
 |---------------------|------------------------|--------------------------------------------|
 | `id`                | スクリプトID             | -                                          |
-| `name`              | スクリプト名              | -                                          |
-| `content`           | スクリプト内容            | -                                          |
-| `description`       | 説明                    | -                                          |
-| `tags`              | タグ                    | -                                          |

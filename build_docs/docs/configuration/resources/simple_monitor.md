@@ -5,18 +5,24 @@
 ### 設定例
 
 ```hcl
-resource "sakuracloud_simple_monitor" "mymonitor" {
-    target = "${sakuracloud_server.myserver.base_nw_ipaddress}"
-    health_check = {
-        protocol = "http"
-        delay_loop = 60
-        path = "/"
-        status = "200"
-    }
-    notify_email_enabled = true
-    notify_email_html = true
-    notify_slack_enabled = true
-    notify_slack_webhook = "https://hooks.slack.com/services/XXXXXXXXX/XXXXXXXXX/XXXXXXXXXXXXXXXXXXXXXXXX"
+resource sakuracloud_simple_monitor "mymonitor" {
+  target = "${sakuracloud_server.myserver.ipaddress}"
+
+  health_check = {
+    protocol   = "http"
+    delay_loop = 60
+    path       = "/"
+    status     = "200"
+  }
+
+  notify_email_enabled = true
+  #notify_email_html    = false
+  #notify_slack_enabled = false
+  #notify_slack_webhook = "https://hooks.slack.com/services/XXXXXXXXX/XXXXXXXXX/XXXXXXXXXXXXXXXXXXXXXXXX"
+  #enabled              = true
+
+  description = "Description"
+  tags        = ["tag1", "tag2"]
 }
 ```
 
@@ -56,12 +62,3 @@ resource "sakuracloud_simple_monitor" "mymonitor" {
 |属性名          | 名称             | 補足                                        |
 |---------------|-----------------|--------------------------------------------|
 | `id`                   | ID              | -                                          |
-| `target`               | 監視対象名(IPアドレス)| -                                          |
-| `health_check`         | 監視方法          | 詳細は[`health_check`](#health_check)を参照 |
-| `description`          | 説明             | -                                          |
-| `tags`                 | タグ             | -                                          |
-| `notify_email_enabled` | Eメール通知有効    | -                                          |
-| `notify_email_html`    | HTMLメール有効    | -                                          |
-| `notify_slack_enabled` | Slack通知有効     | -                                          |
-| `notify_slack_webhook` | Slack WebhookURL| -                                          |
-| `enabled`              | 有効             | -                                          |

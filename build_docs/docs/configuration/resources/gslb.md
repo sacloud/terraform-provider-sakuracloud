@@ -9,25 +9,38 @@
 ### 設定例
 
 ```hcl
-resource "sakuracloud_gslb" "mygslb" {
-    name = "gslb_from_terraform"
-    health_check = {
-        protocol = "http"
-        delay_loop = 10
-        host_header = "example.com"
-        path = "/"
-        status = "200"
-    }
-    description = "GSLB from terraform for SAKURA CLOUD"
-    tags = ["hoge1" , "hoge2" ]
+resource sakuracloud_gslb "gslb" {
+  name = "gslb_from_terraform"
+
+  health_check = {
+    protocol    = "http"
+    delay_loop  = 10
+    host_header = "example.com"
+    path        = "/"
+    status      = "200"
+    #port       = 80
+  }
+
+  #weighted     = false
+  #sorry_server = "192.0.2.254"
+  description  = "GSLB from terraform for SAKURA CLOUD"
+  tags         = ["tag1", "tag2"]
 }
-resource "sakuracloud_gslb_server" "gslb01" {
-    gslb_id = "${sakuracloud_gslb.mygslb.id}"
-    ipaddress = "192.0.2.1"
+
+#GSLB配下のサーバ1
+resource sakuracloud_gslb_server "gslb_server01" {
+  gslb_id   = "${sakuracloud_gslb.gslb.id}"
+  ipaddress = "192.0.2.1"
+  #weight    = 1
+  #enabled   = true
 }
-resource "sakuracloud_gslb_server" "gslb02" {
-    gslb_id = "${sakuracloud_gslb.mygslb.id}"
-    ipaddress = "192.0.2.2"
+
+#GSLB配下のサーバ2
+resource sakuracloud_gslb_server "gslb_server02" {
+  gslb_id   = "${sakuracloud_gslb.gslb.id}"
+  ipaddress = "192.0.2.2"
+  #weight    = 1
+  #enabled   = true
 }
 ```
 
@@ -60,12 +73,6 @@ resource "sakuracloud_gslb_server" "gslb02" {
 |属性名          | 名称             | 補足                                        |
 |---------------|-----------------|--------------------------------------------|
 | `id`          | ID              | -                                          |
-| `name`        | GSLB名           | -                                          |
-| `health_check`| ヘルスチェック     | 詳細は[`health_check`](#health_check)を参照                                          |
-| `weighted`    | 重み付け応答      | -                                          |
-| `sorry_server` | ソーリーサーバ  | -                                          |
-| `description` | 説明             | -                                          |
-| `tags`        | タグ             | -                                          |
 | `FQDN`        | GSLB-FQDN       | GSLB作成時に割り当てられるFQDN<br />ロードバランシングしたいホスト名をFQDNのCNAMEとしてDNS登録する    |
 
 
@@ -87,7 +94,3 @@ resource "sakuracloud_gslb_server" "gslb02" {
 |属性名       | 名称             | 補足 |
 |------------|-----------------|------|
 | `id`       | ID              | -  |
-| `gslb_id`  | DNSゾーンID      | -  |
-| `ipaddress`| レコード名        | -  |
-| `enabled`  | タイプ            | - |
-| `weight`   | 値               | -  |

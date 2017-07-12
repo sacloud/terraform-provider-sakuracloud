@@ -215,6 +215,21 @@
                     <li><a class="toctree-l4" href="#_4">利用例</a></li>
                 
             
+                <li class="toctree-l3"><a href="#ssh_1">SSH公開鍵</a></li>
+                
+            
+                <li class="toctree-l3"><a href="#oscentos">OS(CentOS)</a></li>
+                
+            
+                <li class="toctree-l3"><a href="#_5">ディスクの定義</a></li>
+                
+            
+                <li class="toctree-l3"><a href="#_6">サーバの定義</a></li>
+                
+            
+                <li class="toctree-l3"><a href="#ssh_2">SSH接続用のアウトプット定義</a></li>
+                
+            
             </ul>
         
     </li>
@@ -321,19 +336,23 @@
 <li>このリソースは更新動作に非対応です。属性を変更した場合は常に再生成されます。</li>
 </ul>
 <h3 id="_1">設定例</h3>
-<pre><code class="hcl">resource &quot;sakuracloud_ssh_key_gen&quot; &quot;key&quot; {
-    name = &quot;foobar&quot;
+<pre><code class="hcl">resource sakuracloud_ssh_key_gen &quot;key&quot; {
+  name = &quot;foobar&quot;
 
-    # パスフレーズ(オプション、指定する場合は8〜64文字)
-    # pass_phrase = &quot;your_pass_phrase&quot;
+  # パスフレーズ(オプション、指定する場合は8〜64文字)
+  # pass_phrase = &quot;your_pass_phrase&quot;
 
-    # 説明
-    # description = &quot;your description here&quot;
+  description = &quot;Description&quot;
 
-    # local_execを利用してローカルマシンに秘密鍵ファイルを生成する例
-    provisioner &quot;local-exec&quot; {
-        command = &quot;echo \&quot;${self.private_key}\&quot; &gt; id_rsa; chmod 0600 id_rsa&quot;
-    }
+  # local_execを利用してローカルマシンに秘密鍵ファイルを生成する例
+  provisioner &quot;local-exec&quot; {
+    command = &quot;echo \&quot;${self.private_key}\&quot; &gt; id_rsa; chmod 0600 id_rsa&quot;
+  }
+  # terraform destroy実行時にローカルマシン上の秘密鍵ファイルを削除
+  provisioner &quot;local-exec&quot; {
+    when    = &quot;destroy&quot;
+    command = &quot;rm -f id_rsa&quot;
+  }
 }
 </code></pre>
 
@@ -392,11 +411,6 @@
 <td>-</td>
 </tr>
 <tr>
-<td><code>name</code></td>
-<td>公開鍵名</td>
-<td>-</td>
-</tr>
-<tr>
 <td><code>private_key</code></td>
 <td>秘密鍵</td>
 <td>生成された秘密鍵</td>
@@ -411,63 +425,57 @@
 <td>フィンガープリント</td>
 <td>-</td>
 </tr>
-<tr>
-<td><code>description</code></td>
-<td>説明</td>
-<td>-</td>
-</tr>
 </tbody>
 </table>
 <h3 id="_4">利用例</h3>
 <h4 id="ssh">サーバのプロビジョニング時、SSH接続用に公開鍵(生成)を利用する</h4>
-<pre><code class="hcl"># ssh公開鍵
-resource &quot;sakuracloud_ssh_key_gen&quot; &quot;key&quot; {
-    name = &quot;foobar&quot;
-    provisioner &quot;local-exec&quot; {
-      command = &quot;echo \&quot;${self.private_key}\&quot; &gt; id_rsa; chmod 0600 id_rsa&quot;
-    }
-}
-
-
-# OS(CentOS 7.3)
-data sakuracloud_archive &quot;centos&quot;{
-    os_type = &quot;centos&quot;
-}
-# ディスクの定義
-resource sakuracloud_disk &quot;foobar&quot; {
-    name = &quot;foobar&quot;
-    source_archive_id = &quot;${data.sakuracloud_archive.centos.id}&quot;
-    password = &quot;PUT_YOUR_PASSWORD_HERE&quot;
-    # 生成した公開鍵のIDを指定
-    ssh_key_ids = [&quot;${sakuracloud_ssh_key_gen.key.id}&quot;]
-    # SSH接続時のパスワード/チャレンジレスポンス認証を無効化
-    disable_pw_auth = true
-}
-# サーバの定義
-resource sakuracloud_server &quot;foobar&quot; {
-    name = &quot;foobar&quot;
-    disks = [&quot;${sakuracloud_disk.foobar.id}&quot;]
-    tags = [&quot;@virtio-net-pci&quot;]
-
-    # プロビジョニング
-    connection {
-       user = &quot;root&quot;
-       host = &quot;${self.base_nw_ipaddress}&quot;
-       private_key = &quot;${sakuracloud_ssh_key_gen.key.private_key}&quot;
-    }
-    provisioner &quot;remote-exec&quot; {
-        inline = [
-          &quot;hostname&quot; # 実行したいコマンドを指定
-        ]
-   }
-}
-
-# SSH接続用のアウトプット定義
-output &quot;ssh_to_server&quot; {
-    value = &quot;ssh -i id_rsa root@${sakuracloud_server.foobar.base_nw_ipaddress}&quot;
-}
-
-</code></pre>
+<p>```hcl</p>
+<h1 id="ssh_1">SSH公開鍵</h1>
+<p>resource sakuracloud_ssh_key_gen "key" {
+  name = "foobar"</p>
+<p>provisioner "local-exec" {
+    command = "echo \"${self.private_key}\" &gt; id_rsa; chmod 0600 id_rsa"
+  }</p>
+<p>provisioner "local-exec" {
+    when    = "destroy"
+    command = "rm -f id_rsa"
+  }
+}</p>
+<h1 id="oscentos">OS(CentOS)</h1>
+<p>data sakuracloud_archive "centos" {
+  os_type = "centos"
+}</p>
+<h1 id="_5">ディスクの定義</h1>
+<p>resource sakuracloud_disk "foobar" {
+  name              = "foobar"
+  source_archive_id = "${data.sakuracloud_archive.centos.id}"
+  password          = "PUT_YOUR_PASSWORD_HERE"</p>
+<p># 生成した公開鍵のIDを指定
+  ssh_key_ids = ["${sakuracloud_ssh_key_gen.key.id}"]</p>
+<p># SSH接続時のパスワード/チャレンジレスポンス認証を無効化
+  disable_pw_auth = true
+}</p>
+<h1 id="_6">サーバの定義</h1>
+<p>resource sakuracloud_server "foobar" {
+  name  = "foobar"
+  disks = ["${sakuracloud_disk.foobar.id}"]
+  tags  = ["@virtio-net-pci"]</p>
+<p># プロビジョニング
+  connection {
+    user        = "root"
+    host        = "${self.base_nw_ipaddress}"
+    private_key = "${sakuracloud_ssh_key_gen.key.private_key}"
+  }</p>
+<p>provisioner "remote-exec" {
+    inline = [
+      "hostname",
+    ] # 実行したいコマンドを指定
+  }
+}</p>
+<h1 id="ssh_2">SSH接続用のアウトプット定義</h1>
+<p>output "ssh_to_server" {
+  value = "ssh -i id_rsa root@${sakuracloud_server.foobar.base_nw_ipaddress}"
+}</p>
               
             </div>
           </div>

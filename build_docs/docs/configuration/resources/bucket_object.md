@@ -13,7 +13,7 @@
 ### 設定例
 
 ```hcl
-resource "sakuracloud_bucket_object" "foobar" {
+resource sakuracloud_bucket_object "foobar" {
   #アクセスキー(環境変数SACLOUD_OJS_ACCESS_KEY_ID、またはAWS_ACCESS_KEY_IDでも指定可能)  
   #access_key = ""
 
@@ -76,7 +76,7 @@ resource "sakuracloud_bucket_object" "foobar" {
 ### データソースの利用例
 
 ```hcl
-data "sakuracloud_bucket_object" "foobar" {
+data sakuracloud_bucket_object "foobar" {
   #アクセスキー(環境変数SACLOUD_OJS_ACCESS_KEY_ID、またはAWS_ACCESS_KEY_IDでも指定可能)  
   #access_key = ""
   #シークレットキー(環境変数SACLOUD_OJS_SECRET_ACCESS_KEY、またはAWS_SECRET_ACCESS_KEYでも指定可能)

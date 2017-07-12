@@ -9,21 +9,21 @@
 ### 設定例
 
 ```hcl
-# ディスクの定義
-resource "sakuracloud_disk" "disk01" {
-    name = "disk01"
-    zone = "is1b"
+#ディスクの定義
+resource sakuracloud_disk "disk01" {
+  name = "disk01"
+  zone = "is1b"
 }
 
-# 自動バックアップ
-resource "sakuracloud_auto_backup" "foobar" {
-    name = "auto_backup"
-    disk_id = "${sakuracloud_disk.disk01.id}"
-    weekdays = ["mon","tue","wed"]
-    max_backup_num = 1
-    description = "description"
-    tags = ["hoge1", "hoge2"]
-    zone = "is1b"
+#自動バックアップ
+resource sakuracloud_auto_backup "foobar" {
+  name           = "auto_backup"
+  disk_id        = "${sakuracloud_disk.disk01.id}"
+  weekdays       = ["mon", "tue", "wed"]
+  max_backup_num = 1
+  description    = "description"
+  tags           = ["tag1", "tag2"]
+  zone           = "is1b"
 }
 ```
 
@@ -43,11 +43,4 @@ resource "sakuracloud_auto_backup" "foobar" {
 
 |属性名                | 名称                    | 補足                                        |
 |---------------------|------------------------|--------------------------------------------|
-| `id`                | ID               | -                                          |
-| `name`              | 自動バックアップ名               | -                                          |
-| `disk_id`           | ディスクID               | -                                          |
-| `weekdays`          | バックアップ取得曜日               | -                                          |
-| `max_backup_num`    | 保持世代数               | -                                          |
-| `description`       | 説明               | -                                          |
-| `tags`              | タグ               | -                                          |
-| `zone`              | 対象ゾーン               | -                                          |
+| `id`                | ID                     | -                                          |

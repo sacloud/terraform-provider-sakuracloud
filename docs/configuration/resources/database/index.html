@@ -312,29 +312,31 @@
 <hr />
 <h3 id="_1">設定例</h3>
 <pre><code class="hcl"># データベースの定義
-resource &quot;sakuracloud_database&quot; &quot;foobar&quot; {
+resource sakuracloud_database &quot;foobar&quot; {
+  database_type = &quot;postgresql&quot;
+  plan          = &quot;10g&quot;
+  user_name     = &quot;defuser&quot;
+  user_password = &quot;DatabasePasswordUser397&quot;
 
-    database_type = &quot;postgresql&quot;
-    plan = &quot;10g&quot;
-    user_name = &quot;defuser&quot;
-    user_password = &quot;DatabasePasswordUser397&quot;
+  allow_networks = [&quot;192.168.11.0/24&quot;, &quot;192.168.12.0/24&quot;]
 
-    allow_networks = [&quot;192.168.11.0/24&quot;,&quot;192.168.12.0/24&quot;]
+  port = 54321
 
-    port = 54321
+  backup_time = &quot;00:00&quot;
 
-    backup_time = &quot;00:00&quot;
+  switch_id     = &quot;${sakuracloud_switch.sw.id}&quot;
+  ipaddress1    = &quot;192.168.11.101&quot;
+  nw_mask_len   = 24
+  default_route = &quot;192.168.11.1&quot;
 
-    switch_id = &quot;${sakuracloud_switch.sw.id}&quot;
-    ipaddress1 = &quot;192.168.11.101&quot;
-    nw_mask_len = 24
-    default_route = &quot;192.168.11.1&quot;
+  name        = &quot;name&quot;
+  description = &quot;description&quot;
+  tags        = [&quot;tag1&quot;, &quot;tag2&quot;]
+}
 
-    name = &quot;name_before&quot;
-    description = &quot;description_before&quot;
-    tags = [&quot;hoge1&quot; , &quot;hoge2&quot;]
-
-    zone = &quot;tk1a&quot;
+#接続するスイッチの定義
+resource sakuracloud_switch &quot;sw&quot; {
+  name = &quot;sw&quot;
 }
 </code></pre>
 
@@ -488,81 +490,6 @@ resource &quot;sakuracloud_database&quot; &quot;foobar&quot; {
 <tr>
 <td><code>id</code></td>
 <td>データベースID</td>
-<td>-</td>
-</tr>
-<tr>
-<td><code>name</code></td>
-<td>データベース名</td>
-<td>-</td>
-</tr>
-<tr>
-<td><code>database_type</code></td>
-<td>データベースタイプ</td>
-<td>-</td>
-</tr>
-<tr>
-<td><code>plan</code></td>
-<td>プラン</td>
-<td>-</td>
-</tr>
-<tr>
-<td><code>user_name</code></td>
-<td>ユーザー名</td>
-<td>-</td>
-</tr>
-<tr>
-<td><code>user_password</code></td>
-<td>パスワード</td>
-<td>-</td>
-</tr>
-<tr>
-<td><code>allow_networks</code></td>
-<td>送信元ネットワーク</td>
-<td>-</td>
-</tr>
-<tr>
-<td><code>port</code></td>
-<td>ポート番号</td>
-<td>-</td>
-</tr>
-<tr>
-<td><code>backup_time</code></td>
-<td>バックアップ開始時刻</td>
-<td>-</td>
-</tr>
-<tr>
-<td><code>switch_id</code></td>
-<td>スイッチID</td>
-<td>-</td>
-</tr>
-<tr>
-<td><code>ipaddress1</code></td>
-<td>IPアドレス1</td>
-<td>-</td>
-</tr>
-<tr>
-<td><code>nw_mask_len</code></td>
-<td>ネットマスク</td>
-<td>-</td>
-</tr>
-<tr>
-<td><code>default_route</code></td>
-<td>ゲートウェイ</td>
-<td>-</td>
-</tr>
-<tr>
-<td><code>description</code></td>
-<td>説明</td>
-<td>-</td>
-</tr>
-<tr>
-<td><code>tags</code></td>
-<td>タグ</td>
-<td>-</td>
-</tr>
-<tr>
-<td><code>zone</code></td>
-<td>ゾーン</td>
 <td>-</td>
 </tr>
 </tbody>

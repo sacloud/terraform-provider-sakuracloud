@@ -315,25 +315,38 @@
 <p><strong>全ゾーン共通のグローバルリソースです。</strong></p>
 <p><code>sakuracloud_gslb</code>がGSLB設定を、<code>sakuracloud_gslb_server</code>が対象サーバを表しています。</p>
 <h3 id="_1">設定例</h3>
-<pre><code class="hcl">resource &quot;sakuracloud_gslb&quot; &quot;mygslb&quot; {
-    name = &quot;gslb_from_terraform&quot;
-    health_check = {
-        protocol = &quot;http&quot;
-        delay_loop = 10
-        host_header = &quot;example.com&quot;
-        path = &quot;/&quot;
-        status = &quot;200&quot;
-    }
-    description = &quot;GSLB from terraform for SAKURA CLOUD&quot;
-    tags = [&quot;hoge1&quot; , &quot;hoge2&quot; ]
+<pre><code class="hcl">resource sakuracloud_gslb &quot;gslb&quot; {
+  name = &quot;gslb_from_terraform&quot;
+
+  health_check = {
+    protocol    = &quot;http&quot;
+    delay_loop  = 10
+    host_header = &quot;example.com&quot;
+    path        = &quot;/&quot;
+    status      = &quot;200&quot;
+    #port       = 80
+  }
+
+  #weighted     = false
+  #sorry_server = &quot;192.0.2.254&quot;
+  description  = &quot;GSLB from terraform for SAKURA CLOUD&quot;
+  tags         = [&quot;tag1&quot;, &quot;tag2&quot;]
 }
-resource &quot;sakuracloud_gslb_server&quot; &quot;gslb01&quot; {
-    gslb_id = &quot;${sakuracloud_gslb.mygslb.id}&quot;
-    ipaddress = &quot;192.0.2.1&quot;
+
+#GSLB配下のサーバ1
+resource sakuracloud_gslb_server &quot;gslb_server01&quot; {
+  gslb_id   = &quot;${sakuracloud_gslb.gslb.id}&quot;
+  ipaddress = &quot;192.0.2.1&quot;
+  #weight    = 1
+  #enabled   = true
 }
-resource &quot;sakuracloud_gslb_server&quot; &quot;gslb02&quot; {
-    gslb_id = &quot;${sakuracloud_gslb.mygslb.id}&quot;
-    ipaddress = &quot;192.0.2.2&quot;
+
+#GSLB配下のサーバ2
+resource sakuracloud_gslb_server &quot;gslb_server02&quot; {
+  gslb_id   = &quot;${sakuracloud_gslb.gslb.id}&quot;
+  ipaddress = &quot;192.0.2.2&quot;
+  #weight    = 1
+  #enabled   = true
 }
 </code></pre>
 
@@ -480,36 +493,6 @@ resource &quot;sakuracloud_gslb_server&quot; &quot;gslb02&quot; {
 <td>-</td>
 </tr>
 <tr>
-<td><code>name</code></td>
-<td>GSLB名</td>
-<td>-</td>
-</tr>
-<tr>
-<td><code>health_check</code></td>
-<td>ヘルスチェック</td>
-<td>詳細は<a href="#health_check"><code>health_check</code></a>を参照</td>
-</tr>
-<tr>
-<td><code>weighted</code></td>
-<td>重み付け応答</td>
-<td>-</td>
-</tr>
-<tr>
-<td><code>sorry_server</code></td>
-<td>ソーリーサーバ</td>
-<td>-</td>
-</tr>
-<tr>
-<td><code>description</code></td>
-<td>説明</td>
-<td>-</td>
-</tr>
-<tr>
-<td><code>tags</code></td>
-<td>タグ</td>
-<td>-</td>
-</tr>
-<tr>
 <td><code>FQDN</code></td>
 <td>GSLB-FQDN</td>
 <td>GSLB作成時に割り当てられるFQDN<br />ロードバランシングしたいホスト名をFQDNのCNAMEとしてDNS登録する</td>
@@ -577,26 +560,6 @@ resource &quot;sakuracloud_gslb_server&quot; &quot;gslb02&quot; {
 <tr>
 <td><code>id</code></td>
 <td>ID</td>
-<td>-</td>
-</tr>
-<tr>
-<td><code>gslb_id</code></td>
-<td>DNSゾーンID</td>
-<td>-</td>
-</tr>
-<tr>
-<td><code>ipaddress</code></td>
-<td>レコード名</td>
-<td>-</td>
-</tr>
-<tr>
-<td><code>enabled</code></td>
-<td>タイプ</td>
-<td>-</td>
-</tr>
-<tr>
-<td><code>weight</code></td>
-<td>値</td>
 <td>-</td>
 </tr>
 </tbody>

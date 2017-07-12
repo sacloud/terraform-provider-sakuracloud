@@ -5,15 +5,50 @@
 ### 設定例
 
 ```hcl
+#ディスクの定義
+resource sakuracloud_disk "disk01" {
+  name      = "disk01"
+  #plan      = "ssd"
+  #connector = "virtio"
+  #size      = 20
+
+  #コピー元アーカイブ/ディスクの指定
+  source_archive_id = "${data.sakuracloud_archive.centos.id}"
+  #source_disk_id = "${sakuracloud_disk.disk.id}"
+
+  #ディスクの修正関連
+  hostname = "your-host-name"
+  password = "your-password"
+  
+  #SSH公開鍵
+  ssh_key_ids = ["${sakuracloud_ssh_key_gen.key.id}"]
+  
+  #スタートアップスクリプト
+  note_ids = ["${sakuracloud_note.note.id}"]
+  
+  #SSH接続でのパスワード/チャレンジレスポンス認証無効化
+  disable_pw_auth = true
+ 
+  description = "Description"
+  tags        = ["tag1", "tag2"]
+}
+
+#コピー元アーカイブの定義
 data sakuracloud_archive "centos" {
-    os_type = "centos"
+  os_type = "centos"
 }
-resource "sakuracloud_disk" "disk01"{
-    name = "disk01"
-    source_archive_id = "${data.sakuracloud_archive.centos.id}"
-    ssh_key_ids = ["${sakuracloud_ssh_key.key.id}"]
-    disable_pw_auth = true
+
+#SSH公開鍵
+resource sakuracloud_ssh_key_gen "key" {
+  name = "foobar"
 }
+
+#スタートアップスクリプト
+resource sakuracloud_note "note" {
+  name    = "note"
+  content = "#!/bin/sh ..."
+}
+
 
 ```
 
@@ -61,19 +96,5 @@ v0.3.6以降では[DataResource](data_resource.md)を利用してください。
 |属性名                | 名称                    | 補足                                        |
 |---------------------|------------------------|--------------------------------------------|
 | `id`                | ディスクID               | -                                          |
-| `name`              | ディスク名               | -                                          |
-| `plan`              | ディスクプラン            | -                                          |
-| `connector`        | ディスク接続             | -                                          |
-| `size`              | ディスクサイズ(GB単位)    | -                                          |
-|`source_archive_id`  | コピー元アーカイブID      | -                                          |
-|`source_disk_id`     | コピー元ディスクID        | -                                          |
-| `hostname`          | ホスト名                | -                                          |
-| `password`          | パスワード               | -                                          |
-| `ssh_key_ids`       | SSH公開鍵ID             | -                                          |
-| `disable_pw_auth`   | パスワードでの認証無効化   | -                                          |
-| `note_ids`          | スタートアップスクリプトID | -                                          |
-| `description`       | 説明                    | -                                          |
-| `tags`              | タグ                    | -                                          |
-| `zone`              | ゾーン                  | -                                          |
 | `server_id`         | サーバID               | 接続されているサーバのID                     |
 

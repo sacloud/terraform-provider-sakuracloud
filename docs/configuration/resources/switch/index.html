@@ -313,10 +313,11 @@
                 <h1 id="sakuracloud_switch">スイッチ(sakuracloud_switch)</h1>
 <hr />
 <h3 id="_1">設定例</h3>
-<pre><code class="hcl">resource &quot;sakuracloud_switch&quot; &quot;myswitch&quot; {
-    name = &quot;sw01&quot;
-    description = &quot;Switch from terraform for SAKURA CLOUD&quot;
-    tags = [&quot;hoge1&quot; , &quot;hoge2&quot;]
+<pre><code class="hcl">resource sakuracloud_switch &quot;myswitch&quot; {
+  name = &quot;sw01&quot;
+  #bridge_id = &quot;${sakuracloud_bridge.br.id}&quot;
+  description = &quot;Switch from terraform for SAKURA CLOUD&quot;
+  tags        = [&quot;tag1&quot;, &quot;tag2&quot;]
 }
 </code></pre>
 
@@ -388,31 +389,6 @@
 <tr>
 <td><code>id</code></td>
 <td>スイッチID</td>
-<td>-</td>
-</tr>
-<tr>
-<td><code>name</code></td>
-<td>スイッチ名</td>
-<td>-</td>
-</tr>
-<tr>
-<td><code>bridge_id</code></td>
-<td>ブリッジID</td>
-<td>-</td>
-</tr>
-<tr>
-<td><code>description</code></td>
-<td>説明</td>
-<td>-</td>
-</tr>
-<tr>
-<td><code>tags</code></td>
-<td>タグ</td>
-<td>-</td>
-</tr>
-<tr>
-<td><code>zone</code></td>
-<td>ゾーン</td>
 <td>-</td>
 </tr>
 <tr>

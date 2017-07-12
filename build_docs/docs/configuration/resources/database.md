@@ -6,29 +6,31 @@
 
 ```hcl
 # データベースの定義
-resource "sakuracloud_database" "foobar" {
+resource sakuracloud_database "foobar" {
+  database_type = "postgresql"
+  plan          = "10g"
+  user_name     = "defuser"
+  user_password = "DatabasePasswordUser397"
 
-    database_type = "postgresql"
-    plan = "10g"
-    user_name = "defuser"
-    user_password = "DatabasePasswordUser397"
+  allow_networks = ["192.168.11.0/24", "192.168.12.0/24"]
 
-    allow_networks = ["192.168.11.0/24","192.168.12.0/24"]
+  port = 54321
 
-    port = 54321
+  backup_time = "00:00"
 
-    backup_time = "00:00"
+  switch_id     = "${sakuracloud_switch.sw.id}"
+  ipaddress1    = "192.168.11.101"
+  nw_mask_len   = 24
+  default_route = "192.168.11.1"
 
-    switch_id = "${sakuracloud_switch.sw.id}"
-    ipaddress1 = "192.168.11.101"
-    nw_mask_len = 24
-    default_route = "192.168.11.1"
+  name        = "name"
+  description = "description"
+  tags        = ["tag1", "tag2"]
+}
 
-    name = "name_before"
-    description = "description_before"
-    tags = ["hoge1" , "hoge2"]
-
-    zone = "tk1a"
+#接続するスイッチの定義
+resource sakuracloud_switch "sw" {
+  name = "sw"
 }
 ```
 
@@ -62,19 +64,4 @@ resource "sakuracloud_database" "foobar" {
 |属性名          | 名称             | 補足                  |
 |---------------|------------------|----------------------|
 | `id`            | データベースID | -                    |
-| `name`          | データベース名 | -                    |
-| `database_type`  | データベースタイプ | -                    |
-| `plan`             | プラン| -                    |
-| `user_name`     | ユーザー名       | -                    |
-| `user_password` | パスワード       | -                    |
-| `allow_networks`| 送信元ネットワーク       | -                    |
-| `port`          | ポート番号       | -                    |
-| `backup_time`   | バックアップ開始時刻       | -                    |
-| `switch_id`     | スイッチID      | -                    |
-| `ipaddress1`    | IPアドレス1      | -                    |
-| `nw_mask_len`   | ネットマスク      | -                   |
-| `default_route` | ゲートウェイ      | -                   |
-| `description`   | 説明             | -                   |
-| `tags`          | タグ             | -                  |
-| `zone`          | ゾーン           | -                   |
 
