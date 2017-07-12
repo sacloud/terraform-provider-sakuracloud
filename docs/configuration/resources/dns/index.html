@@ -315,20 +315,27 @@
 <p><strong>全ゾーン共通のグローバルリソースです。</strong></p>
 <p><code>sakuracloud_dns</code>がDNSゾーン設定を、<code>sakuracloud_dns_record</code>が対象ゾーン内のレコードを表しています。</p>
 <h3 id="_1">設定例</h3>
-<pre><code class="hcl">resource &quot;sakuracloud_dns&quot; &quot;dns&quot; {
-    zone = &quot;example.com&quot;
+<pre><code class="hcl"># DNSゾーン登録
+resource sakuracloud_dns &quot;dns&quot; {
+  zone        = &quot;example.com&quot;
+  description = &quot;Description&quot;
+  tags        = [&quot;tag1&quot;, &quot;tag2&quot;]
 }
-resource &quot;sakuracloud_dns_record&quot; &quot;record01&quot; {
-    dns_id = &quot;${sakuracloud_dns.dns.id}&quot;
-    name = &quot;test1&quot;
-    type = &quot;A&quot;
-    value = &quot;192.168.0.1&quot;
+
+# Aレコード1(test1.example.com)
+resource sakuracloud_dns_record &quot;record01&quot; {
+  dns_id = &quot;${sakuracloud_dns.dns.id}&quot;
+  name   = &quot;test&quot;
+  type   = &quot;A&quot;
+  value  = &quot;192.168.0.1&quot;
 }
-resource &quot;sakuracloud_dns_record&quot; &quot;record02&quot; {
-    dns_id = &quot;${sakuracloud_dns.dns.id}&quot;
-    name = &quot;test1&quot;
-    type = &quot;A&quot;
-    value = &quot;192.168.0.2&quot;
+
+# Aレコード2(test.example.com)
+resource sakuracloud_dns_record &quot;record02&quot; {
+  dns_id = &quot;${sakuracloud_dns.dns.id}&quot;
+  name   = &quot;test&quot;
+  type   = &quot;A&quot;
+  value  = &quot;192.168.0.2&quot;
 }
 </code></pre>
 
@@ -385,21 +392,6 @@ resource &quot;sakuracloud_dns_record&quot; &quot;record02&quot; {
 <tr>
 <td><code>id</code></td>
 <td>ID</td>
-<td>-</td>
-</tr>
-<tr>
-<td><code>zone</code></td>
-<td>対象DNSゾーン</td>
-<td>-</td>
-</tr>
-<tr>
-<td><code>description</code></td>
-<td>説明</td>
-<td>-</td>
-</tr>
-<tr>
-<td><code>tags</code></td>
-<td>タグ</td>
 <td>-</td>
 </tr>
 <tr>
@@ -486,63 +478,6 @@ resource &quot;sakuracloud_dns_record&quot; &quot;record02&quot; {
 <td align="center">-</td>
 <td>数値</td>
 <td>タイプが<code>SRV</code>の場合のみ有効。<code>1</code>〜<code>65535</code></td>
-</tr>
-</tbody>
-</table>
-<h3 id="_5">属性</h3>
-<table>
-<thead>
-<tr>
-<th>属性名</th>
-<th>名称</th>
-<th>補足</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>id</code></td>
-<td>ID</td>
-<td>-</td>
-</tr>
-<tr>
-<td><code>dns_id</code></td>
-<td>DNSゾーンID</td>
-<td>-</td>
-</tr>
-<tr>
-<td><code>name</code></td>
-<td>レコード名</td>
-<td>-</td>
-</tr>
-<tr>
-<td><code>type</code></td>
-<td>タイプ</td>
-<td>-</td>
-</tr>
-<tr>
-<td><code>value</code></td>
-<td>値</td>
-<td>-</td>
-</tr>
-<tr>
-<td><code>ttl</code></td>
-<td>TTL</td>
-<td>-</td>
-</tr>
-<tr>
-<td><code>priority</code></td>
-<td>プライオリティ</td>
-<td>-</td>
-</tr>
-<tr>
-<td><code>weight</code></td>
-<td>重み</td>
-<td>-</td>
-</tr>
-<tr>
-<td><code>port</code></td>
-<td>ポート</td>
-<td>-</td>
 </tr>
 </tbody>
 </table>

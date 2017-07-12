@@ -316,15 +316,19 @@
 <h3 id="_1">設定例</h3>
 <pre><code class="hcl"># ルータの定義
 resource sakuracloud_internet &quot;foobar&quot; {
-    name = &quot;router&quot;
+  name = &quot;router&quot;
 }
 
 # ルータに追加するグローバルIPアドレスブロック
-resource &quot;sakuracloud_subnet&quot; &quot;foobar&quot; {
-    # ルータのID
-    internet_id = &quot;${sakuracloud_internet.foobar.id}&quot;
-    # ネクストホップ
-    next_hop = &quot;${sakuracloud_internet.foobar.nw_min_ipaddress}&quot;
+resource sakuracloud_subnet &quot;foobar&quot; {
+  # ルータのID
+  internet_id = &quot;${sakuracloud_internet.foobar.id}&quot;
+
+  # ネクストホップ
+  next_hop = &quot;${sakuracloud_internet.foobar.nw_min_ipaddress}&quot;
+
+  # ネットワークマスク長
+  #nw_mask_len = 28
 }
 </code></pre>
 
@@ -388,26 +392,6 @@ resource &quot;sakuracloud_subnet&quot; &quot;foobar&quot; {
 <tr>
 <td><code>id</code></td>
 <td>スイッチID</td>
-<td>-</td>
-</tr>
-<tr>
-<td><code>internet_id</code></td>
-<td>スイッチ名</td>
-<td>-</td>
-</tr>
-<tr>
-<td><code>nw_mask_len</code></td>
-<td>ブリッジID</td>
-<td>-</td>
-</tr>
-<tr>
-<td><code>next_hop</code></td>
-<td>説明</td>
-<td>-</td>
-</tr>
-<tr>
-<td><code>zone</code></td>
-<td>ゾーン</td>
 <td>-</td>
 </tr>
 <tr>

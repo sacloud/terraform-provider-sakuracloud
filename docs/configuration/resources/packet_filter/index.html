@@ -313,22 +313,25 @@
                 <h1 id="sakuracloud_packet_filter">パケットフィルタ(sakuracloud_packet_filter)</h1>
 <hr />
 <h3 id="_1">設定例</h3>
-<pre><code class="hcl">resource &quot;sakuracloud_packet_filter&quot; &quot;myfilter&quot; {
-    name = &quot;myfilter&quot;
-    description = &quot;PacketFilter from terraform for SAKURA CLOUD&quot;
-    expressions = {
-        protocol = &quot;tcp&quot;
-        source_nw = &quot;192.168.2.0/24&quot;
-        source_port = &quot;0-65535&quot;
-        dest_port = &quot;80&quot;
-        allow = true
-    }
-    expressions = {
-        protocol = &quot;ip&quot;
-        source_nw = &quot;0.0.0.0/0&quot;
-        allow = false
-        description = &quot;Deny all&quot;
-    }
+<pre><code class="hcl">resource sakuracloud_packet_filter &quot;myfilter&quot; {
+  name = &quot;myfilter&quot;
+
+  expressions = {
+    protocol    = &quot;tcp&quot;
+    source_nw   = &quot;192.168.2.0/24&quot;
+    source_port = &quot;0-65535&quot;
+    dest_port   = &quot;80&quot;
+    allow       = true
+  }
+
+  expressions = {
+    protocol    = &quot;ip&quot;
+    source_nw   = &quot;0.0.0.0/0&quot;
+    allow       = false
+    description = &quot;Deny all&quot;
+  }
+
+  description = &quot;PacketFilter from terraform for SAKURA CLOUD&quot;
 }
 </code></pre>
 
@@ -464,31 +467,6 @@
 <td><code>id</code></td>
 <td>ID</td>
 <td>-</td>
-</tr>
-<tr>
-<td><code>name</code></td>
-<td>パケットフィルタ名</td>
-<td>-</td>
-</tr>
-<tr>
-<td><code>description</code></td>
-<td>説明</td>
-<td>-</td>
-</tr>
-<tr>
-<td><code>tags</code></td>
-<td>タグ</td>
-<td>-</td>
-</tr>
-<tr>
-<td><code>zone</code></td>
-<td>ゾーン</td>
-<td>-</td>
-</tr>
-<tr>
-<td><code>expressions</code></td>
-<td>フィルタルール</td>
-<td><a href="#expressions"><code>expressions</code></a>のリスト</td>
 </tr>
 </tbody>
 </table>

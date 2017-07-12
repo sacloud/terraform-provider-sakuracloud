@@ -313,15 +313,50 @@
                 <h1 id="sakuracloud_disk">ディスク(sakuracloud_disk)</h1>
 <hr />
 <h3 id="_1">設定例</h3>
-<pre><code class="hcl">data sakuracloud_archive &quot;centos&quot; {
-    os_type = &quot;centos&quot;
+<pre><code class="hcl">#ディスクの定義
+resource sakuracloud_disk &quot;disk01&quot; {
+  name      = &quot;disk01&quot;
+  #plan      = &quot;ssd&quot;
+  #connector = &quot;virtio&quot;
+  #size      = 20
+
+  #コピー元アーカイブ/ディスクの指定
+  source_archive_id = &quot;${data.sakuracloud_archive.centos.id}&quot;
+  #source_disk_id = &quot;${sakuracloud_disk.disk.id}&quot;
+
+  #ディスクの修正関連
+  hostname = &quot;your-host-name&quot;
+  password = &quot;your-password&quot;
+
+  #SSH公開鍵
+  ssh_key_ids = [&quot;${sakuracloud_ssh_key_gen.key.id}&quot;]
+
+  #スタートアップスクリプト
+  note_ids = [&quot;${sakuracloud_note.note.id}&quot;]
+
+  #SSH接続でのパスワード/チャレンジレスポンス認証無効化
+  disable_pw_auth = true
+
+  description = &quot;Description&quot;
+  tags        = [&quot;tag1&quot;, &quot;tag2&quot;]
 }
-resource &quot;sakuracloud_disk&quot; &quot;disk01&quot;{
-    name = &quot;disk01&quot;
-    source_archive_id = &quot;${data.sakuracloud_archive.centos.id}&quot;
-    ssh_key_ids = [&quot;${sakuracloud_ssh_key.key.id}&quot;]
-    disable_pw_auth = true
+
+#コピー元アーカイブの定義
+data sakuracloud_archive &quot;centos&quot; {
+  os_type = &quot;centos&quot;
 }
+
+#SSH公開鍵
+resource sakuracloud_ssh_key_gen &quot;key&quot; {
+  name = &quot;foobar&quot;
+}
+
+#スタートアップスクリプト
+resource sakuracloud_note &quot;note&quot; {
+  name    = &quot;note&quot;
+  content = &quot;#!/bin/sh ...&quot;
+}
+
 
 </code></pre>
 
@@ -486,76 +521,6 @@ v0.3.6以降では<a href="../data_resource/">DataResource</a>を利用してく
 <tr>
 <td><code>id</code></td>
 <td>ディスクID</td>
-<td>-</td>
-</tr>
-<tr>
-<td><code>name</code></td>
-<td>ディスク名</td>
-<td>-</td>
-</tr>
-<tr>
-<td><code>plan</code></td>
-<td>ディスクプラン</td>
-<td>-</td>
-</tr>
-<tr>
-<td><code>connector</code></td>
-<td>ディスク接続</td>
-<td>-</td>
-</tr>
-<tr>
-<td><code>size</code></td>
-<td>ディスクサイズ(GB単位)</td>
-<td>-</td>
-</tr>
-<tr>
-<td><code>source_archive_id</code></td>
-<td>コピー元アーカイブID</td>
-<td>-</td>
-</tr>
-<tr>
-<td><code>source_disk_id</code></td>
-<td>コピー元ディスクID</td>
-<td>-</td>
-</tr>
-<tr>
-<td><code>hostname</code></td>
-<td>ホスト名</td>
-<td>-</td>
-</tr>
-<tr>
-<td><code>password</code></td>
-<td>パスワード</td>
-<td>-</td>
-</tr>
-<tr>
-<td><code>ssh_key_ids</code></td>
-<td>SSH公開鍵ID</td>
-<td>-</td>
-</tr>
-<tr>
-<td><code>disable_pw_auth</code></td>
-<td>パスワードでの認証無効化</td>
-<td>-</td>
-</tr>
-<tr>
-<td><code>note_ids</code></td>
-<td>スタートアップスクリプトID</td>
-<td>-</td>
-</tr>
-<tr>
-<td><code>description</code></td>
-<td>説明</td>
-<td>-</td>
-</tr>
-<tr>
-<td><code>tags</code></td>
-<td>タグ</td>
-<td>-</td>
-</tr>
-<tr>
-<td><code>zone</code></td>
-<td>ゾーン</td>
 <td>-</td>
 </tr>
 <tr>
