@@ -487,7 +487,7 @@ resource "sakuracloud_packet_filter" "foobar1" {
     name = "mypacket_filter1"
     description = "PacketFilter from TerraForm for SAKURA CLOUD"
     expressions = {
-    	protocol = "tcp"
+    	protocol = "udp"
     	source_nw = "0.0.0.0"
     	source_port = "0-65535"
     	dest_port = "80"
@@ -498,7 +498,7 @@ resource "sakuracloud_packet_filter" "foobar2" {
     name = "mypacket_filter2"
     description = "PacketFilter from TerraForm for SAKURA CLOUD"
     expressions = {
-    	protocol = "tcp"
+    	protocol = "udp"
     	source_nw = "0.0.0.0"
     	source_port = "0-65535"
     	dest_port = "80"

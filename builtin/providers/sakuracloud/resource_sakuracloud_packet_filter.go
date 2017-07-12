@@ -34,7 +34,6 @@ func resourceSakuraCloudPacketFilter() *schema.Resource {
 						"protocol": {
 							Type:         schema.TypeString,
 							Required:     true,
-							ForceNew:     true,
 							ValidateFunc: validateStringInWord(sacloud.AllowPacketFilterProtocol()),
 						},
 
