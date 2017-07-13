@@ -1,4 +1,4 @@
-TEST1?=./builtin/bins/provider-sakuracloud
+TEST1?=./
 TEST2?=./builtin/providers/sakuracloud
 VETARGS?=-all
 GOFMT_FILES?=$$(find . -name '*.go' | grep -v vendor)
