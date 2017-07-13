@@ -16,7 +16,7 @@ for GOOS in $OS; do
             go build \
                 -ldflags "$BUILD_LDFLAGS" \
                 -o bin/$binary \
-                builtin/bins/provider-sakuracloud/main.go
+                main.go
         if [ -n "$ARCHIVE" ]; then
             (cd bin/; zip -r "terraform-provider-sakuracloud_$arch" $binary)
             rm -f bin/$binary

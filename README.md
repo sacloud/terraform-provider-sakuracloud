@@ -111,16 +111,6 @@ terraform apply
 
 ## Building/Developing
 
-#### ソースコード
-    
-[Terraform](https://github.com/hashicorp/terraform)本体でのプロバイダ配置に合わせ、`builtin`ディレクトリ配下にソースを配置しています。
-    
-     builtin/
-       ├── bins
-       │     └── provider-sakuracloud  # Terraformプラグインエントリーポイント(mainパッケージ)
-       └── providers
-             └── sakuracloud           # さくらのクラウド用プロバイダ/リソースなどソース一式
-
 #### ビルド
 
     make build
