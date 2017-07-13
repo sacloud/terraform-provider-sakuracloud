@@ -6,9 +6,9 @@
 
 ```hcl
 provider "sakuracloud" {
-    token = "your API token"
-    secret = "your API secret"
-    zone = "target zone"
+  token  = "your API token"
+  secret = "your API secret"
+  zone   = "target zone"
 }
 ```
 
