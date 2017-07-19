@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>ディスク - Terraform for さくらのクラウド</title>
+  <title>アイコン - Terraform for さくらのクラウド</title>
   
 
   <link rel="shortcut icon" href="../../../img/favicon.ico">
@@ -21,7 +21,7 @@
   
   <script>
     // Current page data
-    var mkdocs_page_name = "ディスク";
+    var mkdocs_page_name = "アイコン";
   </script>
   
   <script src="../../../js/jquery-2.1.1.min.js"></script>
@@ -122,21 +122,8 @@
 
         
             
-    <li class="toctree-l1 current">
-        <a class="current" href="./">ディスク</a>
-        
-            <ul>
-            
-                <li class="toctree-l3"><a href="#sakuracloud_disk">ディスク(sakuracloud_disk)</a></li>
-                
-                    <li><a class="toctree-l4" href="#_1">設定例</a></li>
-                
-                    <li><a class="toctree-l4" href="#_2">パラメーター</a></li>
-                
-                    <li><a class="toctree-l4" href="#_4">属性</a></li>
-                
-            
-            </ul>
+    <li class="toctree-l1 ">
+        <a class="" href="../disk/">ディスク</a>
         
     </li>
 
@@ -219,8 +206,21 @@
 
         
             
-    <li class="toctree-l1 ">
-        <a class="" href="../icon/">アイコン</a>
+    <li class="toctree-l1 current">
+        <a class="current" href="./">アイコン</a>
+        
+            <ul>
+            
+                <li class="toctree-l3"><a href="#sakuracloud_icon">アイコン(sakuracloud_icon)</a></li>
+                
+                    <li><a class="toctree-l4" href="#_1">設定例</a></li>
+                
+                    <li><a class="toctree-l4" href="#_2">パラメーター</a></li>
+                
+                    <li><a class="toctree-l4" href="#_3">属性</a></li>
+                
+            
+            </ul>
         
     </li>
 
@@ -307,7 +307,7 @@
         
       
     
-    <li>ディスク</li>
+    <li>アイコン</li>
     <li class="wy-breadcrumbs-aside">
       
     </li>
@@ -317,54 +317,20 @@
           <div role="main">
             <div class="section">
               
-                <h1 id="sakuracloud_disk">ディスク(sakuracloud_disk)</h1>
+                <h1 id="sakuracloud_icon">アイコン(sakuracloud_icon)</h1>
 <hr />
+<p><strong>全ゾーン共通のグローバルリソースです。</strong></p>
 <h3 id="_1">設定例</h3>
-<pre><code class="hcl">#ディスクの定義
-resource sakuracloud_disk &quot;disk01&quot; {
-  name      = &quot;disk01&quot;
-  #plan      = &quot;ssd&quot;
-  #connector = &quot;virtio&quot;
-  #size      = 20
+<pre><code class="hcl">resource sakuracloud_icon &quot;icon&quot; {
+  name           = &quot;example&quot;
 
-  #コピー元アーカイブ/ディスクの指定
-  source_archive_id = &quot;${data.sakuracloud_archive.centos.id}&quot;
-  #source_disk_id = &quot;${sakuracloud_disk.disk.id}&quot;
+  #ファイルパスを指定する場合
+  source = &quot;example.png&quot;
+  #base64エンコードした文字列を指定する場合 
+  #base64content = &quot;${base64encode(file(&quot;example.png&quot;))}&quot;
 
-  #ディスクの修正関連
-  hostname = &quot;your-host-name&quot;
-  password = &quot;your-password&quot;
-
-  #SSH公開鍵
-  ssh_key_ids = [&quot;${sakuracloud_ssh_key_gen.key.id}&quot;]
-
-  #スタートアップスクリプト
-  note_ids = [&quot;${sakuracloud_note.note.id}&quot;]
-
-  #SSH接続でのパスワード/チャレンジレスポンス認証無効化
-  disable_pw_auth = true
-
-  description = &quot;Description&quot;
-  tags        = [&quot;tag1&quot;, &quot;tag2&quot;]
+  tags           = [&quot;tag1&quot;, &quot;tag2&quot;]
 }
-
-#コピー元アーカイブの定義
-data sakuracloud_archive &quot;centos&quot; {
-  os_type = &quot;centos&quot;
-}
-
-#SSH公開鍵
-resource sakuracloud_ssh_key_gen &quot;key&quot; {
-  name = &quot;foobar&quot;
-}
-
-#スタートアップスクリプト
-resource sakuracloud_note &quot;note&quot; {
-  name    = &quot;note&quot;
-  content = &quot;#!/bin/sh ...&quot;
-}
-
-
 </code></pre>
 
 <h3 id="_2">パラメーター</h3>
@@ -383,98 +349,26 @@ resource sakuracloud_note &quot;note&quot; {
 <tr>
 <td><code>name</code></td>
 <td align="center">◯</td>
-<td>ディスク名</td>
+<td>名称</td>
 <td align="center">-</td>
 <td>文字列</td>
 <td>-</td>
 </tr>
 <tr>
-<td><code>plan</code></td>
-<td align="center">-</td>
-<td>ディスクプラン</td>
-<td align="center"><code>ssd</code></td>
-<td><code>ssd</code><br /><code>hdd</code></td>
-<td>-</td>
-</tr>
-<tr>
-<td><code>connector</code></td>
-<td align="center">-</td>
-<td>ディスク接続</td>
-<td align="center"><code>virtio</code></td>
-<td><code>virtio</code><br /><code>ide</code></td>
-<td>-</td>
-</tr>
-<tr>
-<td><code>size</code></td>
-<td align="center">-</td>
-<td>ディスクサイズ(GB単位)</td>
-<td align="center">20</td>
-<td>数値</td>
-<td>-</td>
-</tr>
-<tr>
-<td><code>source_archive_id</code></td>
-<td align="center">-</td>
-<td>コピー元アーカイブID</td>
+<td><code>source</code></td>
+<td align="center">◯</td>
+<td>アイコン画像ファイルパス</td>
 <td align="center">-</td>
 <td>文字列</td>
-<td><a href="#注1">注1</a></td>
+<td><code>base64content</code>との併用は不可</td>
 </tr>
 <tr>
-<td><code>source_disk_id</code></td>
+<td><code>base64content</code></td>
 <td align="center">-</td>
-<td>コピー元ディスクID</td>
+<td>base64エンコードした画像ファイル文字列データ</td>
 <td align="center">-</td>
 <td>文字列</td>
-<td><a href="#注1">注1</a></td>
-</tr>
-<tr>
-<td><code>hostname</code></td>
-<td align="center">-</td>
-<td>ホスト名</td>
-<td align="center">-</td>
-<td>文字列</td>
-<td>ディスク修正機能で設定される、ホスト名 <a href="#注2">注2</a></td>
-</tr>
-<tr>
-<td><code>password</code></td>
-<td align="center">-</td>
-<td>パスワード</td>
-<td align="center">-</td>
-<td>文字列</td>
-<td>ディスク修正機能で設定される、OS管理者パスワード <a href="#注2">注2</a></td>
-</tr>
-<tr>
-<td><code>ssh_key_ids</code></td>
-<td align="center">-</td>
-<td>SSH公開鍵ID</td>
-<td align="center">-</td>
-<td>リスト(文字列)</td>
-<td>ディスク修正機能で設定される、SSH認証用の公開鍵ID <a href="#注2">注2</a></td>
-</tr>
-<tr>
-<td><code>disable_pw_auth</code></td>
-<td align="center">-</td>
-<td>パスワードでの認証無効化</td>
-<td align="center">-</td>
-<td><code>true</code><br /><code>false</code></td>
-<td>ディスク修正機能で設定される、SSH接続でのパスワード/チャレンジレスポンス認証の無効化 <a href="#注2">注2</a></td>
-</tr>
-<tr>
-<td><code>note_ids</code></td>
-<td align="center">-</td>
-<td>スタートアップスクリプトID</td>
-<td align="center">-</td>
-<td>リスト(文字列)</td>
-<td>スタートアップスクリプトのID</td>
-</tr>
-<tr>
-<td><code>description</code></td>
-<td align="center">-</td>
-<td>説明</td>
-<td align="center">-</td>
-<td>文字列</td>
-<td>-</td>
+<td><code>source</code>との併用は不可</td>
 </tr>
 <tr>
 <td><code>tags</code></td>
@@ -484,38 +378,9 @@ resource sakuracloud_note &quot;note&quot; {
 <td>リスト(文字列)</td>
 <td>-</td>
 </tr>
-<tr>
-<td><code>zone</code></td>
-<td align="center">-</td>
-<td>ゾーン</td>
-<td align="center">-</td>
-<td><code>is1b</code><br /><code>tk1a</code><br /><code>tk1v</code></td>
-<td>-</td>
-</tr>
 </tbody>
 </table>
-<h4 id="_3">互換性</h4>
-<ul>
-<li>
-<p><code>source_archive_name</code>/<code>source_disk_name</code>パラメータはv0.3.6にて廃止されました。
-v0.3.6以降では<a href="../data_resource/">DataResource</a>を利用してください。</p>
-</li>
-<li>
-<p><code>plan</code>パラメータはv0.5.0にて変更されました。</p>
-<ul>
-<li>旧:数値(<code>2</code>(HDD) or <code>4</code>(SSD))を指定</li>
-<li>新:文字列(<code>hdd</code> or <code>ssd</code>)を指定</li>
-</ul>
-</li>
-</ul>
-<h4 id="1">注1</h4>
-<p><code>source_archive_id</code>/<code>source_disk_id</code>はいずれか1つだけ指定可能です。</p>
-<h4 id="2">注2</h4>
-<ul>
-<li>OSによりディスク修正機能に対応していない場合があります。</li>
-<li>これらの値は投入専用です。属性においても投入値を表します(さくらのクラウドAPIからは取得できない項目です)。</li>
-</ul>
-<h3 id="_4">属性</h3>
+<h3 id="_3">属性</h3>
 <table>
 <thead>
 <tr>
@@ -527,13 +392,18 @@ v0.3.6以降では<a href="../data_resource/">DataResource</a>を利用してく
 <tbody>
 <tr>
 <td><code>id</code></td>
-<td>ディスクID</td>
+<td>スクリプトID</td>
 <td>-</td>
 </tr>
 <tr>
-<td><code>server_id</code></td>
-<td>サーバID</td>
-<td>接続されているサーバのID</td>
+<td><code>body</code></td>
+<td>base64エンコードした画像データ</td>
+<td>Size=smallな画像のbase64エンコード文字列</td>
+</tr>
+<tr>
+<td><code>url</code></td>
+<td>画像URL</td>
+<td>-</td>
 </tr>
 </tbody>
 </table>
@@ -544,10 +414,10 @@ v0.3.6以降では<a href="../data_resource/">DataResource</a>を利用してく
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="../switch/" class="btn btn-neutral float-right" title="スイッチ"/>Next <span class="icon icon-circle-arrow-right"></span></a>
+        <a href="../dns/" class="btn btn-neutral float-right" title="DNS"/>Next <span class="icon icon-circle-arrow-right"></span></a>
       
       
-        <a href="../server/" class="btn btn-neutral" title="サーバ"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../ssh_key_gen/" class="btn btn-neutral" title="公開鍵(生成)"><span class="icon icon-circle-arrow-left"></span> Previous</a>
       
     </div>
   
@@ -575,10 +445,10 @@ v0.3.6以降では<a href="../data_resource/">DataResource</a>を利用してく
     <span class="rst-current-version" data-toggle="rst-current-version">
       
       
-        <span><a href="../server/" style="color: #fcfcfc;">&laquo; Previous</a></span>
+        <span><a href="../ssh_key_gen/" style="color: #fcfcfc;">&laquo; Previous</a></span>
       
       
-        <span style="margin-left: 15px"><a href="../switch/" style="color: #fcfcfc">Next &raquo;</a></span>
+        <span style="margin-left: 15px"><a href="../dns/" style="color: #fcfcfc">Next &raquo;</a></span>
       
     </span>
 </div>
