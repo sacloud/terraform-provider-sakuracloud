@@ -26,6 +26,11 @@ func resourceSakuraCloudNote() *schema.Resource {
 				Type:     schema.TypeString,
 				Required: true,
 			},
+			"icon_id": {
+				Type:         schema.TypeString,
+				Optional:     true,
+				ValidateFunc: validateSakuracloudIDType,
+			},
 			"description": {
 				Type:     schema.TypeString,
 				Optional: true,
@@ -46,6 +51,9 @@ func resourceSakuraCloudNoteCreate(d *schema.ResourceData, meta interface{}) err
 
 	opts.Name = d.Get("name").(string)
 	opts.Content = d.Get("content").(string)
+	if iconID, ok := d.GetOk("icon_id"); ok {
+		opts.SetIconByID(toSakuraCloudID(iconID.(string)))
+	}
 	if description, ok := d.GetOk("description"); ok {
 		opts.Description = description.(string)
 	}
@@ -88,6 +96,13 @@ func resourceSakuraCloudNoteUpdate(d *schema.ResourceData, meta interface{}) err
 	if d.HasChange("content") {
 		note.Content = d.Get("content").(string)
 	}
+	if d.HasChange("icon_id") {
+		if iconID, ok := d.GetOk("icon_id"); ok {
+			note.SetIconByID(toSakuraCloudID(iconID.(string)))
+		} else {
+			note.ClearIcon()
+		}
+	}
 	if d.HasChange("description") {
 		if description, ok := d.GetOk("description"); ok {
 			note.Description = description.(string)
@@ -129,6 +144,7 @@ func setNoteResourceData(d *schema.ResourceData, _ *api.Client, data *sacloud.No
 
 	d.Set("name", data.Name)
 	d.Set("content", data.Content)
+	d.Set("icon_id", data.GetIconStrID())
 	d.Set("description", data.Description)
 	d.Set("tags", data.Tags)
 

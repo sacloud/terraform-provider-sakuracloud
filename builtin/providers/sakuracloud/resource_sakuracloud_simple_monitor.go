@@ -84,6 +84,11 @@ func resourceSakuraCloudSimpleMonitor() *schema.Resource {
 					},
 				},
 			},
+			"icon_id": {
+				Type:         schema.TypeString,
+				Optional:     true,
+				ValidateFunc: validateSakuracloudIDType,
+			},
 			"description": {
 				Type:     schema.TypeString,
 				Optional: true,
@@ -189,7 +194,9 @@ func resourceSakuraCloudSimpleMonitorCreate(d *schema.ResourceData, meta interfa
 
 		opts.Settings.SimpleMonitor.DelayLoop = conf["delay_loop"].(int)
 	}
-
+	if iconID, ok := d.GetOk("icon_id"); ok {
+		opts.SetIconByID(toSakuraCloudID(iconID.(string)))
+	}
 	if description, ok := d.GetOk("description"); ok {
 		opts.Description = description.(string)
 	}
@@ -309,6 +316,13 @@ func resourceSakuraCloudSimpleMonitorUpdate(d *schema.ResourceData, meta interfa
 		}
 	}
 
+	if d.HasChange("icon_id") {
+		if iconID, ok := d.GetOk("icon_id"); ok {
+			simpleMonitor.SetIconByID(toSakuraCloudID(iconID.(string)))
+		} else {
+			simpleMonitor.ClearIcon()
+		}
+	}
 	if d.HasChange("description") {
 		if description, ok := d.GetOk("description"); ok {
 			simpleMonitor.Description = description.(string)
@@ -474,6 +488,7 @@ func setSimpleMonitorResourceData(d *schema.ResourceData, _ *api.Client, data *s
 	healthCheck["delay_loop"] = data.Settings.SimpleMonitor.DelayLoop
 	d.Set("health_check", schema.NewSet(healthCheckSimpleMonitorHash, []interface{}{healthCheck}))
 
+	d.Set("icon_id", data.GetIconStrID())
 	d.Set("description", data.Description)
 	d.Set("tags", data.Tags)
 

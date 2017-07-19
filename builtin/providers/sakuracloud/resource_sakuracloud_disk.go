@@ -65,7 +65,11 @@ func resourceSakuraCloudDisk() *schema.Resource {
 				Type:     schema.TypeString,
 				Computed: true, //ReadOnly
 			},
-
+			"icon_id": {
+				Type:         schema.TypeString,
+				Optional:     true,
+				ValidateFunc: validateSakuracloudIDType,
+			},
 			"description": {
 				Type:     schema.TypeString,
 				Optional: true,
@@ -152,6 +156,9 @@ func resourceSakuraCloudDiskCreate(d *schema.ResourceData, meta interface{}) err
 	}
 
 	opts.SizeMB = toSizeMB(d.Get("size").(int))
+	if iconID, ok := d.GetOk("icon_id"); ok {
+		opts.SetIconByID(toSakuraCloudID(iconID.(string)))
+	}
 	if description, ok := d.GetOk("description"); ok {
 		opts.Description = description.(string)
 	}
@@ -326,6 +333,13 @@ func resourceSakuraCloudDiskUpdate(d *schema.ResourceData, meta interface{}) err
 	if d.HasChange("name") {
 		disk.Name = d.Get("name").(string)
 	}
+	if d.HasChange("icon_id") {
+		if iconID, ok := d.GetOk("icon_id"); ok {
+			disk.SetIconByID(toSakuraCloudID(iconID.(string)))
+		} else {
+			disk.ClearIcon()
+		}
+	}
 	if d.HasChange("description") {
 		if description, ok := d.GetOk("description"); ok {
 			disk.Description = description.(string)
@@ -435,6 +449,7 @@ func setDiskResourceData(d *schema.ResourceData, client *api.Client, data *saclo
 
 	d.Set("connector", fmt.Sprintf("%s", data.Connection))
 	d.Set("size", toSizeGB(data.SizeMB))
+	d.Set("icon_id", data.GetIconStrID())
 	d.Set("description", data.Description)
 	d.Set("tags", data.Tags)
 

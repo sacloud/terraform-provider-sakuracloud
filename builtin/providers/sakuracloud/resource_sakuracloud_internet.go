@@ -23,6 +23,11 @@ func resourceSakuraCloudInternet() *schema.Resource {
 				Type:     schema.TypeString,
 				Required: true,
 			},
+			"icon_id": {
+				Type:         schema.TypeString,
+				Optional:     true,
+				ValidateFunc: validateSakuracloudIDType,
+			},
 			"description": {
 				Type:     schema.TypeString,
 				Optional: true,
@@ -138,6 +143,9 @@ func resourceSakuraCloudInternetCreate(d *schema.ResourceData, meta interface{})
 	opts := client.Internet.New()
 
 	opts.Name = d.Get("name").(string)
+	if iconID, ok := d.GetOk("icon_id"); ok {
+		opts.SetIconByID(toSakuraCloudID(iconID.(string)))
+	}
 	if description, ok := d.GetOk("description"); ok {
 		opts.Description = description.(string)
 	}
@@ -208,6 +216,13 @@ func resourceSakuraCloudInternetUpdate(d *schema.ResourceData, meta interface{})
 
 	if d.HasChange("name") {
 		internet.Name = d.Get("name").(string)
+	}
+	if d.HasChange("icon_id") {
+		if iconID, ok := d.GetOk("icon_id"); ok {
+			internet.SetIconByID(toSakuraCloudID(iconID.(string)))
+		} else {
+			internet.ClearIcon()
+		}
 	}
 	if d.HasChange("description") {
 		if description, ok := d.GetOk("description"); ok {
@@ -336,6 +351,7 @@ func resourceSakuraCloudInternetDelete(d *schema.ResourceData, meta interface{})
 func setInternetResourceData(d *schema.ResourceData, client *api.Client, data *sacloud.Internet) error {
 
 	d.Set("name", data.Name)
+	d.Set("icon_id", data.GetIconStrID())
 	d.Set("description", data.Description)
 	d.Set("tags", data.Tags)
 

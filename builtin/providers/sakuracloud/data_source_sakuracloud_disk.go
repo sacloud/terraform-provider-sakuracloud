@@ -50,7 +50,10 @@ func dataSourceSakuraCloudDisk() *schema.Resource {
 				Type:     schema.TypeString,
 				Computed: true, //ReadOnly
 			},
-
+			"icon_id": {
+				Type:     schema.TypeString,
+				Computed: true,
+			},
 			"description": {
 				Type:     schema.TypeString,
 				Computed: true,

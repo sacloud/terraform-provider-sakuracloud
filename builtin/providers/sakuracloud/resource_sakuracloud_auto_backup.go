@@ -40,7 +40,11 @@ func resourceSakuraCloudAutoBackup() *schema.Resource {
 				Default:      1,
 				ValidateFunc: validateIntegerInRange(1, 10),
 			},
-
+			"icon_id": {
+				Type:         schema.TypeString,
+				Optional:     true,
+				ValidateFunc: validateSakuracloudIDType,
+			},
 			"description": {
 				Type:     schema.TypeString,
 				Optional: true,
@@ -81,6 +85,9 @@ func resourceSakuraCloudAutoBackupCreate(d *schema.ResourceData, meta interface{
 		opts.SetBackupSpanWeekdays(weekdays)
 	}
 
+	if iconID, ok := d.GetOk("icon_id"); ok {
+		opts.SetIconByID(toSakuraCloudID(iconID.(string)))
+	}
 	if description, ok := d.GetOk("description"); ok {
 		opts.Description = description.(string)
 	}
@@ -115,7 +122,7 @@ func resourceSakuraCloudAutoBackupRead(d *schema.ResourceData, meta interface{})
 	d.Set("disk_id", autoBackup.Status.DiskID)
 	d.Set("max_backup_num", autoBackup.Settings.Autobackup.MaximumNumberOfArchives)
 	d.Set("weekdays", autoBackup.Settings.Autobackup.BackupSpanWeekdays)
-
+	d.Set("icon_id", autoBackup.GetIconStrID())
 	d.Set("description", autoBackup.Description)
 	d.Set("tags", autoBackup.Tags)
 	d.Set("zone", client.Zone)
@@ -143,6 +150,14 @@ func resourceSakuraCloudAutoBackupUpdate(d *schema.ResourceData, meta interface{
 			return err
 		}
 		autoBackup.SetBackupSpanWeekdays(weekdays)
+	}
+
+	if d.HasChange("icon_id") {
+		if iconID, ok := d.GetOk("icon_id"); ok {
+			autoBackup.SetIconByID(toSakuraCloudID(iconID.(string)))
+		} else {
+			autoBackup.ClearIcon()
+		}
 	}
 
 	if d.HasChange("description") {

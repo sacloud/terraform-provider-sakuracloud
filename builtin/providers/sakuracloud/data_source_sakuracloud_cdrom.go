@@ -38,6 +38,10 @@ func dataSourceSakuraCloudCDROM() *schema.Resource {
 				Type:     schema.TypeInt,
 				Computed: true,
 			},
+			"icon_id": {
+				Type:     schema.TypeString,
+				Computed: true,
+			},
 			"description": {
 				Type:     schema.TypeString,
 				Computed: true,
@@ -88,6 +92,7 @@ func dataSourceSakuraCloudCDROMRead(d *schema.ResourceData, meta interface{}) er
 	d.SetId(cdrom.GetStrID())
 	d.Set("name", cdrom.Name)
 	d.Set("size", toSizeGB(cdrom.SizeMB))
+	d.Set("icon_id", cdrom.GetIconStrID())
 	d.Set("description", cdrom.Description)
 	d.Set("tags", cdrom.Tags)
 
