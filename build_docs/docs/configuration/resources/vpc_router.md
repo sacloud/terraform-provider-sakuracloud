@@ -208,6 +208,7 @@ VPCルータ本体を表します。
 | `VRID`          | △   | VRID           | -        | 数値                          | プランが`premium`、`highspec`の場合必須 |
 | `aliases`       | -   | IPエイリアス    | -        | リスト(文字列)                  | プランが`premium`、`highspec`の場合のみ有効 |
 | `syslog_host`   | -   | syslog転送先ホスト| -      | 文字列                         | - |
+| `icon_id`       | -   | アイコンID         | - | 文字列| - |
 | `description`   | -   | 説明           | -        | 文字列                         | - |
 | `tags`          | -   | タグ           | -        | リスト(文字列)                  | - |
 | `zone`          | -   | ゾーン          | -        | `is1b`<br />`tk1a`<br />`tk1v` | - |

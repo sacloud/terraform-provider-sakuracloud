@@ -32,6 +32,7 @@ resource sakuracloud_simple_monitor "mymonitor" {
 |-----------------------|:---:|--------------------|:--------:|------------------------|------------------------------------------|
 | `target`              | ◯   | 監視対象名(IPアドレス) | -    | 文字列                  | 監視対象のFQDNまたはIPアドレス |
 | `health_check`        | ◯   | 監視方法          | -       | マップ           | 詳細は[`health_check`](#health_check)を参照 |
+| `icon_id`             | -   | アイコンID         | - | 文字列| - |
 | `description`         | -   | 説明             | -       | 文字列 | - |
 | `tags`                | -   | タグ             | -       | リスト(文字列) | - |
 | `notify_email_enabled`| -   | Eメール通知有効    | `true`  | `true`<br />`false` | - |

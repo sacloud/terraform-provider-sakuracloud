@@ -48,6 +48,7 @@ resource sakuracloud_server "myserver" {
 | `nic` | - | 基本NIC | `shared` | `shared`(共有セグメント)<br />`[switch_id]`(スイッチのID)<br />`""`(接続なし)|eth0の上流NWとの接続方法を指定する。 |
 | `additional_nics` | - | 追加NIC | - | リスト(文字列) | 追加で割り当てるNIC。接続するスイッチのID、または空文字を指定する。 |
 | `packet_filter_ids`| - | パケットフィルタID | - | リスト(文字列) | NICに適用するパケットフィルタのIDをリストで指定する。リストの先頭からeth0,eth1の順で適用される |
+| `icon_id`       | -   | アイコンID         | - | 文字列| - |
 | `description` | - | 説明 | - | 文字列 | - |
 | `cdrom_id` | - | CDROM(ISOイメージ)ID | - | 文字列 | - |
 | `ipaddress`| - | 基本NIC:IPアドレス | - | 文字列 | [注1](#注1) |
