@@ -41,3 +41,19 @@ func (p *propInstance) GetInstanceBeforeStatus() string {
 	}
 	return p.Instance.GetBeforeStatus()
 }
+
+// MaintenanceScheduled メンテナンス予定の有無
+func (p *propInstance) MaintenanceScheduled() bool {
+	if p.Instance == nil {
+		return false
+	}
+	return p.Instance.MaintenanceScheduled()
+}
+
+// GetMaintenanceInfoURL メンテナンス情報 URL取得
+func (p *propInstance) GetMaintenanceInfoURL() string {
+	if p.Instance == nil {
+		return ""
+	}
+	return p.Instance.Host.InfoURL
+}
