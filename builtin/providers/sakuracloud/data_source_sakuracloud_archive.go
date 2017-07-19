@@ -48,6 +48,10 @@ func dataSourceSakuraCloudArchive() *schema.Resource {
 				Type:     schema.TypeInt,
 				Computed: true,
 			},
+			"icon_id": {
+				Type:     schema.TypeString,
+				Computed: true,
+			},
 			"description": {
 				Type:     schema.TypeString,
 				Computed: true,
@@ -115,6 +119,7 @@ func dataSourceSakuraCloudArchiveRead(d *schema.ResourceData, meta interface{}) 
 		d.SetId(archive.GetStrID())
 		d.Set("name", archive.Name)
 		d.Set("size", toSizeGB(archive.SizeMB))
+		d.Set("icon_id", archive.GetIconStrID())
 		d.Set("description", archive.Description)
 		d.Set("tags", archive.Tags)
 

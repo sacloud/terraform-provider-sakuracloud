@@ -87,6 +87,10 @@ func dataSourceSakuraCloudSimpleMonitor() *schema.Resource {
 					},
 				},
 			},
+			"icon_id": {
+				Type:     schema.TypeString,
+				Computed: true,
+			},
 			"description": {
 				Type:     schema.TypeString,
 				Computed: true,

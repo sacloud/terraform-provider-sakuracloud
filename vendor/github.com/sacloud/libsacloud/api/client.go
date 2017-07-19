@@ -10,6 +10,7 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"strings"
 	"time"
 )
 
@@ -97,10 +98,13 @@ func (c *Client) isOkStatus(code int) bool {
 func (c *Client) newRequest(method, uri string, body interface{}) ([]byte, error) {
 	var (
 		client = &http.Client{}
-		url    = fmt.Sprintf("%s/%s", c.getEndpoint(), uri)
 		err    error
 		req    *http.Request
 	)
+	var url = uri
+	if !strings.HasPrefix(url, "https://") {
+		url = fmt.Sprintf("%s/%s", c.getEndpoint(), uri)
+	}
 
 	if body != nil {
 		var bodyJSON []byte
@@ -109,7 +113,7 @@ func (c *Client) newRequest(method, uri string, body interface{}) ([]byte, error
 			return nil, err
 		}
 		if method == "GET" {
-			url = fmt.Sprintf("%s/%s?%s", c.getEndpoint(), uri, bytes.NewBuffer(bodyJSON))
+			url = fmt.Sprintf("%s?%s", url, bytes.NewBuffer(bodyJSON))
 			req, err = http.NewRequest(method, url, nil)
 		} else {
 			req, err = http.NewRequest(method, url, bytes.NewBuffer(bodyJSON))
@@ -197,6 +201,7 @@ type API struct {
 	IPv6Net       *IPv6NetAPI       // IPv6ネットワークAPI
 	License       *LicenseAPI       // ライセンスAPI
 	LoadBalancer  *LoadBalancerAPI  // ロードバランサーAPI
+	NewsFeed      *NewsFeedAPI      // フィード(障害/メンテナンス情報)API
 	Note          *NoteAPI          // スタートアップスクリプトAPI
 	PacketFilter  *PacketFilterAPI  // パケットフィルタAPI
 	Product       *ProductAPI       // 製品情報API
@@ -307,6 +312,11 @@ func (api *API) GetLicenseAPI() *LicenseAPI {
 // GetLoadBalancerAPI ロードバランサーAPI取得
 func (api *API) GetLoadBalancerAPI() *LoadBalancerAPI {
 	return api.LoadBalancer
+}
+
+// GetNewsFeedAPI フィード(障害/メンテナンス情報)API取得
+func (api *API) GetNewsFeedAPI() *NewsFeedAPI {
+	return api.NewsFeed
 }
 
 // GetNoteAPI スタートアップAPI取得
@@ -453,6 +463,7 @@ func newAPI(client *Client) *API {
 		IPv6Net:      NewIPv6NetAPI(client),
 		License:      NewLicenseAPI(client),
 		LoadBalancer: NewLoadBalancerAPI(client),
+		NewsFeed:     NewNewsFeedAPI(client),
 		Note:         NewNoteAPI(client),
 		PacketFilter: NewPacketFilterAPI(client),
 		Product: &ProductAPI{

@@ -30,6 +30,7 @@ resource sakuracloud_internet "router" {
 | `nw_mask_len`     | -   | ネットワークマスク長  | `28` | `28`<br />`27`<br />`26` | グローバルIPのプリフィックス(ネットワークマスク長) |
 | `band_width`      | -   | 帯域幅(Mbps単位)  | `100` | `100`<br />`250`<br />`500`<br />`1000`<br />`1500`<br />`2000`<br />`2500`<br />`3000` | - |
 | `enable_ipv6`     | -   | IPv6有効化  | - | `true`<br />`false`| - |
+| `icon_id`         | -   | アイコンID         | - | 文字列 | - |
 | `description`     | -   | 説明  | - | 文字列 | - |
 | `tags`            | -   | タグ | - | リスト(文字列) | - |
 | `zone`            | -   | ゾーン | - | `is1b`<br />`tk1a`<br />`tk1v` | - |

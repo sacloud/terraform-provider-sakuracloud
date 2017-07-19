@@ -54,6 +54,7 @@ resource sakuracloud_gslb_server "gslb_server02" {
 | `health_check`    | ◯   | ヘルスチェック  | -        | マップ                  | 詳細は[`health_check`](#health_check)を参照    |
 | `weighted`        | -   | 重み付け応答    | `false` | `true`<br />`false` | `true`:有効<br />`false`:無効 |
 | `sorry_server`     | -   | ソーリーサーバ  | -      | 文字列 | - |
+| `icon_id`         | -   | アイコンID         | - | 文字列 | - |
 | `description`     | -   | 説明  | -      | 文字列 | - |
 | `tags`            | -   | タグ | -      | リスト(文字列) | - |
 

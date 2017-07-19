@@ -82,6 +82,11 @@ func resourceSakuraCloudServer() *schema.Resource {
 				// ! Current terraform(v0.7) is not support to array validation !
 				// ValidateFunc: validateSakuracloudIDArrayType,
 			},
+			"icon_id": {
+				Type:         schema.TypeString,
+				Optional:     true,
+				ValidateFunc: validateSakuracloudIDType,
+			},
 			"description": {
 				Type:     schema.TypeString,
 				Optional: true,
@@ -231,7 +236,9 @@ func resourceSakuraCloudServerCreate(d *schema.ResourceData, meta interface{}) e
 			}
 		}
 	}
-
+	if iconID, ok := d.GetOk("icon_id"); ok {
+		opts.SetIconByID(toSakuraCloudID(iconID.(string)))
+	}
 	if description, ok := d.GetOk("description"); ok {
 		opts.Description = description.(string)
 	}
@@ -573,6 +580,13 @@ func resourceSakuraCloudServerUpdate(r *schema.ResourceData, meta interface{}) e
 	if d.HasChange("name") {
 		server.Name = d.Get("name").(string)
 	}
+	if d.HasChange("icon_id") {
+		if iconID, ok := d.GetOk("icon_id"); ok {
+			server.SetIconByID(toSakuraCloudID(iconID.(string)))
+		} else {
+			server.ClearIcon()
+		}
+	}
 	if d.HasChange("description") {
 		if description, ok := d.GetOk("description"); ok {
 			server.Description = description.(string)
@@ -755,6 +769,7 @@ func setServerResourceData(d *schema.ResourceData, client *api.Client, data *sac
 		d.Set("additional_interfaces", flattenInterfaces(data.Interfaces))
 	}
 
+	d.Set("icon_id", data.GetIconStrID())
 	d.Set("description", data.Description)
 	d.Set("tags", data.Tags)
 

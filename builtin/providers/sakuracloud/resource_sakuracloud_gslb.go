@@ -74,6 +74,11 @@ func resourceSakuraCloudGSLB() *schema.Resource {
 				Type:     schema.TypeString,
 				Optional: true,
 			},
+			"icon_id": {
+				Type:         schema.TypeString,
+				Optional:     true,
+				ValidateFunc: validateSakuracloudIDType,
+			},
 			"description": {
 				Type:     schema.TypeString,
 				Optional: true,
@@ -126,7 +131,9 @@ func resourceSakuraCloudGSLBCreate(d *schema.ResourceData, meta interface{}) err
 	if sorryServer, ok := d.GetOk("sorry_server"); ok {
 		opts.Settings.GSLB.SorryServer = sorryServer.(string)
 	}
-
+	if iconID, ok := d.GetOk("icon_id"); ok {
+		opts.SetIconByID(toSakuraCloudID(iconID.(string)))
+	}
 	if description, ok := d.GetOk("description"); ok {
 		opts.Description = description.(string)
 	}
@@ -207,6 +214,13 @@ func resourceSakuraCloudGSLBUpdate(d *schema.ResourceData, meta interface{}) err
 		}
 	}
 
+	if d.HasChange("icon_id") {
+		if iconID, ok := d.GetOk("icon_id"); ok {
+			gslb.SetIconByID(toSakuraCloudID(iconID.(string)))
+		} else {
+			gslb.ClearIcon()
+		}
+	}
 	if d.HasChange("description") {
 		if description, ok := d.GetOk("description"); ok {
 			gslb.Description = description.(string)
@@ -285,6 +299,7 @@ func setGSLBResourceData(d *schema.ResourceData, _ *api.Client, data *sacloud.GS
 	d.Set("health_check", schema.NewSet(healthCheckHash, []interface{}{healthCheck}))
 
 	d.Set("sorry_server", data.Settings.GSLB.SorryServer)
+	d.Set("icon_id", data.GetIconStrID())
 	d.Set("description", data.Description)
 	d.Set("tags", data.Tags)
 	d.Set("weighted", data.Settings.GSLB.Weighted == "True")

@@ -30,6 +30,11 @@ func resourceSakuraCloudDNS() *schema.Resource {
 				Computed: true,
 				Elem:     &schema.Schema{Type: schema.TypeString},
 			},
+			"icon_id": {
+				Type:         schema.TypeString,
+				Optional:     true,
+				ValidateFunc: validateSakuracloudIDType,
+			},
 			"description": {
 				Type:     schema.TypeString,
 				Optional: true,
@@ -47,6 +52,9 @@ func resourceSakuraCloudDNSCreate(d *schema.ResourceData, meta interface{}) erro
 	client := meta.(*api.Client)
 
 	opts := client.DNS.New(d.Get("zone").(string))
+	if iconID, ok := d.GetOk("icon_id"); ok {
+		opts.SetIconByID(toSakuraCloudID(iconID.(string)))
+	}
 	if description, ok := d.GetOk("description"); ok {
 		opts.Description = description.(string)
 	}
@@ -83,6 +91,13 @@ func resourceSakuraCloudDNSUpdate(d *schema.ResourceData, meta interface{}) erro
 		return fmt.Errorf("Couldn't find SakuraCloud DNS resource: %s", err)
 	}
 
+	if d.HasChange("icon_id") {
+		if iconID, ok := d.GetOk("icon_id"); ok {
+			opts.SetIconByID(toSakuraCloudID(iconID.(string)))
+		} else {
+			opts.ClearIcon()
+		}
+	}
 	if d.HasChange("description") {
 		if description, ok := d.GetOk("description"); ok {
 			opts.Description = description.(string)
@@ -124,6 +139,7 @@ func resourceSakuraCloudDNSDelete(d *schema.ResourceData, meta interface{}) erro
 func setDNSResourceData(d *schema.ResourceData, _ *api.Client, data *sacloud.DNS) error {
 
 	d.Set("zone", data.Name)
+	d.Set("icon_id", data.GetIconStrID())
 	d.Set("description", data.Description)
 	d.Set("tags", data.Tags)
 	d.Set("dns_servers", data.Status.NS)

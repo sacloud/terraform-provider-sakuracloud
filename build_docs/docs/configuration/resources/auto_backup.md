@@ -35,6 +35,7 @@ resource sakuracloud_auto_backup "foobar" {
 | `disk_id`       | ◯   | ディスクID         | - | 文字列 | - |
 | `weekdays`      | ◯   | バックアップ取得曜日 | - | 以下の値のリスト<br />`mon`<br />`tsu`<br />`wed`<br />`thu`<br />`fri`<br />`sat`<br />`sun`|- |
 | `max_backup_num`| -   | 保持世代数         | 1 | 数値 | `1`から`10`までの整数 |
+| `icon_id`       | -   | アイコンID         | - | 文字列 | - |
 | `description`   | -   | 説明              | - | 文字列 | - |
 | `tags`          | -   | タグ              | - | リスト | - |
 | `zone`          | -   | 対象ゾーン          | - | `is1b`<br />`tk1a` | - |

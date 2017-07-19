@@ -87,6 +87,7 @@ resource sakuracloud_switch "sw" {
 | `ipaddress2`    | △   | IPアドレス2     | -        | 文字列                         | 冗長化構成の場合必須 |
 | `nw_mask_len`   | ◯   | ネットマスク     | -        | 数値                          | - |
 | `default_route` | -   | ゲートウェイ     | -        | 文字列                        | - |
+| `icon_id`       | -   | アイコンID         | - | 文字列 | - |
 | `description`   | -   | 説明           | -        | 文字列                         | - |
 | `tags`          | -   | タグ           | -        | リスト(文字列)                  | - |
 | `zone`          | -   | ゾーン          | -        | `is1b`<br />`tk1a`<br />`tk1v` | - |

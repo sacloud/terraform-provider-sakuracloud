@@ -73,6 +73,11 @@ func resourceSakuraCloudLoadBalancer() *schema.Resource {
 				ForceNew: true,
 				Optional: true,
 			},
+			"icon_id": {
+				Type:         schema.TypeString,
+				Optional:     true,
+				ValidateFunc: validateSakuracloudIDType,
+			},
 			"description": {
 				Type:     schema.TypeString,
 				Optional: true,
@@ -129,7 +134,9 @@ func resourceSakuraCloudLoadBalancerCreate(d *schema.ResourceData, meta interfac
 	} else {
 		opts.Plan = sacloud.LoadBalancerPlanPremium
 	}
-
+	if iconID, ok := d.GetOk("icon_id"); ok {
+		opts.Icon = sacloud.NewResource(toSakuraCloudID(iconID.(string)))
+	}
 	if description, ok := d.GetOk("description"); ok {
 		opts.Description = description.(string)
 	}
@@ -217,6 +224,13 @@ func resourceSakuraCloudLoadBalancerUpdate(d *schema.ResourceData, meta interfac
 	if d.HasChange("name") {
 		loadBalancer.Name = d.Get("name").(string)
 	}
+	if d.HasChange("icon_id") {
+		if iconID, ok := d.GetOk("icon_id"); ok {
+			loadBalancer.SetIconByID(toSakuraCloudID(iconID.(string)))
+		} else {
+			loadBalancer.ClearIcon()
+		}
+	}
 	if d.HasChange("description") {
 		if description, ok := d.GetOk("description"); ok {
 			loadBalancer.Description = description.(string)
@@ -284,6 +298,7 @@ func setLoadBalancerResourceData(d *schema.ResourceData, client *api.Client, dat
 	d.Set("default_route", data.Remark.Network.DefaultRoute)
 
 	d.Set("name", data.Name)
+	d.Set("icon_id", data.GetIconStrID())
 	d.Set("description", data.Description)
 	d.Set("tags", data.Tags)
 

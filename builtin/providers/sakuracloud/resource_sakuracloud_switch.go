@@ -23,6 +23,11 @@ func resourceSakuraCloudSwitch() *schema.Resource {
 				Type:     schema.TypeString,
 				Required: true,
 			},
+			"icon_id": {
+				Type:         schema.TypeString,
+				Optional:     true,
+				ValidateFunc: validateSakuracloudIDType,
+			},
 			"description": {
 				Type:     schema.TypeString,
 				Optional: true,
@@ -68,6 +73,13 @@ func resourceSakuraCloudSwitchCreate(d *schema.ResourceData, meta interface{}) e
 	opts := client.Switch.New()
 
 	opts.Name = d.Get("name").(string)
+	if iconID, ok := d.GetOk("icon_id"); ok {
+		opts.SetIconByID(toSakuraCloudID(iconID.(string)))
+	}
+	if iconID, ok := d.GetOk("icon_id"); ok {
+		opts.SetIconByID(toSakuraCloudID(iconID.(string)))
+	}
+
 	if description, ok := d.GetOk("description"); ok {
 		opts.Description = description.(string)
 	}
@@ -82,8 +94,9 @@ func resourceSakuraCloudSwitchCreate(d *schema.ResourceData, meta interface{}) e
 	}
 
 	d.SetPartial("name")
-	d.SetPartial("tag")
+	d.SetPartial("icon_id")
 	d.SetPartial("description")
+	d.SetPartial("tags")
 
 	if bridgeID, ok := d.GetOk("bridge_id"); ok {
 		brID := bridgeID.(string)
@@ -135,6 +148,13 @@ func resourceSakuraCloudSwitchUpdate(d *schema.ResourceData, meta interface{}) e
 	if d.HasChange("name") {
 		sw.Name = d.Get("name").(string)
 	}
+	if d.HasChange("icon_id") {
+		if iconID, ok := d.GetOk("icon_id"); ok {
+			sw.SetIconByID(toSakuraCloudID(iconID.(string)))
+		} else {
+			sw.ClearIcon()
+		}
+	}
 	if d.HasChange("description") {
 		if description, ok := d.GetOk("description"); ok {
 			sw.Description = description.(string)
@@ -155,6 +175,7 @@ func resourceSakuraCloudSwitchUpdate(d *schema.ResourceData, meta interface{}) e
 	}
 
 	d.SetPartial("name")
+	d.SetPartial("icon_id")
 	d.SetPartial("description")
 	d.SetPartial("tags")
 
@@ -254,9 +275,9 @@ func resourceSakuraCloudSwitchDelete(d *schema.ResourceData, meta interface{}) e
 func setSwitchResourceData(d *schema.ResourceData, client *api.Client, data *sacloud.Switch) error {
 
 	d.Set("name", data.Name)
+	d.Set("icon_id", data.GetIconStrID())
 	d.Set("description", data.Description)
 	d.Set("tags", data.Tags)
-
 	if data.ServerCount > 0 {
 		servers, err := client.Switch.GetServers(toSakuraCloudID(d.Id()))
 		if err != nil {

@@ -24,19 +24,12 @@ type Instance struct {
 	} `json:",omitempty"`
 }
 
-// Storage ストレージ
-type Storage struct {
-	*Resource       // ID
-	propName        // 名称
-	propDescription // 説明
-	propZone        // ゾーン
+// HasInfoURL Host.InfoURLに値があるか
+func (i *Instance) HasInfoURL() bool {
+	return i != nil && i.Host.InfoURL != ""
+}
 
-	Class    string   `json:",omitempty"` // クラス
-	DiskPlan struct { // ディスクプラン
-		*Resource        // ID
-		propName         // 名称
-		propStorageClass // ストレージクラス
-	} `json:",omitempty"`
-
-	//Capacity []string `json:",omitempty"`
+// MaintenanceScheduled メンテナンス予定の有無
+func (i *Instance) MaintenanceScheduled() bool {
+	return i.HasInfoURL()
 }

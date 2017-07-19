@@ -91,6 +91,11 @@ func resourceSakuraCloudDatabase() *schema.Resource {
 				ForceNew: true,
 				Required: true,
 			},
+			"icon_id": {
+				Type:         schema.TypeString,
+				Optional:     true,
+				ValidateFunc: validateSakuracloudIDType,
+			},
 			"description": {
 				Type:     schema.TypeString,
 				Optional: true,
@@ -170,6 +175,10 @@ func resourceSakuraCloudDatabaseCreate(d *schema.ResourceData, meta interface{})
 		opts.Plan = sacloud.DatabasePlan240G
 	}
 
+	if iconID, ok := d.GetOk("icon_id"); ok {
+		opts.Icon = sacloud.NewResource(toSakuraCloudID(iconID.(string)))
+	}
+
 	if description, ok := d.GetOk("description"); ok {
 		opts.Description = description.(string)
 	}
@@ -233,6 +242,13 @@ func resourceSakuraCloudDatabaseUpdate(d *schema.ResourceData, meta interface{})
 
 	if d.HasChange("name") {
 		database.Name = d.Get("name").(string)
+	}
+	if d.HasChange("icon_id") {
+		if iconID, ok := d.GetOk("icon_id"); ok {
+			database.SetIconByID(toSakuraCloudID(iconID.(string)))
+		} else {
+			database.ClearIcon()
+		}
 	}
 	if d.HasChange("description") {
 		if description, ok := d.GetOk("description"); ok {
@@ -357,6 +373,7 @@ func setDatabaseResourceData(d *schema.ResourceData, client *api.Client, data *s
 	d.Set("default_route", data.Remark.Network.DefaultRoute)
 	d.Set("ipaddress1", data.Remark.Servers[0].(map[string]interface{})["IPAddress"])
 
+	d.Set("icon_id", data.GetIconStrID())
 	d.Set("description", data.Description)
 	tags := []string{}
 	for _, t := range data.Tags {

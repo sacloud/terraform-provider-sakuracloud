@@ -94,6 +94,7 @@ data sakuracloud_archive "centos" {
 | `sakuracloud_disk`           | ディスク                | -                                          |
 | `sakuracloud_dns`            | DNS                    | -                                          |
 | `sakuracloud_gslb`           | GSLB                   | -                                          |
+| `sakuracloud_icon`           | アイコン                | -                                          |
 | `sakuracloud_internet`       | ルータ                | -                                          |
 | `sakuracloud_note`           | スタートアップスクリプト   | -                                          |
 | `sakuracloud_packet_filter`  | パケットフィルタ         | -                                          |

@@ -62,6 +62,11 @@ func resourceSakuraCloudVPCRouter() *schema.Resource {
 				Elem:     &schema.Schema{Type: schema.TypeString},
 				MaxItems: 19,
 			},
+			"icon_id": {
+				Type:         schema.TypeString,
+				Optional:     true,
+				ValidateFunc: validateSakuracloudIDType,
+			},
 			"description": {
 				Type:         schema.TypeString,
 				Optional:     true,
@@ -160,6 +165,9 @@ func resourceSakuraCloudVPCRouterCreate(d *schema.ResourceData, meta interface{}
 	}
 
 	opts.Name = d.Get("name").(string)
+	if iconID, ok := d.GetOk("icon_id"); ok {
+		opts.SetIconByID(toSakuraCloudID(iconID.(string)))
+	}
 	if description, ok := d.GetOk("description"); ok {
 		opts.Description = description.(string)
 	}
@@ -210,6 +218,7 @@ func resourceSakuraCloudVPCRouterRead(d *schema.ResourceData, meta interface{}) 
 	}
 
 	d.Set("name", vpcRouter.Name)
+	d.Set("icon_id", vpcRouter.GetIconStrID())
 	d.Set("description", vpcRouter.Description)
 	if vpcRouter.Settings != nil && vpcRouter.Settings.Router != nil {
 		d.Set("syslog_host", vpcRouter.Settings.Router.SyslogHost)
@@ -262,6 +271,13 @@ func resourceSakuraCloudVPCRouterUpdate(d *schema.ResourceData, meta interface{}
 
 	if d.HasChange("name") {
 		vpcRouter.Name = d.Get("name").(string)
+	}
+	if d.HasChange("icon_id") {
+		if iconID, ok := d.GetOk("icon_id"); ok {
+			vpcRouter.SetIconByID(toSakuraCloudID(iconID.(string)))
+		} else {
+			vpcRouter.ClearIcon()
+		}
 	}
 	if d.HasChange("description") {
 		if description, ok := d.GetOk("description"); ok {
