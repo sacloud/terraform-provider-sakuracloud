@@ -35,5 +35,7 @@ pages:
       - シンプル監視: configuration/resources/simple_monitor.md
       - 自動バックアップ: configuration/resources/auto_backup.md
       - オブジェクトストレージ: configuration/resources/bucket_object.md
+    - 特殊なリソース:
+      - サーバ コネクタ: configuration/resources/server_connector.md
     - データソース:
       - データソース: configuration/resources/data_resource.md
