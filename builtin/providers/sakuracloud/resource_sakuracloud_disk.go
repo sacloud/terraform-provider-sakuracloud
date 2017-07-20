@@ -6,7 +6,6 @@ import (
 	"github.com/sacloud/libsacloud/api"
 	"github.com/sacloud/libsacloud/sacloud"
 	"log"
-	"time"
 )
 
 func resourceSakuraCloudDisk() *schema.Resource {
@@ -264,12 +263,7 @@ func resourceSakuraCloudDiskUpdate(d *schema.ResourceData, meta interface{}) err
 	}
 
 	if isRunning && isDiskConfigChanged {
-		_, err := client.Server.Shutdown(disk.Server.ID)
-		if err != nil {
-			return fmt.Errorf("Error stopping SakuraCloud Server resource: %s", err)
-		}
-
-		err = client.Server.SleepUntilDown(disk.Server.ID, client.DefaultTimeoutDuration)
+		err := stopServer(client, disk.Server.ID)
 		if err != nil {
 			return fmt.Errorf("Error stopping SakuraCloud Server resource: %s", err)
 		}
@@ -362,12 +356,7 @@ func resourceSakuraCloudDiskUpdate(d *schema.ResourceData, meta interface{}) err
 	d.SetId(disk.GetStrID())
 
 	if isRunning && isDiskConfigChanged {
-		_, err := client.Server.Boot(disk.Server.ID)
-		if err != nil {
-			return fmt.Errorf("Error booting SakuraCloud Server resource: %s", err)
-		}
-
-		err = client.Server.SleepUntilUp(disk.Server.ID, client.DefaultTimeoutDuration)
+		err := bootServer(client, disk.Server.ID)
 		if err != nil {
 			return fmt.Errorf("Error booting SakuraCloud Server resource: %s", err)
 		}
@@ -392,22 +381,25 @@ func resourceSakuraCloudDiskDelete(d *schema.ResourceData, meta interface{}) err
 	isRunning := false
 	if disk.Server != nil {
 
-		if disk.Server.Instance.IsUp() {
-			isRunning = true
-			time.Sleep(2 * time.Second)
-			_, err := client.Server.Stop(disk.Server.ID)
-			if err != nil {
-				return fmt.Errorf("Error stopping Server: %s", err)
-			}
-			err = client.Server.SleepUntilDown(disk.Server.ID, client.DefaultTimeoutDuration)
-			if err != nil {
-				return fmt.Errorf("Error stopping Server: %s", err)
-			}
-		}
+		// lock during server delete operation
+		lockKey := getServerDeleteAPILockKey(disk.Server.ID)
+		sakuraMutexKV.Lock(lockKey)
+		defer sakuraMutexKV.Unlock(lockKey)
 
-		_, err := client.Disk.DisconnectFromServer(toSakuraCloudID(d.Id()))
-		if err != nil {
-			return fmt.Errorf("Error disconnecting Disk from SakuraCloud Server: %s", err)
+		server, err := client.Server.Read(disk.Server.ID)
+		if err == nil {
+			if server.IsUp() {
+				isRunning = true
+				err := stopServer(client, server.ID)
+				if err != nil {
+					return fmt.Errorf("Error stopping SakuraCloud Server resource: %s", err)
+				}
+			}
+
+			_, err := client.Disk.DisconnectFromServer(toSakuraCloudID(d.Id()))
+			if err != nil {
+				return fmt.Errorf("Error disconnecting Disk from SakuraCloud Server: %s", err)
+			}
 		}
 
 	}
@@ -419,15 +411,10 @@ func resourceSakuraCloudDiskDelete(d *schema.ResourceData, meta interface{}) err
 	}
 
 	if isRunning {
-		_, err := client.Server.Boot(disk.Server.ID)
+		err := bootServer(client, disk.Server.ID)
 		if err != nil {
 			return fmt.Errorf("Error booting Server: %s", err)
 		}
-		err = client.Server.SleepUntilUp(disk.Server.ID, client.DefaultTimeoutDuration)
-		if err != nil {
-			return fmt.Errorf("Error booting Server: %s", err)
-		}
-
 	}
 
 	return nil

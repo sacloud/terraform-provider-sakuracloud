@@ -37,6 +37,8 @@
     - [シンプル監視](configuration/resources/simple_monitor/)
     - [自動バックアップ](configuration/resources/auto_backup/)
     - [オブジェクトストレージ](configuration/resources/bucket_object/)
+- 特殊なリソース
+    - [サーバ コネクタ](configuration/resources/server_connector)
 - データソース:
     - [データソース](configuration/resources/data_resource/)
   
