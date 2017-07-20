@@ -9,6 +9,8 @@ import (
 )
 
 const serverAPILockKey = "sakuracloud_server.lock"
+const serverPowerAPILockKey = "sakuracloud_server.power.%d.lock"
+const serverDeleteAPILockKey = "sakuracloud_server.delete.%d.lock"
 
 func resourceSakuraCloudServer() *schema.Resource {
 	return &schema.Resource{
@@ -38,6 +40,7 @@ func resourceSakuraCloudServer() *schema.Resource {
 			"disks": {
 				Type:     schema.TypeList,
 				Optional: true,
+				Computed: true,
 				Elem:     &schema.Schema{Type: schema.TypeString},
 				// ! Current terraform(v0.7) is not support to array validation !
 				// ValidateFunc: validateSakuracloudIDArrayType,
@@ -57,6 +60,7 @@ func resourceSakuraCloudServer() *schema.Resource {
 			"cdrom_id": {
 				Type:         schema.TypeString,
 				Optional:     true,
+				Computed:     true,
 				ValidateFunc: validateSakuracloudIDType,
 			},
 			"additional_interfaces": {
@@ -77,6 +81,7 @@ func resourceSakuraCloudServer() *schema.Resource {
 			"packet_filter_ids": {
 				Type:     schema.TypeList,
 				Optional: true,
+				Computed: true,
 				MaxItems: 4,
 				Elem:     &schema.Schema{Type: schema.TypeString},
 				// ! Current terraform(v0.7) is not support to array validation !
@@ -348,13 +353,7 @@ func resourceSakuraCloudServerCreate(d *schema.ResourceData, meta interface{}) e
 	if err != nil {
 		return fmt.Errorf("Failed to boot SakuraCloud Server resource: %s", err)
 	}
-	err = client.Server.SleepUntilUp(toSakuraCloudID(d.Id()), client.DefaultTimeoutDuration)
-	if err != nil {
-		return fmt.Errorf("Failed to boot SakuraCloud Server resource: %s", err)
-	}
-
 	return resourceSakuraCloudServerRead(d, meta)
-
 }
 
 func resourceSakuraCloudServerRead(d *schema.ResourceData, meta interface{}) error {
@@ -409,11 +408,6 @@ func resourceSakuraCloudServerUpdate(r *schema.ResourceData, meta interface{}) e
 	if isNeedRestart && isRunning {
 		// shudown server
 		err := stopServer(client, toSakuraCloudID(d.Id()))
-		if err != nil {
-			return fmt.Errorf("Error stopping SakuraCloud Server resource: %s", err)
-		}
-
-		err = client.Server.SleepUntilDown(toSakuraCloudID(d.Id()), client.DefaultTimeoutDuration)
 		if err != nil {
 			return fmt.Errorf("Error stopping SakuraCloud Server resource: %s", err)
 		}
@@ -609,6 +603,7 @@ func resourceSakuraCloudServerUpdate(r *schema.ResourceData, meta interface{}) e
 	d.SetId(server.GetStrID())
 
 	if d.HasChange("packet_filter_ids") {
+
 		if rawPacketFilterIDs, ok := d.GetOk("packet_filter_ids"); ok {
 			packetFilterIDs := rawPacketFilterIDs.([]interface{})
 			for i, filterID := range packetFilterIDs {
@@ -685,12 +680,6 @@ func resourceSakuraCloudServerUpdate(r *schema.ResourceData, meta interface{}) e
 		if err != nil {
 			return fmt.Errorf("Error booting SakuraCloud Server resource: %s", err)
 		}
-
-		err = client.Server.SleepUntilUp(toSakuraCloudID(d.Id()), client.DefaultTimeoutDuration)
-		if err != nil {
-			return fmt.Errorf("Error booting SakuraCloud Server resource: %s", err)
-		}
-
 	}
 
 	return resourceSakuraCloudServerRead(d.RawResourceData(), meta)
@@ -698,6 +687,11 @@ func resourceSakuraCloudServerUpdate(r *schema.ResourceData, meta interface{}) e
 }
 
 func resourceSakuraCloudServerDelete(d *schema.ResourceData, meta interface{}) error {
+
+	lockKey := getServerDeleteAPILockKey(toSakuraCloudID(d.Id()))
+	sakuraMutexKV.Lock(lockKey)
+	defer sakuraMutexKV.Unlock(lockKey)
+
 	c := meta.(*api.Client)
 	client := c.Clone()
 	zone, ok := d.GetOk("zone")
@@ -713,11 +707,6 @@ func resourceSakuraCloudServerDelete(d *schema.ResourceData, meta interface{}) e
 
 	if server.Instance.IsUp() {
 		err := stopServer(client, toSakuraCloudID(d.Id()))
-		if err != nil {
-			return fmt.Errorf("Error stopping SakuraCloud Server resource: %s", err)
-		}
-
-		err = client.Server.SleepUntilDown(toSakuraCloudID(d.Id()), client.DefaultTimeoutDuration)
 		if err != nil {
 			return fmt.Errorf("Error stopping SakuraCloud Server resource: %s", err)
 		}
@@ -740,7 +729,9 @@ func setServerResourceData(d *schema.ResourceData, client *api.Client, data *sac
 	d.Set("memory", toSizeGB(data.ServerPlan.MemoryMB))
 	d.Set("disks", flattenDisks(data.Disks))
 
-	if data.Instance.CDROM != nil {
+	if data.Instance.CDROM == nil {
+		d.Set("cdrom_id", "")
+	} else {
 		d.Set("cdrom_id", data.Instance.CDROM.GetStrID())
 	}
 
@@ -829,17 +820,53 @@ func createServer(client *api.Client, server *sacloud.Server) (*sacloud.Server, 
 }
 
 func bootServer(client *api.Client, id int64) error {
-	sakuraMutexKV.Lock(serverAPILockKey)
-	defer sakuraMutexKV.Unlock(serverAPILockKey)
+	// power API lock
+	lockKey := getServerPowerAPILockKey(id)
+	sakuraMutexKV.Lock(lockKey)
+	defer sakuraMutexKV.Unlock(lockKey)
 
+	// lock API
+	sakuraMutexKV.Lock(serverAPILockKey)
 	_, err := client.Server.Boot(id)
+	sakuraMutexKV.Unlock(serverAPILockKey)
+
+	if err != nil {
+		return err
+	}
+
+	err = client.Server.SleepUntilUp(id, client.DefaultTimeoutDuration)
+	if err != nil {
+		return err
+	}
 	return err
 }
 
 func stopServer(client *api.Client, id int64) error {
-	sakuraMutexKV.Lock(serverAPILockKey)
-	defer sakuraMutexKV.Unlock(serverAPILockKey)
+	// power API lock
+	lockKey := getServerPowerAPILockKey(id)
+	sakuraMutexKV.Lock(lockKey)
+	defer sakuraMutexKV.Unlock(lockKey)
 
+	sakuraMutexKV.Lock(serverAPILockKey)
 	_, err := client.Server.Stop(id)
+	sakuraMutexKV.Unlock(serverAPILockKey)
+
+	if err != nil {
+		return err
+	}
+
+	err = client.Server.SleepUntilDown(id, client.DefaultTimeoutDuration)
+	if err != nil {
+		return err
+	}
+
 	return err
+}
+
+func getServerPowerAPILockKey(id int64) string {
+	return fmt.Sprintf(serverPowerAPILockKey, id)
+}
+
+func getServerDeleteAPILockKey(id int64) string {
+	return fmt.Sprintf(serverDeleteAPILockKey, id)
 }
