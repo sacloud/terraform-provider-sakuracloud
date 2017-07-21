@@ -6,7 +6,6 @@ import (
 	"bytes"
 	"github.com/hashicorp/terraform/helper/hashcode"
 	"github.com/hashicorp/terraform/helper/schema"
-	"github.com/sacloud/libsacloud/api"
 	"github.com/sacloud/libsacloud/sacloud"
 )
 
@@ -50,11 +49,7 @@ func resourceSakuraCloudVPCRouterStaticRoute() *schema.Resource {
 }
 
 func resourceSakuraCloudVPCRouterStaticRouteCreate(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*api.Client)
-	zone, ok := d.GetOk("zone")
-	if ok {
-		client.Zone = zone.(string)
-	}
+	client := getSacloudAPIClient(d, meta)
 
 	routerID := d.Get("vpc_router_id").(string)
 	sakuraMutexKV.Lock(routerID)
@@ -85,11 +80,7 @@ func resourceSakuraCloudVPCRouterStaticRouteCreate(d *schema.ResourceData, meta 
 }
 
 func resourceSakuraCloudVPCRouterStaticRouteRead(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*api.Client)
-	zone, ok := d.GetOk("zone")
-	if ok {
-		client.Zone = zone.(string)
-	}
+	client := getSacloudAPIClient(d, meta)
 
 	routerID := d.Get("vpc_router_id").(string)
 	vpcRouter, err := client.VPCRouter.Read(toSakuraCloudID(routerID))
@@ -102,6 +93,9 @@ func resourceSakuraCloudVPCRouterStaticRouteRead(d *schema.ResourceData, meta in
 		vpcRouter.Settings.Router.FindStaticRoute(staticRoute.Prefix, staticRoute.NextHop) != nil {
 		d.Set("prefix", staticRoute.Prefix)
 		d.Set("next_hop", staticRoute.NextHop)
+	} else {
+		d.Set("prefix", "")
+		d.Set("next_hop", "")
 	}
 
 	d.Set("zone", client.Zone)
@@ -111,11 +105,7 @@ func resourceSakuraCloudVPCRouterStaticRouteRead(d *schema.ResourceData, meta in
 
 func resourceSakuraCloudVPCRouterStaticRouteDelete(d *schema.ResourceData, meta interface{}) error {
 
-	client := meta.(*api.Client)
-	zone, ok := d.GetOk("zone")
-	if ok {
-		client.Zone = zone.(string)
-	}
+	client := getSacloudAPIClient(d, meta)
 
 	routerID := d.Get("vpc_router_id").(string)
 	sakuraMutexKV.Lock(routerID)
@@ -142,7 +132,6 @@ func resourceSakuraCloudVPCRouterStaticRouteDelete(d *schema.ResourceData, meta 
 		}
 	}
 
-	d.SetId("")
 	return nil
 }
 

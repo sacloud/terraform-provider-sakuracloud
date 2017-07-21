@@ -6,7 +6,6 @@ import (
 	"bytes"
 	"github.com/hashicorp/terraform/helper/hashcode"
 	"github.com/hashicorp/terraform/helper/schema"
-	"github.com/sacloud/libsacloud/api"
 	"github.com/sacloud/libsacloud/sacloud"
 	"strings"
 )
@@ -68,11 +67,7 @@ func resourceSakuraCloudLoadBalancerServer() *schema.Resource {
 }
 
 func resourceSakuraCloudLoadBalancerServerCreate(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*api.Client)
-	zone, ok := d.GetOk("zone")
-	if ok {
-		client.Zone = zone.(string)
-	}
+	client := getSacloudAPIClient(d, meta)
 
 	vipID := d.Get("load_balancer_vip_id").(string)
 	lbID, vip, port, err := expandVIPID(vipID)
@@ -124,11 +119,7 @@ func resourceSakuraCloudLoadBalancerServerCreate(d *schema.ResourceData, meta in
 }
 
 func resourceSakuraCloudLoadBalancerServerRead(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*api.Client)
-	zone, ok := d.GetOk("zone")
-	if ok {
-		client.Zone = zone.(string)
-	}
+	client := getSacloudAPIClient(d, meta)
 
 	vipID := d.Get("load_balancer_vip_id").(string)
 	lbID, vip, port, err := expandVIPID(vipID)
@@ -162,11 +153,7 @@ func resourceSakuraCloudLoadBalancerServerRead(d *schema.ResourceData, meta inte
 }
 
 func resourceSakuraCloudLoadBalancerServerDelete(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*api.Client)
-	zone, ok := d.GetOk("zone")
-	if ok {
-		client.Zone = zone.(string)
-	}
+	client := getSacloudAPIClient(d, meta)
 
 	vipID := d.Get("load_balancer_vip_id").(string)
 	lbID, vip, port, err := expandVIPID(vipID)

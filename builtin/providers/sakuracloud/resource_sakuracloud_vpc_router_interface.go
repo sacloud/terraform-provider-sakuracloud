@@ -7,7 +7,6 @@ import (
 	"errors"
 	"github.com/hashicorp/terraform/helper/hashcode"
 	"github.com/hashicorp/terraform/helper/schema"
-	"github.com/sacloud/libsacloud/api"
 	"time"
 )
 
@@ -69,7 +68,7 @@ func resourceSakuraCloudVPCRouterInterface() *schema.Resource {
 
 func resourceSakuraCloudVPCRouterInterfaceCreate(d *schema.ResourceData, meta interface{}) error {
 
-	client := meta.(*api.Client)
+	client := getSacloudAPIClient(d, meta)
 	routerID := d.Get("vpc_router_id").(string)
 
 	sakuraMutexKV.Lock(routerID)
@@ -83,7 +82,8 @@ func resourceSakuraCloudVPCRouterInterfaceCreate(d *schema.ResourceData, meta in
 	isNeedRestart := vpcRouter.Instance.IsUp()
 
 	if isNeedRestart {
-		for i := 0; i < 30; i++ {
+		for i := 0; i < 10; i++ {
+			err = nil
 			if vpcRouter.Instance.IsDown() {
 				break
 			}
@@ -91,7 +91,7 @@ func resourceSakuraCloudVPCRouterInterfaceCreate(d *schema.ResourceData, meta in
 			if err != nil {
 				return fmt.Errorf("Error stopping SakuraCloud VPCRouter resource: %s", err)
 			}
-			err = client.VPCRouter.SleepUntilDown(vpcRouter.ID, 10*time.Second)
+			err = client.VPCRouter.SleepUntilDown(vpcRouter.ID, 30*time.Second)
 		}
 		if err != nil {
 			return fmt.Errorf("Error stopping SakuraCloud VPCRouter resource: %s", err)
@@ -153,12 +153,7 @@ func resourceSakuraCloudVPCRouterInterfaceCreate(d *schema.ResourceData, meta in
 }
 
 func resourceSakuraCloudVPCRouterInterfaceRead(d *schema.ResourceData, meta interface{}) error {
-	c := meta.(*api.Client)
-	client := c.Clone()
-	zone, ok := d.GetOk("zone")
-	if ok {
-		client.Zone = zone.(string)
-	}
+	client := getSacloudAPIClient(d, meta)
 
 	vpcRouter, err := client.VPCRouter.Read(toSakuraCloudID(d.Get("vpc_router_id").(string)))
 	if err != nil {
@@ -179,12 +174,7 @@ func resourceSakuraCloudVPCRouterInterfaceRead(d *schema.ResourceData, meta inte
 
 func resourceSakuraCloudVPCRouterInterfaceDelete(d *schema.ResourceData, meta interface{}) error {
 
-	c := meta.(*api.Client)
-	client := c.Clone()
-	zone, ok := d.GetOk("zone")
-	if ok {
-		client.Zone = zone.(string)
-	}
+	client := getSacloudAPIClient(d, meta)
 
 	routerID := d.Get("vpc_router_id").(string)
 	sakuraMutexKV.Lock(routerID)
@@ -198,7 +188,8 @@ func resourceSakuraCloudVPCRouterInterfaceDelete(d *schema.ResourceData, meta in
 
 	isNeedRestart := vpcRouter.Instance.IsUp()
 	if isNeedRestart {
-		for i := 0; i < 30; i++ {
+		for i := 0; i < 10; i++ {
+			err = nil
 			if vpcRouter.Instance.IsDown() {
 				break
 			}
@@ -206,7 +197,7 @@ func resourceSakuraCloudVPCRouterInterfaceDelete(d *schema.ResourceData, meta in
 			if err != nil {
 				return fmt.Errorf("Error stopping SakuraCloud VPCRouter resource: %s", err)
 			}
-			err = client.VPCRouter.SleepUntilDown(vpcRouter.ID, 10*time.Second)
+			err = client.VPCRouter.SleepUntilDown(vpcRouter.ID, 30*time.Second)
 		}
 		if err != nil {
 			return fmt.Errorf("Error stopping SakuraCloud VPCRouter resource: %s", err)
@@ -218,7 +209,7 @@ func resourceSakuraCloudVPCRouterInterfaceDelete(d *schema.ResourceData, meta in
 
 	_, err = client.VPCRouter.DeleteInterfaceAt(vpcRouter.ID, index)
 	if err != nil {
-		return err
+		return fmt.Errorf("Error deleting SakuraCloud VPCRouter interface[%d]: %s", index, err)
 	}
 
 	if isNeedRestart {

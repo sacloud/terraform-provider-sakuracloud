@@ -46,12 +46,7 @@ func resourceSakuraCloudBridge() *schema.Resource {
 }
 
 func resourceSakuraCloudBridgeCreate(d *schema.ResourceData, meta interface{}) error {
-	c := meta.(*api.Client)
-	client := c.Clone()
-	zone, ok := d.GetOk("zone")
-	if ok {
-		client.Zone = zone.(string)
-	}
+	client := getSacloudAPIClient(d, meta)
 
 	opts := client.Bridge.New()
 
@@ -70,12 +65,7 @@ func resourceSakuraCloudBridgeCreate(d *schema.ResourceData, meta interface{}) e
 }
 
 func resourceSakuraCloudBridgeRead(d *schema.ResourceData, meta interface{}) error {
-	c := meta.(*api.Client)
-	client := c.Clone()
-	zone, ok := d.GetOk("zone")
-	if ok {
-		client.Zone = zone.(string)
-	}
+	client := getSacloudAPIClient(d, meta)
 
 	bridge, err := client.Bridge.Read(toSakuraCloudID(d.Id()))
 	if err != nil {
@@ -86,12 +76,7 @@ func resourceSakuraCloudBridgeRead(d *schema.ResourceData, meta interface{}) err
 }
 
 func resourceSakuraCloudBridgeUpdate(d *schema.ResourceData, meta interface{}) error {
-	c := meta.(*api.Client)
-	client := c.Clone()
-	zone, ok := d.GetOk("zone")
-	if ok {
-		client.Zone = zone.(string)
-	}
+	client := getSacloudAPIClient(d, meta)
 
 	bridge, err := client.Bridge.Read(toSakuraCloudID(d.Id()))
 	if err != nil {
@@ -119,12 +104,7 @@ func resourceSakuraCloudBridgeUpdate(d *schema.ResourceData, meta interface{}) e
 }
 
 func resourceSakuraCloudBridgeDelete(d *schema.ResourceData, meta interface{}) error {
-	c := meta.(*api.Client)
-	client := c.Clone()
-	zone, ok := d.GetOk("zone")
-	if ok {
-		client.Zone = zone.(string)
-	}
+	client := getSacloudAPIClient(d, meta)
 
 	br, err := client.Bridge.Read(toSakuraCloudID(d.Id()))
 	if err != nil {

@@ -3,7 +3,6 @@ package sakuracloud
 import (
 	"fmt"
 	"github.com/hashicorp/terraform/helper/schema"
-	"github.com/sacloud/libsacloud/api"
 	"github.com/sacloud/libsacloud/sacloud"
 )
 
@@ -67,11 +66,7 @@ func resourceSakuraCloudAutoBackup() *schema.Resource {
 }
 
 func resourceSakuraCloudAutoBackupCreate(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*api.Client)
-	zone, ok := d.GetOk("zone")
-	if ok {
-		client.Zone = zone.(string)
-	}
+	client := getSacloudAPIClient(d, meta)
 
 	diskID := d.Get("disk_id").(string)
 	opts := client.AutoBackup.New(d.Get("name").(string), toSakuraCloudID(diskID))
@@ -107,11 +102,7 @@ func resourceSakuraCloudAutoBackupCreate(d *schema.ResourceData, meta interface{
 }
 
 func resourceSakuraCloudAutoBackupRead(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*api.Client)
-	zone, ok := d.GetOk("zone")
-	if ok {
-		client.Zone = zone.(string)
-	}
+	client := getSacloudAPIClient(d, meta)
 
 	autoBackup, err := client.AutoBackup.Read(toSakuraCloudID(d.Id()))
 	if err != nil {
@@ -131,11 +122,7 @@ func resourceSakuraCloudAutoBackupRead(d *schema.ResourceData, meta interface{})
 }
 
 func resourceSakuraCloudAutoBackupUpdate(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*api.Client)
-	zone, ok := d.GetOk("zone")
-	if ok {
-		client.Zone = zone.(string)
-	}
+	client := getSacloudAPIClient(d, meta)
 
 	autoBackup, err := client.AutoBackup.Read(toSakuraCloudID(d.Id()))
 	if err != nil {
@@ -183,11 +170,7 @@ func resourceSakuraCloudAutoBackupUpdate(d *schema.ResourceData, meta interface{
 }
 
 func resourceSakuraCloudAutoBackupDelete(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*api.Client)
-	zone, ok := d.GetOk("zone")
-	if ok {
-		client.Zone = zone.(string)
-	}
+	client := getSacloudAPIClient(d, meta)
 
 	_, err := client.AutoBackup.Delete(toSakuraCloudID(d.Id()))
 	if err != nil {

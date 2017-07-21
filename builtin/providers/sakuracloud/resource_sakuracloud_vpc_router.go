@@ -3,7 +3,6 @@ package sakuracloud
 import (
 	"fmt"
 	"github.com/hashicorp/terraform/helper/schema"
-	"github.com/sacloud/libsacloud/api"
 	"time"
 )
 
@@ -99,12 +98,7 @@ func resourceSakuraCloudVPCRouter() *schema.Resource {
 
 func resourceSakuraCloudVPCRouterCreate(d *schema.ResourceData, meta interface{}) error {
 
-	c := meta.(*api.Client)
-	client := c.Clone()
-	zone, ok := d.GetOk("zone")
-	if ok {
-		client.Zone = zone.(string)
-	}
+	client := getSacloudAPIClient(d, meta)
 
 	opts := client.VPCRouter.New()
 
@@ -205,12 +199,7 @@ func resourceSakuraCloudVPCRouterCreate(d *schema.ResourceData, meta interface{}
 }
 
 func resourceSakuraCloudVPCRouterRead(d *schema.ResourceData, meta interface{}) error {
-	c := meta.(*api.Client)
-	client := c.Clone()
-	zone, ok := d.GetOk("zone")
-	if ok {
-		client.Zone = zone.(string)
-	}
+	client := getSacloudAPIClient(d, meta)
 
 	vpcRouter, err := client.VPCRouter.Read(toSakuraCloudID(d.Id()))
 	if err != nil {
@@ -222,6 +211,8 @@ func resourceSakuraCloudVPCRouterRead(d *schema.ResourceData, meta interface{}) 
 	d.Set("description", vpcRouter.Description)
 	if vpcRouter.Settings != nil && vpcRouter.Settings.Router != nil {
 		d.Set("syslog_host", vpcRouter.Settings.Router.SyslogHost)
+	} else {
+		d.Set("syslog_host", "")
 	}
 	d.Set("tags", vpcRouter.Tags)
 
@@ -254,12 +245,7 @@ func resourceSakuraCloudVPCRouterRead(d *schema.ResourceData, meta interface{}) 
 }
 
 func resourceSakuraCloudVPCRouterUpdate(d *schema.ResourceData, meta interface{}) error {
-	c := meta.(*api.Client)
-	client := c.Clone()
-	zone, ok := d.GetOk("zone")
-	if ok {
-		client.Zone = zone.(string)
-	}
+	client := getSacloudAPIClient(d, meta)
 
 	sakuraMutexKV.Lock(d.Id())
 	defer sakuraMutexKV.Unlock(d.Id())
@@ -316,12 +302,7 @@ func resourceSakuraCloudVPCRouterUpdate(d *schema.ResourceData, meta interface{}
 }
 
 func resourceSakuraCloudVPCRouterDelete(d *schema.ResourceData, meta interface{}) error {
-	c := meta.(*api.Client)
-	client := c.Clone()
-	zone, ok := d.GetOk("zone")
-	if ok {
-		client.Zone = zone.(string)
-	}
+	client := getSacloudAPIClient(d, meta)
 
 	sakuraMutexKV.Lock(d.Id())
 	defer sakuraMutexKV.Unlock(d.Id())
@@ -332,7 +313,8 @@ func resourceSakuraCloudVPCRouterDelete(d *schema.ResourceData, meta interface{}
 	}
 
 	if vpcRouter.Instance.IsUp() {
-		for i := 0; i < 3; i++ {
+		for i := 0; i < 10; i++ {
+			err = nil
 			if vpcRouter.Instance.IsDown() {
 				break
 			}
@@ -340,7 +322,7 @@ func resourceSakuraCloudVPCRouterDelete(d *schema.ResourceData, meta interface{}
 			if err != nil {
 				return fmt.Errorf("Error stopping SakuraCloud VPCRouter resource: %s", err)
 			}
-			err = client.VPCRouter.SleepUntilDown(vpcRouter.ID, 10*time.Second)
+			err = client.VPCRouter.SleepUntilDown(vpcRouter.ID, 30*time.Second)
 		}
 		if err != nil {
 			return fmt.Errorf("Error stopping SakuraCloud VPCRouter resource: %s", err)

@@ -6,7 +6,6 @@ import (
 	"bytes"
 	"github.com/hashicorp/terraform/helper/hashcode"
 	"github.com/hashicorp/terraform/helper/schema"
-	"github.com/sacloud/libsacloud/api"
 	"github.com/sacloud/libsacloud/sacloud"
 )
 
@@ -57,11 +56,7 @@ func resourceSakuraCloudVPCRouterStaticNAT() *schema.Resource {
 }
 
 func resourceSakuraCloudVPCRouterStaticNATCreate(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*api.Client)
-	zone, ok := d.GetOk("zone")
-	if ok {
-		client.Zone = zone.(string)
-	}
+	client := getSacloudAPIClient(d, meta)
 
 	routerID := d.Get("vpc_router_id").(string)
 	sakuraMutexKV.Lock(routerID)
@@ -92,11 +87,7 @@ func resourceSakuraCloudVPCRouterStaticNATCreate(d *schema.ResourceData, meta in
 }
 
 func resourceSakuraCloudVPCRouterStaticNATRead(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*api.Client)
-	zone, ok := d.GetOk("zone")
-	if ok {
-		client.Zone = zone.(string)
-	}
+	client := getSacloudAPIClient(d, meta)
 
 	routerID := d.Get("vpc_router_id").(string)
 	vpcRouter, err := client.VPCRouter.Read(toSakuraCloudID(routerID))
@@ -110,6 +101,10 @@ func resourceSakuraCloudVPCRouterStaticNATRead(d *schema.ResourceData, meta inte
 		d.Set("global_address", staticNAT.GlobalAddress)
 		d.Set("private_address", staticNAT.PrivateAddress)
 		d.Set("description", staticNAT.Description)
+	} else {
+		d.Set("global_address", "")
+		d.Set("private_address", "")
+		d.Set("description", "")
 	}
 
 	d.Set("zone", client.Zone)
@@ -119,11 +114,7 @@ func resourceSakuraCloudVPCRouterStaticNATRead(d *schema.ResourceData, meta inte
 
 func resourceSakuraCloudVPCRouterStaticNATDelete(d *schema.ResourceData, meta interface{}) error {
 
-	client := meta.(*api.Client)
-	zone, ok := d.GetOk("zone")
-	if ok {
-		client.Zone = zone.(string)
-	}
+	client := getSacloudAPIClient(d, meta)
 
 	routerID := d.Get("vpc_router_id").(string)
 	sakuraMutexKV.Lock(routerID)
@@ -150,7 +141,6 @@ func resourceSakuraCloudVPCRouterStaticNATDelete(d *schema.ResourceData, meta in
 		}
 	}
 
-	d.SetId("")
 	return nil
 }
 

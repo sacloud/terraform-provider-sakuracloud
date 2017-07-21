@@ -79,12 +79,7 @@ func resourceSakuraCloudPacketFilter() *schema.Resource {
 }
 
 func resourceSakuraCloudPacketFilterCreate(d *schema.ResourceData, meta interface{}) error {
-	c := meta.(*api.Client)
-	client := c.Clone()
-	zone, ok := d.GetOk("zone")
-	if ok {
-		client.Zone = zone.(string)
-	}
+	client := getSacloudAPIClient(d, meta)
 
 	opts := client.PacketFilter.New()
 
@@ -135,12 +130,7 @@ func resourceSakuraCloudPacketFilterCreate(d *schema.ResourceData, meta interfac
 }
 
 func resourceSakuraCloudPacketFilterRead(d *schema.ResourceData, meta interface{}) error {
-	c := meta.(*api.Client)
-	client := c.Clone()
-	zone, ok := d.GetOk("zone")
-	if ok {
-		client.Zone = zone.(string)
-	}
+	client := getSacloudAPIClient(d, meta)
 
 	filter, err := client.PacketFilter.Read(toSakuraCloudID(d.Id()))
 	if err != nil {
@@ -151,12 +141,7 @@ func resourceSakuraCloudPacketFilterRead(d *schema.ResourceData, meta interface{
 }
 
 func resourceSakuraCloudPacketFilterUpdate(d *schema.ResourceData, meta interface{}) error {
-	c := meta.(*api.Client)
-	client := c.Clone()
-	zone, ok := d.GetOk("zone")
-	if ok {
-		client.Zone = zone.(string)
-	}
+	client := getSacloudAPIClient(d, meta)
 
 	filter, err := client.PacketFilter.Read(toSakuraCloudID(d.Id()))
 	if err != nil {
@@ -220,12 +205,7 @@ func resourceSakuraCloudPacketFilterUpdate(d *schema.ResourceData, meta interfac
 }
 
 func resourceSakuraCloudPacketFilterDelete(d *schema.ResourceData, meta interface{}) error {
-	c := meta.(*api.Client)
-	client := c.Clone()
-	zone, ok := d.GetOk("zone")
-	if ok {
-		client.Zone = zone.(string)
-	}
+	client := getSacloudAPIClient(d, meta)
 
 	servers, err := client.Server.Find()
 	if err != nil {

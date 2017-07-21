@@ -6,7 +6,6 @@ import (
 	"bytes"
 	"github.com/hashicorp/terraform/helper/hashcode"
 	"github.com/hashicorp/terraform/helper/schema"
-	"github.com/sacloud/libsacloud/api"
 	"github.com/sacloud/libsacloud/sacloud"
 )
 
@@ -56,11 +55,7 @@ func resourceSakuraCloudVPCRouterL2TP() *schema.Resource {
 }
 
 func resourceSakuraCloudVPCRouterL2TPCreate(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*api.Client)
-	zone, ok := d.GetOk("zone")
-	if ok {
-		client.Zone = zone.(string)
-	}
+	client := getSacloudAPIClient(d, meta)
 
 	routerID := d.Get("vpc_router_id").(string)
 	sakuraMutexKV.Lock(routerID)
@@ -92,11 +87,7 @@ func resourceSakuraCloudVPCRouterL2TPCreate(d *schema.ResourceData, meta interfa
 }
 
 func resourceSakuraCloudVPCRouterL2TPRead(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*api.Client)
-	zone, ok := d.GetOk("zone")
-	if ok {
-		client.Zone = zone.(string)
-	}
+	client := getSacloudAPIClient(d, meta)
 
 	routerID := d.Get("vpc_router_id").(string)
 	vpcRouter, err := client.VPCRouter.Read(toSakuraCloudID(routerID))
@@ -112,7 +103,10 @@ func resourceSakuraCloudVPCRouterL2TPRead(d *schema.ResourceData, meta interface
 		d.Set("pre_shared_secret", l2tpSetting.PreSharedSecret)
 		d.Set("range_start", l2tpSetting.RangeStart)
 		d.Set("range_stop", l2tpSetting.RangeStop)
-
+	} else {
+		d.Set("pre_shared_secret", "")
+		d.Set("range_start", "")
+		d.Set("range_stop", "")
 	}
 
 	d.Set("zone", client.Zone)
@@ -122,11 +116,7 @@ func resourceSakuraCloudVPCRouterL2TPRead(d *schema.ResourceData, meta interface
 
 func resourceSakuraCloudVPCRouterL2TPDelete(d *schema.ResourceData, meta interface{}) error {
 
-	client := meta.(*api.Client)
-	zone, ok := d.GetOk("zone")
-	if ok {
-		client.Zone = zone.(string)
-	}
+	client := getSacloudAPIClient(d, meta)
 
 	routerID := d.Get("vpc_router_id").(string)
 	sakuraMutexKV.Lock(routerID)
@@ -151,7 +141,6 @@ func resourceSakuraCloudVPCRouterL2TPDelete(d *schema.ResourceData, meta interfa
 		}
 	}
 
-	d.SetId("")
 	return nil
 }
 

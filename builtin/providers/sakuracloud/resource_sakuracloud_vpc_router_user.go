@@ -6,7 +6,6 @@ import (
 	"bytes"
 	"github.com/hashicorp/terraform/helper/hashcode"
 	"github.com/hashicorp/terraform/helper/schema"
-	"github.com/sacloud/libsacloud/api"
 	"github.com/sacloud/libsacloud/sacloud"
 )
 
@@ -47,11 +46,7 @@ func resourceSakuraCloudVPCRouterRemoteAccessUser() *schema.Resource {
 }
 
 func resourceSakuraCloudVPCRouterRemoteAccessUserCreate(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*api.Client)
-	zone, ok := d.GetOk("zone")
-	if ok {
-		client.Zone = zone.(string)
-	}
+	client := getSacloudAPIClient(d, meta)
 
 	routerID := d.Get("vpc_router_id").(string)
 	sakuraMutexKV.Lock(routerID)
@@ -82,11 +77,7 @@ func resourceSakuraCloudVPCRouterRemoteAccessUserCreate(d *schema.ResourceData, 
 }
 
 func resourceSakuraCloudVPCRouterRemoteAccessUserRead(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*api.Client)
-	zone, ok := d.GetOk("zone")
-	if ok {
-		client.Zone = zone.(string)
-	}
+	client := getSacloudAPIClient(d, meta)
 
 	routerID := d.Get("vpc_router_id").(string)
 	vpcRouter, err := client.VPCRouter.Read(toSakuraCloudID(routerID))
@@ -99,6 +90,9 @@ func resourceSakuraCloudVPCRouterRemoteAccessUserRead(d *schema.ResourceData, me
 		vpcRouter.Settings.Router.FindRemoteAccessUser(remoteAccessUser.UserName, remoteAccessUser.Password) != nil {
 		d.Set("name", remoteAccessUser.UserName)
 		d.Set("password", remoteAccessUser.Password)
+	} else {
+		d.Set("name", "")
+		d.Set("password", "")
 	}
 
 	d.Set("zone", client.Zone)
@@ -108,11 +102,7 @@ func resourceSakuraCloudVPCRouterRemoteAccessUserRead(d *schema.ResourceData, me
 
 func resourceSakuraCloudVPCRouterRemoteAccessUserDelete(d *schema.ResourceData, meta interface{}) error {
 
-	client := meta.(*api.Client)
-	zone, ok := d.GetOk("zone")
-	if ok {
-		client.Zone = zone.(string)
-	}
+	client := getSacloudAPIClient(d, meta)
 
 	routerID := d.Get("vpc_router_id").(string)
 	sakuraMutexKV.Lock(routerID)
@@ -139,7 +129,6 @@ func resourceSakuraCloudVPCRouterRemoteAccessUserDelete(d *schema.ResourceData, 
 		}
 	}
 
-	d.SetId("")
 	return nil
 }
 

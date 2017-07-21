@@ -195,11 +195,7 @@ func resourceSakuraCloudLoadBalancerCreate(d *schema.ResourceData, meta interfac
 }
 
 func resourceSakuraCloudLoadBalancerRead(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*api.Client)
-	zone, ok := d.GetOk("zone")
-	if ok {
-		client.Zone = zone.(string)
-	}
+	client := getSacloudAPIClient(d, meta)
 
 	loadBalancer, err := client.LoadBalancer.Read(toSakuraCloudID(d.Id()))
 	if err != nil {
@@ -210,11 +206,7 @@ func resourceSakuraCloudLoadBalancerRead(d *schema.ResourceData, meta interface{
 }
 
 func resourceSakuraCloudLoadBalancerUpdate(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*api.Client)
-	zone, ok := d.GetOk("zone")
-	if ok {
-		client.Zone = zone.(string)
-	}
+	client := getSacloudAPIClient(d, meta)
 
 	loadBalancer, err := client.LoadBalancer.Read(toSakuraCloudID(d.Id()))
 	if err != nil {
@@ -258,11 +250,7 @@ func resourceSakuraCloudLoadBalancerUpdate(d *schema.ResourceData, meta interfac
 }
 
 func resourceSakuraCloudLoadBalancerDelete(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*api.Client)
-	zone, ok := d.GetOk("zone")
-	if ok {
-		client.Zone = zone.(string)
-	}
+	client := getSacloudAPIClient(d, meta)
 
 	_, err := client.LoadBalancer.Stop(toSakuraCloudID(d.Id()))
 	if err != nil {
@@ -293,6 +281,7 @@ func setLoadBalancerResourceData(d *schema.ResourceData, client *api.Client, dat
 	} else {
 		d.Set("high_availability", false)
 		d.Set("ipaddress1", data.Remark.Servers[0].(map[string]interface{})["IPAddress"])
+		d.Set("ipaddress2", "")
 	}
 	d.Set("nw_mask_len", data.Remark.Network.NetworkMaskLen)
 	d.Set("default_route", data.Remark.Network.DefaultRoute)

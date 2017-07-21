@@ -6,7 +6,6 @@ import (
 	"bytes"
 	"github.com/hashicorp/terraform/helper/hashcode"
 	"github.com/hashicorp/terraform/helper/schema"
-	"github.com/sacloud/libsacloud/api"
 	"github.com/sacloud/libsacloud/sacloud"
 	"strings"
 )
@@ -64,11 +63,7 @@ func resourceSakuraCloudVPCRouterSiteToSiteIPsecVPN() *schema.Resource {
 }
 
 func resourceSakuraCloudVPCRouterSiteToSiteIPsecVPNCreate(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*api.Client)
-	zone, ok := d.GetOk("zone")
-	if ok {
-		client.Zone = zone.(string)
-	}
+	client := getSacloudAPIClient(d, meta)
 
 	routerID := d.Get("vpc_router_id").(string)
 	sakuraMutexKV.Lock(routerID)
@@ -99,11 +94,7 @@ func resourceSakuraCloudVPCRouterSiteToSiteIPsecVPNCreate(d *schema.ResourceData
 }
 
 func resourceSakuraCloudVPCRouterSiteToSiteIPsecVPNRead(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*api.Client)
-	zone, ok := d.GetOk("zone")
-	if ok {
-		client.Zone = zone.(string)
-	}
+	client := getSacloudAPIClient(d, meta)
 
 	routerID := d.Get("vpc_router_id").(string)
 	vpcRouter, err := client.VPCRouter.Read(toSakuraCloudID(routerID))
@@ -119,6 +110,12 @@ func resourceSakuraCloudVPCRouterSiteToSiteIPsecVPNRead(d *schema.ResourceData, 
 		d.Set("pre_shared_secret", s2s.PreSharedSecret)
 		d.Set("remote_id", s2s.RemoteID)
 		d.Set("routes", s2s.Routes)
+	} else {
+		d.Set("local_prefix", "")
+		d.Set("peer", "")
+		d.Set("pre_shared_secret", "")
+		d.Set("remote_id", "")
+		d.Set("routes", "")
 	}
 
 	d.Set("zone", client.Zone)
@@ -128,11 +125,7 @@ func resourceSakuraCloudVPCRouterSiteToSiteIPsecVPNRead(d *schema.ResourceData, 
 
 func resourceSakuraCloudVPCRouterSiteToSiteIPsecVPNDelete(d *schema.ResourceData, meta interface{}) error {
 
-	client := meta.(*api.Client)
-	zone, ok := d.GetOk("zone")
-	if ok {
-		client.Zone = zone.(string)
-	}
+	client := getSacloudAPIClient(d, meta)
 
 	routerID := d.Get("vpc_router_id").(string)
 	sakuraMutexKV.Lock(routerID)
@@ -159,7 +152,6 @@ func resourceSakuraCloudVPCRouterSiteToSiteIPsecVPNDelete(d *schema.ResourceData
 		}
 	}
 
-	d.SetId("")
 	return nil
 }
 
