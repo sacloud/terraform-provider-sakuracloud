@@ -1,5 +1,18 @@
 # Changelog
 
+## 0.11.0 (2017-07-21)
+
+* ドキュメントのパケットフィルタ設定例を修正 #159 (mapk0y)
+* オブジェクトストレージ対応 #161 (yamamoto-febc)
+* パケットフィルタ更新時のリソース再生成判定を修正 #162 (yamamoto-febc)
+* サンプル.tfファイルのクリーンアップ #163 (yamamoto-febc)
+* go get対応 #164 (yamamoto-febc)
+* tfファイルのフォーマット #165 (yamamoto-febc)
+* アイコン(sakuracloud_icon)追加 #167 (yamamoto-febc)
+* サーバ コネクタリソース追加 #168 (yamamoto-febc)
+* コード改善 #169 (yamamoto-febc)
+
+
 ## 0.10.4 (2017-07-10)
 
 * textlintルール追加 #153 (yamamoto-febc)
