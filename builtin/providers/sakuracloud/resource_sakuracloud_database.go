@@ -118,12 +118,7 @@ func resourceSakuraCloudDatabase() *schema.Resource {
 }
 
 func resourceSakuraCloudDatabaseCreate(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*api.Client)
-
-	zone, ok := d.GetOk("zone")
-	if ok {
-		client.Zone = zone.(string)
-	}
+	client := getSacloudAPIClient(d, meta)
 
 	var opts *sacloud.CreateDatabaseValue
 	dbType := d.Get("database_type").(string)
@@ -214,11 +209,7 @@ func resourceSakuraCloudDatabaseCreate(d *schema.ResourceData, meta interface{})
 }
 
 func resourceSakuraCloudDatabaseRead(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*api.Client)
-	zone, ok := d.GetOk("zone")
-	if ok {
-		client.Zone = zone.(string)
-	}
+	client := getSacloudAPIClient(d, meta)
 
 	data, err := client.Database.Read(toSakuraCloudID(d.Id()))
 	if err != nil {
@@ -229,11 +220,7 @@ func resourceSakuraCloudDatabaseRead(d *schema.ResourceData, meta interface{}) e
 }
 
 func resourceSakuraCloudDatabaseUpdate(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*api.Client)
-	zone, ok := d.GetOk("zone")
-	if ok {
-		client.Zone = zone.(string)
-	}
+	client := getSacloudAPIClient(d, meta)
 
 	database, err := client.Database.Read(toSakuraCloudID(d.Id()))
 	if err != nil {
@@ -310,11 +297,7 @@ func resourceSakuraCloudDatabaseUpdate(d *schema.ResourceData, meta interface{})
 }
 
 func resourceSakuraCloudDatabaseDelete(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*api.Client)
-	zone, ok := d.GetOk("zone")
-	if ok {
-		client.Zone = zone.(string)
-	}
+	client := getSacloudAPIClient(d, meta)
 
 	_, err := client.Database.Stop(toSakuraCloudID(d.Id()))
 	if err != nil {
@@ -346,7 +329,7 @@ func setDatabaseResourceData(d *schema.ResourceData, client *api.Client, data *s
 	}
 
 	d.Set("name", data.Name)
-	d.Set("user_password", data.Settings.DBConf.Common.DefaultUser)
+	d.Set("user_name", data.Settings.DBConf.Common.DefaultUser)
 	d.Set("user_password", data.Settings.DBConf.Common.UserPassword)
 
 	//plan

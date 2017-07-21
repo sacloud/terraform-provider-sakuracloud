@@ -201,12 +201,7 @@ var serverSchemaMigrateDef = []migrateSchemaDef{
 }
 
 func resourceSakuraCloudServerCreate(d *schema.ResourceData, meta interface{}) error {
-	c := meta.(*api.Client)
-	client := c.Clone()
-	zone, ok := d.GetOk("zone")
-	if ok {
-		client.Zone = zone.(string)
-	}
+	client := getSacloudAPIClient(d, meta)
 
 	migrateResourceData(d, meta, serverSchemaMigrateDef)
 
@@ -357,12 +352,7 @@ func resourceSakuraCloudServerCreate(d *schema.ResourceData, meta interface{}) e
 }
 
 func resourceSakuraCloudServerRead(d *schema.ResourceData, meta interface{}) error {
-	c := meta.(*api.Client)
-	client := c.Clone()
-	zone, ok := d.GetOk("zone")
-	if ok {
-		client.Zone = zone.(string)
-	}
+	client := getSacloudAPIClient(d, meta)
 	migrateResourceData(d, meta, serverSchemaMigrateDef)
 
 	server, err := client.Server.Read(toSakuraCloudID(d.Id()))
@@ -374,12 +364,7 @@ func resourceSakuraCloudServerRead(d *schema.ResourceData, meta interface{}) err
 }
 
 func resourceSakuraCloudServerUpdate(r *schema.ResourceData, meta interface{}) error {
-	c := meta.(*api.Client)
-	client := c.Clone()
-	zone, ok := r.GetOk("zone")
-	if ok {
-		client.Zone = zone.(string)
-	}
+	client := getSacloudAPIClient(r, meta)
 	d := migrateResourceData(r, meta, serverSchemaMigrateDef)
 
 	server, err := client.Server.Read(toSakuraCloudID(d.Id()))
@@ -692,12 +677,7 @@ func resourceSakuraCloudServerDelete(d *schema.ResourceData, meta interface{}) e
 	sakuraMutexKV.Lock(lockKey)
 	defer sakuraMutexKV.Unlock(lockKey)
 
-	c := meta.(*api.Client)
-	client := c.Clone()
-	zone, ok := d.GetOk("zone")
-	if ok {
-		client.Zone = zone.(string)
-	}
+	client := getSacloudAPIClient(d, meta)
 	migrateResourceData(d, meta, serverSchemaMigrateDef)
 
 	server, err := client.Server.Read(toSakuraCloudID(d.Id()))

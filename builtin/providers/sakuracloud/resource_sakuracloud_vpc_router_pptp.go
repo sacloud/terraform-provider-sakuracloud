@@ -6,7 +6,6 @@ import (
 	"bytes"
 	"github.com/hashicorp/terraform/helper/hashcode"
 	"github.com/hashicorp/terraform/helper/schema"
-	"github.com/sacloud/libsacloud/api"
 	"github.com/sacloud/libsacloud/sacloud"
 )
 
@@ -50,11 +49,7 @@ func resourceSakuraCloudVPCRouterPPTP() *schema.Resource {
 }
 
 func resourceSakuraCloudVPCRouterPPTPCreate(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*api.Client)
-	zone, ok := d.GetOk("zone")
-	if ok {
-		client.Zone = zone.(string)
-	}
+	client := getSacloudAPIClient(d, meta)
 
 	routerID := d.Get("vpc_router_id").(string)
 	sakuraMutexKV.Lock(routerID)
@@ -86,11 +81,7 @@ func resourceSakuraCloudVPCRouterPPTPCreate(d *schema.ResourceData, meta interfa
 }
 
 func resourceSakuraCloudVPCRouterPPTPRead(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*api.Client)
-	zone, ok := d.GetOk("zone")
-	if ok {
-		client.Zone = zone.(string)
-	}
+	client := getSacloudAPIClient(d, meta)
 
 	routerID := d.Get("vpc_router_id").(string)
 	vpcRouter, err := client.VPCRouter.Read(toSakuraCloudID(routerID))
@@ -105,7 +96,9 @@ func resourceSakuraCloudVPCRouterPPTPRead(d *schema.ResourceData, meta interface
 		vpcRouter.Settings.Router.PPTPServer.Config != nil {
 		d.Set("range_start", pptpSetting.RangeStart)
 		d.Set("range_stop", pptpSetting.RangeStop)
-
+	} else {
+		d.Set("range_start", "")
+		d.Set("range_stop", "")
 	}
 
 	d.Set("zone", client.Zone)
@@ -115,11 +108,7 @@ func resourceSakuraCloudVPCRouterPPTPRead(d *schema.ResourceData, meta interface
 
 func resourceSakuraCloudVPCRouterPPTPDelete(d *schema.ResourceData, meta interface{}) error {
 
-	client := meta.(*api.Client)
-	zone, ok := d.GetOk("zone")
-	if ok {
-		client.Zone = zone.(string)
-	}
+	client := getSacloudAPIClient(d, meta)
 
 	routerID := d.Get("vpc_router_id").(string)
 	sakuraMutexKV.Lock(routerID)
@@ -144,7 +133,6 @@ func resourceSakuraCloudVPCRouterPPTPDelete(d *schema.ResourceData, meta interfa
 		}
 	}
 
-	d.SetId("")
 	return nil
 }
 

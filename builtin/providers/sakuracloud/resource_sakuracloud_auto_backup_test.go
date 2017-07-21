@@ -24,7 +24,7 @@ func TestAccResourceSakuraCloudAutoBackup(t *testing.T) {
 					resource.TestCheckResourceAttr("sakuracloud_auto_backup.foobar", "name", "name_before"),
 					resource.TestCheckResourceAttr("sakuracloud_auto_backup.foobar", "weekdays.#", "2"),
 					resource.TestCheckResourceAttr("sakuracloud_auto_backup.foobar", "weekdays.0", "wed"),
-					resource.TestCheckResourceAttr("sakuracloud_auto_backup.foobar", "weekdays.1", "thu"),
+					resource.TestCheckResourceAttr("sakuracloud_auto_backup.foobar", "weekdays.1", "fri"),
 					resource.TestCheckResourceAttr("sakuracloud_auto_backup.foobar", "max_backup_num", "1"),
 					resource.TestCheckResourceAttr("sakuracloud_auto_backup.foobar", "description", "description_before"),
 					resource.TestCheckResourceAttr("sakuracloud_auto_backup.foobar", "tags.#", "2"),
@@ -43,8 +43,8 @@ func TestAccResourceSakuraCloudAutoBackup(t *testing.T) {
 					testAccCheckSakuraCloudAutoBackupExists("sakuracloud_auto_backup.foobar", &autoBackup),
 					resource.TestCheckResourceAttr("sakuracloud_auto_backup.foobar", "name", "name_after"),
 					resource.TestCheckResourceAttr("sakuracloud_auto_backup.foobar", "weekdays.#", "2"),
-					resource.TestCheckResourceAttr("sakuracloud_auto_backup.foobar", "weekdays.0", "thu"),
-					resource.TestCheckResourceAttr("sakuracloud_auto_backup.foobar", "weekdays.1", "fri"),
+					resource.TestCheckResourceAttr("sakuracloud_auto_backup.foobar", "weekdays.0", "fri"),
+					resource.TestCheckResourceAttr("sakuracloud_auto_backup.foobar", "weekdays.1", "sun"),
 					resource.TestCheckResourceAttr("sakuracloud_auto_backup.foobar", "max_backup_num", "2"),
 					resource.TestCheckResourceAttr("sakuracloud_auto_backup.foobar", "description", "description_after"),
 					resource.TestCheckResourceAttr("sakuracloud_auto_backup.foobar", "tags.#", "2"),
@@ -121,7 +121,7 @@ resource "sakuracloud_disk" "disk" {
 resource "sakuracloud_auto_backup" "foobar" {
     name = "name_before"
     disk_id = "${sakuracloud_disk.disk.id}"
-    weekdays = ["wed","thu"]
+    weekdays = ["wed","fri"]
     max_backup_num = 1
     description = "description_before"
     tags = ["hoge1", "hoge2"]
@@ -143,7 +143,7 @@ resource "sakuracloud_disk" "disk" {
 resource "sakuracloud_auto_backup" "foobar" {
     name = "name_after"
     disk_id = "${sakuracloud_disk.disk.id}"
-    weekdays = ["thu","fri"]
+    weekdays = ["fri","sun"]
     max_backup_num = 2
     description = "description_after"
     tags = ["hoge1_after", "hoge2_after"]

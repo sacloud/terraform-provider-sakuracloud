@@ -128,7 +128,10 @@ func resourceSakuraCloudDNSRecordRead(d *schema.ResourceData, meta interface{}) 
 		d.Set("priority", values[0])
 		d.Set("weight", values[1])
 		d.Set("port", values[2])
-
+	} else {
+		d.Set("priority", "")
+		d.Set("weight", "")
+		d.Set("port", "")
 	}
 
 	return nil

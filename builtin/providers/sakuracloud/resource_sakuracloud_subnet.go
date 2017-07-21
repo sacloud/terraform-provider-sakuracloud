@@ -70,12 +70,7 @@ func resourceSakuraCloudSubnet() *schema.Resource {
 
 func resourceSakuraCloudSubnetCreate(d *schema.ResourceData, meta interface{}) error {
 
-	c := meta.(*api.Client)
-	client := c.Clone()
-	zone, ok := d.GetOk("zone")
-	if ok {
-		client.Zone = zone.(string)
-	}
+	client := getSacloudAPIClient(d, meta)
 
 	internetID := toSakuraCloudID(d.Get("internet_id").(string))
 	nwMaskLen := d.Get("nw_mask_len").(int)
@@ -91,12 +86,7 @@ func resourceSakuraCloudSubnetCreate(d *schema.ResourceData, meta interface{}) e
 }
 
 func resourceSakuraCloudSubnetRead(d *schema.ResourceData, meta interface{}) error {
-	c := meta.(*api.Client)
-	client := c.Clone()
-	zone, ok := d.GetOk("zone")
-	if ok {
-		client.Zone = zone.(string)
-	}
+	client := getSacloudAPIClient(d, meta)
 
 	subnet, err := client.Subnet.Read(toSakuraCloudID(d.Id()))
 	if err != nil {
@@ -107,12 +97,7 @@ func resourceSakuraCloudSubnetRead(d *schema.ResourceData, meta interface{}) err
 }
 
 func resourceSakuraCloudSubnetUpdate(d *schema.ResourceData, meta interface{}) error {
-	c := meta.(*api.Client)
-	client := c.Clone()
-	zone, ok := d.GetOk("zone")
-	if ok {
-		client.Zone = zone.(string)
-	}
+	client := getSacloudAPIClient(d, meta)
 
 	if d.HasChange("next_hop") {
 		internetID := toSakuraCloudID(d.Get("internet_id").(string))
@@ -133,12 +118,7 @@ func resourceSakuraCloudSubnetUpdate(d *schema.ResourceData, meta interface{}) e
 }
 
 func resourceSakuraCloudSubnetDelete(d *schema.ResourceData, meta interface{}) error {
-	c := meta.(*api.Client)
-	client := c.Clone()
-	zone, ok := d.GetOk("zone")
-	if ok {
-		client.Zone = zone.(string)
-	}
+	client := getSacloudAPIClient(d, meta)
 
 	internetID := toSakuraCloudID(d.Get("internet_id").(string))
 	_, err := client.Internet.DeleteSubnet(internetID, toSakuraCloudID(d.Id()))

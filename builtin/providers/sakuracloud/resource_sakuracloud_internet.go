@@ -133,12 +133,7 @@ func resourceSakuraCloudInternet() *schema.Resource {
 }
 
 func resourceSakuraCloudInternetCreate(d *schema.ResourceData, meta interface{}) error {
-	c := meta.(*api.Client)
-	client := c.Clone()
-	zone, ok := d.GetOk("zone")
-	if ok {
-		client.Zone = zone.(string)
-	}
+	client := getSacloudAPIClient(d, meta)
 
 	opts := client.Internet.New()
 
@@ -186,12 +181,7 @@ func resourceSakuraCloudInternetCreate(d *schema.ResourceData, meta interface{})
 }
 
 func resourceSakuraCloudInternetRead(d *schema.ResourceData, meta interface{}) error {
-	c := meta.(*api.Client)
-	client := c.Clone()
-	zone, ok := d.GetOk("zone")
-	if ok {
-		client.Zone = zone.(string)
-	}
+	client := getSacloudAPIClient(d, meta)
 
 	internet, err := client.Internet.Read(toSakuraCloudID(d.Id()))
 	if err != nil {
@@ -202,12 +192,7 @@ func resourceSakuraCloudInternetRead(d *schema.ResourceData, meta interface{}) e
 }
 
 func resourceSakuraCloudInternetUpdate(d *schema.ResourceData, meta interface{}) error {
-	c := meta.(*api.Client)
-	client := c.Clone()
-	zone, ok := d.GetOk("zone")
-	if ok {
-		client.Zone = zone.(string)
-	}
+	client := getSacloudAPIClient(d, meta)
 
 	internet, err := client.Internet.Read(toSakuraCloudID(d.Id()))
 	if err != nil {
@@ -276,12 +261,7 @@ func resourceSakuraCloudInternetUpdate(d *schema.ResourceData, meta interface{})
 }
 
 func resourceSakuraCloudInternetDelete(d *schema.ResourceData, meta interface{}) error {
-	c := meta.(*api.Client)
-	client := c.Clone()
-	zone, ok := d.GetOk("zone")
-	if ok {
-		client.Zone = zone.(string)
-	}
+	client := getSacloudAPIClient(d, meta)
 
 	internet, err := client.Internet.Read(toSakuraCloudID(d.Id()))
 	if err != nil {

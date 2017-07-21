@@ -6,7 +6,6 @@ import (
 	"bytes"
 	"github.com/hashicorp/terraform/helper/hashcode"
 	"github.com/hashicorp/terraform/helper/schema"
-	"github.com/sacloud/libsacloud/api"
 	"github.com/sacloud/libsacloud/sacloud"
 )
 
@@ -50,11 +49,7 @@ func resourceSakuraCloudVPCRouterDHCPStaticMapping() *schema.Resource {
 }
 
 func resourceSakuraCloudVPCRouterDHCPStaticMappingCreate(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*api.Client)
-	zone, ok := d.GetOk("zone")
-	if ok {
-		client.Zone = zone.(string)
-	}
+	client := getSacloudAPIClient(d, meta)
 
 	routerID := d.Get("vpc_router_id").(string)
 	sakuraMutexKV.Lock(routerID)
@@ -85,11 +80,7 @@ func resourceSakuraCloudVPCRouterDHCPStaticMappingCreate(d *schema.ResourceData,
 }
 
 func resourceSakuraCloudVPCRouterDHCPStaticMappingRead(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*api.Client)
-	zone, ok := d.GetOk("zone")
-	if ok {
-		client.Zone = zone.(string)
-	}
+	client := getSacloudAPIClient(d, meta)
 
 	routerID := d.Get("vpc_router_id").(string)
 	vpcRouter, err := client.VPCRouter.Read(toSakuraCloudID(routerID))
@@ -102,6 +93,9 @@ func resourceSakuraCloudVPCRouterDHCPStaticMappingRead(d *schema.ResourceData, m
 		vpcRouter.Settings.Router.FindDHCPStaticMapping(dhcpStaticMapping.IPAddress, dhcpStaticMapping.MACAddress) != nil {
 		d.Set("ipaddress", dhcpStaticMapping.IPAddress)
 		d.Set("macaddress", dhcpStaticMapping.MACAddress)
+	} else {
+		d.Set("ipaddress", "")
+		d.Set("macaddress", "")
 	}
 
 	d.Set("zone", client.Zone)
@@ -111,11 +105,7 @@ func resourceSakuraCloudVPCRouterDHCPStaticMappingRead(d *schema.ResourceData, m
 
 func resourceSakuraCloudVPCRouterDHCPStaticMappingDelete(d *schema.ResourceData, meta interface{}) error {
 
-	client := meta.(*api.Client)
-	zone, ok := d.GetOk("zone")
-	if ok {
-		client.Zone = zone.(string)
-	}
+	client := getSacloudAPIClient(d, meta)
 
 	routerID := d.Get("vpc_router_id").(string)
 	sakuraMutexKV.Lock(routerID)
@@ -142,7 +132,6 @@ func resourceSakuraCloudVPCRouterDHCPStaticMappingDelete(d *schema.ResourceData,
 		}
 	}
 
-	d.SetId("")
 	return nil
 }
 

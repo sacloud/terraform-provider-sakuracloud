@@ -63,12 +63,7 @@ func resourceSakuraCloudSwitchCreate(d *schema.ResourceData, meta interface{}) e
 
 	d.Partial(true)
 
-	c := meta.(*api.Client)
-	client := c.Clone()
-	zone, ok := d.GetOk("zone")
-	if ok {
-		client.Zone = zone.(string)
-	}
+	client := getSacloudAPIClient(d, meta)
 
 	opts := client.Switch.New()
 
@@ -116,12 +111,7 @@ func resourceSakuraCloudSwitchCreate(d *schema.ResourceData, meta interface{}) e
 }
 
 func resourceSakuraCloudSwitchRead(d *schema.ResourceData, meta interface{}) error {
-	c := meta.(*api.Client)
-	client := c.Clone()
-	zone, ok := d.GetOk("zone")
-	if ok {
-		client.Zone = zone.(string)
-	}
+	client := getSacloudAPIClient(d, meta)
 
 	sw, err := client.Switch.Read(toSakuraCloudID(d.Id()))
 	if err != nil {
@@ -133,12 +123,7 @@ func resourceSakuraCloudSwitchRead(d *schema.ResourceData, meta interface{}) err
 
 func resourceSakuraCloudSwitchUpdate(d *schema.ResourceData, meta interface{}) error {
 	d.Partial(true)
-	c := meta.(*api.Client)
-	client := c.Clone()
-	zone, ok := d.GetOk("zone")
-	if ok {
-		client.Zone = zone.(string)
-	}
+	client := getSacloudAPIClient(d, meta)
 
 	sw, err := client.Switch.Read(toSakuraCloudID(d.Id()))
 	if err != nil {
@@ -211,12 +196,7 @@ func resourceSakuraCloudSwitchUpdate(d *schema.ResourceData, meta interface{}) e
 }
 
 func resourceSakuraCloudSwitchDelete(d *schema.ResourceData, meta interface{}) error {
-	c := meta.(*api.Client)
-	client := c.Clone()
-	zone, ok := d.GetOk("zone")
-	if ok {
-		client.Zone = zone.(string)
-	}
+	client := getSacloudAPIClient(d, meta)
 
 	servers, err := client.Switch.GetServers(toSakuraCloudID(d.Id()))
 	if err != nil {

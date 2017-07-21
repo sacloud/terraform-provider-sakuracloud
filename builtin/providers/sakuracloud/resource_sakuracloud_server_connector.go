@@ -3,7 +3,6 @@ package sakuracloud
 import (
 	"fmt"
 	"github.com/hashicorp/terraform/helper/schema"
-	"github.com/sacloud/libsacloud/api"
 )
 
 func resourceSakuraCloudServerConnector() *schema.Resource {
@@ -60,12 +59,7 @@ func resourceSakuraCloudServerConnector() *schema.Resource {
 }
 
 func resourceSakuraCloudServerConnectorCreate(d *schema.ResourceData, meta interface{}) error {
-	c := meta.(*api.Client)
-	client := c.Clone()
-	zone, ok := d.GetOk("zone")
-	if ok {
-		client.Zone = zone.(string)
-	}
+	client := getSacloudAPIClient(d, meta)
 
 	id := d.Get("server_id").(string)
 	server, err := client.Server.Read(toSakuraCloudID(id))
@@ -188,12 +182,7 @@ func resourceSakuraCloudServerConnectorCreate(d *schema.ResourceData, meta inter
 }
 
 func resourceSakuraCloudServerConnectorRead(d *schema.ResourceData, meta interface{}) error {
-	c := meta.(*api.Client)
-	client := c.Clone()
-	zone, ok := d.GetOk("zone")
-	if ok {
-		client.Zone = zone.(string)
-	}
+	client := getSacloudAPIClient(d, meta)
 
 	data, err := client.Server.Read(toSakuraCloudID(d.Id()))
 	if err != nil {
@@ -213,12 +202,7 @@ func resourceSakuraCloudServerConnectorRead(d *schema.ResourceData, meta interfa
 }
 
 func resourceSakuraCloudServerConnectorUpdate(d *schema.ResourceData, meta interface{}) error {
-	c := meta.(*api.Client)
-	client := c.Clone()
-	zone, ok := d.GetOk("zone")
-	if ok {
-		client.Zone = zone.(string)
-	}
+	client := getSacloudAPIClient(d, meta)
 
 	server, err := client.Server.Read(toSakuraCloudID(d.Id()))
 	if err != nil {
@@ -345,12 +329,7 @@ func resourceSakuraCloudServerConnectorUpdate(d *schema.ResourceData, meta inter
 
 func resourceSakuraCloudServerConnectorDelete(d *schema.ResourceData, meta interface{}) error {
 
-	c := meta.(*api.Client)
-	client := c.Clone()
-	zone, ok := d.GetOk("zone")
-	if ok {
-		client.Zone = zone.(string)
-	}
+	client := getSacloudAPIClient(d, meta)
 
 	server, err := client.Server.Read(toSakuraCloudID(d.Id()))
 	if err != nil {

@@ -4,11 +4,23 @@ import (
 	"fmt"
 	"github.com/hashicorp/terraform/helper/schema"
 	"github.com/hashicorp/terraform/terraform"
+	"github.com/sacloud/libsacloud/api"
 	"github.com/sacloud/libsacloud/sacloud"
 	"strconv"
 	"strings"
 	"time"
 )
+
+func getSacloudAPIClient(d *schema.ResourceData, meta interface{}) *api.Client {
+	c := meta.(*api.Client)
+	client := c.Clone()
+
+	zone, ok := d.GetOk("zone")
+	if ok {
+		client.Zone = zone.(string)
+	}
+	return client
+}
 
 func toSakuraCloudID(id string) int64 {
 	v, _ := strconv.ParseInt(id, 10, 64)

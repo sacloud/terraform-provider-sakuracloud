@@ -120,12 +120,7 @@ func resourceSakuraCloudDisk() *schema.Resource {
 }
 
 func resourceSakuraCloudDiskCreate(d *schema.ResourceData, meta interface{}) error {
-	c := meta.(*api.Client)
-	client := c.Clone()
-	zone, ok := d.GetOk("zone")
-	if ok {
-		client.Zone = zone.(string)
-	}
+	client := getSacloudAPIClient(d, meta)
 
 	opts := client.Disk.New()
 
@@ -226,12 +221,7 @@ func resourceSakuraCloudDiskCreate(d *schema.ResourceData, meta interface{}) err
 }
 
 func resourceSakuraCloudDiskRead(d *schema.ResourceData, meta interface{}) error {
-	c := meta.(*api.Client)
-	client := c.Clone()
-	zone, ok := d.GetOk("zone")
-	if ok {
-		client.Zone = zone.(string)
-	}
+	client := getSacloudAPIClient(d, meta)
 
 	disk, err := client.Disk.Read(toSakuraCloudID(d.Id()))
 	if err != nil {
@@ -242,12 +232,7 @@ func resourceSakuraCloudDiskRead(d *schema.ResourceData, meta interface{}) error
 }
 
 func resourceSakuraCloudDiskUpdate(d *schema.ResourceData, meta interface{}) error {
-	c := meta.(*api.Client)
-	client := c.Clone()
-	zone, ok := d.GetOk("zone")
-	if ok {
-		client.Zone = zone.(string)
-	}
+	client := getSacloudAPIClient(d, meta)
 
 	disk, err := client.Disk.Read(toSakuraCloudID(d.Id()))
 	if err != nil {
@@ -366,12 +351,7 @@ func resourceSakuraCloudDiskUpdate(d *schema.ResourceData, meta interface{}) err
 }
 
 func resourceSakuraCloudDiskDelete(d *schema.ResourceData, meta interface{}) error {
-	c := meta.(*api.Client)
-	client := c.Clone()
-	zone, ok := d.GetOk("zone")
-	if ok {
-		client.Zone = zone.(string)
-	}
+	client := getSacloudAPIClient(d, meta)
 
 	disk, err := client.Disk.Read(toSakuraCloudID(d.Id()))
 	if err != nil {
@@ -440,7 +420,9 @@ func setDiskResourceData(d *schema.ResourceData, client *api.Client, data *saclo
 	d.Set("description", data.Description)
 	d.Set("tags", data.Tags)
 
-	if data.Server != nil {
+	if data.Server == nil {
+		d.Set("server_id", "")
+	} else {
 		d.Set("server_id", data.Server.GetStrID())
 	}
 
