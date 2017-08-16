@@ -30,6 +30,10 @@ func TestAccResourceSakuraCloudServer(t *testing.T) {
 					resource.TestCheckResourceAttr(
 						"sakuracloud_server.foobar", "disks.#", "1"),
 					resource.TestCheckResourceAttr(
+						"sakuracloud_server.foobar", "interface_driver", "virtio"),
+					resource.TestCheckResourceAttr(
+						"sakuracloud_server.foobar", "tags.0", "tag1"),
+					resource.TestCheckResourceAttr(
 						"sakuracloud_server.foobar", "nic", "shared"),
 					resource.TestCheckResourceAttr(
 						"sakuracloud_server.foobar", "additional_nics.#", "0"),
@@ -55,6 +59,10 @@ func TestAccResourceSakuraCloudServer(t *testing.T) {
 						"sakuracloud_server.foobar", "memory", "2"),
 					resource.TestCheckResourceAttr(
 						"sakuracloud_server.foobar", "disks.#", "1"),
+					resource.TestCheckResourceAttr(
+						"sakuracloud_server.foobar", "interface_driver", "e1000"),
+					resource.TestCheckResourceAttr(
+						"sakuracloud_server.foobar", "tags.0", "tag2"),
 					resource.TestCheckResourceAttr(
 						"sakuracloud_server.foobar", "nic", "shared"),
 					resource.TestCheckResourceAttr(
@@ -347,7 +355,7 @@ resource "sakuracloud_server" "foobar" {
     name = "myserver"
     disks = ["${sakuracloud_disk.foobar.id}"]
     description = "Server from TerraForm for SAKURA CLOUD"
-    tags = ["@virtio-net-pci"]
+    tags = ["tag1"]
     icon_id = "${sakuracloud_icon.foobar.id}"
 }
 
@@ -376,7 +384,8 @@ resource "sakuracloud_server" "foobar" {
     core = 2
     memory = 2
     description = "Server from TerraForm for SAKURA CLOUD"
-    tags = ["@virtio-net-pci"]
+    tags = ["tag2"]
+    interface_driver = "e1000"
 }
 `
 
@@ -398,7 +407,6 @@ resource "sakuracloud_server" "foobar" {
     disks = ["${sakuracloud_disk.foobar.id}"]
     description = "Server from TerraForm for SAKURA CLOUD"
     additional_nics = [""]
-    tags = ["@virtio-net-pci"]
 }
 `
 const testAccCheckSakuraCloudServerConfig_swiched_NIC_updated = `
@@ -419,7 +427,6 @@ resource "sakuracloud_server" "foobar" {
     disks = ["${sakuracloud_disk.foobar.id}"]
     description = "Server from TerraForm for SAKURA CLOUD"
     additional_nics = ["","",""]
-    tags = ["@virtio-net-pci"]
 }
 `
 
@@ -442,7 +449,6 @@ resource "sakuracloud_server" "foobar" {
     description = "Server from TerraForm for SAKURA CLOUD"
     nic = ""
     additional_nics = [""]
-    tags = ["@virtio-net-pci"]
 }
 `
 

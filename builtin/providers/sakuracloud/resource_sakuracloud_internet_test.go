@@ -148,7 +148,6 @@ resource "sakuracloud_server" "foobar" {
     name = "myserver"
     disks = ["${sakuracloud_disk.foobar.id}"]
     description = "Server from TerraForm for SAKURA CLOUD"
-    tags = ["@virtio-net-pci"]
     nic = "${sakuracloud_internet.foobar.switch_id}"
     base_nw_ipaddress = "${sakuracloud_internet.foobar.nw_ipaddresses.0}"
     base_nw_gateway = "${sakuracloud_internet.foobar.nw_gateway}"
@@ -176,7 +175,6 @@ resource "sakuracloud_server" "foobar" {
     name = "myserver"
     disks = ["${sakuracloud_disk.foobar.id}"]
     description = "Server from TerraForm for SAKURA CLOUD"
-    tags = ["@virtio-net-pci"]
     nic = "${sakuracloud_internet.foobar.switch_id}"
     base_nw_ipaddress = "${sakuracloud_internet.foobar.nw_ipaddresses.0}"
     base_nw_gateway = "${sakuracloud_internet.foobar.nw_gateway}"

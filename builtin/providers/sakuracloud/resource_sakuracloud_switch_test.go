@@ -134,7 +134,6 @@ var testAccCheckSakuraCloudSwitchConfig_update = `
 resource "sakuracloud_server" "foobar" {
     name = "myserver"
     description = "Server from TerraForm for SAKURA CLOUD"
-    tags = ["@virtio-net-pci"]
     additional_nics = ["${sakuracloud_switch.foobar.id}"]
 }
 resource "sakuracloud_switch" "foobar" {

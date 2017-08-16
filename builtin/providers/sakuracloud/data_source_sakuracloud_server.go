@@ -46,6 +46,10 @@ func dataSourceSakuraCloudServer() *schema.Resource {
 				Computed: true,
 				Elem:     &schema.Schema{Type: schema.TypeString},
 			},
+			"interface_driver": {
+				Type:     schema.TypeString,
+				Computed: true,
+			},
 			"base_interface": {
 				Type:       schema.TypeString,
 				Computed:   true,
