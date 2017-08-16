@@ -90,7 +90,6 @@ resource sakuracloud_disk "foobar" {
 resource sakuracloud_server "foobar" {
   name  = "foobar"
   disks = ["${sakuracloud_disk.foobar.id}"]
-  tags  = ["@virtio-net-pci"]
 
   # プロビジョニング
   connection {

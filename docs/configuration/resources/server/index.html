@@ -345,6 +345,9 @@
   #メモリサイズ(GB)
   #memory = 1
 
+  #NICドライバ(virtio or e1000)
+  #interface_driver = &quot;virtio&quot;
+
   #上流のNWとの接続方法
   #nic = &quot;shared&quot;
 
@@ -363,7 +366,6 @@
   #nw_mask_len = 24
 
   description = &quot;Server from TerraForm for SAKURA CLOUD&quot;
-  tags        = [&quot;@virtio-net-pci&quot;]
 }
 </code></pre>
 
@@ -411,6 +413,14 @@
 <td align="center">1</td>
 <td>数値</td>
 <td>指定可能な値は<a href="http://cloud.sakura.ad.jp/specification/server-disk/">こちら</a>のプラン一覧を参照ください</td>
+</tr>
+<tr>
+<td><code>interface_driver</code></td>
+<td align="center">-</td>
+<td>NICドライバ</td>
+<td align="center"><code>virtio</code></td>
+<td><code>virtio</code><br /><code>e1000</code></td>
+<td>-</td>
 </tr>
 <tr>
 <td><code>nic</code></td>
