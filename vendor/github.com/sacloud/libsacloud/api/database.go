@@ -39,9 +39,17 @@ type databaseResponse struct {
 	Success interface{} `json:",omitempty"` //HACK: さくらのAPI側仕様: 戻り値:Successがbool値へ変換できないためinterface{}で受ける
 }
 
-type databaseSettingsResponse struct {
+type databaseStatusResponse struct {
 	*sacloud.ResultFlagValue
-	*sacloud.Database `json:"Appliance,omitempty"`
+	Success   interface{} `json:",omitempty"` //HACK: さくらのAPI側仕様: 戻り値:Successがbool値へ変換できないためinterface{}
+	Appliance *struct {
+		SettingsResponse *sacloud.DatabaseStatus
+	}
+}
+
+type databaseBackupResponse struct {
+	Log  string `json:",omitempty"`
+	IsOk bool   `json:"is_ok,omitempty"`
 }
 
 // DatabaseAPI データベースAPI
@@ -112,18 +120,136 @@ func (api *DatabaseAPI) Read(id int64) (*sacloud.Database, error) {
 }
 
 // Status DBの設定/起動状態の取得
-func (api *DatabaseAPI) Status(id int64) (*sacloud.DatabaseSettingsResponse, error) {
+func (api *DatabaseAPI) Status(id int64) (*sacloud.DatabaseStatus, error) {
 	var (
 		method = "GET"
 		uri    = fmt.Sprintf("%s/%d/status", api.getResourceURL(), id)
 	)
 
-	res := &databaseResponse{}
+	res := &databaseStatusResponse{}
 	err := api.baseAPI.request(method, uri, nil, res)
 	if err != nil {
 		return nil, err
 	}
-	return res.SettingsResponse, nil
+	return res.Appliance.SettingsResponse, nil
+}
+
+// Backup バックアップ取得
+func (api *DatabaseAPI) Backup(id int64) (string, error) {
+	var (
+		method = "POST"
+		uri    = fmt.Sprintf("%s/%d/action/history", api.getResourceURL(), id)
+	)
+
+	body := map[string]interface{}{
+		"Appliance": map[string]interface{}{
+			"Settings": map[string]interface{}{
+				"DBConf": map[string]interface{}{
+					"backup": map[string]string{
+						"availability": "discontinued",
+					},
+				},
+			},
+		},
+	}
+
+	res := &databaseBackupResponse{}
+	err := api.baseAPI.request(method, uri, body, res)
+	if err != nil {
+		return "", err
+	}
+	return res.Log, nil
+}
+
+// DownloadLog ログ取得
+func (api *DatabaseAPI) DownloadLog(id int64, logID string) (string, error) {
+	var (
+		method = "GET"
+		uri    = fmt.Sprintf("%s/%d/download/log/%s", api.getResourceURL(), id, logID)
+	)
+
+	res := &databaseBackupResponse{}
+	err := api.baseAPI.request(method, uri, nil, res)
+	if err != nil {
+		return "", err
+	}
+	return res.Log, nil
+}
+
+// Restore バックアップからの復元
+func (api *DatabaseAPI) Restore(id int64, backupID string) (string, error) {
+	var (
+		method = "POST"
+		uri    = fmt.Sprintf("%s/%d/action/history/%s", api.getResourceURL(), id, backupID)
+	)
+
+	body := map[string]interface{}{
+		"Appliance": map[string]interface{}{},
+	}
+
+	res := &databaseBackupResponse{}
+	err := api.baseAPI.request(method, uri, body, res)
+	if err != nil {
+		return "", err
+	}
+	return res.Log, nil
+}
+
+// DeleteBackup バックアップの削除
+func (api *DatabaseAPI) DeleteBackup(id int64, backupID string) (string, error) {
+	var (
+		method = "DELETE"
+		uri    = fmt.Sprintf("%s/%d/action/history/%s", api.getResourceURL(), id, backupID)
+	)
+
+	body := map[string]interface{}{
+		"Appliance": map[string]interface{}{},
+	}
+
+	res := &databaseBackupResponse{}
+	err := api.baseAPI.request(method, uri, body, res)
+	if err != nil {
+		return "", err
+	}
+	return res.Log, nil
+}
+
+// HistoryLock バックアップ削除ロック
+func (api *DatabaseAPI) HistoryLock(id int64, backupID string) (string, error) {
+	var (
+		method = "PUT"
+		uri    = fmt.Sprintf("%s/%d/action/history-lock/%s", api.getResourceURL(), id, backupID)
+	)
+
+	body := map[string]interface{}{
+		"Appliance": map[string]interface{}{},
+	}
+
+	res := &databaseBackupResponse{}
+	err := api.baseAPI.request(method, uri, body, res)
+	if err != nil {
+		return "", err
+	}
+	return res.Log, nil
+}
+
+// HistoryUnlock バックアップ削除アンロック
+func (api *DatabaseAPI) HistoryUnlock(id int64, backupID string) (string, error) {
+	var (
+		method = "DELETE"
+		uri    = fmt.Sprintf("%s/%d/action/history-lock/%s", api.getResourceURL(), id, backupID)
+	)
+
+	body := map[string]interface{}{
+		"Appliance": map[string]interface{}{},
+	}
+
+	res := &databaseBackupResponse{}
+	err := api.baseAPI.request(method, uri, body, res)
+	if err != nil {
+		return "", err
+	}
+	return res.Log, nil
 }
 
 // Update 更新

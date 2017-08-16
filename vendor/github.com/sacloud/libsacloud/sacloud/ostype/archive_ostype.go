@@ -78,6 +78,7 @@ func (o ArchiveOSTypes) IsSupportDiskEdit() bool {
 	}
 }
 
+// StrToOSType 文字列からArchiveOSTypesへの変換
 func StrToOSType(osType string) ArchiveOSTypes {
 	switch osType {
 	case "centos":

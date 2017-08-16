@@ -45,6 +45,15 @@ func resourceSakuraCloudServer() *schema.Resource {
 				// ! Current terraform(v0.7) is not support to array validation !
 				// ValidateFunc: validateSakuracloudIDArrayType,
 			},
+			"interface_driver": {
+				Type:     schema.TypeString,
+				Optional: true,
+				Default:  string(sacloud.InterfaceDriverVirtIO),
+				ValidateFunc: validateStringInWord([]string{
+					string(sacloud.InterfaceDriverVirtIO),
+					string(sacloud.InterfaceDriverE1000),
+				}),
+			},
 			"base_interface": {
 				Type:          schema.TypeString,
 				Optional:      true,
@@ -213,6 +222,14 @@ func resourceSakuraCloudServerCreate(d *schema.ResourceData, meta interface{}) e
 		return fmt.Errorf("Invalid server plan.Please change 'core' or 'memory': %s", err)
 	}
 	opts.SetServerPlanByID(planID.GetStrID())
+
+	if interfaceDriver, ok := d.GetOk("interface_driver"); ok {
+		s := interfaceDriver.(string)
+		if s == "" {
+			s = string(sacloud.InterfaceDriverVirtIO)
+		}
+		opts.SetInterfaceDriverByString(s)
+	}
 
 	if hasSharedInterface, ok := d.GetOk("nic"); ok {
 		switch forceString(hasSharedInterface) {
@@ -385,7 +402,7 @@ func resourceSakuraCloudServerUpdate(r *schema.ResourceData, meta interface{}) e
 		isNeedRestart = true
 	}
 
-	if d.HasChange("disks") || d.HasChange("nic") || d.HasChange("additional_nics") ||
+	if d.HasChange("disks") || d.HasChange("nic") || d.HasChange("additional_nics") || d.HasChange("interface_driver") ||
 		d.HasChange("ipaddress") || d.HasChange("gateway") || d.HasChange("nw_mask_len") {
 		isNeedRestart = true
 	}
@@ -556,6 +573,16 @@ func resourceSakuraCloudServerUpdate(r *schema.ResourceData, meta interface{}) e
 		d.SetId(server.GetStrID())
 	}
 
+	if d.HasChange("interface_driver") {
+		if interfaceDriver, ok := d.GetOk("interface_driver"); ok {
+			s := interfaceDriver.(string)
+			if s == "" {
+				s = string(sacloud.InterfaceDriverVirtIO)
+			}
+			server.SetInterfaceDriverByString(s)
+		}
+	}
+
 	if d.HasChange("name") {
 		server.Name = d.Get("name").(string)
 	}
@@ -714,6 +741,8 @@ func setServerResourceData(d *schema.ResourceData, client *api.Client, data *sac
 	} else {
 		d.Set("cdrom_id", data.Instance.CDROM.GetStrID())
 	}
+
+	d.Set("interface_driver", string(data.GetInterfaceDriverString()))
 
 	hasSharedInterface := len(data.Interfaces) > 0 && data.Interfaces[0].Switch != nil
 	if hasSharedInterface {

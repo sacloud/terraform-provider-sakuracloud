@@ -60,12 +60,12 @@ func AllowGSLBHealthCheckProtocol() []string {
 }
 
 // HasGSLBServer GSLB配下にサーバーを保持しているか判定
-func (d *GSLB) HasGSLBServer() bool {
-	return len(d.Settings.GSLB.Servers) > 0
+func (g *GSLB) HasGSLBServer() bool {
+	return len(g.Settings.GSLB.Servers) > 0
 }
 
 // CreateGSLBServer GSLB配下のサーバーを作成
-func (d *GSLB) CreateGSLBServer(ip string) *GSLBServer {
+func (g *GSLB) CreateGSLBServer(ip string) *GSLBServer {
 	return &GSLBServer{
 		IPAddress: ip,
 		Enabled:   "True",
@@ -74,24 +74,24 @@ func (d *GSLB) CreateGSLBServer(ip string) *GSLBServer {
 }
 
 // AddGSLBServer GSLB配下にサーバーを追加
-func (d *GSLB) AddGSLBServer(server *GSLBServer) {
+func (g *GSLB) AddGSLBServer(server *GSLBServer) {
 	var isExist = false
-	for i := range d.Settings.GSLB.Servers {
-		if d.Settings.GSLB.Servers[i].IPAddress == server.IPAddress {
-			d.Settings.GSLB.Servers[i].Enabled = server.Enabled
-			d.Settings.GSLB.Servers[i].Weight = server.Weight
+	for i := range g.Settings.GSLB.Servers {
+		if g.Settings.GSLB.Servers[i].IPAddress == server.IPAddress {
+			g.Settings.GSLB.Servers[i].Enabled = server.Enabled
+			g.Settings.GSLB.Servers[i].Weight = server.Weight
 			isExist = true
 		}
 	}
 
 	if !isExist {
-		d.Settings.GSLB.Servers = append(d.Settings.GSLB.Servers, *server)
+		g.Settings.GSLB.Servers = append(g.Settings.GSLB.Servers, *server)
 	}
 }
 
 // ClearGSLBServer GSLB配下のサーバーをクリア
-func (d *GSLB) ClearGSLBServer() {
-	d.Settings.GSLB.Servers = []GSLBServer{}
+func (g *GSLB) ClearGSLBServer() {
+	g.Settings.GSLB.Servers = []GSLBServer{}
 }
 
 // GSLBRecordSets GSLBエントリー

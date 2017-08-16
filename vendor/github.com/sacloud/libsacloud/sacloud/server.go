@@ -6,6 +6,7 @@ type Server struct {
 	propName              // 名称
 	propDescription       // 説明
 	propHostName          // ホスト名
+	propInterfaceDriver   // インターフェースドライバ
 	propAvailability      // 有功状態
 	propServerPlan        // サーバープラン
 	propZone              // ゾーン

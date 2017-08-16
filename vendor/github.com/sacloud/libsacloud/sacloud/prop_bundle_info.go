@@ -1,5 +1,6 @@
 package sacloud
 
+// BundleInfo バンドル情報
 type BundleInfo struct {
 	HostClass string `json:",omitempty"`
 }

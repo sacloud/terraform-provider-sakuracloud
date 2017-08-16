@@ -73,7 +73,6 @@ resource "sakuracloud_disk" "disk01" {
 resource "sakuracloud_server" "server01" {
   name  = "server01"
   disks = ["${sakuracloud_disk.disk01.id}"]
-  tags  = ["@virtio-net-pci"]
 }
 
 # サーバへのSSH接続を表示するアウトプット定義

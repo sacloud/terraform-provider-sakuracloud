@@ -27,6 +27,7 @@ func TestAccSakuraCloudServerDataSource_Basic(t *testing.T) {
 					testAccCheckSakuraCloudServerDataSourceID("data.sakuracloud_server.foobar"),
 					resource.TestCheckResourceAttr("data.sakuracloud_server.foobar", "name", "name_test"),
 					resource.TestCheckResourceAttr("data.sakuracloud_server.foobar", "description", "description_test"),
+					resource.TestCheckResourceAttr("data.sakuracloud_server.foobar", "interface_driver", "virtio"),
 					resource.TestCheckResourceAttr("data.sakuracloud_server.foobar", "tags.#", "3"),
 					resource.TestCheckResourceAttr("data.sakuracloud_server.foobar", "tags.0", "tag1"),
 					resource.TestCheckResourceAttr("data.sakuracloud_server.foobar", "tags.1", "tag2"),

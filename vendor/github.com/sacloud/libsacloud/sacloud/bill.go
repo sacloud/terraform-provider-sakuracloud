@@ -26,6 +26,7 @@ type BillDetail struct {
 	ContractEndAt  *time.Time `json:",omitempty"` // 契約終了日時
 }
 
+// IsContractEnded 支払済か判定
 func (d *BillDetail) IsContractEnded(t time.Time) bool {
 	return d.ContractEndAt != nil && d.ContractEndAt.Before(t)
 }
