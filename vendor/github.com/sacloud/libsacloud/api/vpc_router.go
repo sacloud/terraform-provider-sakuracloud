@@ -38,6 +38,12 @@ type vpcRouterResponse struct {
 	Success            interface{} `json:",omitempty"` //HACK: さくらのAPI側仕様: 戻り値:Successがbool値へ変換できないためinterface{}
 }
 
+type vpcRouterStatusResponse struct {
+	*sacloud.ResultFlagValue
+	*sacloud.VPCRouterStatus `json:"Router"`
+	Success                  interface{} `json:",omitempty"` //HACK: さくらのAPI側仕様: 戻り値:Successがbool値へ変換できないためinterface{}
+}
+
 // VPCRouterAPI VPCルーターAPI
 type VPCRouterAPI struct {
 	*baseAPI
@@ -474,4 +480,18 @@ func (api *VPCRouterAPI) DeleteInterfaceAt(routerID int64, index int) (*sacloud.
 // MonitorBy 指定位置のインターフェースのアクティビティーモニター取得
 func (api *VPCRouterAPI) MonitorBy(id int64, nicIndex int, body *sacloud.ResourceMonitorRequest) (*sacloud.MonitorValues, error) {
 	return api.baseAPI.applianceMonitorBy(id, "interface", nicIndex, body)
+}
+
+// Status ログなどのステータス情報 取得
+func (api *VPCRouterAPI) Status(id int64) (*sacloud.VPCRouterStatus, error) {
+	var (
+		method = "GET"
+		uri    = fmt.Sprintf("%s/%d/status", api.getResourceURL(), id)
+		res    = &vpcRouterStatusResponse{}
+	)
+	err := api.baseAPI.request(method, uri, nil, res)
+	if err != nil {
+		return nil, err
+	}
+	return res.VPCRouterStatus, nil
 }

@@ -5,6 +5,7 @@ import (
 	"time"
 )
 
+// NewsFeed メンテナンス/障害情報お知らせ
 type NewsFeed struct {
 	StrDate       string `json:"date,omitempty"`
 	Description   string `json:"desc,omitempty"`
@@ -14,12 +15,17 @@ type NewsFeed struct {
 	Url           string `json:"url,omitempty"`
 }
 
+// Date 対象日時
 func (f *NewsFeed) Date() time.Time {
 	return f.parseTime(f.StrDate)
 }
+
+// EventStart 掲載開始日時
 func (f *NewsFeed) EventStart() time.Time {
 	return f.parseTime(f.StrEventStart)
 }
+
+// EventEnd 掲載終了日時
 func (f *NewsFeed) EventEnd() time.Time {
 	return f.parseTime(f.StrEventEnd)
 }
