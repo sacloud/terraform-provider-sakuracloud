@@ -374,7 +374,7 @@ resource sakuracloud_vpc_router &quot;foobar&quot; {
   ipaddress1  = &quot;${sakuracloud_internet.router1.nw_ipaddresses.1}&quot;   # 実IP1
   ipaddress2  = &quot;${sakuracloud_internet.router1.nw_ipaddresses.2}&quot;   # 実IP2
   aliases     = [&quot;${sakuracloud_internet.router1.nw_ipaddresses.3}&quot;] # IPエイリアス
-  VRID        = 1
+  vrid        = 1
   syslog_host = &quot;192.168.11.1&quot;                                       # syslog転送先ホスト
 }
 
@@ -605,7 +605,7 @@ resource sakuracloud_vpc_router_static_route &quot;route1&quot; {
 <td>プランが<code>premium</code>、<code>highspec</code>の場合必須</td>
 </tr>
 <tr>
-<td><code>VRID</code></td>
+<td><code>vrid</code></td>
 <td align="center">△</td>
 <td>VRID</td>
 <td align="center">-</td>
