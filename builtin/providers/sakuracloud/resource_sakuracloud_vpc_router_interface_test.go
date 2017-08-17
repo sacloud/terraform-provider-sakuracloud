@@ -181,10 +181,10 @@ resource "sakuracloud_vpc_router" "foobar" {
     name = "name"
     plan = "premium"
     switch_id = "${sakuracloud_internet.router1.switch_id}"
-    vip = "${sakuracloud_internet.router1.nw_ipaddresses.0}"
-    ipaddress1 = "${sakuracloud_internet.router1.nw_ipaddresses.1}"
-    ipaddress2 = "${sakuracloud_internet.router1.nw_ipaddresses.2}"
-    VRID = 1
+    vip = "${sakuracloud_internet.router1.ipaddresses.0}"
+    ipaddress1 = "${sakuracloud_internet.router1.ipaddresses.1}"
+    ipaddress2 = "${sakuracloud_internet.router1.ipaddresses.2}"
+    vrid = 1
 }
 resource "sakuracloud_vpc_router_interface" "eth1"{
     vpc_router_id = "${sakuracloud_vpc_router.foobar.id}"

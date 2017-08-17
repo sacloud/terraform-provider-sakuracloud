@@ -50,7 +50,7 @@ func resourceSakuraCloudVPCRouter() *schema.Resource {
 				ForceNew: true,
 				Optional: true,
 			},
-			"VRID": {
+			"vrid": {
 				Type:     schema.TypeInt,
 				ForceNew: true,
 				Optional: true,
@@ -138,10 +138,10 @@ func resourceSakuraCloudVPCRouterCreate(d *schema.ResourceData, meta interface{}
 			return fmt.Errorf(errFormat, "ipaddress2")
 		}
 
-		if s, ok := d.GetOk("VRID"); ok {
+		if s, ok := d.GetOk("vrid"); ok {
 			vrid = s.(int)
 		} else {
-			return fmt.Errorf(errFormat, "VRID")
+			return fmt.Errorf(errFormat, "vrid")
 		}
 
 		if list, ok := d.GetOk("aliases"); ok {
@@ -234,7 +234,7 @@ func resourceSakuraCloudVPCRouterRead(d *schema.ResourceData, meta interface{}) 
 		d.Set("ipaddress1", vpcRouter.Settings.Router.Interfaces[0].IPAddress[0])
 		d.Set("ipaddress2", vpcRouter.Settings.Router.Interfaces[0].IPAddress[1])
 		d.Set("aliases", vpcRouter.Settings.Router.Interfaces[0].IPAliases)
-		d.Set("VRID", vpcRouter.Settings.Router.VRID)
+		d.Set("vrid", vpcRouter.Settings.Router.VRID)
 
 		d.Set("global_address", vpcRouter.Settings.Router.Interfaces[0].VirtualIPAddress)
 	}

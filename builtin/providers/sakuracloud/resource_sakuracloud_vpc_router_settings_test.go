@@ -260,11 +260,11 @@ resource "sakuracloud_vpc_router" "foobar" {
     name = "vpc_router_setting_test"
     plan = "premium"
     switch_id = "${sakuracloud_internet.router1.switch_id}"
-    vip = "${sakuracloud_internet.router1.nw_ipaddresses.0}"
-    ipaddress1 = "${sakuracloud_internet.router1.nw_ipaddresses.1}"
-    ipaddress2 = "${sakuracloud_internet.router1.nw_ipaddresses.2}"
-    aliases = ["${sakuracloud_internet.router1.nw_ipaddresses.3}"]
-    VRID = 1
+    vip = "${sakuracloud_internet.router1.ipaddresses.0}"
+    ipaddress1 = "${sakuracloud_internet.router1.ipaddresses.1}"
+    ipaddress2 = "${sakuracloud_internet.router1.ipaddresses.2}"
+    aliases = ["${sakuracloud_internet.router1.ipaddresses.3}"]
+    vrid = 1
 
 }
 resource "sakuracloud_vpc_router_interface" "eth1"{
@@ -286,7 +286,7 @@ resource "sakuracloud_vpc_router_static_nat" "staticNAT1" {
     vpc_router_id = "${sakuracloud_vpc_router.foobar.id}"
     vpc_router_interface_id = "${sakuracloud_vpc_router_interface.eth1.id}"
 
-    global_address = "${sakuracloud_internet.router1.nw_ipaddresses.3}"
+    global_address = "${sakuracloud_internet.router1.ipaddresses.3}"
     private_address = "192.168.11.11"
     description = "desc"
 }
@@ -408,11 +408,11 @@ resource "sakuracloud_vpc_router" "foobar" {
     name = "vpc_router_setting_test"
     plan = "premium"
     switch_id = "${sakuracloud_internet.router1.switch_id}"
-    vip = "${sakuracloud_internet.router1.nw_ipaddresses.0}"
-    ipaddress1 = "${sakuracloud_internet.router1.nw_ipaddresses.1}"
-    ipaddress2 = "${sakuracloud_internet.router1.nw_ipaddresses.2}"
-    aliases = ["${sakuracloud_internet.router1.nw_ipaddresses.3}"]
-    VRID = 1
+    vip = "${sakuracloud_internet.router1.ipaddresses.0}"
+    ipaddress1 = "${sakuracloud_internet.router1.ipaddresses.1}"
+    ipaddress2 = "${sakuracloud_internet.router1.ipaddresses.2}"
+    aliases = ["${sakuracloud_internet.router1.ipaddresses.3}"]
+    vrid = 1
 
 }
 resource "sakuracloud_vpc_router_interface" "eth1"{
@@ -434,7 +434,7 @@ resource "sakuracloud_vpc_router_static_nat" "staticNAT1" {
     vpc_router_id = "${sakuracloud_vpc_router.foobar.id}"
     vpc_router_interface_id = "${sakuracloud_vpc_router_interface.eth1.id}"
 
-    global_address = "${sakuracloud_internet.router1.nw_ipaddresses.3}"
+    global_address = "${sakuracloud_internet.router1.ipaddresses.3}"
     private_address = "192.168.11.12"
     description = "desc"
 }

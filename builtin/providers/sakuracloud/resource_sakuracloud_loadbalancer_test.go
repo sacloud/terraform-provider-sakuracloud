@@ -26,7 +26,7 @@ func TestAccSakuraCloudLoadBalancer(t *testing.T) {
 					resource.TestCheckResourceAttr("sakuracloud_load_balancer.foobar", "tags.#", "2"),
 					resource.TestCheckResourceAttr("sakuracloud_load_balancer.foobar", "tags.0", "hoge1"),
 					resource.TestCheckResourceAttr("sakuracloud_load_balancer.foobar", "tags.1", "hoge2"),
-					resource.TestCheckResourceAttr("sakuracloud_load_balancer.foobar", "VRID", "1"),
+					resource.TestCheckResourceAttr("sakuracloud_load_balancer.foobar", "vrid", "1"),
 					resource.TestCheckResourceAttr("sakuracloud_load_balancer.foobar", "ipaddress1", "192.168.11.101"),
 					resource.TestCheckResourceAttr("sakuracloud_load_balancer.foobar", "ipaddress2", ""),
 					resource.TestCheckResourceAttr("sakuracloud_load_balancer.foobar", "nw_mask_len", "24"),
@@ -46,7 +46,7 @@ func TestAccSakuraCloudLoadBalancer(t *testing.T) {
 					resource.TestCheckResourceAttr("sakuracloud_load_balancer.foobar", "tags.#", "2"),
 					resource.TestCheckResourceAttr("sakuracloud_load_balancer.foobar", "tags.0", "hoge1_after"),
 					resource.TestCheckResourceAttr("sakuracloud_load_balancer.foobar", "tags.1", "hoge2_after"),
-					resource.TestCheckResourceAttr("sakuracloud_load_balancer.foobar", "VRID", "1"),
+					resource.TestCheckResourceAttr("sakuracloud_load_balancer.foobar", "vrid", "1"),
 					resource.TestCheckResourceAttr("sakuracloud_load_balancer.foobar", "ipaddress1", "192.168.11.101"),
 					resource.TestCheckResourceAttr("sakuracloud_load_balancer.foobar", "ipaddress2", ""),
 					resource.TestCheckResourceAttr("sakuracloud_load_balancer.foobar", "nw_mask_len", "24"),
@@ -135,7 +135,7 @@ resource "sakuracloud_switch" "sw" {
 }
 resource "sakuracloud_load_balancer" "foobar" {
     switch_id = "${sakuracloud_switch.sw.id}"
-    VRID = 1
+    vrid = 1
     ipaddress1 = "192.168.11.101"
     nw_mask_len = 24
     default_route = "192.168.11.1"
@@ -158,7 +158,7 @@ resource "sakuracloud_switch" "sw" {
 }
 resource "sakuracloud_load_balancer" "foobar" {
     switch_id = "${sakuracloud_switch.sw.id}"
-    VRID = 1
+    vrid = 1
     ipaddress1 = "192.168.11.101"
     nw_mask_len = 24
     default_route = "192.168.11.1"
@@ -176,11 +176,11 @@ resource "sakuracloud_load_balancer" "foobar" {
     switch_id = "${sakuracloud_internet.router.switch_id}"
     high_availability = true
     plan = "highspec"
-    VRID = 1
-    ipaddress1 = "${sakuracloud_internet.router.nw_ipaddresses.0}"
-    ipaddress2 = "${sakuracloud_internet.router.nw_ipaddresses.1}"
+    vrid = 1
+    ipaddress1 = "${sakuracloud_internet.router.ipaddresses.0}"
+    ipaddress2 = "${sakuracloud_internet.router.ipaddresses.1}"
     nw_mask_len = "${sakuracloud_internet.router.nw_mask_len}"
-    default_route = "${sakuracloud_internet.router.nw_gateway}"
+    default_route = "${sakuracloud_internet.router.gateway}"
 
     name = "name_before"
     description = "description_before"

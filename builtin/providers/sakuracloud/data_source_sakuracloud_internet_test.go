@@ -34,7 +34,7 @@ func TestAccSakuraCloudInternetDataSource_Basic(t *testing.T) {
 					resource.TestCheckResourceAttr("data.sakuracloud_internet.foobar", "nw_mask_len", "28"),
 					resource.TestCheckResourceAttr("data.sakuracloud_internet.foobar", "band_width", "100"),
 					resource.TestCheckResourceAttr("data.sakuracloud_internet.foobar", "server_ids.#", "0"),
-					resource.TestCheckResourceAttr("data.sakuracloud_internet.foobar", "nw_ipaddresses.#", "11"),
+					resource.TestCheckResourceAttr("data.sakuracloud_internet.foobar", "ipaddresses.#", "11"),
 				),
 			},
 			{

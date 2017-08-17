@@ -179,21 +179,6 @@ type migrateSchemaDef struct {
 	destination string
 }
 
-func migrateResourceData(d *schema.ResourceData, _ interface{}, defs []migrateSchemaDef) resourceData {
-
-	// migrate deprecated params
-	for _, def := range defs {
-		if v, ok := d.GetOk(def.source); ok {
-			d.Set(def.destination, v)
-		}
-	}
-
-	return &resourceDataWrapper{
-		ResourceData: d,
-		migrateDefs:  defs,
-	}
-}
-
 type resourceData interface {
 	UnsafeSetFieldRaw(key string, value string)
 	Get(key string) interface{}

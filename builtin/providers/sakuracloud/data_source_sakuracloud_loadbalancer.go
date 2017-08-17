@@ -37,7 +37,7 @@ func dataSourceSakuraCloudLoadBalancer() *schema.Resource {
 				Type:     schema.TypeString,
 				Computed: true,
 			},
-			"VRID": {
+			"vrid": {
 				Type:     schema.TypeInt,
 				Computed: true,
 			},
