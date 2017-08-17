@@ -141,5 +141,6 @@ Homebrew(Linuxbrew)をご利用中の場合、以下のコマンドでTerraform 
 注: brewコマンドでのインストール後、プラグインの有効化のために画面の指示に従って`~/.terraformrc`に以下のような記述を行なってください。
 
     providers {
-        sakuracloud = "terraform-provider-sakuracloud"
+        sakuracloud = "/path/to/your/terraform-provider-sakuracloud"
     }
+    
