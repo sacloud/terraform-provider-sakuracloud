@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.12.0 (2017-09-04)
+
+* NICドライバ(interface_driver)の追加 #173 (yamamoto-febc)
+* 属性名の変更 #174 (yamamoto-febc)
+
+
 ## 0.11.0 (2017-07-21)
 
 * ドキュメントのパケットフィルタ設定例を修正 #159 (mapk0y)
