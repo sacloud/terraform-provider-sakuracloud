@@ -29,15 +29,10 @@ func resourceSakuraCloudLoadBalancer() *schema.Resource {
 				Required:     true,
 				ValidateFunc: validateSakuracloudIDType,
 			},
-			"VRID": {
+			"vrid": {
 				Type:     schema.TypeInt,
 				ForceNew: true,
 				Required: true,
-			},
-			"is_double": {
-				Type:     schema.TypeBool,
-				Optional: true,
-				Removed:  "Use field 'high_availability' instead",
 			},
 			"high_availability": {
 				Type:     schema.TypeBool,
@@ -116,7 +111,7 @@ func resourceSakuraCloudLoadBalancerCreate(d *schema.ResourceData, meta interfac
 
 	opts.Name = d.Get("name").(string)
 	opts.SwitchID = d.Get("switch_id").(string)
-	opts.VRID = d.Get("VRID").(int)
+	opts.VRID = d.Get("vrid").(int)
 	highAvailability := d.Get("high_availability").(bool)
 	ipAddress1 := d.Get("ipaddress1").(string)
 	ipAddress2 := ""
@@ -273,7 +268,7 @@ func resourceSakuraCloudLoadBalancerDelete(d *schema.ResourceData, meta interfac
 func setLoadBalancerResourceData(d *schema.ResourceData, client *api.Client, data *sacloud.LoadBalancer) error {
 
 	d.Set("switch_id", data.Switch.GetStrID())
-	d.Set("VRID", data.Remark.VRRP.VRID)
+	d.Set("vrid", data.Remark.VRRP.VRID)
 	if len(data.Remark.Servers) > 1 {
 		d.Set("high_availability", true)
 		d.Set("ipaddress1", data.Remark.Servers[0].(map[string]interface{})["IPAddress"])

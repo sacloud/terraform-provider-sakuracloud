@@ -90,7 +90,7 @@ resource sakuracloud_internet "foobar" {
 }
 resource "sakuracloud_subnet" "foobar" {
     internet_id = "${sakuracloud_internet.foobar.id}"
-    next_hop = "${sakuracloud_internet.foobar.nw_min_ipaddress}"
+    next_hop = "${sakuracloud_internet.foobar.min_ipaddress}"
 }`
 
 var testAccCheckSakuraCloudSubnetConfig_update = `
@@ -99,5 +99,5 @@ resource sakuracloud_internet "foobar" {
 }
 resource "sakuracloud_subnet" "foobar" {
     internet_id = "${sakuracloud_internet.foobar.id}"
-    next_hop = "${sakuracloud_internet.foobar.nw_max_ipaddress}"
+    next_hop = "${sakuracloud_internet.foobar.max_ipaddress}"
 }`

@@ -30,7 +30,7 @@ func TestAccResourceSakuraCloudInternet(t *testing.T) {
 					resource.TestCheckResourceAttr(
 						"sakuracloud_internet.foobar", "server_ids.#", "0"),
 					resource.TestCheckResourceAttr(
-						"sakuracloud_internet.foobar", "nw_ipaddresses.#", "11"),
+						"sakuracloud_internet.foobar", "ipaddresses.#", "11"),
 					resource.TestCheckResourceAttrPair(
 						"sakuracloud_internet.foobar", "icon_id",
 						"sakuracloud_icon.foobar", "id",
@@ -50,7 +50,7 @@ func TestAccResourceSakuraCloudInternet(t *testing.T) {
 					resource.TestCheckResourceAttr(
 						"sakuracloud_internet.foobar", "server_ids.#", "0"),
 					resource.TestCheckResourceAttr(
-						"sakuracloud_internet.foobar", "nw_ipaddresses.#", "11"),
+						"sakuracloud_internet.foobar", "ipaddresses.#", "11"),
 					resource.TestCheckResourceAttr(
 						"sakuracloud_internet.foobar", "enable_ipv6", "true"),
 					resource.TestCheckResourceAttr(
@@ -72,7 +72,7 @@ func TestAccResourceSakuraCloudInternet(t *testing.T) {
 					resource.TestCheckResourceAttr(
 						"sakuracloud_internet.foobar", "server_ids.#", "1"),
 					resource.TestCheckResourceAttr(
-						"sakuracloud_internet.foobar", "nw_ipaddresses.#", "11"),
+						"sakuracloud_internet.foobar", "ipaddresses.#", "11"),
 					resource.TestCheckResourceAttr(
 						"sakuracloud_internet.foobar", "enable_ipv6", "true"),
 					resource.TestCheckResourceAttr(
@@ -149,15 +149,12 @@ resource "sakuracloud_server" "foobar" {
     disks = ["${sakuracloud_disk.foobar.id}"]
     description = "Server from TerraForm for SAKURA CLOUD"
     nic = "${sakuracloud_internet.foobar.switch_id}"
-    base_nw_ipaddress = "${sakuracloud_internet.foobar.nw_ipaddresses.0}"
-    base_nw_gateway = "${sakuracloud_internet.foobar.nw_gateway}"
-    base_nw_mask_len = "${sakuracloud_internet.foobar.nw_mask_len}"
+    ipaddress = "${sakuracloud_internet.foobar.ipaddresses.0}"
+    gateway = "${sakuracloud_internet.foobar.gateway}"
+    nw_mask_len = "${sakuracloud_internet.foobar.nw_mask_len}"
 }
 data "sakuracloud_archive" "ubuntu" {
-    filter = {
-	name = "Name"
-	values = ["Ubuntu Server 16"]
-    }
+    os_type = "ubuntu"
 }
 resource "sakuracloud_disk" "foobar"{
     name = "mydisk"
@@ -176,15 +173,12 @@ resource "sakuracloud_server" "foobar" {
     disks = ["${sakuracloud_disk.foobar.id}"]
     description = "Server from TerraForm for SAKURA CLOUD"
     nic = "${sakuracloud_internet.foobar.switch_id}"
-    base_nw_ipaddress = "${sakuracloud_internet.foobar.nw_ipaddresses.0}"
-    base_nw_gateway = "${sakuracloud_internet.foobar.nw_gateway}"
-    base_nw_mask_len = "${sakuracloud_internet.foobar.nw_mask_len}"
+    ipaddress = "${sakuracloud_internet.foobar.ipaddresses.0}"
+    gateway = "${sakuracloud_internet.foobar.gateway}"
+    nw_mask_len = "${sakuracloud_internet.foobar.nw_mask_len}"
 }
 data "sakuracloud_archive" "ubuntu" {
-    filter = {
-	name = "Name"
-	values = ["Ubuntu Server 16"]
-    }
+    os_type = "ubuntu"
 }
 resource "sakuracloud_disk" "foobar"{
     name = "mydisk"

@@ -8,7 +8,7 @@
 #ロードバランサの定義
 resource sakuracloud_load_balancer "foobar" {
   switch_id = "${sakuracloud_switch.sw.id}"
-  VRID      = 1
+  vrid      = 1
 
   #冗長化構成の有無
   high_availability = false
@@ -80,7 +80,7 @@ resource sakuracloud_switch "sw" {
 |-----------------|:---:|----------------|:--------:|-------------------------------|----------------------------------------------|
 | `name`          | ◯   | ロードバランサ名 | -        | 文字列                         | - |
 | `switch_id`     | ◯   | スイッチID      | -        | 文字列                         | - |
-| `VRID`          | ◯   | VRID           | -        | 数値                          | - |
+| `vrid`          | ◯   | VRID           | -        | 数値                          | - |
 | `high_availability`     | -   | 冗長化          | `false`  | `true`<br />`false`           | - |
 | `plan`          | -   | プラン          |`standard`| `standard`<br />`highspec`    | - |
 | `ipaddress1`    | ◯   | IPアドレス1     | -        | 文字列                         | - |

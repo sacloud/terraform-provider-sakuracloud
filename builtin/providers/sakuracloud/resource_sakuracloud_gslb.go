@@ -25,7 +25,7 @@ func resourceSakuraCloudGSLB() *schema.Resource {
 				Required: true,
 				ForceNew: true,
 			},
-			"FQDN": {
+			"fqdn": {
 				Type:     schema.TypeString,
 				Computed: true,
 			},
@@ -282,7 +282,7 @@ func healthCheckHash(v interface{}) int {
 func setGSLBResourceData(d *schema.ResourceData, _ *api.Client, data *sacloud.GSLB) error {
 
 	d.Set("name", data.Name)
-	d.Set("FQDN", data.Status.FQDN)
+	d.Set("fqdn", data.Status.FQDN)
 
 	//health_check
 	healthCheck := map[string]interface{}{}

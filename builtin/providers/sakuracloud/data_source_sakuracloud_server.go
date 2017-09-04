@@ -50,11 +50,6 @@ func dataSourceSakuraCloudServer() *schema.Resource {
 				Type:     schema.TypeString,
 				Computed: true,
 			},
-			"base_interface": {
-				Type:       schema.TypeString,
-				Computed:   true,
-				Deprecated: "Use field 'nic' instead",
-			},
 			"nic": {
 				Type:     schema.TypeString,
 				Computed: true,
@@ -62,12 +57,6 @@ func dataSourceSakuraCloudServer() *schema.Resource {
 			"cdrom_id": {
 				Type:     schema.TypeString,
 				Computed: true,
-			},
-			"additional_interfaces": {
-				Type:       schema.TypeList,
-				Computed:   true,
-				Elem:       &schema.Schema{Type: schema.TypeString},
-				Deprecated: "Use field 'additional_nics' instead",
 			},
 			"additional_nics": {
 				Type:     schema.TypeList,
@@ -105,48 +94,22 @@ func dataSourceSakuraCloudServer() *schema.Resource {
 				Computed: true,
 				Elem:     &schema.Schema{Type: schema.TypeString},
 			},
-			"base_nw_ipaddress": {
-				Type:       schema.TypeString,
-				Computed:   true,
-				Deprecated: "Use field 'ipaddress' instead",
-			},
 			"ipaddress": {
 				Type:     schema.TypeString,
 				Computed: true,
-			},
-			"base_nw_dns_servers": {
-				Type:       schema.TypeList,
-				Computed:   true,
-				Elem:       &schema.Schema{Type: schema.TypeString},
-				Deprecated: "Use field 'dns_servers' instead",
 			},
 			"dns_servers": {
 				Type:     schema.TypeList,
 				Computed: true,
 				Elem:     &schema.Schema{Type: schema.TypeString},
 			},
-			"base_nw_gateway": {
-				Type:       schema.TypeString,
-				Computed:   true,
-				Deprecated: "Use field 'gateway' instead",
-			},
 			"gateway": {
 				Type:     schema.TypeString,
 				Computed: true,
 			},
-			"base_nw_address": {
-				Type:       schema.TypeString,
-				Computed:   true,
-				Deprecated: "Use field 'nw_address' instead",
-			},
 			"nw_address": {
 				Type:     schema.TypeString,
 				Computed: true,
-			},
-			"base_nw_mask_len": {
-				Type:       schema.TypeString,
-				Computed:   true,
-				Deprecated: "Use field 'nw_mask_len' instead",
 			},
 			"nw_mask_len": {
 				Type:     schema.TypeString,

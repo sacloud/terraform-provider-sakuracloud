@@ -40,7 +40,7 @@ func TestAccResourceSakuraCloudServer(t *testing.T) {
 					resource.TestCheckResourceAttr(
 						"sakuracloud_server.foobar", "macaddresses.#", "1"),
 					resource.TestMatchResourceAttr("sakuracloud_server.foobar",
-						"base_nw_ipaddress",
+						"ipaddress",
 						regexp.MustCompile(".+")), // should be not empty
 					resource.TestCheckResourceAttrPair(
 						"sakuracloud_server.foobar", "icon_id",
@@ -70,7 +70,7 @@ func TestAccResourceSakuraCloudServer(t *testing.T) {
 					resource.TestCheckResourceAttr(
 						"sakuracloud_server.foobar", "macaddresses.#", "1"),
 					resource.TestMatchResourceAttr("sakuracloud_server.foobar",
-						"base_nw_ipaddress",
+						"nw_ipaddress",
 						regexp.MustCompile(".+")), // should be not empty
 					resource.TestCheckResourceAttr(
 						"sakuracloud_server.foobar", "icon_id", ""),
@@ -92,8 +92,8 @@ func TestAccSakuraCloudServer_EditConnections(t *testing.T) {
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckSakuraCloudServerExists("sakuracloud_server.foobar", &server),
 					testAccCheckSakuraCloudServerAttributes(&server),
-					resource.TestCheckNoResourceAttr(
-						"sakuracloud_server.foobar", "base_interface"),
+					resource.TestCheckResourceAttr(
+						"sakuracloud_server.foobar", "nic", "shared"),
 					resource.TestCheckNoResourceAttr(
 						"sakuracloud_server.foobar", "additional_nics"),
 					resource.TestCheckResourceAttr(
@@ -105,8 +105,8 @@ func TestAccSakuraCloudServer_EditConnections(t *testing.T) {
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckSakuraCloudServerExists("sakuracloud_server.foobar", &server),
 					testAccCheckSakuraCloudServerAttributes(&server),
-					resource.TestCheckNoResourceAttr(
-						"sakuracloud_server.foobar", "base_interface"),
+					resource.TestCheckResourceAttr(
+						"sakuracloud_server.foobar", "nic", "shared"),
 					resource.TestCheckResourceAttr(
 						"sakuracloud_server.foobar", "additional_nics.#", "1"),
 					resource.TestCheckResourceAttr(
@@ -118,8 +118,8 @@ func TestAccSakuraCloudServer_EditConnections(t *testing.T) {
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckSakuraCloudServerExists("sakuracloud_server.foobar", &server),
 					testAccCheckSakuraCloudServerAttributes(&server),
-					resource.TestCheckNoResourceAttr(
-						"sakuracloud_server.foobar", "base_interface"),
+					resource.TestCheckResourceAttr(
+						"sakuracloud_server.foobar", "nic", "shared"),
 					resource.TestCheckResourceAttr(
 						"sakuracloud_server.foobar", "additional_nics.#", "3"),
 					resource.TestCheckResourceAttr(

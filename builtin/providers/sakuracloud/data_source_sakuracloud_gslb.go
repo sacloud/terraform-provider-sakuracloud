@@ -33,7 +33,7 @@ func dataSourceSakuraCloudGSLB() *schema.Resource {
 				Type:     schema.TypeString,
 				Computed: true,
 			},
-			"FQDN": {
+			"fqdn": {
 				Type:     schema.TypeString,
 				Computed: true,
 			},

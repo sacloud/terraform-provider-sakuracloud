@@ -95,7 +95,7 @@ func setSSHKeyGenResourceData(d *schema.ResourceData, _ *api.Client, data interf
 	if key, ok := data.(sshKeyType); ok {
 		d.Set("name", key.GetName())
 		d.Set("public_key", key.GetPublicKey())
-		d.Set("fingerprint", key.GetFingerpinrt())
+		d.Set("fingerprint", key.GetFingerprint())
 		d.Set("description", key.GetDescription())
 
 		// has private key?
@@ -113,7 +113,7 @@ type sshKeyType interface {
 	GetStrID() string
 	GetName() string
 	GetPublicKey() string
-	GetFingerpinrt() string
+	GetFingerprint() string
 	GetDescription() string
 }
 type sshKeyGenType interface {

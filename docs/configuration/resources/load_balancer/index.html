@@ -340,7 +340,7 @@
 <pre><code class="hcl">#ロードバランサの定義
 resource sakuracloud_load_balancer &quot;foobar&quot; {
   switch_id = &quot;${sakuracloud_switch.sw.id}&quot;
-  VRID      = 1
+  vrid      = 1
 
   #冗長化構成の有無
   high_availability = false
@@ -434,7 +434,7 @@ resource sakuracloud_switch &quot;sw&quot; {
 <td>-</td>
 </tr>
 <tr>
-<td><code>VRID</code></td>
+<td><code>vrid</code></td>
 <td align="center">◯</td>
 <td>VRID</td>
 <td align="center">-</td>

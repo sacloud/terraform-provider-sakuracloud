@@ -110,7 +110,7 @@ resource sakuracloud_switch "sw"{
 }
 resource "sakuracloud_load_balancer" "foobar" {
     switch_id = "${sakuracloud_switch.sw.id}"
-    VRID = 1
+    vrid = 1
     ipaddress1 = "192.168.11.101"
     nw_mask_len = 24
     default_route = "192.168.11.1"
@@ -126,7 +126,7 @@ resource sakuracloud_switch "sw"{
 }
 resource "sakuracloud_load_balancer" "foobar" {
     switch_id = "${sakuracloud_switch.sw.id}"
-    VRID = 1
+    vrid = 1
     ipaddress1 = "192.168.11.101"
     nw_mask_len = 24
     default_route = "192.168.11.1"
@@ -148,7 +148,7 @@ resource sakuracloud_switch "sw"{
 }
 resource "sakuracloud_load_balancer" "foobar" {
     switch_id = "${sakuracloud_switch.sw.id}"
-    VRID = 1
+    vrid = 1
     ipaddress1 = "192.168.11.101"
     nw_mask_len = 24
     default_route = "192.168.11.1"
@@ -170,7 +170,7 @@ resource sakuracloud_switch "sw"{
 }
 resource "sakuracloud_load_balancer" "foobar" {
     switch_id = "${sakuracloud_switch.sw.id}"
-    VRID = 1
+    vrid = 1
     ipaddress1 = "192.168.11.101"
     nw_mask_len = 24
     default_route = "192.168.11.1"
@@ -192,7 +192,7 @@ resource sakuracloud_switch "sw"{
 }
 resource "sakuracloud_load_balancer" "foobar" {
     switch_id = "${sakuracloud_switch.sw.id}"
-    VRID = 1
+    vrid = 1
     ipaddress1 = "192.168.11.101"
     nw_mask_len = 24
     default_route = "192.168.11.1"

@@ -54,17 +54,10 @@ func resourceSakuraCloudServer() *schema.Resource {
 					string(sacloud.InterfaceDriverE1000),
 				}),
 			},
-			"base_interface": {
-				Type:          schema.TypeString,
-				Optional:      true,
-				ConflictsWith: []string{"nic"},
-				Deprecated:    "Use field 'nic' instead",
-			},
 			"nic": {
-				Type:          schema.TypeString,
-				Optional:      true,
-				ConflictsWith: []string{"base_interface"},
-				Default:       "shared",
+				Type:     schema.TypeString,
+				Optional: true,
+				Default:  "shared",
 			},
 			"cdrom_id": {
 				Type:         schema.TypeString,
@@ -72,20 +65,11 @@ func resourceSakuraCloudServer() *schema.Resource {
 				Computed:     true,
 				ValidateFunc: validateSakuracloudIDType,
 			},
-			"additional_interfaces": {
-				Type:          schema.TypeList,
-				Optional:      true,
-				MaxItems:      3,
-				Elem:          &schema.Schema{Type: schema.TypeString},
-				ConflictsWith: []string{"additional_nics"},
-				Deprecated:    "Use field 'additional_nics' instead",
-			},
 			"additional_nics": {
-				Type:          schema.TypeList,
-				Optional:      true,
-				MaxItems:      3,
-				Elem:          &schema.Schema{Type: schema.TypeString},
-				ConflictsWith: []string{"additional_interfaces"},
+				Type:     schema.TypeList,
+				Optional: true,
+				MaxItems: 3,
+				Elem:     &schema.Schema{Type: schema.TypeString},
 			},
 			"packet_filter_ids": {
 				Type:     schema.TypeList,
@@ -123,96 +107,36 @@ func resourceSakuraCloudServer() *schema.Resource {
 				Computed: true,
 				Elem:     &schema.Schema{Type: schema.TypeString},
 			},
-			"base_nw_ipaddress": {
-				Type:          schema.TypeString,
-				Optional:      true,
-				Computed:      true,
-				ConflictsWith: []string{"ipaddress"},
-				Deprecated:    "Use field 'ipaddress' instead",
-			},
 			"ipaddress": {
-				Type:          schema.TypeString,
-				Optional:      true,
-				Computed:      true,
-				ConflictsWith: []string{"base_nw_ipaddress"},
-			},
-			"base_nw_dns_servers": {
-				Type:       schema.TypeList,
-				Computed:   true,
-				Elem:       &schema.Schema{Type: schema.TypeString},
-				Deprecated: "Use field 'dns_servers' instead",
+				Type:     schema.TypeString,
+				Optional: true,
+				Computed: true,
 			},
 			"dns_servers": {
 				Type:     schema.TypeList,
 				Computed: true,
 				Elem:     &schema.Schema{Type: schema.TypeString},
 			},
-			"base_nw_gateway": {
-				Type:          schema.TypeString,
-				Optional:      true,
-				Computed:      true,
-				ConflictsWith: []string{"gateway"},
-				Deprecated:    "Use field 'gateway' instead",
-			},
 			"gateway": {
-				Type:          schema.TypeString,
-				Optional:      true,
-				Computed:      true,
-				ConflictsWith: []string{"base_nw_gateway"},
-			},
-			"base_nw_address": {
-				Type:       schema.TypeString,
-				Computed:   true,
-				Deprecated: "Use field 'nw_address' instead",
+				Type:     schema.TypeString,
+				Optional: true,
+				Computed: true,
 			},
 			"nw_address": {
 				Type:     schema.TypeString,
 				Computed: true,
 			},
-			"base_nw_mask_len": {
-				Type:          schema.TypeString,
-				Optional:      true,
-				Computed:      true,
-				ConflictsWith: []string{"nw_mask_len"},
-				Deprecated:    "Use field 'nw_mask_len' instead",
-			},
 			"nw_mask_len": {
-				Type:          schema.TypeString,
-				Optional:      true,
-				Computed:      true,
-				ConflictsWith: []string{"base_nw_mask_len"},
+				Type:     schema.TypeString,
+				Optional: true,
+				Computed: true,
 			},
 		},
 	}
 }
 
-var serverSchemaMigrateDef = []migrateSchemaDef{
-	{
-		source:      "base_interface",
-		destination: "nic",
-	},
-	{
-		source:      "additional_interfaces",
-		destination: "additional_nics",
-	},
-	{
-		source:      "base_nw_ipaddress",
-		destination: "ipaddress",
-	},
-	{
-		source:      "base_nw_gateway",
-		destination: "gateway",
-	},
-	{
-		source:      "base_nw_mask_len",
-		destination: "nw_mask_len",
-	},
-}
-
 func resourceSakuraCloudServerCreate(d *schema.ResourceData, meta interface{}) error {
 	client := getSacloudAPIClient(d, meta)
-
-	migrateResourceData(d, meta, serverSchemaMigrateDef)
 
 	opts := client.Server.New()
 	opts.Name = d.Get("name").(string)
@@ -370,7 +294,6 @@ func resourceSakuraCloudServerCreate(d *schema.ResourceData, meta interface{}) e
 
 func resourceSakuraCloudServerRead(d *schema.ResourceData, meta interface{}) error {
 	client := getSacloudAPIClient(d, meta)
-	migrateResourceData(d, meta, serverSchemaMigrateDef)
 
 	server, err := client.Server.Read(toSakuraCloudID(d.Id()))
 	if err != nil {
@@ -380,9 +303,8 @@ func resourceSakuraCloudServerRead(d *schema.ResourceData, meta interface{}) err
 	return setServerResourceData(d, client, server)
 }
 
-func resourceSakuraCloudServerUpdate(r *schema.ResourceData, meta interface{}) error {
-	client := getSacloudAPIClient(r, meta)
-	d := migrateResourceData(r, meta, serverSchemaMigrateDef)
+func resourceSakuraCloudServerUpdate(d *schema.ResourceData, meta interface{}) error {
+	client := getSacloudAPIClient(d, meta)
 
 	server, err := client.Server.Read(toSakuraCloudID(d.Id()))
 	if err != nil {
@@ -694,7 +616,7 @@ func resourceSakuraCloudServerUpdate(r *schema.ResourceData, meta interface{}) e
 		}
 	}
 
-	return resourceSakuraCloudServerRead(d.RawResourceData(), meta)
+	return resourceSakuraCloudServerRead(d, meta)
 
 }
 
@@ -705,7 +627,6 @@ func resourceSakuraCloudServerDelete(d *schema.ResourceData, meta interface{}) e
 	defer sakuraMutexKV.Unlock(lockKey)
 
 	client := getSacloudAPIClient(d, meta)
-	migrateResourceData(d, meta, serverSchemaMigrateDef)
 
 	server, err := client.Server.Read(toSakuraCloudID(d.Id()))
 	if err != nil {
@@ -747,27 +668,15 @@ func setServerResourceData(d *schema.ResourceData, client *api.Client, data *sac
 	hasSharedInterface := len(data.Interfaces) > 0 && data.Interfaces[0].Switch != nil
 	if hasSharedInterface {
 		if data.Interfaces[0].Switch.Scope == sacloud.ESCopeShared {
-			if _, ok := d.GetOk("base_interface"); ok {
-				d.Set("base_interface", "shared")
-			}
 			d.Set("nic", "shared")
 		} else {
 			d.Set("nic", data.Interfaces[0].Switch.GetStrID())
-			if _, ok := d.GetOk("base_interface"); ok {
-				d.Set("base_interface", data.Interfaces[0].Switch.GetStrID())
-			}
 		}
 	} else {
 		d.Set("nic", "")
-		if _, ok := d.GetOk("base_interface"); ok {
-			d.Set("base_interface", "")
-		}
 	}
 
 	d.Set("additional_nics", flattenInterfaces(data.Interfaces))
-	if _, ok := d.GetOk("additional_interfaces"); ok {
-		d.Set("additional_interfaces", flattenInterfaces(data.Interfaces))
-	}
 
 	d.Set("icon_id", data.GetIconStrID())
 	d.Set("description", data.Description)
@@ -777,42 +686,26 @@ func setServerResourceData(d *schema.ResourceData, client *api.Client, data *sac
 
 	//readonly values
 	d.Set("macaddresses", flattenMacAddresses(data.Interfaces))
-
 	d.Set("ipaddress", "")
-	d.Set("base_nw_ipaddress", "")
-
-	d.Set("base_nw_dns_servers", []string{})
 	d.Set("dns_servers", []string{})
-
-	d.Set("base_nw_gateway", "")
 	d.Set("gateway", "")
-
-	d.Set("base_nw_address", "")
 	d.Set("nw_address", "")
-
 	d.Set("nw_mask_len", "")
-	d.Set("base_nw_mask_len", "")
 	if hasSharedInterface {
 		if data.Interfaces[0].Switch.Scope == sacloud.ESCopeShared {
 			d.Set("ipaddress", data.Interfaces[0].IPAddress)
-			d.Set("base_nw_ipaddress", data.Interfaces[0].IPAddress)
 		} else {
 			d.Set("ipaddress", data.Interfaces[0].UserIPAddress)
-			d.Set("base_nw_ipaddress", data.Interfaces[0].UserIPAddress)
 		}
 
-		d.Set("base_nw_dns_servers", data.Zone.Region.NameServers)
 		d.Set("dns_servers", data.Zone.Region.NameServers)
 		if data.Interfaces[0].Switch.UserSubnet != nil {
-			d.Set("base_nw_gateway", data.Interfaces[0].Switch.UserSubnet.DefaultRoute)
 			d.Set("gateway", data.Interfaces[0].Switch.UserSubnet.DefaultRoute)
 
-			d.Set("base_nw_mask_len", fmt.Sprintf("%d", data.Interfaces[0].Switch.UserSubnet.NetworkMaskLen))
 			d.Set("nw_mask_len", fmt.Sprintf("%d", data.Interfaces[0].Switch.UserSubnet.NetworkMaskLen))
 		}
 		if data.Interfaces[0].Switch.Subnet != nil {
-			d.Set("base_nw_address", data.Interfaces[0].Switch.Subnet.NetworkAddress) // null if connected switch(not router)
-			d.Set("nw_address", data.Interfaces[0].Switch.Subnet.NetworkAddress)      // null if connected switch(not router)
+			d.Set("nw_address", data.Interfaces[0].Switch.Subnet.NetworkAddress) // null if connected switch(not router)
 		}
 	}
 

@@ -74,7 +74,7 @@ resource sakuracloud_gslb_server "gslb_server02" {
 |属性名          | 名称             | 補足                                        |
 |---------------|-----------------|--------------------------------------------|
 | `id`          | ID              | -                                          |
-| `FQDN`        | GSLB-FQDN       | GSLB作成時に割り当てられるFQDN<br />ロードバランシングしたいホスト名をFQDNのCNAMEとしてDNS登録する    |
+| `fqdn`        | GSLB-FQDN       | GSLB作成時に割り当てられるFQDN<br />ロードバランシングしたいホスト名をFQDNのCNAMEとしてDNS登録する    |
 
 
 
