@@ -202,6 +202,7 @@ type API struct {
 	License       *LicenseAPI       // ライセンスAPI
 	LoadBalancer  *LoadBalancerAPI  // ロードバランサーAPI
 	NewsFeed      *NewsFeedAPI      // フィード(障害/メンテナンス情報)API
+	NFS           *NFSAPI           // NFS API
 	Note          *NoteAPI          // スタートアップスクリプトAPI
 	PacketFilter  *PacketFilterAPI  // パケットフィルタAPI
 	Product       *ProductAPI       // 製品情報API
@@ -317,6 +318,11 @@ func (api *API) GetLoadBalancerAPI() *LoadBalancerAPI {
 // GetNewsFeedAPI フィード(障害/メンテナンス情報)API取得
 func (api *API) GetNewsFeedAPI() *NewsFeedAPI {
 	return api.NewsFeed
+}
+
+// GetNFSAPI NFS API取得
+func (api *API) GetNFSAPI() *NFSAPI {
+	return api.NFS
 }
 
 // GetNoteAPI スタートアップAPI取得
@@ -464,6 +470,7 @@ func newAPI(client *Client) *API {
 		License:      NewLicenseAPI(client),
 		LoadBalancer: NewLoadBalancerAPI(client),
 		NewsFeed:     NewNewsFeedAPI(client),
+		NFS:          NewNFSAPI(client),
 		Note:         NewNoteAPI(client),
 		PacketFilter: NewPacketFilterAPI(client),
 		Product: &ProductAPI{
