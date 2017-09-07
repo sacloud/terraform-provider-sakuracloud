@@ -104,6 +104,7 @@ terraform apply
   - [ロードバランサー](https://sacloud.github.io/terraform-provider-sakuracloud/configuration/resources/load_balancer/)
   - [VPCルーター](https://sacloud.github.io/terraform-provider-sakuracloud/configuration/resources/vpc_router/)
   - [データベース](https://sacloud.github.io/terraform-provider-sakuracloud/configuration/resources/database/)
+  - [NFS](https://sacloud.github.io/terraform-provider-sakuracloud/configuration/resources/nfs/)
   - [スタートアップスクリプト](https://sacloud.github.io/terraform-provider-sakuracloud/configuration/resources/note/)
   - [公開鍵](https://sacloud.github.io/terraform-provider-sakuracloud/configuration/resources/ssh_key/)
   - [公開鍵(生成)](https://sacloud.github.io/terraform-provider-sakuracloud/configuration/resources/ssh_key_gen/)

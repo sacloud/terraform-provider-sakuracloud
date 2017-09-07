@@ -97,6 +97,7 @@ data sakuracloud_archive "centos" {
 | `sakuracloud_icon`           | アイコン                | -                                          |
 | `sakuracloud_internet`       | ルータ                | -                                          |
 | `sakuracloud_note`           | スタートアップスクリプト   | -                                          |
+| `sakuracloud_nfs`            | NFS                     | -                                          |
 | `sakuracloud_packet_filter`  | パケットフィルタ         | -                                          |
 | `sakuracloud_server`         | サーバ                | -                                          |
 | `sakuracloud_simple_monitor` | シンプル監視            | -                                          |
