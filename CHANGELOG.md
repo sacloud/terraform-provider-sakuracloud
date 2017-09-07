@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.13.0 (2017-09-07)
+
+* NFSアプライアンス #176 (yamamoto-febc)
+
+
 ## 0.12.0 (2017-09-04)
 
 * NICドライバ(interface_driver)の追加 #173 (yamamoto-febc)
