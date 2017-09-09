@@ -304,7 +304,12 @@ func (api *NFSAPI) AsyncSleepWhileCopying(id int64, timeout time.Duration, maxRe
 	return complete, progress, err
 }
 
-// Monitor アクティビティーモニター取得
-func (api *NFSAPI) Monitor(id int64, body *sacloud.ResourceMonitorRequest) (*sacloud.MonitorValues, error) {
+// MonitorNFS NFS固有項目アクティビティモニター取得
+func (api *NFSAPI) MonitorNFS(id int64, body *sacloud.ResourceMonitorRequest) (*sacloud.MonitorValues, error) {
+	return api.baseAPI.applianceMonitorBy(id, "nfs", 0, body)
+}
+
+// MonitorInterface NICアクティビティーモニター取得
+func (api *NFSAPI) MonitorInterface(id int64, body *sacloud.ResourceMonitorRequest) (*sacloud.MonitorValues, error) {
 	return api.baseAPI.applianceMonitorBy(id, "interface", 0, body)
 }

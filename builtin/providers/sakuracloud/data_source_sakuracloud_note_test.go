@@ -28,6 +28,7 @@ func TestAccSakuraCloudNoteDataSource_Basic(t *testing.T) {
 					resource.TestCheckResourceAttr("data.sakuracloud_note.foobar", "name", "name_test"),
 					resource.TestCheckResourceAttr("data.sakuracloud_note.foobar", "content", "content_test"),
 					resource.TestCheckResourceAttr("data.sakuracloud_note.foobar", "description", "description_test"),
+					resource.TestCheckResourceAttr("data.sakuracloud_note.foobar", "class", "shell"),
 					resource.TestCheckResourceAttr("data.sakuracloud_note.foobar", "tags.#", "3"),
 					resource.TestCheckResourceAttr("data.sakuracloud_note.foobar", "tags.0", "tag1"),
 					resource.TestCheckResourceAttr("data.sakuracloud_note.foobar", "tags.1", "tag2"),

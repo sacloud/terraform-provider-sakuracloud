@@ -11,6 +11,6 @@ type Note struct {
 	propTags                // タグ
 	propCreatedAt           // 作成日時
 	PropModifiedAt          // 変更日時
+	propNoteClass           // クラス
 	Content          string // スクリプト本体
-	Class            string `json:",omitempty"` // クラス
 }

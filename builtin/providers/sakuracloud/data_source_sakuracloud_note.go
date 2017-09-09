@@ -46,6 +46,10 @@ func dataSourceSakuraCloudNote() *schema.Resource {
 				Type:     schema.TypeString,
 				Computed: true,
 			},
+			"class": {
+				Type:     schema.TypeString,
+				Computed: true,
+			},
 			"tags": {
 				Type:     schema.TypeList,
 				Computed: true,

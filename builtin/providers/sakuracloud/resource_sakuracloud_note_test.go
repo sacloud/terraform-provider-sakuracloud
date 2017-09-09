@@ -26,6 +26,8 @@ func TestAccResourceSakuraCloudNote(t *testing.T) {
 					resource.TestCheckResourceAttr(
 						"sakuracloud_note.foobar", "content", "content"),
 					resource.TestCheckResourceAttr(
+						"sakuracloud_note.foobar", "class", "shell"),
+					resource.TestCheckResourceAttr(
 						"sakuracloud_note.foobar", "tags.#", "2"),
 					resource.TestCheckResourceAttrPair(
 						"sakuracloud_note.foobar", "icon_id",
@@ -42,9 +44,34 @@ func TestAccResourceSakuraCloudNote(t *testing.T) {
 					resource.TestCheckResourceAttr(
 						"sakuracloud_note.foobar", "content", "content_upd"),
 					resource.TestCheckResourceAttr(
+						"sakuracloud_note.foobar", "class", "shell"),
+					resource.TestCheckResourceAttr(
 						"sakuracloud_note.foobar", "tags.#", "0"),
 					resource.TestCheckResourceAttr(
 						"sakuracloud_note.foobar", "icon_id", ""),
+				),
+			},
+		},
+	})
+}
+
+func TestAccResourceSakuraCloudNote_WithYAML(t *testing.T) {
+	var note sacloud.Note
+	resource.Test(t, resource.TestCase{
+		PreCheck:     func() { testAccPreCheck(t) },
+		Providers:    testAccProviders,
+		CheckDestroy: testAccCheckSakuraCloudNoteDestroy,
+		Steps: []resource.TestStep{
+			{
+				Config: testAccCheckSakuraCloudNoteConfig_yaml,
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckSakuraCloudNoteExists("sakuracloud_note.foobar", &note),
+					resource.TestCheckResourceAttr(
+						"sakuracloud_note.foobar", "name", "mynote"),
+					resource.TestCheckResourceAttr(
+						"sakuracloud_note.foobar", "content", "#cloud_init"),
+					resource.TestCheckResourceAttr(
+						"sakuracloud_note.foobar", "class", "yaml_cloud_config"),
 				),
 			},
 		},
@@ -117,4 +144,11 @@ const testAccCheckSakuraCloudNoteConfig_update = `
 resource "sakuracloud_note" "foobar" {
     name = "mynote_upd"
     content = "content_upd"
+}`
+
+const testAccCheckSakuraCloudNoteConfig_yaml = `
+resource "sakuracloud_note" "foobar" {
+    name = "mynote"
+    content = "#cloud_init"
+    class = "yaml_cloud_config"
 }`

@@ -20,6 +20,7 @@ type MonitorValue struct {
 	UsedDisk1Size   *float64 `json:"Used-Disk1-Size,omitempty"`   // 使用済みディスクサイズ
 	TotalDisk2Size  *float64 `json:"Total-Disk2-Size,omitempty"`  // 総ディスクサイズ
 	UsedDisk2Size   *float64 `json:"Used-Disk2-Size,omitempty"`   // 使用済みディスクサイズ
+	FreeDiskSize    *float64 `json:"Free-Disk-Size,omitempty"`    // 空きディスクサイズ(NFS)
 }
 
 // ResourceMonitorRequest アクティビティモニター取得リクエスト
@@ -183,6 +184,11 @@ func (m *MonitorValues) FlattenTotalDisk2SizeValue() ([]FlatMonitorValue, error)
 // FlattenUsedDisk2SizeValue フラット化 使用済みディスクサイズ
 func (m *MonitorValues) FlattenUsedDisk2SizeValue() ([]FlatMonitorValue, error) {
 	return m.flattenValue(func(v *MonitorValue) *float64 { return v.UsedDisk2Size })
+}
+
+// FlattenFreeDiskSizeValue フラット化 空きディスクサイズ(NFS)
+func (m *MonitorValues) FlattenFreeDiskSizeValue() ([]FlatMonitorValue, error) {
+	return m.flattenValue(func(v *MonitorValue) *float64 { return v.FreeDiskSize })
 }
 
 func (m *MonitorValues) flattenValue(f func(*MonitorValue) *float64) ([]FlatMonitorValue, error) {

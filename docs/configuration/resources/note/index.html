@@ -346,6 +346,9 @@
 <pre><code class="hcl">resource sakuracloud_note &quot;mynote&quot; {
   name = &quot;mynote&quot;
 
+  #クラス[shell or yaml_cloud_config]
+  #class = &quot;shell&quot;
+
   #文字列を直接指定する場合
   content = &quot;#!/bin/sh ...&quot;
   #ファイルから読み込む場合
@@ -375,6 +378,14 @@
 <td>スクリプト名</td>
 <td align="center">-</td>
 <td>文字列</td>
+<td>-</td>
+</tr>
+<tr>
+<td><code>class</code></td>
+<td align="center">-</td>
+<td>クラス</td>
+<td align="center"><code>shell</code></td>
+<td><code>shell</code><br /><code>yaml_cloud_config</code></td>
 <td>-</td>
 </tr>
 <tr>
