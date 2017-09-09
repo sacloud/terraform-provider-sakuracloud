@@ -9,6 +9,9 @@
 ```hcl
 resource sakuracloud_note "mynote" {
   name = "mynote"
+  
+  #クラス[shell or yaml_cloud_config]
+  #class = "shell"
 
   #文字列を直接指定する場合
   content = "#!/bin/sh ..."
@@ -25,7 +28,8 @@ resource sakuracloud_note "mynote" {
 |パラメーター         |必須  |名称                |初期値     |設定値                    |補足                                          |
 |-------------------|:---:|--------------------|:--------:|------------------------|----------------------------------------------|
 | `name`            | ◯   | スクリプト名           | -        | 文字列                  | - |
-| `content`         | ◯   | スクリプト内容           | -        | 文字列                  | - |
+| `class`           | -   | クラス                | `shell`        | `shell`<br />`yaml_cloud_config`| - |
+| `content`         | ◯   | スクリプト内容         | -        | 文字列                  | - |
 | `icon_id`         | -   | アイコンID         | - | 文字列 | - |
 | `description`     | -   | 説明  | - | 文字列 | - |
 | `tags`            | -   | タグ | - | リスト(文字列) | - |

@@ -35,6 +35,15 @@ func resourceSakuraCloudNote() *schema.Resource {
 				Type:     schema.TypeString,
 				Optional: true,
 			},
+			"class": {
+				Type:     schema.TypeString,
+				Optional: true,
+				Default:  string(sacloud.NoteClassShell),
+				ValidateFunc: validateStringInWord([]string{
+					string(sacloud.NoteClassShell),
+					string(sacloud.NoteClassYAMLCloudConfig),
+				}),
+			},
 			"tags": {
 				Type:     schema.TypeList,
 				Optional: true,
@@ -51,6 +60,15 @@ func resourceSakuraCloudNoteCreate(d *schema.ResourceData, meta interface{}) err
 
 	opts.Name = d.Get("name").(string)
 	opts.Content = d.Get("content").(string)
+
+	if class, ok := d.GetOk("class"); ok {
+		s := class.(string)
+		if s == "" {
+			s = string(sacloud.NoteClassShell)
+		}
+		opts.SetClassByStr(s)
+	}
+
 	if iconID, ok := d.GetOk("icon_id"); ok {
 		opts.SetIconByID(toSakuraCloudID(iconID.(string)))
 	}
@@ -92,6 +110,15 @@ func resourceSakuraCloudNoteUpdate(d *schema.ResourceData, meta interface{}) err
 
 	if d.HasChange("name") {
 		note.Name = d.Get("name").(string)
+	}
+	if d.HasChange("class") {
+		if class, ok := d.GetOk("class"); ok {
+			s := class.(string)
+			if s == "" {
+				s = string(sacloud.NoteClassShell)
+			}
+			note.SetClassByStr(s)
+		}
 	}
 	if d.HasChange("content") {
 		note.Content = d.Get("content").(string)
@@ -144,6 +171,7 @@ func setNoteResourceData(d *schema.ResourceData, _ *api.Client, data *sacloud.No
 
 	d.Set("name", data.Name)
 	d.Set("content", data.Content)
+	d.Set("class", data.Class)
 	d.Set("icon_id", data.GetIconStrID())
 	d.Set("description", data.Description)
 	d.Set("tags", data.Tags)
