@@ -137,30 +137,6 @@ sub github_release_with_exit_code {
     unshift  @_, _github_release; goto \&command_with_exit_code
 }
 
-sub _usacloud {
-    if($dry_run){
-        return
-    }
-    state $com = do {
-        chomp(my $c = `which usacloud`);
-        die "usacloud command is required\n" unless $c;
-        $c;
-    };
-}
-sub usacloud {
-    if($dry_run){
-        return
-    }
-    unshift  @_, _usacloud; goto \&command
-}
-
-sub usacloud_with_exit_code {
-    if($dry_run){
-        return
-    }
-    unshift  @_, _usacloud; goto \&command_with_exit_code
-}
-
 sub http_get {
     my $url = shift;
     my ($ok, $err, undef, $stdout, $stderr) = run(command => [qw{curl -sf}, $url]);
@@ -428,8 +404,6 @@ sub upload_to_github_release {
     push @args, "--pre-release" if $erase_if_exist;
     github_release @args;
 
-    # upload to ojs
-    usacloud qw/object-storage put -y -r bin downloads/ unless $is_staging;
 }
 
 sub create_pull_request {
@@ -536,7 +510,7 @@ sub main {
         exit 0;
     }
     # check command
-    _git;_hub;_usacloud;
+    _git;_hub;
 
     if($task && $task eq "create-pullrequest"){
         infof "Create a Pull Request for version up.\n";

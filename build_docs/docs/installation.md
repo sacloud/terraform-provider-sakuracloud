@@ -56,14 +56,14 @@ Available commands are:
 
 - 1) 以下のリンクから、プラットフォームに応じたzipファイルをダウンロードします
     - Windows: 
-        - [i386](https://terraform.b.sakurastorage.jp/downloads/terraform-provider-sakuracloud_windows-386.zip)
-        - [amd64](https://terraform.b.sakurastorage.jp/downloads/terraform-provider-sakuracloud_windows-amd64.zip)
+        - [i386](http://releases.usacloud.jp/terraform/terraform-provider-sakuracloud_windows-386.zip)
+        - [amd64](http://releases.usacloud.jp/terraform/terraform-provider-sakuracloud_windows-amd64.zip)
     - Linux:
-        - [i386](https://terraform.b.sakurastorage.jp/downloads/terraform-provider-sakuracloud_linux-386.zip)
-        - [amd64](https://terraform.b.sakurastorage.jp/downloads/terraform-provider-sakuracloud_linux-amd64.zip)
+        - [i386](http://releases.usacloud.jp/terraform/terraform-provider-sakuracloud_linux-386.zip)
+        - [amd64](http://releases.usacloud.jp/terraform/terraform-provider-sakuracloud_linux-amd64.zip)
     - Darwin(macOS)
-        - [i386](https://terraform.b.sakurastorage.jp/downloads/terraform-provider-sakuracloud_darwin-386.zip)
-        - [amd64](https://terraform.b.sakurastorage.jp/downloads/terraform-provider-sakuracloud_darwin-amd64.zip)
+        - [i386](http://releases.usacloud.jp/terraform/terraform-provider-sakuracloud_darwin-386.zip)
+        - [amd64](http://releases.usacloud.jp/terraform/terraform-provider-sakuracloud_darwin-amd64.zip)
 - 2) terraformバイナリと同じディレクトリに展開します
 
 > Note:  
@@ -74,7 +74,7 @@ Terraform for さくらのクラウドのバイナリーファイルは[GitHub�
 ```bash
 $ cd ~/terraform
 # ダウンロード
-$ curl -sL https://terraform.b.sakurastorage.jp/downloads/terraform-provider-sakuracloud_darwin-amd64.zip > terraform-provider-sakuracloud.zip
+$ curl -sL http://releases.usacloud.jp/terraform/terraform-provider-sakuracloud_darwin-amd64.zip > terraform-provider-sakuracloud.zip
 # 展開
 $ unzip terraform-provider-sakuracloud.zip
 

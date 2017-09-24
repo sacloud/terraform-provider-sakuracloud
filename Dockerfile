@@ -1,4 +1,4 @@
-FROM golang:1.8
+FROM golang:1.9
 LABEL maintainer="Kazumichi Yamamoto <yamamoto.febc@gmail.com>"
 MAINTAINER Kazumichi Yamamoto <yamamoto.febc@gmail.com>
 
