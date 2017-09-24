@@ -2,7 +2,7 @@ sudo: required
 services: docker
 language: go
 go:
-- 1.8
+- 1.9
 env:
   global:
   - PATH=/home/travis/gopath/bin:$PATH DEBIAN_FRONTEND=noninteractive
@@ -26,7 +26,6 @@ before_deploy:
 - git checkout $TRAVIS_BRANCH
 - git fetch --depth=1000
 - git fetch --tags --depth=1000 || true
-- curl -fsSL https://usacloud.b.sakurastorage.jp/repos/setup-apt.sh | sh
 deploy:
 - provider: script
   script: scripts/release.pl --task=upload-to-github-release && scripts/release.pl
