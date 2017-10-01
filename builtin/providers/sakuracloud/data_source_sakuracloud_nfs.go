@@ -38,7 +38,7 @@ func dataSourceSakuraCloudNFS() *schema.Resource {
 				Computed: true,
 			},
 			"plan": {
-				Type:     schema.TypeString,
+				Type:     schema.TypeInt,
 				Computed: true,
 			},
 			"ipaddress": {
