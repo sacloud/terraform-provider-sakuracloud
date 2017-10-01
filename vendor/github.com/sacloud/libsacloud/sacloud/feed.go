@@ -12,7 +12,7 @@ type NewsFeed struct {
 	StrEventStart string `json:"event_start,omitempty"`
 	StrEventEnd   string `json:"event_end,omitempty"`
 	Title         string `json:"title,omitempty"`
-	Url           string `json:"url,omitempty"`
+	URL           string `json:"url,omitempty"`
 }
 
 // Date 対象日時

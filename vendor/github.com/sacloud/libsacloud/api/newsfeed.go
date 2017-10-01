@@ -42,7 +42,7 @@ func (api *NewsFeedAPI) GetFeedByURL(url string) (*sacloud.NewsFeed, error) {
 		return nil, err
 	}
 	for _, r := range res {
-		if r.Url == url {
+		if r.URL == url {
 			return &r, nil
 		}
 	}

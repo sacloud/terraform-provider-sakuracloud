@@ -192,6 +192,44 @@ func (api *ArchiveAPI) CanEditDisk(id int64) (bool, error) {
 
 }
 
+// GetPublicArchiveIDFromAncestors 祖先の中からパブリックアーカイブのIDを検索
+func (api *ArchiveAPI) GetPublicArchiveIDFromAncestors(id int64) (int64, bool) {
+
+	emptyID := int64(0)
+
+	archive, err := api.Read(id)
+	if err != nil {
+		return emptyID, false
+	}
+
+	if archive == nil {
+		return emptyID, false
+	}
+
+	// BundleInfoがあれば編集不可
+	if archive.BundleInfo != nil && archive.BundleInfo.HostClass == bundleInfoWindowsHostClass {
+		// Windows
+		return emptyID, false
+	}
+
+	for _, t := range allowDiskEditTags {
+		if archive.HasTag(t) {
+			// 対応OSインストール済みディスク
+			return archive.ID, true
+		}
+	}
+
+	// ここまできても判定できないならソースに投げる
+	if archive.SourceDisk != nil && archive.SourceDisk.Availability != "discontinued" {
+		return api.client.Disk.GetPublicArchiveIDFromAncestors(archive.SourceDisk.ID)
+	}
+	if archive.SourceArchive != nil && archive.SourceArchive.Availability != "discontinued" {
+		return api.client.Archive.GetPublicArchiveIDFromAncestors(archive.SourceArchive.ID)
+	}
+	return emptyID, false
+
+}
+
 // FindLatestStableCentOS 安定版最新のCentOSパブリックアーカイブを取得
 func (api *ArchiveAPI) FindLatestStableCentOS() (*sacloud.Archive, error) {
 	return api.findByOSTags(archiveLatestStableCentOSTags)

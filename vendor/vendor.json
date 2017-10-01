@@ -611,28 +611,28 @@
 			"revisionTime": "2017-07-30T19:30:24Z"
 		},
 		{
-			"checksumSHA1": "XI7myxuwZnJ3ySMwSCLTXcpBN4Y=",
+			"checksumSHA1": "6SUOCG4pJYli/d6+mjpIomTUCms=",
 			"path": "github.com/sacloud/libsacloud",
-			"revision": "4f8a07529066cfa2affd1bf5e6fd66118d5133b8",
-			"revisionTime": "2017-09-09T05:33:16Z"
+			"revision": "e6471c25b766c92e97fcab186d83226075c718f9",
+			"revisionTime": "2017-09-30T15:50:18Z"
 		},
 		{
-			"checksumSHA1": "Kk/yNBQXXuNSeJONEfCRFE4y6uM=",
+			"checksumSHA1": "2U6kFf9PFRr52sS3v40Knqq4QzE=",
 			"path": "github.com/sacloud/libsacloud/api",
-			"revision": "4f8a07529066cfa2affd1bf5e6fd66118d5133b8",
-			"revisionTime": "2017-09-09T05:33:16Z"
+			"revision": "e6471c25b766c92e97fcab186d83226075c718f9",
+			"revisionTime": "2017-09-30T15:50:18Z"
 		},
 		{
-			"checksumSHA1": "HVvkMPOT4cvPy3cmAvNYh9RHpxs=",
+			"checksumSHA1": "P5ydy90ygPEAq4lO/82qgBQQs9E=",
 			"path": "github.com/sacloud/libsacloud/sacloud",
-			"revision": "4f8a07529066cfa2affd1bf5e6fd66118d5133b8",
-			"revisionTime": "2017-09-09T05:33:16Z"
+			"revision": "e6471c25b766c92e97fcab186d83226075c718f9",
+			"revisionTime": "2017-09-30T15:50:18Z"
 		},
 		{
 			"checksumSHA1": "CLqmrM7XFbaROU/9IbJyqR9Z1XM=",
 			"path": "github.com/sacloud/libsacloud/sacloud/ostype",
-			"revision": "4f8a07529066cfa2affd1bf5e6fd66118d5133b8",
-			"revisionTime": "2017-09-09T05:33:16Z"
+			"revision": "e6471c25b766c92e97fcab186d83226075c718f9",
+			"revisionTime": "2017-09-30T15:50:18Z"
 		},
 		{
 			"checksumSHA1": "zmC8/3V4ls53DJlNTKDZwPSC/dA=",

@@ -45,8 +45,8 @@ func (l *DatabaseLog) Logs() []string {
 	return strings.Split(l.Data, "\n")
 }
 
-// Id ログのID取得
-func (l *DatabaseLog) Id() string {
+// ID ログのID取得
+func (l *DatabaseLog) ID() string {
 	return l.Name
 }
 
@@ -63,8 +63,8 @@ type DatabaseBackupHistory struct {
 	Size         int64      `json:"size,omitempty"`
 }
 
-// Id バックアップ履歴のID取得
-func (h *DatabaseBackupHistory) Id() string {
+// ID バックアップ履歴のID取得
+func (h *DatabaseBackupHistory) ID() string {
 	return h.CreatedAt.Format(time.RFC3339)
 }
 
