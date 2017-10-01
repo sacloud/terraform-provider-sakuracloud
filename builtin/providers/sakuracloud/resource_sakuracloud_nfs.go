@@ -5,6 +5,7 @@ import (
 	"github.com/hashicorp/terraform/helper/schema"
 	"github.com/sacloud/libsacloud/api"
 	"github.com/sacloud/libsacloud/sacloud"
+	"strconv"
 )
 
 func resourceSakuraCloudNFS() *schema.Resource {
@@ -29,11 +30,17 @@ func resourceSakuraCloudNFS() *schema.Resource {
 				ValidateFunc: validateSakuracloudIDType,
 			},
 			"plan": {
-				Type:         schema.TypeString,
-				ForceNew:     true,
-				Optional:     true,
-				Default:      "100g",
-				ValidateFunc: validateStringInWord([]string{"100g"}),
+				Type:     schema.TypeInt,
+				ForceNew: true,
+				Optional: true,
+				Default:  "100",
+				ValidateFunc: validateIntInWord([]string{
+					strconv.Itoa(int(sacloud.NFSPlan100G)),
+					strconv.Itoa(int(sacloud.NFSPlan500G)),
+					strconv.Itoa(int(sacloud.NFSPlan1T)),
+					strconv.Itoa(int(sacloud.NFSPlan2T)),
+					strconv.Itoa(int(sacloud.NFSPlan4T)),
+				}),
 			},
 			"ipaddress": {
 				Type:     schema.TypeString,
@@ -96,10 +103,7 @@ func resourceSakuraCloudNFSCreate(d *schema.ResourceData, meta interface{}) erro
 		defaultRoute = df.(string)
 	}
 
-	// currently, plan only have 100g
-	if d.Get("plan").(string) == "100g" {
-		opts.Plan = sacloud.NFSPlan100G
-	}
+	opts.Plan = sacloud.NFSPlan(d.Get("plan").(int))
 
 	if iconID, ok := d.GetOk("icon_id"); ok {
 		opts.Icon = sacloud.NewResource(toSakuraCloudID(iconID.(string)))
@@ -222,6 +226,7 @@ func setNFSResourceData(d *schema.ResourceData, client *api.Client, data *saclou
 	d.Set("nw_mask_len", data.Remark.Network.NetworkMaskLen)
 	d.Set("default_route", data.Remark.Network.DefaultRoute)
 
+	d.Set("plan", data.Remark.Plan.ID)
 	d.Set("name", data.Name)
 	d.Set("icon_id", data.GetIconStrID())
 	d.Set("description", data.Description)

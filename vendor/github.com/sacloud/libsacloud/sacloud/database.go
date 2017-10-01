@@ -274,7 +274,8 @@ func CreateNewDatabase(values *CreateDatabaseValue) *Database {
 				},
 			},
 			// Plan
-			propPlanID: propPlanID{Plan: &Resource{ID: int64(values.Plan)}},
+			propPlanID:      propPlanID{Plan: &Resource{ID: int64(values.Plan)}},
+			SourceAppliance: values.SourceAppliance,
 		},
 		// Settings
 		Settings: &DatabaseSettings{
@@ -367,7 +368,8 @@ func CloneNewDatabase(values *CreateDatabaseValue) *Database {
 				},
 			},
 			// Plan
-			propPlanID: propPlanID{Plan: &Resource{ID: int64(values.Plan)}},
+			propPlanID:      propPlanID{Plan: &Resource{ID: int64(values.Plan)}},
+			SourceAppliance: values.SourceAppliance,
 		},
 		// Settings
 		Settings: &DatabaseSettings{

@@ -159,8 +159,8 @@ var defaultGSLBHealthCheck = GSLBHealthCheck{
 	Status:   "200",
 }
 
-// SetHttpHealthCheck HTTPヘルスチェック 設定
-func (g *GSLB) SetHttpHealthCheck(hostHeader string, path string, responseCode int) {
+// SetHTTPHealthCheck HTTPヘルスチェック 設定
+func (g *GSLB) SetHTTPHealthCheck(hostHeader string, path string, responseCode int) {
 	g.Settings.GSLB.HealthCheck.Protocol = "http"
 	g.Settings.GSLB.HealthCheck.Host = hostHeader
 	g.Settings.GSLB.HealthCheck.Path = path
@@ -169,8 +169,8 @@ func (g *GSLB) SetHttpHealthCheck(hostHeader string, path string, responseCode i
 
 }
 
-// SetHttpsHealthCheck HTTPSヘルスチェック 設定
-func (g *GSLB) SetHttpsHealthCheck(hostHeader string, path string, responseCode int) {
+// SetHTTPSHealthCheck HTTPSヘルスチェック 設定
+func (g *GSLB) SetHTTPSHealthCheck(hostHeader string, path string, responseCode int) {
 	g.Settings.GSLB.HealthCheck.Protocol = "https"
 	g.Settings.GSLB.HealthCheck.Host = hostHeader
 	g.Settings.GSLB.HealthCheck.Path = path
