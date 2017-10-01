@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.13.1 (2017-10-01)
+
+* スタートアップスクリプトへのclass属性追加 #178 (yamamoto-febc)
+* リリースプロセス変更 #180 (yamamoto-febc)
+* NFSプラン拡大対応 #181 (yamamoto-febc)
+
+
 ## 0.13.0 (2017-09-07)
 
 * NFSアプライアンス #176 (yamamoto-febc)
