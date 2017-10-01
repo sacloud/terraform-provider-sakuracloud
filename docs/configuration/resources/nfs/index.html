@@ -344,8 +344,8 @@
 resource sakuracloud_nfs &quot;foobar&quot; {
   switch_id = &quot;${sakuracloud_switch.sw.id}&quot;
 
-  #プラン(現在は100gのみ)
-  #plan = &quot;100g&quot;
+  #プラン[100/500/1024(1T)/2048(2T)/4096(4T)]
+  #plan = &quot;100&quot;
 
   ipaddress = &quot;192.168.11.101&quot;
   #default_route = &quot;192.168.11.1&quot;
@@ -399,9 +399,9 @@ resource sakuracloud_switch &quot;sw&quot; {
 <td><code>plan</code></td>
 <td align="center">-</td>
 <td>プラン</td>
-<td align="center"><code>100g</code></td>
-<td><code>100g</code></td>
-<td>現在は値として<code>100g</code>のみ利用可能</td>
+<td align="center"><code>100</code></td>
+<td><code>100</code><br /><code>500</code><br /><code>1024</code><br /><code>2048</code><br /><code>4096</code></td>
+<td>-</td>
 </tr>
 <tr>
 <td><code>ipaddress</code></td>
