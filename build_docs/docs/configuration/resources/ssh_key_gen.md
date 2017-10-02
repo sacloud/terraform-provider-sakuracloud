@@ -94,7 +94,7 @@ resource sakuracloud_server "foobar" {
   # プロビジョニング
   connection {
     user        = "root"
-    host        = "${self.base_nw_ipaddress}"
+    host        = "${self.ipaddress}"
     private_key = "${sakuracloud_ssh_key_gen.key.private_key}"
   }
 
@@ -107,5 +107,6 @@ resource sakuracloud_server "foobar" {
 
 #SSH接続用のアウトプット定義
 output "ssh_to_server" {
-  value = "ssh -i id_rsa root@${sakuracloud_server.foobar.base_nw_ipaddress}"
+  value = "ssh -i id_rsa root@${sakuracloud_server.foobar.ipaddress}"
 }
+```

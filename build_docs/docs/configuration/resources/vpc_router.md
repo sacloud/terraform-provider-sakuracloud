@@ -19,13 +19,13 @@ resource sakuracloud_switch "sw01" {
 resource sakuracloud_vpc_router "foobar" {
   name        = "vpc_router_sample"
   plan        = "premium"
-  switch_id   = "${sakuracloud_internet.router1.switch_id}"          # 上流のスイッチID
-  vip         = "${sakuracloud_internet.router1.nw_ipaddresses.0}"   # VIP
-  ipaddress1  = "${sakuracloud_internet.router1.nw_ipaddresses.1}"   # 実IP1
-  ipaddress2  = "${sakuracloud_internet.router1.nw_ipaddresses.2}"   # 実IP2
-  aliases     = ["${sakuracloud_internet.router1.nw_ipaddresses.3}"] # IPエイリアス
+  switch_id   = "${sakuracloud_internet.router1.switch_id}"        # 上流のスイッチID
+  vip         = "${sakuracloud_internet.router1.ipaddresses[0]}"   # VIP
+  ipaddress1  = "${sakuracloud_internet.router1.ipaddresses[1]}"   # 実IP1
+  ipaddress2  = "${sakuracloud_internet.router1.ipaddresses[2]}"   # 実IP2
+  aliases     = ["${sakuracloud_internet.router1.ipaddresses[3]}"] # IPエイリアス
   vrid        = 1
-  syslog_host = "192.168.11.1"                                       # syslog転送先ホスト
+  syslog_host = "192.168.11.1"                                     # syslog転送先ホスト
 }
 
 # VPCルータ本体の定義(スタンダードプランの場合)
@@ -60,8 +60,8 @@ resource sakuracloud_vpc_router_static_nat "staticNAT1" {
   vpc_router_id           = "${sakuracloud_vpc_router.foobar.id}"
   vpc_router_interface_id = "${sakuracloud_vpc_router_interface.eth1.id}" # 対象プライベートIPが属するNICのID
 
-  global_address  = "${sakuracloud_internet.router1.nw_ipaddresses.3}" # グローバル側IPアドレス(VPCルータ本体に割り当てたIPエイリアス)
-  private_address = "192.168.11.11"                                    # プライベート側アドレス
+  global_address  = "${sakuracloud_internet.router1.ipaddresses[3]}" # グローバル側IPアドレス(VPCルータ本体に割り当てたIPエイリアス)
+  private_address = "192.168.11.11"                                  # プライベート側アドレス
 }
 
 # ポートフォワーディング

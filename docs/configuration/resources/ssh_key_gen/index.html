@@ -222,21 +222,6 @@
                     <li><a class="toctree-l4" href="#_4">利用例</a></li>
                 
             
-                <li class="toctree-l3"><a href="#ssh_1">SSH公開鍵</a></li>
-                
-            
-                <li class="toctree-l3"><a href="#oscentos">OS(CentOS)</a></li>
-                
-            
-                <li class="toctree-l3"><a href="#_5">ディスクの定義</a></li>
-                
-            
-                <li class="toctree-l3"><a href="#_6">サーバの定義</a></li>
-                
-            
-                <li class="toctree-l3"><a href="#ssh_2">SSH接続用のアウトプット定義</a></li>
-                
-            
             </ul>
         
     </li>
@@ -458,52 +443,62 @@
 </table>
 <h3 id="_4">利用例</h3>
 <h4 id="ssh">サーバのプロビジョニング時、SSH接続用に公開鍵(生成)を利用する</h4>
-<p>```hcl</p>
-<h1 id="ssh_1">SSH公開鍵</h1>
-<p>resource sakuracloud_ssh_key_gen "key" {
-  name = "foobar"</p>
-<p>provisioner "local-exec" {
-    command = "echo \"${self.private_key}\" &gt; id_rsa; chmod 0600 id_rsa"
-  }</p>
-<p>provisioner "local-exec" {
-    when    = "destroy"
-    command = "rm -f id_rsa"
+<pre><code class="hcl">#SSH公開鍵
+resource sakuracloud_ssh_key_gen &quot;key&quot; {
+  name = &quot;foobar&quot;
+
+  provisioner &quot;local-exec&quot; {
+    command = &quot;echo \&quot;${self.private_key}\&quot; &gt; id_rsa; chmod 0600 id_rsa&quot;
   }
-}</p>
-<h1 id="oscentos">OS(CentOS)</h1>
-<p>data sakuracloud_archive "centos" {
-  os_type = "centos"
-}</p>
-<h1 id="_5">ディスクの定義</h1>
-<p>resource sakuracloud_disk "foobar" {
-  name              = "foobar"
-  source_archive_id = "${data.sakuracloud_archive.centos.id}"
-  password          = "PUT_YOUR_PASSWORD_HERE"</p>
-<p># 生成した公開鍵のIDを指定
-  ssh_key_ids = ["${sakuracloud_ssh_key_gen.key.id}"]</p>
-<p># SSH接続時のパスワード/チャレンジレスポンス認証を無効化
+
+  provisioner &quot;local-exec&quot; {
+    when    = &quot;destroy&quot;
+    command = &quot;rm -f id_rsa&quot;
+  }
+}
+
+#OS(CentOS)
+data sakuracloud_archive &quot;centos&quot; {
+  os_type = &quot;centos&quot;
+}
+
+#ディスクの定義
+resource sakuracloud_disk &quot;foobar&quot; {
+  name              = &quot;foobar&quot;
+  source_archive_id = &quot;${data.sakuracloud_archive.centos.id}&quot;
+  password          = &quot;PUT_YOUR_PASSWORD_HERE&quot;
+
+  # 生成した公開鍵のIDを指定
+  ssh_key_ids = [&quot;${sakuracloud_ssh_key_gen.key.id}&quot;]
+
+  # SSH接続時のパスワード/チャレンジレスポンス認証を無効化
   disable_pw_auth = true
-}</p>
-<h1 id="_6">サーバの定義</h1>
-<p>resource sakuracloud_server "foobar" {
-  name  = "foobar"
-  disks = ["${sakuracloud_disk.foobar.id}"]</p>
-<p># プロビジョニング
+}
+
+#サーバの定義
+resource sakuracloud_server &quot;foobar&quot; {
+  name  = &quot;foobar&quot;
+  disks = [&quot;${sakuracloud_disk.foobar.id}&quot;]
+
+  # プロビジョニング
   connection {
-    user        = "root"
-    host        = "${self.base_nw_ipaddress}"
-    private_key = "${sakuracloud_ssh_key_gen.key.private_key}"
-  }</p>
-<p>provisioner "remote-exec" {
+    user        = &quot;root&quot;
+    host        = &quot;${self.ipaddress}&quot;
+    private_key = &quot;${sakuracloud_ssh_key_gen.key.private_key}&quot;
+  }
+
+  provisioner &quot;remote-exec&quot; {
     inline = [
-      "hostname",
+      &quot;hostname&quot;,
     ] # 実行したいコマンドを指定
   }
-}</p>
-<h1 id="ssh_2">SSH接続用のアウトプット定義</h1>
-<p>output "ssh_to_server" {
-  value = "ssh -i id_rsa root@${sakuracloud_server.foobar.base_nw_ipaddress}"
-}</p>
+}
+
+#SSH接続用のアウトプット定義
+output &quot;ssh_to_server&quot; {
+  value = &quot;ssh -i id_rsa root@${sakuracloud_server.foobar.ipaddress}&quot;
+}
+</code></pre>
               
             </div>
           </div>
