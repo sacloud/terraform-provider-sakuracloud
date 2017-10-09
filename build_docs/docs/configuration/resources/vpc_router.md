@@ -478,7 +478,25 @@ VPCルータでのサイト間VPNを表します。
 
 |属性名                     | 名称             | 補足                  |
 |--------------------------|------------------|----------------------|
-| `id`                     | ID                    | -                    |
+| `id`                          | ID                    | -                    |
+| `esp_authentication_protocol` | -            | -               |
+| `esp_dh_group`                | -            | -               |
+| `esp_encryption_protocol`     | -            | -               |
+| `esp_lifetime`                | -            | -               |
+| `esp_mode`                    | -            | -               |
+| `esp_perfect_forward_secrecy` | -            | -               |
+| `ike_authentication_protocol` | -            | -               |
+| `ike_encryption_protocol`     | -            | -               |
+| `ike_lifetime`                | -            | -               |
+| `ike_mode`                    | -            | -               |
+| `ike_perfect_forward_secrecy` | -            | -               |
+| `ike_pre_shared_secret`       | -            | -               |
+| `peer_id`                     | -            | -               |
+| `peer_inside_networks`        | -            | -               |
+| `peer_outside_ipaddress`      | -            | -               |
+| `vpc_router_inside_networks`  | -            | -               |
+| `vpc_router_outside_ipaddress`| -            | -               |
+
 
 ## `sakuracloud_vpc_router_static_route`
 
