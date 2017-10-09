@@ -6,6 +6,7 @@ import (
 	"github.com/hashicorp/terraform/terraform"
 	"github.com/sacloud/libsacloud/api"
 	"github.com/sacloud/libsacloud/sacloud"
+	"regexp"
 	"testing"
 )
 
@@ -225,6 +226,92 @@ func TestAccSakuraCloudVPCRouterSetting_Update(t *testing.T) {
 						"sakuracloud_vpc_router_site_to_site_vpn.s2s", "routes.0", "10.0.0.0/8"),
 					resource.TestCheckResourceAttr(
 						"sakuracloud_vpc_router_site_to_site_vpn.s2s", "local_prefix.0", "192.168.21.0/24"),
+				),
+			},
+		},
+	})
+}
+
+func TestAccSakuraCloudVPCRouterSetting_SiteToSite(t *testing.T) {
+	var vpcRouter sacloud.VPCRouter
+	resource.Test(t, resource.TestCase{
+		PreCheck:     func() { testAccPreCheck(t) },
+		Providers:    testAccProviders,
+		CheckDestroy: testAccCheckSakuraCloudVPCRouterSettingDestroy,
+		Steps: []resource.TestStep{
+			{
+				Config: testAccCheckSakuraCloudVPCRouterSettingConfig_s2s,
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckSakuraCloudVPCRouterExists("sakuracloud_vpc_router.foobar", &vpcRouter),
+					resource.TestCheckResourceAttr(
+						"sakuracloud_vpc_router_site_to_site_vpn.s2s", "peer", "8.8.8.8"),
+					resource.TestCheckResourceAttr(
+						"sakuracloud_vpc_router_site_to_site_vpn.s2s", "remote_id", "8.8.8.8"),
+					resource.TestCheckResourceAttr(
+						"sakuracloud_vpc_router_site_to_site_vpn.s2s", "pre_shared_secret", "presharedsecret"),
+					resource.TestCheckResourceAttr(
+						"sakuracloud_vpc_router_site_to_site_vpn.s2s", "routes.0", "10.0.0.0/8"),
+					resource.TestCheckResourceAttr(
+						"sakuracloud_vpc_router_site_to_site_vpn.s2s", "local_prefix.0", "192.168.21.0/24"),
+					// for esp
+					resource.TestMatchResourceAttr("sakuracloud_vpc_router_site_to_site_vpn.s2s",
+						"esp_authentication_protocol",
+						regexp.MustCompile(".+")), // should be not empty
+					resource.TestMatchResourceAttr("sakuracloud_vpc_router_site_to_site_vpn.s2s",
+						"esp_dh_group",
+						regexp.MustCompile(".+")), // should be not empty
+					resource.TestMatchResourceAttr("sakuracloud_vpc_router_site_to_site_vpn.s2s",
+						"esp_encryption_protocol",
+						regexp.MustCompile(".+")), // should be not empty
+					resource.TestMatchResourceAttr("sakuracloud_vpc_router_site_to_site_vpn.s2s",
+						"esp_lifetime",
+						regexp.MustCompile(".+")), // should be not empty
+					resource.TestMatchResourceAttr("sakuracloud_vpc_router_site_to_site_vpn.s2s",
+						"esp_mode",
+						regexp.MustCompile(".+")), // should be not empty
+					resource.TestMatchResourceAttr("sakuracloud_vpc_router_site_to_site_vpn.s2s",
+						"esp_perfect_forward_secrecy",
+						regexp.MustCompile(".+")), // should be not empty
+
+					// for ike
+					resource.TestMatchResourceAttr("sakuracloud_vpc_router_site_to_site_vpn.s2s",
+						"ike_authentication_protocol",
+						regexp.MustCompile(".+")), // should be not empty
+					resource.TestMatchResourceAttr("sakuracloud_vpc_router_site_to_site_vpn.s2s",
+						"ike_encryption_protocol",
+						regexp.MustCompile(".+")), // should be not empty
+					resource.TestMatchResourceAttr("sakuracloud_vpc_router_site_to_site_vpn.s2s",
+						"ike_lifetime",
+						regexp.MustCompile(".+")), // should be not empty
+					resource.TestMatchResourceAttr("sakuracloud_vpc_router_site_to_site_vpn.s2s",
+						"ike_mode",
+						regexp.MustCompile(".+")), // should be not empty
+					resource.TestMatchResourceAttr("sakuracloud_vpc_router_site_to_site_vpn.s2s",
+						"ike_perfect_forward_secrecy",
+						regexp.MustCompile(".+")), // should be not empty
+					resource.TestMatchResourceAttr("sakuracloud_vpc_router_site_to_site_vpn.s2s",
+						"ike_pre_shared_secret",
+						regexp.MustCompile(".+")), // should be not empty
+
+					// for peer
+					resource.TestCheckResourceAttr(
+						"sakuracloud_vpc_router_site_to_site_vpn.s2s",
+						"peer_id", "8.8.8.8"),
+					resource.TestCheckResourceAttr(
+						"sakuracloud_vpc_router_site_to_site_vpn.s2s",
+						"peer_inside_networks.0", "10.0.0.0/8"),
+					resource.TestCheckResourceAttr(
+						"sakuracloud_vpc_router_site_to_site_vpn.s2s",
+						"peer_outside_ipaddress", "8.8.8.8"),
+
+					// for VPCRouter
+					resource.TestCheckResourceAttr(
+						"sakuracloud_vpc_router_site_to_site_vpn.s2s",
+						"vpc_router_inside_networks.0", "192.168.21.0/24"),
+					resource.TestCheckResourceAttrPair(
+						"sakuracloud_vpc_router.foobar", "global_address",
+						"sakuracloud_vpc_router_site_to_site_vpn.s2s", "vpc_router_outside_ipaddress",
+					),
 				),
 			},
 		},
@@ -543,4 +630,18 @@ resource "sakuracloud_vpc_router_static_route" "route" {
     next_hop = "192.168.11.99"
 }
 
+`
+
+var testAccCheckSakuraCloudVPCRouterSettingConfig_s2s = `
+resource "sakuracloud_vpc_router" "foobar" {
+    name = "vpc_router_setting_test"
+}
+resource "sakuracloud_vpc_router_site_to_site_vpn" "s2s" {
+    vpc_router_id = "${sakuracloud_vpc_router.foobar.id}"
+    peer = "8.8.8.8"
+    remote_id = "8.8.8.8"
+    pre_shared_secret = "presharedsecret"
+    routes = ["10.0.0.0/8"]
+    local_prefix = ["192.168.21.0/24"]
+}
 `

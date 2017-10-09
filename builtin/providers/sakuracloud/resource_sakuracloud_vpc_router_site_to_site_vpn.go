@@ -58,6 +58,78 @@ func resourceSakuraCloudVPCRouterSiteToSiteIPsecVPN() *schema.Resource {
 				Description:  "target SakuraCloud zone",
 				ValidateFunc: validateStringInWord([]string{"is1a", "is1b", "tk1a", "tk1v"}),
 			},
+			// HACK : terraform not supported nested structure yet
+			// see: https://github.com/hashicorp/terraform/issues/6215
+			"esp_authentication_protocol": {
+				Type:     schema.TypeString,
+				Computed: true,
+			},
+			"esp_dh_group": {
+				Type:     schema.TypeString,
+				Computed: true,
+			},
+			"esp_encryption_protocol": {
+				Type:     schema.TypeString,
+				Computed: true,
+			},
+			"esp_lifetime": {
+				Type:     schema.TypeString,
+				Computed: true,
+			},
+			"esp_mode": {
+				Type:     schema.TypeString,
+				Computed: true,
+			},
+			"esp_perfect_forward_secrecy": {
+				Type:     schema.TypeString,
+				Computed: true,
+			},
+			"ike_authentication_protocol": {
+				Type:     schema.TypeString,
+				Computed: true,
+			},
+			"ike_encryption_protocol": {
+				Type:     schema.TypeString,
+				Computed: true,
+			},
+			"ike_lifetime": {
+				Type:     schema.TypeString,
+				Computed: true,
+			},
+			"ike_mode": {
+				Type:     schema.TypeString,
+				Computed: true,
+			},
+			"ike_perfect_forward_secrecy": {
+				Type:     schema.TypeString,
+				Computed: true,
+			},
+			"ike_pre_shared_secret": {
+				Type:     schema.TypeString,
+				Computed: true,
+			},
+			"peer_id": {
+				Type:     schema.TypeString,
+				Computed: true,
+			},
+			"peer_inside_networks": {
+				Type:     schema.TypeList,
+				Elem:     &schema.Schema{Type: schema.TypeString},
+				Computed: true,
+			},
+			"peer_outside_ipaddress": {
+				Type:     schema.TypeString,
+				Computed: true,
+			},
+			"vpc_router_inside_networks": {
+				Type:     schema.TypeList,
+				Elem:     &schema.Schema{Type: schema.TypeString},
+				Computed: true,
+			},
+			"vpc_router_outside_ipaddress": {
+				Type:     schema.TypeString,
+				Computed: true,
+			},
 		},
 	}
 }
@@ -116,6 +188,38 @@ func resourceSakuraCloudVPCRouterSiteToSiteIPsecVPNRead(d *schema.ResourceData, 
 		d.Set("pre_shared_secret", "")
 		d.Set("remote_id", "")
 		d.Set("routes", "")
+	}
+
+	// SiteToSiteConnectionDetail
+	connInfo, err := client.VPCRouter.SiteToSiteConnectionDetails(toSakuraCloudID(routerID))
+	if err != nil {
+		return fmt.Errorf("Reading VPCRouter SiteToSiteConnectionDetail is failed: %s", err)
+	}
+	if connInfo != nil && len(connInfo.Details.Config) > 0 {
+		conf := connInfo.Details.Config[0]
+		values := map[string]interface{}{
+			"esp_authentication_protocol":  conf.ESP.AuthenticationProtocol,
+			"esp_dh_group":                 conf.ESP.DHGroup,
+			"esp_encryption_protocol":      conf.ESP.EncryptionProtocol,
+			"esp_lifetime":                 conf.ESP.Lifetime,
+			"esp_mode":                     conf.ESP.Mode,
+			"esp_perfect_forward_secrecy":  conf.ESP.PerfectForwardSecrecy,
+			"ike_authentication_protocol":  conf.IKE.AuthenticationProtocol,
+			"ike_encryption_protocol":      conf.IKE.EncryptionProtocol,
+			"ike_lifetime":                 conf.IKE.Lifetime,
+			"ike_mode":                     conf.IKE.Mode,
+			"ike_perfect_forward_secrecy":  conf.IKE.PerfectForwardSecrecy,
+			"ike_pre_shared_secret":        conf.IKE.PreSharedSecret,
+			"peer_id":                      conf.Peer.ID,
+			"peer_inside_networks":         conf.Peer.InsideNetworks,
+			"peer_outside_ipaddress":       conf.Peer.OutsideIPAddress,
+			"vpc_router_inside_networks":   conf.VPCRouter.InsideNetworks,
+			"vpc_router_outside_ipaddress": conf.VPCRouter.OutsideIPAddress,
+		}
+
+		for k, v := range values {
+			d.Set(k, v)
+		}
 	}
 
 	d.Set("zone", client.Zone)
