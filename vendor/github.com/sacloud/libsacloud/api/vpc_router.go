@@ -44,6 +44,12 @@ type vpcRouterStatusResponse struct {
 	Success                  interface{} `json:",omitempty"` //HACK: さくらのAPI側仕様: 戻り値:Successがbool値へ変換できないためinterface{}
 }
 
+type vpcRouterS2sConnInfoResponse struct {
+	*sacloud.ResultFlagValue
+	*sacloud.SiteToSiteConnectionInfo
+	Name string
+}
+
 // VPCRouterAPI VPCルーターAPI
 type VPCRouterAPI struct {
 	*baseAPI
@@ -494,4 +500,18 @@ func (api *VPCRouterAPI) Status(id int64) (*sacloud.VPCRouterStatus, error) {
 		return nil, err
 	}
 	return res.VPCRouterStatus, nil
+}
+
+// SiteToSiteConnectionDetails サイト間VPN接続情報を取得
+func (api *VPCRouterAPI) SiteToSiteConnectionDetails(id int64) (*sacloud.SiteToSiteConnectionInfo, error) {
+	var (
+		method = "GET"
+		uri    = fmt.Sprintf("%s/%d/vpcrouter/sitetosite/connectiondetails", api.getResourceURL(), id)
+		res    = &vpcRouterS2sConnInfoResponse{}
+	)
+	err := api.baseAPI.request(method, uri, nil, res)
+	if err != nil {
+		return nil, err
+	}
+	return res.SiteToSiteConnectionInfo, nil
 }
