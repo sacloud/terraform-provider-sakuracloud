@@ -24,6 +24,7 @@
     - [ルータ](configuration/resources/internet/)
     - [サブネット](configuration/resources/subnet/)
     - [パケットフィルタ](configuration/resources/packet_filter/)
+    - [パケットフィルタ(ルール)](configuration/resources/packet_filter_rule/)
     - [ブリッジ](configuration/resources/bridge/)
     - [ロードバランサ](configuration/resources/load_balancer/)
     - [VPCルータ](configuration/resources/vpc_router/)

@@ -22,6 +22,7 @@ pages:
       - ルータ: configuration/resources/internet.md
       - サブネット: configuration/resources/subnet.md
       - パケットフィルタ: configuration/resources/packet_filter.md
+      - パケットフィルタ(ルール): configuration/resources/packet_filter_rule.md
       - ブリッジ: configuration/resources/bridge.md
       - ロードバランサ: configuration/resources/load_balancer.md
       - VPCルータ: configuration/resources/vpc_router.md

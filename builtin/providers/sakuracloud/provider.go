@@ -83,6 +83,7 @@ func Provider() terraform.ResourceProvider {
 			"sakuracloud_note":                           resourceSakuraCloudNote(),
 			"sakuracloud_nfs":                            resourceSakuraCloudNFS(),
 			"sakuracloud_packet_filter":                  resourceSakuraCloudPacketFilter(),
+			"sakuracloud_packet_filter_rule":             resourceSakuraCloudPacketFilterRule(),
 			"sakuracloud_simple_monitor":                 resourceSakuraCloudSimpleMonitor(),
 			"sakuracloud_server":                         resourceSakuraCloudServer(),
 			"sakuracloud_server_connector":               resourceSakuraCloudServerConnector(),
