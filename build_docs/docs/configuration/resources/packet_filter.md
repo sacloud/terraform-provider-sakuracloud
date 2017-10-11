@@ -37,6 +37,9 @@ resource sakuracloud_packet_filter "myfilter" {
 | `tags`            | -   | タグ | - | リスト(文字列) | - |
 | `zone`            | -   | ゾーン | - | `is1b`<br />`tk1a`<br />`tk1v` | - |
 
+**注意**  
+
+同一のパケットフィルタに対し`expressions`属性と`sakuracloud_packet_filter_rule`リソースの併用はできません。
 
 #### `expressions`
 
