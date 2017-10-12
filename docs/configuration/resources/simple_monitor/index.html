@@ -349,7 +349,8 @@
                 <h1 id="sakuracloud_simple_monitor">シンプル監視(sakuracloud_simple_monitor)</h1>
 <hr />
 <h3 id="_1">設定例</h3>
-<pre><code class="hcl">resource sakuracloud_simple_monitor &quot;mymonitor&quot; {
+<pre><code class="hcl"># HTTP監視の例
+resource sakuracloud_simple_monitor &quot;mymonitor&quot; {
   target = &quot;${sakuracloud_server.myserver.ipaddress}&quot;
 
   health_check = {
@@ -357,6 +358,25 @@
     delay_loop = 60
     path       = &quot;/&quot;
     status     = &quot;200&quot;
+  }
+
+  notify_email_enabled = true
+  #notify_email_html    = false
+  #notify_slack_enabled = false
+  #notify_slack_webhook = &quot;https://hooks.slack.com/services/XXXXXXXXX/XXXXXXXXX/XXXXXXXXXXXXXXXXXXXXXXXX&quot;
+  #enabled              = true
+
+  description = &quot;Description&quot;
+  tags        = [&quot;tag1&quot;, &quot;tag2&quot;]
+}
+
+# SSLサーバ証明書 有効期限監視の例
+resource sakuracloud_simple_monitor &quot;my_sslcert_monitor&quot; {
+  target = &quot;example.com&quot;
+
+  health_check = {
+    protocol       = &quot;sslcertificate&quot;
+    remaining_days = 30
   }
 
   notify_email_enabled = true
@@ -483,7 +503,7 @@
 <td align="center">◯</td>
 <td>プロトコル</td>
 <td align="center">-</td>
-<td><code>http</code><br /><code>https</code><br /><code>ping</code><br /><code>tcp</code><br /><code>dns</code><br /><code>ssh</code><br /><code>smtp</code><br /><code>pop3</code><br /><code>snmp</code></td>
+<td><code>http</code><br /><code>https</code><br /><code>ping</code><br /><code>tcp</code><br /><code>dns</code><br /><code>ssh</code><br /><code>smtp</code><br /><code>pop3</code><br /><code>snmp</code><br /><code>sslcertificate</code></td>
 <td>-</td>
 </tr>
 <tr>
@@ -565,6 +585,14 @@
 <td align="center">-</td>
 <td>文字列</td>
 <td>プロトコルが<code>snmp</code>の場合のみ有効かつ必須</td>
+</tr>
+<tr>
+<td><code>remaining_days</code></td>
+<td align="center">△</td>
+<td>有効残日数</td>
+<td align="center">-</td>
+<td>数値</td>
+<td><code>1</code>〜<code>9999</code><br />プロトコルが<code>sslcertificate</code>の場合のみ有効かつ必須</td>
 </tr>
 </tbody>
 </table>
