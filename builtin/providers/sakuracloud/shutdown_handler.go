@@ -12,7 +12,7 @@ type shutdownHandler interface {
 }
 
 var (
-	powerManageTimeoutKey   = "power_manage_timeout"
+	powerManageTimeoutKey   = "graceful_shutdown_timeout"
 	powerManageTimeoutParam = &schema.Schema{
 		Type:     schema.TypeInt,
 		Optional: true,
