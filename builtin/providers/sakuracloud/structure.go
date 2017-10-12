@@ -143,6 +143,11 @@ func forceString(target interface{}) string {
 	return target.(string)
 }
 
+func forceAtoI(target string) int {
+	v, _ := strconv.Atoi(target)
+	return v
+}
+
 func expandFilters(filter interface{}) map[string]interface{} {
 
 	ret := map[string]interface{}{}

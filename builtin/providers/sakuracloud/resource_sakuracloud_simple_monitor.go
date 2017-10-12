@@ -9,6 +9,7 @@ import (
 	"github.com/sacloud/libsacloud/api"
 	"github.com/sacloud/libsacloud/sacloud"
 	"strconv"
+	"strings"
 )
 
 func resourceSakuraCloudSimpleMonitor() *schema.Resource {
@@ -84,8 +85,8 @@ func resourceSakuraCloudSimpleMonitor() *schema.Resource {
 						"remaining_days": {
 							Type:         schema.TypeInt,
 							Optional:     true,
-							Default:      30,
 							ValidateFunc: validateIntegerInRange(1, 9999),
+							Default:      30,
 						},
 					},
 				},
@@ -197,10 +198,18 @@ func resourceSakuraCloudSimpleMonitorCreate(d *schema.ResourceData, meta interfa
 		case "ping":
 			opts.SetHealthCheckPing()
 		case "sslcertificate":
-			opts.SetHealthCheckSSLCertificate(conf["remaining_days"].(int))
+			days := 0
+			if v, ok := conf["remaining_days"]; ok {
+				days = v.(int)
+			}
+			opts.SetHealthCheckSSLCertificate(days)
 		}
 
-		opts.Settings.SimpleMonitor.DelayLoop = conf["delay_loop"].(int)
+		delayLoop := 0
+		if v, ok := conf["delay_loop"]; ok {
+			delayLoop = v.(int)
+		}
+		opts.Settings.SimpleMonitor.DelayLoop = delayLoop
 	}
 	if iconID, ok := d.GetOk("icon_id"); ok {
 		opts.SetIconByID(toSakuraCloudID(iconID.(string)))
@@ -319,11 +328,18 @@ func resourceSakuraCloudSimpleMonitorUpdate(d *schema.ResourceData, meta interfa
 			case "ping":
 				simpleMonitor.SetHealthCheckPing()
 			case "sslcertificate":
-				days := conf["remaining_days"].(int)
+				days := 0
+				if v, ok := conf["remaining_days"]; ok {
+					days = v.(int)
+				}
 				simpleMonitor.SetHealthCheckSSLCertificate(days)
 			}
 
-			simpleMonitor.Settings.SimpleMonitor.DelayLoop = conf["delay_loop"].(int)
+			delayLoop := 0
+			if v, ok := conf["delay_loop"]; ok {
+				delayLoop = v.(int)
+			}
+			simpleMonitor.Settings.SimpleMonitor.DelayLoop = delayLoop
 		}
 	}
 
@@ -404,16 +420,20 @@ func healthCheckSimpleMonitorHash(v interface{}) int {
 	community := ""
 	snmpVersion := ""
 	oid := ""
+	remainingDays := ""
+	delayLoop := ""
 
 	switch protocol {
 	case "http", "https":
 		path = target["path"].(string)
 		status = target["status"].(string)
-		if target["port"] != nil {
-			port = target["port"].(string)
+		if v, ok := target["port"]; ok {
+			port = v.(string)
 		}
 	case "tcp", "ssh", "smtp", "pop3":
-		port = target["port"].(string)
+		if v, ok := target["port"]; ok {
+			port = v.(string)
+		}
 	case "dns":
 		qname = target["qname"].(string)
 		ed = target["expected_data"].(string)
@@ -422,11 +442,30 @@ func healthCheckSimpleMonitorHash(v interface{}) int {
 		snmpVersion = target["snmp_version"].(string)
 		oid = target["oid"].(string)
 		ed = target["expected_data"].(string)
+	case "sslcertificate":
+		// noop
 	}
 
-	delay_loop := target["delay_loop"].(int)
+	if v, ok := target["remaining_days"]; ok {
+		remainingDays = fmt.Sprintf("%d", v.(int))
+	}
+	if v, ok := target["delay_loop"]; ok {
+		delayLoop = fmt.Sprintf("%d", v.(int))
+	}
 
-	hk := fmt.Sprintf("%s:%d:%s:%s:%s:%s:%s:%s:%s:%s", protocol, delay_loop, path, status, port, qname, ed, community, snmpVersion, oid)
+	hk := strings.Join([]string{
+		protocol,
+		delayLoop,
+		path,
+		status,
+		port,
+		qname,
+		ed,
+		community,
+		snmpVersion,
+		oid,
+		remainingDays,
+	}, ":")
 	return hashcode.String(hk)
 }
 
@@ -451,10 +490,10 @@ func setSimpleMonitorResourceData(d *schema.ResourceData, _ *api.Client, data *s
 	readHealthCheck := data.Settings.SimpleMonitor.HealthCheck
 	switch data.Settings.SimpleMonitor.HealthCheck.Protocol {
 	case "http":
-
 		healthCheck["path"] = readHealthCheck.Path
 		healthCheck["status"] = readHealthCheck.Status
 		healthCheck["host_header"] = readHealthCheck.Host
+		healthCheck["port"] = port
 		if port != "" || readHealthCheck.Port != "80" {
 			healthCheck["port"] = readHealthCheck.Port
 		}
@@ -462,25 +501,22 @@ func setSimpleMonitorResourceData(d *schema.ResourceData, _ *api.Client, data *s
 		healthCheck["path"] = readHealthCheck.Path
 		healthCheck["status"] = readHealthCheck.Status
 		healthCheck["host_header"] = readHealthCheck.Host
-		healthCheck["port"] = readHealthCheck.Port
+		healthCheck["port"] = port
 		if port != "" || readHealthCheck.Port != "443" {
 			healthCheck["port"] = readHealthCheck.Port
 		}
-
 	case "tcp":
+		healthCheck["port"] = port
 		healthCheck["port"] = readHealthCheck.Port
 	case "ssh":
-		healthCheck["port"] = readHealthCheck.Port
 		if port != "" || readHealthCheck.Port != "22" {
 			healthCheck["port"] = readHealthCheck.Port
 		}
 	case "smtp":
-		healthCheck["port"] = readHealthCheck.Port
 		if port != "" || readHealthCheck.Port != "25" {
 			healthCheck["port"] = readHealthCheck.Port
 		}
 	case "pop3":
-		healthCheck["port"] = readHealthCheck.Port
 		if port != "" || readHealthCheck.Port != "110" {
 			healthCheck["port"] = readHealthCheck.Port
 		}
@@ -494,11 +530,17 @@ func setSimpleMonitorResourceData(d *schema.ResourceData, _ *api.Client, data *s
 		healthCheck["qname"] = readHealthCheck.QName
 		healthCheck["expected_data"] = readHealthCheck.ExpectedData
 	case "sslcertificate":
-		healthCheck["remaining_days"] = readHealthCheck.RemainingDays
+		// noop
 	}
 
+	days := readHealthCheck.RemainingDays
+	if days == 0 {
+		days = 30
+	}
+	healthCheck["remaining_days"] = days
 	healthCheck["protocol"] = data.Settings.SimpleMonitor.HealthCheck.Protocol
 	healthCheck["delay_loop"] = data.Settings.SimpleMonitor.DelayLoop
+
 	d.Set("health_check", schema.NewSet(healthCheckSimpleMonitorHash, []interface{}{healthCheck}))
 
 	d.Set("icon_id", data.GetIconStrID())
