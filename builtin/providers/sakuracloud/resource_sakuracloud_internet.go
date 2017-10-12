@@ -5,7 +5,6 @@ import (
 	"github.com/hashicorp/terraform/helper/schema"
 	"github.com/sacloud/libsacloud/api"
 	"github.com/sacloud/libsacloud/sacloud"
-	"time"
 )
 
 func resourceSakuraCloudInternet() *schema.Resource {
@@ -55,6 +54,7 @@ func resourceSakuraCloudInternet() *schema.Resource {
 				Optional: true,
 				Computed: true,
 			},
+			powerManageTimeoutKey: powerManageTimeoutParam,
 			"zone": {
 				Type:         schema.TypeString,
 				Optional:     true,
@@ -256,13 +256,7 @@ func resourceSakuraCloudInternetDelete(d *schema.ResourceData, meta interface{})
 	for _, s := range servers {
 		if s.Instance.IsUp() {
 			isRunning = append(isRunning, s.ID)
-			//stop server
-			time.Sleep(2 * time.Second)
-			_, err = client.Server.Stop(s.ID)
-			if err != nil {
-				return fmt.Errorf("Error stopping SakuraCloud Server resource: %s", err)
-			}
-			err = client.Server.SleepUntilDown(s.ID, client.DefaultTimeoutDuration)
+			err := stopServer(client, s.ID, d)
 			if err != nil {
 				return fmt.Errorf("Error stopping SakuraCloud Server resource: %s", err)
 			}

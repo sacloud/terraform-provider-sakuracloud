@@ -78,6 +78,7 @@ func resourceSakuraCloudDisk() *schema.Resource {
 				Optional: true,
 				Elem:     &schema.Schema{Type: schema.TypeString},
 			},
+			powerManageTimeoutKey: powerManageTimeoutParam,
 			"zone": {
 				Type:         schema.TypeString,
 				Optional:     true,
@@ -248,7 +249,7 @@ func resourceSakuraCloudDiskUpdate(d *schema.ResourceData, meta interface{}) err
 	}
 
 	if isRunning && isDiskConfigChanged {
-		err := stopServer(client, disk.Server.ID)
+		err := stopServer(client, disk.Server.ID, d)
 		if err != nil {
 			return fmt.Errorf("Error stopping SakuraCloud Server resource: %s", err)
 		}
@@ -370,7 +371,7 @@ func resourceSakuraCloudDiskDelete(d *schema.ResourceData, meta interface{}) err
 		if err == nil {
 			if server.IsUp() {
 				isRunning = true
-				err := stopServer(client, server.ID)
+				err := stopServer(client, server.ID, d)
 				if err != nil {
 					return fmt.Errorf("Error stopping SakuraCloud Server resource: %s", err)
 				}

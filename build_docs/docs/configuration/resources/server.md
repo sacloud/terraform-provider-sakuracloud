@@ -58,6 +58,7 @@ resource sakuracloud_server "myserver" {
 | `gateway`  | - | 基本NIC:ゲートウェイ | - | 文字列 | [注1](#注1) |
 | `nw_mask_len` | - | 基本NIC:サブネットマスク長 | - | 文字列 | [注1](#注1) |
 | `tags` | - | タグ | - | リスト(文字列) | サーバに付与するタグ。@で始まる特殊タグについては[こちら](http://cloud-news.sakura.ad.jp/special-tags/)を参照 |
+| `graceful_shutdown_timeout` | - | シャットダウンまでの待ち時間 | - | 数値(秒数) | シャットダウンが必要な場合の通常シャットダウンするまでの待ち時間(指定の時間まで待ってもシャットダウンしない場合は強制シャットダウンされる) |
 | `zone` | - | ゾーン | - | `is1b`<br />`tk1a`<br />`tk1v` | - |
 
 #### 注1

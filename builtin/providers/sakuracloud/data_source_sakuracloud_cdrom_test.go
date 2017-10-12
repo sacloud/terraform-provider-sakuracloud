@@ -21,7 +21,7 @@ func TestAccSakuraCloudCDROMDataSource_Basic(t *testing.T) {
 				Config: testAccCheckSakuraCloudDataSourceCDROMConfig,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckSakuraCloudCDROMDataSourceID("data.sakuracloud_cdrom.foobar"),
-					resource.TestCheckResourceAttr("data.sakuracloud_cdrom.foobar", "name", "Ubuntu server 16.04.2 LTS 64bit"),
+					resource.TestCheckResourceAttr("data.sakuracloud_cdrom.foobar", "name", "Ubuntu server 16.04.3 LTS 64bit"),
 					resource.TestCheckResourceAttr("data.sakuracloud_cdrom.foobar", "size", "5"),
 					resource.TestCheckResourceAttr("data.sakuracloud_cdrom.foobar", "tags.#", "5"),
 					resource.TestCheckResourceAttr("data.sakuracloud_cdrom.foobar", "tags.0", "arch-64bit"),

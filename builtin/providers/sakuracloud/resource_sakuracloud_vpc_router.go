@@ -6,6 +6,8 @@ import (
 	"time"
 )
 
+const vpcRouterPowerAPILockKey = "sakuracloud_server.power.%d.lock"
+
 func resourceSakuraCloudVPCRouter() *schema.Resource {
 	return &schema.Resource{
 		Create: resourceSakuraCloudVPCRouterCreate,
@@ -84,6 +86,7 @@ func resourceSakuraCloudVPCRouter() *schema.Resource {
 				Type:     schema.TypeString,
 				Optional: true,
 			},
+			powerManageTimeoutKey: powerManageTimeoutParam,
 			"zone": {
 				Type:         schema.TypeString,
 				Optional:     true,
@@ -313,16 +316,22 @@ func resourceSakuraCloudVPCRouterDelete(d *schema.ResourceData, meta interface{}
 	}
 
 	if vpcRouter.Instance.IsUp() {
+		// power API lock
+		lockKey := getVPCRouterPowerAPILockKey(vpcRouter.ID)
+		sakuraMutexKV.Lock(lockKey)
+		defer sakuraMutexKV.Unlock(lockKey)
+
+		err = nil
 		for i := 0; i < 10; i++ {
-			err = nil
+			vpcRouter, err = client.VPCRouter.Read(vpcRouter.ID)
+			if err != nil {
+				return fmt.Errorf("Couldn't find SakuraCloud VPCRouter resource: %s", err)
+			}
 			if vpcRouter.Instance.IsDown() {
+				err = nil
 				break
 			}
-			_, err := client.VPCRouter.Stop(vpcRouter.ID)
-			if err != nil {
-				return fmt.Errorf("Error stopping SakuraCloud VPCRouter resource: %s", err)
-			}
-			err = client.VPCRouter.SleepUntilDown(vpcRouter.ID, 30*time.Second)
+			err = handleShutdown(client.VPCRouter, vpcRouter.ID, d, 60*time.Second)
 		}
 		if err != nil {
 			return fmt.Errorf("Error stopping SakuraCloud VPCRouter resource: %s", err)
@@ -334,4 +343,8 @@ func resourceSakuraCloudVPCRouterDelete(d *schema.ResourceData, meta interface{}
 		return fmt.Errorf("Error deleting SakuraCloud VPCRouter resource: %s", err)
 	}
 	return nil
+}
+
+func getVPCRouterPowerAPILockKey(id int64) string {
+	return fmt.Sprintf(vpcRouterPowerAPILockKey, id)
 }
