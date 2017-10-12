@@ -3,6 +3,7 @@ package api
 import (
 	"encoding/json"
 	//	"strings"
+	"fmt"
 	"github.com/sacloud/libsacloud/sacloud"
 )
 
@@ -115,4 +116,18 @@ func (api *SimpleMonitorAPI) Delete(id int64) (*sacloud.SimpleMonitor, error) {
 	return api.request(func(res *simpleMonitorResponse) error {
 		return api.delete(id, nil, res)
 	})
+}
+
+// MonitorResponseTimeSec アクティビティーモニター(レスポンスタイム)取得
+func (api *SimpleMonitorAPI) MonitorResponseTimeSec(id int64, body *sacloud.ResourceMonitorRequest) (*sacloud.MonitorValues, error) {
+	var (
+		method = "GET"
+		uri    = fmt.Sprintf("%s/%d/activity/responsetimesec/monitor", api.getResourceURL(), id)
+	)
+	res := &sacloud.ResourceMonitorResponse{}
+	err := api.baseAPI.request(method, uri, body, res)
+	if err != nil {
+		return nil, err
+	}
+	return res.Data, nil
 }

@@ -47,17 +47,17 @@ type SimpleMonitorProvider struct {
 
 // SimpleMonitorHealthCheck ヘルスチェック
 type SimpleMonitorHealthCheck struct {
-	Protocol     string `json:",omitempty"` // プロトコル
-	Port         string `json:",omitempty"` // ポート
-	Path         string `json:",omitempty"` // HTTP/HTTPS監視の場合のリクエストパス
-	Status       string `json:",omitempty"` // HTTP/HTTPS監視の場合の期待ステータスコード
-	Host         string `json:",omitempty"` // 対象ホスト(IP or FQDN)
-	QName        string `json:",omitempty"` // DNS監視の場合の問い合わせFQDN
-	ExpectedData string `json:",omitempty"` // 期待値
-	Community    string `json:",omitempty"` // SNMP監視の場合のコミュニティ名
-	SNMPVersion  string `json:",omitempty"` // SNMP監視 SNMPバージョン
-	OID          string `json:",omitempty"` // SNMP監視 OID
-
+	Protocol      string `json:",omitempty"` // プロトコル
+	Port          string `json:",omitempty"` // ポート
+	Path          string `json:",omitempty"` // HTTP/HTTPS監視の場合のリクエストパス
+	Status        string `json:",omitempty"` // HTTP/HTTPS監視の場合の期待ステータスコード
+	Host          string `json:",omitempty"` // 対象ホスト(IP or FQDN)
+	QName         string `json:",omitempty"` // DNS監視の場合の問い合わせFQDN
+	ExpectedData  string `json:",omitempty"` // 期待値
+	Community     string `json:",omitempty"` // SNMP監視の場合のコミュニティ名
+	SNMPVersion   string `json:",omitempty"` // SNMP監視 SNMPバージョン
+	OID           string `json:",omitempty"` // SNMP監視 OID
+	RemainingDays int    `json:",omitempty"` // SSL証明書 有効残日数
 }
 
 // SimpleMonitorNotify シンプル監視通知
@@ -95,7 +95,7 @@ func CreateNewSimpleMonitor(target string) *SimpleMonitor {
 
 // AllowSimpleMonitorHealthCheckProtocol シンプル監視対応プロトコルリスト
 func AllowSimpleMonitorHealthCheckProtocol() []string {
-	return []string{"http", "https", "ping", "tcp", "dns", "ssh", "smtp", "pop3", "snmp"}
+	return []string{"http", "https", "ping", "tcp", "dns", "ssh", "smtp", "pop3", "snmp", "sslcertificate"}
 }
 
 func createSimpleMonitorNotifyEmail(withHTML bool) *SimpleMonitorNotify {
@@ -203,6 +203,18 @@ func (s *SimpleMonitor) SetHealthCheckSNMP(community string, version string, oid
 		SNMPVersion:  version,
 		OID:          oid,
 		ExpectedData: expectedData,
+	}
+}
+
+// SetHealthCheckSSLCertificate SSLサーバ証明書有効期限ヘルスチェック設定
+func (s *SimpleMonitor) SetHealthCheckSSLCertificate(remainingDays int) {
+	// set default
+	if remainingDays < 0 {
+		remainingDays = 30
+	}
+	s.Settings.SimpleMonitor.HealthCheck = &SimpleMonitorHealthCheck{
+		Protocol:      "sslcertificate",
+		RemainingDays: remainingDays,
 	}
 }
 

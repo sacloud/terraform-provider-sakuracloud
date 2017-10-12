@@ -5,6 +5,7 @@
 ### 設定例
 
 ```hcl
+# HTTP監視の例
 resource sakuracloud_simple_monitor "mymonitor" {
   target = "${sakuracloud_server.myserver.ipaddress}"
 
@@ -13,6 +14,25 @@ resource sakuracloud_simple_monitor "mymonitor" {
     delay_loop = 60
     path       = "/"
     status     = "200"
+  }
+
+  notify_email_enabled = true
+  #notify_email_html    = false
+  #notify_slack_enabled = false
+  #notify_slack_webhook = "https://hooks.slack.com/services/XXXXXXXXX/XXXXXXXXX/XXXXXXXXXXXXXXXXXXXXXXXX"
+  #enabled              = true
+
+  description = "Description"
+  tags        = ["tag1", "tag2"]
+}
+
+# SSLサーバ証明書 有効期限監視の例
+resource sakuracloud_simple_monitor "my_sslcert_monitor" {
+  target = "example.com"
+
+  health_check = {
+    protocol       = "sslcertificate"
+    remaining_days = 30
   }
 
   notify_email_enabled = true
@@ -45,7 +65,7 @@ resource sakuracloud_simple_monitor "mymonitor" {
 
 |パラメーター      |必須  |名称                |初期値     |設定値                    |補足                                          |
 |----------------|:---:|--------------------|:--------:|------------------------|----------------------------------------------|
-| `protocol`     | ◯   | プロトコル        | -        | `http`<br />`https`<br />`ping`<br />`tcp`<br />`dns`<br />`ssh`<br />`smtp`<br />`pop3`<br />`snmp`| - |
+| `protocol`     | ◯   | プロトコル        | -        | `http`<br />`https`<br />`ping`<br />`tcp`<br />`dns`<br />`ssh`<br />`smtp`<br />`pop3`<br />`snmp`<br />`sslcertificate`| - |
 | `delay_loop`   | -   | チェック間隔(秒)        | `60`        | 数値                  | `60`〜`3600` |
 | `path`         | △   | パス  | - | 文字列 | プロトコルが`http`または`https`の場合のみ有効かつ必須 |
 | `host_header`  | △   | HOSTヘッダ  | - | 文字列 | プロトコルが`http`または`https`の場合のみ有効 |
@@ -56,6 +76,8 @@ resource sakuracloud_simple_monitor "mymonitor" {
 | `community`    | △   | コミュニティ名 | - | 文字列 | プロトコルが`snmp`の場合のみ有効かつ必須 |
 | `snmp_version` | △   | SNMPバージョン | - | `1`<br />`2c` | プロトコルが`snmp`の場合のみ有効かつ必須 |
 | `oid`          | △   | OID | - | 文字列 | プロトコルが`snmp`の場合のみ有効かつ必須 |
+| `remaining_days`| △  | 有効残日数 | - | 数値 | `1`〜`9999`<br />プロトコルが`sslcertificate`の場合のみ有効かつ必須 |
+
 
 
 ### 属性

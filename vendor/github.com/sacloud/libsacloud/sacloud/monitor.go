@@ -21,6 +21,7 @@ type MonitorValue struct {
 	TotalDisk2Size  *float64 `json:"Total-Disk2-Size,omitempty"`  // 総ディスクサイズ
 	UsedDisk2Size   *float64 `json:"Used-Disk2-Size,omitempty"`   // 使用済みディスクサイズ
 	FreeDiskSize    *float64 `json:"Free-Disk-Size,omitempty"`    // 空きディスクサイズ(NFS)
+	ResponseTimeSec *float64 `json:"responsetimesec,omitempty"`   // レスポンスタイム(シンプル監視)
 }
 
 // ResourceMonitorRequest アクティビティモニター取得リクエスト
@@ -191,6 +192,11 @@ func (m *MonitorValues) FlattenFreeDiskSizeValue() ([]FlatMonitorValue, error) {
 	return m.flattenValue(func(v *MonitorValue) *float64 { return v.FreeDiskSize })
 }
 
+// FlattenResponseTimeSecValue フラット化 レスポンスタイム(シンプル監視)
+func (m *MonitorValues) FlattenResponseTimeSecValue() ([]FlatMonitorValue, error) {
+	return m.flattenValue(func(v *MonitorValue) *float64 { return v.ResponseTimeSec })
+}
+
 func (m *MonitorValues) flattenValue(f func(*MonitorValue) *float64) ([]FlatMonitorValue, error) {
 	var res []FlatMonitorValue
 
@@ -222,6 +228,7 @@ func (m *MonitorValue) HasValue() bool {
 		m.TotalMemorySize, m.UsedMemorySize,
 		m.TotalDisk1Size, m.UsedDisk1Size,
 		m.TotalDisk2Size, m.UsedDisk2Size,
+		m.FreeDiskSize, m.ResponseTimeSec,
 	}
 	for _, v := range values {
 		if v != nil {
