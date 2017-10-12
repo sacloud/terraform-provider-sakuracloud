@@ -72,6 +72,7 @@ func resourceSakuraCloudNFS() *schema.Resource {
 				Optional: true,
 				Elem:     &schema.Schema{Type: schema.TypeString},
 			},
+			powerManageTimeoutKey: powerManageTimeoutParam,
 			"zone": {
 				Type:         schema.TypeString,
 				Optional:     true,
@@ -201,12 +202,7 @@ func resourceSakuraCloudNFSUpdate(d *schema.ResourceData, meta interface{}) erro
 func resourceSakuraCloudNFSDelete(d *schema.ResourceData, meta interface{}) error {
 	client := getSacloudAPIClient(d, meta)
 
-	_, err := client.NFS.Stop(toSakuraCloudID(d.Id()))
-	if err != nil {
-		return fmt.Errorf("Error stopping SakuraCloud NFS resource: %s", err)
-	}
-
-	err = client.NFS.SleepUntilDown(toSakuraCloudID(d.Id()), client.DefaultTimeoutDuration)
+	err := handleShutdown(client.NFS, toSakuraCloudID(d.Id()), d, client.DefaultTimeoutDuration)
 	if err != nil {
 		return fmt.Errorf("Error stopping SakuraCloud NFS resource: %s", err)
 	}

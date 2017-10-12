@@ -105,6 +105,7 @@ func resourceSakuraCloudDatabase() *schema.Resource {
 				Optional: true,
 				Elem:     &schema.Schema{Type: schema.TypeString},
 			},
+			powerManageTimeoutKey: powerManageTimeoutParam,
 			"zone": {
 				Type:         schema.TypeString,
 				Optional:     true,
@@ -299,12 +300,7 @@ func resourceSakuraCloudDatabaseUpdate(d *schema.ResourceData, meta interface{})
 func resourceSakuraCloudDatabaseDelete(d *schema.ResourceData, meta interface{}) error {
 	client := getSacloudAPIClient(d, meta)
 
-	_, err := client.Database.Stop(toSakuraCloudID(d.Id()))
-	if err != nil {
-		return fmt.Errorf("Error stopping SakuraCloud Database resource: %s", err)
-	}
-
-	err = client.Database.SleepUntilDown(toSakuraCloudID(d.Id()), client.DefaultTimeoutDuration)
+	err := handleShutdown(client.Database, toSakuraCloudID(d.Id()), d, client.DefaultTimeoutDuration)
 	if err != nil {
 		return fmt.Errorf("Error stopping SakuraCloud Database resource: %s", err)
 	}

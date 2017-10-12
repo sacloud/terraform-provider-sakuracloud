@@ -94,6 +94,7 @@ func resourceSakuraCloudServer() *schema.Resource {
 				Optional: true,
 				Elem:     &schema.Schema{Type: schema.TypeString},
 			},
+			powerManageTimeoutKey: powerManageTimeoutParam,
 			"zone": {
 				Type:         schema.TypeString,
 				Optional:     true,
@@ -330,8 +331,8 @@ func resourceSakuraCloudServerUpdate(d *schema.ResourceData, meta interface{}) e
 	}
 
 	if isNeedRestart && isRunning {
-		// shudown server
-		err := stopServer(client, toSakuraCloudID(d.Id()))
+		// shutdown server
+		err := stopServer(client, toSakuraCloudID(d.Id()), d)
 		if err != nil {
 			return fmt.Errorf("Error stopping SakuraCloud Server resource: %s", err)
 		}
@@ -634,7 +635,7 @@ func resourceSakuraCloudServerDelete(d *schema.ResourceData, meta interface{}) e
 	}
 
 	if server.Instance.IsUp() {
-		err := stopServer(client, toSakuraCloudID(d.Id()))
+		err := stopServer(client, toSakuraCloudID(d.Id()), d)
 		if err != nil {
 			return fmt.Errorf("Error stopping SakuraCloud Server resource: %s", err)
 		}
@@ -743,14 +744,14 @@ func bootServer(client *api.Client, id int64) error {
 	return err
 }
 
-func stopServer(client *api.Client, id int64) error {
+func stopServer(client *api.Client, id int64, d *schema.ResourceData) error {
 	// power API lock
 	lockKey := getServerPowerAPILockKey(id)
 	sakuraMutexKV.Lock(lockKey)
 	defer sakuraMutexKV.Unlock(lockKey)
 
 	sakuraMutexKV.Lock(serverAPILockKey)
-	_, err := client.Server.Stop(id)
+	err := handleShutdown(client.Server, id, d, client.DefaultTimeoutDuration)
 	sakuraMutexKV.Unlock(serverAPILockKey)
 
 	if err != nil {

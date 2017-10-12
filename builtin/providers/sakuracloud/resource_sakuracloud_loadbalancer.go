@@ -82,6 +82,7 @@ func resourceSakuraCloudLoadBalancer() *schema.Resource {
 				Optional: true,
 				Elem:     &schema.Schema{Type: schema.TypeString},
 			},
+			powerManageTimeoutKey: powerManageTimeoutParam,
 			"zone": {
 				Type:         schema.TypeString,
 				Optional:     true,
@@ -247,12 +248,7 @@ func resourceSakuraCloudLoadBalancerUpdate(d *schema.ResourceData, meta interfac
 func resourceSakuraCloudLoadBalancerDelete(d *schema.ResourceData, meta interface{}) error {
 	client := getSacloudAPIClient(d, meta)
 
-	_, err := client.LoadBalancer.Stop(toSakuraCloudID(d.Id()))
-	if err != nil {
-		return fmt.Errorf("Error stopping SakuraCloud LoadBalancer resource: %s", err)
-	}
-
-	err = client.LoadBalancer.SleepUntilDown(toSakuraCloudID(d.Id()), client.DefaultTimeoutDuration)
+	err := handleShutdown(client.LoadBalancer, toSakuraCloudID(d.Id()), d, client.DefaultTimeoutDuration)
 	if err != nil {
 		return fmt.Errorf("Error stopping SakuraCloud LoadBalancer resource: %s", err)
 	}

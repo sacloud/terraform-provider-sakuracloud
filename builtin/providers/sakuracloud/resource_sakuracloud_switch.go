@@ -5,7 +5,6 @@ import (
 	"github.com/hashicorp/terraform/helper/schema"
 	"github.com/sacloud/libsacloud/api"
 	"github.com/sacloud/libsacloud/sacloud"
-	"time"
 )
 
 func resourceSakuraCloudSwitch() *schema.Resource {
@@ -47,6 +46,7 @@ func resourceSakuraCloudSwitch() *schema.Resource {
 				Computed: true,
 				Elem:     &schema.Schema{Type: schema.TypeString},
 			},
+			powerManageTimeoutKey: powerManageTimeoutParam,
 			"zone": {
 				Type:         schema.TypeString,
 				Optional:     true,
@@ -208,12 +208,7 @@ func resourceSakuraCloudSwitchDelete(d *schema.ResourceData, meta interface{}) e
 		if s.Instance.IsUp() {
 			isRunning = append(isRunning, s.ID)
 			//stop server
-			time.Sleep(2 * time.Second)
-			_, err = client.Server.Stop(s.ID)
-			if err != nil {
-				return fmt.Errorf("Error stopping SakuraCloud Server resource: %s", err)
-			}
-			err = client.Server.SleepUntilDown(s.ID, client.DefaultTimeoutDuration)
+			err := stopServer(client, s.ID, d)
 			if err != nil {
 				return fmt.Errorf("Error stopping SakuraCloud Server resource: %s", err)
 			}

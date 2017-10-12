@@ -46,6 +46,7 @@ func resourceSakuraCloudServerConnector() *schema.Resource {
 				// ! Current terraform(v0.7) is not support to array validation !
 				// ValidateFunc: validateSakuracloudIDArrayType,
 			},
+			powerManageTimeoutKey: powerManageTimeoutParam,
 			"zone": {
 				Type:         schema.TypeString,
 				Optional:     true,
@@ -78,8 +79,8 @@ func resourceSakuraCloudServerConnectorCreate(d *schema.ResourceData, meta inter
 	}
 
 	if isNeedRestart && isRunning {
-		// shudown server
-		err := stopServer(client, toSakuraCloudID(d.Id()))
+		// shutdown server
+		err := stopServer(client, toSakuraCloudID(d.Id()), d)
 		if err != nil {
 			return fmt.Errorf("Error stopping SakuraCloud ServerConnector resource: %s", err)
 		}
@@ -216,8 +217,8 @@ func resourceSakuraCloudServerConnectorUpdate(d *schema.ResourceData, meta inter
 	}
 
 	if isNeedRestart && isRunning {
-		// shudown server
-		err := stopServer(client, toSakuraCloudID(d.Id()))
+		// shutdown server
+		err := stopServer(client, toSakuraCloudID(d.Id()), d)
 		if err != nil {
 			return fmt.Errorf("Error stopping SakuraCloud ServerConnector resource: %s", err)
 		}
@@ -343,8 +344,8 @@ func resourceSakuraCloudServerConnectorDelete(d *schema.ResourceData, meta inter
 	}
 
 	if isNeedRestart && isRunning {
-		// shudown server
-		err := stopServer(client, toSakuraCloudID(d.Id()))
+		// shutdown server
+		err := stopServer(client, toSakuraCloudID(d.Id()), d)
 		if err != nil {
 			return fmt.Errorf("Error stopping SakuraCloud ServerConnector resource: %s", err)
 		}
