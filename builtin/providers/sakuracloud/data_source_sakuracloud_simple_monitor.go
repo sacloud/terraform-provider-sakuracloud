@@ -83,6 +83,10 @@ func dataSourceSakuraCloudSimpleMonitor() *schema.Resource {
 							Type:     schema.TypeString,
 							Computed: true,
 						},
+						"remaining_days": {
+							Type:     schema.TypeInt,
+							Computed: true,
+						},
 					},
 				},
 			},

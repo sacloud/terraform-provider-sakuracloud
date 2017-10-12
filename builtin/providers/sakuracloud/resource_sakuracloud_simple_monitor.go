@@ -81,6 +81,12 @@ func resourceSakuraCloudSimpleMonitor() *schema.Resource {
 							Type:     schema.TypeString,
 							Optional: true,
 						},
+						"remaining_days": {
+							Type:         schema.TypeInt,
+							Optional:     true,
+							Default:      30,
+							ValidateFunc: validateIntegerInRange(1, 9999),
+						},
 					},
 				},
 			},
@@ -190,6 +196,8 @@ func resourceSakuraCloudSimpleMonitorCreate(d *schema.ResourceData, meta interfa
 
 		case "ping":
 			opts.SetHealthCheckPing()
+		case "sslcertificate":
+			opts.SetHealthCheckSSLCertificate(conf["remaining_days"].(int))
 		}
 
 		opts.Settings.SimpleMonitor.DelayLoop = conf["delay_loop"].(int)
@@ -310,6 +318,9 @@ func resourceSakuraCloudSimpleMonitorUpdate(d *schema.ResourceData, meta interfa
 
 			case "ping":
 				simpleMonitor.SetHealthCheckPing()
+			case "sslcertificate":
+				days := conf["remaining_days"].(int)
+				simpleMonitor.SetHealthCheckSSLCertificate(days)
 			}
 
 			simpleMonitor.Settings.SimpleMonitor.DelayLoop = conf["delay_loop"].(int)
@@ -482,6 +493,8 @@ func setSimpleMonitorResourceData(d *schema.ResourceData, _ *api.Client, data *s
 	case "dns":
 		healthCheck["qname"] = readHealthCheck.QName
 		healthCheck["expected_data"] = readHealthCheck.ExpectedData
+	case "sslcertificate":
+		healthCheck["remaining_days"] = readHealthCheck.RemainingDays
 	}
 
 	healthCheck["protocol"] = data.Settings.SimpleMonitor.HealthCheck.Protocol
