@@ -45,7 +45,7 @@ class TerraformProviderSakuracloud < Formula
     To enable, put following text in "~/.terraformrc":
 
         providers {
-            sakuracloud = "terraform-provider-sakuracloud"
+            sakuracloud = "#{bin}/terraform-provider-sakuracloud"
         }
 
   EOS
