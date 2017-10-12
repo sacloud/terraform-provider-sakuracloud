@@ -6,7 +6,7 @@ import (
 	"time"
 )
 
-const vpcRouterPowerAPILockKey = "sakuracloud_server.power.%d.lock"
+const vpcRouterPowerAPILockKey = "sakuracloud_vpc_router.power.%d.lock"
 
 func resourceSakuraCloudVPCRouter() *schema.Resource {
 	return &schema.Resource{
