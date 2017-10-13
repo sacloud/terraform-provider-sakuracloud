@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.14.0 (2017-10-12)
+
+* シンプル監視でのSSLサーバ証明書 有効期限監視 #188 (yamamoto-febc)
+* 2段階シャットダウン実装 #186 (yamamoto-febc)
+* リソース追加:パケットフィルタルール #185 (yamamoto-febc)
+* VPCルータでのサイト間VPN接続情報追加 #184 (yamamoto-febc)
+
+
 ## 0.13.1 (2017-10-01)
 
 * スタートアップスクリプトへのclass属性追加 #178 (yamamoto-febc)
