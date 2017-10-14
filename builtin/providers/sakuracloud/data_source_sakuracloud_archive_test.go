@@ -29,7 +29,7 @@ func TestAccSakuraCloudArchiveDataSource_Basic(t *testing.T) {
 					resource.TestCheckResourceAttr("data.sakuracloud_archive.foobar", "tags.1", "arch-64bit"),
 					resource.TestCheckResourceAttr("data.sakuracloud_archive.foobar", "tags.2", "current-stable"),
 					resource.TestCheckResourceAttr("data.sakuracloud_archive.foobar", "tags.3", "distro-ubuntu"),
-					resource.TestCheckResourceAttr("data.sakuracloud_archive.foobar", "tags.4", "distro-ver-16.04.2"),
+					resource.TestCheckResourceAttr("data.sakuracloud_archive.foobar", "tags.4", "distro-ver-16.04.3"),
 					resource.TestCheckResourceAttr("data.sakuracloud_archive.foobar", "tags.5", "os-linux"),
 				),
 			},
