@@ -451,7 +451,7 @@ $ unzip terraform-provider-sakuracloud.zip
 <pre><code class="bash">$ docker run -it --rm \
          -e SAKURACLOUD_ACCESS_TOKEN=[さくらのクラウド APIトークン] \
          -e SAKURACLOUD_ACCESS_TOKEN_SECRET=[さくらのクラウド APIシークレット] \
-         -v $PWD:/work \
+         -v $PWD:/workdir \
          sacloud/terraform apply
 </code></pre>
 

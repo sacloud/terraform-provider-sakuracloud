@@ -119,7 +119,7 @@ TerraformとTerraform for さくらのクラウドを同梱したDockerイメー
 $ docker run -it --rm \
          -e SAKURACLOUD_ACCESS_TOKEN=[さくらのクラウド APIトークン] \
          -e SAKURACLOUD_ACCESS_TOKEN_SECRET=[さくらのクラウド APIシークレット] \
-         -v $PWD:/work \
+         -v $PWD:/workdir \
          sacloud/terraform apply
 ```
 
