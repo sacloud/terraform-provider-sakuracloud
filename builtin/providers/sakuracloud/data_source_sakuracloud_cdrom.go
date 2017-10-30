@@ -81,16 +81,6 @@ func dataSourceSakuraCloudCDROMRead(d *schema.ResourceData, meta interface{}) er
 		return nil
 		//return fmt.Errorf("Your query returned no results. Please change your filters and try again.")
 	}
-	cdrom := res.CDROMs[0]
-
-	d.SetId(cdrom.GetStrID())
-	d.Set("name", cdrom.Name)
-	d.Set("size", toSizeGB(cdrom.SizeMB))
-	d.Set("icon_id", cdrom.GetIconStrID())
-	d.Set("description", cdrom.Description)
-	d.Set("tags", cdrom.Tags)
-
-	d.Set("zone", client.Zone)
-
-	return nil
+	data := &res.CDROMs[0]
+	return setCDROMResourceData(d, client, data)
 }
