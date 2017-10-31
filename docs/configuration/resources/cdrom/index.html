@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>公開鍵 - Terraform for さくらのクラウド</title>
+  <title>ISOイメージ(CD-ROM) - Terraform for さくらのクラウド</title>
   
 
   <link rel="shortcut icon" href="../../../img/favicon.ico">
@@ -21,7 +21,7 @@
   
   <script>
     // Current page data
-    var mkdocs_page_name = "公開鍵";
+    var mkdocs_page_name = "ISOイメージ(CD-ROM)";
   </script>
   
   <script src="../../../js/jquery-2.1.1.min.js"></script>
@@ -129,8 +129,21 @@
 
         
             
-    <li class="toctree-l1 ">
-        <a class="" href="../cdrom/">ISOイメージ(CD-ROM)</a>
+    <li class="toctree-l1 current">
+        <a class="current" href="./">ISOイメージ(CD-ROM)</a>
+        
+            <ul>
+            
+                <li class="toctree-l3"><a href="#isocd-romsakuracloud_cdrom">ISOイメージ/CD-ROM(sakuracloud_cdrom)</a></li>
+                
+                    <li><a class="toctree-l4" href="#_1">設定例</a></li>
+                
+                    <li><a class="toctree-l4" href="#_2">パラメーター</a></li>
+                
+                    <li><a class="toctree-l4" href="#_3">属性</a></li>
+                
+            
+            </ul>
         
     </li>
 
@@ -213,21 +226,8 @@
 
         
             
-    <li class="toctree-l1 current">
-        <a class="current" href="./">公開鍵</a>
-        
-            <ul>
-            
-                <li class="toctree-l3"><a href="#sakuracloud_ssh_key">公開鍵(sakuracloud_ssh_key)</a></li>
-                
-                    <li><a class="toctree-l4" href="#_1">設定例</a></li>
-                
-                    <li><a class="toctree-l4" href="#_2">パラメーター</a></li>
-                
-                    <li><a class="toctree-l4" href="#_3">属性</a></li>
-                
-            
-            </ul>
+    <li class="toctree-l1 ">
+        <a class="" href="../ssh_key/">公開鍵</a>
         
     </li>
 
@@ -343,7 +343,7 @@
         
       
     
-    <li>公開鍵</li>
+    <li>ISOイメージ(CD-ROM)</li>
     <li class="wy-breadcrumbs-aside">
       
     </li>
@@ -353,19 +353,26 @@
           <div role="main">
             <div class="section">
               
-                <h1 id="sakuracloud_ssh_key">公開鍵(sakuracloud_ssh_key)</h1>
+                <h1 id="isocd-romsakuracloud_cdrom">ISOイメージ/CD-ROM(sakuracloud_cdrom)</h1>
 <hr />
-<p><strong>全ゾーン共通のグローバルリソースです。</strong></p>
 <h3 id="_1">設定例</h3>
-<pre><code class="hcl">resource sakuracloud_ssh_key &quot;mykey&quot; {
-  name       = &quot;mykey&quot;
+<pre><code class="hcl">#ISOイメージの定義
+resource sakuracloud_cdrom &quot;cdrom&quot; {
+  name  = &quot;cdrom01&quot;
+  #size = 5 # or 10
 
-  public_key = &quot;ssh-rsa XXXXXXXXX.....&quot;
-  # or
-  #public_key = &quot;${file(&quot;id_rsa.pub&quot;)}&quot;
+  # ISOイメージをアップロードする場合
+  iso_image_file = &quot;test/dummy.iso&quot;
+  hash           = &quot;${md5(file(&quot;test/dummy.iso&quot;))}&quot;
+
+  # 単一ファイルを内包するISOイメージを作成する場合
+  #content           = &quot;${file(&quot;test/dummy-upd.json&quot;)}&quot;
+  #content_file_name = &quot;config&quot;
 
   description = &quot;Description&quot;
+  tags        = [&quot;tag1&quot;, &quot;tag2&quot;]
 }
+
 </code></pre>
 
 <h3 id="_2">パラメーター</h3>
@@ -384,15 +391,55 @@
 <tr>
 <td><code>name</code></td>
 <td align="center">◯</td>
-<td>公開鍵名</td>
+<td>ディスク名</td>
 <td align="center">-</td>
 <td>文字列</td>
 <td>-</td>
 </tr>
 <tr>
-<td><code>public_key</code></td>
-<td align="center">◯</td>
-<td>公開鍵(文字列)</td>
+<td><code>size</code></td>
+<td align="center">-</td>
+<td>ディスクサイズ(GB単位)</td>
+<td align="center">5</td>
+<td><code>5</code><br /><code>10</code></td>
+<td>-</td>
+</tr>
+<tr>
+<td><code>iso_image_file</code></td>
+<td align="center">-</td>
+<td>ISOイメージファイルパス</td>
+<td align="center">-</td>
+<td>文字列</td>
+<td>※注1</td>
+</tr>
+<tr>
+<td><code>hash</code></td>
+<td align="center">-</td>
+<td>ISOイメージファイルのMD5ハッシュ値</td>
+<td align="center">-</td>
+<td>文字列</td>
+<td><code>iso-image-file</code>の変更検知用MD5ハッシュ</td>
+</tr>
+<tr>
+<td><code>content</code></td>
+<td align="center">-</td>
+<td>ISOイメージコンテント</td>
+<td align="center">-</td>
+<td>文字列</td>
+<td>※注1</td>
+</tr>
+<tr>
+<td><code>content_file_name</code></td>
+<td align="center">-</td>
+<td>作成されるISOイメージ内のファイル名</td>
+<td align="center"><code>config</code></td>
+<td>文字列</td>
+<td>現バージョンではボリュームラベルとしてもこの値が利用される</td>
+</tr>
+<tr>
+<td><code>icon_id</code></td>
+<td align="center">-</td>
+<td>アイコンID</td>
 <td align="center">-</td>
 <td>文字列</td>
 <td>-</td>
@@ -405,8 +452,26 @@
 <td>文字列</td>
 <td>-</td>
 </tr>
+<tr>
+<td><code>tags</code></td>
+<td align="center">-</td>
+<td>タグ</td>
+<td align="center">-</td>
+<td>リスト(文字列)</td>
+<td>-</td>
+</tr>
+<tr>
+<td><code>zone</code></td>
+<td align="center">-</td>
+<td>ゾーン</td>
+<td align="center">-</td>
+<td><code>is1b</code><br /><code>tk1a</code><br /><code>tk1v</code></td>
+<td>-</td>
+</tr>
 </tbody>
 </table>
+<h4 id="1">注1</h4>
+<p><code>iso_image_file</code>/<code>content</code>はいずれか1つだけ指定可能です。</p>
 <h3 id="_3">属性</h3>
 <table>
 <thead>
@@ -419,12 +484,7 @@
 <tbody>
 <tr>
 <td><code>id</code></td>
-<td>公開鍵ID</td>
-<td>-</td>
-</tr>
-<tr>
-<td><code>fingerprint</code></td>
-<td>フィンガープリント</td>
+<td>ディスクID</td>
 <td>-</td>
 </tr>
 </tbody>
@@ -436,10 +496,10 @@
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="../ssh_key_gen/" class="btn btn-neutral float-right" title="公開鍵(生成)"/>Next <span class="icon icon-circle-arrow-right"></span></a>
+        <a href="../switch/" class="btn btn-neutral float-right" title="スイッチ"/>Next <span class="icon icon-circle-arrow-right"></span></a>
       
       
-        <a href="../note/" class="btn btn-neutral" title="スタートアップスクリプト"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../disk/" class="btn btn-neutral" title="ディスク"><span class="icon icon-circle-arrow-left"></span> Previous</a>
       
     </div>
   
@@ -467,10 +527,10 @@
     <span class="rst-current-version" data-toggle="rst-current-version">
       
       
-        <span><a href="../note/" style="color: #fcfcfc;">&laquo; Previous</a></span>
+        <span><a href="../disk/" style="color: #fcfcfc;">&laquo; Previous</a></span>
       
       
-        <span style="margin-left: 15px"><a href="../ssh_key_gen/" style="color: #fcfcfc">Next &raquo;</a></span>
+        <span style="margin-left: 15px"><a href="../switch/" style="color: #fcfcfc">Next &raquo;</a></span>
       
     </span>
 </div>
