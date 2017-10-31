@@ -18,6 +18,7 @@ pages:
     - リソース:
       - サーバ: configuration/resources/server.md
       - ディスク: configuration/resources/disk.md
+      - ISOイメージ(CD-ROM): configuration/resources/cdrom.md
       - スイッチ: configuration/resources/switch.md
       - ルータ: configuration/resources/internet.md
       - サブネット: configuration/resources/subnet.md
