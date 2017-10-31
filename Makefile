@@ -43,7 +43,7 @@ bin/terraform-provider-sakuracloud_linux-386.zip:
 bin/terraform-provider-sakuracloud_linux-amd64.zip:
 	OS="linux"   ARCH="amd64" ARCHIVE=1 BUILD_LDFLAGS=$(BUILD_LDFLAGS) sh -c "'$(CURDIR)/scripts/build.sh'"
 
-test: vet lint-docs
+test: vet
 	TF_ACC= go test $(TEST1) $(TESTARGS) -timeout=30s -parallel=4 ; \
 	TF_ACC= go test $(TEST2) $(TESTARGS) -timeout=30s -parallel=4
 

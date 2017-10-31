@@ -611,6 +611,18 @@
 			"revisionTime": "2017-07-30T19:30:24Z"
 		},
 		{
+			"checksumSHA1": "6/+ENZyTfGOLWgBgtXLwKE2S0i0=",
+			"path": "github.com/sacloud/ftps",
+			"revision": "f05f27c519d0f3b972294618e3a1d70b39150bf4",
+			"revisionTime": "2017-10-30T02:06:02Z"
+		},
+		{
+			"checksumSHA1": "6lgKzZB+G5Al6Yb21htvxYr8Pi8=",
+			"path": "github.com/sacloud/iso9660wrap",
+			"revision": "eda21f77f6a88170de323d5225031f10951de8f9",
+			"revisionTime": "2017-10-31T07:53:02Z"
+		},
+		{
 			"checksumSHA1": "6SUOCG4pJYli/d6+mjpIomTUCms=",
 			"path": "github.com/sacloud/libsacloud",
 			"revision": "9d743980a621d5da44fb1085fcf6819f848ad7b8",
