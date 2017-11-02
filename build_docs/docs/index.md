@@ -20,6 +20,7 @@
 - リソース
     - [サーバ](configuration/resources/server/)
     - [ディスク](configuration/resources/disk/)
+    - [アーカイブ](configuration/resources/archive/)
     - [ISOイメージ(CD-ROM)](configuration/resources/cdrom/)
     - [スイッチ](configuration/resources/switch/)
     - [ルータ](configuration/resources/internet/)
