@@ -82,8 +82,9 @@ output "ssh_to_server" {
 EOF
 
 #################################################
-# インフラ構築(apply)
+# インフラ構築(init & apply)
 #################################################
+terraform init
 terraform apply
 ```
 
@@ -97,6 +98,8 @@ terraform apply
 #### リソース
   - [サーバー](https://sacloud.github.io/terraform-provider-sakuracloud/configuration/resources/server/)
   - [ディスク](https://sacloud.github.io/terraform-provider-sakuracloud//configuration/resources/disk/)
+  - [アーカイブ](https://sacloud.github.io/terraform-provider-sakuracloud//configuration/resources/archive/)
+  - [ISOイメージ(CD-ROM)](https://sacloud.github.io/terraform-provider-sakuracloud//configuration/resources/cdrom/)
   - [スイッチ](https://sacloud.github.io/terraform-provider-sakuracloud//configuration/resources/switch/)
   - [ルーター](https://sacloud.github.io/terraform-provider-sakuracloud//configuration/resources/internet/)
   - [パケットフィルタ](https://sacloud.github.io/terraform-provider-sakuracloud/configuration/resources/packet_filter/)
