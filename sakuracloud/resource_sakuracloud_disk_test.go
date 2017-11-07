@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"github.com/hashicorp/terraform/helper/resource"
 	"github.com/hashicorp/terraform/terraform"
-	"github.com/sacloud/libsacloud/api"
+
 	"github.com/sacloud/libsacloud/sacloud"
 	"testing"
 )
@@ -73,7 +73,7 @@ func testAccCheckSakuraCloudDiskExists(n string, disk *sacloud.Disk) resource.Te
 			return errors.New("No Disk ID is set")
 		}
 
-		client := testAccProvider.Meta().(*api.Client)
+		client := testAccProvider.Meta().(*APIClient)
 		foundDisk, err := client.Disk.Read(toSakuraCloudID(rs.Primary.ID))
 
 		if err != nil {
@@ -105,7 +105,7 @@ func testAccCheckSakuraCloudDiskAttributes(disk *sacloud.Disk) resource.TestChec
 }
 
 func testAccCheckSakuraCloudDiskDestroy(s *terraform.State) error {
-	client := testAccProvider.Meta().(*api.Client)
+	client := testAccProvider.Meta().(*APIClient)
 
 	for _, rs := range s.RootModule().Resources {
 		if rs.Type != "sakuracloud_disk" {

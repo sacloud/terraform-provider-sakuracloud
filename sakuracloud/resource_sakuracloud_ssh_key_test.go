@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"github.com/hashicorp/terraform/helper/resource"
 	"github.com/hashicorp/terraform/terraform"
-	"github.com/sacloud/libsacloud/api"
+
 	"github.com/sacloud/libsacloud/sacloud"
 	"testing"
 )
@@ -57,7 +57,7 @@ func testAccCheckSakuraCloudSSHKeyExists(n string, ssh_key *sacloud.SSHKey) reso
 			return errors.New("No SSHKey ID is set")
 		}
 
-		client := testAccProvider.Meta().(*api.Client)
+		client := testAccProvider.Meta().(*APIClient)
 		foundSSHKey, err := client.SSHKey.Read(toSakuraCloudID(rs.Primary.ID))
 
 		if err != nil {
@@ -75,7 +75,7 @@ func testAccCheckSakuraCloudSSHKeyExists(n string, ssh_key *sacloud.SSHKey) reso
 }
 
 func testAccCheckSakuraCloudSSHKeyDestroy(s *terraform.State) error {
-	client := testAccProvider.Meta().(*api.Client)
+	client := testAccProvider.Meta().(*APIClient)
 
 	for _, rs := range s.RootModule().Resources {
 		if rs.Type != "sakuracloud_ssh_key" {

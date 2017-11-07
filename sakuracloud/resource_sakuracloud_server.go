@@ -3,7 +3,7 @@ package sakuracloud
 import (
 	"fmt"
 	"github.com/hashicorp/terraform/helper/schema"
-	"github.com/sacloud/libsacloud/api"
+
 	"github.com/sacloud/libsacloud/sacloud"
 	"log"
 )
@@ -187,7 +187,7 @@ func resourceSakuraCloudServerCreate(d *schema.ResourceData, meta interface{}) e
 
 	if rawTags, ok := d.GetOk("tags"); ok {
 		if rawTags != nil {
-			opts.Tags = expandStringList(rawTags.([]interface{}))
+			opts.Tags = expandTags(client, rawTags.([]interface{}))
 		}
 	}
 
@@ -527,7 +527,9 @@ func resourceSakuraCloudServerUpdate(d *schema.ResourceData, meta interface{}) e
 	if d.HasChange("tags") {
 		rawTags := d.Get("tags").([]interface{})
 		if rawTags != nil {
-			server.Tags = expandStringList(rawTags)
+			server.Tags = expandTags(client, rawTags)
+		} else {
+			server.Tags = expandTags(client, []interface{}{})
 		}
 	}
 
@@ -651,7 +653,7 @@ func resourceSakuraCloudServerDelete(d *schema.ResourceData, meta interface{}) e
 
 }
 
-func setServerResourceData(d *schema.ResourceData, client *api.Client, data *sacloud.Server) error {
+func setServerResourceData(d *schema.ResourceData, client *APIClient, data *sacloud.Server) error {
 
 	d.Set("name", data.Name)
 	d.Set("core", data.ServerPlan.CPU)
@@ -681,7 +683,7 @@ func setServerResourceData(d *schema.ResourceData, client *api.Client, data *sac
 
 	d.Set("icon_id", data.GetIconStrID())
 	d.Set("description", data.Description)
-	d.Set("tags", data.Tags)
+	d.Set("tags", realTags(client, data.Tags))
 
 	d.Set("packet_filter_ids", flattenPacketFilters(data.Interfaces))
 
@@ -715,14 +717,14 @@ func setServerResourceData(d *schema.ResourceData, client *api.Client, data *sac
 	return nil
 }
 
-func createServer(client *api.Client, server *sacloud.Server) (*sacloud.Server, error) {
+func createServer(client *APIClient, server *sacloud.Server) (*sacloud.Server, error) {
 	sakuraMutexKV.Lock(serverAPILockKey)
 	defer sakuraMutexKV.Unlock(serverAPILockKey)
 
 	return client.Server.Create(server)
 }
 
-func bootServer(client *api.Client, id int64) error {
+func bootServer(client *APIClient, id int64) error {
 	// power API lock
 	lockKey := getServerPowerAPILockKey(id)
 	sakuraMutexKV.Lock(lockKey)
@@ -744,7 +746,7 @@ func bootServer(client *api.Client, id int64) error {
 	return err
 }
 
-func stopServer(client *api.Client, id int64, d *schema.ResourceData) error {
+func stopServer(client *APIClient, id int64, d *schema.ResourceData) error {
 	// power API lock
 	lockKey := getServerPowerAPILockKey(id)
 	sakuraMutexKV.Lock(lockKey)

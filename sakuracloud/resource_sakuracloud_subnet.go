@@ -3,7 +3,7 @@ package sakuracloud
 import (
 	"fmt"
 	"github.com/hashicorp/terraform/helper/schema"
-	"github.com/sacloud/libsacloud/api"
+
 	"github.com/sacloud/libsacloud/sacloud"
 )
 
@@ -129,7 +129,7 @@ func resourceSakuraCloudSubnetDelete(d *schema.ResourceData, meta interface{}) e
 	return nil
 }
 
-func setSubnetResourceData(d *schema.ResourceData, client *api.Client, data *sacloud.Subnet) error {
+func setSubnetResourceData(d *schema.ResourceData, client *APIClient, data *sacloud.Subnet) error {
 
 	if data.Switch == nil {
 		return fmt.Errorf("Error reading SakuraCloud Subnet resource: %s", "switch is nil")

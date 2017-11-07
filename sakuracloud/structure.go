@@ -4,22 +4,25 @@ import (
 	"fmt"
 	"github.com/hashicorp/terraform/helper/schema"
 	"github.com/hashicorp/terraform/terraform"
-	"github.com/sacloud/libsacloud/api"
+
 	"github.com/sacloud/libsacloud/sacloud"
 	"strconv"
 	"strings"
 	"time"
 )
 
-func getSacloudAPIClient(d *schema.ResourceData, meta interface{}) *api.Client {
-	c := meta.(*api.Client)
+func getSacloudAPIClient(d *schema.ResourceData, meta interface{}) *APIClient {
+	c := meta.(*APIClient)
 	client := c.Clone()
 
 	zone, ok := d.GetOk("zone")
 	if ok {
 		client.Zone = zone.(string)
 	}
-	return client
+	return &APIClient{
+		Client:        client,
+		MarkerTagName: c.MarkerTagName,
+	}
 }
 
 func toSakuraCloudID(id string) int64 {
@@ -33,6 +36,24 @@ func expandStringList(configured []interface{}) []string {
 	vs := make([]string, 0, len(configured))
 	for _, v := range configured {
 		vs = append(vs, string(v.(string)))
+	}
+	return vs
+}
+
+func expandTags(client *APIClient, configured []interface{}) []string {
+	vs := expandStringList(configured)
+	if client.MarkerTagName != "" {
+		vs = append(vs, client.MarkerTagName)
+	}
+	return vs
+}
+
+func realTags(client *APIClient, tags []string) []string {
+	vs := make([]string, 0, len(tags))
+	for _, v := range tags {
+		if client.MarkerTagName == "" || client.MarkerTagName != v {
+			vs = append(vs, v)
+		}
 	}
 	return vs
 }

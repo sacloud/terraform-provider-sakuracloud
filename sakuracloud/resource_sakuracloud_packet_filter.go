@@ -3,7 +3,7 @@ package sakuracloud
 import (
 	"fmt"
 	"github.com/hashicorp/terraform/helper/schema"
-	"github.com/sacloud/libsacloud/api"
+
 	"github.com/sacloud/libsacloud/sacloud"
 )
 
@@ -230,7 +230,7 @@ func resourceSakuraCloudPacketFilterDelete(d *schema.ResourceData, meta interfac
 	return nil
 }
 
-func setPacketFilterResourceData(d *schema.ResourceData, client *api.Client, data *sacloud.PacketFilter) error {
+func setPacketFilterResourceData(d *schema.ResourceData, client *APIClient, data *sacloud.PacketFilter) error {
 	d.Set("name", data.Name)
 	d.Set("description", data.Description)
 

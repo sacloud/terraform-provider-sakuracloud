@@ -3,7 +3,7 @@ package sakuracloud
 import (
 	"fmt"
 	"github.com/hashicorp/terraform/helper/schema"
-	"github.com/sacloud/libsacloud/api"
+
 	"github.com/sacloud/libsacloud/sacloud"
 	"strconv"
 )
@@ -86,7 +86,7 @@ func resourceSakuraCloudNFS() *schema.Resource {
 }
 
 func resourceSakuraCloudNFSCreate(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*api.Client)
+	client := meta.(*APIClient)
 
 	zone, ok := d.GetOk("zone")
 	if ok {
@@ -114,7 +114,7 @@ func resourceSakuraCloudNFSCreate(d *schema.ResourceData, meta interface{}) erro
 	}
 	if rawTags, ok := d.GetOk("tags"); ok {
 		if rawTags != nil {
-			opts.Tags = expandStringList(rawTags.([]interface{}))
+			opts.Tags = expandTags(client, rawTags.([]interface{}))
 		}
 	}
 
@@ -184,9 +184,9 @@ func resourceSakuraCloudNFSUpdate(d *schema.ResourceData, meta interface{}) erro
 	if d.HasChange("tags") {
 		rawTags := d.Get("tags").([]interface{})
 		if rawTags != nil {
-			nfs.Tags = expandStringList(rawTags)
+			nfs.Tags = expandTags(client, rawTags)
 		} else {
-			nfs.Tags = []string{}
+			nfs.Tags = expandTags(client, []interface{}{})
 		}
 	}
 
@@ -215,7 +215,7 @@ func resourceSakuraCloudNFSDelete(d *schema.ResourceData, meta interface{}) erro
 	return nil
 }
 
-func setNFSResourceData(d *schema.ResourceData, client *api.Client, data *sacloud.NFS) error {
+func setNFSResourceData(d *schema.ResourceData, client *APIClient, data *sacloud.NFS) error {
 
 	d.Set("switch_id", data.Switch.GetStrID())
 	d.Set("ipaddress", data.Remark.Servers[0].(map[string]interface{})["IPAddress"])
@@ -226,7 +226,7 @@ func setNFSResourceData(d *schema.ResourceData, client *api.Client, data *saclou
 	d.Set("name", data.Name)
 	d.Set("icon_id", data.GetIconStrID())
 	d.Set("description", data.Description)
-	d.Set("tags", data.Tags)
+	d.Set("tags", realTags(client, data.Tags))
 
 	d.Set("zone", client.Zone)
 	d.SetId(data.GetStrID())

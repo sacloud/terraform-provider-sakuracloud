@@ -3,7 +3,7 @@ package sakuracloud
 import (
 	"fmt"
 	"github.com/hashicorp/terraform/helper/schema"
-	"github.com/sacloud/libsacloud/api"
+
 	"github.com/sacloud/libsacloud/sacloud"
 	"strings"
 )
@@ -180,7 +180,7 @@ func resourceSakuraCloudDatabaseCreate(d *schema.ResourceData, meta interface{})
 	}
 	if rawTags, ok := d.GetOk("tags"); ok {
 		if rawTags != nil {
-			opts.Tags = expandStringList(rawTags.([]interface{}))
+			opts.Tags = expandTags(client, rawTags.([]interface{}))
 		}
 	}
 
@@ -249,9 +249,9 @@ func resourceSakuraCloudDatabaseUpdate(d *schema.ResourceData, meta interface{})
 	if d.HasChange("tags") {
 		rawTags := d.Get("tags").([]interface{})
 		if rawTags != nil {
-			database.Tags = expandStringList(rawTags)
+			database.Tags = expandTags(client, rawTags)
 		} else {
-			database.Tags = []string{}
+			database.Tags = expandTags(client, []interface{}{})
 		}
 	}
 
@@ -313,7 +313,7 @@ func resourceSakuraCloudDatabaseDelete(d *schema.ResourceData, meta interface{})
 	return nil
 }
 
-func setDatabaseResourceData(d *schema.ResourceData, client *api.Client, data *sacloud.Database) error {
+func setDatabaseResourceData(d *schema.ResourceData, client *APIClient, data *sacloud.Database) error {
 
 	switch data.Remark.DBConf.Common.DatabaseName {
 	case "postgres":
@@ -360,7 +360,7 @@ func setDatabaseResourceData(d *schema.ResourceData, client *api.Client, data *s
 			tags = append(tags, t)
 		}
 	}
-	d.Set("tags", tags)
+	d.Set("tags", realTags(client, tags))
 
 	d.Set("zone", client.Zone)
 	d.SetId(data.GetStrID())

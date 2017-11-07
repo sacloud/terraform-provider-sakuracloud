@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"github.com/hashicorp/terraform/helper/schema"
 	"github.com/mitchellh/go-homedir"
-	"github.com/sacloud/libsacloud/api"
+
 	"github.com/sacloud/libsacloud/sacloud"
 	"io/ioutil"
 	"os"
@@ -56,7 +56,7 @@ func resourceSakuraCloudIcon() *schema.Resource {
 }
 
 func resourceSakuraCloudIconCreate(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*api.Client)
+	client := meta.(*APIClient)
 
 	opts := client.Icon.New()
 
@@ -87,7 +87,7 @@ func resourceSakuraCloudIconCreate(d *schema.ResourceData, meta interface{}) err
 
 	if rawTags, ok := d.GetOk("tags"); ok {
 		if rawTags != nil {
-			opts.Tags = expandStringList(rawTags.([]interface{}))
+			opts.Tags = expandTags(client, rawTags.([]interface{}))
 		}
 	}
 
@@ -101,7 +101,7 @@ func resourceSakuraCloudIconCreate(d *schema.ResourceData, meta interface{}) err
 }
 
 func resourceSakuraCloudIconRead(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*api.Client)
+	client := meta.(*APIClient)
 	icon, err := client.Icon.Read(toSakuraCloudID(d.Id()))
 	if err != nil {
 		return fmt.Errorf("Couldn't find SakuraCloud Icon resource: %s", err)
@@ -111,7 +111,7 @@ func resourceSakuraCloudIconRead(d *schema.ResourceData, meta interface{}) error
 }
 
 func resourceSakuraCloudIconUpdate(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*api.Client)
+	client := meta.(*APIClient)
 
 	icon, err := client.Icon.Read(toSakuraCloudID(d.Id()))
 	if err != nil {
@@ -125,9 +125,9 @@ func resourceSakuraCloudIconUpdate(d *schema.ResourceData, meta interface{}) err
 	if d.HasChange("tags") {
 		rawTags := d.Get("tags").([]interface{})
 		if rawTags != nil {
-			icon.Tags = expandStringList(rawTags)
+			icon.Tags = expandTags(client, rawTags)
 		} else {
-			icon.Tags = []string{}
+			icon.Tags = expandTags(client, []interface{}{})
 		}
 	}
 
@@ -141,7 +141,7 @@ func resourceSakuraCloudIconUpdate(d *schema.ResourceData, meta interface{}) err
 }
 
 func resourceSakuraCloudIconDelete(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*api.Client)
+	client := meta.(*APIClient)
 
 	_, err := client.Icon.Delete(toSakuraCloudID(d.Id()))
 	if err != nil {
@@ -151,7 +151,7 @@ func resourceSakuraCloudIconDelete(d *schema.ResourceData, meta interface{}) err
 	return nil
 }
 
-func setIconResourceData(d *schema.ResourceData, client *api.Client, data *sacloud.Icon) error {
+func setIconResourceData(d *schema.ResourceData, client *APIClient, data *sacloud.Icon) error {
 
 	d.Set("name", data.Name)
 
@@ -161,7 +161,7 @@ func setIconResourceData(d *schema.ResourceData, client *api.Client, data *saclo
 	}
 
 	d.Set("body", body)
-	d.Set("tags", data.Tags)
+	d.Set("tags", realTags(client, data.Tags))
 	d.Set("url", data.URL)
 
 	d.SetId(data.GetStrID())

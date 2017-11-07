@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"github.com/hashicorp/terraform/helper/resource"
 	"github.com/hashicorp/terraform/terraform"
-	"github.com/sacloud/libsacloud/api"
+
 	"github.com/sacloud/libsacloud/sacloud"
 	"testing"
 )
@@ -48,7 +48,7 @@ func testAccCheckSakuraCloudSubnetExists(n string, subnet *sacloud.Subnet) resou
 			return errors.New("No Subnet ID is set")
 		}
 
-		client := testAccProvider.Meta().(*api.Client)
+		client := testAccProvider.Meta().(*APIClient)
 
 		foundSubnet, err := client.Subnet.Read(toSakuraCloudID(rs.Primary.ID))
 
@@ -67,7 +67,7 @@ func testAccCheckSakuraCloudSubnetExists(n string, subnet *sacloud.Subnet) resou
 }
 
 func testAccCheckSakuraCloudSubnetDestroy(s *terraform.State) error {
-	client := testAccProvider.Meta().(*api.Client)
+	client := testAccProvider.Meta().(*APIClient)
 
 	for _, rs := range s.RootModule().Resources {
 		if rs.Type != "sakuracloud_subnet" {

@@ -6,7 +6,7 @@ import (
 	"bytes"
 	"github.com/hashicorp/terraform/helper/hashcode"
 	"github.com/hashicorp/terraform/helper/schema"
-	"github.com/sacloud/libsacloud/api"
+
 	"github.com/sacloud/libsacloud/sacloud"
 )
 
@@ -46,7 +46,7 @@ func resourceSakuraCloudGSLBServer() *schema.Resource {
 }
 
 func resourceSakuraCloudGSLBServerCreate(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*api.Client)
+	client := meta.(*APIClient)
 	gslbID := d.Get("gslb_id").(string)
 
 	sakuraMutexKV.Lock(gslbID)
@@ -74,7 +74,7 @@ func resourceSakuraCloudGSLBServerCreate(d *schema.ResourceData, meta interface{
 }
 
 func resourceSakuraCloudGSLBServerRead(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*api.Client)
+	client := meta.(*APIClient)
 
 	gslb, err := client.GSLB.Read(toSakuraCloudID(d.Get("gslb_id").(string)))
 	if err != nil {
@@ -94,7 +94,7 @@ func resourceSakuraCloudGSLBServerRead(d *schema.ResourceData, meta interface{})
 }
 
 func resourceSakuraCloudGSLBServerDelete(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*api.Client)
+	client := meta.(*APIClient)
 	gslbID := d.Get("gslb_id").(string)
 
 	sakuraMutexKV.Lock(gslbID)

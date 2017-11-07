@@ -6,7 +6,7 @@ import (
 	"bytes"
 	"github.com/hashicorp/terraform/helper/hashcode"
 	"github.com/hashicorp/terraform/helper/schema"
-	"github.com/sacloud/libsacloud/api"
+
 	"github.com/sacloud/libsacloud/sacloud"
 	"strings"
 )
@@ -72,7 +72,7 @@ func resourceSakuraCloudDNSRecord() *schema.Resource {
 }
 
 func resourceSakuraCloudDNSRecordCreate(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*api.Client)
+	client := meta.(*APIClient)
 	dnsID := d.Get("dns_id").(string)
 
 	sakuraMutexKV.Lock(dnsID)
@@ -100,7 +100,7 @@ func resourceSakuraCloudDNSRecordCreate(d *schema.ResourceData, meta interface{}
 }
 
 func resourceSakuraCloudDNSRecordRead(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*api.Client)
+	client := meta.(*APIClient)
 
 	dns, err := client.DNS.Read(toSakuraCloudID(d.Get("dns_id").(string)))
 	if err != nil {
@@ -138,7 +138,7 @@ func resourceSakuraCloudDNSRecordRead(d *schema.ResourceData, meta interface{}) 
 }
 
 func resourceSakuraCloudDNSRecordDelete(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*api.Client)
+	client := meta.(*APIClient)
 	dnsID := d.Get("dns_id").(string)
 
 	sakuraMutexKV.Lock(dnsID)

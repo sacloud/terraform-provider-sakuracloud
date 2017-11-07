@@ -3,7 +3,6 @@ package sakuracloud
 import (
 	"fmt"
 	"github.com/hashicorp/terraform/helper/schema"
-	"github.com/sacloud/libsacloud/api"
 )
 
 func dataSourceSakuraCloudSSHKey() *schema.Resource {
@@ -51,8 +50,7 @@ func dataSourceSakuraCloudSSHKey() *schema.Resource {
 }
 
 func dataSourceSakuraCloudSSHKeyRead(d *schema.ResourceData, meta interface{}) error {
-	c := meta.(*api.Client)
-	client := c.Clone()
+	client := getSacloudAPIClient(d, meta)
 
 	//filters
 	if rawFilter, filterOk := d.GetOk("filter"); filterOk {

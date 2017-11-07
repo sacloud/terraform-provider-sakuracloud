@@ -6,7 +6,7 @@ import (
 	"errors"
 	"github.com/hashicorp/terraform/helper/hashcode"
 	"github.com/hashicorp/terraform/helper/schema"
-	"github.com/sacloud/libsacloud/api"
+
 	"github.com/sacloud/libsacloud/sacloud"
 	"strconv"
 	"strings"
@@ -135,7 +135,7 @@ func resourceSakuraCloudSimpleMonitor() *schema.Resource {
 }
 
 func resourceSakuraCloudSimpleMonitorCreate(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*api.Client)
+	client := meta.(*APIClient)
 
 	opts := client.SimpleMonitor.New(d.Get("target").(string))
 
@@ -219,7 +219,7 @@ func resourceSakuraCloudSimpleMonitorCreate(d *schema.ResourceData, meta interfa
 	}
 	rawTags := d.Get("tags").([]interface{})
 	if rawTags != nil {
-		opts.Tags = expandStringList(rawTags)
+		opts.Tags = expandTags(client, rawTags)
 	}
 	if d.Get("enabled").(bool) {
 		opts.Settings.SimpleMonitor.Enabled = "True"
@@ -250,7 +250,7 @@ func resourceSakuraCloudSimpleMonitorCreate(d *schema.ResourceData, meta interfa
 }
 
 func resourceSakuraCloudSimpleMonitorRead(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*api.Client)
+	client := meta.(*APIClient)
 
 	simpleMonitor, err := client.SimpleMonitor.Read(toSakuraCloudID(d.Id()))
 	if err != nil {
@@ -261,7 +261,7 @@ func resourceSakuraCloudSimpleMonitorRead(d *schema.ResourceData, meta interface
 }
 
 func resourceSakuraCloudSimpleMonitorUpdate(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*api.Client)
+	client := meta.(*APIClient)
 
 	simpleMonitor, err := client.SimpleMonitor.Read(toSakuraCloudID(d.Id()))
 	if err != nil {
@@ -357,9 +357,13 @@ func resourceSakuraCloudSimpleMonitorUpdate(d *schema.ResourceData, meta interfa
 			simpleMonitor.Description = ""
 		}
 	}
-	rawTags := d.Get("tags").([]interface{})
-	if rawTags != nil {
-		simpleMonitor.Tags = expandStringList(rawTags)
+	if d.HasChange("tags") {
+		rawTags := d.Get("tags").([]interface{})
+		if rawTags != nil {
+			simpleMonitor.Tags = expandTags(client, rawTags)
+		} else {
+			simpleMonitor.Tags = expandTags(client, []interface{}{})
+		}
 	}
 
 	//enabled
@@ -397,7 +401,7 @@ func resourceSakuraCloudSimpleMonitorUpdate(d *schema.ResourceData, meta interfa
 }
 
 func resourceSakuraCloudSimpleMonitorDelete(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*api.Client)
+	client := meta.(*APIClient)
 
 	_, err := client.SimpleMonitor.Delete(toSakuraCloudID(d.Id()))
 
@@ -469,7 +473,7 @@ func healthCheckSimpleMonitorHash(v interface{}) int {
 	return hashcode.String(hk)
 }
 
-func setSimpleMonitorResourceData(d *schema.ResourceData, _ *api.Client, data *sacloud.SimpleMonitor) error {
+func setSimpleMonitorResourceData(d *schema.ResourceData, client *APIClient, data *sacloud.SimpleMonitor) error {
 
 	d.Set("target", data.Status.Target)
 
@@ -545,7 +549,7 @@ func setSimpleMonitorResourceData(d *schema.ResourceData, _ *api.Client, data *s
 
 	d.Set("icon_id", data.GetIconStrID())
 	d.Set("description", data.Description)
-	d.Set("tags", data.Tags)
+	d.Set("tags", realTags(client, data.Tags))
 
 	d.Set("enabled", data.Settings.SimpleMonitor.Enabled)
 

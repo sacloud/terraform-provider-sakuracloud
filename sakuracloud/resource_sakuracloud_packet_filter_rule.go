@@ -3,7 +3,7 @@ package sakuracloud
 import (
 	"fmt"
 	"github.com/hashicorp/terraform/helper/schema"
-	"github.com/sacloud/libsacloud/api"
+
 	"github.com/sacloud/libsacloud/sacloud"
 	"strconv"
 )
@@ -175,7 +175,7 @@ func resourceSakuraCloudPacketFilterRuleDelete(d *schema.ResourceData, meta inte
 	return nil
 }
 
-func setPacketFilterRuleResourceData(d *schema.ResourceData, client *api.Client, data *sacloud.PacketFilter) error {
+func setPacketFilterRuleResourceData(d *schema.ResourceData, client *APIClient, data *sacloud.PacketFilter) error {
 
 	hash := d.Id()
 

@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"github.com/hashicorp/terraform/helper/resource"
 	"github.com/hashicorp/terraform/terraform"
-	"github.com/sacloud/libsacloud/api"
+
 	"testing"
 )
 
@@ -90,7 +90,7 @@ func testAccCheckSakuraCloudServerDataSourceNotExists(n string) resource.TestChe
 }
 
 func testAccCheckSakuraCloudServerDataSourceDestroy(s *terraform.State) error {
-	client := testAccProvider.Meta().(*api.Client)
+	client := testAccProvider.Meta().(*APIClient)
 
 	for _, rs := range s.RootModule().Resources {
 		if rs.Type != "sakuracloud_server" {

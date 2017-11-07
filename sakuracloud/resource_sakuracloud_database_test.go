@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"github.com/hashicorp/terraform/helper/resource"
 	"github.com/hashicorp/terraform/terraform"
-	"github.com/sacloud/libsacloud/api"
+
 	"github.com/sacloud/libsacloud/sacloud"
 	"testing"
 )
@@ -89,7 +89,7 @@ func testAccCheckSakuraCloudDatabaseExists(n string, database *sacloud.Database)
 			return errors.New("No Database ID is set")
 		}
 
-		client := testAccProvider.Meta().(*api.Client)
+		client := testAccProvider.Meta().(*APIClient)
 		originalZone := client.Zone
 		client.Zone = "is1b"
 		defer func() { client.Zone = originalZone }()
@@ -111,7 +111,7 @@ func testAccCheckSakuraCloudDatabaseExists(n string, database *sacloud.Database)
 }
 
 func testAccCheckSakuraCloudDatabaseDestroy(s *terraform.State) error {
-	client := testAccProvider.Meta().(*api.Client)
+	client := testAccProvider.Meta().(*APIClient)
 	originalZone := client.Zone
 	client.Zone = "is1b"
 	defer func() { client.Zone = originalZone }()

@@ -3,7 +3,7 @@ package sakuracloud
 import (
 	"fmt"
 	"github.com/hashicorp/terraform/helper/schema"
-	"github.com/sacloud/libsacloud/api"
+
 	"github.com/sacloud/libsacloud/sacloud"
 )
 
@@ -80,7 +80,7 @@ func resourceSakuraCloudSwitchCreate(d *schema.ResourceData, meta interface{}) e
 	}
 	rawTags := d.Get("tags").([]interface{})
 	if rawTags != nil {
-		opts.Tags = expandStringList(rawTags)
+		opts.Tags = expandTags(client, rawTags)
 	}
 
 	sw, err := client.Switch.Create(opts)
@@ -150,7 +150,9 @@ func resourceSakuraCloudSwitchUpdate(d *schema.ResourceData, meta interface{}) e
 	if d.HasChange("tags") {
 		rawTags := d.Get("tags").([]interface{})
 		if rawTags != nil {
-			sw.Tags = expandStringList(rawTags)
+			sw.Tags = expandTags(client, rawTags)
+		} else {
+			sw.Tags = expandTags(client, []interface{}{})
 		}
 	}
 
@@ -247,12 +249,12 @@ func resourceSakuraCloudSwitchDelete(d *schema.ResourceData, meta interface{}) e
 	return nil
 }
 
-func setSwitchResourceData(d *schema.ResourceData, client *api.Client, data *sacloud.Switch) error {
+func setSwitchResourceData(d *schema.ResourceData, client *APIClient, data *sacloud.Switch) error {
 
 	d.Set("name", data.Name)
 	d.Set("icon_id", data.GetIconStrID())
 	d.Set("description", data.Description)
-	d.Set("tags", data.Tags)
+	d.Set("tags", realTags(client, data.Tags))
 	if data.ServerCount > 0 {
 		servers, err := client.Switch.GetServers(toSakuraCloudID(d.Id()))
 		if err != nil {

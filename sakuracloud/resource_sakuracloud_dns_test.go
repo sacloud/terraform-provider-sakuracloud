@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"github.com/hashicorp/terraform/helper/resource"
 	"github.com/hashicorp/terraform/terraform"
-	"github.com/sacloud/libsacloud/api"
+
 	"github.com/sacloud/libsacloud/sacloud"
 	"testing"
 )
@@ -59,7 +59,7 @@ func testAccCheckSakuraCloudDNSExists(n string, dns *sacloud.DNS) resource.TestC
 			return errors.New("No DNS ID is set")
 		}
 
-		client := testAccProvider.Meta().(*api.Client)
+		client := testAccProvider.Meta().(*APIClient)
 
 		foundDNS, err := client.DNS.Read(toSakuraCloudID(rs.Primary.ID))
 
@@ -78,7 +78,7 @@ func testAccCheckSakuraCloudDNSExists(n string, dns *sacloud.DNS) resource.TestC
 }
 
 func testAccCheckSakuraCloudDNSDestroy(s *terraform.State) error {
-	client := testAccProvider.Meta().(*api.Client)
+	client := testAccProvider.Meta().(*APIClient)
 
 	for _, rs := range s.RootModule().Resources {
 		if rs.Type != "sakuracloud_dns" {

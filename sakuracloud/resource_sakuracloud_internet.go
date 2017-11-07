@@ -3,7 +3,7 @@ package sakuracloud
 import (
 	"fmt"
 	"github.com/hashicorp/terraform/helper/schema"
-	"github.com/sacloud/libsacloud/api"
+
 	"github.com/sacloud/libsacloud/sacloud"
 )
 
@@ -127,7 +127,7 @@ func resourceSakuraCloudInternetCreate(d *schema.ResourceData, meta interface{})
 	if _, ok := d.GetOk("tags"); ok {
 		rawTags := d.Get("tags").([]interface{})
 		if rawTags != nil {
-			opts.Tags = expandStringList(rawTags)
+			opts.Tags = expandTags(client, rawTags)
 		}
 	}
 
@@ -198,7 +198,9 @@ func resourceSakuraCloudInternetUpdate(d *schema.ResourceData, meta interface{})
 	if d.HasChange("tags") {
 		rawTags := d.Get("tags").([]interface{})
 		if rawTags != nil {
-			internet.Tags = expandStringList(rawTags)
+			internet.Tags = expandTags(client, rawTags)
+		} else {
+			internet.Tags = expandTags(client, []interface{}{})
 		}
 	}
 
@@ -301,12 +303,12 @@ func resourceSakuraCloudInternetDelete(d *schema.ResourceData, meta interface{})
 	return nil
 }
 
-func setInternetResourceData(d *schema.ResourceData, client *api.Client, data *sacloud.Internet) error {
+func setInternetResourceData(d *schema.ResourceData, client *APIClient, data *sacloud.Internet) error {
 
 	d.Set("name", data.Name)
 	d.Set("icon_id", data.GetIconStrID())
 	d.Set("description", data.Description)
-	d.Set("tags", data.Tags)
+	d.Set("tags", realTags(client, data.Tags))
 
 	d.Set("nw_mask_len", data.NetworkMaskLen)
 	d.Set("band_width", data.BandWidthMbps)
