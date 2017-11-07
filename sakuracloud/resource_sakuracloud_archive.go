@@ -6,7 +6,7 @@ import (
 	"github.com/hashicorp/terraform/helper/schema"
 	"github.com/mitchellh/go-homedir"
 	"github.com/sacloud/ftps"
-	"github.com/sacloud/libsacloud/api"
+
 	"github.com/sacloud/libsacloud/sacloud"
 	"io"
 	"os"
@@ -97,7 +97,7 @@ func resourceSakuraCloudArchiveCreate(d *schema.ResourceData, meta interface{}) 
 	}
 	rawTags := d.Get("tags").([]interface{})
 	if rawTags != nil {
-		opts.Tags = expandStringList(rawTags)
+		opts.Tags = expandTags(client, rawTags)
 	}
 
 	archive, err := client.Archive.Create(opts)
@@ -164,7 +164,9 @@ func resourceSakuraCloudArchiveUpdate(d *schema.ResourceData, meta interface{}) 
 	if d.HasChange("tags") {
 		rawTags := d.Get("tags").([]interface{})
 		if rawTags != nil {
-			archive.Tags = expandStringList(rawTags)
+			archive.Tags = expandTags(client, rawTags)
+		} else {
+			archive.Tags = expandTags(client, []interface{}{})
 		}
 	}
 	archive, err = client.Archive.Update(archive.ID, archive)
@@ -233,13 +235,13 @@ func resourceSakuraCloudArchiveDelete(d *schema.ResourceData, meta interface{}) 
 	return nil
 }
 
-func setArchiveResourceData(d *schema.ResourceData, client *api.Client, data *sacloud.Archive) error {
+func setArchiveResourceData(d *schema.ResourceData, client *APIClient, data *sacloud.Archive) error {
 
 	d.Set("name", data.Name)
 	d.Set("size", toSizeGB(data.SizeMB))
 	d.Set("icon_id", data.GetIconStrID())
 	d.Set("description", data.Description)
-	d.Set("tags", data.Tags)
+	d.Set("tags", realTags(client, data.Tags))
 
 	// NOTE 本来はAPIにてmd5ハッシュを取得できるのが望ましい
 	if v, ok := d.GetOk("archive_file"); ok {

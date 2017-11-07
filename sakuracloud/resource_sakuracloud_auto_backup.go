@@ -89,7 +89,7 @@ func resourceSakuraCloudAutoBackupCreate(d *schema.ResourceData, meta interface{
 
 	rawTags := d.Get("tags").([]interface{})
 	if rawTags != nil {
-		opts.Tags = expandStringList(rawTags)
+		opts.Tags = expandTags(client, rawTags)
 	}
 
 	autoBackup, err := client.AutoBackup.Create(opts)
@@ -115,7 +115,7 @@ func resourceSakuraCloudAutoBackupRead(d *schema.ResourceData, meta interface{})
 	d.Set("weekdays", autoBackup.Settings.Autobackup.BackupSpanWeekdays)
 	d.Set("icon_id", autoBackup.GetIconStrID())
 	d.Set("description", autoBackup.Description)
-	d.Set("tags", autoBackup.Tags)
+	d.Set("tags", realTags(client, autoBackup.Tags))
 	d.Set("zone", client.Zone)
 
 	return nil
@@ -156,7 +156,9 @@ func resourceSakuraCloudAutoBackupUpdate(d *schema.ResourceData, meta interface{
 	}
 	rawTags := d.Get("tags").([]interface{})
 	if rawTags != nil {
-		autoBackup.Tags = expandStringList(rawTags)
+		autoBackup.Tags = expandTags(client, rawTags)
+	} else {
+		autoBackup.Tags = expandTags(client, []interface{}{})
 	}
 
 	autoBackup, err = client.AutoBackup.Update(autoBackup.ID, autoBackup)

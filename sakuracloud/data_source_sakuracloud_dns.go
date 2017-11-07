@@ -3,7 +3,6 @@ package sakuracloud
 import (
 	"fmt"
 	"github.com/hashicorp/terraform/helper/schema"
-	"github.com/sacloud/libsacloud/api"
 )
 
 func dataSourceSakuraCloudDNS() *schema.Resource {
@@ -58,7 +57,7 @@ func dataSourceSakuraCloudDNS() *schema.Resource {
 }
 
 func dataSourceSakuraCloudDNSRead(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*api.Client)
+	client := meta.(*APIClient)
 
 	//filters
 	if rawFilter, filterOk := d.GetOk("filter"); filterOk {

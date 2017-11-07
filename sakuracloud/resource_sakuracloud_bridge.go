@@ -3,7 +3,7 @@ package sakuracloud
 import (
 	"fmt"
 	"github.com/hashicorp/terraform/helper/schema"
-	"github.com/sacloud/libsacloud/api"
+
 	"github.com/sacloud/libsacloud/sacloud"
 )
 
@@ -128,7 +128,7 @@ func resourceSakuraCloudBridgeDelete(d *schema.ResourceData, meta interface{}) e
 	return nil
 }
 
-func setBridgeResourceData(d *schema.ResourceData, client *api.Client, data *sacloud.Bridge) error {
+func setBridgeResourceData(d *schema.ResourceData, client *APIClient, data *sacloud.Bridge) error {
 	d.Set("name", data.Name)
 	d.Set("description", data.Description)
 

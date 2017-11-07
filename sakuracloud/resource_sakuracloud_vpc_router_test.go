@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"github.com/hashicorp/terraform/helper/resource"
 	"github.com/hashicorp/terraform/terraform"
-	"github.com/sacloud/libsacloud/api"
+
 	"github.com/sacloud/libsacloud/sacloud"
 	"testing"
 )
@@ -92,7 +92,7 @@ func testAccCheckSakuraCloudVPCRouterExists(n string, vpcRouter *sacloud.VPCRout
 			return errors.New("No VPCRouter ID is set")
 		}
 
-		client := testAccProvider.Meta().(*api.Client)
+		client := testAccProvider.Meta().(*APIClient)
 
 		foundVPCRouter, err := client.VPCRouter.Read(toSakuraCloudID(rs.Primary.ID))
 
@@ -111,7 +111,7 @@ func testAccCheckSakuraCloudVPCRouterExists(n string, vpcRouter *sacloud.VPCRout
 }
 
 func testAccCheckSakuraCloudVPCRouterDestroy(s *terraform.State) error {
-	client := testAccProvider.Meta().(*api.Client)
+	client := testAccProvider.Meta().(*APIClient)
 
 	for _, rs := range s.RootModule().Resources {
 		if rs.Type != "sakuracloud_vpc_router" {

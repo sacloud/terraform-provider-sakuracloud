@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"github.com/hashicorp/terraform/helper/resource"
 	"github.com/hashicorp/terraform/terraform"
-	"github.com/sacloud/libsacloud/api"
+
 	"github.com/sacloud/libsacloud/sacloud"
 	"testing"
 )
@@ -90,7 +90,7 @@ func testAccCheckSakuraCloudNoteExists(n string, note *sacloud.Note) resource.Te
 			return errors.New("No Note ID is set")
 		}
 
-		client := testAccProvider.Meta().(*api.Client)
+		client := testAccProvider.Meta().(*APIClient)
 		foundNote, err := client.Note.Read(toSakuraCloudID(rs.Primary.ID))
 
 		if err != nil {
@@ -108,7 +108,7 @@ func testAccCheckSakuraCloudNoteExists(n string, note *sacloud.Note) resource.Te
 }
 
 func testAccCheckSakuraCloudNoteDestroy(s *terraform.State) error {
-	client := testAccProvider.Meta().(*api.Client)
+	client := testAccProvider.Meta().(*APIClient)
 
 	for _, rs := range s.RootModule().Resources {
 		if rs.Type != "sakuracloud_note" {

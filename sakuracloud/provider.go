@@ -38,6 +38,16 @@ func Provider() terraform.ResourceProvider {
 				Optional:    true,
 				DefaultFunc: schema.MultiEnvDefaultFunc([]string{"SAKURACLOUD_TIMEOUT"}, 20),
 			},
+			"use_marker_tags": {
+				Type:        schema.TypeBool,
+				Optional:    true,
+				DefaultFunc: schema.EnvDefaultFunc("SAKURACLOUD_USE_MARKER_TAGS", false),
+			},
+			"marker_tag_name": {
+				Type:        schema.TypeString,
+				Optional:    true,
+				DefaultFunc: schema.EnvDefaultFunc("SAKURACLOUD_MARKER_TAG_NAME", "@terraform"),
+			},
 			"trace": {
 				Type:        schema.TypeBool,
 				Optional:    true,
@@ -122,6 +132,8 @@ func providerConfigure(d *schema.ResourceData) (interface{}, error) {
 		Zone:              d.Get("zone").(string),
 		TimeoutMinute:     d.Get("timeout").(int),
 		TraceMode:         d.Get("trace").(bool),
+		UseMarkerTags:     d.Get("use_marker_tags").(bool),
+		MarkerTagName:     d.Get("marker_tag_name").(string),
 	}
 
 	return config.NewClient(), nil

@@ -3,7 +3,7 @@ package sakuracloud
 import (
 	"fmt"
 	"github.com/hashicorp/terraform/helper/schema"
-	"github.com/sacloud/libsacloud/api"
+
 	"github.com/sacloud/libsacloud/sacloud"
 )
 
@@ -42,7 +42,7 @@ func resourceSakuraCloudSSHKey() *schema.Resource {
 }
 
 func resourceSakuraCloudSSHKeyCreate(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*api.Client)
+	client := meta.(*APIClient)
 
 	opts := client.SSHKey.New()
 
@@ -62,7 +62,7 @@ func resourceSakuraCloudSSHKeyCreate(d *schema.ResourceData, meta interface{}) e
 }
 
 func resourceSakuraCloudSSHKeyRead(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*api.Client)
+	client := meta.(*APIClient)
 	key, err := client.SSHKey.Read(toSakuraCloudID(d.Id()))
 	if err != nil {
 		return fmt.Errorf("Couldn't find SakuraCloud SSHKey resource: %s", err)
@@ -72,7 +72,7 @@ func resourceSakuraCloudSSHKeyRead(d *schema.ResourceData, meta interface{}) err
 }
 
 func resourceSakuraCloudSSHKeyUpdate(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*api.Client)
+	client := meta.(*APIClient)
 
 	key, err := client.SSHKey.Read(toSakuraCloudID(d.Id()))
 	if err != nil {
@@ -103,7 +103,7 @@ func resourceSakuraCloudSSHKeyUpdate(d *schema.ResourceData, meta interface{}) e
 }
 
 func resourceSakuraCloudSSHKeyDelete(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*api.Client)
+	client := meta.(*APIClient)
 
 	_, err := client.SSHKey.Delete(toSakuraCloudID(d.Id()))
 	if err != nil {
@@ -113,7 +113,7 @@ func resourceSakuraCloudSSHKeyDelete(d *schema.ResourceData, meta interface{}) e
 	return nil
 }
 
-func setSSHKeyResourceData(d *schema.ResourceData, _ *api.Client, data *sacloud.SSHKey) error {
+func setSSHKeyResourceData(d *schema.ResourceData, _ *APIClient, data *sacloud.SSHKey) error {
 
 	d.Set("name", data.Name)
 	d.Set("public_key", data.PublicKey)

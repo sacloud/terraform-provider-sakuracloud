@@ -5,7 +5,7 @@ import (
 
 	"github.com/hashicorp/terraform/helper/hashcode"
 	"github.com/hashicorp/terraform/helper/schema"
-	"github.com/sacloud/libsacloud/api"
+
 	"github.com/sacloud/libsacloud/sacloud"
 )
 
@@ -93,7 +93,7 @@ func resourceSakuraCloudGSLB() *schema.Resource {
 }
 
 func resourceSakuraCloudGSLBCreate(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*api.Client)
+	client := meta.(*APIClient)
 
 	opts := client.GSLB.New(d.Get("name").(string))
 
@@ -139,7 +139,7 @@ func resourceSakuraCloudGSLBCreate(d *schema.ResourceData, meta interface{}) err
 	}
 	rawTags := d.Get("tags").([]interface{})
 	if rawTags != nil {
-		opts.Tags = expandStringList(rawTags)
+		opts.Tags = expandTags(client, rawTags)
 	}
 
 	gslb, err := client.GSLB.Create(opts)
@@ -152,7 +152,7 @@ func resourceSakuraCloudGSLBCreate(d *schema.ResourceData, meta interface{}) err
 }
 
 func resourceSakuraCloudGSLBRead(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*api.Client)
+	client := meta.(*APIClient)
 
 	gslb, err := client.GSLB.Read(toSakuraCloudID(d.Id()))
 	if err != nil {
@@ -164,7 +164,7 @@ func resourceSakuraCloudGSLBRead(d *schema.ResourceData, meta interface{}) error
 
 func resourceSakuraCloudGSLBUpdate(d *schema.ResourceData, meta interface{}) error {
 
-	client := meta.(*api.Client)
+	client := meta.(*APIClient)
 
 	gslb, err := client.GSLB.Read(toSakuraCloudID(d.Id()))
 	if err != nil {
@@ -228,9 +228,13 @@ func resourceSakuraCloudGSLBUpdate(d *schema.ResourceData, meta interface{}) err
 			gslb.Description = ""
 		}
 	}
-	rawTags := d.Get("tags").([]interface{})
-	if rawTags != nil {
-		gslb.Tags = expandStringList(rawTags)
+	if d.HasChange("tags") {
+		rawTags := d.Get("tags").([]interface{})
+		if rawTags != nil {
+			gslb.Tags = expandTags(client, rawTags)
+		} else {
+			gslb.Tags = expandTags(client, []interface{}{})
+		}
 	}
 
 	gslb, err = client.GSLB.Update(gslb.ID, gslb)
@@ -244,7 +248,7 @@ func resourceSakuraCloudGSLBUpdate(d *schema.ResourceData, meta interface{}) err
 }
 
 func resourceSakuraCloudGSLBDelete(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*api.Client)
+	client := meta.(*APIClient)
 
 	_, err := client.GSLB.Delete(toSakuraCloudID(d.Id()))
 
@@ -279,7 +283,7 @@ func healthCheckHash(v interface{}) int {
 	return hashcode.String(hk)
 }
 
-func setGSLBResourceData(d *schema.ResourceData, _ *api.Client, data *sacloud.GSLB) error {
+func setGSLBResourceData(d *schema.ResourceData, client *APIClient, data *sacloud.GSLB) error {
 
 	d.Set("name", data.Name)
 	d.Set("fqdn", data.Status.FQDN)
@@ -301,7 +305,7 @@ func setGSLBResourceData(d *schema.ResourceData, _ *api.Client, data *sacloud.GS
 	d.Set("sorry_server", data.Settings.GSLB.SorryServer)
 	d.Set("icon_id", data.GetIconStrID())
 	d.Set("description", data.Description)
-	d.Set("tags", data.Tags)
+	d.Set("tags", realTags(client, data.Tags))
 	d.Set("weighted", data.Settings.GSLB.Weighted == "True")
 
 	d.SetId(data.GetStrID())

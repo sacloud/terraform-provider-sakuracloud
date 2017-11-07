@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"github.com/hashicorp/terraform/helper/resource"
 	"github.com/hashicorp/terraform/terraform"
-	"github.com/sacloud/libsacloud/api"
+
 	"github.com/sacloud/libsacloud/sacloud"
 	"testing"
 )
@@ -61,7 +61,7 @@ func testAccCheckSakuraCloudArchiveExists(n string, archive *sacloud.Archive) re
 			return errors.New("No Archive ID is set")
 		}
 
-		client := testAccProvider.Meta().(*api.Client)
+		client := testAccProvider.Meta().(*APIClient)
 		foundArchive, err := client.Archive.Read(toSakuraCloudID(rs.Primary.ID))
 
 		if err != nil {
@@ -79,7 +79,7 @@ func testAccCheckSakuraCloudArchiveExists(n string, archive *sacloud.Archive) re
 }
 
 func testAccCheckSakuraCloudArchiveDestroy(s *terraform.State) error {
-	client := testAccProvider.Meta().(*api.Client)
+	client := testAccProvider.Meta().(*APIClient)
 
 	for _, rs := range s.RootModule().Resources {
 		if rs.Type != "sakuracloud_archive" {

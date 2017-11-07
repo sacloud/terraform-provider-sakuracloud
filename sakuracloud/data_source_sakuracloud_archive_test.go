@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"github.com/hashicorp/terraform/helper/resource"
 	"github.com/hashicorp/terraform/terraform"
-	"github.com/sacloud/libsacloud/api"
 	"testing"
 )
 
@@ -89,7 +88,7 @@ func testAccCheckSakuraCloudArchiveDataSourceNotExists(n string) resource.TestCh
 }
 
 func testAccCheckSakuraCloudArchiveDataSourceDestroy(s *terraform.State) error {
-	client := testAccProvider.Meta().(*api.Client)
+	client := testAccProvider.Meta().(*APIClient)
 	originalZone := client.Zone
 	client.Zone = "tk1v"
 	defer func() { client.Zone = originalZone }()

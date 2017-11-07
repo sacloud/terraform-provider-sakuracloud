@@ -4,7 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/hashicorp/terraform/helper/schema"
-	"github.com/sacloud/libsacloud/api"
+
 	"github.com/sacloud/libsacloud/sacloud"
 )
 
@@ -101,7 +101,7 @@ func resourceSakuraCloudLoadBalancer() *schema.Resource {
 }
 
 func resourceSakuraCloudLoadBalancerCreate(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*api.Client)
+	client := meta.(*APIClient)
 
 	zone, ok := d.GetOk("zone")
 	if ok {
@@ -138,7 +138,7 @@ func resourceSakuraCloudLoadBalancerCreate(d *schema.ResourceData, meta interfac
 	}
 	if rawTags, ok := d.GetOk("tags"); ok {
 		if rawTags != nil {
-			opts.Tags = expandStringList(rawTags.([]interface{}))
+			opts.Tags = expandTags(client, rawTags.([]interface{}))
 		}
 	}
 
@@ -230,9 +230,9 @@ func resourceSakuraCloudLoadBalancerUpdate(d *schema.ResourceData, meta interfac
 	if d.HasChange("tags") {
 		rawTags := d.Get("tags").([]interface{})
 		if rawTags != nil {
-			loadBalancer.Tags = expandStringList(rawTags)
+			loadBalancer.Tags = expandTags(client, rawTags)
 		} else {
-			loadBalancer.Tags = []string{}
+			loadBalancer.Tags = expandTags(client, []interface{}{})
 		}
 	}
 
@@ -261,7 +261,7 @@ func resourceSakuraCloudLoadBalancerDelete(d *schema.ResourceData, meta interfac
 	return nil
 }
 
-func setLoadBalancerResourceData(d *schema.ResourceData, client *api.Client, data *sacloud.LoadBalancer) error {
+func setLoadBalancerResourceData(d *schema.ResourceData, client *APIClient, data *sacloud.LoadBalancer) error {
 
 	d.Set("switch_id", data.Switch.GetStrID())
 	d.Set("vrid", data.Remark.VRRP.VRID)
@@ -280,7 +280,7 @@ func setLoadBalancerResourceData(d *schema.ResourceData, client *api.Client, dat
 	d.Set("name", data.Name)
 	d.Set("icon_id", data.GetIconStrID())
 	d.Set("description", data.Description)
-	d.Set("tags", data.Tags)
+	d.Set("tags", realTags(client, data.Tags))
 
 	d.Set("vip_ids", []string{})
 	if data.Settings != nil && data.Settings.LoadBalancer != nil {

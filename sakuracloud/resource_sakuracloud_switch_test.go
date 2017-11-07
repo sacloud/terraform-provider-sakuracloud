@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"github.com/hashicorp/terraform/helper/resource"
 	"github.com/hashicorp/terraform/terraform"
-	"github.com/sacloud/libsacloud/api"
+
 	"github.com/sacloud/libsacloud/sacloud"
 	"testing"
 )
@@ -80,7 +80,7 @@ func testAccCheckSakuraCloudSwitchExists(n string, sw *sacloud.Switch) resource.
 			return errors.New("No Switch ID is set")
 		}
 
-		client := testAccProvider.Meta().(*api.Client)
+		client := testAccProvider.Meta().(*APIClient)
 
 		foundSwitch, err := client.Switch.Read(toSakuraCloudID(rs.Primary.ID))
 
@@ -99,7 +99,7 @@ func testAccCheckSakuraCloudSwitchExists(n string, sw *sacloud.Switch) resource.
 }
 
 func testAccCheckSakuraCloudSwitchDestroy(s *terraform.State) error {
-	client := testAccProvider.Meta().(*api.Client)
+	client := testAccProvider.Meta().(*APIClient)
 
 	for _, rs := range s.RootModule().Resources {
 		if rs.Type != "sakuracloud_switch" {

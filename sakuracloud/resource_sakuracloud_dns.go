@@ -4,7 +4,7 @@ import (
 	"fmt"
 
 	"github.com/hashicorp/terraform/helper/schema"
-	"github.com/sacloud/libsacloud/api"
+
 	"github.com/sacloud/libsacloud/sacloud"
 )
 
@@ -49,7 +49,7 @@ func resourceSakuraCloudDNS() *schema.Resource {
 }
 
 func resourceSakuraCloudDNSCreate(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*api.Client)
+	client := meta.(*APIClient)
 
 	opts := client.DNS.New(d.Get("zone").(string))
 	if iconID, ok := d.GetOk("icon_id"); ok {
@@ -60,7 +60,7 @@ func resourceSakuraCloudDNSCreate(d *schema.ResourceData, meta interface{}) erro
 	}
 	rawTags := d.Get("tags").([]interface{})
 	if rawTags != nil {
-		opts.Tags = expandStringList(rawTags)
+		opts.Tags = expandTags(client, rawTags)
 	}
 
 	dns, err := client.DNS.Create(opts)
@@ -73,7 +73,7 @@ func resourceSakuraCloudDNSCreate(d *schema.ResourceData, meta interface{}) erro
 }
 
 func resourceSakuraCloudDNSRead(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*api.Client)
+	client := meta.(*APIClient)
 
 	dns, err := client.DNS.Read(toSakuraCloudID(d.Id()))
 	if err != nil {
@@ -84,7 +84,7 @@ func resourceSakuraCloudDNSRead(d *schema.ResourceData, meta interface{}) error 
 }
 
 func resourceSakuraCloudDNSUpdate(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*api.Client)
+	client := meta.(*APIClient)
 
 	opts, err := client.DNS.Read(toSakuraCloudID(d.Id()))
 	if err != nil {
@@ -108,9 +108,9 @@ func resourceSakuraCloudDNSUpdate(d *schema.ResourceData, meta interface{}) erro
 	if d.HasChange("tags") {
 		rawTags := d.Get("tags").([]interface{})
 		if rawTags == nil {
-			opts.Tags = []string{}
+			opts.Tags = expandTags(client, []interface{}{})
 		} else {
-			opts.Tags = expandStringList(rawTags)
+			opts.Tags = expandTags(client, rawTags)
 		}
 
 	}
@@ -125,7 +125,7 @@ func resourceSakuraCloudDNSUpdate(d *schema.ResourceData, meta interface{}) erro
 }
 
 func resourceSakuraCloudDNSDelete(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*api.Client)
+	client := meta.(*APIClient)
 
 	_, err := client.DNS.Delete(toSakuraCloudID(d.Id()))
 
@@ -136,12 +136,12 @@ func resourceSakuraCloudDNSDelete(d *schema.ResourceData, meta interface{}) erro
 	return nil
 }
 
-func setDNSResourceData(d *schema.ResourceData, _ *api.Client, data *sacloud.DNS) error {
+func setDNSResourceData(d *schema.ResourceData, client *APIClient, data *sacloud.DNS) error {
 
 	d.Set("zone", data.Name)
 	d.Set("icon_id", data.GetIconStrID())
 	d.Set("description", data.Description)
-	d.Set("tags", data.Tags)
+	d.Set("tags", realTags(client, data.Tags))
 	d.Set("dns_servers", data.Status.NS)
 
 	d.SetId(data.GetStrID())

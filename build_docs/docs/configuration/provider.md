@@ -9,6 +9,10 @@ provider "sakuracloud" {
   token  = "your API token"
   secret = "your API secret"
   zone   = "target zone"
+  #timeout = 20  # 単位:分
+  # trace = false
+  # use_marker_tags = false
+  # marker_tag_name = "@terraform"
 }
 ```
 
@@ -16,13 +20,15 @@ provider "sakuracloud" {
 
 以下のパラメーターをサポートしています。
 
-|パラメーター|必須  |名称                |初期値     |設定値 |説明                                          |
-|----------|:---:|--------------------|:--------:|------|----------------------------------------------|
-|`token`   | ◯  |APIキー<br />(トークン)     | -        |文字列|環境変数`SAKURACLOUD_ACCESS_TOKEN`での指定も可         |
-|`secret`  | ◯  |APIキー<br />(シークレット)  | -        |文字列|環境変数`SAKURACLOUD_ACCESS_TOKEN_SECRET`での指定も可  |
-|`zone`    | -   | 対象ゾーン           | `is1b`   |`is1b`<br />`tk1a`<br />`tk1v`|環境変数`SAKURACLOUD_ZONE`での指定も可|
-|`timeout` | -   | タイムアウト         | `20`     | 数値(分) |環境変数`SAKURACLOUD_TIMEOUT`での指定も可|
-|`trace`   | -   | トレースフラグ       | `false`     |`true`<br />`false`|(開発者向け)詳細ログの出力ON/OFFを指定します。 <br />環境変数`SAKURACLOUD_TRACE_MODE`での指定も可|
+|パラメーター       |必須  |名称                |初期値     |設定値 |説明                                          |
+|-----------------|:---:|--------------------|:--------:|------|----------------------------------------------|
+|`token`          | ◯   | APIキー<br />(トークン)     | -        |文字列|環境変数`SAKURACLOUD_ACCESS_TOKEN`での指定も可         |
+|`secret`         | ◯   | APIキー<br />(シークレット)  | -        |文字列|環境変数`SAKURACLOUD_ACCESS_TOKEN_SECRET`での指定も可  |
+|`zone`           | -   | 対象ゾーン           | `is1b`   |`is1b`<br />`tk1a`<br />`tk1v`|環境変数`SAKURACLOUD_ZONE`での指定も可|
+|`timeout`        | -   | タイムアウト         | `20`     | 数値(分) |環境変数`SAKURACLOUD_TIMEOUT`での指定も可|
+|`trace`          | -   | トレースフラグ       | `false`     |`true`<br />`false`|(開発者向け)詳細ログの出力ON/OFFを指定します。 <br />環境変数`SAKURACLOUD_TRACE_MODE`での指定も可|
+|`use_marker_tags`| -   | マーカータグ利用有無  | `false`     |`true`<br />`false`|Terraformで作成されたリソースであるかの判別用に全てのリソースにタグを付与するかを指定<br />環境変数`SAKURACLOUD_USE_MARKER_TAGS`での指定も可|
+|`marker_tag_name`| -   | マーカータグ名       | `@terraform`|文字列|`use_marker_tags`がtrueの場合のタグ名 <br />環境変数`SAKURACLOUD_MARKER_TAG_NAME`での指定も可|
 
 各パラメータとも環境変数での指定が可能です。
 
@@ -34,3 +40,8 @@ provider "sakuracloud" {
 $ export SAKURACLOUD_ACCESS_TOKEN="取得したAPIトークン"
 $ export SAKURACLOUD_ACCESS_TOKEN_SECRET="取得したAPIシークレット"
 ```
+
+#### マーカータグについて
+
+`use_marker_tags`にtrueを指定することで全てのリソースに対しタグを付与することが可能です。(デフォルトは`@terraform`)  
+ただし、パケットフィルタなどのタグの指定をサポートしていないリソースについては対象外となっています。

@@ -3,7 +3,7 @@ package sakuracloud
 import (
 	"fmt"
 	"github.com/hashicorp/terraform/helper/schema"
-	"github.com/sacloud/libsacloud/api"
+
 	"github.com/sacloud/libsacloud/sacloud"
 )
 
@@ -54,7 +54,7 @@ func resourceSakuraCloudNote() *schema.Resource {
 }
 
 func resourceSakuraCloudNoteCreate(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*api.Client)
+	client := meta.(*APIClient)
 
 	opts := client.Note.New()
 
@@ -77,7 +77,7 @@ func resourceSakuraCloudNoteCreate(d *schema.ResourceData, meta interface{}) err
 	}
 	if rawTags, ok := d.GetOk("tags"); ok {
 		if rawTags != nil {
-			opts.Tags = expandStringList(rawTags.([]interface{}))
+			opts.Tags = expandTags(client, rawTags.([]interface{}))
 		}
 	}
 
@@ -91,7 +91,7 @@ func resourceSakuraCloudNoteCreate(d *schema.ResourceData, meta interface{}) err
 }
 
 func resourceSakuraCloudNoteRead(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*api.Client)
+	client := meta.(*APIClient)
 	note, err := client.Note.Read(toSakuraCloudID(d.Id()))
 	if err != nil {
 		return fmt.Errorf("Couldn't find SakuraCloud Note resource: %s", err)
@@ -101,7 +101,7 @@ func resourceSakuraCloudNoteRead(d *schema.ResourceData, meta interface{}) error
 }
 
 func resourceSakuraCloudNoteUpdate(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*api.Client)
+	client := meta.(*APIClient)
 
 	note, err := client.Note.Read(toSakuraCloudID(d.Id()))
 	if err != nil {
@@ -141,9 +141,9 @@ func resourceSakuraCloudNoteUpdate(d *schema.ResourceData, meta interface{}) err
 	if d.HasChange("tags") {
 		rawTags := d.Get("tags").([]interface{})
 		if rawTags != nil {
-			note.Tags = expandStringList(rawTags)
+			note.Tags = expandTags(client, rawTags)
 		} else {
-			note.Tags = []string{}
+			note.Tags = expandTags(client, []interface{}{})
 		}
 	}
 
@@ -157,7 +157,7 @@ func resourceSakuraCloudNoteUpdate(d *schema.ResourceData, meta interface{}) err
 }
 
 func resourceSakuraCloudNoteDelete(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*api.Client)
+	client := meta.(*APIClient)
 
 	_, err := client.Note.Delete(toSakuraCloudID(d.Id()))
 	if err != nil {
@@ -167,14 +167,14 @@ func resourceSakuraCloudNoteDelete(d *schema.ResourceData, meta interface{}) err
 	return nil
 }
 
-func setNoteResourceData(d *schema.ResourceData, _ *api.Client, data *sacloud.Note) error {
+func setNoteResourceData(d *schema.ResourceData, client *APIClient, data *sacloud.Note) error {
 
 	d.Set("name", data.Name)
 	d.Set("content", data.Content)
 	d.Set("class", data.Class)
 	d.Set("icon_id", data.GetIconStrID())
 	d.Set("description", data.Description)
-	d.Set("tags", data.Tags)
+	d.Set("tags", realTags(client, data.Tags))
 
 	d.SetId(data.GetStrID())
 	return nil

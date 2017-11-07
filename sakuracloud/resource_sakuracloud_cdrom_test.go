@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"github.com/hashicorp/terraform/helper/resource"
 	"github.com/hashicorp/terraform/terraform"
-	"github.com/sacloud/libsacloud/api"
+
 	"github.com/sacloud/libsacloud/sacloud"
 	"testing"
 )
@@ -81,7 +81,7 @@ func testAccCheckSakuraCloudCDROMExists(n string, cdrom *sacloud.CDROM) resource
 			return errors.New("No CDROM ID is set")
 		}
 
-		client := testAccProvider.Meta().(*api.Client)
+		client := testAccProvider.Meta().(*APIClient)
 		foundCDROM, err := client.CDROM.Read(toSakuraCloudID(rs.Primary.ID))
 
 		if err != nil {
@@ -99,7 +99,7 @@ func testAccCheckSakuraCloudCDROMExists(n string, cdrom *sacloud.CDROM) resource
 }
 
 func testAccCheckSakuraCloudCDROMDestroy(s *terraform.State) error {
-	client := testAccProvider.Meta().(*api.Client)
+	client := testAccProvider.Meta().(*APIClient)
 
 	for _, rs := range s.RootModule().Resources {
 		if rs.Type != "sakuracloud_cdrom" {

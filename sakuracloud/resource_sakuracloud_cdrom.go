@@ -7,7 +7,7 @@ import (
 	"github.com/mitchellh/go-homedir"
 	"github.com/sacloud/ftps"
 	"github.com/sacloud/iso9660wrap"
-	"github.com/sacloud/libsacloud/api"
+
 	"github.com/sacloud/libsacloud/sacloud"
 	"io"
 	"io/ioutil"
@@ -110,7 +110,7 @@ func resourceSakuraCloudCDROMCreate(d *schema.ResourceData, meta interface{}) er
 	}
 	rawTags := d.Get("tags").([]interface{})
 	if rawTags != nil {
-		opts.Tags = expandStringList(rawTags)
+		opts.Tags = expandTags(client, rawTags)
 	}
 
 	cdrom, ftpServer, err := client.CDROM.Create(opts)
@@ -172,7 +172,9 @@ func resourceSakuraCloudCDROMUpdate(d *schema.ResourceData, meta interface{}) er
 	if d.HasChange("tags") {
 		rawTags := d.Get("tags").([]interface{})
 		if rawTags != nil {
-			cdrom.Tags = expandStringList(rawTags)
+			cdrom.Tags = expandTags(client, rawTags)
+		} else {
+			cdrom.Tags = expandTags(client, []interface{}{})
 		}
 	}
 	cdrom, err = client.CDROM.Update(cdrom.ID, cdrom)
@@ -271,13 +273,13 @@ func resourceSakuraCloudCDROMDelete(d *schema.ResourceData, meta interface{}) er
 	return nil
 }
 
-func setCDROMResourceData(d *schema.ResourceData, client *api.Client, data *sacloud.CDROM) error {
+func setCDROMResourceData(d *schema.ResourceData, client *APIClient, data *sacloud.CDROM) error {
 
 	d.Set("name", data.Name)
 	d.Set("size", toSizeGB(data.SizeMB))
 	d.Set("icon_id", data.GetIconStrID())
 	d.Set("description", data.Description)
-	d.Set("tags", data.Tags)
+	d.Set("tags", realTags(client, data.Tags))
 
 	// NOTE 本来はAPIにてmd5ハッシュを取得できるのが望ましい
 	if v, ok := d.GetOk("iso_image_file"); ok {

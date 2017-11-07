@@ -3,7 +3,7 @@ package sakuracloud
 import (
 	"fmt"
 	"github.com/hashicorp/terraform/helper/schema"
-	"github.com/sacloud/libsacloud/api"
+
 	"github.com/sacloud/libsacloud/sacloud"
 	"log"
 )
@@ -159,7 +159,7 @@ func resourceSakuraCloudDiskCreate(d *schema.ResourceData, meta interface{}) err
 	}
 	rawTags := d.Get("tags").([]interface{})
 	if rawTags != nil {
-		opts.Tags = expandStringList(rawTags)
+		opts.Tags = expandTags(client, rawTags)
 	}
 
 	disk, err := client.Disk.Create(opts)
@@ -330,7 +330,9 @@ func resourceSakuraCloudDiskUpdate(d *schema.ResourceData, meta interface{}) err
 	if d.HasChange("tags") {
 		rawTags := d.Get("tags").([]interface{})
 		if rawTags != nil {
-			disk.Tags = expandStringList(rawTags)
+			disk.Tags = expandTags(client, rawTags)
+		} else {
+			disk.Tags = expandTags(client, []interface{}{})
 		}
 	}
 
@@ -401,7 +403,7 @@ func resourceSakuraCloudDiskDelete(d *schema.ResourceData, meta interface{}) err
 	return nil
 }
 
-func setDiskResourceData(d *schema.ResourceData, client *api.Client, data *sacloud.Disk) error {
+func setDiskResourceData(d *schema.ResourceData, client *APIClient, data *sacloud.Disk) error {
 
 	d.Set("name", data.Name)
 
@@ -419,7 +421,7 @@ func setDiskResourceData(d *schema.ResourceData, client *api.Client, data *saclo
 	d.Set("size", toSizeGB(data.SizeMB))
 	d.Set("icon_id", data.GetIconStrID())
 	d.Set("description", data.Description)
-	d.Set("tags", data.Tags)
+	d.Set("tags", realTags(client, data.Tags))
 
 	if data.Server == nil {
 		d.Set("server_id", "")

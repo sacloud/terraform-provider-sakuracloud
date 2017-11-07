@@ -170,7 +170,7 @@ func resourceSakuraCloudVPCRouterCreate(d *schema.ResourceData, meta interface{}
 	}
 	rawTags := d.Get("tags").([]interface{})
 	if rawTags != nil {
-		opts.Tags = expandStringList(rawTags)
+		opts.Tags = expandTags(client, rawTags)
 	}
 
 	if syslogHost, ok := d.GetOk("syslog_host"); ok {
@@ -217,7 +217,7 @@ func resourceSakuraCloudVPCRouterRead(d *schema.ResourceData, meta interface{}) 
 	} else {
 		d.Set("syslog_host", "")
 	}
-	d.Set("tags", vpcRouter.Tags)
+	d.Set("tags", realTags(client, vpcRouter.Tags))
 
 	//plan
 	planID := vpcRouter.Plan.ID
@@ -278,7 +278,9 @@ func resourceSakuraCloudVPCRouterUpdate(d *schema.ResourceData, meta interface{}
 	if d.HasChange("tags") {
 		rawTags := d.Get("tags").([]interface{})
 		if rawTags != nil {
-			vpcRouter.Tags = expandStringList(rawTags)
+			vpcRouter.Tags = expandTags(client, rawTags)
+		} else {
+			vpcRouter.Tags = expandTags(client, []interface{}{})
 		}
 	}
 	if d.HasChange("syslog_host") {

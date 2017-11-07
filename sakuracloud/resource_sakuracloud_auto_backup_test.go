@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"github.com/hashicorp/terraform/helper/resource"
 	"github.com/hashicorp/terraform/terraform"
-	"github.com/sacloud/libsacloud/api"
+
 	"github.com/sacloud/libsacloud/sacloud"
 	"testing"
 )
@@ -71,7 +71,7 @@ func testAccCheckSakuraCloudAutoBackupExists(n string, auto_backup *sacloud.Auto
 			return errors.New("No AutoBackup ID is set")
 		}
 
-		client := testAccProvider.Meta().(*api.Client)
+		client := testAccProvider.Meta().(*APIClient)
 		originalZone := client.Zone
 		client.Zone = "is1b"
 		defer func() { client.Zone = originalZone }()
@@ -93,7 +93,7 @@ func testAccCheckSakuraCloudAutoBackupExists(n string, auto_backup *sacloud.Auto
 }
 
 func testAccCheckSakuraCloudAutoBackupDestroy(s *terraform.State) error {
-	client := testAccProvider.Meta().(*api.Client)
+	client := testAccProvider.Meta().(*APIClient)
 	originalZone := client.Zone
 	client.Zone = "is1b"
 	defer func() { client.Zone = originalZone }()

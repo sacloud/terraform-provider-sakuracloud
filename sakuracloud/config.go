@@ -1,7 +1,7 @@
 package sakuracloud
 
 import (
-	API "github.com/sacloud/libsacloud/api"
+	"github.com/sacloud/libsacloud/api"
 	"time"
 )
 
@@ -12,11 +12,19 @@ type Config struct {
 	Zone              string
 	TimeoutMinute     int
 	TraceMode         bool
+	UseMarkerTags     bool
+	MarkerTagName     string
+}
+
+// APIClient for SakuraCloud API
+type APIClient struct {
+	*api.Client
+	MarkerTagName string
 }
 
 // NewClient returns new API Client for SakuraCloud
-func (c *Config) NewClient() *API.Client {
-	client := API.NewClient(c.AccessToken, c.AccessTokenSecret, c.Zone)
+func (c *Config) NewClient() *APIClient {
+	client := api.NewClient(c.AccessToken, c.AccessTokenSecret, c.Zone)
 
 	if c.TimeoutMinute > 0 {
 		client.DefaultTimeoutDuration = time.Duration(c.TimeoutMinute) * time.Minute
@@ -26,5 +34,14 @@ func (c *Config) NewClient() *API.Client {
 		client.TraceMode = true
 	}
 	client.UserAgent = "Terraform for SakuraCloud/v" + Version
-	return client
+
+	markerTagName := ""
+	if c.UseMarkerTags {
+		markerTagName = c.MarkerTagName
+	}
+
+	return &APIClient{
+		Client:        client,
+		MarkerTagName: markerTagName,
+	}
 }
