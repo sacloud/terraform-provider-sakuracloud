@@ -16,6 +16,7 @@ type ArchiveAPI struct {
 
 var (
 	archiveLatestStableCentOSTags                      = []string{"current-stable", "distro-centos"}
+	archiveLatestStableCentOS6Tags                     = []string{"distro-centos", "distro-ver-6.9"}
 	archiveLatestStableUbuntuTags                      = []string{"current-stable", "distro-ubuntu"}
 	archiveLatestStableDebianTags                      = []string{"current-stable", "distro-debian"}
 	archiveLatestStableVyOSTags                        = []string{"current-stable", "distro-vyos"}
@@ -47,6 +48,7 @@ func NewArchiveAPI(client *Client) *ArchiveAPI {
 
 	api.findFuncMapPerOSType = map[ostype.ArchiveOSTypes]func() (*sacloud.Archive, error){
 		ostype.CentOS:                          api.FindLatestStableCentOS,
+		ostype.CentOS6:                         api.FindLatestStableCentOS6,
 		ostype.Ubuntu:                          api.FindLatestStableUbuntu,
 		ostype.Debian:                          api.FindLatestStableDebian,
 		ostype.VyOS:                            api.FindLatestStableVyOS,
@@ -231,6 +233,11 @@ func (api *ArchiveAPI) GetPublicArchiveIDFromAncestors(id int64) (int64, bool) {
 // FindLatestStableCentOS 安定版最新のCentOSパブリックアーカイブを取得
 func (api *ArchiveAPI) FindLatestStableCentOS() (*sacloud.Archive, error) {
 	return api.findByOSTags(archiveLatestStableCentOSTags)
+}
+
+// FindLatestStableCentOS6 安定版最新のCentOS6パブリックアーカイブを取得
+func (api *ArchiveAPI) FindLatestStableCentOS6() (*sacloud.Archive, error) {
+	return api.findByOSTags(archiveLatestStableCentOS6Tags)
 }
 
 // FindLatestStableDebian 安定版最新のDebianパブリックアーカイブを取得

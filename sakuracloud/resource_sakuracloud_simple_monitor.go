@@ -7,6 +7,7 @@ import (
 	"github.com/hashicorp/terraform/helper/hashcode"
 	"github.com/hashicorp/terraform/helper/schema"
 
+	"github.com/sacloud/libsacloud/api"
 	"github.com/sacloud/libsacloud/sacloud"
 	"strconv"
 	"strings"
@@ -254,6 +255,10 @@ func resourceSakuraCloudSimpleMonitorRead(d *schema.ResourceData, meta interface
 
 	simpleMonitor, err := client.SimpleMonitor.Read(toSakuraCloudID(d.Id()))
 	if err != nil {
+		if sacloudErr, ok := err.(api.Error); ok && sacloudErr.ResponseCode() == 404 {
+			d.SetId("")
+			return nil
+		}
 		return fmt.Errorf("Couldn't find SakuraCloud SimpleMonitor resource: %s", err)
 	}
 

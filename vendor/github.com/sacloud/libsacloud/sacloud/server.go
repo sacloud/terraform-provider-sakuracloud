@@ -57,11 +57,21 @@ type MouseRequestButtons struct {
 // VNCProxyResponse VNCプロキシ取得レスポンス
 type VNCProxyResponse struct {
 	*ResultFlagValue
-	Status   string `json:",omitempty"` // ステータス
-	Host     string `json:",omitempty"` // プロキシホスト
-	Port     string `json:",omitempty"` // ポート番号
-	Password string `json:",omitempty"` // VNCパスワード
-	VNCFile  string `json:",omitempty"` // VNC接続情報ファイル(VNCビューア用)
+	Status       string `json:",omitempty"` // ステータス
+	Host         string `json:",omitempty"` // プロキシホスト
+	IOServerHost string `json:",omitempty"` // 新プロキシホスト(Hostがlocalhostの場合にこちらを利用する)
+	Port         string `json:",omitempty"` // ポート番号
+	Password     string `json:",omitempty"` // VNCパスワード
+	VNCFile      string `json:",omitempty"` // VNC接続情報ファイル(VNCビューア用)
+}
+
+// ActualHost プロキシホスト名(Host or IOServerHost)を返す
+func (r *VNCProxyResponse) ActualHost() string {
+	host := r.Host
+	if host == "localhost" {
+		host = r.IOServerHost
+	}
+	return host
 }
 
 // VNCSizeResponse VNC画面サイズレスポンス

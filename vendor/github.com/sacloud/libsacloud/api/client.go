@@ -171,7 +171,7 @@ func (c *Client) newRequest(method, uri string, body interface{}) ([]byte, error
 		if err != nil {
 			return nil, fmt.Errorf("Error in response: %s", string(data))
 		}
-		return nil, fmt.Errorf("Error in response: %#v", errResponse)
+		return nil, NewError(resp.StatusCode, errResponse)
 
 	}
 	if err != nil {

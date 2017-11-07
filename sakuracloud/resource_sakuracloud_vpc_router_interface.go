@@ -7,6 +7,7 @@ import (
 	"errors"
 	"github.com/hashicorp/terraform/helper/hashcode"
 	"github.com/hashicorp/terraform/helper/schema"
+	"github.com/sacloud/libsacloud/api"
 	"time"
 )
 
@@ -162,6 +163,10 @@ func resourceSakuraCloudVPCRouterInterfaceRead(d *schema.ResourceData, meta inte
 
 	vpcRouter, err := client.VPCRouter.Read(toSakuraCloudID(d.Get("vpc_router_id").(string)))
 	if err != nil {
+		if sacloudErr, ok := err.(api.Error); ok && sacloudErr.ResponseCode() == 404 {
+			d.SetId("")
+			return nil
+		}
 		return fmt.Errorf("Couldn't find SakuraCloud VPCRouterInterface resource: %s", err)
 	}
 

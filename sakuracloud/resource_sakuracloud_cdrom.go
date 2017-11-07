@@ -8,6 +8,7 @@ import (
 	"github.com/sacloud/ftps"
 	"github.com/sacloud/iso9660wrap"
 
+	"github.com/sacloud/libsacloud/api"
 	"github.com/sacloud/libsacloud/sacloud"
 	"io"
 	"io/ioutil"
@@ -139,6 +140,10 @@ func resourceSakuraCloudCDROMRead(d *schema.ResourceData, meta interface{}) erro
 
 	cdrom, err := client.CDROM.Read(toSakuraCloudID(d.Id()))
 	if err != nil {
+		if sacloudErr, ok := err.(api.Error); ok && sacloudErr.ResponseCode() == 404 {
+			d.SetId("")
+			return nil
+		}
 		return fmt.Errorf("Couldn't find SakuraCloud CDROM resource: %s", err)
 	}
 
