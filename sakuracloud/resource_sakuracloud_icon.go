@@ -6,6 +6,7 @@ import (
 	"github.com/hashicorp/terraform/helper/schema"
 	"github.com/mitchellh/go-homedir"
 
+	"github.com/sacloud/libsacloud/api"
 	"github.com/sacloud/libsacloud/sacloud"
 	"io/ioutil"
 	"os"
@@ -104,6 +105,10 @@ func resourceSakuraCloudIconRead(d *schema.ResourceData, meta interface{}) error
 	client := meta.(*APIClient)
 	icon, err := client.Icon.Read(toSakuraCloudID(d.Id()))
 	if err != nil {
+		if sacloudErr, ok := err.(api.Error); ok && sacloudErr.ResponseCode() == 404 {
+			d.SetId("")
+			return nil
+		}
 		return fmt.Errorf("Couldn't find SakuraCloud Icon resource: %s", err)
 	}
 

@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/hashicorp/terraform/helper/schema"
 
+	"github.com/sacloud/libsacloud/api"
 	"github.com/sacloud/libsacloud/sacloud"
 	"strings"
 )
@@ -214,6 +215,10 @@ func resourceSakuraCloudDatabaseRead(d *schema.ResourceData, meta interface{}) e
 
 	data, err := client.Database.Read(toSakuraCloudID(d.Id()))
 	if err != nil {
+		if sacloudErr, ok := err.(api.Error); ok && sacloudErr.ResponseCode() == 404 {
+			d.SetId("")
+			return nil
+		}
 		return fmt.Errorf("Couldn't find SakuraCloud Database resource: %s", err)
 	}
 

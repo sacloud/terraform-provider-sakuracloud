@@ -3,6 +3,7 @@ package sakuracloud
 import (
 	"fmt"
 	"github.com/hashicorp/terraform/helper/schema"
+	"github.com/sacloud/libsacloud/api"
 )
 
 func resourceSakuraCloudServerConnector() *schema.Resource {
@@ -187,6 +188,10 @@ func resourceSakuraCloudServerConnectorRead(d *schema.ResourceData, meta interfa
 
 	data, err := client.Server.Read(toSakuraCloudID(d.Id()))
 	if err != nil {
+		if sacloudErr, ok := err.(api.Error); ok && sacloudErr.ResponseCode() == 404 {
+			d.SetId("")
+			return nil
+		}
 		return fmt.Errorf("Couldn't find SakuraCloud ServerConnector resource: %s", err)
 	}
 

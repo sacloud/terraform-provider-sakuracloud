@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/hashicorp/terraform/helper/schema"
 
+	"github.com/sacloud/libsacloud/api"
 	"github.com/sacloud/libsacloud/sacloud"
 	"strconv"
 )
@@ -79,6 +80,10 @@ func resourceSakuraCloudPacketFilterRuleRead(d *schema.ResourceData, meta interf
 
 	filter, err := client.PacketFilter.Read(toSakuraCloudID(pfID))
 	if err != nil {
+		if sacloudErr, ok := err.(api.Error); ok && sacloudErr.ResponseCode() == 404 {
+			d.SetId("")
+			return nil
+		}
 		return fmt.Errorf("Couldn't find SakuraCloud PacketFilter resource: %s", err)
 	}
 

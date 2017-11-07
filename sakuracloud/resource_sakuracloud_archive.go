@@ -6,7 +6,7 @@ import (
 	"github.com/hashicorp/terraform/helper/schema"
 	"github.com/mitchellh/go-homedir"
 	"github.com/sacloud/ftps"
-
+	"github.com/sacloud/libsacloud/api"
 	"github.com/sacloud/libsacloud/sacloud"
 	"io"
 	"os"
@@ -131,6 +131,10 @@ func resourceSakuraCloudArchiveRead(d *schema.ResourceData, meta interface{}) er
 
 	archive, err := client.Archive.Read(toSakuraCloudID(d.Id()))
 	if err != nil {
+		if sacloudErr, ok := err.(api.Error); ok && sacloudErr.ResponseCode() == 404 {
+			d.SetId("")
+			return nil
+		}
 		return fmt.Errorf("Couldn't find SakuraCloud Archive resource: %s", err)
 	}
 

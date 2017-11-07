@@ -6,6 +6,7 @@ import (
 	"github.com/hashicorp/terraform/helper/hashcode"
 	"github.com/hashicorp/terraform/helper/schema"
 
+	"github.com/sacloud/libsacloud/api"
 	"github.com/sacloud/libsacloud/sacloud"
 )
 
@@ -156,6 +157,10 @@ func resourceSakuraCloudGSLBRead(d *schema.ResourceData, meta interface{}) error
 
 	gslb, err := client.GSLB.Read(toSakuraCloudID(d.Id()))
 	if err != nil {
+		if sacloudErr, ok := err.(api.Error); ok && sacloudErr.ResponseCode() == 404 {
+			d.SetId("")
+			return nil
+		}
 		return fmt.Errorf("Couldn't find SakuraCloud GSLB resource: %s", err)
 	}
 

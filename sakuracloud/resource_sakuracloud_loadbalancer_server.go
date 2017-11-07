@@ -6,6 +6,7 @@ import (
 	"bytes"
 	"github.com/hashicorp/terraform/helper/hashcode"
 	"github.com/hashicorp/terraform/helper/schema"
+	"github.com/sacloud/libsacloud/api"
 	"github.com/sacloud/libsacloud/sacloud"
 	"strings"
 )
@@ -129,6 +130,10 @@ func resourceSakuraCloudLoadBalancerServerRead(d *schema.ResourceData, meta inte
 
 	loadBalancer, err := client.LoadBalancer.Read(toSakuraCloudID(lbID))
 	if err != nil {
+		if sacloudErr, ok := err.(api.Error); ok && sacloudErr.ResponseCode() == 404 {
+			d.SetId("")
+			return nil
+		}
 		return fmt.Errorf("Couldn't find SakuraCloud LoadBalancer resource: %s", err)
 	}
 
