@@ -5,11 +5,10 @@ import (
 	"fmt"
 	"github.com/hashicorp/terraform/helper/resource"
 	"github.com/hashicorp/terraform/terraform"
-
 	"testing"
 )
 
-func TestAccSakuraCloudInternetDataSource_Basic(t *testing.T) {
+func TestAccSakuraCloudDataSourceInternet_Basic(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck:                  func() { testAccPreCheck(t) },
 		Providers:                 testAccProviders,
@@ -38,25 +37,50 @@ func TestAccSakuraCloudInternetDataSource_Basic(t *testing.T) {
 				),
 			},
 			{
-				Destroy: true,
-				Config:  testAccCheckSakuraCloudDataSourceInternetConfig_With_Tag,
+				Config: testAccCheckSakuraCloudDataSourceInternetConfig_With_Tag,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckSakuraCloudInternetDataSourceID("data.sakuracloud_internet.foobar"),
 				),
 			},
 			{
-				Destroy: true,
-				Config:  testAccCheckSakuraCloudDataSourceInternetConfig_NotExists,
+				Config: testAccCheckSakuraCloudDataSourceInternet_NameSelector_Exists,
 				Check: resource.ComposeTestCheckFunc(
-					testAccCheckSakuraCloudInternetDataSourceNotExists("data.sakuracloud_internet.foobar"),
+					testAccCheckSakuraCloudInternetDataSourceID("data.sakuracloud_internet.foobar"),
 				),
 			},
 			{
-				Destroy: true,
-				Config:  testAccCheckSakuraCloudDataSourceInternetConfig_With_NotExists_Tag,
+				Config: testAccCheckSakuraCloudDataSourceInternet_TagSelector_Exists,
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckSakuraCloudInternetDataSourceID("data.sakuracloud_internet.foobar"),
+				),
+			},
+			{
+				Config: testAccCheckSakuraCloudDataSourceInternetConfig_NotExists,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckSakuraCloudInternetDataSourceNotExists("data.sakuracloud_internet.foobar"),
 				),
+				Destroy: true,
+			},
+			{
+				Config: testAccCheckSakuraCloudDataSourceInternetConfig_With_NotExists_Tag,
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckSakuraCloudInternetDataSourceNotExists("data.sakuracloud_internet.foobar"),
+				),
+				Destroy: true,
+			},
+			{
+				Config: testAccCheckSakuraCloudDataSourceInternet_NameSelector_NotExists,
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckSakuraCloudInternetDataSourceNotExists("data.sakuracloud_internet.foobar"),
+				),
+				Destroy: true,
+			},
+			{
+				Config: testAccCheckSakuraCloudDataSourceInternet_TagSelector_NotExists,
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckSakuraCloudInternetDataSourceNotExists("data.sakuracloud_internet.foobar"),
+				),
+				Destroy: true,
 			},
 		},
 	})
@@ -166,4 +190,36 @@ data "sakuracloud_internet" "foobar" {
 	name = "Name"
 	values = ["xxxxxxxxxxxxxxxxxx"]
     }
+}`
+
+var testAccCheckSakuraCloudDataSourceInternet_NameSelector_Exists = `
+resource "sakuracloud_internet" "foobar" {
+    name = "name_test"
+    description = "description_test"
+    tags = ["tag1","tag2","tag3"]
+}
+data "sakuracloud_internet" "foobar" {
+    name_selectors = ["name", "test"]
+}
+`
+
+var testAccCheckSakuraCloudDataSourceInternet_NameSelector_NotExists = `
+data "sakuracloud_internet" "foobar" {
+    name_selectors = ["xxxxxxxxxx"]
+}
+`
+
+var testAccCheckSakuraCloudDataSourceInternet_TagSelector_Exists = `
+resource "sakuracloud_internet" "foobar" {
+    name = "name_test"
+    description = "description_test"
+    tags = ["tag1","tag2","tag3"]
+}
+data "sakuracloud_internet" "foobar" {
+	tag_selectors = ["tag1","tag2","tag3"]
+}`
+
+var testAccCheckSakuraCloudDataSourceInternet_TagSelector_NotExists = `
+data "sakuracloud_internet" "foobar" {
+	tag_selectors = ["xxxxxxxxxx"]
 }`

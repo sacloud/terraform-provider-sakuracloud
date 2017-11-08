@@ -17,7 +17,21 @@ func dataSourceSakuraCloudArchive() *schema.Resource {
 				Optional:      true,
 				ForceNew:      true,
 				ValidateFunc:  validateStringInWord(ostype.OSTypeShortNames),
-				ConflictsWith: []string{"filter"},
+				ConflictsWith: []string{"filter", "name_selectors", "tag_selectors"},
+			},
+			"name_selectors": {
+				Type:          schema.TypeList,
+				Optional:      true,
+				ForceNew:      true,
+				Elem:          &schema.Schema{Type: schema.TypeString},
+				ConflictsWith: []string{"os_type"},
+			},
+			"tag_selectors": {
+				Type:          schema.TypeList,
+				Optional:      true,
+				ForceNew:      true,
+				Elem:          &schema.Schema{Type: schema.TypeString},
+				ConflictsWith: []string{"os_type"},
 			},
 			"filter": {
 				Type:     schema.TypeSet,
@@ -75,17 +89,16 @@ func dataSourceSakuraCloudArchive() *schema.Resource {
 func dataSourceSakuraCloudArchiveRead(d *schema.ResourceData, meta interface{}) error {
 	client := getSacloudAPIClient(d, meta)
 
-	var archive *sacloud.Archive
-
+	var data *sacloud.Archive
 	if osType, ok := d.GetOk("os_type"); ok {
 		strOSType := osType.(string)
 		if strOSType != "" {
 
 			res, err := client.Archive.FindByOSType(strToOSType(strOSType))
 			if err != nil {
-				return fmt.Errorf("Couldn't find SakuraCloud Archive resource: %s", err)
+				return filterNoResultErr()
 			}
-			archive = res
+			data = res
 		}
 	} else {
 
@@ -102,20 +115,46 @@ func dataSourceSakuraCloudArchiveRead(d *schema.ResourceData, meta interface{}) 
 			return fmt.Errorf("Couldn't find SakuraCloud Archive resource: %s", err)
 		}
 		if res == nil || res.Count == 0 {
-			return nil
-			//return fmt.Errorf("Your query returned no results. Please change your filters and try again.")
+			return filterNoResultErr()
 		}
-		archive = &res.Archives[0]
+
+		targets := res.Archives
+
+		if rawNameSelector, ok := d.GetOk("name_selectors"); ok {
+			selectors := expandStringList(rawNameSelector.([]interface{}))
+			var filtered []sacloud.Archive
+			for _, a := range res.Archives {
+				if hasNames(&a, selectors) {
+					filtered = append(filtered, a)
+				}
+			}
+			targets = filtered
+		}
+		if rawTagSelector, ok := d.GetOk("tag_selectors"); ok {
+			selectors := expandStringList(rawTagSelector.([]interface{}))
+			var filtered []sacloud.Archive
+			for _, a := range res.Archives {
+				if hasTags(&a, selectors) {
+					filtered = append(filtered, a)
+				}
+			}
+			targets = filtered
+		}
+
+		if len(targets) == 0 {
+			return filterNoResultErr()
+		}
+		data = &targets[0]
 	}
 
-	if archive != nil {
+	if data != nil {
 
-		d.SetId(archive.GetStrID())
-		d.Set("name", archive.Name)
-		d.Set("size", toSizeGB(archive.SizeMB))
-		d.Set("icon_id", archive.GetIconStrID())
-		d.Set("description", archive.Description)
-		d.Set("tags", realTags(client, archive.Tags))
+		d.SetId(data.GetStrID())
+		d.Set("name", data.Name)
+		d.Set("size", toSizeGB(data.SizeMB))
+		d.Set("icon_id", data.GetIconStrID())
+		d.Set("description", data.Description)
+		d.Set("tags", realTags(client, data.Tags))
 
 		d.Set("zone", client.Zone)
 	}

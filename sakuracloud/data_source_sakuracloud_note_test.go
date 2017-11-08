@@ -5,11 +5,10 @@ import (
 	"fmt"
 	"github.com/hashicorp/terraform/helper/resource"
 	"github.com/hashicorp/terraform/terraform"
-
 	"testing"
 )
 
-func TestAccSakuraCloudNoteDataSource_Basic(t *testing.T) {
+func TestAccSakuraCloudDataSourceNote_Basic(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck:                  func() { testAccPreCheck(t) },
 		Providers:                 testAccProviders,
@@ -36,25 +35,50 @@ func TestAccSakuraCloudNoteDataSource_Basic(t *testing.T) {
 				),
 			},
 			{
-				Destroy: true,
-				Config:  testAccCheckSakuraCloudDataSourceNoteConfig_With_Tag,
+				Config: testAccCheckSakuraCloudDataSourceNoteConfig_With_Tag,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckSakuraCloudNoteDataSourceID("data.sakuracloud_note.foobar"),
 				),
 			},
 			{
-				Destroy: true,
-				Config:  testAccCheckSakuraCloudDataSourceNoteConfig_NotExists,
+				Config: testAccCheckSakuraCloudDataSourceNote_NameSelector_Exists,
 				Check: resource.ComposeTestCheckFunc(
-					testAccCheckSakuraCloudNoteDataSourceNotExists("data.sakuracloud_note.foobar"),
+					testAccCheckSakuraCloudNoteDataSourceID("data.sakuracloud_note.foobar"),
 				),
 			},
 			{
-				Destroy: true,
-				Config:  testAccCheckSakuraCloudDataSourceNoteConfig_With_NotExists_Tag,
+				Config: testAccCheckSakuraCloudDataSourceNote_TagSelector_Exists,
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckSakuraCloudNoteDataSourceID("data.sakuracloud_note.foobar"),
+				),
+			},
+			{
+				Config: testAccCheckSakuraCloudDataSourceNoteConfig_NotExists,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckSakuraCloudNoteDataSourceNotExists("data.sakuracloud_note.foobar"),
 				),
+				Destroy: true,
+			},
+			{
+				Config: testAccCheckSakuraCloudDataSourceNoteConfig_With_NotExists_Tag,
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckSakuraCloudNoteDataSourceNotExists("data.sakuracloud_note.foobar"),
+				),
+				Destroy: true,
+			},
+			{
+				Config: testAccCheckSakuraCloudDataSourceNote_NameSelector_NotExists,
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckSakuraCloudNoteDataSourceNotExists("data.sakuracloud_note.foobar"),
+				),
+				Destroy: true,
+			},
+			{
+				Config: testAccCheckSakuraCloudDataSourceNote_TagSelector_NotExists,
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckSakuraCloudNoteDataSourceNotExists("data.sakuracloud_note.foobar"),
+				),
+				Destroy: true,
 			},
 		},
 	})
@@ -169,4 +193,37 @@ data "sakuracloud_note" "foobar" {
 	name = "Name"
 	values = ["xxxxxxxxxxxxxxxxxx"]
     }
+}`
+
+var testAccCheckSakuraCloudDataSourceNote_NameSelector_Exists = `
+resource "sakuracloud_note" "foobar" {
+    name = "name_test"
+    description = "description_test"
+    content = "content_test"
+    tags = ["tag1","tag2","tag3"]
+}
+data "sakuracloud_note" "foobar" {
+    name_selectors = ["name", "test"]
+}
+`
+var testAccCheckSakuraCloudDataSourceNote_NameSelector_NotExists = `
+data "sakuracloud_note" "foobar" {
+    name_selectors = ["xxxxxxxxxx"]
+}
+`
+
+var testAccCheckSakuraCloudDataSourceNote_TagSelector_Exists = `
+resource "sakuracloud_note" "foobar" {
+    name = "name_test"
+    description = "description_test"
+    content = "content_test"
+    tags = ["tag1","tag2","tag3"]
+}
+data "sakuracloud_note" "foobar" {
+	tag_selectors = ["tag1","tag2","tag3"]
+}`
+
+var testAccCheckSakuraCloudDataSourceNote_TagSelector_NotExists = `
+data "sakuracloud_note" "foobar" {
+	tag_selectors = ["xxxxxxxxxx"]
 }`

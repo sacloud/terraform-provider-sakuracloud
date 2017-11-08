@@ -5,11 +5,10 @@ import (
 	"fmt"
 	"github.com/hashicorp/terraform/helper/resource"
 	"github.com/hashicorp/terraform/terraform"
-
 	"testing"
 )
 
-func TestAccSakuraCloudPacketFilterDataSource_Basic(t *testing.T) {
+func TestAccSakuraCloudDataSourcePacketFilter_Basic(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck:                  func() { testAccPreCheck(t) },
 		Providers:                 testAccProviders,
@@ -36,11 +35,24 @@ func TestAccSakuraCloudPacketFilterDataSource_Basic(t *testing.T) {
 				),
 			},
 			{
-				Destroy: true,
-				Config:  testAccCheckSakuraCloudDataSourcePacketFilterConfig_NotExists,
+				Config: testAccCheckSakuraCloudDataSourcePacketFilter_NameSelector_Exists,
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckSakuraCloudPacketFilterDataSourceID("sakuracloud_packet_filter.foobar"),
+				),
+			},
+			{
+				Config: testAccCheckSakuraCloudDataSourcePacketFilterConfig_NotExists,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckSakuraCloudPacketFilterDataSourceNotExists("data.sakuracloud_packet_filter.foobar"),
 				),
+				Destroy: true,
+			},
+			{
+				Config: testAccCheckSakuraCloudDataSourcePacketFilter_NameSelector_NotExists,
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckSakuraCloudPacketFilterDataSourceNotExists("data.sakuracloud_packet_filter.foobar"),
+				),
+				Destroy: true,
 			},
 		},
 	})
@@ -140,6 +152,14 @@ data "sakuracloud_packet_filter" "foobar" {
 }`
 
 var testAccCheckSakuraCloudDataSourcePacketFilterConfig_NotExists = `
+data "sakuracloud_packet_filter" "foobar" {
+    filter = {
+	name = "Name"
+	values = ["xxxxxxxxxxxxxxxxxx"]
+    }
+}`
+
+var testAccCheckSakuraCloudDataSourcePacketFilter_NameSelector_Exists = `
 resource "sakuracloud_packet_filter" "foobar" {
     name = "name_test"
     description = "description_test"
@@ -159,8 +179,11 @@ resource "sakuracloud_packet_filter" "foobar" {
     }
 }
 data "sakuracloud_packet_filter" "foobar" {
-    filter = {
-	name = "Name"
-	values = ["xxxxxxxxxxxxxxxxxx"]
-    }
-}`
+    name_selectors = ["name", "test"]
+}
+`
+var testAccCheckSakuraCloudDataSourcePacketFilter_NameSelector_NotExists = `
+data "sakuracloud_packet_filter" "foobar" {
+    name_selectors = ["xxxxxxxxxx"]
+}
+`

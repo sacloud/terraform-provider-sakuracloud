@@ -8,7 +8,7 @@ import (
 	"testing"
 )
 
-func TestAccSakuraCloudArchiveDataSource_Basic(t *testing.T) {
+func TestAccSakuraCloudDataSourceArchive_Basic(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck:                  func() { testAccPreCheck(t) },
 		Providers:                 testAccProviders,
@@ -39,25 +39,51 @@ func TestAccSakuraCloudArchiveDataSource_Basic(t *testing.T) {
 				),
 			},
 			{
-				Destroy: true,
-				Config:  testAccCheckSakuraCloudDataSourceArchiveConfig_With_Tag,
+				Config: testAccCheckSakuraCloudDataSourceArchiveConfig_With_Tag,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckSakuraCloudArchiveDataSourceID("data.sakuracloud_archive.foobar"),
 				),
 			},
 			{
-				Destroy: true,
-				Config:  testAccCheckSakuraCloudDataSourceArchiveConfig_NotExists,
+				Config: testAccCheckSakuraCloudDataSourceArchive_NameSelector_Exists,
 				Check: resource.ComposeTestCheckFunc(
-					testAccCheckSakuraCloudArchiveDataSourceNotExists("data.sakuracloud_archive.foobar"),
+					testAccCheckSakuraCloudArchiveDataSourceID("data.sakuracloud_archive.foobar"),
 				),
 			},
 			{
-				Destroy: true,
-				Config:  testAccCheckSakuraCloudDataSourceArchiveConfig_With_NotExists_Tag,
+				Config: testAccCheckSakuraCloudDataSourceArchive_TagSelector_Exists,
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckSakuraCloudArchiveDataSourceID("data.sakuracloud_archive.foobar"),
+				),
+			},
+
+			{
+				Config: testAccCheckSakuraCloudDataSourceArchiveConfig_NotExists,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckSakuraCloudArchiveDataSourceNotExists("data.sakuracloud_archive.foobar"),
 				),
+				Destroy: true,
+			},
+			{
+				Config: testAccCheckSakuraCloudDataSourceArchiveConfig_With_NotExists_Tag,
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckSakuraCloudArchiveDataSourceNotExists("data.sakuracloud_archive.foobar"),
+				),
+				Destroy: true,
+			},
+			{
+				Config: testAccCheckSakuraCloudDataSourceArchive_NameSelector_NotExists,
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckSakuraCloudArchiveDataSourceNotExists("data.sakuracloud_archive.foobar"),
+				),
+				Destroy: true,
+			},
+			{
+				Config: testAccCheckSakuraCloudDataSourceArchive_TagSelector_NotExists,
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckSakuraCloudArchiveDataSourceNotExists("data.sakuracloud_archive.foobar"),
+				),
+				Destroy: true,
 			},
 		},
 	})
@@ -150,7 +176,32 @@ data "sakuracloud_archive" "foobar" {
 
 var testAccCheckSakuraCloudDataSourceArchive_OSType = `
 data "sakuracloud_archive" "foobar" {
-    os_type = "plesk"
+    os_type = "rancheros"
     zone = "tk1v"
 }
 `
+
+var testAccCheckSakuraCloudDataSourceArchive_NameSelector_Exists = `
+data "sakuracloud_archive" "foobar" {
+    name_selectors = ["Ubuntu", "Server","16"]
+    zone = "tk1v"
+}
+`
+var testAccCheckSakuraCloudDataSourceArchive_NameSelector_NotExists = `
+data "sakuracloud_archive" "foobar" {
+    name_selectors = ["xxxxxxxxxx"]
+    zone = "tk1v"
+}
+`
+
+var testAccCheckSakuraCloudDataSourceArchive_TagSelector_Exists = `
+data "sakuracloud_archive" "foobar" {
+	tag_selectors = ["distro-ubuntu","os-linux"]
+    zone = "tk1v"
+}`
+
+var testAccCheckSakuraCloudDataSourceArchive_TagSelector_NotExists = `
+data "sakuracloud_archive" "foobar" {
+	tag_selectors = ["xxxxxxxxxx"]
+    zone = "tk1v"
+}`

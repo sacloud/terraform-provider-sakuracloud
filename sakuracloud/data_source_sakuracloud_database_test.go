@@ -5,11 +5,10 @@ import (
 	"fmt"
 	"github.com/hashicorp/terraform/helper/resource"
 	"github.com/hashicorp/terraform/terraform"
-
 	"testing"
 )
 
-func TestAccSakuraCloudDatabaseDataSource_Basic(t *testing.T) {
+func TestAccSakuraCloudDataSourceDatabase_Basic(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck:                  func() { testAccPreCheck(t) },
 		Providers:                 testAccProviders,
@@ -32,25 +31,50 @@ func TestAccSakuraCloudDatabaseDataSource_Basic(t *testing.T) {
 				),
 			},
 			{
-				Destroy: true,
-				Config:  testAccCheckSakuraCloudDataSourceDatabaseConfig_With_Tag,
+				Config: testAccCheckSakuraCloudDataSourceDatabaseConfig_With_Tag,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckSakuraCloudDatabaseDataSourceID("data.sakuracloud_database.foobar"),
 				),
 			},
 			{
-				Destroy: true,
-				Config:  testAccCheckSakuraCloudDataSourceDatabaseConfig_NotExists,
+				Config: testAccCheckSakuraCloudDataSourceDatabase_NameSelector_Exists,
 				Check: resource.ComposeTestCheckFunc(
-					testAccCheckSakuraCloudDatabaseDataSourceNotExists("data.sakuracloud_database.foobar"),
+					testAccCheckSakuraCloudDatabaseDataSourceID("data.sakuracloud_database.foobar"),
 				),
 			},
 			{
-				Destroy: true,
-				Config:  testAccCheckSakuraCloudDataSourceDatabaseConfig_With_NotExists_Tag,
+				Config: testAccCheckSakuraCloudDataSourceDatabase_TagSelector_Exists,
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckSakuraCloudDatabaseDataSourceID("data.sakuracloud_database.foobar"),
+				),
+			},
+			{
+				Config: testAccCheckSakuraCloudDataSourceDatabaseConfig_NotExists,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckSakuraCloudDatabaseDataSourceNotExists("data.sakuracloud_database.foobar"),
 				),
+				Destroy: true,
+			},
+			{
+				Config: testAccCheckSakuraCloudDataSourceDatabaseConfig_With_NotExists_Tag,
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckSakuraCloudDatabaseDataSourceNotExists("data.sakuracloud_database.foobar"),
+				),
+				Destroy: true,
+			},
+			{
+				Config: testAccCheckSakuraCloudDataSourceDatabase_NameSelector_NotExists,
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckSakuraCloudDatabaseDataSourceNotExists("data.sakuracloud_database.foobar"),
+				),
+				Destroy: true,
+			},
+			{
+				Config: testAccCheckSakuraCloudDataSourceDatabase_TagSelector_NotExists,
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckSakuraCloudDatabaseDataSourceNotExists("data.sakuracloud_database.foobar"),
+				),
+				Destroy: true,
 			},
 		},
 	})
@@ -264,5 +288,80 @@ data "sakuracloud_database" "foobar" {
 	name = "Name"
 	values = ["xxxxxxxxxxxxxxxxxx"]
     }
+    zone = "tk1a"
+}`
+
+var testAccCheckSakuraCloudDataSourceDatabase_NameSelector_Exists = `
+resource "sakuracloud_switch" "sw" {
+    name = "sw"
+    zone = "tk1a"
+}
+resource "sakuracloud_database" "foobar" {
+    name = "name_test"
+    description = "description_test"
+    tags = ["tag1","tag2","tag3"]
+
+    user_name = "defuser"
+    user_password = "DatabasePasswordUser397"
+
+    allow_networks = ["192.168.11.0/24","192.168.12.0/24"]
+
+    switch_id = "${sakuracloud_switch.sw.id}"
+    ipaddress1 = "192.168.11.101"
+    nw_mask_len = 24
+    default_route = "192.168.11.1"
+
+    port = 54321
+
+    backup_time = "00:00"
+    zone = "tk1a"
+
+}
+data "sakuracloud_database" "foobar" {
+    name_selectors = ["name", "test"]
+    zone = "tk1a"
+}
+`
+var testAccCheckSakuraCloudDataSourceDatabase_NameSelector_NotExists = `
+data "sakuracloud_database" "foobar" {
+    name_selectors = ["xxxxxxxxxx"]
+    zone = "tk1a"
+}
+`
+
+var testAccCheckSakuraCloudDataSourceDatabase_TagSelector_Exists = `
+resource "sakuracloud_switch" "sw" {
+    name = "sw"
+    zone = "tk1a"
+}
+resource "sakuracloud_database" "foobar" {
+    name = "name_test"
+    description = "description_test"
+    tags = ["tag1","tag2","tag3"]
+
+    user_name = "defuser"
+    user_password = "DatabasePasswordUser397"
+
+    allow_networks = ["192.168.11.0/24","192.168.12.0/24"]
+
+    switch_id = "${sakuracloud_switch.sw.id}"
+    ipaddress1 = "192.168.11.101"
+    nw_mask_len = 24
+    default_route = "192.168.11.1"
+
+    port = 54321
+
+    backup_time = "00:00"
+    zone = "tk1a"
+
+}
+data "sakuracloud_database" "foobar" {
+	tag_selectors = ["tag1","tag2","tag3"]
+    zone = "tk1a"
+}`
+
+var testAccCheckSakuraCloudDataSourceDatabase_TagSelector_NotExists = `
+data "sakuracloud_database" "foobar" {
+	tag_selectors = ["xxxxxxxxxx"]
     zone = "tk1a"
 }`

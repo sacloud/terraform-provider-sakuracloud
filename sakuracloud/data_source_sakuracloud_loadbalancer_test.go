@@ -5,11 +5,10 @@ import (
 	"fmt"
 	"github.com/hashicorp/terraform/helper/resource"
 	"github.com/hashicorp/terraform/terraform"
-
 	"testing"
 )
 
-func TestAccSakuraCloudLoadBalancerDataSource_Basic(t *testing.T) {
+func TestAccSakuraCloudDataSourceLoadBalancer_Basic(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck:                  func() { testAccPreCheck(t) },
 		Providers:                 testAccProviders,
@@ -34,25 +33,50 @@ func TestAccSakuraCloudLoadBalancerDataSource_Basic(t *testing.T) {
 				),
 			},
 			{
-				Destroy: true,
-				Config:  testAccCheckSakuraCloudDataSourceLoadBalancerConfig_With_Tag,
+				Config: testAccCheckSakuraCloudDataSourceLoadBalancerConfig_With_Tag,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckSakuraCloudLoadBalancerDataSourceID("data.sakuracloud_load_balancer.foobar"),
 				),
 			},
 			{
-				Destroy: true,
-				Config:  testAccCheckSakuraCloudDataSourceLoadBalancerConfig_NotExists,
+				Config: testAccCheckSakuraCloudDataSourceLoadBalancer_NameSelector_Exists,
 				Check: resource.ComposeTestCheckFunc(
-					testAccCheckSakuraCloudLoadBalancerDataSourceNotExists("data.sakuracloud_load_balancer.foobar"),
+					testAccCheckSakuraCloudLoadBalancerDataSourceID("data.sakuracloud_load_balancer.foobar"),
 				),
 			},
 			{
-				Destroy: true,
-				Config:  testAccCheckSakuraCloudDataSourceLoadBalancerConfig_With_NotExists_Tag,
+				Config: testAccCheckSakuraCloudDataSourceLoadBalancer_TagSelector_Exists,
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckSakuraCloudLoadBalancerDataSourceID("data.sakuracloud_load_balancer.foobar"),
+				),
+			},
+			{
+				Config: testAccCheckSakuraCloudDataSourceLoadBalancerConfig_NotExists,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckSakuraCloudLoadBalancerDataSourceNotExists("data.sakuracloud_load_balancer.foobar"),
 				),
+				Destroy: true,
+			},
+			{
+				Config: testAccCheckSakuraCloudDataSourceLoadBalancerConfig_With_NotExists_Tag,
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckSakuraCloudLoadBalancerDataSourceNotExists("data.sakuracloud_load_balancer.foobar"),
+				),
+				Destroy: true,
+			},
+			{
+				Config: testAccCheckSakuraCloudDataSourceLoadBalancer_NameSelector_NotExists,
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckSakuraCloudLoadBalancerDataSourceNotExists("data.sakuracloud_load_balancer.foobar"),
+				),
+				Destroy: true,
+			},
+			{
+				Config: testAccCheckSakuraCloudDataSourceLoadBalancer_TagSelector_NotExists,
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckSakuraCloudLoadBalancerDataSourceNotExists("data.sakuracloud_load_balancer.foobar"),
+				),
+				Destroy: true,
 			},
 		},
 	})
@@ -206,4 +230,53 @@ data "sakuracloud_load_balancer" "foobar" {
 	name = "Name"
 	values = ["xxxxxxxxxxxxxxxxxx"]
     }
+}`
+
+var testAccCheckSakuraCloudDataSourceLoadBalancer_NameSelector_Exists = `
+resource sakuracloud_switch "sw"{
+    name = "sw"
+}
+resource "sakuracloud_load_balancer" "foobar" {
+    switch_id = "${sakuracloud_switch.sw.id}"
+    vrid = 1
+    ipaddress1 = "192.168.11.101"
+    nw_mask_len = 24
+    default_route = "192.168.11.1"
+
+    name = "name_test"
+    description = "description_test"
+    tags = ["tag1","tag2","tag3"]
+}
+data "sakuracloud_load_balancer" "foobar" {
+    name_selectors = ["name", "test"]
+}
+`
+var testAccCheckSakuraCloudDataSourceLoadBalancer_NameSelector_NotExists = `
+data "sakuracloud_load_balancer" "foobar" {
+    name_selectors = ["xxxxxxxxxx"]
+}
+`
+
+var testAccCheckSakuraCloudDataSourceLoadBalancer_TagSelector_Exists = `
+resource sakuracloud_switch "sw"{
+    name = "sw"
+}
+resource "sakuracloud_load_balancer" "foobar" {
+    switch_id = "${sakuracloud_switch.sw.id}"
+    vrid = 1
+    ipaddress1 = "192.168.11.101"
+    nw_mask_len = 24
+    default_route = "192.168.11.1"
+
+    name = "name_test"
+    description = "description_test"
+    tags = ["tag1","tag2","tag3"]
+}
+data "sakuracloud_load_balancer" "foobar" {
+	tag_selectors = ["tag1","tag2","tag3"]
+}`
+
+var testAccCheckSakuraCloudDataSourceLoadBalancer_TagSelector_NotExists = `
+data "sakuracloud_load_balancer" "foobar" {
+	tag_selectors = ["xxxxxxxxxx"]
 }`
