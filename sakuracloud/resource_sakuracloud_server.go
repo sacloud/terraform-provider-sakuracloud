@@ -66,6 +66,15 @@ func resourceSakuraCloudServer() *schema.Resource {
 				Computed:     true,
 				ValidateFunc: validateSakuracloudIDType,
 			},
+			"private_host_id": {
+				Type:         schema.TypeString,
+				Optional:     true,
+				ValidateFunc: validateSakuracloudIDType,
+			},
+			"private_host_name": {
+				Type:     schema.TypeString,
+				Computed: true,
+			},
 			"additional_nics": {
 				Type:     schema.TypeList,
 				Optional: true,
@@ -191,8 +200,11 @@ func resourceSakuraCloudServerCreate(d *schema.ResourceData, meta interface{}) e
 			opts.Tags = expandTags(client, rawTags.([]interface{}))
 		}
 	}
+	if rawPrivateHostID, ok := d.GetOk("private_host_id"); ok {
+		privateHostID := rawPrivateHostID.(string)
+		opts.SetPrivateHostByID(toSakuraCloudID(privateHostID))
+	}
 
-	//server, err := client.Server.Create(opts)
 	server, err := createServer(client, opts)
 	if err != nil {
 		return fmt.Errorf("Failed to create SakuraCloud Server resource: %s", err)
@@ -331,7 +343,7 @@ func resourceSakuraCloudServerUpdate(d *schema.ResourceData, meta interface{}) e
 	}
 
 	if d.HasChange("disks") || d.HasChange("nic") || d.HasChange("additional_nics") || d.HasChange("interface_driver") ||
-		d.HasChange("ipaddress") || d.HasChange("gateway") || d.HasChange("nw_mask_len") {
+		d.HasChange("ipaddress") || d.HasChange("gateway") || d.HasChange("nw_mask_len") || d.HasChange("private_host_id") {
 		isNeedRestart = true
 	}
 
@@ -538,6 +550,19 @@ func resourceSakuraCloudServerUpdate(d *schema.ResourceData, meta interface{}) e
 		}
 	}
 
+	if d.HasChange("private_host_id") {
+		if rawPrivateHostID, ok := d.GetOk("private_host_id"); ok {
+			privateHostID := rawPrivateHostID.(string)
+			if privateHostID == "" {
+				server.ClearPrivateHost()
+			} else {
+				server.SetPrivateHostByID(toSakuraCloudID(privateHostID))
+			}
+		} else {
+			server.ClearPrivateHost()
+		}
+	}
+
 	server, err = client.Server.Update(toSakuraCloudID(d.Id()), server)
 	if err != nil {
 		return fmt.Errorf("Error updating SakuraCloud Server resource: %s", err)
@@ -672,6 +697,11 @@ func setServerResourceData(d *schema.ResourceData, client *APIClient, data *sacl
 	}
 
 	d.Set("interface_driver", string(data.GetInterfaceDriverString()))
+
+	if data.PrivateHost != nil && data.PrivateHost.ID > 0 {
+		d.Set("private_host_id", data.PrivateHost.GetStrID())
+		d.Set("private_host_name", data.PrivateHost.Host.GetName())
+	}
 
 	hasSharedInterface := len(data.Interfaces) > 0 && data.Interfaces[0].Switch != nil
 	if hasSharedInterface {

@@ -7,6 +7,7 @@ import (
 	"github.com/hashicorp/terraform/terraform"
 
 	"github.com/sacloud/libsacloud/sacloud"
+	"os"
 	"regexp"
 	"testing"
 )
@@ -182,6 +183,34 @@ func TestAccSakuraCloudServer_ConnectPacketFilters(t *testing.T) {
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttr(
 						"sakuracloud_server.foobar", "packet_filter_ids.#", "0"),
+				),
+			},
+		},
+	})
+}
+
+func TestAccSakuraCloudServer_With_PrivateHost(t *testing.T) {
+
+	privateHostID, ok := os.LookupEnv("SAKURACLOUD_PRIVATE_HOST_ID")
+	if !ok {
+		t.Log("Private host ID($SAKURACLOUD_PRIVATE_HOST_ID) is empty. Skip this test.")
+		return
+	}
+
+	var server sacloud.Server
+	resource.Test(t, resource.TestCase{
+		PreCheck:     func() { testAccPreCheck(t) },
+		Providers:    testAccProviders,
+		CheckDestroy: testAccCheckSakuraCloudServerDestroy,
+		Steps: []resource.TestStep{
+			{
+				Config: fmt.Sprintf(testAccCheckSakuraCloudServerConfig_with_private_host_template, privateHostID),
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckSakuraCloudServerExists("sakuracloud_server.foobar", &server),
+					resource.TestCheckResourceAttr("sakuracloud_server.foobar", "private_host_id", privateHostID),
+					resource.TestMatchResourceAttr("sakuracloud_server.foobar",
+						"private_host_name",
+						regexp.MustCompile(".+")), // should not empty
 				),
 			},
 		},
@@ -572,5 +601,13 @@ resource "sakuracloud_server" "foobar" {
     name = "foobar"
     nic = "${sakuracloud_switch.foobar.id}"
     additional_nics = [""]
+}
+`
+
+const testAccCheckSakuraCloudServerConfig_with_private_host_template = `
+resource "sakuracloud_server" "foobar" {
+    name            = "myserver_with_private_host"
+    private_host_id = "%s"
+    zone            = "is1b"
 }
 `

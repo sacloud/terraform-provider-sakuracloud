@@ -140,61 +140,65 @@ type EDiskConnection string
 
 // SakuraCloudResources さくらのクラウド上のリソース種別一覧
 type SakuraCloudResources struct {
-	Server       *Server          `json:",omitempty"` // サーバー
-	Disk         *Disk            `json:",omitempty"` // ディスク
-	Note         *Note            `json:",omitempty"` // スタートアップスクリプト
-	Archive      *Archive         `json:",omitempty"` // アーカイブ
-	PacketFilter *PacketFilter    `json:",omitempty"` // パケットフィルタ
-	Bridge       *Bridge          `json:",omitempty"` // ブリッジ
-	Icon         *Icon            `json:",omitempty"` // アイコン
-	Image        *Image           `json:",omitempty"` // 画像
-	Interface    *Interface       `json:",omitempty"` // インターフェース
-	Internet     *Internet        `json:",omitempty"` // ルーター
-	IPAddress    *IPAddress       `json:",omitempty"` // IPv4アドレス
-	IPv6Addr     *IPv6Addr        `json:",omitempty"` // IPv6アドレス
-	IPv6Net      *IPv6Net         `json:",omitempty"` // IPv6ネットワーク
-	License      *License         `json:",omitempty"` // ライセンス
-	Switch       *Switch          `json:",omitempty"` // スイッチ
-	CDROM        *CDROM           `json:",omitempty"` // ISOイメージ
-	SSHKey       *SSHKey          `json:",omitempty"` // 公開鍵
-	Subnet       *Subnet          `json:",omitempty"` // IPv4ネットワーク
-	DiskPlan     *ProductDisk     `json:",omitempty"` // ディスクプラン
-	InternetPlan *ProductInternet `json:",omitempty"` // ルータープラン
-	LicenseInfo  *ProductLicense  `json:",omitempty"` // ライセンス情報
-	ServerPlan   *ProductServer   `json:",omitempty"` // サーバープラン
-	Region       *Region          `json:",omitempty"` // リージョン
-	Zone         *Zone            `json:",omitempty"` // ゾーン
-	FTPServer    *FTPServer       `json:",omitempty"` // FTPサーバー情報
+	Server          *Server             `json:",omitempty"` // サーバー
+	Disk            *Disk               `json:",omitempty"` // ディスク
+	Note            *Note               `json:",omitempty"` // スタートアップスクリプト
+	Archive         *Archive            `json:",omitempty"` // アーカイブ
+	PacketFilter    *PacketFilter       `json:",omitempty"` // パケットフィルタ
+	PrivateHost     *PrivateHost        `json:",omitempty"` // 専有ホスト
+	Bridge          *Bridge             `json:",omitempty"` // ブリッジ
+	Icon            *Icon               `json:",omitempty"` // アイコン
+	Image           *Image              `json:",omitempty"` // 画像
+	Interface       *Interface          `json:",omitempty"` // インターフェース
+	Internet        *Internet           `json:",omitempty"` // ルーター
+	IPAddress       *IPAddress          `json:",omitempty"` // IPv4アドレス
+	IPv6Addr        *IPv6Addr           `json:",omitempty"` // IPv6アドレス
+	IPv6Net         *IPv6Net            `json:",omitempty"` // IPv6ネットワーク
+	License         *License            `json:",omitempty"` // ライセンス
+	Switch          *Switch             `json:",omitempty"` // スイッチ
+	CDROM           *CDROM              `json:",omitempty"` // ISOイメージ
+	SSHKey          *SSHKey             `json:",omitempty"` // 公開鍵
+	Subnet          *Subnet             `json:",omitempty"` // IPv4ネットワーク
+	DiskPlan        *ProductDisk        `json:",omitempty"` // ディスクプラン
+	InternetPlan    *ProductInternet    `json:",omitempty"` // ルータープラン
+	LicenseInfo     *ProductLicense     `json:",omitempty"` // ライセンス情報
+	ServerPlan      *ProductServer      `json:",omitempty"` // サーバープラン
+	PrivateHostPlan *ProductPrivateHost `json:",omitempty"` // 専有ホストプラン
+	Region          *Region             `json:",omitempty"` // リージョン
+	Zone            *Zone               `json:",omitempty"` // ゾーン
+	FTPServer       *FTPServer          `json:",omitempty"` // FTPサーバー情報
 
 	//REMARK: CommonServiceItemとApplianceはapiパッケージにて別途定義
 }
 
 // SakuraCloudResourceList さくらのクラウド上のリソース種別一覧(複数形)
 type SakuraCloudResourceList struct {
-	Servers        []Server          `json:",omitempty"` // サーバー
-	Disks          []Disk            `json:",omitempty"` // ディスク
-	Notes          []Note            `json:",omitempty"` // スタートアップスクリプト
-	Archives       []Archive         `json:",omitempty"` // アーカイブ
-	PacketFilters  []PacketFilter    `json:",omitempty"` // パケットフィルタ
-	Bridges        []Bridge          `json:",omitempty"` // ブリッジ
-	Icons          []Icon            `json:",omitempty"` // アイコン
-	Interfaces     []Interface       `json:",omitempty"` // インターフェース
-	Internet       []Internet        `json:",omitempty"` // ルーター
-	IPAddress      []IPAddress       `json:",omitempty"` // IPv4アドレス
-	IPv6Addrs      []IPv6Addr        `json:",omitempty"` // IPv6アドレス
-	IPv6Nets       []IPv6Net         `json:",omitempty"` // IPv6ネットワーク
-	Licenses       []License         `json:",omitempty"` // ライセンス
-	Switches       []Switch          `json:",omitempty"` // スイッチ
-	CDROMs         []CDROM           `json:",omitempty"` // ISOイメージ
-	SSHKeys        []SSHKey          `json:",omitempty"` // 公開鍵
-	Subnets        []Subnet          `json:",omitempty"` // IPv4ネットワーク
-	DiskPlans      []ProductDisk     `json:",omitempty"` // ディスクプラン
-	InternetPlans  []ProductInternet `json:",omitempty"` // ルータープラン
-	LicenseInfo    []ProductLicense  `json:",omitempty"` // ライセンス情報
-	ServerPlans    []ProductServer   `json:",omitempty"` // サーバープラン
-	Regions        []Region          `json:",omitempty"` // リージョン
-	Zones          []Zone            `json:",omitempty"` // ゾーン
-	ServiceClasses []PublicPrice     `json:",omitempty"` // サービスクラス(価格情報)
+	Servers          []Server             `json:",omitempty"` // サーバー
+	Disks            []Disk               `json:",omitempty"` // ディスク
+	Notes            []Note               `json:",omitempty"` // スタートアップスクリプト
+	Archives         []Archive            `json:",omitempty"` // アーカイブ
+	PacketFilters    []PacketFilter       `json:",omitempty"` // パケットフィルタ
+	PrivateHosts     []PrivateHost        `json:",omitempty"` // 専有ホスト
+	Bridges          []Bridge             `json:",omitempty"` // ブリッジ
+	Icons            []Icon               `json:",omitempty"` // アイコン
+	Interfaces       []Interface          `json:",omitempty"` // インターフェース
+	Internet         []Internet           `json:",omitempty"` // ルーター
+	IPAddress        []IPAddress          `json:",omitempty"` // IPv4アドレス
+	IPv6Addrs        []IPv6Addr           `json:",omitempty"` // IPv6アドレス
+	IPv6Nets         []IPv6Net            `json:",omitempty"` // IPv6ネットワーク
+	Licenses         []License            `json:",omitempty"` // ライセンス
+	Switches         []Switch             `json:",omitempty"` // スイッチ
+	CDROMs           []CDROM              `json:",omitempty"` // ISOイメージ
+	SSHKeys          []SSHKey             `json:",omitempty"` // 公開鍵
+	Subnets          []Subnet             `json:",omitempty"` // IPv4ネットワーク
+	DiskPlans        []ProductDisk        `json:",omitempty"` // ディスクプラン
+	InternetPlans    []ProductInternet    `json:",omitempty"` // ルータープラン
+	LicenseInfo      []ProductLicense     `json:",omitempty"` // ライセンス情報
+	ServerPlans      []ProductServer      `json:",omitempty"` // サーバープラン
+	PrivateHostPlans []ProductPrivateHost `json:",omitempty"` // 専有ホストプラン
+	Regions          []Region             `json:",omitempty"` // リージョン
+	Zones            []Zone               `json:",omitempty"` // ゾーン
+	ServiceClasses   []PublicPrice        `json:",omitempty"` // サービスクラス(価格情報)
 
 	//REMARK:CommonServiceItemとApplianceはapiパッケージにて別途定義
 }
