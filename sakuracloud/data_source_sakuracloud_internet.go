@@ -3,6 +3,7 @@ package sakuracloud
 import (
 	"fmt"
 	"github.com/hashicorp/terraform/helper/schema"
+	"github.com/sacloud/libsacloud/sacloud"
 )
 
 func dataSourceSakuraCloudInternet() *schema.Resource {
@@ -10,6 +11,18 @@ func dataSourceSakuraCloudInternet() *schema.Resource {
 		Read: dataSourceSakuraCloudInternetRead,
 
 		Schema: map[string]*schema.Schema{
+			"name_selectors": {
+				Type:     schema.TypeList,
+				Optional: true,
+				ForceNew: true,
+				Elem:     &schema.Schema{Type: schema.TypeString},
+			},
+			"tag_selectors": {
+				Type:     schema.TypeList,
+				Optional: true,
+				ForceNew: true,
+				Elem:     &schema.Schema{Type: schema.TypeString},
+			},
 			"filter": {
 				Type:     schema.TypeSet,
 				Optional: true,
@@ -128,10 +141,35 @@ func dataSourceSakuraCloudInternetRead(d *schema.ResourceData, meta interface{})
 		return fmt.Errorf("Couldn't find SakuraCloud Internet resource: %s", err)
 	}
 	if res == nil || res.Count == 0 {
-		return nil
-		//return fmt.Errorf("Your query returned no results. Please change your filters and try again.")
+		return filterNoResultErr()
 	}
-	internet := res.Internet[0]
+	var data *sacloud.Internet
+	targets := res.Internet
 
-	return setInternetResourceData(d, client, &internet)
+	if rawNameSelector, ok := d.GetOk("name_selectors"); ok {
+		selectors := expandStringList(rawNameSelector.([]interface{}))
+		var filtered []sacloud.Internet
+		for _, a := range res.Internet {
+			if hasNames(&a, selectors) {
+				filtered = append(filtered, a)
+			}
+		}
+		targets = filtered
+	}
+	if rawTagSelector, ok := d.GetOk("tag_selectors"); ok {
+		selectors := expandStringList(rawTagSelector.([]interface{}))
+		var filtered []sacloud.Internet
+		for _, a := range res.Internet {
+			if hasTags(&a, selectors) {
+				filtered = append(filtered, a)
+			}
+		}
+		targets = filtered
+	}
+
+	if len(targets) == 0 {
+		return filterNoResultErr()
+	}
+	data = &targets[0]
+	return setInternetResourceData(d, client, data)
 }

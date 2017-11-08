@@ -3,6 +3,7 @@ package sakuracloud
 import (
 	"fmt"
 	"github.com/hashicorp/terraform/helper/schema"
+	"github.com/sacloud/libsacloud/sacloud"
 )
 
 func dataSourceSakuraCloudGSLB() *schema.Resource {
@@ -10,6 +11,18 @@ func dataSourceSakuraCloudGSLB() *schema.Resource {
 		Read: dataSourceSakuraCloudGSLBRead,
 
 		Schema: map[string]*schema.Schema{
+			"name_selectors": {
+				Type:     schema.TypeList,
+				Optional: true,
+				ForceNew: true,
+				Elem:     &schema.Schema{Type: schema.TypeString},
+			},
+			"tag_selectors": {
+				Type:     schema.TypeList,
+				Optional: true,
+				ForceNew: true,
+				Elem:     &schema.Schema{Type: schema.TypeString},
+			},
 			"filter": {
 				Type:     schema.TypeSet,
 				Optional: true,
@@ -110,10 +123,36 @@ func dataSourceSakuraCloudGSLBRead(d *schema.ResourceData, meta interface{}) err
 		return fmt.Errorf("Couldn't find SakuraCloud GSLB resource: %s", err)
 	}
 	if res == nil || res.Count == 0 {
-		return nil
-		//return fmt.Errorf("Your query returned no results. Please change your filters and try again.")
+		return filterNoResultErr()
 	}
-	gslb := res.CommonServiceGSLBItems[0]
+	var data *sacloud.GSLB
+	targets := res.CommonServiceGSLBItems
 
-	return setGSLBResourceData(d, client, &gslb)
+	if rawNameSelector, ok := d.GetOk("name_selectors"); ok {
+		selectors := expandStringList(rawNameSelector.([]interface{}))
+		var filtered []sacloud.GSLB
+		for _, a := range res.CommonServiceGSLBItems {
+			if hasNames(&a, selectors) {
+				filtered = append(filtered, a)
+			}
+		}
+		targets = filtered
+	}
+	if rawTagSelector, ok := d.GetOk("tag_selectors"); ok {
+		selectors := expandStringList(rawTagSelector.([]interface{}))
+		var filtered []sacloud.GSLB
+		for _, a := range res.CommonServiceGSLBItems {
+			if hasTags(&a, selectors) {
+				filtered = append(filtered, a)
+			}
+		}
+		targets = filtered
+	}
+
+	if len(targets) == 0 {
+		return filterNoResultErr()
+	}
+	data = &targets[0]
+
+	return setGSLBResourceData(d, client, data)
 }

@@ -3,6 +3,7 @@ package sakuracloud
 import (
 	"fmt"
 	"github.com/hashicorp/terraform/helper/schema"
+	"github.com/sacloud/libsacloud/sacloud"
 )
 
 func dataSourceSakuraCloudDNS() *schema.Resource {
@@ -10,6 +11,18 @@ func dataSourceSakuraCloudDNS() *schema.Resource {
 		Read: dataSourceSakuraCloudDNSRead,
 
 		Schema: map[string]*schema.Schema{
+			"name_selectors": {
+				Type:     schema.TypeList,
+				Optional: true,
+				ForceNew: true,
+				Elem:     &schema.Schema{Type: schema.TypeString},
+			},
+			"tag_selectors": {
+				Type:     schema.TypeList,
+				Optional: true,
+				ForceNew: true,
+				Elem:     &schema.Schema{Type: schema.TypeString},
+			},
 			"filter": {
 				Type:     schema.TypeSet,
 				Optional: true,
@@ -72,10 +85,36 @@ func dataSourceSakuraCloudDNSRead(d *schema.ResourceData, meta interface{}) erro
 		return fmt.Errorf("Couldn't find SakuraCloud DNS resource: %s", err)
 	}
 	if res == nil || res.Count == 0 {
-		return nil
-		//return fmt.Errorf("Your query returned no results. Please change your filters and try again.")
+		return filterNoResultErr()
 	}
-	dns := res.CommonServiceDNSItems[0]
+	var data *sacloud.DNS
+	targets := res.CommonServiceDNSItems
 
-	return setDNSResourceData(d, client, &dns)
+	if rawNameSelector, ok := d.GetOk("name_selectors"); ok {
+		selectors := expandStringList(rawNameSelector.([]interface{}))
+		var filtered []sacloud.DNS
+		for _, a := range res.CommonServiceDNSItems {
+			if hasNames(&a, selectors) {
+				filtered = append(filtered, a)
+			}
+		}
+		targets = filtered
+	}
+	if rawTagSelector, ok := d.GetOk("tag_selectors"); ok {
+		selectors := expandStringList(rawTagSelector.([]interface{}))
+		var filtered []sacloud.DNS
+		for _, a := range res.CommonServiceDNSItems {
+			if hasTags(&a, selectors) {
+				filtered = append(filtered, a)
+			}
+		}
+		targets = filtered
+	}
+
+	if len(targets) == 0 {
+		return filterNoResultErr()
+	}
+	data = &targets[0]
+
+	return setDNSResourceData(d, client, data)
 }

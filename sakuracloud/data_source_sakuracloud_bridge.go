@@ -3,6 +3,7 @@ package sakuracloud
 import (
 	"fmt"
 	"github.com/hashicorp/terraform/helper/schema"
+	"github.com/sacloud/libsacloud/sacloud"
 )
 
 func dataSourceSakuraCloudBridge() *schema.Resource {
@@ -10,6 +11,12 @@ func dataSourceSakuraCloudBridge() *schema.Resource {
 		Read: dataSourceSakuraCloudBridgeRead,
 
 		Schema: map[string]*schema.Schema{
+			"name_selectors": {
+				Type:     schema.TypeList,
+				Optional: true,
+				ForceNew: true,
+				Elem:     &schema.Schema{Type: schema.TypeString},
+			},
 			"filter": {
 				Type:     schema.TypeSet,
 				Optional: true,
@@ -71,9 +78,27 @@ func dataSourceSakuraCloudBridgeRead(d *schema.ResourceData, meta interface{}) e
 		return fmt.Errorf("Couldn't find SakuraCloud Bridge resource: %s", err)
 	}
 	if res == nil || res.Count == 0 {
-		return nil
-		//return fmt.Errorf("Your query returned no results. Please change your filters and try again.")
+		return filterNoResultErr()
 	}
-	data := res.Bridges[0]
-	return setBridgeResourceData(d, client, &data)
+
+	var data *sacloud.Bridge
+	targets := res.Bridges
+
+	if rawNameSelector, ok := d.GetOk("name_selectors"); ok {
+		selectors := expandStringList(rawNameSelector.([]interface{}))
+		var filtered []sacloud.Bridge
+		for _, a := range res.Bridges {
+			if hasNames(&a, selectors) {
+				filtered = append(filtered, a)
+			}
+		}
+		targets = filtered
+	}
+
+	if len(targets) == 0 {
+		return filterNoResultErr()
+	}
+	data = &targets[0]
+
+	return setBridgeResourceData(d, client, data)
 }

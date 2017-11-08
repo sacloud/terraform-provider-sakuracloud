@@ -5,11 +5,10 @@ import (
 	"fmt"
 	"github.com/hashicorp/terraform/helper/resource"
 	"github.com/hashicorp/terraform/terraform"
-
 	"testing"
 )
 
-func TestAccSakuraCloudSSHKeyDataSource_Basic(t *testing.T) {
+func TestAccSakuraCloudDataSourceSSHKey_Basic(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck:                  func() { testAccPreCheck(t) },
 		Providers:                 testAccProviders,
@@ -32,11 +31,22 @@ func TestAccSakuraCloudSSHKeyDataSource_Basic(t *testing.T) {
 				),
 			},
 			{
-				Destroy: true,
-				Config:  testAccCheckSakuraCloudDataSourceSSHKeyConfig_NotExists,
+				Config: testAccCheckSakuraCloudDataSourceSSHKey_NameSelector_Exists,
+				Check:  testAccCheckSakuraCloudSSHKeyDataSourceID("sakuracloud_ssh_key.foobar"),
+			},
+			{
+				Config: testAccCheckSakuraCloudDataSourceSSHKeyConfig_NotExists,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckSakuraCloudSSHKeyDataSourceNotExists("data.sakuracloud_ssh_key.foobar"),
 				),
+				Destroy: true,
+			},
+			{
+				Config: testAccCheckSakuraCloudDataSourceSSHKey_NameSelector_NotExists,
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckSakuraCloudSSHKeyDataSourceNotExists("data.sakuracloud_ssh_key.foobar"),
+				),
+				Destroy: true,
 			},
 		},
 	})
@@ -112,3 +122,14 @@ data "sakuracloud_ssh_key" "foobar" {
 	values = ["xxxxxxxxxxxxxxxxxx"]
     }
 }`, testAccCheckSakuraCloudDataSourceSSHKeyBase)
+
+var testAccCheckSakuraCloudDataSourceSSHKey_NameSelector_Exists = fmt.Sprintf(`
+%s
+data "sakuracloud_ssh_key" "foobar" {
+    name_selectors = ["name", "test"]
+}`, testAccCheckSakuraCloudDataSourceSSHKeyBase)
+
+var testAccCheckSakuraCloudDataSourceSSHKey_NameSelector_NotExists = `
+data "sakuracloud_ssh_key" "foobar" {
+    name_selectors = ["xxxxxxxxxx"]
+}`

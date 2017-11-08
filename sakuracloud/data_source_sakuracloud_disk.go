@@ -3,6 +3,7 @@ package sakuracloud
 import (
 	"fmt"
 	"github.com/hashicorp/terraform/helper/schema"
+	"github.com/sacloud/libsacloud/sacloud"
 )
 
 func dataSourceSakuraCloudDisk() *schema.Resource {
@@ -10,6 +11,18 @@ func dataSourceSakuraCloudDisk() *schema.Resource {
 		Read: dataSourceSakuraCloudDiskRead,
 
 		Schema: map[string]*schema.Schema{
+			"name_selectors": {
+				Type:     schema.TypeList,
+				Optional: true,
+				ForceNew: true,
+				Elem:     &schema.Schema{Type: schema.TypeString},
+			},
+			"tag_selectors": {
+				Type:     schema.TypeList,
+				Optional: true,
+				ForceNew: true,
+				Elem:     &schema.Schema{Type: schema.TypeString},
+			},
 			"filter": {
 				Type:     schema.TypeSet,
 				Optional: true,
@@ -90,10 +103,35 @@ func dataSourceSakuraCloudDiskRead(d *schema.ResourceData, meta interface{}) err
 		return fmt.Errorf("Couldn't find SakuraCloud Disk resource: %s", err)
 	}
 	if res == nil || res.Count == 0 {
-		return nil
-		//return fmt.Errorf("Your query returned no results. Please change your filters and try again.")
+		return filterNoResultErr()
 	}
-	data := res.Disks[0]
+	var data *sacloud.Disk
+	targets := res.Disks
 
-	return setDiskResourceData(d, client, &data)
+	if rawNameSelector, ok := d.GetOk("name_selectors"); ok {
+		selectors := expandStringList(rawNameSelector.([]interface{}))
+		var filtered []sacloud.Disk
+		for _, a := range res.Disks {
+			if hasNames(&a, selectors) {
+				filtered = append(filtered, a)
+			}
+		}
+		targets = filtered
+	}
+	if rawTagSelector, ok := d.GetOk("tag_selectors"); ok {
+		selectors := expandStringList(rawTagSelector.([]interface{}))
+		var filtered []sacloud.Disk
+		for _, a := range res.Disks {
+			if hasTags(&a, selectors) {
+				filtered = append(filtered, a)
+			}
+		}
+		targets = filtered
+	}
+
+	if len(targets) == 0 {
+		return filterNoResultErr()
+	}
+	data = &targets[0]
+	return setDiskResourceData(d, client, data)
 }

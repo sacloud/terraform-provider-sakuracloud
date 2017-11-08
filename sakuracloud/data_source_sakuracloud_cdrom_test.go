@@ -5,11 +5,10 @@ import (
 	"fmt"
 	"github.com/hashicorp/terraform/helper/resource"
 	"github.com/hashicorp/terraform/terraform"
-
 	"testing"
 )
 
-func TestAccSakuraCloudCDROMDataSource_Basic(t *testing.T) {
+func TestAccSakuraCloudDataSourceCDROM_Basic(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck:                  func() { testAccPreCheck(t) },
 		Providers:                 testAccProviders,
@@ -32,25 +31,50 @@ func TestAccSakuraCloudCDROMDataSource_Basic(t *testing.T) {
 				),
 			},
 			{
-				Destroy: true,
-				Config:  testAccCheckSakuraCloudDataSourceCDROMConfig_With_Tag,
+				Config: testAccCheckSakuraCloudDataSourceCDROMConfig_With_Tag,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckSakuraCloudCDROMDataSourceID("data.sakuracloud_cdrom.foobar"),
 				),
 			},
 			{
-				Destroy: true,
-				Config:  testAccCheckSakuraCloudDataSourceCDROMConfig_NotExists,
+				Config: testAccCheckSakuraCloudDataSourceCDROM_NameSelector_Exists,
 				Check: resource.ComposeTestCheckFunc(
-					testAccCheckSakuraCloudCDROMDataSourceNotExists("data.sakuracloud_cdrom.foobar"),
+					testAccCheckSakuraCloudCDROMDataSourceID("data.sakuracloud_cdrom.foobar"),
 				),
 			},
 			{
-				Destroy: true,
-				Config:  testAccCheckSakuraCloudDataSourceCDROMConfig_With_NotExists_Tag,
+				Config: testAccCheckSakuraCloudDataSourceCDROM_TagSelector_Exists,
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckSakuraCloudCDROMDataSourceID("data.sakuracloud_cdrom.foobar"),
+				),
+			},
+			{
+				Config: testAccCheckSakuraCloudDataSourceCDROMConfig_NotExists,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckSakuraCloudCDROMDataSourceNotExists("data.sakuracloud_cdrom.foobar"),
 				),
+				Destroy: true,
+			},
+			{
+				Config: testAccCheckSakuraCloudDataSourceCDROMConfig_With_NotExists_Tag,
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckSakuraCloudCDROMDataSourceNotExists("data.sakuracloud_cdrom.foobar"),
+				),
+				Destroy: true,
+			},
+			{
+				Config: testAccCheckSakuraCloudDataSourceCDROM_NameSelector_NotExists,
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckSakuraCloudCDROMDataSourceNotExists("data.sakuracloud_cdrom.foobar"),
+				),
+				Destroy: true,
+			},
+			{
+				Config: testAccCheckSakuraCloudDataSourceCDROM_TagSelector_NotExists,
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckSakuraCloudCDROMDataSourceNotExists("data.sakuracloud_cdrom.foobar"),
+				),
+				Destroy: true,
 			},
 		},
 	})
@@ -132,4 +156,25 @@ data "sakuracloud_cdrom" "foobar" {
 	name = "Name"
 	values = ["xxxxxxxxxxxxxxxxxx"]
     }
+}`
+
+var testAccCheckSakuraCloudDataSourceCDROM_NameSelector_Exists = `
+data "sakuracloud_cdrom" "foobar" {
+    name_selectors = ["Ubuntu","server","16"]
+}
+`
+var testAccCheckSakuraCloudDataSourceCDROM_NameSelector_NotExists = `
+data "sakuracloud_cdrom" "foobar" {
+    name_selectors = ["xxxxxxxxxx"]
+}
+`
+
+var testAccCheckSakuraCloudDataSourceCDROM_TagSelector_Exists = `
+data "sakuracloud_cdrom" "foobar" {
+	tag_selectors = ["distro-ubuntu","os-linux"]
+}`
+
+var testAccCheckSakuraCloudDataSourceCDROM_TagSelector_NotExists = `
+data "sakuracloud_cdrom" "foobar" {
+	tag_selectors = ["xxxxxxxxxx"]
 }`

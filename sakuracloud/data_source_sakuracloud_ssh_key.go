@@ -3,6 +3,7 @@ package sakuracloud
 import (
 	"fmt"
 	"github.com/hashicorp/terraform/helper/schema"
+	"github.com/sacloud/libsacloud/sacloud"
 )
 
 func dataSourceSakuraCloudSSHKey() *schema.Resource {
@@ -10,6 +11,12 @@ func dataSourceSakuraCloudSSHKey() *schema.Resource {
 		Read: dataSourceSakuraCloudSSHKeyRead,
 
 		Schema: map[string]*schema.Schema{
+			"name_selectors": {
+				Type:     schema.TypeList,
+				Optional: true,
+				ForceNew: true,
+				Elem:     &schema.Schema{Type: schema.TypeString},
+			},
 			"filter": {
 				Type:     schema.TypeSet,
 				Optional: true,
@@ -65,10 +72,26 @@ func dataSourceSakuraCloudSSHKeyRead(d *schema.ResourceData, meta interface{}) e
 		return fmt.Errorf("Couldn't find SakuraCloud SSHKey resource: %s", err)
 	}
 	if res == nil || res.Count == 0 {
-		return nil
-		//return fmt.Errorf("Your query returned no results. Please change your filters and try again.")
+		return filterNoResultErr()
 	}
-	key := res.SSHKeys[0]
+	var data *sacloud.SSHKey
+	targets := res.SSHKeys
 
-	return setSSHKeyResourceData(d, client, &key)
+	if rawNameSelector, ok := d.GetOk("name_selectors"); ok {
+		selectors := expandStringList(rawNameSelector.([]interface{}))
+		var filtered []sacloud.SSHKey
+		for _, a := range res.SSHKeys {
+			if hasNames(&a, selectors) {
+				filtered = append(filtered, a)
+			}
+		}
+		targets = filtered
+	}
+
+	if len(targets) == 0 {
+		return filterNoResultErr()
+	}
+	data = &targets[0]
+
+	return setSSHKeyResourceData(d, client, data)
 }

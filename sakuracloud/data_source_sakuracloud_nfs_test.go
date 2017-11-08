@@ -5,11 +5,10 @@ import (
 	"fmt"
 	"github.com/hashicorp/terraform/helper/resource"
 	"github.com/hashicorp/terraform/terraform"
-
 	"testing"
 )
 
-func TestAccSakuraCloudNFSDataSource_Basic(t *testing.T) {
+func TestAccSakuraCloudDataSourceNFS_Basic(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck:                  func() { testAccPreCheck(t) },
 		Providers:                 testAccProviders,
@@ -34,25 +33,50 @@ func TestAccSakuraCloudNFSDataSource_Basic(t *testing.T) {
 				),
 			},
 			{
-				Destroy: true,
-				Config:  testAccCheckSakuraCloudDataSourceNFSConfig_With_Tag,
+				Config: testAccCheckSakuraCloudDataSourceNFSConfig_With_Tag,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckSakuraCloudNFSDataSourceID("data.sakuracloud_nfs.foobar"),
 				),
 			},
 			{
-				Destroy: true,
-				Config:  testAccCheckSakuraCloudDataSourceNFSConfig_NotExists,
+				Config: testAccCheckSakuraCloudDataSourceNFS_NameSelector_Exists,
 				Check: resource.ComposeTestCheckFunc(
-					testAccCheckSakuraCloudNFSDataSourceNotExists("data.sakuracloud_nfs.foobar"),
+					testAccCheckSakuraCloudNFSDataSourceID("data.sakuracloud_nfs.foobar"),
 				),
 			},
 			{
-				Destroy: true,
-				Config:  testAccCheckSakuraCloudDataSourceNFSConfig_With_NotExists_Tag,
+				Config: testAccCheckSakuraCloudDataSourceNFS_TagSelector_Exists,
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckSakuraCloudNFSDataSourceID("data.sakuracloud_nfs.foobar"),
+				),
+			},
+			{
+				Config: testAccCheckSakuraCloudDataSourceNFSConfig_NotExists,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckSakuraCloudNFSDataSourceNotExists("data.sakuracloud_nfs.foobar"),
 				),
+				Destroy: true,
+			},
+			{
+				Config: testAccCheckSakuraCloudDataSourceNFSConfig_With_NotExists_Tag,
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckSakuraCloudNFSDataSourceNotExists("data.sakuracloud_nfs.foobar"),
+				),
+				Destroy: true,
+			},
+			{
+				Config: testAccCheckSakuraCloudDataSourceNFS_NameSelector_NotExists,
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckSakuraCloudNFSDataSourceNotExists("data.sakuracloud_nfs.foobar"),
+				),
+				Destroy: true,
+			},
+			{
+				Config: testAccCheckSakuraCloudDataSourceNFS_TagSelector_NotExists,
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckSakuraCloudNFSDataSourceNotExists("data.sakuracloud_nfs.foobar"),
+				),
+				Destroy: true,
 			},
 		},
 	})
@@ -201,4 +225,51 @@ data "sakuracloud_nfs" "foobar" {
 	name = "Name"
 	values = ["xxxxxxxxxxxxxxxxxx"]
     }
+}`
+
+var testAccCheckSakuraCloudDataSourceNFS_NameSelector_Exists = `
+resource sakuracloud_switch "sw"{
+    name = "sw"
+}
+resource "sakuracloud_nfs" "foobar" {
+    switch_id = "${sakuracloud_switch.sw.id}"
+    ipaddress = "192.168.11.101"
+    nw_mask_len = 24
+    default_route = "192.168.11.1"
+
+    name = "name_test"
+    description = "description_test"
+    tags = ["tag1","tag2","tag3"]
+}
+data "sakuracloud_nfs" "foobar" {
+    name_selectors = ["name", "test"]
+}
+`
+var testAccCheckSakuraCloudDataSourceNFS_NameSelector_NotExists = `
+data "sakuracloud_nfs" "foobar" {
+    name_selectors = ["xxxxxxxxxx"]
+}
+`
+
+var testAccCheckSakuraCloudDataSourceNFS_TagSelector_Exists = `
+resource sakuracloud_switch "sw"{
+    name = "sw"
+}
+resource "sakuracloud_nfs" "foobar" {
+    switch_id = "${sakuracloud_switch.sw.id}"
+    ipaddress = "192.168.11.101"
+    nw_mask_len = 24
+    default_route = "192.168.11.1"
+
+    name = "name_test"
+    description = "description_test"
+    tags = ["tag1","tag2","tag3"]
+}
+data "sakuracloud_nfs" "foobar" {
+	tag_selectors = ["tag1","tag2","tag3"]
+}`
+
+var testAccCheckSakuraCloudDataSourceNFS_TagSelector_NotExists = `
+data "sakuracloud_nfs" "foobar" {
+	tag_selectors = ["xxxxxxxxxx"]
 }`

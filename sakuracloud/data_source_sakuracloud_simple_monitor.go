@@ -3,6 +3,7 @@ package sakuracloud
 import (
 	"fmt"
 	"github.com/hashicorp/terraform/helper/schema"
+	"github.com/sacloud/libsacloud/sacloud"
 )
 
 func dataSourceSakuraCloudSimpleMonitor() *schema.Resource {
@@ -10,6 +11,18 @@ func dataSourceSakuraCloudSimpleMonitor() *schema.Resource {
 		Read: dataSourceSakuraCloudSimpleMonitorRead,
 
 		Schema: map[string]*schema.Schema{
+			"name_selectors": {
+				Type:     schema.TypeList,
+				Optional: true,
+				ForceNew: true,
+				Elem:     &schema.Schema{Type: schema.TypeString},
+			},
+			"tag_selectors": {
+				Type:     schema.TypeList,
+				Optional: true,
+				ForceNew: true,
+				Elem:     &schema.Schema{Type: schema.TypeString},
+			},
 			"filter": {
 				Type:     schema.TypeSet,
 				Optional: true,
@@ -144,10 +157,36 @@ func dataSourceSakuraCloudSimpleMonitorRead(d *schema.ResourceData, meta interfa
 		return fmt.Errorf("Couldn't find SakuraCloud SimpleMonitor resource: %s", err)
 	}
 	if res == nil || res.Count == 0 {
-		return nil
-		//return fmt.Errorf("Your query returned no results. Please change your filters and try again.")
+		return filterNoResultErr()
 	}
-	simpleMonitor := res.SimpleMonitors[0]
+	var data *sacloud.SimpleMonitor
+	targets := res.SimpleMonitors
 
-	return setSimpleMonitorResourceData(d, client, &simpleMonitor)
+	if rawNameSelector, ok := d.GetOk("name_selectors"); ok {
+		selectors := expandStringList(rawNameSelector.([]interface{}))
+		var filtered []sacloud.SimpleMonitor
+		for _, a := range res.SimpleMonitors {
+			if hasNames(&a, selectors) {
+				filtered = append(filtered, a)
+			}
+		}
+		targets = filtered
+	}
+	if rawTagSelector, ok := d.GetOk("tag_selectors"); ok {
+		selectors := expandStringList(rawTagSelector.([]interface{}))
+		var filtered []sacloud.SimpleMonitor
+		for _, a := range res.SimpleMonitors {
+			if hasTags(&a, selectors) {
+				filtered = append(filtered, a)
+			}
+		}
+		targets = filtered
+	}
+
+	if len(targets) == 0 {
+		return filterNoResultErr()
+	}
+	data = &targets[0]
+
+	return setSimpleMonitorResourceData(d, client, data)
 }

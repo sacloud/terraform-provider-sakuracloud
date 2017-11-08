@@ -5,11 +5,10 @@ import (
 	"fmt"
 	"github.com/hashicorp/terraform/helper/resource"
 	"github.com/hashicorp/terraform/terraform"
-
 	"testing"
 )
 
-func TestAccSakuraCloudGSLBDataSource_Basic(t *testing.T) {
+func TestAccSakuraCloudDataSourceGSLB_Basic(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck:                  func() { testAccPreCheck(t) },
 		Providers:                 testAccProviders,
@@ -38,25 +37,50 @@ func TestAccSakuraCloudGSLBDataSource_Basic(t *testing.T) {
 				),
 			},
 			{
-				Destroy: true,
-				Config:  testAccCheckSakuraCloudDataSourceGSLBConfig_With_Tag,
+				Config: testAccCheckSakuraCloudDataSourceGSLBConfig_With_Tag,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckSakuraCloudGSLBDataSourceID("data.sakuracloud_gslb.foobar"),
 				),
 			},
 			{
-				Destroy: true,
-				Config:  testAccCheckSakuraCloudDataSourceGSLBConfig_NotExists,
+				Config: testAccCheckSakuraCloudDataSourceGSLB_NameSelector_Exists,
 				Check: resource.ComposeTestCheckFunc(
-					testAccCheckSakuraCloudGSLBDataSourceNotExists("data.sakuracloud_gslb.foobar"),
+					testAccCheckSakuraCloudGSLBDataSourceID("data.sakuracloud_gslb.foobar"),
 				),
 			},
 			{
-				Destroy: true,
-				Config:  testAccCheckSakuraCloudDataSourceGSLBConfig_With_NotExists_Tag,
+				Config: testAccCheckSakuraCloudDataSourceGSLB_TagSelector_Exists,
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckSakuraCloudGSLBDataSourceID("data.sakuracloud_gslb.foobar"),
+				),
+			},
+			{
+				Config: testAccCheckSakuraCloudDataSourceGSLBConfig_NotExists,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckSakuraCloudGSLBDataSourceNotExists("data.sakuracloud_gslb.foobar"),
 				),
+				Destroy: true,
+			},
+			{
+				Config: testAccCheckSakuraCloudDataSourceGSLBConfig_With_NotExists_Tag,
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckSakuraCloudGSLBDataSourceNotExists("data.sakuracloud_gslb.foobar"),
+				),
+				Destroy: true,
+			},
+			{
+				Config: testAccCheckSakuraCloudDataSourceGSLB_NameSelector_NotExists,
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckSakuraCloudGSLBDataSourceNotExists("data.sakuracloud_gslb.foobar"),
+				),
+				Destroy: true,
+			},
+			{
+				Config: testAccCheckSakuraCloudDataSourceGSLB_TagSelector_NotExists,
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckSakuraCloudGSLBDataSourceNotExists("data.sakuracloud_gslb.foobar"),
+				),
+				Destroy: true,
 			},
 		},
 	})
@@ -205,4 +229,51 @@ data "sakuracloud_gslb" "foobar" {
 	name = "Name"
 	values = ["xxxxxxxxxxxxxxxxxx"]
     }
+}`
+
+var testAccCheckSakuraCloudDataSourceGSLB_NameSelector_Exists = `
+resource "sakuracloud_gslb" "foobar" {
+    name = "name_test"
+    health_check = {
+        protocol = "http"
+        delay_loop = 10
+        host_header = "terraform.io"
+        path = "/"
+        status = "200"
+    }
+    sorry_server = "8.8.8.8"
+    description = "description_test"
+    tags = ["tag1","tag2","tag3"]
+}
+data "sakuracloud_gslb" "foobar" {
+    name_selectors = ["name", "test"]
+}
+`
+var testAccCheckSakuraCloudDataSourceGSLB_NameSelector_NotExists = `
+data "sakuracloud_gslb" "foobar" {
+    name_selectors = ["xxxxxxxxxx"]
+}
+`
+
+var testAccCheckSakuraCloudDataSourceGSLB_TagSelector_Exists = `
+resource "sakuracloud_gslb" "foobar" {
+    name = "name_test"
+    health_check = {
+        protocol = "http"
+        delay_loop = 10
+        host_header = "terraform.io"
+        path = "/"
+        status = "200"
+    }
+    sorry_server = "8.8.8.8"
+    description = "description_test"
+    tags = ["tag1","tag2","tag3"]
+}
+data "sakuracloud_gslb" "foobar" {
+	tag_selectors = ["tag1","tag2","tag3"]
+}`
+
+var testAccCheckSakuraCloudDataSourceGSLB_TagSelector_NotExists = `
+data "sakuracloud_gslb" "foobar" {
+	tag_selectors = ["xxxxxxxxxx"]
 }`
