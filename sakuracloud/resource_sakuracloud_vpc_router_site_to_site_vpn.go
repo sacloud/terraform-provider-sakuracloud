@@ -162,7 +162,6 @@ func resourceSakuraCloudVPCRouterSiteToSiteIPsecVPNCreate(d *schema.ResourceData
 		return fmt.Errorf("Couldn'd apply SakuraCloud VPCRouter config: %s", err)
 	}
 
-	d.SetId(vpcRouterSiteToSiteIPsecVPNIDHash(routerID, s2s))
 	return resourceSakuraCloudVPCRouterSiteToSiteIPsecVPNRead(d, meta)
 }
 
@@ -188,11 +187,8 @@ func resourceSakuraCloudVPCRouterSiteToSiteIPsecVPNRead(d *schema.ResourceData, 
 		d.Set("remote_id", s2s.RemoteID)
 		d.Set("routes", s2s.Routes)
 	} else {
-		d.Set("local_prefix", "")
-		d.Set("peer", "")
-		d.Set("pre_shared_secret", "")
-		d.Set("remote_id", "")
-		d.Set("routes", "")
+		d.SetId("")
+		return nil
 	}
 
 	// SiteToSiteConnectionDetail
@@ -227,6 +223,7 @@ func resourceSakuraCloudVPCRouterSiteToSiteIPsecVPNRead(d *schema.ResourceData, 
 		}
 	}
 
+	d.SetId(vpcRouterSiteToSiteIPsecVPNIDHash(routerID, s2s))
 	d.Set("zone", client.Zone)
 
 	return nil

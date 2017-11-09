@@ -40,6 +40,12 @@ func TestAccSakuraCloudVPCRouterSetting_Basic(t *testing.T) {
 					resource.TestCheckResourceAttr(
 						"sakuracloud_vpc_router_dhcp_server.dhcp", "range_stop", "192.168.11.200"),
 					resource.TestCheckResourceAttr(
+						"sakuracloud_vpc_router_dhcp_server.dhcp", "dns_servers.#", "2"),
+					resource.TestCheckResourceAttr(
+						"sakuracloud_vpc_router_dhcp_server.dhcp", "dns_servers.0", "8.8.4.4"),
+					resource.TestCheckResourceAttr(
+						"sakuracloud_vpc_router_dhcp_server.dhcp", "dns_servers.1", "8.8.8.8"),
+					resource.TestCheckResourceAttr(
 						"sakuracloud_vpc_router_dhcp_static_mapping.dhcp_map", "ipaddress", "192.168.11.20"),
 					resource.TestCheckResourceAttr(
 						"sakuracloud_vpc_router_dhcp_static_mapping.dhcp_map", "macaddress", "aa:bb:cc:aa:bb:cc"),
@@ -63,6 +69,8 @@ func TestAccSakuraCloudVPCRouterSetting_Basic(t *testing.T) {
 						"sakuracloud_vpc_router_site_to_site_vpn.s2s", "routes.0", "10.0.0.0/8"),
 					resource.TestCheckResourceAttr(
 						"sakuracloud_vpc_router_site_to_site_vpn.s2s", "local_prefix.0", "192.168.21.0/24"),
+					resource.TestCheckResourceAttr(
+						"sakuracloud_vpc_router_firewall.send_fw", "vpc_router_interface_index", "1"),
 					resource.TestCheckResourceAttr(
 						"sakuracloud_vpc_router_firewall.send_fw", "direction", "send"),
 					resource.TestCheckResourceAttr(
@@ -89,6 +97,8 @@ func TestAccSakuraCloudVPCRouterSetting_Basic(t *testing.T) {
 						"sakuracloud_vpc_router_firewall.send_fw", "expressions.1.dest_nw", ""),
 					resource.TestCheckResourceAttr(
 						"sakuracloud_vpc_router_firewall.send_fw", "expressions.1.dest_port", ""),
+					resource.TestCheckResourceAttr(
+						"sakuracloud_vpc_router_firewall.receive_fw", "vpc_router_interface_index", "1"),
 					resource.TestCheckResourceAttr(
 						"sakuracloud_vpc_router_firewall.receive_fw", "direction", "receive"),
 					resource.TestCheckResourceAttr(
@@ -155,6 +165,12 @@ func TestAccSakuraCloudVPCRouterSetting_Update(t *testing.T) {
 					resource.TestCheckResourceAttr(
 						"sakuracloud_vpc_router_dhcp_server.dhcp", "range_stop", "192.168.11.200"),
 					resource.TestCheckResourceAttr(
+						"sakuracloud_vpc_router_dhcp_server.dhcp", "dns_servers.#", "2"),
+					resource.TestCheckResourceAttr(
+						"sakuracloud_vpc_router_dhcp_server.dhcp", "dns_servers.0", "8.8.4.4"),
+					resource.TestCheckResourceAttr(
+						"sakuracloud_vpc_router_dhcp_server.dhcp", "dns_servers.1", "8.8.8.8"),
+					resource.TestCheckResourceAttr(
 						"sakuracloud_vpc_router_dhcp_static_mapping.dhcp_map", "ipaddress", "192.168.11.20"),
 					resource.TestCheckResourceAttr(
 						"sakuracloud_vpc_router_dhcp_static_mapping.dhcp_map", "macaddress", "aa:bb:cc:aa:bb:cc"),
@@ -202,6 +218,8 @@ func TestAccSakuraCloudVPCRouterSetting_Update(t *testing.T) {
 						"sakuracloud_vpc_router_dhcp_server.dhcp", "range_start", "192.168.11.151"),
 					resource.TestCheckResourceAttr(
 						"sakuracloud_vpc_router_dhcp_server.dhcp", "range_stop", "192.168.11.200"),
+					resource.TestCheckResourceAttr(
+						"sakuracloud_vpc_router_dhcp_server.dhcp", "dns_servers.#", "0"),
 					resource.TestCheckResourceAttr(
 						"sakuracloud_vpc_router_dhcp_static_mapping.dhcp_map", "ipaddress", "192.168.11.21"),
 					resource.TestCheckResourceAttr(
@@ -392,7 +410,8 @@ resource "sakuracloud_vpc_router_dhcp_server" "dhcp" {
     vpc_router_interface_index = "${sakuracloud_vpc_router_interface.eth1.index}"
 
     range_start = "192.168.11.151"
-    range_stop = "192.168.11.200"
+    range_stop  = "192.168.11.200"
+    dns_servers = ["8.8.4.4", "8.8.8.8"]
 }
 resource "sakuracloud_vpc_router_dhcp_static_mapping" "dhcp_map" {
     vpc_router_id = "${sakuracloud_vpc_router.foobar.id}"
@@ -425,7 +444,8 @@ resource "sakuracloud_vpc_router_site_to_site_vpn" "s2s" {
 }
 
 resource "sakuracloud_vpc_router_firewall" "send_fw" {
-    vpc_router_id = "${sakuracloud_vpc_router.foobar.id}"
+    vpc_router_id              = "${sakuracloud_vpc_router.foobar.id}"
+    vpc_router_interface_index = 1
     direction = "send"
     expressions = {
         protocol = "tcp"
@@ -451,7 +471,8 @@ resource "sakuracloud_vpc_router_firewall" "send_fw" {
 }
 
 resource "sakuracloud_vpc_router_firewall" "receive_fw" {
-    vpc_router_id = "${sakuracloud_vpc_router.foobar.id}"
+    vpc_router_id              = "${sakuracloud_vpc_router.foobar.id}"
+    vpc_router_interface_index = 1
     direction = "receive"
     expressions = {
         protocol = "tcp"
@@ -572,7 +593,8 @@ resource "sakuracloud_vpc_router_site_to_site_vpn" "s2s" {
     local_prefix = ["192.168.21.0/24"]
 }
 resource "sakuracloud_vpc_router_firewall" "send_fw" {
-    vpc_router_id = "${sakuracloud_vpc_router.foobar.id}"
+    vpc_router_id              = "${sakuracloud_vpc_router.foobar.id}"
+    vpc_router_interface_index = 1
     direction = "send"
     expressions = {
         protocol = "tcp"
@@ -598,8 +620,9 @@ resource "sakuracloud_vpc_router_firewall" "send_fw" {
 }
 
 resource "sakuracloud_vpc_router_firewall" "receive_fw" {
-    vpc_router_id = "${sakuracloud_vpc_router.foobar.id}"
-    direction = "receive"
+    vpc_router_id              = "${sakuracloud_vpc_router.foobar.id}"
+    vpc_router_interface_index = 1
+    direction                  = "receive"
     expressions = {
         protocol = "tcp"
         source_nw = ""

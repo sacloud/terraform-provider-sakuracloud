@@ -3,6 +3,7 @@ package sakuracloud
 import (
 	"fmt"
 	"github.com/hashicorp/terraform/helper/schema"
+	"net"
 	"strconv"
 	"strings"
 	"unicode/utf8"
@@ -144,4 +145,78 @@ func validateBackupTime() schema.SchemaValidateFunc {
 	}
 
 	return validateStringInWord(timeStrings)
+}
+
+func validateIPv4Address() schema.SchemaValidateFunc {
+	return func(v interface{}, k string) (ws []string, errors []error) {
+		// if target is nil , return OK(Use required attr if necessary)
+		if v == nil {
+			return
+		}
+
+		if value, ok := v.(string); ok {
+			if value == "" {
+				return
+			}
+
+			ip := net.ParseIP(value)
+			if ip == nil || !strings.Contains(value, ".") {
+				errors = append(errors, fmt.Errorf("%q Invalid IPv4 address format", k))
+			}
+		}
+		return
+	}
+}
+
+func validateIPv6Address() schema.SchemaValidateFunc {
+	return func(v interface{}, k string) (ws []string, errors []error) {
+		// if target is nil , return OK(Use required attr if necessary)
+		if v == nil {
+			return
+		}
+
+		if value, ok := v.(string); ok {
+			if value == "" {
+				return
+			}
+
+			ip := net.ParseIP(value)
+			if ip == nil || !strings.Contains(value, ":") {
+				errors = append(errors, fmt.Errorf("%q Invalid IPv6 address format", k))
+			}
+		}
+		return
+	}
+}
+
+func validateMulti(validators ...schema.SchemaValidateFunc) schema.SchemaValidateFunc {
+	return func(v interface{}, k string) (ws []string, errors []error) {
+		for _, validator := range validators {
+			w, errs := validator(v, k)
+			if len(w) > 0 {
+				ws = append(ws, w...)
+			}
+			if len(errs) > 0 {
+				errors = append(errors, errs...)
+			}
+		}
+		return
+	}
+}
+
+func validateList(validator schema.SchemaValidateFunc) schema.SchemaValidateFunc {
+	return func(v interface{}, k string) (ws []string, errors []error) {
+		if values, ok := v.([]interface{}); ok {
+			for _, value := range values {
+				w, errs := validator(value, k)
+				if len(w) > 0 {
+					ws = append(ws, w...)
+				}
+				if len(errs) > 0 {
+					errors = append(errors, errs...)
+				}
+			}
+		}
+		return
+	}
 }

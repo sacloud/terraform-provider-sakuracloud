@@ -22,6 +22,13 @@ func resourceSakuraCloudVPCRouterFirewall() *schema.Resource {
 				ForceNew:     true,
 				ValidateFunc: validateSakuracloudIDType,
 			},
+			"vpc_router_interface_index": {
+				Type:         schema.TypeInt,
+				Optional:     true,
+				Default:      0,
+				ForceNew:     true,
+				ValidateFunc: validateIntegerInRange(0, sacloud.VPCRouterMaxInterfaceCount-1),
+			},
 			"direction": {
 				Type:         schema.TypeString,
 				Required:     true,
@@ -106,6 +113,7 @@ func resourceSakuraCloudVPCRouterFirewallCreate(d *schema.ResourceData, meta int
 		return fmt.Errorf("Couldn't find SakuraCloud VPCRouter resource: %s", err)
 	}
 
+	ifIndex := d.Get("vpc_router_interface_index").(int)
 	direction := d.Get("direction").(string)
 
 	if vpcRouter.Settings == nil {
@@ -114,12 +122,12 @@ func resourceSakuraCloudVPCRouterFirewallCreate(d *schema.ResourceData, meta int
 
 	// clear rules
 	if vpcRouter.Settings.Router.Firewall != nil && vpcRouter.Settings.Router.Firewall.Config != nil &&
-		len(vpcRouter.Settings.Router.Firewall.Config) > 0 {
+		len(vpcRouter.Settings.Router.Firewall.Config) > ifIndex {
 		switch direction {
 		case "send":
-			vpcRouter.Settings.Router.Firewall.Config[0].Send = nil
+			vpcRouter.Settings.Router.Firewall.Config[ifIndex].Send = nil
 		case "receive":
-			vpcRouter.Settings.Router.Firewall.Config[0].Receive = nil
+			vpcRouter.Settings.Router.Firewall.Config[ifIndex].Receive = nil
 		}
 
 	}
@@ -143,9 +151,9 @@ func resourceSakuraCloudVPCRouterFirewallCreate(d *schema.ResourceData, meta int
 
 			switch direction {
 			case "send":
-				vpcRouter.Settings.Router.AddFirewallRuleSend(allow, protocol, sourceNW, sourcePort, destNW, destPort, logging, desc)
+				vpcRouter.Settings.Router.AddFirewallRuleSend(ifIndex, allow, protocol, sourceNW, sourcePort, destNW, destPort, logging, desc)
 			case "receive":
-				vpcRouter.Settings.Router.AddFirewallRuleReceive(allow, protocol, sourceNW, sourcePort, destNW, destPort, logging, desc)
+				vpcRouter.Settings.Router.AddFirewallRuleReceive(ifIndex, allow, protocol, sourceNW, sourcePort, destNW, destPort, logging, desc)
 			}
 		}
 	}
@@ -160,7 +168,6 @@ func resourceSakuraCloudVPCRouterFirewallCreate(d *schema.ResourceData, meta int
 		return fmt.Errorf("Couldn'd apply SakuraCloud VPCRouter config: %s", err)
 	}
 
-	d.SetId(vpcRouterFirewallIDHash(routerID, direction))
 	return resourceSakuraCloudVPCRouterFirewallRead(d, meta)
 }
 
@@ -177,6 +184,7 @@ func resourceSakuraCloudVPCRouterFirewallRead(d *schema.ResourceData, meta inter
 		return fmt.Errorf("Couldn't find SakuraCloud VPCRouter resource: %s", err)
 	}
 
+	ifIndex := d.Get("vpc_router_interface_index").(int)
 	direction := d.Get("direction").(string)
 	if vpcRouter.Settings != nil && vpcRouter.Settings.Router != nil && vpcRouter.Settings.Router.Firewall != nil &&
 		vpcRouter.Settings.Router.Firewall.Config != nil {
@@ -186,9 +194,9 @@ func resourceSakuraCloudVPCRouterFirewallRead(d *schema.ResourceData, meta inter
 		var rules []*sacloud.VPCRouterFirewallRule
 		switch direction {
 		case "send":
-			rules = vpcRouter.Settings.Router.Firewall.Config[0].Send
+			rules = vpcRouter.Settings.Router.Firewall.Config[ifIndex].Send
 		case "receive":
-			rules = vpcRouter.Settings.Router.Firewall.Config[0].Receive
+			rules = vpcRouter.Settings.Router.Firewall.Config[ifIndex].Receive
 		}
 
 		for _, rule := range rules {
@@ -212,6 +220,7 @@ func resourceSakuraCloudVPCRouterFirewallRead(d *schema.ResourceData, meta inter
 
 	d.Set("zone", client.Zone)
 
+	d.SetId(vpcRouterFirewallIDHash(routerID, ifIndex, direction))
 	return nil
 }
 
@@ -228,20 +237,16 @@ func resourceSakuraCloudVPCRouterFirewallDelete(d *schema.ResourceData, meta int
 		return fmt.Errorf("Couldn't find SakuraCloud VPCRouter resource: %s", err)
 	}
 
+	ifIndex := d.Get("vpc_router_interface_index").(int)
 	direction := d.Get("direction").(string)
 	if vpcRouter.Settings != nil && vpcRouter.Settings.Router != nil && vpcRouter.Settings.Router.Firewall != nil &&
 		vpcRouter.Settings.Router.Firewall.Config != nil {
 
 		switch direction {
 		case "send":
-			vpcRouter.Settings.Router.Firewall.Config[0].Send = nil
+			vpcRouter.Settings.Router.Firewall.Config[ifIndex].Send = []*sacloud.VPCRouterFirewallRule{}
 		case "receive":
-			vpcRouter.Settings.Router.Firewall.Config[0].Receive = nil
-		}
-
-		if vpcRouter.Settings.Router.Firewall.Config[0].Send == nil && vpcRouter.Settings.Router.Firewall.Config[0].Receive == nil {
-			vpcRouter.Settings.Router.Firewall.Config = nil
-			vpcRouter.Settings.Router.Firewall.Enabled = "False"
+			vpcRouter.Settings.Router.Firewall.Config[ifIndex].Receive = []*sacloud.VPCRouterFirewallRule{}
 		}
 
 		vpcRouter, err = client.VPCRouter.UpdateSetting(toSakuraCloudID(routerID), vpcRouter)
@@ -258,9 +263,10 @@ func resourceSakuraCloudVPCRouterFirewallDelete(d *schema.ResourceData, meta int
 	return nil
 }
 
-func vpcRouterFirewallIDHash(routerID string, direction string) string {
+func vpcRouterFirewallIDHash(routerID string, ifIndex int, direction string) string {
 	var buf bytes.Buffer
 	buf.WriteString(fmt.Sprintf("%s-", routerID))
+	buf.WriteString(fmt.Sprintf("%d-", ifIndex))
 	buf.WriteString(fmt.Sprintf("%s-", direction))
 
 	return fmt.Sprintf("%d", hashcode.String(buf.String()))

@@ -154,7 +154,6 @@ func resourceSakuraCloudVPCRouterInterfaceCreate(d *schema.ResourceData, meta in
 		}
 	}
 
-	d.SetId(vpcRouterInterfaceIDHash(routerID, index))
 	return resourceSakuraCloudVPCRouterInterfaceRead(d, meta)
 }
 
@@ -171,12 +170,20 @@ func resourceSakuraCloudVPCRouterInterfaceRead(d *schema.ResourceData, meta inte
 	}
 
 	index := d.Get("index").(int)
-	vpcInterface := vpcRouter.Settings.Router.Interfaces[index]
+	if index < len(vpcRouter.Settings.Router.Interfaces) {
 
-	d.Set("switch_id", vpcRouter.Interfaces[index].Switch.GetStrID())
-	d.Set("vip", vpcInterface.VirtualIPAddress)
-	d.Set("ipaddress", vpcInterface.IPAddress)
-	d.Set("nw_mask_len", vpcInterface.NetworkMaskLen)
+		vpcInterface := vpcRouter.Settings.Router.Interfaces[index]
+
+		d.Set("switch_id", vpcRouter.Interfaces[index].Switch.GetStrID())
+		d.Set("vip", vpcInterface.VirtualIPAddress)
+		d.Set("ipaddress", vpcInterface.IPAddress)
+		d.Set("nw_mask_len", vpcInterface.NetworkMaskLen)
+	} else {
+		d.SetId("")
+		return nil
+	}
+
+	d.SetId(vpcRouterInterfaceIDHash(vpcRouter.GetStrID(), index))
 	d.Set("zone", client.Zone)
 
 	return nil

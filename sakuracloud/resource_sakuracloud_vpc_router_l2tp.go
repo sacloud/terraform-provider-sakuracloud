@@ -83,7 +83,6 @@ func resourceSakuraCloudVPCRouterL2TPCreate(d *schema.ResourceData, meta interfa
 		return fmt.Errorf("Couldn'd apply SakuraCloud VPCRouter config: %s", err)
 	}
 
-	d.SetId(vpcRouterL2TPIDHash(routerID, vpcRouter.Settings.Router.L2TPIPsecServer))
 	return resourceSakuraCloudVPCRouterL2TPRead(d, meta)
 }
 
@@ -109,11 +108,11 @@ func resourceSakuraCloudVPCRouterL2TPRead(d *schema.ResourceData, meta interface
 		d.Set("range_start", l2tpSetting.RangeStart)
 		d.Set("range_stop", l2tpSetting.RangeStop)
 	} else {
-		d.Set("pre_shared_secret", "")
-		d.Set("range_start", "")
-		d.Set("range_stop", "")
+		d.SetId("")
+		return nil
 	}
 
+	d.SetId(vpcRouterL2TPIDHash(routerID, vpcRouter.Settings.Router.L2TPIPsecServer))
 	d.Set("zone", client.Zone)
 
 	return nil

@@ -455,7 +455,8 @@ resource sakuracloud_vpc_router_port_forwarding &quot;forward1&quot; {
 
 # ファイアウォール(VPC内部から外部への通信)
 resource sakuracloud_vpc_router_firewall &quot;send_fw&quot; {
-  vpc_router_id = &quot;${sakuracloud_vpc_router.foobar.id}&quot;
+  vpc_router_id              = &quot;${sakuracloud_vpc_router.foobar.id}&quot;
+  # vpc_router_interface_index = 0 # 対象インターフェースのインデックス(グローバル含む)
   direction     = &quot;send&quot;
 
   # VPC内部のWebサーバから外部への応答パケットの許可
@@ -482,6 +483,7 @@ resource sakuracloud_vpc_router_firewall &quot;send_fw&quot; {
 # ファイアウォール(VPC外部から内部への通信)
 resource sakuracloud_vpc_router_firewall &quot;receive_fw&quot; {
   vpc_router_id = &quot;${sakuracloud_vpc_router.foobar.id}&quot;
+  # vpc_router_interface_index = 0 # 対象インターフェースのインデックス(グローバル含む)
   direction     = &quot;receive&quot;
 
   # VPC内部のWebサーバへのパケットを許可
@@ -510,8 +512,9 @@ resource sakuracloud_vpc_router_dhcp_server &quot;dhcp&quot; {
   vpc_router_id              = &quot;${sakuracloud_vpc_router.foobar.id}&quot;
   vpc_router_interface_index = &quot;${sakuracloud_vpc_router_interface.eth1.index}&quot; # 対象プライベートIPが属するNICのインデックス
 
-  range_start = &quot;192.168.11.151&quot; # IPアドレス動的割り当て範囲(開始)
-  range_stop  = &quot;192.168.11.200&quot; # IPアドレス動的割り当て範囲(終了)
+  range_start = &quot;192.168.11.151&quot;       # IPアドレス動的割り当て範囲(開始)
+  range_stop  = &quot;192.168.11.200&quot;       # IPアドレス動的割り当て範囲(終了)
+  # dns_servers = [&quot;8.8.4.4&quot;, &quot;8.8.8.8&quot;] # 配布するDNSサーバIPアドレスのリスト
 }
 
 # DHCPスタティック割り当て
@@ -1021,6 +1024,14 @@ resource sakuracloud_vpc_router_static_route &quot;route1&quot; {
 <td>-</td>
 </tr>
 <tr>
+<td><code>vpc_router_interface_index</code></td>
+<td align="center">-</td>
+<td>対象インターフェースのインデックス</td>
+<td align="center">0</td>
+<td>数値(<code>0</code>-<code>7</code>)</td>
+<td>-</td>
+</tr>
+<tr>
 <td><code>direction</code></td>
 <td align="center">◯</td>
 <td>通信方向</td>
@@ -1189,6 +1200,14 @@ resource sakuracloud_vpc_router_static_route &quot;route1&quot; {
 <td align="center">-</td>
 <td>文字列</td>
 <td>-</td>
+</tr>
+<tr>
+<td><code>dns_servers</code></td>
+<td align="center">-</td>
+<td>DNSサーバーIPアドレス</td>
+<td align="center">-</td>
+<td>リスト(文字列)</td>
+<td>省略した場合はゾーンごとのデフォルトDNSサーバが割り当てられる</td>
 </tr>
 <tr>
 <td><code>zone</code></td>

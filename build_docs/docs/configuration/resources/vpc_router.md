@@ -77,7 +77,8 @@ resource sakuracloud_vpc_router_port_forwarding "forward1" {
 
 # ファイアウォール(VPC内部から外部への通信)
 resource sakuracloud_vpc_router_firewall "send_fw" {
-  vpc_router_id = "${sakuracloud_vpc_router.foobar.id}"
+  vpc_router_id              = "${sakuracloud_vpc_router.foobar.id}"
+  # vpc_router_interface_index = 0 # 対象インターフェースのインデックス(グローバル含む)
   direction     = "send"
 
   # VPC内部のWebサーバから外部への応答パケットの許可
@@ -104,6 +105,7 @@ resource sakuracloud_vpc_router_firewall "send_fw" {
 # ファイアウォール(VPC外部から内部への通信)
 resource sakuracloud_vpc_router_firewall "receive_fw" {
   vpc_router_id = "${sakuracloud_vpc_router.foobar.id}"
+  # vpc_router_interface_index = 0 # 対象インターフェースのインデックス(グローバル含む)
   direction     = "receive"
 
   # VPC内部のWebサーバへのパケットを許可
@@ -132,8 +134,9 @@ resource sakuracloud_vpc_router_dhcp_server "dhcp" {
   vpc_router_id              = "${sakuracloud_vpc_router.foobar.id}"
   vpc_router_interface_index = "${sakuracloud_vpc_router_interface.eth1.index}" # 対象プライベートIPが属するNICのインデックス
 
-  range_start = "192.168.11.151" # IPアドレス動的割り当て範囲(開始)
-  range_stop  = "192.168.11.200" # IPアドレス動的割り当て範囲(終了)
+  range_start = "192.168.11.151"       # IPアドレス動的割り当て範囲(開始)
+  range_stop  = "192.168.11.200"       # IPアドレス動的割り当て範囲(終了)
+  # dns_servers = ["8.8.4.4", "8.8.8.8"] # 配布するDNSサーバIPアドレスのリスト
 }
 
 # DHCPスタティック割り当て
@@ -315,6 +318,7 @@ VPCルータでのファイアウォール機能を表します。
 |パラメーター                 |必須  |名称                 |初期値     |設定値                         |補足                                          |
 |---------------------------|:---:|----------------------|:--------:|-------------------------------|----------------------------------------------|
 | `vpc_router_id`           | ◯   | VPCルータID         | -        | 文字列                   | - |
+| `vpc_router_interface_index`| -   | 対象インターフェースのインデックス| 0        | 数値(`0`-`7`)| - |
 | `direction`               | ◯   | 通信方向 | -        | `send`<br />`receive`               | VPCルータ内から見た通信方向を指定する |
 | `expressions`             | ◯   | フィルタルール        | -        | リスト(マップ)           | 詳細は[`expressions`](#expressions)を参照 |
 | `zone`                    | -   | ゾーン                 | -        | `is1b`<br />`tk1a`<br />`tk1v` | - |
@@ -353,6 +357,7 @@ VPCルータでのDHCPサーバ機能を表します。
 | `vpc_router_interface_index` | ◯   | プライベートNIC 番号   | -        | 数値                   | - |
 | `range_start`                | ◯   | 動的割り当て範囲(開始) | -        | 文字列                          | - |
 | `range_stop`                 | ◯   | 動的割り当て範囲(終了) | -        | 文字列                          | - |
+| `dns_servers`                | -   | DNSサーバーIPアドレス | -        | リスト(文字列)                   | 省略した場合はゾーンごとのデフォルトDNSサーバが割り当てられる |
 | `zone`                    | -   | ゾーン                 | -        | `is1b`<br />`tk1a`<br />`tk1v` | - |
 
 
