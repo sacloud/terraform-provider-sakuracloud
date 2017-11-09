@@ -21,10 +21,11 @@ func TestAccResourceSakuraCloudDNS(t *testing.T) {
 				Config: testAccCheckSakuraCloudDNSConfig_basic,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckSakuraCloudDNSExists("sakuracloud_dns.foobar", &dns),
-					resource.TestCheckResourceAttr(
-						"sakuracloud_dns.foobar", "zone", "terraform.io"),
-					resource.TestCheckResourceAttr(
-						"sakuracloud_dns.foobar", "description", "DNS from TerraForm for SAKURA CLOUD"),
+					resource.TestCheckResourceAttr("sakuracloud_dns.foobar", "zone", "terraform.io"),
+					resource.TestCheckResourceAttr("sakuracloud_dns.foobar", "description", "DNS from TerraForm for SAKURA CLOUD"),
+					resource.TestCheckResourceAttr("sakuracloud_dns.foobar", "tags.#", "2"),
+					resource.TestCheckResourceAttr("sakuracloud_dns.foobar", "tags.0", "tag1"),
+					resource.TestCheckResourceAttr("sakuracloud_dns.foobar", "tags.1", "tag2"),
 					resource.TestCheckResourceAttrPair(
 						"sakuracloud_dns.foobar", "icon_id",
 						"sakuracloud_icon.foobar", "id",
@@ -35,12 +36,11 @@ func TestAccResourceSakuraCloudDNS(t *testing.T) {
 				Config: testAccCheckSakuraCloudDNSConfig_update,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckSakuraCloudDNSExists("sakuracloud_dns.foobar", &dns),
-					resource.TestCheckResourceAttr(
-						"sakuracloud_dns.foobar", "zone", "terraform.io"),
-					resource.TestCheckResourceAttr(
-						"sakuracloud_dns.foobar", "description", "DNS from TerraForm for SAKURA CLOUD_upd"),
-					resource.TestCheckResourceAttr(
-						"sakuracloud_dns.foobar", "icon_id", ""),
+					resource.TestCheckResourceAttr("sakuracloud_dns.foobar", "zone", "terraform.io"),
+					resource.TestCheckResourceAttr("sakuracloud_dns.foobar", "description", "DNS from TerraForm for SAKURA CLOUD_upd"),
+					resource.TestCheckResourceAttr("sakuracloud_dns.foobar", "tags.#", "1"),
+					resource.TestCheckResourceAttr("sakuracloud_dns.foobar", "tags.0", "tag1"),
+					resource.TestCheckResourceAttr("sakuracloud_dns.foobar", "icon_id", ""),
 				),
 			},
 		},
@@ -99,7 +99,7 @@ var testAccCheckSakuraCloudDNSConfig_basic = `
 resource "sakuracloud_dns" "foobar" {
     zone = "terraform.io"
     description = "DNS from TerraForm for SAKURA CLOUD"
-    tags = ["hoge1"]
+    tags = ["tag1","tag2"]
     icon_id = "${sakuracloud_icon.foobar.id}"
 }
 
@@ -113,5 +113,5 @@ var testAccCheckSakuraCloudDNSConfig_update = `
 resource "sakuracloud_dns" "foobar" {
     zone = "terraform.io"
     description = "DNS from TerraForm for SAKURA CLOUD_upd"
-    tags = ["hoge1" , "hoge2"]
+    tags = ["tag1"]
 }`

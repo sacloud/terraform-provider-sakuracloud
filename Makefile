@@ -48,12 +48,12 @@ test: vet
 	TF_ACC= go test $(TEST2) $(TESTARGS) -timeout=30s -parallel=4
 
 testacc: vet
-	TF_ACC=1 go test $(TEST1) -v $(TESTARGS) -timeout 120m ; \
-	TF_ACC=1 go test $(TEST2) -v $(TESTARGS) -timeout 120m
+	TF_ACC=1 go test $(TEST1) -v $(TESTARGS) -timeout 240m ; \
+	TF_ACC=1 go test $(TEST2) -v $(TESTARGS) -timeout 240m
 
 testacc-resource: vet
-	TF_ACC=1 go test $(TEST1) -v $(TESTARGS) -run="^TestAccResource" -timeout 120m ; \
-	TF_ACC=1 go test $(TEST2) -v $(TESTARGS) -run="^TestAccResource" -timeout 120m
+	TF_ACC=1 go test $(TEST1) -v $(TESTARGS) -run="^TestAccResource" -timeout 240m ; \
+	TF_ACC=1 go test $(TEST2) -v $(TESTARGS) -run="^TestAccResource" -timeout 240m
 
 vet: golint
 	@echo "go tool vet $(VETARGS) ."
