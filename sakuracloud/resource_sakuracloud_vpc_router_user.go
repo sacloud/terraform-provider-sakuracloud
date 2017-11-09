@@ -73,7 +73,6 @@ func resourceSakuraCloudVPCRouterRemoteAccessUserCreate(d *schema.ResourceData, 
 		return fmt.Errorf("Couldn'd apply SakuraCloud VPCRouter config: %s", err)
 	}
 
-	d.SetId(vpcRouterRemoteAccessUserIDHash(routerID, remoteAccessUser))
 	return resourceSakuraCloudVPCRouterRemoteAccessUserRead(d, meta)
 }
 
@@ -96,11 +95,12 @@ func resourceSakuraCloudVPCRouterRemoteAccessUserRead(d *schema.ResourceData, me
 		d.Set("name", remoteAccessUser.UserName)
 		d.Set("password", remoteAccessUser.Password)
 	} else {
-		d.Set("name", "")
-		d.Set("password", "")
+		d.SetId("")
+		return nil
 	}
 
 	d.Set("zone", client.Zone)
+	d.SetId(vpcRouterRemoteAccessUserIDHash(routerID, remoteAccessUser))
 
 	return nil
 }

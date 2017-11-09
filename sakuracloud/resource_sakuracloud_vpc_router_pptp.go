@@ -77,7 +77,6 @@ func resourceSakuraCloudVPCRouterPPTPCreate(d *schema.ResourceData, meta interfa
 		return fmt.Errorf("Couldn'd apply SakuraCloud VPCRouter config: %s", err)
 	}
 
-	d.SetId(vpcRouterPPTPIDHash(routerID, vpcRouter.Settings.Router.PPTPServer))
 	return resourceSakuraCloudVPCRouterPPTPRead(d, meta)
 }
 
@@ -102,10 +101,11 @@ func resourceSakuraCloudVPCRouterPPTPRead(d *schema.ResourceData, meta interface
 		d.Set("range_start", pptpSetting.RangeStart)
 		d.Set("range_stop", pptpSetting.RangeStop)
 	} else {
-		d.Set("range_start", "")
-		d.Set("range_stop", "")
+		d.SetId("")
+		return nil
 	}
 
+	d.SetId(vpcRouterPPTPIDHash(routerID, vpcRouter.Settings.Router.PPTPServer))
 	d.Set("zone", client.Zone)
 
 	return nil

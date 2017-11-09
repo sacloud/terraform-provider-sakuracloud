@@ -229,77 +229,89 @@ type VPCRouterFirewallRule struct {
 	Description        string `json:",omitempty"` // 説明
 }
 
-func (s *VPCRouterSetting) addFirewallRule(direction string, rule *VPCRouterFirewallRule) {
+// VPCRouterMaxInterfaceCount VPCルータでの最大NIC数(グローバル含む)
+const VPCRouterMaxInterfaceCount = 8
+
+func (s *VPCRouterSetting) addFirewallRule(ifIndex int, direction string, rule *VPCRouterFirewallRule) {
+	if ifIndex < 0 {
+		ifIndex = 0
+	}
 	if s.Firewall == nil {
 		s.Firewall = &VPCRouterFirewall{
 			Enabled: "True",
 		}
 	}
-	if s.Firewall.Config == nil || len(s.Firewall.Config) == 0 {
-		s.Firewall.Config = []*VPCRouterFirewallSetting{
-			{
-				Receive: []*VPCRouterFirewallRule{},
-				Send:    []*VPCRouterFirewallRule{},
-			},
-		}
+	if s.Firewall.Config == nil {
+		s.Firewall.Config = []*VPCRouterFirewallSetting{}
+	}
+	for len(s.Firewall.Config) < VPCRouterMaxInterfaceCount {
+		s.Firewall.Config = append(s.Firewall.Config, &VPCRouterFirewallSetting{
+			Receive: []*VPCRouterFirewallRule{},
+			Send:    []*VPCRouterFirewallRule{},
+		})
 	}
 
 	switch direction {
 	case "send":
-		s.Firewall.Config[0].Send = append(s.Firewall.Config[0].Send, rule)
+		s.Firewall.Config[ifIndex].Send = append(s.Firewall.Config[ifIndex].Send, rule)
 	case "receive":
-		s.Firewall.Config[0].Receive = append(s.Firewall.Config[0].Receive, rule)
+		s.Firewall.Config[ifIndex].Receive = append(s.Firewall.Config[ifIndex].Receive, rule)
 	}
 }
 
-func (s *VPCRouterSetting) removeFirewallRule(direction string, rule *VPCRouterFirewallRule) {
+func (s *VPCRouterSetting) removeFirewallRule(ifIndex int, direction string, rule *VPCRouterFirewallRule) {
 
-	if s.Firewall == nil {
+	if s.Firewall == nil || !(len(s.Firewall.Config) < ifIndex) {
 		return
 	}
-
+	if ifIndex < 0 {
+		ifIndex = 0
+	}
 	switch direction {
 	case "send":
 		dest := []*VPCRouterFirewallRule{}
-		for _, c := range s.Firewall.Config[0].Send {
+		for _, c := range s.Firewall.Config[ifIndex].Send {
 			if !s.isSameRule(rule, c) {
 				dest = append(dest, c)
 			}
 		}
-		s.Firewall.Config[0].Send = dest
+		s.Firewall.Config[ifIndex].Send = dest
 	case "receive":
 		dest := []*VPCRouterFirewallRule{}
-		for _, c := range s.Firewall.Config[0].Receive {
+		for _, c := range s.Firewall.Config[ifIndex].Receive {
 			if !s.isSameRule(rule, c) {
 				dest = append(dest, c)
 			}
 		}
-		s.Firewall.Config[0].Receive = dest
+		s.Firewall.Config[ifIndex].Receive = dest
 	}
 
-	if len(s.Firewall.Config) == 0 {
-		s.Firewall.Enabled = "False"
-		return
-	}
-
-	if len(s.Firewall.Config[0].Send) == 0 && len(s.Firewall.Config[0].Send) == 0 {
-		s.Firewall.Enabled = "False"
-		return
-	}
+	//if len(s.Firewall.Config) == 0 {
+	//	s.Firewall.Enabled = "False"
+	//	return
+	//}
+	//
+	//if len(s.Firewall.Config[0].Send) == 0 && len(s.Firewall.Config[0].Send) == 0 {
+	//	s.Firewall.Enabled = "False"
+	//	return
+	//}
 
 	s.PortForwarding.Enabled = "True"
 
 }
 
-func (s *VPCRouterSetting) removeFirewallRuleAt(direction string, index int) {
-	if s.Firewall == nil {
+func (s *VPCRouterSetting) removeFirewallRuleAt(ifIndex int, direction string, index int) {
+	if s.Firewall == nil || !(len(s.Firewall.Config) < ifIndex) {
 		return
+	}
+	if ifIndex < 0 {
+		ifIndex = 0
 	}
 
 	switch direction {
 	case "send":
 		dest := []*VPCRouterFirewallRule{}
-		for i, c := range s.Firewall.Config[0].Send {
+		for i, c := range s.Firewall.Config[ifIndex].Send {
 			if i != index {
 				dest = append(dest, c)
 			}
@@ -307,7 +319,7 @@ func (s *VPCRouterSetting) removeFirewallRuleAt(direction string, index int) {
 		s.Firewall.Config[0].Send = dest
 	case "receive":
 		dest := []*VPCRouterFirewallRule{}
-		for i, c := range s.Firewall.Config[0].Receive {
+		for i, c := range s.Firewall.Config[ifIndex].Receive {
 			if i != index {
 				dest = append(dest, c)
 			}
@@ -315,30 +327,37 @@ func (s *VPCRouterSetting) removeFirewallRuleAt(direction string, index int) {
 		s.Firewall.Config[0].Receive = dest
 	}
 
-	if len(s.Firewall.Config) == 0 {
-		s.Firewall.Enabled = "False"
-		return
-	}
-
-	if len(s.Firewall.Config[0].Send) == 0 && len(s.Firewall.Config[0].Send) == 0 {
-		s.Firewall.Enabled = "False"
-		return
-	}
+	//if len(s.Firewall.Config) == 0 {
+	//	s.Firewall.Enabled = "False"
+	//	return
+	//}
+	//
+	//if len(s.Firewall.Config[0].Send) == 0 && len(s.Firewall.Config[0].Send) == 0 {
+	//	s.Firewall.Enabled = "False"
+	//	return
+	//}
 
 	s.PortForwarding.Enabled = "True"
 
 }
 
-func (s *VPCRouterSetting) findFirewallRule(direction string, rule *VPCRouterFirewallRule) *VPCRouterFirewallRule {
+func (s *VPCRouterSetting) findFirewallRule(ifIndex int, direction string, rule *VPCRouterFirewallRule) *VPCRouterFirewallRule {
+	if s.Firewall == nil || !(len(s.Firewall.Config) < ifIndex) {
+		return nil
+	}
+	if ifIndex < 0 {
+		ifIndex = 0
+	}
+
 	switch direction {
 	case "send":
-		for _, c := range s.Firewall.Config[0].Send {
+		for _, c := range s.Firewall.Config[ifIndex].Send {
 			if s.isSameRule(rule, c) {
 				return c
 			}
 		}
 	case "receive":
-		for _, c := range s.Firewall.Config[0].Receive {
+		for _, c := range s.Firewall.Config[ifIndex].Receive {
 			if s.isSameRule(rule, c) {
 				return c
 			}
@@ -359,7 +378,7 @@ func (s *VPCRouterSetting) isSameRule(r1 *VPCRouterFirewallRule, r2 *VPCRouterFi
 }
 
 // AddFirewallRuleSend 送信ルール 追加
-func (s *VPCRouterSetting) AddFirewallRuleSend(isAllow bool, protocol string, sourceNetwork string, sourcePort string, destNetwork string, destPort string, logging bool, description string) {
+func (s *VPCRouterSetting) AddFirewallRuleSend(ifIndex int, isAllow bool, protocol string, sourceNetwork string, sourcePort string, destNetwork string, destPort string, logging bool, description string) {
 	action := "deny"
 	if isAllow {
 		action = "allow"
@@ -380,11 +399,11 @@ func (s *VPCRouterSetting) AddFirewallRuleSend(isAllow bool, protocol string, so
 		Description:        description,
 	}
 
-	s.addFirewallRule("send", rule)
+	s.addFirewallRule(ifIndex, "send", rule)
 }
 
 // RemoveFirewallRuleSend 送信ルール 削除
-func (s *VPCRouterSetting) RemoveFirewallRuleSend(isAllow bool, protocol string, sourceNetwork string, sourcePort string, destNetwork string, destPort string) {
+func (s *VPCRouterSetting) RemoveFirewallRuleSend(ifIndex int, isAllow bool, protocol string, sourceNetwork string, sourcePort string, destNetwork string, destPort string) {
 	action := "deny"
 	if isAllow {
 		action = "allow"
@@ -399,16 +418,16 @@ func (s *VPCRouterSetting) RemoveFirewallRuleSend(isAllow bool, protocol string,
 		DestinationPort:    destPort,
 	}
 
-	s.removeFirewallRule("send", rule)
+	s.removeFirewallRule(ifIndex, "send", rule)
 }
 
 // RemoveFirewallRuleSendAt 指定位置の送信ルールを削除
-func (s *VPCRouterSetting) RemoveFirewallRuleSendAt(index int) {
-	s.removeFirewallRuleAt("send", index)
+func (s *VPCRouterSetting) RemoveFirewallRuleSendAt(ifIndex int, index int) {
+	s.removeFirewallRuleAt(ifIndex, "send", index)
 }
 
 // FindFirewallRuleSend 送信ルール 検索
-func (s *VPCRouterSetting) FindFirewallRuleSend(isAllow bool, protocol string, sourceNetwork string, sourcePort string, destNetwork string, destPort string) *VPCRouterFirewallRule {
+func (s *VPCRouterSetting) FindFirewallRuleSend(ifIndex int, isAllow bool, protocol string, sourceNetwork string, sourcePort string, destNetwork string, destPort string) *VPCRouterFirewallRule {
 	action := "deny"
 	if isAllow {
 		action = "allow"
@@ -422,11 +441,11 @@ func (s *VPCRouterSetting) FindFirewallRuleSend(isAllow bool, protocol string, s
 		DestinationPort:    destPort,
 	}
 
-	return s.findFirewallRule("send", rule)
+	return s.findFirewallRule(ifIndex, "send", rule)
 }
 
 // AddFirewallRuleReceive 受信ルール 追加
-func (s *VPCRouterSetting) AddFirewallRuleReceive(isAllow bool, protocol string, sourceNetwork string, sourcePort string, destNetwork string, destPort string, logging bool, description string) {
+func (s *VPCRouterSetting) AddFirewallRuleReceive(ifIndex int, isAllow bool, protocol string, sourceNetwork string, sourcePort string, destNetwork string, destPort string, logging bool, description string) {
 	action := "deny"
 	if isAllow {
 		action = "allow"
@@ -446,16 +465,16 @@ func (s *VPCRouterSetting) AddFirewallRuleReceive(isAllow bool, protocol string,
 		Description:        description,
 	}
 
-	s.addFirewallRule("receive", rule)
+	s.addFirewallRule(ifIndex, "receive", rule)
 }
 
 // RemoveFirewallRuleReceiveAt 指定位置の受信ルールを削除
-func (s *VPCRouterSetting) RemoveFirewallRuleReceiveAt(index int) {
-	s.removeFirewallRuleAt("receive", index)
+func (s *VPCRouterSetting) RemoveFirewallRuleReceiveAt(ifIndex int, index int) {
+	s.removeFirewallRuleAt(ifIndex, "receive", index)
 }
 
 // RemoveFirewallRuleReceive 受信ルール 削除
-func (s *VPCRouterSetting) RemoveFirewallRuleReceive(isAllow bool, protocol string, sourceNetwork string, sourcePort string, destNetwork string, destPort string) {
+func (s *VPCRouterSetting) RemoveFirewallRuleReceive(ifIndex int, isAllow bool, protocol string, sourceNetwork string, sourcePort string, destNetwork string, destPort string) {
 	action := "deny"
 	if isAllow {
 		action = "allow"
@@ -469,11 +488,11 @@ func (s *VPCRouterSetting) RemoveFirewallRuleReceive(isAllow bool, protocol stri
 		DestinationPort:    destPort,
 	}
 
-	s.removeFirewallRule("receive", rule)
+	s.removeFirewallRule(ifIndex, "receive", rule)
 }
 
 // FindFirewallRuleReceive 受信ルール 検索
-func (s *VPCRouterSetting) FindFirewallRuleReceive(isAllow bool, protocol string, sourceNetwork string, sourcePort string, destNetwork string, destPort string) *VPCRouterFirewallRule {
+func (s *VPCRouterSetting) FindFirewallRuleReceive(ifIndex int, isAllow bool, protocol string, sourceNetwork string, sourcePort string, destNetwork string, destPort string) *VPCRouterFirewallRule {
 	action := "deny"
 	if isAllow {
 		action = "allow"
@@ -487,7 +506,7 @@ func (s *VPCRouterSetting) FindFirewallRuleReceive(isAllow bool, protocol string
 		DestinationPort:    destPort,
 	}
 
-	return s.findFirewallRule("receive", rule)
+	return s.findFirewallRule(ifIndex, "receive", rule)
 }
 
 // HasDHCPServer DHCPサーバー設定を保持しているか
@@ -503,13 +522,14 @@ type VPCRouterDHCPServer struct {
 
 // VPCRouterDHCPServerConfig DHCPサーバー設定
 type VPCRouterDHCPServerConfig struct {
-	Interface  string `json:",omitempty"` // 対象NIC
-	RangeStart string `json:",omitempty"` // 割り当て範囲 開始アドレス
-	RangeStop  string `json:",omitempty"` // 割り当て範囲 終了アドレス
+	Interface  string   `json:",omitempty"` // 対象NIC
+	RangeStart string   `json:",omitempty"` // 割り当て範囲 開始アドレス
+	RangeStop  string   `json:",omitempty"` // 割り当て範囲 終了アドレス
+	DNSServers []string // 配布するDNSサーバIPアドレスのリスト
 }
 
 // AddDHCPServer DHCPサーバー設定追加
-func (s *VPCRouterSetting) AddDHCPServer(nicIndex int, rangeStart string, rangeStop string) {
+func (s *VPCRouterSetting) AddDHCPServer(nicIndex int, rangeStart string, rangeStop string, dnsServers ...string) {
 	if s.DHCPServer == nil {
 		s.DHCPServer = &VPCRouterDHCPServer{
 			Enabled: "True",
@@ -524,12 +544,13 @@ func (s *VPCRouterSetting) AddDHCPServer(nicIndex int, rangeStart string, rangeS
 		Interface:  nic,
 		RangeStart: rangeStart,
 		RangeStop:  rangeStop,
+		DNSServers: dnsServers,
 	})
 
 }
 
 // RemoveDHCPServer DHCPサーバー設定削除
-func (s *VPCRouterSetting) RemoveDHCPServer(nicIndex int, rangeStart string, rangeStop string) {
+func (s *VPCRouterSetting) RemoveDHCPServer(nicIndex int) {
 	if s.DHCPServer == nil {
 		return
 	}
@@ -541,7 +562,7 @@ func (s *VPCRouterSetting) RemoveDHCPServer(nicIndex int, rangeStart string, ran
 
 	dest := []*VPCRouterDHCPServerConfig{}
 	for _, c := range s.DHCPServer.Config {
-		if c.Interface != fmt.Sprintf("eth%d", nicIndex) || c.RangeStart != rangeStart || c.RangeStop != rangeStop {
+		if c.Interface != fmt.Sprintf("eth%d", nicIndex) {
 			dest = append(dest, c)
 		}
 	}
@@ -558,36 +579,13 @@ func (s *VPCRouterSetting) RemoveDHCPServer(nicIndex int, rangeStart string, ran
 
 // RemoveDHCPServerAt DHCPサーバー設定削除
 func (s *VPCRouterSetting) RemoveDHCPServerAt(nicIndex int) {
-	if s.DHCPServer == nil {
-		return
-	}
-
-	if s.DHCPServer.Config == nil {
-		s.DHCPServer.Enabled = "False"
-		return
-	}
-
-	dest := []*VPCRouterDHCPServerConfig{}
-	for i, c := range s.DHCPServer.Config {
-		if i != nicIndex-1 {
-			dest = append(dest, c)
-		}
-	}
-	s.DHCPServer.Config = dest
-
-	if len(s.DHCPServer.Config) == 0 {
-		s.DHCPServer.Enabled = "False"
-		s.DHCPServer.Config = nil
-		return
-	}
-	s.DHCPServer.Enabled = "True"
-
+	s.RemoveDHCPServer(nicIndex)
 }
 
 // FindDHCPServer DHCPサーバー設定 検索
-func (s *VPCRouterSetting) FindDHCPServer(nicIndex int, rangeStart string, rangeStop string) *VPCRouterDHCPServerConfig {
+func (s *VPCRouterSetting) FindDHCPServer(nicIndex int) *VPCRouterDHCPServerConfig {
 	for _, c := range s.DHCPServer.Config {
-		if c.Interface == fmt.Sprintf("eth%d", nicIndex) && c.RangeStart == rangeStart && c.RangeStop == rangeStop {
+		if c.Interface == fmt.Sprintf("eth%d", nicIndex) {
 			return c
 		}
 	}
@@ -596,12 +594,7 @@ func (s *VPCRouterSetting) FindDHCPServer(nicIndex int, rangeStart string, range
 
 // FindDHCPServerAt DHCPサーバー設定 検索
 func (s *VPCRouterSetting) FindDHCPServerAt(nicIndex int) *VPCRouterDHCPServerConfig {
-	for _, c := range s.DHCPServer.Config {
-		if c.Interface == fmt.Sprintf("eth%d", nicIndex) {
-			return c
-		}
-	}
-	return nil
+	return s.FindDHCPServer(nicIndex)
 }
 
 // HasDHCPStaticMapping DHCPスタティックマッピング設定を保持しているか

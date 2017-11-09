@@ -76,7 +76,6 @@ func resourceSakuraCloudVPCRouterDHCPStaticMappingCreate(d *schema.ResourceData,
 		return fmt.Errorf("Couldn'd apply SakuraCloud VPCRouter config: %s", err)
 	}
 
-	d.SetId(vpcRouterDHCPStaticMappingIDHash(routerID, dhcpStaticMapping))
 	return resourceSakuraCloudVPCRouterDHCPStaticMappingRead(d, meta)
 }
 
@@ -99,10 +98,11 @@ func resourceSakuraCloudVPCRouterDHCPStaticMappingRead(d *schema.ResourceData, m
 		d.Set("ipaddress", dhcpStaticMapping.IPAddress)
 		d.Set("macaddress", dhcpStaticMapping.MACAddress)
 	} else {
-		d.Set("ipaddress", "")
-		d.Set("macaddress", "")
+		d.SetId("")
+		return nil
 	}
 
+	d.SetId(vpcRouterDHCPStaticMappingIDHash(routerID, dhcpStaticMapping))
 	d.Set("zone", client.Zone)
 
 	return nil

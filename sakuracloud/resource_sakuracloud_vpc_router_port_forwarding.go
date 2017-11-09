@@ -96,7 +96,6 @@ func resourceSakuraCloudVPCRouterPortForwardingCreate(d *schema.ResourceData, me
 		return fmt.Errorf("Couldn'd apply SakuraCloud VPCRouter config: %s", err)
 	}
 
-	d.SetId(vpcRouterPortForwardingIDHash(routerID, pf))
 	return resourceSakuraCloudVPCRouterPortForwardingRead(d, meta)
 }
 
@@ -122,13 +121,11 @@ func resourceSakuraCloudVPCRouterPortForwardingRead(d *schema.ResourceData, meta
 		d.Set("private_port", pf.PrivatePort)
 		d.Set("description", pf.Description)
 	} else {
-		d.Set("protocol", "")
-		d.Set("global_port", "")
-		d.Set("private_address", "")
-		d.Set("private_port", "")
-		d.Set("description", "")
+		d.SetId("")
+		return nil
 	}
 
+	d.SetId(vpcRouterPortForwardingIDHash(routerID, pf))
 	d.Set("zone", client.Zone)
 
 	return nil
