@@ -1,0 +1,8 @@
+[
+  {
+    "TerraformVersion": "0.11.0-beta1",
+    "ReleaseDate": "2017-11-09T00:00:00+09:00",
+    "PluginVersion": "1.0.0-rc1",
+    "PreRelease": true
+  }
+]
