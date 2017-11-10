@@ -438,7 +438,7 @@ sub create_pull_request {
     }
 
     infof "Write release info JSON.\n";
-    system "docker", ("run","-it","--rm","-v","$ENV{PWD}:/workdir","sacloud/tf-release-info","v$next_version","$ENV{TERRAFORM_VERSION}","releases/versions.json");
+    system "docker", ("run","-it","--rm","-v","$ENV{PWD}:/workdir","sacloud/tf-release-info","v$next_version","v$ENV{TERRAFORM_VERSION}","releases/versions.json");
 
     if($ret || git_with_exit_code qw/diff --exit-code/){
         git qw/config --global push.default matching/;
