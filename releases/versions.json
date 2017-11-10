@@ -10,5 +10,11 @@
 		"ReleaseDate": "2017-11-09T17:55:00Z",
 		"PluginVersion": "1.0.0-rc2",
 		"PreRelease": true
+	},
+	{
+		"TerraformVersion": "v0.10.8",
+		"ReleaseDate": "2017-11-10T06:29:37.086150352Z",
+		"PluginVersion": "v1.0.0",
+		"PreRelease": false
 	}
 ]
