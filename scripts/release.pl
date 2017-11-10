@@ -436,6 +436,10 @@ sub create_pull_request {
     } else {
         infof "skip to update changelogs because no merged pull request is found after the last release.\n"
     }
+
+    infof "Write release info JSON.\n";
+    system "docker", ("run","-it","--rm","-v","$ENV{PWD}:/workdir","sacloud/tf-release-info","v$next_version","$ENV{TERRAFORM_VERSION}","releases/versions.json");
+
     if($ret || git_with_exit_code qw/diff --exit-code/){
         git qw/config --global push.default matching/;
         git qw/config user.email/, 'yamamoto.febc@gmail.com';
