@@ -1,5 +1,20 @@
 # Changelog
 
+## 1.0.0 (2017-11-10)
+
+* パブリックアーカイブPlesk除去 #192 (yamamoto-febc)
+* ISOイメージリソースの追加 #198 (yamamoto-febc)
+* ソースコードレイアウトの修正 #202 (yamamoto-febc)
+* アーカイブリソースの追加 #205 (yamamoto-febc)
+* マーカータグ付与オプション #206 (yamamoto-febc)
+* リソースRead時の404レスポンスハンドリング改善 #207 (yamamoto-febc)
+* サーバリソースでの専有ホストID指定 #208 (yamamoto-febc)
+* データリソースへのセレクタ属性追加 #210 (yamamoto-febc)
+* バージョン情報JSON追加 #211 (yamamoto-febc)
+* テストケース追加 #212 (yamamoto-febc)
+* VPCルータへの機能追加(DHCPでのDNSサーバ配布/NICごとのファイアウォール) #214 (yamamoto-febc)
+
+
 ## 0.14.0 (2017-10-14)
 
 * VPCルータでのサイト間VPN接続情報追加 #184 (yamamoto-febc)
