@@ -8,7 +8,7 @@ cd terraform-for-sakuracloud-docker
 git fetch origin
 
 # check version
-CURRENT_VERSION=`git tag | perl -ne 'if(/([0-9\.]+)$/){print $1;exit}'`
+CURRENT_VERSION=`git tag -l --sort=-v:refname | perl -ne 'if(/^v([0-9\.]+)$/){print $1;exit}'`
 if [ "$CURRENT_VERSION" = "$VERSION" ] ; then
     echo "v$VERSION is already released."
     exit 0
