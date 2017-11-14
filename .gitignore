@@ -6,3 +6,4 @@ terraform.tfstate
 terraform.tfstate.backup
 build_docs/site
 terraform-for-sakuracloud-docker
+releases-terraform
