@@ -30,7 +30,7 @@ before_deploy:
 deploy:
 - provider: script
   script: scripts/release.pl --task=upload-to-github-release && scripts/release.pl
-    --task=upload-master-to-github-release && scripts/release_homebrew.sh && scripts/release_docker_image.sh
+    --task=upload-master-to-github-release && scripts/release_homebrew.sh && scripts/release_docker_image.sh && scripts/release_website.sh
   skip_cleanup: true
   on:
     branch: master
