@@ -206,6 +206,7 @@ type API struct {
 	NFS           *NFSAPI           // NFS API
 	Note          *NoteAPI          // スタートアップスクリプトAPI
 	PacketFilter  *PacketFilterAPI  // パケットフィルタAPI
+	PrivateHost   *PrivateHostAPI   // 専有ホストAPI
 	Product       *ProductAPI       // 製品情報API
 	Server        *ServerAPI        // サーバーAPI
 	SimpleMonitor *SimpleMonitorAPI // シンプル監視API
@@ -336,6 +337,11 @@ func (api *API) GetPacketFilterAPI() *PacketFilterAPI {
 	return api.PacketFilter
 }
 
+// GetPrivateHostAPI 専有ホストAPI取得
+func (api *API) GetPrivateHostAPI() *PrivateHostAPI {
+	return api.PrivateHost
+}
+
 // GetProductServerAPI サーバープランAPI取得
 func (api *API) GetProductServerAPI() *ProductServerAPI {
 	return api.Product.GetProductServerAPI()
@@ -398,11 +404,12 @@ func (api *API) GetWebAccelAPI() *WebAccelAPI {
 
 // ProductAPI 製品情報関連API群
 type ProductAPI struct {
-	Server   *ProductServerAPI   // サーバープランAPI
-	License  *ProductLicenseAPI  // ライセンスプランAPI
-	Disk     *ProductDiskAPI     // ディスクプランAPI
-	Internet *ProductInternetAPI // ルータープランAPI
-	Price    *PublicPriceAPI     // 価格情報API
+	Server      *ProductServerAPI      // サーバープランAPI
+	License     *ProductLicenseAPI     // ライセンスプランAPI
+	Disk        *ProductDiskAPI        // ディスクプランAPI
+	Internet    *ProductInternetAPI    // ルータープランAPI
+	PrivateHost *ProductPrivateHostAPI // 専有ホストプランAPI
+	Price       *PublicPriceAPI        // 価格情報API
 }
 
 // GetProductServerAPI サーバープランAPI取得
@@ -423,6 +430,11 @@ func (api *ProductAPI) GetProductDiskAPI() *ProductDiskAPI {
 // GetProductInternetAPI ルータープランAPI取得
 func (api *ProductAPI) GetProductInternetAPI() *ProductInternetAPI {
 	return api.Internet
+}
+
+// GetProductPrivateHostAPI 専有ホストプラン取得API
+func (api *ProductAPI) GetProductPrivateHostAPI() *ProductPrivateHostAPI {
+	return api.PrivateHost
 }
 
 // GetPublicPriceAPI 価格情報API取得
@@ -474,12 +486,14 @@ func newAPI(client *Client) *API {
 		NFS:          NewNFSAPI(client),
 		Note:         NewNoteAPI(client),
 		PacketFilter: NewPacketFilterAPI(client),
+		PrivateHost:  NewPrivateHostAPI(client),
 		Product: &ProductAPI{
-			Server:   NewProductServerAPI(client),
-			License:  NewProductLicenseAPI(client),
-			Disk:     NewProductDiskAPI(client),
-			Internet: NewProductInternetAPI(client),
-			Price:    NewPublicPriceAPI(client),
+			Server:      NewProductServerAPI(client),
+			License:     NewProductLicenseAPI(client),
+			Disk:        NewProductDiskAPI(client),
+			Internet:    NewProductInternetAPI(client),
+			PrivateHost: NewProductPrivateHostAPI(client),
+			Price:       NewPublicPriceAPI(client),
 		},
 		Server:        NewServerAPI(client),
 		SimpleMonitor: NewSimpleMonitorAPI(client),

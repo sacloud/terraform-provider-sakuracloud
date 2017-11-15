@@ -36,6 +36,7 @@
     - [公開鍵](configuration/resources/ssh_key/)
     - [公開鍵(生成)](configuration/resources/ssh_key_gen/)
     - [アイコン](configuration/resources/icon/)
+    - [専有ホスト](configuration/resources/private_host/)
     - [DNS](configuration/resources/dns/)
     - [GSLB](configuration/resources/gslb/)
     - [シンプル監視](configuration/resources/simple_monitor/)
