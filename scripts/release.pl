@@ -386,7 +386,7 @@ sub upload_to_github_release {
         git qw/push/, "https://$ENV{GITHUB_TOKEN}\@github.com/$REPO_NAME.git" , qw/:staging/;
         $description = "This release includes latest commits with unreleased features";
     }
-    my @filepaths = glob("bin/*.zip");
+    my @filepaths = glob("bin/*.zip bin/*_SHA256SUMS");
     infof "uploading following files:\n" . join("\n", @filepaths). "\n";
     for my $path (@filepaths){
         my $filename = basename($path);

@@ -418,39 +418,14 @@ Available commands are:
 
 <h2 id="terraform-for">Terraform for さくらのクラウドのセットアップ</h2>
 <ul>
-<li>1) 以下のリンクから、プラットフォームに応じたzipファイルをダウンロードします<ul>
-<li>Windows: <ul>
-<li><a href="http://releases.usacloud.jp/terraform/terraform-provider-sakuracloud_windows-386.zip">i386</a></li>
-<li><a href="http://releases.usacloud.jp/terraform/terraform-provider-sakuracloud_windows-amd64.zip">amd64</a></li>
-</ul>
-</li>
-<li>Linux:<ul>
-<li><a href="http://releases.usacloud.jp/terraform/terraform-provider-sakuracloud_linux-386.zip">i386</a></li>
-<li><a href="http://releases.usacloud.jp/terraform/terraform-provider-sakuracloud_linux-amd64.zip">amd64</a></li>
-</ul>
-</li>
-<li>Darwin(macOS)<ul>
-<li><a href="http://releases.usacloud.jp/terraform/terraform-provider-sakuracloud_darwin-386.zip">i386</a></li>
-<li><a href="http://releases.usacloud.jp/terraform/terraform-provider-sakuracloud_darwin-amd64.zip">amd64</a></li>
-</ul>
-</li>
-</ul>
-</li>
+<li>1) 以下のリンクから、プラットフォームに応じたzipファイルをダウンロードします</li>
+<li><a href="http://releases.usacloud.jp/terraform/">Terraform for さくらのクラウド ダウンロードページ</a></li>
 <li>2) terraformバイナリと同じディレクトリに展開します</li>
 </ul>
 <blockquote>
 <p>Note:<br />
 Terraform for さくらのクラウドのバイナリーファイルは<a href="https://github.com/sacloud/terraform-provider-sakuracloud/releases/latest">GitHub上のリリースページ</a>でも配布しています。</p>
 </blockquote>
-<h4 id="terraform-for_1">terraform for さくらのクラウド インストール</h4>
-<pre><code class="bash">$ cd ~/terraform
-# ダウンロード
-$ curl -sL http://releases.usacloud.jp/terraform/terraform-provider-sakuracloud_darwin-amd64.zip &gt; terraform-provider-sakuracloud.zip
-# 展開
-$ unzip terraform-provider-sakuracloud.zip
-
-</code></pre>
-
 <h2 id="api">さくらのクラウドAPIキーの取得</h2>
 <p>さくらのクラウドのコントロールパネルにログインしAPIキーを発行します。
 以下を参考に実施してください。APIキーを発行したら、<code>ACCESS_TOKEN</code>と<code>ACCESS_TOKEN_SECRET</code>を控えておきましょう。</p>

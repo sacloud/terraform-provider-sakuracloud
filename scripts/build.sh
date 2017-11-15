@@ -7,7 +7,7 @@ mkdir -p bin/ 2>/dev/null
 for GOOS in $OS; do
     for GOARCH in $ARCH; do
         arch="$GOOS-$GOARCH"
-        binary="terraform-provider-sakuracloud"
+        binary="terraform-provider-sakuracloud_v${CURRENT_VERSION}_x${PROTOCOL_VERSION}"
         if [ "$GOOS" = "windows" ]; then
           binary="${binary}.exe"
         fi
@@ -18,7 +18,7 @@ for GOOS in $OS; do
                 -o bin/$binary \
                 main.go
         if [ -n "$ARCHIVE" ]; then
-            (cd bin/; zip -r "terraform-provider-sakuracloud_$arch" $binary)
+            (cd bin/; zip -r "terraform-provider-sakuracloud_${CURRENT_VERSION}_$arch.zip" $binary)
             rm -f bin/$binary
         fi
     done

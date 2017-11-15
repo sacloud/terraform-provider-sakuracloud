@@ -1,8 +1,8 @@
 #!/bin/bash
 
 VERSION=`git log --merges --oneline | perl -ne 'if(m/^.+Merge pull request \#[0-9]+ from .+\/bump-version-([0-9\.]+)/){print $1;exit}'`
-SHA256_SRC_DARWIN=`openssl dgst -sha256 bin/terraform-provider-sakuracloud_darwin-amd64.zip | awk '{print $2}'`
-SHA256_SRC_LINUX=`openssl dgst -sha256 bin/terraform-provider-sakuracloud_linux-amd64.zip | awk '{print $2}'`
+SHA256_SRC_DARWIN=`openssl dgst -sha256 bin/terraform-provider-sakuracloud_${VERSION}_darwin-amd64.zip | awk '{print $2}'`
+SHA256_SRC_LINUX=`openssl dgst -sha256 bin/terraform-provider-sakuracloud_${VERSION}_linux-amd64.zip | awk '{print $2}'`
 # clone
 git clone --depth=50 --branch=master https://github.com/sacloud/homebrew-terraform-provider-sakuracloud.git homebrew-terraform-provider-sakuracloud
 cd homebrew-terraform-provider-sakuracloud
@@ -27,10 +27,10 @@ class TerraformProviderSakuracloud < Formula
   version _version
 
   if OS.mac?
-    url "https://github.com/sacloud/terraform-provider-sakuracloud/releases/download/v#{_version}/terraform-provider-sakuracloud_darwin-amd64.zip"
+    url "https://github.com/sacloud/terraform-provider-sakuracloud/releases/download/v#{_version}/terraform-provider-sakuracloud_#{_version}_darwin-amd64.zip"
     sha256 sha256_src_darwin
   else
-    url "https://github.com/sacloud/terraform-provider-sakuracloud/releases/download/v#{_version}/terraform-provider-sakuracloud_linux-amd64.zip"
+    url "https://github.com/sacloud/terraform-provider-sakuracloud/releases/download/v#{_version}/terraform-provider-sakuracloud_#{_version}_linux-amd64.zip"
     sha256 sha256_src_linux
   end
 
@@ -46,7 +46,7 @@ class TerraformProviderSakuracloud < Formula
     To enable, put following text in "~/.terraformrc":
 
         providers {
-            sakuracloud = "#{bin}/terraform-provider-sakuracloud"
+            sakuracloud = "#{bin}/terraform-provider-sakuracloud_#{_version}"
         }
 
   EOS
