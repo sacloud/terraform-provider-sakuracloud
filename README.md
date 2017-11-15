@@ -97,12 +97,14 @@ terraform apply
 
 #### リソース
   - [サーバー](https://sacloud.github.io/terraform-provider-sakuracloud/configuration/resources/server/)
-  - [ディスク](https://sacloud.github.io/terraform-provider-sakuracloud//configuration/resources/disk/)
-  - [アーカイブ](https://sacloud.github.io/terraform-provider-sakuracloud//configuration/resources/archive/)
-  - [ISOイメージ(CD-ROM)](https://sacloud.github.io/terraform-provider-sakuracloud//configuration/resources/cdrom/)
-  - [スイッチ](https://sacloud.github.io/terraform-provider-sakuracloud//configuration/resources/switch/)
-  - [ルーター](https://sacloud.github.io/terraform-provider-sakuracloud//configuration/resources/internet/)
+  - [ディスク](https://sacloud.github.io/terraform-provider-sakuracloud/configuration/resources/disk/)
+  - [アーカイブ](https://sacloud.github.io/terraform-provider-sakuracloud/configuration/resources/archive/)
+  - [ISOイメージ(CD-ROM)](https://sacloud.github.io/terraform-provider-sakuracloud/configuration/resources/cdrom/)
+  - [スイッチ](https://sacloud.github.io/terraform-provider-sakuracloud/configuration/resources/switch/)
+  - [ルーター](https://sacloud.github.io/terraform-provider-sakuracloud/configuration/resources/internet/)
+  - [サブネット](https://sacloud.github.io/terraform-provider-sakuracloud/configuration/resources/subnet/)
   - [パケットフィルタ](https://sacloud.github.io/terraform-provider-sakuracloud/configuration/resources/packet_filter/)
+  - [パケットフィルタ(ルール)](https://sacloud.github.io/terraform-provider-sakuracloud/configuration/resources/packet_filter_rule/)
   - [ブリッジ](https://sacloud.github.io/terraform-provider-sakuracloud/configuration/resources/bridge/)
   - [ロードバランサー](https://sacloud.github.io/terraform-provider-sakuracloud/configuration/resources/load_balancer/)
   - [VPCルーター](https://sacloud.github.io/terraform-provider-sakuracloud/configuration/resources/vpc_router/)
@@ -111,14 +113,28 @@ terraform apply
   - [スタートアップスクリプト](https://sacloud.github.io/terraform-provider-sakuracloud/configuration/resources/note/)
   - [公開鍵](https://sacloud.github.io/terraform-provider-sakuracloud/configuration/resources/ssh_key/)
   - [公開鍵(生成)](https://sacloud.github.io/terraform-provider-sakuracloud/configuration/resources/ssh_key_gen/)
+  - [アイコン](https://sacloud.github.io/terraform-provider-sakuracloud/configuration/resources/icon/)
+  - [専有ホスト](https://sacloud.github.io/terraform-provider-sakuracloud/configuration/resources/private_host/)
   - [DNS](https://sacloud.github.io/terraform-provider-sakuracloud/configuration/resources/dns/)
   - [GSLB](https://sacloud.github.io/terraform-provider-sakuracloud/configuration/resources/gslb/)
   - [シンプル監視](https://sacloud.github.io/terraform-provider-sakuracloud/configuration/resources/simple_monitor/)
   - [自動バックアップ](https://sacloud.github.io/terraform-provider-sakuracloud/configuration/resources/auto_backup/)
+  - [オブジェクトストレージ](https://sacloud.github.io/terraform-provider-sakuracloud/configuration/resources/bucket_object/)
+  - [サーバ コネクタ](https://sacloud.github.io/terraform-provider-sakuracloud/configuration/resources/server_connector)
 
 #### データソース
   - [データソース](http://sacloud.github.io/terraform-provider-sakuracloud/configuration/resources/data_resource/)
 
+#### サポートしていないリソース
+
+以下のリソースはさくらのクラウド側でAPIが提供されていないため未サポートです。
+
+  - ローカルルータ
+  - ウェブアクセラレータ
+  - オブジェクトストレージ(バケット作成)
+  - ライセンス
+  - 割引パスポート
+  - クーポン
 
 ## Building/Developing
 

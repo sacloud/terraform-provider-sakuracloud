@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>スイッチ - Terraform for さくらのクラウド</title>
+  <title>専有ホスト - Terraform for さくらのクラウド</title>
   
 
   <link rel="shortcut icon" href="../../../img/favicon.ico">
@@ -21,7 +21,7 @@
   
   <script>
     // Current page data
-    var mkdocs_page_name = "スイッチ";
+    var mkdocs_page_name = "専有ホスト";
   </script>
   
   <script src="../../../js/jquery-2.1.1.min.js"></script>
@@ -143,21 +143,8 @@
 
         
             
-    <li class="toctree-l1 current">
-        <a class="current" href="./">スイッチ</a>
-        
-            <ul>
-            
-                <li class="toctree-l3"><a href="#sakuracloud_switch">スイッチ(sakuracloud_switch)</a></li>
-                
-                    <li><a class="toctree-l4" href="#_1">設定例</a></li>
-                
-                    <li><a class="toctree-l4" href="#_2">パラメーター</a></li>
-                
-                    <li><a class="toctree-l4" href="#_3">属性</a></li>
-                
-            
-            </ul>
+    <li class="toctree-l1 ">
+        <a class="" href="../switch/">スイッチ</a>
         
     </li>
 
@@ -254,8 +241,21 @@
 
         
             
-    <li class="toctree-l1 ">
-        <a class="" href="../private_host/">専有ホスト</a>
+    <li class="toctree-l1 current">
+        <a class="current" href="./">専有ホスト</a>
+        
+            <ul>
+            
+                <li class="toctree-l3"><a href="#sakuracloud_private_host">専有ホスト(sakuracloud_private_host)</a></li>
+                
+                    <li><a class="toctree-l4" href="#_1">設定例</a></li>
+                
+                    <li><a class="toctree-l4" href="#_2">パラメーター</a></li>
+                
+                    <li><a class="toctree-l4" href="#_3">属性</a></li>
+                
+            
+            </ul>
         
     </li>
 
@@ -357,7 +357,7 @@
         
       
     
-    <li>スイッチ</li>
+    <li>専有ホスト</li>
     <li class="wy-breadcrumbs-aside">
       
     </li>
@@ -367,14 +367,13 @@
           <div role="main">
             <div class="section">
               
-                <h1 id="sakuracloud_switch">スイッチ(sakuracloud_switch)</h1>
+                <h1 id="sakuracloud_private_host">専有ホスト(sakuracloud_private_host)</h1>
 <hr />
 <h3 id="_1">設定例</h3>
-<pre><code class="hcl">resource sakuracloud_switch &quot;myswitch&quot; {
-  name = &quot;sw01&quot;
-  #bridge_id = &quot;${sakuracloud_bridge.br.id}&quot;
-  description = &quot;Switch from terraform for SAKURA CLOUD&quot;
-  tags        = [&quot;tag1&quot;, &quot;tag2&quot;]
+<pre><code class="hcl">resource &quot;sakuracloud_private_host&quot; &quot;private_host&quot; {
+    name = &quot;private_host&quot;
+    description = &quot;PrivateHost from terraform for SAKURA CLOUD&quot;
+    tags = [&quot;tag1&quot; , &quot;tag2&quot;]
 }
 </code></pre>
 
@@ -394,23 +393,7 @@
 <tr>
 <td><code>name</code></td>
 <td align="center">◯</td>
-<td>スイッチ名</td>
-<td align="center">-</td>
-<td>文字列</td>
-<td>-</td>
-</tr>
-<tr>
-<td><code>bridge_id</code></td>
-<td align="center">-</td>
-<td>ブリッジID</td>
-<td align="center">-</td>
-<td>文字列</td>
-<td>-</td>
-</tr>
-<tr>
-<td><code>icon_id</code></td>
-<td align="center">-</td>
-<td>アイコンID</td>
+<td>専有ホスト名</td>
 <td align="center">-</td>
 <td>文字列</td>
 <td>-</td>
@@ -432,19 +415,11 @@
 <td>-</td>
 </tr>
 <tr>
-<td><code>graceful_shutdown_timeout</code></td>
-<td align="center">-</td>
-<td>シャットダウンまでの待ち時間</td>
-<td align="center">-</td>
-<td>数値(秒数)</td>
-<td>シャットダウンが必要な場合の通常シャットダウンするまでの待ち時間(指定の時間まで待ってもシャットダウンしない場合は強制シャットダウンされる)</td>
-</tr>
-<tr>
 <td><code>zone</code></td>
 <td align="center">-</td>
 <td>ゾーン</td>
 <td align="center">-</td>
-<td><code>is1b</code><br /><code>tk1a</code><br /><code>tk1v</code></td>
+<td><code>is1b</code><br /><code>tk1a</code></td>
 <td>-</td>
 </tr>
 </tbody>
@@ -461,13 +436,23 @@
 <tbody>
 <tr>
 <td><code>id</code></td>
-<td>スイッチID</td>
+<td>専有ホストID</td>
 <td>-</td>
 </tr>
 <tr>
-<td><code>server_ids</code></td>
-<td>サーバID</td>
-<td>接続されているサーバのID(リスト)</td>
+<td><code>hostname</code></td>
+<td>物理ホスト名</td>
+<td>-</td>
+</tr>
+<tr>
+<td><code>assigned_core</code></td>
+<td>割当済みコア数</td>
+<td>-</td>
+</tr>
+<tr>
+<td><code>assigned_memory</code></td>
+<td>割当済みメモリ(GB単位)</td>
+<td>-</td>
 </tr>
 </tbody>
 </table>
@@ -478,10 +463,10 @@
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="../internet/" class="btn btn-neutral float-right" title="ルータ"/>Next <span class="icon icon-circle-arrow-right"></span></a>
+        <a href="../dns/" class="btn btn-neutral float-right" title="DNS"/>Next <span class="icon icon-circle-arrow-right"></span></a>
       
       
-        <a href="../cdrom/" class="btn btn-neutral" title="ISOイメージ(CD-ROM)"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../icon/" class="btn btn-neutral" title="アイコン"><span class="icon icon-circle-arrow-left"></span> Previous</a>
       
     </div>
   
@@ -509,10 +494,10 @@
     <span class="rst-current-version" data-toggle="rst-current-version">
       
       
-        <span><a href="../cdrom/" style="color: #fcfcfc;">&laquo; Previous</a></span>
+        <span><a href="../icon/" style="color: #fcfcfc;">&laquo; Previous</a></span>
       
       
-        <span style="margin-left: 15px"><a href="../internet/" style="color: #fcfcfc">Next &raquo;</a></span>
+        <span style="margin-left: 15px"><a href="../dns/" style="color: #fcfcfc">Next &raquo;</a></span>
       
     </span>
 </div>
