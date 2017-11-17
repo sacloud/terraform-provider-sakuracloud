@@ -760,14 +760,22 @@ func createServer(client *APIClient, server *sacloud.Server) (*sacloud.Server, e
 }
 
 func bootServer(client *APIClient, id int64) error {
-	// power API lock
+	var err error
+	// power API lock(for same resource)
 	lockKey := getServerPowerAPILockKey(id)
 	sakuraMutexKV.Lock(lockKey)
 	defer sakuraMutexKV.Unlock(lockKey)
 
-	// lock API
+	// lock API (for power manage APIs)
 	sakuraMutexKV.Lock(serverAPILockKey)
-	_, err := client.Server.Boot(id)
+	s, err := client.Server.Read(id)
+	if err != nil {
+		sakuraMutexKV.Unlock(serverAPILockKey)
+		return err
+	}
+	if !s.IsUp() {
+		_, err = client.Server.Boot(id)
+	}
 	sakuraMutexKV.Unlock(serverAPILockKey)
 
 	if err != nil {
@@ -782,13 +790,22 @@ func bootServer(client *APIClient, id int64) error {
 }
 
 func stopServer(client *APIClient, id int64, d *schema.ResourceData) error {
-	// power API lock
+	var err error
+	// power API lock(for same resource)
 	lockKey := getServerPowerAPILockKey(id)
 	sakuraMutexKV.Lock(lockKey)
 	defer sakuraMutexKV.Unlock(lockKey)
 
+	// lock API (for power manage APIs)
 	sakuraMutexKV.Lock(serverAPILockKey)
-	err := handleShutdown(client.Server, id, d, client.DefaultTimeoutDuration)
+	s, err := client.Server.Read(id)
+	if err != nil {
+		sakuraMutexKV.Unlock(serverAPILockKey)
+		return err
+	}
+	if !s.IsDown() {
+		handleShutdown(client.Server, id, d, client.DefaultTimeoutDuration)
+	}
 	sakuraMutexKV.Unlock(serverAPILockKey)
 
 	if err != nil {

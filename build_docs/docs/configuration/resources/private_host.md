@@ -19,6 +19,7 @@ resource "sakuracloud_private_host" "private_host" {
 | `name`            | ◯   | 専有ホスト名           | -        | 文字列                  | - |
 | `description`     | -   | 説明  | - | 文字列 | - |
 | `tags`            | -   | タグ | - | リスト(文字列) | - |
+| `graceful_shutdown_timeout` | - | シャットダウンまでの待ち時間 | - | 数値(秒数) | シャットダウンが必要な場合の通常シャットダウンするまでの待ち時間(指定の時間まで待ってもシャットダウンしない場合は強制シャットダウンされる) |
 | `zone`            | -   | ゾーン | - | `is1b`<br />`tk1a` | - |
 
 ### 属性
