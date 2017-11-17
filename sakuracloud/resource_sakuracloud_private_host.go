@@ -36,6 +36,7 @@ func resourceSakuraCloudPrivateHost() *schema.Resource {
 				Optional: true,
 				Elem:     &schema.Schema{Type: schema.TypeString},
 			},
+			powerManageTimeoutKey: powerManageTimeoutParam,
 			"hostname": {
 				Type:     schema.TypeString,
 				Computed: true,
@@ -54,7 +55,7 @@ func resourceSakuraCloudPrivateHost() *schema.Resource {
 				Computed:     true,
 				ForceNew:     true,
 				Description:  "target SakuraCloud zone",
-				ValidateFunc: validateStringInWord([]string{"tk1a"}),
+				ValidateFunc: validateStringInWord([]string{"is1b", "tk1a"}),
 			},
 		},
 	}
@@ -154,10 +155,51 @@ func resourceSakuraCloudPrivateHostUpdate(d *schema.ResourceData, meta interface
 func resourceSakuraCloudPrivateHostDelete(d *schema.ResourceData, meta interface{}) error {
 	client := getSacloudAPIClient(d, meta)
 
-	_, err := client.PrivateHost.Delete(toSakuraCloudID(d.Id()))
+	id := toSakuraCloudID(d.Id())
+	// shutdown connected servers
+	res, err := client.Server.Find()
+	if err != nil {
+		return fmt.Errorf("Error deleting SakuraCloud PrivateHost resource: finding server is failed: %s", err)
+	}
+	var needRestartServers []int64
+
+	for _, s := range res.Servers {
+		if s.PrivateHost != nil && s.PrivateHost.ID == id {
+
+			// still running?
+			isNeedRestart := false
+			if s.IsUp() {
+				isNeedRestart = true
+				err := stopServer(client, s.ID, d)
+				if err != nil {
+					return fmt.Errorf("Error deleting SakuraCloud PrivateHost resource: shutdown server is failed: %s", err)
+				}
+			}
+
+			s.ClearPrivateHost()
+			_, err := client.Server.Update(s.ID, &s)
+			if err != nil {
+				return fmt.Errorf("Error deleting SakuraCloud PrivateHost resource: clear private-host is failed: %s", err)
+			}
+
+			if isNeedRestart {
+				needRestartServers = append(needRestartServers, s.ID)
+			}
+		}
+	}
+
+	_, err = client.PrivateHost.Delete(toSakuraCloudID(d.Id()))
 	if err != nil {
 		return fmt.Errorf("Error deleting SakuraCloud PrivateHost resource: %s", err)
 	}
+
+	for _, serverID := range needRestartServers {
+		err := bootServer(client, serverID)
+		if err != nil {
+			return fmt.Errorf("Error deleting SakuraCloud PrivateHost resource: booting server is failed: %s", err)
+		}
+	}
+
 	return nil
 }
 

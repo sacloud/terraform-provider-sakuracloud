@@ -61,6 +61,30 @@ func TestAccResourceSakuraCloudPrivateHost(t *testing.T) {
 	})
 }
 
+func TestAccResourceSakuraCloudPrivateHost_DestroyWithRunningServers(t *testing.T) {
+	var private_host sacloud.PrivateHost
+	resource.Test(t, resource.TestCase{
+		PreCheck:     func() { testAccPreCheck(t) },
+		Providers:    testAccProviders,
+		CheckDestroy: testAccCheckSakuraCloudPrivateHostDestroy,
+		Steps: []resource.TestStep{
+			{
+				Config: testAccCheckSakuraCloudPrivateHostConfig_Destroy_Basic,
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckSakuraCloudPrivateHostExists("sakuracloud_private_host.foobar", &private_host),
+				),
+			},
+			{
+				Config: testAccCheckSakuraCloudPrivateHostConfig_Destroy_Update,
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr(
+						"sakuracloud_server.foobar", "private_host_id", ""),
+				),
+			},
+		},
+	})
+}
+
 func testAccCheckSakuraCloudPrivateHostExists(n string, private_host *sacloud.PrivateHost) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
 		rs, ok := s.RootModule().Resources[n]
@@ -75,7 +99,7 @@ func testAccCheckSakuraCloudPrivateHostExists(n string, private_host *sacloud.Pr
 
 		client := testAccProvider.Meta().(*APIClient)
 		originalZone := client.Zone
-		client.Zone = "tk1a"
+		client.Zone = "is1b"
 		defer func() { client.Zone = originalZone }()
 
 		foundPrivateHost, err := client.PrivateHost.Read(toSakuraCloudID(rs.Primary.ID))
@@ -97,7 +121,7 @@ func testAccCheckSakuraCloudPrivateHostExists(n string, private_host *sacloud.Pr
 func testAccCheckSakuraCloudPrivateHostDestroy(s *terraform.State) error {
 	client := testAccProvider.Meta().(*APIClient)
 	originalZone := client.Zone
-	client.Zone = "tk1a"
+	client.Zone = "is1b"
 	defer func() { client.Zone = originalZone }()
 
 	for _, rs := range s.RootModule().Resources {
@@ -117,16 +141,18 @@ func testAccCheckSakuraCloudPrivateHostDestroy(s *terraform.State) error {
 
 var testAccCheckSakuraCloudPrivateHostConfig_Basic = `
 resource "sakuracloud_server" "foobar" {
-    name = "myswitch"
+    name = "myserver"
     private_host_id = "${sakuracloud_private_host.foobar.id}"
-    zone = "tk1a"
+    graceful_shutdown_timeout = 5
+    zone = "is1b"
 }
 resource "sakuracloud_private_host" "foobar" {
     name = "before"
     description = "before"
     tags = ["tag1", "tag2"]
-    zone = "tk1a"
+    zone = "is1b"
 
+    graceful_shutdown_timeout = 5
     icon_id = "${sakuracloud_icon.foobar.id}"
 }
 
@@ -139,6 +165,32 @@ var testAccCheckSakuraCloudPrivateHostConfig_Update = `
 resource "sakuracloud_private_host" "foobar" {
     name = "after"
     description = "after"
-    zone = "tk1a"
+    graceful_shutdown_timeout = 5
+    zone = "is1b"
+}
+`
+
+var testAccCheckSakuraCloudPrivateHostConfig_Destroy_Basic = `
+resource "sakuracloud_server" "foobar" {
+    name = "myserver"
+    private_host_id = "${sakuracloud_private_host.foobar.id}"
+    zone = "is1b"
+    graceful_shutdown_timeout = 5
+}
+resource "sakuracloud_private_host" "foobar" {
+    name = "before"
+    description = "before"
+    tags = ["tag1", "tag2"]
+    graceful_shutdown_timeout = 5
+    zone = "is1b"
+
+}
+`
+
+var testAccCheckSakuraCloudPrivateHostConfig_Destroy_Update = `
+resource "sakuracloud_server" "foobar" {
+    name = "myserver"
+    zone = "is1b"
+    graceful_shutdown_timeout = 5
 }
 `
