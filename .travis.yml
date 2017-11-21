@@ -5,7 +5,6 @@ go:
 - 1.9
 env:
   global:
-  - TERRAFORM_VERSION=0.10.8
   - PATH=/home/travis/gopath/bin:$PATH DEBIAN_FRONTEND=noninteractive
   - secure: rEKBZer1rDx3heuTxu+iviVDdZRWTlstl8rJqnUW53fdg5tzdvORPckVTQ/NgzuBIw8vpjdlG2xZq+IRPa+qpYrshZBXsOH1GUIQSsZYEcnci/4iTsJtOR6BaUpkWTDOhHgJ+HFs/ffTZWZhXF2F5AddF9ebFUydIxLctlClU4RNqSP3ngWLXcdtBf8Ujk0uHnuyYVErZefZPiGZJWkHrZx94Sx0l1lL7YH8bejNtvFBO03Bt8Gey8paakU2SVKaQkUTYK+GWkOqfsLDAcvyuUbgco0MFgHG3NhM22zw/u0yRty8YZGy5QNbdrSjWrWPxGhTF6b/OeZ5baQSbaHQXU826FPWeJTcPjy21RtzVr6KNFpZ5ncE4OYDID+NjJKXIfOz6Ayhn0QA86z/U8/IzVk+sD+NNOHtAwKlwhHn62LdT8iVHn3jB800hdTjg0Z0kUL3eUB6jMPvWpOrkDEzpttZWFqkcuNbRBqA3Md9qX1YfNkRnM5xKPg9rcGog4SpsFU4QmDYOi4EoJQNcMc3ZRMy8bSiUjWUnzuuaZP4Q/Lk68KW9gi/me1SuqKMtUUd7xues+dkUyLXZydqT8BMEaDeWIwRtGG4JbEe8ouvSGJruH8u5XtqHVVl6tXq57nhXcTrC++jtSOol1lnurmw2pl9H47+OwzLPO/q27s/RO4=
   - secure: NdAMMFql3TrWIVPq4Jd6pevtl1KOPvpO3Qa4wj+Slsb5DLcnHVlL+EqY06fw9/n+YyvGOELVctMNh+WY1A5Xwh3IZiTGxWNcAsD/xBmm0f+aCW7/sjgCVhs0WuDfBMTVjIfCWChAQMTs4QsnQ2kvTsMXhzwNuDKD4jCbN+VafpOm6gDUXNnXkdajYwwp43xM3jzLOkr+IcsQmNi/bIClIY2fNXFCyhQMDnsablqDFuMaeyxJg5wiesh56qWpn8iwfRigtNDfWm40TSRpULYnnkWD2CsUTdJjuY6Z0AKBFUAA3xzmK9FwU/390JM7/EDxV2zz2nBTnNI2PtFxkkIWL5U6A/BxZGJc4QqwdSKn/Rv/9+CWImUZp9a9Kjw6+8pz4bZRKNqS1kgqXgc0dVK/oTNJwxGQvtYE6ZUqBsvueaEBB5CH4F2EwYtPxbjwfZVIsHyt8XwW8F19817qwl0VulsySKaIJxdcrEFrQqAIdMb5TqruC8tF9Vj1zfAx/t8hznTrRgIqWG1WKQJOoFD5k/ZwQt0Ao7ROM8BGW1deKxYCXuhGUjHj2N7uNZOZbYOZ7pdtR2ISKPSBjI6ARFivp3pB35Hmszfw4VBtYolbxdsbt2PgIYmULiHvAFLs72QwPCwHFShQ2NI6bUGhaCLpjx7otbaDje8Y7fzJuTDnTHc=
@@ -16,6 +15,7 @@ script:
 - make test
 - make docker-build
 before_deploy:
+- export TERRAFORM_VERSION=$(go run tools/terraform-version/main.go)
 - go get github.com/aktau/github-release
 - mkdir -p ~/bin
 - git clone https://github.com/github/hub.git && cd hub && script/build -o ~/bin/hub
