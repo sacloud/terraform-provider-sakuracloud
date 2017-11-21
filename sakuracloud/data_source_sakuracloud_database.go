@@ -112,7 +112,7 @@ func dataSourceSakuraCloudDatabase() *schema.Resource {
 				Computed:     true,
 				ForceNew:     true,
 				Description:  "target SakuraCloud zone",
-				ValidateFunc: validateStringInWord([]string{"tk1a", "is1b"}),
+				ValidateFunc: validateZone([]string{"tk1a", "is1b"}),
 			},
 		},
 	}

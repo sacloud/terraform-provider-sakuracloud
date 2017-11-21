@@ -73,7 +73,7 @@ func dataSourceSakuraCloudPrivateHost() *schema.Resource {
 				Computed:     true,
 				ForceNew:     true,
 				Description:  "target SakuraCloud zone",
-				ValidateFunc: validateStringInWord([]string{"tk1a"}),
+				ValidateFunc: validateZone([]string{"tk1a"}),
 			},
 		},
 	}
