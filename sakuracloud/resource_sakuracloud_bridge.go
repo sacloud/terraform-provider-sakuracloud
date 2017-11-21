@@ -40,7 +40,7 @@ func resourceSakuraCloudBridge() *schema.Resource {
 				Computed:     true,
 				ForceNew:     true,
 				Description:  "target SakuraCloud zone",
-				ValidateFunc: validateStringInWord([]string{"is1a", "is1b", "tk1a"}),
+				ValidateFunc: validateZone([]string{"is1a", "is1b", "tk1a"}),
 			},
 		},
 	}

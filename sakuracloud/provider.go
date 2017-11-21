@@ -31,7 +31,7 @@ func Provider() terraform.ResourceProvider {
 				DefaultFunc:  schema.MultiEnvDefaultFunc([]string{"SAKURACLOUD_ZONE"}, nil),
 				Description:  "Target SakuraCloud Zone(is1a | is1b | tk1a | tk1v)",
 				InputDefault: DefaultZone,
-				ValidateFunc: validateStringInWord([]string{"is1a", "is1b", "tk1a", "tk1v"}),
+				ValidateFunc: validateZone([]string{"is1a", "is1b", "tk1a", "tk1v"}),
 			},
 			"timeout": {
 				Type:        schema.TypeInt,

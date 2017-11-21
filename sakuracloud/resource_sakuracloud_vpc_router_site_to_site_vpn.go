@@ -57,7 +57,7 @@ func resourceSakuraCloudVPCRouterSiteToSiteIPsecVPN() *schema.Resource {
 				Computed:     true,
 				ForceNew:     true,
 				Description:  "target SakuraCloud zone",
-				ValidateFunc: validateStringInWord([]string{"is1a", "is1b", "tk1a", "tk1v"}),
+				ValidateFunc: validateZone([]string{"is1a", "is1b", "tk1a", "tk1v"}),
 			},
 			// HACK : terraform not supported nested structure yet
 			// see: https://github.com/hashicorp/terraform/issues/6215

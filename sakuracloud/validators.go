@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/hashicorp/terraform/helper/schema"
 	"net"
+	"os"
 	"strconv"
 	"strings"
 	"unicode/utf8"
@@ -219,4 +220,11 @@ func validateList(validator schema.SchemaValidateFunc) schema.SchemaValidateFunc
 		}
 		return
 	}
+}
+
+func validateZone(allowZones []string) schema.SchemaValidateFunc {
+	if os.Getenv("SAKURACLOUD_FORCE_USE_ZONES") != "" {
+		return func(interface{}, string) (ws []string, errors []error) { return }
+	}
+	return validateStringInWord(allowZones)
 }
