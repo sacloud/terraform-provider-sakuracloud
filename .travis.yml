@@ -10,7 +10,7 @@ env:
   - secure: NdAMMFql3TrWIVPq4Jd6pevtl1KOPvpO3Qa4wj+Slsb5DLcnHVlL+EqY06fw9/n+YyvGOELVctMNh+WY1A5Xwh3IZiTGxWNcAsD/xBmm0f+aCW7/sjgCVhs0WuDfBMTVjIfCWChAQMTs4QsnQ2kvTsMXhzwNuDKD4jCbN+VafpOm6gDUXNnXkdajYwwp43xM3jzLOkr+IcsQmNi/bIClIY2fNXFCyhQMDnsablqDFuMaeyxJg5wiesh56qWpn8iwfRigtNDfWm40TSRpULYnnkWD2CsUTdJjuY6Z0AKBFUAA3xzmK9FwU/390JM7/EDxV2zz2nBTnNI2PtFxkkIWL5U6A/BxZGJc4QqwdSKn/Rv/9+CWImUZp9a9Kjw6+8pz4bZRKNqS1kgqXgc0dVK/oTNJwxGQvtYE6ZUqBsvueaEBB5CH4F2EwYtPxbjwfZVIsHyt8XwW8F19817qwl0VulsySKaIJxdcrEFrQqAIdMb5TqruC8tF9Vj1zfAx/t8hznTrRgIqWG1WKQJOoFD5k/ZwQt0Ao7ROM8BGW1deKxYCXuhGUjHj2N7uNZOZbYOZ7pdtR2ISKPSBjI6ARFivp3pB35Hmszfw4VBtYolbxdsbt2PgIYmULiHvAFLs72QwPCwHFShQ2NI6bUGhaCLpjx7otbaDje8Y7fzJuTDnTHc=
   - secure: TFj6AldmXgOxb0G0GAdEpAdDMftqh2vTFXbiIOQog1lT9AGLwCxkUrUzISfwTomP8155lDVE7Hdm9RoQO07yG0T+fdF7pAHHBBcfgTxXZntLQnrPzcp3JCf3Fe1RgHOhXR3QBoenBxi7PW3Dk+Hu6j9sBZGARaTP0/H3v0ECNUgVhd9SeDJrTflDVMGVXiKJ8mNp1skJF1z1BpxVfihYVxldZg8bWaF1Xe1SxpDMGNSUXnd2taFTpUFvvRS/PSK4ho7BlsOGpXy7g6d10I1Ff47Lm6zdDaPbLifpSyNeypc+yZ4uPopo2ddfKlC/jsDuR0fMN7B/H+gRyoP/myCgEUW67v3dGjC1p3erYdoavf/4suVvNNgPIZdKSpw6T75NvCEiPszVfJNntmHnwBo9TvN25FEDS1S7qFZvRSjpWNY0wM4M30DbfuDA9GQyigzC/ZzDs247fRvcD/anrAZg4+vJcMNOCW0bO107zsCzR603N5sdvFL3iAb97oy2b/CODumSOKdg6nYThRMn696fTftkj+7Zmzk/EA5h/F3gRhXu6n30HJIV6MDTTgJbcunNz6WJZRHpdQf/PG2gNbKEXXR9WDQlgysM/eVCafTBv2Y37rUaoK9xaulOtcvN+pDTqXJz1o02KZ6ZErmtDXFUedEWVOpqaKhPb4vvpao7epA=
 install:
-  - go get -u github.com/golang/lint/golint
+- go get -u github.com/golang/lint/golint
 script:
 - make test
 - make docker-build
@@ -30,14 +30,17 @@ before_deploy:
 deploy:
 - provider: script
   script: scripts/release.pl --task=upload-to-github-release && scripts/release.pl
-    --task=upload-master-to-github-release && scripts/release_homebrew.sh && scripts/release_docker_image.sh && scripts/release_website.sh
+    --task=upload-master-to-github-release && scripts/release_homebrew.sh && scripts/release_docker_image.sh
+    && scripts/release_website.sh
   skip_cleanup: true
   on:
     branch: master
-
 - provider: script
   script: scripts/release.pl --task=create-pullrequest --current-branch=$TRAVIS_BRANCH
   skip_cleanup: true
   on:
     all_branches: true
     condition: "$TRAVIS_BRANCH =~ ^bump-version-.*$"
+notifications:
+  slack:
+    secure: MP6r347wnQxJsbiso/WpUY6xXKGLdNMmof3Pv7SEWEeQ5GtMjt6ye3gmrpB5pkrQprE/ryLzDznlmUVdHfUb+4olimv3lYfdGt15Ep2mc/5Uv1Sthoug/QWQSGEc2va7fyefoZpbLMS2nb/+KbVJyKStwNDPt5dBSB8EoTegGoFtVWoZVKuBqNiQcspSnMAwqul35Aehf/4tyk0iENIAV+N4/VEixk0oH6pEiyvXjriKTROaGTf20HQy0k+9S8U9RDf3XI+YwhO2m8JtpT6qHvSczz7vbBvhUiHJskicmXDH8vWg4Xbkpi8orQVV2B2SvpauUMYEYIuY9Nn6ZXeHtuKnNjFPRyMpAoIO0O7Ys9rZdHwHckdOFFHy5mnBPyIqtptAVjs2Pr7xKb12llHrlR9376+HdE8Jdo/NQHRt9xQ/R3xDcmPhBWfAjTVD5JNdez9K55wvVP9cTMdyg4SM+6kzO4AxFERGz6tXV6Sc0+0/ZW6Xj2aFtCl4mX3HpRvtyRXWAZY4TOZlc75ent6FcsN5xsFHdyj+pV+YBpubdiW+eDtwEGDxRA/mcjCArt95+kFC6JKzmvMUj2CrQfOjViOA2IkaIWXEvY1rJL/F+n1PNbDLTXjLxHrBt8hesfPEuBdC8i+Wxnk2er+cJB3SrBS0bApnB6VFjV276GpW46M=
