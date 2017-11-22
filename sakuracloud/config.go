@@ -14,6 +14,7 @@ type Config struct {
 	TraceMode         bool
 	UseMarkerTags     bool
 	MarkerTagName     string
+	APIRootURL        string
 }
 
 // APIClient for SakuraCloud API
@@ -26,6 +27,9 @@ type APIClient struct {
 func (c *Config) NewClient() *APIClient {
 	client := api.NewClient(c.AccessToken, c.AccessTokenSecret, c.Zone)
 
+	if c.APIRootURL != "" {
+		api.SakuraCloudAPIRoot = c.APIRootURL
+	}
 	if c.TimeoutMinute > 0 {
 		client.DefaultTimeoutDuration = time.Duration(c.TimeoutMinute) * time.Minute
 	}

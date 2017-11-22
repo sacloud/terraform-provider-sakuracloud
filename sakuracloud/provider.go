@@ -33,6 +33,11 @@ func Provider() terraform.ResourceProvider {
 				InputDefault: DefaultZone,
 				ValidateFunc: validateZone([]string{"is1a", "is1b", "tk1a", "tk1v"}),
 			},
+			"api_root_url": {
+				Type:        schema.TypeString,
+				Optional:    true,
+				DefaultFunc: schema.MultiEnvDefaultFunc([]string{"SAKURACLOUD_API_ROOT_URL"}, ""),
+			},
 			"timeout": {
 				Type:        schema.TypeInt,
 				Optional:    true,
@@ -136,6 +141,7 @@ func providerConfigure(d *schema.ResourceData) (interface{}, error) {
 		TraceMode:         d.Get("trace").(bool),
 		UseMarkerTags:     d.Get("use_marker_tags").(bool),
 		MarkerTagName:     d.Get("marker_tag_name").(string),
+		APIRootURL:        d.Get("api_root_url").(string),
 	}
 
 	return config.NewClient(), nil
