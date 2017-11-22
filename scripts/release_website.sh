@@ -23,8 +23,8 @@ EOL
 
 # commit and push to github.com
 git config --global push.default matching
-git config user.email 'yamamoto.febc@gmail.com'
-git config user.name 'usacloud'
+git config user.email 'sacloud.users@gmail.com'
+git config user.name 'sacloud-bot'
 git add .
 git commit -m "v${VERSION}"
 git tag "${VERSION}"
