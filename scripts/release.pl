@@ -306,8 +306,8 @@ sub parse_version {
 sub update_changelog {
     my ($next_version, @releases) = @_;
 
-    my $email = 'yamamoto.febc@gmail.com';
-    my $name = 'terraform-provider-sakuracloud';
+    my $email = 'sacloud.users@gmail.com';
+    my $name = 'sacloud-bot';
 
     my $old_locale = setlocale(LC_TIME);
     setlocale(LC_TIME, "C");
@@ -442,8 +442,8 @@ sub create_pull_request {
 
     if($ret || git_with_exit_code qw/diff --exit-code/){
         git qw/config --global push.default matching/;
-        git qw/config user.email/, 'yamamoto.febc@gmail.com';
-        git qw/config user.name/, 'terraform-provider-sakuracloud';
+        git qw/config user.email/, 'sacloud.users@gmail.com';
+        git qw/config user.name/, 'sacloud-bot';
         git qw/commit -am/, "'update changelogs'";
         git qw/push -u/, "https://$ENV{GITHUB_TOKEN}\@github.com/$REPO_NAME.git";
         infof "Difference is pushed to GitHub.\n";
