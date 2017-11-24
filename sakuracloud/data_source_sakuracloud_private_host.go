@@ -104,7 +104,7 @@ func dataSourceSakuraCloudPrivateHostRead(d *schema.ResourceData, meta interface
 	if rawNameSelector, ok := d.GetOk("name_selectors"); ok {
 		selectors := expandStringList(rawNameSelector.([]interface{}))
 		var filtered []sacloud.PrivateHost
-		for _, a := range res.PrivateHosts {
+		for _, a := range targets {
 			if hasNames(&a, selectors) {
 				filtered = append(filtered, a)
 			}
@@ -114,7 +114,7 @@ func dataSourceSakuraCloudPrivateHostRead(d *schema.ResourceData, meta interface
 	if rawTagSelector, ok := d.GetOk("tag_selectors"); ok {
 		selectors := expandStringList(rawTagSelector.([]interface{}))
 		var filtered []sacloud.PrivateHost
-		for _, a := range res.PrivateHosts {
+		for _, a := range targets {
 			if hasTags(&a, selectors) {
 				filtered = append(filtered, a)
 			}

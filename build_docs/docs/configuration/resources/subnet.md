@@ -32,7 +32,7 @@ resource sakuracloud_subnet "foobar" {
 | `internet_id`     | ◯   | ルータID           | -        | 文字列                  | - |
 | `nw_mask_len`     | -   | ネットワークマスク長  | `28` | `28`<br />`27`<br />`26` | グローバルIPのプリフィックス(ネットワークマスク長) |
 | `next_hop`        | -   | ネクストホップ| - | 文字列 | ネクストホップのIPv4アドレス |
-| `zone`            | -   | ゾーン | - | `is1b`<br />`tk1a`<br />`tk1v` | - |
+| `zone`            | -   | ゾーン | - | `is1a`<br />`is1b`<br />`tk1a`<br />`tk1v` | - |
 
 ### 属性
 

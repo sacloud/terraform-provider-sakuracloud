@@ -55,7 +55,7 @@ resource "sakuracloud_ssh_key_gen" "key" {
   }
 }
 
-# パブリックアーカイブ(OS)のID参照用のデータソース定義
+# パブリックアーカイブ(OS)のID参照用のデータリソース定義
 data sakuracloud_archive "centos" {
   os_type = "centos"
 }
@@ -93,7 +93,7 @@ terraform apply
 * Terraform for さくらのクラウド ドキュメント
     * https://sacloud.github.io/terraform-provider-sakuracloud/
 
-### サポートしているリソース/データソース
+### サポートしているリソース/データリソース
 
 #### リソース
   - [サーバー](https://sacloud.github.io/terraform-provider-sakuracloud/configuration/resources/server/)
@@ -122,8 +122,8 @@ terraform apply
   - [オブジェクトストレージ](https://sacloud.github.io/terraform-provider-sakuracloud/configuration/resources/bucket_object/)
   - [サーバ コネクタ](https://sacloud.github.io/terraform-provider-sakuracloud/configuration/resources/server_connector)
 
-#### データソース
-  - [データソース](http://sacloud.github.io/terraform-provider-sakuracloud/configuration/resources/data_resource/)
+#### データリソース
+  - [データリソース](http://sacloud.github.io/terraform-provider-sakuracloud/configuration/resources/data_resource/)
 
 #### サポートしていないリソース
 

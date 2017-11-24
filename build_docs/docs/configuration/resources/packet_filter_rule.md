@@ -63,6 +63,7 @@ resource sakuracloud_packet_filter_rule "rule2" {
 | `allow`       | -   | アクション       | `true`        | `true`<br />`false` | `true`の場合ALLOW動作<br />`false`の場合DENY動作 |
 | `description` | -   | 説明            | -        | 文字列 | - |
 | `order`       | -   | 並び順           | -        | 数値| 同一のパケットフィルタに対し同一のorderを持つルールを複数適用した場合の並び順は不定となります。 |
+| `zone`            | -   | ゾーン | - | `is1a`<br />`is1b`<br />`tk1a`<br />`tk1v` | - |
 
 **注意点**
 

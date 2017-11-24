@@ -95,7 +95,7 @@ func dataSourceSakuraCloudNoteRead(d *schema.ResourceData, meta interface{}) err
 	if rawNameSelector, ok := d.GetOk("name_selectors"); ok {
 		selectors := expandStringList(rawNameSelector.([]interface{}))
 		var filtered []sacloud.Note
-		for _, a := range res.Notes {
+		for _, a := range targets {
 			if hasNames(&a, selectors) {
 				filtered = append(filtered, a)
 			}
@@ -105,7 +105,7 @@ func dataSourceSakuraCloudNoteRead(d *schema.ResourceData, meta interface{}) err
 	if rawTagSelector, ok := d.GetOk("tag_selectors"); ok {
 		selectors := expandStringList(rawTagSelector.([]interface{}))
 		var filtered []sacloud.Note
-		for _, a := range res.Notes {
+		for _, a := range targets {
 			if hasTags(&a, selectors) {
 				filtered = append(filtered, a)
 			}

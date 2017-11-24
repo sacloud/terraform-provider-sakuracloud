@@ -35,7 +35,7 @@ resource sakuracloud_packet_filter "myfilter" {
 | `expressions`     | ◯   | フィルタルール        | -        | リスト(マップ)           | 詳細は[`expressions`](#expressions)を参照 |
 | `description`     | -   | 説明  | - | 文字列 | - |
 | `tags`            | -   | タグ | - | リスト(文字列) | - |
-| `zone`            | -   | ゾーン | - | `is1b`<br />`tk1a`<br />`tk1v` | - |
+| `zone`            | -   | ゾーン | - | `is1a`<br />`is1b`<br />`tk1a`<br />`tk1v` | - |
 
 **注意**  
 

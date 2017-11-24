@@ -289,9 +289,9 @@
                 
                     <li><a class="toctree-l4" href="#_3">属性</a></li>
                 
-                    <li><a class="toctree-l4" href="#_4">属性(データソースでのみ利用可能)</a></li>
+                    <li><a class="toctree-l4" href="#_4">属性(データリソースでのみ利用可能)</a></li>
                 
-                    <li><a class="toctree-l4" href="#_5">データソースの利用例</a></li>
+                    <li><a class="toctree-l4" href="#_5">データリソースの利用例</a></li>
                 
             
             </ul>
@@ -319,12 +319,152 @@
         
             
     <ul class="subnav">
-    <li><span>データソース</span></li>
+    <li><span>データリソース</span></li>
 
         
             
     <li class="toctree-l1 ">
-        <a class="" href="../data_resource/">データソース</a>
+        <a class="" href="../data_resource/">データリソースとは</a>
+        
+    </li>
+
+        
+            
+    <li class="toctree-l1 ">
+        <a class="" href="../data/server/">サーバ</a>
+        
+    </li>
+
+        
+            
+    <li class="toctree-l1 ">
+        <a class="" href="../data/disk/">ディスク</a>
+        
+    </li>
+
+        
+            
+    <li class="toctree-l1 ">
+        <a class="" href="../data/archive/">アーカイブ</a>
+        
+    </li>
+
+        
+            
+    <li class="toctree-l1 ">
+        <a class="" href="../data/cdrom/">ISOイメージ(CD-ROM)</a>
+        
+    </li>
+
+        
+            
+    <li class="toctree-l1 ">
+        <a class="" href="../data/switch/">スイッチ</a>
+        
+    </li>
+
+        
+            
+    <li class="toctree-l1 ">
+        <a class="" href="../data/internet/">ルータ</a>
+        
+    </li>
+
+        
+            
+    <li class="toctree-l1 ">
+        <a class="" href="../data/subnet/">サブネット</a>
+        
+    </li>
+
+        
+            
+    <li class="toctree-l1 ">
+        <a class="" href="../data/packet_filter/">パケットフィルタ</a>
+        
+    </li>
+
+        
+            
+    <li class="toctree-l1 ">
+        <a class="" href="../data/bridge/">ブリッジ</a>
+        
+    </li>
+
+        
+            
+    <li class="toctree-l1 ">
+        <a class="" href="../data/load_balancer/">ロードバランサ</a>
+        
+    </li>
+
+        
+            
+    <li class="toctree-l1 ">
+        <a class="" href="../data/database/">データベース</a>
+        
+    </li>
+
+        
+            
+    <li class="toctree-l1 ">
+        <a class="" href="../data/nfs/">NFS</a>
+        
+    </li>
+
+        
+            
+    <li class="toctree-l1 ">
+        <a class="" href="../data/note/">スタートアップスクリプト</a>
+        
+    </li>
+
+        
+            
+    <li class="toctree-l1 ">
+        <a class="" href="../data/ssh_key/">公開鍵</a>
+        
+    </li>
+
+        
+            
+    <li class="toctree-l1 ">
+        <a class="" href="../data/icon/">アイコン</a>
+        
+    </li>
+
+        
+            
+    <li class="toctree-l1 ">
+        <a class="" href="../data/private_host/">専有ホスト</a>
+        
+    </li>
+
+        
+            
+    <li class="toctree-l1 ">
+        <a class="" href="../data/dns/">DNS</a>
+        
+    </li>
+
+        
+            
+    <li class="toctree-l1 ">
+        <a class="" href="../data/gslb/">GSLB</a>
+        
+    </li>
+
+        
+            
+    <li class="toctree-l1 ">
+        <a class="" href="../data/simple_monitor/">シンプル監視</a>
+        
+    </li>
+
+        
+            
+    <li class="toctree-l1 ">
+        <a class="" href="../data/bucket_object/">オブジェクトストレージ</a>
         
     </li>
 
@@ -538,8 +678,8 @@
 </tr>
 </tbody>
 </table>
-<h3 id="_4">属性(データソースでのみ利用可能)</h3>
-<p>以下の属性はデータソースでのみ利用可能です。</p>
+<h3 id="_4">属性(データリソースでのみ利用可能)</h3>
+<p>以下の属性はデータリソースでのみ利用可能です。</p>
 <table>
 <thead>
 <tr>
@@ -556,7 +696,7 @@
 </tr>
 </tbody>
 </table>
-<h3 id="_5">データソースの利用例</h3>
+<h3 id="_5">データリソースの利用例</h3>
 <pre><code class="hcl">data sakuracloud_bucket_object &quot;foobar&quot; {
   #アクセスキー(環境変数SACLOUD_OJS_ACCESS_KEY_ID、またはAWS_ACCESS_KEY_IDでも指定可能)  
   #access_key = &quot;&quot;

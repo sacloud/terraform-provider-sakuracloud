@@ -123,7 +123,7 @@ func dataSourceSakuraCloudArchiveRead(d *schema.ResourceData, meta interface{}) 
 		if rawNameSelector, ok := d.GetOk("name_selectors"); ok {
 			selectors := expandStringList(rawNameSelector.([]interface{}))
 			var filtered []sacloud.Archive
-			for _, a := range res.Archives {
+			for _, a := range targets {
 				if hasNames(&a, selectors) {
 					filtered = append(filtered, a)
 				}
@@ -133,7 +133,7 @@ func dataSourceSakuraCloudArchiveRead(d *schema.ResourceData, meta interface{}) 
 		if rawTagSelector, ok := d.GetOk("tag_selectors"); ok {
 			selectors := expandStringList(rawTagSelector.([]interface{}))
 			var filtered []sacloud.Archive
-			for _, a := range res.Archives {
+			for _, a := range targets {
 				if hasTags(&a, selectors) {
 					filtered = append(filtered, a)
 				}

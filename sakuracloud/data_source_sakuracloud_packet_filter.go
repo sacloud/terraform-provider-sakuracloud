@@ -115,7 +115,7 @@ func dataSourceSakuraCloudPacketFilterRead(d *schema.ResourceData, meta interfac
 	if rawNameSelector, ok := d.GetOk("name_selectors"); ok {
 		selectors := expandStringList(rawNameSelector.([]interface{}))
 		var filtered []sacloud.PacketFilter
-		for _, a := range res.PacketFilters {
+		for _, a := range targets {
 			if hasNames(&a, selectors) {
 				filtered = append(filtered, a)
 			}

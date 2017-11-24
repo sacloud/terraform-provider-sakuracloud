@@ -44,6 +44,26 @@
     - [オブジェクトストレージ](configuration/resources/bucket_object/)
 - 特殊なリソース
     - [サーバ コネクタ](configuration/resources/server_connector)
-- データソース:
-    - [データソース](configuration/resources/data_resource/)
+- データリソース:
+    - [データリソースとは](configuration/resources/data_resource)
+    - [サーバ](configuration/resources/data/server)
+    - [ディスク](configuration/resources/data/disk)
+    - [アーカイブ](configuration/resources/data/archive)
+    - [ISOイメージ(CD-ROM)](configuration/resources/data/cdrom)
+    - [スイッチ](configuration/resources/data/switch)
+    - [ルータ](configuration/resources/data/internet)
+    - [サブネット](configuration/resources/data/subnet)
+    - [パケットフィルタ](configuration/resources/data/packet_filter)
+    - [ブリッジ](configuration/resources/data/bridge)
+    - [ロードバランサ](configuration/resources/data/load_balancer)
+    - [データベース](configuration/resources/data/database)
+    - [NFS](configuration/resources/data/nfs)
+    - [スタートアップスクリプト](configuration/resources/data/note)
+    - [公開鍵](configuration/resources/data/ssh_key)
+    - [アイコン](configuration/resources/data/icon)
+    - [専有ホスト](configuration/resources/data/private_host)
+    - [DNS](configuration/resources/data/dns)
+    - [GSLB](configuration/resources/data/gslb)
+    - [シンプル監視](configuration/resources/data/simple_monitor)
+    - [オブジェクトストレージ](configuration/resources/data/bucket_object)
   

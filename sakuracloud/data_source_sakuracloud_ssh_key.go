@@ -80,7 +80,7 @@ func dataSourceSakuraCloudSSHKeyRead(d *schema.ResourceData, meta interface{}) e
 	if rawNameSelector, ok := d.GetOk("name_selectors"); ok {
 		selectors := expandStringList(rawNameSelector.([]interface{}))
 		var filtered []sacloud.SSHKey
-		for _, a := range res.SSHKeys {
+		for _, a := range targets {
 			if hasNames(&a, selectors) {
 				filtered = append(filtered, a)
 			}
