@@ -87,7 +87,7 @@ func dataSourceSakuraCloudBridgeRead(d *schema.ResourceData, meta interface{}) e
 	if rawNameSelector, ok := d.GetOk("name_selectors"); ok {
 		selectors := expandStringList(rawNameSelector.([]interface{}))
 		var filtered []sacloud.Bridge
-		for _, a := range res.Bridges {
+		for _, a := range targets {
 			if hasNames(&a, selectors) {
 				filtered = append(filtered, a)
 			}

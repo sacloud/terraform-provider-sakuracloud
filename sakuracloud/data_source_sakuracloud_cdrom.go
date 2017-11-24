@@ -100,7 +100,7 @@ func dataSourceSakuraCloudCDROMRead(d *schema.ResourceData, meta interface{}) er
 	if rawNameSelector, ok := d.GetOk("name_selectors"); ok {
 		selectors := expandStringList(rawNameSelector.([]interface{}))
 		var filtered []sacloud.CDROM
-		for _, a := range res.CDROMs {
+		for _, a := range targets {
 			if hasNames(&a, selectors) {
 				filtered = append(filtered, a)
 			}
@@ -110,7 +110,7 @@ func dataSourceSakuraCloudCDROMRead(d *schema.ResourceData, meta interface{}) er
 	if rawTagSelector, ok := d.GetOk("tag_selectors"); ok {
 		selectors := expandStringList(rawTagSelector.([]interface{}))
 		var filtered []sacloud.CDROM
-		for _, a := range res.CDROMs {
+		for _, a := range targets {
 			if hasTags(&a, selectors) {
 				filtered = append(filtered, a)
 			}

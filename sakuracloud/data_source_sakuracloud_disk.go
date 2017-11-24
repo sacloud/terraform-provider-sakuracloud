@@ -111,7 +111,7 @@ func dataSourceSakuraCloudDiskRead(d *schema.ResourceData, meta interface{}) err
 	if rawNameSelector, ok := d.GetOk("name_selectors"); ok {
 		selectors := expandStringList(rawNameSelector.([]interface{}))
 		var filtered []sacloud.Disk
-		for _, a := range res.Disks {
+		for _, a := range targets {
 			if hasNames(&a, selectors) {
 				filtered = append(filtered, a)
 			}
@@ -121,7 +121,7 @@ func dataSourceSakuraCloudDiskRead(d *schema.ResourceData, meta interface{}) err
 	if rawTagSelector, ok := d.GetOk("tag_selectors"); ok {
 		selectors := expandStringList(rawTagSelector.([]interface{}))
 		var filtered []sacloud.Disk
-		for _, a := range res.Disks {
+		for _, a := range targets {
 			if hasTags(&a, selectors) {
 				filtered = append(filtered, a)
 			}

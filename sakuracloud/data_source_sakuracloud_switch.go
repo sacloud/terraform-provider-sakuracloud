@@ -105,7 +105,7 @@ func dataSourceSakuraCloudSwitchRead(d *schema.ResourceData, meta interface{}) e
 	if rawNameSelector, ok := d.GetOk("name_selectors"); ok {
 		selectors := expandStringList(rawNameSelector.([]interface{}))
 		var filtered []sacloud.Switch
-		for _, a := range res.Switches {
+		for _, a := range targets {
 			if hasNames(&a, selectors) {
 				filtered = append(filtered, a)
 			}
@@ -115,7 +115,7 @@ func dataSourceSakuraCloudSwitchRead(d *schema.ResourceData, meta interface{}) e
 	if rawTagSelector, ok := d.GetOk("tag_selectors"); ok {
 		selectors := expandStringList(rawTagSelector.([]interface{}))
 		var filtered []sacloud.Switch
-		for _, a := range res.Switches {
+		for _, a := range targets {
 			if hasTags(&a, selectors) {
 				filtered = append(filtered, a)
 			}

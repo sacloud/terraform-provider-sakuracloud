@@ -215,7 +215,7 @@ VPCルータ本体を表します。
 | `description`   | -   | 説明           | -        | 文字列                         | - |
 | `tags`          | -   | タグ           | -        | リスト(文字列)                  | - |
 | `graceful_shutdown_timeout` | - | シャットダウンまでの待ち時間 | - | 数値(秒数) | シャットダウンが必要な場合の通常シャットダウンするまでの待ち時間(指定の時間まで待ってもシャットダウンしない場合は強制シャットダウンされる) |
-| `zone`          | -   | ゾーン          | -        | `is1b`<br />`tk1a`<br />`tk1v` | - |
+| `zone`          | -   | ゾーン          | -        | `is1a`<br />`is1b`<br />`tk1a`<br />`tk1v` | - |
 
 
 ### 属性
@@ -245,7 +245,7 @@ VPCルータが持つプライベートNICを表します。
 | `ipaddress`        | ◯   | IPアドレス      | -        | リスト(文字列)                  | プランが`standard`の場合は1つ、`premium`、`highspec`の場合は2つ指定する |
 | `nw_mask_len`      | ◯   | プリフィックス   | -        | 数値(16〜28)                          | - |
 | `graceful_shutdown_timeout` | - | シャットダウンまでの待ち時間 | - | 数値(秒数) | シャットダウンが必要な場合の通常シャットダウンするまでの待ち時間(指定の時間まで待ってもシャットダウンしない場合は強制シャットダウンされる) |
-| `zone`             | -   | ゾーン          | -        | `is1b`<br />`tk1a`<br />`tk1v` | - |
+| `zone`          | -   | ゾーン          | -        | `is1a`<br />`is1b`<br />`tk1a`<br />`tk1v` | - |
 
 
 ### 属性
@@ -272,7 +272,7 @@ VPCルータでのスタティックNAT機能を表します。
 | `global_address`          | ◯   | グローバル側IPアドレス  | -        | 文字列                   | VPCルータのIPエイリアスの中のいづれかの値を指定する |
 | `private_address`         | ◯   | プライベート側IPアドレス | -        | 文字列                  | - |
 | `description`             | -   | 説明             | -        | 文字列                  | - |
-| `zone`                    | -   | ゾーン          | -        | `is1b`<br />`tk1a`<br />`tk1v` | - |
+| `zone`          | -   | ゾーン          | -        | `is1a`<br />`is1b`<br />`tk1a`<br />`tk1v` | - |
 
 
 ### 属性
@@ -298,8 +298,7 @@ VPCルータでのポートフォワーディング(Reverse NAT)機能を表し�
 | `private_address`         | ◯   | プライベート側IPアドレス | -        | 文字列                          | - |
 | `private_port`            | ◯   | プライベート側ポート番号 | -        | 数値(1〜65535)                  | - |
 | `description`             | -   | 説明             | -        | 文字列                  | - |
-| `zone`                    | -   | ゾーン                 | -        | `is1b`<br />`tk1a`<br />`tk1v` | - |
-
+| `zone`          | -   | ゾーン          | -        | `is1a`<br />`is1b`<br />`tk1a`<br />`tk1v` | - |
 
 ### 属性
 
@@ -321,7 +320,7 @@ VPCルータでのファイアウォール機能を表します。
 | `vpc_router_interface_index`| -   | 対象インターフェースのインデックス| 0        | 数値(`0`-`7`)| - |
 | `direction`               | ◯   | 通信方向 | -        | `send`<br />`receive`               | VPCルータ内から見た通信方向を指定する |
 | `expressions`             | ◯   | フィルタルール        | -        | リスト(マップ)           | 詳細は[`expressions`](#expressions)を参照 |
-| `zone`                    | -   | ゾーン                 | -        | `is1b`<br />`tk1a`<br />`tk1v` | - |
+| `zone`          | -   | ゾーン          | -        | `is1a`<br />`is1b`<br />`tk1a`<br />`tk1v` | - |
 
 #### `expressions`
 
@@ -358,7 +357,7 @@ VPCルータでのDHCPサーバ機能を表します。
 | `range_start`                | ◯   | 動的割り当て範囲(開始) | -        | 文字列                          | - |
 | `range_stop`                 | ◯   | 動的割り当て範囲(終了) | -        | 文字列                          | - |
 | `dns_servers`                | -   | DNSサーバーIPアドレス | -        | リスト(文字列)                   | 省略した場合はゾーンごとのデフォルトDNSサーバが割り当てられる |
-| `zone`                    | -   | ゾーン                 | -        | `is1b`<br />`tk1a`<br />`tk1v` | - |
+| `zone`          | -   | ゾーン          | -        | `is1a`<br />`is1b`<br />`tk1a`<br />`tk1v` | - |
 
 
 ### 属性
@@ -381,7 +380,7 @@ VPCルータでのDHCPスタティック割当機能を表します。
 | `vpc_router_dhcp_server_id` | ◯   | DHCPサーバID       | -        | 文字列                   | - |
 | `ipaddress`                 | ◯   | IPアドレス | -        | 文字列                          | - |
 | `macaddress`                | ◯   | MACアドレス | -        | 文字列                          | 英字は小文字で入力する |
-| `zone`                      | -   | ゾーン                 | -        | `is1b`<br />`tk1a`<br />`tk1v` | - |
+| `zone`          | -   | ゾーン          | -        | `is1a`<br />`is1b`<br />`tk1a`<br />`tk1v` | - |
 
 
 ### 属性
@@ -404,7 +403,7 @@ VPCルータでのPPTPサーバ機能を表します。
 | `vpc_router_interface_id`    | ◯   | プライベートNIC ID     | -        | 文字列                   | - |
 | `range_start`                | ◯   | 動的割り当て範囲(開始) | -        | 文字列                          | - |
 | `range_stop`                 | ◯   | 動的割り当て範囲(終了) | -        | 文字列                          | - |
-| `zone`                    | -   | ゾーン                 | -        | `is1b`<br />`tk1a`<br />`tk1v` | - |
+| `zone`          | -   | ゾーン          | -        | `is1a`<br />`is1b`<br />`tk1a`<br />`tk1v` | - |
 
 
 ### 属性
@@ -428,7 +427,7 @@ VPCルータでのL2TP/IPSecサーバ機能を表します。
 | `pre_shared_secret`          | ◯   | 事前共有シークレット   | -        | 文字列                          | - |
 | `range_start`                | ◯   | 動的割り当て範囲(開始) | -        | 文字列                          | - |
 | `range_stop`                 | ◯   | 動的割り当て範囲(終了) | -        | 文字列                          | - |
-| `zone`                    | -   | ゾーン                 | -        | `is1b`<br />`tk1a`<br />`tk1v` | - |
+| `zone`          | -   | ゾーン          | -        | `is1a`<br />`is1b`<br />`tk1a`<br />`tk1v` | - |
 
 
 ### 属性
@@ -452,7 +451,7 @@ VPCルータでのリモートユーザーを表します。
 | `vpc_router_id`           | ◯   | VPCルータID         | -        | 文字列                   | - |
 | `name`                    | ◯   | ユーザー名 | -        | 文字列                          | - |
 | `password`                | ◯   | パスワード | -        | 文字列                          | - |
-| `zone`                    | -   | ゾーン                 | -        | `is1b`<br />`tk1a`<br />`tk1v` | - |
+| `zone`          | -   | ゾーン          | -        | `is1a`<br />`is1b`<br />`tk1a`<br />`tk1v` | - |
 
 
 ### 属性
@@ -478,7 +477,7 @@ VPCルータでのサイト間VPNを表します。
 | `pre_shared_secret`  | ◯   | 事前共有シークレット | -        | 文字列                          | - |
 | `routes`             | ◯   | 対向Prefix | -        | リスト(文字列)                          | - |
 | `local_prefix`       | ◯   | ローカルPrefix | -        | リスト(文字列)                          | - |
-| `zone`               | -   | ゾーン                 | -        | `is1b`<br />`tk1a`<br />`tk1v` | - |
+| `zone`          | -   | ゾーン          | -        | `is1a`<br />`is1b`<br />`tk1a`<br />`tk1v` | - |
 
 
 ### 属性
@@ -519,7 +518,7 @@ VPCルータでのスタティックルート機能を表します。
 | `vpc_router_interface_id`    | ◯   | プライベートNIC ID     | -        | 文字列                   | - |
 | `prefix`                    | ◯   | プリフィックス | -        | 文字列                          | - |
 | `next_hop`                  | ◯   | ネクストホップ | -        | 文字列                          | - |
-| `zone`                      | -   | ゾーン                 | -        | `is1b`<br />`tk1a`<br />`tk1v` | - |
+| `zone`          | -   | ゾーン          | -        | `is1a`<br />`is1b`<br />`tk1a`<br />`tk1v` | - |
 
 
 ### 属性

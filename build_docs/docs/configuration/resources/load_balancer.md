@@ -91,7 +91,7 @@ resource sakuracloud_switch "sw" {
 | `description`   | -   | 説明           | -        | 文字列                         | - |
 | `tags`          | -   | タグ           | -        | リスト(文字列)                  | - |
 | `graceful_shutdown_timeout` | - | シャットダウンまでの待ち時間 | - | 数値(秒数) | シャットダウンが必要な場合の通常シャットダウンするまでの待ち時間(指定の時間まで待ってもシャットダウンしない場合は強制シャットダウンされる) |
-| `zone`          | -   | ゾーン          | -        | `is1b`<br />`tk1a`<br />`tk1v` | - |
+| `zone`          | -   | ゾーン          | -        | `is1a`<br />`is1b`<br />`tk1a`<br />`tk1v` | - |
 
 
 ### 属性
@@ -117,7 +117,7 @@ resource sakuracloud_switch "sw" {
 | `port`             | ◯   | ポート番号      | -        | 数値                          | - |
 | `delay_loop`       | -   | チェック間隔秒数  | `10`    | `10`〜`2147483647`の整数           | - |
 | `sorry_server`     | -   | ソーリーサーバ  | -        | 文字列     | VIPに紐づく実サーバがすべてダウンした場合、<br />すべてのアクセスを指定したサーバに誘導します |
-| `zone`             | -   | ゾーン          | -        | `is1b`<br />`tk1a`<br />`tk1v` | - |
+| `zone`             | -   | ゾーン          | -        | `is1a`<br />`is1b`<br />`tk1a`<br />`tk1v` | - |
 
 
 ### 属性
@@ -144,7 +144,7 @@ resource sakuracloud_switch "sw" {
 | `check_path`           | △   | チェック対象パス  | -       | 文字列           | チェック方法が`http`、`https`の場合必須 |
 | `check_status`         | △   | チェック期待値   | -        | 文字列           | 期待するレスポンスコード<br />チェック方法が`http`、`https`の場合必須 |
 | `enabled`              | -   | 有効/無効       | `true`    | `true`<br />`false`   | - |
-| `zone`                 | -   | ゾーン          | -        | `is1b`<br />`tk1a`<br />`tk1v` | - |
+| `zone`                 | -   | ゾーン          | -        | `is1a`<br />`is1b`<br />`tk1a`<br />`tk1v` | - |
 
 
 ### 属性

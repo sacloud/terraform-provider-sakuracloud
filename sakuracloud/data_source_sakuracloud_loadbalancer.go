@@ -132,7 +132,7 @@ func dataSourceSakuraCloudLoadBalancerRead(d *schema.ResourceData, meta interfac
 	if rawNameSelector, ok := d.GetOk("name_selectors"); ok {
 		selectors := expandStringList(rawNameSelector.([]interface{}))
 		var filtered []sacloud.LoadBalancer
-		for _, a := range res.LoadBalancers {
+		for _, a := range targets {
 			if hasNames(&a, selectors) {
 				filtered = append(filtered, a)
 			}
@@ -142,7 +142,7 @@ func dataSourceSakuraCloudLoadBalancerRead(d *schema.ResourceData, meta interfac
 	if rawTagSelector, ok := d.GetOk("tag_selectors"); ok {
 		selectors := expandStringList(rawTagSelector.([]interface{}))
 		var filtered []sacloud.LoadBalancer
-		for _, a := range res.LoadBalancers {
+		for _, a := range targets {
 			if hasTags(&a, selectors) {
 				filtered = append(filtered, a)
 			}

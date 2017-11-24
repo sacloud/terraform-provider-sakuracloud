@@ -165,7 +165,7 @@ func dataSourceSakuraCloudSimpleMonitorRead(d *schema.ResourceData, meta interfa
 	if rawNameSelector, ok := d.GetOk("name_selectors"); ok {
 		selectors := expandStringList(rawNameSelector.([]interface{}))
 		var filtered []sacloud.SimpleMonitor
-		for _, a := range res.SimpleMonitors {
+		for _, a := range targets {
 			if hasNames(&a, selectors) {
 				filtered = append(filtered, a)
 			}
@@ -175,7 +175,7 @@ func dataSourceSakuraCloudSimpleMonitorRead(d *schema.ResourceData, meta interfa
 	if rawTagSelector, ok := d.GetOk("tag_selectors"); ok {
 		selectors := expandStringList(rawTagSelector.([]interface{}))
 		var filtered []sacloud.SimpleMonitor
-		for _, a := range res.SimpleMonitors {
+		for _, a := range targets {
 			if hasTags(&a, selectors) {
 				filtered = append(filtered, a)
 			}

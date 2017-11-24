@@ -131,7 +131,7 @@ func dataSourceSakuraCloudGSLBRead(d *schema.ResourceData, meta interface{}) err
 	if rawNameSelector, ok := d.GetOk("name_selectors"); ok {
 		selectors := expandStringList(rawNameSelector.([]interface{}))
 		var filtered []sacloud.GSLB
-		for _, a := range res.CommonServiceGSLBItems {
+		for _, a := range targets {
 			if hasNames(&a, selectors) {
 				filtered = append(filtered, a)
 			}
@@ -141,7 +141,7 @@ func dataSourceSakuraCloudGSLBRead(d *schema.ResourceData, meta interface{}) err
 	if rawTagSelector, ok := d.GetOk("tag_selectors"); ok {
 		selectors := expandStringList(rawTagSelector.([]interface{}))
 		var filtered []sacloud.GSLB
-		for _, a := range res.CommonServiceGSLBItems {
+		for _, a := range targets {
 			if hasTags(&a, selectors) {
 				filtered = append(filtered, a)
 			}

@@ -48,7 +48,7 @@ resource sakuracloud_server_connector "connector" {
 | `packet_filter_ids`| - | パケットフィルタID | - | リスト(文字列) | NICに適用するパケットフィルタのIDをリストで指定する。リストの先頭からeth0,eth1の順で適用される |
 | `cdrom_id`         | - | CDROM(ISOイメージ)ID | - | 文字列 | - |
 | `graceful_shutdown_timeout` | - | シャットダウンまでの待ち時間 | - | 数値(秒数) | シャットダウンが必要な場合の通常シャットダウンするまでの待ち時間(指定の時間まで待ってもシャットダウンしない場合は強制シャットダウンされる) |
-| `zone`             | - | ゾーン | - | `is1b`<br />`tk1a`<br />`tk1v` | - |
+| `zone`             | - | ゾーン | - | `is1a`<br />`is1b`<br />`tk1a`<br />`tk1v` | - |
 
 
 ### 属性
