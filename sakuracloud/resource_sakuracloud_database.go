@@ -194,10 +194,19 @@ func resourceSakuraCloudDatabaseCreate(d *schema.ResourceData, meta interface{})
 	d.SetId(database.GetStrID())
 
 	//wait
-	err = client.Database.SleepWhileCopying(database.ID, client.DefaultTimeoutDuration, 5)
-	if err != nil {
-		return fmt.Errorf("Failed to wait SakuraCloud Database copy: %s", err)
+	compChan, progChan, errChan := client.Database.AsyncSleepWhileCopying(database.ID, client.DefaultTimeoutDuration, 5)
+	for {
+		select {
+		case <-compChan:
+			break
+		case <-progChan:
+			continue
+		case err := <-errChan:
+			return fmt.Errorf("Failed to wait SakuraCloud Database copy: %s", err)
+		}
+		break
 	}
+
 	err = client.Database.SleepUntilUp(database.ID, client.DefaultTimeoutDuration)
 	if err != nil {
 		return fmt.Errorf("Failed to wait SakuraCloud Database boot: %s", err)

@@ -168,9 +168,18 @@ func resourceSakuraCloudDiskCreate(d *schema.ResourceData, meta interface{}) err
 		return fmt.Errorf("Failed to create SakuraCloud Disk resource: %s", err)
 	}
 
-	err = client.Disk.SleepWhileCopying(disk.ID, client.DefaultTimeoutDuration)
-	if err != nil {
-		return fmt.Errorf("Failed to create SakuraCloud Disk resource: %s", err)
+	//wait
+	compChan, progChan, errChan := client.Disk.AsyncSleepWhileCopying(disk.ID, client.DefaultTimeoutDuration)
+	for {
+		select {
+		case <-compChan:
+			break
+		case <-progChan:
+			continue
+		case err := <-errChan:
+			return fmt.Errorf("Failed to wait SakuraCloud Disk copy: %s", err)
+		}
+		break
 	}
 
 	//edit disk
