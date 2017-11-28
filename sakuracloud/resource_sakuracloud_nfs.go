@@ -132,9 +132,17 @@ func resourceSakuraCloudNFSCreate(d *schema.ResourceData, meta interface{}) erro
 	d.SetId(nfs.GetStrID())
 
 	//wait
-	err = client.NFS.SleepWhileCopying(nfs.ID, client.DefaultTimeoutDuration, 5)
-	if err != nil {
-		return fmt.Errorf("Failed to wait SakuraCloud NFS copy: %s", err)
+	compChan, progChan, errChan := client.NFS.AsyncSleepWhileCopying(nfs.ID, client.DefaultTimeoutDuration, 5)
+	for {
+		select {
+		case <-compChan:
+			break
+		case <-progChan:
+			continue
+		case err := <-errChan:
+			return fmt.Errorf("Failed to wait SakuraCloud NFS copy: %s", err)
+		}
+		break
 	}
 
 	err = client.NFS.SleepUntilUp(nfs.ID, client.DefaultTimeoutDuration)

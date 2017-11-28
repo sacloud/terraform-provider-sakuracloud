@@ -178,9 +178,17 @@ func resourceSakuraCloudLoadBalancerCreate(d *schema.ResourceData, meta interfac
 	d.SetId(loadBalancer.GetStrID())
 
 	//wait
-	err = client.LoadBalancer.SleepWhileCopying(loadBalancer.ID, client.DefaultTimeoutDuration, 5)
-	if err != nil {
-		return fmt.Errorf("Failed to wait SakuraCloud LoadBalancer copy: %s", err)
+	compChan, progChan, errChan := client.LoadBalancer.AsyncSleepWhileCopying(loadBalancer.ID, client.DefaultTimeoutDuration, 5)
+	for {
+		select {
+		case <-compChan:
+			break
+		case <-progChan:
+			continue
+		case err := <-errChan:
+			return fmt.Errorf("Failed to wait SakuraCloud LoadBalancer copy: %s", err)
+		}
+		break
 	}
 
 	err = client.LoadBalancer.SleepUntilUp(loadBalancer.ID, client.DefaultTimeoutDuration)
