@@ -190,4 +190,4 @@ terraform apply
 
 ## Author
 
-  * Kazumichi Yamamoto ([@yamamoto-febc](https://github.com/sacloud))
+  * [Terraform for SakuraCloud Authors](AUTHORS)
