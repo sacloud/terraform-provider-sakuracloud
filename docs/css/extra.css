@@ -1,4 +1,6 @@
 code {
     font-size: 100%;
 }
-
+.wy-nav-content {
+    max-width: 1200px;
+}
