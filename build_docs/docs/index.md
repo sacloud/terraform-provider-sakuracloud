@@ -56,6 +56,7 @@
     - [パケットフィルタ](configuration/resources/data/packet_filter)
     - [ブリッジ](configuration/resources/data/bridge)
     - [ロードバランサ](configuration/resources/data/load_balancer)
+    - [VPCルータ](configuration/resources/data/vpc_router/)
     - [データベース](configuration/resources/data/database)
     - [NFS](configuration/resources/data/nfs)
     - [スタートアップスクリプト](configuration/resources/data/note)

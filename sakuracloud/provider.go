@@ -80,6 +80,7 @@ func Provider() terraform.ResourceProvider {
 			"sakuracloud_ssh_key":        dataSourceSakuraCloudSSHKey(),
 			"sakuracloud_subnet":         dataSourceSakuraCloudSubnet(),
 			"sakuracloud_switch":         dataSourceSakuraCloudSwitch(),
+			"sakuracloud_vpc_router":     dataSourceSakuraCloudVPCRouter(),
 		},
 		ResourcesMap: map[string]*schema.Resource{
 			"sakuracloud_auto_backup":                    resourceSakuraCloudAutoBackup(),

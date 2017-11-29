@@ -54,6 +54,7 @@ pages:
       - パケットフィルタ: configuration/resources/data/packet_filter.md
       - ブリッジ: configuration/resources/data/bridge.md
       - ロードバランサ: configuration/resources/data/load_balancer.md
+      - VPCルータ: configuration/resources/data/vpc_router.md
       - データベース: configuration/resources/data/database.md
       - NFS: configuration/resources/data/nfs.md
       - スタートアップスクリプト: configuration/resources/data/note.md

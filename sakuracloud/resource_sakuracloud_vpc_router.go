@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/hashicorp/terraform/helper/schema"
 	"github.com/sacloud/libsacloud/api"
+	"github.com/sacloud/libsacloud/sacloud"
 	"time"
 )
 
@@ -223,18 +224,23 @@ func resourceSakuraCloudVPCRouterRead(d *schema.ResourceData, meta interface{}) 
 		return fmt.Errorf("Couldn't find SakuraCloud VPCRouter resource: %s", err)
 	}
 
-	d.Set("name", vpcRouter.Name)
-	d.Set("icon_id", vpcRouter.GetIconStrID())
-	d.Set("description", vpcRouter.Description)
-	if vpcRouter.Settings != nil && vpcRouter.Settings.Router != nil {
-		d.Set("syslog_host", vpcRouter.Settings.Router.SyslogHost)
+	return setVPCRouterResourceData(d, client, vpcRouter)
+}
+
+func setVPCRouterResourceData(d *schema.ResourceData, client *APIClient, data *sacloud.VPCRouter) error {
+
+	d.Set("name", data.Name)
+	d.Set("icon_id", data.GetIconStrID())
+	d.Set("description", data.Description)
+	if data.Settings != nil && data.Settings.Router != nil {
+		d.Set("syslog_host", data.Settings.Router.SyslogHost)
 	} else {
 		d.Set("syslog_host", "")
 	}
-	d.Set("tags", realTags(client, vpcRouter.Tags))
+	d.Set("tags", realTags(client, data.Tags))
 
 	//plan
-	planID := vpcRouter.Plan.ID
+	planID := data.Plan.ID
 	switch planID {
 	case 1:
 		d.Set("plan", "standard")
@@ -244,20 +250,20 @@ func resourceSakuraCloudVPCRouterRead(d *schema.ResourceData, meta interface{}) 
 		d.Set("plan", "highspec")
 	}
 	if planID == 1 {
-		d.Set("global_address", vpcRouter.Interfaces[0].IPAddress)
+		d.Set("global_address", data.Interfaces[0].IPAddress)
 	} else {
-		d.Set("switch_id", vpcRouter.Switch.GetStrID())
-		d.Set("vip", vpcRouter.Settings.Router.Interfaces[0].VirtualIPAddress)
-		d.Set("ipaddress1", vpcRouter.Settings.Router.Interfaces[0].IPAddress[0])
-		d.Set("ipaddress2", vpcRouter.Settings.Router.Interfaces[0].IPAddress[1])
-		d.Set("aliases", vpcRouter.Settings.Router.Interfaces[0].IPAliases)
-		d.Set("vrid", vpcRouter.Settings.Router.VRID)
+		d.Set("switch_id", data.Switch.GetStrID())
+		d.Set("vip", data.Settings.Router.Interfaces[0].VirtualIPAddress)
+		d.Set("ipaddress1", data.Settings.Router.Interfaces[0].IPAddress[0])
+		d.Set("ipaddress2", data.Settings.Router.Interfaces[0].IPAddress[1])
+		d.Set("aliases", data.Settings.Router.Interfaces[0].IPAliases)
+		d.Set("vrid", data.Settings.Router.VRID)
 
-		d.Set("global_address", vpcRouter.Settings.Router.Interfaces[0].VirtualIPAddress)
+		d.Set("global_address", data.Settings.Router.Interfaces[0].VirtualIPAddress)
 	}
 
 	d.Set("zone", client.Zone)
-
+	d.SetId(data.GetStrID())
 	return nil
 }
 
