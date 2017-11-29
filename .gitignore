@@ -1,3 +1,4 @@
+.mailmap
 .env
 bin/terraform-provider-sakuracloud*
 plugin.log
