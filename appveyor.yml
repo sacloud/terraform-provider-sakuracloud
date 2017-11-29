@@ -1,0 +1,22 @@
+platform: x64
+
+clone_folder: c:\gopath\src\github.com\sacloud\terraform-provider-sakuracloud
+
+environment:
+  GOPATH: c:\gopath
+
+install:
+  - echo %PATH%
+  - echo %GOPATH%
+  - set PATH=%GOPATH%\bin;c:\go\bin;%PATH%
+  - go version
+  - go env
+
+init:
+  - git config --global core.autocrlf false
+
+test_script:
+  - go test -v ./sakuracloud -timeout=30s -parallel=4
+
+build: off
+deploy: off
