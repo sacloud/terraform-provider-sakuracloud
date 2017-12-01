@@ -11,7 +11,11 @@ import (
 	"time"
 )
 
-func getSacloudAPIClient(d *schema.ResourceData, meta interface{}) *APIClient {
+type resourceValueGetable interface {
+	GetOk(key string) (interface{}, bool)
+}
+
+func getSacloudAPIClient(d resourceValueGetable, meta interface{}) *APIClient {
 	c := meta.(*APIClient)
 	client := c.Clone()
 

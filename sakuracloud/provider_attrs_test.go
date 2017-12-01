@@ -88,5 +88,6 @@ provider sakuracloud {
 }
 resource "sakuracloud_switch" "foobar" {
     name = "myswitch_upd"
+    tags = []
 }
 `
