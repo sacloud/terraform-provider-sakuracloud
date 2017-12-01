@@ -114,7 +114,8 @@ func resourceSakuraCloudDNSRecordRead(d *schema.ResourceData, meta interface{}) 
 
 	record := expandDNSRecord(d)
 	if r := findRecordMatch(record, &dns.Settings.DNS.ResourceRecordSets); r == nil {
-		return fmt.Errorf("Couldn't find SakuraCloud DNSRecord resource: %v", record)
+		d.SetId("")
+		return nil
 	}
 
 	d.Set("name", record.Name)

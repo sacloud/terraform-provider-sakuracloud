@@ -139,12 +139,14 @@ func resourceSakuraCloudLoadBalancerServerRead(d *schema.ResourceData, meta inte
 
 	vipSetting := findLoadBalancerVIPMatchByValue(vip, port, loadBalancer.Settings)
 	if vipSetting == nil {
-		return fmt.Errorf("Couldn't find SakuraCloud LoadBalancer VIP resource: %s", vipID)
+		d.SetId("")
+		return nil
 	}
 
 	server := expandLoadBalancerServer(d)
 	if s := findLoadBalancerServer(server, vipSetting.Servers); s != nil {
-		return fmt.Errorf("Couldn't find SakuraCloud LoadBalancerServer resource: %v", server)
+		d.SetId("")
+		return nil
 	}
 
 	d.Set("ipaddress", server.IPAddress)

@@ -88,7 +88,8 @@ func resourceSakuraCloudGSLBServerRead(d *schema.ResourceData, meta interface{})
 
 	server := expandGSLBServer(d)
 	if r := findGSLBServerMatch(server, &gslb.Settings.GSLB.Servers); r == nil {
-		return fmt.Errorf("Couldn't find SakuraCloud GSLBServer resource: %v", server)
+		d.SetId("")
+		return nil
 	}
 
 	d.Set("ipaddress", server.IPAddress)
