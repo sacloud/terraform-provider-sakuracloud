@@ -49,6 +49,77 @@ func TestAccResourceSakuraCloudSwitch(t *testing.T) {
 		},
 	})
 }
+func TestAccResourceSakuraCloudSwitchCustomiezeDiff(t *testing.T) {
+	var sw sacloud.Switch
+	resource.Test(t, resource.TestCase{
+		PreCheck:     func() { testAccPreCheck(t) },
+		Providers:    testAccProviders,
+		CheckDestroy: testAccCheckSakuraCloudSwitchDestroy,
+		Steps: []resource.TestStep{
+			{
+				Config: testAccCheckSakuraCloudSwitchConfig_diff_before,
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckSakuraCloudSwitchExists("sakuracloud_switch.foobar", &sw),
+					resource.TestCheckResourceAttr(
+						"sakuracloud_switch.foobar", "tags.0", "a"),
+					resource.TestCheckResourceAttr(
+						"sakuracloud_switch.foobar", "tags.1", "b"),
+					resource.TestCheckResourceAttr(
+						"sakuracloud_switch.foobar", "tags.2", "c"),
+				),
+			},
+			{
+				Config: testAccCheckSakuraCloudSwitchConfig_diff_after,
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckSakuraCloudSwitchExists("sakuracloud_switch.foobar", &sw),
+					resource.TestCheckResourceAttr(
+						"sakuracloud_switch.foobar", "tags.0", "a"),
+					resource.TestCheckResourceAttr(
+						"sakuracloud_switch.foobar", "tags.1", "b"),
+					resource.TestCheckResourceAttr(
+						"sakuracloud_switch.foobar", "tags.2", "c"),
+				),
+			},
+		},
+	})
+}
+
+func TestAccResourceSakuraCloudSwitchCustomiezeDiff_AddTags(t *testing.T) {
+	var sw sacloud.Switch
+	resource.Test(t, resource.TestCase{
+		PreCheck:     func() { testAccPreCheck(t) },
+		Providers:    testAccProviders,
+		CheckDestroy: testAccCheckSakuraCloudSwitchDestroy,
+		Steps: []resource.TestStep{
+			{
+				Config: testAccCheckSakuraCloudSwitchConfig_diff_before,
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckSakuraCloudSwitchExists("sakuracloud_switch.foobar", &sw),
+					resource.TestCheckResourceAttr(
+						"sakuracloud_switch.foobar", "tags.0", "a"),
+					resource.TestCheckResourceAttr(
+						"sakuracloud_switch.foobar", "tags.1", "b"),
+					resource.TestCheckResourceAttr(
+						"sakuracloud_switch.foobar", "tags.2", "c"),
+				),
+			},
+			{
+				Config: testAccCheckSakuraCloudSwitchConfig_diff_after_addtag,
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckSakuraCloudSwitchExists("sakuracloud_switch.foobar", &sw),
+					resource.TestCheckResourceAttr(
+						"sakuracloud_switch.foobar", "tags.0", "a"),
+					resource.TestCheckResourceAttr(
+						"sakuracloud_switch.foobar", "tags.1", "b"),
+					resource.TestCheckResourceAttr(
+						"sakuracloud_switch.foobar", "tags.2", "c"),
+					resource.TestCheckResourceAttr(
+						"sakuracloud_switch.foobar", "tags.3", "d"),
+				),
+			},
+		},
+	})
+}
 
 //func TestAccResourceSakuraCloudSwitch_Import(t *testing.T) {
 //	resourceName := "sakuracloud_switch.foobar"
@@ -142,3 +213,21 @@ resource "sakuracloud_switch" "foobar" {
     tags = ["hoge1" , "hoge2"]
 }
 `
+
+var testAccCheckSakuraCloudSwitchConfig_diff_before = `
+resource sakuracloud_switch "foobar" {
+    name = "foobar"
+    tags = ["a","b","c"]
+}`
+
+var testAccCheckSakuraCloudSwitchConfig_diff_after = `
+resource sakuracloud_switch "foobar" {
+    name = "foobar"
+    tags = ["c","b","a"]
+}`
+
+var testAccCheckSakuraCloudSwitchConfig_diff_after_addtag = `
+resource sakuracloud_switch "foobar" {
+    name = "foobar"
+    tags = ["c","b","a","d"]
+}`

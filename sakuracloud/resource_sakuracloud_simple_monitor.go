@@ -22,7 +22,7 @@ func resourceSakuraCloudSimpleMonitor() *schema.Resource {
 		Importer: &schema.ResourceImporter{
 			State: schema.ImportStatePassthrough,
 		},
-
+		CustomizeDiff: hasTagResourceCustomizeDiff,
 		Schema: map[string]*schema.Schema{
 			"target": {
 				Type:     schema.TypeString,
@@ -104,6 +104,7 @@ func resourceSakuraCloudSimpleMonitor() *schema.Resource {
 			"tags": {
 				Type:     schema.TypeList,
 				Optional: true,
+				Computed: true,
 				Elem:     &schema.Schema{Type: schema.TypeString},
 			},
 			"notify_email_enabled": {
