@@ -80,7 +80,8 @@ func resourceSakuraCloudLoadBalancerVIPCreate(d *schema.ResourceData, meta inter
 	vipSetting := expandLoadBalancerVIP(d)
 
 	if r := findLoadBalancerVIPMatch(vipSetting, loadBalancer.Settings); r != nil {
-		return fmt.Errorf("Failed to create SakuraCloud LoadBalancer resource:Duplicate LoadBalancer server: %v", vipSetting)
+		d.SetId("")
+		return nil
 	}
 
 	loadBalancer.AddLoadBalancerSetting(vipSetting)
@@ -153,6 +154,7 @@ func resourceSakuraCloudLoadBalancerVIPUpdate(d *schema.ResourceData, meta inter
 	d.SetId(loadBalancerVIPIDHash(lbID, vipSetting))
 	return resourceSakuraCloudLoadBalancerVIPRead(d, meta)
 }
+
 func resourceSakuraCloudLoadBalancerVIPDelete(d *schema.ResourceData, meta interface{}) error {
 	client := getSacloudAPIClient(d, meta)
 
