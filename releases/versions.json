@@ -30,7 +30,7 @@
 		"PreRelease": true
 	},
 	{
-		"TerraformVersion": "v",
+		"TerraformVersion": "v0.11.1",
 		"ReleaseDate": "2017-12-04T00:41:16.269862851Z",
 		"PluginVersion": "v1.0.0",
 		"PreRelease": false
