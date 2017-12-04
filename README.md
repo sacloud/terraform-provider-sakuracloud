@@ -1,6 +1,8 @@
 # Terraform for さくらのクラウド
 
 [![Build Status](https://travis-ci.org/sacloud/terraform-provider-sakuracloud.svg?branch=master)](https://travis-ci.org/sacloud/terraform-provider-sakuracloud)
+[![Build status](https://ci.appveyor.com/api/projects/status/paynsb52uauq1jl8?svg=true)](https://ci.appveyor.com/project/sacloud-bot/terraform-provider-sakuracloud)
+[![Slack](https://slack.usacloud.jp/badge.svg)](https://slack.usacloud.jp/)
 
 Terraformからさくらのクラウドを操作するためのプラグインです。  
 このプラグインは`さくらインターネット公認ツール`としてさくらのクラウドユーザコミュニティによって開発されています。

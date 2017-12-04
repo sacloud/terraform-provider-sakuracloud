@@ -37,7 +37,7 @@ class TerraformProviderSakuracloud < Formula
   depends_on "terraform" => :run
 
   def install
-    bin.install "terraform-provider-sakuracloud"
+    bin.install "terraform-provider-sakuracloud_v${VERSION}_x4"
   end
 
   def caveats; <<-EOS.undent
@@ -46,7 +46,7 @@ class TerraformProviderSakuracloud < Formula
     To enable, put following text in "~/.terraformrc":
 
         providers {
-            sakuracloud = "#{bin}/terraform-provider-sakuracloud_#{_version}"
+            sakuracloud = "#{bin}/terraform-provider-sakuracloud_v${VERSION}_x4"
         }
 
   EOS
