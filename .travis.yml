@@ -11,8 +11,11 @@ install:
 - go get -u github.com/golang/lint/golint
 script:
 - make test
-- make docker-build
+- make lint-docs
 before_deploy:
+- if [ "$TRAVIS_BRANCH" == "master" ]; then
+    make docker-build;
+  fi
 - export TERRAFORM_VERSION=$(go run tools/terraform-version/main.go)
 - go get github.com/aktau/github-release
 - mkdir -p ~/bin
