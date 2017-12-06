@@ -3,6 +3,7 @@ package ftps
 import (
 	"errors"
 	"fmt"
+	"os"
 	"path/filepath"
 	"strings"
 )
@@ -25,6 +26,18 @@ func NewClient(user string, pass string, host string) *Client {
 
 // Upload file to Server
 func (c *Client) Upload(filePath string) error {
+
+	f, err := os.Open(filePath)
+	if err != nil {
+		return fmt.Errorf("Open file failed[%q]: %s", filePath, err)
+	}
+	defer f.Close()
+
+	return c.UploadFile(filepath.Base(filePath), f)
+}
+
+// UploadFile file to Server
+func (c *Client) UploadFile(remoteFilepath string, file *os.File) error {
 	rawClient := &FTPS{}
 	rawClient.TLSConfig.InsecureSkipVerify = true
 
@@ -38,7 +51,7 @@ func (c *Client) Upload(filePath string) error {
 		return fmt.Errorf("Auth FTP failed: %#v", err)
 	}
 
-	err = rawClient.StoreFile(filepath.Base(filePath), filePath)
+	err = rawClient.StoreFile(remoteFilepath, file)
 	if err != nil {
 		return fmt.Errorf("Storefile FTP failed: %#v", err)
 	}
@@ -53,6 +66,19 @@ func (c *Client) Upload(filePath string) error {
 
 // Download file from server
 func (c *Client) Download(filePath string) error {
+
+	file, err := os.Create(filePath)
+	if err != nil {
+		return err
+	}
+	defer file.Close()
+
+	return c.DownloadFile(file)
+}
+
+// DownloadFile file from server
+func (c *Client) DownloadFile(file *os.File) error {
+
 	rawClient := &FTPS{}
 	rawClient.TLSConfig.InsecureSkipVerify = true
 
@@ -83,7 +109,7 @@ func (c *Client) Download(filePath string) error {
 	}
 
 	// download
-	err = rawClient.RetrieveFile(serverFilePath, filePath)
+	err = rawClient.RetrieveFile(serverFilePath, file)
 	if err != nil {
 		return fmt.Errorf("FTP download file is failed: %#v", err)
 	}

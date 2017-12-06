@@ -298,17 +298,7 @@ func (ftps *FTPS) parseEntryLine(line string) (entry *Entry, err error) {
 	return
 }
 
-func (ftps *FTPS) StoreFile(remoteFilepath string, srcFilepath string) (err error) {
-	f, err := os.Open(srcFilepath)
-	if err != nil {
-		return
-	}
-	defer f.Close()
-
-	fileinfo, err := f.Stat()
-	if err != nil {
-		return
-	}
+func (ftps *FTPS) StoreFile(remoteFilepath string, f *os.File) (err error) {
 
 	dataConn, err := ftps.requestDataConn(fmt.Sprintf("STOR %s", remoteFilepath), 150)
 	if err != nil {
@@ -316,13 +306,9 @@ func (ftps *FTPS) StoreFile(remoteFilepath string, srcFilepath string) (err erro
 	}
 	defer dataConn.Close()
 
-	count, err := io.Copy(dataConn, f)
+	_, err = io.Copy(dataConn, f)
 	if err != nil {
 		return
-	}
-
-	if fileinfo.Size() != count {
-		return errors.New("file transfer not complete")
 	}
 
 	if err = dataConn.Close(); err != nil {
@@ -337,19 +323,13 @@ func (ftps *FTPS) StoreFile(remoteFilepath string, srcFilepath string) (err erro
 	return
 }
 
-func (ftps *FTPS) RetrieveFile(remoteFilepath, localFilepath string) (err error) {
+func (ftps *FTPS) RetrieveFile(remoteFilepath string, file *os.File) (err error) {
 
 	dataConn, err := ftps.requestDataConn(fmt.Sprintf("RETR %s", remoteFilepath), 150)
 	if err != nil {
 		return
 	}
 	defer dataConn.Close()
-
-	file, err := os.Create(localFilepath)
-	if err != nil {
-		return
-	}
-	defer file.Close()
 
 	_, err = io.Copy(file, dataConn)
 	if err != nil {
