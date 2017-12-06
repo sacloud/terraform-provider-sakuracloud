@@ -288,6 +288,47 @@ func TestAccSakuraCloudServer_EditConnect_With_Same_Switch(t *testing.T) {
 	})
 }
 
+func TestAccSakuraCloudServer_NIC_CustomDiff(t *testing.T) {
+	var server sacloud.Server
+	resource.Test(t, resource.TestCase{
+		PreCheck:     func() { testAccPreCheck(t) },
+		Providers:    testAccProviders,
+		CheckDestroy: testAccCheckSakuraCloudServerDestroy,
+		Steps: []resource.TestStep{
+			{
+				Config: testAccCheckSakuraCloudServerConfig_nic_custom_diff,
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckSakuraCloudServerExists("sakuracloud_server.foobar", &server),
+					testAccCheckSakuraCloudServerAttributes(&server),
+					resource.TestMatchResourceAttr("sakuracloud_server.foobar",
+						"ipaddress",
+						regexp.MustCompile(".+")), // should be not empty
+				),
+			},
+		},
+	})
+}
+
+func TestAccSakuraCloudServer_Switched_eth0(t *testing.T) {
+	var server sacloud.Server
+	resource.Test(t, resource.TestCase{
+		PreCheck:     func() { testAccPreCheck(t) },
+		Providers:    testAccProviders,
+		CheckDestroy: testAccCheckSakuraCloudServerDestroy,
+		Steps: []resource.TestStep{
+			{
+				Config: testAccCheckSakuraCloudServerConfig_switched_eth0,
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckSakuraCloudServerExists("sakuracloud_server.foobar", &server),
+					resource.TestCheckResourceAttr("sakuracloud_server.foobar", "ipaddress", "192.168.0.2"),
+					resource.TestCheckResourceAttr("sakuracloud_server.foobar", "nw_mask_len", "24"),
+					resource.TestCheckResourceAttr("sakuracloud_server.foobar", "gateway", "192.168.0.1"),
+				),
+			},
+		},
+	})
+}
+
 func testAccCheckSakuraCloudServerExists(n string, server *sacloud.Server) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
 		rs, ok := s.RootModule().Resources[n]
@@ -609,5 +650,39 @@ resource "sakuracloud_server" "foobar" {
     name            = "myserver_with_private_host"
     private_host_id = "%s"
     zone            = "is1b"
+}
+`
+
+const testAccCheckSakuraCloudServerConfig_nic_custom_diff = `
+resource "sakuracloud_server" "foobar" {
+    name      = "foobar"
+    nic       = "shared"
+    ipaddress = ""
+}
+`
+
+const testAccCheckSakuraCloudServerConfig_switched_eth0 = `
+data "sakuracloud_archive" "ubuntu" {
+    filter = {
+	name = "Name"
+	values = ["Ubuntu Server 16"]
+    }
+}
+
+resource "sakuracloud_disk" "foobar" {
+    name = "mydisk"
+    source_archive_id = "${data.sakuracloud_archive.ubuntu.id}"
+}
+
+resource "sakuracloud_switch" "foobar" {
+    name = "foobar"
+}
+resource "sakuracloud_server" "foobar" {
+    name        = "foobar"
+    disks       = ["${sakuracloud_disk.foobar.id}"]
+    nic         = "${sakuracloud_switch.foobar.id}"
+    ipaddress   = "192.168.0.2"
+    nw_mask_len = 24
+    gateway     = "192.168.0.1"
 }
 `
