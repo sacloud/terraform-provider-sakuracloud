@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.0.1 (2017-12-07)
+
+* リリーススクリプト調整 #239 (yamamoto-febc)
+* TravisCI上でのCI/CD改善 #241 (yamamoto-febc)
+* サーバリソースの変更検知にCustomizeDiff導入 #243 (yamamoto-febc)
+
+
 ## 1.0.0 (2017-12-04)
 
 * パブリックアーカイブPlesk除去 #192 (yamamoto-febc)
