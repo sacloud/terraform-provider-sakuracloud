@@ -1,22 +1,23 @@
 package sakuracloud
 
 import (
-	"bytes"
-	"fmt"
-
 	"errors"
-	"github.com/hashicorp/terraform/helper/hashcode"
+	"fmt"
 	"github.com/hashicorp/terraform/helper/schema"
+	"github.com/hashicorp/terraform/terraform"
 	"github.com/sacloud/libsacloud/api"
+	"log"
+	"strconv"
 	"time"
 )
 
 func resourceSakuraCloudVPCRouterInterface() *schema.Resource {
 	return &schema.Resource{
-		Create: resourceSakuraCloudVPCRouterInterfaceCreate,
-		Read:   resourceSakuraCloudVPCRouterInterfaceRead,
-		Delete: resourceSakuraCloudVPCRouterInterfaceDelete,
-
+		Create:        resourceSakuraCloudVPCRouterInterfaceCreate,
+		Read:          resourceSakuraCloudVPCRouterInterfaceRead,
+		Delete:        resourceSakuraCloudVPCRouterInterfaceDelete,
+		MigrateState:  resourceSakuraCloudVPCRouterInterfaceMigrateState,
+		SchemaVersion: 1,
 		Schema: map[string]*schema.Schema{
 			"vpc_router_id": {
 				Type:         schema.TypeString,
@@ -154,6 +155,7 @@ func resourceSakuraCloudVPCRouterInterfaceCreate(d *schema.ResourceData, meta in
 		}
 	}
 
+	d.SetId(vpcRouterInterfaceID(vpcRouter.GetStrID(), index))
 	return resourceSakuraCloudVPCRouterInterfaceRead(d, meta)
 }
 
@@ -183,7 +185,6 @@ func resourceSakuraCloudVPCRouterInterfaceRead(d *schema.ResourceData, meta inte
 		return nil
 	}
 
-	d.SetId(vpcRouterInterfaceIDHash(vpcRouter.GetStrID(), index))
 	d.Set("zone", client.Zone)
 
 	return nil
@@ -248,9 +249,32 @@ func resourceSakuraCloudVPCRouterInterfaceDelete(d *schema.ResourceData, meta in
 	return nil
 }
 
-func vpcRouterInterfaceIDHash(routerID string, index int) string {
-	var buf bytes.Buffer
-	buf.WriteString(routerID)
-	buf.WriteString(fmt.Sprintf("%d", index))
-	return fmt.Sprintf("interface-%d", hashcode.String(buf.String()))
+func vpcRouterInterfaceID(routerID string, index int) string {
+	return fmt.Sprintf("%s-%d", routerID, index)
+}
+
+func resourceSakuraCloudVPCRouterInterfaceMigrateState(
+	v int, is *terraform.InstanceState, meta interface{}) (*terraform.InstanceState, error) {
+
+	switch v {
+	case 0:
+		return migrateVPCRouterInterfaceV0toV1(is)
+	default:
+		return is, fmt.Errorf("Unexpected schema version: %d", v)
+	}
+}
+
+func migrateVPCRouterInterfaceV0toV1(is *terraform.InstanceState) (*terraform.InstanceState, error) {
+	if is.Empty() {
+		return is, nil
+	}
+	log.Printf("[DEBUG] Attributes before migration: %#v", is.Attributes)
+
+	routerID := is.Attributes["vpc_router_id"]
+	ifIndex, _ := strconv.Atoi(is.Attributes["index"])
+
+	is.ID = vpcRouterInterfaceID(routerID, ifIndex)
+
+	log.Printf("[DEBUG] Attributes after migration: %#v", is.Attributes)
+	return is, nil
 }

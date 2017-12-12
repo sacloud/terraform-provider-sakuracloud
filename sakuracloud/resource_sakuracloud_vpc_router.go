@@ -188,7 +188,7 @@ func resourceSakuraCloudVPCRouterCreate(d *schema.ResourceData, meta interface{}
 	}
 
 	//wait
-	compChan, progChan, errChan := client.VPCRouter.AsyncSleepWhileCopying(vpcRouter.ID, client.DefaultTimeoutDuration, 5)
+	compChan, progChan, errChan := client.VPCRouter.AsyncSleepWhileCopying(vpcRouter.ID, client.DefaultTimeoutDuration, 10)
 	for {
 		select {
 		case <-compChan:

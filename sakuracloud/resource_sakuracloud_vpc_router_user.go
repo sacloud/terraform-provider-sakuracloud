@@ -2,19 +2,20 @@ package sakuracloud
 
 import (
 	"fmt"
-
-	"bytes"
-	"github.com/hashicorp/terraform/helper/hashcode"
 	"github.com/hashicorp/terraform/helper/schema"
+	"github.com/hashicorp/terraform/terraform"
 	"github.com/sacloud/libsacloud/api"
 	"github.com/sacloud/libsacloud/sacloud"
+	"log"
 )
 
 func resourceSakuraCloudVPCRouterRemoteAccessUser() *schema.Resource {
 	return &schema.Resource{
-		Create: resourceSakuraCloudVPCRouterRemoteAccessUserCreate,
-		Read:   resourceSakuraCloudVPCRouterRemoteAccessUserRead,
-		Delete: resourceSakuraCloudVPCRouterRemoteAccessUserDelete,
+		Create:        resourceSakuraCloudVPCRouterRemoteAccessUserCreate,
+		Read:          resourceSakuraCloudVPCRouterRemoteAccessUserRead,
+		Delete:        resourceSakuraCloudVPCRouterRemoteAccessUserDelete,
+		MigrateState:  resourceSakuraCloudVPCRouterUserMigrateState,
+		SchemaVersion: 1,
 		Schema: map[string]*schema.Schema{
 			"vpc_router_id": {
 				Type:         schema.TypeString,
@@ -63,7 +64,7 @@ func resourceSakuraCloudVPCRouterRemoteAccessUserCreate(d *schema.ResourceData, 
 		vpcRouter.InitVPCRouterSetting()
 	}
 
-	vpcRouter.Settings.Router.AddRemoteAccessUser(remoteAccessUser.UserName, remoteAccessUser.Password)
+	index, _ := vpcRouter.Settings.Router.AddRemoteAccessUser(remoteAccessUser.UserName, remoteAccessUser.Password)
 	vpcRouter, err = client.VPCRouter.UpdateSetting(toSakuraCloudID(routerID), vpcRouter)
 	if err != nil {
 		return fmt.Errorf("Failed to enable SakuraCloud VPCRouterRemoteAccessUser resource: %s", err)
@@ -73,6 +74,7 @@ func resourceSakuraCloudVPCRouterRemoteAccessUserCreate(d *schema.ResourceData, 
 		return fmt.Errorf("Couldn'd apply SakuraCloud VPCRouter config: %s", err)
 	}
 
+	d.SetId(vpcRouterRemoteAccessUserID(routerID, index))
 	return resourceSakuraCloudVPCRouterRemoteAccessUserRead(d, meta)
 }
 
@@ -90,18 +92,20 @@ func resourceSakuraCloudVPCRouterRemoteAccessUserRead(d *schema.ResourceData, me
 	}
 
 	remoteAccessUser := expandVPCRouterRemoteAccessUser(d)
-	if vpcRouter.Settings != nil && vpcRouter.Settings.Router != nil && vpcRouter.Settings.Router.RemoteAccessUsers != nil &&
-		vpcRouter.Settings.Router.FindRemoteAccessUser(remoteAccessUser.UserName, remoteAccessUser.Password) != nil {
-		d.Set("name", remoteAccessUser.UserName)
-		d.Set("password", remoteAccessUser.Password)
+	if vpcRouter.Settings != nil && vpcRouter.Settings.Router != nil && vpcRouter.Settings.Router.RemoteAccessUsers != nil {
+		if _, c := vpcRouter.Settings.Router.FindRemoteAccessUser(remoteAccessUser.UserName, remoteAccessUser.Password); c != nil {
+			d.Set("name", remoteAccessUser.UserName)
+			d.Set("password", remoteAccessUser.Password)
+		} else {
+			d.SetId("")
+			return nil
+		}
 	} else {
 		d.SetId("")
 		return nil
 	}
 
 	d.Set("zone", client.Zone)
-	d.SetId(vpcRouterRemoteAccessUserIDHash(routerID, remoteAccessUser))
-
 	return nil
 }
 
@@ -137,13 +141,8 @@ func resourceSakuraCloudVPCRouterRemoteAccessUserDelete(d *schema.ResourceData, 
 	return nil
 }
 
-func vpcRouterRemoteAccessUserIDHash(routerID string, s *sacloud.VPCRouterRemoteAccessUsersConfig) string {
-	var buf bytes.Buffer
-	buf.WriteString(fmt.Sprintf("%s-", routerID))
-	buf.WriteString(fmt.Sprintf("%s-", s.UserName))
-	buf.WriteString(fmt.Sprintf("%s", s.Password))
-
-	return fmt.Sprintf("%d", hashcode.String(buf.String()))
+func vpcRouterRemoteAccessUserID(routerID string, index int) string {
+	return fmt.Sprintf("%s-%d", routerID, index)
 }
 
 func expandVPCRouterRemoteAccessUser(d *schema.ResourceData) *sacloud.VPCRouterRemoteAccessUsersConfig {
@@ -154,4 +153,54 @@ func expandVPCRouterRemoteAccessUser(d *schema.ResourceData) *sacloud.VPCRouterR
 	}
 
 	return remoteAccessUser
+}
+
+func resourceSakuraCloudVPCRouterUserMigrateState(
+	v int, is *terraform.InstanceState, meta interface{}) (*terraform.InstanceState, error) {
+
+	switch v {
+	case 0:
+		return migrateVPCRouterUserV0toV1(is, meta)
+	default:
+		return is, fmt.Errorf("Unexpected schema version: %d", v)
+	}
+}
+
+func migrateVPCRouterUserV0toV1(is *terraform.InstanceState, meta interface{}) (*terraform.InstanceState, error) {
+	if is.Empty() {
+		return is, nil
+	}
+	log.Printf("[DEBUG] Attributes before migration: %#v", is.Attributes)
+
+	client := getSacloudAPIClientDirect(meta)
+	zone := is.Attributes["zone"]
+	if zone != "" {
+		client.Zone = zone
+	}
+
+	routerID := is.Attributes["vpc_router_id"]
+	name := is.Attributes["name"]
+	password := is.Attributes["password"]
+
+	vpcRouter, err := client.VPCRouter.Read(toSakuraCloudID(routerID))
+	if err != nil {
+		if sacloudErr, ok := err.(api.Error); ok && sacloudErr.ResponseCode() == 404 {
+			is.ID = ""
+			return is, nil
+		}
+		return is, fmt.Errorf("Couldn't find SakuraCloud VPCRouter resource: %s", err)
+	}
+
+	if vpcRouter.Settings == nil {
+		vpcRouter.InitVPCRouterSetting()
+	}
+	index, _ := vpcRouter.Settings.Router.FindRemoteAccessUser(name, password)
+	if index < 0 {
+		is.ID = ""
+		return is, nil
+	}
+	is.ID = vpcRouterRemoteAccessUserID(routerID, index)
+
+	log.Printf("[DEBUG] Attributes after migration: %#v", is.Attributes)
+	return is, nil
 }

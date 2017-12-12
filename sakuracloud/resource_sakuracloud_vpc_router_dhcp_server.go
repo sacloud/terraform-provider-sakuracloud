@@ -2,19 +2,21 @@ package sakuracloud
 
 import (
 	"fmt"
-
-	"bytes"
-	"github.com/hashicorp/terraform/helper/hashcode"
 	"github.com/hashicorp/terraform/helper/schema"
+	"github.com/hashicorp/terraform/terraform"
 	"github.com/sacloud/libsacloud/api"
 	"github.com/sacloud/libsacloud/sacloud"
+	"log"
+	"strconv"
 )
 
 func resourceSakuraCloudVPCRouterDHCPServer() *schema.Resource {
 	return &schema.Resource{
-		Create: resourceSakuraCloudVPCRouterDHCPServerCreate,
-		Read:   resourceSakuraCloudVPCRouterDHCPServerRead,
-		Delete: resourceSakuraCloudVPCRouterDHCPServerDelete,
+		Create:        resourceSakuraCloudVPCRouterDHCPServerCreate,
+		Read:          resourceSakuraCloudVPCRouterDHCPServerRead,
+		Delete:        resourceSakuraCloudVPCRouterDHCPServerDelete,
+		MigrateState:  resourceSakuraCloudVPCRouterDHCPServerMigrateState,
+		SchemaVersion: 1,
 		Schema: map[string]*schema.Schema{
 			"vpc_router_id": {
 				Type:         schema.TypeString,
@@ -76,9 +78,8 @@ func resourceSakuraCloudVPCRouterDHCPServerCreate(d *schema.ResourceData, meta i
 		vpcRouter.InitVPCRouterSetting()
 	}
 
-	vpcRouter.Settings.Router.AddDHCPServer(d.Get("vpc_router_interface_index").(int),
-		dhcpServer.RangeStart, dhcpServer.RangeStop,
-		dhcpServer.DNSServers...)
+	ifIndex := d.Get("vpc_router_interface_index").(int)
+	vpcRouter.Settings.Router.AddDHCPServer(ifIndex, dhcpServer.RangeStart, dhcpServer.RangeStop, dhcpServer.DNSServers...)
 
 	vpcRouter, err = client.VPCRouter.UpdateSetting(toSakuraCloudID(routerID), vpcRouter)
 	if err != nil {
@@ -89,6 +90,7 @@ func resourceSakuraCloudVPCRouterDHCPServerCreate(d *schema.ResourceData, meta i
 		return fmt.Errorf("Couldn'd apply SakuraCloud VPCRouter config: %s", err)
 	}
 
+	d.SetId(vpcRouterDHCPServerID(routerID, ifIndex))
 	return resourceSakuraCloudVPCRouterDHCPServerRead(d, meta)
 }
 
@@ -105,20 +107,23 @@ func resourceSakuraCloudVPCRouterDHCPServerRead(d *schema.ResourceData, meta int
 		return fmt.Errorf("Couldn't find SakuraCloud VPCRouter resource: %s", err)
 	}
 
+	ifIndex := d.Get("vpc_router_interface_index").(int)
 	dhcpServer := expandVPCRouterDHCPServer(d)
-	if vpcRouter.Settings != nil && vpcRouter.Settings.Router != nil && vpcRouter.Settings.Router.DHCPServer != nil &&
-		vpcRouter.Settings.Router.FindDHCPServer(d.Get("vpc_router_interface_index").(int)) != nil {
-		d.Set("range_start", dhcpServer.RangeStart)
-		d.Set("range_stop", dhcpServer.RangeStop)
-		d.Set("dns_servers", dhcpServer.DNSServers)
+	if vpcRouter.Settings != nil && vpcRouter.Settings.Router != nil && vpcRouter.Settings.Router.DHCPServer != nil {
+		if _, s := vpcRouter.Settings.Router.FindDHCPServer(ifIndex); s != nil {
+			d.Set("range_start", dhcpServer.RangeStart)
+			d.Set("range_stop", dhcpServer.RangeStop)
+			d.Set("dns_servers", dhcpServer.DNSServers)
+		} else {
+			d.SetId("")
+			return nil
+		}
 	} else {
 		d.SetId("")
 		return nil
 	}
 
-	d.SetId(vpcRouterDHCPServerIDHash(routerID, dhcpServer))
 	d.Set("zone", client.Zone)
-
 	return nil
 }
 
@@ -152,14 +157,8 @@ func resourceSakuraCloudVPCRouterDHCPServerDelete(d *schema.ResourceData, meta i
 	return nil
 }
 
-func vpcRouterDHCPServerIDHash(routerID string, s *sacloud.VPCRouterDHCPServerConfig) string {
-	var buf bytes.Buffer
-	buf.WriteString(fmt.Sprintf("%s-", routerID))
-	buf.WriteString(fmt.Sprintf("%s-", s.Interface))
-	buf.WriteString(fmt.Sprintf("%s-", s.RangeStart))
-	buf.WriteString(fmt.Sprintf("%s", s.RangeStop))
-
-	return fmt.Sprintf("%d", hashcode.String(buf.String()))
+func vpcRouterDHCPServerID(routerID string, ifIndex int) string {
+	return fmt.Sprintf("%s-%d", routerID, ifIndex)
 }
 
 func expandVPCRouterDHCPServer(d *schema.ResourceData) *sacloud.VPCRouterDHCPServerConfig {
@@ -172,4 +171,30 @@ func expandVPCRouterDHCPServer(d *schema.ResourceData) *sacloud.VPCRouterDHCPSer
 	}
 
 	return dhcpServer
+}
+
+func resourceSakuraCloudVPCRouterDHCPServerMigrateState(
+	v int, is *terraform.InstanceState, meta interface{}) (*terraform.InstanceState, error) {
+
+	switch v {
+	case 0:
+		return migrateVPCRouterDHCPServerV0toV1(is)
+	default:
+		return is, fmt.Errorf("Unexpected schema version: %d", v)
+	}
+}
+
+func migrateVPCRouterDHCPServerV0toV1(is *terraform.InstanceState) (*terraform.InstanceState, error) {
+	if is.Empty() {
+		return is, nil
+	}
+	log.Printf("[DEBUG] Attributes before migration: %#v", is.Attributes)
+
+	routerID := is.Attributes["vpc_router_id"]
+	ifIndex, _ := strconv.Atoi(is.Attributes["vpc_router_interface_index"])
+
+	is.ID = vpcRouterDHCPServerID(routerID, ifIndex)
+
+	log.Printf("[DEBUG] Attributes after migration: %#v", is.Attributes)
+	return is, nil
 }

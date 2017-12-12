@@ -2,19 +2,20 @@ package sakuracloud
 
 import (
 	"fmt"
-
-	"bytes"
-	"github.com/hashicorp/terraform/helper/hashcode"
 	"github.com/hashicorp/terraform/helper/schema"
+	"github.com/hashicorp/terraform/terraform"
 	"github.com/sacloud/libsacloud/api"
 	"github.com/sacloud/libsacloud/sacloud"
+	"log"
 )
 
 func resourceSakuraCloudVPCRouterStaticNAT() *schema.Resource {
 	return &schema.Resource{
-		Create: resourceSakuraCloudVPCRouterStaticNATCreate,
-		Read:   resourceSakuraCloudVPCRouterStaticNATRead,
-		Delete: resourceSakuraCloudVPCRouterStaticNATDelete,
+		Create:        resourceSakuraCloudVPCRouterStaticNATCreate,
+		Read:          resourceSakuraCloudVPCRouterStaticNATRead,
+		Delete:        resourceSakuraCloudVPCRouterStaticNATDelete,
+		MigrateState:  resourceSakuraCloudVPCRouterStaticNATMigrateState,
+		SchemaVersion: 1,
 		Schema: map[string]*schema.Schema{
 			"vpc_router_id": {
 				Type:         schema.TypeString,
@@ -73,7 +74,7 @@ func resourceSakuraCloudVPCRouterStaticNATCreate(d *schema.ResourceData, meta in
 		vpcRouter.InitVPCRouterSetting()
 	}
 
-	vpcRouter.Settings.Router.AddStaticNAT(staticNAT.GlobalAddress, staticNAT.PrivateAddress, staticNAT.Description)
+	index, _ := vpcRouter.Settings.Router.AddStaticNAT(staticNAT.GlobalAddress, staticNAT.PrivateAddress, staticNAT.Description)
 	vpcRouter, err = client.VPCRouter.UpdateSetting(toSakuraCloudID(routerID), vpcRouter)
 	if err != nil {
 		return fmt.Errorf("Failed to enable SakuraCloud VPCRouterStaticNAT resource: %s", err)
@@ -83,6 +84,7 @@ func resourceSakuraCloudVPCRouterStaticNATCreate(d *schema.ResourceData, meta in
 		return fmt.Errorf("Couldn'd apply SakuraCloud VPCRouter config: %s", err)
 	}
 
+	d.SetId(vpcRouterStaticNATID(routerID, index))
 	return resourceSakuraCloudVPCRouterStaticNATRead(d, meta)
 }
 
@@ -100,17 +102,21 @@ func resourceSakuraCloudVPCRouterStaticNATRead(d *schema.ResourceData, meta inte
 	}
 
 	staticNAT := expandVPCRouterStaticNAT(d)
-	if vpcRouter.Settings != nil && vpcRouter.Settings.Router != nil && vpcRouter.Settings.Router.StaticNAT != nil &&
-		vpcRouter.Settings.Router.FindStaticNAT(staticNAT.GlobalAddress, staticNAT.PrivateAddress) != nil {
-		d.Set("global_address", staticNAT.GlobalAddress)
-		d.Set("private_address", staticNAT.PrivateAddress)
-		d.Set("description", staticNAT.Description)
+	if vpcRouter.Settings != nil && vpcRouter.Settings.Router != nil && vpcRouter.Settings.Router.StaticNAT != nil {
+
+		if _, c := vpcRouter.Settings.Router.FindStaticNAT(staticNAT.GlobalAddress, staticNAT.PrivateAddress); c != nil {
+			d.Set("global_address", staticNAT.GlobalAddress)
+			d.Set("private_address", staticNAT.PrivateAddress)
+			d.Set("description", staticNAT.Description)
+		} else {
+			d.SetId("")
+			return nil
+		}
 	} else {
 		d.SetId("")
 		return nil
 	}
 
-	d.SetId(vpcRouterStaticNATIDHash(routerID, staticNAT))
 	d.Set("zone", client.Zone)
 
 	return nil
@@ -148,14 +154,8 @@ func resourceSakuraCloudVPCRouterStaticNATDelete(d *schema.ResourceData, meta in
 	return nil
 }
 
-func vpcRouterStaticNATIDHash(routerID string, s *sacloud.VPCRouterStaticNATConfig) string {
-	var buf bytes.Buffer
-	buf.WriteString(fmt.Sprintf("%s-", routerID))
-	buf.WriteString(fmt.Sprintf("%s-", s.GlobalAddress))
-	buf.WriteString(fmt.Sprintf("%s", s.PrivateAddress))
-	buf.WriteString(fmt.Sprintf("%s", s.Description))
-
-	return fmt.Sprintf("%d", hashcode.String(buf.String()))
+func vpcRouterStaticNATID(routerID string, index int) string {
+	return fmt.Sprintf("%s-%d", routerID, index)
 }
 
 func expandVPCRouterStaticNAT(d *schema.ResourceData) *sacloud.VPCRouterStaticNATConfig {
@@ -170,4 +170,54 @@ func expandVPCRouterStaticNAT(d *schema.ResourceData) *sacloud.VPCRouterStaticNA
 	}
 
 	return staticNAT
+}
+
+func resourceSakuraCloudVPCRouterStaticNATMigrateState(
+	v int, is *terraform.InstanceState, meta interface{}) (*terraform.InstanceState, error) {
+
+	switch v {
+	case 0:
+		return migrateVPCRouterStaticNATV0toV1(is, meta)
+	default:
+		return is, fmt.Errorf("Unexpected schema version: %d", v)
+	}
+}
+
+func migrateVPCRouterStaticNATV0toV1(is *terraform.InstanceState, meta interface{}) (*terraform.InstanceState, error) {
+	if is.Empty() {
+		return is, nil
+	}
+	log.Printf("[DEBUG] Attributes before migration: %#v", is.Attributes)
+
+	client := getSacloudAPIClientDirect(meta)
+	zone := is.Attributes["zone"]
+	if zone != "" {
+		client.Zone = zone
+	}
+
+	routerID := is.Attributes["vpc_router_id"]
+	global := is.Attributes["global_address"]
+	private := is.Attributes["private_address"]
+
+	vpcRouter, err := client.VPCRouter.Read(toSakuraCloudID(routerID))
+	if err != nil {
+		if sacloudErr, ok := err.(api.Error); ok && sacloudErr.ResponseCode() == 404 {
+			is.ID = ""
+			return is, nil
+		}
+		return is, fmt.Errorf("Couldn't find SakuraCloud VPCRouter resource: %s", err)
+	}
+
+	if vpcRouter.Settings == nil {
+		vpcRouter.InitVPCRouterSetting()
+	}
+	index, _ := vpcRouter.Settings.Router.FindStaticNAT(global, private)
+	if index < 0 {
+		is.ID = ""
+		return is, nil
+	}
+	is.ID = vpcRouterStaticNATID(routerID, index)
+
+	log.Printf("[DEBUG] Attributes after migration: %#v", is.Attributes)
+	return is, nil
 }
