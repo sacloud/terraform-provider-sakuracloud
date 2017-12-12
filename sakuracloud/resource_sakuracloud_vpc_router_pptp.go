@@ -2,19 +2,20 @@ package sakuracloud
 
 import (
 	"fmt"
-
-	"bytes"
-	"github.com/hashicorp/terraform/helper/hashcode"
 	"github.com/hashicorp/terraform/helper/schema"
+	"github.com/hashicorp/terraform/terraform"
 	"github.com/sacloud/libsacloud/api"
 	"github.com/sacloud/libsacloud/sacloud"
+	"log"
 )
 
 func resourceSakuraCloudVPCRouterPPTP() *schema.Resource {
 	return &schema.Resource{
-		Create: resourceSakuraCloudVPCRouterPPTPCreate,
-		Read:   resourceSakuraCloudVPCRouterPPTPRead,
-		Delete: resourceSakuraCloudVPCRouterPPTPDelete,
+		Create:        resourceSakuraCloudVPCRouterPPTPCreate,
+		Read:          resourceSakuraCloudVPCRouterPPTPRead,
+		Delete:        resourceSakuraCloudVPCRouterPPTPDelete,
+		MigrateState:  resourceSakuraCloudVPCRouterPPTPMigrateState,
+		SchemaVersion: 1,
 		Schema: map[string]*schema.Schema{
 			"vpc_router_id": {
 				Type:         schema.TypeString,
@@ -77,6 +78,7 @@ func resourceSakuraCloudVPCRouterPPTPCreate(d *schema.ResourceData, meta interfa
 		return fmt.Errorf("Couldn'd apply SakuraCloud VPCRouter config: %s", err)
 	}
 
+	d.SetId(routerID)
 	return resourceSakuraCloudVPCRouterPPTPRead(d, meta)
 }
 
@@ -105,7 +107,6 @@ func resourceSakuraCloudVPCRouterPPTPRead(d *schema.ResourceData, meta interface
 		return nil
 	}
 
-	d.SetId(vpcRouterPPTPIDHash(routerID, vpcRouter.Settings.Router.PPTPServer))
 	d.Set("zone", client.Zone)
 
 	return nil
@@ -141,15 +142,6 @@ func resourceSakuraCloudVPCRouterPPTPDelete(d *schema.ResourceData, meta interfa
 	return nil
 }
 
-func vpcRouterPPTPIDHash(routerID string, s *sacloud.VPCRouterPPTPServer) string {
-	var buf bytes.Buffer
-	buf.WriteString(fmt.Sprintf("%s-", routerID))
-	buf.WriteString(fmt.Sprintf("%s-", s.Config.RangeStart))
-	buf.WriteString(fmt.Sprintf("%s", s.Config.RangeStop))
-
-	return fmt.Sprintf("%d", hashcode.String(buf.String()))
-}
-
 func expandVPCRouterPPTP(d *schema.ResourceData) *sacloud.VPCRouterPPTPServerConfig {
 
 	var pptpSetting = &sacloud.VPCRouterPPTPServerConfig{
@@ -158,4 +150,27 @@ func expandVPCRouterPPTP(d *schema.ResourceData) *sacloud.VPCRouterPPTPServerCon
 	}
 
 	return pptpSetting
+}
+
+func resourceSakuraCloudVPCRouterPPTPMigrateState(
+	v int, is *terraform.InstanceState, meta interface{}) (*terraform.InstanceState, error) {
+
+	switch v {
+	case 0:
+		return migrateVPCRouterPPTPV0toV1(is)
+	default:
+		return is, fmt.Errorf("Unexpected schema version: %d", v)
+	}
+}
+
+func migrateVPCRouterPPTPV0toV1(is *terraform.InstanceState) (*terraform.InstanceState, error) {
+	if is.Empty() {
+		return is, nil
+	}
+	log.Printf("[DEBUG] Attributes before migration: %#v", is.Attributes)
+
+	is.ID = is.Attributes["vpc_router_id"]
+
+	log.Printf("[DEBUG] Attributes after migration: %#v", is.Attributes)
+	return is, nil
 }
