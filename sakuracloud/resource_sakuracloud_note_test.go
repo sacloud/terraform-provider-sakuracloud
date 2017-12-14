@@ -144,6 +144,7 @@ const testAccCheckSakuraCloudNoteConfig_update = `
 resource "sakuracloud_note" "foobar" {
     name = "mynote_upd"
     content = "content_upd"
+    tags = []
 }`
 
 const testAccCheckSakuraCloudNoteConfig_yaml = `

@@ -166,6 +166,7 @@ resource "sakuracloud_private_host" "foobar" {
     name = "after"
     description = "after"
     graceful_shutdown_timeout = 5
+    tags = []
     zone = "is1b"
 }
 `
