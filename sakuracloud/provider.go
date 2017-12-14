@@ -6,8 +6,11 @@ import (
 	"github.com/hashicorp/terraform/terraform"
 )
 
-// DefaultZone is value that used if zone parameter is empty
-var DefaultZone = "is1b"
+var (
+	defaultZone          = "is1b"
+	defaultRetryMax      = 10
+	defaultRetryInterval = 5
+)
 
 // Provider returns a terraform.ResourceProvider.
 func Provider() terraform.ResourceProvider {
@@ -30,13 +33,25 @@ func Provider() terraform.ResourceProvider {
 				Optional:     true,
 				DefaultFunc:  schema.MultiEnvDefaultFunc([]string{"SAKURACLOUD_ZONE"}, nil),
 				Description:  "Target SakuraCloud Zone(is1a | is1b | tk1a | tk1v)",
-				InputDefault: DefaultZone,
+				InputDefault: defaultZone,
 				ValidateFunc: validateZone([]string{"is1a", "is1b", "tk1a", "tk1v"}),
 			},
 			"api_root_url": {
 				Type:        schema.TypeString,
 				Optional:    true,
 				DefaultFunc: schema.MultiEnvDefaultFunc([]string{"SAKURACLOUD_API_ROOT_URL"}, ""),
+			},
+			"retry_max": {
+				Type:         schema.TypeInt,
+				Optional:     true,
+				DefaultFunc:  schema.MultiEnvDefaultFunc([]string{"SAKURACLOUD_RETRY_MAX"}, 10),
+				ValidateFunc: validateIntegerInRange(0, 100),
+			},
+			"retry_interval": {
+				Type:         schema.TypeInt,
+				Optional:     true,
+				DefaultFunc:  schema.MultiEnvDefaultFunc([]string{"SAKURACLOUD_RETRY_INTERVAL"}, 5),
+				ValidateFunc: validateIntegerInRange(0, 600),
 			},
 			"timeout": {
 				Type:        schema.TypeInt,
@@ -131,7 +146,7 @@ func Provider() terraform.ResourceProvider {
 func providerConfigure(d *schema.ResourceData) (interface{}, error) {
 
 	if _, ok := d.GetOk("zone"); !ok {
-		d.Set("zone", DefaultZone)
+		d.Set("zone", defaultZone)
 	}
 
 	config := Config{
@@ -143,6 +158,8 @@ func providerConfigure(d *schema.ResourceData) (interface{}, error) {
 		UseMarkerTags:     d.Get("use_marker_tags").(bool),
 		MarkerTagName:     d.Get("marker_tag_name").(string),
 		APIRootURL:        d.Get("api_root_url").(string),
+		RetryMax:          d.Get("retry_max").(int),
+		RetryInterval:     d.Get("retry_interval").(int),
 	}
 
 	return config.NewClient(), nil

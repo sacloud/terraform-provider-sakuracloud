@@ -15,6 +15,8 @@ type Config struct {
 	UseMarkerTags     bool
 	MarkerTagName     string
 	APIRootURL        string
+	RetryMax          int
+	RetryInterval     int
 }
 
 // APIClient for SakuraCloud API
@@ -29,6 +31,12 @@ func (c *Config) NewClient() *APIClient {
 
 	if c.APIRootURL != "" {
 		api.SakuraCloudAPIRoot = c.APIRootURL
+	}
+	if c.RetryMax > 0 {
+		client.RetryMax = c.RetryMax
+	}
+	if c.RetryInterval > 0 {
+		client.RetryInterval = time.Duration(c.RetryInterval) * time.Second
 	}
 	if c.TimeoutMinute > 0 {
 		client.DefaultTimeoutDuration = time.Duration(c.TimeoutMinute) * time.Minute
