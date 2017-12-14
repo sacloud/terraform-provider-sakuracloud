@@ -485,19 +485,18 @@ func (api *DatabaseAPI) AsyncSleepWhileCopying(id int64, timeout time.Duration, 
 						err <- e
 						return
 					}
-				}
+				} else {
+					progress <- db
 
-				progress <- db
-
-				if db.IsAvailable() {
-					complete <- db
-					return
+					if db.IsAvailable() {
+						complete <- db
+						return
+					}
+					if db.IsFailed() {
+						err <- fmt.Errorf("Failed: Create Database is failed: %#v", db)
+						return
+					}
 				}
-				if db.IsFailed() {
-					err <- fmt.Errorf("Failed: Create Database is failed: %#v", db)
-					return
-				}
-
 			case <-time.After(timeout):
 				err <- fmt.Errorf("Timeout: AsyncSleepWhileCopying[ID:%d]", id)
 				return

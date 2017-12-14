@@ -1,5 +1,10 @@
 package sacloud
 
+import (
+	"fmt"
+	"net"
+)
+
 // VPCRouter VPCルーター
 type VPCRouter struct {
 	*Appliance // アプライアンス共通属性
@@ -177,4 +182,57 @@ func (v *VPCRouter) HasSiteToSiteIPsecVPN() bool {
 // HasStaticRoutes スタティックルートを保持しているか
 func (v *VPCRouter) HasStaticRoutes() bool {
 	return v.HasSetting() && v.Settings.Router.HasStaticRoutes()
+}
+
+// RealIPAddress プランに応じて外部向けIPアドレスを返す
+//
+// Standard: IPAddress1
+// Other: VirtualIPAddress
+func (v *VPCRouter) RealIPAddress(index int) (string, int) {
+	if !v.HasInterfaces() {
+		return "", -1
+	}
+	for i, nic := range v.Settings.Router.Interfaces {
+		if i == index {
+			if index > 0 && nic == nil {
+				return "", -1
+			}
+
+			if index == 0 && v.IsStandardPlan() {
+				return v.Interfaces[0].IPAddress, v.Interfaces[0].Switch.Subnet.NetworkMaskLen
+			}
+
+			nwMask := nic.NetworkMaskLen
+			if index == 0 {
+				nwMask = v.Interfaces[0].Switch.Subnet.NetworkMaskLen
+			}
+
+			if v.IsStandardPlan() {
+				return nic.IPAddress[0], nwMask
+			}
+			return nic.VirtualIPAddress, nwMask
+		}
+	}
+	return "", -1
+}
+
+// FindBelongsInterface 指定のIPアドレスが所属するIPレンジを持つインターフェースを取得
+func (v *VPCRouter) FindBelongsInterface(ip net.IP) (int, *VPCRouterInterface) {
+	if !v.HasInterfaces() {
+		return -1, nil
+	}
+
+	for i, nic := range v.Settings.Router.Interfaces {
+		nicIP, maskLen := v.RealIPAddress(i)
+		if nicIP != "" {
+			_, ipv4Net, err := net.ParseCIDR(fmt.Sprintf("%s/%d", nicIP, maskLen))
+			if err != nil {
+				return -1, nil
+			}
+			if ipv4Net.Contains(ip) {
+				return i, nic
+			}
+		}
+	}
+	return -1, nil
 }

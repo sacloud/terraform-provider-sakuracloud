@@ -38,6 +38,10 @@ type Client struct {
 	RequestTracer io.Writer
 	// レスポンス トレーサー
 	ResponseTracer io.Writer
+	// 503エラー時のリトライ回数
+	RetryMax int
+	// 503エラー時のリトライ待ち時間
+	RetryInterval time.Duration
 }
 
 // NewClient APIクライアント作成
@@ -49,6 +53,8 @@ func NewClient(token, tokenSecret, zone string) *Client {
 		TraceMode:              false,
 		DefaultTimeoutDuration: 20 * time.Minute,
 		UserAgent:              fmt.Sprintf("libsacloud/%s", libsacloud.Version),
+		RetryMax:               0,
+		RetryInterval:          5 * time.Second,
 	}
 	c.API = newAPI(c)
 	return c
@@ -63,6 +69,8 @@ func (c *Client) Clone() *Client {
 		TraceMode:              c.TraceMode,
 		DefaultTimeoutDuration: c.DefaultTimeoutDuration,
 		UserAgent:              c.UserAgent,
+		RetryMax:               c.RetryMax,
+		RetryInterval:          c.RetryInterval,
 	}
 	n.API = newAPI(n)
 	return n
@@ -98,9 +106,12 @@ func (c *Client) isOkStatus(code int) bool {
 
 func (c *Client) newRequest(method, uri string, body interface{}) ([]byte, error) {
 	var (
-		client = &http.Client{}
-		err    error
-		req    *http.Request
+		client = &retryableHTTPClient{
+			retryMax:      c.RetryMax,
+			retryInterval: c.RetryInterval,
+		}
+		err error
+		req *request
 	)
 	var url = uri
 	if !strings.HasPrefix(url, "https://") {
@@ -115,9 +126,9 @@ func (c *Client) newRequest(method, uri string, body interface{}) ([]byte, error
 		}
 		if method == "GET" {
 			url = fmt.Sprintf("%s?%s", url, bytes.NewBuffer(bodyJSON))
-			req, err = http.NewRequest(method, url, nil)
+			req, err = newRequest(method, url, nil)
 		} else {
-			req, err = http.NewRequest(method, url, bytes.NewBuffer(bodyJSON))
+			req, err = newRequest(method, url, bytes.NewReader(bodyJSON))
 		}
 		b, _ := json.MarshalIndent(body, "", "\t")
 		if c.TraceMode {
@@ -127,7 +138,7 @@ func (c *Client) newRequest(method, uri string, body interface{}) ([]byte, error
 			c.RequestTracer.Write(b)
 		}
 	} else {
-		req, err = http.NewRequest(method, url, nil)
+		req, err = newRequest(method, url, nil)
 		if c.TraceMode {
 			log.Printf("[libsacloud:Client#request] method : %#v , url : %s ", method, url)
 		}
@@ -179,6 +190,71 @@ func (c *Client) newRequest(method, uri string, body interface{}) ([]byte, error
 	}
 
 	return data, nil
+}
+
+type lenReader interface {
+	Len() int
+}
+
+type request struct {
+	// body is a seekable reader over the request body payload. This is
+	// used to rewind the request data in between retries.
+	body io.ReadSeeker
+
+	// Embed an HTTP request directly. This makes a *Request act exactly
+	// like an *http.Request so that all meta methods are supported.
+	*http.Request
+}
+
+func newRequest(method, url string, body io.ReadSeeker) (*request, error) {
+	var rcBody io.ReadCloser
+	if body != nil {
+		rcBody = ioutil.NopCloser(body)
+	}
+
+	httpReq, err := http.NewRequest(method, url, rcBody)
+	if err != nil {
+		return nil, err
+	}
+
+	if lr, ok := body.(lenReader); ok {
+		httpReq.ContentLength = int64(lr.Len())
+	}
+
+	return &request{body, httpReq}, nil
+}
+
+type retryableHTTPClient struct {
+	http.Client
+	retryInterval time.Duration
+	retryMax      int
+}
+
+func (c *retryableHTTPClient) Do(req *request) (*http.Response, error) {
+	for i := 0; ; i++ {
+
+		if req.body != nil {
+			if _, err := req.body.Seek(0, 0); err != nil {
+				return nil, fmt.Errorf("failed to seek body: %v", err)
+			}
+		}
+
+		res, err := c.Client.Do(req.Request)
+		if res.StatusCode != 503 {
+			return res, err
+		}
+		if res != nil && res.Body != nil {
+			res.Body.Close()
+		}
+
+		remain := c.retryMax - i
+		if remain == 0 {
+			break
+		}
+	}
+
+	return nil, fmt.Errorf("%s %s giving up after %d attempts",
+		req.Method, req.URL, c.retryMax+1)
 }
 
 // API libsacloudでサポートしているAPI群

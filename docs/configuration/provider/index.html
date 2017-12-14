@@ -519,8 +519,12 @@
   token  = &quot;your API token&quot;
   secret = &quot;your API secret&quot;
   zone   = &quot;target zone&quot;
-  #timeout = 20  # 単位:分
-  # trace = false
+
+  # retry_max       = 10
+  # retry_interval  = 5   # 単位:秒
+  # timeout         = 20  # 単位:分
+  # api_root_url    = &quot;https://secure.sakura.ad.jp/cloud/zone&quot;  
+  # trace           = false
   # use_marker_tags = false
   # marker_tag_name = &quot;@terraform&quot;
 }
@@ -565,12 +569,20 @@
 <td>環境変数<code>SAKURACLOUD_ZONE</code>での指定も可</td>
 </tr>
 <tr>
-<td><code>api_root_url</code></td>
+<td><code>retry_max</code></td>
 <td align="center">-</td>
-<td>さくらのクラウドAPI ルートURL</td>
+<td>リトライ回数</td>
+<td align="center"><code>10</code></td>
+<td>数値</td>
+<td>環境変数<code>SAKURACLOUD_RETRY_MAX</code>での指定も可</td>
+</tr>
+<tr>
+<td><code>retry_interval</code></td>
 <td align="center">-</td>
-<td>文字列</td>
-<td>テストなどのためにAPIのルートAPIを変更したい場合に設定する。<br />末尾にスラッシュを含めないでください。<br />指定しない場合のルートURLは<code>https://secure.sakura.ad.jp/cloud/zone</code><br />環境変数<code>SAKURACLOUD_API_ROOT_URL</code>での指定も可</td>
+<td>リトライ時待機時間</td>
+<td align="center"><code>5</code></td>
+<td>数値(秒)</td>
+<td>環境変数<code>SAKURACLOUD_RETRY_INTERVAL</code>での指定も可</td>
 </tr>
 <tr>
 <td><code>timeout</code></td>
@@ -579,6 +591,14 @@
 <td align="center"><code>20</code></td>
 <td>数値(分)</td>
 <td>環境変数<code>SAKURACLOUD_TIMEOUT</code>での指定も可</td>
+</tr>
+<tr>
+<td><code>api_root_url</code></td>
+<td align="center">-</td>
+<td>さくらのクラウドAPI ルートURL</td>
+<td align="center">-</td>
+<td>文字列</td>
+<td>テストなどのためにAPIのルートAPIを変更したい場合に設定する。<br />末尾にスラッシュを含めないでください。<br />指定しない場合のルートURLは<code>https://secure.sakura.ad.jp/cloud/zone</code><br />環境変数<code>SAKURACLOUD_API_ROOT_URL</code>での指定も可</td>
 </tr>
 <tr>
 <td><code>trace</code></td>

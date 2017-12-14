@@ -319,19 +319,19 @@ func (api *VPCRouterAPI) AsyncSleepWhileCopying(id int64, timeout time.Duration,
 						err <- e
 						return
 					}
-				}
+				} else {
 
-				progress <- router
+					progress <- router
 
-				if router.IsAvailable() {
-					complete <- router
-					return
+					if router.IsAvailable() {
+						complete <- router
+						return
+					}
+					if router.IsFailed() {
+						err <- fmt.Errorf("Failed: Create VPCRouter is failed: %#v", router)
+						return
+					}
 				}
-				if router.IsFailed() {
-					err <- fmt.Errorf("Failed: Create VPCRouter is failed: %#v", router)
-					return
-				}
-
 			case <-time.After(timeout):
 				err <- fmt.Errorf("Timeout: AsyncSleepWhileCopying[ID:%d]", id)
 				return

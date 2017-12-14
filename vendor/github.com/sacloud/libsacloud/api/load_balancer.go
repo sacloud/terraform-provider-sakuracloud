@@ -285,17 +285,17 @@ func (api *LoadBalancerAPI) AsyncSleepWhileCopying(id int64, timeout time.Durati
 						err <- e
 						return
 					}
-				}
+				} else {
+					progress <- lb
 
-				progress <- lb
-
-				if lb.IsAvailable() {
-					complete <- lb
-					return
-				}
-				if lb.IsFailed() {
-					err <- fmt.Errorf("Failed: Create LoadBalancer is failed: %#v", lb)
-					return
+					if lb.IsAvailable() {
+						complete <- lb
+						return
+					}
+					if lb.IsFailed() {
+						err <- fmt.Errorf("Failed: Create LoadBalancer is failed: %#v", lb)
+						return
+					}
 				}
 
 			case <-time.After(timeout):
