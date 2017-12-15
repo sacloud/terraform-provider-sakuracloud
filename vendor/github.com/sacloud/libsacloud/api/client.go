@@ -251,6 +251,7 @@ func (c *retryableHTTPClient) Do(req *request) (*http.Response, error) {
 		if remain == 0 {
 			break
 		}
+		time.Sleep(c.retryInterval)
 	}
 
 	return nil, fmt.Errorf("%s %s giving up after %d attempts",
