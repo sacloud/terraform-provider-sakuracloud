@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.0.4 (2017-12-19)
+
+* Revert "サーバリソースの変更検知にCustomizeDiff導入" #253 (yamamoto-febc)
+
+
 ## 1.0.3 (2017-12-15)
 
 * APIクライアントの503エラー時リトライでの指定秒数待機 #250 (yamamoto-febc)
