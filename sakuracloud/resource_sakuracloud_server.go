@@ -22,7 +22,10 @@ func resourceSakuraCloudServer() *schema.Resource {
 		Importer: &schema.ResourceImporter{
 			State: schema.ImportStatePassthrough,
 		},
-		CustomizeDiff: hasTagResourceCustomizeDiff,
+		CustomizeDiff: composeCustomizeDiff(
+			serverNetworkAttrsCustomizeDiff,
+			hasTagResourceCustomizeDiff,
+		),
 		Schema: map[string]*schema.Schema{
 			"name": {
 				Type:     schema.TypeString,
@@ -827,4 +830,30 @@ func getServerPowerAPILockKey(id int64) string {
 
 func getServerDeleteAPILockKey(id int64) string {
 	return fmt.Sprintf(serverDeleteAPILockKey, id)
+}
+
+func serverNetworkAttrsCustomizeDiff(d *schema.ResourceDiff, meta interface{}) error {
+	nic := ""
+	if d.HasChange("nic") {
+		_, v := d.GetChange("nic")
+		if v != nil {
+			nic = v.(string)
+		}
+	} else {
+		v := d.Get("nic")
+		if v != nil {
+			nic = v.(string)
+		}
+	}
+
+	if nic == "shared" {
+		targets := []string{"ipaddress", "nw_mask_len", "gateway"}
+		for _, t := range targets {
+			o, n := d.GetChange(t)
+			if o != nil && o.(string) != "" && n != nil {
+				d.Clear(t)
+			}
+		}
+	}
+	return nil
 }
