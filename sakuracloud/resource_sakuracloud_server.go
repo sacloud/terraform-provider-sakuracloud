@@ -3,6 +3,7 @@ package sakuracloud
 import (
 	"fmt"
 	"github.com/hashicorp/terraform/helper/schema"
+
 	"github.com/sacloud/libsacloud/api"
 	"github.com/sacloud/libsacloud/sacloud"
 	"log"
@@ -21,10 +22,7 @@ func resourceSakuraCloudServer() *schema.Resource {
 		Importer: &schema.ResourceImporter{
 			State: schema.ImportStatePassthrough,
 		},
-		CustomizeDiff: composeCustomizeDiff(
-			serverNetworkAttrsCustomizeDiff,
-			hasTagResourceCustomizeDiff,
-		),
+		CustomizeDiff: hasTagResourceCustomizeDiff,
 		Schema: map[string]*schema.Schema{
 			"name": {
 				Type:     schema.TypeString,
@@ -829,26 +827,4 @@ func getServerPowerAPILockKey(id int64) string {
 
 func getServerDeleteAPILockKey(id int64) string {
 	return fmt.Sprintf(serverDeleteAPILockKey, id)
-}
-
-func serverNetworkAttrsCustomizeDiff(d *schema.ResourceDiff, meta interface{}) error {
-	nic := ""
-	if d.HasChange("nic") {
-		_, v := d.GetChange("nic")
-		if v != nil {
-			nic = v.(string)
-		}
-	} else {
-		v := d.Get("nic")
-		if v != nil {
-			nic = v.(string)
-		}
-	}
-
-	if nic == "shared" {
-		d.Clear("ipaddress")
-		d.Clear("nw_mask_len")
-		d.Clear("gateway")
-	}
-	return nil
 }
