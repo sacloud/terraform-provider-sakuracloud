@@ -2,19 +2,21 @@ package sakuracloud
 
 import (
 	"fmt"
-
-	"bytes"
-	"github.com/hashicorp/terraform/helper/hashcode"
 	"github.com/hashicorp/terraform/helper/schema"
+	"github.com/hashicorp/terraform/terraform"
 	"github.com/sacloud/libsacloud/api"
 	"github.com/sacloud/libsacloud/sacloud"
+	"log"
+	"strconv"
 )
 
 func resourceSakuraCloudVPCRouterFirewall() *schema.Resource {
 	return &schema.Resource{
-		Create: resourceSakuraCloudVPCRouterFirewallCreate,
-		Read:   resourceSakuraCloudVPCRouterFirewallRead,
-		Delete: resourceSakuraCloudVPCRouterFirewallDelete,
+		Create:        resourceSakuraCloudVPCRouterFirewallCreate,
+		Read:          resourceSakuraCloudVPCRouterFirewallRead,
+		Delete:        resourceSakuraCloudVPCRouterFirewallDelete,
+		MigrateState:  resourceSakuraCloudVPCRouterFirewallMigrateState,
+		SchemaVersion: 1,
 		Schema: map[string]*schema.Schema{
 			"vpc_router_id": {
 				Type:         schema.TypeString,
@@ -50,22 +52,26 @@ func resourceSakuraCloudVPCRouterFirewall() *schema.Resource {
 						},
 						"source_nw": {
 							Type:     schema.TypeString,
-							Required: true,
+							Optional: true,
+							Default:  "",
 							ForceNew: true,
 						},
 						"source_port": {
 							Type:     schema.TypeString,
-							Required: true,
+							Optional: true,
+							Default:  "",
 							ForceNew: true,
 						},
 						"dest_nw": {
 							Type:     schema.TypeString,
-							Required: true,
+							Optional: true,
+							Default:  "",
 							ForceNew: true,
 						},
 						"dest_port": {
 							Type:     schema.TypeString,
-							Required: true,
+							Optional: true,
+							Default:  "",
 							ForceNew: true,
 						},
 						"allow": {
@@ -168,6 +174,7 @@ func resourceSakuraCloudVPCRouterFirewallCreate(d *schema.ResourceData, meta int
 		return fmt.Errorf("Couldn'd apply SakuraCloud VPCRouter config: %s", err)
 	}
 
+	d.SetId(vpcRouterFirewallID(routerID, ifIndex, direction))
 	return resourceSakuraCloudVPCRouterFirewallRead(d, meta)
 }
 
@@ -220,7 +227,6 @@ func resourceSakuraCloudVPCRouterFirewallRead(d *schema.ResourceData, meta inter
 
 	d.Set("zone", client.Zone)
 
-	d.SetId(vpcRouterFirewallIDHash(routerID, ifIndex, direction))
 	return nil
 }
 
@@ -263,11 +269,33 @@ func resourceSakuraCloudVPCRouterFirewallDelete(d *schema.ResourceData, meta int
 	return nil
 }
 
-func vpcRouterFirewallIDHash(routerID string, ifIndex int, direction string) string {
-	var buf bytes.Buffer
-	buf.WriteString(fmt.Sprintf("%s-", routerID))
-	buf.WriteString(fmt.Sprintf("%d-", ifIndex))
-	buf.WriteString(fmt.Sprintf("%s-", direction))
+func vpcRouterFirewallID(routerID string, ifIndex int, direction string) string {
+	return fmt.Sprintf("%s-%d-%s", routerID, ifIndex, direction)
+}
 
-	return fmt.Sprintf("%d", hashcode.String(buf.String()))
+func resourceSakuraCloudVPCRouterFirewallMigrateState(
+	v int, is *terraform.InstanceState, meta interface{}) (*terraform.InstanceState, error) {
+
+	switch v {
+	case 0:
+		return migrateVPCRouterFirewallV0toV1(is)
+	default:
+		return is, fmt.Errorf("Unexpected schema version: %d", v)
+	}
+}
+
+func migrateVPCRouterFirewallV0toV1(is *terraform.InstanceState) (*terraform.InstanceState, error) {
+	if is.Empty() {
+		return is, nil
+	}
+	log.Printf("[DEBUG] Attributes before migration: %#v", is.Attributes)
+
+	routerID := is.Attributes["vpc_router_id"]
+	ifIndex, _ := strconv.Atoi(is.Attributes["vpc_router_interface_index"])
+	direction := is.Attributes["direction"]
+
+	is.ID = vpcRouterFirewallID(routerID, ifIndex, direction)
+
+	log.Printf("[DEBUG] Attributes after migration: %#v", is.Attributes)
+	return is, nil
 }

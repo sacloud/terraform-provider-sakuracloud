@@ -2,19 +2,20 @@ package sakuracloud
 
 import (
 	"fmt"
-
-	"bytes"
-	"github.com/hashicorp/terraform/helper/hashcode"
 	"github.com/hashicorp/terraform/helper/schema"
+	"github.com/hashicorp/terraform/terraform"
 	"github.com/sacloud/libsacloud/api"
 	"github.com/sacloud/libsacloud/sacloud"
+	"log"
 )
 
 func resourceSakuraCloudVPCRouterL2TP() *schema.Resource {
 	return &schema.Resource{
-		Create: resourceSakuraCloudVPCRouterL2TPCreate,
-		Read:   resourceSakuraCloudVPCRouterL2TPRead,
-		Delete: resourceSakuraCloudVPCRouterL2TPDelete,
+		Create:        resourceSakuraCloudVPCRouterL2TPCreate,
+		Read:          resourceSakuraCloudVPCRouterL2TPRead,
+		Delete:        resourceSakuraCloudVPCRouterL2TPDelete,
+		MigrateState:  resourceSakuraCloudVPCRouterL2TPMigrateState,
+		SchemaVersion: 1,
 		Schema: map[string]*schema.Schema{
 			"vpc_router_id": {
 				Type:         schema.TypeString,
@@ -83,6 +84,7 @@ func resourceSakuraCloudVPCRouterL2TPCreate(d *schema.ResourceData, meta interfa
 		return fmt.Errorf("Couldn'd apply SakuraCloud VPCRouter config: %s", err)
 	}
 
+	d.SetId(routerID)
 	return resourceSakuraCloudVPCRouterL2TPRead(d, meta)
 }
 
@@ -112,7 +114,6 @@ func resourceSakuraCloudVPCRouterL2TPRead(d *schema.ResourceData, meta interface
 		return nil
 	}
 
-	d.SetId(vpcRouterL2TPIDHash(routerID, vpcRouter.Settings.Router.L2TPIPsecServer))
 	d.Set("zone", client.Zone)
 
 	return nil
@@ -148,16 +149,6 @@ func resourceSakuraCloudVPCRouterL2TPDelete(d *schema.ResourceData, meta interfa
 	return nil
 }
 
-func vpcRouterL2TPIDHash(routerID string, s *sacloud.VPCRouterL2TPIPsecServer) string {
-	var buf bytes.Buffer
-	buf.WriteString(fmt.Sprintf("%s-", routerID))
-	buf.WriteString(fmt.Sprintf("%s-", s.Config.PreSharedSecret))
-	buf.WriteString(fmt.Sprintf("%s-", s.Config.RangeStart))
-	buf.WriteString(fmt.Sprintf("%s", s.Config.RangeStop))
-
-	return fmt.Sprintf("%d", hashcode.String(buf.String()))
-}
-
 func expandVPCRouterL2TP(d *schema.ResourceData) *sacloud.VPCRouterL2TPIPsecServerConfig {
 
 	var l2tpSetting = &sacloud.VPCRouterL2TPIPsecServerConfig{
@@ -165,6 +156,28 @@ func expandVPCRouterL2TP(d *schema.ResourceData) *sacloud.VPCRouterL2TPIPsecServ
 		RangeStart:      d.Get("range_start").(string),
 		RangeStop:       d.Get("range_stop").(string),
 	}
-
 	return l2tpSetting
+}
+
+func resourceSakuraCloudVPCRouterL2TPMigrateState(
+	v int, is *terraform.InstanceState, meta interface{}) (*terraform.InstanceState, error) {
+
+	switch v {
+	case 0:
+		return migrateVPCRouterL2TPV0toV1(is)
+	default:
+		return is, fmt.Errorf("Unexpected schema version: %d", v)
+	}
+}
+
+func migrateVPCRouterL2TPV0toV1(is *terraform.InstanceState) (*terraform.InstanceState, error) {
+	if is.Empty() {
+		return is, nil
+	}
+	log.Printf("[DEBUG] Attributes before migration: %#v", is.Attributes)
+
+	is.ID = is.Attributes["vpc_router_id"]
+
+	log.Printf("[DEBUG] Attributes after migration: %#v", is.Attributes)
+	return is, nil
 }

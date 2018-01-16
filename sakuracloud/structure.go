@@ -29,6 +29,15 @@ func getSacloudAPIClient(d resourceValueGetable, meta interface{}) *APIClient {
 	}
 }
 
+func getSacloudAPIClientDirect(meta interface{}) *APIClient {
+	c := meta.(*APIClient)
+	client := c.Clone()
+	return &APIClient{
+		Client:        client,
+		MarkerTagName: c.MarkerTagName,
+	}
+}
+
 func toSakuraCloudID(id string) int64 {
 	v, _ := strconv.ParseInt(id, 10, 64)
 	return v
