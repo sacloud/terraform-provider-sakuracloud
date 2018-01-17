@@ -11,11 +11,12 @@ import (
 	"time"
 )
 
-type resourceValueGetable interface {
+type resourceValueGettable interface {
+	Get(key string) interface{}
 	GetOk(key string) (interface{}, bool)
 }
 
-func getSacloudAPIClient(d resourceValueGetable, meta interface{}) *APIClient {
+func getSacloudAPIClient(d resourceValueGettable, meta interface{}) *APIClient {
 	c := meta.(*APIClient)
 	client := c.Clone()
 
