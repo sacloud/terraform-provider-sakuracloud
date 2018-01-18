@@ -11,6 +11,8 @@ import (
 	"strings"
 )
 
+const defaultTTL = 3600
+
 func resourceSakuraCloudDNSRecord() *schema.Resource {
 	return &schema.Resource{
 		Create:        resourceSakuraCloudDNSRecordCreate,
@@ -46,7 +48,7 @@ func resourceSakuraCloudDNSRecord() *schema.Resource {
 			"ttl": {
 				Type:     schema.TypeInt,
 				Optional: true,
-				Default:  3600,
+				Default:  defaultTTL,
 				ForceNew: true,
 			},
 
@@ -220,7 +222,7 @@ func expandDNSRecordID(id string) (string, int) {
 	return tokens[0], index
 }
 
-func expandDNSRecord(d *schema.ResourceData) *sacloud.DNSRecordSet {
+func expandDNSRecord(d resourceValueGettable) *sacloud.DNSRecordSet {
 	var dns = sacloud.DNS{}
 	t := d.Get("type").(string)
 	if t == "MX" {
@@ -268,23 +270,76 @@ func resourceSakuraCloudDNSRecordMigrateState(
 
 	switch v {
 	case 0:
-		return migrateDNSRecordV0toV1(is)
+		return migrateDNSRecordV0toV1(is, meta)
 	default:
 		return is, fmt.Errorf("Unexpected schema version: %d", v)
 	}
 }
 
-func migrateDNSRecordV0toV1(is *terraform.InstanceState) (*terraform.InstanceState, error) {
+func migrateDNSRecordV0toV1(is *terraform.InstanceState, meta interface{}) (*terraform.InstanceState, error) {
 	if is.Empty() {
 		return is, nil
 	}
 	log.Printf("[DEBUG] Attributes before migration: %#v", is.Attributes)
 
+	client := getSacloudAPIClientDirect(meta)
 	dnsID := is.Attributes["dns_id"]
-	index, _ := strconv.Atoi(is.Attributes["dns_record_index"])
+
+	dns, err := client.DNS.Read(toSakuraCloudID(dnsID))
+	if err != nil {
+		if sacloudErr, ok := err.(api.Error); ok && sacloudErr.ResponseCode() == 404 {
+			is.ID = ""
+			return is, nil
+		}
+		return is, fmt.Errorf("Couldn't find SakuraCloud DNS resource: %s", err)
+	}
+
+	index := -1
+	if dns.HasDNSRecord() {
+		v := expandDNSRecord(&dnsRecordStateValueGettable{is: is})
+		for i, r := range dns.Settings.DNS.ResourceRecordSets {
+			if isSameDNSRecord(v, &r) {
+				index = i
+				break
+			}
+		}
+	}
+	if index < 0 {
+		is.ID = ""
+		return is, nil
+	}
 
 	is.ID = dnsRecordID(dnsID, index)
 
 	log.Printf("[DEBUG] Attributes after migration: %#v", is.Attributes)
 	return is, nil
+}
+
+type dnsRecordStateValueGettable struct {
+	is *terraform.InstanceState
+}
+
+func (s *dnsRecordStateValueGettable) needInt(key string) bool {
+	switch key {
+	case "ttl", "priority", "weight", "port":
+		return true
+	}
+	return false
+}
+
+func (s *dnsRecordStateValueGettable) Get(key string) interface{} {
+	if s.needInt(key) {
+		v, _ := strconv.Atoi(s.is.Attributes[key])
+		return v
+	}
+	return s.is.Attributes[key]
+}
+
+func (s *dnsRecordStateValueGettable) GetOk(key string) (interface{}, bool) {
+	v, ok := s.is.Attributes[key]
+	if s.needInt(key) {
+		i, _ := strconv.Atoi(v)
+		return i, ok
+	}
+	return v, ok
 }
