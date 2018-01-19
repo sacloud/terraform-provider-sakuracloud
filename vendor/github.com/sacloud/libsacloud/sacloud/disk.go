@@ -24,9 +24,11 @@ type Disk struct {
 	ReinstallCount int `json:",omitempty"` // 再インストール回数
 
 	Storage struct { // ストレージ
-		*Resource         // ID
-		MountIndex int64  `json:",omitempty"` // マウント順
-		Class      string `json:",omitempty"` // クラス
+		*Resource              // ID
+		Name       string      `json:",omitempty"`  // 名称
+		DiskPlan   ProductDisk `json:",ommitempty"` // ディスクプラン
+		MountIndex int64       `json:",omitempty"`  // マウント順
+		Class      string      `json:",omitempty"`  // クラス
 	}
 }
 
