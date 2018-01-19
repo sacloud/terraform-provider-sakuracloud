@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.0.5 (2018-01-19)
+
+* サーバリソースの変更検知でCustomizeDiffを利用 #255 (yamamoto-febc)
+* データベースアプライアンス作成APIパラメータの修正 #265 (yamamoto-febc)
+* Terraform v0.11.2対応 #266 (yamamoto-febc)
+
+
 ## 1.0.4 (2017-12-19)
 
 * Revert "サーバリソースの変更検知にCustomizeDiff導入" #253 (yamamoto-febc)
