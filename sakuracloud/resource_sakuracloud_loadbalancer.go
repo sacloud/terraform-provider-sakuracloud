@@ -299,8 +299,8 @@ func setLoadBalancerResourceData(d *schema.ResourceData, client *APIClient, data
 	d.Set("vip_ids", []string{})
 	if data.Settings != nil && data.Settings.LoadBalancer != nil {
 		var vipIDs []string
-		for _, s := range data.Settings.LoadBalancer {
-			vipIDs = append(vipIDs, loadBalancerVIPIDHash(data.GetStrID(), s))
+		for i := range data.Settings.LoadBalancer {
+			vipIDs = append(vipIDs, loadBalancerVIPID(data.GetStrID(), i))
 		}
 		if len(vipIDs) > 0 {
 			d.Set("vip_ids", vipIDs)
