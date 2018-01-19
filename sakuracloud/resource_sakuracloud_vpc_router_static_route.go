@@ -7,6 +7,7 @@ import (
 	"github.com/sacloud/libsacloud/api"
 	"github.com/sacloud/libsacloud/sacloud"
 	"log"
+	"net"
 )
 
 func resourceSakuraCloudVPCRouterStaticRoute() *schema.Resource {
@@ -199,12 +200,21 @@ func migrateVPCRouterStaticRouteV0toV1(is *terraform.InstanceState, meta interfa
 	if vpcRouter.Settings == nil {
 		vpcRouter.InitVPCRouterSetting()
 	}
+
+	ifIndex, _ := vpcRouter.FindBelongsInterface(net.ParseIP(nextHop))
+	if ifIndex < 0 {
+		is.ID = ""
+		return is, nil
+	}
+
 	index, _ := vpcRouter.Settings.Router.FindStaticRoute(prefix, nextHop)
 	if index < 0 {
 		is.ID = ""
 		return is, nil
 	}
+
 	is.ID = vpcRouterStaticRouteID(routerID, index)
+	is.Attributes["vpc_router_interface_id"] = vpcRouterInterfaceID(routerID, ifIndex)
 
 	log.Printf("[DEBUG] Attributes after migration: %#v", is.Attributes)
 	return is, nil

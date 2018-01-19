@@ -7,6 +7,7 @@ import (
 	"github.com/sacloud/libsacloud/api"
 	"github.com/sacloud/libsacloud/sacloud"
 	"log"
+	"net"
 )
 
 func resourceSakuraCloudVPCRouterStaticNAT() *schema.Resource {
@@ -211,12 +212,20 @@ func migrateVPCRouterStaticNATV0toV1(is *terraform.InstanceState, meta interface
 	if vpcRouter.Settings == nil {
 		vpcRouter.InitVPCRouterSetting()
 	}
+
+	ifIndex, _ := vpcRouter.FindBelongsInterface(net.ParseIP(private))
+	if ifIndex < 0 {
+		is.ID = ""
+		return is, nil
+	}
+
 	index, _ := vpcRouter.Settings.Router.FindStaticNAT(global, private)
 	if index < 0 {
 		is.ID = ""
 		return is, nil
 	}
 	is.ID = vpcRouterStaticNATID(routerID, index)
+	is.Attributes["vpc_router_interface_id"] = vpcRouterInterfaceID(routerID, ifIndex)
 
 	log.Printf("[DEBUG] Attributes after migration: %#v", is.Attributes)
 	return is, nil

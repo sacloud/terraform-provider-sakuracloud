@@ -7,6 +7,7 @@ import (
 	"github.com/sacloud/libsacloud/api"
 	"github.com/sacloud/libsacloud/sacloud"
 	"log"
+	"net"
 )
 
 func resourceSakuraCloudVPCRouterPortForwarding() *schema.Resource {
@@ -230,12 +231,20 @@ func migrateVPCRouterPortForwardingV0toV1(is *terraform.InstanceState, meta inte
 	if vpcRouter.Settings == nil {
 		vpcRouter.InitVPCRouterSetting()
 	}
+
+	ifIndex, _ := vpcRouter.FindBelongsInterface(net.ParseIP(privateAddress))
+	if ifIndex < 0 {
+		is.ID = ""
+		return is, nil
+	}
+
 	index, _ := vpcRouter.Settings.Router.FindPortForwarding(protocol, globalPort, privateAddress, privatePort)
 	if index < 0 {
 		is.ID = ""
 		return is, nil
 	}
 	is.ID = vpcRouterPortForwardingID(routerID, index)
+	is.Attributes["vpc_router_interface_id"] = vpcRouterInterfaceID(routerID, ifIndex)
 
 	log.Printf("[DEBUG] Attributes after migration: %#v", is.Attributes)
 	return is, nil
