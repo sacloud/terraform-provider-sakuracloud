@@ -193,22 +193,16 @@ type CreateDatabaseValue struct {
 // NewCreatePostgreSQLDatabaseValue PostgreSQL作成用パラメーター
 func NewCreatePostgreSQLDatabaseValue() *CreateDatabaseValue {
 	return &CreateDatabaseValue{
-		DatabaseName:     "postgres",
-		DatabaseRevision: "9.6.2",
-		DatabaseTitle:    "PostgreSQL 9.6.2",
-		DatabaseVersion:  "9.6",
-		// ReplicaUser:      "replica",
+		DatabaseName:    "postgres",
+		DatabaseVersion: "9.6",
 	}
 }
 
 // NewCreateMariaDBDatabaseValue MariaDB作成用パラメーター
 func NewCreateMariaDBDatabaseValue() *CreateDatabaseValue {
 	return &CreateDatabaseValue{
-		DatabaseName:     "MariaDB",
-		DatabaseRevision: "10.1.21",
-		DatabaseTitle:    "MariaDB 10.1.21",
-		DatabaseVersion:  "10.1",
-		// ReplicaUser:      "replica",
+		DatabaseName:    "MariaDB",
+		DatabaseVersion: "10.1",
 	}
 }
 
