@@ -104,10 +104,7 @@ func resourceSakuraCloudVPCRouterDHCPStaticMappingRead(d *schema.ResourceData, m
 	if vpcRouter.HasDHCPStaticMapping() && index < len(vpcRouter.Settings.Router.DHCPStaticMapping.Config) {
 
 		c := vpcRouter.Settings.Router.DHCPStaticMapping.Config[index]
-		dhcpServerID := vpcRouterDHCPServerID(routerID, dhcpServerIndex)
 
-		d.Set("vpc_router_id", routerID)
-		d.Set("vpc_router_dhcp_server_id", dhcpServerID)
 		d.Set("ipaddress", c.IPAddress)
 		d.Set("macaddress", c.MACAddress)
 		d.Set("zone", client.Zone)
@@ -282,9 +279,9 @@ func migrateVPCRouterDHCPStaticMappingV0toV1(is *terraform.InstanceState, meta i
 		return is, nil
 	}
 
-	dhcpServerID := vpcRouterDHCPServerID(routerID, dhcpServerIndex)
-	is.Attributes["vpc_router_dhcp_server_id"] = dhcpServerID
+	dhcpServerID := vpcRouterDHCPServerID(routerID, ifIndex)
 	is.ID = vpcRouterDHCPStaticMappingID(dhcpServerID, index)
+	is.Attributes["vpc_router_dhcp_server_id"] = dhcpServerID
 
 	log.Printf("[DEBUG] Attributes after migration: %#v", is.Attributes)
 	return is, nil

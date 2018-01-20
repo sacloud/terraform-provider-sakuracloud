@@ -7,6 +7,7 @@ import (
 	"github.com/sacloud/libsacloud/api"
 	"github.com/sacloud/libsacloud/sacloud"
 	"log"
+	"net"
 )
 
 func resourceSakuraCloudVPCRouterPPTP() *schema.Resource {
@@ -157,19 +158,48 @@ func resourceSakuraCloudVPCRouterPPTPMigrateState(
 
 	switch v {
 	case 0:
-		return migrateVPCRouterPPTPV0toV1(is)
+		return migrateVPCRouterPPTPV0toV1(is, meta)
 	default:
 		return is, fmt.Errorf("Unexpected schema version: %d", v)
 	}
 }
 
-func migrateVPCRouterPPTPV0toV1(is *terraform.InstanceState) (*terraform.InstanceState, error) {
+func migrateVPCRouterPPTPV0toV1(is *terraform.InstanceState, meta interface{}) (*terraform.InstanceState, error) {
 	if is.Empty() {
 		return is, nil
 	}
 	log.Printf("[DEBUG] Attributes before migration: %#v", is.Attributes)
 
+	client := getSacloudAPIClientDirect(meta)
+	zone := is.Attributes["zone"]
+	if zone != "" {
+		client.Zone = zone
+	}
+
+	routerID := is.Attributes["vpc_router_id"]
+	ipaddress := is.Attributes["range_start"]
+
+	vpcRouter, err := client.VPCRouter.Read(toSakuraCloudID(routerID))
+	if err != nil {
+		if sacloudErr, ok := err.(api.Error); ok && sacloudErr.ResponseCode() == 404 {
+			is.ID = ""
+			return is, nil
+		}
+		return is, fmt.Errorf("Couldn't find SakuraCloud VPCRouter resource: %s", err)
+	}
+
+	if vpcRouter.Settings == nil {
+		vpcRouter.InitVPCRouterSetting()
+	}
+
+	ifIndex, _ := vpcRouter.FindBelongsInterface(net.ParseIP(ipaddress))
+	if ifIndex < 0 {
+		is.ID = ""
+		return is, nil
+	}
+
 	is.ID = is.Attributes["vpc_router_id"]
+	is.Attributes["vpc_router_interface_id"] = vpcRouterInterfaceID(routerID, ifIndex)
 
 	log.Printf("[DEBUG] Attributes after migration: %#v", is.Attributes)
 	return is, nil
