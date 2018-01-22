@@ -202,6 +202,7 @@ func resourceSakuraCloudServerConnectorRead(d *schema.ResourceData, meta interfa
 		d.Set("cdrom_id", data.Instance.CDROM.GetStrID())
 	}
 	d.Set("packet_filter_ids", flattenPacketFilters(data.Interfaces))
+	setPowerManageTimeoutValueToState(d)
 
 	d.Set("zone", client.Zone)
 	return nil

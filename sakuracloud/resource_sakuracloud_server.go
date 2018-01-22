@@ -751,9 +751,8 @@ func setServerResourceData(d *schema.ResourceData, client *APIClient, data *sacl
 		}
 	}
 
+	setPowerManageTimeoutValueToState(d)
 	d.Set("zone", client.Zone)
-	// プラン変更時はサーバIDが変更となるためRead時にもID設定しておく
-	d.SetId(data.GetStrID())
 	return nil
 }
 

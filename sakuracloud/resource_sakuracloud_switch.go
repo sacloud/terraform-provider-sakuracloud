@@ -277,7 +277,8 @@ func setSwitchResourceData(d *schema.ResourceData, client *APIClient, data *sacl
 		d.Set("bridge_id", "")
 	}
 
+	setPowerManageTimeoutValueToState(d)
+
 	d.Set("zone", client.Zone)
-	d.SetId(data.GetStrID())
 	return nil
 }

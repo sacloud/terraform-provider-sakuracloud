@@ -8,16 +8,17 @@ import (
 	"github.com/sacloud/libsacloud/sacloud"
 	"log"
 	"net"
-	"strconv"
-	"strings"
 )
 
 func resourceSakuraCloudVPCRouterDHCPStaticMapping() *schema.Resource {
 	return &schema.Resource{
-		Create:        resourceSakuraCloudVPCRouterDHCPStaticMappingCreate,
-		Read:          resourceSakuraCloudVPCRouterDHCPStaticMappingRead,
-		Update:        resourceSakuraCloudVPCRouterDHCPStaticMappingUpdate,
-		Delete:        resourceSakuraCloudVPCRouterDHCPStaticMappingDelete,
+		Create: resourceSakuraCloudVPCRouterDHCPStaticMappingCreate,
+		Read:   resourceSakuraCloudVPCRouterDHCPStaticMappingRead,
+		Update: resourceSakuraCloudVPCRouterDHCPStaticMappingUpdate,
+		Delete: resourceSakuraCloudVPCRouterDHCPStaticMappingDelete,
+		Importer: &schema.ResourceImporter{
+			State: schema.ImportStatePassthrough,
+		},
 		MigrateState:  resourceSakuraCloudVPCRouterDHCPStaticMappingMigrateState,
 		SchemaVersion: 1,
 		Schema: map[string]*schema.Schema{
@@ -87,8 +88,8 @@ func resourceSakuraCloudVPCRouterDHCPStaticMappingCreate(d *schema.ResourceData,
 func resourceSakuraCloudVPCRouterDHCPStaticMappingRead(d *schema.ResourceData, meta interface{}) error {
 	client := getSacloudAPIClient(d, meta)
 
-	routerID, dhcpServerIndex, index := expandVPCRouterDHCPStaticMappingID(d.Id())
-	if routerID == "" || dhcpServerIndex < 0 || index < 0 {
+	routerID, ifIndex, index := expandVPCRouterDHCPStaticMappingID(d.Id())
+	if routerID == "" || ifIndex < 0 || index < 0 {
 		d.SetId("")
 		return nil
 	}
@@ -105,6 +106,8 @@ func resourceSakuraCloudVPCRouterDHCPStaticMappingRead(d *schema.ResourceData, m
 
 		c := vpcRouter.Settings.Router.DHCPStaticMapping.Config[index]
 
+		d.Set("vpc_router_id", routerID)
+		d.Set("vpc_router_dhcp_server_id", vpcRouterDHCPServerID(routerID, ifIndex))
 		d.Set("ipaddress", c.IPAddress)
 		d.Set("macaddress", c.MACAddress)
 		d.Set("zone", client.Zone)
@@ -196,19 +199,7 @@ func vpcRouterDHCPStaticMappingID(dhcpServerID string, index int) string {
 }
 
 func expandVPCRouterDHCPStaticMappingID(id string) (string, int, int) {
-	tokens := strings.Split(id, "-")
-	if len(tokens) != 3 {
-		return "", -1, -1
-	}
-	ifIndex, err := strconv.Atoi(tokens[1])
-	if err != nil {
-		return "", -1, -1
-	}
-	index, err := strconv.Atoi(tokens[2])
-	if err != nil {
-		return "", -1, -1
-	}
-	return tokens[0], ifIndex, index
+	return expandSubResourceID2(id)
 }
 
 func expandVPCRouterDHCPStaticMapping(d *schema.ResourceData) *sacloud.VPCRouterDHCPStaticMappingConfig {

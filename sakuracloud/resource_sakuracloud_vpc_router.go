@@ -264,8 +264,9 @@ func setVPCRouterResourceData(d *schema.ResourceData, client *APIClient, data *s
 		d.Set("global_address", data.Settings.Router.Interfaces[0].VirtualIPAddress)
 	}
 
+	setPowerManageTimeoutValueToState(d)
+
 	d.Set("zone", client.Zone)
-	d.SetId(data.GetStrID())
 	return nil
 }
 

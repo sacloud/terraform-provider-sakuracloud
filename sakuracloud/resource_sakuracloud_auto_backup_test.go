@@ -113,6 +113,48 @@ func testAccCheckSakuraCloudAutoBackupDestroy(s *terraform.State) error {
 	return nil
 }
 
+func TestAccImportSakuraCloudAutoBackup(t *testing.T) {
+	checkFn := func(s []*terraform.InstanceState) error {
+		if len(s) != 1 {
+			return fmt.Errorf("expected 1 state: %#v", s)
+		}
+		expects := map[string]string{
+			"name":           "name_before",
+			"weekdays.0":     "wed",
+			"weekdays.1":     "fri",
+			"max_backup_num": "1",
+			"description":    "description_before",
+			"tags.0":         "hoge1",
+			"tags.1":         "hoge2",
+			"zone":           "is1b",
+		}
+
+		if err := compareStateMulti(s[0], expects); err != nil {
+			return err
+		}
+		return stateNotEmptyMulti(s[0], "disk_id", "icon_id")
+	}
+
+	resourceName := "sakuracloud_auto_backup.foobar"
+
+	resource.Test(t, resource.TestCase{
+		PreCheck:     func() { testAccPreCheck(t) },
+		Providers:    testAccProviders,
+		CheckDestroy: testAccCheckSakuraCloudAutoBackupDestroy,
+		Steps: []resource.TestStep{
+			resource.TestStep{
+				Config: testAccCheckSakuraCloudAutoBackupConfig_basic,
+			},
+			resource.TestStep{
+				ResourceName:      resourceName,
+				ImportState:       true,
+				ImportStateCheck:  checkFn,
+				ImportStateVerify: true,
+			},
+		},
+	})
+}
+
 var testAccCheckSakuraCloudAutoBackupConfig_basic = `
 resource "sakuracloud_disk" "disk" {
     name = "disk01"

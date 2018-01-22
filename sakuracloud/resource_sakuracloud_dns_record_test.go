@@ -5,6 +5,7 @@ import (
 	"github.com/hashicorp/terraform/helper/resource"
 	"github.com/hashicorp/terraform/terraform"
 
+	"fmt"
 	"github.com/sacloud/libsacloud/sacloud"
 	"testing"
 )
@@ -107,6 +108,71 @@ func testAccCheckSakuraCloudDNSRecordDestroy(s *terraform.State) error {
 	}
 
 	return nil
+}
+
+func TestAccImportSakuraCloudDNSRecord(t *testing.T) {
+	checkFn_A := func(s []*terraform.InstanceState) error {
+		if len(s) != 1 {
+			return fmt.Errorf("expected 1 state: %#v", s)
+		}
+		expects := map[string]string{
+			"name":     "test1",
+			"type":     "A",
+			"value":    "192.168.0.1",
+			"priority": "",
+			"weight":   "",
+			"port":     "",
+			"ttl":      "3600",
+		}
+
+		if err := compareStateMulti(s[0], expects); err != nil {
+			return err
+		}
+		return stateNotEmptyMulti(s[0], "dns_id")
+	}
+
+	checkFn_SRV := func(s []*terraform.InstanceState) error {
+		if len(s) != 1 {
+			return fmt.Errorf("expected 1 state: %#v", s)
+		}
+		expects := map[string]string{
+			"name":     "_sip._tls",
+			"type":     "SRV",
+			"value":    "www.sakura.ne.jp.",
+			"priority": "1",
+			"weight":   "2",
+			"port":     "3",
+			"ttl":      "3600",
+		}
+
+		if err := compareStateMulti(s[0], expects); err != nil {
+			return err
+		}
+		return stateNotEmptyMulti(s[0], "dns_id")
+	}
+
+	resource.Test(t, resource.TestCase{
+		PreCheck:     func() { testAccPreCheck(t) },
+		Providers:    testAccProviders,
+		CheckDestroy: testAccCheckSakuraCloudDNSRecordDestroy,
+		Steps: []resource.TestStep{
+			resource.TestStep{
+				Config: testAccCheckSakuraCloudDNSRecordConfig_basic,
+			},
+			resource.TestStep{
+				ResourceName:      "sakuracloud_dns_record.foobar",
+				ImportState:       true,
+				ImportStateCheck:  checkFn_A,
+				ImportStateVerify: true,
+			},
+			resource.TestStep{
+				ResourceName:      "sakuracloud_dns_record.foobar1",
+				ImportState:       true,
+				ImportStateCheck:  checkFn_SRV,
+				ImportStateVerify: true,
+			},
+		},
+	})
 }
 
 var testAccCheckSakuraCloudDNSRecordConfig_basic = `

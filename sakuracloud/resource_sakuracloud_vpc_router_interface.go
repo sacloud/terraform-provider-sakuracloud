@@ -13,10 +13,13 @@ import (
 
 func resourceSakuraCloudVPCRouterInterface() *schema.Resource {
 	return &schema.Resource{
-		Create:        resourceSakuraCloudVPCRouterInterfaceCreate,
-		Read:          resourceSakuraCloudVPCRouterInterfaceRead,
-		Delete:        resourceSakuraCloudVPCRouterInterfaceDelete,
-		MigrateState:  resourceSakuraCloudVPCRouterInterfaceMigrateState,
+		Create:       resourceSakuraCloudVPCRouterInterfaceCreate,
+		Read:         resourceSakuraCloudVPCRouterInterfaceRead,
+		Delete:       resourceSakuraCloudVPCRouterInterfaceDelete,
+		MigrateState: resourceSakuraCloudVPCRouterInterfaceMigrateState,
+		Importer: &schema.ResourceImporter{
+			State: schema.ImportStatePassthrough,
+		},
 		SchemaVersion: 1,
 		Schema: map[string]*schema.Schema{
 			"vpc_router_id": {
@@ -162,7 +165,13 @@ func resourceSakuraCloudVPCRouterInterfaceCreate(d *schema.ResourceData, meta in
 func resourceSakuraCloudVPCRouterInterfaceRead(d *schema.ResourceData, meta interface{}) error {
 	client := getSacloudAPIClient(d, meta)
 
-	vpcRouter, err := client.VPCRouter.Read(toSakuraCloudID(d.Get("vpc_router_id").(string)))
+	routerID, index := expandVPCRouterInterfaceID(d.Id())
+	if routerID == "" || index < 0 {
+		d.SetId("")
+		return nil
+	}
+
+	vpcRouter, err := client.VPCRouter.Read(toSakuraCloudID(routerID))
 	if err != nil {
 		if sacloudErr, ok := err.(api.Error); ok && sacloudErr.ResponseCode() == 404 {
 			d.SetId("")
@@ -171,11 +180,11 @@ func resourceSakuraCloudVPCRouterInterfaceRead(d *schema.ResourceData, meta inte
 		return fmt.Errorf("Couldn't find SakuraCloud VPCRouterInterface resource: %s", err)
 	}
 
-	index := d.Get("index").(int)
 	if index < len(vpcRouter.Settings.Router.Interfaces) {
 
 		vpcInterface := vpcRouter.Settings.Router.Interfaces[index]
-
+		d.Set("vpc_router_id", routerID)
+		d.Set("index", index)
 		d.Set("switch_id", vpcRouter.Interfaces[index].Switch.GetStrID())
 		d.Set("vip", vpcInterface.VirtualIPAddress)
 		d.Set("ipaddress", vpcInterface.IPAddress)
@@ -185,6 +194,7 @@ func resourceSakuraCloudVPCRouterInterfaceRead(d *schema.ResourceData, meta inte
 		return nil
 	}
 
+	setPowerManageTimeoutValueToState(d)
 	d.Set("zone", client.Zone)
 
 	return nil
@@ -251,6 +261,10 @@ func resourceSakuraCloudVPCRouterInterfaceDelete(d *schema.ResourceData, meta in
 
 func vpcRouterInterfaceID(routerID string, index int) string {
 	return fmt.Sprintf("%s-%d", routerID, index)
+}
+
+func expandVPCRouterInterfaceID(id string) (string, int) {
+	return expandSubResourceID(id)
 }
 
 func resourceSakuraCloudVPCRouterInterfaceMigrateState(

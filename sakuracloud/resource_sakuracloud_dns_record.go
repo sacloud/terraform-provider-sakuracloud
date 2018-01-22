@@ -15,9 +15,12 @@ const defaultTTL = 3600
 
 func resourceSakuraCloudDNSRecord() *schema.Resource {
 	return &schema.Resource{
-		Create:        resourceSakuraCloudDNSRecordCreate,
-		Read:          resourceSakuraCloudDNSRecordRead,
-		Delete:        resourceSakuraCloudDNSRecordDelete,
+		Create: resourceSakuraCloudDNSRecordCreate,
+		Read:   resourceSakuraCloudDNSRecordRead,
+		Delete: resourceSakuraCloudDNSRecordDelete,
+		Importer: &schema.ResourceImporter{
+			State: schema.ImportStatePassthrough,
+		},
 		MigrateState:  resourceSakuraCloudDNSRecordMigrateState,
 		SchemaVersion: 1,
 		Schema: map[string]*schema.Schema{
@@ -106,13 +109,13 @@ func resourceSakuraCloudDNSRecordCreate(d *schema.ResourceData, meta interface{}
 func resourceSakuraCloudDNSRecordRead(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*APIClient)
 
-	dns_id, index := expandDNSRecordID(d.Id())
-	if dns_id == "" || index < 0 {
+	dnsID, index := expandDNSRecordID(d.Id())
+	if dnsID == "" || index < 0 {
 		d.SetId("")
 		return nil
 	}
 
-	dns, err := client.DNS.Read(toSakuraCloudID(d.Get("dns_id").(string)))
+	dns, err := client.DNS.Read(toSakuraCloudID(dnsID))
 	if err != nil {
 		if sacloudErr, ok := err.(api.Error); ok && sacloudErr.ResponseCode() == 404 {
 			d.SetId("")
@@ -122,6 +125,7 @@ func resourceSakuraCloudDNSRecordRead(d *schema.ResourceData, meta interface{}) 
 	}
 
 	if dns.HasDNSRecord() && index < len(dns.Settings.DNS.ResourceRecordSets) {
+		d.Set("dns_id", dnsID)
 
 		record := dns.Settings.DNS.ResourceRecordSets[index]
 		d.Set("name", record.Name)
@@ -134,16 +138,23 @@ func resourceSakuraCloudDNSRecordRead(d *schema.ResourceData, meta interface{}) 
 			values := strings.SplitN(record.RData, " ", 2)
 			d.Set("value", values[1])
 
-			d.Set("priority", values[0])
+			priority, _ := strconv.Atoi(values[0])
+			d.Set("priority", priority)
+
 			d.Set("weight", "")
 			d.Set("port", "")
 		} else if record.Type == "SRV" {
 			values := strings.SplitN(record.RData, " ", 4)
 			d.Set("value", values[3])
 
-			d.Set("priority", values[0])
-			d.Set("weight", values[1])
-			d.Set("port", values[2])
+			priority, _ := strconv.Atoi(values[0])
+			d.Set("priority", priority)
+
+			weight, _ := strconv.Atoi(values[1])
+			d.Set("weight", weight)
+
+			port, _ := strconv.Atoi(values[2])
+			d.Set("port", port)
 		} else {
 			d.Set("priority", "")
 			d.Set("weight", "")

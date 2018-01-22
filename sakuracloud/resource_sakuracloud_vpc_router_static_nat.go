@@ -12,9 +12,12 @@ import (
 
 func resourceSakuraCloudVPCRouterStaticNAT() *schema.Resource {
 	return &schema.Resource{
-		Create:        resourceSakuraCloudVPCRouterStaticNATCreate,
-		Read:          resourceSakuraCloudVPCRouterStaticNATRead,
-		Delete:        resourceSakuraCloudVPCRouterStaticNATDelete,
+		Create: resourceSakuraCloudVPCRouterStaticNATCreate,
+		Read:   resourceSakuraCloudVPCRouterStaticNATRead,
+		Delete: resourceSakuraCloudVPCRouterStaticNATDelete,
+		Importer: &schema.ResourceImporter{
+			State: schema.ImportStatePassthrough,
+		},
 		MigrateState:  resourceSakuraCloudVPCRouterStaticNATMigrateState,
 		SchemaVersion: 1,
 		Schema: map[string]*schema.Schema{
@@ -92,7 +95,12 @@ func resourceSakuraCloudVPCRouterStaticNATCreate(d *schema.ResourceData, meta in
 func resourceSakuraCloudVPCRouterStaticNATRead(d *schema.ResourceData, meta interface{}) error {
 	client := getSacloudAPIClient(d, meta)
 
-	routerID := d.Get("vpc_router_id").(string)
+	routerID, index := expandVPCRouterStaticNATID(d.Id())
+	if routerID == "" || index < 0 {
+		d.SetId("")
+		return nil
+	}
+
 	vpcRouter, err := client.VPCRouter.Read(toSakuraCloudID(routerID))
 	if err != nil {
 		if sacloudErr, ok := err.(api.Error); ok && sacloudErr.ResponseCode() == 404 {
@@ -102,17 +110,20 @@ func resourceSakuraCloudVPCRouterStaticNATRead(d *schema.ResourceData, meta inte
 		return fmt.Errorf("Couldn't find SakuraCloud VPCRouter resource: %s", err)
 	}
 
-	staticNAT := expandVPCRouterStaticNAT(d)
-	if vpcRouter.Settings != nil && vpcRouter.Settings.Router != nil && vpcRouter.Settings.Router.StaticNAT != nil {
+	if vpcRouter.HasStaticNAT() && index < len(vpcRouter.Settings.Router.StaticNAT.Config) {
 
-		if _, c := vpcRouter.Settings.Router.FindStaticNAT(staticNAT.GlobalAddress, staticNAT.PrivateAddress); c != nil {
-			d.Set("global_address", staticNAT.GlobalAddress)
-			d.Set("private_address", staticNAT.PrivateAddress)
-			d.Set("description", staticNAT.Description)
-		} else {
+		staticNAT := vpcRouter.Settings.Router.StaticNAT.Config[index]
+		ifIndex, _ := vpcRouter.FindBelongsInterface(net.ParseIP(staticNAT.PrivateAddress))
+		if ifIndex < 0 {
 			d.SetId("")
 			return nil
 		}
+
+		d.Set("vpc_router_id", routerID)
+		d.Set("vpc_router_interface_id", vpcRouterInterfaceID(routerID, ifIndex))
+		d.Set("global_address", staticNAT.GlobalAddress)
+		d.Set("private_address", staticNAT.PrivateAddress)
+		d.Set("description", staticNAT.Description)
 	} else {
 		d.SetId("")
 		return nil
@@ -157,6 +168,10 @@ func resourceSakuraCloudVPCRouterStaticNATDelete(d *schema.ResourceData, meta in
 
 func vpcRouterStaticNATID(routerID string, index int) string {
 	return fmt.Sprintf("%s-%d", routerID, index)
+}
+
+func expandVPCRouterStaticNATID(id string) (string, int) {
+	return expandSubResourceID(id)
 }
 
 func expandVPCRouterStaticNAT(d *schema.ResourceData) *sacloud.VPCRouterStaticNATConfig {

@@ -12,9 +12,12 @@ import (
 
 func resourceSakuraCloudVPCRouterStaticRoute() *schema.Resource {
 	return &schema.Resource{
-		Create:        resourceSakuraCloudVPCRouterStaticRouteCreate,
-		Read:          resourceSakuraCloudVPCRouterStaticRouteRead,
-		Delete:        resourceSakuraCloudVPCRouterStaticRouteDelete,
+		Create: resourceSakuraCloudVPCRouterStaticRouteCreate,
+		Read:   resourceSakuraCloudVPCRouterStaticRouteRead,
+		Delete: resourceSakuraCloudVPCRouterStaticRouteDelete,
+		Importer: &schema.ResourceImporter{
+			State: schema.ImportStatePassthrough,
+		},
 		MigrateState:  resourceSakuraCloudVPCRouterStaticRouteMigrateState,
 		SchemaVersion: 1,
 		Schema: map[string]*schema.Schema{
@@ -85,7 +88,12 @@ func resourceSakuraCloudVPCRouterStaticRouteCreate(d *schema.ResourceData, meta 
 func resourceSakuraCloudVPCRouterStaticRouteRead(d *schema.ResourceData, meta interface{}) error {
 	client := getSacloudAPIClient(d, meta)
 
-	routerID := d.Get("vpc_router_id").(string)
+	routerID, index := expandVPCRouterStaticRouteID(d.Id())
+	if routerID == "" || index < 0 {
+		d.SetId("")
+		return nil
+	}
+
 	vpcRouter, err := client.VPCRouter.Read(toSakuraCloudID(routerID))
 	if err != nil {
 		if sacloudErr, ok := err.(api.Error); ok && sacloudErr.ResponseCode() == 404 {
@@ -95,15 +103,19 @@ func resourceSakuraCloudVPCRouterStaticRouteRead(d *schema.ResourceData, meta in
 		return fmt.Errorf("Couldn't find SakuraCloud VPCRouter resource: %s", err)
 	}
 
-	staticRoute := expandVPCRouterStaticRoute(d)
-	if vpcRouter.Settings != nil && vpcRouter.Settings.Router != nil && vpcRouter.Settings.Router.StaticRoutes != nil {
-		if _, c := vpcRouter.Settings.Router.FindStaticRoute(staticRoute.Prefix, staticRoute.NextHop); c != nil {
-			d.Set("prefix", staticRoute.Prefix)
-			d.Set("next_hop", staticRoute.NextHop)
-		} else {
+	if vpcRouter.HasStaticRoutes() && index < len(vpcRouter.Settings.Router.StaticRoutes.Config) {
+
+		staticRoute := vpcRouter.Settings.Router.StaticRoutes.Config[index]
+		ifIndex, _ := vpcRouter.FindBelongsInterface(net.ParseIP(staticRoute.NextHop))
+		if ifIndex < 0 {
 			d.SetId("")
 			return nil
 		}
+
+		d.Set("vpc_router_id", routerID)
+		d.Set("vpc_router_interface_id", vpcRouterInterfaceID(routerID, ifIndex))
+		d.Set("prefix", staticRoute.Prefix)
+		d.Set("next_hop", staticRoute.NextHop)
 
 	} else {
 		d.SetId("")
@@ -149,6 +161,10 @@ func resourceSakuraCloudVPCRouterStaticRouteDelete(d *schema.ResourceData, meta 
 
 func vpcRouterStaticRouteID(routerID string, index int) string {
 	return fmt.Sprintf("%s-%d", routerID, index)
+}
+
+func expandVPCRouterStaticRouteID(id string) (string, int) {
+	return expandSubResourceID(id)
 }
 
 func expandVPCRouterStaticRoute(d *schema.ResourceData) *sacloud.VPCRouterStaticRoutesConfig {

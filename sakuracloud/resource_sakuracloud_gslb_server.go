@@ -13,9 +13,12 @@ import (
 
 func resourceSakuraCloudGSLBServer() *schema.Resource {
 	return &schema.Resource{
-		Create:        resourceSakuraCloudGSLBServerCreate,
-		Read:          resourceSakuraCloudGSLBServerRead,
-		Delete:        resourceSakuraCloudGSLBServerDelete,
+		Create: resourceSakuraCloudGSLBServerCreate,
+		Read:   resourceSakuraCloudGSLBServerRead,
+		Delete: resourceSakuraCloudGSLBServerDelete,
+		Importer: &schema.ResourceImporter{
+			State: schema.ImportStatePassthrough,
+		},
 		MigrateState:  resourceSakuraCloudGSLBServerMigrateState,
 		SchemaVersion: 1,
 		Schema: map[string]*schema.Schema{
@@ -79,7 +82,13 @@ func resourceSakuraCloudGSLBServerCreate(d *schema.ResourceData, meta interface{
 func resourceSakuraCloudGSLBServerRead(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*APIClient)
 
-	gslb, err := client.GSLB.Read(toSakuraCloudID(d.Get("gslb_id").(string)))
+	gslbID, index := expandGSLBServerID(d.Id())
+	if gslbID == "" || index < 0 {
+		d.SetId("")
+		return nil
+	}
+
+	gslb, err := client.GSLB.Read(toSakuraCloudID(gslbID))
 	if err != nil {
 		if sacloudErr, ok := err.(api.Error); ok && sacloudErr.ResponseCode() == 404 {
 			d.SetId("")
@@ -88,12 +97,14 @@ func resourceSakuraCloudGSLBServerRead(d *schema.ResourceData, meta interface{})
 		return fmt.Errorf("Couldn't find SakuraCloud GSLB resource: %s", err)
 	}
 
-	_, index := expandGSLBServerID(d.Id())
-	if gslb.HasGSLBServer() && 0 <= index && index < len(gslb.Settings.GSLB.Servers) {
+	if gslb.HasGSLBServer() && index < len(gslb.Settings.GSLB.Servers) {
+		d.Set("gslb_id", gslbID)
+
 		server := gslb.Settings.GSLB.Servers[index]
 		d.Set("ipaddress", server.IPAddress)
-		d.Set("enabled", server.Enabled)
-		d.Set("weight", server.Weight)
+		d.Set("enabled", strings.ToLower(server.Enabled) == "true")
+		weight, _ := strconv.Atoi(server.Weight)
+		d.Set("weight", weight)
 	} else {
 		d.SetId("")
 		return nil
