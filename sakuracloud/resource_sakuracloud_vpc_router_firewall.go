@@ -8,14 +8,18 @@ import (
 	"github.com/sacloud/libsacloud/sacloud"
 	"log"
 	"strconv"
+	"strings"
 )
 
 func resourceSakuraCloudVPCRouterFirewall() *schema.Resource {
 	return &schema.Resource{
-		Create:        resourceSakuraCloudVPCRouterFirewallCreate,
-		Read:          resourceSakuraCloudVPCRouterFirewallRead,
-		Delete:        resourceSakuraCloudVPCRouterFirewallDelete,
-		MigrateState:  resourceSakuraCloudVPCRouterFirewallMigrateState,
+		Create:       resourceSakuraCloudVPCRouterFirewallCreate,
+		Read:         resourceSakuraCloudVPCRouterFirewallRead,
+		Delete:       resourceSakuraCloudVPCRouterFirewallDelete,
+		MigrateState: resourceSakuraCloudVPCRouterFirewallMigrateState,
+		Importer: &schema.ResourceImporter{
+			State: schema.ImportStatePassthrough,
+		},
 		SchemaVersion: 1,
 		Schema: map[string]*schema.Schema{
 			"vpc_router_id": {
@@ -181,7 +185,12 @@ func resourceSakuraCloudVPCRouterFirewallCreate(d *schema.ResourceData, meta int
 func resourceSakuraCloudVPCRouterFirewallRead(d *schema.ResourceData, meta interface{}) error {
 	client := getSacloudAPIClient(d, meta)
 
-	routerID := d.Get("vpc_router_id").(string)
+	routerID, ifIndex, direction := expandVPCRouterFirewallID(d.Id())
+	if routerID == "" || ifIndex < 0 || direction == "" {
+		d.SetId("")
+		return nil
+	}
+
 	vpcRouter, err := client.VPCRouter.Read(toSakuraCloudID(routerID))
 	if err != nil {
 		if sacloudErr, ok := err.(api.Error); ok && sacloudErr.ResponseCode() == 404 {
@@ -191,38 +200,40 @@ func resourceSakuraCloudVPCRouterFirewallRead(d *schema.ResourceData, meta inter
 		return fmt.Errorf("Couldn't find SakuraCloud VPCRouter resource: %s", err)
 	}
 
-	ifIndex := d.Get("vpc_router_interface_index").(int)
-	direction := d.Get("direction").(string)
-	if vpcRouter.Settings != nil && vpcRouter.Settings.Router != nil && vpcRouter.Settings.Router.Firewall != nil &&
-		vpcRouter.Settings.Router.Firewall.Config != nil {
+	if vpcRouter.HasFirewall() {
+		d.Set("vpc_router_id", routerID)
+		d.Set("vpc_router_interface_index", ifIndex)
+		d.Set("direction", direction)
 
-		expressions := []interface{}{}
+		if ifIndex < len(vpcRouter.Settings.Router.Firewall.Config) {
+			expressions := []interface{}{}
+			var rules []*sacloud.VPCRouterFirewallRule
+			switch direction {
+			case "send":
+				rules = vpcRouter.Settings.Router.Firewall.Config[ifIndex].Send
+			case "receive":
+				rules = vpcRouter.Settings.Router.Firewall.Config[ifIndex].Receive
+			}
 
-		var rules []*sacloud.VPCRouterFirewallRule
-		switch direction {
-		case "send":
-			rules = vpcRouter.Settings.Router.Firewall.Config[ifIndex].Send
-		case "receive":
-			rules = vpcRouter.Settings.Router.Firewall.Config[ifIndex].Receive
+			for _, rule := range rules {
+				expression := map[string]interface{}{}
+
+				expression["source_nw"] = rule.SourceNetwork
+				expression["source_port"] = rule.SourcePort
+				expression["dest_nw"] = rule.DestinationNetwork
+				expression["dest_port"] = rule.DestinationPort
+				expression["allow"] = rule.Action == "allow"
+				expression["protocol"] = rule.Protocol
+				expression["logging"] = strings.ToLower(rule.Logging) == "true"
+				expression["description"] = rule.Description
+
+				expressions = append(expressions, expression)
+			}
+			d.Set("expressions", expressions)
 		}
-
-		for _, rule := range rules {
-			expression := map[string]interface{}{}
-
-			expression["source_nw"] = rule.SourceNetwork
-			expression["source_port"] = rule.SourcePort
-			expression["dest_nw"] = rule.DestinationNetwork
-			expression["dest_port"] = rule.DestinationPort
-			expression["allow"] = (rule.Action == "allow")
-			expression["protocol"] = rule.Protocol
-			expression["logging"] = rule.Logging
-			expression["description"] = rule.Description
-
-			expressions = append(expressions, expression)
-		}
-		d.Set("expressions", expressions)
 	} else {
-		d.Set("expressions", []interface{}{})
+		d.SetId("")
+		return nil
 	}
 
 	d.Set("zone", client.Zone)
@@ -271,6 +282,23 @@ func resourceSakuraCloudVPCRouterFirewallDelete(d *schema.ResourceData, meta int
 
 func vpcRouterFirewallID(routerID string, ifIndex int, direction string) string {
 	return fmt.Sprintf("%s-%d-%s", routerID, ifIndex, direction)
+}
+
+func expandVPCRouterFirewallID(id string) (string, int, string) {
+	tokens := strings.Split(id, "-")
+	if len(tokens) != 3 {
+		return "", -1, ""
+	}
+	index, err := strconv.Atoi(tokens[1])
+	if err != nil {
+		return "", -1, ""
+	}
+	direction := tokens[2]
+	if direction != "send" && direction != "receive" {
+		return "", -1, ""
+	}
+
+	return tokens[0], index, direction
 }
 
 func resourceSakuraCloudVPCRouterFirewallMigrateState(

@@ -5,6 +5,7 @@ import (
 	"github.com/hashicorp/terraform/helper/resource"
 	"github.com/hashicorp/terraform/terraform"
 
+	"fmt"
 	"github.com/sacloud/libsacloud/sacloud"
 	"testing"
 )
@@ -21,9 +22,9 @@ func TestAccResourceSakuraCloudGSLBServer(t *testing.T) {
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckSakuraCloudGSLBExists("sakuracloud_gslb.foobar", &gslb),
 					resource.TestCheckResourceAttr(
-						"sakuracloud_gslb_server.foobar.0", "ipaddress", "8.8.8.8"),
+						"sakuracloud_gslb_server.foobar0", "ipaddress", "8.8.8.8"),
 					resource.TestCheckResourceAttr(
-						"sakuracloud_gslb_server.foobar.1", "ipaddress", "8.8.4.4"),
+						"sakuracloud_gslb_server.foobar1", "ipaddress", "8.8.4.4"),
 				),
 			},
 			{
@@ -62,9 +63,71 @@ func testAccCheckSakuraCloudGSLBServerDestroy(s *terraform.State) error {
 	return nil
 }
 
+func TestAccImportSakuraCloudGSLBServer(t *testing.T) {
+	checkFn := func(s []*terraform.InstanceState) error {
+		if len(s) != 1 {
+			return fmt.Errorf("expected 1 state: %#v", s)
+		}
+		expects := map[string]string{
+			"ipaddress": "8.8.8.8",
+			"enabled":   "true",
+			"weight":    "1",
+		}
+
+		if err := compareStateMulti(s[0], expects); err != nil {
+			return err
+		}
+		return stateNotEmptyMulti(s[0], "gslb_id")
+	}
+
+	resourceName := "sakuracloud_gslb_server.foobar0"
+
+	resource.Test(t, resource.TestCase{
+		PreCheck:     func() { testAccPreCheck(t) },
+		Providers:    testAccProviders,
+		CheckDestroy: testAccCheckSakuraCloudGSLBServerDestroy,
+		Steps: []resource.TestStep{
+			resource.TestStep{
+				Config: testAccCheckSakuraCloudGSLBServerConfig_basic,
+			},
+			resource.TestStep{
+				ResourceName:      resourceName,
+				ImportState:       true,
+				ImportStateCheck:  checkFn,
+				ImportStateVerify: true,
+			},
+		},
+	})
+}
+
 var testAccCheckSakuraCloudGSLBServerConfig_basic = `
 variable "gslb_ip_list" {
-    default = "8.8.8.8,8.8.4.4"
+    default = ["8.8.8.8","8.8.4.4"]
+}
+resource "sakuracloud_gslb" "foobar" {
+    name = "terraform.io"
+    health_check = {
+        protocol = "http"
+        delay_loop = 10
+        host_header = "terraform.io"
+        path = "/"
+        status = "200"
+    }
+    description = "GSLB from TerraForm for SAKURA CLOUD"
+    tags = ["hoge1", "hoge2"]
+}
+resource "sakuracloud_gslb_server" "foobar0" {
+    gslb_id = "${sakuracloud_gslb.foobar.id}"
+    ipaddress = "${var.gslb_ip_list[0]}"
+}
+resource "sakuracloud_gslb_server" "foobar1" {
+    gslb_id = "${sakuracloud_gslb.foobar.id}"
+    ipaddress = "${var.gslb_ip_list[1]}"
+}`
+
+var testAccCheckSakuraCloudGSLBServerConfig_update = `
+variable "gslb_ip_list" {
+    default = ["8.8.8.8","8.8.4.4","208.67.222.123","208.67.220.123"]
 }
 resource "sakuracloud_gslb" "foobar" {
     name = "terraform.io"
@@ -79,30 +142,8 @@ resource "sakuracloud_gslb" "foobar" {
     tags = ["hoge1", "hoge2"]
 }
 resource "sakuracloud_gslb_server" "foobar" {
-    count = 2
-    gslb_id = "${sakuracloud_gslb.foobar.id}"
-    ipaddress = "${element(split("," , var.gslb_ip_list),count.index)}"
-}`
-
-var testAccCheckSakuraCloudGSLBServerConfig_update = `
-variable "gslb_ip_list" {
-    default = "8.8.8.8,8.8.4.4,208.67.222.123,208.67.220.123"
-}
-resource "sakuracloud_gslb" "foobar" {
-    name = "terraform.io"
-    health_check = {
-        protocol = "https"
-        delay_loop = 20
-        host_header = "update.terraform.io"
-        path = "/"
-        status = "200"
-    }
-    description = "GSLB from TerraForm for SAKURA CLOUD"
-    tags = ["hoge1", "hoge2"]
-}
-resource "sakuracloud_gslb_server" "foobar" {
     count = 4
     gslb_id = "${sakuracloud_gslb.foobar.id}"
-    ipaddress = "${element(split("," , var.gslb_ip_list),count.index)}"
+    ipaddress = "${var.gslb_ip_list[count.index]}"
 
 }`

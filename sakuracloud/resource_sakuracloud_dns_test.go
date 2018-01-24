@@ -95,6 +95,44 @@ func testAccCheckSakuraCloudDNSDestroy(s *terraform.State) error {
 	return nil
 }
 
+func TestAccImportSakuraCloudDNS(t *testing.T) {
+	checkFn := func(s []*terraform.InstanceState) error {
+		if len(s) != 1 {
+			return fmt.Errorf("expected 1 state: %#v", s)
+		}
+		expects := map[string]string{
+			"zone":        "terraform.io",
+			"description": "DNS from TerraForm for SAKURA CLOUD",
+			"tags.0":      "tag1",
+			"tags.1":      "tag2",
+		}
+
+		if err := compareStateMulti(s[0], expects); err != nil {
+			return err
+		}
+		return stateNotEmptyMulti(s[0], "icon_id", "dns_servers.0")
+	}
+
+	resourceName := "sakuracloud_dns.foobar"
+
+	resource.Test(t, resource.TestCase{
+		PreCheck:     func() { testAccPreCheck(t) },
+		Providers:    testAccProviders,
+		CheckDestroy: testAccCheckSakuraCloudDNSDestroy,
+		Steps: []resource.TestStep{
+			resource.TestStep{
+				Config: testAccCheckSakuraCloudDNSConfig_basic,
+			},
+			resource.TestStep{
+				ResourceName:      resourceName,
+				ImportState:       true,
+				ImportStateCheck:  checkFn,
+				ImportStateVerify: true,
+			},
+		},
+	})
+}
+
 var testAccCheckSakuraCloudDNSConfig_basic = `
 resource "sakuracloud_dns" "foobar" {
     zone = "terraform.io"

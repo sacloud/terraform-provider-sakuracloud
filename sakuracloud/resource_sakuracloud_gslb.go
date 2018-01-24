@@ -8,6 +8,7 @@ import (
 
 	"github.com/sacloud/libsacloud/api"
 	"github.com/sacloud/libsacloud/sacloud"
+	"strings"
 )
 
 func resourceSakuraCloudGSLB() *schema.Resource {
@@ -312,7 +313,7 @@ func setGSLBResourceData(d *schema.ResourceData, client *APIClient, data *saclou
 	d.Set("icon_id", data.GetIconStrID())
 	d.Set("description", data.Description)
 	d.Set("tags", realTags(client, data.Tags))
-	d.Set("weighted", data.Settings.GSLB.Weighted == "True")
+	d.Set("weighted", strings.ToLower(data.Settings.GSLB.Weighted) == "true")
 
 	d.SetId(data.GetStrID())
 	return nil

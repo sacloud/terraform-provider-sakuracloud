@@ -11,9 +11,12 @@ import (
 
 func resourceSakuraCloudVPCRouterSiteToSiteIPsecVPN() *schema.Resource {
 	return &schema.Resource{
-		Create:        resourceSakuraCloudVPCRouterSiteToSiteIPsecVPNCreate,
-		Read:          resourceSakuraCloudVPCRouterSiteToSiteIPsecVPNRead,
-		Delete:        resourceSakuraCloudVPCRouterSiteToSiteIPsecVPNDelete,
+		Create: resourceSakuraCloudVPCRouterSiteToSiteIPsecVPNCreate,
+		Read:   resourceSakuraCloudVPCRouterSiteToSiteIPsecVPNRead,
+		Delete: resourceSakuraCloudVPCRouterSiteToSiteIPsecVPNDelete,
+		Importer: &schema.ResourceImporter{
+			State: schema.ImportStatePassthrough,
+		},
 		MigrateState:  resourceSakuraCloudVPCRouterS2SMigrateState,
 		SchemaVersion: 1,
 		Schema: map[string]*schema.Schema{
@@ -169,7 +172,11 @@ func resourceSakuraCloudVPCRouterSiteToSiteIPsecVPNCreate(d *schema.ResourceData
 func resourceSakuraCloudVPCRouterSiteToSiteIPsecVPNRead(d *schema.ResourceData, meta interface{}) error {
 	client := getSacloudAPIClient(d, meta)
 
-	routerID := d.Get("vpc_router_id").(string)
+	routerID, index := expandVPCRouterSiteToSiteIPsecVPNID(d.Id())
+	if routerID == "" || index < 0 {
+		d.SetId("")
+		return nil
+	}
 	vpcRouter, err := client.VPCRouter.Read(toSakuraCloudID(routerID))
 	if err != nil {
 		if sacloudErr, ok := err.(api.Error); ok && sacloudErr.ResponseCode() == 404 {
@@ -179,20 +186,14 @@ func resourceSakuraCloudVPCRouterSiteToSiteIPsecVPNRead(d *schema.ResourceData, 
 		return fmt.Errorf("Couldn't find SakuraCloud VPCRouter resource: %s", err)
 	}
 
-	s2s := expandVPCRouterSiteToSiteIPsecVPN(d)
-	if vpcRouter.Settings != nil && vpcRouter.Settings.Router != nil && vpcRouter.Settings.Router.SiteToSiteIPsecVPN != nil {
-
-		_, s2s = vpcRouter.Settings.Router.FindSiteToSiteIPsecVPN(s2s.LocalPrefix, s2s.Peer, s2s.PreSharedSecret, s2s.RemoteID, s2s.Routes)
-		if s2s != nil {
-			d.Set("local_prefix", s2s.LocalPrefix)
-			d.Set("peer", s2s.Peer)
-			d.Set("pre_shared_secret", s2s.PreSharedSecret)
-			d.Set("remote_id", s2s.RemoteID)
-			d.Set("routes", s2s.Routes)
-		} else {
-			d.SetId("")
-			return nil
-		}
+	if vpcRouter.HasSiteToSiteIPsecVPN() && index < len(vpcRouter.Settings.Router.SiteToSiteIPsecVPN.Config) {
+		s2s := vpcRouter.Settings.Router.SiteToSiteIPsecVPN.Config[index]
+		d.Set("vpc_router_id", routerID)
+		d.Set("local_prefix", s2s.LocalPrefix)
+		d.Set("peer", s2s.Peer)
+		d.Set("pre_shared_secret", s2s.PreSharedSecret)
+		d.Set("remote_id", s2s.RemoteID)
+		d.Set("routes", s2s.Routes)
 	} else {
 		d.SetId("")
 		return nil
@@ -269,6 +270,10 @@ func resourceSakuraCloudVPCRouterSiteToSiteIPsecVPNDelete(d *schema.ResourceData
 
 func vpcRouterSiteToSiteIPsecVPNID(routerID string, index int) string {
 	return fmt.Sprintf("%s-%d", routerID, index)
+}
+
+func expandVPCRouterSiteToSiteIPsecVPNID(id string) (string, int) {
+	return expandSubResourceID(id)
 }
 
 func expandVPCRouterSiteToSiteIPsecVPN(d *schema.ResourceData) *sacloud.VPCRouterSiteToSiteIPsecVPNConfig {

@@ -8,13 +8,17 @@ import (
 	"github.com/sacloud/libsacloud/sacloud"
 	"log"
 	"net"
+	"strconv"
 )
 
 func resourceSakuraCloudVPCRouterPortForwarding() *schema.Resource {
 	return &schema.Resource{
-		Create:        resourceSakuraCloudVPCRouterPortForwardingCreate,
-		Read:          resourceSakuraCloudVPCRouterPortForwardingRead,
-		Delete:        resourceSakuraCloudVPCRouterPortForwardingDelete,
+		Create: resourceSakuraCloudVPCRouterPortForwardingCreate,
+		Read:   resourceSakuraCloudVPCRouterPortForwardingRead,
+		Delete: resourceSakuraCloudVPCRouterPortForwardingDelete,
+		Importer: &schema.ResourceImporter{
+			State: schema.ImportStatePassthrough,
+		},
 		MigrateState:  resourceSakuraCloudVPCRouterPortForwardingMigrateState,
 		SchemaVersion: 1,
 		Schema: map[string]*schema.Schema{
@@ -105,7 +109,12 @@ func resourceSakuraCloudVPCRouterPortForwardingCreate(d *schema.ResourceData, me
 func resourceSakuraCloudVPCRouterPortForwardingRead(d *schema.ResourceData, meta interface{}) error {
 	client := getSacloudAPIClient(d, meta)
 
-	routerID := d.Get("vpc_router_id").(string)
+	routerID, index := expandVPCRouterPortForwardingID(d.Id())
+	if routerID == "" || index < 0 {
+		d.SetId("")
+		return nil
+	}
+
 	vpcRouter, err := client.VPCRouter.Read(toSakuraCloudID(routerID))
 	if err != nil {
 		if sacloudErr, ok := err.(api.Error); ok && sacloudErr.ResponseCode() == 404 {
@@ -115,19 +124,26 @@ func resourceSakuraCloudVPCRouterPortForwardingRead(d *schema.ResourceData, meta
 		return fmt.Errorf("Couldn't find SakuraCloud VPCRouter resource: %s", err)
 	}
 
-	pf := expandVPCRouterPortForwarding(d)
-	if vpcRouter.Settings != nil && vpcRouter.Settings.Router != nil && vpcRouter.Settings.Router.PortForwarding != nil {
-		_, p := vpcRouter.Settings.Router.FindPortForwarding(pf.Protocol, pf.GlobalPort, pf.PrivateAddress, pf.PrivatePort)
-		if p != nil {
-			d.Set("protocol", pf.Protocol)
-			d.Set("global_port", pf.GlobalPort)
-			d.Set("private_address", pf.PrivateAddress)
-			d.Set("private_port", pf.PrivatePort)
-			d.Set("description", pf.Description)
-		} else {
+	if vpcRouter.HasPortForwarding() && index < len(vpcRouter.Settings.Router.PortForwarding.Config) {
+
+		p := vpcRouter.Settings.Router.PortForwarding.Config[index]
+		ifIndex, _ := vpcRouter.FindBelongsInterface(net.ParseIP(p.PrivateAddress))
+		if ifIndex < 0 {
 			d.SetId("")
 			return nil
 		}
+
+		d.Set("vpc_router_id", routerID)
+		d.Set("vpc_router_interface_id", vpcRouterInterfaceID(routerID, ifIndex))
+
+		d.Set("protocol", p.Protocol)
+		globalPort, _ := strconv.Atoi(p.GlobalPort)
+		d.Set("global_port", globalPort)
+		d.Set("private_address", p.PrivateAddress)
+		privatePort, _ := strconv.Atoi(p.PrivatePort)
+		d.Set("private_port", privatePort)
+		d.Set("description", p.Description)
+
 	} else {
 		d.SetId("")
 		return nil
@@ -172,6 +188,10 @@ func resourceSakuraCloudVPCRouterPortForwardingDelete(d *schema.ResourceData, me
 
 func vpcRouterPortForwardingID(routerID string, index int) string {
 	return fmt.Sprintf("%s-%d", routerID, index)
+}
+
+func expandVPCRouterPortForwardingID(id string) (string, int) {
+	return expandSubResourceID(id)
 }
 
 func expandVPCRouterPortForwarding(d *schema.ResourceData) *sacloud.VPCRouterPortForwardingConfig {

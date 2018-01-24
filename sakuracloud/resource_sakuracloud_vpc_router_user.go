@@ -11,9 +11,12 @@ import (
 
 func resourceSakuraCloudVPCRouterRemoteAccessUser() *schema.Resource {
 	return &schema.Resource{
-		Create:        resourceSakuraCloudVPCRouterRemoteAccessUserCreate,
-		Read:          resourceSakuraCloudVPCRouterRemoteAccessUserRead,
-		Delete:        resourceSakuraCloudVPCRouterRemoteAccessUserDelete,
+		Create: resourceSakuraCloudVPCRouterRemoteAccessUserCreate,
+		Read:   resourceSakuraCloudVPCRouterRemoteAccessUserRead,
+		Delete: resourceSakuraCloudVPCRouterRemoteAccessUserDelete,
+		Importer: &schema.ResourceImporter{
+			State: schema.ImportStatePassthrough,
+		},
 		MigrateState:  resourceSakuraCloudVPCRouterUserMigrateState,
 		SchemaVersion: 1,
 		Schema: map[string]*schema.Schema{
@@ -81,7 +84,11 @@ func resourceSakuraCloudVPCRouterRemoteAccessUserCreate(d *schema.ResourceData, 
 func resourceSakuraCloudVPCRouterRemoteAccessUserRead(d *schema.ResourceData, meta interface{}) error {
 	client := getSacloudAPIClient(d, meta)
 
-	routerID := d.Get("vpc_router_id").(string)
+	routerID, index := expandVPCRouterRemoteAccessUserID(d.Id())
+	if routerID == "" || index < 0 {
+		d.SetId("")
+		return nil
+	}
 	vpcRouter, err := client.VPCRouter.Read(toSakuraCloudID(routerID))
 	if err != nil {
 		if sacloudErr, ok := err.(api.Error); ok && sacloudErr.ResponseCode() == 404 {
@@ -91,15 +98,11 @@ func resourceSakuraCloudVPCRouterRemoteAccessUserRead(d *schema.ResourceData, me
 		return fmt.Errorf("Couldn't find SakuraCloud VPCRouter resource: %s", err)
 	}
 
-	remoteAccessUser := expandVPCRouterRemoteAccessUser(d)
-	if vpcRouter.Settings != nil && vpcRouter.Settings.Router != nil && vpcRouter.Settings.Router.RemoteAccessUsers != nil {
-		if _, c := vpcRouter.Settings.Router.FindRemoteAccessUser(remoteAccessUser.UserName, remoteAccessUser.Password); c != nil {
-			d.Set("name", remoteAccessUser.UserName)
-			d.Set("password", remoteAccessUser.Password)
-		} else {
-			d.SetId("")
-			return nil
-		}
+	if vpcRouter.HasRemoteAccessUsers() && index < len(vpcRouter.Settings.Router.RemoteAccessUsers.Config) {
+		user := vpcRouter.Settings.Router.RemoteAccessUsers.Config[index]
+		d.Set("vpc_router_id", routerID)
+		d.Set("name", user.UserName)
+		d.Set("password", user.Password)
 	} else {
 		d.SetId("")
 		return nil
@@ -143,6 +146,10 @@ func resourceSakuraCloudVPCRouterRemoteAccessUserDelete(d *schema.ResourceData, 
 
 func vpcRouterRemoteAccessUserID(routerID string, index int) string {
 	return fmt.Sprintf("%s-%d", routerID, index)
+}
+
+func expandVPCRouterRemoteAccessUserID(id string) (string, int) {
+	return expandSubResourceID(id)
 }
 
 func expandVPCRouterRemoteAccessUser(d *schema.ResourceData) *sacloud.VPCRouterRemoteAccessUsersConfig {

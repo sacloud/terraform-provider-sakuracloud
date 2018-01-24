@@ -13,9 +13,12 @@ import (
 
 func resourceSakuraCloudLoadBalancerServer() *schema.Resource {
 	return &schema.Resource{
-		Create:        resourceSakuraCloudLoadBalancerServerCreate,
-		Read:          resourceSakuraCloudLoadBalancerServerRead,
-		Delete:        resourceSakuraCloudLoadBalancerServerDelete,
+		Create: resourceSakuraCloudLoadBalancerServerCreate,
+		Read:   resourceSakuraCloudLoadBalancerServerRead,
+		Delete: resourceSakuraCloudLoadBalancerServerDelete,
+		Importer: &schema.ResourceImporter{
+			State: schema.ImportStatePassthrough,
+		},
 		MigrateState:  resourceSakuraCloudLoadBalancerServerMigrateState,
 		SchemaVersion: 1,
 		Schema: map[string]*schema.Schema{
@@ -121,14 +124,9 @@ func resourceSakuraCloudLoadBalancerServerCreate(d *schema.ResourceData, meta in
 func resourceSakuraCloudLoadBalancerServerRead(d *schema.ResourceData, meta interface{}) error {
 	client := getSacloudAPIClient(d, meta)
 
-	vipID := d.Get("load_balancer_vip_id").(string)
-	lbID, vipIndex := expandLoadBalancerVIPID(vipID)
-	if lbID == "" || vipIndex < 0 {
-		d.SetId("")
-		return nil
-	}
-	_, _, index := expandLoadBalancerServerID(d.Id())
-	if index < 0 {
+	serverID := d.Id()
+	lbID, vipIndex, index := expandLoadBalancerServerID(serverID)
+	if lbID == "" || vipIndex < 0 || index < 0 {
 		d.SetId("")
 		return nil
 	}
@@ -154,11 +152,13 @@ func resourceSakuraCloudLoadBalancerServerRead(d *schema.ResourceData, meta inte
 	}
 	server := vipSetting.Servers[index]
 
+	d.Set("load_balancer_vip_id", loadBalancerVIPID(lbID, vipIndex))
 	d.Set("ipaddress", server.IPAddress)
 	d.Set("check_protocol", server.HealthCheck.Protocol)
 	d.Set("check_path", server.HealthCheck.Path)
 	d.Set("check_status", server.HealthCheck.Status)
-	d.Set("enabled", server.Enabled)
+	d.Set("enabled", strings.ToLower(server.Enabled) == "true")
+
 	d.Set("zone", client.Zone)
 
 	return nil

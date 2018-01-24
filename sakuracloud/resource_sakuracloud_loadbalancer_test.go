@@ -129,6 +129,54 @@ func testAccCheckSakuraCloudLoadBalancerDestroy(s *terraform.State) error {
 	return nil
 }
 
+func TestAccImportSakuraCloudLoadBalancer(t *testing.T) {
+	checkFn := func(s []*terraform.InstanceState) error {
+		if len(s) != 1 {
+			return fmt.Errorf("expected 1 state: %#v", s)
+		}
+		expects := map[string]string{
+			"name":                      "name_before",
+			"vrid":                      "1",
+			"high_availability":         "false",
+			"plan":                      "standard",
+			"ipaddress1":                "192.168.11.101",
+			"ipaddress2":                "",
+			"nw_mask_len":               "24",
+			"default_route":             "192.168.11.1",
+			"description":               "description_before",
+			"tags.0":                    "hoge1",
+			"tags.1":                    "hoge2",
+			"graceful_shutdown_timeout": "60",
+			"vip_ids.0":                 "",
+			"zone":                      "is1b",
+		}
+
+		if err := compareStateMulti(s[0], expects); err != nil {
+			return err
+		}
+		return stateNotEmptyMulti(s[0], "switch_id", "icon_id")
+	}
+
+	resourceName := "sakuracloud_load_balancer.foobar"
+
+	resource.Test(t, resource.TestCase{
+		PreCheck:     func() { testAccPreCheck(t) },
+		Providers:    testAccProviders,
+		CheckDestroy: testAccCheckSakuraCloudLoadBalancerDestroy,
+		Steps: []resource.TestStep{
+			resource.TestStep{
+				Config: testAccCheckSakuraCloudLoadBalancerConfig_basic,
+			},
+			resource.TestStep{
+				ResourceName:      resourceName,
+				ImportState:       true,
+				ImportStateCheck:  checkFn,
+				ImportStateVerify: true,
+			},
+		},
+	})
+}
+
 const testAccCheckSakuraCloudLoadBalancerConfig_basic = `
 resource "sakuracloud_switch" "sw" {
     name = "sw"

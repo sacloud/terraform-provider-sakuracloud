@@ -12,9 +12,12 @@ import (
 
 func resourceSakuraCloudVPCRouterPPTP() *schema.Resource {
 	return &schema.Resource{
-		Create:        resourceSakuraCloudVPCRouterPPTPCreate,
-		Read:          resourceSakuraCloudVPCRouterPPTPRead,
-		Delete:        resourceSakuraCloudVPCRouterPPTPDelete,
+		Create: resourceSakuraCloudVPCRouterPPTPCreate,
+		Read:   resourceSakuraCloudVPCRouterPPTPRead,
+		Delete: resourceSakuraCloudVPCRouterPPTPDelete,
+		Importer: &schema.ResourceImporter{
+			State: schema.ImportStatePassthrough,
+		},
 		MigrateState:  resourceSakuraCloudVPCRouterPPTPMigrateState,
 		SchemaVersion: 1,
 		Schema: map[string]*schema.Schema{
@@ -86,7 +89,7 @@ func resourceSakuraCloudVPCRouterPPTPCreate(d *schema.ResourceData, meta interfa
 func resourceSakuraCloudVPCRouterPPTPRead(d *schema.ResourceData, meta interface{}) error {
 	client := getSacloudAPIClient(d, meta)
 
-	routerID := d.Get("vpc_router_id").(string)
+	routerID := d.Id()
 	vpcRouter, err := client.VPCRouter.Read(toSakuraCloudID(routerID))
 	if err != nil {
 		if sacloudErr, ok := err.(api.Error); ok && sacloudErr.ResponseCode() == 404 {
@@ -96,11 +99,20 @@ func resourceSakuraCloudVPCRouterPPTPRead(d *schema.ResourceData, meta interface
 		return fmt.Errorf("Couldn't find SakuraCloud VPCRouter resource: %s", err)
 	}
 
-	pptpSetting := expandVPCRouterPPTP(d)
 	if vpcRouter.Settings != nil &&
 		vpcRouter.Settings.Router != nil &&
 		vpcRouter.Settings.Router.PPTPServer != nil &&
 		vpcRouter.Settings.Router.PPTPServer.Config != nil {
+
+		pptpSetting := vpcRouter.Settings.Router.PPTPServer.Config
+		ifIndex, _ := vpcRouter.FindBelongsInterface(net.ParseIP(pptpSetting.RangeStart))
+		if ifIndex < 0 {
+			d.SetId("")
+			return nil
+		}
+
+		d.Set("vpc_router_id", routerID)
+		d.Set("vpc_router_interface_id", vpcRouterInterfaceID(routerID, ifIndex))
 		d.Set("range_start", pptpSetting.RangeStart)
 		d.Set("range_stop", pptpSetting.RangeStop)
 	} else {

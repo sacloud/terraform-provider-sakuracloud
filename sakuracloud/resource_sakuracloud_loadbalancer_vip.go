@@ -13,10 +13,13 @@ import (
 
 func resourceSakuraCloudLoadBalancerVIP() *schema.Resource {
 	return &schema.Resource{
-		Create:        resourceSakuraCloudLoadBalancerVIPCreate,
-		Read:          resourceSakuraCloudLoadBalancerVIPRead,
-		Delete:        resourceSakuraCloudLoadBalancerVIPDelete,
-		Update:        resourceSakuraCloudLoadBalancerVIPUpdate,
+		Create: resourceSakuraCloudLoadBalancerVIPCreate,
+		Read:   resourceSakuraCloudLoadBalancerVIPRead,
+		Delete: resourceSakuraCloudLoadBalancerVIPDelete,
+		Update: resourceSakuraCloudLoadBalancerVIPUpdate,
+		Importer: &schema.ResourceImporter{
+			State: schema.ImportStatePassthrough,
+		},
 		MigrateState:  resourceSakuraCloudLoadBalancerVIPMigrateState,
 		SchemaVersion: 1,
 		Schema: map[string]*schema.Schema{
@@ -104,22 +107,32 @@ func resourceSakuraCloudLoadBalancerVIPCreate(d *schema.ResourceData, meta inter
 
 func resourceSakuraCloudLoadBalancerVIPRead(d *schema.ResourceData, meta interface{}) error {
 	client := getSacloudAPIClient(d, meta)
-	lbID := d.Get("load_balancer_id").(string)
-	_, index := expandLoadBalancerVIPID(d.Id())
+	lbID, index := expandLoadBalancerVIPID(d.Id())
+
+	if lbID == "" || index < 0 {
+		d.SetId("")
+		return nil
+	}
 
 	loadBalancer, err := client.LoadBalancer.Read(toSakuraCloudID(lbID))
 	if err != nil {
 		return fmt.Errorf("Couldn't find SakuraCloud LoadBalancer resource: %s", err)
 	}
 
-	if 0 <= index && index < len(loadBalancer.Settings.LoadBalancer) {
-		vipSetting := expandLoadBalancerVIP(d)
+	if index < len(loadBalancer.Settings.LoadBalancer) {
 		matchedSetting := loadBalancer.Settings.LoadBalancer[index]
+		d.Set("load_balancer_id", lbID)
 		d.Set("vip", matchedSetting.VirtualIPAddress)
-		d.Set("port", matchedSetting.Port)
+
+		port, _ := strconv.Atoi(matchedSetting.Port)
+		d.Set("port", port)
+
 		d.Set("servers", expandLoadBalancerServersFromVIP(loadBalancer.GetStrID(), index, matchedSetting))
-		d.Set("delay_loop", vipSetting.DelayLoop)
-		d.Set("sorry_server", vipSetting.SorryServer)
+
+		delayLoop, _ := strconv.Atoi(matchedSetting.DelayLoop)
+		d.Set("delay_loop", delayLoop)
+
+		d.Set("sorry_server", matchedSetting.SorryServer)
 		d.Set("zone", client.Zone)
 	} else {
 		d.SetId("")

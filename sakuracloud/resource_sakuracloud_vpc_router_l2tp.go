@@ -12,9 +12,12 @@ import (
 
 func resourceSakuraCloudVPCRouterL2TP() *schema.Resource {
 	return &schema.Resource{
-		Create:        resourceSakuraCloudVPCRouterL2TPCreate,
-		Read:          resourceSakuraCloudVPCRouterL2TPRead,
-		Delete:        resourceSakuraCloudVPCRouterL2TPDelete,
+		Create: resourceSakuraCloudVPCRouterL2TPCreate,
+		Read:   resourceSakuraCloudVPCRouterL2TPRead,
+		Delete: resourceSakuraCloudVPCRouterL2TPDelete,
+		Importer: &schema.ResourceImporter{
+			State: schema.ImportStatePassthrough,
+		},
 		MigrateState:  resourceSakuraCloudVPCRouterL2TPMigrateState,
 		SchemaVersion: 1,
 		Schema: map[string]*schema.Schema{
@@ -92,7 +95,12 @@ func resourceSakuraCloudVPCRouterL2TPCreate(d *schema.ResourceData, meta interfa
 func resourceSakuraCloudVPCRouterL2TPRead(d *schema.ResourceData, meta interface{}) error {
 	client := getSacloudAPIClient(d, meta)
 
-	routerID := d.Get("vpc_router_id").(string)
+	routerID := d.Id()
+	if routerID == "" {
+		d.SetId("")
+		return nil
+	}
+
 	vpcRouter, err := client.VPCRouter.Read(toSakuraCloudID(routerID))
 	if err != nil {
 		if sacloudErr, ok := err.(api.Error); ok && sacloudErr.ResponseCode() == 404 {
@@ -102,14 +110,25 @@ func resourceSakuraCloudVPCRouterL2TPRead(d *schema.ResourceData, meta interface
 		return fmt.Errorf("Couldn't find SakuraCloud VPCRouter resource: %s", err)
 	}
 
-	l2tpSetting := expandVPCRouterL2TP(d)
 	if vpcRouter.Settings != nil &&
 		vpcRouter.Settings.Router != nil &&
 		vpcRouter.Settings.Router.L2TPIPsecServer != nil &&
 		vpcRouter.Settings.Router.L2TPIPsecServer.Config != nil {
+
+		l2tpSetting := vpcRouter.Settings.Router.L2TPIPsecServer.Config
+
+		ifIndex, _ := vpcRouter.FindBelongsInterface(net.ParseIP(l2tpSetting.RangeStart))
+		if ifIndex < 0 {
+			d.SetId("")
+			return nil
+		}
+
+		d.Set("vpc_router_id", routerID)
+		d.Set("vpc_router_interface_id", vpcRouterInterfaceID(routerID, ifIndex))
 		d.Set("pre_shared_secret", l2tpSetting.PreSharedSecret)
 		d.Set("range_start", l2tpSetting.RangeStart)
 		d.Set("range_stop", l2tpSetting.RangeStop)
+
 	} else {
 		d.SetId("")
 		return nil
@@ -205,7 +224,7 @@ func migrateVPCRouterL2TPV0toV1(is *terraform.InstanceState, meta interface{}) (
 		return is, nil
 	}
 
-	is.ID = is.Attributes["vpc_router_id"]
+	is.ID = routerID
 	is.Attributes["vpc_router_interface_id"] = vpcRouterInterfaceID(routerID, ifIndex)
 
 	log.Printf("[DEBUG] Attributes after migration: %#v", is.Attributes)

@@ -12,9 +12,12 @@ import (
 
 func resourceSakuraCloudVPCRouterDHCPServer() *schema.Resource {
 	return &schema.Resource{
-		Create:        resourceSakuraCloudVPCRouterDHCPServerCreate,
-		Read:          resourceSakuraCloudVPCRouterDHCPServerRead,
-		Delete:        resourceSakuraCloudVPCRouterDHCPServerDelete,
+		Create: resourceSakuraCloudVPCRouterDHCPServerCreate,
+		Read:   resourceSakuraCloudVPCRouterDHCPServerRead,
+		Delete: resourceSakuraCloudVPCRouterDHCPServerDelete,
+		Importer: &schema.ResourceImporter{
+			State: schema.ImportStatePassthrough,
+		},
 		MigrateState:  resourceSakuraCloudVPCRouterDHCPServerMigrateState,
 		SchemaVersion: 1,
 		Schema: map[string]*schema.Schema{
@@ -97,7 +100,12 @@ func resourceSakuraCloudVPCRouterDHCPServerCreate(d *schema.ResourceData, meta i
 func resourceSakuraCloudVPCRouterDHCPServerRead(d *schema.ResourceData, meta interface{}) error {
 	client := getSacloudAPIClient(d, meta)
 
-	routerID := d.Get("vpc_router_id").(string)
+	routerID, ifIndex := expandVPCRouterDHCPServerID(d.Id())
+	if routerID == "" || ifIndex < 0 {
+		d.SetId("")
+		return nil
+	}
+
 	vpcRouter, err := client.VPCRouter.Read(toSakuraCloudID(routerID))
 	if err != nil {
 		if sacloudErr, ok := err.(api.Error); ok && sacloudErr.ResponseCode() == 404 {
@@ -107,13 +115,13 @@ func resourceSakuraCloudVPCRouterDHCPServerRead(d *schema.ResourceData, meta int
 		return fmt.Errorf("Couldn't find SakuraCloud VPCRouter resource: %s", err)
 	}
 
-	ifIndex := d.Get("vpc_router_interface_index").(int)
-	dhcpServer := expandVPCRouterDHCPServer(d)
-	if vpcRouter.Settings != nil && vpcRouter.Settings.Router != nil && vpcRouter.Settings.Router.DHCPServer != nil {
+	if vpcRouter.HasDHCPServer() {
 		if _, s := vpcRouter.Settings.Router.FindDHCPServer(ifIndex); s != nil {
-			d.Set("range_start", dhcpServer.RangeStart)
-			d.Set("range_stop", dhcpServer.RangeStop)
-			d.Set("dns_servers", dhcpServer.DNSServers)
+			d.Set("vpc_router_id", routerID)
+			d.Set("vpc_router_interface_index", ifIndex)
+			d.Set("range_start", s.RangeStart)
+			d.Set("range_stop", s.RangeStop)
+			d.Set("dns_servers", s.DNSServers)
 		} else {
 			d.SetId("")
 			return nil
@@ -159,6 +167,10 @@ func resourceSakuraCloudVPCRouterDHCPServerDelete(d *schema.ResourceData, meta i
 
 func vpcRouterDHCPServerID(routerID string, ifIndex int) string {
 	return fmt.Sprintf("%s-%d", routerID, ifIndex)
+}
+
+func expandVPCRouterDHCPServerID(id string) (string, int) {
+	return expandSubResourceID(id)
 }
 
 func expandVPCRouterDHCPServer(d *schema.ResourceData) *sacloud.VPCRouterDHCPServerConfig {

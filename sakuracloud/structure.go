@@ -259,3 +259,31 @@ func (d *resourceDataWrapper) HasChange(key string) bool {
 func (d *resourceDataWrapper) RawResourceData() *schema.ResourceData {
 	return d.ResourceData
 }
+
+func expandSubResourceID(id string) (string, int) {
+	tokens := strings.Split(id, "-")
+	if len(tokens) != 2 {
+		return "", -1
+	}
+	index, err := strconv.Atoi(tokens[1])
+	if err != nil {
+		return "", -1
+	}
+	return tokens[0], index
+}
+
+func expandSubResourceID2(id string) (string, int, int) {
+	tokens := strings.Split(id, "-")
+	if len(tokens) != 3 {
+		return "", -1, -1
+	}
+	index1, err := strconv.Atoi(tokens[1])
+	if err != nil {
+		return "", -1, -1
+	}
+	index2, err := strconv.Atoi(tokens[2])
+	if err != nil {
+		return "", -1, -1
+	}
+	return tokens[0], index1, index2
+}
