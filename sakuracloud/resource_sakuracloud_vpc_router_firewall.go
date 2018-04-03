@@ -2,6 +2,7 @@ package sakuracloud
 
 import (
 	"fmt"
+	"strings"
 
 	"bytes"
 	"github.com/hashicorp/terraform/helper/hashcode"
@@ -208,7 +209,7 @@ func resourceSakuraCloudVPCRouterFirewallRead(d *schema.ResourceData, meta inter
 			expression["dest_port"] = rule.DestinationPort
 			expression["allow"] = (rule.Action == "allow")
 			expression["protocol"] = rule.Protocol
-			expression["logging"] = rule.Logging
+			expression["logging"] = strings.ToLower(rule.Logging) == "true"
 			expression["description"] = rule.Description
 
 			expressions = append(expressions, expression)

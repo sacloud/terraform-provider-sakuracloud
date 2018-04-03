@@ -188,7 +188,7 @@ func resourceSakuraCloudVPCRouterCreate(d *schema.ResourceData, meta interface{}
 	}
 
 	//wait
-	compChan, progChan, errChan := client.VPCRouter.AsyncSleepWhileCopying(vpcRouter.ID, client.DefaultTimeoutDuration, 5)
+	compChan, progChan, errChan := client.VPCRouter.AsyncSleepWhileCopying(vpcRouter.ID, client.DefaultTimeoutDuration, 10)
 	for {
 		select {
 		case <-compChan:
@@ -263,6 +263,8 @@ func setVPCRouterResourceData(d *schema.ResourceData, client *APIClient, data *s
 
 		d.Set("global_address", data.Settings.Router.Interfaces[0].VirtualIPAddress)
 	}
+
+	setPowerManageTimeoutValueToState(d)
 
 	d.Set("zone", client.Zone)
 	d.SetId(data.GetStrID())

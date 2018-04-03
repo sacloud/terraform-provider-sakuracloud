@@ -75,7 +75,7 @@ func resourceSakuraCloudVPCRouterStaticRouteCreate(d *schema.ResourceData, meta 
 	if err != nil {
 		return fmt.Errorf("Couldn'd apply SakuraCloud VPCRouter config: %s", err)
 	}
-
+	d.SetId(vpcRouterStaticRouteIDHash(routerID, staticRoute))
 	return resourceSakuraCloudVPCRouterStaticRouteRead(d, meta)
 }
 
@@ -102,7 +102,6 @@ func resourceSakuraCloudVPCRouterStaticRouteRead(d *schema.ResourceData, meta in
 		return nil
 	}
 
-	d.SetId(vpcRouterStaticRouteIDHash(routerID, staticRoute))
 	d.Set("zone", client.Zone)
 
 	return nil

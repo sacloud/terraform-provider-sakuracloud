@@ -82,7 +82,7 @@ func resourceSakuraCloudVPCRouterStaticNATCreate(d *schema.ResourceData, meta in
 	if err != nil {
 		return fmt.Errorf("Couldn'd apply SakuraCloud VPCRouter config: %s", err)
 	}
-
+	d.SetId(vpcRouterStaticNATIDHash(routerID, staticNAT))
 	return resourceSakuraCloudVPCRouterStaticNATRead(d, meta)
 }
 
@@ -110,7 +110,6 @@ func resourceSakuraCloudVPCRouterStaticNATRead(d *schema.ResourceData, meta inte
 		return nil
 	}
 
-	d.SetId(vpcRouterStaticNATIDHash(routerID, staticNAT))
 	d.Set("zone", client.Zone)
 
 	return nil

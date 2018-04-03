@@ -143,6 +143,60 @@ resource "sakuracloud_icon" "foobar" {
 }
 `
 
+func TestAccImportSakuraCloudInternet(t *testing.T) {
+	checkFn := func(s []*terraform.InstanceState) error {
+		if len(s) != 1 {
+			return fmt.Errorf("expected 1 state: %#v", s)
+		}
+		expects := map[string]string{
+			"name":                      "myinternet_upd",
+			"nw_mask_len":               "28",
+			"band_width":                "500",
+			"enable_ipv6":               "true",
+			"graceful_shutdown_timeout": "60",
+			"description":               "description",
+			"tags.0":                    "tag1",
+			"tags.1":                    "tag2",
+			"icon_id":                   "",
+		}
+
+		if err := compareStateMulti(s[0], expects); err != nil {
+			return err
+		}
+		return stateNotEmptyMulti(s[0],
+			"switch_id",
+			"server_ids.0",
+			"nw_address",
+			"gateway",
+			"min_ipaddress",
+			"max_ipaddress",
+			"ipaddresses.0",
+			"ipv6_prefix",
+			"ipv6_prefix_len",
+			"ipv6_nw_address",
+		)
+	}
+
+	resourceName := "sakuracloud_internet.foobar"
+
+	resource.Test(t, resource.TestCase{
+		PreCheck:     func() { testAccPreCheck(t) },
+		Providers:    testAccProviders,
+		CheckDestroy: testAccCheckSakuraCloudInternetDestroy,
+		Steps: []resource.TestStep{
+			resource.TestStep{
+				Config: testAccCheckSakuraCloudInternetConfig_update,
+			},
+			resource.TestStep{
+				ResourceName:      resourceName,
+				ImportState:       true,
+				ImportStateCheck:  checkFn,
+				ImportStateVerify: true,
+			},
+		},
+	})
+}
+
 var testAccCheckSakuraCloudInternetConfig_update = `
 resource "sakuracloud_server" "foobar" {
     name = "myserver"
@@ -165,6 +219,8 @@ resource "sakuracloud_internet" "foobar" {
     name = "myinternet_upd"
     band_width = 500
     enable_ipv6 = true
+    description = "description"
+    tags = ["tag1", "tag2"]
 }`
 
 var testAccCheckSakuraCloudInternetConfig_with_server = `

@@ -128,5 +128,6 @@ func dataSourceSakuraCloudSwitchRead(d *schema.ResourceData, meta interface{}) e
 	}
 	data = &targets[0]
 
+	d.SetId(data.GetStrID())
 	return setSwitchResourceData(d, client, data)
 }

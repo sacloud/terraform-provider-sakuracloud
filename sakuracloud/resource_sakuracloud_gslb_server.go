@@ -9,6 +9,8 @@ import (
 
 	"github.com/sacloud/libsacloud/api"
 	"github.com/sacloud/libsacloud/sacloud"
+	"strconv"
+	"strings"
 )
 
 func resourceSakuraCloudGSLBServer() *schema.Resource {
@@ -93,8 +95,9 @@ func resourceSakuraCloudGSLBServerRead(d *schema.ResourceData, meta interface{})
 	}
 
 	d.Set("ipaddress", server.IPAddress)
-	d.Set("enabled", server.Enabled)
-	d.Set("weight", server.Weight)
+	d.Set("enabled", strings.ToLower(server.Enabled) == "true")
+	weight, _ := strconv.Atoi(server.Weight)
+	d.Set("weight", weight)
 
 	return nil
 }

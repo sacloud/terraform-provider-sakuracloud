@@ -82,7 +82,7 @@ func resourceSakuraCloudVPCRouterL2TPCreate(d *schema.ResourceData, meta interfa
 	if err != nil {
 		return fmt.Errorf("Couldn'd apply SakuraCloud VPCRouter config: %s", err)
 	}
-
+	d.SetId(vpcRouterL2TPIDHash(routerID, vpcRouter.Settings.Router.L2TPIPsecServer))
 	return resourceSakuraCloudVPCRouterL2TPRead(d, meta)
 }
 
@@ -112,7 +112,6 @@ func resourceSakuraCloudVPCRouterL2TPRead(d *schema.ResourceData, meta interface
 		return nil
 	}
 
-	d.SetId(vpcRouterL2TPIDHash(routerID, vpcRouter.Settings.Router.L2TPIPsecServer))
 	d.Set("zone", client.Zone)
 
 	return nil

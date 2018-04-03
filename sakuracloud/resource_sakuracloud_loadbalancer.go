@@ -288,6 +288,14 @@ func setLoadBalancerResourceData(d *schema.ResourceData, client *APIClient, data
 		d.Set("ipaddress1", data.Remark.Servers[0].(map[string]interface{})["IPAddress"])
 		d.Set("ipaddress2", "")
 	}
+
+	switch data.GetPlanID() {
+	case int64(sacloud.LoadBalancerPlanStandard):
+		d.Set("plan", "standard")
+	case int64(sacloud.LoadBalancerPlanPremium):
+		d.Set("plan", "highspec")
+	}
+
 	d.Set("nw_mask_len", data.Remark.Network.NetworkMaskLen)
 	d.Set("default_route", data.Remark.Network.DefaultRoute)
 
@@ -307,6 +315,7 @@ func setLoadBalancerResourceData(d *schema.ResourceData, client *APIClient, data
 		}
 	}
 
+	setPowerManageTimeoutValueToState(d)
 	d.Set("zone", client.Zone)
 	d.SetId(data.GetStrID())
 	return nil
