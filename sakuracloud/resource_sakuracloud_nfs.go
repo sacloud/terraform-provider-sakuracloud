@@ -242,6 +242,8 @@ func setNFSResourceData(d *schema.ResourceData, client *APIClient, data *sacloud
 	d.Set("description", data.Description)
 	d.Set("tags", realTags(client, data.Tags))
 
+	setPowerManageTimeoutValueToState(d)
+
 	d.Set("zone", client.Zone)
 	d.SetId(data.GetStrID())
 	return nil

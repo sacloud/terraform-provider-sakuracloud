@@ -131,6 +131,56 @@ func testAccCheckSakuraCloudDatabaseDestroy(s *terraform.State) error {
 	return nil
 }
 
+func TestAccImportSakuraCloudDatabase(t *testing.T) {
+	checkFn := func(s []*terraform.InstanceState) error {
+		if len(s) != 1 {
+			return fmt.Errorf("expected 1 state: %#v", s)
+		}
+		expects := map[string]string{
+			"name":             "name_before",
+			"database_type":    "mariadb",
+			"description":      "description_before",
+			"plan":             "30g",
+			"user_name":        "defuser",
+			"user_password":    "DatabasePasswordUser397",
+			"allow_networks.0": "192.168.11.0/24",
+			"allow_networks.1": "192.168.12.0/24",
+			"port":             "33061",
+			"backup_time":      "00:00",
+			"ipaddress1":       "192.168.11.101",
+			"nw_mask_len":      "24",
+			"default_route":    "192.168.11.1",
+			"tags.0":           "hoge1",
+			"tags.1":           "hoge2",
+			"zone":             "is1b",
+		}
+
+		if err := compareStateMulti(s[0], expects); err != nil {
+			return err
+		}
+		return stateNotEmptyMulti(s[0], "icon_id", "switch_id")
+	}
+
+	resourceName := "sakuracloud_database.foobar"
+
+	resource.Test(t, resource.TestCase{
+		PreCheck:     func() { testAccPreCheck(t) },
+		Providers:    testAccProviders,
+		CheckDestroy: testAccCheckSakuraCloudDatabaseDestroy,
+		Steps: []resource.TestStep{
+			resource.TestStep{
+				Config: testAccCheckSakuraCloudDatabaseConfig_WithSwitch,
+			},
+			resource.TestStep{
+				ResourceName:      resourceName,
+				ImportState:       true,
+				ImportStateCheck:  checkFn,
+				ImportStateVerify: true,
+			},
+		},
+	})
+}
+
 const testAccCheckSakuraCloudDatabaseConfig_WithSwitch = `
 resource "sakuracloud_switch" "sw" {
     name = "sw"

@@ -123,6 +123,51 @@ func testAccCheckSakuraCloudGSLBDestroy(s *terraform.State) error {
 	return nil
 }
 
+func TestAccImportSakuraCloudGSLB(t *testing.T) {
+	checkFn := func(s []*terraform.InstanceState) error {
+		if len(s) != 1 {
+			return fmt.Errorf("expected 1 state: %#v", s)
+		}
+		expects := map[string]string{
+			"name": "terraform.io",
+			"health_check.1802742300.protocol":    "http",
+			"health_check.1802742300.delay_loop":  "10",
+			"health_check.1802742300.host_header": "terraform.io",
+			"health_check.1802742300.path":        "/",
+			"health_check.1802742300.status":      "200",
+			"weighted":                            "false",
+			"sorry_server":                        "8.8.8.8",
+			"description":                         "GSLB from TerraForm for SAKURA CLOUD",
+			"tags.0":                              "hoge1",
+			"tags.1":                              "hoge2",
+		}
+
+		if err := compareStateMulti(s[0], expects); err != nil {
+			return err
+		}
+		return stateNotEmptyMulti(s[0], "icon_id", "fqdn")
+	}
+
+	resourceName := "sakuracloud_gslb.foobar"
+
+	resource.Test(t, resource.TestCase{
+		PreCheck:     func() { testAccPreCheck(t) },
+		Providers:    testAccProviders,
+		CheckDestroy: testAccCheckSakuraCloudGSLBDestroy,
+		Steps: []resource.TestStep{
+			resource.TestStep{
+				Config: testAccCheckSakuraCloudGSLBConfig_basic,
+			},
+			resource.TestStep{
+				ResourceName:      resourceName,
+				ImportState:       true,
+				ImportStateCheck:  checkFn,
+				ImportStateVerify: true,
+			},
+		},
+	})
+}
+
 var testAccCheckSakuraCloudGSLBConfig_basic = `
 resource "sakuracloud_gslb" "foobar" {
     name = "terraform.io"

@@ -214,6 +214,8 @@ func setPrivateHostResourceData(d *schema.ResourceData, client *APIClient, data 
 	d.Set("assigned_core", data.GetAssignedCPU())
 	d.Set("assigned_memory", data.GetAssignedMemoryGB())
 
+	setPowerManageTimeoutValueToState(d)
+
 	d.Set("zone", client.Zone)
 	d.SetId(data.GetStrID())
 	return nil

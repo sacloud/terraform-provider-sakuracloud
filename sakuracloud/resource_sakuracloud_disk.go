@@ -432,6 +432,12 @@ func setDiskResourceData(d *schema.ResourceData, client *APIClient, data *saclou
 
 	}
 
+	if data.SourceDisk != nil {
+		d.Set("source_disk_id", data.SourceDisk.GetStrID())
+	} else if data.SourceArchive != nil {
+		d.Set("source_archive_id", data.SourceArchive.GetStrID())
+	}
+
 	d.Set("connector", fmt.Sprintf("%s", data.Connection))
 	d.Set("size", toSizeGB(data.SizeMB))
 	d.Set("icon_id", data.GetIconStrID())
@@ -443,6 +449,8 @@ func setDiskResourceData(d *schema.ResourceData, client *APIClient, data *saclou
 	} else {
 		d.Set("server_id", data.Server.GetStrID())
 	}
+
+	setPowerManageTimeoutValueToState(d)
 
 	d.Set("zone", client.Zone)
 	d.SetId(data.GetStrID())

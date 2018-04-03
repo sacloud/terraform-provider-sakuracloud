@@ -6,6 +6,7 @@ import (
 
 	"github.com/sacloud/libsacloud/api"
 	"github.com/sacloud/libsacloud/sacloud"
+	"strconv"
 	"strings"
 )
 
@@ -357,7 +358,8 @@ func setDatabaseResourceData(d *schema.ResourceData, client *APIClient, data *sa
 	}
 
 	d.Set("allow_networks", data.Settings.DBConf.Common.SourceNetwork)
-	d.Set("port", data.Settings.DBConf.Common.ServicePort)
+	port, _ := strconv.Atoi(data.Settings.DBConf.Common.ServicePort)
+	d.Set("port", port)
 
 	d.Set("backup_rotate", data.Settings.DBConf.Backup.Rotate)
 	d.Set("backup_time", data.Settings.DBConf.Backup.Time)
@@ -376,6 +378,7 @@ func setDatabaseResourceData(d *schema.ResourceData, client *APIClient, data *sa
 		}
 	}
 	d.Set("tags", realTags(client, tags))
+	setPowerManageTimeoutValueToState(d)
 
 	d.Set("zone", client.Zone)
 	d.SetId(data.GetStrID())

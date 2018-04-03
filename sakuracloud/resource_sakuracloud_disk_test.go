@@ -122,6 +122,58 @@ func testAccCheckSakuraCloudDiskDestroy(s *terraform.State) error {
 	return nil
 }
 
+func TestAccImportSakuraCloudDisk(t *testing.T) {
+	checkFn := func(s []*terraform.InstanceState) error {
+		if len(s) != 1 {
+			return fmt.Errorf("expected 1 state: %#v", s)
+		}
+		expects := map[string]string{
+			"name":           "mydisk",
+			"plan":           "ssd",
+			"connector":      "virtio",
+			"size":           "20",
+			"source_disk_id": "",
+			"server_id":      "",
+			"description":    "Disk from TerraForm for SAKURA CLOUD",
+			"tags.0":         "hoge1",
+			"tags.1":         "hoge2",
+			"zone":           "is1b",
+			"graceful_shutdown_timeout": "60",
+		}
+
+		if err := compareStateMulti(s[0], expects); err != nil {
+			return err
+		}
+		return stateNotEmptyMulti(s[0], "source_archive_id", "icon_id")
+	}
+
+	resourceName := "sakuracloud_disk.foobar"
+
+	resource.Test(t, resource.TestCase{
+		PreCheck:     func() { testAccPreCheck(t) },
+		Providers:    testAccProviders,
+		CheckDestroy: testAccCheckSakuraCloudDiskDestroy,
+		Steps: []resource.TestStep{
+			resource.TestStep{
+				Config: testAccCheckSakuraCloudDiskConfig_basic,
+			},
+			resource.TestStep{
+				ResourceName:      resourceName,
+				ImportState:       true,
+				ImportStateCheck:  checkFn,
+				ImportStateVerify: true,
+				ImportStateVerifyIgnore: []string{
+					"hostname",
+					"password",
+					"ssh_key_ids",
+					"disable_pw_auth",
+					"note_ids",
+				},
+			},
+		},
+	})
+}
+
 var testAccCheckSakuraCloudDiskConfig_basic = `
 data "sakuracloud_archive" "ubuntu" {
     filter = {

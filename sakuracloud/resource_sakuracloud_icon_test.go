@@ -116,6 +116,47 @@ func testAccCheckSakuraCloudIconDestroy(s *terraform.State) error {
 	return nil
 }
 
+func TestAccImportSakuraCloudIcon(t *testing.T) {
+	checkFn := func(s []*terraform.InstanceState) error {
+		if len(s) != 1 {
+			return fmt.Errorf("expected 1 state: %#v", s)
+		}
+		expects := map[string]string{
+			"name":   "myicon",
+			"tags.0": "tag1",
+			"tags.1": "tag2",
+		}
+
+		if err := compareStateMulti(s[0], expects); err != nil {
+			return err
+		}
+		return stateNotEmptyMulti(s[0], "body", "url")
+	}
+
+	resourceName := "sakuracloud_icon.foobar"
+
+	resource.Test(t, resource.TestCase{
+		PreCheck:     func() { testAccPreCheck(t) },
+		Providers:    testAccProviders,
+		CheckDestroy: testAccCheckSakuraCloudIconDestroy,
+		Steps: []resource.TestStep{
+			resource.TestStep{
+				Config: testAccCheckSakuraCloudIconConfig_basic,
+			},
+			resource.TestStep{
+				ResourceName:      resourceName,
+				ImportState:       true,
+				ImportStateCheck:  checkFn,
+				ImportStateVerify: true,
+				ImportStateVerifyIgnore: []string{
+					"source",
+					"base64content",
+				},
+			},
+		},
+	})
+}
+
 const testAccCheckSakuraCloudIconConfig_basic = `
 resource "sakuracloud_icon" "foobar" {
   name = "myicon"

@@ -12,6 +12,8 @@ import (
 	"strings"
 )
 
+const defaultTTL = 3600
+
 func resourceSakuraCloudDNSRecord() *schema.Resource {
 	return &schema.Resource{
 		Create: resourceSakuraCloudDNSRecordCreate,
@@ -46,7 +48,7 @@ func resourceSakuraCloudDNSRecord() *schema.Resource {
 			"ttl": {
 				Type:     schema.TypeInt,
 				Optional: true,
-				Default:  3600,
+				Default:  defaultTTL,
 				ForceNew: true,
 			},
 

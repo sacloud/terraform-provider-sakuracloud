@@ -2,6 +2,7 @@ package sakuracloud
 
 import (
 	"fmt"
+	"strconv"
 
 	"bytes"
 	"github.com/hashicorp/terraform/helper/schema"
@@ -111,9 +112,13 @@ func resourceSakuraCloudLoadBalancerVIPRead(d *schema.ResourceData, meta interfa
 	if matchedSetting == nil {
 		return fmt.Errorf("Couldn't find SakuraCloud LoadBalancerVIP resource: %v", vipSetting)
 	}
+	d.Set("vip", matchedSetting.VirtualIPAddress)
+	port, _ := strconv.Atoi(matchedSetting.Port)
+	d.Set("port", port)
 	d.Set("servers", expandLoadBalancerServersFromVIP(loadBalancer.GetStrID(), matchedSetting))
 
-	d.Set("delay_loop", vipSetting.DelayLoop)
+	delayLoop, _ := strconv.Atoi(matchedSetting.DelayLoop)
+	d.Set("delay_loop", delayLoop)
 	d.Set("sorry_server", vipSetting.SorryServer)
 	d.Set("zone", client.Zone)
 

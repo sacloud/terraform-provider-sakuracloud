@@ -116,6 +116,52 @@ func testAccCheckSakuraCloudCDROMDestroy(s *terraform.State) error {
 	return nil
 }
 
+func TestAccImportSakuraCloudCDROM(t *testing.T) {
+	checkFn := func(s []*terraform.InstanceState) error {
+		if len(s) != 1 {
+			return fmt.Errorf("expected 1 state: %#v", s)
+		}
+		expects := map[string]string{
+			"name":        "mycdrom",
+			"size":        "5",
+			"description": "description",
+			"tags.0":      "tag1",
+			"tags.1":      "tag2",
+			"zone":        "is1b",
+		}
+
+		if err := compareStateMulti(s[0], expects); err != nil {
+			return err
+		}
+		return stateNotEmptyMulti(s[0], "icon_id")
+	}
+
+	resourceName := "sakuracloud_cdrom.foobar"
+
+	resource.Test(t, resource.TestCase{
+		PreCheck:     func() { testAccPreCheck(t) },
+		Providers:    testAccProviders,
+		CheckDestroy: testAccCheckSakuraCloudCDROMDestroy,
+		Steps: []resource.TestStep{
+			resource.TestStep{
+				Config: testAccCheckSakuraCloudCDROMConfig_basic,
+			},
+			resource.TestStep{
+				ResourceName:      resourceName,
+				ImportState:       true,
+				ImportStateCheck:  checkFn,
+				ImportStateVerify: true,
+				ImportStateVerifyIgnore: []string{
+					"iso_image_file",
+					"content",
+					"content_file_name",
+					"hash",
+				},
+			},
+		},
+	})
+}
+
 var testAccCheckSakuraCloudCDROMConfig_basic = `
 resource "sakuracloud_cdrom" "foobar" {
     name = "mycdrom"

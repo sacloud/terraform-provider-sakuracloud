@@ -16,14 +16,15 @@ var (
 	powerManageTimeoutParam = &schema.Schema{
 		Type:     schema.TypeInt,
 		Optional: true,
-		Default:  60,
+		Default:  defaultPowerManageTimeout,
 	}
 	powerManageTimeoutParamForceNew = &schema.Schema{
 		Type:     schema.TypeInt,
 		Optional: true,
-		Default:  60,
+		Default:  defaultPowerManageTimeout,
 		ForceNew: true,
 	}
+	defaultPowerManageTimeout = 60
 )
 
 func handleShutdown(handler shutdownHandler, id int64, d *schema.ResourceData, defaultTimeOut time.Duration) error {
@@ -49,4 +50,10 @@ func handleShutdown(handler shutdownHandler, id int64, d *schema.ResourceData, d
 	}
 
 	return handler.SleepUntilDown(id, timeout)
+}
+
+func setPowerManageTimeoutValueToState(d *schema.ResourceData) {
+	if _, ok := d.GetOk(powerManageTimeoutKey); !ok {
+		d.Set(powerManageTimeoutKey, defaultPowerManageTimeout)
+	}
 }

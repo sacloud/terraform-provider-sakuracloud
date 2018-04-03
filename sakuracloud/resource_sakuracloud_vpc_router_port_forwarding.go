@@ -2,6 +2,7 @@ package sakuracloud
 
 import (
 	"fmt"
+	"strconv"
 
 	"bytes"
 	"github.com/hashicorp/terraform/helper/hashcode"
@@ -96,6 +97,7 @@ func resourceSakuraCloudVPCRouterPortForwardingCreate(d *schema.ResourceData, me
 		return fmt.Errorf("Couldn'd apply SakuraCloud VPCRouter config: %s", err)
 	}
 
+	d.SetId(vpcRouterPortForwardingIDHash(routerID, pf))
 	return resourceSakuraCloudVPCRouterPortForwardingRead(d, meta)
 }
 
@@ -116,16 +118,17 @@ func resourceSakuraCloudVPCRouterPortForwardingRead(d *schema.ResourceData, meta
 	if vpcRouter.Settings != nil && vpcRouter.Settings.Router != nil && vpcRouter.Settings.Router.PortForwarding != nil &&
 		vpcRouter.Settings.Router.FindPortForwarding(pf.Protocol, pf.GlobalPort, pf.PrivateAddress, pf.PrivatePort) != nil {
 		d.Set("protocol", pf.Protocol)
-		d.Set("global_port", pf.GlobalPort)
+		globalPort, _ := strconv.Atoi(pf.GlobalPort)
+		d.Set("global_port", globalPort)
 		d.Set("private_address", pf.PrivateAddress)
-		d.Set("private_port", pf.PrivatePort)
+		privatePort, _ := strconv.Atoi(pf.PrivatePort)
+		d.Set("private_port", privatePort)
 		d.Set("description", pf.Description)
 	} else {
 		d.SetId("")
 		return nil
 	}
 
-	d.SetId(vpcRouterPortForwardingIDHash(routerID, pf))
 	d.Set("zone", client.Zone)
 
 	return nil

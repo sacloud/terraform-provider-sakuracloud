@@ -161,7 +161,7 @@ func resourceSakuraCloudVPCRouterSiteToSiteIPsecVPNCreate(d *schema.ResourceData
 	if err != nil {
 		return fmt.Errorf("Couldn'd apply SakuraCloud VPCRouter config: %s", err)
 	}
-
+	d.SetId(vpcRouterSiteToSiteIPsecVPNIDHash(routerID, s2s))
 	return resourceSakuraCloudVPCRouterSiteToSiteIPsecVPNRead(d, meta)
 }
 
@@ -223,7 +223,6 @@ func resourceSakuraCloudVPCRouterSiteToSiteIPsecVPNRead(d *schema.ResourceData, 
 		}
 	}
 
-	d.SetId(vpcRouterSiteToSiteIPsecVPNIDHash(routerID, s2s))
 	d.Set("zone", client.Zone)
 
 	return nil

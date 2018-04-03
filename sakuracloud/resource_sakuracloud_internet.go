@@ -362,6 +362,8 @@ func setInternetResourceData(d *schema.ResourceData, client *APIClient, data *sa
 		d.Set("ipv6_nw_address", nwAddress)
 	}
 
+	setPowerManageTimeoutValueToState(d)
+
 	d.Set("zone", client.Zone)
 	d.SetId(data.GetStrID())
 	return nil

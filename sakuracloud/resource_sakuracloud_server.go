@@ -501,7 +501,7 @@ func resourceSakuraCloudServerUpdate(d *schema.ResourceData, meta interface{}) e
 						return fmt.Errorf("Error editting SakuraCloud DiskConfig: %s", err)
 					}
 				} else {
-					log.Printf("[WARN] Disk[%s] does not support modify disk", diskID)
+					log.Printf("[WARN] Disk[%d] does not support modify disk", diskID)
 				}
 
 			}
@@ -751,8 +751,8 @@ func setServerResourceData(d *schema.ResourceData, client *APIClient, data *sacl
 		}
 	}
 
+	setPowerManageTimeoutValueToState(d)
 	d.Set("zone", client.Zone)
-	d.SetId(data.GetStrID())
 	return nil
 }
 

@@ -27,12 +27,6 @@ func resourceSakuraCloudLoadBalancerServer() *schema.Resource {
 				ForceNew: true,
 				Required: true,
 			},
-			//"port": {
-			//	Type:         schema.TypeInt,
-			//	Required:     true,
-			//	ForceNew:     true,
-			//	ValidateFunc: validateIntegerInRange(1, 65535),
-			//},
 			"check_protocol": {
 				Type:         schema.TypeString,
 				Required:     true,
@@ -153,7 +147,7 @@ func resourceSakuraCloudLoadBalancerServerRead(d *schema.ResourceData, meta inte
 	d.Set("check_protocol", server.HealthCheck.Protocol)
 	d.Set("check_path", server.HealthCheck.Path)
 	d.Set("check_status", server.HealthCheck.Status)
-	d.Set("enabled", server.Enabled)
+	d.Set("enabled", strings.ToLower(server.Enabled) == "true")
 	d.Set("zone", client.Zone)
 
 	return nil
