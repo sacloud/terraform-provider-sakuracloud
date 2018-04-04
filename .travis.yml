@@ -2,7 +2,7 @@ sudo: required
 services: docker
 language: go
 go:
-- 1.9
+- "1.10"
 env:
   global:
   - PATH=/home/travis/gopath/bin:$PATH DEBIAN_FRONTEND=noninteractive
