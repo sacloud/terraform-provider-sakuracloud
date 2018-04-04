@@ -43,7 +43,7 @@ func resourceSakuraCloudDatabase() *schema.Resource {
 				ForceNew:     true,
 				Optional:     true,
 				Default:      "10g",
-				ValidateFunc: validateStringInWord([]string{"10g", "30g", "90g", "240g"}),
+				ValidateFunc: validateStringInWord([]string{"10g", "30g", "90g", "240g", "500g", "1t"}),
 			},
 			"user_name": {
 				Type:     schema.TypeString,
@@ -172,6 +172,10 @@ func resourceSakuraCloudDatabaseCreate(d *schema.ResourceData, meta interface{})
 		opts.Plan = sacloud.DatabasePlan90G
 	case "240g":
 		opts.Plan = sacloud.DatabasePlan240G
+	case "500g":
+		opts.Plan = sacloud.DatabasePlan500G
+	case "1t":
+		opts.Plan = sacloud.DatabasePlan1T
 	}
 
 	if iconID, ok := d.GetOk("icon_id"); ok {
@@ -356,6 +360,10 @@ func setDatabaseResourceData(d *schema.ResourceData, client *APIClient, data *sa
 		d.Set("plan", "90g")
 	case int64(sacloud.DatabasePlan240G):
 		d.Set("plan", "240g")
+	case int64(sacloud.DatabasePlan500G):
+		d.Set("plan", "500g")
+	case int64(sacloud.DatabasePlan1T):
+		d.Set("plan", "1t")
 
 	}
 
