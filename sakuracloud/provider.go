@@ -36,6 +36,11 @@ func Provider() terraform.ResourceProvider {
 				InputDefault: defaultZone,
 				ValidateFunc: validateZone([]string{"is1a", "is1b", "tk1a", "tk1v"}),
 			},
+			"accept_language": {
+				Type:        schema.TypeString,
+				Optional:    true,
+				DefaultFunc: schema.MultiEnvDefaultFunc([]string{"SAKURACLOUD_ACCEPT_LANGUAGE"}, ""),
+			},
 			"api_root_url": {
 				Type:        schema.TypeString,
 				Optional:    true,
