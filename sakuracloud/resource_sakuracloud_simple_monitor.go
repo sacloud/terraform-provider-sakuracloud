@@ -4,13 +4,13 @@ import (
 	"fmt"
 
 	"errors"
-	"github.com/hashicorp/terraform/helper/hashcode"
+
 	"github.com/hashicorp/terraform/helper/schema"
+
+	"strconv"
 
 	"github.com/sacloud/libsacloud/api"
 	"github.com/sacloud/libsacloud/sacloud"
-	"strconv"
-	"strings"
 )
 
 func resourceSakuraCloudSimpleMonitor() *schema.Resource {
@@ -30,8 +30,10 @@ func resourceSakuraCloudSimpleMonitor() *schema.Resource {
 				ForceNew: true,
 			},
 			"health_check": {
-				Type:     schema.TypeSet,
+				Type:     schema.TypeList,
 				Required: true,
+				MaxItems: 1,
+				MinItems: 1,
 
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
@@ -141,78 +143,76 @@ func resourceSakuraCloudSimpleMonitorCreate(d *schema.ResourceData, meta interfa
 
 	opts := client.SimpleMonitor.New(d.Get("target").(string))
 
-	healthCheckConf := d.Get("health_check").(*schema.Set)
-	for _, c := range healthCheckConf.List() {
-		conf := c.(map[string]interface{})
-		protocol := conf["protocol"].(string)
-		port := ""
-		if _, ok := conf["port"]; ok {
-			port = strconv.Itoa(conf["port"].(int))
-			if port == "0" {
-				port = ""
-			}
+	healthCheckConf := d.Get("health_check").([]interface{})
+	conf := healthCheckConf[0].(map[string]interface{})
+	protocol := conf["protocol"].(string)
+	port := ""
+	if _, ok := conf["port"]; ok {
+		port = strconv.Itoa(conf["port"].(int))
+		if port == "0" {
+			port = ""
 		}
-
-		switch protocol {
-		case "http":
-			if port == "" {
-				port = "80"
-			}
-			opts.SetHealthCheckHTTP(port,
-				forceString(conf["path"]),
-				forceString(conf["status"]),
-				forceString(conf["host_header"]))
-		case "https":
-			if port == "" {
-				port = "443"
-			}
-			opts.SetHealthCheckHTTPS(port,
-				forceString(conf["path"]),
-				forceString(conf["status"]),
-				forceString(conf["host_header"]))
-
-		case "dns":
-			opts.SetHealthCheckDNS(forceString(conf["qname"]),
-				forceString(conf["expected_data"]))
-		case "snmp":
-			opts.SetHealthCheckSNMP(forceString(conf["community"]),
-				forceString(conf["snmp_version"]),
-				forceString(conf["oid"]),
-				forceString(conf["expected_data"]))
-		case "tcp":
-			opts.SetHealthCheckTCP(port)
-		case "ssh":
-			if port == "" {
-				port = "22"
-			}
-			opts.SetHealthCheckSSH(port)
-		case "smtp":
-			if port == "" {
-				port = "25"
-			}
-			opts.SetHealthCheckSMTP(port)
-		case "pop3":
-			if port == "" {
-				port = "110"
-			}
-			opts.SetHealthCheckPOP3(port)
-
-		case "ping":
-			opts.SetHealthCheckPing()
-		case "sslcertificate":
-			days := 0
-			if v, ok := conf["remaining_days"]; ok {
-				days = v.(int)
-			}
-			opts.SetHealthCheckSSLCertificate(days)
-		}
-
-		delayLoop := 0
-		if v, ok := conf["delay_loop"]; ok {
-			delayLoop = v.(int)
-		}
-		opts.Settings.SimpleMonitor.DelayLoop = delayLoop
 	}
+
+	switch protocol {
+	case "http":
+		if port == "" {
+			port = "80"
+		}
+		opts.SetHealthCheckHTTP(port,
+			forceString(conf["path"]),
+			forceString(conf["status"]),
+			forceString(conf["host_header"]))
+	case "https":
+		if port == "" {
+			port = "443"
+		}
+		opts.SetHealthCheckHTTPS(port,
+			forceString(conf["path"]),
+			forceString(conf["status"]),
+			forceString(conf["host_header"]))
+
+	case "dns":
+		opts.SetHealthCheckDNS(forceString(conf["qname"]),
+			forceString(conf["expected_data"]))
+	case "snmp":
+		opts.SetHealthCheckSNMP(forceString(conf["community"]),
+			forceString(conf["snmp_version"]),
+			forceString(conf["oid"]),
+			forceString(conf["expected_data"]))
+	case "tcp":
+		opts.SetHealthCheckTCP(port)
+	case "ssh":
+		if port == "" {
+			port = "22"
+		}
+		opts.SetHealthCheckSSH(port)
+	case "smtp":
+		if port == "" {
+			port = "25"
+		}
+		opts.SetHealthCheckSMTP(port)
+	case "pop3":
+		if port == "" {
+			port = "110"
+		}
+		opts.SetHealthCheckPOP3(port)
+
+	case "ping":
+		opts.SetHealthCheckPing()
+	case "sslcertificate":
+		days := 0
+		if v, ok := conf["remaining_days"]; ok {
+			days = v.(int)
+		}
+		opts.SetHealthCheckSSLCertificate(days)
+	}
+
+	delayLoop := 0
+	if v, ok := conf["delay_loop"]; ok {
+		delayLoop = v.(int)
+	}
+	opts.Settings.SimpleMonitor.DelayLoop = delayLoop
 	if iconID, ok := d.GetOk("icon_id"); ok {
 		opts.SetIconByID(toSakuraCloudID(iconID.(string)))
 	}
@@ -275,78 +275,76 @@ func resourceSakuraCloudSimpleMonitorUpdate(d *schema.ResourceData, meta interfa
 	}
 
 	if d.HasChange("health_check") {
-		healthCheckConf := d.Get("health_check").(*schema.Set)
-		for _, c := range healthCheckConf.List() {
-			conf := c.(map[string]interface{})
-			protocol := conf["protocol"].(string)
-			port := ""
-			if _, ok := conf["port"]; ok {
-				port = strconv.Itoa(conf["port"].(int))
-				if port == "0" {
-					port = ""
-				}
+		healthCheckConf := d.Get("health_check").([]interface{})
+		conf := healthCheckConf[0].(map[string]interface{})
+		protocol := conf["protocol"].(string)
+		port := ""
+		if _, ok := conf["port"]; ok {
+			port = strconv.Itoa(conf["port"].(int))
+			if port == "0" {
+				port = ""
 			}
-
-			switch protocol {
-			case "http":
-				if port == "" {
-					port = "80"
-				}
-				simpleMonitor.SetHealthCheckHTTP(port,
-					forceString(conf["path"]),
-					forceString(conf["status"]),
-					forceString(conf["host_header"]))
-			case "https":
-				if port == "" {
-					port = "443"
-				}
-				simpleMonitor.SetHealthCheckHTTPS(port,
-					forceString(conf["path"]),
-					forceString(conf["status"]),
-					forceString(conf["host_header"]))
-
-			case "dns":
-				simpleMonitor.SetHealthCheckDNS(forceString(conf["qname"]),
-					forceString(conf["expected_data"]))
-			case "snmp":
-				simpleMonitor.SetHealthCheckSNMP(forceString(conf["community"]),
-					forceString(conf["snmp_version"]),
-					forceString(conf["oid"]),
-					forceString(conf["expected_data"]))
-			case "tcp":
-				simpleMonitor.SetHealthCheckTCP(port)
-			case "ssh":
-				if port == "" {
-					port = "22"
-				}
-				simpleMonitor.SetHealthCheckSSH(port)
-			case "smtp":
-				if port == "" {
-					port = "25"
-				}
-				simpleMonitor.SetHealthCheckSMTP(port)
-			case "pop3":
-				if port == "" {
-					port = "110"
-				}
-				simpleMonitor.SetHealthCheckPOP3(port)
-
-			case "ping":
-				simpleMonitor.SetHealthCheckPing()
-			case "sslcertificate":
-				days := 0
-				if v, ok := conf["remaining_days"]; ok {
-					days = v.(int)
-				}
-				simpleMonitor.SetHealthCheckSSLCertificate(days)
-			}
-
-			delayLoop := 0
-			if v, ok := conf["delay_loop"]; ok {
-				delayLoop = v.(int)
-			}
-			simpleMonitor.Settings.SimpleMonitor.DelayLoop = delayLoop
 		}
+
+		switch protocol {
+		case "http":
+			if port == "" {
+				port = "80"
+			}
+			simpleMonitor.SetHealthCheckHTTP(port,
+				forceString(conf["path"]),
+				forceString(conf["status"]),
+				forceString(conf["host_header"]))
+		case "https":
+			if port == "" {
+				port = "443"
+			}
+			simpleMonitor.SetHealthCheckHTTPS(port,
+				forceString(conf["path"]),
+				forceString(conf["status"]),
+				forceString(conf["host_header"]))
+
+		case "dns":
+			simpleMonitor.SetHealthCheckDNS(forceString(conf["qname"]),
+				forceString(conf["expected_data"]))
+		case "snmp":
+			simpleMonitor.SetHealthCheckSNMP(forceString(conf["community"]),
+				forceString(conf["snmp_version"]),
+				forceString(conf["oid"]),
+				forceString(conf["expected_data"]))
+		case "tcp":
+			simpleMonitor.SetHealthCheckTCP(port)
+		case "ssh":
+			if port == "" {
+				port = "22"
+			}
+			simpleMonitor.SetHealthCheckSSH(port)
+		case "smtp":
+			if port == "" {
+				port = "25"
+			}
+			simpleMonitor.SetHealthCheckSMTP(port)
+		case "pop3":
+			if port == "" {
+				port = "110"
+			}
+			simpleMonitor.SetHealthCheckPOP3(port)
+
+		case "ping":
+			simpleMonitor.SetHealthCheckPing()
+		case "sslcertificate":
+			days := 0
+			if v, ok := conf["remaining_days"]; ok {
+				days = v.(int)
+			}
+			simpleMonitor.SetHealthCheckSSLCertificate(days)
+		}
+
+		delayLoop := 0
+		if v, ok := conf["delay_loop"]; ok {
+			delayLoop = v.(int)
+		}
+		simpleMonitor.Settings.SimpleMonitor.DelayLoop = delayLoop
 	}
 
 	if d.HasChange("icon_id") {
@@ -417,85 +415,13 @@ func resourceSakuraCloudSimpleMonitorDelete(d *schema.ResourceData, meta interfa
 	return nil
 }
 
-func healthCheckSimpleMonitorHash(v interface{}) int {
-	target := v.(map[string]interface{})
-
-	protocol := target["protocol"].(string)
-	path := ""
-	status := ""
-	port := ""
-	qname := ""
-	ed := ""
-	community := ""
-	snmpVersion := ""
-	oid := ""
-	remainingDays := ""
-	delayLoop := ""
-
-	switch protocol {
-	case "http", "https":
-		path = target["path"].(string)
-		status = target["status"].(string)
-		if v, ok := target["port"]; ok {
-			port = v.(string)
-		}
-	case "tcp", "ssh", "smtp", "pop3":
-		if v, ok := target["port"]; ok {
-			port = v.(string)
-		}
-	case "dns":
-		qname = target["qname"].(string)
-		ed = target["expected_data"].(string)
-	case "snmp":
-		community = target["community"].(string)
-		snmpVersion = target["snmp_version"].(string)
-		oid = target["oid"].(string)
-		ed = target["expected_data"].(string)
-	case "sslcertificate":
-		// noop
-	}
-
-	if v, ok := target["remaining_days"]; ok {
-		remainingDays = fmt.Sprintf("%d", v.(int))
-	}
-	if v, ok := target["delay_loop"]; ok {
-		delayLoop = fmt.Sprintf("%d", v.(int))
-	}
-
-	hk := strings.Join([]string{
-		protocol,
-		delayLoop,
-		path,
-		status,
-		port,
-		qname,
-		ed,
-		community,
-		snmpVersion,
-		oid,
-		remainingDays,
-	}, ":")
-	return hashcode.String(hk)
-}
-
 func setSimpleMonitorResourceData(d *schema.ResourceData, client *APIClient, data *sacloud.SimpleMonitor) error {
 
 	d.Set("target", data.Status.Target)
 
 	healthCheck := map[string]interface{}{}
 
-	healthCheckConf := d.Get("health_check").(*schema.Set)
 	port := ""
-	for _, c := range healthCheckConf.List() {
-		conf := c.(map[string]interface{})
-		if _, ok := conf["port"]; ok {
-			port = strconv.Itoa(conf["port"].(int))
-			if port == "0" {
-				port = ""
-			}
-		}
-	}
-
 	readHealthCheck := data.Settings.SimpleMonitor.HealthCheck
 	switch data.Settings.SimpleMonitor.HealthCheck.Protocol {
 	case "http":
@@ -550,7 +476,7 @@ func setSimpleMonitorResourceData(d *schema.ResourceData, client *APIClient, dat
 	healthCheck["protocol"] = data.Settings.SimpleMonitor.HealthCheck.Protocol
 	healthCheck["delay_loop"] = data.Settings.SimpleMonitor.DelayLoop
 
-	d.Set("health_check", schema.NewSet(healthCheckSimpleMonitorHash, []interface{}{healthCheck}))
+	d.Set("health_check", []interface{}{healthCheck})
 
 	d.Set("icon_id", data.GetIconStrID())
 	d.Set("description", data.Description)
