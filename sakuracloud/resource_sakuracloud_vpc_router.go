@@ -231,6 +231,11 @@ func resourceSakuraCloudVPCRouterRead(d *schema.ResourceData, meta interface{}) 
 
 func setVPCRouterResourceData(d *schema.ResourceData, client *APIClient, data *sacloud.VPCRouter) error {
 
+	if data.IsFailed() {
+		d.SetId("")
+		return fmt.Errorf("VPCRouter[%d] state is failed", data.ID)
+	}
+
 	d.Set("name", data.Name)
 	d.Set("icon_id", data.GetIconStrID())
 	d.Set("description", data.Description)
@@ -267,7 +272,6 @@ func setVPCRouterResourceData(d *schema.ResourceData, client *APIClient, data *s
 	setPowerManageTimeoutValueToState(d)
 
 	d.Set("zone", client.Zone)
-	d.SetId(data.GetStrID())
 	return nil
 }
 
@@ -324,8 +328,6 @@ func resourceSakuraCloudVPCRouterUpdate(d *schema.ResourceData, meta interface{}
 	if err != nil {
 		return fmt.Errorf("Error updating SakuraCloud VPCRouter resource: %s", err)
 	}
-
-	d.SetId(vpcRouter.GetStrID())
 
 	return resourceSakuraCloudVPCRouterRead(d, meta)
 }

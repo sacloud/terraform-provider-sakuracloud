@@ -176,8 +176,6 @@ func resourceSakuraCloudLoadBalancerCreate(d *schema.ResourceData, meta interfac
 		return fmt.Errorf("Failed to create SakuraCloud LoadBalancer resource: %s", err)
 	}
 
-	d.SetId(loadBalancer.GetStrID())
-
 	//wait
 	compChan, progChan, errChan := client.LoadBalancer.AsyncSleepWhileCopying(loadBalancer.ID, client.DefaultTimeoutDuration, 5)
 	for {
@@ -197,6 +195,7 @@ func resourceSakuraCloudLoadBalancerCreate(d *schema.ResourceData, meta interfac
 		return fmt.Errorf("Failed to wait SakuraCloud LoadBalancer boot: %s", err)
 	}
 
+	d.SetId(loadBalancer.GetStrID())
 	return resourceSakuraCloudLoadBalancerRead(d, meta)
 }
 
@@ -254,7 +253,6 @@ func resourceSakuraCloudLoadBalancerUpdate(d *schema.ResourceData, meta interfac
 	if err != nil {
 		return fmt.Errorf("Error updating SakuraCloud LoadBalancer resource: %s", err)
 	}
-	d.SetId(loadBalancer.GetStrID())
 
 	return resourceSakuraCloudLoadBalancerRead(d, meta)
 }
@@ -276,6 +274,11 @@ func resourceSakuraCloudLoadBalancerDelete(d *schema.ResourceData, meta interfac
 }
 
 func setLoadBalancerResourceData(d *schema.ResourceData, client *APIClient, data *sacloud.LoadBalancer) error {
+
+	if data.IsFailed() {
+		d.SetId("")
+		return fmt.Errorf("LoadBalancer[%d] state is failed", data.ID)
+	}
 
 	d.Set("switch_id", data.Switch.GetStrID())
 	d.Set("vrid", data.Remark.VRRP.VRID)
@@ -317,6 +320,5 @@ func setLoadBalancerResourceData(d *schema.ResourceData, client *APIClient, data
 
 	setPowerManageTimeoutValueToState(d)
 	d.Set("zone", client.Zone)
-	d.SetId(data.GetStrID())
 	return nil
 }

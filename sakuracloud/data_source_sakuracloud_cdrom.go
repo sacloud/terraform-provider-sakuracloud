@@ -122,5 +122,7 @@ func dataSourceSakuraCloudCDROMRead(d *schema.ResourceData, meta interface{}) er
 		return filterNoResultErr()
 	}
 	data = &targets[0]
+
+	d.SetId(data.GetStrID())
 	return setCDROMResourceData(d, client, data)
 }

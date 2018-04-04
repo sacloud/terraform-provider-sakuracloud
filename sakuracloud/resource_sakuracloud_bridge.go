@@ -104,7 +104,6 @@ func resourceSakuraCloudBridgeUpdate(d *schema.ResourceData, meta interface{}) e
 		return fmt.Errorf("Error updating SakuraCloud Bridge resource: %s", err)
 	}
 
-	d.SetId(bridge.GetStrID())
 	return resourceSakuraCloudBridgeRead(d, meta)
 }
 
@@ -150,6 +149,5 @@ func setBridgeResourceData(d *schema.ResourceData, client *APIClient, data *sacl
 	}
 
 	d.Set("zone", client.Zone)
-	d.SetId(data.GetStrID())
 	return nil
 }

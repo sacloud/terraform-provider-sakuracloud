@@ -172,7 +172,6 @@ func resourceSakuraCloudDNSRecordDelete(d *schema.ResourceData, meta interface{}
 		return fmt.Errorf("Failed to delete SakuraCloud DNSRecord resource: %s", err)
 	}
 
-	d.SetId("")
 	return nil
 }
 

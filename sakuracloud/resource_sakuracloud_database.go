@@ -193,8 +193,6 @@ func resourceSakuraCloudDatabaseCreate(d *schema.ResourceData, meta interface{})
 		return fmt.Errorf("Failed to create SakuraCloud Database resource: %s", err)
 	}
 
-	d.SetId(database.GetStrID())
-
 	//wait
 	compChan, progChan, errChan := client.Database.AsyncSleepWhileCopying(database.ID, client.DefaultTimeoutDuration, 5)
 	for {
@@ -218,6 +216,7 @@ func resourceSakuraCloudDatabaseCreate(d *schema.ResourceData, meta interface{})
 		return fmt.Errorf("Failed to wait SakuraCloud Database start: %s", err)
 	}
 
+	d.SetId(database.GetStrID())
 	return resourceSakuraCloudDatabaseRead(d, meta)
 }
 
@@ -308,8 +307,6 @@ func resourceSakuraCloudDatabaseUpdate(d *schema.ResourceData, meta interface{})
 		return fmt.Errorf("Error updating SakuraCloud Database resource: %s", err)
 	}
 
-	d.SetId(database.GetStrID())
-
 	return resourceSakuraCloudDatabaseRead(d, meta)
 }
 
@@ -387,6 +384,5 @@ func setDatabaseResourceData(d *schema.ResourceData, client *APIClient, data *sa
 	setPowerManageTimeoutValueToState(d)
 
 	d.Set("zone", client.Zone)
-	d.SetId(data.GetStrID())
 	return nil
 }

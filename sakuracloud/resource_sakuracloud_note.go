@@ -157,8 +157,6 @@ func resourceSakuraCloudNoteUpdate(d *schema.ResourceData, meta interface{}) err
 	if err != nil {
 		return fmt.Errorf("Error updating SakuraCloud Note resource: %s", err)
 	}
-	d.SetId(note.GetStrID())
-
 	return resourceSakuraCloudNoteRead(d, meta)
 }
 
@@ -174,14 +172,11 @@ func resourceSakuraCloudNoteDelete(d *schema.ResourceData, meta interface{}) err
 }
 
 func setNoteResourceData(d *schema.ResourceData, client *APIClient, data *sacloud.Note) error {
-
 	d.Set("name", data.Name)
 	d.Set("content", data.Content)
 	d.Set("class", data.Class)
 	d.Set("icon_id", data.GetIconStrID())
 	d.Set("description", data.Description)
 	d.Set("tags", realTags(client, data.Tags))
-
-	d.SetId(data.GetStrID())
 	return nil
 }

@@ -117,5 +117,7 @@ func dataSourceSakuraCloudNoteRead(d *schema.ResourceData, meta interface{}) err
 		return filterNoResultErr()
 	}
 	data = &targets[0]
+
+	d.SetId(data.GetStrID())
 	return setNoteResourceData(d, client, data)
 }

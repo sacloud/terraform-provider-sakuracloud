@@ -165,5 +165,7 @@ func dataSourceSakuraCloudDatabaseRead(d *schema.ResourceData, meta interface{})
 		return filterNoResultErr()
 	}
 	data = &targets[0]
+
+	d.SetId(data.GetStrID())
 	return setDatabaseResourceData(d, client, data)
 }

@@ -156,7 +156,6 @@ func resourceSakuraCloudLoadBalancerVIPUpdate(d *schema.ResourceData, meta inter
 		return fmt.Errorf("Couldn'd apply SakuraCloud LoadBalancer config: %s", err)
 	}
 
-	d.SetId(loadBalancerVIPIDHash(lbID, vipSetting))
 	return resourceSakuraCloudLoadBalancerVIPRead(d, meta)
 }
 
@@ -186,7 +185,6 @@ func resourceSakuraCloudLoadBalancerVIPDelete(d *schema.ResourceData, meta inter
 		return fmt.Errorf("Couldn'd apply SakuraCloud LoadBalancer config: %s", err)
 	}
 
-	d.SetId("")
 	return nil
 }
 

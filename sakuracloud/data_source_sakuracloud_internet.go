@@ -171,5 +171,7 @@ func dataSourceSakuraCloudInternetRead(d *schema.ResourceData, meta interface{})
 		return filterNoResultErr()
 	}
 	data = &targets[0]
+
+	d.SetId(data.GetStrID())
 	return setInternetResourceData(d, client, data)
 }

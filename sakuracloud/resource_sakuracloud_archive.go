@@ -179,8 +179,6 @@ func resourceSakuraCloudArchiveUpdate(d *schema.ResourceData, meta interface{}) 
 		return fmt.Errorf("Error updating SakuraCloud Archive resource: %s", err)
 	}
 
-	d.SetId(archive.GetStrID())
-
 	contentAttrs := []string{"iso_image_file", "hash"}
 	isContentChanged := false
 	for _, attr := range contentAttrs {
@@ -274,6 +272,5 @@ func setArchiveResourceData(d *schema.ResourceData, client *APIClient, data *sac
 	}
 
 	d.Set("zone", client.Zone)
-	d.SetId(data.GetStrID())
 	return nil
 }

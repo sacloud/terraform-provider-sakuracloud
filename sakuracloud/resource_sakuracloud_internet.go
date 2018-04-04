@@ -243,7 +243,6 @@ func resourceSakuraCloudInternetUpdate(d *schema.ResourceData, meta interface{})
 		}
 	}
 
-	d.SetId(internet.GetStrID())
 	return resourceSakuraCloudInternetRead(d, meta)
 }
 
@@ -365,6 +364,5 @@ func setInternetResourceData(d *schema.ResourceData, client *APIClient, data *sa
 	setPowerManageTimeoutValueToState(d)
 
 	d.Set("zone", client.Zone)
-	d.SetId(data.GetStrID())
 	return nil
 }

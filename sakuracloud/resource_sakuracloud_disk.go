@@ -356,8 +356,6 @@ func resourceSakuraCloudDiskUpdate(d *schema.ResourceData, meta interface{}) err
 		return fmt.Errorf("Error updating SakuraCloud Disk resource: %s", err)
 	}
 
-	d.SetId(disk.GetStrID())
-
 	if isRunning && isDiskConfigChanged {
 		err := bootServer(client, disk.Server.ID)
 		if err != nil {
@@ -453,6 +451,5 @@ func setDiskResourceData(d *schema.ResourceData, client *APIClient, data *saclou
 	setPowerManageTimeoutValueToState(d)
 
 	d.Set("zone", client.Zone)
-	d.SetId(data.GetStrID())
 	return nil
 }

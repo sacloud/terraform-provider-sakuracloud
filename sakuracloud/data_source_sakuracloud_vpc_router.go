@@ -155,5 +155,6 @@ func dataSourceSakuraCloudVPCRouterRead(d *schema.ResourceData, meta interface{}
 	}
 	data = &targets[0]
 
+	d.SetId(data.GetStrID())
 	return setVPCRouterResourceData(d, client, data)
 }

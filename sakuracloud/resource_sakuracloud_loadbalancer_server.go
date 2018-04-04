@@ -187,7 +187,6 @@ func resourceSakuraCloudLoadBalancerServerDelete(d *schema.ResourceData, meta in
 		return fmt.Errorf("Couldn'd apply SakuraCloud LoadBalancer config: %s", err)
 	}
 
-	d.SetId("")
 	return nil
 }
 

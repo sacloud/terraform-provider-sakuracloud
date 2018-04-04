@@ -188,5 +188,6 @@ func dataSourceSakuraCloudSimpleMonitorRead(d *schema.ResourceData, meta interfa
 	}
 	data = &targets[0]
 
+	d.SetId(data.GetStrID())
 	return setSimpleMonitorResourceData(d, client, data)
 }

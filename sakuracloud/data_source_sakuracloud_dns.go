@@ -116,5 +116,6 @@ func dataSourceSakuraCloudDNSRead(d *schema.ResourceData, meta interface{}) erro
 	}
 	data = &targets[0]
 
+	d.SetId(data.GetStrID())
 	return setDNSResourceData(d, client, data)
 }

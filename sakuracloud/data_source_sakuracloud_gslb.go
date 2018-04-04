@@ -154,5 +154,6 @@ func dataSourceSakuraCloudGSLBRead(d *schema.ResourceData, meta interface{}) err
 	}
 	data = &targets[0]
 
+	d.SetId(data.GetStrID())
 	return setGSLBResourceData(d, client, data)
 }

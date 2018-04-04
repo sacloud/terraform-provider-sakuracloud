@@ -206,7 +206,6 @@ func resourceSakuraCloudPacketFilterUpdate(d *schema.ResourceData, meta interfac
 		return fmt.Errorf("Error updating SakuraCloud PacketFilter resource: %s", err)
 	}
 
-	d.SetId(filter.GetStrID())
 	return resourceSakuraCloudPacketFilterRead(d, meta)
 }
 
@@ -265,6 +264,5 @@ func setPacketFilterResourceData(d *schema.ResourceData, client *APIClient, data
 	}
 
 	d.Set("zone", client.Zone)
-	d.SetId(data.GetStrID())
 	return nil
 }

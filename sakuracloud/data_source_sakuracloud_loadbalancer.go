@@ -155,5 +155,6 @@ func dataSourceSakuraCloudLoadBalancerRead(d *schema.ResourceData, meta interfac
 	}
 	data = &targets[0]
 
+	d.SetId(data.GetStrID())
 	return setLoadBalancerResourceData(d, client, data)
 }

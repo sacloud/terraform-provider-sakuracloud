@@ -66,6 +66,7 @@ func resourceSakuraCloudSSHKeyGenCreate(d *schema.ResourceData, meta interface{}
 		return fmt.Errorf("Failed to create SakuraCloud SSHKey resource: %s", err)
 	}
 
+	d.SetId(key.GetStrID())
 	return setSSHKeyGenResourceData(d, client, key)
 }
 
@@ -106,8 +107,6 @@ func setSSHKeyGenResourceData(d *schema.ResourceData, _ *APIClient, data interfa
 		if pKey, ok := data.(sshKeyGenType); ok {
 			d.Set("private_key", pKey.GetPrivateKey())
 		}
-
-		d.SetId(key.GetStrID())
 	}
 
 	return nil

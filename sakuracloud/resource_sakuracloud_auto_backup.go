@@ -172,7 +172,6 @@ func resourceSakuraCloudAutoBackupUpdate(d *schema.ResourceData, meta interface{
 		return fmt.Errorf("Failed to create SakuraCloud AutoBackup resource: %s", err)
 	}
 
-	d.SetId(autoBackup.GetStrID())
 	return resourceSakuraCloudAutoBackupRead(d, meta)
 
 }

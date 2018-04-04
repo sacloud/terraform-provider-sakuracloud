@@ -249,7 +249,6 @@ func resourceSakuraCloudGSLBUpdate(d *schema.ResourceData, meta interface{}) err
 		return fmt.Errorf("Failed to create SakuraCloud GSLB resource: %s", err)
 	}
 
-	d.SetId(gslb.GetStrID())
 	return resourceSakuraCloudGSLBRead(d, meta)
 
 }
@@ -315,6 +314,5 @@ func setGSLBResourceData(d *schema.ResourceData, client *APIClient, data *saclou
 	d.Set("tags", realTags(client, data.Tags))
 	d.Set("weighted", strings.ToLower(data.Settings.GSLB.Weighted) == "true")
 
-	d.SetId(data.GetStrID())
 	return nil
 }

@@ -106,7 +106,6 @@ func resourceSakuraCloudSwitchCreate(d *schema.ResourceData, meta interface{}) e
 	}
 
 	d.SetId(sw.GetStrID())
-
 	d.Partial(false)
 	return resourceSakuraCloudSwitchRead(d, meta)
 }
@@ -196,9 +195,7 @@ func resourceSakuraCloudSwitchUpdate(d *schema.ResourceData, meta interface{}) e
 		}
 	}
 
-	d.SetId(sw.GetStrID())
 	d.Partial(false)
-
 	return resourceSakuraCloudSwitchRead(d, meta)
 }
 

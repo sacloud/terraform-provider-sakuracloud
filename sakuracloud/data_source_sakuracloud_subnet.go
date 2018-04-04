@@ -83,5 +83,6 @@ func dataSourceSakuraCloudSubnetRead(d *schema.ResourceData, meta interface{}) e
 		return fmt.Errorf("Couldn't find SakuraCloud Subnet(id:%d) resource: %s", subnetID, err)
 	}
 
+	d.SetId(subnet.GetStrID())
 	return setSubnetResourceData(d, client, subnet)
 }

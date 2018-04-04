@@ -188,8 +188,6 @@ func resourceSakuraCloudCDROMUpdate(d *schema.ResourceData, meta interface{}) er
 		return fmt.Errorf("Error updating SakuraCloud CDROM resource: %s", err)
 	}
 
-	d.SetId(cdrom.GetStrID())
-
 	contentAttrs := []string{"iso_image_file", "content", "content_file_name", "hash"}
 	isContentChanged := false
 	for _, attr := range contentAttrs {
@@ -313,7 +311,6 @@ func setCDROMResourceData(d *schema.ResourceData, client *APIClient, data *saclo
 	}
 
 	d.Set("zone", client.Zone)
-	d.SetId(data.GetStrID())
 	return nil
 }
 

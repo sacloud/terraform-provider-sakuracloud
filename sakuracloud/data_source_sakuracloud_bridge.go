@@ -100,5 +100,6 @@ func dataSourceSakuraCloudBridgeRead(d *schema.ResourceData, meta interface{}) e
 	}
 	data = &targets[0]
 
+	d.SetId(data.GetStrID())
 	return setBridgeResourceData(d, client, data)
 }

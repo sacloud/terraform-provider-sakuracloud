@@ -109,5 +109,6 @@ func dataSourceSakuraCloudIconRead(d *schema.ResourceData, meta interface{}) err
 	}
 	data = &targets[0]
 
+	d.SetId(data.GetStrID())
 	return setIconResourceData(d, client, data)
 }

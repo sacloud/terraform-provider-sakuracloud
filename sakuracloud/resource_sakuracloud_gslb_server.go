@@ -122,7 +122,6 @@ func resourceSakuraCloudGSLBServerDelete(d *schema.ResourceData, meta interface{
 		return fmt.Errorf("Failed to delete SakuraCloud GSLBServer resource: %s", err)
 	}
 
-	d.SetId("")
 	return nil
 }
 

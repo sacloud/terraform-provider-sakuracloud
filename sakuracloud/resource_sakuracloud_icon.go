@@ -141,8 +141,6 @@ func resourceSakuraCloudIconUpdate(d *schema.ResourceData, meta interface{}) err
 	if err != nil {
 		return fmt.Errorf("Error updating SakuraCloud Icon resource: %s", err)
 	}
-	d.SetId(icon.GetStrID())
-
 	return resourceSakuraCloudIconRead(d, meta)
 }
 
@@ -170,6 +168,5 @@ func setIconResourceData(d *schema.ResourceData, client *APIClient, data *saclou
 	d.Set("tags", realTags(client, data.Tags))
 	d.Set("url", data.URL)
 
-	d.SetId(data.GetStrID())
 	return nil
 }
