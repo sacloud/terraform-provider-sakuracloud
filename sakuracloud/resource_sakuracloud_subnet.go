@@ -116,7 +116,6 @@ func resourceSakuraCloudSubnetUpdate(d *schema.ResourceData, meta interface{}) e
 			return fmt.Errorf("Error updating SakuraCloud Subnet resource: %s", err)
 		}
 
-		d.SetId(subnet.GetStrID())
 	}
 
 	return resourceSakuraCloudSubnetRead(d, meta)
@@ -160,6 +159,5 @@ func setSubnetResourceData(d *schema.ResourceData, client *APIClient, data *sacl
 	}
 	d.Set("ipaddresses", addrs)
 
-	d.SetId(data.GetStrID())
 	return nil
 }

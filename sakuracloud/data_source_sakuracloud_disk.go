@@ -133,5 +133,7 @@ func dataSourceSakuraCloudDiskRead(d *schema.ResourceData, meta interface{}) err
 		return filterNoResultErr()
 	}
 	data = &targets[0]
+
+	d.SetId(data.GetStrID())
 	return setDiskResourceData(d, client, data)
 }

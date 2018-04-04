@@ -130,8 +130,6 @@ func resourceSakuraCloudNFSCreate(d *schema.ResourceData, meta interface{}) erro
 		return fmt.Errorf("Failed to create SakuraCloud NFS resource: %s", err)
 	}
 
-	d.SetId(nfs.GetStrID())
-
 	//wait
 	compChan, progChan, errChan := client.NFS.AsyncSleepWhileCopying(nfs.ID, client.DefaultTimeoutDuration, 5)
 	for {
@@ -151,6 +149,7 @@ func resourceSakuraCloudNFSCreate(d *schema.ResourceData, meta interface{}) erro
 		return fmt.Errorf("Failed to wait SakuraCloud NFS boot: %s", err)
 	}
 
+	d.SetId(nfs.GetStrID())
 	return resourceSakuraCloudNFSRead(d, meta)
 }
 
@@ -208,8 +207,6 @@ func resourceSakuraCloudNFSUpdate(d *schema.ResourceData, meta interface{}) erro
 	if err != nil {
 		return fmt.Errorf("Error updating SakuraCloud NFS resource: %s", err)
 	}
-	d.SetId(nfs.GetStrID())
-
 	return resourceSakuraCloudNFSRead(d, meta)
 }
 
@@ -231,6 +228,11 @@ func resourceSakuraCloudNFSDelete(d *schema.ResourceData, meta interface{}) erro
 
 func setNFSResourceData(d *schema.ResourceData, client *APIClient, data *sacloud.NFS) error {
 
+	if data.IsFailed() {
+		d.SetId("")
+		return fmt.Errorf("NFS[%d] state is failed", data.ID)
+	}
+
 	d.Set("switch_id", data.Switch.GetStrID())
 	d.Set("ipaddress", data.Remark.Servers[0].(map[string]interface{})["IPAddress"])
 	d.Set("nw_mask_len", data.Remark.Network.NetworkMaskLen)
@@ -245,6 +247,5 @@ func setNFSResourceData(d *schema.ResourceData, client *APIClient, data *sacloud
 	setPowerManageTimeoutValueToState(d)
 
 	d.Set("zone", client.Zone)
-	d.SetId(data.GetStrID())
 	return nil
 }

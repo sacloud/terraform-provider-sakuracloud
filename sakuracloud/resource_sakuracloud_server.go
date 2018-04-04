@@ -299,14 +299,13 @@ func resourceSakuraCloudServerCreate(d *schema.ResourceData, meta interface{}) e
 		}
 	}
 
-	d.SetId(server.GetStrID())
-
 	//boot
-	err = bootServer(client, toSakuraCloudID(d.Id()))
-
+	err = bootServer(client, server.ID)
 	if err != nil {
 		return fmt.Errorf("Failed to boot SakuraCloud Server resource: %s", err)
 	}
+
+	d.SetId(server.GetStrID())
 	return resourceSakuraCloudServerRead(d, meta)
 }
 
@@ -571,7 +570,6 @@ func resourceSakuraCloudServerUpdate(d *schema.ResourceData, meta interface{}) e
 	if err != nil {
 		return fmt.Errorf("Error updating SakuraCloud Server resource: %s", err)
 	}
-	d.SetId(server.GetStrID())
 
 	if d.HasChange("packet_filter_ids") {
 
@@ -654,7 +652,6 @@ func resourceSakuraCloudServerUpdate(d *schema.ResourceData, meta interface{}) e
 	}
 
 	return resourceSakuraCloudServerRead(d, meta)
-
 }
 
 func resourceSakuraCloudServerDelete(d *schema.ResourceData, meta interface{}) error {

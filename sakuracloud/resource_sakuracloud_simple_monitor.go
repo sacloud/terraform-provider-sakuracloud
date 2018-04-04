@@ -401,7 +401,6 @@ func resourceSakuraCloudSimpleMonitorUpdate(d *schema.ResourceData, meta interfa
 		return fmt.Errorf("Failed to create SakuraCloud SimpleMonitor resource: %s", err)
 	}
 
-	d.SetId(simpleMonitor.GetStrID())
 	return resourceSakuraCloudSimpleMonitorRead(d, meta)
 
 }
@@ -570,6 +569,5 @@ func setSimpleMonitorResourceData(d *schema.ResourceData, client *APIClient, dat
 		d.Set("nofity_slack_webhook", "")
 	}
 
-	d.SetId(data.GetStrID())
 	return nil
 }

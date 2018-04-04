@@ -128,5 +128,6 @@ func dataSourceSakuraCloudPacketFilterRead(d *schema.ResourceData, meta interfac
 	}
 	data = &targets[0]
 
+	d.SetId(data.GetStrID())
 	return setPacketFilterResourceData(d, client, data)
 }

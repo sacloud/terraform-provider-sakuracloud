@@ -149,7 +149,6 @@ func resourceSakuraCloudPrivateHostUpdate(d *schema.ResourceData, meta interface
 		return fmt.Errorf("Error updating SakuraCloud PrivateHost resource: %s", err)
 	}
 
-	d.SetId(privateHost.GetStrID())
 	return resourceSakuraCloudPrivateHostRead(d, meta)
 }
 
@@ -209,14 +208,10 @@ func setPrivateHostResourceData(d *schema.ResourceData, client *APIClient, data 
 	d.Set("icon_id", data.GetIconStrID())
 	d.Set("description", data.Description)
 	d.Set("tags", data.Tags)
-
 	d.Set("hostname", data.GetHostName())
 	d.Set("assigned_core", data.GetAssignedCPU())
 	d.Set("assigned_memory", data.GetAssignedMemoryGB())
-
 	setPowerManageTimeoutValueToState(d)
-
 	d.Set("zone", client.Zone)
-	d.SetId(data.GetStrID())
 	return nil
 }

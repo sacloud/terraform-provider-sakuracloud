@@ -102,8 +102,6 @@ func resourceSakuraCloudSSHKeyUpdate(d *schema.ResourceData, meta interface{}) e
 	if err != nil {
 		return fmt.Errorf("Error updating SakuraCloud SSHKey resource: %s", err)
 	}
-	d.SetId(key.GetStrID())
-
 	return resourceSakuraCloudSSHKeyRead(d, meta)
 }
 
@@ -119,12 +117,9 @@ func resourceSakuraCloudSSHKeyDelete(d *schema.ResourceData, meta interface{}) e
 }
 
 func setSSHKeyResourceData(d *schema.ResourceData, _ *APIClient, data *sacloud.SSHKey) error {
-
 	d.Set("name", data.Name)
 	d.Set("public_key", data.PublicKey)
 	d.Set("fingerprint", data.Fingerprint)
 	d.Set("description", data.Description)
-
-	d.SetId(data.GetStrID())
 	return nil
 }

@@ -121,12 +121,11 @@ func resourceSakuraCloudDNSUpdate(d *schema.ResourceData, meta interface{}) erro
 
 	}
 
-	dns, err := client.DNS.Update(opts.ID, opts)
+	_, err = client.DNS.Update(opts.ID, opts)
 	if err != nil {
 		return fmt.Errorf("Failed to update SakuraCloud DNS resource: %s", err)
 	}
 
-	d.SetId(dns.GetStrID())
 	return resourceSakuraCloudDNSRead(d, meta)
 }
 
@@ -143,13 +142,10 @@ func resourceSakuraCloudDNSDelete(d *schema.ResourceData, meta interface{}) erro
 }
 
 func setDNSResourceData(d *schema.ResourceData, client *APIClient, data *sacloud.DNS) error {
-
 	d.Set("zone", data.Name)
 	d.Set("icon_id", data.GetIconStrID())
 	d.Set("description", data.Description)
 	d.Set("tags", realTags(client, data.Tags))
 	d.Set("dns_servers", data.Status.NS)
-
-	d.SetId(data.GetStrID())
 	return nil
 }
