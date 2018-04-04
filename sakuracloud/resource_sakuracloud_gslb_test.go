@@ -26,11 +26,11 @@ func TestAccResourceSakuraCloudGSLB(t *testing.T) {
 					resource.TestCheckResourceAttr(
 						"sakuracloud_gslb.foobar", "sorry_server", "8.8.8.8"),
 					resource.TestCheckResourceAttr(
-						"sakuracloud_gslb.foobar", "health_check.1802742300.protocol", "http"),
+						"sakuracloud_gslb.foobar", "health_check.0.protocol", "http"),
 					resource.TestCheckResourceAttr(
-						"sakuracloud_gslb.foobar", "health_check.1802742300.delay_loop", "10"),
+						"sakuracloud_gslb.foobar", "health_check.0.delay_loop", "10"),
 					resource.TestCheckResourceAttr(
-						"sakuracloud_gslb.foobar", "health_check.1802742300.host_header", "terraform.io"),
+						"sakuracloud_gslb.foobar", "health_check.0.host_header", "terraform.io"),
 					resource.TestCheckResourceAttrPair(
 						"sakuracloud_gslb.foobar", "icon_id",
 						"sakuracloud_icon.foobar", "id",
@@ -46,11 +46,11 @@ func TestAccResourceSakuraCloudGSLB(t *testing.T) {
 					resource.TestCheckResourceAttr(
 						"sakuracloud_gslb.foobar", "sorry_server", "8.8.4.4"),
 					resource.TestCheckResourceAttr(
-						"sakuracloud_gslb.foobar", "health_check.755645870.protocol", "https"),
+						"sakuracloud_gslb.foobar", "health_check.0.protocol", "https"),
 					resource.TestCheckResourceAttr(
-						"sakuracloud_gslb.foobar", "health_check.755645870.delay_loop", "20"),
+						"sakuracloud_gslb.foobar", "health_check.0.delay_loop", "20"),
 					resource.TestCheckResourceAttr(
-						"sakuracloud_gslb.foobar", "health_check.755645870.host_header", "update.terraform.io"),
+						"sakuracloud_gslb.foobar", "health_check.0.host_header", "update.terraform.io"),
 					resource.TestCheckResourceAttr(
 						"sakuracloud_gslb.foobar", "icon_id", ""),
 				),
@@ -64,11 +64,11 @@ func TestAccResourceSakuraCloudGSLB(t *testing.T) {
 					resource.TestCheckResourceAttr(
 						"sakuracloud_gslb.foobar", "sorry_server", "8.8.4.4"),
 					resource.TestCheckResourceAttr(
-						"sakuracloud_gslb.foobar", "health_check.755645870.protocol", "https"),
+						"sakuracloud_gslb.foobar", "health_check.0.protocol", "https"),
 					resource.TestCheckResourceAttr(
-						"sakuracloud_gslb.foobar", "health_check.755645870.delay_loop", "20"),
+						"sakuracloud_gslb.foobar", "health_check.0.delay_loop", "20"),
 					resource.TestCheckResourceAttr(
-						"sakuracloud_gslb.foobar", "health_check.755645870.host_header", "update.terraform.io"),
+						"sakuracloud_gslb.foobar", "health_check.0.host_header", "update.terraform.io"),
 				),
 			},
 		},
@@ -130,16 +130,16 @@ func TestAccImportSakuraCloudGSLB(t *testing.T) {
 		}
 		expects := map[string]string{
 			"name": "terraform.io",
-			"health_check.1802742300.protocol":    "http",
-			"health_check.1802742300.delay_loop":  "10",
-			"health_check.1802742300.host_header": "terraform.io",
-			"health_check.1802742300.path":        "/",
-			"health_check.1802742300.status":      "200",
-			"weighted":                            "false",
-			"sorry_server":                        "8.8.8.8",
-			"description":                         "GSLB from TerraForm for SAKURA CLOUD",
-			"tags.0":                              "hoge1",
-			"tags.1":                              "hoge2",
+			"health_check.0.protocol":    "http",
+			"health_check.0.delay_loop":  "10",
+			"health_check.0.host_header": "terraform.io",
+			"health_check.0.path":        "/",
+			"health_check.0.status":      "200",
+			"weighted":                   "false",
+			"sorry_server":               "8.8.8.8",
+			"description":                "GSLB from TerraForm for SAKURA CLOUD",
+			"tags.0":                     "hoge1",
+			"tags.1":                     "hoge2",
 		}
 
 		if err := compareStateMulti(s[0], expects); err != nil {

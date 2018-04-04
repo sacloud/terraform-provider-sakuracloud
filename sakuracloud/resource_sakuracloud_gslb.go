@@ -3,12 +3,12 @@ package sakuracloud
 import (
 	"fmt"
 
-	"github.com/hashicorp/terraform/helper/hashcode"
 	"github.com/hashicorp/terraform/helper/schema"
+
+	"strings"
 
 	"github.com/sacloud/libsacloud/api"
 	"github.com/sacloud/libsacloud/sacloud"
-	"strings"
 )
 
 func resourceSakuraCloudGSLB() *schema.Resource {
@@ -32,9 +32,10 @@ func resourceSakuraCloudGSLB() *schema.Resource {
 				Computed: true,
 			},
 			"health_check": {
-				Type:     schema.TypeSet,
+				Type:     schema.TypeList,
 				Required: true,
-
+				MaxItems: 1,
+				MinItems: 1,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
 						"protocol": {
@@ -100,31 +101,30 @@ func resourceSakuraCloudGSLBCreate(d *schema.ResourceData, meta interface{}) err
 
 	opts := client.GSLB.New(d.Get("name").(string))
 
-	healthCheckConf := d.Get("health_check").(*schema.Set)
-	for _, c := range healthCheckConf.List() {
-		conf := c.(map[string]interface{})
-		protocol := conf["protocol"].(string)
-		switch protocol {
-		case "http", "https":
-			opts.Settings.GSLB.HealthCheck = sacloud.GSLBHealthCheck{
-				Protocol: protocol,
-				Host:     conf["host_header"].(string),
-				Path:     conf["path"].(string),
-				Status:   conf["status"].(string),
-			}
-		case "tcp":
-			opts.Settings.GSLB.HealthCheck = sacloud.GSLBHealthCheck{
-				Protocol: protocol,
-				Port:     fmt.Sprintf("%d", conf["port"].(int)),
-			}
-		case "ping":
-			opts.Settings.GSLB.HealthCheck = sacloud.GSLBHealthCheck{
-				Protocol: protocol,
-			}
+	healthCheckConf := d.Get("health_check").([]interface{})
+	conf := healthCheckConf[0].(map[string]interface{})
+	protocol := conf["protocol"].(string)
+	switch protocol {
+	case "http", "https":
+		opts.Settings.GSLB.HealthCheck = sacloud.GSLBHealthCheck{
+			Protocol: protocol,
+			Host:     conf["host_header"].(string),
+			Path:     conf["path"].(string),
+			Status:   conf["status"].(string),
 		}
-
-		opts.Settings.GSLB.DelayLoop = conf["delay_loop"].(int)
+	case "tcp":
+		opts.Settings.GSLB.HealthCheck = sacloud.GSLBHealthCheck{
+			Protocol: protocol,
+			Port:     fmt.Sprintf("%d", conf["port"].(int)),
+		}
+	case "ping":
+		opts.Settings.GSLB.HealthCheck = sacloud.GSLBHealthCheck{
+			Protocol: protocol,
+		}
 	}
+
+	opts.Settings.GSLB.DelayLoop = conf["delay_loop"].(int)
+
 	if d.Get("weighted").(bool) {
 		opts.Settings.GSLB.Weighted = "True"
 	} else {
@@ -179,32 +179,29 @@ func resourceSakuraCloudGSLBUpdate(d *schema.ResourceData, meta interface{}) err
 	}
 
 	if d.HasChange("health_check") {
-		healthCheckConf := d.Get("health_check").(*schema.Set)
-		for _, c := range healthCheckConf.List() {
-			conf := c.(map[string]interface{})
-			protocol := conf["protocol"].(string)
-			switch protocol {
-			case "http", "https":
-				gslb.Settings.GSLB.HealthCheck = sacloud.GSLBHealthCheck{
-					Protocol: protocol,
-					Host:     conf["host_header"].(string),
-					Path:     conf["path"].(string),
-					Status:   conf["status"].(string),
-				}
-			case "tcp":
-				gslb.Settings.GSLB.HealthCheck = sacloud.GSLBHealthCheck{
-					Protocol: protocol,
-					Port:     fmt.Sprintf("%d", conf["port"].(int)),
-				}
-			case "ping":
-				gslb.Settings.GSLB.HealthCheck = sacloud.GSLBHealthCheck{
-					Protocol: protocol,
-				}
+		healthCheckConf := d.Get("health_check").([]interface{})
+		conf := healthCheckConf[0].(map[string]interface{})
+		protocol := conf["protocol"].(string)
+		switch protocol {
+		case "http", "https":
+			gslb.Settings.GSLB.HealthCheck = sacloud.GSLBHealthCheck{
+				Protocol: protocol,
+				Host:     conf["host_header"].(string),
+				Path:     conf["path"].(string),
+				Status:   conf["status"].(string),
 			}
-
-			gslb.Settings.GSLB.DelayLoop = conf["delay_loop"].(int)
+		case "tcp":
+			gslb.Settings.GSLB.HealthCheck = sacloud.GSLBHealthCheck{
+				Protocol: protocol,
+				Port:     fmt.Sprintf("%d", conf["port"].(int)),
+			}
+		case "ping":
+			gslb.Settings.GSLB.HealthCheck = sacloud.GSLBHealthCheck{
+				Protocol: protocol,
+			}
 		}
 
+		gslb.Settings.GSLB.DelayLoop = conf["delay_loop"].(int)
 	}
 
 	if d.Get("weighted").(bool) {
@@ -265,30 +262,6 @@ func resourceSakuraCloudGSLBDelete(d *schema.ResourceData, meta interface{}) err
 	return nil
 }
 
-func healthCheckHash(v interface{}) int {
-	target := v.(map[string]interface{})
-
-	protocol := target["protocol"].(string)
-	host_header := ""
-	path := ""
-	status := ""
-	port := ""
-
-	switch protocol {
-	case "http", "https":
-		host_header = target["host_header"].(string)
-		path = target["path"].(string)
-		status = target["status"].(string)
-	case "tcp":
-		port = target["port"].(string)
-	}
-
-	delay_loop := target["delay_loop"].(int)
-
-	hk := fmt.Sprintf("%s:%d:%s:%s:%s:%s", protocol, delay_loop, host_header, path, status, port)
-	return hashcode.String(hk)
-}
-
 func setGSLBResourceData(d *schema.ResourceData, client *APIClient, data *sacloud.GSLB) error {
 
 	d.Set("name", data.Name)
@@ -306,7 +279,7 @@ func setGSLBResourceData(d *schema.ResourceData, client *APIClient, data *saclou
 	}
 	healthCheck["protocol"] = data.Settings.GSLB.HealthCheck.Protocol
 	healthCheck["delay_loop"] = data.Settings.GSLB.DelayLoop
-	d.Set("health_check", schema.NewSet(healthCheckHash, []interface{}{healthCheck}))
+	d.Set("health_check", []interface{}{healthCheck})
 
 	d.Set("sorry_server", data.Settings.GSLB.SorryServer)
 	d.Set("icon_id", data.GetIconStrID())
