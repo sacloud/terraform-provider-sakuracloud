@@ -179,13 +179,18 @@ func resourceSakuraCloudVPCRouterSiteToSiteIPsecVPNRead(d *schema.ResourceData, 
 	}
 
 	s2s := expandVPCRouterSiteToSiteIPsecVPN(d)
-	if vpcRouter.Settings != nil && vpcRouter.Settings.Router != nil && vpcRouter.Settings.Router.SiteToSiteIPsecVPN != nil &&
-		vpcRouter.Settings.Router.FindSiteToSiteIPsecVPN(s2s.LocalPrefix, s2s.Peer, s2s.PreSharedSecret, s2s.RemoteID, s2s.Routes) != nil {
-		d.Set("local_prefix", s2s.LocalPrefix)
-		d.Set("peer", s2s.Peer)
-		d.Set("pre_shared_secret", s2s.PreSharedSecret)
-		d.Set("remote_id", s2s.RemoteID)
-		d.Set("routes", s2s.Routes)
+	if vpcRouter.Settings != nil && vpcRouter.Settings.Router != nil && vpcRouter.Settings.Router.SiteToSiteIPsecVPN != nil {
+		_, v := vpcRouter.Settings.Router.FindSiteToSiteIPsecVPN(s2s.LocalPrefix, s2s.Peer, s2s.PreSharedSecret, s2s.RemoteID, s2s.Routes)
+		if v != nil {
+			d.Set("local_prefix", s2s.LocalPrefix)
+			d.Set("peer", s2s.Peer)
+			d.Set("pre_shared_secret", s2s.PreSharedSecret)
+			d.Set("remote_id", s2s.RemoteID)
+			d.Set("routes", s2s.Routes)
+		} else {
+			d.SetId("")
+			return nil
+		}
 	} else {
 		d.SetId("")
 		return nil

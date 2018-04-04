@@ -90,10 +90,15 @@ func resourceSakuraCloudVPCRouterRemoteAccessUserRead(d *schema.ResourceData, me
 	}
 
 	remoteAccessUser := expandVPCRouterRemoteAccessUser(d)
-	if vpcRouter.Settings != nil && vpcRouter.Settings.Router != nil && vpcRouter.Settings.Router.RemoteAccessUsers != nil &&
-		vpcRouter.Settings.Router.FindRemoteAccessUser(remoteAccessUser.UserName, remoteAccessUser.Password) != nil {
-		d.Set("name", remoteAccessUser.UserName)
-		d.Set("password", remoteAccessUser.Password)
+	if vpcRouter.Settings != nil && vpcRouter.Settings.Router != nil && vpcRouter.Settings.Router.RemoteAccessUsers != nil {
+		_, v := vpcRouter.Settings.Router.FindRemoteAccessUser(remoteAccessUser.UserName, remoteAccessUser.Password)
+		if v != nil {
+			d.Set("name", remoteAccessUser.UserName)
+			d.Set("password", remoteAccessUser.Password)
+		} else {
+			d.SetId("")
+			return nil
+		}
 	} else {
 		d.SetId("")
 		return nil

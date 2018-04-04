@@ -2,7 +2,7 @@ package sacloud
 
 import "time"
 
-// PropCreatedAt 作成日時内包型
+// propCreatedAt 作成日時内包型
 type propCreatedAt struct {
 	CreatedAt *time.Time `json:",omitempty"` // 作成日時
 }

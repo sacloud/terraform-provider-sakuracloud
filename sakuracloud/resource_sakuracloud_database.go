@@ -331,6 +331,11 @@ func resourceSakuraCloudDatabaseDelete(d *schema.ResourceData, meta interface{})
 
 func setDatabaseResourceData(d *schema.ResourceData, client *APIClient, data *sacloud.Database) error {
 
+	if data.IsFailed() {
+		d.SetId("")
+		return fmt.Errorf("Database[%d] state is failed", data.ID)
+	}
+
 	switch data.Remark.DBConf.Common.DatabaseName {
 	case "postgres":
 		d.Set("database_type", "postgresql")
@@ -364,6 +369,7 @@ func setDatabaseResourceData(d *schema.ResourceData, client *APIClient, data *sa
 	d.Set("backup_rotate", data.Settings.DBConf.Backup.Rotate)
 	d.Set("backup_time", data.Settings.DBConf.Backup.Time)
 
+	d.Set("switch_id", "")
 	d.Set("switch_id", data.Interfaces[0].Switch.GetStrID())
 	d.Set("nw_mask_len", data.Remark.Network.NetworkMaskLen)
 	d.Set("default_route", data.Remark.Network.DefaultRoute)

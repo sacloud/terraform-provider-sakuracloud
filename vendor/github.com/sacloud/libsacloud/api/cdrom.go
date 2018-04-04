@@ -65,59 +65,16 @@ func (api *CDROMAPI) CloseFTP(id int64) (bool, error) {
 
 // SleepWhileCopying コピー終了まで待機
 func (api *CDROMAPI) SleepWhileCopying(id int64, timeout time.Duration) error {
-
-	current := 0 * time.Second
-	interval := 5 * time.Second
-	for {
-		archive, err := api.Read(id)
-		if err != nil {
-			return err
-		}
-
-		if archive.IsAvailable() {
-			return nil
-		}
-		time.Sleep(interval)
-		current += interval
-
-		if timeout > 0 && current > timeout {
-			return fmt.Errorf("Timeout: SleepWhileCopying[disk:%d]", id)
-		}
-	}
+	handler := waitingForAvailableFunc(func() (hasAvailable, error) {
+		return api.Read(id)
+	}, 0)
+	return blockingPoll(handler, timeout)
 }
 
 // AsyncSleepWhileCopying コピー終了まで待機(非同期)
-func (api *CDROMAPI) AsyncSleepWhileCopying(id int64, timeout time.Duration) (chan (*sacloud.CDROM), chan (*sacloud.CDROM), chan (error)) {
-	complete := make(chan *sacloud.CDROM)
-	progress := make(chan *sacloud.CDROM)
-	err := make(chan error)
-
-	go func() {
-		for {
-			select {
-			case <-time.After(5 * time.Second):
-				cdrom, e := api.Read(id)
-				if e != nil {
-					err <- e
-					return
-				}
-
-				progress <- cdrom
-
-				if cdrom.IsAvailable() {
-					complete <- cdrom
-					return
-				}
-				if cdrom.IsFailed() {
-					err <- fmt.Errorf("Failed: Create CDROM is failed: %#v", cdrom)
-					return
-				}
-
-			case <-time.After(timeout):
-				err <- fmt.Errorf("Timeout: AsyncSleepWhileCopying[ID:%d]", id)
-				return
-			}
-		}
-	}()
-	return complete, progress, err
+func (api *CDROMAPI) AsyncSleepWhileCopying(id int64, timeout time.Duration) (chan (interface{}), chan (interface{}), chan (error)) {
+	handler := waitingForAvailableFunc(func() (hasAvailable, error) {
+		return api.Read(id)
+	}, 0)
+	return poll(handler, timeout)
 }

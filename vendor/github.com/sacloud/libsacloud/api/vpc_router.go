@@ -227,118 +227,38 @@ func (api *VPCRouterAPI) RebootForce(id int64) (bool, error) {
 }
 
 // SleepUntilUp 起動するまで待機
-func (api *VPCRouterAPI) SleepUntilUp(routerID int64, timeout time.Duration) error {
-	current := 0 * time.Second
-	interval := 5 * time.Second
-	for {
-
-		up, err := api.IsUp(routerID)
-		if err != nil {
-			return err
-		}
-
-		if up {
-			return nil
-		}
-		time.Sleep(interval)
-		current += interval
-
-		if timeout > 0 && current > timeout {
-			return fmt.Errorf("Timeout: WaitforAvailable")
-		}
-	}
+func (api *VPCRouterAPI) SleepUntilUp(id int64, timeout time.Duration) error {
+	handler := waitingForUpFunc(func() (hasUpDown, error) {
+		return api.Read(id)
+	}, 0)
+	return blockingPoll(handler, timeout)
 }
 
 // SleepUntilDown ダウンするまで待機
-func (api *VPCRouterAPI) SleepUntilDown(routerID int64, timeout time.Duration) error {
-	current := 0 * time.Second
-	interval := 5 * time.Second
-	for {
-
-		down, err := api.IsDown(routerID)
-		if err != nil {
-			return err
-		}
-
-		if down {
-			return nil
-		}
-		time.Sleep(interval)
-		current += interval
-
-		if timeout > 0 && current > timeout {
-			return fmt.Errorf("Timeout: WaitforAvailable")
-		}
-	}
+func (api *VPCRouterAPI) SleepUntilDown(id int64, timeout time.Duration) error {
+	handler := waitingForDownFunc(func() (hasUpDown, error) {
+		return api.Read(id)
+	}, 0)
+	return blockingPoll(handler, timeout)
 }
 
 // SleepWhileCopying コピー終了まで待機
 //
-// maxRetryCount: リクエストタイミングによって、コピー完了までの間に404エラーとなる場合がある。
-// 通常そのまま待てばコピー完了するため、404エラーが発生してもmaxRetryCountで指定した回数分は待機する。
-func (api *VPCRouterAPI) SleepWhileCopying(vpcRouterID int64, timeout time.Duration, maxRetryCount int) error {
-	current := 0 * time.Second
-	interval := 5 * time.Second
-	errCount := 0
-	for {
-		router, err := api.Read(vpcRouterID)
-		if err != nil {
-			errCount++
-			if errCount > maxRetryCount {
-				return err
-			}
-		}
-
-		if router != nil && router.IsAvailable() {
-			return nil
-		}
-		time.Sleep(interval)
-		current += interval
-
-		if timeout > 0 && current > timeout {
-			return fmt.Errorf("Timeout: SleepWhileCopying")
-		}
-	}
+// maxRetry: リクエストタイミングによって、コピー完了までの間に404エラーとなる場合がある。
+// 通常そのまま待てばコピー完了するため、404エラーが発生してもmaxRetryで指定した回数分は待機する。
+func (api *VPCRouterAPI) SleepWhileCopying(id int64, timeout time.Duration, maxRetry int) error {
+	handler := waitingForAvailableFunc(func() (hasAvailable, error) {
+		return api.Read(id)
+	}, maxRetry)
+	return blockingPoll(handler, timeout)
 }
 
 // AsyncSleepWhileCopying コピー終了まで待機(非同期)
-func (api *VPCRouterAPI) AsyncSleepWhileCopying(id int64, timeout time.Duration, maxRetryCount int) (chan (*sacloud.VPCRouter), chan (*sacloud.VPCRouter), chan (error)) {
-	complete := make(chan *sacloud.VPCRouter)
-	progress := make(chan *sacloud.VPCRouter)
-	err := make(chan error)
-	errCount := 0
-
-	go func() {
-		for {
-			select {
-			case <-time.After(5 * time.Second):
-				router, e := api.Read(id)
-				if e != nil {
-					errCount++
-					if errCount > maxRetryCount {
-						err <- e
-						return
-					}
-				} else {
-
-					progress <- router
-
-					if router.IsAvailable() {
-						complete <- router
-						return
-					}
-					if router.IsFailed() {
-						err <- fmt.Errorf("Failed: Create VPCRouter is failed: %#v", router)
-						return
-					}
-				}
-			case <-time.After(timeout):
-				err <- fmt.Errorf("Timeout: AsyncSleepWhileCopying[ID:%d]", id)
-				return
-			}
-		}
-	}()
-	return complete, progress, err
+func (api *VPCRouterAPI) AsyncSleepWhileCopying(id int64, timeout time.Duration, maxRetry int) (chan (interface{}), chan (interface{}), chan (error)) {
+	handler := waitingForAvailableFunc(func() (hasAvailable, error) {
+		return api.Read(id)
+	}, maxRetry)
+	return poll(handler, timeout)
 }
 
 // AddStandardInterface スタンダードプランでのインターフェース追加

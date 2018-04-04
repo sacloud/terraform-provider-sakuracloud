@@ -203,5 +203,5 @@
 
 ================================================================================
 
-   Copyright 2015-2017 Kazumichi Yamamoto.
+   Copyright 2015-2018 Kazumichi Yamamoto.
 

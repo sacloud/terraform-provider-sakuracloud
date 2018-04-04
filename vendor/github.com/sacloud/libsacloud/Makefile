@@ -8,13 +8,13 @@ run:
 	go run $(CURDIR)/main.go --disable-healthcheck $(ARGS)
 
 test: vet
-	go test ./sacloud $(TESTARGS) -v -timeout=30m -parallel=4 ;
+	go test ./sacloud $(TESTARGS) -v -timeout=120m -parallel=4 ;
 
 test-api: vet
-	go test ./api $(TESTARGS) -v -timeout=30m -parallel=4 ;
+	go test ./api $(TESTARGS) -v -timeout=120m -parallel=4 ;
 
 test-builder: vet
-	go test ./builder $(TESTARGS) -v -timeout=30m -parallel=4 ;
+	go test ./builder $(TESTARGS) -v -timeout=120m -parallel=4 ;
 
 test-all: test test-api test-builder
 

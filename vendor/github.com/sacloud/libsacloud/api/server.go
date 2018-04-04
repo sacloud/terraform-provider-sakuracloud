@@ -135,48 +135,18 @@ func (api *ServerAPI) RebootForce(id int64) (bool, error) {
 
 // SleepUntilUp 起動するまで待機
 func (api *ServerAPI) SleepUntilUp(id int64, timeout time.Duration) error {
-	current := 0 * time.Second
-	interval := 5 * time.Second
-	for {
-
-		up, err := api.IsUp(id)
-		if err != nil {
-			return err
-		}
-
-		if up {
-			return nil
-		}
-		time.Sleep(interval)
-		current += interval
-
-		if timeout > 0 && current > timeout {
-			return fmt.Errorf("Timeout: WaitforAvailable")
-		}
-	}
+	handler := waitingForUpFunc(func() (hasUpDown, error) {
+		return api.Read(id)
+	}, 0)
+	return blockingPoll(handler, timeout)
 }
 
 // SleepUntilDown ダウンするまで待機
 func (api *ServerAPI) SleepUntilDown(id int64, timeout time.Duration) error {
-	current := 0 * time.Second
-	interval := 5 * time.Second
-	for {
-
-		down, err := api.IsDown(id)
-		if err != nil {
-			return err
-		}
-
-		if down {
-			return nil
-		}
-		time.Sleep(interval)
-		current += interval
-
-		if timeout > 0 && current > timeout {
-			return fmt.Errorf("Timeout: WaitforAvailable")
-		}
-	}
+	handler := waitingForDownFunc(func() (hasUpDown, error) {
+		return api.Read(id)
+	}, 0)
+	return blockingPoll(handler, timeout)
 }
 
 // ChangePlan サーバープラン変更(サーバーIDが変更となるため注意)
