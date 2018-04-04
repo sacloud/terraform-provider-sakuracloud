@@ -14,6 +14,7 @@ type Config struct {
 	TraceMode         bool
 	UseMarkerTags     bool
 	MarkerTagName     string
+	AcceptLanguage    string
 	APIRootURL        string
 	RetryMax          int
 	RetryInterval     int
@@ -29,6 +30,9 @@ type APIClient struct {
 func (c *Config) NewClient() *APIClient {
 	client := api.NewClient(c.AccessToken, c.AccessTokenSecret, c.Zone)
 
+	if c.AcceptLanguage != "" {
+		client.AcceptLanguage = c.AcceptLanguage
+	}
 	if c.APIRootURL != "" {
 		api.SakuraCloudAPIRoot = c.APIRootURL
 	}

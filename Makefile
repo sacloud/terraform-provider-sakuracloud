@@ -48,8 +48,8 @@ shasum:
 	(cd bin/; shasum -a 256 * > terraform-provider-sakuracloud_$(CURRENT_VERSION)_SHA256SUMS)
 
 test: vet
-	TF_ACC= go test $(TEST1) $(TESTARGS) -timeout=30s -parallel=4 ; \
-	TF_ACC= go test $(TEST2) $(TESTARGS) -timeout=30s -parallel=4
+	TF_ACC= go test $(TEST1) -v $(TESTARGS) -timeout=30s -parallel=4 ; \
+	TF_ACC= go test $(TEST2) -v $(TESTARGS) -timeout=30s -parallel=4
 
 testacc: vet
 	TF_ACC=1 go test $(TEST1) -v $(TESTARGS) -timeout 240m ; \
