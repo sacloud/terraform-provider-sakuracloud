@@ -34,6 +34,8 @@ type Client struct {
 	DefaultTimeoutDuration time.Duration
 	// ユーザーエージェント
 	UserAgent string
+	// Accept-Language
+	AcceptLanguage string
 	// リクエストパラメーター トレーサー
 	RequestTracer io.Writer
 	// レスポンス トレーサー
@@ -53,6 +55,7 @@ func NewClient(token, tokenSecret, zone string) *Client {
 		TraceMode:              false,
 		DefaultTimeoutDuration: 20 * time.Minute,
 		UserAgent:              fmt.Sprintf("libsacloud/%s", libsacloud.Version),
+		AcceptLanguage:         "",
 		RetryMax:               0,
 		RetryInterval:          5 * time.Second,
 	}
@@ -69,6 +72,7 @@ func (c *Client) Clone() *Client {
 		TraceMode:              c.TraceMode,
 		DefaultTimeoutDuration: c.DefaultTimeoutDuration,
 		UserAgent:              c.UserAgent,
+		AcceptLanguage:         c.AcceptLanguage,
 		RetryMax:               c.RetryMax,
 		RetryInterval:          c.RetryInterval,
 	}
@@ -154,6 +158,9 @@ func (c *Client) newRequest(method, uri string, body interface{}) ([]byte, error
 	//	req.Header.Add("X-Sakura-API-Beautify", "1") // format response-JSON
 	//}
 	req.Header.Add("User-Agent", c.UserAgent)
+	if c.AcceptLanguage != "" {
+		req.Header.Add("Accept-Language", c.AcceptLanguage)
+	}
 	req.Method = method
 
 	resp, err := client.Do(req)
@@ -240,11 +247,15 @@ func (c *retryableHTTPClient) Do(req *request) (*http.Response, error) {
 		}
 
 		res, err := c.Client.Do(req.Request)
-		if res.StatusCode != 503 {
+		if res != nil && res.StatusCode != 503 {
 			return res, err
 		}
 		if res != nil && res.Body != nil {
 			res.Body.Close()
+		}
+
+		if err != nil {
+			return res, err
 		}
 
 		remain := c.retryMax - i

@@ -137,20 +137,17 @@ func testAccCheckSakuraCloudServerDataSourceDestroy(s *terraform.State) error {
 
 var testAccCheckSakuraCloudDataSourceServerBase = `
 data "sakuracloud_archive" "ubuntu" {
-    filter = {
-	name = "Name"
-	values = ["Ubuntu Server 16"]
-    }
+  os_type = "ubuntu"
 }
 resource "sakuracloud_disk" "foobar" {
-    name = "mydisk"
-    source_archive_id = "${data.sakuracloud_archive.ubuntu.id}"
+  name = "mydisk"
+  source_archive_id = "${data.sakuracloud_archive.ubuntu.id}"
 }
 resource "sakuracloud_server" "foobar" {
-    name = "name_test"
-    disks = ["${sakuracloud_disk.foobar.id}"]
-    description = "description_test"
-    tags = ["tag1","tag2","tag3"]
+  name = "name_test"
+  disks = ["${sakuracloud_disk.foobar.id}"]
+  description = "description_test"
+  tags = ["tag1","tag2","tag3"]
 }`
 
 var testAccCheckSakuraCloudDataSourceServerConfig = fmt.Sprintf(`

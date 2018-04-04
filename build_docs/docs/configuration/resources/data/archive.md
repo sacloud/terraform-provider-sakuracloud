@@ -36,12 +36,14 @@ data sakuracloud_archive "ubuntu" {
 |値|詳細                                          |
 |---------------------------|--------------------|
 | `centos`                  | CentOS 7|
+| `centos6`                  | CentOS 6|
 | `ubuntu`                  | Ubuntu 16.04|
 | `debian`                  | Debian |
 | `vyos`                    | VyOS|
 | `coreos`                  | CoreOS|
 | `rancheros`               | RancherOS|
 | `kusanagi`                | Kusanagi(CentOS7)|
+| `sophos-utm`              | Sophos-UTM(*1)|
 | `freebsd`                 | FreeBSD|
 | `windows2012`             | Windows 2012|
 | `windows2012-rds`         | Windows 2012(RDS)|
@@ -53,6 +55,8 @@ data sakuracloud_archive "ubuntu" {
 | `windows2016-sql-standard`| Windows 2016 SQLServer(Standard)|
 | `windows2016-sql-standard-all` | Windows 2016 SQLServer(Standard,RDS + Office)|
 
+> *1: Sophos-UTMを利用する場合、ディスクの修正機能は利用できません。  
+>     詳細は[さくらのクラウド ドキュメント](https://manual.sakura.ad.jp/cloud/os-packages/sophosutm.html)を参照してください。
 
 ### 属性
 

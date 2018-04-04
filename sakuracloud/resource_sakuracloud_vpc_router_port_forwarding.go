@@ -115,15 +115,20 @@ func resourceSakuraCloudVPCRouterPortForwardingRead(d *schema.ResourceData, meta
 	}
 
 	pf := expandVPCRouterPortForwarding(d)
-	if vpcRouter.Settings != nil && vpcRouter.Settings.Router != nil && vpcRouter.Settings.Router.PortForwarding != nil &&
-		vpcRouter.Settings.Router.FindPortForwarding(pf.Protocol, pf.GlobalPort, pf.PrivateAddress, pf.PrivatePort) != nil {
-		d.Set("protocol", pf.Protocol)
-		globalPort, _ := strconv.Atoi(pf.GlobalPort)
-		d.Set("global_port", globalPort)
-		d.Set("private_address", pf.PrivateAddress)
-		privatePort, _ := strconv.Atoi(pf.PrivatePort)
-		d.Set("private_port", privatePort)
-		d.Set("description", pf.Description)
+	if vpcRouter.Settings != nil && vpcRouter.Settings.Router != nil && vpcRouter.Settings.Router.PortForwarding != nil {
+		_, v := vpcRouter.Settings.Router.FindPortForwarding(pf.Protocol, pf.GlobalPort, pf.PrivateAddress, pf.PrivatePort)
+		if v != nil {
+			d.Set("protocol", pf.Protocol)
+			globalPort, _ := strconv.Atoi(pf.GlobalPort)
+			d.Set("global_port", globalPort)
+			d.Set("private_address", pf.PrivateAddress)
+			privatePort, _ := strconv.Atoi(pf.PrivatePort)
+			d.Set("private_port", privatePort)
+			d.Set("description", pf.Description)
+		} else {
+			d.SetId("")
+			return nil
+		}
 	} else {
 		d.SetId("")
 		return nil

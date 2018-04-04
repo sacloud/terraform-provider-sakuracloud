@@ -365,145 +365,42 @@ func (api *DatabaseAPI) ResetForce(id int64, recycleProcess bool) (bool, error) 
 
 // SleepUntilUp 起動するまで待機
 func (api *DatabaseAPI) SleepUntilUp(id int64, timeout time.Duration) error {
-	current := 0 * time.Second
-	interval := 5 * time.Second
-	for {
-
-		up, err := api.IsUp(id)
-		if err != nil {
-			return err
-		}
-
-		if up {
-			return nil
-		}
-		time.Sleep(interval)
-		current += interval
-
-		if timeout > 0 && current > timeout {
-			return fmt.Errorf("Timeout: WaitforAvailable")
-		}
-	}
+	handler := waitingForUpFunc(func() (hasUpDown, error) {
+		return api.Read(id)
+	}, 0)
+	return blockingPoll(handler, timeout)
 }
 
 // SleepUntilDatabaseRunning 起動するまで待機
-func (api *DatabaseAPI) SleepUntilDatabaseRunning(id int64, timeout time.Duration, maxRetryCount int) error {
-	current := 0 * time.Second
-	interval := 5 * time.Second
-	errCount := 0
-
-	for {
-		isUp, err := api.IsUp(id)
-		if err != nil {
-			errCount++
-			if errCount > maxRetryCount {
-				return err
-			}
-		}
-
-		if isUp {
-			return nil
-		}
-		time.Sleep(interval)
-		current += interval
-
-		if timeout > 0 && current > timeout {
-			return fmt.Errorf("Timeout: SleepUntilDatabaseRunning")
-		}
-	}
+func (api *DatabaseAPI) SleepUntilDatabaseRunning(id int64, timeout time.Duration, maxRetry int) error {
+	handler := waitingForUpFunc(func() (hasUpDown, error) {
+		return api.Read(id)
+	}, maxRetry)
+	return blockingPoll(handler, timeout)
 }
 
 // SleepUntilDown ダウンするまで待機
 func (api *DatabaseAPI) SleepUntilDown(id int64, timeout time.Duration) error {
-	current := 0 * time.Second
-	interval := 5 * time.Second
-	for {
-
-		down, err := api.IsDown(id)
-		if err != nil {
-			return err
-		}
-
-		if down {
-			return nil
-		}
-		time.Sleep(interval)
-		current += interval
-
-		if timeout > 0 && current > timeout {
-			return fmt.Errorf("Timeout: WaitforAvailable")
-		}
-	}
+	handler := waitingForDownFunc(func() (hasUpDown, error) {
+		return api.Read(id)
+	}, 0)
+	return blockingPoll(handler, timeout)
 }
 
 // SleepWhileCopying コピー終了まで待機
-func (api *DatabaseAPI) SleepWhileCopying(id int64, timeout time.Duration, maxRetryCount int) error {
-	current := 0 * time.Second
-	interval := 5 * time.Second
-	errCount := 0
-
-	for {
-		database, err := api.Read(id)
-		if err != nil {
-			errCount++
-			if errCount > maxRetryCount {
-				return err
-			}
-		}
-
-		if database != nil && database.IsFailed() {
-			return fmt.Errorf("Create database Failed")
-		}
-
-		if database != nil && database.IsAvailable() {
-			return nil
-		}
-		time.Sleep(interval)
-		current += interval
-
-		if timeout > 0 && current > timeout {
-			return fmt.Errorf("Timeout: SleepWhileCopying")
-		}
-	}
+func (api *DatabaseAPI) SleepWhileCopying(id int64, timeout time.Duration, maxRetry int) error {
+	handler := waitingForAvailableFunc(func() (hasAvailable, error) {
+		return api.Read(id)
+	}, maxRetry)
+	return blockingPoll(handler, timeout)
 }
 
 // AsyncSleepWhileCopying コピー終了まで待機(非同期)
-func (api *DatabaseAPI) AsyncSleepWhileCopying(id int64, timeout time.Duration, maxRetryCount int) (chan (*sacloud.Database), chan (*sacloud.Database), chan (error)) {
-	complete := make(chan *sacloud.Database)
-	progress := make(chan *sacloud.Database)
-	err := make(chan error)
-	errCount := 0
-
-	go func() {
-		for {
-			select {
-			case <-time.After(5 * time.Second):
-				db, e := api.Read(id)
-				if e != nil {
-					errCount++
-					if errCount > maxRetryCount {
-						err <- e
-						return
-					}
-				} else {
-					progress <- db
-
-					if db.IsAvailable() {
-						complete <- db
-						return
-					}
-					if db.IsFailed() {
-						err <- fmt.Errorf("Failed: Create Database is failed: %#v", db)
-						return
-					}
-				}
-			case <-time.After(timeout):
-				err <- fmt.Errorf("Timeout: AsyncSleepWhileCopying[ID:%d]", id)
-				return
-			}
-		}
-	}()
-	return complete, progress, err
+func (api *DatabaseAPI) AsyncSleepWhileCopying(id int64, timeout time.Duration, maxRetry int) (chan (interface{}), chan (interface{}), chan (error)) {
+	handler := waitingForAvailableFunc(func() (hasAvailable, error) {
+		return api.Read(id)
+	}, maxRetry)
+	return poll(handler, timeout)
 }
 
 // MonitorCPU CPUアクティビティーモニター取得

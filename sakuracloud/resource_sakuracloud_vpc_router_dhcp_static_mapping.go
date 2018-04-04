@@ -93,10 +93,16 @@ func resourceSakuraCloudVPCRouterDHCPStaticMappingRead(d *schema.ResourceData, m
 	}
 
 	dhcpStaticMapping := expandVPCRouterDHCPStaticMapping(d)
-	if vpcRouter.Settings != nil && vpcRouter.Settings.Router != nil && vpcRouter.Settings.Router.DHCPStaticMapping != nil &&
-		vpcRouter.Settings.Router.FindDHCPStaticMapping(dhcpStaticMapping.IPAddress, dhcpStaticMapping.MACAddress) != nil {
-		d.Set("ipaddress", dhcpStaticMapping.IPAddress)
-		d.Set("macaddress", dhcpStaticMapping.MACAddress)
+	if vpcRouter.Settings != nil && vpcRouter.Settings.Router != nil && vpcRouter.Settings.Router.DHCPStaticMapping != nil {
+		//vpcRouter.Settings.Router.FindDHCPStaticMapping(dhcpStaticMapping.IPAddress, dhcpStaticMapping.MACAddress) != nil
+		_, v := vpcRouter.Settings.Router.FindDHCPStaticMapping(dhcpStaticMapping.IPAddress, dhcpStaticMapping.MACAddress)
+		if v != nil {
+			d.Set("ipaddress", dhcpStaticMapping.IPAddress)
+			d.Set("macaddress", dhcpStaticMapping.MACAddress)
+		} else {
+			d.SetId("")
+			return nil
+		}
 	} else {
 		d.SetId("")
 		return nil

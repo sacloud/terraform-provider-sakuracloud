@@ -23,6 +23,7 @@ var (
 	archiveLatestStableCoreOSTags                      = []string{"current-stable", "distro-coreos"}
 	archiveLatestStableRancherOSTags                   = []string{"current-stable", "distro-rancheros"}
 	archiveLatestStableKusanagiTags                    = []string{"current-stable", "pkg-kusanagi"}
+	archiveLatestStableSophosUTMTags                   = []string{"current-stable", "pkg-sophosutm"}
 	archiveLatestStableFreeBSDTags                     = []string{"current-stable", "distro-freebsd"}
 	archiveLatestStableWindows2012Tags                 = []string{"os-windows", "distro-ver-2012.2"}
 	archiveLatestStableWindows2012RDSTags              = []string{"os-windows", "distro-ver-2012.2", "windows-rds"}
@@ -55,6 +56,7 @@ func NewArchiveAPI(client *Client) *ArchiveAPI {
 		ostype.CoreOS:                          api.FindLatestStableCoreOS,
 		ostype.RancherOS:                       api.FindLatestStableRancherOS,
 		ostype.Kusanagi:                        api.FindLatestStableKusanagi,
+		ostype.SophosUTM:                       api.FindLatestStableSophosUTM,
 		ostype.FreeBSD:                         api.FindLatestStableFreeBSD,
 		ostype.Windows2012:                     api.FindLatestStableWindows2012,
 		ostype.Windows2012RDS:                  api.FindLatestStableWindows2012RDS,
@@ -99,61 +101,18 @@ func (api *ArchiveAPI) CloseFTP(id int64) (bool, error) {
 
 // SleepWhileCopying コピー終了まで待機
 func (api *ArchiveAPI) SleepWhileCopying(id int64, timeout time.Duration) error {
-
-	current := 0 * time.Second
-	interval := 5 * time.Second
-	for {
-		archive, err := api.Read(id)
-		if err != nil {
-			return err
-		}
-
-		if archive.IsAvailable() {
-			return nil
-		}
-		time.Sleep(interval)
-		current += interval
-
-		if timeout > 0 && current > timeout {
-			return fmt.Errorf("Timeout: SleepWhileCopying[disk:%d]", id)
-		}
-	}
+	handler := waitingForAvailableFunc(func() (hasAvailable, error) {
+		return api.Read(id)
+	}, 0)
+	return blockingPoll(handler, timeout)
 }
 
 // AsyncSleepWhileCopying コピー終了まで待機(非同期)
-func (api *ArchiveAPI) AsyncSleepWhileCopying(id int64, timeout time.Duration) (chan (*sacloud.Archive), chan (*sacloud.Archive), chan (error)) {
-	complete := make(chan *sacloud.Archive)
-	progress := make(chan *sacloud.Archive)
-	err := make(chan error)
-
-	go func() {
-		for {
-			select {
-			case <-time.After(5 * time.Second):
-				archive, e := api.Read(id)
-				if e != nil {
-					err <- e
-					return
-				}
-
-				progress <- archive
-
-				if archive.IsAvailable() {
-					complete <- archive
-					return
-				}
-				if archive.IsFailed() {
-					err <- fmt.Errorf("Failed: Create archive is failed: %#v", archive)
-					return
-				}
-
-			case <-time.After(timeout):
-				err <- fmt.Errorf("Timeout: AsyncSleepWhileCopying[ID:%d]", id)
-				return
-			}
-		}
-	}()
-	return complete, progress, err
+func (api *ArchiveAPI) AsyncSleepWhileCopying(id int64, timeout time.Duration) (chan (interface{}), chan (interface{}), chan (error)) {
+	handler := waitingForAvailableFunc(func() (hasAvailable, error) {
+		return api.Read(id)
+	}, 0)
+	return poll(handler, timeout)
 }
 
 // CanEditDisk ディスクの修正が可能か判定
@@ -171,6 +130,11 @@ func (api *ArchiveAPI) CanEditDisk(id int64) (bool, error) {
 	// BundleInfoがあれば編集不可
 	if archive.BundleInfo != nil && archive.BundleInfo.HostClass == bundleInfoWindowsHostClass {
 		// Windows
+		return false, nil
+	}
+
+	// SophosUTMであれば編集不可
+	if archive.HasTag("pkg-sophosutm") || archive.IsSophosUTM() {
 		return false, nil
 	}
 
@@ -209,6 +173,11 @@ func (api *ArchiveAPI) GetPublicArchiveIDFromAncestors(id int64) (int64, bool) {
 	// BundleInfoがあれば編集不可
 	if archive.BundleInfo != nil && archive.BundleInfo.HostClass == bundleInfoWindowsHostClass {
 		// Windows
+		return emptyID, false
+	}
+
+	// SophosUTMであれば編集不可
+	if archive.HasTag("pkg-sophosutm") || archive.IsSophosUTM() {
 		return emptyID, false
 	}
 
@@ -268,6 +237,11 @@ func (api *ArchiveAPI) FindLatestStableRancherOS() (*sacloud.Archive, error) {
 // FindLatestStableKusanagi 安定版最新のKusanagiパブリックアーカイブを取得
 func (api *ArchiveAPI) FindLatestStableKusanagi() (*sacloud.Archive, error) {
 	return api.findByOSTags(archiveLatestStableKusanagiTags)
+}
+
+// FindLatestStableSophosUTM 安定板最新のSophosUTMパブリックアーカイブを取得
+func (api *ArchiveAPI) FindLatestStableSophosUTM() (*sacloud.Archive, error) {
+	return api.findByOSTags(archiveLatestStableSophosUTMTags)
 }
 
 // FindLatestStableFreeBSD 安定版最新のFreeBSDパブリックアーカイブを取得

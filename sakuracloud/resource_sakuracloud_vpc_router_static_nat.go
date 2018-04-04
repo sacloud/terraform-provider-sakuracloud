@@ -100,11 +100,16 @@ func resourceSakuraCloudVPCRouterStaticNATRead(d *schema.ResourceData, meta inte
 	}
 
 	staticNAT := expandVPCRouterStaticNAT(d)
-	if vpcRouter.Settings != nil && vpcRouter.Settings.Router != nil && vpcRouter.Settings.Router.StaticNAT != nil &&
-		vpcRouter.Settings.Router.FindStaticNAT(staticNAT.GlobalAddress, staticNAT.PrivateAddress) != nil {
-		d.Set("global_address", staticNAT.GlobalAddress)
-		d.Set("private_address", staticNAT.PrivateAddress)
-		d.Set("description", staticNAT.Description)
+	if vpcRouter.Settings != nil && vpcRouter.Settings.Router != nil && vpcRouter.Settings.Router.StaticNAT != nil {
+		_, v := vpcRouter.Settings.Router.FindStaticNAT(staticNAT.GlobalAddress, staticNAT.PrivateAddress)
+		if v != nil {
+			d.Set("global_address", staticNAT.GlobalAddress)
+			d.Set("private_address", staticNAT.PrivateAddress)
+			d.Set("description", staticNAT.Description)
+		} else {
+			d.SetId("")
+			return nil
+		}
 	} else {
 		d.SetId("")
 		return nil

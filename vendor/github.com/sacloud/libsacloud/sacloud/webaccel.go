@@ -43,7 +43,7 @@ type WebAccelSite struct {
 	GibSentInLastWeek  int64           `json:",omitempty"`
 	CertValidNotBefore int64           `json:",omitempty"`
 	CertValidNotAfter  int64           `json:",omitempty"`
-	*propCreatedAt
+	propCreatedAt
 }
 
 // SetID ID 設定
@@ -93,8 +93,8 @@ type WebAccelCert struct {
 	SiteID           string `json:",omitempty"`
 	CertificateChain string `json:",omitempty"`
 	Key              string `json:",omitempty"`
-	*propCreatedAt   `json:",omitempty"`
-	*propUpdatedAt   `json:",omitempty"`
+	propCreatedAt    `json:",omitempty"`
+	propUpdatedAt    `json:",omitempty"`
 
 	SerialNumber string `json:",omitempty"`
 	NotBefore    int64  `json:",omitempty"`

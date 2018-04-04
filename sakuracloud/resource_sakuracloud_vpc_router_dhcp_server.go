@@ -106,11 +106,16 @@ func resourceSakuraCloudVPCRouterDHCPServerRead(d *schema.ResourceData, meta int
 	}
 
 	dhcpServer := expandVPCRouterDHCPServer(d)
-	if vpcRouter.Settings != nil && vpcRouter.Settings.Router != nil && vpcRouter.Settings.Router.DHCPServer != nil &&
-		vpcRouter.Settings.Router.FindDHCPServer(d.Get("vpc_router_interface_index").(int)) != nil {
-		d.Set("range_start", dhcpServer.RangeStart)
-		d.Set("range_stop", dhcpServer.RangeStop)
-		d.Set("dns_servers", dhcpServer.DNSServers)
+	if vpcRouter.Settings != nil && vpcRouter.Settings.Router != nil && vpcRouter.Settings.Router.DHCPServer != nil {
+		_, s := vpcRouter.Settings.Router.FindDHCPServer(d.Get("vpc_router_interface_index").(int))
+		if s != nil {
+			d.Set("range_start", dhcpServer.RangeStart)
+			d.Set("range_stop", dhcpServer.RangeStop)
+			d.Set("dns_servers", dhcpServer.DNSServers)
+		} else {
+			d.SetId("")
+			return nil
+		}
 	} else {
 		d.SetId("")
 		return nil

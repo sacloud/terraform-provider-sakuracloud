@@ -93,10 +93,15 @@ func resourceSakuraCloudVPCRouterStaticRouteRead(d *schema.ResourceData, meta in
 	}
 
 	staticRoute := expandVPCRouterStaticRoute(d)
-	if vpcRouter.Settings != nil && vpcRouter.Settings.Router != nil && vpcRouter.Settings.Router.StaticRoutes != nil &&
-		vpcRouter.Settings.Router.FindStaticRoute(staticRoute.Prefix, staticRoute.NextHop) != nil {
-		d.Set("prefix", staticRoute.Prefix)
-		d.Set("next_hop", staticRoute.NextHop)
+	if vpcRouter.Settings != nil && vpcRouter.Settings.Router != nil && vpcRouter.Settings.Router.StaticRoutes != nil {
+		_, v := vpcRouter.Settings.Router.FindStaticRoute(staticRoute.Prefix, staticRoute.NextHop)
+		if v != nil {
+			d.Set("prefix", staticRoute.Prefix)
+			d.Set("next_hop", staticRoute.NextHop)
+		} else {
+			d.SetId("")
+			return nil
+		}
 	} else {
 		d.SetId("")
 		return nil

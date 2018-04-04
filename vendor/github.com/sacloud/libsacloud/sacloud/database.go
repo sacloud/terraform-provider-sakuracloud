@@ -102,6 +102,10 @@ var (
 	DatabasePlan90G = DatabasePlan(90)
 	// DatabasePlan240G 240Gプラン
 	DatabasePlan240G = DatabasePlan(240)
+	// DatabasePlan500G 500Gプラン
+	DatabasePlan500G = DatabasePlan(500)
+	// DatabasePlan1T 1Tプラン
+	DatabasePlan1T = DatabasePlan(1000)
 )
 
 // AllowDatabasePlans 指定可能なデータベースプラン
@@ -111,6 +115,8 @@ func AllowDatabasePlans() []int {
 		int(DatabasePlan30G),
 		int(DatabasePlan90G),
 		int(DatabasePlan240G),
+		int(DatabasePlan500G),
+		int(DatabasePlan1T),
 	}
 }
 
@@ -310,7 +316,7 @@ func CreateNewDatabase(values *CreateDatabaseValue) *Database {
 	}
 
 	db.Remark.Servers = []interface{}{
-		map[string]string{"IPAddress": values.IPAddress1},
+		map[string]interface{}{"IPAddress": values.IPAddress1},
 	}
 
 	if values.WebUI {
@@ -400,7 +406,7 @@ func CloneNewDatabase(values *CreateDatabaseValue) *Database {
 	}
 
 	db.Remark.Servers = []interface{}{
-		map[string]string{"IPAddress": values.IPAddress1},
+		map[string]interface{}{"IPAddress": values.IPAddress1},
 	}
 
 	if values.WebUI {

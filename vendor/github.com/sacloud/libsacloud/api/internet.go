@@ -119,32 +119,21 @@ func (api *InternetAPI) DisableIPv6(id int64, ipv6NetID int64) (bool, error) {
 	return true, nil
 }
 
-// SleepWhileCreating 作成完了まで待機
-func (api *InternetAPI) SleepWhileCreating(internetID int64, timeout time.Duration) error {
-	current := 0 * time.Second
-	interval := 5 * time.Second
+// SleepWhileCreating 作成完了まで待機(リトライ10)
+func (api *InternetAPI) SleepWhileCreating(id int64, timeout time.Duration) error {
+	handler := waitingForReadFunc(func() (interface{}, error) {
+		return api.Read(id)
+	}, 10) // 作成直後はReadが404を返すことがあるためリトライ
+	return blockingPoll(handler, timeout)
 
-	var item *sacloud.Internet
-	var err error
-	//READ
-	for item == nil && timeout > current {
-		item, err = api.Read(internetID)
+}
 
-		if err != nil {
-			time.Sleep(interval)
-			current = current + interval
-			err = nil
-		}
-	}
-
-	if err != nil {
-		return err
-	}
-	if current > timeout {
-		return fmt.Errorf("Timeout: Can't read /internet/%d", internetID)
-	}
-
-	return nil
+// RetrySleepWhileCreating 作成完了まで待機 作成直後はReadが404を返すことがあるためmaxRetryまでリトライする
+func (api *InternetAPI) RetrySleepWhileCreating(id int64, timeout time.Duration, maxRetry int) error {
+	handler := waitingForReadFunc(func() (interface{}, error) {
+		return api.Read(id)
+	}, maxRetry)
+	return blockingPoll(handler, timeout)
 
 }
 
