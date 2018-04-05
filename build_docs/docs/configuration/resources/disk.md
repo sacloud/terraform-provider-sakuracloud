@@ -16,6 +16,13 @@ resource sakuracloud_disk "disk01" {
   source_archive_id = "${data.sakuracloud_archive.centos.id}"
   #source_disk_id = "${sakuracloud_disk.disk.id}"
 
+  #コピー元アーカイブのIDが変更された場合のリソース再生成を防ぎたい場合
+  #lifecycle {
+  #  # コピー元がアーカイブの場合の例
+  #  ignore_changes = ["source_archive_id"] 
+  #}
+
+
   #ディスクの修正関連
   hostname = "your-host-name"
   password = "your-password"
@@ -84,11 +91,42 @@ v0.3.6以降では[DataResource](data_resource.md)を利用してください。
     - 新:文字列(`hdd` or `ssd`)を指定
 
 
-#### 注1
+#### 注1 コピー元アーカイブ/ディスクの指定 / アーカイブID変更時のリソース再生成の抑制
 
 `source_archive_id`/`source_disk_id`はいずれか1つだけ指定可能です。
 
-#### 注2
+また、`source_archive_id`を以下のようにアーカイブデータソースを利用して指定している場合、
+さくらのクラウド側でのアーカイブ更新時にアーカイブIDも変更となる場合があります。
+
+```hcl
+data sakuracloud_archive "centos" {
+  os_type = "centos" # 最新安定版のCentOS
+}
+
+resource sakuracloud_disk "disk" {
+   # ...
+   source_archive_disk = "${data.sakuracloud_archive.centos.id}" # アーカイブデータソースを利用してID指定
+}
+```
+
+アーカイブIDが変更された後に`terraform apply`を実行すると、ディスクの再生成が行われます。  
+この挙動は以下のように記述することで抑制可能です。
+
+```hcl
+  lifecycle {
+    ignore_changes = ["source_archive_id"] 
+  }
+```
+
+これは、Terraformの[メタパラメータ](https://www.terraform.io/docs/configuration/resources.html#meta-parameters)と呼ばれるもので、
+標準のTerraformの挙動を上書きします。 
+
+この機能を利用する場合、以下の点に留意ください。
+
+  - `source_archive_disk`を手動で変更しても反映されない(`terraform taint`などで手動でリソース再生性が必要)
+  - コピー元となるアーカイブが変更されているため、次回ディスク生成時に現在の構成と同じにならない可能性がある
+
+#### 注2 ディスク修正機能の制限項目
 
   - OSによりディスク修正機能に対応していない場合があります。
   - これらの値は投入専用です。属性においても投入値を表します(さくらのクラウドAPIからは取得できない項目です)。
