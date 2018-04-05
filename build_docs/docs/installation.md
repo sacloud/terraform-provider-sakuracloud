@@ -16,7 +16,7 @@
 # ~/terraformディレクトリ作成
 $ mkdir -p ~/terraform ; cd ~/terraform
 # ダウンロード
-$ curl -sL https://releases.hashicorp.com/terraform/0.10.7/terraform_0.10.7_darwin_amd64.zip > terraform.zip
+$ curl -sL https://releases.hashicorp.com/terraform/0.11.5/terraform_0.11.5_darwin_amd64.zip > terraform.zip
 # 展開
 $ unzip terraform.zip
 # パスを通す
@@ -56,7 +56,8 @@ Available commands are:
 
 - 1) 以下のリンクから、プラットフォームに応じたzipファイルをダウンロードします
   - [Terraform for さくらのクラウド ダウンロードページ](http://releases.usacloud.jp/terraform/)
-- 2) terraformバイナリと同じディレクトリに展開します
+- 2) `~/.terraform.d/plugins/`配下に展開します  
+     ※ Windowsの場合は`%APPDATA%/terraform.d/plugins/`配下に展開します
 
 > Note:  
 Terraform for さくらのクラウドのバイナリーファイルは[GitHub上のリリースページ](https://github.com/sacloud/terraform-provider-sakuracloud/releases/latest)でも配布しています。
@@ -112,15 +113,4 @@ $ docker run -it --rm \
 $ docker-compose run --rm terraform apply
 ```
 
-## Homebrew(Linuxbrew)でのインストール
 
-Homebrew(Linuxbrew)をご利用中の場合、以下のコマンドでTerraform for さくらのクラウドをインストール可能です。
-
-    brew tap sacloud/homebrew-terraform-provider-sakuracloud ; brew install terraform-provider-sakuracloud
-
-注: brewコマンドでのインストール後、プラグインの有効化のために画面の指示に従って`~/.terraformrc`に以下のような記述を行なってください。
-
-    providers {
-        sakuracloud = "/path/to/your/terraform-provider-sakuracloud"
-    }
-    
