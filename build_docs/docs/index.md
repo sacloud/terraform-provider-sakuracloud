@@ -12,6 +12,14 @@
 
 #### ドキュメント
 - [Installation/インストールガイド](installation/)
+
+#### アップグレードガイド:
+
+- [v0.12での変更点](upgrade_to_v012/)
+- [v1.1での変更点](upgrade_to_v11/)
+      
+#### その他:
+
 - [Articles/ブログ/記事/読み物](articles/)
 
 ####  Reference/設定リファレンス
