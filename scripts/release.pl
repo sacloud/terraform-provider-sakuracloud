@@ -440,6 +440,9 @@ sub create_pull_request {
     infof "Write release info JSON.\n";
     system "docker", ("run","-it","--rm","-v","$ENV{PWD}:/workdir","sacloud/tf-release-info","v$next_version","v$ENV{TERRAFORM_VERSION}","releases/versions.json");
 
+    infof "Build GitHub Pages.\n";
+    system "make", "build-docs";
+
     infof "Update AUTHORS.\n";
     system "scripts/generate-authors.sh";
 

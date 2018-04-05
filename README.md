@@ -175,16 +175,15 @@ terraform apply
 
 ドキュメントはGithub Pagesを利用しています。(masterブランチの`docs`ディレクトリ配下)  
 静的ファイルの生成は`mkdocs`コマンドで行なっています。  
-ドキュメントの追加や修正は`build_docs`ディレクトリ以下のファイルの追加/修正を行なった上で`mkdocs`コマンドでファイル生成してコミットしてください。
+
+**ドキュメントのPRの際は`build_docs`ディレクトリ配下のみ修正を行い、`docs`ディレクトリ配下は変更しないでください。  
+`docs`ディレクトリはリリース時に一括更新されます。**
 
     # ドキュメントのプレビュー用サーバー起動(http://localhost/でプレビュー可能)
     make serve-docs
     
     # ドキュメントの検証(textlint)
     make lint-docs
-    
-    # build_docs配下のファイルからドキュメント生成(docsディレクトリ再生成)
-    make build-docs
 
 ## License
 
