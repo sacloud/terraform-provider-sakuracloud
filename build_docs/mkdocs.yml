@@ -11,6 +11,9 @@ pages:
   - ホーム: index.md
   - ドキュメント:
     - インストールガイド: installation.md
+    - アップグレードガイド:
+      - v0.12以前から: upgrade_to_v012.md
+      - v1.0から: upgrade_to_v11.md
     - ブログ/記事/読み物: articles.md
   - 設定リファレンス:
     - 全体/共通項目:
