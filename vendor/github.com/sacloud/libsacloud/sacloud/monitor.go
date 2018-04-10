@@ -1,7 +1,9 @@
 package sacloud
 
 import (
+	"encoding/json"
 	"math"
+	"strings"
 	"time"
 )
 
@@ -22,6 +24,59 @@ type MonitorValue struct {
 	UsedDisk2Size   *float64 `json:"Used-Disk2-Size,omitempty"`   // 使用済みディスクサイズ
 	FreeDiskSize    *float64 `json:"Free-Disk-Size,omitempty"`    // 空きディスクサイズ(NFS)
 	ResponseTimeSec *float64 `json:"responsetimesec,omitempty"`   // レスポンスタイム(シンプル監視)
+	UplinkBPS       *float64 `json:"UplinkBps,omitempty"`         // 上り方向トラフィック
+	DownlinkBPS     *float64 `json:"DownlinkBps"`                 // 下り方向トラフィック
+}
+
+// UnmarshalJSON JSONアンマーシャル(配列、オブジェクトが混在するためここで対応)
+func (m *MonitorValue) UnmarshalJSON(data []byte) error {
+	targetData := strings.Replace(strings.Replace(string(data), " ", "", -1), "\n", "", -1)
+	if targetData == `[]` {
+		return nil
+	}
+
+	tmp := &struct {
+		CPUTime         *float64 `json:"CPU-TIME,omitempty"`
+		Write           *float64 `json:",omitempty"`
+		Read            *float64 `json:",omitempty"`
+		Receive         *float64 `json:",omitempty"`
+		Send            *float64 `json:",omitempty"`
+		In              *float64 `json:",omitempty"`
+		Out             *float64 `json:",omitempty"`
+		TotalMemorySize *float64 `json:"Total-Memory-Size,omitempty"`
+		UsedMemorySize  *float64 `json:"Used-Memory-Size,omitempty"`
+		TotalDisk1Size  *float64 `json:"Total-Disk1-Size,omitempty"`
+		UsedDisk1Size   *float64 `json:"Used-Disk1-Size,omitempty"`
+		TotalDisk2Size  *float64 `json:"Total-Disk2-Size,omitempty"`
+		UsedDisk2Size   *float64 `json:"Used-Disk2-Size,omitempty"`
+		FreeDiskSize    *float64 `json:"Free-Disk-Size,omitempty"`
+		ResponseTimeSec *float64 `json:"responsetimesec,omitempty"`
+		UplinkBPS       *float64 `json:"UplinkBps,omitempty"`
+		DownlinkBPS     *float64 `json:"DownlinkBps"`
+	}{}
+	if err := json.Unmarshal(data, &tmp); err != nil {
+		return err
+	}
+
+	m.CPUTime = tmp.CPUTime
+	m.Write = tmp.Write
+	m.Read = tmp.Read
+	m.Receive = tmp.Receive
+	m.Send = tmp.Send
+	m.In = tmp.In
+	m.Out = tmp.Out
+	m.TotalMemorySize = tmp.TotalMemorySize
+	m.UsedMemorySize = tmp.UsedMemorySize
+	m.TotalDisk1Size = tmp.TotalDisk1Size
+	m.UsedDisk1Size = tmp.UsedDisk1Size
+	m.TotalDisk2Size = tmp.TotalDisk2Size
+	m.UsedDisk2Size = tmp.UsedDisk2Size
+	m.FreeDiskSize = tmp.FreeDiskSize
+	m.ResponseTimeSec = tmp.ResponseTimeSec
+	m.UplinkBPS = tmp.UplinkBPS
+	m.DownlinkBPS = tmp.DownlinkBPS
+
+	return nil
 }
 
 // ResourceMonitorRequest アクティビティモニター取得リクエスト
@@ -197,6 +252,16 @@ func (m *MonitorValues) FlattenResponseTimeSecValue() ([]FlatMonitorValue, error
 	return m.flattenValue(func(v *MonitorValue) *float64 { return v.ResponseTimeSec })
 }
 
+// FlattenUplinkBPSValue フラット化 上り方向トラフィック(セキュアモバイルSIM)
+func (m *MonitorValues) FlattenUplinkBPSValue() ([]FlatMonitorValue, error) {
+	return m.flattenValue(func(v *MonitorValue) *float64 { return v.UplinkBPS })
+}
+
+// FlattenDownlinkBPSValue フラット化 下り方向トライフィック(セキュアモバイルSIM)
+func (m *MonitorValues) FlattenDownlinkBPSValue() ([]FlatMonitorValue, error) {
+	return m.flattenValue(func(v *MonitorValue) *float64 { return v.DownlinkBPS })
+}
+
 func (m *MonitorValues) flattenValue(f func(*MonitorValue) *float64) ([]FlatMonitorValue, error) {
 	var res []FlatMonitorValue
 
@@ -229,6 +294,7 @@ func (m *MonitorValue) HasValue() bool {
 		m.TotalDisk1Size, m.UsedDisk1Size,
 		m.TotalDisk2Size, m.UsedDisk2Size,
 		m.FreeDiskSize, m.ResponseTimeSec,
+		m.UplinkBPS, m.DownlinkBPS,
 	}
 	for _, v := range values {
 		if v != nil {
