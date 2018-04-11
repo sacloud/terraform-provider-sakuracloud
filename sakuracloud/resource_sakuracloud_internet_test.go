@@ -16,6 +16,7 @@ func TestAccResourceSakuraCloudInternet(t *testing.T) {
 		PreCheck:     func() { testAccPreCheck(t) },
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckSakuraCloudInternetDestroy,
+
 		Steps: []resource.TestStep{
 			{
 				Config: testAccCheckSakuraCloudInternetConfig_basic,
@@ -203,7 +204,7 @@ resource "sakuracloud_server" "foobar" {
     disks = ["${sakuracloud_disk.foobar.id}"]
     description = "Server from TerraForm for SAKURA CLOUD"
     nic = "${sakuracloud_internet.foobar.switch_id}"
-    ipaddress = "${sakuracloud_internet.foobar.ipaddresses.0}"
+    ipaddress = "${sakuracloud_internet.foobar.ipaddresses[0]}"
     gateway = "${sakuracloud_internet.foobar.gateway}"
     nw_mask_len = "${sakuracloud_internet.foobar.nw_mask_len}"
 }
@@ -229,7 +230,7 @@ resource "sakuracloud_server" "foobar" {
     disks = ["${sakuracloud_disk.foobar.id}"]
     description = "Server from TerraForm for SAKURA CLOUD"
     nic = "${sakuracloud_internet.foobar.switch_id}"
-    ipaddress = "${sakuracloud_internet.foobar.ipaddresses.0}"
+    ipaddress = "${sakuracloud_internet.foobar.ipaddresses[0]}"
     gateway = "${sakuracloud_internet.foobar.gateway}"
     nw_mask_len = "${sakuracloud_internet.foobar.nw_mask_len}"
 }
