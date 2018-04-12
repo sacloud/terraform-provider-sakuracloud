@@ -133,7 +133,7 @@ func TestAccSakuraCloudServer_EditConnections(t *testing.T) {
 					testAccCheckSakuraCloudServerExists("sakuracloud_server.foobar", &server),
 					testAccCheckSakuraCloudServerAttributesWithoutSharedInterface(&server),
 					resource.TestCheckResourceAttr(
-						"sakuracloud_server.foobar", "nic", ""),
+						"sakuracloud_server.foobar", "nic", "disconnect"),
 					resource.TestCheckResourceAttr(
 						"sakuracloud_server.foobar", "additional_nics.#", "1"),
 					resource.TestCheckResourceAttr(
@@ -458,6 +458,7 @@ resource "sakuracloud_server" "foobar" {
     description = "Server from TerraForm for SAKURA CLOUD"
     tags = ["tag1"]
     icon_id = "${sakuracloud_icon.foobar.id}"
+    graceful_shutdown_timeout = 10
 }
 
 resource "sakuracloud_icon" "foobar" {
@@ -487,6 +488,7 @@ resource "sakuracloud_server" "foobar" {
     description = "Server from TerraForm for SAKURA CLOUD"
     tags = ["tag2"]
     interface_driver = "e1000"
+    graceful_shutdown_timeout = 10
 }
 `
 
@@ -508,6 +510,7 @@ resource "sakuracloud_server" "foobar" {
     disks = ["${sakuracloud_disk.foobar.id}"]
     description = "Server from TerraForm for SAKURA CLOUD"
     additional_nics = [""]
+    graceful_shutdown_timeout = 10
 }
 `
 const testAccCheckSakuraCloudServerConfig_swiched_NIC_updated = `
@@ -528,6 +531,7 @@ resource "sakuracloud_server" "foobar" {
     disks = ["${sakuracloud_disk.foobar.id}"]
     description = "Server from TerraForm for SAKURA CLOUD"
     additional_nics = ["","",""]
+    graceful_shutdown_timeout = 10
 }
 `
 
@@ -548,8 +552,9 @@ resource "sakuracloud_server" "foobar" {
     name = "myserver"
     disks = ["${sakuracloud_disk.foobar.id}"]
     description = "Server from TerraForm for SAKURA CLOUD"
-    nic = ""
+    nic = "disconnect"
     additional_nics = [""]
+    graceful_shutdown_timeout = 10
 }
 `
 
@@ -569,6 +574,7 @@ resource "sakuracloud_server" "foobar" {
     nic = "shared"
     additional_nics = [""]
     packet_filter_ids = ["" , "${sakuracloud_packet_filter.foobar2.id}"]
+    graceful_shutdown_timeout = 10
 }
 `
 
@@ -600,6 +606,7 @@ resource "sakuracloud_server" "foobar" {
     nic = "shared"
     additional_nics = [""]
     packet_filter_ids = ["${sakuracloud_packet_filter.foobar1.id}" , "${sakuracloud_packet_filter.foobar2.id}"]
+    graceful_shutdown_timeout = 10
 }
 
 `
@@ -632,6 +639,7 @@ resource "sakuracloud_server" "foobar" {
     nic = "shared"
     additional_nics = [""]
     packet_filter_ids = ["${sakuracloud_packet_filter.foobar1.id}"]
+    graceful_shutdown_timeout = 10
 }
 
 `
@@ -641,6 +649,7 @@ resource "sakuracloud_server" "foobar" {
     name = "myserver_upd"
     nic = "shared"
     additional_nics = [""]
+    graceful_shutdown_timeout = 10
 }`
 
 const testAccCheckSakuraCloudServerConfig_with_blank_disk = `
@@ -648,6 +657,7 @@ resource "sakuracloud_server" "foobar" {
     name = "myserver_with_blank"
     nic = "shared"
     disks = ["${sakuracloud_disk.foobar.id}"]
+    graceful_shutdown_timeout = 10
 }
 resource "sakuracloud_disk" "foobar" {
     name = "mydisk"
@@ -662,6 +672,7 @@ resource "sakuracloud_server" "foobar" {
     name = "foobar"
     nic = "shared"
     additional_nics = ["${sakuracloud_switch.foobar.id}"]
+    graceful_shutdown_timeout = 10
 }
 `
 
@@ -673,6 +684,7 @@ resource "sakuracloud_server" "foobar" {
     name = "foobar"
     nic = "${sakuracloud_switch.foobar.id}"
     additional_nics = [""]
+    graceful_shutdown_timeout = 10
 }
 `
 
@@ -681,6 +693,7 @@ resource "sakuracloud_server" "foobar" {
     name            = "myserver_with_private_host"
     private_host_id = "%s"
     zone            = "is1b"
+    graceful_shutdown_timeout = 10
 }
 `
 
@@ -689,12 +702,14 @@ resource "sakuracloud_server" "foobar" {
     name      = "foobar"
     nic       = "shared"
     ipaddress = ""
+    graceful_shutdown_timeout = 10
 }
 `
 
 const testAccCheckSakuraCloudServerConfig_nic_custom_diff_reference = `
 resource "sakuracloud_server" "foobar" {
     name      = "foobar"
+    graceful_shutdown_timeout = 10
 }
 resource sakuracloud_simple_monitor "foobar" {
   target = "${sakuracloud_server.foobar.ipaddress}"
@@ -715,6 +730,7 @@ resource "sakuracloud_server" "foobar" {
     ipaddress   = ""
     gateway     = ""
     nw_mask_len = ""
+    graceful_shutdown_timeout = 10
 }
 resource sakuracloud_simple_monitor "foobar" {
   target = "${sakuracloud_server.foobar.ipaddress}"
@@ -749,5 +765,6 @@ resource "sakuracloud_server" "foobar" {
     ipaddress   = "192.168.0.2"
     nw_mask_len = 24
     gateway     = "192.168.0.1"
+    graceful_shutdown_timeout = 10
 }
 `

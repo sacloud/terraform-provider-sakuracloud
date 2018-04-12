@@ -174,7 +174,7 @@ func resourceSakuraCloudServerCreate(d *schema.ResourceData, meta interface{}) e
 		switch forceString(hasSharedInterface) {
 		case "shared":
 			opts.AddPublicNWConnectedParam()
-		case "":
+		case "disconnect":
 			opts.AddEmptyConnectedParam()
 		default:
 			opts.AddExistsSwitchConnectedParam(forceString(hasSharedInterface))
@@ -427,7 +427,7 @@ func resourceSakuraCloudServerUpdate(d *schema.ResourceData, meta interface{}) e
 				if err != nil {
 					return fmt.Errorf("Error connecting NIC to the shared segment: %s", err)
 				}
-			} else if sharedNICCon != "" {
+			} else if sharedNICCon != "disconnect" {
 				_, err := client.Interface.ConnectToSwitch(server.Interfaces[0].ID, toSakuraCloudID(sharedNICCon))
 				if err != nil {
 					return fmt.Errorf("Error connecting NIC to SakuraCloud Switch resource: %s", err)
@@ -704,12 +704,16 @@ func setServerResourceData(d *schema.ResourceData, client *APIClient, data *sacl
 		d.Set("private_host_name", data.PrivateHost.Host.GetName())
 	}
 
-	hasSharedInterface := len(data.Interfaces) > 0 && data.Interfaces[0].Switch != nil
-	if hasSharedInterface {
-		if data.Interfaces[0].Switch.Scope == sacloud.ESCopeShared {
-			d.Set("nic", "shared")
+	hasFirstInterface := len(data.Interfaces) > 0
+	if hasFirstInterface {
+		if data.Interfaces[0].Switch == nil {
+			d.Set("nic", "disconnect")
 		} else {
-			d.Set("nic", data.Interfaces[0].Switch.GetStrID())
+			if data.Interfaces[0].Switch.Scope == sacloud.ESCopeShared {
+				d.Set("nic", "shared")
+			} else {
+				d.Set("nic", data.Interfaces[0].Switch.GetStrID())
+			}
 		}
 	} else {
 		d.Set("nic", "")
@@ -730,7 +734,7 @@ func setServerResourceData(d *schema.ResourceData, client *APIClient, data *sacl
 	d.Set("gateway", "")
 	d.Set("nw_address", "")
 	d.Set("nw_mask_len", "")
-	if hasSharedInterface {
+	if hasFirstInterface && data.Interfaces[0].Switch != nil {
 		if data.Interfaces[0].Switch.Scope == sacloud.ESCopeShared {
 			d.Set("ipaddress", data.Interfaces[0].IPAddress)
 		} else {
