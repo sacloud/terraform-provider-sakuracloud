@@ -110,6 +110,17 @@ func (api *MobileGatewayAPI) Update(id int64, value *sacloud.MobileGateway) (*sa
 	})
 }
 
+// UpdateSetting 設定更新
+func (api *MobileGatewayAPI) UpdateSetting(id int64, value *sacloud.MobileGateway) (*sacloud.MobileGateway, error) {
+	req := &sacloud.MobileGateway{
+		// Settings
+		Settings: value.Settings,
+	}
+	return api.request(func(res *mobileGatewayResponse) error {
+		return api.update(id, api.createRequest(req), res)
+	})
+}
+
 // Delete 削除
 func (api *MobileGatewayAPI) Delete(id int64) (*sacloud.MobileGateway, error) {
 	return api.request(func(res *mobileGatewayResponse) error {
