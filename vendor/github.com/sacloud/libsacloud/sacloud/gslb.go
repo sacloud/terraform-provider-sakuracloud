@@ -11,7 +11,7 @@ type GSLB struct {
 	propIcon         // アイコン
 	propTags         // タグ
 	propCreatedAt    // 作成日時
-	PropModifiedAt   // 変更日時
+	propModifiedAt   // 変更日時
 
 	Status   GSLBStatus   `json:",omitempty"` // ステータス
 	Provider GSLBProvider `json:",omitempty"` // プロバイダ

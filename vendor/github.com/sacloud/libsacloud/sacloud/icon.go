@@ -8,7 +8,7 @@ type Icon struct {
 	propScope        // スコープ
 	propTags         // タグ
 	propCreatedAt    // 作成日時
-	PropModifiedAt   // 変更日時
+	propModifiedAt   // 変更日時
 
 	URL   string `json:",omitempty"` // アイコンURL
 	Image string `json:",omitempty"` // 画像データBase64文字列(Sizeパラメータ指定時 or 画像アップロード時に利用)

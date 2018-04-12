@@ -9,7 +9,7 @@ type SimpleMonitor struct {
 	propIcon         // アイコン
 	propTags         // タグ
 	propCreatedAt    // 作成日時
-	PropModifiedAt   // 変更日時
+	propModifiedAt   // 変更日時
 
 	Settings *SimpleMonitorSettings `json:",omitempty"` // 設定
 	Status   *SimpleMonitorStatus   `json:",omitempty"` // ステータス
