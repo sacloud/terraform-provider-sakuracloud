@@ -48,7 +48,7 @@ resource sakuracloud_server "myserver" {
 | `core`   | -   | CPUコア数           | 1   | 数値 | 指定可能な値は[こちら](http://cloud.sakura.ad.jp/specification/server-disk/)のプラン一覧を参照ください |
 | `memory` | -   | メモリ(GB単位)       | 1  | 数値 | 指定可能な値は[こちら](http://cloud.sakura.ad.jp/specification/server-disk/)のプラン一覧を参照ください |
 | `interface_driver` | -   | NICドライバ       | `virtio`  | `virtio`<br />`e1000` | - |
-| `nic` | - | 基本NIC | `shared` | `shared`(共有セグメント)<br />`[switch_id]`(スイッチのID)<br />`""`(接続なし)|eth0の上流NWとの接続方法を指定する。 |
+| `nic` | - | 基本NIC | `shared` | `shared`(共有セグメント)<br />`[switch_id]`(スイッチのID)<br />`"disconnect"`(接続なし)|eth0の上流NWとの接続方法を指定する。 |
 | `additional_nics` | - | 追加NIC | - | リスト(文字列) | 追加で割り当てるNIC。接続するスイッチのID、または空文字を指定する。 |
 | `packet_filter_ids`| - | パケットフィルタID | - | リスト(文字列) | NICに適用するパケットフィルタのIDをリストで指定する。リストの先頭からeth0,eth1の順で適用される |
 | `icon_id`       | -   | アイコンID         | - | 文字列| - |
