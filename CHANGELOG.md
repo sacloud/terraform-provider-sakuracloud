@@ -1,5 +1,19 @@
 # Changelog
 
+## 1.1.0 (2018-04-12)
+
+* go v1.10対応 #278 (yamamoto-febc)
+* SetID呼び出しタイミングの統一 #282 (yamamoto-febc)
+* データベースアプライアンス 500GB/1TB プラン追加 #283 (yamamoto-febc)
+* TypeSetからTypeListへの変更 #284 (yamamoto-febc)
+* リリース時のドキュメント生成を自動化 #286 (yamamoto-febc)
+* インストールガイド更新 #288 (yamamoto-febc)
+* セキュアモバイル対応 #291 (yamamoto-febc)
+* Homebrewスクリプトの更新 #292 (yamamoto-febc)
+* Homebrewでのインストールガイド更新 #293 (yamamoto-febc)
+* モバイルゲートウェイでのスタティックルート設定機能 #294 (yamamoto-febc)
+
+
 ## 1.0.5 (2018-01-19)
 
 * サーバリソースの変更検知でCustomizeDiffを利用 #255 (yamamoto-febc)
