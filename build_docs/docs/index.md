@@ -40,6 +40,8 @@
     - [VPCルータ](configuration/resources/vpc_router/)
     - [データベース](configuration/resources/database/)
     - [NFS](configuration/resources/nfs/)
+    - [SIM](configuration/resources/sim/)
+    - [モバイルゲートウェイ](configuration/resources/mobile_gateway/)
     - [スタートアップスクリプト](configuration/resources/note/)
     - [公開鍵](configuration/resources/ssh_key/)
     - [公開鍵(生成)](configuration/resources/ssh_key_gen/)

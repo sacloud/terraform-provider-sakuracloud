@@ -11,6 +11,9 @@
       "sentence-length": {
         max:100
       },
+      "max-kanji-continuous-len": {
+        "max": 7
+      }
     }
   }
 }

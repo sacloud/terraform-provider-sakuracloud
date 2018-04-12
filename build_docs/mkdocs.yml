@@ -33,6 +33,8 @@ pages:
       - VPCルータ: configuration/resources/vpc_router.md
       - データベース: configuration/resources/database.md
       - NFS: configuration/resources/nfs.md
+      - SIM: configuration/resources/sim.md
+      - モバイルゲートウェイ: configuration/resources/mobile_gateway.md
       - スタートアップスクリプト: configuration/resources/note.md
       - 公開鍵: configuration/resources/ssh_key.md
       - 公開鍵(生成): configuration/resources/ssh_key_gen.md
