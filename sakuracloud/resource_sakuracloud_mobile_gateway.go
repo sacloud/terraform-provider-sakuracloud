@@ -231,6 +231,9 @@ func resourceSakuraCloudMobileGatewayRead(d *schema.ResourceData, meta interface
 func resourceSakuraCloudMobileGatewayUpdate(d *schema.ResourceData, meta interface{}) error {
 	client := getSacloudAPIClient(d, meta)
 
+	sakuraMutexKV.Lock(d.Id())
+	defer sakuraMutexKV.Unlock(d.Id())
+
 	mgw, err := client.MobileGateway.Read(toSakuraCloudID(d.Id()))
 	if err != nil {
 		return fmt.Errorf("Couldn't find SakuraCloud MobileGateway resource: %s", err)
@@ -374,6 +377,9 @@ func resourceSakuraCloudMobileGatewayUpdate(d *schema.ResourceData, meta interfa
 func resourceSakuraCloudMobileGatewayDelete(d *schema.ResourceData, meta interface{}) error {
 	client := getSacloudAPIClient(d, meta)
 
+	sakuraMutexKV.Lock(d.Id())
+	defer sakuraMutexKV.Unlock(d.Id())
+
 	mgw, err := client.MobileGateway.Read(toSakuraCloudID(d.Id()))
 	if err != nil {
 		if sacloudErr, ok := err.(api.Error); ok && sacloudErr.ResponseCode() == 404 {
@@ -417,7 +423,7 @@ func setMobileGatewayResourceData(d *schema.ResourceData, client *APIClient, dat
 	}
 
 	d.Set("public_ipaddress", data.Interfaces[0].IPAddress)
-	d.Set("public_nw_mask_len", data.Interfaces[0].Switch.UserSubnet.NetworkMaskLen)
+	d.Set("public_nw_mask_len", data.Interfaces[0].Switch.Subnet.NetworkMaskLen)
 	d.Set("internet_connection", strings.ToLower(data.Settings.MobileGateway.InternetConnection.Enabled) == "true")
 
 	if len(data.Interfaces) > 1 && data.Interfaces[1].Switch != nil {
