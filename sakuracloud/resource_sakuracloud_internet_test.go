@@ -16,7 +16,6 @@ func TestAccResourceSakuraCloudInternet(t *testing.T) {
 		PreCheck:     func() { testAccPreCheck(t) },
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckSakuraCloudInternetDestroy,
-
 		Steps: []resource.TestStep{
 			{
 				Config: testAccCheckSakuraCloudInternetConfig_basic,
