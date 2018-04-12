@@ -34,27 +34,25 @@ class TerraformProviderSakuracloud < Formula
     sha256 sha256_src_linux
   end
 
-  depends_on "terraform" => :run
+  depends_on "terraform"
 
   def install
     bin.install "terraform-provider-sakuracloud_v${VERSION}_x4"
   end
 
-  def caveats; <<-EOS.undent
+  def caveats; <<~EOS
 
-    This plugin requires "~/.terraformrc" file.
-    To enable, put following text in "~/.terraformrc":
+    This plugin needs to be placed in "~/.terraform.d/plugins" directory.
+    To enable, run following command to make symbolic link:
 
-        providers {
-            sakuracloud = "#{bin}/terraform-provider-sakuracloud_v${VERSION}_x4"
-        }
+         ln -s #{bin}/terraform-provider-sakuracloud_v${VERSION}_x4 ~/.terraform.d/plugins/terraform-provider-sakuracloud_v${VERSION}_x4
 
   EOS
   end
 
   test do
     minimal = testpath/"minimal.tf"
-    minimal.write <<-EOS.undent
+    minimal.write <<~EOS
       # Specify the provider and access details
       provider "sakuracloud" {
         token = "this_is_a_fake_token"
