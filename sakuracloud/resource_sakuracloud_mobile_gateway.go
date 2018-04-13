@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"strings"
+	"time"
 
 	"github.com/hashicorp/terraform/helper/schema"
 
@@ -199,6 +200,8 @@ func resourceSakuraCloudMobileGatewayCreate(d *schema.ResourceData, meta interfa
 	}
 
 	// boot
+	time.Sleep(90 * time.Second) // !HACK! For avoid that MobileGateway becomes an invalid state
+
 	_, err = client.MobileGateway.Boot(mgw.ID)
 	if err != nil {
 		return fmt.Errorf("Failed to wait SakuraCloud MobileGateway boot: %s", err)
