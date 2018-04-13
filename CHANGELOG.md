@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.1.1 (2018-04-13)
+
+* 逆引きレコード登録機能 #300 (yamamoto-febc)
+
+
 ## 1.1.0 (2018-04-13)
 
 * Pickup from v1.1-dev #274 (yamamoto-febc)
