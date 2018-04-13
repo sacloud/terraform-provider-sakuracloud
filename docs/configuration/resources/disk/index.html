@@ -80,6 +80,28 @@
 
         
             
+    <ul class="subnav">
+    <li><span>アップグレードガイド</span></li>
+
+        
+            
+    <li class="toctree-l1 ">
+        <a class="" href="../../../upgrade_to_v012/">v0.12以前から</a>
+        
+    </li>
+
+        
+            
+    <li class="toctree-l1 ">
+        <a class="" href="../../../upgrade_to_v11/">v1.0から</a>
+        
+    </li>
+
+        
+    </ul>
+
+        
+            
     <li class="toctree-l1 ">
         <a class="" href="../../../articles/">ブログ/記事/読み物</a>
         
@@ -221,6 +243,20 @@
             
     <li class="toctree-l1 ">
         <a class="" href="../nfs/">NFS</a>
+        
+    </li>
+
+        
+            
+    <li class="toctree-l1 ">
+        <a class="" href="../sim/">SIM</a>
+        
+    </li>
+
+        
+            
+    <li class="toctree-l1 ">
+        <a class="" href="../mobile_gateway/">モバイルゲートウェイ</a>
         
     </li>
 
@@ -528,6 +564,13 @@ resource sakuracloud_disk &quot;disk01&quot; {
   source_archive_id = &quot;${data.sakuracloud_archive.centos.id}&quot;
   #source_disk_id = &quot;${sakuracloud_disk.disk.id}&quot;
 
+  #コピー元アーカイブのIDが変更された場合のリソース再生成を防ぎたい場合
+  #lifecycle {
+  #  # コピー元がアーカイブの場合の例
+  #  ignore_changes = [&quot;source_archive_id&quot;] 
+  #}
+
+
   #ディスクの修正関連
   hostname = &quot;your-host-name&quot;
   password = &quot;your-password&quot;
@@ -721,9 +764,35 @@ v0.3.6以降では<a href="../data_resource/">DataResource</a>を利用してく
 </ul>
 </li>
 </ul>
-<h4 id="1">注1</h4>
+<h4 id="1-id">注1 コピー元アーカイブ/ディスクの指定 / アーカイブID変更時のリソース再生成の抑制</h4>
 <p><code>source_archive_id</code>/<code>source_disk_id</code>はいずれか1つだけ指定可能です。</p>
-<h4 id="2">注2</h4>
+<p>また、<code>source_archive_id</code>を以下のようにアーカイブデータソースを利用して指定している場合、
+さくらのクラウド側でのアーカイブ更新時にアーカイブIDも変更となる場合があります。</p>
+<pre><code class="hcl">data sakuracloud_archive &quot;centos&quot; {
+  os_type = &quot;centos&quot; # 最新安定版のCentOS
+}
+
+resource sakuracloud_disk &quot;disk&quot; {
+   # ...
+   source_archive_disk = &quot;${data.sakuracloud_archive.centos.id}&quot; # アーカイブデータソースを利用してID指定
+}
+</code></pre>
+
+<p>アーカイブIDが変更された後に<code>terraform apply</code>を実行すると、ディスクの再生成が行われます。<br />
+この挙動は以下のように記述することで抑制可能です。</p>
+<pre><code class="hcl">  lifecycle {
+    ignore_changes = [&quot;source_archive_id&quot;] 
+  }
+</code></pre>
+
+<p>これは、Terraformの<a href="https://www.terraform.io/docs/configuration/resources.html#meta-parameters">メタパラメータ</a>と呼ばれるもので、
+標準のTerraformの挙動を上書きします。 </p>
+<p>この機能を利用する場合、以下の点に留意ください。</p>
+<ul>
+<li><code>source_archive_disk</code>を手動で変更しても反映されない(<code>terraform taint</code>などで手動でリソース再生性が必要)</li>
+<li>コピー元となるアーカイブが変更されているため、次回ディスク生成時に現在の構成と同じにならない可能性がある</li>
+</ul>
+<h4 id="2">注2 ディスク修正機能の制限項目</h4>
 <ul>
 <li>OSによりディスク修正機能に対応していない場合があります。</li>
 <li>これらの値は投入専用です。属性においても投入値を表します(さくらのクラウドAPIからは取得できない項目です)。</li>

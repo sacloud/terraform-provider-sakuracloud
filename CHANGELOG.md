@@ -1,5 +1,26 @@
 # Changelog
 
+## 1.1.0 (2018-04-13)
+
+* Pickup from v1.1-dev #274 (yamamoto-febc)
+* Update sacloud/libsacloud #277 (yamamoto-febc)
+* go v1.10対応 #278 (yamamoto-febc)
+* Accept-Languageパラメータ追加 #279 (yamamoto-febc)
+* SetID呼び出しタイミングの統一 #282 (yamamoto-febc)
+* データベースアプライアンス 500GB/1TB プラン追加 #283 (yamamoto-febc)
+* TypeSetからTypeListへの変更 #284 (yamamoto-febc)
+* リリース時のドキュメント生成を自動化 #286 (yamamoto-febc)
+* アーカイブID変更時のディスク再生成抑制についてのドキュメント #287 (yamamoto-febc)
+* インストールガイド更新 #288 (yamamoto-febc)
+* アップグレードガイドの追加 #289 (yamamoto-febc)
+* セキュアモバイル対応 #291 (yamamoto-febc)
+* Homebrewスクリプトの更新 #292 (yamamoto-febc)
+* Homebrewでのインストールガイド更新 #293 (yamamoto-febc)
+* モバイルゲートウェイでのスタティックルート設定機能 #294 (yamamoto-febc)
+* サーバの1番目のNICを接続なしで作成 #295 (yamamoto-febc)
+* モバイルゲートウェイの起動時の待機処理 #297 (yamamoto-febc)
+
+
 ## 1.0.5 (2018-01-19)
 
 * サーバリソースの変更検知でCustomizeDiffを利用 #255 (yamamoto-febc)

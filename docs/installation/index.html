@@ -97,6 +97,28 @@
 
         
             
+    <ul class="subnav">
+    <li><span>アップグレードガイド</span></li>
+
+        
+            
+    <li class="toctree-l1 ">
+        <a class="" href="../upgrade_to_v012/">v0.12以前から</a>
+        
+    </li>
+
+        
+            
+    <li class="toctree-l1 ">
+        <a class="" href="../upgrade_to_v11/">v1.0から</a>
+        
+    </li>
+
+        
+    </ul>
+
+        
+            
     <li class="toctree-l1 ">
         <a class="" href="../articles/">ブログ/記事/読み物</a>
         
@@ -225,6 +247,20 @@
             
     <li class="toctree-l1 ">
         <a class="" href="../configuration/resources/nfs/">NFS</a>
+        
+    </li>
+
+        
+            
+    <li class="toctree-l1 ">
+        <a class="" href="../configuration/resources/sim/">SIM</a>
+        
+    </li>
+
+        
+            
+    <li class="toctree-l1 ">
+        <a class="" href="../configuration/resources/mobile_gateway/">モバイルゲートウェイ</a>
         
     </li>
 
@@ -531,7 +567,7 @@
 <pre><code class="bash"># ~/terraformディレクトリ作成
 $ mkdir -p ~/terraform ; cd ~/terraform
 # ダウンロード
-$ curl -sL https://releases.hashicorp.com/terraform/0.10.7/terraform_0.10.7_darwin_amd64.zip &gt; terraform.zip
+$ curl -sL https://releases.hashicorp.com/terraform/0.11.7/terraform_0.11.7_darwin_amd64.zip &gt; terraform.zip
 # 展開
 $ unzip terraform.zip
 # パスを通す
@@ -567,7 +603,8 @@ Available commands are:
 <ul>
 <li>1) 以下のリンクから、プラットフォームに応じたzipファイルをダウンロードします</li>
 <li><a href="http://releases.usacloud.jp/terraform/">Terraform for さくらのクラウド ダウンロードページ</a></li>
-<li>2) terraformバイナリと同じディレクトリに展開します</li>
+<li>2) <code>~/.terraform.d/plugins/</code>配下に展開します<br />
+     ※ Windowsの場合は<code>%APPDATA%/terraform.d/plugins/</code>配下に展開します</li>
 </ul>
 <blockquote>
 <p>Note:<br />
@@ -607,13 +644,12 @@ $ docker-compose run --rm terraform apply
 </code></pre>
 
 <h2 id="homebrewlinuxbrew">Homebrew(Linuxbrew)でのインストール</h2>
-<p>Homebrew(Linuxbrew)をご利用中の場合、以下のコマンドでTerraform for さくらのクラウドをインストール可能です。</p>
-<pre><code>brew tap sacloud/homebrew-terraform-provider-sakuracloud ; brew install terraform-provider-sakuracloud
+<p>Homebrew(Linuxbrew)をご利用中の場合、以下のコマンドでTerraform for さくらのクラウドをインストール可能です。      </p>
+<pre><code>brew install sacloud/terraform-provider-sakuracloud/terraform-provider-sakuracloud
 </code></pre>
-<p>注: brewコマンドでのインストール後、プラグインの有効化のために画面の指示に従って<code>~/.terraformrc</code>に以下のような記述を行なってください。</p>
-<pre><code>providers {
-    sakuracloud = "/path/to/your/terraform-provider-sakuracloud"
-}
+<p>注: brewコマンドでのインストール後、プラグインの有効化のために画面の指示に従って<code>~/.terraform.d/plugins</code>配下にシンボリックリンクを作成してください。       </p>
+<pre><code># シンボリックリンク作成の例 
+ln -s /usr/local/opt/terraform-provider-sakuracloud/bin/terraform-provider-sakuracloud_v1.0.5_x4 ~/.terraform.d/plugins/terraform-provider-sakuracloud_v1.0.5_x4
 </code></pre>
               
             </div>
@@ -622,7 +658,7 @@ $ docker-compose run --rm terraform apply
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="../articles/" class="btn btn-neutral float-right" title="ブログ/記事/読み物"/>Next <span class="icon icon-circle-arrow-right"></span></a>
+        <a href="../upgrade_to_v012/" class="btn btn-neutral float-right" title="v0.12以前から"/>Next <span class="icon icon-circle-arrow-right"></span></a>
       
       
         <a href=".." class="btn btn-neutral" title="ホーム"><span class="icon icon-circle-arrow-left"></span> Previous</a>
@@ -656,7 +692,7 @@ $ docker-compose run --rm terraform apply
         <span><a href=".." style="color: #fcfcfc;">&laquo; Previous</a></span>
       
       
-        <span style="margin-left: 15px"><a href="../articles/" style="color: #fcfcfc">Next &raquo;</a></span>
+        <span style="margin-left: 15px"><a href="../upgrade_to_v012/" style="color: #fcfcfc">Next &raquo;</a></span>
       
     </span>
 </div>
