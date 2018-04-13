@@ -130,6 +130,9 @@ func resourceSakuraCloudSIMCreate(d *schema.ResourceData, meta interface{}) erro
 
 	// connect to MobileGateway
 	if mgwID > 0 {
+		sakuraMutexKV.Lock(fmt.Sprintf("%d", mgwID))
+		defer sakuraMutexKV.Unlock(fmt.Sprintf("%d", mgwID))
+
 		_, err = client.MobileGateway.AddSIM(mgwID, sim.ID)
 		if err != nil {
 			return fmt.Errorf("Failed to create SakuraCloud SIM resource: %s", err)
@@ -298,6 +301,9 @@ func resourceSakuraCloudSIMDelete(d *schema.ResourceData, meta interface{}) erro
 
 	mgwID := toSakuraCloudID(d.Get("mobile_gateway_id").(string))
 	if mgwID > 0 {
+		sakuraMutexKV.Lock(fmt.Sprintf("%d", mgwID))
+		defer sakuraMutexKV.Unlock(fmt.Sprintf("%d", mgwID))
+
 		mgw, err := client.MobileGateway.Read(mgwID)
 		if err != nil {
 			if sacloudErr, ok := err.(api.Error); ok && sacloudErr.ResponseCode() == 404 {
