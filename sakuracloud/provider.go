@@ -116,6 +116,7 @@ func Provider() terraform.ResourceProvider {
 			"sakuracloud_gslb_server":                    resourceSakuraCloudGSLBServer(),
 			"sakuracloud_icon":                           resourceSakuraCloudIcon(),
 			"sakuracloud_internet":                       resourceSakuraCloudInternet(),
+			"sakuracloud_ipv4_prt":                       resourceSakuraCloudIPv4Prt(),
 			"sakuracloud_load_balancer":                  resourceSakuraCloudLoadBalancer(),
 			"sakuracloud_load_balancer_vip":              resourceSakuraCloudLoadBalancerVIP(),
 			"sakuracloud_load_balancer_server":           resourceSakuraCloudLoadBalancerServer(),
