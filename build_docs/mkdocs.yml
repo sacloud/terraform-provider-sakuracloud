@@ -41,6 +41,7 @@ pages:
       - アイコン: configuration/resources/icon.md
       - 専有ホスト: configuration/resources/private_host.md
       - DNS: configuration/resources/dns.md
+      - IPv4逆引きレコード: configuration/resources/ipv4_ptr.md
       - GSLB: configuration/resources/gslb.md
       - シンプル監視: configuration/resources/simple_monitor.md
       - 自動バックアップ: configuration/resources/auto_backup.md

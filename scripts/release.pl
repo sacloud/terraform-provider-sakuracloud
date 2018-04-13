@@ -446,6 +446,8 @@ sub create_pull_request {
     infof "Update AUTHORS.\n";
     system "scripts/generate-authors.sh";
 
+    system "git", "add", "docs/";
+
     if($ret || git_with_exit_code qw/diff --exit-code/){
         git qw/config --global push.default matching/;
         git qw/config user.email/, 'sacloud.users@gmail.com';

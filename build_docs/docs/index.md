@@ -48,6 +48,7 @@
     - [アイコン](configuration/resources/icon/)
     - [専有ホスト](configuration/resources/private_host/)
     - [DNS](configuration/resources/dns/)
+    - [IPv4逆引きレコード](configuration/resources/ipv4_ptr/)
     - [GSLB](configuration/resources/gslb/)
     - [シンプル監視](configuration/resources/simple_monitor/)
     - [自動バックアップ](configuration/resources/auto_backup/)
