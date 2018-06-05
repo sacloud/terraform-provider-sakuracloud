@@ -200,7 +200,7 @@ type CreateDatabaseValue struct {
 func NewCreatePostgreSQLDatabaseValue() *CreateDatabaseValue {
 	return &CreateDatabaseValue{
 		DatabaseName:    "postgres",
-		DatabaseVersion: "9.6",
+		DatabaseVersion: "10",
 	}
 }
 
@@ -208,7 +208,7 @@ func NewCreatePostgreSQLDatabaseValue() *CreateDatabaseValue {
 func NewCreateMariaDBDatabaseValue() *CreateDatabaseValue {
 	return &CreateDatabaseValue{
 		DatabaseName:    "MariaDB",
-		DatabaseVersion: "10.1",
+		DatabaseVersion: "10.2",
 	}
 }
 
