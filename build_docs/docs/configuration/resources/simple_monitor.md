@@ -72,6 +72,7 @@ resource sakuracloud_simple_monitor "my_sslcert_monitor" {
 | `path`         | △   | パス  | - | 文字列 | プロトコルが`http`または`https`の場合のみ有効かつ必須 |
 | `host_header`  | △   | HOSTヘッダ  | - | 文字列 | プロトコルが`http`または`https`の場合のみ有効 |
 | `status`       | △   | レスポンスコード | - | 文字列 | プロトコルが`http`または`https`の場合のみ有効かつ必須 |
+| `sni`          | △   | SNI | `false` | `true`<br />`false`| プロトコルが`https`の場合のみ有効 |
 | `port`         | △   | ポート番号 | - | 数値 | プロトコルが`tcp`,`ssh`,`smtp`,`pop3`の場合のみ有効かつ必須 |
 | `qname`        | △   | 問合せFQDN | - | 文字列 | プロトコルが`dns`の場合のみ有効かつ必須 |
 | `expected_data`| △   | 期待値 | - | 文字列 | プロトコルが`dns`,`snmp`の場合のみ有効<br />`dns`の場合、省略すると、何らかのAレコードの応答があるかのチェックとなる<br />`snmp`の場合は必須 |
