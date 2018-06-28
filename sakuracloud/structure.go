@@ -168,6 +168,14 @@ func forceString(target interface{}) string {
 	return target.(string)
 }
 
+func forceBool(target interface{}) bool {
+	if target == nil {
+		return false
+	}
+
+	return target.(bool)
+}
+
 func forceAtoI(target string) int {
 	v, _ := strconv.Atoi(target)
 	return v

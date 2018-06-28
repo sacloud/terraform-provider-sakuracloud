@@ -23,9 +23,11 @@ func TestAccResourceSakuraCloudSimpleMonitor(t *testing.T) {
 					testAccCheckSakuraCloudSimpleMonitorExists("sakuracloud_simple_monitor.foobar", &monitor),
 					testAccCheckSakuraCloudSimpleMonitorAttributes(&monitor),
 					resource.TestCheckResourceAttr(
-						"sakuracloud_simple_monitor.foobar", "health_check.0.protocol", "http"),
+						"sakuracloud_simple_monitor.foobar", "health_check.0.protocol", "https"),
 					resource.TestCheckResourceAttr(
 						"sakuracloud_simple_monitor.foobar", "health_check.0.delay_loop", "60"),
+					resource.TestCheckResourceAttr(
+						"sakuracloud_simple_monitor.foobar", "health_check.0.sni", "true"),
 					resource.TestCheckResourceAttr(
 						"sakuracloud_simple_monitor.foobar", "target", "terraform.io"),
 					resource.TestCheckResourceAttr(
@@ -171,11 +173,12 @@ var testAccCheckSakuraCloudSimpleMonitorConfig_basic = fmt.Sprintf(`
 resource "sakuracloud_simple_monitor" "foobar" {
     target = "terraform.io"
     health_check = {
-        protocol = "http"
+        protocol = "https"
         delay_loop = 60
         path = "/"
         status = "200"
         host_header = "libsacloud.com"
+		sni  = true
     }
     description = "SimpleMonitor from TerraForm for SAKURA CLOUD"
     tags = ["hoge1" , "hoge2"]

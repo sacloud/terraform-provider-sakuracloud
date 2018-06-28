@@ -71,6 +71,10 @@ func dataSourceSakuraCloudSimpleMonitor() *schema.Resource {
 							Type:     schema.TypeString,
 							Computed: true,
 						},
+						"sni": {
+							Type:     schema.TypeBool,
+							Computed: true,
+						},
 						"port": {
 							Type:     schema.TypeInt,
 							Computed: true,
