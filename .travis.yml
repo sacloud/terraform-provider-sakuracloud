@@ -19,8 +19,7 @@ before_deploy:
 - export TERRAFORM_VERSION=$(go run tools/terraform-version/main.go)
 - go get github.com/aktau/github-release
 - mkdir -p ~/bin
-- git clone https://github.com/github/hub.git && cd hub && script/build -o ~/bin/hub
-  && cd ..
+- (go get github.com/github/hub && cd $GOPATH/src/github.com/github/hub && script/build -o ~/bin/hub)
 - echo $TRAVIS_BRANCH
 - git config --add remote.origin.fetch '+refs/heads/*:refs/remotes/origin/*'
 - git fetch
