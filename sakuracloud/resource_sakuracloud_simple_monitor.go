@@ -2,6 +2,7 @@ package sakuracloud
 
 import (
 	"fmt"
+	"strings"
 
 	"errors"
 
@@ -58,6 +59,10 @@ func resourceSakuraCloudSimpleMonitor() *schema.Resource {
 						},
 						"status": {
 							Type:     schema.TypeString,
+							Optional: true,
+						},
+						"sni": {
+							Type:     schema.TypeBool,
 							Optional: true,
 						},
 						"port": {
@@ -170,7 +175,8 @@ func resourceSakuraCloudSimpleMonitorCreate(d *schema.ResourceData, meta interfa
 		opts.SetHealthCheckHTTPS(port,
 			forceString(conf["path"]),
 			forceString(conf["status"]),
-			forceString(conf["host_header"]))
+			forceString(conf["host_header"]),
+			forceBool(conf["sni"]))
 
 	case "dns":
 		opts.SetHealthCheckDNS(forceString(conf["qname"]),
@@ -302,7 +308,8 @@ func resourceSakuraCloudSimpleMonitorUpdate(d *schema.ResourceData, meta interfa
 			simpleMonitor.SetHealthCheckHTTPS(port,
 				forceString(conf["path"]),
 				forceString(conf["status"]),
-				forceString(conf["host_header"]))
+				forceString(conf["host_header"]),
+				forceBool(conf["sni"]))
 
 		case "dns":
 			simpleMonitor.SetHealthCheckDNS(forceString(conf["qname"]),
@@ -440,6 +447,7 @@ func setSimpleMonitorResourceData(d *schema.ResourceData, client *APIClient, dat
 		if port != "" || readHealthCheck.Port != "443" {
 			healthCheck["port"] = readHealthCheck.Port
 		}
+		healthCheck["sni"] = strings.ToLower(readHealthCheck.SNI) == "true"
 	case "tcp":
 		healthCheck["port"] = port
 		healthCheck["port"] = readHealthCheck.Port

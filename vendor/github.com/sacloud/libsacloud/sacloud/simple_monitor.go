@@ -51,6 +51,7 @@ type SimpleMonitorHealthCheck struct {
 	Port          string `json:",omitempty"` // ポート
 	Path          string `json:",omitempty"` // HTTP/HTTPS監視の場合のリクエストパス
 	Status        string `json:",omitempty"` // HTTP/HTTPS監視の場合の期待ステータスコード
+	SNI           string `json:",omitempty"` // HTTPS監視時のSNI有効/無効
 	Host          string `json:",omitempty"` // 対象ホスト(IP or FQDN)
 	QName         string `json:",omitempty"` // DNS監視の場合の問い合わせFQDN
 	ExpectedData  string `json:",omitempty"` // 期待値
@@ -152,13 +153,18 @@ func (s *SimpleMonitor) SetHealthCheckHTTP(port string, path string, status stri
 }
 
 // SetHealthCheckHTTPS HTTPSでのヘルスチェック設定
-func (s *SimpleMonitor) SetHealthCheckHTTPS(port string, path string, status string, host string) {
+func (s *SimpleMonitor) SetHealthCheckHTTPS(port string, path string, status string, host string, sni bool) {
+	strSNI := "False"
+	if sni {
+		strSNI = "True"
+	}
 	s.Settings.SimpleMonitor.HealthCheck = &SimpleMonitorHealthCheck{
 		Protocol: "https",
 		Port:     port,
 		Path:     path,
 		Status:   status,
 		Host:     host,
+		SNI:      strSNI,
 	}
 }
 
