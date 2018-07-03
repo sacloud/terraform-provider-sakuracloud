@@ -38,6 +38,28 @@ resource "sakuracloud_mobile_gateway_static_route" "route02" {
     next_hop = "192.168.11.202"
 }
 
+# SIMルートの定義
+resource sakuracloud_mobile_gateway_sim_route "r3" {
+  mobile_gateway_id = "${sakuracloud_mobile_gateway.mgw.id}"
+  sim_id = "${sakuracloud_sim.sim.id}"
+  prefix = "192.168.11.0/26"
+}
+
+# SIMの定義
+resource "sakuracloud_sim" "sim" {
+    name        = "example"
+    description = "example"
+    tags        = ["tags1" , "tags2"]
+
+    iccid    = "<SIMに記載されているICCID>"
+    passcode = "<SIMに記載されているPasscode>"
+    imei     = "<端末識別番号(IMEIロックする場合のみ)>"
+    #enabled  = true
+    
+    mobile_gateway_id = "${sakuracloud_mobile_gateway.mgw.id}" # 接続するモバイルゲートウェイのID
+    ipaddress         = "192.168.100.2"                        # SIMに割り当てるIPアドレス        
+}
+
 # モバイルゲートウェイに接続するスイッチの定義
 resource "sakuracloud_switch" "sw" {
     name = "sw"
@@ -81,6 +103,26 @@ resource "sakuracloud_switch" "sw" {
 | `mobile_gateway_id`   | ◯   | モバイルゲートウェイID         | -        | 文字列                   | - |
 | `prefix`                    | ◯   | プリフィックス | -        | 文字列(`x.x.x.x/n`形式)                          | - |
 | `next_hop`                  | ◯   | ネクストホップ | -        | 文字列                          | - |
+| `zone`          | -   | ゾーン          | -        | `is1a`<br />`is1b`<br />`tk1a`<br />`tk1v` | - |
+
+
+### 属性
+
+|属性名                     | 名称             | 補足                  |
+|--------------------------|------------------|----------------------|
+| `id`                     | ID                    | -                    |
+
+## SIMルート(sakuracloud_mobile_gateway_sim_route)
+
+モバイルゲートウェイに登録するSIMルートを表します。
+
+### パラメーター
+
+|パラメーター                 |必須  |名称                 |初期値     |設定値                         |補足                                          |
+|---------------------------|:---:|----------------------|:--------:|-------------------------------|----------------------------------------------|
+| `mobile_gateway_id`   | ◯   | モバイルゲートウェイID         | -        | 文字列                   | - |
+| `prefix`              | ◯   | プリフィックス | -        | 文字列(`x.x.x.x/n`形式)                          | - |
+| `sim_id`              | ◯   | SIM ID | -        | 文字列                          | - |
 | `zone`          | -   | ゾーン          | -        | `is1a`<br />`is1b`<br />`tk1a`<br />`tk1v` | - |
 
 
