@@ -122,6 +122,7 @@ func Provider() terraform.ResourceProvider {
 			"sakuracloud_load_balancer_server":           resourceSakuraCloudLoadBalancerServer(),
 			"sakuracloud_mobile_gateway":                 resourceSakuraCloudMobileGateway(),
 			"sakuracloud_mobile_gateway_static_route":    resourceSakuraCloudMobileGatewayStaticRoute(),
+			"sakuracloud_mobile_gateway_sim_route":       resourceSakuraCloudMobileGatewaySIMRoute(),
 			"sakuracloud_note":                           resourceSakuraCloudNote(),
 			"sakuracloud_nfs":                            resourceSakuraCloudNFS(),
 			"sakuracloud_packet_filter":                  resourceSakuraCloudPacketFilter(),
