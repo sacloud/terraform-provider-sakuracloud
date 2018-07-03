@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.2.0 (2018-07-03)
+
+* SIMルート リソースの追加 #308 (yamamoto-febc)
+* Update README.md #309 (yamamoto-febc)
+
+
 ## 1.1.3 (2018-06-28)
 
 * シンプル監視でのSNI対応 #306 (yamamoto-febc)
