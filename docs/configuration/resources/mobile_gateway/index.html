@@ -257,6 +257,8 @@
                 
                     <li><a class="toctree-l4" href="#sakuracloud_mobile_gateway_static_route">スタティックルート(sakuracloud_mobile_gateway_static_route)</a></li>
                 
+                    <li><a class="toctree-l4" href="#simsakuracloud_mobile_gateway_sim_route">SIMルート(sakuracloud_mobile_gateway_sim_route)</a></li>
+                
             
             </ul>
         
@@ -595,6 +597,28 @@ resource &quot;sakuracloud_mobile_gateway_static_route&quot; &quot;route02&quot;
     next_hop = &quot;192.168.11.202&quot;
 }
 
+# SIMルートの定義
+resource sakuracloud_mobile_gateway_sim_route &quot;r3&quot; {
+  mobile_gateway_id = &quot;${sakuracloud_mobile_gateway.mgw.id}&quot;
+  sim_id = &quot;${sakuracloud_sim.sim.id}&quot;
+  prefix = &quot;192.168.11.0/26&quot;
+}
+
+# SIMの定義
+resource &quot;sakuracloud_sim&quot; &quot;sim&quot; {
+    name        = &quot;example&quot;
+    description = &quot;example&quot;
+    tags        = [&quot;tags1&quot; , &quot;tags2&quot;]
+
+    iccid    = &quot;&lt;SIMに記載されているICCID&gt;&quot;
+    passcode = &quot;&lt;SIMに記載されているPasscode&gt;&quot;
+    imei     = &quot;&lt;端末識別番号(IMEIロックする場合のみ)&gt;&quot;
+    #enabled  = true
+
+    mobile_gateway_id = &quot;${sakuracloud_mobile_gateway.mgw.id}&quot; # 接続するモバイルゲートウェイのID
+    ipaddress         = &quot;192.168.100.2&quot;                        # SIMに割り当てるIPアドレス        
+}
+
 # モバイルゲートウェイに接続するスイッチの定義
 resource &quot;sakuracloud_switch&quot; &quot;sw&quot; {
     name = &quot;sw&quot;
@@ -794,6 +818,72 @@ resource &quot;sakuracloud_switch&quot; &quot;sw&quot; {
 </tbody>
 </table>
 <h3 id="_5">属性</h3>
+<table>
+<thead>
+<tr>
+<th>属性名</th>
+<th>名称</th>
+<th>補足</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>id</code></td>
+<td>ID</td>
+<td>-</td>
+</tr>
+</tbody>
+</table>
+<h2 id="simsakuracloud_mobile_gateway_sim_route">SIMルート(sakuracloud_mobile_gateway_sim_route)</h2>
+<p>モバイルゲートウェイに登録するSIMルートを表します。</p>
+<h3 id="_6">パラメーター</h3>
+<table>
+<thead>
+<tr>
+<th>パラメーター</th>
+<th align="center">必須</th>
+<th>名称</th>
+<th align="center">初期値</th>
+<th>設定値</th>
+<th>補足</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>mobile_gateway_id</code></td>
+<td align="center">◯</td>
+<td>モバイルゲートウェイID</td>
+<td align="center">-</td>
+<td>文字列</td>
+<td>-</td>
+</tr>
+<tr>
+<td><code>prefix</code></td>
+<td align="center">◯</td>
+<td>プリフィックス</td>
+<td align="center">-</td>
+<td>文字列(<code>x.x.x.x/n</code>形式)</td>
+<td>-</td>
+</tr>
+<tr>
+<td><code>sim_id</code></td>
+<td align="center">◯</td>
+<td>SIM ID</td>
+<td align="center">-</td>
+<td>文字列</td>
+<td>-</td>
+</tr>
+<tr>
+<td><code>zone</code></td>
+<td align="center">-</td>
+<td>ゾーン</td>
+<td align="center">-</td>
+<td><code>is1a</code><br /><code>is1b</code><br /><code>tk1a</code><br /><code>tk1v</code></td>
+<td>-</td>
+</tr>
+</tbody>
+</table>
+<h3 id="_7">属性</h3>
 <table>
 <thead>
 <tr>
