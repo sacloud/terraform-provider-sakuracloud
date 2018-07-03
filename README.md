@@ -112,6 +112,8 @@ terraform apply
   - [VPCルーター](https://sacloud.github.io/terraform-provider-sakuracloud/configuration/resources/vpc_router/)
   - [データベース](https://sacloud.github.io/terraform-provider-sakuracloud/configuration/resources/database/)
   - [NFS](https://sacloud.github.io/terraform-provider-sakuracloud/configuration/resources/nfs/)
+  - [SIM(セキュアモバイル)](http://sacloud.github.io/terraform-provider-sakuracloud/configuration/resources/sim/)
+  - [モバイルゲートウェイ](http://sacloud.github.io/terraform-provider-sakuracloud/configuration/resources/mobile_gateway/)
   - [スタートアップスクリプト](https://sacloud.github.io/terraform-provider-sakuracloud/configuration/resources/note/)
   - [公開鍵](https://sacloud.github.io/terraform-provider-sakuracloud/configuration/resources/ssh_key/)
   - [公開鍵(生成)](https://sacloud.github.io/terraform-provider-sakuracloud/configuration/resources/ssh_key_gen/)
@@ -132,6 +134,7 @@ terraform apply
 以下のリソースはさくらのクラウド側でAPIが提供されていないため未サポートです。
 
   - ローカルルータ
+  - リソースマネージャ
   - ウェブアクセラレータ
   - オブジェクトストレージ(バケット作成)
   - ライセンス
