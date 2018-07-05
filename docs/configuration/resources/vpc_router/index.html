@@ -592,15 +592,16 @@ resource sakuracloud_switch &quot;sw01&quot; {
 
 # VPCルータ本体の定義(プレミアム/ハイスペックプランの場合)
 resource sakuracloud_vpc_router &quot;foobar&quot; {
-  name        = &quot;vpc_router_sample&quot;
-  plan        = &quot;premium&quot;
-  switch_id   = &quot;${sakuracloud_internet.router1.switch_id}&quot;        # 上流のスイッチID
-  vip         = &quot;${sakuracloud_internet.router1.ipaddresses[0]}&quot;   # VIP
-  ipaddress1  = &quot;${sakuracloud_internet.router1.ipaddresses[1]}&quot;   # 実IP1
-  ipaddress2  = &quot;${sakuracloud_internet.router1.ipaddresses[2]}&quot;   # 実IP2
-  aliases     = [&quot;${sakuracloud_internet.router1.ipaddresses[3]}&quot;] # IPエイリアス
-  vrid        = 1
-  syslog_host = &quot;192.168.11.1&quot;                                     # syslog転送先ホスト
+  name                = &quot;vpc_router_sample&quot;
+  plan                = &quot;premium&quot;
+  switch_id           = &quot;${sakuracloud_internet.router1.switch_id}&quot;        # 上流のスイッチID
+  vip                 = &quot;${sakuracloud_internet.router1.ipaddresses[0]}&quot;   # VIP
+  ipaddress1          = &quot;${sakuracloud_internet.router1.ipaddresses[1]}&quot;   # 実IP1
+  ipaddress2          = &quot;${sakuracloud_internet.router1.ipaddresses[2]}&quot;   # 実IP2
+  aliases             = [&quot;${sakuracloud_internet.router1.ipaddresses[3]}&quot;] # IPエイリアス
+  vrid                = 1
+  syslog_host         = &quot;192.168.11.1&quot;                                     # syslog転送先ホスト
+  internet_connection = true # インターネット接続 有効/無効
 }
 
 # VPCルータ本体の定義(スタンダードプランの場合)
@@ -854,6 +855,14 @@ resource sakuracloud_vpc_router_static_route &quot;route1&quot; {
 <td>syslog転送先ホスト</td>
 <td align="center">-</td>
 <td>文字列</td>
+<td>-</td>
+</tr>
+<tr>
+<td><code>internet_connection</code></td>
+<td align="center">-</td>
+<td>インターネット接続</td>
+<td align="center"><code>true</code></td>
+<td><code>true</code><br /><code>false</code></td>
 <td>-</td>
 </tr>
 <tr>
