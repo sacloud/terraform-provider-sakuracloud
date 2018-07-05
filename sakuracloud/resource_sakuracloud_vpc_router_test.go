@@ -33,6 +33,8 @@ func TestAccResourceSakuraCloudVPCRouter(t *testing.T) {
 						"sakuracloud_vpc_router.foobar", "tags.1", "hoge2"),
 					resource.TestCheckResourceAttr(
 						"sakuracloud_vpc_router.foobar", "plan", "standard"),
+					resource.TestCheckResourceAttr(
+						"sakuracloud_vpc_router.foobar", "internet_connection", "true"),
 					resource.TestCheckNoResourceAttr(
 						"sakuracloud_vpc_router.foobar", "switch_id"),
 					resource.TestCheckNoResourceAttr(
@@ -63,6 +65,8 @@ func TestAccResourceSakuraCloudVPCRouter(t *testing.T) {
 						"sakuracloud_vpc_router.foobar", "tags.1", "hoge2_after"),
 					resource.TestCheckResourceAttr(
 						"sakuracloud_vpc_router.foobar", "plan", "standard"),
+					resource.TestCheckResourceAttr(
+						"sakuracloud_vpc_router.foobar", "internet_connection", "false"),
 					resource.TestCheckNoResourceAttr(
 						"sakuracloud_vpc_router.foobar", "switch_id"),
 					resource.TestCheckNoResourceAttr(
@@ -134,6 +138,7 @@ resource "sakuracloud_vpc_router" "foobar" {
     description = "description_before"
     tags = ["hoge1" , "hoge2"]
     icon_id = "${sakuracloud_icon.foobar.id}"
+    internet_connection = true
 }
 
 resource "sakuracloud_icon" "foobar" {
@@ -148,4 +153,5 @@ resource "sakuracloud_vpc_router" "foobar" {
     description = "description_after"
     tags = ["hoge1_after" , "hoge2_after"]
     syslog_host = "192.168.0.2"
+    internet_connection = false
 }`
