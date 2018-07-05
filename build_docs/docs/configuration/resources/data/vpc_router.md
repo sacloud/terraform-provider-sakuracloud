@@ -38,6 +38,7 @@ VPCルータ本体を表します。
 | `vrid`          | VRID           | - |
 | `aliases`       | IPエイリアス    | - |
 | `syslog_host`   | syslog転送先ホスト| - |
+| `internet_connection` | インターネット接続 | - |
 | `icon_id`       | アイコンID         | - |
 | `description`   | 説明           | - |
 | `tags`          | タグ           | - |
