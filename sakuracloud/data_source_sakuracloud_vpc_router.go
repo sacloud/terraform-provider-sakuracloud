@@ -96,6 +96,10 @@ func dataSourceSakuraCloudVPCRouter() *schema.Resource {
 				Type:     schema.TypeString,
 				Computed: true,
 			},
+			"internet_connection": {
+				Type:     schema.TypeBool,
+				Computed: true,
+			},
 			"zone": {
 				Type:         schema.TypeString,
 				Optional:     true,

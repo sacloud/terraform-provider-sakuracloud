@@ -90,6 +90,11 @@ func resourceSakuraCloudVPCRouter() *schema.Resource {
 				Type:     schema.TypeString,
 				Optional: true,
 			},
+			"internet_connection": {
+				Type:     schema.TypeBool,
+				Optional: true,
+				Default:  true,
+			},
 			powerManageTimeoutKey: powerManageTimeoutParam,
 			"zone": {
 				Type:         schema.TypeString,
@@ -177,9 +182,15 @@ func resourceSakuraCloudVPCRouterCreate(d *schema.ResourceData, meta interface{}
 		opts.Tags = expandTags(client, rawTags)
 	}
 
+	opts.InitVPCRouterSetting()
 	if syslogHost, ok := d.GetOk("syslog_host"); ok {
-		opts.InitVPCRouterSetting()
 		opts.Settings.Router.SyslogHost = syslogHost.(string)
+	}
+
+	if d.Get("internet_connection").(bool) {
+		opts.Settings.Router.InternetConnection = &sacloud.VPCRouterInternetConnection{
+			Enabled: "True",
+		}
 	}
 
 	vpcRouter, err := client.VPCRouter.Create(opts)
@@ -208,6 +219,12 @@ func resourceSakuraCloudVPCRouterCreate(d *schema.ResourceData, meta interface{}
 	err = client.VPCRouter.SleepUntilUp(vpcRouter.ID, client.DefaultTimeoutDuration)
 	if err != nil {
 		return fmt.Errorf("Failed to boot SakuraCloud VPCRouter resource: %s", err)
+	}
+
+	if _, err := client.VPCRouter.UpdateSetting(vpcRouter.ID, vpcRouter); err != nil {
+		if err != nil {
+			return fmt.Errorf("Error updating SakuraCloud VPCRouter settings: %s", err)
+		}
 	}
 
 	d.SetId(vpcRouter.GetStrID())
@@ -241,8 +258,17 @@ func setVPCRouterResourceData(d *schema.ResourceData, client *APIClient, data *s
 	d.Set("description", data.Description)
 	if data.Settings != nil && data.Settings.Router != nil {
 		d.Set("syslog_host", data.Settings.Router.SyslogHost)
+
+		in := data.Settings.Router.InternetConnection
+		if in != nil && in.Enabled == "True" {
+			d.Set("internet_connection", true)
+		} else {
+			d.Set("internet_connection", false)
+		}
+
 	} else {
 		d.Set("syslog_host", "")
+		d.Set("internet_connection", false)
 	}
 	d.Set("tags", realTags(client, data.Tags))
 
@@ -323,10 +349,23 @@ func resourceSakuraCloudVPCRouterUpdate(d *schema.ResourceData, meta interface{}
 			vpcRouter.Settings.Router.SyslogHost = ""
 		}
 	}
+	if d.HasChange("internet_connection") {
+		vpcRouter.Settings.Router.InternetConnection = &sacloud.VPCRouterInternetConnection{
+			Enabled: "False",
+		}
+		if d.Get("internet_connection").(bool) {
+			vpcRouter.Settings.Router.InternetConnection.Enabled = "True"
+		}
+	}
 
 	vpcRouter, err = client.VPCRouter.Update(vpcRouter.ID, vpcRouter)
 	if err != nil {
 		return fmt.Errorf("Error updating SakuraCloud VPCRouter resource: %s", err)
+	}
+	if _, err := client.VPCRouter.UpdateSetting(vpcRouter.ID, vpcRouter); err != nil {
+		if err != nil {
+			return fmt.Errorf("Error updating SakuraCloud VPCRouter settings: %s", err)
+		}
 	}
 
 	return resourceSakuraCloudVPCRouterRead(d, meta)

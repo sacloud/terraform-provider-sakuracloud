@@ -17,15 +17,16 @@ resource sakuracloud_switch "sw01" {
 
 # VPCルータ本体の定義(プレミアム/ハイスペックプランの場合)
 resource sakuracloud_vpc_router "foobar" {
-  name        = "vpc_router_sample"
-  plan        = "premium"
-  switch_id   = "${sakuracloud_internet.router1.switch_id}"        # 上流のスイッチID
-  vip         = "${sakuracloud_internet.router1.ipaddresses[0]}"   # VIP
-  ipaddress1  = "${sakuracloud_internet.router1.ipaddresses[1]}"   # 実IP1
-  ipaddress2  = "${sakuracloud_internet.router1.ipaddresses[2]}"   # 実IP2
-  aliases     = ["${sakuracloud_internet.router1.ipaddresses[3]}"] # IPエイリアス
-  vrid        = 1
-  syslog_host = "192.168.11.1"                                     # syslog転送先ホスト
+  name                = "vpc_router_sample"
+  plan                = "premium"
+  switch_id           = "${sakuracloud_internet.router1.switch_id}"        # 上流のスイッチID
+  vip                 = "${sakuracloud_internet.router1.ipaddresses[0]}"   # VIP
+  ipaddress1          = "${sakuracloud_internet.router1.ipaddresses[1]}"   # 実IP1
+  ipaddress2          = "${sakuracloud_internet.router1.ipaddresses[2]}"   # 実IP2
+  aliases             = ["${sakuracloud_internet.router1.ipaddresses[3]}"] # IPエイリアス
+  vrid                = 1
+  syslog_host         = "192.168.11.1"                                     # syslog転送先ホスト
+  internet_connection = true # インターネット接続 有効/無効
 }
 
 # VPCルータ本体の定義(スタンダードプランの場合)
@@ -211,6 +212,7 @@ VPCルータ本体を表します。
 | `vrid`          | △   | VRID           | -        | 数値                          | プランが`premium`、`highspec`の場合必須 |
 | `aliases`       | -   | IPエイリアス    | -        | リスト(文字列)                  | プランが`premium`、`highspec`の場合のみ有効 |
 | `syslog_host`   | -   | syslog転送先ホスト| -      | 文字列                         | - |
+| `internet_connection` | -   | インターネット接続  | `true` | `true`<br />`false`| - |
 | `icon_id`       | -   | アイコンID         | - | 文字列| - |
 | `description`   | -   | 説明           | -        | 文字列                         | - |
 | `tags`          | -   | タグ           | -        | リスト(文字列)                  | - |
