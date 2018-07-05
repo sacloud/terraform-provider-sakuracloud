@@ -221,7 +221,7 @@ func resourceSakuraCloudVPCRouterCreate(d *schema.ResourceData, meta interface{}
 		return fmt.Errorf("Failed to boot SakuraCloud VPCRouter resource: %s", err)
 	}
 
-	if _, err := client.VPCRouter.UpdateSetting(vpcRouter.ID, vpcRouter); err != nil {
+	if _, err := client.VPCRouter.Config(vpcRouter.ID); err != nil {
 		if err != nil {
 			return fmt.Errorf("Error updating SakuraCloud VPCRouter settings: %s", err)
 		}
@@ -362,7 +362,7 @@ func resourceSakuraCloudVPCRouterUpdate(d *schema.ResourceData, meta interface{}
 	if err != nil {
 		return fmt.Errorf("Error updating SakuraCloud VPCRouter resource: %s", err)
 	}
-	if _, err := client.VPCRouter.UpdateSetting(vpcRouter.ID, vpcRouter); err != nil {
+	if _, err := client.VPCRouter.Config(vpcRouter.ID); err != nil {
 		if err != nil {
 			return fmt.Errorf("Error updating SakuraCloud VPCRouter settings: %s", err)
 		}
