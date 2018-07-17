@@ -16,7 +16,7 @@ We will establish the following environment in `Sakura Cloud`.
 - Disk: SSD/20GB, Server: 1core/1GB memory
   - It is omitted from the definition file because it is the default value.
 - Disable password / Challenge response authentication when connecting to server via SSH. (Allow only public key authentication.)
-- The public key for SSH connection is generated on "SAKURA Cloud".
+- The public key for SSH connection is generated on "Sakura Cloud".
   - Save the created key on the local machine.
 
 Install `Terraform` and `Terraform for Sakura Cloud` on the local machine with reference to [Installation](https://sacloud.github.io/terraform-provider-sakuracloud/installation/).
@@ -134,7 +134,7 @@ terraform apply
 
 #### Unsupported Resources
 
-The following resources are unsupported because API is not provided by SAKURA Cloud.
+The following resources are unsupported because API is not provided by Sakura Cloud.
 
 - Local Router
 - Resources Manager
