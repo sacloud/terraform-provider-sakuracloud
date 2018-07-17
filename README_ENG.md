@@ -10,13 +10,13 @@ This plugin is developed by Sakura Cloud user communication as Sakura Internet I
 
 ## Quick start
 
-We will establish the following environment in `Sakura Cloud`.
+We will build infrastructure on Sakura Cloud with following configuration.
 
 - Use the latest stable version of CentOS.
 - Disk: SSD/20GB, Server: 1core/1GB memory
   - It is omitted from the definition file because it is the default value.
 - Disable password / Challenge response authentication when connecting to server via SSH. (Allow only public key authentication.)
-- The public key for SSH connection is generated on "Sakura Cloud".
+- The public key for SSH connection is generated on `Sakura Cloud`.
   - Save the created key on the local machine.
 
 Install `Terraform` and `Terraform for Sakura Cloud` on the local machine with reference to [Installation](https://sacloud.github.io/terraform-provider-sakuracloud/installation/).
