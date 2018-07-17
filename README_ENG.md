@@ -4,9 +4,9 @@
 [![Build status](https://ci.appveyor.com/api/projects/status/paynsb52uauq1jl8?svg=true)](https://ci.appveyor.com/project/sacloud-bot/terraform-provider-sakuracloud)
 [![Slack](https://slack.usacloud.jp/badge.svg)](https://slack.usacloud.jp/)
 
-It is a plug-in for operating `Sakura Cloud` from Terraform. 
+It is a plugin for operating `Sakura Cloud` from Terraform. 
 
-This plug-in is developed by Sakura Cloud user communication as Sakura Internet Inc. official recognition tool.
+This plugin is developed by Sakura Cloud user communication as Sakura Internet Inc. official recognition tool.
 
 
 ## Quick start
