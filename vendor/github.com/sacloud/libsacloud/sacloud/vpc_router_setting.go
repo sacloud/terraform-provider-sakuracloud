@@ -1167,10 +1167,12 @@ type VPCRouterInternetConnection struct {
 func (s *VPCRouterSetting) SetInternetConnection(enabled bool) {
 	if s.InternetConnection == nil {
 		s.InternetConnection = &VPCRouterInternetConnection{
-			Enabled: "False",
+			Enabled: "True",
 		}
 	}
 	if enabled {
 		s.InternetConnection.Enabled = "True"
+	} else {
+		s.InternetConnection.Enabled = "False"
 	}
 }
