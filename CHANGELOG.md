@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.3.2 (2018-07-19)
+
+* typo storage type SSH to SSD #318 (223n)
+* SQL Server 2017パブリックアーカイブ対応  #320 (yamamoto-febc)
+
+
 ## 1.3.1 (2018-07-05)
 
 * VPCルータの設定適用タイミング修正 #313 (yamamoto-febc)
