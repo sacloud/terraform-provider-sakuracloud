@@ -20,7 +20,7 @@ var (
 	testDomain string
 )
 
-func TestAccResourceSakuraCloudIPv4Prt(t *testing.T) {
+func TestAccResourceSakuraCloudIPv4Ptr(t *testing.T) {
 	var ip sacloud.IPAddress
 	if domain, ok := os.LookupEnv(envTestDomain); ok {
 		testDomain = domain
@@ -32,29 +32,29 @@ func TestAccResourceSakuraCloudIPv4Prt(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
 		Providers:    testAccProviders,
-		CheckDestroy: testAccCheckSakuraCloudIPv4PrtDestroy,
+		CheckDestroy: testAccCheckSakuraCloudIPv4PtrDestroy,
 		Steps: []resource.TestStep{
 			{
-				Config: fmt.Sprintf(testAccCheckSakuraCloudIPv4PrtConfig_basic, testDomain, testDomain),
+				Config: fmt.Sprintf(testAccCheckSakuraCloudIPv4PtrConfig_basic, testDomain, testDomain),
 				Check: resource.ComposeTestCheckFunc(
-					testAccCheckSakuraCloudIPv4PrtExists("sakuracloud_ipv4_prt.foobar", &ip),
+					testAccCheckSakuraCloudIPv4PtrExists("sakuracloud_ipv4_ptr.foobar", &ip),
 					resource.TestCheckResourceAttr(
-						"sakuracloud_ipv4_prt.foobar", "hostname", fmt.Sprintf("terraform-test-domain01.%s", testDomain)),
+						"sakuracloud_ipv4_ptr.foobar", "hostname", fmt.Sprintf("terraform-test-domain01.%s", testDomain)),
 				),
 			},
 			{
-				Config: fmt.Sprintf(testAccCheckSakuraCloudIPv4PrtConfig_update, testDomain, testDomain),
+				Config: fmt.Sprintf(testAccCheckSakuraCloudIPv4PtrConfig_update, testDomain, testDomain),
 				Check: resource.ComposeTestCheckFunc(
-					testAccCheckSakuraCloudIPv4PrtExists("sakuracloud_ipv4_prt.foobar", &ip),
+					testAccCheckSakuraCloudIPv4PtrExists("sakuracloud_ipv4_ptr.foobar", &ip),
 					resource.TestCheckResourceAttr(
-						"sakuracloud_ipv4_prt.foobar", "hostname", fmt.Sprintf("terraform-test-domain02.%s", testDomain)),
+						"sakuracloud_ipv4_ptr.foobar", "hostname", fmt.Sprintf("terraform-test-domain02.%s", testDomain)),
 				),
 			},
 		},
 	})
 }
 
-func testAccCheckSakuraCloudIPv4PrtExists(n string, ip *sacloud.IPAddress) resource.TestCheckFunc {
+func testAccCheckSakuraCloudIPv4PtrExists(n string, ip *sacloud.IPAddress) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
 		rs, ok := s.RootModule().Resources[n]
 		if !ok {
@@ -62,49 +62,49 @@ func testAccCheckSakuraCloudIPv4PrtExists(n string, ip *sacloud.IPAddress) resou
 		}
 
 		if rs.Primary.ID == "" {
-			return errors.New("No IPv4Prt ID is set")
+			return errors.New("No IPv4Ptr ID is set")
 		}
 
 		client := testAccProvider.Meta().(*APIClient)
 
-		foundIPv4Prt, err := client.IPAddress.Read(rs.Primary.ID)
+		foundIPv4Ptr, err := client.IPAddress.Read(rs.Primary.ID)
 
 		if err != nil {
 			return err
 		}
 
-		if foundIPv4Prt.IPAddress != rs.Primary.ID {
-			return errors.New("IPv4Prt not found")
+		if foundIPv4Ptr.IPAddress != rs.Primary.ID {
+			return errors.New("IPv4Ptr not found")
 		}
-		if foundIPv4Prt.HostName == "" {
-			return errors.New("IPv4Prt hostname is empty")
+		if foundIPv4Ptr.HostName == "" {
+			return errors.New("IPv4Ptr hostname is empty")
 		}
 
-		*ip = *foundIPv4Prt
+		*ip = *foundIPv4Ptr
 
 		return nil
 	}
 }
 
-func testAccCheckSakuraCloudIPv4PrtDestroy(s *terraform.State) error {
+func testAccCheckSakuraCloudIPv4PtrDestroy(s *terraform.State) error {
 	client := testAccProvider.Meta().(*APIClient)
 
 	for _, rs := range s.RootModule().Resources {
-		if rs.Type != "sakuracloud_ipv4_prt" {
+		if rs.Type != "sakuracloud_ipv4_ptr" {
 			continue
 		}
 
 		ip, err := client.IPAddress.Read(rs.Primary.ID)
 
 		if err == nil && ip.HostName != "" {
-			return errors.New("IPv4Prt still exists")
+			return errors.New("IPv4Ptr still exists")
 		}
 	}
 
 	return nil
 }
 
-var testAccCheckSakuraCloudIPv4PrtConfig_basic = `
+var testAccCheckSakuraCloudIPv4PtrConfig_basic = `
 data sakuracloud_dns "dns" {
   name_selectors = ["%s"]
 }
@@ -121,13 +121,13 @@ resource sakuracloud_server "server" {
   graceful_shutdown_timeout = 5
 }
 
-resource "sakuracloud_ipv4_prt" "foobar" {
+resource "sakuracloud_ipv4_ptr" "foobar" {
   ipaddress = "${sakuracloud_server.server.ipaddress}"
   hostname  = "terraform-test-domain01.%s"
 }
 `
 
-var testAccCheckSakuraCloudIPv4PrtConfig_update = `
+var testAccCheckSakuraCloudIPv4PtrConfig_update = `
 data sakuracloud_dns "dns" {
   name_selectors = ["%s"]
 }
@@ -144,7 +144,7 @@ resource sakuracloud_server "server" {
   graceful_shutdown_timeout = 5
 }
 
-resource "sakuracloud_ipv4_prt" "foobar" {
+resource "sakuracloud_ipv4_ptr" "foobar" {
   ipaddress = "${sakuracloud_server.server.ipaddress}"
   hostname  = "terraform-test-domain02.%s"
 }
