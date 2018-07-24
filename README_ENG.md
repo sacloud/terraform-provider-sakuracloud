@@ -8,6 +8,8 @@ It is a plugin for operating `Sakura Cloud` from Terraform.
 
 This plugin is developed by Sakura Cloud user communication as Sakura Internet Inc. official recognition tool.
 
+([Japanese version](README.md))
+
 ## Quick start
 
 We will build infrastructure on Sakura Cloud with following configuration.
