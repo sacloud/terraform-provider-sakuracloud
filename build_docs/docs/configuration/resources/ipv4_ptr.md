@@ -6,7 +6,7 @@
 
 ```hcl
 # 逆引きレコードの定義
-resource "sakuracloud_ipv4_prt" "foobar" {
+resource "sakuracloud_ipv4_ptr" "foobar" {
   ipaddress = "${sakuracloud_server.server.ipaddress}"
   hostname  = "ptr.example.com"
 }
