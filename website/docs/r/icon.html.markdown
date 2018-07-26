@@ -1,7 +1,7 @@
 ---
 layout: "sakuracloud"
 page_title: "SakuraCloud: sakuracloud_icon"
-sidebar_current: "docs-sakuracloud-resource-icon"
+sidebar_current: "docs-sakuracloud-resource-misc-icon"
 description: |-
   Provides a SakuraCloud Icon resource. This can be used to create, update, and delete Icons.
 ---

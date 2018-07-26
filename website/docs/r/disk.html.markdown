@@ -1,7 +1,7 @@
 ---
 layout: "sakuracloud"
 page_title: "SakuraCloud: sakuracloud_disk"
-sidebar_current: "docs-sakuracloud-resource-disk"
+sidebar_current: "docs-sakuracloud-resource-storage-disk"
 description: |-
   Provides a SakuraCloud Disk resource. This can be used to create, update, and delete Disks.
 ---

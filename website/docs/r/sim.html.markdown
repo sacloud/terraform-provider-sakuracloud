@@ -1,7 +1,7 @@
 ---
 layout: "sakuracloud"
 page_title: "SakuraCloud: sakuracloud_sim"
-sidebar_current: "docs-sakuracloud-resource-sim"
+sidebar_current: "docs-sakuracloud-resource-secure-mobile-sim"
 description: |-
   Provides a SakuraCloud SIM resource. This can be used to create, update, and delete SIMs.
 ---

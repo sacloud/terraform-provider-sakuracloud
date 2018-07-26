@@ -1,7 +1,7 @@
 ---
 layout: "sakuracloud"
 page_title: "SakuraCloud: sakuracloud_vpc_router_static_route"
-sidebar_current: "docs-sakuracloud-resource-vsroute"
+sidebar_current: "docs-sakuracloud-resource-vpc-staticroute"
 description: |-
   Provides a SakuraCloud VPC Router Static Route resource. This can be used to create and delete VPC Router Static Route.
 ---

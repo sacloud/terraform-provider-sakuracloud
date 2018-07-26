@@ -1,7 +1,7 @@
 ---
 layout: "sakuracloud"
 page_title: "SakuraCloud: sakuracloud_vpc_router_pptp"
-sidebar_current: "docs-sakuracloud-resource-vpptp"
+sidebar_current: "docs-sakuracloud-resource-vpc-pptp"
 description: |-
   Provides a SakuraCloud VPC Router PPTP resource. This can be used to create, update, and delete VPC Router PPTP.
 ---

@@ -1,7 +1,7 @@
 ---
 layout: "sakuracloud"
 page_title: "SakuraCloud: sakuracloud_switch"
-sidebar_current: "docs-sakuracloud-resource-switch"
+sidebar_current: "docs-sakuracloud-resource-networking-switch"
 description: |-
   Provides a SakuraCloud Switch resource. This can be used to create, update, and delete Switches.
 ---

@@ -1,7 +1,7 @@
 ---
 layout: "sakuracloud"
 page_title: "SakuraCloud: sakuracloud_vpc_router_l2tp"
-sidebar_current: "docs-sakuracloud-resource-vl2tp"
+sidebar_current: "docs-sakuracloud-resource-vpc-l2tp"
 description: |-
   Provides a SakuraCloud VPC Router L2TP resource. This can be used to create, update, and delete VPC Router L2TP.
 ---

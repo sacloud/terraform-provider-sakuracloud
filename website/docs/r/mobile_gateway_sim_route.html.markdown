@@ -1,7 +1,7 @@
 ---
 layout: "sakuracloud"
 page_title: "SakuraCloud: sakuracloud_mobile_gateway"
-sidebar_current: "docs-sakuracloud-resource-mgwsimroute"
+sidebar_current: "docs-sakuracloud-resource-secure-mobile-mgwsimroute"
 description: |-
   Provides a SakuraCloud Mobile Gateway SIM Route resource. This can be used to create and delete Mobile Gateway SIM Routes.
 ---

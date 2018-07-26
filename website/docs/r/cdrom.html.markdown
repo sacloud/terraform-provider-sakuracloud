@@ -1,7 +1,7 @@
 ---
 layout: "sakuracloud"
 page_title: "SakuraCloud: sakuracloud_cdrom"
-sidebar_current: "docs-sakuracloud-resource-cdrom"
+sidebar_current: "docs-sakuracloud-resource-storage-cdrom"
 description: |-
   Provides a SakuraCloud CDROM(ISO-Image) resource. This can be used to create, update, and delete CDROMs.
 ---

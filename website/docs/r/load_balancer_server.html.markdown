@@ -1,7 +1,7 @@
 ---
 layout: "sakuracloud"
 page_title: "SakuraCloud: sakuracloud_load_balancer_server"
-sidebar_current: "docs-sakuracloud-resource-lbserver"
+sidebar_current: "docs-sakuracloud-resource-lb-server"
 description: |-
   Provides a SakuraCloud LoadBalancer Server resource. This can be used to create and delete LoadBalancer Servers.
 ---

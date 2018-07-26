@@ -1,7 +1,7 @@
 ---
 layout: "sakuracloud"
 page_title: "SakuraCloud: sakuracloud_ipv4_ptr"
-sidebar_current: "docs-sakuracloud-resource-ipv4-ptr"
+sidebar_current: "docs-sakuracloud-resource-networking-ipv4-ptr"
 description: |-
   Provides a SakuraCloud IPv4 PTR record resource. This can be used to create, update, and delete IPv4 PTR records.
 ---

@@ -1,7 +1,7 @@
 ---
 layout: "sakuracloud"
 page_title: "SakuraCloud: sakuracloud_vpc_router_firewall"
-sidebar_current: "docs-sakuracloud-resource-vfirewall"
+sidebar_current: "docs-sakuracloud-resource-vpc-firewall"
 description: |-
   Provides a SakuraCloud VPC Router Firewall resource. This can be used to create and delete VPC Router Firewalls.
 ---

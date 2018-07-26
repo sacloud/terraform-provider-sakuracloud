@@ -1,7 +1,7 @@
 ---
 layout: "sakuracloud"
 page_title: "SakuraCloud: sakuracloud_vpc_router_static_nat"
-sidebar_current: "docs-sakuracloud-resource-vsnat"
+sidebar_current: "docs-sakuracloud-resource-vpc-staticnat"
 description: |-
   Provides a SakuraCloud VPC Router Static NAT resource. This can be used to create and delete VPC Router Static NAT.
 ---

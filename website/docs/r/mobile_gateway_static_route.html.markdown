@@ -1,7 +1,7 @@
 ---
 layout: "sakuracloud"
 page_title: "SakuraCloud: sakuracloud_mobile_gateway"
-sidebar_current: "docs-sakuracloud-resource-mgwstaticroute"
+sidebar_current: "docs-sakuracloud-resource-secure-mobile-mgwstaticroute"
 description: |-
   Provides a SakuraCloud Mobile Gateway Static Route resource. This can be used to create and delete Mobile Gateway Static Routes.
 ---

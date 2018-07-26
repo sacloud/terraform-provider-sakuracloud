@@ -1,7 +1,7 @@
 ---
 layout: "sakuracloud"
 page_title: "SakuraCloud: sakuracloud_server"
-sidebar_current: "docs-sakuracloud-resource-server"
+sidebar_current: "docs-sakuracloud-resource-computing-server"
 description: |-
   Provides a SakuraCloud Server resource. This can be used to create, update, and delete Servers.
 ---

@@ -1,7 +1,7 @@
 ---
 layout: "sakuracloud"
 page_title: "SakuraCloud: sakuracloud_simple_monitor"
-sidebar_current: "docs-sakuracloud-resource-smonitor"
+sidebar_current: "docs-sakuracloud-resource-global-simple-monitor"
 description: |-
   Provides a SakuraCloud Simple Monitor resource. This can be used to create, update, and delete Simple Monitors.
 ---

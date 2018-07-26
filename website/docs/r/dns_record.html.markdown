@@ -1,7 +1,7 @@
 ---
 layout: "sakuracloud"
 page_title: "SakuraCloud: sakuracloud_dns_record"
-sidebar_current: "docs-sakuracloud-resource-drecord"
+sidebar_current: "docs-sakuracloud-resource-global-dns-record"
 description: |-
   Provides a SakuraCloud DNS Record resource. This can be used to create and delete DNS Records.
 ---

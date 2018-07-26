@@ -1,7 +1,7 @@
 ---
 layout: "sakuracloud"
 page_title: "SakuraCloud: sakuracloud_vpc_router_user"
-sidebar_current: "docs-sakuracloud-resource-vuser"
+sidebar_current: "docs-sakuracloud-resource-vpc-user"
 description: |-
   Provides a SakuraCloud VPC Router User resource. This can be used to create and delete VPC Router User.
 ---

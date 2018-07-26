@@ -1,7 +1,7 @@
 ---
 layout: "sakuracloud"
 page_title: "SakuraCloud: sakuracloud_internet"
-sidebar_current: "docs-sakuracloud-resource-internet"
+sidebar_current: "docs-sakuracloud-resource-networking-internet"
 description: |-
   Provides a SakuraCloud Internet resource. This can be used to create, update, and delete Internet.
 ---

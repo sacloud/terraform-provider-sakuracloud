@@ -1,7 +1,7 @@
 ---
 layout: "sakuracloud"
 page_title: "SakuraCloud: sakuracloud_archive"
-sidebar_current: "docs-sakuracloud-resource-archive"
+sidebar_current: "docs-sakuracloud-resource-storage-archive"
 description: |-
   Provides a SakuraCloud Archive resource. This can be used to create, update, and delete Archives.
 ---

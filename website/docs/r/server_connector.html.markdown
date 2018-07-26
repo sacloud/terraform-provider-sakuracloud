@@ -1,7 +1,7 @@
 ---
 layout: "sakuracloud"
 page_title: "SakuraCloud: sakuracloud_server_connector"
-sidebar_current: "docs-sakuracloud-resource-sconnector"
+sidebar_current: "docs-sakuracloud-resource-computing-sconnector"
 description: |-
   Provides a SakuraCloud Server Connection resource. This can be used to create, update, and delete Servers.
 ---

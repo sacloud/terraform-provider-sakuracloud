@@ -1,7 +1,7 @@
 ---
 layout: "sakuracloud"
 page_title: "SakuraCloud: sakuracloud_gslb_server"
-sidebar_current: "docs-sakuracloud-resource-gserver"
+sidebar_current: "docs-sakuracloud-resource-global-gslb-server"
 description: |-
   Provides a SakuraCloud GSLB Server resource. This can be used to create and delete GSLB Servers.
 ---

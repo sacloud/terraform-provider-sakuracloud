@@ -1,7 +1,7 @@
 ---
 layout: "sakuracloud"
 page_title: "SakuraCloud: sakuracloud_bridge"
-sidebar_current: "docs-sakuracloud-resource-bridge"
+sidebar_current: "docs-sakuracloud-resource-networking-bridge"
 description: |-
   Provides a SakuraCloud Bridge resource. This can be used to create, update, and delete Bridges.
 ---

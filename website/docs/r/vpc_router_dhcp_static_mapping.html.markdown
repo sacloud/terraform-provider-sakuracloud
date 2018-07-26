@@ -1,7 +1,7 @@
 ---
 layout: "sakuracloud"
 page_title: "SakuraCloud: sakuracloud_vpc_router_dhcp_static_mapping"
-sidebar_current: "docs-sakuracloud-resource-vdhcpmapping"
+sidebar_current: "docs-sakuracloud-resource-vpc-dhcpmapping"
 description: |-
   Provides a SakuraCloud VPC Router DHCP Static Mapping resource. This can be used to create and delete VPC Router DHCP Static Mappings.
 ---

@@ -1,7 +1,7 @@
 ---
 layout: "sakuracloud"
 page_title: "SakuraCloud: sakuracloud_vpc_router_site_to_site_vpn"
-sidebar_current: "docs-sakuracloud-resource-vs2s"
+sidebar_current: "docs-sakuracloud-resource-vpc-s2s"
 description: |-
   Provides a SakuraCloud VPC Router Site To Site VPN resource. This can be used to create and delete VPC Router Site To Site VPN.
 ---

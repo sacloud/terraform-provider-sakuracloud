@@ -1,7 +1,7 @@
 ---
 layout: "sakuracloud"
 page_title: "SakuraCloud: sakuracloud_nfs"
-sidebar_current: "docs-sakuracloud-resource-nfs"
+sidebar_current: "docs-sakuracloud-resource-appliance-nfs"
 description: |-
   Provides a SakuraCloud NFS Appliance resource. This can be used to create, update, and delete NFS Appliances.
 ---

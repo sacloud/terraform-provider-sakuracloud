@@ -1,7 +1,7 @@
 ---
 layout: "sakuracloud"
 page_title: "SakuraCloud: sakuracloud_gslb"
-sidebar_current: "docs-sakuracloud-resource-gslb"
+sidebar_current: "docs-sakuracloud-resource-global-gslb-setting"
 description: |-
   Provides a SakuraCloud GSLB resource. This can be used to create, update, and delete GSLBs.
 ---

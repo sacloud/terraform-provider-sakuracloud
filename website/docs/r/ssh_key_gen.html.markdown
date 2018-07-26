@@ -1,7 +1,7 @@
 ---
 layout: "sakuracloud"
 page_title: "SakuraCloud: sakuracloud_ssh_key_gen"
-sidebar_current: "docs-sakuracloud-resource-skeygen"
+sidebar_current: "docs-sakuracloud-resource-misc-skeygen"
 description: |-
   Provides a SakuraCloud SSH Key Gen resource. This can be used to create and delete SSH Keys.
 ---

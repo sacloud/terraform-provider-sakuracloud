@@ -1,7 +1,7 @@
 ---
 layout: "sakuracloud"
 page_title: "SakuraCloud: sakuracloud_bucket_object"
-sidebar_current: "docs-sakuracloud-resource-bucket_object"
+sidebar_current: "docs-sakuracloud-resource-objectstorage-bucket-object"
 description: |-
   Provides a SakuraCloud Bucket Object resource. This can be used to create, update, and delete Bucket Objects.
 ---

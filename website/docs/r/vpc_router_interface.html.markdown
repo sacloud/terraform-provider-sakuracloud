@@ -1,7 +1,7 @@
 ---
 layout: "sakuracloud"
 page_title: "SakuraCloud: sakuracloud_vpc_router_interface"
-sidebar_current: "docs-sakuracloud-resource-vinterface"
+sidebar_current: "docs-sakuracloud-resource-vpc-interface"
 description: |-
   Provides a SakuraCloud VPC Router Interface resource. This can be used to create and delete VPC Router Interfaces.
 ---

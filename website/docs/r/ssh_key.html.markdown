@@ -1,7 +1,7 @@
 ---
 layout: "sakuracloud"
 page_title: "SakuraCloud: sakuracloud_ssh_key"
-sidebar_current: "docs-sakuracloud-resource-ssh-key"
+sidebar_current: "docs-sakuracloud-resource-misc-ssh-key"
 description: |-
   Provides a SakuraCloud SSH Key resource. This can be used to create, update, and delete SSH Keys.
 ---

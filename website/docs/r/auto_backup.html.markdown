@@ -1,7 +1,7 @@
 ---
 layout: "sakuracloud"
 page_title: "SakuraCloud: sakuracloud_auto_backup"
-sidebar_current: "docs-sakuracloud-resource-auto-backup"
+sidebar_current: "docs-sakuracloud-resource-appliance-auto-backup"
 description: |-
   Provides a SakuraCloud Auto Backup resource. This can be used to create, update, and delete Auto Backups.
 ---

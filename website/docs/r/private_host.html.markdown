@@ -1,7 +1,7 @@
 ---
 layout: "sakuracloud"
 page_title: "SakuraCloud: sakuracloud_private_host"
-sidebar_current: "docs-sakuracloud-resource-private-host"
+sidebar_current: "docs-sakuracloud-resource-computing-private-host"
 description: |-
   Provides a SakuraCloud Private Host resource. This can be used to create, update, and delete Private Hosts.
 ---

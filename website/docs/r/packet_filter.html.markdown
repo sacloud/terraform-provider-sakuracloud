@@ -1,7 +1,7 @@
 ---
 layout: "sakuracloud"
 page_title: "SakuraCloud: sakuracloud_packet_filter"
-sidebar_current: "docs-sakuracloud-resource-packet-filter"
+sidebar_current: "docs-sakuracloud-resource-networking-packet-filter"
 description: |-
   Provides a SakuraCloud Packet Filter resource. This can be used to create, update, and delete Packet Filters.
 ---

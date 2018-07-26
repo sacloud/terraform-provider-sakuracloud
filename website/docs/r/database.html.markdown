@@ -1,7 +1,7 @@
 ---
 layout: "sakuracloud"
 page_title: "SakuraCloud: sakuracloud_database"
-sidebar_current: "docs-sakuracloud-resource-database"
+sidebar_current: "docs-sakuracloud-resource-appliance-database"
 description: |-
   Provides a SakuraCloud Database resource. This can be used to create, update, and delete Databases.
 ---

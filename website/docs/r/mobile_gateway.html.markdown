@@ -1,7 +1,7 @@
 ---
 layout: "sakuracloud"
 page_title: "SakuraCloud: sakuracloud_mobile_gateway"
-sidebar_current: "docs-sakuracloud-resource-mobile-gateway"
+sidebar_current: "docs-sakuracloud-resource-secure-mobile-mobile-gateway"
 description: |-
   Provides a SakuraCloud Mobile Gateway resource. This can be used to create, update, and delete Mobile Gateways.
 ---

@@ -1,7 +1,7 @@
 ---
 layout: "sakuracloud"
 page_title: "SakuraCloud: sakuracloud_subnet"
-sidebar_current: "docs-sakuracloud-resource-subnet"
+sidebar_current: "docs-sakuracloud-resource-networking-subnet"
 description: |-
   Provides a SakuraCloud Subnet resource. This can be used to create, update, and delete Subnets.
 ---
