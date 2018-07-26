@@ -3,12 +3,12 @@ layout: "sakuracloud"
 page_title: "SakuraCloud: sakuracloud_packet_filter"
 sidebar_current: "docs-sakuracloud-resource-packet-filter"
 description: |-
-  Provides a SakuraCloud Packet Filter resource. This can be used to create, modify, and delete Packet Filters.
+  Provides a SakuraCloud Packet Filter resource. This can be used to create, update, and delete Packet Filters.
 ---
 
 # sakuracloud\_packet\_filter
 
-Provides a SakuraCloud Packet Filter resource. This can be used to create, modify, and delete Packet Filters.
+Provides a SakuraCloud Packet Filter resource. This can be used to create, update, and delete Packet Filters.
 
 ## Example Usage
 
@@ -40,7 +40,7 @@ The following arguments are supported:
 
 * `name` - (Required) The name of the resource.
 * `description` - (Optional) The description of the resource.
-* `expressions` - (Required) Health check rules. It contains several attributes to [Expressions](#expressions).
+* `expressions` - (Required) Health check rules. It contains some attributes to [Expressions](#expressions).
 
 ### Expressions
 
@@ -73,7 +73,7 @@ The following attributes are exported:
 * `id` - The ID of the resource.
 * `name` - The name of the resource.
 * `description` - The description of the resource.
-* `expressions` - Health check rules. It contains several attributes to [Expressions](#expressions).
+* `expressions` - Health check rules. It contains some attributes to [Expressions](#expressions).
 
 ## Import
 

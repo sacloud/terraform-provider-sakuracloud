@@ -31,7 +31,7 @@ data sakuracloud_subnet "foobar" {
 * `next_hop` - Next hop address.
 * `switch_id` - The ID of the switch connected to the Subnet.
 * `nw_address` -  The network address.
-* `min_ipaddress` - Minimum global ip address.
-* `max_ipaddress` - Maximum global ip address.
-* `ipaddresses` - Global ip address list.
+* `min_ipaddress` - Min global IP address.
+* `max_ipaddress` - Max global IP address.
+* `ipaddresses` - Global IP address list.
 * `zone` - The ID of the zone to which the resource belongs.

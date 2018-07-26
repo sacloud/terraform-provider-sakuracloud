@@ -3,12 +3,12 @@ layout: "sakuracloud"
 page_title: "SakuraCloud: sakuracloud_server"
 sidebar_current: "docs-sakuracloud-resource-server"
 description: |-
-  Provides a SakuraCloud Server resource. This can be used to create, modify, and delete Servers.
+  Provides a SakuraCloud Server resource. This can be used to create, update, and delete Servers.
 ---
 
 # sakuracloud\_server
 
-Provides a SakuraCloud Server resource. This can be used to create, modify, and delete Servers.
+Provides a SakuraCloud Server resource. This can be used to create, update, and delete Servers.
 
 ## Example Usage
 
@@ -86,7 +86,7 @@ Valid value is one of the following: [ "virtio"(default) / "e1000"]
 Valid value is one of the following: [ "shared"(default) / <Switch ID> / ""(disconnected) ]
 * `cdrom_id` - (Optional) The ID of the CD-ROM inserted to Server.
 * `private_host_id` - (Optional) The ID of the Private Host to which the Server belongs.
-* `additional_nics` - (Optional) The ID list of the Switch connected to additional NICs of Server.  
+* `additional_nics` - (Optional) The ID list of the Switch connected to NICs(excluding primary NIC) of Server.  
 Valid values are one of the following: [ <Switch ID> / ""(disconnected) ]
 * `packet_filter_ids` - (Optional) The ID list of the Packet Filter connected to Server.
 * `ipaddress` - (Optional) The IP address of primary NIC.
@@ -95,7 +95,7 @@ Valid values are one of the following: [ <Switch ID> / ""(disconnected) ]
 * `description` - (Optional) The description of the resource.
 * `tags` - (Optional) The tag list of the resource.
 * `icon_id` - (Optional) The ID of the icon.
-* `graceful_shutdown_timeout` - (Optional) The wait time(seconds) to gracefully shutdown the Server.
+* `graceful_shutdown_timeout` - (Optional) The wait time(seconds) to do graceful shutdown the Server.
 * `zone` - (Optional) The ID of the zone to which the resource belongs.
 
 ## Attributes Reference
@@ -112,7 +112,7 @@ The following attributes are exported:
 * `cdrom_id` - The ID of the CD-ROM inserted to Server.
 * `private_host_id` - The ID of the Private Host to which the Server belongs.
 * `private_host_name` - The name of the Private Host to which the Server belongs.
-* `additional_nics` - The ID list of the Switch connected to additional NICs of Server.
+* `additional_nics` - The ID list of the Switch connected to NICs(excluding primary NIC) of Server.
 * `packet_filter_ids` - The ID list of the Packet Filter connected to Server.
 * `macaddresses` - The MAC address list of NICs connected to Server.
 * `ipaddress` - The IP address of primary NIC.

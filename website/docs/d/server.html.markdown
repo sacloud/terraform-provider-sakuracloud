@@ -37,7 +37,7 @@ data sakuracloud_server "foobar" {
 * `cdrom_id` - The ID of the CD-ROM inserted to Server.
 * `private_host_id` - The ID of the Private Host to which the Server belongs.
 * `private_host_name` - The name of the Private Host to which the Server belongs.
-* `additional_nics` - The ID list of the Switch connected to additional NICs of Server.
+* `additional_nics` - The ID list of the Switch connected to NICs(excluding primary NIC) of Server.
 * `packet_filter_ids` - The ID list of the Packet Filter connected to Server.
 * `macaddresses` - The MAC address list of NICs connected to Server.
 * `ipaddress` - The IP address of primary NIC.

@@ -3,12 +3,12 @@ layout: "sakuracloud"
 page_title: "SakuraCloud: sakuracloud_vpc_router_port_forwarding"
 sidebar_current: "docs-sakuracloud-resource-vpf"
 description: |-
-  Provides a SakuraCloud VPC Router Port Forwarding resource. This can be used to create, modify, and delete VPC Router Port Forwarding.
+  Provides a SakuraCloud VPC Router Port Forwarding resource. This can be used to create, update, and delete VPC Router Port Forwarding.
 ---
 
 # sakuracloud\_vpc\_router\_port_forwarding
 
-Provides a SakuraCloud VPC Router Port Forwarding resource. This can be used to create, modify, and delete VPC Router Port Forwarding.
+Provides a SakuraCloud VPC Router Port Forwarding resource. This can be used to create, update, and delete VPC Router Port Forwarding.
 
 ## Example Usage
 

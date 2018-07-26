@@ -3,12 +3,12 @@ layout: "sakuracloud"
 page_title: "SakuraCloud: sakuracloud_dns"
 sidebar_current: "docs-sakuracloud-resource-dns"
 description: |-
-  Provides a SakuraCloud DNS zones resource. This can be used to create, modify, and delete DNS zones.
+  Provides a SakuraCloud DNS zones resource. This can be used to create, update, and delete DNS zones.
 ---
 
 # sakuracloud\_dns
 
-Provides a SakuraCloud DNS zones resource. This can be used to create, modify, and delete DNS zones.
+Provides a SakuraCloud DNS zones resource. This can be used to create, update, and delete DNS zones.
 
 ## Example Usage
 

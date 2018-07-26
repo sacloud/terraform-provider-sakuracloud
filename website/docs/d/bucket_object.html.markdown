@@ -31,7 +31,7 @@ data "sakuracloud_bucket_object" "foobar" {
 
 * `id` - ID of the resource.
 * `content_type` - Content-Type header value of the bucket object.
-* `body` - String of the value of the bucket object. It is set only when Content-Type is `"text/*"` or `"application/json"`.
+* `body` - String of the value of the bucket object. Set when Content-Type is `"text/*"` or `"application/json"`.
 * `etag` - ETag of the resource.
 * `size` - Size of the resource(unit: `byte`).
 * `last_modified` - Update date of the resource.

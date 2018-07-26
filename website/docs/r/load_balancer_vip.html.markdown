@@ -3,12 +3,12 @@ layout: "sakuracloud"
 page_title: "SakuraCloud: sakuracloud_load_balancer_vip"
 sidebar_current: "docs-sakuracloud-resource-lbvip"
 description: |-
-  Provides a SakuraCloud LoadBalancer VIP resource. This can be used to create, modify, and delete LoadBalancer VIPs.
+  Provides a SakuraCloud LoadBalancer VIP resource. This can be used to create, update, and delete LoadBalancer VIPs.
 ---
 
 # sakuracloud\_load\_balancer\_vip
 
-Provides a SakuraCloud LoadBalancer VIP resource. This can be used to create, modify, and delete LoadBalancer VIPs.
+Provides a SakuraCloud LoadBalancer VIP resource. This can be used to create, update, and delete LoadBalancer VIPs.
 
 ## Example Usage
 

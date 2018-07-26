@@ -3,12 +3,12 @@ layout: "sakuracloud"
 page_title: "SakuraCloud: sakuracloud_internet"
 sidebar_current: "docs-sakuracloud-resource-internet"
 description: |-
-  Provides a SakuraCloud Internet resource. This can be used to create, modify, and delete Internet.
+  Provides a SakuraCloud Internet resource. This can be used to create, update, and delete Internet.
 ---
 
 # sakuracloud\_internet
 
-Provides a SakuraCloud Internet resource. This can be used to create, modify, and delete Internet.
+Provides a SakuraCloud Internet resource. This can be used to create, update, and delete Internet.
 
 ## Example Usage
 
@@ -37,7 +37,7 @@ Valid value is one of the following: [ 100(default) / 250 / 500 / 1000 / 1500 / 
 * `description` - (Optional) The description of the resource.
 * `tags` - (Optional) The tag list of the resource.
 * `icon_id` - (Optional) The ID of the icon.
-* `graceful_shutdown_timeout` - (Optional) The wait time(seconds) to gracefully shutdown the server connected to the resource.
+* `graceful_shutdown_timeout` - (Optional) The wait time(seconds) to do graceful shutdown the server connected to the resource.
 * `zone` - (Optional) The ID of the zone to which the resource belongs.
 
 ## Attributes Reference
@@ -52,9 +52,9 @@ The following attributes are exported:
 * `server_ids` - The IDs of the server connected to the switch.
 * `nw_address` - The network address.
 * `gateway` - The network gateway address of the switch.
-* `min_ipaddress` - Minimum global ip address.
-* `max_ipaddress` - Maximum global ip address.
-* `ipaddresses` - Global ip address list.
+* `min_ipaddress` - Min global IP address.
+* `max_ipaddress` - Max global IP address.
+* `ipaddresses` - Global IP address list.
 * `enable_ipv6` - The ipv6 enabled flag.
 * `ipv6_prefix` - Address prefix of ipv6 network.
 * `ipv6_prefix_len` - Address prefix length of ipv6 network.

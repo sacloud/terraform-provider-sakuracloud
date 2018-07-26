@@ -3,12 +3,12 @@ layout: "sakuracloud"
 page_title: "SakuraCloud: sakuracloud_packet_filter_rule"
 sidebar_current: "docs-sakuracloud-resource-pfrule"
 description: |-
-  Provides a SakuraCloud Packet Filter Rule resource. This can be used to create, modify, and delete Packet Filter Rules.
+  Provides a SakuraCloud Packet Filter Rule resource. This can be used to create, update, and delete Packet Filter Rules.
 ---
 
 # sakuracloud\_packet\_filter\_rule
 
-Provides a SakuraCloud Packet Filter Rule resource. This can be used to create, modify, and delete Packet Filter Rules.
+Provides a SakuraCloud Packet Filter Rule resource. This can be used to create, update, and delete Packet Filter Rules.
 
 ## Example Usage
 

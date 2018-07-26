@@ -3,12 +3,12 @@ layout: "sakuracloud"
 page_title: "SakuraCloud: sakuracloud_nfs"
 sidebar_current: "docs-sakuracloud-resource-nfs"
 description: |-
-  Provides a SakuraCloud NFS Appliance resource. This can be used to create, modify, and delete NFS Appliances.
+  Provides a SakuraCloud NFS Appliance resource. This can be used to create, update, and delete NFS Appliances.
 ---
 
 # sakuracloud\_nfs
 
-Provides a SakuraCloud NFS Appliance resource. This can be used to create, modify, and delete NFS Appliances.
+Provides a SakuraCloud NFS Appliance resource. This can be used to create, update, and delete NFS Appliances.
 
 ## Example Usage
 
@@ -42,7 +42,7 @@ Valid value is one of the following: [ 100(default) / 500 / 1024 / 2048 / 4096 ]
 * `description` - (Optional) The description of the resource.
 * `tags` - (Optional) The tag list of the resource.
 * `icon_id` - (Optional) The ID of the icon.
-* `graceful_shutdown_timeout` - (Optional) The wait time(seconds) to gracefully shutdown the NFS Appliance.
+* `graceful_shutdown_timeout` - (Optional) The wait time(seconds) to do graceful shutdown the NFS Appliance.
 * `zone` - (Optional) The ID of the zone to which the resource belongs.
 
 ## Attributes Reference

@@ -8,7 +8,7 @@ description: |-
 
 # sakuracloud\_mobile\_gateway\_static\_route
 
-Provides a SakuraCloud Mobile Gateway Static Route resource. This can be used to create, modify, and delete Mobile Gateway Static Routes.
+Provides a SakuraCloud Mobile Gateway Static Route resource. This can be used to create, update, and delete Mobile Gateway Static Routes.
 
 ## Example Usage
 

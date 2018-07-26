@@ -28,7 +28,7 @@ data sakuracloud_packet_filter "foobar" {
 
 * `id` - The ID of the resource.
 * `name` - The name of the resource.
-* `expressions` - List of filter-expression. It contains several attributes to [Filter Expressions](#filter-expressions).
+* `expressions` - List of filter-expression. It contains some attributes to [Filter Expressions](#filter-expressions).
 * `description` - The description of the resource.
 * `zone` - The ID of the zone to which the resource belongs.
 

@@ -3,12 +3,12 @@ layout: "sakuracloud"
 page_title: "SakuraCloud: sakuracloud_sim"
 sidebar_current: "docs-sakuracloud-resource-sim"
 description: |-
-  Provides a SakuraCloud SIM resource. This can be used to create, modify, and delete SIMs.
+  Provides a SakuraCloud SIM resource. This can be used to create, update, and delete SIMs.
 ---
 
 # sakuracloud\_sim
 
-Provides a SakuraCloud SIM resource. This can be used to create, modify, and delete SIMs.
+Provides a SakuraCloud SIM resource. This can be used to create, update, and delete SIMs.
 
 ## Example Usage
 
@@ -45,7 +45,7 @@ The following arguments are supported:
 * `imei` - (Optional) The IMEI of the device that allows communication.
 * `enabled` - (Optional) The flag of enable/disable the Server.
 * `mobile_gateway_id` - (Optional) The ID of the Mobile Gateway to which the SIM belongs.
-* `ipaddress` - (Optional) The IP address of the SIM. Only when connected with mobile gateway.
+* `ipaddress` - (Optional) The IP address of the SIM. Used when connect to mobile gateway.
 * `description` - (Optional) The description of the resource.
 * `tags` - (Optional) The tag list of the resource.
 * `icon_id` - (Optional) The ID of the icon.
@@ -57,7 +57,7 @@ The following attributes are exported:
 * `id` - The ID of the resource.
 * `name` - The name of the resource.
 * `iccid` - The ICCID of the SIM. 
-* `ipaddress` - The IP address of the SIM. Only when connected with mobile gateway.
+* `ipaddress` - The IP address of the SIM. Used when connected with mobile gateway.
 * `description` - The description of the resource.
 * `tags` - The tag list of the resource.
 * `icon_id` - The ID of the icon.

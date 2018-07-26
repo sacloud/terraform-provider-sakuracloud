@@ -3,12 +3,12 @@ layout: "sakuracloud"
 page_title: "SakuraCloud: sakuracloud_mobile_gateway"
 sidebar_current: "docs-sakuracloud-resource-mobile-gateway"
 description: |-
-  Provides a SakuraCloud Mobile Gateway resource. This can be used to create, modify, and delete Mobile Gateways.
+  Provides a SakuraCloud Mobile Gateway resource. This can be used to create, update, and delete Mobile Gateways.
 ---
 
 # sakuracloud\_mobile\_gateway
 
-Provides a SakuraCloud Mobile Gateway resource. This can be used to create, modify, and delete Mobile Gateways.
+Provides a SakuraCloud Mobile Gateway resource. This can be used to create, update, and delete Mobile Gateways.
 
 ## Example Usage
 
@@ -43,7 +43,7 @@ The following arguments are supported:
 * `description` - (Optional) The description of the resource.
 * `tags` - (Optional) The tag list of the resource.
 * `icon_id` - (Optional) The ID of the icon.
-* `graceful_shutdown_timeout` - (Optional) The wait time(seconds) to gracefully shutdown the server connected to the resource.
+* `graceful_shutdown_timeout` - (Optional) The wait time(seconds) to do graceful shutdown the server connected to the resource.
 * `zone` - (Optional) The ID of the zone to which the resource belongs.
 
 ## Attributes Reference
@@ -64,7 +64,7 @@ The following attributes are exported:
 * `description` - The description of the resource.
 * `tags` - The tag list of the resource.
 * `icon_id` - The ID of the icon.
-* `graceful_shutdown_timeout` - The wait time(seconds) to gracefully shutdown the server connected to the resource.
+* `graceful_shutdown_timeout` - The wait time(seconds) to do graceful shutdown the server connected to the resource.
 * `zone` - The ID of the zone to which the resource belongs.
 
 ## Import

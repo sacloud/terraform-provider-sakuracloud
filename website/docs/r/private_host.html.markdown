@@ -3,12 +3,12 @@ layout: "sakuracloud"
 page_title: "SakuraCloud: sakuracloud_private_host"
 sidebar_current: "docs-sakuracloud-resource-private-host"
 description: |-
-  Provides a SakuraCloud Private Host resource. This can be used to create, modify, and delete Private Hosts.
+  Provides a SakuraCloud Private Host resource. This can be used to create, update, and delete Private Hosts.
 ---
 
 # sakuracloud\_private\_host
 
-Provides a SakuraCloud Private Host resource. This can be used to create, modify, and delete Private Hosts.
+Provides a SakuraCloud Private Host resource. This can be used to create, update, and delete Private Hosts.
 
 ## Example Usage
 
@@ -36,7 +36,7 @@ The following arguments are supported:
 * `description` - (Optional) The description of the resource.
 * `tags` - (Optional) The tag list of the resource.
 * `icon_id` - (Optional) The ID of the icon.
-* `graceful_shutdown_timeout` - (Optional) The wait time(seconds) to gracefully shutdown the server connected to the resource.
+* `graceful_shutdown_timeout` - (Optional) The wait time(seconds) to do graceful shutdown the server connected to the resource.
 * `zone` - (Optional) The ID of the zone to which the resource belongs.  
 Valid value is one of the following: ["is1b" / "tk1a"]
 

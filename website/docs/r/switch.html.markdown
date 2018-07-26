@@ -3,12 +3,12 @@ layout: "sakuracloud"
 page_title: "SakuraCloud: sakuracloud_switch"
 sidebar_current: "docs-sakuracloud-resource-switch"
 description: |-
-  Provides a SakuraCloud Switch resource. This can be used to create, modify, and delete Switches.
+  Provides a SakuraCloud Switch resource. This can be used to create, update, and delete Switches.
 ---
 
 # sakuracloud\_switch
 
-Provides a SakuraCloud Switch resource. This can be used to create, modify, and delete Switches.
+Provides a SakuraCloud Switch resource. This can be used to create, update, and delete Switches.
 
 ## Example Usage
 
@@ -33,7 +33,7 @@ The following arguments are supported:
 * `tags` - (Optional) The tag list of the resource.
 * `bridge_id` - (Optional) The ID of the Bridge to connect to the Switch.
 * `icon_id` - (Optional) The ID of the icon.
-* `graceful_shutdown_timeout` - (Optional) The wait time(seconds) to gracefully shutdown the server connected to the resource.
+* `graceful_shutdown_timeout` - (Optional) The wait time(seconds) to do graceful shutdown the server connected to the resource.
 * `zone` - (Optional) The ID of the zone to which the resource belongs.
 
 ## Attributes Reference

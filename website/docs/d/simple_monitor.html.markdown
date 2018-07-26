@@ -28,7 +28,7 @@ data sakuracloud_simple_monitor "foobar" {
 
 * `id` - The ID of the resource.
 * `target` - The HostName or IP address of monitoring target.
-* `health_check` - Health check rules. It contains several attributes to [Health Check](#health-check).
+* `health_check` - Health check rules. It contains some attributes to [Health Check](#health-check).
 * `notify_email_enabled` - The flag of enable/disable notification by E-mail.
 * `notify_email_html` - The flag of enable/disable HTML format for E-mail.
 * `notify_slack_enabled` - The flag of enable/disable notification by slack.

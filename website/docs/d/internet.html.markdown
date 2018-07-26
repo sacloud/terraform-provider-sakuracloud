@@ -35,9 +35,9 @@ data sakuracloud_internet "foobar" {
 * `server_ids` - The IDs of the server connected to the switch.
 * `nw_address` - The network address.
 * `gateway` - The network gateway address of the switch.
-* `min_ipaddress` - Minimum global ip address.
-* `max_ipaddress` - Maximum global ip address.
-* `ipaddresses` - Global ip address list.
+* `min_ipaddress` - Min global IP address.
+* `max_ipaddress` - Max global IP address.
+* `ipaddresses` - Global IP address list.
 * `enable_ipv6` - The ipv6 enabled flag.
 * `ipv6_prefix` - Address prefix of ipv6 network.
 * `ipv6_prefix_len` - Address prefix length of ipv6 network.

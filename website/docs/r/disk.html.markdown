@@ -3,12 +3,12 @@ layout: "sakuracloud"
 page_title: "SakuraCloud: sakuracloud_disk"
 sidebar_current: "docs-sakuracloud-resource-disk"
 description: |-
-  Provides a SakuraCloud Disk resource. This can be used to create, modify, and delete Disks.
+  Provides a SakuraCloud Disk resource. This can be used to create, update, and delete Disks.
 ---
 
 # sakuracloud\_disk
 
-Provides a SakuraCloud Disk resource. This can be used to create, modify, and delete Disks.
+Provides a SakuraCloud Disk resource. This can be used to create, update, and delete Disks.
 
 ## Example Usage
 
@@ -52,15 +52,15 @@ Valid value is one of the following: [ "virtio"(default) / "ide"]
 * `size` - Size of the resource(unit:`GB`).
 * `source_archive_id` - The ID of source Archive.
 * `source_disk_id` - The ID of source Disk.
-* `hostname` - The hostname to set with "Modify Disk" API.
-* `password` - The password of OS's administrator to set with "Modify Disk" API.
-* `ssh_key_ids` - The ID list of SSH Key to set with "Modify Disk" API.
-* `note_ids` - The ID list of Note(Startup-Script) to set with "Modify Disk" API.
+* `hostname` - The hostname to set with `"Modify Disk"` API.
+* `password` - The password of OS's administrator to set with `"Modify Disk"` API.
+* `ssh_key_ids` - The ID list of SSH Key to set with `"Modify Disk"` API.
+* `note_ids` - The ID list of Note(Startup-Script) to set with `"Modify Disk"` API.
 * `disable_pw_auth` - The flag of disable password auth via SSH.
 * `description` - (Optional) The description of the resource.
 * `tags` - (Optional) The tag list of the resource.
 * `icon_id` - (Optional) The ID of the icon.
-* `graceful_shutdown_timeout` - (Optional) The wait time(seconds) to gracefully shutdown the server connected to the resource.
+* `graceful_shutdown_timeout` - (Optional) The wait time(seconds) to do graceful shutdown the server connected to the resource.
 * `zone` - (Optional) The ID of the zone to which the resource belongs.
 
 ## Attributes Reference

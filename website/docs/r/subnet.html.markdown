@@ -3,12 +3,12 @@ layout: "sakuracloud"
 page_title: "SakuraCloud: sakuracloud_subnet"
 sidebar_current: "docs-sakuracloud-resource-subnet"
 description: |-
-  Provides a SakuraCloud Subnet resource. This can be used to create, modify, and delete Subnets.
+  Provides a SakuraCloud Subnet resource. This can be used to create, update, and delete Subnets.
 ---
 
 # sakuracloud\_subnet
 
-Provides a SakuraCloud Subnet resource. This can be used to create, modify, and delete Subnets.
+Provides a SakuraCloud Subnet resource. This can be used to create, update, and delete Subnets.
 
 ## Example Usage
 
@@ -42,9 +42,9 @@ The following attributes are exported:
 * `next_hop` - The next hop IP address.
 * `subnet_id` - The ID of the subnet connected to the Subnet.
 * `nw_address` -  The network address.
-* `min_ipaddress` - Minimum global ip address.
-* `max_ipaddress` - Maximum global ip address.
-* `ipaddresses` - Global ip address list.
+* `min_ipaddress` - Min global IP address.
+* `max_ipaddress` - Max global IP address.
+* `ipaddresses` - Global IP address list.
 * `zone` - The ID of the zone to which the resource belongs.
 
 ## Import

@@ -3,12 +3,12 @@ layout: "sakuracloud"
 page_title: "SakuraCloud: sakuracloud_auto_backup"
 sidebar_current: "docs-sakuracloud-resource-auto-backup"
 description: |-
-  Provides a SakuraCloud Auto Backup resource. This can be used to create, modify, and delete Auto Backups.
+  Provides a SakuraCloud Auto Backup resource. This can be used to create, update, and delete Auto Backups.
 ---
 
 # sakuracloud\_auto_backup
 
-Provides a SakuraCloud Auto Backup resource. This can be used to create, modify, and delete Auto Backups.
+Provides a SakuraCloud Auto Backup resource. This can be used to create, update, and delete Auto Backups.
 
 ## Example Usage
 
@@ -32,7 +32,7 @@ The following arguments are supported:
 * `disk_id` - (Optional) The ID of the target disk. 
 * `weekdays` - (Optional) Day of the week to get backup.  
 Valid values are the following: ["mon", "tue", "wed", "thu", "fri", "sat", "sun"]
-* `max_backup_num` - (Optional) Maximum number of backups to keep.
+* `max_backup_num` - (Optional) Max number of backups to keep.
 * `description` - (Optional) The description of the resource.
 * `tags` - (Optional) The tag list of the resource.
 * `icon_id` - (Optional) The ID of the icon.
@@ -47,7 +47,7 @@ The following attributes are exported:
 * `name` - The name of the resource.
 * `disk_id` - The ID of the target disk. 
 * `weekdays` - Day of the week to get backup.  
-* `max_backup_num` - Maximum number of backups to keep.
+* `max_backup_num` - Max number of backups to keep.
 * `description` - The description of the resource.
 * `tags` - The tag list of the resource.
 * `icon_id` - The ID of the icon of the resource.

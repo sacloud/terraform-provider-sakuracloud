@@ -3,14 +3,14 @@ layout: "sakuracloud"
 page_title: "SakuraCloud: sakuracloud_bucket_object"
 sidebar_current: "docs-sakuracloud-resource-bucket_object"
 description: |-
-  Provides a SakuraCloud Bucket Object resource. This can be used to create, modify, and delete Bucket Objects.
+  Provides a SakuraCloud Bucket Object resource. This can be used to create, update, and delete Bucket Objects.
 ---
 
 # sakuracloud\_bucket\_object
 
-Provides a SakuraCloud Bucket Object resource. This can be used to create, modify, and delete Bucket Objects.
+Provides a SakuraCloud Bucket Object resource. This can be used to create, update, and delete Bucket Objects.
 
-~> **NOTE on Bucket:** Currently, Sakura Cloud does not support API bucket creation.
+~> **NOTE on Bucket:**  Sakura Cloud does not support API bucket creation.
 Buckets should be created on the control panel.
 
 ## Example Usage
@@ -42,7 +42,7 @@ resource sakuracloud_bucket_object "foobar" {
 
 * `id` - ID of the resource.
 * `content_type` - Content-Type header value of the bucket object.
-* `body` - String of the value of the bucket object. It is set only when Content-Type is `"text/*"` or `"application/json"`.
+* `body` - String of the value of the bucket object. Set when Content-Type is `"text/*"` or `"application/json"`.
 * `etag` - ETag of the resource.
 * `size` - Size of the resource(unit: `byte`).
 * `last_modified` - Update date of the resource.

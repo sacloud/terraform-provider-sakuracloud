@@ -3,12 +3,12 @@ layout: "sakuracloud"
 page_title: "SakuraCloud: sakuracloud_simple_monitor"
 sidebar_current: "docs-sakuracloud-resource-smonitor"
 description: |-
-  Provides a SakuraCloud Simple Monitor resource. This can be used to create, modify, and delete Simple Monitors.
+  Provides a SakuraCloud Simple Monitor resource. This can be used to create, update, and delete Simple Monitors.
 ---
 
 # sakuracloud\_simple\_monitor
 
-Provides a SakuraCloud Simple Monitor resource. This can be used to create, modify, and delete Simple Monitors.
+Provides a SakuraCloud Simple Monitor resource. This can be used to create, update, and delete Simple Monitors.
 
 ## Example Usage
 
@@ -50,7 +50,7 @@ resource sakuracloud_simple_monitor "cert" {
 The following arguments are supported:
 
 * `target` - (Required) The HostName or IP address of monitoring target.
-* `health_check` - (Required) Health check rules. It contains several attributes to [Health Check](#health-check).
+* `health_check` - (Required) Health check rules. It contains some attributes to [Health Check](#health-check).
 * `notify_email_enabled` - (Optional) The flag of enable/disable notification by E-mail.
 * `notify_email_html` - (Optional) The flag of enable/disable HTML format for E-mail.
 * `notify_slack_enabled` - (Optional) The flag of enable/disable notification by slack.
@@ -83,7 +83,7 @@ Valid value is one of the following: [ "http" / "https" / "ping" / "tcp" / "dns"
 
 * `id` - The ID of the resource.
 * `target` - The HostName or IP address of monitoring target.
-* `health_check` - Health check rules. It contains several attributes to [Health Check](#health-check).
+* `health_check` - Health check rules. It contains some attributes to [Health Check](#health-check).
 * `notify_email_enabled` - The flag of enable/disable notification by E-mail.
 * `notify_email_html` - The flag of enable/disable HTML format for E-mail.
 * `notify_slack_enabled` - The flag of enable/disable notification by slack.

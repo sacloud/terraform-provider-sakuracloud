@@ -8,7 +8,7 @@ description: |-
 
 # sakuracloud\_mobile\_gateway\_sim\_route
 
-Provides a SakuraCloud Mobile Gateway SIM Route resource. This can be used to create, modify, and delete Mobile Gateway SIM Routes.
+Provides a SakuraCloud Mobile Gateway SIM Route resource. This can be used to create, update, and delete Mobile Gateway SIM Routes.
 
 ## Example Usage
 

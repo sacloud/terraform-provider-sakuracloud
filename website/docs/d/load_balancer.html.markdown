@@ -34,7 +34,7 @@ data sakuracloud_load_balancer "foobar" {
 * `high_availability` - The flag of enable/disable high-availability mode.
 * `plan` - The name of the resource plan. 
 * `ipaddress1` - The primary IP address of the Load Balancer.
-* `ipaddress2` - The secondly IP address of the Load Balancer. It is used only when high-availability mode enabled.
+* `ipaddress2` - The secondly IP address of the Load Balancer. Used when high-availability mode enabled.
 * `nw_mask_len` - Network mask length.
 * `default_route` - Default gateway address of the Load Balancer.	 
 * `description` - The description of the resource.

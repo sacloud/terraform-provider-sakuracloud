@@ -3,12 +3,12 @@ layout: "sakuracloud"
 page_title: "SakuraCloud: sakuracloud_database"
 sidebar_current: "docs-sakuracloud-resource-database"
 description: |-
-  Provides a SakuraCloud Database resource. This can be used to create, modify, and delete Databases.
+  Provides a SakuraCloud Database resource. This can be used to create, update, and delete Databases.
 ---
 
 # sakuracloud\_database
 
-Provides a SakuraCloud Database resource. This can be used to create, modify, and delete Databases.
+Provides a SakuraCloud Database resource. This can be used to create, update, and delete Databases.
 
 ## Example Usage
 
@@ -39,7 +39,7 @@ resource sakuracloud_database "foobar" {
 The following arguments are supported:
 
 * `name` - (Required) The name of the resource.
-* `database_type` - (Optional) The type of the Database.
+* `database_type` - (Optional) The Database type.
 Valid value is one of the following: [ "postgresql"(default) / "mariadb"]
 * `plan` - (Optional) The plan(size) of the Database.   
 Valid value is one of the following: [ "10g"(default) / "30g" / "90g" / "240g" / "500g" / "1t" ]
@@ -55,7 +55,7 @@ Valid value is one of the following: [ "10g"(default) / "30g" / "90g" / "240g" /
 * `description` - (Optional) The description of the resource.
 * `tags` - (Optional) The tag list of the resource.
 * `icon_id` - (Optional) The ID of the icon.
-* `graceful_shutdown_timeout` - (Optional) The wait time(seconds) to gracefully shutdown the Database.
+* `graceful_shutdown_timeout` - (Optional) The wait time(seconds) to do graceful shutdown the Database.
 * `zone` - (Optional) The ID of the zone to which the resource belongs.
 
 ## Attributes Reference

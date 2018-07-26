@@ -34,7 +34,7 @@ The following arguments are supported:
 
 * `dns_id` - (Required) The ID of DNS zones to which the Record belongs.
 * `name` - (Required) The hostname of target Record. If "@" is specified, it indicates own zone.
-* `type` - (Required) The type of the Record.  
+* `type` - (Required) The Record type.  
 Valid value is one of the following: [ "A" / "AAAA" / "CNAME" / "NS" / "MX" / "TXT" / "SRV" ]
 * `value` - (Required) The value of the Record. 
 * `ttl` - (Optional) The ttl value of the Record(unit:`second`). 
@@ -48,7 +48,7 @@ The following attributes are exported:
 
 * `id` - The ID of the resource.
 * `name` - The hostname of target Record. 
-* `type` - The type of the Record.
+* `type` - The Record type.
 * `value` - The value of the Record. 
 * `ttl` - The ttl value of the Record(unit:`second`). 
 * `priority` - The priority used when `type` is `MX` or `SRV`.

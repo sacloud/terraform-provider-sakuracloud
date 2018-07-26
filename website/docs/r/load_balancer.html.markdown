@@ -3,12 +3,12 @@ layout: "sakuracloud"
 page_title: "SakuraCloud: sakuracloud_load_balancer"
 sidebar_current: "docs-sakuracloud-resource-load-balancer"
 description: |-
-  Provides a SakuraCloud LoadBalancer resource. This can be used to create, modify, and delete LoadBalancers.
+  Provides a SakuraCloud LoadBalancer resource. This can be used to create, update, and delete LoadBalancers.
 ---
 
 # sakuracloud\_load\_balancer
 
-Provides a SakuraCloud LoadBalancer resource. This can be used to create, modify, and delete LoadBalancers.
+Provides a SakuraCloud LoadBalancer resource. This can be used to create, update, and delete LoadBalancers.
 
 ## Example Usage
 
@@ -48,13 +48,13 @@ The following arguments are supported:
 * `plan` - (Optional) The name of the resource plan.
 Valid value is one of the following: [ "standard"(default) / "highspec"]
 * `ipaddress1` - (Required) The primary IP address of the Load Balancer.
-* `ipaddress2` - (Optional) The secondly IP address of the Load Balancer. It is used only when high-availability mode enabled.
+* `ipaddress2` - (Optional) The secondly IP address of the Load Balancer. Used when high-availability mode enabled.
 * `nw_mask_len` - (Required) Network mask length.
 * `default_route` - (Optional) Default gateway address of the Load Balancer.	 
 * `description` - (Optional) The description of the resource.
 * `tags` - (Optional) The tag list of the resource.
 * `icon_id` - (Optional) The ID of the icon.
-* `graceful_shutdown_timeout` - (Optional) The wait time(seconds) to gracefully shutdown the server connected to the resource.
+* `graceful_shutdown_timeout` - (Optional) The wait time(seconds) to do graceful shutdown the server connected to the resource.
 * `zone` - (Optional) The ID of the zone to which the resource belongs.
 
 ## Attributes Reference
@@ -68,7 +68,7 @@ The following attributes are exported:
 * `high_availability` - The flag of enable/disable high-availability mode.
 * `plan` - The name of the resource plan. 
 * `ipaddress1` - The primary IP address of the Load Balancer.
-* `ipaddress2` - The secondly IP address of the Load Balancer. It is used only when high-availability mode enabled.
+* `ipaddress2` - The secondly IP address of the Load Balancer. Used when high-availability mode enabled.
 * `nw_mask_len` - Network mask length.
 * `default_route` - Default gateway address of the Load Balancer.	 
 * `description` - The description of the resource.

@@ -29,7 +29,7 @@ data sakuracloud_gslb "foobar" {
 * `id` - The ID of the resource.
 * `name` - Name of the resource.
 * `fqdn` - FQDN to access this resource.
-* `health_check` - Health check rules. It contains several attributes to [Health Check](#health-check).
+* `health_check` - Health check rules. It contains some attributes to [Health Check](#health-check).
 * `weighted` - The flag for enable/disable weighting.
 * `sorry_server` - The hostname or IP address of sorry server.
 * `description` - The description of the resource.

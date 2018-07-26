@@ -3,12 +3,12 @@ layout: "sakuracloud"
 page_title: "SakuraCloud: sakuracloud_gslb"
 sidebar_current: "docs-sakuracloud-resource-gslb"
 description: |-
-  Provides a SakuraCloud GSLB resource. This can be used to create, modify, and delete GSLBs.
+  Provides a SakuraCloud GSLB resource. This can be used to create, update, and delete GSLBs.
 ---
 
 # sakuracloud\_gslb
 
-Provides a SakuraCloud GSLB resource. This can be used to create, modify, and delete GSLBs.
+Provides a SakuraCloud GSLB resource. This can be used to create, update, and delete GSLBs.
 
 ## Example Usage
 
@@ -36,7 +36,7 @@ resource "sakuracloud_gslb" "foobar" {
 The following arguments are supported:
 
 * `name` - (Required) The name of the resource.
-* `health_check` - (Required) Health check rules. It contains several attributes to [Health Check](#health-check).
+* `health_check` - (Required) Health check rules. It contains some attributes to [Health Check](#health-check).
 * `weighted` - (Optional) The flag for enable/disable weighting.(default:`true`)
 * `sorry_server` - (Optional) The hostname or IP address of sorry server.
 * `description` - (Optional) The description of the resource.
@@ -62,7 +62,7 @@ The following attributes are exported:
 * `id` - The ID of the resource.
 * `name` - Name of the resource.
 * `fqdn` - FQDN to access this resource.
-* `health_check` - Health check rules. It contains several attributes to [Health Check](#health-check).
+* `health_check` - Health check rules. It contains some attributes to [Health Check](#health-check).
 * `weighted` - The flag for enable/disable weighting.
 * `sorry_server` - The hostname or IP address of sorry server.
 * `description` - The description of the resource.

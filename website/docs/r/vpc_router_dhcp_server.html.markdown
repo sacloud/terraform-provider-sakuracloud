@@ -3,12 +3,12 @@ layout: "sakuracloud"
 page_title: "SakuraCloud: sakuracloud_vpc_router_dhcp_server"
 sidebar_current: "docs-sakuracloud-resource-vdhcpserver"
 description: |-
-  Provides a SakuraCloud VPC Router DHCP Server resource. This can be used to create, modify, and delete VPC Router DHCP Servers.
+  Provides a SakuraCloud VPC Router DHCP Server resource. This can be used to create, update, and delete VPC Router DHCP Servers.
 ---
 
 # sakuracloud\_vpc\_router\_dhcp\_server
 
-Provides a SakuraCloud VPC Router DHCP Server resource. This can be used to create, modify, and delete VPC Router DHCP Servers.
+Provides a SakuraCloud VPC Router DHCP Server resource. This can be used to create, update, and delete VPC Router DHCP Servers.
 
 ## Example Usage
 

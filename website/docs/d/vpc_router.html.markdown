@@ -31,11 +31,11 @@ data sakuracloud_vpc_router "foobar" {
 * `name` - The name of the resource.
 * `plan` - The name of the resource plan. 
 * `switch_id` - The ID of the Switch connected to the VPC Router(eth0).
-* `vip` - Virtual IP address of the VPC Router. It is used only when plan is in `premium` or `highspec`.
+* `vip` - Virtual IP address of the VPC Router. Used when plan is in `premium` or `highspec`.
 * `ipaddress1` - The primary IP address of the VPC Router.
-* `ipaddress2` - The secondly IP address of the VPC Router. It is used only when plan is in `premium` or `highspec`.
+* `ipaddress2` - The secondly IP address of the VPC Router. Used when plan is in `premium` or `highspec`.
 * `vrid` - VRID used when plan is in `premium` or `highspec`.
-* `aliases` - The IP address aliase list. It is used only when plan is in `premium` or `highspec`.
+* `aliases` - The IP address aliase list. Used when plan is in `premium` or `highspec`.
 * `global_address` - Global IP address of the VPC Router.
 * `syslog_host` - The destination HostName/IP address to send log.	
 * `internet_connection` - The flag of enable/disable connection from the VPC Router to the Internet.
