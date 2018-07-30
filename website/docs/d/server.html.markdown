@@ -3,12 +3,12 @@ layout: "sakuracloud"
 page_title: "SakuraCloud: sakuracloud_server"
 sidebar_current: "docs-sakuracloud-datasource-server"
 description: |-
-  Get information on a SakuraCloud server.
+  Get information on a SakuraCloud Server.
 ---
 
 # sakuracloud\_server
 
-Use this data source to retrieve information about a SakuraCloud server.
+Use this data source to retrieve information about a SakuraCloud Server.
 
 ## Example Usage
 

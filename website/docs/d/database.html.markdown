@@ -3,12 +3,12 @@ layout: "sakuracloud"
 page_title: "SakuraCloud: sakuracloud_database"
 sidebar_current: "docs-sakuracloud-datasource-database"
 description: |-
-  Get information on a SakuraCloud database.
+  Get information on a SakuraCloud Database.
 ---
 
 # sakuracloud\_database
 
-Use this data source to retrieve information about a SakuraCloud database.
+Use this data source to retrieve information about a SakuraCloud Database.
 
 ## Example Usage
 

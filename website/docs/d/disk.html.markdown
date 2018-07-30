@@ -3,12 +3,12 @@ layout: "sakuracloud"
 page_title: "SakuraCloud: sakuracloud_disk"
 sidebar_current: "docs-sakuracloud-datasource-disk"
 description: |-
-  Get information on a SakuraCloud disk.
+  Get information on a SakuraCloud Disk.
 ---
 
 # sakuracloud\_disk
 
-Use this data source to retrieve information about a SakuraCloud disk.
+Use this data source to retrieve information about a SakuraCloud Disk.
 
 ## Example Usage
 

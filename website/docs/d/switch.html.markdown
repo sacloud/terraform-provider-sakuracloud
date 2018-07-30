@@ -3,12 +3,12 @@ layout: "sakuracloud"
 page_title: "SakuraCloud: sakuracloud_switch"
 sidebar_current: "docs-sakuracloud-datasource-switch"
 description: |-
-  Get information on a SakuraCloud switch.
+  Get information on a SakuraCloud Switch.
 ---
 
 # sakuracloud\_switch
 
-Use this data source to retrieve information about a SakuraCloud switch.
+Use this data source to retrieve information about a SakuraCloud Switch.
 
 ## Example Usage
 

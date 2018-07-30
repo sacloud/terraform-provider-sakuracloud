@@ -3,12 +3,12 @@ layout: "sakuracloud"
 page_title: "SakuraCloud: sakuracloud_cdrom"
 sidebar_current: "docs-sakuracloud-datasource-cdrom"
 description: |-
-  Get information on a SakuraCloud cdrom.
+  Get information on a SakuraCloud CD-ROM.
 ---
 
 # sakuracloud\_cdrom
 
-Use this data source to retrieve information about a SakuraCloud cdrom.
+Use this data source to retrieve information about a SakuraCloud CD-ROM.
 
 ## Example Usage
 

@@ -3,12 +3,12 @@ layout: "sakuracloud"
 page_title: "SakuraCloud: sakuracloud_archive"
 sidebar_current: "docs-sakuracloud-datasource-archive"
 description: |-
-  Get information on a SakuraCloud archive.
+  Get information on a SakuraCloud Archive.
 ---
 
 # sakuracloud\_archive
 
-Use this data source to retrieve information about a SakuraCloud archive.
+Use this data source to retrieve information about a SakuraCloud Archive.
 
 ## Example Usage
 

@@ -3,12 +3,12 @@ layout: "sakuracloud"
 page_title: "SakuraCloud: sakuracloud_icon"
 sidebar_current: "docs-sakuracloud-datasource-icon"
 description: |-
-  Get information on a SakuraCloud icon.
+  Get information on a SakuraCloud Icon.
 ---
 
 # sakuracloud\_icon
 
-Use this data source to retrieve information about a SakuraCloud icon.
+Use this data source to retrieve information about a SakuraCloud Icon.
 
 ## Example Usage
 

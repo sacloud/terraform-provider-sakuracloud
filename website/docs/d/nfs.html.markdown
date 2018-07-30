@@ -3,7 +3,7 @@ layout: "sakuracloud"
 page_title: "SakuraCloud: sakuracloud_nfs"
 sidebar_current: "docs-sakuracloud-datasource-nfs"
 description: |-
-  Get information on a SakuraCloud nfs.
+  Get information on a SakuraCloud NFS.
 ---
 
 # sakuracloud\_nfs

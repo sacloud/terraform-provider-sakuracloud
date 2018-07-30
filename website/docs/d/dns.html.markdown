@@ -3,12 +3,12 @@ layout: "sakuracloud"
 page_title: "SakuraCloud: sakuracloud_dns"
 sidebar_current: "docs-sakuracloud-datasource-dns"
 description: |-
-  Get information on a SakuraCloud dns.
+  Get information on a SakuraCloud DNS.
 ---
 
 # sakuracloud\_dns
 
-Use this data source to retrieve information about a SakuraCloud dns.
+Use this data source to retrieve information about a SakuraCloud DNS.
 
 ## Example Usage
 

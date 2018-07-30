@@ -3,12 +3,12 @@ layout: "sakuracloud"
 page_title: "SakuraCloud: sakuracloud_gslb"
 sidebar_current: "docs-sakuracloud-datasource-gslb"
 description: |-
-  Get information on a SakuraCloud gslb.
+  Get information on a SakuraCloud GSLB.
 ---
 
 # sakuracloud\_gslb
 
-Use this data source to retrieve information about a SakuraCloud gslb.
+Use this data source to retrieve information about a SakuraCloud GSLB.
 
 ## Example Usage
 

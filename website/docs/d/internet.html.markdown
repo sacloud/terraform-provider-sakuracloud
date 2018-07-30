@@ -3,12 +3,12 @@ layout: "sakuracloud"
 page_title: "SakuraCloud: sakuracloud_internet"
 sidebar_current: "docs-sakuracloud-datasource-internet"
 description: |-
-  Get information on a SakuraCloud internet.
+  Get information on a SakuraCloud Internet (Switch+Router).
 ---
 
 # sakuracloud\_internet
 
-Use this data source to retrieve information about a SakuraCloud internet (Switch+Router).
+Use this data source to retrieve information about a SakuraCloud Internet (Switch+Router).
 
 ## Example Usage
 

@@ -3,12 +3,12 @@ layout: "sakuracloud"
 page_title: "SakuraCloud: sakuracloud_bridge"
 sidebar_current: "docs-sakuracloud-datasource-bridge"
 description: |-
-  Get information on a SakuraCloud bridge.
+  Get information on a SakuraCloud Bridge.
 ---
 
 # sakuracloud\_bridge
 
-Use this data source to retrieve information about a SakuraCloud bridge.
+Use this data source to retrieve information about a SakuraCloud Bridge.
 
 ## Example Usage
 
