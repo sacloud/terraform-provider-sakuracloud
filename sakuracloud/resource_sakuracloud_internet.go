@@ -220,6 +220,9 @@ func resourceSakuraCloudInternetUpdate(d *schema.ResourceData, meta interface{})
 		if err != nil {
 			return fmt.Errorf("Error updating SakuraCloud Internet bandwidth: %s", err)
 		}
+		// internet.ID is changed when UpdateBandWidth() is called.
+		// so call SetID here.
+		d.SetId(internet.GetStrID()) // nolint
 	}
 
 	// handle ipv6 param
