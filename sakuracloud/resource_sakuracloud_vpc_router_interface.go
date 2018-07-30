@@ -7,6 +7,7 @@ import (
 	"errors"
 	"github.com/hashicorp/terraform/helper/hashcode"
 	"github.com/hashicorp/terraform/helper/schema"
+	"github.com/hashicorp/terraform/helper/validation"
 	"github.com/sacloud/libsacloud/api"
 	"time"
 )
@@ -28,7 +29,7 @@ func resourceSakuraCloudVPCRouterInterface() *schema.Resource {
 				Type:         schema.TypeInt,
 				Required:     true,
 				ForceNew:     true,
-				ValidateFunc: validateIntegerInRange(1, 7),
+				ValidateFunc: validation.IntBetween(1, 7),
 			},
 			"switch_id": {
 				Type:         schema.TypeString,
@@ -53,7 +54,7 @@ func resourceSakuraCloudVPCRouterInterface() *schema.Resource {
 				Type:         schema.TypeInt,
 				ForceNew:     true,
 				Required:     true,
-				ValidateFunc: validateIntegerInRange(16, 28),
+				ValidateFunc: validation.IntBetween(16, 28),
 			},
 			powerManageTimeoutKey: powerManageTimeoutParamForceNew,
 			"zone": {

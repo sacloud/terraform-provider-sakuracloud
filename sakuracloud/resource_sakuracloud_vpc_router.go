@@ -3,6 +3,7 @@ package sakuracloud
 import (
 	"fmt"
 	"github.com/hashicorp/terraform/helper/schema"
+	"github.com/hashicorp/terraform/helper/validation"
 	"github.com/sacloud/libsacloud/api"
 	"github.com/sacloud/libsacloud/sacloud"
 	"time"
@@ -25,14 +26,14 @@ func resourceSakuraCloudVPCRouter() *schema.Resource {
 			"name": {
 				Type:         schema.TypeString,
 				Required:     true,
-				ValidateFunc: validateMaxLength(1, 64),
+				ValidateFunc: validation.StringLenBetween(1, 64),
 			},
 			"plan": {
 				Type:         schema.TypeString,
 				ForceNew:     true,
 				Optional:     true,
 				Default:      "standard",
-				ValidateFunc: validateStringInWord([]string{"standard", "premium", "highspec"}),
+				ValidateFunc: validation.StringInSlice([]string{"standard", "premium", "highspec"}, false),
 			},
 			"switch_id": {
 				Type:         schema.TypeString,
@@ -74,7 +75,7 @@ func resourceSakuraCloudVPCRouter() *schema.Resource {
 			"description": {
 				Type:         schema.TypeString,
 				Optional:     true,
-				ValidateFunc: validateMaxLength(0, 512),
+				ValidateFunc: validation.StringLenBetween(0, 512),
 			},
 			"tags": {
 				Type:     schema.TypeList,

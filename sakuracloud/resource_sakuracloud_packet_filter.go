@@ -3,6 +3,7 @@ package sakuracloud
 import (
 	"fmt"
 	"github.com/hashicorp/terraform/helper/schema"
+	"github.com/hashicorp/terraform/helper/validation"
 
 	"github.com/sacloud/libsacloud/api"
 	"github.com/sacloud/libsacloud/sacloud"
@@ -36,7 +37,7 @@ func resourceSakuraCloudPacketFilter() *schema.Resource {
 						"protocol": {
 							Type:         schema.TypeString,
 							Required:     true,
-							ValidateFunc: validateStringInWord(sacloud.AllowPacketFilterProtocol()),
+							ValidateFunc: validation.StringInSlice(sacloud.AllowPacketFilterProtocol(), false),
 						},
 
 						"source_nw": {

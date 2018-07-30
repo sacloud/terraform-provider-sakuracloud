@@ -3,6 +3,7 @@ package sakuracloud
 import (
 	"fmt"
 	"github.com/hashicorp/terraform/helper/schema"
+	"github.com/hashicorp/terraform/helper/validation"
 
 	"github.com/sacloud/libsacloud/api"
 	"github.com/sacloud/libsacloud/sacloud"
@@ -29,17 +30,17 @@ func resourceSakuraCloudDisk() *schema.Resource {
 				Optional:     true,
 				ForceNew:     true,
 				Default:      "ssd",
-				ValidateFunc: validateStringInWord([]string{"ssd", "hdd"}),
+				ValidateFunc: validation.StringInSlice([]string{"ssd", "hdd"}, false),
 			},
 			"connector": {
 				Type:     schema.TypeString,
 				Optional: true,
 				ForceNew: true,
 				Default:  sacloud.DiskConnectionVirtio,
-				ValidateFunc: validateStringInWord([]string{
+				ValidateFunc: validation.StringInSlice([]string{
 					fmt.Sprintf("%s", sacloud.DiskConnectionVirtio),
 					fmt.Sprintf("%s", sacloud.DiskConnectionIDE),
-				}),
+				}, false),
 			},
 			"source_archive_id": {
 				Type:          schema.TypeString,
@@ -92,12 +93,12 @@ func resourceSakuraCloudDisk() *schema.Resource {
 			"hostname": {
 				Type:         schema.TypeString,
 				Optional:     true,
-				ValidateFunc: validateMaxLength(1, 64),
+				ValidateFunc: validation.StringLenBetween(1, 64),
 			},
 			"password": {
 				Type:         schema.TypeString,
 				Optional:     true,
-				ValidateFunc: validateMaxLength(8, 64),
+				ValidateFunc: validation.StringLenBetween(8, 64),
 				Sensitive:    true,
 			},
 			"ssh_key_ids": {

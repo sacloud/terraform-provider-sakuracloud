@@ -3,6 +3,7 @@ package sakuracloud
 import (
 	"fmt"
 	"github.com/hashicorp/terraform/helper/schema"
+	"github.com/hashicorp/terraform/helper/validation"
 
 	"github.com/sacloud/libsacloud/api"
 	"github.com/sacloud/libsacloud/sacloud"
@@ -29,7 +30,7 @@ func resourceSakuraCloudDatabase() *schema.Resource {
 				Type:         schema.TypeString,
 				Optional:     true,
 				ForceNew:     true,
-				ValidateFunc: validateStringInWord([]string{"postgresql", "mariadb"}),
+				ValidateFunc: validation.StringInSlice([]string{"postgresql", "mariadb"}, false),
 				Default:      "postgresql",
 			},
 			//"is_double": {
@@ -43,7 +44,7 @@ func resourceSakuraCloudDatabase() *schema.Resource {
 				ForceNew:     true,
 				Optional:     true,
 				Default:      "10g",
-				ValidateFunc: validateStringInWord([]string{"10g", "30g", "90g", "240g", "500g", "1t"}),
+				ValidateFunc: validation.StringInSlice([]string{"10g", "30g", "90g", "240g", "500g", "1t"}, false),
 			},
 			"user_name": {
 				Type:     schema.TypeString,
@@ -63,7 +64,7 @@ func resourceSakuraCloudDatabase() *schema.Resource {
 				Type:         schema.TypeInt,
 				Optional:     true,
 				Default:      5432,
-				ValidateFunc: validateIntegerInRange(1024, 65535),
+				ValidateFunc: validation.IntBetween(1024, 65535),
 			},
 			"backup_time": {
 				Type:         schema.TypeString,
@@ -86,7 +87,7 @@ func resourceSakuraCloudDatabase() *schema.Resource {
 				Type:         schema.TypeInt,
 				ForceNew:     true,
 				Required:     true,
-				ValidateFunc: validateIntegerInRange(8, 29),
+				ValidateFunc: validation.IntBetween(8, 29),
 			},
 			"default_route": {
 				Type:     schema.TypeString,

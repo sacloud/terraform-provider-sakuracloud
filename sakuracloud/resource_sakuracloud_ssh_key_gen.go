@@ -3,6 +3,7 @@ package sakuracloud
 import (
 	"fmt"
 	"github.com/hashicorp/terraform/helper/schema"
+	"github.com/hashicorp/terraform/helper/validation"
 	"github.com/sacloud/libsacloud/api"
 )
 
@@ -17,19 +18,19 @@ func resourceSakuraCloudSSHKeyGen() *schema.Resource {
 				Type:         schema.TypeString,
 				Required:     true,
 				ForceNew:     true,
-				ValidateFunc: validateMaxLength(1, 64),
+				ValidateFunc: validation.StringLenBetween(1, 64),
 			},
 			"description": {
 				Type:         schema.TypeString,
 				Optional:     true,
 				ForceNew:     true,
-				ValidateFunc: validateMaxLength(1, 512),
+				ValidateFunc: validation.StringLenBetween(1, 512),
 			},
 			"pass_phrase": {
 				Type:         schema.TypeString,
 				Optional:     true,
 				ForceNew:     true,
-				ValidateFunc: validateMaxLength(8, 64),
+				ValidateFunc: validation.StringLenBetween(8, 64),
 			},
 			"private_key": {
 				Type:     schema.TypeString,

@@ -3,6 +3,7 @@ package sakuracloud
 import (
 	"github.com/hashicorp/terraform/helper/mutexkv"
 	"github.com/hashicorp/terraform/helper/schema"
+	"github.com/hashicorp/terraform/helper/validation"
 	"github.com/hashicorp/terraform/terraform"
 )
 
@@ -50,13 +51,13 @@ func Provider() terraform.ResourceProvider {
 				Type:         schema.TypeInt,
 				Optional:     true,
 				DefaultFunc:  schema.MultiEnvDefaultFunc([]string{"SAKURACLOUD_RETRY_MAX"}, 10),
-				ValidateFunc: validateIntegerInRange(0, 100),
+				ValidateFunc: validation.IntBetween(0, 100),
 			},
 			"retry_interval": {
 				Type:         schema.TypeInt,
 				Optional:     true,
 				DefaultFunc:  schema.MultiEnvDefaultFunc([]string{"SAKURACLOUD_RETRY_INTERVAL"}, 5),
-				ValidateFunc: validateIntegerInRange(0, 600),
+				ValidateFunc: validation.IntBetween(0, 600),
 			},
 			"timeout": {
 				Type:        schema.TypeInt,

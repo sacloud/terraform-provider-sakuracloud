@@ -7,6 +7,7 @@ import (
 	"bytes"
 	"github.com/hashicorp/terraform/helper/hashcode"
 	"github.com/hashicorp/terraform/helper/schema"
+	"github.com/hashicorp/terraform/helper/validation"
 	"github.com/sacloud/libsacloud/api"
 	"github.com/sacloud/libsacloud/sacloud"
 )
@@ -32,13 +33,13 @@ func resourceSakuraCloudVPCRouterPortForwarding() *schema.Resource {
 				Type:         schema.TypeString,
 				Required:     true,
 				ForceNew:     true,
-				ValidateFunc: validateStringInWord([]string{"tcp", "udp"}),
+				ValidateFunc: validation.StringInSlice([]string{"tcp", "udp"}, false),
 			},
 			"global_port": {
 				Type:         schema.TypeInt,
 				Required:     true,
 				ForceNew:     true,
-				ValidateFunc: validateIntegerInRange(1, 65535),
+				ValidateFunc: validation.IntBetween(1, 65535),
 			},
 			"private_address": {
 				Type:     schema.TypeString,
@@ -49,14 +50,14 @@ func resourceSakuraCloudVPCRouterPortForwarding() *schema.Resource {
 				Type:         schema.TypeInt,
 				Required:     true,
 				ForceNew:     true,
-				ValidateFunc: validateIntegerInRange(1, 65535),
+				ValidateFunc: validation.IntBetween(1, 65535),
 			},
 			"description": {
 				Type:         schema.TypeString,
 				Optional:     true,
 				ForceNew:     true,
 				Default:      "",
-				ValidateFunc: validateMaxLength(0, 512),
+				ValidateFunc: validation.StringLenBetween(0, 512),
 			},
 			"zone": {
 				Type:         schema.TypeString,

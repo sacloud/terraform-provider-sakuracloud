@@ -2,53 +2,14 @@ package sakuracloud
 
 import (
 	"fmt"
-	"github.com/hashicorp/terraform/helper/schema"
 	"net"
 	"os"
 	"strconv"
 	"strings"
-	"unicode/utf8"
+
+	"github.com/hashicorp/terraform/helper/schema"
+	"github.com/hashicorp/terraform/helper/validation"
 )
-
-func validateMaxLength(minLength, maxLength int) schema.SchemaValidateFunc {
-	return func(v interface{}, k string) (ws []string, errors []error) {
-		value := v.(string)
-		// if value is empty, return OK(Use required attr if necessary)
-		if value == "" {
-			return
-		}
-
-		strlen := utf8.RuneCountInString(value)
-		if maxLength == 0 {
-			if strlen < minLength {
-				errors = append(errors,
-					fmt.Errorf("%q must be shorter then %d characters: %q", k, minLength, value))
-			}
-		} else {
-			if !(minLength <= strlen && strlen <= maxLength) {
-				errors = append(errors,
-					fmt.Errorf("%q must be between %d and %d characters: %q", k, minLength, maxLength, value))
-			}
-		}
-
-		return
-	}
-}
-
-func validateIntegerInRange(min, max int) schema.SchemaValidateFunc {
-	return func(v interface{}, k string) (ws []string, errors []error) {
-		value := v.(int)
-		if value < min {
-			errors = append(errors, fmt.Errorf(
-				"%q cannot be lower than %d: %d", k, min, value))
-		}
-		if value > max {
-			errors = append(errors, fmt.Errorf(
-				"%q cannot be higher than %d: %d", k, max, value))
-		}
-		return
-	}
-}
 
 func validateSakuracloudIDType(v interface{}, k string) ([]string, []error) {
 	ws := []string{}
@@ -64,34 +25,6 @@ func validateSakuracloudIDType(v interface{}, k string) ([]string, []error) {
 
 	}
 	return ws, errors
-}
-
-//func validateSakuracloudIDArrayType(v interface{}, k string) (ws []string, errors []error) {
-//	values := v.([]string)
-//	for _, value := range values {
-//		_, err := strconv.ParseInt(value, 10, 64)
-//		if err != nil {
-//			errors = append(errors, fmt.Errorf("%q must be ID string(number only): %s", k, err))
-//
-//		}
-//	}
-//	return
-//}
-
-func validateStringInWord(allowWords []string) schema.SchemaValidateFunc {
-	return func(v interface{}, k string) (ws []string, errors []error) {
-		var found bool
-		for _, t := range allowWords {
-			if v.(string) == t {
-				found = true
-			}
-		}
-		if !found {
-			errors = append(errors, fmt.Errorf("%q must be one of [%s]", k, strings.Join(allowWords, "/")))
-
-		}
-		return
-	}
 }
 
 func validateIntInWord(allowWords []string) schema.SchemaValidateFunc {
@@ -145,7 +78,7 @@ func validateBackupTime() schema.SchemaValidateFunc {
 		}
 	}
 
-	return validateStringInWord(timeStrings)
+	return validation.StringInSlice(timeStrings, false)
 }
 
 func validateIPv4Address() schema.SchemaValidateFunc {
@@ -226,5 +159,5 @@ func validateZone(allowZones []string) schema.SchemaValidateFunc {
 	if os.Getenv("SAKURACLOUD_FORCE_USE_ZONES") != "" {
 		return func(interface{}, string) (ws []string, errors []error) { return }
 	}
-	return validateStringInWord(allowZones)
+	return validation.StringInSlice(allowZones, false)
 }

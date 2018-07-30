@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/hashicorp/terraform/helper/schema"
+	"github.com/hashicorp/terraform/helper/validation"
 
 	"github.com/sacloud/libsacloud/api"
 	"github.com/sacloud/libsacloud/sacloud"
@@ -46,7 +47,7 @@ func resourceSakuraCloudLoadBalancer() *schema.Resource {
 				ForceNew:     true,
 				Optional:     true,
 				Default:      "standard",
-				ValidateFunc: validateStringInWord([]string{"standard", "highspec"}),
+				ValidateFunc: validation.StringInSlice([]string{"standard", "highspec"}, false),
 			},
 			"ipaddress1": {
 				Type:     schema.TypeString,
@@ -62,7 +63,7 @@ func resourceSakuraCloudLoadBalancer() *schema.Resource {
 				Type:         schema.TypeInt,
 				ForceNew:     true,
 				Required:     true,
-				ValidateFunc: validateIntegerInRange(8, 29),
+				ValidateFunc: validation.IntBetween(8, 29),
 			},
 			"default_route": {
 				Type:     schema.TypeString,

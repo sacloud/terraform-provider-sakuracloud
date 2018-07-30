@@ -6,6 +6,7 @@ import (
 	"bytes"
 	"github.com/hashicorp/terraform/helper/hashcode"
 	"github.com/hashicorp/terraform/helper/schema"
+	"github.com/hashicorp/terraform/helper/validation"
 	"github.com/sacloud/libsacloud/api"
 	"github.com/sacloud/libsacloud/sacloud"
 )
@@ -31,7 +32,7 @@ func resourceSakuraCloudVPCRouterL2TP() *schema.Resource {
 				Type:         schema.TypeString,
 				Required:     true,
 				ForceNew:     true,
-				ValidateFunc: validateMaxLength(0, 40),
+				ValidateFunc: validation.StringLenBetween(0, 40),
 			},
 			"range_start": {
 				Type:     schema.TypeString,

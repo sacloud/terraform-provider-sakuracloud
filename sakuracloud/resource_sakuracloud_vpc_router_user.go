@@ -6,6 +6,7 @@ import (
 	"bytes"
 	"github.com/hashicorp/terraform/helper/hashcode"
 	"github.com/hashicorp/terraform/helper/schema"
+	"github.com/hashicorp/terraform/helper/validation"
 	"github.com/sacloud/libsacloud/api"
 	"github.com/sacloud/libsacloud/sacloud"
 )
@@ -26,13 +27,13 @@ func resourceSakuraCloudVPCRouterRemoteAccessUser() *schema.Resource {
 				Type:         schema.TypeString,
 				Required:     true,
 				ForceNew:     true,
-				ValidateFunc: validateMaxLength(1, 20),
+				ValidateFunc: validation.StringLenBetween(1, 20),
 			},
 			"password": {
 				Type:         schema.TypeString,
 				Required:     true,
 				ForceNew:     true,
-				ValidateFunc: validateMaxLength(1, 20),
+				ValidateFunc: validation.StringLenBetween(1, 20),
 			},
 			"zone": {
 				Type:         schema.TypeString,

@@ -3,6 +3,7 @@ package sakuracloud
 import (
 	"fmt"
 	"github.com/hashicorp/terraform/helper/schema"
+	"github.com/hashicorp/terraform/helper/validation"
 	"github.com/sacloud/libsacloud/sacloud"
 	"github.com/sacloud/libsacloud/sacloud/ostype"
 )
@@ -16,7 +17,7 @@ func dataSourceSakuraCloudArchive() *schema.Resource {
 				Type:          schema.TypeString,
 				Optional:      true,
 				ForceNew:      true,
-				ValidateFunc:  validateStringInWord(ostype.OSTypeShortNames),
+				ValidateFunc:  validation.StringInSlice(ostype.OSTypeShortNames, false),
 				ConflictsWith: []string{"filter", "name_selectors", "tag_selectors"},
 			},
 			"name_selectors": {

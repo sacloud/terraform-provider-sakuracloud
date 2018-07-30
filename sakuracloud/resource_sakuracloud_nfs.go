@@ -3,6 +3,7 @@ package sakuracloud
 import (
 	"fmt"
 	"github.com/hashicorp/terraform/helper/schema"
+	"github.com/hashicorp/terraform/helper/validation"
 
 	"github.com/sacloud/libsacloud/api"
 	"github.com/sacloud/libsacloud/sacloud"
@@ -52,7 +53,7 @@ func resourceSakuraCloudNFS() *schema.Resource {
 				Type:         schema.TypeInt,
 				ForceNew:     true,
 				Required:     true,
-				ValidateFunc: validateIntegerInRange(8, 29),
+				ValidateFunc: validation.IntBetween(8, 29),
 			},
 			"default_route": {
 				Type:     schema.TypeString,

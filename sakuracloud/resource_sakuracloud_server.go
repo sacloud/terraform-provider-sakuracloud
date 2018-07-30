@@ -3,6 +3,7 @@ package sakuracloud
 import (
 	"fmt"
 	"github.com/hashicorp/terraform/helper/schema"
+	"github.com/hashicorp/terraform/helper/validation"
 
 	"github.com/sacloud/libsacloud/api"
 	"github.com/sacloud/libsacloud/sacloud"
@@ -54,10 +55,10 @@ func resourceSakuraCloudServer() *schema.Resource {
 				Type:     schema.TypeString,
 				Optional: true,
 				Default:  string(sacloud.InterfaceDriverVirtIO),
-				ValidateFunc: validateStringInWord([]string{
+				ValidateFunc: validation.StringInSlice([]string{
 					string(sacloud.InterfaceDriverVirtIO),
 					string(sacloud.InterfaceDriverE1000),
-				}),
+				}, false),
 			},
 			"nic": {
 				Type:     schema.TypeString,

@@ -6,6 +6,7 @@ import (
 	"bytes"
 	"github.com/hashicorp/terraform/helper/hashcode"
 	"github.com/hashicorp/terraform/helper/schema"
+	"github.com/hashicorp/terraform/helper/validation"
 
 	"github.com/sacloud/libsacloud/api"
 	"github.com/sacloud/libsacloud/sacloud"
@@ -36,7 +37,7 @@ func resourceSakuraCloudDNSRecord() *schema.Resource {
 				Type:         schema.TypeString,
 				Required:     true,
 				ForceNew:     true,
-				ValidateFunc: validateStringInWord(sacloud.AllowDNSTypes()),
+				ValidateFunc: validation.StringInSlice(sacloud.AllowDNSTypes(), false),
 			},
 
 			"value": {
@@ -56,19 +57,19 @@ func resourceSakuraCloudDNSRecord() *schema.Resource {
 				Type:         schema.TypeInt,
 				Optional:     true,
 				ForceNew:     true,
-				ValidateFunc: validateIntegerInRange(0, 65535),
+				ValidateFunc: validation.IntBetween(0, 65535),
 			},
 			"weight": {
 				Type:         schema.TypeInt,
 				Optional:     true,
 				ForceNew:     true,
-				ValidateFunc: validateIntegerInRange(0, 65535),
+				ValidateFunc: validation.IntBetween(0, 65535),
 			},
 			"port": {
 				Type:         schema.TypeInt,
 				Optional:     true,
 				ForceNew:     true,
-				ValidateFunc: validateIntegerInRange(1, 65535),
+				ValidateFunc: validation.IntBetween(1, 65535),
 			},
 		},
 	}

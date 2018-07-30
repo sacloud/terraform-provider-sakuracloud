@@ -6,6 +6,7 @@ import (
 	"bytes"
 	"github.com/hashicorp/terraform/helper/hashcode"
 	"github.com/hashicorp/terraform/helper/schema"
+	"github.com/hashicorp/terraform/helper/validation"
 	"github.com/sacloud/libsacloud/api"
 	"github.com/sacloud/libsacloud/sacloud"
 	"strings"
@@ -31,7 +32,7 @@ func resourceSakuraCloudLoadBalancerServer() *schema.Resource {
 				Type:         schema.TypeString,
 				Required:     true,
 				ForceNew:     true,
-				ValidateFunc: validateStringInWord(sacloud.AllowLoadBalancerHealthCheckProtocol()),
+				ValidateFunc: validation.StringInSlice(sacloud.AllowLoadBalancerHealthCheckProtocol(), false),
 			},
 			"check_path": {
 				Type:     schema.TypeString,

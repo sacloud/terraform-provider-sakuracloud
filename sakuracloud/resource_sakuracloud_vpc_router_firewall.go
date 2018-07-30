@@ -7,6 +7,7 @@ import (
 	"bytes"
 	"github.com/hashicorp/terraform/helper/hashcode"
 	"github.com/hashicorp/terraform/helper/schema"
+	"github.com/hashicorp/terraform/helper/validation"
 	"github.com/sacloud/libsacloud/api"
 	"github.com/sacloud/libsacloud/sacloud"
 )
@@ -28,13 +29,13 @@ func resourceSakuraCloudVPCRouterFirewall() *schema.Resource {
 				Optional:     true,
 				Default:      0,
 				ForceNew:     true,
-				ValidateFunc: validateIntegerInRange(0, sacloud.VPCRouterMaxInterfaceCount-1),
+				ValidateFunc: validation.IntBetween(0, sacloud.VPCRouterMaxInterfaceCount-1),
 			},
 			"direction": {
 				Type:         schema.TypeString,
 				Required:     true,
 				ForceNew:     true,
-				ValidateFunc: validateStringInWord([]string{"send", "receive"}),
+				ValidateFunc: validation.StringInSlice([]string{"send", "receive"}, false),
 			},
 			"expressions": {
 				Type:     schema.TypeList,
@@ -47,7 +48,7 @@ func resourceSakuraCloudVPCRouterFirewall() *schema.Resource {
 							Type:         schema.TypeString,
 							Required:     true,
 							ForceNew:     true,
-							ValidateFunc: validateStringInWord([]string{"tcp", "udp", "icmp", "ip"}),
+							ValidateFunc: validation.StringInSlice([]string{"tcp", "udp", "icmp", "ip"}, false),
 						},
 						"source_nw": {
 							Type:     schema.TypeString,
@@ -84,7 +85,7 @@ func resourceSakuraCloudVPCRouterFirewall() *schema.Resource {
 							Optional:     true,
 							Default:      "",
 							ForceNew:     true,
-							ValidateFunc: validateMaxLength(0, 512),
+							ValidateFunc: validation.StringLenBetween(0, 512),
 						},
 					},
 				},

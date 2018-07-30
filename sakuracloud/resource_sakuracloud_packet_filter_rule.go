@@ -3,6 +3,7 @@ package sakuracloud
 import (
 	"fmt"
 	"github.com/hashicorp/terraform/helper/schema"
+	"github.com/hashicorp/terraform/helper/validation"
 
 	"github.com/sacloud/libsacloud/api"
 	"github.com/sacloud/libsacloud/sacloud"
@@ -29,13 +30,13 @@ func resourceSakuraCloudPacketFilterRule() *schema.Resource {
 			"order": {
 				Type:         schema.TypeInt,
 				Optional:     true,
-				ValidateFunc: validateIntegerInRange(0, 1000),
+				ValidateFunc: validation.IntBetween(0, 1000),
 				Default:      1000,
 			},
 			"protocol": {
 				Type:         schema.TypeString,
 				Required:     true,
-				ValidateFunc: validateStringInWord(sacloud.AllowPacketFilterProtocol()),
+				ValidateFunc: validation.StringInSlice(sacloud.AllowPacketFilterProtocol(), false),
 			},
 			"source_nw": {
 				Type:     schema.TypeString,
