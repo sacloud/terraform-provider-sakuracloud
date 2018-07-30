@@ -6,6 +6,7 @@ import (
 	"bytes"
 	"github.com/hashicorp/terraform/helper/hashcode"
 	"github.com/hashicorp/terraform/helper/schema"
+	"github.com/hashicorp/terraform/helper/validation"
 	"github.com/sacloud/libsacloud/api"
 	"github.com/sacloud/libsacloud/sacloud"
 )
@@ -26,7 +27,7 @@ func resourceSakuraCloudVPCRouterDHCPServer() *schema.Resource {
 				Type:         schema.TypeInt,
 				Required:     true,
 				ForceNew:     true,
-				ValidateFunc: validateIntegerInRange(1, sacloud.VPCRouterMaxInterfaceCount-1),
+				ValidateFunc: validation.IntBetween(1, sacloud.VPCRouterMaxInterfaceCount-1),
 			},
 			"range_start": {
 				Type:         schema.TypeString,

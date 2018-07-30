@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/hashicorp/terraform/helper/schema"
+	"github.com/hashicorp/terraform/helper/validation"
 
 	"github.com/sacloud/libsacloud/api"
 	"github.com/sacloud/libsacloud/sacloud"
@@ -48,7 +49,7 @@ func resourceSakuraCloudMobileGateway() *schema.Resource {
 			"private_nw_mask_len": {
 				Type:         schema.TypeInt,
 				Optional:     true,
-				ValidateFunc: validateIntegerInRange(8, 29),
+				ValidateFunc: validation.IntBetween(8, 29),
 			},
 			"internet_connection": {
 				Type:     schema.TypeBool,

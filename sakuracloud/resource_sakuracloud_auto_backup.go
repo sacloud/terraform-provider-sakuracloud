@@ -3,6 +3,7 @@ package sakuracloud
 import (
 	"fmt"
 	"github.com/hashicorp/terraform/helper/schema"
+	"github.com/hashicorp/terraform/helper/validation"
 	"github.com/sacloud/libsacloud/api"
 	"github.com/sacloud/libsacloud/sacloud"
 )
@@ -38,7 +39,7 @@ func resourceSakuraCloudAutoBackup() *schema.Resource {
 				Type:         schema.TypeInt,
 				Optional:     true,
 				Default:      1,
-				ValidateFunc: validateIntegerInRange(1, 10),
+				ValidateFunc: validation.IntBetween(1, 10),
 			},
 			"icon_id": {
 				Type:         schema.TypeString,

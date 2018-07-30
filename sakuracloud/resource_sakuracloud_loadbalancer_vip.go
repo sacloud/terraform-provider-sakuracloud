@@ -6,6 +6,7 @@ import (
 
 	"bytes"
 	"github.com/hashicorp/terraform/helper/schema"
+	"github.com/hashicorp/terraform/helper/validation"
 	"github.com/sacloud/libsacloud/api"
 	"github.com/sacloud/libsacloud/sacloud"
 )
@@ -32,12 +33,12 @@ func resourceSakuraCloudLoadBalancerVIP() *schema.Resource {
 				Type:         schema.TypeInt,
 				Required:     true,
 				ForceNew:     true,
-				ValidateFunc: validateIntegerInRange(1, 65535),
+				ValidateFunc: validation.IntBetween(1, 65535),
 			},
 			"delay_loop": {
 				Type:         schema.TypeInt,
 				Optional:     true,
-				ValidateFunc: validateIntegerInRange(10, 2147483647),
+				ValidateFunc: validation.IntBetween(10, 2147483647),
 				Default:      10,
 			},
 			"sorry_server": {

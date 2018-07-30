@@ -7,6 +7,7 @@ import (
 	"errors"
 
 	"github.com/hashicorp/terraform/helper/schema"
+	"github.com/hashicorp/terraform/helper/validation"
 
 	"strconv"
 
@@ -46,7 +47,7 @@ func resourceSakuraCloudSimpleMonitor() *schema.Resource {
 						"delay_loop": {
 							Type:         schema.TypeInt,
 							Optional:     true,
-							ValidateFunc: validateIntegerInRange(60, 3600),
+							ValidateFunc: validation.IntBetween(60, 3600),
 							Default:      60,
 						},
 						"host_header": {
@@ -93,7 +94,7 @@ func resourceSakuraCloudSimpleMonitor() *schema.Resource {
 						"remaining_days": {
 							Type:         schema.TypeInt,
 							Optional:     true,
-							ValidateFunc: validateIntegerInRange(1, 9999),
+							ValidateFunc: validation.IntBetween(1, 9999),
 							Default:      30,
 						},
 					},

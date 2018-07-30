@@ -39,7 +39,7 @@ func resourceSakuraCloudVPCRouterPortForwarding() *schema.Resource {
 				Type:         schema.TypeInt,
 				Required:     true,
 				ForceNew:     true,
-				ValidateFunc: validateIntegerInRange(1, 65535),
+				ValidateFunc: validation.IntBetween(1, 65535),
 			},
 			"private_address": {
 				Type:     schema.TypeString,
@@ -50,7 +50,7 @@ func resourceSakuraCloudVPCRouterPortForwarding() *schema.Resource {
 				Type:         schema.TypeInt,
 				Required:     true,
 				ForceNew:     true,
-				ValidateFunc: validateIntegerInRange(1, 65535),
+				ValidateFunc: validation.IntBetween(1, 65535),
 			},
 			"description": {
 				Type:         schema.TypeString,

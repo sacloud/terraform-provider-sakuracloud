@@ -10,21 +10,6 @@ import (
 	"github.com/hashicorp/terraform/helper/schema"
 )
 
-func validateIntegerInRange(min, max int) schema.SchemaValidateFunc {
-	return func(v interface{}, k string) (ws []string, errors []error) {
-		value := v.(int)
-		if value < min {
-			errors = append(errors, fmt.Errorf(
-				"%q cannot be lower than %d: %d", k, min, value))
-		}
-		if value > max {
-			errors = append(errors, fmt.Errorf(
-				"%q cannot be higher than %d: %d", k, max, value))
-		}
-		return
-	}
-}
-
 func validateSakuracloudIDType(v interface{}, k string) ([]string, []error) {
 	ws := []string{}
 	errors := []error{}

@@ -29,7 +29,7 @@ func resourceSakuraCloudVPCRouterFirewall() *schema.Resource {
 				Optional:     true,
 				Default:      0,
 				ForceNew:     true,
-				ValidateFunc: validateIntegerInRange(0, sacloud.VPCRouterMaxInterfaceCount-1),
+				ValidateFunc: validation.IntBetween(0, sacloud.VPCRouterMaxInterfaceCount-1),
 			},
 			"direction": {
 				Type:         schema.TypeString,

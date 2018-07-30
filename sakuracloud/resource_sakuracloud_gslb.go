@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/hashicorp/terraform/helper/schema"
+	"github.com/hashicorp/terraform/helper/validation"
 
 	"strings"
 
@@ -46,7 +47,7 @@ func resourceSakuraCloudGSLB() *schema.Resource {
 						"delay_loop": {
 							Type:         schema.TypeInt,
 							Optional:     true,
-							ValidateFunc: validateIntegerInRange(10, 60),
+							ValidateFunc: validation.IntBetween(10, 60),
 							Default:      10,
 						},
 						"host_header": {

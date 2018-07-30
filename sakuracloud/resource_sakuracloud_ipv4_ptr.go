@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/hashicorp/terraform/helper/schema"
+	"github.com/hashicorp/terraform/helper/validation"
 	"github.com/sacloud/libsacloud/api"
 	"github.com/sacloud/libsacloud/sacloud"
 )
@@ -33,13 +34,13 @@ func resourceSakuraCloudIPv4Ptr() *schema.Resource {
 				Type:         schema.TypeInt,
 				Optional:     true,
 				Default:      30,
-				ValidateFunc: validateIntegerInRange(1, 100),
+				ValidateFunc: validation.IntBetween(1, 100),
 			},
 			"retry_interval": {
 				Type:         schema.TypeInt,
 				Optional:     true,
 				Default:      10,
-				ValidateFunc: validateIntegerInRange(1, 600),
+				ValidateFunc: validation.IntBetween(1, 600),
 			},
 			"zone": {
 				Type:         schema.TypeString,
