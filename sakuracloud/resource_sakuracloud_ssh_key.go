@@ -3,6 +3,7 @@ package sakuracloud
 import (
 	"fmt"
 	"github.com/hashicorp/terraform/helper/schema"
+	"github.com/hashicorp/terraform/helper/validation"
 
 	"github.com/sacloud/libsacloud/api"
 	"github.com/sacloud/libsacloud/sacloud"
@@ -22,7 +23,7 @@ func resourceSakuraCloudSSHKey() *schema.Resource {
 			"name": {
 				Type:         schema.TypeString,
 				Required:     true,
-				ValidateFunc: validateMaxLength(1, 64),
+				ValidateFunc: validation.StringLenBetween(1, 64),
 			},
 			"public_key": {
 				Type:     schema.TypeString,
@@ -32,7 +33,7 @@ func resourceSakuraCloudSSHKey() *schema.Resource {
 			"description": {
 				Type:         schema.TypeString,
 				Optional:     true,
-				ValidateFunc: validateMaxLength(1, 512),
+				ValidateFunc: validation.StringLenBetween(1, 512),
 			},
 			"fingerprint": {
 				Type:     schema.TypeString,

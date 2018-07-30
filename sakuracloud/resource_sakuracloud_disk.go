@@ -3,6 +3,7 @@ package sakuracloud
 import (
 	"fmt"
 	"github.com/hashicorp/terraform/helper/schema"
+	"github.com/hashicorp/terraform/helper/validation"
 
 	"github.com/sacloud/libsacloud/api"
 	"github.com/sacloud/libsacloud/sacloud"
@@ -92,12 +93,12 @@ func resourceSakuraCloudDisk() *schema.Resource {
 			"hostname": {
 				Type:         schema.TypeString,
 				Optional:     true,
-				ValidateFunc: validateMaxLength(1, 64),
+				ValidateFunc: validation.StringLenBetween(1, 64),
 			},
 			"password": {
 				Type:         schema.TypeString,
 				Optional:     true,
-				ValidateFunc: validateMaxLength(8, 64),
+				ValidateFunc: validation.StringLenBetween(8, 64),
 				Sensitive:    true,
 			},
 			"ssh_key_ids": {

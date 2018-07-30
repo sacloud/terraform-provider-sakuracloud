@@ -2,38 +2,13 @@ package sakuracloud
 
 import (
 	"fmt"
-	"github.com/hashicorp/terraform/helper/schema"
 	"net"
 	"os"
 	"strconv"
 	"strings"
-	"unicode/utf8"
+
+	"github.com/hashicorp/terraform/helper/schema"
 )
-
-func validateMaxLength(minLength, maxLength int) schema.SchemaValidateFunc {
-	return func(v interface{}, k string) (ws []string, errors []error) {
-		value := v.(string)
-		// if value is empty, return OK(Use required attr if necessary)
-		if value == "" {
-			return
-		}
-
-		strlen := utf8.RuneCountInString(value)
-		if maxLength == 0 {
-			if strlen < minLength {
-				errors = append(errors,
-					fmt.Errorf("%q must be shorter then %d characters: %q", k, minLength, value))
-			}
-		} else {
-			if !(minLength <= strlen && strlen <= maxLength) {
-				errors = append(errors,
-					fmt.Errorf("%q must be between %d and %d characters: %q", k, minLength, maxLength, value))
-			}
-		}
-
-		return
-	}
-}
 
 func validateIntegerInRange(min, max int) schema.SchemaValidateFunc {
 	return func(v interface{}, k string) (ws []string, errors []error) {

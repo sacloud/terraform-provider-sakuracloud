@@ -7,6 +7,7 @@ import (
 	"bytes"
 	"github.com/hashicorp/terraform/helper/hashcode"
 	"github.com/hashicorp/terraform/helper/schema"
+	"github.com/hashicorp/terraform/helper/validation"
 	"github.com/sacloud/libsacloud/api"
 	"github.com/sacloud/libsacloud/sacloud"
 )
@@ -84,7 +85,7 @@ func resourceSakuraCloudVPCRouterFirewall() *schema.Resource {
 							Optional:     true,
 							Default:      "",
 							ForceNew:     true,
-							ValidateFunc: validateMaxLength(0, 512),
+							ValidateFunc: validation.StringLenBetween(0, 512),
 						},
 					},
 				},
