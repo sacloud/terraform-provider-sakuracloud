@@ -1,0 +1,283 @@
+<% wrap_layout :inner do %>
+  <% content_for :sidebar do %>
+    <div class="docs-sidebar hidden-print affix-top" role="complementary">
+      <ul class="nav docs-sidenav">
+        <li<%= sidebar_current("docs-home") %>>
+          <a href="/docs/providers/index.html">All Providers</a>
+        </li>
+
+        <li<%= sidebar_current("docs-sakuracloud-index") %>>
+          <a href="/docs/providers/sakuracloud/index.html">SakuraCloud Provider</a>
+        </li>
+
+        <li<%= sidebar_current("docs-sakuracloud-datasource") %>>
+          <a href="#">Data Sources</a>
+          <ul class="nav nav-visible">
+            <li<%= sidebar_current("docs-sakuracloud-datasource-archive") %>>
+              <a href="/docs/providers/sakuracloud/d/archive.html">sakuracloud_archive</a>
+            </li>
+            <li<%= sidebar_current("docs-sakuracloud-datasource-bridge") %>>
+              <a href="/docs/providers/sakuracloud/d/bridge.html">sakuracloud_bridge</a>
+            </li>
+            <li<%= sidebar_current("docs-sakuracloud-datasource-bucket-object") %>>
+              <a href="/docs/providers/sakuracloud/d/bucket_object.html">sakuracloud_bucket_object</a>
+            </li>
+            <li<%= sidebar_current("docs-sakuracloud-datasource-cdrom") %>>
+              <a href="/docs/providers/sakuracloud/d/cdrom.html">sakuracloud_cdrom</a>
+            </li>
+            <li<%= sidebar_current("docs-sakuracloud-datasource-database") %>>
+              <a href="/docs/providers/sakuracloud/d/database.html">sakuracloud_database</a>
+            </li>
+            <li<%= sidebar_current("docs-sakuracloud-datasource-disk") %>>
+              <a href="/docs/providers/sakuracloud/d/disk.html">sakuracloud_disk</a>
+            </li>
+            <li<%= sidebar_current("docs-sakuracloud-datasource-dns") %>>
+              <a href="/docs/providers/sakuracloud/d/dns.html">sakuracloud_dns</a>
+            </li>
+            <li<%= sidebar_current("docs-sakuracloud-datasource-gslb") %>>
+              <a href="/docs/providers/sakuracloud/d/gslb.html">sakuracloud_gslb</a>
+            </li>
+            <li<%= sidebar_current("docs-sakuracloud-datasource-icon") %>>
+              <a href="/docs/providers/sakuracloud/d/icon.html">sakuracloud_icon</a>
+            </li>
+            <li<%= sidebar_current("docs-sakuracloud-datasource-internet") %>>
+              <a href="/docs/providers/sakuracloud/d/internet.html">sakuracloud_internet</a>
+            </li>
+            <li<%= sidebar_current("docs-sakuracloud-datasource-load-balancer") %>>
+              <a href="/docs/providers/sakuracloud/d/load_balancer.html">sakuracloud_load_balancer</a>
+            </li>
+            <li<%= sidebar_current("docs-sakuracloud-datasource-nfs") %>>
+              <a href="/docs/providers/sakuracloud/d/nfs.html">sakuracloud_nfs</a>
+            </li>
+            <li<%= sidebar_current("docs-sakuracloud-datasource-note") %>>
+              <a href="/docs/providers/sakuracloud/d/note.html">sakuracloud_note</a>
+            </li>
+            <li<%= sidebar_current("docs-sakuracloud-datasource-packet-filter") %>>
+              <a href="/docs/providers/sakuracloud/d/packet_filter.html">sakuracloud_packet_filter</a>
+            </li>
+            <li<%= sidebar_current("docs-sakuracloud-datasource-private-host") %>>
+              <a href="/docs/providers/sakuracloud/d/private_host.html">sakuracloud_private_host</a>
+            </li>
+            <li<%= sidebar_current("docs-sakuracloud-datasource-server") %>>
+              <a href="/docs/providers/sakuracloud/d/server.html">sakuracloud_server</a>
+            </li>
+            <li<%= sidebar_current("docs-sakuracloud-datasource-simple-monitor") %>>
+              <a href="/docs/providers/sakuracloud/d/simple_monitor.html">sakuracloud_simple_monitor</a>
+            </li>
+            <li<%= sidebar_current("docs-sakuracloud-datasource-ssh-key") %>>
+              <a href="/docs/providers/sakuracloud/d/ssh_key.html">sakuracloud_ssh_key</a>
+            </li>
+            <li<%= sidebar_current("docs-sakuracloud-datasource-subnet") %>>
+              <a href="/docs/providers/sakuracloud/d/subnet.html">sakuracloud_subnet</a>
+            </li>
+            <li<%= sidebar_current("docs-sakuracloud-datasource-switch") %>>
+              <a href="/docs/providers/sakuracloud/d/switch.html">sakuracloud_switch</a>
+            </li>
+            <li<%= sidebar_current("docs-sakuracloud-datasource-vpc-router") %>>
+              <a href="/docs/providers/sakuracloud/d/vpc_router.html">sakuracloud_vpc_router</a>
+            </li>
+          </ul>
+        </li>
+
+        <li<%= sidebar_current("docs-sakuracloud-resource-computing") %>>
+          <a href="#">Computing Resources</a>
+          <ul class="nav nav-visible">
+            <li<%= sidebar_current("docs-sakuracloud-resource-computing-server") %>>
+              <a href="/docs/providers/sakuracloud/r/server.html">sakuracloud_server</a>
+            </li>
+            <li<%= sidebar_current("docs-sakuracloud-resource-computing-sconnector") %>>
+              <a href="/docs/providers/sakuracloud/r/server_connector.html">sakuracloud_server_connector</a>
+            </li>
+            <li<%= sidebar_current("docs-sakuracloud-resource-computing-private-host") %>>
+              <a href="/docs/providers/sakuracloud/r/private_host.html">sakuracloud_private_host</a>
+            </li>
+          </ul>
+        </li>
+
+        <li<%= sidebar_current("docs-sakuracloud-resource-storage") %>>
+          <a href="#">Storage Resources</a>
+          <ul class="nav nav-visible">
+            <li<%= sidebar_current("docs-sakuracloud-resource-storage-disk") %>>
+              <a href="/docs/providers/sakuracloud/r/disk.html">sakuracloud_disk</a>
+            </li>
+            <li<%= sidebar_current("docs-sakuracloud-resource-storage-archive") %>>
+              <a href="/docs/providers/sakuracloud/r/archive.html">sakuracloud_archive</a>
+            </li>
+            <li<%= sidebar_current("docs-sakuracloud-resource-storage-cdrom") %>>
+              <a href="/docs/providers/sakuracloud/r/cdrom.html">sakuracloud_cdrom</a>
+            </li>
+          </ul>
+        </li>
+
+        <li<%= sidebar_current("docs-sakuracloud-resource-networking") %>>
+          <a href="#">Networking Resources</a>
+          <ul class="nav nav-visible">
+            <li<%= sidebar_current("docs-sakuracloud-resource-networking-switch") %>>
+              <a href="/docs/providers/sakuracloud/r/switch.html">sakuracloud_switch</a>
+            </li>
+            <li<%= sidebar_current("docs-sakuracloud-resource-networking-internet") %>>
+              <a href="/docs/providers/sakuracloud/r/internet.html">sakuracloud_internet</a>
+            </li>
+            <li<%= sidebar_current("docs-sakuracloud-resource-networking-subnet") %>>
+              <a href="/docs/providers/sakuracloud/r/subnet.html">sakuracloud_subnet</a>
+            </li>
+            <li<%= sidebar_current("docs-sakuracloud-resource-networking-ipv4-ptr") %>>
+              <a href="/docs/providers/sakuracloud/r/ipv4_ptr.html">sakuracloud_ipv4_ptr</a>
+            </li>
+            <li<%= sidebar_current("docs-sakuracloud-resource-networking-packet-filter") %>>
+              <a href="/docs/providers/sakuracloud/r/packet_filter.html">sakuracloud_packet_filter</a>
+            </li>
+            <li<%= sidebar_current("docs-sakuracloud-resource-networking-pfrule") %>>
+              <a href="/docs/providers/sakuracloud/r/packet_filter_rule.html">sakuracloud_packet_filter_rule</a>
+            </li>
+            <li<%= sidebar_current("docs-sakuracloud-resource-networking-bridge") %>>
+              <a href="/docs/providers/sakuracloud/r/bridge.html">sakuracloud_bridge</a>
+            </li>
+
+          </ul>
+        </li>
+
+        <li<%= sidebar_current("docs-sakuracloud-resource-appliance") %>>
+          <a href="#">Appliance Resources</a>
+          <ul class="nav nav-visible">
+            <li<%= sidebar_current("docs-sakuracloud-resource-appliance-auto-backup") %>>
+              <a href="/docs/providers/sakuracloud/r/auto_backup.html">sakuracloud_auto_backup</a>
+            </li>
+            <li<%= sidebar_current("docs-sakuracloud-resource-appliance-database") %>>
+              <a href="/docs/providers/sakuracloud/r/database.html">sakuracloud_database</a>
+            </li>
+            <li<%= sidebar_current("docs-sakuracloud-resource-appliance-nfs") %>>
+              <a href="/docs/providers/sakuracloud/r/nfs.html">sakuracloud_nfs</a>
+            </li>
+          </ul>
+        </li>
+
+        <li<%= sidebar_current("docs-sakuracloud-resource-lb") %>>
+          <a href="#">Load Balancer(Appliance) Resources</a>
+          <ul class="nav nav-visible">
+            <li<%= sidebar_current("docs-sakuracloud-resource-lb-load-balancer") %>>
+              <a href="/docs/providers/sakuracloud/r/load_balancer.html">sakuracloud_load_balancer</a>
+            </li>
+            <li<%= sidebar_current("docs-sakuracloud-resource-lb-server") %>>
+              <a href="/docs/providers/sakuracloud/r/load_balancer_server.html">sakuracloud_load_balancer_server</a>
+            </li>
+            <li<%= sidebar_current("docs-sakuracloud-resource-lb-vip") %>>
+              <a href="/docs/providers/sakuracloud/r/load_balancer_vip.html">sakuracloud_load_balancer_vip</a>
+            </li>
+          </ul>
+        </li>
+
+        <li<%= sidebar_current("docs-sakuracloud-resource-vpc") %>>
+          <a href="#">VPC Router(Appliance) Resources</a>
+          <ul class="nav nav-visible">
+            <li<%= sidebar_current("docs-sakuracloud-resource-vpc-router") %>>
+              <a href="/docs/providers/sakuracloud/r/vpc_router.html">sakuracloud_vpc_router</a>
+            </li>
+            <li<%= sidebar_current("docs-sakuracloud-resource-vpc-dhcpserver") %>>
+              <a href="/docs/providers/sakuracloud/r/vpc_router_dhcp_server.html">sakuracloud_vpc_router_dhcp_server</a>
+            </li>
+            <li<%= sidebar_current("docs-sakuracloud-resource-vpc-dhcpmapping") %>>
+              <a href="/docs/providers/sakuracloud/r/vpc_router_dhcp_static_mapping.html">sakuracloud_vpc_router_dhcp_static_mapping</a>
+            </li>
+            <li<%= sidebar_current("docs-sakuracloud-resource-vpc-firewall") %>>
+              <a href="/docs/providers/sakuracloud/r/vpc_router_firewall.html">sakuracloud_vpc_router_firewall</a>
+            </li>
+            <li<%= sidebar_current("docs-sakuracloud-resource-vpc-interface") %>>
+              <a href="/docs/providers/sakuracloud/r/vpc_router_interface.html">sakuracloud_vpc_router_interface</a>
+            </li>
+            <li<%= sidebar_current("docs-sakuracloud-resource-vpc-l2tp") %>>
+              <a href="/docs/providers/sakuracloud/r/vpc_router_l2tp.html">sakuracloud_vpc_router_l2tp</a>
+            </li>
+            <li<%= sidebar_current("docs-sakuracloud-resource-vpc-pf") %>>
+              <a href="/docs/providers/sakuracloud/r/vpc_router_port_forwarding.html">sakuracloud_vpc_router_port_forwarding</a>
+            </li>
+            <li<%= sidebar_current("docs-sakuracloud-resource-vpc-pptp") %>>
+              <a href="/docs/providers/sakuracloud/r/vpc_router_pptp.html">sakuracloud_vpc_router_pptp</a>
+            </li>
+            <li<%= sidebar_current("docs-sakuracloud-resource-vpc-s2s") %>>
+              <a href="/docs/providers/sakuracloud/r/vpc_router_site_to_site_vpn.html">sakuracloud_vpc_router_site_to_site_vpn</a>
+            </li>
+            <li<%= sidebar_current("docs-sakuracloud-resource-vpc-staticnat") %>>
+              <a href="/docs/providers/sakuracloud/r/vpc_router_static_nat.html">sakuracloud_vpc_router_static_nat</a>
+            </li>
+            <li<%= sidebar_current("docs-sakuracloud-resource-vpc-staticroute") %>>
+              <a href="/docs/providers/sakuracloud/r/vpc_router_static_route.html">sakuracloud_vpc_router_static_route</a>
+            </li>
+            <li<%= sidebar_current("docs-sakuracloud-resource-vpc-user") %>>
+              <a href="/docs/providers/sakuracloud/r/vpc_router_user.html">sakuracloud_vpc_router_user</a>
+            </li>
+          </ul>
+        </li>
+
+        <li<%= sidebar_current("docs-sakuracloud-resource-global") %>>
+          <a href="#">Global Resources</a>
+          <ul class="nav nav-visible">
+            <li<%= sidebar_current("docs-sakuracloud-resource-global-gslb-setting") %>>
+              <a href="/docs/providers/sakuracloud/r/gslb.html">sakuracloud_gslb</a>
+            </li>
+            <li<%= sidebar_current("docs-sakuracloud-resource-global-gslb-server") %>>
+              <a href="/docs/providers/sakuracloud/r/gslb_server.html">sakuracloud_gslb_server</a>
+            </li>
+            <li<%= sidebar_current("docs-sakuracloud-resource-global-dns-zone") %>>
+              <a href="/docs/providers/sakuracloud/r/dns.html">sakuracloud_dns</a>
+            </li>
+            <li<%= sidebar_current("docs-sakuracloud-resource-global-dns-record") %>>
+              <a href="/docs/providers/sakuracloud/r/dns_record.html">sakuracloud_dns_record</a>
+            </li>
+            <li<%= sidebar_current("docs-sakuracloud-resource-global-simple-monitor") %>>
+              <a href="/docs/providers/sakuracloud/r/simple_monitor.html">sakuracloud_simple_monitor</a>
+            </li>
+          </ul>
+        </li>
+
+        <li<%= sidebar_current("docs-sakuracloud-resource-secure-mobile") %>>
+          <a href="#">Secure Mobile Resources</a>
+          <ul class="nav nav-visible">
+            <li<%= sidebar_current("docs-sakuracloud-resource-secure-mobile-sim") %>>
+              <a href="/docs/providers/sakuracloud/r/sim.html">sakuracloud_sim</a>
+            </li>
+            <li<%= sidebar_current("docs-sakuracloud-resource-secure-mobile-mobile-gateway") %>>
+              <a href="/docs/providers/sakuracloud/r/mobile_gateway.html">sakuracloud_mobile_gateway</a>
+            </li>
+            <li<%= sidebar_current("docs-sakuracloud-resource-secure-mobile-mgwsimroute") %>>
+              <a href="/docs/providers/sakuracloud/r/mobile_gateway_sim_route.html">sakuracloud_mobile_gateway_sim_route</a>
+            </li>
+            <li<%= sidebar_current("docs-sakuracloud-resource-secure-mobile-mgwstaticroute") %>>
+              <a href="/docs/providers/sakuracloud/r/mobile_gateway_static_route.html">sakuracloud_mobile_gateway_static_route</a>
+            </li>
+          </ul>
+        </li>
+
+        <li<%= sidebar_current("docs-sakuracloud-resource-misc") %>>
+          <a href="#">Misc Resources</a>
+          <ul class="nav nav-visible">
+            <li<%= sidebar_current("docs-sakuracloud-resource-misc-ssh-key") %>>
+              <a href="/docs/providers/sakuracloud/r/ssh_key.html">sakuracloud_ssh_key</a>
+            </li>
+            <li<%= sidebar_current("docs-sakuracloud-resource-misc-skeygen") %>>
+              <a href="/docs/providers/sakuracloud/r/ssh_key_gen.html">sakuracloud_ssh_key_gen</a>
+            </li>
+            <li<%= sidebar_current("docs-sakuracloud-resource-misc-note") %>>
+              <a href="/docs/providers/sakuracloud/r/note.html">sakuracloud_note</a>
+            </li>
+            <li<%= sidebar_current("docs-sakuracloud-resource-misc-icon") %>>
+              <a href="/docs/providers/sakuracloud/r/icon.html">sakuracloud_icon</a>
+            </li>
+          </ul>
+        </li>
+
+        <li<%= sidebar_current("docs-sakuracloud-resource-objectstorage") %>>
+          <a href="#">Object Storage Resources</a>
+          <ul class="nav nav-visible">
+            <li<%= sidebar_current("docs-sakuracloud-resource-objectstorage-bucket-object") %>>
+              <a href="/docs/providers/sakuracloud/r/bucket_object.html">sakuracloud_bucket_object</a>
+            </li>
+          </ul>
+        </li>
+
+      </ul>
+    </div>
+  <% end %>
+
+  <%= yield %>
+<% end %>
