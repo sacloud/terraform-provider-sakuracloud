@@ -33,7 +33,7 @@ func resourceSakuraCloudVPCRouter() *schema.Resource {
 				ForceNew:     true,
 				Optional:     true,
 				Default:      "standard",
-				ValidateFunc: validateStringInWord([]string{"standard", "premium", "highspec"}),
+				ValidateFunc: validation.StringInSlice([]string{"standard", "premium", "highspec"}, false),
 			},
 			"switch_id": {
 				Type:         schema.TypeString,

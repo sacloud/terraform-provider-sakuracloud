@@ -3,6 +3,7 @@ package sakuracloud
 import (
 	"fmt"
 	"github.com/hashicorp/terraform/helper/schema"
+	"github.com/hashicorp/terraform/helper/validation"
 
 	"github.com/sacloud/libsacloud/api"
 	"github.com/sacloud/libsacloud/sacloud"
@@ -40,10 +41,10 @@ func resourceSakuraCloudNote() *schema.Resource {
 				Type:     schema.TypeString,
 				Optional: true,
 				Default:  string(sacloud.NoteClassShell),
-				ValidateFunc: validateStringInWord([]string{
+				ValidateFunc: validation.StringInSlice([]string{
 					string(sacloud.NoteClassShell),
 					string(sacloud.NoteClassYAMLCloudConfig),
-				}),
+				}, false),
 			},
 			"tags": {
 				Type:     schema.TypeList,

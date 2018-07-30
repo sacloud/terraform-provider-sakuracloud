@@ -42,7 +42,7 @@ func resourceSakuraCloudSimpleMonitor() *schema.Resource {
 						"protocol": {
 							Type:         schema.TypeString,
 							Required:     true,
-							ValidateFunc: validateStringInWord(sacloud.AllowSimpleMonitorHealthCheckProtocol()),
+							ValidateFunc: validation.StringInSlice(sacloud.AllowSimpleMonitorHealthCheckProtocol(), false),
 						},
 						"delay_loop": {
 							Type:         schema.TypeInt,
@@ -84,7 +84,7 @@ func resourceSakuraCloudSimpleMonitor() *schema.Resource {
 						},
 						"snmp_version": {
 							Type:         schema.TypeString,
-							ValidateFunc: validateStringInWord([]string{"1", "2c"}),
+							ValidateFunc: validation.StringInSlice([]string{"1", "2c"}, false),
 							Optional:     true,
 						},
 						"oid": {

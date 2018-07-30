@@ -37,7 +37,7 @@ func resourceSakuraCloudDNSRecord() *schema.Resource {
 				Type:         schema.TypeString,
 				Required:     true,
 				ForceNew:     true,
-				ValidateFunc: validateStringInWord(sacloud.AllowDNSTypes()),
+				ValidateFunc: validation.StringInSlice(sacloud.AllowDNSTypes(), false),
 			},
 
 			"value": {

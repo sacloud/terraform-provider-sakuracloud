@@ -33,7 +33,7 @@ func resourceSakuraCloudVPCRouterPortForwarding() *schema.Resource {
 				Type:         schema.TypeString,
 				Required:     true,
 				ForceNew:     true,
-				ValidateFunc: validateStringInWord([]string{"tcp", "udp"}),
+				ValidateFunc: validation.StringInSlice([]string{"tcp", "udp"}, false),
 			},
 			"global_port": {
 				Type:         schema.TypeInt,

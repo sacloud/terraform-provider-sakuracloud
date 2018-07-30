@@ -30,7 +30,7 @@ func resourceSakuraCloudDatabase() *schema.Resource {
 				Type:         schema.TypeString,
 				Optional:     true,
 				ForceNew:     true,
-				ValidateFunc: validateStringInWord([]string{"postgresql", "mariadb"}),
+				ValidateFunc: validation.StringInSlice([]string{"postgresql", "mariadb"}, false),
 				Default:      "postgresql",
 			},
 			//"is_double": {
@@ -44,7 +44,7 @@ func resourceSakuraCloudDatabase() *schema.Resource {
 				ForceNew:     true,
 				Optional:     true,
 				Default:      "10g",
-				ValidateFunc: validateStringInWord([]string{"10g", "30g", "90g", "240g", "500g", "1t"}),
+				ValidateFunc: validation.StringInSlice([]string{"10g", "30g", "90g", "240g", "500g", "1t"}, false),
 			},
 			"user_name": {
 				Type:     schema.TypeString,

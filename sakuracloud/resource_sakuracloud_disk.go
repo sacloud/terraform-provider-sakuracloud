@@ -30,17 +30,17 @@ func resourceSakuraCloudDisk() *schema.Resource {
 				Optional:     true,
 				ForceNew:     true,
 				Default:      "ssd",
-				ValidateFunc: validateStringInWord([]string{"ssd", "hdd"}),
+				ValidateFunc: validation.StringInSlice([]string{"ssd", "hdd"}, false),
 			},
 			"connector": {
 				Type:     schema.TypeString,
 				Optional: true,
 				ForceNew: true,
 				Default:  sacloud.DiskConnectionVirtio,
-				ValidateFunc: validateStringInWord([]string{
+				ValidateFunc: validation.StringInSlice([]string{
 					fmt.Sprintf("%s", sacloud.DiskConnectionVirtio),
 					fmt.Sprintf("%s", sacloud.DiskConnectionIDE),
-				}),
+				}, false),
 			},
 			"source_archive_id": {
 				Type:          schema.TypeString,

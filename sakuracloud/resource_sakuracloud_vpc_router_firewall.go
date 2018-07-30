@@ -35,7 +35,7 @@ func resourceSakuraCloudVPCRouterFirewall() *schema.Resource {
 				Type:         schema.TypeString,
 				Required:     true,
 				ForceNew:     true,
-				ValidateFunc: validateStringInWord([]string{"send", "receive"}),
+				ValidateFunc: validation.StringInSlice([]string{"send", "receive"}, false),
 			},
 			"expressions": {
 				Type:     schema.TypeList,
@@ -48,7 +48,7 @@ func resourceSakuraCloudVPCRouterFirewall() *schema.Resource {
 							Type:         schema.TypeString,
 							Required:     true,
 							ForceNew:     true,
-							ValidateFunc: validateStringInWord([]string{"tcp", "udp", "icmp", "ip"}),
+							ValidateFunc: validation.StringInSlice([]string{"tcp", "udp", "icmp", "ip"}, false),
 						},
 						"source_nw": {
 							Type:     schema.TypeString,

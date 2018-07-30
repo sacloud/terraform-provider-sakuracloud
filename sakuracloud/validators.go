@@ -8,6 +8,7 @@ import (
 	"strings"
 
 	"github.com/hashicorp/terraform/helper/schema"
+	"github.com/hashicorp/terraform/helper/validation"
 )
 
 func validateSakuracloudIDType(v interface{}, k string) ([]string, []error) {
@@ -24,34 +25,6 @@ func validateSakuracloudIDType(v interface{}, k string) ([]string, []error) {
 
 	}
 	return ws, errors
-}
-
-//func validateSakuracloudIDArrayType(v interface{}, k string) (ws []string, errors []error) {
-//	values := v.([]string)
-//	for _, value := range values {
-//		_, err := strconv.ParseInt(value, 10, 64)
-//		if err != nil {
-//			errors = append(errors, fmt.Errorf("%q must be ID string(number only): %s", k, err))
-//
-//		}
-//	}
-//	return
-//}
-
-func validateStringInWord(allowWords []string) schema.SchemaValidateFunc {
-	return func(v interface{}, k string) (ws []string, errors []error) {
-		var found bool
-		for _, t := range allowWords {
-			if v.(string) == t {
-				found = true
-			}
-		}
-		if !found {
-			errors = append(errors, fmt.Errorf("%q must be one of [%s]", k, strings.Join(allowWords, "/")))
-
-		}
-		return
-	}
 }
 
 func validateIntInWord(allowWords []string) schema.SchemaValidateFunc {
@@ -105,7 +78,7 @@ func validateBackupTime() schema.SchemaValidateFunc {
 		}
 	}
 
-	return validateStringInWord(timeStrings)
+	return validation.StringInSlice(timeStrings, false)
 }
 
 func validateIPv4Address() schema.SchemaValidateFunc {
@@ -186,5 +159,5 @@ func validateZone(allowZones []string) schema.SchemaValidateFunc {
 	if os.Getenv("SAKURACLOUD_FORCE_USE_ZONES") != "" {
 		return func(interface{}, string) (ws []string, errors []error) { return }
 	}
-	return validateStringInWord(allowZones)
+	return validation.StringInSlice(allowZones, false)
 }

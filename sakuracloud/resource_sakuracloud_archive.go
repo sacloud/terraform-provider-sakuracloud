@@ -4,6 +4,7 @@ import (
 	"crypto/md5"
 	"fmt"
 	"github.com/hashicorp/terraform/helper/schema"
+	"github.com/hashicorp/terraform/helper/validation"
 	"github.com/mitchellh/go-homedir"
 	"github.com/sacloud/ftps"
 	"github.com/sacloud/libsacloud/api"
@@ -66,7 +67,7 @@ func resourceSakuraCloudArchive() *schema.Resource {
 				Computed:     true,
 				ForceNew:     true,
 				Description:  "target SakuraCloud zone",
-				ValidateFunc: validateStringInWord([]string{"is1a", "is1b", "tk1a", "tk1v"}),
+				ValidateFunc: validation.StringInSlice([]string{"is1a", "is1b", "tk1a", "tk1v"}, false),
 			},
 		},
 	}

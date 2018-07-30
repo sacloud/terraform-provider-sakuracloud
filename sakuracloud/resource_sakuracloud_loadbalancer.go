@@ -47,7 +47,7 @@ func resourceSakuraCloudLoadBalancer() *schema.Resource {
 				ForceNew:     true,
 				Optional:     true,
 				Default:      "standard",
-				ValidateFunc: validateStringInWord([]string{"standard", "highspec"}),
+				ValidateFunc: validation.StringInSlice([]string{"standard", "highspec"}, false),
 			},
 			"ipaddress1": {
 				Type:     schema.TypeString,

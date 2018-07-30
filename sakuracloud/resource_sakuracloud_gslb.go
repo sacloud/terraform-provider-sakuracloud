@@ -42,7 +42,7 @@ func resourceSakuraCloudGSLB() *schema.Resource {
 						"protocol": {
 							Type:         schema.TypeString,
 							Required:     true,
-							ValidateFunc: validateStringInWord(sacloud.AllowGSLBHealthCheckProtocol()),
+							ValidateFunc: validation.StringInSlice(sacloud.AllowGSLBHealthCheckProtocol(), false),
 						},
 						"delay_loop": {
 							Type:         schema.TypeInt,
