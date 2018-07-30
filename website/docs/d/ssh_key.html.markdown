@@ -20,7 +20,7 @@ data sakuracloud_ssh_key "foobar" {
 
 ## Argument Reference
 
- * `name_selectors` - (Optional) The filter value list of name.
+ * `name_selectors` - (Optional) The list of names to filtering.
  * `filter` - (Optional) The map of filter key and value.
 
 ## Attributes Reference

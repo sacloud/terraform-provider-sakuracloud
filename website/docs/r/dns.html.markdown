@@ -27,7 +27,7 @@ The following arguments are supported:
 
 * `zone` - (Required) The name of the zone.
 * `description` - (Optional) The description of the resource.
-* `tags` - (Optional) The tag list of the resource.
+* `tags` - (Optional) The tag list of the resources.
 * `icon_id` - (Optional) The ID of the icon.
 
 ## Attributes Reference
@@ -38,7 +38,7 @@ The following attributes are exported:
 * `zone` - The name of the zone.
 * `dns_servers` - List of host names of DNS servers.
 * `description` - The description of the resource.
-* `tags` - The tag list of the resource.
+* `tags` - The tag list of the resources.
 * `icon_id` - The ID of the icon of the resource.
 
 ## Import

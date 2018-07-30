@@ -20,8 +20,8 @@ data sakuracloud_simple_monitor "foobar" {
 
 ## Argument Reference
 
- * `name_selectors` - (Optional) The filter value list of name.
- * `tag_selectors` - (Optional) The filter value list of tags.
+ * `name_selectors` - (Optional) The list of names to filtering.
+ * `tag_selectors` - (Optional) The list of tags to filtering.
  * `filter` - (Optional) The map of filter key and value.
 
 ## Attributes Reference
@@ -35,7 +35,7 @@ data sakuracloud_simple_monitor "foobar" {
 * `notify_slack_webhook` - The webhook URL of destination of slack notification.
 * `enabled` - The flag of enable/disable monitoring.
 * `description` - The description of the resource.
-* `tags` - The tag list of the resource.
+* `tags` - The tag list of the resources.
 * `icon_id` - The ID of the icon of the resource.
 
 ### Health Check

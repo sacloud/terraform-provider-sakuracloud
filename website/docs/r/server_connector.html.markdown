@@ -33,9 +33,9 @@ resource sakuracloud_server "foobar" {
 The following arguments are supported:
 
 * `server_id` - (Required) The name of the resource.
-* `disks` - (Optional) The ID list of the Disk connected to Server.
+* `disks` - (Optional) The ID list of the Disks connected to Server.
 * `cdrom_id` - (Optional) The ID of the CD-ROM inserted to Server.
-* `packet_filter_ids` - (Optional) The ID list of the Packet Filter connected to Server.
+* `packet_filter_ids` - (Optional) The ID list of the Packet Filters connected to Server.
 * `graceful_shutdown_timeout` - (Optional) The wait time(seconds) to do graceful shutdown the Server.
 * `zone` - (Optional) The ID of the zone to which the resource belongs.
 
@@ -44,9 +44,9 @@ The following arguments are supported:
 The following attributes are exported:
 
 * `id` - The ID of the resource.
-* `disks` - The ID list of the Disk connected to Server.
+* `disks` - The ID list of the Disks connected to Server.
 * `cdrom_id` - The ID of the CD-ROM inserted to Server.
-* `packet_filter_ids` - The ID list of the Packet Filter connected to Server.
+* `packet_filter_ids` - The ID list of the Packet Filters connected to Server.
 * `zone` - The ID of the zone to which the resource belongs.
 
 ## Import

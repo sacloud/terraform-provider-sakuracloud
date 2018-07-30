@@ -41,7 +41,7 @@ The following arguments are supported:
 * `dns_server1` - (Optional) The primary DNS server IP address.
 * `dns_server2` - (Optional) The secondly DNS server IP address.
 * `description` - (Optional) The description of the resource.
-* `tags` - (Optional) The tag list of the resource.
+* `tags` - (Optional) The tag list of the resources.
 * `icon_id` - (Optional) The ID of the icon.
 * `graceful_shutdown_timeout` - (Optional) The wait time(seconds) to do graceful shutdown the server connected to the resource.
 * `zone` - (Optional) The ID of the zone to which the resource belongs.
@@ -60,9 +60,9 @@ The following attributes are exported:
 * `internet_connection` - The flag of enable/disable connecting from MobileGateway to the Internet.
 * `dns_server1` - The primary DNS server IP address.
 * `dns_server2` - The secondly DNS server IP address.
-* `sim_ids` - The ID list of the SIM connected to the Mobile Gateway.
+* `sim_ids` - The ID list of the SIMs connected to the Mobile Gateway.
 * `description` - The description of the resource.
-* `tags` - The tag list of the resource.
+* `tags` - The tag list of the resources.
 * `icon_id` - The ID of the icon.
 * `graceful_shutdown_timeout` - The wait time(seconds) to do graceful shutdown the server connected to the resource.
 * `zone` - The ID of the zone to which the resource belongs.

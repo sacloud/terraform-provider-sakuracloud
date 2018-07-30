@@ -40,7 +40,7 @@ The following arguments are supported:
 * `weighted` - (Optional) The flag for enable/disable weighting.(default:`true`)
 * `sorry_server` - (Optional) The hostname or IP address of sorry server.
 * `description` - (Optional) The description of the resource.
-* `tags` - (Optional) The tag list of the resource.
+* `tags` - (Optional) The tag list of the resources.
 * `icon_id` - (Optional) The ID of the icon.
 
 ### Health Check
@@ -66,7 +66,7 @@ The following attributes are exported:
 * `weighted` - The flag for enable/disable weighting.
 * `sorry_server` - The hostname or IP address of sorry server.
 * `description` - The description of the resource.
-* `tags` - The tag list of the resource.
+* `tags` - The tag list of the resources.
 * `icon_id` - The ID of the icon of the resource.
 
 ## Import

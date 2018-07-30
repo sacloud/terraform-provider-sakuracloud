@@ -40,7 +40,7 @@ Valid value is one of the following: [ 5(default) / 10 ]
 * `content` - (Optional) String of the value of the CDROM. 
 * `content_file_path` - (Optional) The source file path of the CDROM. 
 * `description` - (Optional) The description of the resource.
-* `tags` - (Optional) The tag list of the resource.
+* `tags` - (Optional) The tag list of the resources.
 * `icon_id` - (Optional) The ID of the icon.
 * `zone` - (Optional) The ID of the zone to which the resource belongs.
 
@@ -52,7 +52,7 @@ The following attributes are exported:
 * `name` - The name of the resource.
 * `size` - The size of the resource(unit:`GB`)
 * `description` - The description of the resource.
-* `tags` - The tag list of the resource.
+* `tags` - The tag list of the resources.
 * `icon_id` - The ID of the icon of the resource.
 * `zone` - The ID of the zone to which the resource belongs.
 

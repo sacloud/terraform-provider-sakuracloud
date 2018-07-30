@@ -47,7 +47,7 @@ The following arguments are supported:
 * `mobile_gateway_id` - (Optional) The ID of the Mobile Gateway to which the SIM belongs.
 * `ipaddress` - (Optional) The IP address of the SIM. Used when connect to mobile gateway.
 * `description` - (Optional) The description of the resource.
-* `tags` - (Optional) The tag list of the resource.
+* `tags` - (Optional) The tag list of the resources.
 * `icon_id` - (Optional) The ID of the icon.
 
 ## Attributes Reference
@@ -59,7 +59,7 @@ The following attributes are exported:
 * `iccid` - The ICCID of the SIM. 
 * `ipaddress` - The IP address of the SIM. Used when connected with mobile gateway.
 * `description` - The description of the resource.
-* `tags` - The tag list of the resource.
+* `tags` - The tag list of the resources.
 * `icon_id` - The ID of the icon.
 
 ## Import

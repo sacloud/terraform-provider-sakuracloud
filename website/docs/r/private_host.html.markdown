@@ -34,7 +34,7 @@ The following arguments are supported:
 
 * `name` - (Required) The name of the resource.
 * `description` - (Optional) The description of the resource.
-* `tags` - (Optional) The tag list of the resource.
+* `tags` - (Optional) The tag list of the resources.
 * `icon_id` - (Optional) The ID of the icon.
 * `graceful_shutdown_timeout` - (Optional) The wait time(seconds) to do graceful shutdown the server connected to the resource.
 * `zone` - (Optional) The ID of the zone to which the resource belongs.  
@@ -50,7 +50,7 @@ The following attributes are exported:
 * `assigned_core` - The number of cores assigned to the Server.
 * `assigned_memory` - The size of memory allocated to the Server(unit:`GB`).
 * `description` - The description of the resource.
-* `tags` - The tag list of the resource.
+* `tags` - The tag list of the resources.
 * `zone` - The ID of the zone to which the resource belongs.
 
 ## Import

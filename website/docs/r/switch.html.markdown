@@ -30,7 +30,7 @@ The following arguments are supported:
 
 * `name` - (Required) The name of the resource.
 * `description` - (Optional) The description of the resource.
-* `tags` - (Optional) The tag list of the resource.
+* `tags` - (Optional) The tag list of the resources.
 * `bridge_id` - (Optional) The ID of the Bridge to connect to the Switch.
 * `icon_id` - (Optional) The ID of the icon.
 * `graceful_shutdown_timeout` - (Optional) The wait time(seconds) to do graceful shutdown the server connected to the resource.
@@ -46,7 +46,7 @@ The following attributes are exported:
 * `bridge_id` - The ID of the bridge connected to the switch.
 * `icon_id` - The ID of the icon.
 * `description` - The description of the resource.
-* `tags` - The tag list of the resource.
+* `tags` - The tag list of the resources.
 * `zone` - The ID of the zone to which the resource belongs.
 
 ## Import

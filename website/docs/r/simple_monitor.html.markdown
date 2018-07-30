@@ -57,7 +57,7 @@ The following arguments are supported:
 * `notify_slack_webhook` - (Optional) The webhook URL of destination of slack notification.
 * `enabled` - (Optional) The flag of enable/disable monitoring.
 * `description` - (Optional) The description of the resource.
-* `tags` - (Optional) The tag list of the resource.
+* `tags` - (Optional) The tag list of the resources.
 * `icon_id` - (Optional) The ID of the icon of the resource.
 
 ### Health Check
@@ -90,7 +90,7 @@ Valid value is one of the following: [ "http" / "https" / "ping" / "tcp" / "dns"
 * `notify_slack_webhook` - The webhook URL of destination of slack notification.
 * `enabled` - The flag of enable/disable monitoring.
 * `description` - The description of the resource.
-* `tags` - The tag list of the resource.
+* `tags` - The tag list of the resources.
 * `icon_id` - The ID of the icon of the resource.
 
 ## Import

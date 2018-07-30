@@ -32,7 +32,7 @@ The following arguments are supported:
 * `name` - (Required) The name of the resource.
 * `source` - (Optional) The path of source content file.
 * `base64content` - (Optional) The base64 encoded body of source content.
-* `tags` - (Optional) The tag list of the resource.
+* `tags` - (Optional) The tag list of the resources.
 
 ## Attributes Reference
 
@@ -42,7 +42,7 @@ The following attributes are exported:
 * `name` - The name of the resource.
 * `body` - Base64 encoded icon data(size:`small`).
 * `url` - URL to access this resource.
-* `tags` - The tag list of the resource.
+* `tags` - The tag list of the resources.
 
 ## Import
 

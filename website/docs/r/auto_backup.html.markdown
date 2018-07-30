@@ -34,7 +34,7 @@ The following arguments are supported:
 Valid values are the following: ["mon", "tue", "wed", "thu", "fri", "sat", "sun"]
 * `max_backup_num` - (Optional) Max number of backups to keep.
 * `description` - (Optional) The description of the resource.
-* `tags` - (Optional) The tag list of the resource.
+* `tags` - (Optional) The tag list of the resources.
 * `icon_id` - (Optional) The ID of the icon.
 * `zone` - (Optional) The ID of the zone to which the resource belongs.  
 Valid value is one of the following: ["is1b" / "tk1a"]
@@ -49,7 +49,7 @@ The following attributes are exported:
 * `weekdays` - Day of the week to get backup.  
 * `max_backup_num` - Max number of backups to keep.
 * `description` - The description of the resource.
-* `tags` - The tag list of the resource.
+* `tags` - The tag list of the resources.
 * `icon_id` - The ID of the icon of the resource.
 * `zone` - The ID of the zone to which the resource belongs.
 

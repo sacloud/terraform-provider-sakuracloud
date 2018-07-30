@@ -34,7 +34,7 @@ Valid value is one of the following: [ 20(default) / 40 / 60 / 80 / 100 / 250 / 
 * `archive_file` - (Optional) Archive file to upload(format:`raw`).
 * `hash` - (Optional) MD5 hash value of the archive file.
 * `description` - (Optional) The description of the resource.
-* `tags` - (Optional) The tag list of the resource.
+* `tags` - (Optional) The tag list of the resources.
 * `icon_id` - (Optional) The ID of the icon.
 * `zone` - (Optional) The ID of the zone to which the resource belongs.
 
@@ -46,7 +46,7 @@ The following attributes are exported:
 * `name` - The name of the resource.
 * `size` - The size of the resource(unit:`GB`)
 * `description` - The description of the resource.
-* `tags` - The tag list of the resource.
+* `tags` - The tag list of the resources.
 * `icon_id` - The ID of the icon of the resource.
 * `zone` - The ID of the zone to which the resource belongs.
 

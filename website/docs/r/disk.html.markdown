@@ -54,11 +54,11 @@ Valid value is one of the following: [ "virtio"(default) / "ide"]
 * `source_disk_id` - The ID of source Disk.
 * `hostname` - The hostname to set with `"Modify Disk"` API.
 * `password` - The password of OS's administrator to set with `"Modify Disk"` API.
-* `ssh_key_ids` - The ID list of SSH Key to set with `"Modify Disk"` API.
-* `note_ids` - The ID list of Note(Startup-Script) to set with `"Modify Disk"` API.
+* `ssh_key_ids` - The ID list of SSH Keys to set with `"Modify Disk"` API.
+* `note_ids` - The ID list of Notes(Startup-Scripts) to set with `"Modify Disk"` API.
 * `disable_pw_auth` - The flag of disable password auth via SSH.
 * `description` - (Optional) The description of the resource.
-* `tags` - (Optional) The tag list of the resource.
+* `tags` - (Optional) The tag list of the resources.
 * `icon_id` - (Optional) The ID of the icon.
 * `graceful_shutdown_timeout` - (Optional) The wait time(seconds) to do graceful shutdown the server connected to the resource.
 * `zone` - (Optional) The ID of the zone to which the resource belongs.
@@ -74,7 +74,7 @@ The following attributes are exported:
 * `size` - Size of the resource(unit:`GB`).
 * `server_id` - The ID of the server connected to the disk.
 * `description` - The description of the resource.
-* `tags` - The tag list of the resource.
+* `tags` - The tag list of the resources.
 * `icon_id` - The ID of the icon of the resource.
 * `zone` - The ID of the zone to which the resource belongs.
 

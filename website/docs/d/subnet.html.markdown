@@ -21,8 +21,8 @@ data sakuracloud_subnet "foobar" {
 
 ## Argument Reference
 
- * `internet_id` - (Required) The filter value list of name.
- * `index` - (Required) The filter value list of tags.
+ * `internet_id` - (Required) The ID of the Internet resource.
+ * `index` - (Required) The index of the target subnet.
 
 ## Attributes Reference
 

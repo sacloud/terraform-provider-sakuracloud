@@ -52,7 +52,7 @@ Valid value is one of the following: [ "standard"(default) / "highspec"]
 * `nw_mask_len` - (Required) Network mask length.
 * `default_route` - (Optional) Default gateway address of the Load Balancer.	 
 * `description` - (Optional) The description of the resource.
-* `tags` - (Optional) The tag list of the resource.
+* `tags` - (Optional) The tag list of the resources.
 * `icon_id` - (Optional) The ID of the icon.
 * `graceful_shutdown_timeout` - (Optional) The wait time(seconds) to do graceful shutdown the server connected to the resource.
 * `zone` - (Optional) The ID of the zone to which the resource belongs.
@@ -72,7 +72,7 @@ The following attributes are exported:
 * `nw_mask_len` - Network mask length.
 * `default_route` - Default gateway address of the Load Balancer.	 
 * `description` - The description of the resource.
-* `tags` - The tag list of the resource.
+* `tags` - The tag list of the resources.
 * `icon_id` - The ID of the icon of the resource.
 * `zone` - The ID of the zone to which the resource belongs.
 

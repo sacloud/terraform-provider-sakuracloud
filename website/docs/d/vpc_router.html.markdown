@@ -20,8 +20,8 @@ data sakuracloud_vpc_router "foobar" {
 
 ## Argument Reference
 
- * `name_selectors` - (Optional) The filter value list of name.
- * `tag_selectors` - (Optional) The filter value list of tags.
+ * `name_selectors` - (Optional) The list of names to filtering.
+ * `tag_selectors` - (Optional) The list of tags to filtering.
  * `filter` - (Optional) The map of filter key and value.
  * `zone` - (Optional) The ID of the zone.
 
@@ -40,7 +40,7 @@ data sakuracloud_vpc_router "foobar" {
 * `syslog_host` - The destination HostName/IP address to send log.	
 * `internet_connection` - The flag of enable/disable connection from the VPC Router to the Internet.
 * `description` - The description of the resource.
-* `tags` - The tag list of the resource.
+* `tags` - The tag list of the resources.
 * `icon_id` - The ID of the icon of the resource.
 * `zone` - The ID of the zone to which the resource belongs.
 

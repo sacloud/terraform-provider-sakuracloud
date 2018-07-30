@@ -42,7 +42,7 @@ The following arguments are supported:
 Valid value is one of the following: [ "shell"(default) / "yaml_cloud_config" ]
 * `content` - (Required) The content body of the Note.
 * `description` - (Optional) The description of the resource.
-* `tags` - (Optional) The tag list of the resource.
+* `tags` - (Optional) The tag list of the resources.
 * `icon_id` - (Optional) The ID of the icon.
 
 ## Attributes Reference
@@ -54,7 +54,7 @@ The following attributes are exported:
 * `class` - The name of the note class.
 * `content` - The body of the note. 
 * `description` - The description of the resource.
-* `tags` - The tag list of the resource.
+* `tags` - The tag list of the resources.
 * `icon_id` - The ID of the icon of the resource.
 
 ## Import

@@ -36,7 +36,7 @@ The following arguments are supported:
 * `vpc_router_id` - (Required) The ID of the Internet resource.
 * `index` - (Required) The NIC index of VPC Router Interface.
 * `switch_id` - (Required) The ID of the switch connected to the VPC Router.
-* `ipaddresses` - (Required) The IP address list of the VPC Router Interface.
+* `ipaddresses` - (Required) The IP address list of the VPC Router Interfaces.
 * `vip` - (Optional) The Virtual IP address of the VPC Router Interface. Used when VPC Router's plan is `premium` or `highspec`.
 * `nw_mask_len` - (Optional) Network mask length of the VPC Router Interface.
 * `graceful_shutdown_timeout` - (Optional) The wait time(seconds) to do graceful shutdown the VPC Router.
@@ -50,7 +50,7 @@ The following attributes are exported:
 * `vpc_router_id` - The ID of the Internet resource.
 * `index` - The NIC index of VPC Router Interface.
 * `switch_id` - The ID of the switch connected to the VPC Router.
-* `ipaddresses` - The IP address list of the VPC Router Interface.
+* `ipaddresses` - The IP address list of the VPC Router Interfaces.
 * `vip` - The Virtual IP address of the VPC Router Interface. Used when VPC Router's plan is `premium` or `highspec`.
 * `nw_mask_len` - Network mask length of the VPC Router Interface.
 * `graceful_shutdown_timeout` - The wait time(seconds) to do graceful shutdown the VPC Router.

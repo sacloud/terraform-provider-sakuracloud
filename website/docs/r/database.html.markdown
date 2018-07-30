@@ -53,7 +53,7 @@ Valid value is one of the following: [ "10g"(default) / "30g" / "90g" / "240g" /
 * `nw_mask_len` - (Required) The network mask length of the database.
 * `default_route` - (Required) The default route IP address of the database.
 * `description` - (Optional) The description of the resource.
-* `tags` - (Optional) The tag list of the resource.
+* `tags` - (Optional) The tag list of the resources.
 * `icon_id` - (Optional) The ID of the icon.
 * `graceful_shutdown_timeout` - (Optional) The wait time(seconds) to do graceful shutdown the Database.
 * `zone` - (Optional) The ID of the zone to which the resource belongs.
@@ -75,7 +75,7 @@ The following attributes are exported:
 * `nw_mask_len` - The network mask length of the database.
 * `default_route` - The default route IP address of the database.
 * `description` - The description of the resource.
-* `tags` - The tag list of the resource.
+* `tags` - The tag list of the resources.
 * `icon_id` - The ID of the icon of the resource.
 * `zone` - The ID of the zone to which the resource belongs.
 

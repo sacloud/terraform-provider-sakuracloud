@@ -52,7 +52,7 @@ Valid value is one of the following: [ "standard"(default) / "premium" / "highsp
 * `vip` - (Optional) The Virtual IP address of the VPC Router. Used when plan is `premium` or `highspec`.
 * `aliases` - (Optional) The IP address aliase list. Used when plan is `premium` or `highspec`.
 * `description` - (Optional) The description of the resource.
-* `tags` - (Optional) The tag list of the resource.
+* `tags` - (Optional) The tag list of the resources.
 * `icon_id` - (Optional) The ID of the icon.
 * `graceful_shutdown_timeout` - (Optional) The wait time(seconds) to do graceful shutdown the VPC Router.
 * `zone` - (Optional) The ID of the zone to which the resource belongs.
@@ -74,7 +74,7 @@ The following attributes are exported:
 * `syslog_host` - The destination HostName/IP address to send log.	
 * `internet_connection` - The flag of enable/disable connection from the VPC Router to the Internet.
 * `description` - The description of the resource.
-* `tags` - The tag list of the resource.
+* `tags` - The tag list of the resources.
 * `icon_id` - The ID of the icon of the resource.
 * `zone` - The ID of the zone to which the resource belongs.
 

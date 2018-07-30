@@ -79,21 +79,21 @@ The following arguments are supported:
 * `name` - (Required) The name of the resource.
 * `core` - (Optional) The number of cores(default:`1`).
 * `memory` - (Optional) The size of memory(unit:`GB`, default:`1`).
-* `disks` - (Optional) The ID list of the Disk connected to Server.
+* `disks` - (Optional) The ID list of the Disks connected to Server.
 * `interface_driver` - (Optional) The name of network interface driver.  
 Valid value is one of the following: [ "virtio"(default) / "e1000"]
 * `nic` - (Optional) The primary NIC's connection destination.  
 Valid value is one of the following: [ "shared"(default) / <Switch ID> / ""(disconnected) ]
 * `cdrom_id` - (Optional) The ID of the CD-ROM inserted to Server.
 * `private_host_id` - (Optional) The ID of the Private Host to which the Server belongs.
-* `additional_nics` - (Optional) The ID list of the Switch connected to NICs(excluding primary NIC) of Server.  
+* `additional_nics` - (Optional) The ID list of the Switches connected to NICs(excluding primary NIC) of Server.  
 Valid values are one of the following: [ <Switch ID> / ""(disconnected) ]
-* `packet_filter_ids` - (Optional) The ID list of the Packet Filter connected to Server.
+* `packet_filter_ids` - (Optional) The ID list of the Packet Filters connected to Server.
 * `ipaddress` - (Optional) The IP address of primary NIC.
 * `gateway` - (Optional) Default gateway address of the Server.	 
 * `nw_mask_len` - (Optional) Network mask length of the Server.
 * `description` - (Optional) The description of the resource.
-* `tags` - (Optional) The tag list of the resource.
+* `tags` - (Optional) The tag list of the resources.
 * `icon_id` - (Optional) The ID of the icon.
 * `graceful_shutdown_timeout` - (Optional) The wait time(seconds) to do graceful shutdown the Server.
 * `zone` - (Optional) The ID of the zone to which the resource belongs.
@@ -106,14 +106,14 @@ The following attributes are exported:
 * `name` - The name of the resource.
 * `core` - The number of cores.
 * `memory` - The size of memory(unit:`GB`).
-* `disks` - The ID list of the Disk connected to Server.
+* `disks` - The ID list of the Disks connected to Server.
 * `interface_driver` - The name of network interface driver.
 * `nic` - The primary NIC's connection destination.
 * `cdrom_id` - The ID of the CD-ROM inserted to Server.
 * `private_host_id` - The ID of the Private Host to which the Server belongs.
 * `private_host_name` - The name of the Private Host to which the Server belongs.
-* `additional_nics` - The ID list of the Switch connected to NICs(excluding primary NIC) of Server.
-* `packet_filter_ids` - The ID list of the Packet Filter connected to Server.
+* `additional_nics` - The ID list of the Switches connected to NICs(excluding primary NIC) of Server.
+* `packet_filter_ids` - The ID list of the Packet Filters connected to Server.
 * `macaddresses` - The MAC address list of NICs connected to Server.
 * `ipaddress` - The IP address of primary NIC.
 * `dns_servers` - List of default DNS servers for the zone to which the Server belongs.
@@ -121,7 +121,7 @@ The following attributes are exported:
 * `nw_address` - The network address of the Server.
 * `nw_mask_len` - Network mask length of the Server.
 * `description` - The description of the resource.
-* `tags` - The tag list of the resource.
+* `tags` - The tag list of the resources.
 * `icon_id` - The ID of the icon of the resource.
 * `zone` - The ID of the zone to which the resource belongs.
 

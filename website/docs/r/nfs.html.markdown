@@ -40,7 +40,7 @@ Valid value is one of the following: [ 100(default) / 500 / 1024 / 2048 / 4096 ]
 * `nw_mask_len` - (Required) The network mask length of the NFS Appliance.
 * `default_route` - (Required) The default route IP address of the NFS Appliance.
 * `description` - (Optional) The description of the resource.
-* `tags` - (Optional) The tag list of the resource.
+* `tags` - (Optional) The tag list of the resources.
 * `icon_id` - (Optional) The ID of the icon.
 * `graceful_shutdown_timeout` - (Optional) The wait time(seconds) to do graceful shutdown the NFS Appliance.
 * `zone` - (Optional) The ID of the zone to which the resource belongs.
@@ -57,7 +57,7 @@ The following attributes are exported:
 * `nw_mask_len` - The network mask length of the NFS Appliance.
 * `default_route` - The default route IP address of the NFS Appliance.
 * `description` - The description of the resource.
-* `tags` - The tag list of the resource.
+* `tags` - The tag list of the resources.
 * `icon_id` - The ID of the icon of the resource.
 * `zone` - The ID of the zone to which the resource belongs.
 
