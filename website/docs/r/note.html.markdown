@@ -3,12 +3,12 @@ layout: "sakuracloud"
 page_title: "SakuraCloud: sakuracloud_note"
 sidebar_current: "docs-sakuracloud-resource-misc-note"
 description: |-
-  Provides a SakuraCloud Note(Startup-Script) resource. This can be used to create, update, and delete Notes.
+  Provides a SakuraCloud Note (Startup-Script) resource. This can be used to create, update, and delete Notes.
 ---
 
 # sakuracloud\_note
 
-Provides a SakuraCloud Note(Startup-Script) resource. This can be used to create, update, and delete Notes.
+Provides a SakuraCloud Note (Startup-Script) resource. This can be used to create, update, and delete Notes.
 
 ## Example Usage
 

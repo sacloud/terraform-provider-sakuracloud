@@ -56,12 +56,12 @@ Valid format is one of the following:
 Valid format is one of the following:
   * Number: `"0"` - `"65535"`
   * Range: `"xx-yy"`
-  * Range(hex): `"0xPPPP/0xMMMM"`
+  * Range (hex): `"0xPPPP/0xMMMM"`
 * `dest_port` - (Optional) Target destination port.
 Valid format is one of the following:
   * Number: `"0"` - `"65535"`
   * Range: `"xx-yy"`
-  * Range(hex): `"0xPPPP/0xMMMM"`
+  * Range (hex): `"0xPPPP/0xMMMM"`
 * `allow` - (Optional) The flag for allow/deny packets (default:`true`).
 * `description` - (Optional) The description of the expression.
 * `order` - (Optional) The order of the expression (default:`1000`).

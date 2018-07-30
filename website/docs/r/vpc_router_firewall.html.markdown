@@ -84,7 +84,7 @@ Valid format is one of the following:
 Valid format is one of the following:
   * Number: `"0"` - `"65535"`
   * Range: `"xx-yy"`
-  * Range(hex): `"0xPPPP/0xMMMM"`
+  * Range (hex): `"0xPPPP/0xMMMM"`
 * `dest_nw` - (Required) Target destination network IP address or CIDR or range.  
   Valid format is one of the following:   
     * IP address: `"xxx.xxx.xxx.xxx"`
@@ -94,7 +94,7 @@ Valid format is one of the following:
 Valid format is one of the following:
   * Number: `"0"` - `"65535"`
   * Range: `"xx-yy"`
-  * Range(hex): `"0xPPPP/0xMMMM"`
+  * Range (hex): `"0xPPPP/0xMMMM"`
 * `allow` - (Required) The flag for allow/deny packets.
 * `logging` - (Required) The flag for enable/disable logging.
 * `description` - (Optional) The description of the expression.
