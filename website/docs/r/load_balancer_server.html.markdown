@@ -32,7 +32,7 @@ resource "sakuracloud_load_balancer_vip" "vip1" {
 }
 
 # Create new LoadBalancer servers
-resource "sakuracloud_load_balancer_server" "server01"{
+resource "sakuracloud_load_balancer_server" "server01" {
   load_balancer_vip_id = "${sakuracloud_load_balancer_vip.vip1.id}"
   ipaddress            = "192.168.2.151"
   check_protocol       = "https"
@@ -40,7 +40,7 @@ resource "sakuracloud_load_balancer_server" "server01"{
   check_status         = 200 
   enabled              = true
 }
-resource "sakuracloud_load_balancer_server" "server01"{
+resource "sakuracloud_load_balancer_server" "server02" {
   load_balancer_vip_id = "${sakuracloud_load_balancer_vip.vip1.id}"
   ipaddress            = "192.168.2.152"
   check_protocol       = "https"

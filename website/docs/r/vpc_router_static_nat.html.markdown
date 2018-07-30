@@ -26,7 +26,7 @@ resource sakuracloud_vpc_router "foobar" {
 }
 
 # Add NIC to the VPC Router
-resource sakuracloud_vpc_router_interface "eth1"{
+resource sakuracloud_vpc_router_interface "eth1" {
   vpc_router_id = "${sakuracloud_vpc_router.foobar.id}"
   index         = 1
   switch_id     = "${sakuracloud_switch.foobar.id}"
