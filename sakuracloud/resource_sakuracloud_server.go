@@ -6,6 +6,7 @@ import (
 
 	"github.com/sacloud/libsacloud/api"
 	"github.com/sacloud/libsacloud/sacloud"
+	serverutils "github.com/sacloud/libsacloud/utils/server"
 	"log"
 )
 
@@ -735,11 +736,13 @@ func setServerResourceData(d *schema.ResourceData, client *APIClient, data *sacl
 	d.Set("nw_address", "")
 	d.Set("nw_mask_len", "")
 	if hasFirstInterface && data.Interfaces[0].Switch != nil {
+		ip := ""
 		if data.Interfaces[0].Switch.Scope == sacloud.ESCopeShared {
-			d.Set("ipaddress", data.Interfaces[0].IPAddress)
+			ip = data.Interfaces[0].IPAddress
 		} else {
-			d.Set("ipaddress", data.Interfaces[0].UserIPAddress)
+			ip = data.Interfaces[0].UserIPAddress
 		}
+		d.Set("ipaddress", ip)
 
 		d.Set("dns_servers", data.Zone.Region.NameServers)
 		if data.Interfaces[0].Switch.UserSubnet != nil {
@@ -750,6 +753,22 @@ func setServerResourceData(d *schema.ResourceData, client *APIClient, data *sacl
 		if data.Interfaces[0].Switch.Subnet != nil {
 			d.Set("nw_address", data.Interfaces[0].Switch.Subnet.NetworkAddress) // null if connected switch(not router)
 		}
+
+		// build conninfo
+		connInfo := map[string]string{
+			"type": "ssh",
+			"host": ip,
+		}
+		userName, err := serverutils.GetDefaultUserName(client.Client, data.ID)
+		if err != nil {
+			log.Printf("[WARN] can't retrive connInfo from archives (server: %d).", data.ID)
+		}
+
+		if userName != "" {
+			connInfo["user"] = userName
+		}
+
+		d.SetConnInfo(connInfo)
 	}
 
 	setPowerManageTimeoutValueToState(d)
