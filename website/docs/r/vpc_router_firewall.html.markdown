@@ -64,7 +64,7 @@ The following arguments are supported:
 
 * `vpc_router_id` - (Required) The ID of the Internet resource.
 * `vpc_router_interface_index` - (Required) The NIC index of VPC Router.
-* `direction` - (Required) Direction of filtering packets.
+* `direction` - (Required) Direction of filtering packets.  
 Valid value is one of the following: [ "send" / "receive" ]
 * `expressions` - (Required) Filtering rules. It contains some attributes to [Expressions](#expressions).
 * `zone` - (Optional) The ID of the zone to which the resource belongs.

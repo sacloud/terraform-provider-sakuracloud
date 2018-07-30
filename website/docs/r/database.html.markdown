@@ -39,7 +39,7 @@ resource sakuracloud_database "foobar" {
 The following arguments are supported:
 
 * `name` - (Required) The name of the resource.
-* `database_type` - (Optional) The Database type.
+* `database_type` - (Optional) The Database type.  
 Valid value is one of the following: [ "postgresql" (default) / "mariadb"]
 * `plan` - (Optional) The plan (size) of the Database.   
 Valid value is one of the following: [ "10g" (default) / "30g" / "90g" / "240g" / "500g" / "1t" ]

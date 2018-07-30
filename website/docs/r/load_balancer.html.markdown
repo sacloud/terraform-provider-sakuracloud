@@ -45,7 +45,7 @@ The following arguments are supported:
 * `switch_id` - (Required) The ID of the Switch connected to the Load Balancer.
 * `vrid` - (Required) VRID used when high-availability mode enabled.
 * `high_availability` - (Optional) The flag of enable/disable high-availability mode.
-* `plan` - (Optional) The name of the resource plan.
+* `plan` - (Optional) The name of the resource plan.  
 Valid value is one of the following: [ "standard" (default) / "highspec"]
 * `ipaddress1` - (Required) The primary IP address of the Load Balancer.
 * `ipaddress2` - (Optional) The secondly IP address of the Load Balancer. Used when high-availability mode enabled.
