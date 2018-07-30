@@ -66,7 +66,7 @@ Attributes for Health Check:
 
 * `protocol` - (Required) Protocol used in health check.  
 Valid value is one of the following: [ "http" / "https" / "ping" / "tcp" / "dns" / "ssh" / "smtp" / "pop3" / "snmp" / "sslcertificate" ]
-* `delay_loop` - (Optional) Health check access interval(unit:`second`). 
+* `delay_loop` - (Optional) Health check access interval (unit:`second`). 
 * `host_header` - (Optional) The value of `Host` header used in http/https health check access.
 * `path` - (Optional) The request path used in http/https health check access.
 * `status` - (Optional) HTTP status code expected by health check access.

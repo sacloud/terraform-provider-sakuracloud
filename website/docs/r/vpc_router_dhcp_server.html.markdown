@@ -59,6 +59,6 @@ The following attributes are exported:
 * `dns_servers` - DNS server list to be assigned by DHCP.  
 * `zone` - The ID of the zone to which the resource belongs.
 
-## Import(not supported)
+## Import (not supported)
 
 Import of VPC Router DHCP Server is not supported.

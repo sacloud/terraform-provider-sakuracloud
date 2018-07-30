@@ -56,7 +56,7 @@ The following attributes are exported:
 * `zone` - The ID of the zone to which the resource belongs.
 
 
-## Import(not supported)
+## Import (not supported)
 
 Import of Load Balancer VIP is not supported.
 

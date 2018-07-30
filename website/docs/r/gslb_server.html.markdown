@@ -49,7 +49,7 @@ The following arguments are supported:
 
 * `gslb_id` - (Required) The ID of the GSLB to which the GSLB Server belongs.
 * `ipaddress` - (Required) The IP address of the GSLB Server.
-* `enabled` - (Optional) The flag for enable/disable the GSLB Server.(default:`true`)
+* `enabled` - (Optional) The flag for enable/disable the GSLB Server (default:`true`).
 * `weight` - (Optional) The weight of GSLB server used when weighting is enabled in the GSLB.
 
 ## Attributes Reference
@@ -61,6 +61,6 @@ The following attributes are exported:
 * `enabled` - The flag for enable/disable the GSLB Server.
 * `weight` - The weight of GSLB server used when weighting is enabled in the GSLB.
 
-## Import(not supported)
+## Import (not supported)
 
 Import of GSLB Server is not supported.

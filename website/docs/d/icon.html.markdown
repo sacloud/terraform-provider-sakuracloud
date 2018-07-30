@@ -28,6 +28,6 @@ data sakuracloud_icon "foobar" {
 
 * `id` - The ID of the resource.
 * `name` - The name of the resource.
-* `body` - Base64 encoded icon data(size:`small`).
+* `body` - Base64 encoded icon data (size:`small`).
 * `url` - URL to access this resource.
 * `tags` - The tag list of the resources.

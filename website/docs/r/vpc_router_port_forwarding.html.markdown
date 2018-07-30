@@ -48,7 +48,7 @@ The following arguments are supported:
 * `vpc_router_id` - (Required) The ID of the Internet resource.
 * `vpc_router_interface_id` - (Required) The ID of VPC Router Interface.
 * `protocol` - (Required) The target protocol of the Port Forwarding.  
-Valid value is one of the following: [ "tcp"(default) / "udp" ]
+Valid value is one of the following: [ "tcp" (default) / "udp" ]
 * `global_port` - (Required) The global port of the Port Forwarding.
 * `private_address` - (Required) The destination private IP address of the Port Forwarding.
 * `private_port` - (Required) The destination port number of the Port Forwarding.
@@ -67,6 +67,6 @@ The following attributes are exported:
 * `description` - The description of the resource.
 * `zone` - The ID of the zone to which the resource belongs.
 
-## Import(not supported)
+## Import (not supported)
 
 Import of VPC Router Port Forwarding is not supported.

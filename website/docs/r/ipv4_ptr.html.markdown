@@ -26,8 +26,8 @@ The following arguments are supported:
 
 * `ipaddress` - (Required) The target IP address.
 * `hostname` - (Required) The hostname of target.
-* `retry_max` - (Optional) Max count of API call retry.(default:`30`)
-* `retry_interval` - (Optional) Interval of API call retry.(unit:`second`, default:`10`)
+* `retry_max` - (Optional) Max count of API call retry (default:`30`).
+* `retry_interval` - (Optional) Interval of API call retry (unit:`second`, default:`10`).
 * `zone` - (Optional) The ID of the zone to which the resource belongs.
 
 ## Attributes Reference
@@ -38,7 +38,7 @@ The following attributes are exported:
 * `ipaddress` - The target IP address.
 * `hostname` - The hostname of target.
 * `retry_max` - Max count of API call retry.
-* `retry_interval` - Interval of API call retry.(unit:`second`)
+* `retry_interval` - Interval of API call retry (unit:`second`).
 * `zone` - The ID of the zone to which the resource belongs.
 
 ## Import

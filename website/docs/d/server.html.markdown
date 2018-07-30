@@ -30,14 +30,14 @@ data sakuracloud_server "foobar" {
 * `id` - The ID of the resource.
 * `name` - The name of the resource.
 * `core` - The number of cores.
-* `memory` - The size of memory(unit:`GB`).
+* `memory` - The size of memory (unit:`GB`).
 * `disks` - The ID list of the Disks connected to Server.
 * `interface_driver` - The name of network interface driver.
 * `nic` - The primary NIC's connection destination.
 * `cdrom_id` - The ID of the CD-ROM inserted to Server.
 * `private_host_id` - The ID of the Private Host to which the Server belongs.
 * `private_host_name` - The name of the Private Host to which the Server belongs.
-* `additional_nics` - The ID list of the Switches connected to NICs(excluding primary NIC) of Server.
+* `additional_nics` - The ID list of the Switches connected to NICs (excluding primary NIC) of Server.
 * `packet_filter_ids` - The ID list of the Packet Filter connected to Server.
 * `macaddresses` - The MAC address list of NICs connected to Server.
 * `ipaddress` - The IP address of primary NIC.

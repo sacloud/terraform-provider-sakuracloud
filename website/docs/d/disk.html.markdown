@@ -29,9 +29,9 @@ data sakuracloud_disk "foobar" {
 
 * `id` - The ID of the resource.
 * `name` - The name of the resource.
-* `plan` - The plan of the resource(`ssd`/`hdd`).
-* `conector` - The disk connector of the resource(`virtio`/`ide`).
-* `size` - Size of the resource(unit:`GB`).
+* `plan` - The plan of the resource (`ssd`/`hdd`).
+* `conector` - The disk connector of the resource (`virtio`/`ide`).
+* `size` - Size of the resource (unit:`GB`).
 * `server_id` - The ID of the server connected to the disk.
 * `description` - The description of the resource.
 * `tags` - The tag list of the resources.

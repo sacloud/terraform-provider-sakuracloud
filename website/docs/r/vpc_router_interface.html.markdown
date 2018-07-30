@@ -39,7 +39,7 @@ The following arguments are supported:
 * `ipaddresses` - (Required) The IP address list of the VPC Router Interfaces.
 * `vip` - (Optional) The Virtual IP address of the VPC Router Interface. Used when VPC Router's plan is `premium` or `highspec`.
 * `nw_mask_len` - (Optional) Network mask length of the VPC Router Interface.
-* `graceful_shutdown_timeout` - (Optional) The wait time(seconds) to do graceful shutdown the VPC Router.
+* `graceful_shutdown_timeout` - (Optional) The wait time (seconds) to do graceful shutdown the VPC Router.
 * `zone` - (Optional) The ID of the zone to which the resource belongs.
 
 ## Attributes Reference
@@ -53,9 +53,9 @@ The following attributes are exported:
 * `ipaddresses` - The IP address list of the VPC Router Interfaces.
 * `vip` - The Virtual IP address of the VPC Router Interface. Used when VPC Router's plan is `premium` or `highspec`.
 * `nw_mask_len` - Network mask length of the VPC Router Interface.
-* `graceful_shutdown_timeout` - The wait time(seconds) to do graceful shutdown the VPC Router.
+* `graceful_shutdown_timeout` - The wait time (seconds) to do graceful shutdown the VPC Router.
 * `zone` - The ID of the zone to which the resource belongs.
 
-## Import(not supported)
+## Import (not supported)
 
 Import of VPC Router Interface is not supported.

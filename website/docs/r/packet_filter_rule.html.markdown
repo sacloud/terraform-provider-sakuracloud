@@ -62,9 +62,9 @@ Valid format is one of the following:
   * Number: `"0"` - `"65535"`
   * Range: `"xx-yy"`
   * Range(hex): `"0xPPPP/0xMMMM"`
-* `allow` - (Optional) The flag for allow/deny packets.(default:`true`)
+* `allow` - (Optional) The flag for allow/deny packets (default:`true`).
 * `description` - (Optional) The description of the expression.
-* `order` - (Optional) The order of the expression.(default:`1000`)
+* `order` - (Optional) The order of the expression (default:`1000`).
 
 ## Attributes Reference
 
@@ -75,11 +75,11 @@ The following attributes are exported:
 * `source_nw` - Target source network IP address or CIDR or range.  
 * `source_port` - Target source port.
 * `dest_port` - Target destination port.
-* `allow` - The flag for allow/deny packets.(default:`true`)
+* `allow` - The flag for allow/deny packets (default:`true`).
 * `description` - The description of the expression.
-* `order` - The order of the expression.(default:`1000`)
+* `order` - The order of the expression (default:`1000`).
 
 
-## Import(not supported)
+## Import (not supported)
 
 Import of Packet Filter Rule is not supported.

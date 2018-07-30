@@ -3,12 +3,12 @@ layout: "sakuracloud"
 page_title: "SakuraCloud: sakuracloud_cdrom"
 sidebar_current: "docs-sakuracloud-resource-storage-cdrom"
 description: |-
-  Provides a SakuraCloud CDROM(ISO-Image) resource. This can be used to create, update, and delete CDROMs.
+  Provides a SakuraCloud CDROM (ISO-Image) resource. This can be used to create, update, and delete CDROMs.
 ---
 
 # sakuracloud\_cdrom
 
-Provides a SakuraCloud CDROM(ISO-Image) resource. This can be used to create, update, and delete CDROMs.
+Provides a SakuraCloud CDROM (ISO-Image) resource. This can be used to create, update, and delete CDROMs.
 
 ## Example Usage
 
@@ -33,9 +33,9 @@ resource sakuracloud_cdrom "foobar" {
 The following arguments are supported:
 
 * `name` - (Required) The name of the resource.
-* `size` - (Optional) The size of the resource(unit:`GB`).   
-Valid value is one of the following: [ 5(default) / 10 ]
-* `iso_image_file` - (Optional) CDROM file to upload(format:`raw`).
+* `size` - (Optional) The size of the resource (unit:`GB`).   
+Valid value is one of the following: [ 5 (default) / 10 ]
+* `iso_image_file` - (Optional) CDROM file to upload (format:`raw`).
 * `hash` - (Optional) MD5 hash value of the CDROM file.
 * `content` - (Optional) String of the value of the CDROM. 
 * `content_file_path` - (Optional) The source file path of the CDROM. 
@@ -50,7 +50,7 @@ The following attributes are exported:
 
 * `id` - The ID of the resource.
 * `name` - The name of the resource.
-* `size` - The size of the resource(unit:`GB`)
+* `size` - The size of the resource (unit:`GB`).
 * `description` - The description of the resource.
 * `tags` - The tag list of the resources.
 * `icon_id` - The ID of the icon of the resource.

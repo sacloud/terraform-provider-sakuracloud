@@ -46,7 +46,7 @@ The following arguments are supported:
 * `vrid` - (Required) VRID used when high-availability mode enabled.
 * `high_availability` - (Optional) The flag of enable/disable high-availability mode.
 * `plan` - (Optional) The name of the resource plan.
-Valid value is one of the following: [ "standard"(default) / "highspec"]
+Valid value is one of the following: [ "standard" (default) / "highspec"]
 * `ipaddress1` - (Required) The primary IP address of the Load Balancer.
 * `ipaddress2` - (Optional) The secondly IP address of the Load Balancer. Used when high-availability mode enabled.
 * `nw_mask_len` - (Required) Network mask length.
@@ -54,7 +54,7 @@ Valid value is one of the following: [ "standard"(default) / "highspec"]
 * `description` - (Optional) The description of the resource.
 * `tags` - (Optional) The tag list of the resources.
 * `icon_id` - (Optional) The ID of the icon.
-* `graceful_shutdown_timeout` - (Optional) The wait time(seconds) to do graceful shutdown the server connected to the resource.
+* `graceful_shutdown_timeout` - (Optional) The wait time (seconds) to do graceful shutdown the server connected to the resource.
 * `zone` - (Optional) The ID of the zone to which the resource belongs.
 
 ## Attributes Reference

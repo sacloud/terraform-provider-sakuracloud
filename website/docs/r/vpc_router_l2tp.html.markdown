@@ -60,6 +60,6 @@ The following attributes are exported:
 * `range_stop` - End IP address of address range to be assigned by L2TP.
 * `zone` - The ID of the zone to which the resource belongs.
 
-## Import(not supported)
+## Import (not supported)
 
 Import of VPC Router L2TP is not supported.

@@ -37,7 +37,7 @@ The following arguments are supported:
 * `type` - (Required) The Record type.  
 Valid value is one of the following: [ "A" / "AAAA" / "CNAME" / "NS" / "MX" / "TXT" / "SRV" ]
 * `value` - (Required) The value of the Record. 
-* `ttl` - (Optional) The ttl value of the Record(unit:`second`). 
+* `ttl` - (Optional) The ttl value of the Record (unit:`second`). 
 * `priority` - (Optional) The priority used when `type` is `MX` or `SRV`.
 * `weight` - (Optional) The weight used when `type` is `SRV`.
 * `port` - (Optional) The port number used when `type` is `SRV`. 
@@ -50,11 +50,11 @@ The following attributes are exported:
 * `name` - The hostname of target Record. 
 * `type` - The Record type.
 * `value` - The value of the Record. 
-* `ttl` - The ttl value of the Record(unit:`second`). 
+* `ttl` - The ttl value of the Record (unit:`second`). 
 * `priority` - The priority used when `type` is `MX` or `SRV`.
 * `weight` - The weight used when `type` is `SRV`.
 * `port` - The port number used when `type` is `SRV`. 
 
-## Import(not supported)
+## Import (not supported)
 
 Import of DNS Record is not supported.

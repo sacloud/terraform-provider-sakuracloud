@@ -39,7 +39,7 @@ The following arguments are supported:
 
 * `name` - (Required) The name of the resource.
 * `class` - (Required) The content body of the Note.  
-Valid value is one of the following: [ "shell"(default) / "yaml_cloud_config" ]
+Valid value is one of the following: [ "shell" (default) / "yaml_cloud_config" ]
 * `content` - (Required) The content body of the Note.
 * `description` - (Optional) The description of the resource.
 * `tags` - (Optional) The tag list of the resources.

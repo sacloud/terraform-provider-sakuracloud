@@ -8,7 +8,7 @@ description: |-
 
 # sakuracloud\_internet
 
-Use this data source to retrieve information about a SakuraCloud internet(switch+router).
+Use this data source to retrieve information about a SakuraCloud internet (Switch+Router).
 
 ## Example Usage
 

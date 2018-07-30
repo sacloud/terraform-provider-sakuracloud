@@ -29,9 +29,9 @@ resource sakuracloud_archive "foobar" {
 The following arguments are supported:
 
 * `name` - (Required) The name of the resource.
-* `size` - (Optional) The size of the resource(unit:`GB`).   
-Valid value is one of the following: [ 20(default) / 40 / 60 / 80 / 100 / 250 / 500 / 750 / 1024 ]
-* `archive_file` - (Optional) Archive file to upload(format:`raw`).
+* `size` - (Optional) The size of the resource (unit:`GB`).   
+Valid value is one of the following: [ 20 (default) / 40 / 60 / 80 / 100 / 250 / 500 / 750 / 1024 ]
+* `archive_file` - (Optional) Archive file to upload (format:`raw`).
 * `hash` - (Optional) MD5 hash value of the archive file.
 * `description` - (Optional) The description of the resource.
 * `tags` - (Optional) The tag list of the resources.
@@ -44,7 +44,7 @@ The following attributes are exported:
 
 * `id` - The ID of the resource.
 * `name` - The name of the resource.
-* `size` - The size of the resource(unit:`GB`)
+* `size` - The size of the resource (unit:`GB`).
 * `description` - The description of the resource.
 * `tags` - The tag list of the resources.
 * `icon_id` - The ID of the icon of the resource.

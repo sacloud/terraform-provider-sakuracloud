@@ -43,7 +43,7 @@ The following arguments are supported:
 * `description` - (Optional) The description of the resource.
 * `tags` - (Optional) The tag list of the resources.
 * `icon_id` - (Optional) The ID of the icon.
-* `graceful_shutdown_timeout` - (Optional) The wait time(seconds) to do graceful shutdown the server connected to the resource.
+* `graceful_shutdown_timeout` - (Optional) The wait time (seconds) to do graceful shutdown the server connected to the resource.
 * `zone` - (Optional) The ID of the zone to which the resource belongs.
 
 ## Attributes Reference
@@ -64,7 +64,6 @@ The following attributes are exported:
 * `description` - The description of the resource.
 * `tags` - The tag list of the resources.
 * `icon_id` - The ID of the icon.
-* `graceful_shutdown_timeout` - The wait time(seconds) to do graceful shutdown the server connected to the resource.
 * `zone` - The ID of the zone to which the resource belongs.
 
 ## Import

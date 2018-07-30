@@ -37,8 +37,8 @@ data sakuracloud_packet_filter "foobar" {
 Attributes for Filter Expressions:
 
 * `protocol` - The target protocol.
-* `source_nw` - The source network address(range).
-* `source_port` - The source port(range).
-* `dest_port` - The destination port(range).
+* `source_nw` - The source network address (range).
+* `source_port` - The source port (range).
+* `dest_port` - The destination port (range).
 * `allow` - The flag to allow packets. Default value is `true`. 
 * `description` - The description of the expression.

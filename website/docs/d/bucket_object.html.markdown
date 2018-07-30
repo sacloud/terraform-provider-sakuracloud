@@ -33,11 +33,11 @@ data "sakuracloud_bucket_object" "foobar" {
 * `content_type` - Content-Type header value of the bucket object.
 * `body` - String of the value of the bucket object. Set when Content-Type is `"text/*"` or `"application/json"`.
 * `etag` - ETag of the resource.
-* `size` - Size of the resource(unit: `byte`).
+* `size` - Size of the resource (unit:`byte`).
 * `last_modified` - Update date of the resource.
-* `http_url` - URL for accessing the object via HTTP(type: `subdomain`).
-* `https_url` - URL for accessing the object via HTTPS(type: `subdomain`).
-* `http_path_url` - URL for accessing the object via HTTP(type: `path`).
-* `http_cache_url` - URL for accessing the object via HTTP(type: `cache`).
-* `https_cache_url` - URL for accessing the object via HTTPS(type: `cache`)..
+* `http_url` - URL for accessing the object via HTTP (type:`subdomain`).
+* `https_url` - URL for accessing the object via HTTPS (type:`subdomain`).
+* `http_path_url` - URL for accessing the object via HTTP (type:`path`).
+* `http_cache_url` - URL for accessing the object via HTTP (type:`cache`).
+* `https_cache_url` - URL for accessing the object via HTTPS (type:`cache`)..
 

@@ -30,7 +30,7 @@ data sakuracloud_vpc_router "foobar" {
 * `id` - The ID of the resource.
 * `name` - The name of the resource.
 * `plan` - The name of the resource plan. 
-* `switch_id` - The ID of the Switch connected to the VPC Router(eth0).
+* `switch_id` - The ID of the Switch connected to the VPC Router (eth0).
 * `vip` - Virtual IP address of the VPC Router. Used when plan is in `premium` or `highspec`.
 * `ipaddress1` - The primary IP address of the VPC Router.
 * `ipaddress2` - The secondly IP address of the VPC Router. Used when plan is in `premium` or `highspec`.

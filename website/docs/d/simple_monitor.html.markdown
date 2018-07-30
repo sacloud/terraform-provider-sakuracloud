@@ -43,7 +43,7 @@ data sakuracloud_simple_monitor "foobar" {
 Attributes for Health Check:
 
 * `protocol` - Protocol used in health check.
-* `delay_loop` - Health check access interval(unit:`second`). 
+* `delay_loop` - Health check access interval (unit:`second`). 
 * `host_header` - The value of `Host` header used in http/https health check access.
 * `path` - The request path used in http/https health check access.
 * `status` - HTTP status code expected by health check access.

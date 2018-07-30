@@ -33,8 +33,8 @@ resource sakuracloud_nfs "foobar" {
 The following arguments are supported:
 
 * `name` - (Required) The name of the resource.
-* `plan` - (Optional) The plan(size) of the NFS Appliance.(unit:`GB`)   
-Valid value is one of the following: [ 100(default) / 500 / 1024 / 2048 / 4096 ]
+* `plan` - (Optional) The plan(size) of the NFS Appliance (unit:`GB`).  
+Valid value is one of the following: [ 100 (default) / 500 / 1024 / 2048 / 4096 ]
 * `switch_id` - (Required) The ID of the switch connected to the NFS Appliance.
 * `ipaddress` - (Required) The IP address of the NFS Appliance.
 * `nw_mask_len` - (Required) The network mask length of the NFS Appliance.
@@ -42,7 +42,7 @@ Valid value is one of the following: [ 100(default) / 500 / 1024 / 2048 / 4096 ]
 * `description` - (Optional) The description of the resource.
 * `tags` - (Optional) The tag list of the resources.
 * `icon_id` - (Optional) The ID of the icon.
-* `graceful_shutdown_timeout` - (Optional) The wait time(seconds) to do graceful shutdown the NFS Appliance.
+* `graceful_shutdown_timeout` - (Optional) The wait time (seconds) to do graceful shutdown the NFS Appliance.
 * `zone` - (Optional) The ID of the zone to which the resource belongs.
 
 ## Attributes Reference
@@ -51,7 +51,7 @@ The following attributes are exported:
 
 * `id` - The ID of the resource.
 * `name` - The name of the resource.
-* `plan` - The plan(size) of the NFS Appliance.(unit:`GB`)   
+* `plan` - The plan(size) of the NFS Appliance (unit:`GB`).
 * `switch_id` - The ID of the switch connected to the NFS Appliance.
 * `ipaddress` - The IP address of the NFS Appliance.
 * `nw_mask_len` - The network mask length of the NFS Appliance.

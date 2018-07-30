@@ -44,7 +44,7 @@ The following arguments are supported:
 
 * `name` - (Required) The name of the resource.
 * `plan` - (Optional) The plan of the VPC Router.   
-Valid value is one of the following: [ "standard"(default) / "premium" / "highspec" ]
+Valid value is one of the following: [ "standard" (default) / "premium" / "highspec" ]
 * `switch_id` - (Required) The ID of the switch connected to the VPC Router. Used when plan is `premium` or `highspec`.
 * `vrid` - (Required) VRID used when plan is `premium` or `highspec`.
 * `ipaddress1` - (Required) The primary IP address of the VPC Router.
@@ -54,7 +54,7 @@ Valid value is one of the following: [ "standard"(default) / "premium" / "highsp
 * `description` - (Optional) The description of the resource.
 * `tags` - (Optional) The tag list of the resources.
 * `icon_id` - (Optional) The ID of the icon.
-* `graceful_shutdown_timeout` - (Optional) The wait time(seconds) to do graceful shutdown the VPC Router.
+* `graceful_shutdown_timeout` - (Optional) The wait time (seconds) to do graceful shutdown the VPC Router.
 * `zone` - (Optional) The ID of the zone to which the resource belongs.
 
 ## Attributes Reference
@@ -64,7 +64,7 @@ The following attributes are exported:
 * `id` - The ID of the resource.
 * `name` - The name of the resource.
 * `plan` - The name of the resource plan. 
-* `switch_id` - The ID of the Switch connected to the VPC Router(eth0).
+* `switch_id` - The ID of the Switch connected to the VPC Router (eth0).
 * `vip` - Virtual IP address of the VPC Router. Used when plan is in `premium` or `highspec`.
 * `ipaddress1` - The primary IP address of the VPC Router.
 * `ipaddress2` - The secondly IP address of the VPC Router. Used when plan is in `premium` or `highspec`.

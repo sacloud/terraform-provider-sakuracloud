@@ -42,7 +42,7 @@ resource sakuracloud_mobile_gateway_sim_route "route1" {
 The following arguments are supported:
 
 * `mobile_gateway_id` - (Required) The ID of the Mobile Gateway to set SIM Route.
-* `prefix` - (Required) The routing prefix.(format:`CIDR`)
+* `prefix` - (Required) The routing prefix (format:`CIDR`).
 * `sim_id` - (Required) The ID of the routing destination SIM.
 * `zone` - (Optional) The ID of the zone to which the resource belongs.
 
@@ -53,6 +53,6 @@ The following attributes are exported:
 * `id` - The ID of the resource.
 * `zone` - The ID of the zone to which the resource belongs.
 
-## Import(not supported)
+## Import (not supported)
 
 Import of Mobile Gateway SIM Route is not supported.

@@ -37,7 +37,7 @@ The following arguments are supported:
 
 * `name` - (Required) The name of the resource.
 * `health_check` - (Required) Health check rules. It contains some attributes to [Health Check](#health-check).
-* `weighted` - (Optional) The flag for enable/disable weighting.(default:`true`)
+* `weighted` - (Optional) The flag for enable/disable weighting (default:`true`).
 * `sorry_server` - (Optional) The hostname or IP address of sorry server.
 * `description` - (Optional) The description of the resource.
 * `tags` - (Optional) The tag list of the resources.
@@ -49,7 +49,7 @@ Attributes for Health Check:
 
 * `protocol` - (Required) Protocol used in health check.  
 Valid value is one of the following: [ "http" / "https" / "ping" / "tcp" ]
-* `delay_loop` - (Optional) Health check access interval(unit:`second`, default:`10`).
+* `delay_loop` - (Optional) Health check access interval (unit:`second`, default:`10`).
 * `host_header` - (Optional) The value of `Host` header used in http/https health check access.
 * `path` - (Optional) The request path used in http/https health check access.
 * `status` - (Optional) HTTP status code expected by health check access.

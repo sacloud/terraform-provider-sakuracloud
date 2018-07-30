@@ -41,6 +41,6 @@ The following attributes are exported:
 * `public_key` - The body of the generated public key. 
 * `finger_print` - The fingerprint of the generated public key.
 
-## Import(not supported)
+## Import (not supported)
 
 Import of SSH Key Gen is not supported.

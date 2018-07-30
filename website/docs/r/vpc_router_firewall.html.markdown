@@ -108,6 +108,6 @@ The following attributes are exported:
 * `expressions` - Filtering rules. It contains some attributes to [Expressions](#expressions).
 * `zone` - The ID of the zone to which the resource belongs.
 
-## Import(not supported)
+## Import (not supported)
 
 Import of VPC Router Firewall is not supported.

@@ -36,7 +36,7 @@ The following arguments are supported:
 * `disks` - (Optional) The ID list of the Disks connected to Server.
 * `cdrom_id` - (Optional) The ID of the CD-ROM inserted to Server.
 * `packet_filter_ids` - (Optional) The ID list of the Packet Filters connected to Server.
-* `graceful_shutdown_timeout` - (Optional) The wait time(seconds) to do graceful shutdown the Server.
+* `graceful_shutdown_timeout` - (Optional) The wait time (seconds) to do graceful shutdown the Server.
 * `zone` - (Optional) The ID of the zone to which the resource belongs.
 
 ## Attributes Reference

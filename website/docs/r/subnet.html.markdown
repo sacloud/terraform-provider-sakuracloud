@@ -30,7 +30,7 @@ The following arguments are supported:
 
 * `internet_id` - (Required) The ID of the Internet resource.
 * `nw_mask_len` - (Optional) Network mask length.  
-Valid value is one of the following: [ 28(default) / 27 / 26 ]
+Valid value is one of the following: [ 28 (default) / 27 / 26 ]
 * `next_hop` - (Optional) The next hop IP address.
 * `zone` - (Optional) The ID of the zone to which the resource belongs.
 

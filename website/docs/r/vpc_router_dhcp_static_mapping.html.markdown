@@ -66,6 +66,6 @@ The following attributes are exported:
 * `ipaddress` - The MAC address to be the key of the mapping. 
 * `zone` - The ID of the zone to which the resource belongs.
 
-## Import(not supported)
+## Import (not supported)
 
 Import of VPC Router DHCP Static Mapping is not supported.

@@ -40,14 +40,14 @@ The following arguments are supported:
 
 * `name` - (Required) The name of the resource.
 * `database_type` - (Optional) The Database type.
-Valid value is one of the following: [ "postgresql"(default) / "mariadb"]
-* `plan` - (Optional) The plan(size) of the Database.   
-Valid value is one of the following: [ "10g"(default) / "30g" / "90g" / "240g" / "500g" / "1t" ]
+Valid value is one of the following: [ "postgresql" (default) / "mariadb"]
+* `plan` - (Optional) The plan (size) of the Database.   
+Valid value is one of the following: [ "10g" (default) / "30g" / "90g" / "240g" / "500g" / "1t" ]
 * `user_name` - (Required) The username to access database.
 * `user_password` - (Required) The password to access database.
 * `allow_networks` - (Optional) The network address list that allowed connections to the database.
-* `port` - (Optional) The number of the port on which the database is listening(default:`5432`).
-* `backup_time` - (Optional) The time to perform backup(format:`HH:mm`).
+* `port` - (Optional) The number of the port on which the database is listening (default:`5432`).
+* `backup_time` - (Optional) The time to perform backup (format:`HH:mm`).
 * `switch_id` - (Required) The ID of the switch connected to the database.
 * `ipaddress1` - (Required) The IP address of the database.
 * `nw_mask_len` - (Required) The network mask length of the database.
@@ -55,7 +55,7 @@ Valid value is one of the following: [ "10g"(default) / "30g" / "90g" / "240g" /
 * `description` - (Optional) The description of the resource.
 * `tags` - (Optional) The tag list of the resources.
 * `icon_id` - (Optional) The ID of the icon.
-* `graceful_shutdown_timeout` - (Optional) The wait time(seconds) to do graceful shutdown the Database.
+* `graceful_shutdown_timeout` - (Optional) The wait time (seconds) to do graceful shutdown the Database.
 * `zone` - (Optional) The ID of the zone to which the resource belongs.
 
 ## Attributes Reference

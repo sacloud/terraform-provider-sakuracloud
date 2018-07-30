@@ -29,7 +29,7 @@ data sakuracloud_cdrom "foobar" {
 
 * `id` - The ID of the resource.
 * `name` - The name of the resource.
-* `size` - Size of the resource(unit:`GB`).
+* `size` - Size of the resource (unit:`GB`).
 * `description` - The description of the resource.
 * `tags` - The tag list of the resources.
 * `icon_id` - The ID of the icon of the resource.

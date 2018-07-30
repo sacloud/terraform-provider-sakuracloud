@@ -31,7 +31,7 @@ data sakuracloud_private_host "foobar" {
 * `name` - The name of the resource.
 * `hostname` - The HostName of the resource.
 * `assigned_core` - The number of cores assigned to the Server.
-* `assigned_memory` - The size of memory allocated to the Server(unit:`GB`).
+* `assigned_memory` - The size of memory allocated to the Server (unit:`GB`).
 * `description` - The description of the resource.
 * `tags` - The tag list of the resources.
 * `zone` - The ID of the zone to which the resource belongs.

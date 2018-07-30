@@ -42,7 +42,7 @@ resource sakuracloud_mobile_gateway_static_route "r1" {
 The following arguments are supported:
 
 * `mobile_gateway_id` - (Required) The ID of the Mobile Gateway to set Static Route.
-* `prefix` - (Required) The routing prefix.(format:`CIDR`)
+* `prefix` - (Required) The routing prefix (format:`CIDR`).
 * `next_hop` - (Required) The IP address of the next hop.
 * `zone` - (Optional) The ID of the zone to which the resource belongs.
 
@@ -53,6 +53,6 @@ The following attributes are exported:
 * `id` - The ID of the resource.
 * `zone` - The ID of the zone to which the resource belongs.
 
-## Import(not supported)
+## Import (not supported)
 
 Import of Mobile Gateway Static Route is not supported.

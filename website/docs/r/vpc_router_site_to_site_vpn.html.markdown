@@ -79,6 +79,6 @@ The following attributes are exported:
 * `vpc_router_outside_ipaddress` - VPC Router outside IP address.
 * `zone` - The ID of the zone to which the resource belongs.
 
-## Import(not supported)
+## Import (not supported)
 
 Import of VPC Router Site To Site VPN is not supported.
