@@ -29,7 +29,7 @@ data sakuracloud_bridge "foobar" {
 
 * `id` - The ID of the resource.
 * `name` - The name of the resource.
-* `switch_ids` - The IDs of the switch connected to the bridge.
+* `switch_ids` - The ID list of the switches connected to the bridge.
 * `description` - The description of the resource.
 * `tags` - The tag list of the resources.
 * `icon_id` - The ID of the icon of the resource.

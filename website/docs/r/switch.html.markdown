@@ -42,7 +42,7 @@ The following attributes are exported:
 
 * `id` - The ID of the resource.
 * `name` - The name of the resource.
-* `server_ids` - The IDs of the server connected to the switch.
+* `server_ids` - The ID list of the servers connected to the switch.
 * `bridge_id` - The ID of the bridge connected to the switch.
 * `icon_id` - The ID of the icon.
 * `description` - The description of the resource.

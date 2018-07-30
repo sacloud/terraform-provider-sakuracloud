@@ -32,7 +32,7 @@ data sakuracloud_internet "foobar" {
 * `nw_mask_len` - Network mask length.
 * `band_width` - Bandwidth of outbound traffic.
 * `switch_id` - The ID of the switch.
-* `server_ids` - The IDs of the server connected to the switch.
+* `server_ids` - The ID list of the servers connected to the switch.
 * `nw_address` - The network address.
 * `gateway` - The network gateway address of the switch.
 * `min_ipaddress` - Min global IP address.
