@@ -1,8 +1,9 @@
 package sakuracloud
 
 import (
-	"github.com/hashicorp/terraform/helper/schema"
 	"time"
+
+	"github.com/hashicorp/terraform/helper/schema"
 )
 
 type shutdownHandler interface {

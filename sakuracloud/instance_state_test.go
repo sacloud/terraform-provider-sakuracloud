@@ -1,9 +1,10 @@
 package sakuracloud
 
 import (
+	"testing"
+
 	"github.com/hashicorp/terraform/terraform"
 	"github.com/stretchr/testify/assert"
-	"testing"
 )
 
 func TestStringSliceFromState(t *testing.T) {

@@ -2,11 +2,12 @@ package sakuracloud
 
 import (
 	"fmt"
+	"time"
+
 	"github.com/hashicorp/terraform/helper/schema"
 	"github.com/hashicorp/terraform/helper/validation"
 	"github.com/sacloud/libsacloud/api"
 	"github.com/sacloud/libsacloud/sacloud"
-	"time"
 )
 
 const vpcRouterPowerAPILockKey = "sakuracloud_vpc_router.power.%d.lock"

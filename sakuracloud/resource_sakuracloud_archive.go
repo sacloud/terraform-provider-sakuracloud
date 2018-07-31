@@ -3,14 +3,15 @@ package sakuracloud
 import (
 	"crypto/md5"
 	"fmt"
+	"io"
+	"os"
+
 	"github.com/hashicorp/terraform/helper/schema"
 	"github.com/hashicorp/terraform/helper/validation"
 	"github.com/mitchellh/go-homedir"
 	"github.com/sacloud/ftps"
 	"github.com/sacloud/libsacloud/api"
 	"github.com/sacloud/libsacloud/sacloud"
-	"io"
-	"os"
 )
 
 var allowArchiveSizes = []string{"20", "40", "60", "80", "100", "250", "500", "750", "1024"}

@@ -3,11 +3,12 @@ package sakuracloud
 import (
 	"errors"
 	"fmt"
+	"testing"
+
 	"github.com/hashicorp/terraform/helper/resource"
 	"github.com/hashicorp/terraform/terraform"
 	"github.com/mitchellh/goamz/aws"
 	"github.com/mitchellh/goamz/s3"
-	"testing"
 )
 
 func TestAccResourceSakuraCloudBucketObject(t *testing.T) {

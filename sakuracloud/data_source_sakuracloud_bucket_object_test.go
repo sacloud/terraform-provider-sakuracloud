@@ -1,8 +1,9 @@
 package sakuracloud
 
 import (
-	"github.com/hashicorp/terraform/helper/resource"
 	"testing"
+
+	"github.com/hashicorp/terraform/helper/resource"
 )
 
 func TestAccSakuraCloudBucketObjectDataSource_Basic(t *testing.T) {

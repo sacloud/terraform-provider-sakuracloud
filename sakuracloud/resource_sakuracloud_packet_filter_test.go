@@ -3,11 +3,13 @@ package sakuracloud
 import (
 	"errors"
 	"fmt"
+
 	"github.com/hashicorp/terraform/helper/resource"
 	"github.com/hashicorp/terraform/terraform"
 
-	"github.com/sacloud/libsacloud/sacloud"
 	"testing"
+
+	"github.com/sacloud/libsacloud/sacloud"
 )
 
 func TestAccResourceSakuraCloudPacketFilter(t *testing.T) {

@@ -3,11 +3,12 @@ package sakuracloud
 import (
 	"errors"
 	"fmt"
+	"regexp"
+	"testing"
+
 	"github.com/hashicorp/terraform/helper/resource"
 	"github.com/hashicorp/terraform/terraform"
 	"github.com/sacloud/libsacloud/sacloud"
-	"regexp"
-	"testing"
 )
 
 func TestAccResourceSakuraCloudPrivateHost(t *testing.T) {

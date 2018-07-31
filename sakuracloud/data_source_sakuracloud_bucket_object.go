@@ -2,10 +2,11 @@ package sakuracloud
 
 import (
 	"fmt"
-	"github.com/hashicorp/terraform/helper/schema"
 	"log"
 	"regexp"
 	"strings"
+
+	"github.com/hashicorp/terraform/helper/schema"
 )
 
 func dataSourceSakuraCloudBucketObject() *schema.Resource {

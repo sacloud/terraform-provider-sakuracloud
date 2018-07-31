@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"bytes"
+
 	"github.com/hashicorp/terraform/helper/hashcode"
 	"github.com/hashicorp/terraform/helper/schema"
 	"github.com/hashicorp/terraform/helper/validation"

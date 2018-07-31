@@ -5,11 +5,12 @@ import (
 	"fmt"
 
 	"errors"
+	"time"
+
 	"github.com/hashicorp/terraform/helper/hashcode"
 	"github.com/hashicorp/terraform/helper/schema"
 	"github.com/hashicorp/terraform/helper/validation"
 	"github.com/sacloud/libsacloud/api"
-	"time"
 )
 
 func resourceSakuraCloudVPCRouterInterface() *schema.Resource {

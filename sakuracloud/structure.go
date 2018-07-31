@@ -2,13 +2,15 @@ package sakuracloud
 
 import (
 	"fmt"
+
 	"github.com/hashicorp/terraform/helper/schema"
 	"github.com/hashicorp/terraform/terraform"
 
-	"github.com/sacloud/libsacloud/sacloud"
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/sacloud/libsacloud/sacloud"
 )
 
 type resourceValueGetable interface {

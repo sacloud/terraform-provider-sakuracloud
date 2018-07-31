@@ -3,9 +3,10 @@ package sakuracloud
 import (
 	"errors"
 	"fmt"
+	"testing"
+
 	"github.com/hashicorp/terraform/helper/resource"
 	"github.com/hashicorp/terraform/terraform"
-	"testing"
 )
 
 func TestAccSakuraCloudDataSourceSwitch_Basic(t *testing.T) {
