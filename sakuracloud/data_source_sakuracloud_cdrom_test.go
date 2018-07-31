@@ -20,13 +20,14 @@ func TestAccSakuraCloudDataSourceCDROM_Basic(t *testing.T) {
 				Config: testAccCheckSakuraCloudDataSourceCDROMConfig,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckSakuraCloudCDROMDataSourceID("data.sakuracloud_cdrom.foobar"),
-					resource.TestCheckResourceAttr("data.sakuracloud_cdrom.foobar", "name", "Ubuntu server 16.04.4 LTS 64bit"),
+					resource.TestCheckResourceAttr("data.sakuracloud_cdrom.foobar", "name", "Ubuntu server 18.04 LTS 64bit"),
 					resource.TestCheckResourceAttr("data.sakuracloud_cdrom.foobar", "size", "5"),
-					resource.TestCheckResourceAttr("data.sakuracloud_cdrom.foobar", "tags.#", "4"),
+					resource.TestCheckResourceAttr("data.sakuracloud_cdrom.foobar", "tags.#", "5"),
 					resource.TestCheckResourceAttr("data.sakuracloud_cdrom.foobar", "tags.0", "arch-64bit"),
-					resource.TestCheckResourceAttr("data.sakuracloud_cdrom.foobar", "tags.1", "distro-ubuntu"),
-					resource.TestCheckResourceAttr("data.sakuracloud_cdrom.foobar", "tags.2", "distro-ver-16.04.4"),
-					resource.TestCheckResourceAttr("data.sakuracloud_cdrom.foobar", "tags.3", "os-unix"),
+					resource.TestCheckResourceAttr("data.sakuracloud_cdrom.foobar", "tags.1", "current-stable"),
+					resource.TestCheckResourceAttr("data.sakuracloud_cdrom.foobar", "tags.2", "distro-ubuntu"),
+					resource.TestCheckResourceAttr("data.sakuracloud_cdrom.foobar", "tags.3", "distro-ver-18.04"),
+					resource.TestCheckResourceAttr("data.sakuracloud_cdrom.foobar", "tags.4", "os-unix"),
 				),
 			},
 			{
@@ -129,7 +130,7 @@ var testAccCheckSakuraCloudDataSourceCDROMConfig = `
 data "sakuracloud_cdrom" "foobar" {
     filter = {
 	name = "Name"
-	values = ["Ubuntu Server 16"]
+	values = ["Ubuntu Server 18"]
     }
 }`
 
@@ -137,7 +138,7 @@ var testAccCheckSakuraCloudDataSourceCDROMConfig_With_Tag = `
 data "sakuracloud_cdrom" "foobar" {
     filter = {
 	name = "Tags"
-	values = ["distro-ubuntu","os-linux"]
+	values = ["distro-ubuntu","os-unix"]
     }
 }`
 
@@ -159,7 +160,7 @@ data "sakuracloud_cdrom" "foobar" {
 
 var testAccCheckSakuraCloudDataSourceCDROM_NameSelector_Exists = `
 data "sakuracloud_cdrom" "foobar" {
-    name_selectors = ["Ubuntu","server","16"]
+    name_selectors = ["Ubuntu","server","18"]
 }
 `
 var testAccCheckSakuraCloudDataSourceCDROM_NameSelector_NotExists = `
@@ -170,7 +171,7 @@ data "sakuracloud_cdrom" "foobar" {
 
 var testAccCheckSakuraCloudDataSourceCDROM_TagSelector_Exists = `
 data "sakuracloud_cdrom" "foobar" {
-	tag_selectors = ["distro-ubuntu","os-linux"]
+	tag_selectors = ["distro-ubuntu","os-unix"]
 }`
 
 var testAccCheckSakuraCloudDataSourceCDROM_TagSelector_NotExists = `
