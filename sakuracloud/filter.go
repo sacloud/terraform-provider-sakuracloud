@@ -2,9 +2,10 @@ package sakuracloud
 
 import (
 	"fmt"
-	"github.com/hashicorp/terraform/helper/resource"
 	"os"
 	"strings"
+
+	"github.com/hashicorp/terraform/helper/resource"
 )
 
 var filterNoResultMessage = "Your query returned no results. Please change your filters or selectors and try again"

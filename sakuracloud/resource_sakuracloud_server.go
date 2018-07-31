@@ -2,13 +2,15 @@ package sakuracloud
 
 import (
 	"fmt"
+
 	"github.com/hashicorp/terraform/helper/schema"
 	"github.com/hashicorp/terraform/helper/validation"
+
+	"log"
 
 	"github.com/sacloud/libsacloud/api"
 	"github.com/sacloud/libsacloud/sacloud"
 	serverutils "github.com/sacloud/libsacloud/utils/server"
-	"log"
 )
 
 const serverAPILockKey = "sakuracloud_server.lock"

@@ -2,12 +2,14 @@ package sakuracloud
 
 import (
 	"fmt"
+
 	"github.com/hashicorp/terraform/helper/schema"
 	"github.com/hashicorp/terraform/helper/validation"
 
+	"log"
+
 	"github.com/sacloud/libsacloud/api"
 	"github.com/sacloud/libsacloud/sacloud"
-	"log"
 )
 
 func resourceSakuraCloudDisk() *schema.Resource {

@@ -2,11 +2,13 @@ package sakuracloud
 
 import (
 	"fmt"
+
 	"github.com/hashicorp/terraform/helper/resource"
 	"github.com/hashicorp/terraform/terraform"
 
-	"github.com/sacloud/libsacloud/sacloud"
 	"testing"
+
+	"github.com/sacloud/libsacloud/sacloud"
 )
 
 func TestAccSakuraCloudVPCRouterInterface_Basic(t *testing.T) {

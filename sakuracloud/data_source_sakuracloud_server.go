@@ -2,6 +2,7 @@ package sakuracloud
 
 import (
 	"fmt"
+
 	"github.com/hashicorp/terraform/helper/schema"
 	"github.com/sacloud/libsacloud/sacloud"
 )

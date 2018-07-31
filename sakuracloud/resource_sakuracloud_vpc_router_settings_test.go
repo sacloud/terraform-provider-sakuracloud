@@ -2,12 +2,14 @@ package sakuracloud
 
 import (
 	"errors"
+
 	"github.com/hashicorp/terraform/helper/resource"
 	"github.com/hashicorp/terraform/terraform"
 
-	"github.com/sacloud/libsacloud/sacloud"
 	"regexp"
 	"testing"
+
+	"github.com/sacloud/libsacloud/sacloud"
 )
 
 func TestAccSakuraCloudVPCRouterSetting_Basic(t *testing.T) {

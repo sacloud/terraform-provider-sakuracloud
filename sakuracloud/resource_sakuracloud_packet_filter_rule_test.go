@@ -1,9 +1,10 @@
 package sakuracloud
 
 import (
+	"testing"
+
 	"github.com/hashicorp/terraform/helper/resource"
 	"github.com/sacloud/libsacloud/sacloud"
-	"testing"
 )
 
 func TestAccResourceSakuraCloudPacketFilterRule(t *testing.T) {

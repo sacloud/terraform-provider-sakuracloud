@@ -3,15 +3,16 @@ package sakuracloud
 import (
 	"bytes"
 	"fmt"
-	"github.com/hashicorp/terraform/helper/schema"
-	"github.com/mitchellh/go-homedir"
-	"github.com/mitchellh/goamz/aws"
-	"github.com/mitchellh/goamz/s3"
 	"io"
 	"mime"
 	"os"
 	"path/filepath"
 	"strings"
+
+	"github.com/hashicorp/terraform/helper/schema"
+	"github.com/mitchellh/go-homedir"
+	"github.com/mitchellh/goamz/aws"
+	"github.com/mitchellh/goamz/s3"
 )
 
 const objectStorageAPIHost = "b.sakurastorage.jp"

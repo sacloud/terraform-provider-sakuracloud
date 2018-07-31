@@ -5,6 +5,7 @@ import (
 	"strconv"
 
 	"bytes"
+
 	"github.com/hashicorp/terraform/helper/schema"
 	"github.com/hashicorp/terraform/helper/validation"
 	"github.com/sacloud/libsacloud/api"

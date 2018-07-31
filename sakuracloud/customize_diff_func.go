@@ -1,9 +1,10 @@
 package sakuracloud
 
 import (
-	"github.com/hashicorp/terraform/helper/schema"
 	"reflect"
 	"sort"
+
+	"github.com/hashicorp/terraform/helper/schema"
 )
 
 func composeCustomizeDiff(funcs ...schema.CustomizeDiffFunc) schema.CustomizeDiffFunc {

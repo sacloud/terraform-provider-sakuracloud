@@ -2,8 +2,9 @@ package sakuracloud
 
 import (
 	"fmt"
-	"github.com/hashicorp/terraform/terraform"
 	"strconv"
+
+	"github.com/hashicorp/terraform/terraform"
 )
 
 // StringSliceFromState returns string slice from *terraform.InstanceState.Attributes

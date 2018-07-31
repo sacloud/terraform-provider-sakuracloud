@@ -1,8 +1,9 @@
 package sakuracloud
 
 import (
-	"github.com/hashicorp/terraform/helper/resource"
 	"testing"
+
+	"github.com/hashicorp/terraform/helper/resource"
 )
 
 func TestAccResourceSakuraCloudServerConnector(t *testing.T) {

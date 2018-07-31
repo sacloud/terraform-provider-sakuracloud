@@ -1,8 +1,9 @@
 package sakuracloud
 
 import (
-	"github.com/sacloud/libsacloud/api"
 	"time"
+
+	"github.com/sacloud/libsacloud/api"
 )
 
 // Config type of SakuraCloud Config

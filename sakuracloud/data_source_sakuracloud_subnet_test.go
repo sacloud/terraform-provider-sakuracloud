@@ -3,6 +3,7 @@ package sakuracloud
 import (
 	"errors"
 	"fmt"
+
 	"github.com/hashicorp/terraform/helper/resource"
 	"github.com/hashicorp/terraform/terraform"
 

@@ -3,13 +3,15 @@ package sakuracloud
 import (
 	"encoding/base64"
 	"fmt"
+
 	"github.com/hashicorp/terraform/helper/schema"
 	"github.com/mitchellh/go-homedir"
 
-	"github.com/sacloud/libsacloud/api"
-	"github.com/sacloud/libsacloud/sacloud"
 	"io/ioutil"
 	"os"
+
+	"github.com/sacloud/libsacloud/api"
+	"github.com/sacloud/libsacloud/sacloud"
 )
 
 func resourceSakuraCloudIcon() *schema.Resource {
