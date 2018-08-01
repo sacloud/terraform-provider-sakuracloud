@@ -5,11 +5,16 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/hashicorp/terraform/helper/acctest"
 	"github.com/hashicorp/terraform/helper/resource"
 	"github.com/hashicorp/terraform/terraform"
 )
 
 func TestAccSakuraCloudDataSourceNFS_Basic(t *testing.T) {
+	randString1 := acctest.RandStringFromCharSet(5, acctest.CharSetAlpha)
+	randString2 := acctest.RandStringFromCharSet(20, acctest.CharSetAlpha)
+	name := fmt.Sprintf("%s_%s", randString1, randString2)
+
 	resource.Test(t, resource.TestCase{
 		PreCheck:                  func() { testAccPreCheck(t) },
 		Providers:                 testAccProviders,
@@ -18,14 +23,14 @@ func TestAccSakuraCloudDataSourceNFS_Basic(t *testing.T) {
 
 		Steps: []resource.TestStep{
 			{
-				Config: testAccCheckSakuraCloudDataSourceNFSBase,
+				Config: testAccCheckSakuraCloudDataSourceNFSBase(name),
 				Check:  testAccCheckSakuraCloudNFSDataSourceID("sakuracloud_nfs.foobar"),
 			},
 			{
-				Config: testAccCheckSakuraCloudDataSourceNFSConfig,
+				Config: testAccCheckSakuraCloudDataSourceNFSConfig(name),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckSakuraCloudNFSDataSourceID("data.sakuracloud_nfs.foobar"),
-					resource.TestCheckResourceAttr("data.sakuracloud_nfs.foobar", "name", "name_test"),
+					resource.TestCheckResourceAttr("data.sakuracloud_nfs.foobar", "name", name),
 					resource.TestCheckResourceAttr("data.sakuracloud_nfs.foobar", "description", "description_test"),
 					resource.TestCheckResourceAttr("data.sakuracloud_nfs.foobar", "tags.#", "3"),
 					resource.TestCheckResourceAttr("data.sakuracloud_nfs.foobar", "tags.0", "tag1"),
@@ -34,32 +39,32 @@ func TestAccSakuraCloudDataSourceNFS_Basic(t *testing.T) {
 				),
 			},
 			{
-				Config: testAccCheckSakuraCloudDataSourceNFSConfig_With_Tag,
+				Config: testAccCheckSakuraCloudDataSourceNFSConfig_With_Tag(name),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckSakuraCloudNFSDataSourceID("data.sakuracloud_nfs.foobar"),
 				),
 			},
 			{
-				Config: testAccCheckSakuraCloudDataSourceNFS_NameSelector_Exists,
+				Config: testAccCheckSakuraCloudDataSourceNFS_NameSelector_Exists(name, randString1, randString2),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckSakuraCloudNFSDataSourceID("data.sakuracloud_nfs.foobar"),
 				),
 			},
 			{
-				Config: testAccCheckSakuraCloudDataSourceNFS_TagSelector_Exists,
+				Config: testAccCheckSakuraCloudDataSourceNFS_TagSelector_Exists(name),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckSakuraCloudNFSDataSourceID("data.sakuracloud_nfs.foobar"),
 				),
 			},
 			{
-				Config: testAccCheckSakuraCloudDataSourceNFSConfig_NotExists,
+				Config: testAccCheckSakuraCloudDataSourceNFSConfig_NotExists(name),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckSakuraCloudNFSDataSourceNotExists("data.sakuracloud_nfs.foobar"),
 				),
 				Destroy: true,
 			},
 			{
-				Config: testAccCheckSakuraCloudDataSourceNFSConfig_With_NotExists_Tag,
+				Config: testAccCheckSakuraCloudDataSourceNFSConfig_With_NotExists_Tag(name),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckSakuraCloudNFSDataSourceNotExists("data.sakuracloud_nfs.foobar"),
 				),
@@ -129,9 +134,10 @@ func testAccCheckSakuraCloudNFSDataSourceDestroy(s *terraform.State) error {
 	return nil
 }
 
-var testAccCheckSakuraCloudDataSourceNFSBase = `
+func testAccCheckSakuraCloudDataSourceNFSBase(name string) string {
+	return fmt.Sprintf(`
 resource sakuracloud_switch "sw"{
-    name = "sw"
+    name = "%s"
 }
 resource "sakuracloud_nfs" "foobar" {
     switch_id = "${sakuracloud_switch.sw.id}"
@@ -139,14 +145,16 @@ resource "sakuracloud_nfs" "foobar" {
     nw_mask_len = 24
     default_route = "192.168.11.1"
 
-    name = "name_test"
+    name = "%s"
     description = "description_test"
     tags = ["tag1","tag2","tag3"]
-}`
+}`, name, name)
+}
 
-var testAccCheckSakuraCloudDataSourceNFSConfig = `
+func testAccCheckSakuraCloudDataSourceNFSConfig(name string) string {
+	return fmt.Sprintf(`
 resource sakuracloud_switch "sw"{
-    name = "sw"
+    name = "%s"
 }
 resource "sakuracloud_nfs" "foobar" {
     switch_id = "${sakuracloud_switch.sw.id}"
@@ -154,20 +162,22 @@ resource "sakuracloud_nfs" "foobar" {
     nw_mask_len = 24
     default_route = "192.168.11.1"
 
-    name = "name_test"
+    name = "%s"
     description = "description_test"
     tags = ["tag1","tag2","tag3"]
 }
 data "sakuracloud_nfs" "foobar" {
     filter = {
 	name = "Name"
-	values = ["name_test"]
+	values = ["%s"]
     }
-}`
+}`, name, name, name)
+}
 
-var testAccCheckSakuraCloudDataSourceNFSConfig_With_Tag = `
+func testAccCheckSakuraCloudDataSourceNFSConfig_With_Tag(name string) string {
+	return fmt.Sprintf(`
 resource sakuracloud_switch "sw"{
-    name = "sw"
+    name = "%s"
 }
 resource "sakuracloud_nfs" "foobar" {
     switch_id = "${sakuracloud_switch.sw.id}"
@@ -175,7 +185,7 @@ resource "sakuracloud_nfs" "foobar" {
     nw_mask_len = 24
     default_route = "192.168.11.1"
 
-    name = "name_test"
+    name = "%s"
     description = "description_test"
     tags = ["tag1","tag2","tag3"]
 }
@@ -184,11 +194,13 @@ data "sakuracloud_nfs" "foobar" {
 	name = "Tags"
 	values = ["tag1","tag3"]
     }
-}`
+}`, name, name)
+}
 
-var testAccCheckSakuraCloudDataSourceNFSConfig_With_NotExists_Tag = `
+func testAccCheckSakuraCloudDataSourceNFSConfig_With_NotExists_Tag(name string) string {
+	return fmt.Sprintf(`
 resource sakuracloud_switch "sw"{
-    name = "sw"
+    name = "%s"
 }
 resource "sakuracloud_nfs" "foobar" {
     switch_id = "${sakuracloud_switch.sw.id}"
@@ -196,7 +208,7 @@ resource "sakuracloud_nfs" "foobar" {
     nw_mask_len = 24
     default_route = "192.168.11.1"
 
-    name = "name_test"
+    name = "%s"
     description = "description_test"
     tags = ["tag1","tag2","tag3"]
 }
@@ -205,11 +217,13 @@ data "sakuracloud_nfs" "foobar" {
 	name = "Tags"
 	values = ["tag1-xxxxxxx","tag3-xxxxxxxx"]
     }
-}`
+}`, name, name)
+}
 
-var testAccCheckSakuraCloudDataSourceNFSConfig_NotExists = `
+func testAccCheckSakuraCloudDataSourceNFSConfig_NotExists(name string) string {
+	return fmt.Sprintf(`
 resource sakuracloud_switch "sw"{
-    name = "sw"
+    name = "%s"
 }
 resource "sakuracloud_nfs" "foobar" {
     switch_id = "${sakuracloud_switch.sw.id}"
@@ -217,7 +231,7 @@ resource "sakuracloud_nfs" "foobar" {
     nw_mask_len = 24
     default_route = "192.168.11.1"
 
-    name = "name_test"
+    name = "%s"
     description = "description_test"
     tags = ["tag1","tag2","tag3"]
 }
@@ -226,11 +240,13 @@ data "sakuracloud_nfs" "foobar" {
 	name = "Name"
 	values = ["xxxxxxxxxxxxxxxxxx"]
     }
-}`
+}`, name, name)
+}
 
-var testAccCheckSakuraCloudDataSourceNFS_NameSelector_Exists = `
+func testAccCheckSakuraCloudDataSourceNFS_NameSelector_Exists(name, p1, p2 string) string {
+	return fmt.Sprintf(`
 resource sakuracloud_switch "sw"{
-    name = "sw"
+    name = "%s"
 }
 resource "sakuracloud_nfs" "foobar" {
     switch_id = "${sakuracloud_switch.sw.id}"
@@ -238,23 +254,25 @@ resource "sakuracloud_nfs" "foobar" {
     nw_mask_len = 24
     default_route = "192.168.11.1"
 
-    name = "name_test"
+    name = "%s"
     description = "description_test"
     tags = ["tag1","tag2","tag3"]
 }
 data "sakuracloud_nfs" "foobar" {
-    name_selectors = ["name", "test"]
+    name_selectors = ["%s", "%s"]
+}`, name, name, p1, p2)
 }
-`
+
 var testAccCheckSakuraCloudDataSourceNFS_NameSelector_NotExists = `
 data "sakuracloud_nfs" "foobar" {
     name_selectors = ["xxxxxxxxxx"]
 }
 `
 
-var testAccCheckSakuraCloudDataSourceNFS_TagSelector_Exists = `
+func testAccCheckSakuraCloudDataSourceNFS_TagSelector_Exists(name string) string {
+	return fmt.Sprintf(`
 resource sakuracloud_switch "sw"{
-    name = "sw"
+    name = "%s"
 }
 resource "sakuracloud_nfs" "foobar" {
     switch_id = "${sakuracloud_switch.sw.id}"
@@ -262,13 +280,14 @@ resource "sakuracloud_nfs" "foobar" {
     nw_mask_len = 24
     default_route = "192.168.11.1"
 
-    name = "name_test"
+    name = "%s"
     description = "description_test"
     tags = ["tag1","tag2","tag3"]
 }
 data "sakuracloud_nfs" "foobar" {
 	tag_selectors = ["tag1","tag2","tag3"]
-}`
+}`, name, name)
+}
 
 var testAccCheckSakuraCloudDataSourceNFS_TagSelector_NotExists = `
 data "sakuracloud_nfs" "foobar" {

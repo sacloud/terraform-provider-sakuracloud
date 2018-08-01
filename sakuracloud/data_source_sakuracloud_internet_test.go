@@ -5,11 +5,16 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/hashicorp/terraform/helper/acctest"
 	"github.com/hashicorp/terraform/helper/resource"
 	"github.com/hashicorp/terraform/terraform"
 )
 
 func TestAccSakuraCloudDataSourceInternet_Basic(t *testing.T) {
+	randString1 := acctest.RandStringFromCharSet(5, acctest.CharSetAlpha)
+	randString2 := acctest.RandStringFromCharSet(20, acctest.CharSetAlpha)
+	name := fmt.Sprintf("%s_%s", randString1, randString2)
+
 	resource.Test(t, resource.TestCase{
 		PreCheck:                  func() { testAccPreCheck(t) },
 		Providers:                 testAccProviders,
@@ -18,14 +23,14 @@ func TestAccSakuraCloudDataSourceInternet_Basic(t *testing.T) {
 
 		Steps: []resource.TestStep{
 			{
-				Config: testAccCheckSakuraCloudDataSourceInternetBase,
+				Config: testAccCheckSakuraCloudDataSourceInternetBase(name),
 				Check:  testAccCheckSakuraCloudInternetDataSourceID("sakuracloud_internet.foobar"),
 			},
 			{
-				Config: testAccCheckSakuraCloudDataSourceInternetConfig,
+				Config: testAccCheckSakuraCloudDataSourceInternetConfig(name),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckSakuraCloudInternetDataSourceID("data.sakuracloud_internet.foobar"),
-					resource.TestCheckResourceAttr("data.sakuracloud_internet.foobar", "name", "name_test"),
+					resource.TestCheckResourceAttr("data.sakuracloud_internet.foobar", "name", name),
 					resource.TestCheckResourceAttr("data.sakuracloud_internet.foobar", "description", "description_test"),
 					resource.TestCheckResourceAttr("data.sakuracloud_internet.foobar", "tags.#", "3"),
 					resource.TestCheckResourceAttr("data.sakuracloud_internet.foobar", "tags.0", "tag1"),
@@ -38,32 +43,32 @@ func TestAccSakuraCloudDataSourceInternet_Basic(t *testing.T) {
 				),
 			},
 			{
-				Config: testAccCheckSakuraCloudDataSourceInternetConfig_With_Tag,
+				Config: testAccCheckSakuraCloudDataSourceInternetConfig_With_Tag(name),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckSakuraCloudInternetDataSourceID("data.sakuracloud_internet.foobar"),
 				),
 			},
 			{
-				Config: testAccCheckSakuraCloudDataSourceInternet_NameSelector_Exists,
+				Config: testAccCheckSakuraCloudDataSourceInternet_NameSelector_Exists(name, randString1, randString2),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckSakuraCloudInternetDataSourceID("data.sakuracloud_internet.foobar"),
 				),
 			},
 			{
-				Config: testAccCheckSakuraCloudDataSourceInternet_TagSelector_Exists,
+				Config: testAccCheckSakuraCloudDataSourceInternet_TagSelector_Exists(name),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckSakuraCloudInternetDataSourceID("data.sakuracloud_internet.foobar"),
 				),
 			},
 			{
-				Config: testAccCheckSakuraCloudDataSourceInternetConfig_NotExists,
+				Config: testAccCheckSakuraCloudDataSourceInternetConfig_NotExists(name),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckSakuraCloudInternetDataSourceNotExists("data.sakuracloud_internet.foobar"),
 				),
 				Destroy: true,
 			},
 			{
-				Config: testAccCheckSakuraCloudDataSourceInternetConfig_With_NotExists_Tag,
+				Config: testAccCheckSakuraCloudDataSourceInternetConfig_With_NotExists_Tag(name),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckSakuraCloudInternetDataSourceNotExists("data.sakuracloud_internet.foobar"),
 				),
@@ -133,30 +138,34 @@ func testAccCheckSakuraCloudInternetDataSourceDestroy(s *terraform.State) error 
 	return nil
 }
 
-var testAccCheckSakuraCloudDataSourceInternetBase = `
+func testAccCheckSakuraCloudDataSourceInternetBase(name string) string {
+	return fmt.Sprintf(`
 resource "sakuracloud_internet" "foobar" {
-    name = "name_test"
+    name = "%s"
     description = "description_test"
     tags = ["tag1","tag2","tag3"]
+}`, name)
 }
-`
 
-var testAccCheckSakuraCloudDataSourceInternetConfig = `
+func testAccCheckSakuraCloudDataSourceInternetConfig(name string) string {
+	return fmt.Sprintf(`
 resource "sakuracloud_internet" "foobar" {
-    name = "name_test"
+    name = "%s"
     description = "description_test"
     tags = ["tag1","tag2","tag3"]
 }
 data "sakuracloud_internet" "foobar" {
     filter = {
 	name = "Name"
-	values = ["name_test"]
+	values = ["%s"]
     }
-}`
+}`, name, name)
+}
 
-var testAccCheckSakuraCloudDataSourceInternetConfig_With_Tag = `
+func testAccCheckSakuraCloudDataSourceInternetConfig_With_Tag(name string) string {
+	return fmt.Sprintf(`
 resource "sakuracloud_internet" "foobar" {
-    name = "name_test"
+    name = "%s"
     description = "description_test"
     tags = ["tag1","tag2","tag3"]
 }
@@ -165,11 +174,13 @@ data "sakuracloud_internet" "foobar" {
 	name = "Tags"
 	values = ["tag1","tag3"]
     }
-}`
+}`, name)
+}
 
-var testAccCheckSakuraCloudDataSourceInternetConfig_With_NotExists_Tag = `
+func testAccCheckSakuraCloudDataSourceInternetConfig_With_NotExists_Tag(name string) string {
+	return fmt.Sprintf(`
 resource "sakuracloud_internet" "foobar" {
-    name = "name_test"
+    name = "%s"
     description = "description_test"
     tags = ["tag1","tag2","tag3"]
 }
@@ -178,11 +189,13 @@ data "sakuracloud_internet" "foobar" {
 	name = "Tags"
 	values = ["tag1-xxxxxxx","tag3-xxxxxxxx"]
     }
-}`
+}`, name)
+}
 
-var testAccCheckSakuraCloudDataSourceInternetConfig_NotExists = `
+func testAccCheckSakuraCloudDataSourceInternetConfig_NotExists(name string) string {
+	return fmt.Sprintf(`
 resource "sakuracloud_internet" "foobar" {
-    name = "name_test"
+    name = "%s"
     description = "description_test"
     tags = ["tag1","tag2","tag3"]
 }
@@ -191,18 +204,20 @@ data "sakuracloud_internet" "foobar" {
 	name = "Name"
 	values = ["xxxxxxxxxxxxxxxxxx"]
     }
-}`
+}`, name)
+}
 
-var testAccCheckSakuraCloudDataSourceInternet_NameSelector_Exists = `
+func testAccCheckSakuraCloudDataSourceInternet_NameSelector_Exists(name, p1, p2 string) string {
+	return fmt.Sprintf(`
 resource "sakuracloud_internet" "foobar" {
-    name = "name_test"
+    name = "%s"
     description = "description_test"
     tags = ["tag1","tag2","tag3"]
 }
 data "sakuracloud_internet" "foobar" {
-    name_selectors = ["name", "test"]
+    name_selectors = ["%s", "%s"]
+}`, name, p1, p2)
 }
-`
 
 var testAccCheckSakuraCloudDataSourceInternet_NameSelector_NotExists = `
 data "sakuracloud_internet" "foobar" {
@@ -210,15 +225,17 @@ data "sakuracloud_internet" "foobar" {
 }
 `
 
-var testAccCheckSakuraCloudDataSourceInternet_TagSelector_Exists = `
+func testAccCheckSakuraCloudDataSourceInternet_TagSelector_Exists(name string) string {
+	return fmt.Sprintf(`
 resource "sakuracloud_internet" "foobar" {
-    name = "name_test"
+    name = "%s"
     description = "description_test"
     tags = ["tag1","tag2","tag3"]
 }
 data "sakuracloud_internet" "foobar" {
 	tag_selectors = ["tag1","tag2","tag3"]
-}`
+}`, name)
+}
 
 var testAccCheckSakuraCloudDataSourceInternet_TagSelector_NotExists = `
 data "sakuracloud_internet" "foobar" {

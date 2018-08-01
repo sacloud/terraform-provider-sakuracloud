@@ -65,6 +65,10 @@ func dataSourceSakuraCloudBucketObject() *schema.Resource {
 				Type:     schema.TypeString,
 				Computed: true,
 			},
+			"https_path_url": {
+				Type:     schema.TypeString,
+				Computed: true,
+			},
 			"http_cache_url": {
 				Type:     schema.TypeString,
 				Computed: true,
@@ -129,8 +133,9 @@ func dataSourceSakuraCloudBucketObjectRead(d *schema.ResourceData, meta interfac
 		key = strings.TrimLeft(key, "/")
 	}
 	d.Set("http_url", fmt.Sprintf("http://%s.%s/%s", strBucket, objectStorageAPIHost, key))
-	d.Set("http_path_url", fmt.Sprintf("http://%s/%s/%s", objectStorageAPIHost, strBucket, key))
 	d.Set("https_url", fmt.Sprintf("https://%s.%s/%s", strBucket, objectStorageAPIHost, key))
+	d.Set("http_path_url", fmt.Sprintf("http://%s/%s/%s", objectStorageAPIHost, strBucket, key))
+	d.Set("https_path_url", fmt.Sprintf("https://%s/%s/%s", objectStorageAPIHost, strBucket, key))
 	d.Set("http_cache_url", fmt.Sprintf("http://%s.%s/%s", strBucket, objectStorageCachedHost, key))
 	d.Set("https_cache_url", fmt.Sprintf("https://%s.%s/%s", strBucket, objectStorageCachedHost, key))
 

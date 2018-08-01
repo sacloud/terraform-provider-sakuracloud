@@ -5,11 +5,16 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/hashicorp/terraform/helper/acctest"
 	"github.com/hashicorp/terraform/helper/resource"
 	"github.com/hashicorp/terraform/terraform"
 )
 
 func TestAccSakuraCloudDataSourceServer_Basic(t *testing.T) {
+	randString1 := acctest.RandStringFromCharSet(5, acctest.CharSetAlpha)
+	randString2 := acctest.RandStringFromCharSet(20, acctest.CharSetAlpha)
+	name := fmt.Sprintf("%s_%s", randString1, randString2)
+
 	resource.Test(t, resource.TestCase{
 		PreCheck:                  func() { testAccPreCheck(t) },
 		Providers:                 testAccProviders,
@@ -18,14 +23,14 @@ func TestAccSakuraCloudDataSourceServer_Basic(t *testing.T) {
 
 		Steps: []resource.TestStep{
 			{
-				Config: testAccCheckSakuraCloudDataSourceServerBase,
+				Config: testAccCheckSakuraCloudDataSourceServerBase(name),
 				Check:  testAccCheckSakuraCloudServerDataSourceID("sakuracloud_server.foobar"),
 			},
 			{
-				Config: testAccCheckSakuraCloudDataSourceServerConfig,
+				Config: testAccCheckSakuraCloudDataSourceServerConfig(name),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckSakuraCloudServerDataSourceID("data.sakuracloud_server.foobar"),
-					resource.TestCheckResourceAttr("data.sakuracloud_server.foobar", "name", "name_test"),
+					resource.TestCheckResourceAttr("data.sakuracloud_server.foobar", "name", name),
 					resource.TestCheckResourceAttr("data.sakuracloud_server.foobar", "description", "description_test"),
 					resource.TestCheckResourceAttr("data.sakuracloud_server.foobar", "interface_driver", "virtio"),
 					resource.TestCheckResourceAttr("data.sakuracloud_server.foobar", "tags.#", "3"),
@@ -41,32 +46,32 @@ func TestAccSakuraCloudDataSourceServer_Basic(t *testing.T) {
 				),
 			},
 			{
-				Config: testAccCheckSakuraCloudDataSourceServerConfig_With_Tag,
+				Config: testAccCheckSakuraCloudDataSourceServerConfig_With_Tag(name),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckSakuraCloudServerDataSourceID("data.sakuracloud_server.foobar"),
 				),
 			},
 			{
-				Config: testAccCheckSakuraCloudDataSourceServer_NameSelector_Exists,
+				Config: testAccCheckSakuraCloudDataSourceServer_NameSelector_Exists(name, randString1, randString2),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckSakuraCloudServerDataSourceID("data.sakuracloud_server.foobar"),
 				),
 			},
 			{
-				Config: testAccCheckSakuraCloudDataSourceServer_TagSelector_Exists,
+				Config: testAccCheckSakuraCloudDataSourceServer_TagSelector_Exists(name),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckSakuraCloudServerDataSourceID("data.sakuracloud_server.foobar"),
 				),
 			},
 			{
-				Config: testAccCheckSakuraCloudDataSourceServerConfig_NotExists,
+				Config: testAccCheckSakuraCloudDataSourceServerConfig_NotExists(name),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckSakuraCloudServerDataSourceNotExists("data.sakuracloud_server.foobar"),
 				),
 				Destroy: true,
 			},
 			{
-				Config: testAccCheckSakuraCloudDataSourceServerConfig_With_NotExists_Tag,
+				Config: testAccCheckSakuraCloudDataSourceServerConfig_With_NotExists_Tag(name),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckSakuraCloudServerDataSourceNotExists("data.sakuracloud_server.foobar"),
 				),
@@ -136,73 +141,87 @@ func testAccCheckSakuraCloudServerDataSourceDestroy(s *terraform.State) error {
 	return nil
 }
 
-var testAccCheckSakuraCloudDataSourceServerBase = `
+func testAccCheckSakuraCloudDataSourceServerBase(name string) string {
+	return fmt.Sprintf(`
 data "sakuracloud_archive" "ubuntu" {
   os_type = "ubuntu"
 }
 resource "sakuracloud_disk" "foobar" {
-  name = "mydisk"
+  name = "%s"
   source_archive_id = "${data.sakuracloud_archive.ubuntu.id}"
 }
 resource "sakuracloud_server" "foobar" {
-  name = "name_test"
+  name = "%s"
   disks = ["${sakuracloud_disk.foobar.id}"]
   description = "description_test"
   tags = ["tag1","tag2","tag3"]
-}`
+}`, name, name)
+}
 
-var testAccCheckSakuraCloudDataSourceServerConfig = fmt.Sprintf(`
+func testAccCheckSakuraCloudDataSourceServerConfig(name string) string {
+	return fmt.Sprintf(`
 %s
 data "sakuracloud_server" "foobar" {
     filter = {
 	name = "Name"
-	values = ["name_test"]
+	values = ["%s"]
     }
-}`, testAccCheckSakuraCloudDataSourceServerBase)
+}`, testAccCheckSakuraCloudDataSourceServerBase(name), name)
+}
 
-var testAccCheckSakuraCloudDataSourceServerConfig_With_Tag = fmt.Sprintf(`
+func testAccCheckSakuraCloudDataSourceServerConfig_With_Tag(name string) string {
+	return fmt.Sprintf(`
 %s
 data "sakuracloud_server" "foobar" {
     filter = {
 	name = "Tags"
 	values = ["tag1","tag3"]
     }
-}`, testAccCheckSakuraCloudDataSourceServerBase)
+}`, testAccCheckSakuraCloudDataSourceServerBase(name))
+}
 
-var testAccCheckSakuraCloudDataSourceServerConfig_With_NotExists_Tag = fmt.Sprintf(`
+func testAccCheckSakuraCloudDataSourceServerConfig_With_NotExists_Tag(name string) string {
+	return fmt.Sprintf(`
 %s
 data "sakuracloud_server" "foobar" {
     filter = {
 	name = "Tags"
 	values = ["tag1-xxxxxxx","tag3-xxxxxxxx"]
     }
-}`, testAccCheckSakuraCloudDataSourceServerBase)
+}`, testAccCheckSakuraCloudDataSourceServerBase(name))
+}
 
-var testAccCheckSakuraCloudDataSourceServerConfig_NotExists = fmt.Sprintf(`
+func testAccCheckSakuraCloudDataSourceServerConfig_NotExists(name string) string {
+	return fmt.Sprintf(`
 %s
 data "sakuracloud_server" "foobar" {
     filter = {
 	name = "Name"
 	values = ["xxxxxxxxxxxxxxxxxx"]
     }
-}`, testAccCheckSakuraCloudDataSourceServerBase)
+}`, testAccCheckSakuraCloudDataSourceServerBase(name))
+}
 
-var testAccCheckSakuraCloudDataSourceServer_NameSelector_Exists = fmt.Sprintf(`
+func testAccCheckSakuraCloudDataSourceServer_NameSelector_Exists(name, p1, p2 string) string {
+	return fmt.Sprintf(`
 %s
 data "sakuracloud_server" "foobar" {
-    name_selectors = ["name", "test"]
-}`, testAccCheckSakuraCloudDataSourceServerBase)
+    name_selectors = ["%s", "%s"]
+}`, testAccCheckSakuraCloudDataSourceServerBase(name), p1, p2)
+}
 
 var testAccCheckSakuraCloudDataSourceServer_NameSelector_NotExists = `
 data "sakuracloud_server" "foobar" {
     name_selectors = ["xxxxxxxxxx"]
 }`
 
-var testAccCheckSakuraCloudDataSourceServer_TagSelector_Exists = fmt.Sprintf(`
+func testAccCheckSakuraCloudDataSourceServer_TagSelector_Exists(name string) string {
+	return fmt.Sprintf(`
 %s
 data "sakuracloud_server" "foobar" {
 	tag_selectors = ["tag1","tag2","tag3"]
-}`, testAccCheckSakuraCloudDataSourceServerBase)
+}`, testAccCheckSakuraCloudDataSourceServerBase(name))
+}
 
 var testAccCheckSakuraCloudDataSourceServer_TagSelector_NotExists = `
 data "sakuracloud_server" "foobar" {

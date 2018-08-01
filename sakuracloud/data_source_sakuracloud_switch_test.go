@@ -5,11 +5,16 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/hashicorp/terraform/helper/acctest"
 	"github.com/hashicorp/terraform/helper/resource"
 	"github.com/hashicorp/terraform/terraform"
 )
 
 func TestAccSakuraCloudDataSourceSwitch_Basic(t *testing.T) {
+	randString1 := acctest.RandStringFromCharSet(5, acctest.CharSetAlpha)
+	randString2 := acctest.RandStringFromCharSet(20, acctest.CharSetAlpha)
+	name := fmt.Sprintf("%s_%s", randString1, randString2)
+
 	resource.Test(t, resource.TestCase{
 		PreCheck:                  func() { testAccPreCheck(t) },
 		Providers:                 testAccProviders,
@@ -18,14 +23,14 @@ func TestAccSakuraCloudDataSourceSwitch_Basic(t *testing.T) {
 
 		Steps: []resource.TestStep{
 			{
-				Config: testAccCheckSakuraCloudDataSourceSwitchBase,
+				Config: testAccCheckSakuraCloudDataSourceSwitchBase(name),
 				Check:  testAccCheckSakuraCloudSwitchDataSourceID("sakuracloud_switch.foobar"),
 			},
 			{
-				Config: testAccCheckSakuraCloudDataSourceSwitchConfig,
+				Config: testAccCheckSakuraCloudDataSourceSwitchConfig(name),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckSakuraCloudSwitchDataSourceID("data.sakuracloud_switch.foobar"),
-					resource.TestCheckResourceAttr("data.sakuracloud_switch.foobar", "name", "name_test"),
+					resource.TestCheckResourceAttr("data.sakuracloud_switch.foobar", "name", name),
 					resource.TestCheckResourceAttr("data.sakuracloud_switch.foobar", "description", "description_test"),
 					resource.TestCheckResourceAttr("data.sakuracloud_switch.foobar", "tags.#", "3"),
 					resource.TestCheckResourceAttr("data.sakuracloud_switch.foobar", "tags.0", "tag1"),
@@ -34,32 +39,32 @@ func TestAccSakuraCloudDataSourceSwitch_Basic(t *testing.T) {
 				),
 			},
 			{
-				Config: testAccCheckSakuraCloudDataSourceSwitchConfig_With_Tag,
+				Config: testAccCheckSakuraCloudDataSourceSwitchConfig_With_Tag(name),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckSakuraCloudSwitchDataSourceID("data.sakuracloud_switch.foobar"),
 				),
 			},
 			{
-				Config: testAccCheckSakuraCloudDataSourceSwitch_NameSelector_Exists,
+				Config: testAccCheckSakuraCloudDataSourceSwitch_NameSelector_Exists(name, randString1, randString2),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckSakuraCloudSwitchDataSourceID("data.sakuracloud_switch.foobar"),
 				),
 			},
 			{
-				Config: testAccCheckSakuraCloudDataSourceSwitch_TagSelector_Exists,
+				Config: testAccCheckSakuraCloudDataSourceSwitch_TagSelector_Exists(name),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckSakuraCloudSwitchDataSourceID("data.sakuracloud_switch.foobar"),
 				),
 			},
 			{
-				Config: testAccCheckSakuraCloudDataSourceSwitchConfig_NotExists,
+				Config: testAccCheckSakuraCloudDataSourceSwitchConfig_NotExists(name),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckSakuraCloudSwitchDataSourceNotExists("data.sakuracloud_switch.foobar"),
 				),
 				Destroy: true,
 			},
 			{
-				Config: testAccCheckSakuraCloudDataSourceSwitchConfig_With_NotExists_Tag,
+				Config: testAccCheckSakuraCloudDataSourceSwitchConfig_With_NotExists_Tag(name),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckSakuraCloudSwitchDataSourceNotExists("data.sakuracloud_switch.foobar"),
 				),
@@ -129,30 +134,35 @@ func testAccCheckSakuraCloudSwitchDataSourceDestroy(s *terraform.State) error {
 	return nil
 }
 
-var testAccCheckSakuraCloudDataSourceSwitchBase = `
+func testAccCheckSakuraCloudDataSourceSwitchBase(name string) string {
+	return fmt.Sprintf(`
 resource "sakuracloud_switch" "foobar" {
-    name = "name_test"
+    name = "%s"
     description = "description_test"
     tags = ["tag1","tag2","tag3"]
 }
-`
+`, name)
+}
 
-var testAccCheckSakuraCloudDataSourceSwitchConfig = `
+func testAccCheckSakuraCloudDataSourceSwitchConfig(name string) string {
+	return fmt.Sprintf(`
 resource "sakuracloud_switch" "foobar" {
-    name = "name_test"
+    name = "%s"
     description = "description_test"
     tags = ["tag1","tag2","tag3"]
 }
 data "sakuracloud_switch" "foobar" {
     filter = {
 	name = "Name"
-	values = ["name_test"]
+	values = ["%s"]
     }
-}`
+}`, name, name)
+}
 
-var testAccCheckSakuraCloudDataSourceSwitchConfig_With_Tag = `
+func testAccCheckSakuraCloudDataSourceSwitchConfig_With_Tag(name string) string {
+	return fmt.Sprintf(`
 resource "sakuracloud_switch" "foobar" {
-    name = "name_test"
+    name = "%s"
     description = "description_test"
     tags = ["tag1","tag2","tag3"]
 }
@@ -161,11 +171,13 @@ data "sakuracloud_switch" "foobar" {
 	name = "Tags"
 	values = ["tag1","tag3"]
     }
-}`
+}`, name)
+}
 
-var testAccCheckSakuraCloudDataSourceSwitchConfig_With_NotExists_Tag = `
+func testAccCheckSakuraCloudDataSourceSwitchConfig_With_NotExists_Tag(name string) string {
+	return fmt.Sprintf(`
 resource "sakuracloud_switch" "foobar" {
-    name = "name_test"
+    name = "%s"
     description = "description_test"
     tags = ["tag1","tag2","tag3"]
 }
@@ -174,11 +186,13 @@ data "sakuracloud_switch" "foobar" {
 	name = "Tags"
 	values = ["tag1-xxxxxxx","tag3-xxxxxxxx"]
     }
-}`
+}`, name)
+}
 
-var testAccCheckSakuraCloudDataSourceSwitchConfig_NotExists = `
+func testAccCheckSakuraCloudDataSourceSwitchConfig_NotExists(name string) string {
+	return fmt.Sprintf(`
 resource "sakuracloud_switch" "foobar" {
-    name = "name_test"
+    name = "%s"
     description = "description_test"
     tags = ["tag1","tag2","tag3"]
 }
@@ -187,32 +201,37 @@ data "sakuracloud_switch" "foobar" {
 	name = "Name"
 	values = ["xxxxxxxxxxxxxxxxxx"]
     }
-}`
+}`, name)
+}
 
-var testAccCheckSakuraCloudDataSourceSwitch_NameSelector_Exists = `
+func testAccCheckSakuraCloudDataSourceSwitch_NameSelector_Exists(name, p1, p2 string) string {
+	return fmt.Sprintf(`
 resource "sakuracloud_switch" "foobar" {
-    name = "name_test"
+    name = "%s"
     description = "description_test"
     tags = ["tag1","tag2","tag3"]
 }
 data "sakuracloud_switch" "foobar" {
-    name_selectors = ["name", "test"]
-}`
+    name_selectors = ["%s", "%s"]
+}`, name, p1, p2)
+}
 
 var testAccCheckSakuraCloudDataSourceSwitch_NameSelector_NotExists = `
 data "sakuracloud_switch" "foobar" {
     name_selectors = ["xxxxxxxxxx"]
 }`
 
-var testAccCheckSakuraCloudDataSourceSwitch_TagSelector_Exists = `
+func testAccCheckSakuraCloudDataSourceSwitch_TagSelector_Exists(name string) string {
+	return fmt.Sprintf(`
 resource "sakuracloud_switch" "foobar" {
-    name = "name_test"
+    name = "%s"
     description = "description_test"
     tags = ["tag1","tag2","tag3"]
 }
 data "sakuracloud_switch" "foobar" {
 	tag_selectors = ["tag1","tag2","tag3"]
-}`
+}`, name)
+}
 
 var testAccCheckSakuraCloudDataSourceSwitch_TagSelector_NotExists = `
 data "sakuracloud_switch" "foobar" {

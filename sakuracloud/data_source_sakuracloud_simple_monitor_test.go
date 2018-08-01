@@ -5,11 +5,16 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/hashicorp/terraform/helper/acctest"
 	"github.com/hashicorp/terraform/helper/resource"
 	"github.com/hashicorp/terraform/terraform"
 )
 
 func TestAccSakuraCloudDataSourceSimpleMonitor_Basic(t *testing.T) {
+	randString1 := acctest.RandStringFromCharSet(5, acctest.CharSetAlpha)
+	randString2 := acctest.RandStringFromCharSet(20, acctest.CharSetAlpha)
+	target := fmt.Sprintf("%s.%s.com", randString1, randString2)
+
 	resource.Test(t, resource.TestCase{
 		PreCheck:                  func() { testAccPreCheck(t) },
 		Providers:                 testAccProviders,
@@ -18,14 +23,14 @@ func TestAccSakuraCloudDataSourceSimpleMonitor_Basic(t *testing.T) {
 
 		Steps: []resource.TestStep{
 			{
-				Config: testAccCheckSakuraCloudDataSourceSimpleMonitorBase,
+				Config: testAccCheckSakuraCloudDataSourceSimpleMonitorBase(target),
 				Check:  testAccCheckSakuraCloudSimpleMonitorDataSourceID("sakuracloud_simple_monitor.foobar"),
 			},
 			{
-				Config: testAccCheckSakuraCloudDataSourceSimpleMonitorConfig,
+				Config: testAccCheckSakuraCloudDataSourceSimpleMonitorConfig(target),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckSakuraCloudSimpleMonitorDataSourceID("data.sakuracloud_simple_monitor.foobar"),
-					resource.TestCheckResourceAttr("data.sakuracloud_simple_monitor.foobar", "target", "test-terraform-for-sakuracloud.com"),
+					resource.TestCheckResourceAttr("data.sakuracloud_simple_monitor.foobar", "target", target),
 					resource.TestCheckResourceAttr("data.sakuracloud_simple_monitor.foobar", "description", "description_test"),
 					resource.TestCheckResourceAttr("data.sakuracloud_simple_monitor.foobar", "tags.#", "3"),
 					resource.TestCheckResourceAttr("data.sakuracloud_simple_monitor.foobar", "tags.0", "tag1"),
@@ -36,32 +41,32 @@ func TestAccSakuraCloudDataSourceSimpleMonitor_Basic(t *testing.T) {
 				),
 			},
 			{
-				Config: testAccCheckSakuraCloudDataSourceSimpleMonitorConfig_With_Tag,
+				Config: testAccCheckSakuraCloudDataSourceSimpleMonitorConfig_With_Tag(target),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckSakuraCloudSimpleMonitorDataSourceID("data.sakuracloud_simple_monitor.foobar"),
 				),
 			},
 			{
-				Config: testAccCheckSakuraCloudDataSourceSimpleMonitor_NameSelector_Exists,
+				Config: testAccCheckSakuraCloudDataSourceSimpleMonitor_NameSelector_Exists(target, randString1, randString2),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckSakuraCloudSimpleMonitorDataSourceID("data.sakuracloud_simple_monitor.foobar"),
 				),
 			},
 			{
-				Config: testAccCheckSakuraCloudDataSourceSimpleMonitor_TagSelector_Exists,
+				Config: testAccCheckSakuraCloudDataSourceSimpleMonitor_TagSelector_Exists(target),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckSakuraCloudSimpleMonitorDataSourceID("data.sakuracloud_simple_monitor.foobar"),
 				),
 			},
 			{
-				Config: testAccCheckSakuraCloudDataSourceSimpleMonitorConfig_NotExists,
+				Config: testAccCheckSakuraCloudDataSourceSimpleMonitorConfig_NotExists(target),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckSakuraCloudSimpleMonitorDataSourceNotExists("data.sakuracloud_simple_monitor.foobar"),
 				),
 				Destroy: true,
 			},
 			{
-				Config: testAccCheckSakuraCloudDataSourceSimpleMonitorConfig_With_NotExists_Tag,
+				Config: testAccCheckSakuraCloudDataSourceSimpleMonitorConfig_With_NotExists_Tag(target),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckSakuraCloudSimpleMonitorDataSourceNotExists("data.sakuracloud_simple_monitor.foobar"),
 				),
@@ -131,9 +136,10 @@ func testAccCheckSakuraCloudSimpleMonitorDataSourceDestroy(s *terraform.State) e
 	return nil
 }
 
-var testAccCheckSakuraCloudDataSourceSimpleMonitorBase = fmt.Sprintf(`
+func testAccCheckSakuraCloudDataSourceSimpleMonitorBase(target string) string {
+	return fmt.Sprintf(`
 resource "sakuracloud_simple_monitor" "foobar" {
-    target = "test-terraform-for-sakuracloud.com"
+    target = "%s"
     health_check = {
         protocol = "http"
         delay_loop = 60
@@ -146,60 +152,73 @@ resource "sakuracloud_simple_monitor" "foobar" {
     notify_email_enabled = true
     notify_slack_enabled = true
     notify_slack_webhook = "%s"
-}`, testAccSlackWebhook)
+}`, target, testAccSlackWebhook)
+}
 
-var testAccCheckSakuraCloudDataSourceSimpleMonitorConfig = fmt.Sprintf(`
+func testAccCheckSakuraCloudDataSourceSimpleMonitorConfig(target string) string {
+	return fmt.Sprintf(`
 %s
 data "sakuracloud_simple_monitor" "foobar" {
     filter = {
 	name = "Name"
-	values = ["test-terraform-for-sakuracloud.com"]
+	values = ["%s"]
     }
-}`, testAccCheckSakuraCloudDataSourceSimpleMonitorBase)
+}`, testAccCheckSakuraCloudDataSourceSimpleMonitorBase(target), target)
+}
 
-var testAccCheckSakuraCloudDataSourceSimpleMonitorConfig_With_Tag = fmt.Sprintf(`
+func testAccCheckSakuraCloudDataSourceSimpleMonitorConfig_With_Tag(target string) string {
+	return fmt.Sprintf(`
 %s
 data "sakuracloud_simple_monitor" "foobar" {
     filter = {
 	name = "Tags"
 	values = ["tag1","tag3"]
     }
-}`, testAccCheckSakuraCloudDataSourceSimpleMonitorBase)
+}`, testAccCheckSakuraCloudDataSourceSimpleMonitorBase(target))
+}
 
-var testAccCheckSakuraCloudDataSourceSimpleMonitorConfig_With_NotExists_Tag = fmt.Sprintf(`
+func testAccCheckSakuraCloudDataSourceSimpleMonitorConfig_With_NotExists_Tag(target string) string {
+	return fmt.Sprintf(`
 %s
 data "sakuracloud_simple_monitor" "foobar" {
     filter = {
 	name = "Tags"
 	values = ["tag1-xxxxxxx","tag3-xxxxxxxx"]
     }
-}`, testAccCheckSakuraCloudDataSourceSimpleMonitorBase)
+}`, testAccCheckSakuraCloudDataSourceSimpleMonitorBase(target))
+}
 
-var testAccCheckSakuraCloudDataSourceSimpleMonitorConfig_NotExists = fmt.Sprintf(`
+func testAccCheckSakuraCloudDataSourceSimpleMonitorConfig_NotExists(target string) string {
+	return fmt.Sprintf(`
 %s
 data "sakuracloud_simple_monitor" "foobar" {
     filter = {
 	name = "Name"
 	values = ["xxxxxxxxxxxxxxxxxx"]
     }
-}`, testAccCheckSakuraCloudDataSourceSimpleMonitorBase)
+}`, testAccCheckSakuraCloudDataSourceSimpleMonitorBase(target))
+}
 
-var testAccCheckSakuraCloudDataSourceSimpleMonitor_NameSelector_Exists = fmt.Sprintf(`
+func testAccCheckSakuraCloudDataSourceSimpleMonitor_NameSelector_Exists(target, p1, p2 string) string {
+	return fmt.Sprintf(`
 %s
 data "sakuracloud_simple_monitor" "foobar" {
-    name_selectors = ["terraform", "test"]
-}`, testAccCheckSakuraCloudDataSourceSimpleMonitorBase)
+    name_selectors = ["%s", "%s"]
+}`, testAccCheckSakuraCloudDataSourceSimpleMonitorBase(target), p1, p2)
+}
 
 var testAccCheckSakuraCloudDataSourceSimpleMonitor_NameSelector_NotExists = `
 data "sakuracloud_simple_monitor" "foobar" {
     name_selectors = ["xxxxxxxxxx"]
 }`
 
-var testAccCheckSakuraCloudDataSourceSimpleMonitor_TagSelector_Exists = fmt.Sprintf(`
+func testAccCheckSakuraCloudDataSourceSimpleMonitor_TagSelector_Exists(target string) string {
+	return fmt.Sprintf(`
 %s
 data "sakuracloud_simple_monitor" "foobar" {
 	tag_selectors = ["tag1","tag2","tag3"]
-}`, testAccCheckSakuraCloudDataSourceSimpleMonitorBase)
+}`, testAccCheckSakuraCloudDataSourceSimpleMonitorBase(target))
+}
 
 var testAccCheckSakuraCloudDataSourceSimpleMonitor_TagSelector_NotExists = `
 data "sakuracloud_simple_monitor" "foobar" {

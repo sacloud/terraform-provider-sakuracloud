@@ -92,7 +92,7 @@ func testAccCheckSakuraCloudSubnetDataSourceDestroy(s *terraform.State) error {
 
 var testAccCheckSakuraCloudDataSourceSubnetBase = `
 resource sakuracloud_internet "foobar" {
-    name = "myinternet"
+    name = "subnet_test"
 }
 resource "sakuracloud_subnet" "foobar" {
     internet_id = "${sakuracloud_internet.foobar.id}"
@@ -106,7 +106,7 @@ resource "sakuracloud_subnet" "foobar2" {
 
 var testAccCheckSakuraCloudDataSourceSubnetConfig = `
 resource sakuracloud_internet "foobar" {
-    name = "myinternet"
+    name = "subnet_test"
 }
 resource "sakuracloud_subnet" "foobar" {
     internet_id = "${sakuracloud_internet.foobar.id}"
@@ -125,7 +125,7 @@ data sakuracloud_subnet "foobar" {
 
 var testAccCheckSakuraCloudDataSourceSubnetConfig_NotExists = `
 resource sakuracloud_internet "foobar" {
-    name = "myinternet"
+    name = "subnet_test"
 }
 resource "sakuracloud_subnet" "foobar" {
     internet_id = "${sakuracloud_internet.foobar.id}"
