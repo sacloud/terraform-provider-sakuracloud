@@ -2,7 +2,9 @@ package sakuracloud
 
 import (
 	"errors"
+	"fmt"
 
+	"github.com/hashicorp/terraform/helper/acctest"
 	"github.com/hashicorp/terraform/helper/resource"
 	"github.com/hashicorp/terraform/terraform"
 
@@ -12,6 +14,10 @@ import (
 )
 
 func TestAccResourceSakuraCloudDNSRecord_Basic(t *testing.T) {
+	randString1 := acctest.RandStringFromCharSet(5, acctest.CharSetAlpha)
+	randString2 := acctest.RandStringFromCharSet(20, acctest.CharSetAlpha)
+	zone := fmt.Sprintf("%s.%s.com", randString1, randString2)
+
 	var dns sacloud.DNS
 	resource.Test(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
@@ -19,11 +25,11 @@ func TestAccResourceSakuraCloudDNSRecord_Basic(t *testing.T) {
 		CheckDestroy: testAccCheckSakuraCloudDNSRecordDestroy,
 		Steps: []resource.TestStep{
 			{
-				Config: testAccCheckSakuraCloudDNSRecordConfig_basic,
+				Config: testAccCheckSakuraCloudDNSRecordConfig_basic(zone),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckSakuraCloudDNSExists("sakuracloud_dns.foobar", &dns),
 					resource.TestCheckResourceAttr(
-						"sakuracloud_dns.foobar", "zone", "terraform.io"),
+						"sakuracloud_dns.foobar", "zone", zone),
 					resource.TestCheckResourceAttr(
 						"sakuracloud_dns_record.foobar", "name", "test1"),
 					resource.TestCheckResourceAttr(
@@ -45,11 +51,11 @@ func TestAccResourceSakuraCloudDNSRecord_Basic(t *testing.T) {
 				),
 			},
 			{
-				Config: testAccCheckSakuraCloudDNSRecordConfig_update,
+				Config: testAccCheckSakuraCloudDNSRecordConfig_update(zone),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckSakuraCloudDNSExists("sakuracloud_dns.foobar", &dns),
 					resource.TestCheckResourceAttr(
-						"sakuracloud_dns.foobar", "zone", "terraform.io"),
+						"sakuracloud_dns.foobar", "zone", zone),
 					resource.TestCheckResourceAttr(
 						"sakuracloud_dns_record.foobar", "name", "test2"),
 					resource.TestCheckResourceAttr(
@@ -63,6 +69,10 @@ func TestAccResourceSakuraCloudDNSRecord_Basic(t *testing.T) {
 }
 
 func TestAccResourceSakuraCloudDNSRecord_With_Count(t *testing.T) {
+	randString1 := acctest.RandStringFromCharSet(5, acctest.CharSetAlpha)
+	randString2 := acctest.RandStringFromCharSet(20, acctest.CharSetAlpha)
+	zone := fmt.Sprintf("%s.%s.com", randString1, randString2)
+
 	var dns sacloud.DNS
 	resource.Test(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
@@ -70,11 +80,11 @@ func TestAccResourceSakuraCloudDNSRecord_With_Count(t *testing.T) {
 		CheckDestroy: testAccCheckSakuraCloudDNSRecordDestroy,
 		Steps: []resource.TestStep{
 			{
-				Config: testAccCheckSakuraCloudDNSRecordConfig_with_count,
+				Config: testAccCheckSakuraCloudDNSRecordConfig_with_count(zone),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckSakuraCloudDNSExists("sakuracloud_dns.foobar", &dns),
 					resource.TestCheckResourceAttr(
-						"sakuracloud_dns.foobar", "zone", "terraform.io"),
+						"sakuracloud_dns.foobar", "zone", zone),
 					resource.TestCheckResourceAttr(
 						"sakuracloud_dns_record.foobar.0", "name", "test"),
 					resource.TestCheckResourceAttr(
@@ -111,9 +121,10 @@ func testAccCheckSakuraCloudDNSRecordDestroy(s *terraform.State) error {
 	return nil
 }
 
-var testAccCheckSakuraCloudDNSRecordConfig_basic = `
+func testAccCheckSakuraCloudDNSRecordConfig_basic(zone string) string {
+	return fmt.Sprintf(`
 resource "sakuracloud_dns" "foobar" {
-    zone = "terraform.io"
+    zone = "%s"
     description = "DNS from TerraForm for SAKURA CLOUD"
     tags = ["hoge1"]
 }
@@ -134,11 +145,13 @@ resource "sakuracloud_dns_record" "foobar1" {
     weight = 2
     port = 3
 }
-`
+`, zone)
+}
 
-var testAccCheckSakuraCloudDNSRecordConfig_update = `
+func testAccCheckSakuraCloudDNSRecordConfig_update(zone string) string {
+	return fmt.Sprintf(`
 resource "sakuracloud_dns" "foobar" {
-    zone = "terraform.io"
+    zone = "%s"
     description = "DNS from TerraForm for SAKURA CLOUD"
     tags = ["hoge1"]
 }
@@ -148,12 +161,13 @@ resource "sakuracloud_dns_record" "foobar" {
     name = "test2"
     type = "A"
     value = "192.168.0.2"
-}`
+}`, zone)
+}
 
-var testAccCheckSakuraCloudDNSRecordConfig_with_count = `
-
+func testAccCheckSakuraCloudDNSRecordConfig_with_count(zone string) string {
+	return fmt.Sprintf(`
 resource "sakuracloud_dns" "foobar" {
-    zone = "terraform.io"
+    zone = "%s"
     description = "DNS from TerraForm for SAKURA CLOUD"
     tags = ["hoge1"]
 }
@@ -166,4 +180,5 @@ resource "sakuracloud_dns_record" "foobar" {
     name = "test"
     type = "A"
     value = "${var.ip_list[count.index]}"
-}`
+}`, zone)
+}

@@ -5,11 +5,16 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/hashicorp/terraform/helper/acctest"
 	"github.com/hashicorp/terraform/helper/resource"
 	"github.com/hashicorp/terraform/terraform"
 )
 
 func TestAccSakuraCloudDataSourceLoadBalancer_Basic(t *testing.T) {
+	randString1 := acctest.RandStringFromCharSet(5, acctest.CharSetAlpha)
+	randString2 := acctest.RandStringFromCharSet(20, acctest.CharSetAlpha)
+	name := fmt.Sprintf("%s_%s", randString1, randString2)
+
 	resource.Test(t, resource.TestCase{
 		PreCheck:                  func() { testAccPreCheck(t) },
 		Providers:                 testAccProviders,
@@ -18,14 +23,14 @@ func TestAccSakuraCloudDataSourceLoadBalancer_Basic(t *testing.T) {
 
 		Steps: []resource.TestStep{
 			{
-				Config: testAccCheckSakuraCloudDataSourceLoadBalancerBase,
+				Config: testAccCheckSakuraCloudDataSourceLoadBalancerBase(name),
 				Check:  testAccCheckSakuraCloudLoadBalancerDataSourceID("sakuracloud_load_balancer.foobar"),
 			},
 			{
-				Config: testAccCheckSakuraCloudDataSourceLoadBalancerConfig,
+				Config: testAccCheckSakuraCloudDataSourceLoadBalancerConfig(name),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckSakuraCloudLoadBalancerDataSourceID("data.sakuracloud_load_balancer.foobar"),
-					resource.TestCheckResourceAttr("data.sakuracloud_load_balancer.foobar", "name", "name_test"),
+					resource.TestCheckResourceAttr("data.sakuracloud_load_balancer.foobar", "name", name),
 					resource.TestCheckResourceAttr("data.sakuracloud_load_balancer.foobar", "description", "description_test"),
 					resource.TestCheckResourceAttr("data.sakuracloud_load_balancer.foobar", "tags.#", "3"),
 					resource.TestCheckResourceAttr("data.sakuracloud_load_balancer.foobar", "tags.0", "tag1"),
@@ -34,32 +39,32 @@ func TestAccSakuraCloudDataSourceLoadBalancer_Basic(t *testing.T) {
 				),
 			},
 			{
-				Config: testAccCheckSakuraCloudDataSourceLoadBalancerConfig_With_Tag,
+				Config: testAccCheckSakuraCloudDataSourceLoadBalancerConfig_With_Tag(name),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckSakuraCloudLoadBalancerDataSourceID("data.sakuracloud_load_balancer.foobar"),
 				),
 			},
 			{
-				Config: testAccCheckSakuraCloudDataSourceLoadBalancer_NameSelector_Exists,
+				Config: testAccCheckSakuraCloudDataSourceLoadBalancer_NameSelector_Exists(name, randString1, randString2),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckSakuraCloudLoadBalancerDataSourceID("data.sakuracloud_load_balancer.foobar"),
 				),
 			},
 			{
-				Config: testAccCheckSakuraCloudDataSourceLoadBalancer_TagSelector_Exists,
+				Config: testAccCheckSakuraCloudDataSourceLoadBalancer_TagSelector_Exists(name),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckSakuraCloudLoadBalancerDataSourceID("data.sakuracloud_load_balancer.foobar"),
 				),
 			},
 			{
-				Config: testAccCheckSakuraCloudDataSourceLoadBalancerConfig_NotExists,
+				Config: testAccCheckSakuraCloudDataSourceLoadBalancerConfig_NotExists(name),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckSakuraCloudLoadBalancerDataSourceNotExists("data.sakuracloud_load_balancer.foobar"),
 				),
 				Destroy: true,
 			},
 			{
-				Config: testAccCheckSakuraCloudDataSourceLoadBalancerConfig_With_NotExists_Tag,
+				Config: testAccCheckSakuraCloudDataSourceLoadBalancerConfig_With_NotExists_Tag(name),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckSakuraCloudLoadBalancerDataSourceNotExists("data.sakuracloud_load_balancer.foobar"),
 				),
@@ -129,9 +134,10 @@ func testAccCheckSakuraCloudLoadBalancerDataSourceDestroy(s *terraform.State) er
 	return nil
 }
 
-var testAccCheckSakuraCloudDataSourceLoadBalancerBase = `
+func testAccCheckSakuraCloudDataSourceLoadBalancerBase(name string) string {
+	return fmt.Sprintf(`
 resource sakuracloud_switch "sw"{
-    name = "sw"
+    name = "%s"
 }
 resource "sakuracloud_load_balancer" "foobar" {
     switch_id = "${sakuracloud_switch.sw.id}"
@@ -140,14 +146,16 @@ resource "sakuracloud_load_balancer" "foobar" {
     nw_mask_len = 24
     default_route = "192.168.11.1"
 
-    name = "name_test"
+    name = "%s"
     description = "description_test"
     tags = ["tag1","tag2","tag3"]
-}`
+}`, name, name)
+}
 
-var testAccCheckSakuraCloudDataSourceLoadBalancerConfig = `
+func testAccCheckSakuraCloudDataSourceLoadBalancerConfig(name string) string {
+	return fmt.Sprintf(`
 resource sakuracloud_switch "sw"{
-    name = "sw"
+    name = "%s"
 }
 resource "sakuracloud_load_balancer" "foobar" {
     switch_id = "${sakuracloud_switch.sw.id}"
@@ -156,20 +164,22 @@ resource "sakuracloud_load_balancer" "foobar" {
     nw_mask_len = 24
     default_route = "192.168.11.1"
 
-    name = "name_test"
+    name = "%s"
     description = "description_test"
     tags = ["tag1","tag2","tag3"]
 }
 data "sakuracloud_load_balancer" "foobar" {
     filter = {
 	name = "Name"
-	values = ["name_test"]
+	values = ["%s"]
     }
-}`
+}`, name, name, name)
+}
 
-var testAccCheckSakuraCloudDataSourceLoadBalancerConfig_With_Tag = `
+func testAccCheckSakuraCloudDataSourceLoadBalancerConfig_With_Tag(name string) string {
+	return fmt.Sprintf(`
 resource sakuracloud_switch "sw"{
-    name = "sw"
+    name = "%s"
 }
 resource "sakuracloud_load_balancer" "foobar" {
     switch_id = "${sakuracloud_switch.sw.id}"
@@ -178,7 +188,7 @@ resource "sakuracloud_load_balancer" "foobar" {
     nw_mask_len = 24
     default_route = "192.168.11.1"
 
-    name = "name_test"
+    name = "%s"
     description = "description_test"
     tags = ["tag1","tag2","tag3"]
 }
@@ -187,11 +197,13 @@ data "sakuracloud_load_balancer" "foobar" {
 	name = "Tags"
 	values = ["tag1","tag3"]
     }
-}`
+}`, name, name)
+}
 
-var testAccCheckSakuraCloudDataSourceLoadBalancerConfig_With_NotExists_Tag = `
+func testAccCheckSakuraCloudDataSourceLoadBalancerConfig_With_NotExists_Tag(name string) string {
+	return fmt.Sprintf(`
 resource sakuracloud_switch "sw"{
-    name = "sw"
+    name = "%s"
 }
 resource "sakuracloud_load_balancer" "foobar" {
     switch_id = "${sakuracloud_switch.sw.id}"
@@ -200,7 +212,7 @@ resource "sakuracloud_load_balancer" "foobar" {
     nw_mask_len = 24
     default_route = "192.168.11.1"
 
-    name = "name_test"
+    name = "%s"
     description = "description_test"
     tags = ["tag1","tag2","tag3"]
 }
@@ -209,11 +221,13 @@ data "sakuracloud_load_balancer" "foobar" {
 	name = "Tags"
 	values = ["tag1-xxxxxxx","tag3-xxxxxxxx"]
     }
-}`
+}`, name, name)
+}
 
-var testAccCheckSakuraCloudDataSourceLoadBalancerConfig_NotExists = `
+func testAccCheckSakuraCloudDataSourceLoadBalancerConfig_NotExists(name string) string {
+	return fmt.Sprintf(`
 resource sakuracloud_switch "sw"{
-    name = "sw"
+    name = "%s"
 }
 resource "sakuracloud_load_balancer" "foobar" {
     switch_id = "${sakuracloud_switch.sw.id}"
@@ -222,7 +236,7 @@ resource "sakuracloud_load_balancer" "foobar" {
     nw_mask_len = 24
     default_route = "192.168.11.1"
 
-    name = "name_test"
+    name = "%s"
     description = "description_test"
     tags = ["tag1","tag2","tag3"]
 }
@@ -231,11 +245,13 @@ data "sakuracloud_load_balancer" "foobar" {
 	name = "Name"
 	values = ["xxxxxxxxxxxxxxxxxx"]
     }
-}`
+}`, name, name)
+}
 
-var testAccCheckSakuraCloudDataSourceLoadBalancer_NameSelector_Exists = `
+func testAccCheckSakuraCloudDataSourceLoadBalancer_NameSelector_Exists(name, p1, p2 string) string {
+	return fmt.Sprintf(`
 resource sakuracloud_switch "sw"{
-    name = "sw"
+    name = "%s"
 }
 resource "sakuracloud_load_balancer" "foobar" {
     switch_id = "${sakuracloud_switch.sw.id}"
@@ -244,23 +260,26 @@ resource "sakuracloud_load_balancer" "foobar" {
     nw_mask_len = 24
     default_route = "192.168.11.1"
 
-    name = "name_test"
+    name = "%s"
     description = "description_test"
     tags = ["tag1","tag2","tag3"]
 }
 data "sakuracloud_load_balancer" "foobar" {
-    name_selectors = ["name", "test"]
+    name_selectors = ["%s", "%s"]
 }
-`
+`, name, name, p1, p2)
+}
+
 var testAccCheckSakuraCloudDataSourceLoadBalancer_NameSelector_NotExists = `
 data "sakuracloud_load_balancer" "foobar" {
     name_selectors = ["xxxxxxxxxx"]
 }
 `
 
-var testAccCheckSakuraCloudDataSourceLoadBalancer_TagSelector_Exists = `
+func testAccCheckSakuraCloudDataSourceLoadBalancer_TagSelector_Exists(name string) string {
+	return fmt.Sprintf(`
 resource sakuracloud_switch "sw"{
-    name = "sw"
+    name = "%s"
 }
 resource "sakuracloud_load_balancer" "foobar" {
     switch_id = "${sakuracloud_switch.sw.id}"
@@ -269,13 +288,14 @@ resource "sakuracloud_load_balancer" "foobar" {
     nw_mask_len = 24
     default_route = "192.168.11.1"
 
-    name = "name_test"
+    name = "%s"
     description = "description_test"
     tags = ["tag1","tag2","tag3"]
 }
 data "sakuracloud_load_balancer" "foobar" {
 	tag_selectors = ["tag1","tag2","tag3"]
-}`
+}`, name, name)
+}
 
 var testAccCheckSakuraCloudDataSourceLoadBalancer_TagSelector_NotExists = `
 data "sakuracloud_load_balancer" "foobar" {

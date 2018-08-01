@@ -1,12 +1,22 @@
 package sakuracloud
 
 import (
+	"fmt"
+	"os"
 	"testing"
 
+	"github.com/hashicorp/terraform/helper/acctest"
 	"github.com/hashicorp/terraform/helper/resource"
 )
 
 func TestAccSakuraCloudBucketObjectDataSource_Basic(t *testing.T) {
+
+	randString1 := acctest.RandStringFromCharSet(10, acctest.CharSetAlpha)
+	randString2 := acctest.RandStringFromCharSet(10, acctest.CharSetAlpha)
+	randString3 := acctest.RandStringFromCharSet(10, acctest.CharSetAlpha)
+	key := fmt.Sprintf("%s/%s/%s.txt", randString1, randString2, randString3)
+	bucket := os.Getenv("SACLOUD_OJS_ACCESS_KEY_ID")
+
 	resource.Test(t, resource.TestCase{
 		PreCheck:                  func() { testAccPreCheck(t) },
 		Providers:                 testAccProviders,
@@ -15,10 +25,10 @@ func TestAccSakuraCloudBucketObjectDataSource_Basic(t *testing.T) {
 
 		Steps: []resource.TestStep{
 			{
-				Config: testAccCheckSakuraCloudDataSourceBucketObject,
+				Config: testAccCheckSakuraCloudDataSourceBucketObject(bucket, key),
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttr(
-						"data.sakuracloud_bucket_object.foobar", "key", "foo/bar/test.txt"),
+						"data.sakuracloud_bucket_object.foobar", "key", key),
 					resource.TestCheckResourceAttr(
 						"data.sakuracloud_bucket_object.foobar", "size", "7"),
 					resource.TestCheckResourceAttr(
@@ -29,29 +39,33 @@ func TestAccSakuraCloudBucketObjectDataSource_Basic(t *testing.T) {
 						"data.sakuracloud_bucket_object.foobar", "etag", "9a0364b9e99bb480dd25e1f0284c8555"),
 					resource.TestCheckResourceAttr(
 						"data.sakuracloud_bucket_object.foobar",
-						"http_url", "http://terraform-for-sakuracloud-test.b.sakurastorage.jp/foo/bar/test.txt"),
+						"http_url", fmt.Sprintf("http://%s.b.sakurastorage.jp/%s", bucket, key)),
 					resource.TestCheckResourceAttr(
 						"data.sakuracloud_bucket_object.foobar",
-						"https_url", "https://terraform-for-sakuracloud-test.b.sakurastorage.jp/foo/bar/test.txt"),
+						"https_url", fmt.Sprintf("https://%s.b.sakurastorage.jp/%s", bucket, key)),
 					resource.TestCheckResourceAttr(
 						"data.sakuracloud_bucket_object.foobar",
-						"http_path_url", "http://b.sakurastorage.jp/terraform-for-sakuracloud-test/foo/bar/test.txt"),
+						"http_path_url", fmt.Sprintf("http://b.sakurastorage.jp/%s/%s", bucket, key)),
 					resource.TestCheckResourceAttr(
 						"data.sakuracloud_bucket_object.foobar",
-						"http_cache_url", "http://terraform-for-sakuracloud-test.c.sakurastorage.jp/foo/bar/test.txt"),
+						"https_path_url", fmt.Sprintf("https://b.sakurastorage.jp/%s/%s", bucket, key)),
 					resource.TestCheckResourceAttr(
 						"data.sakuracloud_bucket_object.foobar",
-						"https_cache_url", "https://terraform-for-sakuracloud-test.c.sakurastorage.jp/foo/bar/test.txt"),
+						"http_cache_url", fmt.Sprintf("http://%s.c.sakurastorage.jp/%s", bucket, key)),
+					resource.TestCheckResourceAttr(
+						"data.sakuracloud_bucket_object.foobar",
+						"https_cache_url", fmt.Sprintf("https://%s.c.sakurastorage.jp/%s", bucket, key)),
 				),
 			},
 		},
 	})
 }
 
-var testAccCheckSakuraCloudDataSourceBucketObject = `
+func testAccCheckSakuraCloudDataSourceBucketObject(bucket, key string) string {
+	return fmt.Sprintf(`
 resource "sakuracloud_bucket_object" "foobar" {
-  bucket  = "terraform-for-sakuracloud-test"
-  key     = "foo/bar/test.txt"
+  bucket  = "%s"
+  key     = "%s"
   content = "content"
 }
 
@@ -59,4 +73,5 @@ data "sakuracloud_bucket_object" "foobar" {
   bucket = "${sakuracloud_bucket_object.foobar.bucket}"
   key    = "${sakuracloud_bucket_object.foobar.key}"
 }
-`
+`, bucket, key)
+}

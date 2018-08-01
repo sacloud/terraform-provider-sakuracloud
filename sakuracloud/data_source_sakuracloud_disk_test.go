@@ -5,11 +5,16 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/hashicorp/terraform/helper/acctest"
 	"github.com/hashicorp/terraform/helper/resource"
 	"github.com/hashicorp/terraform/terraform"
 )
 
 func TestAccSakuraCloudDataSourceDisk_Basic(t *testing.T) {
+	randString1 := acctest.RandStringFromCharSet(10, acctest.CharSetAlpha)
+	randString2 := acctest.RandStringFromCharSet(10, acctest.CharSetAlpha)
+	name := fmt.Sprintf("%s_%s", randString1, randString2)
+
 	resource.Test(t, resource.TestCase{
 		PreCheck:                  func() { testAccPreCheck(t) },
 		Providers:                 testAccProviders,
@@ -18,16 +23,16 @@ func TestAccSakuraCloudDataSourceDisk_Basic(t *testing.T) {
 
 		Steps: []resource.TestStep{
 			{
-				Config: testAccCheckSakuraCloudDataSourceDiskConfigBase,
+				Config: testAccCheckSakuraCloudDataSourceDiskConfigBase(name),
 				Check: resource.ComposeTestCheckFunc(
-					resource.TestCheckResourceAttr("sakuracloud_disk.disk01", "name", "hoge_Ubuntu_fuga"),
+					resource.TestCheckResourceAttr("sakuracloud_disk.disk01", "name", name),
 				),
 			},
 			{
-				Config: testAccCheckSakuraCloudDataSourceDiskConfig,
+				Config: testAccCheckSakuraCloudDataSourceDiskConfig(name, randString1, randString2),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckSakuraCloudDiskDataSourceID("data.sakuracloud_disk.foobar"),
-					resource.TestCheckResourceAttr("data.sakuracloud_disk.foobar", "name", "hoge_Ubuntu_fuga"),
+					resource.TestCheckResourceAttr("data.sakuracloud_disk.foobar", "name", name),
 					resource.TestCheckResourceAttr("data.sakuracloud_disk.foobar", "plan", "ssd"),
 					resource.TestCheckResourceAttr("data.sakuracloud_disk.foobar", "connector", "virtio"),
 					resource.TestCheckResourceAttr("data.sakuracloud_disk.foobar", "size", "20"),
@@ -39,32 +44,32 @@ func TestAccSakuraCloudDataSourceDisk_Basic(t *testing.T) {
 				),
 			},
 			{
-				Config: testAccCheckSakuraCloudDataSourceDiskConfig_With_Tag,
+				Config: testAccCheckSakuraCloudDataSourceDiskConfig_With_Tag(name),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckSakuraCloudDiskDataSourceID("data.sakuracloud_disk.foobar"),
 				),
 			},
 			{
-				Config: testAccCheckSakuraCloudDataSourceDisk_NameSelector_Exists,
+				Config: testAccCheckSakuraCloudDataSourceDisk_NameSelector_Exists(name, randString1, randString2),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckSakuraCloudDiskDataSourceID("data.sakuracloud_disk.foobar"),
 				),
 			},
 			{
-				Config: testAccCheckSakuraCloudDataSourceDisk_TagSelector_Exists,
+				Config: testAccCheckSakuraCloudDataSourceDisk_TagSelector_Exists(name),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckSakuraCloudDiskDataSourceID("data.sakuracloud_disk.foobar"),
 				),
 			},
 			{
-				Config: testAccCheckSakuraCloudDataSourceDiskConfig_NotExists,
+				Config: testAccCheckSakuraCloudDataSourceDiskConfig_NotExists(name),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckSakuraCloudDiskDataSourceNotExists("data.sakuracloud_disk.foobar"),
 				),
 				Destroy: true,
 			},
 			{
-				Config: testAccCheckSakuraCloudDataSourceDiskConfig_With_NotExists_Tag,
+				Config: testAccCheckSakuraCloudDataSourceDiskConfig_With_NotExists_Tag(name),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckSakuraCloudDiskDataSourceNotExists("data.sakuracloud_disk.foobar"),
 				),
@@ -134,17 +139,19 @@ func testAccCheckSakuraCloudDiskDataSourceDestroy(s *terraform.State) error {
 	return nil
 }
 
-var testAccCheckSakuraCloudDataSourceDiskConfigBase = `
+func testAccCheckSakuraCloudDataSourceDiskConfigBase(name string) string {
+	return fmt.Sprintf(`
 resource "sakuracloud_disk" "disk01"{
-    name = "hoge_Ubuntu_fuga"
+    name = "%s"
     tags = ["tag1","tag2","tag3"]
     description = "source_disk_description"
+}`, name)
 }
-`
 
-var testAccCheckSakuraCloudDataSourceDiskConfig = `
+func testAccCheckSakuraCloudDataSourceDiskConfig(name, p1, p2 string) string {
+	return fmt.Sprintf(`
 resource "sakuracloud_disk" "disk01"{
-    name = "hoge_Ubuntu_fuga"
+    name = "%s"
     tags = ["tag1","tag2","tag3"]
     description = "source_disk_description"
 }
@@ -152,13 +159,15 @@ resource "sakuracloud_disk" "disk01"{
 data "sakuracloud_disk" "foobar" {
     filter = {
 	name = "Name"
-	values = ["Ubuntu"]
+	values = ["%s", "%s"]
     }
-}`
+}`, name, p1, p2)
+}
 
-var testAccCheckSakuraCloudDataSourceDiskConfig_With_Tag = `
+func testAccCheckSakuraCloudDataSourceDiskConfig_With_Tag(name string) string {
+	return fmt.Sprintf(`
 resource "sakuracloud_disk" "disk01"{
-    name = "hoge_Ubuntu_fuga"
+    name = "%s"
     tags = ["tag1","tag2","tag3"]
     description = "source_disk_description"
 }
@@ -168,11 +177,13 @@ data "sakuracloud_disk" "foobar" {
 	name = "Tags"
 	values = ["tag2","tag3"]
     }
-}`
+}`, name)
+}
 
-var testAccCheckSakuraCloudDataSourceDiskConfig_With_NotExists_Tag = `
+func testAccCheckSakuraCloudDataSourceDiskConfig_With_NotExists_Tag(name string) string {
+	return fmt.Sprintf(`
 resource "sakuracloud_disk" "disk01"{
-    name = "hoge_Ubuntu_fuga"
+    name = "%s"
     tags = ["tag1","tag2","tag3"]
     description = "source_disk_description"
 }
@@ -182,11 +193,13 @@ data "sakuracloud_disk" "foobar" {
 	name = "Tags"
 	values = ["tag2","tag4"]
     }
-}`
+}`, name)
+}
 
-var testAccCheckSakuraCloudDataSourceDiskConfig_NotExists = `
+func testAccCheckSakuraCloudDataSourceDiskConfig_NotExists(name string) string {
+	return fmt.Sprintf(`
 resource "sakuracloud_disk" "disk01"{
-    name = "hoge_Ubuntu_fuga"
+    name = "%s"
     tags = ["tag1","tag2","tag3"]
     description = "source_disk_description"
 }
@@ -196,33 +209,39 @@ data "sakuracloud_disk" "foobar" {
 	name = "Name"
 	values = ["xxxxxxxxxxxxxxxxxx"]
     }
-}`
+}`, name)
+}
 
-var testAccCheckSakuraCloudDataSourceDisk_NameSelector_Exists = `
+func testAccCheckSakuraCloudDataSourceDisk_NameSelector_Exists(name, p1, p2 string) string {
+	return fmt.Sprintf(`
 resource "sakuracloud_disk" "disk01"{
-    name = "hoge_Ubuntu_fuga"
+    name = "%s"
     tags = ["tag1","tag2","tag3"]
     description = "source_disk_description"
 }
 data "sakuracloud_disk" "foobar" {
-    name_selectors = ["hoge", "Ubuntu","fuga"]
+    name_selectors = ["%s", "%s"]
 }
-`
+`, name, p1, p2)
+}
+
 var testAccCheckSakuraCloudDataSourceDisk_NameSelector_NotExists = `
 data "sakuracloud_disk" "foobar" {
     name_selectors = ["xxxxxxxxxx"]
 }
 `
 
-var testAccCheckSakuraCloudDataSourceDisk_TagSelector_Exists = `
+func testAccCheckSakuraCloudDataSourceDisk_TagSelector_Exists(name string) string {
+	return fmt.Sprintf(`
 resource "sakuracloud_disk" "disk01"{
-    name = "hoge_Ubuntu_fuga"
+    name = "%s"
     tags = ["tag1","tag2","tag3"]
     description = "source_disk_description"
 }
 data "sakuracloud_disk" "foobar" {
 	tag_selectors = ["tag1","tag2","tag3"]
-}`
+}`, name)
+}
 
 var testAccCheckSakuraCloudDataSourceDisk_TagSelector_NotExists = `
 data "sakuracloud_disk" "foobar" {

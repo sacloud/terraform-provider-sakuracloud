@@ -3,8 +3,10 @@ package sakuracloud
 import (
 	"errors"
 	"fmt"
+	"os"
 	"testing"
 
+	"github.com/hashicorp/terraform/helper/acctest"
 	"github.com/hashicorp/terraform/helper/resource"
 	"github.com/hashicorp/terraform/terraform"
 	"github.com/mitchellh/goamz/aws"
@@ -12,17 +14,23 @@ import (
 )
 
 func TestAccResourceSakuraCloudBucketObject(t *testing.T) {
+	randString1 := acctest.RandStringFromCharSet(10, acctest.CharSetAlpha)
+	randString2 := acctest.RandStringFromCharSet(10, acctest.CharSetAlpha)
+	randString3 := acctest.RandStringFromCharSet(10, acctest.CharSetAlpha)
+	key := fmt.Sprintf("%s/%s/%s.txt", randString1, randString2, randString3)
+	bucket := os.Getenv("SACLOUD_OJS_ACCESS_KEY_ID")
+
 	resource.Test(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckSakuraCloudBucketObjectDestroy,
 		Steps: []resource.TestStep{
 			{
-				Config: testAccCheckSakuraCloudBucketObjectConfig_basic,
+				Config: testAccCheckSakuraCloudBucketObjectConfig_basic(bucket, key),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckSakuraCloudBucketObjectExists("sakuracloud_bucket_object.foobar"),
 					resource.TestCheckResourceAttr(
-						"sakuracloud_bucket_object.foobar", "key", "foo/bar/test.txt"),
+						"sakuracloud_bucket_object.foobar", "key", key),
 					resource.TestCheckResourceAttr(
 						"sakuracloud_bucket_object.foobar", "size", "7"),
 					resource.TestCheckResourceAttr(
@@ -32,30 +40,30 @@ func TestAccResourceSakuraCloudBucketObject(t *testing.T) {
 						"sakuracloud_bucket_object.foobar", "etag", "9a0364b9e99bb480dd25e1f0284c8555"),
 					resource.TestCheckResourceAttr(
 						"sakuracloud_bucket_object.foobar",
-						"http_url", "http://terraform-for-sakuracloud-test.b.sakurastorage.jp/foo/bar/test.txt"),
+						"http_url", fmt.Sprintf("http://%s.b.sakurastorage.jp/%s", bucket, key)),
 					resource.TestCheckResourceAttr(
 						"sakuracloud_bucket_object.foobar",
-						"https_url", "https://terraform-for-sakuracloud-test.b.sakurastorage.jp/foo/bar/test.txt"),
+						"https_url", fmt.Sprintf("https://%s.b.sakurastorage.jp/%s", bucket, key)),
 					resource.TestCheckResourceAttr(
 						"sakuracloud_bucket_object.foobar",
-						"http_path_url", "http://b.sakurastorage.jp/terraform-for-sakuracloud-test/foo/bar/test.txt"),
+						"http_path_url", fmt.Sprintf("http://b.sakurastorage.jp/%s/%s", bucket, key)),
 					resource.TestCheckResourceAttr(
 						"sakuracloud_bucket_object.foobar",
-						"https_path_url", "https://b.sakurastorage.jp/terraform-for-sakuracloud-test/foo/bar/test.txt"),
+						"https_path_url", fmt.Sprintf("https://b.sakurastorage.jp/%s/%s", bucket, key)),
 					resource.TestCheckResourceAttr(
 						"sakuracloud_bucket_object.foobar",
-						"http_cache_url", "http://terraform-for-sakuracloud-test.c.sakurastorage.jp/foo/bar/test.txt"),
+						"http_cache_url", fmt.Sprintf("http://%s.c.sakurastorage.jp/%s", bucket, key)),
 					resource.TestCheckResourceAttr(
 						"sakuracloud_bucket_object.foobar",
-						"https_cache_url", "https://terraform-for-sakuracloud-test.c.sakurastorage.jp/foo/bar/test.txt"),
+						"https_cache_url", fmt.Sprintf("https://%s.c.sakurastorage.jp/%s", bucket, key)),
 				),
 			},
 			{
-				Config: testAccCheckSakuraCloudBucketObjectConfig_update,
+				Config: testAccCheckSakuraCloudBucketObjectConfig_update(bucket, key),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckSakuraCloudBucketObjectExists("sakuracloud_bucket_object.foobar"),
 					resource.TestCheckResourceAttr(
-						"sakuracloud_bucket_object.foobar", "key", "foo/bar/test.txt"),
+						"sakuracloud_bucket_object.foobar", "key", key),
 					resource.TestCheckResourceAttr(
 						"sakuracloud_bucket_object.foobar", "size", "11"),
 					resource.TestCheckResourceAttr(
@@ -112,16 +120,20 @@ func testAccCheckSakuraCloudBucketObjectDestroy(s *terraform.State) error {
 	return nil
 }
 
-const testAccCheckSakuraCloudBucketObjectConfig_basic = `
+func testAccCheckSakuraCloudBucketObjectConfig_basic(bucket, key string) string {
+	return fmt.Sprintf(`
 resource "sakuracloud_bucket_object" "foobar" {
-  key = "foo/bar/test.txt"
-  bucket = "terraform-for-sakuracloud-test"
+  bucket = "%s"
+  key = "%s"
   content = "content"
-}`
+}`, bucket, key)
+}
 
-const testAccCheckSakuraCloudBucketObjectConfig_update = `
+func testAccCheckSakuraCloudBucketObjectConfig_update(bucket, key string) string {
+	return fmt.Sprintf(`
 resource "sakuracloud_bucket_object" "foobar" {
-  key = "foo/bar/test.txt"
-  bucket = "terraform-for-sakuracloud-test"
+  bucket = "%s"
+  key = "%s"
   content = "content-upd"
-}`
+}`, bucket, key)
+}

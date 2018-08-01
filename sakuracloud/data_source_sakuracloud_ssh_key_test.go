@@ -5,11 +5,16 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/hashicorp/terraform/helper/acctest"
 	"github.com/hashicorp/terraform/helper/resource"
 	"github.com/hashicorp/terraform/terraform"
 )
 
 func TestAccSakuraCloudDataSourceSSHKey_Basic(t *testing.T) {
+	randString1 := acctest.RandStringFromCharSet(5, acctest.CharSetAlpha)
+	randString2 := acctest.RandStringFromCharSet(20, acctest.CharSetAlpha)
+	name := fmt.Sprintf("%s_%s", randString1, randString2)
+
 	resource.Test(t, resource.TestCase{
 		PreCheck:                  func() { testAccPreCheck(t) },
 		Providers:                 testAccProviders,
@@ -18,25 +23,25 @@ func TestAccSakuraCloudDataSourceSSHKey_Basic(t *testing.T) {
 
 		Steps: []resource.TestStep{
 			{
-				Config: testAccCheckSakuraCloudDataSourceSSHKeyBase,
+				Config: testAccCheckSakuraCloudDataSourceSSHKeyBase(name),
 				Check:  testAccCheckSakuraCloudSSHKeyDataSourceID("sakuracloud_ssh_key.foobar"),
 			},
 			{
-				Config: testAccCheckSakuraCloudDataSourceSSHKeyConfig,
+				Config: testAccCheckSakuraCloudDataSourceSSHKeyConfig(name),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckSakuraCloudSSHKeyDataSourceID("data.sakuracloud_ssh_key.foobar"),
-					resource.TestCheckResourceAttr("data.sakuracloud_ssh_key.foobar", "name", "name_test"),
+					resource.TestCheckResourceAttr("data.sakuracloud_ssh_key.foobar", "name", name),
 					resource.TestCheckResourceAttr("data.sakuracloud_ssh_key.foobar", "description", "description_test"),
 					resource.TestCheckResourceAttr("data.sakuracloud_ssh_key.foobar", "public_key", testAccPublicKey),
 					resource.TestCheckResourceAttr("data.sakuracloud_ssh_key.foobar", "fingerprint", testAccFingerprint),
 				),
 			},
 			{
-				Config: testAccCheckSakuraCloudDataSourceSSHKey_NameSelector_Exists,
+				Config: testAccCheckSakuraCloudDataSourceSSHKey_NameSelector_Exists(name, randString1, randString2),
 				Check:  testAccCheckSakuraCloudSSHKeyDataSourceID("sakuracloud_ssh_key.foobar"),
 			},
 			{
-				Config: testAccCheckSakuraCloudDataSourceSSHKeyConfig_NotExists,
+				Config: testAccCheckSakuraCloudDataSourceSSHKeyConfig_NotExists(name),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckSakuraCloudSSHKeyDataSourceNotExists("data.sakuracloud_ssh_key.foobar"),
 				),
@@ -99,36 +104,44 @@ func testAccCheckSakuraCloudSSHKeyDataSourceDestroy(s *terraform.State) error {
 	return nil
 }
 
-var testAccCheckSakuraCloudDataSourceSSHKeyBase = fmt.Sprintf(`
+func testAccCheckSakuraCloudDataSourceSSHKeyBase(name string) string {
+	return fmt.Sprintf(`
 resource "sakuracloud_ssh_key" "foobar" {
-    name = "name_test"
+    name = "%s"
     description = "description_test"
     public_key = "%s"
-}`, testAccPublicKey)
+}`, name, testAccPublicKey)
+}
 
-var testAccCheckSakuraCloudDataSourceSSHKeyConfig = fmt.Sprintf(`
+func testAccCheckSakuraCloudDataSourceSSHKeyConfig(name string) string {
+	return fmt.Sprintf(`
 %s
 data "sakuracloud_ssh_key" "foobar" {
     filter = {
 	name = "Name"
-	values = ["name_test"]
+	values = ["%s"]
     }
-}`, testAccCheckSakuraCloudDataSourceSSHKeyBase)
+}`, testAccCheckSakuraCloudDataSourceSSHKeyBase(name), name)
+}
 
-var testAccCheckSakuraCloudDataSourceSSHKeyConfig_NotExists = fmt.Sprintf(`
+func testAccCheckSakuraCloudDataSourceSSHKeyConfig_NotExists(name string) string {
+	return fmt.Sprintf(`
 %s
 data "sakuracloud_ssh_key" "foobar" {
     filter = {
 	name = "Name"
 	values = ["xxxxxxxxxxxxxxxxxx"]
     }
-}`, testAccCheckSakuraCloudDataSourceSSHKeyBase)
+}`, testAccCheckSakuraCloudDataSourceSSHKeyBase(name))
+}
 
-var testAccCheckSakuraCloudDataSourceSSHKey_NameSelector_Exists = fmt.Sprintf(`
+func testAccCheckSakuraCloudDataSourceSSHKey_NameSelector_Exists(name, p1, p2 string) string {
+	return fmt.Sprintf(`
 %s
 data "sakuracloud_ssh_key" "foobar" {
-    name_selectors = ["name", "test"]
-}`, testAccCheckSakuraCloudDataSourceSSHKeyBase)
+    name_selectors = ["%s", "%s"]
+}`, testAccCheckSakuraCloudDataSourceSSHKeyBase(name), p1, p2)
+}
 
 var testAccCheckSakuraCloudDataSourceSSHKey_NameSelector_NotExists = `
 data "sakuracloud_ssh_key" "foobar" {

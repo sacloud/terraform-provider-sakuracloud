@@ -5,11 +5,16 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/hashicorp/terraform/helper/acctest"
 	"github.com/hashicorp/terraform/helper/resource"
 	"github.com/hashicorp/terraform/terraform"
 )
 
 func TestAccSakuraCloudDataSourceDNS_Basic(t *testing.T) {
+	randString1 := acctest.RandStringFromCharSet(5, acctest.CharSetAlpha)
+	randString2 := acctest.RandStringFromCharSet(20, acctest.CharSetAlpha)
+	zone := fmt.Sprintf("%s.%s.com", randString1, randString2)
+
 	resource.Test(t, resource.TestCase{
 		PreCheck:                  func() { testAccPreCheck(t) },
 		Providers:                 testAccProviders,
@@ -18,14 +23,14 @@ func TestAccSakuraCloudDataSourceDNS_Basic(t *testing.T) {
 
 		Steps: []resource.TestStep{
 			{
-				Config: testAccCheckSakuraCloudDataSourceDNSBase,
+				Config: testAccCheckSakuraCloudDataSourceDNSBase(zone),
 				Check:  testAccCheckSakuraCloudDNSDataSourceID("sakuracloud_dns.foobar"),
 			},
 			{
-				Config: testAccCheckSakuraCloudDataSourceDNSConfig,
+				Config: testAccCheckSakuraCloudDataSourceDNSConfig(zone),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckSakuraCloudDNSDataSourceID("data.sakuracloud_dns.foobar"),
-					resource.TestCheckResourceAttr("data.sakuracloud_dns.foobar", "zone", "test-terraform-sakuracloud.com"),
+					resource.TestCheckResourceAttr("data.sakuracloud_dns.foobar", "zone", zone),
 					resource.TestCheckResourceAttr("data.sakuracloud_dns.foobar", "description", "description_test"),
 					resource.TestCheckResourceAttr("data.sakuracloud_dns.foobar", "tags.#", "3"),
 					resource.TestCheckResourceAttr("data.sakuracloud_dns.foobar", "tags.0", "tag1"),
@@ -34,32 +39,32 @@ func TestAccSakuraCloudDataSourceDNS_Basic(t *testing.T) {
 				),
 			},
 			{
-				Config: testAccCheckSakuraCloudDataSourceDNSConfig_With_Tag,
+				Config: testAccCheckSakuraCloudDataSourceDNSConfig_With_Tag(zone),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckSakuraCloudDNSDataSourceID("data.sakuracloud_dns.foobar"),
 				),
 			},
 			{
-				Config: testAccCheckSakuraCloudDataSourceDNS_NameSelector_Exists,
+				Config: testAccCheckSakuraCloudDataSourceDNS_NameSelector_Exists(zone, randString1, randString2),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckSakuraCloudDNSDataSourceID("data.sakuracloud_dns.foobar"),
 				),
 			},
 			{
-				Config: testAccCheckSakuraCloudDataSourceDNS_TagSelector_Exists,
+				Config: testAccCheckSakuraCloudDataSourceDNS_TagSelector_Exists(zone),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckSakuraCloudDNSDataSourceID("data.sakuracloud_dns.foobar"),
 				),
 			},
 			{
-				Config: testAccCheckSakuraCloudDataSourceDNSConfig_NotExists,
+				Config: testAccCheckSakuraCloudDataSourceDNSConfig_NotExists(zone),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckSakuraCloudDNSDataSourceNotExists("data.sakuracloud_dns.foobar"),
 				),
 				Destroy: true,
 			},
 			{
-				Config: testAccCheckSakuraCloudDataSourceDNSConfig_With_NotExists_Tag,
+				Config: testAccCheckSakuraCloudDataSourceDNSConfig_With_NotExists_Tag(zone),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckSakuraCloudDNSDataSourceNotExists("data.sakuracloud_dns.foobar"),
 				),
@@ -129,29 +134,34 @@ func testAccCheckSakuraCloudDNSDataSourceDestroy(s *terraform.State) error {
 	return nil
 }
 
-var testAccCheckSakuraCloudDataSourceDNSBase = `
+func testAccCheckSakuraCloudDataSourceDNSBase(zone string) string {
+	return fmt.Sprintf(`
 resource "sakuracloud_dns" "foobar" {
-    zone = "test-terraform-sakuracloud.com"
+    zone = "%s"
     description = "description_test"
     tags = ["tag1","tag2","tag3"]
-}`
+}`, zone)
+}
 
-var testAccCheckSakuraCloudDataSourceDNSConfig = `
+func testAccCheckSakuraCloudDataSourceDNSConfig(zone string) string {
+	return fmt.Sprintf(`
 resource "sakuracloud_dns" "foobar" {
-    zone = "test-terraform-sakuracloud.com"
+    zone = "%s"
     description = "description_test"
     tags = ["tag1","tag2","tag3"]
 }
 data "sakuracloud_dns" "foobar" {
     filter = {
 	name = "Name"
-	values = ["test-terraform-sakuracloud.com"]
+	values = ["%s"]
     }
-}`
+}`, zone, zone)
+}
 
-var testAccCheckSakuraCloudDataSourceDNSConfig_With_Tag = `
+func testAccCheckSakuraCloudDataSourceDNSConfig_With_Tag(zone string) string {
+	return fmt.Sprintf(`
 resource "sakuracloud_dns" "foobar" {
-    zone = "test-terraform-sakuracloud.com"
+    zone = "%s"
     description = "description_test"
     tags = ["tag1","tag2","tag3"]
 }
@@ -160,11 +170,13 @@ data "sakuracloud_dns" "foobar" {
 	name = "Tags"
 	values = ["tag1","tag3"]
     }
-}`
+}`, zone)
+}
 
-var testAccCheckSakuraCloudDataSourceDNSConfig_With_NotExists_Tag = `
+func testAccCheckSakuraCloudDataSourceDNSConfig_With_NotExists_Tag(zone string) string {
+	return fmt.Sprintf(`
 resource "sakuracloud_dns" "foobar" {
-    zone = "test-terraform-sakuracloud.com"
+    zone = "%s"
     description = "description_test"
     tags = ["tag1","tag2","tag3"]
 }
@@ -173,11 +185,13 @@ data "sakuracloud_dns" "foobar" {
 	name = "Tags"
 	values = ["tag1-xxxxxxx","tag3-xxxxxxxx"]
     }
-}`
+}`, zone)
+}
 
-var testAccCheckSakuraCloudDataSourceDNSConfig_NotExists = `
+func testAccCheckSakuraCloudDataSourceDNSConfig_NotExists(zone string) string {
+	return fmt.Sprintf(`
 resource "sakuracloud_dns" "foobar" {
-    zone = "test-terraform-sakuracloud.com"
+    zone = "%s"
     description = "description_test"
     tags = ["tag1","tag2","tag3"]
 }
@@ -186,33 +200,39 @@ data "sakuracloud_dns" "foobar" {
 	name = "Name"
 	values = ["xxxxxxxxxxxxxxxxxx"]
     }
-}`
+}`, zone)
+}
 
-var testAccCheckSakuraCloudDataSourceDNS_NameSelector_Exists = `
+func testAccCheckSakuraCloudDataSourceDNS_NameSelector_Exists(zone, p1, p2 string) string {
+	return fmt.Sprintf(`
 resource "sakuracloud_dns" "foobar" {
-    zone = "test-terraform-sakuracloud.com"
+    zone = "%s"
     description = "description_test"
     tags = ["tag1","tag2","tag3"]
 }
 data "sakuracloud_dns" "foobar" {
-    name_selectors = ["test", "terraform","sakuracloud.com"]
+    name_selectors = ["%s", "%s",".com"]
 }
-`
+`, zone, p1, p2)
+}
+
 var testAccCheckSakuraCloudDataSourceDNS_NameSelector_NotExists = `
 data "sakuracloud_dns" "foobar" {
     name_selectors = ["xxxxxxxxxx"]
 }
 `
 
-var testAccCheckSakuraCloudDataSourceDNS_TagSelector_Exists = `
+func testAccCheckSakuraCloudDataSourceDNS_TagSelector_Exists(zone string) string {
+	return fmt.Sprintf(`
 resource "sakuracloud_dns" "foobar" {
-    zone = "test-terraform-sakuracloud.com"
+    zone = "%s"
     description = "description_test"
     tags = ["tag1","tag2","tag3"]
 }
 data "sakuracloud_dns" "foobar" {
 	tag_selectors = ["tag1","tag2","tag3"]
-}`
+}`, zone)
+}
 
 var testAccCheckSakuraCloudDataSourceDNS_TagSelector_NotExists = `
 data "sakuracloud_dns" "foobar" {
