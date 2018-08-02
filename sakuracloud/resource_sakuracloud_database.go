@@ -5,6 +5,7 @@ import (
 
 	"github.com/hashicorp/terraform/helper/schema"
 	"github.com/hashicorp/terraform/helper/validation"
+	"github.com/sacloud/libsacloud/utils/setup"
 
 	"strconv"
 	"strings"
@@ -195,29 +196,34 @@ func resourceSakuraCloudDatabaseCreate(d *schema.ResourceData, meta interface{})
 	}
 
 	createDB := sacloud.CreateNewDatabase(opts)
-	database, err := client.Database.Create(createDB)
+
+	dbBuilder := &setup.RetryableSetup{
+		Create: func() (sacloud.ResourceIDHolder, error) {
+			return client.Database.Create(createDB)
+		},
+		AsyncWaitForCopy: func(id int64) (chan interface{}, chan interface{}, chan error) {
+			return client.Database.AsyncSleepWhileCopying(id, client.DefaultTimeoutDuration, 5)
+		},
+		Delete: func(id int64) error {
+			_, err := client.Database.Delete(id)
+			return err
+		},
+		WaitForUp: func(id int64) error {
+			return client.Database.SleepUntilUp(id, client.DefaultTimeoutDuration)
+		},
+		RetryCount: 3,
+	}
+
+	res, err := dbBuilder.Setup()
 	if err != nil {
 		return fmt.Errorf("Failed to create SakuraCloud Database resource: %s", err)
 	}
 
-	//wait
-	compChan, progChan, errChan := client.Database.AsyncSleepWhileCopying(database.ID, client.DefaultTimeoutDuration, 5)
-	for {
-		select {
-		case <-compChan:
-			break
-		case <-progChan:
-			continue
-		case err := <-errChan:
-			return fmt.Errorf("Failed to wait SakuraCloud Database copy: %s", err)
-		}
-		break
+	database, ok := res.(*sacloud.Database)
+	if !ok {
+		return fmt.Errorf("Failed to create SakuraCloud Database resource: created resource is not *sacloud.Database")
 	}
 
-	err = client.Database.SleepUntilUp(database.ID, client.DefaultTimeoutDuration)
-	if err != nil {
-		return fmt.Errorf("Failed to wait SakuraCloud Database boot: %s", err)
-	}
 	err = client.Database.SleepUntilDatabaseRunning(database.ID, client.DefaultTimeoutDuration, 5)
 	if err != nil {
 		return fmt.Errorf("Failed to wait SakuraCloud Database start: %s", err)

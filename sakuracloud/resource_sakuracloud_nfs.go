@@ -5,6 +5,7 @@ import (
 
 	"github.com/hashicorp/terraform/helper/schema"
 	"github.com/hashicorp/terraform/helper/validation"
+	"github.com/sacloud/libsacloud/utils/setup"
 
 	"strconv"
 
@@ -128,30 +129,33 @@ func resourceSakuraCloudNFSCreate(d *schema.ResourceData, meta interface{}) erro
 	opts.DefaultRoute = defaultRoute
 
 	createNFS := sacloud.NewNFS(opts)
-	nfs, err := client.NFS.Create(createNFS)
+
+	nfsBuilder := &setup.RetryableSetup{
+		Create: func() (sacloud.ResourceIDHolder, error) {
+			return client.NFS.Create(createNFS)
+		},
+		AsyncWaitForCopy: func(id int64) (chan interface{}, chan interface{}, chan error) {
+			return client.NFS.AsyncSleepWhileCopying(id, client.DefaultTimeoutDuration, 5)
+		},
+		Delete: func(id int64) error {
+			_, err := client.NFS.Delete(id)
+			return err
+		},
+		WaitForUp: func(id int64) error {
+			return client.NFS.SleepUntilUp(id, client.DefaultTimeoutDuration)
+		},
+		RetryCount: 3,
+	}
+
+	res, err := nfsBuilder.Setup()
 	if err != nil {
 		return fmt.Errorf("Failed to create SakuraCloud NFS resource: %s", err)
 	}
 
-	//wait
-	compChan, progChan, errChan := client.NFS.AsyncSleepWhileCopying(nfs.ID, client.DefaultTimeoutDuration, 5)
-	for {
-		select {
-		case <-compChan:
-			break
-		case <-progChan:
-			continue
-		case err := <-errChan:
-			return fmt.Errorf("Failed to wait SakuraCloud NFS copy: %s", err)
-		}
-		break
+	nfs, ok := res.(*sacloud.NFS)
+	if !ok {
+		return fmt.Errorf("Failed to create SakuraCloud NFS resource: created resource is not *sacloud.NFS")
 	}
-
-	err = client.NFS.SleepUntilUp(nfs.ID, client.DefaultTimeoutDuration)
-	if err != nil {
-		return fmt.Errorf("Failed to wait SakuraCloud NFS boot: %s", err)
-	}
-
 	d.SetId(nfs.GetStrID())
 	return resourceSakuraCloudNFSRead(d, meta)
 }
