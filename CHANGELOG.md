@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.3.4 (2018-08-09)
+
+* サーバ作成時のプロビジョニング用接続情報のデフォルト値設定 #326 (yamamoto-febc)
+* marker_tagsに廃止予定マークを付与 #338 (yamamoto-febc)
+* ディスクの作成失敗時のリトライ #339 (yamamoto-febc)
+
+
 ## 1.3.3 (2018-07-24)
 
 * fix typo: ipv4_prt -> ipv4_ptr #322 (yamamoto-febc)
