@@ -16,7 +16,10 @@ test-api: vet
 test-builder: vet
 	go test ./builder $(TESTARGS) -v -timeout=120m -parallel=4 ;
 
-test-all: test test-api test-builder
+test-utils: vet
+	go test ./utils/* $(TESTARGS) -v -timeout=120m -parallel=4 ;
+
+test-all: test test-api test-builder test-utils
 
 vet: golint
 	go vet ./...
