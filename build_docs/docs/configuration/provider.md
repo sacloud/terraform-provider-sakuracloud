@@ -34,8 +34,8 @@ provider "sakuracloud" {
 |`timeout`        | -   | タイムアウト         | `20`     | 数値(分) |環境変数`SAKURACLOUD_TIMEOUT`での指定も可|
 |`api_root_url`   | -   | さくらのクラウドAPI ルートURL | -        |文字列|テストなどのためにAPIのルートAPIを変更したい場合に設定する。<br />末尾にスラッシュを含めないでください。<br />指定しない場合のルートURLは`https://secure.sakura.ad.jp/cloud/zone`<br />環境変数`SAKURACLOUD_API_ROOT_URL`での指定も可  |
 |`trace`          | -   | トレースフラグ       | `false`     |`true`<br />`false`|(開発者向け)詳細ログの出力ON/OFFを指定します。 <br />環境変数`SAKURACLOUD_TRACE_MODE`での指定も可|
-|`use_marker_tags`| -   | マーカータグ利用有無  | `false`     |`true`<br />`false`|Terraformで作成されたリソースであるかの判別用に全てのリソースにタグを付与するかを指定<br />環境変数`SAKURACLOUD_USE_MARKER_TAGS`での指定も可|
-|`marker_tag_name`| -   | マーカータグ名       | `@terraform`|文字列|`use_marker_tags`がtrueの場合のタグ名 <br />環境変数`SAKURACLOUD_MARKER_TAG_NAME`での指定も可|
+|`use_marker_tags`| -   | マーカータグ利用有無  | `false`     |`true`<br />`false`| (非推奨/廃止予定) Terraformで作成されたリソースであるかの判別用に全てのリソースにタグを付与するかを指定<br />環境変数`SAKURACLOUD_USE_MARKER_TAGS`での指定も可|
+|`marker_tag_name`| -   | マーカータグ名       | `@terraform`|文字列| (非推奨/廃止予定) `use_marker_tags`がtrueの場合のタグ名 <br />環境変数`SAKURACLOUD_MARKER_TAG_NAME`での指定も可|
 
 各パラメータとも環境変数での指定が可能です。
 
