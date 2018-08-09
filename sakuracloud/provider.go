@@ -68,11 +68,13 @@ func Provider() terraform.ResourceProvider {
 				Type:        schema.TypeBool,
 				Optional:    true,
 				DefaultFunc: schema.EnvDefaultFunc("SAKURACLOUD_USE_MARKER_TAGS", false),
+				Deprecated:  "Use `tags` in the each resources instead",
 			},
 			"marker_tag_name": {
 				Type:        schema.TypeString,
 				Optional:    true,
 				DefaultFunc: schema.EnvDefaultFunc("SAKURACLOUD_MARKER_TAG_NAME", "@terraform"),
+				Deprecated:  "Use `tags` in the each resources instead",
 			},
 			"trace": {
 				Type:        schema.TypeBool,
