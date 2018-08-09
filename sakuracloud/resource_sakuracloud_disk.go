@@ -5,6 +5,7 @@ import (
 
 	"github.com/hashicorp/terraform/helper/schema"
 	"github.com/hashicorp/terraform/helper/validation"
+	"github.com/sacloud/libsacloud/utils/setup"
 
 	"log"
 
@@ -167,68 +168,76 @@ func resourceSakuraCloudDiskCreate(d *schema.ResourceData, meta interface{}) err
 		opts.Tags = expandTags(client, rawTags)
 	}
 
-	disk, err := client.Disk.Create(opts)
+	diskBuilder := &setup.RetryableSetup{
+		Create: func() (sacloud.ResourceIDHolder, error) {
+			return client.Disk.Create(opts)
+		},
+		AsyncWaitForCopy: func(id int64) (chan interface{}, chan interface{}, chan error) {
+			return client.Disk.AsyncSleepWhileCopying(id, client.DefaultTimeoutDuration)
+		},
+		Delete: func(id int64) error {
+			_, err := client.Disk.Delete(id)
+			return err
+		},
+		ProvisionBeforeUp: func(id int64, _ interface{}) error {
+			//edit disk
+			diskEditConfig := client.Disk.NewCondig()
+			if hostName, ok := d.GetOk("hostname"); ok {
+				diskEditConfig.SetHostName(hostName.(string))
+			}
+			if password, ok := d.GetOk("password"); ok {
+				diskEditConfig.SetPassword(password.(string))
+			}
+			if sshKeyIDs, ok := d.GetOk("ssh_key_ids"); ok {
+				ids := expandStringList(sshKeyIDs.([]interface{}))
+				diskEditConfig.SetSSHKeys(ids)
+			}
+
+			if disablePasswordAuth, ok := d.GetOk("disable_pw_auth"); ok {
+				diskEditConfig.SetDisablePWAuth(disablePasswordAuth.(bool))
+			}
+
+			if noteIDs, ok := d.GetOk("note_ids"); ok {
+				ids := expandStringList(noteIDs.([]interface{}))
+				diskEditConfig.SetNotes(ids)
+			}
+
+			// call disk edit API
+			res, err := client.Disk.CanEditDisk(id)
+			if err != nil {
+				return fmt.Errorf("Failed to check CanEditDisk: %s", err)
+			}
+			if res {
+				_, err = client.Disk.Config(id, diskEditConfig)
+				if err != nil {
+					return fmt.Errorf("Error editting SakuraCloud DiskConfig: %s", err)
+				}
+			} else {
+				log.Printf("[WARN] Disk[%d] does not support modify disk", id)
+			}
+
+			server_id, ok := d.GetOk("server_id")
+			if ok {
+				_, err = client.Disk.ConnectToServer(id, toSakuraCloudID(server_id.(string)))
+
+				if err != nil {
+					return fmt.Errorf("Failed to connect SakuraCloud Disk resource: %s", err)
+				}
+			}
+
+			return nil
+		},
+		RetryCount: 3,
+	}
+
+	res, err := diskBuilder.Setup()
 	if err != nil {
 		return fmt.Errorf("Failed to create SakuraCloud Disk resource: %s", err)
 	}
 
-	//wait
-	compChan, progChan, errChan := client.Disk.AsyncSleepWhileCopying(disk.ID, client.DefaultTimeoutDuration)
-	for {
-		select {
-		case <-compChan:
-			break
-		case <-progChan:
-			continue
-		case err := <-errChan:
-			return fmt.Errorf("Failed to wait SakuraCloud Disk copy: %s", err)
-		}
-		break
-	}
-
-	//edit disk
-	diskEditConfig := client.Disk.NewCondig()
-	if hostName, ok := d.GetOk("hostname"); ok {
-		diskEditConfig.SetHostName(hostName.(string))
-	}
-	if password, ok := d.GetOk("password"); ok {
-		diskEditConfig.SetPassword(password.(string))
-	}
-	if sshKeyIDs, ok := d.GetOk("ssh_key_ids"); ok {
-		ids := expandStringList(sshKeyIDs.([]interface{}))
-		diskEditConfig.SetSSHKeys(ids)
-	}
-
-	if disablePasswordAuth, ok := d.GetOk("disable_pw_auth"); ok {
-		diskEditConfig.SetDisablePWAuth(disablePasswordAuth.(bool))
-	}
-
-	if noteIDs, ok := d.GetOk("note_ids"); ok {
-		ids := expandStringList(noteIDs.([]interface{}))
-		diskEditConfig.SetNotes(ids)
-	}
-
-	// call disk edit API
-	res, err := client.Disk.CanEditDisk(disk.ID)
-	if err != nil {
-		return fmt.Errorf("Failed to check CanEditDisk: %s", err)
-	}
-	if res {
-		_, err = client.Disk.Config(disk.ID, diskEditConfig)
-		if err != nil {
-			return fmt.Errorf("Error editting SakuraCloud DiskConfig: %s", err)
-		}
-	} else {
-		log.Printf("[WARN] Disk[%d] does not support modify disk", disk.ID)
-	}
-
-	server_id, ok := d.GetOk("server_id")
-	if ok {
-		_, err = client.Disk.ConnectToServer(disk.ID, toSakuraCloudID(server_id.(string)))
-
-		if err != nil {
-			return fmt.Errorf("Failed to connect SakuraCloud Disk resource: %s", err)
-		}
+	disk, ok := res.(*sacloud.Disk)
+	if !ok {
+		return fmt.Errorf("Failed to create SakuraCloud Disk resource: created resource is not *sacloud.Disk")
 	}
 
 	d.SetId(disk.GetStrID())
