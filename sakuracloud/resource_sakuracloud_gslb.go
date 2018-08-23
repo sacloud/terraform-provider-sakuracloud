@@ -285,7 +285,7 @@ func setGSLBResourceData(d *schema.ResourceData, client *APIClient, data *saclou
 	d.Set("sorry_server", data.Settings.GSLB.SorryServer)
 	d.Set("icon_id", data.GetIconStrID())
 	d.Set("description", data.Description)
-	d.Set("tags", realTags(client, data.Tags))
+	d.Set("tags", data.Tags)
 	d.Set("weighted", strings.ToLower(data.Settings.GSLB.Weighted) == "true")
 
 	return nil

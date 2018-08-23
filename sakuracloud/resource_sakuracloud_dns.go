@@ -145,7 +145,7 @@ func setDNSResourceData(d *schema.ResourceData, client *APIClient, data *sacloud
 	d.Set("zone", data.Name)
 	d.Set("icon_id", data.GetIconStrID())
 	d.Set("description", data.Description)
-	d.Set("tags", realTags(client, data.Tags))
+	d.Set("tags", data.Tags)
 	d.Set("dns_servers", data.Status.NS)
 	return nil
 }

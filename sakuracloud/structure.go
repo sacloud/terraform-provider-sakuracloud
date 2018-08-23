@@ -26,8 +26,7 @@ func getSacloudAPIClient(d resourceValueGetable, meta interface{}) *APIClient {
 		client.Zone = zone.(string)
 	}
 	return &APIClient{
-		Client:        client,
-		MarkerTagName: c.MarkerTagName,
+		Client: client,
 	}
 }
 
@@ -46,22 +45,8 @@ func expandStringList(configured []interface{}) []string {
 	return vs
 }
 
-func expandTags(client *APIClient, configured []interface{}) []string {
-	vs := expandStringList(configured)
-	if client.MarkerTagName != "" {
-		vs = append(vs, client.MarkerTagName)
-	}
-	return vs
-}
-
-func realTags(client *APIClient, tags []string) []string {
-	vs := make([]string, 0, len(tags))
-	for _, v := range tags {
-		if client.MarkerTagName == "" || client.MarkerTagName != v {
-			vs = append(vs, v)
-		}
-	}
-	return vs
+func expandTags(_ *APIClient, configured []interface{}) []string {
+	return expandStringList(configured)
 }
 
 func expandStringListWithValidateInList(fieldName string, configured []interface{}, allowWords []string) ([]string, error) {

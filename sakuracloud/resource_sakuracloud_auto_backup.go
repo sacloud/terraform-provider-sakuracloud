@@ -123,7 +123,7 @@ func resourceSakuraCloudAutoBackupRead(d *schema.ResourceData, meta interface{})
 	d.Set("weekdays", autoBackup.Settings.Autobackup.BackupSpanWeekdays)
 	d.Set("icon_id", autoBackup.GetIconStrID())
 	d.Set("description", autoBackup.Description)
-	d.Set("tags", realTags(client, autoBackup.Tags))
+	d.Set("tags", autoBackup.Tags)
 	d.Set("zone", client.Zone)
 
 	return nil

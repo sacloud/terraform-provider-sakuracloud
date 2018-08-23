@@ -511,7 +511,7 @@ func setSimpleMonitorResourceData(d *schema.ResourceData, client *APIClient, dat
 
 	d.Set("icon_id", data.GetIconStrID())
 	d.Set("description", data.Description)
-	d.Set("tags", realTags(client, data.Tags))
+	d.Set("tags", data.Tags)
 
 	d.Set("enabled", data.Settings.SimpleMonitor.Enabled)
 

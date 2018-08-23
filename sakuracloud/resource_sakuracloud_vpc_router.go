@@ -272,7 +272,7 @@ func setVPCRouterResourceData(d *schema.ResourceData, client *APIClient, data *s
 		d.Set("syslog_host", "")
 		d.Set("internet_connection", false)
 	}
-	d.Set("tags", realTags(client, data.Tags))
+	d.Set("tags", data.Tags)
 
 	//plan
 	planID := data.Plan.ID

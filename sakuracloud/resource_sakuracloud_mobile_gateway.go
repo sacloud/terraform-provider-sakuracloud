@@ -451,7 +451,7 @@ func setMobileGatewayResourceData(d *schema.ResourceData, client *APIClient, dat
 	d.Set("name", data.Name)
 	d.Set("icon_id", data.GetIconStrID())
 	d.Set("description", data.Description)
-	d.Set("tags", realTags(client, data.Tags))
+	d.Set("tags", data.Tags)
 
 	sims, err := client.MobileGateway.ListSIM(data.ID, nil)
 	if err != nil {

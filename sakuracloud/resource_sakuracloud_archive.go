@@ -246,7 +246,7 @@ func setArchiveResourceData(d *schema.ResourceData, client *APIClient, data *sac
 	d.Set("size", toSizeGB(data.SizeMB))
 	d.Set("icon_id", data.GetIconStrID())
 	d.Set("description", data.Description)
-	d.Set("tags", realTags(client, data.Tags))
+	d.Set("tags", data.Tags)
 
 	// NOTE 本来はAPIにてmd5ハッシュを取得できるのが望ましい
 	if v, ok := d.GetOk("archive_file"); ok {

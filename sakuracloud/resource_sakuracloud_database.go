@@ -391,7 +391,7 @@ func setDatabaseResourceData(d *schema.ResourceData, client *APIClient, data *sa
 			tags = append(tags, t)
 		}
 	}
-	d.Set("tags", realTags(client, tags))
+	d.Set("tags", tags)
 	setPowerManageTimeoutValueToState(d)
 
 	d.Set("zone", client.Zone)

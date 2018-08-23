@@ -13,8 +13,6 @@ type Config struct {
 	Zone              string
 	TimeoutMinute     int
 	TraceMode         bool
-	UseMarkerTags     bool
-	MarkerTagName     string
 	AcceptLanguage    string
 	APIRootURL        string
 	RetryMax          int
@@ -24,7 +22,6 @@ type Config struct {
 // APIClient for SakuraCloud API
 type APIClient struct {
 	*api.Client
-	MarkerTagName string
 }
 
 // NewClient returns new API Client for SakuraCloud
@@ -52,13 +49,7 @@ func (c *Config) NewClient() *APIClient {
 	}
 	client.UserAgent = "Terraform for SakuraCloud/v" + Version
 
-	markerTagName := ""
-	if c.UseMarkerTags {
-		markerTagName = c.MarkerTagName
-	}
-
 	return &APIClient{
-		Client:        client,
-		MarkerTagName: markerTagName,
+		Client: client,
 	}
 }

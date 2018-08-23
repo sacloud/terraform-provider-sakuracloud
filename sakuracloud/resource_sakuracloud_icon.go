@@ -167,7 +167,7 @@ func setIconResourceData(d *schema.ResourceData, client *APIClient, data *saclou
 	}
 
 	d.Set("body", body)
-	d.Set("tags", realTags(client, data.Tags))
+	d.Set("tags", data.Tags)
 	d.Set("url", data.URL)
 
 	return nil

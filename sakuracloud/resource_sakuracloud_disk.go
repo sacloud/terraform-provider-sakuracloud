@@ -452,7 +452,7 @@ func setDiskResourceData(d *schema.ResourceData, client *APIClient, data *saclou
 	d.Set("size", toSizeGB(data.SizeMB))
 	d.Set("icon_id", data.GetIconStrID())
 	d.Set("description", data.Description)
-	d.Set("tags", realTags(client, data.Tags))
+	d.Set("tags", data.Tags)
 
 	if data.Server == nil {
 		d.Set("server_id", "")

@@ -257,7 +257,7 @@ func setSwitchResourceData(d *schema.ResourceData, client *APIClient, data *sacl
 	d.Set("name", data.Name)
 	d.Set("icon_id", data.GetIconStrID())
 	d.Set("description", data.Description)
-	d.Set("tags", realTags(client, data.Tags))
+	d.Set("tags", data.Tags)
 	if data.ServerCount > 0 {
 		servers, err := client.Switch.GetServers(toSakuraCloudID(d.Id()))
 		if err != nil {

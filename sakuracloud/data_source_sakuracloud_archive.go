@@ -156,7 +156,7 @@ func dataSourceSakuraCloudArchiveRead(d *schema.ResourceData, meta interface{}) 
 		d.Set("size", toSizeGB(data.SizeMB))
 		d.Set("icon_id", data.GetIconStrID())
 		d.Set("description", data.Description)
-		d.Set("tags", realTags(client, data.Tags))
+		d.Set("tags", data.Tags)
 
 		d.Set("zone", client.Zone)
 	}
