@@ -31,6 +31,8 @@ func TestAccSakuraCloudLoadBalancerVIP(t *testing.T) {
 					resource.TestCheckResourceAttr(
 						"sakuracloud_load_balancer_vip.vip1", "sorry_server", "192.168.11.11"),
 					resource.TestCheckResourceAttr(
+						"sakuracloud_load_balancer_vip.vip1", "description", "description"),
+					resource.TestCheckResourceAttr(
 						"sakuracloud_load_balancer_vip.vip2", "vip", "192.168.11.202"),
 				),
 			},
@@ -111,6 +113,7 @@ resource "sakuracloud_load_balancer_vip" "vip1" {
     port = 80
     delay_loop = 100
     sorry_server = "192.168.11.11"
+    description  = "description"
 }
 resource "sakuracloud_load_balancer_vip" "vip2" {
     load_balancer_id = "${sakuracloud_load_balancer.foobar.id}"

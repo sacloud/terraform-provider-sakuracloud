@@ -46,6 +46,10 @@ func resourceSakuraCloudLoadBalancerVIP() *schema.Resource {
 				Type:     schema.TypeString,
 				Optional: true,
 			},
+			"description": {
+				Type:     schema.TypeString,
+				Optional: true,
+			},
 			"zone": {
 				Type:         schema.TypeString,
 				Optional:     true,
