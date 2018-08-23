@@ -23,6 +23,9 @@ resource sakuracloud_simple_monitor "foobar" {
     status      = "200"
     host_header = "hostname.example.com"
     sni         = true
+    # for Basic Auth
+    # username = "foo"
+    # password = "bar"
   }
     
   notify_email_enabled = true
@@ -71,6 +74,8 @@ Valid value is one of the following: [ "http" / "https" / "ping" / "tcp" / "dns"
 * `path` - (Optional) The request path used in http/https health check access.
 * `status` - (Optional) HTTP status code expected by health check access.
 * `sni` - (Optional) The flag of enable/disable SNI.
+* `username` - (Optional) The Basic Auth Username used in http/https health check access.
+* `password` - (Optional) The Basic Auth Password request path used in http/https health check access.
 * `port` - (Optional) Port number used in health check access.
 * `qname` - (Optional) The QName value used in dns health check access.
 * `excepcted_data` - (Optional) The expect value used in dns/snmp health check.

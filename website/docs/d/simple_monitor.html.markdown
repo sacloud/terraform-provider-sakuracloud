@@ -48,6 +48,8 @@ Attributes for Health Check:
 * `path` - The request path used in http/https health check access.
 * `status` - HTTP status code expected by health check access.
 * `sni` - The flag of enable/disable SNI.
+* `username` - The Basic Auth Username used in http/https health check access.
+* `password` - The Basic Auth Password request path used in http/https health check access.
 * `port` - Port number used in health check access.
 * `qname` - The QName value used in dns health check access.
 * `excepcted_data` - The expect value used in dns/snmp health check.
