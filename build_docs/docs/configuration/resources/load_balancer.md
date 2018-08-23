@@ -35,6 +35,7 @@ resource sakuracloud_load_balancer_vip "vip1" {
   port             = 80
   #delay_loop       = 10
   #sorry_server     = "192.168.11.11"
+  #description      = "description"
 
   zone = "tk1v"
 }
@@ -117,6 +118,7 @@ resource sakuracloud_switch "sw" {
 | `port`             | ◯   | ポート番号      | -        | 数値                          | - |
 | `delay_loop`       | -   | チェック間隔秒数  | `10`    | `10`〜`2147483647`の整数           | - |
 | `sorry_server`     | -   | ソーリーサーバ  | -        | 文字列     | VIPに紐づく実サーバがすべてダウンした場合、<br />すべてのアクセスを指定したサーバに誘導します |
+| `description`      | -   | 説明           | -        | 文字列                         | - |
 | `zone`             | -   | ゾーン          | -        | `is1a`<br />`is1b`<br />`tk1a`<br />`tk1v` | - |
 
 
