@@ -29,6 +29,7 @@ resource "sakuracloud_load_balancer_vip" "vip1" {
     port             = 80
     delay_loop       = 50
     sorry_server     = "192.168.2.201"
+    description      = "description"
 }
 ```
 
@@ -41,6 +42,7 @@ The following arguments are supported:
 * `port` - (Required) The port number on which Load Balancer listens.
 * `delay_loop` - (Optional) The interval seconds for health check access.
 * `sorry_server` - (Optional) The hostname or IP address of sorry server.
+* `description` - (Optional) The description of the VIP.
 * `zone` - (Optional) The ID of the zone to which the resource belongs.
 
 ## Attributes Reference
@@ -52,6 +54,7 @@ The following attributes are exported:
 * `port` - The port number on which Load Balancer listens.
 * `delay_loop` - The interval seconds for Health check access.
 * `sorry_server` - The hostname or IP address of sorry server.
+* `description` - The description of the VIP.
 * `servers` - The internal ID list of servers under VIP.
 * `zone` - The ID of the zone to which the resource belongs.
 
