@@ -76,6 +76,14 @@ func dataSourceSakuraCloudSimpleMonitor() *schema.Resource {
 							Type:     schema.TypeBool,
 							Computed: true,
 						},
+						"username": {
+							Type:     schema.TypeString,
+							Optional: true,
+						},
+						"password": {
+							Type:     schema.TypeString,
+							Optional: true,
+						},
 						"port": {
 							Type:     schema.TypeInt,
 							Computed: true,

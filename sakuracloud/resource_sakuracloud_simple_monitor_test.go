@@ -31,6 +31,10 @@ func TestAccResourceSakuraCloudSimpleMonitor(t *testing.T) {
 					resource.TestCheckResourceAttr(
 						"sakuracloud_simple_monitor.foobar", "health_check.0.sni", "true"),
 					resource.TestCheckResourceAttr(
+						"sakuracloud_simple_monitor.foobar", "health_check.0.username", "foo"),
+					resource.TestCheckResourceAttr(
+						"sakuracloud_simple_monitor.foobar", "health_check.0.password", "bar"),
+					resource.TestCheckResourceAttr(
 						"sakuracloud_simple_monitor.foobar", "target", "terraform.io"),
 					resource.TestCheckResourceAttr(
 						"sakuracloud_simple_monitor.foobar", "notify_email_enabled", "true"),
@@ -181,6 +185,8 @@ resource "sakuracloud_simple_monitor" "foobar" {
         status = "200"
         host_header = "libsacloud.com"
 		sni  = true
+        username = "foo"
+        password = "bar"
     }
     description = "SimpleMonitor from TerraForm for SAKURA CLOUD"
     tags = ["hoge1" , "hoge2"]

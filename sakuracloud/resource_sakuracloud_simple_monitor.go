@@ -66,6 +66,14 @@ func resourceSakuraCloudSimpleMonitor() *schema.Resource {
 							Type:     schema.TypeBool,
 							Optional: true,
 						},
+						"username": {
+							Type:     schema.TypeString,
+							Optional: true,
+						},
+						"password": {
+							Type:     schema.TypeString,
+							Optional: true,
+						},
 						"port": {
 							Type:     schema.TypeInt,
 							Optional: true,
@@ -168,7 +176,9 @@ func resourceSakuraCloudSimpleMonitorCreate(d *schema.ResourceData, meta interfa
 		opts.SetHealthCheckHTTP(port,
 			forceString(conf["path"]),
 			forceString(conf["status"]),
-			forceString(conf["host_header"]))
+			forceString(conf["host_header"]),
+			forceString(conf["username"]),
+			forceString(conf["password"]))
 	case "https":
 		if port == "" {
 			port = "443"
@@ -177,7 +187,9 @@ func resourceSakuraCloudSimpleMonitorCreate(d *schema.ResourceData, meta interfa
 			forceString(conf["path"]),
 			forceString(conf["status"]),
 			forceString(conf["host_header"]),
-			forceBool(conf["sni"]))
+			forceBool(conf["sni"]),
+			forceString(conf["username"]),
+			forceString(conf["password"]))
 
 	case "dns":
 		opts.SetHealthCheckDNS(forceString(conf["qname"]),
@@ -301,7 +313,10 @@ func resourceSakuraCloudSimpleMonitorUpdate(d *schema.ResourceData, meta interfa
 			simpleMonitor.SetHealthCheckHTTP(port,
 				forceString(conf["path"]),
 				forceString(conf["status"]),
-				forceString(conf["host_header"]))
+				forceString(conf["host_header"]),
+				forceString(conf["username"]),
+				forceString(conf["password"]),
+			)
 		case "https":
 			if port == "" {
 				port = "443"
@@ -310,7 +325,10 @@ func resourceSakuraCloudSimpleMonitorUpdate(d *schema.ResourceData, meta interfa
 				forceString(conf["path"]),
 				forceString(conf["status"]),
 				forceString(conf["host_header"]),
-				forceBool(conf["sni"]))
+				forceBool(conf["sni"]),
+				forceString(conf["username"]),
+				forceString(conf["password"]),
+			)
 
 		case "dns":
 			simpleMonitor.SetHealthCheckDNS(forceString(conf["qname"]),
@@ -440,6 +458,8 @@ func setSimpleMonitorResourceData(d *schema.ResourceData, client *APIClient, dat
 		if port != "" || readHealthCheck.Port != "80" {
 			healthCheck["port"] = readHealthCheck.Port
 		}
+		healthCheck["username"] = readHealthCheck.BasicAuthUsername
+		healthCheck["password"] = readHealthCheck.BasicAuthPassword
 	case "https":
 		healthCheck["path"] = readHealthCheck.Path
 		healthCheck["status"] = readHealthCheck.Status
@@ -449,6 +469,8 @@ func setSimpleMonitorResourceData(d *schema.ResourceData, client *APIClient, dat
 			healthCheck["port"] = readHealthCheck.Port
 		}
 		healthCheck["sni"] = strings.ToLower(readHealthCheck.SNI) == "true"
+		healthCheck["username"] = readHealthCheck.BasicAuthUsername
+		healthCheck["password"] = readHealthCheck.BasicAuthPassword
 	case "tcp":
 		healthCheck["port"] = port
 		healthCheck["port"] = readHealthCheck.Port
