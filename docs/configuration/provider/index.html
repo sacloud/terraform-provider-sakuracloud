@@ -568,8 +568,6 @@
   # timeout         = 20  # 単位:分
   # api_root_url    = &quot;https://secure.sakura.ad.jp/cloud/zone&quot;  
   # trace           = false
-  # use_marker_tags = false
-  # marker_tag_name = &quot;@terraform&quot;
 }
 </code></pre>
 
@@ -657,7 +655,7 @@
 <td>マーカータグ利用有無</td>
 <td align="center"><code>false</code></td>
 <td><code>true</code><br /><code>false</code></td>
-<td>(非推奨/廃止予定) Terraformで作成されたリソースであるかの判別用に全てのリソースにタグを付与するかを指定<br />環境変数<code>SAKURACLOUD_USE_MARKER_TAGS</code>での指定も可</td>
+<td>(v1.4で廃止) Terraformで作成されたリソースであるかの判別用に全てのリソースにタグを付与するかを指定<br />環境変数<code>SAKURACLOUD_USE_MARKER_TAGS</code>での指定も可</td>
 </tr>
 <tr>
 <td><code>marker_tag_name</code></td>
@@ -665,7 +663,7 @@
 <td>マーカータグ名</td>
 <td align="center"><code>@terraform</code></td>
 <td>文字列</td>
-<td>(非推奨/廃止予定) <code>use_marker_tags</code>がtrueの場合のタグ名 <br />環境変数<code>SAKURACLOUD_MARKER_TAG_NAME</code>での指定も可</td>
+<td>(v1.4で廃止) <code>use_marker_tags</code>がtrueの場合のタグ名 <br />環境変数<code>SAKURACLOUD_MARKER_TAG_NAME</code>での指定も可</td>
 </tr>
 </tbody>
 </table>
@@ -675,10 +673,6 @@
 <pre><code class="bash">$ export SAKURACLOUD_ACCESS_TOKEN=&quot;取得したAPIトークン&quot;
 $ export SAKURACLOUD_ACCESS_TOKEN_SECRET=&quot;取得したAPIシークレット&quot;
 </code></pre>
-
-<h4 id="_5">マーカータグについて</h4>
-<p><code>use_marker_tags</code>にtrueを指定することで全てのリソースに対しタグを付与することが可能です。(デフォルトは<code>@terraform</code>)<br />
-ただし、パケットフィルタなどのタグの指定をサポートしていないリソースについては対象外となっています。</p>
               
             </div>
           </div>

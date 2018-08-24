@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.4.0 (2018-08-24)
+
+* シンプル監視でのBasic認証 #341 (yamamoto-febc)
+* ロードバランサーVIPヘの説明欄追加 #342 (yamamoto-febc)
+* marker_tags設定を除去 #343 (yamamoto-febc)
+
+
 ## 1.3.4 (2018-08-09)
 
 * サーバ作成時のプロビジョニング用接続情報のデフォルト値設定 #326 (yamamoto-febc)
