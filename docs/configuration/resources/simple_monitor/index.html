@@ -570,6 +570,10 @@ resource sakuracloud_simple_monitor &quot;mymonitor&quot; {
     delay_loop = 60
     path       = &quot;/&quot;
     status     = &quot;200&quot;
+
+    # BASIC認証
+    # username   = &quot;foo&quot;
+    # password   = &quot;bar&quot;
   }
 
   notify_email_enabled = true
@@ -757,6 +761,22 @@ resource sakuracloud_simple_monitor &quot;my_sslcert_monitor&quot; {
 <td align="center"><code>false</code></td>
 <td><code>true</code><br /><code>false</code></td>
 <td>プロトコルが<code>https</code>の場合のみ有効</td>
+</tr>
+<tr>
+<td><code>username</code></td>
+<td align="center">△</td>
+<td>Basic認証ユーザー名</td>
+<td align="center">-</td>
+<td>文字列</td>
+<td>プロトコルが<code>http</code>または<code>https</code>の場合のみ有効</td>
+</tr>
+<tr>
+<td><code>password</code></td>
+<td align="center">△</td>
+<td>Basic認証パスワード</td>
+<td align="center">-</td>
+<td>文字列</td>
+<td>プロトコルが<code>http</code>または<code>https</code>の場合のみ有効</td>
 </tr>
 <tr>
 <td><code>port</code></td>
