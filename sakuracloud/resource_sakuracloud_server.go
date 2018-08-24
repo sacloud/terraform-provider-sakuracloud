@@ -727,7 +727,7 @@ func setServerResourceData(d *schema.ResourceData, client *APIClient, data *sacl
 
 	d.Set("icon_id", data.GetIconStrID())
 	d.Set("description", data.Description)
-	d.Set("tags", realTags(client, data.Tags))
+	d.Set("tags", data.Tags)
 
 	d.Set("packet_filter_ids", flattenPacketFilters(data.Interfaces))
 

@@ -24,8 +24,8 @@ func hasTagResourceCustomizeDiff(d *schema.ResourceDiff, meta interface{}) error
 	if d.HasChange("tags") {
 		o, n := d.GetChange("tags")
 		if o != nil && n != nil {
-			os := realTags(client, expandTags(client, o.([]interface{})))
-			ns := realTags(client, expandTags(client, n.([]interface{})))
+			os := expandTags(client, o.([]interface{}))
+			ns := expandTags(client, n.([]interface{}))
 
 			sort.Strings(os)
 			sort.Strings(ns)

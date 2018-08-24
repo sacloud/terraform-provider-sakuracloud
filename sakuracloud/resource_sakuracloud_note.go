@@ -179,6 +179,6 @@ func setNoteResourceData(d *schema.ResourceData, client *APIClient, data *saclou
 	d.Set("class", data.Class)
 	d.Set("icon_id", data.GetIconStrID())
 	d.Set("description", data.Description)
-	d.Set("tags", realTags(client, data.Tags))
+	d.Set("tags", data.Tags)
 	return nil
 }

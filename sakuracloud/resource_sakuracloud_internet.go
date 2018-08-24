@@ -317,7 +317,7 @@ func setInternetResourceData(d *schema.ResourceData, client *APIClient, data *sa
 	d.Set("name", data.Name)
 	d.Set("icon_id", data.GetIconStrID())
 	d.Set("description", data.Description)
-	d.Set("tags", realTags(client, data.Tags))
+	d.Set("tags", data.Tags)
 
 	d.Set("nw_mask_len", data.NetworkMaskLen)
 	d.Set("band_width", data.BandWidthMbps)

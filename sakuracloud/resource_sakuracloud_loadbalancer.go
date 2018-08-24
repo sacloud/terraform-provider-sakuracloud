@@ -307,7 +307,7 @@ func setLoadBalancerResourceData(d *schema.ResourceData, client *APIClient, data
 	d.Set("name", data.Name)
 	d.Set("icon_id", data.GetIconStrID())
 	d.Set("description", data.Description)
-	d.Set("tags", realTags(client, data.Tags))
+	d.Set("tags", data.Tags)
 
 	d.Set("vip_ids", []string{})
 	if data.Settings != nil && data.Settings.LoadBalancer != nil {

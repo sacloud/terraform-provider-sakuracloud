@@ -357,7 +357,7 @@ func setSIMResourceData(d *schema.ResourceData, client *APIClient, data *sacloud
 	d.Set("name", data.Name)
 	d.Set("icon_id", data.GetIconStrID())
 	d.Set("description", data.Description)
-	d.Set("tags", realTags(client, data.Tags))
+	d.Set("tags", data.Tags)
 	d.Set("iccid", data.Status.ICCID)
 
 	if data.Status.SIMInfo != nil {
