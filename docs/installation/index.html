@@ -86,9 +86,11 @@
                 
                     <li><a class="toctree-l4" href="#api">さくらのクラウドAPIキーの取得</a></li>
                 
-                    <li><a class="toctree-l4" href="#docker">Dockerでの実行</a></li>
+                    <li><a class="toctree-l4" href="#api_4">さくらのクラウドAPIキーの設定</a></li>
                 
-                    <li><a class="toctree-l4" href="#homebrewlinuxbrew">Homebrew(Linuxbrew)でのインストール</a></li>
+                    <li><a class="toctree-l4" href="#docker">(オプション) Dockerでの実行</a></li>
+                
+                    <li><a class="toctree-l4" href="#homebrewlinuxbrew">(オプション) Homebrew(Linuxbrew)でのインストール</a></li>
                 
             
             </ul>
@@ -569,8 +571,8 @@
 <li>2) 適当なディレクトリに展開します。</li>
 <li>3) 2)のディレクトリにパスを通します。</li>
 </ul>
-<p>以下はMacでの例です。展開先ディレクトリは<code>~/terraform</code>として記載しています。</p>
-<h4 id="terraform_1">terraformインストール</h4>
+<h3 id="terraformmac">terraformインストール(Macの場合)</h3>
+<p>展開先ディレクトリは<code>~/terraform</code>として記載しています。</p>
 <pre><code class="bash"># ~/terraformディレクトリ作成
 $ mkdir -p ~/terraform ; cd ~/terraform
 # ダウンロード
@@ -582,7 +584,26 @@ $ export PATH=$PATH:~/terraform/
 
 </code></pre>
 
-<h3 id="_1">動作確認</h3>
+<h3 id="terraformwindows">terraformインストール(Windowsの場合)</h3>
+<p>ユーザー名を<code>USER</code>として記載しています。インストールする環境に応じて適宜読み替えてください。</p>
+<p>管理者権限でコマンドプロンプトを起動します。</p>
+<h4 id="terraform_1">~/terraformディレクトリ作成</h4>
+<pre><code class="cmd">&gt; mkdir c:\User\USER\terraform
+&gt; cd c:\User\USER\terraform
+</code></pre>
+
+<h4 id="_1">ダウンロード</h4>
+<p>Windows 64bits版をダウンロードし作成したディレクトリに保存します。</p>
+<h4 id="_2">展開</h4>
+<p>対象ファイルを展開します。<code>c:\User\USER\terraform</code> の直下に、terraform.exe を配置します。  </p>
+<pre><code># パスを通す
+&gt; SETX /M PATH “%PATH%;c:\User\USER\terraform”
+</code></pre>
+
+<blockquote>
+<p>※set コマンドで設定出来ているかの確認が出来ます。</p>
+</blockquote>
+<h3 id="_3">動作確認</h3>
 <p><code>terraform</code>コマンドを実行してみましょう。
 以下のような表示がされればOKです。</p>
 <h4 id="terraform_2">terraform動作確認</h4>
@@ -611,7 +632,8 @@ Available commands are:
 <li>1) 以下のリンクから、プラットフォームに応じたzipファイルをダウンロードします</li>
 <li><a href="http://releases.usacloud.jp/terraform/">Terraform for さくらのクラウド ダウンロードページ</a></li>
 <li>2) <code>~/.terraform.d/plugins/</code>配下に展開します<br />
-     ※ Windowsの場合は<code>%APPDATA%/terraform.d/plugins/</code>配下に展開します</li>
+     ※ Windowsの場合は<code>%APPDATA%/terraform.d/plugins/</code>配下に展開します<br />
+     ※ setコマンドでAPPDATAがどこかを確認出来ます</li>
 </ul>
 <blockquote>
 <p>Note:<br />
@@ -620,7 +642,7 @@ Terraform for さくらのクラウドのバイナリーファイルは<a href="
 <h2 id="api">さくらのクラウドAPIキーの取得</h2>
 <p>さくらのクラウドのコントロールパネルにログインしAPIキーを発行します。
 以下を参考に実施してください。APIキーを発行したら、<code>ACCESS_TOKEN</code>と<code>ACCESS_TOKEN_SECRET</code>を控えておきましょう。</p>
-<h4 id="_2">さくらのクラウド コントロールパネルへのログイン</h4>
+<h4 id="_4">さくらのクラウド コントロールパネルへのログイン</h4>
 <p><img alt="ログイン.png" src="../images/login.png" title="ログイン.png" /></p>
 <h4 id="iaas">さくらのクラウド(IaaS)を選択</h4>
 <p><img alt="01_コンパネ.png" src="../images/apikey01.png" title="01_コンパネ.png" /></p>
@@ -630,7 +652,37 @@ Terraform for さくらのクラウドのバイナリーファイルは<a href="
 <p><img alt="03_APIキー.png" src="../images/apikey03.png" title="03_APIキー.png" /></p>
 <h4 id="api_3">発行されたAPIキーの確認</h4>
 <p><img alt="04_APIキー.png" src="../images/apikey04.png" title="04_APIキー.png" /></p>
-<h2 id="docker">Dockerでの実行</h2>
+<h2 id="api_4">さくらのクラウドAPIキーの設定</h2>
+<p>APIキーは環境変数、またはtfファイルにて設定します。<br />
+ここでは環境変数を利用する方法を記載しています。<br />
+tfファイルでの設定方法は設定リファレンスの<a href="http://sacloud.github.io/terraform-provider-sakuracloud/configuration/provider/">プロバイダ セクション</a>を参照してください。</p>
+<h4 id="macunixos">Mac/Unix系OSなどの場合</h4>
+<pre><code># アクセストークン
+$ export SAKURACLOUD_ACCESS_TOKEN=[入力]
+
+# アクセスシークレット
+$ export SAKURACLOUD_ACCESS_TOKEN_SECRET=[入力]
+
+# デフォルトゾーン(石狩第２を指定)
+$ export SAKURACLOUD_ZONE=is1b  
+</code></pre>
+
+<p>※env コマンドで設定出来ているかの確認が出来ます。</p>
+<h4 id="windows">Windowsの場合</h4>
+<p>管理者権限でコマンドプロンプトを起動します。</p>
+<pre><code># アクセストークン
+$ setx SAKURACLOUD_ACCESS_TOKEN [入力]
+
+# アクセスシークレット
+$ setx SAKURACLOUD_ACCESS_TOKEN_SECRET [入力]
+
+# デフォルトゾーン(石狩第２を指定)
+$ setx SAKURACLOUD_ZONE is1b  
+</code></pre>
+
+<p>※設定後、コマンドプロンプトの再起動を行っておいてください。<br />
+※set コマンドで設定出来ているかの確認が出来ます。</p>
+<h2 id="docker">(オプション) Dockerでの実行</h2>
 <p>TerraformとTerraform for さくらのクラウドを同梱したDockerイメージを用意しています。</p>
 <p><a href="https://hub.docker.com/r/sacloud/terraform/">Terraform for さくらのクラウド Dockerイメージ</a></p>
 <p>以下のように実行します。</p>
@@ -650,7 +702,7 @@ Terraform for さくらのクラウドのバイナリーファイルは<a href="
 $ docker-compose run --rm terraform apply
 </code></pre>
 
-<h2 id="homebrewlinuxbrew">Homebrew(Linuxbrew)でのインストール</h2>
+<h2 id="homebrewlinuxbrew">(オプション) Homebrew(Linuxbrew)でのインストール</h2>
 <p>Homebrew(Linuxbrew)をご利用中の場合、以下のコマンドでTerraform for さくらのクラウドをインストール可能です。      </p>
 <pre><code>brew install sacloud/terraform-provider-sakuracloud/terraform-provider-sakuracloud
 </code></pre>
