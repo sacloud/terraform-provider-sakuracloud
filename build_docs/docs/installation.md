@@ -8,9 +8,10 @@
 - 2) 適当なディレクトリに展開します。
 - 3) 2)のディレクトリにパスを通します。
 
-以下はMacでの例です。展開先ディレクトリは`~/terraform`として記載しています。
 
-#### terraformインストール
+### terraformインストール(Macの場合)
+
+展開先ディレクトリは`~/terraform`として記載しています。
 
 ```bash
 # ~/terraformディレクトリ作成
@@ -23,6 +24,34 @@ $ unzip terraform.zip
 $ export PATH=$PATH:~/terraform/
 
 ```
+
+### terraformインストール(Windowsの場合)
+
+ユーザー名を`USER`として記載しています。インストールする環境に応じて適宜読み替えてください。
+
+管理者権限でコマンドプロンプトを起動します。
+
+#### ~/terraformディレクトリ作成
+
+```cmd
+> mkdir c:\User\USER\terraform
+> cd c:\User\USER\terraform
+```
+
+#### ダウンロード
+
+Windows 64bits版をダウンロードし作成したディレクトリに保存します。
+
+#### 展開
+
+対象ファイルを展開します。`c:\User\USER\terraform` の直下に、terraform.exe を配置します。  
+
+```
+# パスを通す
+> SETX /M PATH “%PATH%;c:\User\USER\terraform”
+```
+
+> ※set コマンドで設定出来ているかの確認が出来ます。
 
 ### 動作確認
 
@@ -57,7 +86,9 @@ Available commands are:
 - 1) 以下のリンクから、プラットフォームに応じたzipファイルをダウンロードします
   - [Terraform for さくらのクラウド ダウンロードページ](http://releases.usacloud.jp/terraform/)
 - 2) `~/.terraform.d/plugins/`配下に展開します  
-     ※ Windowsの場合は`%APPDATA%/terraform.d/plugins/`配下に展開します
+     ※ Windowsの場合は`%APPDATA%/terraform.d/plugins/`配下に展開します  
+     ※ setコマンドでAPPDATAがどこかを確認出来ます
+     
 
 > Note:  
 Terraform for さくらのクラウドのバイナリーファイルは[GitHub上のリリースページ](https://github.com/sacloud/terraform-provider-sakuracloud/releases/latest)でも配布しています。
@@ -87,7 +118,45 @@ Terraform for さくらのクラウドのバイナリーファイルは[GitHub�
 
 ![04_APIキー.png](images/apikey04.png "04_APIキー.png")
 
-## Dockerでの実行
+## さくらのクラウドAPIキーの設定
+
+APIキーは環境変数、またはtfファイルにて設定します。  
+ここでは環境変数を利用する方法を記載しています。  
+tfファイルでの設定方法は設定リファレンスの[プロバイダ セクション](http://sacloud.github.io/terraform-provider-sakuracloud/configuration/provider/)を参照してください。
+
+#### Mac/Unix系OSなどの場合
+
+```
+# アクセストークン
+$ export SAKURACLOUD_ACCESS_TOKEN=[入力]
+
+# アクセスシークレット
+$ export SAKURACLOUD_ACCESS_TOKEN_SECRET=[入力]
+
+# デフォルトゾーン(石狩第２を指定)
+$ export SAKURACLOUD_ZONE=is1b  
+```
+※env コマンドで設定出来ているかの確認が出来ます。
+
+#### Windowsの場合
+
+管理者権限でコマンドプロンプトを起動します。
+
+```
+# アクセストークン
+$ setx SAKURACLOUD_ACCESS_TOKEN [入力]
+
+# アクセスシークレット
+$ setx SAKURACLOUD_ACCESS_TOKEN_SECRET [入力]
+
+# デフォルトゾーン(石狩第２を指定)
+$ setx SAKURACLOUD_ZONE is1b  
+```
+
+※設定後、コマンドプロンプトの再起動を行っておいてください。  
+※set コマンドで設定出来ているかの確認が出来ます。
+
+## (オプション) Dockerでの実行
 
 TerraformとTerraform for さくらのクラウドを同梱したDockerイメージを用意しています。
 
@@ -113,7 +182,7 @@ $ docker run -it --rm \
 $ docker-compose run --rm terraform apply
 ```
 
-## Homebrew(Linuxbrew)でのインストール		
+## (オプション) Homebrew(Linuxbrew)でのインストール		
   		  
 Homebrew(Linuxbrew)をご利用中の場合、以下のコマンドでTerraform for さくらのクラウドをインストール可能です。		
 		
