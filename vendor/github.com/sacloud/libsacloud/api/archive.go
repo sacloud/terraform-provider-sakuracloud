@@ -16,7 +16,7 @@ type ArchiveAPI struct {
 
 var (
 	archiveLatestStableCentOSTags                          = []string{"current-stable", "distro-centos"}
-	archiveLatestStableCentOS6Tags                         = []string{"distro-centos", "distro-ver-6.9"}
+	archiveLatestStableCentOS6Tags                         = []string{"distro-centos", "distro-ver-6.10"}
 	archiveLatestStableUbuntuTags                          = []string{"current-stable", "distro-ubuntu"}
 	archiveLatestStableDebianTags                          = []string{"current-stable", "distro-debian"}
 	archiveLatestStableVyOSTags                            = []string{"current-stable", "distro-vyos"}
