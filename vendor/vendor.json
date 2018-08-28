@@ -837,38 +837,38 @@
 		{
 			"checksumSHA1": "8nDGNcD2krFRHIfRjkHx+e715eQ=",
 			"path": "github.com/sacloud/libsacloud",
-			"revision": "9207724918f5a5c8eeb188e11d81d457922e550e",
-			"revisionTime": "2018-08-23T07:11:47Z"
+			"revision": "7afff3fbc0a3bdff2e008fe2c429d44d9f66f209",
+			"revisionTime": "2018-08-28T09:01:00Z"
 		},
 		{
-			"checksumSHA1": "ZUzeefxzjgdxHAxHkSAAePFHR70=",
+			"checksumSHA1": "C3wX3rccN+R0nlXtl8Pm9wCycx8=",
 			"path": "github.com/sacloud/libsacloud/api",
-			"revision": "9207724918f5a5c8eeb188e11d81d457922e550e",
-			"revisionTime": "2018-08-23T07:11:47Z"
+			"revision": "7afff3fbc0a3bdff2e008fe2c429d44d9f66f209",
+			"revisionTime": "2018-08-28T09:01:00Z"
 		},
 		{
 			"checksumSHA1": "epFeaAW3W176crE+Lr67Hka4W5g=",
 			"path": "github.com/sacloud/libsacloud/sacloud",
-			"revision": "9207724918f5a5c8eeb188e11d81d457922e550e",
-			"revisionTime": "2018-08-23T07:11:47Z"
+			"revision": "7afff3fbc0a3bdff2e008fe2c429d44d9f66f209",
+			"revisionTime": "2018-08-28T09:01:00Z"
 		},
 		{
 			"checksumSHA1": "CCHevC5s2wMPgjYZMKhbcTmB65w=",
 			"path": "github.com/sacloud/libsacloud/sacloud/ostype",
-			"revision": "9207724918f5a5c8eeb188e11d81d457922e550e",
-			"revisionTime": "2018-08-23T07:11:47Z"
+			"revision": "7afff3fbc0a3bdff2e008fe2c429d44d9f66f209",
+			"revisionTime": "2018-08-28T09:01:00Z"
 		},
 		{
 			"checksumSHA1": "WTBpxpedzjJAQKMVJ/w8/G72DHU=",
 			"path": "github.com/sacloud/libsacloud/utils/server",
-			"revision": "9207724918f5a5c8eeb188e11d81d457922e550e",
-			"revisionTime": "2018-08-23T07:11:47Z"
+			"revision": "7afff3fbc0a3bdff2e008fe2c429d44d9f66f209",
+			"revisionTime": "2018-08-28T09:01:00Z"
 		},
 		{
 			"checksumSHA1": "rFnP8fart3FGUJK1OLNZuNk4Tmc=",
 			"path": "github.com/sacloud/libsacloud/utils/setup",
-			"revision": "9207724918f5a5c8eeb188e11d81d457922e550e",
-			"revisionTime": "2018-08-23T07:11:47Z"
+			"revision": "7afff3fbc0a3bdff2e008fe2c429d44d9f66f209",
+			"revisionTime": "2018-08-28T09:01:00Z"
 		},
 		{
 			"checksumSHA1": "zmC8/3V4ls53DJlNTKDZwPSC/dA=",
