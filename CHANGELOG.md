@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.5.0 (2018-09-04)
+
+* パブリックアーカイブ更新 #348 (yamamoto-febc)
+* ディスクのストレージ隔離用パラメータ distant_from 追加 #349 (yamamoto-febc)
+
+
 ## 1.4.0 (2018-08-24)
 
 * シンプル監視でのBasic認証 #341 (yamamoto-febc)

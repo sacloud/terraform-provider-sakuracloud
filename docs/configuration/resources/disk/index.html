@@ -577,6 +577,8 @@ resource sakuracloud_disk &quot;disk01&quot; {
   #  ignore_changes = [&quot;source_archive_id&quot;] 
   #}
 
+  # 指定ディスクと別ストレージに格納したい場合
+  #distant_from = [&quot;&lt;your-disk-id&gt;&quot;]
 
   #ディスクの修正関連
   hostname = &quot;your-host-name&quot;
@@ -658,6 +660,14 @@ resource sakuracloud_note &quot;note&quot; {
 <td align="center">20</td>
 <td>数値</td>
 <td>-</td>
+</tr>
+<tr>
+<td><code>distant_from</code></td>
+<td align="center">-</td>
+<td>ストレージ隔離対象ディスクID</td>
+<td align="center">-</td>
+<td>リスト(文字列)</td>
+<td>ストレージを隔離したいディスクのIDのリスト</td>
 </tr>
 <tr>
 <td><code>source_archive_id</code></td>
