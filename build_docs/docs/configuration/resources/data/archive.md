@@ -44,6 +44,8 @@ data sakuracloud_archive "ubuntu" {
 | `rancheros`               | RancherOS|
 | `kusanagi`                | Kusanagi(CentOS7)|
 | `sophos-utm`              | Sophos-UTM(*1)|
+| `netwiser`                | Netwiser Virtual Edition(*2) |
+| `opnsense`                | OPNsense |
 | `freebsd`                 | FreeBSD|
 | `windows2012`             | Windows 2012|
 | `windows2012-rds`         | Windows 2012(RDS)|
@@ -59,6 +61,9 @@ data sakuracloud_archive "ubuntu" {
 
 > *1: Sophos-UTMを利用する場合、ディスクの修正機能は利用できません。  
 >     詳細は[さくらのクラウド ドキュメント](https://manual.sakura.ad.jp/cloud/os-packages/sophosutm.html)を参照してください。
+
+> *2: Netwiser Virtual Editionを利用する場合、ディスクの修正機能は利用できません。  
+>     詳細は[さくらのクラウド ドキュメント](https://manual.sakura.ad.jp/cloud/os-packages/netwiser/about.html)を参照してください。
 
 ### 属性
 

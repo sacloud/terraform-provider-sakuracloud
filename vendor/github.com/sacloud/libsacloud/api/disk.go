@@ -213,6 +213,10 @@ func (api *DiskAPI) CanEditDisk(id int64) (bool, error) {
 	if disk.HasTag("pkg-sophosutm") || disk.IsSophosUTM() {
 		return false, nil
 	}
+	// Netwiser VEであれば編集不可
+	if disk.HasTag("pkg-netwiserve") {
+		return false, nil
+	}
 
 	// ソースアーカイブ/ソースディスクともに持っていない場合
 	if disk.SourceArchive == nil && disk.SourceDisk == nil {
@@ -261,6 +265,10 @@ func (api *DiskAPI) GetPublicArchiveIDFromAncestors(id int64) (int64, bool) {
 
 	// SophosUTMであれば編集不可
 	if disk.HasTag("pkg-sophosutm") || disk.IsSophosUTM() {
+		return emptyID, false
+	}
+	// Netwiser VEであれば編集不可
+	if disk.HasTag("pkg-netwiserve") {
 		return emptyID, false
 	}
 
