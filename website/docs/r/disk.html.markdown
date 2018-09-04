@@ -22,6 +22,9 @@ resource "sakuracloud_disk" "foobar" {
   source_archive_id = "${data.sakuracloud_archive.ubuntu.id}"
   # or
   # source_disk_id  = "<your-disk-id>"
+
+  # for storage isolation
+  #distant_from = ["<your-disk-id>"]
   
   # For "Modify Disk" API
   hostname          = "your-host-name"
@@ -50,6 +53,7 @@ Valid value is one of the following: [ "ssd" (default) / "hdd"]
 * `conector` - The disk connector of the resource.  
 Valid value is one of the following: [ "virtio" (default) / "ide"]
 * `size` - Size of the resource (unit:`GB`).
+* `distant_from` - The ID list of the Disks isolated from Disk.
 * `source_archive_id` - The ID of source Archive.
 * `source_disk_id` - The ID of source Disk.
 * `hostname` - The hostname to set with `"Modify Disk"` API.
