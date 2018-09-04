@@ -213,7 +213,7 @@ type Request struct {
 	Filter               map[string]interface{} `json:",omitempty"` // フィルタ
 	Exclude              []string               `json:",omitempty"` // 除外する項目
 	Include              []string               `json:",omitempty"` // 取得する項目
-
+	DistantFrom          []int64                `json:",omitempty"` // ストレージ隔離対象ディスク
 }
 
 // AddFilter フィルタの追加
