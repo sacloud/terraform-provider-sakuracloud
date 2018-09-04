@@ -56,7 +56,15 @@ func (api *DiskAPI) Create(value *sacloud.Disk) (*sacloud.Disk, error) {
 		Success string `json:",omitempty"`
 	}
 	res := &diskResponse{}
-	err := api.create(api.createRequest(value), res)
+
+	rawBody := &sacloud.Request{}
+	rawBody.Disk = value
+	if len(value.DistantFrom) > 0 {
+		rawBody.DistantFrom = value.DistantFrom
+		value.DistantFrom = []int64{}
+	}
+
+	err := api.create(rawBody, res)
 	if err != nil {
 		return nil, err
 	}
@@ -90,7 +98,14 @@ func (api *DiskAPI) install(id int64, body *sacloud.Disk) (bool, error) {
 		Success string `json:",omitempty"`
 	}
 	res := &diskResponse{}
-	err := api.baseAPI.request(method, uri, api.createRequest(body), res)
+	rawBody := &sacloud.Request{}
+	rawBody.Disk = body
+	if len(body.DistantFrom) > 0 {
+		rawBody.DistantFrom = body.DistantFrom
+		body.DistantFrom = []int64{}
+	}
+
+	err := api.baseAPI.request(method, uri, rawBody, res)
 	if err != nil {
 		return false, err
 	}

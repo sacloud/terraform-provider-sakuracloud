@@ -22,6 +22,8 @@ resource sakuracloud_disk "disk01" {
   #  ignore_changes = ["source_archive_id"] 
   #}
 
+  # 指定ディスクと別ストレージに格納したい場合
+  #distant_from = ["<your-disk-id>"]
 
   #ディスクの修正関連
   hostname = "your-host-name"
@@ -67,6 +69,7 @@ resource sakuracloud_note "note" {
 | `plan`            | -   | ディスクプラン        | `ssd` | `ssd`<br />`hdd` | - |
 | `connector`      | -   | ディスク接続          | `virtio` | `virtio`<br />`ide`    | - |
 | `size`            | -   | ディスクサイズ(GB単位) | 20       | 数値                    | - |
+| `distant_from`    | -   | ストレージ隔離対象ディスクID | -       | リスト(文字列)                    | ストレージを隔離したいディスクのIDのリスト |
 |`source_archive_id`| -   | コピー元アーカイブID   | -        | 文字列                | [注1](#注1) |
 |`source_disk_id`   | -   | コピー元ディスクID   | -        | 文字列                | [注1](#注1) |
 | `hostname`        | -   | ホスト名               | - | 文字列 | ディスク修正機能で設定される、ホスト名 [注2](#注2)|

@@ -43,10 +43,13 @@ func (s *Server) IPAddress() string {
 
 // Gateway デフォルトゲートウェイアドレス
 func (s *Server) Gateway() string {
-	if len(s.Interfaces) == 0 || s.Interfaces[0].Switch == nil || s.Interfaces[0].Switch.UserSubnet == nil {
+	if len(s.Interfaces) == 0 || s.Interfaces[0].Switch == nil {
 		return ""
 	}
-	return s.Interfaces[0].Switch.UserSubnet.DefaultRoute
+	if s.Interfaces[0].Switch.UserSubnet != nil {
+		return s.Interfaces[0].Switch.UserSubnet.DefaultRoute
+	}
+	return s.Interfaces[0].Switch.Subnet.DefaultRoute
 }
 
 // DefaultRoute デフォルトゲートウェイアドレス(Gatewayのエイリアス)
@@ -56,10 +59,13 @@ func (s *Server) DefaultRoute() string {
 
 // NetworkMaskLen サーバの1番目のNIC(eth0)のネットワークマスク長
 func (s *Server) NetworkMaskLen() int {
-	if len(s.Interfaces) == 0 || s.Interfaces[0].Switch == nil || s.Interfaces[0].Switch.UserSubnet == nil {
+	if len(s.Interfaces) == 0 || s.Interfaces[0].Switch == nil {
 		return 0
 	}
-	return s.Interfaces[0].Switch.UserSubnet.NetworkMaskLen
+	if s.Interfaces[0].Switch.UserSubnet != nil {
+		return s.Interfaces[0].Switch.UserSubnet.NetworkMaskLen
+	}
+	return s.Interfaces[0].Switch.Subnet.NetworkMaskLen
 }
 
 // NetworkAddress サーバの1番目のNIC(eth0)のネットワークアドレス

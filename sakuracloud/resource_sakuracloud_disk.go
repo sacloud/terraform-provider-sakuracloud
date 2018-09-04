@@ -65,6 +65,12 @@ func resourceSakuraCloudDisk() *schema.Resource {
 				ForceNew: true,
 				Default:  20,
 			},
+			"distant_from": {
+				Type:     schema.TypeList,
+				Optional: true,
+				Elem:     &schema.Schema{Type: schema.TypeString},
+				ForceNew: true,
+			},
 			"server_id": {
 				Type:     schema.TypeString,
 				Computed: true, //ReadOnly
@@ -166,6 +172,19 @@ func resourceSakuraCloudDiskCreate(d *schema.ResourceData, meta interface{}) err
 	rawTags := d.Get("tags").([]interface{})
 	if rawTags != nil {
 		opts.Tags = expandTags(client, rawTags)
+	}
+
+	if _, ok := d.GetOk("distant_from"); ok {
+		rawDistantFrom := d.Get("distant_from").([]interface{})
+		if rawDistantFrom != nil {
+			strDiskIDs := expandStringList(rawDistantFrom)
+			diskIDs := []int64{}
+			for _, id := range strDiskIDs {
+				diskIDs = append(diskIDs, int64(forceAtoI(id)))
+			}
+
+			opts.DistantFrom = diskIDs
+		}
 	}
 
 	diskBuilder := &setup.RetryableSetup{

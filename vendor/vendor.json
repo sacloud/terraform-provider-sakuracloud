@@ -837,38 +837,38 @@
 		{
 			"checksumSHA1": "8nDGNcD2krFRHIfRjkHx+e715eQ=",
 			"path": "github.com/sacloud/libsacloud",
-			"revision": "1c75e3a1aa0ec8dfe435ec4fc309cfc8afb2b793",
-			"revisionTime": "2018-08-31T01:03:41Z"
+			"revision": "9d2d727a9ddcec03444dc20aafd9f1e284cfdbe4",
+			"revisionTime": "2018-09-04T07:33:19Z"
 		},
 		{
-			"checksumSHA1": "Q105JaP5A4y5JHQbrU/XyywR/XQ=",
+			"checksumSHA1": "SjwqdEPn8jtMNUBDR6J2I1rPI9s=",
 			"path": "github.com/sacloud/libsacloud/api",
-			"revision": "1c75e3a1aa0ec8dfe435ec4fc309cfc8afb2b793",
-			"revisionTime": "2018-08-31T01:03:41Z"
+			"revision": "9d2d727a9ddcec03444dc20aafd9f1e284cfdbe4",
+			"revisionTime": "2018-09-04T07:33:19Z"
 		},
 		{
-			"checksumSHA1": "epFeaAW3W176crE+Lr67Hka4W5g=",
+			"checksumSHA1": "GyGvI781B2eXgbCXsibc3Xr7dHw=",
 			"path": "github.com/sacloud/libsacloud/sacloud",
-			"revision": "1c75e3a1aa0ec8dfe435ec4fc309cfc8afb2b793",
-			"revisionTime": "2018-08-31T01:03:41Z"
+			"revision": "9d2d727a9ddcec03444dc20aafd9f1e284cfdbe4",
+			"revisionTime": "2018-09-04T07:33:19Z"
 		},
 		{
 			"checksumSHA1": "LmBnV3yfAhrU0ceC++K1oovT7kY=",
 			"path": "github.com/sacloud/libsacloud/sacloud/ostype",
-			"revision": "1c75e3a1aa0ec8dfe435ec4fc309cfc8afb2b793",
-			"revisionTime": "2018-08-31T01:03:41Z"
+			"revision": "9d2d727a9ddcec03444dc20aafd9f1e284cfdbe4",
+			"revisionTime": "2018-09-04T07:33:19Z"
 		},
 		{
 			"checksumSHA1": "WTBpxpedzjJAQKMVJ/w8/G72DHU=",
 			"path": "github.com/sacloud/libsacloud/utils/server",
-			"revision": "1c75e3a1aa0ec8dfe435ec4fc309cfc8afb2b793",
-			"revisionTime": "2018-08-31T01:03:41Z"
+			"revision": "9d2d727a9ddcec03444dc20aafd9f1e284cfdbe4",
+			"revisionTime": "2018-09-04T07:33:19Z"
 		},
 		{
 			"checksumSHA1": "rFnP8fart3FGUJK1OLNZuNk4Tmc=",
 			"path": "github.com/sacloud/libsacloud/utils/setup",
-			"revision": "1c75e3a1aa0ec8dfe435ec4fc309cfc8afb2b793",
-			"revisionTime": "2018-08-31T01:03:41Z"
+			"revision": "9d2d727a9ddcec03444dc20aafd9f1e284cfdbe4",
+			"revisionTime": "2018-09-04T07:33:19Z"
 		},
 		{
 			"checksumSHA1": "zmC8/3V4ls53DJlNTKDZwPSC/dA=",

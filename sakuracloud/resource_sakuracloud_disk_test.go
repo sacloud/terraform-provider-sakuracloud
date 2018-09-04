@@ -188,6 +188,7 @@ resource "sakuracloud_disk" "foobar" {
     plan = "ssd"
     connector = "virtio"
     size = 20
+    distant_from = ["111111111111"]
     source_archive_id = "${data.sakuracloud_archive.ubuntu.id}"
     description = "Disk from TerraForm for SAKURA CLOUD"
     tags = ["hoge1" , "hoge2"]
@@ -213,6 +214,7 @@ resource "sakuracloud_disk" "foobar" {
     plan = "ssd"
     connector = "virtio"
     size = 20
+    distant_from = ["111111111111"]
     source_archive_id = "${data.sakuracloud_archive.ubuntu.id}"
     description = "Disk from TerraForm for SAKURA CLOUD"
     tags = ["hoge1" , "hoge2"]
