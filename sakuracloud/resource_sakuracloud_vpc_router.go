@@ -8,6 +8,7 @@ import (
 	"github.com/hashicorp/terraform/helper/validation"
 	"github.com/sacloud/libsacloud/api"
 	"github.com/sacloud/libsacloud/sacloud"
+	"github.com/sacloud/libsacloud/utils/setup"
 )
 
 const vpcRouterPowerAPILockKey = "sakuracloud_vpc_router.power.%d.lock"
@@ -195,38 +196,37 @@ func resourceSakuraCloudVPCRouterCreate(d *schema.ResourceData, meta interface{}
 		}
 	}
 
-	vpcRouter, err := client.VPCRouter.Create(opts)
+	vpcRouterBuilder := &setup.RetryableSetup{
+		Create: func() (sacloud.ResourceIDHolder, error) {
+			return client.VPCRouter.Create(opts)
+		},
+		AsyncWaitForCopy: func(id int64) (chan interface{}, chan interface{}, chan error) {
+			return client.VPCRouter.AsyncSleepWhileCopying(id, client.DefaultTimeoutDuration, 10)
+		},
+		Delete: func(id int64) error {
+			_, err := client.VPCRouter.Delete(id)
+			return err
+		},
+		ProvisionBeforeUp: func(id int64, _ interface{}) error {
+			if _, err := client.VPCRouter.Boot(id); err != nil {
+				return fmt.Errorf("Failed to boot SakuraCloud VPCRouter resource: %s", err)
+			}
+			return nil
+		},
+		WaitForUp: func(id int64) error {
+			return client.VPCRouter.SleepUntilUp(id, client.DefaultTimeoutDuration)
+		},
+		RetryCount: 3,
+	}
+
+	res, err := vpcRouterBuilder.Setup()
 	if err != nil {
 		return fmt.Errorf("Failed to create SakuraCloud VPCRouter resource: %s", err)
 	}
 
-	//wait
-	compChan, progChan, errChan := client.VPCRouter.AsyncSleepWhileCopying(vpcRouter.ID, client.DefaultTimeoutDuration, 10)
-	for {
-		select {
-		case <-compChan:
-			break
-		case <-progChan:
-			continue
-		case err := <-errChan:
-			return fmt.Errorf("Failed to wait SakuraCloud VPCRouter copy: %s", err)
-		}
-		break
-	}
-
-	_, err = client.VPCRouter.Boot(vpcRouter.ID)
-	if err != nil {
-		return fmt.Errorf("Failed to boot SakuraCloud VPCRouter resource: %s", err)
-	}
-	err = client.VPCRouter.SleepUntilUp(vpcRouter.ID, client.DefaultTimeoutDuration)
-	if err != nil {
-		return fmt.Errorf("Failed to boot SakuraCloud VPCRouter resource: %s", err)
-	}
-
-	if _, err := client.VPCRouter.Config(vpcRouter.ID); err != nil {
-		if err != nil {
-			return fmt.Errorf("Error updating SakuraCloud VPCRouter settings: %s", err)
-		}
+	vpcRouter, ok := res.(*sacloud.VPCRouter)
+	if !ok {
+		return fmt.Errorf("Failed to create SakuraCloud VPCRouter resource: created resource is not *sacloud.VPCRouter")
 	}
 
 	d.SetId(vpcRouter.GetStrID())

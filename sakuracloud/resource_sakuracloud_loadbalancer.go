@@ -6,6 +6,7 @@ import (
 
 	"github.com/hashicorp/terraform/helper/schema"
 	"github.com/hashicorp/terraform/helper/validation"
+	"github.com/sacloud/libsacloud/utils/setup"
 
 	"github.com/sacloud/libsacloud/api"
 	"github.com/sacloud/libsacloud/sacloud"
@@ -173,30 +174,32 @@ func resourceSakuraCloudLoadBalancerCreate(d *schema.ResourceData, meta interfac
 		}
 	}
 
-	loadBalancer, err := client.LoadBalancer.Create(createLb)
+	lbBuilder := &setup.RetryableSetup{
+		Create: func() (sacloud.ResourceIDHolder, error) {
+			return client.LoadBalancer.Create(createLb)
+		},
+		AsyncWaitForCopy: func(id int64) (chan interface{}, chan interface{}, chan error) {
+			return client.LoadBalancer.AsyncSleepWhileCopying(id, client.DefaultTimeoutDuration, 5)
+		},
+		Delete: func(id int64) error {
+			_, err := client.LoadBalancer.Delete(id)
+			return err
+		},
+		WaitForUp: func(id int64) error {
+			return client.LoadBalancer.SleepUntilUp(id, client.DefaultTimeoutDuration)
+		},
+		RetryCount: 3,
+	}
+
+	res, err := lbBuilder.Setup()
 	if err != nil {
 		return fmt.Errorf("Failed to create SakuraCloud LoadBalancer resource: %s", err)
 	}
 
-	//wait
-	compChan, progChan, errChan := client.LoadBalancer.AsyncSleepWhileCopying(loadBalancer.ID, client.DefaultTimeoutDuration, 5)
-	for {
-		select {
-		case <-compChan:
-			break
-		case <-progChan:
-			continue
-		case err := <-errChan:
-			return fmt.Errorf("Failed to wait SakuraCloud LoadBalancer copy: %s", err)
-		}
-		break
+	loadBalancer, ok := res.(*sacloud.LoadBalancer)
+	if !ok {
+		return fmt.Errorf("Failed to create SakuraCloud LoadBalancer resource: created resource is not *sacloud.LoadBalancer ")
 	}
-
-	err = client.LoadBalancer.SleepUntilUp(loadBalancer.ID, client.DefaultTimeoutDuration)
-	if err != nil {
-		return fmt.Errorf("Failed to wait SakuraCloud LoadBalancer boot: %s", err)
-	}
-
 	d.SetId(loadBalancer.GetStrID())
 	return resourceSakuraCloudLoadBalancerRead(d, meta)
 }
