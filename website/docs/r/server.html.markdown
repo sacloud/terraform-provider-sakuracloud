@@ -42,6 +42,13 @@ resource sakuracloud_server "foobar" {
   
   description       = "description"
   tags              = ["foo", "bar"]
+  
+  # For "Modify Disk" API
+  hostname          = "your-host-name"
+  password          = ""
+  ssh_key_ids       = ["<your-ssh-key-id>"]
+  note_ids          = ["<your-note-id"]
+  disable_pw_auth   = true
 }
 
 # Create a new Disk
@@ -53,13 +60,6 @@ resource sakuracloud_disk "foobar" {
   source_archive_id = "${data.sakuracloud_archive.ubuntu.id}"
   # or
   # source_disk_id  = "<your-disk-id>"
-  
-  # For "Modify Disk" API
-  hostname          = "your-host-name"
-  password          = ""
-  ssh_key_ids       = ["<your-ssh-key-id>"]
-  note_ids          = ["<your-note-id"]
-  disable_pw_auth   = true
   
   description       = "description"
   tags              = ["foo", "bar"]
@@ -89,9 +89,14 @@ Valid value is one of the following: [ "shared" (default) / <Switch ID> / "" (di
 * `additional_nics` - (Optional) The ID list of the Switches connected to NICs (excluding primary NIC) of Server.  
 Valid values are one of the following: [ <Switch ID> / "" (disconnected) ]
 * `packet_filter_ids` - (Optional) The ID list of the Packet Filters connected to Server.
-* `ipaddress` - (Optional) The IP address of primary NIC.
-* `gateway` - (Optional) Default gateway address of the Server.	 
-* `nw_mask_len` - (Optional) Network mask length of the Server.
+* `ipaddress` - (Optional) The IP address of primary NIC to set with `"Modify Disk"` API.
+* `gateway` - (Optional) Default gateway address of the Server to set with `"Modify Disk"` API.	 
+* `nw_mask_len` - (Optional) Network mask length of the Server to set with `"Modify Disk"` API.
+* `hostname` - (Optional) The hostname to set with `"Modify Disk"` API.
+* `password` - (Optional) The password of OS's administrator to set with `"Modify Disk"` API.
+* `ssh_key_ids` - (Optional) The ID list of SSH Keys to set with `"Modify Disk"` API.
+* `note_ids` - (Optional) The ID list of Notes (Startup-Scripts) to set with `"Modify Disk"` API.
+* `disable_pw_auth` - (Optional) The flag of disable password auth via SSH.
 * `description` - (Optional) The description of the resource.
 * `tags` - (Optional) The tag list of the resources.
 * `icon_id` - (Optional) The ID of the icon.

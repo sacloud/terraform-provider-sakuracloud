@@ -17,7 +17,9 @@
 
 - [v0.12での変更点](upgrade_to_v012/)
 - [v1.1での変更点](upgrade_to_v11/)
-      
+- [v1.4での変更点](upgrade_to_v14/)
+- [v1.6での変更点](upgrade_to_v16/)      
+
 #### その他:
 
 - [Articles/ブログ/記事/読み物](articles/)

@@ -26,13 +26,6 @@ resource "sakuracloud_disk" "foobar" {
   # for storage isolation
   #distant_from = ["<your-disk-id>"]
   
-  # For "Modify Disk" API
-  hostname          = "your-host-name"
-  password          = ""
-  ssh_key_ids       = ["<your-ssh-key-id>"]
-  note_ids          = ["<your-note-id"]
-  disable_pw_auth   = true
-  
   description       = "description"
   tags              = ["foo", "bar"]
 }
@@ -50,17 +43,17 @@ The following arguments are supported:
 * `name` - (Required) The name of the resource.
 * `plan` - The plan of the resource.  
 Valid value is one of the following: [ "ssd" (default) / "hdd"]
-* `conector` - The disk connector of the resource.  
+* `conector` - (Optional) The disk connector of the resource.  
 Valid value is one of the following: [ "virtio" (default) / "ide"]
-* `size` - Size of the resource (unit:`GB`).
-* `distant_from` - The ID list of the Disks isolated from Disk.
-* `source_archive_id` - The ID of source Archive.
-* `source_disk_id` - The ID of source Disk.
-* `hostname` - The hostname to set with `"Modify Disk"` API.
-* `password` - The password of OS's administrator to set with `"Modify Disk"` API.
-* `ssh_key_ids` - The ID list of SSH Keys to set with `"Modify Disk"` API.
-* `note_ids` - The ID list of Notes (Startup-Scripts) to set with `"Modify Disk"` API.
-* `disable_pw_auth` - The flag of disable password auth via SSH.
+* `size` - (Optional) Size of the resource (unit:`GB`).
+* `distant_from` - (Optional) The ID list of the Disks isolated from Disk.
+* `source_archive_id` - (Optional) The ID of source Archive.
+* `source_disk_id` - (Optional) The ID of source Disk.
+* `hostname` - (**Deprecated**) The hostname to set with `"Modify Disk"` API.
+* `password` - (**Deprecated**) The password of OS's administrator to set with `"Modify Disk"` API.
+* `ssh_key_ids` - (**Deprecated**) The ID list of SSH Keys to set with `"Modify Disk"` API.
+* `note_ids` - (**Deprecated**) The ID list of Notes (Startup-Scripts) to set with `"Modify Disk"` API.
+* `disable_pw_auth` - (**Deprecated**) The flag of disable password auth via SSH.
 * `description` - (Optional) The description of the resource.
 * `tags` - (Optional) The tag list of the resources.
 * `icon_id` - (Optional) The ID of the icon.

@@ -12,8 +12,10 @@ pages:
   - ドキュメント:
     - インストールガイド: installation.md
     - アップグレードガイド:
-      - v0.12以前から: upgrade_to_v012.md
-      - v1.0から: upgrade_to_v11.md
+      - v0.12での変更点: upgrade_to_v012.md
+      - v1.1での変更点: upgrade_to_v11.md
+      - v1.4での変更点: upgrade_to_v14.md
+      - v1.6での変更点: upgrade_to_v16.md
     - ブログ/記事/読み物: articles.md
   - 設定リファレンス:
     - 全体/共通項目:
