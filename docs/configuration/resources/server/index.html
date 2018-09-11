@@ -86,14 +86,28 @@
         
             
     <li class="toctree-l1 ">
-        <a class="" href="../../../upgrade_to_v012/">v0.12以前から</a>
+        <a class="" href="../../../upgrade_to_v012/">v0.12での変更点</a>
         
     </li>
 
         
             
     <li class="toctree-l1 ">
-        <a class="" href="../../../upgrade_to_v11/">v1.0から</a>
+        <a class="" href="../../../upgrade_to_v11/">v1.1での変更点</a>
+        
+    </li>
+
+        
+            
+    <li class="toctree-l1 ">
+        <a class="" href="../../../upgrade_to_v14/">v1.4での変更点</a>
+        
+    </li>
+
+        
+            
+    <li class="toctree-l1 ">
+        <a class="" href="../../../upgrade_to_v16/">v1.6での変更点</a>
         
     </li>
 
@@ -591,6 +605,22 @@
   #nw_mask_len = 24
 
   description = &quot;Server from TerraForm for SAKURA CLOUD&quot;
+  tags        = [&quot;tag1&quot;, &quot;tag2&quot;]
+
+  #==========================
+  #ディスクの修正関連
+  #==========================
+  hostname = &quot;myserver&quot; #ホスト名
+  password = &quot;p@ssw0rd&quot; #パスワード
+
+  #SSH公開鍵
+  #ssh_key_ids = [&quot;${sakuracloud_ssh_key_gen.key.id}&quot;]
+
+  #スタートアップスクリプト
+  #note_ids = [&quot;${sakuracloud_note.note.id}&quot;]
+
+  #SSH接続でのパスワード/チャレンジレスポンス認証無効化
+  #disable_pw_auth = true
 }
 </code></pre>
 
@@ -701,7 +731,7 @@
 <td>基本NIC:IPアドレス</td>
 <td align="center">-</td>
 <td>文字列</td>
-<td><a href="#注1">注1</a></td>
+<td>ディスク修正機能で設定される、IPアドレス <a href="#注1">注1</a></td>
 </tr>
 <tr>
 <td><code>gateway</code></td>
@@ -709,7 +739,7 @@
 <td>基本NIC:ゲートウェイ</td>
 <td align="center">-</td>
 <td>文字列</td>
-<td><a href="#注1">注1</a></td>
+<td>ディスク修正機能で設定される、ゲートウェイアドレス <a href="#注1">注1</a></td>
 </tr>
 <tr>
 <td><code>nw_mask_len</code></td>
@@ -717,7 +747,47 @@
 <td>基本NIC:サブネットマスク長</td>
 <td align="center">-</td>
 <td>文字列</td>
-<td><a href="#注1">注1</a></td>
+<td>ディスク修正機能で設定される、サブネットマスク長 <a href="#注1">注1</a></td>
+</tr>
+<tr>
+<td><code>hostname</code></td>
+<td align="center">-</td>
+<td>ホスト名</td>
+<td align="center">-</td>
+<td>文字列</td>
+<td>ディスク修正機能で設定される、ホスト名 <a href="#注1">注1</a></td>
+</tr>
+<tr>
+<td><code>password</code></td>
+<td align="center">-</td>
+<td>パスワード</td>
+<td align="center">-</td>
+<td>文字列</td>
+<td>ディスク修正機能で設定される、OS管理者パスワード <a href="#注1">注1</a></td>
+</tr>
+<tr>
+<td><code>ssh_key_ids</code></td>
+<td align="center">-</td>
+<td>SSH公開鍵ID</td>
+<td align="center">-</td>
+<td>リスト(文字列)</td>
+<td>ディスク修正機能で設定される、SSH認証用の公開鍵ID <a href="#注1">注1</a></td>
+</tr>
+<tr>
+<td><code>disable_pw_auth</code></td>
+<td align="center">-</td>
+<td>パスワードでの認証無効化</td>
+<td align="center">-</td>
+<td><code>true</code><br /><code>false</code></td>
+<td>ディスク修正機能で設定される、SSH接続でのパスワード/チャレンジレスポンス認証の無効化 <a href="#注1">注1</a></td>
+</tr>
+<tr>
+<td><code>note_ids</code></td>
+<td align="center">-</td>
+<td>スタートアップスクリプトID</td>
+<td align="center">-</td>
+<td>リスト(文字列)</td>
+<td>ディスク修正機能で設置される、スタートアップスクリプトのID <a href="#注1">注1</a></td>
 </tr>
 <tr>
 <td><code>private_host_id</code></td>
@@ -753,10 +823,16 @@
 </tr>
 </tbody>
 </table>
-<h4 id="1">注1</h4>
-<p><code>nic</code>にスイッチのIDが指定されており、かつ<code>disks</code>の最初のパラメーターに
-ディスクの修正に対応しているディスクのIDが指定されている場合に有効。
-ディスクの修正は主にLinux系パブリックアーカイブを元にしたディスクの場合にサポートされています。</p>
+<h4 id="1">注1 ディスク修正機能関連の項目</h4>
+<ul>
+<li>サーバにディスクが接続されている場合のみ有効です。</li>
+<li>サーバに接続されたディスクのうち、最初のディスクのみが対象となります。</li>
+<li>OS(ディスクのコピー元アーカイブ)によってはディスク修正機能に対応していない場合があります。</li>
+<li>これらの値は投入専用です。属性においても投入値を表します(さくらのクラウドAPIからは取得できない項目です)。</li>
+<li>IPアドレス/ゲートウェイ/サブネットマスク長については<code>nic</code>にスイッチのIDが指定されている場合にのみ設定されます。</li>
+</ul>
+<p>これらの値をサーバリソース/ディスクリソースの両方に記載した場合の動作は不定です。
+混乱を避けるためにいずれか一方にのみ記載するようにしてください。</p>
 <h3 id="_3">属性</h3>
 <table>
 <thead>
