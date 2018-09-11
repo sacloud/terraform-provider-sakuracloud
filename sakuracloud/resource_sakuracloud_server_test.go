@@ -37,6 +37,20 @@ func TestAccResourceSakuraCloudServer(t *testing.T) {
 					resource.TestCheckResourceAttr(
 						"sakuracloud_server.foobar", "tags.0", "tag1"),
 					resource.TestCheckResourceAttr(
+						"sakuracloud_server.foobar", "hostname", "myserver"),
+					resource.TestCheckResourceAttr(
+						"sakuracloud_server.foobar", "password", "p@ssw0rd"),
+					resource.TestCheckResourceAttr(
+						"sakuracloud_server.foobar", "ssh_key_ids.#", "2"),
+					resource.TestCheckResourceAttr(
+						"sakuracloud_server.foobar", "ssh_key_ids.0", "100000000000"),
+					resource.TestCheckResourceAttr(
+						"sakuracloud_server.foobar", "disable_pw_auth", "true"),
+					resource.TestCheckResourceAttr(
+						"sakuracloud_server.foobar", "note_ids.#", "2"),
+					resource.TestCheckResourceAttr(
+						"sakuracloud_server.foobar", "note_ids.0", "100000000000"),
+					resource.TestCheckResourceAttr(
 						"sakuracloud_server.foobar", "nic", "shared"),
 					resource.TestCheckResourceAttr(
 						"sakuracloud_server.foobar", "additional_nics.#", "0"),
@@ -460,6 +474,13 @@ resource "sakuracloud_server" "foobar" {
     description = "Server from TerraForm for SAKURA CLOUD"
     tags = ["tag1"]
     icon_id = "${sakuracloud_icon.foobar.id}"
+
+    hostname = "myserver"
+    password = "p@ssw0rd"
+    ssh_key_ids = ["100000000000", "200000000000"]
+    disable_pw_auth = true
+    note_ids = ["100000000000", "200000000000"]
+
     graceful_shutdown_timeout = 10
 }
 
