@@ -165,6 +165,7 @@ func TestAccImportSakuraCloudDisk(t *testing.T) {
 				ImportStateCheck:  checkFn,
 				ImportStateVerify: true,
 				ImportStateVerifyIgnore: []string{
+					"distant_from",
 					"hostname",
 					"password",
 					"ssh_key_ids",
