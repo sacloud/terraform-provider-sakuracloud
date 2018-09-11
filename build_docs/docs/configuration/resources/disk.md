@@ -24,19 +24,6 @@ resource sakuracloud_disk "disk01" {
 
   # 指定ディスクと別ストレージに格納したい場合
   #distant_from = ["<your-disk-id>"]
-
-  #ディスクの修正関連
-  hostname = "your-host-name"
-  password = "your-password"
-  
-  #SSH公開鍵
-  ssh_key_ids = ["${sakuracloud_ssh_key_gen.key.id}"]
-  
-  #スタートアップスクリプト
-  note_ids = ["${sakuracloud_note.note.id}"]
-  
-  #SSH接続でのパスワード/チャレンジレスポンス認証無効化
-  disable_pw_auth = true
  
   description = "Description"
   tags        = ["tag1", "tag2"]
@@ -46,19 +33,6 @@ resource sakuracloud_disk "disk01" {
 data sakuracloud_archive "centos" {
   os_type = "centos"
 }
-
-#SSH公開鍵
-resource sakuracloud_ssh_key_gen "key" {
-  name = "foobar"
-}
-
-#スタートアップスクリプト
-resource sakuracloud_note "note" {
-  name    = "note"
-  content = "#!/bin/sh ..."
-}
-
-
 ```
 
 ### パラメーター
@@ -72,11 +46,11 @@ resource sakuracloud_note "note" {
 | `distant_from`    | -   | ストレージ隔離対象ディスクID | -       | リスト(文字列)                    | ストレージを隔離したいディスクのIDのリスト |
 |`source_archive_id`| -   | コピー元アーカイブID   | -        | 文字列                | [注1](#注1) |
 |`source_disk_id`   | -   | コピー元ディスクID   | -        | 文字列                | [注1](#注1) |
-| `hostname`        | -   | ホスト名               | - | 文字列 | ディスク修正機能で設定される、ホスト名 [注2](#注2)|
-| `password`        | -   | パスワード               | - | 文字列 | ディスク修正機能で設定される、OS管理者パスワード [注2](#注2)|
-| `ssh_key_ids`     | -   | SSH公開鍵ID             | - | リスト(文字列) | ディスク修正機能で設定される、SSH認証用の公開鍵ID [注2](#注2)|
-| `disable_pw_auth` | -   | パスワードでの認証無効化   | - | `true`<br />`false` | ディスク修正機能で設定される、SSH接続でのパスワード/チャレンジレスポンス認証の無効化 [注2](#注2)|
-| `note_ids`        | -   | スタートアップスクリプトID | - | リスト(文字列) | スタートアップスクリプトのID |
+| `hostname`        | -   | ホスト名               | - | 文字列 | (非推奨) ディスク修正機能で設定される、ホスト名 [注2](#注2)|
+| `password`        | -   | パスワード               | - | 文字列 | (非推奨) ディスク修正機能で設定される、OS管理者パスワード [注2](#注2)|
+| `ssh_key_ids`     | -   | SSH公開鍵ID             | - | リスト(文字列) | (非推奨) ディスク修正機能で設定される、SSH認証用の公開鍵ID [注2](#注2)|
+| `disable_pw_auth` | -   | パスワードでの認証無効化   | - | `true`<br />`false` | (非推奨) ディスク修正機能で設定される、SSH接続でのパスワード/チャレンジレスポンス認証の無効化 [注2](#注2)|
+| `note_ids`        | -   | スタートアップスクリプトID | - | リスト(文字列) | (非推奨) ディスク修正機能で設置される、スタートアップスクリプトのID [注2](#注2)|
 | `icon_id`         | -   | アイコンID         | - | 文字列 | - |
 | `description`     | -   | 説明  | - | 文字列 | - |
 | `tags`            | -   | タグ | - | リスト(文字列) | - |
@@ -129,7 +103,13 @@ resource sakuracloud_disk "disk" {
   - `source_archive_disk`を手動で変更しても反映されない(`terraform taint`などで手動でリソース再生性が必要)
   - コピー元となるアーカイブが変更されているため、次回ディスク生成時に現在の構成と同じにならない可能性がある
 
-#### 注2 ディスク修正機能の制限項目
+#### 注2 ディスク修正機能の項目
+
+これらの項目は[サーバリソース](server.md)に移動されました。  
+過去のバージョンとの互換性維持のために現在でも利用可能ですが、Terraform for さくらのクラウドの将来のバージョンでは削除される予定です。
+
+また、これらの値をサーバリソース/ディスクリソースの両方に記載した場合の動作は不定です。
+混乱を避けるためにいずれか一方にのみ記載するようにしてください。
 
   - OSによりディスク修正機能に対応していない場合があります。
   - これらの値は投入専用です。属性においても投入値を表します(さくらのクラウドAPIからは取得できない項目です)。

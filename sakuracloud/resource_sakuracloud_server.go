@@ -121,6 +121,35 @@ func resourceSakuraCloudServer() *schema.Resource {
 				Description:  "target SakuraCloud zone",
 				ValidateFunc: validateZone([]string{"is1a", "is1b", "tk1a", "tk1v"}),
 			},
+			"hostname": {
+				Type:         schema.TypeString,
+				Optional:     true,
+				ValidateFunc: validation.StringLenBetween(1, 64),
+			},
+			"password": {
+				Type:         schema.TypeString,
+				Optional:     true,
+				ValidateFunc: validation.StringLenBetween(8, 64),
+				Sensitive:    true,
+			},
+			"ssh_key_ids": {
+				Type:     schema.TypeList,
+				Optional: true,
+				Elem:     &schema.Schema{Type: schema.TypeString},
+				// ! Current terraform(v0.7) is not support to array validation !
+				// ValidateFunc: validateSakuracloudIDArrayType,
+			},
+			"disable_pw_auth": {
+				Type:     schema.TypeBool,
+				Optional: true,
+			},
+			"note_ids": {
+				Type:     schema.TypeList,
+				Optional: true,
+				Elem:     &schema.Schema{Type: schema.TypeString},
+				// ! Current terraform(v0.7) is not support to array validation !
+				// ValidateFunc: validateSakuracloudIDArrayType,
+			},
 			"macaddresses": {
 				Type:     schema.TypeList,
 				Computed: true,
@@ -239,9 +268,34 @@ func resourceSakuraCloudServerCreate(d *schema.ResourceData, meta interface{}) e
 				}
 
 				// edit disk if server is connected the shared segment
+				isNeedEditDisk := false
+				diskEditConfig := client.Disk.NewCondig()
+				if hostName, ok := d.GetOk("hostname"); ok {
+					diskEditConfig.SetHostName(hostName.(string))
+					isNeedEditDisk = true
+				}
+				if password, ok := d.GetOk("password"); ok {
+					diskEditConfig.SetPassword(password.(string))
+					isNeedEditDisk = true
+				}
+				if sshKeyIDs, ok := d.GetOk("ssh_key_ids"); ok {
+					ids := expandStringList(sshKeyIDs.([]interface{}))
+					diskEditConfig.SetSSHKeys(ids)
+					isNeedEditDisk = true
+				}
+
+				if disablePasswordAuth, ok := d.GetOk("disable_pw_auth"); ok {
+					diskEditConfig.SetDisablePWAuth(disablePasswordAuth.(bool))
+					isNeedEditDisk = true
+				}
+
+				if noteIDs, ok := d.GetOk("note_ids"); ok {
+					ids := expandStringList(noteIDs.([]interface{}))
+					diskEditConfig.SetNotes(ids)
+					isNeedEditDisk = true
+				}
+
 				if i == 0 && len(server.Interfaces) > 0 && server.Interfaces[0].Switch != nil {
-					isNeedEditDisk := false
-					diskEditConfig := client.Disk.NewCondig()
 					if server.Interfaces[0].Switch.Scope == sacloud.ESCopeShared {
 						isNeedEditDisk = true
 					} else {
@@ -253,28 +307,25 @@ func resourceSakuraCloudServerCreate(d *schema.ResourceData, meta interface{}) e
 						diskEditConfig.SetDefaultRoute(baseGateway)
 						diskEditConfig.SetNetworkMaskLen(baseMaskLen)
 
-						isNeedEditDisk = baseIP != "" || baseGateway != "" || baseMaskLen != ""
-					}
-
-					if isNeedEditDisk {
-
-						res, err := client.Disk.CanEditDisk(toSakuraCloudID(diskID))
-						if err != nil {
-							return fmt.Errorf("Failed to check CanEditDisk: %s", err)
+						if baseIP != "" || baseGateway != "" || baseMaskLen != "" {
+							isNeedEditDisk = true
 						}
-						if res {
-							_, err := client.Disk.Config(toSakuraCloudID(diskID), diskEditConfig)
-							if err != nil {
-								return fmt.Errorf("Error editting SakuraCloud DiskConfig: %s", err)
-							}
-						} else {
-							log.Printf("[WARN] Disk[%s] does not support modify disk", diskID)
-						}
-
 					}
-
 				}
-
+				if i == 0 && isNeedEditDisk {
+					res, err := client.Disk.CanEditDisk(toSakuraCloudID(diskID))
+					if err != nil {
+						return fmt.Errorf("Failed to check CanEditDisk: %s", err)
+					}
+					if res {
+						_, err := client.Disk.Config(toSakuraCloudID(diskID), diskEditConfig)
+						if err != nil {
+							return fmt.Errorf("Error editting SakuraCloud DiskConfig: %s", err)
+						}
+					} else {
+						log.Printf("[WARN] Disk[%s] does not support modify disk", diskID)
+					}
+				}
 			}
 		}
 	}
@@ -348,9 +399,15 @@ func resourceSakuraCloudServerUpdate(d *schema.ResourceData, meta interface{}) e
 
 		isNeedRestart = true
 	}
+	isDiskConfigChanged := false
+	if d.HasChange("disks") || d.HasChange("nic") || d.HasChange("ipaddress") ||
+		d.HasChange("gateway") || d.HasChange("nw_mask_len") || d.HasChange("hostname") ||
+		d.HasChange("password") || d.HasChange("ssh_key_ids") || d.HasChange("disable_pw_auth") ||
+		d.HasChange("note_ids") {
+		isDiskConfigChanged = true
+	}
 
-	if d.HasChange("disks") || d.HasChange("nic") || d.HasChange("additional_nics") || d.HasChange("interface_driver") ||
-		d.HasChange("ipaddress") || d.HasChange("gateway") || d.HasChange("nw_mask_len") || d.HasChange("private_host_id") {
+	if isDiskConfigChanged || d.HasChange("additional_nics") || d.HasChange("interface_driver") || d.HasChange("private_host_id") {
 		isNeedRestart = true
 	}
 
@@ -474,22 +531,66 @@ func resourceSakuraCloudServerUpdate(d *schema.ResourceData, meta interface{}) e
 		return fmt.Errorf("Couldn't find SakuraCloud Server resource: %s", err)
 	}
 
-	if d.HasChange("ipaddress") || d.HasChange("gateway") || d.HasChange("nw_mask_len") {
-		if len(updatedServer.Disks) > 0 && len(updatedServer.Interfaces) > 0 && updatedServer.Interfaces[0].Switch != nil {
+	if isDiskConfigChanged {
+		if len(updatedServer.Disks) > 0 {
 			isNeedEditDisk := false
 			diskEditConfig := client.Disk.NewCondig()
-			if updatedServer.Interfaces[0].Switch.Scope == sacloud.ESCopeShared {
-				isNeedEditDisk = true
-			} else {
-				baseIP := forceString(d.Get("ipaddress"))
-				baseGateway := forceString(d.Get("gateway"))
-				baseMaskLen := forceString(d.Get("nw_mask_len"))
 
-				diskEditConfig.SetUserIPAddress(baseIP)
-				diskEditConfig.SetDefaultRoute(baseGateway)
-				diskEditConfig.SetNetworkMaskLen(baseMaskLen)
+			if d.HasChange("nic") || d.HasChange("ipaddress") || d.HasChange("gateway") || d.HasChange("nw_mask_len") {
+				if len(updatedServer.Interfaces) > 0 && updatedServer.Interfaces[0].Switch != nil {
+					if updatedServer.Interfaces[0].Switch.Scope == sacloud.ESCopeShared {
+						isNeedEditDisk = true
+					} else {
+						baseIP := forceString(d.Get("ipaddress"))
+						baseGateway := forceString(d.Get("gateway"))
+						baseMaskLen := forceString(d.Get("nw_mask_len"))
 
-				isNeedEditDisk = baseIP != "" || baseGateway != "" || baseMaskLen != ""
+						diskEditConfig.SetUserIPAddress(baseIP)
+						diskEditConfig.SetDefaultRoute(baseGateway)
+						diskEditConfig.SetNetworkMaskLen(baseMaskLen)
+
+						if baseIP != "" || baseGateway != "" || baseMaskLen != "" {
+							isNeedEditDisk = true
+						}
+					}
+				}
+			}
+
+			if d.HasChange("hostname") {
+				if hostName, ok := d.GetOk("hostname"); ok {
+					diskEditConfig.SetHostName(hostName.(string))
+					isNeedEditDisk = true
+				}
+			}
+
+			if d.HasChange("password") {
+				if password, ok := d.GetOk("password"); ok {
+					diskEditConfig.SetPassword(password.(string))
+					isNeedEditDisk = true
+				}
+			}
+
+			if d.HasChange("ssh_key_ids") {
+				if sshKeyIDs, ok := d.GetOk("ssh_key_ids"); ok {
+					ids := expandStringList(sshKeyIDs.([]interface{}))
+					diskEditConfig.SetSSHKeys(ids)
+					isNeedEditDisk = true
+				}
+			}
+
+			if d.HasChange("disable_pw_auth") {
+				if disablePasswordAuth, ok := d.GetOk("disable_pw_auth"); ok {
+					diskEditConfig.SetDisablePWAuth(disablePasswordAuth.(bool))
+					isNeedEditDisk = true
+				}
+			}
+
+			if d.HasChange("note_ids") {
+				if noteIDs, ok := d.GetOk("note_ids"); ok {
+					ids := expandStringList(noteIDs.([]interface{}))
+					diskEditConfig.SetNotes(ids)
+					isNeedEditDisk = true
+				}
 			}
 
 			if isNeedEditDisk {
@@ -506,11 +607,9 @@ func resourceSakuraCloudServerUpdate(d *schema.ResourceData, meta interface{}) e
 				} else {
 					log.Printf("[WARN] Disk[%d] does not support modify disk", diskID)
 				}
-
 			}
 		}
 	}
-
 	// change Plan
 	if d.HasChange("core") || d.HasChange("memory") {
 		server, err := client.Server.ChangePlan(toSakuraCloudID(d.Id()), server.ServerPlan.GetStrID())

@@ -103,12 +103,14 @@ func resourceSakuraCloudDisk() *schema.Resource {
 				Type:         schema.TypeString,
 				Optional:     true,
 				ValidateFunc: validation.StringLenBetween(1, 64),
+				Deprecated:   "Use attribute in `sakuracloud_server` instead",
 			},
 			"password": {
 				Type:         schema.TypeString,
 				Optional:     true,
 				ValidateFunc: validation.StringLenBetween(8, 64),
 				Sensitive:    true,
+				Deprecated:   "Use attribute in `sakuracloud_server` instead",
 			},
 			"ssh_key_ids": {
 				Type:     schema.TypeList,
@@ -116,10 +118,12 @@ func resourceSakuraCloudDisk() *schema.Resource {
 				Elem:     &schema.Schema{Type: schema.TypeString},
 				// ! Current terraform(v0.7) is not support to array validation !
 				// ValidateFunc: validateSakuracloudIDArrayType,
+				Deprecated: "Use attribute in `sakuracloud_server` instead",
 			},
 			"disable_pw_auth": {
-				Type:     schema.TypeBool,
-				Optional: true,
+				Type:       schema.TypeBool,
+				Optional:   true,
+				Deprecated: "Use attribute in `sakuracloud_server` instead",
 			},
 			"note_ids": {
 				Type:     schema.TypeList,
@@ -127,6 +131,7 @@ func resourceSakuraCloudDisk() *schema.Resource {
 				Elem:     &schema.Schema{Type: schema.TypeString},
 				// ! Current terraform(v0.7) is not support to array validation !
 				// ValidateFunc: validateSakuracloudIDArrayType,
+				Deprecated: "Use attribute in `sakuracloud_server` instead",
 			},
 		},
 	}
@@ -199,46 +204,54 @@ func resourceSakuraCloudDiskCreate(d *schema.ResourceData, meta interface{}) err
 			return err
 		},
 		ProvisionBeforeUp: func(id int64, _ interface{}) error {
+			isNeedEditDisk := false
+
 			//edit disk
 			diskEditConfig := client.Disk.NewCondig()
 			if hostName, ok := d.GetOk("hostname"); ok {
 				diskEditConfig.SetHostName(hostName.(string))
+				isNeedEditDisk = true
 			}
 			if password, ok := d.GetOk("password"); ok {
 				diskEditConfig.SetPassword(password.(string))
+				isNeedEditDisk = true
 			}
 			if sshKeyIDs, ok := d.GetOk("ssh_key_ids"); ok {
 				ids := expandStringList(sshKeyIDs.([]interface{}))
 				diskEditConfig.SetSSHKeys(ids)
+				isNeedEditDisk = true
 			}
 
 			if disablePasswordAuth, ok := d.GetOk("disable_pw_auth"); ok {
 				diskEditConfig.SetDisablePWAuth(disablePasswordAuth.(bool))
+				isNeedEditDisk = true
 			}
 
 			if noteIDs, ok := d.GetOk("note_ids"); ok {
 				ids := expandStringList(noteIDs.([]interface{}))
 				diskEditConfig.SetNotes(ids)
+				isNeedEditDisk = true
 			}
 
-			// call disk edit API
-			res, err := client.Disk.CanEditDisk(id)
-			if err != nil {
-				return fmt.Errorf("Failed to check CanEditDisk: %s", err)
-			}
-			if res {
-				_, err = client.Disk.Config(id, diskEditConfig)
+			if isNeedEditDisk {
+				// call disk edit API
+				res, err := client.Disk.CanEditDisk(id)
 				if err != nil {
-					return fmt.Errorf("Error editting SakuraCloud DiskConfig: %s", err)
+					return fmt.Errorf("Failed to check CanEditDisk: %s", err)
 				}
-			} else {
-				log.Printf("[WARN] Disk[%d] does not support modify disk", id)
+				if res {
+					_, err = client.Disk.Config(id, diskEditConfig)
+					if err != nil {
+						return fmt.Errorf("Error editting SakuraCloud DiskConfig: %s", err)
+					}
+				} else {
+					log.Printf("[WARN] Disk[%d] does not support modify disk", id)
+				}
 			}
 
 			server_id, ok := d.GetOk("server_id")
 			if ok {
-				_, err = client.Disk.ConnectToServer(id, toSakuraCloudID(server_id.(string)))
-
+				_, err := client.Disk.ConnectToServer(id, toSakuraCloudID(server_id.(string)))
 				if err != nil {
 					return fmt.Errorf("Failed to connect SakuraCloud Disk resource: %s", err)
 				}
@@ -290,7 +303,8 @@ func resourceSakuraCloudDiskUpdate(d *schema.ResourceData, meta interface{}) err
 	isRunning := disk.Server != nil && disk.Server.Instance.IsUp()
 	isDiskConfigChanged := false
 
-	if d.HasChange("hostname") || d.HasChange("password") || d.HasChange("ssh_key_ids") || d.HasChange("disable_pw_auth") || d.HasChange("note_ids") {
+	if d.HasChange("hostname") || d.HasChange("password") || d.HasChange("ssh_key_ids") ||
+		d.HasChange("disable_pw_auth") || d.HasChange("note_ids") {
 		isDiskConfigChanged = true
 	}
 
@@ -306,16 +320,12 @@ func resourceSakuraCloudDiskUpdate(d *schema.ResourceData, meta interface{}) err
 		if d.HasChange("hostname") {
 			if hostName, ok := d.GetOk("hostname"); ok {
 				diskEditConfig.SetHostName(hostName.(string))
-			} else {
-				diskEditConfig.HostName = nil
 			}
 		}
 
 		if d.HasChange("password") {
 			if password, ok := d.GetOk("password"); ok {
 				diskEditConfig.SetPassword(password.(string))
-			} else {
-				diskEditConfig.SetPassword("")
 			}
 		}
 
@@ -323,8 +333,6 @@ func resourceSakuraCloudDiskUpdate(d *schema.ResourceData, meta interface{}) err
 			if sshKeyIDs, ok := d.GetOk("ssh_key_ids"); ok {
 				ids := expandStringList(sshKeyIDs.([]interface{}))
 				diskEditConfig.SetSSHKeys(ids)
-			} else {
-				diskEditConfig.SSHKeys = nil
 			}
 		}
 
@@ -336,8 +344,6 @@ func resourceSakuraCloudDiskUpdate(d *schema.ResourceData, meta interface{}) err
 			if noteIDs, ok := d.GetOk("note_ids"); ok {
 				ids := expandStringList(noteIDs.([]interface{}))
 				diskEditConfig.SetNotes(ids)
-			} else {
-				diskEditConfig.Notes = nil
 			}
 		}
 
