@@ -70,15 +70,16 @@ data sakuracloud_archive "centos" {
 resource "sakuracloud_disk" "disk01" {
   name              = "disk01"
   source_archive_id = "${data.sakuracloud_archive.centos.id}"
-  ssh_key_ids       = ["${sakuracloud_ssh_key_gen.key.id}"]
-  password          = "${var.password}"
-  disable_pw_auth   = true
 }
 
 # Define Server
 resource "sakuracloud_server" "server01" {
   name  = "server01"
   disks = ["${sakuracloud_disk.disk01.id}"]
+  
+  ssh_key_ids       = ["${sakuracloud_ssh_key_gen.key.id}"]
+  password          = "${var.password}"
+  disable_pw_auth   = true
 }
 
 # Define output to display SSH commands
