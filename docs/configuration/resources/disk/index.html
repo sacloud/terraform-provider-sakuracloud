@@ -86,14 +86,28 @@
         
             
     <li class="toctree-l1 ">
-        <a class="" href="../../../upgrade_to_v012/">v0.12以前から</a>
+        <a class="" href="../../../upgrade_to_v012/">v0.12での変更点</a>
         
     </li>
 
         
             
     <li class="toctree-l1 ">
-        <a class="" href="../../../upgrade_to_v11/">v1.0から</a>
+        <a class="" href="../../../upgrade_to_v11/">v1.1での変更点</a>
+        
+    </li>
+
+        
+            
+    <li class="toctree-l1 ">
+        <a class="" href="../../../upgrade_to_v14/">v1.4での変更点</a>
+        
+    </li>
+
+        
+            
+    <li class="toctree-l1 ">
+        <a class="" href="../../../upgrade_to_v16/">v1.6での変更点</a>
         
     </li>
 
@@ -580,19 +594,6 @@ resource sakuracloud_disk &quot;disk01&quot; {
   # 指定ディスクと別ストレージに格納したい場合
   #distant_from = [&quot;&lt;your-disk-id&gt;&quot;]
 
-  #ディスクの修正関連
-  hostname = &quot;your-host-name&quot;
-  password = &quot;your-password&quot;
-
-  #SSH公開鍵
-  ssh_key_ids = [&quot;${sakuracloud_ssh_key_gen.key.id}&quot;]
-
-  #スタートアップスクリプト
-  note_ids = [&quot;${sakuracloud_note.note.id}&quot;]
-
-  #SSH接続でのパスワード/チャレンジレスポンス認証無効化
-  disable_pw_auth = true
-
   description = &quot;Description&quot;
   tags        = [&quot;tag1&quot;, &quot;tag2&quot;]
 }
@@ -601,19 +602,6 @@ resource sakuracloud_disk &quot;disk01&quot; {
 data sakuracloud_archive &quot;centos&quot; {
   os_type = &quot;centos&quot;
 }
-
-#SSH公開鍵
-resource sakuracloud_ssh_key_gen &quot;key&quot; {
-  name = &quot;foobar&quot;
-}
-
-#スタートアップスクリプト
-resource sakuracloud_note &quot;note&quot; {
-  name    = &quot;note&quot;
-  content = &quot;#!/bin/sh ...&quot;
-}
-
-
 </code></pre>
 
 <h3 id="_2">パラメーター</h3>
@@ -691,7 +679,7 @@ resource sakuracloud_note &quot;note&quot; {
 <td>ホスト名</td>
 <td align="center">-</td>
 <td>文字列</td>
-<td>ディスク修正機能で設定される、ホスト名 <a href="#注2">注2</a></td>
+<td>(非推奨) ディスク修正機能で設定される、ホスト名 <a href="#注2">注2</a></td>
 </tr>
 <tr>
 <td><code>password</code></td>
@@ -699,7 +687,7 @@ resource sakuracloud_note &quot;note&quot; {
 <td>パスワード</td>
 <td align="center">-</td>
 <td>文字列</td>
-<td>ディスク修正機能で設定される、OS管理者パスワード <a href="#注2">注2</a></td>
+<td>(非推奨) ディスク修正機能で設定される、OS管理者パスワード <a href="#注2">注2</a></td>
 </tr>
 <tr>
 <td><code>ssh_key_ids</code></td>
@@ -707,7 +695,7 @@ resource sakuracloud_note &quot;note&quot; {
 <td>SSH公開鍵ID</td>
 <td align="center">-</td>
 <td>リスト(文字列)</td>
-<td>ディスク修正機能で設定される、SSH認証用の公開鍵ID <a href="#注2">注2</a></td>
+<td>(非推奨) ディスク修正機能で設定される、SSH認証用の公開鍵ID <a href="#注2">注2</a></td>
 </tr>
 <tr>
 <td><code>disable_pw_auth</code></td>
@@ -715,7 +703,7 @@ resource sakuracloud_note &quot;note&quot; {
 <td>パスワードでの認証無効化</td>
 <td align="center">-</td>
 <td><code>true</code><br /><code>false</code></td>
-<td>ディスク修正機能で設定される、SSH接続でのパスワード/チャレンジレスポンス認証の無効化 <a href="#注2">注2</a></td>
+<td>(非推奨) ディスク修正機能で設定される、SSH接続でのパスワード/チャレンジレスポンス認証の無効化 <a href="#注2">注2</a></td>
 </tr>
 <tr>
 <td><code>note_ids</code></td>
@@ -723,7 +711,7 @@ resource sakuracloud_note &quot;note&quot; {
 <td>スタートアップスクリプトID</td>
 <td align="center">-</td>
 <td>リスト(文字列)</td>
-<td>スタートアップスクリプトのID</td>
+<td>(非推奨) ディスク修正機能で設置される、スタートアップスクリプトのID <a href="#注2">注2</a></td>
 </tr>
 <tr>
 <td><code>icon_id</code></td>
@@ -809,7 +797,11 @@ resource sakuracloud_disk &quot;disk&quot; {
 <li><code>source_archive_disk</code>を手動で変更しても反映されない(<code>terraform taint</code>などで手動でリソース再生性が必要)</li>
 <li>コピー元となるアーカイブが変更されているため、次回ディスク生成時に現在の構成と同じにならない可能性がある</li>
 </ul>
-<h4 id="2">注2 ディスク修正機能の制限項目</h4>
+<h4 id="2">注2 ディスク修正機能の項目</h4>
+<p>これらの項目は<a href="../server/">サーバリソース</a>に移動されました。<br />
+過去のバージョンとの互換性維持のために現在でも利用可能ですが、Terraform for さくらのクラウドの将来のバージョンでは削除される予定です。</p>
+<p>また、これらの値をサーバリソース/ディスクリソースの両方に記載した場合の動作は不定です。
+混乱を避けるためにいずれか一方にのみ記載するようにしてください。</p>
 <ul>
 <li>OSによりディスク修正機能に対応していない場合があります。</li>
 <li>これらの値は投入専用です。属性においても投入値を表します(さくらのクラウドAPIからは取得できない項目です)。</li>
