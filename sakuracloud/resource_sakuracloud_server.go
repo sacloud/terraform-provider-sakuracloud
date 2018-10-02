@@ -189,11 +189,11 @@ func resourceSakuraCloudServerCreate(d *schema.ResourceData, meta interface{}) e
 	opts := client.Server.New()
 	opts.Name = d.Get("name").(string)
 
-	planID, err := client.Product.Server.GetBySpec(d.Get("core").(int), d.Get("memory").(int))
+	plan, err := client.Product.Server.GetBySpec(d.Get("core").(int), d.Get("memory").(int), sacloud.PlanDefault)
 	if err != nil {
 		return fmt.Errorf("Invalid server plan.Please change 'core' or 'memory': %s", err)
 	}
-	opts.SetServerPlanByID(planID.GetStrID())
+	opts.SetServerPlanByValue(plan.CPU, plan.GetMemoryGB(), plan.Generation)
 
 	if interfaceDriver, ok := d.GetOk("interface_driver"); ok {
 		s := interfaceDriver.(string)
@@ -391,11 +391,11 @@ func resourceSakuraCloudServerUpdate(d *schema.ResourceData, meta interface{}) e
 
 	if d.HasChange("core") || d.HasChange("memory") {
 		// If planID changed , server ID will change.
-		planID, err := client.Product.Server.GetBySpec(d.Get("core").(int), d.Get("memory").(int))
+		plan, err := client.Product.Server.GetBySpec(d.Get("core").(int), d.Get("memory").(int), sacloud.PlanDefault)
 		if err != nil {
 			return fmt.Errorf("Invalid server plan.Please change 'core' or 'memory': %s", err)
 		}
-		server.SetServerPlanByID(planID.GetStrID())
+		server.SetServerPlanByValue(plan.CPU, plan.GetMemoryGB(), plan.Generation)
 
 		isNeedRestart = true
 	}
@@ -612,7 +612,7 @@ func resourceSakuraCloudServerUpdate(d *schema.ResourceData, meta interface{}) e
 	}
 	// change Plan
 	if d.HasChange("core") || d.HasChange("memory") {
-		server, err := client.Server.ChangePlan(toSakuraCloudID(d.Id()), server.ServerPlan.GetStrID())
+		server, err := client.Server.ChangePlan(toSakuraCloudID(d.Id()), server.ServerPlan)
 		if err != nil {
 			return fmt.Errorf("Error changing SakuraCloud ServerPlan : %s", err)
 		}
