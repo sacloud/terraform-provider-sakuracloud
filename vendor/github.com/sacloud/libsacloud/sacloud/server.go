@@ -21,6 +21,7 @@ type Server struct {
 	propIcon              // アイコン
 	propTags              // タグ
 	propCreatedAt         // 作成日時
+	propWaitDiskMigration // サーバ作成時のディスク作成待ち
 }
 
 // DNSServers サーバの所属するリージョンの推奨ネームサーバリスト

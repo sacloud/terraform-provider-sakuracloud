@@ -2,8 +2,9 @@ package api
 
 import (
 	"fmt"
-	"github.com/sacloud/libsacloud/sacloud"
 	"time"
+
+	"github.com/sacloud/libsacloud/sacloud"
 )
 
 var (
@@ -59,6 +60,41 @@ func (api *DiskAPI) Create(value *sacloud.Disk) (*sacloud.Disk, error) {
 
 	rawBody := &sacloud.Request{}
 	rawBody.Disk = value
+	if len(value.DistantFrom) > 0 {
+		rawBody.DistantFrom = value.DistantFrom
+		value.DistantFrom = []int64{}
+	}
+
+	err := api.create(rawBody, res)
+	if err != nil {
+		return nil, err
+	}
+	return res.Disk, nil
+}
+
+// CreateWithConfig ディスク作成とディスクの修正、サーバ起動(指定されていれば)を１回のAPI呼び出しで実行
+func (api *DiskAPI) CreateWithConfig(value *sacloud.Disk, config *sacloud.DiskEditValue, bootAtAvailable bool) (*sacloud.Disk, error) {
+	//HACK: さくらのAPI側仕様: 戻り値:Successがbool値へ変換できないため文字列で受ける("Accepted"などが返る)
+	type diskResponse struct {
+		*sacloud.Response
+		// Success
+		Success string `json:",omitempty"`
+	}
+	res := &diskResponse{}
+
+	type diskRequest struct {
+		*sacloud.Request
+		Config          *sacloud.DiskEditValue `json:",omitempty"`
+		BootAtAvailable bool                   `json:",omitempty"`
+	}
+
+	rawBody := &diskRequest{
+		Request:         &sacloud.Request{},
+		BootAtAvailable: bootAtAvailable,
+	}
+	rawBody.Disk = value
+	rawBody.Config = config
+
 	if len(value.DistantFrom) > 0 {
 		rawBody.DistantFrom = value.DistantFrom
 		value.DistantFrom = []int64{}

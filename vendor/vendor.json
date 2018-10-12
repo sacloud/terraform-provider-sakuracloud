@@ -835,40 +835,40 @@
 			"revisionTime": "2017-10-31T07:53:02Z"
 		},
 		{
-			"checksumSHA1": "8nDGNcD2krFRHIfRjkHx+e715eQ=",
+			"checksumSHA1": "FX+Pa0Mk8k3lRDXuKM1e5soCjWw=",
 			"path": "github.com/sacloud/libsacloud",
-			"revision": "80f39989b51dbe68e731971ac61ec7d180f5aaac",
-			"revisionTime": "2018-09-28T07:07:42Z"
+			"revision": "a06f17c4eb0b0eb1a07a61b1780a955c9d8af34f",
+			"revisionTime": "2018-10-12T04:45:08Z"
 		},
 		{
-			"checksumSHA1": "4rg8EW386kstaR/HMdbHeXZbbuA=",
+			"checksumSHA1": "1fL+iQwS3zoMAotyqWs8YaGjSCs=",
 			"path": "github.com/sacloud/libsacloud/api",
-			"revision": "80f39989b51dbe68e731971ac61ec7d180f5aaac",
-			"revisionTime": "2018-09-28T07:07:42Z"
+			"revision": "a06f17c4eb0b0eb1a07a61b1780a955c9d8af34f",
+			"revisionTime": "2018-10-12T04:45:08Z"
 		},
 		{
-			"checksumSHA1": "6kr2/6zvvJ7h8kTQk1KMMNOzG7Y=",
+			"checksumSHA1": "kR63nGmLFAAse/7rbP/snjWC+8Q=",
 			"path": "github.com/sacloud/libsacloud/sacloud",
-			"revision": "80f39989b51dbe68e731971ac61ec7d180f5aaac",
-			"revisionTime": "2018-09-28T07:07:42Z"
+			"revision": "a06f17c4eb0b0eb1a07a61b1780a955c9d8af34f",
+			"revisionTime": "2018-10-12T04:45:08Z"
 		},
 		{
 			"checksumSHA1": "LmBnV3yfAhrU0ceC++K1oovT7kY=",
 			"path": "github.com/sacloud/libsacloud/sacloud/ostype",
-			"revision": "80f39989b51dbe68e731971ac61ec7d180f5aaac",
-			"revisionTime": "2018-09-28T07:07:42Z"
+			"revision": "a06f17c4eb0b0eb1a07a61b1780a955c9d8af34f",
+			"revisionTime": "2018-10-12T04:45:08Z"
 		},
 		{
 			"checksumSHA1": "WTBpxpedzjJAQKMVJ/w8/G72DHU=",
 			"path": "github.com/sacloud/libsacloud/utils/server",
-			"revision": "80f39989b51dbe68e731971ac61ec7d180f5aaac",
-			"revisionTime": "2018-09-28T07:07:42Z"
+			"revision": "a06f17c4eb0b0eb1a07a61b1780a955c9d8af34f",
+			"revisionTime": "2018-10-12T04:45:08Z"
 		},
 		{
 			"checksumSHA1": "rFnP8fart3FGUJK1OLNZuNk4Tmc=",
 			"path": "github.com/sacloud/libsacloud/utils/setup",
-			"revision": "80f39989b51dbe68e731971ac61ec7d180f5aaac",
-			"revisionTime": "2018-09-28T07:07:42Z"
+			"revision": "a06f17c4eb0b0eb1a07a61b1780a955c9d8af34f",
+			"revisionTime": "2018-10-12T04:45:08Z"
 		},
 		{
 			"checksumSHA1": "zmC8/3V4ls53DJlNTKDZwPSC/dA=",

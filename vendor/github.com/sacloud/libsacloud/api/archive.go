@@ -2,10 +2,11 @@ package api
 
 import (
 	"fmt"
-	"github.com/sacloud/libsacloud/sacloud"
-	"github.com/sacloud/libsacloud/sacloud/ostype"
 	"strings"
 	"time"
+
+	"github.com/sacloud/libsacloud/sacloud"
+	"github.com/sacloud/libsacloud/sacloud/ostype"
 )
 
 // ArchiveAPI アーカイブAPI
