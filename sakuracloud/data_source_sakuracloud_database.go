@@ -68,16 +68,15 @@ func dataSourceSakuraCloudDatabase() *schema.Resource {
 				Type:     schema.TypeInt,
 				Computed: true,
 			},
-
-			"backup_rotate": {
-				Type:     schema.TypeInt,
+			"backup_weekdays": {
+				Type:     schema.TypeList,
+				Elem:     &schema.Schema{Type: schema.TypeString},
 				Computed: true,
 			},
 			"backup_time": {
 				Type:     schema.TypeString,
 				Computed: true,
 			},
-
 			"switch_id": {
 				Type:     schema.TypeString,
 				Computed: true,

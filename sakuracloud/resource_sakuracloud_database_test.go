@@ -37,8 +37,9 @@ func TestAccResourceSakuraCloudDatabase_WithSwitch(t *testing.T) {
 					resource.TestCheckResourceAttr("sakuracloud_database.foobar", "allow_networks.0", "192.168.11.0/24"),
 					resource.TestCheckResourceAttr("sakuracloud_database.foobar", "allow_networks.1", "192.168.12.0/24"),
 					resource.TestCheckResourceAttr("sakuracloud_database.foobar", "port", "33061"),
-					//resource.TestCheckResourceAttr("sakuracloud_database.foobar", "backup_rotate", "8"),
 					resource.TestCheckResourceAttr("sakuracloud_database.foobar", "backup_time", "00:00"),
+					resource.TestCheckResourceAttr("sakuracloud_database.foobar", "backup_weekdays.0", "mon"),
+					resource.TestCheckResourceAttr("sakuracloud_database.foobar", "backup_weekdays.1", "tue"),
 					resource.TestCheckResourceAttr("sakuracloud_database.foobar", "ipaddress1", "192.168.11.101"),
 					resource.TestCheckResourceAttr("sakuracloud_database.foobar", "nw_mask_len", "24"),
 					resource.TestCheckResourceAttr("sakuracloud_database.foobar", "default_route", "192.168.11.1"),
@@ -66,8 +67,9 @@ func TestAccResourceSakuraCloudDatabase_WithSwitch(t *testing.T) {
 					resource.TestCheckResourceAttr("sakuracloud_database.foobar", "allow_networks.0", "192.168.110.0/24"),
 					resource.TestCheckResourceAttr("sakuracloud_database.foobar", "allow_networks.1", "192.168.120.0/24"),
 					resource.TestCheckResourceAttr("sakuracloud_database.foobar", "port", "33062"),
-					//resource.TestCheckResourceAttr("sakuracloud_database.foobar", "backup_rotate", "7"),
 					resource.TestCheckResourceAttr("sakuracloud_database.foobar", "backup_time", "00:30"),
+					resource.TestCheckResourceAttr("sakuracloud_database.foobar", "backup_weekdays.0", "sat"),
+					resource.TestCheckResourceAttr("sakuracloud_database.foobar", "backup_weekdays.1", "sun"),
 					resource.TestCheckResourceAttr("sakuracloud_database.foobar", "ipaddress1", "192.168.11.101"),
 					resource.TestCheckResourceAttr("sakuracloud_database.foobar", "nw_mask_len", "24"),
 					resource.TestCheckResourceAttr("sakuracloud_database.foobar", "default_route", "192.168.11.1"),
@@ -139,22 +141,24 @@ func TestAccImportSakuraCloudDatabase(t *testing.T) {
 			return fmt.Errorf("expected 1 state: %#v", s)
 		}
 		expects := map[string]string{
-			"name":             "name_before",
-			"database_type":    "mariadb",
-			"description":      "description_before",
-			"plan":             "30g",
-			"user_name":        "defuser",
-			"user_password":    "DatabasePasswordUser397",
-			"allow_networks.0": "192.168.11.0/24",
-			"allow_networks.1": "192.168.12.0/24",
-			"port":             "33061",
-			"backup_time":      "00:00",
-			"ipaddress1":       "192.168.11.101",
-			"nw_mask_len":      "24",
-			"default_route":    "192.168.11.1",
-			"tags.0":           "hoge1",
-			"tags.1":           "hoge2",
-			"zone":             "is1b",
+			"name":              "name_before",
+			"database_type":     "mariadb",
+			"description":       "description_before",
+			"plan":              "30g",
+			"user_name":         "defuser",
+			"user_password":     "DatabasePasswordUser397",
+			"allow_networks.0":  "192.168.11.0/24",
+			"allow_networks.1":  "192.168.12.0/24",
+			"port":              "33061",
+			"backup_time":       "00:00",
+			"backup_weekdays.0": "mon",
+			"backup_weekdays.1": "tue",
+			"ipaddress1":        "192.168.11.101",
+			"nw_mask_len":       "24",
+			"default_route":     "192.168.11.1",
+			"tags.0":            "hoge1",
+			"tags.1":            "hoge2",
+			"zone":              "is1b",
 		}
 
 		if err := compareStateMulti(s[0], expects); err != nil {
@@ -201,7 +205,7 @@ resource "sakuracloud_database" "foobar" {
     port = 33061
 
     backup_time = "00:00"
-
+    backup_weekdays = ["mon","tue"]
 
     switch_id = "${sakuracloud_switch.sw.id}"
     ipaddress1 = "192.168.11.101"
@@ -238,6 +242,7 @@ resource "sakuracloud_database" "foobar" {
     port = 33062
 
     backup_time = "00:30"
+    backup_weekdays = ["sat","sun"]
 
     name = "name_after"
     description = "description_after"

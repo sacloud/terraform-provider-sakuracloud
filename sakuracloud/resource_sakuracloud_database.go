@@ -1,13 +1,13 @@
 package sakuracloud
 
 import (
+	"encoding/json"
 	"fmt"
 
 	"github.com/hashicorp/terraform/helper/schema"
 	"github.com/hashicorp/terraform/helper/validation"
 	"github.com/sacloud/libsacloud/utils/setup"
 
-	"strconv"
 	"strings"
 
 	"github.com/sacloud/libsacloud/api"
@@ -69,12 +69,16 @@ func resourceSakuraCloudDatabase() *schema.Resource {
 				Default:      5432,
 				ValidateFunc: validation.IntBetween(1024, 65535),
 			},
+			"backup_weekdays": {
+				Type:     schema.TypeList,
+				Optional: true,
+				Elem:     &schema.Schema{Type: schema.TypeString},
+			},
 			"backup_time": {
 				Type:         schema.TypeString,
-				Required:     true,
+				Optional:     true,
 				ValidateFunc: validateBackupTime(),
 			},
-
 			"switch_id": {
 				Type:         schema.TypeString,
 				ForceNew:     true,
@@ -119,7 +123,7 @@ func resourceSakuraCloudDatabase() *schema.Resource {
 				Computed:     true,
 				ForceNew:     true,
 				Description:  "target SakuraCloud zone",
-				ValidateFunc: validateZone([]string{"tk1a", "is1b"}),
+				ValidateFunc: validateZone([]string{"tk1a", "is1b", "is1a"}),
 			},
 		},
 	}
@@ -149,9 +153,18 @@ func resourceSakuraCloudDatabaseCreate(d *schema.ResourceData, meta interface{})
 			opts.SourceNetwork = expandStringList(rawNetworks.([]interface{}))
 		}
 	}
-	opts.ServicePort = fmt.Sprintf("%d", d.Get("port").(int))
-	//opts.BackupRotate = d.Get("backup_rotate").(int)
+	opts.ServicePort = d.Get("port").(int)
+
 	opts.BackupTime = d.Get("backup_time").(string)
+	rawBackupWeekdays := d.Get("backup_weekdays").([]interface{})
+	backupWeekdays, err := expandStringListWithValidateInList("backup_weekdays", rawBackupWeekdays, sacloud.AllowDatabaseBackupWeekdays())
+	if err != nil {
+		return err
+	}
+	opts.BackupDayOfWeek = backupWeekdays
+	if opts.BackupTime != "" && len(backupWeekdays) > 0 {
+		opts.EnableBackup = true
+	}
 
 	opts.SwitchID = d.Get("switch_id").(string)
 	ipAddress1 := d.Get("ipaddress1").(string)
@@ -302,13 +315,33 @@ func resourceSakuraCloudDatabaseUpdate(d *schema.ResourceData, meta interface{})
 
 	}
 	if d.HasChange("port") {
-		database.Settings.DBConf.Common.ServicePort = fmt.Sprintf("%d", d.Get("port").(int))
+		rawPort := d.Get("port").(int)
+		database.Settings.DBConf.Common.ServicePort = json.Number(fmt.Sprintf("%d", rawPort))
 	}
-	if d.HasChange("backup_rotate") {
-		database.Settings.DBConf.Backup.Rotate = d.Get("backup_rotate").(int)
+	if d.HasChange("backup_weekdays") {
+		rawBackupWeekdays := d.Get("backup_weekdays").([]interface{})
+		backupWeekdays, err := expandStringListWithValidateInList("backup_weekdays", rawBackupWeekdays, sacloud.AllowDatabaseBackupWeekdays())
+		if err != nil {
+			return err
+		}
+
+		if database.Settings.DBConf.Backup == nil {
+			database.Settings.DBConf.Backup = &sacloud.DatabaseBackupSetting{}
+		}
+		database.Settings.DBConf.Backup.DayOfWeek = backupWeekdays
 	}
+
 	if d.HasChange("backup_time") {
-		database.Settings.DBConf.Backup.Time = d.Get("backup_time").(string)
+		backupTime := d.Get("backup_time").(string)
+		if database.Settings.DBConf.Backup == nil {
+			database.Settings.DBConf.Backup = &sacloud.DatabaseBackupSetting{}
+		}
+		database.Settings.DBConf.Backup.Time = backupTime
+	}
+	if database.Settings.DBConf.Backup != nil &&
+		(len(database.Settings.DBConf.Backup.DayOfWeek) == 0 || database.Settings.DBConf.Backup.Time == "") {
+
+		database.Settings.DBConf.Backup = nil
 	}
 
 	database, err = client.Database.UpdateSetting(database.ID, database)
@@ -377,11 +410,13 @@ func setDatabaseResourceData(d *schema.ResourceData, client *APIClient, data *sa
 	}
 
 	d.Set("allow_networks", data.Settings.DBConf.Common.SourceNetwork)
-	port, _ := strconv.Atoi(data.Settings.DBConf.Common.ServicePort)
+	port, _ := data.Settings.DBConf.Common.ServicePort.Int64()
 	d.Set("port", port)
 
-	d.Set("backup_rotate", data.Settings.DBConf.Backup.Rotate)
-	d.Set("backup_time", data.Settings.DBConf.Backup.Time)
+	if data.Settings.DBConf.Backup != nil {
+		d.Set("backup_time", data.Settings.DBConf.Backup.Time)
+		d.Set("backup_weekdays", data.Settings.DBConf.Backup.DayOfWeek)
+	}
 
 	d.Set("switch_id", "")
 	d.Set("switch_id", data.Interfaces[0].Switch.GetStrID())
