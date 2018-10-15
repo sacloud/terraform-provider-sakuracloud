@@ -38,7 +38,7 @@ resource sakuracloud_auto_backup "foobar" {
 | `icon_id`       | -   | アイコンID         | - | 文字列 | - |
 | `description`   | -   | 説明              | - | 文字列 | - |
 | `tags`          | -   | タグ              | - | リスト | - |
-| `zone`          | -   | 対象ゾーン          | - | `is1b`<br />`tk1a` | - |
+| `zone`          | -   | 対象ゾーン          | - | `is1b`<br />`tk1a`<br />`is1a` | - |
 
 ### 属性
 

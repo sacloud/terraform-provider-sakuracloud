@@ -37,7 +37,7 @@ Valid values are the following: ["mon", "tue", "wed", "thu", "fri", "sat", "sun"
 * `tags` - (Optional) The tag list of the resources.
 * `icon_id` - (Optional) The ID of the icon.
 * `zone` - (Optional) The ID of the zone to which the resource belongs.  
-Valid value is one of the following: ["is1b" / "tk1a"]
+Valid value is one of the following: ["is1b" / "tk1a" / "is1a"]
 
 ## Attributes Reference
 
