@@ -69,16 +69,16 @@ func main() {
 	client := api.NewClient(token, secret, zone)
 
 	// Create server using CentOS public archive
-	result, err := builder.ServerPublicArchiveUnix(client, ostype.CentOS, serverName, password).
-		AddPublicNWConnectedNIC(). // connect shared segment
-		SetCore(core).             // set cpu core
-		SetMemory(memory).         // set memory size
-		SetDiskSize(diskSize).     // set disk size
-		AddSSHKey(sshKey).         // regist ssh public key
-		SetDisablePWAuth(true).    // disable password auth
-		AddNote(script).           // regist startup script
-		Build()                    // build server
-
+	builder := builder.ServerPublicArchiveUnix(client, ostype.CentOS, serverName, password)
+	builder.AddPublicNWConnectedNIC() // connect shared segment
+	builder.SetCore(core)             // set cpu core
+	builder.SetMemory(memory)         // set memory size
+	builder.SetDiskSize(diskSize)     // set disk size
+	builder.AddSSHKey(sshKey)         // regist ssh public key
+	builder.SetDisablePWAuth(true)    // disable password auth
+	builder.AddNote(script)           // regist startup script
+	result, err := builder.Build()
+	
 	if err != nil {
 		panic(err)
 	}

@@ -15,19 +15,20 @@ Provides a SakuraCloud Database resource. This can be used to create, update, an
 ```hcl
 # Create a new Database
 resource sakuracloud_database "foobar" {
-  name           = "foobar"
-  database_type  = "mariadb"
-  plan           = "30g"
-  user_name      = "user"
-  user_password  = "p@ssword"
-  allow_networks = ["192.168.2.0/24"]
-  port           = 33061
-  backup_time    = "00:00"
+  name            = "foobar"
+  database_type   = "mariadb"
+  plan            = "30g"
+  user_name       = "user"
+  user_password   = "p@ssword"
+  allow_networks  = ["192.168.2.0/24"]
+  port            = 33061
+  backup_time     = "00:00"
+  backup_weekdays = ["mon", "tue", "wed"]
 
-  switch_id      = "${sakuracloud_switch.foobar.id}"
-  ipaddress1     = "192.168.11.101"
-  nw_mask_len    = 24
-  default_route  = "192.168.11.1"
+  switch_id       = "${sakuracloud_switch.foobar.id}"
+  ipaddress1      = "192.168.11.101"
+  nw_mask_len     = 24
+  default_route   = "192.168.11.1"
   
   description    = "description"
   tags           = ["foo", "bar"]
@@ -48,6 +49,8 @@ Valid value is one of the following: [ "10g" (default) / "30g" / "90g" / "240g" 
 * `allow_networks` - (Optional) The network address list that allowed connections to the database.
 * `port` - (Optional) The number of the port on which the database is listening (default:`5432`).
 * `backup_time` - (Optional) The time to perform backup (format:`HH:mm`).
+* `backup_weekdays` - (Optional) Day of the week to get backup.  
+Valid values are the following: ["mon", "tue", "wed", "thu", "fri", "sat", "sun"]
 * `switch_id` - (Required) The ID of the switch connected to the database.
 * `ipaddress1` - (Required) The IP address of the database.
 * `nw_mask_len` - (Required) The network mask length of the database.

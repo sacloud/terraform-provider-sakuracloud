@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	//	"strings"
 	"fmt"
+
 	"github.com/sacloud/libsacloud/sacloud"
 )
 

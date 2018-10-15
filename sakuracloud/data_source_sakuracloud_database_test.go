@@ -158,6 +158,7 @@ resource "sakuracloud_database" "foobar" {
 
     port = 54321
 
+    backup_weekdays = ["mon", "tue"]
     backup_time = "00:00"
     zone = "tk1a"
 }`, name, name)
@@ -186,6 +187,7 @@ resource "sakuracloud_database" "foobar" {
 
     port = 54321
 
+    backup_weekdays = ["mon", "tue"]
     backup_time = "00:00"
     zone = "tk1a"
 }
@@ -221,6 +223,7 @@ resource "sakuracloud_database" "foobar" {
 
     port = 54321
 
+    backup_weekdays = ["mon", "tue"]
     backup_time = "00:00"
     zone = "tk1a"
 
@@ -257,6 +260,7 @@ resource "sakuracloud_database" "foobar" {
 
     port = 54321
 
+    backup_weekdays = ["mon", "tue"]
     backup_time = "00:00"
     zone = "tk1a"
 
@@ -294,6 +298,7 @@ resource "sakuracloud_database" "foobar" {
 
     port = 54321
 
+    backup_weekdays = ["mon", "tue"]
     backup_time = "00:00"
     zone = "tk1a"
 
@@ -330,6 +335,7 @@ resource "sakuracloud_database" "foobar" {
 
     port = 54321
 
+    backup_weekdays = ["mon", "tue"]
     backup_time = "00:00"
     zone = "tk1a"
 
@@ -370,6 +376,7 @@ resource "sakuracloud_database" "foobar" {
 
     port = 54321
 
+    backup_weekdays = ["mon", "tue"]
     backup_time = "00:00"
     zone = "tk1a"
 

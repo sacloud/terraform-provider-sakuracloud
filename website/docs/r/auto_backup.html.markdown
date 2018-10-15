@@ -31,7 +31,7 @@ The following arguments are supported:
 * `name` - (Required) The name of the resource.
 * `disk_id` - (Optional) The ID of the target disk. 
 * `weekdays` - (Optional) Day of the week to get backup.  
-Valid values are the following: ["mon", "tue", "wed", "thu", "fri", "sat", "sun"]
+Valid values are the following: ["mon", "tue", "wed", "thu", "fri", "sat", "sun"]  
 * `max_backup_num` - (Optional) Max number of backups to keep.
 * `description` - (Optional) The description of the resource.
 * `tags` - (Optional) The tag list of the resources.

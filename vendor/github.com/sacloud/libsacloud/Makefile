@@ -24,13 +24,17 @@ test-all: test test-api test-builder test-utils
 vet: golint
 	go vet ./...
 
-golint: fmt
+golint: goimports
 	test -z "$$(golint ./... | grep -v 'vendor/' | grep -v '_string.go' | tee /dev/stderr )"
+
+goimports: fmt
+	goimports -l -w $(GOFMT_FILES)
 
 fmt:
 	gofmt -s -l -w $(GOFMT_FILES)
 
+
 godoc:
 	docker-compose up godoc
 
-.PHONY: default test vet fmt golint test-api test-builder test-all run
+.PHONY: default test vet fmt golint test-api test-builder test-all run goimports

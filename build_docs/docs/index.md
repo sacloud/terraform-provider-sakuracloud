@@ -19,6 +19,7 @@
 - [v1.1での変更点](upgrade_to_v11/)
 - [v1.4での変更点](upgrade_to_v14/)
 - [v1.6での変更点](upgrade_to_v16/)      
+- [v1.7での変更点](upgrade_to_v17/)      
 
 #### その他:
 
