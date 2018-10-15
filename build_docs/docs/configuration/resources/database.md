@@ -16,7 +16,8 @@ resource sakuracloud_database "foobar" {
 
   port = 54321
 
-  backup_time = "00:00"
+  backup_weekdays = ["mon", "tue", "wed"]
+  backup_time     = "00:00"
 
   switch_id     = "${sakuracloud_switch.sw.id}"
   ipaddress1    = "192.168.11.101"
@@ -49,6 +50,7 @@ resource sakuracloud_switch "sw" {
 | `user_password` | ◯   | パスワード       | -        | 文字列                         | - |
 | `allow_networks`| -   | 送信元ネットワーク | -        | リスト(文字列)、`xxx.xxx.xxx.xxx`、または`xxx.xxx.xxx.xxx/nn`形式 | 接続を許可するネットワークアドレスを指定する |
 | `port`          | -   | ポート番号       | `5432`   | `1024`〜`65525`の範囲の整数     | - |
+| `backup_weekdays` | ◯   | バックアップ取得曜日   | -   | 以下の値のリスト<br />`mon`<br />`tue`<br />`wed`<br />`thu`<br />`fri`<br />`sat`<br />`sun`    | - |
 | `backup_time`   | ◯   | バックアップ開始時刻   | -   | `hh:mm`形式の時刻文字列     | `hh`部分は`00`〜`23`、`mm`部分は`00`/`15`/`30`/`45`のいずれかを指定 |
 | `switch_id`     | ◯   | スイッチID      | - | 文字列                         | - |
 | `ipaddress1`    | ◯   | IPアドレス1     | -        | 文字列                         | - |
@@ -58,8 +60,9 @@ resource sakuracloud_switch "sw" {
 | `description`   | -   | 説明           | -        | 文字列                         | - |
 | `tags`          | -   | タグ           | -        | リスト(文字列)                  | - |
 | `graceful_shutdown_timeout` | - | シャットダウンまでの待ち時間 | - | 数値(秒数) | シャットダウンが必要な場合の通常シャットダウンするまでの待ち時間(指定の時間まで待ってもシャットダウンしない場合は強制シャットダウンされる) |
-| `zone`          | -   | ゾーン          | -        | `tk1a`<br />`is1b` | - |
+| `zone`          | -   | ゾーン          | -        | `tk1a`<br />`is1b`<br />`is1a` | - |
 
+* バックアップを有効にするには`backup_weekdays`と`backup_time`の両方を指定されている必要があります。  
 
 ### 属性
 

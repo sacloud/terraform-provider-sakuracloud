@@ -38,6 +38,7 @@ data sakuracloud_database "foobar" {
 | `allow_networks`| 送信元ネットワーク | 接続を許可するネットワークアドレス(範囲)のリスト |
 | `port`          | ポート番号       |  - |
 | `backup_time`   | バックアップ開始時刻   | - |
+| `backup_weekdays`   | バックアップ取得曜日   | - |
 | `switch_id`     | スイッチID      | - |
 | `ipaddress1`    | IPアドレス1     | - |
 | `nw_mask_len`   | ネットマスク     | - |
