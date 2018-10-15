@@ -3,6 +3,9 @@ package sakuracloud
 import (
 	"errors"
 	"fmt"
+	"math"
+	"net/http"
+	"regexp"
 	"strings"
 	"time"
 
@@ -67,6 +70,43 @@ func resourceSakuraCloudMobileGateway() *schema.Resource {
 				Optional:     true,
 				Computed:     true,
 				ValidateFunc: validateIPv4Address(),
+			},
+			"traffic_control": {
+				Type:     schema.TypeList,
+				Optional: true,
+				MaxItems: 1,
+				MinItems: 1,
+				Elem: &schema.Resource{
+					Schema: map[string]*schema.Schema{
+						"quota": {
+							Type:         schema.TypeInt,
+							Required:     true,
+							ValidateFunc: validation.IntBetween(1, math.MaxInt32),
+						},
+						"band_width_limit": {
+							Type:         schema.TypeInt,
+							Optional:     true,
+							ValidateFunc: validation.IntBetween(1, math.MaxInt32),
+						},
+						"enable_email": {
+							Type:     schema.TypeBool,
+							Optional: true,
+						},
+						"enable_slack": {
+							Type:     schema.TypeBool,
+							Optional: true,
+						},
+						"slack_webhook": {
+							Type:         schema.TypeString,
+							Optional:     true,
+							ValidateFunc: validation.StringMatch(regexp.MustCompile(`^https://hooks.slack.com/services/\w+/\w+/\w+$`), ""),
+						},
+						"auto_traffic_shaping": {
+							Type:     schema.TypeBool,
+							Optional: true,
+						},
+					},
+				},
 			},
 			"icon_id": {
 				Type:         schema.TypeString,
@@ -188,6 +228,27 @@ func resourceSakuraCloudMobileGatewayCreate(d *schema.ResourceData, meta interfa
 			return fmt.Errorf("MobileGatewayInterfaceConnect is failed: %s", err)
 		}
 
+	}
+
+	rawTrafficControl := d.Get("traffic_control").([]interface{})
+	if len(rawTrafficControl) > 0 {
+		values := rawTrafficControl[0].(map[string]interface{})
+		trafficControl := &sacloud.TrafficMonitoringConfig{
+			TrafficQuotaInMB:     values["quota"].(int),
+			BandWidthLimitInKbps: values["band_width_limit"].(int),
+			EMailConfig: &sacloud.TrafficMonitoringNotifyEmail{
+				Enabled: values["enable_email"].(bool),
+			},
+			SlackConfig: &sacloud.TrafficMonitoringNotifySlack{
+				Enabled:             values["enable_slack"].(bool),
+				IncomingWebhooksURL: values["slack_webhook"].(string),
+			},
+			AutoTrafficShaping: values["auto_traffic_shaping"].(bool),
+		}
+
+		if _, err := client.MobileGateway.SetTrafficMonitoringConfig(mgw.ID, trafficControl); err != nil {
+			return fmt.Errorf("Failed to enable traffic-control on SakuraCloud MobileGateway: %s", err)
+		}
 	}
 
 	// set DNS
@@ -353,6 +414,35 @@ func resourceSakuraCloudMobileGatewayUpdate(d *schema.ResourceData, meta interfa
 
 	}
 
+	if d.HasChange("traffic_control") {
+		rawTrafficControl := d.Get("traffic_control").([]interface{})
+		if len(rawTrafficControl) > 0 {
+			values := rawTrafficControl[0].(map[string]interface{})
+			trafficControl := &sacloud.TrafficMonitoringConfig{
+				TrafficQuotaInMB:     values["quota"].(int),
+				BandWidthLimitInKbps: values["band_width_limit"].(int),
+				EMailConfig: &sacloud.TrafficMonitoringNotifyEmail{
+					Enabled: values["enable_email"].(bool),
+				},
+				SlackConfig: &sacloud.TrafficMonitoringNotifySlack{
+					Enabled:             values["enable_slack"].(bool),
+					IncomingWebhooksURL: values["slack_webhook"].(string),
+				},
+				AutoTrafficShaping: values["auto_traffic_shaping"].(bool),
+			}
+
+			if _, err := client.MobileGateway.SetTrafficMonitoringConfig(mgw.ID, trafficControl); err != nil {
+				return fmt.Errorf("Failed to enable traffic-control on SakuraCloud MobileGateway: %s", err)
+			}
+		} else {
+			if _, err := client.MobileGateway.DisableTrafficMonitoringConfig(mgw.ID); err != nil {
+				if e, ok := err.(api.Error); !ok || e.ResponseCode() != http.StatusNotFound {
+					return fmt.Errorf("Failed to disable traffic-control on SakuraCloud MobileGateway: %s", err)
+				}
+			}
+		}
+	}
+
 	if d.HasChange("dns1") || d.HasChange("dns2") {
 		dns1 := d.Get("dns_server1").(string)
 		dns2 := d.Get("dns_server2").(string)
@@ -440,6 +530,34 @@ func setMobileGatewayResourceData(d *schema.ResourceData, client *APIClient, dat
 		d.Set("private_nw_mask_len", "")
 	}
 
+	tc, err := client.MobileGateway.GetTrafficMonitoringConfig(data.ID)
+	if err != nil {
+		if e, ok := err.(api.Error); ok && e.ResponseCode() != http.StatusNotFound {
+			return fmt.Errorf("Error reading SakuraCloud MobileGateway resource(traffic-control): %s", err)
+		}
+	}
+
+	if tc != nil {
+		tcValues := map[string]interface{}{
+			"quota":                tc.TrafficQuotaInMB,
+			"band_width_limit":     tc.BandWidthLimitInKbps,
+			"auto_traffic_shaping": tc.AutoTrafficShaping,
+		}
+		if tc.EMailConfig == nil {
+			tcValues["enable_email"] = false
+		} else {
+			tcValues["enable_email"] = tc.EMailConfig.Enabled
+		}
+		if tc.SlackConfig == nil {
+			tcValues["enable_slack"] = false
+			tcValues["slack_webhook"] = ""
+		} else {
+			tcValues["enable_slack"] = tc.SlackConfig.Enabled
+			tcValues["slack_webhook"] = tc.SlackConfig.IncomingWebhooksURL
+		}
+		d.Set("traffic_control", []interface{}{tcValues})
+	}
+
 	resolver, err := client.MobileGateway.GetDNS(data.ID)
 	if err != nil {
 		return fmt.Errorf("Error reading SakuraCloud MobileGateway resource(dns-resolver): %s", err)
@@ -464,7 +582,6 @@ func setMobileGatewayResourceData(d *schema.ResourceData, client *APIClient, dat
 	d.Set("sim_ids", simIDs)
 
 	setPowerManageTimeoutValueToState(d)
-	d.Set("zone", client.Zone)
 
 	return nil
 }

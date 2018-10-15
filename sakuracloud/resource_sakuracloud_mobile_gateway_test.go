@@ -35,6 +35,19 @@ func TestAccSakuraCloudMobileGateway(t *testing.T) {
 						"sakuracloud_mobile_gateway.foobar", "icon_id",
 						"sakuracloud_icon.foobar", "id",
 					),
+					resource.TestCheckResourceAttr("sakuracloud_mobile_gateway.foobar", "traffic_control.#", "1"),
+					resource.TestCheckResourceAttr("sakuracloud_mobile_gateway.foobar",
+						"traffic_control.0.quota", "256"),
+					resource.TestCheckResourceAttr("sakuracloud_mobile_gateway.foobar",
+						"traffic_control.0.band_width_limit", "64"),
+					resource.TestCheckResourceAttr("sakuracloud_mobile_gateway.foobar",
+						"traffic_control.0.enable_email", "true"),
+					resource.TestCheckResourceAttr("sakuracloud_mobile_gateway.foobar",
+						"traffic_control.0.enable_slack", "true"),
+					resource.TestCheckResourceAttr("sakuracloud_mobile_gateway.foobar",
+						"traffic_control.0.slack_webhook", "https://hooks.slack.com/services/xxx/xxx/xxx"),
+					resource.TestCheckResourceAttr("sakuracloud_mobile_gateway.foobar",
+						"traffic_control.0.auto_traffic_shaping", "true"),
 					resource.TestCheckResourceAttr("sakuracloud_mobile_gateway_static_route.r1", "prefix", "192.168.10.0/24"),
 					resource.TestCheckResourceAttr("sakuracloud_mobile_gateway_static_route.r1", "next_hop", "192.168.11.1"),
 					resource.TestCheckResourceAttr("sakuracloud_mobile_gateway_static_route.r2", "prefix", "192.168.10.0/25"),
@@ -57,6 +70,7 @@ func TestAccSakuraCloudMobileGateway(t *testing.T) {
 					resource.TestCheckResourceAttr("sakuracloud_mobile_gateway.foobar", "private_nw_mask_len", "0"),
 					resource.TestCheckResourceAttr("sakuracloud_mobile_gateway.foobar", "switch_id", ""),
 					resource.TestCheckResourceAttr("sakuracloud_mobile_gateway.foobar", "icon_id", ""),
+					resource.TestCheckResourceAttr("sakuracloud_mobile_gateway.foobar", "traffic_control.#", "0"),
 				),
 			},
 		},
@@ -117,13 +131,19 @@ func TestAccImportSakuraCloudMobileGateway(t *testing.T) {
 			return fmt.Errorf("expected 1 state: %#v", s)
 		}
 		expects := map[string]string{
-			"name":                      "name_before",
-			"private_ipaddress":         "192.168.11.101",
-			"private_nw_mask_len":       "24",
-			"description":               "description_before",
-			"tags.0":                    "hoge1",
-			"tags.1":                    "hoge2",
-			"graceful_shutdown_timeout": "60",
+			"name":                                   "name_before",
+			"private_ipaddress":                      "192.168.11.101",
+			"private_nw_mask_len":                    "24",
+			"description":                            "description_before",
+			"tags.0":                                 "hoge1",
+			"tags.1":                                 "hoge2",
+			"graceful_shutdown_timeout":              "60",
+			"traffic_control.0.quota":                "256",
+			"traffic_control.0.band_width_limit":     "64",
+			"traffic_control.0.enable_email":         "true",
+			"traffic_control.0.enable_slack":         "true",
+			"traffic_control.0.slack_webhook":        "https://hooks.slack.com/services/xxx/xxx/xxx",
+			"traffic_control.0.auto_traffic_shaping": "true",
 		}
 
 		if err := compareStateMulti(s[0], expects); err != nil {
@@ -154,35 +174,45 @@ func TestAccImportSakuraCloudMobileGateway(t *testing.T) {
 
 const testAccCheckSakuraCloudMobileGatewayConfig_basic = `
 resource "sakuracloud_switch" "sw" {
-    name = "sw"
+  name = "sw"
 }
+
 resource "sakuracloud_mobile_gateway" "foobar" {
-    switch_id = "${sakuracloud_switch.sw.id}"
-    private_ipaddress = "192.168.11.101"
-    private_nw_mask_len = 24
-	internet_connection = true
-    name = "name_before"
-    description = "description_before"
-    tags = ["hoge1" , "hoge2"]
-    icon_id = "${sakuracloud_icon.foobar.id}"
+  switch_id           = "${sakuracloud_switch.sw.id}"
+  private_ipaddress   = "192.168.11.101"
+  private_nw_mask_len = 24
+  internet_connection = true
+  name                = "name_before"
+  description         = "description_before"
+  tags                = ["hoge1", "hoge2"]
+  icon_id             = "${sakuracloud_icon.foobar.id}"
+
+  traffic_control = {
+    quota                = 256
+    band_width_limit     = 64
+    enable_email         = true
+    enable_slack         = true
+    slack_webhook        = "https://hooks.slack.com/services/xxx/xxx/xxx"
+    auto_traffic_shaping = true
+  }
 }
 
 resource sakuracloud_mobile_gateway_static_route "r1" {
-	mobile_gateway_id = "${sakuracloud_mobile_gateway.foobar.id}"
-    prefix = "192.168.10.0/24"
-    next_hop = "192.168.11.1"
+  mobile_gateway_id = "${sakuracloud_mobile_gateway.foobar.id}"
+  prefix = "192.168.10.0/24"
+  next_hop = "192.168.11.1"
 }
 
 resource sakuracloud_mobile_gateway_static_route "r2" {
-	mobile_gateway_id = "${sakuracloud_mobile_gateway.foobar.id}"
-    prefix = "192.168.10.0/25"
-    next_hop = "192.168.11.2"
+  mobile_gateway_id = "${sakuracloud_mobile_gateway.foobar.id}"
+  prefix = "192.168.10.0/25"
+  next_hop = "192.168.11.2"
 }
 
 resource sakuracloud_mobile_gateway_static_route "r3" {
-	mobile_gateway_id = "${sakuracloud_mobile_gateway.foobar.id}"
-    prefix = "192.168.10.0/26"
-    next_hop = "192.168.11.3"
+  mobile_gateway_id = "${sakuracloud_mobile_gateway.foobar.id}"
+  prefix = "192.168.10.0/26"
+  next_hop = "192.168.11.3"
 }
 
 resource "sakuracloud_icon" "foobar" {
