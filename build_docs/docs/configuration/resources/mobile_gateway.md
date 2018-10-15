@@ -19,7 +19,17 @@ resource "sakuracloud_mobile_gateway" "mgw" {
     #dns_server2 = "8.8.4.4" # DNSサーバ2
     
     description = "example"
-    tags = ["tags1" , "tags2"]
+    tags        = ["tags1" , "tags2"]
+    
+    # トラフィックコントロール
+    traffic_control = {
+      quota                = 256
+      band_width_limit     = 64
+      enable_email         = true
+      enable_slack         = true
+      slack_webhook        = "https://hooks.slack.com/services/xxx/xxx/xxx"
+      auto_traffic_shaping = true
+    }
 }
 
 # スタティックルートの定義
@@ -77,11 +87,23 @@ resource "sakuracloud_switch" "sw" {
 | `private_nw_mask_len`       | -   | プライベート側ネットワークマスク長さ  | - | 数値(`8`〜`29`)| - |
 | `dns_server1`       | -   | DNSサーバIP1アドレス  | - | 文字列 | - |
 | `dns_server2`       | -   | DNSサーバ2IPアドレス  | - | 文字列 | - |
+| `traffic_control` | -   | トラフィックコントロール  | - | マップ | 詳細は[`traffic_control`](#traffic_control)を参照 |
 | `icon_id`         | -   | アイコンID         | - | 文字列| - |
 | `description`     | -   | 説明  | - | 文字列 | - |
 | `tags`            | -   | タグ | - | リスト(文字列) | - |
 | `graceful_shutdown_timeout` | - | シャットダウンまでの待ち時間 | - | 数値(秒数) | シャットダウンが必要な場合の通常シャットダウンするまでの待ち時間(指定の時間まで待ってもシャットダウンしない場合は強制シャットダウンされる) |
 | `zone`            | -   | ゾーン | - | `is1a`<br />`is1b`<br />`tk1a`<br />`tk1v` | - |
+
+#### `traffic_control`
+
+|パラメーター         |必須  |名称                |初期値     |設定値                    |補足                                          |
+|-------------------|:---:|--------------------|:--------:|------------------------|----------------------------------------------|
+| `quota`            | ◯   | 通信量しきい値(MB) | -        | 数値| - |
+| `auto_traffic_shaping`       | -   | 帯域制限の有効/無効 | - | `true`<br />`false` | - |
+| `band_width_limit` | -   | 帯域制限値(Kbps)  | - | `true`<br />`false` | - |
+| `enable_email`       | -   | Eメール通知の有効/無効 | - | `true`<br />`false` | - |
+| `enable_slack`       | -   | Slack通知の有効/無効  | - | `true`<br />`false` | - |
+| `slack_webhook`       | -   | Slack通知 Webhook URL| - | 文字列 | `https://hooks.slack.com/services/xxx/xxx/xxx`形式で指定 |
 
 ### 属性
 

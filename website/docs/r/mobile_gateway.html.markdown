@@ -23,6 +23,15 @@ resource sakuracloud_mobile_gateway "foobar" {
   internet_connection = true
   dns_server1         = "8.8.8.8"
   dns_server2         = "8.8.4.4" 
+ 
+  traffic_control = {
+    quota                = 256
+    band_width_limit     = 64
+    enable_email         = true
+    enable_slack         = true
+    slack_webhook        = "https://hooks.slack.com/services/xxx/xxx/xxx"
+    auto_traffic_shaping = true
+  } 
   
   description         = "description"
   tags                = ["foo", "bar"]
@@ -40,11 +49,23 @@ The following arguments are supported:
 * `internet_connection` - (Optional) The flag of enable/disable connecting from MobileGateway to the Internet.
 * `dns_server1` - (Optional) The primary DNS server IP address.
 * `dns_server2` - (Optional) The secondly DNS server IP address.
+* `traffic_control` - (Optional) Traffic control rules. It contains some attributes to [Traffic Control](#traffic-control).
 * `description` - (Optional) The description of the resource.
 * `tags` - (Optional) The tag list of the resources.
 * `icon_id` - (Optional) The ID of the icon.
 * `graceful_shutdown_timeout` - (Optional) The wait time (seconds) to do graceful shutdown the server connected to the resource.
 * `zone` - (Optional) The ID of the zone to which the resource belongs.
+
+### Traffic Control
+
+Attributes for Traffic Control:
+
+* `quota` - (Required) Traffic quota size (unit:`MB`).  
+* `band_width_limit` - (Optional) Traffic bandwidth limit(unit:`Kbps`). 
+* `auto_traffic_shaping` - (Optional) The flag of enable/disable Auto Traffic Shaping.
+* `enable_email` - (Optional) The flag of enable/disable e-mail notification.
+* `enable_slack` - (Optional) The flag of enable/disable slack notification.
+* `slack_webhook` - (Optional) The webhook URL of destination of slack notification.
 
 ## Attributes Reference
 
@@ -60,6 +81,7 @@ The following attributes are exported:
 * `internet_connection` - The flag of enable/disable connecting from MobileGateway to the Internet.
 * `dns_server1` - The primary DNS server IP address.
 * `dns_server2` - The secondly DNS server IP address.
+* `traffic_control` - Traffic control rules.
 * `sim_ids` - The ID list of the SIMs connected to the Mobile Gateway.
 * `description` - The description of the resource.
 * `tags` - The tag list of the resources.
