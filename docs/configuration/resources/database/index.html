@@ -112,6 +112,13 @@
     </li>
 
         
+            
+    <li class="toctree-l1 ">
+        <a class="" href="../../../upgrade_to_v17/">v1.7での変更点</a>
+        
+    </li>
+
+        
     </ul>
 
         
@@ -248,6 +255,13 @@
                 
             
             </ul>
+        
+    </li>
+
+        
+            
+    <li class="toctree-l1 ">
+        <a class="" href="../database_read_replica/">データベース(リードレプリカ)</a>
         
     </li>
 
@@ -579,11 +593,15 @@ resource sakuracloud_database &quot;foobar&quot; {
   user_name     = &quot;defuser&quot;
   user_password = &quot;DatabasePasswordUser397&quot;
 
+  # レプリケーションのマスターにする場合(postgresの場合のみ指定可) 
+  #replica_password = &quot;DatabasePasswordUser397&quot;
+
   allow_networks = [&quot;192.168.11.0/24&quot;, &quot;192.168.12.0/24&quot;]
 
   port = 54321
 
-  backup_time = &quot;00:00&quot;
+  backup_weekdays = [&quot;mon&quot;, &quot;tue&quot;, &quot;wed&quot;]
+  backup_time     = &quot;00:00&quot;
 
   switch_id     = &quot;${sakuracloud_switch.sw.id}&quot;
   ipaddress1    = &quot;192.168.11.101&quot;
@@ -657,6 +675,14 @@ resource sakuracloud_switch &quot;sw&quot; {
 <td>-</td>
 </tr>
 <tr>
+<td><code>replica_password</code></td>
+<td align="center">-</td>
+<td>レプリケーションパスワード</td>
+<td align="center">-</td>
+<td>文字列</td>
+<td>指定するとレプリケーションのマスターとして構成される。<code>database_type</code>が<code>postgresql</code>の場合のみ有効</td>
+</tr>
+<tr>
 <td><code>allow_networks</code></td>
 <td align="center">-</td>
 <td>送信元ネットワーク</td>
@@ -670,6 +696,14 @@ resource sakuracloud_switch &quot;sw&quot; {
 <td>ポート番号</td>
 <td align="center"><code>5432</code></td>
 <td><code>1024</code>〜<code>65525</code>の範囲の整数</td>
+<td>-</td>
+</tr>
+<tr>
+<td><code>backup_weekdays</code></td>
+<td align="center">◯</td>
+<td>バックアップ取得曜日</td>
+<td align="center">-</td>
+<td>以下の値のリスト<br /><code>mon</code><br /><code>tue</code><br /><code>wed</code><br /><code>thu</code><br /><code>fri</code><br /><code>sat</code><br /><code>sun</code></td>
 <td>-</td>
 </tr>
 <tr>
@@ -749,11 +783,14 @@ resource sakuracloud_switch &quot;sw&quot; {
 <td align="center">-</td>
 <td>ゾーン</td>
 <td align="center">-</td>
-<td><code>tk1a</code><br /><code>is1b</code></td>
+<td><code>tk1a</code><br /><code>is1b</code><br /><code>is1a</code></td>
 <td>-</td>
 </tr>
 </tbody>
 </table>
+<ul>
+<li>バックアップを有効にするには<code>backup_weekdays</code>と<code>backup_time</code>の両方を指定されている必要があります。  </li>
+</ul>
 <h3 id="_3">属性</h3>
 <table>
 <thead>
@@ -769,6 +806,11 @@ resource sakuracloud_switch &quot;sw&quot; {
 <td>データベースID</td>
 <td>-</td>
 </tr>
+<tr>
+<td><code>replica_user</code></td>
+<td>レプリケーションユーザー名</td>
+<td>-</td>
+</tr>
 </tbody>
 </table>
               
@@ -778,7 +820,7 @@ resource sakuracloud_switch &quot;sw&quot; {
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="../nfs/" class="btn btn-neutral float-right" title="NFS"/>Next <span class="icon icon-circle-arrow-right"></span></a>
+        <a href="../database_read_replica/" class="btn btn-neutral float-right" title="データベース(リードレプリカ)"/>Next <span class="icon icon-circle-arrow-right"></span></a>
       
       
         <a href="../vpc_router/" class="btn btn-neutral" title="VPCルータ"><span class="icon icon-circle-arrow-left"></span> Previous</a>
@@ -812,7 +854,7 @@ resource sakuracloud_switch &quot;sw&quot; {
         <span><a href="../vpc_router/" style="color: #fcfcfc;">&laquo; Previous</a></span>
       
       
-        <span style="margin-left: 15px"><a href="../nfs/" style="color: #fcfcfc">Next &raquo;</a></span>
+        <span style="margin-left: 15px"><a href="../database_read_replica/" style="color: #fcfcfc">Next &raquo;</a></span>
       
     </span>
 </div>

@@ -4,12 +4,10 @@ import (
 	"errors"
 	"fmt"
 	"os"
+	"testing"
 
 	"github.com/hashicorp/terraform/helper/resource"
 	"github.com/hashicorp/terraform/terraform"
-
-	"testing"
-
 	"github.com/sacloud/libsacloud/sacloud"
 )
 

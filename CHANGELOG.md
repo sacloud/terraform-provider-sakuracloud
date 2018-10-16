@@ -1,5 +1,14 @@
 # Changelog
 
+## 1.7.0 (2018-10-16)
+
+* サーバ/ディスク新プラン対応 #362 (yamamoto-febc)
+* モバイルゲートウェイでのトラフィックコントロール機能 #363 (yamamoto-febc)
+* libsacloud更新/データベースアプライアンス最新API対応 #364 (yamamoto-febc)
+* Update dependencies - terraform v0.11.8 #366 (yamamoto-febc)
+* 石狩第1ゾーンの利用可能リソース拡大 #367 (yamamoto-febc)
+
+
 ## 1.6.1 (2018-09-13)
 
 * DNSゾーン登録時のパラメータにデフォルト値を明示 #358 (yamamoto-febc)

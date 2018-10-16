@@ -2,15 +2,13 @@ package sakuracloud
 
 import (
 	"fmt"
+	"strconv"
 
 	"github.com/hashicorp/terraform/helper/schema"
 	"github.com/hashicorp/terraform/helper/validation"
-	"github.com/sacloud/libsacloud/utils/setup"
-
-	"strconv"
-
 	"github.com/sacloud/libsacloud/api"
 	"github.com/sacloud/libsacloud/sacloud"
+	"github.com/sacloud/libsacloud/utils/setup"
 )
 
 func resourceSakuraCloudNFS() *schema.Resource {
