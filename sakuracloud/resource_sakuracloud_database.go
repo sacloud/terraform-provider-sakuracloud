@@ -58,6 +58,15 @@ func resourceSakuraCloudDatabase() *schema.Resource {
 				Type:     schema.TypeString,
 				Required: true,
 			},
+			"replica_user": {
+				Type:     schema.TypeString,
+				Computed: true,
+			},
+			"replica_password": {
+				Type:      schema.TypeString,
+				Optional:  true,
+				Sensitive: true,
+			},
 			"allow_networks": {
 				Type:     schema.TypeList,
 				Optional: true,
@@ -148,6 +157,12 @@ func resourceSakuraCloudDatabaseCreate(d *schema.ResourceData, meta interface{})
 	opts.Name = d.Get("name").(string)
 	opts.DefaultUser = d.Get("user_name").(string)
 	opts.UserPassword = d.Get("user_password").(string)
+
+	replicaPassword := d.Get("replica_password").(string)
+	if replicaPassword != "" {
+		opts.ReplicaPassword = replicaPassword
+	}
+
 	if rawNetworks, ok := d.GetOk("allow_networks"); ok {
 		if rawNetworks != nil {
 			opts.SourceNetwork = expandStringList(rawNetworks.([]interface{}))
@@ -269,6 +284,21 @@ func resourceSakuraCloudDatabaseUpdate(d *schema.ResourceData, meta interface{})
 		return fmt.Errorf("Couldn't find SakuraCloud Database resource: %s", err)
 	}
 
+	needRestart := false
+	if d.HasChange("replica_password") {
+		if database.IsUp() {
+			needRestart = true
+			err = handleShutdown(client.Database, database.ID, d, client.DefaultTimeoutDuration)
+			if err != nil {
+				return fmt.Errorf("Error updating SakuraCloud Database resource: %s", err)
+			}
+			err = client.Database.SleepUntilDown(database.ID, client.DefaultTimeoutDuration)
+			if err != nil {
+				return fmt.Errorf("Error updating SakuraCloud Database resource: %s", err)
+			}
+		}
+	}
+
 	if d.HasChange("name") {
 		database.Name = d.Get("name").(string)
 	}
@@ -304,6 +334,20 @@ func resourceSakuraCloudDatabaseUpdate(d *schema.ResourceData, meta interface{})
 	if d.HasChange("user_password") {
 		database.Settings.DBConf.Common.UserPassword = d.Get("user_password").(string)
 	}
+
+	if d.HasChange("replica_password") {
+		replicaPassword := d.Get("replica_password").(string)
+		if replicaPassword == "" {
+			database.Settings.DBConf.Common.ReplicaPassword = ""
+			database.Settings.DBConf.Replication = nil
+		} else {
+			database.Settings.DBConf.Common.ReplicaPassword = replicaPassword
+			database.Settings.DBConf.Replication = &sacloud.DatabaseReplicationSetting{
+				Model: sacloud.DatabaseReplicationModelMasterSlave,
+			}
+		}
+	}
+
 	if d.HasChange("allow_networks") {
 		if rawNetworks, ok := d.GetOk("allow_networks"); ok {
 			if rawNetworks != nil {
@@ -353,6 +397,17 @@ func resourceSakuraCloudDatabaseUpdate(d *schema.ResourceData, meta interface{})
 		return fmt.Errorf("Error updating SakuraCloud Database resource: %s", err)
 	}
 
+	if needRestart {
+		_, err = client.Database.Boot(database.ID)
+		if err != nil {
+			return fmt.Errorf("Error updating SakuraCloud Database resource: %s", err)
+		}
+		err = client.Database.SleepUntilDatabaseRunning(database.ID, client.DefaultTimeoutDuration, 5)
+		if err != nil {
+			return fmt.Errorf("Error updating SakuraCloud Database resource: %s", err)
+		}
+	}
+
 	return resourceSakuraCloudDatabaseRead(d, meta)
 }
 
@@ -391,6 +446,8 @@ func setDatabaseResourceData(d *schema.ResourceData, client *APIClient, data *sa
 	d.Set("name", data.Name)
 	d.Set("user_name", data.Settings.DBConf.Common.DefaultUser)
 	d.Set("user_password", data.Settings.DBConf.Common.UserPassword)
+	d.Set("replica_user", data.Settings.DBConf.Common.ReplicaUser)
+	d.Set("replica_password", data.Settings.DBConf.Common.ReplicaPassword)
 
 	//plan
 	switch data.Plan.ID {

@@ -11,6 +11,9 @@ resource sakuracloud_database "foobar" {
   plan          = "10g"
   user_name     = "defuser"
   user_password = "DatabasePasswordUser397"
+ 
+  # レプリケーションのマスターにする場合(postgresの場合のみ指定可) 
+  #replica_password = "DatabasePasswordUser397"
 
   allow_networks = ["192.168.11.0/24", "192.168.12.0/24"]
 
@@ -48,6 +51,7 @@ resource sakuracloud_switch "sw" {
 | `plan`          | -   | プラン           | `10g`| `10g`<br />`30g`<br />`90g`<br />`240g`<br />`500g`<br />`1t`  | - |
 | `user_name`     | ◯   | ユーザー名       | -        | 文字列                         | - |
 | `user_password` | ◯   | パスワード       | -        | 文字列                         | - |
+| `replica_password` | -   | レプリケーションパスワード       | -        | 文字列         | 指定するとレプリケーションのマスターとして構成される。`database_type`が`postgresql`の場合のみ有効 |
 | `allow_networks`| -   | 送信元ネットワーク | -        | リスト(文字列)、`xxx.xxx.xxx.xxx`、または`xxx.xxx.xxx.xxx/nn`形式 | 接続を許可するネットワークアドレスを指定する |
 | `port`          | -   | ポート番号       | `5432`   | `1024`〜`65525`の範囲の整数     | - |
 | `backup_weekdays` | ◯   | バックアップ取得曜日   | -   | 以下の値のリスト<br />`mon`<br />`tue`<br />`wed`<br />`thu`<br />`fri`<br />`sat`<br />`sun`    | - |
@@ -69,4 +73,5 @@ resource sakuracloud_switch "sw" {
 |属性名          | 名称             | 補足                  |
 |---------------|------------------|----------------------|
 | `id`            | データベースID | -                    |
+| `replica_user`  | レプリケーションユーザー名 | -                    |
 

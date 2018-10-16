@@ -59,6 +59,14 @@ func dataSourceSakuraCloudDatabase() *schema.Resource {
 				Type:     schema.TypeString,
 				Computed: true,
 			},
+			"replica_user": {
+				Type:     schema.TypeString,
+				Computed: true,
+			},
+			"replica_password": {
+				Type:     schema.TypeString,
+				Computed: true,
+			},
 			"allow_networks": {
 				Type:     schema.TypeList,
 				Computed: true,

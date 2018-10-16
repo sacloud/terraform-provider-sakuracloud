@@ -23,6 +23,7 @@ func TestAccResourceSakuraCloudDatabase_WithSwitch(t *testing.T) {
 				Config: testAccCheckSakuraCloudDatabaseConfig_WithSwitch,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckSakuraCloudDatabaseExists("sakuracloud_database.foobar", &database),
+					testAccCheckSakuraCloudDatabaseIsMaster(true, &database),
 					resource.TestCheckResourceAttr("sakuracloud_database.foobar", "database_type", "mariadb"),
 					resource.TestCheckResourceAttr("sakuracloud_database.foobar", "name", "name_before"),
 					resource.TestCheckResourceAttr("sakuracloud_database.foobar", "plan", "30g"),
@@ -33,6 +34,7 @@ func TestAccResourceSakuraCloudDatabase_WithSwitch(t *testing.T) {
 					//resource.TestCheckResourceAttr("sakuracloud_database.foobar", "is_double", "false"),
 					resource.TestCheckResourceAttr("sakuracloud_database.foobar", "user_name", "defuser"),
 					resource.TestCheckResourceAttr("sakuracloud_database.foobar", "user_password", "DatabasePasswordUser397"),
+					resource.TestCheckResourceAttr("sakuracloud_database.foobar", "replica_password", "DatabasePasswordUser397"),
 					resource.TestCheckResourceAttr("sakuracloud_database.foobar", "allow_networks.#", "2"),
 					resource.TestCheckResourceAttr("sakuracloud_database.foobar", "allow_networks.0", "192.168.11.0/24"),
 					resource.TestCheckResourceAttr("sakuracloud_database.foobar", "allow_networks.1", "192.168.12.0/24"),
@@ -53,6 +55,7 @@ func TestAccResourceSakuraCloudDatabase_WithSwitch(t *testing.T) {
 				Config: testAccCheckSakuraCloudDatabaseConfig_WithSwitchUpdate,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckSakuraCloudDatabaseExists("sakuracloud_database.foobar", &database),
+					testAccCheckSakuraCloudDatabaseIsMaster(false, &database),
 					resource.TestCheckResourceAttr("sakuracloud_database.foobar", "database_type", "mariadb"),
 					resource.TestCheckResourceAttr("sakuracloud_database.foobar", "name", "name_after"),
 					resource.TestCheckResourceAttr("sakuracloud_database.foobar", "plan", "30g"),
@@ -94,9 +97,6 @@ func testAccCheckSakuraCloudDatabaseExists(n string, database *sacloud.Database)
 		}
 
 		client := testAccProvider.Meta().(*APIClient)
-		originalZone := client.Zone
-		client.Zone = "is1b"
-		defer func() { client.Zone = originalZone }()
 
 		foundDatabase, err := client.Database.Read(toSakuraCloudID(rs.Primary.ID))
 
@@ -114,11 +114,20 @@ func testAccCheckSakuraCloudDatabaseExists(n string, database *sacloud.Database)
 	}
 }
 
+func testAccCheckSakuraCloudDatabaseIsMaster(isMaster bool, database *sacloud.Database) resource.TestCheckFunc {
+	return func(s *terraform.State) error {
+		if database == nil {
+			return errors.New("database is nil")
+		}
+		if database.IsReplicationMaster() != isMaster {
+			return fmt.Errorf("database replication settings is not match, expect: %t actual: %t", isMaster, database.IsReplicationMaster())
+		}
+		return nil
+	}
+}
+
 func testAccCheckSakuraCloudDatabaseDestroy(s *terraform.State) error {
 	client := testAccProvider.Meta().(*APIClient)
-	originalZone := client.Zone
-	client.Zone = "is1b"
-	defer func() { client.Zone = originalZone }()
 
 	for _, rs := range s.RootModule().Resources {
 		if rs.Type != "sakuracloud_database" {
@@ -147,6 +156,7 @@ func TestAccImportSakuraCloudDatabase(t *testing.T) {
 			"plan":              "30g",
 			"user_name":         "defuser",
 			"user_password":     "DatabasePasswordUser397",
+			"replica_password":  "DatabasePasswordUser397",
 			"allow_networks.0":  "192.168.11.0/24",
 			"allow_networks.1":  "192.168.12.0/24",
 			"port":              "33061",
@@ -158,7 +168,6 @@ func TestAccImportSakuraCloudDatabase(t *testing.T) {
 			"default_route":     "192.168.11.1",
 			"tags.0":            "hoge1",
 			"tags.1":            "hoge2",
-			"zone":              "is1b",
 		}
 
 		if err := compareStateMulti(s[0], expects); err != nil {
@@ -190,7 +199,6 @@ func TestAccImportSakuraCloudDatabase(t *testing.T) {
 const testAccCheckSakuraCloudDatabaseConfig_WithSwitch = `
 resource "sakuracloud_switch" "sw" {
     name = "sw"
-    zone = "is1b"
 }
 resource "sakuracloud_database" "foobar" {
 
@@ -199,6 +207,7 @@ resource "sakuracloud_database" "foobar" {
 
     user_name = "defuser"
     user_password = "DatabasePasswordUser397"
+    replica_password = "DatabasePasswordUser397"
 
     allow_networks = ["192.168.11.0/24","192.168.12.0/24"]
 
@@ -215,7 +224,6 @@ resource "sakuracloud_database" "foobar" {
     name = "name_before"
     description = "description_before"
     tags = ["hoge1" , "hoge2"]
-    zone = "is1b"
     icon_id = "${sakuracloud_icon.foobar.id}"
 }
 
@@ -228,7 +236,6 @@ resource "sakuracloud_icon" "foobar" {
 const testAccCheckSakuraCloudDatabaseConfig_WithSwitchUpdate = `
 resource "sakuracloud_switch" "sw" {
     name = "sw"
-    zone = "is1b"
 }
 resource "sakuracloud_database" "foobar" {
     database_type = "mariadb"
@@ -253,5 +260,4 @@ resource "sakuracloud_database" "foobar" {
     nw_mask_len = 24
     default_route = "192.168.11.1"
 
-    zone = "is1b"
 }`

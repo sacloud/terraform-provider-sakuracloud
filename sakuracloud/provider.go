@@ -110,6 +110,7 @@ func Provider() terraform.ResourceProvider {
 			"sakuracloud_bucket_object":                  resourceSakuraCloudBucketObject(),
 			"sakuracloud_cdrom":                          resourceSakuraCloudCDROM(),
 			"sakuracloud_database":                       resourceSakuraCloudDatabase(),
+			"sakuracloud_database_read_replica":          resourceSakuraCloudDatabaseReadReplica(),
 			"sakuracloud_disk":                           resourceSakuraCloudDisk(),
 			"sakuracloud_dns":                            resourceSakuraCloudDNS(),
 			"sakuracloud_dns_record":                     resourceSakuraCloudDNSRecord(),

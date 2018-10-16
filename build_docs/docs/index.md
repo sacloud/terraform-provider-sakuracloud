@@ -42,6 +42,7 @@
     - [ロードバランサ](configuration/resources/load_balancer/)
     - [VPCルータ](configuration/resources/vpc_router/)
     - [データベース](configuration/resources/database/)
+    - [データベース(リードレプリカ)](configuration/resources/database_read_replica/)
     - [NFS](configuration/resources/nfs/)
     - [SIM](configuration/resources/sim/)
     - [モバイルゲートウェイ](configuration/resources/mobile_gateway/)
