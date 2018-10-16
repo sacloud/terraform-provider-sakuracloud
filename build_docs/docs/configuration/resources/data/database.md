@@ -35,6 +35,8 @@ data sakuracloud_database "foobar" {
 | `plan`          | プラン           | - |
 | `user_name`     | ユーザー名       |  - |
 | `user_password` | パスワード       |  - |
+| `replica_user`     | レプリケーションユーザー名       |  - |
+| `replica_password` | レプリケーションパスワード       |  - |
 | `allow_networks`| 送信元ネットワーク | 接続を許可するネットワークアドレス(範囲)のリスト |
 | `port`          | ポート番号       |  - |
 | `backup_time`   | バックアップ開始時刻   | - |
