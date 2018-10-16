@@ -35,6 +35,7 @@ pages:
       - ロードバランサ: configuration/resources/load_balancer.md
       - VPCルータ: configuration/resources/vpc_router.md
       - データベース: configuration/resources/database.md
+      - データベース(リードレプリカ): configuration/resources/database_read_replica.md
       - NFS: configuration/resources/nfs.md
       - SIM: configuration/resources/sim.md
       - モバイルゲートウェイ: configuration/resources/mobile_gateway.md
