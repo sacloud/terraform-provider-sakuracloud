@@ -112,6 +112,13 @@
     </li>
 
         
+            
+    <li class="toctree-l1 ">
+        <a class="" href="../../../../upgrade_to_v17/">v1.7での変更点</a>
+        
+    </li>
+
+        
     </ul>
 
         
@@ -237,6 +244,13 @@
             
     <li class="toctree-l1 ">
         <a class="" href="../../database/">データベース</a>
+        
+    </li>
+
+        
+            
+    <li class="toctree-l1 ">
+        <a class="" href="../../database_read_replica/">データベース(リードレプリカ)</a>
         
     </li>
 
@@ -622,7 +636,7 @@ data sakuracloud_database &quot;foobar&quot; {
 <td align="center">-</td>
 <td>ゾーン</td>
 <td align="center">-</td>
-<td><code>tk1a</code><br /><code>is1b</code></td>
+<td><code>tk1a</code><br /><code>is1b</code><br /><code>is1a</code></td>
 <td>-</td>
 </tr>
 </tbody>
@@ -668,6 +682,16 @@ data sakuracloud_database &quot;foobar&quot; {
 <td>-</td>
 </tr>
 <tr>
+<td><code>replica_user</code></td>
+<td>レプリケーションユーザー名</td>
+<td>-</td>
+</tr>
+<tr>
+<td><code>replica_password</code></td>
+<td>レプリケーションパスワード</td>
+<td>-</td>
+</tr>
+<tr>
 <td><code>allow_networks</code></td>
 <td>送信元ネットワーク</td>
 <td>接続を許可するネットワークアドレス(範囲)のリスト</td>
@@ -680,6 +704,11 @@ data sakuracloud_database &quot;foobar&quot; {
 <tr>
 <td><code>backup_time</code></td>
 <td>バックアップ開始時刻</td>
+<td>-</td>
+</tr>
+<tr>
+<td><code>backup_weekdays</code></td>
+<td>バックアップ取得曜日</td>
 <td>-</td>
 </tr>
 <tr>

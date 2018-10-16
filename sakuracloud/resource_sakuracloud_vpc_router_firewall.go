@@ -1,10 +1,9 @@
 package sakuracloud
 
 import (
+	"bytes"
 	"fmt"
 	"strings"
-
-	"bytes"
 
 	"github.com/hashicorp/terraform/helper/hashcode"
 	"github.com/hashicorp/terraform/helper/schema"

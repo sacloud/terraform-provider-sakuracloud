@@ -1,12 +1,10 @@
 package sakuracloud
 
 import (
+	"errors"
 	"fmt"
 
-	"errors"
-
 	"github.com/hashicorp/terraform/helper/schema"
-
 	"github.com/sacloud/libsacloud/api"
 	"github.com/sacloud/libsacloud/sacloud"
 )

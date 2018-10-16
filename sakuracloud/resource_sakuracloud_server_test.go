@@ -3,14 +3,12 @@ package sakuracloud
 import (
 	"errors"
 	"fmt"
-
-	"github.com/hashicorp/terraform/helper/resource"
-	"github.com/hashicorp/terraform/terraform"
-
 	"os"
 	"regexp"
 	"testing"
 
+	"github.com/hashicorp/terraform/helper/resource"
+	"github.com/hashicorp/terraform/terraform"
 	"github.com/sacloud/libsacloud/sacloud"
 )
 

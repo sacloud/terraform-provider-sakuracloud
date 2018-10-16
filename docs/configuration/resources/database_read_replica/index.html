@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>ブリッジ - Terraform for さくらのクラウド</title>
+  <title>データベース(リードレプリカ) - Terraform for さくらのクラウド</title>
   
 
   <link rel="shortcut icon" href="../../../img/favicon.ico">
@@ -21,7 +21,7 @@
   
   <script>
     // Current page data
-    var mkdocs_page_name = "ブリッジ";
+    var mkdocs_page_name = "データベース(リードレプリカ)";
   </script>
   
   <script src="../../../js/jquery-2.1.1.min.js"></script>
@@ -221,21 +221,8 @@
 
         
             
-    <li class="toctree-l1 current">
-        <a class="current" href="./">ブリッジ</a>
-        
-            <ul>
-            
-                <li class="toctree-l3"><a href="#sakuracloud_bridge">ブリッジ(sakuracloud_bridge)</a></li>
-                
-                    <li><a class="toctree-l4" href="#_1">設定例</a></li>
-                
-                    <li><a class="toctree-l4" href="#_2">パラメーター</a></li>
-                
-                    <li><a class="toctree-l4" href="#_3">属性</a></li>
-                
-            
-            </ul>
+    <li class="toctree-l1 ">
+        <a class="" href="../bridge/">ブリッジ</a>
         
     </li>
 
@@ -262,8 +249,19 @@
 
         
             
-    <li class="toctree-l1 ">
-        <a class="" href="../database_read_replica/">データベース(リードレプリカ)</a>
+    <li class="toctree-l1 current">
+        <a class="current" href="./">データベース(リードレプリカ)</a>
+        
+            <ul>
+            
+                <li class="toctree-l3"><a href="#sakuracloud_database_read_replica">データベース リードレプリカ(sakuracloud_database_read_replica)</a></li>
+                
+                    <li><a class="toctree-l4" href="#_1">設定例</a></li>
+                
+                    <li><a class="toctree-l4" href="#sakuracloud_database_read_replica_1">sakuracloud_database_read_replica</a></li>
+                
+            
+            </ul>
         
     </li>
 
@@ -575,7 +573,7 @@
         
       
     
-    <li>ブリッジ</li>
+    <li>データベース(リードレプリカ)</li>
     <li class="wy-breadcrumbs-aside">
       
     </li>
@@ -585,31 +583,49 @@
           <div role="main">
             <div class="section">
               
-                <h1 id="sakuracloud_bridge">ブリッジ(sakuracloud_bridge)</h1>
+                <h1 id="sakuracloud_database_read_replica">データベース リードレプリカ(sakuracloud_database_read_replica)</h1>
 <hr />
-<p><strong>全ゾーン共通のグローバルリソースです。</strong></p>
 <h3 id="_1">設定例</h3>
-<pre><code class="hcl">#ブリッジの定義
-resource sakuracloud_bridge &quot;br01&quot; {
-  name        = &quot;br01&quot;
-  description = &quot;BRIDGE from terraform for SAKURA CLOUD&quot;
+<pre><code class="hcl"># データベース リードレプリカ定義
+resource &quot;sakuracloud_database_read_replica&quot; &quot;foobar&quot; {
+  # マスター側データベースのID 
+  master_id = &quot;${sakuracloud_database.foobar.id}&quot;
+
+  ipaddress1 = &quot;192.168.11.111&quot;
+  # IPアドレス以外のネットワーク関連項目が未指定の場合、マスター側から引き継ぐ
+  #switch_id     = &quot;${sakuracloud_switch.sw.id}&quot;
+  #nw_mask_len   = 24
+  #default_route = &quot;192.168.11.1&quot;  
+
+  name = &quot;slave&quot;
 }
 
-# ブリッジに接続するスイッチ(東京第1ゾーン)
-resource sakuracloud_switch &quot;sw_tk1a&quot; {
-  name      = &quot;switch_tk1a&quot;
-  bridge_id = &quot;${sakuracloud_bridge.br01.id}&quot;
-  zone      = &quot;tk1a&quot;
+
+# データベースの定義(マスター側)
+resource sakuracloud_database &quot;master&quot; {
+  database_type = &quot;postgresql&quot;
+  plan          = &quot;10g&quot;
+  user_name     = &quot;defuser&quot;
+  user_password = &quot;DatabasePasswordUser397&quot;
+
+  replica_password = &quot;DatabasePasswordUser397&quot;
+
+  switch_id     = &quot;${sakuracloud_switch.sw.id}&quot;
+  ipaddress1    = &quot;192.168.11.101&quot;
+  nw_mask_len   = 24
+  default_route = &quot;192.168.11.1&quot;
+
+  name        = &quot;name&quot;
 }
 
-# ブリッジに接続するスイッチ(石狩第2ゾーン)
-resource sakuracloud_switch &quot;sw_is1b&quot; {
-  name      = &quot;switch_is1b&quot;
-  bridge_id = &quot;${sakuracloud_bridge.br01.id}&quot;
-  zone      = &quot;is1b&quot;
+#接続するスイッチの定義
+resource sakuracloud_switch &quot;sw&quot; {
+  name = &quot;sw&quot;
 }
 </code></pre>
 
+<h2 id="sakuracloud_database_read_replica_1"><code>sakuracloud_database_read_replica</code></h2>
+<p>データベースアプライアンス(リードレプリカ)を表します。</p>
 <h3 id="_2">パラメーター</h3>
 <table>
 <thead>
@@ -624,9 +640,57 @@ resource sakuracloud_switch &quot;sw_is1b&quot; {
 </thead>
 <tbody>
 <tr>
+<td><code>master_id</code></td>
+<td align="center">◯</td>
+<td>マスター側データベースアプライアンスのID</td>
+<td align="center">-</td>
+<td>文字列</td>
+<td>-</td>
+</tr>
+<tr>
 <td><code>name</code></td>
 <td align="center">◯</td>
-<td>ブリッジ名</td>
+<td>データベース名</td>
+<td align="center">-</td>
+<td>文字列</td>
+<td>-</td>
+</tr>
+<tr>
+<td><code>ipaddress1</code></td>
+<td align="center">◯</td>
+<td>IPアドレス1</td>
+<td align="center">-</td>
+<td>文字列</td>
+<td>-</td>
+</tr>
+<tr>
+<td><code>switch_id</code></td>
+<td align="center">-</td>
+<td>スイッチID</td>
+<td align="center">-</td>
+<td>文字列</td>
+<td>未指定の場合マスター側の値を引き継ぐ</td>
+</tr>
+<tr>
+<td><code>nw_mask_len</code></td>
+<td align="center">-</td>
+<td>ネットマスク</td>
+<td align="center">-</td>
+<td>数値</td>
+<td>未指定の場合マスター側の値を引き継ぐ</td>
+</tr>
+<tr>
+<td><code>default_route</code></td>
+<td align="center">-</td>
+<td>ゲートウェイ</td>
+<td align="center">-</td>
+<td>文字列</td>
+<td>未指定の場合マスター側の値を引き継ぐ</td>
+</tr>
+<tr>
+<td><code>icon_id</code></td>
+<td align="center">-</td>
+<td>アイコンID</td>
 <td align="center">-</td>
 <td>文字列</td>
 <td>-</td>
@@ -639,8 +703,35 @@ resource sakuracloud_switch &quot;sw_is1b&quot; {
 <td>文字列</td>
 <td>-</td>
 </tr>
+<tr>
+<td><code>tags</code></td>
+<td align="center">-</td>
+<td>タグ</td>
+<td align="center">-</td>
+<td>リスト(文字列)</td>
+<td>-</td>
+</tr>
+<tr>
+<td><code>graceful_shutdown_timeout</code></td>
+<td align="center">-</td>
+<td>シャットダウンまでの待ち時間</td>
+<td align="center">-</td>
+<td>数値(秒数)</td>
+<td>シャットダウンが必要な場合の通常シャットダウンするまでの待ち時間(指定の時間まで待ってもシャットダウンしない場合は強制シャットダウンされる)</td>
+</tr>
+<tr>
+<td><code>zone</code></td>
+<td align="center">-</td>
+<td>ゾーン</td>
+<td align="center">-</td>
+<td><code>tk1a</code><br /><code>is1b</code><br /><code>is1a</code></td>
+<td>-</td>
+</tr>
 </tbody>
 </table>
+<ul>
+<li>マスター側データベースアプライアンスはレプリケーションが有効、かつマスター側として構成されている必要があります。</li>
+</ul>
 <h3 id="_3">属性</h3>
 <table>
 <thead>
@@ -653,7 +744,7 @@ resource sakuracloud_switch &quot;sw_is1b&quot; {
 <tbody>
 <tr>
 <td><code>id</code></td>
-<td>ブリッジID</td>
+<td>データベースID</td>
 <td>-</td>
 </tr>
 </tbody>
@@ -665,10 +756,10 @@ resource sakuracloud_switch &quot;sw_is1b&quot; {
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="../load_balancer/" class="btn btn-neutral float-right" title="ロードバランサ"/>Next <span class="icon icon-circle-arrow-right"></span></a>
+        <a href="../nfs/" class="btn btn-neutral float-right" title="NFS"/>Next <span class="icon icon-circle-arrow-right"></span></a>
       
       
-        <a href="../packet_filter_rule/" class="btn btn-neutral" title="パケットフィルタ(ルール)"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../database/" class="btn btn-neutral" title="データベース"><span class="icon icon-circle-arrow-left"></span> Previous</a>
       
     </div>
   
@@ -696,10 +787,10 @@ resource sakuracloud_switch &quot;sw_is1b&quot; {
     <span class="rst-current-version" data-toggle="rst-current-version">
       
       
-        <span><a href="../packet_filter_rule/" style="color: #fcfcfc;">&laquo; Previous</a></span>
+        <span><a href="../database/" style="color: #fcfcfc;">&laquo; Previous</a></span>
       
       
-        <span style="margin-left: 15px"><a href="../load_balancer/" style="color: #fcfcfc">Next &raquo;</a></span>
+        <span style="margin-left: 15px"><a href="../nfs/" style="color: #fcfcfc">Next &raquo;</a></span>
       
     </span>
 </div>
