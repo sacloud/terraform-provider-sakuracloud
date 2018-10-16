@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>インストールガイド - Terraform for さくらのクラウド</title>
+  <title>v1.7での変更点 - Terraform for さくらのクラウド</title>
   
 
   <link rel="shortcut icon" href="../img/favicon.ico">
@@ -21,7 +21,7 @@
   
   <script>
     // Current page data
-    var mkdocs_page_name = "インストールガイド";
+    var mkdocs_page_name = "v1.7での変更点";
   </script>
   
   <script src="../js/jquery-2.1.1.min.js"></script>
@@ -73,27 +73,8 @@
 
         
             
-    <li class="toctree-l1 current">
-        <a class="current" href="./">インストールガイド</a>
-        
-            <ul>
-            
-                <li class="toctree-l3"><a href="#installation">Installation / インストール</a></li>
-                
-                    <li><a class="toctree-l4" href="#terraform">Terraformのセットアップ</a></li>
-                
-                    <li><a class="toctree-l4" href="#terraform-for">Terraform for さくらのクラウドのセットアップ</a></li>
-                
-                    <li><a class="toctree-l4" href="#api">さくらのクラウドAPIキーの取得</a></li>
-                
-                    <li><a class="toctree-l4" href="#api_4">さくらのクラウドAPIキーの設定</a></li>
-                
-                    <li><a class="toctree-l4" href="#docker">(オプション) Dockerでの実行</a></li>
-                
-                    <li><a class="toctree-l4" href="#homebrewlinuxbrew">(オプション) Homebrew(Linuxbrew)でのインストール</a></li>
-                
-            
-            </ul>
+    <li class="toctree-l1 ">
+        <a class="" href="../installation/">インストールガイド</a>
         
     </li>
 
@@ -132,8 +113,19 @@
 
         
             
-    <li class="toctree-l1 ">
-        <a class="" href="../upgrade_to_v17/">v1.7での変更点</a>
+    <li class="toctree-l1 current">
+        <a class="current" href="./">v1.7での変更点</a>
+        
+            <ul>
+            
+                <li class="toctree-l3"><a href="#v17">v1.7での変更点</a></li>
+                
+                    <li><a class="toctree-l4" href="#_1">データベースアプライアンス/モバイルゲートウェイのゾーン拡大</a></li>
+                
+                    <li><a class="toctree-l4" href="#_2">データベースアプライアンスでのバックアップ設定</a></li>
+                
+            
+            </ul>
         
     </li>
 
@@ -577,11 +569,11 @@
     
       
         
-          <li>ドキュメント &raquo;</li>
+          <li>アップグレードガイド &raquo;</li>
         
       
     
-    <li>インストールガイド</li>
+    <li>v1.7での変更点</li>
     <li class="wy-breadcrumbs-aside">
       
     </li>
@@ -591,153 +583,18 @@
           <div role="main">
             <div class="section">
               
-                <h1 id="installation">Installation / インストール</h1>
+                <h1 id="v17">v1.7での変更点</h1>
 <hr />
-<h2 id="terraform">Terraformのセットアップ</h2>
+<h2 id="_1">データベースアプライアンス/モバイルゲートウェイのゾーン拡大</h2>
+<p>これまで石狩第2/東京第1ゾーンでのみ利用可能でしたが石狩第1ゾーン(<code>is1a</code>)でも利用可能となりました。  </p>
+<p><a href="https://cloud-news.sakura.ad.jp/2018/10/11/is1a-appliance/">https://cloud-news.sakura.ad.jp/2018/10/11/is1a-appliance/</a></p>
+<h2 id="_2">データベースアプライアンスでのバックアップ設定</h2>
+<p>v1.7ではバックアップ関連の設定項目が以下2つとなりました。  </p>
 <ul>
-<li>1) こちらの<a href="https://www.terraform.io/downloads.html">公式サイト</a>からzipファイルのダウンロードを行います。</li>
-<li>2) 適当なディレクトリに展開します。</li>
-<li>3) 2)のディレクトリにパスを通します。</li>
+<li><code>backup_time</code>: バックアップ開始時刻</li>
+<li><code>backup_weekdays</code>: バックアップ取得曜日(リスト)</li>
 </ul>
-<h3 id="terraformmac">terraformインストール(Macの場合)</h3>
-<p>展開先ディレクトリは<code>~/terraform</code>として記載しています。</p>
-<pre><code class="bash"># ~/terraformディレクトリ作成
-$ mkdir -p ~/terraform ; cd ~/terraform
-# ダウンロード
-$ curl -sL https://releases.hashicorp.com/terraform/0.11.7/terraform_0.11.7_darwin_amd64.zip &gt; terraform.zip
-# 展開
-$ unzip terraform.zip
-# パスを通す
-$ export PATH=$PATH:~/terraform/
-
-</code></pre>
-
-<h3 id="terraformwindows">terraformインストール(Windowsの場合)</h3>
-<p>ユーザー名を<code>USER</code>として記載しています。インストールする環境に応じて適宜読み替えてください。</p>
-<p>管理者権限でコマンドプロンプトを起動します。</p>
-<h4 id="terraform_1">~/terraformディレクトリ作成</h4>
-<pre><code class="cmd">&gt; mkdir c:\User\USER\terraform
-&gt; cd c:\User\USER\terraform
-</code></pre>
-
-<h4 id="_1">ダウンロード</h4>
-<p>Windows 64bits版をダウンロードし作成したディレクトリに保存します。</p>
-<h4 id="_2">展開</h4>
-<p>対象ファイルを展開します。<code>c:\User\USER\terraform</code> の直下に、terraform.exe を配置します。  </p>
-<pre><code># パスを通す
-&gt; SETX /M PATH “%PATH%;c:\User\USER\terraform”
-</code></pre>
-
-<blockquote>
-<p>※set コマンドで設定出来ているかの確認が出来ます。</p>
-</blockquote>
-<h3 id="_3">動作確認</h3>
-<p><code>terraform</code>コマンドを実行してみましょう。
-以下のような表示がされればOKです。</p>
-<h4 id="terraform_2">terraform動作確認</h4>
-<pre><code class="bash">$ terraform
-usage: terraform [--version] [--help] &lt;command&gt; [&lt;args&gt;]
-
-Available commands are:
-    apply       Builds or changes infrastructure
-    destroy     Destroy Terraform-managed infrastructure
-    get         Download and install modules for the configuration
-    graph       Create a visual graph of Terraform resources
-    init        Initializes Terraform configuration from a module
-    output      Read an output from a state file
-    plan        Generate and show an execution plan
-    push        Upload this Terraform module to Atlas to run
-    refresh     Update local state file against real resources
-    remote      Configure remote state storage
-    show        Inspect Terraform state or plan
-    taint       Manually mark a resource for recreation
-    validate    Validates the Terraform files
-    version     Prints the Terraform version
-</code></pre>
-
-<h2 id="terraform-for">Terraform for さくらのクラウドのセットアップ</h2>
-<ul>
-<li>1) 以下のリンクから、プラットフォームに応じたzipファイルをダウンロードします</li>
-<li><a href="http://releases.usacloud.jp/terraform/">Terraform for さくらのクラウド ダウンロードページ</a></li>
-<li>2) <code>~/.terraform.d/plugins/</code>配下に展開します<br />
-     ※ Windowsの場合は<code>%APPDATA%/terraform.d/plugins/</code>配下に展開します<br />
-     ※ setコマンドでAPPDATAがどこかを確認出来ます</li>
-</ul>
-<blockquote>
-<p>Note:<br />
-Terraform for さくらのクラウドのバイナリーファイルは<a href="https://github.com/sacloud/terraform-provider-sakuracloud/releases/latest">GitHub上のリリースページ</a>でも配布しています。</p>
-</blockquote>
-<h2 id="api">さくらのクラウドAPIキーの取得</h2>
-<p>さくらのクラウドのコントロールパネルにログインしAPIキーを発行します。
-以下を参考に実施してください。APIキーを発行したら、<code>ACCESS_TOKEN</code>と<code>ACCESS_TOKEN_SECRET</code>を控えておきましょう。</p>
-<h4 id="_4">さくらのクラウド コントロールパネルへのログイン</h4>
-<p><img alt="ログイン.png" src="../images/login.png" title="ログイン.png" /></p>
-<h4 id="iaas">さくらのクラウド(IaaS)を選択</h4>
-<p><img alt="01_コンパネ.png" src="../images/apikey01.png" title="01_コンパネ.png" /></p>
-<h4 id="api_1">APIキー発行画面へ移動</h4>
-<p><img alt="02_APIキー.png" src="../images/apikey02.png" title="02_APIキー.png" /></p>
-<h4 id="api_2">APIキーの発行</h4>
-<p><img alt="03_APIキー.png" src="../images/apikey03.png" title="03_APIキー.png" /></p>
-<h4 id="api_3">発行されたAPIキーの確認</h4>
-<p><img alt="04_APIキー.png" src="../images/apikey04.png" title="04_APIキー.png" /></p>
-<h2 id="api_4">さくらのクラウドAPIキーの設定</h2>
-<p>APIキーは環境変数、またはtfファイルにて設定します。<br />
-ここでは環境変数を利用する方法を記載しています。<br />
-tfファイルでの設定方法は設定リファレンスの<a href="http://sacloud.github.io/terraform-provider-sakuracloud/configuration/provider/">プロバイダ セクション</a>を参照してください。</p>
-<h4 id="macunixos">Mac/Unix系OSなどの場合</h4>
-<pre><code># アクセストークン
-$ export SAKURACLOUD_ACCESS_TOKEN=[入力]
-
-# アクセスシークレット
-$ export SAKURACLOUD_ACCESS_TOKEN_SECRET=[入力]
-
-# デフォルトゾーン(石狩第２を指定)
-$ export SAKURACLOUD_ZONE=is1b  
-</code></pre>
-
-<p>※env コマンドで設定出来ているかの確認が出来ます。</p>
-<h4 id="windows">Windowsの場合</h4>
-<p>管理者権限でコマンドプロンプトを起動します。</p>
-<pre><code># アクセストークン
-$ setx SAKURACLOUD_ACCESS_TOKEN [入力]
-
-# アクセスシークレット
-$ setx SAKURACLOUD_ACCESS_TOKEN_SECRET [入力]
-
-# デフォルトゾーン(石狩第２を指定)
-$ setx SAKURACLOUD_ZONE is1b  
-</code></pre>
-
-<p>※設定後、コマンドプロンプトの再起動を行っておいてください。<br />
-※set コマンドで設定出来ているかの確認が出来ます。</p>
-<h2 id="docker">(オプション) Dockerでの実行</h2>
-<p>TerraformとTerraform for さくらのクラウドを同梱したDockerイメージを用意しています。</p>
-<p><a href="https://hub.docker.com/r/sacloud/terraform/">Terraform for さくらのクラウド Dockerイメージ</a></p>
-<p>以下のように実行します。</p>
-<h4 id="docker_1">Dockerでの実行</h4>
-<pre><code class="bash">$ docker run -it --rm \
-         -e SAKURACLOUD_ACCESS_TOKEN=[さくらのクラウド APIトークン] \
-         -e SAKURACLOUD_ACCESS_TOKEN_SECRET=[さくらのクラウド APIシークレット] \
-         -v $PWD:/workdir \
-         sacloud/terraform apply
-</code></pre>
-
-<h4 id="docker-compose">docker-composeでの実行</h4>
-<pre><code class="bash"># あらかじめ以下コマンドで必要な設定ファイルをダウンロード/編集しておく
-# curl -LO https://github.com/sacloud/terraform-for-sakuracloud-docker/raw/master/docker-compose.yml
-# curl -L https://github.com/sacloud/terraform-for-sakuracloud-docker/raw/master/env-sample &gt; .env
-
-$ docker-compose run --rm terraform apply
-</code></pre>
-
-<h2 id="homebrewlinuxbrew">(オプション) Homebrew(Linuxbrew)でのインストール</h2>
-<p>Homebrew(Linuxbrew)をご利用中の場合、以下のコマンドでTerraform for さくらのクラウドをインストール可能です。      </p>
-<pre><code>brew install sacloud/terraform-provider-sakuracloud/terraform-provider-sakuracloud
-</code></pre>
-<p>注: brewコマンドでのインストール後、プラグインの有効化のために画面の指示に従って<code>~/.terraform.d/plugins</code>配下にシンボリックリンクを作成してください。       </p>
-<pre><code># シンボリックリンク作成の例 
-ln -s /usr/local/opt/terraform-provider-sakuracloud/bin/terraform-provider-sakuracloud_v1.0.5_x4 ~/.terraform.d/plugins/terraform-provider-sakuracloud_v1.0.5_x4
-</code></pre>
+<p>2つとも指定した場合にデータベースのバックアップが有効になります。</p>
               
             </div>
           </div>
@@ -745,10 +602,10 @@ ln -s /usr/local/opt/terraform-provider-sakuracloud/bin/terraform-provider-sakur
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="../upgrade_to_v012/" class="btn btn-neutral float-right" title="v0.12での変更点"/>Next <span class="icon icon-circle-arrow-right"></span></a>
+        <a href="../articles/" class="btn btn-neutral float-right" title="ブログ/記事/読み物"/>Next <span class="icon icon-circle-arrow-right"></span></a>
       
       
-        <a href=".." class="btn btn-neutral" title="ホーム"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../upgrade_to_v16/" class="btn btn-neutral" title="v1.6での変更点"><span class="icon icon-circle-arrow-left"></span> Previous</a>
       
     </div>
   
@@ -776,10 +633,10 @@ ln -s /usr/local/opt/terraform-provider-sakuracloud/bin/terraform-provider-sakur
     <span class="rst-current-version" data-toggle="rst-current-version">
       
       
-        <span><a href=".." style="color: #fcfcfc;">&laquo; Previous</a></span>
+        <span><a href="../upgrade_to_v16/" style="color: #fcfcfc;">&laquo; Previous</a></span>
       
       
-        <span style="margin-left: 15px"><a href="../upgrade_to_v012/" style="color: #fcfcfc">Next &raquo;</a></span>
+        <span style="margin-left: 15px"><a href="../articles/" style="color: #fcfcfc">Next &raquo;</a></span>
       
     </span>
 </div>

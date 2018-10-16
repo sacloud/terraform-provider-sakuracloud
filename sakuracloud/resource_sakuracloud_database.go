@@ -3,15 +3,13 @@ package sakuracloud
 import (
 	"encoding/json"
 	"fmt"
+	"strings"
 
 	"github.com/hashicorp/terraform/helper/schema"
 	"github.com/hashicorp/terraform/helper/validation"
-	"github.com/sacloud/libsacloud/utils/setup"
-
-	"strings"
-
 	"github.com/sacloud/libsacloud/api"
 	"github.com/sacloud/libsacloud/sacloud"
+	"github.com/sacloud/libsacloud/utils/setup"
 )
 
 func resourceSakuraCloudDatabase() *schema.Resource {

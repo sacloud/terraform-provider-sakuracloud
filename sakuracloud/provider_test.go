@@ -1,10 +1,9 @@
 package sakuracloud
 
 import (
+	"fmt"
 	"os"
 	"testing"
-
-	"fmt"
 
 	"github.com/hashicorp/terraform/helper/schema"
 	"github.com/hashicorp/terraform/terraform"

@@ -112,6 +112,13 @@
     </li>
 
         
+            
+    <li class="toctree-l1 ">
+        <a class="" href="../../../upgrade_to_v17/">v1.7での変更点</a>
+        
+    </li>
+
+        
     </ul>
 
         
@@ -237,6 +244,13 @@
             
     <li class="toctree-l1 ">
         <a class="" href="../database/">データベース</a>
+        
+    </li>
+
+        
+            
+    <li class="toctree-l1 ">
+        <a class="" href="../database_read_replica/">データベース(リードレプリカ)</a>
         
     </li>
 
@@ -592,7 +606,17 @@ resource &quot;sakuracloud_mobile_gateway&quot; &quot;mgw&quot; {
     #dns_server2 = &quot;8.8.4.4&quot; # DNSサーバ2
 
     description = &quot;example&quot;
-    tags = [&quot;tags1&quot; , &quot;tags2&quot;]
+    tags        = [&quot;tags1&quot; , &quot;tags2&quot;]
+
+    # トラフィックコントロール
+    traffic_control = {
+      quota                = 256
+      band_width_limit     = 64
+      enable_email         = true
+      enable_slack         = true
+      slack_webhook        = &quot;https://hooks.slack.com/services/xxx/xxx/xxx&quot;
+      auto_traffic_shaping = true
+    }
 }
 
 # スタティックルートの定義
@@ -709,6 +733,14 @@ resource &quot;sakuracloud_switch&quot; &quot;sw&quot; {
 <td>-</td>
 </tr>
 <tr>
+<td><code>traffic_control</code></td>
+<td align="center">-</td>
+<td>トラフィックコントロール</td>
+<td align="center">-</td>
+<td>マップ</td>
+<td>詳細は<a href="#traffic_control"><code>traffic_control</code></a>を参照</td>
+</tr>
+<tr>
 <td><code>icon_id</code></td>
 <td align="center">-</td>
 <td>アイコンID</td>
@@ -747,6 +779,69 @@ resource &quot;sakuracloud_switch&quot; &quot;sw&quot; {
 <td align="center">-</td>
 <td><code>is1a</code><br /><code>is1b</code><br /><code>tk1a</code><br /><code>tk1v</code></td>
 <td>-</td>
+</tr>
+</tbody>
+</table>
+<h4 id="traffic_control"><code>traffic_control</code></h4>
+<table>
+<thead>
+<tr>
+<th>パラメーター</th>
+<th align="center">必須</th>
+<th>名称</th>
+<th align="center">初期値</th>
+<th>設定値</th>
+<th>補足</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>quota</code></td>
+<td align="center">◯</td>
+<td>通信量しきい値(MB)</td>
+<td align="center">-</td>
+<td>数値</td>
+<td>-</td>
+</tr>
+<tr>
+<td><code>auto_traffic_shaping</code></td>
+<td align="center">-</td>
+<td>帯域制限の有効/無効</td>
+<td align="center">-</td>
+<td><code>true</code><br /><code>false</code></td>
+<td>-</td>
+</tr>
+<tr>
+<td><code>band_width_limit</code></td>
+<td align="center">-</td>
+<td>帯域制限値(Kbps)</td>
+<td align="center">-</td>
+<td><code>true</code><br /><code>false</code></td>
+<td>-</td>
+</tr>
+<tr>
+<td><code>enable_email</code></td>
+<td align="center">-</td>
+<td>Eメール通知の有効/無効</td>
+<td align="center">-</td>
+<td><code>true</code><br /><code>false</code></td>
+<td>-</td>
+</tr>
+<tr>
+<td><code>enable_slack</code></td>
+<td align="center">-</td>
+<td>Slack通知の有効/無効</td>
+<td align="center">-</td>
+<td><code>true</code><br /><code>false</code></td>
+<td>-</td>
+</tr>
+<tr>
+<td><code>slack_webhook</code></td>
+<td align="center">-</td>
+<td>Slack通知 Webhook URL</td>
+<td align="center">-</td>
+<td>文字列</td>
+<td><code>https://hooks.slack.com/services/xxx/xxx/xxx</code>形式で指定</td>
 </tr>
 </tbody>
 </table>
