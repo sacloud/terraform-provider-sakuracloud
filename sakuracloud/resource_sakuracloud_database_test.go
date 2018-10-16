@@ -23,6 +23,7 @@ func TestAccResourceSakuraCloudDatabase_WithSwitch(t *testing.T) {
 				Config: testAccCheckSakuraCloudDatabaseConfig_WithSwitch,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckSakuraCloudDatabaseExists("sakuracloud_database.foobar", &database),
+					testAccCheckSakuraCloudDatabaseIsMaster(true, &database),
 					resource.TestCheckResourceAttr("sakuracloud_database.foobar", "database_type", "mariadb"),
 					resource.TestCheckResourceAttr("sakuracloud_database.foobar", "name", "name_before"),
 					resource.TestCheckResourceAttr("sakuracloud_database.foobar", "plan", "30g"),
@@ -33,6 +34,7 @@ func TestAccResourceSakuraCloudDatabase_WithSwitch(t *testing.T) {
 					//resource.TestCheckResourceAttr("sakuracloud_database.foobar", "is_double", "false"),
 					resource.TestCheckResourceAttr("sakuracloud_database.foobar", "user_name", "defuser"),
 					resource.TestCheckResourceAttr("sakuracloud_database.foobar", "user_password", "DatabasePasswordUser397"),
+					resource.TestCheckResourceAttr("sakuracloud_database.foobar", "replica_password", "DatabasePasswordUser397"),
 					resource.TestCheckResourceAttr("sakuracloud_database.foobar", "allow_networks.#", "2"),
 					resource.TestCheckResourceAttr("sakuracloud_database.foobar", "allow_networks.0", "192.168.11.0/24"),
 					resource.TestCheckResourceAttr("sakuracloud_database.foobar", "allow_networks.1", "192.168.12.0/24"),
@@ -53,6 +55,7 @@ func TestAccResourceSakuraCloudDatabase_WithSwitch(t *testing.T) {
 				Config: testAccCheckSakuraCloudDatabaseConfig_WithSwitchUpdate,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckSakuraCloudDatabaseExists("sakuracloud_database.foobar", &database),
+					testAccCheckSakuraCloudDatabaseIsMaster(false, &database),
 					resource.TestCheckResourceAttr("sakuracloud_database.foobar", "database_type", "mariadb"),
 					resource.TestCheckResourceAttr("sakuracloud_database.foobar", "name", "name_after"),
 					resource.TestCheckResourceAttr("sakuracloud_database.foobar", "plan", "30g"),
@@ -114,6 +117,18 @@ func testAccCheckSakuraCloudDatabaseExists(n string, database *sacloud.Database)
 	}
 }
 
+func testAccCheckSakuraCloudDatabaseIsMaster(isMaster bool, database *sacloud.Database) resource.TestCheckFunc {
+	return func(s *terraform.State) error {
+		if database == nil {
+			return errors.New("database is nil")
+		}
+		if database.IsReplicationMaster() != isMaster {
+			return fmt.Errorf("database replication settings is not match, expect: %t actual: %t", isMaster, database.IsReplicationMaster())
+		}
+		return nil
+	}
+}
+
 func testAccCheckSakuraCloudDatabaseDestroy(s *terraform.State) error {
 	client := testAccProvider.Meta().(*APIClient)
 	originalZone := client.Zone
@@ -147,6 +162,7 @@ func TestAccImportSakuraCloudDatabase(t *testing.T) {
 			"plan":              "30g",
 			"user_name":         "defuser",
 			"user_password":     "DatabasePasswordUser397",
+			"replica_password":  "DatabasePasswordUser397",
 			"allow_networks.0":  "192.168.11.0/24",
 			"allow_networks.1":  "192.168.12.0/24",
 			"port":              "33061",
@@ -199,6 +215,7 @@ resource "sakuracloud_database" "foobar" {
 
     user_name = "defuser"
     user_password = "DatabasePasswordUser397"
+    replica_password = "DatabasePasswordUser397"
 
     allow_networks = ["192.168.11.0/24","192.168.12.0/24"]
 
