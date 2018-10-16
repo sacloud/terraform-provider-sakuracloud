@@ -97,9 +97,6 @@ func testAccCheckSakuraCloudDatabaseExists(n string, database *sacloud.Database)
 		}
 
 		client := testAccProvider.Meta().(*APIClient)
-		originalZone := client.Zone
-		client.Zone = "is1b"
-		defer func() { client.Zone = originalZone }()
 
 		foundDatabase, err := client.Database.Read(toSakuraCloudID(rs.Primary.ID))
 
@@ -131,9 +128,6 @@ func testAccCheckSakuraCloudDatabaseIsMaster(isMaster bool, database *sacloud.Da
 
 func testAccCheckSakuraCloudDatabaseDestroy(s *terraform.State) error {
 	client := testAccProvider.Meta().(*APIClient)
-	originalZone := client.Zone
-	client.Zone = "is1b"
-	defer func() { client.Zone = originalZone }()
 
 	for _, rs := range s.RootModule().Resources {
 		if rs.Type != "sakuracloud_database" {
@@ -174,7 +168,6 @@ func TestAccImportSakuraCloudDatabase(t *testing.T) {
 			"default_route":     "192.168.11.1",
 			"tags.0":            "hoge1",
 			"tags.1":            "hoge2",
-			"zone":              "is1b",
 		}
 
 		if err := compareStateMulti(s[0], expects); err != nil {
@@ -206,7 +199,6 @@ func TestAccImportSakuraCloudDatabase(t *testing.T) {
 const testAccCheckSakuraCloudDatabaseConfig_WithSwitch = `
 resource "sakuracloud_switch" "sw" {
     name = "sw"
-    zone = "is1b"
 }
 resource "sakuracloud_database" "foobar" {
 
@@ -232,7 +224,6 @@ resource "sakuracloud_database" "foobar" {
     name = "name_before"
     description = "description_before"
     tags = ["hoge1" , "hoge2"]
-    zone = "is1b"
     icon_id = "${sakuracloud_icon.foobar.id}"
 }
 
@@ -245,7 +236,6 @@ resource "sakuracloud_icon" "foobar" {
 const testAccCheckSakuraCloudDatabaseConfig_WithSwitchUpdate = `
 resource "sakuracloud_switch" "sw" {
     name = "sw"
-    zone = "is1b"
 }
 resource "sakuracloud_database" "foobar" {
     database_type = "mariadb"
@@ -270,5 +260,4 @@ resource "sakuracloud_database" "foobar" {
     nw_mask_len = 24
     default_route = "192.168.11.1"
 
-    zone = "is1b"
 }`
