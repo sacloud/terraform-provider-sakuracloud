@@ -191,6 +191,15 @@ terraform apply
     # ドキュメントの検証(textlint)
     make lint-docs
 
+#### 英語版ドキュメント(terraform.ioスタイル)
+
+[terraform.io](https://terraform.io)スタイルの英語版ドキュメントのプレビューが行えます。  
+以下のコマンドを実行し、`http://localhost:4567/docs/providers/sakuracloud`へアクセスしてください。  
+
+    # 英語版ドキュメントのプレビュー
+    make serve-english-docs 
+
+
 ## License
 
   This project is published under [Apache 2.0 License](LICENSE).
