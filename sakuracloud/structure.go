@@ -2,14 +2,12 @@ package sakuracloud
 
 import (
 	"fmt"
-
-	"github.com/hashicorp/terraform/helper/schema"
-	"github.com/hashicorp/terraform/terraform"
-
 	"strconv"
 	"strings"
 	"time"
 
+	"github.com/hashicorp/terraform/helper/schema"
+	"github.com/hashicorp/terraform/terraform"
 	"github.com/sacloud/libsacloud/sacloud"
 )
 

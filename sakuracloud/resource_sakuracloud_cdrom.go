@@ -3,16 +3,14 @@ package sakuracloud
 import (
 	"crypto/md5"
 	"fmt"
+	"io"
+	"io/ioutil"
+	"os"
 
 	"github.com/hashicorp/terraform/helper/schema"
 	"github.com/mitchellh/go-homedir"
 	"github.com/sacloud/ftps"
 	"github.com/sacloud/iso9660wrap"
-
-	"io"
-	"io/ioutil"
-	"os"
-
 	"github.com/sacloud/libsacloud/api"
 	"github.com/sacloud/libsacloud/sacloud"
 )
