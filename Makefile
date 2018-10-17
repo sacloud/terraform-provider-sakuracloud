@@ -87,6 +87,9 @@ serve-docs:
 lint-docs:
 	sh -c "'$(CURDIR)/scripts/lint_docs.sh'"
 
+serve-english-docs:
+	sh -c "'$(CURDIR)/scripts/serve_english_docs.sh'"
+
 docker-test: 
 	sh -c "'$(CURDIR)/scripts/build_on_docker.sh' 'test'"
 
