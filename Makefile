@@ -4,11 +4,12 @@ VETARGS?=-all
 GOFMT_FILES?=$$(find . -name '*.go' | grep -v vendor)
 GOLINT_TARGETS?=$$(golint github.com/sacloud/terraform-provider-sakuracloud/sakuracloud | grep -v 'underscores in Go names' | tee /dev/stderr)
 CURRENT_VERSION = $(shell git log --merges --oneline | perl -ne 'if(m/^.+Merge pull request \#[0-9]+ from .+\/bump-version-([0-9\.]+)/){print $$1;exit}')
-PROTOCOL_VERSION = $(shell go run tools/plugin-protocol-version/main.go)
+PROTOCOL_VERSION = 5
 
 BUILD_LDFLAGS = "-s -w \
-	  -X github.com/sacloud/terraform-provider-sakuracloud/sakuracloud.Revision=`git rev-parse --short HEAD` \
-	  -X github.com/sacloud/terraform-provider-sakuracloud/sakuracloud.Version=$(CURRENT_VERSION)"
+	  -X github.com/sacloud/terraform-provider-sakuracloud/version.Revision=`git rev-parse --short HEAD` \
+	  -X github.com/sacloud/terraform-provider-sakuracloud/version.Version=$(CURRENT_VERSION)"
+export GO111MODULE=on
 
 default: test vet
 
