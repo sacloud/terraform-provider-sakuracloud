@@ -9,8 +9,7 @@
 resource "sakuracloud_sim" "sim" {
   name        = "example"
   description = "example"
-  tags        = ["tags1" , "tags2"]
-
+  tags        = ["tags1", "tags2"]
   iccid    = "<SIMに記載されているICCID>"
   passcode = "<SIMに記載されているPasscode>"
   imei     = "<端末識別番号(IMEIロックする場合のみ)>"

@@ -7,7 +7,6 @@ import (
 
 	"github.com/hashicorp/terraform/helper/hashcode"
 	"github.com/hashicorp/terraform/helper/schema"
-	"github.com/hashicorp/terraform/helper/validation"
 	"github.com/sacloud/libsacloud/api"
 	"github.com/sacloud/libsacloud/sacloud"
 )
@@ -17,57 +16,7 @@ func resourceSakuraCloudVPCRouterPortForwarding() *schema.Resource {
 		Create: resourceSakuraCloudVPCRouterPortForwardingCreate,
 		Read:   resourceSakuraCloudVPCRouterPortForwardingRead,
 		Delete: resourceSakuraCloudVPCRouterPortForwardingDelete,
-		Schema: map[string]*schema.Schema{
-			"vpc_router_id": {
-				Type:         schema.TypeString,
-				Required:     true,
-				ForceNew:     true,
-				ValidateFunc: validateSakuracloudIDType,
-			},
-			"vpc_router_interface_id": {
-				Type:     schema.TypeString,
-				Required: true,
-				ForceNew: true,
-			},
-			"protocol": {
-				Type:         schema.TypeString,
-				Required:     true,
-				ForceNew:     true,
-				ValidateFunc: validation.StringInSlice([]string{"tcp", "udp"}, false),
-			},
-			"global_port": {
-				Type:         schema.TypeInt,
-				Required:     true,
-				ForceNew:     true,
-				ValidateFunc: validation.IntBetween(1, 65535),
-			},
-			"private_address": {
-				Type:     schema.TypeString,
-				Required: true,
-				ForceNew: true,
-			},
-			"private_port": {
-				Type:         schema.TypeInt,
-				Required:     true,
-				ForceNew:     true,
-				ValidateFunc: validation.IntBetween(1, 65535),
-			},
-			"description": {
-				Type:         schema.TypeString,
-				Optional:     true,
-				ForceNew:     true,
-				Default:      "",
-				ValidateFunc: validation.StringLenBetween(0, 512),
-			},
-			"zone": {
-				Type:         schema.TypeString,
-				Optional:     true,
-				Computed:     true,
-				ForceNew:     true,
-				Description:  "target SakuraCloud zone",
-				ValidateFunc: validateZone([]string{"is1a", "is1b", "tk1a", "tk1v"}),
-			},
-		},
+		Schema: vpcRouterPortForwardingSchema(),
 	}
 }
 
@@ -184,7 +133,7 @@ func vpcRouterPortForwardingIDHash(routerID string, s *sacloud.VPCRouterPortForw
 	return fmt.Sprintf("%d", hashcode.String(buf.String()))
 }
 
-func expandVPCRouterPortForwarding(d *schema.ResourceData) *sacloud.VPCRouterPortForwardingConfig {
+func expandVPCRouterPortForwarding(d resourceValueGetable) *sacloud.VPCRouterPortForwardingConfig {
 
 	var portForwarding = &sacloud.VPCRouterPortForwardingConfig{
 		Protocol:       d.Get("protocol").(string),

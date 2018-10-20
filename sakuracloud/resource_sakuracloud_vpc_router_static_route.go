@@ -15,37 +15,7 @@ func resourceSakuraCloudVPCRouterStaticRoute() *schema.Resource {
 		Create: resourceSakuraCloudVPCRouterStaticRouteCreate,
 		Read:   resourceSakuraCloudVPCRouterStaticRouteRead,
 		Delete: resourceSakuraCloudVPCRouterStaticRouteDelete,
-		Schema: map[string]*schema.Schema{
-			"vpc_router_id": {
-				Type:         schema.TypeString,
-				Required:     true,
-				ForceNew:     true,
-				ValidateFunc: validateSakuracloudIDType,
-			},
-			"vpc_router_interface_id": {
-				Type:     schema.TypeString,
-				Required: true,
-				ForceNew: true,
-			},
-			"prefix": {
-				Type:     schema.TypeString,
-				Required: true,
-				ForceNew: true,
-			},
-			"next_hop": {
-				Type:     schema.TypeString,
-				Required: true,
-				ForceNew: true,
-			},
-			"zone": {
-				Type:         schema.TypeString,
-				Optional:     true,
-				Computed:     true,
-				ForceNew:     true,
-				Description:  "target SakuraCloud zone",
-				ValidateFunc: validateZone([]string{"is1a", "is1b", "tk1a", "tk1v"}),
-			},
-		},
+		Schema: vpcRouterStaticRouteSchema(),
 	}
 }
 
@@ -153,7 +123,7 @@ func vpcRouterStaticRouteIDHash(routerID string, s *sacloud.VPCRouterStaticRoute
 	return fmt.Sprintf("%d", hashcode.String(buf.String()))
 }
 
-func expandVPCRouterStaticRoute(d *schema.ResourceData) *sacloud.VPCRouterStaticRoutesConfig {
+func expandVPCRouterStaticRoute(d resourceValueGetable) *sacloud.VPCRouterStaticRoutesConfig {
 
 	var staticRoute = &sacloud.VPCRouterStaticRoutesConfig{
 		Prefix:  d.Get("prefix").(string),

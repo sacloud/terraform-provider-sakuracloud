@@ -9,3 +9,4 @@ build_docs/site
 terraform-for-sakuracloud-docker
 releases-terraform
 website_preview/
+vendor/

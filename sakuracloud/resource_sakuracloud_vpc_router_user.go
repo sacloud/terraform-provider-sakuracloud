@@ -6,7 +6,6 @@ import (
 
 	"github.com/hashicorp/terraform/helper/hashcode"
 	"github.com/hashicorp/terraform/helper/schema"
-	"github.com/hashicorp/terraform/helper/validation"
 	"github.com/sacloud/libsacloud/api"
 	"github.com/sacloud/libsacloud/sacloud"
 )
@@ -16,34 +15,7 @@ func resourceSakuraCloudVPCRouterRemoteAccessUser() *schema.Resource {
 		Create: resourceSakuraCloudVPCRouterRemoteAccessUserCreate,
 		Read:   resourceSakuraCloudVPCRouterRemoteAccessUserRead,
 		Delete: resourceSakuraCloudVPCRouterRemoteAccessUserDelete,
-		Schema: map[string]*schema.Schema{
-			"vpc_router_id": {
-				Type:         schema.TypeString,
-				Required:     true,
-				ForceNew:     true,
-				ValidateFunc: validateSakuracloudIDType,
-			},
-			"name": {
-				Type:         schema.TypeString,
-				Required:     true,
-				ForceNew:     true,
-				ValidateFunc: validation.StringLenBetween(1, 20),
-			},
-			"password": {
-				Type:         schema.TypeString,
-				Required:     true,
-				ForceNew:     true,
-				ValidateFunc: validation.StringLenBetween(1, 20),
-			},
-			"zone": {
-				Type:         schema.TypeString,
-				Optional:     true,
-				Computed:     true,
-				ForceNew:     true,
-				Description:  "target SakuraCloud zone",
-				ValidateFunc: validateZone([]string{"is1a", "is1b", "tk1a", "tk1v"}),
-			},
-		},
+		Schema: vpcRouterUserSchema(),
 	}
 }
 
@@ -151,7 +123,7 @@ func vpcRouterRemoteAccessUserIDHash(routerID string, s *sacloud.VPCRouterRemote
 	return fmt.Sprintf("%d", hashcode.String(buf.String()))
 }
 
-func expandVPCRouterRemoteAccessUser(d *schema.ResourceData) *sacloud.VPCRouterRemoteAccessUsersConfig {
+func expandVPCRouterRemoteAccessUser(d resourceValueGetable) *sacloud.VPCRouterRemoteAccessUsersConfig {
 
 	var remoteAccessUser = &sacloud.VPCRouterRemoteAccessUsersConfig{
 		UserName: d.Get("name").(string),
