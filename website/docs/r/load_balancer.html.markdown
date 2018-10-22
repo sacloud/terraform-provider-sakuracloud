@@ -15,26 +15,28 @@ Provides a SakuraCloud LoadBalancer resource. This can be used to create, update
 ```hcl
 # Create a new LoadBalancer
 resource "sakuracloud_load_balancer" "foobar" {
-  name              = "foobar"
-  
-  switch_id         = "${sakuracloud_switch.foobar.id}"
+  name = "foobar"
+
+  switch_id         = sakuracloud_switch.foobar.id
   vrid              = 1
   high_availability = false
   plan              = "standard"
-  
-  ipaddress1        = "192.168.2.1"
+
+  ipaddress1 = "192.168.2.1"
   # only when high_availability = true 
   #ipaddress2        = "192.168.2.2"
-  nw_mask_len       = 24
-  default_route     = "192.168.2.254"
   
-  description       = "description"
-  tags              = ["foo" , "bar"]
+  nw_mask_len   = 24
+  default_route = "192.168.2.254"
+
+  description = "description"
+  tags        = ["foo", "bar"]
 }
 
 resource "sakuracloud_switch" "foobar" {
   name = "foobar"
 }
+
 ```
 
 ## Argument Reference

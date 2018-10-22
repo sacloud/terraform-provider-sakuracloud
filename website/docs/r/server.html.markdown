@@ -14,25 +14,25 @@ Provides a SakuraCloud Server resource. This can be used to create, update, and 
 
 ```hcl
 # Create a new Server
-resource sakuracloud_server "foobar" {
+resource "sakuracloud_server" "foobar" {
   name                = "foobar"
   # core              = 1
   # memory            = 1
-  disks               = ["${sakuracloud_disk.foobar.id}"]
+  disks               = [sakuracloud_disk.foobar.id]
   # interface_driver  = "virtio"
   # nic               = "shared"
   
-  # cdrom_id          = "${sakuracloud_cdrom.foobar.id}"
-  # private_host_id   = "${sakuracloud_private_host.foobar.id}"
+  # cdrom_id          = sakuracloud_cdrom.foobar.id
+  # private_host_id   = sakuracloud_private_host.foobar.id
   
   # additional_nics   = [
-  #  "${sakuracloud_switch.foobar.id}",  # connect to switch
+  #  sakuracloud_switch.foobar.id,  # connect to switch
   #  "", # disconnected
   # ] 
   
   # packet_filter_ids = [
-  #  "${sakuracloud_packet_filter.foobar.id}", # for primary NIC
-  #  "${sakuracloud_packet_filter.foobar.id}", # for secondly NIC
+  #  sakuracloud_packet_filter.foobar.id, # for primary NIC
+  #  sakuracloud_packet_filter.foobar.id, # for secondly NIC
   #]
  
   # only when nic != shared
@@ -52,12 +52,12 @@ resource sakuracloud_server "foobar" {
 }
 
 # Create a new Disk
-resource sakuracloud_disk "foobar" {
+resource "sakuracloud_disk" "foobar" {
   name              = "foobar"
   plan              = "ssd"
   connector         = "virtio"
   size              = 20
-  source_archive_id = "${data.sakuracloud_archive.ubuntu.id}"
+  source_archive_id = data.sakuracloud_archive.ubuntu.id
   # or
   # source_disk_id  = "<your-disk-id>"
   
@@ -66,7 +66,7 @@ resource sakuracloud_disk "foobar" {
 }
 
 # Source archive
-data sakuracloud_archive "ubuntu" {
+data "sakuracloud_archive" "ubuntu" {
   os_type = "ubuntu"
 }
 

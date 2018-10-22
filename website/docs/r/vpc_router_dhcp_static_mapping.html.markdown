@@ -14,23 +14,23 @@ Provides a SakuraCloud VPC Router DHCP Static Mapping resource. This can be used
 
 ```hcl
 # Create a new VPC Router(standard)
-resource sakuracloud_vpc_router "foobar" {
-  name           = "foobar"
+resource "sakuracloud_vpc_router" "foobar" {
+  name = "foobar"
 }
 
 # Add NIC to the VPC Router
-resource sakuracloud_vpc_router_interface "eth1" {
-  vpc_router_id = "${sakuracloud_vpc_router.foobar.id}"
+resource "sakuracloud_vpc_router_interface" "eth1" {
+  vpc_router_id = sakuracloud_vpc_router.foobar.id
   index         = 1
-  switch_id     = "${sakuracloud_switch.foobar.id}"
+  switch_id     = sakuracloud_switch.foobar.id
   ipaddress     = ["192.168.2.1"]
   nw_mask_len   = 24
 }
 
 # Create a new DHCP Server under the VPC Router
-resource sakuracloud_vpc_router_dhcp_server "foobar" {
-  vpc_router_id              = "${sakuracloud_vpc_router.foobar.id}"
-  vpc_router_interface_index = "${sakuracloud_vpc_router_interface.eth1.index}"
+resource "sakuracloud_vpc_router_dhcp_server" "foobar" {
+  vpc_router_id              = sakuracloud_vpc_router.foobar.id
+  vpc_router_interface_index = sakuracloud_vpc_router_interface.eth1.index
 
   range_start = "192.168.2.101"
   range_stop  = "192.168.2.200"
@@ -38,12 +38,12 @@ resource sakuracloud_vpc_router_dhcp_server "foobar" {
 }
 
 # Create a new DHCP Static Mapping config
-resource sakuracloud_vpc_router_dhcp_static_mapping "dhcp_map" {
-    vpc_router_id             = "${sakuracloud_vpc_router.foobar.id}"
-    vpc_router_dhcp_server_id = "${sakuracloud_vpc_router_dhcp_server.foobar.id}"
+resource "sakuracloud_vpc_router_dhcp_static_mapping" "dhcp_map" {
+  vpc_router_id             = sakuracloud_vpc_router.foobar.id
+  vpc_router_dhcp_server_id = sakuracloud_vpc_router_dhcp_server.foobar.id
 
-    macaddress = "aa:bb:cc:aa:bb:cc"
-    ipaddress = "192.168.2.51"
+  macaddress = "aa:bb:cc:aa:bb:cc"
+  ipaddress  = "192.168.2.51"
 }
 ```
 

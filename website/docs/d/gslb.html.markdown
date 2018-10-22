@@ -13,7 +13,7 @@ Use this data source to retrieve information about a SakuraCloud GSLB.
 ## Example Usage
 
 ```hcl
-data sakuracloud_gslb "foobar" {
+data "sakuracloud_gslb" "foobar" {
   name_selectors = ["foobar"]
 }
 ```

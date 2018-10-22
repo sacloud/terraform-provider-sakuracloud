@@ -14,10 +14,10 @@ Provides a SakuraCloud Auto Backup resource. This can be used to create, update,
 
 ```hcl
 # Create a new Auto Backup
-resource sakuracloud_auto_backup "foobar" {
+resource "sakuracloud_auto_backup" "foobar" {
   name           = "foobar"
-  disk_id        = "${sakuracloud_disk.disk.id}"
-  weekdays       = ["fri","sun"]
+  disk_id        = sakuracloud_disk.disk.id
+  weekdays       = ["fri", "sun"]
   max_backup_num = 2
   description    = "description"
   tags           = ["foo", "bar"]

@@ -14,11 +14,11 @@ Provides a SakuraCloud Archive resource. This can be used to create, update, and
 
 ```hcl
 # Create a new Archive
-resource sakuracloud_archive "foobar" {
+resource "sakuracloud_archive" "foobar" {
   name         = "foobar"
   size         = 20
   archive_file = "your/archive/file.raw"
-  hash         = "${md5(file("your/archive/file.raw"))}"
+  hash         = md5(file("your/archive/file.raw"))
   description  = "description"
   tags         = ["foo", "bar"]
 }

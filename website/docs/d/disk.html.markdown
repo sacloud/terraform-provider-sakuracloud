@@ -13,7 +13,7 @@ Use this data source to retrieve information about a SakuraCloud Disk.
 ## Example Usage
 
 ```hcl
-data sakuracloud_disk "foobar" {
+data "sakuracloud_disk" "foobar" {
   name_selectors = ["foobar"]
 }
 ```

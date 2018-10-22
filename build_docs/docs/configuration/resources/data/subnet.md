@@ -7,9 +7,9 @@
 ### 設定例
 
 ```hcl
-data sakuracloud_subnet "foobar" {
+data "sakuracloud_subnet" "foobar" {
   # ルータのID
-  internet_id = "${sakuracloud_internet.foobar.id}"
+  internet_id = sakuracloud_internet.foobar.id
 
   # サブネットのインデックス
   index = 0

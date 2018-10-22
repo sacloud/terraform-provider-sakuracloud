@@ -13,7 +13,7 @@ Use this data source to retrieve information about a SakuraCloud DNS.
 ## Example Usage
 
 ```hcl
-data sakuracloud_dns "foobar" {
+data "sakuracloud_dns" "foobar" {
   name_selectors = ["example.com"]
 }
 ```

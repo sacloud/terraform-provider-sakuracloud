@@ -13,7 +13,7 @@ Use this data source to retrieve information about a SakuraCloud Icon.
 ## Example Usage
 
 ```hcl
-data sakuracloud_icon "foobar" {
+data "sakuracloud_icon" "foobar" {
   name_selectors = ["foobar"]
 }
 ```

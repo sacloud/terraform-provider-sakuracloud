@@ -13,7 +13,7 @@ Use this data source to retrieve information about a SakuraCloud Server.
 ## Example Usage
 
 ```hcl
-data sakuracloud_server "foobar" {
+data "sakuracloud_server" "foobar" {
   name_selectors = ["foobar"]
 }
 ```

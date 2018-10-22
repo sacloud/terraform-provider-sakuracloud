@@ -7,25 +7,25 @@
 ```hcl
 # SIMの定義
 resource "sakuracloud_sim" "sim" {
-    name        = "example"
-    description = "example"
-    tags        = ["tags1" , "tags2"]
+  name        = "example"
+  description = "example"
+  tags        = ["tags1", "tags2"]
 
-    iccid    = "<SIMに記載されているICCID>"
-    passcode = "<SIMに記載されているPasscode>"
-    imei     = "<端末識別番号(IMEIロックする場合のみ)>"
-    #enabled  = true
-    
-    mobile_gateway_id = "${sakuracloud_mobile_gateway.mgw.id}" # 接続するモバイルゲートウェイのID
-    ipaddress         = "192.168.100.2"                        # SIMに割り当てるIPアドレス        
+  iccid    = "<SIMに記載されているICCID>"
+  passcode = "<SIMに記載されているPasscode>"
+  imei     = "<端末識別番号(IMEIロックする場合のみ)>"
+
+  #enabled  = true
+
+  mobile_gateway_id = sakuracloud_mobile_gateway.mgw.id # 接続するモバイルゲートウェイのID
+  ipaddress         = "192.168.100.2"                   # SIMに割り当てるIPアドレス        
 }
 
 # モバイルゲートウェイの定義
-resource sakuracloud_mobile_gateway "mgw" {
-    name                = "example"
-    internet_connection = true
+resource "sakuracloud_mobile_gateway" "mgw" {
+  name                = "example"
+  internet_connection = true
 }
-
 ```
 
 ### パラメーター

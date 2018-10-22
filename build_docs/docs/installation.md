@@ -17,7 +17,7 @@
 # ~/terraformディレクトリ作成
 $ mkdir -p ~/terraform ; cd ~/terraform
 # ダウンロード
-$ curl -sL https://releases.hashicorp.com/terraform/0.11.7/terraform_0.11.7_darwin_amd64.zip > terraform.zip
+$ curl -sL https://releases.hashicorp.com/terraform/0.12.0/terraform_0.12.0_darwin_amd64.zip > terraform.zip
 # 展開
 $ unzip terraform.zip
 # パスを通す
@@ -61,24 +61,42 @@ Windows 64bits版をダウンロードし作成したディレクトリに保存
 #### terraform動作確認 
 
 ```bash
-$ terraform
-usage: terraform [--version] [--help] <command> [<args>]
-
-Available commands are:
-    apply       Builds or changes infrastructure
-    destroy     Destroy Terraform-managed infrastructure
-    get         Download and install modules for the configuration
-    graph       Create a visual graph of Terraform resources
-    init        Initializes Terraform configuration from a module
-    output      Read an output from a state file
-    plan        Generate and show an execution plan
-    push        Upload this Terraform module to Atlas to run
-    refresh     Update local state file against real resources
-    remote      Configure remote state storage
-    show        Inspect Terraform state or plan
-    taint       Manually mark a resource for recreation
-    validate    Validates the Terraform files
-    version     Prints the Terraform version
+$ terraform help
+  Usage: terraform [-version] [-help] <command> [args]
+  
+  The available commands for execution are listed below.
+  The most common, useful commands are shown first, followed by
+  less common or more advanced commands. If you're just getting
+  started with Terraform, stick with the common commands. For the
+  other commands, please read the help and docs before usage.
+  
+  Common commands:
+      apply              Builds or changes infrastructure
+      console            Interactive console for Terraform interpolations
+      destroy            Destroy Terraform-managed infrastructure
+      env                Workspace management
+      fmt                Rewrites config files to canonical format
+      get                Download and install modules for the configuration
+      graph              Create a visual graph of Terraform resources
+      import             Import existing infrastructure into Terraform
+      init               Initialize a Terraform working directory
+      output             Read an output from a state file
+      plan               Generate and show an execution plan
+      providers          Prints a tree of the providers used in the configuration
+      refresh            Update local state file against real resources
+      show               Inspect Terraform state or plan
+      taint              Manually mark a resource for recreation
+      untaint            Manually unmark a resource as tainted
+      validate           Validates the Terraform files
+      version            Prints the Terraform version
+      workspace          Workspace management
+  
+  All other commands:
+      0.12upgrade        Rewrites pre-0.12 module source code for v0.12
+      debug              Debug output management (experimental)
+      force-unlock       Manually unlock the terraform state
+      push               Obsolete command for Terraform Enterprise legacy (v1)
+      state              Advanced state management
 ```
 
 ## Terraform for さくらのクラウドのセットアップ

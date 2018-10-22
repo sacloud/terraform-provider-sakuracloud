@@ -15,8 +15,8 @@ Provides a SakuraCloud GSLB Server resource. This can be used to create and dele
 ```hcl
 # Create a new GSLB
 resource "sakuracloud_gslb" "foobar" {
-  name         = "foobar"
-  health_check = {
+  name = "foobar"
+  health_check {
     protocol    = "https"
     delay_loop  = 20
     host_header = "example.com"
@@ -27,7 +27,7 @@ resource "sakuracloud_gslb" "foobar" {
 
 # Add Server To GSLB
 resource "sakuracloud_gslb_server" "foobar1" {
-  gslb_id   = "${sakuracloud_gslb.foobar.id}"
+  gslb_id   = sakuracloud_gslb.foobar.id
   ipaddress = "192.2.0.1"
   enabled   = true
   weight    = 1
@@ -35,7 +35,7 @@ resource "sakuracloud_gslb_server" "foobar1" {
 
 # Add Server To GSLB
 resource "sakuracloud_gslb_server" "foobar2" {
-  gslb_id   = "${sakuracloud_gslb.foobar.id}"
+  gslb_id   = sakuracloud_gslb.foobar.id
   ipaddress = "192.2.0.2"
   enabled   = true
   weight    = 1

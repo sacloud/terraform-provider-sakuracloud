@@ -6,27 +6,27 @@
 
 ```hcl
 # VPCルータの上流ルータ(プレミアム以上のプランの場合、ルータが必須)
-resource sakuracloud_internet "router1" {
+resource "sakuracloud_internet" "router1" {
   name = "myinternet1"
 }
 
 # VPCルータ配下に接続するスイッチ
-resource sakuracloud_switch "sw01" {
+resource "sakuracloud_switch" "sw01" {
   name = "sw01"
 }
 
 # VPCルータ本体の定義(プレミアム/ハイスペックプランの場合)
-resource sakuracloud_vpc_router "foobar" {
+resource "sakuracloud_vpc_router" "foobar" {
   name                = "vpc_router_sample"
   plan                = "premium"
-  switch_id           = "${sakuracloud_internet.router1.switch_id}"        # 上流のスイッチID
-  vip                 = "${sakuracloud_internet.router1.ipaddresses[0]}"   # VIP
-  ipaddress1          = "${sakuracloud_internet.router1.ipaddresses[1]}"   # 実IP1
-  ipaddress2          = "${sakuracloud_internet.router1.ipaddresses[2]}"   # 実IP2
-  aliases             = ["${sakuracloud_internet.router1.ipaddresses[3]}"] # IPエイリアス
+  switch_id           = sakuracloud_internet.router1.switch_id             # 上流のスイッチID
+  vip                 = sakuracloud_internet.router1.ipaddresses[0]        # VIP
+  ipaddress1          = sakuracloud_internet.router1.ipaddresses[1]        # 実IP1
+  ipaddress2          = sakuracloud_internet.router1.ipaddresses[2]        # 実IP2
+  aliases             = [sakuracloud_internet.router1.ipaddresses[3]]      # IPエイリアス
   vrid                = 1
-  syslog_host         = "192.168.11.1"                                     # syslog転送先ホスト
-  internet_connection = true # インターネット接続 有効/無効
+  syslog_host         = "192.168.11.1" # syslog転送先ホスト
+  internet_connection = true           # インターネット接続 有効/無効
 }
 
 # VPCルータ本体の定義(スタンダードプランの場合)
@@ -36,39 +36,39 @@ resource sakuracloud_vpc_router "foobar" {
 #}
 
 # VPCルータ配下のプライベートNIC(プレミアム/ハイスペックプランの場合)
-resource sakuracloud_vpc_router_interface "eth1" {
-  vpc_router_id = "${sakuracloud_vpc_router.foobar.id}"
+resource "sakuracloud_vpc_router_interface" "eth1" {
+  vpc_router_id = sakuracloud_vpc_router.foobar.id
 
   index       = 1                                # NICのインデックス(1〜7)
-  switch_id   = "${sakuracloud_switch.sw01.id}"  # スイッチのID
+  switch_id   = sakuracloud_switch.sw01.id       # スイッチのID
   vip         = "192.168.11.1"                   # VIP
   ipaddress   = ["192.168.11.2", "192.168.11.3"] # 実IPリスト
   nw_mask_len = 24
 }
 
 # VPCルータ配下のプライベートNIC(スタンダードプランの場合)
-#resource sakuracloud_vpc_router_interface "eth1"{
-#    vpc_router_id = "${sakuracloud_vpc_router.foobar.id}"
+#resource "sakuracloud_vpc_router_interface" "eth1"{
+#    vpc_router_id = sakuracloud_vpc_router.foobar.id
 #
 #    index = 1                                       # NICのインデックス(1〜7)
-#    switch_id = "${sakuracloud_switch.sw01.id}"     # スイッチのID
+#    switch_id = sakuracloud_switch.sw01.id          # スイッチのID
 #    ipaddress = ["192.168.11.2"]                    # 実IPリスト
 #    nw_mask_len = 24
 #}
 
 # StaticNAT機能(プレミアム/ハイスペックプランの場合のみ利用可能)
-resource sakuracloud_vpc_router_static_nat "staticNAT1" {
-  vpc_router_id           = "${sakuracloud_vpc_router.foobar.id}"
-  vpc_router_interface_id = "${sakuracloud_vpc_router_interface.eth1.id}" # 対象プライベートIPが属するNICのID
+resource "sakuracloud_vpc_router_static_nat" "staticNAT1" {
+  vpc_router_id           = sakuracloud_vpc_router.foobar.id
+  vpc_router_interface_id = sakuracloud_vpc_router_interface.eth1.id # 対象プライベートIPが属するNICのID
 
-  global_address  = "${sakuracloud_internet.router1.ipaddresses[3]}" # グローバル側IPアドレス(VPCルータ本体に割り当てたIPエイリアス)
-  private_address = "192.168.11.11"                                  # プライベート側アドレス
+  global_address  = sakuracloud_internet.router1.ipaddresses[3] # グローバル側IPアドレス(VPCルータ本体に割り当てたIPエイリアス)
+  private_address = "192.168.11.11"                             # プライベート側アドレス
 }
 
 # ポートフォワーディング
-resource sakuracloud_vpc_router_port_forwarding "forward1" {
-  vpc_router_id           = "${sakuracloud_vpc_router.foobar.id}"
-  vpc_router_interface_id = "${sakuracloud_vpc_router_interface.eth1.id}" # 対象プライベートIPが属するNICのID
+resource "sakuracloud_vpc_router_port_forwarding" "forward1" {
+  vpc_router_id           = sakuracloud_vpc_router.foobar.id
+  vpc_router_interface_id = sakuracloud_vpc_router_interface.eth1.id # 対象プライベートIPが属するNICのID
 
   protocol        = "tcp"           # プロトコル(tcp/udp)
   global_port     = 10022           # グローバル側ポート番号
@@ -77,13 +77,14 @@ resource sakuracloud_vpc_router_port_forwarding "forward1" {
 }
 
 # ファイアウォール(VPC内部から外部への通信)
-resource sakuracloud_vpc_router_firewall "send_fw" {
-  vpc_router_id              = "${sakuracloud_vpc_router.foobar.id}"
+resource "sakuracloud_vpc_router_firewall" "send_fw" {
+  vpc_router_id = sakuracloud_vpc_router.foobar.id
+
   # vpc_router_interface_index = 0 # 対象インターフェースのインデックス(グローバル含む)
-  direction     = "send"
+  direction = "send"
 
   # VPC内部のWebサーバから外部への応答パケットの許可
-  expressions = {
+  expressions {
     protocol    = "tcp"
     source_nw   = ""
     source_port = "80"
@@ -93,7 +94,7 @@ resource sakuracloud_vpc_router_firewall "send_fw" {
   }
 
   # 全拒否(暗黙Deny)
-  expressions = {
+  expressions {
     protocol    = "ip"
     source_nw   = ""
     source_port = ""
@@ -104,13 +105,14 @@ resource sakuracloud_vpc_router_firewall "send_fw" {
 }
 
 # ファイアウォール(VPC外部から内部への通信)
-resource sakuracloud_vpc_router_firewall "receive_fw" {
-  vpc_router_id = "${sakuracloud_vpc_router.foobar.id}"
+resource "sakuracloud_vpc_router_firewall" "receive_fw" {
+  vpc_router_id = sakuracloud_vpc_router.foobar.id
+
   # vpc_router_interface_index = 0 # 対象インターフェースのインデックス(グローバル含む)
-  direction     = "receive"
+  direction = "receive"
 
   # VPC内部のWebサーバへのパケットを許可
-  expressions = {
+  expressions {
     protocol    = "tcp"
     source_nw   = ""
     source_port = ""
@@ -120,7 +122,7 @@ resource sakuracloud_vpc_router_firewall "receive_fw" {
   }
 
   # 全拒否(暗黙Deny)
-  expressions = {
+  expressions {
     protocol    = "ip"
     source_nw   = ""
     source_port = ""
@@ -131,37 +133,39 @@ resource sakuracloud_vpc_router_firewall "receive_fw" {
 }
 
 # DHCPサーバ機能
-resource sakuracloud_vpc_router_dhcp_server "dhcp" {
-  vpc_router_id              = "${sakuracloud_vpc_router.foobar.id}"
-  vpc_router_interface_index = "${sakuracloud_vpc_router_interface.eth1.index}" # 対象プライベートIPが属するNICのインデックス
+resource "sakuracloud_vpc_router_dhcp_server" "dhcp" {
+  vpc_router_id              = sakuracloud_vpc_router.foobar.id
+  vpc_router_interface_index = sakuracloud_vpc_router_interface.eth1.index # 対象プライベートIPが属するNICのインデックス
 
-  range_start = "192.168.11.151"       # IPアドレス動的割り当て範囲(開始)
-  range_stop  = "192.168.11.200"       # IPアドレス動的割り当て範囲(終了)
+  range_start = "192.168.11.151" # IPアドレス動的割り当て範囲(開始)
+  range_stop  = "192.168.11.200" # IPアドレス動的割り当て範囲(終了)
+  
   # dns_servers = ["8.8.4.4", "8.8.8.8"] # 配布するDNSサーバIPアドレスのリスト
 }
 
+
 # DHCPスタティック割り当て
-resource sakuracloud_vpc_router_dhcp_static_mapping "dhcp_map" {
-  vpc_router_id             = "${sakuracloud_vpc_router.foobar.id}"
-  vpc_router_dhcp_server_id = "${sakuracloud_vpc_router_dhcp_server.dhcp.id}" # DHCPサーバリソースのID
+resource "sakuracloud_vpc_router_dhcp_static_mapping" "dhcp_map" {
+  vpc_router_id             = sakuracloud_vpc_router.foobar.id
+  vpc_router_dhcp_server_id = sakuracloud_vpc_router_dhcp_server.dhcp.id # DHCPサーバリソースのID
 
   macaddress = "aa:bb:cc:aa:bb:cc" # 対象MACアドレス
   ipaddress  = "192.168.11.20"     # 割りあてるIPアドレス
 }
 
 # リモートアクセス:PPTPサーバ機能
-resource sakuracloud_vpc_router_pptp "pptp" {
-  vpc_router_id           = "${sakuracloud_vpc_router.foobar.id}"
-  vpc_router_interface_id = "${sakuracloud_vpc_router_interface.eth1.id}"
+resource "sakuracloud_vpc_router_pptp" "pptp" {
+  vpc_router_id           = sakuracloud_vpc_router.foobar.id
+  vpc_router_interface_id = sakuracloud_vpc_router_interface.eth1.id
 
   range_start = "192.168.11.101" # IPアドレス動的割り当て範囲(開始)
   range_stop  = "192.168.11.150" # IPアドレス動的割り当て範囲(終了)
 }
 
 # リモートアクセス:L2TP/IPSecサーバ機能
-resource sakuracloud_vpc_router_l2tp "l2tp" {
-  vpc_router_id           = "${sakuracloud_vpc_router.foobar.id}"
-  vpc_router_interface_id = "${sakuracloud_vpc_router_interface.eth1.id}"
+resource "sakuracloud_vpc_router_l2tp" "l2tp" {
+  vpc_router_id           = sakuracloud_vpc_router.foobar.id
+  vpc_router_interface_id = sakuracloud_vpc_router_interface.eth1.id
 
   pre_shared_secret = "hogehoge"       # 事前共有シークレット
   range_start       = "192.168.11.51"  # IPアドレス動的割り当て範囲(開始)
@@ -169,16 +173,16 @@ resource sakuracloud_vpc_router_l2tp "l2tp" {
 }
 
 # リモートユーザーアカウント
-resource sakuracloud_vpc_router_user "user1" {
-  vpc_router_id = "${sakuracloud_vpc_router.foobar.id}"
+resource "sakuracloud_vpc_router_user" "user1" {
+  vpc_router_id = sakuracloud_vpc_router.foobar.id
 
   name     = "username" # ユーザー名
   password = "password" # パスワード
 }
 
 # サイト間VPN
-resource sakuracloud_vpc_router_site_to_site_vpn "s2s" {
-  vpc_router_id     = "${sakuracloud_vpc_router.foobar.id}"
+resource "sakuracloud_vpc_router_site_to_site_vpn" "s2s" {
+  vpc_router_id     = sakuracloud_vpc_router.foobar.id
   peer              = "8.8.8.8"
   remote_id         = "8.8.8.8"
   pre_shared_secret = "presharedsecret"
@@ -187,9 +191,9 @@ resource sakuracloud_vpc_router_site_to_site_vpn "s2s" {
 }
 
 # スタティックルート
-resource sakuracloud_vpc_router_static_route "route1" {
-  vpc_router_id           = "${sakuracloud_vpc_router.foobar.id}"
-  vpc_router_interface_id = "${sakuracloud_vpc_router_interface.eth1.id}"
+resource "sakuracloud_vpc_router_static_route" "route1" {
+  vpc_router_id           = sakuracloud_vpc_router.foobar.id
+  vpc_router_interface_id = sakuracloud_vpc_router_interface.eth1.id
   prefix                  = "172.16.0.0/16"
   next_hop                = "192.168.11.99"
 }

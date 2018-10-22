@@ -7,7 +7,7 @@
 ### 設定例
 
 ```hcl
-data sakuracloud_icon "icon" {
+data "sakuracloud_icon" "icon" {
   name_selector = ["foobar"]
 }
 ```

@@ -6,15 +6,17 @@
 
 ```hcl
 #ディスクの定義
-resource sakuracloud_disk "disk01" {
-  name      = "disk01"
+resource "sakuracloud_disk" "disk01" {
+  name = "disk01"
+
   #plan      = "ssd"
   #connector = "virtio"
   #size      = 20
 
   #コピー元アーカイブ/ディスクの指定
-  source_archive_id = "${data.sakuracloud_archive.centos.id}"
-  #source_disk_id = "${sakuracloud_disk.disk.id}"
+  source_archive_id = data.sakuracloud_archive.centos.id
+
+  #source_disk_id = sakuracloud_disk.disk.id
 
   #コピー元アーカイブのIDが変更された場合のリソース再生成を防ぎたい場合
   #lifecycle {
@@ -24,13 +26,13 @@ resource sakuracloud_disk "disk01" {
 
   # 指定ディスクと別ストレージに格納したい場合
   #distant_from = ["<your-disk-id>"]
- 
+
   description = "Description"
   tags        = ["tag1", "tag2"]
 }
 
 #コピー元アーカイブの定義
-data sakuracloud_archive "centos" {
+data "sakuracloud_archive" "centos" {
   os_type = "centos"
 }
 ```

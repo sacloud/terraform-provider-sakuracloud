@@ -13,7 +13,7 @@
 ### 設定例
 
 ```hcl
-resource sakuracloud_bucket_object "foobar" {
+resource "sakuracloud_bucket_object" "foobar" {
   #アクセスキー(環境変数SACLOUD_OJS_ACCESS_KEY_ID、またはAWS_ACCESS_KEY_IDでも指定可能)  
   #access_key = ""
 
@@ -29,11 +29,12 @@ resource sakuracloud_bucket_object "foobar" {
   #ボディ:
   #文字列で指定する場合
   content = "content"
+
   #ファイルを指定する場合
   #source = "path/your/object/file"
-
+  
   #ETag: オブジェクトストレージ上でオブジェクトが変更されたことを検知したい場合に指定
-  #etag = "${md5(file("path/your/object/file"))}" 
+  #etag = md5(file("path/your/object/file"))
 }
 ```
 
@@ -76,7 +77,7 @@ resource sakuracloud_bucket_object "foobar" {
 ### データリソースの利用例
 
 ```hcl
-data sakuracloud_bucket_object "foobar" {
+data "sakuracloud_bucket_object" "foobar" {
   #アクセスキー(環境変数SACLOUD_OJS_ACCESS_KEY_ID、またはAWS_ACCESS_KEY_IDでも指定可能)  
   #access_key = ""
   #シークレットキー(環境変数SACLOUD_OJS_SECRET_ACCESS_KEY、またはAWS_SECRET_ACCESS_KEYでも指定可能)

@@ -6,7 +6,7 @@
 
 ```hcl
 #ロードバランサの参照
-data sakuracloud_load_balancer "foobar" {
+data "sakuracloud_load_balancer" "foobar" {
   name_selectors = ["foobar"]
 }
 ```

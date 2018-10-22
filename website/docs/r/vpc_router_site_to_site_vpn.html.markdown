@@ -14,22 +14,22 @@ Provides a SakuraCloud VPC Router Site To Site VPN resource. This can be used to
 
 ```hcl
 # Create a new VPC Router(standard)
-resource sakuracloud_vpc_router "foobar" {
-  name           = "foobar"
+resource "sakuracloud_vpc_router" "foobar" {
+  name = "foobar"
 }
 
 # Add NIC to the VPC Router
-resource sakuracloud_vpc_router_interface "eth1" {
-  vpc_router_id = "${sakuracloud_vpc_router.foobar.id}"
+resource "sakuracloud_vpc_router_interface" "eth1" {
+  vpc_router_id = sakuracloud_vpc_router.foobar.id
   index         = 1
-  switch_id     = "${sakuracloud_switch.foobar.id}"
+  switch_id     = sakuracloud_switch.foobar.id
   ipaddress     = ["192.168.2.1"]
   nw_mask_len   = 24
 }
 
 # Add Site to Site VPN config
 resource "sakuracloud_vpc_router_site_to_site_vpn" "s2s" {
-  vpc_router_id     = "${sakuracloud_vpc_router.foobar.id}"
+  vpc_router_id     = sakuracloud_vpc_router.foobar.id
   peer              = "172.16.0.1"
   remote_id         = "172.16.0.1"
   pre_shared_secret = "<your-pre-shared-secret>"

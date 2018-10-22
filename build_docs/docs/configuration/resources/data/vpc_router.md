@@ -5,7 +5,7 @@
 ### 設定例
 
 ```hcl
-data sakuracloud_vpc_router "foobar" {
+data "sakuracloud_vpc_router" "foobar" {
   name_selectors = ["foobar"]
 }
 ```

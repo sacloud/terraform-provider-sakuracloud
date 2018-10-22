@@ -9,39 +9,42 @@
 ### 設定例
 
 ```hcl
-resource sakuracloud_gslb "gslb" {
+resource "sakuracloud_gslb" "gslb" {
   name = "gslb_from_terraform"
 
-  health_check = {
+  health_check {
     protocol    = "http"
     delay_loop  = 10
     host_header = "example.com"
     path        = "/"
     status      = "200"
-    #port       = 80
   }
+
+  #port       = 80
 
   #weighted     = false
   #sorry_server = "192.0.2.254"
-  description  = "GSLB from terraform for SAKURA CLOUD"
-  tags         = ["tag1", "tag2"]
+  description = "GSLB from terraform for SAKURA CLOUD"
+  tags        = ["tag1", "tag2"]
 }
 
 #GSLB配下のサーバ1
-resource sakuracloud_gslb_server "gslb_server01" {
-  gslb_id   = "${sakuracloud_gslb.gslb.id}"
+resource "sakuracloud_gslb_server" "gslb_server01" {
+  gslb_id   = sakuracloud_gslb.gslb.id
   ipaddress = "192.0.2.1"
   #weight    = 1
   #enabled   = true
 }
 
+
 #GSLB配下のサーバ2
-resource sakuracloud_gslb_server "gslb_server02" {
-  gslb_id   = "${sakuracloud_gslb.gslb.id}"
+resource "sakuracloud_gslb_server" "gslb_server02" {
+  gslb_id   = sakuracloud_gslb.gslb.id
   ipaddress = "192.0.2.2"
   #weight    = 1
   #enabled   = true
 }
+
 ```
 
 ## `sakuracloud_gslb`

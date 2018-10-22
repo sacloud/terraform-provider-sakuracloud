@@ -6,8 +6,8 @@
 
 ```hcl
 #ロードバランサの定義
-resource sakuracloud_load_balancer "foobar" {
-  switch_id = "${sakuracloud_switch.sw.id}"
+resource "sakuracloud_load_balancer" "foobar" {
+  switch_id = sakuracloud_switch.sw.id
   vrid      = 1
 
   #冗長化構成の有無
@@ -17,6 +17,7 @@ resource sakuracloud_load_balancer "foobar" {
   plan = "standard"
 
   ipaddress1 = "192.168.11.101"
+
   #ipaddress2 = "192.168.11.101"
   #default_route = "192.168.11.1"
   nw_mask_len = 24
@@ -24,50 +25,44 @@ resource sakuracloud_load_balancer "foobar" {
   name        = "name"
   description = "Description"
   tags        = ["tag1", "tag2"]
-
-  zone = "tk1v"
 }
 
 #ロードバランサVIPの定義
-resource sakuracloud_load_balancer_vip "vip1" {
-  load_balancer_id = "${sakuracloud_load_balancer.foobar.id}"
+resource "sakuracloud_load_balancer_vip" "vip1" {
+  load_balancer_id = sakuracloud_load_balancer.foobar.id
   vip              = "192.168.11.201"
   port             = 80
+
   #delay_loop       = 10
   #sorry_server     = "192.168.11.11"
   #description      = "description"
-
-  zone = "tk1v"
 }
 
 #ロードバランサVIP配下の実サーバの定義(1台目)
-resource sakuracloud_load_balancer_server "server01" {
-  load_balancer_vip_id = "${sakuracloud_load_balancer_vip.vip1.id}"
+resource "sakuracloud_load_balancer_server" "server01" {
+  load_balancer_vip_id = sakuracloud_load_balancer_vip.vip1.id
   ipaddress            = "192.168.11.51"
   check_protocol       = "http"
   check_path           = "/"
   check_status         = "200"
-  #enabled              = true
 
-  zone = "tk1v"
+  #enabled              = true
 }
 
 #ロードバランサVIP配下の実サーバの定義(2台目)
-resource sakuracloud_load_balancer_server "server02" {
-  load_balancer_vip_id = "${sakuracloud_load_balancer_vip.vip1.id}"
+resource "sakuracloud_load_balancer_server" "server02" {
+  load_balancer_vip_id = sakuracloud_load_balancer_vip.vip1.id
   ipaddress            = "192.168.11.52"
   check_protocol       = "http"
   check_path           = "/"
   check_status         = "200"
-  #enabled              = true
 
-  zone = "tk1v"
+  #enabled              = true
 }
 
 #ロードバランサ上流のスイッチ
-resource sakuracloud_switch "sw" {
+resource "sakuracloud_switch" "sw" {
   name = "sw"
-  zone = "tk1v"
 }
 ```
 

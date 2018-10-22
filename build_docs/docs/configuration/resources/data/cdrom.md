@@ -6,14 +6,14 @@
 
 ```hcl
 #ISOイメージの参照
-data sakuracloud_cdrom "cdrom" {
+data "sakuracloud_cdrom" "cdrom" {
   name_selectors = ["CentOS", "7.4"]
 }
 
 # 参照したISOイメージをサーバに挿入
-resource sakuracloud_server "server" {
+resource "sakuracloud_server" "server" {
   name     = "foobar"
-  cdrom_id = "${data.sakuracloud_cdrom.cdrom.id}"
+  cdrom_id = data.sakuracloud_cdrom.cdrom.id
 }
 
 ```

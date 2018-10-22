@@ -5,9 +5,9 @@
 ### 設定例
 
 ```hcl
-resource sakuracloud_server "myserver" {
+resource "sakuracloud_server" "myserver" {
   name  = "myserver"
-  disks = ["${sakuracloud_disk.mydisk.id}"]
+  disks = [sakuracloud_disk.mydisk.id]
 
   #コア数
   #core = 1
@@ -22,13 +22,13 @@ resource sakuracloud_server "myserver" {
   #nic = "shared"
 
   #追加NIC
-  #additional_nics = ["${sakuracloud_switch.myswitch.id}"]
+  #additional_nics = [sakuracloud_switch.myswitch.id]
 
   #パケットフィルタ
-  #packet_filter_ids = ["${sakuracloud_packet_filter.myfilter.id}"]
+  #packet_filter_ids = [sakuracloud_packet_filter.myfilter.id]
 
   #ISOイメージ(CD-ROM)
-  #cdrom_id = "${data.sakuracloud_cdrom.mycdrom.id}"
+  #cdrom_id = data.sakuracloud_cdrom.mycdrom.id
 
   #ネットワーク設定(nicにスイッチIDが指定されている場合のみ)
   #ipaddress   = "192.168.0.101"
@@ -45,14 +45,15 @@ resource sakuracloud_server "myserver" {
   password = "p@ssw0rd" #パスワード
   
   #SSH公開鍵
-  #ssh_key_ids = ["${sakuracloud_ssh_key_gen.key.id}"]
+  #ssh_key_ids = [sakuracloud_ssh_key_gen.key.id]
   
   #スタートアップスクリプト
-  #note_ids = ["${sakuracloud_note.note.id}"]
+  #note_ids = [sakuracloud_note.note.id]
   
   #SSH接続でのパスワード/チャレンジレスポンス認証無効化
   #disable_pw_auth = true
 }
+
 ```
 
 ### パラメーター

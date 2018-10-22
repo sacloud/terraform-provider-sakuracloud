@@ -13,8 +13,8 @@ Use this data source to retrieve information about a SakuraCloud Subnet.
 ## Example Usage
 
 ```hcl
-data sakuracloud_subnet "foobar" {
-  internet_id = "${sakuracloud_internet.foobar.id}"
+data "sakuracloud_subnet" "foobar" {
+  internet_id = sakuracloud_internet.foobar.id
   index       = 0
 }
 ```
