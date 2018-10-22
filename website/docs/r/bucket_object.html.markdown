@@ -17,13 +17,15 @@ Buckets should be created on the control panel.
 
 ```hcl
 # Create a new Bucket Object
-resource sakuracloud_bucket_object "foobar" {
-   bucket       = "your-bucket-name"
-   key          = "path/to/your/object"
-   source       = "path/to/your/source/file"
-   # or
-   #content     = "your-content-body"
-   content_type = "application/json"
+resource "sakuracloud_bucket_object" "foobar" {
+  bucket = "your-bucket-name"
+  key    = "path/to/your/object"
+  
+  source = "path/to/your/source/file"
+  # or
+  #content     = "your-content-body"
+  
+  content_type = "application/json"
 }
 ```
 

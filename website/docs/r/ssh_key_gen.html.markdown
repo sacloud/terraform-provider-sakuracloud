@@ -15,7 +15,7 @@ The private and public keys is generated on the Sakura Cloud platform.
 
 ```hcl
 # Create a new SSH Key
-resource sakuracloud_ssh_key_gen "foobar" {
+resource "sakuracloud_ssh_key_gen" "foobar" {
   name        = "foobar"
   pass_phrase = "<your-pass-phrase>"
   description = "description"

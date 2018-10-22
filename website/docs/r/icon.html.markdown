@@ -15,14 +15,15 @@ Provides a SakuraCloud Icon resource. This can be used to create, update, and de
 ```hcl
 # Create a new Icon
 resource "sakuracloud_icon" "foobar" {
-  name          = "foobar"
-  
-  source        = "path/to/your/file"
+  name = "foobar"
+
+  source = "path/to/your/file"
   # or
   #base64content = "<base64-encoded-content-body>"
   
-  tags          = ["foo", "bar"]
+  tags = ["foo", "bar"]
 }
+
 ```
 
 ## Argument Reference

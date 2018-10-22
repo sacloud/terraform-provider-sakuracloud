@@ -6,7 +6,7 @@
 
 ```hcl
 # データベースの参照
-data sakuracloud_database "foobar" {
+data "sakuracloud_database" "foobar" {
   name_selectors = ["foobar"]
 }
 ```

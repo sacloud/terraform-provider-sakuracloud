@@ -13,7 +13,7 @@ Use this data source to retrieve information about a SakuraCloud VPC Router.
 ## Example Usage
 
 ```hcl
-data sakuracloud_vpc_router "foobar" {
+data "sakuracloud_vpc_router" "foobar" {
   name_selectors = ["foobar"]
 }
 ```

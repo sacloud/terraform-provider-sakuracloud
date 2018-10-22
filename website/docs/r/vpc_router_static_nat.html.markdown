@@ -14,35 +14,35 @@ Provides a SakuraCloud VPC Router Static NAT resource. This can be used to creat
 
 ```hcl
 # Create a new VPC Router(premium or highspec)
-resource sakuracloud_vpc_router "foobar" {
-  name                = "foobar"
-  plan                = "premium"
-  switch_id           = "${sakuracloud_internet.foobar.switch_id}"
-  vip                 = "${sakuracloud_internet.foobar.ipaddresses[0]}"
-  ipaddress1          = "${sakuracloud_internet.foobar.ipaddresses[1]}"
-  ipaddress2          = "${sakuracloud_internet.foobar.ipaddresses[2]}"
-  #aliases             = ["${sakuracloud_internet.foobar.ipaddresses[3]}"] 
-  vrid                = 1
+resource "sakuracloud_vpc_router" "foobar" {
+  name       = "foobar"
+  plan       = "premium"
+  switch_id  = sakuracloud_internet.foobar.switch_id
+  vip        = sakuracloud_internet.foobar.ipaddresses[0]
+  ipaddress1 = sakuracloud_internet.foobar.ipaddresses[1]
+  ipaddress2 = sakuracloud_internet.foobar.ipaddresses[2]
+  #aliases   = [sakuracloud_internet.foobar.ipaddresses[3]] 
+  vrid = 1
 }
 
 # Add NIC to the VPC Router
-resource sakuracloud_vpc_router_interface "eth1" {
-  vpc_router_id = "${sakuracloud_vpc_router.foobar.id}"
+resource "sakuracloud_vpc_router_interface" "eth1" {
+  vpc_router_id = sakuracloud_vpc_router.foobar.id
   index         = 1
-  switch_id     = "${sakuracloud_switch.foobar.id}"
+  switch_id     = sakuracloud_switch.foobar.id
   vip           = "192.2.0.1"
   ipaddress     = ["192.2.0.2", "192.2.0.3"]
   nw_mask_len   = 24
 }
 
 # Add Static NAT config
-resource sakuracloud_vpc_router_static_nat "snat" {
-    vpc_router_id           = "${sakuracloud_vpc_router.foobar.id}"
-    vpc_router_interface_id = "${sakuracloud_vpc_router_interface.eth1.id}"
+resource "sakuracloud_vpc_router_static_nat" "snat" {
+  vpc_router_id           = sakuracloud_vpc_router.foobar.id
+  vpc_router_interface_id = sakuracloud_vpc_router_interface.eth1.id
 
-    global_address  = "${sakuracloud_internet.router1.ipaddresses[3]}"
-    private_address = "192.2.0.11"
-    description     = "description"
+  global_address  = sakuracloud_internet.router1.ipaddresses[3]
+  private_address = "192.2.0.11"
+  description     = "description"
 }
 ```
 

@@ -6,18 +6,19 @@
 
 ```hcl
 #ISOイメージの定義
-resource sakuracloud_cdrom "cdrom" {
-  name  = "cdrom01"
-  #size = 5 # or 10
+resource "sakuracloud_cdrom" "cdrom" {
+  name = "cdrom01"
+
+  #size = 5 # or 10, デフォルトは5GB
 
   # ISOイメージをアップロードする場合
   iso_image_file = "test/dummy.iso"
-  hash           = "${md5(file("test/dummy.iso"))}"
+  hash           = md5(file("test/dummy.iso"))
 
   # 単一ファイルを内包するISOイメージを作成する場合
-  #content           = "${file("test/dummy-upd.json")}"
+  #content           = file("test/dummy-upd.json")
   #content_file_name = "config"
- 
+
   description = "Description"
   tags        = ["tag1", "tag2"]
 }

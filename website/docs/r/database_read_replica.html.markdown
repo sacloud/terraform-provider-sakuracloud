@@ -14,18 +14,18 @@ Provides a SakuraCloud Database(ReadReplica) resource. This can be used to creat
 
 ```hcl
 # Create a new Database(ReadReplica)
-resource sakuracloud_database_read_replica "foobar" {
-  master_id = "${sakuracloud_database.foobar.id}"
-  
-  ipaddress1 = "192.168.11.111"
-  #switch_id     = "${sakuracloud_switch.sw.id}"
+resource "sakuracloud_database_read_replica" "foobar" {
+  name          = "slave"
+  master_id     = sakuracloud_database.foobar.id
+
+  ipaddress1    = "192.168.11.111"
+  #switch_id     = sakuracloud_switch.sw.id
   #nw_mask_len   = 24
-  #default_route = "192.168.11.1"  
-  name = "slave"
+  #default_route = "192.168.11.1"
 }
 
 # Create a new Database(Master)
-resource sakuracloud_database "foobar" {
+resource "sakuracloud_database" "foobar" {
   name             = "foobar"
   database_type    = "mariadb"
   plan             = "30g"
@@ -33,13 +33,13 @@ resource sakuracloud_database "foobar" {
   user_password    = "p@ssw0rd"
   replica_password = "p@ssw0rd"
 
-  switch_id       = "${sakuracloud_switch.foobar.id}"
-  ipaddress1      = "192.168.11.101"
-  nw_mask_len     = 24
-  default_route   = "192.168.11.1"
-  
-  description    = "description"
-  tags           = ["foo", "bar"]
+  switch_id     = sakuracloud_switch.foobar.id
+  ipaddress1    = "192.168.11.101"
+  nw_mask_len   = 24
+  default_route = "192.168.11.1"
+
+  description = "description"
+  tags        = ["foo", "bar"]
 }
 ```
 

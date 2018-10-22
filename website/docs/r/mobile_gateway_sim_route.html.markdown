@@ -14,27 +14,26 @@ Provides a SakuraCloud Mobile Gateway SIM Route resource. This can be used to cr
 
 ```hcl
 # Create a new Mobile Gateway
-resource sakuracloud_mobile_gateway "foobar" {
-  name                = "foobar"
+resource "sakuracloud_mobile_gateway" "foobar" {
+  name = "foobar"
 
-  switch_id           = "${sakuracloud_switch.sw.id}"
+  switch_id           = sakuracloud_switch.sw.id
   private_ipaddress   = "192.168.2.101"
   private_nw_mask_len = 24
   internet_connection = true
   dns_server1         = "8.8.8.8"
-  dns_server2         = "8.8.4.4" 
-  
-  description         = "description"
-  tags                = ["foo", "bar"]
+  dns_server2         = "8.8.4.4"
+
+  description = "description"
+  tags        = ["foo", "bar"]
 }
 
 # Create a new SIM Route
-resource sakuracloud_mobile_gateway_sim_route "route1" {
-  mobile_gateway_id = "${sakuracloud_mobile_gateqway.foobar.id}"
+resource "sakuracloud_mobile_gateway_sim_route" "route1" {
+  mobile_gateway_id = sakuracloud_mobile_gateqway.foobar.id
   prefix            = "10.16.0.0/24"
-  sim_id            = "${sakuracloud_sim.foobar.id}"
+  sim_id            = sakuracloud_sim.foobar.id
 }
-
 ```
 
 ## Argument Reference

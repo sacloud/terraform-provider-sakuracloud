@@ -14,7 +14,7 @@ Provides a SakuraCloud Database resource. This can be used to create, update, an
 
 ```hcl
 # Create a new Database
-resource sakuracloud_database "foobar" {
+resource "sakuracloud_database" "foobar" {
   name            = "foobar"
   database_type   = "mariadb"
   plan            = "30g"
@@ -25,13 +25,13 @@ resource sakuracloud_database "foobar" {
   backup_time     = "00:00"
   backup_weekdays = ["mon", "tue", "wed"]
 
-  switch_id       = "${sakuracloud_switch.foobar.id}"
-  ipaddress1      = "192.168.11.101"
-  nw_mask_len     = 24
-  default_route   = "192.168.11.1"
-  
-  description    = "description"
-  tags           = ["foo", "bar"]
+  switch_id     = sakuracloud_switch.foobar.id
+  ipaddress1    = "192.168.11.101"
+  nw_mask_len   = 24
+  default_route = "192.168.11.1"
+
+  description = "description"
+  tags        = ["foo", "bar"]
 }
 ```
 

@@ -5,7 +5,7 @@
 ### 設定例
 
 ```hcl
-provider "sakuracloud" {
+provider sakuracloud {
   token  = "your API token"
   secret = "your API secret"
   zone   = "target zone"

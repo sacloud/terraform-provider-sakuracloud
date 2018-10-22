@@ -6,7 +6,7 @@
 
 ```hcl
 #ディスクの定義
-data sakuracloud_disk "disk01" {
+data "sakuracloud_disk" "disk01" {
   name_selectors = ["disk01"]
 }
 ```

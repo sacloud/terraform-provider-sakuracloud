@@ -8,21 +8,21 @@
 
 ```hcl
 # DNSゾーン参照
-data sakuracloud_dns "dns" {
+data "sakuracloud_dns" "dns" {
   name_selectors = ["example.com"]
 }
 
 # Aレコード1(test1.example.com)
-resource sakuracloud_dns_record "record01" {
-  dns_id = "${data.sakuracloud_dns.dns.id}"
+resource "sakuracloud_dns_record" "record01" {
+  dns_id = data.sakuracloud_dns.dns.id
   name   = "test"
   type   = "A"
   value  = "192.168.0.1"
 }
 
 # Aレコード2(test.example.com)
-resource sakuracloud_dns_record "record02" {
-  dns_id = "${data.sakuracloud_dns.dns.id}"
+resource "sakuracloud_dns_record" "record02" {
+  dns_id = data.sakuracloud_dns.dns.id
   name   = "test"
   type   = "A"
   value  = "192.168.0.2"

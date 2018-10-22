@@ -11,31 +11,31 @@
 ### 設定例
 
 ```hcl
-resource sakuracloud_server "sv" {
+resource "sakuracloud_server" "sv" {
   name = "sv"
 }
 
-resource sakuracloud_packet_filter "pf" {
+resource "sakuracloud_packet_filter" "pf" {
   name = "pf"
 
-  expressions = {
+  expressions {
     protocol  = "ip"
-    source_nw = "${sakuracloud_server.sv.ipaddress}"
+    source_nw = sakuracloud_server.sv.ipaddress
   }
 }
 
 # リソース間の接続のみを扱うリソース = コネクタリソース
-resource sakuracloud_server_connector "connector" {
-  server_id         = "${sakuracloud_server.sv.id}"
-  
+resource "sakuracloud_server_connector" "connector" {
+  server_id = sakuracloud_server.sv.id
+
   # パケットフィルタ
-  packet_filter_ids = ["${sakuracloud_packet_filter.pf.id}"]
+  packet_filter_ids = [sakuracloud_packet_filter.pf.id]
   
   # ディスク
-  #disks             = ["${sakuracloud_disk.disk01.id}"]
+  #disks             = [sakuracloud_disk.disk01.id]
   
   # ISOイメージ(CD-ROM)
-  #cdrom_id          = "${data.sakuracloud_cdrom.centos.id}"
+  #cdrom_id          = data.sakuracloud_cdrom.centos.id
 }
 ```
 

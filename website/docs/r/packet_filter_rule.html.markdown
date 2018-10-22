@@ -15,27 +15,27 @@ Provides a SakuraCloud Packet Filter Rule resource. This can be used to create, 
 ```hcl
 # Create a new Packet Filter
 resource "sakuracloud_packet_filter" "foobar" {
-    name        = "foobar"
+  name = "foobar"
 }
 
 # Create a new packet filter rule
-resource sakuracloud_packet_filter_rule "rule0" {
-    packet_filter_id = "${sakuracloud_packet_filter.foobar.id}"
+resource "sakuracloud_packet_filter_rule" "rule0" {
+  packet_filter_id = sakuracloud_packet_filter.foobar.id
 
- 	protocol    = "tcp"
-	source_nw   = "0.0.0.0/0"
-	source_port = "0-65535"
-	dest_port   = "80"
-	order       = 0
+  protocol    = "tcp"
+  source_nw   = "0.0.0.0/0"
+  source_port = "0-65535"
+  dest_port   = "80"
+  order       = 0
 }
 
-resource sakuracloud_packet_filter_rule "rule1" {
-    packet_filter_id = "${sakuracloud_packet_filter.foobar.id}"
+resource "sakuracloud_packet_filter_rule" "rule1" {
+  packet_filter_id = sakuracloud_packet_filter.foobar.id
 
-	protocol    = "ip"
-	source_nw   = "0.0.0.0/0"
-	allow       = false
-	description = "deny all"
+  protocol    = "ip"
+  source_nw   = "0.0.0.0/0"
+  allow       = false
+  description = "deny all"
 }
 
 ```

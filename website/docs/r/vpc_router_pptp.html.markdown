@@ -14,27 +14,26 @@ Provides a SakuraCloud VPC Router PPTP resource. This can be used to create, upd
 
 ```hcl
 # Create a new VPC Router(standard)
-resource sakuracloud_vpc_router "foobar" {
-  name           = "foobar"
+resource "sakuracloud_vpc_router" "foobar" {
+  name = "foobar"
 }
 
 # Add NIC to the VPC Router
-resource sakuracloud_vpc_router_interface "eth1" {
-  vpc_router_id = "${sakuracloud_vpc_router.foobar.id}"
+resource "sakuracloud_vpc_router_interface" "eth1" {
+  vpc_router_id = sakuracloud_vpc_router.foobar.id
   index         = 1
-  switch_id     = "${sakuracloud_switch.foobar.id}"
+  switch_id     = sakuracloud_switch.foobar.id
   ipaddress     = ["192.168.2.1"]
   nw_mask_len   = 24
 }
 
 # Create a new PPTP config.
-resource sakuracloud_vpc_router_pptp "pptp" {
-    vpc_router_id           = "${sakuracloud_vpc_router.foobar.id}"
-    vpc_router_interface_id = "${sakuracloud_vpc_router_interface.eth1.id}"
+resource "sakuracloud_vpc_router_pptp" "pptp" {
+  vpc_router_id           = sakuracloud_vpc_router.foobar.id
+  vpc_router_interface_id = sakuracloud_vpc_router_interface.eth1.id
 
-    range_start       = "192.168.2.51"
-    range_stop        = "192.168.2.100"
-
+  range_start = "192.168.2.51"
+  range_stop  = "192.168.2.100"
 }
 ```
 

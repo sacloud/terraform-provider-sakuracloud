@@ -8,37 +8,37 @@
 # データベース リードレプリカ定義
 resource "sakuracloud_database_read_replica" "foobar" {
   # マスター側データベースのID 
-  master_id = "${sakuracloud_database.foobar.id}"
-  
+  master_id = sakuracloud_database.master.id
+
   ipaddress1 = "192.168.11.111"
+
   # IPアドレス以外のネットワーク関連項目が未指定の場合、マスター側から引き継ぐ
-  #switch_id     = "${sakuracloud_switch.sw.id}"
+  #switch_id     = sakuracloud_switch.sw.id
   #nw_mask_len   = 24
   #default_route = "192.168.11.1"  
-  
+
   name = "slave"
 }
 
-
 # データベースの定義(マスター側)
-resource sakuracloud_database "master" {
+resource "sakuracloud_database" "master" {
   database_type = "postgresql"
   plan          = "10g"
   user_name     = "defuser"
   user_password = "DatabasePasswordUser397"
- 
+
   replica_password = "DatabasePasswordUser397"
 
-  switch_id     = "${sakuracloud_switch.sw.id}"
+  switch_id     = sakuracloud_switch.sw.id
   ipaddress1    = "192.168.11.101"
   nw_mask_len   = 24
   default_route = "192.168.11.1"
 
-  name        = "name"
+  name = "name"
 }
 
 #接続するスイッチの定義
-resource sakuracloud_switch "sw" {
+resource "sakuracloud_switch" "sw" {
   name = "sw"
 }
 ```

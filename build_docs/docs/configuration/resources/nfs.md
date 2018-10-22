@@ -6,27 +6,25 @@
 
 ```hcl
 #NFS定義
-resource sakuracloud_nfs "foobar" {
-  switch_id = "${sakuracloud_switch.sw.id}"
+resource "sakuracloud_nfs" "foobar" {
+  switch_id = sakuracloud_switch.sw.id
 
   #プラン[100/500/1024(1T)/2048(2T)/4096(4T)]
   #plan = "100"
 
   ipaddress = "192.168.11.101"
+
   #default_route = "192.168.11.1"
   nw_mask_len = 24
 
   name        = "name"
   description = "Description"
   tags        = ["tag1", "tag2"]
-
-  zone = "tk1v"
 }
 
 #NFSの上流スイッチ
-resource sakuracloud_switch "sw" {
+resource "sakuracloud_switch" "sw" {
   name = "sw"
-  zone = "tk1v"
 }
 ```
 

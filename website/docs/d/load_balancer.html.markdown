@@ -13,7 +13,7 @@ Use this data source to retrieve information about a SakuraCloud Load Balancer.
 ## Example Usage
 
 ```hcl
-data sakuracloud_load_balancer "foobar" {
+data "sakuracloud_load_balancer" "foobar" {
   name_selectors = ["foobar"]
 }
 ```

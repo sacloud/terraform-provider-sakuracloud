@@ -12,23 +12,13 @@ SSH公開鍵をさくらのクラウド側で生成するためのリソース�
 ### 設定例
 
 ```hcl
-resource sakuracloud_ssh_key_gen "key" {
+resource "sakuracloud_ssh_key_gen" "key" {
   name = "foobar"
 
   # パスフレーズ(オプション、指定する場合は8〜64文字)
   # pass_phrase = "your_pass_phrase"
 
   description = "Description"
-  
-  # local_execを利用してローカルマシンに秘密鍵ファイルを生成する例
-  provisioner "local-exec" {
-    command = "echo \"${self.private_key}\" > id_rsa; chmod 0600 id_rsa"
-  }
-  # terraform destroy実行時にローカルマシン上の秘密鍵ファイルを削除
-  provisioner "local-exec" {
-    when    = "destroy"
-    command = "rm -f id_rsa"
-  }
 }
 ```
 

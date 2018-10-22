@@ -6,12 +6,12 @@
 
 ```hcl
 # アーカイブの参照(パブリックアーカイブ)
-data sakuracloud_archive "centos" {
+data "sakuracloud_archive" "centos" {
   os_type = "centos"
 }
 
 # アーカイブの参照(名称 or タグ指定)
-data sakuracloud_archive "ubuntu" {
+data "sakuracloud_archive" "ubuntu" {
   name_selectors = ["Ubuntu", "LTS"]
   tag_selectors  = ["current-stable", "os-linux"]
 }

@@ -7,12 +7,13 @@
 ### 設定例
 
 ```hcl
-resource sakuracloud_ssh_key "mykey" {
-  name       = "mykey"
-  
+resource "sakuracloud_ssh_key" "mykey" {
+  name = "mykey"
+
   public_key = "ssh-rsa XXXXXXXXX....."
+
   # or
-  #public_key = "${file("id_rsa.pub")}"
+  #public_key = file("id_rsa.pub")
 
   description = "Description"
 }

@@ -5,7 +5,7 @@
 ### 設定例
 
 ```hcl
-data sakuracloud_server "myserver" {
+data "sakuracloud_server" "myserver" {
   name_selectors = ["foobar"]
 }
 ```

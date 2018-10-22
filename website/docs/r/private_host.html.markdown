@@ -14,7 +14,7 @@ Provides a SakuraCloud Private Host resource. This can be used to create, update
 
 ```hcl
 # Create a new Private Host
-resource sakuracloud_private_host "foobar" {
+resource "sakuracloud_private_host" "foobar" {
   name        = "foobar"
   description = "description"
   tags        = ["foo", "bar"]
@@ -23,7 +23,7 @@ resource sakuracloud_private_host "foobar" {
 # Add server on Private Host
 resource "sakuracloud_server" "foobar" {
   name            = "example"
-  private_host_id = "${sakuracloud_private_host.foobar.id}"
+  private_host_id = sakuracloud_private_host.foobar.id
 }
 
 ```

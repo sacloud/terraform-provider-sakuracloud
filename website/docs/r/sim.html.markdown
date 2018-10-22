@@ -14,24 +14,25 @@ Provides a SakuraCloud SIM resource. This can be used to create, update, and del
 
 ```hcl
 # Create a new SIM
-resource sakuracloud_sim "foobar" {
-    name     = "foobar"
-    iccid    = "<your-iccid>"
-    passcode = "<your-passcode>"
-    # imei     = "<imei>"
-    # enabled  = true
+resource "sakuracloud_sim" "foobar" {
+  name     = "foobar"
+  iccid    = "<your-iccid>"
+  passcode = "<your-passcode>"
 
-    # connect to the Mobile Gateway 
-    mobile_gateway_id = "${sakuracloud_mobile_gateway.foobar.id}"
-    ipaddress         = "192.168.2.1"
-    
-    description = "description"
-    tags        = ["foo", "bar"]
+  # imei     = "<imei>"
+  # enabled  = true
+
+  # connect to the Mobile Gateway 
+  mobile_gateway_id = sakuracloud_mobile_gateway.foobar.id
+  ipaddress         = "192.168.2.1"
+
+  description = "description"
+  tags        = ["foo", "bar"]
 }
 
 # Create a new Mobile Gateway
-resource sakuracloud_mobile_gateway "foobar" {
-    name = "foobar"
+resource "sakuracloud_mobile_gateway" "foobar" {
+  name = "foobar"
 }
 ```
 

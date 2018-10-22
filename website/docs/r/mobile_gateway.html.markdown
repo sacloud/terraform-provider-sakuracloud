@@ -14,16 +14,16 @@ Provides a SakuraCloud Mobile Gateway resource. This can be used to create, upda
 
 ```hcl
 # Create a new Mobile Gateway
-resource sakuracloud_mobile_gateway "foobar" {
-  name                = "foobar"
+resource "sakuracloud_mobile_gateway" "foobar" {
+  name = "foobar"
 
-  switch_id           = "${sakuracloud_switch.sw.id}"
+  switch_id           = sakuracloud_switch.sw.id
   private_ipaddress   = "192.168.11.101"
   private_nw_mask_len = 24
   internet_connection = true
   dns_server1         = "8.8.8.8"
-  dns_server2         = "8.8.4.4" 
- 
+  dns_server2         = "8.8.4.4"
+
   traffic_control = {
     quota                = 256
     band_width_limit     = 64
@@ -31,10 +31,10 @@ resource sakuracloud_mobile_gateway "foobar" {
     enable_slack         = true
     slack_webhook        = "https://hooks.slack.com/services/xxx/xxx/xxx"
     auto_traffic_shaping = true
-  } 
-  
-  description         = "description"
-  tags                = ["foo", "bar"]
+  }
+
+  description = "description"
+  tags        = ["foo", "bar"]
 }
 ```
 
