@@ -7,7 +7,7 @@
 ### 設定例
 
 ```hcl
-data sakuracloud_ssh_key "mykey" {
+data "sakuracloud_ssh_key" "mykey" {
   name_selectors = ["foobar"]
 }
 ```

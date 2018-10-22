@@ -13,7 +13,7 @@ Use this data source to retrieve information about a SakuraCloud Switch.
 ## Example Usage
 
 ```hcl
-data sakuracloud_switch "foobar" {
+data "sakuracloud_switch" "foobar" {
   name_selectors = ["foobar"]
 }
 ```

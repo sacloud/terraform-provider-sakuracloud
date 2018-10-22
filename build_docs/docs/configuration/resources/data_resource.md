@@ -13,20 +13,20 @@
 ### 利用例
 
 ```hcl
-data sakuracloud_archive "ubuntu" {
-    filter = {
-        name = "Name"
-        values = ["Ubuntu Server"]
-    }
-    filter = {
-        name = "Tags"
-        values = ["current-stable","arch-64bit","os-linux"]
-    }
+data "sakuracloud_archive" "ubuntu" {
+  filter {
+    name   = "Name"
+    values = ["Ubuntu Server"]
+  }
+  filter {
+    name   = "Tags"
+    values = ["current-stable", "arch-64bit", "os-linux"]
+  }
 }
 
-resource sakuracloud_disk "disk01"{
-    name = "disk01"
-    source_archive_id = "${data.sakuracloud_archive.ubuntu.id}"
+resource "sakuracloud_disk" "disk01" {
+  name              = "disk01"
+  source_archive_id = data.sakuracloud_archive.ubuntu.id
 }
 ```
 
@@ -35,12 +35,12 @@ resource sakuracloud_disk "disk01"{
 アーカイブ(`sakuracloud_archive`)リソースでは、`os_type`パラメーターが利用可能です。
 
 ```hcl
-data sakuracloud_archive "ubuntu" {
-    os_type = "ubuntu" # Ubuntuの最新安定版パブリックアーカイブ
+data "sakuracloud_archive" "ubuntu" {
+  os_type = "ubuntu" # Ubuntuの最新安定版パブリックアーカイブ
 }
 
-data sakuracloud_archive "centos" {
-    os_type = "centos" # CentOSの最新安定版パブリックアーカイブ
+data "sakuracloud_archive" "centos" {
+  os_type = "centos" # CentOSの最新安定版パブリックアーカイブ
 }
 
 ```

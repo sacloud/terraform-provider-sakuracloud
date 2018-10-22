@@ -5,7 +5,7 @@
 ### 設定例
 
 ```hcl
-resource sakuracloud_internet "router" {
+resource "sakuracloud_internet" "router" {
   name = "router"
 
   #ネットワークマスク超

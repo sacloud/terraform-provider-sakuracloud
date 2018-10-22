@@ -8,23 +8,24 @@
 
 ```hcl
 #ブリッジの参照
-data sakuracloud_bridge "br01" {
+data "sakuracloud_bridge" "br01" {
   name_selectors = ["br01"]
 }
 
 # ブリッジに接続するスイッチ(東京第1ゾーン)
-resource sakuracloud_switch "sw_tk1a" {
+resource "sakuracloud_switch" "sw_tk1a" {
   name      = "switch_tk1a"
-  bridge_id = "${data.sakuracloud_bridge.br01.id}"
+  bridge_id = data.sakuracloud_bridge.br01.id
   zone      = "tk1a"
 }
 
 # ブリッジに接続するスイッチ(石狩第2ゾーン)
-resource sakuracloud_switch "sw_is1b" {
+resource "sakuracloud_switch" "sw_is1b" {
   name      = "switch_is1b"
-  bridge_id = "${data.sakuracloud_bridge.br01.id}"
+  bridge_id = data.sakuracloud_bridge.br01.id
   zone      = "is1b"
 }
+
 ```
 
 ### パラメーター

@@ -13,7 +13,7 @@ Use this data source to retrieve information about a SakuraCloud SSH Key.
 ## Example Usage
 
 ```hcl
-data sakuracloud_ssh_key "foobar" {
+data "sakuracloud_ssh_key" "foobar" {
   name_selectors = ["foobar"]
 }
 ```

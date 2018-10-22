@@ -8,21 +8,22 @@
 
 ```hcl
 # ルータの定義
-resource sakuracloud_internet "foobar" {
+resource "sakuracloud_internet" "foobar" {
   name = "router"
 }
 
 # ルータに追加するグローバルIPアドレスブロック
-resource sakuracloud_subnet "foobar" {
+resource "sakuracloud_subnet" "foobar" {
   # ルータのID
-  internet_id = "${sakuracloud_internet.foobar.id}"
+  internet_id = sakuracloud_internet.foobar.id
 
   # ネクストホップ
-  next_hop = "${sakuracloud_internet.foobar.nw_min_ipaddress}"
-
+  next_hop = sakuracloud_internet.foobar.nw_min_ipaddress
+  
   # ネットワークマスク長
   #nw_mask_len = 28
 }
+
 ```
 
 ### パラメーター

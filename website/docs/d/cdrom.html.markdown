@@ -13,7 +13,7 @@ Use this data source to retrieve information about a SakuraCloud CD-ROM.
 ## Example Usage
 
 ```hcl
-data sakuracloud_cdrom "foobar" {
+data "sakuracloud_cdrom" "foobar" {
   name_selectors = ["foobar"]
 }
 ```

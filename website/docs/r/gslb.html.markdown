@@ -15,19 +15,20 @@ Provides a SakuraCloud GSLB resource. This can be used to create, update, and de
 ```hcl
 # Create a new GSLB
 resource "sakuracloud_gslb" "foobar" {
-  name         = "foobar"
-  
-  health_check = {
+  name = "foobar"
+
+  health_check {
     protocol    = "https"
     delay_loop  = 20
     host_header = "example.com"
     path        = "/"
     status      = "200"
   }
+
   sorry_server = "192.2.0.1"
-  
-  description  = "description"
-  tags         = ["foo", "bar"]
+
+  description = "description"
+  tags        = ["foo", "bar"]
 }
 ```
 

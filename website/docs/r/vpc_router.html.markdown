@@ -14,26 +14,26 @@ Provides a SakuraCloud VPC Router resource. This can be used to create, update, 
 
 ```hcl
 # Create a new VPC Router(standard)
-resource sakuracloud_vpc_router "foobar" {
-  name           = "foobar"
-  
+resource "sakuracloud_vpc_router" "foobar" {
+  name = "foobar"
+
   #syslog_host         = "192.168.11.1"
   #internet_connection = true
-  
-  description    = "description"
-  tags           = ["foo", "bar"]
+
+  description = "description"
+  tags        = ["foo", "bar"]
 }
 
 # Create a new VPC Router(premium or highspec)
-resource sakuracloud_vpc_router "foobar1" {
-  name                = "foobar"
-  plan                = "premium"
-  switch_id           = "${sakuracloud_internet.foobar.switch_id}"
-  vip                 = "${sakuracloud_internet.foobar.ipaddresses[0]}"
-  ipaddress1          = "${sakuracloud_internet.foobar.ipaddresses[1]}"
-  ipaddress2          = "${sakuracloud_internet.foobar.ipaddresses[2]}"
-  #aliases             = ["${sakuracloud_internet.foobar.ipaddresses[3]}"] 
-  vrid                = 1
+resource "sakuracloud_vpc_router" "foobar1" {
+  name       = "foobar"
+  plan       = "premium"
+  switch_id  = sakuracloud_internet.foobar.switch_id
+  vip        = sakuracloud_internet.foobar.ipaddresses[0]
+  ipaddress1 = sakuracloud_internet.foobar.ipaddresses[1]
+  ipaddress2 = sakuracloud_internet.foobar.ipaddresses[2]
+  #aliases   = [sakuracloud_internet.foobar.ipaddresses[3]] 
+  vrid = 1
 }
 
 ```

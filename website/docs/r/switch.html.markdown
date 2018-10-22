@@ -14,13 +14,13 @@ Provides a SakuraCloud Switch resource. This can be used to create, update, and 
 
 ```hcl
 # Create a new Switch
-resource sakuracloud_switch "foobar" {
+resource "sakuracloud_switch" "foobar" {
   name        = "foobar"
   description = "description"
   tags        = ["foo", "bar"]
- 
+
   # If you want to connect to the bridge, please uncomment here.
-  #bridge_id = "${sakuracloud_bridge.br.id}"
+  #bridge_id = sakuracloud_bridge.br.id
 }
 ```
 

@@ -7,21 +7,22 @@
 ### 設定例
 
 ```hcl
-data sakuracloud_gslb "gslb" {
+data "sakuracloud_gslb" "gslb" {
  name_selectors = ["foobar"]
 }
 
 #GSLB配下のサーバ1
-resource sakuracloud_gslb_server "gslb_server01" {
-  gslb_id   = "${data.sakuracloud_gslb.gslb.id}"
+resource "sakuracloud_gslb_server" "gslb_server01" {
+  gslb_id   = data.sakuracloud_gslb.gslb.id
   ipaddress = "192.0.2.1"
   #weight    = 1
   #enabled   = true
 }
 
+
 #GSLB配下のサーバ2
-resource sakuracloud_gslb_server "gslb_server02" {
-  gslb_id   = "${data.sakuracloud_gslb.gslb.id}"
+resource "sakuracloud_gslb_server" "gslb_server02" {
+  gslb_id   = data.sakuracloud_gslb.gslb.id
   ipaddress = "192.0.2.2"
   #weight    = 1
   #enabled   = true

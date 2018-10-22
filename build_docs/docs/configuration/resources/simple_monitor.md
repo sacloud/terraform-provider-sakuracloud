@@ -8,21 +8,22 @@
 
 ```hcl
 # HTTP監視の例
-resource sakuracloud_simple_monitor "mymonitor" {
-  target = "${sakuracloud_server.myserver.ipaddress}"
+resource "sakuracloud_simple_monitor" "mymonitor" {
+  target = sakuracloud_server.myserver.ipaddress
 
-  health_check = {
+  health_check {
     protocol   = "http"
     delay_loop = 60
     path       = "/"
     status     = "200"
-    
-    # BASIC認証
-    # username   = "foo"
-    # password   = "bar"
   }
 
+  # BASIC認証
+  # username   = "foo"
+  # password   = "bar"
+
   notify_email_enabled = true
+
   #notify_email_html    = false
   #notify_slack_enabled = false
   #notify_slack_webhook = "https://hooks.slack.com/services/XXXXXXXXX/XXXXXXXXX/XXXXXXXXXXXXXXXXXXXXXXXX"
@@ -33,15 +34,16 @@ resource sakuracloud_simple_monitor "mymonitor" {
 }
 
 # SSLサーバ証明書 有効期限監視の例
-resource sakuracloud_simple_monitor "my_sslcert_monitor" {
+resource "sakuracloud_simple_monitor" "my_sslcert_monitor" {
   target = "example.com"
 
-  health_check = {
+  health_check {
     protocol       = "sslcertificate"
     remaining_days = 30
   }
 
   notify_email_enabled = true
+
   #notify_email_html    = false
   #notify_slack_enabled = false
   #notify_slack_webhook = "https://hooks.slack.com/services/XXXXXXXXX/XXXXXXXXX/XXXXXXXXXXXXXXXXXXXXXXXX"
@@ -50,6 +52,7 @@ resource sakuracloud_simple_monitor "my_sslcert_monitor" {
   description = "Description"
   tags        = ["tag1", "tag2"]
 }
+
 ```
 
 ### パラメーター

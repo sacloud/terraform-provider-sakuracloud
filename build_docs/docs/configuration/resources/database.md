@@ -6,12 +6,12 @@
 
 ```hcl
 # データベースの定義
-resource sakuracloud_database "foobar" {
+resource "sakuracloud_database" "foobar" {
   database_type = "postgresql"
   plan          = "10g"
   user_name     = "defuser"
   user_password = "DatabasePasswordUser397"
- 
+
   # レプリケーションのマスターにする場合(postgresの場合のみ指定可) 
   #replica_password = "DatabasePasswordUser397"
 
@@ -22,7 +22,7 @@ resource sakuracloud_database "foobar" {
   backup_weekdays = ["mon", "tue", "wed"]
   backup_time     = "00:00"
 
-  switch_id     = "${sakuracloud_switch.sw.id}"
+  switch_id     = sakuracloud_switch.sw.id
   ipaddress1    = "192.168.11.101"
   nw_mask_len   = 24
   default_route = "192.168.11.1"
@@ -33,7 +33,7 @@ resource sakuracloud_database "foobar" {
 }
 
 #接続するスイッチの定義
-resource sakuracloud_switch "sw" {
+resource "sakuracloud_switch" "sw" {
   name = "sw"
 }
 ```

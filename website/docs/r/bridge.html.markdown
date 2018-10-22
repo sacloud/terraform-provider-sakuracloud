@@ -14,9 +14,9 @@ Provides a SakuraCloud Bridge resource. This can be used to create, update, and 
 
 ```hcl
 # Create a new Bridge
-resource sakuracloud_bridge "foobar" {
+resource "sakuracloud_bridge" "foobar" {
   name        = "foobar"
-  switch_ids  = ["${sakuracloud_switch.foobar.id}"]
+  switch_ids  = [sakuracloud_switch.foobar.id]
   description = "description"
 }
 ```

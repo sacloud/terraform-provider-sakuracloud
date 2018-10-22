@@ -13,7 +13,7 @@ Use this data source to retrieve information about a SakuraCloud Simple Monitor.
 ## Example Usage
 
 ```hcl
-data sakuracloud_simple_monitor "foobar" {
+data "sakuracloud_simple_monitor" "foobar" {
   name_selectors = ["foobar"]
 }
 ```

@@ -19,15 +19,16 @@ resource "sakuracloud_disk" "foobar" {
   plan              = "ssd"
   connector         = "virtio"
   size              = 20
-  source_archive_id = "${data.sakuracloud_archive.ubuntu.id}"
+  
+  source_archive_id = data.sakuracloud_archive.ubuntu.id
   # or
-  # source_disk_id  = "<your-disk-id>"
+  #source_disk_id = "<your-disk-id>"
 
   # for storage isolation
   #distant_from = ["<your-disk-id>"]
-  
-  description       = "description"
-  tags              = ["foo", "bar"]
+
+  description = "description"
+  tags        = ["foo", "bar"]
 }
 
 # Source archive

@@ -14,26 +14,26 @@ Provides a SakuraCloud VPC Router Firewall resource. This can be used to create 
 
 ```hcl
 # Create a new VPC Router(standard)
-resource sakuracloud_vpc_router "foobar" {
-  name           = "foobar"
+resource "sakuracloud_vpc_router" "foobar" {
+  name = "foobar"
 }
 
 # Add NIC to the VPC Router
-resource sakuracloud_vpc_router_interface "eth1" {
-  vpc_router_id = "${sakuracloud_vpc_router.foobar.id}"
+resource "sakuracloud_vpc_router_interface" "eth1" {
+  vpc_router_id = sakuracloud_vpc_router.foobar.id
   index         = 1
-  switch_id     = "${sakuracloud_switch.foobar.id}"
+  switch_id     = sakuracloud_switch.foobar.id
   ipaddress     = ["192.168.2.1"]
   nw_mask_len   = 24
 }
 
 # Create a new Firewall config
 resource "sakuracloud_vpc_router_firewall" "send_fw" {
-  vpc_router_id              = "${sakuracloud_vpc_router.foobar.id}"
+  vpc_router_id              = sakuracloud_vpc_router.foobar.id
   vpc_router_interface_index = 1
-  
-  direction   = "send"
-  expressions = {
+
+  direction = "send"
+  expressions {
     protocol    = "tcp"
     source_nw   = ""
     source_port = "80"
@@ -44,7 +44,7 @@ resource "sakuracloud_vpc_router_firewall" "send_fw" {
     description = "allow http"
   }
 
-  expressions = {
+  expressions {
     protocol    = "ip"
     source_nw   = ""
     source_port = ""
@@ -55,6 +55,7 @@ resource "sakuracloud_vpc_router_firewall" "send_fw" {
     description = "deny all"
   }
 }
+
 
 ```
 

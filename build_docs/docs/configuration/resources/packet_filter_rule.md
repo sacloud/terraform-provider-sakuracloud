@@ -11,14 +11,14 @@
 
 ```hcl
 
-resource sakuracloud_packet_filter "myfilter" {
+resource "sakuracloud_packet_filter" "myfilter" {
   name        = "myfilter"
   description = "PacketFilter from terraform for SAKURA CLOUD"
 }
 
-resource sakuracloud_packet_filter_rule "rule1" {
-  packet_filter_id = "${sakuracloud_packet_filter.myfilter.id}"
-  
+resource "sakuracloud_packet_filter_rule" "rule1" {
+  packet_filter_id = sakuracloud_packet_filter.myfilter.id
+
   protocol    = "tcp"
   source_nw   = "192.168.2.0/24"
   source_port = "0-65535"
@@ -27,9 +27,9 @@ resource sakuracloud_packet_filter_rule "rule1" {
   order       = 0
 }
 
-resource sakuracloud_packet_filter_rule "rule2" {
-  packet_filter_id = "${sakuracloud_packet_filter.myfilter.id}"
-  
+resource "sakuracloud_packet_filter_rule" "rule2" {
+  packet_filter_id = sakuracloud_packet_filter.myfilter.id
+
   protocol    = "ip"
   allow       = false
   description = "Deny all"
@@ -38,14 +38,14 @@ resource sakuracloud_packet_filter_rule "rule2" {
 
 # 以下のようにcount構文と併用することで動的にルールの追加が行えます
 #resource sakuracloud_packet_filter_rule "rules" {
-#  packet_filter_id = "${sakuracloud_packet_filter.myfilter.id}"
-#  protocol         = "${var.protocol[count.index]}"
-#  source_nw        = "${var.source_nw[count.index]}"
-#  source_port      = "${var.source_port[count.index]}"
-#  dest_port        = "${var.dest_port[count.index]}"
-#  allow            = "${var.allow[count.index]}"
+#  packet_filter_id = sakuracloud_packet_filter.myfilter.id
+#  protocol         = var.protocol[count.index]
+#  source_nw        = var.source_nw[count.index]
+#  source_port      = var.source_port[count.index]
+#  dest_port        = var.dest_port[count.index]
+#  allow            = var.allow[count.index]
 #
-#  order = "${count.index}"
+#  order = count.index
 #  count = 10
 #}
 

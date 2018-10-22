@@ -20,7 +20,7 @@ resource "sakuracloud_dns" "foobar" {
 
 # Create a new DNS Record(Type: A)
 resource "sakuracloud_dns_record" "foobar" {
-  dns_id = "${sakuracloud_dns.foobar.id}"
+  dns_id = sakuracloud_dns.foobar.id
   name   = "test1"
   type   = "A"
   value  = "192.168.2.1"

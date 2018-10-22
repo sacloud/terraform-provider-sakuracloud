@@ -7,16 +7,17 @@
 ### 設定例
 
 ```hcl
-resource sakuracloud_note "mynote" {
+resource "sakuracloud_note" "mynote" {
   name = "mynote"
-  
+
   #クラス[shell or yaml_cloud_config]
   #class = "shell"
 
   #文字列を直接指定する場合
   content = "#!/bin/sh ..."
+
   #ファイルから読み込む場合
-  #content = "${file("example.sh")}"
+  #content = file("example.sh")
 
   description = "Description"
   tags        = ["tag1", "tag2"]

@@ -2,28 +2,24 @@
 
 ---
 
-**このリソースは石狩第2、東京第1ゾーンでのみ利用可能です。**
-
 自動バックアップの設定を行うリソースです。
 
 ### 設定例
 
 ```hcl
 #ディスクの定義
-resource sakuracloud_disk "disk01" {
+resource "sakuracloud_disk" "disk01" {
   name = "disk01"
-  zone = "is1b"
 }
 
 #自動バックアップ
-resource sakuracloud_auto_backup "foobar" {
+resource "sakuracloud_auto_backup" "foobar" {
   name           = "auto_backup"
-  disk_id        = "${sakuracloud_disk.disk01.id}"
+  disk_id        = sakuracloud_disk.disk01.id
   weekdays       = ["mon", "tue", "wed"]
   max_backup_num = 1
   description    = "description"
   tags           = ["tag1", "tag2"]
-  zone           = "is1b"
 }
 ```
 

@@ -17,6 +17,7 @@ pages:
       - v1.4での変更点: upgrade_to_v14.md
       - v1.6での変更点: upgrade_to_v16.md
       - v1.7での変更点: upgrade_to_v17.md
+      - v1.8での変更点: upgrade_to_v18.md
     - ブログ/記事/読み物: articles.md
   - 設定リファレンス:
     - 全体/共通項目:

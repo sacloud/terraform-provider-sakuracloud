@@ -6,9 +6,9 @@
 
 ```hcl
 resource "sakuracloud_private_host" "private_host" {
-    name = "private_host"
-    description = "PrivateHost from terraform for SAKURA CLOUD"
-    tags = ["tag1" , "tag2"]
+  name        = "private_host"
+  description = "PrivateHost from terraform for SAKURA CLOUD"
+  tags        = ["tag1", "tag2"]
 }
 ```
 

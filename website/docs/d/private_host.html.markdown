@@ -13,7 +13,7 @@ Use this data source to retrieve information about a SakuraCloud Private Host.
 ## Example Usage
 
 ```hcl
-data sakuracloud_private_host "foobar" {
+data "sakuracloud_private_host" "foobar" {
   name_selectors = ["foobar"]
 }
 ```

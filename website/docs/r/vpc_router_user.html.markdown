@@ -14,15 +14,15 @@ Provides a SakuraCloud VPC Router User resource. This can be used to create and 
 
 ```hcl
 # Create a new VPC Router(standard)
-resource sakuracloud_vpc_router "foobar" {
-  name           = "foobar"
+resource "sakuracloud_vpc_router" "foobar" {
+  name = "foobar"
 }
 
 # Create a new VPC Router User.
 resource "sakuracloud_vpc_router_user" "user" {
-    vpc_router_id = "${sakuracloud_vpc_router.foobar.id}"
-    name          = "<user-name>"
-    password      = "<p@ssword>"
+  vpc_router_id = sakuracloud_vpc_router.foobar.id
+  name          = "<user-name>"
+  password      = "<p@ssword>"
 }
 ```
 

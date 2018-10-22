@@ -8,22 +8,22 @@
 
 ```hcl
 #ブリッジの定義
-resource sakuracloud_bridge "br01" {
-  name        = "br01"
-  description = "BRIDGE from terraform for SAKURA CLOUD"
+resource "sakuracloud_bridge" "bridge" {
+  name        = "bridge"
+  description = "example bridge"
 }
 
 # ブリッジに接続するスイッチ(東京第1ゾーン)
-resource sakuracloud_switch "sw_tk1a" {
+resource "sakuracloud_switch" "tk1a" {
   name      = "switch_tk1a"
-  bridge_id = "${sakuracloud_bridge.br01.id}"
+  bridge_id = sakuracloud_bridge.bridge.id
   zone      = "tk1a"
 }
 
 # ブリッジに接続するスイッチ(石狩第2ゾーン)
-resource sakuracloud_switch "sw_is1b" {
+resource "sakuracloud_switch" "is1b" {
   name      = "switch_is1b"
-  bridge_id = "${sakuracloud_bridge.br01.id}"
+  bridge_id = sakuracloud_bridge.bridge.id
   zone      = "is1b"
 }
 ```
