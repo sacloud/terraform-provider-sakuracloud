@@ -68,6 +68,10 @@ func dataSourceSakuraCloudServer() *schema.Resource {
 				Type:     schema.TypeString,
 				Computed: true,
 			},
+			"display_ipaddress": {
+				Type:     schema.TypeString,
+				Computed: true,
+			},
 			"cdrom_id": {
 				Type:     schema.TypeString,
 				Computed: true,
@@ -81,6 +85,11 @@ func dataSourceSakuraCloudServer() *schema.Resource {
 				Computed: true,
 			},
 			"additional_nics": {
+				Type:     schema.TypeList,
+				Computed: true,
+				Elem:     &schema.Schema{Type: schema.TypeString},
+			},
+			"additional_display_ipaddresses": {
 				Type:     schema.TypeList,
 				Computed: true,
 				Elem:     &schema.Schema{Type: schema.TypeString},
