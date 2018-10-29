@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.7.1 (2018-10-29)
+
+* terraform.ioスタイルの英語版ドキュメントのプレビュー #373 (yamamoto-febc)
+* Fix ldflags #377 (blp1526)
+
+
 ## 1.7.0 (2018-10-17)
 
 * サーバ/ディスク新プラン対応 #362 (yamamoto-febc)
