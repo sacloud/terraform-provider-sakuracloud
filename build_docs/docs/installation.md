@@ -84,10 +84,10 @@ Available commands are:
 ## Terraform for さくらのクラウドのセットアップ
 
 - 1) 以下のリンクから、プラットフォームに応じたzipファイルをダウンロードします
-  - [Terraform for さくらのクラウド ダウンロードページ](http://releases.usacloud.jp/terraform/)
+  > [Terraform for さくらのクラウド ダウンロードページ](http://releases.usacloud.jp/terraform/)
 - 2) `~/.terraform.d/plugins/`配下に展開します  
-     ※ Windowsの場合は`%APPDATA%/terraform.d/plugins/`配下に展開します  
-     ※ setコマンドでAPPDATAがどこかを確認出来ます
+  > - Windowsの場合は`%APPDATA%/terraform.d/plugins/`配下に展開します  
+  > - setコマンドでAPPDATAがどこかを確認出来ます
      
 
 > Note:  
