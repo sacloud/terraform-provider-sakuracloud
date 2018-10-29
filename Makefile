@@ -7,8 +7,8 @@ CURRENT_VERSION = $(shell git log --merges --oneline | perl -ne 'if(m/^.+Merge p
 PROTOCOL_VERSION = $(shell go run tools/plugin-protocol-version/main.go)
 
 BUILD_LDFLAGS = "-s -w \
-	  -X github.com/sacloud/terraform-provider-sakuracloud/version.Revision=`git rev-parse --short HEAD` \
-	  -X github.com/sacloud/terraform-provider-sakuracloud/version.Version=$(CURRENT_VERSION)"
+	  -X github.com/sacloud/terraform-provider-sakuracloud/sakuracloud.Revision=`git rev-parse --short HEAD` \
+	  -X github.com/sacloud/terraform-provider-sakuracloud/sakuracloud.Version=$(CURRENT_VERSION)"
 
 default: test vet
 
