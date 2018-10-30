@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.8.0 (2018-10-30)
+
+* 表示用IPアドレス display_ipaddress 追加 #380 (yamamoto-febc)
+
+
 ## 1.7.1 (2018-10-29)
 
 * terraform.ioスタイルの英語版ドキュメントのプレビュー #373 (yamamoto-febc)

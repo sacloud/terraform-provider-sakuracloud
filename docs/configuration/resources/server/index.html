@@ -602,10 +602,12 @@
   #interface_driver = &quot;virtio&quot;
 
   #上流のNWとの接続方法
-  #nic = &quot;shared&quot;
+  #nic               = &quot;shared&quot;
+  #display_ipaddress = &quot;192.2.0.1&quot;
 
   #追加NIC
-  #additional_nics = [&quot;${sakuracloud_switch.myswitch.id}&quot;]
+  #additional_nics                = [&quot;${sakuracloud_switch.myswitch.id}&quot;]
+  #additional_display_ipaddresses = [&quot;192.2.0.1&quot;]
 
   #パケットフィルタ
   #packet_filter_ids = [&quot;${sakuracloud_packet_filter.myfilter.id}&quot;]
@@ -614,9 +616,9 @@
   #cdrom_id = &quot;${data.sakuracloud_cdrom.mycdrom.id}&quot;
 
   #ネットワーク設定(nicにスイッチIDが指定されている場合のみ)
-  #ipaddress   = &quot;192.168.0.101&quot;
-  #gateway     = &quot;192.168.0.1&quot;
-  #nw_mask_len = 24
+  #ipaddress         = &quot;192.168.0.101&quot;
+  #gateway           = &quot;192.168.0.1&quot;
+  #nw_mask_len       = 24
 
   description = &quot;Server from TerraForm for SAKURA CLOUD&quot;
   tags        = [&quot;tag1&quot;, &quot;tag2&quot;]
@@ -700,12 +702,28 @@
 <td>eth0の上流NWとの接続方法を指定する。</td>
 </tr>
 <tr>
+<td><code>display_ipaddress</code></td>
+<td align="center">-</td>
+<td>基本NIC:表示用IPアドレス</td>
+<td align="center">-</td>
+<td>文字列</td>
+<td>コントロールパネルに表示される表示用IPアドレス、<code>nic</code>にスイッチのIDが指定されている場合のみ有効</td>
+</tr>
+<tr>
 <td><code>additional_nics</code></td>
 <td align="center">-</td>
 <td>追加NIC</td>
 <td align="center">-</td>
 <td>リスト(文字列)</td>
 <td>追加で割り当てるNIC。接続するスイッチのID、または空文字を指定する。</td>
+</tr>
+<tr>
+<td><code>additional_display_ipaddress</code></td>
+<td align="center">-</td>
+<td>追加NIC:表示用IPアドレス</td>
+<td align="center">-</td>
+<td>リスト(文字列)</td>
+<td>追加で割り当てるNIC向けのコントロールパネルに表示される表示用IPアドレス</td>
 </tr>
 <tr>
 <td><code>packet_filter_ids</code></td>
