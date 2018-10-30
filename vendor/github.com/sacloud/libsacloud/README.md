@@ -14,14 +14,6 @@ See list of implemented API clients under this.
   - [Low-level API(api package)](https://godoc.org/github.com/sacloud/libsacloud/api)
   - [Model defines(sacloud package)](https://godoc.org/github.com/sacloud/libsacloud/sacloud)
 
-
-
-**Notice:** This is the library formerly known as
-`github.com/yamamoto-febc/libsacloud` -- Github will automatically redirect requests
-to this repository, but we recommend updating your references for clarity.
-
-
-
 # Installation
 
     go get -d github.com/sacloud/libsacloud
@@ -300,7 +292,7 @@ func main() {
 
 # License
 
-  `libsacloud` Copyright (C) 2016 Kazumichi Yamamoto.
+  `libsacloud` Copyright (C) 2016-2018 Kazumichi Yamamoto.
 
   This project is published under [Apache 2.0 License](LICENSE).
 

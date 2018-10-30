@@ -19,10 +19,12 @@ resource sakuracloud_server "myserver" {
   #interface_driver = "virtio"
 
   #上流のNWとの接続方法
-  #nic = "shared"
+  #nic               = "shared"
+  #display_ipaddress = "192.2.0.1"
 
   #追加NIC
-  #additional_nics = ["${sakuracloud_switch.myswitch.id}"]
+  #additional_nics                = ["${sakuracloud_switch.myswitch.id}"]
+  #additional_display_ipaddresses = ["192.2.0.1"]
 
   #パケットフィルタ
   #packet_filter_ids = ["${sakuracloud_packet_filter.myfilter.id}"]
@@ -31,9 +33,9 @@ resource sakuracloud_server "myserver" {
   #cdrom_id = "${data.sakuracloud_cdrom.mycdrom.id}"
 
   #ネットワーク設定(nicにスイッチIDが指定されている場合のみ)
-  #ipaddress   = "192.168.0.101"
-  #gateway     = "192.168.0.1"
-  #nw_mask_len = 24
+  #ipaddress         = "192.168.0.101"
+  #gateway           = "192.168.0.1"
+  #nw_mask_len       = 24
 
   description = "Server from TerraForm for SAKURA CLOUD"
   tags        = ["tag1", "tag2"]
@@ -65,7 +67,9 @@ resource sakuracloud_server "myserver" {
 | `memory` | -   | メモリ(GB単位)       | 1  | 数値 | 指定可能な値は[こちら](http://cloud.sakura.ad.jp/specification/server-disk/)のプラン一覧を参照ください |
 | `interface_driver` | -   | NICドライバ       | `virtio`  | `virtio`<br />`e1000` | - |
 | `nic` | - | 基本NIC | `shared` | `shared`(共有セグメント)<br />`[switch_id]`(スイッチのID)<br />`"disconnect"`(接続なし)|eth0の上流NWとの接続方法を指定する。 |
+| `display_ipaddress`| - | 基本NIC:表示用IPアドレス | - | 文字列 | コントロールパネルに表示される表示用IPアドレス、`nic`にスイッチのIDが指定されている場合のみ有効 |
 | `additional_nics` | - | 追加NIC | - | リスト(文字列) | 追加で割り当てるNIC。接続するスイッチのID、または空文字を指定する。 |
+| `additional_display_ipaddress` | - | 追加NIC:表示用IPアドレス | - | リスト(文字列) | 追加で割り当てるNIC向けのコントロールパネルに表示される表示用IPアドレス |
 | `packet_filter_ids`| - | パケットフィルタID | - | リスト(文字列) | NICに適用するパケットフィルタのIDをリストで指定する。リストの先頭からeth0,eth1の順で適用される |
 | `icon_id`       | -   | アイコンID         | - | 文字列| - |
 | `description` | - | 説明 | - | 文字列 | - |

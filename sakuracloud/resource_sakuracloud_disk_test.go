@@ -128,16 +128,16 @@ func TestAccImportSakuraCloudDisk(t *testing.T) {
 			return fmt.Errorf("expected 1 state: %#v", s)
 		}
 		expects := map[string]string{
-			"name":           "mydisk",
-			"plan":           "ssd",
-			"connector":      "virtio",
-			"size":           "20",
-			"source_disk_id": "",
-			"server_id":      "",
-			"description":    "Disk from TerraForm for SAKURA CLOUD",
-			"tags.0":         "hoge1",
-			"tags.1":         "hoge2",
-			"zone":           "is1b",
+			"name":                      "mydisk",
+			"plan":                      "ssd",
+			"connector":                 "virtio",
+			"size":                      "20",
+			"source_disk_id":            "",
+			"server_id":                 "",
+			"description":               "Disk from TerraForm for SAKURA CLOUD",
+			"tags.0":                    "hoge1",
+			"tags.1":                    "hoge2",
+			"zone":                      "is1b",
 			"graceful_shutdown_timeout": "60",
 		}
 

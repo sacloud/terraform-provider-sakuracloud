@@ -30,7 +30,9 @@ data sakuracloud_server "myserver" {
 | `memory` | メモリ(GB単位)       | - | 
 | `interface_driver`  | NICドライバ  | - |
 | `nic`    | 基本NIC | - |
+| `display_ipaddress`    | 基本NIC 表示用IPアドレス | - |
 | `additional_nics` | 追加NIC | - |
+| `additional_display_ipaddresses` | 追加NIC 表示用IPアドレス | - |
 | `packet_filter_ids`| パケットフィルタID | - |
 | `icon_id`     | アイコンID         | - |
 | `description` | 説明 | - |

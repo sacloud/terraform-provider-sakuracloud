@@ -302,6 +302,38 @@ func TestAccSakuraCloudServer_EditConnect_With_Same_Switch(t *testing.T) {
 	})
 }
 
+func TestAccResourceSakuraCloudServer_DisplayIPAddress(t *testing.T) {
+	resource.Test(t, resource.TestCase{
+		PreCheck:     func() { testAccPreCheck(t) },
+		Providers:    testAccProviders,
+		CheckDestroy: testAccCheckSakuraCloudServerDestroy,
+		Steps: []resource.TestStep{
+			{
+				Config: testAccCheckSakuraCloudServerConfig_display_ipaddress,
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr(
+						"sakuracloud_server.switched", "display_ipaddress", "192.2.0.1"),
+					resource.TestCheckResourceAttr(
+						"sakuracloud_server.switched", "additional_display_ipaddresses.0", "192.2.1.1"),
+					resource.TestCheckResourceAttr(
+						"sakuracloud_server.switched", "additional_display_ipaddresses.1", "192.2.2.1"),
+				),
+			},
+			{
+				Config: testAccCheckSakuraCloudServerConfig_display_ipaddress_upd,
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr(
+						"sakuracloud_server.switched", "display_ipaddress", "192.2.0.2"),
+					resource.TestCheckResourceAttr(
+						"sakuracloud_server.switched", "additional_display_ipaddresses.0", "192.2.1.2"),
+					resource.TestCheckResourceAttr(
+						"sakuracloud_server.switched", "additional_display_ipaddresses.1", "192.2.2.2"),
+				),
+			},
+		},
+	})
+}
+
 func TestAccSakuraCloudServer_NIC_CustomDiff(t *testing.T) {
 	var server sacloud.Server
 	resource.Test(t, resource.TestCase{
@@ -787,5 +819,35 @@ resource "sakuracloud_server" "foobar" {
     nw_mask_len = 24
     gateway     = "192.168.0.1"
     graceful_shutdown_timeout = 10
+}
+`
+
+const testAccCheckSakuraCloudServerConfig_display_ipaddress = `
+resource sakuracloud_switch "sw" {
+  count = 3
+  name = "sakuracloud_test_switch"
+}
+
+resource sakuracloud_server "switched" {
+  name              = "sakuracloud_test_connect_to_switched"
+  nic               = "${sakuracloud_switch.sw.0.id}"
+  display_ipaddress = "192.2.0.1"
+
+  additional_nics                = ["${sakuracloud_switch.sw.1.id}", "${sakuracloud_switch.sw.2.id}"]
+  additional_display_ipaddresses = ["192.2.1.1", "192.2.2.1"]
+}
+`
+const testAccCheckSakuraCloudServerConfig_display_ipaddress_upd = `
+resource sakuracloud_switch "sw" {
+  count = 3
+  name = "sakuracloud_test_switch"
+}
+
+resource sakuracloud_server "switched" {
+  name              = "sakuracloud_test_connect_to_switched"
+  nic               = "${sakuracloud_switch.sw.0.id}"
+  display_ipaddress = "192.2.0.2"
+  additional_nics   = ["${sakuracloud_switch.sw.1.id}", "${sakuracloud_switch.sw.2.id}"]
+  additional_display_ipaddresses = ["192.2.1.2", "192.2.2.2"]
 }
 `

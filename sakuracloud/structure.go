@@ -118,6 +118,28 @@ func flattenInterfaces(interfaces []sacloud.Interface) []interface{} {
 	return ret
 }
 
+func flattenDisplayIPAddress(interfaces []sacloud.Interface) []interface{} {
+	var ret []interface{}
+	for index, i := range interfaces {
+		if index == 0 {
+			continue
+		}
+		if i.Switch == nil {
+			ret = append(ret, "")
+		} else {
+			switch i.Switch.Scope {
+			case sacloud.ESCopeUser:
+				ip := i.GetUserIPAddress()
+				if ip == "0.0.0.0" {
+					ip = ""
+				}
+				ret = append(ret, ip)
+			}
+		}
+	}
+	return ret
+}
+
 func flattenPacketFilters(interfaces []sacloud.Interface) []string {
 	var ret []string
 	var isExists = false

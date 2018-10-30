@@ -65,6 +65,12 @@ func resourceSakuraCloudServer() *schema.Resource {
 				Optional: true,
 				Default:  "shared",
 			},
+			"display_ipaddress": {
+				Type:         schema.TypeString,
+				Optional:     true,
+				Computed:     true,
+				ValidateFunc: validateIPv4Address(),
+			},
 			"cdrom_id": {
 				Type:         schema.TypeString,
 				Optional:     true,
@@ -83,6 +89,13 @@ func resourceSakuraCloudServer() *schema.Resource {
 			"additional_nics": {
 				Type:     schema.TypeList,
 				Optional: true,
+				MaxItems: 3,
+				Elem:     &schema.Schema{Type: schema.TypeString},
+			},
+			"additional_display_ipaddresses": {
+				Type:     schema.TypeList,
+				Optional: true,
+				Computed: true,
 				MaxItems: 3,
 				Elem:     &schema.Schema{Type: schema.TypeString},
 			},
@@ -243,6 +256,26 @@ func resourceSakuraCloudServerCreate(d *schema.ResourceData, meta interface{}) e
 	server, err := createServer(client, opts)
 	if err != nil {
 		return fmt.Errorf("Failed to create SakuraCloud Server resource: %s", err)
+	}
+
+	if displayIP, ok := d.GetOk("display_ipaddress"); ok && len(server.Interfaces) > 0 {
+		if server.Interfaces[0].Switch.Scope != sacloud.ESCopeShared {
+			ifID := server.Interfaces[0].ID
+			if _, err := client.Interface.SetDisplayIPAddress(ifID, displayIP.(string)); err != nil {
+				return fmt.Errorf("Failed to create SakuraCloud Server resource: Failed to set display ip address: %s", err)
+			}
+		}
+	}
+	if rawAdditionalDIPs, ok := d.GetOk("additional_display_ipaddresses"); ok {
+		additionalDIPs := rawAdditionalDIPs.([]interface{})
+		for i, displayIP := range additionalDIPs {
+			if len(server.Interfaces) > i+1 {
+				ifID := server.Interfaces[i+1].ID
+				if _, err := client.Interface.SetDisplayIPAddress(ifID, displayIP.(string)); err != nil {
+					return fmt.Errorf("Failed to create SakuraCloud Server resource: Failed to set display ip address: %s", err)
+				}
+			}
+		}
 	}
 
 	//connect disk to server
@@ -529,6 +562,48 @@ func resourceSakuraCloudServerUpdate(d *schema.ResourceData, meta interface{}) e
 		return fmt.Errorf("Couldn't find SakuraCloud Server resource: %s", err)
 	}
 
+	if d.HasChange("display_ipaddress") {
+		if len(updatedServer.Interfaces) > 0 && updatedServer.Interfaces[0].Switch.Scope != sacloud.ESCopeShared {
+			displayIP := d.Get("display_ipaddress").(string)
+			ifID := updatedServer.Interfaces[0].ID
+
+			if displayIP == "" {
+				if _, err := client.Interface.SetDisplayIPAddress(ifID, ""); err != nil {
+					return fmt.Errorf("Failed to update SakuraCloud Server resource: Failed to delete display ip address: %s", err)
+				}
+			} else {
+				if _, err := client.Interface.SetDisplayIPAddress(ifID, displayIP); err != nil {
+					return fmt.Errorf("Failed to update SakuraCloud Server resource: Failed to set display ip address: %s", err)
+				}
+			}
+		}
+	}
+	if d.HasChange("additional_display_ipaddresses") {
+		additionalDIPs := d.Get("additional_display_ipaddresses").([]interface{})
+		for i, nic := range updatedServer.Interfaces {
+			if i == 0 {
+				continue
+			}
+			ifID := nic.ID
+			if len(additionalDIPs) > i-1 {
+				displayIP := additionalDIPs[i-1].(string)
+				if displayIP == "" {
+					if _, err := client.Interface.SetDisplayIPAddress(ifID, ""); err != nil {
+						return fmt.Errorf("Failed to update SakuraCloud Server resource: Failed to delete display ip address: %s", err)
+					}
+				} else {
+					if _, err := client.Interface.SetDisplayIPAddress(ifID, displayIP); err != nil {
+						return fmt.Errorf("Failed to update SakuraCloud Server resource: Failed to set display ip address: %s", err)
+					}
+				}
+			} else {
+				if _, err := client.Interface.SetDisplayIPAddress(ifID, ""); err != nil {
+					return fmt.Errorf("Failed to update SakuraCloud Server resource: Failed to delete display ip address: %s", err)
+				}
+			}
+		}
+	}
+
 	if isDiskConfigChanged {
 		if len(updatedServer.Disks) > 0 {
 			isNeedEditDisk := false
@@ -809,18 +884,27 @@ func setServerResourceData(d *schema.ResourceData, client *APIClient, data *sacl
 	if hasFirstInterface {
 		if data.Interfaces[0].Switch == nil {
 			d.Set("nic", "disconnect")
+			d.Set("display_ipaddress", "")
 		} else {
 			if data.Interfaces[0].Switch.Scope == sacloud.ESCopeShared {
 				d.Set("nic", "shared")
+				d.Set("display_ipaddress", data.Interfaces[0].GetIPAddress())
 			} else {
 				d.Set("nic", data.Interfaces[0].Switch.GetStrID())
+				ip := data.Interfaces[0].UserIPAddress
+				if ip == "0.0.0.0" {
+					ip = ""
+				}
+				d.Set("display_ipaddress", ip)
 			}
 		}
 	} else {
 		d.Set("nic", "")
+		d.Set("display_ipaddress", "")
 	}
 
 	d.Set("additional_nics", flattenInterfaces(data.Interfaces))
+	d.Set("additional_display_ipaddresses", flattenDisplayIPAddress(data.Interfaces))
 
 	d.Set("icon_id", data.GetIconStrID())
 	d.Set("description", data.Description)
