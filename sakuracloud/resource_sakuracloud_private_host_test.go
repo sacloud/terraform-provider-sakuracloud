@@ -100,7 +100,7 @@ func testAccCheckSakuraCloudPrivateHostExists(n string, private_host *sacloud.Pr
 
 		client := testAccProvider.Meta().(*APIClient)
 		originalZone := client.Zone
-		client.Zone = "is1b"
+		client.Zone = "tk1a"
 		defer func() { client.Zone = originalZone }()
 
 		foundPrivateHost, err := client.PrivateHost.Read(toSakuraCloudID(rs.Primary.ID))
@@ -122,7 +122,7 @@ func testAccCheckSakuraCloudPrivateHostExists(n string, private_host *sacloud.Pr
 func testAccCheckSakuraCloudPrivateHostDestroy(s *terraform.State) error {
 	client := testAccProvider.Meta().(*APIClient)
 	originalZone := client.Zone
-	client.Zone = "is1b"
+	client.Zone = "tk1a"
 	defer func() { client.Zone = originalZone }()
 
 	for _, rs := range s.RootModule().Resources {
@@ -145,13 +145,13 @@ resource "sakuracloud_server" "foobar" {
     name = "myserver"
     private_host_id = "${sakuracloud_private_host.foobar.id}"
     graceful_shutdown_timeout = 5
-    zone = "is1b"
+    zone = "tk1a"
 }
 resource "sakuracloud_private_host" "foobar" {
     name = "before"
     description = "before"
     tags = ["tag1", "tag2"]
-    zone = "is1b"
+    zone = "tk1a"
 
     graceful_shutdown_timeout = 5
     icon_id = "${sakuracloud_icon.foobar.id}"
@@ -168,7 +168,7 @@ resource "sakuracloud_private_host" "foobar" {
     description = "after"
     graceful_shutdown_timeout = 5
     tags = []
-    zone = "is1b"
+    zone = "tk1a"
 }
 `
 
@@ -176,7 +176,7 @@ var testAccCheckSakuraCloudPrivateHostConfig_Destroy_Basic = `
 resource "sakuracloud_server" "foobar" {
     name = "myserver"
     private_host_id = "${sakuracloud_private_host.foobar.id}"
-    zone = "is1b"
+    zone = "tk1a"
     graceful_shutdown_timeout = 5
 }
 resource "sakuracloud_private_host" "foobar" {
@@ -184,7 +184,7 @@ resource "sakuracloud_private_host" "foobar" {
     description = "before"
     tags = ["tag1", "tag2"]
     graceful_shutdown_timeout = 5
-    zone = "is1b"
+    zone = "tk1a"
 
 }
 `
@@ -192,7 +192,7 @@ resource "sakuracloud_private_host" "foobar" {
 var testAccCheckSakuraCloudPrivateHostConfig_Destroy_Update = `
 resource "sakuracloud_server" "foobar" {
     name = "myserver"
-    zone = "is1b"
+    zone = "tk1a"
     graceful_shutdown_timeout = 5
 }
 `
