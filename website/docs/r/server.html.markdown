@@ -20,7 +20,9 @@ resource sakuracloud_server "foobar" {
   # memory            = 1
   disks               = ["${sakuracloud_disk.foobar.id}"]
   # interface_driver  = "virtio"
+  
   # nic               = "shared"
+  # display_ipaddress = "192.2.0.1"
   
   # cdrom_id          = "${sakuracloud_cdrom.foobar.id}"
   # private_host_id   = "${sakuracloud_private_host.foobar.id}"
@@ -84,10 +86,12 @@ The following arguments are supported:
 Valid value is one of the following: [ "virtio" (default) / "e1000"]
 * `nic` - (Optional) The primary NIC's connection destination.  
 Valid value is one of the following: [ "shared" (default) / <Switch ID> / "" (disconnected) ]
+* `display_ipaddress` - (Optional) The IP address of NIC for display. Valid only when connected to switch.  
 * `cdrom_id` - (Optional) The ID of the CD-ROM inserted to Server.
 * `private_host_id` - (Optional) The ID of the Private Host to which the Server belongs.
 * `additional_nics` - (Optional) The ID list of the Switches connected to NICs (excluding primary NIC) of Server.  
 Valid values are one of the following: [ <Switch ID> / "" (disconnected) ]
+* `additional_display_ipaddresses` - (Optional) The display IP address list of the NICs (excluding primary NIC) of Server.  
 * `packet_filter_ids` - (Optional) The ID list of the Packet Filters connected to Server.
 * `ipaddress` - (Optional) The IP address of primary NIC to set with `"Modify Disk"` API.
 * `gateway` - (Optional) Default gateway address of the Server to set with `"Modify Disk"` API.	 
@@ -114,10 +118,12 @@ The following attributes are exported:
 * `disks` - The ID list of the Disks connected to Server.
 * `interface_driver` - The name of network interface driver.
 * `nic` - The primary NIC's connection destination.
+* `display_ipaddress` - The IP address of NIC for display. 
 * `cdrom_id` - The ID of the CD-ROM inserted to Server.
 * `private_host_id` - The ID of the Private Host to which the Server belongs.
 * `private_host_name` - The name of the Private Host to which the Server belongs.
 * `additional_nics` - The ID list of the Switches connected to NICs (excluding primary NIC) of Server.
+* `additional_display_ipaddresses` - (Optional) The display IP address list of the NICs (excluding primary NIC) of Server. 
 * `packet_filter_ids` - The ID list of the Packet Filters connected to Server.
 * `macaddresses` - The MAC address list of NICs connected to Server.
 * `ipaddress` - The IP address of primary NIC.
