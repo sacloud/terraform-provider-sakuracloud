@@ -102,8 +102,8 @@ func testAccCheckSakuraCloudDatabaseDataSourceID(n string) resource.TestCheckFun
 
 func testAccCheckSakuraCloudDatabaseDataSourceNotExists(n string) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
-		_, ok := s.RootModule().Resources[n]
-		if ok {
+		v, ok := s.RootModule().Resources[n]
+		if ok && v.Primary.ID != "" {
 			return fmt.Errorf("Found Database data source: %s", n)
 		}
 		return nil
@@ -192,7 +192,7 @@ resource "sakuracloud_database" "foobar" {
     zone = "tk1a"
 }
 data "sakuracloud_database" "foobar" {
-    filter = {
+    filter {
 	name = "Name"
 	values = ["%s"]
     }
@@ -229,7 +229,7 @@ resource "sakuracloud_database" "foobar" {
 
 }
 data "sakuracloud_database" "foobar" {
-    filter = {
+    filter {
 	name = "Tags"
 	values = ["tag1","tag3"]
     }
@@ -266,7 +266,7 @@ resource "sakuracloud_database" "foobar" {
 
 }
 data "sakuracloud_database" "foobar" {
-    filter = {
+    filter {
 	name = "Tags"
 	values = ["tag1-xxxxxxx","tag3-xxxxxxxx"]
     }
@@ -304,7 +304,7 @@ resource "sakuracloud_database" "foobar" {
 
 }
 data "sakuracloud_database" "foobar" {
-    filter = {
+    filter {
 	name = "Name"
 	values = ["xxxxxxxxxxxxxxxxxx"]
     }

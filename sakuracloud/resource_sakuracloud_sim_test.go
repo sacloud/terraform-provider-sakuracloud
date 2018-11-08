@@ -172,14 +172,14 @@ resource "sakuracloud_sim" "foobar" {
     name = "name_before"
     description = "description_before"
     tags = ["hoge1" , "hoge2"]
-    icon_id = "${sakuracloud_icon.foobar.id}"
+    icon_id = sakuracloud_icon.foobar.id
 
     iccid = "%s"
     passcode = "%s"
     imei = "%s"
 
     enabled = true
-    mobile_gateway_id = "${sakuracloud_mobile_gateway.mgw.id}"
+    mobile_gateway_id = sakuracloud_mobile_gateway.mgw.id
     ipaddress = "192.168.100.1"
 }
 
@@ -202,7 +202,7 @@ resource "sakuracloud_sim" "foobar" {
     imei = "%s"
 
     enabled = false
-    mobile_gateway_id = "${sakuracloud_mobile_gateway.mgw.id}"
+    mobile_gateway_id = sakuracloud_mobile_gateway.mgw.id
     ipaddress = "192.168.100.2"
 }`
 

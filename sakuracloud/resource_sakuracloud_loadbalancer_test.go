@@ -182,7 +182,7 @@ resource "sakuracloud_switch" "sw" {
     name = "sw"
 }
 resource "sakuracloud_load_balancer" "foobar" {
-    switch_id = "${sakuracloud_switch.sw.id}"
+    switch_id = sakuracloud_switch.sw.id
     vrid = 1
     ipaddress1 = "192.168.11.101"
     nw_mask_len = 24
@@ -205,7 +205,7 @@ resource "sakuracloud_switch" "sw" {
     name = "sw"
 }
 resource "sakuracloud_load_balancer" "foobar" {
-    switch_id = "${sakuracloud_switch.sw.id}"
+    switch_id = sakuracloud_switch.sw.id
     vrid = 1
     ipaddress1 = "192.168.11.101"
     nw_mask_len = 24
@@ -221,14 +221,14 @@ resource "sakuracloud_internet" "router" {
     name = "sw"
 }
 resource "sakuracloud_load_balancer" "foobar" {
-    switch_id = "${sakuracloud_internet.router.switch_id}"
+    switch_id = sakuracloud_internet.router.switch_id
     high_availability = true
     plan = "highspec"
     vrid = 1
-    ipaddress1 = "${sakuracloud_internet.router.ipaddresses.0}"
-    ipaddress2 = "${sakuracloud_internet.router.ipaddresses.1}"
-    nw_mask_len = "${sakuracloud_internet.router.nw_mask_len}"
-    default_route = "${sakuracloud_internet.router.gateway}"
+    ipaddress1 = sakuracloud_internet.router.ipaddresses[0]
+    ipaddress2 = sakuracloud_internet.router.ipaddresses[1]
+    nw_mask_len = sakuracloud_internet.router.nw_mask_len
+    default_route = sakuracloud_internet.router.gateway
 
     name = "name_before"
     description = "description_before"

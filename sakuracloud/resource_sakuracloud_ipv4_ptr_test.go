@@ -109,10 +109,10 @@ data sakuracloud_dns "dns" {
 }
 
 resource sakuracloud_dns_record "record01" {
-  dns_id = "${data.sakuracloud_dns.dns.id}"
+  dns_id = data.sakuracloud_dns.dns.id
   name   = "terraform-test-domain01"
   type   = "A"
-  value  = "${sakuracloud_server.server.ipaddress}"
+  value  = sakuracloud_server.server.ipaddress
 }
 
 resource sakuracloud_server "server" {
@@ -121,7 +121,7 @@ resource sakuracloud_server "server" {
 }
 
 resource "sakuracloud_ipv4_ptr" "foobar" {
-  ipaddress = "${sakuracloud_server.server.ipaddress}"
+  ipaddress = sakuracloud_server.server.ipaddress
   hostname  = "terraform-test-domain01.%s"
 }
 `
@@ -132,10 +132,10 @@ data sakuracloud_dns "dns" {
 }
 
 resource sakuracloud_dns_record "record01" {
-  dns_id = "${data.sakuracloud_dns.dns.id}"
+  dns_id = data.sakuracloud_dns.dns.id
   name   = "terraform-test-domain02"
   type   = "A"
-  value  = "${sakuracloud_server.server.ipaddress}"
+  value  = sakuracloud_server.server.ipaddress
 }
 
 resource sakuracloud_server "server" {
@@ -144,7 +144,7 @@ resource sakuracloud_server "server" {
 }
 
 resource "sakuracloud_ipv4_ptr" "foobar" {
-  ipaddress = "${sakuracloud_server.server.ipaddress}"
+  ipaddress = sakuracloud_server.server.ipaddress
   hostname  = "terraform-test-domain02.%s"
 }
 `

@@ -59,8 +59,8 @@ func testAccCheckSakuraCloudSubnetDataSourceID(n string) resource.TestCheckFunc 
 
 func testAccCheckSakuraCloudSubnetDataSourceNotExists(n string) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
-		_, ok := s.RootModule().Resources[n]
-		if ok {
+		v, ok := s.RootModule().Resources[n]
+		if ok && v.Primary.ID != "" {
 			return fmt.Errorf("Found Subnet data source: %s", n)
 		}
 		return nil

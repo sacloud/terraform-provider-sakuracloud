@@ -1,7 +1,9 @@
 package sakuracloud
 
 import (
+	"bytes"
 	"crypto/md5"
+	"encoding/base64"
 	"fmt"
 	"io"
 	"os"
@@ -265,8 +267,17 @@ func setArchiveResourceData(d *schema.ResourceData, client *APIClient, data *sac
 			return fmt.Errorf("Error opening archive_file(%s): %s", source, err)
 		}
 		defer f.Close()
+
+		b := base64.NewEncoder(base64.StdEncoding, f)
+		defer b.Close()
+
+		var buf bytes.Buffer
+		if _, err := io.Copy(&buf, f); err != nil {
+			return fmt.Errorf("Error encoding to base64 from archive_file (%s): %s", source, err)
+		}
+
 		h := md5.New()
-		if _, err := io.Copy(h, f); err != nil {
+		if _, err := io.Copy(h, &buf); err != nil {
 			return fmt.Errorf("Error calculate md5 from archive_file (%s): %s", source, err)
 		}
 

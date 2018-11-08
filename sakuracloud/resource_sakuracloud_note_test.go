@@ -131,7 +131,7 @@ resource "sakuracloud_note" "foobar" {
     content = "content"
     description = "Note from TerraForm for SAKURA CLOUD"
     tags = ["hoge" , "hoge2"]
-    icon_id = "${sakuracloud_icon.foobar.id}"
+    icon_id = sakuracloud_icon.foobar.id
 }
 
 resource "sakuracloud_icon" "foobar" {

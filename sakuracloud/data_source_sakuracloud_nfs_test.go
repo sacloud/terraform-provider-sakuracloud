@@ -104,8 +104,8 @@ func testAccCheckSakuraCloudNFSDataSourceID(n string) resource.TestCheckFunc {
 
 func testAccCheckSakuraCloudNFSDataSourceNotExists(n string) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
-		_, ok := s.RootModule().Resources[n]
-		if ok {
+		v, ok := s.RootModule().Resources[n]
+		if ok && v.Primary.ID != "" {
 			return fmt.Errorf("Found NFS data source: %s", n)
 		}
 		return nil
@@ -167,7 +167,7 @@ resource "sakuracloud_nfs" "foobar" {
     tags = ["tag1","tag2","tag3"]
 }
 data "sakuracloud_nfs" "foobar" {
-    filter = {
+    filter {
 	name = "Name"
 	values = ["%s"]
     }
@@ -190,7 +190,7 @@ resource "sakuracloud_nfs" "foobar" {
     tags = ["tag1","tag2","tag3"]
 }
 data "sakuracloud_nfs" "foobar" {
-    filter = {
+    filter {
 	name = "Tags"
 	values = ["tag1","tag3"]
     }
@@ -213,7 +213,7 @@ resource "sakuracloud_nfs" "foobar" {
     tags = ["tag1","tag2","tag3"]
 }
 data "sakuracloud_nfs" "foobar" {
-    filter = {
+    filter {
 	name = "Tags"
 	values = ["tag1-xxxxxxx","tag3-xxxxxxxx"]
     }
@@ -236,7 +236,7 @@ resource "sakuracloud_nfs" "foobar" {
     tags = ["tag1","tag2","tag3"]
 }
 data "sakuracloud_nfs" "foobar" {
-    filter = {
+    filter {
 	name = "Name"
 	values = ["xxxxxxxxxxxxxxxxxx"]
     }

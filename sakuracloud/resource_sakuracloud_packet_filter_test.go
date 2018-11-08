@@ -116,14 +116,14 @@ var testAccCheckSakuraCloudPacketFilterConfig_basic = `
 resource "sakuracloud_packet_filter" "foobar" {
     name = "mypacket_filter"
     description = "PacketFilter from TerraForm for SAKURA CLOUD"
-    expressions = {
+    expressions {
     	protocol = "tcp"
     	source_nw = "0.0.0.0"
     	source_port = "0-65535"
     	dest_port = "80"
     	allow = true
     }
-    expressions = {
+    expressions {
     	protocol = "udp"
     	source_nw = "0.0.0.0"
     	source_port = "0-65535"
@@ -136,31 +136,31 @@ var testAccCheckSakuraCloudPacketFilterConfig_update = `
 resource "sakuracloud_packet_filter" "foobar" {
     name = "mypacket_filter_upd"
     description = "PacketFilter from TerraForm for SAKURA CLOUD"
-    expressions = {
+    expressions {
     	protocol = "tcp"
     	source_nw = "192.168.2.0"
     	source_port = "8080"
     	dest_port = "8080"
     	allow = false
     }
-    expressions = {
+    expressions {
     	protocol = "udp"
     	source_nw = "0.0.0.0"
     	source_port = "0-65535"
     	dest_port = "80"
     	allow = true
     }
-    expressions = {
+    expressions {
     	protocol = "icmp"
     	source_nw = "0.0.0.0"
     	allow = true
     }
-    expressions = {
+    expressions {
     	protocol = "fragment"
     	source_nw = "0.0.0.0"
     	allow = true
     }
-    expressions = {
+    expressions {
     	protocol = "ip"
     	source_nw = "0.0.0.0"
     	allow = true
