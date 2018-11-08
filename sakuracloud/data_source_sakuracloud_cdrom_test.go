@@ -97,8 +97,8 @@ func testAccCheckSakuraCloudCDROMDataSourceID(n string) resource.TestCheckFunc {
 
 func testAccCheckSakuraCloudCDROMDataSourceNotExists(n string) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
-		_, ok := s.RootModule().Resources[n]
-		if ok {
+		v, ok := s.RootModule().Resources[n]
+		if ok && v.Primary.ID != "" {
 			return fmt.Errorf("Found CDROM data source: %s", n)
 		}
 		return nil
@@ -129,7 +129,7 @@ func testAccCheckSakuraCloudCDROMDataSourceDestroy(s *terraform.State) error {
 
 var testAccCheckSakuraCloudDataSourceCDROMConfig = `
 data "sakuracloud_cdrom" "foobar" {
-    filter = {
+    filter {
 	name = "Name"
 	values = ["Ubuntu Server 18"]
     }
@@ -137,7 +137,7 @@ data "sakuracloud_cdrom" "foobar" {
 
 var testAccCheckSakuraCloudDataSourceCDROMConfig_With_Tag = `
 data "sakuracloud_cdrom" "foobar" {
-    filter = {
+    filter {
 	name = "Tags"
 	values = ["distro-ubuntu","os-unix"]
     }
@@ -145,7 +145,7 @@ data "sakuracloud_cdrom" "foobar" {
 
 var testAccCheckSakuraCloudDataSourceCDROMConfig_With_NotExists_Tag = `
 data "sakuracloud_cdrom" "foobar" {
-    filter = {
+    filter {
 	name = "Tags"
 	values = ["distro-ubuntu-xxxxxxxxxxx","os-linux-xxxxxxxx"]
     }
@@ -153,7 +153,7 @@ data "sakuracloud_cdrom" "foobar" {
 
 var testAccCheckSakuraCloudDataSourceCDROMConfig_NotExists = `
 data "sakuracloud_cdrom" "foobar" {
-    filter = {
+    filter {
 	name = "Name"
 	values = ["xxxxxxxxxxxxxxxxxx"]
     }

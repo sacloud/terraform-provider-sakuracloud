@@ -167,7 +167,7 @@ resource "sakuracloud_cdrom" "foobar" {
     name = "mycdrom"
     size = 5
     iso_image_file = "test/dummy.iso"
-    hash = "${md5(file("test/dummy.iso"))}"
+    hash = md5(filebase64("test/dummy.iso"))
     description = "description"
     tags = ["tag1" , "tag2"]
     icon_id = "${sakuracloud_icon.foobar.id}"
@@ -184,7 +184,7 @@ resource "sakuracloud_cdrom" "foobar" {
     name = "mycdrom-upd"
     size = 5
     iso_image_file = "test/dummy-upd.iso"
-    hash = "${md5(file("test/dummy-upd.iso"))}"
+    hash = md5(filebase64("test/dummy-upd.iso"))
     description = "description-upd"
     tags = ["tag1-upd" , "tag2-upd"]
 }`
@@ -192,12 +192,12 @@ resource "sakuracloud_cdrom" "foobar" {
 var testAccCheckSakuraCloudCDROMConfig_text_content = `
 resource "sakuracloud_cdrom" "foobar" {
     name = "mycdrom"
-    content = "${file("test/dummy.json")}"
+    content = file("test/dummy.json")
 }
 `
 var testAccCheckSakuraCloudCDROMConfig_text_content_upd = `
 resource "sakuracloud_cdrom" "foobar" {
     name = "mycdrom-upd"
-    content = "${file("test/dummy-upd.json")}"
+    content = file("test/dummy-upd.json")
 }
 `

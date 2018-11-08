@@ -219,7 +219,11 @@ func TestAccSakuraCloudVPCRouterSetting_Update(t *testing.T) {
 					resource.TestCheckResourceAttr(
 						"sakuracloud_vpc_router_dhcp_server.dhcp", "range_stop", "192.168.11.200"),
 					resource.TestCheckResourceAttr(
-						"sakuracloud_vpc_router_dhcp_server.dhcp", "dns_servers.#", "0"),
+						"sakuracloud_vpc_router_dhcp_server.dhcp", "dns_servers.#", "2"),
+					resource.TestCheckResourceAttr(
+						"sakuracloud_vpc_router_dhcp_server.dhcp", "dns_servers.0", "1.1.1.1"),
+					resource.TestCheckResourceAttr(
+						"sakuracloud_vpc_router_dhcp_server.dhcp", "dns_servers.1", "2.2.2.2"),
 					resource.TestCheckResourceAttr(
 						"sakuracloud_vpc_router_dhcp_static_mapping.dhcp_map", "ipaddress", "192.168.11.21"),
 					resource.TestCheckResourceAttr(
@@ -364,40 +368,40 @@ resource "sakuracloud_switch" "sw01"{
 resource "sakuracloud_vpc_router" "foobar" {
     name = "vpc_router_setting_test"
     plan = "premium"
-    switch_id = "${sakuracloud_internet.router1.switch_id}"
-    vip = "${sakuracloud_internet.router1.ipaddresses.0}"
-    ipaddress1 = "${sakuracloud_internet.router1.ipaddresses.1}"
-    ipaddress2 = "${sakuracloud_internet.router1.ipaddresses.2}"
-    aliases = ["${sakuracloud_internet.router1.ipaddresses.3}"]
+    switch_id = sakuracloud_internet.router1.switch_id
+    vip = sakuracloud_internet.router1.ipaddresses[0]
+    ipaddress1 = sakuracloud_internet.router1.ipaddresses[1]
+    ipaddress2 = sakuracloud_internet.router1.ipaddresses[2]
+    aliases = [sakuracloud_internet.router1.ipaddresses[3]]
     vrid = 1
 
 }
 resource "sakuracloud_vpc_router_interface" "eth1"{
-    vpc_router_id = "${sakuracloud_vpc_router.foobar.id}"
+    vpc_router_id = sakuracloud_vpc_router.foobar.id
     index = 1
-    switch_id = "${sakuracloud_switch.sw01.id}"
+    switch_id = sakuracloud_switch.sw01.id
     vip = "192.168.11.1"
     ipaddress = ["192.168.11.2" , "192.168.11.3"]
     nw_mask_len = 24
 }
 resource "sakuracloud_vpc_router_pptp" "pptp"{
-    vpc_router_id = "${sakuracloud_vpc_router.foobar.id}"
-    vpc_router_interface_id = "${sakuracloud_vpc_router_interface.eth1.id}"
+    vpc_router_id = sakuracloud_vpc_router.foobar.id
+    vpc_router_interface_id = sakuracloud_vpc_router_interface.eth1.id
 
     range_start = "192.168.11.101"
     range_stop = "192.168.11.150"
 }
 resource "sakuracloud_vpc_router_static_nat" "staticNAT1" {
-    vpc_router_id = "${sakuracloud_vpc_router.foobar.id}"
-    vpc_router_interface_id = "${sakuracloud_vpc_router_interface.eth1.id}"
+    vpc_router_id = sakuracloud_vpc_router.foobar.id
+    vpc_router_interface_id = sakuracloud_vpc_router_interface.eth1.id
 
-    global_address = "${sakuracloud_internet.router1.ipaddresses.3}"
+    global_address = sakuracloud_internet.router1.ipaddresses[3]
     private_address = "192.168.11.11"
     description = "desc"
 }
 resource "sakuracloud_vpc_router_port_forwarding" "forward1" {
-    vpc_router_id = "${sakuracloud_vpc_router.foobar.id}"
-    vpc_router_interface_id = "${sakuracloud_vpc_router_interface.eth1.id}"
+    vpc_router_id = sakuracloud_vpc_router.foobar.id
+    vpc_router_interface_id = sakuracloud_vpc_router_interface.eth1.id
 
     protocol = "tcp"
     global_port = 10022
@@ -406,23 +410,23 @@ resource "sakuracloud_vpc_router_port_forwarding" "forward1" {
     description = "desc"
 }
 resource "sakuracloud_vpc_router_dhcp_server" "dhcp" {
-    vpc_router_id = "${sakuracloud_vpc_router.foobar.id}"
-    vpc_router_interface_index = "${sakuracloud_vpc_router_interface.eth1.index}"
+    vpc_router_id = sakuracloud_vpc_router.foobar.id
+    vpc_router_interface_index = sakuracloud_vpc_router_interface.eth1.index
 
     range_start = "192.168.11.151"
     range_stop  = "192.168.11.200"
     dns_servers = ["8.8.4.4", "8.8.8.8"]
 }
 resource "sakuracloud_vpc_router_dhcp_static_mapping" "dhcp_map" {
-    vpc_router_id = "${sakuracloud_vpc_router.foobar.id}"
-    vpc_router_dhcp_server_id = "${sakuracloud_vpc_router_dhcp_server.dhcp.id}"
+    vpc_router_id = sakuracloud_vpc_router.foobar.id
+    vpc_router_dhcp_server_id = sakuracloud_vpc_router_dhcp_server.dhcp.id
 
     ipaddress = "192.168.11.20"
     macaddress = "aa:bb:cc:aa:bb:cc"
 }
 resource "sakuracloud_vpc_router_l2tp" "l2tp" {
-    vpc_router_id = "${sakuracloud_vpc_router.foobar.id}"
-    vpc_router_interface_id = "${sakuracloud_vpc_router_interface.eth1.id}"
+    vpc_router_id = sakuracloud_vpc_router.foobar.id
+    vpc_router_interface_id = sakuracloud_vpc_router_interface.eth1.id
 
     pre_shared_secret = "hogehoge"
     range_start = "192.168.11.51"
@@ -430,12 +434,12 @@ resource "sakuracloud_vpc_router_l2tp" "l2tp" {
 
 }
 resource "sakuracloud_vpc_router_user" "user1" {
-    vpc_router_id = "${sakuracloud_vpc_router.foobar.id}"
+    vpc_router_id = sakuracloud_vpc_router.foobar.id
     name = "username"
     password = "password"
 }
 resource "sakuracloud_vpc_router_site_to_site_vpn" "s2s" {
-    vpc_router_id = "${sakuracloud_vpc_router.foobar.id}"
+    vpc_router_id = sakuracloud_vpc_router.foobar.id
     peer = "8.8.8.8"
     remote_id = "8.8.8.8"
     pre_shared_secret = "presharedsecret"
@@ -444,10 +448,10 @@ resource "sakuracloud_vpc_router_site_to_site_vpn" "s2s" {
 }
 
 resource "sakuracloud_vpc_router_firewall" "send_fw" {
-    vpc_router_id              = "${sakuracloud_vpc_router.foobar.id}"
+    vpc_router_id              = sakuracloud_vpc_router.foobar.id
     vpc_router_interface_index = 1
     direction = "send"
-    expressions = {
+    expressions {
         protocol = "tcp"
         source_nw = ""
         source_port = "80"
@@ -458,7 +462,7 @@ resource "sakuracloud_vpc_router_firewall" "send_fw" {
         description = "desc"
     }
 
-    expressions = {
+    expressions {
         protocol = "ip"
         source_nw = ""
         source_port = ""
@@ -471,10 +475,10 @@ resource "sakuracloud_vpc_router_firewall" "send_fw" {
 }
 
 resource "sakuracloud_vpc_router_firewall" "receive_fw" {
-    vpc_router_id              = "${sakuracloud_vpc_router.foobar.id}"
+    vpc_router_id              = sakuracloud_vpc_router.foobar.id
     vpc_router_interface_index = 1
     direction = "receive"
-    expressions = {
+    expressions {
         protocol = "tcp"
         source_nw = ""
         source_port = ""
@@ -485,7 +489,7 @@ resource "sakuracloud_vpc_router_firewall" "receive_fw" {
         description = "desc"
     }
 
-    expressions = {
+    expressions {
         protocol = "ip"
         source_nw = ""
         source_port = ""
@@ -497,8 +501,8 @@ resource "sakuracloud_vpc_router_firewall" "receive_fw" {
     }
 }
 resource "sakuracloud_vpc_router_static_route" "route" {
-    vpc_router_id = "${sakuracloud_vpc_router.foobar.id}"
-    vpc_router_interface_id = "${sakuracloud_vpc_router_interface.eth1.id}"
+    vpc_router_id = sakuracloud_vpc_router.foobar.id
+    vpc_router_interface_id = sakuracloud_vpc_router_interface.eth1.id
 
     prefix = "172.16.0.0/16"
     next_hop = "192.168.11.99"
@@ -515,40 +519,40 @@ resource "sakuracloud_switch" "sw01"{
 resource "sakuracloud_vpc_router" "foobar" {
     name = "vpc_router_setting_test"
     plan = "premium"
-    switch_id = "${sakuracloud_internet.router1.switch_id}"
-    vip = "${sakuracloud_internet.router1.ipaddresses.0}"
-    ipaddress1 = "${sakuracloud_internet.router1.ipaddresses.1}"
-    ipaddress2 = "${sakuracloud_internet.router1.ipaddresses.2}"
-    aliases = ["${sakuracloud_internet.router1.ipaddresses.3}"]
+    switch_id = sakuracloud_internet.router1.switch_id
+    vip = sakuracloud_internet.router1.ipaddresses[0]
+    ipaddress1 = sakuracloud_internet.router1.ipaddresses[1]
+    ipaddress2 = sakuracloud_internet.router1.ipaddresses[2]
+    aliases = [ sakuracloud_internet.router1.ipaddresses[3] ]
     vrid = 1
 
 }
 resource "sakuracloud_vpc_router_interface" "eth1"{
-    vpc_router_id = "${sakuracloud_vpc_router.foobar.id}"
+    vpc_router_id = sakuracloud_vpc_router.foobar.id
     index = 1
-    switch_id = "${sakuracloud_switch.sw01.id}"
+    switch_id = sakuracloud_switch.sw01.id
     vip = "192.168.11.1"
     ipaddress = ["192.168.11.2" , "192.168.11.3"]
     nw_mask_len = 24
 }
 resource "sakuracloud_vpc_router_pptp" "pptp"{
-    vpc_router_id = "${sakuracloud_vpc_router.foobar.id}"
-    vpc_router_interface_id = "${sakuracloud_vpc_router_interface.eth1.id}"
+    vpc_router_id = sakuracloud_vpc_router.foobar.id
+    vpc_router_interface_id = sakuracloud_vpc_router_interface.eth1.id
 
     range_start = "192.168.11.201"
     range_stop = "192.168.11.250"
 }
 resource "sakuracloud_vpc_router_static_nat" "staticNAT1" {
-    vpc_router_id = "${sakuracloud_vpc_router.foobar.id}"
-    vpc_router_interface_id = "${sakuracloud_vpc_router_interface.eth1.id}"
+    vpc_router_id = sakuracloud_vpc_router.foobar.id
+    vpc_router_interface_id = sakuracloud_vpc_router_interface.eth1.id
 
-    global_address = "${sakuracloud_internet.router1.ipaddresses.3}"
+    global_address = sakuracloud_internet.router1.ipaddresses[3]
     private_address = "192.168.11.12"
     description = "desc"
 }
 resource "sakuracloud_vpc_router_port_forwarding" "forward1" {
-    vpc_router_id = "${sakuracloud_vpc_router.foobar.id}"
-    vpc_router_interface_id = "${sakuracloud_vpc_router_interface.eth1.id}"
+    vpc_router_id = sakuracloud_vpc_router.foobar.id
+    vpc_router_interface_id = sakuracloud_vpc_router_interface.eth1.id
 
     protocol = "udp"
     global_port = 10022
@@ -557,22 +561,24 @@ resource "sakuracloud_vpc_router_port_forwarding" "forward1" {
     description = "desc"
 }
 resource "sakuracloud_vpc_router_dhcp_server" "dhcp" {
-    vpc_router_id = "${sakuracloud_vpc_router.foobar.id}"
-    vpc_router_interface_index = "${sakuracloud_vpc_router_interface.eth1.index}"
+    vpc_router_id = sakuracloud_vpc_router.foobar.id
+    vpc_router_interface_index = sakuracloud_vpc_router_interface.eth1.index
 
     range_start = "192.168.11.151"
     range_stop = "192.168.11.200"
+
+    dns_servers = ["1.1.1.1", "2.2.2.2"]
 }
 resource "sakuracloud_vpc_router_dhcp_static_mapping" "dhcp_map" {
-    vpc_router_id = "${sakuracloud_vpc_router.foobar.id}"
-    vpc_router_dhcp_server_id = "${sakuracloud_vpc_router_dhcp_server.dhcp.id}"
+    vpc_router_id = sakuracloud_vpc_router.foobar.id
+    vpc_router_dhcp_server_id = sakuracloud_vpc_router_dhcp_server.dhcp.id
 
     ipaddress = "192.168.11.21"
     macaddress = "aa:bb:cc:aa:bb:cc"
 }
 resource "sakuracloud_vpc_router_l2tp" "l2tp" {
-    vpc_router_id = "${sakuracloud_vpc_router.foobar.id}"
-    vpc_router_interface_id = "${sakuracloud_vpc_router_interface.eth1.id}"
+    vpc_router_id = sakuracloud_vpc_router.foobar.id
+    vpc_router_interface_id = sakuracloud_vpc_router_interface.eth1.id
 
     pre_shared_secret = "hogehoge"
     range_start = "192.168.11.51"
@@ -580,12 +586,12 @@ resource "sakuracloud_vpc_router_l2tp" "l2tp" {
 
 }
 resource "sakuracloud_vpc_router_user" "user1" {
-    vpc_router_id = "${sakuracloud_vpc_router.foobar.id}"
+    vpc_router_id = sakuracloud_vpc_router.foobar.id
     name = "username"
     password = "password"
 }
 resource "sakuracloud_vpc_router_site_to_site_vpn" "s2s" {
-    vpc_router_id = "${sakuracloud_vpc_router.foobar.id}"
+    vpc_router_id = sakuracloud_vpc_router.foobar.id
     peer = "8.8.8.8"
     remote_id = "8.8.8.8"
     pre_shared_secret = "presharedsecret"
@@ -593,10 +599,10 @@ resource "sakuracloud_vpc_router_site_to_site_vpn" "s2s" {
     local_prefix = ["192.168.21.0/24"]
 }
 resource "sakuracloud_vpc_router_firewall" "send_fw" {
-    vpc_router_id              = "${sakuracloud_vpc_router.foobar.id}"
+    vpc_router_id              = sakuracloud_vpc_router.foobar.id
     vpc_router_interface_index = 1
     direction = "send"
-    expressions = {
+    expressions {
         protocol = "tcp"
         source_nw = ""
         source_port = "80"
@@ -607,7 +613,7 @@ resource "sakuracloud_vpc_router_firewall" "send_fw" {
         description = "desc"
     }
 
-    expressions = {
+    expressions {
         protocol = "ip"
         source_nw = ""
         source_port = ""
@@ -620,10 +626,10 @@ resource "sakuracloud_vpc_router_firewall" "send_fw" {
 }
 
 resource "sakuracloud_vpc_router_firewall" "receive_fw" {
-    vpc_router_id              = "${sakuracloud_vpc_router.foobar.id}"
+    vpc_router_id              = sakuracloud_vpc_router.foobar.id
     vpc_router_interface_index = 1
     direction                  = "receive"
-    expressions = {
+    expressions {
         protocol = "tcp"
         source_nw = ""
         source_port = ""
@@ -634,7 +640,7 @@ resource "sakuracloud_vpc_router_firewall" "receive_fw" {
         description = "desc"
     }
 
-    expressions = {
+    expressions {
         protocol = "ip"
         source_nw = ""
         source_port = ""
@@ -646,8 +652,8 @@ resource "sakuracloud_vpc_router_firewall" "receive_fw" {
     }
 }
 resource "sakuracloud_vpc_router_static_route" "route" {
-    vpc_router_id = "${sakuracloud_vpc_router.foobar.id}"
-    vpc_router_interface_id = "${sakuracloud_vpc_router_interface.eth1.id}"
+    vpc_router_id = sakuracloud_vpc_router.foobar.id
+    vpc_router_interface_id = sakuracloud_vpc_router_interface.eth1.id
 
     prefix = "172.16.0.0/16"
     next_hop = "192.168.11.99"
@@ -660,7 +666,7 @@ resource "sakuracloud_vpc_router" "foobar" {
     name = "vpc_router_setting_test"
 }
 resource "sakuracloud_vpc_router_site_to_site_vpn" "s2s" {
-    vpc_router_id = "${sakuracloud_vpc_router.foobar.id}"
+    vpc_router_id = sakuracloud_vpc_router.foobar.id
     peer = "8.8.8.8"
     remote_id = "8.8.8.8"
     pre_shared_secret = "presharedsecret"

@@ -158,17 +158,15 @@ func TestAccImportSakuraCloudAutoBackup(t *testing.T) {
 var testAccCheckSakuraCloudAutoBackupConfig_basic = `
 resource "sakuracloud_disk" "disk" {
     name = "disk01"
-    zone = "is1b"
 }
 resource "sakuracloud_auto_backup" "foobar" {
     name = "name_before"
-    disk_id = "${sakuracloud_disk.disk.id}"
+    disk_id = sakuracloud_disk.disk.id
     weekdays = ["wed","fri"]
     max_backup_num = 1
     description = "description_before"
     tags = ["hoge1", "hoge2"]
-    zone = "is1b"
-    icon_id = "${sakuracloud_icon.foobar.id}"
+    icon_id = sakuracloud_icon.foobar.id
 }
 
 resource "sakuracloud_icon" "foobar" {
@@ -180,14 +178,12 @@ resource "sakuracloud_icon" "foobar" {
 var testAccCheckSakuraCloudAutoBackupConfig_update = `
 resource "sakuracloud_disk" "disk" {
     name = "disk01"
-    zone = "is1b"
 }
 resource "sakuracloud_auto_backup" "foobar" {
     name = "name_after"
-    disk_id = "${sakuracloud_disk.disk.id}"
+    disk_id = sakuracloud_disk.disk.id
     weekdays = ["fri","sun"]
     max_backup_num = 2
     description = "description_after"
     tags = ["hoge1_after", "hoge2_after"]
-    zone = "is1b"
 }`

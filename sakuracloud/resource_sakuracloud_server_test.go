@@ -488,22 +488,19 @@ func testAccCheckSakuraCloudServerDestroy(s *terraform.State) error {
 
 const testAccCheckSakuraCloudServerConfig_basic = `
 data "sakuracloud_archive" "ubuntu" {
-    filter = {
-	name = "Name"
-	values = ["Ubuntu Server 16"]
-    }
+  os_type = "ubuntu"
 }
 resource "sakuracloud_disk" "foobar" {
     name = "mydisk"
-    source_archive_id = "${data.sakuracloud_archive.ubuntu.id}"
+    source_archive_id = data.sakuracloud_archive.ubuntu.id
 }
 
 resource "sakuracloud_server" "foobar" {
     name = "myserver"
-    disks = ["${sakuracloud_disk.foobar.id}"]
+    disks = [sakuracloud_disk.foobar.id]
     description = "Server from TerraForm for SAKURA CLOUD"
     tags = ["tag1"]
-    icon_id = "${sakuracloud_icon.foobar.id}"
+    icon_id = sakuracloud_icon.foobar.id
 
     hostname = "myserver"
     password = "p@ssw0rd"
@@ -522,20 +519,17 @@ resource "sakuracloud_icon" "foobar" {
 
 const testAccCheckSakuraCloudServerConfig_update = `
 data "sakuracloud_archive" "ubuntu" {
-    filter = {
-	name = "Name"
-	values = ["Ubuntu Server 16"]
-    }
+  os_type = "ubuntu"
 }
 
 resource "sakuracloud_disk" "foobar" {
     name = "mydisk"
-    source_archive_id = "${data.sakuracloud_archive.ubuntu.id}"
+    source_archive_id = data.sakuracloud_archive.ubuntu.id
 }
 
 resource "sakuracloud_server" "foobar" {
     name = "myserver_after"
-    disks = ["${sakuracloud_disk.foobar.id}"]
+    disks = [sakuracloud_disk.foobar.id]
     core = 2
     memory = 2
     description = "Server from TerraForm for SAKURA CLOUD"
@@ -547,20 +541,17 @@ resource "sakuracloud_server" "foobar" {
 
 const testAccCheckSakuraCloudServerConfig_swiched_NIC_added = `
 data "sakuracloud_archive" "ubuntu" {
-    filter = {
-	name = "Name"
-	values = ["Ubuntu Server 16"]
-    }
+  os_type = "ubuntu"
 }
 
 resource "sakuracloud_disk" "foobar" {
     name = "mydisk"
-    source_archive_id = "${data.sakuracloud_archive.ubuntu.id}"
+    source_archive_id = data.sakuracloud_archive.ubuntu.id
 }
 
 resource "sakuracloud_server" "foobar" {
     name = "myserver"
-    disks = ["${sakuracloud_disk.foobar.id}"]
+    disks = [sakuracloud_disk.foobar.id]
     description = "Server from TerraForm for SAKURA CLOUD"
     additional_nics = [""]
     graceful_shutdown_timeout = 10
@@ -568,20 +559,17 @@ resource "sakuracloud_server" "foobar" {
 `
 const testAccCheckSakuraCloudServerConfig_swiched_NIC_updated = `
 data "sakuracloud_archive" "ubuntu" {
-    filter = {
-	name = "Name"
-	values = ["Ubuntu Server 16"]
-    }
+  os_type = "ubuntu"
 }
 
 resource "sakuracloud_disk" "foobar" {
     name = "mydisk"
-    source_archive_id = "${data.sakuracloud_archive.ubuntu.id}"
+    source_archive_id = data.sakuracloud_archive.ubuntu.id
 }
 
 resource "sakuracloud_server" "foobar" {
     name = "myserver"
-    disks = ["${sakuracloud_disk.foobar.id}"]
+    disks = [sakuracloud_disk.foobar.id]
     description = "Server from TerraForm for SAKURA CLOUD"
     additional_nics = ["","",""]
     graceful_shutdown_timeout = 10
@@ -590,20 +578,17 @@ resource "sakuracloud_server" "foobar" {
 
 const testAccCheckSakuraCloudServerConfig_nw_nothing = `
 data "sakuracloud_archive" "ubuntu" {
-    filter = {
-	name = "Name"
-	values = ["Ubuntu Server 16"]
-    }
+  os_type = "ubuntu"
 }
 
 resource "sakuracloud_disk" "foobar" {
     name = "mydisk"
-    source_archive_id = "${data.sakuracloud_archive.ubuntu.id}"
+    source_archive_id = data.sakuracloud_archive.ubuntu.id
 }
 
 resource "sakuracloud_server" "foobar" {
     name = "myserver"
-    disks = ["${sakuracloud_disk.foobar.id}"]
+    disks = [sakuracloud_disk.foobar.id]
     description = "Server from TerraForm for SAKURA CLOUD"
     nic = "disconnect"
     additional_nics = [""]
@@ -614,7 +599,7 @@ resource "sakuracloud_server" "foobar" {
 const testAccCheckSakuraCloudServerConfig_with_packet_filter = `
 resource "sakuracloud_packet_filter" "foobar2" {
     name = "mypacket_filter2"
-    expressions = {
+    expressions {
     	protocol = "tcp"
     	source_nw = "0.0.0.0"
     	source_port = "0-65535"
@@ -626,7 +611,7 @@ resource "sakuracloud_server" "foobar" {
     name = "myserver"
     nic = "shared"
     additional_nics = [""]
-    packet_filter_ids = ["" , "${sakuracloud_packet_filter.foobar2.id}"]
+    packet_filter_ids = ["" , sakuracloud_packet_filter.foobar2.id]
     graceful_shutdown_timeout = 10
 }
 `
@@ -635,7 +620,7 @@ const testAccCheckSakuraCloudServerConfig_with_packet_filter_add = `
 resource "sakuracloud_packet_filter" "foobar1" {
     name = "mypacket_filter1"
     description = "PacketFilter from TerraForm for SAKURA CLOUD"
-    expressions = {
+    expressions {
     	protocol = "tcp"
     	source_nw = "0.0.0.0"
     	source_port = "0-65535"
@@ -646,7 +631,7 @@ resource "sakuracloud_packet_filter" "foobar1" {
 resource "sakuracloud_packet_filter" "foobar2" {
     name = "mypacket_filter2"
     description = "PacketFilter from TerraForm for SAKURA CLOUD"
-    expressions = {
+    expressions {
     	protocol = "tcp"
     	source_nw = "0.0.0.0"
     	source_port = "0-65535"
@@ -658,7 +643,7 @@ resource "sakuracloud_server" "foobar" {
     name = "myserver_upd"
     nic = "shared"
     additional_nics = [""]
-    packet_filter_ids = ["${sakuracloud_packet_filter.foobar1.id}" , "${sakuracloud_packet_filter.foobar2.id}"]
+    packet_filter_ids = [sakuracloud_packet_filter.foobar1.id , sakuracloud_packet_filter.foobar2.id]
     graceful_shutdown_timeout = 10
 }
 
@@ -668,7 +653,7 @@ const testAccCheckSakuraCloudServerConfig_with_packet_filter_upd = `
 resource "sakuracloud_packet_filter" "foobar1" {
     name = "mypacket_filter1"
     description = "PacketFilter from TerraForm for SAKURA CLOUD"
-    expressions = {
+    expressions {
     	protocol = "udp"
     	source_nw = "0.0.0.0"
     	source_port = "0-65535"
@@ -679,7 +664,7 @@ resource "sakuracloud_packet_filter" "foobar1" {
 resource "sakuracloud_packet_filter" "foobar2" {
     name = "mypacket_filter2"
     description = "PacketFilter from TerraForm for SAKURA CLOUD"
-    expressions = {
+    expressions {
     	protocol = "udp"
     	source_nw = "0.0.0.0"
     	source_port = "0-65535"
@@ -691,7 +676,7 @@ resource "sakuracloud_server" "foobar" {
     name = "myserver_upd"
     nic = "shared"
     additional_nics = [""]
-    packet_filter_ids = ["${sakuracloud_packet_filter.foobar1.id}"]
+    packet_filter_ids = [sakuracloud_packet_filter.foobar1.id]
     graceful_shutdown_timeout = 10
 }
 
@@ -709,7 +694,7 @@ const testAccCheckSakuraCloudServerConfig_with_blank_disk = `
 resource "sakuracloud_server" "foobar" {
     name = "myserver_with_blank"
     nic = "shared"
-    disks = ["${sakuracloud_disk.foobar.id}"]
+    disks = [sakuracloud_disk.foobar.id]
     graceful_shutdown_timeout = 10
 }
 resource "sakuracloud_disk" "foobar" {
@@ -724,7 +709,7 @@ resource "sakuracloud_switch" "foobar" {
 resource "sakuracloud_server" "foobar" {
     name = "foobar"
     nic = "shared"
-    additional_nics = ["${sakuracloud_switch.foobar.id}"]
+    additional_nics = [sakuracloud_switch.foobar.id]
     graceful_shutdown_timeout = 10
 }
 `
@@ -735,7 +720,7 @@ resource "sakuracloud_switch" "foobar" {
 }
 resource "sakuracloud_server" "foobar" {
     name = "foobar"
-    nic = "${sakuracloud_switch.foobar.id}"
+    nic = sakuracloud_switch.foobar.id
     additional_nics = [""]
     graceful_shutdown_timeout = 10
 }
@@ -765,9 +750,9 @@ resource "sakuracloud_server" "foobar" {
     graceful_shutdown_timeout = 10
 }
 resource sakuracloud_simple_monitor "foobar" {
-  target = "${sakuracloud_server.foobar.ipaddress}"
+  target = sakuracloud_server.foobar.ipaddress
 
-  health_check = {
+  health_check {
     protocol   = "ping"
   }
 
@@ -786,9 +771,9 @@ resource "sakuracloud_server" "foobar" {
     graceful_shutdown_timeout = 10
 }
 resource sakuracloud_simple_monitor "foobar" {
-  target = "${sakuracloud_server.foobar.ipaddress}"
+  target = sakuracloud_server.foobar.ipaddress
 
-  health_check = {
+  health_check {
     protocol   = "ping"
   }
 
@@ -799,22 +784,19 @@ resource sakuracloud_simple_monitor "foobar" {
 
 const testAccCheckSakuraCloudServerConfig_switched_eth0 = `
 data "sakuracloud_archive" "ubuntu" {
-    filter = {
-	name = "Name"
-	values = ["Ubuntu Server 16"]
-    }
+  os_type = "ubuntu"
 }
 resource "sakuracloud_disk" "foobar" {
     name = "mydisk"
-    source_archive_id = "${data.sakuracloud_archive.ubuntu.id}"
+    source_archive_id = data.sakuracloud_archive.ubuntu.id
 }
 resource "sakuracloud_switch" "foobar" {
     name = "foobar"
 }
 resource "sakuracloud_server" "foobar" {
     name        = "foobar"
-    disks       = ["${sakuracloud_disk.foobar.id}"]
-    nic         = "${sakuracloud_switch.foobar.id}"
+    disks       = [sakuracloud_disk.foobar.id]
+    nic         = sakuracloud_switch.foobar.id
     ipaddress   = "192.168.0.2"
     nw_mask_len = 24
     gateway     = "192.168.0.1"
@@ -830,10 +812,10 @@ resource sakuracloud_switch "sw" {
 
 resource sakuracloud_server "switched" {
   name              = "sakuracloud_test_connect_to_switched"
-  nic               = "${sakuracloud_switch.sw.0.id}"
+  nic               = sakuracloud_switch.sw[0].id
   display_ipaddress = "192.2.0.1"
 
-  additional_nics                = ["${sakuracloud_switch.sw.1.id}", "${sakuracloud_switch.sw.2.id}"]
+  additional_nics                = [sakuracloud_switch.sw[1].id, sakuracloud_switch.sw[2].id]
   additional_display_ipaddresses = ["192.2.1.1", "192.2.2.1"]
 }
 `
@@ -845,9 +827,9 @@ resource sakuracloud_switch "sw" {
 
 resource sakuracloud_server "switched" {
   name              = "sakuracloud_test_connect_to_switched"
-  nic               = "${sakuracloud_switch.sw.0.id}"
+  nic               = sakuracloud_switch.sw[0].id
   display_ipaddress = "192.2.0.2"
-  additional_nics   = ["${sakuracloud_switch.sw.1.id}", "${sakuracloud_switch.sw.2.id}"]
+  additional_nics   = [sakuracloud_switch.sw[1].id, sakuracloud_switch.sw[2].id]
   additional_display_ipaddresses = ["192.2.1.2", "192.2.2.2"]
 }
 `

@@ -149,7 +149,7 @@ resource "sakuracloud_dns" "foobar" {
     zone = "%s"
     description = "DNS from TerraForm for SAKURA CLOUD"
     tags = ["tag1","tag2"]
-    icon_id = "${sakuracloud_icon.foobar.id}"
+    icon_id = sakuracloud_icon.foobar.id
 }
 
 resource "sakuracloud_icon" "foobar" {

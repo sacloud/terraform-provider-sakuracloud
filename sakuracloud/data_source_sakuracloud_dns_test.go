@@ -104,8 +104,8 @@ func testAccCheckSakuraCloudDNSDataSourceID(n string) resource.TestCheckFunc {
 
 func testAccCheckSakuraCloudDNSDataSourceNotExists(n string) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
-		_, ok := s.RootModule().Resources[n]
-		if ok {
+		v, ok := s.RootModule().Resources[n]
+		if ok && v.Primary.ID != "" {
 			return fmt.Errorf("Found DNS data source: %s", n)
 		}
 		return nil
@@ -151,7 +151,7 @@ resource "sakuracloud_dns" "foobar" {
     tags = ["tag1","tag2","tag3"]
 }
 data "sakuracloud_dns" "foobar" {
-    filter = {
+    filter {
 	name = "Name"
 	values = ["%s"]
     }
@@ -166,7 +166,7 @@ resource "sakuracloud_dns" "foobar" {
     tags = ["tag1","tag2","tag3"]
 }
 data "sakuracloud_dns" "foobar" {
-    filter = {
+    filter {
 	name = "Tags"
 	values = ["tag1","tag3"]
     }
@@ -181,7 +181,7 @@ resource "sakuracloud_dns" "foobar" {
     tags = ["tag1","tag2","tag3"]
 }
 data "sakuracloud_dns" "foobar" {
-    filter = {
+    filter {
 	name = "Tags"
 	values = ["tag1-xxxxxxx","tag3-xxxxxxxx"]
     }
@@ -196,7 +196,7 @@ resource "sakuracloud_dns" "foobar" {
     tags = ["tag1","tag2","tag3"]
 }
 data "sakuracloud_dns" "foobar" {
-    filter = {
+    filter {
 	name = "Name"
 	values = ["xxxxxxxxxxxxxxxxxx"]
     }

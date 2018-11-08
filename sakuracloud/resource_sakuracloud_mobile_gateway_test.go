@@ -176,16 +176,16 @@ resource "sakuracloud_switch" "sw" {
 }
 
 resource "sakuracloud_mobile_gateway" "foobar" {
-  switch_id           = "${sakuracloud_switch.sw.id}"
+  switch_id           = sakuracloud_switch.sw.id
   private_ipaddress   = "192.168.11.101"
   private_nw_mask_len = 24
   internet_connection = true
   name                = "name_before"
   description         = "description_before"
   tags                = ["hoge1", "hoge2"]
-  icon_id             = "${sakuracloud_icon.foobar.id}"
+  icon_id             = sakuracloud_icon.foobar.id
 
-  traffic_control = {
+  traffic_control {
     quota                = 256
     band_width_limit     = 64
     enable_email         = true
@@ -196,19 +196,19 @@ resource "sakuracloud_mobile_gateway" "foobar" {
 }
 
 resource sakuracloud_mobile_gateway_static_route "r1" {
-  mobile_gateway_id = "${sakuracloud_mobile_gateway.foobar.id}"
+  mobile_gateway_id = sakuracloud_mobile_gateway.foobar.id
   prefix = "192.168.10.0/24"
   next_hop = "192.168.11.1"
 }
 
 resource sakuracloud_mobile_gateway_static_route "r2" {
-  mobile_gateway_id = "${sakuracloud_mobile_gateway.foobar.id}"
+  mobile_gateway_id = sakuracloud_mobile_gateway.foobar.id
   prefix = "192.168.10.0/25"
   next_hop = "192.168.11.2"
 }
 
 resource sakuracloud_mobile_gateway_static_route "r3" {
-  mobile_gateway_id = "${sakuracloud_mobile_gateway.foobar.id}"
+  mobile_gateway_id = sakuracloud_mobile_gateway.foobar.id
   prefix = "192.168.10.0/26"
   next_hop = "192.168.11.3"
 }

@@ -76,8 +76,8 @@ func testAccCheckSakuraCloudBridgeDataSourceID(n string) resource.TestCheckFunc 
 
 func testAccCheckSakuraCloudBridgeDataSourceNotExists(n string) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
-		_, ok := s.RootModule().Resources[n]
-		if ok {
+		v, ok := s.RootModule().Resources[n]
+		if ok && v.Primary.ID != "" {
 			return fmt.Errorf("Found Bridge data source: %s", n)
 		}
 		return nil
@@ -122,29 +122,29 @@ resource "sakuracloud_bridge" "foobar" {
     description = "description_test"
 }
 data "sakuracloud_bridge" "foobar" {
-    filter = {
-	name = "Name"
-	values = ["%s"]
-    }
+  filter {
+    name = "Name"
+    values = ["%s"]
+  }
 }`, name, name)
 }
 
 var testAccCheckSakuraCloudDataSourceBridgeConfig_NotExists = `
 data "sakuracloud_bridge" "foobar" {
-    filter = {
-	name = "Name"
-	values = ["xxxxxxxxxxxxxxxxxx"]
-    }
+  filter {
+    name = "Name"
+    values = ["xxxxxxxxxxxxxxxxxx"]
+  }
 }`
 
 func testAccCheckSakuraCloudDataSourceBridgeConfig_NameSelector_Exists(name, p1, p2 string) string {
 	return fmt.Sprintf(`
 resource "sakuracloud_bridge" "foobar" {
-    name = "%s"
-    description = "description_test"
+  name = "%s"
+  description = "description_test"
 }
 data "sakuracloud_bridge" "foobar" {
-    name_selectors = ["%s", "%s"]
+  name_selectors = ["%s", "%s"]
 }`, name, p1, p2)
 }
 

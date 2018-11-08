@@ -121,25 +121,6 @@ func TestAccResourceSakuraCloudSwitchCustomiezeDiff_AddTags(t *testing.T) {
 	})
 }
 
-//func TestAccResourceSakuraCloudSwitch_Import(t *testing.T) {
-//	resourceName := "sakuracloud_switch.foobar"
-//	resource.Test(t, resource.TestCase{
-//		PreCheck:     func() { testAccPreCheck(t) },
-//		Providers:    testAccProviders,
-//		CheckDestroy: testAccCheckSakuraCloudSwitchDestroy,
-//		Steps: []resource.TestStep{
-//			{
-//				Config: testAccCheckSakuraCloudSwitchConfig_basic,
-//			},
-//			{
-//				ResourceName:      resourceName,
-//				ImportState:       true,
-//				ImportStateVerify: true,
-//			},
-//		},
-//	})
-//}
-
 func testAccCheckSakuraCloudSwitchExists(n string, sw *sacloud.Switch) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
 		rs, ok := s.RootModule().Resources[n]
@@ -192,7 +173,7 @@ resource "sakuracloud_switch" "foobar" {
     name = "myswitch"
     description = "Switch from TerraForm for SAKURA CLOUD"
     tags = ["hoge1" , "hoge2"]
-    icon_id = "${sakuracloud_icon.foobar.id}"
+    icon_id = sakuracloud_icon.foobar.id
 }
 
 resource "sakuracloud_icon" "foobar" {
@@ -205,7 +186,7 @@ var testAccCheckSakuraCloudSwitchConfig_update = `
 resource "sakuracloud_server" "foobar" {
     name = "myserver"
     description = "Server from TerraForm for SAKURA CLOUD"
-    additional_nics = ["${sakuracloud_switch.foobar.id}"]
+    additional_nics = [sakuracloud_switch.foobar.id]
 }
 resource "sakuracloud_switch" "foobar" {
     name = "myswitch_upd"
