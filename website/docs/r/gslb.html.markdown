@@ -25,6 +25,18 @@ resource "sakuracloud_gslb" "foobar" {
     status      = "200"
   }
 
+  servers {
+    ipaddress = "192.0.2.1"
+    #weight    = 1
+    #enabled   = true
+  }
+  
+  servers {
+    ipaddress = "192.0.2.2"
+    #weight    = 1
+    #enabled   = true
+  }
+
   sorry_server = "192.2.0.1"
 
   description = "description"
@@ -38,6 +50,7 @@ The following arguments are supported:
 
 * `name` - (Required) The name of the resource.
 * `health_check` - (Required) Health check rules. It contains some attributes to [Health Check](#health-check).
+* `servers` - (Optional) Real servers. It contains some attributes to [Servers](#servers).
 * `weighted` - (Optional) The flag for enable/disable weighting (default:`true`).
 * `sorry_server` - (Optional) The hostname or IP address of sorry server.
 * `description` - (Optional) The description of the resource.
@@ -55,6 +68,12 @@ Valid value is one of the following: [ "http" / "https" / "ping" / "tcp" ]
 * `path` - (Optional) The request path used in http/https health check access.
 * `status` - (Optional) HTTP status code expected by health check access.
 * `port` - (Optional) Port number used in tcp health check access.
+
+### Servers
+
+* `ipaddress` - (Required) The IP address of the GSLB Server.
+* `enabled` - (Optional) The flag for enable/disable the GSLB Server (default:`true`).
+* `weight` - (Optional) The weight of GSLB server used when weighting is enabled in the GSLB.
 
 ## Attributes Reference
 

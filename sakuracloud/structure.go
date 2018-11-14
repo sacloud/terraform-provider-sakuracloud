@@ -15,6 +15,25 @@ type resourceValueGetable interface {
 	GetOk(key string) (interface{}, bool)
 }
 
+type resourceMapValue struct {
+	value map[string]interface{}
+}
+
+func (r *resourceMapValue) GetOk(key string) (interface{}, bool) {
+	v, ok := r.value[key]
+	return v, ok
+}
+
+func mergeSchemas(schemas ...map[string]*schema.Schema) map[string]*schema.Schema {
+	m := map[string]*schema.Schema{}
+	for _, schema := range schemas {
+		for k, v := range schema {
+			m[k] = v
+		}
+	}
+	return m
+}
+
 func getSacloudAPIClient(d resourceValueGetable, meta interface{}) *APIClient {
 	c := meta.(*APIClient)
 	client := c.Clone()
