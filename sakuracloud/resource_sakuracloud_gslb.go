@@ -83,7 +83,7 @@ func resourceSakuraCloudGSLB() *schema.Resource {
 				Computed: true,
 				MaxItems: 6,
 				Elem: &schema.Resource{
-					Schema: gslbServerValueSchemas,
+					Schema: gslbServerValueSchemas(),
 				},
 			},
 			"icon_id": {
@@ -105,22 +105,24 @@ func resourceSakuraCloudGSLB() *schema.Resource {
 	}
 }
 
-var gslbServerValueSchemas = map[string]*schema.Schema{
-	"ipaddress": {
-		Type:     schema.TypeString,
-		Required: true,
-	},
-	"enabled": {
-		Type:     schema.TypeBool,
-		Optional: true,
-		Default:  true,
-	},
-	"weight": {
-		Type:         schema.TypeInt,
-		Optional:     true,
-		ValidateFunc: validation.IntBetween(1, 10000),
-		Default:      1,
-	},
+func gslbServerValueSchemas() map[string]*schema.Schema {
+	return map[string]*schema.Schema{
+		"ipaddress": {
+			Type:     schema.TypeString,
+			Required: true,
+		},
+		"enabled": {
+			Type:     schema.TypeBool,
+			Optional: true,
+			Default:  true,
+		},
+		"weight": {
+			Type:         schema.TypeInt,
+			Optional:     true,
+			ValidateFunc: validation.IntBetween(1, 10000),
+			Default:      1,
+		},
+	}
 }
 
 func resourceSakuraCloudGSLBCreate(d *schema.ResourceData, meta interface{}) error {
