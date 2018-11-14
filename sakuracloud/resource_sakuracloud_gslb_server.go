@@ -29,7 +29,7 @@ func gslbServerResourceSchema() map[string]*schema.Schema {
 			ForceNew:     true,
 			ValidateFunc: validateSakuracloudIDType,
 		},
-	}, gslbServerValueSchemas)
+	}, gslbServerValueSchemas())
 	for _, v := range s {
 		v.ForceNew = true
 	}
