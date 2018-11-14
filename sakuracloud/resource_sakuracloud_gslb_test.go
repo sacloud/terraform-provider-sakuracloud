@@ -31,6 +31,18 @@ func TestAccResourceSakuraCloudGSLB(t *testing.T) {
 						"sakuracloud_gslb.foobar", "health_check.0.delay_loop", "10"),
 					resource.TestCheckResourceAttr(
 						"sakuracloud_gslb.foobar", "health_check.0.host_header", "terraform.io"),
+					resource.TestCheckResourceAttr(
+						"sakuracloud_gslb.foobar", "servers.0.ipaddress", "1.1.1.1"),
+					resource.TestCheckResourceAttr(
+						"sakuracloud_gslb.foobar", "servers.0.weight", "1"),
+					resource.TestCheckResourceAttr(
+						"sakuracloud_gslb.foobar", "servers.0.enabled", "true"),
+					resource.TestCheckResourceAttr(
+						"sakuracloud_gslb.foobar", "servers.1.ipaddress", "2.2.2.2"),
+					resource.TestCheckResourceAttr(
+						"sakuracloud_gslb.foobar", "servers.1.weight", "2"),
+					resource.TestCheckResourceAttr(
+						"sakuracloud_gslb.foobar", "servers.1.enabled", "false"),
 					resource.TestCheckResourceAttrPair(
 						"sakuracloud_gslb.foobar", "icon_id",
 						"sakuracloud_icon.foobar", "id",
@@ -52,6 +64,18 @@ func TestAccResourceSakuraCloudGSLB(t *testing.T) {
 					resource.TestCheckResourceAttr(
 						"sakuracloud_gslb.foobar", "health_check.0.host_header", "update.terraform.io"),
 					resource.TestCheckResourceAttr(
+						"sakuracloud_gslb.foobar", "servers.0.ipaddress", "2.2.2.2"),
+					resource.TestCheckResourceAttr(
+						"sakuracloud_gslb.foobar", "servers.0.weight", "2"),
+					resource.TestCheckResourceAttr(
+						"sakuracloud_gslb.foobar", "servers.0.enabled", "true"),
+					resource.TestCheckResourceAttr(
+						"sakuracloud_gslb.foobar", "servers.1.ipaddress", "3.3.3.3"),
+					resource.TestCheckResourceAttr(
+						"sakuracloud_gslb.foobar", "servers.1.weight", "3"),
+					resource.TestCheckResourceAttr(
+						"sakuracloud_gslb.foobar", "servers.1.enabled", "false"),
+					resource.TestCheckResourceAttr(
 						"sakuracloud_gslb.foobar", "icon_id", ""),
 				),
 			},
@@ -69,6 +93,20 @@ func TestAccResourceSakuraCloudGSLB(t *testing.T) {
 						"sakuracloud_gslb.foobar", "health_check.0.delay_loop", "20"),
 					resource.TestCheckResourceAttr(
 						"sakuracloud_gslb.foobar", "health_check.0.host_header", "update.terraform.io"),
+
+					// gslb.servers is set compted=true, so left following values
+					resource.TestCheckResourceAttr(
+						"sakuracloud_gslb.foobar", "servers.0.ipaddress", "2.2.2.2"),
+					resource.TestCheckResourceAttr(
+						"sakuracloud_gslb.foobar", "servers.0.weight", "2"),
+					resource.TestCheckResourceAttr(
+						"sakuracloud_gslb.foobar", "servers.0.enabled", "true"),
+					resource.TestCheckResourceAttr(
+						"sakuracloud_gslb.foobar", "servers.1.ipaddress", "3.3.3.3"),
+					resource.TestCheckResourceAttr(
+						"sakuracloud_gslb.foobar", "servers.1.weight", "3"),
+					resource.TestCheckResourceAttr(
+						"sakuracloud_gslb.foobar", "servers.1.enabled", "false"),
 				),
 			},
 		},
@@ -179,6 +217,16 @@ resource "sakuracloud_gslb" "foobar" {
         status = "200"
     }
     sorry_server = "8.8.8.8"
+    servers {
+        ipaddress = "1.1.1.1"
+        weight    = 1
+        enabled   = true
+    }
+    servers {
+        ipaddress = "2.2.2.2"
+        weight    = 2
+        enabled   = false
+    }
     description = "GSLB from TerraForm for SAKURA CLOUD"
     tags = ["hoge1", "hoge2"]
     icon_id = sakuracloud_icon.foobar.id
@@ -199,6 +247,16 @@ resource "sakuracloud_gslb" "foobar" {
         host_header = "update.terraform.io"
         path = "/"
         status = "200"
+    }
+    servers {
+        ipaddress = "2.2.2.2"
+        weight    = 2
+        enabled   = true
+    }
+    servers {
+        ipaddress = "3.3.3.3"
+        weight    = 3
+        enabled   = false
     }
     sorry_server = "8.8.4.4"
     description = "GSLB from TerraForm for SAKURA CLOUD"
