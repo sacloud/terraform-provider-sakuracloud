@@ -154,7 +154,7 @@ resource "sakuracloud_packet_filter" "foobar" {
 }
 
 resource sakuracloud_packet_filter_rule "rule0" {
-    packet_filter_id = "${sakuracloud_packet_filter.foobar.id}"
+    packet_filter_id = sakuracloud_packet_filter.foobar.id
 
  	protocol    = "tcp"
 	source_nw   = "192.168.2.0"
@@ -165,7 +165,7 @@ resource sakuracloud_packet_filter_rule "rule0" {
 }
 
 resource sakuracloud_packet_filter_rule "rule1" {
-    packet_filter_id = "${sakuracloud_packet_filter.foobar.id}"
+    packet_filter_id = sakuracloud_packet_filter.foobar.id
 
 	protocol    = "tcp"
 	source_nw   = "192.168.2.0"
@@ -176,7 +176,7 @@ resource sakuracloud_packet_filter_rule "rule1" {
 }
 
 resource sakuracloud_packet_filter_rule "rule2" {
-    packet_filter_id = "${sakuracloud_packet_filter.foobar.id}"
+    packet_filter_id = sakuracloud_packet_filter.foobar.id
 
  	protocol    = "ip"
 	allow       = false
@@ -191,7 +191,7 @@ resource "sakuracloud_packet_filter" "foobar" {
 }
 
 resource sakuracloud_packet_filter_rule "rule0" {
-    packet_filter_id = "${sakuracloud_packet_filter.foobar.id}"
+    packet_filter_id = sakuracloud_packet_filter.foobar.id
 
    	protocol    = "udp"
   	source_nw   = "192.168.2.2"
@@ -202,7 +202,7 @@ resource sakuracloud_packet_filter_rule "rule0" {
 }
 
 resource sakuracloud_packet_filter_rule "rule1" {
-    packet_filter_id = "${sakuracloud_packet_filter.foobar.id}"
+    packet_filter_id = sakuracloud_packet_filter.foobar.id
 
    	protocol    = "udp"
   	source_nw   = "192.168.2.2"
@@ -213,7 +213,7 @@ resource sakuracloud_packet_filter_rule "rule1" {
 }
 
 resource sakuracloud_packet_filter_rule "rule2" {
-    packet_filter_id = "${sakuracloud_packet_filter.foobar.id}"
+    packet_filter_id = sakuracloud_packet_filter.foobar.id
 
   	protocol    = "ip"
 	allow       = false
@@ -228,7 +228,7 @@ resource "sakuracloud_packet_filter" "foobar" {
 }
 
 resource sakuracloud_packet_filter_rule "rule0" {
-    packet_filter_id = "${sakuracloud_packet_filter.foobar.id}"
+    packet_filter_id = sakuracloud_packet_filter.foobar.id
 
  	protocol    = "tcp"
 	source_nw   = "192.168.2.0"
@@ -239,7 +239,7 @@ resource sakuracloud_packet_filter_rule "rule0" {
 }
 
 resource sakuracloud_packet_filter_rule "rule2" {
-    packet_filter_id = "${sakuracloud_packet_filter.foobar.id}"
+    packet_filter_id = sakuracloud_packet_filter.foobar.id
 
  	protocol    = "ip"
 	allow       = false

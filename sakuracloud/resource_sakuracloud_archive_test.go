@@ -144,7 +144,7 @@ resource "sakuracloud_archive" "foobar" {
     name = "myarchive"
     size = 20
     archive_file = "test/dummy.raw"
-    hash = "${md5(file("test/dummy.raw"))}"
+    hash = md5(filebase64("test/dummy.raw"))
     description = "description"
     tags = ["tag1" , "tag2"]
 }
@@ -155,10 +155,10 @@ resource "sakuracloud_archive" "foobar" {
     name = "myarchive-upd"
     size = 20
     archive_file = "test/dummy-upd.raw"
-    hash = "${md5(file("test/dummy-upd.raw"))}"
+    hash = md5(filebase64("test/dummy-upd.raw"))
     description = "description-upd"
     tags = ["tag1-upd" , "tag2-upd"]
-    icon_id = "${sakuracloud_icon.foobar.id}"
+    icon_id = sakuracloud_icon.foobar.id
 }
 resource "sakuracloud_icon" "foobar" {
     name = "myicon"

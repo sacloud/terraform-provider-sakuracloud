@@ -80,8 +80,8 @@ func testAccCheckSakuraCloudPacketFilterDataSourceID(n string) resource.TestChec
 
 func testAccCheckSakuraCloudPacketFilterDataSourceNotExists(n string) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
-		_, ok := s.RootModule().Resources[n]
-		if ok {
+		v, ok := s.RootModule().Resources[n]
+		if ok && v.Primary.ID != "" {
 			return fmt.Errorf("Found PacketFilter data source: %s", n)
 		}
 		return nil
@@ -115,14 +115,14 @@ func testAccCheckSakuraCloudDataSourcePacketFilterBase(name string) string {
 resource "sakuracloud_packet_filter" "foobar" {
     name = "%s"
     description = "description_test"
-    expressions = {
+    expressions {
     	protocol = "tcp"
     	source_nw = "0.0.0.0"
     	source_port = "0-65535"
     	dest_port = "80"
     	allow = true
     }
-    expressions = {
+    expressions {
     	protocol = "udp"
     	source_nw = "0.0.0.0"
     	source_port = "0-65535"
@@ -137,14 +137,14 @@ func testAccCheckSakuraCloudDataSourcePacketFilterConfig(name string) string {
 resource "sakuracloud_packet_filter" "foobar" {
     name = "%s"
     description = "description_test"
-    expressions = {
+    expressions {
     	protocol = "tcp"
     	source_nw = "0.0.0.0"
     	source_port = "0-65535"
     	dest_port = "80"
     	allow = true
     }
-    expressions = {
+    expressions {
     	protocol = "udp"
     	source_nw = "0.0.0.0"
     	source_port = "0-65535"
@@ -153,7 +153,7 @@ resource "sakuracloud_packet_filter" "foobar" {
     }
 }
 data "sakuracloud_packet_filter" "foobar" {
-    filter = {
+    filter {
 	name = "Name"
 	values = ["%s"]
     }
@@ -162,7 +162,7 @@ data "sakuracloud_packet_filter" "foobar" {
 
 var testAccCheckSakuraCloudDataSourcePacketFilterConfig_NotExists = `
 data "sakuracloud_packet_filter" "foobar" {
-    filter = {
+    filter {
 	name = "Name"
 	values = ["xxxxxxxxxxxxxxxxxx"]
     }
@@ -173,14 +173,14 @@ func testAccCheckSakuraCloudDataSourcePacketFilter_NameSelector_Exists(name, p1,
 resource "sakuracloud_packet_filter" "foobar" {
     name = "%s"
     description = "description_test"
-    expressions = {
+    expressions {
     	protocol = "tcp"
     	source_nw = "0.0.0.0"
     	source_port = "0-65535"
     	dest_port = "80"
     	allow = true
     }
-    expressions = {
+    expressions {
     	protocol = "udp"
     	source_nw = "0.0.0.0"
     	source_port = "0-65535"

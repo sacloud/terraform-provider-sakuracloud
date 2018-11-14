@@ -109,8 +109,8 @@ func testAccCheckSakuraCloudDiskDataSourceID(n string) resource.TestCheckFunc {
 
 func testAccCheckSakuraCloudDiskDataSourceNotExists(n string) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
-		_, ok := s.RootModule().Resources[n]
-		if ok {
+		v, ok := s.RootModule().Resources[n]
+		if ok && v.Primary.ID != "" {
 			return fmt.Errorf("Found Disk data source: %s", n)
 		}
 		return nil
@@ -157,7 +157,7 @@ resource "sakuracloud_disk" "disk01"{
 }
 
 data "sakuracloud_disk" "foobar" {
-    filter = {
+    filter {
 	name = "Name"
 	values = ["%s", "%s"]
     }
@@ -173,7 +173,7 @@ resource "sakuracloud_disk" "disk01"{
 }
 
 data "sakuracloud_disk" "foobar" {
-    filter = {
+    filter {
 	name = "Tags"
 	values = ["tag2","tag3"]
     }
@@ -189,7 +189,7 @@ resource "sakuracloud_disk" "disk01"{
 }
 
 data "sakuracloud_disk" "foobar" {
-    filter = {
+    filter {
 	name = "Tags"
 	values = ["tag2","tag4"]
     }
@@ -205,7 +205,7 @@ resource "sakuracloud_disk" "disk01"{
 }
 
 data "sakuracloud_disk" "foobar" {
-    filter = {
+    filter {
 	name = "Name"
 	values = ["xxxxxxxxxxxxxxxxxx"]
     }

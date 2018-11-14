@@ -106,8 +106,8 @@ func testAccCheckSakuraCloudSimpleMonitorDataSourceID(n string) resource.TestChe
 
 func testAccCheckSakuraCloudSimpleMonitorDataSourceNotExists(n string) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
-		_, ok := s.RootModule().Resources[n]
-		if ok {
+		v, ok := s.RootModule().Resources[n]
+		if ok && v.Primary.ID != "" {
 			return fmt.Errorf("Found SimpleMonitor data source: %s", n)
 		}
 		return nil
@@ -140,7 +140,7 @@ func testAccCheckSakuraCloudDataSourceSimpleMonitorBase(target string) string {
 	return fmt.Sprintf(`
 resource "sakuracloud_simple_monitor" "foobar" {
     target = "%s"
-    health_check = {
+    health_check {
         protocol = "http"
         delay_loop = 60
         path = "/"
@@ -159,7 +159,7 @@ func testAccCheckSakuraCloudDataSourceSimpleMonitorConfig(target string) string 
 	return fmt.Sprintf(`
 %s
 data "sakuracloud_simple_monitor" "foobar" {
-    filter = {
+    filter {
 	name = "Name"
 	values = ["%s"]
     }
@@ -170,7 +170,7 @@ func testAccCheckSakuraCloudDataSourceSimpleMonitorConfig_With_Tag(target string
 	return fmt.Sprintf(`
 %s
 data "sakuracloud_simple_monitor" "foobar" {
-    filter = {
+    filter {
 	name = "Tags"
 	values = ["tag1","tag3"]
     }
@@ -181,7 +181,7 @@ func testAccCheckSakuraCloudDataSourceSimpleMonitorConfig_With_NotExists_Tag(tar
 	return fmt.Sprintf(`
 %s
 data "sakuracloud_simple_monitor" "foobar" {
-    filter = {
+    filter {
 	name = "Tags"
 	values = ["tag1-xxxxxxx","tag3-xxxxxxxx"]
     }
@@ -192,7 +192,7 @@ func testAccCheckSakuraCloudDataSourceSimpleMonitorConfig_NotExists(target strin
 	return fmt.Sprintf(`
 %s
 data "sakuracloud_simple_monitor" "foobar" {
-    filter = {
+    filter {
 	name = "Name"
 	values = ["xxxxxxxxxxxxxxxxxx"]
     }

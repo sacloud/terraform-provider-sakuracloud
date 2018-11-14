@@ -4,11 +4,13 @@ clone_folder: c:\gopath\src\github.com\sacloud\terraform-provider-sakuracloud
 
 environment:
   GOPATH: c:\gopath
+  GOROOT: c:\go111
+  GO111MODULE: on
 
 install:
   - echo %PATH%
   - echo %GOPATH%
-  - set PATH=%GOPATH%\bin;c:\go\bin;%PATH%
+  - set PATH=%GOPATH%\bin;C:\go111\bin;%PATH%
   - go version
   - go env
 

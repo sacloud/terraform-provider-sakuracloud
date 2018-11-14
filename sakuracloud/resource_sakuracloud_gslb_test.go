@@ -129,7 +129,7 @@ func TestAccImportSakuraCloudGSLB(t *testing.T) {
 			return fmt.Errorf("expected 1 state: %#v", s)
 		}
 		expects := map[string]string{
-			"name": "terraform.io",
+			"name":                       "terraform.io",
 			"health_check.0.protocol":    "http",
 			"health_check.0.delay_loop":  "10",
 			"health_check.0.host_header": "terraform.io",
@@ -171,7 +171,7 @@ func TestAccImportSakuraCloudGSLB(t *testing.T) {
 var testAccCheckSakuraCloudGSLBConfig_basic = `
 resource "sakuracloud_gslb" "foobar" {
     name = "terraform.io"
-    health_check = {
+    health_check {
         protocol = "http"
         delay_loop = 10
         host_header = "terraform.io"
@@ -181,7 +181,7 @@ resource "sakuracloud_gslb" "foobar" {
     sorry_server = "8.8.8.8"
     description = "GSLB from TerraForm for SAKURA CLOUD"
     tags = ["hoge1", "hoge2"]
-    icon_id = "${sakuracloud_icon.foobar.id}"
+    icon_id = sakuracloud_icon.foobar.id
 }
 
 resource "sakuracloud_icon" "foobar" {
@@ -193,7 +193,7 @@ resource "sakuracloud_icon" "foobar" {
 var testAccCheckSakuraCloudGSLBConfig_update = `
 resource "sakuracloud_gslb" "foobar" {
     name = "terraform.io"
-    health_check = {
+    health_check {
         protocol = "https"
         delay_loop = 20
         host_header = "update.terraform.io"
@@ -208,7 +208,7 @@ resource "sakuracloud_gslb" "foobar" {
 var testAccCheckSakuraCloudGSLBConfig_added = `
 resource "sakuracloud_gslb" "foobar" {
     name = "terraform.io"
-    health_check = {
+    health_check {
         protocol = "https"
         delay_loop = 20
         host_header = "update.terraform.io"

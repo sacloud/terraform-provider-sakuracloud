@@ -16,7 +16,6 @@ require (
 	github.com/armon/go-radix v1.0.0 // indirect
 	github.com/aws/aws-sdk-go v1.15.59 // indirect
 	github.com/beevik/etree v1.0.1 // indirect
-	github.com/blang/semver v3.5.1+incompatible // indirect
 	github.com/chzyer/readline v0.0.0-20180603132655-2972be24d48e // indirect
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible // indirect
 	github.com/golang/groupcache v0.0.0-20180924190550-6f2cf27854a4 // indirect
@@ -39,7 +38,7 @@ require (
 	github.com/hashicorp/hcl2 v0.0.0-20181001210626-3e4b7e0eb20e // indirect
 	github.com/hashicorp/logutils v1.0.0 // indirect
 	github.com/hashicorp/serf v0.8.1 // indirect
-	github.com/hashicorp/terraform v0.12.0-alpha1
+	github.com/hashicorp/terraform v0.12.0-alpha2
 	github.com/hashicorp/vault v0.11.3 // indirect
 	github.com/hashicorp/yamux v0.0.0-20181012175058-2f1d1f20f75d // indirect
 	github.com/jen20/awspolicyequivalence v1.0.0 // indirect
@@ -55,13 +54,11 @@ require (
 	github.com/mattn/go-isatty v0.0.4 // indirect
 	github.com/mattn/go-runewidth v0.0.3 // indirect
 	github.com/mattn/go-shellwords v1.0.3 // indirect
-	github.com/mattn/go-tty v0.0.0-20180219170247-931426f7535a // indirect
 	github.com/miekg/dns v1.0.13 // indirect
 	github.com/mitchellh/cli v1.0.0 // indirect
 	github.com/mitchellh/copystructure v1.0.0 // indirect
 	github.com/mitchellh/go-homedir v1.0.0
 	github.com/mitchellh/go-testing-interface v1.0.0 // indirect
-	github.com/mitchellh/go-vnc v0.0.0-20150629162542-723ed9867aed // indirect
 	github.com/mitchellh/goamz v0.0.0-20150317174335-caaaea8b30ee
 	github.com/mitchellh/hashstructure v1.0.0 // indirect
 	github.com/mitchellh/mapstructure v1.1.2 // indirect
@@ -76,22 +73,18 @@ require (
 	github.com/ryanuber/columnize v2.1.0+incompatible // indirect
 	github.com/sacloud/ftps v0.0.0-20171205062625-42fc0f9886fe
 	github.com/sacloud/iso9660wrap v0.0.0-20171031075302-eda21f77f6a8
-	github.com/sacloud/libsacloud v0.0.0-20181012044508-a06f17c4eb0b
+	github.com/sacloud/libsacloud v1.1.0
 	github.com/satori/go.uuid v1.2.0 // indirect
 	github.com/satori/uuid v1.2.0 // indirect
-	github.com/skratchdot/open-golang v0.0.0-20160302144031-75fb7ed4208c // indirect
 	github.com/spf13/afero v1.1.2 // indirect
 	github.com/spf13/pflag v1.0.3 // indirect
 	github.com/stretchr/testify v1.2.2
-	github.com/terraform-providers/terraform-provider-aws v1.41.0 // indirect
 	github.com/terraform-providers/terraform-provider-openstack v1.10.0 // indirect
 	github.com/vaughan0/go-ini v0.0.0-20130923145212-a98ad7ee00ec // indirect
 	github.com/xlab/treeprint v0.0.0-20180616005107-d6fb6747feb6 // indirect
 	golang.org/x/crypto v0.0.0-20181015023909-0c41d7ab0a0e // indirect
-	golang.org/x/lint v0.0.0-20181011164241-5906bd5c48cd // indirect
 	golang.org/x/oauth2 v0.0.0-20181017192945-9dcd33a902f4 // indirect
 	golang.org/x/sys v0.0.0-20181019160139-8e24a49d80f8 // indirect
-	golang.org/x/tools v0.0.0-20181019201213-3e7aa9e59977 // indirect
 	google.golang.org/api v0.0.0-20181019000435-7fb5a8353b60 // indirect
 	google.golang.org/genproto v0.0.0-20181016170114-94acd270e44e // indirect
 	honnef.co/go/tools v0.0.0-20180920025451-e3ad64cb4ed3 // indirect

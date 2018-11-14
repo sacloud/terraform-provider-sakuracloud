@@ -110,7 +110,7 @@ resource "sakuracloud_switch" "sw" {
     name = "sw"
 }
 resource "sakuracloud_nfs" "foobar" {
-    switch_id     = "${sakuracloud_switch.sw.id}"
+    switch_id     = sakuracloud_switch.sw.id
     plan          = "500"
     ipaddress     = "192.168.11.101"
     nw_mask_len   = 24
@@ -118,7 +118,7 @@ resource "sakuracloud_nfs" "foobar" {
     name          = "name_before"
     description   = "description_before"
     tags          = ["hoge1" , "hoge2"]
-    icon_id       = "${sakuracloud_icon.foobar.id}"
+    icon_id       = sakuracloud_icon.foobar.id
 }
 
 resource "sakuracloud_icon" "foobar" {
@@ -132,7 +132,7 @@ resource "sakuracloud_switch" "sw" {
     name = "sw"
 }
 resource "sakuracloud_nfs" "foobar" {
-    switch_id     = "${sakuracloud_switch.sw.id}"
+    switch_id     = sakuracloud_switch.sw.id
     plan          = "500"
     ipaddress     = "192.168.11.101"
     nw_mask_len   = 24

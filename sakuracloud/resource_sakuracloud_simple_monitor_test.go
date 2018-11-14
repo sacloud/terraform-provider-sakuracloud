@@ -176,7 +176,7 @@ func testAccCheckSakuraCloudSimpleMonitorDestroy(s *terraform.State) error {
 var testAccCheckSakuraCloudSimpleMonitorConfig_basic = fmt.Sprintf(`
 resource "sakuracloud_simple_monitor" "foobar" {
     target = "terraform.io"
-    health_check = {
+    health_check {
         protocol = "https"
         delay_loop = 60
         path = "/"
@@ -192,7 +192,7 @@ resource "sakuracloud_simple_monitor" "foobar" {
     notify_email_html = true
     notify_slack_enabled = true
     notify_slack_webhook = "%s"
-    icon_id = "${sakuracloud_icon.foobar.id}"
+    icon_id = sakuracloud_icon.foobar.id
 }
 
 resource "sakuracloud_icon" "foobar" {
@@ -203,7 +203,7 @@ resource "sakuracloud_icon" "foobar" {
 var testAccCheckSakuraCloudSimpleMonitorConfig_update = fmt.Sprintf(`
 resource "sakuracloud_simple_monitor" "foobar" {
     target = "terraform.io"
-    health_check = {
+    health_check {
         protocol = "http"
         delay_loop = 120
         path = "/"
@@ -222,7 +222,7 @@ const testAccSlackWebhook = `https://hooks.slack.com/services/XXXXXXXXX/XXXXXXXX
 var testAccCheckSakuraCloudSimpleMonitorConfig_sslCertificate = fmt.Sprintf(`
 resource "sakuracloud_simple_monitor" "foobar" {
     target = "terraform.io"
-    health_check = {
+    health_check {
         protocol       = "sslcertificate"
         remaining_days = 30
     }
@@ -232,7 +232,7 @@ resource "sakuracloud_simple_monitor" "foobar" {
     notify_email_html = true
     notify_slack_enabled = true
     notify_slack_webhook = "%s"
-    icon_id = "${sakuracloud_icon.foobar.id}"
+    icon_id = sakuracloud_icon.foobar.id
 }
 
 resource "sakuracloud_icon" "foobar" {

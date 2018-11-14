@@ -134,7 +134,7 @@ func testAccCheckSakuraCloudInternetDestroy(s *terraform.State) error {
 var testAccCheckSakuraCloudInternetConfig_basic = `
 resource "sakuracloud_internet" "foobar" {
     name = "myinternet"
-    icon_id = "${sakuracloud_icon.foobar.id}"
+    icon_id = sakuracloud_icon.foobar.id
 }
 
 resource "sakuracloud_icon" "foobar" {
@@ -200,19 +200,19 @@ func TestAccImportSakuraCloudInternet(t *testing.T) {
 var testAccCheckSakuraCloudInternetConfig_update = `
 resource "sakuracloud_server" "foobar" {
     name = "myserver"
-    disks = ["${sakuracloud_disk.foobar.id}"]
+    disks = [sakuracloud_disk.foobar.id]
     description = "Server from TerraForm for SAKURA CLOUD"
-    nic = "${sakuracloud_internet.foobar.switch_id}"
-    ipaddress = "${sakuracloud_internet.foobar.ipaddresses[0]}"
-    gateway = "${sakuracloud_internet.foobar.gateway}"
-    nw_mask_len = "${sakuracloud_internet.foobar.nw_mask_len}"
+    nic = sakuracloud_internet.foobar.switch_id
+    ipaddress = sakuracloud_internet.foobar.ipaddresses[0]
+    gateway = sakuracloud_internet.foobar.gateway
+    nw_mask_len = sakuracloud_internet.foobar.nw_mask_len
 }
 data "sakuracloud_archive" "ubuntu" {
     os_type = "ubuntu"
 }
 resource "sakuracloud_disk" "foobar"{
     name = "mydisk"
-    source_archive_id = "${data.sakuracloud_archive.ubuntu.id}"
+    source_archive_id = data.sakuracloud_archive.ubuntu.id
 }
 
 resource "sakuracloud_internet" "foobar" {

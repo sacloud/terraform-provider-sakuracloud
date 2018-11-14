@@ -11,12 +11,12 @@ BUILD_LDFLAGS = "-s -w \
 	  -X github.com/sacloud/terraform-provider-sakuracloud/version.Version=$(CURRENT_VERSION)"
 export GO111MODULE=on
 
-default: test vet
+default: vet build
 
 clean:
 	rm -Rf $(CURDIR)/bin/*
 
-build: clean vet
+build:
 	OS="`go env GOOS`" ARCH="`go env GOARCH`" ARCHIVE= BUILD_LDFLAGS=$(BUILD_LDFLAGS) CURRENT_VERSION=$(CURRENT_VERSION) PROTOCOL_VERSION=$(PROTOCOL_VERSION) sh -c "'$(CURDIR)/scripts/build.sh'"
 
 build-x: build-darwin build-windows build-linux shasum
@@ -48,15 +48,15 @@ bin/terraform-provider-sakuracloud_$(CURRENT_VERSION)_linux-amd64.zip:
 shasum:
 	(cd bin/; shasum -a 256 * > terraform-provider-sakuracloud_$(CURRENT_VERSION)_SHA256SUMS)
 
-test: vet
+test:
 	TF_ACC= go test $(TEST1) -v $(TESTARGS) -timeout=30s -parallel=4 ; \
 	TF_ACC= go test $(TEST2) -v $(TESTARGS) -timeout=30s -parallel=4
 
-testacc: vet
+testacc:
 	TF_ACC=1 go test $(TEST1) -v $(TESTARGS) -timeout 240m ; \
 	TF_ACC=1 go test $(TEST2) -v $(TESTARGS) -timeout 240m
 
-testacc-resource: vet
+testacc-resource:
 	TF_ACC=1 go test $(TEST1) -v $(TESTARGS) -run="^TestAccResource" -timeout 240m ; \
 	TF_ACC=1 go test $(TEST2) -v $(TESTARGS) -run="^TestAccResource" -timeout 240m
 

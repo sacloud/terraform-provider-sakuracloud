@@ -179,7 +179,7 @@ resource "sakuracloud_icon" "foobar" {
 
 resource sakuracloud_switch "foobar" {
   name = "mySwitch"
-  icon_id = "${sakuracloud_icon.foobar.id}"
+  icon_id = sakuracloud_icon.foobar.id
 }
 `
 
