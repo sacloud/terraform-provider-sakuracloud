@@ -7,7 +7,6 @@ import (
 
 	"github.com/hashicorp/terraform/helper/hashcode"
 	"github.com/hashicorp/terraform/helper/schema"
-	"github.com/hashicorp/terraform/helper/validation"
 	"github.com/sacloud/libsacloud/api"
 	"github.com/sacloud/libsacloud/sacloud"
 )
@@ -17,38 +16,17 @@ func resourceSakuraCloudLoadBalancerServer() *schema.Resource {
 		Create: resourceSakuraCloudLoadBalancerServerCreate,
 		Read:   resourceSakuraCloudLoadBalancerServerRead,
 		Delete: resourceSakuraCloudLoadBalancerServerDelete,
-		Schema: map[string]*schema.Schema{
+		Schema: resourceLoadBalancerServerSchema(),
+	}
+}
+
+func resourceLoadBalancerServerSchema() map[string]*schema.Schema {
+	s := mergeSchemas(
+		map[string]*schema.Schema{
 			"load_balancer_vip_id": {
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
-			},
-			"ipaddress": {
-				Type:     schema.TypeString,
-				ForceNew: true,
-				Required: true,
-			},
-			"check_protocol": {
-				Type:         schema.TypeString,
-				Required:     true,
-				ForceNew:     true,
-				ValidateFunc: validation.StringInSlice(sacloud.AllowLoadBalancerHealthCheckProtocol(), false),
-			},
-			"check_path": {
-				Type:     schema.TypeString,
-				Optional: true,
-				ForceNew: true,
-			},
-			"check_status": {
-				Type:     schema.TypeString,
-				Optional: true,
-				ForceNew: true,
-			},
-			"enabled": {
-				Type:     schema.TypeBool,
-				Optional: true,
-				ForceNew: true,
-				Default:  true,
 			},
 			"zone": {
 				Type:         schema.TypeString,
@@ -58,8 +36,12 @@ func resourceSakuraCloudLoadBalancerServer() *schema.Resource {
 				Description:  "target SakuraCloud zone",
 				ValidateFunc: validateZone([]string{"is1a", "is1b", "tk1a", "tk1v"}),
 			},
-		},
+		}, loadBalancerServerValueSchema(),
+	)
+	for _ , v := range s {
+		v.ForceNew = true
 	}
+	return s
 }
 
 func resourceSakuraCloudLoadBalancerServerCreate(d *schema.ResourceData, meta interface{}) error {
@@ -227,27 +209,6 @@ func loadBalancerServerIDHash(vipID string, s *sacloud.LoadBalancerServer) strin
 	buf.WriteString(fmt.Sprintf("%s", s.Port))
 
 	return fmt.Sprintf("%d", hashcode.String(buf.String()))
-}
-
-func expandLoadBalancerServer(d *schema.ResourceData) *sacloud.LoadBalancerServer {
-
-	var server = &sacloud.LoadBalancerServer{}
-	server.IPAddress = d.Get("ipaddress").(string)
-	server.Enabled = "False"
-	if d.Get("enabled").(bool) {
-		server.Enabled = "True"
-	}
-	server.HealthCheck = &sacloud.LoadBalancerHealthCheck{}
-
-	server.HealthCheck.Protocol = d.Get("check_protocol").(string)
-
-	switch server.HealthCheck.Protocol {
-	case "http", "https":
-		server.HealthCheck.Path = d.Get("check_path").(string)
-		server.HealthCheck.Status = d.Get("check_status").(string)
-	}
-
-	return server
 }
 
 func expandVIPID(vipID string) (string, string, string, error) {

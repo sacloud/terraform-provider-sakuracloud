@@ -6,7 +6,6 @@ import (
 	"strconv"
 
 	"github.com/hashicorp/terraform/helper/schema"
-	"github.com/hashicorp/terraform/helper/validation"
 	"github.com/sacloud/libsacloud/api"
 	"github.com/sacloud/libsacloud/sacloud"
 )
@@ -17,53 +16,31 @@ func resourceSakuraCloudLoadBalancerVIP() *schema.Resource {
 		Read:   resourceSakuraCloudLoadBalancerVIPRead,
 		Delete: resourceSakuraCloudLoadBalancerVIPDelete,
 		Update: resourceSakuraCloudLoadBalancerVIPUpdate,
-		Schema: map[string]*schema.Schema{
-			"load_balancer_id": {
-				Type:         schema.TypeString,
-				Required:     true,
-				ForceNew:     true,
-				ValidateFunc: validateSakuracloudIDType,
-			},
-			"vip": {
-				Type:     schema.TypeString,
-				ForceNew: true,
-				Required: true,
-			},
-			"port": {
-				Type:         schema.TypeInt,
-				Required:     true,
-				ForceNew:     true,
-				ValidateFunc: validation.IntBetween(1, 65535),
-			},
-			"delay_loop": {
-				Type:         schema.TypeInt,
-				Optional:     true,
-				ValidateFunc: validation.IntBetween(10, 2147483647),
-				Default:      10,
-			},
-			"sorry_server": {
-				Type:     schema.TypeString,
-				Optional: true,
-			},
-			"description": {
-				Type:     schema.TypeString,
-				Optional: true,
-			},
-			"zone": {
-				Type:         schema.TypeString,
-				Optional:     true,
-				Computed:     true,
-				ForceNew:     true,
-				Description:  "target SakuraCloud zone",
-				ValidateFunc: validateZone([]string{"is1a", "is1b", "tk1a", "tk1v"}),
-			},
-			"servers": {
-				Type:     schema.TypeList,
-				Computed: true,
-				Elem:     &schema.Schema{Type: schema.TypeString},
-			},
-		},
+		Schema: loadBalancerVIPSchema(),
 	}
+}
+
+func loadBalancerVIPSchema() map[string]*schema.Schema {
+	s := mergeSchemas(map[string]*schema.Schema{
+		"load_balancer_id": {
+			Type:         schema.TypeString,
+			Required:     true,
+			ForceNew:     true,
+			ValidateFunc: validateSakuracloudIDType,
+		},
+		"zone": {
+			Type:         schema.TypeString,
+			Optional:     true,
+			Computed:     true,
+			ForceNew:     true,
+			Description:  "target SakuraCloud zone",
+			ValidateFunc: validateZone([]string{"is1a", "is1b", "tk1a", "tk1v"}),
+		},
+	}, loadBalancerVIPValueSchema())
+
+	s["vip"].ForceNew = true
+	s["port"].ForceNew = true
+	return s
 }
 
 func resourceSakuraCloudLoadBalancerVIPCreate(d *schema.ResourceData, meta interface{}) error {
@@ -218,16 +195,7 @@ func loadBalancerVIPIDHash(loadBalancerID string, s *sacloud.LoadBalancerSetting
 	return buf.String()
 }
 
-func expandLoadBalancerVIP(d *schema.ResourceData) *sacloud.LoadBalancerSetting {
-	var vip = &sacloud.LoadBalancerSetting{}
-	vip.VirtualIPAddress = d.Get("vip").(string)
-	vip.Port = fmt.Sprintf("%d", d.Get("port").(int))
-	vip.DelayLoop = fmt.Sprintf("%d", d.Get("delay_loop").(int))
-	if sorry, ok := d.GetOk("sorry_server"); ok {
-		vip.SorryServer = sorry.(string)
-	}
-	return vip
-}
+
 
 func expandLoadBalancerServersFromVIP(lbID string, vipSetting *sacloud.LoadBalancerSetting) []string {
 	if vipSetting.Servers == nil || len(vipSetting.Servers) == 0 {
