@@ -248,7 +248,7 @@ func resourceSakuraCloudLoadBalancerCreate(d *schema.ResourceData, meta interfac
 		}
 	}
 
-	for _ , rawVip := range d.Get("vips").([]interface{}) {
+	for _, rawVip := range d.Get("vips").([]interface{}) {
 		v := &resourceMapValue{rawVip.(map[string]interface{})}
 		vip := expandLoadBalancerVIP(v)
 		createLb.AddLoadBalancerSetting(vip)
@@ -336,7 +336,7 @@ func resourceSakuraCloudLoadBalancerUpdate(d *schema.ResourceData, meta interfac
 
 	if d.HasChange("vips") {
 		loadBalancer.Settings.LoadBalancer = []*sacloud.LoadBalancerSetting{}
-		for _ , rawVip := range d.Get("vips").([]interface{}) {
+		for _, rawVip := range d.Get("vips").([]interface{}) {
 			v := &resourceMapValue{rawVip.(map[string]interface{})}
 			vip := expandLoadBalancerVIP(v)
 			loadBalancer.AddLoadBalancerSetting(vip)
@@ -410,8 +410,8 @@ func setLoadBalancerResourceData(d *schema.ResourceData, client *APIClient, data
 			vipIDs = append(vipIDs, loadBalancerVIPIDHash(data.GetStrID(), s))
 
 			vip := map[string]interface{}{
-				"vip": s.VirtualIPAddress,
-				"servers": expandLoadBalancerServersFromVIP(data.GetStrID(), s),
+				"vip":          s.VirtualIPAddress,
+				"servers":      expandLoadBalancerServersFromVIP(data.GetStrID(), s),
 				"sorry_server": s.SorryServer,
 			}
 
@@ -422,9 +422,9 @@ func setLoadBalancerResourceData(d *schema.ResourceData, client *APIClient, data
 			vip["delay_loop"] = delayLoop
 
 			var servers []interface{}
-			for _ , server := range s.Servers {
+			for _, server := range s.Servers {
 				s := map[string]interface{}{}
-				s["ipaddress"]  = server.IPAddress
+				s["ipaddress"] = server.IPAddress
 				s["check_protocol"] = server.HealthCheck.Protocol
 				s["check_path"] = server.HealthCheck.Path
 				s["check_status"] = server.HealthCheck.Status
@@ -451,7 +451,7 @@ func setLoadBalancerResourceData(d *schema.ResourceData, client *APIClient, data
 func expandLoadBalancerVIP(d resourceValueGetable) *sacloud.LoadBalancerSetting {
 	var vip = &sacloud.LoadBalancerSetting{}
 
-	if v , ok := d.GetOk("vip"); ok {
+	if v, ok := d.GetOk("vip"); ok {
 		vip.VirtualIPAddress = v.(string)
 	}
 	if v, ok := d.GetOk("port"); ok {
@@ -465,11 +465,11 @@ func expandLoadBalancerVIP(d resourceValueGetable) *sacloud.LoadBalancerSetting 
 	}
 	if rawServers, ok := d.GetOk("servers"); ok {
 		var servers []*sacloud.LoadBalancerServer
-		for _ , v := range rawServers.([]interface{}) {
+		for _, v := range rawServers.([]interface{}) {
 			data := &resourceMapValue{v.(map[string]interface{})}
 			server := expandLoadBalancerServer(data)
 			server.Port = vip.Port
-			servers = append(servers , server)
+			servers = append(servers, server)
 		}
 		vip.Servers = servers
 	}
@@ -489,16 +489,16 @@ func expandLoadBalancerServer(d resourceValueGetable) *sacloud.LoadBalancerServe
 	}
 	server.HealthCheck = &sacloud.LoadBalancerHealthCheck{}
 
-	if v , ok := d.GetOk("check_protocol"); ok {
+	if v, ok := d.GetOk("check_protocol"); ok {
 		server.HealthCheck.Protocol = v.(string)
 	}
 
 	switch server.HealthCheck.Protocol {
 	case "http", "https":
-		if v , ok := d.GetOk("check_path"); ok {
+		if v, ok := d.GetOk("check_path"); ok {
 			server.HealthCheck.Path = v.(string)
 		}
-		if v , ok := d.GetOk("check_status"); ok {
+		if v, ok := d.GetOk("check_status"); ok {
 			server.HealthCheck.Status = v.(string)
 		}
 	}
