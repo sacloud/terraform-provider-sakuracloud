@@ -31,6 +31,12 @@ func TestAccResourceSakuraCloudDNS(t *testing.T) {
 					resource.TestCheckResourceAttr("sakuracloud_dns.foobar", "tags.#", "2"),
 					resource.TestCheckResourceAttr("sakuracloud_dns.foobar", "tags.0", "tag1"),
 					resource.TestCheckResourceAttr("sakuracloud_dns.foobar", "tags.1", "tag2"),
+					resource.TestCheckResourceAttr("sakuracloud_dns.foobar", "records.0.name", "test1"),
+					resource.TestCheckResourceAttr("sakuracloud_dns.foobar", "records.0.type", "A"),
+					resource.TestCheckResourceAttr("sakuracloud_dns.foobar", "records.0.value", "192.168.11.1"),
+					resource.TestCheckResourceAttr("sakuracloud_dns.foobar", "records.1.name", "test2"),
+					resource.TestCheckResourceAttr("sakuracloud_dns.foobar", "records.1.type", "A"),
+					resource.TestCheckResourceAttr("sakuracloud_dns.foobar", "records.1.value", "192.168.11.2"),
 					resource.TestCheckResourceAttrPair(
 						"sakuracloud_dns.foobar", "icon_id",
 						"sakuracloud_icon.foobar", "id",
@@ -45,6 +51,9 @@ func TestAccResourceSakuraCloudDNS(t *testing.T) {
 					resource.TestCheckResourceAttr("sakuracloud_dns.foobar", "description", "DNS from TerraForm for SAKURA CLOUD_upd"),
 					resource.TestCheckResourceAttr("sakuracloud_dns.foobar", "tags.#", "1"),
 					resource.TestCheckResourceAttr("sakuracloud_dns.foobar", "tags.0", "tag1"),
+					resource.TestCheckResourceAttr("sakuracloud_dns.foobar", "records.0.name", "test1"),
+					resource.TestCheckResourceAttr("sakuracloud_dns.foobar", "records.0.type", "A"),
+					resource.TestCheckResourceAttr("sakuracloud_dns.foobar", "records.0.value", "192.168.11.1"),
 					resource.TestCheckResourceAttr("sakuracloud_dns.foobar", "icon_id", ""),
 				),
 			},
@@ -150,6 +159,16 @@ resource "sakuracloud_dns" "foobar" {
     description = "DNS from TerraForm for SAKURA CLOUD"
     tags = ["tag1","tag2"]
     icon_id = sakuracloud_icon.foobar.id
+    records {
+      name = "test1"
+      type = "A"
+      value = "192.168.11.1"
+    }
+    records {
+      name = "test2"
+      type = "A"
+      value = "192.168.11.2"
+    }
 }
 
 resource "sakuracloud_icon" "foobar" {
@@ -165,5 +184,10 @@ resource "sakuracloud_dns" "foobar" {
     zone = "%s"
     description = "DNS from TerraForm for SAKURA CLOUD_upd"
     tags = ["tag1"]
+    records {
+      name = "test1"
+      type = "A"
+      value = "192.168.11.1"
+    }
 }`, zone)
 }
