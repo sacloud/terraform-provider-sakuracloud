@@ -38,7 +38,7 @@ func resourceLoadBalancerServerSchema() map[string]*schema.Schema {
 			},
 		}, loadBalancerServerValueSchema(),
 	)
-	for _ , v := range s {
+	for _, v := range s {
 		v.ForceNew = true
 	}
 	return s
