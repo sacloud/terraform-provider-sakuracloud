@@ -195,8 +195,6 @@ func loadBalancerVIPIDHash(loadBalancerID string, s *sacloud.LoadBalancerSetting
 	return buf.String()
 }
 
-
-
 func expandLoadBalancerServersFromVIP(lbID string, vipSetting *sacloud.LoadBalancerSetting) []string {
 	if vipSetting.Servers == nil || len(vipSetting.Servers) == 0 {
 		return nil
