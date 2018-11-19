@@ -2,8 +2,10 @@ package sakuracloud
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/hashicorp/terraform/helper/schema"
+	"github.com/hashicorp/terraform/helper/validation"
 	"github.com/sacloud/libsacloud/api"
 	"github.com/sacloud/libsacloud/sacloud"
 )
@@ -30,6 +32,15 @@ func resourceSakuraCloudDNS() *schema.Resource {
 				Computed: true,
 				Elem:     &schema.Schema{Type: schema.TypeString},
 			},
+			"records": {
+				Type:     schema.TypeList,
+				Optional: true,
+				Computed: true,
+				MaxItems: 1000,
+				Elem: &schema.Resource{
+					Schema: dnsRecordValueSchema(),
+				},
+			},
 			"icon_id": {
 				Type:         schema.TypeString,
 				Optional:     true,
@@ -49,6 +60,44 @@ func resourceSakuraCloudDNS() *schema.Resource {
 	}
 }
 
+func dnsRecordValueSchema() map[string]*schema.Schema {
+	return map[string]*schema.Schema{
+		"name": {
+			Type:     schema.TypeString,
+			Required: true,
+		},
+		"type": {
+			Type:         schema.TypeString,
+			Required:     true,
+			ValidateFunc: validation.StringInSlice(sacloud.AllowDNSTypes(), false),
+		},
+		"value": {
+			Type:     schema.TypeString,
+			Required: true,
+		},
+		"ttl": {
+			Type:     schema.TypeInt,
+			Optional: true,
+			Default:  defaultTTL,
+		},
+		"priority": {
+			Type:         schema.TypeInt,
+			Optional:     true,
+			ValidateFunc: validation.IntBetween(0, 65535),
+		},
+		"weight": {
+			Type:         schema.TypeInt,
+			Optional:     true,
+			ValidateFunc: validation.IntBetween(0, 65535),
+		},
+		"port": {
+			Type:         schema.TypeInt,
+			Optional:     true,
+			ValidateFunc: validation.IntBetween(1, 65535),
+		},
+	}
+}
+
 func resourceSakuraCloudDNSCreate(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*APIClient)
 
@@ -62,6 +111,12 @@ func resourceSakuraCloudDNSCreate(d *schema.ResourceData, meta interface{}) erro
 	rawTags := d.Get("tags").([]interface{})
 	if rawTags != nil {
 		opts.Tags = expandTags(client, rawTags)
+	}
+
+	for _, rawRecord := range d.Get("records").([]interface{}) {
+		r := &resourceMapValue{rawRecord.(map[string]interface{})}
+		record := expandDNSRecord(r)
+		opts.AddRecord(record)
 	}
 
 	dns, err := client.DNS.Create(opts)
@@ -117,7 +172,14 @@ func resourceSakuraCloudDNSUpdate(d *schema.ResourceData, meta interface{}) erro
 		} else {
 			opts.Tags = expandTags(client, rawTags)
 		}
-
+	}
+	if d.HasChange("records") {
+		opts.ClearRecords()
+		for _, rawRecord := range d.Get("records").([]interface{}) {
+			r := &resourceMapValue{rawRecord.(map[string]interface{})}
+			record := expandDNSRecord(r)
+			opts.AddRecord(record)
+		}
 	}
 
 	_, err = client.DNS.Update(opts.ID, opts)
@@ -146,5 +208,87 @@ func setDNSResourceData(d *schema.ResourceData, client *APIClient, data *sacloud
 	d.Set("description", data.Description)
 	d.Set("tags", data.Tags)
 	d.Set("dns_servers", data.Status.NS)
+
+	var records []interface{}
+	for _, record := range data.Settings.DNS.ResourceRecordSets {
+		records = append(records, dnsRecordToState(&record))
+	}
+	d.Set("records", records)
+
 	return nil
+}
+
+func dnsRecordToState(record *sacloud.DNSRecordSet) map[string]interface{} {
+	var r = map[string]interface{}{
+		"name":  record.Name,
+		"type":  record.Type,
+		"value": record.RData,
+		"ttl":   record.TTL,
+	}
+
+	switch record.Type {
+	case "MX":
+		// ex. record.RData = "10 example.com."
+		values := strings.SplitN(record.RData, " ", 2)
+		r["value"] = values[1]
+		r["priority"] = values[0]
+	case "SRV":
+		values := strings.SplitN(record.RData, " ", 4)
+		r["value"] = values[3]
+		r["priority"] = values[0]
+		r["weight"] = values[1]
+		r["port"] = values[2]
+	default:
+		r["priority"] = ""
+		r["weight"] = ""
+		r["port"] = ""
+	}
+
+	return r
+}
+
+func expandDNSRecord(d resourceValueGetable) *sacloud.DNSRecordSet {
+	var dns = sacloud.DNS{}
+	t, _ := d.GetOk("type")
+	recordType := t.(string)
+	name, _ := d.GetOk("name")
+	value, _ := d.GetOk("value")
+	ttl, _ := d.GetOk("ttl")
+
+	switch recordType {
+	case "MX":
+		pr := 10
+		if p, ok := d.GetOk("priority"); ok {
+			pr = p.(int)
+		}
+		return dns.CreateNewMXRecord(
+			name.(string),
+			value.(string),
+			ttl.(int),
+			pr)
+	case "SRV":
+		pr := 0
+		if p, ok := d.GetOk("priority"); ok {
+			pr = p.(int)
+		}
+		weight := 0
+		if w, ok := d.GetOk("weight"); ok {
+			weight = w.(int)
+		}
+		port := 1
+		if po, ok := d.GetOk("port"); ok {
+			port = po.(int)
+		}
+		return dns.CreateNewSRVRecord(
+			name.(string),
+			value.(string),
+			ttl.(int),
+			pr, weight, port)
+	default:
+		return dns.CreateNewRecord(
+			name.(string),
+			recordType,
+			value.(string),
+			ttl.(int))
+	}
 }

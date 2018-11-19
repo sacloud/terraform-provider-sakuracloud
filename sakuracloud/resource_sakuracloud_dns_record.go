@@ -3,11 +3,9 @@ package sakuracloud
 import (
 	"bytes"
 	"fmt"
-	"strings"
 
 	"github.com/hashicorp/terraform/helper/hashcode"
 	"github.com/hashicorp/terraform/helper/schema"
-	"github.com/hashicorp/terraform/helper/validation"
 	"github.com/sacloud/libsacloud/api"
 	"github.com/sacloud/libsacloud/sacloud"
 )
@@ -19,59 +17,23 @@ func resourceSakuraCloudDNSRecord() *schema.Resource {
 		Create: resourceSakuraCloudDNSRecordCreate,
 		Read:   resourceSakuraCloudDNSRecordRead,
 		Delete: resourceSakuraCloudDNSRecordDelete,
-
-		Schema: map[string]*schema.Schema{
-			"dns_id": {
-				Type:         schema.TypeString,
-				Required:     true,
-				ForceNew:     true,
-				ValidateFunc: validateSakuracloudIDType,
-			},
-			"name": {
-				Type:     schema.TypeString,
-				Required: true,
-				ForceNew: true,
-			},
-			"type": {
-				Type:         schema.TypeString,
-				Required:     true,
-				ForceNew:     true,
-				ValidateFunc: validation.StringInSlice(sacloud.AllowDNSTypes(), false),
-			},
-
-			"value": {
-				Type:     schema.TypeString,
-				Required: true,
-				ForceNew: true,
-			},
-
-			"ttl": {
-				Type:     schema.TypeInt,
-				Optional: true,
-				Default:  defaultTTL,
-				ForceNew: true,
-			},
-
-			"priority": {
-				Type:         schema.TypeInt,
-				Optional:     true,
-				ForceNew:     true,
-				ValidateFunc: validation.IntBetween(0, 65535),
-			},
-			"weight": {
-				Type:         schema.TypeInt,
-				Optional:     true,
-				ForceNew:     true,
-				ValidateFunc: validation.IntBetween(0, 65535),
-			},
-			"port": {
-				Type:         schema.TypeInt,
-				Optional:     true,
-				ForceNew:     true,
-				ValidateFunc: validation.IntBetween(1, 65535),
-			},
-		},
+		Schema: dnsRecordResourceSchema(),
 	}
+}
+
+func dnsRecordResourceSchema() map[string]*schema.Schema {
+	s := mergeSchemas(map[string]*schema.Schema{
+		"dns_id": {
+			Type:         schema.TypeString,
+			Required:     true,
+			ForceNew:     true,
+			ValidateFunc: validateSakuracloudIDType,
+		},
+	}, dnsRecordValueSchema())
+	for _, v := range s {
+		v.ForceNew = true
+	}
+	return s
 }
 
 func resourceSakuraCloudDNSRecordCreate(d *schema.ResourceData, meta interface{}) error {
@@ -120,26 +82,9 @@ func resourceSakuraCloudDNSRecordRead(d *schema.ResourceData, meta interface{}) 
 		return nil
 	}
 
-	d.Set("name", record.Name)
-	d.Set("type", record.Type)
-	d.Set("value", record.RData)
-	d.Set("ttl", record.TTL)
-
-	if record.Type == "MX" {
-		// ex. record.RData = "10 example.com."
-		values := strings.SplitN(record.RData, " ", 2)
-		d.Set("value", values[1])
-		d.Set("priority", values[0])
-	} else if record.Type == "SRV" {
-		values := strings.SplitN(record.RData, " ", 4)
-		d.Set("value", values[3])
-		d.Set("priority", values[0])
-		d.Set("weight", values[1])
-		d.Set("port", values[2])
-	} else {
-		d.Set("priority", "")
-		d.Set("weight", "")
-		d.Set("port", "")
+	r := dnsRecordToState(record)
+	for k, v := range r {
+		d.Set(k, v)
 	}
 
 	return nil
@@ -197,47 +142,4 @@ func dnsRecordIDHash(dns_id string, r *sacloud.DNSRecordSet) string {
 	buf.WriteString(fmt.Sprintf("%s-", r.Name))
 
 	return fmt.Sprintf("dnsrecord-%d", hashcode.String(buf.String()))
-}
-
-func expandDNSRecord(d *schema.ResourceData) *sacloud.DNSRecordSet {
-	var dns = sacloud.DNS{}
-	t := d.Get("type").(string)
-	if t == "MX" {
-		pr := 10
-		if p, ok := d.GetOk("priority"); ok {
-			pr = p.(int)
-		}
-		return dns.CreateNewMXRecord(
-			d.Get("name").(string),
-			d.Get("value").(string),
-			d.Get("ttl").(int),
-			pr)
-	} else if t == "SRV" {
-		pr := 0
-		if p, ok := d.GetOk("priority"); ok {
-			pr = p.(int)
-		}
-		weight := 0
-		if w, ok := d.GetOk("weight"); ok {
-			weight = w.(int)
-		}
-		port := 1
-		if po, ok := d.GetOk("port"); ok {
-			port = po.(int)
-		}
-
-		return dns.CreateNewSRVRecord(
-			d.Get("name").(string),
-			d.Get("value").(string),
-			d.Get("ttl").(int),
-			pr, weight, port)
-
-	} else {
-		return dns.CreateNewRecord(
-			d.Get("name").(string),
-			d.Get("type").(string),
-			d.Get("value").(string),
-			d.Get("ttl").(int))
-
-	}
 }
