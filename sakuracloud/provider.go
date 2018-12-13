@@ -13,6 +13,8 @@ var (
 	defaultRetryInterval = 5
 )
 
+var allowZones = []string{"is1a", "is1b", "tk1a", "tk1v"}
+
 // Provider returns a terraform.ResourceProvider.
 func Provider() terraform.ResourceProvider {
 	return &schema.Provider{
@@ -35,7 +37,7 @@ func Provider() terraform.ResourceProvider {
 				DefaultFunc:  schema.MultiEnvDefaultFunc([]string{"SAKURACLOUD_ZONE"}, nil),
 				Description:  "Target SakuraCloud Zone(is1a | is1b | tk1a | tk1v)",
 				InputDefault: defaultZone,
-				ValidateFunc: validateZone([]string{"is1a", "is1b", "tk1a", "tk1v"}),
+				ValidateFunc: validateZone(allowZones),
 			},
 			"accept_language": {
 				Type:        schema.TypeString,
@@ -102,6 +104,7 @@ func Provider() terraform.ResourceProvider {
 			"sakuracloud_subnet":         dataSourceSakuraCloudSubnet(),
 			"sakuracloud_switch":         dataSourceSakuraCloudSwitch(),
 			"sakuracloud_vpc_router":     dataSourceSakuraCloudVPCRouter(),
+			"sakuracloud_zone":           dataSourceSakuraCloudZone(),
 		},
 		ResourcesMap: map[string]*schema.Resource{
 			"sakuracloud_auto_backup":                    resourceSakuraCloudAutoBackup(),
