@@ -7,7 +7,7 @@ import (
 	"os"
 
 	"github.com/hashicorp/terraform/helper/schema"
-	"github.com/mitchellh/go-homedir"
+	homedir "github.com/mitchellh/go-homedir"
 	"github.com/sacloud/libsacloud/api"
 	"github.com/sacloud/libsacloud/sacloud"
 )

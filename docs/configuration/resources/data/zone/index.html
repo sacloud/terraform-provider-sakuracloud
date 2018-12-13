@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>ISOイメージ(CD-ROM) - Terraform for さくらのクラウド</title>
+  <title>ゾーン - Terraform for さくらのクラウド</title>
   
 
   <link rel="shortcut icon" href="../../../../img/favicon.ico">
@@ -21,7 +21,7 @@
   
   <script>
     // Current page data
-    var mkdocs_page_name = "ISOイメージ(CD-ROM)";
+    var mkdocs_page_name = "ゾーン";
   </script>
   
   <script src="../../../../js/jquery-2.1.1.min.js"></script>
@@ -405,21 +405,8 @@
 
         
             
-    <li class="toctree-l1 current">
-        <a class="current" href="./">ISOイメージ(CD-ROM)</a>
-        
-            <ul>
-            
-                <li class="toctree-l3"><a href="#isocd-romsakuracloud_cdrom">ISOイメージ/CD-ROM(sakuracloud_cdrom)</a></li>
-                
-                    <li><a class="toctree-l4" href="#_1">設定例</a></li>
-                
-                    <li><a class="toctree-l4" href="#_2">パラメーター</a></li>
-                
-                    <li><a class="toctree-l4" href="#_3">属性</a></li>
-                
-            
-            </ul>
+    <li class="toctree-l1 ">
+        <a class="" href="../cdrom/">ISOイメージ(CD-ROM)</a>
         
     </li>
 
@@ -544,8 +531,21 @@
 
         
             
-    <li class="toctree-l1 ">
-        <a class="" href="../zone/">ゾーン</a>
+    <li class="toctree-l1 current">
+        <a class="current" href="./">ゾーン</a>
+        
+            <ul>
+            
+                <li class="toctree-l3"><a href="#sakuracloud_zone">ゾーン(sakuracloud_zone)</a></li>
+                
+                    <li><a class="toctree-l4" href="#_1">設定例</a></li>
+                
+                    <li><a class="toctree-l4" href="#_2">パラメーター</a></li>
+                
+                    <li><a class="toctree-l4" href="#_3">属性</a></li>
+                
+            
+            </ul>
         
     </li>
 
@@ -582,7 +582,7 @@
         
       
     
-    <li>ISOイメージ(CD-ROM)</li>
+    <li>ゾーン</li>
     <li class="wy-breadcrumbs-aside">
       
     </li>
@@ -592,20 +592,14 @@
           <div role="main">
             <div class="section">
               
-                <h1 id="isocd-romsakuracloud_cdrom">ISOイメージ/CD-ROM(sakuracloud_cdrom)</h1>
+                <h1 id="sakuracloud_zone">ゾーン(sakuracloud_zone)</h1>
 <hr />
 <h3 id="_1">設定例</h3>
-<pre><code class="hcl">#ISOイメージの参照
-data sakuracloud_cdrom &quot;cdrom&quot; {
-  name_selectors = [&quot;CentOS&quot;, &quot;7.4&quot;]
-}
+<pre><code class="hcl">data sakuracloud_zone &quot;current&quot; {}
 
-# 参照したISOイメージをサーバに挿入
-resource sakuracloud_server &quot;server&quot; {
-  name     = &quot;foobar&quot;
-  cdrom_id = &quot;${data.sakuracloud_cdrom.cdrom.id}&quot;
+data sakuracloud_zone &quot;is1a&quot; {
+  name = &quot;is1a&quot;
 }
-
 </code></pre>
 
 <h3 id="_2">パラメーター</h3>
@@ -622,36 +616,12 @@ resource sakuracloud_server &quot;server&quot; {
 </thead>
 <tbody>
 <tr>
-<td><code>name_selectors</code></td>
+<td><code>name</code></td>
 <td align="center">-</td>
-<td>検索条件(名称)</td>
+<td>ゾーン名</td>
 <td align="center">-</td>
-<td>リスト(文字列)</td>
-<td>複数指定した場合はAND条件</td>
-</tr>
-<tr>
-<td><code>tag_selectors</code></td>
-<td align="center">-</td>
-<td>検索条件(タグ)</td>
-<td align="center">-</td>
-<td>リスト(文字列)</td>
-<td>複数指定した場合はAND条件</td>
-</tr>
-<tr>
-<td><code>filter</code></td>
-<td align="center">-</td>
-<td>検索条件(その他)</td>
-<td align="center">-</td>
-<td>オブジェクト</td>
-<td>APIにそのまま渡されます。検索条件を指定してもAPI側が対応していない場合があります。</td>
-</tr>
-<tr>
-<td><code>zone</code></td>
-<td align="center">-</td>
-<td>ゾーン</td>
-<td align="center">-</td>
-<td><code>is1a</code><br /><code>is1b</code><br /><code>tk1a</code><br /><code>tk1v</code></td>
-<td>-</td>
+<td>文字列</td>
+<td>省略した場合はプロバイダー設定が利用される</td>
 </tr>
 </tbody>
 </table>
@@ -667,22 +637,17 @@ resource sakuracloud_server &quot;server&quot; {
 <tbody>
 <tr>
 <td><code>id</code></td>
-<td>ISOイメージID</td>
+<td>ID</td>
 <td>-</td>
 </tr>
 <tr>
 <td><code>name</code></td>
-<td>ISOイメージ名</td>
+<td>ゾーン名</td>
 <td>-</td>
 </tr>
 <tr>
-<td><code>size</code></td>
-<td>ISOイメージサイズ(GB単位)</td>
-<td>-</td>
-</tr>
-<tr>
-<td><code>icon_id</code></td>
-<td>アイコンID</td>
+<td><code>zone_id</code></td>
+<td>ゾーンID</td>
 <td>-</td>
 </tr>
 <tr>
@@ -691,13 +656,18 @@ resource sakuracloud_server &quot;server&quot; {
 <td>-</td>
 </tr>
 <tr>
-<td><code>tags</code></td>
-<td>タグ</td>
+<td><code>region_id</code></td>
+<td>リージョンID</td>
 <td>-</td>
 </tr>
 <tr>
-<td><code>zone</code></td>
-<td>ゾーン</td>
+<td><code>region_name</code></td>
+<td>リージョン名</td>
+<td>-</td>
+</tr>
+<tr>
+<td><code>dns_servers</code></td>
+<td>リージョンのDNSサーバIPアドレスのリスト</td>
 <td>-</td>
 </tr>
 </tbody>
@@ -709,10 +679,8 @@ resource sakuracloud_server &quot;server&quot; {
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="../switch/" class="btn btn-neutral float-right" title="スイッチ"/>Next <span class="icon icon-circle-arrow-right"></span></a>
       
-      
-        <a href="../archive/" class="btn btn-neutral" title="アーカイブ"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../bucket_object/" class="btn btn-neutral" title="オブジェクトストレージ"><span class="icon icon-circle-arrow-left"></span> Previous</a>
       
     </div>
   
@@ -740,10 +708,8 @@ resource sakuracloud_server &quot;server&quot; {
     <span class="rst-current-version" data-toggle="rst-current-version">
       
       
-        <span><a href="../archive/" style="color: #fcfcfc;">&laquo; Previous</a></span>
+        <span><a href="../bucket_object/" style="color: #fcfcfc;">&laquo; Previous</a></span>
       
-      
-        <span style="margin-left: 15px"><a href="../switch/" style="color: #fcfcfc">Next &raquo;</a></span>
       
     </span>
 </div>

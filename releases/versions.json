@@ -166,5 +166,11 @@
 		"ReleaseDate": "2018-10-30T01:17:56.058106477Z",
 		"PluginVersion": "v1.8.0",
 		"PreRelease": false
+	},
+	{
+		"TerraformVersion": "v0.11.8",
+		"ReleaseDate": "2018-12-13T10:37:31.866822861Z",
+		"PluginVersion": "v1.9.0",
+		"PreRelease": false
 	}
 ]

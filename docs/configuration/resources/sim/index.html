@@ -543,6 +543,13 @@
     </li>
 
         
+            
+    <li class="toctree-l1 ">
+        <a class="" href="../data/zone/">ゾーン</a>
+        
+    </li>
+
+        
     </ul>
 
         
@@ -597,6 +604,7 @@ resource &quot;sakuracloud_sim&quot; &quot;sim&quot; {
     iccid    = &quot;&lt;SIMに記載されているICCID&gt;&quot;
     passcode = &quot;&lt;SIMに記載されているPasscode&gt;&quot;
     imei     = &quot;&lt;端末識別番号(IMEIロックする場合のみ)&gt;&quot;
+    carrier  = [&quot;softbank&quot;, &quot;kddi&quot;, &quot;docomo&quot;]
     #enabled  = true
 
     mobile_gateway_id = &quot;${sakuracloud_mobile_gateway.mgw.id}&quot; # 接続するモバイルゲートウェイのID
@@ -655,6 +663,14 @@ resource sakuracloud_mobile_gateway &quot;mgw&quot; {
 <td align="center">-</td>
 <td>文字列</td>
 <td>-</td>
+</tr>
+<tr>
+<td><code>carrier</code></td>
+<td align="center">◯</td>
+<td>キャリア</td>
+<td align="center">-</td>
+<td>リスト(文字列)<br /><code>docomo</code> <br /><code>kddi</code> <br /><code>softbank</code></td>
+<td>1つ以上必須、3つまで</td>
 </tr>
 <tr>
 <td><code>enabled</code></td>
