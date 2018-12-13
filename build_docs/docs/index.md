@@ -82,4 +82,5 @@
     - [GSLB](configuration/resources/data/gslb)
     - [シンプル監視](configuration/resources/data/simple_monitor)
     - [オブジェクトストレージ](configuration/resources/data/bucket_object)
+    - [ゾーン](configuration/resources/data/zone)
   

@@ -75,3 +75,4 @@ pages:
       - GSLB: configuration/resources/data/gslb.md
       - シンプル監視: configuration/resources/data/simple_monitor.md
       - オブジェクトストレージ: configuration/resources/data/bucket_object.md
+      - ゾーン: configuration/resources/data/zone.md
