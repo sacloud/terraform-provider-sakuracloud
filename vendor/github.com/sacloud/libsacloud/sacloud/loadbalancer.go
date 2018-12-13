@@ -17,7 +17,7 @@ type LoadBalancerRemark struct {
 
 // LoadBalancerSettings ロードバランサー設定リスト
 type LoadBalancerSettings struct {
-	LoadBalancer []*LoadBalancerSetting `json:",omitempty"` // ロードバランサー設定リスト
+	LoadBalancer []*LoadBalancerSetting // ロードバランサー設定リスト
 }
 
 // LoadBalancerSetting ロードバランサー仮想IP設定
