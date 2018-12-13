@@ -19,6 +19,7 @@ resource sakuracloud_sim "foobar" {
     iccid    = "<your-iccid>"
     passcode = "<your-passcode>"
     # imei     = "<imei>"
+    carrier  = ["docomo", "kddi", "softbank"]
     # enabled  = true
 
     # connect to the Mobile Gateway 
@@ -43,6 +44,8 @@ The following arguments are supported:
 * `iccid` - (Required) The ICCID of the SIM.  
 * `passcode` - (Required) The Passcode of the SIM.  
 * `imei` - (Optional) The IMEI of the device that allows communication.
+* `carrier` - (Required) The list of Carrier name.  
+Valid values are in followings: [ "docomo" / "kddi" / "softbank"]
 * `enabled` - (Optional) The flag of enable/disable the Server.
 * `mobile_gateway_id` - (Optional) The ID of the Mobile Gateway to which the SIM belongs.
 * `ipaddress` - (Optional) The IP address of the SIM. Used when connect to mobile gateway.
