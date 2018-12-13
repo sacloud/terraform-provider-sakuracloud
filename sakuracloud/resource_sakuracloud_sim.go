@@ -9,6 +9,12 @@ import (
 	"github.com/sacloud/libsacloud/sacloud"
 )
 
+var simCarrier = map[string]string{
+	"kddi":     sacloud.SIMOperatorsKDDI,
+	"docomo":   sacloud.SIMOperatorsDOCOMO,
+	"softbank": sacloud.SIMOperatorsSoftBank,
+}
+
 func resourceSakuraCloudSIM() *schema.Resource {
 	return &schema.Resource{
 		Create: resourceSakuraCloudSIMCreate,
@@ -37,6 +43,13 @@ func resourceSakuraCloudSIM() *schema.Resource {
 			"imei": {
 				Type:     schema.TypeString,
 				Optional: true,
+			},
+			"carrier": {
+				Type:     schema.TypeList,
+				Required: true,
+				Elem:     &schema.Schema{Type: schema.TypeString},
+				MinItems: 1,
+				MaxItems: 3,
 			},
 			"enabled": {
 				Type:     schema.TypeBool,
@@ -76,6 +89,10 @@ func resourceSakuraCloudSIM() *schema.Resource {
 func resourceSakuraCloudSIMCreate(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*APIClient)
 
+	if err := validateCarrier(d); err != nil {
+		return err
+	}
+
 	var mgwID int64
 	var ip string
 	if rawMgwID, ok := d.GetOk("mobile_gateway_id"); ok {
@@ -105,6 +122,19 @@ func resourceSakuraCloudSIMCreate(d *schema.ResourceData, meta interface{}) erro
 
 	sim, err := client.SIM.Create(opts)
 	if err != nil {
+		return fmt.Errorf("Failed to create SakuraCloud SIM resource: %s", err)
+	}
+
+	// carriers
+	var carriers []*sacloud.SIMNetworkOperatorConfig
+	rawCarriers := d.Get("carrier").([]interface{})
+	for _, carrier := range rawCarriers {
+		carriers = append(carriers, &sacloud.SIMNetworkOperatorConfig{
+			Allow: true,
+			Name:  simCarrier[carrier.(string)],
+		})
+	}
+	if _, err := client.SIM.SetNetworkOperator(sim.ID, carriers...); err != nil {
 		return fmt.Errorf("Failed to create SakuraCloud SIM resource: %s", err)
 	}
 
@@ -170,6 +200,9 @@ func resourceSakuraCloudSIMRead(d *schema.ResourceData, meta interface{}) error 
 
 func resourceSakuraCloudSIMUpdate(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*APIClient)
+	if err := validateCarrier(d); err != nil {
+		return err
+	}
 
 	var mgwID int64
 	var ip string
@@ -228,6 +261,21 @@ func resourceSakuraCloudSIMUpdate(d *schema.ResourceData, meta interface{}) erro
 	_, err = client.SIM.Update(sim.ID, sim)
 	if err != nil {
 		return fmt.Errorf("Failed to update SakuraCloud SIM resource: %s", err)
+	}
+
+	// carriers
+	if d.HasChange("carrier") {
+		var carriers []*sacloud.SIMNetworkOperatorConfig
+		rawCarriers := d.Get("carrier").([]interface{})
+		for _, carrier := range rawCarriers {
+			carriers = append(carriers, &sacloud.SIMNetworkOperatorConfig{
+				Allow: true,
+				Name:  simCarrier[carrier.(string)],
+			})
+		}
+		if _, err := client.SIM.SetNetworkOperator(sim.ID, carriers...); err != nil {
+			return fmt.Errorf("Failed to activate SakuraCloud SIM resource: %s", err)
+		}
 	}
 
 	// activate/deactivate
@@ -360,6 +408,44 @@ func setSIMResourceData(d *schema.ResourceData, client *APIClient, data *sacloud
 
 	if data.Status.SIMInfo != nil {
 		d.Set("ipaddress", data.Status.SIMInfo.IP)
+	}
+
+	carrierInfo, err := client.SIM.GetNetworkOperator(data.ID)
+	if err != nil {
+		return fmt.Errorf("Error reading SakuraCloud SIM resource: %s", err)
+	}
+	var carriers []string
+	for _, c := range carrierInfo.NetworkOperatorConfigs {
+		if !c.Allow {
+			continue
+		}
+		for k, v := range simCarrier {
+			if v == c.Name {
+				carriers = append(carriers, k)
+			}
+		}
+	}
+	d.Set("carrier", carriers)
+
+	return nil
+}
+
+func validateCarrier(d *schema.ResourceData) error {
+
+	carrier, ok := d.GetOk("carrier")
+	if !ok {
+		return errors.New("carrier is required")
+	}
+
+	for _, c := range carrier.([]interface{}) {
+		if c == nil {
+			return errors.New(`carrier[""] is invalid`)
+		}
+
+		c := c.(string)
+		if _, ok := simCarrier[c]; !ok {
+			return fmt.Errorf("carrier[%q] is invalid", c)
+		}
 	}
 
 	return nil

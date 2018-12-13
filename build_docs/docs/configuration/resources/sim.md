@@ -14,6 +14,7 @@ resource "sakuracloud_sim" "sim" {
     iccid    = "<SIMに記載されているICCID>"
     passcode = "<SIMに記載されているPasscode>"
     imei     = "<端末識別番号(IMEIロックする場合のみ)>"
+    carrier  = ["softbank", "kddi", "docomo"]
     #enabled  = true
     
     mobile_gateway_id = "${sakuracloud_mobile_gateway.mgw.id}" # 接続するモバイルゲートウェイのID
@@ -36,6 +37,7 @@ resource sakuracloud_mobile_gateway "mgw" {
 | `iccid`             | ◯   | ICCID             | -        | 文字列                  | - |
 | `passcode`          | ◯   | パスコード         | -        | 文字列                  | - |
 | `imei`              | -   | IMEI(端末識別番号)  | - | 文字列 | - |
+| `carrier`           | ◯  | キャリア  | - | リスト(文字列)<br />`docomo` <br />`kddi` <br />`softbank` | 1つ以上必須、3つまで |
 | `enabled`           | -   | 有効/無効          | `true` | `true`<br />`false`| - |
 | `mobile_gateway_id` | -   | モバイルゲートウェイID  | - | 文字列 | - |
 | `ipaddress`         | -   | IPアドレス  | - | 文字列 | - |
