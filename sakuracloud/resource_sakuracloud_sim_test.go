@@ -59,6 +59,10 @@ func TestAccResourceSakuraCloudSIM(t *testing.T) {
 					resource.TestCheckResourceAttr(
 						"sakuracloud_sim.foobar", "description", "description_before"),
 					resource.TestCheckResourceAttr(
+						"sakuracloud_sim.foobar", "carrier.#", "1"),
+					resource.TestCheckResourceAttr(
+						"sakuracloud_sim.foobar", "carrier.0", "softbank"),
+					resource.TestCheckResourceAttr(
 						"sakuracloud_sim.foobar", "tags.#", "2"),
 					resource.TestCheckResourceAttr(
 						"sakuracloud_sim.foobar", "tags.0", "hoge1"),
@@ -82,6 +86,10 @@ func TestAccResourceSakuraCloudSIM(t *testing.T) {
 						"sakuracloud_sim.foobar", "name", "name_after"),
 					resource.TestCheckResourceAttr(
 						"sakuracloud_sim.foobar", "description", "description_after"),
+					resource.TestCheckResourceAttr(
+						"sakuracloud_sim.foobar", "carrier.#", "1"),
+					resource.TestCheckResourceAttr(
+						"sakuracloud_sim.foobar", "carrier.0", "kddi"),
 					resource.TestCheckResourceAttr(
 						"sakuracloud_sim.foobar", "tags.#", "2"),
 					resource.TestCheckResourceAttr(
@@ -177,6 +185,7 @@ resource "sakuracloud_sim" "foobar" {
     iccid = "%s"
     passcode = "%s"
     imei = "%s"
+    carrier = ["softbank"]
 
     enabled = true
     mobile_gateway_id = "${sakuracloud_mobile_gateway.mgw.id}"
@@ -201,6 +210,8 @@ resource "sakuracloud_sim" "foobar" {
     passcode = "%s"
     imei = "%s"
 
+    carrier = ["kddi"]
+
     enabled = false
     mobile_gateway_id = "${sakuracloud_mobile_gateway.mgw.id}"
     ipaddress = "192.168.100.2"
@@ -215,5 +226,6 @@ resource "sakuracloud_sim" "foobar" {
     iccid = "%s"
     passcode = "%s"
     imei = "%s"
+    carrier = ["softbank"]
     enabled = false
 }`
