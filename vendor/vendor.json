@@ -837,50 +837,50 @@
 		{
 			"checksumSHA1": "cHSqx9eSltUBTsZ73TSqqShhiOA=",
 			"path": "github.com/sacloud/libsacloud",
-			"revision": "249671887191f0a26bcc49c016d9ce841b12c877",
-			"revisionTime": "2018-12-04T07:47:50Z",
-			"version": "v1.3.0",
-			"versionExact": "v1.3.0"
+			"revision": "22e3e1a9b99c43446f1d2e79a68921450fe95652",
+			"revisionTime": "2018-12-13T10:03:46Z",
+			"version": "v1.3.1",
+			"versionExact": "v1.3.1"
 		},
 		{
 			"checksumSHA1": "xDPS+QpQxrOnaOWcpWB9fncnu8c=",
 			"path": "github.com/sacloud/libsacloud/api",
-			"revision": "249671887191f0a26bcc49c016d9ce841b12c877",
-			"revisionTime": "2018-12-04T07:47:50Z",
-			"version": "v1.3.0",
-			"versionExact": "v1.3.0"
+			"revision": "22e3e1a9b99c43446f1d2e79a68921450fe95652",
+			"revisionTime": "2018-12-13T10:03:46Z",
+			"version": "v1.3.1",
+			"versionExact": "v1.3.1"
 		},
 		{
-			"checksumSHA1": "44nHjeg7hEFaJDxNyj06pEbnaM0=",
+			"checksumSHA1": "GB7e09GqxMlLuYK4uymK2KdeAew=",
 			"path": "github.com/sacloud/libsacloud/sacloud",
-			"revision": "249671887191f0a26bcc49c016d9ce841b12c877",
-			"revisionTime": "2018-12-04T07:47:50Z",
-			"version": "v1.3.0",
-			"versionExact": "v1.3.0"
+			"revision": "22e3e1a9b99c43446f1d2e79a68921450fe95652",
+			"revisionTime": "2018-12-13T10:03:46Z",
+			"version": "v1.3.1",
+			"versionExact": "v1.3.1"
 		},
 		{
 			"checksumSHA1": "LmBnV3yfAhrU0ceC++K1oovT7kY=",
 			"path": "github.com/sacloud/libsacloud/sacloud/ostype",
-			"revision": "249671887191f0a26bcc49c016d9ce841b12c877",
-			"revisionTime": "2018-12-04T07:47:50Z",
-			"version": "v1.3.0",
-			"versionExact": "v1.3.0"
+			"revision": "22e3e1a9b99c43446f1d2e79a68921450fe95652",
+			"revisionTime": "2018-12-13T10:03:46Z",
+			"version": "v1.3.1",
+			"versionExact": "v1.3.1"
 		},
 		{
 			"checksumSHA1": "WTBpxpedzjJAQKMVJ/w8/G72DHU=",
 			"path": "github.com/sacloud/libsacloud/utils/server",
-			"revision": "249671887191f0a26bcc49c016d9ce841b12c877",
-			"revisionTime": "2018-12-04T07:47:50Z",
-			"version": "v1.3.0",
-			"versionExact": "v1.3.0"
+			"revision": "22e3e1a9b99c43446f1d2e79a68921450fe95652",
+			"revisionTime": "2018-12-13T10:03:46Z",
+			"version": "v1.3.1",
+			"versionExact": "v1.3.1"
 		},
 		{
 			"checksumSHA1": "rFnP8fart3FGUJK1OLNZuNk4Tmc=",
 			"path": "github.com/sacloud/libsacloud/utils/setup",
-			"revision": "249671887191f0a26bcc49c016d9ce841b12c877",
-			"revisionTime": "2018-12-04T07:47:50Z",
-			"version": "v1.3.0",
-			"versionExact": "v1.3.0"
+			"revision": "22e3e1a9b99c43446f1d2e79a68921450fe95652",
+			"revisionTime": "2018-12-13T10:03:46Z",
+			"version": "v1.3.1",
+			"versionExact": "v1.3.1"
 		},
 		{
 			"checksumSHA1": "zmC8/3V4ls53DJlNTKDZwPSC/dA=",
