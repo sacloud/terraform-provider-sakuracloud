@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.9.0 (2018-12-13)
+
+* ゾーン情報データリソース追加 #395 (yamamoto-febc)
+* SIMマルチキャリア対応 #396 (yamamoto-febc)
+* Fix broken acceptance tests #397 (yamamoto-febc)
+
+
 ## 1.8.0 (2018-10-30)
 
 * 表示用IPアドレス display_ipaddress 追加 #380 (yamamoto-febc)
