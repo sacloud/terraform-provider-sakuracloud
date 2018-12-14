@@ -3,6 +3,7 @@
 ## 1.9.0 (2018-12-13)
 
 * ゾーン情報データリソース追加 #395 (yamamoto-febc)
+* SIMマルチキャリア対応 #396 (yamamoto-febc)
 * Fix broken acceptance tests #397 (yamamoto-febc)
 
 
