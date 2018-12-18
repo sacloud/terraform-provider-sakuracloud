@@ -58,6 +58,7 @@ data sakuracloud_archive "ubuntu" {
 | `windows2016-sql2017-standard`| Windows 2016 SQLServer 2017(Standard)|
 | `windows2016-sql-standard-all` | Windows 2016 SQLServer(Standard,RDS + Office)|
 | `windows2016-sql2017-standard-all` | Windows 2016 SQLServer 2017(Standard,RDS + Office)|
+| `windows2019`             | Windows 2019|
 
 > *1: Sophos-UTMを利用する場合、ディスクの修正機能は利用できません。  
 >     詳細は[さくらのクラウド ドキュメント](https://manual.sakura.ad.jp/cloud/os-packages/sophosutm.html)を参照してください。
