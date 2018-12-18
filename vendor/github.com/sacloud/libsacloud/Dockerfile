@@ -1,4 +1,4 @@
-FROM golang:1.10-alpine
+FROM golang:1.11-alpine
 LABEL maintainer="Kazumichi Yamamoto <yamamoto.febc@gmail.com>"
 
 RUN apk add --no-cache --update ca-certificates git && \
