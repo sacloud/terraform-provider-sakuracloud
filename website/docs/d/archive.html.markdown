@@ -70,3 +70,4 @@ data sakuracloud_archive "ubuntu" {
 * `windows2016-sql2017-standard` - Windows 2016 SQLServer 2017 (Standard)
 * `windows2016-sql-standard-all` - Windows 2016 SQLServer (Standard, RDS + Office)
 * `windows2016-sql2017-standard-all` - Windows 2016 SQLServer 2017 (Standard, RDS + Office)
+* `windows2019` - Windows 2019
