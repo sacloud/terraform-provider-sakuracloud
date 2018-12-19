@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.9.1 (2018-12-19)
+
+* Windows Server 2019対応 #399 (yamamoto-febc)
+
+
 ## 1.9.0 (2018-12-13)
 
 * ゾーン情報データリソース追加 #395 (yamamoto-febc)
