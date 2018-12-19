@@ -256,7 +256,7 @@ sub merged_prs {
     say "Pull Requests: " . join(", ", @pull_nums);
     my @releases;
     for my $pull_num (@pull_nums) {
-        my $url = sprintf "https://api.github.com/repos/%s/pulls/%d", $REPO_NAME, $pull_num;
+        my $url = sprintf "https://api.github.com/repos/%s/pulls/%d?access_token=%s", $REPO_NAME, $pull_num, $ENV{GITHUB_TOKEN};
         my $res = http_get($url);
         unless ($res->{success}) {
             warnf "request to $url failed\n";
@@ -279,7 +279,7 @@ sub merged_prs {
 }
 
 sub find_latest_release_pullrequest {
-    my $url = sprintf "https://api.github.com/repos/%s/pulls?state=close&sort=updated&direction=desc", $REPO_NAME;
+    my $url = sprintf "https://api.github.com/repos/%s/pulls?state=close&sort=updated&direction=desc&access_token=%s", $REPO_NAME, $ENV{GITHUB_TOKEN};
     my $res = http_get($url);
     unless ($res->{success}) {
         warnf "request to $url failed\n";
