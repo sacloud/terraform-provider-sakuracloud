@@ -43,6 +43,8 @@ func resourceSakuraCloudNFS() *schema.Resource {
 					strconv.Itoa(int(sacloud.NFSPlan1T)),
 					strconv.Itoa(int(sacloud.NFSPlan2T)),
 					strconv.Itoa(int(sacloud.NFSPlan4T)),
+					strconv.Itoa(int(sacloud.NFSPlan8T)),
+					strconv.Itoa(int(sacloud.NFSPlan12T)),
 				}),
 			},
 			"ipaddress": {

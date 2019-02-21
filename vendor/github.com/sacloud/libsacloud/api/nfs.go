@@ -224,9 +224,9 @@ func (api *NFSAPI) AsyncSleepWhileCopying(id int64, timeout time.Duration, maxRe
 	return poll(handler, timeout)
 }
 
-// MonitorNFS NFS固有項目アクティビティモニター取得
-func (api *NFSAPI) MonitorNFS(id int64, body *sacloud.ResourceMonitorRequest) (*sacloud.MonitorValues, error) {
-	return api.baseAPI.applianceMonitorBy(id, "nfs", 0, body)
+// MonitorFreeDiskSize NFSディスク残量アクティビティモニター取得
+func (api *NFSAPI) MonitorFreeDiskSize(id int64, body *sacloud.ResourceMonitorRequest) (*sacloud.MonitorValues, error) {
+	return api.baseAPI.applianceMonitorBy(id, "database", 0, body)
 }
 
 // MonitorInterface NICアクティビティーモニター取得

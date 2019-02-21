@@ -278,6 +278,7 @@ type API struct {
 	Bill          *BillAPI          // 請求情報API
 	Bridge        *BridgeAPI        // ブリッジAPi
 	CDROM         *CDROMAPI         // ISOイメージAPI
+	Coupon        *CouponAPI        // クーポンAPI
 	Database      *DatabaseAPI      // データベースAPI
 	Disk          *DiskAPI          // ディスクAPI
 	DNS           *DNSAPI           // DNS API
@@ -336,6 +337,11 @@ func (api *API) GetBridgeAPI() *BridgeAPI {
 // GetCDROMAPI ISOイメージAPI取得
 func (api *API) GetCDROMAPI() *CDROMAPI {
 	return api.CDROM
+}
+
+// GetCouponAPI クーポン情報API取得
+func (api *API) GetCouponAPI() *CouponAPI {
+	return api.Coupon
 }
 
 // GetDatabaseAPI データベースAPI取得
@@ -567,6 +573,7 @@ func newAPI(client *Client) *API {
 		Bill:       NewBillAPI(client),
 		Bridge:     NewBridgeAPI(client),
 		CDROM:      NewCDROMAPI(client),
+		Coupon:     NewCouponAPI(client),
 		Database:   NewDatabaseAPI(client),
 		Disk:       NewDiskAPI(client),
 		DNS:        NewDNSAPI(client),
