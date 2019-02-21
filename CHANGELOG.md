@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.10.0 (2019-02-21)
+
+* Upgrade libsacloud to v1.14 #402 (yamamoto-febc)
+
+
 ## 1.9.1 (2018-12-19)
 
 * Windows Server 2019対応 #399 (yamamoto-febc)

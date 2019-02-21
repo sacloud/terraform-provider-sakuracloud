@@ -129,7 +129,7 @@ func TestAccImportSakuraCloudGSLB(t *testing.T) {
 			return fmt.Errorf("expected 1 state: %#v", s)
 		}
 		expects := map[string]string{
-			"name":                       "terraform.io",
+			"name": "terraform.io",
 			"health_check.0.protocol":    "http",
 			"health_check.0.delay_loop":  "10",
 			"health_check.0.host_header": "terraform.io",
