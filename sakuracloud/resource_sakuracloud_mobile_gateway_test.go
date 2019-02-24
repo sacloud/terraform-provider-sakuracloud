@@ -75,6 +75,36 @@ func TestAccSakuraCloudMobileGateway(t *testing.T) {
 	})
 }
 
+func TestAccSakuraCloudMobileGateway_Full(t *testing.T) {
+	var mgs sacloud.MobileGateway
+	resource.Test(t, resource.TestCase{
+		PreCheck:     func() { testAccPreCheck(t) },
+		Providers:    testAccProviders,
+		CheckDestroy: testAccCheckSakuraCloudMobileGatewayDestroy,
+		Steps: []resource.TestStep{
+			{
+				Config: testAccCheckSakuraCloudMobileGatewayConfig_full_basic,
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckSakuraCloudMobileGatewayExists("sakuracloud_mobile_gateway.foobar", &mgs),
+					resource.TestCheckResourceAttr("sakuracloud_mobile_gateway.foobar", "name", "name_before"),
+					resource.TestCheckResourceAttr("sakuracloud_mobile_gateway.foobar", "private_ipaddress", "192.168.11.101"),
+					resource.TestCheckResourceAttr("sakuracloud_mobile_gateway.foobar", "private_nw_mask_len", "24"),
+					resource.TestCheckResourceAttr("sakuracloud_mobile_gateway.foobar", "static_route.#", "1"),
+					resource.TestCheckResourceAttr("sakuracloud_mobile_gateway.foobar", "static_route.0.prefix", "192.168.10.0/24"),
+					resource.TestCheckResourceAttr("sakuracloud_mobile_gateway.foobar", "static_route.0.next_hop", "192.168.11.1"),
+				),
+			},
+			{
+				Config: testAccCheckSakuraCloudMobileGatewayConfig_update,
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckSakuraCloudMobileGatewayExists("sakuracloud_mobile_gateway.foobar", &mgs),
+					resource.TestCheckNoResourceAttr("sakuracloud_mobile_gateway.foobar", "static_route"),
+				),
+			},
+		},
+	})
+}
+
 func testAccCheckSakuraCloudMobileGatewayExists(n string, mgs *sacloud.MobileGateway) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
 		rs, ok := s.RootModule().Resources[n]
@@ -224,8 +254,28 @@ resource "sakuracloud_switch" "sw" {
     name = "sw"
 }
 resource "sakuracloud_mobile_gateway" "foobar" {
-    internet_connection = false
-    name = "name_after"
-    description = "description_after"
-    tags = ["hoge1_after" , "hoge2_after"]
+  switch_id           = sakuracloud_switch.sw.id
+  private_ipaddress   = "192.168.11.101"
+  private_nw_mask_len = 24
+  internet_connection = true
+  name                = "name_before"
 }`
+
+const testAccCheckSakuraCloudMobileGatewayConfig_full_basic = `
+resource "sakuracloud_switch" "sw" {
+  name = "sw"
+}
+
+resource "sakuracloud_mobile_gateway" "foobar" {
+  switch_id           = sakuracloud_switch.sw.id
+  private_ipaddress   = "192.168.11.101"
+  private_nw_mask_len = 24
+  internet_connection = true
+  name                = "name_before"
+  
+  static_route {
+    prefix = "192.168.10.0/24"
+    next_hop = "192.168.11.1"
+  }
+}
+`
