@@ -30,23 +30,20 @@ resource "sakuracloud_mobile_gateway" "mgw" {
     slack_webhook        = "https://hooks.slack.com/services/xxx/xxx/xxx"
     auto_traffic_shaping = true
   }
+  
+  static_route {
+    prefix   = "192.168.10.0/24"
+    next_hop = "192.168.11.201"
+  }
 }
 
-# スタティックルートの定義
-resource "sakuracloud_mobile_gateway_static_route" "route01" {
-  mobile_gateway_id = sakuracloud_mobile_gateway.mgw.id
-
-  prefix   = "192.168.10.0/24"
-  next_hop = "192.168.11.201"
-}
-
-# スタティックルートの定義
-resource "sakuracloud_mobile_gateway_static_route" "route02" {
-  mobile_gateway_id = sakuracloud_mobile_gateway.mgw.id
-
-  prefix   = "192.168.10.0/26"
-  next_hop = "192.168.11.202"
-}
+# スタティックルートの定義(terraform v0.11)
+#resource "sakuracloud_mobile_gateway_static_route" "route01" {
+#  mobile_gateway_id = sakuracloud_mobile_gateway.mgw.id
+#
+#  prefix   = "192.168.10.0/24"
+#  next_hop = "192.168.11.201"
+#}
 
 # SIMルートの定義
 resource "sakuracloud_mobile_gateway_sim_route" "r3" {
