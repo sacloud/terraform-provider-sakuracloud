@@ -27,8 +27,6 @@ func TestAccResourceSakuraCloudNote(t *testing.T) {
 						"sakuracloud_note.foobar", "content", "content"),
 					resource.TestCheckResourceAttr(
 						"sakuracloud_note.foobar", "class", "shell"),
-					resource.TestCheckResourceAttr(
-						"sakuracloud_note.foobar", "tags.#", "2"),
 					resource.TestCheckResourceAttrPair(
 						"sakuracloud_note.foobar", "icon_id",
 						"sakuracloud_icon.foobar", "id",
@@ -45,8 +43,6 @@ func TestAccResourceSakuraCloudNote(t *testing.T) {
 						"sakuracloud_note.foobar", "content", "content_upd"),
 					resource.TestCheckResourceAttr(
 						"sakuracloud_note.foobar", "class", "shell"),
-					resource.TestCheckResourceAttr(
-						"sakuracloud_note.foobar", "tags.#", "0"),
 					resource.TestCheckResourceAttr(
 						"sakuracloud_note.foobar", "icon_id", ""),
 				),
@@ -129,8 +125,6 @@ const testAccCheckSakuraCloudNoteConfig_basic = `
 resource "sakuracloud_note" "foobar" {
     name = "mynote"
     content = "content"
-    description = "Note from TerraForm for SAKURA CLOUD"
-    tags = ["hoge" , "hoge2"]
     icon_id = sakuracloud_icon.foobar.id
 }
 
@@ -144,7 +138,6 @@ const testAccCheckSakuraCloudNoteConfig_update = `
 resource "sakuracloud_note" "foobar" {
     name = "mynote_upd"
     content = "content_upd"
-    tags = []
 }`
 
 const testAccCheckSakuraCloudNoteConfig_yaml = `
