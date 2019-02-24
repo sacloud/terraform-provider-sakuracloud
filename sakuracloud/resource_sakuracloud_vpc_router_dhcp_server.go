@@ -6,7 +6,6 @@ import (
 
 	"github.com/hashicorp/terraform/helper/hashcode"
 	"github.com/hashicorp/terraform/helper/schema"
-	"github.com/hashicorp/terraform/helper/validation"
 	"github.com/sacloud/libsacloud/api"
 	"github.com/sacloud/libsacloud/sacloud"
 )
@@ -16,47 +15,7 @@ func resourceSakuraCloudVPCRouterDHCPServer() *schema.Resource {
 		Create: resourceSakuraCloudVPCRouterDHCPServerCreate,
 		Read:   resourceSakuraCloudVPCRouterDHCPServerRead,
 		Delete: resourceSakuraCloudVPCRouterDHCPServerDelete,
-		Schema: map[string]*schema.Schema{
-			"vpc_router_id": {
-				Type:         schema.TypeString,
-				Required:     true,
-				ForceNew:     true,
-				ValidateFunc: validateSakuracloudIDType,
-			},
-			"vpc_router_interface_index": {
-				Type:         schema.TypeInt,
-				Required:     true,
-				ForceNew:     true,
-				ValidateFunc: validation.IntBetween(1, sacloud.VPCRouterMaxInterfaceCount-1),
-			},
-			"range_start": {
-				Type:         schema.TypeString,
-				Required:     true,
-				ForceNew:     true,
-				ValidateFunc: validateIPv4Address(),
-			},
-			"range_stop": {
-				Type:         schema.TypeString,
-				Required:     true,
-				ForceNew:     true,
-				ValidateFunc: validateIPv4Address(),
-			},
-			"dns_servers": {
-				Type:     schema.TypeList,
-				Optional: true,
-				ForceNew: true,
-				Elem:     &schema.Schema{Type: schema.TypeString},
-				//ValidateFunc: validateList(validateIPv4Address()),
-			},
-			"zone": {
-				Type:         schema.TypeString,
-				Optional:     true,
-				Computed:     true,
-				ForceNew:     true,
-				Description:  "target SakuraCloud zone",
-				ValidateFunc: validateZone([]string{"is1a", "is1b", "tk1a", "tk1v"}),
-			},
-		},
+		Schema: vpcRouterDHCPServerSchema(),
 	}
 }
 
@@ -168,7 +127,7 @@ func vpcRouterDHCPServerIDHash(routerID string, s *sacloud.VPCRouterDHCPServerCo
 	return fmt.Sprintf("%d", hashcode.String(buf.String()))
 }
 
-func expandVPCRouterDHCPServer(d *schema.ResourceData) *sacloud.VPCRouterDHCPServerConfig {
+func expandVPCRouterDHCPServer(d resourceValueGetable) *sacloud.VPCRouterDHCPServerConfig {
 
 	var dhcpServer = &sacloud.VPCRouterDHCPServerConfig{
 		Interface:  fmt.Sprintf("eth%d", d.Get("vpc_router_interface_index").(int)),

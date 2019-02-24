@@ -20,7 +20,7 @@
 - [v1.4での変更点](upgrade_to_v14/)
 - [v1.6での変更点](upgrade_to_v16/)      
 - [v1.7での変更点](upgrade_to_v17/)      
-- [v1.8での変更点](upgrade_to_v18/)      
+- [v2.0での変更点](upgrade_to_v20/)      
 
 #### その他:
 
@@ -42,6 +42,7 @@
     - [ブリッジ](configuration/resources/bridge/)
     - [ロードバランサ](configuration/resources/load_balancer/)
     - [VPCルータ](configuration/resources/vpc_router/)
+    - [VPCルータ(子リソース)](configuration/resources/vpc_router_old/)
     - [データベース](configuration/resources/database/)
     - [データベース(リードレプリカ)](configuration/resources/database_read_replica/)
     - [NFS](configuration/resources/nfs/)

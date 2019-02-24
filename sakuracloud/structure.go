@@ -12,6 +12,7 @@ import (
 )
 
 type resourceValueGetable interface {
+	Get(key string) interface{}
 	GetOk(key string) (interface{}, bool)
 }
 
@@ -19,9 +20,39 @@ type resourceMapValue struct {
 	value map[string]interface{}
 }
 
+func (r *resourceMapValue) Get(key string) interface{} {
+	return r.value[key]
+}
+
 func (r *resourceMapValue) GetOk(key string) (interface{}, bool) {
 	v, ok := r.value[key]
 	return v, ok
+}
+
+func mapToResourceData(v map[string]interface{}) resourceValueGetable {
+	return &resourceMapValue{value: v}
+}
+
+func getMapFromResource(d resourceValueGetable, key string) (map[string]interface{}, bool) {
+	v, ok := d.GetOk(key)
+	if !ok {
+		return nil, false
+	}
+	if v, ok := v.(map[string]interface{}); ok {
+		return v, true
+	}
+	return nil, false
+}
+
+func getListFromResource(d resourceValueGetable, key string) ([]interface{}, bool) {
+	v, ok := d.GetOk(key)
+	if !ok {
+		return nil, false
+	}
+	if v, ok := v.([]interface{}); ok {
+		return v, true
+	}
+	return nil, false
 }
 
 func mergeSchemas(schemas ...map[string]*schema.Schema) map[string]*schema.Schema {

@@ -7,7 +7,6 @@ import (
 
 	"github.com/hashicorp/terraform/helper/hashcode"
 	"github.com/hashicorp/terraform/helper/schema"
-	"github.com/hashicorp/terraform/helper/validation"
 	"github.com/sacloud/libsacloud/api"
 	"github.com/sacloud/libsacloud/sacloud"
 )
@@ -17,122 +16,7 @@ func resourceSakuraCloudVPCRouterSiteToSiteIPsecVPN() *schema.Resource {
 		Create: resourceSakuraCloudVPCRouterSiteToSiteIPsecVPNCreate,
 		Read:   resourceSakuraCloudVPCRouterSiteToSiteIPsecVPNRead,
 		Delete: resourceSakuraCloudVPCRouterSiteToSiteIPsecVPNDelete,
-		Schema: map[string]*schema.Schema{
-			"vpc_router_id": {
-				Type:         schema.TypeString,
-				Required:     true,
-				ForceNew:     true,
-				ValidateFunc: validateSakuracloudIDType,
-			},
-			"peer": {
-				Type:     schema.TypeString,
-				Required: true,
-				ForceNew: true,
-			},
-			"remote_id": {
-				Type:     schema.TypeString,
-				Required: true,
-				ForceNew: true,
-			},
-			"pre_shared_secret": {
-				Type:         schema.TypeString,
-				Required:     true,
-				ForceNew:     true,
-				ValidateFunc: validation.StringLenBetween(0, 40),
-			},
-			"routes": {
-				Type:     schema.TypeList,
-				Required: true,
-				ForceNew: true,
-				Elem:     &schema.Schema{Type: schema.TypeString},
-			},
-			"local_prefix": {
-				Type:     schema.TypeList,
-				Required: true,
-				ForceNew: true,
-				Elem:     &schema.Schema{Type: schema.TypeString},
-			},
-			"zone": {
-				Type:         schema.TypeString,
-				Optional:     true,
-				Computed:     true,
-				ForceNew:     true,
-				Description:  "target SakuraCloud zone",
-				ValidateFunc: validateZone([]string{"is1a", "is1b", "tk1a", "tk1v"}),
-			},
-			// HACK : terraform not supported nested structure yet
-			// see: https://github.com/hashicorp/terraform/issues/6215
-			"esp_authentication_protocol": {
-				Type:     schema.TypeString,
-				Computed: true,
-			},
-			"esp_dh_group": {
-				Type:     schema.TypeString,
-				Computed: true,
-			},
-			"esp_encryption_protocol": {
-				Type:     schema.TypeString,
-				Computed: true,
-			},
-			"esp_lifetime": {
-				Type:     schema.TypeString,
-				Computed: true,
-			},
-			"esp_mode": {
-				Type:     schema.TypeString,
-				Computed: true,
-			},
-			"esp_perfect_forward_secrecy": {
-				Type:     schema.TypeString,
-				Computed: true,
-			},
-			"ike_authentication_protocol": {
-				Type:     schema.TypeString,
-				Computed: true,
-			},
-			"ike_encryption_protocol": {
-				Type:     schema.TypeString,
-				Computed: true,
-			},
-			"ike_lifetime": {
-				Type:     schema.TypeString,
-				Computed: true,
-			},
-			"ike_mode": {
-				Type:     schema.TypeString,
-				Computed: true,
-			},
-			"ike_perfect_forward_secrecy": {
-				Type:     schema.TypeString,
-				Computed: true,
-			},
-			"ike_pre_shared_secret": {
-				Type:     schema.TypeString,
-				Computed: true,
-			},
-			"peer_id": {
-				Type:     schema.TypeString,
-				Computed: true,
-			},
-			"peer_inside_networks": {
-				Type:     schema.TypeList,
-				Elem:     &schema.Schema{Type: schema.TypeString},
-				Computed: true,
-			},
-			"peer_outside_ipaddress": {
-				Type:     schema.TypeString,
-				Computed: true,
-			},
-			"vpc_router_inside_networks": {
-				Type:     schema.TypeList,
-				Elem:     &schema.Schema{Type: schema.TypeString},
-				Computed: true,
-			},
-			"vpc_router_outside_ipaddress": {
-				Type:     schema.TypeString,
-				Computed: true,
-			},
-		},
+		Schema: vpcRouterS2SSchema(),
 	}
 }
 
@@ -278,7 +162,7 @@ func vpcRouterSiteToSiteIPsecVPNIDHash(routerID string, s *sacloud.VPCRouterSite
 	return fmt.Sprintf("%d", hashcode.String(buf.String()))
 }
 
-func expandVPCRouterSiteToSiteIPsecVPN(d *schema.ResourceData) *sacloud.VPCRouterSiteToSiteIPsecVPNConfig {
+func expandVPCRouterSiteToSiteIPsecVPN(d resourceValueGetable) *sacloud.VPCRouterSiteToSiteIPsecVPNConfig {
 
 	var s2sIPsecVPN = &sacloud.VPCRouterSiteToSiteIPsecVPNConfig{
 		Peer:            d.Get("peer").(string),

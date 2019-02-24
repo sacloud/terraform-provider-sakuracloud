@@ -26,7 +26,6 @@ resource "sakuracloud_dns" "dns" {
   }
 }
 
-
 # 互換性維持のため以下の書き方も可能
 #resource "sakuracloud_dns_record" "record01" {
 #  dns_id = sakuracloud_dns.dns.id
