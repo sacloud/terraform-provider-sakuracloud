@@ -2,7 +2,7 @@
 
 ---
 
-NOTE: VPCルータの各設定を子リソースとして定義したい場合(Terraform v0.11までの方法)は[VPCルータ(v0.11)](./vpc_router_old)を参照してください。
+NOTE: VPCルータの各設定を子リソースとして定義したい場合(Terraform v0.11までの方法)は[VPCルータ(子リソース)](./vpc_router_old)を参照してください。
 
 ### 設定例
 

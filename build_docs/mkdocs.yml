@@ -35,7 +35,7 @@ pages:
       - ブリッジ: configuration/resources/bridge.md
       - ロードバランサ: configuration/resources/load_balancer.md
       - VPCルータ: configuration/resources/vpc_router.md
-      - VPCルータ(v0.11): configuration/resources/vpc_router_old.md
+      - VPCルータ(子リソース): configuration/resources/vpc_router_old.md
       - データベース: configuration/resources/database.md
       - データベース(リードレプリカ): configuration/resources/database_read_replica.md
       - NFS: configuration/resources/nfs.md

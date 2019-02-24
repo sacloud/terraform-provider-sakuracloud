@@ -42,7 +42,7 @@
     - [ブリッジ](configuration/resources/bridge/)
     - [ロードバランサ](configuration/resources/load_balancer/)
     - [VPCルータ](configuration/resources/vpc_router/)
-    - [VPCルータ(v0.11)](configuration/resources/vpc_router_old/)
+    - [VPCルータ(子リソース)](configuration/resources/vpc_router_old/)
     - [データベース](configuration/resources/database/)
     - [データベース(リードレプリカ)](configuration/resources/database_read_replica/)
     - [NFS](configuration/resources/nfs/)

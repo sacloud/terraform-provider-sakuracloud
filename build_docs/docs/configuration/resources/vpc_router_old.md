@@ -1,4 +1,4 @@
-# VPCルータ(sakuracloud_vpc_router)(v0.11)
+# VPCルータ(sakuracloud_vpc_router)(子リソース)
 
 ---
 
