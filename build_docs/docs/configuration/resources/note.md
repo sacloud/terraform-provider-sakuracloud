@@ -19,7 +19,6 @@ resource "sakuracloud_note" "mynote" {
   #ファイルから読み込む場合
   #content = file("example.sh")
 
-  description = "Description"
   tags        = ["tag1", "tag2"]
 }
 ```
@@ -32,7 +31,6 @@ resource "sakuracloud_note" "mynote" {
 | `class`           | -   | クラス                | `shell`        | `shell`<br />`yaml_cloud_config`| - |
 | `content`         | ◯   | スクリプト内容         | -        | 文字列                  | - |
 | `icon_id`         | -   | アイコンID         | - | 文字列 | - |
-| `description`     | -   | 説明  | - | 文字列 | - |
 | `tags`            | -   | タグ | - | リスト(文字列) | - |
 
 ### 属性
@@ -40,3 +38,4 @@ resource "sakuracloud_note" "mynote" {
 |属性名                | 名称                    | 補足                                        |
 |---------------------|------------------------|--------------------------------------------|
 | `id`                | スクリプトID             | -                                          |
+| `description`       | | 説明                  | スクリプトの中の`@sacloud-desc`タグの値が格納される |
