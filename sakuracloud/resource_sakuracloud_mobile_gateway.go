@@ -636,16 +636,16 @@ func setMobileGatewayResourceData(d *schema.ResourceData, client *APIClient, dat
 	d.Set("dns_server1", resolver.SimGroup.DNS1)
 	d.Set("dns_server2", resolver.SimGroup.DNS2)
 
+	var staticRoutes []map[string]interface{}
 	if data.HasStaticRoutes() {
-		var staticRoutes []map[string]interface{}
 		for _, r := range data.Settings.MobileGateway.StaticRoutes {
 			staticRoutes = append(staticRoutes, map[string]interface{}{
 				"prefix":   r.Prefix,
 				"next_hop": r.NextHop,
 			})
 		}
-		d.Set("static_route", staticRoutes)
 	}
+	d.Set("static_route", staticRoutes)
 
 	d.Set("name", data.Name)
 	d.Set("icon_id", data.GetIconStrID())

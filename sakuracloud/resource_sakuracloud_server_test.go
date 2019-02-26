@@ -196,7 +196,7 @@ func TestAccSakuraCloudServer_ConnectPacketFilters(t *testing.T) {
 				Config: testAccCheckSakuraCloudServerConfig_with_packet_filter_del,
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttr(
-						"sakuracloud_server.foobar", "packet_filter_ids.#", "0"),
+						"sakuracloud_server.foobar", "packet_filter_ids.0", ""),
 				),
 			},
 		},

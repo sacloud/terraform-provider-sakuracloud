@@ -28,7 +28,7 @@ func TestAccSakuraCloudDataSourceArchive_Basic(t *testing.T) {
 					resource.TestCheckResourceAttr("data.sakuracloud_archive.foobar", "tags.0", "@size-extendable"),
 					resource.TestCheckResourceAttr("data.sakuracloud_archive.foobar", "tags.1", "arch-64bit"),
 					resource.TestCheckResourceAttr("data.sakuracloud_archive.foobar", "tags.2", "distro-ubuntu"),
-					resource.TestCheckResourceAttr("data.sakuracloud_archive.foobar", "tags.3", "distro-ver-16.04.4"),
+					resource.TestCheckResourceAttr("data.sakuracloud_archive.foobar", "tags.3", "distro-ver-16.04.5"),
 					resource.TestCheckResourceAttr("data.sakuracloud_archive.foobar", "tags.4", "os-linux"),
 				),
 			},

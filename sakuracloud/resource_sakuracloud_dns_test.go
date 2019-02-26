@@ -129,7 +129,7 @@ func TestAccImportSakuraCloudDNS(t *testing.T) {
 		if err := compareStateMulti(s[0], expects); err != nil {
 			return err
 		}
-		return stateNotEmptyMulti(s[0], "icon_id", "dns_servers.0")
+		return stateNotEmptyMulti(s[0], "dns_servers.0")
 	}
 
 	resourceName := "sakuracloud_dns.foobar"
@@ -140,7 +140,7 @@ func TestAccImportSakuraCloudDNS(t *testing.T) {
 		CheckDestroy: testAccCheckSakuraCloudDNSDestroy,
 		Steps: []resource.TestStep{
 			{
-				Config: testAccCheckSakuraCloudDNSConfig_basic(zone),
+				Config: testAccCheckSakuraCloudDNSConfig_import(zone),
 			},
 			{
 				ResourceName:      resourceName,
@@ -190,4 +190,14 @@ resource "sakuracloud_dns" "foobar" {
       value = "192.168.11.1"
     }
 }`, zone)
+}
+
+func testAccCheckSakuraCloudDNSConfig_import(zone string) string {
+	return fmt.Sprintf(`
+resource "sakuracloud_dns" "foobar" {
+    zone = "%s"
+    description = "DNS from TerraForm for SAKURA CLOUD"
+    tags = ["tag1","tag2"]
+}
+`, zone)
 }

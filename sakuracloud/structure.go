@@ -192,20 +192,32 @@ func flattenDisplayIPAddress(interfaces []sacloud.Interface) []interface{} {
 
 func flattenPacketFilters(interfaces []sacloud.Interface) []string {
 	var ret []string
-	var isExists = false
-	for index, i := range interfaces {
+	for _, i := range interfaces {
 		var id string
 		if i.PacketFilter != nil {
 			id = i.PacketFilter.GetStrID()
-			isExists = true
 		}
-		if index == 0 || (len(interfaces)-1 == index && id != "") {
-			ret = append(ret, id)
+		ret = append(ret, id)
+	}
+
+	if len(interfaces) <= 1 {
+		return ret
+	}
+
+	exists := false
+	for i := 1; i < len(interfaces); i++ {
+		if ret[i] != "" {
+			exists = true
+			break
 		}
 	}
-	if !isExists {
+	if !exists {
+		if ret[0] != "" {
+			return []string{ret[0]}
+		}
 		return []string{}
 	}
+
 	return ret
 }
 

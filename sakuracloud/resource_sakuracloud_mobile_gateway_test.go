@@ -64,11 +64,13 @@ func TestAccSakuraCloudMobileGateway(t *testing.T) {
 					resource.TestCheckResourceAttr("sakuracloud_mobile_gateway.foobar", "tags.#", "2"),
 					resource.TestCheckResourceAttr("sakuracloud_mobile_gateway.foobar", "tags.0", "hoge1_after"),
 					resource.TestCheckResourceAttr("sakuracloud_mobile_gateway.foobar", "tags.1", "hoge2_after"),
-					resource.TestCheckResourceAttr("sakuracloud_mobile_gateway.foobar", "private_ipaddress", ""),
-					resource.TestCheckResourceAttr("sakuracloud_mobile_gateway.foobar", "private_nw_mask_len", "0"),
-					resource.TestCheckResourceAttr("sakuracloud_mobile_gateway.foobar", "switch_id", ""),
+					resource.TestCheckResourceAttr("sakuracloud_mobile_gateway.foobar", "private_ipaddress", "192.168.11.101"),
+					resource.TestCheckResourceAttr("sakuracloud_mobile_gateway.foobar", "private_nw_mask_len", "24"),
 					resource.TestCheckResourceAttr("sakuracloud_mobile_gateway.foobar", "icon_id", ""),
 					resource.TestCheckResourceAttr("sakuracloud_mobile_gateway.foobar", "traffic_control.#", "0"),
+					resource.TestCheckResourceAttrPair(
+						"sakuracloud_mobile_gateway.foobar", "switch_id",
+						"sakuracloud_switch.sw", "id"),
 				),
 			},
 		},
@@ -257,8 +259,10 @@ resource "sakuracloud_mobile_gateway" "foobar" {
   switch_id           = sakuracloud_switch.sw.id
   private_ipaddress   = "192.168.11.101"
   private_nw_mask_len = 24
-  internet_connection = true
-  name                = "name_before"
+  internet_connection = false
+  name                = "name_after"
+  description         = "description_after"
+  tags                = ["hoge1_after", "hoge2_after"]
 }`
 
 const testAccCheckSakuraCloudMobileGatewayConfig_full_basic = `

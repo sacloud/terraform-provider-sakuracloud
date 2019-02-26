@@ -117,7 +117,7 @@ func TestAccResourceSakuraCloudSIM(t *testing.T) {
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckSakuraCloudSIMExists("sakuracloud_sim.foobar", &sim),
 					resource.TestCheckResourceAttr(
-						"sakuracloud_mobile_gateway.mgw", "sim_ids.#", "0"),
+						"sakuracloud_mobile_gateway.mgw", "sim_ids.0", ""),
 				),
 			},
 		},

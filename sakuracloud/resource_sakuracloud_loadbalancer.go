@@ -174,6 +174,7 @@ func loadBalancerServerValueSchema() map[string]*schema.Schema {
 		"enabled": {
 			Type:     schema.TypeBool,
 			Optional: true,
+			Default:  true,
 			ForceNew: true,
 		},
 	}
@@ -483,9 +484,9 @@ func expandLoadBalancerServer(d resourceValueGetable) *sacloud.LoadBalancerServe
 		server.IPAddress = v.(string)
 	}
 
-	server.Enabled = "False"
-	if v, ok := d.GetOk("enabled"); ok && v.(bool) {
-		server.Enabled = "True"
+	server.Enabled = "True"
+	if v, ok := d.GetOk("enabled"); ok && !v.(bool) {
+		server.Enabled = "False"
 	}
 	server.HealthCheck = &sacloud.LoadBalancerHealthCheck{}
 

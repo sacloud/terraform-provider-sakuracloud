@@ -40,15 +40,6 @@ func TestAccResourceSakuraCloudBridge(t *testing.T) {
 					testAccCheckSakuraCloudBridgeExists("sakuracloud_bridge.foobar", &bridge),
 					resource.TestCheckResourceAttr(
 						"sakuracloud_bridge.foobar", "name", "mybridge_upd"),
-					resource.TestCheckResourceAttr(
-						"sakuracloud_switch.foobar", "name", "myswitch_upd"),
-				),
-			},
-			{
-				Config: testAccCheckSakuraCloudBridgeConfig_withSwitchDisconnect,
-				Check: resource.ComposeTestCheckFunc(
-					resource.TestCheckResourceAttr(
-						"sakuracloud_bridge.foobar", "switch_ids.#", "0"),
 				),
 			},
 		},
@@ -160,11 +151,6 @@ resource "sakuracloud_bridge" "foobar" {
 }`
 
 var testAccCheckSakuraCloudBridgeConfig_withSwitchDisconnect = `
-resource "sakuracloud_switch" "foobar" {
-    name = "myswitch_upd"
-    description = "Switch from TerraForm for SAKURA CLOUD"
-    zone = "is1b"
-}
 resource "sakuracloud_bridge" "foobar" {
     name = "mybridge_upd"
     description = "Bridge from TerraForm for SAKURA CLOUD"

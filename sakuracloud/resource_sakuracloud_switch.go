@@ -220,6 +220,9 @@ func resourceSakuraCloudSwitchDelete(d *schema.ResourceData, meta interface{}) e
 		}
 	}
 
+	sakuraMutexKV.Lock(d.Id())
+	defer sakuraMutexKV.Unlock(d.Id())
+
 	sw, err := client.Switch.Read(toSakuraCloudID(d.Id()))
 	if err != nil {
 		return fmt.Errorf("Couldn't find SakuraCloud Servers: %s", err)

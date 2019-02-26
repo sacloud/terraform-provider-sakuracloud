@@ -6,32 +6,103 @@ import (
 	"github.com/sacloud/libsacloud/sacloud"
 )
 
+type vpcRouterSchemaTypes int
+
+const (
+	vpcRouterSchemaForceNew = iota
+	vpcRouterSchemaEmbedded
+	vpcRouterSchemaDataSource
+)
+
+func (v vpcRouterSchemaTypes) forceNew() bool {
+	switch v {
+	case vpcRouterSchemaForceNew:
+		return true
+	default:
+		return false
+	}
+}
+
+func (v vpcRouterSchemaTypes) required(original bool) bool {
+	if v == vpcRouterSchemaDataSource {
+		return false
+	}
+	return original
+}
+
+func (v vpcRouterSchemaTypes) optional(original bool) bool {
+	if v == vpcRouterSchemaDataSource {
+		return false
+	}
+	return original
+}
+
+func (v vpcRouterSchemaTypes) validateFunc(original schema.SchemaValidateFunc) schema.SchemaValidateFunc {
+	if v == vpcRouterSchemaDataSource {
+		return nil
+	}
+	return original
+}
+
+func (v vpcRouterSchemaTypes) computed(original bool) bool {
+	if v == vpcRouterSchemaDataSource {
+		return true
+	}
+	return original
+}
+
+func (v vpcRouterSchemaTypes) defaultValue(original interface{}) interface{} {
+	if v == vpcRouterSchemaDataSource {
+		return nil
+	}
+	return original
+}
+
+func (v vpcRouterSchemaTypes) maxItems(original int) int {
+	if v == vpcRouterSchemaDataSource {
+		return 0
+	}
+	return original
+}
+
 func vpcRouterInterfaceSchema() map[string]*schema.Schema {
 	return mergeSchemas(
 		vpcRouterIDSchema(true),
-		vpcRouterInterfaceIndexSchema(true, true),
-		vpcRouterInterfaceValueSchema(true),
-		vpcRouterCommonSchema(true, true),
+		vpcRouterInterfaceIndexSchema(vpcRouterSchemaForceNew, true),
+		vpcRouterInterfaceValueSchema(vpcRouterSchemaForceNew),
+		vpcRouterPowerManageSchema(true),
+		vpcRouterZoneSchema(true),
 	)
 }
 
 func vpcRouterInterfaceEmbeddedSchema() map[string]*schema.Schema {
-	return vpcRouterInterfaceValueSchema(false)
+	return vpcRouterInterfaceValueSchema(vpcRouterSchemaEmbedded)
+}
+
+func vpcRouterInterfaceDataSchema() map[string]*schema.Schema {
+	return vpcRouterInterfaceValueSchema(vpcRouterSchemaDataSource)
 }
 
 func vpcRouterDHCPServerSchema() map[string]*schema.Schema {
 	return mergeSchemas(
 		vpcRouterIDSchema(true),
-		vpcRouterInterfaceIndexSchema(true, false),
-		vpcRouterDHCPServerValueSchema(true),
-		vpcRouterCommonSchema(true, false),
+		vpcRouterInterfaceIndexSchema(vpcRouterSchemaForceNew, false),
+		vpcRouterDHCPServerValueSchema(vpcRouterSchemaForceNew),
+		vpcRouterZoneSchema(true),
 	)
 }
 
 func vpcRouterDHCPServerEmbeddedSchema() map[string]*schema.Schema {
 	return mergeSchemas(
-		vpcRouterInterfaceIndexSchema(false, false),
-		vpcRouterDHCPServerValueSchema(false),
+		vpcRouterInterfaceIndexSchema(vpcRouterSchemaEmbedded, false),
+		vpcRouterDHCPServerValueSchema(vpcRouterSchemaEmbedded),
+	)
+}
+
+func vpcRouterDHCPServerDataSchema() map[string]*schema.Schema {
+	return mergeSchemas(
+		vpcRouterInterfaceIndexSchema(vpcRouterSchemaDataSource, false),
+		vpcRouterDHCPServerValueSchema(vpcRouterSchemaDataSource),
 	)
 }
 
@@ -45,14 +116,20 @@ func vpcRouterDHCPStaticMappingSchema() map[string]*schema.Schema {
 				ForceNew: true,
 			},
 		},
-		vpcRouterDHCPStaticMappingValueSchema(true),
-		vpcRouterCommonSchema(true, false),
+		vpcRouterDHCPStaticMappingValueSchema(vpcRouterSchemaForceNew),
+		vpcRouterZoneSchema(true),
 	)
 }
 
 func vpcRouterDHCPStaticMappingEmbeddedSchema() map[string]*schema.Schema {
 	return mergeSchemas(
-		vpcRouterDHCPStaticMappingValueSchema(false),
+		vpcRouterDHCPStaticMappingValueSchema(vpcRouterSchemaEmbedded),
+	)
+}
+
+func vpcRouterDHCPStaticMappingDataSchema() map[string]*schema.Schema {
+	return mergeSchemas(
+		vpcRouterDHCPStaticMappingValueSchema(vpcRouterSchemaDataSource),
 	)
 }
 
@@ -68,8 +145,8 @@ func vpcRouterFirewallSchema() map[string]*schema.Schema {
 				ValidateFunc: validation.IntBetween(0, sacloud.VPCRouterMaxInterfaceCount-1),
 			},
 		},
-		vpcRouterFirewallValueSchema(true),
-		vpcRouterCommonSchema(true, false),
+		vpcRouterFirewallValueSchema(vpcRouterSchemaForceNew),
+		vpcRouterZoneSchema(true),
 	)
 }
 
@@ -83,7 +160,19 @@ func vpcRouterFirewallEmbeddedSchema() map[string]*schema.Schema {
 				ValidateFunc: validation.IntBetween(0, sacloud.VPCRouterMaxInterfaceCount-1),
 			},
 		},
-		vpcRouterFirewallValueSchema(false),
+		vpcRouterFirewallValueSchema(vpcRouterSchemaEmbedded),
+	)
+}
+
+func vpcRouterFirewallDataSchema() map[string]*schema.Schema {
+	return mergeSchemas(
+		map[string]*schema.Schema{
+			"vpc_router_interface_index": {
+				Type:     schema.TypeInt,
+				Computed: true,
+			},
+		},
+		vpcRouterFirewallValueSchema(vpcRouterSchemaDataSource),
 	)
 }
 
@@ -91,14 +180,20 @@ func vpcRouterL2TPSchema() map[string]*schema.Schema {
 	return mergeSchemas(
 		vpcRouterIDSchema(true),
 		vpcRouterInterfaceIDSchema(true),
-		vpcRouterL2TPValueSchema(true),
-		vpcRouterCommonSchema(true, false),
+		vpcRouterL2TPValueSchema(vpcRouterSchemaForceNew),
+		vpcRouterZoneSchema(true),
 	)
 }
 
 func vpcRouterL2TPEmbeddedSchema() map[string]*schema.Schema {
 	return mergeSchemas(
-		vpcRouterL2TPValueSchema(false),
+		vpcRouterL2TPValueSchema(vpcRouterSchemaEmbedded),
+	)
+}
+
+func vpcRouterL2TPDataSchema() map[string]*schema.Schema {
+	return mergeSchemas(
+		vpcRouterL2TPValueSchema(vpcRouterSchemaDataSource),
 	)
 }
 
@@ -106,14 +201,20 @@ func vpcRouterPortForwardingSchema() map[string]*schema.Schema {
 	return mergeSchemas(
 		vpcRouterIDSchema(true),
 		vpcRouterInterfaceIDSchema(true),
-		vpcRouterPortForwardingValueSchema(true),
-		vpcRouterCommonSchema(true, false),
+		vpcRouterPortForwardingValueSchema(vpcRouterSchemaForceNew),
+		vpcRouterZoneSchema(true),
 	)
 }
 
 func vpcRouterPortForwardingEmbeddedSchema() map[string]*schema.Schema {
 	return mergeSchemas(
-		vpcRouterPortForwardingValueSchema(false),
+		vpcRouterPortForwardingValueSchema(vpcRouterSchemaEmbedded),
+	)
+}
+
+func vpcRouterPortForwardingDataSchema() map[string]*schema.Schema {
+	return mergeSchemas(
+		vpcRouterPortForwardingValueSchema(vpcRouterSchemaDataSource),
 	)
 }
 
@@ -121,28 +222,40 @@ func vpcRouterPPTPSchema() map[string]*schema.Schema {
 	return mergeSchemas(
 		vpcRouterIDSchema(true),
 		vpcRouterInterfaceIDSchema(true),
-		vpcRouterPPTPValueSchema(true),
-		vpcRouterCommonSchema(true, false),
+		vpcRouterPPTPValueSchema(vpcRouterSchemaForceNew),
+		vpcRouterZoneSchema(true),
 	)
 }
 
 func vpcRouterPPTPEmbeddedSchema() map[string]*schema.Schema {
 	return mergeSchemas(
-		vpcRouterPPTPValueSchema(false),
+		vpcRouterPPTPValueSchema(vpcRouterSchemaEmbedded),
+	)
+}
+
+func vpcRouterPPTPDataSchema() map[string]*schema.Schema {
+	return mergeSchemas(
+		vpcRouterPPTPValueSchema(vpcRouterSchemaDataSource),
 	)
 }
 
 func vpcRouterS2SSchema() map[string]*schema.Schema {
 	return mergeSchemas(
 		vpcRouterIDSchema(true),
-		vpcRouterS2SValueSchema(true),
-		vpcRouterCommonSchema(true, false),
+		vpcRouterS2SValueSchema(vpcRouterSchemaForceNew),
+		vpcRouterZoneSchema(true),
 	)
 }
 
 func vpcRouterS2SEmbeddedSchema() map[string]*schema.Schema {
 	return mergeSchemas(
-		vpcRouterS2SValueSchema(false),
+		vpcRouterS2SValueSchema(vpcRouterSchemaEmbedded),
+	)
+}
+
+func vpcRouterS2SDataSchema() map[string]*schema.Schema {
+	return mergeSchemas(
+		vpcRouterS2SValueSchema(vpcRouterSchemaDataSource),
 	)
 }
 
@@ -150,14 +263,20 @@ func vpcRouterStaticNATSchema() map[string]*schema.Schema {
 	return mergeSchemas(
 		vpcRouterIDSchema(true),
 		vpcRouterInterfaceIDSchema(true),
-		vpcRouterStaticNATValueSchema(true),
-		vpcRouterCommonSchema(true, false),
+		vpcRouterStaticNATValueSchema(vpcRouterSchemaForceNew),
+		vpcRouterZoneSchema(true),
 	)
 }
 
 func vpcRouterStaticNATEmbeddedSchema() map[string]*schema.Schema {
 	return mergeSchemas(
-		vpcRouterStaticNATValueSchema(false),
+		vpcRouterStaticNATValueSchema(vpcRouterSchemaEmbedded),
+	)
+}
+
+func vpcRouterStaticNATDataSchema() map[string]*schema.Schema {
+	return mergeSchemas(
+		vpcRouterStaticNATValueSchema(vpcRouterSchemaDataSource),
 	)
 }
 
@@ -165,28 +284,40 @@ func vpcRouterStaticRouteSchema() map[string]*schema.Schema {
 	return mergeSchemas(
 		vpcRouterIDSchema(true),
 		vpcRouterInterfaceIDSchema(true),
-		vpcRouterStaticRouteValueSchema(true),
-		vpcRouterCommonSchema(true, false),
+		vpcRouterStaticRouteValueSchema(vpcRouterSchemaForceNew),
+		vpcRouterZoneSchema(true),
 	)
 }
 
 func vpcRouterStaticRouteEmbeddedSchema() map[string]*schema.Schema {
 	return mergeSchemas(
-		vpcRouterStaticRouteValueSchema(false),
+		vpcRouterStaticRouteValueSchema(vpcRouterSchemaEmbedded),
+	)
+}
+
+func vpcRouterStaticRouteDataSchema() map[string]*schema.Schema {
+	return mergeSchemas(
+		vpcRouterStaticRouteValueSchema(vpcRouterSchemaDataSource),
 	)
 }
 
 func vpcRouterUserSchema() map[string]*schema.Schema {
 	return mergeSchemas(
 		vpcRouterIDSchema(true),
-		vpcRouterUserValueSchema(true),
-		vpcRouterCommonSchema(true, false),
+		vpcRouterUserValueSchema(vpcRouterSchemaForceNew),
+		vpcRouterZoneSchema(true),
 	)
 }
 
 func vpcRouterUserEmbeddedSchema() map[string]*schema.Schema {
 	return mergeSchemas(
-		vpcRouterUserValueSchema(false),
+		vpcRouterUserValueSchema(vpcRouterSchemaEmbedded),
+	)
+}
+
+func vpcRouterUserDataSchema() map[string]*schema.Schema {
+	return mergeSchemas(
+		vpcRouterUserValueSchema(vpcRouterSchemaDataSource),
 	)
 }
 
@@ -211,7 +342,7 @@ func vpcRouterInterfaceIDSchema(forceNew bool) map[string]*schema.Schema {
 	}
 }
 
-func vpcRouterInterfaceIndexSchema(forceNew, shortName bool) map[string]*schema.Schema {
+func vpcRouterInterfaceIndexSchema(t vpcRouterSchemaTypes, shortName bool) map[string]*schema.Schema {
 	key := "vpc_router_interface_index"
 	if shortName {
 		key = "index"
@@ -219,15 +350,16 @@ func vpcRouterInterfaceIndexSchema(forceNew, shortName bool) map[string]*schema.
 	return map[string]*schema.Schema{
 		key: {
 			Type:         schema.TypeInt,
-			Required:     true,
-			ForceNew:     forceNew,
-			ValidateFunc: validation.IntBetween(1, 7),
+			Required:     t.required(true),
+			ForceNew:     t.forceNew(),
+			ValidateFunc: t.validateFunc(validation.IntBetween(1, 7)),
+			Computed:     t.computed(false),
 		},
 	}
 }
 
-func vpcRouterCommonSchema(forceNew, withPowerManager bool) map[string]*schema.Schema {
-	s := map[string]*schema.Schema{
+func vpcRouterZoneSchema(forceNew bool) map[string]*schema.Schema {
+	return map[string]*schema.Schema{
 		"zone": {
 			Type:         schema.TypeString,
 			Optional:     true,
@@ -237,141 +369,163 @@ func vpcRouterCommonSchema(forceNew, withPowerManager bool) map[string]*schema.S
 			ValidateFunc: validateZone([]string{"is1a", "is1b", "tk1a", "tk1v"}),
 		},
 	}
-	if withPowerManager {
-		power := powerManageTimeoutParam
-		if forceNew {
-			power = powerManageTimeoutParamForceNew
-		}
-		s[powerManageTimeoutKey] = power
-	}
-	return s
 }
 
-func vpcRouterInterfaceValueSchema(forceNew bool) map[string]*schema.Schema {
+func vpcRouterPowerManageSchema(forceNew bool) map[string]*schema.Schema {
+	if forceNew {
+		return map[string]*schema.Schema{
+			powerManageTimeoutKey: powerManageTimeoutParamForceNew,
+		}
+	}
+	return map[string]*schema.Schema{
+		powerManageTimeoutKey: powerManageTimeoutParam,
+	}
+
+}
+
+func vpcRouterInterfaceValueSchema(t vpcRouterSchemaTypes) map[string]*schema.Schema {
 	return map[string]*schema.Schema{
 		"switch_id": {
 			Type:         schema.TypeString,
-			Required:     true,
-			ForceNew:     forceNew,
-			ValidateFunc: validateSakuracloudIDType,
+			Required:     t.required(true),
+			ForceNew:     t.forceNew(),
+			ValidateFunc: t.validateFunc(validateSakuracloudIDType),
+			Computed:     t.computed(false),
 		},
 		"vip": {
 			Type:     schema.TypeString,
-			ForceNew: forceNew,
-			Optional: true,
-			Default:  "",
+			ForceNew: t.forceNew(),
+			Optional: t.optional(true),
+			Default:  t.defaultValue(""),
+			Computed: t.computed(false),
 		},
 		"ipaddress": {
 			Type:     schema.TypeList,
-			Required: true,
-			ForceNew: forceNew,
+			Required: t.required(true),
+			ForceNew: t.forceNew(),
 			Elem:     &schema.Schema{Type: schema.TypeString},
-			MaxItems: 2,
+			MaxItems: t.maxItems(2),
+			Computed: t.computed(false),
 		},
 		"nw_mask_len": {
 			Type:         schema.TypeInt,
-			Required:     true,
-			ForceNew:     forceNew,
-			ValidateFunc: validation.IntBetween(16, 28),
+			Required:     t.required(true),
+			ForceNew:     t.forceNew(),
+			ValidateFunc: t.validateFunc(validation.IntBetween(16, 28)),
+			Computed:     t.computed(false),
 		},
 	}
 }
 
-func vpcRouterDHCPServerValueSchema(forceNew bool) map[string]*schema.Schema {
+func vpcRouterDHCPServerValueSchema(t vpcRouterSchemaTypes) map[string]*schema.Schema {
 	return map[string]*schema.Schema{
 		"range_start": {
 			Type:         schema.TypeString,
-			Required:     true,
-			ForceNew:     forceNew,
-			ValidateFunc: validateIPv4Address(),
+			Required:     t.required(true),
+			ForceNew:     t.forceNew(),
+			ValidateFunc: t.validateFunc(validateIPv4Address()),
+			Computed:     t.computed(false),
 		},
 		"range_stop": {
 			Type:         schema.TypeString,
-			Required:     true,
-			ForceNew:     forceNew,
-			ValidateFunc: validateIPv4Address(),
+			Required:     t.required(true),
+			ForceNew:     t.forceNew(),
+			ValidateFunc: t.validateFunc(validateIPv4Address()),
+			Computed:     t.computed(false),
 		},
 		"dns_servers": {
 			Type:     schema.TypeList,
-			Optional: true,
-			ForceNew: forceNew,
+			Optional: t.optional(true),
+			ForceNew: t.forceNew(),
 			Elem:     &schema.Schema{Type: schema.TypeString},
-			//ValidateFunc: validateList(validateIPv4Address()),
+			Computed: t.computed(false),
 		},
 	}
 }
 
-func vpcRouterDHCPStaticMappingValueSchema(forceNew bool) map[string]*schema.Schema {
+func vpcRouterDHCPStaticMappingValueSchema(t vpcRouterSchemaTypes) map[string]*schema.Schema {
 	return map[string]*schema.Schema{
 		"ipaddress": {
 			Type:     schema.TypeString,
-			Required: true,
-			ForceNew: forceNew,
+			Required: t.required(true),
+			ForceNew: t.forceNew(),
+			Computed: t.computed(false),
 		},
 		"macaddress": {
 			Type:     schema.TypeString,
-			Required: true,
-			ForceNew: forceNew,
+			Required: t.required(true),
+			ForceNew: t.forceNew(),
+			Computed: t.computed(false),
 		},
 	}
 }
 
-func vpcRouterFirewallValueSchema(forceNew bool) map[string]*schema.Schema {
+func vpcRouterFirewallValueSchema(t vpcRouterSchemaTypes) map[string]*schema.Schema {
 	return map[string]*schema.Schema{
 		"direction": {
 			Type:         schema.TypeString,
-			Required:     true,
-			ForceNew:     forceNew,
-			ValidateFunc: validation.StringInSlice([]string{"send", "receive"}, false),
+			Required:     t.required(true),
+			ForceNew:     t.forceNew(),
+			ValidateFunc: t.validateFunc(validation.StringInSlice([]string{"send", "receive"}, false)),
+			Computed:     t.computed(false),
 		},
 		"expressions": {
 			Type:     schema.TypeList,
-			Required: true,
-			ForceNew: forceNew,
+			Required: t.required(true),
+			ForceNew: t.forceNew(),
+			Computed: t.computed(false),
 			Elem: &schema.Resource{
 				Schema: map[string]*schema.Schema{
 					"protocol": {
 						Type:         schema.TypeString,
-						Required:     true,
-						ForceNew:     forceNew,
-						ValidateFunc: validation.StringInSlice([]string{"tcp", "udp", "icmp", "ip"}, false),
+						Required:     t.required(true),
+						ForceNew:     t.forceNew(),
+						ValidateFunc: t.validateFunc(validation.StringInSlice([]string{"tcp", "udp", "icmp", "ip"}, false)),
+						Computed:     t.computed(false),
 					},
 					"source_nw": {
 						Type:     schema.TypeString,
-						Required: true,
-						ForceNew: forceNew,
+						Required: t.required(true),
+						ForceNew: t.forceNew(),
+						Computed: t.computed(false),
 					},
 					"source_port": {
 						Type:     schema.TypeString,
-						Required: true,
-						ForceNew: forceNew,
+						Required: t.required(true),
+						ForceNew: t.forceNew(),
+						Computed: t.computed(false),
 					},
 					"dest_nw": {
 						Type:     schema.TypeString,
-						Required: true,
-						ForceNew: forceNew,
+						Required: t.required(true),
+						ForceNew: t.forceNew(),
+						Computed: t.computed(false),
 					},
 					"dest_port": {
 						Type:     schema.TypeString,
-						Required: true,
-						ForceNew: forceNew,
+						Required: t.required(true),
+						ForceNew: t.forceNew(),
+						Computed: t.computed(false),
 					},
 					"allow": {
 						Type:     schema.TypeBool,
-						Required: true,
-						ForceNew: forceNew,
+						Required: t.required(true),
+						ForceNew: t.forceNew(),
+						Computed: t.computed(false),
 					},
 					"logging": {
 						Type:     schema.TypeBool,
-						Optional: true,
-						ForceNew: forceNew,
+						Optional: t.optional(true),
+						ForceNew: t.forceNew(),
+						Computed: t.computed(false),
 					},
 					"description": {
 						Type:         schema.TypeString,
-						Optional:     true,
-						Default:      "",
-						ForceNew:     forceNew,
-						ValidateFunc: validation.StringLenBetween(0, 512),
+						Optional:     t.optional(true),
+						Default:      t.defaultValue(""),
+						ForceNew:     t.forceNew(),
+						ValidateFunc: t.validateFunc(validation.StringLenBetween(0, 512)),
+						Computed:     t.computed(false),
 					},
 				},
 			},
@@ -379,108 +533,123 @@ func vpcRouterFirewallValueSchema(forceNew bool) map[string]*schema.Schema {
 	}
 }
 
-func vpcRouterL2TPValueSchema(forceNew bool) map[string]*schema.Schema {
+func vpcRouterL2TPValueSchema(t vpcRouterSchemaTypes) map[string]*schema.Schema {
 	return map[string]*schema.Schema{
 		"pre_shared_secret": {
 			Type:         schema.TypeString,
-			Required:     true,
-			ForceNew:     forceNew,
+			Required:     t.required(true),
+			ForceNew:     t.forceNew(),
 			Sensitive:    true,
-			ValidateFunc: validation.StringLenBetween(0, 40),
+			ValidateFunc: t.validateFunc(validation.StringLenBetween(0, 40)),
+			Computed:     t.computed(false),
 		},
 		"range_start": {
 			Type:     schema.TypeString,
-			Required: true,
-			ForceNew: forceNew,
+			Required: t.required(true),
+			ForceNew: t.forceNew(),
+			Computed: t.computed(false),
 		},
 		"range_stop": {
 			Type:     schema.TypeString,
-			Required: true,
-			ForceNew: forceNew,
+			Required: t.required(true),
+			ForceNew: t.forceNew(),
+			Computed: t.computed(false),
 		},
 	}
 }
 
-func vpcRouterPortForwardingValueSchema(forceNew bool) map[string]*schema.Schema {
+func vpcRouterPortForwardingValueSchema(t vpcRouterSchemaTypes) map[string]*schema.Schema {
 	return map[string]*schema.Schema{
 		"protocol": {
 			Type:         schema.TypeString,
-			Required:     true,
-			ForceNew:     forceNew,
-			ValidateFunc: validation.StringInSlice([]string{"tcp", "udp"}, false),
+			Required:     t.required(true),
+			ForceNew:     t.forceNew(),
+			ValidateFunc: t.validateFunc(validation.StringInSlice([]string{"tcp", "udp"}, false)),
+			Computed:     t.computed(false),
 		},
 		"global_port": {
 			Type:         schema.TypeInt,
-			Required:     true,
-			ForceNew:     forceNew,
-			ValidateFunc: validation.IntBetween(1, 65535),
+			Required:     t.required(true),
+			ForceNew:     t.forceNew(),
+			ValidateFunc: t.validateFunc(validation.IntBetween(1, 65535)),
+			Computed:     t.computed(false),
 		},
 		"private_address": {
 			Type:     schema.TypeString,
-			Required: true,
-			ForceNew: forceNew,
+			Required: t.required(true),
+			ForceNew: t.forceNew(),
+			Computed: t.computed(false),
 		},
 		"private_port": {
 			Type:         schema.TypeInt,
-			Required:     true,
-			ForceNew:     forceNew,
-			ValidateFunc: validation.IntBetween(1, 65535),
+			Required:     t.required(true),
+			ForceNew:     t.forceNew(),
+			ValidateFunc: t.validateFunc(validation.IntBetween(1, 65535)),
+			Computed:     t.computed(false),
 		},
 		"description": {
 			Type:         schema.TypeString,
-			Optional:     true,
-			Default:      "",
-			ForceNew:     forceNew,
-			ValidateFunc: validation.StringLenBetween(0, 512),
+			Optional:     t.optional(true),
+			Default:      t.defaultValue(""),
+			ForceNew:     t.forceNew(),
+			ValidateFunc: t.validateFunc(validation.StringLenBetween(0, 512)),
+			Computed:     t.computed(false),
 		},
 	}
 }
 
-func vpcRouterPPTPValueSchema(forceNew bool) map[string]*schema.Schema {
+func vpcRouterPPTPValueSchema(t vpcRouterSchemaTypes) map[string]*schema.Schema {
 	return map[string]*schema.Schema{
 		"range_start": {
 			Type:     schema.TypeString,
-			Required: true,
-			ForceNew: forceNew,
+			Required: t.required(true),
+			ForceNew: t.forceNew(),
+			Computed: t.computed(false),
 		},
 		"range_stop": {
 			Type:     schema.TypeString,
-			Required: true,
-			ForceNew: forceNew,
+			Required: t.required(true),
+			ForceNew: t.forceNew(),
+			Computed: t.computed(false),
 		},
 	}
 }
 
-func vpcRouterS2SValueSchema(forceNew bool) map[string]*schema.Schema {
+func vpcRouterS2SValueSchema(t vpcRouterSchemaTypes) map[string]*schema.Schema {
 	return map[string]*schema.Schema{
 		"peer": {
 			Type:     schema.TypeString,
-			Required: true,
-			ForceNew: forceNew,
+			Required: t.required(true),
+			ForceNew: t.forceNew(),
+			Computed: t.computed(false),
 		},
 		"remote_id": {
 			Type:     schema.TypeString,
-			Required: true,
-			ForceNew: forceNew,
+			Required: t.required(true),
+			ForceNew: t.forceNew(),
+			Computed: t.computed(false),
 		},
 		"pre_shared_secret": {
 			Type:         schema.TypeString,
-			Required:     true,
-			ForceNew:     forceNew,
+			Required:     t.required(true),
+			ForceNew:     t.forceNew(),
 			Sensitive:    true,
-			ValidateFunc: validation.StringLenBetween(0, 40),
+			ValidateFunc: t.validateFunc(validation.StringLenBetween(0, 40)),
+			Computed:     t.computed(false),
 		},
 		"routes": {
 			Type:     schema.TypeList,
-			Required: true,
-			ForceNew: forceNew,
+			Required: t.required(true),
+			ForceNew: t.forceNew(),
 			Elem:     &schema.Schema{Type: schema.TypeString},
+			Computed: t.computed(false),
 		},
 		"local_prefix": {
 			Type:     schema.TypeList,
-			Required: true,
-			ForceNew: forceNew,
+			Required: t.required(true),
+			ForceNew: t.forceNew(),
 			Elem:     &schema.Schema{Type: schema.TypeString},
+			Computed: t.computed(false),
 		},
 		// HACK : terraform not supported nested structure yet
 		// see: https://github.com/hashicorp/terraform/issues/6215
@@ -558,57 +727,64 @@ func vpcRouterS2SValueSchema(forceNew bool) map[string]*schema.Schema {
 	}
 }
 
-func vpcRouterStaticNATValueSchema(forceNew bool) map[string]*schema.Schema {
+func vpcRouterStaticNATValueSchema(t vpcRouterSchemaTypes) map[string]*schema.Schema {
 	return map[string]*schema.Schema{
 		"global_address": {
 			Type:     schema.TypeString,
-			Required: true,
-			ForceNew: forceNew,
+			Required: t.required(true),
+			ForceNew: t.forceNew(),
+			Computed: t.computed(false),
 		},
 		"private_address": {
 			Type:     schema.TypeString,
-			Required: true,
-			ForceNew: forceNew,
+			Required: t.required(true),
+			ForceNew: t.forceNew(),
+			Computed: t.computed(false),
 		},
 		"description": {
 			Type:         schema.TypeString,
-			Optional:     true,
-			Default:      "",
-			ForceNew:     forceNew,
-			ValidateFunc: validation.StringLenBetween(0, 512),
+			Optional:     t.optional(true),
+			Default:      t.defaultValue(""),
+			ForceNew:     t.forceNew(),
+			ValidateFunc: t.validateFunc(validation.StringLenBetween(0, 512)),
+			Computed:     t.computed(false),
 		},
 	}
 }
 
-func vpcRouterStaticRouteValueSchema(forceNew bool) map[string]*schema.Schema {
+func vpcRouterStaticRouteValueSchema(t vpcRouterSchemaTypes) map[string]*schema.Schema {
 	return map[string]*schema.Schema{
 		"prefix": {
 			Type:     schema.TypeString,
-			Required: true,
-			ForceNew: forceNew,
+			Required: t.required(true),
+			ForceNew: t.forceNew(),
+			Computed: t.computed(false),
 		},
 		"next_hop": {
 			Type:     schema.TypeString,
-			Required: true,
-			ForceNew: forceNew,
+			Required: t.required(true),
+			ForceNew: t.forceNew(),
+			Computed: t.computed(false),
 		},
 	}
 }
 
-func vpcRouterUserValueSchema(forceNew bool) map[string]*schema.Schema {
+func vpcRouterUserValueSchema(t vpcRouterSchemaTypes) map[string]*schema.Schema {
 	return map[string]*schema.Schema{
 		"name": {
 			Type:         schema.TypeString,
-			Required:     true,
-			ForceNew:     forceNew,
-			ValidateFunc: validation.StringLenBetween(1, 20),
+			Required:     t.required(true),
+			ForceNew:     t.forceNew(),
+			ValidateFunc: t.validateFunc(validation.StringLenBetween(1, 20)),
+			Computed:     t.computed(false),
 		},
 		"password": {
 			Type:         schema.TypeString,
-			Required:     true,
-			ForceNew:     forceNew,
+			Required:     t.required(true),
+			ForceNew:     t.forceNew(),
 			Sensitive:    true,
-			ValidateFunc: validation.StringLenBetween(1, 20),
+			ValidateFunc: t.validateFunc(validation.StringLenBetween(1, 20)),
+			Computed:     t.computed(false),
 		},
 	}
 }

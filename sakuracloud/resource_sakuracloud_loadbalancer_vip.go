@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"fmt"
 	"strconv"
+	"strings"
 
 	"github.com/hashicorp/terraform/helper/schema"
 	"github.com/sacloud/libsacloud/api"
@@ -97,7 +98,18 @@ func resourceSakuraCloudLoadBalancerVIPRead(d *schema.ResourceData, meta interfa
 	d.Set("vip", matchedSetting.VirtualIPAddress)
 	port, _ := strconv.Atoi(matchedSetting.Port)
 	d.Set("port", port)
-	d.Set("servers", expandLoadBalancerServersFromVIP(loadBalancer.GetStrID(), matchedSetting))
+
+	var servers []map[string]interface{}
+	for _, s := range matchedSetting.Servers {
+		servers = append(servers, map[string]interface{}{
+			"ipaddress":      s.IPAddress,
+			"check_protocol": s.HealthCheck.Protocol,
+			"check_path":     s.HealthCheck.Path,
+			"check_status":   s.HealthCheck.Status,
+			"enabled":        strings.ToLower(s.Enabled) == "true",
+		})
+	}
+	d.Set("servers", servers)
 
 	delayLoop, _ := strconv.Atoi(matchedSetting.DelayLoop)
 	d.Set("delay_loop", delayLoop)
@@ -196,10 +208,10 @@ func loadBalancerVIPIDHash(loadBalancerID string, s *sacloud.LoadBalancerSetting
 }
 
 func expandLoadBalancerServersFromVIP(lbID string, vipSetting *sacloud.LoadBalancerSetting) []string {
+	var ids []string
 	if vipSetting.Servers == nil || len(vipSetting.Servers) == 0 {
-		return nil
+		return ids
 	}
-	ids := []string{}
 	for _, s := range vipSetting.Servers {
 		ids = append(ids, loadBalancerServerIDHash(loadBalancerVIPIDHash(lbID, vipSetting), s))
 	}

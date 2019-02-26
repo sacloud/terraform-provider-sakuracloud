@@ -120,8 +120,10 @@ func resourceSakuraCloudLoadBalancerServerRead(d *schema.ResourceData, meta inte
 		return nil
 	}
 
-	server := expandLoadBalancerServer(d)
-	if s := findLoadBalancerServer(server, vipSetting.Servers); s != nil {
+	param := expandLoadBalancerServer(d)
+	param.Port = port
+	server := findLoadBalancerServer(param, vipSetting.Servers)
+	if server == nil {
 		d.SetId("")
 		return nil
 	}

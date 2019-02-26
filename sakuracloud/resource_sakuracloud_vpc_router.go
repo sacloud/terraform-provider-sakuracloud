@@ -577,8 +577,8 @@ func setVPCRouterResourceData(d *schema.ResourceData, client *APIClient, data *s
 	setPowerManageTimeoutValueToState(d)
 
 	// interface
+	var interfaces []map[string]interface{}
 	if data.HasInterfaces() {
-		var interfaces []map[string]interface{}
 		for i, iface := range data.Settings.Router.Interfaces {
 			if i == 0 {
 				continue
@@ -590,11 +590,11 @@ func setVPCRouterResourceData(d *schema.ResourceData, client *APIClient, data *s
 				"nw_mask_len": iface.NetworkMaskLen,
 			})
 		}
-		d.Set("interface", interfaces)
 	}
+	d.Set("interface", interfaces)
 
+	var dhcpServers []map[string]interface{}
 	if data.HasDHCPServer() {
-		var dhcpServers []map[string]interface{}
 		for _, c := range data.Settings.Router.DHCPServer.Config {
 			dhcpServers = append(dhcpServers, map[string]interface{}{
 				"range_start":                c.RangeStart,
@@ -603,22 +603,22 @@ func setVPCRouterResourceData(d *schema.ResourceData, client *APIClient, data *s
 				"dns_servers":                c.DNSServers,
 			})
 		}
-		d.Set("dhcp_server", dhcpServers)
 	}
+	d.Set("dhcp_server", dhcpServers)
 
+	var staticMappings []map[string]interface{}
 	if data.HasDHCPStaticMapping() {
-		var staticMappings []map[string]interface{}
 		for _, c := range data.Settings.Router.DHCPStaticMapping.Config {
 			staticMappings = append(staticMappings, map[string]interface{}{
 				"ipaddress":  c.IPAddress,
 				"macaddress": c.MACAddress,
 			})
 		}
-		d.Set("dhcp_static_mapping", staticMappings)
 	}
+	d.Set("dhcp_static_mapping", staticMappings)
 
+	var firewallRules []map[string]interface{}
 	if data.HasFirewall() {
-		var firewallRules []map[string]interface{}
 		for i, configs := range data.Settings.Router.Firewall.Config {
 
 			directionRules := map[string][]*sacloud.VPCRouterFirewallRule{
@@ -651,24 +651,22 @@ func setVPCRouterResourceData(d *schema.ResourceData, client *APIClient, data *s
 				})
 			}
 		}
-
-		d.Set("firewall", firewallRules)
 	}
+	d.Set("firewall", firewallRules)
 
+	var l2tp []map[string]interface{}
 	if data.HasL2TPIPsecServer() {
 		c := data.Settings.Router.L2TPIPsecServer.Config
-		l2tp := []map[string]interface{}{
-			{
-				"pre_shared_secret": c.PreSharedSecret,
-				"range_start":       c.RangeStart,
-				"range_stop":        c.RangeStop,
-			},
-		}
-		d.Set("l2tp", l2tp)
+		l2tp = append(l2tp, map[string]interface{}{
+			"pre_shared_secret": c.PreSharedSecret,
+			"range_start":       c.RangeStart,
+			"range_stop":        c.RangeStop,
+		})
 	}
+	d.Set("l2tp", l2tp)
 
+	var portForwardings []map[string]interface{}
 	if data.HasPortForwarding() {
-		var portForwardings []map[string]interface{}
 		for _, c := range data.Settings.Router.PortForwarding.Config {
 			globalPort, _ := strconv.Atoi(c.GlobalPort)
 			privatePort, _ := strconv.Atoi(c.PrivatePort)
@@ -680,20 +678,20 @@ func setVPCRouterResourceData(d *schema.ResourceData, client *APIClient, data *s
 				"description":     c.Description,
 			})
 		}
-		d.Set("port_forwarding", portForwardings)
 	}
+	d.Set("port_forwarding", portForwardings)
 
+	var pptp []map[string]interface{}
 	if data.HasPPTPServer() {
 		c := data.Settings.Router.PPTPServer.Config
-		pptp := []map[string]interface{}{
-			{
-				"range_start": c.RangeStart,
-				"range_stop":  c.RangeStop,
-			},
-		}
-		d.Set("pptp", pptp)
+		pptp = append(pptp, map[string]interface{}{
+			"range_start": c.RangeStart,
+			"range_stop":  c.RangeStop,
+		})
 	}
+	d.Set("pptp", pptp)
 
+	var s2sSettings []map[string]interface{}
 	if data.HasSiteToSiteIPsecVPN() {
 		// SiteToSiteConnectionDetail
 		connInfo, err := client.VPCRouter.SiteToSiteConnectionDetails(data.ID)
@@ -701,7 +699,6 @@ func setVPCRouterResourceData(d *schema.ResourceData, client *APIClient, data *s
 			return fmt.Errorf("Reading VPCRouter SiteToSiteConnectionDetail is failed: %s", err)
 		}
 
-		var s2sSettings []map[string]interface{}
 		for i, c := range data.Settings.Router.SiteToSiteIPsecVPN.Config {
 			detail := connInfo.Details.Config[i]
 			s2sSettings = append(s2sSettings, map[string]interface{}{
@@ -729,11 +726,11 @@ func setVPCRouterResourceData(d *schema.ResourceData, client *APIClient, data *s
 				"vpc_router_outside_ipaddress": detail.VPCRouter.OutsideIPAddress,
 			})
 		}
-		d.Set("site_to_site_vpn", s2sSettings)
 	}
+	d.Set("site_to_site_vpn", s2sSettings)
 
+	var staticNATs []map[string]interface{}
 	if data.HasStaticNAT() {
-		var staticNATs []map[string]interface{}
 		for _, c := range data.Settings.Router.StaticNAT.Config {
 			staticNATs = append(staticNATs, map[string]interface{}{
 				"global_address":  c.GlobalAddress,
@@ -741,22 +738,22 @@ func setVPCRouterResourceData(d *schema.ResourceData, client *APIClient, data *s
 				"description":     c.Description,
 			})
 		}
-		d.Set("static_nat", staticNATs)
 	}
+	d.Set("static_nat", staticNATs)
 
+	var staticRoutes []map[string]interface{}
 	if data.HasStaticRoutes() {
-		var staticRoutes []map[string]interface{}
 		for _, c := range data.Settings.Router.StaticRoutes.Config {
 			staticRoutes = append(staticRoutes, map[string]interface{}{
 				"prefix":   c.Prefix,
 				"next_hop": c.NextHop,
 			})
 		}
-		d.Set("static_route", staticRoutes)
 	}
+	d.Set("static_route", staticRoutes)
 
+	var users []map[string]interface{}
 	if data.HasRemoteAccessUsers() {
-		var users []map[string]interface{}
 		for _, c := range data.Settings.Router.RemoteAccessUsers.Config {
 			users = append(users, map[string]interface{}{
 				"name":     c.UserName,
@@ -764,8 +761,10 @@ func setVPCRouterResourceData(d *schema.ResourceData, client *APIClient, data *s
 			})
 		}
 	}
+	d.Set("user", users)
 
 	d.Set("zone", client.Zone)
+
 	return nil
 }
 

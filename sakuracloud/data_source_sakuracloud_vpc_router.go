@@ -101,6 +101,83 @@ func dataSourceSakuraCloudVPCRouter() *schema.Resource {
 				Type:     schema.TypeBool,
 				Computed: true,
 			},
+			"interface": {
+				Type:     schema.TypeList,
+				Computed: true,
+				Elem: &schema.Resource{
+					Schema: vpcRouterInterfaceDataSchema(),
+				},
+			},
+			"dhcp_server": {
+				Type:     schema.TypeList,
+				Computed: true,
+				Elem: &schema.Resource{
+					Schema: vpcRouterDHCPServerDataSchema(),
+				},
+			},
+			"dhcp_static_mapping": {
+				Type:     schema.TypeList,
+				Computed: true,
+				Elem: &schema.Resource{
+					Schema: vpcRouterDHCPStaticMappingDataSchema(),
+				},
+			},
+			"firewall": {
+				Type:     schema.TypeList,
+				Computed: true,
+				Elem: &schema.Resource{
+					Schema: vpcRouterFirewallDataSchema(),
+				},
+			},
+			"l2tp": {
+				Type:     schema.TypeList,
+				Computed: true,
+				Elem: &schema.Resource{
+					Schema: vpcRouterL2TPDataSchema(),
+				},
+			},
+			"port_forwarding": {
+				Type:     schema.TypeList,
+				Computed: true,
+				Elem: &schema.Resource{
+					Schema: vpcRouterPortForwardingDataSchema(),
+				},
+			},
+			"pptp": {
+				Type:     schema.TypeList,
+				Computed: true,
+				Elem: &schema.Resource{
+					Schema: vpcRouterPPTPDataSchema(),
+				},
+			},
+			"site_to_site_vpn": {
+				Type:     schema.TypeList,
+				Computed: true,
+				Elem: &schema.Resource{
+					Schema: vpcRouterS2SDataSchema(),
+				},
+			},
+			"static_nat": {
+				Type:     schema.TypeList,
+				Computed: true,
+				Elem: &schema.Resource{
+					Schema: vpcRouterStaticNATDataSchema(),
+				},
+			},
+			"static_route": {
+				Type:     schema.TypeList,
+				Computed: true,
+				Elem: &schema.Resource{
+					Schema: vpcRouterStaticRouteDataSchema(),
+				},
+			},
+			"user": {
+				Type:     schema.TypeList,
+				Computed: true,
+				Elem: &schema.Resource{
+					Schema: vpcRouterUserDataSchema(),
+				},
+			},
 			"zone": {
 				Type:         schema.TypeString,
 				Optional:     true,

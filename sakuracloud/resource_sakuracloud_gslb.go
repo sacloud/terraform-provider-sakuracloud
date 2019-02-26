@@ -326,7 +326,7 @@ func setGSLBResourceData(d *schema.ResourceData, client *APIClient, data *saclou
 	healthCheck["delay_loop"] = data.Settings.GSLB.DelayLoop
 	d.Set("health_check", []interface{}{healthCheck})
 
-	var servers = []interface{}{}
+	var servers []interface{}
 	for _, server := range data.Settings.GSLB.Servers {
 		v := map[string]interface{}{}
 		v["ipaddress"] = server.IPAddress

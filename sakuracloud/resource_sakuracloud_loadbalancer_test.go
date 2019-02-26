@@ -203,7 +203,6 @@ func TestAccImportSakuraCloudLoadBalancer(t *testing.T) {
 			"tags.0":                    "hoge1",
 			"tags.1":                    "hoge2",
 			"graceful_shutdown_timeout": "60",
-			"vip_ids.0":                 "",
 			"zone":                      "is1b",
 		}
 

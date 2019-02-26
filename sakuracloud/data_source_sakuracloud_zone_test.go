@@ -45,4 +45,7 @@ func testAccCheckSakuraCloudZoneDataSourceID(n string) resource.TestCheckFunc {
 	}
 }
 
-var testAccCheckSakuraCloudDataSourceZoneBase = `data "sakuracloud_zone" "foobar" { name = "is1a"}`
+var testAccCheckSakuraCloudDataSourceZoneBase = `
+data "sakuracloud_zone" "foobar" { 
+  name = "is1a"
+}`

@@ -919,6 +919,7 @@ func setServerResourceData(d *schema.ResourceData, client *APIClient, data *sacl
 	d.Set("gateway", "")
 	d.Set("nw_address", "")
 	d.Set("nw_mask_len", "")
+	d.Set("dns_servers", data.Zone.Region.NameServers)
 	if hasFirstInterface && data.Interfaces[0].Switch != nil {
 		ip := ""
 		if data.Interfaces[0].Switch.Scope == sacloud.ESCopeShared {
@@ -928,7 +929,6 @@ func setServerResourceData(d *schema.ResourceData, client *APIClient, data *sacl
 		}
 		d.Set("ipaddress", ip)
 
-		d.Set("dns_servers", data.Zone.Region.NameServers)
 		if data.Interfaces[0].Switch.UserSubnet != nil {
 			d.Set("gateway", data.Interfaces[0].Switch.UserSubnet.DefaultRoute)
 
