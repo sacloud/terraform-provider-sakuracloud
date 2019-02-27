@@ -3,6 +3,7 @@ package sakuracloud
 import (
 	"errors"
 	"fmt"
+	"os"
 	"testing"
 
 	"github.com/hashicorp/terraform/helper/resource"
@@ -12,7 +13,7 @@ import (
 
 func TestAccSakuraCloudLoadBalancer(t *testing.T) {
 	var loadBalancer sacloud.LoadBalancer
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckSakuraCloudLoadBalancerDestroy,
@@ -117,7 +118,7 @@ func TestAccSakuraCloudLoadBalancer(t *testing.T) {
 
 func TestAccSakuraCloudLoadBalancer_WithRouter(t *testing.T) {
 	var loadBalancer sacloud.LoadBalancer
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckSakuraCloudLoadBalancerDestroy,
@@ -203,7 +204,7 @@ func TestAccImportSakuraCloudLoadBalancer(t *testing.T) {
 			"tags.0":                    "hoge1",
 			"tags.1":                    "hoge2",
 			"graceful_shutdown_timeout": "60",
-			"zone":                      "is1b",
+			"zone":                      os.Getenv("SAKURACLOUD_ZONE"),
 		}
 
 		if err := compareStateMulti(s[0], expects); err != nil {
@@ -214,7 +215,7 @@ func TestAccImportSakuraCloudLoadBalancer(t *testing.T) {
 
 	resourceName := "sakuracloud_load_balancer.foobar"
 
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckSakuraCloudLoadBalancerDestroy,

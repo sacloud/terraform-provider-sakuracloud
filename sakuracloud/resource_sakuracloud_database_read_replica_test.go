@@ -12,7 +12,7 @@ import (
 
 func TestAccResourceSakuraCloudDatabaseReplica(t *testing.T) {
 	var database sacloud.Database
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckSakuraCloudDatabaseReadReplicaDestroy,
@@ -78,7 +78,7 @@ func TestAccImportSakuraCloudDatabaseReadReplica(t *testing.T) {
 
 	resourceName := "sakuracloud_database_read_replica.foobar"
 
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckSakuraCloudDatabaseDestroy,

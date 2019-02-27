@@ -12,7 +12,7 @@ import (
 
 func TestAccResourceSakuraCloudNote(t *testing.T) {
 	var note sacloud.Note
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckSakuraCloudNoteDestroy,
@@ -53,7 +53,7 @@ func TestAccResourceSakuraCloudNote(t *testing.T) {
 
 func TestAccResourceSakuraCloudNote_WithYAML(t *testing.T) {
 	var note sacloud.Note
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckSakuraCloudNoteDestroy,

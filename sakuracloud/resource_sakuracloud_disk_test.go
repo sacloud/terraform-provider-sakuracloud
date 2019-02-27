@@ -3,6 +3,7 @@ package sakuracloud
 import (
 	"errors"
 	"fmt"
+	"os"
 	"testing"
 
 	"github.com/hashicorp/terraform/helper/resource"
@@ -12,7 +13,7 @@ import (
 
 func TestAccResourceSakuraCloudDisk(t *testing.T) {
 	var disk sacloud.Disk
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckSakuraCloudDiskDestroy,
@@ -137,7 +138,7 @@ func TestAccImportSakuraCloudDisk(t *testing.T) {
 			"description":               "Disk from TerraForm for SAKURA CLOUD",
 			"tags.0":                    "hoge1",
 			"tags.1":                    "hoge2",
-			"zone":                      "is1b",
+			"zone":                      os.Getenv("SAKURACLOUD_ZONE"),
 			"graceful_shutdown_timeout": "60",
 		}
 
@@ -149,7 +150,7 @@ func TestAccImportSakuraCloudDisk(t *testing.T) {
 
 	resourceName := "sakuracloud_disk.foobar"
 
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckSakuraCloudDiskDestroy,

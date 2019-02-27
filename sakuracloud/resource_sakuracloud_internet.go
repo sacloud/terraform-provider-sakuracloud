@@ -141,7 +141,7 @@ func resourceSakuraCloudInternetCreate(d *schema.ResourceData, meta interface{})
 		return fmt.Errorf("Failed to create SakuraCloud Internet resource: %s", err)
 	}
 
-	err = client.Internet.SleepWhileCreating(internet.ID, client.DefaultTimeoutDuration)
+	err = client.Internet.RetrySleepWhileCreating(internet.ID, client.DefaultTimeoutDuration, client.RetryMax)
 
 	if err != nil {
 		return fmt.Errorf("Failed to create SakuraCloud Internet resource: %s", err)

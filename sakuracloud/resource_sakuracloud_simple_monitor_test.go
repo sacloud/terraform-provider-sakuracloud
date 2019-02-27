@@ -12,7 +12,7 @@ import (
 
 func TestAccResourceSakuraCloudSimpleMonitor(t *testing.T) {
 	var monitor sacloud.SimpleMonitor
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckSakuraCloudSimpleMonitorDestroy,
@@ -73,7 +73,7 @@ func TestAccResourceSakuraCloudSimpleMonitor(t *testing.T) {
 
 func TestAccResourceSakuraCloudSimpleMonitor_SSLCertificate(t *testing.T) {
 	var monitor sacloud.SimpleMonitor
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckSakuraCloudSimpleMonitorDestroy,

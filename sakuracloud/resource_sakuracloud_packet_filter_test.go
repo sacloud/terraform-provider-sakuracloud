@@ -12,7 +12,7 @@ import (
 
 func TestAccResourceSakuraCloudPacketFilter(t *testing.T) {
 	var filter sacloud.PacketFilter
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckSakuraCloudPacketFilterDestroy,

@@ -12,7 +12,7 @@ import (
 
 func TestAccResourceSakuraCloudVPCRouter(t *testing.T) {
 	var vpcRouter sacloud.VPCRouter
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckSakuraCloudVPCRouterDestroy,
@@ -87,7 +87,7 @@ func TestAccResourceSakuraCloudVPCRouter(t *testing.T) {
 
 func TestAccResourceSakuraCloudVPCRouter_Full(t *testing.T) {
 	var vpcRouter sacloud.VPCRouter
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckSakuraCloudVPCRouterDestroy,

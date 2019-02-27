@@ -12,7 +12,7 @@ import (
 
 func TestAccResourceSakuraCloudArchive(t *testing.T) {
 	var archive sacloud.Archive
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckSakuraCloudArchiveDestroy,
@@ -117,7 +117,7 @@ func TestAccImportSakuraCloudArchive(t *testing.T) {
 
 	resourceName := "sakuracloud_archive.foobar"
 
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckSakuraCloudArchiveDestroy,

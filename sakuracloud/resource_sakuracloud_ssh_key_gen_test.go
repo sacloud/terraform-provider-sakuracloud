@@ -12,7 +12,7 @@ import (
 
 func TestAccResourceSakuraCloudSSHKeyGen(t *testing.T) {
 	var ssh_key sacloud.SSHKey
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckSakuraCloudSSHKeyGenDestroy,

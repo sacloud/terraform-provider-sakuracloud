@@ -45,7 +45,7 @@ func TestAccResourceSakuraCloudSIM(t *testing.T) {
 	}
 
 	var sim sacloud.SIM
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckSakuraCloudSIMDestroy,

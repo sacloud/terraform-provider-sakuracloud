@@ -12,7 +12,7 @@ import (
 
 func TestAccResourceSakuraCloudDatabase_WithSwitch(t *testing.T) {
 	var database sacloud.Database
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckSakuraCloudDatabaseDestroy,
@@ -176,7 +176,7 @@ func TestAccImportSakuraCloudDatabase(t *testing.T) {
 
 	resourceName := "sakuracloud_database.foobar"
 
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckSakuraCloudDatabaseDestroy,

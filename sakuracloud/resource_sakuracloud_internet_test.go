@@ -12,7 +12,7 @@ import (
 
 func TestAccResourceSakuraCloudInternet(t *testing.T) {
 	var internet sacloud.Internet
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckSakuraCloudInternetDestroy,

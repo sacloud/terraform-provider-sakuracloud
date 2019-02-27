@@ -11,7 +11,7 @@ import (
 
 func TestAccResourceSakuraCloudGSLBServer(t *testing.T) {
 	var gslb sacloud.GSLB
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckSakuraCloudGSLBServerDestroy,

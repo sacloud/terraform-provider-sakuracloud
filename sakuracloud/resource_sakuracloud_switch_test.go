@@ -12,7 +12,7 @@ import (
 
 func TestAccResourceSakuraCloudSwitch(t *testing.T) {
 	var sw sacloud.Switch
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckSakuraCloudSwitchDestroy,
@@ -51,7 +51,7 @@ func TestAccResourceSakuraCloudSwitch(t *testing.T) {
 }
 func TestAccResourceSakuraCloudSwitchCustomiezeDiff(t *testing.T) {
 	var sw sacloud.Switch
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckSakuraCloudSwitchDestroy,
@@ -86,7 +86,7 @@ func TestAccResourceSakuraCloudSwitchCustomiezeDiff(t *testing.T) {
 
 func TestAccResourceSakuraCloudSwitchCustomiezeDiff_AddTags(t *testing.T) {
 	var sw sacloud.Switch
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckSakuraCloudSwitchDestroy,

@@ -12,7 +12,7 @@ import (
 
 func TestAccResourceSakuraCloudGSLB(t *testing.T) {
 	var gslb sacloud.GSLB
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckSakuraCloudGSLBDestroy,
@@ -188,7 +188,7 @@ func TestAccImportSakuraCloudGSLB(t *testing.T) {
 
 	resourceName := "sakuracloud_gslb.foobar"
 
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckSakuraCloudGSLBDestroy,

@@ -28,7 +28,7 @@ func TestAccResourceSakuraCloudIPv4Ptr(t *testing.T) {
 		return
 	}
 
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckSakuraCloudIPv4PtrDestroy,

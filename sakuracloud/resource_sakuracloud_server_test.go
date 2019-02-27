@@ -14,7 +14,7 @@ import (
 
 func TestAccResourceSakuraCloudServer(t *testing.T) {
 	var server sacloud.Server
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckSakuraCloudServerDestroy,
@@ -97,7 +97,7 @@ func TestAccResourceSakuraCloudServer(t *testing.T) {
 
 func TestAccSakuraCloudServer_EditConnections(t *testing.T) {
 	var server sacloud.Server
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckSakuraCloudServerDestroy,
@@ -159,7 +159,7 @@ func TestAccSakuraCloudServer_EditConnections(t *testing.T) {
 }
 
 func TestAccSakuraCloudServer_ConnectPacketFilters(t *testing.T) {
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckSakuraCloudServerDestroy,
@@ -212,7 +212,7 @@ func TestAccSakuraCloudServer_With_PrivateHost(t *testing.T) {
 	}
 
 	var server sacloud.Server
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckSakuraCloudServerDestroy,
@@ -233,7 +233,7 @@ func TestAccSakuraCloudServer_With_PrivateHost(t *testing.T) {
 
 func TestAccSakuraCloudServer_With_BlankDisk(t *testing.T) {
 	var server sacloud.Server
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckSakuraCloudServerDestroy,
@@ -251,7 +251,7 @@ func TestAccSakuraCloudServer_With_BlankDisk(t *testing.T) {
 
 func TestAccSakuraCloudServer_EditConnect_With_Same_Switch(t *testing.T) {
 	var server sacloud.Server
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckSakuraCloudServerDestroy,
@@ -303,7 +303,7 @@ func TestAccSakuraCloudServer_EditConnect_With_Same_Switch(t *testing.T) {
 }
 
 func TestAccResourceSakuraCloudServer_DisplayIPAddress(t *testing.T) {
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckSakuraCloudServerDestroy,
@@ -336,7 +336,7 @@ func TestAccResourceSakuraCloudServer_DisplayIPAddress(t *testing.T) {
 
 func TestAccSakuraCloudServer_NIC_CustomDiff(t *testing.T) {
 	var server sacloud.Server
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckSakuraCloudServerDestroy,
@@ -357,7 +357,7 @@ func TestAccSakuraCloudServer_NIC_CustomDiff(t *testing.T) {
 
 func TestAccSakuraCloudServer_NIC_CustomDiffReference(t *testing.T) {
 	var server sacloud.Server
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckSakuraCloudServerDestroy,
@@ -388,7 +388,7 @@ func TestAccSakuraCloudServer_NIC_CustomDiffReference(t *testing.T) {
 
 func TestAccSakuraCloudServer_Switched_eth0(t *testing.T) {
 	var server sacloud.Server
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckSakuraCloudServerDestroy,
@@ -730,7 +730,6 @@ const testAccCheckSakuraCloudServerConfig_with_private_host_template = `
 resource "sakuracloud_server" "foobar" {
     name            = "myserver_with_private_host"
     private_host_id = "%s"
-    zone            = "is1b"
     graceful_shutdown_timeout = 10
 }
 `

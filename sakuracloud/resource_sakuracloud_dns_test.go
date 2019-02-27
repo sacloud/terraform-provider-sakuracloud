@@ -17,7 +17,7 @@ func TestAccResourceSakuraCloudDNS(t *testing.T) {
 	zone := fmt.Sprintf("%s.%s.com", randString1, randString2)
 
 	var dns sacloud.DNS
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckSakuraCloudDNSDestroy,
@@ -134,7 +134,7 @@ func TestAccImportSakuraCloudDNS(t *testing.T) {
 
 	resourceName := "sakuracloud_dns.foobar"
 
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckSakuraCloudDNSDestroy,

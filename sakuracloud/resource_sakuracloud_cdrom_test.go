@@ -3,6 +3,7 @@ package sakuracloud
 import (
 	"errors"
 	"fmt"
+	"os"
 	"testing"
 
 	"github.com/hashicorp/terraform/helper/resource"
@@ -11,7 +12,7 @@ import (
 )
 
 func TestAccResourceSakuraCloudCDROM(t *testing.T) {
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckSakuraCloudCDROMDestroy,
@@ -48,7 +49,7 @@ func TestAccResourceSakuraCloudCDROM(t *testing.T) {
 }
 
 func TestAccResourceSakuraCloudCDROM_With_TextContent(t *testing.T) {
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckSakuraCloudCDROMDestroy,
@@ -127,7 +128,7 @@ func TestAccImportSakuraCloudCDROM(t *testing.T) {
 			"description": "description",
 			"tags.0":      "tag1",
 			"tags.1":      "tag2",
-			"zone":        "is1b",
+			"zone":        os.Getenv("SAKURACLOUD_ZONE"),
 		}
 
 		if err := compareStateMulti(s[0], expects); err != nil {
@@ -138,7 +139,7 @@ func TestAccImportSakuraCloudCDROM(t *testing.T) {
 
 	resourceName := "sakuracloud_cdrom.foobar"
 
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckSakuraCloudCDROMDestroy,

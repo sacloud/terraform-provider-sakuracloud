@@ -11,7 +11,7 @@ import (
 
 func TestAccResourceSakuraCloudLoadBalancerServer(t *testing.T) {
 	var loadBalancer sacloud.LoadBalancer
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckSakuraCloudLoadBalancerServerDestroy,

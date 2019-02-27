@@ -13,7 +13,7 @@ import (
 
 func TestAccResourceSakuraCloudPrivateHost(t *testing.T) {
 	var private_host sacloud.PrivateHost
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckSakuraCloudPrivateHostDestroy,
@@ -64,7 +64,7 @@ func TestAccResourceSakuraCloudPrivateHost(t *testing.T) {
 
 func TestAccResourceSakuraCloudPrivateHost_DestroyWithRunningServers(t *testing.T) {
 	var private_host sacloud.PrivateHost
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckSakuraCloudPrivateHostDestroy,

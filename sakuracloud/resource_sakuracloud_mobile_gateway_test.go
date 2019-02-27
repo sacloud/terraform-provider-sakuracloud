@@ -12,7 +12,7 @@ import (
 
 func TestAccSakuraCloudMobileGateway(t *testing.T) {
 	var mgs sacloud.MobileGateway
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckSakuraCloudMobileGatewayDestroy,
@@ -79,7 +79,7 @@ func TestAccSakuraCloudMobileGateway(t *testing.T) {
 
 func TestAccSakuraCloudMobileGateway_Full(t *testing.T) {
 	var mgs sacloud.MobileGateway
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckSakuraCloudMobileGatewayDestroy,
@@ -184,7 +184,7 @@ func TestAccImportSakuraCloudMobileGateway(t *testing.T) {
 
 	resourceName := "sakuracloud_mobile_gateway.foobar"
 
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckSakuraCloudMobileGatewayDestroy,

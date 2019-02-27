@@ -12,7 +12,7 @@ import (
 
 func TestAccSakuraCloudNFS(t *testing.T) {
 	var nfs sacloud.NFS
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckSakuraCloudNFSDestroy,

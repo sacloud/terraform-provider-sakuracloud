@@ -9,7 +9,7 @@ import (
 
 func TestAccResourceSakuraCloudPacketFilterRule(t *testing.T) {
 	var filter sacloud.PacketFilter
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckSakuraCloudPacketFilterDestroy,
@@ -107,7 +107,7 @@ func TestAccResourceSakuraCloudPacketFilterRule(t *testing.T) {
 
 func TestAccResourceSakuraCloudPacketFilterRule_DiscontinuousIndex(t *testing.T) {
 	var filter sacloud.PacketFilter
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckSakuraCloudPacketFilterDestroy,
