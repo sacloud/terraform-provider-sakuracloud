@@ -16,6 +16,12 @@ default: vet build
 clean:
 	rm -Rf $(CURDIR)/bin/*
 
+.PHONY: tools
+tools:
+	GO111MODULE=off go get -u golang.org/x/tools/cmd/goimports
+	GO111MODULE=off go get -u github.com/motemen/gobump/cmd/gobump
+	GO111MODULE=off go get -u golang.org/x/lint/golint
+
 build:
 	OS="`go env GOOS`" ARCH="`go env GOARCH`" ARCHIVE= BUILD_LDFLAGS=$(BUILD_LDFLAGS) CURRENT_VERSION=$(CURRENT_VERSION) PROTOCOL_VERSION=$(PROTOCOL_VERSION) sh -c "'$(CURDIR)/scripts/build.sh'"
 
@@ -61,8 +67,8 @@ testacc-resource:
 	TF_ACC=1 go test $(TEST2) -v $(TESTARGS) -run="^TestAccResource" -timeout 240m
 
 vet: golint
-	@echo "go tool vet $(VETARGS) ."
-	@go tool vet $(VETARGS) $$(ls -d */ | grep -v vendor) ; if [ $$? -eq 1 ]; then \
+	@echo "go vet $(VETARGS) ."
+	@go vet $(VETARGS) ; if [ $$? -eq 1 ]; then \
 		echo ""; \
 		echo "Vet found suspicious constructs. Please check the reported constructs"; \
 		echo "and fix them if necessary before submitting the code for review."; \
