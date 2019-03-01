@@ -5,7 +5,7 @@
 ### 設定例
 
 ```hcl
-data sakuracloud_packet_filter "myfilter" {
+data "sakuracloud_packet_filter" "myfilter" {
   name_selectors = ["foobar"]
 }
 ```

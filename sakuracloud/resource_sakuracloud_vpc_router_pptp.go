@@ -15,37 +15,7 @@ func resourceSakuraCloudVPCRouterPPTP() *schema.Resource {
 		Create: resourceSakuraCloudVPCRouterPPTPCreate,
 		Read:   resourceSakuraCloudVPCRouterPPTPRead,
 		Delete: resourceSakuraCloudVPCRouterPPTPDelete,
-		Schema: map[string]*schema.Schema{
-			"vpc_router_id": {
-				Type:         schema.TypeString,
-				Required:     true,
-				ForceNew:     true,
-				ValidateFunc: validateSakuracloudIDType,
-			},
-			"vpc_router_interface_id": {
-				Type:     schema.TypeString,
-				Required: true,
-				ForceNew: true,
-			},
-			"range_start": {
-				Type:     schema.TypeString,
-				Required: true,
-				ForceNew: true,
-			},
-			"range_stop": {
-				Type:     schema.TypeString,
-				Required: true,
-				ForceNew: true,
-			},
-			"zone": {
-				Type:         schema.TypeString,
-				Optional:     true,
-				Computed:     true,
-				ForceNew:     true,
-				Description:  "target SakuraCloud zone",
-				ValidateFunc: validateZone([]string{"is1a", "is1b", "tk1a", "tk1v"}),
-			},
-		},
+		Schema: vpcRouterPPTPSchema(),
 	}
 }
 
@@ -150,7 +120,7 @@ func vpcRouterPPTPIDHash(routerID string, s *sacloud.VPCRouterPPTPServer) string
 	return fmt.Sprintf("%d", hashcode.String(buf.String()))
 }
 
-func expandVPCRouterPPTP(d *schema.ResourceData) *sacloud.VPCRouterPPTPServerConfig {
+func expandVPCRouterPPTP(d resourceValueGetable) *sacloud.VPCRouterPPTPServerConfig {
 
 	var pptpSetting = &sacloud.VPCRouterPPTPServerConfig{
 		RangeStart: d.Get("range_start").(string),

@@ -16,7 +16,7 @@ func TestAccSakuraCloudDataSourcePrivateHost_Basic(t *testing.T) {
 	randString2 := acctest.RandStringFromCharSet(20, acctest.CharSetAlpha)
 	name := fmt.Sprintf("%s_%s", randString1, randString2)
 
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:                  func() { testAccPreCheck(t) },
 		Providers:                 testAccProviders,
 		PreventPostDestroyRefresh: true,
@@ -108,8 +108,8 @@ func testAccCheckSakuraCloudPrivateHostDataSourceID(n string) resource.TestCheck
 
 func testAccCheckSakuraCloudPrivateHostDataSourceNotExists(n string) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
-		_, ok := s.RootModule().Resources[n]
-		if ok {
+		v, ok := s.RootModule().Resources[n]
+		if ok && v.Primary.ID != "" {
 			return fmt.Errorf("Found PrivateHost data source: %s", n)
 		}
 		return nil
@@ -160,7 +160,7 @@ resource "sakuracloud_private_host" "foobar" {
     zone = "tk1a"
 }
 data "sakuracloud_private_host" "foobar" {
-    filter = {
+    filter {
 	name = "Name"
 	values = ["%s"]
     }
@@ -177,7 +177,7 @@ resource "sakuracloud_private_host" "foobar" {
     zone = "tk1a"
 }
 data "sakuracloud_private_host" "foobar" {
-    filter = {
+    filter {
 	name = "Tags"
 	values = ["tag1","tag3"]
     }
@@ -194,7 +194,7 @@ resource "sakuracloud_private_host" "foobar" {
     zone = "tk1a"
 }
 data "sakuracloud_private_host" "foobar" {
-    filter = {
+    filter {
 	name = "Tags"
 	values = ["tag1-xxxxxxx","tag3-xxxxxxxx"]
     }
@@ -211,7 +211,7 @@ resource "sakuracloud_private_host" "foobar" {
     zone = "tk1a"
 }
 data "sakuracloud_private_host" "foobar" {
-    filter = {
+    filter {
 	name = "Name"
 	values = ["xxxxxxxxxxxxxxxxxx"]
     }

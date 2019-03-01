@@ -12,7 +12,7 @@ import (
 
 func TestAccResourceSakuraCloudNote(t *testing.T) {
 	var note sacloud.Note
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckSakuraCloudNoteDestroy,
@@ -27,8 +27,6 @@ func TestAccResourceSakuraCloudNote(t *testing.T) {
 						"sakuracloud_note.foobar", "content", "content"),
 					resource.TestCheckResourceAttr(
 						"sakuracloud_note.foobar", "class", "shell"),
-					resource.TestCheckResourceAttr(
-						"sakuracloud_note.foobar", "tags.#", "2"),
 					resource.TestCheckResourceAttrPair(
 						"sakuracloud_note.foobar", "icon_id",
 						"sakuracloud_icon.foobar", "id",
@@ -46,8 +44,6 @@ func TestAccResourceSakuraCloudNote(t *testing.T) {
 					resource.TestCheckResourceAttr(
 						"sakuracloud_note.foobar", "class", "shell"),
 					resource.TestCheckResourceAttr(
-						"sakuracloud_note.foobar", "tags.#", "0"),
-					resource.TestCheckResourceAttr(
 						"sakuracloud_note.foobar", "icon_id", ""),
 				),
 			},
@@ -57,7 +53,7 @@ func TestAccResourceSakuraCloudNote(t *testing.T) {
 
 func TestAccResourceSakuraCloudNote_WithYAML(t *testing.T) {
 	var note sacloud.Note
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckSakuraCloudNoteDestroy,
@@ -129,9 +125,7 @@ const testAccCheckSakuraCloudNoteConfig_basic = `
 resource "sakuracloud_note" "foobar" {
     name = "mynote"
     content = "content"
-    description = "Note from TerraForm for SAKURA CLOUD"
-    tags = ["hoge" , "hoge2"]
-    icon_id = "${sakuracloud_icon.foobar.id}"
+    icon_id = sakuracloud_icon.foobar.id
 }
 
 resource "sakuracloud_icon" "foobar" {
@@ -144,7 +138,6 @@ const testAccCheckSakuraCloudNoteConfig_update = `
 resource "sakuracloud_note" "foobar" {
     name = "mynote_upd"
     content = "content_upd"
-    tags = []
 }`
 
 const testAccCheckSakuraCloudNoteConfig_yaml = `

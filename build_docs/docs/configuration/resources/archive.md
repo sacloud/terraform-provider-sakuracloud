@@ -10,12 +10,13 @@ Note: サイズの大きなファイルを扱う場合、アップロード処�
 
 ```hcl
 # アーカイブの定義
-resource sakuracloud_archive "archive" {
-  name  = "archive01"
+resource "sakuracloud_archive" "archive" {
+  name = "archive01"
+
   #size = 20
 
   archive_file = "dummy.raw"
-  hash           = "${md5(file("dummy.raw"))}"
+  hash         = md5(file("dummy.raw"))
 
   description = "Description"
   tags        = ["tag1", "tag2"]

@@ -3,6 +3,7 @@ package sakuracloud
 import (
 	"errors"
 	"fmt"
+	"os"
 	"testing"
 
 	"github.com/hashicorp/terraform/helper/resource"
@@ -11,7 +12,7 @@ import (
 )
 
 func TestAccResourceSakuraCloudCDROM(t *testing.T) {
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckSakuraCloudCDROMDestroy,
@@ -48,7 +49,7 @@ func TestAccResourceSakuraCloudCDROM(t *testing.T) {
 }
 
 func TestAccResourceSakuraCloudCDROM_With_TextContent(t *testing.T) {
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckSakuraCloudCDROMDestroy,
@@ -127,7 +128,7 @@ func TestAccImportSakuraCloudCDROM(t *testing.T) {
 			"description": "description",
 			"tags.0":      "tag1",
 			"tags.1":      "tag2",
-			"zone":        "is1b",
+			"zone":        os.Getenv("SAKURACLOUD_ZONE"),
 		}
 
 		if err := compareStateMulti(s[0], expects); err != nil {
@@ -138,7 +139,7 @@ func TestAccImportSakuraCloudCDROM(t *testing.T) {
 
 	resourceName := "sakuracloud_cdrom.foobar"
 
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckSakuraCloudCDROMDestroy,
@@ -167,7 +168,7 @@ resource "sakuracloud_cdrom" "foobar" {
     name = "mycdrom"
     size = 5
     iso_image_file = "test/dummy.iso"
-    hash = "${md5(file("test/dummy.iso"))}"
+    hash = md5(filebase64("test/dummy.iso"))
     description = "description"
     tags = ["tag1" , "tag2"]
     icon_id = "${sakuracloud_icon.foobar.id}"
@@ -184,7 +185,7 @@ resource "sakuracloud_cdrom" "foobar" {
     name = "mycdrom-upd"
     size = 5
     iso_image_file = "test/dummy-upd.iso"
-    hash = "${md5(file("test/dummy-upd.iso"))}"
+    hash = md5(filebase64("test/dummy-upd.iso"))
     description = "description-upd"
     tags = ["tag1-upd" , "tag2-upd"]
 }`
@@ -192,12 +193,12 @@ resource "sakuracloud_cdrom" "foobar" {
 var testAccCheckSakuraCloudCDROMConfig_text_content = `
 resource "sakuracloud_cdrom" "foobar" {
     name = "mycdrom"
-    content = "${file("test/dummy.json")}"
+    content = file("test/dummy.json")
 }
 `
 var testAccCheckSakuraCloudCDROMConfig_text_content_upd = `
 resource "sakuracloud_cdrom" "foobar" {
     name = "mycdrom-upd"
-    content = "${file("test/dummy-upd.json")}"
+    content = file("test/dummy-upd.json")
 }
 `

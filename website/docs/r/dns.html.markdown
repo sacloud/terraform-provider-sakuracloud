@@ -26,9 +26,23 @@ resource "sakuracloud_dns" "foobar" {
 The following arguments are supported:
 
 * `zone` - (Required) The name of the zone.
+* `records` - (Optional) Records. It contains some attributes to [Records](#records).
 * `description` - (Optional) The description of the resource.
 * `tags` - (Optional) The tag list of the resources.
 * `icon_id` - (Optional) The ID of the icon.
+
+### Records
+
+Attributes for Records:
+
+* `name` - (Required) The hostname of target Record. If "@" is specified, it indicates own zone.
+* `type` - (Required) The Record type.  
+Valid value is one of the following: [ "A" / "AAAA" / "CNAME" / "NS" / "MX" / "TXT" / "SRV" ]
+* `value` - (Required) The value of the Record. 
+* `ttl` - (Optional) The ttl value of the Record (unit:`second`). 
+* `priority` - (Optional) The priority used when `type` is `MX` or `SRV`.
+* `weight` - (Optional) The weight used when `type` is `SRV`.
+* `port` - (Optional) The port number used when `type` is `SRV`. 
 
 ## Attributes Reference
 

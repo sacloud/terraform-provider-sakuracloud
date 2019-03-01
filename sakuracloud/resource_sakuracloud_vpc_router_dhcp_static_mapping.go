@@ -15,37 +15,7 @@ func resourceSakuraCloudVPCRouterDHCPStaticMapping() *schema.Resource {
 		Create: resourceSakuraCloudVPCRouterDHCPStaticMappingCreate,
 		Read:   resourceSakuraCloudVPCRouterDHCPStaticMappingRead,
 		Delete: resourceSakuraCloudVPCRouterDHCPStaticMappingDelete,
-		Schema: map[string]*schema.Schema{
-			"vpc_router_id": {
-				Type:         schema.TypeString,
-				Required:     true,
-				ForceNew:     true,
-				ValidateFunc: validateSakuracloudIDType,
-			},
-			"vpc_router_dhcp_server_id": {
-				Type:     schema.TypeString,
-				Required: true,
-				ForceNew: true,
-			},
-			"ipaddress": {
-				Type:     schema.TypeString,
-				Required: true,
-				ForceNew: true,
-			},
-			"macaddress": {
-				Type:     schema.TypeString,
-				Required: true,
-				ForceNew: true,
-			},
-			"zone": {
-				Type:         schema.TypeString,
-				Optional:     true,
-				Computed:     true,
-				ForceNew:     true,
-				Description:  "target SakuraCloud zone",
-				ValidateFunc: validateZone([]string{"is1a", "is1b", "tk1a", "tk1v"}),
-			},
-		},
+		Schema: vpcRouterDHCPStaticMappingSchema(),
 	}
 }
 
@@ -155,7 +125,7 @@ func vpcRouterDHCPStaticMappingIDHash(routerID string, s *sacloud.VPCRouterDHCPS
 	return fmt.Sprintf("%d", hashcode.String(buf.String()))
 }
 
-func expandVPCRouterDHCPStaticMapping(d *schema.ResourceData) *sacloud.VPCRouterDHCPStaticMappingConfig {
+func expandVPCRouterDHCPStaticMapping(d resourceValueGetable) *sacloud.VPCRouterDHCPStaticMappingConfig {
 
 	var dhcpStaticMapping = &sacloud.VPCRouterDHCPStaticMappingConfig{
 		IPAddress:  d.Get("ipaddress").(string),

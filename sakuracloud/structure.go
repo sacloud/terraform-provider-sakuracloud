@@ -12,7 +12,57 @@ import (
 )
 
 type resourceValueGetable interface {
+	Get(key string) interface{}
 	GetOk(key string) (interface{}, bool)
+}
+
+type resourceMapValue struct {
+	value map[string]interface{}
+}
+
+func (r *resourceMapValue) Get(key string) interface{} {
+	return r.value[key]
+}
+
+func (r *resourceMapValue) GetOk(key string) (interface{}, bool) {
+	v, ok := r.value[key]
+	return v, ok
+}
+
+func mapToResourceData(v map[string]interface{}) resourceValueGetable {
+	return &resourceMapValue{value: v}
+}
+
+func getMapFromResource(d resourceValueGetable, key string) (map[string]interface{}, bool) {
+	v, ok := d.GetOk(key)
+	if !ok {
+		return nil, false
+	}
+	if v, ok := v.(map[string]interface{}); ok {
+		return v, true
+	}
+	return nil, false
+}
+
+func getListFromResource(d resourceValueGetable, key string) ([]interface{}, bool) {
+	v, ok := d.GetOk(key)
+	if !ok {
+		return nil, false
+	}
+	if v, ok := v.([]interface{}); ok {
+		return v, true
+	}
+	return nil, false
+}
+
+func mergeSchemas(schemas ...map[string]*schema.Schema) map[string]*schema.Schema {
+	m := map[string]*schema.Schema{}
+	for _, schema := range schemas {
+		for k, v := range schema {
+			m[k] = v
+		}
+	}
+	return m
 }
 
 func getSacloudAPIClient(d resourceValueGetable, meta interface{}) *APIClient {
@@ -142,20 +192,32 @@ func flattenDisplayIPAddress(interfaces []sacloud.Interface) []interface{} {
 
 func flattenPacketFilters(interfaces []sacloud.Interface) []string {
 	var ret []string
-	var isExists = false
-	for index, i := range interfaces {
+	for _, i := range interfaces {
 		var id string
 		if i.PacketFilter != nil {
 			id = i.PacketFilter.GetStrID()
-			isExists = true
 		}
-		if index == 0 || (len(interfaces)-1 == index && id != "") {
-			ret = append(ret, id)
+		ret = append(ret, id)
+	}
+
+	if len(interfaces) <= 1 {
+		return ret
+	}
+
+	exists := false
+	for i := 1; i < len(interfaces); i++ {
+		if ret[i] != "" {
+			exists = true
+			break
 		}
 	}
-	if !isExists {
+	if !exists {
+		if ret[0] != "" {
+			return []string{ret[0]}
+		}
 		return []string{}
 	}
+
 	return ret
 }
 

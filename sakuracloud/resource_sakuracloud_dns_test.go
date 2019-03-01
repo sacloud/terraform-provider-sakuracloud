@@ -17,7 +17,7 @@ func TestAccResourceSakuraCloudDNS(t *testing.T) {
 	zone := fmt.Sprintf("%s.%s.com", randString1, randString2)
 
 	var dns sacloud.DNS
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckSakuraCloudDNSDestroy,
@@ -31,6 +31,12 @@ func TestAccResourceSakuraCloudDNS(t *testing.T) {
 					resource.TestCheckResourceAttr("sakuracloud_dns.foobar", "tags.#", "2"),
 					resource.TestCheckResourceAttr("sakuracloud_dns.foobar", "tags.0", "tag1"),
 					resource.TestCheckResourceAttr("sakuracloud_dns.foobar", "tags.1", "tag2"),
+					resource.TestCheckResourceAttr("sakuracloud_dns.foobar", "records.0.name", "test1"),
+					resource.TestCheckResourceAttr("sakuracloud_dns.foobar", "records.0.type", "A"),
+					resource.TestCheckResourceAttr("sakuracloud_dns.foobar", "records.0.value", "192.168.11.1"),
+					resource.TestCheckResourceAttr("sakuracloud_dns.foobar", "records.1.name", "test2"),
+					resource.TestCheckResourceAttr("sakuracloud_dns.foobar", "records.1.type", "A"),
+					resource.TestCheckResourceAttr("sakuracloud_dns.foobar", "records.1.value", "192.168.11.2"),
 					resource.TestCheckResourceAttrPair(
 						"sakuracloud_dns.foobar", "icon_id",
 						"sakuracloud_icon.foobar", "id",
@@ -45,6 +51,9 @@ func TestAccResourceSakuraCloudDNS(t *testing.T) {
 					resource.TestCheckResourceAttr("sakuracloud_dns.foobar", "description", "DNS from TerraForm for SAKURA CLOUD_upd"),
 					resource.TestCheckResourceAttr("sakuracloud_dns.foobar", "tags.#", "1"),
 					resource.TestCheckResourceAttr("sakuracloud_dns.foobar", "tags.0", "tag1"),
+					resource.TestCheckResourceAttr("sakuracloud_dns.foobar", "records.0.name", "test1"),
+					resource.TestCheckResourceAttr("sakuracloud_dns.foobar", "records.0.type", "A"),
+					resource.TestCheckResourceAttr("sakuracloud_dns.foobar", "records.0.value", "192.168.11.1"),
 					resource.TestCheckResourceAttr("sakuracloud_dns.foobar", "icon_id", ""),
 				),
 			},
@@ -120,18 +129,18 @@ func TestAccImportSakuraCloudDNS(t *testing.T) {
 		if err := compareStateMulti(s[0], expects); err != nil {
 			return err
 		}
-		return stateNotEmptyMulti(s[0], "icon_id", "dns_servers.0")
+		return stateNotEmptyMulti(s[0], "dns_servers.0")
 	}
 
 	resourceName := "sakuracloud_dns.foobar"
 
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckSakuraCloudDNSDestroy,
 		Steps: []resource.TestStep{
 			{
-				Config: testAccCheckSakuraCloudDNSConfig_basic(zone),
+				Config: testAccCheckSakuraCloudDNSConfig_import(zone),
 			},
 			{
 				ResourceName:      resourceName,
@@ -149,7 +158,17 @@ resource "sakuracloud_dns" "foobar" {
     zone = "%s"
     description = "DNS from TerraForm for SAKURA CLOUD"
     tags = ["tag1","tag2"]
-    icon_id = "${sakuracloud_icon.foobar.id}"
+    icon_id = sakuracloud_icon.foobar.id
+    records {
+      name = "test1"
+      type = "A"
+      value = "192.168.11.1"
+    }
+    records {
+      name = "test2"
+      type = "A"
+      value = "192.168.11.2"
+    }
 }
 
 resource "sakuracloud_icon" "foobar" {
@@ -165,5 +184,20 @@ resource "sakuracloud_dns" "foobar" {
     zone = "%s"
     description = "DNS from TerraForm for SAKURA CLOUD_upd"
     tags = ["tag1"]
+    records {
+      name = "test1"
+      type = "A"
+      value = "192.168.11.1"
+    }
 }`, zone)
+}
+
+func testAccCheckSakuraCloudDNSConfig_import(zone string) string {
+	return fmt.Sprintf(`
+resource "sakuracloud_dns" "foobar" {
+    zone = "%s"
+    description = "DNS from TerraForm for SAKURA CLOUD"
+    tags = ["tag1","tag2"]
+}
+`, zone)
 }

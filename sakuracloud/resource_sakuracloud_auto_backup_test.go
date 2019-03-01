@@ -3,6 +3,7 @@ package sakuracloud
 import (
 	"errors"
 	"fmt"
+	"os"
 	"testing"
 
 	"github.com/hashicorp/terraform/helper/resource"
@@ -12,7 +13,7 @@ import (
 
 func TestAccResourceSakuraCloudAutoBackup(t *testing.T) {
 	var autoBackup sacloud.AutoBackup
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckSakuraCloudAutoBackupDestroy,
@@ -30,7 +31,6 @@ func TestAccResourceSakuraCloudAutoBackup(t *testing.T) {
 					resource.TestCheckResourceAttr("sakuracloud_auto_backup.foobar", "tags.#", "2"),
 					resource.TestCheckResourceAttr("sakuracloud_auto_backup.foobar", "tags.0", "hoge1"),
 					resource.TestCheckResourceAttr("sakuracloud_auto_backup.foobar", "tags.1", "hoge2"),
-					resource.TestCheckResourceAttr("sakuracloud_auto_backup.foobar", "zone", "is1b"),
 					resource.TestCheckResourceAttrPair(
 						"sakuracloud_auto_backup.foobar", "icon_id",
 						"sakuracloud_icon.foobar", "id",
@@ -50,7 +50,6 @@ func TestAccResourceSakuraCloudAutoBackup(t *testing.T) {
 					resource.TestCheckResourceAttr("sakuracloud_auto_backup.foobar", "tags.#", "2"),
 					resource.TestCheckResourceAttr("sakuracloud_auto_backup.foobar", "tags.0", "hoge1_after"),
 					resource.TestCheckResourceAttr("sakuracloud_auto_backup.foobar", "tags.1", "hoge2_after"),
-					resource.TestCheckResourceAttr("sakuracloud_auto_backup.foobar", "zone", "is1b"),
 					resource.TestCheckResourceAttr(
 						"sakuracloud_auto_backup.foobar", "icon_id", ""),
 				),
@@ -72,9 +71,6 @@ func testAccCheckSakuraCloudAutoBackupExists(n string, auto_backup *sacloud.Auto
 		}
 
 		client := testAccProvider.Meta().(*APIClient)
-		originalZone := client.Zone
-		client.Zone = "is1b"
-		defer func() { client.Zone = originalZone }()
 
 		foundAutoBackup, err := client.AutoBackup.Read(toSakuraCloudID(rs.Primary.ID))
 
@@ -94,9 +90,6 @@ func testAccCheckSakuraCloudAutoBackupExists(n string, auto_backup *sacloud.Auto
 
 func testAccCheckSakuraCloudAutoBackupDestroy(s *terraform.State) error {
 	client := testAccProvider.Meta().(*APIClient)
-	originalZone := client.Zone
-	client.Zone = "is1b"
-	defer func() { client.Zone = originalZone }()
 
 	for _, rs := range s.RootModule().Resources {
 		if rs.Type != "sakuracloud_auto_backup" {
@@ -126,7 +119,7 @@ func TestAccImportSakuraCloudAutoBackup(t *testing.T) {
 			"description":    "description_before",
 			"tags.0":         "hoge1",
 			"tags.1":         "hoge2",
-			"zone":           "is1b",
+			"zone":           os.Getenv("SAKURACLOUD_ZONE"),
 		}
 
 		if err := compareStateMulti(s[0], expects); err != nil {
@@ -137,15 +130,15 @@ func TestAccImportSakuraCloudAutoBackup(t *testing.T) {
 
 	resourceName := "sakuracloud_auto_backup.foobar"
 
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckSakuraCloudAutoBackupDestroy,
 		Steps: []resource.TestStep{
-			resource.TestStep{
+			{
 				Config: testAccCheckSakuraCloudAutoBackupConfig_basic,
 			},
-			resource.TestStep{
+			{
 				ResourceName:      resourceName,
 				ImportState:       true,
 				ImportStateCheck:  checkFn,
@@ -158,17 +151,15 @@ func TestAccImportSakuraCloudAutoBackup(t *testing.T) {
 var testAccCheckSakuraCloudAutoBackupConfig_basic = `
 resource "sakuracloud_disk" "disk" {
     name = "disk01"
-    zone = "is1b"
 }
 resource "sakuracloud_auto_backup" "foobar" {
     name = "name_before"
-    disk_id = "${sakuracloud_disk.disk.id}"
+    disk_id = sakuracloud_disk.disk.id
     weekdays = ["wed","fri"]
     max_backup_num = 1
     description = "description_before"
     tags = ["hoge1", "hoge2"]
-    zone = "is1b"
-    icon_id = "${sakuracloud_icon.foobar.id}"
+    icon_id = sakuracloud_icon.foobar.id
 }
 
 resource "sakuracloud_icon" "foobar" {
@@ -180,14 +171,12 @@ resource "sakuracloud_icon" "foobar" {
 var testAccCheckSakuraCloudAutoBackupConfig_update = `
 resource "sakuracloud_disk" "disk" {
     name = "disk01"
-    zone = "is1b"
 }
 resource "sakuracloud_auto_backup" "foobar" {
     name = "name_after"
-    disk_id = "${sakuracloud_disk.disk.id}"
+    disk_id = sakuracloud_disk.disk.id
     weekdays = ["fri","sun"]
     max_backup_num = 2
     description = "description_after"
     tags = ["hoge1_after", "hoge2_after"]
-    zone = "is1b"
 }`

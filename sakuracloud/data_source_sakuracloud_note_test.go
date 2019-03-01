@@ -15,7 +15,7 @@ func TestAccSakuraCloudDataSourceNote_Basic(t *testing.T) {
 	randString2 := acctest.RandStringFromCharSet(20, acctest.CharSetAlpha)
 	name := fmt.Sprintf("%s_%s", randString1, randString2)
 
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:                  func() { testAccPreCheck(t) },
 		Providers:                 testAccProviders,
 		PreventPostDestroyRefresh: true,
@@ -32,7 +32,6 @@ func TestAccSakuraCloudDataSourceNote_Basic(t *testing.T) {
 					testAccCheckSakuraCloudNoteDataSourceID("data.sakuracloud_note.foobar"),
 					resource.TestCheckResourceAttr("data.sakuracloud_note.foobar", "name", name),
 					resource.TestCheckResourceAttr("data.sakuracloud_note.foobar", "content", "content_test"),
-					resource.TestCheckResourceAttr("data.sakuracloud_note.foobar", "description", "description_test"),
 					resource.TestCheckResourceAttr("data.sakuracloud_note.foobar", "class", "shell"),
 					resource.TestCheckResourceAttr("data.sakuracloud_note.foobar", "tags.#", "3"),
 					resource.TestCheckResourceAttr("data.sakuracloud_note.foobar", "tags.0", "tag1"),
@@ -106,8 +105,8 @@ func testAccCheckSakuraCloudNoteDataSourceID(n string) resource.TestCheckFunc {
 
 func testAccCheckSakuraCloudNoteDataSourceNotExists(n string) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
-		_, ok := s.RootModule().Resources[n]
-		if ok {
+		v, ok := s.RootModule().Resources[n]
+		if ok && v.Primary.ID != "" {
 			return fmt.Errorf("Found Note data source: %s", n)
 		}
 		return nil
@@ -140,7 +139,6 @@ func testAccCheckSakuraCloudDataSourceNoteBase(name string) string {
 	return fmt.Sprintf(`
 resource "sakuracloud_note" "foobar" {
     name = "%s"
-    description = "description_test"
     content = "content_test"
     tags = ["tag1","tag2","tag3"]
 }`, name)
@@ -150,12 +148,11 @@ func testAccCheckSakuraCloudDataSourceNoteConfig(name string) string {
 	return fmt.Sprintf(`
 resource "sakuracloud_note" "foobar" {
     name = "%s"
-    description = "description_test"
     content = "content_test"
     tags = ["tag1","tag2","tag3"]
 }
 data "sakuracloud_note" "foobar" {
-    filter = {
+    filter {
 	name = "Name"
 	values = ["%s"]
     }
@@ -166,12 +163,11 @@ func testAccCheckSakuraCloudDataSourceNoteConfig_With_Tag(name string) string {
 	return fmt.Sprintf(`
 resource "sakuracloud_note" "foobar" {
     name = "%s"
-    description = "description_test"
     content = "content_test"
     tags = ["tag1","tag2","tag3"]
 }
 data "sakuracloud_note" "foobar" {
-    filter = {
+    filter {
 	name = "Tags"
 	values = ["tag1","tag3"]
     }
@@ -182,12 +178,11 @@ func testAccCheckSakuraCloudDataSourceNoteConfig_With_NotExists_Tag(name string)
 	return fmt.Sprintf(`
 resource "sakuracloud_note" "foobar" {
     name = "%s"
-    description = "description_test"
     content = "content_test"
     tags = ["tag1","tag2","tag3"]
 }
 data "sakuracloud_note" "foobar" {
-    filter = {
+    filter {
 	name = "Tags"
 	values = ["tag1-xxxxxxx","tag3-xxxxxxxx"]
     }
@@ -198,12 +193,11 @@ func testAccCheckSakuraCloudDataSourceNoteConfig_NotExists(name string) string {
 	return fmt.Sprintf(`
 resource "sakuracloud_note" "foobar" {
     name = "%s"
-    description = "description_test"
     content = "content_test"
     tags = ["tag1","tag2","tag3"]
 }
 data "sakuracloud_note" "foobar" {
-    filter = {
+    filter {
 	name = "Name"
 	values = ["xxxxxxxxxxxxxxxxxx"]
     }
@@ -214,7 +208,6 @@ func testAccCheckSakuraCloudDataSourceNote_NameSelector_Exists(name, p1, p2 stri
 	return fmt.Sprintf(`
 resource "sakuracloud_note" "foobar" {
     name = "%s"
-    description = "description_test"
     content = "content_test"
     tags = ["tag1","tag2","tag3"]
 }
@@ -233,7 +226,6 @@ func testAccCheckSakuraCloudDataSourceNote_TagSelector_Exists(name string) strin
 	return fmt.Sprintf(`
 resource "sakuracloud_note" "foobar" {
     name = "%s"
-    description = "description_test"
     content = "content_test"
     tags = ["tag1","tag2","tag3"]
 }

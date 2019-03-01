@@ -7,7 +7,7 @@
 ### 設定例
 
 ```hcl
-data sakuracloud_note "mynote" {
+data "sakuracloud_note" "mynote" {
   name_selectors = ["foobar"]
 }
 ```

@@ -12,7 +12,7 @@ import (
 
 func TestAccResourceSakuraCloudDatabase_WithSwitch(t *testing.T) {
 	var database sacloud.Database
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckSakuraCloudDatabaseDestroy,
@@ -176,7 +176,7 @@ func TestAccImportSakuraCloudDatabase(t *testing.T) {
 
 	resourceName := "sakuracloud_database.foobar"
 
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckSakuraCloudDatabaseDestroy,
@@ -214,7 +214,7 @@ resource "sakuracloud_database" "foobar" {
     backup_time = "00:00"
     backup_weekdays = ["mon","tue"]
 
-    switch_id = "${sakuracloud_switch.sw.id}"
+    switch_id = sakuracloud_switch.sw.id
     ipaddress1 = "192.168.11.101"
     nw_mask_len = 24
     default_route = "192.168.11.1"
@@ -222,7 +222,7 @@ resource "sakuracloud_database" "foobar" {
     name = "name_before"
     description = "description_before"
     tags = ["hoge1" , "hoge2"]
-    icon_id = "${sakuracloud_icon.foobar.id}"
+    icon_id = sakuracloud_icon.foobar.id
 }
 
 resource "sakuracloud_icon" "foobar" {
@@ -253,9 +253,8 @@ resource "sakuracloud_database" "foobar" {
     description = "description_after"
     tags = ["hoge1_after" , "hoge2_after"]
 
-    switch_id = "${sakuracloud_switch.sw.id}"
+    switch_id = sakuracloud_switch.sw.id
     ipaddress1 = "192.168.11.101"
     nw_mask_len = 24
     default_route = "192.168.11.1"
-
 }`

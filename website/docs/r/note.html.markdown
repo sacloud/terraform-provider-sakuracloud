@@ -15,20 +15,19 @@ Provides a SakuraCloud Note (Startup-Script) resource. This can be used to creat
 ```hcl
 # Create a new Note
 resource "sakuracloud_note" "foobar" {
-  name        = "foobar"
-  
-  class       = "shell" 
-  content     = <<EOS
-#!/bin/sh
+  name  = "foobar"
+  class = "shell"
 
-: your-script-here
-EOS
+  content     = <<-EOS
+  #!/bin/sh
+
+  : your-script-here
+  EOS
   
   # for RancherOS(cloud_config)
   # class   = "yaml_cloud_config"
-  # content = "${file("path/to/your/content")}"
-  
-  description = "description"
+  # content = file("path/to/your/content")
+
   tags        = ["foo", "bar"]
 }
 ```
@@ -41,7 +40,6 @@ The following arguments are supported:
 * `class` - (Required) The content body of the Note.  
 Valid value is one of the following: [ "shell" (default) / "yaml_cloud_config" ]
 * `content` - (Required) The content body of the Note.
-* `description` - (Optional) The description of the resource.
 * `tags` - (Optional) The tag list of the resources.
 * `icon_id` - (Optional) The ID of the icon.
 

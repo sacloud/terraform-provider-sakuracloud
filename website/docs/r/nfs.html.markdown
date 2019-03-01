@@ -14,17 +14,17 @@ Provides a SakuraCloud NFS Appliance resource. This can be used to create, updat
 
 ```hcl
 # Create a new NFS Appliance
-resource sakuracloud_nfs "foobar" {
-  name           = "foobar"
-  plan           = 100
+resource "sakuracloud_nfs" "foobar" {
+  name = "foobar"
+  plan = 100
 
-  switch_id      = "${sakuracloud_switch.foobar.id}"
-  ipaddress1     = "192.168.11.101"
-  nw_mask_len    = 24
-  default_route  = "192.168.11.1"
-  
-  description    = "description"
-  tags           = ["foo", "bar"]
+  switch_id     = sakuracloud_switch.foobar.id
+  ipaddress     = "192.168.11.101"
+  nw_mask_len   = 24
+  default_route = "192.168.11.1"
+
+  description = "description"
+  tags        = ["foo", "bar"]
 }
 ```
 

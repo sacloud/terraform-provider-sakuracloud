@@ -6,7 +6,7 @@
 
 ```hcl
 #NFSリソースの参照
-data sakuracloud_nfs "foobar" {
+data "sakuracloud_nfs" "foobar" {
   name_selectors = ["foobar"]
 }
 ```

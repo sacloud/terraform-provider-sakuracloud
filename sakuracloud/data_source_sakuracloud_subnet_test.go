@@ -10,7 +10,7 @@ import (
 )
 
 func TestAccSakuraCloudSubnetDataSource_Basic(t *testing.T) {
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:                  func() { testAccPreCheck(t) },
 		Providers:                 testAccProviders,
 		PreventPostDestroyRefresh: true,
@@ -59,8 +59,8 @@ func testAccCheckSakuraCloudSubnetDataSourceID(n string) resource.TestCheckFunc 
 
 func testAccCheckSakuraCloudSubnetDataSourceNotExists(n string) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
-		_, ok := s.RootModule().Resources[n]
-		if ok {
+		v, ok := s.RootModule().Resources[n]
+		if ok && v.Primary.ID != "" {
 			return fmt.Errorf("Found Subnet data source: %s", n)
 		}
 		return nil

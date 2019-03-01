@@ -16,7 +16,7 @@ Provides a SakuraCloud SSH Key resource. This can be used to create, update, and
 # Create a new SSH Key(from file)
 resource "sakuracloud_ssh_key" "foobar" {
   name       = "foobar"
-  public_key = "${file("~/.ssh/id_rsa")}"
+  public_key = file("~/.ssh/id_rsa")
 }
 
 # Create a new SSH Key(from tls_private_key resource)
@@ -24,9 +24,9 @@ resource "tls_private_key" "foobar" {
   algorithm = "RSA"
 }
 
-resource sakuracloud_ssh_key "foobar2" {
+resource "sakuracloud_ssh_key" "foobar2" {
   name       = "foobar2"
-  public_key = "${tls_private_key.foobar.public_key_openssh}"
+  public_key = tls_private_key.foobar.public_key_openssh
 }
 ```
 

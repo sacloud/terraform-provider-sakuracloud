@@ -1,7 +1,9 @@
 package sakuracloud
 
 import (
+	"bytes"
 	"crypto/md5"
+	"encoding/base64"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -302,6 +304,15 @@ func setCDROMResourceData(d *schema.ResourceData, client *APIClient, data *saclo
 			return fmt.Errorf("Error opening iso_image_file (%s): %s", source, err)
 		}
 		defer f.Close()
+
+		b := base64.NewEncoder(base64.StdEncoding, f)
+		defer b.Close()
+
+		var buf bytes.Buffer
+		if _, err := io.Copy(&buf, f); err != nil {
+			return fmt.Errorf("Error encoding to base64 from iso_image_file (%s): %s", source, err)
+		}
+
 		h := md5.New()
 		if _, err := io.Copy(h, f); err != nil {
 			return fmt.Errorf("Error calculate md5 from iso_image_file (%s): %s", source, err)

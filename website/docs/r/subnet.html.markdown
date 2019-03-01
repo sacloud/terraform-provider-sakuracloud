@@ -14,13 +14,10 @@ Provides a SakuraCloud Subnet resource. This can be used to create, update, and 
 
 ```hcl
 # Create a new Subnet
-resource sakuracloud_subnet "foobar" {
+resource "sakuracloud_subnet" "foobar" {
   name        = "foobar"
   description = "description"
   tags        = ["foo", "bar"]
- 
-  # If you want to connect to the bridge, please uncomment here.
-  #bridge_id = "${sakuracloud_bridge.br.id}"
 }
 ```
 

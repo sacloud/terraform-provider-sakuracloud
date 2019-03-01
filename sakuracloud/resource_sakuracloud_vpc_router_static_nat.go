@@ -6,7 +6,6 @@ import (
 
 	"github.com/hashicorp/terraform/helper/hashcode"
 	"github.com/hashicorp/terraform/helper/schema"
-	"github.com/hashicorp/terraform/helper/validation"
 	"github.com/sacloud/libsacloud/api"
 	"github.com/sacloud/libsacloud/sacloud"
 )
@@ -16,44 +15,7 @@ func resourceSakuraCloudVPCRouterStaticNAT() *schema.Resource {
 		Create: resourceSakuraCloudVPCRouterStaticNATCreate,
 		Read:   resourceSakuraCloudVPCRouterStaticNATRead,
 		Delete: resourceSakuraCloudVPCRouterStaticNATDelete,
-		Schema: map[string]*schema.Schema{
-			"vpc_router_id": {
-				Type:         schema.TypeString,
-				Required:     true,
-				ForceNew:     true,
-				ValidateFunc: validateSakuracloudIDType,
-			},
-			"vpc_router_interface_id": {
-				Type:     schema.TypeString,
-				Required: true,
-				ForceNew: true,
-			},
-			"global_address": {
-				Type:     schema.TypeString,
-				Required: true,
-				ForceNew: true,
-			},
-			"private_address": {
-				Type:     schema.TypeString,
-				Required: true,
-				ForceNew: true,
-			},
-			"description": {
-				Type:         schema.TypeString,
-				Optional:     true,
-				Default:      "",
-				ForceNew:     true,
-				ValidateFunc: validation.StringLenBetween(0, 512),
-			},
-			"zone": {
-				Type:         schema.TypeString,
-				Optional:     true,
-				Computed:     true,
-				ForceNew:     true,
-				Description:  "target SakuraCloud zone",
-				ValidateFunc: validateZone([]string{"is1a", "is1b", "tk1a", "tk1v"}),
-			},
-		},
+		Schema: vpcRouterStaticNATSchema(),
 	}
 }
 
@@ -163,7 +125,7 @@ func vpcRouterStaticNATIDHash(routerID string, s *sacloud.VPCRouterStaticNATConf
 	return fmt.Sprintf("%d", hashcode.String(buf.String()))
 }
 
-func expandVPCRouterStaticNAT(d *schema.ResourceData) *sacloud.VPCRouterStaticNATConfig {
+func expandVPCRouterStaticNAT(d resourceValueGetable) *sacloud.VPCRouterStaticNATConfig {
 
 	var staticNAT = &sacloud.VPCRouterStaticNATConfig{
 		GlobalAddress:  d.Get("global_address").(string),

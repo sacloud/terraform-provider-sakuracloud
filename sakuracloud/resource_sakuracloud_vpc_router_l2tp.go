@@ -6,7 +6,6 @@ import (
 
 	"github.com/hashicorp/terraform/helper/hashcode"
 	"github.com/hashicorp/terraform/helper/schema"
-	"github.com/hashicorp/terraform/helper/validation"
 	"github.com/sacloud/libsacloud/api"
 	"github.com/sacloud/libsacloud/sacloud"
 )
@@ -16,43 +15,7 @@ func resourceSakuraCloudVPCRouterL2TP() *schema.Resource {
 		Create: resourceSakuraCloudVPCRouterL2TPCreate,
 		Read:   resourceSakuraCloudVPCRouterL2TPRead,
 		Delete: resourceSakuraCloudVPCRouterL2TPDelete,
-		Schema: map[string]*schema.Schema{
-			"vpc_router_id": {
-				Type:         schema.TypeString,
-				Required:     true,
-				ForceNew:     true,
-				ValidateFunc: validateSakuracloudIDType,
-			},
-			"vpc_router_interface_id": {
-				Type:     schema.TypeString,
-				Required: true,
-				ForceNew: true,
-			},
-			"pre_shared_secret": {
-				Type:         schema.TypeString,
-				Required:     true,
-				ForceNew:     true,
-				ValidateFunc: validation.StringLenBetween(0, 40),
-			},
-			"range_start": {
-				Type:     schema.TypeString,
-				Required: true,
-				ForceNew: true,
-			},
-			"range_stop": {
-				Type:     schema.TypeString,
-				Required: true,
-				ForceNew: true,
-			},
-			"zone": {
-				Type:         schema.TypeString,
-				Optional:     true,
-				Computed:     true,
-				ForceNew:     true,
-				Description:  "target SakuraCloud zone",
-				ValidateFunc: validateZone([]string{"is1a", "is1b", "tk1a", "tk1v"}),
-			},
-		},
+		Schema: vpcRouterL2TPSchema(),
 	}
 }
 
@@ -158,7 +121,7 @@ func vpcRouterL2TPIDHash(routerID string, s *sacloud.VPCRouterL2TPIPsecServer) s
 	return fmt.Sprintf("%d", hashcode.String(buf.String()))
 }
 
-func expandVPCRouterL2TP(d *schema.ResourceData) *sacloud.VPCRouterL2TPIPsecServerConfig {
+func expandVPCRouterL2TP(d resourceValueGetable) *sacloud.VPCRouterL2TPIPsecServerConfig {
 
 	var l2tpSetting = &sacloud.VPCRouterL2TPIPsecServerConfig{
 		PreSharedSecret: d.Get("pre_shared_secret").(string),

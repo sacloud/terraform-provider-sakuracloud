@@ -8,7 +8,6 @@ import (
 
 	"github.com/hashicorp/terraform/helper/hashcode"
 	"github.com/hashicorp/terraform/helper/schema"
-	"github.com/hashicorp/terraform/helper/validation"
 	"github.com/sacloud/libsacloud/api"
 	"github.com/sacloud/libsacloud/sacloud"
 )
@@ -18,34 +17,23 @@ func resourceSakuraCloudGSLBServer() *schema.Resource {
 		Create: resourceSakuraCloudGSLBServerCreate,
 		Read:   resourceSakuraCloudGSLBServerRead,
 		Delete: resourceSakuraCloudGSLBServerDelete,
-
-		Schema: map[string]*schema.Schema{
-			"gslb_id": {
-				Type:         schema.TypeString,
-				Required:     true,
-				ForceNew:     true,
-				ValidateFunc: validateSakuracloudIDType,
-			},
-			"ipaddress": {
-				Type:     schema.TypeString,
-				ForceNew: true,
-				Required: true,
-			},
-			"enabled": {
-				Type:     schema.TypeBool,
-				Optional: true,
-				ForceNew: true,
-				Default:  true,
-			},
-			"weight": {
-				Type:         schema.TypeInt,
-				Optional:     true,
-				ValidateFunc: validation.IntBetween(1, 10000),
-				ForceNew:     true,
-				Default:      1,
-			},
-		},
+		Schema: gslbServerResourceSchema(),
 	}
+}
+
+func gslbServerResourceSchema() map[string]*schema.Schema {
+	s := mergeSchemas(map[string]*schema.Schema{
+		"gslb_id": {
+			Type:         schema.TypeString,
+			Required:     true,
+			ForceNew:     true,
+			ValidateFunc: validateSakuracloudIDType,
+		},
+	}, gslbServerValueSchemas())
+	for _, v := range s {
+		v.ForceNew = true
+	}
+	return s
 }
 
 func resourceSakuraCloudGSLBServerCreate(d *schema.ResourceData, meta interface{}) error {
@@ -148,12 +136,25 @@ func gslbServerIDHash(gslbID string, s *sacloud.GSLBServer) string {
 	return fmt.Sprintf("gslbserver-%d", hashcode.String(buf.String()))
 }
 
-func expandGSLBServer(d *schema.ResourceData) *sacloud.GSLBServer {
+func expandGSLBServer(d resourceValueGetable) *sacloud.GSLBServer {
 	var gslb = sacloud.GSLB{}
-	server := gslb.CreateGSLBServer(d.Get("ipaddress").(string))
-	if !d.Get("enabled").(bool) {
+	var ipaddress string
+	var enabled bool
+	var weight int
+	if v, ok := d.GetOk("ipaddress"); ok {
+		ipaddress = v.(string)
+	}
+	if v, ok := d.GetOk("weight"); ok {
+		weight = v.(int)
+	}
+	if v, ok := d.GetOk("enabled"); ok {
+		enabled = v.(bool)
+	}
+
+	server := gslb.CreateGSLBServer(ipaddress)
+	if !enabled {
 		server.Enabled = "False"
 	}
-	server.Weight = fmt.Sprintf("%d", d.Get("weight").(int))
+	server.Weight = fmt.Sprintf("%d", weight)
 	return server
 }

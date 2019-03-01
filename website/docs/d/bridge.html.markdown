@@ -13,7 +13,7 @@ Use this data source to retrieve information about a SakuraCloud Bridge.
 ## Example Usage
 
 ```hcl
-data sakuracloud_bridge "foobar" {
+data "sakuracloud_bridge" "foobar" {
   name_selectors = ["foobar"]
 }
 ```

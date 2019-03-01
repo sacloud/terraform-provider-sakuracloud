@@ -7,27 +7,28 @@
 ```hcl
 # 逆引きレコードの定義
 resource "sakuracloud_ipv4_ptr" "foobar" {
-  ipaddress = "${sakuracloud_server.server.ipaddress}"
+  ipaddress = sakuracloud_server.server.ipaddress
   hostname  = "ptr.example.com"
 }
 
 # 対象ゾーンの参照
-data sakuracloud_dns "dns" {
+data "sakuracloud_dns" "dns" {
   name_selectors = ["example.com"]
 }
 
 # Aレコードの定義
-resource sakuracloud_dns_record "record01" {
-  dns_id = "${data.sakuracloud_dns.dns.id}"
+resource "sakuracloud_dns_record" "record01" {
+  dns_id = data.sakuracloud_dns.dns.id
   name   = "ptr"
   type   = "A"
-  value  = "${sakuracloud_server.server.ipaddress}"
+  value  = sakuracloud_server.server.ipaddress
 }
 
 # Aレコード/PTRレコード登録対象のサーバ
-resource sakuracloud_server "server" {
+resource "sakuracloud_server" "server" {
   name = "example"
 }
+
 ```
 
 逆引きレコードを登録するには対応するAレコードがあらかじめ登録されている必要があります。  

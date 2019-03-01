@@ -14,18 +14,19 @@ Provides a SakuraCloud Server Connection resource. This can be used to create, u
 
 ```hcl
 # Connect Disk or CDROM or PacketFilter to Server
-resource sakuracloud_server "foobar" {
-  server_id           = "${sakuracloud_server.foobar.id}"
-  
-  # disks             = ["${sakuracloud_disk.foobar.id}"]
-  
-  # cdrom_id          = "${sakuracloud_cdrom.foobar.id}"
-  
-  # packet_filter_ids = [
-  #  "${sakuracloud_packet_filter.foobar.id}", # for primary NIC
-  #  "${sakuracloud_packet_filter.foobar.id}", # for secondly NIC
-  #]
+resource "sakuracloud_server_connector" "foobar" {
+  server_id = sakuracloud_server.foobar.id
+
+  disks = [sakuracloud_disk.foobar.id]
+
+  cdrom_id = sakuracloud_cdrom.foobar.id
+
+  packet_filter_ids = [
+    sakuracloud_packet_filter.foobar.id, # for primary NIC
+    sakuracloud_packet_filter.foobar.id, # for secondly NIC
+  ]
 }
+
 ```
 
 ## Argument Reference

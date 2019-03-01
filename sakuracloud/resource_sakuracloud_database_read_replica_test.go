@@ -12,7 +12,7 @@ import (
 
 func TestAccResourceSakuraCloudDatabaseReplica(t *testing.T) {
 	var database sacloud.Database
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckSakuraCloudDatabaseReadReplicaDestroy,
@@ -78,7 +78,7 @@ func TestAccImportSakuraCloudDatabaseReadReplica(t *testing.T) {
 
 	resourceName := "sakuracloud_database_read_replica.foobar"
 
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckSakuraCloudDatabaseDestroy,
@@ -126,22 +126,22 @@ resource "sakuracloud_database" "foobar" {
     user_password = "DatabasePasswordUser397"
     replica_password = "DatabasePasswordUser397"
 
-    switch_id = "${sakuracloud_switch.sw.id}"
+    switch_id = sakuracloud_switch.sw.id
     ipaddress1 = "192.168.11.101"
     nw_mask_len = 24
     default_route = "192.168.11.1"
 
     name = "terraform-test-master-db"
-    icon_id = "${sakuracloud_icon.foobar.id}"
+    icon_id = sakuracloud_icon.foobar.id
 }
 
 resource "sakuracloud_database_read_replica" "foobar" {
-    master_id = "${sakuracloud_database.foobar.id}"
+    master_id = sakuracloud_database.foobar.id
     ipaddress1 = "192.168.11.111"
     name = "name_before"
     description = "description_before"
     tags = ["hoge1" , "hoge2"]
-    icon_id = "${sakuracloud_icon.foobar.id}"
+    icon_id = sakuracloud_icon.foobar.id
 }
 
 resource "sakuracloud_icon" "foobar" {
@@ -163,7 +163,7 @@ resource "sakuracloud_database" "foobar" {
     user_password = "DatabasePasswordUser397"
     replica_password = "DatabasePasswordUser397"
 
-    switch_id = "${sakuracloud_switch.sw.id}"
+    switch_id = sakuracloud_switch.sw.id
     ipaddress1 = "192.168.11.101"
     nw_mask_len = 24
     default_route = "192.168.11.1"
@@ -172,7 +172,7 @@ resource "sakuracloud_database" "foobar" {
 }
 
 resource "sakuracloud_database_read_replica" "foobar" {
-    master_id = "${sakuracloud_database.foobar.id}"
+    master_id = sakuracloud_database.foobar.id
     ipaddress1 = "192.168.11.111"
     name = "name_after"
     description = "description_after"

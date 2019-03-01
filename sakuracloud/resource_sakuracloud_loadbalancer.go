@@ -3,6 +3,8 @@ package sakuracloud
 import (
 	"errors"
 	"fmt"
+	"strconv"
+	"strings"
 
 	"github.com/hashicorp/terraform/helper/schema"
 	"github.com/hashicorp/terraform/helper/validation"
@@ -95,11 +97,85 @@ func resourceSakuraCloudLoadBalancer() *schema.Resource {
 				Description:  "target SakuraCloud zone",
 				ValidateFunc: validateZone([]string{"is1a", "is1b", "tk1a", "tk1v"}),
 			},
+			"vips": {
+				Type:     schema.TypeList,
+				Optional: true,
+				Computed: true,
+				MaxItems: 10,
+				Elem: &schema.Resource{
+					Schema: loadBalancerVIPValueSchema(),
+				},
+			},
 			"vip_ids": {
 				Type:     schema.TypeList,
 				Computed: true,
 				Elem:     &schema.Schema{Type: schema.TypeString},
 			},
+		},
+	}
+}
+
+func loadBalancerVIPValueSchema() map[string]*schema.Schema {
+	return map[string]*schema.Schema{
+		"vip": {
+			Type:     schema.TypeString,
+			Required: true,
+		},
+		"port": {
+			Type:         schema.TypeInt,
+			Required:     true,
+			ValidateFunc: validation.IntBetween(1, 65535),
+		},
+		"delay_loop": {
+			Type:         schema.TypeInt,
+			Optional:     true,
+			ValidateFunc: validation.IntBetween(10, 2147483647),
+			Default:      10,
+		},
+		"sorry_server": {
+			Type:     schema.TypeString,
+			Optional: true,
+		},
+		"description": {
+			Type:     schema.TypeString,
+			Optional: true,
+		},
+		"servers": {
+			Type:     schema.TypeList,
+			Optional: true,
+			Computed: true,
+			MaxItems: 40,
+			Elem: &schema.Resource{
+				Schema: loadBalancerServerValueSchema(),
+			},
+		},
+	}
+}
+
+func loadBalancerServerValueSchema() map[string]*schema.Schema {
+	return map[string]*schema.Schema{
+		"ipaddress": {
+			Type:     schema.TypeString,
+			Required: true,
+		},
+		"check_protocol": {
+			Type:         schema.TypeString,
+			Required:     true,
+			ValidateFunc: validation.StringInSlice(sacloud.AllowLoadBalancerHealthCheckProtocol(), false),
+		},
+		"check_path": {
+			Type:     schema.TypeString,
+			Optional: true,
+		},
+		"check_status": {
+			Type:     schema.TypeString,
+			Optional: true,
+		},
+		"enabled": {
+			Type:     schema.TypeBool,
+			Optional: true,
+			Default:  true,
+			ForceNew: true,
 		},
 	}
 }
@@ -171,6 +247,12 @@ func resourceSakuraCloudLoadBalancerCreate(d *schema.ResourceData, meta interfac
 		if err != nil {
 			return fmt.Errorf("Failed to create SakuraCloud LoadBalancer resource: %s", err)
 		}
+	}
+
+	for _, rawVip := range d.Get("vips").([]interface{}) {
+		v := &resourceMapValue{rawVip.(map[string]interface{})}
+		vip := expandLoadBalancerVIP(v)
+		createLb.AddLoadBalancerSetting(vip)
 	}
 
 	lbBuilder := &setup.RetryableSetup{
@@ -253,6 +335,15 @@ func resourceSakuraCloudLoadBalancerUpdate(d *schema.ResourceData, meta interfac
 		}
 	}
 
+	if d.HasChange("vips") {
+		loadBalancer.Settings.LoadBalancer = []*sacloud.LoadBalancerSetting{}
+		for _, rawVip := range d.Get("vips").([]interface{}) {
+			v := &resourceMapValue{rawVip.(map[string]interface{})}
+			vip := expandLoadBalancerVIP(v)
+			loadBalancer.AddLoadBalancerSetting(vip)
+		}
+	}
+
 	loadBalancer, err = client.LoadBalancer.Update(loadBalancer.ID, loadBalancer)
 	if err != nil {
 		return fmt.Errorf("Error updating SakuraCloud LoadBalancer resource: %s", err)
@@ -312,17 +403,106 @@ func setLoadBalancerResourceData(d *schema.ResourceData, client *APIClient, data
 	d.Set("tags", data.Tags)
 
 	d.Set("vip_ids", []string{})
+	d.Set("vips", []interface{}{})
 	if data.Settings != nil && data.Settings.LoadBalancer != nil {
 		var vipIDs []string
+		var vips []interface{}
 		for _, s := range data.Settings.LoadBalancer {
 			vipIDs = append(vipIDs, loadBalancerVIPIDHash(data.GetStrID(), s))
+
+			vip := map[string]interface{}{
+				"vip":          s.VirtualIPAddress,
+				"servers":      expandLoadBalancerServersFromVIP(data.GetStrID(), s),
+				"sorry_server": s.SorryServer,
+			}
+
+			port, _ := strconv.Atoi(s.Port)
+			vip["port"] = port
+
+			delayLoop, _ := strconv.Atoi(s.DelayLoop)
+			vip["delay_loop"] = delayLoop
+
+			var servers []interface{}
+			for _, server := range s.Servers {
+				s := map[string]interface{}{}
+				s["ipaddress"] = server.IPAddress
+				s["check_protocol"] = server.HealthCheck.Protocol
+				s["check_path"] = server.HealthCheck.Path
+				s["check_status"] = server.HealthCheck.Status
+				s["enabled"] = strings.ToLower(server.Enabled) == "true"
+				servers = append(servers, s)
+			}
+			vip["servers"] = servers
+
+			vips = append(vips, vip)
 		}
 		if len(vipIDs) > 0 {
 			d.Set("vip_ids", vipIDs)
+		}
+		if len(vips) > 0 {
+			d.Set("vips", vips)
 		}
 	}
 
 	setPowerManageTimeoutValueToState(d)
 	d.Set("zone", client.Zone)
 	return nil
+}
+
+func expandLoadBalancerVIP(d resourceValueGetable) *sacloud.LoadBalancerSetting {
+	var vip = &sacloud.LoadBalancerSetting{}
+
+	if v, ok := d.GetOk("vip"); ok {
+		vip.VirtualIPAddress = v.(string)
+	}
+	if v, ok := d.GetOk("port"); ok {
+		vip.Port = fmt.Sprintf("%d", v.(int))
+	}
+	if v, ok := d.GetOk("delay_loop"); ok {
+		vip.DelayLoop = fmt.Sprintf("%d", v.(int))
+	}
+	if sorry, ok := d.GetOk("sorry_server"); ok {
+		vip.SorryServer = sorry.(string)
+	}
+	if rawServers, ok := d.GetOk("servers"); ok {
+		var servers []*sacloud.LoadBalancerServer
+		for _, v := range rawServers.([]interface{}) {
+			data := &resourceMapValue{v.(map[string]interface{})}
+			server := expandLoadBalancerServer(data)
+			server.Port = vip.Port
+			servers = append(servers, server)
+		}
+		vip.Servers = servers
+	}
+	return vip
+}
+
+func expandLoadBalancerServer(d resourceValueGetable) *sacloud.LoadBalancerServer {
+
+	var server = &sacloud.LoadBalancerServer{}
+	if v, ok := d.GetOk("ipaddress"); ok {
+		server.IPAddress = v.(string)
+	}
+
+	server.Enabled = "True"
+	if v, ok := d.GetOk("enabled"); ok && !v.(bool) {
+		server.Enabled = "False"
+	}
+	server.HealthCheck = &sacloud.LoadBalancerHealthCheck{}
+
+	if v, ok := d.GetOk("check_protocol"); ok {
+		server.HealthCheck.Protocol = v.(string)
+	}
+
+	switch server.HealthCheck.Protocol {
+	case "http", "https":
+		if v, ok := d.GetOk("check_path"); ok {
+			server.HealthCheck.Path = v.(string)
+		}
+		if v, ok := d.GetOk("check_status"); ok {
+			server.HealthCheck.Status = v.(string)
+		}
+	}
+
+	return server
 }

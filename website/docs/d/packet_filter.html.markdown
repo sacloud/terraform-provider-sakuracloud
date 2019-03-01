@@ -13,7 +13,7 @@ Use this data source to retrieve information about a SakuraCloud Packet Filter.
 ## Example Usage
 
 ```hcl
-data sakuracloud_packet_filter "foobar" {
+data "sakuracloud_packet_filter" "foobar" {
   name_selectors = ["foobar"]
 }
 ```

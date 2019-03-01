@@ -3,6 +3,7 @@ package sakuracloud
 import (
 	"errors"
 	"fmt"
+	"os"
 	"testing"
 
 	"github.com/hashicorp/terraform/helper/resource"
@@ -12,7 +13,7 @@ import (
 
 func TestAccSakuraCloudLoadBalancer(t *testing.T) {
 	var loadBalancer sacloud.LoadBalancer
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckSakuraCloudLoadBalancerDestroy,
@@ -31,6 +32,38 @@ func TestAccSakuraCloudLoadBalancer(t *testing.T) {
 					resource.TestCheckResourceAttr("sakuracloud_load_balancer.foobar", "ipaddress2", ""),
 					resource.TestCheckResourceAttr("sakuracloud_load_balancer.foobar", "nw_mask_len", "24"),
 					resource.TestCheckResourceAttr("sakuracloud_load_balancer.foobar", "default_route", "192.168.11.1"),
+					resource.TestCheckResourceAttr(
+						"sakuracloud_load_balancer.foobar", "vips.0.vip", "192.168.11.201"),
+					resource.TestCheckResourceAttr(
+						"sakuracloud_load_balancer.foobar", "vips.0.port", "80"),
+					resource.TestCheckResourceAttr(
+						"sakuracloud_load_balancer.foobar", "vips.0.delay_loop", "10"),
+					resource.TestCheckResourceAttr(
+						"sakuracloud_load_balancer.foobar", "vips.0.sorry_server", "192.168.11.21"),
+					resource.TestCheckResourceAttr(
+						"sakuracloud_load_balancer.foobar", "vips.0.servers.0.ipaddress", "192.168.11.51"),
+					resource.TestCheckResourceAttr(
+						"sakuracloud_load_balancer.foobar", "vips.0.servers.0.check_protocol", "http"),
+					resource.TestCheckResourceAttr(
+						"sakuracloud_load_balancer.foobar", "vips.0.servers.0.check_path", "/ping.html"),
+					resource.TestCheckResourceAttr(
+						"sakuracloud_load_balancer.foobar", "vips.0.servers.0.check_status", "200"),
+					resource.TestCheckResourceAttr(
+						"sakuracloud_load_balancer.foobar", "vips.0.servers.1.ipaddress", "192.168.11.52"),
+					resource.TestCheckResourceAttr(
+						"sakuracloud_load_balancer.foobar", "vips.0.servers.1.check_protocol", "http"),
+					resource.TestCheckResourceAttr(
+						"sakuracloud_load_balancer.foobar", "vips.0.servers.1.check_path", "/ping.html"),
+					resource.TestCheckResourceAttr(
+						"sakuracloud_load_balancer.foobar", "vips.0.servers.1.check_status", "200"),
+					resource.TestCheckResourceAttr(
+						"sakuracloud_load_balancer.foobar", "vips.1.vip", "192.168.11.202"),
+					resource.TestCheckResourceAttr(
+						"sakuracloud_load_balancer.foobar", "vips.1.port", "443"),
+					resource.TestCheckResourceAttr(
+						"sakuracloud_load_balancer.foobar", "vips.1.delay_loop", "20"),
+					resource.TestCheckResourceAttr(
+						"sakuracloud_load_balancer.foobar", "vips.1.sorry_server", "192.168.11.22"),
 					resource.TestCheckResourceAttrPair(
 						"sakuracloud_load_balancer.foobar", "icon_id",
 						"sakuracloud_icon.foobar", "id",
@@ -52,6 +85,30 @@ func TestAccSakuraCloudLoadBalancer(t *testing.T) {
 					resource.TestCheckResourceAttr("sakuracloud_load_balancer.foobar", "nw_mask_len", "24"),
 					resource.TestCheckResourceAttr("sakuracloud_load_balancer.foobar", "default_route", "192.168.11.1"),
 					resource.TestCheckResourceAttr(
+						"sakuracloud_load_balancer.foobar", "vips.0.vip", "192.168.11.201"),
+					resource.TestCheckResourceAttr(
+						"sakuracloud_load_balancer.foobar", "vips.0.port", "8080"),
+					resource.TestCheckResourceAttr(
+						"sakuracloud_load_balancer.foobar", "vips.0.delay_loop", "10"),
+					resource.TestCheckResourceAttr(
+						"sakuracloud_load_balancer.foobar", "vips.0.sorry_server", "192.168.11.21"),
+					resource.TestCheckResourceAttr(
+						"sakuracloud_load_balancer.foobar", "vips.0.servers.0.ipaddress", "192.168.11.51"),
+					resource.TestCheckResourceAttr(
+						"sakuracloud_load_balancer.foobar", "vips.0.servers.0.check_protocol", "ping"),
+					resource.TestCheckResourceAttr(
+						"sakuracloud_load_balancer.foobar", "vips.0.servers.1.ipaddress", "192.168.11.52"),
+					resource.TestCheckResourceAttr(
+						"sakuracloud_load_balancer.foobar", "vips.0.servers.1.check_protocol", "ping"),
+					resource.TestCheckResourceAttr(
+						"sakuracloud_load_balancer.foobar", "vips.1.vip", "192.168.11.202"),
+					resource.TestCheckResourceAttr(
+						"sakuracloud_load_balancer.foobar", "vips.1.port", "6443"),
+					resource.TestCheckResourceAttr(
+						"sakuracloud_load_balancer.foobar", "vips.1.delay_loop", "20"),
+					resource.TestCheckResourceAttr(
+						"sakuracloud_load_balancer.foobar", "vips.1.sorry_server", "192.168.11.22"),
+					resource.TestCheckResourceAttr(
 						"sakuracloud_load_balancer.foobar", "icon_id", ""),
 				),
 			},
@@ -61,7 +118,7 @@ func TestAccSakuraCloudLoadBalancer(t *testing.T) {
 
 func TestAccSakuraCloudLoadBalancer_WithRouter(t *testing.T) {
 	var loadBalancer sacloud.LoadBalancer
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckSakuraCloudLoadBalancerDestroy,
@@ -147,8 +204,7 @@ func TestAccImportSakuraCloudLoadBalancer(t *testing.T) {
 			"tags.0":                    "hoge1",
 			"tags.1":                    "hoge2",
 			"graceful_shutdown_timeout": "60",
-			"vip_ids.0":                 "",
-			"zone":                      "is1b",
+			"zone":                      os.Getenv("SAKURACLOUD_ZONE"),
 		}
 
 		if err := compareStateMulti(s[0], expects); err != nil {
@@ -159,7 +215,7 @@ func TestAccImportSakuraCloudLoadBalancer(t *testing.T) {
 
 	resourceName := "sakuracloud_load_balancer.foobar"
 
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckSakuraCloudLoadBalancerDestroy,
@@ -182,7 +238,7 @@ resource "sakuracloud_switch" "sw" {
     name = "sw"
 }
 resource "sakuracloud_load_balancer" "foobar" {
-    switch_id = "${sakuracloud_switch.sw.id}"
+    switch_id = sakuracloud_switch.sw.id
     vrid = 1
     ipaddress1 = "192.168.11.101"
     nw_mask_len = 24
@@ -192,6 +248,31 @@ resource "sakuracloud_load_balancer" "foobar" {
     description = "description_before"
     tags = ["hoge1" , "hoge2"]
     icon_id = "${sakuracloud_icon.foobar.id}"
+
+    vips {
+      vip = "192.168.11.201"
+      port = 80
+      delay_loop = 10
+      sorry_server = "192.168.11.21"
+      servers {
+        ipaddress      = "192.168.11.51"
+        check_protocol = "http"
+        check_path     = "/ping.html"
+        check_status   = 200
+      }
+      servers {
+        ipaddress = "192.168.11.52"
+        check_protocol = "http"
+        check_path     = "/ping.html"
+        check_status   = 200
+      }
+    }
+    vips {
+      vip = "192.168.11.202"
+      port = 443
+      delay_loop = 20
+      sorry_server = "192.168.11.22"
+    }
 }
 
 resource "sakuracloud_icon" "foobar" {
@@ -205,7 +286,7 @@ resource "sakuracloud_switch" "sw" {
     name = "sw"
 }
 resource "sakuracloud_load_balancer" "foobar" {
-    switch_id = "${sakuracloud_switch.sw.id}"
+    switch_id = sakuracloud_switch.sw.id
     vrid = 1
     ipaddress1 = "192.168.11.101"
     nw_mask_len = 24
@@ -214,6 +295,27 @@ resource "sakuracloud_load_balancer" "foobar" {
     name = "name_after"
     description = "description_after"
     tags = ["hoge1_after" , "hoge2_after"]
+
+    vips {
+      vip = "192.168.11.201"
+      port = 8080
+      delay_loop = 10
+      sorry_server = "192.168.11.21"
+      servers {
+        ipaddress      = "192.168.11.51"
+        check_protocol = "ping"
+      }
+      servers {
+        ipaddress = "192.168.11.52"
+        check_protocol = "ping"
+      }
+    }
+    vips {
+      vip = "192.168.11.202"
+      port = 6443
+      delay_loop = 20
+      sorry_server = "192.168.11.22"
+    }
 }`
 
 const testAccCheckSakuraCloudLoadBalancerConfig_WithRouter = `
@@ -221,14 +323,14 @@ resource "sakuracloud_internet" "router" {
     name = "sw"
 }
 resource "sakuracloud_load_balancer" "foobar" {
-    switch_id = "${sakuracloud_internet.router.switch_id}"
+    switch_id = sakuracloud_internet.router.switch_id
     high_availability = true
     plan = "highspec"
     vrid = 1
-    ipaddress1 = "${sakuracloud_internet.router.ipaddresses.0}"
-    ipaddress2 = "${sakuracloud_internet.router.ipaddresses.1}"
-    nw_mask_len = "${sakuracloud_internet.router.nw_mask_len}"
-    default_route = "${sakuracloud_internet.router.gateway}"
+    ipaddress1 = sakuracloud_internet.router.ipaddresses[0]
+    ipaddress2 = sakuracloud_internet.router.ipaddresses[1]
+    nw_mask_len = sakuracloud_internet.router.nw_mask_len
+    default_route = sakuracloud_internet.router.gateway
 
     name = "name_before"
     description = "description_before"

@@ -5,7 +5,7 @@
 ### 設定例
 
 ```hcl
-data sakuracloud_simple_monitor "mymonitor" {
+data "sakuracloud_simple_monitor" "mymonitor" {
   name_selectors = ["foobar"]
 }
 ```

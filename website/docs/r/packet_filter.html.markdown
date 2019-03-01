@@ -15,23 +15,24 @@ Provides a SakuraCloud Packet Filter resource. This can be used to create, updat
 ```hcl
 # Create a new Packet Filter
 resource "sakuracloud_packet_filter" "foobar" {
-    name        = "foobar"
-    description = "description"
-    
-    expressions = {
-    	protocol    = "tcp"
-    	source_nw   = "0.0.0.0/0"
-    	source_port = "0-65535"
-    	dest_port   = "80"
-    }
-    
-    expressions = {
-    	protocol    = "ip"
-    	source_nw   = "0.0.0.0/0"
-    	allow       = false
-    	description = "deny all"
-    }
+  name        = "foobar"
+  description = "description"
+
+  expressions {
+    protocol    = "tcp"
+    source_nw   = "0.0.0.0/0"
+    source_port = "0-65535"
+    dest_port   = "80"
+  }
+
+  expressions {
+    protocol    = "ip"
+    source_nw   = "0.0.0.0/0"
+    allow       = false
+    description = "deny all"
+  }
 }
+
 ```
 
 ## Argument Reference

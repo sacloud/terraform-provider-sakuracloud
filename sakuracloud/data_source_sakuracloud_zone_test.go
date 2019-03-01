@@ -10,7 +10,7 @@ import (
 )
 
 func TestAccSakuraCloudDataSourceZone_Basic(t *testing.T) {
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:  func() { testAccPreCheck(t) },
 		Providers: testAccProviders,
 		Steps: []resource.TestStep{
@@ -45,4 +45,7 @@ func testAccCheckSakuraCloudZoneDataSourceID(n string) resource.TestCheckFunc {
 	}
 }
 
-var testAccCheckSakuraCloudDataSourceZoneBase = `data "sakuracloud_zone" "foobar" { name = "is1a"}`
+var testAccCheckSakuraCloudDataSourceZoneBase = `
+data "sakuracloud_zone" "foobar" { 
+  name = "is1a"
+}`

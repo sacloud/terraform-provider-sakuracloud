@@ -17,6 +17,7 @@ pages:
       - v1.4での変更点: upgrade_to_v14.md
       - v1.6での変更点: upgrade_to_v16.md
       - v1.7での変更点: upgrade_to_v17.md
+      - v2.0での変更点: upgrade_to_v20.md
     - ブログ/記事/読み物: articles.md
   - 設定リファレンス:
     - 全体/共通項目:
@@ -34,6 +35,7 @@ pages:
       - ブリッジ: configuration/resources/bridge.md
       - ロードバランサ: configuration/resources/load_balancer.md
       - VPCルータ: configuration/resources/vpc_router.md
+      - VPCルータ(子リソース): configuration/resources/vpc_router_old.md
       - データベース: configuration/resources/database.md
       - データベース(リードレプリカ): configuration/resources/database_read_replica.md
       - NFS: configuration/resources/nfs.md

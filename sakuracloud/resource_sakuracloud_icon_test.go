@@ -12,7 +12,7 @@ import (
 
 func TestAccResourceSakuraCloudIcon(t *testing.T) {
 	var icon sacloud.Icon
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckSakuraCloudIconDestroy,
@@ -43,7 +43,7 @@ func TestAccResourceSakuraCloudIcon(t *testing.T) {
 
 func TestAccResourceSakuraCloudIconWithResource(t *testing.T) {
 	var icon sacloud.Icon
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckSakuraCloudIconDestroy,
@@ -135,7 +135,7 @@ func TestAccImportSakuraCloudIcon(t *testing.T) {
 
 	resourceName := "sakuracloud_icon.foobar"
 
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckSakuraCloudIconDestroy,
@@ -179,7 +179,7 @@ resource "sakuracloud_icon" "foobar" {
 
 resource sakuracloud_switch "foobar" {
   name = "mySwitch"
-  icon_id = "${sakuracloud_icon.foobar.id}"
+  icon_id = sakuracloud_icon.foobar.id
 }
 `
 

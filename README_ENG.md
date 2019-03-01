@@ -47,38 +47,35 @@ provider sakuracloud {
   zone = "tk1a" # Tokyo No.1 Zone
 }
 
-# Create a public key on Sakura Cloud
+# Create the public key on Sakura Cloud
 resource "sakuracloud_ssh_key_gen" "key" {
   name = "foobar"
+}
 
-  provisioner "local-exec" {
-    command = "echo \"${self.private_key}\" > id_rsa; chmod 0600 id_rsa"
-  }
-
-  provisioner "local-exec" {
-    when    = "destroy"
-    command = "rm -f id_rsa"
-  }
+# Store the private key to local machine
+resource "local_file" "private_key" {
+  content     = sakuracloud_ssh_key_gen.key.private_key
+  filename = "id_rsa"
 }
 
 # Define the data resource for reference to the ID of the public archive (OS)
-data sakuracloud_archive "centos" {
+data "sakuracloud_archive2 "centos" {
   os_type = "centos"
 }
 
 # Define Disk
 resource "sakuracloud_disk" "disk01" {
   name              = "disk01"
-  source_archive_id = "${data.sakuracloud_archive.centos.id}"
+  source_archive_id = data.sakuracloud_archive.centos.id
 }
 
 # Define Server
 resource "sakuracloud_server" "server01" {
   name  = "server01"
-  disks = ["${sakuracloud_disk.disk01.id}"]
+  disks = [sakuracloud_disk.disk01.id]
   
-  ssh_key_ids       = ["${sakuracloud_ssh_key_gen.key.id}"]
-  password          = "${var.password}"
+  ssh_key_ids       = [sakuracloud_ssh_key_gen.key.id]
+  password          = var.password
   disable_pw_auth   = true
 }
 

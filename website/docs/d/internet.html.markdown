@@ -13,7 +13,7 @@ Use this data source to retrieve information about a SakuraCloud Internet (Switc
 ## Example Usage
 
 ```hcl
-data sakuracloud_internet "foobar" {
+data "sakuracloud_internet" "foobar" {
   name_selectors = ["foobar"]
 }
 ```

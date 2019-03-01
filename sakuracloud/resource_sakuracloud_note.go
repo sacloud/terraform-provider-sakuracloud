@@ -35,7 +35,7 @@ func resourceSakuraCloudNote() *schema.Resource {
 			},
 			"description": {
 				Type:     schema.TypeString,
-				Optional: true,
+				Computed: true,
 			},
 			"class": {
 				Type:     schema.TypeString,
@@ -74,9 +74,6 @@ func resourceSakuraCloudNoteCreate(d *schema.ResourceData, meta interface{}) err
 
 	if iconID, ok := d.GetOk("icon_id"); ok {
 		opts.SetIconByID(toSakuraCloudID(iconID.(string)))
-	}
-	if description, ok := d.GetOk("description"); ok {
-		opts.Description = description.(string)
 	}
 	if rawTags, ok := d.GetOk("tags"); ok {
 		if rawTags != nil {
@@ -135,13 +132,6 @@ func resourceSakuraCloudNoteUpdate(d *schema.ResourceData, meta interface{}) err
 			note.SetIconByID(toSakuraCloudID(iconID.(string)))
 		} else {
 			note.ClearIcon()
-		}
-	}
-	if d.HasChange("description") {
-		if description, ok := d.GetOk("description"); ok {
-			note.Description = description.(string)
-		} else {
-			note.Description = ""
 		}
 	}
 

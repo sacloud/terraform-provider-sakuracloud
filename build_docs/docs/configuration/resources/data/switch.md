@@ -5,7 +5,7 @@
 ### 設定例
 
 ```hcl
-data sakuracloud_switch "myswitch" {
+data "sakuracloud_switch" "myswitch" {
   name_selectors = ["foobar"]
 }
 ```

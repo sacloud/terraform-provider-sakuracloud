@@ -12,7 +12,7 @@ import (
 
 func TestAccResourceSakuraCloudGSLB(t *testing.T) {
 	var gslb sacloud.GSLB
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckSakuraCloudGSLBDestroy,
@@ -31,6 +31,18 @@ func TestAccResourceSakuraCloudGSLB(t *testing.T) {
 						"sakuracloud_gslb.foobar", "health_check.0.delay_loop", "10"),
 					resource.TestCheckResourceAttr(
 						"sakuracloud_gslb.foobar", "health_check.0.host_header", "terraform.io"),
+					resource.TestCheckResourceAttr(
+						"sakuracloud_gslb.foobar", "servers.0.ipaddress", "1.1.1.1"),
+					resource.TestCheckResourceAttr(
+						"sakuracloud_gslb.foobar", "servers.0.weight", "1"),
+					resource.TestCheckResourceAttr(
+						"sakuracloud_gslb.foobar", "servers.0.enabled", "true"),
+					resource.TestCheckResourceAttr(
+						"sakuracloud_gslb.foobar", "servers.1.ipaddress", "2.2.2.2"),
+					resource.TestCheckResourceAttr(
+						"sakuracloud_gslb.foobar", "servers.1.weight", "2"),
+					resource.TestCheckResourceAttr(
+						"sakuracloud_gslb.foobar", "servers.1.enabled", "false"),
 					resource.TestCheckResourceAttrPair(
 						"sakuracloud_gslb.foobar", "icon_id",
 						"sakuracloud_icon.foobar", "id",
@@ -52,6 +64,18 @@ func TestAccResourceSakuraCloudGSLB(t *testing.T) {
 					resource.TestCheckResourceAttr(
 						"sakuracloud_gslb.foobar", "health_check.0.host_header", "update.terraform.io"),
 					resource.TestCheckResourceAttr(
+						"sakuracloud_gslb.foobar", "servers.0.ipaddress", "2.2.2.2"),
+					resource.TestCheckResourceAttr(
+						"sakuracloud_gslb.foobar", "servers.0.weight", "2"),
+					resource.TestCheckResourceAttr(
+						"sakuracloud_gslb.foobar", "servers.0.enabled", "true"),
+					resource.TestCheckResourceAttr(
+						"sakuracloud_gslb.foobar", "servers.1.ipaddress", "3.3.3.3"),
+					resource.TestCheckResourceAttr(
+						"sakuracloud_gslb.foobar", "servers.1.weight", "3"),
+					resource.TestCheckResourceAttr(
+						"sakuracloud_gslb.foobar", "servers.1.enabled", "false"),
+					resource.TestCheckResourceAttr(
 						"sakuracloud_gslb.foobar", "icon_id", ""),
 				),
 			},
@@ -69,6 +93,20 @@ func TestAccResourceSakuraCloudGSLB(t *testing.T) {
 						"sakuracloud_gslb.foobar", "health_check.0.delay_loop", "20"),
 					resource.TestCheckResourceAttr(
 						"sakuracloud_gslb.foobar", "health_check.0.host_header", "update.terraform.io"),
+
+					// gslb.servers is set compted=true, so left following values
+					resource.TestCheckResourceAttr(
+						"sakuracloud_gslb.foobar", "servers.0.ipaddress", "2.2.2.2"),
+					resource.TestCheckResourceAttr(
+						"sakuracloud_gslb.foobar", "servers.0.weight", "2"),
+					resource.TestCheckResourceAttr(
+						"sakuracloud_gslb.foobar", "servers.0.enabled", "true"),
+					resource.TestCheckResourceAttr(
+						"sakuracloud_gslb.foobar", "servers.1.ipaddress", "3.3.3.3"),
+					resource.TestCheckResourceAttr(
+						"sakuracloud_gslb.foobar", "servers.1.weight", "3"),
+					resource.TestCheckResourceAttr(
+						"sakuracloud_gslb.foobar", "servers.1.enabled", "false"),
 				),
 			},
 		},
@@ -150,7 +188,7 @@ func TestAccImportSakuraCloudGSLB(t *testing.T) {
 
 	resourceName := "sakuracloud_gslb.foobar"
 
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckSakuraCloudGSLBDestroy,
@@ -171,7 +209,7 @@ func TestAccImportSakuraCloudGSLB(t *testing.T) {
 var testAccCheckSakuraCloudGSLBConfig_basic = `
 resource "sakuracloud_gslb" "foobar" {
     name = "terraform.io"
-    health_check = {
+    health_check {
         protocol = "http"
         delay_loop = 10
         host_header = "terraform.io"
@@ -179,9 +217,19 @@ resource "sakuracloud_gslb" "foobar" {
         status = "200"
     }
     sorry_server = "8.8.8.8"
+    servers {
+        ipaddress = "1.1.1.1"
+        weight    = 1
+        enabled   = true
+    }
+    servers {
+        ipaddress = "2.2.2.2"
+        weight    = 2
+        enabled   = false
+    }
     description = "GSLB from TerraForm for SAKURA CLOUD"
     tags = ["hoge1", "hoge2"]
-    icon_id = "${sakuracloud_icon.foobar.id}"
+    icon_id = sakuracloud_icon.foobar.id
 }
 
 resource "sakuracloud_icon" "foobar" {
@@ -193,12 +241,22 @@ resource "sakuracloud_icon" "foobar" {
 var testAccCheckSakuraCloudGSLBConfig_update = `
 resource "sakuracloud_gslb" "foobar" {
     name = "terraform.io"
-    health_check = {
+    health_check {
         protocol = "https"
         delay_loop = 20
         host_header = "update.terraform.io"
         path = "/"
         status = "200"
+    }
+    servers {
+        ipaddress = "2.2.2.2"
+        weight    = 2
+        enabled   = true
+    }
+    servers {
+        ipaddress = "3.3.3.3"
+        weight    = 3
+        enabled   = false
     }
     sorry_server = "8.8.4.4"
     description = "GSLB from TerraForm for SAKURA CLOUD"
@@ -208,7 +266,7 @@ resource "sakuracloud_gslb" "foobar" {
 var testAccCheckSakuraCloudGSLBConfig_added = `
 resource "sakuracloud_gslb" "foobar" {
     name = "terraform.io"
-    health_check = {
+    health_check {
         protocol = "https"
         delay_loop = 20
         host_header = "update.terraform.io"

@@ -162,7 +162,7 @@ func mgwStaticRouteIDHash(mgwID string, s *sacloud.MGWStaticRoute) string {
 	return fmt.Sprintf("%d", hashcode.String(buf.String()))
 }
 
-func expandMobileGatewayStaticRoute(d *schema.ResourceData) *sacloud.MGWStaticRoute {
+func expandMobileGatewayStaticRoute(d resourceValueGetable) *sacloud.MGWStaticRoute {
 
 	var staticRoute = &sacloud.MGWStaticRoute{
 		Prefix:  d.Get("prefix").(string),

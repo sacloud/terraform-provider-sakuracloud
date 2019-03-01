@@ -8,7 +8,6 @@ import (
 
 	"github.com/hashicorp/terraform/helper/hashcode"
 	"github.com/hashicorp/terraform/helper/schema"
-	"github.com/hashicorp/terraform/helper/validation"
 	"github.com/sacloud/libsacloud/api"
 )
 
@@ -17,55 +16,7 @@ func resourceSakuraCloudVPCRouterInterface() *schema.Resource {
 		Create: resourceSakuraCloudVPCRouterInterfaceCreate,
 		Read:   resourceSakuraCloudVPCRouterInterfaceRead,
 		Delete: resourceSakuraCloudVPCRouterInterfaceDelete,
-
-		Schema: map[string]*schema.Schema{
-			"vpc_router_id": {
-				Type:         schema.TypeString,
-				Required:     true,
-				ForceNew:     true,
-				ValidateFunc: validateSakuracloudIDType,
-			},
-			"index": {
-				Type:         schema.TypeInt,
-				Required:     true,
-				ForceNew:     true,
-				ValidateFunc: validation.IntBetween(1, 7),
-			},
-			"switch_id": {
-				Type:         schema.TypeString,
-				Required:     true,
-				ForceNew:     true,
-				ValidateFunc: validateSakuracloudIDType,
-			},
-			"vip": {
-				Type:     schema.TypeString,
-				ForceNew: true,
-				Optional: true,
-				Default:  "",
-			},
-			"ipaddress": {
-				Type:     schema.TypeList,
-				ForceNew: true,
-				Required: true,
-				Elem:     &schema.Schema{Type: schema.TypeString},
-				MaxItems: 2,
-			},
-			"nw_mask_len": {
-				Type:         schema.TypeInt,
-				ForceNew:     true,
-				Required:     true,
-				ValidateFunc: validation.IntBetween(16, 28),
-			},
-			powerManageTimeoutKey: powerManageTimeoutParamForceNew,
-			"zone": {
-				Type:         schema.TypeString,
-				Optional:     true,
-				Computed:     true,
-				ForceNew:     true,
-				Description:  "target SakuraCloud zone",
-				ValidateFunc: validateZone([]string{"is1a", "is1b", "tk1a", "tk1v"}),
-			},
-		},
+		Schema: vpcRouterInterfaceSchema(),
 	}
 }
 

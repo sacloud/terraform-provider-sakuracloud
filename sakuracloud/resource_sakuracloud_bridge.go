@@ -17,7 +17,6 @@ func resourceSakuraCloudBridge() *schema.Resource {
 		Importer: &schema.ResourceImporter{
 			State: schema.ImportStatePassthrough,
 		},
-
 		Schema: map[string]*schema.Schema{
 			"name": {
 				Type:     schema.TypeString,
@@ -31,8 +30,6 @@ func resourceSakuraCloudBridge() *schema.Resource {
 				Type:     schema.TypeList,
 				Computed: true,
 				Elem:     &schema.Schema{Type: schema.TypeString},
-				// ! Current terraform(v0.7) is not support to array validation !
-				// ValidateFunc: validateSakuracloudIDArrayType,
 			},
 			"zone": {
 				Type:         schema.TypeString,
@@ -118,7 +115,13 @@ func resourceSakuraCloudBridgeDelete(d *schema.ResourceData, meta interface{}) e
 	if br.Info != nil && br.Info.Switches != nil && len(br.Info.Switches) > 0 {
 		for _, s := range br.Info.Switches {
 			switchID, _ := s.ID.Int64()
-			_, err = client.Switch.DisconnectFromBridge(switchID)
+			strSwitchID := s.ID.String()
+			sakuraMutexKV.Lock(strSwitchID)
+			defer sakuraMutexKV.Unlock(strSwitchID)
+
+			if _, err := client.Switch.Read(switchID); err == nil {
+				_, err = client.Switch.DisconnectFromBridge(switchID)
+			}
 		}
 		if err != nil {
 			return fmt.Errorf("Error disconnecting Bridge resource: %s", err)
@@ -136,17 +139,21 @@ func setBridgeResourceData(d *schema.ResourceData, client *APIClient, data *sacl
 	d.Set("name", data.Name)
 	d.Set("description", data.Description)
 
+	var switchIDs []interface{}
 	if data.Info != nil && data.Info.Switches != nil && len(data.Info.Switches) > 0 {
 
-		var ids []string
 		for _, d := range data.Info.Switches {
-			ids = append(ids, d.ID.String())
-		}
+			swID := d.ID.String()
+			sakuraMutexKV.Lock(swID)
+			defer sakuraMutexKV.Unlock(swID)
 
-		d.Set("switch_ids", ids)
-	} else {
-		d.Set("switch_ids", []string{})
+			id, _ := d.ID.Int64()
+			if _, err := client.Switch.Read(id); err == nil {
+				switchIDs = append(switchIDs, d.ID.String())
+			}
+		}
 	}
+	d.Set("switch_ids", switchIDs)
 
 	d.Set("zone", client.Zone)
 	return nil

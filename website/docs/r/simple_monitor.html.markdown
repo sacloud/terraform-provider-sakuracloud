@@ -14,33 +14,34 @@ Provides a SakuraCloud Simple Monitor resource. This can be used to create, upda
 
 ```hcl
 # Create a new Simple Monitor(protocol: https)
-resource sakuracloud_simple_monitor "foobar" {
-  target       = "www.example.com"
-  health_check = {
+resource "sakuracloud_simple_monitor" "foobar" {
+  target = "www.example.com"
+  health_check {
     protocol    = "https"
     delay_loop  = 60
     path        = "/"
     status      = "200"
     host_header = "hostname.example.com"
     sni         = true
-    # for Basic Auth
-    # username = "foo"
-    # password = "bar"
   }
-    
+
+  # for Basic Auth
+  # username = "foo"
+  # password = "bar"
+
   notify_email_enabled = true
   notify_email_html    = true
   notify_slack_enabled = true
   notify_slack_webhook = "https://hooks.slack.com/services/XXX/XXX/XXXXXX"
-  
+
   description = "description"
   tags        = ["foo", "bar"]
 }
 
 # Create a new Simple Monitor(protocol: sslcertificate)
-resource sakuracloud_simple_monitor "cert" {
+resource "sakuracloud_simple_monitor" "cert" {
   target = "www.example.com"
-  health_check = {
+  health_check {
     protocol       = "sslcertificate"
     remaining_days = 30
   }

@@ -7,7 +7,6 @@ import (
 
 	"github.com/hashicorp/terraform/helper/hashcode"
 	"github.com/hashicorp/terraform/helper/schema"
-	"github.com/hashicorp/terraform/helper/validation"
 	"github.com/sacloud/libsacloud/api"
 	"github.com/sacloud/libsacloud/sacloud"
 )
@@ -17,89 +16,7 @@ func resourceSakuraCloudVPCRouterFirewall() *schema.Resource {
 		Create: resourceSakuraCloudVPCRouterFirewallCreate,
 		Read:   resourceSakuraCloudVPCRouterFirewallRead,
 		Delete: resourceSakuraCloudVPCRouterFirewallDelete,
-		Schema: map[string]*schema.Schema{
-			"vpc_router_id": {
-				Type:         schema.TypeString,
-				Required:     true,
-				ForceNew:     true,
-				ValidateFunc: validateSakuracloudIDType,
-			},
-			"vpc_router_interface_index": {
-				Type:         schema.TypeInt,
-				Optional:     true,
-				Default:      0,
-				ForceNew:     true,
-				ValidateFunc: validation.IntBetween(0, sacloud.VPCRouterMaxInterfaceCount-1),
-			},
-			"direction": {
-				Type:         schema.TypeString,
-				Required:     true,
-				ForceNew:     true,
-				ValidateFunc: validation.StringInSlice([]string{"send", "receive"}, false),
-			},
-			"expressions": {
-				Type:     schema.TypeList,
-				Required: true,
-				ForceNew: true,
-				Elem: &schema.Resource{
-					Schema: map[string]*schema.Schema{
-
-						"protocol": {
-							Type:         schema.TypeString,
-							Required:     true,
-							ForceNew:     true,
-							ValidateFunc: validation.StringInSlice([]string{"tcp", "udp", "icmp", "ip"}, false),
-						},
-						"source_nw": {
-							Type:     schema.TypeString,
-							Required: true,
-							ForceNew: true,
-						},
-						"source_port": {
-							Type:     schema.TypeString,
-							Required: true,
-							ForceNew: true,
-						},
-						"dest_nw": {
-							Type:     schema.TypeString,
-							Required: true,
-							ForceNew: true,
-						},
-						"dest_port": {
-							Type:     schema.TypeString,
-							Required: true,
-							ForceNew: true,
-						},
-						"allow": {
-							Type:     schema.TypeBool,
-							Required: true,
-							ForceNew: true,
-						},
-						"logging": {
-							Type:     schema.TypeBool,
-							Optional: true,
-							ForceNew: true,
-						},
-						"description": {
-							Type:         schema.TypeString,
-							Optional:     true,
-							Default:      "",
-							ForceNew:     true,
-							ValidateFunc: validation.StringLenBetween(0, 512),
-						},
-					},
-				},
-			},
-
-			"zone": {
-				Type:         schema.TypeString,
-				Optional:     true,
-				Computed:     true,
-				ForceNew:     true,
-				Description:  "target SakuraCloud zone",
-				ValidateFunc: validateZone([]string{"is1a", "is1b", "tk1a", "tk1v"}),
-			},
-		},
+		Schema: vpcRouterFirewallSchema(),
 	}
 }
 

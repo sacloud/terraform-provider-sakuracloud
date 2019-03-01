@@ -15,7 +15,7 @@ func TestAccSakuraCloudDataSourceLoadBalancer_Basic(t *testing.T) {
 	randString2 := acctest.RandStringFromCharSet(20, acctest.CharSetAlpha)
 	name := fmt.Sprintf("%s_%s", randString1, randString2)
 
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:                  func() { testAccPreCheck(t) },
 		Providers:                 testAccProviders,
 		PreventPostDestroyRefresh: true,
@@ -104,8 +104,8 @@ func testAccCheckSakuraCloudLoadBalancerDataSourceID(n string) resource.TestChec
 
 func testAccCheckSakuraCloudLoadBalancerDataSourceNotExists(n string) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
-		_, ok := s.RootModule().Resources[n]
-		if ok {
+		v, ok := s.RootModule().Resources[n]
+		if ok && v.Primary.ID != "" {
 			return fmt.Errorf("Found LoadBalancer data source: %s", n)
 		}
 		return nil
@@ -169,7 +169,7 @@ resource "sakuracloud_load_balancer" "foobar" {
     tags = ["tag1","tag2","tag3"]
 }
 data "sakuracloud_load_balancer" "foobar" {
-    filter = {
+    filter {
 	name = "Name"
 	values = ["%s"]
     }
@@ -193,7 +193,7 @@ resource "sakuracloud_load_balancer" "foobar" {
     tags = ["tag1","tag2","tag3"]
 }
 data "sakuracloud_load_balancer" "foobar" {
-    filter = {
+    filter {
 	name = "Tags"
 	values = ["tag1","tag3"]
     }
@@ -217,7 +217,7 @@ resource "sakuracloud_load_balancer" "foobar" {
     tags = ["tag1","tag2","tag3"]
 }
 data "sakuracloud_load_balancer" "foobar" {
-    filter = {
+    filter {
 	name = "Tags"
 	values = ["tag1-xxxxxxx","tag3-xxxxxxxx"]
     }
@@ -241,7 +241,7 @@ resource "sakuracloud_load_balancer" "foobar" {
     tags = ["tag1","tag2","tag3"]
 }
 data "sakuracloud_load_balancer" "foobar" {
-    filter = {
+    filter {
 	name = "Name"
 	values = ["xxxxxxxxxxxxxxxxxx"]
     }

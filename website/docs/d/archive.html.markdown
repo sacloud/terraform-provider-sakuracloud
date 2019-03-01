@@ -15,7 +15,7 @@ Use this data source to retrieve information about a SakuraCloud Archive.
 ### Using `os_type` parameter
 
 ```hcl
-data sakuracloud_archive "centos" {
+data "sakuracloud_archive" "centos" {
   os_type = "centos"
 }
 ```
@@ -23,7 +23,7 @@ data sakuracloud_archive "centos" {
 ### Using filter parameters
 
 ```hcl
-data sakuracloud_archive "ubuntu" {
+data "sakuracloud_archive" "ubuntu" {
   name_selectors = ["Ubuntu", "LTS"]
   tag_selectors  = ["current-stable", "os-linux"]
 }

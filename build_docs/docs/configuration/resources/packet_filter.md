@@ -5,10 +5,10 @@
 ### 設定例
 
 ```hcl
-resource sakuracloud_packet_filter "myfilter" {
+resource "sakuracloud_packet_filter" "myfilter" {
   name = "myfilter"
 
-  expressions = {
+  expressions {
     protocol    = "tcp"
     source_nw   = "192.168.2.0/24"
     source_port = "0-65535"
@@ -16,7 +16,7 @@ resource sakuracloud_packet_filter "myfilter" {
     allow       = true
   }
 
-  expressions = {
+  expressions {
     protocol    = "ip"
     source_nw   = "0.0.0.0/0"
     allow       = false

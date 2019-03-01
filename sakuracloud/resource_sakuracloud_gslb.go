@@ -2,6 +2,7 @@ package sakuracloud
 
 import (
 	"fmt"
+	"strconv"
 	"strings"
 
 	"github.com/hashicorp/terraform/helper/schema"
@@ -76,6 +77,15 @@ func resourceSakuraCloudGSLB() *schema.Resource {
 				Type:     schema.TypeString,
 				Optional: true,
 			},
+			"servers": {
+				Type:     schema.TypeList,
+				Optional: true,
+				Computed: true,
+				MaxItems: 6,
+				Elem: &schema.Resource{
+					Schema: gslbServerValueSchemas(),
+				},
+			},
 			"icon_id": {
 				Type:         schema.TypeString,
 				Optional:     true,
@@ -91,6 +101,26 @@ func resourceSakuraCloudGSLB() *schema.Resource {
 				Computed: true,
 				Elem:     &schema.Schema{Type: schema.TypeString},
 			},
+		},
+	}
+}
+
+func gslbServerValueSchemas() map[string]*schema.Schema {
+	return map[string]*schema.Schema{
+		"ipaddress": {
+			Type:     schema.TypeString,
+			Required: true,
+		},
+		"enabled": {
+			Type:     schema.TypeBool,
+			Optional: true,
+			Default:  true,
+		},
+		"weight": {
+			Type:         schema.TypeInt,
+			Optional:     true,
+			ValidateFunc: validation.IntBetween(1, 10000),
+			Default:      1,
 		},
 	}
 }
@@ -142,6 +172,12 @@ func resourceSakuraCloudGSLBCreate(d *schema.ResourceData, meta interface{}) err
 	rawTags := d.Get("tags").([]interface{})
 	if rawTags != nil {
 		opts.Tags = expandTags(client, rawTags)
+	}
+
+	for _, s := range d.Get("servers").([]interface{}) {
+		v := s.(map[string]interface{})
+		server := expandGSLBServer(&resourceMapValue{value: v})
+		opts.AddGSLBServer(server)
 	}
 
 	gslb, err := client.GSLB.Create(opts)
@@ -240,6 +276,16 @@ func resourceSakuraCloudGSLBUpdate(d *schema.ResourceData, meta interface{}) err
 		}
 	}
 
+	if d.HasChange("servers") {
+		gslb.ClearGSLBServer()
+
+		for _, s := range d.Get("servers").([]interface{}) {
+			v := s.(map[string]interface{})
+			server := expandGSLBServer(&resourceMapValue{value: v})
+			gslb.AddGSLBServer(server)
+		}
+	}
+
 	gslb, err = client.GSLB.Update(gslb.ID, gslb)
 	if err != nil {
 		return fmt.Errorf("Failed to create SakuraCloud GSLB resource: %s", err)
@@ -279,6 +325,17 @@ func setGSLBResourceData(d *schema.ResourceData, client *APIClient, data *saclou
 	healthCheck["protocol"] = data.Settings.GSLB.HealthCheck.Protocol
 	healthCheck["delay_loop"] = data.Settings.GSLB.DelayLoop
 	d.Set("health_check", []interface{}{healthCheck})
+
+	var servers []interface{}
+	for _, server := range data.Settings.GSLB.Servers {
+		v := map[string]interface{}{}
+		v["ipaddress"] = server.IPAddress
+		v["enabled"] = strings.ToLower(server.Enabled) == "true"
+		weight, _ := strconv.Atoi(server.Weight)
+		v["weight"] = weight
+		servers = append(servers, v)
+	}
+	d.Set("servers", servers)
 
 	d.Set("sorry_server", data.Settings.GSLB.SorryServer)
 	d.Set("icon_id", data.GetIconStrID())

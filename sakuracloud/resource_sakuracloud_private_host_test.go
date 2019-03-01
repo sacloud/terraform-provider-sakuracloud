@@ -13,7 +13,7 @@ import (
 
 func TestAccResourceSakuraCloudPrivateHost(t *testing.T) {
 	var private_host sacloud.PrivateHost
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckSakuraCloudPrivateHostDestroy,
@@ -64,7 +64,7 @@ func TestAccResourceSakuraCloudPrivateHost(t *testing.T) {
 
 func TestAccResourceSakuraCloudPrivateHost_DestroyWithRunningServers(t *testing.T) {
 	var private_host sacloud.PrivateHost
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckSakuraCloudPrivateHostDestroy,
@@ -143,7 +143,7 @@ func testAccCheckSakuraCloudPrivateHostDestroy(s *terraform.State) error {
 var testAccCheckSakuraCloudPrivateHostConfig_Basic = `
 resource "sakuracloud_server" "foobar" {
     name = "myserver"
-    private_host_id = "${sakuracloud_private_host.foobar.id}"
+    private_host_id = sakuracloud_private_host.foobar.id
     graceful_shutdown_timeout = 5
     zone = "tk1a"
 }
@@ -154,7 +154,7 @@ resource "sakuracloud_private_host" "foobar" {
     zone = "tk1a"
 
     graceful_shutdown_timeout = 5
-    icon_id = "${sakuracloud_icon.foobar.id}"
+    icon_id = sakuracloud_icon.foobar.id
 }
 
 resource "sakuracloud_icon" "foobar" {
@@ -175,7 +175,7 @@ resource "sakuracloud_private_host" "foobar" {
 var testAccCheckSakuraCloudPrivateHostConfig_Destroy_Basic = `
 resource "sakuracloud_server" "foobar" {
     name = "myserver"
-    private_host_id = "${sakuracloud_private_host.foobar.id}"
+    private_host_id = sakuracloud_private_host.foobar.id
     zone = "tk1a"
     graceful_shutdown_timeout = 5
 }

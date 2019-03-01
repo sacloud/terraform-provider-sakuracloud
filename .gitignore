@@ -1,3 +1,4 @@
+go.sum
 .mailmap
 .env
 bin/terraform-provider-sakuracloud*
@@ -9,3 +10,4 @@ build_docs/site
 terraform-for-sakuracloud-docker
 releases-terraform
 website_preview/
+vendor/

@@ -4,9 +4,9 @@ import (
 	"bytes"
 	"fmt"
 	"strconv"
+	"strings"
 
 	"github.com/hashicorp/terraform/helper/schema"
-	"github.com/hashicorp/terraform/helper/validation"
 	"github.com/sacloud/libsacloud/api"
 	"github.com/sacloud/libsacloud/sacloud"
 )
@@ -17,53 +17,31 @@ func resourceSakuraCloudLoadBalancerVIP() *schema.Resource {
 		Read:   resourceSakuraCloudLoadBalancerVIPRead,
 		Delete: resourceSakuraCloudLoadBalancerVIPDelete,
 		Update: resourceSakuraCloudLoadBalancerVIPUpdate,
-		Schema: map[string]*schema.Schema{
-			"load_balancer_id": {
-				Type:         schema.TypeString,
-				Required:     true,
-				ForceNew:     true,
-				ValidateFunc: validateSakuracloudIDType,
-			},
-			"vip": {
-				Type:     schema.TypeString,
-				ForceNew: true,
-				Required: true,
-			},
-			"port": {
-				Type:         schema.TypeInt,
-				Required:     true,
-				ForceNew:     true,
-				ValidateFunc: validation.IntBetween(1, 65535),
-			},
-			"delay_loop": {
-				Type:         schema.TypeInt,
-				Optional:     true,
-				ValidateFunc: validation.IntBetween(10, 2147483647),
-				Default:      10,
-			},
-			"sorry_server": {
-				Type:     schema.TypeString,
-				Optional: true,
-			},
-			"description": {
-				Type:     schema.TypeString,
-				Optional: true,
-			},
-			"zone": {
-				Type:         schema.TypeString,
-				Optional:     true,
-				Computed:     true,
-				ForceNew:     true,
-				Description:  "target SakuraCloud zone",
-				ValidateFunc: validateZone([]string{"is1a", "is1b", "tk1a", "tk1v"}),
-			},
-			"servers": {
-				Type:     schema.TypeList,
-				Computed: true,
-				Elem:     &schema.Schema{Type: schema.TypeString},
-			},
-		},
+		Schema: loadBalancerVIPSchema(),
 	}
+}
+
+func loadBalancerVIPSchema() map[string]*schema.Schema {
+	s := mergeSchemas(map[string]*schema.Schema{
+		"load_balancer_id": {
+			Type:         schema.TypeString,
+			Required:     true,
+			ForceNew:     true,
+			ValidateFunc: validateSakuracloudIDType,
+		},
+		"zone": {
+			Type:         schema.TypeString,
+			Optional:     true,
+			Computed:     true,
+			ForceNew:     true,
+			Description:  "target SakuraCloud zone",
+			ValidateFunc: validateZone([]string{"is1a", "is1b", "tk1a", "tk1v"}),
+		},
+	}, loadBalancerVIPValueSchema())
+
+	s["vip"].ForceNew = true
+	s["port"].ForceNew = true
+	return s
 }
 
 func resourceSakuraCloudLoadBalancerVIPCreate(d *schema.ResourceData, meta interface{}) error {
@@ -120,7 +98,18 @@ func resourceSakuraCloudLoadBalancerVIPRead(d *schema.ResourceData, meta interfa
 	d.Set("vip", matchedSetting.VirtualIPAddress)
 	port, _ := strconv.Atoi(matchedSetting.Port)
 	d.Set("port", port)
-	d.Set("servers", expandLoadBalancerServersFromVIP(loadBalancer.GetStrID(), matchedSetting))
+
+	var servers []map[string]interface{}
+	for _, s := range matchedSetting.Servers {
+		servers = append(servers, map[string]interface{}{
+			"ipaddress":      s.IPAddress,
+			"check_protocol": s.HealthCheck.Protocol,
+			"check_path":     s.HealthCheck.Path,
+			"check_status":   s.HealthCheck.Status,
+			"enabled":        strings.ToLower(s.Enabled) == "true",
+		})
+	}
+	d.Set("servers", servers)
 
 	delayLoop, _ := strconv.Atoi(matchedSetting.DelayLoop)
 	d.Set("delay_loop", delayLoop)
@@ -218,22 +207,11 @@ func loadBalancerVIPIDHash(loadBalancerID string, s *sacloud.LoadBalancerSetting
 	return buf.String()
 }
 
-func expandLoadBalancerVIP(d *schema.ResourceData) *sacloud.LoadBalancerSetting {
-	var vip = &sacloud.LoadBalancerSetting{}
-	vip.VirtualIPAddress = d.Get("vip").(string)
-	vip.Port = fmt.Sprintf("%d", d.Get("port").(int))
-	vip.DelayLoop = fmt.Sprintf("%d", d.Get("delay_loop").(int))
-	if sorry, ok := d.GetOk("sorry_server"); ok {
-		vip.SorryServer = sorry.(string)
-	}
-	return vip
-}
-
 func expandLoadBalancerServersFromVIP(lbID string, vipSetting *sacloud.LoadBalancerSetting) []string {
+	var ids []string
 	if vipSetting.Servers == nil || len(vipSetting.Servers) == 0 {
-		return nil
+		return ids
 	}
-	ids := []string{}
 	for _, s := range vipSetting.Servers {
 		ids = append(ids, loadBalancerServerIDHash(loadBalancerVIPIDHash(lbID, vipSetting), s))
 	}

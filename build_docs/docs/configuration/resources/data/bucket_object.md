@@ -5,7 +5,7 @@
 ### 設定例
 
 ```hcl
-data sakuracloud_bucket_object "foobar" {
+data "sakuracloud_bucket_object" "foobar" {
   #アクセスキー(環境変数SACLOUD_OJS_ACCESS_KEY_ID、またはAWS_ACCESS_KEY_IDでも指定可能)  
   #access_key = ""
 

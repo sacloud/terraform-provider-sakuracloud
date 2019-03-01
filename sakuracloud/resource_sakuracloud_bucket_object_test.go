@@ -20,7 +20,7 @@ func TestAccResourceSakuraCloudBucketObject(t *testing.T) {
 	key := fmt.Sprintf("%s/%s/%s.txt", randString1, randString2, randString3)
 	bucket := os.Getenv("SACLOUD_OJS_ACCESS_KEY_ID")
 
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckSakuraCloudBucketObjectDestroy,

@@ -15,21 +15,21 @@ Provides a SakuraCloud LoadBalancer VIP resource. This can be used to create, up
 ```hcl
 # Create a new LoadBalancer
 resource "sakuracloud_load_balancer" "foobar" {
-    name          = "foobar"
-    switch_id     = "${sakuracloud_switch.sw.id}"
-    vrid          = 1
-    ipaddress1    = "192.168.2.1"
-    nw_mask_len   = 24
+  name        = "foobar"
+  switch_id   = sakuracloud_switch.sw.id
+  vrid        = 1
+  ipaddress1  = "192.168.2.1"
+  nw_mask_len = 24
 }
 
 # Create a new LoadBalancer VIP
 resource "sakuracloud_load_balancer_vip" "vip1" {
-    load_balancer_id = "${sakuracloud_load_balancer.foobar.id}"
-    vip              = "192.168.2.101"
-    port             = 80
-    delay_loop       = 50
-    sorry_server     = "192.168.2.201"
-    description      = "description"
+  load_balancer_id = sakuracloud_load_balancer.foobar.id
+  vip              = "192.168.2.101"
+  port             = 80
+  delay_loop       = 50
+  sorry_server     = "192.168.2.201"
+  description      = "description"
 }
 ```
 

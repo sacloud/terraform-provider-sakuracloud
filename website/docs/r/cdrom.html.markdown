@@ -14,17 +14,21 @@ Provides a SakuraCloud CDROM (ISO-Image) resource. This can be used to create, u
 
 ```hcl
 # Create a new CDROM(ISO-Image)
-resource sakuracloud_cdrom "foobar" {
+resource "sakuracloud_cdrom" "foobar" {
   name           = "foobar"
   size           = 5
+ 
   iso_image_file = "your/cdrom/file.iso"
-  hash           = "${md5(file("your/cdrom/file.iso"))}"
+  hash           = md5(file("your/cdrom/file.iso"))
+  
   # or
   # content      = "your-content" 
+  
   # or
-  # content_file_path = "${file("your/cdrom/content.json")}" 
-  description  = "description"
-  tags         = ["foo", "bar"]
+  # content_file_path = file("your/cdrom/content.json")
+  
+  description = "description"
+  tags        = ["foo", "bar"]
 }
 ```
 

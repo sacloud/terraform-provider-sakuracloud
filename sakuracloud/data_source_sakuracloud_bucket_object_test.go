@@ -17,7 +17,7 @@ func TestAccSakuraCloudBucketObjectDataSource_Basic(t *testing.T) {
 	key := fmt.Sprintf("%s/%s/%s.txt", randString1, randString2, randString3)
 	bucket := os.Getenv("SACLOUD_OJS_ACCESS_KEY_ID")
 
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:                  func() { testAccPreCheck(t) },
 		Providers:                 testAccProviders,
 		PreventPostDestroyRefresh: true,
@@ -70,8 +70,8 @@ resource "sakuracloud_bucket_object" "foobar" {
 }
 
 data "sakuracloud_bucket_object" "foobar" {
-  bucket = "${sakuracloud_bucket_object.foobar.bucket}"
-  key    = "${sakuracloud_bucket_object.foobar.key}"
+  bucket = sakuracloud_bucket_object.foobar.bucket
+  key    = sakuracloud_bucket_object.foobar.key
 }
 `, bucket, key)
 }

@@ -3,6 +3,7 @@ package sakuracloud
 import (
 	"errors"
 	"fmt"
+	"os"
 	"testing"
 
 	"github.com/hashicorp/terraform/helper/resource"
@@ -12,7 +13,7 @@ import (
 
 func TestAccResourceSakuraCloudDisk(t *testing.T) {
 	var disk sacloud.Disk
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckSakuraCloudDiskDestroy,
@@ -128,16 +129,16 @@ func TestAccImportSakuraCloudDisk(t *testing.T) {
 			return fmt.Errorf("expected 1 state: %#v", s)
 		}
 		expects := map[string]string{
-			"name":           "mydisk",
-			"plan":           "ssd",
-			"connector":      "virtio",
-			"size":           "20",
-			"source_disk_id": "",
-			"server_id":      "",
-			"description":    "Disk from TerraForm for SAKURA CLOUD",
-			"tags.0":         "hoge1",
-			"tags.1":         "hoge2",
-			"zone":           "is1b",
+			"name":                      "mydisk",
+			"plan":                      "ssd",
+			"connector":                 "virtio",
+			"size":                      "20",
+			"source_disk_id":            "",
+			"server_id":                 "",
+			"description":               "Disk from TerraForm for SAKURA CLOUD",
+			"tags.0":                    "hoge1",
+			"tags.1":                    "hoge2",
+			"zone":                      os.Getenv("SAKURACLOUD_ZONE"),
 			"graceful_shutdown_timeout": "60",
 		}
 
@@ -149,7 +150,7 @@ func TestAccImportSakuraCloudDisk(t *testing.T) {
 
 	resourceName := "sakuracloud_disk.foobar"
 
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckSakuraCloudDiskDestroy,
@@ -177,7 +178,7 @@ func TestAccImportSakuraCloudDisk(t *testing.T) {
 
 var testAccCheckSakuraCloudDiskConfig_basic = `
 data "sakuracloud_archive" "ubuntu" {
-    filter = {
+    filter {
 	name = "Name"
 	values = ["Ubuntu Server 16"]
     }
@@ -188,11 +189,11 @@ resource "sakuracloud_disk" "foobar" {
     connector = "virtio"
     size = 20
     distant_from = ["111111111111"]
-    source_archive_id = "${data.sakuracloud_archive.ubuntu.id}"
+    source_archive_id = data.sakuracloud_archive.ubuntu.id
     description = "Disk from TerraForm for SAKURA CLOUD"
     tags = ["hoge1" , "hoge2"]
     hostname = "aaaa"
-    icon_id = "${sakuracloud_icon.foobar.id}"
+    icon_id = sakuracloud_icon.foobar.id
 }
 
 resource "sakuracloud_icon" "foobar" {
@@ -203,7 +204,7 @@ resource "sakuracloud_icon" "foobar" {
 
 var testAccCheckSakuraCloudDiskConfig_update = `
 data "sakuracloud_archive" "ubuntu" {
-    filter = {
+    filter {
 	name = "Name"
 	values = ["Ubuntu Server 16"]
     }
@@ -214,7 +215,7 @@ resource "sakuracloud_disk" "foobar" {
     connector = "virtio"
     size = 20
     distant_from = ["111111111111"]
-    source_archive_id = "${data.sakuracloud_archive.ubuntu.id}"
+    source_archive_id = data.sakuracloud_archive.ubuntu.id
     description = "Disk from TerraForm for SAKURA CLOUD"
     tags = ["hoge1" , "hoge2"]
     disable_pw_auth = true

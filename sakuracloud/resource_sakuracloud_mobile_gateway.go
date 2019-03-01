@@ -74,7 +74,6 @@ func resourceSakuraCloudMobileGateway() *schema.Resource {
 				Type:     schema.TypeList,
 				Optional: true,
 				MaxItems: 1,
-				MinItems: 1,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
 						"quota": {
@@ -103,6 +102,23 @@ func resourceSakuraCloudMobileGateway() *schema.Resource {
 						"auto_traffic_shaping": {
 							Type:     schema.TypeBool,
 							Optional: true,
+						},
+					},
+				},
+			},
+			"static_route": {
+				Type:     schema.TypeList,
+				Optional: true,
+				Computed: true,
+				Elem: &schema.Resource{
+					Schema: map[string]*schema.Schema{
+						"prefix": {
+							Type:     schema.TypeString,
+							Required: true,
+						},
+						"next_hop": {
+							Type:     schema.TypeString,
+							Required: true,
 						},
 					},
 				},
@@ -258,6 +274,32 @@ func resourceSakuraCloudMobileGatewayCreate(d *schema.ResourceData, meta interfa
 		if err != nil {
 			return fmt.Errorf("Failed to wait SakuraCloud MobileGateway boot: %s", err)
 		}
+	}
+
+	// static route
+	if staticRoutes, ok := getListFromResource(d, "static_route"); ok && len(staticRoutes) > 0 {
+		for _, rawStaticRoutes := range staticRoutes {
+			values := mapToResourceData(rawStaticRoutes.(map[string]interface{}))
+			staticRoute := expandMobileGatewayStaticRoute(values)
+
+			// check duplicated
+			for _, sr := range mgw.Settings.MobileGateway.StaticRoutes {
+				if sr.Prefix == staticRoute.Prefix {
+					return fmt.Errorf("prefix %q already exists", sr.Prefix)
+				}
+			}
+
+			mgw.Settings.MobileGateway.StaticRoutes = append(mgw.Settings.MobileGateway.StaticRoutes, staticRoute)
+		}
+	}
+
+	mgw, err = client.MobileGateway.UpdateSetting(mgw.ID, mgw)
+	if err != nil {
+		return fmt.Errorf("Failed to enable SakuraCloud MobileGatewayStaticRoute resource: %s", err)
+	}
+	_, err = client.MobileGateway.Config(mgw.ID)
+	if err != nil {
+		return fmt.Errorf("Couldn'd apply SakuraCloud MobileGateway config: %s", err)
 	}
 
 	// boot
@@ -453,6 +495,35 @@ func resourceSakuraCloudMobileGatewayUpdate(d *schema.ResourceData, meta interfa
 		}
 	}
 
+	// static route
+	if d.HasChange("static_route") {
+		mgw.Settings.MobileGateway.StaticRoutes = []*sacloud.MGWStaticRoute{}
+		if staticRoutes, ok := getListFromResource(d, "static_route"); ok && len(staticRoutes) > 0 {
+			for _, rawStaticRoutes := range staticRoutes {
+				values := mapToResourceData(rawStaticRoutes.(map[string]interface{}))
+				staticRoute := expandMobileGatewayStaticRoute(values)
+
+				// check duplicated
+				for _, sr := range mgw.Settings.MobileGateway.StaticRoutes {
+					if sr.Prefix == staticRoute.Prefix {
+						return fmt.Errorf("prefix %q already exists", sr.Prefix)
+					}
+				}
+				mgw.Settings.MobileGateway.StaticRoutes = append(mgw.Settings.MobileGateway.StaticRoutes, staticRoute)
+			}
+		}
+
+		mgw, err = client.MobileGateway.UpdateSetting(mgw.ID, mgw)
+		if err != nil {
+			return fmt.Errorf("Failed to enable SakuraCloud MobileGatewayStaticRoute resource: %s", err)
+		}
+		_, err = client.MobileGateway.Config(mgw.ID)
+		if err != nil {
+			return fmt.Errorf("Couldn'd apply SakuraCloud MobileGateway config: %s", err)
+		}
+
+	}
+
 	if needRestart {
 		_, err = client.MobileGateway.Boot(mgw.ID)
 		if err != nil {
@@ -564,6 +635,17 @@ func setMobileGatewayResourceData(d *schema.ResourceData, client *APIClient, dat
 
 	d.Set("dns_server1", resolver.SimGroup.DNS1)
 	d.Set("dns_server2", resolver.SimGroup.DNS2)
+
+	var staticRoutes []map[string]interface{}
+	if data.HasStaticRoutes() {
+		for _, r := range data.Settings.MobileGateway.StaticRoutes {
+			staticRoutes = append(staticRoutes, map[string]interface{}{
+				"prefix":   r.Prefix,
+				"next_hop": r.NextHop,
+			})
+		}
+	}
+	d.Set("static_route", staticRoutes)
 
 	d.Set("name", data.Name)
 	d.Set("icon_id", data.GetIconStrID())
