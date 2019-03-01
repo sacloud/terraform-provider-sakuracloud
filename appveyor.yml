@@ -8,6 +8,7 @@ environment:
   GO111MODULE: on
 
 install:
+  - choco install bzr
   - echo %PATH%
   - echo %GOPATH%
   - set PATH=%GOPATH%\bin;C:\go111\bin;%PATH%
