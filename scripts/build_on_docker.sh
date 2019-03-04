@@ -16,6 +16,7 @@ docker run --name $DOCKER_CONTAINER_NAME \
        -e SAKURACLOUD_ACCESS_TOKEN_SECRET \
        -e SAKURACLOUD_ZONE \
        -e SAKURACLOUD_TRACE_MODE \
+       -e CURRENT_VERSION \
        -e TF_LOG \
        -e TESTARGS \
        $DOCKER_IMAGE_NAME make "$@"
