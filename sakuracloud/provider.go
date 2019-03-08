@@ -66,16 +66,6 @@ func Provider() terraform.ResourceProvider {
 				Optional:    true,
 				DefaultFunc: schema.MultiEnvDefaultFunc([]string{"SAKURACLOUD_TIMEOUT"}, 20),
 			},
-			"use_marker_tags": {
-				Type:     schema.TypeBool,
-				Optional: true,
-				Removed:  "Use `tags` in the each resources instead",
-			},
-			"marker_tag_name": {
-				Type:     schema.TypeString,
-				Optional: true,
-				Removed:  "Use `tags` in the each resources instead",
-			},
 			"trace": {
 				Type:        schema.TypeBool,
 				Optional:    true,
