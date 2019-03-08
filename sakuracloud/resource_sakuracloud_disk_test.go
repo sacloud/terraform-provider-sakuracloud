@@ -31,8 +31,6 @@ func TestAccResourceSakuraCloudDisk(t *testing.T) {
 						"sakuracloud_disk.foobar", "connector", "virtio"),
 					resource.TestCheckResourceAttr(
 						"sakuracloud_disk.foobar", "size", "20"),
-					resource.TestCheckNoResourceAttr(
-						"sakuracloud_disk.foobar", "disable_pw_auth"),
 					resource.TestCheckResourceAttrPair(
 						"sakuracloud_disk.foobar", "icon_id",
 						"sakuracloud_icon.foobar", "id",
@@ -52,8 +50,6 @@ func TestAccResourceSakuraCloudDisk(t *testing.T) {
 						"sakuracloud_disk.foobar", "connector", "virtio"),
 					resource.TestCheckResourceAttr(
 						"sakuracloud_disk.foobar", "size", "20"),
-					resource.TestCheckResourceAttr(
-						"sakuracloud_disk.foobar", "disable_pw_auth", "true"),
 					resource.TestCheckResourceAttr(
 						"sakuracloud_disk.foobar", "icon_id", ""),
 				),
@@ -165,11 +161,6 @@ func TestAccImportSakuraCloudDisk(t *testing.T) {
 				ImportStateVerify: true,
 				ImportStateVerifyIgnore: []string{
 					"distant_from",
-					"hostname",
-					"password",
-					"ssh_key_ids",
-					"disable_pw_auth",
-					"note_ids",
 				},
 			},
 		},
@@ -192,7 +183,6 @@ resource "sakuracloud_disk" "foobar" {
     source_archive_id = data.sakuracloud_archive.ubuntu.id
     description = "Disk from TerraForm for SAKURA CLOUD"
     tags = ["hoge1" , "hoge2"]
-    hostname = "aaaa"
     icon_id = sakuracloud_icon.foobar.id
 }
 
@@ -218,6 +208,4 @@ resource "sakuracloud_disk" "foobar" {
     source_archive_id = data.sakuracloud_archive.ubuntu.id
     description = "Disk from TerraForm for SAKURA CLOUD"
     tags = ["hoge1" , "hoge2"]
-    disable_pw_auth = true
-    hostname = "aaaa"
 }`

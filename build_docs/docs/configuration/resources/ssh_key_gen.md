@@ -67,13 +67,6 @@ data sakuracloud_archive "centos" {
 resource sakuracloud_disk "foobar" {
   name              = "foobar"
   source_archive_id = "${data.sakuracloud_archive.centos.id}"
-  password          = "PUT_YOUR_PASSWORD_HERE"
-
-  # 生成した公開鍵のIDを指定
-  ssh_key_ids = ["${sakuracloud_ssh_key_gen.key.id}"]
-
-  # SSH接続時のパスワード/チャレンジレスポンス認証を無効化
-  disable_pw_auth = true
 }
 
 #サーバの定義
@@ -81,6 +74,12 @@ resource sakuracloud_server "foobar" {
   name  = "foobar"
   disks = ["${sakuracloud_disk.foobar.id}"]
 
+  password          = "PUT_YOUR_PASSWORD_HERE"
+  # 生成した公開鍵のIDを指定
+  ssh_key_ids = ["${sakuracloud_ssh_key_gen.key.id}"]
+  # SSH接続時のパスワード/チャレンジレスポンス認証を無効化
+  disable_pw_auth = true
+  
   # プロビジョニング
   connection {
     user        = "root"
