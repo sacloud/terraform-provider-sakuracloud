@@ -16,3 +16,7 @@ Terraform v0.12以前のバージョンをご利用中の場合、Terraform v0.1
 # terraform v0.12以前のバージョン向けのtfファイルをv0.12向けに書き換え
 $ terraform 0.12upgrade
 ```
+
+## marker_tags機能の除去
+   
+v1.4でmarker_tags機能のソースが除去されました。 
