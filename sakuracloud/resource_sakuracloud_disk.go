@@ -101,7 +101,7 @@ func resourceSakuraCloudDisk() *schema.Resource {
 				Type:         schema.TypeString,
 				Optional:     true,
 				ValidateFunc: validation.StringLenBetween(1, 64),
-				Removed:   "Use attribute in `sakuracloud_server` instead",
+				Removed:      "Use attribute in `sakuracloud_server` instead",
 			},
 			"password": {
 				Type:         schema.TypeString,
