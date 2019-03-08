@@ -101,14 +101,14 @@ func resourceSakuraCloudDisk() *schema.Resource {
 				Type:         schema.TypeString,
 				Optional:     true,
 				ValidateFunc: validation.StringLenBetween(1, 64),
-				Deprecated:   "Use attribute in `sakuracloud_server` instead",
+				Removed:   "Use attribute in `sakuracloud_server` instead",
 			},
 			"password": {
 				Type:         schema.TypeString,
 				Optional:     true,
 				ValidateFunc: validation.StringLenBetween(8, 64),
 				Sensitive:    true,
-				Deprecated:   "Use attribute in `sakuracloud_server` instead",
+				Removed:   "Use attribute in `sakuracloud_server` instead",
 			},
 			"ssh_key_ids": {
 				Type:     schema.TypeList,
@@ -116,12 +116,12 @@ func resourceSakuraCloudDisk() *schema.Resource {
 				Elem:     &schema.Schema{Type: schema.TypeString},
 				// ! Current terraform(v0.7) is not support to array validation !
 				// ValidateFunc: validateSakuracloudIDArrayType,
-				Deprecated: "Use attribute in `sakuracloud_server` instead",
+				Removed: "Use attribute in `sakuracloud_server` instead",
 			},
 			"disable_pw_auth": {
 				Type:       schema.TypeBool,
 				Optional:   true,
-				Deprecated: "Use attribute in `sakuracloud_server` instead",
+				Removed: "Use attribute in `sakuracloud_server` instead",
 			},
 			"note_ids": {
 				Type:     schema.TypeList,
@@ -129,7 +129,7 @@ func resourceSakuraCloudDisk() *schema.Resource {
 				Elem:     &schema.Schema{Type: schema.TypeString},
 				// ! Current terraform(v0.7) is not support to array validation !
 				// ValidateFunc: validateSakuracloudIDArrayType,
-				Deprecated: "Use attribute in `sakuracloud_server` instead",
+				Removed: "Use attribute in `sakuracloud_server` instead",
 			},
 		},
 	}
