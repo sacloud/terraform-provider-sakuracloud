@@ -24,6 +24,8 @@ func TestAccResourceSakuraCloudProxyLB(t *testing.T) {
 					resource.TestCheckResourceAttr(
 						"sakuracloud_proxylb.foobar", "name", "terraform-test-proxylb"),
 					resource.TestCheckResourceAttr(
+						"sakuracloud_proxylb.foobar", "plan", "5000"),
+					resource.TestCheckResourceAttr(
 						"sakuracloud_proxylb.foobar", "health_check.0.protocol", "http"),
 					resource.TestCheckResourceAttr(
 						"sakuracloud_proxylb.foobar", "health_check.0.delay_loop", "10"),
@@ -187,6 +189,7 @@ func TestAccImportSakuraCloudProxyLB(t *testing.T) {
 var testAccCheckSakuraCloudProxyLBConfig_basic = `
 resource "sakuracloud_proxylb" "foobar" {
   name = "terraform-test-proxylb"
+  plan = 5000
   health_check {
     protocol = "http"
     delay_loop = 10
@@ -224,6 +227,7 @@ resource sakuracloud_server "server01" {
 var testAccCheckSakuraCloudProxyLBConfig_update = `
 resource "sakuracloud_proxylb" "foobar" {
   name = "terraform-test-proxylb-upd"
+  plan = 5000
   health_check {
     protocol = "tcp"
     delay_loop = 20

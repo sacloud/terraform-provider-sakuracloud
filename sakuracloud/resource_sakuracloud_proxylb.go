@@ -2,6 +2,7 @@ package sakuracloud
 
 import (
 	"fmt"
+	"strconv"
 
 	"github.com/hashicorp/terraform/helper/schema"
 	"github.com/hashicorp/terraform/helper/validation"
@@ -23,6 +24,19 @@ func resourceSakuraCloudProxyLB() *schema.Resource {
 			"name": {
 				Type:     schema.TypeString,
 				Required: true,
+			},
+			"plan": {
+				Type:     schema.TypeInt,
+				ForceNew: true,
+				Optional: true,
+				Default:  1000,
+				ValidateFunc: validateIntInWord([]string{
+					strconv.Itoa(int(sacloud.ProxyLBPlan1000)),
+					strconv.Itoa(int(sacloud.ProxyLBPlan5000)),
+					strconv.Itoa(int(sacloud.ProxyLBPlan10000)),
+					strconv.Itoa(int(sacloud.ProxyLBPlan50000)),
+					strconv.Itoa(int(sacloud.ProxyLBPlan100000)),
+				}),
 			},
 			"bind_ports": {
 				Type:     schema.TypeList,
@@ -67,10 +81,6 @@ func resourceSakuraCloudProxyLB() *schema.Resource {
 						},
 						"path": {
 							Type:     schema.TypeString,
-							Optional: true,
-						},
-						"port": {
-							Type:     schema.TypeInt,
 							Optional: true,
 						},
 					},
@@ -172,6 +182,7 @@ func resourceSakuraCloudProxyLBCreate(d *schema.ResourceData, meta interface{}) 
 
 	opts := client.ProxyLB.New(d.Get("name").(string))
 
+	opts.SetPlan(sacloud.ProxyLBPlan(d.Get("plan").(int)))
 	if bindPorts, ok := getListFromResource(d, "bind_ports"); ok {
 		for _, bindPort := range bindPorts {
 			values := mapToResourceData(bindPort.(map[string]interface{}))
@@ -194,7 +205,6 @@ func resourceSakuraCloudProxyLBCreate(d *schema.ResourceData, meta interface{}) 
 			)
 		case "tcp":
 			opts.SetTCPHealthCheck(
-				values.Get("port").(int),
 				values.Get("delay_loop").(int),
 			)
 		default:
@@ -313,7 +323,6 @@ func resourceSakuraCloudProxyLBUpdate(d *schema.ResourceData, meta interface{}) 
 				)
 			case "tcp":
 				proxyLB.SetTCPHealthCheck(
-					values.Get("port").(int),
 					values.Get("delay_loop").(int),
 				)
 			default:
@@ -410,6 +419,7 @@ func resourceSakuraCloudProxyLBDelete(d *schema.ResourceData, meta interface{}) 
 func setProxyLBResourceData(d *schema.ResourceData, client *APIClient, data *sacloud.ProxyLB) error {
 
 	d.Set("name", data.Name)
+	d.Set("plan", int(data.GetPlan()))
 
 	// bind ports
 	var bindPorts []map[string]interface{}
@@ -429,7 +439,6 @@ func setProxyLBResourceData(d *schema.ResourceData, client *APIClient, data *sac
 			"delay_loop":  hc.DelayLoop,
 			"host_header": hc.Host,
 			"path":        hc.Path,
-			"port":        hc.Port,
 		},
 	}
 	d.Set("health_check", healthChecks)

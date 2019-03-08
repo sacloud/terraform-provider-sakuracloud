@@ -54,7 +54,9 @@ resource "sakuracloud_proxylb" "foobar" {
 
 The following arguments are supported:
 
-* `name` - (Required) The name of the resource.
+* `name` - (Required) The name of the resource.  
+* `plan` - (Optional) The plan of the resource.
+Valid value is one of the following: [ 1000 (default) / 5000 / 10000 / 50000 / 100000 ]  
 * `bind_ports` - (Required) The external listen ports. It contains some attributes to [Bind Ports](#bind-ports).
 * `health_check` - (Required) The health check rules. It contains some attributes to [Health Check](#health-check).
 * `sorry_server` - (Optional) The pair of IPAddress and port number of sorry-server.
@@ -82,7 +84,6 @@ Valid value is one of the following: [ "http" / "tcp" ]
 * `delay_loop` - (Optional) Health check access interval (unit:`second`, default:`10`).
 * `host_header` - (Optional) The value of `Host` header used in http/https health check access.
 * `path` - (Optional) The request path used in http health check access.
-* `port` - (Optional) Port number used in tcp health check access.
 
 ### Servers
 
@@ -102,6 +103,7 @@ The following attributes are exported:
 
 * `id` - The ID of the resource.
 * `name` - Name of the resource.
+* `plan` - The plan of the resource.
 * `bind_ports` - The external listen ports. It contains some attributes to [Bind Ports](#bind-ports).
 * `health_check` - The health check rules. It contains some attributes to [Health Check](#health-check).
 * `sorry_server` - The pair of IPAddress and port number of sorry-server.

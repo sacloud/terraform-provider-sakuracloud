@@ -47,6 +47,10 @@ func dataSourceSakuraCloudProxyLB() *schema.Resource {
 				Type:     schema.TypeString,
 				Computed: true,
 			},
+			"plan": {
+				Type:     schema.TypeInt,
+				Computed: true,
+			},
 			"bind_ports": {
 				Type:     schema.TypeList,
 				Computed: true,
