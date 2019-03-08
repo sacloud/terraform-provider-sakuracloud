@@ -108,7 +108,7 @@ func resourceSakuraCloudDisk() *schema.Resource {
 				Optional:     true,
 				ValidateFunc: validation.StringLenBetween(8, 64),
 				Sensitive:    true,
-				Removed:   "Use attribute in `sakuracloud_server` instead",
+				Removed:      "Use attribute in `sakuracloud_server` instead",
 			},
 			"ssh_key_ids": {
 				Type:     schema.TypeList,
