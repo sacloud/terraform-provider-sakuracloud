@@ -173,7 +173,7 @@ resource "sakuracloud_switch" "foobar" {
     name = "myswitch"
     description = "Switch from TerraForm for SAKURA CLOUD"
     tags = ["hoge1" , "hoge2"]
-    icon_id = sakuracloud_icon.foobar.id
+    icon_id = "${sakuracloud_icon.foobar.id}"
 }
 
 resource "sakuracloud_icon" "foobar" {
@@ -186,7 +186,7 @@ var testAccCheckSakuraCloudSwitchConfig_update = `
 resource "sakuracloud_server" "foobar" {
     name = "myserver"
     description = "Server from TerraForm for SAKURA CLOUD"
-    additional_nics = [sakuracloud_switch.foobar.id]
+    additional_nics = ["${sakuracloud_switch.foobar.id}"]
 }
 resource "sakuracloud_switch" "foobar" {
     name = "myswitch_upd"

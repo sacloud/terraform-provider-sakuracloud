@@ -171,7 +171,7 @@ func resourceSakuraCloudVPCRouterInterfaceDelete(d *schema.ResourceData, meta in
 				err = nil
 				break
 			}
-			err = handleShutdown(client.VPCRouter, vpcRouter.ID, d, 60*time.Second)
+			err = handleShutdown(client.VPCRouter, vpcRouter.ID, d, client.DefaultTimeoutDuration)
 		}
 		if err != nil {
 			return fmt.Errorf("Error stopping SakuraCloud VPCRouter resource: %s", err)

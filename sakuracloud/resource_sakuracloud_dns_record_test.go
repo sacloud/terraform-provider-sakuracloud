@@ -155,7 +155,7 @@ resource "sakuracloud_dns" "foobar" {
 }
 
 resource "sakuracloud_dns_record" "foobar" {
-    dns_id = sakuracloud_dns.foobar.id
+    dns_id = "${sakuracloud_dns.foobar.id}"
     name = "test2"
     type = "A"
     value = "192.168.0.2"
@@ -174,9 +174,9 @@ variable "ip_list" {
 }
 resource "sakuracloud_dns_record" "foobar" {
     count = 2
-    dns_id = sakuracloud_dns.foobar.id
+    dns_id = "${sakuracloud_dns.foobar.id}"
     name = "test"
     type = "A"
-    value = var.ip_list[count.index]
+    value = "${var.ip_list[count.index]}"
 }`, zone)
 }

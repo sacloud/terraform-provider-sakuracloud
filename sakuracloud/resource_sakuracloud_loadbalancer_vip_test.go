@@ -95,7 +95,7 @@ resource "sakuracloud_switch" "sw" {
     name = "sw"
 }
 resource "sakuracloud_load_balancer" "foobar" {
-    switch_id = sakuracloud_switch.sw.id
+    switch_id = "${sakuracloud_switch.sw.id}"
     vrid = 1
     ipaddress1 = "192.168.11.101"
     nw_mask_len = 24
@@ -106,7 +106,7 @@ resource "sakuracloud_load_balancer" "foobar" {
     tags = ["hoge1" , "hoge2"]
 }
 resource "sakuracloud_load_balancer_vip" "vip1" {
-    load_balancer_id = sakuracloud_load_balancer.foobar.id
+    load_balancer_id = "${sakuracloud_load_balancer.foobar.id}"
     vip = "192.168.11.201"
     port = 80
     delay_loop = 100
@@ -114,7 +114,7 @@ resource "sakuracloud_load_balancer_vip" "vip1" {
     description  = "description"
 }
 resource "sakuracloud_load_balancer_vip" "vip2" {
-    load_balancer_id = sakuracloud_load_balancer.foobar.id
+    load_balancer_id = "${sakuracloud_load_balancer.foobar.id}"
     vip = "192.168.11.202"
     port = 80
 }
@@ -125,7 +125,7 @@ resource "sakuracloud_switch" "sw" {
     name = "sw"
 }
 resource "sakuracloud_load_balancer" "foobar" {
-    switch_id = sakuracloud_switch.sw.id
+    switch_id = "${sakuracloud_switch.sw.id}"
     vrid = 1
     ipaddress1 = "192.168.11.101"
     nw_mask_len = 24
@@ -136,24 +136,24 @@ resource "sakuracloud_load_balancer" "foobar" {
     tags = ["hoge1" , "hoge2"]
 }
 resource "sakuracloud_load_balancer_vip" "vip1" {
-    load_balancer_id = sakuracloud_load_balancer.foobar.id
+    load_balancer_id = "${sakuracloud_load_balancer.foobar.id}"
     vip = "192.168.11.201"
     port = 80
     delay_loop = 50
     sorry_server = "192.168.11.22"
 }
 resource "sakuracloud_load_balancer_vip" "vip2" {
-    load_balancer_id = sakuracloud_load_balancer.foobar.id
+    load_balancer_id = "${sakuracloud_load_balancer.foobar.id}"
     vip = "192.168.11.202"
     port = 80
 }
 resource "sakuracloud_load_balancer_vip" "vip3" {
-    load_balancer_id = sakuracloud_load_balancer.foobar.id
+    load_balancer_id = "${sakuracloud_load_balancer.foobar.id}"
     vip = "192.168.11.203"
     port = 80
 }
 resource "sakuracloud_load_balancer_vip" "vip4" {
-    load_balancer_id = sakuracloud_load_balancer.foobar.id
+    load_balancer_id = "${sakuracloud_load_balancer.foobar.id}"
     vip = "192.168.11.204"
     port = 80
 }

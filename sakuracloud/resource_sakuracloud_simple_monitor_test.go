@@ -192,7 +192,7 @@ resource "sakuracloud_simple_monitor" "foobar" {
     notify_email_html = true
     notify_slack_enabled = true
     notify_slack_webhook = "%s"
-    icon_id = sakuracloud_icon.foobar.id
+    icon_id = "${sakuracloud_icon.foobar.id}"
 }
 
 resource "sakuracloud_icon" "foobar" {
@@ -232,7 +232,7 @@ resource "sakuracloud_simple_monitor" "foobar" {
     notify_email_html = true
     notify_slack_enabled = true
     notify_slack_webhook = "%s"
-    icon_id = sakuracloud_icon.foobar.id
+    icon_id = "${sakuracloud_icon.foobar.id}"
 }
 
 resource "sakuracloud_icon" "foobar" {

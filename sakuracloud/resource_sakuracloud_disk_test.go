@@ -180,10 +180,10 @@ resource "sakuracloud_disk" "foobar" {
     connector = "virtio"
     size = 20
     distant_from = ["111111111111"]
-    source_archive_id = data.sakuracloud_archive.ubuntu.id
+    source_archive_id = "${data.sakuracloud_archive.ubuntu.id}"
     description = "Disk from TerraForm for SAKURA CLOUD"
     tags = ["hoge1" , "hoge2"]
-    icon_id = sakuracloud_icon.foobar.id
+    icon_id = "${sakuracloud_icon.foobar.id}"
 }
 
 resource "sakuracloud_icon" "foobar" {
@@ -205,7 +205,7 @@ resource "sakuracloud_disk" "foobar" {
     connector = "virtio"
     size = 20
     distant_from = ["111111111111"]
-    source_archive_id = data.sakuracloud_archive.ubuntu.id
+    source_archive_id = "${data.sakuracloud_archive.ubuntu.id}"
     description = "Disk from TerraForm for SAKURA CLOUD"
     tags = ["hoge1" , "hoge2"]
 }`

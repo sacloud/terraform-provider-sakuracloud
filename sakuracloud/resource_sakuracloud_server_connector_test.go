@@ -110,10 +110,10 @@ data "sakuracloud_cdrom" "foobar" {
 }
 
 resource sakuracloud_server_connector "foobar" {
-  server_id         = sakuracloud_server.foobar.id
-  disks             = [sakuracloud_disk.foobar[0].id]
-  packet_filter_ids = [sakuracloud_packet_filter.foobar[0].id]
-  cdrom_id          = data.sakuracloud_cdrom.foobar.id
+  server_id         = "${sakuracloud_server.foobar.id}"
+  disks             = ["${sakuracloud_disk.foobar.0.id}"]
+  packet_filter_ids = ["${sakuracloud_packet_filter.foobar.0.id}"]
+  cdrom_id          = "${data.sakuracloud_cdrom.foobar.id}"
 }
 `
 
@@ -138,10 +138,10 @@ data "sakuracloud_cdrom" "foobar" {
 }
 
 resource sakuracloud_server_connector "foobar" {
-  server_id         = sakuracloud_server.foobar.id
-  disks             = [sakuracloud_disk.foobar[0].id,sakuracloud_disk.foobar[1].id]
-  packet_filter_ids = [sakuracloud_packet_filter.foobar[0].id, sakuracloud_packet_filter.foobar[1].id]
-  cdrom_id          = data.sakuracloud_cdrom.foobar.id
+  server_id         = "${sakuracloud_server.foobar.id}"
+  disks             = ["${sakuracloud_disk.foobar.0.id}", "${sakuracloud_disk.foobar.1.id}"]
+  packet_filter_ids = ["${sakuracloud_packet_filter.foobar.0.id}", "${sakuracloud_packet_filter.foobar.1.id}"]
+  cdrom_id          = "${data.sakuracloud_cdrom.foobar.id}"
 }
 `
 

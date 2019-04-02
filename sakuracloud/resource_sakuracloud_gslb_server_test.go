@@ -80,8 +80,8 @@ resource "sakuracloud_gslb" "foobar" {
 }
 resource "sakuracloud_gslb_server" "foobar" {
     count = 2
-    gslb_id = sakuracloud_gslb.foobar.id
-    ipaddress = var.gslb_ip_list[count.index]
+    gslb_id = "${sakuracloud_gslb.foobar.id}"
+    ipaddress = "${var.gslb_ip_list[count.index]}"
 }`
 
 var testAccCheckSakuraCloudGSLBServerConfig_update = `
@@ -102,6 +102,6 @@ resource "sakuracloud_gslb" "foobar" {
 }
 resource "sakuracloud_gslb_server" "foobar" {
     count = 4
-    gslb_id = sakuracloud_gslb.foobar.id
-    ipaddress = var.gslb_ip_list[count.index]
+    gslb_id = "${sakuracloud_gslb.foobar.id}"
+    ipaddress = "${var.gslb_ip_list[count.index]}"
 }`

@@ -229,7 +229,7 @@ resource "sakuracloud_gslb" "foobar" {
     }
     description = "GSLB from TerraForm for SAKURA CLOUD"
     tags = ["hoge1", "hoge2"]
-    icon_id = sakuracloud_icon.foobar.id
+    icon_id = "${sakuracloud_icon.foobar.id}"
 }
 
 resource "sakuracloud_icon" "foobar" {
