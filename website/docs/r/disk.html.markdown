@@ -50,11 +50,11 @@ Valid value is one of the following: [ "virtio" (default) / "ide"]
 * `distant_from` - (Optional) The ID list of the Disks isolated from Disk.
 * `source_archive_id` - (Optional) The ID of source Archive.
 * `source_disk_id` - (Optional) The ID of source Disk.
-* `hostname` - (**Removed:v2.0.0**) The hostname to set with `"Modify Disk"` API.
-* `password` - (**Removed:v2.0.0**) The password of OS's administrator to set with `"Modify Disk"` API.
-* `ssh_key_ids` - (**Removed:v2.0.0**) The ID list of SSH Keys to set with `"Modify Disk"` API.
-* `note_ids` - (**Removed:v2.0.0**) The ID list of Notes (Startup-Scripts) to set with `"Modify Disk"` API.
-* `disable_pw_auth` - (**Removed:v2.0.0**) The flag of disable password auth via SSH.
+* `hostname` - (**Removed:v1.11.0**) The hostname to set with `"Modify Disk"` API.
+* `password` - (**Removed:v1.11.0**) The password of OS's administrator to set with `"Modify Disk"` API.
+* `ssh_key_ids` - (**Removed:v1.11.0**) The ID list of SSH Keys to set with `"Modify Disk"` API.
+* `note_ids` - (**Removed:v1.11.0**) The ID list of Notes (Startup-Scripts) to set with `"Modify Disk"` API.
+* `disable_pw_auth` - (**Removed:v1.11.0**) The flag of disable password auth via SSH.
 * `description` - (Optional) The description of the resource.
 * `tags` - (Optional) The tag list of the resources.
 * `icon_id` - (Optional) The ID of the icon.
