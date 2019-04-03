@@ -119,9 +119,9 @@ func resourceSakuraCloudDisk() *schema.Resource {
 				Removed: "Use attribute in `sakuracloud_server` instead",
 			},
 			"disable_pw_auth": {
-				Type:       schema.TypeBool,
-				Optional:   true,
-				Removed: "Use attribute in `sakuracloud_server` instead",
+				Type:     schema.TypeBool,
+				Optional: true,
+				Removed:  "Use attribute in `sakuracloud_server` instead",
 			},
 			"note_ids": {
 				Type:     schema.TypeList,

@@ -21,14 +21,14 @@ func TestAccSakuraCloudDataSourceCDROM_Basic(t *testing.T) {
 				Config: testAccCheckSakuraCloudDataSourceCDROMConfig,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckSakuraCloudCDROMDataSourceID("data.sakuracloud_cdrom.foobar"),
-					resource.TestCheckResourceAttr("data.sakuracloud_cdrom.foobar", "name", "Ubuntu server 18.04.1 LTS 64bit"),
+					resource.TestCheckResourceAttr("data.sakuracloud_cdrom.foobar", "name", "Ubuntu Server 18.04.2 LTS 64bit"),
 					resource.TestCheckResourceAttr("data.sakuracloud_cdrom.foobar", "size", "5"),
 					resource.TestCheckResourceAttr("data.sakuracloud_cdrom.foobar", "tags.#", "5"),
 					resource.TestCheckResourceAttr("data.sakuracloud_cdrom.foobar", "tags.0", "arch-64bit"),
 					resource.TestCheckResourceAttr("data.sakuracloud_cdrom.foobar", "tags.1", "current-stable"),
 					resource.TestCheckResourceAttr("data.sakuracloud_cdrom.foobar", "tags.2", "distro-ubuntu"),
-					resource.TestCheckResourceAttr("data.sakuracloud_cdrom.foobar", "tags.3", "distro-ver-18.04.1"),
-					resource.TestCheckResourceAttr("data.sakuracloud_cdrom.foobar", "tags.4", "os-unix"),
+					resource.TestCheckResourceAttr("data.sakuracloud_cdrom.foobar", "tags.3", "distro-ver-18.04.2"),
+					resource.TestCheckResourceAttr("data.sakuracloud_cdrom.foobar", "tags.4", "os-linux"),
 				),
 			},
 			{
@@ -131,7 +131,7 @@ var testAccCheckSakuraCloudDataSourceCDROMConfig = `
 data "sakuracloud_cdrom" "foobar" {
     filter {
 	name = "Name"
-	values = ["Ubuntu Server 18"]
+	values = ["Ubuntu server 18.04.2 LTS 64bit"]
     }
 }`
 

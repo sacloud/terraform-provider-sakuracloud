@@ -3,6 +3,7 @@ package sakuracloud
 import (
 	"errors"
 	"fmt"
+	"os"
 	"testing"
 
 	"github.com/hashicorp/terraform/helper/acctest"
@@ -15,6 +16,19 @@ func TestAccSakuraCloudDataSourceProxyLB_Basic(t *testing.T) {
 	randString2 := acctest.RandStringFromCharSet(20, acctest.CharSetAlpha)
 	name := fmt.Sprintf("%s_%s", randString1, randString2)
 
+	if ip, ok := os.LookupEnv(envProxyLBRealServerIP0); ok {
+		proxyLBRealServerIP0 = ip
+	} else {
+		t.Skipf("ENV %q is requilred. skip", envProxyLBRealServerIP0)
+		return
+	}
+	if ip, ok := os.LookupEnv(envProxyLBRealServerIP1); ok {
+		proxyLBRealServerIP1 = ip
+	} else {
+		t.Skipf("ENV %q is requilred. skip", envProxyLBRealServerIP1)
+		return
+	}
+
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:                  func() { testAccPreCheck(t) },
 		Providers:                 testAccProviders,
@@ -23,11 +37,11 @@ func TestAccSakuraCloudDataSourceProxyLB_Basic(t *testing.T) {
 
 		Steps: []resource.TestStep{
 			{
-				Config: testAccCheckSakuraCloudDataSourceProxyLBBase(name),
+				Config: testAccCheckSakuraCloudDataSourceProxyLBBase(name, proxyLBRealServerIP0, proxyLBRealServerIP1),
 				Check:  testAccCheckSakuraCloudProxyLBDataSourceID("sakuracloud_proxylb.foobar"),
 			},
 			{
-				Config: testAccCheckSakuraCloudDataSourceProxyLBConfig(name),
+				Config: testAccCheckSakuraCloudDataSourceProxyLBConfig(name, proxyLBRealServerIP0, proxyLBRealServerIP1),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckSakuraCloudProxyLBDataSourceID("data.sakuracloud_proxylb.foobar"),
 					resource.TestCheckResourceAttr("data.sakuracloud_proxylb.foobar", "name", name),
@@ -38,10 +52,10 @@ func TestAccSakuraCloudDataSourceProxyLB_Basic(t *testing.T) {
 					resource.TestCheckResourceAttr("data.sakuracloud_proxylb.foobar", "health_check.0.delay_loop", "20"),
 					resource.TestCheckResourceAttr("data.sakuracloud_proxylb.foobar", "bind_ports.0.proxy_mode", "http"),
 					resource.TestCheckResourceAttr("data.sakuracloud_proxylb.foobar", "bind_ports.0.port", "80"),
-					resource.TestCheckResourceAttr("data.sakuracloud_proxylb.foobar", "servers.0.ipaddress", "133.242.0.3"),
+					resource.TestCheckResourceAttr("data.sakuracloud_proxylb.foobar", "servers.0.ipaddress", proxyLBRealServerIP0),
 					resource.TestCheckResourceAttr("data.sakuracloud_proxylb.foobar", "servers.0.port", "80"),
 					resource.TestCheckResourceAttr("data.sakuracloud_proxylb.foobar", "servers.0.enabled", "true"),
-					resource.TestCheckResourceAttr("data.sakuracloud_proxylb.foobar", "servers.1.ipaddress", "133.242.0.4"),
+					resource.TestCheckResourceAttr("data.sakuracloud_proxylb.foobar", "servers.1.ipaddress", proxyLBRealServerIP1),
 					resource.TestCheckResourceAttr("data.sakuracloud_proxylb.foobar", "servers.1.port", "80"),
 					resource.TestCheckResourceAttr("data.sakuracloud_proxylb.foobar", "servers.1.enabled", "true"),
 					resource.TestCheckResourceAttr("data.sakuracloud_proxylb.foobar", "tags.#", "3"),
@@ -51,32 +65,32 @@ func TestAccSakuraCloudDataSourceProxyLB_Basic(t *testing.T) {
 				),
 			},
 			{
-				Config: testAccCheckSakuraCloudDataSourceProxyLBConfig_With_Tag(name),
+				Config: testAccCheckSakuraCloudDataSourceProxyLBConfig_With_Tag(name, proxyLBRealServerIP0, proxyLBRealServerIP1),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckSakuraCloudProxyLBDataSourceID("data.sakuracloud_proxylb.foobar"),
 				),
 			},
 			{
-				Config: testAccCheckSakuraCloudDataSourceProxyLB_NameSelector_Exists(name, randString1, randString2),
+				Config: testAccCheckSakuraCloudDataSourceProxyLB_NameSelector_Exists(name, proxyLBRealServerIP0, proxyLBRealServerIP1, randString1, randString2),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckSakuraCloudProxyLBDataSourceID("data.sakuracloud_proxylb.foobar"),
 				),
 			},
 			{
-				Config: testAccCheckSakuraCloudDataSourceProxyLB_TagSelector_Exists(name),
+				Config: testAccCheckSakuraCloudDataSourceProxyLB_TagSelector_Exists(name, proxyLBRealServerIP0, proxyLBRealServerIP1),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckSakuraCloudProxyLBDataSourceID("data.sakuracloud_proxylb.foobar"),
 				),
 			},
 			{
-				Config: testAccCheckSakuraCloudDataSourceProxyLBConfig_NotExists(name),
+				Config: testAccCheckSakuraCloudDataSourceProxyLBConfig_NotExists(name, proxyLBRealServerIP0, proxyLBRealServerIP1),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckSakuraCloudProxyLBDataSourceNotExists("data.sakuracloud_proxylb.foobar"),
 				),
 				Destroy: true,
 			},
 			{
-				Config: testAccCheckSakuraCloudDataSourceProxyLBConfig_With_NotExists_Tag(name),
+				Config: testAccCheckSakuraCloudDataSourceProxyLBConfig_With_NotExists_Tag(name, proxyLBRealServerIP0, proxyLBRealServerIP1),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckSakuraCloudProxyLBDataSourceNotExists("data.sakuracloud_proxylb.foobar"),
 				),
@@ -146,7 +160,7 @@ func testAccCheckSakuraCloudProxyLBDataSourceDestroy(s *terraform.State) error {
 	return nil
 }
 
-func testAccCheckSakuraCloudDataSourceProxyLBBase(name string) string {
+func testAccCheckSakuraCloudDataSourceProxyLBBase(name, ip1, ip2 string) string {
 	return fmt.Sprintf(`
 resource "sakuracloud_proxylb" "foobar" {
   name = "%s"
@@ -159,19 +173,19 @@ resource "sakuracloud_proxylb" "foobar" {
     port       = 80
   }
   servers {
-      ipaddress = "133.242.0.3"
+      ipaddress = "%s"
       port = 80
   }
   servers {
-      ipaddress = "133.242.0.4"
+      ipaddress = "%s"
       port = 80
   }
   description = "description_test"
   tags = ["tag1","tag2","tag3"]
-}`, name)
+}`, name, ip1, ip2)
 }
 
-func testAccCheckSakuraCloudDataSourceProxyLBConfig(name string) string {
+func testAccCheckSakuraCloudDataSourceProxyLBConfig(name, ip1, ip2 string) string {
 	return fmt.Sprintf(`
 resource "sakuracloud_proxylb" "foobar" {
   name = "%s"
@@ -184,11 +198,11 @@ resource "sakuracloud_proxylb" "foobar" {
     port       = 80
   }
   servers {
-      ipaddress = "133.242.0.3"
+      ipaddress = "%s"
       port = 80
   }
   servers {
-      ipaddress = "133.242.0.4"
+      ipaddress = "%s"
       port = 80
   }
   description = "description_test"
@@ -199,10 +213,10 @@ data "sakuracloud_proxylb" "foobar" {
 	name = "Name"
 	values = ["%s"]
   }
-}`, name, name)
+}`, name, ip1, ip2, name)
 }
 
-func testAccCheckSakuraCloudDataSourceProxyLBConfig_With_Tag(name string) string {
+func testAccCheckSakuraCloudDataSourceProxyLBConfig_With_Tag(name, ip1, ip2 string) string {
 	return fmt.Sprintf(`
 resource "sakuracloud_proxylb" "foobar" {
   name = "%s"
@@ -215,11 +229,11 @@ resource "sakuracloud_proxylb" "foobar" {
     port       = 80
   }
   servers {
-      ipaddress = "133.242.0.3"
+      ipaddress = "%s"
       port = 80
   }
   servers {
-      ipaddress = "133.242.0.4"
+      ipaddress = "%s"
       port = 80
   }
   description = "description_test"
@@ -230,10 +244,10 @@ data "sakuracloud_proxylb" "foobar" {
 	name = "Tags"
 	values = ["tag1","tag3"]
   }
-}`, name)
+}`, name, ip1, ip2)
 }
 
-func testAccCheckSakuraCloudDataSourceProxyLBConfig_With_NotExists_Tag(name string) string {
+func testAccCheckSakuraCloudDataSourceProxyLBConfig_With_NotExists_Tag(name, ip1, ip2 string) string {
 	return fmt.Sprintf(`
 resource "sakuracloud_proxylb" "foobar" {
   name = "%s"
@@ -246,11 +260,11 @@ resource "sakuracloud_proxylb" "foobar" {
     port       = 80
   }
   servers {
-      ipaddress = "133.242.0.3"
+      ipaddress = "%s"
       port = 80
   }
   servers {
-      ipaddress = "133.242.0.4"
+      ipaddress = "%s"
       port = 80
   }
   description = "description_test"
@@ -261,10 +275,10 @@ data "sakuracloud_proxylb" "foobar" {
 	name = "Tags"
 	values = ["tag1-xxxxxxx","tag3-xxxxxxxx"]
   }
-}`, name)
+}`, name, ip1, ip2)
 }
 
-func testAccCheckSakuraCloudDataSourceProxyLBConfig_NotExists(name string) string {
+func testAccCheckSakuraCloudDataSourceProxyLBConfig_NotExists(name, ip1, ip2 string) string {
 	return fmt.Sprintf(`
 resource "sakuracloud_proxylb" "foobar" {
   name = "%s"
@@ -277,11 +291,11 @@ resource "sakuracloud_proxylb" "foobar" {
     port       = 80
   }
   servers {
-      ipaddress = "133.242.0.3"
+      ipaddress = "%s"
       port = 80
   }
   servers {
-      ipaddress = "133.242.0.4"
+      ipaddress = "%s"
       port = 80
   }
   description = "description_test"
@@ -292,10 +306,10 @@ data "sakuracloud_proxylb" "foobar" {
 	name = "Name"
 	values = ["xxxxxxxxxxxxxxxxxx"]
   }
-}`, name)
+}`, name, ip1, ip2)
 }
 
-func testAccCheckSakuraCloudDataSourceProxyLB_NameSelector_Exists(name, p1, p2 string) string {
+func testAccCheckSakuraCloudDataSourceProxyLB_NameSelector_Exists(name, ip1, ip2, p1, p2 string) string {
 	return fmt.Sprintf(`
 resource "sakuracloud_proxylb" "foobar" {
   name = "%s"
@@ -308,11 +322,11 @@ resource "sakuracloud_proxylb" "foobar" {
     port       = 80
   }
   servers {
-      ipaddress = "133.242.0.3"
+      ipaddress = "%s"
       port = 80
   }
   servers {
-      ipaddress = "133.242.0.4"
+      ipaddress = "%s"
       port = 80
   }
   description = "description_test"
@@ -321,7 +335,7 @@ resource "sakuracloud_proxylb" "foobar" {
 data "sakuracloud_proxylb" "foobar" {
   name_selectors = ["%s", "%s"]
 }
-`, name, p1, p2)
+`, name, ip1, ip2, p1, p2)
 }
 
 var testAccCheckSakuraCloudDataSourceProxyLB_NameSelector_NotExists = `
@@ -330,7 +344,7 @@ data "sakuracloud_proxylb" "foobar" {
 }
 `
 
-func testAccCheckSakuraCloudDataSourceProxyLB_TagSelector_Exists(name string) string {
+func testAccCheckSakuraCloudDataSourceProxyLB_TagSelector_Exists(name, ip1, ip2 string) string {
 	return fmt.Sprintf(`
 resource "sakuracloud_proxylb" "foobar" {
   name = "%s"
@@ -343,11 +357,11 @@ resource "sakuracloud_proxylb" "foobar" {
     port       = 80
   }
   servers {
-      ipaddress = "133.242.0.3"
+      ipaddress = "%s"
       port = 80
   }
   servers {
-      ipaddress = "133.242.0.4"
+      ipaddress = "%s"
       port = 80
   }
   description = "description_test"
@@ -355,7 +369,7 @@ resource "sakuracloud_proxylb" "foobar" {
 }
 data "sakuracloud_proxylb" "foobar" {
   tag_selectors = ["tag1","tag2","tag3"]
-}`, name)
+}`, name, ip1, ip2)
 }
 
 var testAccCheckSakuraCloudDataSourceProxyLB_TagSelector_NotExists = `

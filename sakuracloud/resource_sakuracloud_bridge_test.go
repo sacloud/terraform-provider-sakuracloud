@@ -136,7 +136,7 @@ var testAccCheckSakuraCloudBridgeConfig_withSwitch = `
 resource "sakuracloud_switch" "foobar" {
     name = "myswitch"
     description = "Switch from TerraForm for SAKURA CLOUD"
-    bridge_id = sakuracloud_bridge.foobar.id
+    bridge_id = "${sakuracloud_bridge.foobar.id}"
 }
 resource "sakuracloud_bridge" "foobar" {
     name = "mybridge"

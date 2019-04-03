@@ -70,8 +70,8 @@ resource "sakuracloud_bucket_object" "foobar" {
 }
 
 data "sakuracloud_bucket_object" "foobar" {
-  bucket = sakuracloud_bucket_object.foobar.bucket
-  key    = sakuracloud_bucket_object.foobar.key
+  bucket = "${sakuracloud_bucket_object.foobar.bucket}"
+  key    = "${sakuracloud_bucket_object.foobar.key}"
 }
 `, bucket, key)
 }

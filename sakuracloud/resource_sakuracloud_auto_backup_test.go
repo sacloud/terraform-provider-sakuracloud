@@ -154,12 +154,12 @@ resource "sakuracloud_disk" "disk" {
 }
 resource "sakuracloud_auto_backup" "foobar" {
     name = "name_before"
-    disk_id = sakuracloud_disk.disk.id
+    disk_id = "${sakuracloud_disk.disk.id}"
     weekdays = ["wed","fri"]
     max_backup_num = 1
     description = "description_before"
     tags = ["hoge1", "hoge2"]
-    icon_id = sakuracloud_icon.foobar.id
+    icon_id = "${sakuracloud_icon.foobar.id}"
 }
 
 resource "sakuracloud_icon" "foobar" {
@@ -174,7 +174,7 @@ resource "sakuracloud_disk" "disk" {
 }
 resource "sakuracloud_auto_backup" "foobar" {
     name = "name_after"
-    disk_id = sakuracloud_disk.disk.id
+    disk_id = "${sakuracloud_disk.disk.id}"
     weekdays = ["fri","sun"]
     max_backup_num = 2
     description = "description_after"

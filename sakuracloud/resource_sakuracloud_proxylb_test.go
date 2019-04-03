@@ -3,6 +3,7 @@ package sakuracloud
 import (
 	"errors"
 	"fmt"
+	"os"
 	"testing"
 
 	"github.com/hashicorp/terraform/helper/resource"
@@ -10,7 +11,22 @@ import (
 	"github.com/sacloud/libsacloud/sacloud"
 )
 
+const (
+	envProxyLBRealServerIP0 = "SAKURACLOUD_PROXYLB_SERVER0"
+	envProxyLBRealServerIP1 = "SAKURACLOUD_PROXYLB_SERVER1"
+)
+
+var proxyLBRealServerIP0, proxyLBRealServerIP1 string
+
 func TestAccResourceSakuraCloudProxyLB(t *testing.T) {
+
+	if ip, ok := os.LookupEnv(envProxyLBRealServerIP0); ok {
+		proxyLBRealServerIP0 = ip
+	} else {
+		t.Skipf("ENV %q is requilred. skip", envProxyLBRealServerIP0)
+		return
+	}
+
 	var proxylb sacloud.ProxyLB
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
@@ -18,7 +34,7 @@ func TestAccResourceSakuraCloudProxyLB(t *testing.T) {
 		CheckDestroy: testAccCheckSakuraCloudProxyLBDestroy,
 		Steps: []resource.TestStep{
 			{
-				Config: testAccCheckSakuraCloudProxyLBConfig_basic,
+				Config: fmt.Sprintf(testAccCheckSakuraCloudProxyLBConfig_basic, proxyLBRealServerIP0),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckSakuraCloudProxyLBExists("sakuracloud_proxylb.foobar", &proxylb),
 					resource.TestCheckResourceAttr(
@@ -34,7 +50,7 @@ func TestAccResourceSakuraCloudProxyLB(t *testing.T) {
 					resource.TestCheckResourceAttr(
 						"sakuracloud_proxylb.foobar", "health_check.0.path", "/"),
 					resource.TestCheckResourceAttr(
-						"sakuracloud_proxylb.foobar", "sorry_server.0.ipaddress", "133.242.0.3"),
+						"sakuracloud_proxylb.foobar", "sorry_server.0.ipaddress", proxyLBRealServerIP0),
 					resource.TestCheckResourceAttr(
 						"sakuracloud_proxylb.foobar", "sorry_server.0.port", "80"),
 					resource.TestCheckResourceAttr(
@@ -69,8 +85,7 @@ func TestAccResourceSakuraCloudProxyLB(t *testing.T) {
 						"sakuracloud_proxylb.foobar", "health_check.0.host_header", ""),
 					resource.TestCheckResourceAttr(
 						"sakuracloud_proxylb.foobar", "health_check.0.path", ""),
-					resource.TestCheckResourceAttr(
-						"sakuracloud_proxylb.foobar", "sorry_server.0.ipaddress.#", "0"),
+					resource.TestCheckNoResourceAttr("sakuracloud_proxylb.foobar", "sorry_server.0.ipaddress.#"),
 					resource.TestCheckResourceAttr(
 						"sakuracloud_proxylb.foobar", "bind_ports.0.proxy_mode", "https"),
 					resource.TestCheckResourceAttr(
@@ -138,6 +153,20 @@ func testAccCheckSakuraCloudProxyLBDestroy(s *terraform.State) error {
 }
 
 func TestAccImportSakuraCloudProxyLB(t *testing.T) {
+
+	if ip, ok := os.LookupEnv(envProxyLBRealServerIP0); ok {
+		proxyLBRealServerIP0 = ip
+	} else {
+		t.Skipf("ENV %q is requilred. skip", envProxyLBRealServerIP0)
+		return
+	}
+	if ip, ok := os.LookupEnv(envProxyLBRealServerIP1); ok {
+		proxyLBRealServerIP1 = ip
+	} else {
+		t.Skipf("ENV %q is requilred. skip", envProxyLBRealServerIP1)
+		return
+	}
+
 	checkFn := func(s []*terraform.InstanceState) error {
 		if len(s) != 1 {
 			return fmt.Errorf("expected 1 state: %#v", s)
@@ -152,10 +181,10 @@ func TestAccImportSakuraCloudProxyLB(t *testing.T) {
 			"bind_ports.0.proxy_mode":   "https",
 			"bind_ports.0.port":         "443",
 			"servers.#":                 "2",
-			"servers.0.ipaddress":       "133.242.0.3",
+			"servers.0.ipaddress":       proxyLBRealServerIP0,
 			"servers.0.port":            "80",
 			"servers.0.enabled":         "true",
-			"servers.1.ipaddress":       "133.242.0.4",
+			"servers.1.ipaddress":       proxyLBRealServerIP1,
 			"servers.1.port":            "80",
 			"servers.1.enabled":         "true",
 		}
@@ -174,7 +203,7 @@ func TestAccImportSakuraCloudProxyLB(t *testing.T) {
 		CheckDestroy: testAccCheckSakuraCloudProxyLBDestroy,
 		Steps: []resource.TestStep{
 			{
-				Config: testAccCheckSakuraCloudProxyLBConfig_import,
+				Config: fmt.Sprintf(testAccCheckSakuraCloudProxyLBConfig_import, proxyLBRealServerIP0, proxyLBRealServerIP1),
 			},
 			{
 				ResourceName:      resourceName,
@@ -197,7 +226,7 @@ resource "sakuracloud_proxylb" "foobar" {
     path = "/"
   }
   sorry_server {
-    ipaddress = "133.242.0.3"
+    ipaddress = "%s"
     port      = 80
   }
   bind_ports {
@@ -205,12 +234,12 @@ resource "sakuracloud_proxylb" "foobar" {
     port       = 80
   }
   servers {
-      ipaddress = sakuracloud_server.server01.ipaddress 
+      ipaddress = "${sakuracloud_server.server01.ipaddress}"
       port = 80
   }
   description = "ProxyLB from TerraForm for SAKURA CLOUD"
   tags = ["hoge1", "hoge2"]
-  icon_id = sakuracloud_icon.foobar.id
+  icon_id = "${sakuracloud_icon.foobar.id}"
 }
 
 resource "sakuracloud_icon" "foobar" {
@@ -238,7 +267,7 @@ resource "sakuracloud_proxylb" "foobar" {
   }
 
   servers {
-      ipaddress = sakuracloud_server.server01.ipaddress 
+      ipaddress = "${sakuracloud_server.server01.ipaddress}"
       port = 443
   }
 
@@ -264,11 +293,11 @@ resource "sakuracloud_proxylb" "foobar" {
     port       = 443
   }
   servers {
-      ipaddress = "133.242.0.3"
+      ipaddress = "%s"
       port = 80
   }
   servers {
-      ipaddress = "133.242.0.4"
+      ipaddress = "%s"
       port = 80
   }
 

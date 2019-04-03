@@ -313,7 +313,7 @@ resource "sakuracloud_vpc_router" "foobar" {
     name = "name_before"
     description = "description_before"
     tags = ["hoge1" , "hoge2"]
-    icon_id = sakuracloud_icon.foobar.id
+    icon_id = "${sakuracloud_icon.foobar.id}"
     internet_connection = true
 }
 
@@ -348,15 +348,15 @@ resource "sakuracloud_vpc_router" "foobar" {
 
   internet_connection = true
 
-  switch_id  = sakuracloud_internet.router1.switch_id
-  vip        = sakuracloud_internet.router1.ipaddresses[0]
-  ipaddress1 = sakuracloud_internet.router1.ipaddresses[1]
-  ipaddress2 = sakuracloud_internet.router1.ipaddresses[2]
-  aliases    = [ sakuracloud_internet.router1.ipaddresses[3] ]
+  switch_id  = "${sakuracloud_internet.router1.switch_id}"
+  vip        = "${sakuracloud_internet.router1.ipaddresses[0]}"
+  ipaddress1 = "${sakuracloud_internet.router1.ipaddresses[1]}"
+  ipaddress2 = "${sakuracloud_internet.router1.ipaddresses[2]}"
+  aliases    = ["${sakuracloud_internet.router1.ipaddresses[3]}"]
   vrid       = 1
 
   interface {
-    switch_id   = sakuracloud_switch.sw.id
+    switch_id   = "${sakuracloud_switch.sw.id}"
     vip         = "192.168.11.1"
     ipaddress   = ["192.168.11.2" , "192.168.11.3"]
     nw_mask_len = 24 
@@ -430,7 +430,7 @@ resource "sakuracloud_vpc_router" "foobar" {
   }
 
   static_nat {
-    global_address  = sakuracloud_internet.router1.ipaddresses[3]
+    global_address  = "${sakuracloud_internet.router1.ipaddresses[3]}"
     private_address = "192.168.11.12"
     description     = "desc"
   }
@@ -464,11 +464,11 @@ resource "sakuracloud_vpc_router" "foobar" {
 
   internet_connection = true
 
-  switch_id  = sakuracloud_internet.router1.switch_id
-  vip        = sakuracloud_internet.router1.ipaddresses[0]
-  ipaddress1 = sakuracloud_internet.router1.ipaddresses[1]
-  ipaddress2 = sakuracloud_internet.router1.ipaddresses[2]
-  aliases    = [ sakuracloud_internet.router1.ipaddresses[3] ]
+  switch_id  = "${sakuracloud_internet.router1.switch_id}"
+  vip        = "${sakuracloud_internet.router1.ipaddresses[0]}"
+  ipaddress1 = "${sakuracloud_internet.router1.ipaddresses[1]}"
+  ipaddress2 = "${sakuracloud_internet.router1.ipaddresses[2]}"
+  aliases    = [ "${sakuracloud_internet.router1.ipaddresses[3]}" ]
   vrid       = 1
 }
 `

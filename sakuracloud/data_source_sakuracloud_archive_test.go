@@ -21,7 +21,7 @@ func TestAccSakuraCloudDataSourceArchive_Basic(t *testing.T) {
 				Config: testAccCheckSakuraCloudDataSourceArchiveConfig,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckSakuraCloudArchiveDataSourceID("data.sakuracloud_archive.foobar"),
-					resource.TestCheckResourceAttr("data.sakuracloud_archive.foobar", "name", "Ubuntu Server 16.04.5 LTS 64bit"),
+					resource.TestCheckResourceAttr("data.sakuracloud_archive.foobar", "name", "Ubuntu Server 16.04.6 LTS 64bit"),
 					resource.TestCheckResourceAttr("data.sakuracloud_archive.foobar", "size", "20"),
 					resource.TestCheckResourceAttr("data.sakuracloud_archive.foobar", "zone", "tk1v"),
 					resource.TestCheckResourceAttr("data.sakuracloud_archive.foobar", "tags.#", "5"),

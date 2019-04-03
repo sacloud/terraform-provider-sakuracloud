@@ -125,7 +125,7 @@ const testAccCheckSakuraCloudNoteConfig_basic = `
 resource "sakuracloud_note" "foobar" {
     name = "mynote"
     content = "content"
-    icon_id = sakuracloud_icon.foobar.id
+    icon_id = "${sakuracloud_icon.foobar.id}"
 }
 
 resource "sakuracloud_icon" "foobar" {

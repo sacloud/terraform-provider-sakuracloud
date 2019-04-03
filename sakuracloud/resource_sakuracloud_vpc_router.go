@@ -295,7 +295,7 @@ func resourceSakuraCloudVPCRouterCreate(d *schema.ResourceData, meta interface{}
 			return client.VPCRouter.Create(opts)
 		},
 		AsyncWaitForCopy: func(id int64) (chan interface{}, chan interface{}, chan error) {
-			return client.VPCRouter.AsyncSleepWhileCopying(id, client.DefaultTimeoutDuration, 10)
+			return client.VPCRouter.AsyncSleepWhileCopying(id, client.DefaultTimeoutDuration, 20)
 		},
 		Delete: func(id int64) error {
 			_, err := client.VPCRouter.Delete(id)
