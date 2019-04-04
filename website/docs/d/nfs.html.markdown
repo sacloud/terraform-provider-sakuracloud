@@ -31,6 +31,7 @@ data "sakuracloud_nfs" "foobar" {
 * `name` - The name of the resource.
 * `switch_id` - The ID of the Switch connected to the NFS.
 * `plan` - The name of the resource plan.
+* `size` - The size of the NFS.
 * `ipaddress` - The IP address of the NFS.
 * `nw_mask_len` - Network mask length.
 * `default_route` - Default gateway address of the NFS.	 

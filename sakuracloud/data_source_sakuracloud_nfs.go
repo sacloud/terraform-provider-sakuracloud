@@ -52,6 +52,10 @@ func dataSourceSakuraCloudNFS() *schema.Resource {
 				Computed: true,
 			},
 			"plan": {
+				Type:     schema.TypeString,
+				Computed: true,
+			},
+			"size": {
 				Type:     schema.TypeInt,
 				Computed: true,
 			},

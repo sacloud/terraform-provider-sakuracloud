@@ -33,8 +33,11 @@ resource "sakuracloud_nfs" "foobar" {
 The following arguments are supported:
 
 * `name` - (Required) The name of the resource.
-* `plan` - (Optional) The plan (size) of the NFS Appliance (unit:`GB`).  
-Valid value is one of the following: [ 100 (default) / 500 / 1024 / 2048 / 4096 ]
+* `switch_id` - (Required) The ID of the switch connected to the NFS Appliance.
+* `plan` - (Optional) The plan of the NFS Appliance 
+Valid value is one of the following: [ hdd (default) / ssd ]
+* `size` - (Optional) The size of the NFS Appliance (unit:`GB`).  
+Valid value is one of the following: [ 100 (default) / 500 / 1024 / 2048 / 4096 / 8192(hdd only) / 12288(hdd only) ]
 * `switch_id` - (Required) The ID of the switch connected to the NFS Appliance.
 * `ipaddress` - (Required) The IP address of the NFS Appliance.
 * `nw_mask_len` - (Required) The network mask length of the NFS Appliance.
