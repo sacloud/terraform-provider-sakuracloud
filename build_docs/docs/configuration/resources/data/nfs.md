@@ -30,6 +30,7 @@ data "sakuracloud_nfs" "foobar" {
 | `name`          | NFS名 | - |
 | `switch_id`     | スイッチID | - |
 | `plan`          | プラン     | - |
+| `size`          | サイズ     | - |
 | `ipaddress`     | IPアドレス | - |
 | `nw_mask_len`   | ネットマスク | - |
 | `default_route` | ゲートウェイ | - |

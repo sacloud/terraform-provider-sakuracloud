@@ -94,3 +94,37 @@ resource "sakuracloud_server" "foobar" {
 }
 ```
 
+## NFS SSDプラン対応
+
+NFSにSSDプランが導入された際にパラメータ名が変更となりました。
+v1.11以前でNFSアプライアンスを利用していた場合はtfファイルの変更が必要となります。  
+
+旧: `plan`: NFSのサイズをGB単位で指定
+新: `plan`で`hdd` or `ssd`を指定、サイズは`size`パラメータで指定
+
+### 対応方法
+
+- tfファイルで`plan`を指定していた場合は`size`に置き換えてください。
+
+#### 対応前のtfファイルの例
+
+```hcl
+resource "sakuracloud_nfs" "foobar" {
+  switch_id   = "${sakuracloud_switch.foobar.id}"
+  plan        = "100"
+  
+  # ...
+}
+```
+
+#### 対応後のtfファイルの例
+
+```hcl
+resource "sakuracloud_nfs" "foobar" {
+  switch_id   = "${sakuracloud_switch.foobar.id}"
+  size        = "100" # planをsizeに置き換える
+  
+  # ...
+}
+```
+
