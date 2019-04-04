@@ -3,6 +3,7 @@ package sakuracloud
 import (
 	"fmt"
 	"strconv"
+	"time"
 
 	"github.com/hashicorp/terraform/helper/schema"
 	"github.com/hashicorp/terraform/helper/validation"
@@ -37,6 +38,11 @@ func resourceSakuraCloudProxyLB() *schema.Resource {
 					strconv.Itoa(int(sacloud.ProxyLBPlan50000)),
 					strconv.Itoa(int(sacloud.ProxyLBPlan100000)),
 				}),
+			},
+			"vip_failover": {
+				Type:     schema.TypeBool,
+				Optional: true,
+				ForceNew: true,
 			},
 			"bind_ports": {
 				Type:     schema.TypeList,
@@ -123,6 +129,42 @@ func resourceSakuraCloudProxyLB() *schema.Resource {
 							Type:     schema.TypeString,
 							Required: true,
 						},
+						"common_name": {
+							Type:     schema.TypeString,
+							Computed: true,
+						},
+						"end_date": {
+							Type:     schema.TypeString,
+							Computed: true,
+						},
+						"additional_certificates": {
+							Type:     schema.TypeList,
+							Optional: true,
+							Elem: &schema.Resource{
+								Schema: map[string]*schema.Schema{
+									"server_cert": {
+										Type:     schema.TypeString,
+										Required: true,
+									},
+									"intermediate_cert": {
+										Type:     schema.TypeString,
+										Optional: true,
+									},
+									"private_key": {
+										Type:     schema.TypeString,
+										Required: true,
+									},
+									"common_name": {
+										Type:     schema.TypeString,
+										Computed: true,
+									},
+									"end_date": {
+										Type:     schema.TypeString,
+										Computed: true,
+									},
+								},
+							},
+						},
 					},
 				},
 			},
@@ -164,6 +206,10 @@ func resourceSakuraCloudProxyLB() *schema.Resource {
 				Computed: true,
 				Elem:     &schema.Schema{Type: schema.TypeString},
 			},
+			"fqdn": {
+				Type:     schema.TypeString,
+				Computed: true,
+			},
 			"vip": {
 				Type:     schema.TypeString,
 				Computed: true,
@@ -183,6 +229,15 @@ func resourceSakuraCloudProxyLBCreate(d *schema.ResourceData, meta interface{}) 
 	opts := client.ProxyLB.New(d.Get("name").(string))
 
 	opts.SetPlan(sacloud.ProxyLBPlan(d.Get("plan").(int)))
+
+	var failOver bool
+	if f, ok := d.GetOk("vip_failover"); ok {
+		failOver = f.(bool)
+	}
+	opts.Status = &sacloud.ProxyLBStatus{
+		UseVIPFailover: failOver,
+	}
+
 	if bindPorts, ok := getListFromResource(d, "bind_ports"); ok {
 		for _, bindPort := range bindPorts {
 			values := mapToResourceData(bindPort.(map[string]interface{}))
@@ -255,6 +310,18 @@ func resourceSakuraCloudProxyLBCreate(d *schema.ResourceData, meta interface{}) 
 			IntermediateCertificate: values.Get("intermediate_cert").(string),
 			PrivateKey:              values.Get("private_key").(string),
 		}
+
+		if rawAdditionalCerts, ok := getListFromResource(values, "additional_certificates"); ok && len(rawAdditionalCerts) > 0 {
+			for _, rawCert := range rawAdditionalCerts {
+				values := mapToResourceData(rawCert.(map[string]interface{}))
+				cert.AddAdditionalCert(
+					values.Get("server_cert").(string),
+					values.Get("intermediate_cert").(string),
+					values.Get("private_key").(string),
+				)
+			}
+		}
+
 		if _, err := client.ProxyLB.SetCertificates(proxyLB.ID, cert); err != nil {
 			return fmt.Errorf("Failed to set SakuraCloud ProxyLB certificates: %s", err)
 		}
@@ -383,7 +450,7 @@ func resourceSakuraCloudProxyLBUpdate(d *schema.ResourceData, meta interface{}) 
 
 	proxyLB, err = client.ProxyLB.Update(proxyLB.ID, proxyLB)
 	if err != nil {
-		return fmt.Errorf("Failed to create SakuraCloud ProxyLB resource: %s", err)
+		return fmt.Errorf("Failed to update SakuraCloud ProxyLB resource: %s", err)
 	}
 
 	if d.HasChange("certificate") {
@@ -394,9 +461,25 @@ func resourceSakuraCloudProxyLBUpdate(d *schema.ResourceData, meta interface{}) 
 				IntermediateCertificate: values.Get("intermediate_cert").(string),
 				PrivateKey:              values.Get("private_key").(string),
 			}
+
+			if rawAdditionalCerts, ok := getListFromResource(values, "additional_certificates"); ok && len(rawAdditionalCerts) > 0 {
+				for _, rawCert := range rawAdditionalCerts {
+					values := mapToResourceData(rawCert.(map[string]interface{}))
+					cert.AddAdditionalCert(
+						values.Get("server_cert").(string),
+						values.Get("intermediate_cert").(string),
+						values.Get("private_key").(string),
+					)
+				}
+			}
 			if _, err := client.ProxyLB.SetCertificates(proxyLB.ID, cert); err != nil {
 				return fmt.Errorf("Failed to set SakuraCloud ProxyLB certificates: %s", err)
 			}
+		} else {
+			if _, err := client.ProxyLB.DeleteCertificates(proxyLB.ID); err != nil {
+				return fmt.Errorf("Failed to remove SakuraCloud ProxyLB certificates: %s", err)
+			}
+
 		}
 	}
 
@@ -420,7 +503,7 @@ func setProxyLBResourceData(d *schema.ResourceData, client *APIClient, data *sac
 
 	d.Set("name", data.Name)
 	d.Set("plan", int(data.GetPlan()))
-
+	d.Set("vip_failover", data.Status.UseVIPFailover)
 	// bind ports
 	var bindPorts []map[string]interface{}
 	for _, bindPort := range data.Settings.ProxyLB.BindPorts {
@@ -464,6 +547,7 @@ func setProxyLBResourceData(d *schema.ResourceData, client *APIClient, data *sac
 		})
 	}
 	d.Set("servers", servers)
+	d.Set("fqdn", data.Status.FQDN)
 	d.Set("vip", data.Status.VirtualIPAddress)
 	d.Set("proxy_networks", data.Status.ProxyNetworks)
 
@@ -477,9 +561,31 @@ func setProxyLBResourceData(d *schema.ResourceData, client *APIClient, data *sac
 		// even if certificate is deleted, it will not result in an error
 		return err
 	}
-	d.Set("server_cert", cert.ServerCertificate)
-	d.Set("intermediate_cert", cert.IntermediateCertificate)
-	d.Set("private_key", cert.PrivateKey)
+
+	proxylbCert := map[string]interface{}{
+		"server_cert":       cert.ServerCertificate,
+		"intermediate_cert": cert.IntermediateCertificate,
+		"private_key":       cert.PrivateKey,
+		"common_name":       cert.CertificateCommonName,
+		"end_date":          cert.CertificateEndDate.Format(time.RFC3339),
+	}
+	if len(cert.AdditionalCerts) > 0 {
+		var certs []interface{}
+		for _, cert := range cert.AdditionalCerts {
+			certs = append(certs, map[string]interface{}{
+				"server_cert":       cert.ServerCertificate,
+				"intermediate_cert": cert.IntermediateCertificate,
+				"private_key":       cert.PrivateKey,
+				"common_name":       cert.CertificateCommonName,
+				"end_date":          cert.CertificateEndDate.Format(time.RFC3339),
+			})
+		}
+		proxylbCert["additional_certificates"] = certs
+	} else {
+		proxylbCert["additional_certificates"] = []interface{}{}
+	}
+
+	d.Set("certificates", []interface{}{proxylbCert})
 
 	return nil
 }
