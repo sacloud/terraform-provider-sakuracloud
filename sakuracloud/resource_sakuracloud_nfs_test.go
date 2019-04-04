@@ -23,7 +23,8 @@ func TestAccSakuraCloudNFS(t *testing.T) {
 					testAccCheckSakuraCloudNFSExists("sakuracloud_nfs.foobar", &nfs),
 					resource.TestCheckResourceAttr("sakuracloud_nfs.foobar", "name", "name_before"),
 					resource.TestCheckResourceAttr("sakuracloud_nfs.foobar", "description", "description_before"),
-					resource.TestCheckResourceAttr("sakuracloud_nfs.foobar", "plan", "500"),
+					resource.TestCheckResourceAttr("sakuracloud_nfs.foobar", "plan", "ssd"),
+					resource.TestCheckResourceAttr("sakuracloud_nfs.foobar", "size", "500"),
 					resource.TestCheckResourceAttr("sakuracloud_nfs.foobar", "tags.#", "2"),
 					resource.TestCheckResourceAttr("sakuracloud_nfs.foobar", "tags.0", "hoge1"),
 					resource.TestCheckResourceAttr("sakuracloud_nfs.foobar", "tags.1", "hoge2"),
@@ -42,7 +43,8 @@ func TestAccSakuraCloudNFS(t *testing.T) {
 					testAccCheckSakuraCloudNFSExists("sakuracloud_nfs.foobar", &nfs),
 					resource.TestCheckResourceAttr("sakuracloud_nfs.foobar", "name", "name_after"),
 					resource.TestCheckResourceAttr("sakuracloud_nfs.foobar", "description", "description_after"),
-					resource.TestCheckResourceAttr("sakuracloud_nfs.foobar", "plan", "500"),
+					resource.TestCheckResourceAttr("sakuracloud_nfs.foobar", "plan", "ssd"),
+					resource.TestCheckResourceAttr("sakuracloud_nfs.foobar", "size", "500"),
 					resource.TestCheckResourceAttr("sakuracloud_nfs.foobar", "tags.#", "2"),
 					resource.TestCheckResourceAttr("sakuracloud_nfs.foobar", "tags.0", "hoge1_after"),
 					resource.TestCheckResourceAttr("sakuracloud_nfs.foobar", "tags.1", "hoge2_after"),
@@ -111,7 +113,8 @@ resource "sakuracloud_switch" "sw" {
 }
 resource "sakuracloud_nfs" "foobar" {
     switch_id     = "${sakuracloud_switch.sw.id}"
-    plan          = "500"
+    plan          = "ssd"
+    size          = "500"
     ipaddress     = "192.168.11.101"
     nw_mask_len   = 24
     default_route = "192.168.11.1"
@@ -133,7 +136,8 @@ resource "sakuracloud_switch" "sw" {
 }
 resource "sakuracloud_nfs" "foobar" {
     switch_id     = "${sakuracloud_switch.sw.id}"
-    plan          = "500"
+    plan          = "ssd"
+    size          = "500"
     ipaddress     = "192.168.11.101"
     nw_mask_len   = 24
     default_route = "192.168.11.1"

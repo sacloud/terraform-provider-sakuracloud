@@ -3,6 +3,7 @@ package sakuracloud
 import (
 	"fmt"
 	"strconv"
+	"strings"
 
 	"github.com/hashicorp/terraform/helper/schema"
 	"github.com/hashicorp/terraform/helper/validation"
@@ -33,18 +34,25 @@ func resourceSakuraCloudNFS() *schema.Resource {
 				ValidateFunc: validateSakuracloudIDType,
 			},
 			"plan": {
+				Type:         schema.TypeString,
+				ForceNew:     true,
+				Optional:     true,
+				Default:      "hdd",
+				ValidateFunc: validation.StringInSlice([]string{"hdd", "ssd"}, false),
+			},
+			"size": {
 				Type:     schema.TypeInt,
 				ForceNew: true,
 				Optional: true,
 				Default:  "100",
 				ValidateFunc: validateIntInWord([]string{
-					strconv.Itoa(int(sacloud.NFSPlan100G)),
-					strconv.Itoa(int(sacloud.NFSPlan500G)),
-					strconv.Itoa(int(sacloud.NFSPlan1T)),
-					strconv.Itoa(int(sacloud.NFSPlan2T)),
-					strconv.Itoa(int(sacloud.NFSPlan4T)),
-					strconv.Itoa(int(sacloud.NFSPlan8T)),
-					strconv.Itoa(int(sacloud.NFSPlan12T)),
+					strconv.Itoa(int(sacloud.NFSSize100G)),
+					strconv.Itoa(int(sacloud.NFSSize500G)),
+					strconv.Itoa(int(sacloud.NFSSize1T)),
+					strconv.Itoa(int(sacloud.NFSSize2T)),
+					strconv.Itoa(int(sacloud.NFSSize4T)),
+					strconv.Itoa(int(sacloud.NFSSize8T)),
+					strconv.Itoa(int(sacloud.NFSSize12T)),
 				}),
 			},
 			"ipaddress": {
@@ -110,7 +118,16 @@ func resourceSakuraCloudNFSCreate(d *schema.ResourceData, meta interface{}) erro
 		defaultRoute = df.(string)
 	}
 
-	opts.Plan = sacloud.NFSPlan(d.Get("plan").(int))
+	strPlan := d.Get("plan").(string)
+	intSize := d.Get("size").(int)
+	plan := sacloud.NFSPlanHDD
+	if strPlan == "ssd" {
+		plan = sacloud.NFSPlanSSD
+		if _, errs := validation.IntInSlice(sacloud.AllowNFSSSDPlanSizes())(intSize, "size"); len(errs) != 0 {
+			return errs[0]
+		}
+	}
+	size := sacloud.NFSSize(intSize)
 
 	if iconID, ok := d.GetOk("icon_id"); ok {
 		opts.Icon = sacloud.NewResource(toSakuraCloudID(iconID.(string)))
@@ -128,11 +145,9 @@ func resourceSakuraCloudNFSCreate(d *schema.ResourceData, meta interface{}) erro
 	opts.MaskLen = nwMaskLen
 	opts.DefaultRoute = defaultRoute
 
-	createNFS := sacloud.NewNFS(opts)
-
 	nfsBuilder := &setup.RetryableSetup{
 		Create: func() (sacloud.ResourceIDHolder, error) {
-			return client.NFS.Create(createNFS)
+			return client.NFS.CreateWithPlan(opts, plan, size)
 		},
 		AsyncWaitForCopy: func(id int64) (chan interface{}, chan interface{}, chan error) {
 			return client.NFS.AsyncSleepWhileCopying(id, client.DefaultTimeoutDuration, 5)
@@ -245,7 +260,16 @@ func setNFSResourceData(d *schema.ResourceData, client *APIClient, data *sacloud
 	d.Set("nw_mask_len", data.Remark.Network.NetworkMaskLen)
 	d.Set("default_route", data.Remark.Network.DefaultRoute)
 
-	d.Set("plan", data.Remark.Plan.ID)
+	d.Set("plan", "")
+	d.Set("size", 0)
+	if plans, err := client.NFS.GetNFSPlans(); err == nil {
+		plan, planDetail := plans.FindByPlanID(data.Plan.ID)
+		if planDetail != nil {
+			d.Set("plan", strings.ToLower(plan.String()))
+			d.Set("size", planDetail.Size)
+		}
+	}
+
 	d.Set("name", data.Name)
 	d.Set("icon_id", data.GetIconStrID())
 	d.Set("description", data.Description)
