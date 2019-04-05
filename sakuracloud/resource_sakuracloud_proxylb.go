@@ -95,7 +95,6 @@ func resourceSakuraCloudProxyLB() *schema.Resource {
 				Type:     schema.TypeList,
 				Optional: true,
 				MaxItems: 1,
-				MinItems: 1,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
 						"ipaddress": {
@@ -113,7 +112,6 @@ func resourceSakuraCloudProxyLB() *schema.Resource {
 				Type:     schema.TypeList,
 				Optional: true,
 				MaxItems: 1,
-				MinItems: 1,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
 						"server_cert": {
@@ -475,6 +473,7 @@ func resourceSakuraCloudProxyLBUpdate(d *schema.ResourceData, meta interface{}) 
 				ServerCertificate:       values.Get("server_cert").(string),
 				IntermediateCertificate: values.Get("intermediate_cert").(string),
 				PrivateKey:              values.Get("private_key").(string),
+				AdditionalCerts:         []*sacloud.ProxyLBCertificate{},
 			}
 
 			if rawAdditionalCerts, ok := getListFromResource(values, "additional_certificates"); ok && len(rawAdditionalCerts) > 0 {
