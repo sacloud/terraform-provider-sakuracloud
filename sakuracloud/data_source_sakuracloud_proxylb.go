@@ -132,14 +132,6 @@ func dataSourceSakuraCloudProxyLB() *schema.Resource {
 							Type:     schema.TypeString,
 							Computed: true,
 						},
-						"common_name": {
-							Type:     schema.TypeString,
-							Computed: true,
-						},
-						"end_date": {
-							Type:     schema.TypeString,
-							Computed: true,
-						},
 						"additional_certificates": {
 							Type:     schema.TypeList,
 							Optional: true,
@@ -154,14 +146,6 @@ func dataSourceSakuraCloudProxyLB() *schema.Resource {
 										Computed: true,
 									},
 									"private_key": {
-										Type:     schema.TypeString,
-										Computed: true,
-									},
-									"common_name": {
-										Type:     schema.TypeString,
-										Computed: true,
-									},
-									"end_date": {
 										Type:     schema.TypeString,
 										Computed: true,
 									},

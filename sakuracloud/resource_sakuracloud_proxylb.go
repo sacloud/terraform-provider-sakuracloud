@@ -3,7 +3,6 @@ package sakuracloud
 import (
 	"fmt"
 	"strconv"
-	"time"
 
 	"github.com/hashicorp/terraform/helper/schema"
 	"github.com/hashicorp/terraform/helper/validation"
@@ -126,14 +125,6 @@ func resourceSakuraCloudProxyLB() *schema.Resource {
 							Type:     schema.TypeString,
 							Required: true,
 						},
-						"common_name": {
-							Type:     schema.TypeString,
-							Computed: true,
-						},
-						"end_date": {
-							Type:     schema.TypeString,
-							Computed: true,
-						},
 						"additional_certificates": {
 							Type:     schema.TypeList,
 							Optional: true,
@@ -150,14 +141,6 @@ func resourceSakuraCloudProxyLB() *schema.Resource {
 									"private_key": {
 										Type:     schema.TypeString,
 										Required: true,
-									},
-									"common_name": {
-										Type:     schema.TypeString,
-										Computed: true,
-									},
-									"end_date": {
-										Type:     schema.TypeString,
-										Computed: true,
 									},
 								},
 							},
@@ -580,8 +563,8 @@ func setProxyLBResourceData(d *schema.ResourceData, client *APIClient, data *sac
 		"server_cert":       cert.ServerCertificate,
 		"intermediate_cert": cert.IntermediateCertificate,
 		"private_key":       cert.PrivateKey,
-		"common_name":       cert.CertificateCommonName,
-		"end_date":          cert.CertificateEndDate.Format(time.RFC3339),
+		//"common_name":       cert.CertificateCommonName,
+		//"end_date":          cert.CertificateEndDate.Format(time.RFC3339),
 	}
 	if len(cert.AdditionalCerts) > 0 {
 		var certs []interface{}
@@ -590,8 +573,8 @@ func setProxyLBResourceData(d *schema.ResourceData, client *APIClient, data *sac
 				"server_cert":       cert.ServerCertificate,
 				"intermediate_cert": cert.IntermediateCertificate,
 				"private_key":       cert.PrivateKey,
-				"common_name":       cert.CertificateCommonName,
-				"end_date":          cert.CertificateEndDate.Format(time.RFC3339),
+				//"common_name":       cert.CertificateCommonName,
+				//"end_date":          cert.CertificateEndDate.Format(time.RFC3339),
 			})
 		}
 		proxylbCert["additional_certificates"] = certs
@@ -600,6 +583,5 @@ func setProxyLBResourceData(d *schema.ResourceData, client *APIClient, data *sac
 	}
 
 	d.Set("certificates", []interface{}{proxylbCert})
-
 	return nil
 }

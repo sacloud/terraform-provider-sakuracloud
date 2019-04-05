@@ -68,6 +68,4 @@ Attributes for Health Check:
 * `server_cert` - The server certificate.
 * `intermediate_cert` - The intermediate certificate.
 * `private_key` - The private key.
-* `common_name` - The common name of certificates.  
-* `end_date` - End date.  
 * `additional_certificates` - The additional certificates.

@@ -107,11 +107,6 @@ Valid value is one of the following: [ "http" / "tcp" ]
 * `private_key` - (Optional) The private key.
 * `additional_certificates` - (Optional) Additional certificates.
 
-Certificate has following attributes:
-
-- `common_name` - The common name of certificates.  
-- `end_date` - End date.  
-
 ## Attributes Reference
 
 The following attributes are exported:

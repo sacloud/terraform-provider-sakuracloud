@@ -120,13 +120,6 @@ resource "sakuracloud_proxylb" "foobar" {
 | `private_key`      | ◯  | 秘密鍵      | - | 文字列 | - |
 | `additional_certificates`| -  | 追加証明書      | - | リスト | 詳細は[`certificate`](#certificate)を参照 |
 
-`certificate`は以下の属性を持ちます。(`additional_certificates`配下の各要素も同様です)
-
-|属性名          | 名称             | 補足                                        |
-|---------------|-----------------|--------------------------------------------|
-| `common_name` | Common Name | -                                          |
-| `end_date`    | 有効期限     | -                                          |
-
 
 ### 属性
 
