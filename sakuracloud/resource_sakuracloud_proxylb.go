@@ -28,7 +28,6 @@ func resourceSakuraCloudProxyLB() *schema.Resource {
 			},
 			"plan": {
 				Type:     schema.TypeInt,
-				ForceNew: true,
 				Optional: true,
 				Default:  1000,
 				ValidateFunc: validateIntInWord([]string{
@@ -353,6 +352,22 @@ func resourceSakuraCloudProxyLBUpdate(d *schema.ResourceData, meta interface{}) 
 	proxyLB, err := client.ProxyLB.Read(toSakuraCloudID(d.Id()))
 	if err != nil {
 		return fmt.Errorf("Couldn't find SakuraCloud ProxyLB resource: %s", err)
+	}
+
+	if d.HasChange("plan") {
+		if rawPlan, ok := d.GetOk("plan"); ok {
+			plan := rawPlan.(int)
+			if plan > 0 {
+				upd, err := client.ProxyLB.ChangePlan(proxyLB.ID, sacloud.ProxyLBPlan(plan))
+				if err != nil {
+					return fmt.Errorf("Couldn't find SakuraCloud ProxyLB resource: %s", err)
+				}
+
+				// update ID
+				proxyLB = upd
+				d.SetId(proxyLB.GetStrID())
+			}
+		}
 	}
 
 	if d.HasChange("name") {
