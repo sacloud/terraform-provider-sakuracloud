@@ -31,6 +31,7 @@ The following attributes are exported:
 * `id` - The ID of the resource.
 * `name` - Name of the resource.
 * `plan` - The plan of the resource.
+* `vip_failover` - The flag of enable VIP Fail-Over.  
 * `bind_ports` - The external listen ports. It contains some attributes to [Bind Ports](#bind-ports).
 * `health_check` - The health check rules. It contains some attributes to [Health Check](#health-check).
 * `sorry_server` - The pair of IPAddress and port number of sorry-server.
@@ -67,5 +68,6 @@ Attributes for Health Check:
 * `server_cert` - The server certificate.
 * `intermediate_cert` - The intermediate certificate.
 * `private_key` - The private key.
-
-
+* `common_name` - The common name of certificates.  
+* `end_date` - End date.  
+* `additional_certificates` - The additional certificates.

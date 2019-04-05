@@ -14,7 +14,9 @@ Provides a SakuraCloud ProxyLB(Enhanced-LoadBalancer) resource. This can be used
 
 ```hcl
 resource "sakuracloud_proxylb" "foobar" {
-  name = "foobar"
+  name         = "foobar"
+  plan         = 1000 
+  vip_failover = false
 
   health_check {
     protocol    = "http"
@@ -34,18 +36,24 @@ resource "sakuracloud_proxylb" "foobar" {
   }
 
   servers {
-      ipaddress = "133.242.0.3"
-      port = 80
+    ipaddress = "133.242.0.3"
+    port = 80
   }
   servers {
-      ipaddress = "133.242.0.4"
-      port = 80
+    ipaddress = "133.242.0.4"
+    port = 80
   }
 
   certificate {
     server_cert = file("server.crt")
     private_key = file("server.key")    
     # intermediate_cert = file("intermediate.crt")
+    
+    additional_certificates {
+      server_cert = file("server2.crt")
+      private_key = file("server2.key")    
+      # intermediate_cert = file("intermediate2.crt")
+    }
   }
 }
 ```
@@ -57,6 +65,7 @@ The following arguments are supported:
 * `name` - (Required) The name of the resource.  
 * `plan` - (Optional) The plan of the resource.
 Valid value is one of the following: [ 1000 (default) / 5000 / 10000 / 50000 / 100000 ]  
+* `vip_failover` - (Optional) The flag of enable VIP Fail-Over.  
 * `bind_ports` - (Required) The external listen ports. It contains some attributes to [Bind Ports](#bind-ports).
 * `health_check` - (Required) The health check rules. It contains some attributes to [Health Check](#health-check).
 * `sorry_server` - (Optional) The pair of IPAddress and port number of sorry-server.
@@ -96,6 +105,12 @@ Valid value is one of the following: [ "http" / "tcp" ]
 * `server_cert` - (Required) The server certificate.
 * `intermediate_cert` - (Optional) The intermediate certificate.
 * `private_key` - (Optional) The private key.
+* `additional_certificates` - (Optional) Additional certificates.
+
+Certificate has following attributes:
+
+- `common_name` - The common name of certificates.  
+- `end_date` - End date.  
 
 ## Attributes Reference
 
@@ -104,11 +119,15 @@ The following attributes are exported:
 * `id` - The ID of the resource.
 * `name` - Name of the resource.
 * `plan` - The plan of the resource.
+* `vip_failover` - The flag of enable VIP Fail-Over.  
 * `bind_ports` - The external listen ports. It contains some attributes to [Bind Ports](#bind-ports).
 * `health_check` - The health check rules. It contains some attributes to [Health Check](#health-check).
 * `sorry_server` - The pair of IPAddress and port number of sorry-server.
 * `servers` - Real servers. It contains some attributes to [Servers](#servers).
 * `certificate` - Certificate used to terminate SSL/TSL. It contains some attributes to [Certificate](#certificate).
+* `vip` - The VirtualIPAddress that was assigned. This attribute only valid when `vip_failover` is set to `false`.  
+* `fqdn` - The FQDN that was assigned. This attribute only valid when `vip_failover` is set to `true`.  
+* `proxy_networks` - ProxyLB network address.   
 * `description` - The description of the resource.
 * `tags` - The tag list of the resources.
 * `icon_id` - The ID of the icon.
