@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"os"
+	"regexp"
 	"testing"
 
 	"github.com/hashicorp/terraform/helper/resource"
@@ -41,6 +42,10 @@ func TestAccResourceSakuraCloudProxyLB(t *testing.T) {
 						"sakuracloud_proxylb.foobar", "name", "terraform-test-proxylb"),
 					resource.TestCheckResourceAttr(
 						"sakuracloud_proxylb.foobar", "plan", "5000"),
+					resource.TestMatchResourceAttr(
+						"sakuracloud_proxylb.foobar", "fqdn", regexp.MustCompile(`.+\.sakura\.ne\.jp$`)),
+					resource.TestCheckResourceAttr(
+						"sakuracloud_proxylb.foobar", "vip_failover", "true"),
 					resource.TestCheckResourceAttr(
 						"sakuracloud_proxylb.foobar", "health_check.0.protocol", "http"),
 					resource.TestCheckResourceAttr(
@@ -173,6 +178,7 @@ func TestAccImportSakuraCloudProxyLB(t *testing.T) {
 		}
 		expects := map[string]string{
 			"name":                      "terraform-test-proxylb-import",
+			"vip_failover":              "true",
 			"health_check.0.protocol":   "tcp",
 			"health_check.0.delay_loop": "20",
 			"description":               "ProxyLB from TerraForm for SAKURA CLOUD",
@@ -192,7 +198,7 @@ func TestAccImportSakuraCloudProxyLB(t *testing.T) {
 		if err := compareStateMulti(s[0], expects); err != nil {
 			return err
 		}
-		return stateNotEmptyMulti(s[0], "vip", "proxy_networks.0")
+		return stateNotEmptyMulti(s[0], "fqdn", "proxy_networks.0")
 	}
 
 	resourceName := "sakuracloud_proxylb.foobar"
@@ -219,6 +225,7 @@ var testAccCheckSakuraCloudProxyLBConfig_basic = `
 resource "sakuracloud_proxylb" "foobar" {
   name = "terraform-test-proxylb"
   plan = 5000
+  vip_failover = true
   health_check {
     protocol = "http"
     delay_loop = 10
@@ -257,6 +264,7 @@ var testAccCheckSakuraCloudProxyLBConfig_update = `
 resource "sakuracloud_proxylb" "foobar" {
   name = "terraform-test-proxylb-upd"
   plan = 5000
+  vip_failover = true
   health_check {
     protocol = "tcp"
     delay_loop = 20
@@ -284,6 +292,7 @@ resource sakuracloud_server "server01" {
 var testAccCheckSakuraCloudProxyLBConfig_import = `
 resource "sakuracloud_proxylb" "foobar" {
   name = "terraform-test-proxylb-import"
+  vip_failover = true
   health_check {
     protocol = "tcp"
     delay_loop = 20

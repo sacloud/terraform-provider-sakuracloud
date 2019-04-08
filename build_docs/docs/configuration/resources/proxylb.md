@@ -8,7 +8,9 @@
 
 ```hcl
 resource "sakuracloud_proxylb" "foobar" {
-  name = "foobar"
+  name         = "foobar"
+  plan         = 1000 
+  vip_failover = true # default: false
 
   health_check {
     protocol    = "http"
@@ -28,18 +30,30 @@ resource "sakuracloud_proxylb" "foobar" {
   }
 
   servers {
-      ipaddress = "133.242.0.3"
-      port = 80
+    ipaddress = "133.242.0.3"
+    port = 80
   }
   servers {
-      ipaddress = "133.242.0.4"
-      port = 80
+    ipaddress = "133.242.0.4"
+    port = 80
   }
 
   certificate {
     server_cert = file("server.crt")
     private_key = file("server.key")    
     # intermediate_cert = file("intermediate.crt")
+    
+    additional_certificates {
+      server_cert = file("server2.crt")
+      private_key = file("server2.key")    
+      # intermediate_cert = file("intermediate2.crt")
+    }
+    
+    additional_certificates {
+      server_cert = file("server3.crt")
+      private_key = file("server3.key")    
+      # intermediate_cert = file("intermediate3.crt")
+    }
   }
 }
 ```
@@ -52,6 +66,7 @@ resource "sakuracloud_proxylb" "foobar" {
 |-------------------|:---:|---------------|:--------:|------------------------|----------------------------------------------|
 | `name`            | ◯   | エンハンスドロードバランサ名        | -        | 文字列                  | - |
 | `plan`            | -   | プラン        | `1000`        | `1000`<br />`5000`<br />`10000`<br />`50000`<br />`100000`     | - |
+| `vip_failover`    | -   | VIPフェイルオーバ | `false`        | `true` or `false`     | - |
 | `bind_ports`      | ◯   | 待ち受けポート  | -        | リスト                  | 詳細は[`bind_ports`](#bind_ports)を参照    |
 | `health_check`    | ◯   | ヘルスチェック  | -        | マップ                  | 詳細は[`health_check`](#health_check)を参照    |
 | `sorry_server`     | -   | ソーリーサーバ  | -      | マップ| 詳細は[`sorry_server`](#sorry_server)を参照 |
@@ -101,14 +116,17 @@ resource "sakuracloud_proxylb" "foobar" {
 |パラメーター  |必須  |名称          |初期値   |設定値                 |補足                                          |
 |------------|:---:|--------------|:------:|---------------------|----------------------------------------------|
 | `server_cert`      | ◯  | サーバ証明書 | -      | 文字列               | -|
-| `intermediate_cert`| ◯  | 中間証明書   | - | 文字列 | - |
+| `intermediate_cert`| -  | 中間証明書   | - | 文字列 | - |
 | `private_key`      | ◯  | 秘密鍵      | - | 文字列 | - |
+| `additional_certificates`| -  | 追加証明書      | - | リスト | 詳細は[`certificate`](#certificate)を参照 |
+
 
 ### 属性
 
 |属性名          | 名称             | 補足                                        |
 |---------------|-----------------|--------------------------------------------|
 | `id`          | ID              | -                                          |
-| `vip`        | VIP       | ロードバランサに割り当てられたグローバルIP    |
+| `vip`        | VIP       | ロードバランサに割り当てられたグローバルIP(`vip_failover`が`false`の場合のみ有効)    |
+| `fqdn`        | VIP       | ロードバランサに割り当てられたグローバルIP(`vip_failover`が`true`の場合のみ有効)    |
 | `proxy_networks`  | プロキシ元ネットワーク | プロキシ元IP(CIDR)のリスト    |
 

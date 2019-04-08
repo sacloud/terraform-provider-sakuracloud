@@ -51,6 +51,10 @@ func dataSourceSakuraCloudProxyLB() *schema.Resource {
 				Type:     schema.TypeInt,
 				Computed: true,
 			},
+			"vip_failover": {
+				Type:     schema.TypeBool,
+				Computed: true,
+			},
 			"bind_ports": {
 				Type:     schema.TypeList,
 				Computed: true,
@@ -128,6 +132,26 @@ func dataSourceSakuraCloudProxyLB() *schema.Resource {
 							Type:     schema.TypeString,
 							Computed: true,
 						},
+						"additional_certificates": {
+							Type:     schema.TypeList,
+							Optional: true,
+							Elem: &schema.Resource{
+								Schema: map[string]*schema.Schema{
+									"server_cert": {
+										Type:     schema.TypeString,
+										Computed: true,
+									},
+									"intermediate_cert": {
+										Type:     schema.TypeString,
+										Computed: true,
+									},
+									"private_key": {
+										Type:     schema.TypeString,
+										Computed: true,
+									},
+								},
+							},
+						},
 					},
 				},
 			},
@@ -163,6 +187,10 @@ func dataSourceSakuraCloudProxyLB() *schema.Resource {
 				Type:     schema.TypeList,
 				Computed: true,
 				Elem:     &schema.Schema{Type: schema.TypeString},
+			},
+			"fqdn": {
+				Type:     schema.TypeString,
+				Computed: true,
 			},
 			"vip": {
 				Type:     schema.TypeString,
