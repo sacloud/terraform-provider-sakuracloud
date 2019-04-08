@@ -119,6 +119,13 @@
     </li>
 
         
+            
+    <li class="toctree-l1 ">
+        <a class="" href="../../../upgrade_to_v1_11/">v1.11での変更点</a>
+        
+    </li>
+
+        
     </ul>
 
         
@@ -243,6 +250,13 @@
         
             
     <li class="toctree-l1 ">
+        <a class="" href="../vpc_router_old/">VPCルータ(子リソース)</a>
+        
+    </li>
+
+        
+            
+    <li class="toctree-l1 ">
         <a class="" href="../database/">データベース</a>
         
     </li>
@@ -338,6 +352,13 @@
             
     <li class="toctree-l1 ">
         <a class="" href="../ipv4_ptr/">IPv4逆引きレコード</a>
+        
+    </li>
+
+        
+            
+    <li class="toctree-l1 ">
+        <a class="" href="../proxylb/">エンハンスドロードバランサ</a>
         
     </li>
 
@@ -528,6 +549,13 @@
         
             
     <li class="toctree-l1 ">
+        <a class="" href="../data/proxylb/">エンハンスドロードバランサ</a>
+        
+    </li>
+
+        
+            
+    <li class="toctree-l1 ">
         <a class="" href="../data/gslb/">GSLB</a>
         
     </li>
@@ -601,72 +629,70 @@
 <h3 id="_1">設定例</h3>
 <pre><code class="hcl"># モバイルゲートウェイの定義
 resource &quot;sakuracloud_mobile_gateway&quot; &quot;mgw&quot; {
-    name = &quot;example&quot;
+  name = &quot;example&quot;
 
-    internet_connection = true
+  internet_connection = true
 
-    switch_id           = &quot;${sakuracloud_switch.sw.id}&quot; # スイッチのID
-    private_ipaddress   = &quot;192.168.11.101&quot;              # プライベート側IPアドレス
-    private_nw_mask_len = 24                            # プライベート側ネットワークマスク長
+  switch_id           = sakuracloud_switch.sw.id # スイッチのID
+  private_ipaddress   = &quot;192.168.11.101&quot;         # プライベート側IPアドレス
+  private_nw_mask_len = 24                       # プライベート側ネットワークマスク長
 
-    #dns_server1 = &quot;8.8.8.8&quot; # DNSサーバ1
-    #dns_server2 = &quot;8.8.4.4&quot; # DNSサーバ2
+  #dns_server1 = &quot;8.8.8.8&quot; # DNSサーバ1
+  #dns_server2 = &quot;8.8.4.4&quot; # DNSサーバ2
 
-    description = &quot;example&quot;
-    tags        = [&quot;tags1&quot; , &quot;tags2&quot;]
+  description = &quot;example&quot;
+  tags        = [&quot;tags1&quot;, &quot;tags2&quot;]
 
-    # トラフィックコントロール
-    traffic_control = {
-      quota                = 256
-      band_width_limit     = 64
-      enable_email         = true
-      enable_slack         = true
-      slack_webhook        = &quot;https://hooks.slack.com/services/xxx/xxx/xxx&quot;
-      auto_traffic_shaping = true
-    }
-}
+  # トラフィックコントロール
+  traffic_control {
+    quota                = 256
+    band_width_limit     = 64
+    enable_email         = true
+    enable_slack         = true
+    slack_webhook        = &quot;https://hooks.slack.com/services/xxx/xxx/xxx&quot;
+    auto_traffic_shaping = true
+  }
 
-# スタティックルートの定義
-resource &quot;sakuracloud_mobile_gateway_static_route&quot; &quot;route01&quot; {
-    mobile_gateway_id = &quot;${sakuracloud_mobile_gateway.mgw.id}&quot;
-
+  static_route {
     prefix   = &quot;192.168.10.0/24&quot;
     next_hop = &quot;192.168.11.201&quot;
+  }
 }
 
-# スタティックルートの定義
-resource &quot;sakuracloud_mobile_gateway_static_route&quot; &quot;route02&quot; {
-    mobile_gateway_id = &quot;${sakuracloud_mobile_gateway.mgw.id}&quot;
-
-    prefix   = &quot;192.168.10.0/26&quot;
-    next_hop = &quot;192.168.11.202&quot;
-}
+# スタティックルートの定義(terraform v0.11)
+#resource &quot;sakuracloud_mobile_gateway_static_route&quot; &quot;route01&quot; {
+#  mobile_gateway_id = sakuracloud_mobile_gateway.mgw.id
+#
+#  prefix   = &quot;192.168.10.0/24&quot;
+#  next_hop = &quot;192.168.11.201&quot;
+#}
 
 # SIMルートの定義
-resource sakuracloud_mobile_gateway_sim_route &quot;r3&quot; {
-  mobile_gateway_id = &quot;${sakuracloud_mobile_gateway.mgw.id}&quot;
-  sim_id = &quot;${sakuracloud_sim.sim.id}&quot;
-  prefix = &quot;192.168.11.0/26&quot;
+resource &quot;sakuracloud_mobile_gateway_sim_route&quot; &quot;r3&quot; {
+  mobile_gateway_id = sakuracloud_mobile_gateway.mgw.id
+  sim_id            = sakuracloud_sim.sim.id
+  prefix            = &quot;192.168.11.0/26&quot;
 }
 
 # SIMの定義
 resource &quot;sakuracloud_sim&quot; &quot;sim&quot; {
-    name        = &quot;example&quot;
-    description = &quot;example&quot;
-    tags        = [&quot;tags1&quot; , &quot;tags2&quot;]
+  name        = &quot;example&quot;
+  description = &quot;example&quot;
+  tags        = [&quot;tags1&quot;, &quot;tags2&quot;]
 
-    iccid    = &quot;&lt;SIMに記載されているICCID&gt;&quot;
-    passcode = &quot;&lt;SIMに記載されているPasscode&gt;&quot;
-    imei     = &quot;&lt;端末識別番号(IMEIロックする場合のみ)&gt;&quot;
-    #enabled  = true
+  iccid    = &quot;&lt;SIMに記載されているICCID&gt;&quot;
+  passcode = &quot;&lt;SIMに記載されているPasscode&gt;&quot;
+  imei     = &quot;&lt;端末識別番号(IMEIロックする場合のみ)&gt;&quot;
 
-    mobile_gateway_id = &quot;${sakuracloud_mobile_gateway.mgw.id}&quot; # 接続するモバイルゲートウェイのID
-    ipaddress         = &quot;192.168.100.2&quot;                        # SIMに割り当てるIPアドレス        
+  #enabled  = true
+
+  mobile_gateway_id = sakuracloud_mobile_gateway.mgw.id # 接続するモバイルゲートウェイのID
+  ipaddress         = &quot;192.168.100.2&quot;                   # SIMに割り当てるIPアドレス        
 }
 
 # モバイルゲートウェイに接続するスイッチの定義
 resource &quot;sakuracloud_switch&quot; &quot;sw&quot; {
-    name = &quot;sw&quot;
+  name = &quot;sw&quot;
 }
 </code></pre>
 

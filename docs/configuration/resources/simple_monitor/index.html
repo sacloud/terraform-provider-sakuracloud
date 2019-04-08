@@ -119,6 +119,13 @@
     </li>
 
         
+            
+    <li class="toctree-l1 ">
+        <a class="" href="../../../upgrade_to_v1_11/">v1.11での変更点</a>
+        
+    </li>
+
+        
     </ul>
 
         
@@ -243,6 +250,13 @@
         
             
     <li class="toctree-l1 ">
+        <a class="" href="../vpc_router_old/">VPCルータ(子リソース)</a>
+        
+    </li>
+
+        
+            
+    <li class="toctree-l1 ">
         <a class="" href="../database/">データベース</a>
         
     </li>
@@ -321,6 +335,13 @@
             
     <li class="toctree-l1 ">
         <a class="" href="../ipv4_ptr/">IPv4逆引きレコード</a>
+        
+    </li>
+
+        
+            
+    <li class="toctree-l1 ">
+        <a class="" href="../proxylb/">エンハンスドロードバランサ</a>
         
     </li>
 
@@ -524,6 +545,13 @@
         
             
     <li class="toctree-l1 ">
+        <a class="" href="../data/proxylb/">エンハンスドロードバランサ</a>
+        
+    </li>
+
+        
+            
+    <li class="toctree-l1 ">
         <a class="" href="../data/gslb/">GSLB</a>
         
     </li>
@@ -597,21 +625,22 @@
 <p><strong>全ゾーン共通のグローバルリソースです。</strong></p>
 <h3 id="_1">設定例</h3>
 <pre><code class="hcl"># HTTP監視の例
-resource sakuracloud_simple_monitor &quot;mymonitor&quot; {
-  target = &quot;${sakuracloud_server.myserver.ipaddress}&quot;
+resource &quot;sakuracloud_simple_monitor&quot; &quot;mymonitor&quot; {
+  target = sakuracloud_server.myserver.ipaddress
 
-  health_check = {
+  health_check {
     protocol   = &quot;http&quot;
     delay_loop = 60
     path       = &quot;/&quot;
     status     = &quot;200&quot;
-
-    # BASIC認証
-    # username   = &quot;foo&quot;
-    # password   = &quot;bar&quot;
   }
 
+  # BASIC認証
+  # username   = &quot;foo&quot;
+  # password   = &quot;bar&quot;
+
   notify_email_enabled = true
+
   #notify_email_html    = false
   #notify_slack_enabled = false
   #notify_slack_webhook = &quot;https://hooks.slack.com/services/XXXXXXXXX/XXXXXXXXX/XXXXXXXXXXXXXXXXXXXXXXXX&quot;
@@ -622,15 +651,16 @@ resource sakuracloud_simple_monitor &quot;mymonitor&quot; {
 }
 
 # SSLサーバ証明書 有効期限監視の例
-resource sakuracloud_simple_monitor &quot;my_sslcert_monitor&quot; {
+resource &quot;sakuracloud_simple_monitor&quot; &quot;my_sslcert_monitor&quot; {
   target = &quot;example.com&quot;
 
-  health_check = {
+  health_check {
     protocol       = &quot;sslcertificate&quot;
     remaining_days = 30
   }
 
   notify_email_enabled = true
+
   #notify_email_html    = false
   #notify_slack_enabled = false
   #notify_slack_webhook = &quot;https://hooks.slack.com/services/XXXXXXXXX/XXXXXXXXX/XXXXXXXXXXXXXXXXXXXXXXXX&quot;
@@ -639,6 +669,7 @@ resource sakuracloud_simple_monitor &quot;my_sslcert_monitor&quot; {
   description = &quot;Description&quot;
   tags        = [&quot;tag1&quot;, &quot;tag2&quot;]
 }
+
 </code></pre>
 
 <h3 id="_2">パラメーター</h3>

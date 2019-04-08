@@ -119,6 +119,13 @@
     </li>
 
         
+            
+    <li class="toctree-l1 ">
+        <a class="" href="../../../upgrade_to_v1_11/">v1.11での変更点</a>
+        
+    </li>
+
+        
     </ul>
 
         
@@ -243,6 +250,13 @@
         
             
     <li class="toctree-l1 ">
+        <a class="" href="../vpc_router_old/">VPCルータ(子リソース)</a>
+        
+    </li>
+
+        
+            
+    <li class="toctree-l1 ">
         <a class="" href="../database/">データベース</a>
         
     </li>
@@ -332,6 +346,13 @@
             
     <li class="toctree-l1 ">
         <a class="" href="../ipv4_ptr/">IPv4逆引きレコード</a>
+        
+    </li>
+
+        
+            
+    <li class="toctree-l1 ">
+        <a class="" href="../proxylb/">エンハンスドロードバランサ</a>
         
     </li>
 
@@ -522,6 +543,13 @@
         
             
     <li class="toctree-l1 ">
+        <a class="" href="../data/proxylb/">エンハンスドロードバランサ</a>
+        
+    </li>
+
+        
+            
+    <li class="toctree-l1 ">
         <a class="" href="../data/gslb/">GSLB</a>
         
     </li>
@@ -594,27 +622,26 @@
 <hr />
 <h3 id="_1">設定例</h3>
 <pre><code class="hcl">#NFS定義
-resource sakuracloud_nfs &quot;foobar&quot; {
-  switch_id = &quot;${sakuracloud_switch.sw.id}&quot;
+resource &quot;sakuracloud_nfs&quot; &quot;foobar&quot; {
+  switch_id = sakuracloud_switch.sw.id
 
-  #プラン[100/500/1024(1T)/2048(2T)/4096(4T)]
-  #plan = &quot;100&quot;
+  # プラン
+  #plan = &quot;hdd&quot;
+  #size = &quot;100&quot;
 
   ipaddress = &quot;192.168.11.101&quot;
+
   #default_route = &quot;192.168.11.1&quot;
   nw_mask_len = 24
 
   name        = &quot;name&quot;
   description = &quot;Description&quot;
   tags        = [&quot;tag1&quot;, &quot;tag2&quot;]
-
-  zone = &quot;tk1v&quot;
 }
 
 #NFSの上流スイッチ
-resource sakuracloud_switch &quot;sw&quot; {
+resource &quot;sakuracloud_switch&quot; &quot;sw&quot; {
   name = &quot;sw&quot;
-  zone = &quot;tk1v&quot;
 }
 </code></pre>
 
@@ -652,8 +679,16 @@ resource sakuracloud_switch &quot;sw&quot; {
 <td><code>plan</code></td>
 <td align="center">-</td>
 <td>プラン</td>
+<td align="center"><code>hdd</code></td>
+<td><code>hdd</code><br /><code>ssd</code><br /></td>
+<td>-</td>
+</tr>
+<tr>
+<td><code>size</code></td>
+<td align="center">-</td>
+<td>サイズ</td>
 <td align="center"><code>100</code></td>
-<td><code>100</code><br /><code>500</code><br /><code>1024</code><br /><code>2048</code><br /><code>4096</code></td>
+<td><code>100</code><br /><code>500</code><br /><code>1024</code><br /><code>2048</code><br /><code>4096</code><br /><code>8192</code>(HDDのみ)<br /><code>12288</code>(HDDのみ)<br /></td>
 <td>-</td>
 </tr>
 <tr>

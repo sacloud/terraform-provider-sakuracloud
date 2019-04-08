@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>パケットフィルタ - Terraform for さくらのクラウド</title>
+  <title>エンハンスドロードバランサ - Terraform for さくらのクラウド</title>
   
 
   <link rel="shortcut icon" href="../../../img/favicon.ico">
@@ -21,7 +21,7 @@
   
   <script>
     // Current page data
-    var mkdocs_page_name = "パケットフィルタ";
+    var mkdocs_page_name = "エンハンスドロードバランサ";
   </script>
   
   <script src="../../../js/jquery-2.1.1.min.js"></script>
@@ -214,21 +214,8 @@
 
         
             
-    <li class="toctree-l1 current">
-        <a class="current" href="./">パケットフィルタ</a>
-        
-            <ul>
-            
-                <li class="toctree-l3"><a href="#sakuracloud_packet_filter">パケットフィルタ(sakuracloud_packet_filter)</a></li>
-                
-                    <li><a class="toctree-l4" href="#_1">設定例</a></li>
-                
-                    <li><a class="toctree-l4" href="#_2">パラメーター</a></li>
-                
-                    <li><a class="toctree-l4" href="#_3">属性</a></li>
-                
-            
-            </ul>
+    <li class="toctree-l1 ">
+        <a class="" href="../packet_filter/">パケットフィルタ</a>
         
     </li>
 
@@ -353,8 +340,19 @@
 
         
             
-    <li class="toctree-l1 ">
-        <a class="" href="../proxylb/">エンハンスドロードバランサ</a>
+    <li class="toctree-l1 current">
+        <a class="current" href="./">エンハンスドロードバランサ</a>
+        
+            <ul>
+            
+                <li class="toctree-l3"><a href="#sakuracloud_proxylb">エンハンスドロードバランサ(sakuracloud_proxylb)</a></li>
+                
+                    <li><a class="toctree-l4" href="#_1">設定例</a></li>
+                
+                    <li><a class="toctree-l4" href="#sakuracloud_proxylb_1">sakuracloud_proxylb</a></li>
+                
+            
+            </ul>
         
     </li>
 
@@ -610,7 +608,7 @@
         
       
     
-    <li>パケットフィルタ</li>
+    <li>エンハンスドロードバランサ</li>
     <li class="wy-breadcrumbs-aside">
       
     </li>
@@ -620,31 +618,62 @@
           <div role="main">
             <div class="section">
               
-                <h1 id="sakuracloud_packet_filter">パケットフィルタ(sakuracloud_packet_filter)</h1>
+                <h1 id="sakuracloud_proxylb">エンハンスドロードバランサ(sakuracloud_proxylb)</h1>
 <hr />
+<p><strong>全ゾーン共通のグローバルリソースです。</strong></p>
 <h3 id="_1">設定例</h3>
-<pre><code class="hcl">resource &quot;sakuracloud_packet_filter&quot; &quot;myfilter&quot; {
-  name = &quot;myfilter&quot;
+<pre><code class="hcl">resource &quot;sakuracloud_proxylb&quot; &quot;foobar&quot; {
+  name         = &quot;foobar&quot;
+  plan         = 1000 
+  vip_failover = true # default: false
 
-  expressions {
-    protocol    = &quot;tcp&quot;
-    source_nw   = &quot;192.168.2.0/24&quot;
-    source_port = &quot;0-65535&quot;
-    dest_port   = &quot;80&quot;
-    allow       = true
+  health_check {
+    protocol    = &quot;http&quot;
+    path        = &quot;/&quot;
+    host_header = &quot;example.com&quot;
+    delay_loop  = 10
   }
 
-  expressions {
-    protocol    = &quot;ip&quot;
-    source_nw   = &quot;0.0.0.0/0&quot;
-    allow       = false
-    description = &quot;Deny all&quot;
+  bind_ports {
+    proxy_mode = &quot;https&quot;
+    port       = 443
   }
 
-  description = &quot;PacketFilter from terraform for SAKURA CLOUD&quot;
+  sorry_server {
+    ipaddress = &quot;192.2.0.1&quot;
+    port      = 80
+  }
+
+  servers {
+    ipaddress = &quot;133.242.0.3&quot;
+    port = 80
+  }
+  servers {
+    ipaddress = &quot;133.242.0.4&quot;
+    port = 80
+  }
+
+  certificate {
+    server_cert = file(&quot;server.crt&quot;)
+    private_key = file(&quot;server.key&quot;)    
+    # intermediate_cert = file(&quot;intermediate.crt&quot;)
+
+    additional_certificates {
+      server_cert = file(&quot;server2.crt&quot;)
+      private_key = file(&quot;server2.key&quot;)    
+      # intermediate_cert = file(&quot;intermediate2.crt&quot;)
+    }
+
+    additional_certificates {
+      server_cert = file(&quot;server3.crt&quot;)
+      private_key = file(&quot;server3.key&quot;)    
+      # intermediate_cert = file(&quot;intermediate3.crt&quot;)
+    }
+  }
 }
 </code></pre>
 
+<h2 id="sakuracloud_proxylb_1"><code>sakuracloud_proxylb</code></h2>
 <h3 id="_2">パラメーター</h3>
 <table>
 <thead>
@@ -661,18 +690,74 @@
 <tr>
 <td><code>name</code></td>
 <td align="center">◯</td>
-<td>スイッチ名</td>
+<td>エンハンスドロードバランサ名</td>
 <td align="center">-</td>
 <td>文字列</td>
 <td>-</td>
 </tr>
 <tr>
-<td><code>expressions</code></td>
-<td align="center">◯</td>
-<td>フィルタルール</td>
+<td><code>plan</code></td>
 <td align="center">-</td>
-<td>リスト(マップ)</td>
-<td>詳細は<a href="#expressions"><code>expressions</code></a>を参照</td>
+<td>プラン</td>
+<td align="center"><code>1000</code></td>
+<td><code>1000</code><br /><code>5000</code><br /><code>10000</code><br /><code>50000</code><br /><code>100000</code></td>
+<td>-</td>
+</tr>
+<tr>
+<td><code>vip_failover</code></td>
+<td align="center">-</td>
+<td>VIPフェイルオーバ</td>
+<td align="center"><code>false</code></td>
+<td><code>true</code> or <code>false</code></td>
+<td>-</td>
+</tr>
+<tr>
+<td><code>bind_ports</code></td>
+<td align="center">◯</td>
+<td>待ち受けポート</td>
+<td align="center">-</td>
+<td>リスト</td>
+<td>詳細は<a href="#bind_ports"><code>bind_ports</code></a>を参照</td>
+</tr>
+<tr>
+<td><code>health_check</code></td>
+<td align="center">◯</td>
+<td>ヘルスチェック</td>
+<td align="center">-</td>
+<td>マップ</td>
+<td>詳細は<a href="#health_check"><code>health_check</code></a>を参照</td>
+</tr>
+<tr>
+<td><code>sorry_server</code></td>
+<td align="center">-</td>
+<td>ソーリーサーバ</td>
+<td align="center">-</td>
+<td>マップ</td>
+<td>詳細は<a href="#sorry_server"><code>sorry_server</code></a>を参照</td>
+</tr>
+<tr>
+<td><code>servers</code></td>
+<td align="center">-</td>
+<td>実サーバ</td>
+<td align="center">-</td>
+<td>リスト</td>
+<td>詳細は<a href="#servers"><code>servers</code></a>を参照</td>
+</tr>
+<tr>
+<td><code>certificate</code></td>
+<td align="center">-</td>
+<td>SSL証明書</td>
+<td align="center">-</td>
+<td>マップ</td>
+<td>詳細は<a href="#certificate"><code>certificate</code></a>を参照</td>
+</tr>
+<tr>
+<td><code>icon_id</code></td>
+<td align="center">-</td>
+<td>アイコンID</td>
+<td align="center">-</td>
+<td>文字列</td>
+<td>-</td>
 </tr>
 <tr>
 <td><code>description</code></td>
@@ -690,19 +775,41 @@
 <td>リスト(文字列)</td>
 <td>-</td>
 </tr>
+</tbody>
+</table>
+<h3 id="bind_ports"><code>bind_ports</code></h3>
+<p>この要素は最大2つまで指定可能です。  </p>
+<table>
+<thead>
 <tr>
-<td><code>zone</code></td>
+<th>パラメーター</th>
+<th align="center">必須</th>
+<th>名称</th>
+<th align="center">初期値</th>
+<th>設定値</th>
+<th>補足</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>proxy_mode</code></td>
+<td align="center">◯</td>
+<td>プロキシ方式</td>
 <td align="center">-</td>
-<td>ゾーン</td>
+<td><code>http</code><br /><code>https</code></td>
+<td>-</td>
+</tr>
+<tr>
+<td><code>port</code></td>
+<td align="center">◯</td>
+<td>ポート番号</td>
 <td align="center">-</td>
-<td><code>is1a</code><br /><code>is1b</code><br /><code>tk1a</code><br /><code>tk1v</code></td>
+<td>数値</td>
 <td>-</td>
 </tr>
 </tbody>
 </table>
-<p><strong>注意</strong>  </p>
-<p>同一のパケットフィルタに対し<code>expressions</code>属性と<code>sakuracloud_packet_filter_rule</code>リソースの併用はできません。</p>
-<h4 id="expressions"><code>expressions</code></h4>
+<h3 id="health_check"><code>health_check</code></h3>
 <table>
 <thead>
 <tr>
@@ -720,48 +827,150 @@
 <td align="center">◯</td>
 <td>プロトコル</td>
 <td align="center">-</td>
-<td><code>tcp</code><br /><code>udp</code><br /><code>icmp</code><br /><code>fragment</code><br /><code>ip</code></td>
+<td><code>http</code><br /><code>tcp</code></td>
 <td>-</td>
 </tr>
 <tr>
-<td><code>source_nw</code></td>
+<td><code>delay_loop</code></td>
 <td align="center">-</td>
-<td>送信元ネットワーク</td>
-<td align="center">-</td>
-<td><code>xxx.xxx.xxx.xxx</code>(IP)<br /><code>xxx.xxx.xxx.xxx/nn</code>(ネットワーク)<br /><code>xxx.xxx.xxx.xxx/yyy.yyy.yyy.yyy</code>(アドレス範囲)</td>
-<td>空欄の場合はANY</td>
+<td>チェック間隔(秒)</td>
+<td align="center"><code>10</code></td>
+<td>数値</td>
+<td><code>10</code>〜<code>60</code></td>
 </tr>
 <tr>
-<td><code>source_port</code></td>
+<td><code>host_header</code></td>
 <td align="center">-</td>
-<td>送信元ポート</td>
+<td>Hostヘッダ</td>
 <td align="center">-</td>
-<td><code>0</code>〜<code>65535</code>の整数<br /><code>xx-yy</code>(範囲指定)<br /><code>0xPPPP/0xMMMM</code>(16進範囲指定)</td>
-<td>空欄の場合はANY</td>
+<td>文字列</td>
+<td>プロトコルが<code>http</code>の場合のみ有効</td>
 </tr>
 <tr>
-<td><code>dest_port</code></td>
+<td><code>path</code></td>
+<td align="center">△</td>
+<td>パス</td>
 <td align="center">-</td>
-<td>宛先ポート</td>
-<td align="center">-</td>
-<td><code>0</code>〜<code>65535</code>の整数<br /><code>xx-yy</code>(範囲指定)<br /><code>0xPPPP/0xMMMM</code>(16進範囲指定)</td>
-<td>空欄の場合はANY</td>
+<td>文字列</td>
+<td>プロトコルが<code>http</code>の場合のみ有効かつ必須</td>
 </tr>
+</tbody>
+</table>
+<h3 id="sorry_server"><code>sorry_server</code></h3>
+<table>
+<thead>
 <tr>
-<td><code>allow</code></td>
-<td align="center">-</td>
-<td>アクション</td>
-<td align="center"><code>true</code></td>
-<td><code>true</code><br /><code>false</code></td>
-<td><code>true</code>の場合ALLOW動作<br /><code>false</code>の場合DENY動作</td>
+<th>パラメーター</th>
+<th align="center">必須</th>
+<th>名称</th>
+<th align="center">初期値</th>
+<th>設定値</th>
+<th>補足</th>
 </tr>
+</thead>
+<tbody>
 <tr>
-<td><code>description</code></td>
-<td align="center">-</td>
-<td>説明</td>
+<td><code>ipaddress</code></td>
+<td align="center">◯</td>
+<td>IPアドレス</td>
 <td align="center">-</td>
 <td>文字列</td>
 <td>-</td>
+</tr>
+<tr>
+<td><code>port</code></td>
+<td align="center">◯</td>
+<td>ポート番号</td>
+<td align="center">-</td>
+<td>数値</td>
+<td>-</td>
+</tr>
+</tbody>
+</table>
+<h3 id="servers"><code>servers</code></h3>
+<p>この要素は最大40個まで指定可能です。  </p>
+<table>
+<thead>
+<tr>
+<th>パラメーター</th>
+<th align="center">必須</th>
+<th>名称</th>
+<th align="center">初期値</th>
+<th>設定値</th>
+<th>補足</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>ipaddress</code></td>
+<td align="center">◯</td>
+<td>IPアドレス</td>
+<td align="center">-</td>
+<td>文字列</td>
+<td>実サーバのIPアドレス</td>
+</tr>
+<tr>
+<td><code>port</code></td>
+<td align="center">◯</td>
+<td>ポート番号</td>
+<td align="center">-</td>
+<td>数値</td>
+<td>-</td>
+</tr>
+<tr>
+<td><code>enabled</code></td>
+<td align="center">-</td>
+<td>有効</td>
+<td align="center"><code>true</code></td>
+<td><code>true</code><br /><code>false</code></td>
+<td>-</td>
+</tr>
+</tbody>
+</table>
+<h3 id="certificate"><code>certificate</code></h3>
+<table>
+<thead>
+<tr>
+<th>パラメーター</th>
+<th align="center">必須</th>
+<th>名称</th>
+<th align="center">初期値</th>
+<th>設定値</th>
+<th>補足</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>server_cert</code></td>
+<td align="center">◯</td>
+<td>サーバ証明書</td>
+<td align="center">-</td>
+<td>文字列</td>
+<td>-</td>
+</tr>
+<tr>
+<td><code>intermediate_cert</code></td>
+<td align="center">-</td>
+<td>中間証明書</td>
+<td align="center">-</td>
+<td>文字列</td>
+<td>-</td>
+</tr>
+<tr>
+<td><code>private_key</code></td>
+<td align="center">◯</td>
+<td>秘密鍵</td>
+<td align="center">-</td>
+<td>文字列</td>
+<td>-</td>
+</tr>
+<tr>
+<td><code>additional_certificates</code></td>
+<td align="center">-</td>
+<td>追加証明書</td>
+<td align="center">-</td>
+<td>リスト</td>
+<td>詳細は<a href="#certificate"><code>certificate</code></a>を参照</td>
 </tr>
 </tbody>
 </table>
@@ -780,6 +989,21 @@
 <td>ID</td>
 <td>-</td>
 </tr>
+<tr>
+<td><code>vip</code></td>
+<td>VIP</td>
+<td>ロードバランサに割り当てられたグローバルIP(<code>vip_failover</code>が<code>false</code>の場合のみ有効)</td>
+</tr>
+<tr>
+<td><code>fqdn</code></td>
+<td>VIP</td>
+<td>ロードバランサに割り当てられたグローバルIP(<code>vip_failover</code>が<code>true</code>の場合のみ有効)</td>
+</tr>
+<tr>
+<td><code>proxy_networks</code></td>
+<td>プロキシ元ネットワーク</td>
+<td>プロキシ元IP(CIDR)のリスト</td>
+</tr>
 </tbody>
 </table>
               
@@ -789,10 +1013,10 @@
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="../packet_filter_rule/" class="btn btn-neutral float-right" title="パケットフィルタ(ルール)"/>Next <span class="icon icon-circle-arrow-right"></span></a>
+        <a href="../gslb/" class="btn btn-neutral float-right" title="GSLB"/>Next <span class="icon icon-circle-arrow-right"></span></a>
       
       
-        <a href="../subnet/" class="btn btn-neutral" title="サブネット"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../ipv4_ptr/" class="btn btn-neutral" title="IPv4逆引きレコード"><span class="icon icon-circle-arrow-left"></span> Previous</a>
       
     </div>
   
@@ -820,10 +1044,10 @@
     <span class="rst-current-version" data-toggle="rst-current-version">
       
       
-        <span><a href="../subnet/" style="color: #fcfcfc;">&laquo; Previous</a></span>
+        <span><a href="../ipv4_ptr/" style="color: #fcfcfc;">&laquo; Previous</a></span>
       
       
-        <span style="margin-left: 15px"><a href="../packet_filter_rule/" style="color: #fcfcfc">Next &raquo;</a></span>
+        <span style="margin-left: 15px"><a href="../gslb/" style="color: #fcfcfc">Next &raquo;</a></span>
       
     </span>
 </div>

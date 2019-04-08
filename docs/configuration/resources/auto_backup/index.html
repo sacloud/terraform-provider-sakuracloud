@@ -119,6 +119,13 @@
     </li>
 
         
+            
+    <li class="toctree-l1 ">
+        <a class="" href="../../../upgrade_to_v1_11/">v1.11での変更点</a>
+        
+    </li>
+
+        
     </ul>
 
         
@@ -243,6 +250,13 @@
         
             
     <li class="toctree-l1 ">
+        <a class="" href="../vpc_router_old/">VPCルータ(子リソース)</a>
+        
+    </li>
+
+        
+            
+    <li class="toctree-l1 ">
         <a class="" href="../database/">データベース</a>
         
     </li>
@@ -321,6 +335,13 @@
             
     <li class="toctree-l1 ">
         <a class="" href="../ipv4_ptr/">IPv4逆引きレコード</a>
+        
+    </li>
+
+        
+            
+    <li class="toctree-l1 ">
+        <a class="" href="../proxylb/">エンハンスドロードバランサ</a>
         
     </li>
 
@@ -524,6 +545,13 @@
         
             
     <li class="toctree-l1 ">
+        <a class="" href="../data/proxylb/">エンハンスドロードバランサ</a>
+        
+    </li>
+
+        
+            
+    <li class="toctree-l1 ">
         <a class="" href="../data/gslb/">GSLB</a>
         
     </li>
@@ -594,24 +622,21 @@
               
                 <h1 id="sakuracloud_auto_backup">自動バックアップ(sakuracloud_auto_backup)</h1>
 <hr />
-<p><strong>このリソースは石狩第2、東京第1ゾーンでのみ利用可能です。</strong></p>
 <p>自動バックアップの設定を行うリソースです。</p>
 <h3 id="_1">設定例</h3>
 <pre><code class="hcl">#ディスクの定義
-resource sakuracloud_disk &quot;disk01&quot; {
+resource &quot;sakuracloud_disk&quot; &quot;disk01&quot; {
   name = &quot;disk01&quot;
-  zone = &quot;is1b&quot;
 }
 
 #自動バックアップ
-resource sakuracloud_auto_backup &quot;foobar&quot; {
+resource &quot;sakuracloud_auto_backup&quot; &quot;foobar&quot; {
   name           = &quot;auto_backup&quot;
-  disk_id        = &quot;${sakuracloud_disk.disk01.id}&quot;
+  disk_id        = sakuracloud_disk.disk01.id
   weekdays       = [&quot;mon&quot;, &quot;tue&quot;, &quot;wed&quot;]
   max_backup_num = 1
   description    = &quot;description&quot;
   tags           = [&quot;tag1&quot;, &quot;tag2&quot;]
-  zone           = &quot;is1b&quot;
 }
 </code></pre>
 

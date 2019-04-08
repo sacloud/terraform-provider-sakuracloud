@@ -119,6 +119,13 @@
     </li>
 
         
+            
+    <li class="toctree-l1 ">
+        <a class="" href="../../../upgrade_to_v1_11/">v1.11での変更点</a>
+        
+    </li>
+
+        
     </ul>
 
         
@@ -243,6 +250,13 @@
         
             
     <li class="toctree-l1 ">
+        <a class="" href="../vpc_router_old/">VPCルータ(子リソース)</a>
+        
+    </li>
+
+        
+            
+    <li class="toctree-l1 ">
         <a class="" href="../database/">データベース</a>
         
     </li>
@@ -332,6 +346,13 @@
             
     <li class="toctree-l1 ">
         <a class="" href="../ipv4_ptr/">IPv4逆引きレコード</a>
+        
+    </li>
+
+        
+            
+    <li class="toctree-l1 ">
+        <a class="" href="../proxylb/">エンハンスドロードバランサ</a>
         
     </li>
 
@@ -522,6 +543,13 @@
         
             
     <li class="toctree-l1 ">
+        <a class="" href="../data/proxylb/">エンハンスドロードバランサ</a>
+        
+    </li>
+
+        
+            
+    <li class="toctree-l1 ">
         <a class="" href="../data/gslb/">GSLB</a>
         
     </li>
@@ -596,20 +624,20 @@
 <pre><code class="hcl"># データベース リードレプリカ定義
 resource &quot;sakuracloud_database_read_replica&quot; &quot;foobar&quot; {
   # マスター側データベースのID 
-  master_id = &quot;${sakuracloud_database.foobar.id}&quot;
+  master_id = sakuracloud_database.master.id
 
   ipaddress1 = &quot;192.168.11.111&quot;
+
   # IPアドレス以外のネットワーク関連項目が未指定の場合、マスター側から引き継ぐ
-  #switch_id     = &quot;${sakuracloud_switch.sw.id}&quot;
+  #switch_id     = sakuracloud_switch.sw.id
   #nw_mask_len   = 24
   #default_route = &quot;192.168.11.1&quot;  
 
   name = &quot;slave&quot;
 }
 
-
 # データベースの定義(マスター側)
-resource sakuracloud_database &quot;master&quot; {
+resource &quot;sakuracloud_database&quot; &quot;master&quot; {
   database_type = &quot;postgresql&quot;
   plan          = &quot;10g&quot;
   user_name     = &quot;defuser&quot;
@@ -617,16 +645,16 @@ resource sakuracloud_database &quot;master&quot; {
 
   replica_password = &quot;DatabasePasswordUser397&quot;
 
-  switch_id     = &quot;${sakuracloud_switch.sw.id}&quot;
+  switch_id     = sakuracloud_switch.sw.id
   ipaddress1    = &quot;192.168.11.101&quot;
   nw_mask_len   = 24
   default_route = &quot;192.168.11.1&quot;
 
-  name        = &quot;name&quot;
+  name = &quot;name&quot;
 }
 
 #接続するスイッチの定義
-resource sakuracloud_switch &quot;sw&quot; {
+resource &quot;sakuracloud_switch&quot; &quot;sw&quot; {
   name = &quot;sw&quot;
 }
 </code></pre>

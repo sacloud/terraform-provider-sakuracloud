@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>ブログ/記事/読み物 - Terraform for さくらのクラウド</title>
+  <title>v1.11での変更点 - Terraform for さくらのクラウド</title>
   
 
   <link rel="shortcut icon" href="../img/favicon.ico">
@@ -21,7 +21,7 @@
   
   <script>
     // Current page data
-    var mkdocs_page_name = "ブログ/記事/読み物";
+    var mkdocs_page_name = "v1.11での変更点";
   </script>
   
   <script src="../js/jquery-2.1.1.min.js"></script>
@@ -120,8 +120,23 @@
 
         
             
-    <li class="toctree-l1 ">
-        <a class="" href="../upgrade_to_v1_11/">v1.11での変更点</a>
+    <li class="toctree-l1 current">
+        <a class="current" href="./">v1.11での変更点</a>
+        
+            <ul>
+            
+                <li class="toctree-l3"><a href="#v111">v1.11での変更点</a></li>
+                
+                    <li><a class="toctree-l4" href="#terraform-v012">Terraform v0.12対応</a></li>
+                
+                    <li><a class="toctree-l4" href="#marker_tags">marker_tags機能の除去</a></li>
+                
+                    <li><a class="toctree-l4" href="#_1">ディスクの修正関連パラメータの移動</a></li>
+                
+                    <li><a class="toctree-l4" href="#nfs-ssd">NFS SSDプラン対応</a></li>
+                
+            
+            </ul>
         
     </li>
 
@@ -130,21 +145,8 @@
 
         
             
-    <li class="toctree-l1 current">
-        <a class="current" href="./">ブログ/記事/読み物</a>
-        
-            <ul>
-            
-                <li class="toctree-l3"><a href="#_1">ブログ/記事/読み物</a></li>
-                
-                    <li><a class="toctree-l4" href="#_2">参考サイト</a></li>
-                
-                    <li><a class="toctree-l4" href="#_3">紹介記事</a></li>
-                
-                    <li><a class="toctree-l4" href="#_4">サンプルなど</a></li>
-                
-            
-            </ul>
+    <li class="toctree-l1 ">
+        <a class="" href="../articles/">ブログ/記事/読み物</a>
         
     </li>
 
@@ -606,11 +608,11 @@
     
       
         
-          <li>ドキュメント &raquo;</li>
+          <li>アップグレードガイド &raquo;</li>
         
       
     
-    <li>ブログ/記事/読み物</li>
+    <li>v1.11での変更点</li>
     <li class="wy-breadcrumbs-aside">
       
     </li>
@@ -620,66 +622,111 @@
           <div role="main">
             <div class="section">
               
-                <h1 id="_1">ブログ/記事/読み物</h1>
+                <h1 id="v111">v1.11での変更点</h1>
 <hr />
-<h3 id="_2">参考サイト</h3>
+<h2 id="terraform-v012">Terraform v0.12対応</h2>
+<p>このバージョンからTerraform v0.12に対応しています。<br />
+Terraform v0.12ではtfファイル記法などに大幅な変更が行われました。<br />
+変更内容の詳細については<a href="https://terraform.io/docs/">公式ドキュメント</a>を参照してください。</p>
+<p>このドキュメントに記載しているtfファイルの例はTerraform v0.12対応となっています。</p>
+<p>Terraform v0.12以前のバージョンをご利用中の場合、Terraform v0.12を用いて以下のコマンドを実行することでtfファイルのマイグレーションが行えます。</p>
+<pre><code class="bash"># terraform v0.12以前のバージョン向けのtfファイルをv0.12向けに書き換え
+$ terraform 0.12upgrade
+</code></pre>
+
+<h2 id="marker_tags">marker_tags機能の除去</h2>
+<p>v1.4でmarker_tags機能のソースが除去されました。 </p>
+<h2 id="_1">ディスクの修正関連パラメータの移動</h2>
+<p>v1.6でディスクの修正関連パラメータがディスクリソース(<code>sakuracloud_disk</code>)からサーバリソース(<code>sakuracloud_server</code>)へと移動されました。
+v1.11まではディスクリソースでのパラメータ指定を行うことも可能でしたが、このバージョンではこれらのパラメータは指定できなくなりました。  </p>
+<h3 id="_2">対応方法</h3>
+<p>これまでディスクリソースで以下のパラメータを指定していた場合、tfファイルの書き換えが必要となります。</p>
 <ul>
-<li>Terraform<ul>
-<li><a href="https://www.terraform.io/">https://www.terraform.io/</a></li>
+<li>パスワード(<code>password</code>)</li>
+<li>ホスト名(<code>hostname</code>)</li>
+<li>SSH接続時パスワード/チャレンジレスポンス認証の無効化フラグ(<code>disable_pw_auth</code>)</li>
+<li>スタートアップスクリプト(<code>note_ids</code>)</li>
+<li>公開鍵(<code>ssh_key_ids</code>)</li>
 </ul>
-</li>
-<li>Terraform for さくらのクラウド<ul>
-<li><a href="https://github.com/sacloud/terraform-provider-sakuracloud">https://github.com/sacloud/terraform-provider-sakuracloud</a></li>
-</ul>
-</li>
-</ul>
-<hr />
-<h3 id="_3">紹介記事</h3>
+<p>これらのパラメータをディスクリソースからサーバリソースへ移動させてください。</p>
+<h4 id="tf">対応前のtfファイルの例</h4>
+<pre><code class="hcl">data &quot;sakuracloud_archive&quot; &quot;ubuntu&quot; {
+  os_type = &quot;ubuntu&quot;
+}
+
+# ディスクリソース
+resource &quot;sakuracloud_disk&quot; &quot;foobar&quot; {
+  name = &quot;mydisk&quot;
+  source_archive_id = data.sakuracloud_archive.ubuntu.id
+
+  # ディスクの修正関連のパラメータ 
+  hostname = &quot;myserver&quot;
+  password = &quot;p@ssw0rd&quot;
+  ssh_key_ids = [&quot;100000000000&quot;, &quot;200000000000&quot;]
+  disable_pw_auth = true
+  note_ids = [&quot;100000000000&quot;, &quot;200000000000&quot;]
+
+}
+
+# サーバリソース
+resource &quot;sakuracloud_server&quot; &quot;foobar&quot; {
+  name = &quot;myserver&quot;
+  disks = [sakuracloud_disk.foobar.id]
+}
+</code></pre>
+
+<h4 id="tf_1">対応後のtfファイルの例</h4>
+<pre><code class="hcl">data &quot;sakuracloud_archive&quot; &quot;ubuntu&quot; {
+  os_type = &quot;ubuntu&quot;
+}
+
+# ディスクリソース
+resource &quot;sakuracloud_disk&quot; &quot;foobar&quot; {
+  name = &quot;mydisk&quot;
+  source_archive_id = data.sakuracloud_archive.ubuntu.id
+}
+
+# サーバリソース
+resource &quot;sakuracloud_server&quot; &quot;foobar&quot; {
+  name = &quot;myserver&quot;
+  disks = [sakuracloud_disk.foobar.id]
+
+  # ディスクの修正関連のパラメータ 
+  hostname = &quot;myserver&quot;
+  password = &quot;p@ssw0rd&quot;
+  ssh_key_ids = [&quot;100000000000&quot;, &quot;200000000000&quot;]
+  disable_pw_auth = true
+  note_ids = [&quot;100000000000&quot;, &quot;200000000000&quot;]
+
+}
+</code></pre>
+
+<h2 id="nfs-ssd">NFS SSDプラン対応</h2>
+<p>NFSにSSDプランが導入された際にパラメータ名が変更となりました。
+v1.11以前でNFSアプライアンスを利用していた場合はtfファイルの変更が必要となります。  </p>
+<p>旧: <code>plan</code>: NFSのサイズをGB単位で指定
+新: <code>plan</code>で<code>hdd</code> or <code>ssd</code>を指定、サイズは<code>size</code>パラメータで指定</p>
+<h3 id="_3">対応方法</h3>
 <ul>
-<li>Terraform for さくらのクラウド スタートガイド（第1回）～インストールから基本操作 ～ <ul>
-<li><a href="http://knowledge.sakura.ad.jp/knowledge/7230/">http://knowledge.sakura.ad.jp/knowledge/7230/</a>  </li>
+<li>tfファイルで<code>plan</code>を指定していた場合は<code>size</code>に置き換えてください。</li>
 </ul>
-</li>
-<li>Terraform for さくらのクラウド スタートガイド（第2回）～便利なビルトイン機能～ <ul>
-<li><a href="http://knowledge.sakura.ad.jp/knowledge/7550/">http://knowledge.sakura.ad.jp/knowledge/7550/</a></li>
-</ul>
-</li>
-<li>Terraform for さくらのクラウド スタートガイド（第3回）〜さくらのクラウド上にインフラ構築〜<ul>
-<li><a href="http://knowledge.sakura.ad.jp/knowledge/7660/">http://knowledge.sakura.ad.jp/knowledge/7660/</a></li>
-</ul>
-</li>
-<li>Terraform for さくらのクラウド スタートガイド（第4回）〜ネットワークの構築〜<ul>
-<li><a href="http://knowledge.sakura.ad.jp/knowledge/8248/">http://knowledge.sakura.ad.jp/knowledge/8248/</a></li>
-</ul>
-</li>
-<li>Terraform for さくらのクラウド スタートガイド（第5回）〜サービス提供リソースと応用〜<ul>
-<li><a href="http://knowledge.sakura.ad.jp/knowledge/8581/">http://knowledge.sakura.ad.jp/knowledge/8581/</a></li>
-</ul>
-</li>
-</ul>
-<hr />
-<ul>
-<li>Terraform for さくらのクラウド入門チュートリアル(@zembutsu)<ul>
-<li><a href="http://qiita.com/zembutsu/items/fb0819e38b4fcda49299">http://qiita.com/zembutsu/items/fb0819e38b4fcda49299</a></li>
-</ul>
-</li>
-<li>Terraform for Sakura Cloud ハンズオン資料(@zembutsu)<ul>
-<li><a href="https://github.com/zembutsu/sakura-terraform">https://github.com/zembutsu/sakura-terraform</a></li>
-</ul>
-</li>
-<li>Terraform for Sakura Cloud ハンズオン資料(@yamamoto-febc)<ul>
-<li><a href="https://github.com/sacloud/terraform-hands-on">https://github.com/sacloud/terraform-hands-on</a></li>
-</ul>
-</li>
-</ul>
-<hr />
-<h3 id="_4">サンプルなど</h3>
-<ul>
-<li>teratailのさくらのクラウド チュートリアルの構成を「Terraform for さくらのクラウド」で構築するためのtfファイル集<ul>
-<li><a href="https://github.com/yamamoto-febc/teratail-sakuracloud-terraform-examples">https://github.com/yamamoto-febc/teratail-sakuracloud-terraform-examples</a></li>
-</ul>
-</li>
-</ul>
+<h4 id="tf_2">対応前のtfファイルの例</h4>
+<pre><code class="hcl">resource &quot;sakuracloud_nfs&quot; &quot;foobar&quot; {
+  switch_id   = &quot;${sakuracloud_switch.foobar.id}&quot;
+  plan        = &quot;100&quot;
+
+  # ...
+}
+</code></pre>
+
+<h4 id="tf_3">対応後のtfファイルの例</h4>
+<pre><code class="hcl">resource &quot;sakuracloud_nfs&quot; &quot;foobar&quot; {
+  switch_id   = &quot;${sakuracloud_switch.foobar.id}&quot;
+  size        = &quot;100&quot; # planをsizeに置き換える
+
+  # ...
+}
+</code></pre>
               
             </div>
           </div>
@@ -687,10 +734,10 @@
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="../configuration/provider/" class="btn btn-neutral float-right" title="プロバイダ"/>Next <span class="icon icon-circle-arrow-right"></span></a>
+        <a href="../articles/" class="btn btn-neutral float-right" title="ブログ/記事/読み物"/>Next <span class="icon icon-circle-arrow-right"></span></a>
       
       
-        <a href="../upgrade_to_v1_11/" class="btn btn-neutral" title="v1.11での変更点"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../upgrade_to_v17/" class="btn btn-neutral" title="v1.7での変更点"><span class="icon icon-circle-arrow-left"></span> Previous</a>
       
     </div>
   
@@ -718,10 +765,10 @@
     <span class="rst-current-version" data-toggle="rst-current-version">
       
       
-        <span><a href="../upgrade_to_v1_11/" style="color: #fcfcfc;">&laquo; Previous</a></span>
+        <span><a href="../upgrade_to_v17/" style="color: #fcfcfc;">&laquo; Previous</a></span>
       
       
-        <span style="margin-left: 15px"><a href="../configuration/provider/" style="color: #fcfcfc">Next &raquo;</a></span>
+        <span style="margin-left: 15px"><a href="../articles/" style="color: #fcfcfc">Next &raquo;</a></span>
       
     </span>
 </div>

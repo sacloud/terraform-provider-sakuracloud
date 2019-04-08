@@ -119,6 +119,13 @@
     </li>
 
         
+            
+    <li class="toctree-l1 ">
+        <a class="" href="../../../../upgrade_to_v1_11/">v1.11での変更点</a>
+        
+    </li>
+
+        
     </ul>
 
         
@@ -243,6 +250,13 @@
         
             
     <li class="toctree-l1 ">
+        <a class="" href="../../vpc_router_old/">VPCルータ(子リソース)</a>
+        
+    </li>
+
+        
+            
+    <li class="toctree-l1 ">
         <a class="" href="../../database/">データベース</a>
         
     </li>
@@ -321,6 +335,13 @@
             
     <li class="toctree-l1 ">
         <a class="" href="../../ipv4_ptr/">IPv4逆引きレコード</a>
+        
+    </li>
+
+        
+            
+    <li class="toctree-l1 ">
+        <a class="" href="../../proxylb/">エンハンスドロードバランサ</a>
         
     </li>
 
@@ -526,6 +547,13 @@
         
             
     <li class="toctree-l1 ">
+        <a class="" href="../proxylb/">エンハンスドロードバランサ</a>
+        
+    </li>
+
+        
+            
+    <li class="toctree-l1 ">
         <a class="" href="../gslb/">GSLB</a>
         
     </li>
@@ -598,12 +626,12 @@
 <hr />
 <h3 id="_1">設定例</h3>
 <pre><code class="hcl"># アーカイブの参照(パブリックアーカイブ)
-data sakuracloud_archive &quot;centos&quot; {
+data &quot;sakuracloud_archive&quot; &quot;centos&quot; {
   os_type = &quot;centos&quot;
 }
 
 # アーカイブの参照(名称 or タグ指定)
-data sakuracloud_archive &quot;ubuntu&quot; {
+data &quot;sakuracloud_archive&quot; &quot;ubuntu&quot; {
   name_selectors = [&quot;Ubuntu&quot;, &quot;LTS&quot;]
   tag_selectors  = [&quot;current-stable&quot;, &quot;os-linux&quot;]
 }

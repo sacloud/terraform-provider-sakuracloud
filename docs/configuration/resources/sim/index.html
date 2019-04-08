@@ -119,6 +119,13 @@
     </li>
 
         
+            
+    <li class="toctree-l1 ">
+        <a class="" href="../../../upgrade_to_v1_11/">v1.11での変更点</a>
+        
+    </li>
+
+        
     </ul>
 
         
@@ -243,6 +250,13 @@
         
             
     <li class="toctree-l1 ">
+        <a class="" href="../vpc_router_old/">VPCルータ(子リソース)</a>
+        
+    </li>
+
+        
+            
+    <li class="toctree-l1 ">
         <a class="" href="../database/">データベース</a>
         
     </li>
@@ -334,6 +348,13 @@
             
     <li class="toctree-l1 ">
         <a class="" href="../ipv4_ptr/">IPv4逆引きレコード</a>
+        
+    </li>
+
+        
+            
+    <li class="toctree-l1 ">
+        <a class="" href="../proxylb/">エンハンスドロードバランサ</a>
         
     </li>
 
@@ -524,6 +545,13 @@
         
             
     <li class="toctree-l1 ">
+        <a class="" href="../data/proxylb/">エンハンスドロードバランサ</a>
+        
+    </li>
+
+        
+            
+    <li class="toctree-l1 ">
         <a class="" href="../data/gslb/">GSLB</a>
         
     </li>
@@ -597,26 +625,24 @@
 <h3 id="_1">設定例</h3>
 <pre><code class="hcl"># SIMの定義
 resource &quot;sakuracloud_sim&quot; &quot;sim&quot; {
-    name        = &quot;example&quot;
-    description = &quot;example&quot;
-    tags        = [&quot;tags1&quot; , &quot;tags2&quot;]
+  name        = &quot;example&quot;
+  description = &quot;example&quot;
+  tags        = [&quot;tags1&quot;, &quot;tags2&quot;]
+  iccid    = &quot;&lt;SIMに記載されているICCID&gt;&quot;
+  passcode = &quot;&lt;SIMに記載されているPasscode&gt;&quot;
+  imei     = &quot;&lt;端末識別番号(IMEIロックする場合のみ)&gt;&quot;
+  carrier  = [&quot;softbank&quot;, &quot;kddi&quot;, &quot;docomo&quot;]
+  #enabled  = true
 
-    iccid    = &quot;&lt;SIMに記載されているICCID&gt;&quot;
-    passcode = &quot;&lt;SIMに記載されているPasscode&gt;&quot;
-    imei     = &quot;&lt;端末識別番号(IMEIロックする場合のみ)&gt;&quot;
-    carrier  = [&quot;softbank&quot;, &quot;kddi&quot;, &quot;docomo&quot;]
-    #enabled  = true
-
-    mobile_gateway_id = &quot;${sakuracloud_mobile_gateway.mgw.id}&quot; # 接続するモバイルゲートウェイのID
-    ipaddress         = &quot;192.168.100.2&quot;                        # SIMに割り当てるIPアドレス        
+  mobile_gateway_id = &quot;${sakuracloud_mobile_gateway.mgw.id}&quot; # 接続するモバイルゲートウェイのID
+  ipaddress         = &quot;192.168.100.2&quot;                        # SIMに割り当てるIPアドレス        
 }
 
 # モバイルゲートウェイの定義
-resource sakuracloud_mobile_gateway &quot;mgw&quot; {
-    name                = &quot;example&quot;
-    internet_connection = true
+resource &quot;sakuracloud_mobile_gateway&quot; &quot;mgw&quot; {
+  name                = &quot;example&quot;
+  internet_connection = true
 }
-
 </code></pre>
 
 <h3 id="_2">パラメーター</h3>

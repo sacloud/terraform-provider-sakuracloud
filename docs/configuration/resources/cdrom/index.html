@@ -119,6 +119,13 @@
     </li>
 
         
+            
+    <li class="toctree-l1 ">
+        <a class="" href="../../../upgrade_to_v1_11/">v1.11での変更点</a>
+        
+    </li>
+
+        
     </ul>
 
         
@@ -256,6 +263,13 @@
         
             
     <li class="toctree-l1 ">
+        <a class="" href="../vpc_router_old/">VPCルータ(子リソース)</a>
+        
+    </li>
+
+        
+            
+    <li class="toctree-l1 ">
         <a class="" href="../database/">データベース</a>
         
     </li>
@@ -334,6 +348,13 @@
             
     <li class="toctree-l1 ">
         <a class="" href="../ipv4_ptr/">IPv4逆引きレコード</a>
+        
+    </li>
+
+        
+            
+    <li class="toctree-l1 ">
+        <a class="" href="../proxylb/">エンハンスドロードバランサ</a>
         
     </li>
 
@@ -524,6 +545,13 @@
         
             
     <li class="toctree-l1 ">
+        <a class="" href="../data/proxylb/">エンハンスドロードバランサ</a>
+        
+    </li>
+
+        
+            
+    <li class="toctree-l1 ">
         <a class="" href="../data/gslb/">GSLB</a>
         
     </li>
@@ -596,16 +624,17 @@
 <hr />
 <h3 id="_1">設定例</h3>
 <pre><code class="hcl">#ISOイメージの定義
-resource sakuracloud_cdrom &quot;cdrom&quot; {
-  name  = &quot;cdrom01&quot;
-  #size = 5 # or 10
+resource &quot;sakuracloud_cdrom&quot; &quot;cdrom&quot; {
+  name = &quot;cdrom01&quot;
+
+  #size = 5 # or 10, デフォルトは5GB
 
   # ISOイメージをアップロードする場合
   iso_image_file = &quot;test/dummy.iso&quot;
-  hash           = &quot;${md5(file(&quot;test/dummy.iso&quot;))}&quot;
+  hash           = md5(file(&quot;test/dummy.iso&quot;))
 
   # 単一ファイルを内包するISOイメージを作成する場合
-  #content           = &quot;${file(&quot;test/dummy-upd.json&quot;)}&quot;
+  #content           = file(&quot;test/dummy-upd.json&quot;)
   #content_file_name = &quot;config&quot;
 
   description = &quot;Description&quot;

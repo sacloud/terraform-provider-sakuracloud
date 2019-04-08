@@ -119,6 +119,13 @@
     </li>
 
         
+            
+    <li class="toctree-l1 ">
+        <a class="" href="../../../../upgrade_to_v1_11/">v1.11での変更点</a>
+        
+    </li>
+
+        
     </ul>
 
         
@@ -243,6 +250,13 @@
         
             
     <li class="toctree-l1 ">
+        <a class="" href="../../vpc_router_old/">VPCルータ(子リソース)</a>
+        
+    </li>
+
+        
+            
+    <li class="toctree-l1 ">
         <a class="" href="../../database/">データベース</a>
         
     </li>
@@ -321,6 +335,13 @@
             
     <li class="toctree-l1 ">
         <a class="" href="../../ipv4_ptr/">IPv4逆引きレコード</a>
+        
+    </li>
+
+        
+            
+    <li class="toctree-l1 ">
+        <a class="" href="../../proxylb/">エンハンスドロードバランサ</a>
         
     </li>
 
@@ -522,6 +543,13 @@
         
             
     <li class="toctree-l1 ">
+        <a class="" href="../proxylb/">エンハンスドロードバランサ</a>
+        
+    </li>
+
+        
+            
+    <li class="toctree-l1 ">
         <a class="" href="../gslb/">GSLB</a>
         
     </li>
@@ -595,21 +623,21 @@
 <p><strong>全ゾーン共通のグローバルリソースです。</strong></p>
 <h3 id="_1">設定例</h3>
 <pre><code class="hcl"># DNSゾーン参照
-data sakuracloud_dns &quot;dns&quot; {
+data &quot;sakuracloud_dns&quot; &quot;dns&quot; {
   name_selectors = [&quot;example.com&quot;]
 }
 
 # Aレコード1(test1.example.com)
-resource sakuracloud_dns_record &quot;record01&quot; {
-  dns_id = &quot;${data.sakuracloud_dns.dns.id}&quot;
+resource &quot;sakuracloud_dns_record&quot; &quot;record01&quot; {
+  dns_id = data.sakuracloud_dns.dns.id
   name   = &quot;test&quot;
   type   = &quot;A&quot;
   value  = &quot;192.168.0.1&quot;
 }
 
 # Aレコード2(test.example.com)
-resource sakuracloud_dns_record &quot;record02&quot; {
-  dns_id = &quot;${data.sakuracloud_dns.dns.id}&quot;
+resource &quot;sakuracloud_dns_record&quot; &quot;record02&quot; {
+  dns_id = data.sakuracloud_dns.dns.id
   name   = &quot;test&quot;
   type   = &quot;A&quot;
   value  = &quot;192.168.0.2&quot;
@@ -700,7 +728,7 @@ resource sakuracloud_dns_record &quot;record02&quot; {
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="../gslb/" class="btn btn-neutral float-right" title="GSLB"/>Next <span class="icon icon-circle-arrow-right"></span></a>
+        <a href="../proxylb/" class="btn btn-neutral float-right" title="エンハンスドロードバランサ"/>Next <span class="icon icon-circle-arrow-right"></span></a>
       
       
         <a href="../private_host/" class="btn btn-neutral" title="専有ホスト"><span class="icon icon-circle-arrow-left"></span> Previous</a>
@@ -734,7 +762,7 @@ resource sakuracloud_dns_record &quot;record02&quot; {
         <span><a href="../private_host/" style="color: #fcfcfc;">&laquo; Previous</a></span>
       
       
-        <span style="margin-left: 15px"><a href="../gslb/" style="color: #fcfcfc">Next &raquo;</a></span>
+        <span style="margin-left: 15px"><a href="../proxylb/" style="color: #fcfcfc">Next &raquo;</a></span>
       
     </span>
 </div>

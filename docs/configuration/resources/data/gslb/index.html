@@ -119,6 +119,13 @@
     </li>
 
         
+            
+    <li class="toctree-l1 ">
+        <a class="" href="../../../../upgrade_to_v1_11/">v1.11での変更点</a>
+        
+    </li>
+
+        
     </ul>
 
         
@@ -243,6 +250,13 @@
         
             
     <li class="toctree-l1 ">
+        <a class="" href="../../vpc_router_old/">VPCルータ(子リソース)</a>
+        
+    </li>
+
+        
+            
+    <li class="toctree-l1 ">
         <a class="" href="../../database/">データベース</a>
         
     </li>
@@ -321,6 +335,13 @@
             
     <li class="toctree-l1 ">
         <a class="" href="../../ipv4_ptr/">IPv4逆引きレコード</a>
+        
+    </li>
+
+        
+            
+    <li class="toctree-l1 ">
+        <a class="" href="../../proxylb/">エンハンスドロードバランサ</a>
         
     </li>
 
@@ -510,6 +531,13 @@
 
         
             
+    <li class="toctree-l1 ">
+        <a class="" href="../proxylb/">エンハンスドロードバランサ</a>
+        
+    </li>
+
+        
+            
     <li class="toctree-l1 current">
         <a class="current" href="./">GSLB</a>
         
@@ -594,21 +622,22 @@
 <hr />
 <p><strong>全ゾーン共通のグローバルリソースです。</strong></p>
 <h3 id="_1">設定例</h3>
-<pre><code class="hcl">data sakuracloud_gslb &quot;gslb&quot; {
+<pre><code class="hcl">data &quot;sakuracloud_gslb&quot; &quot;gslb&quot; {
  name_selectors = [&quot;foobar&quot;]
 }
 
 #GSLB配下のサーバ1
-resource sakuracloud_gslb_server &quot;gslb_server01&quot; {
-  gslb_id   = &quot;${data.sakuracloud_gslb.gslb.id}&quot;
+resource &quot;sakuracloud_gslb_server&quot; &quot;gslb_server01&quot; {
+  gslb_id   = data.sakuracloud_gslb.gslb.id
   ipaddress = &quot;192.0.2.1&quot;
   #weight    = 1
   #enabled   = true
 }
 
+
 #GSLB配下のサーバ2
-resource sakuracloud_gslb_server &quot;gslb_server02&quot; {
-  gslb_id   = &quot;${data.sakuracloud_gslb.gslb.id}&quot;
+resource &quot;sakuracloud_gslb_server&quot; &quot;gslb_server02&quot; {
+  gslb_id   = data.sakuracloud_gslb.gslb.id
   ipaddress = &quot;192.0.2.2&quot;
   #weight    = 1
   #enabled   = true
@@ -722,7 +751,7 @@ resource sakuracloud_gslb_server &quot;gslb_server02&quot; {
         <a href="../simple_monitor/" class="btn btn-neutral float-right" title="シンプル監視"/>Next <span class="icon icon-circle-arrow-right"></span></a>
       
       
-        <a href="../dns/" class="btn btn-neutral" title="DNS"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../proxylb/" class="btn btn-neutral" title="エンハンスドロードバランサ"><span class="icon icon-circle-arrow-left"></span> Previous</a>
       
     </div>
   
@@ -750,7 +779,7 @@ resource sakuracloud_gslb_server &quot;gslb_server02&quot; {
     <span class="rst-current-version" data-toggle="rst-current-version">
       
       
-        <span><a href="../dns/" style="color: #fcfcfc;">&laquo; Previous</a></span>
+        <span><a href="../proxylb/" style="color: #fcfcfc;">&laquo; Previous</a></span>
       
       
         <span style="margin-left: 15px"><a href="../simple_monitor/" style="color: #fcfcfc">Next &raquo;</a></span>
