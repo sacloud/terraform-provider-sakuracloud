@@ -37,7 +37,7 @@ class TerraformProviderSakuracloud < Formula
   depends_on "terraform"
 
   def install
-    bin.install "terraform-provider-sakuracloud_v${VERSION}_x4"
+    bin.install "terraform-provider-sakuracloud_v${VERSION}"
   end
 
   def caveats; <<~EOS
@@ -45,7 +45,7 @@ class TerraformProviderSakuracloud < Formula
     This plugin needs to be placed in "~/.terraform.d/plugins" directory.
     To enable, run following command to make symbolic link:
 
-         ln -s #{bin}/terraform-provider-sakuracloud_v${VERSION}_x4 ~/.terraform.d/plugins/terraform-provider-sakuracloud_v${VERSION}_x4
+         ln -s #{bin}/terraform-provider-sakuracloud_v${VERSION} ~/.terraform.d/plugins/terraform-provider-sakuracloud_v${VERSION}
 
   EOS
   end
