@@ -119,6 +119,13 @@
     </li>
 
         
+            
+    <li class="toctree-l1 ">
+        <a class="" href="../../../upgrade_to_v1_11/">v1.11での変更点</a>
+        
+    </li>
+
+        
     </ul>
 
         
@@ -243,6 +250,13 @@
         
             
     <li class="toctree-l1 ">
+        <a class="" href="../vpc_router_old/">VPCルータ(子リソース)</a>
+        
+    </li>
+
+        
+            
+    <li class="toctree-l1 ">
         <a class="" href="../database/">データベース</a>
         
     </li>
@@ -334,6 +348,13 @@
                 
             
             </ul>
+        
+    </li>
+
+        
+            
+    <li class="toctree-l1 ">
+        <a class="" href="../proxylb/">エンハンスドロードバランサ</a>
         
     </li>
 
@@ -524,6 +545,13 @@
         
             
     <li class="toctree-l1 ">
+        <a class="" href="../data/proxylb/">エンハンスドロードバランサ</a>
+        
+    </li>
+
+        
+            
+    <li class="toctree-l1 ">
         <a class="" href="../data/gslb/">GSLB</a>
         
     </li>
@@ -597,27 +625,28 @@
 <h3 id="_1">設定例</h3>
 <pre><code class="hcl"># 逆引きレコードの定義
 resource &quot;sakuracloud_ipv4_ptr&quot; &quot;foobar&quot; {
-  ipaddress = &quot;${sakuracloud_server.server.ipaddress}&quot;
+  ipaddress = sakuracloud_server.server.ipaddress
   hostname  = &quot;ptr.example.com&quot;
 }
 
 # 対象ゾーンの参照
-data sakuracloud_dns &quot;dns&quot; {
+data &quot;sakuracloud_dns&quot; &quot;dns&quot; {
   name_selectors = [&quot;example.com&quot;]
 }
 
 # Aレコードの定義
-resource sakuracloud_dns_record &quot;record01&quot; {
-  dns_id = &quot;${data.sakuracloud_dns.dns.id}&quot;
+resource &quot;sakuracloud_dns_record&quot; &quot;record01&quot; {
+  dns_id = data.sakuracloud_dns.dns.id
   name   = &quot;ptr&quot;
   type   = &quot;A&quot;
-  value  = &quot;${sakuracloud_server.server.ipaddress}&quot;
+  value  = sakuracloud_server.server.ipaddress
 }
 
 # Aレコード/PTRレコード登録対象のサーバ
-resource sakuracloud_server &quot;server&quot; {
+resource &quot;sakuracloud_server&quot; &quot;server&quot; {
   name = &quot;example&quot;
 }
+
 </code></pre>
 
 <p>逆引きレコードを登録するには対応するAレコードがあらかじめ登録されている必要があります。<br />
@@ -701,7 +730,7 @@ resource sakuracloud_server &quot;server&quot; {
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="../gslb/" class="btn btn-neutral float-right" title="GSLB"/>Next <span class="icon icon-circle-arrow-right"></span></a>
+        <a href="../proxylb/" class="btn btn-neutral float-right" title="エンハンスドロードバランサ"/>Next <span class="icon icon-circle-arrow-right"></span></a>
       
       
         <a href="../dns/" class="btn btn-neutral" title="DNS"><span class="icon icon-circle-arrow-left"></span> Previous</a>
@@ -735,7 +764,7 @@ resource sakuracloud_server &quot;server&quot; {
         <span><a href="../dns/" style="color: #fcfcfc;">&laquo; Previous</a></span>
       
       
-        <span style="margin-left: 15px"><a href="../gslb/" style="color: #fcfcfc">Next &raquo;</a></span>
+        <span style="margin-left: 15px"><a href="../proxylb/" style="color: #fcfcfc">Next &raquo;</a></span>
       
     </span>
 </div>

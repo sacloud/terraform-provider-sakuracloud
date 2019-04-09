@@ -119,6 +119,13 @@
     </li>
 
         
+            
+    <li class="toctree-l1 ">
+        <a class="" href="../../../upgrade_to_v1_11/">v1.11での変更点</a>
+        
+    </li>
+
+        
     </ul>
 
         
@@ -243,6 +250,13 @@
         
             
     <li class="toctree-l1 ">
+        <a class="" href="../vpc_router_old/">VPCルータ(子リソース)</a>
+        
+    </li>
+
+        
+            
+    <li class="toctree-l1 ">
         <a class="" href="../database/">データベース</a>
         
     </li>
@@ -321,6 +335,13 @@
             
     <li class="toctree-l1 ">
         <a class="" href="../ipv4_ptr/">IPv4逆引きレコード</a>
+        
+    </li>
+
+        
+            
+    <li class="toctree-l1 ">
+        <a class="" href="../proxylb/">エンハンスドロードバランサ</a>
         
     </li>
 
@@ -528,6 +549,13 @@
         
             
     <li class="toctree-l1 ">
+        <a class="" href="../data/proxylb/">エンハンスドロードバランサ</a>
+        
+    </li>
+
+        
+            
+    <li class="toctree-l1 ">
         <a class="" href="../data/gslb/">GSLB</a>
         
     </li>
@@ -606,7 +634,7 @@
 </ul>
 <hr />
 <h3 id="_1">設定例</h3>
-<pre><code class="hcl">resource sakuracloud_bucket_object &quot;foobar&quot; {
+<pre><code class="hcl">resource &quot;sakuracloud_bucket_object&quot; &quot;foobar&quot; {
   #アクセスキー(環境変数SACLOUD_OJS_ACCESS_KEY_ID、またはAWS_ACCESS_KEY_IDでも指定可能)  
   #access_key = &quot;&quot;
 
@@ -622,11 +650,12 @@
   #ボディ:
   #文字列で指定する場合
   content = &quot;content&quot;
+
   #ファイルを指定する場合
   #source = &quot;path/your/object/file&quot;
 
   #ETag: オブジェクトストレージ上でオブジェクトが変更されたことを検知したい場合に指定
-  #etag = &quot;${md5(file(&quot;path/your/object/file&quot;))}&quot; 
+  #etag = md5(file(&quot;path/your/object/file&quot;))
 }
 </code></pre>
 
@@ -782,7 +811,7 @@
 </tbody>
 </table>
 <h3 id="_5">データリソースの利用例</h3>
-<pre><code class="hcl">data sakuracloud_bucket_object &quot;foobar&quot; {
+<pre><code class="hcl">data &quot;sakuracloud_bucket_object&quot; &quot;foobar&quot; {
   #アクセスキー(環境変数SACLOUD_OJS_ACCESS_KEY_ID、またはAWS_ACCESS_KEY_IDでも指定可能)  
   #access_key = &quot;&quot;
   #シークレットキー(環境変数SACLOUD_OJS_SECRET_ACCESS_KEY、またはAWS_SECRET_ACCESS_KEYでも指定可能)

@@ -1,5 +1,22 @@
 # Changelog
 
+## 1.11.0 (2019-04-08)
+
+* VPCルータでネストした子要素の定義を可能にする #392 (yamamoto-febc)
+* モバイルゲートウェイでネストした子要素の定義を可能にする #405 (yamamoto-febc)
+* スタートアップスクリプトのdescriptionをcomputed:trueに変更 #406 (yamamoto-febc)
+* Terraform v0.12.0-beta1 #408 (yamamoto-febc)
+* エンハンスドロードバランサ追加 #410 (yamamoto-febc)
+* エンハンスドロードバランサ: プラン選択 #414 (yamamoto-febc)
+* marker_tag関連コードの除去 #415 (yamamoto-febc)
+* ディスクリソースでのディスク修正関連パラメータをRemovedに変更 #416 (yamamoto-febc)
+* Terraform v0.12対応 #422 (yamamoto-febc)
+* Update docs - v2.0 to v1.11 #423 (yamamoto-febc)
+* NFS新プラン対応 #424 (yamamoto-febc)
+* エンハンスドロードバランサの正式版対応 #426 (yamamoto-febc)
+* リリースファイルの名前からサフィックスを除去 #427 (yamamoto-febc)
+
+
 ## 1.10.0 (2019-02-21)
 
 * Upgrade libsacloud to v1.14 #402 (yamamoto-febc)

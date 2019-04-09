@@ -119,6 +119,13 @@
     </li>
 
         
+            
+    <li class="toctree-l1 ">
+        <a class="" href="../../../upgrade_to_v1_11/">v1.11での変更点</a>
+        
+    </li>
+
+        
     </ul>
 
         
@@ -243,6 +250,13 @@
         
             
     <li class="toctree-l1 ">
+        <a class="" href="../vpc_router_old/">VPCルータ(子リソース)</a>
+        
+    </li>
+
+        
+            
+    <li class="toctree-l1 ">
         <a class="" href="../database/">データベース</a>
         
     </li>
@@ -321,6 +335,13 @@
             
     <li class="toctree-l1 ">
         <a class="" href="../ipv4_ptr/">IPv4逆引きレコード</a>
+        
+    </li>
+
+        
+            
+    <li class="toctree-l1 ">
+        <a class="" href="../proxylb/">エンハンスドロードバランサ</a>
         
     </li>
 
@@ -524,6 +545,13 @@
         
             
     <li class="toctree-l1 ">
+        <a class="" href="../data/proxylb/">エンハンスドロードバランサ</a>
+        
+    </li>
+
+        
+            
+    <li class="toctree-l1 ">
         <a class="" href="../data/gslb/">GSLB</a>
         
     </li>
@@ -598,31 +626,31 @@
 <p>他のリソースがサーバの値を利用する場合などに利用する。<br />
 (例: パケットフィルタにてサーバのIPアドレスを利用する場合など)</p>
 <h3 id="_1">設定例</h3>
-<pre><code class="hcl">resource sakuracloud_server &quot;sv&quot; {
+<pre><code class="hcl">resource &quot;sakuracloud_server&quot; &quot;sv&quot; {
   name = &quot;sv&quot;
 }
 
-resource sakuracloud_packet_filter &quot;pf&quot; {
+resource &quot;sakuracloud_packet_filter&quot; &quot;pf&quot; {
   name = &quot;pf&quot;
 
-  expressions = {
+  expressions {
     protocol  = &quot;ip&quot;
-    source_nw = &quot;${sakuracloud_server.sv.ipaddress}&quot;
+    source_nw = sakuracloud_server.sv.ipaddress
   }
 }
 
 # リソース間の接続のみを扱うリソース = コネクタリソース
-resource sakuracloud_server_connector &quot;connector&quot; {
-  server_id         = &quot;${sakuracloud_server.sv.id}&quot;
+resource &quot;sakuracloud_server_connector&quot; &quot;connector&quot; {
+  server_id = sakuracloud_server.sv.id
 
   # パケットフィルタ
-  packet_filter_ids = [&quot;${sakuracloud_packet_filter.pf.id}&quot;]
+  packet_filter_ids = [sakuracloud_packet_filter.pf.id]
 
   # ディスク
-  #disks             = [&quot;${sakuracloud_disk.disk01.id}&quot;]
+  #disks             = [sakuracloud_disk.disk01.id]
 
   # ISOイメージ(CD-ROM)
-  #cdrom_id          = &quot;${data.sakuracloud_cdrom.centos.id}&quot;
+  #cdrom_id          = data.sakuracloud_cdrom.centos.id
 }
 </code></pre>
 

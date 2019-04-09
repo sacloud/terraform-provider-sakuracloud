@@ -119,6 +119,13 @@
     </li>
 
         
+            
+    <li class="toctree-l1 ">
+        <a class="" href="../../../upgrade_to_v1_11/">v1.11での変更点</a>
+        
+    </li>
+
+        
     </ul>
 
         
@@ -243,6 +250,13 @@
         
             
     <li class="toctree-l1 ">
+        <a class="" href="../vpc_router_old/">VPCルータ(子リソース)</a>
+        
+    </li>
+
+        
+            
+    <li class="toctree-l1 ">
         <a class="" href="../database/">データベース</a>
         
     </li>
@@ -336,6 +350,13 @@
             
     <li class="toctree-l1 ">
         <a class="" href="../ipv4_ptr/">IPv4逆引きレコード</a>
+        
+    </li>
+
+        
+            
+    <li class="toctree-l1 ">
+        <a class="" href="../proxylb/">エンハンスドロードバランサ</a>
         
     </li>
 
@@ -526,6 +547,13 @@
         
             
     <li class="toctree-l1 ">
+        <a class="" href="../data/proxylb/">エンハンスドロードバランサ</a>
+        
+    </li>
+
+        
+            
+    <li class="toctree-l1 ">
         <a class="" href="../data/gslb/">GSLB</a>
         
     </li>
@@ -603,23 +631,13 @@
 <li>このリソースは更新動作に非対応です。属性を変更した場合は常に再生成されます。</li>
 </ul>
 <h3 id="_1">設定例</h3>
-<pre><code class="hcl">resource sakuracloud_ssh_key_gen &quot;key&quot; {
+<pre><code class="hcl">resource &quot;sakuracloud_ssh_key_gen&quot; &quot;key&quot; {
   name = &quot;foobar&quot;
 
   # パスフレーズ(オプション、指定する場合は8〜64文字)
   # pass_phrase = &quot;your_pass_phrase&quot;
 
   description = &quot;Description&quot;
-
-  # local_execを利用してローカルマシンに秘密鍵ファイルを生成する例
-  provisioner &quot;local-exec&quot; {
-    command = &quot;echo \&quot;${self.private_key}\&quot; &gt; id_rsa; chmod 0600 id_rsa&quot;
-  }
-  # terraform destroy実行時にローカルマシン上の秘密鍵ファイルを削除
-  provisioner &quot;local-exec&quot; {
-    when    = &quot;destroy&quot;
-    command = &quot;rm -f id_rsa&quot;
-  }
 }
 </code></pre>
 
@@ -719,19 +737,18 @@ data sakuracloud_archive &quot;centos&quot; {
 resource sakuracloud_disk &quot;foobar&quot; {
   name              = &quot;foobar&quot;
   source_archive_id = &quot;${data.sakuracloud_archive.centos.id}&quot;
-  password          = &quot;PUT_YOUR_PASSWORD_HERE&quot;
-
-  # 生成した公開鍵のIDを指定
-  ssh_key_ids = [&quot;${sakuracloud_ssh_key_gen.key.id}&quot;]
-
-  # SSH接続時のパスワード/チャレンジレスポンス認証を無効化
-  disable_pw_auth = true
 }
 
 #サーバの定義
 resource sakuracloud_server &quot;foobar&quot; {
   name  = &quot;foobar&quot;
   disks = [&quot;${sakuracloud_disk.foobar.id}&quot;]
+
+  password          = &quot;PUT_YOUR_PASSWORD_HERE&quot;
+  # 生成した公開鍵のIDを指定
+  ssh_key_ids = [&quot;${sakuracloud_ssh_key_gen.key.id}&quot;]
+  # SSH接続時のパスワード/チャレンジレスポンス認証を無効化
+  disable_pw_auth = true
 
   # プロビジョニング
   connection {

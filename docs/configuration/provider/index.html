@@ -119,6 +119,13 @@
     </li>
 
         
+            
+    <li class="toctree-l1 ">
+        <a class="" href="../../upgrade_to_v1_11/">v1.11での変更点</a>
+        
+    </li>
+
+        
     </ul>
 
         
@@ -254,6 +261,13 @@
         
             
     <li class="toctree-l1 ">
+        <a class="" href="../resources/vpc_router_old/">VPCルータ(子リソース)</a>
+        
+    </li>
+
+        
+            
+    <li class="toctree-l1 ">
         <a class="" href="../resources/database/">データベース</a>
         
     </li>
@@ -332,6 +346,13 @@
             
     <li class="toctree-l1 ">
         <a class="" href="../resources/ipv4_ptr/">IPv4逆引きレコード</a>
+        
+    </li>
+
+        
+            
+    <li class="toctree-l1 ">
+        <a class="" href="../resources/proxylb/">エンハンスドロードバランサ</a>
         
     </li>
 
@@ -522,6 +543,13 @@
         
             
     <li class="toctree-l1 ">
+        <a class="" href="../resources/data/proxylb/">エンハンスドロードバランサ</a>
+        
+    </li>
+
+        
+            
+    <li class="toctree-l1 ">
         <a class="" href="../resources/data/gslb/">GSLB</a>
         
     </li>
@@ -593,7 +621,7 @@
                 <h1 id="_1">プロバイダ設定</h1>
 <hr />
 <h3 id="_2">設定例</h3>
-<pre><code class="hcl">provider &quot;sakuracloud&quot; {
+<pre><code class="hcl">provider sakuracloud {
   token  = &quot;your API token&quot;
   secret = &quot;your API secret&quot;
   zone   = &quot;target zone&quot;
@@ -683,22 +711,6 @@
 <td align="center"><code>false</code></td>
 <td><code>true</code><br /><code>false</code></td>
 <td>(開発者向け)詳細ログの出力ON/OFFを指定します。 <br />環境変数<code>SAKURACLOUD_TRACE_MODE</code>での指定も可</td>
-</tr>
-<tr>
-<td><code>use_marker_tags</code></td>
-<td align="center">-</td>
-<td>マーカータグ利用有無</td>
-<td align="center"><code>false</code></td>
-<td><code>true</code><br /><code>false</code></td>
-<td>(v1.4で廃止) Terraformで作成されたリソースであるかの判別用に全てのリソースにタグを付与するかを指定<br />環境変数<code>SAKURACLOUD_USE_MARKER_TAGS</code>での指定も可</td>
-</tr>
-<tr>
-<td><code>marker_tag_name</code></td>
-<td align="center">-</td>
-<td>マーカータグ名</td>
-<td align="center"><code>@terraform</code></td>
-<td>文字列</td>
-<td>(v1.4で廃止) <code>use_marker_tags</code>がtrueの場合のタグ名 <br />環境変数<code>SAKURACLOUD_MARKER_TAG_NAME</code>での指定も可</td>
 </tr>
 </tbody>
 </table>

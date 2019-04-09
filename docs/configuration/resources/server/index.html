@@ -119,6 +119,13 @@
     </li>
 
         
+            
+    <li class="toctree-l1 ">
+        <a class="" href="../../../upgrade_to_v1_11/">v1.11での変更点</a>
+        
+    </li>
+
+        
     </ul>
 
         
@@ -256,6 +263,13 @@
         
             
     <li class="toctree-l1 ">
+        <a class="" href="../vpc_router_old/">VPCルータ(子リソース)</a>
+        
+    </li>
+
+        
+            
+    <li class="toctree-l1 ">
         <a class="" href="../database/">データベース</a>
         
     </li>
@@ -334,6 +348,13 @@
             
     <li class="toctree-l1 ">
         <a class="" href="../ipv4_ptr/">IPv4逆引きレコード</a>
+        
+    </li>
+
+        
+            
+    <li class="toctree-l1 ">
+        <a class="" href="../proxylb/">エンハンスドロードバランサ</a>
         
     </li>
 
@@ -524,6 +545,13 @@
         
             
     <li class="toctree-l1 ">
+        <a class="" href="../data/proxylb/">エンハンスドロードバランサ</a>
+        
+    </li>
+
+        
+            
+    <li class="toctree-l1 ">
         <a class="" href="../data/gslb/">GSLB</a>
         
     </li>
@@ -595,9 +623,9 @@
                 <h1 id="sakuracloud_server">サーバ(sakuracloud_server)</h1>
 <hr />
 <h3 id="_1">設定例</h3>
-<pre><code class="hcl">resource sakuracloud_server &quot;myserver&quot; {
+<pre><code class="hcl">resource &quot;sakuracloud_server&quot; &quot;myserver&quot; {
   name  = &quot;myserver&quot;
-  disks = [&quot;${sakuracloud_disk.mydisk.id}&quot;]
+  disks = [sakuracloud_disk.mydisk.id]
 
   #コア数
   #core = 1
@@ -613,14 +641,14 @@
   #display_ipaddress = &quot;192.2.0.1&quot;
 
   #追加NIC
-  #additional_nics                = [&quot;${sakuracloud_switch.myswitch.id}&quot;]
+  #additional_nics                = [sakuracloud_switch.myswitch.id]
   #additional_display_ipaddresses = [&quot;192.2.0.1&quot;]
 
   #パケットフィルタ
-  #packet_filter_ids = [&quot;${sakuracloud_packet_filter.myfilter.id}&quot;]
+  #packet_filter_ids = [sakuracloud_packet_filter.myfilter.id]
 
   #ISOイメージ(CD-ROM)
-  #cdrom_id = &quot;${data.sakuracloud_cdrom.mycdrom.id}&quot;
+  #cdrom_id = data.sakuracloud_cdrom.mycdrom.id
 
   #ネットワーク設定(nicにスイッチIDが指定されている場合のみ)
   #ipaddress         = &quot;192.168.0.101&quot;
@@ -637,14 +665,15 @@
   password = &quot;p@ssw0rd&quot; #パスワード
 
   #SSH公開鍵
-  #ssh_key_ids = [&quot;${sakuracloud_ssh_key_gen.key.id}&quot;]
+  #ssh_key_ids = [sakuracloud_ssh_key_gen.key.id]
 
   #スタートアップスクリプト
-  #note_ids = [&quot;${sakuracloud_note.note.id}&quot;]
+  #note_ids = [sakuracloud_note.note.id]
 
   #SSH接続でのパスワード/チャレンジレスポンス認証無効化
   #disable_pw_auth = true
 }
+
 </code></pre>
 
 <h3 id="_2">パラメーター</h3>

@@ -183,6 +183,12 @@
 		"TerraformVersion": "v0.11.8",
 		"ReleaseDate": "2019-02-21T05:19:00.565793627Z",
 		"PluginVersion": "v1.10.0",
-		"PreRelease": true
+		"PreRelease": false
+	},
+	{
+		"TerraformVersion": "v0.12.0@pluginsdk-v0.12-early6",
+		"ReleaseDate": "2019-04-08T11:41:57.688699141Z",
+		"PluginVersion": "v1.11.0",
+		"PreRelease": false
 	}
 ]

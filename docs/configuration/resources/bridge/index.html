@@ -119,6 +119,13 @@
     </li>
 
         
+            
+    <li class="toctree-l1 ">
+        <a class="" href="../../../upgrade_to_v1_11/">v1.11での変更点</a>
+        
+    </li>
+
+        
     </ul>
 
         
@@ -256,6 +263,13 @@
         
             
     <li class="toctree-l1 ">
+        <a class="" href="../vpc_router_old/">VPCルータ(子リソース)</a>
+        
+    </li>
+
+        
+            
+    <li class="toctree-l1 ">
         <a class="" href="../database/">データベース</a>
         
     </li>
@@ -334,6 +348,13 @@
             
     <li class="toctree-l1 ">
         <a class="" href="../ipv4_ptr/">IPv4逆引きレコード</a>
+        
+    </li>
+
+        
+            
+    <li class="toctree-l1 ">
+        <a class="" href="../proxylb/">エンハンスドロードバランサ</a>
         
     </li>
 
@@ -524,6 +545,13 @@
         
             
     <li class="toctree-l1 ">
+        <a class="" href="../data/proxylb/">エンハンスドロードバランサ</a>
+        
+    </li>
+
+        
+            
+    <li class="toctree-l1 ">
         <a class="" href="../data/gslb/">GSLB</a>
         
     </li>
@@ -597,22 +625,22 @@
 <p><strong>全ゾーン共通のグローバルリソースです。</strong></p>
 <h3 id="_1">設定例</h3>
 <pre><code class="hcl">#ブリッジの定義
-resource sakuracloud_bridge &quot;br01&quot; {
-  name        = &quot;br01&quot;
-  description = &quot;BRIDGE from terraform for SAKURA CLOUD&quot;
+resource &quot;sakuracloud_bridge&quot; &quot;bridge&quot; {
+  name        = &quot;bridge&quot;
+  description = &quot;example bridge&quot;
 }
 
 # ブリッジに接続するスイッチ(東京第1ゾーン)
-resource sakuracloud_switch &quot;sw_tk1a&quot; {
+resource &quot;sakuracloud_switch&quot; &quot;tk1a&quot; {
   name      = &quot;switch_tk1a&quot;
-  bridge_id = &quot;${sakuracloud_bridge.br01.id}&quot;
+  bridge_id = sakuracloud_bridge.bridge.id
   zone      = &quot;tk1a&quot;
 }
 
 # ブリッジに接続するスイッチ(石狩第2ゾーン)
-resource sakuracloud_switch &quot;sw_is1b&quot; {
+resource &quot;sakuracloud_switch&quot; &quot;is1b&quot; {
   name      = &quot;switch_is1b&quot;
-  bridge_id = &quot;${sakuracloud_bridge.br01.id}&quot;
+  bridge_id = sakuracloud_bridge.bridge.id
   zone      = &quot;is1b&quot;
 }
 </code></pre>

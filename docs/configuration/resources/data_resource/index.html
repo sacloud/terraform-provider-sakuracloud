@@ -119,6 +119,13 @@
     </li>
 
         
+            
+    <li class="toctree-l1 ">
+        <a class="" href="../../../upgrade_to_v1_11/">v1.11での変更点</a>
+        
+    </li>
+
+        
     </ul>
 
         
@@ -243,6 +250,13 @@
         
             
     <li class="toctree-l1 ">
+        <a class="" href="../vpc_router_old/">VPCルータ(子リソース)</a>
+        
+    </li>
+
+        
+            
+    <li class="toctree-l1 ">
         <a class="" href="../database/">データベース</a>
         
     </li>
@@ -321,6 +335,13 @@
             
     <li class="toctree-l1 ">
         <a class="" href="../ipv4_ptr/">IPv4逆引きレコード</a>
+        
+    </li>
+
+        
+            
+    <li class="toctree-l1 ">
+        <a class="" href="../proxylb/">エンハンスドロードバランサ</a>
         
     </li>
 
@@ -522,6 +543,13 @@
         
             
     <li class="toctree-l1 ">
+        <a class="" href="../data/proxylb/">エンハンスドロードバランサ</a>
+        
+    </li>
+
+        
+            
+    <li class="toctree-l1 ">
         <a class="" href="../data/gslb/">GSLB</a>
         
     </li>
@@ -598,31 +626,31 @@
 <code>sakuracloud_archive</code>データリソースを利用しています。</p>
 <p>データリソースを利用することで<code>sakuracloud_disk</code>の定義中にアーカイブのIDを直接指定しないように出来ます。</p>
 <h3 id="_2">利用例</h3>
-<pre><code class="hcl">data sakuracloud_archive &quot;ubuntu&quot; {
-    filter = {
-        name = &quot;Name&quot;
-        values = [&quot;Ubuntu Server&quot;]
-    }
-    filter = {
-        name = &quot;Tags&quot;
-        values = [&quot;current-stable&quot;,&quot;arch-64bit&quot;,&quot;os-linux&quot;]
-    }
+<pre><code class="hcl">data &quot;sakuracloud_archive&quot; &quot;ubuntu&quot; {
+  filter {
+    name   = &quot;Name&quot;
+    values = [&quot;Ubuntu Server&quot;]
+  }
+  filter {
+    name   = &quot;Tags&quot;
+    values = [&quot;current-stable&quot;, &quot;arch-64bit&quot;, &quot;os-linux&quot;]
+  }
 }
 
-resource sakuracloud_disk &quot;disk01&quot;{
-    name = &quot;disk01&quot;
-    source_archive_id = &quot;${data.sakuracloud_archive.ubuntu.id}&quot;
+resource &quot;sakuracloud_disk&quot; &quot;disk01&quot; {
+  name              = &quot;disk01&quot;
+  source_archive_id = data.sakuracloud_archive.ubuntu.id
 }
 </code></pre>
 
 <h3 id="_3">パラメーター(アーカイブのみ)</h3>
 <p>アーカイブ(<code>sakuracloud_archive</code>)リソースでは、<code>os_type</code>パラメーターが利用可能です。</p>
-<pre><code class="hcl">data sakuracloud_archive &quot;ubuntu&quot; {
-    os_type = &quot;ubuntu&quot; # Ubuntuの最新安定版パブリックアーカイブ
+<pre><code class="hcl">data &quot;sakuracloud_archive&quot; &quot;ubuntu&quot; {
+  os_type = &quot;ubuntu&quot; # Ubuntuの最新安定版パブリックアーカイブ
 }
 
-data sakuracloud_archive &quot;centos&quot; {
-    os_type = &quot;centos&quot; # CentOSの最新安定版パブリックアーカイブ
+data &quot;sakuracloud_archive&quot; &quot;centos&quot; {
+  os_type = &quot;centos&quot; # CentOSの最新安定版パブリックアーカイブ
 }
 
 </code></pre>

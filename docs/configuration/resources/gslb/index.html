@@ -119,6 +119,13 @@
     </li>
 
         
+            
+    <li class="toctree-l1 ">
+        <a class="" href="../../../upgrade_to_v1_11/">v1.11での変更点</a>
+        
+    </li>
+
+        
     </ul>
 
         
@@ -243,6 +250,13 @@
         
             
     <li class="toctree-l1 ">
+        <a class="" href="../vpc_router_old/">VPCルータ(子リソース)</a>
+        
+    </li>
+
+        
+            
+    <li class="toctree-l1 ">
         <a class="" href="../database/">データベース</a>
         
     </li>
@@ -321,6 +335,13 @@
             
     <li class="toctree-l1 ">
         <a class="" href="../ipv4_ptr/">IPv4逆引きレコード</a>
+        
+    </li>
+
+        
+            
+    <li class="toctree-l1 ">
+        <a class="" href="../proxylb/">エンハンスドロードバランサ</a>
         
     </li>
 
@@ -524,6 +545,13 @@
         
             
     <li class="toctree-l1 ">
+        <a class="" href="../data/proxylb/">エンハンスドロードバランサ</a>
+        
+    </li>
+
+        
+            
+    <li class="toctree-l1 ">
         <a class="" href="../data/gslb/">GSLB</a>
         
     </li>
@@ -597,39 +625,43 @@
 <p><strong>全ゾーン共通のグローバルリソースです。</strong></p>
 <p><code>sakuracloud_gslb</code>がGSLB設定を、<code>sakuracloud_gslb_server</code>が対象サーバを表しています。</p>
 <h3 id="_1">設定例</h3>
-<pre><code class="hcl">resource sakuracloud_gslb &quot;gslb&quot; {
+<pre><code class="hcl">resource &quot;sakuracloud_gslb&quot; &quot;gslb&quot; {
   name = &quot;gslb_from_terraform&quot;
 
-  health_check = {
+  health_check {
     protocol    = &quot;http&quot;
     delay_loop  = 10
     host_header = &quot;example.com&quot;
     path        = &quot;/&quot;
     status      = &quot;200&quot;
-    #port       = 80
   }
+
+  #port       = 80
 
   #weighted     = false
   #sorry_server = &quot;192.0.2.254&quot;
-  description  = &quot;GSLB from terraform for SAKURA CLOUD&quot;
-  tags         = [&quot;tag1&quot;, &quot;tag2&quot;]
+  description = &quot;GSLB from terraform for SAKURA CLOUD&quot;
+  tags        = [&quot;tag1&quot;, &quot;tag2&quot;]
+
+  servers {
+    ipaddress = &quot;192.0.2.1&quot;
+    #weight    = 1
+    #enabled   = true
+  }
+  servers {
+    ipaddress = &quot;192.0.2.2&quot;
+    #weight    = 1
+    #enabled   = true
+  }
 }
 
-#GSLB配下のサーバ1
-resource sakuracloud_gslb_server &quot;gslb_server01&quot; {
-  gslb_id   = &quot;${sakuracloud_gslb.gslb.id}&quot;
-  ipaddress = &quot;192.0.2.1&quot;
-  #weight    = 1
-  #enabled   = true
-}
-
-#GSLB配下のサーバ2
-resource sakuracloud_gslb_server &quot;gslb_server02&quot; {
-  gslb_id   = &quot;${sakuracloud_gslb.gslb.id}&quot;
-  ipaddress = &quot;192.0.2.2&quot;
-  #weight    = 1
-  #enabled   = true
-}
+#GSLB配下のサーバ(後方互換のため以下の書き方も可能になっています)
+#resource &quot;sakuracloud_gslb_server&quot; &quot;gslb_server01&quot; {
+#  gslb_id   = sakuracloud_gslb.gslb.id
+#  ipaddress = &quot;192.0.2.1&quot;
+#  #weight    = 1
+#  #enabled   = true
+#}
 </code></pre>
 
 <h2 id="sakuracloud_gslb"><code>sakuracloud_gslb</code></h2>
@@ -767,6 +799,46 @@ resource sakuracloud_gslb_server &quot;gslb_server02&quot; {
 </tr>
 </tbody>
 </table>
+<h3 id="servers"><code>servers</code></h3>
+<p>この要素は最大6つまで指定可能です。  </p>
+<table>
+<thead>
+<tr>
+<th>パラメーター</th>
+<th align="center">必須</th>
+<th>名称</th>
+<th align="center">初期値</th>
+<th>設定値</th>
+<th>補足</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>ipaddress</code></td>
+<td align="center">◯</td>
+<td>IPアドレス</td>
+<td align="center">-</td>
+<td>文字列</td>
+<td>監視対象サーバのIPアドレス</td>
+</tr>
+<tr>
+<td><code>enabled</code></td>
+<td align="center">-</td>
+<td>有効</td>
+<td align="center"><code>true</code></td>
+<td><code>true</code><br /><code>false</code></td>
+<td>-</td>
+</tr>
+<tr>
+<td><code>weight</code></td>
+<td align="center">-</td>
+<td>重み</td>
+<td align="center"><code>1</code></td>
+<td>数値</td>
+<td>重み付け応答が有効な場合のみ有効。<code>1</code>〜<code>10000</code></td>
+</tr>
+</tbody>
+</table>
 <h3 id="_3">属性</h3>
 <table>
 <thead>
@@ -789,6 +861,8 @@ resource sakuracloud_gslb_server &quot;gslb_server02&quot; {
 </tr>
 </tbody>
 </table>
+<p><strong>注意</strong>  </p>
+<p>同一のGSLBに対し<code>servers</code>属性と<code>sakuracloud_gslb_server</code>リソースの併用はできません。</p>
 <h2 id="sakuracloud_gslb_server"><code>sakuracloud_gslb_server</code></h2>
 <h3 id="_4">パラメーター</h3>
 <table>
@@ -864,7 +938,7 @@ resource sakuracloud_gslb_server &quot;gslb_server02&quot; {
         <a href="../simple_monitor/" class="btn btn-neutral float-right" title="シンプル監視"/>Next <span class="icon icon-circle-arrow-right"></span></a>
       
       
-        <a href="../ipv4_ptr/" class="btn btn-neutral" title="IPv4逆引きレコード"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../proxylb/" class="btn btn-neutral" title="エンハンスドロードバランサ"><span class="icon icon-circle-arrow-left"></span> Previous</a>
       
     </div>
   
@@ -892,7 +966,7 @@ resource sakuracloud_gslb_server &quot;gslb_server02&quot; {
     <span class="rst-current-version" data-toggle="rst-current-version">
       
       
-        <span><a href="../ipv4_ptr/" style="color: #fcfcfc;">&laquo; Previous</a></span>
+        <span><a href="../proxylb/" style="color: #fcfcfc;">&laquo; Previous</a></span>
       
       
         <span style="margin-left: 15px"><a href="../simple_monitor/" style="color: #fcfcfc">Next &raquo;</a></span>

@@ -119,6 +119,13 @@
     </li>
 
         
+            
+    <li class="toctree-l1 ">
+        <a class="" href="../../../upgrade_to_v1_11/">v1.11での変更点</a>
+        
+    </li>
+
+        
     </ul>
 
         
@@ -258,6 +265,13 @@
         
             
     <li class="toctree-l1 ">
+        <a class="" href="../vpc_router_old/">VPCルータ(子リソース)</a>
+        
+    </li>
+
+        
+            
+    <li class="toctree-l1 ">
         <a class="" href="../database/">データベース</a>
         
     </li>
@@ -336,6 +350,13 @@
             
     <li class="toctree-l1 ">
         <a class="" href="../ipv4_ptr/">IPv4逆引きレコード</a>
+        
+    </li>
+
+        
+            
+    <li class="toctree-l1 ">
+        <a class="" href="../proxylb/">エンハンスドロードバランサ</a>
         
     </li>
 
@@ -526,6 +547,13 @@
         
             
     <li class="toctree-l1 ">
+        <a class="" href="../data/proxylb/">エンハンスドロードバランサ</a>
+        
+    </li>
+
+        
+            
+    <li class="toctree-l1 ">
         <a class="" href="../data/gslb/">GSLB</a>
         
     </li>
@@ -598,8 +626,8 @@
 <hr />
 <h3 id="_1">設定例</h3>
 <pre><code class="hcl">#ロードバランサの定義
-resource sakuracloud_load_balancer &quot;foobar&quot; {
-  switch_id = &quot;${sakuracloud_switch.sw.id}&quot;
+resource &quot;sakuracloud_load_balancer&quot; &quot;foobar&quot; {
+  switch_id = sakuracloud_switch.sw.id
   vrid      = 1
 
   #冗長化構成の有無
@@ -609,6 +637,7 @@ resource sakuracloud_load_balancer &quot;foobar&quot; {
   plan = &quot;standard&quot;
 
   ipaddress1 = &quot;192.168.11.101&quot;
+
   #ipaddress2 = &quot;192.168.11.101&quot;
   #default_route = &quot;192.168.11.1&quot;
   nw_mask_len = 24
@@ -617,49 +646,66 @@ resource sakuracloud_load_balancer &quot;foobar&quot; {
   description = &quot;Description&quot;
   tags        = [&quot;tag1&quot;, &quot;tag2&quot;]
 
-  zone = &quot;tk1v&quot;
+  # VIPの定義
+  vips {
+    vip          = &quot;192.168.11.201&quot;
+    port         = 80
+    delay_loop   = 10
+    sorry_server = &quot;192.168.11.21&quot;
+
+    # VIP配下の実サーバの定義
+    servers {
+      ipaddress      = &quot;192.168.11.51&quot;
+      check_protocol = &quot;http&quot;
+      check_path     = &quot;/ping.html&quot;
+      check_status   = 200
+    }
+    servers {
+      ipaddress      = &quot;192.168.11.52&quot;
+      check_protocol = &quot;http&quot;
+      check_path     = &quot;/ping.html&quot;
+      check_status   = 200
+    }
+  }
 }
 
+# 互換性維持のため以下の書き方も可能
 #ロードバランサVIPの定義
-resource sakuracloud_load_balancer_vip &quot;vip1&quot; {
-  load_balancer_id = &quot;${sakuracloud_load_balancer.foobar.id}&quot;
-  vip              = &quot;192.168.11.201&quot;
-  port             = 80
-  #delay_loop       = 10
-  #sorry_server     = &quot;192.168.11.11&quot;
-  #description      = &quot;description&quot;
-
-  zone = &quot;tk1v&quot;
-}
+#resource &quot;sakuracloud_load_balancer_vip&quot; &quot;vip1&quot; {
+#  load_balancer_id = sakuracloud_load_balancer.foobar.id
+#  vip              = &quot;192.168.11.201&quot;
+#  port             = 80
+#
+#  #delay_loop       = 10
+#  #sorry_server     = &quot;192.168.11.11&quot;
+#  #description      = &quot;description&quot;
+#}
 
 #ロードバランサVIP配下の実サーバの定義(1台目)
-resource sakuracloud_load_balancer_server &quot;server01&quot; {
-  load_balancer_vip_id = &quot;${sakuracloud_load_balancer_vip.vip1.id}&quot;
-  ipaddress            = &quot;192.168.11.51&quot;
-  check_protocol       = &quot;http&quot;
-  check_path           = &quot;/&quot;
-  check_status         = &quot;200&quot;
-  #enabled              = true
-
-  zone = &quot;tk1v&quot;
-}
+#resource &quot;sakuracloud_load_balancer_server&quot; &quot;server01&quot; {
+#  load_balancer_vip_id = sakuracloud_load_balancer_vip.vip1.id
+#  ipaddress            = &quot;192.168.11.51&quot;
+#  check_protocol       = &quot;http&quot;
+#  check_path           = &quot;/&quot;
+#  check_status         = &quot;200&quot;
+#
+#  #enabled              = true
+#}
 
 #ロードバランサVIP配下の実サーバの定義(2台目)
-resource sakuracloud_load_balancer_server &quot;server02&quot; {
-  load_balancer_vip_id = &quot;${sakuracloud_load_balancer_vip.vip1.id}&quot;
-  ipaddress            = &quot;192.168.11.52&quot;
-  check_protocol       = &quot;http&quot;
-  check_path           = &quot;/&quot;
-  check_status         = &quot;200&quot;
-  #enabled              = true
-
-  zone = &quot;tk1v&quot;
-}
+#resource &quot;sakuracloud_load_balancer_server&quot; &quot;server02&quot; {
+#  load_balancer_vip_id = sakuracloud_load_balancer_vip.vip1.id
+#  ipaddress            = &quot;192.168.11.52&quot;
+#  check_protocol       = &quot;http&quot;
+#  check_path           = &quot;/&quot;
+#  check_status         = &quot;200&quot;
+#
+#  #enabled              = true
+#}
 
 #ロードバランサ上流のスイッチ
-resource sakuracloud_switch &quot;sw&quot; {
+resource &quot;sakuracloud_switch&quot; &quot;sw&quot; {
   name = &quot;sw&quot;
-  zone = &quot;tk1v&quot;
 }
 </code></pre>
 
@@ -751,6 +797,14 @@ resource sakuracloud_switch &quot;sw&quot; {
 <td>-</td>
 </tr>
 <tr>
+<td><code>vips</code></td>
+<td align="center">-</td>
+<td>VIP</td>
+<td align="center">-</td>
+<td>リスト</td>
+<td>詳細は<a href="#vips"><code>vips</code></a>を参照</td>
+</tr>
+<tr>
 <td><code>icon_id</code></td>
 <td align="center">-</td>
 <td>アイコンID</td>
@@ -792,6 +846,126 @@ resource sakuracloud_switch &quot;sw&quot; {
 </tr>
 </tbody>
 </table>
+<h3 id="vips">VIPs</h3>
+<p>この要素は最大10個まで指定可能です。  </p>
+<table>
+<thead>
+<tr>
+<th>パラメーター</th>
+<th align="center">必須</th>
+<th>名称</th>
+<th align="center">初期値</th>
+<th>設定値</th>
+<th>補足</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>vip</code></td>
+<td align="center">◯</td>
+<td>VIPアドレス</td>
+<td align="center">-</td>
+<td>文字列</td>
+<td>-</td>
+</tr>
+<tr>
+<td><code>port</code></td>
+<td align="center">◯</td>
+<td>ポート番号</td>
+<td align="center">-</td>
+<td>数値</td>
+<td>-</td>
+</tr>
+<tr>
+<td><code>delay_loop</code></td>
+<td align="center">-</td>
+<td>チェック間隔秒数</td>
+<td align="center"><code>10</code></td>
+<td><code>10</code>〜<code>2147483647</code>の整数</td>
+<td>-</td>
+</tr>
+<tr>
+<td><code>sorry_server</code></td>
+<td align="center">-</td>
+<td>ソーリーサーバ</td>
+<td align="center">-</td>
+<td>文字列</td>
+<td>VIPに紐づく実サーバがすべてダウンした場合、<br />すべてのアクセスを指定したサーバに誘導します</td>
+</tr>
+<tr>
+<td><code>description</code></td>
+<td align="center">-</td>
+<td>説明</td>
+<td align="center">-</td>
+<td>文字列</td>
+<td>-</td>
+</tr>
+<tr>
+<td><code>servers</code></td>
+<td align="center">-</td>
+<td>実サーバ</td>
+<td align="center">-</td>
+<td>リスト</td>
+<td>詳細は<a href="#servers"><code>servers</code></a>を参照</td>
+</tr>
+</tbody>
+</table>
+<h3 id="servers"><code>servers</code></h3>
+<p>この要素は最大40個まで指定可能です。</p>
+<table>
+<thead>
+<tr>
+<th>パラメーター</th>
+<th align="center">必須</th>
+<th>名称</th>
+<th align="center">初期値</th>
+<th>設定値</th>
+<th>補足</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>ipaddress</code></td>
+<td align="center">◯</td>
+<td>IPアドレス</td>
+<td align="center">-</td>
+<td>文字列</td>
+<td>-</td>
+</tr>
+<tr>
+<td><code>check_protocol</code></td>
+<td align="center">◯</td>
+<td>チェック方法</td>
+<td align="center">-</td>
+<td><code>ping</code><br /><code>tcp</code><br /><code>http</code><br /><code>https</code></td>
+<td>-</td>
+</tr>
+<tr>
+<td><code>check_path</code></td>
+<td align="center">△</td>
+<td>チェック対象パス</td>
+<td align="center">-</td>
+<td>文字列</td>
+<td>チェック方法が<code>http</code>、<code>https</code>の場合必須</td>
+</tr>
+<tr>
+<td><code>check_status</code></td>
+<td align="center">△</td>
+<td>チェック期待値</td>
+<td align="center">-</td>
+<td>文字列</td>
+<td>期待するレスポンスコード<br />チェック方法が<code>http</code>、<code>https</code>の場合必須</td>
+</tr>
+<tr>
+<td><code>enabled</code></td>
+<td align="center">-</td>
+<td>有効/無効</td>
+<td align="center"><code>true</code></td>
+<td><code>true</code><br /><code>false</code></td>
+<td>-</td>
+</tr>
+</tbody>
+</table>
 <h3 id="_3">属性</h3>
 <table>
 <thead>
@@ -814,6 +988,9 @@ resource sakuracloud_switch &quot;sw&quot; {
 </tr>
 </tbody>
 </table>
+<p><strong>注意</strong>  </p>
+<p>同一のロードバランサに対し<code>vips</code>属性と<code>sakuracloud_load_balancer_vip</code>リソースの併用はできません。<br />
+また、同一のロードバランサVIPに対し<code>servers</code>属性と<code>sakuracloud_load_balancer_server</code>リソースの併用はできません。</p>
 <h2 id="sakuracloud_load_balancer_vip"><code>sakuracloud_load_balancer_vip</code></h2>
 <p>ロードバランサが持つVIPを表します。</p>
 <p>1台のロードバランサにつき4つまでのVIPを登録できます。

@@ -119,6 +119,13 @@
     </li>
 
         
+            
+    <li class="toctree-l1 ">
+        <a class="" href="../../../upgrade_to_v1_11/">v1.11での変更点</a>
+        
+    </li>
+
+        
     </ul>
 
         
@@ -256,6 +263,13 @@
         
             
     <li class="toctree-l1 ">
+        <a class="" href="../vpc_router_old/">VPCルータ(子リソース)</a>
+        
+    </li>
+
+        
+            
+    <li class="toctree-l1 ">
         <a class="" href="../database/">データベース</a>
         
     </li>
@@ -334,6 +348,13 @@
             
     <li class="toctree-l1 ">
         <a class="" href="../ipv4_ptr/">IPv4逆引きレコード</a>
+        
+    </li>
+
+        
+            
+    <li class="toctree-l1 ">
+        <a class="" href="../proxylb/">エンハンスドロードバランサ</a>
         
     </li>
 
@@ -524,6 +545,13 @@
         
             
     <li class="toctree-l1 ">
+        <a class="" href="../data/proxylb/">エンハンスドロードバランサ</a>
+        
+    </li>
+
+        
+            
+    <li class="toctree-l1 ">
         <a class="" href="../data/gslb/">GSLB</a>
         
     </li>
@@ -596,15 +624,17 @@
 <hr />
 <h3 id="_1">設定例</h3>
 <pre><code class="hcl">#ディスクの定義
-resource sakuracloud_disk &quot;disk01&quot; {
-  name      = &quot;disk01&quot;
+resource &quot;sakuracloud_disk&quot; &quot;disk01&quot; {
+  name = &quot;disk01&quot;
+
   #plan      = &quot;ssd&quot;
   #connector = &quot;virtio&quot;
   #size      = 20
 
   #コピー元アーカイブ/ディスクの指定
-  source_archive_id = &quot;${data.sakuracloud_archive.centos.id}&quot;
-  #source_disk_id = &quot;${sakuracloud_disk.disk.id}&quot;
+  source_archive_id = data.sakuracloud_archive.centos.id
+
+  #source_disk_id = sakuracloud_disk.disk.id
 
   #コピー元アーカイブのIDが変更された場合のリソース再生成を防ぎたい場合
   #lifecycle {
@@ -620,7 +650,7 @@ resource sakuracloud_disk &quot;disk01&quot; {
 }
 
 #コピー元アーカイブの定義
-data sakuracloud_archive &quot;centos&quot; {
+data &quot;sakuracloud_archive&quot; &quot;centos&quot; {
   os_type = &quot;centos&quot;
 }
 </code></pre>
@@ -700,7 +730,7 @@ data sakuracloud_archive &quot;centos&quot; {
 <td>ホスト名</td>
 <td align="center">-</td>
 <td>文字列</td>
-<td>(非推奨) ディスク修正機能で設定される、ホスト名 <a href="#注2">注2</a></td>
+<td>(v1.11.0で削除されました) ディスク修正機能で設定される、ホスト名 <a href="#注2">注2</a></td>
 </tr>
 <tr>
 <td><code>password</code></td>
@@ -708,7 +738,7 @@ data sakuracloud_archive &quot;centos&quot; {
 <td>パスワード</td>
 <td align="center">-</td>
 <td>文字列</td>
-<td>(非推奨) ディスク修正機能で設定される、OS管理者パスワード <a href="#注2">注2</a></td>
+<td>(v1.11.0で削除されました) ディスク修正機能で設定される、OS管理者パスワード <a href="#注2">注2</a></td>
 </tr>
 <tr>
 <td><code>ssh_key_ids</code></td>
@@ -716,7 +746,7 @@ data sakuracloud_archive &quot;centos&quot; {
 <td>SSH公開鍵ID</td>
 <td align="center">-</td>
 <td>リスト(文字列)</td>
-<td>(非推奨) ディスク修正機能で設定される、SSH認証用の公開鍵ID <a href="#注2">注2</a></td>
+<td>(v1.11.0で削除されました) ディスク修正機能で設定される、SSH認証用の公開鍵ID <a href="#注2">注2</a></td>
 </tr>
 <tr>
 <td><code>disable_pw_auth</code></td>
@@ -724,7 +754,7 @@ data sakuracloud_archive &quot;centos&quot; {
 <td>パスワードでの認証無効化</td>
 <td align="center">-</td>
 <td><code>true</code><br /><code>false</code></td>
-<td>(非推奨) ディスク修正機能で設定される、SSH接続でのパスワード/チャレンジレスポンス認証の無効化 <a href="#注2">注2</a></td>
+<td>(v1.11.0で削除されました) ディスク修正機能で設定される、SSH接続でのパスワード/チャレンジレスポンス認証の無効化 <a href="#注2">注2</a></td>
 </tr>
 <tr>
 <td><code>note_ids</code></td>
@@ -732,7 +762,7 @@ data sakuracloud_archive &quot;centos&quot; {
 <td>スタートアップスクリプトID</td>
 <td align="center">-</td>
 <td>リスト(文字列)</td>
-<td>(非推奨) ディスク修正機能で設置される、スタートアップスクリプトのID <a href="#注2">注2</a></td>
+<td>(v1.11.0で削除されました) ディスク修正機能で設置される、スタートアップスクリプトのID <a href="#注2">注2</a></td>
 </tr>
 <tr>
 <td><code>icon_id</code></td>
@@ -820,13 +850,7 @@ resource sakuracloud_disk &quot;disk&quot; {
 </ul>
 <h4 id="2">注2 ディスク修正機能の項目</h4>
 <p>これらの項目は<a href="../server/">サーバリソース</a>に移動されました。<br />
-過去のバージョンとの互換性維持のために現在でも利用可能ですが、Terraform for さくらのクラウドの将来のバージョンでは削除される予定です。</p>
-<p>また、これらの値をサーバリソース/ディスクリソースの両方に記載した場合の動作は不定です。
-混乱を避けるためにいずれか一方にのみ記載するようにしてください。</p>
-<ul>
-<li>OSによりディスク修正機能に対応していない場合があります。</li>
-<li>これらの値は投入専用です。属性においても投入値を表します(さくらのクラウドAPIからは取得できない項目です)。</li>
-</ul>
+(v1.11.0までは互換性維持のためにディスクリソースでも指定可能でした)</p>
 <h3 id="_4">属性</h3>
 <table>
 <thead>

@@ -119,6 +119,13 @@
     </li>
 
         
+            
+    <li class="toctree-l1 ">
+        <a class="" href="../../../upgrade_to_v1_11/">v1.11での変更点</a>
+        
+    </li>
+
+        
     </ul>
 
         
@@ -242,6 +249,13 @@
 
         
             
+    <li class="toctree-l1 ">
+        <a class="" href="../vpc_router_old/">VPCルータ(子リソース)</a>
+        
+    </li>
+
+        
+            
     <li class="toctree-l1 current">
         <a class="current" href="./">データベース</a>
         
@@ -332,6 +346,13 @@
             
     <li class="toctree-l1 ">
         <a class="" href="../ipv4_ptr/">IPv4逆引きレコード</a>
+        
+    </li>
+
+        
+            
+    <li class="toctree-l1 ">
+        <a class="" href="../proxylb/">エンハンスドロードバランサ</a>
         
     </li>
 
@@ -522,6 +543,13 @@
         
             
     <li class="toctree-l1 ">
+        <a class="" href="../data/proxylb/">エンハンスドロードバランサ</a>
+        
+    </li>
+
+        
+            
+    <li class="toctree-l1 ">
         <a class="" href="../data/gslb/">GSLB</a>
         
     </li>
@@ -594,7 +622,7 @@
 <hr />
 <h3 id="_1">設定例</h3>
 <pre><code class="hcl"># データベースの定義
-resource sakuracloud_database &quot;foobar&quot; {
+resource &quot;sakuracloud_database&quot; &quot;foobar&quot; {
   database_type = &quot;postgresql&quot;
   plan          = &quot;10g&quot;
   user_name     = &quot;defuser&quot;
@@ -610,7 +638,7 @@ resource sakuracloud_database &quot;foobar&quot; {
   backup_weekdays = [&quot;mon&quot;, &quot;tue&quot;, &quot;wed&quot;]
   backup_time     = &quot;00:00&quot;
 
-  switch_id     = &quot;${sakuracloud_switch.sw.id}&quot;
+  switch_id     = sakuracloud_switch.sw.id
   ipaddress1    = &quot;192.168.11.101&quot;
   nw_mask_len   = 24
   default_route = &quot;192.168.11.1&quot;
@@ -621,7 +649,7 @@ resource sakuracloud_database &quot;foobar&quot; {
 }
 
 #接続するスイッチの定義
-resource sakuracloud_switch &quot;sw&quot; {
+resource &quot;sakuracloud_switch&quot; &quot;sw&quot; {
   name = &quot;sw&quot;
 }
 </code></pre>
@@ -830,7 +858,7 @@ resource sakuracloud_switch &quot;sw&quot; {
         <a href="../database_read_replica/" class="btn btn-neutral float-right" title="データベース(リードレプリカ)"/>Next <span class="icon icon-circle-arrow-right"></span></a>
       
       
-        <a href="../vpc_router/" class="btn btn-neutral" title="VPCルータ"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../vpc_router_old/" class="btn btn-neutral" title="VPCルータ(子リソース)"><span class="icon icon-circle-arrow-left"></span> Previous</a>
       
     </div>
   
@@ -858,7 +886,7 @@ resource sakuracloud_switch &quot;sw&quot; {
     <span class="rst-current-version" data-toggle="rst-current-version">
       
       
-        <span><a href="../vpc_router/" style="color: #fcfcfc;">&laquo; Previous</a></span>
+        <span><a href="../vpc_router_old/" style="color: #fcfcfc;">&laquo; Previous</a></span>
       
       
         <span style="margin-left: 15px"><a href="../database_read_replica/" style="color: #fcfcfc">Next &raquo;</a></span>

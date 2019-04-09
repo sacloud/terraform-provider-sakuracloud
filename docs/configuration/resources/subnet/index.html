@@ -119,6 +119,13 @@
     </li>
 
         
+            
+    <li class="toctree-l1 ">
+        <a class="" href="../../../upgrade_to_v1_11/">v1.11での変更点</a>
+        
+    </li>
+
+        
     </ul>
 
         
@@ -256,6 +263,13 @@
         
             
     <li class="toctree-l1 ">
+        <a class="" href="../vpc_router_old/">VPCルータ(子リソース)</a>
+        
+    </li>
+
+        
+            
+    <li class="toctree-l1 ">
         <a class="" href="../database/">データベース</a>
         
     </li>
@@ -334,6 +348,13 @@
             
     <li class="toctree-l1 ">
         <a class="" href="../ipv4_ptr/">IPv4逆引きレコード</a>
+        
+    </li>
+
+        
+            
+    <li class="toctree-l1 ">
+        <a class="" href="../proxylb/">エンハンスドロードバランサ</a>
         
     </li>
 
@@ -524,6 +545,13 @@
         
             
     <li class="toctree-l1 ">
+        <a class="" href="../data/proxylb/">エンハンスドロードバランサ</a>
+        
+    </li>
+
+        
+            
+    <li class="toctree-l1 ">
         <a class="" href="../data/gslb/">GSLB</a>
         
     </li>
@@ -597,21 +625,22 @@
 <p>ルータ(<code>sakuracloud_internet</code>)に追加可能なグローバルIPアドレスブロックを表すリソースです。  </p>
 <h3 id="_1">設定例</h3>
 <pre><code class="hcl"># ルータの定義
-resource sakuracloud_internet &quot;foobar&quot; {
+resource &quot;sakuracloud_internet&quot; &quot;foobar&quot; {
   name = &quot;router&quot;
 }
 
 # ルータに追加するグローバルIPアドレスブロック
-resource sakuracloud_subnet &quot;foobar&quot; {
+resource &quot;sakuracloud_subnet&quot; &quot;foobar&quot; {
   # ルータのID
-  internet_id = &quot;${sakuracloud_internet.foobar.id}&quot;
+  internet_id = sakuracloud_internet.foobar.id
 
   # ネクストホップ
-  next_hop = &quot;${sakuracloud_internet.foobar.nw_min_ipaddress}&quot;
+  next_hop = sakuracloud_internet.foobar.nw_min_ipaddress
 
   # ネットワークマスク長
   #nw_mask_len = 28
 }
+
 </code></pre>
 
 <h3 id="_2">パラメーター</h3>

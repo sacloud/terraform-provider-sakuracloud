@@ -119,6 +119,13 @@
     </li>
 
         
+            
+    <li class="toctree-l1 ">
+        <a class="" href="../../../upgrade_to_v1_11/">v1.11での変更点</a>
+        
+    </li>
+
+        
     </ul>
 
         
@@ -256,6 +263,13 @@
         
             
     <li class="toctree-l1 ">
+        <a class="" href="../vpc_router_old/">VPCルータ(子リソース)</a>
+        
+    </li>
+
+        
+            
+    <li class="toctree-l1 ">
         <a class="" href="../database/">データベース</a>
         
     </li>
@@ -334,6 +348,13 @@
             
     <li class="toctree-l1 ">
         <a class="" href="../ipv4_ptr/">IPv4逆引きレコード</a>
+        
+    </li>
+
+        
+            
+    <li class="toctree-l1 ">
+        <a class="" href="../proxylb/">エンハンスドロードバランサ</a>
         
     </li>
 
@@ -524,6 +545,13 @@
         
             
     <li class="toctree-l1 ">
+        <a class="" href="../data/proxylb/">エンハンスドロードバランサ</a>
+        
+    </li>
+
+        
+            
+    <li class="toctree-l1 ">
         <a class="" href="../data/gslb/">GSLB</a>
         
     </li>
@@ -598,13 +626,13 @@
 <p><strong>このリソースはパケットフィルタリソース(sakuracloud_packet_filter)の<code>expressions</code>属性との共存はできません</strong></p>
 <h3 id="_1">設定例</h3>
 <pre><code class="hcl">
-resource sakuracloud_packet_filter &quot;myfilter&quot; {
+resource &quot;sakuracloud_packet_filter&quot; &quot;myfilter&quot; {
   name        = &quot;myfilter&quot;
   description = &quot;PacketFilter from terraform for SAKURA CLOUD&quot;
 }
 
-resource sakuracloud_packet_filter_rule &quot;rule1&quot; {
-  packet_filter_id = &quot;${sakuracloud_packet_filter.myfilter.id}&quot;
+resource &quot;sakuracloud_packet_filter_rule&quot; &quot;rule1&quot; {
+  packet_filter_id = sakuracloud_packet_filter.myfilter.id
 
   protocol    = &quot;tcp&quot;
   source_nw   = &quot;192.168.2.0/24&quot;
@@ -614,8 +642,8 @@ resource sakuracloud_packet_filter_rule &quot;rule1&quot; {
   order       = 0
 }
 
-resource sakuracloud_packet_filter_rule &quot;rule2&quot; {
-  packet_filter_id = &quot;${sakuracloud_packet_filter.myfilter.id}&quot;
+resource &quot;sakuracloud_packet_filter_rule&quot; &quot;rule2&quot; {
+  packet_filter_id = sakuracloud_packet_filter.myfilter.id
 
   protocol    = &quot;ip&quot;
   allow       = false
@@ -625,14 +653,14 @@ resource sakuracloud_packet_filter_rule &quot;rule2&quot; {
 
 # 以下のようにcount構文と併用することで動的にルールの追加が行えます
 #resource sakuracloud_packet_filter_rule &quot;rules&quot; {
-#  packet_filter_id = &quot;${sakuracloud_packet_filter.myfilter.id}&quot;
-#  protocol         = &quot;${var.protocol[count.index]}&quot;
-#  source_nw        = &quot;${var.source_nw[count.index]}&quot;
-#  source_port      = &quot;${var.source_port[count.index]}&quot;
-#  dest_port        = &quot;${var.dest_port[count.index]}&quot;
-#  allow            = &quot;${var.allow[count.index]}&quot;
+#  packet_filter_id = sakuracloud_packet_filter.myfilter.id
+#  protocol         = var.protocol[count.index]
+#  source_nw        = var.source_nw[count.index]
+#  source_port      = var.source_port[count.index]
+#  dest_port        = var.dest_port[count.index]
+#  allow            = var.allow[count.index]
 #
-#  order = &quot;${count.index}&quot;
+#  order = count.index
 #  count = 10
 #}
 

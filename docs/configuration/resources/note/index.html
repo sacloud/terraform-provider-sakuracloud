@@ -119,6 +119,13 @@
     </li>
 
         
+            
+    <li class="toctree-l1 ">
+        <a class="" href="../../../upgrade_to_v1_11/">v1.11での変更点</a>
+        
+    </li>
+
+        
     </ul>
 
         
@@ -243,6 +250,13 @@
         
             
     <li class="toctree-l1 ">
+        <a class="" href="../vpc_router_old/">VPCルータ(子リソース)</a>
+        
+    </li>
+
+        
+            
+    <li class="toctree-l1 ">
         <a class="" href="../database/">データベース</a>
         
     </li>
@@ -334,6 +348,13 @@
             
     <li class="toctree-l1 ">
         <a class="" href="../ipv4_ptr/">IPv4逆引きレコード</a>
+        
+    </li>
+
+        
+            
+    <li class="toctree-l1 ">
+        <a class="" href="../proxylb/">エンハンスドロードバランサ</a>
         
     </li>
 
@@ -524,6 +545,13 @@
         
             
     <li class="toctree-l1 ">
+        <a class="" href="../data/proxylb/">エンハンスドロードバランサ</a>
+        
+    </li>
+
+        
+            
+    <li class="toctree-l1 ">
         <a class="" href="../data/gslb/">GSLB</a>
         
     </li>
@@ -596,7 +624,7 @@
 <hr />
 <p><strong>全ゾーン共通のグローバルリソースです。</strong></p>
 <h3 id="_1">設定例</h3>
-<pre><code class="hcl">resource sakuracloud_note &quot;mynote&quot; {
+<pre><code class="hcl">resource &quot;sakuracloud_note&quot; &quot;mynote&quot; {
   name = &quot;mynote&quot;
 
   #クラス[shell or yaml_cloud_config]
@@ -604,10 +632,10 @@
 
   #文字列を直接指定する場合
   content = &quot;#!/bin/sh ...&quot;
-  #ファイルから読み込む場合
-  #content = &quot;${file(&quot;example.sh&quot;)}&quot;
 
-  description = &quot;Description&quot;
+  #ファイルから読み込む場合
+  #content = file(&quot;example.sh&quot;)
+
   tags        = [&quot;tag1&quot;, &quot;tag2&quot;]
 }
 </code></pre>
@@ -658,14 +686,6 @@
 <td>-</td>
 </tr>
 <tr>
-<td><code>description</code></td>
-<td align="center">-</td>
-<td>説明</td>
-<td align="center">-</td>
-<td>文字列</td>
-<td>-</td>
-</tr>
-<tr>
 <td><code>tags</code></td>
 <td align="center">-</td>
 <td>タグ</td>
@@ -689,6 +709,11 @@
 <td><code>id</code></td>
 <td>スクリプトID</td>
 <td>-</td>
+</tr>
+<tr>
+<td><code>description</code></td>
+<td></td>
+<td>説明</td>
 </tr>
 </tbody>
 </table>
