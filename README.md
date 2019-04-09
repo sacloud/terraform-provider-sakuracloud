@@ -51,7 +51,7 @@ resource "sakuracloud_ssh_key_gen" "key" {
 
 # 生成した秘密鍵をローカルマシン上に保存
 resource "local_file" "private_key" {
-  content     = sakuracloud_ssh_key_gen.key.private_key
+  content  = "${sakuracloud_ssh_key_gen.key.private_key}"
   filename = "id_rsa"
 }
 
@@ -63,7 +63,7 @@ data "sakuracloud_archive" "centos" {
 # ディスク定義
 resource "sakuracloud_disk" "disk01" {
   name              = "disk01"
-  source_archive_id = data.sakuracloud_archive.centos.id
+  source_archive_id = "${data.sakuracloud_archive.centos.id}"
 }
 
 # サーバー定義
@@ -72,7 +72,7 @@ resource "sakuracloud_server" "server01" {
   disks = ["${sakuracloud_disk.disk01.id}"]
 
   ssh_key_ids     = ["${sakuracloud_ssh_key_gen.key.id}"]
-  password        = var.password
+  password        = "${var.password}"
   disable_pw_auth = true
 }
 
@@ -110,6 +110,7 @@ terraform apply
   - [ロードバランサー](https://sacloud.github.io/terraform-provider-sakuracloud/configuration/resources/load_balancer/)
   - [VPCルーター](https://sacloud.github.io/terraform-provider-sakuracloud/configuration/resources/vpc_router/)
   - [データベース](https://sacloud.github.io/terraform-provider-sakuracloud/configuration/resources/database/)
+  - [データベース(リードレプリカ)](https://sacloud.github.io/terraform-provider-sakuracloud/configuration/resources/database_read_replica/)
   - [NFS](https://sacloud.github.io/terraform-provider-sakuracloud/configuration/resources/nfs/)
   - [SIM(セキュアモバイル)](http://sacloud.github.io/terraform-provider-sakuracloud/configuration/resources/sim/)
   - [モバイルゲートウェイ](http://sacloud.github.io/terraform-provider-sakuracloud/configuration/resources/mobile_gateway/)
@@ -119,6 +120,8 @@ terraform apply
   - [アイコン](https://sacloud.github.io/terraform-provider-sakuracloud/configuration/resources/icon/)
   - [専有ホスト](https://sacloud.github.io/terraform-provider-sakuracloud/configuration/resources/private_host/)
   - [DNS](https://sacloud.github.io/terraform-provider-sakuracloud/configuration/resources/dns/)
+  - [IPv4逆引きレコード](https://sacloud.github.io/terraform-provider-sakuracloud/configuration/resources/ipv4_ptr/)
+  - [エンハンスドロードバランサ](https://sacloud.github.io/terraform-provider-sakuracloud/configuration/resources/proxylb/)
   - [GSLB](https://sacloud.github.io/terraform-provider-sakuracloud/configuration/resources/gslb/)
   - [シンプル監視](https://sacloud.github.io/terraform-provider-sakuracloud/configuration/resources/simple_monitor/)
   - [自動バックアップ](https://sacloud.github.io/terraform-provider-sakuracloud/configuration/resources/auto_backup/)

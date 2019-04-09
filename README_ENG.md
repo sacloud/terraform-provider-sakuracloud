@@ -54,29 +54,29 @@ resource "sakuracloud_ssh_key_gen" "key" {
 
 # Store the private key to local machine
 resource "local_file" "private_key" {
-  content     = sakuracloud_ssh_key_gen.key.private_key
+  content  = "${sakuracloud_ssh_key_gen.key.private_key}"
   filename = "id_rsa"
 }
 
 # Define the data resource for reference to the ID of the public archive (OS)
-data "sakuracloud_archive2 "centos" {
+data "sakuracloud_archive" "centos" {
   os_type = "centos"
 }
 
 # Define Disk
 resource "sakuracloud_disk" "disk01" {
   name              = "disk01"
-  source_archive_id = data.sakuracloud_archive.centos.id
+  source_archive_id = "${data.sakuracloud_archive.centos.id}"
 }
 
 # Define Server
 resource "sakuracloud_server" "server01" {
   name  = "server01"
-  disks = [sakuracloud_disk.disk01.id]
-  
-  ssh_key_ids       = [sakuracloud_ssh_key_gen.key.id]
-  password          = var.password
-  disable_pw_auth   = true
+  disks = ["${sakuracloud_disk.disk01.id}"]
+
+  ssh_key_ids     = ["${sakuracloud_ssh_key_gen.key.id}"]
+  password        = "${var.password}"
+  disable_pw_auth = true
 }
 
 # Define output to display SSH commands
@@ -113,6 +113,7 @@ terraform apply
 - [Load Balancer](https://sacloud.github.io/terraform-provider-sakuracloud/configuration/resources/load_balancer/)
 - [VPC Router](https://sacloud.github.io/terraform-provider-sakuracloud/configuration/resources/vpc_router/)
 - [Database](https://sacloud.github.io/terraform-provider-sakuracloud/configuration/resources/database/)
+- [Database(Read Replica)](https://sacloud.github.io/terraform-provider-sakuracloud/configuration/resources/database_read_replica/)
 - [NFS](https://sacloud.github.io/terraform-provider-sakuracloud/configuration/resources/nfs/)
 - [SIM(Secure Mobile)](http://sacloud.github.io/terraform-provider-sakuracloud/configuration/resources/sim/)
 - [Mobile Gateway](http://sacloud.github.io/terraform-provider-sakuracloud/configuration/resources/mobile_gateway/)
@@ -122,6 +123,8 @@ terraform apply
 - [Icon](https://sacloud.github.io/terraform-provider-sakuracloud/configuration/resources/icon/)
 - [Private Host](https://sacloud.github.io/terraform-provider-sakuracloud/configuration/resources/private_host/)
 - [DNS](https://sacloud.github.io/terraform-provider-sakuracloud/configuration/resources/dns/)
+- [IPv4 PTR Record](https://sacloud.github.io/terraform-provider-sakuracloud/configuration/resources/ipv4_ptr/)
+- [Enhanced LOad Balancer](https://sacloud.github.io/terraform-provider-sakuracloud/configuration/resources/proxylb/)
 - [GSLB](https://sacloud.github.io/terraform-provider-sakuracloud/configuration/resources/gslb/)
 - [Simple Monitoring](https://sacloud.github.io/terraform-provider-sakuracloud/configuration/resources/simple_monitor/)
 - [Auto Backup](https://sacloud.github.io/terraform-provider-sakuracloud/configuration/resources/auto_backup/)
