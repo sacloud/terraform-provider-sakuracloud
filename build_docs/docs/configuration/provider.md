@@ -15,6 +15,8 @@ provider sakuracloud {
   # timeout         = 20  # 単位:分
   # api_root_url    = "https://secure.sakura.ad.jp/cloud/zone"  
   # trace           = false
+  
+  # api_request_timeout = 60 # 単位:秒
 }
 ```
 
@@ -31,6 +33,7 @@ provider sakuracloud {
 |`retry_interval` | -   | リトライ時待機時間    | `5`     |数値(秒)|環境変数`SAKURACLOUD_RETRY_INTERVAL`での指定も可  |
 |`timeout`        | -   | タイムアウト         | `20`     | 数値(分) |環境変数`SAKURACLOUD_TIMEOUT`での指定も可|
 |`api_root_url`   | -   | さくらのクラウドAPI ルートURL | -        |文字列|テストなどのためにAPIのルートAPIを変更したい場合に設定する。<br />末尾にスラッシュを含めないでください。<br />指定しない場合のルートURLは`https://secure.sakura.ad.jp/cloud/zone`<br />環境変数`SAKURACLOUD_API_ROOT_URL`での指定も可  |
+|`api_request_timeout` | -   | APIリクエストタイムアウト         | `60`     | 数値(秒) |環境変数`SAKURACLOUD_API_REQUEST_TIMEOUT`での指定も可|
 |`trace`          | -   | トレースフラグ       | `false`     |`true`<br />`false`|(開発者向け)詳細ログの出力ON/OFFを指定します。 <br />環境変数`SAKURACLOUD_TRACE_MODE`での指定も可|
 
 各パラメータとも環境変数での指定が可能です。
