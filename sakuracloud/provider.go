@@ -66,6 +66,11 @@ func Provider() terraform.ResourceProvider {
 				Optional:    true,
 				DefaultFunc: schema.MultiEnvDefaultFunc([]string{"SAKURACLOUD_TIMEOUT"}, 20),
 			},
+			"api_request_timeout": {
+				Type:        schema.TypeInt,
+				Optional:    true,
+				DefaultFunc: schema.MultiEnvDefaultFunc([]string{"SAKURACLOUD_API_REQUEST_TIMEOUT"}, 60),
+			},
 			"trace": {
 				Type:        schema.TypeBool,
 				Optional:    true,
@@ -165,6 +170,7 @@ func providerConfigure(d *schema.ResourceData) (interface{}, error) {
 		APIRootURL:        d.Get("api_root_url").(string),
 		RetryMax:          d.Get("retry_max").(int),
 		RetryInterval:     d.Get("retry_interval").(int),
+		APIRequestTimeout: d.Get("api_request_timeout").(int),
 	}
 
 	return config.NewClient(), nil

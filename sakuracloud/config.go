@@ -1,6 +1,7 @@
 package sakuracloud
 
 import (
+	"net/http"
 	"time"
 
 	"github.com/sacloud/libsacloud/api"
@@ -17,6 +18,7 @@ type Config struct {
 	APIRootURL        string
 	RetryMax          int
 	RetryInterval     int
+	APIRequestTimeout int
 }
 
 // APIClient for SakuraCloud API
@@ -42,6 +44,11 @@ func (c *Config) NewClient() *APIClient {
 	}
 	if c.TimeoutMinute > 0 {
 		client.DefaultTimeoutDuration = time.Duration(c.TimeoutMinute) * time.Minute
+	}
+	if c.APIRequestTimeout > 0 {
+		client.HTTPClient = &http.Client{
+			Timeout: time.Duration(c.APIRequestTimeout) * time.Second,
+		}
 	}
 
 	if c.TraceMode {
