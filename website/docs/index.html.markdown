@@ -37,4 +37,5 @@ The following arguments are supported:
 * `retry_max` - (Optional) The number of retries when an error (status=`503`) occurs in the API call. It can also be sourced from the `SAKURACLOUD_RETRY_MAX` environment variable. Default value is `10`.
 * `retry_interval` - (Optional) The retry interval (seconds) when an error (status=`503`) occurs in the API call. It can also be sourced from the `SAKURACLOUD_RETRY_INTERVAL` environment variable. Default value is `5`.
 * `timeout` - (Optional) The status change wait time in API call (minutes). It can also be sourced from the `SAKURACLOUD_TIMEOUT` environment variable. Default value is `20`.
+* `api_request_timeout` - (Optional) The maximum wait time in API call (seconds). It can also be sourced from the `SAKURACLOUD_API_REQUEST_TIMEOUT` environment variable. Default value is `60`.
 * `trace` - (Optional) The flag of output logs at API call. It can also be sourced from the `SAKURACLOUD_TRACE_MODE` environment variable. 
