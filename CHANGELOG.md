@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.11.1 (2019-04-12)
+
+* Terraform provider SDK: v0.12-early7 #429 (yamamoto-febc)
+* パラメータ追加: APIリクエストタイムアウト #430 (yamamoto-febc)
+
+
 ## 1.11.0 (2019-04-08)
 
 * VPCルータでネストした子要素の定義を可能にする #392 (yamamoto-febc)
