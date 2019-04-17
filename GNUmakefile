@@ -7,8 +7,8 @@ GOLINT_TARGETS   ?= $$(golint github.com/sacloud/terraform-provider-sakuracloud/
 
 CURRENT_VERSION  ?= $(shell git log --merges --oneline | perl -ne 'if(m/^.+Merge pull request \#[0-9]+ from .+\/bump-version-([0-9\.]+)/){print $$1;exit}')
 BUILD_LDFLAGS = "-s -w \
-	  -X github.com/sacloud/terraform-provider-sakuracloud/version.Revision=`git rev-parse --short HEAD` \
-	  -X github.com/sacloud/terraform-provider-sakuracloud/version.Version=$(CURRENT_VERSION)"
+	  -X github.com/sacloud/terraform-provider-sakuracloud/sakuracloud.Revision=`git rev-parse --short HEAD` \
+	  -X github.com/sacloud/terraform-provider-sakuracloud/sakuracloud.Version=$(CURRENT_VERSION)"
 
 export GO111MODULE=on
 
