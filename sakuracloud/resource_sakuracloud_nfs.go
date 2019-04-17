@@ -145,7 +145,7 @@ func resourceSakuraCloudNFSCreate(d *schema.ResourceData, meta interface{}) erro
 			return client.NFS.CreateWithPlan(opts, plan, size)
 		},
 		AsyncWaitForCopy: func(id int64) (chan interface{}, chan interface{}, chan error) {
-			return client.NFS.AsyncSleepWhileCopying(id, client.DefaultTimeoutDuration, 5)
+			return client.NFS.AsyncSleepWhileCopying(id, client.DefaultTimeoutDuration, 20)
 		},
 		Delete: func(id int64) error {
 			_, err := client.NFS.Delete(id)

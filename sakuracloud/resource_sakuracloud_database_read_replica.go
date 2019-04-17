@@ -143,7 +143,7 @@ func resourceSakuraCloudDatabaseReadReplicaCreate(d *schema.ResourceData, meta i
 			return client.Database.Create(createDB)
 		},
 		AsyncWaitForCopy: func(id int64) (chan interface{}, chan interface{}, chan error) {
-			return client.Database.AsyncSleepWhileCopying(id, client.DefaultTimeoutDuration, 5)
+			return client.Database.AsyncSleepWhileCopying(id, client.DefaultTimeoutDuration, 20)
 		},
 		Delete: func(id int64) error {
 			_, err := client.Database.Delete(id)
