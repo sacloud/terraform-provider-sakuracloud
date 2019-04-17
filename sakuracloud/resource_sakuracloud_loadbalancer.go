@@ -181,12 +181,7 @@ func loadBalancerServerValueSchema() map[string]*schema.Schema {
 }
 
 func resourceSakuraCloudLoadBalancerCreate(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*APIClient)
-
-	zone, ok := d.GetOk("zone")
-	if ok {
-		client.Zone = zone.(string)
-	}
+	client := getSacloudAPIClient(d, meta)
 
 	opts := &sacloud.CreateLoadBalancerValue{}
 
