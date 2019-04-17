@@ -1,6 +1,7 @@
 package sakuracloud
 
 import (
+	"log"
 	"net/http"
 	"time"
 
@@ -53,6 +54,7 @@ func (c *Config) NewClient() *APIClient {
 
 	if c.TraceMode {
 		client.TraceMode = true
+		log.SetPrefix("[DEBUG] ")
 	}
 	client.UserAgent = "Terraform for SakuraCloud/v" + Version
 
