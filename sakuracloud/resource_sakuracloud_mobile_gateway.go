@@ -157,12 +157,7 @@ func resourceSakuraCloudMobileGateway() *schema.Resource {
 }
 
 func resourceSakuraCloudMobileGatewayCreate(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*APIClient)
-
-	zone, ok := d.GetOk("zone")
-	if ok {
-		client.Zone = zone.(string)
-	}
+	client := getSacloudAPIClient(d, meta)
 
 	var switchID int64
 	var ip string

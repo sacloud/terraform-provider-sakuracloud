@@ -100,12 +100,7 @@ func resourceSakuraCloudNFS() *schema.Resource {
 }
 
 func resourceSakuraCloudNFSCreate(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*APIClient)
-
-	zone, ok := d.GetOk("zone")
-	if ok {
-		client.Zone = zone.(string)
-	}
+	client := getSacloudAPIClient(d, meta)
 
 	opts := &sacloud.CreateNFSValue{}
 
