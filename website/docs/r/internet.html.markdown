@@ -32,7 +32,7 @@ The following arguments are supported:
 * `nw_mask_len` - (Optional) Network mask length.  
 Valid value is one of the following: [ 28 (default) / 27 / 26 ]
 * `band_width` - (Optional) Bandwidth of outbound traffic (unit:`Mbps`).  
-Valid value is one of the following: [ 100 (default) / 250 / 500 / 1000 / 1500 / 2000 / 2500 / 3000 ]
+Valid value is one of the following: [ 100 (default) / 250 / 500 / 1000 / 1500 / 2000 / 2500 / 3000 / 5000 ]
 * `enable_ipv6` - (Optional) The ipv6 enabled flag.
 * `description` - (Optional) The description of the resource.
 * `tags` - (Optional) The tag list of the resources.
