@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/hashicorp/terraform/helper/schema"
+	"github.com/hashicorp/terraform/helper/validation"
 	"github.com/sacloud/libsacloud/api"
 	"github.com/sacloud/libsacloud/sacloud"
 )
@@ -42,13 +43,13 @@ func resourceSakuraCloudInternet() *schema.Resource {
 				Type:         schema.TypeInt,
 				ForceNew:     true,
 				Optional:     true,
-				ValidateFunc: validateIntInWord([]string{"28", "27", "26"}),
+				ValidateFunc: validation.IntInSlice(sacloud.AllowInternetNetworkMaskLen()),
 				Default:      28,
 			},
 			"band_width": {
 				Type:         schema.TypeInt,
 				Optional:     true,
-				ValidateFunc: validateIntInWord([]string{"100", "250", "500", "1000", "1500", "2000", "2500", "3000"}),
+				ValidateFunc: validation.IntInSlice(sacloud.AllowInternetBandWidth()),
 				Default:      100,
 			},
 			"enable_ipv6": {
