@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.11.2 (2019-04-17)
+
+* APIクライアントの分離 #435 (yamamoto-febc)
+
+
 ## 1.11.1 (2019-04-12)
 
 * Terraform provider SDK: v0.12-early7 #429 (yamamoto-febc)
