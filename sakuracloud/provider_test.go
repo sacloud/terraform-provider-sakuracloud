@@ -12,8 +12,9 @@ import (
 var testAccProviders map[string]terraform.ResourceProvider
 var testAccProvider *schema.Provider
 var (
-	testDefaultTargetZone  = "is1b"
-	testDefaultAPIRetryMax = "30"
+	testDefaultTargetZone   = "is1b"
+	testDefaultAPIRetryMax  = "30"
+	testDefaultAPIRateLimit = "5"
 )
 
 func init() {
@@ -58,5 +59,9 @@ func testAccPreCheck(t *testing.T) {
 
 	if v := os.Getenv("SAKURACLOUD_RETRY_MAX"); v == "" {
 		os.Setenv("SAKURACLOUD_RETRY_MAX", testDefaultAPIRetryMax)
+	}
+
+	if v := os.Getenv("SAKURACLOUD_RATE_LIMIT"); v == "" {
+		os.Setenv("SAKURACLOUD_RATE_LIMIT", testDefaultAPIRateLimit)
 	}
 }

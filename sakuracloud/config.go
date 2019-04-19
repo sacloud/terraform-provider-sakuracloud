@@ -10,16 +10,17 @@ import (
 
 // Config type of SakuraCloud Config
 type Config struct {
-	AccessToken       string
-	AccessTokenSecret string
-	Zone              string
-	TimeoutMinute     int
-	TraceMode         bool
-	AcceptLanguage    string
-	APIRootURL        string
-	RetryMax          int
-	RetryInterval     int
-	APIRequestTimeout int
+	AccessToken         string
+	AccessTokenSecret   string
+	Zone                string
+	TimeoutMinute       int
+	TraceMode           bool
+	AcceptLanguage      string
+	APIRootURL          string
+	RetryMax            int
+	RetryInterval       int
+	APIRequestTimeout   int
+	APIRequestRateLimit int
 }
 
 // APIClient for SakuraCloud API
@@ -46,11 +47,15 @@ func (c *Config) NewClient() *APIClient {
 	if c.TimeoutMinute > 0 {
 		client.DefaultTimeoutDuration = time.Duration(c.TimeoutMinute) * time.Minute
 	}
+
+	httpClient := &http.Client{}
 	if c.APIRequestTimeout > 0 {
-		client.HTTPClient = &http.Client{
-			Timeout: time.Duration(c.APIRequestTimeout) * time.Second,
-		}
+		httpClient.Timeout = time.Duration(c.APIRequestTimeout) * time.Second
 	}
+	if c.APIRequestRateLimit > 0 {
+		httpClient.Transport = &api.RateLimitRoundTripper{RateLimitPerSec: c.APIRequestRateLimit}
+	}
+	client.HTTPClient = httpClient
 
 	if c.TraceMode {
 		client.TraceMode = true
