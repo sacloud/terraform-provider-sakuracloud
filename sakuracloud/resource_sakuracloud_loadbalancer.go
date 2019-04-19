@@ -255,7 +255,7 @@ func resourceSakuraCloudLoadBalancerCreate(d *schema.ResourceData, meta interfac
 			return client.LoadBalancer.Create(createLb)
 		},
 		AsyncWaitForCopy: func(id int64) (chan interface{}, chan interface{}, chan error) {
-			return client.LoadBalancer.AsyncSleepWhileCopying(id, client.DefaultTimeoutDuration, 5)
+			return client.LoadBalancer.AsyncSleepWhileCopying(id, client.DefaultTimeoutDuration, 20)
 		},
 		Delete: func(id int64) error {
 			_, err := client.LoadBalancer.Delete(id)
