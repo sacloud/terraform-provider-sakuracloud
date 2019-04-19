@@ -632,7 +632,8 @@
   # api_root_url    = &quot;https://secure.sakura.ad.jp/cloud/zone&quot;  
   # trace           = false
 
-  # api_request_timeout = 60 # 単位:秒
+  # api_request_timeout    = 60 # 単位:秒
+  # api_request_rate_limit = 5  # 秒あたりの最大APIリクエスト数
 }
 </code></pre>
 
@@ -715,6 +716,14 @@
 <td>環境変数<code>SAKURACLOUD_API_REQUEST_TIMEOUT</code>での指定も可</td>
 </tr>
 <tr>
+<td><code>api_request_rate_limit</code></td>
+<td align="center">-</td>
+<td>APIリクエストレートリミット</td>
+<td align="center"><code>5</code></td>
+<td>数値(<code>1</code>〜<code>10</code>)</td>
+<td>秒あたりのさくらのクラウドAPIリクエスト最大数。環境変数<code>SAKURACLOUD_RATE_LIMIT</code>での指定も可</td>
+</tr>
+<tr>
 <td><code>trace</code></td>
 <td align="center">-</td>
 <td>トレースフラグ</td>
@@ -725,7 +734,7 @@
 </tbody>
 </table>
 <p>各パラメータとも環境変数での指定が可能です。</p>
-<p><code>token</code>と<code>secret</code>を環境変数で指定した場合、プロバイダ設定の記述は不要です。</p>
+<p><code>token</code>と<code>secret</code>を環境変数で指定した場合、プロバイダ設定の記述は省略可能です。</p>
 <h4 id="_4">環境変数の指定例</h4>
 <pre><code class="bash">$ export SAKURACLOUD_ACCESS_TOKEN=&quot;取得したAPIトークン&quot;
 $ export SAKURACLOUD_ACCESS_TOKEN_SECRET=&quot;取得したAPIシークレット&quot;
