@@ -16,7 +16,8 @@ provider sakuracloud {
   # api_root_url    = "https://secure.sakura.ad.jp/cloud/zone"  
   # trace           = false
   
-  # api_request_timeout = 60 # 単位:秒
+  # api_request_timeout    = 60 # 単位:秒
+  # api_request_rate_limit = 5  # 秒あたりの最大APIリクエスト数
 }
 ```
 
@@ -34,11 +35,12 @@ provider sakuracloud {
 |`timeout`        | -   | タイムアウト         | `20`     | 数値(分) |環境変数`SAKURACLOUD_TIMEOUT`での指定も可|
 |`api_root_url`   | -   | さくらのクラウドAPI ルートURL | -        |文字列|テストなどのためにAPIのルートAPIを変更したい場合に設定する。<br />末尾にスラッシュを含めないでください。<br />指定しない場合のルートURLは`https://secure.sakura.ad.jp/cloud/zone`<br />環境変数`SAKURACLOUD_API_ROOT_URL`での指定も可  |
 |`api_request_timeout` | -   | APIリクエストタイムアウト         | `60`     | 数値(秒) |環境変数`SAKURACLOUD_API_REQUEST_TIMEOUT`での指定も可|
+|`api_request_rate_limit` | -   | APIリクエストレートリミット         | `5`     | 数値(`1`〜`10`) | 秒あたりのさくらのクラウドAPIリクエスト最大数。環境変数`SAKURACLOUD_RATE_LIMIT`での指定も可|
 |`trace`          | -   | トレースフラグ       | `false`     |`true`<br />`false`|(開発者向け)詳細ログの出力ON/OFFを指定します。 <br />環境変数`SAKURACLOUD_TRACE_MODE`での指定も可|
 
 各パラメータとも環境変数での指定が可能です。
 
-`token`と`secret`を環境変数で指定した場合、プロバイダ設定の記述は不要です。
+`token`と`secret`を環境変数で指定した場合、プロバイダ設定の記述は省略可能です。
 
 #### 環境変数の指定例
 

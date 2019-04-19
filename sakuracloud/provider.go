@@ -71,6 +71,12 @@ func Provider() terraform.ResourceProvider {
 				Optional:    true,
 				DefaultFunc: schema.MultiEnvDefaultFunc([]string{"SAKURACLOUD_API_REQUEST_TIMEOUT"}, 60),
 			},
+			"api_request_rate_limit": {
+				Type:         schema.TypeInt,
+				Optional:     true,
+				DefaultFunc:  schema.MultiEnvDefaultFunc([]string{"SAKURACLOUD_RATE_LIMIT"}, 5),
+				ValidateFunc: validation.IntBetween(1, 10),
+			},
 			"trace": {
 				Type:        schema.TypeBool,
 				Optional:    true,
@@ -162,15 +168,16 @@ func providerConfigure(d *schema.ResourceData) (interface{}, error) {
 	}
 
 	config := Config{
-		AccessToken:       d.Get("token").(string),
-		AccessTokenSecret: d.Get("secret").(string),
-		Zone:              d.Get("zone").(string),
-		TimeoutMinute:     d.Get("timeout").(int),
-		TraceMode:         d.Get("trace").(bool),
-		APIRootURL:        d.Get("api_root_url").(string),
-		RetryMax:          d.Get("retry_max").(int),
-		RetryInterval:     d.Get("retry_interval").(int),
-		APIRequestTimeout: d.Get("api_request_timeout").(int),
+		AccessToken:         d.Get("token").(string),
+		AccessTokenSecret:   d.Get("secret").(string),
+		Zone:                d.Get("zone").(string),
+		TimeoutMinute:       d.Get("timeout").(int),
+		TraceMode:           d.Get("trace").(bool),
+		APIRootURL:          d.Get("api_root_url").(string),
+		RetryMax:            d.Get("retry_max").(int),
+		RetryInterval:       d.Get("retry_interval").(int),
+		APIRequestTimeout:   d.Get("api_request_timeout").(int),
+		APIRequestRateLimit: d.Get("api_request_rate_limit").(int),
 	}
 
 	return config.NewClient(), nil
