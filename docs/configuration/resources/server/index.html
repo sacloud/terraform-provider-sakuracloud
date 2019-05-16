@@ -633,6 +633,9 @@
   #メモリサイズ(GB)
   #memory = 1
 
+  # コアプラン(共用or専有)
+  #commitment = &quot;standard&quot;
+
   #NICドライバ(virtio or e1000)
   #interface_driver = &quot;virtio&quot;
 
@@ -720,6 +723,14 @@
 <td align="center">1</td>
 <td>数値</td>
 <td>指定可能な値は<a href="http://cloud.sakura.ad.jp/specification/server-disk/">こちら</a>のプラン一覧を参照ください</td>
+</tr>
+<tr>
+<td><code>commitment</code></td>
+<td align="center">-</td>
+<td>コアプラン</td>
+<td align="center"><code>standard</code></td>
+<td><code>standard</code><br /><code>dedicatedcpu</code></td>
+<td><code>standard</code>:共用<br /> <code>dedicatedcpu</code>:コア専有</td>
 </tr>
 <tr>
 <td><code>interface_driver</code></td>
