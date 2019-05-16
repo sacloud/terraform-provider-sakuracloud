@@ -28,6 +28,7 @@ data "sakuracloud_server" "myserver" {
 | `disks`  | ディスクID          | - | 
 | `core`   | CPUコア数           | - | 
 | `memory` | メモリ(GB単位)       | - | 
+| `commitment` | コアプラン       | - | 
 | `interface_driver`  | NICドライバ  | - |
 | `nic`    | 基本NIC | - |
 | `display_ipaddress`    | 基本NIC 表示用IPアドレス | - |
