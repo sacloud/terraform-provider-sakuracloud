@@ -6,6 +6,7 @@ import (
 
 	"github.com/hashicorp/terraform/helper/schema"
 	"github.com/hashicorp/terraform/helper/validation"
+	"github.com/hashicorp/terraform/terraform"
 	"github.com/sacloud/libsacloud/api"
 	"github.com/sacloud/libsacloud/sacloud"
 	serverutils "github.com/sacloud/libsacloud/utils/server"
@@ -28,6 +29,16 @@ func resourceSakuraCloudServer() *schema.Resource {
 			serverNetworkAttrsCustomizeDiff,
 			hasTagResourceCustomizeDiff,
 		),
+		SchemaVersion: 1,
+		MigrateState: func(version int, state *terraform.InstanceState, meta interface{}) (*terraform.InstanceState, error) {
+			if version < 1 {
+				v, exists := state.Attributes["commitment"]
+				if !exists || v == "" {
+					state.Attributes["commitment"] = string(sacloud.ECommitmentStandard)
+				}
+			}
+			return state, nil
+		},
 		Schema: map[string]*schema.Schema{
 			"name": {
 				Type:     schema.TypeString,
@@ -42,6 +53,15 @@ func resourceSakuraCloudServer() *schema.Resource {
 				Type:     schema.TypeInt,
 				Optional: true,
 				Default:  1,
+			},
+			"commitment": {
+				Type:     schema.TypeString,
+				Optional: true,
+				Default:  string(sacloud.ECommitmentStandard),
+				ValidateFunc: validation.StringInSlice([]string{
+					string(sacloud.ECommitmentStandard),
+					string(sacloud.ECommitmentDedicatedCPU),
+				}, false),
 			},
 			"disks": {
 				Type:     schema.TypeList,
@@ -200,11 +220,17 @@ func resourceSakuraCloudServerCreate(d *schema.ResourceData, meta interface{}) e
 	opts := client.Server.New()
 	opts.Name = d.Get("name").(string)
 
-	plan, err := client.Product.Server.GetBySpec(d.Get("core").(int), d.Get("memory").(int), sacloud.PlanDefault)
+	plan, err := client.Product.Server.GetBySpecCommitment(
+		d.Get("core").(int),
+		d.Get("memory").(int),
+		sacloud.PlanDefault,
+		sacloud.ECommitment(d.Get("commitment").(string)),
+	)
 	if err != nil {
 		return fmt.Errorf("Invalid server plan.Please change 'core' or 'memory': %s", err)
 	}
 	opts.SetServerPlanByValue(plan.CPU, plan.GetMemoryGB(), plan.Generation)
+	opts.ServerPlan.Commitment = plan.Commitment
 
 	if interfaceDriver, ok := d.GetOk("interface_driver"); ok {
 		s := interfaceDriver.(string)
@@ -420,13 +446,22 @@ func resourceSakuraCloudServerUpdate(d *schema.ResourceData, meta interface{}) e
 	isNeedRestart := false
 	isRunning := server.Instance.IsUp()
 
-	if d.HasChange("core") || d.HasChange("memory") {
+	isPlanChanged := d.HasChange("core") || d.HasChange("memory") || d.HasChange("commitment")
+
+	if isPlanChanged {
 		// If planID changed , server ID will change.
-		plan, err := client.Product.Server.GetBySpec(d.Get("core").(int), d.Get("memory").(int), sacloud.PlanDefault)
+		plan, err := client.Product.Server.GetBySpecCommitment(
+			d.Get("core").(int),
+			d.Get("memory").(int),
+			sacloud.PlanDefault,
+			sacloud.ECommitment(d.Get("commitment").(string)),
+		)
 		if err != nil {
-			return fmt.Errorf("Invalid server plan.Please change 'core' or 'memory': %s", err)
+			return fmt.Errorf("Invalid server plan.Please change 'core' or 'memory' or 'commitment': %s", err)
 		}
+
 		server.SetServerPlanByValue(plan.CPU, plan.GetMemoryGB(), plan.Generation)
+		server.ServerPlan.Commitment = plan.Commitment
 
 		isNeedRestart = true
 	}
@@ -684,12 +719,13 @@ func resourceSakuraCloudServerUpdate(d *schema.ResourceData, meta interface{}) e
 		}
 	}
 	// change Plan
-	if d.HasChange("core") || d.HasChange("memory") {
-		server, err := client.Server.ChangePlan(toSakuraCloudID(d.Id()), server.ServerPlan)
+	if isPlanChanged {
+		s, err := client.Server.ChangePlan(toSakuraCloudID(d.Id()), server.ServerPlan)
 		if err != nil {
 			return fmt.Errorf("Error changing SakuraCloud ServerPlan : %s", err)
 		}
-		d.SetId(server.GetStrID())
+		server = s
+		d.SetId(s.GetStrID())
 	}
 
 	if d.HasChange("interface_driver") {
@@ -863,8 +899,13 @@ func resourceSakuraCloudServerDelete(d *schema.ResourceData, meta interface{}) e
 func setServerResourceData(d *schema.ResourceData, client *APIClient, data *sacloud.Server) error {
 
 	d.Set("name", data.Name)
-	d.Set("core", data.ServerPlan.CPU)
-	d.Set("memory", toSizeGB(data.ServerPlan.MemoryMB))
+	if err := d.Set("core", data.ServerPlan.CPU); err != nil {
+		return err
+	}
+	if err := d.Set("memory", toSizeGB(data.ServerPlan.MemoryMB)); err != nil {
+		return err
+	}
+	d.Set("commitment", string(data.ServerPlan.Commitment))
 	d.Set("disks", flattenDisks(data.Disks))
 
 	if data.Instance.CDROM == nil {

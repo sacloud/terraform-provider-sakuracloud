@@ -55,6 +55,10 @@ func dataSourceSakuraCloudServer() *schema.Resource {
 				Type:     schema.TypeInt,
 				Computed: true,
 			},
+			"commitment": {
+				Type:     schema.TypeString,
+				Computed: true,
+			},
 			"disks": {
 				Type:     schema.TypeList,
 				Computed: true,

@@ -18,6 +18,7 @@ resource "sakuracloud_server" "foobar" {
   name                = "foobar"
   # core              = 1
   # memory            = 1
+  # commmitment       = "standard"
   disks               = [sakuracloud_disk.foobar.id]
   # interface_driver  = "virtio"
   
@@ -81,6 +82,8 @@ The following arguments are supported:
 * `name` - (Required) The name of the resource.
 * `core` - (Optional) The number of cores (default:`1`).
 * `memory` - (Optional) The size of memory (unit:`GB`, default:`1`).
+* `commitment` - (Optional) The plan of assignment of CPU to VM(default:`standard`).  
+Valid value is one of the following: [ "standard" (default) / "dedicatedcpu"]
 * `disks` - (Optional) The ID list of the Disks connected to Server.
 * `interface_driver` - (Optional) The name of network interface driver.  
 Valid value is one of the following: [ "virtio" (default) / "e1000"]
@@ -115,6 +118,7 @@ The following attributes are exported:
 * `name` - The name of the resource.
 * `core` - The number of cores.
 * `memory` - The size of memory (unit:`GB`).
+* `commitment` - The plan of assignment of CPU to VM.
 * `disks` - The ID list of the Disks connected to Server.
 * `interface_driver` - The name of network interface driver.
 * `nic` - The primary NIC's connection destination.

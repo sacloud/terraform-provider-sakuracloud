@@ -31,6 +31,7 @@ data "sakuracloud_server" "foobar" {
 * `name` - The name of the resource.
 * `core` - The number of cores.
 * `memory` - The size of memory (unit:`GB`).
+* `commitment` - The plan of assignment of CPU to VM.
 * `disks` - The ID list of the Disks connected to Server.
 * `interface_driver` - The name of network interface driver.
 * `nic` - The primary NIC's connection destination.

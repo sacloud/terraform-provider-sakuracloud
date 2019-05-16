@@ -14,6 +14,9 @@ resource "sakuracloud_server" "myserver" {
 
   #メモリサイズ(GB)
   #memory = 1
+  
+  # コアプラン(共用or専有)
+  #commitment = "standard"
 
   #NICドライバ(virtio or e1000)
   #interface_driver = "virtio"
@@ -66,6 +69,7 @@ resource "sakuracloud_server" "myserver" {
 | `disks`  | ◯   | ディスクID          | -   | リスト(文字列) | サーバに接続するディスクのID |
 | `core`   | -   | CPUコア数           | 1   | 数値 | 指定可能な値は[こちら](http://cloud.sakura.ad.jp/specification/server-disk/)のプラン一覧を参照ください |
 | `memory` | -   | メモリ(GB単位)       | 1  | 数値 | 指定可能な値は[こちら](http://cloud.sakura.ad.jp/specification/server-disk/)のプラン一覧を参照ください |
+| `commitment` | -   | コアプラン       | `standard`  | `standard`<br />`dedicatedcpu` | `standard`:共用<br /> `dedicatedcpu`:コア専有 |
 | `interface_driver` | -   | NICドライバ       | `virtio`  | `virtio`<br />`e1000` | - |
 | `nic` | - | 基本NIC | `shared` | `shared`(共有セグメント)<br />`[switch_id]`(スイッチのID)<br />`"disconnect"`(接続なし)|eth0の上流NWとの接続方法を指定する。 |
 | `display_ipaddress`| - | 基本NIC:表示用IPアドレス | - | 文字列 | コントロールパネルに表示される表示用IPアドレス、`nic`にスイッチのIDが指定されている場合のみ有効 |
