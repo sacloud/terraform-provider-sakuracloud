@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.12.1 (2019-06-05)
+
+* api_request_timeoutパラメータのデフォルト値変更 #448 (yamamoto-febc)
+* Terraform v0.12.1 #449 (yamamoto-febc)
+* 423 Lockedのハンドリング #450 (yamamoto-febc)
+
+
 ## 1.12.0 (2019-05-16)
 
 * コア専有プラン #445 (yamamoto-febc)
