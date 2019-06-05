@@ -69,7 +69,7 @@ func Provider() terraform.ResourceProvider {
 			"api_request_timeout": {
 				Type:        schema.TypeInt,
 				Optional:    true,
-				DefaultFunc: schema.MultiEnvDefaultFunc([]string{"SAKURACLOUD_API_REQUEST_TIMEOUT"}, 60),
+				DefaultFunc: schema.MultiEnvDefaultFunc([]string{"SAKURACLOUD_API_REQUEST_TIMEOUT"}, 300),
 			},
 			"api_request_rate_limit": {
 				Type:         schema.TypeInt,
