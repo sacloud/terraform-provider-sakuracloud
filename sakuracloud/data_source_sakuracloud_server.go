@@ -150,6 +150,18 @@ func dataSourceSakuraCloudServer() *schema.Resource {
 				Type:     schema.TypeString,
 				Computed: true,
 			},
+			"vnc_host": {
+				Type:     schema.TypeString,
+				Computed: true,
+			},
+			"vnc_port": {
+				Type:     schema.TypeInt,
+				Computed: true,
+			},
+			"vnc_password": {
+				Type:     schema.TypeString,
+				Computed: true,
+			},
 		},
 	}
 }

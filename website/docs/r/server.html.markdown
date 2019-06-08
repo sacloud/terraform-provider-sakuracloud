@@ -139,6 +139,9 @@ The following attributes are exported:
 * `tags` - The tag list of the resources.
 * `icon_id` - The ID of the icon of the resource.
 * `zone` - The ID of the zone to which the resource belongs.
+* `vnc_host`     - The hostname of VNC server.
+* `vnc_port`     - The port number of VNC server.
+* `vnc_password` - The password of VNC server.
 
 ## Import
 
