@@ -159,8 +159,9 @@ func dataSourceSakuraCloudServer() *schema.Resource {
 				Computed: true,
 			},
 			"vnc_password": {
-				Type:     schema.TypeString,
-				Computed: true,
+				Type:      schema.TypeString,
+				Computed:  true,
+				Sensitive: true,
 			},
 		},
 	}
