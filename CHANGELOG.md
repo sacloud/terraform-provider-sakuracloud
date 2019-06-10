@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.12.2 (2019-06-10)
+
+* VNC接続情報の追加 #453 (yamamoto-febc)
+
+
 ## 1.12.1 (2019-06-05)
 
 * api_request_timeoutパラメータのデフォルト値変更 #448 (yamamoto-febc)
