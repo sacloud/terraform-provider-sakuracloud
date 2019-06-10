@@ -210,6 +210,19 @@ func resourceSakuraCloudServer() *schema.Resource {
 				Optional: true,
 				Computed: true,
 			},
+			"vnc_host": {
+				Type:     schema.TypeString,
+				Computed: true,
+			},
+			"vnc_port": {
+				Type:     schema.TypeInt,
+				Computed: true,
+			},
+			"vnc_password": {
+				Type:      schema.TypeString,
+				Computed:  true,
+				Sensitive: true,
+			},
 		},
 	}
 }
@@ -994,6 +1007,20 @@ func setServerResourceData(d *schema.ResourceData, client *APIClient, data *sacl
 		}
 
 		d.SetConnInfo(connInfo)
+	}
+
+	d.Set("vnc_host", "")
+	d.Set("vnc_port", 0)
+	d.Set("vnc_password", "")
+
+	if data.IsUp() {
+		vncRes, err := client.Server.GetVNCProxy(data.ID)
+		if err != nil {
+			return fmt.Errorf("Get VNCProxy info is failed: %s", err)
+		}
+		d.Set("vnc_host", vncRes.IOServerHost)
+		d.Set("vnc_port", forceAtoI(vncRes.Port))
+		d.Set("vnc_password", vncRes.Password)
 	}
 
 	setPowerManageTimeoutValueToState(d)

@@ -48,3 +48,6 @@ data "sakuracloud_server" "myserver" {
 | `dns_servers`           | 基本NIC:DNSサーバ        | eth0の属するセグメントの推奨ネームサーバのリスト|
 | `nw_address`            | 基本NIC:ネットワークアドレス | eth0のIPアドレスのネットワークアドレス          |
 | `private_host_name`     | 専有ホスト名 | -          |
+| `vnc_host`     | VNCホスト名 | -          |
+| `vnc_port`     | VNCポート番号 | -          |
+| `vnc_password`     | VNCパスワード | -          |
