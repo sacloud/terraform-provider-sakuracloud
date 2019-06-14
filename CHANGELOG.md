@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.12.3 (2019-06-14)
+
+* CAAレコード対応 #456 (yamamoto-febc)
+
+
 ## 1.12.2 (2019-06-10)
 
 * VNC接続情報の追加 #453 (yamamoto-febc)
