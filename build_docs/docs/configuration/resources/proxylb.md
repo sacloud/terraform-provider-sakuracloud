@@ -18,10 +18,16 @@ resource "sakuracloud_proxylb" "foobar" {
     host_header = "example.com"
     delay_loop  = 10
   }
-
+  
   bind_ports {
-    proxy_mode = "https"
-    port       = 443
+    proxy_mode        = "http"
+    port              = 80
+    redirect_to_https = true
+  }
+  bind_ports {
+    proxy_mode    = "https"
+    port          = 443
+    support_http2 = true
   }
   
   sorry_server {
@@ -84,6 +90,8 @@ resource "sakuracloud_proxylb" "foobar" {
 |---------------|:---:|--------------------|:--------:|------------------------|----------------------------------------------|
 | `proxy_mode`    | ◯   | プロキシ方式 | -        | `http`<br />`https`| - |
 | `port`        | ◯  | ポート番号 | - | 数値 | - |
+| `redirect_to_https`  | -  | HTTPSへのリダイレクト | - | bool | `proxy_mode`が`http`の場合のみ有効 |
+| `support_http2`      | -  | HTTP/2のサポート | - | bool | `proxy_mode`が`https`の場合のみ有効  |
 
 ### `health_check`
 
