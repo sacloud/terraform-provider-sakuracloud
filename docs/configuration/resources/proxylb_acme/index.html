@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>スタートアップスクリプト - Terraform for さくらのクラウド</title>
+  <title>エンハンスドロードバランサ(Let's Encrypt設定) - Terraform for さくらのクラウド</title>
   
 
   <link rel="shortcut icon" href="../../../img/favicon.ico">
@@ -21,7 +21,7 @@
   
   <script>
     // Current page data
-    var mkdocs_page_name = "スタートアップスクリプト";
+    var mkdocs_page_name = "エンハンスドロードバランサ(Let's Encrypt設定)";
   </script>
   
   <script src="../../../js/jquery-2.1.1.min.js"></script>
@@ -291,21 +291,8 @@
 
         
             
-    <li class="toctree-l1 current">
-        <a class="current" href="./">スタートアップスクリプト</a>
-        
-            <ul>
-            
-                <li class="toctree-l3"><a href="#sakuracloud_note">スタートアップスクリプト(sakuracloud_note)</a></li>
-                
-                    <li><a class="toctree-l4" href="#_1">設定例</a></li>
-                
-                    <li><a class="toctree-l4" href="#_2">パラメーター</a></li>
-                
-                    <li><a class="toctree-l4" href="#_3">属性</a></li>
-                
-            
-            </ul>
+    <li class="toctree-l1 ">
+        <a class="" href="../note/">スタートアップスクリプト</a>
         
     </li>
 
@@ -360,8 +347,19 @@
 
         
             
-    <li class="toctree-l1 ">
-        <a class="" href="../proxylb_acme/">エンハンスドロードバランサ(Let's Encrypt設定)</a>
+    <li class="toctree-l1 current">
+        <a class="current" href="./">エンハンスドロードバランサ(Let's Encrypt設定)</a>
+        
+            <ul>
+            
+                <li class="toctree-l3"><a href="#lets-encryptsakuracloud_proxylb_acme">エンハンスドロードバランサ Let's Encrypt設定(sakuracloud_proxylb_acme)</a></li>
+                
+                    <li><a class="toctree-l4" href="#_1">設定例</a></li>
+                
+                    <li><a class="toctree-l4" href="#sakuracloud_proxylb_acme">sakuracloud_proxylb_acme</a></li>
+                
+            
+            </ul>
         
     </li>
 
@@ -617,7 +615,7 @@
         
       
     
-    <li>スタートアップスクリプト</li>
+    <li>エンハンスドロードバランサ(Let's Encrypt設定)</li>
     <li class="wy-breadcrumbs-aside">
       
     </li>
@@ -627,26 +625,44 @@
           <div role="main">
             <div class="section">
               
-                <h1 id="sakuracloud_note">スタートアップスクリプト(sakuracloud_note)</h1>
+                <h1 id="lets-encryptsakuracloud_proxylb_acme">エンハンスドロードバランサ Let's Encrypt設定(sakuracloud_proxylb_acme)</h1>
 <hr />
 <p><strong>全ゾーン共通のグローバルリソースです。</strong></p>
+<p>エンハンスドロードバランサにてLet's Encryptで証明書を取得するための設定を行うリソースです。</p>
 <h3 id="_1">設定例</h3>
-<pre><code class="hcl">resource &quot;sakuracloud_note&quot; &quot;mynote&quot; {
-  name = &quot;mynote&quot;
+<pre><code class="hcl">resource &quot;sakuracloud_proxylb_acme&quot; &quot;cert&quot; {
+  proxylb_id = sakuracloud_proxylb.foobar.id
+  accept_tos = true
+  common_name = &quot;foobar.example.com&quot;
+  update_delay_sec = 120
+}
 
-  #クラス[shell or yaml_cloud_config]
-  #class = &quot;shell&quot;
+resource &quot;sakuracloud_proxylb&quot; &quot;foobar&quot; {
+  name         = &quot;foobar&quot;
+  plan         = 1000 
+  vip_failover = true # default: false
 
-  #文字列を直接指定する場合
-  content = &quot;#!/bin/sh ...&quot;
+  bind_ports {
+    proxy_mode        = &quot;http&quot;
+    port              = 80
+  }
+  bind_ports {
+    proxy_mode    = &quot;https&quot;
+    port          = 443
+  }
 
-  #ファイルから読み込む場合
-  #content = file(&quot;example.sh&quot;)
-
-  tags        = [&quot;tag1&quot;, &quot;tag2&quot;]
+  servers {
+    ipaddress = &quot;133.242.0.3&quot;
+    port = 80
+  }
+  servers {
+    ipaddress = &quot;133.242.0.4&quot;
+    port = 80
+  }
 }
 </code></pre>
 
+<h2 id="sakuracloud_proxylb_acme"><code>sakuracloud_proxylb_acme</code></h2>
 <h3 id="_2">パラメーター</h3>
 <table>
 <thead>
@@ -661,47 +677,44 @@
 </thead>
 <tbody>
 <tr>
-<td><code>name</code></td>
+<td><code>proxylb_id</code></td>
 <td align="center">◯</td>
-<td>スクリプト名</td>
+<td>エンハンスドロードバランサID</td>
 <td align="center">-</td>
 <td>文字列</td>
 <td>-</td>
 </tr>
 <tr>
-<td><code>class</code></td>
-<td align="center">-</td>
-<td>クラス</td>
-<td align="center"><code>shell</code></td>
-<td><code>shell</code><br /><code>yaml_cloud_config</code></td>
-<td>-</td>
-</tr>
-<tr>
-<td><code>content</code></td>
+<td><code>accept_tos</code></td>
 <td align="center">◯</td>
-<td>スクリプト内容</td>
+<td>利用規約への同意</td>
 <td align="center">-</td>
-<td>文字列</td>
-<td>-</td>
+<td>Let's Encryptの<a href="https://letsencrypt.org/repository/">利用規約</a>への同意</td>
+<td><code>true</code>の場合のみ証明書の発行を行う</td>
 </tr>
 <tr>
-<td><code>icon_id</code></td>
+<td><code>common_name</code></td>
+<td align="center">◯</td>
+<td>コモンネーム</td>
 <td align="center">-</td>
-<td>アイコンID</td>
-<td align="center">-</td>
-<td>文字列</td>
 <td>-</td>
+<td>証明書発行対象となるFQDN</td>
 </tr>
 <tr>
-<td><code>tags</code></td>
+<td><code>update_delay_sec</code></td>
 <td align="center">-</td>
-<td>タグ</td>
+<td>更新待ち秒数</td>
 <td align="center">-</td>
-<td>リスト(文字列)</td>
-<td>-</td>
+<td>0</td>
+<td>エンハンスドロードバランサへのLet's Encrpt設定投入までの待ち時間 (<a href="#注1">注1</a>)</td>
 </tr>
 </tbody>
 </table>
+<h4 id="1">注1 更新待ち秒数について</h4>
+<p>エンハンスドロードバランサでLet's Encryptでの証明書取得を行うには、<code>common_name</code>で指定したFQDNがエンハンスドロードバランサのVIPまたはFQDNを指している必要があります。<br />
+参考: <a href="https://manual.sakura.ad.jp/cloud/appliance/enhanced-lb/#let-s-encrypt">さくらのクラウドマニュアル - Let's Encrypt証明書自動インストール・更新機能</a></p>
+<p>TerraformにてDNSレコードの登録を行う場合、レコード作成直後にコモンネームの解決をできない場合があります。<br />
+この項目はそのような場合のために待ち時間を指定するものです。</p>
 <h3 id="_3">属性</h3>
 <table>
 <thead>
@@ -714,13 +727,55 @@
 <tbody>
 <tr>
 <td><code>id</code></td>
-<td>スクリプトID</td>
+<td>ID</td>
+<td>エンハンスドロードバランサのIDが設定される</td>
+</tr>
+<tr>
+<td><code>certificate</code></td>
+<td>証明書</td>
+<td>発行された証明書(sakuracloud_proxylbにて参照できる値と同じ)</td>
+</tr>
+</tbody>
+</table>
+<h3 id="certificate"><code>certificate</code></h3>
+<table>
+<thead>
+<tr>
+<th>パラメーター</th>
+<th>名称</th>
+<th align="center">初期値</th>
+<th>設定値</th>
+<th>補足</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>server_cert</code></td>
+<td>サーバ証明書</td>
+<td align="center">-</td>
+<td>文字列</td>
 <td>-</td>
 </tr>
 <tr>
-<td><code>description</code></td>
-<td></td>
-<td>説明</td>
+<td><code>intermediate_cert</code></td>
+<td>中間証明書</td>
+<td align="center">-</td>
+<td>文字列</td>
+<td>-</td>
+</tr>
+<tr>
+<td><code>private_key</code></td>
+<td>秘密鍵</td>
+<td align="center">-</td>
+<td>文字列</td>
+<td>-</td>
+</tr>
+<tr>
+<td><code>additional_certificates</code></td>
+<td>追加証明書</td>
+<td align="center">-</td>
+<td>リスト</td>
+<td>詳細は<a href="#certificate"><code>certificate</code></a>を参照</td>
 </tr>
 </tbody>
 </table>
@@ -731,10 +786,10 @@
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="../ssh_key/" class="btn btn-neutral float-right" title="公開鍵"/>Next <span class="icon icon-circle-arrow-right"></span></a>
+        <a href="../gslb/" class="btn btn-neutral float-right" title="GSLB"/>Next <span class="icon icon-circle-arrow-right"></span></a>
       
       
-        <a href="../mobile_gateway/" class="btn btn-neutral" title="モバイルゲートウェイ"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../proxylb/" class="btn btn-neutral" title="エンハンスドロードバランサ"><span class="icon icon-circle-arrow-left"></span> Previous</a>
       
     </div>
   
@@ -762,10 +817,10 @@
     <span class="rst-current-version" data-toggle="rst-current-version">
       
       
-        <span><a href="../mobile_gateway/" style="color: #fcfcfc;">&laquo; Previous</a></span>
+        <span><a href="../proxylb/" style="color: #fcfcfc;">&laquo; Previous</a></span>
       
       
-        <span style="margin-left: 15px"><a href="../ssh_key/" style="color: #fcfcfc">Next &raquo;</a></span>
+        <span style="margin-left: 15px"><a href="../gslb/" style="color: #fcfcfc">Next &raquo;</a></span>
       
     </span>
 </div>
