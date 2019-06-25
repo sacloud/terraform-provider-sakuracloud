@@ -359,6 +359,13 @@
         
             
     <li class="toctree-l1 ">
+        <a class="" href="../proxylb_acme/">エンハンスドロードバランサ(Let's Encrypt設定)</a>
+        
+    </li>
+
+        
+            
+    <li class="toctree-l1 ">
         <a class="" href="../gslb/">GSLB</a>
         
     </li>
@@ -635,8 +642,14 @@
   }
 
   bind_ports {
-    proxy_mode = &quot;https&quot;
-    port       = 443
+    proxy_mode        = &quot;http&quot;
+    port              = 80
+    redirect_to_https = true
+  }
+  bind_ports {
+    proxy_mode    = &quot;https&quot;
+    port          = 443
+    support_http2 = true
   }
 
   sorry_server {
@@ -806,6 +819,22 @@
 <td align="center">-</td>
 <td>数値</td>
 <td>-</td>
+</tr>
+<tr>
+<td><code>redirect_to_https</code></td>
+<td align="center">-</td>
+<td>HTTPSへのリダイレクト</td>
+<td align="center">-</td>
+<td>bool</td>
+<td><code>proxy_mode</code>が<code>http</code>の場合のみ有効</td>
+</tr>
+<tr>
+<td><code>support_http2</code></td>
+<td align="center">-</td>
+<td>HTTP/2のサポート</td>
+<td align="center">-</td>
+<td>bool</td>
+<td><code>proxy_mode</code>が<code>https</code>の場合のみ有効</td>
 </tr>
 </tbody>
 </table>
@@ -1013,7 +1042,7 @@
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="../gslb/" class="btn btn-neutral float-right" title="GSLB"/>Next <span class="icon icon-circle-arrow-right"></span></a>
+        <a href="../proxylb_acme/" class="btn btn-neutral float-right" title="エンハンスドロードバランサ(Let's Encrypt設定)"/>Next <span class="icon icon-circle-arrow-right"></span></a>
       
       
         <a href="../ipv4_ptr/" class="btn btn-neutral" title="IPv4逆引きレコード"><span class="icon icon-circle-arrow-left"></span> Previous</a>
@@ -1047,7 +1076,7 @@
         <span><a href="../ipv4_ptr/" style="color: #fcfcfc;">&laquo; Previous</a></span>
       
       
-        <span style="margin-left: 15px"><a href="../gslb/" style="color: #fcfcfc">Next &raquo;</a></span>
+        <span style="margin-left: 15px"><a href="../proxylb_acme/" style="color: #fcfcfc">Next &raquo;</a></span>
       
     </span>
 </div>

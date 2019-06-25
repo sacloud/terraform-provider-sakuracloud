@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.13.0 (2019-06-25)
+
+* Terraform v0.12.2 #458 (yamamoto-febc)
+* エンハンスドロードバランサへの機能追加 #459 (yamamoto-febc)
+
+
 ## 1.12.3 (2019-06-14)
 
 * CAAレコード対応 #456 (yamamoto-febc)
