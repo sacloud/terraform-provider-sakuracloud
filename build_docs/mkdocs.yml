@@ -49,6 +49,7 @@ pages:
       - DNS: configuration/resources/dns.md
       - IPv4逆引きレコード: configuration/resources/ipv4_ptr.md
       - エンハンスドロードバランサ: configuration/resources/proxylb.md
+      - エンハンスドロードバランサ(Let's Encrypt設定): configuration/resources/proxylb_acme.md
       - GSLB: configuration/resources/gslb.md
       - シンプル監視: configuration/resources/simple_monitor.md
       - 自動バックアップ: configuration/resources/auto_backup.md

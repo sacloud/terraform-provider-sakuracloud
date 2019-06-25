@@ -30,6 +30,8 @@ func resourceSakuraCloudProxyLB() *schema.Resource {
 				Optional: true,
 				Default:  1000,
 				ValidateFunc: validateIntInWord([]string{
+					strconv.Itoa(int(sacloud.ProxyLBPlan100)),
+					strconv.Itoa(int(sacloud.ProxyLBPlan500)),
 					strconv.Itoa(int(sacloud.ProxyLBPlan1000)),
 					strconv.Itoa(int(sacloud.ProxyLBPlan5000)),
 					strconv.Itoa(int(sacloud.ProxyLBPlan10000)),
@@ -56,6 +58,14 @@ func resourceSakuraCloudProxyLB() *schema.Resource {
 						},
 						"port": {
 							Type:     schema.TypeInt,
+							Optional: true,
+						},
+						"redirect_to_https": {
+							Type:     schema.TypeBool,
+							Optional: true,
+						},
+						"support_http2": {
+							Type:     schema.TypeBool,
 							Optional: true,
 						},
 					},
@@ -110,24 +120,29 @@ func resourceSakuraCloudProxyLB() *schema.Resource {
 			"certificate": {
 				Type:     schema.TypeList,
 				Optional: true,
+				Computed: true,
 				MaxItems: 1,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
 						"server_cert": {
 							Type:     schema.TypeString,
-							Required: true,
+							Optional: true,
+							Computed: true,
 						},
 						"intermediate_cert": {
 							Type:     schema.TypeString,
 							Optional: true,
+							Computed: true,
 						},
 						"private_key": {
 							Type:     schema.TypeString,
-							Required: true,
+							Optional: true,
+							Computed: true,
 						},
 						"additional_certificates": {
 							Type:     schema.TypeList,
 							Optional: true,
+							Computed: true,
 							Elem: &schema.Resource{
 								Schema: map[string]*schema.Schema{
 									"server_cert": {
@@ -224,6 +239,8 @@ func resourceSakuraCloudProxyLBCreate(d *schema.ResourceData, meta interface{}) 
 			opts.AddBindPort(
 				values.Get("proxy_mode").(string),
 				values.Get("port").(int),
+				values.Get("redirect_to_https").(bool),
+				values.Get("support_http2").(bool),
 			)
 		}
 	}
@@ -329,6 +346,8 @@ func resourceSakuraCloudProxyLBRead(d *schema.ResourceData, meta interface{}) er
 func resourceSakuraCloudProxyLBUpdate(d *schema.ResourceData, meta interface{}) error {
 
 	client := meta.(*APIClient)
+	sakuraMutexKV.Lock(d.Id())
+	defer sakuraMutexKV.Unlock(d.Id())
 
 	proxyLB, err := client.ProxyLB.Read(toSakuraCloudID(d.Id()))
 	if err != nil {
@@ -368,6 +387,8 @@ func resourceSakuraCloudProxyLBUpdate(d *schema.ResourceData, meta interface{}) 
 				proxyLB.AddBindPort(
 					values.Get("proxy_mode").(string),
 					values.Get("port").(int),
+					values.Get("redirect_to_https").(bool),
+					values.Get("support_http2").(bool),
 				)
 			}
 		}
@@ -449,7 +470,7 @@ func resourceSakuraCloudProxyLBUpdate(d *schema.ResourceData, meta interface{}) 
 		return fmt.Errorf("Failed to update SakuraCloud ProxyLB resource: %s", err)
 	}
 
-	if d.HasChange("certificate") {
+	if !proxyLB.Settings.ProxyLB.LetsEncrypt.Enabled && d.HasChange("certificate") {
 		if certs, ok := getListFromResource(d, "certificate"); ok && len(certs) > 0 {
 			values := mapToResourceData(certs[0].(map[string]interface{}))
 			cert := &sacloud.ProxyLBCertificates{
@@ -486,6 +507,8 @@ func resourceSakuraCloudProxyLBUpdate(d *schema.ResourceData, meta interface{}) 
 
 func resourceSakuraCloudProxyLBDelete(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*APIClient)
+	sakuraMutexKV.Lock(d.Id())
+	defer sakuraMutexKV.Unlock(d.Id())
 
 	_, err := client.ProxyLB.Delete(toSakuraCloudID(d.Id()))
 
@@ -505,8 +528,10 @@ func setProxyLBResourceData(d *schema.ResourceData, client *APIClient, data *sac
 	var bindPorts []map[string]interface{}
 	for _, bindPort := range data.Settings.ProxyLB.BindPorts {
 		bindPorts = append(bindPorts, map[string]interface{}{
-			"proxy_mode": bindPort.ProxyMode,
-			"port":       bindPort.Port,
+			"proxy_mode":        bindPort.ProxyMode,
+			"port":              bindPort.Port,
+			"redirect_to_https": bindPort.RedirectToHTTPS,
+			"support_http2":     bindPort.SupportHTTP2,
 		})
 	}
 	d.Set("bind_ports", bindPorts)
@@ -582,6 +607,6 @@ func setProxyLBResourceData(d *schema.ResourceData, client *APIClient, data *sac
 		proxylbCert["additional_certificates"] = []interface{}{}
 	}
 
-	d.Set("certificates", []interface{}{proxylbCert})
+	d.Set("certificate", []interface{}{proxylbCert})
 	return nil
 }

@@ -56,6 +56,7 @@
     - [DNS](configuration/resources/dns/)
     - [IPv4逆引きレコード](configuration/resources/ipv4_ptr/)
     - [エンハンスドロードバランサ](configuration/resources/proxylb/)
+    - [エンハンスドロードバランサ(Let's Encrypt設定)](configuration/resources/proxylb_acme/)
     - [GSLB](configuration/resources/gslb/)
     - [シンプル監視](configuration/resources/simple_monitor/)
     - [自動バックアップ](configuration/resources/auto_backup/)

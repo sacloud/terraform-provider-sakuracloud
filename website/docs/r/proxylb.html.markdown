@@ -1,7 +1,7 @@
 ---
 layout: "sakuracloud"
 page_title: "SakuraCloud: sakuracloud_proxylb"
-sidebar_current: "docs-sakuracloud-resource-global-proxylb-setting"
+sidebar_current: "docs-sakuracloud-resource-global-proxylb"
 description: |-
   Provides a SakuraCloud ProxyLB resource. This can be used to create, update, and delete ProxyLBs.
 ---
@@ -26,13 +26,15 @@ resource "sakuracloud_proxylb" "foobar" {
   }
 
   bind_ports {
-    proxy_mode = "https"
-    port       = 443
+    proxy_mode    = "https"
+    port          = 443
+    support_http2 = true
   }
 
   sorry_server {
-    ipaddress = "192.2.0.1"
-    port      = 80
+    ipaddress         = "192.2.0.1"
+    port              = 80
+    redirect_to_https = true
   }
 
   servers {
@@ -82,6 +84,8 @@ Attributes for Bind-Ports:
 * `proxy_mode` - (Required) Proxy protocol.  
 Valid value is one of the following: [ "http" / "https"]
 * `port` - (Required) Port number used in tcp proxy.
+* `redirect_to_https` - (Optional) The flag for enable to redirect to https.
+* `support_http2` - (Optional) The flag for enable to support HTTP/2.
 
 
 ### Health Check

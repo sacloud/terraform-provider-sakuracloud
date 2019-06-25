@@ -47,6 +47,8 @@ Attributes for Bind-Ports:
 
 * `proxy_mode` - Proxy protocol.  
 * `port` - Port number used in tcp proxy.
+* `redirect_to_https` - The flag for enable to redirect to https.
+* `support_http2` - The flag for enable to support HTTP/2.
 
 ### Health Check
 
