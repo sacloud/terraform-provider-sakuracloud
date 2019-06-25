@@ -68,6 +68,14 @@ func dataSourceSakuraCloudProxyLB() *schema.Resource {
 							Type:     schema.TypeInt,
 							Computed: true,
 						},
+						"redirect_to_https": {
+							Type:     schema.TypeBool,
+							Computed: true,
+						},
+						"support_http2": {
+							Type:     schema.TypeBool,
+							Computed: true,
+						},
 					},
 				},
 			},
