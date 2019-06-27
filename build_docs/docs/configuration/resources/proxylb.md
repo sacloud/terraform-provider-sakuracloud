@@ -73,6 +73,7 @@ resource "sakuracloud_proxylb" "foobar" {
 | `name`            | ◯   | エンハンスドロードバランサ名        | -        | 文字列                  | - |
 | `plan`            | -   | プラン        | `1000`        | `1000`<br />`5000`<br />`10000`<br />`50000`<br />`100000`     | - |
 | `vip_failover`    | -   | VIPフェイルオーバ | `false`        | `true` or `false`     | - |
+| `sticky_session`    | -   | セッション維持 | `false`        | `true` or `false`     | - |
 | `bind_ports`      | ◯   | 待ち受けポート  | -        | リスト                  | 詳細は[`bind_ports`](#bind_ports)を参照    |
 | `health_check`    | ◯   | ヘルスチェック  | -        | マップ                  | 詳細は[`health_check`](#health_check)を参照    |
 | `sorry_server`     | -   | ソーリーサーバ  | -      | マップ| 詳細は[`sorry_server`](#sorry_server)を参照 |

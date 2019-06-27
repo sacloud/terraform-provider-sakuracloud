@@ -68,6 +68,7 @@ The following arguments are supported:
 * `plan` - (Optional) The plan of the resource.
 Valid value is one of the following: [ 1000 (default) / 5000 / 10000 / 50000 / 100000 ]  
 * `vip_failover` - (Optional) The flag of enable VIP Fail-Over.  
+* `sticky_session` - (Optional) The flag of enable Sticky-Session.  
 * `bind_ports` - (Required) The external listen ports. It contains some attributes to [Bind Ports](#bind-ports).
 * `health_check` - (Required) The health check rules. It contains some attributes to [Health Check](#health-check).
 * `sorry_server` - (Optional) The pair of IPAddress and port number of sorry-server.
