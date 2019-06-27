@@ -39,17 +39,14 @@ data "sakuracloud_archive" "ubuntu" {
 | `centos6`                  | CentOS 6|
 | `ubuntu`                  | Ubuntu 18.04|
 | `debian`                  | Debian |
-| `vyos`                    | VyOS|
 | `coreos`                  | CoreOS|
 | `rancheros`               | RancherOS|
+| `k3os`                    | k3OS|
 | `kusanagi`                | Kusanagi(CentOS7)|
 | `sophos-utm`              | Sophos-UTM(*1)|
 | `netwiser`                | Netwiser Virtual Edition(*2) |
 | `opnsense`                | OPNsense |
 | `freebsd`                 | FreeBSD|
-| `windows2012`             | Windows 2012|
-| `windows2012-rds`         | Windows 2012(RDS)|
-| `windows2012-rds-office`  | Windows 2012(RDS + Office)|
 | `windows2016`             | Windows 2016|
 | `windows2016-rds`         | Windows 2016(RDS)|
 | `windows2016-rds-office`  | Windows 2016(RDS + Office)|
