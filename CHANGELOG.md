@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.14.0 (2019-06-27)
+
+* libsacloud v1.25 #461 (yamamoto-febc)
+* エンハンスドロードバランサでのセッション維持機能 #462 (yamamoto-febc)
+
+
 ## 1.13.0 (2019-06-25)
 
 * Terraform v0.12.2 #458 (yamamoto-febc)
