@@ -47,6 +47,8 @@ func TestAccResourceSakuraCloudProxyLB(t *testing.T) {
 					resource.TestCheckResourceAttr(
 						"sakuracloud_proxylb.foobar", "vip_failover", "true"),
 					resource.TestCheckResourceAttr(
+						"sakuracloud_proxylb.foobar", "sticky_session", "true"),
+					resource.TestCheckResourceAttr(
 						"sakuracloud_proxylb.foobar", "health_check.0.protocol", "http"),
 					resource.TestCheckResourceAttr(
 						"sakuracloud_proxylb.foobar", "health_check.0.delay_loop", "10"),
@@ -82,6 +84,8 @@ func TestAccResourceSakuraCloudProxyLB(t *testing.T) {
 					testAccCheckSakuraCloudProxyLBExists("sakuracloud_proxylb.foobar", &proxylb),
 					resource.TestCheckResourceAttr(
 						"sakuracloud_proxylb.foobar", "name", "terraform-test-proxylb-upd"),
+					resource.TestCheckResourceAttr(
+						"sakuracloud_proxylb.foobar", "sticky_session", "false"),
 					resource.TestCheckResourceAttr(
 						"sakuracloud_proxylb.foobar", "health_check.0.protocol", "tcp"),
 					resource.TestCheckResourceAttr(
@@ -179,6 +183,7 @@ func TestAccImportSakuraCloudProxyLB(t *testing.T) {
 		expects := map[string]string{
 			"name":                      "terraform-test-proxylb-import",
 			"vip_failover":              "true",
+			"sticky_session":            "true",
 			"health_check.0.protocol":   "tcp",
 			"health_check.0.delay_loop": "20",
 			"description":               "ProxyLB from TerraForm for SAKURA CLOUD",
@@ -226,6 +231,7 @@ resource "sakuracloud_proxylb" "foobar" {
   name = "terraform-test-proxylb"
   plan = 5000
   vip_failover = true
+  sticky_session = true
   health_check {
     protocol = "http"
     delay_loop = 10
@@ -265,6 +271,7 @@ resource "sakuracloud_proxylb" "foobar" {
   name = "terraform-test-proxylb-upd"
   plan = 5000
   vip_failover = true
+  sticky_session = false
   health_check {
     protocol = "tcp"
     delay_loop = 20
@@ -293,6 +300,7 @@ var testAccCheckSakuraCloudProxyLBConfig_import = `
 resource "sakuracloud_proxylb" "foobar" {
   name = "terraform-test-proxylb-import"
   vip_failover = true
+  sticky_session = true
   health_check {
     protocol = "tcp"
     delay_loop = 20

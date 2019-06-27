@@ -44,6 +44,10 @@ func resourceSakuraCloudProxyLB() *schema.Resource {
 				Optional: true,
 				ForceNew: true,
 			},
+			"sticky_session": {
+				Type:     schema.TypeBool,
+				Optional: true,
+			},
 			"bind_ports": {
 				Type:     schema.TypeList,
 				Required: true,
@@ -233,6 +237,17 @@ func resourceSakuraCloudProxyLBCreate(d *schema.ResourceData, meta interface{}) 
 		UseVIPFailover: failOver,
 	}
 
+	var stickySession bool
+	if f, ok := d.GetOk("sticky_session"); ok {
+		stickySession = f.(bool)
+	}
+	if stickySession {
+		opts.Settings.ProxyLB.StickySession = sacloud.ProxyLBSessionSetting{
+			Enabled: true,
+			Method:  sacloud.ProxyLBStickySessionDefaultMethod,
+		}
+	}
+
 	if bindPorts, ok := getListFromResource(d, "bind_ports"); ok {
 		for _, bindPort := range bindPorts {
 			values := mapToResourceData(bindPort.(map[string]interface{}))
@@ -375,6 +390,23 @@ func resourceSakuraCloudProxyLBUpdate(d *schema.ResourceData, meta interface{}) 
 			proxyLB.Name = name.(string)
 		} else {
 			proxyLB.Name = ""
+		}
+	}
+
+	if d.HasChange("sticky_session") {
+		var stickySession bool
+		if f, ok := d.GetOk("sticky_session"); ok {
+			stickySession = f.(bool)
+		}
+		if stickySession {
+			proxyLB.Settings.ProxyLB.StickySession = sacloud.ProxyLBSessionSetting{
+				Enabled: true,
+				Method:  sacloud.ProxyLBStickySessionDefaultMethod,
+			}
+		} else {
+			proxyLB.Settings.ProxyLB.StickySession = sacloud.ProxyLBSessionSetting{
+				Enabled: false,
+			}
 		}
 	}
 
@@ -524,6 +556,7 @@ func setProxyLBResourceData(d *schema.ResourceData, client *APIClient, data *sac
 	d.Set("name", data.Name)
 	d.Set("plan", int(data.GetPlan()))
 	d.Set("vip_failover", data.Status.UseVIPFailover)
+	d.Set("sticky_session", data.Settings.ProxyLB.StickySession.Enabled)
 	// bind ports
 	var bindPorts []map[string]interface{}
 	for _, bindPort := range data.Settings.ProxyLB.BindPorts {

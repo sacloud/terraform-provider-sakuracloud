@@ -30,6 +30,7 @@ data "sakuracloud_proxylb" "proxylb" {
 | `id`          | ID              | -                                          |
 | `plan`        | プラン    | -                                          |
 | `vip_failover` | VIPフェイルオーバ | - |
+| `sticky_session` | セッション維持 | - |
 | `vip`        | VIP       | ロードバランサに割り当てられたグローバルIP(`vip_failover`が`false`の場合のみ有効)    |
 | `fqdn`        | VIP       | ロードバランサに割り当てられたグローバルIP(`vip_failover`が`true`の場合のみ有効)    |
 | `proxy_networks`  | プロキシ元ネットワーク | プロキシ元IP(CIDR)のリスト    |

@@ -32,6 +32,7 @@ The following attributes are exported:
 * `name` - Name of the resource.
 * `plan` - The plan of the resource.
 * `vip_failover` - The flag of enable VIP Fail-Over.  
+* `sticky_session` - The flag of enable Sticky-Session.  
 * `bind_ports` - The external listen ports. It contains some attributes to [Bind Ports](#bind-ports).
 * `health_check` - The health check rules. It contains some attributes to [Health Check](#health-check).
 * `sorry_server` - The pair of IPAddress and port number of sorry-server.
