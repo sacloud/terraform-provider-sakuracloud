@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.14.1 (2019-06-28)
+
+* Use libsacloud v1.25.1 - fix database apis #464 (yamamoto-febc)
+
+
 ## 1.14.0 (2019-06-27)
 
 * libsacloud v1.25 #461 (yamamoto-febc)
