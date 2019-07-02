@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.14.2 (2019-07-02)
+
+* シンプル監視でのポート番号をComputed=trueに変更 #467 (yamamoto-febc)
+* Terraform v0.12.3 #468 (yamamoto-febc)
+
+
 ## 1.14.1 (2019-06-28)
 
 * Use libsacloud v1.25.1 - fix database apis #464 (yamamoto-febc)
