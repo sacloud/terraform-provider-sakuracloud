@@ -74,8 +74,7 @@ func TestAccResourceSakuraCloudDatabase_WithSwitch(t *testing.T) {
 					resource.TestCheckResourceAttr("sakuracloud_database.foobar", "ipaddress1", "192.168.11.101"),
 					resource.TestCheckResourceAttr("sakuracloud_database.foobar", "nw_mask_len", "24"),
 					resource.TestCheckResourceAttr("sakuracloud_database.foobar", "default_route", "192.168.11.1"),
-					resource.TestCheckResourceAttr(
-						"sakuracloud_database.foobar", "icon_id", ""),
+					resource.TestCheckNoResourceAttr("sakuracloud_database.foobar", "icon_id"),
 				),
 			},
 		},

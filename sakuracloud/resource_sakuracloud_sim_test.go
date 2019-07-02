@@ -100,8 +100,7 @@ func TestAccResourceSakuraCloudSIM(t *testing.T) {
 						"sakuracloud_sim.foobar", "enabled", "false"),
 					resource.TestCheckResourceAttr(
 						"sakuracloud_sim.foobar", "ipaddress", "192.168.100.2"),
-					resource.TestCheckResourceAttr(
-						"sakuracloud_sim.foobar", "icon_id", ""),
+					resource.TestCheckNoResourceAttr("sakuracloud_sim.foobar", "icon_id"),
 					resource.TestCheckResourceAttrPair(
 						"sakuracloud_sim.foobar", "id",
 						"sakuracloud_mobile_gateway.mgw", "sim_ids.0",

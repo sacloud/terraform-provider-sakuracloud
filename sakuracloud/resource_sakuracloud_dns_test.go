@@ -54,7 +54,7 @@ func TestAccResourceSakuraCloudDNS(t *testing.T) {
 					resource.TestCheckResourceAttr("sakuracloud_dns.foobar", "records.0.name", "test1"),
 					resource.TestCheckResourceAttr("sakuracloud_dns.foobar", "records.0.type", "A"),
 					resource.TestCheckResourceAttr("sakuracloud_dns.foobar", "records.0.value", "192.168.11.1"),
-					resource.TestCheckResourceAttr("sakuracloud_dns.foobar", "icon_id", ""),
+					resource.TestCheckNoResourceAttr("sakuracloud_dns.foobar", "icon_id"),
 				),
 			},
 		},

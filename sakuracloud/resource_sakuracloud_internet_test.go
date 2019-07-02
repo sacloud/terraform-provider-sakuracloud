@@ -55,8 +55,7 @@ func TestAccResourceSakuraCloudInternet(t *testing.T) {
 						"sakuracloud_internet.foobar", "enable_ipv6", "true"),
 					resource.TestCheckResourceAttr(
 						"sakuracloud_internet.foobar", "ipv6_prefix_len", "64"),
-					resource.TestCheckResourceAttr(
-						"sakuracloud_internet.foobar", "icon_id", ""),
+					resource.TestCheckNoResourceAttr("sakuracloud_internet.foobar", "icon_id"),
 				),
 			},
 			{

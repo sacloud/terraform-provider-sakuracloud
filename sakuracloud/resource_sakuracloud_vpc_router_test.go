@@ -77,8 +77,7 @@ func TestAccResourceSakuraCloudVPCRouter(t *testing.T) {
 						"sakuracloud_vpc_router.foobar", "ipaddress2"),
 					resource.TestCheckResourceAttr(
 						"sakuracloud_vpc_router.foobar", "syslog_host", "192.168.0.2"),
-					resource.TestCheckResourceAttr(
-						"sakuracloud_vpc_router.foobar", "icon_id", ""),
+					resource.TestCheckNoResourceAttr("sakuracloud_vpc_router.foobar", "icon_id"),
 				),
 			},
 		},
