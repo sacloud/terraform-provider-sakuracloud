@@ -50,8 +50,7 @@ func TestAccResourceSakuraCloudDisk(t *testing.T) {
 						"sakuracloud_disk.foobar", "connector", "virtio"),
 					resource.TestCheckResourceAttr(
 						"sakuracloud_disk.foobar", "size", "20"),
-					resource.TestCheckResourceAttr(
-						"sakuracloud_disk.foobar", "icon_id", ""),
+					resource.TestCheckNoResourceAttr("sakuracloud_disk.foobar", "icon_id"),
 				),
 			},
 		},

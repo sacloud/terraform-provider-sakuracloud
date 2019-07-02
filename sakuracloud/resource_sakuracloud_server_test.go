@@ -87,8 +87,7 @@ func TestAccResourceSakuraCloudServer(t *testing.T) {
 					resource.TestMatchResourceAttr("sakuracloud_server.foobar",
 						"nw_address",
 						regexp.MustCompile(".+")), // should be not empty
-					resource.TestCheckResourceAttr(
-						"sakuracloud_server.foobar", "icon_id", ""),
+					resource.TestCheckNoResourceAttr("sakuracloud_server.foobar", "icon_id"),
 				),
 			},
 		},

@@ -69,8 +69,8 @@ func TestAccResourceSakuraCloudSimpleMonitor(t *testing.T) {
 						"sakuracloud_simple_monitor.foobar", "notify_email_html", "false"),
 					resource.TestCheckResourceAttr(
 						"sakuracloud_simple_monitor.foobar", "notify_email_enabled", "false"),
-					resource.TestCheckResourceAttr(
-						"sakuracloud_simple_monitor.foobar", "icon_id", ""),
+					resource.TestCheckNoResourceAttr(
+						"sakuracloud_simple_monitor.foobar", "icon_id"),
 				),
 			},
 		},

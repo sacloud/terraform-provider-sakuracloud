@@ -37,7 +37,7 @@ func TestAccResourceSakuraCloudCDROM(t *testing.T) {
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttr("sakuracloud_cdrom.foobar", "name", "mycdrom-upd"),
 					resource.TestCheckResourceAttr("sakuracloud_cdrom.foobar", "size", "5"),
-					resource.TestCheckResourceAttr("sakuracloud_cdrom.foobar", "icon_id", ""),
+					resource.TestCheckNoResourceAttr("sakuracloud_cdrom.foobar", "icon_id"),
 					resource.TestCheckResourceAttr("sakuracloud_cdrom.foobar", "iso_image_file", "test/dummy-upd.iso"),
 					resource.TestCheckResourceAttr("sakuracloud_cdrom.foobar", "description", "description-upd"),
 					resource.TestCheckResourceAttr("sakuracloud_cdrom.foobar", "tags.0", "tag1-upd"),

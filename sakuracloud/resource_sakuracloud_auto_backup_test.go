@@ -50,8 +50,7 @@ func TestAccResourceSakuraCloudAutoBackup(t *testing.T) {
 					resource.TestCheckResourceAttr("sakuracloud_auto_backup.foobar", "tags.#", "2"),
 					resource.TestCheckResourceAttr("sakuracloud_auto_backup.foobar", "tags.0", "hoge1_after"),
 					resource.TestCheckResourceAttr("sakuracloud_auto_backup.foobar", "tags.1", "hoge2_after"),
-					resource.TestCheckResourceAttr(
-						"sakuracloud_auto_backup.foobar", "icon_id", ""),
+					resource.TestCheckNoResourceAttr("sakuracloud_auto_backup.foobar", "icon_id"),
 				),
 			},
 		},

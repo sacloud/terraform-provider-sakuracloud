@@ -62,7 +62,7 @@ func TestAccResourceSakuraCloudIconWithResource(t *testing.T) {
 				Config: testAccCheckSakuraCloudIconWithSwitch_update,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckSakuraCloudIconExists("sakuracloud_icon.foobar", &icon),
-					resource.TestCheckResourceAttr("sakuracloud_switch.foobar", "icon_id", ""),
+					resource.TestCheckNoResourceAttr("sakuracloud_switch.foobar", "icon_id"),
 				),
 			},
 		},

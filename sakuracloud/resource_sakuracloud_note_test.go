@@ -43,8 +43,7 @@ func TestAccResourceSakuraCloudNote(t *testing.T) {
 						"sakuracloud_note.foobar", "content", "content_upd"),
 					resource.TestCheckResourceAttr(
 						"sakuracloud_note.foobar", "class", "shell"),
-					resource.TestCheckResourceAttr(
-						"sakuracloud_note.foobar", "icon_id", ""),
+					resource.TestCheckNoResourceAttr("sakuracloud_note.foobar", "icon_id"),
 				),
 			},
 		},

@@ -51,8 +51,7 @@ func TestAccResourceSakuraCloudPrivateHost(t *testing.T) {
 						"sakuracloud_private_host.foobar", "description", "after"),
 					resource.TestCheckResourceAttr(
 						"sakuracloud_private_host.foobar", "tags.#", "0"),
-					resource.TestCheckResourceAttr(
-						"sakuracloud_private_host.foobar", "icon_id", ""),
+					resource.TestCheckNoResourceAttr("sakuracloud_private_host.foobar", "icon_id"),
 					resource.TestMatchResourceAttr("sakuracloud_private_host.foobar",
 						"hostname",
 						regexp.MustCompile(".+")), // should be not empty
@@ -78,8 +77,8 @@ func TestAccResourceSakuraCloudPrivateHost_DestroyWithRunningServers(t *testing.
 			{
 				Config: testAccCheckSakuraCloudPrivateHostConfig_Destroy_Update,
 				Check: resource.ComposeTestCheckFunc(
-					resource.TestCheckResourceAttr(
-						"sakuracloud_server.foobar", "private_host_id", ""),
+					resource.TestCheckNoResourceAttr(
+						"sakuracloud_server.foobar", "private_host_id"),
 				),
 			},
 		},

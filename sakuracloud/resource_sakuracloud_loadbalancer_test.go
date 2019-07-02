@@ -108,8 +108,7 @@ func TestAccSakuraCloudLoadBalancer(t *testing.T) {
 						"sakuracloud_load_balancer.foobar", "vips.1.delay_loop", "20"),
 					resource.TestCheckResourceAttr(
 						"sakuracloud_load_balancer.foobar", "vips.1.sorry_server", "192.168.11.22"),
-					resource.TestCheckResourceAttr(
-						"sakuracloud_load_balancer.foobar", "icon_id", ""),
+					resource.TestCheckNoResourceAttr("sakuracloud_load_balancer.foobar", "icon_id"),
 				),
 			},
 		},

@@ -47,8 +47,7 @@ func TestAccResourceSakuraCloudDatabaseReplica(t *testing.T) {
 					resource.TestCheckResourceAttr("sakuracloud_database_read_replica.foobar", "ipaddress1", "192.168.11.111"),
 					resource.TestCheckResourceAttr("sakuracloud_database_read_replica.foobar", "nw_mask_len", "24"),
 					resource.TestCheckResourceAttr("sakuracloud_database_read_replica.foobar", "default_route", "192.168.11.1"),
-					resource.TestCheckResourceAttr(
-						"sakuracloud_database_read_replica.foobar", "icon_id", ""),
+					resource.TestCheckNoResourceAttr("sakuracloud_database_read_replica.foobar", "icon_id"),
 				),
 			},
 		},

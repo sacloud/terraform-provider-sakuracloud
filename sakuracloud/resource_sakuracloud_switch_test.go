@@ -35,8 +35,7 @@ func TestAccResourceSakuraCloudSwitch(t *testing.T) {
 					testAccCheckSakuraCloudSwitchExists("sakuracloud_switch.foobar", &sw),
 					resource.TestCheckResourceAttr(
 						"sakuracloud_switch.foobar", "name", "myswitch_upd"),
-					resource.TestCheckResourceAttr(
-						"sakuracloud_switch.foobar", "icon_id", ""),
+					resource.TestCheckNoResourceAttr("sakuracloud_switch.foobar", "icon_id"),
 				),
 			},
 			{

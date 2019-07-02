@@ -75,8 +75,7 @@ func TestAccResourceSakuraCloudGSLB(t *testing.T) {
 						"sakuracloud_gslb.foobar", "servers.1.weight", "3"),
 					resource.TestCheckResourceAttr(
 						"sakuracloud_gslb.foobar", "servers.1.enabled", "false"),
-					resource.TestCheckResourceAttr(
-						"sakuracloud_gslb.foobar", "icon_id", ""),
+					resource.TestCheckNoResourceAttr("sakuracloud_gslb.foobar", "icon_id"),
 				),
 			},
 			{

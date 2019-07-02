@@ -66,7 +66,7 @@ func TestAccSakuraCloudMobileGateway(t *testing.T) {
 					resource.TestCheckResourceAttr("sakuracloud_mobile_gateway.foobar", "tags.1", "hoge2_after"),
 					resource.TestCheckResourceAttr("sakuracloud_mobile_gateway.foobar", "private_ipaddress", "192.168.11.101"),
 					resource.TestCheckResourceAttr("sakuracloud_mobile_gateway.foobar", "private_nw_mask_len", "24"),
-					resource.TestCheckResourceAttr("sakuracloud_mobile_gateway.foobar", "icon_id", ""),
+					resource.TestCheckNoResourceAttr("sakuracloud_mobile_gateway.foobar", "icon_id"),
 					resource.TestCheckResourceAttr("sakuracloud_mobile_gateway.foobar", "traffic_control.#", "0"),
 					resource.TestCheckResourceAttrPair(
 						"sakuracloud_mobile_gateway.foobar", "switch_id",

@@ -51,8 +51,7 @@ func TestAccSakuraCloudNFS(t *testing.T) {
 					resource.TestCheckResourceAttr("sakuracloud_nfs.foobar", "ipaddress", "192.168.11.101"),
 					resource.TestCheckResourceAttr("sakuracloud_nfs.foobar", "nw_mask_len", "24"),
 					resource.TestCheckResourceAttr("sakuracloud_nfs.foobar", "default_route", "192.168.11.1"),
-					resource.TestCheckResourceAttr(
-						"sakuracloud_nfs.foobar", "icon_id", ""),
+					resource.TestCheckNoResourceAttr("sakuracloud_nfs.foobar", "icon_id"),
 				),
 			},
 		},
