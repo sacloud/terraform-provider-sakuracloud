@@ -74,6 +74,7 @@ func resourceSakuraCloudSimpleMonitor() *schema.Resource {
 						"port": {
 							Type:     schema.TypeInt,
 							Optional: true,
+							Computed: true,
 						},
 						"qname": {
 							Type:     schema.TypeString,
@@ -452,9 +453,7 @@ func setSimpleMonitorResourceData(d *schema.ResourceData, client *APIClient, dat
 		healthCheck["status"] = readHealthCheck.Status
 		healthCheck["host_header"] = readHealthCheck.Host
 		healthCheck["port"] = port
-		if port != "" || readHealthCheck.Port != "80" {
-			healthCheck["port"] = readHealthCheck.Port
-		}
+		healthCheck["port"] = readHealthCheck.Port
 		healthCheck["username"] = readHealthCheck.BasicAuthUsername
 		healthCheck["password"] = readHealthCheck.BasicAuthPassword
 	case "https":
@@ -462,9 +461,7 @@ func setSimpleMonitorResourceData(d *schema.ResourceData, client *APIClient, dat
 		healthCheck["status"] = readHealthCheck.Status
 		healthCheck["host_header"] = readHealthCheck.Host
 		healthCheck["port"] = port
-		if port != "" || readHealthCheck.Port != "443" {
-			healthCheck["port"] = readHealthCheck.Port
-		}
+		healthCheck["port"] = readHealthCheck.Port
 		healthCheck["sni"] = strings.ToLower(readHealthCheck.SNI) == "true"
 		healthCheck["username"] = readHealthCheck.BasicAuthUsername
 		healthCheck["password"] = readHealthCheck.BasicAuthPassword
@@ -472,17 +469,11 @@ func setSimpleMonitorResourceData(d *schema.ResourceData, client *APIClient, dat
 		healthCheck["port"] = port
 		healthCheck["port"] = readHealthCheck.Port
 	case "ssh":
-		if port != "" || readHealthCheck.Port != "22" {
-			healthCheck["port"] = readHealthCheck.Port
-		}
+		healthCheck["port"] = readHealthCheck.Port
 	case "smtp":
-		if port != "" || readHealthCheck.Port != "25" {
-			healthCheck["port"] = readHealthCheck.Port
-		}
+		healthCheck["port"] = readHealthCheck.Port
 	case "pop3":
-		if port != "" || readHealthCheck.Port != "110" {
-			healthCheck["port"] = readHealthCheck.Port
-		}
+		healthCheck["port"] = readHealthCheck.Port
 
 	case "snmp":
 		healthCheck["community"] = readHealthCheck.Community

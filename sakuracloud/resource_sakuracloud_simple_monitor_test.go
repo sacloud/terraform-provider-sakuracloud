@@ -25,6 +25,8 @@ func TestAccResourceSakuraCloudSimpleMonitor(t *testing.T) {
 					resource.TestCheckResourceAttr(
 						"sakuracloud_simple_monitor.foobar", "health_check.0.protocol", "https"),
 					resource.TestCheckResourceAttr(
+						"sakuracloud_simple_monitor.foobar", "health_check.0.port", "8443"),
+					resource.TestCheckResourceAttr(
 						"sakuracloud_simple_monitor.foobar", "health_check.0.delay_loop", "60"),
 					resource.TestCheckResourceAttr(
 						"sakuracloud_simple_monitor.foobar", "health_check.0.sni", "true"),
@@ -53,6 +55,10 @@ func TestAccResourceSakuraCloudSimpleMonitor(t *testing.T) {
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckSakuraCloudSimpleMonitorExists("sakuracloud_simple_monitor.foobar", &monitor),
 					testAccCheckSakuraCloudSimpleMonitorAttributesUpdated(&monitor),
+					resource.TestCheckResourceAttr(
+						"sakuracloud_simple_monitor.foobar", "health_check.0.protocol", "http"),
+					resource.TestCheckResourceAttr(
+						"sakuracloud_simple_monitor.foobar", "health_check.0.port", "80"),
 					resource.TestCheckResourceAttr(
 						"sakuracloud_simple_monitor.foobar", "health_check.0.host_header", "libsacloud.com"),
 					resource.TestCheckResourceAttr(
@@ -178,6 +184,7 @@ resource "sakuracloud_simple_monitor" "foobar" {
     target = "terraform.io"
     health_check {
         protocol = "https"
+        port = 8443
         delay_loop = 60
         path = "/"
         status = "200"
@@ -205,6 +212,7 @@ resource "sakuracloud_simple_monitor" "foobar" {
     target = "terraform.io"
     health_check {
         protocol = "http"
+        port = 80
         delay_loop = 120
         path = "/"
         status = "200"
