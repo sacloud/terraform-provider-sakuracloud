@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>v1.6での変更点 - Terraform for さくらのクラウド</title>
+  <title>v1.15での変更点 - Terraform for さくらのクラウド</title>
   
 
   <link rel="shortcut icon" href="../img/favicon.ico">
@@ -21,7 +21,7 @@
   
   <script>
     // Current page data
-    var mkdocs_page_name = "v1.6での変更点";
+    var mkdocs_page_name = "v1.15での変更点";
   </script>
   
   <script src="../js/jquery-2.1.1.min.js"></script>
@@ -106,17 +106,8 @@
 
         
             
-    <li class="toctree-l1 current">
-        <a class="current" href="./">v1.6での変更点</a>
-        
-            <ul>
-            
-                <li class="toctree-l3"><a href="#v16">v1.6での変更点</a></li>
-                
-                    <li><a class="toctree-l4" href="#_1">ディスクの修正関連パラメータの移動</a></li>
-                
-            
-            </ul>
+    <li class="toctree-l1 ">
+        <a class="" href="../upgrade_to_v16/">v1.6での変更点</a>
         
     </li>
 
@@ -143,8 +134,17 @@
 
         
             
-    <li class="toctree-l1 ">
-        <a class="" href="../upgrade_to_v1_15/">v1.15での変更点</a>
+    <li class="toctree-l1 current">
+        <a class="current" href="./">v1.15での変更点</a>
+        
+            <ul>
+            
+                <li class="toctree-l3"><a href="#v115">v1.15での変更点</a></li>
+                
+                    <li><a class="toctree-l4" href="#_1">エンハンスドロードバランサでのレスポンスヘッダ設定</a></li>
+                
+            
+            </ul>
         
     </li>
 
@@ -627,7 +627,7 @@
         
       
     
-    <li>v1.6での変更点</li>
+    <li>v1.15での変更点</li>
     <li class="wy-breadcrumbs-aside">
       
     </li>
@@ -637,71 +637,37 @@
           <div role="main">
             <div class="section">
               
-                <h1 id="v16">v1.6での変更点</h1>
+                <h1 id="v115">v1.15での変更点</h1>
 <hr />
-<h2 id="_1">ディスクの修正関連パラメータの移動</h2>
-<p>v1.6ではディスクの修正関連パラメータがディスクリソース(<code>sakuracloud_disk</code>)からサーバリソース(<code>sakuracloud_server</code>)へと移動されました。</p>
-<p>これまでのバージョンとの互換性維持のため引き続きディスクリソースでのパラメータ指定を行うことも可能ですが、
-将来のバージョンではこれらのパラメータを削除する予定です。</p>
-<h3 id="_2">対応方法</h3>
-<p>これまでディスクリソースで以下のパラメータを指定していた場合、tfファイルの書き換えが必要となります。</p>
-<ul>
-<li>パスワード(<code>password</code>)</li>
-<li>ホスト名(<code>hostname</code>)</li>
-<li>SSH接続時パスワード/チャレンジレスポンス認証の無効化フラグ(<code>disable_pw_auth</code>)</li>
-<li>スタートアップスクリプト(<code>note_ids</code>)</li>
-<li>公開鍵(<code>ssh_key_ids</code>)</li>
-</ul>
-<p>これらのパラメータをディスクリソースからサーバリソースへ移動させてください。</p>
-<h4 id="tf">対応前のtfファイルの例</h4>
-<pre><code class="hcl">data &quot;sakuracloud_archive&quot; &quot;ubuntu&quot; {
-  os_type = &quot;ubuntu&quot;
-}
+<h2 id="_1">エンハンスドロードバランサでのレスポンスヘッダ設定</h2>
+<p>エンハンスドロードバランサ(sakuracloud_proxylb)にてポートごとに任意のレスポンスヘッダを付与できるようになりました。</p>
+<h4 id="_2">利用例</h4>
+<pre><code class="hcl">resource &quot;sakuracloud_proxylb&quot; &quot;example&quot; {
+  name           = &quot;terraform-test-proxylb&quot;
+  plan           = 100
+  vip_failover   = true
+  sticky_session = true
 
-# ディスクリソース
-resource &quot;sakuracloud_disk&quot; &quot;foobar&quot; {
-  name = &quot;mydisk&quot;
-  source_archive_id = &quot;${data.sakuracloud_archive.ubuntu.id}&quot;
+  health_check {
+    protocol    = &quot;http&quot;
+    delay_loop  = 10
+    host_header = &quot;example.jp&quot;
+    path        = &quot;/&quot;
+  }
+  bind_ports {
+    proxy_mode = &quot;http&quot;
+    port       = 80
 
-  # ディスクの修正関連のパラメータ 
-  hostname = &quot;myserver&quot;
-  password = &quot;p@ssw0rd&quot;
-  ssh_key_ids = [&quot;100000000000&quot;, &quot;200000000000&quot;]
-  disable_pw_auth = true
-  note_ids = [&quot;100000000000&quot;, &quot;200000000000&quot;]
-
-}
-
-# サーバリソース
-resource &quot;sakuracloud_server&quot; &quot;foobar&quot; {
-  name = &quot;myserver&quot;
-  disks = [&quot;${sakuracloud_disk.foobar.id}&quot;]
-}
-</code></pre>
-
-<h4 id="tf_1">対応後のtfファイルの例</h4>
-<pre><code class="hcl">data &quot;sakuracloud_archive&quot; &quot;ubuntu&quot; {
-  os_type = &quot;ubuntu&quot;
-}
-
-# ディスクリソース
-resource &quot;sakuracloud_disk&quot; &quot;foobar&quot; {
-  name = &quot;mydisk&quot;
-  source_archive_id = &quot;${data.sakuracloud_archive.ubuntu.id}&quot;
-}
-
-# サーバリソース
-resource &quot;sakuracloud_server&quot; &quot;foobar&quot; {
-  name = &quot;myserver&quot;
-  disks = [&quot;${sakuracloud_disk.foobar.id}&quot;]
-
-  # ディスクの修正関連のパラメータ 
-  hostname = &quot;myserver&quot;
-  password = &quot;p@ssw0rd&quot;
-  ssh_key_ids = [&quot;100000000000&quot;, &quot;200000000000&quot;]
-  disable_pw_auth = true
-  note_ids = [&quot;100000000000&quot;, &quot;200000000000&quot;]
-
+    # レスポンスヘッダ(複数指定可能:10個まで)
+    response_header {
+        header = &quot;Cache-Control&quot;
+        value  = &quot;public, max-age=10&quot;
+    }
+  }
+  servers {
+      ipaddress = &quot;${sakuracloud_server.server01.ipaddress}&quot;
+      port = 80
+  }
 }
 </code></pre>
               
@@ -711,10 +677,10 @@ resource &quot;sakuracloud_server&quot; &quot;foobar&quot; {
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="../upgrade_to_v17/" class="btn btn-neutral float-right" title="v1.7での変更点"/>Next <span class="icon icon-circle-arrow-right"></span></a>
+        <a href="../articles/" class="btn btn-neutral float-right" title="ブログ/記事/読み物"/>Next <span class="icon icon-circle-arrow-right"></span></a>
       
       
-        <a href="../upgrade_to_v14/" class="btn btn-neutral" title="v1.4での変更点"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../upgrade_to_v1_14/" class="btn btn-neutral" title="v1.14での変更点"><span class="icon icon-circle-arrow-left"></span> Previous</a>
       
     </div>
   
@@ -742,10 +708,10 @@ resource &quot;sakuracloud_server&quot; &quot;foobar&quot; {
     <span class="rst-current-version" data-toggle="rst-current-version">
       
       
-        <span><a href="../upgrade_to_v14/" style="color: #fcfcfc;">&laquo; Previous</a></span>
+        <span><a href="../upgrade_to_v1_14/" style="color: #fcfcfc;">&laquo; Previous</a></span>
       
       
-        <span style="margin-left: 15px"><a href="../upgrade_to_v17/" style="color: #fcfcfc">Next &raquo;</a></span>
+        <span style="margin-left: 15px"><a href="../articles/" style="color: #fcfcfc">Next &raquo;</a></span>
       
     </span>
 </div>

@@ -133,6 +133,13 @@
     </li>
 
         
+            
+    <li class="toctree-l1 ">
+        <a class="" href="../../../upgrade_to_v1_15/">v1.15での変更点</a>
+        
+    </li>
+
+        
     </ul>
 
         
@@ -657,6 +664,10 @@
     proxy_mode    = &quot;https&quot;
     port          = 443
     support_http2 = true
+    response_header {
+      header = &quot;Cache-Control&quot;
+      value  = &quot;public, max-age=10&quot;
+    }
   }
 
   sorry_server {
@@ -850,6 +861,46 @@
 <td align="center">-</td>
 <td>bool</td>
 <td><code>proxy_mode</code>が<code>https</code>の場合のみ有効</td>
+</tr>
+<tr>
+<td><code>response_header</code></td>
+<td align="center">-</td>
+<td>レスポンスヘッダ</td>
+<td align="center">-</td>
+<td>リスト</td>
+<td>10個まで指定可能。詳細は<a href="#response_header"><code>response_header</code></a>を参照</td>
+</tr>
+</tbody>
+</table>
+<h3 id="response_header"><code>response_header</code></h3>
+<p>この要素は<code>bind_ports</code>毎に最大10個まで指定可能です。  </p>
+<table>
+<thead>
+<tr>
+<th>パラメーター</th>
+<th align="center">必須</th>
+<th>名称</th>
+<th align="center">初期値</th>
+<th>設定値</th>
+<th>補足</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>header</code></td>
+<td align="center">◯</td>
+<td>ヘッダ</td>
+<td align="center">-</td>
+<td>-</td>
+<td>英字/数字/ハイフンで指定</td>
+</tr>
+<tr>
+<td><code>value</code></td>
+<td align="center">◯</td>
+<td>値</td>
+<td align="center">-</td>
+<td>-</td>
+<td>英字/数字/半角スペース/一部記号で指定</td>
 </tr>
 </tbody>
 </table>
