@@ -87,7 +87,14 @@ Valid value is one of the following: [ "http" / "https"]
 * `port` - (Required) Port number used in tcp proxy.
 * `redirect_to_https` - (Optional) The flag for enable to redirect to https.
 * `support_http2` - (Optional) The flag for enable to support HTTP/2.
+* `response_header` - (Optional) Additional response headers. It contains some attributes to [Response Header](#response-header).  
 
+### Response Header
+
+Attributes for Bind-Ports:
+
+* `header` - (Required) The key of additional header.  
+* `value` - (Required) The value of additional header.  
 
 ### Health Check
 
