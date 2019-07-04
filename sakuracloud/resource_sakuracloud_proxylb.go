@@ -72,6 +72,23 @@ func resourceSakuraCloudProxyLB() *schema.Resource {
 							Type:     schema.TypeBool,
 							Optional: true,
 						},
+						"response_header": {
+							Type:     schema.TypeList,
+							Optional: true,
+							MaxItems: 10,
+							Elem: &schema.Resource{
+								Schema: map[string]*schema.Schema{
+									"header": {
+										Type:     schema.TypeString,
+										Required: true,
+									},
+									"value": {
+										Type:     schema.TypeString,
+										Required: true,
+									},
+								},
+							},
+						},
 					},
 				},
 			},
@@ -251,11 +268,26 @@ func resourceSakuraCloudProxyLBCreate(d *schema.ResourceData, meta interface{}) 
 	if bindPorts, ok := getListFromResource(d, "bind_ports"); ok {
 		for _, bindPort := range bindPorts {
 			values := mapToResourceData(bindPort.(map[string]interface{}))
+			headers := []*sacloud.ProxyLBResponseHeader{}
+			if rawHeaders, ok := values.GetOk("response_header"); ok {
+				for _, rawHeader := range rawHeaders.([]interface{}) {
+					if rawHeader == nil {
+						continue
+					}
+					v := rawHeader.(map[string]interface{})
+					headers = append(headers, &sacloud.ProxyLBResponseHeader{
+						Header: v["header"].(string),
+						Value:  v["value"].(string),
+					})
+				}
+			}
+
 			opts.AddBindPort(
 				values.Get("proxy_mode").(string),
 				values.Get("port").(int),
 				values.Get("redirect_to_https").(bool),
 				values.Get("support_http2").(bool),
+				headers,
 			)
 		}
 	}
@@ -416,11 +448,25 @@ func resourceSakuraCloudProxyLBUpdate(d *schema.ResourceData, meta interface{}) 
 		if bindPorts, ok := getListFromResource(d, "bind_ports"); ok {
 			for _, bindPort := range bindPorts {
 				values := mapToResourceData(bindPort.(map[string]interface{}))
+				headers := []*sacloud.ProxyLBResponseHeader{}
+				if rawHeaders, ok := values.GetOk("response_header"); ok {
+					for _, rawHeader := range rawHeaders.([]interface{}) {
+						if rawHeader == nil {
+							continue
+						}
+						v := rawHeader.(map[string]interface{})
+						headers = append(headers, &sacloud.ProxyLBResponseHeader{
+							Header: v["header"].(string),
+							Value:  v["value"].(string),
+						})
+					}
+				}
 				proxyLB.AddBindPort(
 					values.Get("proxy_mode").(string),
 					values.Get("port").(int),
 					values.Get("redirect_to_https").(bool),
 					values.Get("support_http2").(bool),
+					headers,
 				)
 			}
 		}
@@ -560,11 +606,20 @@ func setProxyLBResourceData(d *schema.ResourceData, client *APIClient, data *sac
 	// bind ports
 	var bindPorts []map[string]interface{}
 	for _, bindPort := range data.Settings.ProxyLB.BindPorts {
+		var headers []interface{}
+		for _, header := range bindPort.AddResponseHeader {
+			headers = append(headers, map[string]interface{}{
+				"header": header.Header,
+				"value":  header.Value,
+			})
+		}
+
 		bindPorts = append(bindPorts, map[string]interface{}{
 			"proxy_mode":        bindPort.ProxyMode,
 			"port":              bindPort.Port,
 			"redirect_to_https": bindPort.RedirectToHTTPS,
 			"support_http2":     bindPort.SupportHTTP2,
+			"response_header":   headers,
 		})
 	}
 	d.Set("bind_ports", bindPorts)
