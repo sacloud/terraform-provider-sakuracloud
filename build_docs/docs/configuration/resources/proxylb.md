@@ -28,6 +28,10 @@ resource "sakuracloud_proxylb" "foobar" {
     proxy_mode    = "https"
     port          = 443
     support_http2 = true
+    response_header {
+      header = "Cache-Control"
+      value  = "public, max-age=10"
+    }
   }
   
   sorry_server {
@@ -93,6 +97,16 @@ resource "sakuracloud_proxylb" "foobar" {
 | `port`        | ◯  | ポート番号 | - | 数値 | - |
 | `redirect_to_https`  | -  | HTTPSへのリダイレクト | - | bool | `proxy_mode`が`http`の場合のみ有効 |
 | `support_http2`      | -  | HTTP/2のサポート | - | bool | `proxy_mode`が`https`の場合のみ有効  |
+| `response_header`    | -  | レスポンスヘッダ | - | リスト| 10個まで指定可能。詳細は[`response_header`](#response_header)を参照  |
+
+### `response_header`
+
+この要素は`bind_ports`毎に最大10個まで指定可能です。  
+
+|パラメーター     |必須  |名称                |初期値     |設定値                    |補足                                          |
+|---------------|:---:|--------------------|:--------:|------------------------|----------------------------------------------|
+| `header`    | ◯   | ヘッダ | -        | - | 英字/数字/ハイフンで指定 |
+| `value`     | ◯  | 値 | - | - | 英字/数字/半角スペース/一部記号で指定 |
 
 ### `health_check`
 

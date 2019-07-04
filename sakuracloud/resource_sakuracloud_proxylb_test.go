@@ -64,6 +64,12 @@ func TestAccResourceSakuraCloudProxyLB(t *testing.T) {
 						"sakuracloud_proxylb.foobar", "bind_ports.0.proxy_mode", "http"),
 					resource.TestCheckResourceAttr(
 						"sakuracloud_proxylb.foobar", "bind_ports.0.port", "80"),
+					resource.TestCheckResourceAttr(
+						"sakuracloud_proxylb.foobar", "bind_ports.0.response_header.#", "1"),
+					resource.TestCheckResourceAttr(
+						"sakuracloud_proxylb.foobar", "bind_ports.0.response_header.0.header", "Cache-Control"),
+					resource.TestCheckResourceAttr(
+						"sakuracloud_proxylb.foobar", "bind_ports.0.response_header.0.value", "public, max-age=10"),
 					resource.TestCheckResourceAttrPair(
 						"sakuracloud_proxylb.foobar", "servers.0.ipaddress",
 						"sakuracloud_server.server01", "ipaddress",
@@ -99,6 +105,8 @@ func TestAccResourceSakuraCloudProxyLB(t *testing.T) {
 						"sakuracloud_proxylb.foobar", "bind_ports.0.proxy_mode", "https"),
 					resource.TestCheckResourceAttr(
 						"sakuracloud_proxylb.foobar", "bind_ports.0.port", "443"),
+					resource.TestCheckResourceAttr(
+						"sakuracloud_proxylb.foobar", "bind_ports.0.response_header.#", "0"),
 					resource.TestCheckResourceAttrPair(
 						"sakuracloud_proxylb.foobar", "servers.0.ipaddress",
 						"sakuracloud_server.server01", "ipaddress",
@@ -245,6 +253,10 @@ resource "sakuracloud_proxylb" "foobar" {
   bind_ports {
     proxy_mode = "http"
     port       = 80
+    response_header {
+        header = "Cache-Control"
+        value  = "public, max-age=10"
+    }
   }
   servers {
       ipaddress = "${sakuracloud_server.server01.ipaddress}"

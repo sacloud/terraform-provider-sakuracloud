@@ -80,6 +80,22 @@ func dataSourceSakuraCloudProxyLB() *schema.Resource {
 							Type:     schema.TypeBool,
 							Computed: true,
 						},
+						"response_header": {
+							Type:     schema.TypeList,
+							Computed: true,
+							Elem: &schema.Resource{
+								Schema: map[string]*schema.Schema{
+									"header": {
+										Type:     schema.TypeString,
+										Computed: true,
+									},
+									"value": {
+										Type:     schema.TypeString,
+										Computed: true,
+									},
+								},
+							},
+						},
 					},
 				},
 			},
