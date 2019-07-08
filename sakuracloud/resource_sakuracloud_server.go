@@ -1013,7 +1013,7 @@ func setServerResourceData(d *schema.ResourceData, client *APIClient, data *sacl
 	d.Set("vnc_port", 0)
 	d.Set("vnc_password", "")
 
-	if data.IsUp() {
+	if data.IsUp() && data.Zone.Name != "tk1v" {
 		vncRes, err := client.Server.GetVNCProxy(data.ID)
 		if err != nil {
 			return fmt.Errorf("Get VNCProxy info is failed: %s", err)
