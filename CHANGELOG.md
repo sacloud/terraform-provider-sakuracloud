@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.15.2 (2019-07-09)
+
+* サンドボックスでのGetVNCProxy API呼び出し抑制 #477 (yamamoto-febc)
+
+
 ## 1.15.1 (2019-07-04)
 
 * Use libsacloud v1.26.1 - サーバプランが検索できない問題への対応 #472 (yamamoto-febc)
