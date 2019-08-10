@@ -1,0 +1,12 @@
+.mailmap
+.env
+bin/terraform-provider-sakuracloud*
+plugin.log
+terraform-provider-sakuracloud
+terraform.tfstate
+terraform.tfstate.backup
+build_docs/site
+terraform-for-sakuracloud-docker
+releases-terraform
+website_preview/
+vendor/
