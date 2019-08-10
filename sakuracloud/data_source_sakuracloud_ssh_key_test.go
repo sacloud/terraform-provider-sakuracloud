@@ -37,18 +37,7 @@ func TestAccSakuraCloudDataSourceSSHKey_Basic(t *testing.T) {
 				),
 			},
 			{
-				Config: testAccCheckSakuraCloudDataSourceSSHKey_NameSelector_Exists(name, randString1, randString2),
-				Check:  testAccCheckSakuraCloudSSHKeyDataSourceID("sakuracloud_ssh_key.foobar"),
-			},
-			{
 				Config: testAccCheckSakuraCloudDataSourceSSHKeyConfig_NotExists(name),
-				Check: resource.ComposeTestCheckFunc(
-					testAccCheckSakuraCloudSSHKeyDataSourceNotExists("data.sakuracloud_ssh_key.foobar"),
-				),
-				Destroy: true,
-			},
-			{
-				Config: testAccCheckSakuraCloudDataSourceSSHKey_NameSelector_NotExists,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckSakuraCloudSSHKeyDataSourceNotExists("data.sakuracloud_ssh_key.foobar"),
 				),
@@ -107,9 +96,9 @@ func testAccCheckSakuraCloudSSHKeyDataSourceDestroy(s *terraform.State) error {
 func testAccCheckSakuraCloudDataSourceSSHKeyBase(name string) string {
 	return fmt.Sprintf(`
 resource "sakuracloud_ssh_key" "foobar" {
-    name = "%s"
-    description = "description_test"
-    public_key = "%s"
+  name = "%s"
+  description = "description_test"
+  public_key = "%s"
 }`, name, testAccPublicKey)
 }
 
@@ -117,10 +106,9 @@ func testAccCheckSakuraCloudDataSourceSSHKeyConfig(name string) string {
 	return fmt.Sprintf(`
 %s
 data "sakuracloud_ssh_key" "foobar" {
-    filter {
-	name = "Name"
-	values = ["%s"]
-    }
+  filters {
+	names = ["%s"]
+  }
 }`, testAccCheckSakuraCloudDataSourceSSHKeyBase(name), name)
 }
 
@@ -128,22 +116,8 @@ func testAccCheckSakuraCloudDataSourceSSHKeyConfig_NotExists(name string) string
 	return fmt.Sprintf(`
 %s
 data "sakuracloud_ssh_key" "foobar" {
-    filter {
-	name = "Name"
-	values = ["xxxxxxxxxxxxxxxxxx"]
-    }
+  filters {
+	names = ["xxxxxxxxxxxxxxxxxx"]
+  }
 }`, testAccCheckSakuraCloudDataSourceSSHKeyBase(name))
 }
-
-func testAccCheckSakuraCloudDataSourceSSHKey_NameSelector_Exists(name, p1, p2 string) string {
-	return fmt.Sprintf(`
-%s
-data "sakuracloud_ssh_key" "foobar" {
-    name_selectors = ["%s", "%s"]
-}`, testAccCheckSakuraCloudDataSourceSSHKeyBase(name), p1, p2)
-}
-
-var testAccCheckSakuraCloudDataSourceSSHKey_NameSelector_NotExists = `
-data "sakuracloud_ssh_key" "foobar" {
-    name_selectors = ["xxxxxxxxxx"]
-}`

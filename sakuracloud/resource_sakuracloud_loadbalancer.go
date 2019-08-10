@@ -444,7 +444,7 @@ func setLoadBalancerResourceData(d *schema.ResourceData, client *APIClient, data
 	return nil
 }
 
-func expandLoadBalancerVIP(d resourceValueGetable) *sacloud.LoadBalancerSetting {
+func expandLoadBalancerVIP(d resourceValueGettable) *sacloud.LoadBalancerSetting {
 	var vip = &sacloud.LoadBalancerSetting{}
 
 	if v, ok := d.GetOk("vip"); ok {
@@ -472,7 +472,7 @@ func expandLoadBalancerVIP(d resourceValueGetable) *sacloud.LoadBalancerSetting 
 	return vip
 }
 
-func expandLoadBalancerServer(d resourceValueGetable) *sacloud.LoadBalancerServer {
+func expandLoadBalancerServer(d resourceValueGettable) *sacloud.LoadBalancerServer {
 
 	var server = &sacloud.LoadBalancerServer{}
 	if v, ok := d.GetOk("ipaddress"); ok {

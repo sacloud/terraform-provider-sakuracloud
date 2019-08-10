@@ -123,7 +123,7 @@ func vpcRouterRemoteAccessUserIDHash(routerID string, s *sacloud.VPCRouterRemote
 	return fmt.Sprintf("%d", hashcode.String(buf.String()))
 }
 
-func expandVPCRouterRemoteAccessUser(d resourceValueGetable) *sacloud.VPCRouterRemoteAccessUsersConfig {
+func expandVPCRouterRemoteAccessUser(d resourceValueGettable) *sacloud.VPCRouterRemoteAccessUsersConfig {
 
 	var remoteAccessUser = &sacloud.VPCRouterRemoteAccessUsersConfig{
 		UserName: d.Get("name").(string),

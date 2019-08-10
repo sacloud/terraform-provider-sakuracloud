@@ -1,10 +1,11 @@
 package sakuracloud
 
 import (
+	"context"
 	"fmt"
 
 	"github.com/hashicorp/terraform/helper/schema"
-	"github.com/sacloud/libsacloud/sacloud"
+	"github.com/sacloud/libsacloud/v2/sacloud"
 )
 
 func dataSourceSakuraCloudZone() *schema.Resource {
@@ -45,14 +46,19 @@ func dataSourceSakuraCloudZone() *schema.Resource {
 
 func dataSourceSakuraCloudZoneRead(d *schema.ResourceData, meta interface{}) error {
 	client := getSacloudAPIClient(d, meta)
+	zoneOp := sacloud.NewZoneOp(client)
+	ctx := context.Background()
+
 	zoneSlug := client.Zone
 	if v, ok := d.GetOk("name"); ok {
 		zoneSlug = v.(string)
 	}
 
-	res, err := client.GetZoneAPI().Find()
+	res, err := zoneOp.Find(ctx, &sacloud.FindCondition{
+		Count: defaultSearchLimit,
+	})
 	if err != nil {
-		return fmt.Errorf("Couldn't find SakuraCloud Zone resource: %s", err)
+		return fmt.Errorf("could not find SakuraCloud Zone resource: %s", err)
 	}
 	if res == nil || len(res.Zones) == 0 {
 		return filterNoResultErr()
@@ -61,7 +67,7 @@ func dataSourceSakuraCloudZoneRead(d *schema.ResourceData, meta interface{}) err
 
 	for _, z := range res.Zones {
 		if z.Name == zoneSlug {
-			data = &z
+			data = z
 			break
 		}
 	}
@@ -69,13 +75,13 @@ func dataSourceSakuraCloudZoneRead(d *schema.ResourceData, meta interface{}) err
 		return filterNoResultErr()
 	}
 
-	d.SetId(data.GetStrID())
-	d.Set("name", data.Name)
-	d.Set("zone_id", data.GetStrID())
-	d.Set("description", data.Description)
-	d.Set("region_id", data.Region.GetStrID())
-	d.Set("region_name", data.GetRegionName())
-	d.Set("dns_servers", data.Region.NameServers)
-
-	return nil
+	d.SetId(data.ID.String())
+	return setResourceData(d, map[string]interface{}{
+		"name":        data.Name,
+		"zone_id":     data.ID.String(),
+		"description": data.Description,
+		"region_id":   data.Region.ID.String(),
+		"region_name": data.Region.Name,
+		"dns_servers": data.Region.NameServers,
+	})
 }

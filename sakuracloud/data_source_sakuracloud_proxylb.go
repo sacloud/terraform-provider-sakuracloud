@@ -1,10 +1,11 @@
 package sakuracloud
 
 import (
+	"context"
 	"fmt"
 
 	"github.com/hashicorp/terraform/helper/schema"
-	"github.com/sacloud/libsacloud/sacloud"
+	"github.com/sacloud/libsacloud/v2/sacloud"
 )
 
 func dataSourceSakuraCloudProxyLB() *schema.Resource {
@@ -12,37 +13,7 @@ func dataSourceSakuraCloudProxyLB() *schema.Resource {
 		Read: dataSourceSakuraCloudProxyLBRead,
 
 		Schema: map[string]*schema.Schema{
-			"name_selectors": {
-				Type:     schema.TypeList,
-				Optional: true,
-				ForceNew: true,
-				Elem:     &schema.Schema{Type: schema.TypeString},
-			},
-			"tag_selectors": {
-				Type:     schema.TypeList,
-				Optional: true,
-				ForceNew: true,
-				Elem:     &schema.Schema{Type: schema.TypeString},
-			},
-			"filter": {
-				Type:     schema.TypeSet,
-				Optional: true,
-				ForceNew: true,
-				Elem: &schema.Resource{
-					Schema: map[string]*schema.Schema{
-						"name": {
-							Type:     schema.TypeString,
-							Required: true,
-						},
-
-						"values": {
-							Type:     schema.TypeList,
-							Required: true,
-							Elem:     &schema.Schema{Type: schema.TypeString},
-						},
-					},
-				},
-			},
+			filterAttrName: filterSchema(&filterSchemaOption{}),
 			"name": {
 				Type:     schema.TypeString,
 				Computed: true,
@@ -235,51 +206,128 @@ func dataSourceSakuraCloudProxyLB() *schema.Resource {
 
 func dataSourceSakuraCloudProxyLBRead(d *schema.ResourceData, meta interface{}) error {
 	client := getSacloudAPIClient(d, meta)
+	searcher := sacloud.NewProxyLBOp(client)
+	ctx := context.Background()
 
-	//filters
-	if rawFilter, filterOk := d.GetOk("filter"); filterOk {
-		filters := expandFilters(rawFilter)
-		for key, f := range filters {
-			client.ProxyLB.FilterBy(key, f)
-		}
+	findCondition := &sacloud.FindCondition{
+		Count: defaultSearchLimit,
+	}
+	if rawFilter, ok := d.GetOk(filterAttrName); ok {
+		findCondition.Filter = expandSearchFilter(rawFilter)
 	}
 
-	res, err := client.ProxyLB.Find()
+	res, err := searcher.Find(ctx, findCondition)
 	if err != nil {
-		return fmt.Errorf("Couldn't find SakuraCloud ProxyLB resource: %s", err)
+		return fmt.Errorf("could not find SakuraCloud ProxyLB resource: %s", err)
 	}
-	if res == nil || res.Count == 0 {
+	if res == nil || res.Count == 0 || len(res.ProxyLBs) == 0 {
 		return filterNoResultErr()
 	}
-	var data *sacloud.ProxyLB
-	targets := res.CommonServiceProxyLBItems
 
-	if rawNameSelector, ok := d.GetOk("name_selectors"); ok {
-		selectors := expandStringList(rawNameSelector.([]interface{}))
-		var filtered []sacloud.ProxyLB
-		for _, a := range targets {
-			if hasNames(&a, selectors) {
-				filtered = append(filtered, a)
-			}
+	targets := res.ProxyLBs
+	d.SetId(targets[0].ID.String())
+	return setProxyLBV2ResourceData(ctx, d, client, targets[0])
+}
+
+func setProxyLBV2ResourceData(ctx context.Context, d *schema.ResourceData, client *APIClient, data *sacloud.ProxyLB) error {
+	// bind ports
+	var bindPorts []map[string]interface{}
+	for _, bindPort := range data.BindPorts {
+		var headers []interface{}
+		for _, header := range bindPort.AddResponseHeader {
+			headers = append(headers, map[string]interface{}{
+				"header": header.Header,
+				"value":  header.Value,
+			})
 		}
-		targets = filtered
+
+		bindPorts = append(bindPorts, map[string]interface{}{
+			"proxy_mode":        bindPort.ProxyMode,
+			"port":              bindPort.Port,
+			"redirect_to_https": bindPort.RedirectToHTTPS,
+			"support_http2":     bindPort.SupportHTTP2,
+			"response_header":   headers,
+		})
 	}
-	if rawTagSelector, ok := d.GetOk("tag_selectors"); ok {
-		selectors := expandStringList(rawTagSelector.([]interface{}))
-		var filtered []sacloud.ProxyLB
-		for _, a := range targets {
-			if hasTags(&a, selectors) {
-				filtered = append(filtered, a)
-			}
+
+	//health_check
+	hc := data.HealthCheck
+	healthChecks := []map[string]interface{}{
+		{
+			"protocol":    hc.Protocol,
+			"delay_loop":  hc.DelayLoop,
+			"host_header": hc.Host,
+			"path":        hc.Path,
+		},
+	}
+
+	// sorry server
+	ss := data.SorryServer
+	var sorryServers []map[string]interface{}
+	if ss.IPAddress != "" {
+		sorryServers = append(sorryServers, map[string]interface{}{
+			"ipaddress": ss.IPAddress,
+			"port":      ss.Port,
+		})
+	}
+
+	// servers
+	var servers []map[string]interface{}
+	for _, server := range data.Servers {
+		servers = append(servers, map[string]interface{}{
+			"ipaddress": server.IPAddress,
+			"port":      server.Port,
+			"enabled":   server.Enabled,
+		})
+	}
+
+	// certificates
+	proxyLBOp := sacloud.NewProxyLBOp(client)
+	cert, err := proxyLBOp.GetCertificates(ctx, data.ID)
+	if err != nil {
+		// even if certificate is deleted, it will not result in an error
+		return err
+	}
+
+	proxylbCert := map[string]interface{}{
+		"server_cert":       cert.ServerCertificate,
+		"intermediate_cert": cert.IntermediateCertificate,
+		"private_key":       cert.PrivateKey,
+		//"common_name":       cert.CertificateCommonName,
+		//"end_date":          cert.CertificateEndDate.Format(time.RFC3339),
+	}
+	if len(cert.AdditionalCerts) > 0 {
+		var certs []interface{}
+		for _, cert := range cert.AdditionalCerts {
+			certs = append(certs, map[string]interface{}{
+				"server_cert":       cert.ServerCertificate,
+				"intermediate_cert": cert.IntermediateCertificate,
+				"private_key":       cert.PrivateKey,
+				//"common_name":       cert.CertificateCommonName,
+				//"end_date":          cert.CertificateEndDate.Format(time.RFC3339),
+			})
 		}
-		targets = filtered
+		proxylbCert["additional_certificates"] = certs
+	} else {
+		proxylbCert["additional_certificates"] = []interface{}{}
 	}
 
-	if len(targets) == 0 {
-		return filterNoResultErr()
-	}
-	data = &targets[0]
+	return setResourceData(d, map[string]interface{}{
+		"name":           data.Name,
+		"plan":           int(data.Plan),
+		"vip_failover":   data.UseVIPFailover,
+		"sticky_session": data.StickySession.Enabled,
+		"bind_ports":     bindPorts,
+		"health_check":   healthChecks,
+		"sorry_server":   sorryServers,
+		"servers":        servers,
+		"fqdn":           data.FQDN,
+		"vip":            data.VirtualIPAddress,
+		"proxy_networks": data.ProxyNetworks,
+		"icon_id":        data.IconID.String(),
+		"description":    data.Description,
+		"tags":           data.Tags,
+		"certificate":    []interface{}{proxylbCert},
+	})
 
-	d.SetId(data.GetStrID())
-	return setProxyLBResourceData(d, client, data)
 }

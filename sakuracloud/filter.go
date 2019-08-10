@@ -6,7 +6,66 @@ import (
 	"strings"
 
 	"github.com/hashicorp/terraform/helper/resource"
+	"github.com/hashicorp/terraform/helper/schema"
 )
+
+const filterAttrName = "filters"
+
+type filterSchemaOption struct {
+	excludeTags bool
+}
+
+func filterSchema(opt *filterSchemaOption) *schema.Schema {
+	if opt == nil {
+		opt = &filterSchemaOption{}
+	}
+	s := map[string]*schema.Schema{
+		"id": {
+			Type:     schema.TypeString,
+			Optional: true,
+		},
+		"names": {
+			Type:     schema.TypeList,
+			Optional: true,
+			Elem:     &schema.Schema{Type: schema.TypeString},
+		},
+		"tags": {
+			Type:     schema.TypeList,
+			Optional: true,
+			Elem:     &schema.Schema{Type: schema.TypeString},
+		},
+		"conditions": {
+			Type:     schema.TypeList,
+			Optional: true,
+			Elem: &schema.Resource{
+				Schema: map[string]*schema.Schema{
+					"name": {
+						Type:     schema.TypeString,
+						Required: true,
+					},
+
+					"values": {
+						Type:     schema.TypeList,
+						Required: true,
+						Elem:     &schema.Schema{Type: schema.TypeString},
+					},
+				},
+			},
+		},
+	}
+	if opt.excludeTags {
+		delete(s, "tags")
+	}
+	return &schema.Schema{
+		Type:     schema.TypeList,
+		Optional: true,
+		MaxItems: 1,
+		MinItems: 1,
+		Elem: &schema.Resource{
+			Schema: s,
+		},
+	}
+}
 
 var filterNoResultMessage = "Your query returned no results. Please change your filters or selectors and try again"
 

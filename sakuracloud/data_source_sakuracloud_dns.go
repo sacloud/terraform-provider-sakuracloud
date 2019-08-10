@@ -1,10 +1,12 @@
 package sakuracloud
 
 import (
+	"context"
 	"fmt"
+	"strings"
 
 	"github.com/hashicorp/terraform/helper/schema"
-	"github.com/sacloud/libsacloud/sacloud"
+	"github.com/sacloud/libsacloud/v2/sacloud"
 )
 
 func dataSourceSakuraCloudDNS() *schema.Resource {
@@ -12,37 +14,7 @@ func dataSourceSakuraCloudDNS() *schema.Resource {
 		Read: dataSourceSakuraCloudDNSRead,
 
 		Schema: map[string]*schema.Schema{
-			"name_selectors": {
-				Type:     schema.TypeList,
-				Optional: true,
-				ForceNew: true,
-				Elem:     &schema.Schema{Type: schema.TypeString},
-			},
-			"tag_selectors": {
-				Type:     schema.TypeList,
-				Optional: true,
-				ForceNew: true,
-				Elem:     &schema.Schema{Type: schema.TypeString},
-			},
-			"filter": {
-				Type:     schema.TypeSet,
-				Optional: true,
-				ForceNew: true,
-				Elem: &schema.Resource{
-					Schema: map[string]*schema.Schema{
-						"name": {
-							Type:     schema.TypeString,
-							Required: true,
-						},
-
-						"values": {
-							Type:     schema.TypeList,
-							Required: true,
-							Elem:     &schema.Schema{Type: schema.TypeString},
-						},
-					},
-				},
-			},
+			filterAttrName: filterSchema(&filterSchemaOption{}),
 			"zone": {
 				Type:     schema.TypeString,
 				Computed: true,
@@ -66,57 +38,112 @@ func dataSourceSakuraCloudDNS() *schema.Resource {
 				Computed: true,
 				Elem:     &schema.Schema{Type: schema.TypeString},
 			},
+			"records": {
+				Type:     schema.TypeList,
+				Computed: true,
+				Elem: &schema.Resource{
+					Schema: map[string]*schema.Schema{
+						"name": {
+							Type:     schema.TypeString,
+							Computed: true,
+						},
+						"type": {
+							Type:     schema.TypeString,
+							Computed: true,
+						},
+						"value": {
+							Type:     schema.TypeString,
+							Computed: true,
+						},
+						"ttl": {
+							Type:     schema.TypeInt,
+							Computed: true,
+						},
+						"priority": {
+							Type:     schema.TypeInt,
+							Computed: true,
+						},
+						"weight": {
+							Type:     schema.TypeInt,
+							Computed: true,
+						},
+						"port": {
+							Type:     schema.TypeInt,
+							Computed: true,
+						},
+					},
+				},
+			},
 		},
 	}
 }
 
 func dataSourceSakuraCloudDNSRead(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*APIClient)
+	client := getSacloudAPIClient(d, meta)
+	searcher := sacloud.NewDNSOp(client)
+	ctx := context.Background()
 
-	//filters
-	if rawFilter, filterOk := d.GetOk("filter"); filterOk {
-		filters := expandFilters(rawFilter)
-		for key, f := range filters {
-			client.DNS.FilterBy(key, f)
-		}
+	findCondition := &sacloud.FindCondition{
+		Count: defaultSearchLimit,
+	}
+	if rawFilter, ok := d.GetOk(filterAttrName); ok {
+		findCondition.Filter = expandSearchFilter(rawFilter)
 	}
 
-	res, err := client.DNS.Find()
+	res, err := searcher.Find(ctx, findCondition)
 	if err != nil {
-		return fmt.Errorf("Couldn't find SakuraCloud DNS resource: %s", err)
+		return fmt.Errorf("could not find SakuraCloud Disk resource: %s", err)
 	}
-	if res == nil || res.Count == 0 {
+	if res == nil || res.Count == 0 || len(res.DNS) == 0 {
 		return filterNoResultErr()
 	}
-	var data *sacloud.DNS
-	targets := res.CommonServiceDNSItems
 
-	if rawNameSelector, ok := d.GetOk("name_selectors"); ok {
-		selectors := expandStringList(rawNameSelector.([]interface{}))
-		var filtered []sacloud.DNS
-		for _, a := range targets {
-			if hasNames(&a, selectors) {
-				filtered = append(filtered, a)
-			}
-		}
-		targets = filtered
-	}
-	if rawTagSelector, ok := d.GetOk("tag_selectors"); ok {
-		selectors := expandStringList(rawTagSelector.([]interface{}))
-		var filtered []sacloud.DNS
-		for _, a := range targets {
-			if hasTags(&a, selectors) {
-				filtered = append(filtered, a)
-			}
-		}
-		targets = filtered
+	targets := res.DNS
+	d.SetId(targets[0].ID.String())
+	return setDNSV2ResourceData(ctx, d, client, targets[0])
+}
+
+func setDNSV2ResourceData(ctx context.Context, d *schema.ResourceData, client *APIClient, data *sacloud.DNS) error {
+	var records []interface{}
+	for _, record := range data.Records {
+		records = append(records, v2DNSRecordToState(record))
 	}
 
-	if len(targets) == 0 {
-		return filterNoResultErr()
-	}
-	data = &targets[0]
+	return setResourceData(d, map[string]interface{}{
+		"zone":        data.Name,
+		"icon_id":     data.IconID.String(),
+		"description": data.Description,
+		"tags":        data.Tags,
+		"dns_servers": data.DNSNameServers,
+		"records":     records,
+	})
+}
 
-	d.SetId(data.GetStrID())
-	return setDNSResourceData(d, client, data)
+func v2DNSRecordToState(record *sacloud.DNSRecord) map[string]interface{} {
+	var r = map[string]interface{}{
+		"name":  record.Name,
+		"type":  record.Type,
+		"value": record.RData,
+		"ttl":   record.TTL,
+	}
+
+	switch record.Type {
+	case "MX":
+		// ex. record.RData = "10 example.com."
+		values := strings.SplitN(record.RData, " ", 2)
+		r["value"] = values[1]
+		r["priority"] = values[0]
+	case "SRV":
+		values := strings.SplitN(record.RData, " ", 4)
+		r["value"] = values[3]
+		r["priority"] = values[0]
+		r["weight"] = values[1]
+		r["port"] = values[2]
+	default:
+		r["priority"] = ""
+		r["weight"] = ""
+		r["port"] = ""
+	}
+
+	return r
 }

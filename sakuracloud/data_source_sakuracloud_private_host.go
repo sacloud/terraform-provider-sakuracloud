@@ -1,10 +1,11 @@
 package sakuracloud
 
 import (
+	"context"
 	"fmt"
 
 	"github.com/hashicorp/terraform/helper/schema"
-	"github.com/sacloud/libsacloud/sacloud"
+	"github.com/sacloud/libsacloud/v2/sacloud"
 )
 
 func dataSourceSakuraCloudPrivateHost() *schema.Resource {
@@ -12,38 +13,12 @@ func dataSourceSakuraCloudPrivateHost() *schema.Resource {
 		Read: dataSourceSakuraCloudPrivateHostRead,
 
 		Schema: map[string]*schema.Schema{
-			"name_selectors": {
-				Type:     schema.TypeList,
-				Optional: true,
-				ForceNew: true,
-				Elem:     &schema.Schema{Type: schema.TypeString},
-			},
-			"tag_selectors": {
-				Type:     schema.TypeList,
-				Optional: true,
-				ForceNew: true,
-				Elem:     &schema.Schema{Type: schema.TypeString},
-			},
-			"filter": {
-				Type:     schema.TypeSet,
-				Optional: true,
-				ForceNew: true,
-				Elem: &schema.Resource{
-					Schema: map[string]*schema.Schema{
-						"name": {
-							Type:     schema.TypeString,
-							Required: true,
-						},
-
-						"values": {
-							Type:     schema.TypeList,
-							Required: true,
-							Elem:     &schema.Schema{Type: schema.TypeString},
-						},
-					},
-				},
-			},
+			filterAttrName: filterSchema(&filterSchemaOption{}),
 			"name": {
+				Type:     schema.TypeString,
+				Computed: true,
+			},
+			"icon_id": {
 				Type:     schema.TypeString,
 				Computed: true,
 			},
@@ -82,52 +57,41 @@ func dataSourceSakuraCloudPrivateHost() *schema.Resource {
 
 func dataSourceSakuraCloudPrivateHostRead(d *schema.ResourceData, meta interface{}) error {
 	client := getSacloudAPIClient(d, meta)
+	searcher := sacloud.NewPrivateHostOp(client)
+	ctx := context.Background()
+	zone := getV2Zone(d, client)
 
-	//filters
-	if rawFilter, filterOk := d.GetOk("filter"); filterOk {
-		filters := expandFilters(rawFilter)
-		for key, f := range filters {
-			client.PrivateHost.FilterBy(key, f)
-		}
+	findCondition := &sacloud.FindCondition{
+		Count: defaultSearchLimit,
+	}
+	if rawFilter, ok := d.GetOk(filterAttrName); ok {
+		findCondition.Filter = expandSearchFilter(rawFilter)
 	}
 
-	res, err := client.PrivateHost.Find()
+	res, err := searcher.Find(ctx, zone, findCondition)
 	if err != nil {
-		return fmt.Errorf("Couldn't find SakuraCloud PrivateHost resource: %s", err)
+		return fmt.Errorf("could not find SakuraCloud PrivateHost resource: %s", err)
 	}
-	if res == nil || res.Count == 0 {
+	if res == nil || res.Count == 0 || len(res.PrivateHosts) == 0 {
 		return filterNoResultErr()
 	}
 
-	var data *sacloud.PrivateHost
 	targets := res.PrivateHosts
+	d.SetId(targets[0].ID.String())
+	return setPrivateHostV2ResourceData(ctx, d, client, targets[0])
+}
 
-	if rawNameSelector, ok := d.GetOk("name_selectors"); ok {
-		selectors := expandStringList(rawNameSelector.([]interface{}))
-		var filtered []sacloud.PrivateHost
-		for _, a := range targets {
-			if hasNames(&a, selectors) {
-				filtered = append(filtered, a)
-			}
-		}
-		targets = filtered
-	}
-	if rawTagSelector, ok := d.GetOk("tag_selectors"); ok {
-		selectors := expandStringList(rawTagSelector.([]interface{}))
-		var filtered []sacloud.PrivateHost
-		for _, a := range targets {
-			if hasTags(&a, selectors) {
-				filtered = append(filtered, a)
-			}
-		}
-		targets = filtered
-	}
+func setPrivateHostV2ResourceData(ctx context.Context, d *schema.ResourceData, client *APIClient, data *sacloud.PrivateHost) error {
+	setPowerManageTimeoutValueToState(d)
 
-	if len(targets) == 0 {
-		return filterNoResultErr()
-	}
-	data = &targets[0]
-
-	d.SetId(data.GetStrID())
-	return setPrivateHostResourceData(d, client, data)
+	return setResourceData(d, map[string]interface{}{
+		"name":            data.Name,
+		"icon_id":         data.IconID.String(),
+		"description":     data.Description,
+		"tags":            data.Tags,
+		"hostname":        data.HostName,
+		"assigned_core":   data.AssignedCPU,
+		"assigned_memory": data.GetAssignedMemoryGB(),
+		"zone":            client.Zone,
+	})
 }

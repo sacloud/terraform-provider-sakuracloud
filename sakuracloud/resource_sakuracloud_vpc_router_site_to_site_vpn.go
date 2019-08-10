@@ -162,7 +162,7 @@ func vpcRouterSiteToSiteIPsecVPNIDHash(routerID string, s *sacloud.VPCRouterSite
 	return fmt.Sprintf("%d", hashcode.String(buf.String()))
 }
 
-func expandVPCRouterSiteToSiteIPsecVPN(d resourceValueGetable) *sacloud.VPCRouterSiteToSiteIPsecVPNConfig {
+func expandVPCRouterSiteToSiteIPsecVPN(d resourceValueGettable) *sacloud.VPCRouterSiteToSiteIPsecVPNConfig {
 
 	var s2sIPsecVPN = &sacloud.VPCRouterSiteToSiteIPsecVPNConfig{
 		Peer:            d.Get("peer").(string),

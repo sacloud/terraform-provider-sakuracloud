@@ -45,18 +45,6 @@ func TestAccSakuraCloudDataSourceVPCRouter_Basic(t *testing.T) {
 				),
 			},
 			{
-				Config: testAccCheckSakuraCloudDataSourceVPCRouter_NameSelector_Exists(name, randString1, randString2),
-				Check: resource.ComposeTestCheckFunc(
-					testAccCheckSakuraCloudVPCRouterDataSourceID("data.sakuracloud_vpc_router.foobar"),
-				),
-			},
-			{
-				Config: testAccCheckSakuraCloudDataSourceVPCRouter_TagSelector_Exists(name),
-				Check: resource.ComposeTestCheckFunc(
-					testAccCheckSakuraCloudVPCRouterDataSourceID("data.sakuracloud_vpc_router.foobar"),
-				),
-			},
-			{
 				Config: testAccCheckSakuraCloudDataSourceVPCRouterConfig_NotExists(name),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckSakuraCloudVPCRouterDataSourceNotExists("data.sakuracloud_vpc_router.foobar"),
@@ -65,20 +53,6 @@ func TestAccSakuraCloudDataSourceVPCRouter_Basic(t *testing.T) {
 			},
 			{
 				Config: testAccCheckSakuraCloudDataSourceVPCRouterConfig_With_NotExists_Tag(name),
-				Check: resource.ComposeTestCheckFunc(
-					testAccCheckSakuraCloudVPCRouterDataSourceNotExists("data.sakuracloud_vpc_router.foobar"),
-				),
-				Destroy: true,
-			},
-			{
-				Config: testAccCheckSakuraCloudDataSourceVPCRouter_NameSelector_NotExists,
-				Check: resource.ComposeTestCheckFunc(
-					testAccCheckSakuraCloudVPCRouterDataSourceNotExists("data.sakuracloud_vpc_router.foobar"),
-				),
-				Destroy: true,
-			},
-			{
-				Config: testAccCheckSakuraCloudDataSourceVPCRouter_TagSelector_NotExists,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckSakuraCloudVPCRouterDataSourceNotExists("data.sakuracloud_vpc_router.foobar"),
 				),
@@ -137,11 +111,11 @@ func testAccCheckSakuraCloudVPCRouterDataSourceDestroy(s *terraform.State) error
 func testAccCheckSakuraCloudDataSourceVPCRouterBase(name string) string {
 	return fmt.Sprintf(`
 resource sakuracloud_vpc_router "foobar" {
-    plan = "standard"
+  plan = "standard"
 
-    name = "%s"
-    description = "description_test"
-    tags = ["tag1","tag2","tag3"]
+  name = "%s"
+  description = "description_test"
+  tags = ["tag1","tag2","tag3"]
 }
 `, name)
 }
@@ -149,106 +123,63 @@ resource sakuracloud_vpc_router "foobar" {
 func testAccCheckSakuraCloudDataSourceVPCRouterConfig(name string) string {
 	return fmt.Sprintf(`
 resource sakuracloud_vpc_router "foobar" {
-    plan = "standard"
+  plan = "standard"
 
-    name = "%s"
-    description = "description_test"
-    tags = ["tag1","tag2","tag3"]
+  name = "%s"
+  description = "description_test"
+  tags = ["tag1","tag2","tag3"]
 }
 data "sakuracloud_vpc_router" "foobar" {
-    filter {
-	name = "Name"
-	values = ["%s"]
-    }
+  filters {
+	names = ["%s"]
+  }
 }`, name, name)
 }
 
 func testAccCheckSakuraCloudDataSourceVPCRouterConfig_With_Tag(name string) string {
 	return fmt.Sprintf(`
 resource sakuracloud_vpc_router "foobar" {
-    plan = "standard"
+  plan = "standard"
 
-    name = "%s"
-    description = "description_test"
-    tags = ["tag1","tag2","tag3"]
+  name = "%s"
+  description = "description_test"
+  tags = ["tag1","tag2","tag3"]
 }
 data "sakuracloud_vpc_router" "foobar" {
-    filter {
-	name = "Tags"
-	values = ["tag1","tag3"]
-    }
+  filters {
+	tags = ["tag1","tag3"]
+  }
 }`, name)
 }
 
 func testAccCheckSakuraCloudDataSourceVPCRouterConfig_With_NotExists_Tag(name string) string {
 	return fmt.Sprintf(`
 resource sakuracloud_vpc_router "foobar" {
-    plan = "standard"
+  plan = "standard"
 
-    name = "%s"
-    description = "description_test"
-    tags = ["tag1","tag2","tag3"]
+  name = "%s"
+  description = "description_test"
+  tags = ["tag1","tag2","tag3"]
 }
 data "sakuracloud_vpc_router" "foobar" {
-    filter {
-	name = "Tags"
-	values = ["tag1-xxxxxxx","tag3-xxxxxxxx"]
-    }
+  filters {
+	tags = ["tag1-xxxxxxx","tag3-xxxxxxxx"]
+  }
 }`, name)
 }
 
 func testAccCheckSakuraCloudDataSourceVPCRouterConfig_NotExists(name string) string {
 	return fmt.Sprintf(`
 resource sakuracloud_vpc_router "foobar" {
-    plan = "standard"
+  plan = "standard"
 
-    name = "%s"
-    description = "description_test"
-    tags = ["tag1","tag2","tag3"]
+  name = "%s"
+  description = "description_test"
+  tags = ["tag1","tag2","tag3"]
 }
 data "sakuracloud_vpc_router" "foobar" {
-    filter {
-	name = "Name"
-	values = ["xxxxxxxxxxxxxxxxxx"]
-    }
+  filters {
+	names = ["xxxxxxxxxxxxxxxxxx"]
+  }
 }`, name)
 }
-
-func testAccCheckSakuraCloudDataSourceVPCRouter_NameSelector_Exists(name, p1, p2 string) string {
-	return fmt.Sprintf(`
-resource sakuracloud_vpc_router "foobar" {
-    plan = "standard"
-
-    name = "%s"
-    description = "description_test"
-    tags = ["tag1","tag2","tag3"]
-}
-data "sakuracloud_vpc_router" "foobar" {
-    name_selectors = ["%s", "%s"]
-}`, name, p1, p2)
-}
-
-var testAccCheckSakuraCloudDataSourceVPCRouter_NameSelector_NotExists = `
-data "sakuracloud_vpc_router" "foobar" {
-    name_selectors = ["xxxxxxxxxx"]
-}
-`
-
-func testAccCheckSakuraCloudDataSourceVPCRouter_TagSelector_Exists(name string) string {
-	return fmt.Sprintf(`
-resource sakuracloud_vpc_router "foobar" {
-    plan = "standard"
-
-    name = "%s"
-    description = "description_test"
-    tags = ["tag1","tag2","tag3"]
-}
-data "sakuracloud_vpc_router" "foobar" {
-	tag_selectors = ["tag1","tag2","tag3"]
-}`, name)
-}
-
-var testAccCheckSakuraCloudDataSourceVPCRouter_TagSelector_NotExists = `
-data "sakuracloud_vpc_router" "foobar" {
-	tag_selectors = ["xxxxxxxxxx"]
-}`

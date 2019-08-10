@@ -47,18 +47,6 @@ func TestAccSakuraCloudDataSourceSimpleMonitor_Basic(t *testing.T) {
 				),
 			},
 			{
-				Config: testAccCheckSakuraCloudDataSourceSimpleMonitor_NameSelector_Exists(target, randString1, randString2),
-				Check: resource.ComposeTestCheckFunc(
-					testAccCheckSakuraCloudSimpleMonitorDataSourceID("data.sakuracloud_simple_monitor.foobar"),
-				),
-			},
-			{
-				Config: testAccCheckSakuraCloudDataSourceSimpleMonitor_TagSelector_Exists(target),
-				Check: resource.ComposeTestCheckFunc(
-					testAccCheckSakuraCloudSimpleMonitorDataSourceID("data.sakuracloud_simple_monitor.foobar"),
-				),
-			},
-			{
 				Config: testAccCheckSakuraCloudDataSourceSimpleMonitorConfig_NotExists(target),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckSakuraCloudSimpleMonitorDataSourceNotExists("data.sakuracloud_simple_monitor.foobar"),
@@ -67,20 +55,6 @@ func TestAccSakuraCloudDataSourceSimpleMonitor_Basic(t *testing.T) {
 			},
 			{
 				Config: testAccCheckSakuraCloudDataSourceSimpleMonitorConfig_With_NotExists_Tag(target),
-				Check: resource.ComposeTestCheckFunc(
-					testAccCheckSakuraCloudSimpleMonitorDataSourceNotExists("data.sakuracloud_simple_monitor.foobar"),
-				),
-				Destroy: true,
-			},
-			{
-				Config: testAccCheckSakuraCloudDataSourceSimpleMonitor_NameSelector_NotExists,
-				Check: resource.ComposeTestCheckFunc(
-					testAccCheckSakuraCloudSimpleMonitorDataSourceNotExists("data.sakuracloud_simple_monitor.foobar"),
-				),
-				Destroy: true,
-			},
-			{
-				Config: testAccCheckSakuraCloudDataSourceSimpleMonitor_TagSelector_NotExists,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckSakuraCloudSimpleMonitorDataSourceNotExists("data.sakuracloud_simple_monitor.foobar"),
 				),
@@ -139,19 +113,19 @@ func testAccCheckSakuraCloudSimpleMonitorDataSourceDestroy(s *terraform.State) e
 func testAccCheckSakuraCloudDataSourceSimpleMonitorBase(target string) string {
 	return fmt.Sprintf(`
 resource "sakuracloud_simple_monitor" "foobar" {
-    target = "%s"
-    health_check {
-        protocol = "http"
-        delay_loop = 60
-        path = "/"
-        status = "200"
-        host_header = "sakuracloud.com"
-    }
-    description = "description_test"
-    tags = ["tag1","tag2","tag3"]
-    notify_email_enabled = true
-    notify_slack_enabled = true
-    notify_slack_webhook = "%s"
+  target = "%s"
+  health_check {
+      protocol = "http"
+      delay_loop = 60
+      path = "/"
+      status = 200
+      host_header = "sakuracloud.com"
+  }
+  description = "description_test"
+  tags = ["tag1","tag2","tag3"]
+  notify_email_enabled = true
+  notify_slack_enabled = true
+  notify_slack_webhook = "%s"
 }`, target, testAccSlackWebhook)
 }
 
@@ -159,10 +133,9 @@ func testAccCheckSakuraCloudDataSourceSimpleMonitorConfig(target string) string 
 	return fmt.Sprintf(`
 %s
 data "sakuracloud_simple_monitor" "foobar" {
-    filter {
-	name = "Name"
-	values = ["%s"]
-    }
+  filters {
+	names = ["%s"]
+  }
 }`, testAccCheckSakuraCloudDataSourceSimpleMonitorBase(target), target)
 }
 
@@ -170,10 +143,9 @@ func testAccCheckSakuraCloudDataSourceSimpleMonitorConfig_With_Tag(target string
 	return fmt.Sprintf(`
 %s
 data "sakuracloud_simple_monitor" "foobar" {
-    filter {
-	name = "Tags"
-	values = ["tag1","tag3"]
-    }
+  filters {
+	tags = ["tag1","tag3"]
+  }
 }`, testAccCheckSakuraCloudDataSourceSimpleMonitorBase(target))
 }
 
@@ -181,10 +153,9 @@ func testAccCheckSakuraCloudDataSourceSimpleMonitorConfig_With_NotExists_Tag(tar
 	return fmt.Sprintf(`
 %s
 data "sakuracloud_simple_monitor" "foobar" {
-    filter {
-	name = "Tags"
-	values = ["tag1-xxxxxxx","tag3-xxxxxxxx"]
-    }
+  filters {
+	tags = ["tag1-xxxxxxx","tag3-xxxxxxxx"]
+  }
 }`, testAccCheckSakuraCloudDataSourceSimpleMonitorBase(target))
 }
 
@@ -192,35 +163,8 @@ func testAccCheckSakuraCloudDataSourceSimpleMonitorConfig_NotExists(target strin
 	return fmt.Sprintf(`
 %s
 data "sakuracloud_simple_monitor" "foobar" {
-    filter {
-	name = "Name"
-	values = ["xxxxxxxxxxxxxxxxxx"]
-    }
+  filters {
+	names = ["xxxxxxxxxxxxxxxxxx"]
+  }
 }`, testAccCheckSakuraCloudDataSourceSimpleMonitorBase(target))
 }
-
-func testAccCheckSakuraCloudDataSourceSimpleMonitor_NameSelector_Exists(target, p1, p2 string) string {
-	return fmt.Sprintf(`
-%s
-data "sakuracloud_simple_monitor" "foobar" {
-    name_selectors = ["%s", "%s"]
-}`, testAccCheckSakuraCloudDataSourceSimpleMonitorBase(target), p1, p2)
-}
-
-var testAccCheckSakuraCloudDataSourceSimpleMonitor_NameSelector_NotExists = `
-data "sakuracloud_simple_monitor" "foobar" {
-    name_selectors = ["xxxxxxxxxx"]
-}`
-
-func testAccCheckSakuraCloudDataSourceSimpleMonitor_TagSelector_Exists(target string) string {
-	return fmt.Sprintf(`
-%s
-data "sakuracloud_simple_monitor" "foobar" {
-	tag_selectors = ["tag1","tag2","tag3"]
-}`, testAccCheckSakuraCloudDataSourceSimpleMonitorBase(target))
-}
-
-var testAccCheckSakuraCloudDataSourceSimpleMonitor_TagSelector_NotExists = `
-data "sakuracloud_simple_monitor" "foobar" {
-	tag_selectors = ["xxxxxxxxxx"]
-}`

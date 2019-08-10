@@ -91,51 +91,51 @@ func testAccCheckSakuraCloudSubnetDataSourceDestroy(s *terraform.State) error {
 
 var testAccCheckSakuraCloudDataSourceSubnetBase = `
 resource sakuracloud_internet "foobar" {
-    name = "subnet_test"
+  name = "subnet_test"
 }
 resource "sakuracloud_subnet" "foobar" {
-    internet_id = "${sakuracloud_internet.foobar.id}"
-    next_hop = "${sakuracloud_internet.foobar.ipaddresses[0]}"
+  internet_id = "${sakuracloud_internet.foobar.id}"
+  next_hop = "${sakuracloud_internet.foobar.ipaddresses[0]}"
 }
 resource "sakuracloud_subnet" "foobar2" {
-    internet_id = "${sakuracloud_internet.foobar.id}"
-    next_hop = "${sakuracloud_internet.foobar.ipaddresses[1]}"
+  internet_id = "${sakuracloud_internet.foobar.id}"
+  next_hop = "${sakuracloud_internet.foobar.ipaddresses[1]}"
 }
 `
 
 var testAccCheckSakuraCloudDataSourceSubnetConfig = `
 resource sakuracloud_internet "foobar" {
-    name = "subnet_test"
+  name = "subnet_test"
 }
 resource "sakuracloud_subnet" "foobar" {
-    internet_id = "${sakuracloud_internet.foobar.id}"
-    next_hop = "${sakuracloud_internet.foobar.ipaddresses[0]}"
+  internet_id = "${sakuracloud_internet.foobar.id}"
+  next_hop = "${sakuracloud_internet.foobar.ipaddresses[0]}"
 }
 resource "sakuracloud_subnet" "foobar2" {
-    internet_id = "${sakuracloud_internet.foobar.id}"
-    next_hop = "${sakuracloud_internet.foobar.ipaddresses[1]}"
+  internet_id = "${sakuracloud_internet.foobar.id}"
+  next_hop = "${sakuracloud_internet.foobar.ipaddresses[1]}"
 }
 
 data sakuracloud_subnet "foobar" {
-    internet_id = "${sakuracloud_internet.foobar.id}"
-    index = 1
+  internet_id = "${sakuracloud_internet.foobar.id}"
+  index = 1
 }
 `
 
 var testAccCheckSakuraCloudDataSourceSubnetConfig_NotExists = `
 resource sakuracloud_internet "foobar" {
-    name = "subnet_test"
+  name = "subnet_test"
 }
 resource "sakuracloud_subnet" "foobar" {
-    internet_id = "${sakuracloud_internet.foobar.id}"
-    next_hop = "${sakuracloud_internet.foobar.ipaddresses[0]}"
+  internet_id = "${sakuracloud_internet.foobar.id}"
+  next_hop = "${sakuracloud_internet.foobar.ipaddresses[0]}"
 }
 resource "sakuracloud_subnet" "foobar2" {
-    internet_id = "${sakuracloud_internet.foobar.id}"
-    next_hop = "${sakuracloud_internet.foobar.ipaddresses[1]}"
+  internet_id = "${sakuracloud_internet.foobar.id}"
+  next_hop = "${sakuracloud_internet.foobar.ipaddresses[1]}"
 }
 data sakuracloud_subnet "foobar" {
-    internet_id = "${sakuracloud_internet.foobar.id}"
-    index = 2
+  internet_id = "${sakuracloud_internet.foobar.id}"
+  index = 2
 }
 `

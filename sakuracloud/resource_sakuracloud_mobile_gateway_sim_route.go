@@ -152,7 +152,7 @@ func mgwSIMRouteIDHash(mgwID string, s *sacloud.MobileGatewaySIMRoute) string {
 	return fmt.Sprintf("%d", hashcode.String(buf.String()))
 }
 
-func expandMobileGatewaySIMRoute(d resourceValueGetable) *sacloud.MobileGatewaySIMRoute {
+func expandMobileGatewaySIMRoute(d resourceValueGettable) *sacloud.MobileGatewaySIMRoute {
 
 	var simRoute = &sacloud.MobileGatewaySIMRoute{
 		Prefix:     d.Get("prefix").(string),

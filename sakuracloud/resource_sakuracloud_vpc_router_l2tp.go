@@ -121,7 +121,7 @@ func vpcRouterL2TPIDHash(routerID string, s *sacloud.VPCRouterL2TPIPsecServer) s
 	return fmt.Sprintf("%d", hashcode.String(buf.String()))
 }
 
-func expandVPCRouterL2TP(d resourceValueGetable) *sacloud.VPCRouterL2TPIPsecServerConfig {
+func expandVPCRouterL2TP(d resourceValueGettable) *sacloud.VPCRouterL2TPIPsecServerConfig {
 
 	var l2tpSetting = &sacloud.VPCRouterL2TPIPsecServerConfig{
 		PreSharedSecret: d.Get("pre_shared_secret").(string),

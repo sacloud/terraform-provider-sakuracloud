@@ -1,10 +1,13 @@
 package sakuracloud
 
 import (
+	"context"
 	"fmt"
 
 	"github.com/hashicorp/terraform/helper/schema"
-	"github.com/sacloud/libsacloud/sacloud"
+	"github.com/sacloud/libsacloud/v2/sacloud"
+	"github.com/sacloud/libsacloud/v2/sacloud/types"
+	"github.com/sacloud/libsacloud/v2/utils/nfs"
 )
 
 func dataSourceSakuraCloudNFS() *schema.Resource {
@@ -12,37 +15,7 @@ func dataSourceSakuraCloudNFS() *schema.Resource {
 		Read: dataSourceSakuraCloudNFSRead,
 
 		Schema: map[string]*schema.Schema{
-			"name_selectors": {
-				Type:     schema.TypeList,
-				Optional: true,
-				ForceNew: true,
-				Elem:     &schema.Schema{Type: schema.TypeString},
-			},
-			"tag_selectors": {
-				Type:     schema.TypeList,
-				Optional: true,
-				ForceNew: true,
-				Elem:     &schema.Schema{Type: schema.TypeString},
-			},
-			"filter": {
-				Type:     schema.TypeSet,
-				Optional: true,
-				ForceNew: true,
-				Elem: &schema.Resource{
-					Schema: map[string]*schema.Schema{
-						"name": {
-							Type:     schema.TypeString,
-							Required: true,
-						},
-
-						"values": {
-							Type:     schema.TypeList,
-							Required: true,
-							Elem:     &schema.Schema{Type: schema.TypeString},
-						},
-					},
-				},
-			},
+			filterAttrName: filterSchema(&filterSchemaOption{}),
 			"name": {
 				Type:     schema.TypeString,
 				Computed: true,
@@ -98,51 +71,64 @@ func dataSourceSakuraCloudNFS() *schema.Resource {
 
 func dataSourceSakuraCloudNFSRead(d *schema.ResourceData, meta interface{}) error {
 	client := getSacloudAPIClient(d, meta)
+	searcher := sacloud.NewNFSOp(client)
+	ctx := context.Background()
+	zone := getV2Zone(d, client)
 
-	//filters
-	if rawFilter, filterOk := d.GetOk("filter"); filterOk {
-		filters := expandFilters(rawFilter)
-		for key, f := range filters {
-			client.NFS.FilterBy(key, f)
-		}
+	findCondition := &sacloud.FindCondition{
+		Count: defaultSearchLimit,
+	}
+	if rawFilter, ok := d.GetOk(filterAttrName); ok {
+		findCondition.Filter = expandSearchFilter(rawFilter)
 	}
 
-	res, err := client.NFS.Find()
+	res, err := searcher.Find(ctx, zone, findCondition)
 	if err != nil {
-		return fmt.Errorf("Couldn't find SakuraCloud NFS resource: %s", err)
+		return fmt.Errorf("could not find SakuraCloud NFS resource: %s", err)
 	}
-	if res == nil || res.Count == 0 {
+	if res == nil || res.Count == 0 || len(res.NFS) == 0 {
 		return filterNoResultErr()
 	}
-	var data *sacloud.NFS
+
 	targets := res.NFS
+	d.SetId(targets[0].ID.String())
+	return setNFSV2ResourceData(ctx, d, client, targets[0])
+}
 
-	if rawNameSelector, ok := d.GetOk("name_selectors"); ok {
-		selectors := expandStringList(rawNameSelector.([]interface{}))
-		var filtered []sacloud.NFS
-		for _, a := range targets {
-			if hasNames(&a, selectors) {
-				filtered = append(filtered, a)
-			}
-		}
-		targets = filtered
-	}
-	if rawTagSelector, ok := d.GetOk("tag_selectors"); ok {
-		selectors := expandStringList(rawTagSelector.([]interface{}))
-		var filtered []sacloud.NFS
-		for _, a := range targets {
-			if hasTags(&a, selectors) {
-				filtered = append(filtered, a)
-			}
-		}
-		targets = filtered
+func setNFSV2ResourceData(ctx context.Context, d *schema.ResourceData, client *APIClient, data *sacloud.NFS) error {
+	if data.Availability.IsFailed() {
+		d.SetId("")
+		return fmt.Errorf("got unexpected state: NFS[%d].Availability is failed", data.ID)
 	}
 
-	if len(targets) == 0 {
-		return filterNoResultErr()
-	}
-	data = &targets[0]
+	var plan string
+	var size int
 
-	d.SetId(data.GetStrID())
-	return setNFSResourceData(d, client, data)
+	planInfo, err := nfs.GetPlanInfo(ctx, sacloud.NewNoteOp(client), data.PlanID)
+	if err != nil {
+		return err
+	}
+	switch planInfo.DiskPlanID {
+	case types.NFSPlans.HDD:
+		plan = "hdd"
+	case types.NFSPlans.SSD:
+		plan = "ssd"
+	}
+	size = int(planInfo.Size)
+
+	setPowerManageTimeoutValueToState(d)
+	d.Set("zone", client.Zone)
+	return setResourceData(d, map[string]interface{}{
+		"switch_id":     data.SwitchID.String(),
+		"ipaddress":     data.IPAddresses[0],
+		"nw_mask_len":   data.NetworkMaskLen,
+		"default_route": data.DefaultRoute,
+		"plan":          plan,
+		"size":          size,
+		"name":          data.Name,
+		"icon_id":       data.IconID.String(),
+		"description":   data.Description,
+		"tags":          data.Tags,
+	})
+
 }

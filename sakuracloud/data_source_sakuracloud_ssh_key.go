@@ -1,10 +1,11 @@
 package sakuracloud
 
 import (
+	"context"
 	"fmt"
 
 	"github.com/hashicorp/terraform/helper/schema"
-	"github.com/sacloud/libsacloud/sacloud"
+	"github.com/sacloud/libsacloud/v2/sacloud"
 )
 
 func dataSourceSakuraCloudSSHKey() *schema.Resource {
@@ -12,31 +13,7 @@ func dataSourceSakuraCloudSSHKey() *schema.Resource {
 		Read: dataSourceSakuraCloudSSHKeyRead,
 
 		Schema: map[string]*schema.Schema{
-			"name_selectors": {
-				Type:     schema.TypeList,
-				Optional: true,
-				ForceNew: true,
-				Elem:     &schema.Schema{Type: schema.TypeString},
-			},
-			"filter": {
-				Type:     schema.TypeSet,
-				Optional: true,
-				ForceNew: true,
-				Elem: &schema.Resource{
-					Schema: map[string]*schema.Schema{
-						"name": {
-							Type:     schema.TypeString,
-							Required: true,
-						},
-
-						"values": {
-							Type:     schema.TypeList,
-							Required: true,
-							Elem:     &schema.Schema{Type: schema.TypeString},
-						},
-					},
-				},
-			},
+			filterAttrName: filterSchema(&filterSchemaOption{excludeTags: true}),
 			"name": {
 				Type:     schema.TypeString,
 				Computed: true,
@@ -59,41 +36,34 @@ func dataSourceSakuraCloudSSHKey() *schema.Resource {
 
 func dataSourceSakuraCloudSSHKeyRead(d *schema.ResourceData, meta interface{}) error {
 	client := getSacloudAPIClient(d, meta)
+	searcher := sacloud.NewSSHKeyOp(client)
+	ctx := context.Background()
 
-	//filters
-	if rawFilter, filterOk := d.GetOk("filter"); filterOk {
-		filters := expandFilters(rawFilter)
-		for key, f := range filters {
-			client.SSHKey.FilterBy(key, f)
-		}
+	findCondition := &sacloud.FindCondition{
+		Count: defaultSearchLimit,
+	}
+	if rawFilter, ok := d.GetOk(filterAttrName); ok {
+		findCondition.Filter = expandSearchFilter(rawFilter)
 	}
 
-	res, err := client.SSHKey.Find()
+	res, err := searcher.Find(ctx, findCondition)
 	if err != nil {
-		return fmt.Errorf("Couldn't find SakuraCloud SSHKey resource: %s", err)
+		return fmt.Errorf("could not find SakuraCloud SSHKey resource: %s", err)
 	}
-	if res == nil || res.Count == 0 {
+	if res == nil || res.Count == 0 || len(res.SSHKeys) == 0 {
 		return filterNoResultErr()
 	}
-	var data *sacloud.SSHKey
+
 	targets := res.SSHKeys
+	d.SetId(targets[0].ID.String())
+	return setSSHKeyV2ResourceData(ctx, d, client, targets[0])
+}
 
-	if rawNameSelector, ok := d.GetOk("name_selectors"); ok {
-		selectors := expandStringList(rawNameSelector.([]interface{}))
-		var filtered []sacloud.SSHKey
-		for _, a := range targets {
-			if hasNames(&a, selectors) {
-				filtered = append(filtered, a)
-			}
-		}
-		targets = filtered
-	}
-
-	if len(targets) == 0 {
-		return filterNoResultErr()
-	}
-	data = &targets[0]
-
-	d.SetId(data.GetStrID())
-	return setSSHKeyResourceData(d, client, data)
+func setSSHKeyV2ResourceData(ctx context.Context, d *schema.ResourceData, client *APIClient, data *sacloud.SSHKey) error {
+	return setResourceData(d, map[string]interface{}{
+		"name":        data.Name,
+		"public_key":  data.PublicKey,
+		"fingerprint": data.Fingerprint,
+		"description": data.Description,
+	})
 }

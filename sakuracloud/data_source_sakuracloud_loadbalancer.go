@@ -1,10 +1,12 @@
 package sakuracloud
 
 import (
+	"context"
 	"fmt"
 
 	"github.com/hashicorp/terraform/helper/schema"
-	"github.com/sacloud/libsacloud/sacloud"
+	"github.com/sacloud/libsacloud/v2/sacloud"
+	"github.com/sacloud/libsacloud/v2/sacloud/types"
 )
 
 func dataSourceSakuraCloudLoadBalancer() *schema.Resource {
@@ -12,37 +14,7 @@ func dataSourceSakuraCloudLoadBalancer() *schema.Resource {
 		Read: dataSourceSakuraCloudLoadBalancerRead,
 
 		Schema: map[string]*schema.Schema{
-			"name_selectors": {
-				Type:     schema.TypeList,
-				Optional: true,
-				ForceNew: true,
-				Elem:     &schema.Schema{Type: schema.TypeString},
-			},
-			"tag_selectors": {
-				Type:     schema.TypeList,
-				Optional: true,
-				ForceNew: true,
-				Elem:     &schema.Schema{Type: schema.TypeString},
-			},
-			"filter": {
-				Type:     schema.TypeSet,
-				Optional: true,
-				ForceNew: true,
-				Elem: &schema.Resource{
-					Schema: map[string]*schema.Schema{
-						"name": {
-							Type:     schema.TypeString,
-							Required: true,
-						},
-
-						"values": {
-							Type:     schema.TypeList,
-							Required: true,
-							Elem:     &schema.Schema{Type: schema.TypeString},
-						},
-					},
-				},
-			},
+			filterAttrName: filterSchema(&filterSchemaOption{}),
 			"name": {
 				Type:     schema.TypeString,
 				Computed: true,
@@ -97,6 +69,62 @@ func dataSourceSakuraCloudLoadBalancer() *schema.Resource {
 				Computed: true,
 				Elem:     &schema.Schema{Type: schema.TypeString},
 			},
+			"vips": {
+				Type:     schema.TypeList,
+				Computed: true,
+				Elem: &schema.Resource{
+					Schema: map[string]*schema.Schema{
+						"vip": {
+							Type:     schema.TypeString,
+							Computed: true,
+						},
+						"port": {
+							Type:     schema.TypeInt,
+							Computed: true,
+						},
+						"delay_loop": {
+							Type:     schema.TypeInt,
+							Computed: true,
+						},
+						"sorry_server": {
+							Type:     schema.TypeString,
+							Computed: true,
+						},
+						"description": {
+							Type:     schema.TypeString,
+							Computed: true,
+						},
+						"servers": {
+							Type:     schema.TypeList,
+							Computed: true,
+							Elem: &schema.Resource{
+								Schema: map[string]*schema.Schema{
+									"ipaddress": {
+										Type:     schema.TypeString,
+										Computed: true,
+									},
+									"check_protocol": {
+										Type:     schema.TypeString,
+										Computed: true,
+									},
+									"check_path": {
+										Type:     schema.TypeString,
+										Computed: true,
+									},
+									"check_status": {
+										Type:     schema.TypeString,
+										Computed: true,
+									},
+									"enabled": {
+										Type:     schema.TypeBool,
+										Computed: true,
+									},
+								},
+							},
+						},
+					},
+				},
+			},
 			"zone": {
 				Type:         schema.TypeString,
 				Optional:     true,
@@ -111,51 +139,89 @@ func dataSourceSakuraCloudLoadBalancer() *schema.Resource {
 
 func dataSourceSakuraCloudLoadBalancerRead(d *schema.ResourceData, meta interface{}) error {
 	client := getSacloudAPIClient(d, meta)
+	searcher := sacloud.NewLoadBalancerOp(client)
+	ctx := context.Background()
+	zone := getV2Zone(d, client)
 
-	//filters
-	if rawFilter, filterOk := d.GetOk("filter"); filterOk {
-		filters := expandFilters(rawFilter)
-		for key, f := range filters {
-			client.LoadBalancer.FilterBy(key, f)
-		}
+	findCondition := &sacloud.FindCondition{
+		Count: defaultSearchLimit,
+	}
+	if rawFilter, ok := d.GetOk(filterAttrName); ok {
+		findCondition.Filter = expandSearchFilter(rawFilter)
 	}
 
-	res, err := client.LoadBalancer.Find()
+	res, err := searcher.Find(ctx, zone, findCondition)
 	if err != nil {
-		return fmt.Errorf("Couldn't find SakuraCloud LoadBalancer resource: %s", err)
+		return fmt.Errorf("could not find SakuraCloud LoadBalancer resource: %s", err)
 	}
-	if res == nil || res.Count == 0 {
+	if res == nil || res.Count == 0 || len(res.LoadBalancers) == 0 {
 		return filterNoResultErr()
 	}
-	var data *sacloud.LoadBalancer
+
 	targets := res.LoadBalancers
+	d.SetId(targets[0].ID.String())
+	return setLoadBalancerV2ResourceData(ctx, d, client, targets[0])
+}
 
-	if rawNameSelector, ok := d.GetOk("name_selectors"); ok {
-		selectors := expandStringList(rawNameSelector.([]interface{}))
-		var filtered []sacloud.LoadBalancer
-		for _, a := range targets {
-			if hasNames(&a, selectors) {
-				filtered = append(filtered, a)
-			}
+func setLoadBalancerV2ResourceData(ctx context.Context, d *schema.ResourceData, client *APIClient, data *sacloud.LoadBalancer) error {
+	if data.Availability.IsFailed() {
+		d.SetId("")
+		return fmt.Errorf("got unexpected state: LoadBalancer[%d].Availability is failed", data.ID)
+	}
+
+	var ha bool
+	var ipaddress1, ipaddress2 string
+	ipaddress1 = data.IPAddresses[0]
+	if len(data.IPAddresses) > 1 {
+		ha = true
+		ipaddress2 = data.IPAddresses[1]
+	}
+
+	var plan string
+	switch data.PlanID {
+	case types.LoadBalancerPlans.Standard:
+		plan = "standard"
+	case types.LoadBalancerPlans.Premium:
+		plan = "highspec"
+	}
+
+	var vips []interface{}
+	for _, v := range data.VirtualIPAddresses {
+		vip := map[string]interface{}{
+			"vip":          v.VirtualIPAddress,
+			"port":         v.Port.Int(),
+			"delay_loop":   v.DelayLoop.Int(),
+			"sorry_server": v.SorryServer,
 		}
-		targets = filtered
-	}
-	if rawTagSelector, ok := d.GetOk("tag_selectors"); ok {
-		selectors := expandStringList(rawTagSelector.([]interface{}))
-		var filtered []sacloud.LoadBalancer
-		for _, a := range targets {
-			if hasTags(&a, selectors) {
-				filtered = append(filtered, a)
-			}
+		var servers []interface{}
+		for _, server := range v.Servers {
+			s := map[string]interface{}{}
+			s["ipaddress"] = server.IPAddress
+			s["check_protocol"] = server.HealthCheck.Protocol
+			s["check_path"] = server.HealthCheck.Path
+			s["check_status"] = server.HealthCheck.ResponseCode.String()
+			s["enabled"] = server.Enabled.Bool()
+			servers = append(servers, s)
 		}
-		targets = filtered
+		vip["servers"] = servers
+		vips = append(vips, vip)
 	}
 
-	if len(targets) == 0 {
-		return filterNoResultErr()
-	}
-	data = &targets[0]
-
-	d.SetId(data.GetStrID())
-	return setLoadBalancerResourceData(d, client, data)
+	setPowerManageTimeoutValueToState(d)
+	return setResourceData(d, map[string]interface{}{
+		"switch_id":         data.SwitchID.String(),
+		"vrid":              data.VRID,
+		"plan":              plan,
+		"high_availability": ha,
+		"ipaddress1":        ipaddress1,
+		"ipaddress2":        ipaddress2,
+		"nw_mask_len":       data.NetworkMaskLen,
+		"default_route":     data.DefaultRoute,
+		"name":              data.Name,
+		"icon_id":           data.IconID.String(),
+		"description":       data.Description,
+		"tags":              data.Tags,
+		"vips":              vips,
+		"zone":              getV2Zone(d, client),
+	})
 }

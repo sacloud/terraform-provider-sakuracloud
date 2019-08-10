@@ -123,7 +123,7 @@ func vpcRouterStaticRouteIDHash(routerID string, s *sacloud.VPCRouterStaticRoute
 	return fmt.Sprintf("%d", hashcode.String(buf.String()))
 }
 
-func expandVPCRouterStaticRoute(d resourceValueGetable) *sacloud.VPCRouterStaticRoutesConfig {
+func expandVPCRouterStaticRoute(d resourceValueGettable) *sacloud.VPCRouterStaticRoutesConfig {
 
 	var staticRoute = &sacloud.VPCRouterStaticRoutesConfig{
 		Prefix:  d.Get("prefix").(string),

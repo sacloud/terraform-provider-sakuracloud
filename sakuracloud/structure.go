@@ -9,9 +9,24 @@ import (
 	"github.com/hashicorp/terraform/helper/schema"
 	"github.com/hashicorp/terraform/terraform"
 	"github.com/sacloud/libsacloud/sacloud"
+	"github.com/sacloud/libsacloud/v2/sacloud/search"
+	"github.com/sacloud/libsacloud/v2/sacloud/search/keys"
 )
 
-type resourceValueGetable interface {
+type resourceValueSettable interface {
+	Set(key string, value interface{}) error
+}
+
+func setResourceData(d resourceValueSettable, data map[string]interface{}) error {
+	for k, v := range data {
+		if err := d.Set(k, v); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+type resourceValueGettable interface {
 	Get(key string) interface{}
 	GetOk(key string) (interface{}, bool)
 }
@@ -29,11 +44,11 @@ func (r *resourceMapValue) GetOk(key string) (interface{}, bool) {
 	return v, ok
 }
 
-func mapToResourceData(v map[string]interface{}) resourceValueGetable {
+func mapToResourceData(v map[string]interface{}) resourceValueGettable {
 	return &resourceMapValue{value: v}
 }
 
-func getMapFromResource(d resourceValueGetable, key string) (map[string]interface{}, bool) {
+func getMapFromResource(d resourceValueGettable, key string) (map[string]interface{}, bool) {
 	v, ok := d.GetOk(key)
 	if !ok {
 		return nil, false
@@ -44,7 +59,7 @@ func getMapFromResource(d resourceValueGetable, key string) (map[string]interfac
 	return nil, false
 }
 
-func getListFromResource(d resourceValueGetable, key string) ([]interface{}, bool) {
+func getListFromResource(d resourceValueGettable, key string) ([]interface{}, bool) {
 	v, ok := d.GetOk(key)
 	if !ok {
 		return nil, false
@@ -65,7 +80,7 @@ func mergeSchemas(schemas ...map[string]*schema.Schema) map[string]*schema.Schem
 	return m
 }
 
-func getSacloudAPIClient(d resourceValueGetable, meta interface{}) *APIClient {
+func getSacloudAPIClient(d resourceValueGettable, meta interface{}) *APIClient {
 	c := meta.(*APIClient)
 	client := c.Clone()
 
@@ -74,8 +89,20 @@ func getSacloudAPIClient(d resourceValueGetable, meta interface{}) *APIClient {
 		client.Zone = zone.(string)
 	}
 	return &APIClient{
-		Client: client,
+		Client:      client,
+		APICaller:   c.APICaller,
+		defaultZone: c.defaultZone,
 	}
+}
+
+func getV2Zone(d resourceValueGettable, client *APIClient) string {
+	zone, ok := d.GetOk("zone")
+	if ok {
+		if z, ok := zone.(string); ok && z != "" {
+			return z
+		}
+	}
+	return client.defaultZone
 }
 
 func toSakuraCloudID(id string) int64 {
@@ -276,6 +303,70 @@ func expandFilters(filter interface{}) map[string]interface{} {
 			ret[name] = filterValues
 		}
 
+	}
+
+	return ret
+}
+
+func expandSearchFilter(rawFilters interface{}) search.Filter {
+	ret := search.Filter{}
+	filters, ok := rawFilters.([]interface{})
+	if !ok {
+		return ret
+	}
+	mv := filters[0].(map[string]interface{})
+	// ID
+	if rawID, ok := mv["id"]; ok {
+		id := rawID.(string)
+		if id != "" {
+			ret[search.Key(keys.ID)] = search.AndEqual(id)
+		}
+	}
+	// Names
+	if rawNames, ok := mv["names"]; ok {
+		var names []string
+		for _, rawName := range rawNames.([]interface{}) {
+			name := rawName.(string)
+			if name != "" {
+				names = append(names, name)
+			}
+		}
+		if len(names) > 0 {
+			ret[search.Key(keys.Name)] = search.AndEqual(names...)
+		}
+	}
+
+	// Tags
+	if rawTags, ok := mv["tags"]; ok {
+		var tags []string
+		for _, rawTag := range rawTags.([]interface{}) {
+			tag := rawTag.(string)
+			if tag != "" {
+				tags = append(tags, tag)
+			}
+		}
+		if len(tags) > 0 {
+			ret[search.Key(keys.Tags)] = search.TagsAndEqual(tags...)
+		}
+	}
+	// others
+	if rawConditions, ok := mv["conditions"]; ok {
+		for _, rawCondition := range rawConditions.([]interface{}) {
+			mv := rawCondition.(map[string]interface{})
+
+			keyName := mv["name"].(string)
+			values := mv["values"].([]interface{})
+			var conditions []string
+			for _, value := range values {
+				v := value.(string)
+				if v != "" {
+					conditions = append(conditions, v)
+				}
+			}
+			if len(conditions) > 0 {
+				ret[search.Key(keyName)] = search.AndEqual(conditions...)
+			}
+		}
 	}
 
 	return ret

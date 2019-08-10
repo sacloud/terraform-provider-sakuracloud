@@ -1,10 +1,13 @@
 package sakuracloud
 
 import (
+	"context"
 	"fmt"
+	"strings"
 
 	"github.com/hashicorp/terraform/helper/schema"
-	"github.com/sacloud/libsacloud/sacloud"
+	"github.com/sacloud/libsacloud/v2/sacloud"
+	"github.com/sacloud/libsacloud/v2/sacloud/types"
 )
 
 func dataSourceSakuraCloudDatabase() *schema.Resource {
@@ -12,38 +15,12 @@ func dataSourceSakuraCloudDatabase() *schema.Resource {
 		Read: dataSourceSakuraCloudDatabaseRead,
 
 		Schema: map[string]*schema.Schema{
-			"name_selectors": {
-				Type:     schema.TypeList,
-				Optional: true,
-				ForceNew: true,
-				Elem:     &schema.Schema{Type: schema.TypeString},
-			},
-			"tag_selectors": {
-				Type:     schema.TypeList,
-				Optional: true,
-				ForceNew: true,
-				Elem:     &schema.Schema{Type: schema.TypeString},
-			},
-			"filter": {
-				Type:     schema.TypeSet,
-				Optional: true,
-				ForceNew: true,
-				Elem: &schema.Resource{
-					Schema: map[string]*schema.Schema{
-						"name": {
-							Type:     schema.TypeString,
-							Required: true,
-						},
-
-						"values": {
-							Type:     schema.TypeList,
-							Required: true,
-							Elem:     &schema.Schema{Type: schema.TypeString},
-						},
-					},
-				},
-			},
+			filterAttrName: filterSchema(&filterSchemaOption{}),
 			"name": {
+				Type:     schema.TypeString,
+				Computed: true,
+			},
+			"database_type": {
 				Type:     schema.TypeString,
 				Computed: true,
 			},
@@ -120,7 +97,7 @@ func dataSourceSakuraCloudDatabase() *schema.Resource {
 				Computed:     true,
 				ForceNew:     true,
 				Description:  "target SakuraCloud zone",
-				ValidateFunc: validateZone([]string{"tk1a", "is1b", "is1a"}),
+				ValidateFunc: validateZone([]string{"tk1a", "tk1v", "is1b", "is1a"}),
 			},
 		},
 	}
@@ -128,52 +105,85 @@ func dataSourceSakuraCloudDatabase() *schema.Resource {
 
 func dataSourceSakuraCloudDatabaseRead(d *schema.ResourceData, meta interface{}) error {
 	client := getSacloudAPIClient(d, meta)
+	searcher := sacloud.NewDatabaseOp(client)
+	ctx := context.Background()
+	zone := getV2Zone(d, client)
 
-	//filters
-	if rawFilter, filterOk := d.GetOk("filter"); filterOk {
-		filters := expandFilters(rawFilter)
-		for key, f := range filters {
-			client.Database.FilterBy(key, f)
-		}
+	findCondition := &sacloud.FindCondition{
+		Count: defaultSearchLimit,
+	}
+	if rawFilter, ok := d.GetOk(filterAttrName); ok {
+		findCondition.Filter = expandSearchFilter(rawFilter)
 	}
 
-	res, err := client.Database.Find()
+	res, err := searcher.Find(ctx, zone, findCondition)
 	if err != nil {
-		return fmt.Errorf("Couldn't find SakuraCloud Database resource: %s", err)
+		return fmt.Errorf("could not find SakuraCloud Database resource: %s", err)
 	}
-	if res == nil || res.Count == 0 {
+	if res == nil || res.Count == 0 || len(res.Databases) == 0 {
 		return filterNoResultErr()
 	}
 
-	var data *sacloud.Database
 	targets := res.Databases
+	d.SetId(targets[0].ID.String())
+	return setDatabaseV2ResourceData(ctx, d, client, targets[0])
+}
 
-	if rawNameSelector, ok := d.GetOk("name_selectors"); ok {
-		selectors := expandStringList(rawNameSelector.([]interface{}))
-		var filtered []sacloud.Database
-		for _, a := range targets {
-			if hasNames(&a, selectors) {
-				filtered = append(filtered, a)
-			}
+func setDatabaseV2ResourceData(ctx context.Context, d *schema.ResourceData, client *APIClient, data *sacloud.Database) error {
+
+	if data.Availability.IsFailed() {
+		d.SetId("")
+		return fmt.Errorf("got unexpected state: Database[%d].Availability is failed", data.ID)
+	}
+
+	var databaseType string
+	switch data.Conf.DatabaseName {
+	case types.RDBMSVersions[types.RDBMSTypesPostgreSQL].Name:
+		databaseType = "postgresql"
+	case types.RDBMSVersions[types.RDBMSTypesMariaDB].Name:
+		databaseType = "mariadb"
+	}
+
+	var replicaUser, replicaPassword string
+	if data.ReplicationSetting != nil {
+		replicaUser = data.ReplicationSetting.User
+		replicaPassword = data.ReplicationSetting.Password
+	}
+
+	var backupTime string
+	var backupWeekdays []types.EBackupSpanWeekday
+	if data.BackupSetting != nil {
+		backupTime = data.BackupSetting.Time
+		backupWeekdays = data.BackupSetting.DayOfWeek
+	}
+
+	var tags []string
+	for _, t := range data.Tags {
+		if !(strings.HasPrefix(t, "@MariaDB-") || strings.HasPrefix(t, "@postgres-")) {
+			tags = append(tags, t)
 		}
-		targets = filtered
 	}
-	if rawTagSelector, ok := d.GetOk("tag_selectors"); ok {
-		selectors := expandStringList(rawTagSelector.([]interface{}))
-		var filtered []sacloud.Database
-		for _, a := range targets {
-			if hasTags(&a, selectors) {
-				filtered = append(filtered, a)
-			}
-		}
-		targets = filtered
-	}
+	setPowerManageTimeoutValueToState(d)
 
-	if len(targets) == 0 {
-		return filterNoResultErr()
-	}
-	data = &targets[0]
-
-	d.SetId(data.GetStrID())
-	return setDatabaseResourceData(d, client, data)
+	return setResourceData(d, map[string]interface{}{
+		"database_type":    databaseType,
+		"name":             data.Name,
+		"user_name":        data.CommonSetting.DefaultUser,
+		"user_password":    data.CommonSetting.UserPassword,
+		"replica_user":     replicaUser,
+		"replica_password": replicaPassword,
+		"plan":             data.PlanID.String(),
+		"allow_networks":   data.CommonSetting.SourceNetwork,
+		"port":             data.CommonSetting.ServicePort,
+		"backup_time":      backupTime,
+		"backup_weekdays":  backupWeekdays,
+		"switch_id":        data.SwitchID.String(),
+		"nw_mask_len":      data.NetworkMaskLen,
+		"default_route":    data.DefaultRoute,
+		"ipaddress1":       data.IPAddresses[0],
+		"icon_id":          data.IconID.String(),
+		"description":      data.Description,
+		"tags":             tags,
+		"zone":             getV2Zone(d, client),
+	})
 }

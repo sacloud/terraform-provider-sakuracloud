@@ -1,12 +1,14 @@
 package sakuracloud
 
 import (
+	"context"
 	"fmt"
 
 	"github.com/hashicorp/terraform/helper/schema"
 	"github.com/hashicorp/terraform/helper/validation"
-	"github.com/sacloud/libsacloud/sacloud"
-	"github.com/sacloud/libsacloud/sacloud/ostype"
+	"github.com/sacloud/libsacloud/v2/sacloud"
+	"github.com/sacloud/libsacloud/v2/sacloud/ostype"
+	"github.com/sacloud/libsacloud/v2/utils/archive"
 )
 
 func dataSourceSakuraCloudArchive() *schema.Resource {
@@ -14,46 +16,12 @@ func dataSourceSakuraCloudArchive() *schema.Resource {
 		Read: dataSourceSakuraCloudArchiveRead,
 
 		Schema: map[string]*schema.Schema{
+			filterAttrName: filterSchema(&filterSchemaOption{}),
 			"os_type": {
 				Type:          schema.TypeString,
 				Optional:      true,
-				ForceNew:      true,
 				ValidateFunc:  validation.StringInSlice(ostype.OSTypeShortNames, false),
-				ConflictsWith: []string{"filter", "name_selectors", "tag_selectors"},
-			},
-			"name_selectors": {
-				Type:          schema.TypeList,
-				Optional:      true,
-				ForceNew:      true,
-				Elem:          &schema.Schema{Type: schema.TypeString},
-				ConflictsWith: []string{"os_type"},
-			},
-			"tag_selectors": {
-				Type:          schema.TypeList,
-				Optional:      true,
-				ForceNew:      true,
-				Elem:          &schema.Schema{Type: schema.TypeString},
-				ConflictsWith: []string{"os_type"},
-			},
-			"filter": {
-				Type:     schema.TypeSet,
-				Optional: true,
-				ForceNew: true,
-				Elem: &schema.Resource{
-					Schema: map[string]*schema.Schema{
-						"name": {
-							Type:     schema.TypeString,
-							Required: true,
-						},
-
-						"values": {
-							Type:     schema.TypeList,
-							Required: true,
-							Elem:     &schema.Schema{Type: schema.TypeString},
-						},
-					},
-				},
-				ConflictsWith: []string{"os_type"},
+				ConflictsWith: []string{"filters"},
 			},
 			"name": {
 				Type:     schema.TypeString,
@@ -90,80 +58,54 @@ func dataSourceSakuraCloudArchive() *schema.Resource {
 
 func dataSourceSakuraCloudArchiveRead(d *schema.ResourceData, meta interface{}) error {
 	client := getSacloudAPIClient(d, meta)
+	searcher := sacloud.NewArchiveOp(client)
+
+	ctx := context.Background()
+	zone := getV2Zone(d, client)
 
 	var data *sacloud.Archive
 	if osType, ok := d.GetOk("os_type"); ok {
 		strOSType := osType.(string)
 		if strOSType != "" {
-
-			res, err := client.Archive.FindByOSType(strToOSType(strOSType))
+			res, err := archive.FindByOSType(ctx, searcher, zone, ostype.StrToOSType(strOSType))
 			if err != nil {
-				return filterNoResultErr()
+				return err
 			}
 			data = res
 		}
 	} else {
-
-		//filters
-		if rawFilter, filterOk := d.GetOk("filter"); filterOk {
-			filters := expandFilters(rawFilter)
-			for key, f := range filters {
-				client.Archive.FilterBy(key, f)
-			}
+		findCondition := &sacloud.FindCondition{
+			Count: defaultSearchLimit,
+		}
+		if rawFilter, ok := d.GetOk(filterAttrName); ok {
+			findCondition.Filter = expandSearchFilter(rawFilter)
 		}
 
-		res, err := client.Archive.Find()
+		res, err := searcher.Find(ctx, zone, findCondition)
 		if err != nil {
-			return fmt.Errorf("Couldn't find SakuraCloud Archive resource: %s", err)
+			return fmt.Errorf("could not find SakuraCloud Archive resource: %s", err)
 		}
 		if res == nil || res.Count == 0 {
 			return filterNoResultErr()
 		}
 
 		targets := res.Archives
-
-		if rawNameSelector, ok := d.GetOk("name_selectors"); ok {
-			selectors := expandStringList(rawNameSelector.([]interface{}))
-			var filtered []sacloud.Archive
-			for _, a := range targets {
-				if hasNames(&a, selectors) {
-					filtered = append(filtered, a)
-				}
-			}
-			targets = filtered
-		}
-		if rawTagSelector, ok := d.GetOk("tag_selectors"); ok {
-			selectors := expandStringList(rawTagSelector.([]interface{}))
-			var filtered []sacloud.Archive
-			for _, a := range targets {
-				if hasTags(&a, selectors) {
-					filtered = append(filtered, a)
-				}
-			}
-			targets = filtered
-		}
-
 		if len(targets) == 0 {
 			return filterNoResultErr()
 		}
-		data = &targets[0]
+		data = targets[0]
 	}
 
 	if data != nil {
-
-		d.SetId(data.GetStrID())
-		d.Set("name", data.Name)
-		d.Set("size", toSizeGB(data.SizeMB))
-		d.Set("icon_id", data.GetIconStrID())
-		d.Set("description", data.Description)
-		d.Set("tags", data.Tags)
-
-		d.Set("zone", client.Zone)
+		d.SetId(data.ID.String())
+		return setResourceData(d, map[string]interface{}{
+			"name":        data.Name,
+			"size":        data.GetSizeGB(),
+			"icon_id":     data.IconID.String(),
+			"description": data.Description,
+			"tags":        data.Tags,
+			"zone":        getV2Zone(d, client),
+		})
 	}
-
 	return nil
-}
-
-func strToOSType(strType string) ostype.ArchiveOSTypes {
-	return ostype.StrToOSType(strType)
 }

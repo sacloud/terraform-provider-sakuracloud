@@ -1,10 +1,11 @@
 package sakuracloud
 
 import (
+	"context"
 	"fmt"
 
 	"github.com/hashicorp/terraform/helper/schema"
-	"github.com/sacloud/libsacloud/sacloud"
+	"github.com/sacloud/libsacloud/v2/sacloud"
 )
 
 func dataSourceSakuraCloudSwitch() *schema.Resource {
@@ -12,37 +13,7 @@ func dataSourceSakuraCloudSwitch() *schema.Resource {
 		Read: dataSourceSakuraCloudSwitchRead,
 
 		Schema: map[string]*schema.Schema{
-			"name_selectors": {
-				Type:     schema.TypeList,
-				Optional: true,
-				ForceNew: true,
-				Elem:     &schema.Schema{Type: schema.TypeString},
-			},
-			"tag_selectors": {
-				Type:     schema.TypeList,
-				Optional: true,
-				ForceNew: true,
-				Elem:     &schema.Schema{Type: schema.TypeString},
-			},
-			"filter": {
-				Type:     schema.TypeSet,
-				Optional: true,
-				ForceNew: true,
-				Elem: &schema.Resource{
-					Schema: map[string]*schema.Schema{
-						"name": {
-							Type:     schema.TypeString,
-							Required: true,
-						},
-
-						"values": {
-							Type:     schema.TypeList,
-							Required: true,
-							Elem:     &schema.Schema{Type: schema.TypeString},
-						},
-					},
-				},
-			},
+			filterAttrName: filterSchema(&filterSchemaOption{}),
 			"name": {
 				Type:     schema.TypeString,
 				Computed: true,
@@ -84,51 +55,54 @@ func dataSourceSakuraCloudSwitch() *schema.Resource {
 
 func dataSourceSakuraCloudSwitchRead(d *schema.ResourceData, meta interface{}) error {
 	client := getSacloudAPIClient(d, meta)
+	searcher := sacloud.NewSwitchOp(client)
+	ctx := context.Background()
+	zone := getV2Zone(d, client)
 
-	//filters
-	if rawFilter, filterOk := d.GetOk("filter"); filterOk {
-		filters := expandFilters(rawFilter)
-		for key, f := range filters {
-			client.Switch.FilterBy(key, f)
-		}
+	findCondition := &sacloud.FindCondition{
+		Count: defaultSearchLimit,
+	}
+	if rawFilter, ok := d.GetOk(filterAttrName); ok {
+		findCondition.Filter = expandSearchFilter(rawFilter)
 	}
 
-	res, err := client.Switch.Find()
+	res, err := searcher.Find(ctx, zone, findCondition)
 	if err != nil {
-		return fmt.Errorf("Couldn't find SakuraCloud Switch resource: %s", err)
+		return fmt.Errorf("could not find SakuraCloud Switch resource: %s", err)
 	}
-	if res == nil || res.Count == 0 {
+	if res == nil || res.Count == 0 || len(res.Switches) == 0 {
 		return filterNoResultErr()
 	}
-	var data *sacloud.Switch
+
 	targets := res.Switches
+	d.SetId(targets[0].ID.String())
+	return setSwitchV2ResourceData(ctx, d, client, targets[0])
+}
 
-	if rawNameSelector, ok := d.GetOk("name_selectors"); ok {
-		selectors := expandStringList(rawNameSelector.([]interface{}))
-		var filtered []sacloud.Switch
-		for _, a := range targets {
-			if hasNames(&a, selectors) {
-				filtered = append(filtered, a)
-			}
+func setSwitchV2ResourceData(ctx context.Context, d *schema.ResourceData, client *APIClient, data *sacloud.Switch) error {
+	zone := getV2Zone(d, client)
+
+	var serverIDs []string
+	if data.ServerCount > 0 {
+		swOp := sacloud.NewSwitchOp(client)
+		searched, err := swOp.GetServers(ctx, zone, data.ID)
+		if err != nil {
+			return fmt.Errorf("could not find SakuraCloud Servers: switch[%s]", err)
 		}
-		targets = filtered
-	}
-	if rawTagSelector, ok := d.GetOk("tag_selectors"); ok {
-		selectors := expandStringList(rawTagSelector.([]interface{}))
-		var filtered []sacloud.Switch
-		for _, a := range targets {
-			if hasTags(&a, selectors) {
-				filtered = append(filtered, a)
-			}
+		for _, s := range searched.Servers {
+			serverIDs = append(serverIDs, s.ID.String())
 		}
-		targets = filtered
 	}
 
-	if len(targets) == 0 {
-		return filterNoResultErr()
-	}
-	data = &targets[0]
+	setPowerManageTimeoutValueToState(d)
+	return setResourceData(d, map[string]interface{}{
+		"name":        data.Name,
+		"icon_id":     data.IconID.String(),
+		"description": data.Description,
+		"tags":        data.Tags,
+		"bridge_id":   data.BridgeID.String(),
+		"server_ids":  serverIDs,
+		"zone":        zone,
+	})
 
-	d.SetId(data.GetStrID())
-	return setSwitchResourceData(d, client, data)
 }

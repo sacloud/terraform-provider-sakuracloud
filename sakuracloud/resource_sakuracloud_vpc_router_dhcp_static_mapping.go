@@ -125,7 +125,7 @@ func vpcRouterDHCPStaticMappingIDHash(routerID string, s *sacloud.VPCRouterDHCPS
 	return fmt.Sprintf("%d", hashcode.String(buf.String()))
 }
 
-func expandVPCRouterDHCPStaticMapping(d resourceValueGetable) *sacloud.VPCRouterDHCPStaticMappingConfig {
+func expandVPCRouterDHCPStaticMapping(d resourceValueGettable) *sacloud.VPCRouterDHCPStaticMappingConfig {
 
 	var dhcpStaticMapping = &sacloud.VPCRouterDHCPStaticMappingConfig{
 		IPAddress:  d.Get("ipaddress").(string),
