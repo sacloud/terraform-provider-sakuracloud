@@ -1,10 +1,11 @@
 package sakuracloud
 
 import (
+	"context"
 	"fmt"
 
 	"github.com/hashicorp/terraform/helper/schema"
-	"github.com/sacloud/libsacloud/sacloud"
+	"github.com/sacloud/libsacloud/v2/sacloud"
 )
 
 func dataSourceSakuraCloudBridge() *schema.Resource {
@@ -12,31 +13,7 @@ func dataSourceSakuraCloudBridge() *schema.Resource {
 		Read: dataSourceSakuraCloudBridgeRead,
 
 		Schema: map[string]*schema.Schema{
-			"name_selectors": {
-				Type:     schema.TypeList,
-				Optional: true,
-				ForceNew: true,
-				Elem:     &schema.Schema{Type: schema.TypeString},
-			},
-			"filter": {
-				Type:     schema.TypeSet,
-				Optional: true,
-				ForceNew: true,
-				Elem: &schema.Resource{
-					Schema: map[string]*schema.Schema{
-						"name": {
-							Type:     schema.TypeString,
-							Required: true,
-						},
-
-						"values": {
-							Type:     schema.TypeList,
-							Required: true,
-							Elem:     &schema.Schema{Type: schema.TypeString},
-						},
-					},
-				},
-			},
+			filterAttrName: filterSchema(&filterSchemaOption{excludeTags: true}),
 			"name": {
 				Type:     schema.TypeString,
 				Computed: true,
@@ -50,7 +27,6 @@ func dataSourceSakuraCloudBridge() *schema.Resource {
 				Computed: true,
 				Elem:     &schema.Schema{Type: schema.TypeString},
 			},
-
 			"zone": {
 				Type:         schema.TypeString,
 				Optional:     true,
@@ -65,42 +41,47 @@ func dataSourceSakuraCloudBridge() *schema.Resource {
 
 func dataSourceSakuraCloudBridgeRead(d *schema.ResourceData, meta interface{}) error {
 	client := getSacloudAPIClient(d, meta)
+	searcher := sacloud.NewBridgeOp(client)
+	ctx := context.Background()
+	zone := getV2Zone(d, client)
 
-	//filters
-	if rawFilter, filterOk := d.GetOk("filter"); filterOk {
-		filters := expandFilters(rawFilter)
-		for key, f := range filters {
-			client.Bridge.FilterBy(key, f)
-		}
+	findCondition := &sacloud.FindCondition{
+		Count: defaultSearchLimit,
+	}
+	if rawFilter, ok := d.GetOk(filterAttrName); ok {
+		findCondition.Filter = expandSearchFilter(rawFilter)
 	}
 
-	res, err := client.Bridge.Find()
+	res, err := searcher.Find(ctx, zone, findCondition)
 	if err != nil {
-		return fmt.Errorf("Couldn't find SakuraCloud Bridge resource: %s", err)
+		return fmt.Errorf("could not find SakuraCloud Bridge resource: %s", err)
 	}
 	if res == nil || res.Count == 0 {
 		return filterNoResultErr()
 	}
 
-	var data *sacloud.Bridge
 	targets := res.Bridges
-
-	if rawNameSelector, ok := d.GetOk("name_selectors"); ok {
-		selectors := expandStringList(rawNameSelector.([]interface{}))
-		var filtered []sacloud.Bridge
-		for _, a := range targets {
-			if hasNames(&a, selectors) {
-				filtered = append(filtered, a)
-			}
-		}
-		targets = filtered
-	}
-
 	if len(targets) == 0 {
 		return filterNoResultErr()
 	}
-	data = &targets[0]
 
-	d.SetId(data.GetStrID())
-	return setBridgeResourceData(d, client, data)
+	d.SetId(targets[0].ID.String())
+	return setV2BridgeResourceData(ctx, d, client, targets[0])
+}
+
+func setV2BridgeResourceData(ctx context.Context, d *schema.ResourceData, client *APIClient, data *sacloud.Bridge) error {
+	swOp := sacloud.NewSwitchOp(client)
+	var switchIDs []interface{}
+	for _, d := range data.BridgeInfo {
+		if _, err := swOp.Read(ctx, d.ZoneName, d.ID); err == nil {
+			switchIDs = append(switchIDs, d.ID.String())
+		}
+	}
+
+	return setResourceData(d, map[string]interface{}{
+		"name":        data.Name,
+		"description": data.Description,
+		"switch_ids":  switchIDs,
+		"zone":        getV2Zone(d, client),
+	})
 }

@@ -1,10 +1,12 @@
 package sakuracloud
 
 import (
+	"context"
 	"fmt"
 
 	"github.com/hashicorp/terraform/helper/schema"
-	"github.com/sacloud/libsacloud/sacloud"
+	"github.com/sacloud/libsacloud/v2/sacloud"
+	"github.com/sacloud/libsacloud/v2/sacloud/types"
 )
 
 func dataSourceSakuraCloudSimpleMonitor() *schema.Resource {
@@ -12,37 +14,7 @@ func dataSourceSakuraCloudSimpleMonitor() *schema.Resource {
 		Read: dataSourceSakuraCloudSimpleMonitorRead,
 
 		Schema: map[string]*schema.Schema{
-			"name_selectors": {
-				Type:     schema.TypeList,
-				Optional: true,
-				ForceNew: true,
-				Elem:     &schema.Schema{Type: schema.TypeString},
-			},
-			"tag_selectors": {
-				Type:     schema.TypeList,
-				Optional: true,
-				ForceNew: true,
-				Elem:     &schema.Schema{Type: schema.TypeString},
-			},
-			"filter": {
-				Type:     schema.TypeSet,
-				Optional: true,
-				ForceNew: true,
-				Elem: &schema.Resource{
-					Schema: map[string]*schema.Schema{
-						"name": {
-							Type:     schema.TypeString,
-							Required: true,
-						},
-
-						"values": {
-							Type:     schema.TypeList,
-							Required: true,
-							Elem:     &schema.Schema{Type: schema.TypeString},
-						},
-					},
-				},
-			},
+			filterAttrName: filterSchema(&filterSchemaOption{}),
 			"target": {
 				Type:     schema.TypeString,
 				Computed: true,
@@ -69,7 +41,7 @@ func dataSourceSakuraCloudSimpleMonitor() *schema.Resource {
 							Computed: true,
 						},
 						"status": {
-							Type:     schema.TypeString,
+							Type:     schema.TypeInt,
 							Computed: true,
 						},
 						"sni": {
@@ -155,51 +127,81 @@ func dataSourceSakuraCloudSimpleMonitor() *schema.Resource {
 
 func dataSourceSakuraCloudSimpleMonitorRead(d *schema.ResourceData, meta interface{}) error {
 	client := getSacloudAPIClient(d, meta)
+	searcher := sacloud.NewSimpleMonitorOp(client)
+	ctx := context.Background()
 
-	//filters
-	if rawFilter, filterOk := d.GetOk("filter"); filterOk {
-		filters := expandFilters(rawFilter)
-		for key, f := range filters {
-			client.SimpleMonitor.FilterBy(key, f)
-		}
+	findCondition := &sacloud.FindCondition{
+		Count: defaultSearchLimit,
+	}
+	if rawFilter, ok := d.GetOk(filterAttrName); ok {
+		findCondition.Filter = expandSearchFilter(rawFilter)
 	}
 
-	res, err := client.SimpleMonitor.Find()
+	res, err := searcher.Find(ctx, findCondition)
 	if err != nil {
-		return fmt.Errorf("Couldn't find SakuraCloud SimpleMonitor resource: %s", err)
+		return fmt.Errorf("could not find SakuraCloud SimpleMonitor resource: %s", err)
 	}
-	if res == nil || res.Count == 0 {
+	if res == nil || res.Count == 0 || len(res.SimpleMonitors) == 0 {
 		return filterNoResultErr()
 	}
-	var data *sacloud.SimpleMonitor
+
 	targets := res.SimpleMonitors
+	d.SetId(targets[0].ID.String())
+	return setSimpleMonitorV2ResourceData(ctx, d, client, targets[0])
+}
 
-	if rawNameSelector, ok := d.GetOk("name_selectors"); ok {
-		selectors := expandStringList(rawNameSelector.([]interface{}))
-		var filtered []sacloud.SimpleMonitor
-		for _, a := range targets {
-			if hasNames(&a, selectors) {
-				filtered = append(filtered, a)
-			}
-		}
-		targets = filtered
-	}
-	if rawTagSelector, ok := d.GetOk("tag_selectors"); ok {
-		selectors := expandStringList(rawTagSelector.([]interface{}))
-		var filtered []sacloud.SimpleMonitor
-		for _, a := range targets {
-			if hasTags(&a, selectors) {
-				filtered = append(filtered, a)
-			}
-		}
-		targets = filtered
+func setSimpleMonitorV2ResourceData(ctx context.Context, d *schema.ResourceData, client *APIClient, data *sacloud.SimpleMonitor) error {
+
+	healthCheck := map[string]interface{}{}
+	hc := data.HealthCheck
+	switch hc.Protocol {
+	case types.SimpleMonitorProtocols.HTTP:
+		healthCheck["path"] = hc.Path
+		healthCheck["status"] = hc.Status.Int()
+		healthCheck["host_header"] = hc.Host
+		healthCheck["port"] = hc.Port.Int()
+		healthCheck["username"] = hc.BasicAuthUsername
+		healthCheck["password"] = hc.BasicAuthPassword
+	case types.SimpleMonitorProtocols.HTTPS:
+		healthCheck["path"] = hc.Path
+		healthCheck["status"] = hc.Status.Int()
+		healthCheck["host_header"] = hc.Host
+		healthCheck["port"] = hc.Port.Int()
+		healthCheck["sni"] = hc.SNI.Bool()
+		healthCheck["username"] = hc.BasicAuthUsername
+		healthCheck["password"] = hc.BasicAuthPassword
+	case types.SimpleMonitorProtocols.TCP, types.SimpleMonitorProtocols.SSH, types.SimpleMonitorProtocols.SMTP, types.SimpleMonitorProtocols.POP3:
+		healthCheck["port"] = hc.Port.Int()
+	case types.SimpleMonitorProtocols.SNMP:
+		healthCheck["community"] = hc.Community
+		healthCheck["snmp_version"] = hc.SNMPVersion
+		healthCheck["oid"] = hc.OID
+		healthCheck["expected_data"] = hc.ExpectedData
+	case types.SimpleMonitorProtocols.DNS:
+		healthCheck["qname"] = hc.QName
+		healthCheck["expected_data"] = hc.ExpectedData
+	case types.SimpleMonitorProtocols.SSLCertificate:
+		// noop
 	}
 
-	if len(targets) == 0 {
-		return filterNoResultErr()
+	days := hc.RemainingDays
+	if days == 0 {
+		days = 30
 	}
-	data = &targets[0]
+	healthCheck["remaining_days"] = days
+	healthCheck["protocol"] = hc.Protocol
+	healthCheck["delay_loop"] = data.DelayLoop
 
-	d.SetId(data.GetStrID())
-	return setSimpleMonitorResourceData(d, client, data)
+	return setResourceData(d, map[string]interface{}{
+		"target":               data.Target,
+		"health_check":         []interface{}{healthCheck},
+		"icon_id":              data.IconID.String(),
+		"description":          data.Description,
+		"tags":                 data.Tags,
+		"enabled":              data.Enabled.Bool(),
+		"notify_email_enabled": data.NotifyEmailEnabled.Bool(),
+		"notify_email_html":    data.NotifyEmailHTML.Bool(),
+		"notify_slack_enabled": data.NotifySlackEnabled.Bool(),
+		"notify_slack_webhook": data.SlackWebhooksURL,
+	})
 }

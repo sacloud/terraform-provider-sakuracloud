@@ -45,18 +45,6 @@ func TestAccSakuraCloudDataSourceNFS_Basic(t *testing.T) {
 				),
 			},
 			{
-				Config: testAccCheckSakuraCloudDataSourceNFS_NameSelector_Exists(name, randString1, randString2),
-				Check: resource.ComposeTestCheckFunc(
-					testAccCheckSakuraCloudNFSDataSourceID("data.sakuracloud_nfs.foobar"),
-				),
-			},
-			{
-				Config: testAccCheckSakuraCloudDataSourceNFS_TagSelector_Exists(name),
-				Check: resource.ComposeTestCheckFunc(
-					testAccCheckSakuraCloudNFSDataSourceID("data.sakuracloud_nfs.foobar"),
-				),
-			},
-			{
 				Config: testAccCheckSakuraCloudDataSourceNFSConfig_NotExists(name),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckSakuraCloudNFSDataSourceNotExists("data.sakuracloud_nfs.foobar"),
@@ -65,20 +53,6 @@ func TestAccSakuraCloudDataSourceNFS_Basic(t *testing.T) {
 			},
 			{
 				Config: testAccCheckSakuraCloudDataSourceNFSConfig_With_NotExists_Tag(name),
-				Check: resource.ComposeTestCheckFunc(
-					testAccCheckSakuraCloudNFSDataSourceNotExists("data.sakuracloud_nfs.foobar"),
-				),
-				Destroy: true,
-			},
-			{
-				Config: testAccCheckSakuraCloudDataSourceNFS_NameSelector_NotExists,
-				Check: resource.ComposeTestCheckFunc(
-					testAccCheckSakuraCloudNFSDataSourceNotExists("data.sakuracloud_nfs.foobar"),
-				),
-				Destroy: true,
-			},
-			{
-				Config: testAccCheckSakuraCloudDataSourceNFS_TagSelector_NotExists,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckSakuraCloudNFSDataSourceNotExists("data.sakuracloud_nfs.foobar"),
 				),
@@ -137,159 +111,104 @@ func testAccCheckSakuraCloudNFSDataSourceDestroy(s *terraform.State) error {
 func testAccCheckSakuraCloudDataSourceNFSBase(name string) string {
 	return fmt.Sprintf(`
 resource sakuracloud_switch "sw"{
-    name = "%s"
+  name = "%s"
 }
 resource "sakuracloud_nfs" "foobar" {
-    switch_id = "${sakuracloud_switch.sw.id}"
-    ipaddress = "192.168.11.101"
-    nw_mask_len = 24
-    default_route = "192.168.11.1"
+  switch_id = "${sakuracloud_switch.sw.id}"
+  ipaddress = "192.168.11.101"
+  nw_mask_len = 24
+  default_route = "192.168.11.1"
 
-    name = "%s"
-    description = "description_test"
-    tags = ["tag1","tag2","tag3"]
+  name = "%s"
+  description = "description_test"
+  tags = ["tag1","tag2","tag3"]
 }`, name, name)
 }
 
 func testAccCheckSakuraCloudDataSourceNFSConfig(name string) string {
 	return fmt.Sprintf(`
 resource sakuracloud_switch "sw"{
-    name = "%s"
+  name = "%s"
 }
 resource "sakuracloud_nfs" "foobar" {
-    switch_id = "${sakuracloud_switch.sw.id}"
-    ipaddress = "192.168.11.101"
-    nw_mask_len = 24
-    default_route = "192.168.11.1"
+  switch_id = "${sakuracloud_switch.sw.id}"
+  ipaddress = "192.168.11.101"
+  nw_mask_len = 24
+  default_route = "192.168.11.1"
 
-    name = "%s"
-    description = "description_test"
-    tags = ["tag1","tag2","tag3"]
+  name = "%s"
+  description = "description_test"
+  tags = ["tag1","tag2","tag3"]
 }
 data "sakuracloud_nfs" "foobar" {
-    filter {
-	name = "Name"
-	values = ["%s"]
-    }
+  filters {
+	names = ["%s"]
+  }
 }`, name, name, name)
 }
 
 func testAccCheckSakuraCloudDataSourceNFSConfig_With_Tag(name string) string {
 	return fmt.Sprintf(`
 resource sakuracloud_switch "sw"{
-    name = "%s"
+  name = "%s"
 }
 resource "sakuracloud_nfs" "foobar" {
-    switch_id = "${sakuracloud_switch.sw.id}"
-    ipaddress = "192.168.11.101"
-    nw_mask_len = 24
-    default_route = "192.168.11.1"
+  switch_id = "${sakuracloud_switch.sw.id}"
+  ipaddress = "192.168.11.101"
+  nw_mask_len = 24
+  default_route = "192.168.11.1"
 
-    name = "%s"
-    description = "description_test"
-    tags = ["tag1","tag2","tag3"]
+  name = "%s"
+  description = "description_test"
+  tags = ["tag1","tag2","tag3"]
 }
 data "sakuracloud_nfs" "foobar" {
-    filter {
-	name = "Tags"
-	values = ["tag1","tag3"]
-    }
+  filters {
+	tags = ["tag1","tag3"]
+  }
 }`, name, name)
 }
 
 func testAccCheckSakuraCloudDataSourceNFSConfig_With_NotExists_Tag(name string) string {
 	return fmt.Sprintf(`
 resource sakuracloud_switch "sw"{
-    name = "%s"
+  name = "%s"
 }
 resource "sakuracloud_nfs" "foobar" {
-    switch_id = "${sakuracloud_switch.sw.id}"
-    ipaddress = "192.168.11.101"
-    nw_mask_len = 24
-    default_route = "192.168.11.1"
+  switch_id = "${sakuracloud_switch.sw.id}"
+  ipaddress = "192.168.11.101"
+  nw_mask_len = 24
+  default_route = "192.168.11.1"
 
-    name = "%s"
-    description = "description_test"
-    tags = ["tag1","tag2","tag3"]
+  name = "%s"
+  description = "description_test"
+  tags = ["tag1","tag2","tag3"]
 }
 data "sakuracloud_nfs" "foobar" {
-    filter {
-	name = "Tags"
-	values = ["tag1-xxxxxxx","tag3-xxxxxxxx"]
-    }
+  filters {
+	tags = ["tag1-xxxxxxx","tag3-xxxxxxxx"]
+  }
 }`, name, name)
 }
 
 func testAccCheckSakuraCloudDataSourceNFSConfig_NotExists(name string) string {
 	return fmt.Sprintf(`
 resource sakuracloud_switch "sw"{
-    name = "%s"
+  name = "%s"
 }
 resource "sakuracloud_nfs" "foobar" {
-    switch_id = "${sakuracloud_switch.sw.id}"
-    ipaddress = "192.168.11.101"
-    nw_mask_len = 24
-    default_route = "192.168.11.1"
+  switch_id = "${sakuracloud_switch.sw.id}"
+  ipaddress = "192.168.11.101"
+  nw_mask_len = 24
+  default_route = "192.168.11.1"
 
-    name = "%s"
-    description = "description_test"
-    tags = ["tag1","tag2","tag3"]
+  name = "%s"
+  description = "description_test"
+  tags = ["tag1","tag2","tag3"]
 }
 data "sakuracloud_nfs" "foobar" {
-    filter {
-	name = "Name"
-	values = ["xxxxxxxxxxxxxxxxxx"]
-    }
+  filters {
+	names = ["xxxxxxxxxxxxxxxxxx"]
+  }
 }`, name, name)
 }
-
-func testAccCheckSakuraCloudDataSourceNFS_NameSelector_Exists(name, p1, p2 string) string {
-	return fmt.Sprintf(`
-resource sakuracloud_switch "sw"{
-    name = "%s"
-}
-resource "sakuracloud_nfs" "foobar" {
-    switch_id = "${sakuracloud_switch.sw.id}"
-    ipaddress = "192.168.11.101"
-    nw_mask_len = 24
-    default_route = "192.168.11.1"
-
-    name = "%s"
-    description = "description_test"
-    tags = ["tag1","tag2","tag3"]
-}
-data "sakuracloud_nfs" "foobar" {
-    name_selectors = ["%s", "%s"]
-}`, name, name, p1, p2)
-}
-
-var testAccCheckSakuraCloudDataSourceNFS_NameSelector_NotExists = `
-data "sakuracloud_nfs" "foobar" {
-    name_selectors = ["xxxxxxxxxx"]
-}
-`
-
-func testAccCheckSakuraCloudDataSourceNFS_TagSelector_Exists(name string) string {
-	return fmt.Sprintf(`
-resource sakuracloud_switch "sw"{
-    name = "%s"
-}
-resource "sakuracloud_nfs" "foobar" {
-    switch_id = "${sakuracloud_switch.sw.id}"
-    ipaddress = "192.168.11.101"
-    nw_mask_len = 24
-    default_route = "192.168.11.1"
-
-    name = "%s"
-    description = "description_test"
-    tags = ["tag1","tag2","tag3"]
-}
-data "sakuracloud_nfs" "foobar" {
-	tag_selectors = ["tag1","tag2","tag3"]
-}`, name, name)
-}
-
-var testAccCheckSakuraCloudDataSourceNFS_TagSelector_NotExists = `
-data "sakuracloud_nfs" "foobar" {
-	tag_selectors = ["xxxxxxxxxx"]
-}`

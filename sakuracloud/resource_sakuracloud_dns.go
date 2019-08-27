@@ -247,7 +247,7 @@ func dnsRecordToState(record *sacloud.DNSRecordSet) map[string]interface{} {
 	return r
 }
 
-func expandDNSRecord(d resourceValueGetable) *sacloud.DNSRecordSet {
+func expandDNSRecord(d resourceValueGettable) *sacloud.DNSRecordSet {
 	var dns = sacloud.DNS{}
 	t, _ := d.GetOk("type")
 	recordType := t.(string)

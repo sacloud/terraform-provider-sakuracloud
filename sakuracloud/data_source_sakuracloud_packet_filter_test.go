@@ -41,20 +41,7 @@ func TestAccSakuraCloudDataSourcePacketFilter_Basic(t *testing.T) {
 				),
 			},
 			{
-				Config: testAccCheckSakuraCloudDataSourcePacketFilter_NameSelector_Exists(name, randString1, randString2),
-				Check: resource.ComposeTestCheckFunc(
-					testAccCheckSakuraCloudPacketFilterDataSourceID("sakuracloud_packet_filter.foobar"),
-				),
-			},
-			{
 				Config: testAccCheckSakuraCloudDataSourcePacketFilterConfig_NotExists,
-				Check: resource.ComposeTestCheckFunc(
-					testAccCheckSakuraCloudPacketFilterDataSourceNotExists("data.sakuracloud_packet_filter.foobar"),
-				),
-				Destroy: true,
-			},
-			{
-				Config: testAccCheckSakuraCloudDataSourcePacketFilter_NameSelector_NotExists,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckSakuraCloudPacketFilterDataSourceNotExists("data.sakuracloud_packet_filter.foobar"),
 				),
@@ -113,88 +100,55 @@ func testAccCheckSakuraCloudPacketFilterDataSourceDestroy(s *terraform.State) er
 func testAccCheckSakuraCloudDataSourcePacketFilterBase(name string) string {
 	return fmt.Sprintf(`
 resource "sakuracloud_packet_filter" "foobar" {
-    name = "%s"
-    description = "description_test"
-    expressions {
-    	protocol = "tcp"
-    	source_nw = "0.0.0.0"
-    	source_port = "0-65535"
-    	dest_port = "80"
-    	allow = true
-    }
-    expressions {
-    	protocol = "udp"
-    	source_nw = "0.0.0.0"
-    	source_port = "0-65535"
-    	dest_port = "80"
-    	allow = true
-    }
+  name = "%s"
+  description = "description_test"
+  expressions {
+  	protocol = "tcp"
+  	source_nw = "0.0.0.0"
+  	source_port = "0-65535"
+  	dest_port = "80"
+  	allow = true
+  }
+  expressions {
+  	protocol = "udp"
+  	source_nw = "0.0.0.0"
+  	source_port = "0-65535"
+  	dest_port = "80"
+  	allow = true
+  }
 }`, name)
 }
 
 func testAccCheckSakuraCloudDataSourcePacketFilterConfig(name string) string {
 	return fmt.Sprintf(`
 resource "sakuracloud_packet_filter" "foobar" {
-    name = "%s"
-    description = "description_test"
-    expressions {
-    	protocol = "tcp"
-    	source_nw = "0.0.0.0"
-    	source_port = "0-65535"
-    	dest_port = "80"
-    	allow = true
-    }
-    expressions {
-    	protocol = "udp"
-    	source_nw = "0.0.0.0"
-    	source_port = "0-65535"
-    	dest_port = "80"
-    	allow = true
-    }
+  name = "%s"
+  description = "description_test"
+  expressions {
+  	protocol = "tcp"
+  	source_nw = "0.0.0.0"
+  	source_port = "0-65535"
+  	dest_port = "80"
+  	allow = true
+  }
+  expressions {
+  	protocol = "udp"
+  	source_nw = "0.0.0.0"
+  	source_port = "0-65535"
+  	dest_port = "80"
+  	allow = true
+  }
 }
 data "sakuracloud_packet_filter" "foobar" {
-    filter {
-	name = "Name"
-	values = ["%s"]
-    }
+  filters {
+	names = ["%s"]
+  }
 }`, name, name)
 }
 
 var testAccCheckSakuraCloudDataSourcePacketFilterConfig_NotExists = `
 data "sakuracloud_packet_filter" "foobar" {
-    filter {
-	name = "Name"
-	values = ["xxxxxxxxxxxxxxxxxx"]
-    }
+  filters {
+	names = ["xxxxxxxxxxxxxxxxxx"]
+  }
 }`
-
-func testAccCheckSakuraCloudDataSourcePacketFilter_NameSelector_Exists(name, p1, p2 string) string {
-	return fmt.Sprintf(`
-resource "sakuracloud_packet_filter" "foobar" {
-    name = "%s"
-    description = "description_test"
-    expressions {
-    	protocol = "tcp"
-    	source_nw = "0.0.0.0"
-    	source_port = "0-65535"
-    	dest_port = "80"
-    	allow = true
-    }
-    expressions {
-    	protocol = "udp"
-    	source_nw = "0.0.0.0"
-    	source_port = "0-65535"
-    	dest_port = "80"
-    	allow = true
-    }
-}
-data "sakuracloud_packet_filter" "foobar" {
-    name_selectors = ["%s", "%s"]
-}`, name, p1, p2)
-}
-
-var testAccCheckSakuraCloudDataSourcePacketFilter_NameSelector_NotExists = `
-data "sakuracloud_packet_filter" "foobar" {
-    name_selectors = ["xxxxxxxxxx"]
-}
-`

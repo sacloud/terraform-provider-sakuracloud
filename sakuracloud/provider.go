@@ -78,9 +78,19 @@ func Provider() terraform.ResourceProvider {
 				ValidateFunc: validation.IntBetween(1, 10),
 			},
 			"trace": {
-				Type:        schema.TypeBool,
+				Type:        schema.TypeString,
 				Optional:    true,
-				DefaultFunc: schema.EnvDefaultFunc("SAKURACLOUD_TRACE_MODE", false),
+				DefaultFunc: schema.EnvDefaultFunc("SAKURACLOUD_TRACE", ""),
+			},
+			"fake_mode": {
+				Type:        schema.TypeString,
+				Optional:    true,
+				DefaultFunc: schema.EnvDefaultFunc("FAKE_MODE", ""),
+			},
+			"fake_store_path": {
+				Type:        schema.TypeString,
+				Optional:    true,
+				DefaultFunc: schema.EnvDefaultFunc("FAKE_STORE_PATH", ""),
 			},
 		},
 		DataSourcesMap: map[string]*schema.Resource{
@@ -173,12 +183,14 @@ func providerConfigure(d *schema.ResourceData) (interface{}, error) {
 		AccessTokenSecret:   d.Get("secret").(string),
 		Zone:                d.Get("zone").(string),
 		TimeoutMinute:       d.Get("timeout").(int),
-		TraceMode:           d.Get("trace").(bool),
+		TraceMode:           d.Get("trace").(string),
 		APIRootURL:          d.Get("api_root_url").(string),
 		RetryMax:            d.Get("retry_max").(int),
 		RetryInterval:       d.Get("retry_interval").(int),
 		APIRequestTimeout:   d.Get("api_request_timeout").(int),
 		APIRequestRateLimit: d.Get("api_request_rate_limit").(int),
+		FakeMode:            d.Get("fake_mode").(string),
+		FakeStorePath:       d.Get("fake_store_path").(string),
 	}
 
 	return config.NewClient(), nil

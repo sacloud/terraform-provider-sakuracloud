@@ -71,18 +71,6 @@ func TestAccSakuraCloudDataSourceProxyLB_Basic(t *testing.T) {
 				),
 			},
 			{
-				Config: testAccCheckSakuraCloudDataSourceProxyLB_NameSelector_Exists(name, proxyLBRealServerIP0, proxyLBRealServerIP1, randString1, randString2),
-				Check: resource.ComposeTestCheckFunc(
-					testAccCheckSakuraCloudProxyLBDataSourceID("data.sakuracloud_proxylb.foobar"),
-				),
-			},
-			{
-				Config: testAccCheckSakuraCloudDataSourceProxyLB_TagSelector_Exists(name, proxyLBRealServerIP0, proxyLBRealServerIP1),
-				Check: resource.ComposeTestCheckFunc(
-					testAccCheckSakuraCloudProxyLBDataSourceID("data.sakuracloud_proxylb.foobar"),
-				),
-			},
-			{
 				Config: testAccCheckSakuraCloudDataSourceProxyLBConfig_NotExists(name, proxyLBRealServerIP0, proxyLBRealServerIP1),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckSakuraCloudProxyLBDataSourceNotExists("data.sakuracloud_proxylb.foobar"),
@@ -91,20 +79,6 @@ func TestAccSakuraCloudDataSourceProxyLB_Basic(t *testing.T) {
 			},
 			{
 				Config: testAccCheckSakuraCloudDataSourceProxyLBConfig_With_NotExists_Tag(name, proxyLBRealServerIP0, proxyLBRealServerIP1),
-				Check: resource.ComposeTestCheckFunc(
-					testAccCheckSakuraCloudProxyLBDataSourceNotExists("data.sakuracloud_proxylb.foobar"),
-				),
-				Destroy: true,
-			},
-			{
-				Config: testAccCheckSakuraCloudDataSourceProxyLB_NameSelector_NotExists,
-				Check: resource.ComposeTestCheckFunc(
-					testAccCheckSakuraCloudProxyLBDataSourceNotExists("data.sakuracloud_proxylb.foobar"),
-				),
-				Destroy: true,
-			},
-			{
-				Config: testAccCheckSakuraCloudDataSourceProxyLB_TagSelector_NotExists,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckSakuraCloudProxyLBDataSourceNotExists("data.sakuracloud_proxylb.foobar"),
 				),
@@ -209,9 +183,8 @@ resource "sakuracloud_proxylb" "foobar" {
   tags = ["tag1","tag2","tag3"]
 }
 data "sakuracloud_proxylb" "foobar" {
-  filter {
-	name = "Name"
-	values = ["%s"]
+  filters {
+	names = ["%s"]
   }
 }`, name, ip1, ip2, name)
 }
@@ -240,9 +213,8 @@ resource "sakuracloud_proxylb" "foobar" {
   tags = ["tag1","tag2","tag3"]
 }
 data "sakuracloud_proxylb" "foobar" {
-  filter {
-	name = "Tags"
-	values = ["tag1","tag3"]
+  filters {
+	tags = ["tag1","tag3"]
   }
 }`, name, ip1, ip2)
 }
@@ -271,9 +243,8 @@ resource "sakuracloud_proxylb" "foobar" {
   tags = ["tag1","tag2","tag3"]
 }
 data "sakuracloud_proxylb" "foobar" {
-  filter {
-	name = "Tags"
-	values = ["tag1-xxxxxxx","tag3-xxxxxxxx"]
+  filters {
+	tags = ["tag1-xxxxxxx","tag3-xxxxxxxx"]
   }
 }`, name, ip1, ip2)
 }
@@ -302,77 +273,8 @@ resource "sakuracloud_proxylb" "foobar" {
   tags = ["tag1","tag2","tag3"]
 }
 data "sakuracloud_proxylb" "foobar" {
-  filter {
-	name = "Name"
-	values = ["xxxxxxxxxxxxxxxxxx"]
+  filters {
+	names = ["xxxxxxxxxxxxxxxxxx"]
   }
 }`, name, ip1, ip2)
 }
-
-func testAccCheckSakuraCloudDataSourceProxyLB_NameSelector_Exists(name, ip1, ip2, p1, p2 string) string {
-	return fmt.Sprintf(`
-resource "sakuracloud_proxylb" "foobar" {
-  name = "%s"
-  health_check {
-    protocol = "tcp"
-    delay_loop = 20
-  }
-  bind_ports {
-    proxy_mode = "http"
-    port       = 80
-  }
-  servers {
-      ipaddress = "%s"
-      port = 80
-  }
-  servers {
-      ipaddress = "%s"
-      port = 80
-  }
-  description = "description_test"
-  tags = ["tag1","tag2","tag3"]
-}
-data "sakuracloud_proxylb" "foobar" {
-  name_selectors = ["%s", "%s"]
-}
-`, name, ip1, ip2, p1, p2)
-}
-
-var testAccCheckSakuraCloudDataSourceProxyLB_NameSelector_NotExists = `
-data "sakuracloud_proxylb" "foobar" {
-  name_selectors = ["xxxxxxxxxx"]
-}
-`
-
-func testAccCheckSakuraCloudDataSourceProxyLB_TagSelector_Exists(name, ip1, ip2 string) string {
-	return fmt.Sprintf(`
-resource "sakuracloud_proxylb" "foobar" {
-  name = "%s"
-  health_check {
-    protocol = "tcp"
-    delay_loop = 20
-  }
-  bind_ports {
-    proxy_mode = "http"
-    port       = 80
-  }
-  servers {
-      ipaddress = "%s"
-      port = 80
-  }
-  servers {
-      ipaddress = "%s"
-      port = 80
-  }
-  description = "description_test"
-  tags = ["tag1","tag2","tag3"]
-}
-data "sakuracloud_proxylb" "foobar" {
-  tag_selectors = ["tag1","tag2","tag3"]
-}`, name, ip1, ip2)
-}
-
-var testAccCheckSakuraCloudDataSourceProxyLB_TagSelector_NotExists = `
-data "sakuracloud_proxylb" "foobar" {
-  tag_selectors = ["xxxxxxxxxx"]
-}`

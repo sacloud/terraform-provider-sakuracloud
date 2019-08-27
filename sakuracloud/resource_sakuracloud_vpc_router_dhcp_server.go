@@ -127,7 +127,7 @@ func vpcRouterDHCPServerIDHash(routerID string, s *sacloud.VPCRouterDHCPServerCo
 	return fmt.Sprintf("%d", hashcode.String(buf.String()))
 }
 
-func expandVPCRouterDHCPServer(d resourceValueGetable) *sacloud.VPCRouterDHCPServerConfig {
+func expandVPCRouterDHCPServer(d resourceValueGettable) *sacloud.VPCRouterDHCPServerConfig {
 
 	var dhcpServer = &sacloud.VPCRouterDHCPServerConfig{
 		Interface:  fmt.Sprintf("eth%d", d.Get("vpc_router_interface_index").(int)),

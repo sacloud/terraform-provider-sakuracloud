@@ -125,7 +125,7 @@ func vpcRouterStaticNATIDHash(routerID string, s *sacloud.VPCRouterStaticNATConf
 	return fmt.Sprintf("%d", hashcode.String(buf.String()))
 }
 
-func expandVPCRouterStaticNAT(d resourceValueGetable) *sacloud.VPCRouterStaticNATConfig {
+func expandVPCRouterStaticNAT(d resourceValueGettable) *sacloud.VPCRouterStaticNATConfig {
 
 	var staticNAT = &sacloud.VPCRouterStaticNATConfig{
 		GlobalAddress:  d.Get("global_address").(string),

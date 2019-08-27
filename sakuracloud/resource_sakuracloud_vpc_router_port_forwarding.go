@@ -133,7 +133,7 @@ func vpcRouterPortForwardingIDHash(routerID string, s *sacloud.VPCRouterPortForw
 	return fmt.Sprintf("%d", hashcode.String(buf.String()))
 }
 
-func expandVPCRouterPortForwarding(d resourceValueGetable) *sacloud.VPCRouterPortForwardingConfig {
+func expandVPCRouterPortForwarding(d resourceValueGettable) *sacloud.VPCRouterPortForwardingConfig {
 
 	var portForwarding = &sacloud.VPCRouterPortForwardingConfig{
 		Protocol:       d.Get("protocol").(string),

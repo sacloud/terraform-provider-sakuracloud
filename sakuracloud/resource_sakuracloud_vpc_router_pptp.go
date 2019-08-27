@@ -120,7 +120,7 @@ func vpcRouterPPTPIDHash(routerID string, s *sacloud.VPCRouterPPTPServer) string
 	return fmt.Sprintf("%d", hashcode.String(buf.String()))
 }
 
-func expandVPCRouterPPTP(d resourceValueGetable) *sacloud.VPCRouterPPTPServerConfig {
+func expandVPCRouterPPTP(d resourceValueGettable) *sacloud.VPCRouterPPTPServerConfig {
 
 	var pptpSetting = &sacloud.VPCRouterPPTPServerConfig{
 		RangeStart: d.Get("range_start").(string),

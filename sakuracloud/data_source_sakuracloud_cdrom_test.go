@@ -32,12 +32,6 @@ func TestAccSakuraCloudDataSourceCDROM_Basic(t *testing.T) {
 				),
 			},
 			{
-				Config: testAccCheckSakuraCloudDataSourceCDROMConfig_With_Tag,
-				Check: resource.ComposeTestCheckFunc(
-					testAccCheckSakuraCloudCDROMDataSourceID("data.sakuracloud_cdrom.foobar"),
-				),
-			},
-			{
 				Config: testAccCheckSakuraCloudDataSourceCDROM_NameSelector_Exists,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckSakuraCloudCDROMDataSourceID("data.sakuracloud_cdrom.foobar"),
@@ -51,13 +45,6 @@ func TestAccSakuraCloudDataSourceCDROM_Basic(t *testing.T) {
 			},
 			{
 				Config: testAccCheckSakuraCloudDataSourceCDROMConfig_NotExists,
-				Check: resource.ComposeTestCheckFunc(
-					testAccCheckSakuraCloudCDROMDataSourceNotExists("data.sakuracloud_cdrom.foobar"),
-				),
-				Destroy: true,
-			},
-			{
-				Config: testAccCheckSakuraCloudDataSourceCDROMConfig_With_NotExists_Tag,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckSakuraCloudCDROMDataSourceNotExists("data.sakuracloud_cdrom.foobar"),
 				),
@@ -129,53 +116,49 @@ func testAccCheckSakuraCloudCDROMDataSourceDestroy(s *terraform.State) error {
 
 var testAccCheckSakuraCloudDataSourceCDROMConfig = `
 data "sakuracloud_cdrom" "foobar" {
-    filter {
-	name = "Name"
-	values = ["Ubuntu server 18.04.2 LTS 64bit"]
+  filters {
+    conditions {
+	  name = "Name"
+	  values = ["Ubuntu server 18.04.2 LTS 64bit"]
     }
-}`
-
-var testAccCheckSakuraCloudDataSourceCDROMConfig_With_Tag = `
-data "sakuracloud_cdrom" "foobar" {
-    filter {
-	name = "Tags"
-	values = ["distro-ubuntu","os-unix"]
-    }
-}`
-
-var testAccCheckSakuraCloudDataSourceCDROMConfig_With_NotExists_Tag = `
-data "sakuracloud_cdrom" "foobar" {
-    filter {
-	name = "Tags"
-	values = ["distro-ubuntu-xxxxxxxxxxx","os-linux-xxxxxxxx"]
-    }
+  }
 }`
 
 var testAccCheckSakuraCloudDataSourceCDROMConfig_NotExists = `
 data "sakuracloud_cdrom" "foobar" {
-    filter {
-	name = "Name"
-	values = ["xxxxxxxxxxxxxxxxxx"]
+  filters {
+    conditions {
+	  name = "Name"
+	  values = ["xxxxxxxxxxxxxxxxxx"]
     }
+  }
 }`
 
 var testAccCheckSakuraCloudDataSourceCDROM_NameSelector_Exists = `
 data "sakuracloud_cdrom" "foobar" {
-    name_selectors = ["Ubuntu","server","18"]
+  filters {
+    names = ["Ubuntu","server","18"]
+  }
 }
 `
 var testAccCheckSakuraCloudDataSourceCDROM_NameSelector_NotExists = `
 data "sakuracloud_cdrom" "foobar" {
-    name_selectors = ["xxxxxxxxxx"]
+  filters {
+    names = ["xxxxxxxxxx"]
+  }
 }
 `
 
 var testAccCheckSakuraCloudDataSourceCDROM_TagSelector_Exists = `
 data "sakuracloud_cdrom" "foobar" {
-	tag_selectors = ["distro-ubuntu","os-unix"]
+  filters {
+	tags = ["distro-ubuntu","os-unix"]
+  }
 }`
 
 var testAccCheckSakuraCloudDataSourceCDROM_TagSelector_NotExists = `
 data "sakuracloud_cdrom" "foobar" {
-	tag_selectors = ["xxxxxxxxxx"]
+  filters {
+	tags = ["xxxxxxxxxx"]
+  }
 }`

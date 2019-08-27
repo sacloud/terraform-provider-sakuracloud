@@ -1,10 +1,11 @@
 package sakuracloud
 
 import (
+	"context"
 	"fmt"
 
 	"github.com/hashicorp/terraform/helper/schema"
-	"github.com/sacloud/libsacloud/sacloud"
+	"github.com/sacloud/libsacloud/v2/sacloud"
 )
 
 func dataSourceSakuraCloudInternet() *schema.Resource {
@@ -12,37 +13,7 @@ func dataSourceSakuraCloudInternet() *schema.Resource {
 		Read: dataSourceSakuraCloudInternetRead,
 
 		Schema: map[string]*schema.Schema{
-			"name_selectors": {
-				Type:     schema.TypeList,
-				Optional: true,
-				ForceNew: true,
-				Elem:     &schema.Schema{Type: schema.TypeString},
-			},
-			"tag_selectors": {
-				Type:     schema.TypeList,
-				Optional: true,
-				ForceNew: true,
-				Elem:     &schema.Schema{Type: schema.TypeString},
-			},
-			"filter": {
-				Type:     schema.TypeSet,
-				Optional: true,
-				ForceNew: true,
-				Elem: &schema.Resource{
-					Schema: map[string]*schema.Schema{
-						"name": {
-							Type:     schema.TypeString,
-							Required: true,
-						},
-
-						"values": {
-							Type:     schema.TypeList,
-							Required: true,
-							Elem:     &schema.Schema{Type: schema.TypeString},
-						},
-					},
-				},
-			},
+			filterAttrName: filterSchema(&filterSchemaOption{}),
 			"name": {
 				Type:     schema.TypeString,
 				Computed: true,
@@ -128,51 +99,79 @@ func dataSourceSakuraCloudInternet() *schema.Resource {
 
 func dataSourceSakuraCloudInternetRead(d *schema.ResourceData, meta interface{}) error {
 	client := getSacloudAPIClient(d, meta)
+	searcher := sacloud.NewInternetOp(client)
+	ctx := context.Background()
+	zone := getV2Zone(d, client)
 
-	//filters
-	if rawFilter, filterOk := d.GetOk("filter"); filterOk {
-		filters := expandFilters(rawFilter)
-		for key, f := range filters {
-			client.Internet.FilterBy(key, f)
-		}
+	findCondition := &sacloud.FindCondition{
+		Count: defaultSearchLimit,
+	}
+	if rawFilter, ok := d.GetOk(filterAttrName); ok {
+		findCondition.Filter = expandSearchFilter(rawFilter)
 	}
 
-	res, err := client.Internet.Find()
+	res, err := searcher.Find(ctx, zone, findCondition)
 	if err != nil {
-		return fmt.Errorf("Couldn't find SakuraCloud Internet resource: %s", err)
+		return fmt.Errorf("could not find SakuraCloud Internet resource: %s", err)
 	}
-	if res == nil || res.Count == 0 {
+	if res == nil || res.Count == 0 || len(res.Internet) == 0 {
 		return filterNoResultErr()
 	}
-	var data *sacloud.Internet
+
 	targets := res.Internet
+	d.SetId(targets[0].ID.String())
+	return setInternetV2ResourceData(ctx, d, client, targets[0])
+}
 
-	if rawNameSelector, ok := d.GetOk("name_selectors"); ok {
-		selectors := expandStringList(rawNameSelector.([]interface{}))
-		var filtered []sacloud.Internet
-		for _, a := range targets {
-			if hasNames(&a, selectors) {
-				filtered = append(filtered, a)
-			}
+func setInternetV2ResourceData(ctx context.Context, d *schema.ResourceData, client *APIClient, data *sacloud.Internet) error {
+
+	swOp := sacloud.NewSwitchOp(client)
+	zone := getV2Zone(d, client)
+	sw, err := swOp.Read(ctx, zone, data.Switch.ID)
+	if err != nil {
+		return fmt.Errorf("could not find SakuraCloud Switch resource: %s", err)
+	}
+
+	var serverIDs []string
+	if sw.ServerCount > 0 {
+		servers, err := swOp.GetServers(ctx, zone, sw.ID)
+		if err != nil {
+			return fmt.Errorf("coul not find SakuraCloud Servers: %s", err)
 		}
-		targets = filtered
-	}
-	if rawTagSelector, ok := d.GetOk("tag_selectors"); ok {
-		selectors := expandStringList(rawTagSelector.([]interface{}))
-		var filtered []sacloud.Internet
-		for _, a := range targets {
-			if hasTags(&a, selectors) {
-				filtered = append(filtered, a)
-			}
+		for _, s := range servers.Servers {
+			serverIDs = append(serverIDs, s.ID.String())
 		}
-		targets = filtered
 	}
 
-	if len(targets) == 0 {
-		return filterNoResultErr()
+	var enableIPv6 bool
+	var ipv6Prefix, ipv6NetworkAddress string
+	var ipv6PrefixLen int
+	if len(data.Switch.IPv6Nets) > 0 {
+		enableIPv6 = true
+		ipv6Prefix = data.Switch.IPv6Nets[0].IPv6Prefix
+		ipv6PrefixLen = data.Switch.IPv6Nets[0].IPv6PrefixLen
+		ipv6NetworkAddress = fmt.Sprintf("%s/%d", ipv6Prefix, ipv6PrefixLen)
 	}
-	data = &targets[0]
 
-	d.SetId(data.GetStrID())
-	return setInternetResourceData(d, client, data)
+	setPowerManageTimeoutValueToState(d)
+	return setResourceData(d, map[string]interface{}{
+		"name":            data.Name,
+		"icon_id":         data.IconID.String(),
+		"description":     data.Description,
+		"tags":            data.Tags,
+		"nw_mask_len":     data.NetworkMaskLen,
+		"band_width":      data.BandWidthMbps,
+		"switch_id":       sw.ID.String(),
+		"nw_address":      sw.Subnets[0].NetworkAddress,
+		"gateway":         sw.Subnets[0].DefaultRoute,
+		"min_ipaddress":   sw.Subnets[0].AssignedIPAddressMin,
+		"max_ipaddress":   sw.Subnets[0].AssignedIPAddressMax,
+		"ipaddresses":     sw.Subnets[0].GetAssignedIPAddresses(),
+		"server_ids":      serverIDs,
+		"enable_ipv6":     enableIPv6,
+		"ipv6_prefix":     ipv6Prefix,
+		"ipv6_prefix_len": ipv6PrefixLen,
+		"ipv6_nw_address": ipv6NetworkAddress,
+		"zone":            zone,
+	})
 }

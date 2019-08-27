@@ -49,18 +49,6 @@ func TestAccSakuraCloudDataSourceGSLB_Basic(t *testing.T) {
 				),
 			},
 			{
-				Config: testAccCheckSakuraCloudDataSourceGSLB_NameSelector_Exists(name, randString1, randString2),
-				Check: resource.ComposeTestCheckFunc(
-					testAccCheckSakuraCloudGSLBDataSourceID("data.sakuracloud_gslb.foobar"),
-				),
-			},
-			{
-				Config: testAccCheckSakuraCloudDataSourceGSLB_TagSelector_Exists(name),
-				Check: resource.ComposeTestCheckFunc(
-					testAccCheckSakuraCloudGSLBDataSourceID("data.sakuracloud_gslb.foobar"),
-				),
-			},
-			{
 				Config: testAccCheckSakuraCloudDataSourceGSLBConfig_NotExists(name),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckSakuraCloudGSLBDataSourceNotExists("data.sakuracloud_gslb.foobar"),
@@ -69,20 +57,6 @@ func TestAccSakuraCloudDataSourceGSLB_Basic(t *testing.T) {
 			},
 			{
 				Config: testAccCheckSakuraCloudDataSourceGSLBConfig_With_NotExists_Tag(name),
-				Check: resource.ComposeTestCheckFunc(
-					testAccCheckSakuraCloudGSLBDataSourceNotExists("data.sakuracloud_gslb.foobar"),
-				),
-				Destroy: true,
-			},
-			{
-				Config: testAccCheckSakuraCloudDataSourceGSLB_NameSelector_NotExists,
-				Check: resource.ComposeTestCheckFunc(
-					testAccCheckSakuraCloudGSLBDataSourceNotExists("data.sakuracloud_gslb.foobar"),
-				),
-				Destroy: true,
-			},
-			{
-				Config: testAccCheckSakuraCloudDataSourceGSLB_TagSelector_NotExists,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckSakuraCloudGSLBDataSourceNotExists("data.sakuracloud_gslb.foobar"),
 				),
@@ -141,160 +115,104 @@ func testAccCheckSakuraCloudGSLBDataSourceDestroy(s *terraform.State) error {
 func testAccCheckSakuraCloudDataSourceGSLBBase(name string) string {
 	return fmt.Sprintf(`
 resource "sakuracloud_gslb" "foobar" {
-    name = "%s"
-    health_check {
-        protocol = "http"
-        delay_loop = 10
-        host_header = "terraform.io"
-        path = "/"
-        status = "200"
-    }
-    sorry_server = "8.8.8.8"
-    description = "description_test"
-    tags = ["tag1","tag2","tag3"]
+ name = "%s"
+  health_check {
+    protocol = "http"
+    delay_loop = 10
+    host_header = "terraform.io"
+    path = "/"
+    status = "200"
+  }
+  sorry_server = "8.8.8.8"
+  description = "description_test"
+  tags = ["tag1","tag2","tag3"]
 }`, name)
 }
 
 func testAccCheckSakuraCloudDataSourceGSLBConfig(name string) string {
 	return fmt.Sprintf(`
 resource "sakuracloud_gslb" "foobar" {
-    name = "%s"
-    health_check {
-        protocol = "http"
-        delay_loop = 10
-        host_header = "terraform.io"
-        path = "/"
-        status = "200"
-    }
-    sorry_server = "8.8.8.8"
-    description = "description_test"
-    tags = ["tag1","tag2","tag3"]
+  name = "%s"
+  health_check {
+    protocol = "http"
+    delay_loop = 10
+    host_header = "terraform.io"
+    path = "/"
+    status = "200"
+  }
+  sorry_server = "8.8.8.8"
+  description = "description_test"
+  tags = ["tag1","tag2","tag3"]
 }
 data "sakuracloud_gslb" "foobar" {
-    filter {
-	name = "Name"
-	values = ["%s"]
-    }
+  filters {
+	names = ["%s"]
+  }
 }`, name, name)
 }
 
 func testAccCheckSakuraCloudDataSourceGSLBConfig_With_Tag(name string) string {
 	return fmt.Sprintf(`
 resource "sakuracloud_gslb" "foobar" {
-    name = "%s"
-    health_check {
-        protocol = "http"
-        delay_loop = 10
-        host_header = "terraform.io"
-        path = "/"
-        status = "200"
-    }
-    sorry_server = "8.8.8.8"
-    description = "description_test"
-    tags = ["tag1","tag2","tag3"]
+  name = "%s"
+  health_check {
+    protocol = "http"
+    delay_loop = 10
+    host_header = "terraform.io"
+    path = "/"
+    status = "200"
+  }
+  sorry_server = "8.8.8.8"
+  description = "description_test"
+  tags = ["tag1","tag2","tag3"]
 }
 data "sakuracloud_gslb" "foobar" {
-    filter {
-	name = "Tags"
-	values = ["tag1","tag3"]
-    }
+  filters {
+	tags = ["tag1","tag3"]
+  }
 }`, name)
 }
 
 func testAccCheckSakuraCloudDataSourceGSLBConfig_With_NotExists_Tag(name string) string {
 	return fmt.Sprintf(`
 resource "sakuracloud_gslb" "foobar" {
-    name = "%s"
-    health_check {
-        protocol = "http"
-        delay_loop = 10
-        host_header = "terraform.io"
-        path = "/"
-        status = "200"
-    }
-    sorry_server = "8.8.8.8"
-    description = "description_test"
-    tags = ["tag1","tag2","tag3"]
+  name = "%s"
+  health_check {
+    protocol = "http"
+    delay_loop = 10
+    host_header = "terraform.io"
+    path = "/"
+    status = "200"
+  }
+  sorry_server = "8.8.8.8"
+  description = "description_test"
+  tags = ["tag1","tag2","tag3"]
 }
 data "sakuracloud_gslb" "foobar" {
-    filter {
-	name = "Tags"
-	values = ["tag1-xxxxxxx","tag3-xxxxxxxx"]
-    }
+  filters {
+	tags = ["tag1-xxxxxxx","tag3-xxxxxxxx"]
+  }
 }`, name)
 }
 
 func testAccCheckSakuraCloudDataSourceGSLBConfig_NotExists(name string) string {
 	return fmt.Sprintf(`
 resource "sakuracloud_gslb" "foobar" {
-    name = "%s"
-    health_check {
-        protocol = "http"
-        delay_loop = 10
-        host_header = "terraform.io"
-        path = "/"
-        status = "200"
-    }
-    sorry_server = "8.8.8.8"
-    description = "description_test"
-    tags = ["tag1","tag2","tag3"]
+  name = "%s"
+  health_check {
+    protocol = "http"
+    delay_loop = 10
+    host_header = "terraform.io"
+    path = "/"
+    status = "200"
+  }
+  sorry_server = "8.8.8.8"
+  description = "description_test"
+  tags = ["tag1","tag2","tag3"]
 }
 data "sakuracloud_gslb" "foobar" {
-    filter {
-	name = "Name"
-	values = ["xxxxxxxxxxxxxxxxxx"]
-    }
+  filters {
+	names = ["xxxxxxxxxxxxxxxxxx"]
+  }
 }`, name)
 }
-
-func testAccCheckSakuraCloudDataSourceGSLB_NameSelector_Exists(name, p1, p2 string) string {
-	return fmt.Sprintf(`
-resource "sakuracloud_gslb" "foobar" {
-    name = "%s"
-    health_check {
-        protocol = "http"
-        delay_loop = 10
-        host_header = "terraform.io"
-        path = "/"
-        status = "200"
-    }
-    sorry_server = "8.8.8.8"
-    description = "description_test"
-    tags = ["tag1","tag2","tag3"]
-}
-data "sakuracloud_gslb" "foobar" {
-    name_selectors = ["%s", "%s"]
-}
-`, name, p1, p2)
-}
-
-var testAccCheckSakuraCloudDataSourceGSLB_NameSelector_NotExists = `
-data "sakuracloud_gslb" "foobar" {
-    name_selectors = ["xxxxxxxxxx"]
-}
-`
-
-func testAccCheckSakuraCloudDataSourceGSLB_TagSelector_Exists(name string) string {
-	return fmt.Sprintf(`
-resource "sakuracloud_gslb" "foobar" {
-    name = "%s"
-    health_check {
-        protocol = "http"
-        delay_loop = 10
-        host_header = "terraform.io"
-        path = "/"
-        status = "200"
-    }
-    sorry_server = "8.8.8.8"
-    description = "description_test"
-    tags = ["tag1","tag2","tag3"]
-}
-data "sakuracloud_gslb" "foobar" {
-	tag_selectors = ["tag1","tag2","tag3"]
-}`, name)
-}
-
-var testAccCheckSakuraCloudDataSourceGSLB_TagSelector_NotExists = `
-data "sakuracloud_gslb" "foobar" {
-	tag_selectors = ["xxxxxxxxxx"]
-}`

@@ -1,10 +1,11 @@
 package sakuracloud
 
 import (
+	"context"
 	"fmt"
 
 	"github.com/hashicorp/terraform/helper/schema"
-	"github.com/sacloud/libsacloud/sacloud"
+	"github.com/sacloud/libsacloud/v2/sacloud"
 )
 
 func dataSourceSakuraCloudCDROM() *schema.Resource {
@@ -12,37 +13,7 @@ func dataSourceSakuraCloudCDROM() *schema.Resource {
 		Read: dataSourceSakuraCloudCDROMRead,
 
 		Schema: map[string]*schema.Schema{
-			"name_selectors": {
-				Type:     schema.TypeList,
-				Optional: true,
-				ForceNew: true,
-				Elem:     &schema.Schema{Type: schema.TypeString},
-			},
-			"tag_selectors": {
-				Type:     schema.TypeList,
-				Optional: true,
-				ForceNew: true,
-				Elem:     &schema.Schema{Type: schema.TypeString},
-			},
-			"filter": {
-				Type:     schema.TypeSet,
-				Optional: true,
-				ForceNew: true,
-				Elem: &schema.Resource{
-					Schema: map[string]*schema.Schema{
-						"name": {
-							Type:     schema.TypeString,
-							Required: true,
-						},
-
-						"values": {
-							Type:     schema.TypeList,
-							Required: true,
-							Elem:     &schema.Schema{Type: schema.TypeString},
-						},
-					},
-				},
-			},
+			filterAttrName: filterSchema(&filterSchemaOption{}),
 			"name": {
 				Type:     schema.TypeString,
 				Computed: true,
@@ -78,52 +49,37 @@ func dataSourceSakuraCloudCDROM() *schema.Resource {
 
 func dataSourceSakuraCloudCDROMRead(d *schema.ResourceData, meta interface{}) error {
 	client := getSacloudAPIClient(d, meta)
+	searcher := sacloud.NewCDROMOp(client)
+	ctx := context.Background()
+	zone := getV2Zone(d, client)
 
-	//filters
-	if rawFilter, filterOk := d.GetOk("filter"); filterOk {
-		filters := expandFilters(rawFilter)
-		for key, f := range filters {
-			client.CDROM.FilterBy(key, f)
-		}
+	findCondition := &sacloud.FindCondition{
+		Count: defaultSearchLimit,
+	}
+	if rawFilter, ok := d.GetOk(filterAttrName); ok {
+		findCondition.Filter = expandSearchFilter(rawFilter)
 	}
 
-	res, err := client.CDROM.Find()
+	res, err := searcher.Find(ctx, zone, findCondition)
 	if err != nil {
-		return fmt.Errorf("Couldn't find SakuraCloud CDROM resource: %s", err)
+		return fmt.Errorf("could not find SakuraCloud CDROM resource: %s", err)
 	}
-	if res == nil || res.Count == 0 {
+	if res == nil || res.Count == 0 || len(res.CDROMs) == 0 {
 		return filterNoResultErr()
 	}
 
-	var data *sacloud.CDROM
 	targets := res.CDROMs
+	d.SetId(targets[0].ID.String())
+	return setCDROMV2ResourceData(ctx, d, client, targets[0])
+}
 
-	if rawNameSelector, ok := d.GetOk("name_selectors"); ok {
-		selectors := expandStringList(rawNameSelector.([]interface{}))
-		var filtered []sacloud.CDROM
-		for _, a := range targets {
-			if hasNames(&a, selectors) {
-				filtered = append(filtered, a)
-			}
-		}
-		targets = filtered
-	}
-	if rawTagSelector, ok := d.GetOk("tag_selectors"); ok {
-		selectors := expandStringList(rawTagSelector.([]interface{}))
-		var filtered []sacloud.CDROM
-		for _, a := range targets {
-			if hasTags(&a, selectors) {
-				filtered = append(filtered, a)
-			}
-		}
-		targets = filtered
-	}
-
-	if len(targets) == 0 {
-		return filterNoResultErr()
-	}
-	data = &targets[0]
-
-	d.SetId(data.GetStrID())
-	return setCDROMResourceData(d, client, data)
+func setCDROMV2ResourceData(ctx context.Context, d *schema.ResourceData, client *APIClient, data *sacloud.CDROM) error {
+	return setResourceData(d, map[string]interface{}{
+		"name":        data.Name,
+		"size":        data.GetSizeGB(),
+		"icon_id":     data.IconID.String(),
+		"description": data.Description,
+		"tags":        data.Tags,
+		"zone":        getV2Zone(d, client),
+	})
 }

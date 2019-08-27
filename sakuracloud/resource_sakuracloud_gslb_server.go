@@ -136,7 +136,7 @@ func gslbServerIDHash(gslbID string, s *sacloud.GSLBServer) string {
 	return fmt.Sprintf("gslbserver-%d", hashcode.String(buf.String()))
 }
 
-func expandGSLBServer(d resourceValueGetable) *sacloud.GSLBServer {
+func expandGSLBServer(d resourceValueGettable) *sacloud.GSLBServer {
 	var gslb = sacloud.GSLB{}
 	var ipaddress string
 	var enabled bool

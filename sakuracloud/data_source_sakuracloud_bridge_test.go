@@ -122,18 +122,22 @@ resource "sakuracloud_bridge" "foobar" {
     description = "description_test"
 }
 data "sakuracloud_bridge" "foobar" {
-  filter {
-    name = "Name"
-    values = ["%s"]
+  filters {
+    conditions {
+      name = "Name"
+      values = ["%s"]
+    }
   }
 }`, name, name)
 }
 
 var testAccCheckSakuraCloudDataSourceBridgeConfig_NotExists = `
 data "sakuracloud_bridge" "foobar" {
-  filter {
-    name = "Name"
-    values = ["xxxxxxxxxxxxxxxxxx"]
+  filters {
+    conditions {
+      name = "Name"
+      values = ["xxxxxxxxxxxxxxxxxx"]
+    }
   }
 }`
 
@@ -144,11 +148,15 @@ resource "sakuracloud_bridge" "foobar" {
   description = "description_test"
 }
 data "sakuracloud_bridge" "foobar" {
-  name_selectors = ["%s", "%s"]
+  filters {
+    names = ["%s", "%s"]
+  }
 }`, name, p1, p2)
 }
 
 var testAccCheckSakuraCloudDataSourceBridgeConfig_NameSelector_NotExists = `
 data "sakuracloud_bridge" "foobar" {
-    name_selectors = ["xxxxxxxxxx"]
+  filters {
+    names = ["xxxxxxxx"]
+  }
 }`
