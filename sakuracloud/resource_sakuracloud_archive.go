@@ -16,7 +16,8 @@ import (
 	"github.com/sacloud/libsacloud/sacloud"
 )
 
-var allowArchiveSizes = []string{"20", "40", "60", "80", "100", "250", "500", "750", "1024"}
+// TODO libsacloudに持たせる
+var allowArchiveSizes = []int{20, 40, 60, 80, 100, 250, 500, 750, 1024}
 
 func resourceSakuraCloudArchive() *schema.Resource {
 	return &schema.Resource{
@@ -38,7 +39,7 @@ func resourceSakuraCloudArchive() *schema.Resource {
 				Optional:     true,
 				ForceNew:     true,
 				Default:      20,
-				ValidateFunc: validateIntInWord(allowArchiveSizes),
+				ValidateFunc: validation.IntInSlice(allowArchiveSizes),
 			},
 			"archive_file": {
 				Type:     schema.TypeString,
