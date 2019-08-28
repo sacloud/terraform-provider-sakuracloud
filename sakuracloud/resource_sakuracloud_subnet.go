@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/hashicorp/terraform/helper/schema"
+	"github.com/hashicorp/terraform/helper/validation"
 	"github.com/sacloud/libsacloud/api"
 	"github.com/sacloud/libsacloud/sacloud"
 )
@@ -29,7 +30,7 @@ func resourceSakuraCloudSubnet() *schema.Resource {
 				Type:         schema.TypeInt,
 				ForceNew:     true,
 				Optional:     true,
-				ValidateFunc: validateIntInWord([]string{"28", "27", "26"}),
+				ValidateFunc: validation.IntInSlice([]int{28, 27, 26}),
 				Default:      28,
 			},
 			"next_hop": {

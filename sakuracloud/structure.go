@@ -1,6 +1,7 @@
 package sakuracloud
 
 import (
+	"context"
 	"fmt"
 	"strconv"
 	"strings"
@@ -93,6 +94,13 @@ func getSacloudAPIClient(d resourceValueGettable, meta interface{}) *APIClient {
 		APICaller:   c.APICaller,
 		defaultZone: c.defaultZone,
 	}
+}
+
+func getSacloudV2Client(d resourceValueGettable, meta interface{}) (*APIClient, context.Context, string) {
+	client := getSacloudAPIClient(d, meta)
+	ctx := context.Background()
+	zone := getV2Zone(d, client)
+	return client, ctx, zone
 }
 
 func getV2Zone(d resourceValueGettable, client *APIClient) string {

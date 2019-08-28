@@ -2,7 +2,6 @@ package sakuracloud
 
 import (
 	"fmt"
-	"strconv"
 	"strings"
 
 	"github.com/hashicorp/terraform/helper/schema"
@@ -45,14 +44,14 @@ func resourceSakuraCloudNFS() *schema.Resource {
 				ForceNew: true,
 				Optional: true,
 				Default:  "100",
-				ValidateFunc: validateIntInWord([]string{
-					strconv.Itoa(int(sacloud.NFSSize100G)),
-					strconv.Itoa(int(sacloud.NFSSize500G)),
-					strconv.Itoa(int(sacloud.NFSSize1T)),
-					strconv.Itoa(int(sacloud.NFSSize2T)),
-					strconv.Itoa(int(sacloud.NFSSize4T)),
-					strconv.Itoa(int(sacloud.NFSSize8T)),
-					strconv.Itoa(int(sacloud.NFSSize12T)),
+				ValidateFunc: validation.IntInSlice([]int{
+					int(sacloud.NFSSize100G),
+					int(sacloud.NFSSize500G),
+					int(sacloud.NFSSize1T),
+					int(sacloud.NFSSize2T),
+					int(sacloud.NFSSize4T),
+					int(sacloud.NFSSize8T),
+					int(sacloud.NFSSize12T),
 				}),
 			},
 			"ipaddress": {
