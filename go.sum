@@ -363,8 +363,8 @@ github.com/sacloud/iso9660wrap v0.0.0-20171031075302-eda21f77f6a8 h1:5piK7EELHKR
 github.com/sacloud/iso9660wrap v0.0.0-20171031075302-eda21f77f6a8/go.mod h1:1jHHCa624cG5rODkWmourombJaNmkY9/SBHWhLJcg+w=
 github.com/sacloud/libsacloud v1.26.1 h1:td3Kd7lvpSAxxHEVpnaZ9goHmmhi0D/RfP0Rqqf/kek=
 github.com/sacloud/libsacloud v1.26.1/go.mod h1:79ZwATmHLIFZIMd7sxA3LwzVy/B77uj3LDoToVTxDoQ=
-github.com/sacloud/libsacloud/v2 v2.0.0-beta5.0.20190827075200-4a834e714540 h1:jlQ5alq+VmtztqRE3I7BKUNih6HuHwairnHK4zK1FBM=
-github.com/sacloud/libsacloud/v2 v2.0.0-beta5.0.20190827075200-4a834e714540/go.mod h1:pMzeuC8nezPoWXhQ1ZrawwdZOGDqe3xs4Fa3MddE1W0=
+github.com/sacloud/libsacloud/v2 v2.0.0-beta5.0.20190828055130-509e8b220d4f h1:lcgMcxpojgUCb3V/nUqOSw1jCCoNgBDYgtM6qoBmYqc=
+github.com/sacloud/libsacloud/v2 v2.0.0-beta5.0.20190828055130-509e8b220d4f/go.mod h1:pMzeuC8nezPoWXhQ1ZrawwdZOGDqe3xs4Fa3MddE1W0=
 github.com/satori/go.uuid v1.2.0 h1:0uYX9dsZ2yD7q2RtLRtPSdGDWzjeM3TbMJP9utgA0ww=
 github.com/satori/go.uuid v1.2.0/go.mod h1:dA0hQrYB0VpLJoorglMZABFdXlWrHn1NEOzdhQKdks0=
 github.com/sean-/seed v0.0.0-20170313163322-e2103e2c3529/go.mod h1:DxrIzT+xaE7yg65j358z/aeFdxmN0P9QXhEzd20vsDc=

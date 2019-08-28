@@ -12,6 +12,7 @@ import (
 	"github.com/sacloud/libsacloud/sacloud"
 	"github.com/sacloud/libsacloud/v2/sacloud/search"
 	"github.com/sacloud/libsacloud/v2/sacloud/search/keys"
+	"github.com/sacloud/libsacloud/v2/sacloud/types"
 )
 
 type resourceValueSettable interface {
@@ -132,6 +133,14 @@ func expandTags(_ *APIClient, configured []interface{}) []string {
 	return expandStringList(configured)
 }
 
+func expandTagsV2(configured []interface{}) types.Tags {
+	return types.Tags(expandStringList(configured))
+}
+
+func flattenTags(tags types.Tags) []string {
+	return []string(tags)
+}
+
 func expandStringListWithValidateInList(fieldName string, configured []interface{}, allowWords []string) ([]string, error) {
 	vs := make([]string, 0, len(configured))
 	for _, v := range configured {
@@ -151,21 +160,27 @@ func expandStringListWithValidateInList(fieldName string, configured []interface
 	return vs, nil
 }
 
-// Takes the result of schema.Set of strings and returns a []*string
-//func expandStringSet(configured *schema.Set) []string {
-//	return expandStringList(configured.List())
-//}
+func expandAutoBackupWeekdays(configured []interface{}) []types.EBackupSpanWeekday {
+	var vs []types.EBackupSpanWeekday
+	for _, w := range expandStringList(configured) {
+		vs = append(vs, types.EBackupSpanWeekday(w))
+	}
+	types.SortBackupSpanWeekdays(vs)
+	return vs
+}
 
-// Takes list of pointers to strings. Expand to an array
-// of raw strings and returns a []interface{}
-// to keep compatibility w/ schema.NewSetschema.NewSet
-//func flattenStringList(list []string) []interface{} {
-//	vs := make([]interface{}, 0, len(list))
-//	for _, v := range list {
-//		vs = append(vs, v)
-//	}
-//	return vs
-//}
+func flattenAutoBackupWeekdays(weekdays []types.EBackupSpanWeekday) []string {
+	types.SortBackupSpanWeekdays(weekdays)
+	var ws []string
+	for _, w := range weekdays {
+		ws = append(ws, w.String())
+	}
+	return ws
+}
+
+func extractSakuraID(d resourceValueGettable, key string) types.ID {
+	return types.StringID(d.Get(key).(string))
+}
 
 func flattenDisks(disks []sacloud.Disk) []string {
 	var ids []string

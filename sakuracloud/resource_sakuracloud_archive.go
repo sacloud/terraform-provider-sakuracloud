@@ -18,9 +18,6 @@ import (
 	"github.com/sacloud/libsacloud/v2/sacloud/types"
 )
 
-// TODO libsacloudに持たせる
-var allowArchiveSizes = []int{20, 40, 60, 80, 100, 250, 500, 750, 1024}
-
 func resourceSakuraCloudArchive() *schema.Resource {
 	return &schema.Resource{
 		Create: resourceSakuraCloudArchiveCreate,
@@ -43,7 +40,7 @@ func resourceSakuraCloudArchive() *schema.Resource {
 				Optional:     true,
 				ForceNew:     true,
 				Default:      20,
-				ValidateFunc: validation.IntInSlice(allowArchiveSizes),
+				ValidateFunc: validation.IntInSlice(types.ValidArchiveSizes),
 			},
 			"archive_file": {
 				Type:     schema.TypeString,
@@ -200,6 +197,10 @@ func resourceSakuraCloudArchiveDelete(d *schema.ResourceData, meta interface{}) 
 
 	archive, err := archiveOp.Read(ctx, zone, types.StringID(d.Id()))
 	if err != nil {
+		if sacloud.IsNotFoundError(err) {
+			d.SetId("")
+			return nil
+		}
 		return fmt.Errorf("could not read SakuraCloud Archive[%s]: %s", d.Id(), err)
 	}
 
@@ -207,6 +208,7 @@ func resourceSakuraCloudArchiveDelete(d *schema.ResourceData, meta interface{}) 
 		return fmt.Errorf("deleting SakuraCloud Archive[%s] is failed: %s", archive.ID, err)
 	}
 
+	d.SetId("")
 	return nil
 }
 
@@ -229,7 +231,7 @@ func setArchiveResourceData(d *schema.ResourceData, client *APIClient, data *sac
 	if !data.IconID.IsEmpty() {
 		d.Set("icon_id", data.IconID.String())
 	}
-	if err := d.Set("tags", data.Tags); err != nil {
+	if err := d.Set("tags", flattenTags(data.Tags)); err != nil {
 		return fmt.Errorf("error setting tags: %v", data.Tags)
 	}
 	d.Set("name", data.Name)

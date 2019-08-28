@@ -9,6 +9,7 @@ import (
 
 	"github.com/hashicorp/terraform/helper/schema"
 	"github.com/hashicorp/terraform/helper/validation"
+	"github.com/sacloud/libsacloud/v2/sacloud/types"
 )
 
 func validateSakuracloudIDType(v interface{}, k string) ([]string, []error) {
@@ -25,6 +26,27 @@ func validateSakuracloudIDType(v interface{}, k string) ([]string, []error) {
 
 	}
 	return ws, errors
+}
+
+func validateAutoBackupWeekdays(d resourceValueGettable, k string) error {
+	weekdays, ok := d.GetOk(k)
+	if !ok || len(weekdays.([]interface{})) == 0 {
+		return nil
+	}
+
+	for _, v := range weekdays.([]interface{}) {
+		var found bool
+		for _, t := range types.ValidAutoBackupWeekdaysInString {
+			if v.(string) == t {
+				found = true
+				break
+			}
+		}
+		if !found {
+			return fmt.Errorf("%q must be one of [%s]", k, strings.Join(types.ValidAutoBackupWeekdaysInString, "/"))
+		}
+	}
+	return nil
 }
 
 func validateBackupTime() schema.SchemaValidateFunc {
