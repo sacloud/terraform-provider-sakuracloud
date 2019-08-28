@@ -28,6 +28,25 @@ func validateSakuracloudIDType(v interface{}, k string) ([]string, []error) {
 	return ws, errors
 }
 
+func validateSakuraIDs(d resourceValueGettable, k string, required bool) error {
+	ids, ok := d.GetOk(k)
+	if !ok || len(ids.([]interface{})) == 0 {
+		if required {
+			return fmt.Errorf("%q is required", k)
+		}
+		return nil
+	}
+
+	for _, v := range ids.([]interface{}) {
+		id := v.(string)
+		_, err := strconv.ParseInt(id, 10, 64)
+		if err != nil {
+			return fmt.Errorf("%q must be ID string(number only): %s", k, err)
+		}
+	}
+	return nil
+}
+
 func validateAutoBackupWeekdays(d resourceValueGettable, k string) error {
 	weekdays, ok := d.GetOk(k)
 	if !ok || len(weekdays.([]interface{})) == 0 {

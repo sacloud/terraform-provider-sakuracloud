@@ -1,11 +1,12 @@
 package sakuracloud
 
 import (
+	"context"
 	"fmt"
 
 	"github.com/hashicorp/terraform/helper/schema"
-	"github.com/sacloud/libsacloud/api"
-	"github.com/sacloud/libsacloud/sacloud"
+	"github.com/sacloud/libsacloud/v2/sacloud"
+	"github.com/sacloud/libsacloud/v2/sacloud/types"
 )
 
 func resourceSakuraCloudBridge() *schema.Resource {
@@ -44,117 +45,93 @@ func resourceSakuraCloudBridge() *schema.Resource {
 }
 
 func resourceSakuraCloudBridgeCreate(d *schema.ResourceData, meta interface{}) error {
-	client := getSacloudAPIClient(d, meta)
+	client, ctx, zone := getSacloudV2Client(d, meta)
+	bridgeOp := sacloud.NewBridgeOp(client)
 
-	opts := client.Bridge.New()
-
-	opts.Name = d.Get("name").(string)
-	if description, ok := d.GetOk("description"); ok {
-		opts.Description = description.(string)
+	req := &sacloud.BridgeCreateRequest{
+		Name:        d.Get("name").(string),
+		Description: d.Get("description").(string),
 	}
 
-	bridge, err := client.Bridge.Create(opts)
+	bridge, err := bridgeOp.Create(ctx, zone, req)
 	if err != nil {
-		return fmt.Errorf("Failed to create SakuraCloud Bridge resource: %s", err)
+		return fmt.Errorf("creating SakuraCloud Bridge is failed: %s", err)
 	}
 
-	d.SetId(bridge.GetStrID())
+	d.SetId(bridge.ID.String())
 	return resourceSakuraCloudBridgeRead(d, meta)
 }
 
 func resourceSakuraCloudBridgeRead(d *schema.ResourceData, meta interface{}) error {
-	client := getSacloudAPIClient(d, meta)
-
-	bridge, err := client.Bridge.Read(toSakuraCloudID(d.Id()))
+	client, ctx, zone := getSacloudV2Client(d, meta)
+	bridgeOp := sacloud.NewBridgeOp(client)
+	bridge, err := bridgeOp.Read(ctx, zone, types.StringID(d.Id()))
 	if err != nil {
-		if sacloudErr, ok := err.(api.Error); ok && sacloudErr.ResponseCode() == 404 {
+		if sacloud.IsNotFoundError(err) {
 			d.SetId("")
 			return nil
 		}
-		return fmt.Errorf("Couldn't find SakuraCloud Bridge resource: %s", err)
+		return fmt.Errorf("could not read SakuraCloud Bridge[%s]: %s", d.Id(), err)
 	}
-
-	return setBridgeResourceData(d, client, bridge)
+	return setBridgeResourceData(ctx, d, client, bridge)
 }
 
 func resourceSakuraCloudBridgeUpdate(d *schema.ResourceData, meta interface{}) error {
-	client := getSacloudAPIClient(d, meta)
+	client, ctx, zone := getSacloudV2Client(d, meta)
+	bridgeOp := sacloud.NewBridgeOp(client)
 
-	bridge, err := client.Bridge.Read(toSakuraCloudID(d.Id()))
+	bridge, err := bridgeOp.Read(ctx, zone, types.StringID(d.Id()))
 	if err != nil {
-		return fmt.Errorf("Couldn't find SakuraCloud Bridge resource: %s", err)
+		return fmt.Errorf("could not read SakuraCloud Bridge[%s]: %s", d.Id(), err)
 	}
 
-	if d.HasChange("name") {
-		bridge.Name = d.Get("name").(string)
-	}
-	if d.HasChange("description") {
-		if description, ok := d.GetOk("description"); ok {
-			bridge.Description = description.(string)
-		} else {
-			bridge.Description = ""
-		}
+	req := &sacloud.BridgeUpdateRequest{
+		Name:        d.Get("name").(string),
+		Description: d.Get("description").(string),
 	}
 
-	bridge, err = client.Bridge.Update(bridge.ID, bridge)
+	bridge, err = bridgeOp.Update(ctx, zone, bridge.ID, req)
 	if err != nil {
-		return fmt.Errorf("Error updating SakuraCloud Bridge resource: %s", err)
+		return fmt.Errorf("updating SakuraCloud Bridge[%s] is failed: %s", d.Id(), err)
 	}
-
 	return resourceSakuraCloudBridgeRead(d, meta)
 }
 
 func resourceSakuraCloudBridgeDelete(d *schema.ResourceData, meta interface{}) error {
-	client := getSacloudAPIClient(d, meta)
+	client, ctx, zone := getSacloudV2Client(d, meta)
+	bridgeOp := sacloud.NewBridgeOp(client)
 
-	br, err := client.Bridge.Read(toSakuraCloudID(d.Id()))
+	bridge, err := bridgeOp.Read(ctx, zone, types.StringID(d.Id()))
 	if err != nil {
-		return fmt.Errorf("Couldn't find SakuraCloud Bridge resource: %s", err)
-	}
-
-	if br.Info != nil && br.Info.Switches != nil && len(br.Info.Switches) > 0 {
-		for _, s := range br.Info.Switches {
-			switchID, _ := s.ID.Int64()
-			strSwitchID := s.ID.String()
-			sakuraMutexKV.Lock(strSwitchID)
-			defer sakuraMutexKV.Unlock(strSwitchID)
-
-			if _, err := client.Switch.Read(switchID); err == nil {
-				_, err = client.Switch.DisconnectFromBridge(switchID)
-			}
+		if sacloud.IsNotFoundError(err) {
+			d.SetId("")
+			return nil
 		}
-		if err != nil {
-			return fmt.Errorf("Error disconnecting Bridge resource: %s", err)
-		}
+		return fmt.Errorf("could not read SakuraCloud Bridge[%s]: %s", d.Id(), err)
 	}
 
-	_, err = client.Bridge.Delete(toSakuraCloudID(d.Id()))
-	if err != nil {
-		return fmt.Errorf("Error deleting SakuraCloud Bridge resource: %s", err)
+	if err := bridgeOp.Delete(ctx, zone, bridge.ID); err != nil {
+		return fmt.Errorf("deleting SakuraCloud AutoBackup[%s] is failed: %s", d.Id(), err)
 	}
+	d.SetId("")
 	return nil
 }
 
-func setBridgeResourceData(d *schema.ResourceData, client *APIClient, data *sacloud.Bridge) error {
+func setBridgeResourceData(ctx context.Context, d *schema.ResourceData, client *APIClient, data *sacloud.Bridge) error {
 	d.Set("name", data.Name)
 	d.Set("description", data.Description)
 
+	swOp := sacloud.NewSwitchOp(client)
 	var switchIDs []interface{}
-	if data.Info != nil && data.Info.Switches != nil && len(data.Info.Switches) > 0 {
-
-		for _, d := range data.Info.Switches {
-			swID := d.ID.String()
-			sakuraMutexKV.Lock(swID)
-			defer sakuraMutexKV.Unlock(swID)
-
-			id, _ := d.ID.Int64()
-			if _, err := client.Switch.Read(id); err == nil {
-				switchIDs = append(switchIDs, d.ID.String())
-			}
+	for _, d := range data.BridgeInfo {
+		if _, err := swOp.Read(ctx, d.ZoneName, d.ID); err == nil {
+			switchIDs = append(switchIDs, d.ID.String())
 		}
 	}
-	d.Set("switch_ids", switchIDs)
+	if err := d.Set("switch_ids", switchIDs); err != nil {
+		return fmt.Errorf("error setting switch_ids: %v", switchIDs)
+	}
 
-	d.Set("zone", client.Zone)
+	d.Set("zone", getV2Zone(d, client))
 	return nil
 }

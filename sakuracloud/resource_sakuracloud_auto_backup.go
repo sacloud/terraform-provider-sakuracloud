@@ -154,7 +154,7 @@ func resourceSakuraCloudAutoBackupUpdate(d *schema.ResourceData, meta interface{
 
 	autoBackup, err = autoBackupOp.Update(ctx, zone, autoBackup.ID, req)
 	if err != nil {
-		return fmt.Errorf("updating SakuraCloud AutoBackup[%s] is failed: %s", autoBackup.ID, err)
+		return fmt.Errorf("updating SakuraCloud AutoBackup[%s] is failed: %s", d.Id(), err)
 	}
 
 	return resourceSakuraCloudAutoBackupRead(d, meta)
