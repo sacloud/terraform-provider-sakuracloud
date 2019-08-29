@@ -8,9 +8,11 @@
 
 ```hcl
 resource "sakuracloud_proxylb" "foobar" {
-  name         = "foobar"
-  plan         = 1000 
-  vip_failover = true # default: false
+  name           = "foobar"
+  plan           = 1000 
+  vip_failover   = true # default: false
+  sticky_session = true # default: false
+  timeout        = 10
 
   health_check {
     protocol    = "http"
@@ -75,9 +77,10 @@ resource "sakuracloud_proxylb" "foobar" {
 |パラメーター         |必須  |名称           |初期値     |設定値                    |補足                                          |
 |-------------------|:---:|---------------|:--------:|------------------------|----------------------------------------------|
 | `name`            | ◯   | エンハンスドロードバランサ名        | -        | 文字列                  | - |
-| `plan`            | -   | プラン        | `1000`        | `1000`<br />`5000`<br />`10000`<br />`50000`<br />`100000`     | - |
+| `plan`            | -   | プラン        | `1000`        | `1000`<br />`5000`<br />`10000`<br />`50000`<br />`100000`<br />`400000`     | - |
 | `vip_failover`    | -   | VIPフェイルオーバ | `false`        | `true` or `false`     | - |
 | `sticky_session`    | -   | セッション維持 | `false`        | `true` or `false`     | - |
+| `timeout`         | -   | 実サーバ通信タイムアウト | `10`        | `10`から`600`までの数値     | 登録済みの実サーバからの応答タイムアウト時間(秒数) |
 | `bind_ports`      | ◯   | 待ち受けポート  | -        | リスト                  | 詳細は[`bind_ports`](#bind_ports)を参照    |
 | `health_check`    | ◯   | ヘルスチェック  | -        | マップ                  | 詳細は[`health_check`](#health_check)を参照    |
 | `sorry_server`     | -   | ソーリーサーバ  | -      | マップ| 詳細は[`sorry_server`](#sorry_server)を参照 |
