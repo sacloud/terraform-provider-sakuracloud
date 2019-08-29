@@ -73,7 +73,7 @@ func resourceSakuraCloudAutoBackupCreate(d *schema.ResourceData, meta interface{
 	client, ctx, zone := getSacloudV2Client(d, meta)
 	autoBackupOp := sacloud.NewAutoBackupOp(client)
 
-	if err := validateAutoBackupWeekdays(d, "weekdays"); err != nil {
+	if err := validateBackupWeekdays(d, "weekdays"); err != nil {
 		return err
 	}
 
@@ -83,7 +83,7 @@ func resourceSakuraCloudAutoBackupCreate(d *schema.ResourceData, meta interface{
 		Tags:                    expandTagsV2(d.Get("tags").([]interface{})),
 		DiskID:                  extractSakuraID(d, "disk_id"),
 		MaximumNumberOfArchives: d.Get("max_backup_num").(int),
-		BackupSpanWeekdays:      expandAutoBackupWeekdays(d.Get("weekdays").([]interface{})),
+		BackupSpanWeekdays:      expandBackupWeekdays(d.Get("weekdays").([]interface{})),
 		IconID:                  extractSakuraID(d, "icon_id"),
 	}
 
@@ -114,7 +114,7 @@ func resourceSakuraCloudAutoBackupRead(d *schema.ResourceData, meta interface{})
 func setAutoBackupResourceData(d *schema.ResourceData, client *APIClient, data *sacloud.AutoBackup) error {
 	d.Set("name", data.Name)
 	d.Set("disk_id", data.DiskID.String())
-	if err := d.Set("weekdays", flattenAutoBackupWeekdays(data.BackupSpanWeekdays)); err != nil {
+	if err := d.Set("weekdays", flattenBackupWeekdays(data.BackupSpanWeekdays)); err != nil {
 		return fmt.Errorf("error setting weekdays: %v", data.BackupSpanWeekdays)
 	}
 	d.Set("max_backup_num", data.MaximumNumberOfArchives)
@@ -138,7 +138,7 @@ func resourceSakuraCloudAutoBackupUpdate(d *schema.ResourceData, meta interface{
 		return fmt.Errorf("could not read SakuraCloud AutoBackup[%s]: %s", d.Id(), err)
 	}
 
-	if err := validateAutoBackupWeekdays(d, "weekdays"); err != nil {
+	if err := validateBackupWeekdays(d, "weekdays"); err != nil {
 		return err
 	}
 
@@ -147,7 +147,7 @@ func resourceSakuraCloudAutoBackupUpdate(d *schema.ResourceData, meta interface{
 		Description:             d.Get("description").(string),
 		Tags:                    expandTagsV2(d.Get("tags").([]interface{})),
 		MaximumNumberOfArchives: d.Get("max_backup_num").(int),
-		BackupSpanWeekdays:      expandAutoBackupWeekdays(d.Get("weekdays").([]interface{})),
+		BackupSpanWeekdays:      expandBackupWeekdays(d.Get("weekdays").([]interface{})),
 		IconID:                  extractSakuraID(d, "icon_id"),
 		SettingsHash:            autoBackup.SettingsHash,
 	}

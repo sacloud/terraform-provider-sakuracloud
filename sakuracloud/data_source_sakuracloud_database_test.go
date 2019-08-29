@@ -1,8 +1,11 @@
 package sakuracloud
 
 import (
+	"context"
 	"errors"
 	"fmt"
+	"github.com/sacloud/libsacloud/v2/sacloud"
+	"github.com/sacloud/libsacloud/v2/sacloud/types"
 	"testing"
 
 	"github.com/hashicorp/terraform/helper/acctest"
@@ -31,7 +34,7 @@ func TestAccSakuraCloudDataSourceDatabase_Basic(t *testing.T) {
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckSakuraCloudDatabaseDataSourceID("data.sakuracloud_database.foobar"),
 					resource.TestCheckResourceAttr("data.sakuracloud_database.foobar", "name", name),
-					resource.TestCheckResourceAttr("data.sakuracloud_database.foobar", "plan", "10"),
+					resource.TestCheckResourceAttr("data.sakuracloud_database.foobar", "plan", "10g"),
 					resource.TestCheckResourceAttr("data.sakuracloud_database.foobar", "description", "description_test"),
 					resource.TestCheckResourceAttr("data.sakuracloud_database.foobar", "tags.#", "3"),
 				),
@@ -64,11 +67,11 @@ func testAccCheckSakuraCloudDatabaseDataSourceID(n string) resource.TestCheckFun
 	return func(s *terraform.State) error {
 		rs, ok := s.RootModule().Resources[n]
 		if !ok {
-			return fmt.Errorf("Can't find Database data source: %s", n)
+			return fmt.Errorf("could not find Database data source: %s", n)
 		}
 
 		if rs.Primary.ID == "" {
-			return errors.New("Database data source ID not set")
+			return errors.New("ID is not set")
 		}
 		return nil
 	}
@@ -78,7 +81,7 @@ func testAccCheckSakuraCloudDatabaseDataSourceNotExists(n string) resource.TestC
 	return func(s *terraform.State) error {
 		v, ok := s.RootModule().Resources[n]
 		if ok && v.Primary.ID != "" {
-			return fmt.Errorf("Found Database data source: %s", n)
+			return fmt.Errorf("found Database data source: %s", n)
 		}
 		return nil
 	}
@@ -86,9 +89,6 @@ func testAccCheckSakuraCloudDatabaseDataSourceNotExists(n string) resource.TestC
 
 func testAccCheckSakuraCloudDatabaseDataSourceDestroy(s *terraform.State) error {
 	client := testAccProvider.Meta().(*APIClient)
-	originalZone := client.Zone
-	client.Zone = "tk1a"
-	defer func() { client.Zone = originalZone }()
 
 	for _, rs := range s.RootModule().Resources {
 		if rs.Type != "sakuracloud_database" {
@@ -99,10 +99,12 @@ func testAccCheckSakuraCloudDatabaseDataSourceDestroy(s *terraform.State) error 
 			continue
 		}
 
-		_, err := client.Database.Read(toSakuraCloudID(rs.Primary.ID))
+		dbOp := sacloud.NewDatabaseOp(client)
+		zone := rs.Primary.Attributes["zone"]
+		_, err := dbOp.Read(context.Background(), zone, types.StringID(rs.Primary.ID))
 
 		if err == nil {
-			return errors.New("Database still exists")
+			return errors.New("database still exists")
 		}
 	}
 
@@ -113,7 +115,6 @@ func testAccCheckSakuraCloudDataSourceDatabaseBase(name string) string {
 	return fmt.Sprintf(`
 resource "sakuracloud_switch" "sw" {
   name = "%s"
-  zone = "tk1a"
 }
 resource "sakuracloud_database" "foobar" {
   name = "%s"
@@ -134,7 +135,6 @@ resource "sakuracloud_database" "foobar" {
 
   backup_weekdays = ["mon", "tue"]
   backup_time = "00:00"
-  zone = "tk1a"
 }`, name, name)
 }
 
@@ -142,7 +142,6 @@ func testAccCheckSakuraCloudDataSourceDatabaseConfig(name string) string {
 	return fmt.Sprintf(`
 resource "sakuracloud_switch" "sw" {
   name = "%s"
-  zone = "tk1a"
 }
 resource "sakuracloud_database" "foobar" {
   name = "%s"
@@ -163,13 +162,11 @@ resource "sakuracloud_database" "foobar" {
 
   backup_weekdays = ["mon", "tue"]
   backup_time = "00:00"
-  zone = "tk1a"
 }
 data "sakuracloud_database" "foobar" {
   filters {
 	names = ["%s"]
   }
-  zone = "tk1a"
 }`, name, name, name)
 }
 
@@ -177,7 +174,6 @@ func testAccCheckSakuraCloudDataSourceDatabaseConfig_With_Tag(name string) strin
 	return fmt.Sprintf(`
 resource "sakuracloud_switch" "sw" {
   name = "%s"
-  zone = "tk1a"
 }
 resource "sakuracloud_database" "foobar" {
   name = "%s"
@@ -198,13 +194,11 @@ resource "sakuracloud_database" "foobar" {
 
   backup_weekdays = ["mon", "tue"]
   backup_time = "00:00"
-  zone = "tk1a"
 }
 data "sakuracloud_database" "foobar" {
   filters {
 	tags = ["tag1","tag3"]
   }
-  zone = "tk1a"
 }`, name, name)
 }
 
@@ -212,7 +206,6 @@ func testAccCheckSakuraCloudDataSourceDatabaseConfig_With_NotExists_Tag(name str
 	return fmt.Sprintf(`
 resource "sakuracloud_switch" "sw" {
   name = "%s"
-  zone = "tk1a"
 }
 resource "sakuracloud_database" "foobar" {
   name = "%s"
@@ -233,13 +226,11 @@ resource "sakuracloud_database" "foobar" {
 
   backup_weekdays = ["mon", "tue"]
   backup_time = "00:00"
-  zone = "tk1a"
 }
 data "sakuracloud_database" "foobar" {
   filters {
 	tags = ["tag1-xxxxxxx","tag3-xxxxxxxx"]
   }
-  zone = "tk1a"
 }`, name, name)
 }
 
@@ -248,7 +239,6 @@ func testAccCheckSakuraCloudDataSourceDatabaseConfig_NotExists(name string) stri
 	return fmt.Sprintf(`
 resource "sakuracloud_switch" "sw" {
   name = "%s"
-  zone = "tk1a"
 }
 resource "sakuracloud_database" "foobar" {
   name = "%s"
@@ -269,12 +259,10 @@ resource "sakuracloud_database" "foobar" {
 
   backup_weekdays = ["mon", "tue"]
   backup_time = "00:00"
-  zone = "tk1a"
 }
 data "sakuracloud_database" "foobar" {
   filters {
 	names = ["xxxxxxxxxxxxxxxxxx"]
   }
-  zone = "tk1a"
 }`, name, name)
 }

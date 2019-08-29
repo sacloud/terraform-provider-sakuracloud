@@ -47,7 +47,7 @@ func validateSakuraIDs(d resourceValueGettable, k string, required bool) error {
 	return nil
 }
 
-func validateAutoBackupWeekdays(d resourceValueGettable, k string) error {
+func validateBackupWeekdays(d resourceValueGettable, k string) error {
 	weekdays, ok := d.GetOk(k)
 	if !ok || len(weekdays.([]interface{})) == 0 {
 		return nil

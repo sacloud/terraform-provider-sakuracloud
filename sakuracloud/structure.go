@@ -160,7 +160,7 @@ func expandStringListWithValidateInList(fieldName string, configured []interface
 	return vs, nil
 }
 
-func expandAutoBackupWeekdays(configured []interface{}) []types.EBackupSpanWeekday {
+func expandBackupWeekdays(configured []interface{}) []types.EBackupSpanWeekday {
 	var vs []types.EBackupSpanWeekday
 	for _, w := range expandStringList(configured) {
 		vs = append(vs, types.EBackupSpanWeekday(w))
@@ -169,7 +169,7 @@ func expandAutoBackupWeekdays(configured []interface{}) []types.EBackupSpanWeekd
 	return vs
 }
 
-func flattenAutoBackupWeekdays(weekdays []types.EBackupSpanWeekday) []string {
+func flattenBackupWeekdays(weekdays []types.EBackupSpanWeekday) []string {
 	types.SortBackupSpanWeekdays(weekdays)
 	var ws []string
 	for _, w := range weekdays {

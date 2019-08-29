@@ -114,6 +114,7 @@ func (c *Config) newClientV2() v2.APICaller {
 		RetryInterval:          time.Duration(c.RetryInterval) * time.Second,
 		HTTPClient:             httpClient,
 	}
+	v2.DefaultStatePollTimeout = time.Duration(c.TimeoutMinute) * time.Minute
 
 	if c.TraceMode != "" {
 		enableAPITrace := true
