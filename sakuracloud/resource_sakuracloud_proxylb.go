@@ -48,6 +48,12 @@ func resourceSakuraCloudProxyLB() *schema.Resource {
 				Type:     schema.TypeBool,
 				Optional: true,
 			},
+			"timeout": {
+				Type:         schema.TypeInt,
+				ValidateFunc: validation.IntBetween(10, 600),
+				Optional:     true,
+				Default:      10,
+			},
 			"bind_ports": {
 				Type:     schema.TypeList,
 				Required: true,
@@ -265,6 +271,10 @@ func resourceSakuraCloudProxyLBCreate(d *schema.ResourceData, meta interface{}) 
 		}
 	}
 
+	opts.Settings.ProxyLB.Timeout = &sacloud.ProxyLBTimeout{
+		InactiveSec: d.Get("timeout").(int),
+	}
+
 	if bindPorts, ok := getListFromResource(d, "bind_ports"); ok {
 		for _, bindPort := range bindPorts {
 			values := mapToResourceData(bindPort.(map[string]interface{}))
@@ -441,6 +451,11 @@ func resourceSakuraCloudProxyLBUpdate(d *schema.ResourceData, meta interface{}) 
 			}
 		}
 	}
+	if d.HasChange("timeout") {
+		proxyLB.Settings.ProxyLB.Timeout = &sacloud.ProxyLBTimeout{
+			InactiveSec: d.Get("timeout").(int),
+		}
+	}
 
 	if d.HasChange("bind_ports") {
 		proxyLB.Settings.ProxyLB.BindPorts = []*sacloud.ProxyLBBindPorts{}
@@ -603,6 +618,9 @@ func setProxyLBResourceData(d *schema.ResourceData, client *APIClient, data *sac
 	d.Set("plan", int(data.GetPlan()))
 	d.Set("vip_failover", data.Status.UseVIPFailover)
 	d.Set("sticky_session", data.Settings.ProxyLB.StickySession.Enabled)
+	if data.Settings.ProxyLB.Timeout != nil {
+		d.Set("timeout", data.Settings.ProxyLB.Timeout.InactiveSec)
+	}
 	// bind ports
 	var bindPorts []map[string]interface{}
 	for _, bindPort := range data.Settings.ProxyLB.BindPorts {

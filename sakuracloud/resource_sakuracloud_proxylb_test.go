@@ -49,6 +49,8 @@ func TestAccResourceSakuraCloudProxyLB(t *testing.T) {
 					resource.TestCheckResourceAttr(
 						"sakuracloud_proxylb.foobar", "sticky_session", "true"),
 					resource.TestCheckResourceAttr(
+						"sakuracloud_proxylb.foobar", "timeout", "30"),
+					resource.TestCheckResourceAttr(
 						"sakuracloud_proxylb.foobar", "health_check.0.protocol", "http"),
 					resource.TestCheckResourceAttr(
 						"sakuracloud_proxylb.foobar", "health_check.0.delay_loop", "10"),
@@ -92,6 +94,8 @@ func TestAccResourceSakuraCloudProxyLB(t *testing.T) {
 						"sakuracloud_proxylb.foobar", "name", "terraform-test-proxylb-upd"),
 					resource.TestCheckResourceAttr(
 						"sakuracloud_proxylb.foobar", "sticky_session", "false"),
+					resource.TestCheckResourceAttr(
+						"sakuracloud_proxylb.foobar", "timeout", "10"),
 					resource.TestCheckResourceAttr(
 						"sakuracloud_proxylb.foobar", "health_check.0.protocol", "tcp"),
 					resource.TestCheckResourceAttr(
@@ -240,6 +244,7 @@ resource "sakuracloud_proxylb" "foobar" {
   plan = 5000
   vip_failover = true
   sticky_session = true
+  timeout = 30
   health_check {
     protocol = "http"
     delay_loop = 10
