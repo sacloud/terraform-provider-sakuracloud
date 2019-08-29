@@ -1,12 +1,15 @@
 package sakuracloud
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"testing"
 
 	"github.com/hashicorp/terraform/helper/resource"
 	"github.com/hashicorp/terraform/terraform"
+	"github.com/sacloud/libsacloud/v2/sacloud"
+	"github.com/sacloud/libsacloud/v2/sacloud/types"
 )
 
 func TestAccSakuraCloudDataSourceCDROM_Basic(t *testing.T) {
@@ -86,7 +89,7 @@ func testAccCheckSakuraCloudCDROMDataSourceNotExists(n string) resource.TestChec
 	return func(s *terraform.State) error {
 		v, ok := s.RootModule().Resources[n]
 		if ok && v.Primary.ID != "" {
-			return fmt.Errorf("Found CDROM data source: %s", n)
+			return fmt.Errorf("found CDROM[%s]: %s", v.Primary.ID, n)
 		}
 		return nil
 	}
@@ -104,10 +107,12 @@ func testAccCheckSakuraCloudCDROMDataSourceDestroy(s *terraform.State) error {
 			continue
 		}
 
-		_, err := client.CDROM.Read(toSakuraCloudID(rs.Primary.ID))
+		cdromOp := sacloud.NewCDROMOp(client)
+		zone := rs.Primary.Attributes["zone"]
+		_, err := cdromOp.Read(context.Background(), zone, types.StringID(rs.Primary.ID))
 
 		if err == nil {
-			return errors.New("CDROM still exists")
+			return fmt.Errorf("resource CDROM[%s] still exists", rs.Primary.ID)
 		}
 	}
 

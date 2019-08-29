@@ -129,7 +129,7 @@ func resourceSakuraCloudArchiveRead(d *schema.ResourceData, meta interface{}) er
 			d.SetId("")
 			return nil
 		}
-		return fmt.Errorf("could not find SakuraCloud Archive resource: %s", err)
+		return fmt.Errorf("could not read SakuraCloud Archive[%s]: %s", d.Id(), err)
 	}
 	return setArchiveResourceData(d, client, archive)
 }
@@ -152,7 +152,7 @@ func resourceSakuraCloudArchiveUpdate(d *schema.ResourceData, meta interface{}) 
 
 	archive, err = archiveOp.Update(ctx, zone, archive.ID, req)
 	if err != nil {
-		return fmt.Errorf("updating SakuraCloud Archive[%s] is failed: %s", archive.ID, err)
+		return fmt.Errorf("updating SakuraCloud Archive[%s] is failed: %s", d.Id(), err)
 	}
 
 	contentAttrs := []string{"archive_file", "hash"}

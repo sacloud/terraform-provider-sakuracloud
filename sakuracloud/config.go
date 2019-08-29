@@ -4,6 +4,7 @@ import (
 	"log"
 	"net/http"
 	"strings"
+	"sync"
 	"time"
 
 	v1 "github.com/sacloud/libsacloud/api"
@@ -34,6 +35,8 @@ type Config struct {
 	RetryInterval       int
 	APIRequestTimeout   int
 	APIRequestRateLimit int
+
+	initOnce sync.Once
 }
 
 // APIClient for SakuraCloud API
@@ -94,6 +97,8 @@ func (c *Config) NewClient() *APIClient {
 	}
 }
 
+var v2ClientOnce sync.Once
+
 func (c *Config) newClientV2() v2.APICaller {
 	httpClient := &http.Client{
 		Timeout:   time.Duration(c.APIRequestTimeout) * time.Second,
@@ -123,7 +128,9 @@ func (c *Config) newClientV2() v2.APICaller {
 		}
 
 		if enableAPITrace {
-			trace.AddClientFactoryHooks()
+			v2ClientOnce.Do(func() {
+				trace.AddClientFactoryHooks()
+			})
 		}
 		if enableHTTPTrace {
 			caller.HTTPClient.Transport = &v2.TracingRoundTripper{
