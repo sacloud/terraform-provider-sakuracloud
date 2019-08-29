@@ -2,7 +2,6 @@ package sakuracloud
 
 import (
 	"fmt"
-	"strconv"
 
 	"github.com/hashicorp/terraform/helper/schema"
 	"github.com/hashicorp/terraform/helper/validation"
@@ -26,18 +25,10 @@ func resourceSakuraCloudProxyLB() *schema.Resource {
 				Required: true,
 			},
 			"plan": {
-				Type:     schema.TypeInt,
-				Optional: true,
-				Default:  1000,
-				ValidateFunc: validateIntInWord([]string{
-					strconv.Itoa(int(sacloud.ProxyLBPlan100)),
-					strconv.Itoa(int(sacloud.ProxyLBPlan500)),
-					strconv.Itoa(int(sacloud.ProxyLBPlan1000)),
-					strconv.Itoa(int(sacloud.ProxyLBPlan5000)),
-					strconv.Itoa(int(sacloud.ProxyLBPlan10000)),
-					strconv.Itoa(int(sacloud.ProxyLBPlan50000)),
-					strconv.Itoa(int(sacloud.ProxyLBPlan100000)),
-				}),
+				Type:         schema.TypeInt,
+				Optional:     true,
+				Default:      1000,
+				ValidateFunc: validation.IntInSlice(sacloud.AllowProxyLBPlans),
 			},
 			"vip_failover": {
 				Type:     schema.TypeBool,
@@ -47,6 +38,12 @@ func resourceSakuraCloudProxyLB() *schema.Resource {
 			"sticky_session": {
 				Type:     schema.TypeBool,
 				Optional: true,
+			},
+			"timeout": {
+				Type:         schema.TypeInt,
+				ValidateFunc: validation.IntBetween(10, 600),
+				Optional:     true,
+				Default:      10,
 			},
 			"bind_ports": {
 				Type:     schema.TypeList,
@@ -265,6 +262,10 @@ func resourceSakuraCloudProxyLBCreate(d *schema.ResourceData, meta interface{}) 
 		}
 	}
 
+	opts.Settings.ProxyLB.Timeout = &sacloud.ProxyLBTimeout{
+		InactiveSec: d.Get("timeout").(int),
+	}
+
 	if bindPorts, ok := getListFromResource(d, "bind_ports"); ok {
 		for _, bindPort := range bindPorts {
 			values := mapToResourceData(bindPort.(map[string]interface{}))
@@ -441,6 +442,11 @@ func resourceSakuraCloudProxyLBUpdate(d *schema.ResourceData, meta interface{}) 
 			}
 		}
 	}
+	if d.HasChange("timeout") {
+		proxyLB.Settings.ProxyLB.Timeout = &sacloud.ProxyLBTimeout{
+			InactiveSec: d.Get("timeout").(int),
+		}
+	}
 
 	if d.HasChange("bind_ports") {
 		proxyLB.Settings.ProxyLB.BindPorts = []*sacloud.ProxyLBBindPorts{}
@@ -603,6 +609,9 @@ func setProxyLBResourceData(d *schema.ResourceData, client *APIClient, data *sac
 	d.Set("plan", int(data.GetPlan()))
 	d.Set("vip_failover", data.Status.UseVIPFailover)
 	d.Set("sticky_session", data.Settings.ProxyLB.StickySession.Enabled)
+	if data.Settings.ProxyLB.Timeout != nil {
+		d.Set("timeout", data.Settings.ProxyLB.Timeout.InactiveSec)
+	}
 	// bind ports
 	var bindPorts []map[string]interface{}
 	for _, bindPort := range data.Settings.ProxyLB.BindPorts {

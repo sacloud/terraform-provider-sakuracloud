@@ -14,10 +14,12 @@ Provides a SakuraCloud ProxyLB(Enhanced-LoadBalancer) resource. This can be used
 
 ```hcl
 resource "sakuracloud_proxylb" "foobar" {
-  name         = "foobar"
-  plan         = 1000 
-  vip_failover = false
-
+  name           = "foobar"
+  plan           = 1000 
+  vip_failover   = false
+  sticky_session = false
+  timeout        = 10
+  
   health_check {
     protocol    = "http"
     path        = "/"
@@ -66,9 +68,10 @@ The following arguments are supported:
 
 * `name` - (Required) The name of the resource.  
 * `plan` - (Optional) The plan of the resource.
-Valid value is one of the following: [ 1000 (default) / 5000 / 10000 / 50000 / 100000 ]  
+Valid value is one of the following: [ 1000 (default) / 5000 / 10000 / 50000 / 100000 / 400000]  
 * `vip_failover` - (Optional) The flag of enable VIP Fail-Over.  
 * `sticky_session` - (Optional) The flag of enable Sticky-Session.  
+* `timeout` - (Optional) Timeout seconds.  
 * `bind_ports` - (Required) The external listen ports. It contains some attributes to [Bind Ports](#bind-ports).
 * `health_check` - (Required) The health check rules. It contains some attributes to [Health Check](#health-check).
 * `sorry_server` - (Optional) The pair of IPAddress and port number of sorry-server.
