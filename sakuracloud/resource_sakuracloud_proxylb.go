@@ -2,7 +2,6 @@ package sakuracloud
 
 import (
 	"fmt"
-	"strconv"
 
 	"github.com/hashicorp/terraform/helper/schema"
 	"github.com/hashicorp/terraform/helper/validation"
@@ -26,18 +25,10 @@ func resourceSakuraCloudProxyLB() *schema.Resource {
 				Required: true,
 			},
 			"plan": {
-				Type:     schema.TypeInt,
-				Optional: true,
-				Default:  1000,
-				ValidateFunc: validateIntInWord([]string{
-					strconv.Itoa(int(sacloud.ProxyLBPlan100)),
-					strconv.Itoa(int(sacloud.ProxyLBPlan500)),
-					strconv.Itoa(int(sacloud.ProxyLBPlan1000)),
-					strconv.Itoa(int(sacloud.ProxyLBPlan5000)),
-					strconv.Itoa(int(sacloud.ProxyLBPlan10000)),
-					strconv.Itoa(int(sacloud.ProxyLBPlan50000)),
-					strconv.Itoa(int(sacloud.ProxyLBPlan100000)),
-				}),
+				Type:         schema.TypeInt,
+				Optional:     true,
+				Default:      1000,
+				ValidateFunc: validation.IntInSlice(sacloud.AllowProxyLBPlans),
 			},
 			"vip_failover": {
 				Type:     schema.TypeBool,
