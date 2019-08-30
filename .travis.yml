@@ -2,11 +2,13 @@ sudo: required
 services: docker
 language: go
 go:
-- "1.12"
+- "1.12.x"
 env:
   global:
   - PATH=/home/travis/gopath/bin:$PATH DEBIAN_FRONTEND=noninteractive
   - secure: SZZnrpdABMnQBZuzHIc5gTYDPPT2FhCc9/7meOxPkjgOPUv/Fm2oQl/6+xVkDOdGZDZEImA8YS5p75m1V4V55SoeCV0xFxM/CiyyVojC06RonnGPpSFlofu0m1B91ff0gsmt4ZfQCRe8o/L73JQXLjKJzeAbUPNYdPZfSMmObss1f/rwmDj+zVILU7t3m1aIEiJHf2pJN9zMJ49KtUP8rOlAtjg9knd1L8VrJL5UkROh3G8KFordDTPFWJYOhtoHTiCPK/mn7x527z6eEzxFaWLGsSLm4x6YGdUhcTJ9RijYc0t7ZSuYxXUL2KsKkJ5PTAo7DpCjYItWWBTcJIUOd0Lw6v49I/qu57ol0NTlyrDRa3Oq9fYVyj0wlripR/aBBOdtXv5/S/GSvTpnzADbuy/lub1f57JDIWGiiHmjI/9WboTiNOih8Zu3317yJr1ztMZdWLHfOsUr26bu22XeFk9UKUiI1/GbRhxNu04A2mDgidrszdAMmyibULFzqCcodb5h7Xpt1pDP45GBPbgu+wXNjZgkTSCvMrTq1NWLZL+phuEJkhyL9HuCp/UEVrSc3uOcs7pGJensHVPqGJn6IDBgqbKna8kI/M7iS2/SZDziMeh8U4T/nmdZgwTK2vgNeopsO9P5lX/iF3Z6CVOV6ygQojqBJ9npFBRwNUfzDsU=
+before_install:
+  - sudo apt-get install bzr
 install:
 - go get -u golang.org/x/lint/golint
 - go get -u golang.org/x/tools/cmd/goimports
