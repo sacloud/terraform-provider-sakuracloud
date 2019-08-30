@@ -644,9 +644,11 @@
 <p><strong>全ゾーン共通のグローバルリソースです。</strong></p>
 <h3 id="_1">設定例</h3>
 <pre><code class="hcl">resource &quot;sakuracloud_proxylb&quot; &quot;foobar&quot; {
-  name         = &quot;foobar&quot;
-  plan         = 1000 
-  vip_failover = true # default: false
+  name           = &quot;foobar&quot;
+  plan           = 1000 
+  vip_failover   = true # default: false
+  sticky_session = true # default: false
+  timeout        = 10
 
   health_check {
     protocol    = &quot;http&quot;
@@ -731,7 +733,7 @@
 <td align="center">-</td>
 <td>プラン</td>
 <td align="center"><code>1000</code></td>
-<td><code>1000</code><br /><code>5000</code><br /><code>10000</code><br /><code>50000</code><br /><code>100000</code></td>
+<td><code>1000</code><br /><code>5000</code><br /><code>10000</code><br /><code>50000</code><br /><code>100000</code><br /><code>400000</code></td>
 <td>-</td>
 </tr>
 <tr>
@@ -749,6 +751,14 @@
 <td align="center"><code>false</code></td>
 <td><code>true</code> or <code>false</code></td>
 <td>-</td>
+</tr>
+<tr>
+<td><code>timeout</code></td>
+<td align="center">-</td>
+<td>実サーバ通信タイムアウト</td>
+<td align="center"><code>10</code></td>
+<td><code>10</code>から<code>600</code>までの数値</td>
+<td>登録済みの実サーバからの応答タイムアウト時間(秒数)</td>
 </tr>
 <tr>
 <td><code>bind_ports</code></td>
