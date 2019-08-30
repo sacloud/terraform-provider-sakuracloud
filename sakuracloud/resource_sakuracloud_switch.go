@@ -1,11 +1,12 @@
 package sakuracloud
 
 import (
+	"context"
 	"fmt"
+	"github.com/sacloud/libsacloud/v2/sacloud/types"
 
 	"github.com/hashicorp/terraform/helper/schema"
-	"github.com/sacloud/libsacloud/api"
-	"github.com/sacloud/libsacloud/sacloud"
+	"github.com/sacloud/libsacloud/v2/sacloud"
 )
 
 func resourceSakuraCloudSwitch() *schema.Resource {
@@ -17,7 +18,6 @@ func resourceSakuraCloudSwitch() *schema.Resource {
 		Importer: &schema.ResourceImporter{
 			State: schema.ImportStatePassthrough,
 		},
-		CustomizeDiff: hasTagResourceCustomizeDiff,
 		Schema: map[string]*schema.Schema{
 			"name": {
 				Type:     schema.TypeString,
@@ -48,7 +48,6 @@ func resourceSakuraCloudSwitch() *schema.Resource {
 				Computed: true,
 				Elem:     &schema.Schema{Type: schema.TypeString},
 			},
-			powerManageTimeoutKey: powerManageTimeoutParam,
 			"zone": {
 				Type:         schema.TypeString,
 				Optional:     true,
@@ -62,108 +61,78 @@ func resourceSakuraCloudSwitch() *schema.Resource {
 }
 
 func resourceSakuraCloudSwitchCreate(d *schema.ResourceData, meta interface{}) error {
-
 	d.Partial(true)
 
-	client := getSacloudAPIClient(d, meta)
+	client, ctx, zone := getSacloudV2Client(d, meta)
+	swOp := sacloud.NewSwitchOp(client)
 
-	opts := client.Switch.New()
-
-	opts.Name = d.Get("name").(string)
-	if iconID, ok := d.GetOk("icon_id"); ok {
-		opts.SetIconByID(toSakuraCloudID(iconID.(string)))
-	}
-	if iconID, ok := d.GetOk("icon_id"); ok {
-		opts.SetIconByID(toSakuraCloudID(iconID.(string)))
+	req := &sacloud.SwitchCreateRequest{
+		Name:        d.Get("name").(string),
+		Description: d.Get("description").(string),
+		Tags:        expandTagsV2(d.Get("tags").([]interface{})),
+		IconID:      types.StringID(d.Get("icon_id").(string)),
 	}
 
-	if description, ok := d.GetOk("description"); ok {
-		opts.Description = description.(string)
-	}
-	rawTags := d.Get("tags").([]interface{})
-	if rawTags != nil {
-		opts.Tags = expandTags(client, rawTags)
-	}
-
-	sw, err := client.Switch.Create(opts)
+	sw, err := swOp.Create(ctx, zone, req)
 	if err != nil {
-		return fmt.Errorf("Failed to create SakuraCloud Switch resource: %s", err)
+		return fmt.Errorf("creating SakuraCloud Switch is failed: %s", err)
 	}
 
+	d.SetId(sw.ID.String())
 	d.SetPartial("name")
-	d.SetPartial("icon_id")
 	d.SetPartial("description")
 	d.SetPartial("tags")
+	d.SetPartial("icon_id")
 
 	if bridgeID, ok := d.GetOk("bridge_id"); ok {
 		brID := bridgeID.(string)
 		if brID != "" {
-			_, err := client.Switch.ConnectToBridge(sw.ID, toSakuraCloudID(brID))
-			if err != nil {
-				return fmt.Errorf("Failed to create SakuraCloud Switch resource: %s", err)
+			if err := swOp.ConnectToBridge(ctx, zone, sw.ID, types.StringID(brID)); err != nil {
+				return fmt.Errorf("connecting Switch[%s] to Bridge[%s] is failed: %s", sw.ID, brID, err)
 			}
 		}
 		d.SetPartial("bridge_id")
 	}
 
-	d.SetId(sw.GetStrID())
 	d.Partial(false)
 	return resourceSakuraCloudSwitchRead(d, meta)
 }
 
 func resourceSakuraCloudSwitchRead(d *schema.ResourceData, meta interface{}) error {
-	client := getSacloudAPIClient(d, meta)
+	client, ctx, zone := getSacloudV2Client(d, meta)
+	swOp := sacloud.NewSwitchOp(client)
 
-	sw, err := client.Switch.Read(toSakuraCloudID(d.Id()))
+	sw, err := swOp.Read(ctx, zone, types.StringID(d.Id()))
 	if err != nil {
-		if sacloudErr, ok := err.(api.Error); ok && sacloudErr.ResponseCode() == 404 {
+		if sacloud.IsNotFoundError(err) {
 			d.SetId("")
 			return nil
 		}
-		return fmt.Errorf("Couldn't find SakuraCloud Switch resource: %s", err)
+		return fmt.Errorf("could not read SakuraCloud Switch[%s] : %s", d.Id(), err)
 	}
-
-	return setSwitchResourceData(d, client, sw)
+	return setSwitchResourceData(ctx, d, client, sw)
 }
 
 func resourceSakuraCloudSwitchUpdate(d *schema.ResourceData, meta interface{}) error {
 	d.Partial(true)
-	client := getSacloudAPIClient(d, meta)
+	client, ctx, zone := getSacloudV2Client(d, meta)
+	swOp := sacloud.NewSwitchOp(client)
 
-	sw, err := client.Switch.Read(toSakuraCloudID(d.Id()))
+	sw, err := swOp.Read(ctx, zone, types.StringID(d.Id()))
 	if err != nil {
-		return fmt.Errorf("Couldn't find SakuraCloud Switch resource: %s", err)
+		return fmt.Errorf("could not read SakuraCloud Switch[%s] : %s", d.Id(), err)
 	}
 
-	if d.HasChange("name") {
-		sw.Name = d.Get("name").(string)
-	}
-	if d.HasChange("icon_id") {
-		if iconID, ok := d.GetOk("icon_id"); ok {
-			sw.SetIconByID(toSakuraCloudID(iconID.(string)))
-		} else {
-			sw.ClearIcon()
-		}
-	}
-	if d.HasChange("description") {
-		if description, ok := d.GetOk("description"); ok {
-			sw.Description = description.(string)
-		} else {
-			sw.Description = ""
-		}
-	}
-	if d.HasChange("tags") {
-		rawTags := d.Get("tags").([]interface{})
-		if rawTags != nil {
-			sw.Tags = expandTags(client, rawTags)
-		} else {
-			sw.Tags = expandTags(client, []interface{}{})
-		}
+	req := &sacloud.SwitchUpdateRequest{
+		Name:        d.Get("name").(string),
+		Description: d.Get("description").(string),
+		Tags:        expandTagsV2(d.Get("tags").([]interface{})),
+		IconID:      types.StringID(d.Get("icon_id").(string)),
 	}
 
-	sw, err = client.Switch.Update(sw.ID, sw)
+	sw, err = swOp.Update(ctx, zone, sw.ID, req)
 	if err != nil {
-		return fmt.Errorf("Error updating SakuraCloud Switch resource: %s", err)
+		return fmt.Errorf("updating SakuraCloud Switch[%s] is failed : %s", d.Id(), err)
 	}
 
 	d.SetPartial("name")
@@ -174,26 +143,17 @@ func resourceSakuraCloudSwitchUpdate(d *schema.ResourceData, meta interface{}) e
 	if d.HasChange("bridge_id") {
 		if bridgeID, ok := d.GetOk("bridge_id"); ok {
 			brID := bridgeID.(string)
-			if brID == "" && sw.Bridge != nil {
-				_, err := client.Switch.DisconnectFromBridge(sw.ID)
-				if err != nil {
-					return fmt.Errorf("Failed to disconnect bridge: %s", err)
+			if brID == "" && !sw.BridgeID.IsEmpty() {
+				if err := swOp.DisconnectFromBridge(ctx, zone, sw.ID); err != nil {
+					return fmt.Errorf("disconnecting from Bridge[%s] is failed: %s", sw.BridgeID, err)
 				}
 			} else {
-				_, err := client.Switch.ConnectToBridge(sw.ID, toSakuraCloudID(brID))
-				if err != nil {
-					return fmt.Errorf("Failed to connect bridge: %s", err)
-				}
-			}
-			d.SetPartial("bridge_id")
-		} else {
-			if sw.Bridge != nil {
-				_, err := client.Switch.DisconnectFromBridge(sw.ID)
-				if err != nil {
-					return fmt.Errorf("Failed to disconnect bridge: %s", err)
+				if err := swOp.ConnectToBridge(ctx, zone, sw.ID, types.StringID(brID)); err != nil {
+					return fmt.Errorf("connecting to Bridge[%s] is failed: %s", brID, err)
 				}
 			}
 		}
+		d.SetPartial("bridge_id")
 	}
 
 	d.Partial(false)
@@ -201,85 +161,60 @@ func resourceSakuraCloudSwitchUpdate(d *schema.ResourceData, meta interface{}) e
 }
 
 func resourceSakuraCloudSwitchDelete(d *schema.ResourceData, meta interface{}) error {
-	client := getSacloudAPIClient(d, meta)
+	client, ctx, zone := getSacloudV2Client(d, meta)
+	swOp := sacloud.NewSwitchOp(client)
 
-	servers, err := client.Switch.GetServers(toSakuraCloudID(d.Id()))
+	sw, err := swOp.Read(ctx, zone, types.StringID(d.Id()))
 	if err != nil {
-		return fmt.Errorf("Couldn't find SakuraCloud Servers: %s", err)
+		if sacloud.IsNotFoundError(err) {
+			d.SetId("")
+			return nil
+		}
+		return fmt.Errorf("could not read SakuraCloud Switch[%s]: %s", d.Id(), err)
 	}
 
-	isRunning := []int64{}
-	for _, s := range servers {
-		if s.Instance.IsUp() {
-			isRunning = append(isRunning, s.ID)
-			//stop server
-			err := stopServer(client, s.ID, d)
-			if err != nil {
-				return fmt.Errorf("Error stopping SakuraCloud Server resource: %s", err)
-			}
+	if !sw.BridgeID.IsEmpty() {
+		if err := swOp.DisconnectFromBridge(ctx, zone, sw.ID); err != nil {
+			return fmt.Errorf("disconnecting Switch[%s] from Bridge[%s] is failed: %s", sw.ID, sw.BridgeID, err)
 		}
 	}
 
-	sakuraMutexKV.Lock(d.Id())
-	defer sakuraMutexKV.Unlock(d.Id())
-
-	sw, err := client.Switch.Read(toSakuraCloudID(d.Id()))
-	if err != nil {
-		return fmt.Errorf("Couldn't find SakuraCloud Servers: %s", err)
+	if err := swOp.Delete(ctx, zone, sw.ID); err != nil {
+		return fmt.Errorf("deleting SakuraCloud Switch[%s] is failed: %s", sw.ID, err)
 	}
-	if sw.Bridge != nil {
-		_, err = client.Switch.DisconnectFromBridge(sw.ID)
-		if err != nil {
-			return fmt.Errorf("Couldn't disconnect from bridge: %s", err)
-		}
-
-	}
-
-	_, err = client.Switch.Delete(toSakuraCloudID(d.Id()))
-	if err != nil {
-		return fmt.Errorf("Error deleting SakuraCloud Switch resource: %s", err)
-	}
-
-	for _, id := range isRunning {
-		_, err = client.Server.Boot(id)
-		if err != nil {
-			return fmt.Errorf("Error booting SakuraCloud Server resource: %s", err)
-		}
-		err = client.Server.SleepUntilUp(id, client.DefaultTimeoutDuration)
-		if err != nil {
-			return fmt.Errorf("Error booting SakuraCloud Server resource: %s", err)
-		}
-
-	}
-
 	return nil
 }
 
-func setSwitchResourceData(d *schema.ResourceData, client *APIClient, data *sacloud.Switch) error {
+func setSwitchResourceData(ctx context.Context, d *schema.ResourceData, client *APIClient, data *sacloud.Switch) error {
+	zone := getV2Zone(d, client)
+	var serverIDs []string
+	if data.ServerCount > 0 {
+		swOp := sacloud.NewSwitchOp(client)
+		searched, err := swOp.GetServers(ctx, zone, data.ID)
+		if err != nil {
+			return fmt.Errorf("could not find SakuraCloud Servers: switch[%s]", err)
+		}
+		for _, s := range searched.Servers {
+			serverIDs = append(serverIDs, s.ID.String())
+		}
+	}
 
 	d.Set("name", data.Name)
-	d.Set("icon_id", data.GetIconStrID())
+	if !data.IconID.IsEmpty() {
+		d.Set("icon_id", data.IconID.String())
+	}
 	d.Set("description", data.Description)
-	d.Set("tags", data.Tags)
-	if data.ServerCount > 0 {
-		servers, err := client.Switch.GetServers(toSakuraCloudID(d.Id()))
-		if err != nil {
-			return fmt.Errorf("Couldn't find SakuraCloud Servers( is connected Switch): %s", err)
-		}
 
-		d.Set("server_ids", flattenServers(servers))
-	} else {
-		d.Set("server_ids", []string{})
+	if err := d.Set("tags", data.Tags); err != nil {
+		return fmt.Errorf("error setting tags: %v", data.Tags)
 	}
 
-	if data.Bridge != nil {
-		d.Set("bridge_id", data.Bridge.GetStrID())
-	} else {
-		d.Set("bridge_id", "")
+	if !data.BridgeID.IsEmpty() {
+		d.Set("bridge_id", data.BridgeID.String())
 	}
-
-	setPowerManageTimeoutValueToState(d)
-
-	d.Set("zone", client.Zone)
+	if err := d.Set("server_ids", serverIDs); err != nil {
+		return fmt.Errorf("error setting server_ids: %v", serverIDs)
+	}
+	d.Set("zone", zone)
 	return nil
 }

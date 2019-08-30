@@ -1,13 +1,15 @@
 package sakuracloud
 
 import (
+	"context"
 	"errors"
 	"fmt"
+	"github.com/sacloud/libsacloud/v2/sacloud/types"
 	"testing"
 
 	"github.com/hashicorp/terraform/helper/resource"
 	"github.com/hashicorp/terraform/terraform"
-	"github.com/sacloud/libsacloud/sacloud"
+	"github.com/sacloud/libsacloud/v2/sacloud"
 )
 
 func TestAccResourceSakuraCloudSwitch(t *testing.T) {
@@ -35,7 +37,7 @@ func TestAccResourceSakuraCloudSwitch(t *testing.T) {
 					testAccCheckSakuraCloudSwitchExists("sakuracloud_switch.foobar", &sw),
 					resource.TestCheckResourceAttr(
 						"sakuracloud_switch.foobar", "name", "myswitch_upd"),
-					resource.TestCheckNoResourceAttr("sakuracloud_switch.foobar", "icon_id"),
+					resource.TestCheckResourceAttr("sakuracloud_switch.foobar", "icon_id", ""),
 				),
 			},
 			{
@@ -48,99 +50,29 @@ func TestAccResourceSakuraCloudSwitch(t *testing.T) {
 		},
 	})
 }
-func TestAccResourceSakuraCloudSwitchCustomiezeDiff(t *testing.T) {
-	var sw sacloud.Switch
-	resource.ParallelTest(t, resource.TestCase{
-		PreCheck:     func() { testAccPreCheck(t) },
-		Providers:    testAccProviders,
-		CheckDestroy: testAccCheckSakuraCloudSwitchDestroy,
-		Steps: []resource.TestStep{
-			{
-				Config: testAccCheckSakuraCloudSwitchConfig_diff_before,
-				Check: resource.ComposeTestCheckFunc(
-					testAccCheckSakuraCloudSwitchExists("sakuracloud_switch.foobar", &sw),
-					resource.TestCheckResourceAttr(
-						"sakuracloud_switch.foobar", "tags.0", "a"),
-					resource.TestCheckResourceAttr(
-						"sakuracloud_switch.foobar", "tags.1", "b"),
-					resource.TestCheckResourceAttr(
-						"sakuracloud_switch.foobar", "tags.2", "c"),
-				),
-			},
-			{
-				Config: testAccCheckSakuraCloudSwitchConfig_diff_after,
-				Check: resource.ComposeTestCheckFunc(
-					testAccCheckSakuraCloudSwitchExists("sakuracloud_switch.foobar", &sw),
-					resource.TestCheckResourceAttr(
-						"sakuracloud_switch.foobar", "tags.0", "a"),
-					resource.TestCheckResourceAttr(
-						"sakuracloud_switch.foobar", "tags.1", "b"),
-					resource.TestCheckResourceAttr(
-						"sakuracloud_switch.foobar", "tags.2", "c"),
-				),
-			},
-		},
-	})
-}
-
-func TestAccResourceSakuraCloudSwitchCustomiezeDiff_AddTags(t *testing.T) {
-	var sw sacloud.Switch
-	resource.ParallelTest(t, resource.TestCase{
-		PreCheck:     func() { testAccPreCheck(t) },
-		Providers:    testAccProviders,
-		CheckDestroy: testAccCheckSakuraCloudSwitchDestroy,
-		Steps: []resource.TestStep{
-			{
-				Config: testAccCheckSakuraCloudSwitchConfig_diff_before,
-				Check: resource.ComposeTestCheckFunc(
-					testAccCheckSakuraCloudSwitchExists("sakuracloud_switch.foobar", &sw),
-					resource.TestCheckResourceAttr(
-						"sakuracloud_switch.foobar", "tags.0", "a"),
-					resource.TestCheckResourceAttr(
-						"sakuracloud_switch.foobar", "tags.1", "b"),
-					resource.TestCheckResourceAttr(
-						"sakuracloud_switch.foobar", "tags.2", "c"),
-				),
-			},
-			{
-				Config: testAccCheckSakuraCloudSwitchConfig_diff_after_addtag,
-				Check: resource.ComposeTestCheckFunc(
-					testAccCheckSakuraCloudSwitchExists("sakuracloud_switch.foobar", &sw),
-					resource.TestCheckResourceAttr(
-						"sakuracloud_switch.foobar", "tags.0", "a"),
-					resource.TestCheckResourceAttr(
-						"sakuracloud_switch.foobar", "tags.1", "b"),
-					resource.TestCheckResourceAttr(
-						"sakuracloud_switch.foobar", "tags.2", "c"),
-					resource.TestCheckResourceAttr(
-						"sakuracloud_switch.foobar", "tags.3", "d"),
-				),
-			},
-		},
-	})
-}
 
 func testAccCheckSakuraCloudSwitchExists(n string, sw *sacloud.Switch) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
 		rs, ok := s.RootModule().Resources[n]
 		if !ok {
-			return fmt.Errorf("Not found: %s", n)
+			return fmt.Errorf("not found: %s", n)
 		}
 
 		if rs.Primary.ID == "" {
-			return errors.New("No Switch ID is set")
+			return errors.New("no Switch ID is set")
 		}
 
 		client := testAccProvider.Meta().(*APIClient)
+		swOp := sacloud.NewSwitchOp(client)
+		zone := rs.Primary.Attributes["zone"]
 
-		foundSwitch, err := client.Switch.Read(toSakuraCloudID(rs.Primary.ID))
-
+		foundSwitch, err := swOp.Read(context.Background(), zone, types.StringID(rs.Primary.ID))
 		if err != nil {
 			return err
 		}
 
-		if foundSwitch.ID != toSakuraCloudID(rs.Primary.ID) {
-			return errors.New("Switch not found")
+		if foundSwitch.ID.String() != rs.Primary.ID {
+			return fmt.Errorf("resource Switch[%s] is not found", rs.Primary.ID)
 		}
 
 		*sw = *foundSwitch
@@ -151,16 +83,17 @@ func testAccCheckSakuraCloudSwitchExists(n string, sw *sacloud.Switch) resource.
 
 func testAccCheckSakuraCloudSwitchDestroy(s *terraform.State) error {
 	client := testAccProvider.Meta().(*APIClient)
+	swOp := sacloud.NewSwitchOp(client)
 
 	for _, rs := range s.RootModule().Resources {
 		if rs.Type != "sakuracloud_switch" {
 			continue
 		}
 
-		_, err := client.Switch.Read(toSakuraCloudID(rs.Primary.ID))
-
+		zone := rs.Primary.Attributes["zone"]
+		_, err := swOp.Read(context.Background(), zone, types.StringID(rs.Primary.ID))
 		if err == nil {
-			return errors.New("Switch still exists")
+			return fmt.Errorf("resource Switch[%s] still exists", rs.Primary.ID)
 		}
 	}
 
@@ -169,10 +102,10 @@ func testAccCheckSakuraCloudSwitchDestroy(s *terraform.State) error {
 
 var testAccCheckSakuraCloudSwitchConfig_basic = `
 resource "sakuracloud_switch" "foobar" {
-    name = "myswitch"
-    description = "Switch from TerraForm for SAKURA CLOUD"
-    tags = ["hoge1" , "hoge2"]
-    icon_id = "${sakuracloud_icon.foobar.id}"
+  name = "myswitch"
+  description = "Switch from TerraForm for SAKURA CLOUD"
+  tags = ["hoge1" , "hoge2"]
+  icon_id = "${sakuracloud_icon.foobar.id}"
 }
 
 resource "sakuracloud_icon" "foobar" {
@@ -183,31 +116,14 @@ resource "sakuracloud_icon" "foobar" {
 
 var testAccCheckSakuraCloudSwitchConfig_update = `
 resource "sakuracloud_server" "foobar" {
-    name = "myserver"
-    description = "Server from TerraForm for SAKURA CLOUD"
-    additional_nics = ["${sakuracloud_switch.foobar.id}"]
+  name = "myserver"
+  description = "Server from TerraForm for SAKURA CLOUD"
+  additional_nics = ["${sakuracloud_switch.foobar.id}"]
+  graceful_shutdown_timeout = 3
 }
 resource "sakuracloud_switch" "foobar" {
-    name = "myswitch_upd"
-    description = "Switch from TerraForm for SAKURA CLOUD"
-    tags = ["hoge1" , "hoge2"]
+  name = "myswitch_upd"
+  description = "Switch from TerraForm for SAKURA CLOUD"
+  tags = ["hoge1" , "hoge2"]
 }
 `
-
-var testAccCheckSakuraCloudSwitchConfig_diff_before = `
-resource sakuracloud_switch "foobar" {
-    name = "foobar"
-    tags = ["a","b","c"]
-}`
-
-var testAccCheckSakuraCloudSwitchConfig_diff_after = `
-resource sakuracloud_switch "foobar" {
-    name = "foobar"
-    tags = ["c","b","a"]
-}`
-
-var testAccCheckSakuraCloudSwitchConfig_diff_after_addtag = `
-resource sakuracloud_switch "foobar" {
-    name = "foobar"
-    tags = ["c","b","a","d"]
-}`
