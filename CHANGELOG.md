@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.16.0 (2019-08-30)
+
+* エンハンスドロードバランサ更新 #488 (yamamoto-febc)
+* 石狩第1ゾーンでの専有ホスト #492 (yamamoto-febc)
+
+
 ## 1.15.2 (2019-07-09)
 
 * サンドボックスでのGetVNCProxy API呼び出し抑制 #477 (yamamoto-febc)
