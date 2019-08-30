@@ -38,7 +38,7 @@ The following arguments are supported:
 * `icon_id` - (Optional) The ID of the icon.
 * `graceful_shutdown_timeout` - (Optional) The wait time (seconds) to do graceful shutdown the server connected to the resource.
 * `zone` - (Optional) The ID of the zone to which the resource belongs.  
-Valid value is one of the following: ["is1b" / "tk1a"]
+Valid value is one of the following: ["is1a" / "is1b" / "tk1a"]
 
 ## Attributes Reference
 
