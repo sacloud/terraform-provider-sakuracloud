@@ -66,6 +66,42 @@ func dataSourceSakuraCloudDNS() *schema.Resource {
 				Computed: true,
 				Elem:     &schema.Schema{Type: schema.TypeString},
 			},
+			"records": {
+				Type:     schema.TypeList,
+				Computed: true,
+				Elem: &schema.Resource{
+					Schema: map[string]*schema.Schema{
+						"name": {
+							Type:     schema.TypeString,
+							Computed: true,
+						},
+						"type": {
+							Type:     schema.TypeString,
+							Computed: true,
+						},
+						"value": {
+							Type:     schema.TypeString,
+							Computed: true,
+						},
+						"ttl": {
+							Type:     schema.TypeInt,
+							Computed: true,
+						},
+						"priority": {
+							Type:     schema.TypeInt,
+							Computed: true,
+						},
+						"weight": {
+							Type:     schema.TypeInt,
+							Computed: true,
+						},
+						"port": {
+							Type:     schema.TypeInt,
+							Computed: true,
+						},
+					},
+				},
+			},
 		},
 	}
 }
