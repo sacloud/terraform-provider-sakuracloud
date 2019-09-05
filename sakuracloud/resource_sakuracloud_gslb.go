@@ -81,7 +81,7 @@ func resourceSakuraCloudGSLB() *schema.Resource {
 				Type:     schema.TypeList,
 				Optional: true,
 				Computed: true,
-				MaxItems: 6,
+				MaxItems: 12,
 				Elem: &schema.Resource{
 					Schema: gslbServerValueSchemas(),
 				},
