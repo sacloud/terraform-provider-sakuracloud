@@ -100,7 +100,7 @@ func resourceSakuraCloudSimpleMonitor() *schema.Resource {
 						"remaining_days": {
 							Type:         schema.TypeInt,
 							Optional:     true,
-							ValidateFunc: validation.IntBetween(1, 9999),
+							ValidateFunc: validation.IntBetween(0, 9999),
 							Default:      30,
 						},
 					},

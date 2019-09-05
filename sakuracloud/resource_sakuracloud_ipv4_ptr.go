@@ -34,13 +34,13 @@ func resourceSakuraCloudIPv4Ptr() *schema.Resource {
 				Type:         schema.TypeInt,
 				Optional:     true,
 				Default:      30,
-				ValidateFunc: validation.IntBetween(1, 100),
+				ValidateFunc: validation.IntBetween(0, 100),
 			},
 			"retry_interval": {
 				Type:         schema.TypeInt,
 				Optional:     true,
 				Default:      10,
-				ValidateFunc: validation.IntBetween(1, 600),
+				ValidateFunc: validation.IntBetween(0, 600),
 			},
 			"zone": {
 				Type:         schema.TypeString,
