@@ -120,10 +120,13 @@ func TestAccImportSakuraCloudDNS(t *testing.T) {
 			return fmt.Errorf("expected 1 state: %#v", s)
 		}
 		expects := map[string]string{
-			"zone":        zone,
-			"description": "DNS from TerraForm for SAKURA CLOUD",
-			"tags.0":      "tag1",
-			"tags.1":      "tag2",
+			"zone":            zone,
+			"description":     "DNS from TerraForm for SAKURA CLOUD",
+			"tags.0":          "tag1",
+			"tags.1":          "tag2",
+			"records.0.name":  "test1",
+			"records.0.type":  "A",
+			"records.0.value": "192.168.11.1",
 		}
 
 		if err := compareStateMulti(s[0], expects); err != nil {
@@ -198,6 +201,11 @@ resource "sakuracloud_dns" "foobar" {
     zone = "%s"
     description = "DNS from TerraForm for SAKURA CLOUD"
     tags = ["tag1","tag2"]
+    records {
+      name = "test1"
+      type = "A"
+      value = "192.168.11.1"
+    }
 }
 `, zone)
 }

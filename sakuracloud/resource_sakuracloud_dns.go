@@ -206,14 +206,21 @@ func setDNSResourceData(d *schema.ResourceData, client *APIClient, data *sacloud
 	d.Set("zone", data.Name)
 	d.Set("icon_id", data.GetIconStrID())
 	d.Set("description", data.Description)
-	d.Set("tags", data.Tags)
-	d.Set("dns_servers", data.Status.NS)
+
+	if err := d.Set("tags", data.Tags); err != nil {
+		return fmt.Errorf("error setting tags: %s", err)
+	}
+	if err := d.Set("dns_servers", data.Status.NS); err != nil {
+		return fmt.Errorf("error setting dns_servers: %s", err)
+	}
 
 	var records []interface{}
 	for _, record := range data.Settings.DNS.ResourceRecordSets {
 		records = append(records, dnsRecordToState(&record))
 	}
-	d.Set("records", records)
+	if err := d.Set("records", records); err != nil {
+		return fmt.Errorf("error setting records: %s", err)
+	}
 
 	return nil
 }
@@ -231,17 +238,13 @@ func dnsRecordToState(record *sacloud.DNSRecordSet) map[string]interface{} {
 		// ex. record.RData = "10 example.com."
 		values := strings.SplitN(record.RData, " ", 2)
 		r["value"] = values[1]
-		r["priority"] = values[0]
+		r["priority"] = forceAtoI(values[0])
 	case "SRV":
 		values := strings.SplitN(record.RData, " ", 4)
 		r["value"] = values[3]
-		r["priority"] = values[0]
-		r["weight"] = values[1]
-		r["port"] = values[2]
-	default:
-		r["priority"] = ""
-		r["weight"] = ""
-		r["port"] = ""
+		r["priority"] = forceAtoI(values[0])
+		r["weight"] = forceAtoI(values[1])
+		r["port"] = forceAtoI(values[2])
 	}
 
 	return r
