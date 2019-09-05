@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.16.1 (2019-09-05)
+
+* DNSリソースでのStateセット時エラーチェックの厳格化 #496 (yamamoto-febc)
+* Use GOPROXY #499 (yamamoto-febc)
+* GSLB実サーバ数の上限を6から12へ #500 (yamamoto-febc)
+
+
 ## 1.16.0 (2019-08-30)
 
 * エンハンスドロードバランサ更新 #488 (yamamoto-febc)
