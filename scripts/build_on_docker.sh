@@ -19,6 +19,7 @@ docker run --name $DOCKER_CONTAINER_NAME \
        -e CURRENT_VERSION \
        -e TF_LOG \
        -e TESTARGS \
+       -e GOPROXY=https://proxy.golang.org \
        $DOCKER_IMAGE_NAME make "$@"
 if [[ "$@" == *"build"* ]]; then
   docker cp $DOCKER_CONTAINER_NAME:/go/src/github.com/sacloud/terraform-provider-sakuracloud/bin ./
