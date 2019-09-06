@@ -506,12 +506,12 @@ func setSimpleMonitorResourceData(d *schema.ResourceData, client *APIClient, dat
 		return fmt.Errorf("error setting tags: %s", err)
 	}
 
-	d.Set("enabled", data.Settings.SimpleMonitor.Enabled)
+	d.Set("enabled", strings.ToLower(data.Settings.SimpleMonitor.Enabled) == "true")
 
-	d.Set("notify_email_enabled", data.Settings.SimpleMonitor.NotifyEmail.Enabled == "True")
-	d.Set("notify_email_html", data.Settings.SimpleMonitor.NotifyEmail.HTML == "True")
+	d.Set("notify_email_enabled", strings.ToLower(data.Settings.SimpleMonitor.NotifyEmail.Enabled) == "true")
+	d.Set("notify_email_html", strings.ToLower(data.Settings.SimpleMonitor.NotifyEmail.HTML) == "true")
 
-	enableSlack := data.Settings.SimpleMonitor.NotifySlack.Enabled == "True"
+	enableSlack := strings.ToLower(data.Settings.SimpleMonitor.NotifySlack.Enabled) == "true"
 	d.Set("notify_slack_enabled", enableSlack)
 	if enableSlack {
 		d.Set("notify_slack_webhook", data.Settings.SimpleMonitor.NotifySlack.IncomingWebhooksURL)
