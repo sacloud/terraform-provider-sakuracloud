@@ -93,7 +93,7 @@ func dnsRecordValueSchema() map[string]*schema.Schema {
 		"port": {
 			Type:         schema.TypeInt,
 			Optional:     true,
-			ValidateFunc: validation.IntBetween(1, 65535),
+			ValidateFunc: validation.IntBetween(0, 65535),
 		},
 	}
 }

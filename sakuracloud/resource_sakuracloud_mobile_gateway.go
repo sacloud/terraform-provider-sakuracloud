@@ -84,7 +84,7 @@ func resourceSakuraCloudMobileGateway() *schema.Resource {
 						"band_width_limit": {
 							Type:         schema.TypeInt,
 							Optional:     true,
-							ValidateFunc: validation.IntBetween(1, math.MaxInt32),
+							ValidateFunc: validation.IntBetween(0, math.MaxInt32),
 						},
 						"enable_email": {
 							Type:     schema.TypeBool,

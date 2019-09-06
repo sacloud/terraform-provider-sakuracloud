@@ -98,7 +98,7 @@ resource "sakuracloud_switch" "sw" {
 |-------------------|:---:|--------------------|:--------:|------------------------|----------------------------------------------|
 | `quota`            | ◯   | 通信量しきい値(MB) | -        | 数値| - |
 | `auto_traffic_shaping`       | -   | 帯域制限の有効/無効 | - | `true`<br />`false` | - |
-| `band_width_limit` | -   | 帯域制限値(Kbps)  | - | `true`<br />`false` | - |
+| `band_width_limit` | -   | 帯域制限値(Kbps)  | - | 数値 | - |
 | `enable_email`       | -   | Eメール通知の有効/無効 | - | `true`<br />`false` | - |
 | `enable_slack`       | -   | Slack通知の有効/無効  | - | `true`<br />`false` | - |
 | `slack_webhook`       | -   | Slack通知 Webhook URL| - | 文字列 | `https://hooks.slack.com/services/xxx/xxx/xxx`形式で指定 |

@@ -88,7 +88,7 @@ resource "sakuracloud_simple_monitor" "my_sslcert_monitor" {
 | `community`    | △   | コミュニティ名 | - | 文字列 | プロトコルが`snmp`の場合のみ有効かつ必須 |
 | `snmp_version` | △   | SNMPバージョン | - | `1`<br />`2c` | プロトコルが`snmp`の場合のみ有効かつ必須 |
 | `oid`          | △   | OID | - | 文字列 | プロトコルが`snmp`の場合のみ有効かつ必須 |
-| `remaining_days`| △  | 有効残日数 | - | 数値 | `1`〜`9999`<br />プロトコルが`sslcertificate`の場合のみ有効かつ必須 |
+| `remaining_days`| △  | 有効残日数 | - | 数値 | `0`〜`9999`<br />プロトコルが`sslcertificate`の場合のみ有効かつ必須 |
 
 
 
