@@ -445,15 +445,18 @@ func setSimpleMonitorResourceData(d *schema.ResourceData, client *APIClient, dat
 
 	healthCheck := map[string]interface{}{}
 
-	port := ""
+	port := 0
 	readHealthCheck := data.Settings.SimpleMonitor.HealthCheck
+	if readHealthCheck.Port != "" {
+		port = forceAtoI(readHealthCheck.Port)
+	}
+
 	switch data.Settings.SimpleMonitor.HealthCheck.Protocol {
 	case "http":
 		healthCheck["path"] = readHealthCheck.Path
 		healthCheck["status"] = readHealthCheck.Status
 		healthCheck["host_header"] = readHealthCheck.Host
 		healthCheck["port"] = port
-		healthCheck["port"] = readHealthCheck.Port
 		healthCheck["username"] = readHealthCheck.BasicAuthUsername
 		healthCheck["password"] = readHealthCheck.BasicAuthPassword
 	case "https":
@@ -461,19 +464,17 @@ func setSimpleMonitorResourceData(d *schema.ResourceData, client *APIClient, dat
 		healthCheck["status"] = readHealthCheck.Status
 		healthCheck["host_header"] = readHealthCheck.Host
 		healthCheck["port"] = port
-		healthCheck["port"] = readHealthCheck.Port
 		healthCheck["sni"] = strings.ToLower(readHealthCheck.SNI) == "true"
 		healthCheck["username"] = readHealthCheck.BasicAuthUsername
 		healthCheck["password"] = readHealthCheck.BasicAuthPassword
 	case "tcp":
 		healthCheck["port"] = port
-		healthCheck["port"] = readHealthCheck.Port
 	case "ssh":
-		healthCheck["port"] = readHealthCheck.Port
+		healthCheck["port"] = port
 	case "smtp":
-		healthCheck["port"] = readHealthCheck.Port
+		healthCheck["port"] = port
 	case "pop3":
-		healthCheck["port"] = readHealthCheck.Port
+		healthCheck["port"] = port
 
 	case "snmp":
 		healthCheck["community"] = readHealthCheck.Community
@@ -495,11 +496,15 @@ func setSimpleMonitorResourceData(d *schema.ResourceData, client *APIClient, dat
 	healthCheck["protocol"] = data.Settings.SimpleMonitor.HealthCheck.Protocol
 	healthCheck["delay_loop"] = data.Settings.SimpleMonitor.DelayLoop
 
-	d.Set("health_check", []interface{}{healthCheck})
+	if err := d.Set("health_check", []interface{}{healthCheck}); err != nil {
+		return fmt.Errorf("error setting health_check: %s", err)
+	}
 
 	d.Set("icon_id", data.GetIconStrID())
 	d.Set("description", data.Description)
-	d.Set("tags", data.Tags)
+	if err := d.Set("tags", data.Tags); err != nil {
+		return fmt.Errorf("error setting tags: %s", err)
+	}
 
 	d.Set("enabled", data.Settings.SimpleMonitor.Enabled)
 
