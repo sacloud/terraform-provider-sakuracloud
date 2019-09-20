@@ -304,5 +304,11 @@
 		"ReleaseDate": "2019-09-06T03:02:30.818224736Z",
 		"PluginVersion": "v1.16.3",
 		"PreRelease": true
+	},
+	{
+		"TerraformVersion": "v0.12.3",
+		"ReleaseDate": "2019-09-20T04:59:11.13944045Z",
+		"PluginVersion": "v1.16.4",
+		"PreRelease": true
 	}
 ]
