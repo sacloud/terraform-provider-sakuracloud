@@ -852,7 +852,6 @@ func resourceSakuraCloudServerUpdate(d *schema.ResourceData, meta interface{}) e
 	}
 
 	if d.HasChange("cdrom_id") {
-
 		if server.Instance.CDROM != nil {
 			_, err := client.Server.EjectCDROM(server.ID, server.Instance.CDROM.ID)
 			if err != nil {
@@ -912,21 +911,15 @@ func resourceSakuraCloudServerDelete(d *schema.ResourceData, meta interface{}) e
 func setServerResourceData(d *schema.ResourceData, client *APIClient, data *sacloud.Server) error {
 
 	d.Set("name", data.Name)
-	if err := d.Set("core", data.ServerPlan.CPU); err != nil {
-		return err
-	}
-	if err := d.Set("memory", toSizeGB(data.ServerPlan.MemoryMB)); err != nil {
-		return err
-	}
+	d.Set("core", data.ServerPlan.CPU)
+	d.Set("memory", toSizeGB(data.ServerPlan.MemoryMB))
 	d.Set("commitment", string(data.ServerPlan.Commitment))
-	d.Set("disks", flattenDisks(data.Disks))
-
-	if data.Instance.CDROM == nil {
-		d.Set("cdrom_id", "")
-	} else {
+	if err := d.Set("disks", flattenDisks(data.Disks)); err != nil {
+		return fmt.Errorf("error setting disks: %s", err)
+	}
+	if data.Instance.CDROM != nil && data.Instance.CDROM.ID > 0 {
 		d.Set("cdrom_id", data.Instance.CDROM.GetStrID())
 	}
-
 	d.Set("interface_driver", string(data.GetInterfaceDriverString()))
 
 	if data.PrivateHost != nil && data.PrivateHost.ID > 0 {
@@ -957,23 +950,36 @@ func setServerResourceData(d *schema.ResourceData, client *APIClient, data *sacl
 		d.Set("display_ipaddress", "")
 	}
 
-	d.Set("additional_nics", flattenInterfaces(data.Interfaces))
-	d.Set("additional_display_ipaddresses", flattenDisplayIPAddress(data.Interfaces))
+	if err := d.Set("additional_nics", flattenInterfaces(data.Interfaces)); err != nil {
+		return fmt.Errorf("error setting additional_nics: %s", err)
+	}
+	if err := d.Set("additional_display_ipaddresses", flattenDisplayIPAddress(data.Interfaces)); err != nil {
+		return fmt.Errorf("error setting additional_display_ipaddress: %s", err)
+	}
 
-	d.Set("icon_id", data.GetIconStrID())
+	if data.Icon != nil && data.Icon.ID > 0 {
+		d.Set("icon_id", data.GetIconStrID())
+	}
 	d.Set("description", data.Description)
-	d.Set("tags", data.Tags)
-
-	d.Set("packet_filter_ids", flattenPacketFilters(data.Interfaces))
+	if err := d.Set("tags", data.Tags); err != nil {
+		return fmt.Errorf("error setting tags: %s", err)
+	}
+	if err := d.Set("packet_filter_ids", flattenPacketFilters(data.Interfaces)); err != nil {
+		return fmt.Errorf("error setting packet_filter_ids: %s", err)
+	}
 
 	//readonly values
-	d.Set("macaddresses", flattenMacAddresses(data.Interfaces))
+	if err := d.Set("macaddresses", flattenMacAddresses(data.Interfaces)); err != nil {
+		return fmt.Errorf("error setting macaddresses: %s", err)
+	}
 	d.Set("ipaddress", "")
 	d.Set("dns_servers", []string{})
 	d.Set("gateway", "")
 	d.Set("nw_address", "")
 	d.Set("nw_mask_len", "")
-	d.Set("dns_servers", data.Zone.Region.NameServers)
+	if err := d.Set("dns_servers", data.Zone.Region.NameServers); err != nil {
+		return fmt.Errorf("error setting dns_servers: %s", err)
+	}
 	if hasFirstInterface && data.Interfaces[0].Switch != nil {
 		ip := ""
 		if data.Interfaces[0].Switch.Scope == sacloud.ESCopeShared {

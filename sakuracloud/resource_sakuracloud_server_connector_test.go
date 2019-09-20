@@ -80,9 +80,6 @@ func TestAccResourceSakuraCloudServerConnector(t *testing.T) {
 					resource.TestCheckNoResourceAttr(
 						"sakuracloud_server.foobar", "packet_filter_ids",
 					),
-					resource.TestCheckResourceAttr(
-						"sakuracloud_server.foobar", "cdrom_id", "",
-					),
 				),
 			},
 		},
@@ -92,11 +89,12 @@ func TestAccResourceSakuraCloudServerConnector(t *testing.T) {
 const testAccCheckSakuraCloudServerConnectorConfig_basic = `
 resource sakuracloud_server "foobar" {
   name = "foobar"
-  additional_nics = [""]
+  graceful_shutdown_timeout = 5
 }
 resource sakuracloud_disk "foobar" {
   name = "foobar"
   count = 1
+  graceful_shutdown_timeout = 5
 }
 resource sakuracloud_packet_filter "foobar" {
   name = "foobar"
@@ -118,13 +116,18 @@ resource sakuracloud_server_connector "foobar" {
 `
 
 const testAccCheckSakuraCloudServerConnectorConfig_update = `
+resource sakuracloud_switch "foobar" {
+  name = "foobar"
+}
 resource sakuracloud_server "foobar" {
   name = "foobar"
-  additional_nics = [""]
+  additional_nics = ["${sakuracloud_switch.foobar.id}"]
+  graceful_shutdown_timeout = 5
 }
 resource sakuracloud_disk "foobar" {
   name = "foobar"
   count = 2
+  graceful_shutdown_timeout = 5
 }
 resource sakuracloud_packet_filter "foobar" {
   name = "foobar"
@@ -146,13 +149,17 @@ resource sakuracloud_server_connector "foobar" {
 `
 
 const testAccCheckSakuraCloudServerConnectorConfig_delete = `
+resource sakuracloud_switch "foobar" {
+  name = "foobar"
+}
 resource sakuracloud_server "foobar" {
   name = "foobar"
-  additional_nics = [""]
+  graceful_shutdown_timeout = 5
 }
 resource sakuracloud_disk "foobar" {
   name = "foobar"
   count = 2
+  graceful_shutdown_timeout = 5
 }
 resource sakuracloud_packet_filter "foobar" {
   name = "foobar"

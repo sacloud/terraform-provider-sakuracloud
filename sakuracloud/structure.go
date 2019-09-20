@@ -187,7 +187,17 @@ func flattenDisplayIPAddress(interfaces []sacloud.Interface) []interface{} {
 			}
 		}
 	}
-	return ret
+	exists := false
+	for _, v := range ret {
+		if v.(string) != "" {
+			exists = true
+			break
+		}
+	}
+	if exists {
+		return ret
+	}
+	return []interface{}{}
 }
 
 func flattenPacketFilters(interfaces []sacloud.Interface) []string {
@@ -200,7 +210,7 @@ func flattenPacketFilters(interfaces []sacloud.Interface) []string {
 		ret = append(ret, id)
 	}
 
-	if len(interfaces) <= 1 {
+	if len(interfaces) == 0 {
 		return ret
 	}
 

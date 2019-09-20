@@ -28,7 +28,6 @@ func resourceSakuraCloudServerConnector() *schema.Resource {
 			"disks": {
 				Type:     schema.TypeList,
 				Optional: true,
-				Computed: true,
 				Elem:     &schema.Schema{Type: schema.TypeString},
 				// ! Current terraform(v0.7) is not support to array validation !
 				// ValidateFunc: validateSakuracloudIDArrayType,
@@ -36,13 +35,11 @@ func resourceSakuraCloudServerConnector() *schema.Resource {
 			"cdrom_id": {
 				Type:         schema.TypeString,
 				Optional:     true,
-				Computed:     true,
 				ValidateFunc: validateSakuracloudIDType,
 			},
 			"packet_filter_ids": {
 				Type:     schema.TypeList,
 				Optional: true,
-				Computed: true,
 				MaxItems: 4,
 				Elem:     &schema.Schema{Type: schema.TypeString},
 				// ! Current terraform(v0.7) is not support to array validation !
@@ -196,13 +193,15 @@ func resourceSakuraCloudServerConnectorRead(d *schema.ResourceData, meta interfa
 		return fmt.Errorf("Couldn't find SakuraCloud ServerConnector resource: %s", err)
 	}
 
-	d.Set("disks", flattenDisks(data.Disks))
-	if data.Instance.CDROM == nil {
-		d.Set("cdrom_id", "")
-	} else {
+	if err := d.Set("disks", flattenDisks(data.Disks)); err != nil {
+		return fmt.Errorf("error setting disks: %s", err)
+	}
+	if data.Instance.CDROM != nil && data.Instance.CDROM.ID > 0 {
 		d.Set("cdrom_id", data.Instance.CDROM.GetStrID())
 	}
-	d.Set("packet_filter_ids", flattenPacketFilters(data.Interfaces))
+	if err := d.Set("packet_filter_ids", flattenPacketFilters(data.Interfaces)); err != nil {
+		return fmt.Errorf("error setting packet_filter_ids: %s", err)
+	}
 	setPowerManageTimeoutValueToState(d)
 
 	d.Set("zone", client.Zone)
@@ -343,14 +342,9 @@ func resourceSakuraCloudServerConnectorDelete(d *schema.ResourceData, meta inter
 	if err != nil {
 		return fmt.Errorf("Couldn't find SakuraCloud ServerConnector resource: %s", err)
 	}
-	isNeedRestart := false
 	isRunning := server.Instance.IsUp()
 
-	if _, ok := d.GetOk("disks"); ok {
-		isNeedRestart = true
-	}
-
-	if isNeedRestart && isRunning {
+	if isRunning {
 		// shutdown server
 		err := stopServer(client, toSakuraCloudID(d.Id()), d)
 		if err != nil {
@@ -358,37 +352,45 @@ func resourceSakuraCloudServerConnectorDelete(d *schema.ResourceData, meta inter
 		}
 	}
 
-	if _, ok := d.GetOk("disks"); ok {
+	rawIDs := d.Get("disks")
+	if rawIDs != nil {
+		ids := rawIDs.([]interface{})
 		//disconnect all old disks
 		for _, disk := range server.Disks {
-			_, err := client.Disk.DisconnectFromServer(disk.ID)
-			if err != nil {
-				return fmt.Errorf("Error disconnecting disk from SakuraCloud ServerConnector resource: %s", err)
-			}
-		}
-	}
-
-	if _, ok := d.GetOk("packet_filter_ids"); ok {
-		for _, nic := range server.Interfaces {
-			if nic.PacketFilter != nil {
-				_, err := client.Interface.DisconnectFromPacketFilter(nic.ID)
-				if err != nil {
-					return fmt.Errorf("Error disconnecting packet filter: %s", err)
+			for _, id := range ids {
+				if disk.GetStrID() == id.(string) {
+					_, err := client.Disk.DisconnectFromServer(toSakuraCloudID(id.(string)))
+					if err != nil {
+						return fmt.Errorf("Error disconnecting disk from SakuraCloud ServerConnector resource: %s", err)
+					}
 				}
 			}
 		}
 	}
 
-	if _, ok := d.GetOk("cdrom_id"); ok {
-		if server.Instance.CDROM != nil {
-			_, err := client.Server.EjectCDROM(server.ID, server.Instance.CDROM.ID)
-			if err != nil {
-				return fmt.Errorf("Error Ejecting CDROM: %s", err)
+	rawIDs = d.Get("packet_filter_ids")
+	if rawIDs != nil {
+		ids := rawIDs.([]interface{})
+		for _, nic := range server.Interfaces {
+			for _, id := range ids {
+				if nic.PacketFilter != nil && nic.PacketFilter.GetStrID() == id.(string) {
+					_, err := client.Interface.DisconnectFromPacketFilter(nic.ID)
+					if err != nil {
+						return fmt.Errorf("Error disconnecting packet filter: %s", err)
+					}
+				}
 			}
 		}
 	}
 
-	if isNeedRestart && isRunning {
+	if server.Instance.CDROM != nil {
+		_, err := client.Server.EjectCDROM(server.ID, server.Instance.CDROM.ID)
+		if err != nil {
+			return fmt.Errorf("Error Ejecting CDROM: %s", err)
+		}
+	}
+
+	if isRunning {
 		err := bootServer(client, toSakuraCloudID(d.Id()))
 		if err != nil {
 			return fmt.Errorf("Error booting SakuraCloud ServerConnector resource: %s", err)
