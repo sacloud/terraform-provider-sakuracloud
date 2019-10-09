@@ -1,10 +1,10 @@
 module github.com/sacloud/terraform-provider-sakuracloud
 
 require (
-	github.com/hashicorp/terraform v0.12.3
+	github.com/hashicorp/terraform-plugin-sdk v1.0.0
 	github.com/mattn/go-isatty v0.0.7 // indirect
 	github.com/mattn/go-tty v0.0.0-20190418143243-a87bf4b22d6e // indirect
-	github.com/mitchellh/go-homedir v1.0.0
+	github.com/mitchellh/go-homedir v1.1.0
 	github.com/mitchellh/goamz v0.0.0-20150317174335-caaaea8b30ee
 	github.com/motain/gocheck v0.0.0-20131023154940-9beb271d26e6 // indirect
 	github.com/sacloud/ftps v0.0.0-20171205062625-42fc0f9886fe

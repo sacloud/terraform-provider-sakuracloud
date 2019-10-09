@@ -1,11 +1,7 @@
 package main
 
-import (
-	"fmt"
-
-	"github.com/hashicorp/terraform/version"
-)
+import "fmt"
 
 func main() {
-	fmt.Print(version.Version)
+	fmt.Print("0.12.9")
 }

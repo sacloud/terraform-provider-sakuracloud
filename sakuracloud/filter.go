@@ -5,7 +5,7 @@ import (
 	"os"
 	"strings"
 
-	"github.com/hashicorp/terraform/helper/resource"
+	"github.com/hashicorp/terraform-plugin-sdk/helper/resource"
 )
 
 var filterNoResultMessage = "Your query returned no results. Please change your filters or selectors and try again"
