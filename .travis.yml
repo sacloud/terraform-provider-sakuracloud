@@ -11,8 +11,8 @@ env:
 before_install:
   - sudo apt-get install bzr
 install:
-- go get -u golang.org/x/lint/golint
-- go get -u golang.org/x/tools/cmd/goimports
+- GO111MODULE=off go get -u golang.org/x/lint/golint
+- GO111MODULE=off go get -u golang.org/x/tools/cmd/goimports
 script:
 - make test
 - make lint-docs
@@ -21,9 +21,9 @@ before_deploy:
     make docker-build;
   fi
 - export TERRAFORM_VERSION=$(GO111MODULE=on go run tools/terraform-version/main.go)
-- go get github.com/aktau/github-release
+- GO111MODULE=off go get github.com/aktau/github-release
 - mkdir -p ~/bin
-- (go get github.com/github/hub && cd $GOPATH/src/github.com/github/hub && script/build -o ~/bin/hub)
+- (GO111MODULE=off go get github.com/github/hub && cd $GOPATH/src/github.com/github/hub && script/build -o ~/bin/hub)
 - echo $TRAVIS_BRANCH
 - git config --add remote.origin.fetch '+refs/heads/*:refs/remotes/origin/*'
 - git fetch
