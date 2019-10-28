@@ -16,7 +16,6 @@ type SimpleMonitor struct {
 	Settings *SimpleMonitorSettings `json:",omitempty"` // 設定
 	Status   *SimpleMonitorStatus   `json:",omitempty"` // ステータス
 	Provider *SimpleMonitorProvider `json:",omitempty"` // プロバイダ
-
 }
 
 // SimpleMonitorSettings シンプル監視設定 リスト
@@ -26,11 +25,12 @@ type SimpleMonitorSettings struct {
 
 // SimpleMonitorSetting シンプル監視設定
 type SimpleMonitorSetting struct {
-	DelayLoop   int                       `json:",omitempty"` // 監視間隔
-	HealthCheck *SimpleMonitorHealthCheck `json:",omitempty"` // ヘルスチェック
-	Enabled     string                    `json:",omitempty"` // 有効/無効
-	NotifyEmail *SimpleMonitorNotify      `json:",omitempty"` // Email通知
-	NotifySlack *SimpleMonitorNotify      `json:",omitempty"` // Slack通知
+	DelayLoop      int                       `json:",omitempty"` // 監視間隔
+	NotifyInterval int                       `json:",omitempty"` // 再通知間隔(秒数)
+	HealthCheck    *SimpleMonitorHealthCheck `json:",omitempty"` // ヘルスチェック
+	Enabled        string                    `json:",omitempty"` // 有効/無効
+	NotifyEmail    *SimpleMonitorNotify      `json:",omitempty"` // Email通知
+	NotifySlack    *SimpleMonitorNotify      `json:",omitempty"` // Slack通知
 }
 
 // SimpleMonitorStatus シンプル監視ステータス
@@ -286,4 +286,9 @@ func (s *SimpleMonitor) DisableNotifySlack() {
 // SetDelayLoop 監視間隔の設定
 func (s *SimpleMonitor) SetDelayLoop(loop int) {
 	s.Settings.SimpleMonitor.DelayLoop = loop
+}
+
+// SetNotifyInterval 再通知間隔の設定
+func (s *SimpleMonitor) SetNotifyInterval(loop int) {
+	s.Settings.SimpleMonitor.NotifyInterval = loop
 }

@@ -94,6 +94,7 @@ func (d *Disk) SetDiskPlanToSSD() {
 //
 // 設定を行う項目のみ値をセットする。値のセットにはセッターを利用すること。
 type DiskEditValue struct {
+	Background    bool        `json:",omitempty"` // バックグラウンド実行
 	Password      *string     `json:",omitempty"` // パスワード
 	SSHKey        *SSHKey     `json:",omitempty"` // 公開鍵(単体)
 	SSHKeys       []*SSHKey   `json:",omitempty"` // 公開鍵(複数)
@@ -105,6 +106,11 @@ type DiskEditValue struct {
 		DefaultRoute   string `json:",omitempty"` // デフォルトルート
 		NetworkMaskLen string `json:",omitempty"` // ネットワークマスク長
 	} `json:",omitempty"`
+}
+
+// SetBackground バックグラウンド実行 設定
+func (d *DiskEditValue) SetBackground(value bool) {
+	d.Background = value
 }
 
 // SetHostName ホスト名 設定
