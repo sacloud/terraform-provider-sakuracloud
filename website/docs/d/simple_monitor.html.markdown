@@ -33,6 +33,7 @@ data "sakuracloud_simple_monitor" "foobar" {
 * `notify_email_html` - The flag of enable/disable HTML format for E-mail.
 * `notify_slack_enabled` - The flag of enable/disable notification by slack.
 * `notify_slack_webhook` - The webhook URL of destination of slack notification.
+* `notify_interval` - The intervals of notify (unit:`second`).  
 * `enabled` - The flag of enable/disable monitoring.
 * `description` - The description of the resource.
 * `tags` - The tag list of the resources.

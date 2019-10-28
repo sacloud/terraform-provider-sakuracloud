@@ -33,6 +33,7 @@ resource "sakuracloud_simple_monitor" "foobar" {
   notify_email_html    = true
   notify_slack_enabled = true
   notify_slack_webhook = "https://hooks.slack.com/services/XXX/XXX/XXXXXX"
+  notify_interval      = 7200
 
   description = "description"
   tags        = ["foo", "bar"]
@@ -59,6 +60,7 @@ The following arguments are supported:
 * `notify_email_html` - (Optional) The flag of enable/disable HTML format for E-mail.
 * `notify_slack_enabled` - (Optional) The flag of enable/disable notification by slack.
 * `notify_slack_webhook` - (Optional) The webhook URL of destination of slack notification.
+* `notify_interval` - The intervals of notify (unit:`second`).  
 * `enabled` - (Optional) The flag of enable/disable monitoring.
 * `description` - (Optional) The description of the resource.
 * `tags` - (Optional) The tag list of the resources.
@@ -94,6 +96,7 @@ Valid value is one of the following: [ "http" / "https" / "ping" / "tcp" / "dns"
 * `notify_email_html` - The flag of enable/disable HTML format for E-mail.
 * `notify_slack_enabled` - The flag of enable/disable notification by slack.
 * `notify_slack_webhook` - The webhook URL of destination of slack notification.
+* `notify_interval` - The intervals of notify (unit:`second`).  
 * `enabled` - The flag of enable/disable monitoring.
 * `description` - The description of the resource.
 * `tags` - The tag list of the resources.

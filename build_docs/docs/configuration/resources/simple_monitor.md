@@ -23,10 +23,12 @@ resource "sakuracloud_simple_monitor" "mymonitor" {
   # password   = "bar"
 
   notify_email_enabled = true
+  
 
   #notify_email_html    = false
   #notify_slack_enabled = false
   #notify_slack_webhook = "https://hooks.slack.com/services/XXXXXXXXX/XXXXXXXXX/XXXXXXXXXXXXXXXXXXXXXXXX"
+  #notify_interval      = 7200
   #enabled              = true
 
   description = "Description"
@@ -68,6 +70,7 @@ resource "sakuracloud_simple_monitor" "my_sslcert_monitor" {
 | `notify_email_html`   | -   | HTMLメール有効    | `false`  | `true`<br />`false` | - |
 | `notify_slack_enabled`| -   | Slack通知有効     | `false` | `true`<br />`false` | - |
 | `notify_slack_webhook`| -   | Slack WebhookURL | -       | 文字列 | - |
+| `notify_interval`| -   | 再通知間隔(秒) | -       | 数値 | - |
 | `enabled`             | -   | 有効              | `true` | `true`<br />`false` | - |
 
 #### `health_check`
