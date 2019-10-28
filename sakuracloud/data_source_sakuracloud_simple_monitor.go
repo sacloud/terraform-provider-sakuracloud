@@ -144,7 +144,10 @@ func dataSourceSakuraCloudSimpleMonitor() *schema.Resource {
 				Type:     schema.TypeString,
 				Computed: true,
 			},
-
+			"notify_interval": {
+				Type:     schema.TypeInt,
+				Computed: true,
+			},
 			"enabled": {
 				Type:     schema.TypeBool,
 				Computed: true,

@@ -140,7 +140,11 @@ func resourceSakuraCloudSimpleMonitor() *schema.Resource {
 				Type:     schema.TypeString,
 				Optional: true,
 			},
-
+			"notify_interval": {
+				Type:     schema.TypeInt,
+				Optional: true,
+				Default:  60 * 60 * 2,
+			},
 			"enabled": {
 				Type:     schema.TypeBool,
 				Optional: true,
@@ -257,6 +261,11 @@ func resourceSakuraCloudSimpleMonitorCreate(d *schema.ResourceData, meta interfa
 	}
 	if notifySlack {
 		opts.EnableNofitySlack(d.Get("notify_slack_webhook").(string))
+	}
+
+	notifyInterval := d.Get("notify_interval").(int)
+	if notifyInterval > 0 {
+		opts.SetNotifyInterval(notifyInterval)
 	}
 
 	simpleMonitor, err := client.SimpleMonitor.Create(opts)
@@ -418,6 +427,11 @@ func resourceSakuraCloudSimpleMonitorUpdate(d *schema.ResourceData, meta interfa
 		simpleMonitor.DisableNotifySlack()
 	}
 
+	notifyInterval := d.Get("notify_interval").(int)
+	if notifyInterval > 0 {
+		simpleMonitor.SetNotifyInterval(notifyInterval)
+	}
+
 	simpleMonitor, err = client.SimpleMonitor.Update(simpleMonitor.ID, simpleMonitor)
 	if err != nil {
 		return fmt.Errorf("Failed to create SakuraCloud SimpleMonitor resource: %s", err)
@@ -510,6 +524,7 @@ func setSimpleMonitorResourceData(d *schema.ResourceData, client *APIClient, dat
 
 	d.Set("notify_email_enabled", strings.ToLower(data.Settings.SimpleMonitor.NotifyEmail.Enabled) == "true")
 	d.Set("notify_email_html", strings.ToLower(data.Settings.SimpleMonitor.NotifyEmail.HTML) == "true")
+	d.Set("notify_interval", data.Settings.SimpleMonitor.NotifyInterval)
 
 	enableSlack := strings.ToLower(data.Settings.SimpleMonitor.NotifySlack.Enabled) == "true"
 	d.Set("notify_slack_enabled", enableSlack)

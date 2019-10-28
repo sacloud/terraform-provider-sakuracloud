@@ -44,6 +44,8 @@ func TestAccResourceSakuraCloudSimpleMonitor(t *testing.T) {
 						"sakuracloud_simple_monitor.foobar", "notify_slack_enabled", "true"),
 					resource.TestCheckResourceAttr(
 						"sakuracloud_simple_monitor.foobar", "notify_slack_webhook", testAccSlackWebhook),
+					resource.TestCheckResourceAttr(
+						"sakuracloud_simple_monitor.foobar", "notify_interval", "3600"),
 					resource.TestCheckResourceAttrPair(
 						"sakuracloud_simple_monitor.foobar", "icon_id",
 						"sakuracloud_icon.foobar", "id",
@@ -69,8 +71,10 @@ func TestAccResourceSakuraCloudSimpleMonitor(t *testing.T) {
 						"sakuracloud_simple_monitor.foobar", "notify_email_html", "false"),
 					resource.TestCheckResourceAttr(
 						"sakuracloud_simple_monitor.foobar", "notify_email_enabled", "false"),
-					resource.TestCheckNoResourceAttr(
-						"sakuracloud_simple_monitor.foobar", "icon_id"),
+					resource.TestCheckResourceAttr(
+						"sakuracloud_simple_monitor.foobar", "notify_interval", "7200"),
+					resource.TestCheckResourceAttr(
+						"sakuracloud_simple_monitor.foobar", "icon_id", ""),
 				),
 			},
 		},
@@ -199,6 +203,7 @@ resource "sakuracloud_simple_monitor" "foobar" {
     notify_email_html = true
     notify_slack_enabled = true
     notify_slack_webhook = "%s"
+    notify_interval = 3600
     icon_id = "${sakuracloud_icon.foobar.id}"
 }
 
@@ -223,6 +228,7 @@ resource "sakuracloud_simple_monitor" "foobar" {
     notify_email_enabled = false
     notify_slack_enabled = true
     notify_slack_webhook = "%s"
+    notify_interval = 7200
 }`, testAccSlackWebhook)
 
 const testAccSlackWebhook = `https://hooks.slack.com/services/XXXXXXXXX/XXXXXXXXX/XXXXXXXXXXXXXXXXXXXXXXXX`

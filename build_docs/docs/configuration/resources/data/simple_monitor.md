@@ -32,5 +32,6 @@ data "sakuracloud_simple_monitor" "mymonitor" {
 | `notify_email_html`   | HTMLメール有効    | - | 
 | `notify_slack_enabled`| Slack通知有効     | - | 
 | `notify_slack_webhook`| Slack WebhookURL | - | 
+| `notify_interval`| 再通知間隔(秒) | - | 
 | `enabled`             | 有効              | - | 
 
