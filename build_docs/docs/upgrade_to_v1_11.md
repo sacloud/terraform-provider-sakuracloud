@@ -128,3 +128,40 @@ resource "sakuracloud_nfs" "foobar" {
 }
 ```
 
+## スタートアップスクリプトのDescriptionフィールド
+
+これまではスタートアップスクリプト(`sakuracloud_note`)のDescriptionフィールドを指定可能でした。  
+しかし、このフィールドはスタートアップスクリプト内の`@sacloud-desc`の内容から算出されるため、v1.11からは読み取り専用項目へと修正されました。  
+これまでDescriptionフィールドを設定していた場合はtfファイルの修正が必要になります。
+
+### 対応方法
+
+- tfファイルで`description`を指定していた場合はスタートアップスクリプト内の`@sacloud-desc`に置き換えてください。
+
+#### 対応前のtfファイルの例
+
+```hcl
+resource sakuracloud_note "foobar" {
+  name        = "example"
+  description = "example-description"
+  content     = <<EOT
+#!/bin/bash
+# @sacloud-name ""
+# ...
+EOT
+}
+```
+
+#### 対応後のtfファイルの例
+
+```hcl
+resource sakuracloud_note "foobar" {
+  name        = "example"
+  content     = <<EOT
+#!/bin/bash
+# @sacloud-name ""
+# @sacloud-desc example-description
+# ...
+EOT
+}
+```
