@@ -217,7 +217,7 @@ github.com/posener/complete/match
 github.com/sacloud/ftps
 # github.com/sacloud/iso9660wrap v0.0.0-20171031075302-eda21f77f6a8
 github.com/sacloud/iso9660wrap
-# github.com/sacloud/libsacloud v1.28.0
+# github.com/sacloud/libsacloud v1.28.1
 github.com/sacloud/libsacloud
 github.com/sacloud/libsacloud/api
 github.com/sacloud/libsacloud/sacloud

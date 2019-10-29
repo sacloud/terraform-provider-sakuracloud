@@ -119,7 +119,16 @@ func (api *DiskAPI) Config(id int64, disk *sacloud.DiskEditValue) (bool, error) 
 		uri    = fmt.Sprintf("%s/%d/config", api.getResourceURL(), id)
 	)
 
-	return api.modify(method, uri, disk)
+	// HACK APIからの戻り値"Success"がboolではなく文字列となっているためapi.modifyを使わずに実装する。
+	res := &struct {
+		IsOk bool `json:"is_ok,omitempty"` // is_ok項目
+	}{}
+	err := api.baseAPI.request(method, uri, disk, res)
+	if err != nil {
+		return false, err
+	}
+	return res.IsOk, nil
+
 }
 
 func (api *DiskAPI) install(id int64, body *sacloud.Disk) (bool, error) {
