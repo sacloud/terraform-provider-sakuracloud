@@ -340,6 +340,7 @@ func resourceSakuraCloudServerCreate(d *schema.ResourceData, meta interface{}) e
 				// edit disk if server is connected the shared segment
 				isNeedEditDisk := false
 				diskEditConfig := client.Disk.NewCondig()
+				diskEditConfig.SetBackground(true)
 				if hostName, ok := d.GetOk("hostname"); ok {
 					diskEditConfig.SetHostName(hostName.(string))
 					isNeedEditDisk = true
@@ -392,6 +393,11 @@ func resourceSakuraCloudServerCreate(d *schema.ResourceData, meta interface{}) e
 						if err != nil {
 							return fmt.Errorf("Error editting SakuraCloud DiskConfig: %s", err)
 						}
+						// wait
+						if err := client.Disk.SleepWhileCopying(toSakuraCloudID(diskID), client.DefaultTimeoutDuration); err != nil {
+							return fmt.Errorf("Error editting SakuraCloud DiskConfig: timeout: %s", err)
+						}
+
 					} else {
 						log.Printf("[WARN] Disk[%s] does not support modify disk", diskID)
 					}
@@ -656,6 +662,7 @@ func resourceSakuraCloudServerUpdate(d *schema.ResourceData, meta interface{}) e
 		if len(updatedServer.Disks) > 0 {
 			isNeedEditDisk := false
 			diskEditConfig := client.Disk.NewCondig()
+			diskEditConfig.SetBackground(true)
 
 			if d.HasChange("nic") || d.HasChange("ipaddress") || d.HasChange("gateway") || d.HasChange("nw_mask_len") {
 				if len(updatedServer.Interfaces) > 0 && updatedServer.Interfaces[0].Switch != nil {
@@ -724,6 +731,10 @@ func resourceSakuraCloudServerUpdate(d *schema.ResourceData, meta interface{}) e
 					_, err := client.Disk.Config(diskID, diskEditConfig)
 					if err != nil {
 						return fmt.Errorf("Error editting SakuraCloud DiskConfig: %s", err)
+					}
+					// wait
+					if err := client.Disk.SleepWhileCopying(diskID, client.DefaultTimeoutDuration); err != nil {
+						return fmt.Errorf("Error editting SakuraCloud DiskConfig: timeout: %s", err)
 					}
 				} else {
 					log.Printf("[WARN] Disk[%d] does not support modify disk", diskID)

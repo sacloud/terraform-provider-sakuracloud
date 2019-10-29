@@ -206,6 +206,8 @@ func resourceSakuraCloudDiskCreate(d *schema.ResourceData, meta interface{}) err
 
 			//edit disk
 			diskEditConfig := client.Disk.NewCondig()
+			diskEditConfig.SetBackground(true)
+
 			if hostName, ok := d.GetOk("hostname"); ok {
 				diskEditConfig.SetHostName(hostName.(string))
 				isNeedEditDisk = true
@@ -241,6 +243,10 @@ func resourceSakuraCloudDiskCreate(d *schema.ResourceData, meta interface{}) err
 					_, err = client.Disk.Config(id, diskEditConfig)
 					if err != nil {
 						return fmt.Errorf("Error editting SakuraCloud DiskConfig: %s", err)
+					}
+					// wait
+					if err := client.Disk.SleepWhileCopying(id, client.DefaultTimeoutDuration); err != nil {
+						return fmt.Errorf("Error editting SakuraCloud DiskConfig: timeout: %s", err)
 					}
 				} else {
 					log.Printf("[WARN] Disk[%d] does not support modify disk", id)
@@ -315,6 +321,7 @@ func resourceSakuraCloudDiskUpdate(d *schema.ResourceData, meta interface{}) err
 
 	if isDiskConfigChanged {
 		diskEditConfig := client.Disk.NewCondig()
+		diskEditConfig.SetBackground(true)
 		if d.HasChange("hostname") {
 			if hostName, ok := d.GetOk("hostname"); ok {
 				diskEditConfig.SetHostName(hostName.(string))
@@ -353,6 +360,9 @@ func resourceSakuraCloudDiskUpdate(d *schema.ResourceData, meta interface{}) err
 			_, err := client.Disk.Config(disk.ID, diskEditConfig)
 			if err != nil {
 				return fmt.Errorf("Error editting SakuraCloud DiskConfig: %s", err)
+			}
+			if err := client.Disk.SleepWhileCopying(disk.ID, client.DefaultTimeoutDuration); err != nil {
+				return fmt.Errorf("Error editting SakuraCloud DiskConfig: timeout: %s", err)
 			}
 		} else {
 			log.Printf("[WARN] Disk[%d] does not support modify disk", disk.ID)
