@@ -135,6 +135,8 @@
                 
                     <li><a class="toctree-l4" href="#nfs-ssd">NFS SSDプラン対応</a></li>
                 
+                    <li><a class="toctree-l4" href="#description">スタートアップスクリプトのDescriptionフィールド</a></li>
+                
             
             </ul>
         
@@ -746,6 +748,38 @@ v1.11以前でNFSアプライアンスを利用していた場合はtfファイ�
   size        = &quot;100&quot; # planをsizeに置き換える
 
   # ...
+}
+</code></pre>
+
+<h2 id="description">スタートアップスクリプトのDescriptionフィールド</h2>
+<p>これまではスタートアップスクリプト(<code>sakuracloud_note</code>)のDescriptionフィールドを指定可能でした。<br />
+しかし、このフィールドはスタートアップスクリプト内の<code>@sacloud-desc</code>の内容から算出されるため、v1.11からは読み取り専用項目へと修正されました。<br />
+これまでDescriptionフィールドを設定していた場合はtfファイルの修正が必要になります。</p>
+<h3 id="_4">対応方法</h3>
+<ul>
+<li>tfファイルで<code>description</code>を指定していた場合はスタートアップスクリプト内の<code>@sacloud-desc</code>に置き換えてください。</li>
+</ul>
+<h4 id="tf_4">対応前のtfファイルの例</h4>
+<pre><code class="hcl">resource sakuracloud_note &quot;foobar&quot; {
+  name        = &quot;example&quot;
+  description = &quot;example-description&quot;
+  content     = &lt;&lt;EOT
+#!/bin/bash
+# @sacloud-name &quot;&quot;
+# ...
+EOT
+}
+</code></pre>
+
+<h4 id="tf_5">対応後のtfファイルの例</h4>
+<pre><code class="hcl">resource sakuracloud_note &quot;foobar&quot; {
+  name        = &quot;example&quot;
+  content     = &lt;&lt;EOT
+#!/bin/bash
+# @sacloud-name &quot;&quot;
+# @sacloud-desc example-description
+# ...
+EOT
 }
 </code></pre>
               

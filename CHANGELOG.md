@@ -1,5 +1,15 @@
 # Changelog
 
+## 1.17.0 (2019-10-29)
+
+* Switch to Terraform SDK v1.0.0 #515 (yamamoto-febc)
+* Use go 1.13 #516 (yamamoto-febc)
+* シンプル監視での再通知間隔の設定 #518 (yamamoto-febc)
+* Aliasレコード対応 #519 (yamamoto-febc)
+* ディスクの修正でのBackgroundパラメータの利用 #520 (yamamoto-febc)
+* アップグレードガイドの修正 #521 (yamamoto-febc)
+
+
 ## 1.16.4 (2019-09-20)
 
 * サーバリソースでの予期せぬdiffの回避 #510 (yamamoto-febc)
