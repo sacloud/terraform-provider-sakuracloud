@@ -158,6 +158,7 @@ func Provider() terraform.ResourceProvider {
 			"sakuracloud_vpc_router_user":                resourceSakuraCloudVPCRouterRemoteAccessUser(),
 			"sakuracloud_vpc_router_site_to_site_vpn":    resourceSakuraCloudVPCRouterSiteToSiteIPsecVPN(),
 			"sakuracloud_vpc_router_static_route":        resourceSakuraCloudVPCRouterStaticRoute(),
+			"sakuracloud_webaccel_certificate":           resourceSakuraCloudWebAccelCertificate(),
 		},
 		ConfigureFunc: providerConfigure,
 	}
