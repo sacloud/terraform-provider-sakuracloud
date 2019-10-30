@@ -154,7 +154,7 @@ type WebAccelCertRequest struct {
 // WebAccelCertResponse ウェブアクセラレータ証明書API レスポンス
 type WebAccelCertResponse struct {
 	Certificate *WebAccelCertResponseBody `json:",omitempty"`
-	ResultFlagValue
+	IsOk        bool                      `json:"is_ok,omitempty"` // is_ok項目
 }
 
 // WebAccelCertResponseBody ウェブアクセラレータ証明書API レスポンスボディ
@@ -167,7 +167,7 @@ type WebAccelCertResponseBody struct {
 func (s *WebAccelCertResponse) UnmarshalJSON(data []byte) error {
 	tmp := &struct {
 		Certificate *WebAccelCertResponseBody `json:",omitempty"`
-		ResultFlagValue
+		IsOk        bool                      `json:"is_ok,omitempty"` // is_ok項目
 	}{}
 	if err := json.Unmarshal(data, &tmp); err != nil {
 		return err
@@ -176,7 +176,7 @@ func (s *WebAccelCertResponse) UnmarshalJSON(data []byte) error {
 	if tmp.Certificate.Current != nil || len(tmp.Certificate.Old) > 0 {
 		s.Certificate = tmp.Certificate
 	}
-	s.ResultFlagValue = tmp.ResultFlagValue
+	s.IsOk = tmp.IsOk
 	return nil
 }
 

@@ -67,6 +67,31 @@ func (api *WebAccelAPI) ReadCertificate(id string) (*sacloud.WebAccelCertRespons
 	return res.Certificate, nil
 }
 
+// CreateCertificate 証明書 更新
+func (api *WebAccelAPI) CreateCertificate(id string, request *sacloud.WebAccelCertRequest) (*sacloud.WebAccelCertResponse, error) {
+	uri := fmt.Sprintf("%s/site/%s/certificate", api.getResourceURL(), id)
+
+	if request.CertificateChain != "" {
+		request.CertificateChain = strings.TrimRight(request.CertificateChain, "\n")
+	}
+	if request.Key != "" {
+		request.Key = strings.TrimRight(request.Key, "\n")
+	}
+
+	data, err := api.client.newRequest("POST", uri, map[string]interface{}{
+		"Certificate": request,
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	var res sacloud.WebAccelCertResponse
+	if err := json.Unmarshal(data, &res); err != nil {
+		return nil, err
+	}
+	return &res, nil
+}
+
 // UpdateCertificate 証明書 更新
 func (api *WebAccelAPI) UpdateCertificate(id string, request *sacloud.WebAccelCertRequest) (*sacloud.WebAccelCertResponse, error) {
 	uri := fmt.Sprintf("%s/site/%s/certificate", api.getResourceURL(), id)
@@ -81,6 +106,22 @@ func (api *WebAccelAPI) UpdateCertificate(id string, request *sacloud.WebAccelCe
 	data, err := api.client.newRequest("PUT", uri, map[string]interface{}{
 		"Certificate": request,
 	})
+	if err != nil {
+		return nil, err
+	}
+
+	var res sacloud.WebAccelCertResponse
+	if err := json.Unmarshal(data, &res); err != nil {
+		return nil, err
+	}
+	return &res, nil
+}
+
+// DeleteCertificate 証明書 削除
+func (api *WebAccelAPI) DeleteCertificate(id string) (*sacloud.WebAccelCertResponse, error) {
+	uri := fmt.Sprintf("%s/site/%s/certificate", api.getResourceURL(), id)
+
+	data, err := api.client.newRequest("DELETE", uri, nil)
 	if err != nil {
 		return nil, err
 	}
