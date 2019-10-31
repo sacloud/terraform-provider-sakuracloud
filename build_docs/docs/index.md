@@ -62,6 +62,7 @@
     - [GSLB](configuration/resources/gslb/)
     - [シンプル監視](configuration/resources/simple_monitor/)
     - [自動バックアップ](configuration/resources/auto_backup/)
+    - [ウェブアクセラレータ(証明書)](configuration/resources/webaccel_certificate/)
     - [オブジェクトストレージ](configuration/resources/bucket_object/)
 - 特殊なリソース
     - [サーバ コネクタ](configuration/resources/server_connector)
@@ -89,5 +90,6 @@
     - [GSLB](configuration/resources/data/gslb)
     - [シンプル監視](configuration/resources/data/simple_monitor)
     - [オブジェクトストレージ](configuration/resources/data/bucket_object)
+    - [ウェブアクセラレータ(サイト)](configuration/resources/data/webaccel)
     - [ゾーン](configuration/resources/data/zone)
   
