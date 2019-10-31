@@ -55,6 +55,7 @@ pages:
       - GSLB: configuration/resources/gslb.md
       - シンプル監視: configuration/resources/simple_monitor.md
       - 自動バックアップ: configuration/resources/auto_backup.md
+      - ウェブアクセラレータ(証明書): configuration/resources/webaccel_certificate.md
       - オブジェクトストレージ: configuration/resources/bucket_object.md
     - 特殊なリソース:
       - サーバ コネクタ: configuration/resources/server_connector.md
@@ -82,4 +83,5 @@ pages:
       - GSLB: configuration/resources/data/gslb.md
       - シンプル監視: configuration/resources/data/simple_monitor.md
       - オブジェクトストレージ: configuration/resources/data/bucket_object.md
+      - ウェブアクセラレータ(サイト): configuration/resources/data/webaccel.md
       - ゾーン: configuration/resources/data/zone.md

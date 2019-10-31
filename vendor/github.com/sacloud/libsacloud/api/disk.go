@@ -200,7 +200,15 @@ func (api *DiskAPI) ResizePartition(diskID int64) (bool, error) {
 		method = "PUT"
 		uri    = fmt.Sprintf("%s/%d/resize-partition", api.getResourceURL(), diskID)
 	)
-	return api.modify(method, uri, nil)
+	// HACK APIからの戻り値"Success"がboolではなく文字列となっているためapi.modifyを使わずに実装する。
+	res := &struct {
+		IsOk bool `json:"is_ok,omitempty"` // is_ok項目
+	}{}
+	err := api.baseAPI.request(method, uri, nil, res)
+	if err != nil {
+		return false, err
+	}
+	return res.IsOk, nil
 }
 
 // ResizePartitionBackground パーティションのリサイズ(非同期)
@@ -212,7 +220,16 @@ func (api *DiskAPI) ResizePartitionBackground(diskID int64) (bool, error) {
 			"Background": true,
 		}
 	)
-	return api.modify(method, uri, body)
+
+	// HACK APIからの戻り値"Success"がboolではなく文字列となっているためapi.modifyを使わずに実装する。
+	res := &struct {
+		IsOk bool `json:"is_ok,omitempty"` // is_ok項目
+	}{}
+	err := api.baseAPI.request(method, uri, body, res)
+	if err != nil {
+		return false, err
+	}
+	return res.IsOk, nil
 }
 
 // DisconnectFromServer サーバーとの接続解除

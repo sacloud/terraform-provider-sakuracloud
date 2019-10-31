@@ -325,9 +325,9 @@ type ResultErrorValue struct {
 
 // MigrationJobStatus マイグレーションジョブステータス
 type MigrationJobStatus struct {
-	Status string `json:",omitempty"` // ステータス
-
-	Delays *struct { // Delays
+	Status      string          `json:",omitempty"` // ステータス
+	ConfigError *JobConfigError `json:",omitempty"`
+	Delays      *struct {       // Delays
 		Start *struct { // 開始
 			Max int `json:",omitempty"` // 最大
 			Min int `json:",omitempty"` // 最小
@@ -338,6 +338,13 @@ type MigrationJobStatus struct {
 			Min int `json:",omitempty"` // 最小
 		} `json:",omitempty"`
 	}
+}
+
+// JobConfigError マイグレーションジョブのエラー
+type JobConfigError struct {
+	ErrorCode string `json:",omitempty"`
+	ErrorMsg  string `json:",omitempty"`
+	Status    string `json:",omitempty"`
 }
 
 var (
