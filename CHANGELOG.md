@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.18.1 (2019-10-31)
+
+* フィールド名変更: key => private_key #525 (yamamoto-febc)
+
+
 ## 1.18.0 (2019-10-31)
 
 * ウェブアクセラレータ対応 #523 (yamamoto-febc)
