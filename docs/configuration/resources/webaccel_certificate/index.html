@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>サブネット - Terraform for さくらのクラウド</title>
+  <title>ウェブアクセラレータ(証明書) - Terraform for さくらのクラウド</title>
   
 
   <link rel="shortcut icon" href="../../../img/favicon.ico">
@@ -21,7 +21,7 @@
   
   <script>
     // Current page data
-    var mkdocs_page_name = "サブネット";
+    var mkdocs_page_name = "ウェブアクセラレータ(証明書)";
   </script>
   
   <script src="../../../js/jquery-2.1.1.min.js"></script>
@@ -221,21 +221,8 @@
 
         
             
-    <li class="toctree-l1 current">
-        <a class="current" href="./">サブネット</a>
-        
-            <ul>
-            
-                <li class="toctree-l3"><a href="#sakuracloud_subnet">サブネット(sakuracloud_subnet)</a></li>
-                
-                    <li><a class="toctree-l4" href="#_1">設定例</a></li>
-                
-                    <li><a class="toctree-l4" href="#_2">パラメーター</a></li>
-                
-                    <li><a class="toctree-l4" href="#_3">属性</a></li>
-                
-            
-            </ul>
+    <li class="toctree-l1 ">
+        <a class="" href="../subnet/">サブネット</a>
         
     </li>
 
@@ -402,8 +389,21 @@
 
         
             
-    <li class="toctree-l1 ">
-        <a class="" href="../webaccel_certificate/">ウェブアクセラレータ(証明書)</a>
+    <li class="toctree-l1 current">
+        <a class="current" href="./">ウェブアクセラレータ(証明書)</a>
+        
+            <ul>
+            
+                <li class="toctree-l3"><a href="#sakuradloud_webaccel_certificate">ウェブアクセラレータ証明書(sakuradloud_webaccel_certificate)</a></li>
+                
+                    <li><a class="toctree-l4" href="#_1">設定例</a></li>
+                
+                    <li><a class="toctree-l4" href="#_2">パラメーター</a></li>
+                
+                    <li><a class="toctree-l4" href="#_3">属性</a></li>
+                
+            
+            </ul>
         
     </li>
 
@@ -645,7 +645,7 @@
         
       
     
-    <li>サブネット</li>
+    <li>ウェブアクセラレータ(証明書)</li>
     <li class="wy-breadcrumbs-aside">
       
     </li>
@@ -655,27 +655,20 @@
           <div role="main">
             <div class="section">
               
-                <h1 id="sakuracloud_subnet">サブネット(sakuracloud_subnet)</h1>
+                <h1 id="sakuradloud_webaccel_certificate">ウェブアクセラレータ証明書(sakuradloud_webaccel_certificate)</h1>
 <hr />
-<p>ルータ(<code>sakuracloud_internet</code>)に追加可能なグローバルIPアドレスブロックを表すリソースです。  </p>
 <h3 id="_1">設定例</h3>
-<pre><code class="hcl"># ルータの定義
-resource &quot;sakuracloud_internet&quot; &quot;foobar&quot; {
-  name = &quot;router&quot;
+<pre><code class="hcl"># サイト情報の参照用
+data sakuracloud_webaccel &quot;site&quot; {
+  name = &quot;example&quot;
 }
 
-# ルータに追加するグローバルIPアドレスブロック
-resource &quot;sakuracloud_subnet&quot; &quot;foobar&quot; {
-  # ルータのID
-  internet_id = sakuracloud_internet.foobar.id
-
-  # ネクストホップ
-  next_hop = sakuracloud_internet.foobar.nw_min_ipaddress
-
-  # ネットワークマスク長
-  #nw_mask_len = 28
+# 証明書
+resource sakuracloud_webaccel_certificate &quot;example&quot; {
+  site_id           = data.sakuracloud_webaccel.site.id
+  certificate_chain = file(&quot;crt&quot;)
+  key               = file(&quot;key&quot;)
 }
-
 </code></pre>
 
 <h3 id="_2">パラメーター</h3>
@@ -683,44 +676,36 @@ resource &quot;sakuracloud_subnet&quot; &quot;foobar&quot; {
 <thead>
 <tr>
 <th>パラメーター</th>
-<th align="center">必須</th>
+<th>必須</th>
 <th>名称</th>
-<th align="center">初期値</th>
+<th>初期値</th>
 <th>設定値</th>
 <th>補足</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td><code>internet_id</code></td>
-<td align="center">◯</td>
-<td>ルータID</td>
-<td align="center">-</td>
+<td><code>site_id</code></td>
+<td>◯</td>
+<td>ウェブアクセラレータのサイトID</td>
+<td>-</td>
 <td>文字列</td>
 <td>-</td>
 </tr>
 <tr>
-<td><code>nw_mask_len</code></td>
-<td align="center">-</td>
-<td>ネットワークマスク長</td>
-<td align="center"><code>28</code></td>
-<td><code>28</code><br /><code>27</code><br /><code>26</code></td>
-<td>グローバルIPのプリフィックス(ネットワークマスク長)</td>
-</tr>
-<tr>
-<td><code>next_hop</code></td>
-<td align="center">-</td>
-<td>ネクストホップ</td>
-<td align="center">-</td>
+<td><code>certificate_chain</code></td>
+<td>-</td>
+<td>証明書</td>
+<td>-</td>
 <td>文字列</td>
-<td>ネクストホップのIPv4アドレス</td>
+<td>中間証明書がある場合はサーバ証明書、中間証明書の順番に連結したものを指定</td>
 </tr>
 <tr>
-<td><code>zone</code></td>
-<td align="center">-</td>
-<td>ゾーン</td>
-<td align="center">-</td>
-<td><code>is1a</code><br /><code>is1b</code><br /><code>tk1a</code><br /><code>tk1v</code></td>
+<td><code>key</code></td>
+<td>-</td>
+<td>秘密鍵</td>
+<td>-</td>
+<td>文字列</td>
 <td>-</td>
 </tr>
 </tbody>
@@ -737,33 +722,43 @@ resource &quot;sakuracloud_subnet&quot; &quot;foobar&quot; {
 <tbody>
 <tr>
 <td><code>id</code></td>
-<td>スイッチID</td>
+<td>ID</td>
+<td>サイトIDと同一</td>
+</tr>
+<tr>
+<td><code>serial_number</code></td>
+<td>シリアルナンバー</td>
 <td>-</td>
 </tr>
 <tr>
-<td><code>switch_id</code></td>
-<td>スイッチID</td>
-<td>(内部的に)接続されているスイッチID</td>
+<td><code>not_before</code></td>
+<td>-</td>
+<td>RFC3339形式</td>
 </tr>
 <tr>
-<td><code>nw_address</code></td>
-<td>ネットワークアドレス</td>
-<td>割り当てられたグローバルIPのネットワークアドレス</td>
+<td><code>not_after</code></td>
+<td>-</td>
+<td>RFC3339形式</td>
 </tr>
 <tr>
-<td><code>min_ipaddress</code></td>
-<td>最小IPアドレス</td>
-<td>割り当てられたグローバルIPアドレスのうち、利用可能な先頭IPアドレス</td>
+<td><code>issuer_common_name</code></td>
+<td>Issuerコモンネーム</td>
+<td></td>
 </tr>
 <tr>
-<td><code>max_ipaddress</code></td>
-<td>最大IPアドレス</td>
-<td>割り当てられたグローバルIPアドレスのうち、利用可能な最後尾IPアドレス</td>
+<td><code>subject_common_name</code></td>
+<td>Subjectコモンネーム</td>
+<td></td>
 </tr>
 <tr>
-<td><code>ipaddresses</code></td>
-<td>IPアドレスリスト</td>
-<td>割り当てられたグローバルIPアドレスのうち、利用可能なIPアドレスのリスト</td>
+<td><code>dns_names</code></td>
+<td>DNS名</td>
+<td></td>
+</tr>
+<tr>
+<td><code>sha256_fingerprint</code></td>
+<td>フィンガープリント</td>
+<td></td>
 </tr>
 </tbody>
 </table>
@@ -774,10 +769,10 @@ resource &quot;sakuracloud_subnet&quot; &quot;foobar&quot; {
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="../packet_filter/" class="btn btn-neutral float-right" title="パケットフィルタ"/>Next <span class="icon icon-circle-arrow-right"></span></a>
+        <a href="../bucket_object/" class="btn btn-neutral float-right" title="オブジェクトストレージ"/>Next <span class="icon icon-circle-arrow-right"></span></a>
       
       
-        <a href="../internet/" class="btn btn-neutral" title="ルータ"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../auto_backup/" class="btn btn-neutral" title="自動バックアップ"><span class="icon icon-circle-arrow-left"></span> Previous</a>
       
     </div>
   
@@ -805,10 +800,10 @@ resource &quot;sakuracloud_subnet&quot; &quot;foobar&quot; {
     <span class="rst-current-version" data-toggle="rst-current-version">
       
       
-        <span><a href="../internet/" style="color: #fcfcfc;">&laquo; Previous</a></span>
+        <span><a href="../auto_backup/" style="color: #fcfcfc;">&laquo; Previous</a></span>
       
       
-        <span style="margin-left: 15px"><a href="../packet_filter/" style="color: #fcfcfc">Next &raquo;</a></span>
+        <span style="margin-left: 15px"><a href="../bucket_object/" style="color: #fcfcfc">Next &raquo;</a></span>
       
     </span>
 </div>
