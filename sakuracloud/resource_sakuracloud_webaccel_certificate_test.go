@@ -79,7 +79,7 @@ data sakuracloud_webaccel "site" {
 resource sakuracloud_webaccel_certificate "foobar" {
   site_id           = data.sakuracloud_webaccel.site.id
   certificate_chain = file("%s") 
-  key               = file("%s")
+  private_key       = file("%s")
 }
 `
 	return fmt.Sprintf(tmpl, siteName, crt, key)

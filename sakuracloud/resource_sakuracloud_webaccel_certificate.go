@@ -29,7 +29,7 @@ func resourceSakuraCloudWebAccelCertificate() *schema.Resource {
 				Required:  true,
 				Sensitive: true,
 			},
-			"key": {
+			"private_key": {
 				Type:      schema.TypeString,
 				Required:  true,
 				Sensitive: true,
@@ -74,7 +74,7 @@ func resourceSakuraCloudWebAccelCertificateCreate(d *schema.ResourceData, meta i
 
 	res, err := client.WebAccel.CreateCertificate(siteID, &sacloud.WebAccelCertRequest{
 		CertificateChain: d.Get("certificate_chain").(string),
-		Key:              d.Get("key").(string),
+		Key:              d.Get("private_key").(string),
 	})
 	if err != nil {
 		return err
@@ -109,10 +109,10 @@ func resourceSakuraCloudWebAccelCertificateUpdate(d *schema.ResourceData, meta i
 	client := meta.(*APIClient)
 	siteID := d.Id()
 
-	if d.HasChange("certificate_chain") || d.HasChange("key") {
+	if d.HasChange("certificate_chain") || d.HasChange("private_key") {
 		res, err := client.WebAccel.UpdateCertificate(siteID, &sacloud.WebAccelCertRequest{
 			CertificateChain: d.Get("certificate_chain").(string),
-			Key:              d.Get("key").(string),
+			Key:              d.Get("private_key").(string),
 		})
 		if err != nil {
 			return err
