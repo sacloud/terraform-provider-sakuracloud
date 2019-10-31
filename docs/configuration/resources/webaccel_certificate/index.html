@@ -667,7 +667,7 @@ data sakuracloud_webaccel &quot;site&quot; {
 resource sakuracloud_webaccel_certificate &quot;example&quot; {
   site_id           = data.sakuracloud_webaccel.site.id
   certificate_chain = file(&quot;crt&quot;)
-  key               = file(&quot;key&quot;)
+  private_key               = file(&quot;key&quot;)
 }
 </code></pre>
 
@@ -701,7 +701,7 @@ resource sakuracloud_webaccel_certificate &quot;example&quot; {
 <td>中間証明書がある場合はサーバ証明書、中間証明書の順番に連結したものを指定</td>
 </tr>
 <tr>
-<td><code>key</code></td>
+<td><code>private_key</code></td>
 <td>-</td>
 <td>秘密鍵</td>
 <td>-</td>
