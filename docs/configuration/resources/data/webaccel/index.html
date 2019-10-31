@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>VPCルータ - Terraform for さくらのクラウド</title>
+  <title>ウェブアクセラレータ(サイト) - Terraform for さくらのクラウド</title>
   
 
   <link rel="shortcut icon" href="../../../../img/favicon.ico">
@@ -21,7 +21,7 @@
   
   <script>
     // Current page data
-    var mkdocs_page_name = "VPCルータ";
+    var mkdocs_page_name = "ウェブアクセラレータ(サイト)";
   </script>
   
   <script src="../../../../js/jquery-2.1.1.min.js"></script>
@@ -503,19 +503,8 @@
 
         
             
-    <li class="toctree-l1 current">
-        <a class="current" href="./">VPCルータ</a>
-        
-            <ul>
-            
-                <li class="toctree-l3"><a href="#vpcsakuracloud_vpc_router">VPCルータ(sakuracloud_vpc_router)</a></li>
-                
-                    <li><a class="toctree-l4" href="#_1">設定例</a></li>
-                
-                    <li><a class="toctree-l4" href="#sakuracloud_vpc_router">sakuracloud_vpc_router</a></li>
-                
-            
-            </ul>
+    <li class="toctree-l1 ">
+        <a class="" href="../vpc_router/">VPCルータ</a>
         
     </li>
 
@@ -598,8 +587,21 @@
 
         
             
-    <li class="toctree-l1 ">
-        <a class="" href="../webaccel/">ウェブアクセラレータ(サイト)</a>
+    <li class="toctree-l1 current">
+        <a class="current" href="./">ウェブアクセラレータ(サイト)</a>
+        
+            <ul>
+            
+                <li class="toctree-l3"><a href="#sakuracloud_webaccel">ウェブアクセラレータ サイト(sakuracloud_webaccel)</a></li>
+                
+                    <li><a class="toctree-l4" href="#_1">設定例</a></li>
+                
+                    <li><a class="toctree-l4" href="#_2">パラメーター</a></li>
+                
+                    <li><a class="toctree-l4" href="#_3">属性</a></li>
+                
+            
+            </ul>
         
     </li>
 
@@ -643,7 +645,7 @@
         
       
     
-    <li>VPCルータ</li>
+    <li>ウェブアクセラレータ(サイト)</li>
     <li class="wy-breadcrumbs-aside">
       
     </li>
@@ -653,60 +655,45 @@
           <div role="main">
             <div class="section">
               
-                <h1 id="vpcsakuracloud_vpc_router">VPCルータ(sakuracloud_vpc_router)</h1>
+                <h1 id="sakuracloud_webaccel">ウェブアクセラレータ サイト(sakuracloud_webaccel)</h1>
 <hr />
 <h3 id="_1">設定例</h3>
-<pre><code class="hcl">data &quot;sakuracloud_vpc_router&quot; &quot;foobar&quot; {
-  name_selectors = [&quot;foobar&quot;]
+<pre><code class="hcl"># サイト情報の参照用
+data sakuracloud_webaccel &quot;site&quot; {
+  name = &quot;example&quot;
+  # または
+  # domain = &quot;www.example.com&quot;
 }
 </code></pre>
 
-<h2 id="sakuracloud_vpc_router"><code>sakuracloud_vpc_router</code></h2>
-<p>VPCルータ本体を表します。</p>
 <h3 id="_2">パラメーター</h3>
 <table>
 <thead>
 <tr>
 <th>パラメーター</th>
-<th align="center">必須</th>
+<th>必須</th>
 <th>名称</th>
-<th align="center">初期値</th>
+<th>初期値</th>
 <th>設定値</th>
 <th>補足</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td><code>name_selectors</code></td>
-<td align="center">-</td>
-<td>検索条件(名称)</td>
-<td align="center">-</td>
-<td>リスト(文字列)</td>
-<td>複数指定した場合はAND条件</td>
-</tr>
-<tr>
-<td><code>tag_selectors</code></td>
-<td align="center">-</td>
-<td>検索条件(タグ)</td>
-<td align="center">-</td>
-<td>リスト(文字列)</td>
-<td>複数指定した場合はAND条件</td>
-</tr>
-<tr>
-<td><code>filter</code></td>
-<td align="center">-</td>
-<td>検索条件(その他)</td>
-<td align="center">-</td>
-<td>オブジェクト</td>
-<td>APIにそのまま渡されます。検索条件を指定してもAPI側が対応していない場合があります。</td>
-</tr>
-<tr>
-<td><code>zone</code></td>
-<td align="center">-</td>
-<td>ゾーン</td>
-<td align="center">-</td>
-<td><code>is1a</code><br /><code>is1b</code><br /><code>tk1a</code><br /><code>tk1v</code></td>
+<td><code>name</code></td>
+<td>△</td>
+<td>サイト名</td>
 <td>-</td>
+<td>文字列</td>
+<td><code>name</code>または<code>domain</code>いずれか必須</td>
+</tr>
+<tr>
+<td><code>domain</code></td>
+<td>△</td>
+<td>ドメイン</td>
+<td>-</td>
+<td>文字列</td>
+<td><code>name</code>または<code>domain</code>いずれか必須</td>
 </tr>
 </tbody>
 </table>
@@ -726,74 +713,49 @@
 <td>-</td>
 </tr>
 <tr>
-<td><code>name</code></td>
-<td>ロードバランサ名</td>
+<td><code>site_id</code></td>
+<td>サイトID</td>
 <td>-</td>
 </tr>
 <tr>
-<td><code>plan</code></td>
-<td>プラン</td>
+<td><code>origin</code></td>
+<td>オリジン</td>
 <td>-</td>
 </tr>
 <tr>
-<td><code>switch_id</code></td>
-<td>スイッチID</td>
+<td><code>subdomain</code></td>
+<td>サブドメイン</td>
 <td>-</td>
 </tr>
 <tr>
-<td><code>vip</code></td>
-<td>IPアドレス1</td>
+<td><code>domain_type</code></td>
+<td>ドメインタイプ</td>
 <td>-</td>
 </tr>
 <tr>
-<td><code>ipaddress1</code></td>
-<td>IPアドレス1</td>
+<td><code>has_certificate</code></td>
+<td>証明書有無</td>
 <td>-</td>
 </tr>
 <tr>
-<td><code>ipaddress2</code></td>
-<td>IPアドレス2</td>
+<td><code>host_header</code></td>
+<td>ホストヘッダー</td>
 <td>-</td>
 </tr>
 <tr>
-<td><code>vrid</code></td>
-<td>VRID</td>
+<td><code>status</code></td>
+<td>ステータス</td>
 <td>-</td>
 </tr>
 <tr>
-<td><code>aliases</code></td>
-<td>IPエイリアス</td>
-<td>-</td>
+<td><code>cname_record_value</code></td>
+<td>CNAMEレコード値</td>
+<td>独自ドメイン利用時にCNAMEレコードを利用する場合のレコード値</td>
 </tr>
 <tr>
-<td><code>syslog_host</code></td>
-<td>syslog転送先ホスト</td>
-<td>-</td>
-</tr>
-<tr>
-<td><code>internet_connection</code></td>
-<td>インターネット接続</td>
-<td>-</td>
-</tr>
-<tr>
-<td><code>icon_id</code></td>
-<td>アイコンID</td>
-<td>-</td>
-</tr>
-<tr>
-<td><code>description</code></td>
-<td>説明</td>
-<td>-</td>
-</tr>
-<tr>
-<td><code>tags</code></td>
-<td>タグ</td>
-<td>-</td>
-</tr>
-<tr>
-<td><code>global_address</code></td>
-<td>グローバルIP</td>
-<td>-</td>
+<td><code>txt_record_value</code></td>
+<td>TXTレコード値</td>
+<td>独自ドメイン利用時にTXTレコードを利用する場合のレコード値</td>
 </tr>
 </tbody>
 </table>
@@ -804,10 +766,10 @@
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="../database/" class="btn btn-neutral float-right" title="データベース"/>Next <span class="icon icon-circle-arrow-right"></span></a>
+        <a href="../zone/" class="btn btn-neutral float-right" title="ゾーン"/>Next <span class="icon icon-circle-arrow-right"></span></a>
       
       
-        <a href="../load_balancer/" class="btn btn-neutral" title="ロードバランサ"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../bucket_object/" class="btn btn-neutral" title="オブジェクトストレージ"><span class="icon icon-circle-arrow-left"></span> Previous</a>
       
     </div>
   
@@ -835,10 +797,10 @@
     <span class="rst-current-version" data-toggle="rst-current-version">
       
       
-        <span><a href="../load_balancer/" style="color: #fcfcfc;">&laquo; Previous</a></span>
+        <span><a href="../bucket_object/" style="color: #fcfcfc;">&laquo; Previous</a></span>
       
       
-        <span style="margin-left: 15px"><a href="../database/" style="color: #fcfcfc">Next &raquo;</a></span>
+        <span style="margin-left: 15px"><a href="../zone/" style="color: #fcfcfc">Next &raquo;</a></span>
       
     </span>
 </div>

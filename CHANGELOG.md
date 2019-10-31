@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.18.0 (2019-10-31)
+
+* ウェブアクセラレータ対応 #523 (yamamoto-febc)
+
+
 ## 1.17.0 (2019-10-29)
 
 * Switch to Terraform SDK v1.0.0 #515 (yamamoto-febc)
