@@ -14,7 +14,7 @@ data sakuracloud_webaccel "site" {
 resource sakuracloud_webaccel_certificate "example" {
   site_id           = data.sakuracloud_webaccel.site.id
   certificate_chain = file("crt")
-  key               = file("key")
+  private_key               = file("key")
 }
 ```
 
@@ -24,7 +24,7 @@ resource sakuracloud_webaccel_certificate "example" {
 |-- ----------------- | :---: | -------------------- | :--------: | ------------------------ | -------------------------------------------- --|
 | `site_id`           | ◯     | ウェブアクセラレータのサイトID                | -          | 文字列                      | -                                              |
 | `certificate_chain` | -     | 証明書               | -          | 文字列                      | 中間証明書がある場合はサーバ証明書、中間証明書の順番に連結したものを指定                                              |
-| `key`               | -     | 秘密鍵               | -          | 文字列                      | -                                              |
+| `private_key`               | -     | 秘密鍵               | -          | 文字列                      | -                                              |
 
 ### 属性
 

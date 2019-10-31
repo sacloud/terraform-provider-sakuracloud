@@ -20,7 +20,7 @@ data sakuracloud_webaccel "site" {
 resource sakuracloud_webaccel_certificate "example" {
   site_id           = data.sakuracloud_webaccel.site.id
   certificate_chain = file("crt")
-  key               = file("key")
+  private_key               = file("key")
 }
 ```
 
@@ -30,7 +30,7 @@ The following arguments are supported:
 
 * `site_id` - (Required) The id of the target site on WebAccel.
 * `certificate_chain` - (Required) The contents of certificate.
-* `key` - (Required) The content of private key.
+* `private_key` - (Required) The content of private key.
 
 ## Attributes Reference
 
