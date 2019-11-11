@@ -81,7 +81,7 @@ func resourceSakuraCloudPrivateHostCreate(d *schema.ResourceData, meta interface
 		}
 	}
 
-	plans, err := client.Product.GetProductPrivateHostAPI().Find()
+	plans, err := client.Product.GetProductPrivateHostAPI().FilterBy("Class", "dynamic").Find()
 	if err != nil || len(plans.PrivateHostPlans) == 0 {
 		return fmt.Errorf("Failed to create SakuraCloud PrivateHost resource: %s", err)
 	}
@@ -90,7 +90,7 @@ func resourceSakuraCloudPrivateHostCreate(d *schema.ResourceData, meta interface
 
 	privateHost, err := client.PrivateHost.Create(opts)
 	if err != nil {
-		return fmt.Errorf("Failed to create SakuraCloud PrivateHost resource: %s", err)
+		return fmt.Errorf("plan is not found on zone[%s]: %s", client.Zone, err)
 	}
 	d.SetId(privateHost.GetStrID())
 	return resourceSakuraCloudPrivateHostRead(d, meta)

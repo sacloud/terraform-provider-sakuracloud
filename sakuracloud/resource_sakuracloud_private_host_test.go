@@ -51,7 +51,7 @@ func TestAccResourceSakuraCloudPrivateHost(t *testing.T) {
 						"sakuracloud_private_host.foobar", "description", "after"),
 					resource.TestCheckResourceAttr(
 						"sakuracloud_private_host.foobar", "tags.#", "0"),
-					resource.TestCheckNoResourceAttr("sakuracloud_private_host.foobar", "icon_id"),
+					resource.TestCheckResourceAttr("sakuracloud_private_host.foobar", "icon_id", ""),
 					resource.TestMatchResourceAttr("sakuracloud_private_host.foobar",
 						"hostname",
 						regexp.MustCompile(".+")), // should be not empty
