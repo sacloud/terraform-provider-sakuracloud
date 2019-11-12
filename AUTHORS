@@ -1,12 +1,6 @@
-# This file lists all individuals having contributed content to the repository.
-# For how it is generated, see `scripts/generate-authors.sh`.
-
-223n <223n@223n.tech>
-fixmie[bot] <fixmie[bot]@users.noreply.github.com>
+# This is the list of terraform-provider-sakuracloud authors for copyright purposes.
+#
+# This does not necessarily list everyone who has contributed code, since in
+# some cases, their employer may be the copyright holder.  To see the full list
+# of contributors, see the revision history in source control.
 Kazumichi Yamamoto <yamamoto.febc@gmail.com>
-llamakko <llamakko@users.noreply.github.com>
-mapk0y <mapk0y@gmail.com>
-sacloud-bot <sacloud.users@gmail.com>
-Shingo Kawamura <blp1526@gmail.com>
-Shinichi Shinoda <s-shinoda@sakura.ad.jp>
-wate <pc.poisoning@gmail.com>

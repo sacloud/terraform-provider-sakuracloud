@@ -1,11 +1,29 @@
-TEST1?=./
-TEST2?=./sakuracloud
-VETARGS?=-all
+#
+# Copyright 2016-2019 The terraform-provider-sakuracloud Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+TEST1           ?=./
+TEST2           ?=./sakuracloud
+VETARGS         ?=-all
+GOFMT_FILES     ?=$$(find . -name '*.go' | grep -v vendor)
+GOGEN_FILES     ?=$$(go list ./... | grep -v vendor)
+GOLINT_TARGETS  ?= $$(golint github.com/sacloud/terraform-provider-sakuracloud/sakuracloud | grep -v 'underscores in Go names' | tee /dev/stderr)
+CURRENT_VERSION ?= $(shell git log --merges --oneline | perl -ne 'if(m/^.+Merge pull request \#[0-9]+ from .+\/bump-version-([0-9\.]+)/){print $$1;exit}')
+AUTHOR          ?="terraform-provider-sakuracloud authors"
+COPYRIGHT_YEAR  ?="2016-2019"
+COPYRIGHT_FILES ?=$$(find . \( -name "*.dockerfile" -or -name "*.go" -or -name "*.sh" -or -name "*.pl" -or -name "*.bash" \) -print | grep -v "/vendor/")
 
-GOFMT_FILES      ?= $$(find . -name '*.go' | grep -v vendor)
-GOLINT_TARGETS   ?= $$(golint github.com/sacloud/terraform-provider-sakuracloud/sakuracloud | grep -v 'underscores in Go names' | tee /dev/stderr)
-
-CURRENT_VERSION  ?= $(shell git log --merges --oneline | perl -ne 'if(m/^.+Merge pull request \#[0-9]+ from .+\/bump-version-([0-9\.]+)/){print $$1;exit}')
 BUILD_LDFLAGS = "-s -w \
 	  -X github.com/sacloud/terraform-provider-sakuracloud/sakuracloud.Revision=`git rev-parse --short HEAD` \
 	  -X github.com/sacloud/terraform-provider-sakuracloud/sakuracloud.Version=$(CURRENT_VERSION)"
@@ -22,6 +40,7 @@ tools:
 	GO111MODULE=off go get -u golang.org/x/tools/cmd/goimports
 	GO111MODULE=off go get -u github.com/motemen/gobump/cmd/gobump
 	GO111MODULE=off go get -u golang.org/x/lint/golint
+	GO111MODULE=off go get github.com/sacloud/addlicense
 
 build:
 	OS="`go env GOOS`" ARCH="`go env GOARCH`" ARCHIVE= BUILD_LDFLAGS=$(BUILD_LDFLAGS) CURRENT_VERSION=$(CURRENT_VERSION) sh -c "'$(CURDIR)/scripts/build.sh'"
@@ -112,3 +131,6 @@ docker-build: clean
 
 
 .PHONY: default test vet testacc fmt fmtcheck
+
+set-license:
+	@addlicense -c $(AUTHOR) -y $(COPYRIGHT_YEAR) $(COPYRIGHT_FILES)
