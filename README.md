@@ -165,17 +165,6 @@ terraform apply
 
     make testacc
     
-#### 依存ライブラリ
-
-    # 一覧表示
-    govendor list
-    
-    # vendor配下のライブラリを一括更新
-    govendor fetch +v
-
-    # vendor配下のライブラリをGOPATH上から更新
-    govendor update +v
-
 #### ドキュメント
 
 ドキュメントはGithub Pagesを利用しています。(masterブランチの`docs`ディレクトリ配下)  
@@ -201,8 +190,6 @@ terraform apply
 
 ## License
 
-  This project is published under [Apache 2.0 License](LICENSE).
+ `terraform-proivder-sakuracloud` Copyright (C) 2016-2019 terraform-provider-sakuraclou authors.
 
-## Author
-
-  * [Terraform for SakuraCloud Authors](AUTHORS)
+  This project is published under [Apache 2.0 License](LICENSE.txt).
