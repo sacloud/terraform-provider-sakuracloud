@@ -80,7 +80,7 @@ func Provider() terraform.ResourceProvider {
 			"trace": {
 				Type:        schema.TypeString,
 				Optional:    true,
-				DefaultFunc: schema.EnvDefaultFunc("SAKURACLOUD_TRACE", ""),
+				DefaultFunc: schema.MultiEnvDefaultFunc([]string{"SAKURACLOUD_TRACE", "SAKURACLOUD_TRACE_MODE"}, ""),
 			},
 			"fake_mode": {
 				Type:        schema.TypeString,

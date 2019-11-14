@@ -266,7 +266,7 @@ func resourceSakuraCloudDatabaseUpdate(d *schema.ResourceData, meta interface{})
 		Description: d.Get("description").(string),
 		Tags:        expandTagsV2(d.Get("tags").([]interface{})),
 		IconID:      types.StringID(d.Get("icon_id").(string)),
-		CommonSetting: &sacloud.DatabaseSettingCommonUpdate{
+		CommonSetting: &sacloud.DatabaseSettingCommon{
 			ServicePort:     d.Get("port").(int),
 			SourceNetwork:   expandStringList(d.Get("allow_networks").([]interface{})),
 			DefaultUser:     d.Get("user_name").(string),
