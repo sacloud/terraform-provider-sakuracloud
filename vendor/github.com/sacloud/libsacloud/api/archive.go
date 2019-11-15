@@ -1,3 +1,17 @@
+// Copyright 2016-2019 The Libsacloud Authors
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
 package api
 
 import (
@@ -17,6 +31,7 @@ type ArchiveAPI struct {
 
 var (
 	archiveLatestStableCentOSTags                          = []string{"current-stable", "distro-centos"}
+	archiveLatestStableCentOS7Tags                         = []string{"distro-centos", "distro-ver-7.7"}
 	archiveLatestStableCentOS6Tags                         = []string{"distro-centos", "distro-ver-6.10"}
 	archiveLatestStableUbuntuTags                          = []string{"current-stable", "distro-ubuntu"}
 	archiveLatestStableDebianTags                          = []string{"current-stable", "distro-debian"}
@@ -52,6 +67,7 @@ func NewArchiveAPI(client *Client) *ArchiveAPI {
 
 	api.findFuncMapPerOSType = map[ostype.ArchiveOSTypes]func() (*sacloud.Archive, error){
 		ostype.CentOS:                              api.FindLatestStableCentOS,
+		ostype.CentOS7:                             api.FindLatestStableCentOS7,
 		ostype.CentOS6:                             api.FindLatestStableCentOS6,
 		ostype.Ubuntu:                              api.FindLatestStableUbuntu,
 		ostype.Debian:                              api.FindLatestStableDebian,
@@ -222,6 +238,11 @@ func (api *ArchiveAPI) GetPublicArchiveIDFromAncestors(id int64) (int64, bool) {
 // FindLatestStableCentOS 安定版最新のCentOSパブリックアーカイブを取得
 func (api *ArchiveAPI) FindLatestStableCentOS() (*sacloud.Archive, error) {
 	return api.findByOSTags(archiveLatestStableCentOSTags)
+}
+
+// FindLatestStableCentOS7 安定版最新のCentOS7パブリックアーカイブを取得
+func (api *ArchiveAPI) FindLatestStableCentOS7() (*sacloud.Archive, error) {
+	return api.findByOSTags(archiveLatestStableCentOS7Tags)
 }
 
 // FindLatestStableCentOS6 安定版最新のCentOS6パブリックアーカイブを取得
