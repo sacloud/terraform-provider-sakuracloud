@@ -153,13 +153,13 @@ VPCルータ本体を表します。
 |パラメーター       |必須  |名称           |初期値     |設定値                         |補足                                          |
 |-----------------|:---:|----------------|:--------:|-------------------------------|----------------------------------------------|
 | `name`          | ◯   | ロードバランサ名 | -        | 文字列                         | - |
-| `plan`          | -   | プラン          |`standard`| `standard`<br />`premium`<br />`highspec` | - |
-| `switch_id`     | △   | スイッチID      | -        | 文字列                         | プランが`premium`、`highspec`の場合必須 |
-| `vip`           | △   | IPアドレス1     | -        | 文字列                         | プランが`premium`、`highspec`の場合必須 |
-| `ipaddress1`    | △   | IPアドレス1     | -        | 文字列                         | プランが`premium`、`highspec`の場合必須 |
-| `ipaddress2`    | △   | IPアドレス2     | -        | 文字列                         | プランが`premium`、`highspec`の場合必須 |
-| `vrid`          | △   | VRID           | -        | 数値                          | プランが`premium`、`highspec`の場合必須 |
-| `aliases`       | -   | IPエイリアス    | -        | リスト(文字列)                  | プランが`premium`、`highspec`の場合のみ有効 |
+| `plan`          | -   | プラン          |`standard`| `standard`<br />`premium`<br />`highspec`<br />`highspec4000` | - |
+| `switch_id`     | △   | スイッチID      | -        | 文字列                         | プランが`premium`、`highspec`、`highspec4000`の場合必須 |
+| `vip`           | △   | IPアドレス1     | -        | 文字列                         | プランが`premium`、`highspec`、`highspec4000`の場合必須 |
+| `ipaddress1`    | △   | IPアドレス1     | -        | 文字列                         | プランが`premium`、`highspec`、`highspec4000`の場合必須 |
+| `ipaddress2`    | △   | IPアドレス2     | -        | 文字列                         | プランが`premium`、`highspec`、`highspec4000`の場合必須 |
+| `vrid`          | △   | VRID           | -        | 数値                          | プランが`premium`、`highspec`、`highspec4000`の場合必須 |
+| `aliases`       | -   | IPエイリアス    | -        | リスト(文字列)                  | プランが`premium`、`highspec`、`highspec4000`の場合のみ有効 |
 | `syslog_host`   | -   | syslog転送先ホスト| -      | 文字列                         | - |
 | `internet_connection` | -   | インターネット接続  | `true` | `true`<br />`false`| - |
 | `interface` | -   | プライベートNIC | リスト | [interface](#interface)を参照 | - |
@@ -208,7 +208,7 @@ VPCルータが持つプライベートNICを表します。
 
 VPCルータでのスタティックNAT機能を表します。
 
-**このリソースはVPCルータのプランが`premium`、または`highspec`の場合に利用できます。**
+**このリソースはVPCルータのプランが`premium`、または`highspec`/`highspec4000`の場合に利用できます。**
 
 (詳細は[さくらのクラウドのマニュアル](http://cloud-news.sakura.ad.jp/vpc-router/vpc-nat/)を参照ください)
 

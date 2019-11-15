@@ -134,13 +134,13 @@ The following arguments are supported:
 
 * `name` - (Required) The name of the resource.
 * `plan` - (Optional) The plan of the VPC Router.   
-Valid value is one of the following: [ "standard" (default) / "premium" / "highspec" ]
-* `switch_id` - (Required) The ID of the switch connected to the VPC Router. Used when plan is `premium` or `highspec`.
-* `vrid` - (Required) VRID used when plan is `premium` or `highspec`.
+Valid value is one of the following: [ "standard" (default) / "premium" / "highspec" / "highspec4000" ]
+* `switch_id` - (Required) The ID of the switch connected to the VPC Router. Used when plan is `premium` or `highspec` or `highspec4000`.
+* `vrid` - (Required) VRID used when plan is `premium` or `highspec` or `highspec4000`.
 * `ipaddress1` - (Required) The primary IP address of the VPC Router.
-* `ipaddress2` - (Optional) The secondly IP address of the VPC Router. Used when plan is `premium` or `highspec`.
-* `vip` - (Optional) The Virtual IP address of the VPC Router. Used when plan is `premium` or `highspec`.
-* `aliases` - (Optional) The IP address aliase list. Used when plan is `premium` or `highspec`.
+* `ipaddress2` - (Optional) The secondly IP address of the VPC Router. Used when plan is `premium` or `highspec` or `highspec4000`.
+* `vip` - (Optional) The Virtual IP address of the VPC Router. Used when plan is `premium` or `highspec` or `highspec4000`.
+* `aliases` - (Optional) The IP address aliase list. Used when plan is `premium` or `highspec` or `highspec4000`.
 * `interface` - (Optional) The private NICs. It contains some attributes to [interface](#interface). 
 * `port_forwarding` - (Optional) The port forwarding settings. It contains some attributes to [port_forwarding](#port_forwarding). 
 * `static_nat` - (Optional) The static NAT settings. It contains some attributes to [static_nat](#static_nat).  
@@ -166,11 +166,11 @@ The following attributes are exported:
 * `name` - The name of the resource.
 * `plan` - The name of the resource plan. 
 * `switch_id` - The ID of the Switch connected to the VPC Router (eth0).
-* `vip` - Virtual IP address of the VPC Router. Used when plan is in `premium` or `highspec`.
+* `vip` - Virtual IP address of the VPC Router. Used when plan is in `premium` or `highspec` or `highspec4000`.
 * `ipaddress1` - The primary IP address of the VPC Router.
-* `ipaddress2` - The secondly IP address of the VPC Router. Used when plan is in `premium` or `highspec`.
-* `vrid` - VRID used when plan is in `premium` or `highspec`.
-* `aliases` - The IP address aliase list. Used when plan is in `premium` or `highspec`.
+* `ipaddress2` - The secondly IP address of the VPC Router. Used when plan is in `premium` or `highspec` or `highspec4000`.
+* `vrid` - VRID used when plan is in `premium` or `highspec` or `highspec4000`.
+* `aliases` - The IP address aliase list. Used when plan is in `premium` or `highspec` or `highspec4000`.
 * `global_address` - Global IP address of the VPC Router.
 * `syslog_host` - The destination HostName/IP address to send log.	
 * `internet_connection` - The flag of enable/disable connection from the VPC Router to the Internet.
@@ -186,7 +186,7 @@ The following arguments are supported:
 * `index` - (Required) The NIC index of VPC Router Interface.
 * `switch_id` - (Required) The ID of the switch connected to the VPC Router.
 * `ipaddresses` - (Required) The IP address list of the VPC Router Interfaces.
-* `vip` - (Optional) The Virtual IP address of the VPC Router Interface. Used when VPC Router's plan is `premium` or `highspec`.
+* `vip` - (Optional) The Virtual IP address of the VPC Router Interface. Used when VPC Router's plan is `premium` or `highspec` or `highspec4000`.
 * `nw_mask_len` - (Optional) Network mask length of the VPC Router Interface.
 
 ### `port_forwarding`

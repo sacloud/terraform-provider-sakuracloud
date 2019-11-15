@@ -51,7 +51,7 @@ func resourceSakuraCloudVPCRouter() *schema.Resource {
 				ForceNew:     true,
 				Optional:     true,
 				Default:      "standard",
-				ValidateFunc: validation.StringInSlice([]string{"standard", "premium", "highspec"}, false),
+				ValidateFunc: validation.StringInSlice([]string{"standard", "premium", "highspec", "highspec4000"}, false),
 			},
 			"switch_id": {
 				Type:         schema.TypeString,
@@ -229,7 +229,7 @@ func resourceSakuraCloudVPCRouterCreate(d *schema.ResourceData, meta interface{}
 	switch plan {
 	case "standard":
 		opts.SetStandardPlan()
-	case "premium", "highspec":
+	case "premium", "highspec", "highspec4000":
 		switchID := ""
 		vip := ""
 		ipaddress1 := ""
@@ -238,7 +238,7 @@ func resourceSakuraCloudVPCRouterCreate(d *schema.ResourceData, meta interface{}
 		aliases := []string{}
 
 		//validate
-		errFormat := "Failed to create SakuraCloud VPCRouter resource : %s is Required when plan is 'premium' or 'highspec'"
+		errFormat := "Failed to create SakuraCloud VPCRouter resource : %s is Required when plan is 'premium' or 'highspec' or 'highspec4000'"
 		if s, ok := d.GetOk("switch_id"); ok {
 			switchID = s.(string)
 		} else {
@@ -274,10 +274,15 @@ func resourceSakuraCloudVPCRouterCreate(d *schema.ResourceData, meta interface{}
 			}
 		}
 
-		if plan == "premium" {
+		switch plan {
+		case "premium":
 			opts.SetPremiumPlan(switchID, vip, ipaddress1, ipaddress2, vrid, aliases)
-		} else {
+		case "highspec":
 			opts.SetHighSpecPlan(switchID, vip, ipaddress1, ipaddress2, vrid, aliases)
+		case "highspec4000":
+			opts.SetHighSpec4000MbpsPlan(switchID, vip, ipaddress1, ipaddress2, vrid, aliases)
+		default:
+			return fmt.Errorf("invalid plan: %s", plan)
 		}
 	}
 
@@ -574,6 +579,8 @@ func setVPCRouterResourceData(d *schema.ResourceData, client *APIClient, data *s
 		d.Set("plan", "premium")
 	case 3:
 		d.Set("plan", "highspec")
+	case 4:
+		d.Set("plan", "highspec4000")
 	}
 	if planID == 1 {
 		d.Set("global_address", data.Interfaces[0].IPAddress)
