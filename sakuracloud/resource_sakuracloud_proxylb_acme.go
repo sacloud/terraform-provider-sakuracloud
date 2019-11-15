@@ -110,7 +110,7 @@ func resourceSakuraCloudProxyLBACMECreate(d *schema.ResourceData, meta interface
 	}
 
 	// clear
-	proxyLB.Settings.ProxyLB.LetsEncrypt = sacloud.ProxyLBACMESetting{
+	proxyLB.Settings.ProxyLB.LetsEncrypt = &sacloud.ProxyLBACMESetting{
 		Enabled: false,
 	}
 
@@ -118,7 +118,7 @@ func resourceSakuraCloudProxyLBACMECreate(d *schema.ResourceData, meta interface
 	commonName := d.Get("common_name").(string)
 	updateDelaySec := d.Get("update_delay_sec").(int)
 	if tos {
-		proxyLB.Settings.ProxyLB.LetsEncrypt = sacloud.ProxyLBACMESetting{
+		proxyLB.Settings.ProxyLB.LetsEncrypt = &sacloud.ProxyLBACMESetting{
 			Enabled:    true,
 			CommonName: commonName,
 		}
@@ -168,7 +168,7 @@ func resourceSakuraCloudProxyLBACMEDelete(d *schema.ResourceData, meta interface
 	}
 
 	// clear
-	proxyLB.Settings.ProxyLB.LetsEncrypt = sacloud.ProxyLBACMESetting{
+	proxyLB.Settings.ProxyLB.LetsEncrypt = &sacloud.ProxyLBACMESetting{
 		Enabled: false,
 	}
 
