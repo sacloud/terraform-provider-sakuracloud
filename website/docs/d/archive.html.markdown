@@ -49,8 +49,9 @@ data "sakuracloud_archive" "ubuntu" {
 
 ## `os_type` Parameter Reference
 
-* `centos` - CentOS 7
-* `centos6` - CentOS 6
+* `centos` - CentOS(latest) 
+* `centos7` - CentOS 7.7
+* `centos6` - CentOS 6.10
 * `ubuntu` - Ubuntu 
 * `debian` - Debian 
 * `coreos` - CoreOS

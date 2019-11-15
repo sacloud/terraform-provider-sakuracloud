@@ -1,3 +1,17 @@
+// Copyright 2016-2019 The Libsacloud Authors
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
 // Package ostype is define OS type of SakuraCloud public archive
 package ostype
 
@@ -9,6 +23,8 @@ type ArchiveOSTypes int
 const (
 	// CentOS OS種別:CentOS
 	CentOS ArchiveOSTypes = iota
+	// CentOS7 OS種別:CentOS7
+	CentOS7
 	// CentOS6 OS種別:CentOS6
 	CentOS6
 	// Ubuntu OS種別:Ubuntu
@@ -55,7 +71,7 @@ const (
 
 // OSTypeShortNames OSTypeとして利用できる文字列のリスト
 var OSTypeShortNames = []string{
-	"centos", "centos6", "ubuntu", "debian", "coreos",
+	"centos", "centos7", "centos6", "ubuntu", "debian", "coreos",
 	"rancheros", "k3os", "kusanagi", "sophos-utm", "freebsd",
 	"netwiser", "opnsense",
 	"windows2016", "windows2016-rds", "windows2016-rds-office",
@@ -80,7 +96,7 @@ func (o ArchiveOSTypes) IsWindows() bool {
 // IsSupportDiskEdit ディスクの修正機能をフルサポートしているか(Windowsは一部サポートのためfalseを返す)
 func (o ArchiveOSTypes) IsSupportDiskEdit() bool {
 	switch o {
-	case CentOS, CentOS6, Ubuntu, Debian, CoreOS, RancherOS, K3OS, Kusanagi, FreeBSD:
+	case CentOS, CentOS7, CentOS6, Ubuntu, Debian, CoreOS, RancherOS, K3OS, Kusanagi, FreeBSD:
 		return true
 	default:
 		return false
@@ -92,6 +108,8 @@ func StrToOSType(osType string) ArchiveOSTypes {
 	switch osType {
 	case "centos":
 		return CentOS
+	case "centos7":
+		return CentOS7
 	case "centos6":
 		return CentOS6
 	case "ubuntu":

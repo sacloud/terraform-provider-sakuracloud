@@ -35,8 +35,9 @@ data "sakuracloud_archive" "ubuntu" {
 
 |値|詳細                                          |
 |---------------------------|--------------------|
-| `centos`                  | CentOS 7|
-| `centos6`                  | CentOS 6|
+| `centos`                  | CentOS(最新安定板)|
+| `centos7`                  | CentOS 7.7|
+| `centos6`                  | CentOS 6.10|
 | `ubuntu`                  | Ubuntu 18.04|
 | `debian`                  | Debian |
 | `coreos`                  | CoreOS|
@@ -62,6 +63,10 @@ data "sakuracloud_archive" "ubuntu" {
 
 > *2: Netwiser Virtual Editionを利用する場合、ディスクの修正機能は利用できません。  
 >     詳細は[さくらのクラウド ドキュメント](https://manual.sakura.ad.jp/cloud/os-packages/netwiser/about.html)を参照してください。
+
+### os_type指定時の注意点
+
+詳細は[ディスクリソースの"コピー元アーカイブ/ディスクの指定 / アーカイブID変更時のリソース再生成の抑制"セクション](https://sacloud.github.io/terraform-provider-sakuracloud/configuration/resources/disk/)を参照してください。
 
 ### 属性
 
