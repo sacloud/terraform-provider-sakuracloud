@@ -79,7 +79,7 @@ resource "sakuracloud_proxylb" "foobar" {
 | `name`            | ◯   | エンハンスドロードバランサ名        | -        | 文字列                  | - |
 | `plan`            | -   | プラン        | `1000`        | `1000`<br />`5000`<br />`10000`<br />`50000`<br />`100000`<br />`400000`     | - |
 | `vip_failover`    | -   | VIPフェイルオーバ | `false`        | `true` or `false`     | - |
-| `sticky_session`    | -   | セッション維持 | `false`        | `true` or `false`     | - |
+| `sticky_session`    | -   | セッション維持 | `false`        | `true` or `false`     | 待ち受けポートのプロキシ方式が`tcp`の場合は利用不可 |
 | `timeout`         | -   | 実サーバ通信タイムアウト | `10`        | `10`から`600`までの数値     | 登録済みの実サーバからの応答タイムアウト時間(秒数) |
 | `bind_ports`      | ◯   | 待ち受けポート  | -        | リスト                  | 詳細は[`bind_ports`](#bind_ports)を参照    |
 | `health_check`    | ◯   | ヘルスチェック  | -        | マップ                  | 詳細は[`health_check`](#health_check)を参照    |
@@ -96,11 +96,11 @@ resource "sakuracloud_proxylb" "foobar" {
 
 |パラメーター     |必須  |名称                |初期値     |設定値                    |補足                                          |
 |---------------|:---:|--------------------|:--------:|------------------------|----------------------------------------------|
-| `proxy_mode`    | ◯   | プロキシ方式 | -        | `http`<br />`https`| - |
+| `proxy_mode`    | ◯   | プロキシ方式 | -        | `http`<br />`https`<br />`tcp`| - |
 | `port`        | ◯  | ポート番号 | - | 数値 | - |
 | `redirect_to_https`  | -  | HTTPSへのリダイレクト | - | bool | `proxy_mode`が`http`の場合のみ有効 |
 | `support_http2`      | -  | HTTP/2のサポート | - | bool | `proxy_mode`が`https`の場合のみ有効  |
-| `response_header`    | -  | レスポンスヘッダ | - | リスト| 10個まで指定可能。詳細は[`response_header`](#response_header)を参照  |
+| `response_header`    | -  | レスポンスヘッダ | - | リスト| `proxy_mode`が`http`または`https`の場合に有効。10個まで指定可能。詳細は[`response_header`](#response_header)を参照  |
 
 ### `response_header`
 
