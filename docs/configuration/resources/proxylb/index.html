@@ -764,7 +764,7 @@
 <td>セッション維持</td>
 <td align="center"><code>false</code></td>
 <td><code>true</code> or <code>false</code></td>
-<td>-</td>
+<td>待ち受けポートのプロキシ方式が<code>tcp</code>の場合は利用不可</td>
 </tr>
 <tr>
 <td><code>timeout</code></td>
@@ -859,7 +859,7 @@
 <td align="center">◯</td>
 <td>プロキシ方式</td>
 <td align="center">-</td>
-<td><code>http</code><br /><code>https</code></td>
+<td><code>http</code><br /><code>https</code><br /><code>tcp</code></td>
 <td>-</td>
 </tr>
 <tr>
@@ -892,7 +892,7 @@
 <td>レスポンスヘッダ</td>
 <td align="center">-</td>
 <td>リスト</td>
-<td>10個まで指定可能。詳細は<a href="#response_header"><code>response_header</code></a>を参照</td>
+<td><code>proxy_mode</code>が<code>http</code>または<code>https</code>の場合に有効。10個まで指定可能。詳細は<a href="#response_header"><code>response_header</code></a>を参照</td>
 </tr>
 </tbody>
 </table>
@@ -1145,7 +1145,7 @@
   <div role="contentinfo">
     <!-- Copyright etc -->
     
-      <p>Copyright (C) 2017 Kazumichi Yamamoto.</p>
+      <p>Copyright (C) 2016-2019 terraform-provider-sakuracloud authors</p>
     
   </div>
 

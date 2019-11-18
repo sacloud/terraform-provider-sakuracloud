@@ -844,7 +844,7 @@ resource &quot;sakuracloud_vpc_router&quot; &quot;foobar&quot; {
 <td align="center">-</td>
 <td>プラン</td>
 <td align="center"><code>standard</code></td>
-<td><code>standard</code><br /><code>premium</code><br /><code>highspec</code></td>
+<td><code>standard</code><br /><code>premium</code><br /><code>highspec</code><br /><code>highspec4000</code></td>
 <td>-</td>
 </tr>
 <tr>
@@ -853,7 +853,7 @@ resource &quot;sakuracloud_vpc_router&quot; &quot;foobar&quot; {
 <td>スイッチID</td>
 <td align="center">-</td>
 <td>文字列</td>
-<td>プランが<code>premium</code>、<code>highspec</code>の場合必須</td>
+<td>プランが<code>premium</code>、<code>highspec</code>、<code>highspec4000</code>の場合必須</td>
 </tr>
 <tr>
 <td><code>vip</code></td>
@@ -861,7 +861,7 @@ resource &quot;sakuracloud_vpc_router&quot; &quot;foobar&quot; {
 <td>IPアドレス1</td>
 <td align="center">-</td>
 <td>文字列</td>
-<td>プランが<code>premium</code>、<code>highspec</code>の場合必須</td>
+<td>プランが<code>premium</code>、<code>highspec</code>、<code>highspec4000</code>の場合必須</td>
 </tr>
 <tr>
 <td><code>ipaddress1</code></td>
@@ -869,7 +869,7 @@ resource &quot;sakuracloud_vpc_router&quot; &quot;foobar&quot; {
 <td>IPアドレス1</td>
 <td align="center">-</td>
 <td>文字列</td>
-<td>プランが<code>premium</code>、<code>highspec</code>の場合必須</td>
+<td>プランが<code>premium</code>、<code>highspec</code>、<code>highspec4000</code>の場合必須</td>
 </tr>
 <tr>
 <td><code>ipaddress2</code></td>
@@ -877,7 +877,7 @@ resource &quot;sakuracloud_vpc_router&quot; &quot;foobar&quot; {
 <td>IPアドレス2</td>
 <td align="center">-</td>
 <td>文字列</td>
-<td>プランが<code>premium</code>、<code>highspec</code>の場合必須</td>
+<td>プランが<code>premium</code>、<code>highspec</code>、<code>highspec4000</code>の場合必須</td>
 </tr>
 <tr>
 <td><code>vrid</code></td>
@@ -885,7 +885,7 @@ resource &quot;sakuracloud_vpc_router&quot; &quot;foobar&quot; {
 <td>VRID</td>
 <td align="center">-</td>
 <td>数値</td>
-<td>プランが<code>premium</code>、<code>highspec</code>の場合必須</td>
+<td>プランが<code>premium</code>、<code>highspec</code>、<code>highspec4000</code>の場合必須</td>
 </tr>
 <tr>
 <td><code>aliases</code></td>
@@ -893,7 +893,7 @@ resource &quot;sakuracloud_vpc_router&quot; &quot;foobar&quot; {
 <td>IPエイリアス</td>
 <td align="center">-</td>
 <td>リスト(文字列)</td>
-<td>プランが<code>premium</code>、<code>highspec</code>の場合のみ有効</td>
+<td>プランが<code>premium</code>、<code>highspec</code>、<code>highspec4000</code>の場合のみ有効</td>
 </tr>
 <tr>
 <td><code>syslog_host</code></td>
@@ -1108,7 +1108,7 @@ resource &quot;sakuracloud_vpc_router&quot; &quot;foobar&quot; {
 </table>
 <h2 id="static_nat"><code>static_nat</code></h2>
 <p>VPCルータでのスタティックNAT機能を表します。</p>
-<p><strong>このリソースはVPCルータのプランが<code>premium</code>、または<code>highspec</code>の場合に利用できます。</strong></p>
+<p><strong>このリソースはVPCルータのプランが<code>premium</code>、または<code>highspec</code>/<code>highspec4000</code>の場合に利用できます。</strong></p>
 <p>(詳細は<a href="http://cloud-news.sakura.ad.jp/vpc-router/vpc-nat/">さくらのクラウドのマニュアル</a>を参照ください)</p>
 <table>
 <thead>
@@ -1727,7 +1727,7 @@ resource &quot;sakuracloud_vpc_router&quot; &quot;foobar&quot; {
   <div role="contentinfo">
     <!-- Copyright etc -->
     
-      <p>Copyright (C) 2017 Kazumichi Yamamoto.</p>
+      <p>Copyright (C) 2016-2019 terraform-provider-sakuracloud authors</p>
     
   </div>
 

@@ -1,5 +1,15 @@
 # Changelog
 
+## 1.19.0 (2019-11-18)
+
+* ライセンスヘッダの追加 #530 (yamamoto-febc)
+* v2.0: design doc #531 (yamamoto-febc)
+* sakuracloud_archive.os_typeへのcentos7指定 #536 (yamamoto-febc)
+* VPCルータ4000Mbpsプランの追加 #538 (yamamoto-febc)
+* docs: PTRレコード #539 (yamamoto-febc)
+* エンハンスドロードバランサでのTCP対応 #540 (yamamoto-febc)
+
+
 ## 1.18.2 (2019-11-11)
 
 * 専有ホストのプラン検索パラメータ #527 (yamamoto-febc)
