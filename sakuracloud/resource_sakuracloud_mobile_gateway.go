@@ -574,6 +574,16 @@ func resourceSakuraCloudMobileGatewayDelete(d *schema.ResourceData, meta interfa
 	}
 
 	for _, sim := range sims {
+		if sim.Activated {
+			_, err = client.SIM.Deactivate(toSakuraCloudID(sim.ResourceID))
+			if err != nil {
+				return fmt.Errorf("Failed to deactivate SakuraCloud SIM resource: %s", err)
+			}
+		}
+		_, err = client.SIM.ClearIP(toSakuraCloudID(sim.ResourceID))
+		if err != nil {
+			return fmt.Errorf("Failed to ClearIP SakuraCloud SIM resource: %s", err)
+		}
 		_, err = client.MobileGateway.DeleteSIM(mgw.ID, toSakuraCloudID(sim.ResourceID))
 		if err != nil {
 			return fmt.Errorf("Error deleting SakuraCloud MobileGateway resource: %s", err)
