@@ -460,6 +460,8 @@
                 
                     <li><a class="toctree-l4" href="#os_type">os_typeに指定可能な値</a></li>
                 
+                    <li><a class="toctree-l4" href="#os_type_1">os_type指定時の注意点</a></li>
+                
                     <li><a class="toctree-l4" href="#_3">属性</a></li>
                 
             
@@ -740,11 +742,15 @@ data &quot;sakuracloud_archive&quot; &quot;ubuntu&quot; {
 <tbody>
 <tr>
 <td><code>centos</code></td>
-<td>CentOS 7</td>
+<td>CentOS(最新安定板)</td>
+</tr>
+<tr>
+<td><code>centos7</code></td>
+<td>CentOS 7.7</td>
 </tr>
 <tr>
 <td><code>centos6</code></td>
-<td>CentOS 6</td>
+<td>CentOS 6.10</td>
 </tr>
 <tr>
 <td><code>ubuntu</code></td>
@@ -830,6 +836,8 @@ data &quot;sakuracloud_archive&quot; &quot;ubuntu&quot; {
 <p>*2: Netwiser Virtual Editionを利用する場合、ディスクの修正機能は利用できません。<br />
     詳細は<a href="https://manual.sakura.ad.jp/cloud/os-packages/netwiser/about.html">さくらのクラウド ドキュメント</a>を参照してください。</p>
 </blockquote>
+<h3 id="os_type_1">os_type指定時の注意点</h3>
+<p>詳細は<a href="https://sacloud.github.io/terraform-provider-sakuracloud/configuration/resources/disk/">ディスクリソースの"コピー元アーカイブ/ディスクの指定 / アーカイブID変更時のリソース再生成の抑制"セクション</a>を参照してください。</p>
 <h3 id="_3">属性</h3>
 <table>
 <thead>
@@ -907,7 +915,7 @@ data &quot;sakuracloud_archive&quot; &quot;ubuntu&quot; {
   <div role="contentinfo">
     <!-- Copyright etc -->
     
-      <p>Copyright (C) 2017 Kazumichi Yamamoto.</p>
+      <p>Copyright (C) 2016-2019 terraform-provider-sakuracloud authors</p>
     
   </div>
 
