@@ -86,7 +86,7 @@ Valid value is one of the following: [ 1000 (default) / 5000 / 10000 / 50000 / 1
 Attributes for Bind-Ports:
 
 * `proxy_mode` - (Required) Proxy protocol.  
-Valid value is one of the following: [ "http" / "https"]
+Valid value is one of the following: [ "http" / "https" / "tcp" ]
 * `port` - (Required) Port number used in tcp proxy.
 * `redirect_to_https` - (Optional) The flag for enable to redirect to https.
 * `support_http2` - (Optional) The flag for enable to support HTTP/2.
