@@ -568,34 +568,36 @@ func resourceSakuraCloudProxyLBUpdate(d *schema.ResourceData, meta interface{}) 
 		return fmt.Errorf("Failed to update SakuraCloud ProxyLB resource: %s", err)
 	}
 
-	if !proxyLB.Settings.ProxyLB.LetsEncrypt.Enabled && d.HasChange("certificate") {
-		if certs, ok := getListFromResource(d, "certificate"); ok && len(certs) > 0 {
-			values := mapToResourceData(certs[0].(map[string]interface{}))
-			cert := &sacloud.ProxyLBCertificates{
-				ServerCertificate:       values.Get("server_cert").(string),
-				IntermediateCertificate: values.Get("intermediate_cert").(string),
-				PrivateKey:              values.Get("private_key").(string),
-				AdditionalCerts:         []*sacloud.ProxyLBCertificate{},
-			}
-
-			if rawAdditionalCerts, ok := getListFromResource(values, "additional_certificates"); ok && len(rawAdditionalCerts) > 0 {
-				for _, rawCert := range rawAdditionalCerts {
-					values := mapToResourceData(rawCert.(map[string]interface{}))
-					cert.AddAdditionalCert(
-						values.Get("server_cert").(string),
-						values.Get("intermediate_cert").(string),
-						values.Get("private_key").(string),
-					)
+	if proxyLB.Settings.ProxyLB.LetsEncrypt != nil {
+		if !proxyLB.Settings.ProxyLB.LetsEncrypt.Enabled && d.HasChange("certificate") {
+			if certs, ok := getListFromResource(d, "certificate"); ok && len(certs) > 0 {
+				values := mapToResourceData(certs[0].(map[string]interface{}))
+				cert := &sacloud.ProxyLBCertificates{
+					ServerCertificate:       values.Get("server_cert").(string),
+					IntermediateCertificate: values.Get("intermediate_cert").(string),
+					PrivateKey:              values.Get("private_key").(string),
+					AdditionalCerts:         []*sacloud.ProxyLBCertificate{},
 				}
-			}
-			if _, err := client.ProxyLB.SetCertificates(proxyLB.ID, cert); err != nil {
-				return fmt.Errorf("Failed to set SakuraCloud ProxyLB certificates: %s", err)
-			}
-		} else {
-			if _, err := client.ProxyLB.DeleteCertificates(proxyLB.ID); err != nil {
-				return fmt.Errorf("Failed to remove SakuraCloud ProxyLB certificates: %s", err)
-			}
 
+				if rawAdditionalCerts, ok := getListFromResource(values, "additional_certificates"); ok && len(rawAdditionalCerts) > 0 {
+					for _, rawCert := range rawAdditionalCerts {
+						values := mapToResourceData(rawCert.(map[string]interface{}))
+						cert.AddAdditionalCert(
+							values.Get("server_cert").(string),
+							values.Get("intermediate_cert").(string),
+							values.Get("private_key").(string),
+						)
+					}
+				}
+				if _, err := client.ProxyLB.SetCertificates(proxyLB.ID, cert); err != nil {
+					return fmt.Errorf("Failed to set SakuraCloud ProxyLB certificates: %s", err)
+				}
+			} else {
+				if _, err := client.ProxyLB.DeleteCertificates(proxyLB.ID); err != nil {
+					return fmt.Errorf("Failed to remove SakuraCloud ProxyLB certificates: %s", err)
+				}
+
+			}
 		}
 	}
 

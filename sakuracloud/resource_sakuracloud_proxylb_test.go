@@ -139,6 +139,62 @@ func TestAccResourceSakuraCloudProxyLB(t *testing.T) {
 	})
 }
 
+func TestAccResourceSakuraCloudProxyLB_TCP(t *testing.T) {
+
+	if ip, ok := os.LookupEnv(envProxyLBRealServerIP0); ok {
+		proxyLBRealServerIP0 = ip
+	} else {
+		t.Skipf("ENV %q is requilred. skip", envProxyLBRealServerIP0)
+		return
+	}
+
+	var proxylb sacloud.ProxyLB
+	resource.ParallelTest(t, resource.TestCase{
+		PreCheck:     func() { testAccPreCheck(t) },
+		Providers:    testAccProviders,
+		CheckDestroy: testAccCheckSakuraCloudProxyLBDestroy,
+		Steps: []resource.TestStep{
+			{
+				Config: fmt.Sprintf(testAccCheckSakuraCloudProxyLBConfig_TCP, proxyLBRealServerIP0),
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckSakuraCloudProxyLBExists("sakuracloud_proxylb.foobar", &proxylb),
+					resource.TestCheckResourceAttr(
+						"sakuracloud_proxylb.foobar", "name", "terraform-test-proxylb"),
+					resource.TestCheckResourceAttr(
+						"sakuracloud_proxylb.foobar", "plan", "100"),
+					resource.TestMatchResourceAttr(
+						"sakuracloud_proxylb.foobar", "fqdn", regexp.MustCompile(`.+\.sakura\.ne\.jp$`)),
+					resource.TestCheckResourceAttr(
+						"sakuracloud_proxylb.foobar", "vip_failover", "true"),
+					resource.TestCheckResourceAttr(
+						"sakuracloud_proxylb.foobar", "sticky_session", "false"),
+					resource.TestCheckResourceAttr(
+						"sakuracloud_proxylb.foobar", "timeout", "30"),
+					resource.TestCheckResourceAttr(
+						"sakuracloud_proxylb.foobar", "health_check.0.protocol", "tcp"),
+					resource.TestCheckResourceAttr(
+						"sakuracloud_proxylb.foobar", "health_check.0.delay_loop", "30"),
+					resource.TestCheckResourceAttr(
+						"sakuracloud_proxylb.foobar", "sorry_server.0.ipaddress", proxyLBRealServerIP0),
+					resource.TestCheckResourceAttr(
+						"sakuracloud_proxylb.foobar", "sorry_server.0.port", "8080"),
+					resource.TestCheckResourceAttr(
+						"sakuracloud_proxylb.foobar", "bind_ports.0.proxy_mode", "tcp"),
+					resource.TestCheckResourceAttr(
+						"sakuracloud_proxylb.foobar", "bind_ports.0.port", "80"),
+					resource.TestCheckResourceAttrPair(
+						"sakuracloud_proxylb.foobar", "servers.0.ipaddress",
+						"sakuracloud_server.server01", "ipaddress",
+					),
+					resource.TestCheckResourceAttr(
+						"sakuracloud_proxylb.foobar", "servers.0.port", "80"),
+					resource.TestCheckResourceAttr(
+						"sakuracloud_proxylb.foobar", "servers.0.enabled", "true"),
+				),
+			},
+		},
+	})
+}
 func testAccCheckSakuraCloudProxyLBExists(n string, proxylb *sacloud.ProxyLB) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
 		rs, ok := s.RootModule().Resources[n]
@@ -351,5 +407,36 @@ resource "sakuracloud_proxylb" "foobar" {
 
   description = "ProxyLB from TerraForm for SAKURA CLOUD"
   tags = ["hoge1", "hoge2"]
+}
+`
+
+var testAccCheckSakuraCloudProxyLBConfig_TCP = `
+resource "sakuracloud_proxylb" "foobar" {
+  name = "terraform-test-proxylb"
+  plan = 100
+  vip_failover = true
+  sticky_session = false
+  timeout = 30
+  health_check {
+    protocol = "tcp"
+    delay_loop = 30
+  }
+  sorry_server {
+    ipaddress = "%s"
+    port      = 8080
+  }
+  bind_ports {
+    proxy_mode = "tcp"
+    port       = 80
+  }
+  servers {
+      ipaddress = "${sakuracloud_server.server01.ipaddress}"
+      port = 80
+  }
+}
+
+resource sakuracloud_server "server01" {
+  name = "terraform-test-server01"
+  graceful_shutdown_timeout = 1
 }
 `
