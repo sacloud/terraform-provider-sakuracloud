@@ -37,7 +37,7 @@ Attributes for Records:
 
 * `name` - (Required) The hostname of target Record. If "@" is specified, it indicates own zone.
 * `type` - (Required) The Record type.  
-Valid value is one of the following: [ "A" / "AAAA" / "ALIAS" / "CNAME" / "NS" / "MX" / "TXT" / "SRV" / "CAA" ]
+Valid value is one of the following: [ "A" / "AAAA" / "ALIAS" / "CNAME" / "NS" / "MX" / "TXT" / "SRV" / "CAA" / "PTR" ]
 * `value` - (Required) The value of the Record. 
 * `ttl` - (Optional) The ttl value of the Record (unit:`second`). 
 * `priority` - (Optional) The priority used when `type` is `MX` or `SRV`.
