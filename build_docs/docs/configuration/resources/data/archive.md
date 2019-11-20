@@ -36,10 +36,15 @@ data "sakuracloud_archive" "ubuntu" {
 |値|詳細                                          |
 |---------------------------|--------------------|
 | `centos`                  | CentOS(最新安定板)|
-| `centos7`                  | CentOS 7.7|
-| `centos6`                  | CentOS 6.10|
-| `ubuntu`                  | Ubuntu 18.04|
-| `debian`                  | Debian |
+| `centos8`                  | CentOS 8|
+| `centos7`                  | CentOS 7|
+| `centos6`                  | CentOS 6|
+| `ubuntu`                  | Ubuntu(最新安定板)|
+| `ubuntu1804`              | Ubuntu 18.04|
+| `ubuntu1604`              | Ubuntu 16.04|
+| `debian`                  | Debian(最新安定板) |
+| `debian10`                  | Debian10 |
+| `debian9`                  | Debian9 |
 | `coreos`                  | CoreOS|
 | `rancheros`               | RancherOS|
 | `k3os`                    | k3OS|

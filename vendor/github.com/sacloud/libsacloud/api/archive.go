@@ -31,10 +31,15 @@ type ArchiveAPI struct {
 
 var (
 	archiveLatestStableCentOSTags                          = []string{"current-stable", "distro-centos"}
-	archiveLatestStableCentOS7Tags                         = []string{"distro-centos", "distro-ver-7.7"}
-	archiveLatestStableCentOS6Tags                         = []string{"distro-centos", "distro-ver-6.10"}
+	archiveLatestStableCentOS8Tags                         = []string{"centos-8-latest"}
+	archiveLatestStableCentOS7Tags                         = []string{"centos-7-latest"}
+	archiveLatestStableCentOS6Tags                         = []string{"centos-6-latest"}
 	archiveLatestStableUbuntuTags                          = []string{"current-stable", "distro-ubuntu"}
+	archiveLatestStableUbuntu1804Tags                      = []string{"ubuntu-18.04-latest"}
+	archiveLatestStableUbuntu1604Tags                      = []string{"ubuntu-16.04-latest"}
 	archiveLatestStableDebianTags                          = []string{"current-stable", "distro-debian"}
+	archiveLatestStableDebian10Tags                        = []string{"debian-10-latest"}
+	archiveLatestStableDebian9Tags                         = []string{"debian-9-latest"}
 	archiveLatestStableCoreOSTags                          = []string{"current-stable", "distro-coreos"}
 	archiveLatestStableRancherOSTags                       = []string{"current-stable", "distro-rancheros"}
 	archiveLatestStableK3OSTags                            = []string{"current-stable", "distro-k3os"}
@@ -67,10 +72,15 @@ func NewArchiveAPI(client *Client) *ArchiveAPI {
 
 	api.findFuncMapPerOSType = map[ostype.ArchiveOSTypes]func() (*sacloud.Archive, error){
 		ostype.CentOS:                              api.FindLatestStableCentOS,
+		ostype.CentOS8:                             api.FindLatestStableCentOS8,
 		ostype.CentOS7:                             api.FindLatestStableCentOS7,
 		ostype.CentOS6:                             api.FindLatestStableCentOS6,
 		ostype.Ubuntu:                              api.FindLatestStableUbuntu,
+		ostype.Ubuntu1804:                          api.FindLatestStableUbuntu1804,
+		ostype.Ubuntu1604:                          api.FindLatestStableUbuntu1604,
 		ostype.Debian:                              api.FindLatestStableDebian,
+		ostype.Debian10:                            api.FindLatestStableDebian10,
+		ostype.Debian9:                             api.FindLatestStableDebian9,
 		ostype.CoreOS:                              api.FindLatestStableCoreOS,
 		ostype.RancherOS:                           api.FindLatestStableRancherOS,
 		ostype.K3OS:                                api.FindLatestStableK3OS,
@@ -240,6 +250,11 @@ func (api *ArchiveAPI) FindLatestStableCentOS() (*sacloud.Archive, error) {
 	return api.findByOSTags(archiveLatestStableCentOSTags)
 }
 
+// FindLatestStableCentOS8 安定版最新のCentOS8パブリックアーカイブを取得
+func (api *ArchiveAPI) FindLatestStableCentOS8() (*sacloud.Archive, error) {
+	return api.findByOSTags(archiveLatestStableCentOS8Tags)
+}
+
 // FindLatestStableCentOS7 安定版最新のCentOS7パブリックアーカイブを取得
 func (api *ArchiveAPI) FindLatestStableCentOS7() (*sacloud.Archive, error) {
 	return api.findByOSTags(archiveLatestStableCentOS7Tags)
@@ -255,9 +270,29 @@ func (api *ArchiveAPI) FindLatestStableDebian() (*sacloud.Archive, error) {
 	return api.findByOSTags(archiveLatestStableDebianTags)
 }
 
+// FindLatestStableDebian10 安定版最新のDebian10パブリックアーカイブを取得
+func (api *ArchiveAPI) FindLatestStableDebian10() (*sacloud.Archive, error) {
+	return api.findByOSTags(archiveLatestStableDebian10Tags)
+}
+
+// FindLatestStableDebian9 安定版最新のDebian9パブリックアーカイブを取得
+func (api *ArchiveAPI) FindLatestStableDebian9() (*sacloud.Archive, error) {
+	return api.findByOSTags(archiveLatestStableDebian9Tags)
+}
+
 // FindLatestStableUbuntu 安定版最新のUbuntuパブリックアーカイブを取得
 func (api *ArchiveAPI) FindLatestStableUbuntu() (*sacloud.Archive, error) {
 	return api.findByOSTags(archiveLatestStableUbuntuTags)
+}
+
+// FindLatestStableUbuntu1804 安定版最新のUbuntu1804パブリックアーカイブを取得
+func (api *ArchiveAPI) FindLatestStableUbuntu1804() (*sacloud.Archive, error) {
+	return api.findByOSTags(archiveLatestStableUbuntu1804Tags)
+}
+
+// FindLatestStableUbuntu1604 安定版最新のUbuntu1604パブリックアーカイブを取得
+func (api *ArchiveAPI) FindLatestStableUbuntu1604() (*sacloud.Archive, error) {
+	return api.findByOSTags(archiveLatestStableUbuntu1604Tags)
 }
 
 // FindLatestStableCoreOS 安定版最新のCoreOSパブリックアーカイブを取得
