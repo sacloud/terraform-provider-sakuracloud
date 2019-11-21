@@ -6,7 +6,6 @@ import (
 
 	"github.com/hashicorp/terraform/helper/schema"
 	"github.com/sacloud/libsacloud/v2/sacloud"
-	"github.com/sacloud/libsacloud/v2/sacloud/types"
 )
 
 func dataSourceSakuraCloudDisk() *schema.Resource {
@@ -91,42 +90,5 @@ func dataSourceSakuraCloudDiskRead(d *schema.ResourceData, meta interface{}) err
 
 	targets := res.Disks
 	d.SetId(targets[0].ID.String())
-	return setDiskV2ResourceData(ctx, d, client, targets[0])
-}
-
-func setDiskV2ResourceData(ctx context.Context, d *schema.ResourceData, client *APIClient, data *sacloud.Disk) error {
-	var plan string
-	switch data.DiskPlanID {
-	case types.DiskPlans.SSD:
-		plan = "ssd"
-	case types.DiskPlans.HDD:
-		plan = "hdd"
-	}
-
-	var sourceDiskID, sourceArchiveID, serverID string
-	if !data.SourceDiskID.IsEmpty() {
-		sourceDiskID = data.SourceDiskID.String()
-	}
-	if !data.SourceArchiveID.IsEmpty() {
-		sourceArchiveID = data.SourceArchiveID.String()
-	}
-	if !data.ServerID.IsEmpty() {
-		serverID = data.ServerID.String()
-	}
-
-	setPowerManageTimeoutValueToState(d)
-
-	return setResourceData(d, map[string]interface{}{
-		"name":              data.Name,
-		"plan":              plan,
-		"source_disk_id":    sourceDiskID,
-		"source_archive_id": sourceArchiveID,
-		"connector":         data.Connection.String(),
-		"size":              data.GetSizeGB(),
-		"icon_id":           data.IconID.String(),
-		"description":       data.Description,
-		"tags":              data.Tags,
-		"server_id":         serverID,
-		"zone":              getV2Zone(d, client),
-	})
+	return setDiskResourceData(ctx, d, client, targets[0])
 }

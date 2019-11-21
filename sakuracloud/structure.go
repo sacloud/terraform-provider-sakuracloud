@@ -119,6 +119,29 @@ func toSakuraCloudID(id string) int64 {
 	return v
 }
 
+func expandSakuraCloudID(d resourceValueGettable, key string) types.ID {
+	if v, ok := d.GetOk(key); ok {
+		if v, ok := v.(string); ok {
+			return types.StringID(v)
+		}
+	}
+	return types.ID(0)
+}
+
+func expandSakuraCloudIDs(d resourceValueGettable, key string) []types.ID {
+	var ids []types.ID
+	if v, ok := d.GetOk(key); ok {
+		if v, ok := v.([]interface{}); ok {
+			for _, v := range v {
+				if v, ok := v.(string); ok {
+					ids = append(ids, types.StringID(v))
+				}
+			}
+		}
+	}
+	return ids
+}
+
 // Takes the result of flatmap.Expand for an array of strings
 // and returns a []*string
 func expandStringList(configured []interface{}) []string {
