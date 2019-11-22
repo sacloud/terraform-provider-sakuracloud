@@ -120,58 +120,5 @@ func dataSourceSakuraCloudInternetRead(d *schema.ResourceData, meta interface{})
 
 	targets := res.Internet
 	d.SetId(targets[0].ID.String())
-	return setInternetV2ResourceData(ctx, d, client, targets[0])
-}
-
-func setInternetV2ResourceData(ctx context.Context, d *schema.ResourceData, client *APIClient, data *sacloud.Internet) error {
-
-	swOp := sacloud.NewSwitchOp(client)
-	zone := getV2Zone(d, client)
-	sw, err := swOp.Read(ctx, zone, data.Switch.ID)
-	if err != nil {
-		return fmt.Errorf("could not find SakuraCloud Switch resource: %s", err)
-	}
-
-	var serverIDs []string
-	if sw.ServerCount > 0 {
-		servers, err := swOp.GetServers(ctx, zone, sw.ID)
-		if err != nil {
-			return fmt.Errorf("coul not find SakuraCloud Servers: %s", err)
-		}
-		for _, s := range servers.Servers {
-			serverIDs = append(serverIDs, s.ID.String())
-		}
-	}
-
-	var enableIPv6 bool
-	var ipv6Prefix, ipv6NetworkAddress string
-	var ipv6PrefixLen int
-	if len(data.Switch.IPv6Nets) > 0 {
-		enableIPv6 = true
-		ipv6Prefix = data.Switch.IPv6Nets[0].IPv6Prefix
-		ipv6PrefixLen = data.Switch.IPv6Nets[0].IPv6PrefixLen
-		ipv6NetworkAddress = fmt.Sprintf("%s/%d", ipv6Prefix, ipv6PrefixLen)
-	}
-
-	setPowerManageTimeoutValueToState(d)
-	return setResourceData(d, map[string]interface{}{
-		"name":            data.Name,
-		"icon_id":         data.IconID.String(),
-		"description":     data.Description,
-		"tags":            data.Tags,
-		"nw_mask_len":     data.NetworkMaskLen,
-		"band_width":      data.BandWidthMbps,
-		"switch_id":       sw.ID.String(),
-		"nw_address":      sw.Subnets[0].NetworkAddress,
-		"gateway":         sw.Subnets[0].DefaultRoute,
-		"min_ipaddress":   sw.Subnets[0].AssignedIPAddressMin,
-		"max_ipaddress":   sw.Subnets[0].AssignedIPAddressMax,
-		"ipaddresses":     sw.Subnets[0].GetAssignedIPAddresses(),
-		"server_ids":      serverIDs,
-		"enable_ipv6":     enableIPv6,
-		"ipv6_prefix":     ipv6Prefix,
-		"ipv6_prefix_len": ipv6PrefixLen,
-		"ipv6_nw_address": ipv6NetworkAddress,
-		"zone":            zone,
-	})
+	return setInternetResourceData(ctx, d, client, targets[0])
 }
