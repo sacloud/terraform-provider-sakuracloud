@@ -144,7 +144,7 @@ func findRecordMatch(records []*sacloud.DNSRecord, record *sacloud.DNSRecord) *s
 	}
 	return nil
 }
-func isSameDNSRecord(r1 *sacloud.DNSRecord, r2 *sacloud.DNSRecord) bool {
+func isSameDNSRecord(r1, r2 *sacloud.DNSRecord) bool {
 	return r1.Name == r2.Name && r1.RData == r2.RData && r1.TTL == r2.TTL && r1.Type == r2.Type
 }
 
