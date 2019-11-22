@@ -1,6 +1,7 @@
 package sakuracloud
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"os"
@@ -8,7 +9,7 @@ import (
 
 	"github.com/hashicorp/terraform/helper/resource"
 	"github.com/hashicorp/terraform/terraform"
-	"github.com/sacloud/libsacloud/sacloud"
+	"github.com/sacloud/libsacloud/v2/sacloud"
 )
 
 const (
@@ -57,46 +58,48 @@ func testAccCheckSakuraCloudIPv4PtrExists(n string, ip *sacloud.IPAddress) resou
 	return func(s *terraform.State) error {
 		rs, ok := s.RootModule().Resources[n]
 		if !ok {
-			return fmt.Errorf("Not found: %s", n)
+			return fmt.Errorf("not found: %s", n)
 		}
 
 		if rs.Primary.ID == "" {
-			return errors.New("No IPv4Ptr ID is set")
+			return errors.New("no IPv4Ptr ID is set")
 		}
 
 		client := testAccProvider.Meta().(*APIClient)
+		zone := rs.Primary.Attributes["zone"]
+		ipAddrOp := sacloud.NewIPAddressOp(client)
 
-		foundIPv4Ptr, err := client.IPAddress.Read(rs.Primary.ID)
-
+		foundIPv4Ptr, err := ipAddrOp.Read(context.Background(), zone, rs.Primary.ID)
 		if err != nil {
 			return err
 		}
 
 		if foundIPv4Ptr.IPAddress != rs.Primary.ID {
-			return errors.New("IPv4Ptr not found")
+			return fmt.Errorf("not found IPv4Ptr: %s", rs.Primary.ID)
 		}
 		if foundIPv4Ptr.HostName == "" {
-			return errors.New("IPv4Ptr hostname is empty")
+			return fmt.Errorf("hostname is empty IPv4Ptr: %s", foundIPv4Ptr.IPAddress)
 		}
 
 		*ip = *foundIPv4Ptr
-
 		return nil
 	}
 }
 
 func testAccCheckSakuraCloudIPv4PtrDestroy(s *terraform.State) error {
 	client := testAccProvider.Meta().(*APIClient)
+	ipAddrOp := sacloud.NewIPAddressOp(client)
 
 	for _, rs := range s.RootModule().Resources {
 		if rs.Type != "sakuracloud_ipv4_ptr" {
 			continue
 		}
 
-		ip, err := client.IPAddress.Read(rs.Primary.ID)
+		zone := rs.Primary.Attributes["zone"]
+		ip, err := ipAddrOp.Read(context.Background(), zone, rs.Primary.ID)
 
 		if err == nil && ip.HostName != "" {
-			return errors.New("IPv4Ptr still exists")
+			return fmt.Errorf("still exists IPv4Ptr: %s", ip.IPAddress)
 		}
 	}
 
@@ -105,7 +108,9 @@ func testAccCheckSakuraCloudIPv4PtrDestroy(s *terraform.State) error {
 
 var testAccCheckSakuraCloudIPv4PtrConfig_basic = `
 data sakuracloud_dns "dns" {
-  name_selectors = ["%s"]
+  filters {
+    names = ["%s"]
+  }
 }
 
 resource sakuracloud_dns_record "record01" {
@@ -128,7 +133,9 @@ resource "sakuracloud_ipv4_ptr" "foobar" {
 
 var testAccCheckSakuraCloudIPv4PtrConfig_update = `
 data sakuracloud_dns "dns" {
-  name_selectors = ["%s"]
+  filters {
+    names = ["%s"]
+  }
 }
 
 resource sakuracloud_dns_record "record01" {

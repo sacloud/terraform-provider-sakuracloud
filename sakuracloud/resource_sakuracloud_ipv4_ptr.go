@@ -6,8 +6,7 @@ import (
 
 	"github.com/hashicorp/terraform/helper/schema"
 	"github.com/hashicorp/terraform/helper/validation"
-	"github.com/sacloud/libsacloud/api"
-	"github.com/sacloud/libsacloud/sacloud"
+	"github.com/sacloud/libsacloud/v2/sacloud"
 )
 
 func resourceSakuraCloudIPv4Ptr() *schema.Resource {
@@ -56,10 +55,8 @@ func resourceSakuraCloudIPv4Ptr() *schema.Resource {
 
 func resourceSakuraCloudIPv4PtrUpdate(d *schema.ResourceData, meta interface{}) error {
 	var err error
-	client := getSacloudAPIClient(d, meta)
-
-	client.TraceMode = true
-	defer func() { client.TraceMode = false }()
+	client, ctx, zone := getSacloudV2Client(d, meta)
+	ipAddrOp := sacloud.NewIPAddressOp(client)
 
 	ip := d.Get("ipaddress").(string)
 	hostName := d.Get("hostname").(string)
@@ -69,10 +66,10 @@ func resourceSakuraCloudIPv4PtrUpdate(d *schema.ResourceData, meta interface{}) 
 	interval := time.Duration(retrySec) * time.Second
 
 	// check IP exists
-	_, err = client.IPAddress.Read(ip)
+	_, err = ipAddrOp.Read(ctx, zone, ip)
 	if err != nil {
 		// includes 404 error
-		return fmt.Errorf("Couldn't find SakuraCloud IPv4Ptr resource: %s", err)
+		return fmt.Errorf("could not find SakuraCloud IPv4Ptr: %s", err)
 	}
 
 	i := 0
@@ -80,7 +77,7 @@ func resourceSakuraCloudIPv4PtrUpdate(d *schema.ResourceData, meta interface{}) 
 	for i < retryMax {
 
 		// set
-		if _, err = client.IPAddress.Update(ip, hostName); err == nil {
+		if _, err = ipAddrOp.UpdateHostName(ctx, zone, ip, hostName); err == nil {
 			success = true
 			break
 		}
@@ -90,7 +87,7 @@ func resourceSakuraCloudIPv4PtrUpdate(d *schema.ResourceData, meta interface{}) 
 	}
 
 	if !success {
-		return fmt.Errorf("Couldn't update SakuraCloud IPv4Ptr resource: %s", err)
+		return fmt.Errorf("could not update SakuraCloud IPv4Ptr resource: %s", err)
 	}
 
 	d.SetId(ip)
@@ -98,40 +95,41 @@ func resourceSakuraCloudIPv4PtrUpdate(d *schema.ResourceData, meta interface{}) 
 }
 
 func resourceSakuraCloudIPv4PtrRead(d *schema.ResourceData, meta interface{}) error {
-	client := getSacloudAPIClient(d, meta)
+	client, ctx, zone := getSacloudV2Client(d, meta)
+	ipAddrOp := sacloud.NewIPAddressOp(client)
+	ip := d.Id()
 
-	ptr, err := client.IPAddress.Read(d.Id())
+	ptr, err := ipAddrOp.Read(ctx, zone, ip)
 	if err != nil {
-		if sacloudErr, ok := err.(api.Error); ok && sacloudErr.ResponseCode() == 404 {
+		if sacloud.IsNotFoundError(err) {
 			d.SetId("")
 			return nil
 		}
-		return fmt.Errorf("Couldn't find SakuraCloud IPv4Ptr resource: %s", err)
+		return fmt.Errorf("could not read SakuraCloud IPv4Ptr: %s", err)
 	}
-
 	return setIPv4PtrResourceData(d, client, ptr)
 }
 
 func resourceSakuraCloudIPv4PtrDelete(d *schema.ResourceData, meta interface{}) error {
 	var err error
-	client := getSacloudAPIClient(d, meta)
+	client, ctx, zone := getSacloudV2Client(d, meta)
+	ipAddrOp := sacloud.NewIPAddressOp(client)
+	ip := d.Id()
 
-	_, err = client.IPAddress.Read(d.Id())
+	_, err = ipAddrOp.Read(ctx, zone, ip)
 	if err != nil {
 		d.SetId("")
 		return nil
 	}
 
-	_, err = client.IPAddress.Update(d.Id(), "")
+	_, err = ipAddrOp.UpdateHostName(ctx, zone, ip, "")
 	if err != nil {
-		return fmt.Errorf("Couldn't update SakuraCloud IPv4Ptr resource: %s", err)
+		return fmt.Errorf("could not update SakuraCloud IPv4Ptr: %s", err)
 	}
-
 	return nil
 }
 
 func setIPv4PtrResourceData(d *schema.ResourceData, client *APIClient, data *sacloud.IPAddress) error {
-
 	d.Set("ipaddress", data.IPAddress)
 	d.Set("hostname", data.HostName)
 	d.Set("zone", client.Zone)
