@@ -1,13 +1,14 @@
 package sakuracloud
 
 import (
+	"context"
 	"fmt"
 	"strings"
 
 	"github.com/hashicorp/terraform/helper/schema"
 	"github.com/hashicorp/terraform/helper/validation"
-	"github.com/sacloud/libsacloud/api"
-	"github.com/sacloud/libsacloud/sacloud"
+	"github.com/sacloud/libsacloud/v2/sacloud"
+	"github.com/sacloud/libsacloud/v2/sacloud/types"
 )
 
 func resourceSakuraCloudDNS() *schema.Resource {
@@ -26,7 +27,6 @@ func resourceSakuraCloudDNS() *schema.Resource {
 				Required: true,
 				ForceNew: true,
 			},
-
 			"dns_servers": {
 				Type:     schema.TypeList,
 				Computed: true,
@@ -69,7 +69,7 @@ func dnsRecordValueSchema() map[string]*schema.Schema {
 		"type": {
 			Type:         schema.TypeString,
 			Required:     true,
-			ValidateFunc: validation.StringInSlice(sacloud.AllowDNSTypes(), false),
+			ValidateFunc: validation.StringInSlice(types.DNSRecordTypesStrings(), false),
 		},
 		"value": {
 			Type:     schema.TypeString,
@@ -99,126 +99,106 @@ func dnsRecordValueSchema() map[string]*schema.Schema {
 }
 
 func resourceSakuraCloudDNSCreate(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*APIClient)
+	client, ctx, _ := getSacloudV2Client(d, meta)
+	dnsOp := sacloud.NewDNSOp(client)
 
-	opts := client.DNS.New(d.Get("zone").(string))
-	if iconID, ok := d.GetOk("icon_id"); ok {
-		opts.SetIconByID(toSakuraCloudID(iconID.(string)))
-	}
-	if description, ok := d.GetOk("description"); ok {
-		opts.Description = description.(string)
-	}
-	rawTags := d.Get("tags").([]interface{})
-	if rawTags != nil {
-		opts.Tags = expandTags(client, rawTags)
+	opts := &sacloud.DNSCreateRequest{
+		Name:        d.Get("zone").(string),
+		Description: d.Get("description").(string),
+		Tags:        expandTagsV2(d.Get("tags").([]interface{})),
+		IconID:      expandSakuraCloudID(d, "icon_id"),
+		Records:     expandDNSRecords(d, "records"),
 	}
 
-	for _, rawRecord := range d.Get("records").([]interface{}) {
-		r := &resourceMapValue{rawRecord.(map[string]interface{})}
-		record := expandDNSRecord(r)
-		opts.AddRecord(record)
-	}
-
-	dns, err := client.DNS.Create(opts)
+	dns, err := dnsOp.Create(ctx, opts)
 	if err != nil {
-		return fmt.Errorf("Failed to create SakuraCloud DNS resource: %s", err)
+		return fmt.Errorf("creating SakuraCloud DNS resource is failed: %s", err)
 	}
 
-	d.SetId(dns.GetStrID())
+	d.SetId(dns.ID.String())
 	return resourceSakuraCloudDNSRead(d, meta)
 }
 
 func resourceSakuraCloudDNSRead(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*APIClient)
+	client, ctx, _ := getSacloudV2Client(d, meta)
+	dnsOp := sacloud.NewDNSOp(client)
 
-	dns, err := client.DNS.Read(toSakuraCloudID(d.Id()))
+	dns, err := dnsOp.Read(ctx, types.StringID(d.Id()))
 	if err != nil {
-		if sacloudErr, ok := err.(api.Error); ok && sacloudErr.ResponseCode() == 404 {
+		if sacloud.IsNotFoundError(err) {
 			d.SetId("")
 			return nil
 		}
-		return fmt.Errorf("Couldn't find SakuraCloud DNS resource: %s", err)
+		return fmt.Errorf("could not read SakuraCloud DNS resource: %s", err)
 	}
 
-	return setDNSResourceData(d, client, dns)
+	return setDNSResourceData(ctx, d, client, dns)
 }
 
 func resourceSakuraCloudDNSUpdate(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*APIClient)
+	client, ctx, _ := getSacloudV2Client(d, meta)
+	dnsOp := sacloud.NewDNSOp(client)
 
-	opts, err := client.DNS.Read(toSakuraCloudID(d.Id()))
+	dns, err := dnsOp.Read(ctx, types.StringID(d.Id()))
 	if err != nil {
-		return fmt.Errorf("Couldn't find SakuraCloud DNS resource: %s", err)
+		return fmt.Errorf("could not read SakuraCloud DNS resource: %s", err)
 	}
 
-	if d.HasChange("icon_id") {
-		if iconID, ok := d.GetOk("icon_id"); ok {
-			opts.SetIconByID(toSakuraCloudID(iconID.(string)))
-		} else {
-			opts.ClearIcon()
-		}
-	}
-	if d.HasChange("description") {
-		if description, ok := d.GetOk("description"); ok {
-			opts.Description = description.(string)
-		} else {
-			opts.Description = ""
-		}
-	}
-	if d.HasChange("tags") {
-		rawTags := d.Get("tags").([]interface{})
-		if rawTags == nil {
-			opts.Tags = expandTags(client, []interface{}{})
-		} else {
-			opts.Tags = expandTags(client, rawTags)
-		}
-	}
-	if d.HasChange("records") {
-		opts.ClearRecords()
-		for _, rawRecord := range d.Get("records").([]interface{}) {
-			r := &resourceMapValue{rawRecord.(map[string]interface{})}
-			record := expandDNSRecord(r)
-			opts.AddRecord(record)
-		}
+	opts := &sacloud.DNSUpdateRequest{
+		Description: d.Get("description").(string),
+		Tags:        expandTagsV2(d.Get("tags").([]interface{})),
+		IconID:      expandSakuraCloudID(d, "icon_id"),
+		Records:     expandDNSRecords(d, "records"),
 	}
 
-	_, err = client.DNS.Update(opts.ID, opts)
-	if err != nil {
-		return fmt.Errorf("Failed to update SakuraCloud DNS resource: %s", err)
+	if _, err := dnsOp.Update(ctx, dns.ID, opts); err != nil {
+		return fmt.Errorf("updating SakuraCloud DNS resource is failed: %s", err)
 	}
-
 	return resourceSakuraCloudDNSRead(d, meta)
 }
 
 func resourceSakuraCloudDNSDelete(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*APIClient)
+	client, ctx, _ := getSacloudV2Client(d, meta)
+	dnsOp := sacloud.NewDNSOp(client)
 
-	_, err := client.DNS.Delete(toSakuraCloudID(d.Id()))
-
+	dns, err := dnsOp.Read(ctx, types.StringID(d.Id()))
 	if err != nil {
-		return fmt.Errorf("Error deleting SakuraCloud DNS resource: %s", err)
+		if sacloud.IsNotFoundError(err) {
+			d.SetId("")
+			return nil
+		}
+		return fmt.Errorf("could not read SakuraCloud DNS resource: %s", err)
+	}
+
+	if err := dnsOp.Delete(ctx, dns.ID); err != nil {
+		return fmt.Errorf("deleting SakuraCloud DNS resource is failed: %s", err)
 	}
 
 	return nil
 }
 
-func setDNSResourceData(d *schema.ResourceData, client *APIClient, data *sacloud.DNS) error {
-	d.Set("zone", data.Name)
-	d.Set("icon_id", data.GetIconStrID())
-	d.Set("description", data.Description)
-	d.Set("tags", data.Tags)
-	d.Set("dns_servers", data.Status.NS)
-
+func setDNSResourceData(ctx context.Context, d *schema.ResourceData, client *APIClient, data *sacloud.DNS) error {
 	var records []interface{}
-	for _, record := range data.Settings.DNS.ResourceRecordSets {
-		records = append(records, dnsRecordToState(&record))
+	for _, record := range data.Records {
+		records = append(records, dnsRecordToState(record))
 	}
-	d.Set("records", records)
 
+	d.Set("zone", data.Name)
+	d.Set("icon_id", data.IconID.String())
+	d.Set("description", data.Description)
+	if err := d.Set("tags", data.Tags); err != nil {
+		return err
+	}
+	if err := d.Set("dns_servers", data.DNSNameServers); err != nil {
+		return err
+	}
+	if err := d.Set("records", records); err != nil {
+		return err
+	}
 	return nil
 }
 
-func dnsRecordToState(record *sacloud.DNSRecordSet) map[string]interface{} {
+func dnsRecordToState(record *sacloud.DNSRecord) map[string]interface{} {
 	var r = map[string]interface{}{
 		"name":  record.Name,
 		"type":  record.Type,
@@ -231,29 +211,36 @@ func dnsRecordToState(record *sacloud.DNSRecordSet) map[string]interface{} {
 		// ex. record.RData = "10 example.com."
 		values := strings.SplitN(record.RData, " ", 2)
 		r["value"] = values[1]
-		r["priority"] = values[0]
+		r["priority"] = forceAtoI(values[0])
 	case "SRV":
 		values := strings.SplitN(record.RData, " ", 4)
 		r["value"] = values[3]
-		r["priority"] = values[0]
-		r["weight"] = values[1]
-		r["port"] = values[2]
+		r["priority"] = forceAtoI(values[0])
+		r["weight"] = forceAtoI(values[1])
+		r["port"] = forceAtoI(values[2])
 	default:
-		r["priority"] = ""
-		r["weight"] = ""
-		r["port"] = ""
+		delete(r, "priority")
+		delete(r, "weight")
+		delete(r, "port")
 	}
 
 	return r
 }
 
-func expandDNSRecord(d resourceValueGettable) *sacloud.DNSRecordSet {
-	var dns = sacloud.DNS{}
+func expandDNSRecords(d resourceValueGettable, key string) []*sacloud.DNSRecord {
+	var records []*sacloud.DNSRecord
+	for _, rawRecord := range d.Get(key).([]interface{}) {
+		records = append(records, expandDNSRecord(&resourceMapValue{rawRecord.(map[string]interface{})}))
+	}
+	return records
+}
+
+func expandDNSRecord(d resourceValueGettable) *sacloud.DNSRecord {
 	t, _ := d.GetOk("type")
 	recordType := t.(string)
-	name, _ := d.GetOk("name")
-	value, _ := d.GetOk("value")
-	ttl, _ := d.GetOk("ttl")
+	name := d.Get("name")
+	value := d.Get("value")
+	ttl := d.Get("ttl")
 
 	switch recordType {
 	case "MX":
@@ -261,11 +248,16 @@ func expandDNSRecord(d resourceValueGettable) *sacloud.DNSRecordSet {
 		if p, ok := d.GetOk("priority"); ok {
 			pr = p.(int)
 		}
-		return dns.CreateNewMXRecord(
-			name.(string),
-			value.(string),
-			ttl.(int),
-			pr)
+		rdata := value.(string)
+		if rdata != "" && !strings.HasSuffix(rdata, ".") {
+			rdata = rdata + "."
+		}
+		return &sacloud.DNSRecord{
+			Name:  name.(string),
+			Type:  types.EDNSRecordType(recordType),
+			RData: fmt.Sprintf("%d %s", pr, rdata),
+			TTL:   ttl.(int),
+		}
 	case "SRV":
 		pr := 0
 		if p, ok := d.GetOk("priority"); ok {
@@ -279,16 +271,22 @@ func expandDNSRecord(d resourceValueGettable) *sacloud.DNSRecordSet {
 		if po, ok := d.GetOk("port"); ok {
 			port = po.(int)
 		}
-		return dns.CreateNewSRVRecord(
-			name.(string),
-			value.(string),
-			ttl.(int),
-			pr, weight, port)
+		rdata := value.(string)
+		if rdata != "" && !strings.HasSuffix(rdata, ".") {
+			rdata = rdata + "."
+		}
+		return &sacloud.DNSRecord{
+			Name:  name.(string),
+			Type:  types.EDNSRecordType(recordType),
+			RData: fmt.Sprintf("%d %d %d %s", pr, weight, port, rdata),
+			TTL:   ttl.(int),
+		}
 	default:
-		return dns.CreateNewRecord(
-			name.(string),
-			recordType,
-			value.(string),
-			ttl.(int))
+		return &sacloud.DNSRecord{
+			Name:  name.(string),
+			Type:  types.EDNSRecordType(recordType),
+			RData: value.(string),
+			TTL:   ttl.(int),
+		}
 	}
 }

@@ -1,14 +1,17 @@
 package sakuracloud
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"testing"
 
+	"github.com/sacloud/libsacloud/v2/sacloud/types"
+
 	"github.com/hashicorp/terraform/helper/acctest"
 	"github.com/hashicorp/terraform/helper/resource"
 	"github.com/hashicorp/terraform/terraform"
-	"github.com/sacloud/libsacloud/sacloud"
+	"github.com/sacloud/libsacloud/v2/sacloud"
 )
 
 func TestAccResourceSakuraCloudDNS(t *testing.T) {
@@ -54,7 +57,7 @@ func TestAccResourceSakuraCloudDNS(t *testing.T) {
 					resource.TestCheckResourceAttr("sakuracloud_dns.foobar", "records.0.name", "test1"),
 					resource.TestCheckResourceAttr("sakuracloud_dns.foobar", "records.0.type", "A"),
 					resource.TestCheckResourceAttr("sakuracloud_dns.foobar", "records.0.value", "192.168.11.1"),
-					resource.TestCheckNoResourceAttr("sakuracloud_dns.foobar", "icon_id"),
+					resource.TestCheckResourceAttr("sakuracloud_dns.foobar", "icon_id", ""),
 				),
 			},
 		},
@@ -74,35 +77,36 @@ func testAccCheckSakuraCloudDNSExists(n string, dns *sacloud.DNS) resource.TestC
 		}
 
 		client := testAccProvider.Meta().(*APIClient)
+		dnsOp := sacloud.NewDNSOp(client)
+		ctx := context.Background()
 
-		foundDNS, err := client.DNS.Read(toSakuraCloudID(rs.Primary.ID))
+		foundDNS, err := dnsOp.Read(ctx, types.StringID(rs.Primary.ID))
 
 		if err != nil {
 			return err
 		}
 
-		if foundDNS.ID != toSakuraCloudID(rs.Primary.ID) {
-			return errors.New("Record not found")
+		if foundDNS.ID.String() != rs.Primary.ID {
+			return fmt.Errorf("not found: ID: %s", rs.Primary.ID)
 		}
 
 		*dns = *foundDNS
-
 		return nil
 	}
 }
 
 func testAccCheckSakuraCloudDNSDestroy(s *terraform.State) error {
 	client := testAccProvider.Meta().(*APIClient)
+	dnsOp := sacloud.NewDNSOp(client)
 
 	for _, rs := range s.RootModule().Resources {
 		if rs.Type != "sakuracloud_dns" {
 			continue
 		}
 
-		_, err := client.DNS.Read(toSakuraCloudID(rs.Primary.ID))
-
+		_, err := dnsOp.Read(context.Background(), types.StringID(rs.Primary.ID))
 		if err == nil {
-			return errors.New("DNS still exists")
+			return fmt.Errorf("resource still exists: DNS: %s", rs.Primary.ID)
 		}
 	}
 
@@ -155,20 +159,20 @@ func TestAccImportSakuraCloudDNS(t *testing.T) {
 func testAccCheckSakuraCloudDNSConfig_basic(zone string) string {
 	return fmt.Sprintf(`
 resource "sakuracloud_dns" "foobar" {
-    zone = "%s"
-    description = "DNS from TerraForm for SAKURA CLOUD"
-    tags = ["tag1","tag2"]
-    icon_id = "${sakuracloud_icon.foobar.id}"
-    records {
-      name = "test1"
-      type = "A"
-      value = "192.168.11.1"
-    }
-    records {
-      name = "test2"
-      type = "A"
-      value = "192.168.11.2"
-    }
+  zone = "%s"
+  description = "DNS from TerraForm for SAKURA CLOUD"
+  tags = ["tag1","tag2"]
+  icon_id = "${sakuracloud_icon.foobar.id}"
+  records {
+    name = "test1"
+    type = "A"
+    value = "192.168.11.1"
+  }
+  records {
+    name = "test2"
+    type = "A"
+    value = "192.168.11.2"
+  }
 }
 
 resource "sakuracloud_icon" "foobar" {
@@ -181,23 +185,23 @@ resource "sakuracloud_icon" "foobar" {
 func testAccCheckSakuraCloudDNSConfig_update(zone string) string {
 	return fmt.Sprintf(`
 resource "sakuracloud_dns" "foobar" {
-    zone = "%s"
-    description = "DNS from TerraForm for SAKURA CLOUD_upd"
-    tags = ["tag1"]
-    records {
-      name = "test1"
-      type = "A"
-      value = "192.168.11.1"
-    }
+  zone = "%s"
+  description = "DNS from TerraForm for SAKURA CLOUD_upd"
+  tags = ["tag1"]
+  records {
+    name = "test1"
+    type = "A"
+    value = "192.168.11.1"
+  }
 }`, zone)
 }
 
 func testAccCheckSakuraCloudDNSConfig_import(zone string) string {
 	return fmt.Sprintf(`
 resource "sakuracloud_dns" "foobar" {
-    zone = "%s"
-    description = "DNS from TerraForm for SAKURA CLOUD"
-    tags = ["tag1","tag2"]
+  zone = "%s"
+  description = "DNS from TerraForm for SAKURA CLOUD"
+  tags = ["tag1","tag2"]
 }
 `, zone)
 }

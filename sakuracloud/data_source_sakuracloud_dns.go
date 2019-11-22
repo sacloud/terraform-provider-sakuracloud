@@ -3,7 +3,6 @@ package sakuracloud
 import (
 	"context"
 	"fmt"
-	"strings"
 
 	"github.com/hashicorp/terraform/helper/schema"
 	"github.com/sacloud/libsacloud/v2/sacloud"
@@ -100,50 +99,5 @@ func dataSourceSakuraCloudDNSRead(d *schema.ResourceData, meta interface{}) erro
 
 	targets := res.DNS
 	d.SetId(targets[0].ID.String())
-	return setDNSV2ResourceData(ctx, d, client, targets[0])
-}
-
-func setDNSV2ResourceData(ctx context.Context, d *schema.ResourceData, client *APIClient, data *sacloud.DNS) error {
-	var records []interface{}
-	for _, record := range data.Records {
-		records = append(records, v2DNSRecordToState(record))
-	}
-
-	return setResourceData(d, map[string]interface{}{
-		"zone":        data.Name,
-		"icon_id":     data.IconID.String(),
-		"description": data.Description,
-		"tags":        data.Tags,
-		"dns_servers": data.DNSNameServers,
-		"records":     records,
-	})
-}
-
-func v2DNSRecordToState(record *sacloud.DNSRecord) map[string]interface{} {
-	var r = map[string]interface{}{
-		"name":  record.Name,
-		"type":  record.Type,
-		"value": record.RData,
-		"ttl":   record.TTL,
-	}
-
-	switch record.Type {
-	case "MX":
-		// ex. record.RData = "10 example.com."
-		values := strings.SplitN(record.RData, " ", 2)
-		r["value"] = values[1]
-		r["priority"] = values[0]
-	case "SRV":
-		values := strings.SplitN(record.RData, " ", 4)
-		r["value"] = values[3]
-		r["priority"] = values[0]
-		r["weight"] = values[1]
-		r["port"] = values[2]
-	default:
-		r["priority"] = ""
-		r["weight"] = ""
-		r["port"] = ""
-	}
-
-	return r
+	return setDNSResourceData(ctx, d, client, targets[0])
 }

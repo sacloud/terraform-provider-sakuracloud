@@ -4,8 +4,9 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"github.com/sacloud/libsacloud/v2/sacloud/types"
 	"testing"
+
+	"github.com/sacloud/libsacloud/v2/sacloud/types"
 
 	"github.com/hashicorp/terraform/helper/resource"
 	"github.com/hashicorp/terraform/terraform"
