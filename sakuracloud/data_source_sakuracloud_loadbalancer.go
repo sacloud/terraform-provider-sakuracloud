@@ -6,7 +6,6 @@ import (
 
 	"github.com/hashicorp/terraform/helper/schema"
 	"github.com/sacloud/libsacloud/v2/sacloud"
-	"github.com/sacloud/libsacloud/v2/sacloud/types"
 )
 
 func dataSourceSakuraCloudLoadBalancer() *schema.Resource {
@@ -160,68 +159,5 @@ func dataSourceSakuraCloudLoadBalancerRead(d *schema.ResourceData, meta interfac
 
 	targets := res.LoadBalancers
 	d.SetId(targets[0].ID.String())
-	return setLoadBalancerV2ResourceData(ctx, d, client, targets[0])
-}
-
-func setLoadBalancerV2ResourceData(ctx context.Context, d *schema.ResourceData, client *APIClient, data *sacloud.LoadBalancer) error {
-	if data.Availability.IsFailed() {
-		d.SetId("")
-		return fmt.Errorf("got unexpected state: LoadBalancer[%d].Availability is failed", data.ID)
-	}
-
-	var ha bool
-	var ipaddress1, ipaddress2 string
-	ipaddress1 = data.IPAddresses[0]
-	if len(data.IPAddresses) > 1 {
-		ha = true
-		ipaddress2 = data.IPAddresses[1]
-	}
-
-	var plan string
-	switch data.PlanID {
-	case types.LoadBalancerPlans.Standard:
-		plan = "standard"
-	case types.LoadBalancerPlans.Premium:
-		plan = "highspec"
-	}
-
-	var vips []interface{}
-	for _, v := range data.VirtualIPAddresses {
-		vip := map[string]interface{}{
-			"vip":          v.VirtualIPAddress,
-			"port":         v.Port.Int(),
-			"delay_loop":   v.DelayLoop.Int(),
-			"sorry_server": v.SorryServer,
-		}
-		var servers []interface{}
-		for _, server := range v.Servers {
-			s := map[string]interface{}{}
-			s["ipaddress"] = server.IPAddress
-			s["check_protocol"] = server.HealthCheck.Protocol
-			s["check_path"] = server.HealthCheck.Path
-			s["check_status"] = server.HealthCheck.ResponseCode.String()
-			s["enabled"] = server.Enabled.Bool()
-			servers = append(servers, s)
-		}
-		vip["servers"] = servers
-		vips = append(vips, vip)
-	}
-
-	setPowerManageTimeoutValueToState(d)
-	return setResourceData(d, map[string]interface{}{
-		"switch_id":         data.SwitchID.String(),
-		"vrid":              data.VRID,
-		"plan":              plan,
-		"high_availability": ha,
-		"ipaddress1":        ipaddress1,
-		"ipaddress2":        ipaddress2,
-		"nw_mask_len":       data.NetworkMaskLen,
-		"default_route":     data.DefaultRoute,
-		"name":              data.Name,
-		"icon_id":           data.IconID.String(),
-		"description":       data.Description,
-		"tags":              data.Tags,
-		"vips":              vips,
-		"zone":              getV2Zone(d, client),
-	})
+	return setLoadBalancerResourceData(ctx, d, client, targets[0])
 }

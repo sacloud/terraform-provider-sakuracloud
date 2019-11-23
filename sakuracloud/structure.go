@@ -418,6 +418,23 @@ func expandSearchFilter(rawFilters interface{}) search.Filter {
 	return ret
 }
 
+func expandStringNumber(d resourceValueGettable, key string) types.StringNumber {
+	switch v := d.Get(key).(type) {
+	case string:
+		return types.StringNumber(forceAtoI(v))
+	case int:
+		return types.StringNumber(v)
+	case int64:
+		return types.StringNumber(v)
+	default:
+		return types.StringNumber(0)
+	}
+}
+
+func expandStringFlag(d resourceValueGettable, key string) types.StringFlag {
+	return types.StringFlag(d.Get(key).(bool))
+}
+
 type migrateSchemaDef struct {
 	source      string
 	destination string

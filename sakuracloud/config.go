@@ -85,7 +85,9 @@ func (c *Config) NewClient() *APIClient {
 		if c.FakeStorePath != "" {
 			fake.DataStore = fake.NewJSONFileStore(c.FakeStorePath)
 		}
-		fake.SwitchFactoryFuncToFake()
+		fakeModeOnce.Do(func() {
+			fake.SwitchFactoryFuncToFake()
+		})
 	}
 
 	v2Client := c.newClientV2()
@@ -97,6 +99,7 @@ func (c *Config) NewClient() *APIClient {
 	}
 }
 
+var fakeModeOnce sync.Once
 var v2ClientOnce sync.Once
 
 func (c *Config) newClientV2() v2.APICaller {
