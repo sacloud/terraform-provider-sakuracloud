@@ -193,7 +193,7 @@ func resourceSakuraCloudSIMRead(d *schema.ResourceData, meta interface{}) error 
 	client := meta.(*APIClient)
 
 	var sim *sacloud.SIM
-	res, err := client.SIM.Reset().Include("*").Include("Status.sim").Find()
+	res, err := client.SIM.Reset().Limit(defaultSearchLimit).Include("*").Include("Status.sim").Find()
 	if err != nil {
 		return fmt.Errorf("Couldn't find SakuraCloud SIM resource: %s", err)
 	}
@@ -230,7 +230,7 @@ func resourceSakuraCloudSIMUpdate(d *schema.ResourceData, meta interface{}) erro
 
 	// read sim info
 	var sim *sacloud.SIM
-	res, err := client.SIM.Reset().Include("*").Include("Status.sim").Find()
+	res, err := client.SIM.Reset().Limit(defaultSearchLimit).Include("*").Include("Status.sim").Find()
 	if err != nil {
 		return fmt.Errorf("Couldn't find SakuraCloud SIM resource: %s", err)
 	}
@@ -344,7 +344,7 @@ func resourceSakuraCloudSIMDelete(d *schema.ResourceData, meta interface{}) erro
 	client := meta.(*APIClient)
 
 	var sim *sacloud.SIM
-	res, err := client.SIM.Reset().Include("*").Include("Status.sim").Find()
+	res, err := client.SIM.Reset().Limit(defaultSearchLimit).Include("*").Include("Status.sim").Find()
 	if err != nil {
 		return fmt.Errorf("Couldn't find SakuraCloud SIM resource: %s", err)
 	}

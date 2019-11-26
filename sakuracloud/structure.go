@@ -87,9 +87,7 @@ func getSacloudAPIClient(d resourceValueGetable, meta interface{}) *APIClient {
 	if ok {
 		client.Zone = zone.(string)
 	}
-	return &APIClient{
-		Client: client,
-	}
+	return newAPIClient(client)
 }
 
 func toSakuraCloudID(id string) int64 {
