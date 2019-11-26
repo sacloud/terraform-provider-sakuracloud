@@ -190,7 +190,7 @@ func resourceSakuraCloudLoadBalancerServerDelete(d *schema.ResourceData, meta in
 
 }
 
-func findLoadBalancerVIPMatchByValue(vips []*sacloud.LoadBalancerVirtualIPAddress, vip string, port string) *sacloud.LoadBalancerVirtualIPAddress {
+func findLoadBalancerVIPMatchByValue(vips []*sacloud.LoadBalancerVirtualIPAddress, vip, port string) *sacloud.LoadBalancerVirtualIPAddress {
 	for _, v := range vips {
 		if isSameLoadBalancerVIPByValue(v, vip, port) {
 			return v
