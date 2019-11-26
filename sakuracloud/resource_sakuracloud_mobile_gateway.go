@@ -1,18 +1,17 @@
 package sakuracloud
 
 import (
+	"context"
 	"errors"
 	"fmt"
-	"math"
-	"net/http"
-	"regexp"
-	"strings"
-	"time"
-
 	"github.com/hashicorp/terraform/helper/schema"
 	"github.com/hashicorp/terraform/helper/validation"
-	"github.com/sacloud/libsacloud/api"
-	"github.com/sacloud/libsacloud/sacloud"
+	"github.com/sacloud/libsacloud/v2/sacloud"
+	"github.com/sacloud/libsacloud/v2/sacloud/accessor"
+	"github.com/sacloud/libsacloud/v2/sacloud/types"
+	"github.com/sacloud/libsacloud/v2/utils/setup"
+	"math"
+	"regexp"
 )
 
 func resourceSakuraCloudMobileGateway() *schema.Resource {
@@ -54,6 +53,11 @@ func resourceSakuraCloudMobileGateway() *schema.Resource {
 				ValidateFunc: validation.IntBetween(8, 29),
 			},
 			"internet_connection": {
+				Type:     schema.TypeBool,
+				Optional: true,
+				Default:  false,
+			},
+			"inter_device_communication": {
 				Type:     schema.TypeBool,
 				Optional: true,
 				Default:  false,
@@ -143,7 +147,6 @@ func resourceSakuraCloudMobileGateway() *schema.Resource {
 				Computed: true,
 				Elem:     &schema.Schema{Type: schema.TypeString},
 			},
-			powerManageTimeoutKey: powerManageTimeoutParam,
 			"zone": {
 				Type:         schema.TypeString,
 				Optional:     true,
@@ -157,324 +160,244 @@ func resourceSakuraCloudMobileGateway() *schema.Resource {
 }
 
 func resourceSakuraCloudMobileGatewayCreate(d *schema.ResourceData, meta interface{}) error {
-	client := getSacloudAPIClient(d, meta)
+	client, ctx, zone := getSacloudV2Client(d, meta)
+	mgwOp := sacloud.NewMobileGatewayOp(client)
 
-	var switchID int64
-	var ip string
-	var nwMaskLen int
-	if rawSwitchID, ok := d.GetOk("switch_id"); ok {
-		strSwitchID := rawSwitchID.(string)
-		if strSwitchID != "" {
-			switchID = toSakuraCloudID(strSwitchID)
-			if rawIP, ok := d.GetOk("private_ipaddress"); ok {
-				ip = rawIP.(string)
-			}
-			if rawNWMaskLen, ok := d.GetOk("private_nw_mask_len"); ok {
-				nwMaskLen = rawNWMaskLen.(int)
-			}
-
-			if ip == "" || nwMaskLen == 0 {
-				return errors.New("MobileGateway needs private_ipaddress and private_nw_mask_len when switch_id is specified")
-			}
-		}
-	}
-
-	opts := &sacloud.CreateMobileGatewayValue{}
-	opts.Name = d.Get("name").(string)
-	if iconID, ok := d.GetOk("icon_id"); ok {
-		opts.IconID = toSakuraCloudID(iconID.(string))
-	}
-	if description, ok := d.GetOk("description"); ok {
-		opts.Description = description.(string)
-	}
-	if rawTags, ok := d.GetOk("tags"); ok {
-		if rawTags != nil {
-			opts.Tags = expandTags(client, rawTags.([]interface{}))
-		}
-	}
-
-	setting := &sacloud.MobileGatewaySetting{}
-	setting.InternetConnection = &sacloud.MGWInternetConnection{
-		Enabled: "False",
-	}
-	if d.Get("internet_connection").(bool) {
-		setting.InternetConnection.Enabled = "True"
-	}
-
-	createMgw, err := sacloud.CreateNewMobileGateway(opts, setting)
+	// validate
+	switchID, ip, nwMaskLen, err := expandMobileGatewayPrivateNetworks(d)
 	if err != nil {
-		return fmt.Errorf("Failed to create SakuraCloud MobileGateway resource: %s", err)
+		return err
 	}
 
-	mgw, err := client.MobileGateway.Create(createMgw)
-	if err != nil {
-		return fmt.Errorf("Failed to create SakuraCloud MobileGateway resource: %s", err)
+	opts := &sacloud.MobileGatewayCreateRequest{
+		Name:        d.Get("name").(string),
+		Description: d.Get("description").(string),
+		Tags:        expandTagsV2(d.Get("tags").([]interface{})),
+		IconID:      expandSakuraCloudID(d, "icon_id"),
+		Settings: &sacloud.MobileGatewaySettingCreate{
+			InternetConnectionEnabled:       expandStringFlag(d, "internet_connection"),
+			InterDeviceCommunicationEnabled: expandStringFlag(d, "inter_device_communication"),
+		},
 	}
 
-	//wait
-	err = client.MobileGateway.SleepWhileCopying(mgw.ID, client.DefaultTimeoutDuration, 20)
-	if err != nil {
-		return fmt.Errorf("Failed to create SakuraCloud MobileGateway resource: %s", err)
+	builder := &setup.RetryableSetup{
+		Create: func(ctx context.Context, zone string) (accessor.ID, error) {
+			return mgwOp.Create(ctx, zone, opts)
+		},
+		Delete: func(ctx context.Context, zone string, id types.ID) error {
+			return mgwOp.Delete(ctx, zone, id)
+		},
+		Read: func(ctx context.Context, zone string, id types.ID) (interface{}, error) {
+			return mgwOp.Read(ctx, zone, id)
+		},
+		IsWaitForCopy: true,
+		IsWaitForUp:   false,
 	}
+
+	result, err := builder.Setup(ctx, zone)
+	if err != nil {
+		return fmt.Errorf("creating SakuraCloud MobileGateway is failed: %s", err)
+	}
+	mgw := result.(*sacloud.MobileGateway)
 
 	// connect to switch
-	if switchID > 0 {
-		_, err = client.MobileGateway.ConnectToSwitch(mgw.ID, switchID)
-		if err != nil {
-			return fmt.Errorf("Failed to create SakuraCloud MobileGateway resource: %s", err)
+	if !switchID.IsEmpty() {
+		patchParam := &sacloud.MobileGatewayPatchRequest{
+			Settings:     mgw.Settings,
+			SettingsHash: mgw.SettingsHash,
 		}
 
-		if len(mgw.Settings.MobileGateway.Interfaces) == 0 {
-			mgw.Settings.MobileGateway.Interfaces = append(mgw.Settings.MobileGateway.Interfaces, nil)
-		}
-		mgw.SetPrivateInterface(ip, nwMaskLen)
-		mgw, err = client.MobileGateway.Update(mgw.ID, mgw)
-		if err != nil {
-			return fmt.Errorf("MobileGatewayInterfaceConnect is failed: %s", err)
+		if err := mgwOp.ConnectToSwitch(ctx, zone, mgw.ID, switchID); err != nil {
+			return fmt.Errorf("connecting to switch is failed: %s", err)
 		}
 
-		_, err = client.MobileGateway.Config(mgw.ID)
-		if err != nil {
-			return fmt.Errorf("MobileGatewayInterfaceConnect is failed: %s", err)
-		}
+		patchParam.Settings.Interfaces = append(patchParam.Settings.Interfaces, &sacloud.MobileGatewayInterfaceSetting{
+			IPAddress:      []string{ip},
+			NetworkMaskLen: nwMaskLen,
+			Index:          1,
+		})
 
+		upd, err := mgwOp.Patch(ctx, zone, mgw.ID, patchParam)
+		if err != nil {
+			return fmt.Errorf("updating network settings is failed: %s", err)
+		}
+		mgw = upd
 	}
 
-	rawTrafficControl := d.Get("traffic_control").([]interface{})
-	if len(rawTrafficControl) > 0 {
-		values := rawTrafficControl[0].(map[string]interface{})
-		trafficControl := &sacloud.TrafficMonitoringConfig{
-			TrafficQuotaInMB:     values["quota"].(int),
-			BandWidthLimitInKbps: values["band_width_limit"].(int),
-			EMailConfig: &sacloud.TrafficMonitoringNotifyEmail{
-				Enabled: values["enable_email"].(bool),
-			},
-			SlackConfig: &sacloud.TrafficMonitoringNotifySlack{
-				Enabled:             values["enable_slack"].(bool),
-				IncomingWebhooksURL: values["slack_webhook"].(string),
-			},
-			AutoTrafficShaping: values["auto_traffic_shaping"].(bool),
-		}
-
-		if _, err := client.MobileGateway.SetTrafficMonitoringConfig(mgw.ID, trafficControl); err != nil {
-			return fmt.Errorf("Failed to enable traffic-control on SakuraCloud MobileGateway: %s", err)
+	// traffic config
+	if tc := expandMobileGatewayTrafficConfig(d); tc != nil {
+		if err := mgwOp.SetTrafficConfig(ctx, zone, mgw.ID, tc); err != nil {
+			return fmt.Errorf("updating traffic config is failed: %s", err)
 		}
 	}
 
-	// set DNS
+	// dns
 	dns1 := d.Get("dns_server1").(string)
 	dns2 := d.Get("dns_server2").(string)
 	if dns1 != "" || dns2 != "" {
-		_, err = client.MobileGateway.SetDNS(mgw.ID, sacloud.NewMobileGatewayResolver(dns1, dns2))
+		err := mgwOp.SetDNS(ctx, zone, mgw.ID, &sacloud.MobileGatewayDNSSetting{
+			DNS1: dns1,
+			DNS2: dns2,
+		})
 		if err != nil {
-			return fmt.Errorf("Failed to wait SakuraCloud MobileGateway boot: %s", err)
+			return fmt.Errorf("updating dns settings is failed: %s", err)
 		}
 	}
 
 	// static route
-	if staticRoutes, ok := getListFromResource(d, "static_route"); ok && len(staticRoutes) > 0 {
-		for _, rawStaticRoutes := range staticRoutes {
-			values := mapToResourceData(rawStaticRoutes.(map[string]interface{}))
-			staticRoute := expandMobileGatewayStaticRoute(values)
-
-			// check duplicated
-			for _, sr := range mgw.Settings.MobileGateway.StaticRoutes {
-				if sr.Prefix == staticRoute.Prefix {
-					return fmt.Errorf("prefix %q already exists", sr.Prefix)
-				}
-			}
-
-			mgw.Settings.MobileGateway.StaticRoutes = append(mgw.Settings.MobileGateway.StaticRoutes, staticRoute)
+	staticRoutes := expandMobileGatewayStaticRoutes(d)
+	if len(staticRoutes) > 0 {
+		patchParam := &sacloud.MobileGatewayPatchRequest{
+			Settings:     mgw.Settings,
+			SettingsHash: mgw.SettingsHash,
 		}
-	}
+		patchParam.Settings.StaticRoute = staticRoutes
 
-	mgw, err = client.MobileGateway.UpdateSetting(mgw.ID, mgw)
-	if err != nil {
-		return fmt.Errorf("Failed to enable SakuraCloud MobileGatewayStaticRoute resource: %s", err)
-	}
-	_, err = client.MobileGateway.Config(mgw.ID)
-	if err != nil {
-		return fmt.Errorf("Couldn'd apply SakuraCloud MobileGateway config: %s", err)
+		upd, err := mgwOp.Patch(ctx, zone, mgw.ID, patchParam)
+		if err != nil {
+			return fmt.Errorf("updating static routes is failed: %s", err)
+		}
+		mgw = upd
 	}
 
 	// boot
-	time.Sleep(90 * time.Second) // !HACK! For avoid that MobileGateway becomes an invalid state
+	if err := mgwOp.Boot(ctx, zone, mgw.ID); err != nil {
+		return fmt.Errorf("booting SakuraCloud MobileGateway is failed: %s", err)
+	}
+	_, err = sacloud.WaiterForUp(func() (interface{}, error) {
+		return mgwOp.Read(ctx, zone, mgw.ID)
+	}).WaitForState(ctx)
 
-	_, err = client.MobileGateway.Boot(mgw.ID)
 	if err != nil {
-		return fmt.Errorf("Failed to wait SakuraCloud MobileGateway boot: %s", err)
+		return fmt.Errorf("booting SakuraCloud MobileGateway is failed: %s", err)
 	}
 
-	err = client.MobileGateway.SleepUntilUp(mgw.ID, client.DefaultTimeoutDuration)
-	if err != nil {
-		return fmt.Errorf("Failed to wait SakuraCloud MobileGateway boot: %s", err)
-	}
-
-	d.SetId(mgw.GetStrID())
+	d.SetId(mgw.ID.String())
 	return resourceSakuraCloudMobileGatewayRead(d, meta)
+
 }
 
 func resourceSakuraCloudMobileGatewayRead(d *schema.ResourceData, meta interface{}) error {
-	client := getSacloudAPIClient(d, meta)
+	client, ctx, zone := getSacloudV2Client(d, meta)
+	mgwOp := sacloud.NewMobileGatewayOp(client)
 
-	mgw, err := client.MobileGateway.Read(toSakuraCloudID(d.Id()))
+	mgw, err := mgwOp.Read(ctx, zone, types.StringID(d.Id()))
 	if err != nil {
-		if sacloudErr, ok := err.(api.Error); ok && sacloudErr.ResponseCode() == 404 {
+		if sacloud.IsNotFoundError(err) {
 			d.SetId("")
 			return nil
 		}
-		return fmt.Errorf("Couldn't find SakuraCloud MobileGateway resource: %s", err)
+		return fmt.Errorf("could not read SakuraCloud MobileGateway: %s", err)
 	}
 
-	return setMobileGatewayResourceData(d, client, mgw)
+	return setMobileGatewayResourceData(ctx, d, client, mgw)
 }
 
 func resourceSakuraCloudMobileGatewayUpdate(d *schema.ResourceData, meta interface{}) error {
-	client := getSacloudAPIClient(d, meta)
+	client, ctx, zone := getSacloudV2Client(d, meta)
+	mgwOp := sacloud.NewMobileGatewayOp(client)
+
+	switchID, ip, nwMaskLen, err := expandMobileGatewayPrivateNetworks(d)
+	if err != nil {
+		return err
+	}
 
 	sakuraMutexKV.Lock(d.Id())
 	defer sakuraMutexKV.Unlock(d.Id())
 
-	mgw, err := client.MobileGateway.Read(toSakuraCloudID(d.Id()))
+	mgw, err := mgwOp.Read(ctx, zone, types.StringID(d.Id()))
 	if err != nil {
-		return fmt.Errorf("Couldn't find SakuraCloud MobileGateway resource: %s", err)
+		return fmt.Errorf("could not read SakuraCloud MobileGateway: %s", err)
 	}
 
-	var switchID int64
-	var ip string
-	var nwMaskLen int
-	if rawSwitchID, ok := d.GetOk("switch_id"); ok {
-		strSwitchID := rawSwitchID.(string)
-		if strSwitchID != "" {
-			switchID = toSakuraCloudID(strSwitchID)
-			if rawIP, ok := d.GetOk("private_ipaddress"); ok {
-				ip = rawIP.(string)
-			}
-			if rawNWMaskLen, ok := d.GetOk("private_nw_mask_len"); ok {
-				nwMaskLen = rawNWMaskLen.(int)
-			}
-
-			if ip == "" || nwMaskLen == 0 {
-				return errors.New("MobileGateway needs private_ipaddress and private_nw_mask_len when switch_id is specified")
-			}
-		}
-	}
-
-	if d.HasChange("name") {
-		mgw.Name = d.Get("name").(string)
-	}
-	if d.HasChange("icon_id") {
-		if iconID, ok := d.GetOk("icon_id"); ok {
-			mgw.SetIconByID(toSakuraCloudID(iconID.(string)))
-		} else {
-			mgw.ClearIcon()
-		}
-	}
-	if d.HasChange("description") {
-		if description, ok := d.GetOk("description"); ok {
-			mgw.Description = description.(string)
-		} else {
-			mgw.Description = ""
-		}
-	}
-
-	if d.HasChange("tags") {
-		rawTags := d.Get("tags").([]interface{})
-		if rawTags != nil {
-			mgw.Tags = expandTags(client, rawTags)
-		} else {
-			mgw.Tags = expandTags(client, []interface{}{})
-		}
-	}
-
-	if d.HasChange("internet_connection") {
-		mgw.Settings.MobileGateway.InternetConnection.Enabled = "False"
-		if d.Get("internet_connection").(bool) {
-			mgw.Settings.MobileGateway.InternetConnection.Enabled = "True"
-		}
-	}
-
-	mgw, err = client.MobileGateway.Update(mgw.ID, mgw)
+	mgw, err = mgwOp.Update(ctx, zone, mgw.ID, &sacloud.MobileGatewayUpdateRequest{
+		Name:        d.Get("name").(string),
+		Description: d.Get("description").(string),
+		Tags:        expandTagsV2(d.Get("tags").([]interface{})),
+		IconID:      expandSakuraCloudID(d, "icon_id"),
+		Settings: &sacloud.MobileGatewaySetting{
+			Interfaces:                      mgw.Settings.Interfaces,
+			StaticRoute:                     mgw.Settings.StaticRoute,
+			InternetConnectionEnabled:       expandStringFlag(d, "internet_connection"),
+			InterDeviceCommunicationEnabled: expandStringFlag(d, "inter_device_communication"),
+		},
+		SettingsHash: mgw.SettingsHash,
+	})
 	if err != nil {
-		return fmt.Errorf("Error updating SakuraCloud MobileGateway resource: %s", err)
+		return fmt.Errorf("updating SakuraCloud MobileGateway is failed: %s", err)
 	}
 
-	// need shutdown fields
+	swOptsHasChange := d.HasChange("switch_id") || d.HasChange("private_ipaddress") || d.HasChange("private_nw_mask_len")
 	needRestart := false
-	if d.HasChange("switch_id") || d.HasChange("private_ipaddress") || d.HasChange("private_nw_mask_len") {
-		// shutdown required for changing network settings
-		if mgw.IsUp() {
-			needRestart = true
+	if mgw.InstanceStatus.IsUp() && swOptsHasChange {
+		needRestart = true
+	}
 
-			err = handleShutdown(client.MobileGateway, mgw.ID, d, client.DefaultTimeoutDuration)
-			if err != nil {
-				return fmt.Errorf("Error updating SakuraCloud MobileGateway resource: %s", err)
-			}
-			err = client.MobileGateway.SleepUntilDown(mgw.ID, client.DefaultTimeoutDuration)
-			if err != nil {
-				return fmt.Errorf("Error updating SakuraCloud MobileGateway resource: %s", err)
-			}
+	// shutdown
+	if needRestart {
+		if err := mgwOp.Shutdown(ctx, zone, mgw.ID, nil); err != nil {
+			return fmt.Errorf("updating SakuraCloud MobileGateway is failed: %s", err)
+		}
+		_, err = sacloud.WaiterForDown(func() (interface{}, error) {
+			return mgwOp.Read(ctx, zone, mgw.ID)
+		}).WaitForState(ctx)
+		if err != nil {
+			return fmt.Errorf("updating SakuraCloud MobileGateway is failed: %s", err)
+		}
+	}
+
+	if swOptsHasChange {
+		updateParam := &sacloud.MobileGatewayUpdateRequest{
+			Name:         mgw.Name,
+			Description:  mgw.Description,
+			Tags:         mgw.Tags,
+			IconID:       mgw.IconID,
+			Settings:     mgw.Settings,
+			SettingsHash: mgw.SettingsHash,
 		}
 
 		// disconnect from switch if already connected
-		if d.HasChange("switch_id") && len(mgw.Interfaces) > 1 && mgw.Interfaces[1].Switch != nil {
-			_, err = client.MobileGateway.DisconnectFromSwitch(mgw.ID)
-			if err != nil {
-				return fmt.Errorf("Error updating SakuraCloud MobileGateway resource: %s", err)
+		if len(mgw.Interfaces) > 1 && !mgw.Interfaces[1].SwitchID.IsEmpty() {
+			if err := mgwOp.DisconnectFromSwitch(ctx, zone, mgw.ID); err != nil {
+				return fmt.Errorf("disconnecting from switch is failed: %s", err)
 			}
 		}
 
-		if switchID > 0 {
-			_, err = client.MobileGateway.ConnectToSwitch(mgw.ID, switchID)
-			if err != nil {
-				return fmt.Errorf("Error updating SakuraCloud MobileGateway resource: %s", err)
+		if !switchID.IsEmpty() {
+			if err := mgwOp.ConnectToSwitch(ctx, zone, mgw.ID, switchID); err != nil {
+				return fmt.Errorf("connecting to switch is failed: %s", err)
 			}
 
-			if len(mgw.Settings.MobileGateway.Interfaces) == 0 {
-				mgw.Settings.MobileGateway.Interfaces = append(mgw.Settings.MobileGateway.Interfaces, nil)
-			}
-			mgw.SetPrivateInterface(ip, nwMaskLen)
+			updateParam.Settings.Interfaces = append(updateParam.Settings.Interfaces, &sacloud.MobileGatewayInterfaceSetting{
+				IPAddress:      []string{ip},
+				NetworkMaskLen: nwMaskLen,
+				Index:          1,
+			})
 		} else {
-			mgw.ClearPrivateInterface()
+			var ifs []*sacloud.MobileGatewayInterfaceSetting
+			for _, i := range updateParam.Settings.Interfaces {
+				if i.Index != 1 {
+					ifs = append(ifs, i)
+				}
+			}
+			updateParam.Settings.Interfaces = ifs
 		}
 
-		mgw, err = client.MobileGateway.Update(mgw.ID, mgw)
+		upd, err := mgwOp.Update(ctx, zone, mgw.ID, updateParam)
 		if err != nil {
-			return fmt.Errorf("MobileGatewayInterfaceConnect is failed: %s", err)
+			return fmt.Errorf("updating network settings is failed: %s", err)
 		}
-
-		_, err = client.MobileGateway.Config(mgw.ID)
-		if err != nil {
-			return fmt.Errorf("MobileGatewayInterfaceConnect is failed: %s", err)
-		}
-
+		mgw = upd
 	}
 
 	if d.HasChange("traffic_control") {
-		rawTrafficControl := d.Get("traffic_control").([]interface{})
-		if len(rawTrafficControl) > 0 {
-			values := rawTrafficControl[0].(map[string]interface{})
-			trafficControl := &sacloud.TrafficMonitoringConfig{
-				TrafficQuotaInMB:     values["quota"].(int),
-				BandWidthLimitInKbps: values["band_width_limit"].(int),
-				EMailConfig: &sacloud.TrafficMonitoringNotifyEmail{
-					Enabled: values["enable_email"].(bool),
-				},
-				SlackConfig: &sacloud.TrafficMonitoringNotifySlack{
-					Enabled:             values["enable_slack"].(bool),
-					IncomingWebhooksURL: values["slack_webhook"].(string),
-				},
-				AutoTrafficShaping: values["auto_traffic_shaping"].(bool),
-			}
-
-			if _, err := client.MobileGateway.SetTrafficMonitoringConfig(mgw.ID, trafficControl); err != nil {
-				return fmt.Errorf("Failed to enable traffic-control on SakuraCloud MobileGateway: %s", err)
+		if tc := expandMobileGatewayTrafficConfig(d); tc != nil {
+			if err := mgwOp.SetTrafficConfig(ctx, zone, mgw.ID, tc); err != nil {
+				return fmt.Errorf("updating traffic config is failed: %s", err)
 			}
 		} else {
-			if _, err := client.MobileGateway.DisableTrafficMonitoringConfig(mgw.ID); err != nil {
-				if e, ok := err.(api.Error); !ok || e.ResponseCode() != http.StatusNotFound {
-					return fmt.Errorf("Failed to disable traffic-control on SakuraCloud MobileGateway: %s", err)
-				}
+			if err := mgwOp.DeleteTrafficConfig(ctx, zone, mgw.ID); err != nil {
+				return fmt.Errorf("updating traffic config is failed: %s", err)
 			}
 		}
 	}
@@ -483,50 +406,44 @@ func resourceSakuraCloudMobileGatewayUpdate(d *schema.ResourceData, meta interfa
 		dns1 := d.Get("dns_server1").(string)
 		dns2 := d.Get("dns_server2").(string)
 		if dns1 != "" || dns2 != "" {
-			_, err = client.MobileGateway.SetDNS(mgw.ID, sacloud.NewMobileGatewayResolver(dns1, dns2))
+			err := mgwOp.SetDNS(ctx, zone, mgw.ID, &sacloud.MobileGatewayDNSSetting{
+				DNS1: dns1,
+				DNS2: dns2,
+			})
 			if err != nil {
-				return fmt.Errorf("Failed to wait SakuraCloud MobileGateway boot: %s", err)
+				return fmt.Errorf("updating dns settings is failed: %s", err)
 			}
 		}
 	}
 
 	// static route
 	if d.HasChange("static_route") {
-		mgw.Settings.MobileGateway.StaticRoutes = []*sacloud.MGWStaticRoute{}
-		if staticRoutes, ok := getListFromResource(d, "static_route"); ok && len(staticRoutes) > 0 {
-			for _, rawStaticRoutes := range staticRoutes {
-				values := mapToResourceData(rawStaticRoutes.(map[string]interface{}))
-				staticRoute := expandMobileGatewayStaticRoute(values)
-
-				// check duplicated
-				for _, sr := range mgw.Settings.MobileGateway.StaticRoutes {
-					if sr.Prefix == staticRoute.Prefix {
-						return fmt.Errorf("prefix %q already exists", sr.Prefix)
-					}
-				}
-				mgw.Settings.MobileGateway.StaticRoutes = append(mgw.Settings.MobileGateway.StaticRoutes, staticRoute)
-			}
+		mgw.Settings.StaticRoute = expandMobileGatewayStaticRoutes(d)
+		updateParam := &sacloud.MobileGatewayUpdateRequest{
+			Name:         mgw.Name,
+			Description:  mgw.Description,
+			Tags:         mgw.Tags,
+			IconID:       mgw.IconID,
+			Settings:     mgw.Settings,
+			SettingsHash: mgw.SettingsHash,
 		}
-
-		mgw, err = client.MobileGateway.UpdateSetting(mgw.ID, mgw)
+		upd, err := mgwOp.Update(ctx, zone, mgw.ID, updateParam)
 		if err != nil {
-			return fmt.Errorf("Failed to enable SakuraCloud MobileGatewayStaticRoute resource: %s", err)
+			return fmt.Errorf("updating static routes is failed: %s", err)
 		}
-		_, err = client.MobileGateway.Config(mgw.ID)
-		if err != nil {
-			return fmt.Errorf("Couldn'd apply SakuraCloud MobileGateway config: %s", err)
-		}
-
+		mgw = upd
 	}
 
 	if needRestart {
-		_, err = client.MobileGateway.Boot(mgw.ID)
-		if err != nil {
-			return fmt.Errorf("Error updating SakuraCloud MobileGateway resource: %s", err)
+		if err := mgwOp.Boot(ctx, zone, mgw.ID); err != nil {
+			return fmt.Errorf("updating SakuraCloud MobileGateway is failed: %s", err)
 		}
-		err = client.MobileGateway.SleepUntilUp(mgw.ID, client.DefaultTimeoutDuration)
+		_, err = sacloud.WaiterForUp(func() (interface{}, error) {
+			return mgwOp.Read(ctx, zone, mgw.ID)
+		}).WaitForState(ctx)
+
 		if err != nil {
-			return fmt.Errorf("Error updating SakuraCloud MobileGateway resource: %s", err)
+			return fmt.Errorf("updating SakuraCloud MobileGateway is failed: %s", err)
 		}
 	}
 
@@ -534,130 +451,179 @@ func resourceSakuraCloudMobileGatewayUpdate(d *schema.ResourceData, meta interfa
 }
 
 func resourceSakuraCloudMobileGatewayDelete(d *schema.ResourceData, meta interface{}) error {
-	client := getSacloudAPIClient(d, meta)
+	client, ctx, zone := getSacloudV2Client(d, meta)
+	mgwOp := sacloud.NewMobileGatewayOp(client)
 
 	sakuraMutexKV.Lock(d.Id())
 	defer sakuraMutexKV.Unlock(d.Id())
 
-	mgw, err := client.MobileGateway.Read(toSakuraCloudID(d.Id()))
+	mgw, err := mgwOp.Read(ctx, zone, types.StringID(d.Id()))
 	if err != nil {
-		if sacloudErr, ok := err.(api.Error); ok && sacloudErr.ResponseCode() == 404 {
+		if sacloud.IsNotFoundError(err) {
 			d.SetId("")
 			return nil
 		}
-		return fmt.Errorf("Couldn't find SakuraCloud MobileGateway resource: %s", err)
+		return fmt.Errorf("could not read SakuraCloud MobileGateway: %s", err)
 	}
 
-	err = handleShutdown(client.MobileGateway, toSakuraCloudID(d.Id()), d, client.DefaultTimeoutDuration)
-	if err != nil {
-		return fmt.Errorf("Error stopping SakuraCloud MobileGateway resource: %s", err)
+	if err := mgwOp.Shutdown(ctx, zone, mgw.ID, &sacloud.ShutdownOption{Force: true}); err != nil {
+		return fmt.Errorf("stopping SakuraCloud MobileGateway is failed: %s", err)
+	}
+	if _, err := sacloud.WaiterForDown(func() (interface{}, error) {
+		return mgwOp.Read(ctx, zone, mgw.ID)
+	}).WaitForState(ctx); err != nil {
+		return fmt.Errorf("stopping SakuraCloud MobileGateway is failed: %s", err)
 	}
 
-	// delete SIMs
-	sims, err := client.MobileGateway.ListSIM(mgw.ID, nil)
-	if err != nil {
-		return fmt.Errorf("Error deleting SakuraCloud MobileGateway resource: %s", err)
-	}
-
-	for _, sim := range sims {
-		_, err = client.MobileGateway.DeleteSIM(mgw.ID, toSakuraCloudID(sim.ResourceID))
-		if err != nil {
-			return fmt.Errorf("Error deleting SakuraCloud MobileGateway resource: %s", err)
-		}
-	}
-
-	_, err = client.MobileGateway.Delete(toSakuraCloudID(d.Id()))
-	if err != nil {
-		return fmt.Errorf("Error deleting SakuraCloud MobileGateway resource: %s", err)
+	if err := mgwOp.Delete(ctx, zone, mgw.ID); err != nil {
+		return fmt.Errorf("deleting SakuraCloud MobileGateway is failed: %s", err)
 	}
 
 	return nil
 }
 
-func setMobileGatewayResourceData(d *schema.ResourceData, client *APIClient, data *sacloud.MobileGateway) error {
+func setMobileGatewayResourceData(ctx context.Context, d *schema.ResourceData, client *APIClient, data *sacloud.MobileGateway) error {
+	zone := getV2Zone(d, client)
+	mgwOp := sacloud.NewMobileGatewayOp(client)
 
-	if data.IsFailed() {
+	if data.Availability.IsFailed() {
 		d.SetId("")
-		return fmt.Errorf("MobileGateway[%d] state is failed", data.ID)
+		return fmt.Errorf("got unexpected state: MobileGateway[%d].Availability is failed", data.ID)
 	}
 
-	d.Set("public_ipaddress", data.Interfaces[0].IPAddress)
-	d.Set("public_nw_mask_len", data.Interfaces[0].Switch.Subnet.NetworkMaskLen)
-	d.Set("internet_connection", strings.ToLower(data.Settings.MobileGateway.InternetConnection.Enabled) == "true")
-
-	if len(data.Interfaces) > 1 && data.Interfaces[1].Switch != nil {
-		d.Set("switch_id", data.Interfaces[1].Switch.GetStrID())
-		d.Set("private_ipaddress", data.Settings.MobileGateway.Interfaces[1].IPAddress[0])
-		d.Set("private_nw_mask_len", data.Settings.MobileGateway.Interfaces[1].NetworkMaskLen)
-	} else {
-		d.Set("switch_id", "")
-		d.Set("private_ipaddress", "")
-		d.Set("private_nw_mask_len", "")
+	// fetch configs
+	tc, err := mgwOp.GetTrafficConfig(ctx, zone, data.ID)
+	if err != nil && !sacloud.IsNotFoundError(err) {
+		return fmt.Errorf("reading TrafficConfig is failed: %s", err)
 	}
-
-	tc, err := client.MobileGateway.GetTrafficMonitoringConfig(data.ID)
+	resolver, err := mgwOp.GetDNS(ctx, zone, data.ID)
 	if err != nil {
-		if e, ok := err.(api.Error); ok && e.ResponseCode() != http.StatusNotFound {
-			return fmt.Errorf("Error reading SakuraCloud MobileGateway resource(traffic-control): %s", err)
-		}
+		return fmt.Errorf("reading resolver config is failed: %s", err)
+	}
+	sims, err := mgwOp.ListSIM(ctx, zone, data.ID)
+	if err != nil {
+		return fmt.Errorf("reading sim list is failed: %s", err)
+	}
+
+	// set data
+	d.Set("public_ipaddress", data.Interfaces[0].IPAddress)
+	d.Set("public_nw_mask_len", data.Interfaces[0].SubnetNetworkMaskLen)
+	d.Set("internet_connection", data.Settings.InternetConnectionEnabled.Bool())
+	d.Set("inter_device_communication", data.Settings.InterDeviceCommunicationEnabled.Bool())
+
+	if len(data.Interfaces) > 0 && !data.Interfaces[1].SwitchID.IsEmpty() {
+		d.Set("switch_id", data.Interfaces[1].SwitchID.String())
+		d.Set("private_ipaddress", data.Settings.Interfaces[0].IPAddress[0])
+		d.Set("private_nw_mask_len", data.Settings.Interfaces[0].NetworkMaskLen)
 	}
 
 	if tc != nil {
-		tcValues := map[string]interface{}{
-			"quota":                tc.TrafficQuotaInMB,
-			"band_width_limit":     tc.BandWidthLimitInKbps,
-			"auto_traffic_shaping": tc.AutoTrafficShaping,
-		}
-		if tc.EMailConfig == nil {
-			tcValues["enable_email"] = false
-		} else {
-			tcValues["enable_email"] = tc.EMailConfig.Enabled
-		}
-		if tc.SlackConfig == nil {
-			tcValues["enable_slack"] = false
-			tcValues["slack_webhook"] = ""
-		} else {
-			tcValues["enable_slack"] = tc.SlackConfig.Enabled
-			tcValues["slack_webhook"] = tc.SlackConfig.IncomingWebhooksURL
-		}
-		d.Set("traffic_control", []interface{}{tcValues})
-	}
-
-	resolver, err := client.MobileGateway.GetDNS(data.ID)
-	if err != nil {
-		return fmt.Errorf("Error reading SakuraCloud MobileGateway resource(dns-resolver): %s", err)
-	}
-
-	d.Set("dns_server1", resolver.SimGroup.DNS1)
-	d.Set("dns_server2", resolver.SimGroup.DNS2)
-
-	var staticRoutes []map[string]interface{}
-	if data.HasStaticRoutes() {
-		for _, r := range data.Settings.MobileGateway.StaticRoutes {
-			staticRoutes = append(staticRoutes, map[string]interface{}{
-				"prefix":   r.Prefix,
-				"next_hop": r.NextHop,
-			})
+		if err := d.Set("traffic_control", flattenMobileGatewayTrafficConfigs(tc)); err != nil {
+			return err
 		}
 	}
-	d.Set("static_route", staticRoutes)
+
+	d.Set("dns_server1", resolver.DNS1)
+	d.Set("dns_server2", resolver.DNS2)
+
+	if err := d.Set("static_route", flattenMobileGatewayStaticRoutes(data.Settings.StaticRoute)); err != nil {
+		return err
+	}
 
 	d.Set("name", data.Name)
-	d.Set("icon_id", data.GetIconStrID())
+	d.Set("icon_id", data.IconID.String())
 	d.Set("description", data.Description)
-	d.Set("tags", data.Tags)
-
-	sims, err := client.MobileGateway.ListSIM(data.ID, nil)
-	if err != nil {
-		return fmt.Errorf("Error reading SakuraCloud MobileGateway resource(dns-resolver): %s", err)
+	if err := d.Set("tags", data.Tags); err != nil {
+		return err
 	}
-	simIDs := []string{}
-	for _, sim := range sims {
-		simIDs = append(simIDs, sim.ResourceID)
-	}
-	d.Set("sim_ids", simIDs)
 
-	setPowerManageTimeoutValueToState(d)
+	if err := d.Set("sim_ids", flattenMobileGatewaySIMList(sims)); err != nil {
+		return err
+	}
+	d.Set("zone", zone)
 
 	return nil
+}
+
+func expandMobileGatewayPrivateNetworks(d resourceValueGettable) (switchID types.ID, ip string, nwMaskLen int, err error) {
+	if rawSwitchID, ok := d.GetOk("switch_id"); ok {
+		switchID = types.StringID(rawSwitchID.(string))
+		if !switchID.IsEmpty() {
+			ip = d.Get("private_ipaddress").(string)
+			nwMaskLen = d.Get("private_nw_mask_len").(int)
+
+			if ip == "" || nwMaskLen == 0 {
+				err = errors.New("private_ipaddress and private_nw_mask_len is required when switch_id is specified")
+			}
+		}
+	}
+	return
+}
+
+func expandMobileGatewayTrafficConfig(d resourceValueGettable) *sacloud.MobileGatewayTrafficControl {
+	values := d.Get("traffic_control").([]interface{})
+	if len(values) == 0 {
+		return nil
+	}
+	v := &resourceMapValue{value: values[0].(map[string]interface{})}
+	return &sacloud.MobileGatewayTrafficControl{
+		TrafficQuotaInMB:       v.Get("quota").(int),
+		BandWidthLimitInKbps:   v.Get("band_width_limit").(int),
+		EmailNotifyEnabled:     v.Get("enable_email").(bool),
+		SlackNotifyEnabled:     v.Get("enable_slack").(bool),
+		SlackNotifyWebhooksURL: v.Get("slack_webhook").(string),
+		AutoTrafficShaping:     v.Get("auto_traffic_shaping").(bool),
+	}
+}
+
+func flattenMobileGatewayTrafficConfig(tc *sacloud.MobileGatewayTrafficControl) interface{} {
+	return map[string]interface{}{
+		"quota":                tc.TrafficQuotaInMB,
+		"band_width_limit":     tc.BandWidthLimitInKbps,
+		"auto_traffic_shaping": tc.AutoTrafficShaping,
+		"enable_email":         tc.EmailNotifyEnabled,
+		"enable_slack":         tc.SlackNotifyEnabled,
+		"slack_webhook":        tc.SlackNotifyWebhooksURL,
+	}
+}
+
+func flattenMobileGatewayTrafficConfigs(tc *sacloud.MobileGatewayTrafficControl) []interface{} {
+	return []interface{}{flattenMobileGatewayTrafficConfig(tc)}
+}
+
+func expandMobileGatewayStaticRoutes(d resourceValueGettable) []*sacloud.MobileGatewayStaticRoute {
+	var routes []*sacloud.MobileGatewayStaticRoute
+	if staticRoutes, ok := d.Get("static_route").([]interface{}); ok && len(staticRoutes) > 0 {
+		for _, v := range staticRoutes {
+			route := expandMobileGatewayStaticRoute(&resourceMapValue{v.(map[string]interface{})})
+			routes = append(routes, route)
+		}
+	}
+	return routes
+}
+
+func expandMobileGatewayStaticRoute(d resourceValueGettable) *sacloud.MobileGatewayStaticRoute {
+	return &sacloud.MobileGatewayStaticRoute{
+		Prefix:  d.Get("prefix").(string),
+		NextHop: d.Get("next_hop").(string),
+	}
+}
+
+func flattenMobileGatewayStaticRoutes(routes []*sacloud.MobileGatewayStaticRoute) []interface{} {
+	var results []interface{}
+	for _, r := range routes {
+		results = append(results, map[string]interface{}{
+			"prefix":   r.Prefix,
+			"next_hop": r.NextHop,
+		})
+	}
+	return results
+}
+
+func flattenMobileGatewaySIMList(sims []*sacloud.MobileGatewaySIMInfo) []interface{} {
+	var result []interface{}
+	for _, s := range sims {
+		result = append(result, s.ResourceID)
+	}
+	return result
 }

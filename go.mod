@@ -12,7 +12,7 @@ require (
 	github.com/sacloud/ftps v0.0.0-20171205062625-42fc0f9886fe
 	github.com/sacloud/iso9660wrap v0.0.0-20171031075302-eda21f77f6a8
 	github.com/sacloud/libsacloud v1.29.1
-	github.com/sacloud/libsacloud/v2 v2.0.0-beta6.0.20191122055912-b3321873ae02
+	github.com/sacloud/libsacloud/v2 v2.0.0-beta6.0.20191126052724-a18a52f76f8c
 	github.com/skratchdot/open-golang v0.0.0-20190402232053-79abb63cd66e // indirect
 	github.com/stretchr/testify v1.3.0
 	github.com/vaughan0/go-ini v0.0.0-20130923145212-a98ad7ee00ec // indirect

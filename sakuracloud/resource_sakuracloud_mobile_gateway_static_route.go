@@ -6,8 +6,8 @@ import (
 
 	"github.com/hashicorp/terraform/helper/hashcode"
 	"github.com/hashicorp/terraform/helper/schema"
-	"github.com/sacloud/libsacloud/api"
-	"github.com/sacloud/libsacloud/sacloud"
+	"github.com/sacloud/libsacloud/v2/sacloud"
+	"github.com/sacloud/libsacloud/v2/sacloud/types"
 )
 
 func resourceSakuraCloudMobileGatewayStaticRoute() *schema.Resource {
@@ -45,129 +45,117 @@ func resourceSakuraCloudMobileGatewayStaticRoute() *schema.Resource {
 }
 
 func resourceSakuraCloudMobileGatewayStaticRouteCreate(d *schema.ResourceData, meta interface{}) error {
-	client := getSacloudAPIClient(d, meta)
+	client, ctx, zone := getSacloudV2Client(d, meta)
+	mgwOp := sacloud.NewMobileGatewayOp(client)
 
 	mgwID := d.Get("mobile_gateway_id").(string)
+
 	sakuraMutexKV.Lock(mgwID)
 	defer sakuraMutexKV.Unlock(mgwID)
 
-	mgw, err := client.MobileGateway.Read(toSakuraCloudID(mgwID))
+	mgw, err := mgwOp.Read(ctx, zone, types.StringID(mgwID))
 	if err != nil {
-		return fmt.Errorf("Couldn't find SakuraCloud MobileGateway resource: %s", err)
+		return fmt.Errorf("could not read SakuraCloud MobileGateway: %s", err)
 	}
 
-	staticRoute := expandMobileGatewayStaticRoute(d)
+	src := expandMobileGatewayStaticRoute(d)
 
 	// check duplicated
-	for _, sr := range mgw.Settings.MobileGateway.StaticRoutes {
-		if sr.Prefix == staticRoute.Prefix {
+	for _, sr := range mgw.Settings.StaticRoute {
+		if sr.Prefix == src.Prefix {
 			return fmt.Errorf("prefix %q already exists", sr.Prefix)
 		}
 	}
 
-	mgw.Settings.MobileGateway.StaticRoutes = append(mgw.Settings.MobileGateway.StaticRoutes, staticRoute)
+	mgw.Settings.StaticRoute = append(mgw.Settings.StaticRoute, src)
 
-	mgw, err = client.MobileGateway.UpdateSetting(toSakuraCloudID(mgwID), mgw)
+	mgw, err = mgwOp.UpdateSettings(ctx, zone, mgw.ID, &sacloud.MobileGatewayUpdateSettingsRequest{
+		Settings:     mgw.Settings,
+		SettingsHash: mgw.SettingsHash,
+	})
 	if err != nil {
-		return fmt.Errorf("Failed to enable SakuraCloud MobileGatewayStaticRoute resource: %s", err)
+		return fmt.Errorf("updating StaticRoutes is failed: %s", err)
 	}
-	_, err = client.MobileGateway.Config(toSakuraCloudID(mgwID))
-	if err != nil {
-		return fmt.Errorf("Couldn'd apply SakuraCloud MobileGateway config: %s", err)
-	}
-	d.SetId(mgwStaticRouteIDHash(mgwID, staticRoute))
+
+	d.SetId(mgwStaticRouteIDHash(mgwID, src))
 	return resourceSakuraCloudMobileGatewayStaticRouteRead(d, meta)
 }
 
 func resourceSakuraCloudMobileGatewayStaticRouteRead(d *schema.ResourceData, meta interface{}) error {
-	client := getSacloudAPIClient(d, meta)
+	client, ctx, zone := getSacloudV2Client(d, meta)
+	mgwOp := sacloud.NewMobileGatewayOp(client)
 
 	mgwID := d.Get("mobile_gateway_id").(string)
-	mgw, err := client.MobileGateway.Read(toSakuraCloudID(mgwID))
+	mgw, err := mgwOp.Read(ctx, zone, types.StringID(mgwID))
 	if err != nil {
-		if sacloudErr, ok := err.(api.Error); ok && sacloudErr.ResponseCode() == 404 {
+		if sacloud.IsNotFoundError(err) {
 			d.SetId("")
 			return nil
 		}
-		return fmt.Errorf("Couldn't find SakuraCloud MobileGateway resource: %s", err)
+		return fmt.Errorf("could not read SakuraCloud MobileGateway: %s", err)
 	}
 
-	staticRoute := expandMobileGatewayStaticRoute(d)
-	if mgw.Settings != nil && mgw.Settings.MobileGateway != nil && mgw.Settings.MobileGateway.StaticRoutes != nil {
+	src := expandMobileGatewayStaticRoute(d)
 
-		exists := false
-		for _, sr := range mgw.Settings.MobileGateway.StaticRoutes {
-			if sr.Prefix == staticRoute.Prefix {
-				d.Set("prefix", sr.Prefix)
-				d.Set("next_hop", sr.NextHop)
-				exists = true
-			}
+	exists := false
+	for _, sr := range mgw.Settings.StaticRoute {
+		if sr.Prefix == src.Prefix {
+			d.Set("prefix", sr.Prefix)
+			d.Set("next_hop", sr.NextHop)
+			exists = true
 		}
-		if !exists {
-			d.SetId("")
-			return nil
-		}
-	} else {
+	}
+	if !exists {
 		d.SetId("")
 		return nil
 	}
 
-	d.Set("zone", client.Zone)
-
+	d.Set("zone", zone)
 	return nil
 }
 
 func resourceSakuraCloudMobileGatewayStaticRouteDelete(d *schema.ResourceData, meta interface{}) error {
-
-	client := getSacloudAPIClient(d, meta)
+	client, ctx, zone := getSacloudV2Client(d, meta)
+	mgwOp := sacloud.NewMobileGatewayOp(client)
 
 	mgwID := d.Get("mobile_gateway_id").(string)
+
 	sakuraMutexKV.Lock(mgwID)
 	defer sakuraMutexKV.Unlock(mgwID)
 
-	mgw, err := client.MobileGateway.Read(toSakuraCloudID(mgwID))
+	mgw, err := mgwOp.Read(ctx, zone, types.StringID(mgwID))
 	if err != nil {
-		return fmt.Errorf("Couldn't find SakuraCloud MobileGateway resource: %s", err)
+		if sacloud.IsNotFoundError(err) {
+			d.SetId("")
+			return nil
+		}
+		return fmt.Errorf("could not read SakuraCloud MobileGateway: %s", err)
 	}
 
-	staticRoute := expandMobileGatewayStaticRoute(d)
-	routes := []*sacloud.MGWStaticRoute{}
-	if mgw.Settings != nil && mgw.Settings.MobileGateway != nil && mgw.Settings.MobileGateway.StaticRoutes != nil {
-		for _, sr := range mgw.Settings.MobileGateway.StaticRoutes {
-			if sr.Prefix != staticRoute.Prefix {
-				routes = append(routes, sr)
-			}
+	src := expandMobileGatewayStaticRoute(d)
+	var routes []*sacloud.MobileGatewayStaticRoute
+	for _, sr := range mgw.Settings.StaticRoute {
+		if sr.Prefix != src.Prefix {
+			routes = append(routes, sr)
 		}
 	}
+	mgw.Settings.StaticRoute = routes
 
-	mgw.Settings.MobileGateway.StaticRoutes = routes
-	mgw, err = client.MobileGateway.UpdateSetting(toSakuraCloudID(mgwID), mgw)
+	mgw, err = mgwOp.UpdateSettings(ctx, zone, mgw.ID, &sacloud.MobileGatewayUpdateSettingsRequest{
+		Settings:     mgw.Settings,
+		SettingsHash: mgw.SettingsHash,
+	})
 	if err != nil {
-		return fmt.Errorf("Failed to update SakuraCloud MobileGateway StaticRoute: %s", err)
+		return fmt.Errorf("updating SakuraCloud MobileGateway is failed: %s", err)
 	}
-	_, err = client.MobileGateway.Config(toSakuraCloudID(mgwID))
-	if err != nil {
-		return fmt.Errorf("Couldn'd apply SakuraCloud MobileGateway config: %s", err)
-	}
-
 	return nil
 }
 
-func mgwStaticRouteIDHash(mgwID string, s *sacloud.MGWStaticRoute) string {
+func mgwStaticRouteIDHash(mgwID string, s *sacloud.MobileGatewayStaticRoute) string {
 	var buf bytes.Buffer
 	buf.WriteString(fmt.Sprintf("%s-", mgwID))
 	buf.WriteString(fmt.Sprintf("%s-", s.Prefix))
 	buf.WriteString(fmt.Sprintf("%s", s.NextHop))
 
 	return fmt.Sprintf("%d", hashcode.String(buf.String()))
-}
-
-func expandMobileGatewayStaticRoute(d resourceValueGettable) *sacloud.MGWStaticRoute {
-
-	var staticRoute = &sacloud.MGWStaticRoute{
-		Prefix:  d.Get("prefix").(string),
-		NextHop: d.Get("next_hop").(string),
-	}
-
-	return staticRoute
 }
