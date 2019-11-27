@@ -259,10 +259,12 @@ type SakuraCloudResourceList struct {
 }
 
 // Request APIリクエスト型
+//
+// FromとCountに0を指定するとページングが無効となる
 type Request struct {
 	SakuraCloudResources                        // さくらのクラウドリソース
-	From                 int                    `json:",omitempty"` // ページング FROM
-	Count                int                    `json:",omitempty"` // 取得件数
+	From                 int                    // ページング FROM
+	Count                int                    // 取得件数
 	Sort                 []string               `json:",omitempty"` // ソート
 	Filter               map[string]interface{} `json:",omitempty"` // フィルタ
 	Exclude              []string               `json:",omitempty"` // 除外する項目
