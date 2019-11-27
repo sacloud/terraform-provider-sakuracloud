@@ -1,13 +1,15 @@
 package sakuracloud
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"testing"
 
 	"github.com/hashicorp/terraform/helper/resource"
 	"github.com/hashicorp/terraform/terraform"
-	"github.com/sacloud/libsacloud/sacloud"
+	"github.com/sacloud/libsacloud/v2/sacloud"
+	"github.com/sacloud/libsacloud/v2/sacloud/types"
 )
 
 func TestAccResourceSakuraCloudNote(t *testing.T) {
@@ -43,7 +45,7 @@ func TestAccResourceSakuraCloudNote(t *testing.T) {
 						"sakuracloud_note.foobar", "content", "content_upd"),
 					resource.TestCheckResourceAttr(
 						"sakuracloud_note.foobar", "class", "shell"),
-					resource.TestCheckNoResourceAttr("sakuracloud_note.foobar", "icon_id"),
+					resource.TestCheckResourceAttr("sakuracloud_note.foobar", "icon_id", ""),
 				),
 			},
 		},
@@ -78,42 +80,42 @@ func testAccCheckSakuraCloudNoteExists(n string, note *sacloud.Note) resource.Te
 		rs, ok := s.RootModule().Resources[n]
 
 		if !ok {
-			return fmt.Errorf("Not found: %s", n)
+			return fmt.Errorf("not found: %s", n)
 		}
 
 		if rs.Primary.ID == "" {
-			return errors.New("No Note ID is set")
+			return errors.New("no Note ID is set")
 		}
 
 		client := testAccProvider.Meta().(*APIClient)
-		foundNote, err := client.Note.Read(toSakuraCloudID(rs.Primary.ID))
+		noteOp := sacloud.NewNoteOp(client)
 
+		foundNote, err := noteOp.Read(context.Background(), types.StringID(rs.Primary.ID))
 		if err != nil {
 			return err
 		}
 
-		if foundNote.ID != toSakuraCloudID(rs.Primary.ID) {
-			return errors.New("Note not found")
+		if foundNote.ID.String() != rs.Primary.ID {
+			return fmt.Errorf("not found Note: %s", rs.Primary.ID)
 		}
 
 		*note = *foundNote
-
 		return nil
 	}
 }
 
 func testAccCheckSakuraCloudNoteDestroy(s *terraform.State) error {
 	client := testAccProvider.Meta().(*APIClient)
+	noteOp := sacloud.NewNoteOp(client)
 
 	for _, rs := range s.RootModule().Resources {
 		if rs.Type != "sakuracloud_note" {
 			continue
 		}
 
-		_, err := client.Note.Read(toSakuraCloudID(rs.Primary.ID))
-
+		_, err := noteOp.Read(context.Background(), types.StringID(rs.Primary.ID))
 		if err == nil {
-			return errors.New("Note still exists")
+			return fmt.Errorf("still exists Note: %s", rs.Primary.ID)
 		}
 	}
 
@@ -122,9 +124,9 @@ func testAccCheckSakuraCloudNoteDestroy(s *terraform.State) error {
 
 const testAccCheckSakuraCloudNoteConfig_basic = `
 resource "sakuracloud_note" "foobar" {
-    name = "mynote"
-    content = "content"
-    icon_id = "${sakuracloud_icon.foobar.id}"
+  name    = "mynote"
+  content = "content"
+  icon_id = "${sakuracloud_icon.foobar.id}"
 }
 
 resource "sakuracloud_icon" "foobar" {
@@ -135,13 +137,13 @@ resource "sakuracloud_icon" "foobar" {
 
 const testAccCheckSakuraCloudNoteConfig_update = `
 resource "sakuracloud_note" "foobar" {
-    name = "mynote_upd"
-    content = "content_upd"
+  name    = "mynote_upd"
+  content = "content_upd"
 }`
 
 const testAccCheckSakuraCloudNoteConfig_yaml = `
 resource "sakuracloud_note" "foobar" {
-    name = "mynote"
-    content = "#cloud_init"
-    class = "yaml_cloud_config"
+  name = "mynote"
+  content = "#cloud_init"
+  class = "yaml_cloud_config"
 }`

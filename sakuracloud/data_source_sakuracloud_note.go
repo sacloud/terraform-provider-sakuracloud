@@ -65,16 +65,5 @@ func dataSourceSakuraCloudNoteRead(d *schema.ResourceData, meta interface{}) err
 
 	targets := res.Notes
 	d.SetId(targets[0].ID.String())
-	return setNoteV2ResourceData(ctx, d, client, targets[0])
-}
-
-func setNoteV2ResourceData(ctx context.Context, d *schema.ResourceData, client *APIClient, data *sacloud.Note) error {
-	return setResourceData(d, map[string]interface{}{
-		"name":        data.Name,
-		"content":     data.Content,
-		"class":       data.Class,
-		"icon_id":     data.IconID.String(),
-		"description": data.Description,
-		"tags":        data.Tags,
-	})
+	return setNoteResourceData(ctx, d, client, targets[0])
 }

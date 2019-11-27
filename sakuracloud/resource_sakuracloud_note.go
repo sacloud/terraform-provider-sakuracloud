@@ -1,12 +1,13 @@
 package sakuracloud
 
 import (
+	"context"
 	"fmt"
 
 	"github.com/hashicorp/terraform/helper/schema"
 	"github.com/hashicorp/terraform/helper/validation"
-	"github.com/sacloud/libsacloud/api"
-	"github.com/sacloud/libsacloud/sacloud"
+	"github.com/sacloud/libsacloud/v2/sacloud"
+	"github.com/sacloud/libsacloud/v2/sacloud/types"
 )
 
 func resourceSakuraCloudNote() *schema.Resource {
@@ -40,10 +41,10 @@ func resourceSakuraCloudNote() *schema.Resource {
 			"class": {
 				Type:     schema.TypeString,
 				Optional: true,
-				Default:  string(sacloud.NoteClassShell),
+				Default:  "shell",
 				ValidateFunc: validation.StringInSlice([]string{
-					string(sacloud.NoteClassShell),
-					string(sacloud.NoteClassYAMLCloudConfig),
+					"shell",
+					"yaml_cloud_config",
 				}, false),
 			},
 			"tags": {
@@ -57,117 +58,90 @@ func resourceSakuraCloudNote() *schema.Resource {
 }
 
 func resourceSakuraCloudNoteCreate(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*APIClient)
+	client, ctx, _ := getSacloudV2Client(d, meta)
+	noteOp := sacloud.NewNoteOp(client)
 
-	opts := client.Note.New()
-
-	opts.Name = d.Get("name").(string)
-	opts.Content = d.Get("content").(string)
-
-	if class, ok := d.GetOk("class"); ok {
-		s := class.(string)
-		if s == "" {
-			s = string(sacloud.NoteClassShell)
-		}
-		opts.SetClassByStr(s)
-	}
-
-	if iconID, ok := d.GetOk("icon_id"); ok {
-		opts.SetIconByID(toSakuraCloudID(iconID.(string)))
-	}
-	if rawTags, ok := d.GetOk("tags"); ok {
-		if rawTags != nil {
-			opts.Tags = expandTags(client, rawTags.([]interface{}))
-		}
-	}
-
-	note, err := client.Note.Create(opts)
+	note, err := noteOp.Create(ctx, &sacloud.NoteCreateRequest{
+		Name:    d.Get("name").(string),
+		Tags:    expandTagsV2(d.Get("tags").([]interface{})),
+		IconID:  expandSakuraCloudID(d, "icon_id"),
+		Class:   d.Get("class").(string),
+		Content: d.Get("content").(string),
+	})
 	if err != nil {
-		return fmt.Errorf("Failed to create SakuraCloud Note resource: %s", err)
+		return fmt.Errorf("creating SakuraCloud Note is failed: %s", err)
 	}
 
-	d.SetId(note.GetStrID())
+	d.SetId(note.ID.String())
 	return resourceSakuraCloudNoteRead(d, meta)
 }
 
 func resourceSakuraCloudNoteRead(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*APIClient)
-	note, err := client.Note.Read(toSakuraCloudID(d.Id()))
+	client, ctx, _ := getSacloudV2Client(d, meta)
+	noteOp := sacloud.NewNoteOp(client)
+
+	note, err := noteOp.Read(ctx, types.StringID(d.Id()))
 	if err != nil {
-		if sacloudErr, ok := err.(api.Error); ok && sacloudErr.ResponseCode() == 404 {
+		if sacloud.IsNotFoundError(err) {
 			d.SetId("")
 			return nil
 		}
-		return fmt.Errorf("Couldn't find SakuraCloud Note resource: %s", err)
+		return fmt.Errorf("could not read SakuraCloud Note: %s", err)
 	}
 
-	return setNoteResourceData(d, client, note)
+	return setNoteResourceData(ctx, d, client, note)
 }
 
 func resourceSakuraCloudNoteUpdate(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*APIClient)
+	client, ctx, _ := getSacloudV2Client(d, meta)
+	noteOp := sacloud.NewNoteOp(client)
 
-	note, err := client.Note.Read(toSakuraCloudID(d.Id()))
+	note, err := noteOp.Read(ctx, types.StringID(d.Id()))
 	if err != nil {
-		return fmt.Errorf("Couldn't find SakuraCloud Note resource: %s", err)
+		return fmt.Errorf("could not read SakuraCloud Note: %s", err)
 	}
 
-	if d.HasChange("name") {
-		note.Name = d.Get("name").(string)
-	}
-	if d.HasChange("class") {
-		if class, ok := d.GetOk("class"); ok {
-			s := class.(string)
-			if s == "" {
-				s = string(sacloud.NoteClassShell)
-			}
-			note.SetClassByStr(s)
-		}
-	}
-	if d.HasChange("content") {
-		note.Content = d.Get("content").(string)
-	}
-	if d.HasChange("icon_id") {
-		if iconID, ok := d.GetOk("icon_id"); ok {
-			note.SetIconByID(toSakuraCloudID(iconID.(string)))
-		} else {
-			note.ClearIcon()
-		}
-	}
-
-	if d.HasChange("tags") {
-		rawTags := d.Get("tags").([]interface{})
-		if rawTags != nil {
-			note.Tags = expandTags(client, rawTags)
-		} else {
-			note.Tags = expandTags(client, []interface{}{})
-		}
-	}
-
-	note, err = client.Note.Update(note.ID, note)
+	_, err = noteOp.Update(ctx, note.ID, &sacloud.NoteUpdateRequest{
+		Name:    d.Get("name").(string),
+		Tags:    expandTagsV2(d.Get("tags").([]interface{})),
+		IconID:  expandSakuraCloudID(d, "icon_id"),
+		Class:   d.Get("class").(string),
+		Content: d.Get("content").(string),
+	})
 	if err != nil {
-		return fmt.Errorf("Error updating SakuraCloud Note resource: %s", err)
+		return fmt.Errorf("updating SakuraCloud Note is failed: %s", err)
 	}
+
 	return resourceSakuraCloudNoteRead(d, meta)
 }
 
 func resourceSakuraCloudNoteDelete(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*APIClient)
+	client, ctx, _ := getSacloudV2Client(d, meta)
+	noteOp := sacloud.NewNoteOp(client)
 
-	_, err := client.Note.Delete(toSakuraCloudID(d.Id()))
+	note, err := noteOp.Read(ctx, types.StringID(d.Id()))
 	if err != nil {
-		return fmt.Errorf("Error deleting SakuraCloud Note resource: %s", err)
+		if sacloud.IsNotFoundError(err) {
+			d.SetId("")
+			return nil
+		}
+		return fmt.Errorf("could not read SakuraCloud Note: %s", err)
 	}
 
+	if err := noteOp.Delete(ctx, note.ID); err != nil {
+		return fmt.Errorf("deleting SakuraCloud Note is failed: %s", err)
+	}
 	return nil
 }
 
-func setNoteResourceData(d *schema.ResourceData, client *APIClient, data *sacloud.Note) error {
+func setNoteResourceData(ctx context.Context, d *schema.ResourceData, client *APIClient, data *sacloud.Note) error {
 	d.Set("name", data.Name)
 	d.Set("content", data.Content)
 	d.Set("class", data.Class)
-	d.Set("icon_id", data.GetIconStrID())
+	d.Set("icon_id", data.IconID.String())
 	d.Set("description", data.Description)
-	d.Set("tags", data.Tags)
+	if err := d.Set("tags", data.Tags); err != nil {
+		return err
+	}
 	return nil
 }
