@@ -6,8 +6,6 @@ import (
 
 	"github.com/hashicorp/terraform/helper/schema"
 	"github.com/sacloud/libsacloud/v2/sacloud"
-	"github.com/sacloud/libsacloud/v2/sacloud/types"
-	"github.com/sacloud/libsacloud/v2/utils/nfs"
 )
 
 func dataSourceSakuraCloudNFS() *schema.Resource {
@@ -92,43 +90,5 @@ func dataSourceSakuraCloudNFSRead(d *schema.ResourceData, meta interface{}) erro
 
 	targets := res.NFS
 	d.SetId(targets[0].ID.String())
-	return setNFSV2ResourceData(ctx, d, client, targets[0])
-}
-
-func setNFSV2ResourceData(ctx context.Context, d *schema.ResourceData, client *APIClient, data *sacloud.NFS) error {
-	if data.Availability.IsFailed() {
-		d.SetId("")
-		return fmt.Errorf("got unexpected state: NFS[%d].Availability is failed", data.ID)
-	}
-
-	var plan string
-	var size int
-
-	planInfo, err := nfs.GetPlanInfo(ctx, sacloud.NewNoteOp(client), data.PlanID)
-	if err != nil {
-		return err
-	}
-	switch planInfo.DiskPlanID {
-	case types.NFSPlans.HDD:
-		plan = "hdd"
-	case types.NFSPlans.SSD:
-		plan = "ssd"
-	}
-	size = int(planInfo.Size)
-
-	setPowerManageTimeoutValueToState(d)
-	d.Set("zone", client.Zone)
-	return setResourceData(d, map[string]interface{}{
-		"switch_id":     data.SwitchID.String(),
-		"ipaddress":     data.IPAddresses[0],
-		"nw_mask_len":   data.NetworkMaskLen,
-		"default_route": data.DefaultRoute,
-		"plan":          plan,
-		"size":          size,
-		"name":          data.Name,
-		"icon_id":       data.IconID.String(),
-		"description":   data.Description,
-		"tags":          data.Tags,
-	})
-
+	return setNFSResourceData(ctx, d, client, targets[0])
 }
