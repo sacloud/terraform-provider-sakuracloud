@@ -34,9 +34,9 @@ func TestAccSakuraCloudDataSourcePacketFilter_Basic(t *testing.T) {
 					resource.TestCheckResourceAttr("data.sakuracloud_packet_filter.foobar", "description", "description_test"),
 					resource.TestCheckResourceAttr("data.sakuracloud_packet_filter.foobar", "expressions.#", "2"),
 					resource.TestCheckResourceAttr("data.sakuracloud_packet_filter.foobar", "expressions.0.protocol", "tcp"),
-					resource.TestCheckResourceAttr("data.sakuracloud_packet_filter.foobar", "expressions.0.source_nw", "0.0.0.0"),
+					resource.TestCheckResourceAttr("data.sakuracloud_packet_filter.foobar", "expressions.0.source_network", "0.0.0.0"),
 					resource.TestCheckResourceAttr("data.sakuracloud_packet_filter.foobar", "expressions.0.source_port", "0-65535"),
-					resource.TestCheckResourceAttr("data.sakuracloud_packet_filter.foobar", "expressions.0.dest_port", "80"),
+					resource.TestCheckResourceAttr("data.sakuracloud_packet_filter.foobar", "expressions.0.destination_port", "80"),
 					resource.TestCheckResourceAttr("data.sakuracloud_packet_filter.foobar", "expressions.0.allow", "true"),
 				),
 			},
@@ -104,16 +104,16 @@ resource "sakuracloud_packet_filter" "foobar" {
   description = "description_test"
   expressions {
   	protocol = "tcp"
-  	source_nw = "0.0.0.0"
+  	source_network = "0.0.0.0"
   	source_port = "0-65535"
-  	dest_port = "80"
+  	destination_port = "80"
   	allow = true
   }
   expressions {
   	protocol = "udp"
-  	source_nw = "0.0.0.0"
+  	source_network = "0.0.0.0"
   	source_port = "0-65535"
-  	dest_port = "80"
+  	destination_port = "80"
   	allow = true
   }
 }`, name)
@@ -126,16 +126,16 @@ resource "sakuracloud_packet_filter" "foobar" {
   description = "description_test"
   expressions {
   	protocol = "tcp"
-  	source_nw = "0.0.0.0"
+  	source_network = "0.0.0.0"
   	source_port = "0-65535"
-  	dest_port = "80"
+  	destination_port = "80"
   	allow = true
   }
   expressions {
   	protocol = "udp"
-  	source_nw = "0.0.0.0"
+  	source_network = "0.0.0.0"
   	source_port = "0-65535"
-  	dest_port = "80"
+  	destination_port = "80"
   	allow = true
   }
 }

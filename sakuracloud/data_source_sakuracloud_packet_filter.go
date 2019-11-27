@@ -6,7 +6,6 @@ import (
 
 	"github.com/hashicorp/terraform/helper/schema"
 	"github.com/sacloud/libsacloud/v2/sacloud"
-	"github.com/sacloud/libsacloud/v2/sacloud/types"
 )
 
 func dataSourceSakuraCloudPacketFilter() *schema.Resource {
@@ -33,7 +32,7 @@ func dataSourceSakuraCloudPacketFilter() *schema.Resource {
 							Computed: true,
 						},
 
-						"source_nw": {
+						"source_network": {
 							Type:     schema.TypeString,
 							Computed: true,
 						},
@@ -42,7 +41,7 @@ func dataSourceSakuraCloudPacketFilter() *schema.Resource {
 							Type:     schema.TypeString,
 							Computed: true,
 						},
-						"dest_port": {
+						"destination_port": {
 							Type:     schema.TypeString,
 							Computed: true,
 						},
@@ -93,35 +92,5 @@ func dataSourceSakuraCloudPacketFilterRead(d *schema.ResourceData, meta interfac
 
 	targets := res.PacketFilters
 	d.SetId(targets[0].ID.String())
-	return setPacketFilterV2ResourceData(ctx, d, client, targets[0])
-}
-
-func setPacketFilterV2ResourceData(ctx context.Context, d *schema.ResourceData, client *APIClient, data *sacloud.PacketFilter) error {
-	var expressions []interface{}
-	if len(data.Expression) > 0 {
-		for _, exp := range data.Expression {
-			expression := map[string]interface{}{}
-			protocol := exp.Protocol
-			switch protocol {
-			case types.Protocols.TCP, types.Protocols.UDP:
-				expression["source_nw"] = exp.SourceNetwork
-				expression["source_port"] = exp.SourcePort
-				expression["dest_port"] = exp.DestinationPort
-			case types.Protocols.ICMP, types.Protocols.Fragment, types.Protocols.IP:
-				expression["source_nw"] = exp.SourceNetwork
-			}
-			expression["protocol"] = exp.Protocol
-			expression["allow"] = exp.Action.IsAllow()
-			expression["description"] = exp.Description
-
-			expressions = append(expressions, expression)
-		}
-	}
-
-	return setResourceData(d, map[string]interface{}{
-		"name":        data.Name,
-		"description": data.Description,
-		"expressions": expressions,
-		"zone":        getV2Zone(d, client),
-	})
+	return setPacketFilterResourceData(ctx, d, client, targets[0])
 }

@@ -143,7 +143,7 @@ func Provider() terraform.ResourceProvider {
 			"sakuracloud_note":                           resourceSakuraCloudNote(),
 			"sakuracloud_nfs":                            resourceSakuraCloudNFS(),
 			"sakuracloud_packet_filter":                  resourceSakuraCloudPacketFilter(),
-			"sakuracloud_packet_filter_rule":             resourceSakuraCloudPacketFilterRule(),
+			"sakuracloud_packet_filter_rules":            resourceSakuraCloudPacketFilterRules(),
 			"sakuracloud_proxylb":                        resourceSakuraCloudProxyLB(),
 			"sakuracloud_proxylb_acme":                   resourceSakuraCloudProxyLBACME(),
 			"sakuracloud_private_host":                   resourceSakuraCloudPrivateHost(),

@@ -600,9 +600,9 @@ resource "sakuracloud_packet_filter" "foobar2" {
     name = "mypacket_filter2"
     expressions {
     	protocol = "tcp"
-    	source_nw = "0.0.0.0"
+    	source_network = "0.0.0.0"
     	source_port = "0-65535"
-    	dest_port = "80"
+    	destination_port = "80"
     	allow = true
     }
 }
@@ -621,9 +621,9 @@ resource "sakuracloud_packet_filter" "foobar1" {
     description = "PacketFilter from TerraForm for SAKURA CLOUD"
     expressions {
     	protocol = "tcp"
-    	source_nw = "0.0.0.0"
+    	source_network = "0.0.0.0"
     	source_port = "0-65535"
-    	dest_port = "80"
+    	destination_port = "80"
     	allow = true
     }
 }
@@ -632,9 +632,9 @@ resource "sakuracloud_packet_filter" "foobar2" {
     description = "PacketFilter from TerraForm for SAKURA CLOUD"
     expressions {
     	protocol = "tcp"
-    	source_nw = "0.0.0.0"
+    	source_network = "0.0.0.0"
     	source_port = "0-65535"
-    	dest_port = "80"
+    	destination_port = "80"
     	allow = true
     }
 }
@@ -654,9 +654,9 @@ resource "sakuracloud_packet_filter" "foobar1" {
     description = "PacketFilter from TerraForm for SAKURA CLOUD"
     expressions {
     	protocol = "udp"
-    	source_nw = "0.0.0.0"
+    	source_network = "0.0.0.0"
     	source_port = "0-65535"
-    	dest_port = "80"
+    	destination_port = "80"
     	allow = true
     }
 }
@@ -665,9 +665,9 @@ resource "sakuracloud_packet_filter" "foobar2" {
     description = "PacketFilter from TerraForm for SAKURA CLOUD"
     expressions {
     	protocol = "udp"
-    	source_nw = "0.0.0.0"
+    	source_network = "0.0.0.0"
     	source_port = "0-65535"
-    	dest_port = "80"
+    	destination_port = "80"
     	allow = true
     }
 }
