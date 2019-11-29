@@ -962,7 +962,7 @@ type serverConnectedNIC interface {
 	GetSwitchScope() types.EScope
 }
 
-func reconcileServerInterfaceConnection(ctx context.Context, client *APIClient, zone string, nicConf string, nicIndex int, server *v2.Server) error {
+func reconcileServerInterfaceConnection(ctx context.Context, client *APIClient, zone, nicConf string, nicIndex int, server *v2.Server) error {
 	interfaceOp := v2.NewInterfaceOp(client)
 
 	var nic serverConnectedNIC
