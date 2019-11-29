@@ -150,7 +150,6 @@ func Provider() terraform.ResourceProvider {
 			"sakuracloud_sim":                            resourceSakuraCloudSIM(),
 			"sakuracloud_simple_monitor":                 resourceSakuraCloudSimpleMonitor(),
 			"sakuracloud_server":                         resourceSakuraCloudServer(),
-			"sakuracloud_server_connector":               resourceSakuraCloudServerConnector(),
 			"sakuracloud_ssh_key":                        resourceSakuraCloudSSHKey(),
 			"sakuracloud_ssh_key_gen":                    resourceSakuraCloudSSHKeyGen(),
 			"sakuracloud_subnet":                         resourceSakuraCloudSubnet(),
