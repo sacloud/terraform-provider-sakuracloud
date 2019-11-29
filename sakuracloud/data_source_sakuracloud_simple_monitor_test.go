@@ -114,9 +114,9 @@ func testAccCheckSakuraCloudDataSourceSimpleMonitorBase(target string) string {
 	return fmt.Sprintf(`
 resource "sakuracloud_simple_monitor" "foobar" {
   target = "%s"
+  delay_loop = 60
   health_check {
       protocol = "http"
-      delay_loop = 60
       path = "/"
       status = 200
       host_header = "sakuracloud.com"
