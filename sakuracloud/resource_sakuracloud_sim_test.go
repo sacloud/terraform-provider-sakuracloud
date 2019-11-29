@@ -1,6 +1,7 @@
 package sakuracloud
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"os"
@@ -8,7 +9,8 @@ import (
 
 	"github.com/hashicorp/terraform/helper/resource"
 	"github.com/hashicorp/terraform/terraform"
-	"github.com/sacloud/libsacloud/sacloud"
+	"github.com/sacloud/libsacloud/v2/sacloud"
+	"github.com/sacloud/libsacloud/v2/sacloud/types"
 )
 
 const (
@@ -100,7 +102,7 @@ func TestAccResourceSakuraCloudSIM(t *testing.T) {
 						"sakuracloud_sim.foobar", "enabled", "false"),
 					resource.TestCheckResourceAttr(
 						"sakuracloud_sim.foobar", "ipaddress", "192.168.100.2"),
-					resource.TestCheckNoResourceAttr("sakuracloud_sim.foobar", "icon_id"),
+					resource.TestCheckResourceAttr("sakuracloud_sim.foobar", "icon_id", ""),
 					resource.TestCheckResourceAttrPair(
 						"sakuracloud_sim.foobar", "id",
 						"sakuracloud_mobile_gateway.mgw", "sim_ids.0",
@@ -116,7 +118,7 @@ func TestAccResourceSakuraCloudSIM(t *testing.T) {
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckSakuraCloudSIMExists("sakuracloud_sim.foobar", &sim),
 					resource.TestCheckResourceAttr(
-						"sakuracloud_mobile_gateway.mgw", "sim_ids.0", ""),
+						"sakuracloud_mobile_gateway.mgw", "sim_ids.#", "0"),
 				),
 			},
 		},
@@ -128,43 +130,41 @@ func testAccCheckSakuraCloudSIMExists(n string, sim *sacloud.SIM) resource.TestC
 		rs, ok := s.RootModule().Resources[n]
 
 		if !ok {
-			return fmt.Errorf("Not found: %s", n)
+			return fmt.Errorf("not found: %s", n)
 		}
 
 		if rs.Primary.ID == "" {
-			return errors.New("No SIM ID is set")
+			return errors.New("no SIM ID is set")
 		}
 
 		client := testAccProvider.Meta().(*APIClient)
+		simOp := sacloud.NewSIMOp(client)
 
-		foundSIM, err := client.SIM.Read(toSakuraCloudID(rs.Primary.ID))
-
+		foundSIM, err := simOp.Read(context.Background(), types.StringID(rs.Primary.ID))
 		if err != nil {
 			return err
 		}
 
-		if foundSIM.ID != toSakuraCloudID(rs.Primary.ID) {
-			return errors.New("Record not found")
+		if foundSIM.ID.String() != rs.Primary.ID {
+			return fmt.Errorf("not found SIM: %s", rs.Primary.ID)
 		}
-
 		*sim = *foundSIM
-
 		return nil
 	}
 }
 
 func testAccCheckSakuraCloudSIMDestroy(s *terraform.State) error {
 	client := testAccProvider.Meta().(*APIClient)
+	simOp := sacloud.NewSIMOp(client)
 
 	for _, rs := range s.RootModule().Resources {
 		if rs.Type != "sakuracloud_sim" {
 			continue
 		}
 
-		_, err := client.SIM.Read(toSakuraCloudID(rs.Primary.ID))
-
+		_, err := simOp.Read(context.Background(), types.StringID(rs.Primary.ID))
 		if err == nil {
-			return errors.New("SIM still exists")
+			return fmt.Errorf("still exists SIM: %s", rs.Primary.ID)
 		}
 	}
 
@@ -173,22 +173,24 @@ func testAccCheckSakuraCloudSIMDestroy(s *terraform.State) error {
 
 var testAccCheckSakuraCloudSIMConfig_basic = `
 resource sakuracloud_mobile_gateway "mgw" {
-    name = "name"
+  name = "name"
+  zone = "is1b"
 }
 resource "sakuracloud_sim" "foobar" {
-    name = "name_before"
-    description = "description_before"
-    tags = ["hoge1" , "hoge2"]
-    icon_id = "${sakuracloud_icon.foobar.id}"
+  name = "name_before"
+  description = "description_before"
+  tags = ["hoge1" , "hoge2"]
+  icon_id = "${sakuracloud_icon.foobar.id}"
 
-    iccid = "%s"
-    passcode = "%s"
-    imei = "%s"
-    carrier = ["softbank"]
+  iccid = "%s"
+  passcode = "%s"
+  imei = "%s"
+  carrier = ["softbank"]
 
-    enabled = true
-    mobile_gateway_id = "${sakuracloud_mobile_gateway.mgw.id}"
-    ipaddress = "192.168.100.1"
+  enabled = true
+  mobile_gateway_id = "${sakuracloud_mobile_gateway.mgw.id}"
+  mobile_gateway_zone = "is1b"
+  ipaddress = "192.168.100.1"
 }
 
 resource "sakuracloud_icon" "foobar" {
@@ -198,33 +200,36 @@ resource "sakuracloud_icon" "foobar" {
 
 var testAccCheckSakuraCloudSIMConfig_update = `
 resource sakuracloud_mobile_gateway "mgw" {
-    name = "name"
+  name = "name"
+  zone = "is1b"
 }
 resource "sakuracloud_sim" "foobar" {
-    name = "name_after"
-    description = "description_after"
-    tags = ["hoge1_after" , "hoge2_after"]
+  name = "name_after"
+  description = "description_after"
+  tags = ["hoge1_after" , "hoge2_after"]
 
-    iccid = "%s"
-    passcode = "%s"
-    imei = "%s"
+  iccid = "%s"
+  passcode = "%s"
+  imei = "%s"
 
-    carrier = ["kddi"]
+  carrier = ["kddi"]
 
-    enabled = false
-    mobile_gateway_id = "${sakuracloud_mobile_gateway.mgw.id}"
-    ipaddress = "192.168.100.2"
+  enabled = false
+  mobile_gateway_id = "${sakuracloud_mobile_gateway.mgw.id}"
+  mobile_gateway_zone = "is1b"
+  ipaddress = "192.168.100.2"
 }`
 
 var testAccCheckSakuraCloudSIMConfig_disconnect = `
 resource sakuracloud_mobile_gateway "mgw" {
-    name = "name"
+  name = "name"
+  zone = "is1b"
 }
 resource "sakuracloud_sim" "foobar" {
-    name = "name_disconnect"
-    iccid = "%s"
-    passcode = "%s"
-    imei = "%s"
-    carrier = ["softbank"]
-    enabled = false
+  name = "name_disconnect"
+  iccid = "%s"
+  passcode = "%s"
+  imei = "%s"
+  carrier = ["softbank"]
+  enabled = false
 }`

@@ -512,7 +512,7 @@ func setMobileGatewayResourceData(ctx context.Context, d *schema.ResourceData, c
 	d.Set("internet_connection", data.Settings.InternetConnectionEnabled.Bool())
 	d.Set("inter_device_communication", data.Settings.InterDeviceCommunicationEnabled.Bool())
 
-	if len(data.Interfaces) > 0 && !data.Interfaces[1].SwitchID.IsEmpty() {
+	if len(data.Interfaces) > 1 && !data.Interfaces[1].SwitchID.IsEmpty() {
 		d.Set("switch_id", data.Interfaces[1].SwitchID.String())
 		d.Set("private_ipaddress", data.Settings.Interfaces[0].IPAddress[0])
 		d.Set("private_nw_mask_len", data.Settings.Interfaces[0].NetworkMaskLen)
