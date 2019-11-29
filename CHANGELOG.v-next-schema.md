@@ -1,11 +1,13 @@
 # CHANGELOG: v-nextでのスキーマ変更
 
-- プロバイダー
+## プロバイダー
 
   - `trace`属性をboolからstringへデータ型変更
   - 環境変数`SAKURACLOUD_TRACE_MODE`から`SAKURACLOUD_TRACE`へ名称変更
   - `fake_mode`属性の追加
   - `fake_store_path`属性の追加
+
+## データソース
 
 - データソース共通
 
@@ -51,3 +53,10 @@ data sakuracoud_server "example" {
     
   - サイト間VPNの詳細情報属性を除去
   
+## リソース
+
+- PacketFilterルール
+
+  - `sakuracloud_packet_filter_rule`を`sakuracloud_packet_filter_rules`に変更  
+  これまでルールごとに1リソースだったものが複数のリソースを保持するようになった
+    
