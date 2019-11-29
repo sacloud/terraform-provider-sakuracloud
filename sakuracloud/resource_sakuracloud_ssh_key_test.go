@@ -1,16 +1,20 @@
 package sakuracloud
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"testing"
 
 	"github.com/hashicorp/terraform/helper/resource"
 	"github.com/hashicorp/terraform/terraform"
-	"github.com/sacloud/libsacloud/sacloud"
+	"github.com/sacloud/libsacloud/v2/sacloud"
+	"github.com/sacloud/libsacloud/v2/sacloud/types"
 )
 
 func TestAccResourceSakuraCloudSSHKey(t *testing.T) {
+	skipIfFakeModeEnabled(t)
+
 	var ssh_key sacloud.SSHKey
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
@@ -50,42 +54,42 @@ func testAccCheckSakuraCloudSSHKeyExists(n string, ssh_key *sacloud.SSHKey) reso
 		rs, ok := s.RootModule().Resources[n]
 
 		if !ok {
-			return fmt.Errorf("Not found: %s", n)
+			return fmt.Errorf("not found: %s", n)
 		}
 
 		if rs.Primary.ID == "" {
-			return errors.New("No SSHKey ID is set")
+			return errors.New("no SSHKey ID is set")
 		}
 
 		client := testAccProvider.Meta().(*APIClient)
-		foundSSHKey, err := client.SSHKey.Read(toSakuraCloudID(rs.Primary.ID))
+		keyOp := sacloud.NewSSHKeyOp(client)
 
+		foundSSHKey, err := keyOp.Read(context.Background(), types.StringID(rs.Primary.ID))
 		if err != nil {
 			return err
 		}
 
-		if foundSSHKey.ID != toSakuraCloudID(rs.Primary.ID) {
-			return errors.New("SSHKey not found")
+		if foundSSHKey.ID.String() != rs.Primary.ID {
+			return fmt.Errorf("not found SSHKey: %s", rs.Primary.ID)
 		}
 
 		*ssh_key = *foundSSHKey
-
 		return nil
 	}
 }
 
 func testAccCheckSakuraCloudSSHKeyDestroy(s *terraform.State) error {
 	client := testAccProvider.Meta().(*APIClient)
+	keyOp := sacloud.NewSSHKeyOp(client)
 
 	for _, rs := range s.RootModule().Resources {
 		if rs.Type != "sakuracloud_ssh_key" {
 			continue
 		}
 
-		_, err := client.SSHKey.Read(toSakuraCloudID(rs.Primary.ID))
-
+		_, err := keyOp.Read(context.Background(), types.StringID(rs.Primary.ID))
 		if err == nil {
-			return errors.New("SSHKey still exists")
+			return fmt.Errorf("still exists SSHKey: %s", rs.Primary.ID)
 		}
 	}
 
@@ -94,16 +98,16 @@ func testAccCheckSakuraCloudSSHKeyDestroy(s *terraform.State) error {
 
 var testAccCheckSakuraCloudSSHKeyConfig_basic = fmt.Sprintf(`
 resource "sakuracloud_ssh_key" "foobar" {
-    name = "mykey"
-    public_key = "%s"
-    description = "SSHKey from TerraForm for SAKURA CLOUD"
+  name        = "mykey"
+  public_key  = "%s"
+  description = "SSHKey from TerraForm for SAKURA CLOUD"
 }`, testAccPublicKey)
 
 var testAccCheckSakuraCloudSSHKeyConfig_update = fmt.Sprintf(`
 resource "sakuracloud_ssh_key" "foobar" {
-    name = "mykey"
-    public_key = "%s"
-    description = "SSHKey from TerraForm for SAKURA CLOUD"
+  name        = "mykey"
+  public_key  = "%s"
+  description = "SSHKey from TerraForm for SAKURA CLOUD"
 }`, testAccPublicKeyUpd)
 
 const testAccPublicKey = `ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDq94EJW1+KAQLHNLC1KKdJq2aTIg/FSYeuKBiA7HWsCeG384uPo9afBS/+flXZfYzLlphQuS3HNC94CqlpNny3h7UdeUXcM0NOlhUBEuY5asVi60LnTAFCemlySXl0lQNKN/ly6oTVVe5auOFKl+wmRzJWETM71wg6908+n4M8BLzJcxoHWJ6m4KLXAS7WMbzsB+KyDQ/vp84hsvfhdgUj5NLt/WrVtdSY7CguNkV/P/ws7Fhi86qxu2V34e9/blZYTNqISTkwRriYYT0aCBB2vaN56pDcVzt+Wz41dXKymyheuTMPRUljFUfjIzgH5/vWSHpUEWDKTOwfjsCD6rv1`

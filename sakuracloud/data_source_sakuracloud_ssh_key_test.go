@@ -1,9 +1,13 @@
 package sakuracloud
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"testing"
+
+	"github.com/sacloud/libsacloud/v2/sacloud"
+	"github.com/sacloud/libsacloud/v2/sacloud/types"
 
 	"github.com/hashicorp/terraform/helper/acctest"
 	"github.com/hashicorp/terraform/helper/resource"
@@ -51,7 +55,7 @@ func testAccCheckSakuraCloudSSHKeyDataSourceID(n string) resource.TestCheckFunc 
 	return func(s *terraform.State) error {
 		rs, ok := s.RootModule().Resources[n]
 		if !ok {
-			return fmt.Errorf("Can't find SSHKey data source: %s", n)
+			return fmt.Errorf("could not find SSHKey: %s", n)
 		}
 
 		if rs.Primary.ID == "" {
@@ -73,6 +77,7 @@ func testAccCheckSakuraCloudSSHKeyDataSourceNotExists(n string) resource.TestChe
 
 func testAccCheckSakuraCloudSSHKeyDataSourceDestroy(s *terraform.State) error {
 	client := testAccProvider.Meta().(*APIClient)
+	sshKeyOp := sacloud.NewSSHKeyOp(client)
 
 	for _, rs := range s.RootModule().Resources {
 		if rs.Type != "sakuracloud_ssh_key" {
@@ -83,10 +88,9 @@ func testAccCheckSakuraCloudSSHKeyDataSourceDestroy(s *terraform.State) error {
 			continue
 		}
 
-		_, err := client.SSHKey.Read(toSakuraCloudID(rs.Primary.ID))
-
+		_, err := sshKeyOp.Read(context.Background(), types.StringID(rs.Primary.ID))
 		if err == nil {
-			return errors.New("SSHKey still exists")
+			return fmt.Errorf("still exists SSHKey: %s", rs.Primary.ID)
 		}
 	}
 

@@ -65,3 +65,9 @@ func testAccPreCheck(t *testing.T) {
 		os.Setenv("SAKURACLOUD_RATE_LIMIT", testDefaultAPIRateLimit)
 	}
 }
+
+func skipIfFakeModeEnabled(t *testing.T) {
+	if fakeMode := os.Getenv("FAKE_MODE"); fakeMode != "" {
+		t.Skip("This test runs only without FAKE_MODE environment variables")
+	}
+}
