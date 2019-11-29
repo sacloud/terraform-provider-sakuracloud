@@ -1,12 +1,13 @@
 package sakuracloud
 
 import (
+	"context"
 	"fmt"
 
 	"github.com/hashicorp/terraform/helper/schema"
 	"github.com/hashicorp/terraform/helper/validation"
-	"github.com/sacloud/libsacloud/api"
-	"github.com/sacloud/libsacloud/sacloud"
+	"github.com/sacloud/libsacloud/v2/sacloud"
+	"github.com/sacloud/libsacloud/v2/sacloud/types"
 )
 
 func resourceSakuraCloudProxyLB() *schema.Resource {
@@ -27,15 +28,15 @@ func resourceSakuraCloudProxyLB() *schema.Resource {
 			"plan": {
 				Type:     schema.TypeInt,
 				Optional: true,
-				Default:  1000,
+				Default:  100,
 				ValidateFunc: validation.IntInSlice([]int{
-					int(sacloud.ProxyLBPlan100),
-					int(sacloud.ProxyLBPlan500),
-					int(sacloud.ProxyLBPlan1000),
-					int(sacloud.ProxyLBPlan5000),
-					int(sacloud.ProxyLBPlan10000),
-					int(sacloud.ProxyLBPlan50000),
-					int(sacloud.ProxyLBPlan100000),
+					int(types.ProxyLBPlans.CPS100),
+					int(types.ProxyLBPlans.CPS500),
+					int(types.ProxyLBPlans.CPS1000),
+					int(types.ProxyLBPlans.CPS5000),
+					int(types.ProxyLBPlans.CPS10000),
+					int(types.ProxyLBPlans.CPS50000),
+					int(types.ProxyLBPlans.CPS100000),
 				}),
 			},
 			"vip_failover": {
@@ -47,6 +48,21 @@ func resourceSakuraCloudProxyLB() *schema.Resource {
 				Type:     schema.TypeBool,
 				Optional: true,
 			},
+			"timeout": {
+				Type:     schema.TypeInt,
+				Default:  10,
+				Optional: true,
+			},
+			"region": {
+				Type:     schema.TypeString,
+				Optional: true,
+				Default:  types.ProxyLBRegions.IS1.String(),
+				ValidateFunc: validation.StringInSlice([]string{
+					types.ProxyLBRegions.IS1.String(),
+					types.ProxyLBRegions.TK1.String(),
+				}, false),
+				ForceNew: true,
+			},
 			"bind_ports": {
 				Type:     schema.TypeList,
 				Required: true,
@@ -55,9 +71,13 @@ func resourceSakuraCloudProxyLB() *schema.Resource {
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
 						"proxy_mode": {
-							Type:         schema.TypeString,
-							Required:     true,
-							ValidateFunc: validation.StringInSlice(sacloud.AllowProxyLBBindModes, false),
+							Type:     schema.TypeString,
+							Required: true,
+							ValidateFunc: validation.StringInSlice([]string{
+								types.ProxyLBProxyModes.TCP.String(),
+								types.ProxyLBProxyModes.HTTP.String(),
+								types.ProxyLBProxyModes.HTTPS.String(),
+							}, false),
 						},
 						"port": {
 							Type:     schema.TypeInt,
@@ -99,9 +119,12 @@ func resourceSakuraCloudProxyLB() *schema.Resource {
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
 						"protocol": {
-							Type:         schema.TypeString,
-							Required:     true,
-							ValidateFunc: validation.StringInSlice(sacloud.AllowProxyLBHealthCheckProtocols, false),
+							Type:     schema.TypeString,
+							Required: true,
+							ValidateFunc: validation.StringInSlice([]string{
+								types.ProxyLBProtocols.HTTP.String(),
+								types.ProxyLBProtocols.TCP.String(),
+							}, false),
 						},
 						"delay_loop": {
 							Type:         schema.TypeInt,
@@ -239,372 +262,188 @@ func resourceSakuraCloudProxyLB() *schema.Resource {
 }
 
 func resourceSakuraCloudProxyLBCreate(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*APIClient)
+	client, ctx, _ := getSacloudV2Client(d, meta)
+	proxyLBOp := sacloud.NewProxyLBOp(client)
 
-	opts := client.ProxyLB.New(d.Get("name").(string))
-
-	opts.SetPlan(sacloud.ProxyLBPlan(d.Get("plan").(int)))
-
-	var failOver bool
-	if f, ok := d.GetOk("vip_failover"); ok {
-		failOver = f.(bool)
-	}
-	opts.Status = &sacloud.ProxyLBStatus{
-		UseVIPFailover: failOver,
-	}
-
-	var stickySession bool
-	if f, ok := d.GetOk("sticky_session"); ok {
-		stickySession = f.(bool)
-	}
-	if stickySession {
-		opts.Settings.ProxyLB.StickySession = sacloud.ProxyLBSessionSetting{
-			Enabled: true,
-			Method:  sacloud.ProxyLBStickySessionDefaultMethod,
-		}
-	}
-
-	if bindPorts, ok := getListFromResource(d, "bind_ports"); ok {
-		for _, bindPort := range bindPorts {
-			values := mapToResourceData(bindPort.(map[string]interface{}))
-			headers := []*sacloud.ProxyLBResponseHeader{}
-			if rawHeaders, ok := values.GetOk("response_header"); ok {
-				for _, rawHeader := range rawHeaders.([]interface{}) {
-					if rawHeader == nil {
-						continue
-					}
-					v := rawHeader.(map[string]interface{})
-					headers = append(headers, &sacloud.ProxyLBResponseHeader{
-						Header: v["header"].(string),
-						Value:  v["value"].(string),
-					})
-				}
-			}
-
-			opts.AddBindPort(
-				values.Get("proxy_mode").(string),
-				values.Get("port").(int),
-				values.Get("redirect_to_https").(bool),
-				values.Get("support_http2").(bool),
-				headers,
-			)
-		}
-	}
-
-	if healthChecks, ok := getListFromResource(d, "health_check"); ok {
-		values := mapToResourceData(healthChecks[0].(map[string]interface{}))
-		protocol := values.Get("protocol").(string)
-		switch protocol {
-		case "http":
-			opts.SetHTTPHealthCheck(
-				values.Get("host_header").(string),
-				values.Get("path").(string),
-				values.Get("delay_loop").(int),
-			)
-		case "tcp":
-			opts.SetTCPHealthCheck(
-				values.Get("delay_loop").(int),
-			)
-		default:
-			return fmt.Errorf("Invalid Healthcheck Protocol: %v", protocol)
-		}
-	}
-
-	if sorryServers, ok := getListFromResource(d, "sorry_server"); ok && len(sorryServers) > 0 {
-		values := mapToResourceData(sorryServers[0].(map[string]interface{}))
-		opts.SetSorryServer(
-			values.Get("ipaddress").(string),
-			values.Get("port").(int),
-		)
-	}
-
-	if iconID, ok := d.GetOk("icon_id"); ok {
-		opts.SetIconByID(toSakuraCloudID(iconID.(string)))
-	}
-	if description, ok := d.GetOk("description"); ok {
-		opts.Description = description.(string)
-	}
-	rawTags := d.Get("tags").([]interface{})
-	if rawTags != nil {
-		opts.Tags = expandTags(client, rawTags)
-	}
-
-	if servers, ok := getListFromResource(d, "servers"); ok && len(servers) > 0 {
-		for _, server := range servers {
-			values := mapToResourceData(server.(map[string]interface{}))
-			opts.Settings.ProxyLB.Servers = append(opts.Settings.ProxyLB.Servers, sacloud.ProxyLBServer{
-				IPAddress: values.Get("ipaddress").(string),
-				Port:      values.Get("port").(int),
-				Enabled:   values.Get("enabled").(bool),
-			})
-		}
-	}
-
-	proxyLB, err := client.ProxyLB.Create(opts)
+	proxyLB, err := proxyLBOp.Create(ctx, &sacloud.ProxyLBCreateRequest{
+		Plan:           types.EProxyLBPlan(d.Get("plan").(int)),
+		HealthCheck:    expandProxyLBHealthCheck(d),
+		SorryServer:    expandProxyLBSorryServer(d),
+		BindPorts:      expandProxyLBBindPorts(d),
+		Servers:        expandProxyLBServers(d),
+		StickySession:  expandProxyLBStickySession(d),
+		Timeout:        expandProxyLBTimeout(d),
+		UseVIPFailover: d.Get("vip_failover").(bool),
+		Region:         types.EProxyLBRegion(d.Get("region").(string)),
+		Name:           d.Get("name").(string),
+		Description:    d.Get("description").(string),
+		Tags:           expandTagsV2(d.Get("tags").([]interface{})),
+		IconID:         expandSakuraCloudID(d, "icon_id"),
+	})
 	if err != nil {
-		return fmt.Errorf("Failed to create SakuraCloud ProxyLB resource: %s", err)
+		return fmt.Errorf("creating SakuraCloud ProxyLB is failed: %s", err)
 	}
 
-	// set cert
-	if certs, ok := getListFromResource(d, "certificate"); ok && len(certs) > 0 {
-		values := mapToResourceData(certs[0].(map[string]interface{}))
-		cert := &sacloud.ProxyLBCertificates{
-			ServerCertificate:       values.Get("server_cert").(string),
-			IntermediateCertificate: values.Get("intermediate_cert").(string),
-			PrivateKey:              values.Get("private_key").(string),
-		}
-
-		if rawAdditionalCerts, ok := getListFromResource(values, "additional_certificates"); ok && len(rawAdditionalCerts) > 0 {
-			for _, rawCert := range rawAdditionalCerts {
-				values := mapToResourceData(rawCert.(map[string]interface{}))
-				cert.AddAdditionalCert(
-					values.Get("server_cert").(string),
-					values.Get("intermediate_cert").(string),
-					values.Get("private_key").(string),
-				)
-			}
-		}
-
-		if _, err := client.ProxyLB.SetCertificates(proxyLB.ID, cert); err != nil {
-			return fmt.Errorf("Failed to set SakuraCloud ProxyLB certificates: %s", err)
+	certs := expandProxyLBCerts(d)
+	if certs != nil {
+		_, err := proxyLBOp.SetCertificates(ctx, proxyLB.ID, &sacloud.ProxyLBSetCertificatesRequest{
+			ServerCertificate:       certs.ServerCertificate,
+			IntermediateCertificate: certs.IntermediateCertificate,
+			PrivateKey:              certs.PrivateKey,
+			AdditionalCerts:         certs.AdditionalCerts,
+		})
+		if err != nil {
+			return fmt.Errorf("setting ProxyLB Certificates is failed: %s", err)
 		}
 	}
 
-	d.SetId(proxyLB.GetStrID())
+	d.SetId(proxyLB.ID.String())
 	return resourceSakuraCloudProxyLBRead(d, meta)
 }
 
 func resourceSakuraCloudProxyLBRead(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*APIClient)
+	client, ctx, _ := getSacloudV2Client(d, meta)
+	proxyLBOp := sacloud.NewProxyLBOp(client)
 
-	proxyLB, err := client.ProxyLB.Read(toSakuraCloudID(d.Id()))
+	proxyLB, err := proxyLBOp.Read(ctx, types.StringID(d.Id()))
 	if err != nil {
-		if sacloudErr, ok := err.(api.Error); ok && sacloudErr.ResponseCode() == 404 {
+		if sacloud.IsNotFoundError(err) {
 			d.SetId("")
 			return nil
 		}
-		return fmt.Errorf("Couldn't find SakuraCloud ProxyLB resource: %s", err)
+		return fmt.Errorf("could not read SakuraCloud ProxyLB: %s", err)
 	}
 
-	return setProxyLBResourceData(d, client, proxyLB)
+	return setProxyLBResourceData(ctx, d, client, proxyLB)
 }
 
 func resourceSakuraCloudProxyLBUpdate(d *schema.ResourceData, meta interface{}) error {
+	client, ctx, _ := getSacloudV2Client(d, meta)
+	proxyLBOp := sacloud.NewProxyLBOp(client)
 
-	client := meta.(*APIClient)
 	sakuraMutexKV.Lock(d.Id())
 	defer sakuraMutexKV.Unlock(d.Id())
 
-	proxyLB, err := client.ProxyLB.Read(toSakuraCloudID(d.Id()))
+	proxyLB, err := proxyLBOp.Read(ctx, types.StringID(d.Id()))
 	if err != nil {
-		return fmt.Errorf("Couldn't find SakuraCloud ProxyLB resource: %s", err)
+		return fmt.Errorf("could not read SakuraCloud ProxyLB: %s", err)
+	}
+
+	proxyLB, err = proxyLBOp.Update(ctx, proxyLB.ID, &sacloud.ProxyLBUpdateRequest{
+		HealthCheck:   expandProxyLBHealthCheck(d),
+		SorryServer:   expandProxyLBSorryServer(d),
+		BindPorts:     expandProxyLBBindPorts(d),
+		Servers:       expandProxyLBServers(d),
+		StickySession: expandProxyLBStickySession(d),
+		Timeout:       expandProxyLBTimeout(d),
+		Name:          d.Get("name").(string),
+		Description:   d.Get("description").(string),
+		Tags:          expandTagsV2(d.Get("tags").([]interface{})),
+		IconID:        expandSakuraCloudID(d, "icon_id"),
+	})
+	if err != nil {
+		fmt.Errorf("updating SakuraCloud ProxyLB is failed: %s", err)
 	}
 
 	if d.HasChange("plan") {
-		if rawPlan, ok := d.GetOk("plan"); ok {
-			plan := rawPlan.(int)
-			if plan > 0 {
-				upd, err := client.ProxyLB.ChangePlan(proxyLB.ID, sacloud.ProxyLBPlan(plan))
-				if err != nil {
-					return fmt.Errorf("Couldn't find SakuraCloud ProxyLB resource: %s", err)
-				}
-
-				// update ID
-				proxyLB = upd
-				d.SetId(proxyLB.GetStrID())
-			}
+		newPlan := types.EProxyLBPlan(d.Get("plan").(int))
+		upd, err := proxyLBOp.ChangePlan(ctx, proxyLB.ID, &sacloud.ProxyLBChangePlanRequest{Plan: newPlan})
+		if err != nil {
+			return fmt.Errorf("changing ProxyLB plan is failed: %s", err)
 		}
+
+		// update ID
+		proxyLB = upd
+		d.SetId(proxyLB.ID.String())
 	}
 
-	if d.HasChange("name") {
-		if name, ok := d.GetOk("name"); ok {
-			proxyLB.Name = name.(string)
-		} else {
-			proxyLB.Name = ""
-		}
-	}
-
-	if d.HasChange("sticky_session") {
-		var stickySession bool
-		if f, ok := d.GetOk("sticky_session"); ok {
-			stickySession = f.(bool)
-		}
-		if stickySession {
-			proxyLB.Settings.ProxyLB.StickySession = sacloud.ProxyLBSessionSetting{
-				Enabled: true,
-				Method:  sacloud.ProxyLBStickySessionDefaultMethod,
+	if proxyLB.LetsEncrypt == nil && d.HasChange("certificate") {
+		certs := expandProxyLBCerts(d)
+		if certs == nil {
+			if err := proxyLBOp.DeleteCertificates(ctx, proxyLB.ID); err != nil {
+				return fmt.Errorf("deleting ProxyLB Certificates is failed: %s", err)
 			}
 		} else {
-			proxyLB.Settings.ProxyLB.StickySession = sacloud.ProxyLBSessionSetting{
-				Enabled: false,
+			if _, err := proxyLBOp.SetCertificates(ctx, proxyLB.ID, &sacloud.ProxyLBSetCertificatesRequest{
+				ServerCertificate:       certs.ServerCertificate,
+				IntermediateCertificate: certs.IntermediateCertificate,
+				PrivateKey:              certs.PrivateKey,
+				AdditionalCerts:         certs.AdditionalCerts,
+			}); err != nil {
+				return fmt.Errorf("setting ProxyLB Certificates is failed: %s", err)
 			}
 		}
 	}
-
-	if d.HasChange("bind_ports") {
-		proxyLB.Settings.ProxyLB.BindPorts = []*sacloud.ProxyLBBindPorts{}
-
-		if bindPorts, ok := getListFromResource(d, "bind_ports"); ok {
-			for _, bindPort := range bindPorts {
-				values := mapToResourceData(bindPort.(map[string]interface{}))
-				headers := []*sacloud.ProxyLBResponseHeader{}
-				if rawHeaders, ok := values.GetOk("response_header"); ok {
-					for _, rawHeader := range rawHeaders.([]interface{}) {
-						if rawHeader == nil {
-							continue
-						}
-						v := rawHeader.(map[string]interface{})
-						headers = append(headers, &sacloud.ProxyLBResponseHeader{
-							Header: v["header"].(string),
-							Value:  v["value"].(string),
-						})
-					}
-				}
-				proxyLB.AddBindPort(
-					values.Get("proxy_mode").(string),
-					values.Get("port").(int),
-					values.Get("redirect_to_https").(bool),
-					values.Get("support_http2").(bool),
-					headers,
-				)
-			}
-		}
-	}
-
-	if d.HasChange("health_check") {
-		if healthChecks, ok := getListFromResource(d, "health_check"); ok {
-			values := mapToResourceData(healthChecks[0].(map[string]interface{}))
-			protocol := values.Get("protocol").(string)
-			switch protocol {
-			case "http":
-				proxyLB.SetHTTPHealthCheck(
-					values.Get("host_header").(string),
-					values.Get("path").(string),
-					values.Get("delay_loop").(int),
-				)
-			case "tcp":
-				proxyLB.SetTCPHealthCheck(
-					values.Get("delay_loop").(int),
-				)
-			default:
-				return fmt.Errorf("Invalid Healthcheck Protocol: %v", protocol)
-			}
-		}
-	}
-
-	if d.HasChange("sorry_server") {
-		proxyLB.ClearSorryServer()
-
-		if sorryServers, ok := getListFromResource(d, "sorry_server"); ok && len(sorryServers) > 0 {
-			values := mapToResourceData(sorryServers[0].(map[string]interface{}))
-			proxyLB.SetSorryServer(
-				values.Get("ipaddress").(string),
-				values.Get("port").(int),
-			)
-		}
-	}
-
-	if d.HasChange("icon_id") {
-		if iconID, ok := d.GetOk("icon_id"); ok {
-			proxyLB.SetIconByID(toSakuraCloudID(iconID.(string)))
-		} else {
-			proxyLB.ClearIcon()
-		}
-	}
-	if d.HasChange("description") {
-		if description, ok := d.GetOk("description"); ok {
-			proxyLB.Description = description.(string)
-		} else {
-			proxyLB.Description = ""
-		}
-	}
-	if d.HasChange("tags") {
-		rawTags := d.Get("tags").([]interface{})
-		if rawTags != nil {
-			proxyLB.Tags = expandTags(client, rawTags)
-		} else {
-			proxyLB.Tags = expandTags(client, []interface{}{})
-		}
-	}
-
-	if d.HasChange("servers") {
-		proxyLB.ClearProxyLBServer()
-
-		if servers, ok := getListFromResource(d, "servers"); ok && len(servers) > 0 {
-			for _, server := range servers {
-				values := mapToResourceData(server.(map[string]interface{}))
-				proxyLB.Settings.ProxyLB.Servers = append(proxyLB.Settings.ProxyLB.Servers, sacloud.ProxyLBServer{
-					IPAddress: values.Get("ipaddress").(string),
-					Port:      values.Get("port").(int),
-					Enabled:   values.Get("enabled").(bool),
-				})
-			}
-		}
-	}
-
-	proxyLB, err = client.ProxyLB.Update(proxyLB.ID, proxyLB)
-	if err != nil {
-		return fmt.Errorf("Failed to update SakuraCloud ProxyLB resource: %s", err)
-	}
-
-	if !proxyLB.Settings.ProxyLB.LetsEncrypt.Enabled && d.HasChange("certificate") {
-		if certs, ok := getListFromResource(d, "certificate"); ok && len(certs) > 0 {
-			values := mapToResourceData(certs[0].(map[string]interface{}))
-			cert := &sacloud.ProxyLBCertificates{
-				ServerCertificate:       values.Get("server_cert").(string),
-				IntermediateCertificate: values.Get("intermediate_cert").(string),
-				PrivateKey:              values.Get("private_key").(string),
-				AdditionalCerts:         []*sacloud.ProxyLBCertificate{},
-			}
-
-			if rawAdditionalCerts, ok := getListFromResource(values, "additional_certificates"); ok && len(rawAdditionalCerts) > 0 {
-				for _, rawCert := range rawAdditionalCerts {
-					values := mapToResourceData(rawCert.(map[string]interface{}))
-					cert.AddAdditionalCert(
-						values.Get("server_cert").(string),
-						values.Get("intermediate_cert").(string),
-						values.Get("private_key").(string),
-					)
-				}
-			}
-			if _, err := client.ProxyLB.SetCertificates(proxyLB.ID, cert); err != nil {
-				return fmt.Errorf("Failed to set SakuraCloud ProxyLB certificates: %s", err)
-			}
-		} else {
-			if _, err := client.ProxyLB.DeleteCertificates(proxyLB.ID); err != nil {
-				return fmt.Errorf("Failed to remove SakuraCloud ProxyLB certificates: %s", err)
-			}
-
-		}
-	}
-
 	return resourceSakuraCloudProxyLBRead(d, meta)
-
 }
 
 func resourceSakuraCloudProxyLBDelete(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*APIClient)
+	client, ctx, _ := getSacloudV2Client(d, meta)
+	proxyLBOp := sacloud.NewProxyLBOp(client)
+
 	sakuraMutexKV.Lock(d.Id())
 	defer sakuraMutexKV.Unlock(d.Id())
 
-	_, err := client.ProxyLB.Delete(toSakuraCloudID(d.Id()))
-
+	proxyLB, err := proxyLBOp.Read(ctx, types.StringID(d.Id()))
 	if err != nil {
-		return fmt.Errorf("Error deleting SakuraCloud ProxyLB resource: %s", err)
+		if sacloud.IsNotFoundError(err) {
+			d.SetId("")
+			return nil
+		}
+		return fmt.Errorf("could not read SakuraCloud ProxyLB: %s", err)
 	}
 
+	if err := proxyLBOp.Delete(ctx, proxyLB.ID); err != nil {
+		return fmt.Errorf("deleting ProxyLB is failed: %s", err)
+	}
 	return nil
 }
 
-func setProxyLBResourceData(d *schema.ResourceData, client *APIClient, data *sacloud.ProxyLB) error {
+func setProxyLBResourceData(ctx context.Context, d *schema.ResourceData, client *APIClient, data *sacloud.ProxyLB) error {
+	// certificates
+	proxyLBOp := sacloud.NewProxyLBOp(client)
+
+	certs, err := proxyLBOp.GetCertificates(ctx, data.ID)
+	if err != nil {
+		// even if certificate is deleted, it will not result in an error
+		return err
+	}
 
 	d.Set("name", data.Name)
-	d.Set("plan", int(data.GetPlan()))
-	d.Set("vip_failover", data.Status.UseVIPFailover)
-	d.Set("sticky_session", data.Settings.ProxyLB.StickySession.Enabled)
-	// bind ports
-	var bindPorts []map[string]interface{}
-	for _, bindPort := range data.Settings.ProxyLB.BindPorts {
+	d.Set("plan", int(data.Plan))
+	d.Set("vip_failover", data.UseVIPFailover)
+	d.Set("sticky_session", flattenProxyLBStickySession(data))
+	d.Set("timeout", flattenProxyLBTimeout(data))
+	d.Set("region", data.Region.String())
+	if err := d.Set("bind_ports", flattenProxyLBBindPorts(data)); err != nil {
+		return err
+	}
+	if err := d.Set("health_check", flattenProxyLBHealthCheck(data)); err != nil {
+		return err
+	}
+	if err := d.Set("sorry_server", flattenProxyLBSorryServer(data)); err != nil {
+		return err
+	}
+	if err := d.Set("servers", flattenProxyLBServers(data)); err != nil {
+		return err
+	}
+	d.Set("fqdn", data.FQDN)
+	d.Set("vip", data.VirtualIPAddress)
+	d.Set("proxy_networks", data.ProxyNetworks)
+	d.Set("icon_id", data.IconID.String())
+	d.Set("description", data.Description)
+	if err := d.Set("tags", data.Tags); err != nil {
+		return err
+	}
+	if err := d.Set("certificate", flattenProxyLBCerts(certs)); err != nil {
+		return err
+	}
+	return nil
+}
+
+func flattenProxyLBBindPorts(proxyLB *sacloud.ProxyLB) []interface{} {
+	var bindPorts []interface{}
+	for _, bindPort := range proxyLB.BindPorts {
 		var headers []interface{}
 		for _, header := range bindPort.AddResponseHeader {
 			headers = append(headers, map[string]interface{}{
@@ -621,79 +460,202 @@ func setProxyLBResourceData(d *schema.ResourceData, client *APIClient, data *sac
 			"response_header":   headers,
 		})
 	}
-	d.Set("bind_ports", bindPorts)
+	return bindPorts
+}
 
-	//health_check
-	hc := data.Settings.ProxyLB.HealthCheck
-	healthChecks := []map[string]interface{}{
-		{
-			"protocol":    hc.Protocol,
-			"delay_loop":  hc.DelayLoop,
-			"host_header": hc.Host,
-			"path":        hc.Path,
-		},
+func flattenProxyLBHealthCheck(proxyLB *sacloud.ProxyLB) []interface{} {
+	var results []interface{}
+	if proxyLB.HealthCheck != nil {
+		results = []interface{}{
+			map[string]interface{}{
+				"protocol":    proxyLB.HealthCheck.Protocol,
+				"delay_loop":  proxyLB.HealthCheck.DelayLoop,
+				"host_header": proxyLB.HealthCheck.Host,
+				"path":        proxyLB.HealthCheck.Path,
+			},
+		}
 	}
-	d.Set("health_check", healthChecks)
+	return results
+}
 
-	// sorry server
-	ss := data.Settings.ProxyLB.SorryServer
-	var sorryServers []map[string]interface{}
-	if ss.IPAddress != "" && ss.Port != nil {
-		sorryServers = append(sorryServers, map[string]interface{}{
-			"ipaddress": ss.IPAddress,
-			"port":      *ss.Port,
-		})
+func flattenProxyLBSorryServer(proxyLB *sacloud.ProxyLB) []interface{} {
+	var results []interface{}
+	if proxyLB.SorryServer != nil && proxyLB.SorryServer.IPAddress != "" {
+		results = []interface{}{
+			map[string]interface{}{
+				"ipaddress": proxyLB.SorryServer.IPAddress,
+				"port":      proxyLB.SorryServer.Port,
+			},
+		}
 	}
-	d.Set("sorry_server", sorryServers)
+	return results
+}
 
-	// servers
-	var servers []map[string]interface{}
-	for _, server := range data.Settings.ProxyLB.Servers {
-		servers = append(servers, map[string]interface{}{
+func flattenProxyLBServers(proxyLB *sacloud.ProxyLB) []interface{} {
+	var results []interface{}
+	for _, server := range proxyLB.Servers {
+		results = append(results, map[string]interface{}{
 			"ipaddress": server.IPAddress,
 			"port":      server.Port,
 			"enabled":   server.Enabled,
 		})
 	}
-	d.Set("servers", servers)
-	d.Set("fqdn", data.Status.FQDN)
-	d.Set("vip", data.Status.VirtualIPAddress)
-	d.Set("proxy_networks", data.Status.ProxyNetworks)
+	return results
+}
 
-	d.Set("icon_id", data.GetIconStrID())
-	d.Set("description", data.Description)
-	d.Set("tags", data.Tags)
-
-	// certificates
-	cert, err := client.ProxyLB.GetCertificates(data.ID)
-	if err != nil {
-		// even if certificate is deleted, it will not result in an error
-		return err
+func flattenProxyLBCerts(certs *sacloud.ProxyLBCertificates) []interface{} {
+	if certs == nil {
+		return nil
 	}
-
 	proxylbCert := map[string]interface{}{
-		"server_cert":       cert.ServerCertificate,
-		"intermediate_cert": cert.IntermediateCertificate,
-		"private_key":       cert.PrivateKey,
-		//"common_name":       cert.CertificateCommonName,
-		//"end_date":          cert.CertificateEndDate.Format(time.RFC3339),
+		"server_cert":       certs.ServerCertificate,
+		"intermediate_cert": certs.IntermediateCertificate,
+		"private_key":       certs.PrivateKey,
 	}
-	if len(cert.AdditionalCerts) > 0 {
-		var certs []interface{}
-		for _, cert := range cert.AdditionalCerts {
-			certs = append(certs, map[string]interface{}{
+	if len(certs.AdditionalCerts) > 0 {
+		var additionalCerts []interface{}
+		for _, cert := range certs.AdditionalCerts {
+			additionalCerts = append(additionalCerts, map[string]interface{}{
 				"server_cert":       cert.ServerCertificate,
 				"intermediate_cert": cert.IntermediateCertificate,
 				"private_key":       cert.PrivateKey,
-				//"common_name":       cert.CertificateCommonName,
-				//"end_date":          cert.CertificateEndDate.Format(time.RFC3339),
 			})
 		}
-		proxylbCert["additional_certificates"] = certs
-	} else {
-		proxylbCert["additional_certificates"] = []interface{}{}
+		proxylbCert["additional_certificates"] = additionalCerts
 	}
+	return []interface{}{proxylbCert}
+}
 
-	d.Set("certificate", []interface{}{proxylbCert})
+func flattenProxyLBStickySession(proxyLB *sacloud.ProxyLB) bool {
+	if proxyLB.StickySession != nil {
+		return proxyLB.StickySession.Enabled
+	}
+	return false
+}
+
+func flattenProxyLBTimeout(proxyLB *sacloud.ProxyLB) int {
+	if proxyLB.Timeout != nil {
+		return proxyLB.Timeout.InactiveSec
+	}
+	return 0
+}
+
+func expandProxyLBStickySession(d resourceValueGettable) *sacloud.ProxyLBStickySession {
+	stickySession := d.Get("sticky_session").(bool)
+	if stickySession {
+		return &sacloud.ProxyLBStickySession{
+			Enabled: true,
+			Method:  "cookie",
+		}
+	}
+	return nil
+}
+
+func expandProxyLBBindPorts(d resourceValueGettable) []*sacloud.ProxyLBBindPort {
+	var results []*sacloud.ProxyLBBindPort
+	if bindPorts, ok := getListFromResource(d, "bind_ports"); ok {
+		for _, bindPort := range bindPorts {
+			values := mapToResourceData(bindPort.(map[string]interface{}))
+			var headers []*sacloud.ProxyLBResponseHeader
+			if rawHeaders, ok := values.GetOk("response_header"); ok {
+				for _, rawHeader := range rawHeaders.([]interface{}) {
+					if rawHeader == nil {
+						continue
+					}
+					v := rawHeader.(map[string]interface{})
+					headers = append(headers, &sacloud.ProxyLBResponseHeader{
+						Header: v["header"].(string),
+						Value:  v["value"].(string),
+					})
+				}
+			}
+
+			results = append(results, &sacloud.ProxyLBBindPort{
+				ProxyMode:         types.EProxyLBProxyMode(values.Get("proxy_mode").(string)),
+				Port:              values.Get("port").(int),
+				RedirectToHTTPS:   values.Get("redirect_to_https").(bool),
+				SupportHTTP2:      values.Get("support_http2").(bool),
+				AddResponseHeader: headers,
+			})
+		}
+	}
+	return results
+}
+
+func expandProxyLBHealthCheck(d resourceValueGettable) *sacloud.ProxyLBHealthCheck {
+	if healthChecks, ok := getListFromResource(d, "health_check"); ok {
+		v := mapToResourceData(healthChecks[0].(map[string]interface{}))
+		protocol := v.Get("protocol").(string)
+		switch protocol {
+		case "http":
+			return &sacloud.ProxyLBHealthCheck{
+				Protocol:  types.ProxyLBProtocols.HTTP,
+				Path:      v.Get("path").(string),
+				Host:      v.Get("host_header").(string),
+				DelayLoop: v.Get("delay_loop").(int),
+			}
+		case "tcp":
+			return &sacloud.ProxyLBHealthCheck{
+				Protocol:  types.ProxyLBProtocols.TCP,
+				DelayLoop: v.Get("delay_loop").(int),
+			}
+		}
+	}
+	return nil
+}
+
+func expandProxyLBSorryServer(d resourceValueGettable) *sacloud.ProxyLBSorryServer {
+	if sorryServers, ok := getListFromResource(d, "sorry_server"); ok && len(sorryServers) > 0 {
+		v := mapToResourceData(sorryServers[0].(map[string]interface{}))
+		return &sacloud.ProxyLBSorryServer{
+			IPAddress: v.Get("ipaddress").(string),
+			Port:      v.Get("port").(int),
+		}
+	}
+	return nil
+}
+
+func expandProxyLBServers(d resourceValueGettable) []*sacloud.ProxyLBServer {
+	var results []*sacloud.ProxyLBServer
+	if servers, ok := getListFromResource(d, "servers"); ok && len(servers) > 0 {
+		for _, server := range servers {
+			v := mapToResourceData(server.(map[string]interface{}))
+			results = append(results, &sacloud.ProxyLBServer{
+				IPAddress: v.Get("ipaddress").(string),
+				Port:      v.Get("port").(int),
+				Enabled:   v.Get("enabled").(bool),
+			})
+		}
+	}
+	return results
+}
+
+func expandProxyLBTimeout(d resourceValueGettable) *sacloud.ProxyLBTimeout {
+	return &sacloud.ProxyLBTimeout{InactiveSec: d.Get("timeout").(int)}
+}
+
+func expandProxyLBCerts(d resourceValueGettable) *sacloud.ProxyLBCertificates {
+	// set cert
+	if certs, ok := getListFromResource(d, "certificate"); ok && len(certs) > 0 {
+		values := mapToResourceData(certs[0].(map[string]interface{}))
+		cert := &sacloud.ProxyLBCertificates{
+			ServerCertificate:       values.Get("server_cert").(string),
+			IntermediateCertificate: values.Get("intermediate_cert").(string),
+			PrivateKey:              values.Get("private_key").(string),
+		}
+
+		if rawAdditionalCerts, ok := getListFromResource(values, "additional_certificates"); ok && len(rawAdditionalCerts) > 0 {
+			for _, rawCert := range rawAdditionalCerts {
+				values := mapToResourceData(rawCert.(map[string]interface{}))
+				cert.AdditionalCerts = append(cert.AdditionalCerts, &sacloud.ProxyLBAdditionalCert{
+					ServerCertificate:       values.Get("server_cert").(string),
+					IntermediateCertificate: values.Get("intermediate_cert").(string),
+					PrivateKey:              values.Get("private_key").(string),
+				})
+			}
+		}
+
+		return cert
+	}
 	return nil
 }

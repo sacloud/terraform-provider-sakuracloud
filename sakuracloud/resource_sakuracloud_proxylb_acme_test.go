@@ -2,11 +2,10 @@ package sakuracloud
 
 import (
 	"fmt"
+	"github.com/hashicorp/terraform/helper/resource"
+	"github.com/sacloud/libsacloud/v2/sacloud"
 	"os"
 	"testing"
-
-	"github.com/hashicorp/terraform/helper/resource"
-	"github.com/sacloud/libsacloud/sacloud"
 )
 
 const (
@@ -16,6 +15,9 @@ const (
 var proxyLBDomain string
 
 func TestAccResourceSakuraCloudProxyLBACME(t *testing.T) {
+	if fakeMode := os.Getenv("FAKE_MODE"); fakeMode != "" {
+		t.Skip("This test runs only non FAKE_MODE")
+	}
 
 	if domain, ok := os.LookupEnv(envProxyLBACMEDomain); ok {
 		proxyLBDomain = domain
@@ -77,7 +79,9 @@ resource sakuracloud_server "server01" {
 }
 
 data sakuracloud_dns "zone" {
-  name_selectors = ["%s"]
+  filters {
+    names = ["%s"]
+  }
 }
 
 resource "sakuracloud_dns_record" "record" {

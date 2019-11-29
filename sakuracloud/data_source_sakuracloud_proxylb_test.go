@@ -45,7 +45,7 @@ func TestAccSakuraCloudDataSourceProxyLB_Basic(t *testing.T) {
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckSakuraCloudProxyLBDataSourceID("data.sakuracloud_proxylb.foobar"),
 					resource.TestCheckResourceAttr("data.sakuracloud_proxylb.foobar", "name", name),
-					resource.TestCheckResourceAttr("data.sakuracloud_proxylb.foobar", "plan", "1000"),
+					resource.TestCheckResourceAttr("data.sakuracloud_proxylb.foobar", "plan", "100"),
 					resource.TestCheckResourceAttr("data.sakuracloud_proxylb.foobar", "description", "description_test"),
 
 					resource.TestCheckResourceAttr("data.sakuracloud_proxylb.foobar", "health_check.0.protocol", "tcp"),
