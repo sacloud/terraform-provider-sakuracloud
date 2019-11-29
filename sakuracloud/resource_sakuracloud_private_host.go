@@ -20,7 +20,6 @@ func resourceSakuraCloudPrivateHost() *schema.Resource {
 		Importer: &schema.ResourceImporter{
 			State: schema.ImportStatePassthrough,
 		},
-		CustomizeDiff: hasTagResourceCustomizeDiff,
 		Schema: map[string]*schema.Schema{
 			"name": {
 				Type:     schema.TypeString,
@@ -38,7 +37,6 @@ func resourceSakuraCloudPrivateHost() *schema.Resource {
 			"tags": {
 				Type:     schema.TypeList,
 				Optional: true,
-				Computed: true,
 				Elem:     &schema.Schema{Type: schema.TypeString},
 			},
 			"hostname": {
@@ -129,6 +127,7 @@ func resourceSakuraCloudPrivateHostUpdate(d *schema.ResourceData, meta interface
 func resourceSakuraCloudPrivateHostDelete(d *schema.ResourceData, meta interface{}) error {
 	client, ctx, zone := getSacloudV2Client(d, meta)
 	phOp := sacloud.NewPrivateHostOp(client)
+	serverOp := sacloud.NewServerOp(client)
 
 	ph, err := phOp.Read(ctx, zone, types.StringID(d.Id()))
 	if err != nil {
@@ -139,8 +138,59 @@ func resourceSakuraCloudPrivateHostDelete(d *schema.ResourceData, meta interface
 		return fmt.Errorf("could not read SakuraCloud PrivateHost: %s", err)
 	}
 
+	searched, err := serverOp.Find(ctx, zone, &sacloud.FindCondition{})
+	if err != nil {
+		return fmt.Errorf("detaching Server is failed: %s", err)
+	}
+	for _, server := range searched.Servers {
+		if server.PrivateHostID == ph.ID {
+			if err := detachServerFromPrivateHost(ctx, client, zone, server.ID); err != nil {
+				return fmt.Errorf("detaching Server is failed: %s", err)
+			}
+		}
+	}
+
 	if err := phOp.Delete(ctx, zone, ph.ID); err != nil {
 		return fmt.Errorf("deleting SakuraCloud PrivateHost is failed: %s", err)
+	}
+	return nil
+}
+
+func detachServerFromPrivateHost(ctx context.Context, client *APIClient, zone string, serverID types.ID) error {
+	serverOp := sacloud.NewServerOp(client)
+
+	sakuraMutexKV.Lock(serverID.String())
+	defer sakuraMutexKV.Unlock(serverID.String())
+
+	server, err := serverOp.Read(ctx, zone, serverID)
+	if err != nil {
+		return fmt.Errorf("reading SakuraCloud Server is failed: %s", err)
+	}
+	if !server.PrivateHostID.IsEmpty() {
+		isNeedRestart := false
+		if server.InstanceStatus.IsUp() {
+			isNeedRestart = true
+			if err := shutdownServerSync(ctx, client, zone, server.ID); err != nil {
+				return fmt.Errorf("stopping SakuraCloud Server is failed: %s", err)
+			}
+		}
+
+		_, err := serverOp.Update(ctx, zone, serverID, &sacloud.ServerUpdateRequest{
+			Name:            server.Name,
+			Description:     server.Description,
+			Tags:            server.Tags,
+			IconID:          server.IconID,
+			InterfaceDriver: server.InterfaceDriver,
+		})
+		if err != nil {
+			return fmt.Errorf("detaching Server From PrivateHost is failed: %s", err)
+		}
+
+		if isNeedRestart {
+			if err := bootServerSync(ctx, client, zone, server.ID); err != nil {
+				return fmt.Errorf("booting SakuraCloud Server is failed: %s", err)
+			}
+		}
 	}
 	return nil
 }

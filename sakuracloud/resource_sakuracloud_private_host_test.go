@@ -96,8 +96,8 @@ func TestAccResourceSakuraCloudPrivateHost_DestroyWithRunningServers(t *testing.
 			{
 				Config: testAccCheckSakuraCloudPrivateHostConfig_Destroy_Update,
 				Check: resource.ComposeTestCheckFunc(
-					resource.TestCheckNoResourceAttr(
-						"sakuracloud_server.foobar", "private_host_id"),
+					resource.TestCheckResourceAttr(
+						"sakuracloud_server.foobar", "private_host_id", ""),
 				),
 			},
 		},

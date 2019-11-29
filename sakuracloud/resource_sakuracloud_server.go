@@ -1,15 +1,18 @@
 package sakuracloud
 
 import (
+	"context"
 	"fmt"
 	"log"
+	"strings"
 
 	"github.com/hashicorp/terraform/helper/schema"
 	"github.com/hashicorp/terraform/helper/validation"
 	"github.com/hashicorp/terraform/terraform"
-	"github.com/sacloud/libsacloud/api"
 	"github.com/sacloud/libsacloud/sacloud"
-	serverutils "github.com/sacloud/libsacloud/utils/server"
+	v2 "github.com/sacloud/libsacloud/v2/sacloud"
+	"github.com/sacloud/libsacloud/v2/sacloud/types"
+	serverUtil "github.com/sacloud/libsacloud/v2/utils/server"
 )
 
 const serverAPILockKey = "sakuracloud_server.lock"
@@ -85,12 +88,12 @@ func resourceSakuraCloudServer() *schema.Resource {
 				Optional: true,
 				Default:  "shared",
 			},
-			"display_ipaddress": {
-				Type:         schema.TypeString,
-				Optional:     true,
-				Computed:     true,
-				ValidateFunc: validateIPv4Address(),
-			},
+			//"display_ipaddress": {
+			//	Type:         schema.TypeString,
+			//	Optional:     true,
+			//	Computed:     true,
+			//	ValidateFunc: validateIPv4Address(),
+			//},
 			"cdrom_id": {
 				Type:         schema.TypeString,
 				Optional:     true,
@@ -112,13 +115,13 @@ func resourceSakuraCloudServer() *schema.Resource {
 				MaxItems: 3,
 				Elem:     &schema.Schema{Type: schema.TypeString},
 			},
-			"additional_display_ipaddresses": {
-				Type:     schema.TypeList,
-				Optional: true,
-				Computed: true,
-				MaxItems: 3,
-				Elem:     &schema.Schema{Type: schema.TypeString},
-			},
+			//"additional_display_ipaddresses": {
+			//	Type:     schema.TypeList,
+			//	Optional: true,
+			//	Computed: true,
+			//	MaxItems: 3,
+			//	Elem:     &schema.Schema{Type: schema.TypeString},
+			//},
 			"packet_filter_ids": {
 				Type:     schema.TypeList,
 				Optional: true,
@@ -206,673 +209,219 @@ func resourceSakuraCloudServer() *schema.Resource {
 				Computed: true,
 			},
 			"nw_mask_len": {
-				Type:     schema.TypeString,
+				Type:     schema.TypeInt,
 				Optional: true,
 				Computed: true,
-			},
-			"vnc_host": {
-				Type:     schema.TypeString,
-				Computed: true,
-			},
-			"vnc_port": {
-				Type:     schema.TypeInt,
-				Computed: true,
-			},
-			"vnc_password": {
-				Type:      schema.TypeString,
-				Computed:  true,
-				Sensitive: true,
 			},
 		},
 	}
 }
 
 func resourceSakuraCloudServerCreate(d *schema.ResourceData, meta interface{}) error {
-	client := getSacloudAPIClient(d, meta)
+	client, ctx, zone := getSacloudV2Client(d, meta)
+	serverOp := v2.NewServerOp(client)
+	diskOp := v2.NewDiskOp(client)
+	interfaceOp := v2.NewInterfaceOp(client)
 
-	opts := client.Server.New()
-	opts.Name = d.Get("name").(string)
+	// validate
+	if err := validateServerPlan(ctx, client, d); err != nil {
+		return err
+	}
 
-	plan, err := client.Product.Server.GetBySpecCommitment(
-		d.Get("core").(int),
-		d.Get("memory").(int),
-		sacloud.PlanDefault,
-		sacloud.ECommitment(d.Get("commitment").(string)),
-	)
+	server, err := serverOp.Create(ctx, zone, &v2.ServerCreateRequest{
+		CPU:                  d.Get("core").(int),
+		MemoryMB:             d.Get("memory").(int) * 1024,
+		ServerPlanCommitment: types.ECommitment(d.Get("commitment").(string)),
+		ServerPlanGeneration: types.PlanGenerations.Default,
+		ConnectedSwitches:    expandConnectedSwitches(d),
+		InterfaceDriver:      types.EInterfaceDriver(d.Get("interface_driver").(string)),
+		Name:                 d.Get("name").(string),
+		Description:          d.Get("description").(string),
+		Tags:                 expandTagsV2(d.Get("tags").([]interface{})),
+		IconID:               expandSakuraCloudID(d, "icon_id"),
+		WaitDiskMigration:    false,
+		PrivateHostID:        expandSakuraCloudID(d, "private_host_id"),
+	})
 	if err != nil {
-		return fmt.Errorf("Invalid server plan.Please change 'core' or 'memory': %s", err)
-	}
-	opts.SetServerPlanByValue(plan.CPU, plan.GetMemoryGB(), plan.Generation)
-	opts.ServerPlan.Commitment = plan.Commitment
-
-	if interfaceDriver, ok := d.GetOk("interface_driver"); ok {
-		s := interfaceDriver.(string)
-		if s == "" {
-			s = string(sacloud.InterfaceDriverVirtIO)
-		}
-		opts.SetInterfaceDriverByString(s)
-	}
-
-	if hasSharedInterface, ok := d.GetOk("nic"); ok {
-		switch forceString(hasSharedInterface) {
-		case "shared":
-			opts.AddPublicNWConnectedParam()
-		case "disconnect":
-			opts.AddEmptyConnectedParam()
-		default:
-			opts.AddExistsSwitchConnectedParam(forceString(hasSharedInterface))
-		}
-	} else {
-		opts.AddPublicNWConnectedParam()
-	}
-
-	if interfaces, ok := d.GetOk("additional_nics"); ok {
-		for _, switchID := range interfaces.([]interface{}) {
-			if switchID == nil {
-				opts.AddEmptyConnectedParam()
-			} else {
-				opts.AddExistsSwitchConnectedParam(switchID.(string))
-			}
-		}
-	}
-	if iconID, ok := d.GetOk("icon_id"); ok {
-		opts.SetIconByID(toSakuraCloudID(iconID.(string)))
-	}
-	if description, ok := d.GetOk("description"); ok {
-		opts.Description = description.(string)
-	}
-
-	if rawTags, ok := d.GetOk("tags"); ok {
-		if rawTags != nil {
-			opts.Tags = expandTags(client, rawTags.([]interface{}))
-		}
-	}
-	if rawPrivateHostID, ok := d.GetOk("private_host_id"); ok {
-		privateHostID := rawPrivateHostID.(string)
-		opts.SetPrivateHostByID(toSakuraCloudID(privateHostID))
-	}
-
-	server, err := createServer(client, opts)
-	if err != nil {
-		return fmt.Errorf("Failed to create SakuraCloud Server resource: %s", err)
-	}
-
-	if displayIP, ok := d.GetOk("display_ipaddress"); ok && len(server.Interfaces) > 0 {
-		if server.Interfaces[0].Switch.Scope != sacloud.ESCopeShared {
-			ifID := server.Interfaces[0].ID
-			if _, err := client.Interface.SetDisplayIPAddress(ifID, displayIP.(string)); err != nil {
-				return fmt.Errorf("Failed to create SakuraCloud Server resource: Failed to set display ip address: %s", err)
-			}
-		}
-	}
-	if rawAdditionalDIPs, ok := d.GetOk("additional_display_ipaddresses"); ok {
-		additionalDIPs := rawAdditionalDIPs.([]interface{})
-		for i, displayIP := range additionalDIPs {
-			if len(server.Interfaces) > i+1 {
-				ifID := server.Interfaces[i+1].ID
-				if _, err := client.Interface.SetDisplayIPAddress(ifID, displayIP.(string)); err != nil {
-					return fmt.Errorf("Failed to create SakuraCloud Server resource: Failed to set display ip address: %s", err)
-				}
-			}
-		}
+		return fmt.Errorf("creating SakuraCloud Server is failed: %s", err)
 	}
 
 	//connect disk to server
-	if _, ok := d.GetOk("disks"); ok {
-		rawDisks := d.Get("disks").([]interface{})
-		if rawDisks != nil {
-			diskIDs := expandStringList(rawDisks)
-			for i, diskID := range diskIDs {
-				_, err := client.Disk.ConnectToServer(toSakuraCloudID(diskID), server.ID)
-				if err != nil {
-					return fmt.Errorf("Failed to connect SakuraCloud Disk to Server: %s", err)
-				}
+	diskIDs := expandSakuraCloudIDs(d, "disks")
+	for _, diskID := range diskIDs {
+		if err := diskOp.ConnectToServer(ctx, zone, diskID, server.ID); err != nil {
+			return fmt.Errorf("connecting Disk to Server is failed: %s", err)
+		}
+	}
 
-				targetDisk, err := client.Disk.Read(toSakuraCloudID(diskID))
-				if err != nil {
-					return fmt.Errorf("Failed to read SakuraCloud Disk: %s", err)
-				}
+	// edit disk
+	editReq := expandDiskEditRequest(d)
+	if editReq != nil && len(diskIDs) > 0 {
+		if err := configDiskSync(ctx, client, zone, diskIDs[0], editReq); err != nil {
+			return fmt.Errorf("editting Disk is failed: %s", err)
+		}
+	}
 
-				if targetDisk.SourceArchive == nil && targetDisk.SourceDisk == nil {
-					continue
-				}
-
-				// edit disk if server is connected the shared segment
-				isNeedEditDisk := false
-				diskEditConfig := client.Disk.NewCondig()
-				if hostName, ok := d.GetOk("hostname"); ok {
-					diskEditConfig.SetHostName(hostName.(string))
-					isNeedEditDisk = true
-				}
-				if password, ok := d.GetOk("password"); ok {
-					diskEditConfig.SetPassword(password.(string))
-					isNeedEditDisk = true
-				}
-				if sshKeyIDs, ok := d.GetOk("ssh_key_ids"); ok {
-					ids := expandStringList(sshKeyIDs.([]interface{}))
-					diskEditConfig.SetSSHKeys(ids)
-					isNeedEditDisk = true
-				}
-
-				if disablePasswordAuth, ok := d.GetOk("disable_pw_auth"); ok {
-					diskEditConfig.SetDisablePWAuth(disablePasswordAuth.(bool))
-					isNeedEditDisk = true
-				}
-
-				if noteIDs, ok := d.GetOk("note_ids"); ok {
-					ids := expandStringList(noteIDs.([]interface{}))
-					diskEditConfig.SetNotes(ids)
-					isNeedEditDisk = true
-				}
-
-				if i == 0 && len(server.Interfaces) > 0 && server.Interfaces[0].Switch != nil {
-					if server.Interfaces[0].Switch.Scope == sacloud.ESCopeShared {
-						isNeedEditDisk = true
-					} else {
-						baseIP := forceString(d.Get("ipaddress"))
-						baseGateway := forceString(d.Get("gateway"))
-						baseMaskLen := forceString(d.Get("nw_mask_len"))
-
-						diskEditConfig.SetUserIPAddress(baseIP)
-						diskEditConfig.SetDefaultRoute(baseGateway)
-						diskEditConfig.SetNetworkMaskLen(baseMaskLen)
-
-						if baseIP != "" || baseGateway != "" || baseMaskLen != "" {
-							isNeedEditDisk = true
-						}
-					}
-				}
-				if i == 0 && isNeedEditDisk {
-					res, err := client.Disk.CanEditDisk(toSakuraCloudID(diskID))
-					if err != nil {
-						return fmt.Errorf("Failed to check CanEditDisk: %s", err)
-					}
-					if res {
-						_, err := client.Disk.Config(toSakuraCloudID(diskID), diskEditConfig)
-						if err != nil {
-							return fmt.Errorf("Error editting SakuraCloud DiskConfig: %s", err)
-						}
-					} else {
-						log.Printf("[WARN] Disk[%s] does not support modify disk", diskID)
-					}
-				}
+	// packet filters
+	packetFilterIDs := expandSakuraCloudIDs(d, "packet_filter_ids")
+	for i, pfID := range packetFilterIDs {
+		if !pfID.IsEmpty() && len(server.Interfaces) > i {
+			ifID := server.Interfaces[i].ID
+			if err := interfaceOp.ConnectToPacketFilter(ctx, zone, ifID, pfID); err != nil {
+				return fmt.Errorf("connecting PacketFilter[%d] to Interface[%d] is failed: %s", pfID, ifID, err)
 			}
 		}
 	}
 
-	if rawPacketFilterIDs, ok := d.GetOk("packet_filter_ids"); ok {
-		packetFilterIDs := rawPacketFilterIDs.([]interface{})
-		for i, filterID := range packetFilterIDs {
-			strFilterID := ""
-			if filterID != nil {
-				strFilterID = filterID.(string)
-			}
-			if server.Interfaces != nil && len(server.Interfaces) > i && strFilterID != "" {
-				_, err := client.Interface.ConnectToPacketFilter(server.Interfaces[i].ID, toSakuraCloudID(strFilterID))
-				if err != nil {
-					return fmt.Errorf("Error connecting packet filter: %s", err)
-				}
-			}
-		}
-	}
-
-	if rawCDROMID, ok := d.GetOk("cdrom_id"); ok {
-		cdromID := rawCDROMID.(string)
-		_, err := client.Server.InsertCDROM(server.ID, toSakuraCloudID(cdromID))
-		if err != nil {
-			return fmt.Errorf("Error Inserting CDROM: %s", err)
+	// cdrom
+	cdromID := expandSakuraCloudID(d, "cdrom_id")
+	if !cdromID.IsEmpty() {
+		if err := serverOp.InsertCDROM(ctx, zone, server.ID, &v2.InsertCDROMRequest{ID: cdromID}); err != nil {
+			return fmt.Errorf("inserting CD-ROM to server is failed: %s", err)
 		}
 	}
 
 	//boot
-	err = bootServer(client, server.ID)
-	if err != nil {
-		return fmt.Errorf("Failed to boot SakuraCloud Server resource: %s", err)
+	if err := bootServerSync(ctx, client, zone, server.ID); err != nil {
+		return fmt.Errorf("booting SakuraCloud Server is failed: %s", err)
 	}
 
-	d.SetId(server.GetStrID())
+	d.SetId(server.ID.String())
 	return resourceSakuraCloudServerRead(d, meta)
 }
 
 func resourceSakuraCloudServerRead(d *schema.ResourceData, meta interface{}) error {
-	client := getSacloudAPIClient(d, meta)
+	client, ctx, zone := getSacloudV2Client(d, meta)
+	serverOp := v2.NewServerOp(client)
 
-	server, err := client.Server.Read(toSakuraCloudID(d.Id()))
+	server, err := serverOp.Read(ctx, zone, types.StringID(d.Id()))
 	if err != nil {
-		if sacloudErr, ok := err.(api.Error); ok && sacloudErr.ResponseCode() == 404 {
+		if v2.IsNotFoundError(err) {
 			d.SetId("")
 			return nil
 		}
-		return fmt.Errorf("Couldn't find SakuraCloud Server resource: %s", err)
+		return fmt.Errorf("could not read SakuraCloud Server: %s", err)
 	}
 
-	return setServerResourceData(d, client, server)
+	return setServerResourceData(ctx, d, client, server)
 }
 
 func resourceSakuraCloudServerUpdate(d *schema.ResourceData, meta interface{}) error {
-	client := getSacloudAPIClient(d, meta)
+	client, ctx, zone := getSacloudV2Client(d, meta)
+	serverOp := v2.NewServerOp(client)
 
-	server, err := client.Server.Read(toSakuraCloudID(d.Id()))
+	sakuraMutexKV.Lock(d.Id())
+	defer sakuraMutexKV.Unlock(d.Id())
+
+	server, err := serverOp.Read(ctx, zone, types.StringID(d.Id()))
 	if err != nil {
-		return fmt.Errorf("Couldn't find SakuraCloud Server resource: %s", err)
+		return fmt.Errorf("could not read SakuraCloud Server: %s", err)
 	}
-	isNeedRestart := false
-	isRunning := server.Instance.IsUp()
 
-	isPlanChanged := d.HasChange("core") || d.HasChange("memory") || d.HasChange("commitment")
+	isNeedRestart := false
+	isRunning := server.InstanceStatus.IsUp()
+	isPlanChanged := isServerPlanChanged(d)
 
 	if isPlanChanged {
-		// If planID changed , server ID will change.
-		plan, err := client.Product.Server.GetBySpecCommitment(
-			d.Get("core").(int),
-			d.Get("memory").(int),
-			sacloud.PlanDefault,
-			sacloud.ECommitment(d.Get("commitment").(string)),
-		)
-		if err != nil {
-			return fmt.Errorf("Invalid server plan.Please change 'core' or 'memory' or 'commitment': %s", err)
+		// validate
+		if err := validateServerPlan(ctx, client, d); err != nil {
+			return err
 		}
-
-		server.SetServerPlanByValue(plan.CPU, plan.GetMemoryGB(), plan.Generation)
-		server.ServerPlan.Commitment = plan.Commitment
-
 		isNeedRestart = true
 	}
-	isDiskConfigChanged := false
-	if d.HasChange("disks") || d.HasChange("nic") || d.HasChange("ipaddress") ||
-		d.HasChange("gateway") || d.HasChange("nw_mask_len") || d.HasChange("hostname") ||
-		d.HasChange("password") || d.HasChange("ssh_key_ids") || d.HasChange("disable_pw_auth") ||
-		d.HasChange("note_ids") {
-		isDiskConfigChanged = true
-	}
+
+	isDiskConfigChanged := isServerDiskConfigChanged(d)
 
 	if isDiskConfigChanged || d.HasChange("additional_nics") || d.HasChange("interface_driver") || d.HasChange("private_host_id") {
 		isNeedRestart = true
 	}
 
 	if isNeedRestart && isRunning {
-		// shutdown server
-		err := stopServer(client, toSakuraCloudID(d.Id()), d)
-		if err != nil {
-			return fmt.Errorf("Error stopping SakuraCloud Server resource: %s", err)
+		if err := shutdownServerSync(ctx, client, zone, server.ID); err != nil {
+			return fmt.Errorf("stopping SakuraCloud Server is failed: %s", err)
 		}
 	}
 
 	if d.HasChange("disks") {
-		//disconnect all old disks
-		for _, disk := range server.Disks {
-			_, err := client.Disk.DisconnectFromServer(disk.ID)
-			if err != nil {
-				return fmt.Errorf("Error disconnecting disk from SakuraCloud Server resource: %s", err)
-			}
-		}
-
-		rawDisks := d.Get("disks").([]interface{})
-		if rawDisks != nil {
-			newDisks := expandStringList(rawDisks)
-			// connect disks
-			for _, diskID := range newDisks {
-				_, err := client.Disk.ConnectToServer(toSakuraCloudID(diskID), server.ID)
-				if err != nil {
-					return fmt.Errorf("Error connecting disk to SakuraCloud Server resource: %s", err)
-				}
-			}
-
+		if err := reconcileServerDisks(ctx, client, d, server); err != nil {
+			return fmt.Errorf("reconciling Disks is failed: %s", err)
 		}
 	}
 
 	// NIC
 	if d.HasChange("nic") || d.HasChange("additional_nics") {
-
-		var conf []interface{}
-		if c, ok := d.GetOk("additional_nics"); ok {
-			conf = c.([]interface{})
-		}
-
-		newNICCount := len(conf)
-		for i, nic := range server.Interfaces {
-			if i == 0 {
-				// only when nic has change
-				if d.HasChange("nic") &&
-					server.Interfaces[0].Switch != nil {
-					_, err := client.Interface.DisconnectFromSwitch(server.Interfaces[0].ID)
-					if err != nil {
-						return fmt.Errorf("Error disconnecting NIC from SakuraCloud Switch resource: %s", err)
-					}
-				}
-				continue
-			}
-
-			// disconnect exists NIC
-			if nic.Switch != nil {
-				_, err := client.Interface.DisconnectFromSwitch(nic.ID)
-				if err != nil {
-					return fmt.Errorf("Error disconnecting NIC from SakuraCloud Switch resource: %s", err)
-				}
-			}
-
-			//delete NIC
-			if i > newNICCount {
-				_, err := client.Interface.Delete(nic.ID)
-				if err != nil {
-					return fmt.Errorf("Error deleting SakuraCloud NIC resource: %s", err)
-				}
-			}
-		}
-		// only when nic has change
-		if d.HasChange("nic") {
-			sharedNICCon := d.Get("nic").(string)
-			if sharedNICCon == "shared" {
-				_, err := client.Interface.ConnectToSharedSegment(server.Interfaces[0].ID)
-				if err != nil {
-					return fmt.Errorf("Error connecting NIC to the shared segment: %s", err)
-				}
-			} else if sharedNICCon != "disconnect" {
-				_, err := client.Interface.ConnectToSwitch(server.Interfaces[0].ID, toSakuraCloudID(sharedNICCon))
-				if err != nil {
-					return fmt.Errorf("Error connecting NIC to SakuraCloud Switch resource: %s", err)
-				}
-			}
-		}
-
-		for i, s := range conf {
-			switchID := ""
-			if s != nil {
-				switchID = s.(string)
-			}
-			if len(server.Interfaces) <= i+1 {
-				//create NIC
-				nic := client.Interface.New()
-				nic.SetServerID(server.ID)
-				if switchID != "" {
-					nic.SetSwitchID(toSakuraCloudID(switchID))
-				}
-				_, err := client.Interface.Create(nic)
-				if err != nil {
-					return fmt.Errorf("Error creating NIC to SakuraCloud Server resource: %s", err)
-				}
-
-			} else {
-
-				if switchID != "" {
-					_, err := client.Interface.ConnectToSwitch(server.Interfaces[i+1].ID, toSakuraCloudID(switchID))
-					if err != nil {
-						return fmt.Errorf("Error connecting NIC to SakuraCloud Switch resource: %s", err)
-					}
-				}
-			}
+		if err := reconcileServerNICs(ctx, client, d, server); err != nil {
+			return fmt.Errorf("reconciling NICs is failed: %s", err)
 		}
 	}
 
-	//refresh server(need refresh after disk and nid edit)
-	updatedServer, err := client.Server.Read(toSakuraCloudID(d.Id()))
+	//refresh server(need refresh after disk and nic edit)
+	updatedServer, err := serverOp.Read(ctx, zone, server.ID)
 	if err != nil {
-		return fmt.Errorf("Couldn't find SakuraCloud Server resource: %s", err)
+		return fmt.Errorf("could not read Server: %s", err)
 	}
+	server = updatedServer
 
-	if d.HasChange("display_ipaddress") {
-		if len(updatedServer.Interfaces) > 0 && updatedServer.Interfaces[0].Switch.Scope != sacloud.ESCopeShared {
-			displayIP := d.Get("display_ipaddress").(string)
-			ifID := updatedServer.Interfaces[0].ID
-
-			if displayIP == "" {
-				if _, err := client.Interface.SetDisplayIPAddress(ifID, ""); err != nil {
-					return fmt.Errorf("Failed to update SakuraCloud Server resource: Failed to delete display ip address: %s", err)
-				}
-			} else {
-				if _, err := client.Interface.SetDisplayIPAddress(ifID, displayIP); err != nil {
-					return fmt.Errorf("Failed to update SakuraCloud Server resource: Failed to set display ip address: %s", err)
-				}
-			}
-		}
-	}
-	if d.HasChange("additional_display_ipaddresses") {
-		additionalDIPs := d.Get("additional_display_ipaddresses").([]interface{})
-		for i, nic := range updatedServer.Interfaces {
-			if i == 0 {
-				continue
-			}
-			ifID := nic.ID
-			if len(additionalDIPs) > i-1 {
-				displayIP := additionalDIPs[i-1].(string)
-				if displayIP == "" {
-					if _, err := client.Interface.SetDisplayIPAddress(ifID, ""); err != nil {
-						return fmt.Errorf("Failed to update SakuraCloud Server resource: Failed to delete display ip address: %s", err)
-					}
-				} else {
-					if _, err := client.Interface.SetDisplayIPAddress(ifID, displayIP); err != nil {
-						return fmt.Errorf("Failed to update SakuraCloud Server resource: Failed to set display ip address: %s", err)
-					}
-				}
-			} else {
-				if _, err := client.Interface.SetDisplayIPAddress(ifID, ""); err != nil {
-					return fmt.Errorf("Failed to update SakuraCloud Server resource: Failed to delete display ip address: %s", err)
-				}
+	// edit disk
+	if isDiskConfigChanged && len(updatedServer.Disks) > 0 {
+		editReq := expandDiskEditRequest(d)
+		if editReq != nil {
+			if err := configDiskSync(ctx, client, zone, updatedServer.Disks[0].ID, editReq); err != nil {
+				return fmt.Errorf("editting Disk is failed: %s", err)
 			}
 		}
 	}
 
-	if isDiskConfigChanged {
-		if len(updatedServer.Disks) > 0 {
-			isNeedEditDisk := false
-			diskEditConfig := client.Disk.NewCondig()
-
-			if d.HasChange("nic") || d.HasChange("ipaddress") || d.HasChange("gateway") || d.HasChange("nw_mask_len") {
-				if len(updatedServer.Interfaces) > 0 && updatedServer.Interfaces[0].Switch != nil {
-					if updatedServer.Interfaces[0].Switch.Scope == sacloud.ESCopeShared {
-						isNeedEditDisk = true
-					} else {
-						baseIP := forceString(d.Get("ipaddress"))
-						baseGateway := forceString(d.Get("gateway"))
-						baseMaskLen := forceString(d.Get("nw_mask_len"))
-
-						diskEditConfig.SetUserIPAddress(baseIP)
-						diskEditConfig.SetDefaultRoute(baseGateway)
-						diskEditConfig.SetNetworkMaskLen(baseMaskLen)
-
-						if baseIP != "" || baseGateway != "" || baseMaskLen != "" {
-							isNeedEditDisk = true
-						}
-					}
-				}
-			}
-
-			if d.HasChange("hostname") {
-				if hostName, ok := d.GetOk("hostname"); ok {
-					diskEditConfig.SetHostName(hostName.(string))
-					isNeedEditDisk = true
-				}
-			}
-
-			if d.HasChange("password") {
-				if password, ok := d.GetOk("password"); ok {
-					diskEditConfig.SetPassword(password.(string))
-					isNeedEditDisk = true
-				}
-			}
-
-			if d.HasChange("ssh_key_ids") {
-				if sshKeyIDs, ok := d.GetOk("ssh_key_ids"); ok {
-					ids := expandStringList(sshKeyIDs.([]interface{}))
-					diskEditConfig.SetSSHKeys(ids)
-					isNeedEditDisk = true
-				}
-			}
-
-			if d.HasChange("disable_pw_auth") {
-				if disablePasswordAuth, ok := d.GetOk("disable_pw_auth"); ok {
-					diskEditConfig.SetDisablePWAuth(disablePasswordAuth.(bool))
-					isNeedEditDisk = true
-				}
-			}
-
-			if d.HasChange("note_ids") {
-				if noteIDs, ok := d.GetOk("note_ids"); ok {
-					ids := expandStringList(noteIDs.([]interface{}))
-					diskEditConfig.SetNotes(ids)
-					isNeedEditDisk = true
-				}
-			}
-
-			if isNeedEditDisk {
-				diskID := updatedServer.Disks[0].ID
-				res, err := client.Disk.CanEditDisk(diskID)
-				if err != nil {
-					return fmt.Errorf("Failed to check CanEditDisk: %s", err)
-				}
-				if res {
-					_, err := client.Disk.Config(diskID, diskEditConfig)
-					if err != nil {
-						return fmt.Errorf("Error editting SakuraCloud DiskConfig: %s", err)
-					}
-				} else {
-					log.Printf("[WARN] Disk[%d] does not support modify disk", diskID)
-				}
-			}
-		}
-	}
 	// change Plan
 	if isPlanChanged {
-		s, err := client.Server.ChangePlan(toSakuraCloudID(d.Id()), server.ServerPlan)
+		s, err := serverOp.ChangePlan(ctx, zone, server.ID, &v2.ServerChangePlanRequest{
+			CPU:                  d.Get("core").(int),
+			MemoryMB:             d.Get("memory").(int) * 1024,
+			ServerPlanCommitment: types.ECommitment(d.Get("commitment").(string)),
+			ServerPlanGeneration: types.PlanGenerations.Default,
+		})
 		if err != nil {
-			return fmt.Errorf("Error changing SakuraCloud ServerPlan : %s", err)
+			return fmt.Errorf("changing ServerPlan is failed: %s", err)
 		}
 		server = s
-		d.SetId(s.GetStrID())
+		d.SetId(server.ID.String())
 	}
 
-	if d.HasChange("interface_driver") {
-		if interfaceDriver, ok := d.GetOk("interface_driver"); ok {
-			s := interfaceDriver.(string)
-			if s == "" {
-				s = string(sacloud.InterfaceDriverVirtIO)
-			}
-			server.SetInterfaceDriverByString(s)
-		}
-	}
-
-	if d.HasChange("name") {
-		server.Name = d.Get("name").(string)
-	}
-	if d.HasChange("icon_id") {
-		if iconID, ok := d.GetOk("icon_id"); ok {
-			server.SetIconByID(toSakuraCloudID(iconID.(string)))
-		} else {
-			server.ClearIcon()
-		}
-	}
-	if d.HasChange("description") {
-		if description, ok := d.GetOk("description"); ok {
-			server.Description = description.(string)
-		} else {
-			server.Description = ""
-		}
-	}
-
-	if d.HasChange("tags") {
-		rawTags := d.Get("tags").([]interface{})
-		if rawTags != nil {
-			server.Tags = expandTags(client, rawTags)
-		} else {
-			server.Tags = expandTags(client, []interface{}{})
-		}
-	}
-
-	if d.HasChange("private_host_id") {
-		if rawPrivateHostID, ok := d.GetOk("private_host_id"); ok {
-			privateHostID := rawPrivateHostID.(string)
-			if privateHostID == "" {
-				server.ClearPrivateHost()
-			} else {
-				server.SetPrivateHostByID(toSakuraCloudID(privateHostID))
-			}
-		} else {
-			server.ClearPrivateHost()
-		}
-	}
-
-	server, err = client.Server.Update(toSakuraCloudID(d.Id()), server)
+	server, err = serverOp.Update(ctx, zone, server.ID, &v2.ServerUpdateRequest{
+		Name:            d.Get("name").(string),
+		Description:     d.Get("description").(string),
+		Tags:            expandTagsV2(d.Get("tags").([]interface{})),
+		IconID:          expandSakuraCloudID(d, "icon_id"),
+		PrivateHostID:   expandSakuraCloudID(d, "private_host_id"),
+		InterfaceDriver: types.EInterfaceDriver(d.Get("interface_driver").(string)),
+	})
 	if err != nil {
-		return fmt.Errorf("Error updating SakuraCloud Server resource: %s", err)
+		return fmt.Errorf("updating SakuraCloud Server is failed: %s", err)
 	}
 
 	if d.HasChange("packet_filter_ids") {
-
-		if rawPacketFilterIDs, ok := d.GetOk("packet_filter_ids"); ok {
-			packetFilterIDs := rawPacketFilterIDs.([]interface{})
-			for i, filterID := range packetFilterIDs {
-				strFilterID := ""
-				if filterID != nil {
-					strFilterID = filterID.(string)
-				}
-				if server.Interfaces != nil && len(server.Interfaces) > i {
-					if server.Interfaces[i].PacketFilter != nil {
-						_, err := client.Interface.DisconnectFromPacketFilter(server.Interfaces[i].ID)
-						if err != nil {
-							return fmt.Errorf("Error disconnecting packet filter: %s", err)
-						}
-					}
-
-					if strFilterID != "" {
-						_, err := client.Interface.ConnectToPacketFilter(server.Interfaces[i].ID, toSakuraCloudID(filterID.(string)))
-						if err != nil {
-							return fmt.Errorf("Error connecting packet filter: %s", err)
-						}
-					}
-				}
-			}
-
-			if len(server.Interfaces) > len(packetFilterIDs) {
-				i := len(packetFilterIDs)
-				for i < len(server.Interfaces) {
-					if server.Interfaces[i].PacketFilter != nil {
-						_, err := client.Interface.DisconnectFromPacketFilter(server.Interfaces[i].ID)
-						if err != nil {
-							return fmt.Errorf("Error disconnecting packet filter: %s", err)
-						}
-					}
-
-					i++
-				}
-
-			}
-
-		} else {
-			if server.Interfaces != nil {
-				for _, i := range server.Interfaces {
-					if i.PacketFilter != nil {
-						_, err := client.Interface.DisconnectFromPacketFilter(i.ID)
-						if err != nil {
-							return fmt.Errorf("Error disconnecting packet filter: %s", err)
-						}
-					}
-				}
-			}
+		if err := reconcileServerPacketFilters(ctx, client, d, server); err != nil {
+			return fmt.Errorf("reconciling PacketFilter is failed: %s", err)
 		}
 	}
 
 	if d.HasChange("cdrom_id") {
-
-		if server.Instance.CDROM != nil {
-			_, err := client.Server.EjectCDROM(server.ID, server.Instance.CDROM.ID)
-			if err != nil {
-				return fmt.Errorf("Error Ejecting CDROM: %s", err)
+		if !server.CDROMID.IsEmpty() {
+			if err := serverOp.EjectCDROM(ctx, zone, server.ID, &v2.EjectCDROMRequest{ID: server.CDROMID}); err != nil {
+				return fmt.Errorf("ejecting CD-ROM is failed: %s", err)
 			}
 		}
-
-		if rawCDROMID, ok := d.GetOk("cdrom_id"); ok {
-			cdromID := rawCDROMID.(string)
-			_, err := client.Server.InsertCDROM(server.ID, toSakuraCloudID(cdromID))
-			if err != nil {
-				return fmt.Errorf("Error Inserting CDROM: %s", err)
+		cdromID := expandSakuraCloudID(d, "cdrom_id")
+		if !cdromID.IsEmpty() {
+			if err := serverOp.InsertCDROM(ctx, zone, server.ID, &v2.InsertCDROMRequest{ID: cdromID}); err != nil {
+				return fmt.Errorf("inserting CD-ROM is failed: %s", err)
 			}
 		}
 	}
 
 	if isNeedRestart && isRunning {
-		err := bootServer(client, toSakuraCloudID(d.Id()))
-		if err != nil {
-			return fmt.Errorf("Error booting SakuraCloud Server resource: %s", err)
+		if err := bootServerSync(ctx, client, zone, server.ID); err != nil {
+			return fmt.Errorf("booting SakuraCloud Server is failed: %s", err)
 		}
 	}
 
@@ -880,159 +429,163 @@ func resourceSakuraCloudServerUpdate(d *schema.ResourceData, meta interface{}) e
 }
 
 func resourceSakuraCloudServerDelete(d *schema.ResourceData, meta interface{}) error {
+	client, ctx, zone := getSacloudV2Client(d, meta)
+	serverOp := v2.NewServerOp(client)
 
-	lockKey := getServerDeleteAPILockKey(toSakuraCloudID(d.Id()))
-	sakuraMutexKV.Lock(lockKey)
-	defer sakuraMutexKV.Unlock(lockKey)
+	sakuraMutexKV.Lock(d.Id())
+	defer sakuraMutexKV.Unlock(d.Id())
 
-	client := getSacloudAPIClient(d, meta)
-
-	server, err := client.Server.Read(toSakuraCloudID(d.Id()))
+	server, err := serverOp.Read(ctx, zone, types.StringID(d.Id()))
 	if err != nil {
-		return fmt.Errorf("Couldn't find SakuraCloud Server resource: %s", err)
+		if v2.IsNotFoundError(err) {
+			d.SetId("")
+			return nil
+		}
+		return fmt.Errorf("could not read SakuraCloud Server: %s", err)
 	}
 
-	if server.Instance.IsUp() {
-		err := stopServer(client, toSakuraCloudID(d.Id()), d)
-		if err != nil {
-			return fmt.Errorf("Error stopping SakuraCloud Server resource: %s", err)
+	if server.InstanceStatus.IsUp() {
+		if err := shutdownServerSync(ctx, client, zone, server.ID); err != nil {
+			return fmt.Errorf("stopping SakuraCloud Server is failed: %s", err)
 		}
 	}
 
-	_, err = client.Server.Delete(toSakuraCloudID(d.Id()))
-
-	if err != nil {
-		return fmt.Errorf("Error deleting SakuraCloud Server resource: %s", err)
+	if err := serverOp.Delete(ctx, zone, server.ID); err != nil {
+		return fmt.Errorf("deleting SakuraCloud Server is failed: %s", err)
 	}
-
 	return nil
-
 }
 
-func setServerResourceData(d *schema.ResourceData, client *APIClient, data *sacloud.Server) error {
+func setServerResourceData(ctx context.Context, d *schema.ResourceData, client *APIClient, data *v2.Server) error {
+	zone := getV2Zone(d, client)
 
-	d.Set("name", data.Name)
-	if err := d.Set("core", data.ServerPlan.CPU); err != nil {
-		return err
-	}
-	if err := d.Set("memory", toSizeGB(data.ServerPlan.MemoryMB)); err != nil {
-		return err
-	}
-	d.Set("commitment", string(data.ServerPlan.Commitment))
-	d.Set("disks", flattenDisks(data.Disks))
-
-	if data.Instance.CDROM == nil {
-		d.Set("cdrom_id", "")
-	} else {
-		d.Set("cdrom_id", data.Instance.CDROM.GetStrID())
-	}
-
-	d.Set("interface_driver", string(data.GetInterfaceDriverString()))
-
-	if data.PrivateHost != nil && data.PrivateHost.ID > 0 {
-		d.Set("private_host_id", data.PrivateHost.GetStrID())
-		d.Set("private_host_name", data.PrivateHost.Host.GetName())
-	}
-
-	hasFirstInterface := len(data.Interfaces) > 0
-	if hasFirstInterface {
-		if data.Interfaces[0].Switch == nil {
-			d.Set("nic", "disconnect")
-			d.Set("display_ipaddress", "")
-		} else {
-			if data.Interfaces[0].Switch.Scope == sacloud.ESCopeShared {
-				d.Set("nic", "shared")
-				d.Set("display_ipaddress", data.Interfaces[0].GetIPAddress())
-			} else {
-				d.Set("nic", data.Interfaces[0].Switch.GetStrID())
-				ip := data.Interfaces[0].UserIPAddress
-				if ip == "0.0.0.0" {
-					ip = ""
-				}
-				d.Set("display_ipaddress", ip)
-			}
-		}
-	} else {
-		d.Set("nic", "")
-		d.Set("display_ipaddress", "")
-	}
-
-	d.Set("additional_nics", flattenInterfaces(data.Interfaces))
-	d.Set("additional_display_ipaddresses", flattenDisplayIPAddress(data.Interfaces))
-
-	d.Set("icon_id", data.GetIconStrID())
-	d.Set("description", data.Description)
-	d.Set("tags", data.Tags)
-
-	d.Set("packet_filter_ids", flattenPacketFilters(data.Interfaces))
-
-	//readonly values
-	d.Set("macaddresses", flattenMacAddresses(data.Interfaces))
-	d.Set("ipaddress", "")
-	d.Set("dns_servers", []string{})
-	d.Set("gateway", "")
-	d.Set("nw_address", "")
-	d.Set("nw_mask_len", "")
-	d.Set("dns_servers", data.Zone.Region.NameServers)
-	if hasFirstInterface && data.Interfaces[0].Switch != nil {
-		ip := ""
-		if data.Interfaces[0].Switch.Scope == sacloud.ESCopeShared {
-			ip = data.Interfaces[0].IPAddress
-		} else {
-			ip = data.Interfaces[0].UserIPAddress
-		}
-		d.Set("ipaddress", ip)
-
-		if data.Interfaces[0].Switch.UserSubnet != nil {
-			d.Set("gateway", data.Interfaces[0].Switch.UserSubnet.DefaultRoute)
-
-			d.Set("nw_mask_len", fmt.Sprintf("%d", data.Interfaces[0].Switch.UserSubnet.NetworkMaskLen))
-		}
-		if data.Interfaces[0].Switch.Subnet != nil {
-			d.Set("nw_address", data.Interfaces[0].Switch.Subnet.NetworkAddress) // null if connected switch(not router)
-		}
-
+	ip, gateway, nwMaskLen, nwAddress := flattenServerNetworkInfo(data)
+	if ip != "" {
 		// build conninfo
 		connInfo := map[string]string{
 			"type": "ssh",
 			"host": ip,
 		}
-		userName, err := serverutils.GetDefaultUserName(client.Client, data.ID)
+		userName, err := serverUtil.GetDefaultUserName(ctx, zone, serverUtil.NewSourceInfoReader(client), data.ID)
 		if err != nil {
 			log.Printf("[WARN] can't retrive connInfo from archives (server: %d).", data.ID)
 		}
-
 		if userName != "" {
 			connInfo["user"] = userName
 		}
-
 		d.SetConnInfo(connInfo)
 	}
 
-	d.Set("vnc_host", "")
-	d.Set("vnc_port", 0)
-	d.Set("vnc_password", "")
-
-	if data.IsUp() && data.Zone.Name != "tk1v" {
-		vncRes, err := client.Server.GetVNCProxy(data.ID)
-		if err != nil {
-			return fmt.Errorf("Get VNCProxy info is failed: %s", err)
-		}
-		d.Set("vnc_host", vncRes.IOServerHost)
-		d.Set("vnc_port", forceAtoI(vncRes.Port))
-		d.Set("vnc_password", vncRes.Password)
+	d.Set("name", data.Name)
+	d.Set("core", data.CPU)
+	d.Set("memory", data.GetMemoryGB())
+	d.Set("commitment", data.ServerPlanCommitment.String())
+	if err := d.Set("disks", flattenServerConnectedDiskIDs(data)); err != nil {
+		return err
 	}
-
-	setPowerManageTimeoutValueToState(d)
-	d.Set("zone", client.Zone)
+	d.Set("cdrom_id", data.CDROMID.String())
+	d.Set("interface_driver", data.InterfaceDriver.String())
+	d.Set("private_host_id", data.PrivateHostID.String())
+	d.Set("private_host_name", data.PrivateHostName)
+	d.Set("nic", flattenServerNIC(data))
+	if err := d.Set("additional_nics", flattenServerAdditionalNICs(data)); err != nil {
+		return err
+	}
+	d.Set("icon_id", data.IconID.String())
+	d.Set("description", data.Description)
+	if err := d.Set("tags", data.Tags); err != nil {
+		return err
+	}
+	if err := d.Set("packet_filter_ids", flattenServerConnectedPacketFilterIDs(data)); err != nil {
+		return err
+	}
+	if err := d.Set("macaddresses", flattenServerMACAddresses(data)); err != nil {
+		return err
+	}
+	d.Set("ipaddress", ip)
+	d.Set("gateway", gateway)
+	d.Set("nw_address", nwAddress)
+	d.Set("nw_mask_len", nwMaskLen)
+	if err := d.Set("dns_servers", data.Zone.Region.NameServers); err != nil {
+		return err
+	}
+	d.Set("zone", zone)
 	return nil
 }
 
-func createServer(client *APIClient, server *sacloud.Server) (*sacloud.Server, error) {
-	sakuraMutexKV.Lock(serverAPILockKey)
-	defer sakuraMutexKV.Unlock(serverAPILockKey)
+func configDiskSync(ctx context.Context, client *APIClient, zone string, id types.ID, editReq *v2.DiskEditRequest) error {
+	diskOp := v2.NewDiskOp(client)
+	if err := diskOp.Config(ctx, zone, id, editReq); err != nil {
+		return err
+	}
+	waiter := v2.WaiterForReady(func() (interface{}, error) {
+		return diskOp.Read(ctx, zone, id)
+	})
+	if _, err := waiter.WaitForState(ctx); err != nil {
+		return err
+	}
+	return nil
+}
 
-	return client.Server.Create(server)
+func bootServerSync(ctx context.Context, client *APIClient, zone string, id types.ID) error {
+	serverOp := v2.NewServerOp(client)
+	if err := bootServerV2(ctx, client, zone, id); err != nil {
+		return err
+	}
+	waiter := v2.WaiterForUp(func() (interface{}, error) { return serverOp.Read(ctx, zone, id) })
+	if _, err := waiter.WaitForState(ctx); err != nil {
+		return err
+	}
+	return nil
+}
+
+func shutdownServerSync(ctx context.Context, client *APIClient, zone string, id types.ID) error {
+	serverOp := v2.NewServerOp(client)
+	if err := shutdownServerV2(ctx, client, zone, id); err != nil {
+		return err
+	}
+	waiter := v2.WaiterForDown(func() (interface{}, error) { return serverOp.Read(ctx, zone, id) })
+	if _, err := waiter.WaitForState(ctx); err != nil {
+		return err
+	}
+	return nil
+}
+
+func bootServerV2(ctx context.Context, client *APIClient, zone string, id types.ID) error {
+	serverOp := v2.NewServerOp(client)
+
+	lockServerPowerState(id)
+	defer unlockServerPowerState(id)
+
+	if err := serverOp.Boot(ctx, zone, id); err != nil {
+		return err
+	}
+	return nil
+}
+
+func shutdownServerV2(ctx context.Context, client *APIClient, zone string, id types.ID) error {
+	serverOp := v2.NewServerOp(client)
+
+	lockServerPowerState(id)
+	defer unlockServerPowerState(id)
+
+	if err := serverOp.Shutdown(ctx, zone, id, &v2.ShutdownOption{
+		Force: true, // TODO 後で
+	}); err != nil {
+		return err
+	}
+	return nil
+
+}
+
+func lockServerPowerState(id types.ID) {
+	sakuraMutexKV.Lock(getServerPowerAPILockKey(id.Int64()))
+	sakuraMutexKV.Lock(serverAPILockKey)
+}
+
+func unlockServerPowerState(id types.ID) {
+	sakuraMutexKV.Unlock(serverAPILockKey)
+	sakuraMutexKV.Unlock(getServerPowerAPILockKey(id.Int64()))
 }
 
 func bootServer(client *APIClient, id int64) error {
@@ -1119,13 +672,348 @@ func serverNetworkAttrsCustomizeDiff(d *schema.ResourceDiff, meta interface{}) e
 	}
 
 	if nic == "shared" {
-		targets := []string{"ipaddress", "nw_mask_len", "gateway"}
+		targets := []string{"ipaddress", "gateway"}
 		for _, t := range targets {
 			o, n := d.GetChange(t)
 			if o != nil && o.(string) != "" && n != nil {
 				d.Clear(t)
 			}
 		}
+		o, n := d.GetChange("nw_mask_len")
+		if o != nil && o.(int) != 0 && n != nil {
+			d.Clear("nw_mask_len")
+		}
+	}
+	return nil
+}
+
+func expandConnectedSwitches(d resourceValueGettable) []*v2.ConnectedSwitch {
+	var switches []*v2.ConnectedSwitch
+
+	var primary *v2.ConnectedSwitch
+	nic := d.Get("nic").(string)
+	switch nic {
+	case "", "shared":
+		primary = &v2.ConnectedSwitch{
+			Scope: types.Scopes.Shared,
+		}
+	case "disconnect":
+		primary = nil
+	default:
+		primary = &v2.ConnectedSwitch{
+			ID: types.StringID(nic),
+		}
+	}
+	switches = append(switches, primary)
+
+	additionalNICs := expandSakuraCloudIDs(d, "additional_nics")
+	for _, id := range additionalNICs {
+		var cs *v2.ConnectedSwitch
+		if !id.IsEmpty() {
+			cs = &v2.ConnectedSwitch{ID: id}
+		}
+		switches = append(switches, cs)
+	}
+
+	return switches
+}
+
+func flattenServerNIC(server *v2.Server) string {
+	hasFirstInterface := len(server.Interfaces) > 0
+	if hasFirstInterface {
+		nic := server.Interfaces[0]
+		if nic.SwitchID.IsEmpty() {
+			return "disconnect"
+		}
+		if nic.SwitchScope == types.Scopes.Shared {
+			return "shared"
+		}
+		return nic.SwitchID.String()
+	}
+	return ""
+}
+
+func flattenServerAdditionalNICs(server *v2.Server) []string {
+	var additionalNICs []string
+	for i, iface := range server.Interfaces {
+		if i == 0 {
+			continue
+		}
+		additionalNICs = append(additionalNICs, iface.SwitchID.String())
+	}
+	return additionalNICs
+}
+
+func flattenServerConnectedDiskIDs(server *v2.Server) []string {
+	var ids []string
+	for _, disk := range server.Disks {
+		ids = append(ids, disk.ID.String())
+	}
+	return ids
+}
+
+func flattenServerConnectedPacketFilterIDs(server *v2.Server) []string {
+	var ids []string
+	for _, nic := range server.Interfaces {
+		ids = append(ids, nic.PacketFilterID.String())
+	}
+	return ids
+}
+
+func flattenServerMACAddresses(server *v2.Server) []string {
+	var macs []string
+	for _, nic := range server.Interfaces {
+		macs = append(macs, strings.ToLower(nic.MACAddress))
+	}
+	return macs
+}
+
+func flattenServerNetworkInfo(server *v2.Server) (ip, gateway string, nwMaskLen int, nwAddress string) {
+	if !server.Interfaces[0].SwitchID.IsEmpty() {
+		nic := server.Interfaces[0]
+		if nic.SwitchScope == types.Scopes.Shared {
+			ip = nic.IPAddress
+		} else {
+			ip = nic.UserIPAddress
+		}
+		gateway = nic.UserSubnetDefaultRoute
+		nwMaskLen = nic.UserSubnetNetworkMaskLen
+		nwAddress = nic.SubnetNetworkAddress // null if connected switch(not router)
+	}
+	return
+}
+
+func expandDiskEditSSHKeys(d resourceValueGettable) []*v2.DiskEditSSHKey {
+	var keys []*v2.DiskEditSSHKey
+	ids := expandSakuraCloudIDs(d, "ssh_key_ids")
+	for _, id := range ids {
+		keys = append(keys, &v2.DiskEditSSHKey{ID: id})
+	}
+	return keys
+}
+
+func expandDiskEditNotes(d resourceValueGettable) []*v2.DiskEditNote {
+	var notes []*v2.DiskEditNote
+	ids := expandSakuraCloudIDs(d, "note_ids")
+	for _, id := range ids {
+		notes = append(notes, &v2.DiskEditNote{ID: id})
+	}
+	return notes
+}
+
+func expandDiskEditUserSubnet(d resourceValueGettable) *v2.DiskEditUserSubnet {
+	maskLen := d.Get("nw_mask_len").(int)
+	gateway := d.Get("gateway").(string)
+	if maskLen != 0 && gateway != "" {
+		return &v2.DiskEditUserSubnet{
+			DefaultRoute:   gateway,
+			NetworkMaskLen: maskLen,
+		}
+	}
+	return nil
+}
+
+func expandDiskEditRequest(d resourceValueGettable) *v2.DiskEditRequest {
+
+	editReq := &v2.DiskEditRequest{
+		Background:          true,
+		Password:            d.Get("password").(string),
+		SSHKeys:             expandDiskEditSSHKeys(d),
+		DisablePWAuth:       d.Get("disable_pw_auth").(bool),
+		EnableDHCP:          false, // TODO 項目追加
+		ChangePartitionUUID: false, // TODO 項目追加
+		HostName:            d.Get("hostname").(string),
+		Notes:               expandDiskEditNotes(d),
+		UserIPAddress:       d.Get("ipaddress").(string),
+		UserSubnet:          expandDiskEditUserSubnet(d),
+	}
+
+	if isNeedDiskEdit(editReq) {
+		return editReq
+	}
+	return nil
+}
+
+func isNeedDiskEdit(req *v2.DiskEditRequest) bool {
+	return req.Password != "" ||
+		len(req.SSHKeys) > 0 ||
+		req.DisablePWAuth ||
+		req.EnableDHCP ||
+		req.ChangePartitionUUID ||
+		req.HostName != "" ||
+		len(req.Notes) > 0 ||
+		req.UserIPAddress != "" ||
+		req.UserSubnet != nil
+}
+
+func isServerPlanChanged(d *schema.ResourceData) bool {
+	return d.HasChange("core") || d.HasChange("memory") || d.HasChange("commitment")
+}
+
+func isServerDiskConfigChanged(d *schema.ResourceData) bool {
+	return d.HasChange("disks") ||
+		d.HasChange("nic") ||
+		d.HasChange("ipaddress") ||
+		d.HasChange("gateway") ||
+		d.HasChange("nw_mask_len") ||
+		d.HasChange("hostname") ||
+		d.HasChange("password") ||
+		d.HasChange("ssh_key_ids") ||
+		d.HasChange("disable_pw_auth") ||
+		d.HasChange("note_ids")
+}
+
+func validateServerPlan(ctx context.Context, client *APIClient, d resourceValueGettable) error {
+	zone := getV2Zone(d, client)
+	_, err := serverUtil.FindPlan(ctx, v2.NewServerPlanOp(client), zone, &serverUtil.FindPlanRequest{
+		CPU:        d.Get("core").(int),
+		MemoryGB:   d.Get("memory").(int),
+		Commitment: types.ECommitment(d.Get("commitment").(string)),
+		Generation: types.PlanGenerations.Default,
+	})
+	if err != nil {
+		return fmt.Errorf("server plan is not found. Please change 'core' or 'memory' or 'commitment': %s", err)
+	}
+	return nil
+}
+
+func reconcileServerDisks(ctx context.Context, client *APIClient, d resourceValueGettable, server *v2.Server) error {
+	diskOp := v2.NewDiskOp(client)
+	zone := getV2Zone(d, client)
+
+	//disconnect all old disks
+	for _, disk := range server.Disks {
+		if err := diskOp.DisconnectFromServer(ctx, zone, disk.ID); err != nil {
+			return fmt.Errorf("disconnecting Disk from Server is failed: %s", err)
+		}
+	}
+
+	diskIDs := expandSakuraCloudIDs(d, "disks")
+	for _, diskID := range diskIDs {
+		if err := diskOp.ConnectToServer(ctx, zone, diskID, server.ID); err != nil {
+			return fmt.Errorf("connecting Disk to Server is failed: %s", err)
+		}
+	}
+	return nil
+}
+
+func reconcileServerPacketFilters(ctx context.Context, client *APIClient, d resourceValueGettable, server *v2.Server) error {
+	interfaceOp := v2.NewInterfaceOp(client)
+	zone := getV2Zone(d, client)
+	pfIDs := expandSakuraCloudIDs(d, "packet_filter_ids")
+
+	//disconnect
+	for i, nic := range server.Interfaces {
+		if !nic.PacketFilterID.IsEmpty() {
+			if err := interfaceOp.DisconnectFromPacketFilter(ctx, zone, nic.ID); err != nil {
+				return fmt.Errorf("disconnecting PacketFilter is failed: %s", err)
+			}
+		}
+		if len(pfIDs) > i {
+			pfID := pfIDs[i]
+			if err := interfaceOp.ConnectToPacketFilter(ctx, zone, nic.ID, pfID); err != nil {
+				return fmt.Errorf("connecting PacketFilter is failed: %s", err)
+			}
+		}
+	}
+	return nil
+}
+
+func reconcileServerNICs(ctx context.Context, client *APIClient, d *schema.ResourceData, server *v2.Server) error {
+	interfaceOp := v2.NewInterfaceOp(client)
+	zone := getV2Zone(d, client)
+
+	nicConf := []string{d.Get("nic").(string)}
+	additionalIDs := expandSakuraCloudIDs(d, "additional_nics")
+	for _, id := range additionalIDs {
+		nicConf = append(nicConf, id.String())
+	}
+
+	// disconnect&delete unnecessary interfaces
+	for i, nic := range server.Interfaces {
+		if i < len(nicConf) {
+			continue
+		}
+		if !nic.SwitchID.IsEmpty() {
+			if err := interfaceOp.DisconnectFromSwitch(ctx, zone, nic.ID); err != nil {
+				return fmt.Errorf("disconnecting from Switch is failed: %s", err)
+			}
+		}
+		if err := interfaceOp.Delete(ctx, zone, nic.ID); err != nil {
+			return fmt.Errorf("deleting Interface is failed: %s", err)
+		}
+	}
+
+	if len(nicConf) == 0 {
+		return nil
+	}
+
+	for i, nic := range nicConf {
+		if err := reconcileServerInterfaceConnection(ctx, client, zone, nic, i, server); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+type serverConnectedNIC interface {
+	GetID() types.ID
+	GetSwitchID() types.ID
+	GetSwitchScope() types.EScope
+}
+
+func reconcileServerInterfaceConnection(ctx context.Context, client *APIClient, zone string, nicConf string, nicIndex int, server *v2.Server) error {
+	interfaceOp := v2.NewInterfaceOp(client)
+
+	var nic serverConnectedNIC
+	if len(server.Interfaces) <= nicIndex {
+		newNIC, err := interfaceOp.Create(ctx, zone, &v2.InterfaceCreateRequest{ServerID: server.ID})
+		if err != nil {
+			return err
+		}
+		nic = newNIC
+	} else {
+		nic = server.Interfaces[nicIndex]
+	}
+
+	switch nicConf {
+	case "shared":
+		if nic.GetSwitchScope() != types.Scopes.Shared {
+			// disconnect if already connected
+			if !nic.GetSwitchID().IsEmpty() {
+				if err := interfaceOp.DisconnectFromSwitch(ctx, zone, nic.GetID()); err != nil {
+					return fmt.Errorf("disconnecting from Switch is failed: %s", err)
+				}
+			}
+			// connect to shared segment
+			if err := interfaceOp.ConnectToSharedSegment(ctx, zone, nic.GetID()); err != nil {
+				return fmt.Errorf("connecting to SharedSegment is failed: %s", err)
+			}
+		}
+	case "disconnect":
+		// disconnect if already connected
+		if !nic.GetSwitchID().IsEmpty() {
+			if err := interfaceOp.DisconnectFromSwitch(ctx, zone, nic.GetID()); err != nil {
+				return fmt.Errorf("disconnecting from Switch is failed: %s", err)
+			}
+		}
+	default:
+		switchID := types.StringID(nicConf)
+		if !nic.GetSwitchID().IsEmpty() && nic.GetSwitchID() != switchID {
+			if err := interfaceOp.DisconnectFromSwitch(ctx, zone, nic.GetID()); err != nil {
+				return fmt.Errorf("disconnecting from Switch is failed: %s", err)
+			}
+		}
+
+		if nic.GetSwitchID() != switchID {
+			// connect to switch
+			if !switchID.IsEmpty() {
+				if err := interfaceOp.ConnectToSwitch(ctx, zone, nic.GetID(), switchID); err != nil {
+					return fmt.Errorf("connecting to Switch is failed: %s", err)
+				}
+			}
+		}
+
 	}
 	return nil
 }
