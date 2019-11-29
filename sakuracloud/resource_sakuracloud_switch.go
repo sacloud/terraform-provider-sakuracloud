@@ -196,7 +196,7 @@ func resourceSakuraCloudSwitchDelete(d *schema.ResourceData, meta interface{}) e
 	return nil
 }
 
-func disconnectSwitchFromServer(ctx context.Context, client *APIClient, zone string, id types.ID, serverID types.ID) error {
+func disconnectSwitchFromServer(ctx context.Context, client *APIClient, zone string, id, serverID types.ID) error {
 	ifOp := sacloud.NewInterfaceOp(client)
 	serverOp := sacloud.NewServerOp(client)
 
