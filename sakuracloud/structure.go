@@ -50,6 +50,42 @@ func mapToResourceData(v map[string]interface{}) resourceValueGettable {
 	return &resourceMapValue{value: v}
 }
 
+func boolOrDefault(d resourceValueGettable, key string) bool {
+	if v, ok := d.GetOk(key); ok {
+		if v, ok := v.(bool); ok {
+			return v
+		}
+	}
+	return false
+}
+
+func intOrDefault(d resourceValueGettable, key string) int {
+	if v, ok := d.GetOk(key); ok {
+		if v, ok := v.(int); ok {
+			return v
+		}
+	}
+	return 0
+}
+
+func stringOrDefault(d resourceValueGettable, key string) string {
+	if v, ok := d.GetOk(key); ok {
+		if v, ok := v.(string); ok {
+			return v
+		}
+	}
+	return ""
+}
+
+func stringListOrDefault(d resourceValueGettable, key string) []string {
+	if v, ok := d.GetOk(key); ok {
+		if v, ok := v.([]interface{}); ok {
+			return expandStringList(v)
+		}
+	}
+	return []string{}
+}
+
 func getMapFromResource(d resourceValueGettable, key string) (map[string]interface{}, bool) {
 	v, ok := d.GetOk(key)
 	if !ok {
@@ -91,9 +127,11 @@ func getSacloudAPIClient(d resourceValueGettable, meta interface{}) *APIClient {
 		client.Zone = zone.(string)
 	}
 	return &APIClient{
-		Client:      client,
-		APICaller:   c.APICaller,
-		defaultZone: c.defaultZone,
+		Client:                        client,
+		APICaller:                     c.APICaller,
+		defaultZone:                   c.defaultZone,
+		deletionWaiterTimeout:         c.deletionWaiterTimeout,
+		deletionWaiterPollingInterval: c.deletionWaiterPollingInterval,
 	}
 }
 

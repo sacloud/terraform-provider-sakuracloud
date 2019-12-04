@@ -16,8 +16,6 @@ import (
 )
 
 const serverAPILockKey = "sakuracloud_server.lock"
-const serverPowerAPILockKey = "sakuracloud_server.power.%d.lock"
-const serverDeleteAPILockKey = "sakuracloud_server.delete.%d.lock"
 
 func resourceSakuraCloudServer() *schema.Resource {
 	return &schema.Resource{
@@ -146,7 +144,6 @@ func resourceSakuraCloudServer() *schema.Resource {
 				Computed: true,
 				Elem:     &schema.Schema{Type: schema.TypeString},
 			},
-			powerManageTimeoutKey: powerManageTimeoutParam,
 			"zone": {
 				Type:         schema.TypeString,
 				Optional:     true,
@@ -525,136 +522,6 @@ func configDiskSync(ctx context.Context, client *APIClient, zone string, id type
 		return err
 	}
 	return nil
-}
-
-func bootServerSync(ctx context.Context, client *APIClient, zone string, id types.ID) error {
-	serverOp := v2.NewServerOp(client)
-	if err := bootServerV2(ctx, client, zone, id); err != nil {
-		return err
-	}
-	waiter := v2.WaiterForUp(func() (interface{}, error) { return serverOp.Read(ctx, zone, id) })
-	if _, err := waiter.WaitForState(ctx); err != nil {
-		return err
-	}
-	return nil
-}
-
-func shutdownServerSync(ctx context.Context, client *APIClient, zone string, id types.ID) error {
-	serverOp := v2.NewServerOp(client)
-	if err := shutdownServerV2(ctx, client, zone, id); err != nil {
-		return err
-	}
-	waiter := v2.WaiterForDown(func() (interface{}, error) { return serverOp.Read(ctx, zone, id) })
-	if _, err := waiter.WaitForState(ctx); err != nil {
-		return err
-	}
-	return nil
-}
-
-func bootServerV2(ctx context.Context, client *APIClient, zone string, id types.ID) error {
-	serverOp := v2.NewServerOp(client)
-
-	lockServerPowerState(id)
-	defer unlockServerPowerState(id)
-
-	if err := serverOp.Boot(ctx, zone, id); err != nil {
-		return err
-	}
-	return nil
-}
-
-func shutdownServerV2(ctx context.Context, client *APIClient, zone string, id types.ID) error {
-	serverOp := v2.NewServerOp(client)
-
-	lockServerPowerState(id)
-	defer unlockServerPowerState(id)
-
-	if err := serverOp.Shutdown(ctx, zone, id, &v2.ShutdownOption{
-		Force: true, // TODO 後で
-	}); err != nil {
-		return err
-	}
-	return nil
-
-}
-
-func lockServerPowerState(id types.ID) {
-	sakuraMutexKV.Lock(getServerPowerAPILockKey(id.Int64()))
-	sakuraMutexKV.Lock(serverAPILockKey)
-}
-
-func unlockServerPowerState(id types.ID) {
-	sakuraMutexKV.Unlock(serverAPILockKey)
-	sakuraMutexKV.Unlock(getServerPowerAPILockKey(id.Int64()))
-}
-
-func bootServer(client *APIClient, id int64) error {
-	var err error
-	// power API lock(for same resource)
-	lockKey := getServerPowerAPILockKey(id)
-	sakuraMutexKV.Lock(lockKey)
-	defer sakuraMutexKV.Unlock(lockKey)
-
-	// lock API (for power manage APIs)
-	sakuraMutexKV.Lock(serverAPILockKey)
-	s, err := client.Server.Read(id)
-	if err != nil {
-		sakuraMutexKV.Unlock(serverAPILockKey)
-		return err
-	}
-	if !s.IsUp() {
-		_, err = client.Server.Boot(id)
-	}
-	sakuraMutexKV.Unlock(serverAPILockKey)
-
-	if err != nil {
-		return err
-	}
-
-	err = client.Server.SleepUntilUp(id, client.DefaultTimeoutDuration)
-	if err != nil {
-		return err
-	}
-	return err
-}
-
-func stopServer(client *APIClient, id int64, d *schema.ResourceData) error {
-	var err error
-	// power API lock(for same resource)
-	lockKey := getServerPowerAPILockKey(id)
-	sakuraMutexKV.Lock(lockKey)
-	defer sakuraMutexKV.Unlock(lockKey)
-
-	// lock API (for power manage APIs)
-	sakuraMutexKV.Lock(serverAPILockKey)
-	s, err := client.Server.Read(id)
-	if err != nil {
-		sakuraMutexKV.Unlock(serverAPILockKey)
-		return err
-	}
-	if !s.IsDown() {
-		handleShutdown(client.Server, id, d, client.DefaultTimeoutDuration)
-	}
-	sakuraMutexKV.Unlock(serverAPILockKey)
-
-	if err != nil {
-		return err
-	}
-
-	err = client.Server.SleepUntilDown(id, client.DefaultTimeoutDuration)
-	if err != nil {
-		return err
-	}
-
-	return err
-}
-
-func getServerPowerAPILockKey(id int64) string {
-	return fmt.Sprintf(serverPowerAPILockKey, id)
-}
-
-func getServerDeleteAPILockKey(id int64) string {
-	return fmt.Sprintf(serverDeleteAPILockKey, id)
 }
 
 func serverNetworkAttrsCustomizeDiff(d *schema.ResourceDiff, meta interface{}) error {

@@ -257,7 +257,6 @@ func setServerV2ResourceData(ctx context.Context, d *schema.ResourceData, client
 		vncPassword = vncRes.Password
 	}
 
-	setPowerManageTimeoutValueToState(d)
 	return setResourceData(d, map[string]interface{}{
 		"name":                           data.Name,
 		"core":                           data.CPU,

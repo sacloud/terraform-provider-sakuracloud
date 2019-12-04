@@ -2,11 +2,10 @@ package sakuracloud
 
 import (
 	"fmt"
-	"os"
-	"testing"
-
 	"github.com/hashicorp/terraform/helper/schema"
 	"github.com/hashicorp/terraform/terraform"
+	"os"
+	"testing"
 )
 
 var testAccProviders map[string]terraform.ResourceProvider
@@ -25,7 +24,6 @@ func init() {
 	testAccProviders = map[string]terraform.ResourceProvider{
 		"sakuracloud": testAccProvider,
 	}
-
 }
 
 func TestProvider(t *testing.T) {
@@ -67,7 +65,12 @@ func testAccPreCheck(t *testing.T) {
 }
 
 func skipIfFakeModeEnabled(t *testing.T) {
-	if fakeMode := os.Getenv("FAKE_MODE"); fakeMode != "" {
+	if isFakeModeEnabled() {
 		t.Skip("This test runs only without FAKE_MODE environment variables")
 	}
+}
+
+func isFakeModeEnabled() bool {
+	fakeMode := os.Getenv("FAKE_MODE")
+	return fakeMode != ""
 }

@@ -43,7 +43,9 @@ type Config struct {
 type APIClient struct {
 	*v1.Client
 	v2.APICaller
-	defaultZone string
+	defaultZone                   string
+	deletionWaiterTimeout         time.Duration
+	deletionWaiterPollingInterval time.Duration
 }
 
 // NewClient returns new API Client for SakuraCloud
@@ -92,10 +94,20 @@ func (c *Config) NewClient() *APIClient {
 
 	v2Client := c.newClientV2()
 
+	// TODO パラメータ化
+	deletionWaiterTimeout := 30 * time.Minute
+	deletionWaiterPollingInterval := 5 * time.Second
+	if c.FakeMode != "" {
+		deletionWaiterTimeout = 10 * time.Second
+		deletionWaiterPollingInterval = 10 * time.Millisecond
+	}
+
 	return &APIClient{
-		Client:      client,
-		APICaller:   v2Client,
-		defaultZone: c.Zone,
+		Client:                        client,
+		APICaller:                     v2Client,
+		defaultZone:                   c.Zone,
+		deletionWaiterTimeout:         deletionWaiterTimeout,
+		deletionWaiterPollingInterval: deletionWaiterPollingInterval,
 	}
 }
 
@@ -118,6 +130,11 @@ func (c *Config) newClientV2() v2.APICaller {
 		HTTPClient:             httpClient,
 	}
 	v2.DefaultStatePollTimeout = time.Duration(c.TimeoutMinute) * time.Minute
+
+	if c.FakeMode != "" {
+		v2.DefaultStatePollInterval = 10 * time.Millisecond
+		v2.APIDefaultRetryInterval = 10 * time.Millisecond
+	}
 
 	if c.TraceMode != "" {
 		enableAPITrace := true

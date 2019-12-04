@@ -3,7 +3,6 @@ package sakuracloud
 import (
 	"context"
 	"fmt"
-
 	"github.com/sacloud/libsacloud/v2/sacloud/types"
 
 	"github.com/hashicorp/terraform/helper/schema"
@@ -119,6 +118,9 @@ func resourceSakuraCloudSwitchUpdate(d *schema.ResourceData, meta interface{}) e
 	client, ctx, zone := getSacloudV2Client(d, meta)
 	swOp := sacloud.NewSwitchOp(client)
 
+	sakuraMutexKV.Lock(d.Id())
+	defer sakuraMutexKV.Unlock(d.Id())
+
 	sw, err := swOp.Read(ctx, zone, types.StringID(d.Id()))
 	if err != nil {
 		return fmt.Errorf("could not read SakuraCloud Switch[%s] : %s", d.Id(), err)
@@ -165,6 +167,9 @@ func resourceSakuraCloudSwitchDelete(d *schema.ResourceData, meta interface{}) e
 	client, ctx, zone := getSacloudV2Client(d, meta)
 	swOp := sacloud.NewSwitchOp(client)
 
+	sakuraMutexKV.Lock(d.Id())
+	defer sakuraMutexKV.Unlock(d.Id())
+
 	sw, err := swOp.Read(ctx, zone, types.StringID(d.Id()))
 	if err != nil {
 		if sacloud.IsNotFoundError(err) {
@@ -180,56 +185,12 @@ func resourceSakuraCloudSwitchDelete(d *schema.ResourceData, meta interface{}) e
 		}
 	}
 
-	searched, err := swOp.GetServers(ctx, zone, sw.ID)
-	if err != nil {
-		return fmt.Errorf("reading connected server info is failed: %s", err)
-	}
-
-	for _, server := range searched.Servers {
-		if err := disconnectSwitchFromServer(ctx, client, zone, sw.ID, server.ID); err != nil {
-			return fmt.Errorf("disconnecting Switch is failed: %s", err)
-		}
+	if err := waitForDeletionBySwitchID(ctx, client, zone, sw.ID); err != nil {
+		return fmt.Errorf("waiting deletion is failed: %s", err)
 	}
 
 	if err := swOp.Delete(ctx, zone, sw.ID); err != nil {
 		return fmt.Errorf("deleting SakuraCloud Switch[%s] is failed: %s", sw.ID, err)
-	}
-	return nil
-}
-
-func disconnectSwitchFromServer(ctx context.Context, client *APIClient, zone string, id, serverID types.ID) error {
-	ifOp := sacloud.NewInterfaceOp(client)
-	serverOp := sacloud.NewServerOp(client)
-
-	sakuraMutexKV.Lock(serverID.String())
-	defer sakuraMutexKV.Unlock(serverID.String())
-
-	server, err := serverOp.Read(ctx, zone, serverID)
-	if err != nil {
-		return fmt.Errorf("reading SakuraCloud Server is failed: %s", err)
-	}
-
-	for _, nic := range server.Interfaces {
-		if nic.SwitchID == id {
-			isNeedRestart := false
-
-			if server.InstanceStatus.IsUp() {
-				isNeedRestart = true
-				if err := shutdownServerSync(ctx, client, zone, server.ID); err != nil {
-					return fmt.Errorf("stopping SakuraCloud Server is failed: %s", err)
-				}
-			}
-
-			if err := ifOp.DisconnectFromSwitch(ctx, zone, nic.ID); err != nil {
-				return fmt.Errorf("disconnecting Switch[%s] from Server[%s] is failed: %s", id, server.ID, err)
-			}
-
-			if isNeedRestart {
-				if err := bootServerSync(ctx, client, zone, server.ID); err != nil {
-					return fmt.Errorf("booting SakuraCloud Server is failed: %s", err)
-				}
-			}
-		}
 	}
 	return nil
 }

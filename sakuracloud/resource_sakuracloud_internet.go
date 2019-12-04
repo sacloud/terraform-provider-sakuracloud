@@ -235,6 +235,10 @@ func resourceSakuraCloudInternetDelete(d *schema.ResourceData, meta interface{})
 		}
 	}
 
+	if err := waitForDeletionBySwitchID(ctx, client, zone, internet.Switch.ID); err != nil {
+		return fmt.Errorf("waiting deletion is failed: %s", err)
+	}
+
 	if err := internetOp.Delete(ctx, zone, internet.ID); err != nil {
 		return fmt.Errorf("deleting SakuraCloud Internet is failed: %s", err)
 	}
