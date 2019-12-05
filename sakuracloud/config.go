@@ -15,10 +15,15 @@
 package sakuracloud
 
 import (
+	"fmt"
+	"log"
 	"net/http"
+	"os"
 	"strings"
 	"sync"
 	"time"
+
+	"github.com/hashicorp/terraform-plugin-sdk/httpclient"
 
 	"github.com/sacloud/libsacloud/v2/sacloud"
 
@@ -30,6 +35,8 @@ const (
 	traceHTTP = "http"
 	traceAPI  = "api"
 )
+
+const uaEnvVar = "SAKURACLOUD_APPEND_USER_AGENT"
 
 var (
 	fakeModeOnce                  sync.Once
@@ -54,7 +61,8 @@ type Config struct {
 	APIRequestTimeout   int
 	APIRequestRateLimit int
 
-	initOnce sync.Once
+	terraformVersion string
+	initOnce         sync.Once
 }
 
 // APIClient for SakuraCloud API
@@ -68,6 +76,14 @@ type APIClient struct {
 // NewClient returns new API Client for SakuraCloud
 func (c *Config) NewClient() *APIClient {
 
+	tfUserAgent := httpclient.TerraformUserAgent(c.terraformVersion)
+	providerUserAgent := fmt.Sprintf("%s/v%s", "terraform-provider-sakuracloud", Version)
+	ua := fmt.Sprintf("%s %s", tfUserAgent, providerUserAgent)
+	if add := os.Getenv(uaEnvVar); add != "" {
+		ua += " " + add
+		log.Printf("[DEBUG] Using modified User-Agent: %s", ua)
+	}
+
 	httpClient := &http.Client{
 		Timeout:   time.Duration(c.APIRequestTimeout) * time.Second,
 		Transport: &sacloud.RateLimitRoundTripper{RateLimitPerSec: c.APIRequestRateLimit},
@@ -76,7 +92,7 @@ func (c *Config) NewClient() *APIClient {
 		AccessToken:            c.AccessToken,
 		AccessTokenSecret:      c.AccessTokenSecret,
 		DefaultTimeoutDuration: time.Duration(c.TimeoutMinute) * time.Minute,
-		UserAgent:              "Terraform for SakuraCloud/v" + Version,
+		UserAgent:              ua,
 		AcceptLanguage:         c.AcceptLanguage,
 		RetryMax:               c.RetryMax,
 		RetryInterval:          time.Duration(c.RetryInterval) * time.Second,
