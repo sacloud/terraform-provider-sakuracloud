@@ -84,9 +84,7 @@ func dataSourceSakuraCloudArchiveRead(d *schema.ResourceData, meta interface{}) 
 			data = res
 		}
 	} else {
-		findCondition := &sacloud.FindCondition{
-			Count: defaultSearchLimit,
-		}
+		findCondition := &sacloud.FindCondition{}
 		if rawFilter, ok := d.GetOk(filterAttrName); ok {
 			findCondition.Filter = expandSearchFilter(rawFilter)
 		}
