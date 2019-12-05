@@ -92,7 +92,6 @@ func resourceSakuraCloudDatabaseReadReplica() *schema.Resource {
 			"tags": {
 				Type:     schema.TypeList,
 				Optional: true,
-				Computed: true,
 				Elem:     &schema.Schema{Type: schema.TypeString},
 			},
 			"zone": {
@@ -108,12 +107,12 @@ func resourceSakuraCloudDatabaseReadReplica() *schema.Resource {
 }
 
 func resourceSakuraCloudDatabaseReadReplicaCreate(d *schema.ResourceData, meta interface{}) error {
-	client, ctx, zone := getSacloudV2Client(d, meta)
+	client, ctx, zone := getSacloudClient(d, meta)
 	dbOp := sacloud.NewDatabaseOp(client)
 
 	// validate master instance
 	masterID := d.Get("master_id").(string)
-	masterDB, err := dbOp.Read(ctx, zone, types.StringID(masterID))
+	masterDB, err := dbOp.Read(ctx, zone, sakuraCloudID(masterID))
 	if err != nil {
 		return fmt.Errorf("master database instance[%s] is not found", masterID)
 	}
@@ -137,10 +136,10 @@ func resourceSakuraCloudDatabaseReadReplicaCreate(d *schema.ResourceData, meta i
 	req := &sacloud.DatabaseCreateRequest{
 		Name:           d.Get("name").(string),
 		Description:    d.Get("description").(string),
-		Tags:           expandTagsV2(d.Get("tags").([]interface{})),
-		IconID:         types.StringID(d.Get("icon_id").(string)),
+		Tags:           expandTags(d),
+		IconID:         expandSakuraCloudID(d, "icon_id"),
 		PlanID:         types.ID(masterDB.PlanID.Int64() + 1),
-		SwitchID:       types.StringID(switchID),
+		SwitchID:       sakuraCloudID(switchID),
 		IPAddresses:    []string{d.Get("ipaddress1").(string)},
 		NetworkMaskLen: maskLen,
 		DefaultRoute:   defaultRoute,
@@ -197,10 +196,10 @@ func resourceSakuraCloudDatabaseReadReplicaCreate(d *schema.ResourceData, meta i
 }
 
 func resourceSakuraCloudDatabaseReadReplicaRead(d *schema.ResourceData, meta interface{}) error {
-	client, ctx, zone := getSacloudV2Client(d, meta)
+	client, ctx, zone := getSacloudClient(d, meta)
 	dbOp := sacloud.NewDatabaseOp(client)
 
-	data, err := dbOp.Read(ctx, zone, types.StringID(d.Id()))
+	data, err := dbOp.Read(ctx, zone, sakuraCloudID(d.Id()))
 	if err != nil {
 		if sacloud.IsNotFoundError(err) {
 			d.SetId("")
@@ -212,10 +211,10 @@ func resourceSakuraCloudDatabaseReadReplicaRead(d *schema.ResourceData, meta int
 }
 
 func resourceSakuraCloudDatabaseReadReplicaUpdate(d *schema.ResourceData, meta interface{}) error {
-	client, ctx, zone := getSacloudV2Client(d, meta)
+	client, ctx, zone := getSacloudClient(d, meta)
 	dbOp := sacloud.NewDatabaseOp(client)
 
-	db, err := dbOp.Read(ctx, zone, types.StringID(d.Id()))
+	db, err := dbOp.Read(ctx, zone, sakuraCloudID(d.Id()))
 	if err != nil {
 		return fmt.Errorf("could not read SakuraCloud Database[%s]: %s", d.Id(), err)
 	}
@@ -223,8 +222,8 @@ func resourceSakuraCloudDatabaseReadReplicaUpdate(d *schema.ResourceData, meta i
 	req := &sacloud.DatabasePatchRequest{
 		Name:         d.Get("name").(string),
 		Description:  d.Get("description").(string),
-		Tags:         expandTagsV2(d.Get("tags").([]interface{})),
-		IconID:       types.StringID(d.Get("icon_id").(string)),
+		Tags:         expandTags(d),
+		IconID:       expandSakuraCloudID(d, "icon_id"),
 		SettingsHash: db.SettingsHash,
 	}
 	db, err = dbOp.Patch(ctx, zone, db.ID, req)
@@ -236,10 +235,10 @@ func resourceSakuraCloudDatabaseReadReplicaUpdate(d *schema.ResourceData, meta i
 }
 
 func resourceSakuraCloudDatabaseReadReplicaDelete(d *schema.ResourceData, meta interface{}) error {
-	client, ctx, zone := getSacloudV2Client(d, meta)
+	client, ctx, zone := getSacloudClient(d, meta)
 	dbOp := sacloud.NewDatabaseOp(client)
 
-	data, err := dbOp.Read(ctx, zone, types.StringID(d.Id()))
+	data, err := dbOp.Read(ctx, zone, sakuraCloudID(d.Id()))
 	if err != nil {
 		if sacloud.IsNotFoundError(err) {
 			d.SetId("")
@@ -294,7 +293,7 @@ func setDatabaseReadReplicaResourceData(ctx context.Context, d *schema.ResourceD
 		d.Set("icon_id", data.IconID.String())
 	}
 	d.Set("description", data.Description)
-	d.Set("zone", getV2Zone(d, client))
+	d.Set("zone", getZone(d, client))
 
 	return nil
 }

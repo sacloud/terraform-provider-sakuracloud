@@ -83,7 +83,7 @@ func dataSourceSakuraCloudPacketFilter() *schema.Resource {
 }
 
 func dataSourceSakuraCloudPacketFilterRead(d *schema.ResourceData, meta interface{}) error {
-	client, ctx, zone := getSacloudV2Client(d, meta)
+	client, ctx, zone := getSacloudClient(d, meta)
 	searcher := sacloud.NewPacketFilterOp(client)
 
 	findCondition := &sacloud.FindCondition{}

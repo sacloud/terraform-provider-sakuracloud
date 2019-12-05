@@ -23,7 +23,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/helper/resource"
 	"github.com/hashicorp/terraform-plugin-sdk/terraform"
 	"github.com/sacloud/libsacloud/v2/sacloud"
-	"github.com/sacloud/libsacloud/v2/sacloud/types"
 )
 
 func TestAccResourceSakuraCloudNote(t *testing.T) {
@@ -104,7 +103,7 @@ func testAccCheckSakuraCloudNoteExists(n string, note *sacloud.Note) resource.Te
 		client := testAccProvider.Meta().(*APIClient)
 		noteOp := sacloud.NewNoteOp(client)
 
-		foundNote, err := noteOp.Read(context.Background(), types.StringID(rs.Primary.ID))
+		foundNote, err := noteOp.Read(context.Background(), sakuraCloudID(rs.Primary.ID))
 		if err != nil {
 			return err
 		}
@@ -130,7 +129,7 @@ func testAccCheckSakuraCloudNoteDestroy(s *terraform.State) error {
 			continue
 		}
 
-		_, err := noteOp.Read(context.Background(), types.StringID(rs.Primary.ID))
+		_, err := noteOp.Read(context.Background(), sakuraCloudID(rs.Primary.ID))
 		if err == nil {
 			return fmt.Errorf("still exists Note: %s", rs.Primary.ID)
 		}

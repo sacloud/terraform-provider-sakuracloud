@@ -99,7 +99,6 @@ func resourceSakuraCloudNFS() *schema.Resource {
 			"tags": {
 				Type:     schema.TypeList,
 				Optional: true,
-				Computed: true,
 				Elem:     &schema.Schema{Type: schema.TypeString},
 			},
 			"zone": {
@@ -115,7 +114,7 @@ func resourceSakuraCloudNFS() *schema.Resource {
 }
 
 func resourceSakuraCloudNFSCreate(d *schema.ResourceData, meta interface{}) error {
-	client, ctx, zone := getSacloudV2Client(d, meta)
+	client, ctx, zone := getSacloudClient(d, meta)
 	nfsOp := sacloud.NewNFSOp(client)
 
 	planID, err := expandNFSDiskPlanID(ctx, client, d)
@@ -131,7 +130,7 @@ func resourceSakuraCloudNFSCreate(d *schema.ResourceData, meta interface{}) erro
 		DefaultRoute:   d.Get("default_route").(string),
 		Name:           d.Get("name").(string),
 		Description:    d.Get("description").(string),
-		Tags:           expandTagsV2(d.Get("tags").([]interface{})),
+		Tags:           expandTags(d),
 		IconID:         expandSakuraCloudID(d, "icon_id"),
 	}
 
@@ -165,10 +164,10 @@ func resourceSakuraCloudNFSCreate(d *schema.ResourceData, meta interface{}) erro
 }
 
 func resourceSakuraCloudNFSRead(d *schema.ResourceData, meta interface{}) error {
-	client, ctx, zone := getSacloudV2Client(d, meta)
+	client, ctx, zone := getSacloudClient(d, meta)
 	nfsOp := sacloud.NewNFSOp(client)
 
-	nfs, err := nfsOp.Read(ctx, zone, types.StringID(d.Id()))
+	nfs, err := nfsOp.Read(ctx, zone, sakuraCloudID(d.Id()))
 	if err != nil {
 		if sacloud.IsNotFoundError(err) {
 			d.SetId("")
@@ -181,10 +180,10 @@ func resourceSakuraCloudNFSRead(d *schema.ResourceData, meta interface{}) error 
 }
 
 func resourceSakuraCloudNFSUpdate(d *schema.ResourceData, meta interface{}) error {
-	client, ctx, zone := getSacloudV2Client(d, meta)
+	client, ctx, zone := getSacloudClient(d, meta)
 	nfsOp := sacloud.NewNFSOp(client)
 
-	nfs, err := nfsOp.Read(ctx, zone, types.StringID(d.Id()))
+	nfs, err := nfsOp.Read(ctx, zone, sakuraCloudID(d.Id()))
 	if err != nil {
 		return fmt.Errorf("could not read SakuraCloud NFS: %s", err)
 	}
@@ -192,7 +191,7 @@ func resourceSakuraCloudNFSUpdate(d *schema.ResourceData, meta interface{}) erro
 	nfs, err = nfsOp.Update(ctx, zone, nfs.ID, &sacloud.NFSUpdateRequest{
 		Name:        d.Get("name").(string),
 		Description: d.Get("description").(string),
-		Tags:        expandTagsV2(d.Get("tags").([]interface{})),
+		Tags:        expandTags(d),
 		IconID:      expandSakuraCloudID(d, "icon_id"),
 	})
 	if err != nil {
@@ -203,10 +202,10 @@ func resourceSakuraCloudNFSUpdate(d *schema.ResourceData, meta interface{}) erro
 }
 
 func resourceSakuraCloudNFSDelete(d *schema.ResourceData, meta interface{}) error {
-	client, ctx, zone := getSacloudV2Client(d, meta)
+	client, ctx, zone := getSacloudClient(d, meta)
 	nfsOp := sacloud.NewNFSOp(client)
 
-	nfs, err := nfsOp.Read(ctx, zone, types.StringID(d.Id()))
+	nfs, err := nfsOp.Read(ctx, zone, sakuraCloudID(d.Id()))
 	if err != nil {
 		if sacloud.IsNotFoundError(err) {
 			d.SetId("")
@@ -254,7 +253,7 @@ func setNFSResourceData(ctx context.Context, d *schema.ResourceData, client *API
 	if err := d.Set("tags", data.Tags); err != nil {
 		return err
 	}
-	d.Set("zone", getV2Zone(d, client))
+	d.Set("zone", getZone(d, client))
 
 	return nil
 }

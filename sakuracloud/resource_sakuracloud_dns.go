@@ -52,7 +52,41 @@ func resourceSakuraCloudDNS() *schema.Resource {
 				Computed: true,
 				MaxItems: 1000,
 				Elem: &schema.Resource{
-					Schema: dnsRecordValueSchema(),
+					Schema: map[string]*schema.Schema{
+						"name": {
+							Type:     schema.TypeString,
+							Required: true,
+						},
+						"type": {
+							Type:         schema.TypeString,
+							Required:     true,
+							ValidateFunc: validation.StringInSlice(types.DNSRecordTypesStrings(), false),
+						},
+						"value": {
+							Type:     schema.TypeString,
+							Required: true,
+						},
+						"ttl": {
+							Type:     schema.TypeInt,
+							Optional: true,
+							Default:  defaultTTL,
+						},
+						"priority": {
+							Type:         schema.TypeInt,
+							Optional:     true,
+							ValidateFunc: validation.IntBetween(0, 65535),
+						},
+						"weight": {
+							Type:         schema.TypeInt,
+							Optional:     true,
+							ValidateFunc: validation.IntBetween(0, 65535),
+						},
+						"port": {
+							Type:         schema.TypeInt,
+							Optional:     true,
+							ValidateFunc: validation.IntBetween(1, 65535),
+						},
+					},
 				},
 			},
 			"icon_id": {
@@ -67,59 +101,20 @@ func resourceSakuraCloudDNS() *schema.Resource {
 			"tags": {
 				Type:     schema.TypeList,
 				Optional: true,
-				Computed: true,
 				Elem:     &schema.Schema{Type: schema.TypeString},
 			},
 		},
 	}
 }
 
-func dnsRecordValueSchema() map[string]*schema.Schema {
-	return map[string]*schema.Schema{
-		"name": {
-			Type:     schema.TypeString,
-			Required: true,
-		},
-		"type": {
-			Type:         schema.TypeString,
-			Required:     true,
-			ValidateFunc: validation.StringInSlice(types.DNSRecordTypesStrings(), false),
-		},
-		"value": {
-			Type:     schema.TypeString,
-			Required: true,
-		},
-		"ttl": {
-			Type:     schema.TypeInt,
-			Optional: true,
-			Default:  defaultTTL,
-		},
-		"priority": {
-			Type:         schema.TypeInt,
-			Optional:     true,
-			ValidateFunc: validation.IntBetween(0, 65535),
-		},
-		"weight": {
-			Type:         schema.TypeInt,
-			Optional:     true,
-			ValidateFunc: validation.IntBetween(0, 65535),
-		},
-		"port": {
-			Type:         schema.TypeInt,
-			Optional:     true,
-			ValidateFunc: validation.IntBetween(1, 65535),
-		},
-	}
-}
-
 func resourceSakuraCloudDNSCreate(d *schema.ResourceData, meta interface{}) error {
-	client, ctx, _ := getSacloudV2Client(d, meta)
+	client, ctx, _ := getSacloudClient(d, meta)
 	dnsOp := sacloud.NewDNSOp(client)
 
 	opts := &sacloud.DNSCreateRequest{
 		Name:        d.Get("zone").(string),
 		Description: d.Get("description").(string),
-		Tags:        expandTagsV2(d.Get("tags").([]interface{})),
+		Tags:        expandTags(d),
 		IconID:      expandSakuraCloudID(d, "icon_id"),
 		Records:     expandDNSRecords(d, "records"),
 	}
@@ -134,10 +129,10 @@ func resourceSakuraCloudDNSCreate(d *schema.ResourceData, meta interface{}) erro
 }
 
 func resourceSakuraCloudDNSRead(d *schema.ResourceData, meta interface{}) error {
-	client, ctx, _ := getSacloudV2Client(d, meta)
+	client, ctx, _ := getSacloudClient(d, meta)
 	dnsOp := sacloud.NewDNSOp(client)
 
-	dns, err := dnsOp.Read(ctx, types.StringID(d.Id()))
+	dns, err := dnsOp.Read(ctx, sakuraCloudID(d.Id()))
 	if err != nil {
 		if sacloud.IsNotFoundError(err) {
 			d.SetId("")
@@ -150,17 +145,17 @@ func resourceSakuraCloudDNSRead(d *schema.ResourceData, meta interface{}) error 
 }
 
 func resourceSakuraCloudDNSUpdate(d *schema.ResourceData, meta interface{}) error {
-	client, ctx, _ := getSacloudV2Client(d, meta)
+	client, ctx, _ := getSacloudClient(d, meta)
 	dnsOp := sacloud.NewDNSOp(client)
 
-	dns, err := dnsOp.Read(ctx, types.StringID(d.Id()))
+	dns, err := dnsOp.Read(ctx, sakuraCloudID(d.Id()))
 	if err != nil {
 		return fmt.Errorf("could not read SakuraCloud DNS resource: %s", err)
 	}
 
 	opts := &sacloud.DNSUpdateRequest{
 		Description: d.Get("description").(string),
-		Tags:        expandTagsV2(d.Get("tags").([]interface{})),
+		Tags:        expandTags(d),
 		IconID:      expandSakuraCloudID(d, "icon_id"),
 		Records:     expandDNSRecords(d, "records"),
 	}
@@ -172,10 +167,10 @@ func resourceSakuraCloudDNSUpdate(d *schema.ResourceData, meta interface{}) erro
 }
 
 func resourceSakuraCloudDNSDelete(d *schema.ResourceData, meta interface{}) error {
-	client, ctx, _ := getSacloudV2Client(d, meta)
+	client, ctx, _ := getSacloudClient(d, meta)
 	dnsOp := sacloud.NewDNSOp(client)
 
-	dns, err := dnsOp.Read(ctx, types.StringID(d.Id()))
+	dns, err := dnsOp.Read(ctx, sakuraCloudID(d.Id()))
 	if err != nil {
 		if sacloud.IsNotFoundError(err) {
 			d.SetId("")

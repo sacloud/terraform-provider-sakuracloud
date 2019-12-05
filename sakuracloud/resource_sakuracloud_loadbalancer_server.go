@@ -19,6 +19,8 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/hashicorp/terraform-plugin-sdk/helper/validation"
+
 	"github.com/hashicorp/terraform-plugin-sdk/helper/hashcode"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/sacloud/libsacloud/v2/sacloud"
@@ -30,13 +32,7 @@ func resourceSakuraCloudLoadBalancerServer() *schema.Resource {
 		Create: resourceSakuraCloudLoadBalancerServerCreate,
 		Read:   resourceSakuraCloudLoadBalancerServerRead,
 		Delete: resourceSakuraCloudLoadBalancerServerDelete,
-		Schema: resourceLoadBalancerServerSchema(),
-	}
-}
-
-func resourceLoadBalancerServerSchema() map[string]*schema.Schema {
-	s := mergeSchemas(
-		map[string]*schema.Schema{
+		Schema: map[string]*schema.Schema{
 			"load_balancer_vip_id": {
 				Type:     schema.TypeString,
 				Required: true,
@@ -50,16 +46,39 @@ func resourceLoadBalancerServerSchema() map[string]*schema.Schema {
 				Description:  "target SakuraCloud zone",
 				ValidateFunc: validateZone([]string{"is1a", "is1b", "tk1a", "tk1v"}),
 			},
-		}, loadBalancerServerValueSchema(),
-	)
-	for _, v := range s {
-		v.ForceNew = true
+			"ipaddress": {
+				Type:     schema.TypeString,
+				Required: true,
+				ForceNew: true,
+			},
+			"check_protocol": {
+				Type:         schema.TypeString,
+				Required:     true,
+				ValidateFunc: validation.StringInSlice(types.LoadBalancerHealthCheckProtocolsStrings(), false),
+				ForceNew:     true,
+			},
+			"check_path": {
+				Type:     schema.TypeString,
+				Optional: true,
+				ForceNew: true,
+			},
+			"check_status": {
+				Type:     schema.TypeString,
+				Optional: true,
+				ForceNew: true,
+			},
+			"enabled": {
+				Type:     schema.TypeBool,
+				Optional: true,
+				Default:  true,
+				ForceNew: true,
+			},
+		},
 	}
-	return s
 }
 
 func resourceSakuraCloudLoadBalancerServerCreate(d *schema.ResourceData, meta interface{}) error {
-	client, ctx, zone := getSacloudV2Client(d, meta)
+	client, ctx, zone := getSacloudClient(d, meta)
 	vipID := d.Get("load_balancer_vip_id").(string)
 	lbID, vip, port, err := expandVIPID(vipID)
 	if err != nil {
@@ -83,7 +102,7 @@ func resourceSakuraCloudLoadBalancerServerCreate(d *schema.ResourceData, meta in
 	sakuraMutexKV.Lock(lbID)
 	defer sakuraMutexKV.Unlock(lbID)
 
-	lb, err := lbOp.Read(ctx, zone, types.StringID(lbID))
+	lb, err := lbOp.Read(ctx, zone, sakuraCloudID(lbID))
 	if err != nil {
 		return fmt.Errorf("could not read SakuraCloud LoadBalancer resource: %s", err)
 	}
@@ -113,7 +132,7 @@ func resourceSakuraCloudLoadBalancerServerCreate(d *schema.ResourceData, meta in
 }
 
 func resourceSakuraCloudLoadBalancerServerRead(d *schema.ResourceData, meta interface{}) error {
-	client, ctx, zone := getSacloudV2Client(d, meta)
+	client, ctx, zone := getSacloudClient(d, meta)
 	lbID, vip, port, err := expandVIPID(d.Get("load_balancer_vip_id").(string))
 	if err != nil {
 		return fmt.Errorf("could not parse SakuraCloud LoadBalancer VIP ID: %s", err)
@@ -121,7 +140,7 @@ func resourceSakuraCloudLoadBalancerServerRead(d *schema.ResourceData, meta inte
 
 	lbOp := sacloud.NewLoadBalancerOp(client)
 
-	lb, err := lbOp.Read(ctx, zone, types.StringID(lbID))
+	lb, err := lbOp.Read(ctx, zone, sakuraCloudID(lbID))
 	if err != nil {
 		if sacloud.IsNotFoundError(err) {
 			d.SetId("")
@@ -148,12 +167,12 @@ func resourceSakuraCloudLoadBalancerServerRead(d *schema.ResourceData, meta inte
 	d.Set("check_path", server.HealthCheck.Path)
 	d.Set("check_status", server.HealthCheck.ResponseCode.String())
 	d.Set("enabled", server.Enabled)
-	d.Set("zone", getV2Zone(d, client))
+	d.Set("zone", getZone(d, client))
 	return nil
 }
 
 func resourceSakuraCloudLoadBalancerServerDelete(d *schema.ResourceData, meta interface{}) error {
-	client, ctx, zone := getSacloudV2Client(d, meta)
+	client, ctx, zone := getSacloudClient(d, meta)
 	lbID, vip, port, err := expandVIPID(d.Get("load_balancer_vip_id").(string))
 	if err != nil {
 		return fmt.Errorf("could not parse SakuraCloud LoadBalancer VIP ID: %s", err)
@@ -164,7 +183,7 @@ func resourceSakuraCloudLoadBalancerServerDelete(d *schema.ResourceData, meta in
 	sakuraMutexKV.Lock(lbID)
 	defer sakuraMutexKV.Unlock(lbID)
 
-	lb, err := lbOp.Read(ctx, zone, types.StringID(lbID))
+	lb, err := lbOp.Read(ctx, zone, sakuraCloudID(lbID))
 	if err != nil {
 		if sacloud.IsNotFoundError(err) {
 			d.SetId("")

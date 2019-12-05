@@ -399,7 +399,7 @@ func testAccCheckSakuraCloudServerExists(n string, server *sacloud.Server) resou
 		serverOp := sacloud.NewServerOp(client)
 		zone := rs.Primary.Attributes["zone"]
 
-		foundServer, err := serverOp.Read(context.Background(), zone, types.StringID(rs.Primary.ID))
+		foundServer, err := serverOp.Read(context.Background(), zone, sakuraCloudID(rs.Primary.ID))
 		if err != nil {
 			return err
 		}
@@ -460,7 +460,7 @@ func testAccCheckSakuraCloudServerDestroy(s *terraform.State) error {
 		}
 
 		zone := rs.Primary.Attributes["zone"]
-		_, err := serverOp.Read(context.Background(), zone, types.StringID(rs.Primary.ID))
+		_, err := serverOp.Read(context.Background(), zone, sakuraCloudID(rs.Primary.ID))
 
 		if err == nil {
 			return fmt.Errorf("still exists Server:%s", rs.Primary.ID)

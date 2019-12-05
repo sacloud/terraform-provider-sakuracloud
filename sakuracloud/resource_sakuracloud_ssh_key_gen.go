@@ -17,8 +17,6 @@ package sakuracloud
 import (
 	"fmt"
 
-	"github.com/sacloud/libsacloud/v2/sacloud/types"
-
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/validation"
 	"github.com/sacloud/libsacloud/v2/sacloud"
@@ -66,7 +64,7 @@ func resourceSakuraCloudSSHKeyGen() *schema.Resource {
 }
 
 func resourceSakuraCloudSSHKeyGenCreate(d *schema.ResourceData, meta interface{}) error {
-	client, ctx, _ := getSacloudV2Client(d, meta)
+	client, ctx, _ := getSacloudClient(d, meta)
 	sshKeyOp := sacloud.NewSSHKeyOp(client)
 
 	key, err := sshKeyOp.Generate(ctx, &sacloud.SSHKeyGenerateRequest{
@@ -85,10 +83,10 @@ func resourceSakuraCloudSSHKeyGenCreate(d *schema.ResourceData, meta interface{}
 }
 
 func resourceSakuraCloudSSHKeyGenRead(d *schema.ResourceData, meta interface{}) error {
-	client, ctx, _ := getSacloudV2Client(d, meta)
+	client, ctx, _ := getSacloudClient(d, meta)
 	sshKeyOp := sacloud.NewSSHKeyOp(client)
 
-	key, err := sshKeyOp.Read(ctx, types.StringID(d.Id()))
+	key, err := sshKeyOp.Read(ctx, sakuraCloudID(d.Id()))
 	if err != nil {
 		if sacloud.IsNotFoundError(err) {
 			d.SetId("")
@@ -101,10 +99,10 @@ func resourceSakuraCloudSSHKeyGenRead(d *schema.ResourceData, meta interface{}) 
 }
 
 func resourceSakuraCloudSSHKeyGenDelete(d *schema.ResourceData, meta interface{}) error {
-	client, ctx, _ := getSacloudV2Client(d, meta)
+	client, ctx, _ := getSacloudClient(d, meta)
 	sshKeyOp := sacloud.NewSSHKeyOp(client)
 
-	key, err := sshKeyOp.Read(ctx, types.StringID(d.Id()))
+	key, err := sshKeyOp.Read(ctx, sakuraCloudID(d.Id()))
 	if err != nil {
 		if sacloud.IsNotFoundError(err) {
 			d.SetId("")

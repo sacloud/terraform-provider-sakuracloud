@@ -42,25 +42,6 @@ func validateSakuracloudIDType(v interface{}, k string) ([]string, []error) {
 	return ws, errors
 }
 
-func validateSakuraIDs(d resourceValueGettable, k string, required bool) error {
-	ids, ok := d.GetOk(k)
-	if !ok || len(ids.([]interface{})) == 0 {
-		if required {
-			return fmt.Errorf("%q is required", k)
-		}
-		return nil
-	}
-
-	for _, v := range ids.([]interface{}) {
-		id := v.(string)
-		_, err := strconv.ParseInt(id, 10, 64)
-		if err != nil {
-			return fmt.Errorf("%q must be ID string(number only): %s", k, err)
-		}
-	}
-	return nil
-}
-
 func validateBackupWeekdays(d resourceValueGettable, k string) error {
 	weekdays, ok := d.GetOk(k)
 	if !ok || len(weekdays.([]interface{})) == 0 {
@@ -111,27 +92,6 @@ func validateIPv4Address() schema.SchemaValidateFunc {
 			ip := net.ParseIP(value)
 			if ip == nil || !strings.Contains(value, ".") {
 				errors = append(errors, fmt.Errorf("%q Invalid IPv4 address format", k))
-			}
-		}
-		return
-	}
-}
-
-func validateIPv6Address() schema.SchemaValidateFunc {
-	return func(v interface{}, k string) (ws []string, errors []error) {
-		// if target is nil , return OK(Use required attr if necessary)
-		if v == nil {
-			return
-		}
-
-		if value, ok := v.(string); ok {
-			if value == "" {
-				return
-			}
-
-			ip := net.ParseIP(value)
-			if ip == nil || !strings.Contains(value, ":") {
-				errors = append(errors, fmt.Errorf("%q Invalid IPv6 address format", k))
 			}
 		}
 		return

@@ -20,7 +20,6 @@ import (
 	"testing"
 
 	"github.com/sacloud/libsacloud/v2/sacloud"
-	"github.com/sacloud/libsacloud/v2/sacloud/types"
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/resource"
 	"github.com/hashicorp/terraform-plugin-sdk/terraform"
@@ -124,7 +123,7 @@ func testAccCheckSakuraCloudDatabaseReadReplicaDestroy(s *terraform.State) error
 
 		dbOp := sacloud.NewDatabaseOp(client)
 		zone := rs.Primary.Attributes["zone"]
-		_, err := dbOp.Read(context.Background(), zone, types.StringID(rs.Primary.ID))
+		_, err := dbOp.Read(context.Background(), zone, sakuraCloudID(rs.Primary.ID))
 
 		if err == nil {
 			return fmt.Errorf("resource Database[%s] still exists", rs.Primary.ID)

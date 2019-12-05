@@ -255,7 +255,6 @@ func resourceSakuraCloudProxyLB() *schema.Resource {
 			"tags": {
 				Type:     schema.TypeList,
 				Optional: true,
-				Computed: true,
 				Elem:     &schema.Schema{Type: schema.TypeString},
 			},
 			"fqdn": {
@@ -276,7 +275,7 @@ func resourceSakuraCloudProxyLB() *schema.Resource {
 }
 
 func resourceSakuraCloudProxyLBCreate(d *schema.ResourceData, meta interface{}) error {
-	client, ctx, _ := getSacloudV2Client(d, meta)
+	client, ctx, _ := getSacloudClient(d, meta)
 	proxyLBOp := sacloud.NewProxyLBOp(client)
 
 	proxyLB, err := proxyLBOp.Create(ctx, &sacloud.ProxyLBCreateRequest{
@@ -291,7 +290,7 @@ func resourceSakuraCloudProxyLBCreate(d *schema.ResourceData, meta interface{}) 
 		Region:         types.EProxyLBRegion(d.Get("region").(string)),
 		Name:           d.Get("name").(string),
 		Description:    d.Get("description").(string),
-		Tags:           expandTagsV2(d.Get("tags").([]interface{})),
+		Tags:           expandTags(d),
 		IconID:         expandSakuraCloudID(d, "icon_id"),
 	})
 	if err != nil {
@@ -316,10 +315,10 @@ func resourceSakuraCloudProxyLBCreate(d *schema.ResourceData, meta interface{}) 
 }
 
 func resourceSakuraCloudProxyLBRead(d *schema.ResourceData, meta interface{}) error {
-	client, ctx, _ := getSacloudV2Client(d, meta)
+	client, ctx, _ := getSacloudClient(d, meta)
 	proxyLBOp := sacloud.NewProxyLBOp(client)
 
-	proxyLB, err := proxyLBOp.Read(ctx, types.StringID(d.Id()))
+	proxyLB, err := proxyLBOp.Read(ctx, sakuraCloudID(d.Id()))
 	if err != nil {
 		if sacloud.IsNotFoundError(err) {
 			d.SetId("")
@@ -332,13 +331,13 @@ func resourceSakuraCloudProxyLBRead(d *schema.ResourceData, meta interface{}) er
 }
 
 func resourceSakuraCloudProxyLBUpdate(d *schema.ResourceData, meta interface{}) error {
-	client, ctx, _ := getSacloudV2Client(d, meta)
+	client, ctx, _ := getSacloudClient(d, meta)
 	proxyLBOp := sacloud.NewProxyLBOp(client)
 
 	sakuraMutexKV.Lock(d.Id())
 	defer sakuraMutexKV.Unlock(d.Id())
 
-	proxyLB, err := proxyLBOp.Read(ctx, types.StringID(d.Id()))
+	proxyLB, err := proxyLBOp.Read(ctx, sakuraCloudID(d.Id()))
 	if err != nil {
 		return fmt.Errorf("could not read SakuraCloud ProxyLB: %s", err)
 	}
@@ -352,7 +351,7 @@ func resourceSakuraCloudProxyLBUpdate(d *schema.ResourceData, meta interface{}) 
 		Timeout:       expandProxyLBTimeout(d),
 		Name:          d.Get("name").(string),
 		Description:   d.Get("description").(string),
-		Tags:          expandTagsV2(d.Get("tags").([]interface{})),
+		Tags:          expandTags(d),
 		IconID:        expandSakuraCloudID(d, "icon_id"),
 	})
 	if err != nil {
@@ -392,13 +391,13 @@ func resourceSakuraCloudProxyLBUpdate(d *schema.ResourceData, meta interface{}) 
 }
 
 func resourceSakuraCloudProxyLBDelete(d *schema.ResourceData, meta interface{}) error {
-	client, ctx, _ := getSacloudV2Client(d, meta)
+	client, ctx, _ := getSacloudClient(d, meta)
 	proxyLBOp := sacloud.NewProxyLBOp(client)
 
 	sakuraMutexKV.Lock(d.Id())
 	defer sakuraMutexKV.Unlock(d.Id())
 
-	proxyLB, err := proxyLBOp.Read(ctx, types.StringID(d.Id()))
+	proxyLB, err := proxyLBOp.Read(ctx, sakuraCloudID(d.Id()))
 	if err != nil {
 		if sacloud.IsNotFoundError(err) {
 			d.SetId("")

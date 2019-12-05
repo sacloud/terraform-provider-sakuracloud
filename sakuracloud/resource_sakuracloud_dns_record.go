@@ -18,6 +18,8 @@ import (
 	"bytes"
 	"fmt"
 
+	"github.com/hashicorp/terraform-plugin-sdk/helper/validation"
+
 	"github.com/hashicorp/terraform-plugin-sdk/helper/hashcode"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/sacloud/libsacloud/v2/sacloud"
@@ -36,36 +38,72 @@ func resourceSakuraCloudDNSRecord() *schema.Resource {
 }
 
 func dnsRecordResourceSchema() map[string]*schema.Schema {
-	s := mergeSchemas(map[string]*schema.Schema{
+	return map[string]*schema.Schema{
 		"dns_id": {
 			Type:         schema.TypeString,
 			Required:     true,
 			ForceNew:     true,
 			ValidateFunc: validateSakuracloudIDType,
 		},
-	}, dnsRecordValueSchema())
-	for _, v := range s {
-		v.ForceNew = true
+		"name": {
+			Type:     schema.TypeString,
+			Required: true,
+			ForceNew: true,
+		},
+		"type": {
+			Type:         schema.TypeString,
+			Required:     true,
+			ValidateFunc: validation.StringInSlice(types.DNSRecordTypesStrings(), false),
+			ForceNew:     true,
+		},
+		"value": {
+			Type:     schema.TypeString,
+			Required: true,
+			ForceNew: true,
+		},
+		"ttl": {
+			Type:     schema.TypeInt,
+			Optional: true,
+			Default:  defaultTTL,
+			ForceNew: true,
+		},
+		"priority": {
+			Type:         schema.TypeInt,
+			Optional:     true,
+			ValidateFunc: validation.IntBetween(0, 65535),
+			ForceNew:     true,
+		},
+		"weight": {
+			Type:         schema.TypeInt,
+			Optional:     true,
+			ValidateFunc: validation.IntBetween(0, 65535),
+			ForceNew:     true,
+		},
+		"port": {
+			Type:         schema.TypeInt,
+			Optional:     true,
+			ValidateFunc: validation.IntBetween(1, 65535),
+			ForceNew:     true,
+		},
 	}
-	return s
 }
 
 func resourceSakuraCloudDNSRecordCreate(d *schema.ResourceData, meta interface{}) error {
-	client, ctx, _ := getSacloudV2Client(d, meta)
+	client, ctx, _ := getSacloudClient(d, meta)
 	dnsOp := sacloud.NewDNSOp(client)
 	dnsID := d.Get("dns_id").(string)
 
 	sakuraMutexKV.Lock(dnsID)
 	defer sakuraMutexKV.Unlock(dnsID)
 
-	dns, err := dnsOp.Read(ctx, types.StringID(dnsID))
+	dns, err := dnsOp.Read(ctx, sakuraCloudID(dnsID))
 	if err != nil {
 		return fmt.Errorf("could not read SakuraCloud DNS resource: %s", err)
 	}
 
 	record := expandDNSRecord(d)
 	records := append(dns.Records, record)
-	dns, err = dnsOp.Update(ctx, types.StringID(dnsID), &sacloud.DNSUpdateRequest{
+	dns, err = dnsOp.Update(ctx, sakuraCloudID(dnsID), &sacloud.DNSUpdateRequest{
 		Description:  dns.Description,
 		Tags:         dns.Tags,
 		IconID:       dns.IconID,
@@ -81,11 +119,11 @@ func resourceSakuraCloudDNSRecordCreate(d *schema.ResourceData, meta interface{}
 }
 
 func resourceSakuraCloudDNSRecordRead(d *schema.ResourceData, meta interface{}) error {
-	client, ctx, _ := getSacloudV2Client(d, meta)
+	client, ctx, _ := getSacloudClient(d, meta)
 	dnsOp := sacloud.NewDNSOp(client)
 	dnsID := d.Get("dns_id").(string)
 
-	dns, err := dnsOp.Read(ctx, types.StringID(dnsID))
+	dns, err := dnsOp.Read(ctx, sakuraCloudID(dnsID))
 	if err != nil {
 		if sacloud.IsNotFoundError(err) {
 			d.SetId("")
@@ -111,14 +149,14 @@ func resourceSakuraCloudDNSRecordRead(d *schema.ResourceData, meta interface{}) 
 }
 
 func resourceSakuraCloudDNSRecordDelete(d *schema.ResourceData, meta interface{}) error {
-	client, ctx, _ := getSacloudV2Client(d, meta)
+	client, ctx, _ := getSacloudClient(d, meta)
 	dnsOp := sacloud.NewDNSOp(client)
 	dnsID := d.Get("dns_id").(string)
 
 	sakuraMutexKV.Lock(dnsID)
 	defer sakuraMutexKV.Unlock(dnsID)
 
-	dns, err := dnsOp.Read(ctx, types.StringID(dnsID))
+	dns, err := dnsOp.Read(ctx, sakuraCloudID(dnsID))
 	if err != nil {
 		if sacloud.IsNotFoundError(err) {
 			d.SetId("")
@@ -136,7 +174,7 @@ func resourceSakuraCloudDNSRecordDelete(d *schema.ResourceData, meta interface{}
 		}
 	}
 
-	dns, err = dnsOp.Update(ctx, types.StringID(dnsID), &sacloud.DNSUpdateRequest{
+	dns, err = dnsOp.Update(ctx, sakuraCloudID(dnsID), &sacloud.DNSUpdateRequest{
 		Description:  dns.Description,
 		Tags:         dns.Tags,
 		IconID:       dns.IconID,

@@ -95,7 +95,7 @@ func resourceSakuraCloudPacketFilter() *schema.Resource {
 }
 
 func resourceSakuraCloudPacketFilterCreate(d *schema.ResourceData, meta interface{}) error {
-	client, ctx, zone := getSacloudV2Client(d, meta)
+	client, ctx, zone := getSacloudClient(d, meta)
 	pfOp := sacloud.NewPacketFilterOp(client)
 
 	pf, err := pfOp.Create(ctx, zone, &sacloud.PacketFilterCreateRequest{
@@ -112,10 +112,10 @@ func resourceSakuraCloudPacketFilterCreate(d *schema.ResourceData, meta interfac
 }
 
 func resourceSakuraCloudPacketFilterRead(d *schema.ResourceData, meta interface{}) error {
-	client, ctx, zone := getSacloudV2Client(d, meta)
+	client, ctx, zone := getSacloudClient(d, meta)
 	pfOp := sacloud.NewPacketFilterOp(client)
 
-	pf, err := pfOp.Read(ctx, zone, types.StringID(d.Id()))
+	pf, err := pfOp.Read(ctx, zone, sakuraCloudID(d.Id()))
 	if err != nil {
 		if sacloud.IsNotFoundError(err) {
 			d.SetId("")
@@ -128,10 +128,10 @@ func resourceSakuraCloudPacketFilterRead(d *schema.ResourceData, meta interface{
 }
 
 func resourceSakuraCloudPacketFilterUpdate(d *schema.ResourceData, meta interface{}) error {
-	client, ctx, zone := getSacloudV2Client(d, meta)
+	client, ctx, zone := getSacloudClient(d, meta)
 	pfOp := sacloud.NewPacketFilterOp(client)
 
-	pf, err := pfOp.Read(ctx, zone, types.StringID(d.Id()))
+	pf, err := pfOp.Read(ctx, zone, sakuraCloudID(d.Id()))
 	if err != nil {
 		return fmt.Errorf("could not read SakuraCloud PacketFilter: %s", err)
 	}
@@ -149,10 +149,10 @@ func resourceSakuraCloudPacketFilterUpdate(d *schema.ResourceData, meta interfac
 }
 
 func resourceSakuraCloudPacketFilterDelete(d *schema.ResourceData, meta interface{}) error {
-	client, ctx, zone := getSacloudV2Client(d, meta)
+	client, ctx, zone := getSacloudClient(d, meta)
 	pfOp := sacloud.NewPacketFilterOp(client)
 
-	pf, err := pfOp.Read(ctx, zone, types.StringID(d.Id()))
+	pf, err := pfOp.Read(ctx, zone, sakuraCloudID(d.Id()))
 	if err != nil {
 		if sacloud.IsNotFoundError(err) {
 			d.SetId("")
@@ -173,7 +173,7 @@ func setPacketFilterResourceData(ctx context.Context, d *schema.ResourceData, cl
 	if err := d.Set("expressions", flattenPacketFilterExpressions(data)); err != nil {
 		return err
 	}
-	d.Set("zone", getV2Zone(d, client))
+	d.Set("zone", getZone(d, client))
 	return nil
 }
 

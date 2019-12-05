@@ -24,7 +24,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	homedir "github.com/mitchellh/go-homedir"
 	"github.com/sacloud/libsacloud/v2/sacloud"
-	"github.com/sacloud/libsacloud/v2/sacloud/types"
 )
 
 func resourceSakuraCloudIcon() *schema.Resource {
@@ -58,7 +57,6 @@ func resourceSakuraCloudIcon() *schema.Resource {
 			"tags": {
 				Type:     schema.TypeList,
 				Optional: true,
-				Computed: true,
 				Elem:     &schema.Schema{Type: schema.TypeString},
 			},
 			"url": {
@@ -70,7 +68,7 @@ func resourceSakuraCloudIcon() *schema.Resource {
 }
 
 func resourceSakuraCloudIconCreate(d *schema.ResourceData, meta interface{}) error {
-	client, ctx, _ := getSacloudV2Client(d, meta)
+	client, ctx, _ := getSacloudClient(d, meta)
 	iconOp := sacloud.NewIconOp(client)
 
 	body, err := expandIconBody(d)
@@ -80,7 +78,7 @@ func resourceSakuraCloudIconCreate(d *schema.ResourceData, meta interface{}) err
 
 	icon, err := iconOp.Create(ctx, &sacloud.IconCreateRequest{
 		Name:  d.Get("name").(string),
-		Tags:  expandTagsV2(d.Get("tags").([]interface{})),
+		Tags:  expandTags(d),
 		Image: body,
 	})
 	if err != nil {
@@ -92,10 +90,10 @@ func resourceSakuraCloudIconCreate(d *schema.ResourceData, meta interface{}) err
 }
 
 func resourceSakuraCloudIconRead(d *schema.ResourceData, meta interface{}) error {
-	client, ctx, _ := getSacloudV2Client(d, meta)
+	client, ctx, _ := getSacloudClient(d, meta)
 	iconOp := sacloud.NewIconOp(client)
 
-	icon, err := iconOp.Read(ctx, types.StringID(d.Id()))
+	icon, err := iconOp.Read(ctx, sakuraCloudID(d.Id()))
 	if err != nil {
 		if sacloud.IsNotFoundError(err) {
 			d.SetId("")
@@ -108,17 +106,17 @@ func resourceSakuraCloudIconRead(d *schema.ResourceData, meta interface{}) error
 }
 
 func resourceSakuraCloudIconUpdate(d *schema.ResourceData, meta interface{}) error {
-	client, ctx, _ := getSacloudV2Client(d, meta)
+	client, ctx, _ := getSacloudClient(d, meta)
 	iconOp := sacloud.NewIconOp(client)
 
-	_, err := iconOp.Read(ctx, types.StringID(d.Id()))
+	_, err := iconOp.Read(ctx, sakuraCloudID(d.Id()))
 	if err != nil {
 		return fmt.Errorf("could not read SakuraCloud Icon: %s", err)
 	}
 
-	_, err = iconOp.Update(ctx, types.StringID(d.Id()), &sacloud.IconUpdateRequest{
+	_, err = iconOp.Update(ctx, sakuraCloudID(d.Id()), &sacloud.IconUpdateRequest{
 		Name: d.Get("name").(string),
-		Tags: expandTagsV2(d.Get("tags").([]interface{})),
+		Tags: expandTags(d),
 	})
 	if err != nil {
 		return fmt.Errorf("updating SakuraCloud Icon is failed: %s", err)
@@ -127,10 +125,10 @@ func resourceSakuraCloudIconUpdate(d *schema.ResourceData, meta interface{}) err
 }
 
 func resourceSakuraCloudIconDelete(d *schema.ResourceData, meta interface{}) error {
-	client, ctx, _ := getSacloudV2Client(d, meta)
+	client, ctx, _ := getSacloudClient(d, meta)
 	iconOp := sacloud.NewIconOp(client)
 
-	icon, err := iconOp.Read(ctx, types.StringID(d.Id()))
+	icon, err := iconOp.Read(ctx, sakuraCloudID(d.Id()))
 	if err != nil {
 		if sacloud.IsNotFoundError(err) {
 			d.SetId("")

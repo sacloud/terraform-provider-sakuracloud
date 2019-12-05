@@ -20,8 +20,6 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/sacloud/libsacloud/v2/sacloud/types"
-
 	"github.com/hashicorp/terraform-plugin-sdk/helper/resource"
 	"github.com/hashicorp/terraform-plugin-sdk/terraform"
 	"github.com/sacloud/libsacloud/v2/sacloud"
@@ -145,7 +143,7 @@ func testAccCheckSakuraCloudGSLBExists(n string, gslb *sacloud.GSLB) resource.Te
 		gslbOp := sacloud.NewGSLBOp(client)
 		ctx := context.Background()
 
-		foundGSLB, err := gslbOp.Read(ctx, types.StringID(rs.Primary.ID))
+		foundGSLB, err := gslbOp.Read(ctx, sakuraCloudID(rs.Primary.ID))
 		if err != nil {
 			return err
 		}
@@ -171,7 +169,7 @@ func testAccCheckSakuraCloudGSLBDestroy(s *terraform.State) error {
 			continue
 		}
 
-		_, err := gslbOp.Read(ctx, types.StringID(rs.Primary.ID))
+		_, err := gslbOp.Read(ctx, sakuraCloudID(rs.Primary.ID))
 		if err == nil {
 			return errors.New("GSLB still exists")
 		}

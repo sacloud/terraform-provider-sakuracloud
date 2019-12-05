@@ -25,7 +25,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/helper/resource"
 	"github.com/hashicorp/terraform-plugin-sdk/terraform"
 	"github.com/sacloud/libsacloud/v2/sacloud"
-	"github.com/sacloud/libsacloud/v2/sacloud/types"
 )
 
 const (
@@ -152,7 +151,7 @@ func testAccCheckSakuraCloudProxyLBExists(n string, proxylb *sacloud.ProxyLB) re
 		client := testAccProvider.Meta().(*APIClient)
 		proxyLBOp := sacloud.NewProxyLBOp(client)
 
-		foundProxyLB, err := proxyLBOp.Read(context.Background(), types.StringID(rs.Primary.ID))
+		foundProxyLB, err := proxyLBOp.Read(context.Background(), sakuraCloudID(rs.Primary.ID))
 		if err != nil {
 			return err
 		}
@@ -177,7 +176,7 @@ func testAccCheckSakuraCloudProxyLBDestroy(s *terraform.State) error {
 			continue
 		}
 
-		_, err := proxyLBOp.Read(context.Background(), types.StringID(rs.Primary.ID))
+		_, err := proxyLBOp.Read(context.Background(), sakuraCloudID(rs.Primary.ID))
 		if err == nil {
 			return fmt.Errorf("still exists ProxyLB: %s", rs.Primary.ID)
 		}

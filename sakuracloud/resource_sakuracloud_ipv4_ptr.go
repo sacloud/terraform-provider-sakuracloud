@@ -69,7 +69,7 @@ func resourceSakuraCloudIPv4Ptr() *schema.Resource {
 
 func resourceSakuraCloudIPv4PtrUpdate(d *schema.ResourceData, meta interface{}) error {
 	var err error
-	client, ctx, zone := getSacloudV2Client(d, meta)
+	client, ctx, zone := getSacloudClient(d, meta)
 	ipAddrOp := sacloud.NewIPAddressOp(client)
 
 	ip := d.Get("ipaddress").(string)
@@ -109,7 +109,7 @@ func resourceSakuraCloudIPv4PtrUpdate(d *schema.ResourceData, meta interface{}) 
 }
 
 func resourceSakuraCloudIPv4PtrRead(d *schema.ResourceData, meta interface{}) error {
-	client, ctx, zone := getSacloudV2Client(d, meta)
+	client, ctx, zone := getSacloudClient(d, meta)
 	ipAddrOp := sacloud.NewIPAddressOp(client)
 	ip := d.Id()
 
@@ -126,7 +126,7 @@ func resourceSakuraCloudIPv4PtrRead(d *schema.ResourceData, meta interface{}) er
 
 func resourceSakuraCloudIPv4PtrDelete(d *schema.ResourceData, meta interface{}) error {
 	var err error
-	client, ctx, zone := getSacloudV2Client(d, meta)
+	client, ctx, zone := getSacloudClient(d, meta)
 	ipAddrOp := sacloud.NewIPAddressOp(client)
 	ip := d.Id()
 
@@ -146,6 +146,6 @@ func resourceSakuraCloudIPv4PtrDelete(d *schema.ResourceData, meta interface{}) 
 func setIPv4PtrResourceData(d *schema.ResourceData, client *APIClient, data *sacloud.IPAddress) error {
 	d.Set("ipaddress", data.IPAddress)
 	d.Set("hostname", data.HostName)
-	d.Set("zone", getV2Zone(d, client))
+	d.Set("zone", getZone(d, client))
 	return nil
 }

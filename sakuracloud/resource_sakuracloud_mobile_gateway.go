@@ -154,7 +154,6 @@ func resourceSakuraCloudMobileGateway() *schema.Resource {
 			"tags": {
 				Type:     schema.TypeList,
 				Optional: true,
-				Computed: true,
 				Elem:     &schema.Schema{Type: schema.TypeString},
 			},
 			"sim_ids": {
@@ -175,7 +174,7 @@ func resourceSakuraCloudMobileGateway() *schema.Resource {
 }
 
 func resourceSakuraCloudMobileGatewayCreate(d *schema.ResourceData, meta interface{}) error {
-	client, ctx, zone := getSacloudV2Client(d, meta)
+	client, ctx, zone := getSacloudClient(d, meta)
 	mgwOp := sacloud.NewMobileGatewayOp(client)
 
 	// validate
@@ -187,7 +186,7 @@ func resourceSakuraCloudMobileGatewayCreate(d *schema.ResourceData, meta interfa
 	opts := &sacloud.MobileGatewayCreateRequest{
 		Name:        d.Get("name").(string),
 		Description: d.Get("description").(string),
-		Tags:        expandTagsV2(d.Get("tags").([]interface{})),
+		Tags:        expandTags(d),
 		IconID:      expandSakuraCloudID(d, "icon_id"),
 		Settings: &sacloud.MobileGatewaySettingCreate{
 			InternetConnectionEnabled:       expandStringFlag(d, "internet_connection"),
@@ -293,10 +292,10 @@ func resourceSakuraCloudMobileGatewayCreate(d *schema.ResourceData, meta interfa
 }
 
 func resourceSakuraCloudMobileGatewayRead(d *schema.ResourceData, meta interface{}) error {
-	client, ctx, zone := getSacloudV2Client(d, meta)
+	client, ctx, zone := getSacloudClient(d, meta)
 	mgwOp := sacloud.NewMobileGatewayOp(client)
 
-	mgw, err := mgwOp.Read(ctx, zone, types.StringID(d.Id()))
+	mgw, err := mgwOp.Read(ctx, zone, sakuraCloudID(d.Id()))
 	if err != nil {
 		if sacloud.IsNotFoundError(err) {
 			d.SetId("")
@@ -309,7 +308,7 @@ func resourceSakuraCloudMobileGatewayRead(d *schema.ResourceData, meta interface
 }
 
 func resourceSakuraCloudMobileGatewayUpdate(d *schema.ResourceData, meta interface{}) error {
-	client, ctx, zone := getSacloudV2Client(d, meta)
+	client, ctx, zone := getSacloudClient(d, meta)
 	mgwOp := sacloud.NewMobileGatewayOp(client)
 
 	switchID, ip, nwMaskLen, err := expandMobileGatewayPrivateNetworks(d)
@@ -320,7 +319,7 @@ func resourceSakuraCloudMobileGatewayUpdate(d *schema.ResourceData, meta interfa
 	sakuraMutexKV.Lock(d.Id())
 	defer sakuraMutexKV.Unlock(d.Id())
 
-	mgw, err := mgwOp.Read(ctx, zone, types.StringID(d.Id()))
+	mgw, err := mgwOp.Read(ctx, zone, sakuraCloudID(d.Id()))
 	if err != nil {
 		return fmt.Errorf("could not read SakuraCloud MobileGateway: %s", err)
 	}
@@ -328,7 +327,7 @@ func resourceSakuraCloudMobileGatewayUpdate(d *schema.ResourceData, meta interfa
 	mgw, err = mgwOp.Update(ctx, zone, mgw.ID, &sacloud.MobileGatewayUpdateRequest{
 		Name:        d.Get("name").(string),
 		Description: d.Get("description").(string),
-		Tags:        expandTagsV2(d.Get("tags").([]interface{})),
+		Tags:        expandTags(d),
 		IconID:      expandSakuraCloudID(d, "icon_id"),
 		Settings: &sacloud.MobileGatewaySetting{
 			Interfaces:                      mgw.Settings.Interfaces,
@@ -466,13 +465,13 @@ func resourceSakuraCloudMobileGatewayUpdate(d *schema.ResourceData, meta interfa
 }
 
 func resourceSakuraCloudMobileGatewayDelete(d *schema.ResourceData, meta interface{}) error {
-	client, ctx, zone := getSacloudV2Client(d, meta)
+	client, ctx, zone := getSacloudClient(d, meta)
 	mgwOp := sacloud.NewMobileGatewayOp(client)
 
 	sakuraMutexKV.Lock(d.Id())
 	defer sakuraMutexKV.Unlock(d.Id())
 
-	mgw, err := mgwOp.Read(ctx, zone, types.StringID(d.Id()))
+	mgw, err := mgwOp.Read(ctx, zone, sakuraCloudID(d.Id()))
 	if err != nil {
 		if sacloud.IsNotFoundError(err) {
 			d.SetId("")
@@ -498,7 +497,7 @@ func resourceSakuraCloudMobileGatewayDelete(d *schema.ResourceData, meta interfa
 }
 
 func setMobileGatewayResourceData(ctx context.Context, d *schema.ResourceData, client *APIClient, data *sacloud.MobileGateway) error {
-	zone := getV2Zone(d, client)
+	zone := getZone(d, client)
 	mgwOp := sacloud.NewMobileGatewayOp(client)
 
 	if data.Availability.IsFailed() {
@@ -562,7 +561,7 @@ func setMobileGatewayResourceData(ctx context.Context, d *schema.ResourceData, c
 
 func expandMobileGatewayPrivateNetworks(d resourceValueGettable) (switchID types.ID, ip string, nwMaskLen int, err error) {
 	if rawSwitchID, ok := d.GetOk("switch_id"); ok {
-		switchID = types.StringID(rawSwitchID.(string))
+		switchID = sakuraCloudID(rawSwitchID.(string))
 		if !switchID.IsEmpty() {
 			ip = d.Get("private_ipaddress").(string)
 			nwMaskLen = d.Get("private_nw_mask_len").(int)

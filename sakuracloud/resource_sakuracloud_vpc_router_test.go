@@ -24,7 +24,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/helper/resource"
 	"github.com/hashicorp/terraform-plugin-sdk/terraform"
 	"github.com/sacloud/libsacloud/v2/sacloud"
-	"github.com/sacloud/libsacloud/v2/sacloud/types"
 	"github.com/sacloud/libsacloud/v2/utils/vpcrouter"
 )
 
@@ -213,7 +212,7 @@ func testAccCheckSakuraCloudVPCRouterExists(n string, vpcRouter *sacloud.VPCRout
 		vrOp := sacloud.NewVPCRouterOp(client)
 		zone := rs.Primary.Attributes["zone"]
 
-		foundVPCRouter, err := vrOp.Read(context.Background(), zone, types.StringID(rs.Primary.ID))
+		foundVPCRouter, err := vrOp.Read(context.Background(), zone, sakuraCloudID(rs.Primary.ID))
 		if err != nil {
 			return err
 		}
@@ -240,7 +239,7 @@ func testAccCheckSakuraCloudVPCRouterDestroy(s *terraform.State) error {
 		}
 
 		zone := rs.Primary.Attributes["zone"]
-		_, err := vrOp.Read(context.Background(), zone, types.StringID(rs.Primary.ID))
+		_, err := vrOp.Read(context.Background(), zone, sakuraCloudID(rs.Primary.ID))
 
 		if err == nil {
 			return fmt.Errorf("still exists VPCRouter: %s", rs.Primary.ID)

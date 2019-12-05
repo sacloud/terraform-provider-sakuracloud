@@ -37,6 +37,7 @@ func resourceSakuraCloudDatabase() *schema.Resource {
 		Importer: &schema.ResourceImporter{
 			State: schema.ImportStatePassthrough,
 		},
+		CustomizeDiff: hasTagResourceCustomizeDiff,
 		Schema: map[string]*schema.Schema{
 			"name": {
 				Type:     schema.TypeString,
@@ -130,7 +131,6 @@ func resourceSakuraCloudDatabase() *schema.Resource {
 			"tags": {
 				Type:     schema.TypeList,
 				Optional: true,
-				Computed: true,
 				Elem:     &schema.Schema{Type: schema.TypeString},
 			},
 			"zone": {
@@ -146,7 +146,7 @@ func resourceSakuraCloudDatabase() *schema.Resource {
 }
 
 func resourceSakuraCloudDatabaseCreate(d *schema.ResourceData, meta interface{}) error {
-	client, ctx, zone := getSacloudV2Client(d, meta)
+	client, ctx, zone := getSacloudClient(d, meta)
 	dbOp := sacloud.NewDatabaseOp(client)
 
 	if err := validateBackupWeekdays(d, "backup_weekdays"); err != nil {
@@ -170,10 +170,10 @@ func resourceSakuraCloudDatabaseCreate(d *schema.ResourceData, meta interface{})
 	req := &sacloud.DatabaseCreateRequest{
 		Name:           d.Get("name").(string),
 		Description:    d.Get("description").(string),
-		Tags:           expandTagsV2(d.Get("tags").([]interface{})),
-		IconID:         types.StringID(d.Get("icon_id").(string)),
+		Tags:           expandTags(d),
+		IconID:         expandSakuraCloudID(d, "icon_id"),
 		PlanID:         databasePlanNameToID(d.Get("plan").(string)),
-		SwitchID:       types.StringID(d.Get("switch_id").(string)),
+		SwitchID:       expandSakuraCloudID(d, "switch_id"),
 		IPAddresses:    []string{d.Get("ipaddress1").(string)},
 		NetworkMaskLen: d.Get("nw_mask_len").(int),
 		DefaultRoute:   d.Get("default_route").(string),
@@ -241,10 +241,10 @@ func resourceSakuraCloudDatabaseCreate(d *schema.ResourceData, meta interface{})
 }
 
 func resourceSakuraCloudDatabaseRead(d *schema.ResourceData, meta interface{}) error {
-	client, ctx, zone := getSacloudV2Client(d, meta)
+	client, ctx, zone := getSacloudClient(d, meta)
 	dbOp := sacloud.NewDatabaseOp(client)
 
-	data, err := dbOp.Read(ctx, zone, types.StringID(d.Id()))
+	data, err := dbOp.Read(ctx, zone, sakuraCloudID(d.Id()))
 	if err != nil {
 		if sacloud.IsNotFoundError(err) {
 			d.SetId("")
@@ -256,10 +256,10 @@ func resourceSakuraCloudDatabaseRead(d *schema.ResourceData, meta interface{}) e
 }
 
 func resourceSakuraCloudDatabaseUpdate(d *schema.ResourceData, meta interface{}) error {
-	client, ctx, zone := getSacloudV2Client(d, meta)
+	client, ctx, zone := getSacloudClient(d, meta)
 	dbOp := sacloud.NewDatabaseOp(client)
 
-	db, err := dbOp.Read(ctx, zone, types.StringID(d.Id()))
+	db, err := dbOp.Read(ctx, zone, sakuraCloudID(d.Id()))
 	if err != nil {
 		return fmt.Errorf("could not read SakuraCloud Database[%s]: %s", d.Id(), err)
 	}
@@ -278,8 +278,8 @@ func resourceSakuraCloudDatabaseUpdate(d *schema.ResourceData, meta interface{})
 	req := &sacloud.DatabaseUpdateRequest{
 		Name:        d.Get("name").(string),
 		Description: d.Get("description").(string),
-		Tags:        expandTagsV2(d.Get("tags").([]interface{})),
-		IconID:      types.StringID(d.Get("icon_id").(string)),
+		Tags:        expandTags(d),
+		IconID:      expandSakuraCloudID(d, "icon_id"),
 		CommonSetting: &sacloud.DatabaseSettingCommon{
 			ServicePort:     d.Get("port").(int),
 			SourceNetwork:   expandStringList(d.Get("allow_networks").([]interface{})),
@@ -321,10 +321,10 @@ func resourceSakuraCloudDatabaseUpdate(d *schema.ResourceData, meta interface{})
 }
 
 func resourceSakuraCloudDatabaseDelete(d *schema.ResourceData, meta interface{}) error {
-	client, ctx, zone := getSacloudV2Client(d, meta)
+	client, ctx, zone := getSacloudClient(d, meta)
 	dbOp := sacloud.NewDatabaseOp(client)
 
-	data, err := dbOp.Read(ctx, zone, types.StringID(d.Id()))
+	data, err := dbOp.Read(ctx, zone, sakuraCloudID(d.Id()))
 	if err != nil {
 		if sacloud.IsNotFoundError(err) {
 			d.SetId("")
@@ -402,7 +402,7 @@ func setDatabaseResourceData(ctx context.Context, d *schema.ResourceData, client
 		d.Set("icon_id", data.IconID.String())
 	}
 	d.Set("description", data.Description)
-	d.Set("zone", getV2Zone(d, client))
+	d.Set("zone", getZone(d, client))
 
 	return nil
 }

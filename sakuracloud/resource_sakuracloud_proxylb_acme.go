@@ -21,7 +21,6 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/sacloud/libsacloud/v2/sacloud"
-	"github.com/sacloud/libsacloud/v2/sacloud/types"
 )
 
 func resourceSakuraCloudProxyLBACME() *schema.Resource {
@@ -100,7 +99,7 @@ func resourceSakuraCloudProxyLBACME() *schema.Resource {
 }
 
 func resourceSakuraCloudProxyLBACMECreate(d *schema.ResourceData, meta interface{}) error {
-	client, ctx, _ := getSacloudV2Client(d, meta)
+	client, ctx, _ := getSacloudClient(d, meta)
 	proxyLBOp := sacloud.NewProxyLBOp(client)
 
 	proxyLBID := d.Get("proxylb_id").(string)
@@ -108,7 +107,7 @@ func resourceSakuraCloudProxyLBACMECreate(d *schema.ResourceData, meta interface
 	sakuraMutexKV.Lock(proxyLBID)
 	defer sakuraMutexKV.Unlock(proxyLBID)
 
-	proxyLB, err := proxyLBOp.Read(ctx, types.StringID(proxyLBID))
+	proxyLB, err := proxyLBOp.Read(ctx, sakuraCloudID(proxyLBID))
 	if err != nil {
 		return fmt.Errorf("could not read SakuraCloud ProxyLB: %s", err)
 	}
@@ -154,12 +153,12 @@ func resourceSakuraCloudProxyLBACMECreate(d *schema.ResourceData, meta interface
 }
 
 func resourceSakuraCloudProxyLBACMERead(d *schema.ResourceData, meta interface{}) error {
-	client, ctx, _ := getSacloudV2Client(d, meta)
+	client, ctx, _ := getSacloudClient(d, meta)
 	proxyLBOp := sacloud.NewProxyLBOp(client)
 
 	proxyLBID := d.Get("proxylb_id").(string)
 
-	proxyLB, err := proxyLBOp.Read(ctx, types.StringID(proxyLBID))
+	proxyLB, err := proxyLBOp.Read(ctx, sakuraCloudID(proxyLBID))
 	if err != nil {
 		if sacloud.IsNotFoundError(err) {
 			d.SetId("")
@@ -172,7 +171,7 @@ func resourceSakuraCloudProxyLBACMERead(d *schema.ResourceData, meta interface{}
 }
 
 func resourceSakuraCloudProxyLBACMEDelete(d *schema.ResourceData, meta interface{}) error {
-	client, ctx, _ := getSacloudV2Client(d, meta)
+	client, ctx, _ := getSacloudClient(d, meta)
 	proxyLBOp := sacloud.NewProxyLBOp(client)
 
 	proxyLBID := d.Get("proxylb_id").(string)
@@ -180,7 +179,7 @@ func resourceSakuraCloudProxyLBACMEDelete(d *schema.ResourceData, meta interface
 	sakuraMutexKV.Lock(proxyLBID)
 	defer sakuraMutexKV.Unlock(proxyLBID)
 
-	proxyLB, err := proxyLBOp.Read(ctx, types.StringID(proxyLBID))
+	proxyLB, err := proxyLBOp.Read(ctx, sakuraCloudID(proxyLBID))
 	if err != nil {
 		return fmt.Errorf("could not read SakuraCloud ProxyLB: %s", err)
 	}

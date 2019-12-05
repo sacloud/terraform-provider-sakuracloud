@@ -129,7 +129,6 @@ func resourceSakuraCloudSimpleMonitor() *schema.Resource {
 			"tags": {
 				Type:     schema.TypeList,
 				Optional: true,
-				Computed: true,
 				Elem:     &schema.Schema{Type: schema.TypeString},
 			},
 			"notify_email_enabled": {
@@ -167,7 +166,7 @@ func resourceSakuraCloudSimpleMonitor() *schema.Resource {
 }
 
 func resourceSakuraCloudSimpleMonitorCreate(d *schema.ResourceData, meta interface{}) error {
-	client, ctx, _ := getSacloudV2Client(d, meta)
+	client, ctx, _ := getSacloudClient(d, meta)
 	smOp := sacloud.NewSimpleMonitorOp(client)
 
 	simpleMonitor, err := smOp.Create(ctx, &sacloud.SimpleMonitorCreateRequest{
@@ -181,7 +180,7 @@ func resourceSakuraCloudSimpleMonitorCreate(d *schema.ResourceData, meta interfa
 		SlackWebhooksURL:   d.Get("notify_slack_webhook").(string),
 		NotifyInterval:     d.Get("notify_interval").(int) * 60 * 60, // hours => seconds
 		Description:        d.Get("description").(string),
-		Tags:               expandTagsV2(d.Get("tags").([]interface{})),
+		Tags:               expandTags(d),
 		IconID:             expandSakuraCloudID(d, "icon_id"),
 	})
 	if err != nil {
@@ -193,10 +192,10 @@ func resourceSakuraCloudSimpleMonitorCreate(d *schema.ResourceData, meta interfa
 }
 
 func resourceSakuraCloudSimpleMonitorRead(d *schema.ResourceData, meta interface{}) error {
-	client, ctx, _ := getSacloudV2Client(d, meta)
+	client, ctx, _ := getSacloudClient(d, meta)
 	smOp := sacloud.NewSimpleMonitorOp(client)
 
-	simpleMonitor, err := smOp.Read(ctx, types.StringID(d.Id()))
+	simpleMonitor, err := smOp.Read(ctx, sakuraCloudID(d.Id()))
 	if err != nil {
 		if sacloud.IsNotFoundError(err) {
 			d.SetId("")
@@ -209,10 +208,10 @@ func resourceSakuraCloudSimpleMonitorRead(d *schema.ResourceData, meta interface
 }
 
 func resourceSakuraCloudSimpleMonitorUpdate(d *schema.ResourceData, meta interface{}) error {
-	client, ctx, _ := getSacloudV2Client(d, meta)
+	client, ctx, _ := getSacloudClient(d, meta)
 	smOp := sacloud.NewSimpleMonitorOp(client)
 
-	simpleMonitor, err := smOp.Read(ctx, types.StringID(d.Id()))
+	simpleMonitor, err := smOp.Read(ctx, sakuraCloudID(d.Id()))
 	if err != nil {
 		return fmt.Errorf("could not read SimpleMonitor: %s", err)
 	}
@@ -227,7 +226,7 @@ func resourceSakuraCloudSimpleMonitorUpdate(d *schema.ResourceData, meta interfa
 		SlackWebhooksURL:   d.Get("notify_slack_webhook").(string),
 		NotifyInterval:     d.Get("notify_interval").(int) * 60 * 60, // hours => seconds
 		Description:        d.Get("description").(string),
-		Tags:               expandTagsV2(d.Get("tags").([]interface{})),
+		Tags:               expandTags(d),
 		IconID:             expandSakuraCloudID(d, "icon_id"),
 	})
 	if err != nil {
@@ -238,10 +237,10 @@ func resourceSakuraCloudSimpleMonitorUpdate(d *schema.ResourceData, meta interfa
 }
 
 func resourceSakuraCloudSimpleMonitorDelete(d *schema.ResourceData, meta interface{}) error {
-	client, ctx, _ := getSacloudV2Client(d, meta)
+	client, ctx, _ := getSacloudClient(d, meta)
 	smOp := sacloud.NewSimpleMonitorOp(client)
 
-	simpleMonitor, err := smOp.Read(ctx, types.StringID(d.Id()))
+	simpleMonitor, err := smOp.Read(ctx, sakuraCloudID(d.Id()))
 	if err != nil {
 		if sacloud.IsNotFoundError(err) {
 			d.SetId("")

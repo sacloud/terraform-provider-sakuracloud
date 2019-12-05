@@ -38,9 +38,12 @@ func resourceSakuraCloudArchive() *schema.Resource {
 		Read:   resourceSakuraCloudArchiveRead,
 		Update: resourceSakuraCloudArchiveUpdate,
 		Delete: resourceSakuraCloudArchiveDelete,
-		CustomizeDiff: customdiff.ComputedIf("hash", func(d *schema.ResourceDiff, meta interface{}) bool {
-			return d.HasChange("archive_file")
-		}),
+		CustomizeDiff: customdiff.All(
+			customdiff.ComputedIf("hash", func(d *schema.ResourceDiff, meta interface{}) bool {
+				return d.HasChange("archive_file")
+			}),
+			hasTagResourceCustomizeDiff,
+		),
 		Importer: &schema.ResourceImporter{
 			State: schema.ImportStatePassthrough,
 		},
@@ -77,7 +80,6 @@ func resourceSakuraCloudArchive() *schema.Resource {
 			"tags": {
 				Type:     schema.TypeList,
 				Optional: true,
-				Computed: true,
 				Elem:     &schema.Schema{Type: schema.TypeString},
 			},
 			"zone": {
@@ -93,7 +95,7 @@ func resourceSakuraCloudArchive() *schema.Resource {
 }
 
 func resourceSakuraCloudArchiveCreate(d *schema.ResourceData, meta interface{}) error {
-	client, ctx, zone := getSacloudV2Client(d, meta)
+	client, ctx, zone := getSacloudClient(d, meta)
 	archiveOp := sacloud.NewArchiveOp(client)
 
 	// prepare create parameters
@@ -101,8 +103,8 @@ func resourceSakuraCloudArchiveCreate(d *schema.ResourceData, meta interface{}) 
 		Name:        d.Get("name").(string),
 		Description: d.Get("description").(string),
 		SizeMB:      toSizeMB(d.Get("size").(int)),
-		IconID:      types.StringID(d.Get("icon_id").(string)),
-		Tags:        expandTagsV2(d.Get("tags").([]interface{})),
+		IconID:      expandSakuraCloudID(d, "icon_id"),
+		Tags:        expandTags(d),
 	}
 
 	source := d.Get("archive_file").(string)
@@ -134,10 +136,10 @@ func resourceSakuraCloudArchiveCreate(d *schema.ResourceData, meta interface{}) 
 }
 
 func resourceSakuraCloudArchiveRead(d *schema.ResourceData, meta interface{}) error {
-	client, ctx, zone := getSacloudV2Client(d, meta)
+	client, ctx, zone := getSacloudClient(d, meta)
 	archiveOp := sacloud.NewArchiveOp(client)
 
-	archive, err := archiveOp.Read(ctx, zone, types.StringID(d.Id()))
+	archive, err := archiveOp.Read(ctx, zone, sakuraCloudID(d.Id()))
 	if err != nil {
 		if sacloud.IsNotFoundError(err) {
 			d.SetId("")
@@ -149,10 +151,10 @@ func resourceSakuraCloudArchiveRead(d *schema.ResourceData, meta interface{}) er
 }
 
 func resourceSakuraCloudArchiveUpdate(d *schema.ResourceData, meta interface{}) error {
-	client, ctx, zone := getSacloudV2Client(d, meta)
+	client, ctx, zone := getSacloudClient(d, meta)
 	archiveOp := sacloud.NewArchiveOp(client)
 
-	archive, err := archiveOp.Read(ctx, zone, types.StringID(d.Id()))
+	archive, err := archiveOp.Read(ctx, zone, sakuraCloudID(d.Id()))
 	if err != nil {
 		return fmt.Errorf("could not read SakuraCloud Archive[%s]: %s", d.Id(), err)
 	}
@@ -160,8 +162,8 @@ func resourceSakuraCloudArchiveUpdate(d *schema.ResourceData, meta interface{}) 
 	req := &sacloud.ArchiveUpdateRequest{
 		Name:        d.Get("name").(string),
 		Description: d.Get("description").(string),
-		Tags:        expandTagsV2(d.Get("tags").([]interface{})),
-		IconID:      types.StringID(d.Get("icon_id").(string)),
+		Tags:        expandTags(d),
+		IconID:      expandSakuraCloudID(d, "icon_id"),
 	}
 
 	archive, err = archiveOp.Update(ctx, zone, archive.ID, req)
@@ -206,10 +208,10 @@ func resourceSakuraCloudArchiveUpdate(d *schema.ResourceData, meta interface{}) 
 }
 
 func resourceSakuraCloudArchiveDelete(d *schema.ResourceData, meta interface{}) error {
-	client, ctx, zone := getSacloudV2Client(d, meta)
+	client, ctx, zone := getSacloudClient(d, meta)
 	archiveOp := sacloud.NewArchiveOp(client)
 
-	archive, err := archiveOp.Read(ctx, zone, types.StringID(d.Id()))
+	archive, err := archiveOp.Read(ctx, zone, sakuraCloudID(d.Id()))
 	if err != nil {
 		if sacloud.IsNotFoundError(err) {
 			d.SetId("")
@@ -245,13 +247,13 @@ func setArchiveResourceData(d *schema.ResourceData, client *APIClient, data *sac
 	if !data.IconID.IsEmpty() {
 		d.Set("icon_id", data.IconID.String())
 	}
-	if err := d.Set("tags", flattenTags(data.Tags)); err != nil {
+	if err := d.Set("tags", data.Tags); err != nil {
 		return fmt.Errorf("error setting tags: %v", data.Tags)
 	}
 	d.Set("name", data.Name)
 	d.Set("size", data.GetSizeGB())
 	d.Set("description", data.Description)
-	d.Set("zone", getV2Zone(d, client))
+	d.Set("zone", getZone(d, client))
 	return nil
 }
 

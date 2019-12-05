@@ -21,8 +21,6 @@ import (
 	"os"
 	"testing"
 
-	"github.com/sacloud/libsacloud/v2/sacloud/types"
-
 	"github.com/hashicorp/terraform-plugin-sdk/helper/resource"
 	"github.com/hashicorp/terraform-plugin-sdk/terraform"
 	"github.com/sacloud/libsacloud/v2/sacloud"
@@ -170,7 +168,7 @@ func testAccCheckSakuraCloudLoadBalancerExists(n string, loadBalancer *sacloud.L
 		zone := rs.Primary.Attributes["zone"]
 		lbOp := sacloud.NewLoadBalancerOp(client)
 
-		foundLoadBalancer, err := lbOp.Read(context.Background(), zone, types.StringID(rs.Primary.ID))
+		foundLoadBalancer, err := lbOp.Read(context.Background(), zone, sakuraCloudID(rs.Primary.ID))
 		if err != nil {
 			return err
 		}
@@ -197,7 +195,7 @@ func testAccCheckSakuraCloudLoadBalancerDestroy(s *terraform.State) error {
 		}
 
 		zone := rs.Primary.Attributes["zone"]
-		_, err := lbOp.Read(context.Background(), zone, types.StringID(rs.Primary.ID))
+		_, err := lbOp.Read(context.Background(), zone, sakuraCloudID(rs.Primary.ID))
 		if err == nil {
 			return fmt.Errorf("still exists LoadBalancer: %s", rs.Primary.ID)
 		}

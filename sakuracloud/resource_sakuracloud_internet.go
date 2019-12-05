@@ -51,7 +51,6 @@ func resourceSakuraCloudInternet() *schema.Resource {
 			"tags": {
 				Type:     schema.TypeList,
 				Optional: true,
-				Computed: true,
 				Elem:     &schema.Schema{Type: schema.TypeString},
 			},
 			"nw_mask_len": {
@@ -88,8 +87,6 @@ func resourceSakuraCloudInternet() *schema.Resource {
 				Type:     schema.TypeList,
 				Computed: true,
 				Elem:     &schema.Schema{Type: schema.TypeString},
-				// ! Current terraform(v0.7) is not support to array validation !
-				// ValidateFunc: validateSakuracloudIDArrayType,
 			},
 			"nw_address": {
 				Type:     schema.TypeString,
@@ -129,13 +126,13 @@ func resourceSakuraCloudInternet() *schema.Resource {
 }
 
 func resourceSakuraCloudInternetCreate(d *schema.ResourceData, meta interface{}) error {
-	client, ctx, zone := getSacloudV2Client(d, meta)
+	client, ctx, zone := getSacloudClient(d, meta)
 	internetOp := sacloud.NewInternetOp(client)
 
 	internet, err := internetOp.Create(ctx, zone, &sacloud.InternetCreateRequest{
 		Name:           d.Get("name").(string),
 		Description:    d.Get("description").(string),
-		Tags:           expandTagsV2(d.Get("tags").([]interface{})),
+		Tags:           expandTags(d),
 		IconID:         expandSakuraCloudID(d, "icon_id"),
 		NetworkMaskLen: d.Get("nw_mask_len").(int),
 		BandWidthMbps:  d.Get("band_width").(int),
@@ -165,10 +162,10 @@ func resourceSakuraCloudInternetCreate(d *schema.ResourceData, meta interface{})
 }
 
 func resourceSakuraCloudInternetRead(d *schema.ResourceData, meta interface{}) error {
-	client, ctx, zone := getSacloudV2Client(d, meta)
+	client, ctx, zone := getSacloudClient(d, meta)
 	internetOp := sacloud.NewInternetOp(client)
 
-	internet, err := internetOp.Read(ctx, zone, types.StringID(d.Id()))
+	internet, err := internetOp.Read(ctx, zone, sakuraCloudID(d.Id()))
 	if err != nil {
 		if sacloud.IsNotFoundError(err) {
 			d.SetId("")
@@ -180,10 +177,10 @@ func resourceSakuraCloudInternetRead(d *schema.ResourceData, meta interface{}) e
 }
 
 func resourceSakuraCloudInternetUpdate(d *schema.ResourceData, meta interface{}) error {
-	client, ctx, zone := getSacloudV2Client(d, meta)
+	client, ctx, zone := getSacloudClient(d, meta)
 	internetOp := sacloud.NewInternetOp(client)
 
-	internet, err := internetOp.Read(ctx, zone, types.StringID(d.Id()))
+	internet, err := internetOp.Read(ctx, zone, sakuraCloudID(d.Id()))
 	if err != nil {
 		return fmt.Errorf("could not read SakuraCloud Internet: %s", err)
 	}
@@ -191,7 +188,7 @@ func resourceSakuraCloudInternetUpdate(d *schema.ResourceData, meta interface{})
 	internet, err = internetOp.Update(ctx, zone, internet.ID, &sacloud.InternetUpdateRequest{
 		Name:        d.Get("name").(string),
 		Description: d.Get("description").(string),
-		Tags:        expandTagsV2(d.Get("tags").([]interface{})),
+		Tags:        expandTags(d),
 		IconID:      expandSakuraCloudID(d, "icon_id"),
 	})
 	if err != nil {
@@ -230,10 +227,10 @@ func resourceSakuraCloudInternetUpdate(d *schema.ResourceData, meta interface{})
 }
 
 func resourceSakuraCloudInternetDelete(d *schema.ResourceData, meta interface{}) error {
-	client, ctx, zone := getSacloudV2Client(d, meta)
+	client, ctx, zone := getSacloudClient(d, meta)
 	internetOp := sacloud.NewInternetOp(client)
 
-	internet, err := internetOp.Read(ctx, zone, types.StringID(d.Id()))
+	internet, err := internetOp.Read(ctx, zone, sakuraCloudID(d.Id()))
 	if err != nil {
 		if sacloud.IsNotFoundError(err) {
 			d.SetId("")
@@ -262,7 +259,7 @@ func resourceSakuraCloudInternetDelete(d *schema.ResourceData, meta interface{})
 func setInternetResourceData(ctx context.Context, d *schema.ResourceData, client *APIClient, data *sacloud.Internet) error {
 
 	swOp := sacloud.NewSwitchOp(client)
-	zone := getV2Zone(d, client)
+	zone := getZone(d, client)
 	sw, err := swOp.Read(ctx, zone, data.Switch.ID)
 	if err != nil {
 		return fmt.Errorf("could not read SakuraCloud Switch resource: %s", err)
