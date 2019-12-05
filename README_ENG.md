@@ -225,8 +225,6 @@ make serve-english-docs
 
 ## License
 
+ `terraform-proivder-sakuracloud` Copyright (C) 2016-2019 terraform-provider-sakuraclou authors.
+
   This project is published under [Apache 2.0 License](LICENSE).
-
-## Author
-
-- [Terraform for Sakura Cloud Authors](AUTHORS)
