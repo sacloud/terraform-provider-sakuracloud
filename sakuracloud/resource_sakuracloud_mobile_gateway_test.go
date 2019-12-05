@@ -1,13 +1,15 @@
 package sakuracloud
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"testing"
 
 	"github.com/hashicorp/terraform/helper/resource"
 	"github.com/hashicorp/terraform/terraform"
-	"github.com/sacloud/libsacloud/sacloud"
+	"github.com/sacloud/libsacloud/v2/sacloud"
+	"github.com/sacloud/libsacloud/v2/sacloud/types"
 )
 
 func TestAccSakuraCloudMobileGateway(t *testing.T) {
@@ -66,7 +68,7 @@ func TestAccSakuraCloudMobileGateway(t *testing.T) {
 					resource.TestCheckResourceAttr("sakuracloud_mobile_gateway.foobar", "tags.1", "hoge2_after"),
 					resource.TestCheckResourceAttr("sakuracloud_mobile_gateway.foobar", "private_ipaddress", "192.168.11.101"),
 					resource.TestCheckResourceAttr("sakuracloud_mobile_gateway.foobar", "private_nw_mask_len", "24"),
-					resource.TestCheckNoResourceAttr("sakuracloud_mobile_gateway.foobar", "icon_id"),
+					resource.TestCheckResourceAttr("sakuracloud_mobile_gateway.foobar", "icon_id", ""),
 					resource.TestCheckResourceAttr("sakuracloud_mobile_gateway.foobar", "traffic_control.#", "0"),
 					resource.TestCheckResourceAttrPair(
 						"sakuracloud_mobile_gateway.foobar", "switch_id",
@@ -112,23 +114,25 @@ func testAccCheckSakuraCloudMobileGatewayExists(n string, mgs *sacloud.MobileGat
 		rs, ok := s.RootModule().Resources[n]
 
 		if !ok {
-			return fmt.Errorf("Not found: %s", n)
+			return fmt.Errorf("not found: %s", n)
 		}
 
 		if rs.Primary.ID == "" {
-			return errors.New("No MobileGateway ID is set")
+			return errors.New("no MobileGateway ID is set")
 		}
 
 		client := testAccProvider.Meta().(*APIClient)
+		zone := rs.Primary.Attributes["zone"]
+		mgwOp := sacloud.NewMobileGatewayOp(client)
 
-		foundMobileGateway, err := client.MobileGateway.Read(toSakuraCloudID(rs.Primary.ID))
+		foundMobileGateway, err := mgwOp.Read(context.Background(), zone, types.StringID(rs.Primary.ID))
 
 		if err != nil {
 			return err
 		}
 
-		if foundMobileGateway.ID != toSakuraCloudID(rs.Primary.ID) {
-			return errors.New("MobileGateway not found")
+		if foundMobileGateway.ID.String() != rs.Primary.ID {
+			return fmt.Errorf("not found MobileGateway: %s", rs.Primary.ID)
 		}
 
 		*mgs = *foundMobileGateway
@@ -139,16 +143,18 @@ func testAccCheckSakuraCloudMobileGatewayExists(n string, mgs *sacloud.MobileGat
 
 func testAccCheckSakuraCloudMobileGatewayDestroy(s *terraform.State) error {
 	client := testAccProvider.Meta().(*APIClient)
+	mgwOp := sacloud.NewMobileGatewayOp(client)
 
 	for _, rs := range s.RootModule().Resources {
 		if rs.Type != "sakuracloud_mobile_gateway" {
 			continue
 		}
 
-		_, err := client.MobileGateway.Read(toSakuraCloudID(rs.Primary.ID))
+		zone := rs.Primary.Attributes["zone"]
+		_, err := mgwOp.Read(context.Background(), zone, types.StringID(rs.Primary.ID))
 
 		if err == nil {
-			return errors.New("MobileGateway still exists")
+			return fmt.Errorf("still exists MobileGateway: %s", rs.Primary.ID)
 		}
 	}
 
@@ -165,9 +171,10 @@ func TestAccImportSakuraCloudMobileGateway(t *testing.T) {
 			"private_ipaddress":                      "192.168.11.101",
 			"private_nw_mask_len":                    "24",
 			"description":                            "description_before",
+			"internet_connection":                    "true",
+			"inter_device_communication":             "false",
 			"tags.0":                                 "hoge1",
 			"tags.1":                                 "hoge2",
-			"graceful_shutdown_timeout":              "60",
 			"traffic_control.0.quota":                "256",
 			"traffic_control.0.band_width_limit":     "64",
 			"traffic_control.0.enable_email":         "true",

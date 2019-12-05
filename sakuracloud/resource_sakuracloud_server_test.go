@@ -1,6 +1,7 @@
 package sakuracloud
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"os"
@@ -9,7 +10,8 @@ import (
 
 	"github.com/hashicorp/terraform/helper/resource"
 	"github.com/hashicorp/terraform/terraform"
-	"github.com/sacloud/libsacloud/sacloud"
+	"github.com/sacloud/libsacloud/v2/sacloud"
+	"github.com/sacloud/libsacloud/v2/sacloud/types"
 )
 
 func TestAccResourceSakuraCloudServer(t *testing.T) {
@@ -87,7 +89,7 @@ func TestAccResourceSakuraCloudServer(t *testing.T) {
 					resource.TestMatchResourceAttr("sakuracloud_server.foobar",
 						"nw_address",
 						regexp.MustCompile(".+")), // should be not empty
-					resource.TestCheckNoResourceAttr("sakuracloud_server.foobar", "icon_id"),
+					resource.TestCheckResourceAttr("sakuracloud_server.foobar", "icon_id", ""),
 				),
 			},
 		},
@@ -102,7 +104,7 @@ func TestAccSakuraCloudServer_EditConnections(t *testing.T) {
 		CheckDestroy: testAccCheckSakuraCloudServerDestroy,
 		Steps: []resource.TestStep{
 			{
-				Config: testAccCheckSakuraCloudServerConfig_basic,
+				Config: testAccCheckSakuraCloudServerConfig_swiched_NIC_basic,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckSakuraCloudServerExists("sakuracloud_server.foobar", &server),
 					testAccCheckSakuraCloudServerAttributes(&server),
@@ -265,11 +267,8 @@ func TestAccSakuraCloudServer_EditConnect_With_Same_Switch(t *testing.T) {
 					resource.TestCheckResourceAttr(
 						"sakuracloud_server.foobar", "additional_nics.#", "1"),
 					func(s *terraform.State) error {
-						if server.Interfaces[1].GetSwitch() == nil {
+						if server.Interfaces[1].SwitchID.IsEmpty() {
 							return errors.New("Server.Interfaces[1].Switch is nil")
-						}
-						if server.Interfaces[1].GetSwitch().GetID() == 0 {
-							return errors.New("Server.Interfaces[1].Switch has invalid ID")
 						}
 						return nil
 					},
@@ -284,49 +283,14 @@ func TestAccSakuraCloudServer_EditConnect_With_Same_Switch(t *testing.T) {
 					resource.TestCheckResourceAttr(
 						"sakuracloud_server.foobar", "additional_nics.0", ""),
 					func(s *terraform.State) error {
-						if server.Interfaces[0].GetSwitch() == nil {
+						if server.Interfaces[0].SwitchID.IsEmpty() {
 							return errors.New("Server.Interfaces[0].Switch is nil")
 						}
-						if server.Interfaces[0].GetSwitch().GetID() == 0 {
-							return errors.New("Server.Interfaces[0].Switch has invalid ID")
-						}
-						if server.Interfaces[0].GetSwitch().Scope == sacloud.ESCopeShared {
+						if server.Interfaces[0].SwitchScope == types.Scopes.Shared {
 							return errors.New("Server.Interfaces[0].Switch is connecting to shared segment")
 						}
 						return nil
 					},
-				),
-			},
-		},
-	})
-}
-
-func TestAccResourceSakuraCloudServer_DisplayIPAddress(t *testing.T) {
-	resource.ParallelTest(t, resource.TestCase{
-		PreCheck:     func() { testAccPreCheck(t) },
-		Providers:    testAccProviders,
-		CheckDestroy: testAccCheckSakuraCloudServerDestroy,
-		Steps: []resource.TestStep{
-			{
-				Config: testAccCheckSakuraCloudServerConfig_display_ipaddress,
-				Check: resource.ComposeTestCheckFunc(
-					resource.TestCheckResourceAttr(
-						"sakuracloud_server.switched", "display_ipaddress", "192.2.0.1"),
-					resource.TestCheckResourceAttr(
-						"sakuracloud_server.switched", "additional_display_ipaddresses.0", "192.2.1.1"),
-					resource.TestCheckResourceAttr(
-						"sakuracloud_server.switched", "additional_display_ipaddresses.1", "192.2.2.1"),
-				),
-			},
-			{
-				Config: testAccCheckSakuraCloudServerConfig_display_ipaddress_upd,
-				Check: resource.ComposeTestCheckFunc(
-					resource.TestCheckResourceAttr(
-						"sakuracloud_server.switched", "display_ipaddress", "192.2.0.2"),
-					resource.TestCheckResourceAttr(
-						"sakuracloud_server.switched", "additional_display_ipaddresses.0", "192.2.1.2"),
-					resource.TestCheckResourceAttr(
-						"sakuracloud_server.switched", "additional_display_ipaddresses.1", "192.2.2.2"),
 				),
 			},
 		},
@@ -410,27 +374,27 @@ func testAccCheckSakuraCloudServerExists(n string, server *sacloud.Server) resou
 		rs, ok := s.RootModule().Resources[n]
 
 		if !ok {
-			return fmt.Errorf("Not found: %s", n)
+			return fmt.Errorf("not found: %s", n)
 		}
 
 		if rs.Primary.ID == "" {
-			return errors.New("No Server ID is set")
+			return errors.New("no Server ID is set")
 		}
 
 		client := testAccProvider.Meta().(*APIClient)
+		serverOp := sacloud.NewServerOp(client)
+		zone := rs.Primary.Attributes["zone"]
 
-		foundServer, err := client.Server.Read(toSakuraCloudID(rs.Primary.ID))
-
+		foundServer, err := serverOp.Read(context.Background(), zone, types.StringID(rs.Primary.ID))
 		if err != nil {
 			return err
 		}
 
-		if foundServer.ID != toSakuraCloudID(rs.Primary.ID) {
-			return errors.New("Server not found")
+		if foundServer.ID.String() != rs.Primary.ID {
+			return fmt.Errorf("not found Server: %s", rs.Primary.ID)
 		}
 
 		*server = *foundServer
-
 		return nil
 	}
 }
@@ -438,14 +402,16 @@ func testAccCheckSakuraCloudServerExists(n string, server *sacloud.Server) resou
 func testAccCheckSakuraCloudServerAttributes(server *sacloud.Server) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
 
-		if !server.Instance.IsUp() {
-			return fmt.Errorf("Bad server status. Server must be running.: %v", server.Instance.Status)
+		if !server.InstanceStatus.IsUp() {
+			return fmt.Errorf("unexpecterd server status: status=%v", server.InstanceStatus)
 		}
 
-		if len(server.Interfaces) == 0 ||
-			server.Interfaces[0].Switch == nil ||
-			server.Interfaces[0].Switch.Scope != sacloud.ESCopeShared {
-			return fmt.Errorf("Bad server NIC status. Server must have are connected to the shared segment.: %v", server)
+		if len(server.Interfaces) == 0 {
+			return errors.New("unexpecterd server NIC status: interfaces is nil")
+		}
+
+		if server.Interfaces[0].SwitchID.IsEmpty() || server.Interfaces[0].SwitchScope != types.Scopes.Shared {
+			return fmt.Errorf("unexpected server NIC status: %#v", server.Interfaces[0])
 		}
 
 		return nil
@@ -455,12 +421,12 @@ func testAccCheckSakuraCloudServerAttributes(server *sacloud.Server) resource.Te
 func testAccCheckSakuraCloudServerAttributesWithoutSharedInterface(server *sacloud.Server) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
 
-		if !server.Instance.IsUp() {
-			return fmt.Errorf("Bad server status. Server must be running.: %v", server.Instance.Status)
+		if !server.InstanceStatus.IsUp() {
+			return fmt.Errorf("unexpected server status: status=%v", server.InstanceStatus)
 		}
 
-		if len(server.Interfaces) == 0 || server.Interfaces[0].Switch != nil {
-			return fmt.Errorf("Bad server NIC status. Server must have NIC which are disconnected the shared segment.: %#v", server.Interfaces)
+		if len(server.Interfaces) == 0 || !server.Interfaces[0].SwitchID.IsEmpty() {
+			return fmt.Errorf("unexpected server NIC status. %#v", server.Interfaces)
 		}
 
 		return nil
@@ -469,16 +435,18 @@ func testAccCheckSakuraCloudServerAttributesWithoutSharedInterface(server *saclo
 
 func testAccCheckSakuraCloudServerDestroy(s *terraform.State) error {
 	client := testAccProvider.Meta().(*APIClient)
+	serverOp := sacloud.NewServerOp(client)
 
 	for _, rs := range s.RootModule().Resources {
 		if rs.Type != "sakuracloud_server" {
 			continue
 		}
 
-		_, err := client.Server.Read(toSakuraCloudID(rs.Primary.ID))
+		zone := rs.Primary.Attributes["zone"]
+		_, err := serverOp.Read(context.Background(), zone, types.StringID(rs.Primary.ID))
 
 		if err == nil {
-			return errors.New("Server still exists")
+			return fmt.Errorf("still exists Server:%s", rs.Primary.ID)
 		}
 	}
 
@@ -538,80 +506,85 @@ resource "sakuracloud_server" "foobar" {
 }
 `
 
-const testAccCheckSakuraCloudServerConfig_swiched_NIC_added = `
-data "sakuracloud_archive" "ubuntu" {
-  os_type = "ubuntu"
-}
-
-resource "sakuracloud_disk" "foobar" {
-    name = "mydisk"
-    source_archive_id = "${data.sakuracloud_archive.ubuntu.id}"
-}
-
+const testAccCheckSakuraCloudServerConfig_swiched_NIC_basic = `
 resource "sakuracloud_server" "foobar" {
     name = "myserver"
-    disks = ["${sakuracloud_disk.foobar.id}"]
     description = "Server from TerraForm for SAKURA CLOUD"
-    additional_nics = [""]
-    graceful_shutdown_timeout = 10
+    tags = ["tag1"]
+
+    hostname = "myserver"
+    password = "p@ssw0rd"
+    ssh_key_ids = ["100000000000", "200000000000"]
+    disable_pw_auth = true
+    note_ids = ["100000000000", "200000000000"]
+
+    graceful_shutdown_timeout = 2
+}
+`
+
+const testAccCheckSakuraCloudServerConfig_swiched_NIC_added = `
+resource "sakuracloud_server" "foobar" {
+    name = "myserver"
+    description = "Server from TerraForm for SAKURA CLOUD"
+    additional_nics = [sakuracloud_switch.sw1.id]
+    graceful_shutdown_timeout = 2
+}
+resource "sakuracloud_switch" "sw1" {
+  name = "terraform-test-switch1"
 }
 `
 const testAccCheckSakuraCloudServerConfig_swiched_NIC_updated = `
-data "sakuracloud_archive" "ubuntu" {
-  os_type = "ubuntu"
-}
-
-resource "sakuracloud_disk" "foobar" {
-    name = "mydisk"
-    source_archive_id = "${data.sakuracloud_archive.ubuntu.id}"
-}
-
 resource "sakuracloud_server" "foobar" {
     name = "myserver"
-    disks = ["${sakuracloud_disk.foobar.id}"]
     description = "Server from TerraForm for SAKURA CLOUD"
-    additional_nics = ["","",""]
-    graceful_shutdown_timeout = 10
+    additional_nics = [sakuracloud_switch.sw1.id, sakuracloud_switch.sw2.id, sakuracloud_switch.sw3.id]
+    graceful_shutdown_timeout = 2
+}
+resource "sakuracloud_switch" "sw1" {
+  name = "terraform-test-switch1"
+}
+resource "sakuracloud_switch" "sw2" {
+  name = "terraform-test-switch2"
+}
+resource "sakuracloud_switch" "sw3" {
+  name = "terraform-test-switch3"
 }
 `
 
 const testAccCheckSakuraCloudServerConfig_nw_nothing = `
-data "sakuracloud_archive" "ubuntu" {
-  os_type = "ubuntu"
-}
-
-resource "sakuracloud_disk" "foobar" {
-    name = "mydisk"
-    source_archive_id = "${data.sakuracloud_archive.ubuntu.id}"
-}
-
 resource "sakuracloud_server" "foobar" {
     name = "myserver"
-    disks = ["${sakuracloud_disk.foobar.id}"]
     description = "Server from TerraForm for SAKURA CLOUD"
     nic = "disconnect"
-    additional_nics = [""]
-    graceful_shutdown_timeout = 10
+    additional_nics = [sakuracloud_switch.sw1.id]
+    graceful_shutdown_timeout = 2
+}
+resource "sakuracloud_switch" "sw1" {
+  name = "terraform-test-switch1"
 }
 `
 
 const testAccCheckSakuraCloudServerConfig_with_packet_filter = `
-resource "sakuracloud_packet_filter" "foobar2" {
-    name = "mypacket_filter2"
-    expressions {
-    	protocol = "tcp"
-    	source_nw = "0.0.0.0"
-    	source_port = "0-65535"
-    	dest_port = "80"
-    	allow = true
-    }
+resource "sakuracloud_packet_filter" "foobar" {
+  name = "terraform-test-packetfilter"
+  expressions {
+  	protocol = "tcp"
+  	source_network = "0.0.0.0"
+  	source_port = "0-65535"
+  	destination_port = "80"
+  	allow = true
+  }
 }
 resource "sakuracloud_server" "foobar" {
-    name = "myserver"
-    nic = "shared"
-    additional_nics = [""]
-    packet_filter_ids = ["" , "${sakuracloud_packet_filter.foobar2.id}"]
-    graceful_shutdown_timeout = 10
+  name = "terraform-test-server"
+  nic = "shared"
+  additional_nics = [sakurackoud_switch.foobar.id]
+  packet_filter_ids = ["" , "${sakuracloud_packet_filter.foobar2.id}"]
+  graceful_shutdown_timeout = 10
+}
+
+resource "sakuracloud_switch" "foobar" {
+  name = "terraform-test-switch"
 }
 `
 
@@ -621,9 +594,9 @@ resource "sakuracloud_packet_filter" "foobar1" {
     description = "PacketFilter from TerraForm for SAKURA CLOUD"
     expressions {
     	protocol = "tcp"
-    	source_nw = "0.0.0.0"
+    	source_network = "0.0.0.0"
     	source_port = "0-65535"
-    	dest_port = "80"
+    	destination_port = "80"
     	allow = true
     }
 }
@@ -632,9 +605,9 @@ resource "sakuracloud_packet_filter" "foobar2" {
     description = "PacketFilter from TerraForm for SAKURA CLOUD"
     expressions {
     	protocol = "tcp"
-    	source_nw = "0.0.0.0"
+    	source_network = "0.0.0.0"
     	source_port = "0-65535"
-    	dest_port = "80"
+    	destination_port = "80"
     	allow = true
     }
 }
@@ -654,9 +627,9 @@ resource "sakuracloud_packet_filter" "foobar1" {
     description = "PacketFilter from TerraForm for SAKURA CLOUD"
     expressions {
     	protocol = "udp"
-    	source_nw = "0.0.0.0"
+    	source_network = "0.0.0.0"
     	source_port = "0-65535"
-    	dest_port = "80"
+    	destination_port = "80"
     	allow = true
     }
 }
@@ -665,9 +638,9 @@ resource "sakuracloud_packet_filter" "foobar2" {
     description = "PacketFilter from TerraForm for SAKURA CLOUD"
     expressions {
     	protocol = "udp"
-    	source_nw = "0.0.0.0"
+    	source_network = "0.0.0.0"
     	source_port = "0-65535"
-    	dest_port = "80"
+    	destination_port = "80"
     	allow = true
     }
 }

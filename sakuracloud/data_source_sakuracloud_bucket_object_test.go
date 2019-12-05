@@ -21,7 +21,7 @@ func TestAccSakuraCloudBucketObjectDataSource_Basic(t *testing.T) {
 		PreCheck:                  func() { testAccPreCheck(t) },
 		Providers:                 testAccProviders,
 		PreventPostDestroyRefresh: true,
-		CheckDestroy:              testAccCheckSakuraCloudNoteDataSourceDestroy,
+		CheckDestroy:              testAccCheckSakuraCloudNoteDestroy,
 
 		Steps: []resource.TestStep{
 			{

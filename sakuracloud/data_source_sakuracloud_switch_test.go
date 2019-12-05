@@ -19,7 +19,7 @@ func TestAccSakuraCloudDataSourceSwitch_Basic(t *testing.T) {
 		PreCheck:                  func() { testAccPreCheck(t) },
 		Providers:                 testAccProviders,
 		PreventPostDestroyRefresh: true,
-		CheckDestroy:              testAccCheckSakuraCloudSwitchDataSourceDestroy,
+		CheckDestroy:              testAccCheckSakuraCloudSwitchDestroy,
 
 		Steps: []resource.TestStep{
 			{
@@ -84,28 +84,6 @@ func testAccCheckSakuraCloudSwitchDataSourceNotExists(n string) resource.TestChe
 		}
 		return nil
 	}
-}
-
-func testAccCheckSakuraCloudSwitchDataSourceDestroy(s *terraform.State) error {
-	client := testAccProvider.Meta().(*APIClient)
-
-	for _, rs := range s.RootModule().Resources {
-		if rs.Type != "sakuracloud_switch" {
-			continue
-		}
-
-		if rs.Primary.ID == "" {
-			continue
-		}
-
-		_, err := client.Switch.Read(toSakuraCloudID(rs.Primary.ID))
-
-		if err == nil {
-			return errors.New("Switch still exists")
-		}
-	}
-
-	return nil
 }
 
 func testAccCheckSakuraCloudDataSourceSwitchBase(name string) string {

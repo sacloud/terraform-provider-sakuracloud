@@ -1,14 +1,15 @@
 package sakuracloud
 
 import (
+	"context"
 	"fmt"
-	"log"
 
 	"github.com/hashicorp/terraform/helper/schema"
 	"github.com/hashicorp/terraform/helper/validation"
-	"github.com/sacloud/libsacloud/api"
-	"github.com/sacloud/libsacloud/sacloud"
-	"github.com/sacloud/libsacloud/utils/setup"
+	"github.com/sacloud/libsacloud/v2/sacloud"
+	"github.com/sacloud/libsacloud/v2/sacloud/accessor"
+	"github.com/sacloud/libsacloud/v2/sacloud/types"
+	"github.com/sacloud/libsacloud/v2/utils/setup"
 )
 
 func resourceSakuraCloudDisk() *schema.Resource {
@@ -37,10 +38,10 @@ func resourceSakuraCloudDisk() *schema.Resource {
 				Type:     schema.TypeString,
 				Optional: true,
 				ForceNew: true,
-				Default:  sacloud.DiskConnectionVirtio,
+				Default:  types.DiskConnections.VirtIO,
 				ValidateFunc: validation.StringInSlice([]string{
-					fmt.Sprintf("%s", sacloud.DiskConnectionVirtio),
-					fmt.Sprintf("%s", sacloud.DiskConnectionIDE),
+					types.DiskConnections.VirtIO.String(),
+					types.DiskConnections.IDE.String(),
 				}, false),
 			},
 			"source_archive_id": {
@@ -88,7 +89,6 @@ func resourceSakuraCloudDisk() *schema.Resource {
 				Computed: true,
 				Elem:     &schema.Schema{Type: schema.TypeString},
 			},
-			powerManageTimeoutKey: powerManageTimeoutParam,
 			"zone": {
 				Type:         schema.TypeString,
 				Optional:     true,
@@ -97,394 +97,158 @@ func resourceSakuraCloudDisk() *schema.Resource {
 				Description:  "target SakuraCloud zone",
 				ValidateFunc: validateZone([]string{"is1a", "is1b", "tk1a", "tk1v"}),
 			},
-			"hostname": {
-				Type:         schema.TypeString,
-				Optional:     true,
-				ValidateFunc: validation.StringLenBetween(1, 64),
-				Removed:      "Use attribute in `sakuracloud_server` instead",
-			},
-			"password": {
-				Type:         schema.TypeString,
-				Optional:     true,
-				ValidateFunc: validation.StringLenBetween(8, 64),
-				Sensitive:    true,
-				Removed:      "Use attribute in `sakuracloud_server` instead",
-			},
-			"ssh_key_ids": {
-				Type:     schema.TypeList,
-				Optional: true,
-				Elem:     &schema.Schema{Type: schema.TypeString},
-				// ! Current terraform(v0.7) is not support to array validation !
-				// ValidateFunc: validateSakuracloudIDArrayType,
-				Removed: "Use attribute in `sakuracloud_server` instead",
-			},
-			"disable_pw_auth": {
-				Type:     schema.TypeBool,
-				Optional: true,
-				Removed:  "Use attribute in `sakuracloud_server` instead",
-			},
-			"note_ids": {
-				Type:     schema.TypeList,
-				Optional: true,
-				Elem:     &schema.Schema{Type: schema.TypeString},
-				// ! Current terraform(v0.7) is not support to array validation !
-				// ValidateFunc: validateSakuracloudIDArrayType,
-				Removed: "Use attribute in `sakuracloud_server` instead",
-			},
 		},
 	}
 }
 
 func resourceSakuraCloudDiskCreate(d *schema.ResourceData, meta interface{}) error {
-	client := getSacloudAPIClient(d, meta)
+	client, ctx, zone := getSacloudV2Client(d, meta)
+	diskOp := sacloud.NewDiskOp(client)
 
-	opts := client.Disk.New()
-
-	opts.Name = d.Get("name").(string)
-
+	var planID types.ID
 	plan := d.Get("plan").(string)
-	switch plan {
+	switch d.Get("plan").(string) {
 	case "ssd":
-		opts.SetDiskPlanToSSD()
-		break
+		planID = types.DiskPlans.SSD
 	case "hdd":
-		opts.SetDiskPlanToHDD()
-		break
+		planID = types.DiskPlans.HDD
 	default:
 		return fmt.Errorf("invalid disk plan [%s]", plan)
 	}
+	distantFrom := expandSakuraCloudIDs(d, "distant_from")
 
-	opts.Connection = sacloud.EDiskConnection(d.Get("connector").(string))
-
-	archiveID, ok := d.GetOk("source_archive_id")
-	if ok {
-		opts.SetSourceArchive(toSakuraCloudID(archiveID.(string)))
-	}
-	diskID, ok := d.GetOk("source_disk_id")
-	if ok {
-		opts.SetSourceDisk(toSakuraCloudID(diskID.(string)))
-	}
-
-	opts.SizeMB = toSizeMB(d.Get("size").(int))
-	if iconID, ok := d.GetOk("icon_id"); ok {
-		opts.SetIconByID(toSakuraCloudID(iconID.(string)))
-	}
-	if description, ok := d.GetOk("description"); ok {
-		opts.Description = description.(string)
-	}
-	rawTags := d.Get("tags").([]interface{})
-	if rawTags != nil {
-		opts.Tags = expandTags(client, rawTags)
-	}
-
-	if _, ok := d.GetOk("distant_from"); ok {
-		rawDistantFrom := d.Get("distant_from").([]interface{})
-		if rawDistantFrom != nil {
-			strDiskIDs := expandStringList(rawDistantFrom)
-			diskIDs := []int64{}
-			for _, id := range strDiskIDs {
-				diskIDs = append(diskIDs, int64(forceAtoI(id)))
-			}
-
-			opts.DistantFrom = diskIDs
-		}
+	ops := &sacloud.DiskCreateRequest{
+		DiskPlanID:      planID,
+		Connection:      types.EDiskConnection(d.Get("connector").(string)),
+		SourceDiskID:    expandSakuraCloudID(d, "source_disk_id"),
+		SourceArchiveID: expandSakuraCloudID(d, "source_archive_id"),
+		SizeMB:          toSizeMB(d.Get("size").(int)),
+		Name:            d.Get("name").(string),
+		Description:     d.Get("description").(string),
+		Tags:            expandTagsV2(d.Get("tags").([]interface{})),
+		IconID:          expandSakuraCloudID(d, "icon_id"),
 	}
 
 	diskBuilder := &setup.RetryableSetup{
-		Create: func() (sacloud.ResourceIDHolder, error) {
-			return client.Disk.Create(opts)
+		IsWaitForCopy: true,
+		Create: func(ctx context.Context, zone string) (accessor.ID, error) {
+			return diskOp.Create(ctx, zone, ops, distantFrom)
 		},
-		AsyncWaitForCopy: func(id int64) (chan interface{}, chan interface{}, chan error) {
-			return client.Disk.AsyncSleepWhileCopying(id, client.DefaultTimeoutDuration)
+		Read: func(ctx context.Context, zone string, id types.ID) (interface{}, error) {
+			return diskOp.Read(ctx, zone, id)
 		},
-		Delete: func(id int64) error {
-			_, err := client.Disk.Delete(id)
-			return err
-		},
-		ProvisionBeforeUp: func(id int64, _ interface{}) error {
-			isNeedEditDisk := false
-
-			//edit disk
-			diskEditConfig := client.Disk.NewCondig()
-			if hostName, ok := d.GetOk("hostname"); ok {
-				diskEditConfig.SetHostName(hostName.(string))
-				isNeedEditDisk = true
-			}
-			if password, ok := d.GetOk("password"); ok {
-				diskEditConfig.SetPassword(password.(string))
-				isNeedEditDisk = true
-			}
-			if sshKeyIDs, ok := d.GetOk("ssh_key_ids"); ok {
-				ids := expandStringList(sshKeyIDs.([]interface{}))
-				diskEditConfig.SetSSHKeys(ids)
-				isNeedEditDisk = true
-			}
-
-			if disablePasswordAuth, ok := d.GetOk("disable_pw_auth"); ok {
-				diskEditConfig.SetDisablePWAuth(disablePasswordAuth.(bool))
-				isNeedEditDisk = true
-			}
-
-			if noteIDs, ok := d.GetOk("note_ids"); ok {
-				ids := expandStringList(noteIDs.([]interface{}))
-				diskEditConfig.SetNotes(ids)
-				isNeedEditDisk = true
-			}
-
-			if isNeedEditDisk {
-				// call disk edit API
-				res, err := client.Disk.CanEditDisk(id)
-				if err != nil {
-					return fmt.Errorf("Failed to check CanEditDisk: %s", err)
-				}
-				if res {
-					_, err = client.Disk.Config(id, diskEditConfig)
-					if err != nil {
-						return fmt.Errorf("Error editting SakuraCloud DiskConfig: %s", err)
-					}
-				} else {
-					log.Printf("[WARN] Disk[%d] does not support modify disk", id)
-				}
-			}
-
-			server_id, ok := d.GetOk("server_id")
-			if ok {
-				_, err := client.Disk.ConnectToServer(id, toSakuraCloudID(server_id.(string)))
-				if err != nil {
-					return fmt.Errorf("Failed to connect SakuraCloud Disk resource: %s", err)
-				}
-			}
-
-			return nil
+		Delete: func(ctx context.Context, zone string, id types.ID) error {
+			return diskOp.Delete(ctx, zone, id)
 		},
 		RetryCount: 3,
 	}
 
-	res, err := diskBuilder.Setup()
+	res, err := diskBuilder.Setup(ctx, zone)
 	if err != nil {
-		return fmt.Errorf("Failed to create SakuraCloud Disk resource: %s", err)
+		return fmt.Errorf("creating SakuraCloud Disk resource is failed: %s", err)
 	}
 
 	disk, ok := res.(*sacloud.Disk)
 	if !ok {
-		return fmt.Errorf("Failed to create SakuraCloud Disk resource: created resource is not *sacloud.Disk")
+		return fmt.Errorf("creating SakuraCloud Disk resource is failed: created resource is not a *sacloud.Disk")
 	}
 
-	d.SetId(disk.GetStrID())
+	d.SetId(disk.ID.String())
 	return resourceSakuraCloudDiskRead(d, meta)
 }
 
 func resourceSakuraCloudDiskRead(d *schema.ResourceData, meta interface{}) error {
-	client := getSacloudAPIClient(d, meta)
+	client, ctx, zone := getSacloudV2Client(d, meta)
+	diskOp := sacloud.NewDiskOp(client)
 
-	disk, err := client.Disk.Read(toSakuraCloudID(d.Id()))
+	disk, err := diskOp.Read(ctx, zone, types.StringID(d.Id()))
 	if err != nil {
-		if sacloudErr, ok := err.(api.Error); ok && sacloudErr.ResponseCode() == 404 {
+		if sacloud.IsNotFoundError(err) {
 			d.SetId("")
 			return nil
 		}
-		return fmt.Errorf("Couldn't find SakuraCloud Disk resource: %s", err)
+		return fmt.Errorf("could not find SakuraCloud Disk resource: %s", err)
 	}
 
-	return setDiskResourceData(d, client, disk)
+	return setDiskResourceData(ctx, d, client, disk)
 }
 
 func resourceSakuraCloudDiskUpdate(d *schema.ResourceData, meta interface{}) error {
-	client := getSacloudAPIClient(d, meta)
+	client, ctx, zone := getSacloudV2Client(d, meta)
+	diskOp := sacloud.NewDiskOp(client)
 
-	disk, err := client.Disk.Read(toSakuraCloudID(d.Id()))
+	disk, err := diskOp.Read(ctx, zone, types.StringID(d.Id()))
 	if err != nil {
-		return fmt.Errorf("Couldn't find SakuraCloud Disk resource: %s", err)
+		return fmt.Errorf("could not read SakuraCloud Disk resource: %s", err)
 	}
 
-	// has server_id and server is up,shutdown
-	isRunning := disk.Server != nil && disk.Server.Instance.IsUp()
-	isDiskConfigChanged := false
-
-	if d.HasChange("hostname") || d.HasChange("password") || d.HasChange("ssh_key_ids") ||
-		d.HasChange("disable_pw_auth") || d.HasChange("note_ids") {
-		isDiskConfigChanged = true
+	ops := &sacloud.DiskUpdateRequest{
+		Connection:  types.EDiskConnection(d.Get("connector").(string)),
+		Name:        d.Get("name").(string),
+		Description: d.Get("description").(string),
+		Tags:        expandTagsV2(d.Get("tags").([]interface{})),
+		IconID:      expandSakuraCloudID(d, "icon_id"),
 	}
 
-	if isRunning && isDiskConfigChanged {
-		err := stopServer(client, disk.Server.ID, d)
-		if err != nil {
-			return fmt.Errorf("Error stopping SakuraCloud Server resource: %s", err)
-		}
-	}
-
-	if isDiskConfigChanged {
-		diskEditConfig := client.Disk.NewCondig()
-		if d.HasChange("hostname") {
-			if hostName, ok := d.GetOk("hostname"); ok {
-				diskEditConfig.SetHostName(hostName.(string))
-			}
-		}
-
-		if d.HasChange("password") {
-			if password, ok := d.GetOk("password"); ok {
-				diskEditConfig.SetPassword(password.(string))
-			}
-		}
-
-		if d.HasChange("ssh_key_ids") {
-			if sshKeyIDs, ok := d.GetOk("ssh_key_ids"); ok {
-				ids := expandStringList(sshKeyIDs.([]interface{}))
-				diskEditConfig.SetSSHKeys(ids)
-			}
-		}
-
-		if d.HasChange("disable_pw_auth") {
-			diskEditConfig.SetDisablePWAuth(d.Get("disable_pw_auth").(bool))
-		}
-
-		if d.HasChange("note_ids") {
-			if noteIDs, ok := d.GetOk("note_ids"); ok {
-				ids := expandStringList(noteIDs.([]interface{}))
-				diskEditConfig.SetNotes(ids)
-			}
-		}
-
-		res, err := client.Disk.CanEditDisk(disk.ID)
-		if err != nil {
-			return fmt.Errorf("Failed to check CanEditDisk: %s", err)
-		}
-		if res {
-			_, err := client.Disk.Config(disk.ID, diskEditConfig)
-			if err != nil {
-				return fmt.Errorf("Error editting SakuraCloud DiskConfig: %s", err)
-			}
-		} else {
-			log.Printf("[WARN] Disk[%d] does not support modify disk", disk.ID)
-		}
-
-	}
-
-	if d.HasChange("name") {
-		disk.Name = d.Get("name").(string)
-	}
-	if d.HasChange("icon_id") {
-		if iconID, ok := d.GetOk("icon_id"); ok {
-			disk.SetIconByID(toSakuraCloudID(iconID.(string)))
-		} else {
-			disk.ClearIcon()
-		}
-	}
-	if d.HasChange("description") {
-		if description, ok := d.GetOk("description"); ok {
-			disk.Description = description.(string)
-		} else {
-			disk.Description = ""
-		}
-	}
-	if d.HasChange("tags") {
-		rawTags := d.Get("tags").([]interface{})
-		if rawTags != nil {
-			disk.Tags = expandTags(client, rawTags)
-		} else {
-			disk.Tags = expandTags(client, []interface{}{})
-		}
-	}
-
-	disk, err = client.Disk.Update(disk.ID, disk)
+	disk, err = diskOp.Update(ctx, zone, disk.ID, ops)
 	if err != nil {
-		return fmt.Errorf("Error updating SakuraCloud Disk resource: %s", err)
-	}
-
-	if isRunning && isDiskConfigChanged {
-		err := bootServer(client, disk.Server.ID)
-		if err != nil {
-			return fmt.Errorf("Error booting SakuraCloud Server resource: %s", err)
-		}
+		return fmt.Errorf("updating SakuraCloud Disk resource is failed: %s", err)
 	}
 
 	return resourceSakuraCloudDiskRead(d, meta)
 }
 
 func resourceSakuraCloudDiskDelete(d *schema.ResourceData, meta interface{}) error {
-	client := getSacloudAPIClient(d, meta)
+	client, ctx, zone := getSacloudV2Client(d, meta)
+	diskOp := sacloud.NewDiskOp(client)
 
-	disk, err := client.Disk.Read(toSakuraCloudID(d.Id()))
+	disk, err := diskOp.Read(ctx, zone, types.StringID(d.Id()))
 	if err != nil {
-		return fmt.Errorf("Couldn't find SakuraCloud Disk resource: %s", err)
-	}
-
-	isRunning := false
-	if disk.Server != nil {
-
-		// lock during server delete operation
-		lockKey := getServerDeleteAPILockKey(disk.Server.ID)
-		sakuraMutexKV.Lock(lockKey)
-		defer sakuraMutexKV.Unlock(lockKey)
-
-		server, err := client.Server.Read(disk.Server.ID)
-		if err == nil {
-			if server.IsUp() {
-				isRunning = true
-				err := stopServer(client, server.ID, d)
-				if err != nil {
-					return fmt.Errorf("Error stopping SakuraCloud Server resource: %s", err)
-				}
-			}
-
-			_, err := client.Disk.DisconnectFromServer(toSakuraCloudID(d.Id()))
-			if err != nil {
-				return fmt.Errorf("Error disconnecting Disk from SakuraCloud Server: %s", err)
-			}
+		if sacloud.IsNotFoundError(err) {
+			d.SetId("")
+			return nil
 		}
-
+		return fmt.Errorf("could not read SakuraCloud Disk resource: %s", err)
 	}
 
-	_, err = client.Disk.Delete(toSakuraCloudID(d.Id()))
-
-	if err != nil {
-		return fmt.Errorf("Error deleting SakuraCloud Disk resource: %s", err)
+	if err := diskOp.Delete(ctx, zone, disk.ID); err != nil {
+		return fmt.Errorf("deleting SakuraCloud Disk resource is failed: %s", err)
 	}
-
-	if isRunning {
-		err := bootServer(client, disk.Server.ID)
-		if err != nil {
-			return fmt.Errorf("Error booting Server: %s", err)
-		}
-	}
-
 	return nil
 }
 
-func setDiskResourceData(d *schema.ResourceData, client *APIClient, data *sacloud.Disk) error {
+func setDiskResourceData(ctx context.Context, d *schema.ResourceData, client *APIClient, data *sacloud.Disk) error {
+	var plan string
+	switch data.DiskPlanID {
+	case types.DiskPlans.SSD:
+		plan = "ssd"
+	case types.DiskPlans.HDD:
+		plan = "hdd"
+	}
+
+	var sourceDiskID, sourceArchiveID, serverID string
+	if !data.SourceDiskID.IsEmpty() {
+		sourceDiskID = data.SourceDiskID.String()
+	}
+	if !data.SourceArchiveID.IsEmpty() {
+		sourceArchiveID = data.SourceArchiveID.String()
+	}
+	if !data.ServerID.IsEmpty() {
+		serverID = data.ServerID.String()
+	}
 
 	d.Set("name", data.Name)
-
-	switch data.Plan.ID {
-	case sacloud.DiskPlanSSD.ID:
-		d.Set("plan", "ssd")
-		break
-	case sacloud.DiskPlanHDD.ID:
-		d.Set("plan", "hdd")
-		break
-
-	}
-
-	if data.SourceDisk != nil {
-		d.Set("source_disk_id", data.SourceDisk.GetStrID())
-	} else if data.SourceArchive != nil {
-		d.Set("source_archive_id", data.SourceArchive.GetStrID())
-	}
-
-	d.Set("connector", fmt.Sprintf("%s", data.Connection))
-	d.Set("size", toSizeGB(data.SizeMB))
-	d.Set("icon_id", data.GetIconStrID())
+	d.Set("plan", plan)
+	d.Set("source_disk_id", sourceDiskID)
+	d.Set("source_archive_id", sourceArchiveID)
+	d.Set("connector", data.Connection.String())
+	d.Set("size", data.GetSizeGB())
+	d.Set("icon_id", data.IconID.String())
 	d.Set("description", data.Description)
-	d.Set("tags", data.Tags)
-
-	if data.Server == nil {
-		d.Set("server_id", "")
-	} else {
-		d.Set("server_id", data.Server.GetStrID())
+	if err := d.Set("tags", data.Tags); err != nil {
+		return err
 	}
-
-	setPowerManageTimeoutValueToState(d)
-
-	d.Set("zone", client.Zone)
+	d.Set("server_id", serverID)
+	d.Set("zone", getV2Zone(d, client))
 	return nil
 }

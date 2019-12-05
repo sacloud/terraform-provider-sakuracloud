@@ -1,18 +1,29 @@
 package sakuracloud
 
 import (
+	"context"
 	"errors"
 	"fmt"
+	"os"
 	"regexp"
 	"testing"
 
 	"github.com/hashicorp/terraform/helper/resource"
 	"github.com/hashicorp/terraform/terraform"
-	"github.com/sacloud/libsacloud/sacloud"
+	"github.com/sacloud/libsacloud/v2/sacloud"
+	"github.com/sacloud/libsacloud/v2/sacloud/types"
 )
 
 func TestAccResourceSakuraCloudPrivateHost(t *testing.T) {
-	var private_host sacloud.PrivateHost
+	zone := os.Getenv("SAKURACLOUD_ZONE")
+	switch zone {
+	case "":
+		t.Skip("SAKURACLOUD_ZONE is required")
+	case "tk1v":
+		t.Skip("PrivateHost is supported on tk1v")
+	}
+
+	var privateHost sacloud.PrivateHost
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
 		Providers:    testAccProviders,
@@ -21,7 +32,7 @@ func TestAccResourceSakuraCloudPrivateHost(t *testing.T) {
 			{
 				Config: testAccCheckSakuraCloudPrivateHostConfig_Basic,
 				Check: resource.ComposeTestCheckFunc(
-					testAccCheckSakuraCloudPrivateHostExists("sakuracloud_private_host.foobar", &private_host),
+					testAccCheckSakuraCloudPrivateHostExists("sakuracloud_private_host.foobar", &privateHost),
 					resource.TestCheckResourceAttr(
 						"sakuracloud_private_host.foobar", "name", "before"),
 					resource.TestCheckResourceAttr(
@@ -44,14 +55,14 @@ func TestAccResourceSakuraCloudPrivateHost(t *testing.T) {
 			{
 				Config: testAccCheckSakuraCloudPrivateHostConfig_Update,
 				Check: resource.ComposeTestCheckFunc(
-					testAccCheckSakuraCloudPrivateHostExists("sakuracloud_private_host.foobar", &private_host),
+					testAccCheckSakuraCloudPrivateHostExists("sakuracloud_private_host.foobar", &privateHost),
 					resource.TestCheckResourceAttr(
 						"sakuracloud_private_host.foobar", "name", "after"),
 					resource.TestCheckResourceAttr(
 						"sakuracloud_private_host.foobar", "description", "after"),
 					resource.TestCheckResourceAttr(
 						"sakuracloud_private_host.foobar", "tags.#", "0"),
-					resource.TestCheckNoResourceAttr("sakuracloud_private_host.foobar", "icon_id"),
+					resource.TestCheckResourceAttr("sakuracloud_private_host.foobar", "icon_id", ""),
 					resource.TestMatchResourceAttr("sakuracloud_private_host.foobar",
 						"hostname",
 						regexp.MustCompile(".+")), // should be not empty
@@ -62,7 +73,15 @@ func TestAccResourceSakuraCloudPrivateHost(t *testing.T) {
 }
 
 func TestAccResourceSakuraCloudPrivateHost_DestroyWithRunningServers(t *testing.T) {
-	var private_host sacloud.PrivateHost
+	zone := os.Getenv("SAKURACLOUD_ZONE")
+	switch zone {
+	case "":
+		t.Skip("SAKURACLOUD_ZONE is required")
+	case "tk1v":
+		t.Skip("PrivateHost is supported on tk1v")
+	}
+
+	var privateHost sacloud.PrivateHost
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
 		Providers:    testAccProviders,
@@ -71,14 +90,14 @@ func TestAccResourceSakuraCloudPrivateHost_DestroyWithRunningServers(t *testing.
 			{
 				Config: testAccCheckSakuraCloudPrivateHostConfig_Destroy_Basic,
 				Check: resource.ComposeTestCheckFunc(
-					testAccCheckSakuraCloudPrivateHostExists("sakuracloud_private_host.foobar", &private_host),
+					testAccCheckSakuraCloudPrivateHostExists("sakuracloud_private_host.foobar", &privateHost),
 				),
 			},
 			{
 				Config: testAccCheckSakuraCloudPrivateHostConfig_Destroy_Update,
 				Check: resource.ComposeTestCheckFunc(
-					resource.TestCheckNoResourceAttr(
-						"sakuracloud_server.foobar", "private_host_id"),
+					resource.TestCheckResourceAttr(
+						"sakuracloud_server.foobar", "private_host_id", ""),
 				),
 			},
 		},
@@ -90,28 +109,25 @@ func testAccCheckSakuraCloudPrivateHostExists(n string, private_host *sacloud.Pr
 		rs, ok := s.RootModule().Resources[n]
 
 		if !ok {
-			return fmt.Errorf("Not found: %s", n)
+			return fmt.Errorf("not found: %s", n)
 		}
 
 		if rs.Primary.ID == "" {
-			return errors.New("No PrivateHost ID is set")
+			return errors.New("no PrivateHost ID is set")
 		}
 
 		client := testAccProvider.Meta().(*APIClient)
-		originalZone := client.Zone
-		client.Zone = "tk1a"
-		defer func() { client.Zone = originalZone }()
+		zone := rs.Primary.Attributes["zone"]
+		phOp := sacloud.NewPrivateHostOp(client)
 
-		foundPrivateHost, err := client.PrivateHost.Read(toSakuraCloudID(rs.Primary.ID))
-
+		foundPrivateHost, err := phOp.Read(context.Background(), zone, types.StringID(rs.Primary.ID))
 		if err != nil {
 			return err
 		}
 
-		if foundPrivateHost.ID != toSakuraCloudID(rs.Primary.ID) {
-			return errors.New("PrivateHost not found")
+		if foundPrivateHost.ID.String() != rs.Primary.ID {
+			return fmt.Errorf("not found PrivateHost: %s", rs.Primary.ID)
 		}
-
 		*private_host = *foundPrivateHost
 
 		return nil
@@ -120,19 +136,17 @@ func testAccCheckSakuraCloudPrivateHostExists(n string, private_host *sacloud.Pr
 
 func testAccCheckSakuraCloudPrivateHostDestroy(s *terraform.State) error {
 	client := testAccProvider.Meta().(*APIClient)
-	originalZone := client.Zone
-	client.Zone = "tk1a"
-	defer func() { client.Zone = originalZone }()
+	phOp := sacloud.NewPrivateHostOp(client)
 
 	for _, rs := range s.RootModule().Resources {
 		if rs.Type != "sakuracloud_private_host" {
 			continue
 		}
 
-		_, err := client.PrivateHost.Read(toSakuraCloudID(rs.Primary.ID))
-
+		zone := rs.Primary.Attributes["zone"]
+		_, err := phOp.Read(context.Background(), zone, types.StringID(rs.Primary.ID))
 		if err == nil {
-			return errors.New("PrivateHost still exists")
+			return fmt.Errorf("still exists PrivateHost: %s", rs.Primary.ID)
 		}
 	}
 
@@ -141,19 +155,15 @@ func testAccCheckSakuraCloudPrivateHostDestroy(s *terraform.State) error {
 
 var testAccCheckSakuraCloudPrivateHostConfig_Basic = `
 resource "sakuracloud_server" "foobar" {
-    name = "myserver"
-    private_host_id = "${sakuracloud_private_host.foobar.id}"
-    graceful_shutdown_timeout = 5
-    zone = "tk1a"
+  name = "myserver"
+  private_host_id = "${sakuracloud_private_host.foobar.id}"
+  graceful_shutdown_timeout = 5
 }
 resource "sakuracloud_private_host" "foobar" {
-    name = "before"
-    description = "before"
-    tags = ["tag1", "tag2"]
-    zone = "tk1a"
-
-    graceful_shutdown_timeout = 5
-    icon_id = "${sakuracloud_icon.foobar.id}"
+  name = "before"
+  description = "before"
+  tags = ["tag1", "tag2"]
+  icon_id = "${sakuracloud_icon.foobar.id}"
 }
 
 resource "sakuracloud_icon" "foobar" {
@@ -163,35 +173,27 @@ resource "sakuracloud_icon" "foobar" {
 
 var testAccCheckSakuraCloudPrivateHostConfig_Update = `
 resource "sakuracloud_private_host" "foobar" {
-    name = "after"
-    description = "after"
-    graceful_shutdown_timeout = 5
-    tags = []
-    zone = "tk1a"
+  name = "after"
+  description = "after"
 }
 `
 
 var testAccCheckSakuraCloudPrivateHostConfig_Destroy_Basic = `
 resource "sakuracloud_server" "foobar" {
-    name = "myserver"
-    private_host_id = "${sakuracloud_private_host.foobar.id}"
-    zone = "tk1a"
-    graceful_shutdown_timeout = 5
+  name = "myserver"
+  private_host_id = "${sakuracloud_private_host.foobar.id}"
+  graceful_shutdown_timeout = 5
 }
 resource "sakuracloud_private_host" "foobar" {
-    name = "before"
-    description = "before"
-    tags = ["tag1", "tag2"]
-    graceful_shutdown_timeout = 5
-    zone = "tk1a"
-
+  name = "before"
+  description = "before"
+  tags = ["tag1", "tag2"]
 }
 `
 
 var testAccCheckSakuraCloudPrivateHostConfig_Destroy_Update = `
 resource "sakuracloud_server" "foobar" {
-    name = "myserver"
-    zone = "tk1a"
-    graceful_shutdown_timeout = 5
+  name = "myserver"
+  graceful_shutdown_timeout = 5
 }
 `

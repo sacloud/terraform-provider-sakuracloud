@@ -1,16 +1,15 @@
 package sakuracloud
 
 import (
-	"errors"
+	"context"
 	"fmt"
-	"strconv"
-	"strings"
 
 	"github.com/hashicorp/terraform/helper/schema"
 	"github.com/hashicorp/terraform/helper/validation"
-	"github.com/sacloud/libsacloud/api"
-	"github.com/sacloud/libsacloud/sacloud"
-	"github.com/sacloud/libsacloud/utils/setup"
+	"github.com/sacloud/libsacloud/v2/sacloud"
+	"github.com/sacloud/libsacloud/v2/sacloud/accessor"
+	"github.com/sacloud/libsacloud/v2/sacloud/types"
+	"github.com/sacloud/libsacloud/v2/utils/setup"
 )
 
 func resourceSakuraCloudLoadBalancer() *schema.Resource {
@@ -88,7 +87,6 @@ func resourceSakuraCloudLoadBalancer() *schema.Resource {
 				Computed: true,
 				Elem:     &schema.Schema{Type: schema.TypeString},
 			},
-			powerManageTimeoutKey: powerManageTimeoutParam,
 			"zone": {
 				Type:         schema.TypeString,
 				Optional:     true,
@@ -105,11 +103,6 @@ func resourceSakuraCloudLoadBalancer() *schema.Resource {
 				Elem: &schema.Resource{
 					Schema: loadBalancerVIPValueSchema(),
 				},
-			},
-			"vip_ids": {
-				Type:     schema.TypeList,
-				Computed: true,
-				Elem:     &schema.Schema{Type: schema.TypeString},
 			},
 		},
 	}
@@ -161,7 +154,7 @@ func loadBalancerServerValueSchema() map[string]*schema.Schema {
 		"check_protocol": {
 			Type:         schema.TypeString,
 			Required:     true,
-			ValidateFunc: validation.StringInSlice(sacloud.AllowLoadBalancerHealthCheckProtocol(), false),
+			ValidateFunc: validation.StringInSlice(types.LoadBalancerHealthCheckProtocolsStrings(), false),
 		},
 		"check_path": {
 			Type:     schema.TypeString,
@@ -181,323 +174,247 @@ func loadBalancerServerValueSchema() map[string]*schema.Schema {
 }
 
 func resourceSakuraCloudLoadBalancerCreate(d *schema.ResourceData, meta interface{}) error {
-	client := getSacloudAPIClient(d, meta)
+	client, ctx, zone := getSacloudV2Client(d, meta)
+	lbOp := sacloud.NewLoadBalancerOp(client)
 
-	opts := &sacloud.CreateLoadBalancerValue{}
-
-	opts.Name = d.Get("name").(string)
-	opts.SwitchID = d.Get("switch_id").(string)
-	opts.VRID = d.Get("vrid").(int)
-	highAvailability := d.Get("high_availability").(bool)
-	ipAddress1 := d.Get("ipaddress1").(string)
-	ipAddress2 := ""
-	if ip2, ok := d.GetOk("ipaddress2"); ok {
-		ipAddress2 = ip2.(string)
-	}
-	nwMaskLen := d.Get("nw_mask_len").(int)
-	defaultRoute := ""
-	if df, ok := d.GetOk("default_route"); ok {
-		defaultRoute = df.(string)
+	opts := &sacloud.LoadBalancerCreateRequest{
+		SwitchID:           expandSakuraCloudID(d, "switch_id"),
+		PlanID:             expandLoadBalancerPlanID(d),
+		VRID:               d.Get("vrid").(int),
+		IPAddresses:        expandLoadBalancerIPAddresses(d),
+		NetworkMaskLen:     d.Get("nw_mask_len").(int),
+		DefaultRoute:       d.Get("default_route").(string),
+		Name:               d.Get("name").(string),
+		Description:        d.Get("description").(string),
+		Tags:               expandTagsV2(d.Get("tags").([]interface{})),
+		IconID:             expandSakuraCloudID(d, "icon_id"),
+		VirtualIPAddresses: expandLoadBalancerVIPs(d),
 	}
 
-	if d.Get("plan").(string) == "standard" {
-		opts.Plan = sacloud.LoadBalancerPlanStandard
-	} else {
-		opts.Plan = sacloud.LoadBalancerPlanPremium
-	}
-	if iconID, ok := d.GetOk("icon_id"); ok {
-		opts.Icon = sacloud.NewResource(toSakuraCloudID(iconID.(string)))
-	}
-	if description, ok := d.GetOk("description"); ok {
-		opts.Description = description.(string)
-	}
-	if rawTags, ok := d.GetOk("tags"); ok {
-		if rawTags != nil {
-			opts.Tags = expandTags(client, rawTags.([]interface{}))
-		}
-	}
-
-	opts.IPAddress1 = ipAddress1
-	opts.MaskLen = nwMaskLen
-	opts.DefaultRoute = defaultRoute
-
-	var createLb *sacloud.LoadBalancer
-	var err error
-	if highAvailability {
-		if ipAddress2 == "" {
-			return errors.New("ipaddress2 is required")
-		}
-		//冗長構成
-		createLb, err = sacloud.CreateNewLoadBalancerDouble(&sacloud.CreateDoubleLoadBalancerValue{
-			CreateLoadBalancerValue: opts,
-			IPAddress2:              ipAddress2,
-		}, nil)
-
-		if err != nil {
-			return fmt.Errorf("Failed to create SakuraCloud LoadBalancer resource: %s", err)
-		}
-
-	} else {
-		createLb, err = sacloud.CreateNewLoadBalancerSingle(opts, nil)
-		if err != nil {
-			return fmt.Errorf("Failed to create SakuraCloud LoadBalancer resource: %s", err)
-		}
-	}
-
-	for _, rawVip := range d.Get("vips").([]interface{}) {
-		v := &resourceMapValue{rawVip.(map[string]interface{})}
-		vip := expandLoadBalancerVIP(v)
-		createLb.AddLoadBalancerSetting(vip)
-	}
-
-	lbBuilder := &setup.RetryableSetup{
-		Create: func() (sacloud.ResourceIDHolder, error) {
-			return client.LoadBalancer.Create(createLb)
+	builder := &setup.RetryableSetup{
+		Create: func(ctx context.Context, zone string) (accessor.ID, error) {
+			return lbOp.Create(ctx, zone, opts)
 		},
-		AsyncWaitForCopy: func(id int64) (chan interface{}, chan interface{}, chan error) {
-			return client.LoadBalancer.AsyncSleepWhileCopying(id, client.DefaultTimeoutDuration, 20)
+		Read: func(ctx context.Context, zone string, id types.ID) (interface{}, error) {
+			return lbOp.Read(ctx, zone, id)
 		},
-		Delete: func(id int64) error {
-			_, err := client.LoadBalancer.Delete(id)
-			return err
+		ProvisionBeforeUp: func(ctx context.Context, zone string, id types.ID, target interface{}) error {
+			return lbOp.Boot(ctx, zone, id)
 		},
-		WaitForUp: func(id int64) error {
-			return client.LoadBalancer.SleepUntilUp(id, client.DefaultTimeoutDuration)
+		Delete: func(ctx context.Context, zone string, id types.ID) error {
+			return lbOp.Delete(ctx, zone, id)
 		},
-		RetryCount: 3,
+		RetryCount:    3,
+		IsWaitForUp:   true,
+		IsWaitForCopy: true,
 	}
-
-	res, err := lbBuilder.Setup()
+	res, err := builder.Setup(ctx, zone)
 	if err != nil {
-		return fmt.Errorf("Failed to create SakuraCloud LoadBalancer resource: %s", err)
+		return fmt.Errorf("creating SakuraCloud LoadBalancer is failed: %s", err)
 	}
 
 	loadBalancer, ok := res.(*sacloud.LoadBalancer)
 	if !ok {
-		return fmt.Errorf("Failed to create SakuraCloud LoadBalancer resource: created resource is not *sacloud.LoadBalancer ")
+		return fmt.Errorf("creating SakuraCloud LoadBalancer is failed: created resource is not *sacloud.LoadBalancer")
 	}
-	d.SetId(loadBalancer.GetStrID())
+	d.SetId(loadBalancer.ID.String())
 	return resourceSakuraCloudLoadBalancerRead(d, meta)
 }
 
 func resourceSakuraCloudLoadBalancerRead(d *schema.ResourceData, meta interface{}) error {
-	client := getSacloudAPIClient(d, meta)
+	client, ctx, zone := getSacloudV2Client(d, meta)
+	lbOp := sacloud.NewLoadBalancerOp(client)
 
-	loadBalancer, err := client.LoadBalancer.Read(toSakuraCloudID(d.Id()))
+	loadBalancer, err := lbOp.Read(ctx, zone, types.StringID(d.Id()))
 	if err != nil {
-		if sacloudErr, ok := err.(api.Error); ok && sacloudErr.ResponseCode() == 404 {
+		if sacloud.IsNotFoundError(err) {
 			d.SetId("")
 			return nil
 		}
-		return fmt.Errorf("Couldn't find SakuraCloud LoadBalancer resource: %s", err)
+		return fmt.Errorf("could not read SakuraCloud LoadBalancer: %s", err)
 	}
-
-	return setLoadBalancerResourceData(d, client, loadBalancer)
+	return setLoadBalancerResourceData(ctx, d, client, loadBalancer)
 }
 
 func resourceSakuraCloudLoadBalancerUpdate(d *schema.ResourceData, meta interface{}) error {
-	client := getSacloudAPIClient(d, meta)
+	client, ctx, zone := getSacloudV2Client(d, meta)
+	lbOp := sacloud.NewLoadBalancerOp(client)
 
-	loadBalancer, err := client.LoadBalancer.Read(toSakuraCloudID(d.Id()))
+	loadBalancer, err := lbOp.Read(ctx, zone, types.StringID(d.Id()))
 	if err != nil {
-		return fmt.Errorf("Couldn't find SakuraCloud LoadBalancer resource: %s", err)
+		return fmt.Errorf("could not read SakuraCloud LoadBalancer: %s", err)
 	}
 
-	if d.HasChange("name") {
-		loadBalancer.Name = d.Get("name").(string)
-	}
-	if d.HasChange("icon_id") {
-		if iconID, ok := d.GetOk("icon_id"); ok {
-			loadBalancer.SetIconByID(toSakuraCloudID(iconID.(string)))
-		} else {
-			loadBalancer.ClearIcon()
-		}
-	}
-	if d.HasChange("description") {
-		if description, ok := d.GetOk("description"); ok {
-			loadBalancer.Description = description.(string)
-		} else {
-			loadBalancer.Description = ""
-		}
+	opts := &sacloud.LoadBalancerUpdateRequest{
+		Name:               d.Get("name").(string),
+		Description:        d.Get("description").(string),
+		Tags:               expandTagsV2(d.Get("tags").([]interface{})),
+		IconID:             expandSakuraCloudID(d, "icon_id"),
+		VirtualIPAddresses: expandLoadBalancerVIPs(d),
+		SettingsHash:       loadBalancer.SettingsHash,
 	}
 
-	if d.HasChange("tags") {
-		rawTags := d.Get("tags").([]interface{})
-		if rawTags != nil {
-			loadBalancer.Tags = expandTags(client, rawTags)
-		} else {
-			loadBalancer.Tags = expandTags(client, []interface{}{})
-		}
-	}
-
-	if d.HasChange("vips") {
-		loadBalancer.Settings.LoadBalancer = []*sacloud.LoadBalancerSetting{}
-		for _, rawVip := range d.Get("vips").([]interface{}) {
-			v := &resourceMapValue{rawVip.(map[string]interface{})}
-			vip := expandLoadBalancerVIP(v)
-			loadBalancer.AddLoadBalancerSetting(vip)
-		}
-	}
-
-	loadBalancer, err = client.LoadBalancer.Update(loadBalancer.ID, loadBalancer)
-	if err != nil {
-		return fmt.Errorf("Error updating SakuraCloud LoadBalancer resource: %s", err)
+	if _, err := lbOp.Update(ctx, zone, loadBalancer.ID, opts); err != nil {
+		return fmt.Errorf("updating SakuraCloud LoadBalancer is failed: %s", err)
 	}
 
 	return resourceSakuraCloudLoadBalancerRead(d, meta)
 }
 
 func resourceSakuraCloudLoadBalancerDelete(d *schema.ResourceData, meta interface{}) error {
-	client := getSacloudAPIClient(d, meta)
+	client, ctx, zone := getSacloudV2Client(d, meta)
+	lbOp := sacloud.NewLoadBalancerOp(client)
 
-	err := handleShutdown(client.LoadBalancer, toSakuraCloudID(d.Id()), d, client.DefaultTimeoutDuration)
+	loadBalancer, err := lbOp.Read(ctx, zone, types.StringID(d.Id()))
 	if err != nil {
-		return fmt.Errorf("Error stopping SakuraCloud LoadBalancer resource: %s", err)
+		if sacloud.IsNotFoundError(err) {
+			d.SetId("")
+			return nil
+		}
+		return fmt.Errorf("could not read SakuraCloud LoadBalancer: %s", err)
 	}
 
-	_, err = client.LoadBalancer.Delete(toSakuraCloudID(d.Id()))
-	if err != nil {
-		return fmt.Errorf("Error deleting SakuraCloud LoadBalancer resource: %s", err)
+	if err := lbOp.Shutdown(ctx, zone, loadBalancer.ID, &sacloud.ShutdownOption{Force: true}); err != nil {
+		return fmt.Errorf("stopping SakuraCloud LoadBalancer is failed: %s", err)
+	}
+	waiter := sacloud.WaiterForDown(func() (interface{}, error) {
+		return lbOp.Read(ctx, zone, loadBalancer.ID)
+	})
+	if _, err := waiter.WaitForState(ctx); err != nil {
+		return fmt.Errorf("stopping SakuraCloud LoadBalancer is failed: %s", err)
+	}
+
+	if err := lbOp.Delete(ctx, zone, loadBalancer.ID); err != nil {
+		return fmt.Errorf("deleting SakuraCloud LoadBalancer is failed: %s", err)
 	}
 
 	return nil
 }
 
-func setLoadBalancerResourceData(d *schema.ResourceData, client *APIClient, data *sacloud.LoadBalancer) error {
-
-	if data.IsFailed() {
+func setLoadBalancerResourceData(ctx context.Context, d *schema.ResourceData, client *APIClient, data *sacloud.LoadBalancer) error {
+	if data.Availability.IsFailed() {
 		d.SetId("")
-		return fmt.Errorf("LoadBalancer[%d] state is failed", data.ID)
+		return fmt.Errorf("got unexpected state: LoadBalancer[%d].Availability is failed", data.ID)
 	}
 
-	d.Set("switch_id", data.Switch.GetStrID())
-	d.Set("vrid", data.Remark.VRRP.VRID)
-	if len(data.Remark.Servers) > 1 {
-		d.Set("high_availability", true)
-		d.Set("ipaddress1", data.Remark.Servers[0].(map[string]interface{})["IPAddress"])
-		d.Set("ipaddress2", data.Remark.Servers[1].(map[string]interface{})["IPAddress"])
-	} else {
-		d.Set("high_availability", false)
-		d.Set("ipaddress1", data.Remark.Servers[0].(map[string]interface{})["IPAddress"])
-		d.Set("ipaddress2", "")
+	var ha bool
+	var ipaddress1, ipaddress2 string
+	ipaddress1 = data.IPAddresses[0]
+	if len(data.IPAddresses) > 1 {
+		ha = true
+		ipaddress2 = data.IPAddresses[1]
 	}
 
-	switch data.GetPlanID() {
-	case int64(sacloud.LoadBalancerPlanStandard):
-		d.Set("plan", "standard")
-	case int64(sacloud.LoadBalancerPlanPremium):
-		d.Set("plan", "highspec")
+	var plan string
+	switch data.PlanID {
+	case types.LoadBalancerPlans.Standard:
+		plan = "standard"
+	case types.LoadBalancerPlans.Premium:
+		plan = "highspec"
 	}
 
-	d.Set("nw_mask_len", data.Remark.Network.NetworkMaskLen)
-	d.Set("default_route", data.Remark.Network.DefaultRoute)
+	var vips []interface{}
+	for _, v := range data.VirtualIPAddresses {
+		vip := map[string]interface{}{
+			"vip":          v.VirtualIPAddress,
+			"port":         v.Port.Int(),
+			"delay_loop":   v.DelayLoop.Int(),
+			"sorry_server": v.SorryServer,
+		}
+		var servers []interface{}
+		for _, server := range v.Servers {
+			s := map[string]interface{}{}
+			s["ipaddress"] = server.IPAddress
+			s["check_protocol"] = server.HealthCheck.Protocol
+			s["check_path"] = server.HealthCheck.Path
+			s["check_status"] = server.HealthCheck.ResponseCode.String()
+			s["enabled"] = server.Enabled.Bool()
+			servers = append(servers, s)
+		}
+		vip["servers"] = servers
+		vips = append(vips, vip)
+	}
 
+	d.Set("switch_id", data.SwitchID.String())
+	d.Set("vrid", data.VRID)
+	d.Set("plan", plan)
+	d.Set("high_availability", ha)
+	d.Set("ipaddress1", ipaddress1)
+	d.Set("ipaddress2", ipaddress2)
+	d.Set("nw_mask_len", data.NetworkMaskLen)
+	d.Set("default_route", data.DefaultRoute)
 	d.Set("name", data.Name)
-	d.Set("icon_id", data.GetIconStrID())
+	d.Set("icon_id", data.IconID.String())
 	d.Set("description", data.Description)
-	d.Set("tags", data.Tags)
-
-	d.Set("vip_ids", []string{})
-	d.Set("vips", []interface{}{})
-	if data.Settings != nil && data.Settings.LoadBalancer != nil {
-		var vipIDs []string
-		var vips []interface{}
-		for _, s := range data.Settings.LoadBalancer {
-			vipIDs = append(vipIDs, loadBalancerVIPIDHash(data.GetStrID(), s))
-
-			vip := map[string]interface{}{
-				"vip":          s.VirtualIPAddress,
-				"servers":      expandLoadBalancerServersFromVIP(data.GetStrID(), s),
-				"sorry_server": s.SorryServer,
-			}
-
-			port, _ := strconv.Atoi(s.Port)
-			vip["port"] = port
-
-			delayLoop, _ := strconv.Atoi(s.DelayLoop)
-			vip["delay_loop"] = delayLoop
-
-			var servers []interface{}
-			for _, server := range s.Servers {
-				s := map[string]interface{}{}
-				s["ipaddress"] = server.IPAddress
-				s["check_protocol"] = server.HealthCheck.Protocol
-				s["check_path"] = server.HealthCheck.Path
-				s["check_status"] = server.HealthCheck.Status
-				s["enabled"] = strings.ToLower(server.Enabled) == "true"
-				servers = append(servers, s)
-			}
-			vip["servers"] = servers
-
-			vips = append(vips, vip)
-		}
-		if len(vipIDs) > 0 {
-			d.Set("vip_ids", vipIDs)
-		}
-		if len(vips) > 0 {
-			d.Set("vips", vips)
-		}
+	if err := d.Set("tags", data.Tags); err != nil {
+		return err
 	}
+	if err := d.Set("vips", vips); err != nil {
+		return err
+	}
+	d.Set("zone", getV2Zone(d, client))
 
-	setPowerManageTimeoutValueToState(d)
-	d.Set("zone", client.Zone)
 	return nil
 }
 
-func expandLoadBalancerVIP(d resourceValueGettable) *sacloud.LoadBalancerSetting {
-	var vip = &sacloud.LoadBalancerSetting{}
-
-	if v, ok := d.GetOk("vip"); ok {
-		vip.VirtualIPAddress = v.(string)
+func expandLoadBalancerVIPs(d resourceValueGettable) []*sacloud.LoadBalancerVirtualIPAddress {
+	var vips []*sacloud.LoadBalancerVirtualIPAddress
+	vipsConf := d.Get("vips").([]interface{})
+	for _, vip := range vipsConf {
+		v := &resourceMapValue{vip.(map[string]interface{})}
+		vips = append(vips, expandLoadBalancerVIP(v))
 	}
-	if v, ok := d.GetOk("port"); ok {
-		vip.Port = fmt.Sprintf("%d", v.(int))
-	}
-	if v, ok := d.GetOk("delay_loop"); ok {
-		vip.DelayLoop = fmt.Sprintf("%d", v.(int))
-	}
-	if sorry, ok := d.GetOk("sorry_server"); ok {
-		vip.SorryServer = sorry.(string)
-	}
-	if rawServers, ok := d.GetOk("servers"); ok {
-		var servers []*sacloud.LoadBalancerServer
-		for _, v := range rawServers.([]interface{}) {
-			data := &resourceMapValue{v.(map[string]interface{})}
-			server := expandLoadBalancerServer(data)
-			server.Port = vip.Port
-			servers = append(servers, server)
-		}
-		vip.Servers = servers
-	}
-	return vip
+	return vips
 }
 
-func expandLoadBalancerServer(d resourceValueGettable) *sacloud.LoadBalancerServer {
+func expandLoadBalancerVIP(d resourceValueGettable) *sacloud.LoadBalancerVirtualIPAddress {
+	servers := expandLoadBalancerServers(d, d.Get("port").(int))
+	return &sacloud.LoadBalancerVirtualIPAddress{
+		VirtualIPAddress: d.Get("vip").(string),
+		Port:             types.StringNumber(d.Get("port").(int)),
+		DelayLoop:        types.StringNumber(d.Get("delay_loop").(int)),
+		SorryServer:      d.Get("sorry_server").(string),
+		Description:      d.Get("description").(string),
+		Servers:          servers,
+	}
+}
 
-	var server = &sacloud.LoadBalancerServer{}
-	if v, ok := d.GetOk("ipaddress"); ok {
-		server.IPAddress = v.(string)
+func expandLoadBalancerServers(d resourceValueGettable, vipPort int) []*sacloud.LoadBalancerServer {
+	var servers []*sacloud.LoadBalancerServer
+	for _, v := range d.Get("servers").([]interface{}) {
+		data := &resourceMapValue{v.(map[string]interface{})}
+		server := expandLoadBalancerServer(data, vipPort)
+		servers = append(servers, server)
+	}
+	return servers
+}
+
+func expandLoadBalancerServer(d resourceValueGettable, vipPort int) *sacloud.LoadBalancerServer {
+	return &sacloud.LoadBalancerServer{
+		IPAddress: d.Get("ipaddress").(string),
+		Port:      types.StringNumber(vipPort),
+		Enabled:   expandStringFlag(d, "enabled"),
+		HealthCheck: &sacloud.LoadBalancerServerHealthCheck{
+			Protocol:     types.ELoadBalancerHealthCheckProtocol(d.Get("check_protocol").(string)),
+			Path:         d.Get("check_path").(string),
+			ResponseCode: expandStringNumber(d, "check_status"),
+		},
+	}
+}
+
+func expandLoadBalancerPlanID(d resourceValueGettable) types.ID {
+	plan := d.Get("plan").(string)
+	if plan == "standard" {
+		return types.LoadBalancerPlans.Standard
 	}
 
-	server.Enabled = "True"
-	if v, ok := d.GetOk("enabled"); ok && !v.(bool) {
-		server.Enabled = "False"
-	}
-	server.HealthCheck = &sacloud.LoadBalancerHealthCheck{}
+	return types.LoadBalancerPlans.Premium
+}
 
-	if v, ok := d.GetOk("check_protocol"); ok {
-		server.HealthCheck.Protocol = v.(string)
+func expandLoadBalancerIPAddresses(d resourceValueGettable) []string {
+	ipAddresses := []string{d.Get("ipaddress1").(string)}
+	if ip2, ok := d.GetOk("ipaddress2"); ok {
+		ipAddresses = append(ipAddresses, ip2.(string))
 	}
-
-	switch server.HealthCheck.Protocol {
-	case "http", "https":
-		if v, ok := d.GetOk("check_path"); ok {
-			server.HealthCheck.Path = v.(string)
-		}
-		if v, ok := d.GetOk("check_status"); ok {
-			server.HealthCheck.Status = v.(string)
-		}
-	}
-
-	return server
+	return ipAddresses
 }

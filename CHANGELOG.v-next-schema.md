@@ -1,11 +1,13 @@
 # CHANGELOG: v-nextでのスキーマ変更
 
-- プロバイダー
+## プロバイダー
 
   - `trace`属性をboolからstringへデータ型変更
   - 環境変数`SAKURACLOUD_TRACE_MODE`から`SAKURACLOUD_TRACE`へ名称変更
   - `fake_mode`属性の追加
   - `fake_store_path`属性の追加
+
+## データソース
 
 - データソース共通
 
@@ -35,9 +37,10 @@ data sakuracoud_server "example" {
 
   - `nw_mask_len`属性をstringからintへデータ型変更
 
-- SimpleMonitorデータソース
+- シンプル監視データソース
 
   - `health_check`.`status`属性をstringからintへデータ型変更
+  - `health_check`.`delay_loop`をトップレベルへ移動
   
 - VPCルータデータソース
 
@@ -45,9 +48,29 @@ data sakuracoud_server "example" {
     - `interface` -> `interfaces`
     - `dhcp_server` -> `dhcp_servers`
     - `dhcp_static_mapping` -> `dhcp_static_mappings`
+    - `firewall` -> `firewalls`
     - `port_forwarding` -> `port_forwardings`
     - `static_route` -> `static_routes`
     - `user` -> `users`
     
   - サイト間VPNの詳細情報属性を除去
   
+## リソース
+
+- PacketFilterルール
+
+  - `sakuracloud_packet_filter_rule`を`sakuracloud_packet_filter_rules`に変更  
+  これまでルールごとに1リソースだったものが複数のリソースを保持するようになった
+    
+- シンプル監視 
+
+  - `health_check`.`status`属性をstringからintへデータ型変更
+  - `health_check`.`delay_loop`をトップレベルへ移動
+  
+- VPCルータ
+
+  - 子リソース(`sakuracloud_vpc_router_xxx`)を廃止
+  - ファイアウォールルールのフィールド名変更
+    - `source_nw` -> `source_network`
+    - `dest_nw` -> `destination_network`
+    - `dest_port` -> `destination_port`

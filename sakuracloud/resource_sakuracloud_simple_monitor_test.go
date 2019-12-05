@@ -1,13 +1,16 @@
 package sakuracloud
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"testing"
 
+	"github.com/sacloud/libsacloud/v2/sacloud/types"
+
 	"github.com/hashicorp/terraform/helper/resource"
 	"github.com/hashicorp/terraform/terraform"
-	"github.com/sacloud/libsacloud/sacloud"
+	"github.com/sacloud/libsacloud/v2/sacloud"
 )
 
 func TestAccResourceSakuraCloudSimpleMonitor(t *testing.T) {
@@ -23,11 +26,11 @@ func TestAccResourceSakuraCloudSimpleMonitor(t *testing.T) {
 					testAccCheckSakuraCloudSimpleMonitorExists("sakuracloud_simple_monitor.foobar", &monitor),
 					testAccCheckSakuraCloudSimpleMonitorAttributes(&monitor),
 					resource.TestCheckResourceAttr(
+						"sakuracloud_simple_monitor.foobar", "delay_loop", "60"),
+					resource.TestCheckResourceAttr(
 						"sakuracloud_simple_monitor.foobar", "health_check.0.protocol", "https"),
 					resource.TestCheckResourceAttr(
 						"sakuracloud_simple_monitor.foobar", "health_check.0.port", "8443"),
-					resource.TestCheckResourceAttr(
-						"sakuracloud_simple_monitor.foobar", "health_check.0.delay_loop", "60"),
 					resource.TestCheckResourceAttr(
 						"sakuracloud_simple_monitor.foobar", "health_check.0.sni", "true"),
 					resource.TestCheckResourceAttr(
@@ -69,8 +72,8 @@ func TestAccResourceSakuraCloudSimpleMonitor(t *testing.T) {
 						"sakuracloud_simple_monitor.foobar", "notify_email_html", "false"),
 					resource.TestCheckResourceAttr(
 						"sakuracloud_simple_monitor.foobar", "notify_email_enabled", "false"),
-					resource.TestCheckNoResourceAttr(
-						"sakuracloud_simple_monitor.foobar", "icon_id"),
+					resource.TestCheckResourceAttr(
+						"sakuracloud_simple_monitor.foobar", "icon_id", ""),
 				),
 			},
 		},
@@ -118,35 +121,34 @@ func testAccCheckSakuraCloudSimpleMonitorExists(n string, monitor *sacloud.Simpl
 		rs, ok := s.RootModule().Resources[n]
 
 		if !ok {
-			return fmt.Errorf("Not found: %s", n)
+			return fmt.Errorf("not found: %s", n)
 		}
 
 		if rs.Primary.ID == "" {
-			return errors.New("No SimpleMonitor ID is set")
+			return errors.New("no SimpleMonitor ID is set")
 		}
 
 		client := testAccProvider.Meta().(*APIClient)
+		smOp := sacloud.NewSimpleMonitorOp(client)
 
-		foundSimpleMonitor, err := client.SimpleMonitor.Read(toSakuraCloudID(rs.Primary.ID))
-
+		foundSimpleMonitor, err := smOp.Read(context.Background(), types.StringID(rs.Primary.ID))
 		if err != nil {
 			return err
 		}
 
-		if foundSimpleMonitor.ID != toSakuraCloudID(rs.Primary.ID) {
-			return errors.New("Record not found")
+		if foundSimpleMonitor.ID.String() != rs.Primary.ID {
+			return fmt.Errorf("not found SimpleMonitor: %s", rs.Primary.ID)
 		}
 
 		*monitor = *foundSimpleMonitor
-
 		return nil
 	}
 }
 
 func testAccCheckSakuraCloudSimpleMonitorAttributes(monitor *sacloud.SimpleMonitor) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
-		if monitor.Settings.SimpleMonitor.DelayLoop != 60 {
-			return fmt.Errorf("Bad delay_loop: %d", monitor.Settings.SimpleMonitor.DelayLoop)
+		if monitor.DelayLoop != 60 {
+			return fmt.Errorf("unexpected delay_loop: expected:60 actual:%d", monitor.DelayLoop)
 		}
 		return nil
 	}
@@ -154,8 +156,8 @@ func testAccCheckSakuraCloudSimpleMonitorAttributes(monitor *sacloud.SimpleMonit
 
 func testAccCheckSakuraCloudSimpleMonitorAttributesUpdated(monitor *sacloud.SimpleMonitor) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
-		if monitor.Settings.SimpleMonitor.DelayLoop != 120 {
-			return fmt.Errorf("Bad delay_loop: %d", monitor.Settings.SimpleMonitor.DelayLoop)
+		if monitor.DelayLoop != 120 {
+			return fmt.Errorf("unexpected delay_loop: expected:120 actual:%d", monitor.DelayLoop)
 		}
 		return nil
 	}
@@ -163,43 +165,42 @@ func testAccCheckSakuraCloudSimpleMonitorAttributesUpdated(monitor *sacloud.Simp
 
 func testAccCheckSakuraCloudSimpleMonitorDestroy(s *terraform.State) error {
 	client := testAccProvider.Meta().(*APIClient)
+	smOp := sacloud.NewSimpleMonitorOp(client)
 
 	for _, rs := range s.RootModule().Resources {
 		if rs.Type != "sakuracloud_simple_monitor" {
 			continue
 		}
 
-		_, err := client.SimpleMonitor.Read(toSakuraCloudID(rs.Primary.ID))
-
+		_, err := smOp.Read(context.Background(), types.StringID(rs.Primary.ID))
 		if err == nil {
-			return errors.New("SimpleMonitor still exists")
+			return fmt.Errorf("still exists SimpleMonitor: %s", rs.Primary.ID)
 		}
 	}
-
 	return nil
 }
 
 var testAccCheckSakuraCloudSimpleMonitorConfig_basic = fmt.Sprintf(`
 resource "sakuracloud_simple_monitor" "foobar" {
-    target = "terraform.io"
-    health_check {
-        protocol = "https"
-        port = 8443
-        delay_loop = 60
-        path = "/"
-        status = "200"
-        host_header = "libsacloud.com"
-		sni  = true
-        username = "foo"
-        password = "bar"
-    }
-    description = "SimpleMonitor from TerraForm for SAKURA CLOUD"
-    tags = ["hoge1" , "hoge2"]
-    notify_email_enabled = true
-    notify_email_html = true
-    notify_slack_enabled = true
-    notify_slack_webhook = "%s"
-    icon_id = "${sakuracloud_icon.foobar.id}"
+  target = "terraform.io"
+  delay_loop = 60
+  health_check {
+    protocol = "https"
+    port = 8443
+    path = "/"
+    status = "200"
+    host_header = "libsacloud.com"
+    sni  = true
+    username = "foo"
+    password = "bar"
+  }
+  description = "SimpleMonitor from TerraForm for SAKURA CLOUD"
+  tags = ["hoge1" , "hoge2"]
+  notify_email_enabled = true
+  notify_email_html = true
+  notify_slack_enabled = true
+  notify_slack_webhook = "%s"
+  icon_id = "${sakuracloud_icon.foobar.id}"
 }
 
 resource "sakuracloud_icon" "foobar" {
@@ -209,38 +210,38 @@ resource "sakuracloud_icon" "foobar" {
 
 var testAccCheckSakuraCloudSimpleMonitorConfig_update = fmt.Sprintf(`
 resource "sakuracloud_simple_monitor" "foobar" {
-    target = "terraform.io"
-    health_check {
-        protocol = "http"
-        port = 80
-        delay_loop = 120
-        path = "/"
-        status = "200"
-        host_header = "libsacloud.com"
-    }
-    description = "SimpleMonitor from TerraForm for SAKURA CLOUD"
-    tags = ["hoge1" , "hoge2"]
-    notify_email_enabled = false
-    notify_slack_enabled = true
-    notify_slack_webhook = "%s"
+  target = "terraform.io"
+  delay_loop = 120
+  health_check {
+      protocol = "http"
+      port = 80
+      path = "/"
+      status = "200"
+      host_header = "libsacloud.com"
+  }
+  description = "SimpleMonitor from TerraForm for SAKURA CLOUD"
+  tags = ["hoge1" , "hoge2"]
+  notify_email_enabled = false
+  notify_slack_enabled = true
+  notify_slack_webhook = "%s"
 }`, testAccSlackWebhook)
 
 const testAccSlackWebhook = `https://hooks.slack.com/services/XXXXXXXXX/XXXXXXXXX/XXXXXXXXXXXXXXXXXXXXXXXX`
 
 var testAccCheckSakuraCloudSimpleMonitorConfig_sslCertificate = fmt.Sprintf(`
 resource "sakuracloud_simple_monitor" "foobar" {
-    target = "terraform.io"
-    health_check {
-        protocol       = "sslcertificate"
-        remaining_days = 30
-    }
-    description = "SimpleMonitor from TerraForm for SAKURA CLOUD"
-    tags = ["hoge1" , "hoge2"]
-    notify_email_enabled = true
-    notify_email_html = true
-    notify_slack_enabled = true
-    notify_slack_webhook = "%s"
-    icon_id = "${sakuracloud_icon.foobar.id}"
+  target = "terraform.io"
+  health_check {
+      protocol       = "sslcertificate"
+      remaining_days = 30
+  }
+  description = "SimpleMonitor from TerraForm for SAKURA CLOUD"
+  tags = ["hoge1" , "hoge2"]
+  notify_email_enabled = true
+  notify_email_html = true
+  notify_slack_enabled = true
+  notify_slack_webhook = "%s"
+  icon_id = "${sakuracloud_icon.foobar.id}"
 }
 
 resource "sakuracloud_icon" "foobar" {

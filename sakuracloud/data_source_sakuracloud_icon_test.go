@@ -19,7 +19,7 @@ func TestAccSakuraCloudDataSourceIcon_Basic(t *testing.T) {
 		PreCheck:                  func() { testAccPreCheck(t) },
 		Providers:                 testAccProviders,
 		PreventPostDestroyRefresh: true,
-		CheckDestroy:              testAccCheckSakuraCloudIconDataSourceDestroy,
+		CheckDestroy:              testAccCheckSakuraCloudIconDestroy,
 
 		Steps: []resource.TestStep{
 			{
@@ -83,28 +83,6 @@ func testAccCheckSakuraCloudIconDataSourceNotExists(n string) resource.TestCheck
 		}
 		return nil
 	}
-}
-
-func testAccCheckSakuraCloudIconDataSourceDestroy(s *terraform.State) error {
-	client := testAccProvider.Meta().(*APIClient)
-
-	for _, rs := range s.RootModule().Resources {
-		if rs.Type != "sakuracloud_icon" {
-			continue
-		}
-
-		if rs.Primary.ID == "" {
-			continue
-		}
-
-		_, err := client.Icon.Read(toSakuraCloudID(rs.Primary.ID))
-
-		if err == nil {
-			return errors.New("Icon still exists")
-		}
-	}
-
-	return nil
 }
 
 func testAccCheckSakuraCloudDataSourceIconBase(name string) string {

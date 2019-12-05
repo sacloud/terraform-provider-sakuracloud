@@ -1,14 +1,17 @@
 package sakuracloud
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"os"
 	"testing"
 
+	"github.com/sacloud/libsacloud/v2/sacloud/types"
+
 	"github.com/hashicorp/terraform/helper/resource"
 	"github.com/hashicorp/terraform/terraform"
-	"github.com/sacloud/libsacloud/sacloud"
+	"github.com/sacloud/libsacloud/v2/sacloud"
 )
 
 func TestAccSakuraCloudLoadBalancer(t *testing.T) {
@@ -108,7 +111,7 @@ func TestAccSakuraCloudLoadBalancer(t *testing.T) {
 						"sakuracloud_load_balancer.foobar", "vips.1.delay_loop", "20"),
 					resource.TestCheckResourceAttr(
 						"sakuracloud_load_balancer.foobar", "vips.1.sorry_server", "192.168.11.22"),
-					resource.TestCheckNoResourceAttr("sakuracloud_load_balancer.foobar", "icon_id"),
+					resource.TestCheckResourceAttr("sakuracloud_load_balancer.foobar", "icon_id", ""),
 				),
 			},
 		},
@@ -142,43 +145,44 @@ func testAccCheckSakuraCloudLoadBalancerExists(n string, loadBalancer *sacloud.L
 		rs, ok := s.RootModule().Resources[n]
 
 		if !ok {
-			return fmt.Errorf("Not found: %s", n)
+			return fmt.Errorf("not found: %s", n)
 		}
 
 		if rs.Primary.ID == "" {
-			return errors.New("No LoadBalancer ID is set")
+			return errors.New("no LoadBalancer ID is set")
 		}
 
 		client := testAccProvider.Meta().(*APIClient)
+		zone := rs.Primary.Attributes["zone"]
+		lbOp := sacloud.NewLoadBalancerOp(client)
 
-		foundLoadBalancer, err := client.LoadBalancer.Read(toSakuraCloudID(rs.Primary.ID))
-
+		foundLoadBalancer, err := lbOp.Read(context.Background(), zone, types.StringID(rs.Primary.ID))
 		if err != nil {
 			return err
 		}
 
-		if foundLoadBalancer.ID != toSakuraCloudID(rs.Primary.ID) {
-			return errors.New("LoadBalancer not found")
+		if foundLoadBalancer.ID.String() != rs.Primary.ID {
+			return fmt.Errorf("not found LoadBalancer: %s", rs.Primary.ID)
 		}
 
 		*loadBalancer = *foundLoadBalancer
-
 		return nil
 	}
 }
 
 func testAccCheckSakuraCloudLoadBalancerDestroy(s *terraform.State) error {
 	client := testAccProvider.Meta().(*APIClient)
+	lbOp := sacloud.NewLoadBalancerOp(client)
 
 	for _, rs := range s.RootModule().Resources {
 		if rs.Type != "sakuracloud_load_balancer" {
 			continue
 		}
 
-		_, err := client.LoadBalancer.Read(toSakuraCloudID(rs.Primary.ID))
-
+		zone := rs.Primary.Attributes["zone"]
+		_, err := lbOp.Read(context.Background(), zone, types.StringID(rs.Primary.ID))
 		if err == nil {
-			return errors.New("LoadBalancer still exists")
+			return fmt.Errorf("still exists LoadBalancer: %s", rs.Primary.ID)
 		}
 	}
 
@@ -191,19 +195,18 @@ func TestAccImportSakuraCloudLoadBalancer(t *testing.T) {
 			return fmt.Errorf("expected 1 state: %#v", s)
 		}
 		expects := map[string]string{
-			"name":                      "name_before",
-			"vrid":                      "1",
-			"high_availability":         "false",
-			"plan":                      "standard",
-			"ipaddress1":                "192.168.11.101",
-			"ipaddress2":                "",
-			"nw_mask_len":               "24",
-			"default_route":             "192.168.11.1",
-			"description":               "description_before",
-			"tags.0":                    "hoge1",
-			"tags.1":                    "hoge2",
-			"graceful_shutdown_timeout": "60",
-			"zone":                      os.Getenv("SAKURACLOUD_ZONE"),
+			"name":              "name_before",
+			"vrid":              "1",
+			"high_availability": "false",
+			"plan":              "standard",
+			"ipaddress1":        "192.168.11.101",
+			"ipaddress2":        "",
+			"nw_mask_len":       "24",
+			"default_route":     "192.168.11.1",
+			"description":       "description_before",
+			"tags.0":            "hoge1",
+			"tags.1":            "hoge2",
+			"zone":              os.Getenv("SAKURACLOUD_ZONE"),
 		}
 
 		if err := compareStateMulti(s[0], expects); err != nil {
@@ -234,44 +237,44 @@ func TestAccImportSakuraCloudLoadBalancer(t *testing.T) {
 
 const testAccCheckSakuraCloudLoadBalancerConfig_basic = `
 resource "sakuracloud_switch" "sw" {
-    name = "sw"
+  name = "sw"
 }
 resource "sakuracloud_load_balancer" "foobar" {
-    switch_id = "${sakuracloud_switch.sw.id}"
-    vrid = 1
-    ipaddress1 = "192.168.11.101"
-    nw_mask_len = 24
-    default_route = "192.168.11.1"
+  switch_id = "${sakuracloud_switch.sw.id}"
+  vrid = 1
+  ipaddress1 = "192.168.11.101"
+  nw_mask_len = 24
+  default_route = "192.168.11.1"
 
-    name = "name_before"
-    description = "description_before"
-    tags = ["hoge1" , "hoge2"]
-    icon_id = "${sakuracloud_icon.foobar.id}"
+  name = "name_before"
+  description = "description_before"
+  tags = ["hoge1" , "hoge2"]
+  icon_id = "${sakuracloud_icon.foobar.id}"
 
-    vips {
-      vip = "192.168.11.201"
-      port = 80
-      delay_loop = 10
-      sorry_server = "192.168.11.21"
-      servers {
-        ipaddress      = "192.168.11.51"
-        check_protocol = "http"
-        check_path     = "/ping.html"
-        check_status   = 200
-      }
-      servers {
-        ipaddress = "192.168.11.52"
-        check_protocol = "http"
-        check_path     = "/ping.html"
-        check_status   = 200
-      }
+  vips {
+    vip = "192.168.11.201"
+    port = 80
+    delay_loop = 10
+    sorry_server = "192.168.11.21"
+    servers {
+      ipaddress      = "192.168.11.51"
+      check_protocol = "http"
+      check_path     = "/ping.html"
+      check_status   = 200
     }
-    vips {
-      vip = "192.168.11.202"
-      port = 443
-      delay_loop = 20
-      sorry_server = "192.168.11.22"
+    servers {
+      ipaddress = "192.168.11.52"
+      check_protocol = "http"
+      check_path     = "/ping.html"
+      check_status   = 200
     }
+  }
+  vips {
+    vip = "192.168.11.202"
+    port = 443
+    delay_loop = 20
+    sorry_server = "192.168.11.22"
+  }
 }
 
 resource "sakuracloud_icon" "foobar" {
@@ -282,56 +285,56 @@ resource "sakuracloud_icon" "foobar" {
 
 const testAccCheckSakuraCloudLoadBalancerConfig_update = `
 resource "sakuracloud_switch" "sw" {
-    name = "sw"
+  name = "sw"
 }
 resource "sakuracloud_load_balancer" "foobar" {
-    switch_id = "${sakuracloud_switch.sw.id}"
-    vrid = 1
-    ipaddress1 = "192.168.11.101"
-    nw_mask_len = 24
-    default_route = "192.168.11.1"
+  switch_id = "${sakuracloud_switch.sw.id}"
+  vrid = 1
+  ipaddress1 = "192.168.11.101"
+  nw_mask_len = 24
+  default_route = "192.168.11.1"
 
-    name = "name_after"
-    description = "description_after"
-    tags = ["hoge1_after" , "hoge2_after"]
+  name = "name_after"
+  description = "description_after"
+  tags = ["hoge1_after" , "hoge2_after"]
 
-    vips {
-      vip = "192.168.11.201"
-      port = 8080
-      delay_loop = 10
-      sorry_server = "192.168.11.21"
-      servers {
-        ipaddress      = "192.168.11.51"
-        check_protocol = "ping"
-      }
-      servers {
-        ipaddress = "192.168.11.52"
-        check_protocol = "ping"
-      }
+  vips {
+    vip = "192.168.11.201"
+    port = 8080
+    delay_loop = 10
+    sorry_server = "192.168.11.21"
+    servers {
+      ipaddress      = "192.168.11.51"
+      check_protocol = "ping"
     }
-    vips {
-      vip = "192.168.11.202"
-      port = 6443
-      delay_loop = 20
-      sorry_server = "192.168.11.22"
+    servers {
+      ipaddress = "192.168.11.52"
+      check_protocol = "ping"
     }
+  }
+  vips {
+    vip = "192.168.11.202"
+    port = 6443
+    delay_loop = 20
+    sorry_server = "192.168.11.22"
+  }
 }`
 
 const testAccCheckSakuraCloudLoadBalancerConfig_WithRouter = `
 resource "sakuracloud_internet" "router" {
-    name = "sw"
+  name = "sw"
 }
 resource "sakuracloud_load_balancer" "foobar" {
-    switch_id = "${sakuracloud_internet.router.switch_id}"
-    high_availability = true
-    plan = "highspec"
-    vrid = 1
-    ipaddress1 = "${sakuracloud_internet.router.ipaddresses[0]}"
-    ipaddress2 = "${sakuracloud_internet.router.ipaddresses[1]}"
-    nw_mask_len = "${sakuracloud_internet.router.nw_mask_len}"
-    default_route = "${sakuracloud_internet.router.gateway}"
+  switch_id = "${sakuracloud_internet.router.switch_id}"
+  high_availability = true
+  plan = "highspec"
+  vrid = 1
+  ipaddress1 = "${sakuracloud_internet.router.ipaddresses[0]}"
+  ipaddress2 = "${sakuracloud_internet.router.ipaddresses[1]}"
+  nw_mask_len = "${sakuracloud_internet.router.nw_mask_len}"
+  default_route = "${sakuracloud_internet.router.gateway}"
 
-    name = "name_before"
-    description = "description_before"
-    tags = ["hoge1" , "hoge2"]
+  name = "name_before"
+  description = "description_before"
+  tags = ["hoge1" , "hoge2"]
 }`

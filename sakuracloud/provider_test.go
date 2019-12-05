@@ -25,7 +25,6 @@ func init() {
 	testAccProviders = map[string]terraform.ResourceProvider{
 		"sakuracloud": testAccProvider,
 	}
-
 }
 
 func TestProvider(t *testing.T) {
@@ -64,4 +63,15 @@ func testAccPreCheck(t *testing.T) {
 	if v := os.Getenv("SAKURACLOUD_RATE_LIMIT"); v == "" {
 		os.Setenv("SAKURACLOUD_RATE_LIMIT", testDefaultAPIRateLimit)
 	}
+}
+
+func skipIfFakeModeEnabled(t *testing.T) {
+	if isFakeModeEnabled() {
+		t.Skip("This test runs only without FAKE_MODE environment variables")
+	}
+}
+
+func isFakeModeEnabled() bool {
+	fakeMode := os.Getenv("FAKE_MODE")
+	return fakeMode != ""
 }

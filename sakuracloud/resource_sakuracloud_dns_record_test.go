@@ -1,14 +1,15 @@
 package sakuracloud
 
 import (
-	"errors"
+	"context"
 	"fmt"
 	"testing"
 
 	"github.com/hashicorp/terraform/helper/acctest"
 	"github.com/hashicorp/terraform/helper/resource"
 	"github.com/hashicorp/terraform/terraform"
-	"github.com/sacloud/libsacloud/sacloud"
+	"github.com/sacloud/libsacloud/v2/sacloud"
+	"github.com/sacloud/libsacloud/v2/sacloud/types"
 )
 
 func TestAccResourceSakuraCloudDNSRecord_Basic(t *testing.T) {
@@ -103,16 +104,34 @@ func TestAccResourceSakuraCloudDNSRecord_With_Count(t *testing.T) {
 
 func testAccCheckSakuraCloudDNSRecordDestroy(s *terraform.State) error {
 	client := testAccProvider.Meta().(*APIClient)
+	dnsOp := sacloud.NewDNSOp(client)
 
 	for _, rs := range s.RootModule().Resources {
-		if rs.Type != "sakuracloud_dns" {
+		if rs.Type != "sakuracloud_dns_record" {
 			continue
 		}
+		dnsID := rs.Primary.Attributes["dns_id"]
+		if dnsID != "" {
+			dns, err := dnsOp.Read(context.Background(), types.StringID(dnsID))
+			if err == nil {
+				return fmt.Errorf("resource still exists: DNS: %s", rs.Primary.ID)
+			}
 
-		_, err := client.DNS.Read(toSakuraCloudID(rs.Primary.ID))
+			if dns != nil {
+				record := &sacloud.DNSRecord{
+					Name:  rs.Primary.Attributes["name"],
+					Type:  types.EDNSRecordType(rs.Primary.Attributes["type"]),
+					RData: rs.Primary.Attributes["value"],
+					TTL:   forceAtoI(rs.Primary.Attributes["ttl"]),
+				}
 
-		if err == nil {
-			return errors.New("DNS still exists")
+				for _, r := range dns.Records {
+					if isSameDNSRecord(r, record) {
+						return fmt.Errorf("resource still exists: DNSRecord: %s", rs.Primary.ID)
+					}
+				}
+			}
+
 		}
 	}
 
@@ -122,26 +141,26 @@ func testAccCheckSakuraCloudDNSRecordDestroy(s *terraform.State) error {
 func testAccCheckSakuraCloudDNSRecordConfig_basic(zone string) string {
 	return fmt.Sprintf(`
 resource "sakuracloud_dns" "foobar" {
-    zone = "%s"
-    description = "DNS from TerraForm for SAKURA CLOUD"
-    tags = ["hoge1"]
+  zone = "%s"
+  description = "DNS from TerraForm for SAKURA CLOUD"
+  tags = ["hoge1"]
 }
 
 resource "sakuracloud_dns_record" "foobar" {
-    dns_id = "${sakuracloud_dns.foobar.id}"
-    name = "test1"
-    type = "A"
-    value = "192.168.0.1"
+  dns_id = "${sakuracloud_dns.foobar.id}"
+  name = "test1"
+  type = "A"
+  value = "192.168.0.1"
 }
 
 resource "sakuracloud_dns_record" "foobar1" {
-    dns_id = "${sakuracloud_dns.foobar.id}"
-    name = "_sip._tls"
-    type = "SRV"
-    value = "www.sakura.ne.jp."
-    priority = 1
-    weight = 2
-    port = 3
+  dns_id = "${sakuracloud_dns.foobar.id}"
+  name = "_sip._tls"
+  type = "SRV"
+  value = "www.sakura.ne.jp."
+  priority = 1
+  weight = 2
+  port = 3
 }
 `, zone)
 }
@@ -149,34 +168,34 @@ resource "sakuracloud_dns_record" "foobar1" {
 func testAccCheckSakuraCloudDNSRecordConfig_update(zone string) string {
 	return fmt.Sprintf(`
 resource "sakuracloud_dns" "foobar" {
-    zone = "%s"
-    description = "DNS from TerraForm for SAKURA CLOUD"
-    tags = ["hoge1"]
+  zone = "%s"
+  description = "DNS from TerraForm for SAKURA CLOUD"
+  tags = ["hoge1"]
 }
 
 resource "sakuracloud_dns_record" "foobar" {
-    dns_id = "${sakuracloud_dns.foobar.id}"
-    name = "test2"
-    type = "A"
-    value = "192.168.0.2"
+  dns_id = "${sakuracloud_dns.foobar.id}"
+  name = "test2"
+  type = "A"
+  value = "192.168.0.2"
 }`, zone)
 }
 
 func testAccCheckSakuraCloudDNSRecordConfig_with_count(zone string) string {
 	return fmt.Sprintf(`
 resource "sakuracloud_dns" "foobar" {
-    zone = "%s"
-    description = "DNS from TerraForm for SAKURA CLOUD"
-    tags = ["hoge1"]
+  zone = "%s"
+  description = "DNS from TerraForm for SAKURA CLOUD"
+  tags = ["hoge1"]
 }
 variable "ip_list" {
-    default = ["192.168.0.1","192.168.0.2"]
+  default = ["192.168.0.1","192.168.0.2"]
 }
 resource "sakuracloud_dns_record" "foobar" {
-    count = 2
-    dns_id = "${sakuracloud_dns.foobar.id}"
-    name = "test"
-    type = "A"
-    value = "${var.ip_list[count.index]}"
+  count = 2
+  dns_id = "${sakuracloud_dns.foobar.id}"
+  name = "test"
+  type = "A"
+  value = "${var.ip_list[count.index]}"
 }`, zone)
 }

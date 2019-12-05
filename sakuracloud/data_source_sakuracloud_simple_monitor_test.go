@@ -19,7 +19,7 @@ func TestAccSakuraCloudDataSourceSimpleMonitor_Basic(t *testing.T) {
 		PreCheck:                  func() { testAccPreCheck(t) },
 		Providers:                 testAccProviders,
 		PreventPostDestroyRefresh: true,
-		CheckDestroy:              testAccCheckSakuraCloudSimpleMonitorDataSourceDestroy,
+		CheckDestroy:              testAccCheckSakuraCloudSimpleMonitorDestroy,
 
 		Steps: []resource.TestStep{
 			{
@@ -88,35 +88,13 @@ func testAccCheckSakuraCloudSimpleMonitorDataSourceNotExists(n string) resource.
 	}
 }
 
-func testAccCheckSakuraCloudSimpleMonitorDataSourceDestroy(s *terraform.State) error {
-	client := testAccProvider.Meta().(*APIClient)
-
-	for _, rs := range s.RootModule().Resources {
-		if rs.Type != "sakuracloud_simple_monitor" {
-			continue
-		}
-
-		if rs.Primary.ID == "" {
-			continue
-		}
-
-		_, err := client.SimpleMonitor.Read(toSakuraCloudID(rs.Primary.ID))
-
-		if err == nil {
-			return errors.New("SimpleMonitor still exists")
-		}
-	}
-
-	return nil
-}
-
 func testAccCheckSakuraCloudDataSourceSimpleMonitorBase(target string) string {
 	return fmt.Sprintf(`
 resource "sakuracloud_simple_monitor" "foobar" {
   target = "%s"
+  delay_loop = 60
   health_check {
       protocol = "http"
-      delay_loop = 60
       path = "/"
       status = 200
       host_header = "sakuracloud.com"

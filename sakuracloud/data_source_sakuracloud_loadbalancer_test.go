@@ -19,7 +19,7 @@ func TestAccSakuraCloudDataSourceLoadBalancer_Basic(t *testing.T) {
 		PreCheck:                  func() { testAccPreCheck(t) },
 		Providers:                 testAccProviders,
 		PreventPostDestroyRefresh: true,
-		CheckDestroy:              testAccCheckSakuraCloudLoadBalancerDataSourceDestroy,
+		CheckDestroy:              testAccCheckSakuraCloudLoadBalancerDestroy,
 
 		Steps: []resource.TestStep{
 			{
@@ -84,28 +84,6 @@ func testAccCheckSakuraCloudLoadBalancerDataSourceNotExists(n string) resource.T
 		}
 		return nil
 	}
-}
-
-func testAccCheckSakuraCloudLoadBalancerDataSourceDestroy(s *terraform.State) error {
-	client := testAccProvider.Meta().(*APIClient)
-
-	for _, rs := range s.RootModule().Resources {
-		if rs.Type != "sakuracloud_load_balancer" {
-			continue
-		}
-
-		if rs.Primary.ID == "" {
-			continue
-		}
-
-		_, err := client.LoadBalancer.Read(toSakuraCloudID(rs.Primary.ID))
-
-		if err == nil {
-			return errors.New("LoadBalancer still exists")
-		}
-	}
-
-	return nil
 }
 
 func testAccCheckSakuraCloudDataSourceLoadBalancerBase(name string) string {

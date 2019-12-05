@@ -1,16 +1,29 @@
 package sakuracloud
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"testing"
+	"time"
 
 	"github.com/hashicorp/terraform/helper/resource"
 	"github.com/hashicorp/terraform/terraform"
-	"github.com/sacloud/libsacloud/sacloud"
+	"github.com/sacloud/libsacloud/v2/sacloud"
+	"github.com/sacloud/libsacloud/v2/sacloud/types"
+	"github.com/sacloud/libsacloud/v2/utils/vpcrouter"
 )
 
 func TestAccResourceSakuraCloudVPCRouter(t *testing.T) {
+	if isFakeModeEnabled() {
+		vpcrouter.DefaultSetupOptions = &vpcrouter.RetryableSetupParameter{
+			NICUpdateWaitDuration:     10 * time.Millisecond,
+			ProvisioningRetryInterval: 10 * time.Millisecond,
+			DeleteRetryInterval:       10 * time.Millisecond,
+			PollInterval:              10 * time.Millisecond,
+		}
+	}
+
 	var vpcRouter sacloud.VPCRouter
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
@@ -21,28 +34,17 @@ func TestAccResourceSakuraCloudVPCRouter(t *testing.T) {
 				Config: testAccCheckSakuraCloudVPCRouterConfig_basic,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckSakuraCloudVPCRouterExists("sakuracloud_vpc_router.foobar", &vpcRouter),
-					resource.TestCheckResourceAttr(
-						"sakuracloud_vpc_router.foobar", "name", "name_before"),
-					resource.TestCheckResourceAttr(
-						"sakuracloud_vpc_router.foobar", "description", "description_before"),
-					resource.TestCheckResourceAttr(
-						"sakuracloud_vpc_router.foobar", "tags.#", "2"),
-					resource.TestCheckResourceAttr(
-						"sakuracloud_vpc_router.foobar", "tags.0", "hoge1"),
-					resource.TestCheckResourceAttr(
-						"sakuracloud_vpc_router.foobar", "tags.1", "hoge2"),
-					resource.TestCheckResourceAttr(
-						"sakuracloud_vpc_router.foobar", "plan", "standard"),
-					resource.TestCheckResourceAttr(
-						"sakuracloud_vpc_router.foobar", "internet_connection", "true"),
-					resource.TestCheckNoResourceAttr(
-						"sakuracloud_vpc_router.foobar", "switch_id"),
-					resource.TestCheckNoResourceAttr(
-						"sakuracloud_vpc_router.foobar", "vip"),
-					resource.TestCheckNoResourceAttr(
-						"sakuracloud_vpc_router.foobar", "ipaddress1"),
-					resource.TestCheckNoResourceAttr(
-						"sakuracloud_vpc_router.foobar", "ipaddress2"),
+					resource.TestCheckResourceAttr("sakuracloud_vpc_router.foobar", "name", "name_before"),
+					resource.TestCheckResourceAttr("sakuracloud_vpc_router.foobar", "description", "description_before"),
+					resource.TestCheckResourceAttr("sakuracloud_vpc_router.foobar", "tags.#", "2"),
+					resource.TestCheckResourceAttr("sakuracloud_vpc_router.foobar", "tags.0", "hoge1"),
+					resource.TestCheckResourceAttr("sakuracloud_vpc_router.foobar", "tags.1", "hoge2"),
+					resource.TestCheckResourceAttr("sakuracloud_vpc_router.foobar", "plan", "standard"),
+					resource.TestCheckResourceAttr("sakuracloud_vpc_router.foobar", "internet_connection", "true"),
+					resource.TestCheckResourceAttr("sakuracloud_vpc_router.foobar", "switch_id", ""),
+					resource.TestCheckResourceAttr("sakuracloud_vpc_router.foobar", "vip", ""),
+					resource.TestCheckResourceAttr("sakuracloud_vpc_router.foobar", "ipaddress1", ""),
+					resource.TestCheckResourceAttr("sakuracloud_vpc_router.foobar", "ipaddress2", ""),
 					resource.TestCheckResourceAttrPair(
 						"sakuracloud_vpc_router.foobar", "icon_id",
 						"sakuracloud_icon.foobar", "id",
@@ -53,31 +55,19 @@ func TestAccResourceSakuraCloudVPCRouter(t *testing.T) {
 				Config: testAccCheckSakuraCloudVPCRouterConfig_update,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckSakuraCloudVPCRouterExists("sakuracloud_vpc_router.foobar", &vpcRouter),
-					resource.TestCheckResourceAttr(
-						"sakuracloud_vpc_router.foobar", "name", "name_after"),
-					resource.TestCheckResourceAttr(
-						"sakuracloud_vpc_router.foobar", "description", "description_after"),
-					resource.TestCheckResourceAttr(
-						"sakuracloud_vpc_router.foobar", "tags.#", "2"),
-					resource.TestCheckResourceAttr(
-						"sakuracloud_vpc_router.foobar", "tags.0", "hoge1_after"),
-					resource.TestCheckResourceAttr(
-						"sakuracloud_vpc_router.foobar", "tags.1", "hoge2_after"),
-					resource.TestCheckResourceAttr(
-						"sakuracloud_vpc_router.foobar", "plan", "standard"),
-					resource.TestCheckResourceAttr(
-						"sakuracloud_vpc_router.foobar", "internet_connection", "false"),
-					resource.TestCheckNoResourceAttr(
-						"sakuracloud_vpc_router.foobar", "switch_id"),
-					resource.TestCheckNoResourceAttr(
-						"sakuracloud_vpc_router.foobar", "vip"),
-					resource.TestCheckNoResourceAttr(
-						"sakuracloud_vpc_router.foobar", "ipaddress1"),
-					resource.TestCheckNoResourceAttr(
-						"sakuracloud_vpc_router.foobar", "ipaddress2"),
-					resource.TestCheckResourceAttr(
-						"sakuracloud_vpc_router.foobar", "syslog_host", "192.168.0.2"),
-					resource.TestCheckNoResourceAttr("sakuracloud_vpc_router.foobar", "icon_id"),
+					resource.TestCheckResourceAttr("sakuracloud_vpc_router.foobar", "name", "name_after"),
+					resource.TestCheckResourceAttr("sakuracloud_vpc_router.foobar", "description", "description_after"),
+					resource.TestCheckResourceAttr("sakuracloud_vpc_router.foobar", "tags.#", "2"),
+					resource.TestCheckResourceAttr("sakuracloud_vpc_router.foobar", "tags.0", "hoge1_after"),
+					resource.TestCheckResourceAttr("sakuracloud_vpc_router.foobar", "tags.1", "hoge2_after"),
+					resource.TestCheckResourceAttr("sakuracloud_vpc_router.foobar", "plan", "standard"),
+					resource.TestCheckResourceAttr("sakuracloud_vpc_router.foobar", "internet_connection", "false"),
+					resource.TestCheckResourceAttr("sakuracloud_vpc_router.foobar", "switch_id", ""),
+					resource.TestCheckResourceAttr("sakuracloud_vpc_router.foobar", "vip", ""),
+					resource.TestCheckResourceAttr("sakuracloud_vpc_router.foobar", "ipaddress1", ""),
+					resource.TestCheckResourceAttr("sakuracloud_vpc_router.foobar", "ipaddress2", ""),
+					resource.TestCheckResourceAttr("sakuracloud_vpc_router.foobar", "syslog_host", "192.168.0.2"),
+					resource.TestCheckResourceAttr("sakuracloud_vpc_router.foobar", "icon_id", ""),
 				),
 			},
 		},
@@ -85,6 +75,15 @@ func TestAccResourceSakuraCloudVPCRouter(t *testing.T) {
 }
 
 func TestAccResourceSakuraCloudVPCRouter_Full(t *testing.T) {
+	if isFakeModeEnabled() {
+		vpcrouter.DefaultSetupOptions = &vpcrouter.RetryableSetupParameter{
+			NICUpdateWaitDuration:     10 * time.Millisecond,
+			ProvisioningRetryInterval: 10 * time.Millisecond,
+			DeleteRetryInterval:       10 * time.Millisecond,
+			PollInterval:              10 * time.Millisecond,
+		}
+	}
+
 	var vpcRouter sacloud.VPCRouter
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
@@ -95,165 +94,90 @@ func TestAccResourceSakuraCloudVPCRouter_Full(t *testing.T) {
 				Config: testAccCheckSakuraCloudVPCRouterConfig_full_basic,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckSakuraCloudVPCRouterExists("sakuracloud_vpc_router.foobar", &vpcRouter),
-					resource.TestCheckResourceAttr(
-						"sakuracloud_vpc_router.foobar", "name", "name_before"),
-					resource.TestCheckResourceAttr(
-						"sakuracloud_vpc_router.foobar", "interface.#", "1"),
-					resource.TestCheckResourceAttr(
-						"sakuracloud_vpc_router.foobar", "interface.0.vip", "192.168.11.1"),
-					resource.TestCheckResourceAttr(
-						"sakuracloud_vpc_router.foobar", "interface.0.ipaddress.#", "2"),
-					resource.TestCheckResourceAttr(
-						"sakuracloud_vpc_router.foobar", "interface.0.ipaddress.0", "192.168.11.2"),
-					resource.TestCheckResourceAttr(
-						"sakuracloud_vpc_router.foobar", "interface.0.ipaddress.1", "192.168.11.3"),
-					resource.TestCheckResourceAttr(
-						"sakuracloud_vpc_router.foobar", "interface.0.nw_mask_len", "24"),
-					resource.TestCheckResourceAttr(
-						"sakuracloud_vpc_router.foobar", "dhcp_server.#", "1"),
-					resource.TestCheckResourceAttr(
-						"sakuracloud_vpc_router.foobar", "dhcp_server.0.vpc_router_interface_index", "1"),
-					resource.TestCheckResourceAttr(
-						"sakuracloud_vpc_router.foobar", "dhcp_server.0.range_start", "192.168.11.11"),
-					resource.TestCheckResourceAttr(
-						"sakuracloud_vpc_router.foobar", "dhcp_server.0.range_stop", "192.168.11.20"),
-					resource.TestCheckResourceAttr(
-						"sakuracloud_vpc_router.foobar", "dhcp_server.0.dns_servers.#", "2"),
-					resource.TestCheckResourceAttr(
-						"sakuracloud_vpc_router.foobar", "dhcp_server.0.dns_servers.0", "8.8.8.8"),
-					resource.TestCheckResourceAttr(
-						"sakuracloud_vpc_router.foobar", "dhcp_server.0.dns_servers.1", "8.8.4.4"),
-					resource.TestCheckResourceAttr(
-						"sakuracloud_vpc_router.foobar", "dhcp_static_mapping.#", "1"),
-					resource.TestCheckResourceAttr(
-						"sakuracloud_vpc_router.foobar", "dhcp_static_mapping.0.ipaddress", "192.168.11.10"),
-					resource.TestCheckResourceAttr(
-						"sakuracloud_vpc_router.foobar", "dhcp_static_mapping.0.macaddress", "aa:bb:cc:aa:bb:cc"),
-					resource.TestCheckResourceAttr(
-						"sakuracloud_vpc_router.foobar", "firewall.#", "1"),
-					resource.TestCheckResourceAttr(
-						"sakuracloud_vpc_router.foobar", "firewall.0.vpc_router_interface_index", "1"),
-					resource.TestCheckResourceAttr(
-						"sakuracloud_vpc_router.foobar", "firewall.0.direction", "send"),
-					resource.TestCheckResourceAttr(
-						"sakuracloud_vpc_router.foobar", "firewall.0.expressions.#", "2"),
-					resource.TestCheckResourceAttr(
-						"sakuracloud_vpc_router.foobar", "firewall.0.expressions.0.protocol", "tcp"),
-					resource.TestCheckResourceAttr(
-						"sakuracloud_vpc_router.foobar", "firewall.0.expressions.0.allow", "true"),
-					resource.TestCheckResourceAttr(
-						"sakuracloud_vpc_router.foobar", "firewall.0.expressions.0.source_nw", ""),
-					resource.TestCheckResourceAttr(
-						"sakuracloud_vpc_router.foobar", "firewall.0.expressions.0.source_port", "80"),
-					resource.TestCheckResourceAttr(
-						"sakuracloud_vpc_router.foobar", "firewall.0.expressions.0.dest_nw", ""),
-					resource.TestCheckResourceAttr(
-						"sakuracloud_vpc_router.foobar", "firewall.0.expressions.0.dest_port", ""),
-					resource.TestCheckResourceAttr(
-						"sakuracloud_vpc_router.foobar", "firewall.0.expressions.1.protocol", "ip"),
-					resource.TestCheckResourceAttr(
-						"sakuracloud_vpc_router.foobar", "firewall.0.expressions.1.allow", "false"),
-					resource.TestCheckResourceAttr(
-						"sakuracloud_vpc_router.foobar", "firewall.0.expressions.1.source_nw", ""),
-					resource.TestCheckResourceAttr(
-						"sakuracloud_vpc_router.foobar", "firewall.0.expressions.1.source_port", ""),
-					resource.TestCheckResourceAttr(
-						"sakuracloud_vpc_router.foobar", "firewall.0.expressions.1.dest_nw", ""),
-					resource.TestCheckResourceAttr(
-						"sakuracloud_vpc_router.foobar", "firewall.0.expressions.1.dest_port", ""),
-					resource.TestCheckResourceAttr(
-						"sakuracloud_vpc_router.foobar", "l2tp.#", "1"),
-					resource.TestCheckResourceAttr(
-						"sakuracloud_vpc_router.foobar", "l2tp.0.pre_shared_secret", "example"),
-					resource.TestCheckResourceAttr(
-						"sakuracloud_vpc_router.foobar", "l2tp.0.range_start", "192.168.11.21"),
-					resource.TestCheckResourceAttr(
-						"sakuracloud_vpc_router.foobar", "l2tp.0.range_stop", "192.168.11.30"),
-					resource.TestCheckResourceAttr(
-						"sakuracloud_vpc_router.foobar", "port_forwarding.#", "1"),
-					resource.TestCheckResourceAttr(
-						"sakuracloud_vpc_router.foobar", "port_forwarding.0.protocol", "udp"),
-					resource.TestCheckResourceAttr(
-						"sakuracloud_vpc_router.foobar", "port_forwarding.0.global_port", "10022"),
-					resource.TestCheckResourceAttr(
-						"sakuracloud_vpc_router.foobar", "port_forwarding.0.private_address", "192.168.11.11"),
-					resource.TestCheckResourceAttr(
-						"sakuracloud_vpc_router.foobar", "port_forwarding.0.private_port", "22"),
-					resource.TestCheckResourceAttr(
-						"sakuracloud_vpc_router.foobar", "port_forwarding.0.description", "desc"),
-					resource.TestCheckResourceAttr(
-						"sakuracloud_vpc_router.foobar", "pptp.#", "1"),
-					resource.TestCheckResourceAttr(
-						"sakuracloud_vpc_router.foobar", "pptp.0.range_start", "192.168.11.31"),
-					resource.TestCheckResourceAttr(
-						"sakuracloud_vpc_router.foobar", "pptp.0.range_stop", "192.168.11.40"),
-					resource.TestCheckResourceAttr(
-						"sakuracloud_vpc_router.foobar", "site_to_site_vpn.#", "1"),
-					resource.TestCheckResourceAttr(
-						"sakuracloud_vpc_router.foobar", "site_to_site_vpn.0.peer", "8.8.8.8"),
-					resource.TestCheckResourceAttr(
-						"sakuracloud_vpc_router.foobar", "site_to_site_vpn.0.remote_id", "8.8.8.8"),
-					resource.TestCheckResourceAttr(
-						"sakuracloud_vpc_router.foobar", "site_to_site_vpn.0.pre_shared_secret", "example"),
-					resource.TestCheckResourceAttr(
-						"sakuracloud_vpc_router.foobar", "site_to_site_vpn.0.routes.#", "1"),
-					resource.TestCheckResourceAttr(
-						"sakuracloud_vpc_router.foobar", "site_to_site_vpn.0.routes.0", "10.0.0.0/8"),
-					resource.TestCheckResourceAttr(
-						"sakuracloud_vpc_router.foobar", "site_to_site_vpn.0.local_prefix.#", "1"),
-					resource.TestCheckResourceAttr(
-						"sakuracloud_vpc_router.foobar", "site_to_site_vpn.0.local_prefix.0", "192.168.21.0/24"),
-					resource.TestCheckResourceAttr(
-						"sakuracloud_vpc_router.foobar", "static_nat.#", "1"),
+					resource.TestCheckResourceAttr("sakuracloud_vpc_router.foobar", "name", "name_before"),
+					resource.TestCheckResourceAttr("sakuracloud_vpc_router.foobar", "interfaces.#", "1"),
+					resource.TestCheckResourceAttr("sakuracloud_vpc_router.foobar", "interfaces.0.vip", "192.168.11.1"),
+					resource.TestCheckResourceAttr("sakuracloud_vpc_router.foobar", "interfaces.0.ipaddresses.#", "2"),
+					resource.TestCheckResourceAttr("sakuracloud_vpc_router.foobar", "interfaces.0.ipaddresses.0", "192.168.11.2"),
+					resource.TestCheckResourceAttr("sakuracloud_vpc_router.foobar", "interfaces.0.ipaddresses.1", "192.168.11.3"),
+					resource.TestCheckResourceAttr("sakuracloud_vpc_router.foobar", "interfaces.0.nw_mask_len", "24"),
+					resource.TestCheckResourceAttr("sakuracloud_vpc_router.foobar", "dhcp_servers.#", "1"),
+					resource.TestCheckResourceAttr("sakuracloud_vpc_router.foobar", "dhcp_servers.0.interface_index", "1"),
+					resource.TestCheckResourceAttr("sakuracloud_vpc_router.foobar", "dhcp_servers.0.range_start", "192.168.11.11"),
+					resource.TestCheckResourceAttr("sakuracloud_vpc_router.foobar", "dhcp_servers.0.range_stop", "192.168.11.20"),
+					resource.TestCheckResourceAttr("sakuracloud_vpc_router.foobar", "dhcp_servers.0.dns_servers.#", "2"),
+					resource.TestCheckResourceAttr("sakuracloud_vpc_router.foobar", "dhcp_servers.0.dns_servers.0", "8.8.8.8"),
+					resource.TestCheckResourceAttr("sakuracloud_vpc_router.foobar", "dhcp_servers.0.dns_servers.1", "8.8.4.4"),
+					resource.TestCheckResourceAttr("sakuracloud_vpc_router.foobar", "dhcp_static_mappings.#", "1"),
+					resource.TestCheckResourceAttr("sakuracloud_vpc_router.foobar", "dhcp_static_mappings.0.ipaddress", "192.168.11.10"),
+					resource.TestCheckResourceAttr("sakuracloud_vpc_router.foobar", "dhcp_static_mappings.0.macaddress", "aa:bb:cc:aa:bb:cc"),
+					resource.TestCheckResourceAttr("sakuracloud_vpc_router.foobar", "firewalls.#", "1"),
+					resource.TestCheckResourceAttr("sakuracloud_vpc_router.foobar", "firewalls.0.interface_index", "1"),
+					resource.TestCheckResourceAttr("sakuracloud_vpc_router.foobar", "firewalls.0.direction", "send"),
+					resource.TestCheckResourceAttr("sakuracloud_vpc_router.foobar", "firewalls.0.expressions.#", "2"),
+					resource.TestCheckResourceAttr("sakuracloud_vpc_router.foobar", "firewalls.0.expressions.0.protocol", "tcp"),
+					resource.TestCheckResourceAttr("sakuracloud_vpc_router.foobar", "firewalls.0.expressions.0.allow", "true"),
+					resource.TestCheckResourceAttr("sakuracloud_vpc_router.foobar", "firewalls.0.expressions.0.source_network", ""),
+					resource.TestCheckResourceAttr("sakuracloud_vpc_router.foobar", "firewalls.0.expressions.0.source_port", "80"),
+					resource.TestCheckResourceAttr("sakuracloud_vpc_router.foobar", "firewalls.0.expressions.0.destination_network", ""),
+					resource.TestCheckResourceAttr("sakuracloud_vpc_router.foobar", "firewalls.0.expressions.0.destination_port", ""),
+					resource.TestCheckResourceAttr("sakuracloud_vpc_router.foobar", "firewalls.0.expressions.1.protocol", "ip"),
+					resource.TestCheckResourceAttr("sakuracloud_vpc_router.foobar", "firewalls.0.expressions.1.allow", "false"),
+					resource.TestCheckResourceAttr("sakuracloud_vpc_router.foobar", "firewalls.0.expressions.1.source_network", ""),
+					resource.TestCheckResourceAttr("sakuracloud_vpc_router.foobar", "firewalls.0.expressions.1.source_port", ""),
+					resource.TestCheckResourceAttr("sakuracloud_vpc_router.foobar", "firewalls.0.expressions.1.destination_network", ""),
+					resource.TestCheckResourceAttr("sakuracloud_vpc_router.foobar", "firewalls.0.expressions.1.destination_port", ""),
+					resource.TestCheckResourceAttr("sakuracloud_vpc_router.foobar", "l2tp.#", "1"),
+					resource.TestCheckResourceAttr("sakuracloud_vpc_router.foobar", "l2tp.0.pre_shared_secret", "example"),
+					resource.TestCheckResourceAttr("sakuracloud_vpc_router.foobar", "l2tp.0.range_start", "192.168.11.21"),
+					resource.TestCheckResourceAttr("sakuracloud_vpc_router.foobar", "l2tp.0.range_stop", "192.168.11.30"),
+					resource.TestCheckResourceAttr("sakuracloud_vpc_router.foobar", "port_forwardings.#", "1"),
+					resource.TestCheckResourceAttr("sakuracloud_vpc_router.foobar", "port_forwardings.0.protocol", "udp"),
+					resource.TestCheckResourceAttr("sakuracloud_vpc_router.foobar", "port_forwardings.0.global_port", "10022"),
+					resource.TestCheckResourceAttr("sakuracloud_vpc_router.foobar", "port_forwardings.0.private_address", "192.168.11.11"),
+					resource.TestCheckResourceAttr("sakuracloud_vpc_router.foobar", "port_forwardings.0.private_port", "22"),
+					resource.TestCheckResourceAttr("sakuracloud_vpc_router.foobar", "port_forwardings.0.description", "desc"),
+					resource.TestCheckResourceAttr("sakuracloud_vpc_router.foobar", "pptp.#", "1"),
+					resource.TestCheckResourceAttr("sakuracloud_vpc_router.foobar", "pptp.0.range_start", "192.168.11.31"),
+					resource.TestCheckResourceAttr("sakuracloud_vpc_router.foobar", "pptp.0.range_stop", "192.168.11.40"),
+					resource.TestCheckResourceAttr("sakuracloud_vpc_router.foobar", "site_to_site_vpn.#", "1"),
+					resource.TestCheckResourceAttr("sakuracloud_vpc_router.foobar", "site_to_site_vpn.0.peer", "8.8.8.8"),
+					resource.TestCheckResourceAttr("sakuracloud_vpc_router.foobar", "site_to_site_vpn.0.remote_id", "8.8.8.8"),
+					resource.TestCheckResourceAttr("sakuracloud_vpc_router.foobar", "site_to_site_vpn.0.pre_shared_secret", "example"),
+					resource.TestCheckResourceAttr("sakuracloud_vpc_router.foobar", "site_to_site_vpn.0.routes.#", "1"),
+					resource.TestCheckResourceAttr("sakuracloud_vpc_router.foobar", "site_to_site_vpn.0.routes.0", "10.0.0.0/8"),
+					resource.TestCheckResourceAttr("sakuracloud_vpc_router.foobar", "site_to_site_vpn.0.local_prefix.#", "1"),
+					resource.TestCheckResourceAttr("sakuracloud_vpc_router.foobar", "site_to_site_vpn.0.local_prefix.0", "192.168.21.0/24"),
+					resource.TestCheckResourceAttr("sakuracloud_vpc_router.foobar", "static_nat.#", "1"),
 					resource.TestCheckResourceAttrPair(
 						"sakuracloud_vpc_router.foobar", "static_nat.0.global_address",
 						"sakuracloud_internet.router1", "ipaddresses.3"),
-					resource.TestCheckResourceAttr(
-						"sakuracloud_vpc_router.foobar", "static_nat.0.private_address", "192.168.11.12"),
-					resource.TestCheckResourceAttr(
-						"sakuracloud_vpc_router.foobar", "static_nat.0.description", "desc"),
-					resource.TestCheckResourceAttr(
-						"sakuracloud_vpc_router.foobar", "static_route.#", "1"),
-					resource.TestCheckResourceAttr(
-						"sakuracloud_vpc_router.foobar", "static_route.0.prefix", "172.16.0.0/16"),
-					resource.TestCheckResourceAttr(
-						"sakuracloud_vpc_router.foobar", "static_route.0.next_hop", "192.168.11.99"),
-					resource.TestCheckResourceAttr(
-						"sakuracloud_vpc_router.foobar", "user.#", "1"),
-					resource.TestCheckResourceAttr(
-						"sakuracloud_vpc_router.foobar", "user.0.name", "username"),
-					resource.TestCheckResourceAttr(
-						"sakuracloud_vpc_router.foobar", "user.0.password", "password"),
+					resource.TestCheckResourceAttr("sakuracloud_vpc_router.foobar", "static_nat.0.private_address", "192.168.11.12"),
+					resource.TestCheckResourceAttr("sakuracloud_vpc_router.foobar", "static_nat.0.description", "desc"),
+					resource.TestCheckResourceAttr("sakuracloud_vpc_router.foobar", "static_routes.#", "1"),
+					resource.TestCheckResourceAttr("sakuracloud_vpc_router.foobar", "static_routes.0.prefix", "172.16.0.0/16"),
+					resource.TestCheckResourceAttr("sakuracloud_vpc_router.foobar", "static_routes.0.next_hop", "192.168.11.99"),
+					resource.TestCheckResourceAttr("sakuracloud_vpc_router.foobar", "users.#", "1"),
+					resource.TestCheckResourceAttr("sakuracloud_vpc_router.foobar", "users.0.name", "username"),
+					resource.TestCheckResourceAttr("sakuracloud_vpc_router.foobar", "users.0.password", "password"),
 				),
 			},
 			{
 				Config: testAccCheckSakuraCloudVPCRouterConfig_full_update,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckSakuraCloudVPCRouterExists("sakuracloud_vpc_router.foobar", &vpcRouter),
-					resource.TestCheckResourceAttr(
-						"sakuracloud_vpc_router.foobar", "name", "name_before"),
-					resource.TestCheckNoResourceAttr(
-						"sakuracloud_vpc_router.foobar", "interface"),
-					resource.TestCheckNoResourceAttr(
-						"sakuracloud_vpc_router.foobar", "dhcp_server"),
-					resource.TestCheckNoResourceAttr(
-						"sakuracloud_vpc_router.foobar", "dhcp_static_mapping"),
-					resource.TestCheckNoResourceAttr(
-						"sakuracloud_vpc_router.foobar", "firewall"),
-					resource.TestCheckNoResourceAttr(
-						"sakuracloud_vpc_router.foobar", "l2tp"),
-					resource.TestCheckNoResourceAttr(
-						"sakuracloud_vpc_router.foobar", "port_forwarding"),
-					resource.TestCheckNoResourceAttr(
-						"sakuracloud_vpc_router.foobar", "pptp"),
-					resource.TestCheckNoResourceAttr(
-						"sakuracloud_vpc_router.foobar", "site_to_site_vpn"),
-					resource.TestCheckNoResourceAttr(
-						"sakuracloud_vpc_router.foobar", "static_nat"),
-					resource.TestCheckNoResourceAttr(
-						"sakuracloud_vpc_router.foobar", "static_route"),
-					resource.TestCheckNoResourceAttr(
-						"sakuracloud_vpc_router.foobar", "user"),
+					resource.TestCheckResourceAttr("sakuracloud_vpc_router.foobar", "name", "name_before"),
+					resource.TestCheckNoResourceAttr("sakuracloud_vpc_router.foobar", "interfaces"),
+					resource.TestCheckNoResourceAttr("sakuracloud_vpc_router.foobar", "dhcp_servers"),
+					resource.TestCheckNoResourceAttr("sakuracloud_vpc_router.foobar", "dhcp_static_mappings"),
+					resource.TestCheckNoResourceAttr("sakuracloud_vpc_router.foobar", "firewalls"),
+					resource.TestCheckNoResourceAttr("sakuracloud_vpc_router.foobar", "l2tp"),
+					resource.TestCheckNoResourceAttr("sakuracloud_vpc_router.foobar", "port_forwardings"),
+					resource.TestCheckNoResourceAttr("sakuracloud_vpc_router.foobar", "pptp"),
+					resource.TestCheckNoResourceAttr("sakuracloud_vpc_router.foobar", "site_to_site_vpn"),
+					resource.TestCheckNoResourceAttr("sakuracloud_vpc_router.foobar", "static_nat"),
+					resource.TestCheckNoResourceAttr("sakuracloud_vpc_router.foobar", "static_routes"),
+					resource.TestCheckNoResourceAttr("sakuracloud_vpc_router.foobar", "users"),
 				),
 			},
 		},
@@ -264,23 +188,24 @@ func testAccCheckSakuraCloudVPCRouterExists(n string, vpcRouter *sacloud.VPCRout
 	return func(s *terraform.State) error {
 		rs, ok := s.RootModule().Resources[n]
 		if !ok {
-			return fmt.Errorf("Not found: %s", n)
+			return fmt.Errorf("not found: %s", n)
 		}
 
 		if rs.Primary.ID == "" {
-			return errors.New("No VPCRouter ID is set")
+			return errors.New("no VPCRouter ID is set")
 		}
 
 		client := testAccProvider.Meta().(*APIClient)
+		vrOp := sacloud.NewVPCRouterOp(client)
+		zone := rs.Primary.Attributes["zone"]
 
-		foundVPCRouter, err := client.VPCRouter.Read(toSakuraCloudID(rs.Primary.ID))
-
+		foundVPCRouter, err := vrOp.Read(context.Background(), zone, types.StringID(rs.Primary.ID))
 		if err != nil {
 			return err
 		}
 
-		if foundVPCRouter.ID != toSakuraCloudID(rs.Primary.ID) {
-			return errors.New("VPCRouter not found")
+		if foundVPCRouter.ID.String() != rs.Primary.ID {
+			return fmt.Errorf("not found VPCRouter: %s", rs.Primary.ID)
 		}
 
 		*vpcRouter = *foundVPCRouter
@@ -291,16 +216,17 @@ func testAccCheckSakuraCloudVPCRouterExists(n string, vpcRouter *sacloud.VPCRout
 
 func testAccCheckSakuraCloudVPCRouterDestroy(s *terraform.State) error {
 	client := testAccProvider.Meta().(*APIClient)
-
+	vrOp := sacloud.NewVPCRouterOp(client)
 	for _, rs := range s.RootModule().Resources {
 		if rs.Type != "sakuracloud_vpc_router" {
 			continue
 		}
 
-		_, err := client.VPCRouter.Read(toSakuraCloudID(rs.Primary.ID))
+		zone := rs.Primary.Attributes["zone"]
+		_, err := vrOp.Read(context.Background(), zone, types.StringID(rs.Primary.ID))
 
 		if err == nil {
-			return errors.New("VPCRouter still exists")
+			return fmt.Errorf("still exists VPCRouter: %s", rs.Primary.ID)
 		}
 	}
 
@@ -309,11 +235,11 @@ func testAccCheckSakuraCloudVPCRouterDestroy(s *terraform.State) error {
 
 var testAccCheckSakuraCloudVPCRouterConfig_basic = `
 resource "sakuracloud_vpc_router" "foobar" {
-    name = "name_before"
-    description = "description_before"
-    tags = ["hoge1" , "hoge2"]
-    icon_id = "${sakuracloud_icon.foobar.id}"
-    internet_connection = true
+  name = "name_before"
+  description = "description_before"
+  tags = ["hoge1" , "hoge2"]
+  icon_id = "${sakuracloud_icon.foobar.id}"
+  internet_connection = true
 }
 
 resource "sakuracloud_icon" "foobar" {
@@ -324,16 +250,16 @@ resource "sakuracloud_icon" "foobar" {
 
 var testAccCheckSakuraCloudVPCRouterConfig_update = `
 resource "sakuracloud_vpc_router" "foobar" {
-    name = "name_after"
-    description = "description_after"
-    tags = ["hoge1_after" , "hoge2_after"]
-    syslog_host = "192.168.0.2"
-    internet_connection = false
+  name = "name_after"
+  description = "description_after"
+  tags = ["hoge1_after" , "hoge2_after"]
+  syslog_host = "192.168.0.2"
+  internet_connection = false
 }`
 
 var testAccCheckSakuraCloudVPCRouterConfig_full_basic = `
 resource "sakuracloud_internet" "router1" {
-    name = "myinternet1"
+  name = "myinternet1"
 }
 resource sakuracloud_switch "sw" {
   name = "name_before"
@@ -354,50 +280,51 @@ resource "sakuracloud_vpc_router" "foobar" {
   aliases    = ["${sakuracloud_internet.router1.ipaddresses[3]}"]
   vrid       = 1
 
-  interface {
+  interfaces {
+    index       = 1
     switch_id   = "${sakuracloud_switch.sw.id}"
     vip         = "192.168.11.1"
-    ipaddress   = ["192.168.11.2" , "192.168.11.3"]
+    ipaddresses   = ["192.168.11.2" , "192.168.11.3"]
     nw_mask_len = 24 
   }
 
-  dhcp_server {
-    vpc_router_interface_index = 1
+  dhcp_servers {
+    interface_index = 1
 
     range_start = "192.168.11.11"
     range_stop  = "192.168.11.20"
     dns_servers = ["8.8.8.8", "8.8.4.4"]
   }
 
-  dhcp_static_mapping {
+  dhcp_static_mappings {
     ipaddress  = "192.168.11.10"
     macaddress = "aa:bb:cc:aa:bb:cc"
   }
 
-  firewall {
-    vpc_router_interface_index = 1
+  firewalls {
+    interface_index = 1
 
     direction = "send"
     expressions {
-        protocol    = "tcp"
-        source_nw   = ""
-        source_port = "80"
-        dest_nw     = ""
-        dest_port   = ""
-        allow       = true
-        logging     = true
-        description = "desc"
+        protocol            = "tcp"
+        source_network      = ""
+        source_port         = "80"
+        destination_network = ""
+        destination_port    = ""
+        allow               = true
+        logging             = true
+        description         = "desc"
     }
 
     expressions {
-        protocol    = "ip"
-        source_nw   = ""
-        source_port = ""
-        dest_nw     = ""
-        dest_port   = ""
-        allow       = false
-        logging     = true
-        description = "desc"
+        protocol            = "ip"
+        source_network      = ""
+        source_port         = ""
+        destination_network = ""
+        destination_port    = ""
+        allow               = false
+        logging             = true
+        description         = "desc"
     }
   }
 
@@ -407,7 +334,7 @@ resource "sakuracloud_vpc_router" "foobar" {
     range_stop        = "192.168.11.30"
   }
 
-  port_forwarding {
+  port_forwardings {
     protocol        = "udp"
     global_port     = 10022
     private_address = "192.168.11.11"
@@ -434,12 +361,12 @@ resource "sakuracloud_vpc_router" "foobar" {
     description     = "desc"
   }
 
-  static_route {
+  static_routes {
     prefix   = "172.16.0.0/16"
     next_hop = "192.168.11.99"
   }
 
-  user {
+  users {
     name     = "username"
     password = "password"
   }
@@ -448,14 +375,12 @@ resource "sakuracloud_vpc_router" "foobar" {
 
 var testAccCheckSakuraCloudVPCRouterConfig_full_update = `
 resource "sakuracloud_internet" "router1" {
-    name = "myinternet1"
+  name = "myinternet1"
 }
 resource sakuracloud_switch "sw" {
   name = "name_before"
 }
 resource "sakuracloud_vpc_router" "foobar" {
-  depends_on = ["sakuracloud_switch.sw", "sakuracloud_internet.router1"] # TODO for terraform v0.12-alpha4(if without this, deleting switch will fail)
-
   name        = "name_before"
   description = "description_before"
   tags        = ["hoge1" , "hoge2"]

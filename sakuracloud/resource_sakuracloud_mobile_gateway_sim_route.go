@@ -6,8 +6,8 @@ import (
 
 	"github.com/hashicorp/terraform/helper/hashcode"
 	"github.com/hashicorp/terraform/helper/schema"
-	"github.com/sacloud/libsacloud/api"
-	"github.com/sacloud/libsacloud/sacloud"
+	"github.com/sacloud/libsacloud/v2/sacloud"
+	"github.com/sacloud/libsacloud/v2/sacloud/types"
 )
 
 func resourceSakuraCloudMobileGatewaySIMRoute() *schema.Resource {
@@ -46,97 +46,116 @@ func resourceSakuraCloudMobileGatewaySIMRoute() *schema.Resource {
 }
 
 func resourceSakuraCloudMobileGatewaySIMRouteCreate(d *schema.ResourceData, meta interface{}) error {
-	client := getSacloudAPIClient(d, meta)
+	client, ctx, zone := getSacloudV2Client(d, meta)
+	mgwOp := sacloud.NewMobileGatewayOp(client)
 
 	mgwID := d.Get("mobile_gateway_id").(string)
+
 	sakuraMutexKV.Lock(mgwID)
 	defer sakuraMutexKV.Unlock(mgwID)
 
-	mgw, err := client.MobileGateway.Read(toSakuraCloudID(mgwID))
+	mgw, err := mgwOp.Read(ctx, zone, types.StringID(mgwID))
 	if err != nil {
-		return fmt.Errorf("Couldn't find SakuraCloud MobileGateway resource: %s", err)
+		return fmt.Errorf("could not read SakuraCloud MobileGateway: %s", err)
 	}
 
-	param := expandMobileGatewaySIMRoute(d)
-	simRoutes, err := client.MobileGateway.GetSIMRoutes(mgw.ID)
+	src := expandMobileGatewaySIMRoute(d)
+	simRoutes, err := mgwOp.GetSIMRoutes(ctx, zone, mgw.ID)
 	if err != nil {
-		return fmt.Errorf("Couldn't find SakuraCloud MobileGateway SIMRoutes: %s", err)
+		return fmt.Errorf("could not read SIMRoutes: %s", err)
 	}
 
 	// check duplicated
 	for _, sr := range simRoutes {
-		if sr.Prefix == param.Prefix {
+		if sr.Prefix == src.Prefix {
 			return fmt.Errorf("prefix %q already exists", sr.Prefix)
 		}
 	}
 
-	if _, err := client.MobileGateway.AddSIMRoute(mgw.ID, toSakuraCloudID(param.ResourceID), param.Prefix); err != nil {
+	simRoutes = append(simRoutes, src)
+	var param []*sacloud.MobileGatewaySIMRouteParam
+	for _, r := range simRoutes {
+		param = append(param, &sacloud.MobileGatewaySIMRouteParam{
+			ResourceID: r.ResourceID,
+			Prefix:     r.Prefix,
+		})
+	}
+
+	if err := mgwOp.SetSIMRoutes(ctx, zone, mgw.ID, param); err != nil {
 		return err
 	}
 
-	d.SetId(mgwSIMRouteIDHash(mgwID, param))
+	d.SetId(mgwSIMRouteIDHash(mgwID, src))
 	return resourceSakuraCloudMobileGatewaySIMRouteRead(d, meta)
 }
 
 func resourceSakuraCloudMobileGatewaySIMRouteRead(d *schema.ResourceData, meta interface{}) error {
-	client := getSacloudAPIClient(d, meta)
+	client, ctx, zone := getSacloudV2Client(d, meta)
+	mgwOp := sacloud.NewMobileGatewayOp(client)
 
 	mgwID := d.Get("mobile_gateway_id").(string)
-	mgw, err := client.MobileGateway.Read(toSakuraCloudID(mgwID))
+	mgw, err := mgwOp.Read(ctx, zone, types.StringID(mgwID))
 	if err != nil {
-		if sacloudErr, ok := err.(api.Error); ok && sacloudErr.ResponseCode() == 404 {
+		if sacloud.IsNotFoundError(err) {
 			d.SetId("")
 			return nil
 		}
-		return fmt.Errorf("Couldn't find SakuraCloud MobileGateway resource: %s", err)
+		return fmt.Errorf("could not read SakuraCloud MobileGateway: %s", err)
 	}
 
-	param := expandMobileGatewaySIMRoute(d)
-
-	simRoutes, err := client.MobileGateway.GetSIMRoutes(mgw.ID)
+	src := expandMobileGatewaySIMRoute(d)
+	simRoutes, err := mgwOp.GetSIMRoutes(ctx, zone, mgw.ID)
 	if err != nil {
-		return err
+		return fmt.Errorf("could not read SIMRoutes: %s", err)
 	}
 
-	if simRoutes != nil {
-		exists := false
-		for _, sr := range simRoutes {
-			if sr.Prefix == param.Prefix {
-				d.Set("prefix", sr.Prefix)
-				d.Set("sim_id", toSakuraCloudID(sr.ResourceID))
-				exists = true
-			}
+	exists := false
+	for _, sr := range simRoutes {
+		if sr.Prefix == src.Prefix {
+			d.Set("prefix", sr.Prefix)
+			d.Set("sim_id", toSakuraCloudID(sr.ResourceID))
+			exists = true
 		}
-		if !exists {
-			d.SetId("")
-			return nil
-		}
-	} else {
+	}
+	if !exists {
 		d.SetId("")
 		return nil
 	}
 
-	d.Set("zone", client.Zone)
-
+	d.Set("zone", zone)
 	return nil
 }
 
 func resourceSakuraCloudMobileGatewaySIMRouteDelete(d *schema.ResourceData, meta interface{}) error {
-
-	client := getSacloudAPIClient(d, meta)
+	client, ctx, zone := getSacloudV2Client(d, meta)
+	mgwOp := sacloud.NewMobileGatewayOp(client)
 
 	mgwID := d.Get("mobile_gateway_id").(string)
+
 	sakuraMutexKV.Lock(mgwID)
 	defer sakuraMutexKV.Unlock(mgwID)
 
-	mgw, err := client.MobileGateway.Read(toSakuraCloudID(mgwID))
+	mgw, err := mgwOp.Read(ctx, zone, types.StringID(mgwID))
 	if err != nil {
-		return fmt.Errorf("Couldn't find SakuraCloud MobileGateway resource: %s", err)
+		return fmt.Errorf("could not read SakuraCloud MobileGateway: %s", err)
+	}
+	simRoutes, err := mgwOp.GetSIMRoutes(ctx, zone, mgw.ID)
+	if err != nil {
+		return fmt.Errorf("could not read SIMRoutes: %s", err)
 	}
 
 	simRoute := expandMobileGatewaySIMRoute(d)
+	var param []*sacloud.MobileGatewaySIMRouteParam
+	for _, r := range simRoutes {
+		if r.Prefix != simRoute.Prefix {
+			param = append(param, &sacloud.MobileGatewaySIMRouteParam{
+				ResourceID: r.ResourceID,
+				Prefix:     r.Prefix,
+			})
+		}
+	}
 
-	if _, err := client.MobileGateway.DeleteSIMRoute(mgw.ID, toSakuraCloudID(simRoute.ResourceID), simRoute.Prefix); err != nil {
+	if err := mgwOp.SetSIMRoutes(ctx, zone, mgw.ID, param); err != nil {
 		return err
 	}
 

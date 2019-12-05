@@ -7,8 +7,8 @@ import (
 
 	"github.com/hashicorp/terraform/helper/hashcode"
 	"github.com/hashicorp/terraform/helper/schema"
-	"github.com/sacloud/libsacloud/api"
-	"github.com/sacloud/libsacloud/sacloud"
+	"github.com/sacloud/libsacloud/v2/sacloud"
+	"github.com/sacloud/libsacloud/v2/sacloud/types"
 )
 
 func resourceSakuraCloudLoadBalancerServer() *schema.Resource {
@@ -45,13 +45,14 @@ func resourceLoadBalancerServerSchema() map[string]*schema.Schema {
 }
 
 func resourceSakuraCloudLoadBalancerServerCreate(d *schema.ResourceData, meta interface{}) error {
-	client := getSacloudAPIClient(d, meta)
-
+	client, ctx, zone := getSacloudV2Client(d, meta)
 	vipID := d.Get("load_balancer_vip_id").(string)
 	lbID, vip, port, err := expandVIPID(vipID)
 	if err != nil {
-		return fmt.Errorf("Couldn't parse SakuraCloud LoadBalancer VIP ID: %s", err)
+		return fmt.Errorf("could not parse SakuraCloud LoadBalancer VIP ID: %s", err)
 	}
+
+	lbOp := sacloud.NewLoadBalancerOp(client)
 
 	//validate
 	protocol := d.Get("check_protocol").(string)
@@ -68,28 +69,29 @@ func resourceSakuraCloudLoadBalancerServerCreate(d *schema.ResourceData, meta in
 	sakuraMutexKV.Lock(lbID)
 	defer sakuraMutexKV.Unlock(lbID)
 
-	loadBalancer, err := client.LoadBalancer.Read(toSakuraCloudID(lbID))
+	lb, err := lbOp.Read(ctx, zone, types.StringID(lbID))
 	if err != nil {
-		return fmt.Errorf("Couldn't find SakuraCloud LoadBalancer resource: %s", err)
+		return fmt.Errorf("could not read SakuraCloud LoadBalancer resource: %s", err)
 	}
 
-	vipSetting := findLoadBalancerVIPMatchByValue(vip, port, loadBalancer.Settings)
+	vipSetting := findLoadBalancerVIPMatchByValue(lb.VirtualIPAddresses, vip, port)
 	if vipSetting == nil {
-		return fmt.Errorf("Couldn't find SakuraCloud LoadBalancer VIP resource: %s", vipID)
+		return fmt.Errorf("could not find SakuraCloud LoadBalancer VIP resource: %s:%s", vip, port)
 	}
 
-	server := expandLoadBalancerServer(d)
-	server.Port = port
-	vipSetting.AddServer(server)
+	server := expandLoadBalancerServer(d, vipSetting.Port.Int())
+	vipSetting.Servers = append(vipSetting.Servers, server)
 
-	loadBalancer, err = client.LoadBalancer.Update(toSakuraCloudID(lbID), loadBalancer)
+	lb, err = lbOp.Update(ctx, zone, lb.ID, &sacloud.LoadBalancerUpdateRequest{
+		Name:               lb.Name,
+		Description:        lb.Description,
+		Tags:               lb.Tags,
+		IconID:             lb.IconID,
+		VirtualIPAddresses: lb.VirtualIPAddresses,
+		SettingsHash:       lb.SettingsHash,
+	})
 	if err != nil {
-		return fmt.Errorf("Failed to create SakuraCloud LoadBalancerServer resource: %s", err)
-	}
-
-	_, err = client.LoadBalancer.Config(toSakuraCloudID(lbID))
-	if err != nil {
-		return fmt.Errorf("Couldn'd apply SakuraCloud LoadBalancer config: %s", err)
+		return fmt.Errorf("creating SakuraCloud LoadBalancerServer is failed: %s", err)
 	}
 
 	d.SetId(loadBalancerServerIDHash(vipID, server))
@@ -97,111 +99,117 @@ func resourceSakuraCloudLoadBalancerServerCreate(d *schema.ResourceData, meta in
 }
 
 func resourceSakuraCloudLoadBalancerServerRead(d *schema.ResourceData, meta interface{}) error {
-	client := getSacloudAPIClient(d, meta)
-
-	vipID := d.Get("load_balancer_vip_id").(string)
-	lbID, vip, port, err := expandVIPID(vipID)
+	client, ctx, zone := getSacloudV2Client(d, meta)
+	lbID, vip, port, err := expandVIPID(d.Get("load_balancer_vip_id").(string))
 	if err != nil {
-		return fmt.Errorf("Couldn't parse SakuraCloud LoadBalancer VIP ID: %s", err)
+		return fmt.Errorf("could not parse SakuraCloud LoadBalancer VIP ID: %s", err)
 	}
 
-	loadBalancer, err := client.LoadBalancer.Read(toSakuraCloudID(lbID))
+	lbOp := sacloud.NewLoadBalancerOp(client)
+
+	lb, err := lbOp.Read(ctx, zone, types.StringID(lbID))
 	if err != nil {
-		if sacloudErr, ok := err.(api.Error); ok && sacloudErr.ResponseCode() == 404 {
+		if sacloud.IsNotFoundError(err) {
 			d.SetId("")
 			return nil
 		}
-		return fmt.Errorf("Couldn't find SakuraCloud LoadBalancer resource: %s", err)
+		return fmt.Errorf("could not read SakuraCloud LoadBalancer resource: %s", err)
 	}
 
-	vipSetting := findLoadBalancerVIPMatchByValue(vip, port, loadBalancer.Settings)
+	vipSetting := findLoadBalancerVIPMatchByValue(lb.VirtualIPAddresses, vip, port)
 	if vipSetting == nil {
 		d.SetId("")
 		return nil
 	}
 
-	param := expandLoadBalancerServer(d)
-	param.Port = port
-	server := findLoadBalancerServer(param, vipSetting.Servers)
+	src := expandLoadBalancerServer(d, vipSetting.Port.Int())
+	server := findLoadBalancerServer(vipSetting.Servers, src)
 	if server == nil {
 		d.SetId("")
 		return nil
 	}
 
 	d.Set("ipaddress", server.IPAddress)
-	d.Set("check_protocol", server.HealthCheck.Protocol)
+	d.Set("check_protocol", server.HealthCheck.Protocol.String())
 	d.Set("check_path", server.HealthCheck.Path)
-	d.Set("check_status", server.HealthCheck.Status)
-	d.Set("enabled", strings.ToLower(server.Enabled) == "true")
-	d.Set("zone", client.Zone)
-
+	d.Set("check_status", server.HealthCheck.ResponseCode.String())
+	d.Set("enabled", server.Enabled)
+	d.Set("zone", getV2Zone(d, client))
 	return nil
 }
 
 func resourceSakuraCloudLoadBalancerServerDelete(d *schema.ResourceData, meta interface{}) error {
-	client := getSacloudAPIClient(d, meta)
-
-	vipID := d.Get("load_balancer_vip_id").(string)
-	lbID, vip, port, err := expandVIPID(vipID)
+	client, ctx, zone := getSacloudV2Client(d, meta)
+	lbID, vip, port, err := expandVIPID(d.Get("load_balancer_vip_id").(string))
 	if err != nil {
-		return fmt.Errorf("Couldn't parse SakuraCloud LoadBalancer VIP ID: %s", err)
+		return fmt.Errorf("could not parse SakuraCloud LoadBalancer VIP ID: %s", err)
 	}
+
+	lbOp := sacloud.NewLoadBalancerOp(client)
+
 	sakuraMutexKV.Lock(lbID)
 	defer sakuraMutexKV.Unlock(lbID)
 
-	loadBalancer, err := client.LoadBalancer.Read(toSakuraCloudID(lbID))
+	lb, err := lbOp.Read(ctx, zone, types.StringID(lbID))
 	if err != nil {
-		return fmt.Errorf("Couldn't find SakuraCloud LoadBalancer resource: %s", err)
+		if sacloud.IsNotFoundError(err) {
+			d.SetId("")
+			return nil
+		}
+		return fmt.Errorf("could not read SakuraCloud LoadBalancer resource: %s", err)
 	}
 
-	vipSetting := findLoadBalancerVIPMatchByValue(vip, port, loadBalancer.Settings)
+	vipSetting := findLoadBalancerVIPMatchByValue(lb.VirtualIPAddresses, vip, port)
 	if vipSetting == nil {
-		return fmt.Errorf("Couldn't find SakuraCloud LoadBalancer VIP resource: %s", vipID)
+		d.SetId("")
+		return nil
 	}
+	src := expandLoadBalancerServer(d, vipSetting.Port.Int())
 
-	server := expandLoadBalancerServer(d)
-	vipSetting.DeleteServer(server.IPAddress, port)
-
-	loadBalancer, err = client.LoadBalancer.Update(toSakuraCloudID(lbID), loadBalancer)
-	if err != nil {
-		return fmt.Errorf("Failed to delete SakuraCloud LoadBalancerServer resource: %s", err)
+	var servers []*sacloud.LoadBalancerServer
+	for _, s := range vipSetting.Servers {
+		if s.IPAddress != src.IPAddress {
+			servers = append(servers, s)
+		}
 	}
+	vipSetting.Servers = servers
 
-	_, err = client.LoadBalancer.Config(toSakuraCloudID(lbID))
+	lb, err = lbOp.Update(ctx, zone, lb.ID, &sacloud.LoadBalancerUpdateRequest{
+		Name:               lb.Name,
+		Description:        lb.Description,
+		Tags:               lb.Tags,
+		IconID:             lb.IconID,
+		VirtualIPAddresses: lb.VirtualIPAddresses,
+		SettingsHash:       lb.SettingsHash,
+	})
 	if err != nil {
-		return fmt.Errorf("Couldn'd apply SakuraCloud LoadBalancer config: %s", err)
+		return fmt.Errorf("deleting SakuraCloud LoadBalancerServer is failed: %s", err)
 	}
 
 	return nil
+
 }
 
-func findLoadBalancerVIPMatchByValue(vip string, port string, servers *sacloud.LoadBalancerSettings) *sacloud.LoadBalancerSetting {
-	if servers == nil || servers.LoadBalancer == nil || len(servers.LoadBalancer) == 0 {
-		return nil
-	}
-	for _, server := range servers.LoadBalancer {
-		if isSameLoadBalancerVIPByValue(vip, port, server) {
-			return server
+func findLoadBalancerVIPMatchByValue(vips []*sacloud.LoadBalancerVirtualIPAddress, vip, port string) *sacloud.LoadBalancerVirtualIPAddress {
+	for _, v := range vips {
+		if isSameLoadBalancerVIPByValue(v, vip, port) {
+			return v
 		}
 	}
 	return nil
 }
 
-func isSameLoadBalancerVIPByValue(vip string, port string, s2 *sacloud.LoadBalancerSetting) bool {
-	return vip == s2.VirtualIPAddress && port == s2.Port
+func isSameLoadBalancerVIPByValue(v *sacloud.LoadBalancerVirtualIPAddress, vip, port string) bool {
+	return vip == v.VirtualIPAddress && port == v.Port.String()
 }
 
-func findLoadBalancerServer(server *sacloud.LoadBalancerServer, servers []*sacloud.LoadBalancerServer) *sacloud.LoadBalancerServer {
-	if servers == nil || len(servers) == 0 {
-		return nil
-	}
+func findLoadBalancerServer(servers []*sacloud.LoadBalancerServer, server *sacloud.LoadBalancerServer) *sacloud.LoadBalancerServer {
 	for _, s := range servers {
-		if s.IPAddress == server.IPAddress && s.Port == server.Port {
+		if s.IPAddress == server.IPAddress {
 			return s
 		}
 	}
 	return nil
-
 }
 
 func loadBalancerServerIDHash(vipID string, s *sacloud.LoadBalancerServer) string {

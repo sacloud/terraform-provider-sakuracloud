@@ -1,7 +1,6 @@
 package sakuracloud
 
 import (
-	"context"
 	"fmt"
 
 	"github.com/hashicorp/terraform/helper/schema"
@@ -54,10 +53,8 @@ func dataSourceSakuraCloudSwitch() *schema.Resource {
 }
 
 func dataSourceSakuraCloudSwitchRead(d *schema.ResourceData, meta interface{}) error {
-	client := getSacloudAPIClient(d, meta)
+	client, ctx, zone := getSacloudV2Client(d, meta)
 	searcher := sacloud.NewSwitchOp(client)
-	ctx := context.Background()
-	zone := getV2Zone(d, client)
 
 	findCondition := &sacloud.FindCondition{
 		Count: defaultSearchLimit,
@@ -76,33 +73,5 @@ func dataSourceSakuraCloudSwitchRead(d *schema.ResourceData, meta interface{}) e
 
 	targets := res.Switches
 	d.SetId(targets[0].ID.String())
-	return setSwitchV2ResourceData(ctx, d, client, targets[0])
-}
-
-func setSwitchV2ResourceData(ctx context.Context, d *schema.ResourceData, client *APIClient, data *sacloud.Switch) error {
-	zone := getV2Zone(d, client)
-
-	var serverIDs []string
-	if data.ServerCount > 0 {
-		swOp := sacloud.NewSwitchOp(client)
-		searched, err := swOp.GetServers(ctx, zone, data.ID)
-		if err != nil {
-			return fmt.Errorf("could not find SakuraCloud Servers: switch[%s]", err)
-		}
-		for _, s := range searched.Servers {
-			serverIDs = append(serverIDs, s.ID.String())
-		}
-	}
-
-	setPowerManageTimeoutValueToState(d)
-	return setResourceData(d, map[string]interface{}{
-		"name":        data.Name,
-		"icon_id":     data.IconID.String(),
-		"description": data.Description,
-		"tags":        data.Tags,
-		"bridge_id":   data.BridgeID.String(),
-		"server_ids":  serverIDs,
-		"zone":        zone,
-	})
-
+	return setSwitchResourceData(ctx, d, client, targets[0])
 }

@@ -1,12 +1,13 @@
 package sakuracloud
 
 import (
+	"context"
 	"fmt"
 
 	"github.com/hashicorp/terraform/helper/schema"
 	"github.com/hashicorp/terraform/helper/validation"
-	"github.com/sacloud/libsacloud/api"
-	"github.com/sacloud/libsacloud/sacloud"
+	"github.com/sacloud/libsacloud/v2/sacloud"
+	"github.com/sacloud/libsacloud/v2/sacloud/types"
 )
 
 func resourceSakuraCloudPacketFilter() *schema.Resource {
@@ -37,21 +38,19 @@ func resourceSakuraCloudPacketFilter() *schema.Resource {
 						"protocol": {
 							Type:         schema.TypeString,
 							Required:     true,
-							ValidateFunc: validation.StringInSlice(sacloud.AllowPacketFilterProtocol(), false),
+							ValidateFunc: validation.StringInSlice(types.PacketFilterProtocolsStrings(), false),
 						},
-
-						"source_nw": {
+						"source_network": {
 							Type:     schema.TypeString,
 							Optional: true,
 							Default:  "",
 						},
-
 						"source_port": {
 							Type:     schema.TypeString,
 							Optional: true,
 							Default:  "",
 						},
-						"dest_port": {
+						"destination_port": {
 							Type:     schema.TypeString,
 							Optional: true,
 							Default:  "",
@@ -82,188 +81,138 @@ func resourceSakuraCloudPacketFilter() *schema.Resource {
 }
 
 func resourceSakuraCloudPacketFilterCreate(d *schema.ResourceData, meta interface{}) error {
-	client := getSacloudAPIClient(d, meta)
+	client, ctx, zone := getSacloudV2Client(d, meta)
+	pfOp := sacloud.NewPacketFilterOp(client)
 
-	opts := client.PacketFilter.New()
-
-	opts.Name = d.Get("name").(string)
-	if description, ok := d.GetOk("description"); ok {
-		opts.Description = description.(string)
-	}
-
-	if rawExpressions, ok := d.GetOk("expressions"); ok {
-		expressions := rawExpressions.([]interface{})
-		for _, e := range expressions {
-			exp := e.(map[string]interface{})
-			protocol := exp["protocol"].(string)
-			sourceNW := exp["source_nw"].(string)
-			sourcePort := exp["source_port"].(string)
-			destPort := exp["dest_port"].(string)
-			allow := exp["allow"].(bool)
-			desc := exp["description"].(string)
-
-			var err error
-			switch protocol {
-			case "tcp":
-				_, err = opts.AddTCPRule(sourceNW, sourcePort, destPort, desc, allow)
-			case "udp":
-				_, err = opts.AddUDPRule(sourceNW, sourcePort, destPort, desc, allow)
-			case "icmp":
-				_, err = opts.AddICMPRule(sourceNW, desc, allow)
-			case "fragment":
-				_, err = opts.AddFragmentRule(sourceNW, desc, allow)
-			case "ip":
-				_, err = opts.AddIPRule(sourceNW, desc, allow)
-			}
-
-			if err != nil {
-				return err
-			}
-
-		}
-	}
-
-	filter, err := client.PacketFilter.Create(opts)
+	pf, err := pfOp.Create(ctx, zone, &sacloud.PacketFilterCreateRequest{
+		Name:        d.Get("name").(string),
+		Description: d.Get("description").(string),
+		Expression:  expandPacketFilterExpressions(d),
+	})
 	if err != nil {
-		return fmt.Errorf("Failed to create SakuraCloud PacketFilter resource: %s", err)
+		return fmt.Errorf("creating SakuraCloud PacketFilter is failed: %s", err)
 	}
 
-	d.SetId(filter.GetStrID())
+	d.SetId(pf.ID.String())
 	return resourceSakuraCloudPacketFilterRead(d, meta)
 }
 
 func resourceSakuraCloudPacketFilterRead(d *schema.ResourceData, meta interface{}) error {
-	client := getSacloudAPIClient(d, meta)
+	client, ctx, zone := getSacloudV2Client(d, meta)
+	pfOp := sacloud.NewPacketFilterOp(client)
 
-	filter, err := client.PacketFilter.Read(toSakuraCloudID(d.Id()))
+	pf, err := pfOp.Read(ctx, zone, types.StringID(d.Id()))
 	if err != nil {
-		if sacloudErr, ok := err.(api.Error); ok && sacloudErr.ResponseCode() == 404 {
+		if sacloud.IsNotFoundError(err) {
 			d.SetId("")
 			return nil
 		}
-		return fmt.Errorf("Couldn't find SakuraCloud PacketFilter resource: %s", err)
+		return fmt.Errorf("could not read SakuraCloud PacketFilter: %s", err)
 	}
 
-	return setPacketFilterResourceData(d, client, filter)
+	return setPacketFilterResourceData(ctx, d, client, pf)
 }
 
 func resourceSakuraCloudPacketFilterUpdate(d *schema.ResourceData, meta interface{}) error {
-	client := getSacloudAPIClient(d, meta)
+	client, ctx, zone := getSacloudV2Client(d, meta)
+	pfOp := sacloud.NewPacketFilterOp(client)
 
-	filter, err := client.PacketFilter.Read(toSakuraCloudID(d.Id()))
+	pf, err := pfOp.Read(ctx, zone, types.StringID(d.Id()))
 	if err != nil {
-		return fmt.Errorf("Couldn't find SakuraCloud PacketFilter resource: %s", err)
+		return fmt.Errorf("could not read SakuraCloud PacketFilter: %s", err)
 	}
 
-	if d.HasChange("name") {
-		filter.Name = d.Get("name").(string)
-	}
-	if d.HasChange("description") {
-		if description, ok := d.GetOk("description"); ok {
-			filter.Description = description.(string)
-		} else {
-			filter.Description = ""
-		}
-	}
-
-	if d.HasChange("expressions") {
-		filter.ClearRules()
-		if rawExpressions, ok := d.GetOk("expressions"); ok {
-			expressions := rawExpressions.([]interface{})
-			for _, e := range expressions {
-				exp := e.(map[string]interface{})
-				protocol := exp["protocol"].(string)
-				sourceNW := exp["source_nw"].(string)
-				sourcePort := exp["source_port"].(string)
-				destPort := exp["dest_port"].(string)
-				allow := exp["allow"].(bool)
-				desc := exp["description"].(string)
-
-				var err error
-				switch protocol {
-				case "tcp":
-					_, err = filter.AddTCPRule(sourceNW, sourcePort, destPort, desc, allow)
-				case "udp":
-					_, err = filter.AddUDPRule(sourceNW, sourcePort, destPort, desc, allow)
-				case "icmp":
-					_, err = filter.AddICMPRule(sourceNW, desc, allow)
-				case "fragment":
-					_, err = filter.AddFragmentRule(sourceNW, desc, allow)
-				case "ip":
-					_, err = filter.AddIPRule(sourceNW, desc, allow)
-				}
-
-				if err != nil {
-					return err
-				}
-
-			}
-		}
-
-	}
-
-	filter, err = client.PacketFilter.Update(filter.ID, filter)
+	_, err = pfOp.Update(ctx, zone, pf.ID, &sacloud.PacketFilterUpdateRequest{
+		Name:        d.Get("name").(string),
+		Description: d.Get("description").(string),
+		Expression:  expandPacketFilterExpressions(d),
+	})
 	if err != nil {
-		return fmt.Errorf("Error updating SakuraCloud PacketFilter resource: %s", err)
+		return fmt.Errorf("updating SakuraCloud PacketFilter is failed: %s", err)
 	}
 
 	return resourceSakuraCloudPacketFilterRead(d, meta)
 }
 
 func resourceSakuraCloudPacketFilterDelete(d *schema.ResourceData, meta interface{}) error {
-	client := getSacloudAPIClient(d, meta)
+	client, ctx, zone := getSacloudV2Client(d, meta)
+	pfOp := sacloud.NewPacketFilterOp(client)
 
-	servers, err := client.Server.Find()
+	pf, err := pfOp.Read(ctx, zone, types.StringID(d.Id()))
 	if err != nil {
-		return fmt.Errorf("Couldn't find SakuraCloud Server resource: %s", err)
-	}
-	for _, server := range servers.Servers {
-		for _, i := range server.Interfaces {
-			if i.PacketFilter != nil && i.PacketFilter.GetStrID() == d.Id() {
-				_, err := client.Interface.DisconnectFromPacketFilter(i.ID)
-				if err != nil {
-					return fmt.Errorf("Error disconnecting SakuraCloud PacketFilter : %s", err)
-				}
-			}
+		if sacloud.IsNotFoundError(err) {
+			d.SetId("")
+			return nil
 		}
+		return fmt.Errorf("could not read SakuraCloud PacketFilter: %s", err)
 	}
 
-	_, err = client.PacketFilter.Delete(toSakuraCloudID(d.Id()))
-	if err != nil {
-		return fmt.Errorf("Error deleting SakuraCloud PacketFilter resource: %s", err)
+	if err := pfOp.Delete(ctx, zone, pf.ID); err != nil {
+		return fmt.Errorf("deleting SakuraCloud PacketFilter is failed: %s", err)
 	}
 	return nil
 }
 
-func setPacketFilterResourceData(d *schema.ResourceData, client *APIClient, data *sacloud.PacketFilter) error {
+func setPacketFilterResourceData(ctx context.Context, d *schema.ResourceData, client *APIClient, data *sacloud.PacketFilter) error {
 	d.Set("name", data.Name)
 	d.Set("description", data.Description)
+	if err := d.Set("expressions", flattenPacketFilterExpressions(data)); err != nil {
+		return err
+	}
+	d.Set("zone", getV2Zone(d, client))
+	return nil
+}
 
-	if data.Expression != nil && len(data.Expression) > 0 {
-		expressions := []interface{}{}
-		for _, exp := range data.Expression {
+func flattenPacketFilterExpressions(pf *sacloud.PacketFilter) []interface{} {
+	var expressions []interface{}
+	if len(pf.Expression) > 0 {
+		for _, exp := range pf.Expression {
 			expression := map[string]interface{}{}
 			protocol := exp.Protocol
 			switch protocol {
-			case "tcp", "udp":
-				expression["source_nw"] = exp.SourceNetwork
+			case types.Protocols.TCP, types.Protocols.UDP:
+				expression["source_network"] = exp.SourceNetwork
 				expression["source_port"] = exp.SourcePort
-				expression["dest_port"] = exp.DestinationPort
-			case "icmp", "fragment", "ip":
-				expression["source_nw"] = exp.SourceNetwork
+				expression["destination_port"] = exp.DestinationPort
+			case types.Protocols.ICMP, types.Protocols.Fragment, types.Protocols.IP:
+				expression["source_network"] = exp.SourceNetwork
 			}
-
 			expression["protocol"] = exp.Protocol
-			expression["allow"] = (exp.Action == "allow")
+			expression["allow"] = exp.Action.IsAllow()
 			expression["description"] = exp.Description
 
 			expressions = append(expressions, expression)
 		}
-		d.Set("expressions", expressions)
-	} else {
-		d.Set("expressions", []interface{}{})
+	}
+	return expressions
+}
+
+func expandPacketFilterExpressions(d resourceValueGettable) []*sacloud.PacketFilterExpression {
+	var expressions []*sacloud.PacketFilterExpression
+	for _, e := range d.Get("expressions").([]interface{}) {
+		expressions = append(expressions, expandPacketFilterExpression(&resourceMapValue{value: e.(map[string]interface{})}))
+	}
+	return expressions
+}
+
+func expandPacketFilterExpression(d resourceValueGettable) *sacloud.PacketFilterExpression {
+	action := "deny"
+	if d.Get("allow").(bool) {
+		action = "allow"
 	}
 
-	d.Set("zone", client.Zone)
-	return nil
+	exp := &sacloud.PacketFilterExpression{
+		Protocol:      types.Protocol(d.Get("protocol").(string)),
+		SourceNetwork: types.PacketFilterNetwork(d.Get("source_network").(string)),
+		Action:        types.Action(action),
+		Description:   d.Get("description").(string),
+	}
+	if v, ok := d.GetOk("source_port"); ok {
+		exp.SourcePort = types.PacketFilterPort(v.(string))
+	}
+	if v, ok := d.GetOk("destination_port"); ok {
+		exp.DestinationPort = types.PacketFilterPort(v.(string))
+	}
+
+	return exp
 }

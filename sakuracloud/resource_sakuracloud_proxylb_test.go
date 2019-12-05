@@ -1,6 +1,7 @@
 package sakuracloud
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"os"
@@ -9,7 +10,8 @@ import (
 
 	"github.com/hashicorp/terraform/helper/resource"
 	"github.com/hashicorp/terraform/terraform"
-	"github.com/sacloud/libsacloud/sacloud"
+	"github.com/sacloud/libsacloud/v2/sacloud"
+	"github.com/sacloud/libsacloud/v2/sacloud/types"
 )
 
 const (
@@ -126,43 +128,41 @@ func testAccCheckSakuraCloudProxyLBExists(n string, proxylb *sacloud.ProxyLB) re
 		rs, ok := s.RootModule().Resources[n]
 
 		if !ok {
-			return fmt.Errorf("Not found: %s", n)
+			return fmt.Errorf("not found: %s", n)
 		}
 
 		if rs.Primary.ID == "" {
-			return errors.New("No ProxyLB ID is set")
+			return errors.New("no ProxyLB ID is set")
 		}
 
 		client := testAccProvider.Meta().(*APIClient)
+		proxyLBOp := sacloud.NewProxyLBOp(client)
 
-		foundProxyLB, err := client.ProxyLB.Read(toSakuraCloudID(rs.Primary.ID))
-
+		foundProxyLB, err := proxyLBOp.Read(context.Background(), types.StringID(rs.Primary.ID))
 		if err != nil {
 			return err
 		}
 
-		if foundProxyLB.ID != toSakuraCloudID(rs.Primary.ID) {
-			return errors.New("Resource not found")
+		if foundProxyLB.ID.String() != rs.Primary.ID {
+			return fmt.Errorf("not found ProxyLB: %s", rs.Primary.ID)
 		}
-
 		*proxylb = *foundProxyLB
-
 		return nil
 	}
 }
 
 func testAccCheckSakuraCloudProxyLBDestroy(s *terraform.State) error {
 	client := testAccProvider.Meta().(*APIClient)
+	proxyLBOp := sacloud.NewProxyLBOp(client)
 
 	for _, rs := range s.RootModule().Resources {
 		if rs.Type != "sakuracloud_proxylb" {
 			continue
 		}
 
-		_, err := client.ProxyLB.Read(toSakuraCloudID(rs.Primary.ID))
-
+		_, err := proxyLBOp.Read(context.Background(), types.StringID(rs.Primary.ID))
 		if err == nil {
-			return errors.New("ProxyLB still exists")
+			return fmt.Errorf("still exists ProxyLB: %s", rs.Primary.ID)
 		}
 	}
 
@@ -192,6 +192,8 @@ func TestAccImportSakuraCloudProxyLB(t *testing.T) {
 			"name":                      "terraform-test-proxylb-import",
 			"vip_failover":              "true",
 			"sticky_session":            "true",
+			"timeout":                   "10",
+			"region":                    "is1",
 			"health_check.0.protocol":   "tcp",
 			"health_check.0.delay_loop": "20",
 			"description":               "ProxyLB from TerraForm for SAKURA CLOUD",
@@ -240,6 +242,8 @@ resource "sakuracloud_proxylb" "foobar" {
   plan = 5000
   vip_failover = true
   sticky_session = true
+  timeout = 10
+  region = "is1"
   health_check {
     protocol = "http"
     delay_loop = 10
@@ -284,6 +288,8 @@ resource "sakuracloud_proxylb" "foobar" {
   plan = 5000
   vip_failover = true
   sticky_session = false
+  timeout = 10
+  region = "is1"
   health_check {
     protocol = "tcp"
     delay_loop = 20
@@ -313,6 +319,8 @@ resource "sakuracloud_proxylb" "foobar" {
   name = "terraform-test-proxylb-import"
   vip_failover = true
   sticky_session = true
+  timeout = 10
+  region = "is1"
   health_check {
     protocol = "tcp"
     delay_loop = 20

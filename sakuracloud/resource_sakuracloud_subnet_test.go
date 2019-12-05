@@ -1,13 +1,15 @@
 package sakuracloud
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"testing"
 
 	"github.com/hashicorp/terraform/helper/resource"
 	"github.com/hashicorp/terraform/terraform"
-	"github.com/sacloud/libsacloud/sacloud"
+	"github.com/sacloud/libsacloud/v2/sacloud"
+	"github.com/sacloud/libsacloud/v2/sacloud/types"
 )
 
 func TestAccResourceSakuraCloudSubnet(t *testing.T) {
@@ -49,35 +51,36 @@ func testAccCheckSakuraCloudSubnetExists(n string, subnet *sacloud.Subnet) resou
 		}
 
 		client := testAccProvider.Meta().(*APIClient)
+		subnetOp := sacloud.NewSubnetOp(client)
+		zone := rs.Primary.Attributes["zone"]
 
-		foundSubnet, err := client.Subnet.Read(toSakuraCloudID(rs.Primary.ID))
-
+		foundSubnet, err := subnetOp.Read(context.Background(), zone, types.StringID(rs.Primary.ID))
 		if err != nil {
 			return err
 		}
 
-		if foundSubnet.ID != toSakuraCloudID(rs.Primary.ID) {
-			return errors.New("Subnet not found")
+		if foundSubnet.ID.String() != rs.Primary.ID {
+			return fmt.Errorf("not found Subnet: %s", rs.Primary.ID)
 		}
 
 		*subnet = *foundSubnet
-
 		return nil
 	}
 }
 
 func testAccCheckSakuraCloudSubnetDestroy(s *terraform.State) error {
 	client := testAccProvider.Meta().(*APIClient)
+	subnetOp := sacloud.NewSubnetOp(client)
 
 	for _, rs := range s.RootModule().Resources {
 		if rs.Type != "sakuracloud_subnet" {
 			continue
 		}
 
-		_, err := client.Subnet.Read(toSakuraCloudID(rs.Primary.ID))
-
+		zone := rs.Primary.Attributes["zone"]
+		_, err := subnetOp.Read(context.Background(), zone, types.StringID(rs.Primary.ID))
 		if err == nil {
-			return errors.New("Subnet still exists")
+			return fmt.Errorf("still exists Subnet: %s", rs.Primary.ID)
 		}
 	}
 
@@ -86,18 +89,18 @@ func testAccCheckSakuraCloudSubnetDestroy(s *terraform.State) error {
 
 var testAccCheckSakuraCloudSubnetConfig_basic = `
 resource sakuracloud_internet "foobar" {
-    name = "myinternet"
+  name = "myinternet"
 }
 resource "sakuracloud_subnet" "foobar" {
-    internet_id = "${sakuracloud_internet.foobar.id}"
-    next_hop = "${sakuracloud_internet.foobar.min_ipaddress}"
+  internet_id = "${sakuracloud_internet.foobar.id}"
+  next_hop    = "${sakuracloud_internet.foobar.min_ipaddress}"
 }`
 
 var testAccCheckSakuraCloudSubnetConfig_update = `
 resource sakuracloud_internet "foobar" {
-    name = "myinternet"
+  name = "myinternet"
 }
 resource "sakuracloud_subnet" "foobar" {
-    internet_id = "${sakuracloud_internet.foobar.id}"
-    next_hop = "${sakuracloud_internet.foobar.max_ipaddress}"
+  internet_id = "${sakuracloud_internet.foobar.id}"
+  next_hop    = "${sakuracloud_internet.foobar.max_ipaddress}"
 }`

@@ -1,7 +1,6 @@
 package sakuracloud
 
 import (
-	"context"
 	"fmt"
 
 	"github.com/hashicorp/terraform/helper/schema"
@@ -28,6 +27,14 @@ func dataSourceSakuraCloudProxyLB() *schema.Resource {
 			},
 			"sticky_session": {
 				Type:     schema.TypeBool,
+				Computed: true,
+			},
+			"timeout": {
+				Type:     schema.TypeInt,
+				Computed: true,
+			},
+			"region": {
+				Type:     schema.TypeString,
 				Computed: true,
 			},
 			"bind_ports": {
@@ -205,9 +212,8 @@ func dataSourceSakuraCloudProxyLB() *schema.Resource {
 }
 
 func dataSourceSakuraCloudProxyLBRead(d *schema.ResourceData, meta interface{}) error {
-	client := getSacloudAPIClient(d, meta)
+	client, ctx, _ := getSacloudV2Client(d, meta)
 	searcher := sacloud.NewProxyLBOp(client)
-	ctx := context.Background()
 
 	findCondition := &sacloud.FindCondition{
 		Count: defaultSearchLimit,
@@ -226,108 +232,5 @@ func dataSourceSakuraCloudProxyLBRead(d *schema.ResourceData, meta interface{}) 
 
 	targets := res.ProxyLBs
 	d.SetId(targets[0].ID.String())
-	return setProxyLBV2ResourceData(ctx, d, client, targets[0])
-}
-
-func setProxyLBV2ResourceData(ctx context.Context, d *schema.ResourceData, client *APIClient, data *sacloud.ProxyLB) error {
-	// bind ports
-	var bindPorts []map[string]interface{}
-	for _, bindPort := range data.BindPorts {
-		var headers []interface{}
-		for _, header := range bindPort.AddResponseHeader {
-			headers = append(headers, map[string]interface{}{
-				"header": header.Header,
-				"value":  header.Value,
-			})
-		}
-
-		bindPorts = append(bindPorts, map[string]interface{}{
-			"proxy_mode":        bindPort.ProxyMode,
-			"port":              bindPort.Port,
-			"redirect_to_https": bindPort.RedirectToHTTPS,
-			"support_http2":     bindPort.SupportHTTP2,
-			"response_header":   headers,
-		})
-	}
-
-	//health_check
-	hc := data.HealthCheck
-	healthChecks := []map[string]interface{}{
-		{
-			"protocol":    hc.Protocol,
-			"delay_loop":  hc.DelayLoop,
-			"host_header": hc.Host,
-			"path":        hc.Path,
-		},
-	}
-
-	// sorry server
-	ss := data.SorryServer
-	var sorryServers []map[string]interface{}
-	if ss.IPAddress != "" {
-		sorryServers = append(sorryServers, map[string]interface{}{
-			"ipaddress": ss.IPAddress,
-			"port":      ss.Port,
-		})
-	}
-
-	// servers
-	var servers []map[string]interface{}
-	for _, server := range data.Servers {
-		servers = append(servers, map[string]interface{}{
-			"ipaddress": server.IPAddress,
-			"port":      server.Port,
-			"enabled":   server.Enabled,
-		})
-	}
-
-	// certificates
-	proxyLBOp := sacloud.NewProxyLBOp(client)
-	cert, err := proxyLBOp.GetCertificates(ctx, data.ID)
-	if err != nil {
-		// even if certificate is deleted, it will not result in an error
-		return err
-	}
-
-	proxylbCert := map[string]interface{}{
-		"server_cert":       cert.ServerCertificate,
-		"intermediate_cert": cert.IntermediateCertificate,
-		"private_key":       cert.PrivateKey,
-		//"common_name":       cert.CertificateCommonName,
-		//"end_date":          cert.CertificateEndDate.Format(time.RFC3339),
-	}
-	if len(cert.AdditionalCerts) > 0 {
-		var certs []interface{}
-		for _, cert := range cert.AdditionalCerts {
-			certs = append(certs, map[string]interface{}{
-				"server_cert":       cert.ServerCertificate,
-				"intermediate_cert": cert.IntermediateCertificate,
-				"private_key":       cert.PrivateKey,
-				//"common_name":       cert.CertificateCommonName,
-				//"end_date":          cert.CertificateEndDate.Format(time.RFC3339),
-			})
-		}
-		proxylbCert["additional_certificates"] = certs
-	} else {
-		proxylbCert["additional_certificates"] = []interface{}{}
-	}
-
-	return setResourceData(d, map[string]interface{}{
-		"name":           data.Name,
-		"plan":           int(data.Plan),
-		"vip_failover":   data.UseVIPFailover,
-		"sticky_session": data.StickySession.Enabled,
-		"bind_ports":     bindPorts,
-		"health_check":   healthChecks,
-		"sorry_server":   sorryServers,
-		"servers":        servers,
-		"fqdn":           data.FQDN,
-		"vip":            data.VirtualIPAddress,
-		"proxy_networks": data.ProxyNetworks,
-		"icon_id":        data.IconID.String(),
-		"description":    data.Description,
-		"tags":           data.Tags,
-		"certificate":    []interface{}{proxylbCert},
-	})
-
+	return setProxyLBResourceData(ctx, d, client, targets[0])
 }

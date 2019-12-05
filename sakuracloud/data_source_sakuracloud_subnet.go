@@ -1,7 +1,6 @@
 package sakuracloud
 
 import (
-	"context"
 	"fmt"
 
 	"github.com/hashicorp/terraform/helper/schema"
@@ -68,12 +67,9 @@ func dataSourceSakuraCloudSubnet() *schema.Resource {
 }
 
 func dataSourceSakuraCloudSubnetRead(d *schema.ResourceData, meta interface{}) error {
-	client := getSacloudAPIClient(d, meta)
+	client, ctx, zone := getSacloudV2Client(d, meta)
 	internetOp := sacloud.NewInternetOp(client)
 	subnetOp := sacloud.NewSubnetOp(client)
-
-	ctx := context.Background()
-	zone := getV2Zone(d, client)
 
 	internetID := types.StringID(d.Get("internet_id").(string))
 	subnetIndex := d.Get("index").(int)
@@ -93,30 +89,5 @@ func dataSourceSakuraCloudSubnetRead(d *schema.ResourceData, meta interface{}) e
 	}
 
 	d.SetId(subnetID.String())
-	return setSubnetV2ResourceData(ctx, d, client, subnet)
-}
-
-func setSubnetV2ResourceData(ctx context.Context, d *schema.ResourceData, client *APIClient, data *sacloud.Subnet) error {
-	if data.SwitchID.IsEmpty() {
-		return fmt.Errorf("error reading SakuraCloud Subnet resource: %s", "switch is nil")
-	}
-	if data.InternetID.IsEmpty() {
-		return fmt.Errorf("error reading SakuraCloud Subnet resource: %s", "internet is nil")
-	}
-	var addrs []string
-	for _, ip := range data.IPAddresses {
-		addrs = append(addrs, ip.IPAddress)
-	}
-
-	return setResourceData(d, map[string]interface{}{
-		"switch_id":     data.SwitchID.String(),
-		"internet_id":   data.InternetID.String(),
-		"nw_mask_len":   data.NetworkMaskLen,
-		"next_hop":      data.NextHop,
-		"nw_address":    data.NetworkAddress,
-		"min_ipaddress": data.IPAddresses[0].IPAddress,
-		"max_ipaddress": data.IPAddresses[len(data.IPAddresses)-1].IPAddress,
-		"ipaddresses":   addrs,
-		"zone":          getV2Zone(d, client),
-	})
+	return setSubnetResourceData(ctx, d, client, subnet)
 }

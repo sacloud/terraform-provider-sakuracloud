@@ -1,11 +1,13 @@
 package sakuracloud
 
 import (
+	"context"
 	"fmt"
 
 	"github.com/hashicorp/terraform/helper/schema"
-	"github.com/sacloud/libsacloud/api"
-	"github.com/sacloud/libsacloud/sacloud"
+	"github.com/hashicorp/terraform/helper/validation"
+	"github.com/sacloud/libsacloud/v2/sacloud"
+	"github.com/sacloud/libsacloud/v2/sacloud/types"
 )
 
 func resourceSakuraCloudSubnet() *schema.Resource {
@@ -29,7 +31,7 @@ func resourceSakuraCloudSubnet() *schema.Resource {
 				Type:         schema.TypeInt,
 				ForceNew:     true,
 				Optional:     true,
-				ValidateFunc: validateIntInWord([]string{"28", "27", "26"}),
+				ValidateFunc: validation.IntInSlice([]int{28, 27, 26}),
 				Default:      28,
 			},
 			"next_hop": {
@@ -70,94 +72,115 @@ func resourceSakuraCloudSubnet() *schema.Resource {
 }
 
 func resourceSakuraCloudSubnetCreate(d *schema.ResourceData, meta interface{}) error {
+	client, ctx, zone := getSacloudV2Client(d, meta)
+	internetOp := sacloud.NewInternetOp(client)
 
-	client := getSacloudAPIClient(d, meta)
+	internetID := d.Get("internet_id").(string)
 
-	internetID := toSakuraCloudID(d.Get("internet_id").(string))
-	nwMaskLen := d.Get("nw_mask_len").(int)
-	nextHop := d.Get("next_hop").(string)
+	sakuraMutexKV.Lock(internetID)
+	defer sakuraMutexKV.Unlock(internetID)
 
-	subnet, err := client.Internet.AddSubnet(internetID, nwMaskLen, nextHop)
+	internet, err := internetOp.Read(ctx, zone, types.StringID(internetID))
 	if err != nil {
-		return fmt.Errorf("Failed to create SakuraCloud Subnet resource: %s", err)
+		return fmt.Errorf("could not read SakuraCloud Internet: %s", err)
 	}
 
-	d.SetId(subnet.GetStrID())
+	subnet, err := internetOp.AddSubnet(ctx, zone, internet.ID, &sacloud.InternetAddSubnetRequest{
+		NetworkMaskLen: d.Get("nw_mask_len").(int),
+		NextHop:        d.Get("next_hop").(string),
+	})
+	if err != nil {
+		return fmt.Errorf("adding Subnet is failed: %s", err)
+	}
+
+	d.SetId(subnet.ID.String())
 	return resourceSakuraCloudSubnetRead(d, meta)
 }
 
 func resourceSakuraCloudSubnetRead(d *schema.ResourceData, meta interface{}) error {
-	client := getSacloudAPIClient(d, meta)
+	client, ctx, zone := getSacloudV2Client(d, meta)
+	subnetOp := sacloud.NewSubnetOp(client)
 
-	subnet, err := client.Subnet.Read(toSakuraCloudID(d.Id()))
+	subnet, err := subnetOp.Read(ctx, zone, types.StringID(d.Id()))
 	if err != nil {
-		if sacloudErr, ok := err.(api.Error); ok && sacloudErr.ResponseCode() == 404 {
+		if sacloud.IsNotFoundError(err) {
 			d.SetId("")
 			return nil
 		}
-		return fmt.Errorf("Couldn't find SakuraCloud Subnet resource: %s", err)
+		return fmt.Errorf("could not read Subnet: %s", err)
 	}
-
-	return setSubnetResourceData(d, client, subnet)
+	return setSubnetResourceData(ctx, d, client, subnet)
 }
 
 func resourceSakuraCloudSubnetUpdate(d *schema.ResourceData, meta interface{}) error {
-	client := getSacloudAPIClient(d, meta)
+	client, ctx, zone := getSacloudV2Client(d, meta)
+	subnetOp := sacloud.NewSubnetOp(client)
+	internetOp := sacloud.NewInternetOp(client)
 
-	if d.HasChange("next_hop") {
-		internetID := toSakuraCloudID(d.Get("internet_id").(string))
-		subnet, err := client.Subnet.Read(toSakuraCloudID(d.Id()))
-		if err != nil {
-			return fmt.Errorf("Couldn't find SakuraCloud Subnet resource: %s", err)
-		}
+	internetID := d.Get("internet_id").(string)
 
-		subnet, err = client.Internet.UpdateSubnet(internetID, subnet.ID, d.Get("next_hop").(string))
-		if err != nil {
-			return fmt.Errorf("Error updating SakuraCloud Subnet resource: %s", err)
-		}
+	sakuraMutexKV.Lock(internetID)
+	defer sakuraMutexKV.Unlock(internetID)
 
+	subnet, err := subnetOp.Read(ctx, zone, types.StringID(d.Id()))
+	if err != nil {
+		return fmt.Errorf("could not read Subnet: %s", err)
 	}
 
+	_, err = internetOp.UpdateSubnet(ctx, zone, types.StringID(internetID), subnet.ID, &sacloud.InternetUpdateSubnetRequest{
+		NextHop: d.Get("next_hop").(string),
+	})
+	if err != nil {
+		return fmt.Errorf("updating Subnet is failed: %s", err)
+	}
 	return resourceSakuraCloudSubnetRead(d, meta)
 }
 
 func resourceSakuraCloudSubnetDelete(d *schema.ResourceData, meta interface{}) error {
-	client := getSacloudAPIClient(d, meta)
+	client, ctx, zone := getSacloudV2Client(d, meta)
+	subnetOp := sacloud.NewSubnetOp(client)
+	internetOp := sacloud.NewInternetOp(client)
 
-	internetID := toSakuraCloudID(d.Get("internet_id").(string))
-	_, err := client.Internet.DeleteSubnet(internetID, toSakuraCloudID(d.Id()))
+	internetID := d.Get("internet_id").(string)
+
+	sakuraMutexKV.Lock(internetID)
+	defer sakuraMutexKV.Unlock(internetID)
+
+	subnet, err := subnetOp.Read(ctx, zone, types.StringID(d.Id()))
 	if err != nil {
-		return fmt.Errorf("Error deleting SakuraCloud Subnet resource: %s", err)
+		if sacloud.IsNotFoundError(err) {
+			d.SetId("")
+			return nil
+		}
+		return fmt.Errorf("could not read Subnet: %s", err)
 	}
 
+	if err := internetOp.DeleteSubnet(ctx, zone, types.StringID(internetID), subnet.ID); err != nil {
+		return fmt.Errorf("deleting Subnet is failed: %s", err)
+	}
 	return nil
 }
 
-func setSubnetResourceData(d *schema.ResourceData, client *APIClient, data *sacloud.Subnet) error {
-
-	if data.Switch == nil {
-		return fmt.Errorf("Error reading SakuraCloud Subnet resource: %s", "switch is nil")
+func setSubnetResourceData(ctx context.Context, d *schema.ResourceData, client *APIClient, data *sacloud.Subnet) error {
+	if data.SwitchID.IsEmpty() {
+		return fmt.Errorf("error reading SakuraCloud Subnet resource: %s", "switch is nil")
 	}
-	if data.Switch.Internet == nil {
-		return fmt.Errorf("Error reading SakuraCloud Subnet resource: %s", "internet is nil")
+	if data.InternetID.IsEmpty() {
+		return fmt.Errorf("error reading SakuraCloud Subnet resource: %s", "internet is nil")
 	}
-	d.Set("switch_id", data.Switch.ID)
-	d.Set("internet_id", data.Switch.Internet.ID)
-
-	d.Set("nw_mask_len", data.NetworkMaskLen)
-	d.Set("next_hop", data.NextHop)
-	d.Set("zone", client.Zone)
-
-	d.Set("nw_address", data.NetworkAddress)
-
-	d.Set("min_ipaddress", data.IPAddresses[0].IPAddress)
-	d.Set("max_ipaddress", data.IPAddresses[len(data.IPAddresses)-1].IPAddress)
-
-	addrs := []string{}
+	var addrs []string
 	for _, ip := range data.IPAddresses {
 		addrs = append(addrs, ip.IPAddress)
 	}
-	d.Set("ipaddresses", addrs)
 
+	d.Set("switch_id", data.SwitchID.String())
+	d.Set("internet_id", data.InternetID.String())
+	d.Set("nw_mask_len", data.NetworkMaskLen)
+	d.Set("next_hop", data.NextHop)
+	d.Set("nw_address", data.NetworkAddress)
+	d.Set("min_ipaddress", data.IPAddresses[0].IPAddress)
+	d.Set("max_ipaddress", data.IPAddresses[len(data.IPAddresses)-1].IPAddress)
+	d.Set("ipaddresses", addrs)
+	d.Set("zone", getV2Zone(d, client))
 	return nil
 }

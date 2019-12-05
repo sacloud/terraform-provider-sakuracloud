@@ -1,6 +1,7 @@
 package sakuracloud
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"os"
@@ -8,7 +9,8 @@ import (
 
 	"github.com/hashicorp/terraform/helper/resource"
 	"github.com/hashicorp/terraform/terraform"
-	"github.com/sacloud/libsacloud/sacloud"
+	"github.com/sacloud/libsacloud/v2/sacloud"
+	"github.com/sacloud/libsacloud/v2/sacloud/types"
 )
 
 func TestAccResourceSakuraCloudAutoBackup(t *testing.T) {
@@ -43,8 +45,8 @@ func TestAccResourceSakuraCloudAutoBackup(t *testing.T) {
 					testAccCheckSakuraCloudAutoBackupExists("sakuracloud_auto_backup.foobar", &autoBackup),
 					resource.TestCheckResourceAttr("sakuracloud_auto_backup.foobar", "name", "name_after"),
 					resource.TestCheckResourceAttr("sakuracloud_auto_backup.foobar", "weekdays.#", "2"),
-					resource.TestCheckResourceAttr("sakuracloud_auto_backup.foobar", "weekdays.0", "fri"),
-					resource.TestCheckResourceAttr("sakuracloud_auto_backup.foobar", "weekdays.1", "sun"),
+					resource.TestCheckResourceAttr("sakuracloud_auto_backup.foobar", "weekdays.0", "sun"),
+					resource.TestCheckResourceAttr("sakuracloud_auto_backup.foobar", "weekdays.1", "fri"),
 					resource.TestCheckResourceAttr("sakuracloud_auto_backup.foobar", "max_backup_num", "2"),
 					resource.TestCheckResourceAttr("sakuracloud_auto_backup.foobar", "description", "description_after"),
 					resource.TestCheckResourceAttr("sakuracloud_auto_backup.foobar", "tags.#", "2"),
@@ -62,23 +64,25 @@ func testAccCheckSakuraCloudAutoBackupExists(n string, auto_backup *sacloud.Auto
 		rs, ok := s.RootModule().Resources[n]
 
 		if !ok {
-			return fmt.Errorf("Not found: %s", n)
+			return fmt.Errorf("not found: %s", n)
 		}
 
 		if rs.Primary.ID == "" {
-			return errors.New("No AutoBackup ID is set")
+			return errors.New("no AutoBackup ID is set")
 		}
 
 		client := testAccProvider.Meta().(*APIClient)
+		autoBackupOp := sacloud.NewAutoBackupOp(client)
+		zone := rs.Primary.Attributes["zone"]
 
-		foundAutoBackup, err := client.AutoBackup.Read(toSakuraCloudID(rs.Primary.ID))
+		foundAutoBackup, err := autoBackupOp.Read(context.Background(), zone, types.StringID(rs.Primary.ID))
 
 		if err != nil {
 			return err
 		}
 
-		if foundAutoBackup.ID != toSakuraCloudID(rs.Primary.ID) {
-			return errors.New("Resource not found")
+		if foundAutoBackup.ID.String() != rs.Primary.ID {
+			return errors.New("resource not found")
 		}
 
 		*auto_backup = *foundAutoBackup
@@ -94,8 +98,9 @@ func testAccCheckSakuraCloudAutoBackupDestroy(s *terraform.State) error {
 		if rs.Type != "sakuracloud_auto_backup" {
 			continue
 		}
-
-		_, err := client.AutoBackup.Read(toSakuraCloudID(rs.Primary.ID))
+		autoBackupOp := sacloud.NewAutoBackupOp(client)
+		zone := rs.Primary.Attributes["zone"]
+		_, err := autoBackupOp.Read(context.Background(), zone, types.StringID(rs.Primary.ID))
 
 		if err == nil {
 			return errors.New("AutoBackup still exists")
@@ -149,16 +154,16 @@ func TestAccImportSakuraCloudAutoBackup(t *testing.T) {
 
 var testAccCheckSakuraCloudAutoBackupConfig_basic = `
 resource "sakuracloud_disk" "disk" {
-    name = "disk01"
+  name = "disk01"
 }
 resource "sakuracloud_auto_backup" "foobar" {
-    name = "name_before"
-    disk_id = "${sakuracloud_disk.disk.id}"
-    weekdays = ["wed","fri"]
-    max_backup_num = 1
-    description = "description_before"
-    tags = ["hoge1", "hoge2"]
-    icon_id = "${sakuracloud_icon.foobar.id}"
+  name = "name_before"
+  disk_id = "${sakuracloud_disk.disk.id}"
+  weekdays = ["wed","fri"]
+  max_backup_num = 1
+  description = "description_before"
+  tags = ["hoge1", "hoge2"]
+  icon_id = "${sakuracloud_icon.foobar.id}"
 }
 
 resource "sakuracloud_icon" "foobar" {
@@ -169,13 +174,13 @@ resource "sakuracloud_icon" "foobar" {
 
 var testAccCheckSakuraCloudAutoBackupConfig_update = `
 resource "sakuracloud_disk" "disk" {
-    name = "disk01"
+  name = "disk01"
 }
 resource "sakuracloud_auto_backup" "foobar" {
-    name = "name_after"
-    disk_id = "${sakuracloud_disk.disk.id}"
-    weekdays = ["fri","sun"]
-    max_backup_num = 2
-    description = "description_after"
-    tags = ["hoge1_after", "hoge2_after"]
+  name = "name_after"
+  disk_id = "${sakuracloud_disk.disk.id}"
+  weekdays = ["sun","fri"]
+  max_backup_num = 2
+  description = "description_after"
+  tags = ["hoge1_after", "hoge2_after"]
 }`

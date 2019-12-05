@@ -14,7 +14,7 @@ func TestAccSakuraCloudSubnetDataSource_Basic(t *testing.T) {
 		PreCheck:                  func() { testAccPreCheck(t) },
 		Providers:                 testAccProviders,
 		PreventPostDestroyRefresh: true,
-		CheckDestroy:              testAccCheckSakuraCloudSubnetDataSourceDestroy,
+		CheckDestroy:              testAccCheckSakuraCloudSubnetDestroy,
 
 		Steps: []resource.TestStep{
 			{
@@ -65,28 +65,6 @@ func testAccCheckSakuraCloudSubnetDataSourceNotExists(n string) resource.TestChe
 		}
 		return nil
 	}
-}
-
-func testAccCheckSakuraCloudSubnetDataSourceDestroy(s *terraform.State) error {
-	client := testAccProvider.Meta().(*APIClient)
-
-	for _, rs := range s.RootModule().Resources {
-		if rs.Type != "sakuracloud_subnet" {
-			continue
-		}
-
-		if rs.Primary.ID == "" {
-			continue
-		}
-
-		_, err := client.Subnet.Read(toSakuraCloudID(rs.Primary.ID))
-
-		if err == nil {
-			return errors.New("Subnet still exists")
-		}
-	}
-
-	return nil
 }
 
 var testAccCheckSakuraCloudDataSourceSubnetBase = `

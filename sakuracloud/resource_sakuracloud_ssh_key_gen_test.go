@@ -1,13 +1,15 @@
 package sakuracloud
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"testing"
 
 	"github.com/hashicorp/terraform/helper/resource"
 	"github.com/hashicorp/terraform/terraform"
-	"github.com/sacloud/libsacloud/sacloud"
+	"github.com/sacloud/libsacloud/v2/sacloud"
+	"github.com/sacloud/libsacloud/v2/sacloud/types"
 )
 
 func TestAccResourceSakuraCloudSSHKeyGen(t *testing.T) {
@@ -54,42 +56,43 @@ func testAccCheckSakuraCloudSSHKeyGenExists(n string, ssh_key *sacloud.SSHKey) r
 		rs, ok := s.RootModule().Resources[n]
 
 		if !ok {
-			return fmt.Errorf("Not found: %s", n)
+			return fmt.Errorf("not found: %s", n)
 		}
 
 		if rs.Primary.ID == "" {
-			return errors.New("No SSHKey ID is set")
+			return errors.New("no SSHKey ID is set")
 		}
 
 		client := testAccProvider.Meta().(*APIClient)
-		foundSSHKey, err := client.SSHKey.Read(toSakuraCloudID(rs.Primary.ID))
+		keyOp := sacloud.NewSSHKeyOp(client)
 
+		foundSSHKey, err := keyOp.Read(context.Background(), types.StringID(rs.Primary.ID))
 		if err != nil {
 			return err
 		}
 
-		if foundSSHKey.ID != toSakuraCloudID(rs.Primary.ID) {
-			return errors.New("SSHKey not found")
+		if foundSSHKey.ID.String() != rs.Primary.ID {
+			return fmt.Errorf("not found SSHKey: %s", rs.Primary)
 		}
 
 		*ssh_key = *foundSSHKey
-
 		return nil
 	}
 }
 
 func testAccCheckSakuraCloudSSHKeyGenDestroy(s *terraform.State) error {
 	client := testAccProvider.Meta().(*APIClient)
+	keyOp := sacloud.NewSSHKeyOp(client)
 
 	for _, rs := range s.RootModule().Resources {
 		if rs.Type != "sakuracloud_ssh_key_gen" {
 			continue
 		}
 
-		_, err := client.SSHKey.Read(toSakuraCloudID(rs.Primary.ID))
+		_, err := keyOp.Read(context.Background(), types.StringID(rs.Primary.ID))
 
 		if err == nil {
-			return errors.New("SSHKey still exists")
+			return fmt.Errorf("still exists SSHKey: %s", rs.Primary)
 		}
 	}
 
@@ -98,13 +101,13 @@ func testAccCheckSakuraCloudSSHKeyGenDestroy(s *terraform.State) error {
 
 var testAccCheckSakuraCloudSSHKeyGenConfig_basic = `
 resource "sakuracloud_ssh_key_gen" "foobar" {
-    name = "mykey"
-    description = "SSHKey from TerraForm for SAKURA CLOUD"
+  name        = "mykey"
+  description = "SSHKey from TerraForm for SAKURA CLOUD"
 }`
 
 var testAccCheckSakuraCloudSSHKeyGenConfig_with_pass_phrase = `
 resource "sakuracloud_ssh_key_gen" "foobar" {
-    name = "mykey"
-    pass_phrase = "DummyPassphrase"
-    description = "SSHKey from TerraForm for SAKURA CLOUD"
+  name        = "mykey"
+  pass_phrase = "DummyPassphrase"
+  description = "SSHKey from TerraForm for SAKURA CLOUD"
 }`

@@ -1,12 +1,14 @@
 package sakuracloud
 
 import (
+	"context"
 	"errors"
 	"testing"
 
 	"github.com/hashicorp/terraform/helper/resource"
 	"github.com/hashicorp/terraform/terraform"
-	"github.com/sacloud/libsacloud/sacloud"
+	"github.com/sacloud/libsacloud/v2/sacloud"
+	"github.com/sacloud/libsacloud/v2/sacloud/types"
 )
 
 func TestAccResourceSakuraCloudLoadBalancerServer(t *testing.T) {
@@ -62,15 +64,18 @@ func TestAccResourceSakuraCloudLoadBalancerServer(t *testing.T) {
 }
 
 func testAccCheckSakuraCloudLoadBalancerServerDestroy(s *terraform.State) error {
+	// TODO IDをパースしてLBのIDを取得すべき
+
 	client := testAccProvider.Meta().(*APIClient)
+	lbOp := sacloud.NewLoadBalancerOp(client)
 
 	for _, rs := range s.RootModule().Resources {
 		if rs.Type != "sakuracloud_load_balancer" {
 			continue
 		}
 
-		_, err := client.LoadBalancer.Read(toSakuraCloudID(rs.Primary.ID))
-
+		zone := rs.Primary.Attributes["zone"]
+		_, err := lbOp.Read(context.Background(), zone, types.StringID(rs.Primary.ID))
 		if err == nil {
 			return errors.New("LoadBalancer still exists")
 		}
@@ -81,53 +86,53 @@ func testAccCheckSakuraCloudLoadBalancerServerDestroy(s *terraform.State) error 
 
 var testAccCheckSakuraCloudLoadBalancerServerConfig_basic = `
 resource "sakuracloud_switch" "sw" {
-    name = "sw"
+  name = "sw"
 }
 resource "sakuracloud_load_balancer" "foobar" {
-    switch_id = "${sakuracloud_switch.sw.id}"
-    vrid = 1
-    ipaddress1 = "192.168.11.101"
-    nw_mask_len = 24
-    name = "name"
+  switch_id = "${sakuracloud_switch.sw.id}"
+  vrid = 1
+  ipaddress1 = "192.168.11.101"
+  nw_mask_len = 24
+  name = "name"
 }
 resource "sakuracloud_load_balancer_vip" "vip1" {
-    load_balancer_id = "${sakuracloud_load_balancer.foobar.id}"
-    vip = "192.168.11.201"
-    port = 80
+  load_balancer_id = "${sakuracloud_load_balancer.foobar.id}"
+  vip = "192.168.11.201"
+  port = 80
 }
 resource "sakuracloud_load_balancer_server" "server01"{
-    load_balancer_vip_id = "${sakuracloud_load_balancer_vip.vip1.id}"
-    ipaddress = "192.168.11.51"
-    check_protocol = "http"
-    check_path = "/"
-    check_status = "200"
+  load_balancer_vip_id = "${sakuracloud_load_balancer_vip.vip1.id}"
+  ipaddress = "192.168.11.51"
+  check_protocol = "http"
+  check_path = "/"
+  check_status = "200"
 }
 `
 
 var testAccCheckSakuraCloudLoadBalancerServerConfig_update = `
 resource "sakuracloud_switch" "sw" {
-    name = "sw"
+  name = "sw"
 }
 resource "sakuracloud_load_balancer" "foobar" {
-    switch_id = "${sakuracloud_switch.sw.id}"
-    vrid = 1
-    ipaddress1 = "192.168.11.101"
-    nw_mask_len = 24
-    name = "name"
+  switch_id = "${sakuracloud_switch.sw.id}"
+  vrid = 1
+  ipaddress1 = "192.168.11.101"
+  nw_mask_len = 24
+  name = "name"
 }
 resource "sakuracloud_load_balancer_vip" "vip1" {
-    load_balancer_id = "${sakuracloud_load_balancer.foobar.id}"
-    vip = "192.168.11.201"
-    port = 80
+  load_balancer_id = "${sakuracloud_load_balancer.foobar.id}"
+  vip = "192.168.11.201"
+  port = 80
 }
 resource "sakuracloud_load_balancer_server" "server01"{
-    load_balancer_vip_id = "${sakuracloud_load_balancer_vip.vip1.id}"
-    ipaddress = "192.168.11.51"
-    check_protocol = "ping"
+  load_balancer_vip_id = "${sakuracloud_load_balancer_vip.vip1.id}"
+  ipaddress = "192.168.11.51"
+  check_protocol = "ping"
 }
 resource "sakuracloud_load_balancer_server" "server02"{
-    load_balancer_vip_id = "${sakuracloud_load_balancer_vip.vip1.id}"
-    ipaddress = "192.168.11.52"
-    check_protocol = "ping"
+  load_balancer_vip_id = "${sakuracloud_load_balancer_vip.vip1.id}"
+  ipaddress = "192.168.11.52"
+  check_protocol = "ping"
 }
 `

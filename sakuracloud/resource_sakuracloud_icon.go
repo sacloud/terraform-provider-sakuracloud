@@ -1,6 +1,7 @@
 package sakuracloud
 
 import (
+	"context"
 	"encoding/base64"
 	"fmt"
 	"io/ioutil"
@@ -8,19 +9,16 @@ import (
 
 	"github.com/hashicorp/terraform/helper/schema"
 	homedir "github.com/mitchellh/go-homedir"
-	"github.com/sacloud/libsacloud/api"
-	"github.com/sacloud/libsacloud/sacloud"
+	"github.com/sacloud/libsacloud/v2/sacloud"
+	"github.com/sacloud/libsacloud/v2/sacloud/types"
 )
 
 func resourceSakuraCloudIcon() *schema.Resource {
 	return &schema.Resource{
-		Create: resourceSakuraCloudIconCreate,
-		Read:   resourceSakuraCloudIconRead,
-		Update: resourceSakuraCloudIconUpdate,
-		Delete: resourceSakuraCloudIconDelete,
-		Importer: &schema.ResourceImporter{
-			State: schema.ImportStatePassthrough,
-		},
+		Create:        resourceSakuraCloudIconCreate,
+		Read:          resourceSakuraCloudIconRead,
+		Update:        resourceSakuraCloudIconUpdate,
+		Delete:        resourceSakuraCloudIconDelete,
 		CustomizeDiff: hasTagResourceCustomizeDiff,
 		Schema: map[string]*schema.Schema{
 			"name": {
@@ -58,115 +56,111 @@ func resourceSakuraCloudIcon() *schema.Resource {
 }
 
 func resourceSakuraCloudIconCreate(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*APIClient)
+	client, ctx, _ := getSacloudV2Client(d, meta)
+	iconOp := sacloud.NewIconOp(client)
 
-	opts := client.Icon.New()
-
-	opts.Name = d.Get("name").(string)
-
-	var body string
-	if v, ok := d.GetOk("source"); ok {
-		source := v.(string)
-		path, err := homedir.Expand(source)
-		if err != nil {
-			return fmt.Errorf("Error expanding homedir in source (%s): %s", source, err)
-		}
-		file, err := os.Open(path)
-		if err != nil {
-			return fmt.Errorf("Error opening SakuraCloud Icon source (%s): %s", source, err)
-		}
-		data, err := ioutil.ReadAll(file)
-		if err != nil {
-			return fmt.Errorf("Error opening SakuraCloud Icon source : %s", err)
-		}
-		body = base64.StdEncoding.EncodeToString(data)
-	} else if v, ok := d.GetOk("base64content"); ok {
-		body = v.(string)
-	} else {
-		return fmt.Errorf("Must specify \"source\" or \"base64content\" field")
-	}
-	opts.SetImage(body)
-
-	if rawTags, ok := d.GetOk("tags"); ok {
-		if rawTags != nil {
-			opts.Tags = expandTags(client, rawTags.([]interface{}))
-		}
-	}
-
-	icon, err := client.Icon.Create(opts)
+	body, err := expandIconBody(d)
 	if err != nil {
-		return fmt.Errorf("Failed to create SakuraCloud Icon resource: %s", err)
+		return fmt.Errorf("creating SakuraCloud Icon is failed: %s", err)
 	}
 
-	d.SetId(icon.GetStrID())
+	icon, err := iconOp.Create(ctx, &sacloud.IconCreateRequest{
+		Name:  d.Get("name").(string),
+		Tags:  expandTagsV2(d.Get("tags").([]interface{})),
+		Image: body,
+	})
+	if err != nil {
+		return fmt.Errorf("creating SakuraCloud Icon is failed: %s", err)
+	}
+
+	d.SetId(icon.ID.String())
 	return resourceSakuraCloudIconRead(d, meta)
 }
 
 func resourceSakuraCloudIconRead(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*APIClient)
-	icon, err := client.Icon.Read(toSakuraCloudID(d.Id()))
+	client, ctx, _ := getSacloudV2Client(d, meta)
+	iconOp := sacloud.NewIconOp(client)
+
+	icon, err := iconOp.Read(ctx, types.StringID(d.Id()))
 	if err != nil {
-		if sacloudErr, ok := err.(api.Error); ok && sacloudErr.ResponseCode() == 404 {
+		if sacloud.IsNotFoundError(err) {
 			d.SetId("")
 			return nil
 		}
-		return fmt.Errorf("Couldn't find SakuraCloud Icon resource: %s", err)
+		return fmt.Errorf("could not read SakuraCloud Icon: %s", err)
 	}
 
-	return setIconResourceData(d, client, icon)
+	return setIconResourceData(ctx, d, client, icon)
 }
 
 func resourceSakuraCloudIconUpdate(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*APIClient)
+	client, ctx, _ := getSacloudV2Client(d, meta)
+	iconOp := sacloud.NewIconOp(client)
 
-	icon, err := client.Icon.Read(toSakuraCloudID(d.Id()))
+	_, err := iconOp.Read(ctx, types.StringID(d.Id()))
 	if err != nil {
-		return fmt.Errorf("Couldn't find SakuraCloud Icon resource: %s", err)
+		return fmt.Errorf("could not read SakuraCloud Icon: %s", err)
 	}
 
-	if d.HasChange("name") {
-		icon.Name = d.Get("name").(string)
-	}
-
-	if d.HasChange("tags") {
-		rawTags := d.Get("tags").([]interface{})
-		if rawTags != nil {
-			icon.Tags = expandTags(client, rawTags)
-		} else {
-			icon.Tags = expandTags(client, []interface{}{})
-		}
-	}
-
-	icon, err = client.Icon.Update(icon.ID, icon)
+	_, err = iconOp.Update(ctx, types.StringID(d.Id()), &sacloud.IconUpdateRequest{
+		Name: d.Get("name").(string),
+		Tags: expandTagsV2(d.Get("tags").([]interface{})),
+	})
 	if err != nil {
-		return fmt.Errorf("Error updating SakuraCloud Icon resource: %s", err)
+		return fmt.Errorf("updating SakuraCloud Icon is failed: %s", err)
 	}
 	return resourceSakuraCloudIconRead(d, meta)
 }
 
 func resourceSakuraCloudIconDelete(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*APIClient)
+	client, ctx, _ := getSacloudV2Client(d, meta)
+	iconOp := sacloud.NewIconOp(client)
 
-	_, err := client.Icon.Delete(toSakuraCloudID(d.Id()))
+	icon, err := iconOp.Read(ctx, types.StringID(d.Id()))
 	if err != nil {
-		return fmt.Errorf("Error deleting SakuraCloud Icon resource: %s", err)
+		if sacloud.IsNotFoundError(err) {
+			d.SetId("")
+			return nil
+		}
+		return fmt.Errorf("could not read SakuraCloud Icon: %s", err)
 	}
 
+	if err := iconOp.Delete(ctx, icon.ID); err != nil {
+		return fmt.Errorf("deleting SakuraCloud Icon is failed: %s", err)
+	}
 	return nil
 }
 
-func setIconResourceData(d *schema.ResourceData, client *APIClient, data *sacloud.Icon) error {
-
+func setIconResourceData(ctx context.Context, d *schema.ResourceData, client *APIClient, data *sacloud.Icon) error {
 	d.Set("name", data.Name)
-
-	body, err := client.Icon.GetImage(data.ID, "small")
-	if err != nil {
-		return fmt.Errorf("Error reading SakuraCloud Icon Resource: %s", err)
+	if err := d.Set("tags", data.Tags); err != nil {
+		return err
 	}
-
-	d.Set("body", body)
-	d.Set("tags", data.Tags)
 	d.Set("url", data.URL)
-
 	return nil
+}
+
+func expandIconBody(d resourceValueGettable) (string, error) {
+	var body string
+	if v, ok := d.GetOk("source"); ok {
+		source := v.(string)
+		path, err := homedir.Expand(source)
+		if err != nil {
+			return "", fmt.Errorf("expanding homedir in source (%s) is failed: %s", source, err)
+		}
+		file, err := os.Open(path)
+		if err != nil {
+			return "", fmt.Errorf("opening SakuraCloud Icon source(%s) is failed: %s", source, err)
+		}
+		data, err := ioutil.ReadAll(file)
+		if err != nil {
+			return "", fmt.Errorf("reading SakuraCloud Icon source file is failed: %s", err)
+		}
+		body = base64.StdEncoding.EncodeToString(data)
+	} else if v, ok := d.GetOk("base64content"); ok {
+		body = v.(string)
+	} else {
+		return "", fmt.Errorf(`"source" or "base64content" field is required`)
+	}
+	return body, nil
 }

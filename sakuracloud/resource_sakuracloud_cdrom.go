@@ -1,20 +1,18 @@
 package sakuracloud
 
 import (
-	"bytes"
-	"crypto/md5"
-	"encoding/base64"
+	"context"
 	"fmt"
-	"io"
 	"io/ioutil"
 	"os"
 
+	"github.com/hashicorp/terraform/helper/customdiff"
 	"github.com/hashicorp/terraform/helper/schema"
-	homedir "github.com/mitchellh/go-homedir"
+	"github.com/mitchellh/go-homedir"
 	"github.com/sacloud/ftps"
 	"github.com/sacloud/iso9660wrap"
-	"github.com/sacloud/libsacloud/api"
-	"github.com/sacloud/libsacloud/sacloud"
+	"github.com/sacloud/libsacloud/v2/sacloud"
+	"github.com/sacloud/libsacloud/v2/sacloud/types"
 )
 
 func resourceSakuraCloudCDROM() *schema.Resource {
@@ -26,7 +24,9 @@ func resourceSakuraCloudCDROM() *schema.Resource {
 		Importer: &schema.ResourceImporter{
 			State: schema.ImportStatePassthrough,
 		},
-		CustomizeDiff: hasTagResourceCustomizeDiff,
+		CustomizeDiff: customdiff.ComputedIf("hash", func(d *schema.ResourceDiff, meta interface{}) bool {
+			return d.HasChange("iso_image_file") || d.HasChange("content")
+		}),
 		Schema: map[string]*schema.Schema{
 			"name": {
 				Type:     schema.TypeString,
@@ -86,16 +86,22 @@ func resourceSakuraCloudCDROM() *schema.Resource {
 	}
 }
 
-var (
+const (
 	cdromDefaultISOLabel = "config"
 )
 
 func resourceSakuraCloudCDROMCreate(d *schema.ResourceData, meta interface{}) error {
-	client := getSacloudAPIClient(d, meta)
+	client, ctx, zone := getSacloudV2Client(d, meta)
+	cdromOp := sacloud.NewCDROMOp(client)
 
-	opts := client.CDROM.New()
-
-	opts.Name = d.Get("name").(string)
+	// prepare create parameters
+	req := &sacloud.CDROMCreateRequest{
+		Name:        d.Get("name").(string),
+		Description: d.Get("description").(string),
+		SizeMB:      toSizeMB(d.Get("size").(int)),
+		IconID:      types.StringID(d.Get("icon_id").(string)),
+		Tags:        expandTagsV2(d.Get("tags").([]interface{})),
+	}
 
 	filePath, isTemporal, err := prepareContentFile(d)
 	if isTemporal {
@@ -105,89 +111,60 @@ func resourceSakuraCloudCDROMCreate(d *schema.ResourceData, meta interface{}) er
 		return err
 	}
 
-	opts.SizeMB = toSizeMB(d.Get("size").(int))
-	if iconID, ok := d.GetOk("icon_id"); ok {
-		opts.SetIconByID(toSakuraCloudID(iconID.(string)))
-	}
-	if description, ok := d.GetOk("description"); ok {
-		opts.Description = description.(string)
-	}
-	rawTags := d.Get("tags").([]interface{})
-	if rawTags != nil {
-		opts.Tags = expandTags(client, rawTags)
-	}
-
-	cdrom, ftpServer, err := client.CDROM.Create(opts)
+	cdrom, ftpServer, err := cdromOp.Create(ctx, zone, req)
 	if err != nil {
-		return fmt.Errorf("Failed to create SakuraCloud CDROM resource: %s", err)
+		return fmt.Errorf("creating SakuraCloud CDROM resource is failed: %s", err)
 	}
 
 	// upload
 	ftpClient := ftps.NewClient(ftpServer.User, ftpServer.Password, ftpServer.HostName)
 	if err := ftpClient.Upload(filePath); err != nil {
-		return fmt.Errorf("Failed to upload SakuraCloud CDROM resource: %s", err)
+		return fmt.Errorf("upload CD-ROM contents to SakuraCloud is failed: %s", err)
 	}
 
 	// close
-	if _, err := client.CDROM.CloseFTP(cdrom.ID); err != nil {
-		return fmt.Errorf("Failed to Close FTPS Connection from CDROM resource: %s", err)
-
+	if err := cdromOp.CloseFTP(ctx, zone, cdrom.ID); err != nil {
+		return fmt.Errorf("closing FTPS Connection is failed: %s", err)
 	}
 
-	d.SetId(cdrom.GetStrID())
+	d.SetId(cdrom.ID.String())
 	return resourceSakuraCloudCDROMRead(d, meta)
 }
 
 func resourceSakuraCloudCDROMRead(d *schema.ResourceData, meta interface{}) error {
-	client := getSacloudAPIClient(d, meta)
+	client, ctx, zone := getSacloudV2Client(d, meta)
+	cdromOp := sacloud.NewCDROMOp(client)
 
-	cdrom, err := client.CDROM.Read(toSakuraCloudID(d.Id()))
+	cdrom, err := cdromOp.Read(ctx, zone, types.StringID(d.Id()))
 	if err != nil {
-		if sacloudErr, ok := err.(api.Error); ok && sacloudErr.ResponseCode() == 404 {
+		if sacloud.IsNotFoundError(err) {
 			d.SetId("")
 			return nil
 		}
-		return fmt.Errorf("Couldn't find SakuraCloud CDROM resource: %s", err)
+		return fmt.Errorf("could not read SakuraCloud CDROM[%s]: %s", d.Id(), err)
 	}
-
-	return setCDROMResourceData(d, client, cdrom)
+	return setCDROMResourceData(ctx, d, client, cdrom)
 }
 
 func resourceSakuraCloudCDROMUpdate(d *schema.ResourceData, meta interface{}) error {
-	client := getSacloudAPIClient(d, meta)
+	client, ctx, zone := getSacloudV2Client(d, meta)
+	cdromOp := sacloud.NewCDROMOp(client)
 
-	cdrom, err := client.CDROM.Read(toSakuraCloudID(d.Id()))
+	cdrom, err := cdromOp.Read(ctx, zone, types.StringID(d.Id()))
 	if err != nil {
-		return fmt.Errorf("Couldn't find SakuraCloud CDROM resource: %s", err)
+		return fmt.Errorf("could not read SakuraCloud CDROM[%s]: %s", d.Id(), err)
 	}
-	if d.HasChange("name") {
-		cdrom.Name = d.Get("name").(string)
+
+	req := &sacloud.CDROMUpdateRequest{
+		Name:        d.Get("name").(string),
+		Description: d.Get("description").(string),
+		Tags:        expandTagsV2(d.Get("tags").([]interface{})),
+		IconID:      types.StringID(d.Get("icon_id").(string)),
 	}
-	if d.HasChange("icon_id") {
-		if iconID, ok := d.GetOk("icon_id"); ok {
-			cdrom.SetIconByID(toSakuraCloudID(iconID.(string)))
-		} else {
-			cdrom.ClearIcon()
-		}
-	}
-	if d.HasChange("description") {
-		if description, ok := d.GetOk("description"); ok {
-			cdrom.Description = description.(string)
-		} else {
-			cdrom.Description = ""
-		}
-	}
-	if d.HasChange("tags") {
-		rawTags := d.Get("tags").([]interface{})
-		if rawTags != nil {
-			cdrom.Tags = expandTags(client, rawTags)
-		} else {
-			cdrom.Tags = expandTags(client, []interface{}{})
-		}
-	}
-	cdrom, err = client.CDROM.Update(cdrom.ID, cdrom)
+
+	cdrom, err = cdromOp.Update(ctx, zone, cdrom.ID, req)
 	if err != nil {
-		return fmt.Errorf("Error updating SakuraCloud CDROM resource: %s", err)
+		return fmt.Errorf("updating SakuraCloud CDROM[%s] is failed: %s", d.Id(), err)
 	}
 
 	contentAttrs := []string{"iso_image_file", "content", "content_file_name", "hash"}
@@ -200,48 +177,35 @@ func resourceSakuraCloudCDROMUpdate(d *schema.ResourceData, meta interface{}) er
 	}
 	if isContentChanged {
 		// eject
-		allServers, err := client.GetServerAPI().Find()
+		ejectedServerIDs, err := ejectCDROMFromAllServers(ctx, d, client, cdrom.ID)
 		if err != nil {
-			return fmt.Errorf("Couldn't find SakuraCloud server resource: %s", err)
-		}
-		var serverIDs []int64
-		for _, s := range allServers.Servers {
-			if s.Instance.CDROM != nil && s.Instance.CDROM.ID == cdrom.ID {
-				// eject
-				if _, err := client.GetServerAPI().EjectCDROM(s.ID, cdrom.ID); err != nil {
-					return fmt.Errorf("Couldn't eject CDROM from Server: %s", err)
-				}
-				serverIDs = append(serverIDs, s.ID)
-			}
+			return fmt.Errorf("could not eject CDROM[%s] from Server: %s", cdrom.ID, err)
 		}
 
 		filePath, isTemporal, err := prepareContentFile(d)
 		if isTemporal {
-			defer os.Remove(filePath)
+			defer os.Remove(filePath) // nolint
 		}
 		if err != nil {
 			return err
 		}
-		ftpServer, err := client.CDROM.OpenFTP(cdrom.ID, false)
+		ftpServer, err := cdromOp.OpenFTP(ctx, zone, cdrom.ID, &sacloud.OpenFTPRequest{ChangePassword: false})
 		if err != nil {
-			return fmt.Errorf("Failed to Open FTPS Connection to CDROM resource: %s", err)
+			return fmt.Errorf("opening FTPS connection to CDROM[%s] is failed: %s", cdrom.ID, err)
 		}
 		// upload
 		ftpClient := ftps.NewClient(ftpServer.User, ftpServer.Password, ftpServer.HostName)
 		if err := ftpClient.Upload(filePath); err != nil {
-			return fmt.Errorf("Failed to upload SakuraCloud CDROM resource: %s", err)
+			return fmt.Errorf("upload CD-ROM contents to SakuraCloud is failed: %s", err)
 		}
 		// close
-		if _, err := client.CDROM.CloseFTP(cdrom.ID); err != nil {
-			return fmt.Errorf("Failed to Close FTPS Connection from CDROM resource: %s", err)
-
+		if err := cdromOp.CloseFTP(ctx, zone, cdrom.ID); err != nil {
+			return fmt.Errorf("closing FTPS Connection is failed: %s", err)
 		}
 
 		// re-insert CDROM
-		for _, serverID := range serverIDs {
-			if _, err := client.GetServerAPI().InsertCDROM(serverID, cdrom.ID); err != nil {
-				return fmt.Errorf("Couldn't insert CDROM from Server: %s", err)
-			}
+		if err := insertCDROMToAllServers(ctx, d, client, cdrom.ID, ejectedServerIDs); err != nil {
+			return fmt.Errorf("could not insert CDROM[%s] to Server: %s", cdrom.ID, err)
 		}
 	}
 
@@ -249,79 +213,57 @@ func resourceSakuraCloudCDROMUpdate(d *schema.ResourceData, meta interface{}) er
 }
 
 func resourceSakuraCloudCDROMDelete(d *schema.ResourceData, meta interface{}) error {
-	client := getSacloudAPIClient(d, meta)
+	client, ctx, zone := getSacloudV2Client(d, meta)
+	cdromOp := sacloud.NewCDROMOp(client)
 
-	cdrom, err := client.CDROM.Read(toSakuraCloudID(d.Id()))
+	cdrom, err := cdromOp.Read(ctx, zone, types.StringID(d.Id()))
 	if err != nil {
-		return fmt.Errorf("Couldn't find SakuraCloud CDROM resource: %s", err)
+		if sacloud.IsNotFoundError(err) {
+			d.SetId("")
+			return nil
+		}
+		return fmt.Errorf("could not read SakuraCloud CDROM[%s]: %s", d.Id(), err)
 	}
 
 	// eject
-	allServers, err := client.GetServerAPI().Find()
-	if err != nil {
-		return fmt.Errorf("Couldn't find SakuraCloud server resource: %s", err)
-	}
-	for _, s := range allServers.Servers {
-		if s.Instance.CDROM != nil && s.Instance.CDROM.ID == cdrom.ID {
-			// eject
-			if _, err := client.GetServerAPI().EjectCDROM(s.ID, cdrom.ID); err != nil {
-				return fmt.Errorf("Couldn't eject CDROM from Server: %s", err)
-			}
-		}
+	if _, err := ejectCDROMFromAllServers(ctx, d, client, cdrom.ID); err != nil {
+		return fmt.Errorf("could not eject CDROM[%s] from Server: %s", cdrom.ID, err)
 	}
 
-	_, err = client.CDROM.Delete(toSakuraCloudID(d.Id()))
-
-	if err != nil {
-		return fmt.Errorf("Error deleting SakuraCloud CDROM resource: %s", err)
+	if err := cdromOp.Delete(ctx, zone, cdrom.ID); err != nil {
+		return fmt.Errorf("deleting SakuraCloud CDROM[%s] is failed: %s", cdrom.ID, err)
 	}
 
+	d.SetId("")
 	return nil
 }
 
-func setCDROMResourceData(d *schema.ResourceData, client *APIClient, data *sacloud.CDROM) error {
-
-	d.Set("name", data.Name)
-	d.Set("size", toSizeGB(data.SizeMB))
-	d.Set("icon_id", data.GetIconStrID())
-	d.Set("description", data.Description)
-	d.Set("tags", data.Tags)
-
-	// NOTE 本来はAPIにてmd5ハッシュを取得できるのが望ましい
+func setCDROMResourceData(ctx context.Context, d *schema.ResourceData, client *APIClient, data *sacloud.CDROM) error {
+	// NOTE 本来はAPIにてmd5ハッシュを取得できるのが望ましい。現状ではここでファイルを読んで算出する。
 	if v, ok := d.GetOk("iso_image_file"); ok {
 		source := v.(string)
-		path, err := homedir.Expand(source)
+
+		path, err := expandHomeDir(source)
 		if err != nil {
-			return fmt.Errorf("Error expanding homedir in source (%s): %s", source, err)
+			return err
 		}
-		// file exists?
-		if _, err := os.Stat(path); err != nil {
-			return fmt.Errorf("Error opening iso_image_file (%s): %s", source, err)
-		}
-
-		f, err := os.Open(path)
+		hash, err := md5CheckSumFromFile(path)
 		if err != nil {
-			return fmt.Errorf("Error opening iso_image_file (%s): %s", source, err)
+			return err
 		}
-		defer f.Close()
-
-		b := base64.NewEncoder(base64.StdEncoding, f)
-		defer b.Close()
-
-		var buf bytes.Buffer
-		if _, err := io.Copy(&buf, f); err != nil {
-			return fmt.Errorf("Error encoding to base64 from iso_image_file (%s): %s", source, err)
-		}
-
-		h := md5.New()
-		if _, err := io.Copy(h, f); err != nil {
-			return fmt.Errorf("Error calculate md5 from iso_image_file (%s): %s", source, err)
-		}
-
-		d.Set("hash", h.Sum(nil))
+		d.Set("hash", hash)
 	}
 
-	d.Set("zone", client.Zone)
+	d.Set("name", data.Name)
+	d.Set("size", data.GetSizeGB())
+	if !data.IconID.IsEmpty() {
+		d.Set("icon_id", data.IconID.String())
+	}
+	d.Set("description", data.Description)
+	if err := d.Set("tags", flattenTags(data.Tags)); err != nil {
+		return fmt.Errorf("error settings tags: %v", data.Tags)
+	}
+	d.Set("zone", getV2Zone(d, client))
 	return nil
 }
 
@@ -333,11 +275,11 @@ func prepareContentFile(d *schema.ResourceData) (string, bool, error) {
 		source := v.(string)
 		path, err := homedir.Expand(source)
 		if err != nil {
-			return "", isTemporal, fmt.Errorf("Error expanding homedir in source (%s): %s", source, err)
+			return "", false, fmt.Errorf("error expanding homedir in source (%s): %s", source, err)
 		}
 		// file exists?
 		if _, err := os.Stat(path); err != nil {
-			return "", isTemporal, fmt.Errorf("Error opening iso_image_file (%s): %s", source, err)
+			return "", false, fmt.Errorf("error opening iso_image_file (%s): %s", source, err)
 		}
 		filePath = path
 	} else if v, ok := d.GetOk("content"); ok {
@@ -354,17 +296,17 @@ func prepareContentFile(d *schema.ResourceData) (string, bool, error) {
 		// create iso9660 format file
 		tmpFile, err := ioutil.TempFile("", "tf-sakuracloud-cdrom")
 		if err != nil {
-			return "", isTemporal, fmt.Errorf("Error creating temp-file : %s", err)
+			return "", isTemporal, fmt.Errorf("error creating temp-file : %s", err)
 		}
-		defer tmpFile.Close()
+		defer tmpFile.Close() // nolint
 		filePath = tmpFile.Name()
 		err = writeISOFile(filePath, []byte(content), label)
 		if err != nil {
-			return "", isTemporal, fmt.Errorf("Error writing temp-file : %s", err)
+			return "", isTemporal, fmt.Errorf("error writing temp-file : %s", err)
 		}
 
 	} else {
-		return "", isTemporal, fmt.Errorf("Must specify \"iso_image_file\" or \"content\" field")
+		return "", isTemporal, fmt.Errorf("must specify \"iso_image_file\" or \"content\" field")
 	}
 	return filePath, isTemporal, nil
 }
@@ -374,7 +316,38 @@ func writeISOFile(path string, content []byte, label string) error {
 	if err != nil {
 		return err
 	}
-	defer outfh.Close()
+	defer outfh.Close() // nolint
 
 	return iso9660wrap.WriteBuffer(outfh, content, label)
+}
+
+func ejectCDROMFromAllServers(ctx context.Context, d *schema.ResourceData, client *APIClient, cdromID types.ID) ([]types.ID, error) {
+	serverOp := sacloud.NewServerOp(client)
+	zone := getV2Zone(d, client)
+	searched, err := serverOp.Find(ctx, zone, &sacloud.FindCondition{Count: defaultSearchLimit})
+	if err != nil {
+		return nil, err
+	}
+	var ejectedIDs []types.ID
+	for _, server := range searched.Servers {
+		if server.CDROMID == cdromID {
+			if err := serverOp.EjectCDROM(ctx, zone, server.ID, &sacloud.EjectCDROMRequest{ID: cdromID}); err != nil {
+				return nil, err
+			}
+			ejectedIDs = append(ejectedIDs, server.ID)
+		}
+	}
+	return ejectedIDs, nil
+}
+
+func insertCDROMToAllServers(ctx context.Context, d *schema.ResourceData, client *APIClient, cdromID types.ID, serverIDs []types.ID) error {
+	serverOp := sacloud.NewServerOp(client)
+	zone := getV2Zone(d, client)
+
+	for _, id := range serverIDs {
+		if err := serverOp.InsertCDROM(ctx, zone, id, &sacloud.InsertCDROMRequest{ID: cdromID}); err != nil {
+			return err
+		}
+	}
+	return nil
 }

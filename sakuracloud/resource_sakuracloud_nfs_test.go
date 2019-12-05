@@ -1,13 +1,15 @@
 package sakuracloud
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"testing"
 
 	"github.com/hashicorp/terraform/helper/resource"
 	"github.com/hashicorp/terraform/terraform"
-	"github.com/sacloud/libsacloud/sacloud"
+	"github.com/sacloud/libsacloud/v2/sacloud"
+	"github.com/sacloud/libsacloud/v2/sacloud/types"
 )
 
 func TestAccSakuraCloudNFS(t *testing.T) {
@@ -51,7 +53,7 @@ func TestAccSakuraCloudNFS(t *testing.T) {
 					resource.TestCheckResourceAttr("sakuracloud_nfs.foobar", "ipaddress", "192.168.11.101"),
 					resource.TestCheckResourceAttr("sakuracloud_nfs.foobar", "nw_mask_len", "24"),
 					resource.TestCheckResourceAttr("sakuracloud_nfs.foobar", "default_route", "192.168.11.1"),
-					resource.TestCheckNoResourceAttr("sakuracloud_nfs.foobar", "icon_id"),
+					resource.TestCheckResourceAttr("sakuracloud_nfs.foobar", "icon_id", ""),
 				),
 			},
 		},
@@ -63,43 +65,44 @@ func testAccCheckSakuraCloudNFSExists(n string, nfs *sacloud.NFS) resource.TestC
 		rs, ok := s.RootModule().Resources[n]
 
 		if !ok {
-			return fmt.Errorf("Not found: %s", n)
+			return fmt.Errorf("not found: %s", n)
 		}
 
 		if rs.Primary.ID == "" {
-			return errors.New("No NFS ID is set")
+			return errors.New("no NFS ID is set")
 		}
 
 		client := testAccProvider.Meta().(*APIClient)
+		zone := rs.Primary.Attributes["zone"]
+		nfsOp := sacloud.NewNFSOp(client)
 
-		foundNFS, err := client.NFS.Read(toSakuraCloudID(rs.Primary.ID))
-
+		foundNFS, err := nfsOp.Read(context.Background(), zone, types.StringID(rs.Primary.ID))
 		if err != nil {
 			return err
 		}
 
-		if foundNFS.ID != toSakuraCloudID(rs.Primary.ID) {
-			return errors.New("NFS not found")
+		if foundNFS.ID.String() != rs.Primary.ID {
+			return fmt.Errorf("not found NFS: %s", rs.Primary.ID)
 		}
 
 		*nfs = *foundNFS
-
 		return nil
 	}
 }
 
 func testAccCheckSakuraCloudNFSDestroy(s *terraform.State) error {
 	client := testAccProvider.Meta().(*APIClient)
+	nfsOp := sacloud.NewNFSOp(client)
 
 	for _, rs := range s.RootModule().Resources {
 		if rs.Type != "sakuracloud_nfs" {
 			continue
 		}
 
-		_, err := client.NFS.Read(toSakuraCloudID(rs.Primary.ID))
-
+		zone := rs.Primary.Attributes["zone"]
+		_, err := nfsOp.Read(context.Background(), zone, types.StringID(rs.Primary.ID))
 		if err == nil {
-			return errors.New("NFS still exists")
+			return fmt.Errorf("still exists NFS: %s", rs.Primary.ID)
 		}
 	}
 
@@ -108,19 +111,19 @@ func testAccCheckSakuraCloudNFSDestroy(s *terraform.State) error {
 
 const testAccCheckSakuraCloudNFSConfig_basic = `
 resource "sakuracloud_switch" "sw" {
-    name = "sw"
+  name = "sw"
 }
 resource "sakuracloud_nfs" "foobar" {
-    switch_id     = "${sakuracloud_switch.sw.id}"
-    plan          = "ssd"
-    size          = "500"
-    ipaddress     = "192.168.11.101"
-    nw_mask_len   = 24
-    default_route = "192.168.11.1"
-    name          = "name_before"
-    description   = "description_before"
-    tags          = ["hoge1" , "hoge2"]
-    icon_id       = "${sakuracloud_icon.foobar.id}"
+  switch_id     = "${sakuracloud_switch.sw.id}"
+  plan          = "ssd"
+  size          = "500"
+  ipaddress     = "192.168.11.101"
+  nw_mask_len   = 24
+  default_route = "192.168.11.1"
+  name          = "name_before"
+  description   = "description_before"
+  tags          = ["hoge1" , "hoge2"]
+  icon_id       = "${sakuracloud_icon.foobar.id}"
 }
 
 resource "sakuracloud_icon" "foobar" {
@@ -131,16 +134,16 @@ resource "sakuracloud_icon" "foobar" {
 
 const testAccCheckSakuraCloudNFSConfig_update = `
 resource "sakuracloud_switch" "sw" {
-    name = "sw"
+  name = "sw"
 }
 resource "sakuracloud_nfs" "foobar" {
-    switch_id     = "${sakuracloud_switch.sw.id}"
-    plan          = "ssd"
-    size          = "500"
-    ipaddress     = "192.168.11.101"
-    nw_mask_len   = 24
-    default_route = "192.168.11.1"
-    name          = "name_after"
-    description   = "description_after"
-    tags          = ["hoge1_after" , "hoge2_after"]
+  switch_id     = "${sakuracloud_switch.sw.id}"
+  plan          = "ssd"
+  size          = "500"
+  ipaddress     = "192.168.11.101"
+  nw_mask_len   = 24
+  default_route = "192.168.11.1"
+  name          = "name_after"
+  description   = "description_after"
+  tags          = ["hoge1_after" , "hoge2_after"]
 }`

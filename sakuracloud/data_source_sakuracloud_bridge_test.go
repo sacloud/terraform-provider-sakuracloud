@@ -19,7 +19,7 @@ func TestAccSakuraCloudDataSourceBridge_Basic(t *testing.T) {
 		PreCheck:                  func() { testAccPreCheck(t) },
 		Providers:                 testAccProviders,
 		PreventPostDestroyRefresh: true,
-		CheckDestroy:              testAccCheckSakuraCloudBridgeDataSourceDestroy,
+		CheckDestroy:              testAccCheckSakuraCloudBridgeDestroy,
 
 		Steps: []resource.TestStep{
 			{
@@ -82,28 +82,6 @@ func testAccCheckSakuraCloudBridgeDataSourceNotExists(n string) resource.TestChe
 		}
 		return nil
 	}
-}
-
-func testAccCheckSakuraCloudBridgeDataSourceDestroy(s *terraform.State) error {
-	client := testAccProvider.Meta().(*APIClient)
-
-	for _, rs := range s.RootModule().Resources {
-		if rs.Type != "sakuracloud_bridge" {
-			continue
-		}
-
-		if rs.Primary.ID == "" {
-			continue
-		}
-
-		_, err := client.Bridge.Read(toSakuraCloudID(rs.Primary.ID))
-
-		if err == nil {
-			return errors.New("Bridge still exists")
-		}
-	}
-
-	return nil
 }
 
 func testAccCheckSakuraCloudDataSourceBridgeBase(name string) string {

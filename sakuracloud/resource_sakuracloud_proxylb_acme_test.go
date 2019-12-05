@@ -6,7 +6,7 @@ import (
 	"testing"
 
 	"github.com/hashicorp/terraform/helper/resource"
-	"github.com/sacloud/libsacloud/sacloud"
+	"github.com/sacloud/libsacloud/v2/sacloud"
 )
 
 const (
@@ -16,6 +16,7 @@ const (
 var proxyLBDomain string
 
 func TestAccResourceSakuraCloudProxyLBACME(t *testing.T) {
+	skipIfFakeModeEnabled(t)
 
 	if domain, ok := os.LookupEnv(envProxyLBACMEDomain); ok {
 		proxyLBDomain = domain
@@ -77,7 +78,9 @@ resource sakuracloud_server "server01" {
 }
 
 data sakuracloud_dns "zone" {
-  name_selectors = ["%s"]
+  filters {
+    names = ["%s"]
+  }
 }
 
 resource "sakuracloud_dns_record" "record" {
