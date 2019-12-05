@@ -15,13 +15,11 @@
 package sakuracloud
 
 import (
-	"errors"
 	"fmt"
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/acctest"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/resource"
-	"github.com/hashicorp/terraform-plugin-sdk/terraform"
 )
 
 func TestAccSakuraCloudDataSourcePacketFilter_Basic(t *testing.T) {
@@ -38,12 +36,12 @@ func TestAccSakuraCloudDataSourcePacketFilter_Basic(t *testing.T) {
 		Steps: []resource.TestStep{
 			{
 				Config: testAccCheckSakuraCloudDataSourcePacketFilterBase(name),
-				Check:  testAccCheckSakuraCloudPacketFilterDataSourceID("sakuracloud_packet_filter.foobar"),
+				Check:  testAccCheckSakuraCloudDataSourceExists("sakuracloud_packet_filter.foobar"),
 			},
 			{
 				Config: testAccCheckSakuraCloudDataSourcePacketFilterConfig(name),
 				Check: resource.ComposeTestCheckFunc(
-					testAccCheckSakuraCloudPacketFilterDataSourceID("data.sakuracloud_packet_filter.foobar"),
+					testAccCheckSakuraCloudDataSourceExists("data.sakuracloud_packet_filter.foobar"),
 					resource.TestCheckResourceAttr("data.sakuracloud_packet_filter.foobar", "name", name),
 					resource.TestCheckResourceAttr("data.sakuracloud_packet_filter.foobar", "description", "description_test"),
 					resource.TestCheckResourceAttr("data.sakuracloud_packet_filter.foobar", "expressions.#", "2"),
@@ -57,36 +55,12 @@ func TestAccSakuraCloudDataSourcePacketFilter_Basic(t *testing.T) {
 			{
 				Config: testAccCheckSakuraCloudDataSourcePacketFilterConfig_NotExists,
 				Check: resource.ComposeTestCheckFunc(
-					testAccCheckSakuraCloudPacketFilterDataSourceNotExists("data.sakuracloud_packet_filter.foobar"),
+					testAccCheckSakuraCloudDataSourceNotExists("data.sakuracloud_packet_filter.foobar"),
 				),
 				Destroy: true,
 			},
 		},
 	})
-}
-
-func testAccCheckSakuraCloudPacketFilterDataSourceID(n string) resource.TestCheckFunc {
-	return func(s *terraform.State) error {
-		rs, ok := s.RootModule().Resources[n]
-		if !ok {
-			return fmt.Errorf("Can't find PacketFilter data source: %s", n)
-		}
-
-		if rs.Primary.ID == "" {
-			return errors.New("PacketFilter data source ID not set")
-		}
-		return nil
-	}
-}
-
-func testAccCheckSakuraCloudPacketFilterDataSourceNotExists(n string) resource.TestCheckFunc {
-	return func(s *terraform.State) error {
-		v, ok := s.RootModule().Resources[n]
-		if ok && v.Primary.ID != "" {
-			return fmt.Errorf("Found PacketFilter data source: %s", n)
-		}
-		return nil
-	}
 }
 
 func testAccCheckSakuraCloudDataSourcePacketFilterBase(name string) string {

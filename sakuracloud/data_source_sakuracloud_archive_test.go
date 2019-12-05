@@ -15,12 +15,9 @@
 package sakuracloud
 
 import (
-	"errors"
-	"fmt"
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/resource"
-	"github.com/hashicorp/terraform-plugin-sdk/terraform"
 )
 
 func TestAccSakuraCloudDataSourceArchive_Basic(t *testing.T) {
@@ -34,70 +31,47 @@ func TestAccSakuraCloudDataSourceArchive_Basic(t *testing.T) {
 			{
 				Config: testAccCheckSakuraCloudDataSourceArchiveConfig,
 				Check: resource.ComposeTestCheckFunc(
-					testAccCheckSakuraCloudArchiveDataSourceID("data.sakuracloud_archive.foobar"),
+					testAccCheckSakuraCloudDataSourceExists("data.sakuracloud_archive.foobar"),
 					resource.TestCheckResourceAttr("data.sakuracloud_archive.foobar", "name", "Ubuntu Server 16.04.6 LTS 64bit"),
 					resource.TestCheckResourceAttr("data.sakuracloud_archive.foobar", "size", "20"),
 					resource.TestCheckResourceAttr("data.sakuracloud_archive.foobar", "zone", "tk1v"),
-					resource.TestCheckResourceAttr("data.sakuracloud_archive.foobar", "tags.#", "5"),
+					resource.TestCheckResourceAttr("data.sakuracloud_archive.foobar", "tags.#", "6"),
 					resource.TestCheckResourceAttr("data.sakuracloud_archive.foobar", "tags.0", "@size-extendable"),
 					resource.TestCheckResourceAttr("data.sakuracloud_archive.foobar", "tags.1", "arch-64bit"),
 					resource.TestCheckResourceAttr("data.sakuracloud_archive.foobar", "tags.2", "distro-ubuntu"),
 					resource.TestCheckResourceAttr("data.sakuracloud_archive.foobar", "tags.3", "distro-ver-16.04.5"),
 					resource.TestCheckResourceAttr("data.sakuracloud_archive.foobar", "tags.4", "os-linux"),
+					resource.TestCheckResourceAttr("data.sakuracloud_archive.foobar", "tags.5", "ubuntu-16.04-latest"),
 				),
 			},
 			{
 				Config: testAccCheckSakuraCloudDataSourceArchive_OSType,
 				Check: resource.ComposeTestCheckFunc(
-					testAccCheckSakuraCloudArchiveDataSourceID("data.sakuracloud_archive.foobar"),
+					testAccCheckSakuraCloudDataSourceExists("data.sakuracloud_archive.foobar"),
 				),
 			},
 			{
 				Config: testAccCheckSakuraCloudDataSourceArchiveConfig_With_Tag,
 				Check: resource.ComposeTestCheckFunc(
-					testAccCheckSakuraCloudArchiveDataSourceID("data.sakuracloud_archive.foobar"),
+					testAccCheckSakuraCloudDataSourceExists("data.sakuracloud_archive.foobar"),
 				),
 			},
 			{
 				Config: testAccCheckSakuraCloudDataSourceArchiveConfig_NotExists,
 				Check: resource.ComposeTestCheckFunc(
-					testAccCheckSakuraCloudArchiveDataSourceNotExists("data.sakuracloud_archive.foobar"),
+					testAccCheckSakuraCloudDataSourceNotExists("data.sakuracloud_archive.foobar"),
 				),
 				Destroy: true,
 			},
 			{
 				Config: testAccCheckSakuraCloudDataSourceArchiveConfig_With_NotExists_Tag,
 				Check: resource.ComposeTestCheckFunc(
-					testAccCheckSakuraCloudArchiveDataSourceNotExists("data.sakuracloud_archive.foobar"),
+					testAccCheckSakuraCloudDataSourceNotExists("data.sakuracloud_archive.foobar"),
 				),
 				Destroy: true,
 			},
 		},
 	})
-}
-
-func testAccCheckSakuraCloudArchiveDataSourceID(n string) resource.TestCheckFunc {
-	return func(s *terraform.State) error {
-		rs, ok := s.RootModule().Resources[n]
-		if !ok {
-			return fmt.Errorf("Can't find Archive data source: %s", n)
-		}
-
-		if rs.Primary.ID == "" {
-			return errors.New("Archive data source ID not set")
-		}
-		return nil
-	}
-}
-
-func testAccCheckSakuraCloudArchiveDataSourceNotExists(n string) resource.TestCheckFunc {
-	return func(s *terraform.State) error {
-		v, ok := s.RootModule().Resources[n]
-		if ok && v.Primary.ID != "" {
-			return fmt.Errorf("Found Archive data source: %s", n)
-		}
-		return nil
-	}
 }
 
 var testAccCheckSakuraCloudDataSourceArchiveConfig = `

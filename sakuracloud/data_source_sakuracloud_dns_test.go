@@ -15,13 +15,11 @@
 package sakuracloud
 
 import (
-	"errors"
 	"fmt"
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/acctest"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/resource"
-	"github.com/hashicorp/terraform-plugin-sdk/terraform"
 )
 
 func TestAccSakuraCloudDataSourceDNS_Basic(t *testing.T) {
@@ -38,12 +36,12 @@ func TestAccSakuraCloudDataSourceDNS_Basic(t *testing.T) {
 		Steps: []resource.TestStep{
 			{
 				Config: testAccCheckSakuraCloudDataSourceDNSBase(zone),
-				Check:  testAccCheckSakuraCloudDNSDataSourceID("sakuracloud_dns.foobar"),
+				Check:  testAccCheckSakuraCloudDataSourceExists("sakuracloud_dns.foobar"),
 			},
 			{
 				Config: testAccCheckSakuraCloudDataSourceDNSConfig(zone),
 				Check: resource.ComposeTestCheckFunc(
-					testAccCheckSakuraCloudDNSDataSourceID("data.sakuracloud_dns.foobar"),
+					testAccCheckSakuraCloudDataSourceExists("data.sakuracloud_dns.foobar"),
 					resource.TestCheckResourceAttr("data.sakuracloud_dns.foobar", "zone", zone),
 					resource.TestCheckResourceAttr("data.sakuracloud_dns.foobar", "description", "description_test"),
 					resource.TestCheckResourceAttr("data.sakuracloud_dns.foobar", "tags.#", "3"),
@@ -55,49 +53,25 @@ func TestAccSakuraCloudDataSourceDNS_Basic(t *testing.T) {
 			{
 				Config: testAccCheckSakuraCloudDataSourceDNSConfig_With_Tag(zone),
 				Check: resource.ComposeTestCheckFunc(
-					testAccCheckSakuraCloudDNSDataSourceID("data.sakuracloud_dns.foobar"),
+					testAccCheckSakuraCloudDataSourceExists("data.sakuracloud_dns.foobar"),
 				),
 			},
 			{
 				Config: testAccCheckSakuraCloudDataSourceDNSConfig_NotExists(zone),
 				Check: resource.ComposeTestCheckFunc(
-					testAccCheckSakuraCloudDNSDataSourceNotExists("data.sakuracloud_dns.foobar"),
+					testAccCheckSakuraCloudDataSourceNotExists("data.sakuracloud_dns.foobar"),
 				),
 				Destroy: true,
 			},
 			{
 				Config: testAccCheckSakuraCloudDataSourceDNSConfig_With_NotExists_Tag(zone),
 				Check: resource.ComposeTestCheckFunc(
-					testAccCheckSakuraCloudDNSDataSourceNotExists("data.sakuracloud_dns.foobar"),
+					testAccCheckSakuraCloudDataSourceNotExists("data.sakuracloud_dns.foobar"),
 				),
 				Destroy: true,
 			},
 		},
 	})
-}
-
-func testAccCheckSakuraCloudDNSDataSourceID(n string) resource.TestCheckFunc {
-	return func(s *terraform.State) error {
-		rs, ok := s.RootModule().Resources[n]
-		if !ok {
-			return fmt.Errorf("Can't find DNS data source: %s", n)
-		}
-
-		if rs.Primary.ID == "" {
-			return errors.New("DNS data source ID not set")
-		}
-		return nil
-	}
-}
-
-func testAccCheckSakuraCloudDNSDataSourceNotExists(n string) resource.TestCheckFunc {
-	return func(s *terraform.State) error {
-		v, ok := s.RootModule().Resources[n]
-		if ok && v.Primary.ID != "" {
-			return fmt.Errorf("Found DNS data source: %s", n)
-		}
-		return nil
-	}
 }
 
 func testAccCheckSakuraCloudDataSourceDNSBase(zone string) string {

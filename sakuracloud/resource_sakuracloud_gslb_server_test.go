@@ -69,6 +69,9 @@ func testAccCheckSakuraCloudGSLBServerDestroy(s *terraform.State) error {
 		if rs.Type != "sakuracloud_gslb" {
 			continue
 		}
+		if rs.Primary.ID == "" {
+			continue
+		}
 
 		_, err := gslbOp.Read(ctx, types.StringID(rs.Primary.ID))
 		if err == nil {

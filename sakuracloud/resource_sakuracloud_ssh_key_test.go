@@ -100,6 +100,9 @@ func testAccCheckSakuraCloudSSHKeyDestroy(s *terraform.State) error {
 		if rs.Type != "sakuracloud_ssh_key" {
 			continue
 		}
+		if rs.Primary.ID == "" {
+			continue
+		}
 
 		_, err := keyOp.Read(context.Background(), types.StringID(rs.Primary.ID))
 		if err == nil {

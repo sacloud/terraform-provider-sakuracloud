@@ -112,6 +112,10 @@ func testAccCheckSakuraCloudAutoBackupDestroy(s *terraform.State) error {
 		if rs.Type != "sakuracloud_auto_backup" {
 			continue
 		}
+		if rs.Primary.ID == "" {
+			continue
+		}
+
 		autoBackupOp := sacloud.NewAutoBackupOp(client)
 		zone := rs.Primary.Attributes["zone"]
 		_, err := autoBackupOp.Read(context.Background(), zone, types.StringID(rs.Primary.ID))

@@ -163,6 +163,9 @@ func testAccCheckSakuraCloudMobileGatewayDestroy(s *terraform.State) error {
 		if rs.Type != "sakuracloud_mobile_gateway" {
 			continue
 		}
+		if rs.Primary.ID == "" {
+			continue
+		}
 
 		zone := rs.Primary.Attributes["zone"]
 		_, err := mgwOp.Read(context.Background(), zone, types.StringID(rs.Primary.ID))

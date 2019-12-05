@@ -185,6 +185,9 @@ func testAccCheckSakuraCloudSimpleMonitorDestroy(s *terraform.State) error {
 		if rs.Type != "sakuracloud_simple_monitor" {
 			continue
 		}
+		if rs.Primary.ID == "" {
+			continue
+		}
 
 		_, err := smOp.Read(context.Background(), types.StringID(rs.Primary.ID))
 		if err == nil {

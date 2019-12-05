@@ -15,13 +15,11 @@
 package sakuracloud
 
 import (
-	"errors"
 	"fmt"
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/acctest"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/resource"
-	"github.com/hashicorp/terraform-plugin-sdk/terraform"
 )
 
 func TestAccSakuraCloudDataSourceIcon_Basic(t *testing.T) {
@@ -38,12 +36,12 @@ func TestAccSakuraCloudDataSourceIcon_Basic(t *testing.T) {
 		Steps: []resource.TestStep{
 			{
 				Config: testAccCheckSakuraCloudDataSourceIconBase(name),
-				Check:  testAccCheckSakuraCloudIconDataSourceID("sakuracloud_icon.foobar"),
+				Check:  testAccCheckSakuraCloudDataSourceExists("sakuracloud_icon.foobar"),
 			},
 			{
 				Config: testAccCheckSakuraCloudDataSourceIconConfig(name),
 				Check: resource.ComposeTestCheckFunc(
-					testAccCheckSakuraCloudIconDataSourceID("data.sakuracloud_icon.foobar"),
+					testAccCheckSakuraCloudDataSourceExists("data.sakuracloud_icon.foobar"),
 					resource.TestCheckResourceAttr("data.sakuracloud_icon.foobar", "name", name),
 					resource.TestCheckResourceAttr("data.sakuracloud_icon.foobar", "tags.#", "3"),
 					resource.TestCheckResourceAttr("data.sakuracloud_icon.foobar", "tags.0", "tag1"),
@@ -54,49 +52,25 @@ func TestAccSakuraCloudDataSourceIcon_Basic(t *testing.T) {
 			{
 				Config: testAccCheckSakuraCloudDataSourceIconConfig_With_Tag(name),
 				Check: resource.ComposeTestCheckFunc(
-					testAccCheckSakuraCloudIconDataSourceID("data.sakuracloud_icon.foobar"),
+					testAccCheckSakuraCloudDataSourceExists("data.sakuracloud_icon.foobar"),
 				),
 			},
 			{
 				Config: testAccCheckSakuraCloudDataSourceIconConfig_NotExists(name),
 				Check: resource.ComposeTestCheckFunc(
-					testAccCheckSakuraCloudIconDataSourceNotExists("data.sakuracloud_icon.foobar"),
+					testAccCheckSakuraCloudDataSourceNotExists("data.sakuracloud_icon.foobar"),
 				),
 				Destroy: true,
 			},
 			{
 				Config: testAccCheckSakuraCloudDataSourceIconConfig_With_NotExists_Tag(name),
 				Check: resource.ComposeTestCheckFunc(
-					testAccCheckSakuraCloudIconDataSourceNotExists("data.sakuracloud_icon.foobar"),
+					testAccCheckSakuraCloudDataSourceNotExists("data.sakuracloud_icon.foobar"),
 				),
 				Destroy: true,
 			},
 		},
 	})
-}
-
-func testAccCheckSakuraCloudIconDataSourceID(n string) resource.TestCheckFunc {
-	return func(s *terraform.State) error {
-		rs, ok := s.RootModule().Resources[n]
-		if !ok {
-			return fmt.Errorf("Can't find Icon data source: %s", n)
-		}
-
-		if rs.Primary.ID == "" {
-			return errors.New("Icon data source ID not set")
-		}
-		return nil
-	}
-}
-
-func testAccCheckSakuraCloudIconDataSourceNotExists(n string) resource.TestCheckFunc {
-	return func(s *terraform.State) error {
-		v, ok := s.RootModule().Resources[n]
-		if ok && v.Primary.ID != "" {
-			return fmt.Errorf("Found Icon data source: %s", n)
-		}
-		return nil
-	}
 }
 
 func testAccCheckSakuraCloudDataSourceIconBase(name string) string {

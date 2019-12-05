@@ -117,6 +117,9 @@ func testAccCheckSakuraCloudDNSDestroy(s *terraform.State) error {
 		if rs.Type != "sakuracloud_dns" {
 			continue
 		}
+		if rs.Primary.ID == "" {
+			continue
+		}
 
 		_, err := dnsOp.Read(context.Background(), types.StringID(rs.Primary.ID))
 		if err == nil {

@@ -124,6 +124,9 @@ func testAccCheckSakuraCloudCDROMDestroy(s *terraform.State) error {
 		if rs.Type != "sakuracloud_cdrom" {
 			continue
 		}
+		if rs.Primary.ID == "" {
+			continue
+		}
 
 		cdromOp := sacloud.NewCDROMOp(client)
 		zone := rs.Primary.Attributes["zone"]
