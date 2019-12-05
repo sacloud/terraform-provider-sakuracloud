@@ -38,9 +38,12 @@ func resourceSakuraCloudArchive() *schema.Resource {
 		Read:   resourceSakuraCloudArchiveRead,
 		Update: resourceSakuraCloudArchiveUpdate,
 		Delete: resourceSakuraCloudArchiveDelete,
-		CustomizeDiff: customdiff.ComputedIf("hash", func(d *schema.ResourceDiff, meta interface{}) bool {
-			return d.HasChange("archive_file")
-		}),
+		CustomizeDiff: customdiff.All(
+			customdiff.ComputedIf("hash", func(d *schema.ResourceDiff, meta interface{}) bool {
+				return d.HasChange("archive_file")
+			}),
+			hasTagResourceCustomizeDiff,
+		),
 		Importer: &schema.ResourceImporter{
 			State: schema.ImportStatePassthrough,
 		},
@@ -77,7 +80,6 @@ func resourceSakuraCloudArchive() *schema.Resource {
 			"tags": {
 				Type:     schema.TypeList,
 				Optional: true,
-				Computed: true,
 				Elem:     &schema.Schema{Type: schema.TypeString},
 			},
 			"zone": {

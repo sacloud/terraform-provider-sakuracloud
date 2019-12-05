@@ -98,7 +98,6 @@ func resourceSakuraCloudLoadBalancer() *schema.Resource {
 			"tags": {
 				Type:     schema.TypeList,
 				Optional: true,
-				Computed: true,
 				Elem:     &schema.Schema{Type: schema.TypeString},
 			},
 			"zone": {
@@ -115,67 +114,63 @@ func resourceSakuraCloudLoadBalancer() *schema.Resource {
 				Computed: true,
 				MaxItems: 10,
 				Elem: &schema.Resource{
-					Schema: loadBalancerVIPValueSchema(),
-				},
-			},
-		},
-	}
-}
-
-func loadBalancerVIPValueSchema() map[string]*schema.Schema {
-	return map[string]*schema.Schema{
-		"vip": {
-			Type:     schema.TypeString,
-			Required: true,
-		},
-		"port": {
-			Type:         schema.TypeInt,
-			Required:     true,
-			ValidateFunc: validation.IntBetween(1, 65535),
-		},
-		"delay_loop": {
-			Type:         schema.TypeInt,
-			Optional:     true,
-			ValidateFunc: validation.IntBetween(10, 2147483647),
-			Default:      10,
-		},
-		"sorry_server": {
-			Type:     schema.TypeString,
-			Optional: true,
-		},
-		"description": {
-			Type:     schema.TypeString,
-			Optional: true,
-		},
-		"servers": {
-			Type:     schema.TypeList,
-			Optional: true,
-			Computed: true,
-			MaxItems: 40,
-			Elem: &schema.Resource{
-				Schema: map[string]*schema.Schema{
-					"ipaddress": {
-						Type:     schema.TypeString,
-						Required: true,
-					},
-					"check_protocol": {
-						Type:         schema.TypeString,
-						Required:     true,
-						ValidateFunc: validation.StringInSlice(types.LoadBalancerHealthCheckProtocolsStrings(), false),
-					},
-					"check_path": {
-						Type:     schema.TypeString,
-						Optional: true,
-					},
-					"check_status": {
-						Type:     schema.TypeString,
-						Optional: true,
-					},
-					"enabled": {
-						Type:     schema.TypeBool,
-						Optional: true,
-						Default:  true,
-						ForceNew: true,
+					Schema: map[string]*schema.Schema{
+						"vip": {
+							Type:     schema.TypeString,
+							Required: true,
+						},
+						"port": {
+							Type:         schema.TypeInt,
+							Required:     true,
+							ValidateFunc: validation.IntBetween(1, 65535),
+						},
+						"delay_loop": {
+							Type:         schema.TypeInt,
+							Optional:     true,
+							ValidateFunc: validation.IntBetween(10, 2147483647),
+							Default:      10,
+						},
+						"sorry_server": {
+							Type:     schema.TypeString,
+							Optional: true,
+						},
+						"description": {
+							Type:     schema.TypeString,
+							Optional: true,
+						},
+						"servers": {
+							Type:     schema.TypeList,
+							Optional: true,
+							Computed: true,
+							MaxItems: 40,
+							Elem: &schema.Resource{
+								Schema: map[string]*schema.Schema{
+									"ipaddress": {
+										Type:     schema.TypeString,
+										Required: true,
+									},
+									"check_protocol": {
+										Type:         schema.TypeString,
+										Required:     true,
+										ValidateFunc: validation.StringInSlice(types.LoadBalancerHealthCheckProtocolsStrings(), false),
+									},
+									"check_path": {
+										Type:     schema.TypeString,
+										Optional: true,
+									},
+									"check_status": {
+										Type:     schema.TypeString,
+										Optional: true,
+									},
+									"enabled": {
+										Type:     schema.TypeBool,
+										Optional: true,
+										Default:  true,
+										ForceNew: true,
+									},
+								},
+							},
+						},
 					},
 				},
 			},

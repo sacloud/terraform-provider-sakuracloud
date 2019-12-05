@@ -51,7 +51,6 @@ func resourceSakuraCloudInternet() *schema.Resource {
 			"tags": {
 				Type:     schema.TypeList,
 				Optional: true,
-				Computed: true,
 				Elem:     &schema.Schema{Type: schema.TypeString},
 			},
 			"nw_mask_len": {
@@ -88,8 +87,6 @@ func resourceSakuraCloudInternet() *schema.Resource {
 				Type:     schema.TypeList,
 				Computed: true,
 				Elem:     &schema.Schema{Type: schema.TypeString},
-				// ! Current terraform(v0.7) is not support to array validation !
-				// ValidateFunc: validateSakuracloudIDArrayType,
 			},
 			"nw_address": {
 				Type:     schema.TypeString,
