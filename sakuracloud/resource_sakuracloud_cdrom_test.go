@@ -24,7 +24,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/helper/resource"
 	"github.com/hashicorp/terraform-plugin-sdk/terraform"
 	"github.com/sacloud/libsacloud/v2/sacloud"
-	"github.com/sacloud/libsacloud/v2/sacloud/types"
 )
 
 func TestAccResourceSakuraCloudCDROM(t *testing.T) {
@@ -101,7 +100,7 @@ func testAccCheckSakuraCloudCDROMExists(n string, cdrom *sacloud.CDROM) resource
 		client := testAccProvider.Meta().(*APIClient)
 		cdromOp := sacloud.NewCDROMOp(client)
 		zone := rs.Primary.Attributes["zone"]
-		foundCDROM, err := cdromOp.Read(context.Background(), zone, types.StringID(rs.Primary.ID))
+		foundCDROM, err := cdromOp.Read(context.Background(), zone, sakuraCloudID(rs.Primary.ID))
 
 		if err != nil {
 			return err
@@ -130,7 +129,7 @@ func testAccCheckSakuraCloudCDROMDestroy(s *terraform.State) error {
 
 		cdromOp := sacloud.NewCDROMOp(client)
 		zone := rs.Primary.Attributes["zone"]
-		_, err := cdromOp.Read(context.Background(), zone, types.StringID(rs.Primary.ID))
+		_, err := cdromOp.Read(context.Background(), zone, sakuraCloudID(rs.Primary.ID))
 
 		if err == nil {
 			return fmt.Errorf("resource CDROM[%s] still exists", rs.Primary.ID)

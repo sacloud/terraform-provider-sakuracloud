@@ -102,7 +102,7 @@ func resourceSakuraCloudSIM() *schema.Resource {
 }
 
 func resourceSakuraCloudSIMCreate(d *schema.ResourceData, meta interface{}) error {
-	client, ctx, _ := getSacloudV2Client(d, meta)
+	client, ctx, _ := getSacloudClient(d, meta)
 	simOp := sacloud.NewSIMOp(client)
 
 	if err := validateCarrier(d); err != nil {
@@ -117,7 +117,7 @@ func resourceSakuraCloudSIMCreate(d *schema.ResourceData, meta interface{}) erro
 	sim, err := simOp.Create(ctx, &sacloud.SIMCreateRequest{
 		Name:        d.Get("name").(string),
 		Description: d.Get("description").(string),
-		Tags:        expandTagsV2(d.Get("tags").([]interface{})),
+		Tags:        expandTags(d),
 		IconID:      expandSakuraCloudID(d, "icon_id"),
 		ICCID:       d.Get("iccid").(string),
 		PassCode:    d.Get("passcode").(string),
@@ -168,9 +168,9 @@ func resourceSakuraCloudSIMCreate(d *schema.ResourceData, meta interface{}) erro
 }
 
 func resourceSakuraCloudSIMRead(d *schema.ResourceData, meta interface{}) error {
-	client, ctx, _ := getSacloudV2Client(d, meta)
+	client, ctx, _ := getSacloudClient(d, meta)
 
-	sim, err := readSIM(ctx, client, types.StringID(d.Id()))
+	sim, err := readSIM(ctx, client, sakuraCloudID(d.Id()))
 	if err != nil {
 		return err
 	}
@@ -182,7 +182,7 @@ func resourceSakuraCloudSIMRead(d *schema.ResourceData, meta interface{}) error 
 }
 
 func resourceSakuraCloudSIMUpdate(d *schema.ResourceData, meta interface{}) error {
-	client, ctx, _ := getSacloudV2Client(d, meta)
+	client, ctx, _ := getSacloudClient(d, meta)
 	simOp := sacloud.NewSIMOp(client)
 
 	if err := validateCarrier(d); err != nil {
@@ -195,7 +195,7 @@ func resourceSakuraCloudSIMUpdate(d *schema.ResourceData, meta interface{}) erro
 	}
 
 	// read sim info
-	sim, err := readSIM(ctx, client, types.StringID(d.Id()))
+	sim, err := readSIM(ctx, client, sakuraCloudID(d.Id()))
 	if err != nil {
 		return err
 	}
@@ -206,7 +206,7 @@ func resourceSakuraCloudSIMUpdate(d *schema.ResourceData, meta interface{}) erro
 	_, err = simOp.Update(ctx, sim.ID, &sacloud.SIMUpdateRequest{
 		Name:        d.Get("name").(string),
 		Description: d.Get("description").(string),
-		Tags:        expandTagsV2(d.Get("tags").([]interface{})),
+		Tags:        expandTags(d),
 		IconID:      expandSakuraCloudID(d, "icon_id"),
 	})
 	if err != nil {
@@ -268,13 +268,13 @@ func resourceSakuraCloudSIMUpdate(d *schema.ResourceData, meta interface{}) erro
 }
 
 func resourceSakuraCloudSIMDelete(d *schema.ResourceData, meta interface{}) error {
-	client, ctx, _ := getSacloudV2Client(d, meta)
+	client, ctx, _ := getSacloudClient(d, meta)
 	simOp := sacloud.NewSIMOp(client)
 
 	mgwID, mgwZone, _, _ := expandSIMMobileGatewaySettings(d)
 
 	// read sim info
-	sim, err := readSIM(ctx, client, types.StringID(d.Id()))
+	sim, err := readSIM(ctx, client, sakuraCloudID(d.Id()))
 	if err != nil {
 		return err
 	}

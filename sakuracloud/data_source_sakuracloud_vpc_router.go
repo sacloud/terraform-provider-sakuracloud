@@ -373,7 +373,7 @@ func dataSourceSakuraCloudVPCRouter() *schema.Resource {
 }
 
 func dataSourceSakuraCloudVPCRouterRead(d *schema.ResourceData, meta interface{}) error {
-	client, ctx, zone := getSacloudV2Client(d, meta)
+	client, ctx, zone := getSacloudClient(d, meta)
 	searcher := sacloud.NewVPCRouterOp(client)
 
 	findCondition := &sacloud.FindCondition{}

@@ -19,7 +19,6 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/sacloud/libsacloud/v2/sacloud"
-	"github.com/sacloud/libsacloud/v2/sacloud/types"
 )
 
 func dataSourceSakuraCloudSubnet() *schema.Resource {
@@ -81,11 +80,11 @@ func dataSourceSakuraCloudSubnet() *schema.Resource {
 }
 
 func dataSourceSakuraCloudSubnetRead(d *schema.ResourceData, meta interface{}) error {
-	client, ctx, zone := getSacloudV2Client(d, meta)
+	client, ctx, zone := getSacloudClient(d, meta)
 	internetOp := sacloud.NewInternetOp(client)
 	subnetOp := sacloud.NewSubnetOp(client)
 
-	internetID := types.StringID(d.Get("internet_id").(string))
+	internetID := sakuraCloudID(d.Get("internet_id").(string))
 	subnetIndex := d.Get("index").(int)
 
 	res, err := internetOp.Read(ctx, zone, internetID)

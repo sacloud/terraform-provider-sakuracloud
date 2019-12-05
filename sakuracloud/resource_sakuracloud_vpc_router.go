@@ -21,7 +21,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/validation"
 	"github.com/sacloud/libsacloud/v2/sacloud"
-	"github.com/sacloud/libsacloud/v2/sacloud/types"
 	"github.com/sacloud/libsacloud/v2/utils/vpcrouter"
 )
 
@@ -432,13 +431,13 @@ func resourceSakuraCloudVPCRouter() *schema.Resource {
 }
 
 func resourceSakuraCloudVPCRouterCreate(d *schema.ResourceData, meta interface{}) error {
-	client, ctx, zone := getSacloudV2Client(d, meta)
+	client, ctx, zone := getSacloudClient(d, meta)
 	vrOp := sacloud.NewVPCRouterOp(client)
 
 	builder := vpcrouter.Builder{
 		Name:                  d.Get("name").(string),
 		Description:           d.Get("description").(string),
-		Tags:                  expandTagsV2(d.Get("tags").([]interface{})),
+		Tags:                  expandTags(d),
 		IconID:                expandSakuraCloudID(d, "icon_id"),
 		PlanID:                expandVPCRouterPlanID(d),
 		NICSetting:            expandVPCRouterNICSetting(d),
@@ -459,10 +458,10 @@ func resourceSakuraCloudVPCRouterCreate(d *schema.ResourceData, meta interface{}
 }
 
 func resourceSakuraCloudVPCRouterRead(d *schema.ResourceData, meta interface{}) error {
-	client, ctx, zone := getSacloudV2Client(d, meta)
+	client, ctx, zone := getSacloudClient(d, meta)
 	vrOp := sacloud.NewVPCRouterOp(client)
 
-	vpcRouter, err := vrOp.Read(ctx, zone, types.StringID(d.Id()))
+	vpcRouter, err := vrOp.Read(ctx, zone, sakuraCloudID(d.Id()))
 	if err != nil {
 		if sacloud.IsNotFoundError(err) {
 			d.SetId("")
@@ -475,13 +474,13 @@ func resourceSakuraCloudVPCRouterRead(d *schema.ResourceData, meta interface{}) 
 }
 
 func resourceSakuraCloudVPCRouterUpdate(d *schema.ResourceData, meta interface{}) error {
-	client, ctx, zone := getSacloudV2Client(d, meta)
+	client, ctx, zone := getSacloudClient(d, meta)
 	vrOp := sacloud.NewVPCRouterOp(client)
 
 	sakuraMutexKV.Lock(d.Id())
 	defer sakuraMutexKV.Unlock(d.Id())
 
-	vpcRouter, err := vrOp.Read(ctx, zone, types.StringID(d.Id()))
+	vpcRouter, err := vrOp.Read(ctx, zone, sakuraCloudID(d.Id()))
 	if err != nil {
 		return fmt.Errorf("could not read SakuraCloud VPCRouter: %s", err)
 	}
@@ -489,7 +488,7 @@ func resourceSakuraCloudVPCRouterUpdate(d *schema.ResourceData, meta interface{}
 	builder := vpcrouter.Builder{
 		Name:                  d.Get("name").(string),
 		Description:           d.Get("description").(string),
-		Tags:                  expandTagsV2(d.Get("tags").([]interface{})),
+		Tags:                  expandTags(d),
 		IconID:                expandSakuraCloudID(d, "icon_id"),
 		PlanID:                expandVPCRouterPlanID(d),
 		NICSetting:            expandVPCRouterNICSetting(d),
@@ -509,13 +508,13 @@ func resourceSakuraCloudVPCRouterUpdate(d *schema.ResourceData, meta interface{}
 }
 
 func resourceSakuraCloudVPCRouterDelete(d *schema.ResourceData, meta interface{}) error {
-	client, ctx, zone := getSacloudV2Client(d, meta)
+	client, ctx, zone := getSacloudClient(d, meta)
 	vrOp := sacloud.NewVPCRouterOp(client)
 
 	sakuraMutexKV.Lock(d.Id())
 	defer sakuraMutexKV.Unlock(d.Id())
 
-	vpcRouter, err := vrOp.Read(ctx, zone, types.StringID(d.Id()))
+	vpcRouter, err := vrOp.Read(ctx, zone, sakuraCloudID(d.Id()))
 	if err != nil {
 		if sacloud.IsNotFoundError(err) {
 			d.SetId("")
@@ -593,6 +592,6 @@ func setVPCRouterResourceData(ctx context.Context, d *schema.ResourceData, clien
 	if err := d.Set("users", flattenVPCRouterUsers(data)); err != nil {
 		return err
 	}
-	d.Set("zone", getV2Zone(d, client))
+	d.Set("zone", getZone(d, client))
 	return nil
 }

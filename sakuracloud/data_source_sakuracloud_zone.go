@@ -58,7 +58,7 @@ func dataSourceSakuraCloudZone() *schema.Resource {
 }
 
 func dataSourceSakuraCloudZoneRead(d *schema.ResourceData, meta interface{}) error {
-	client, ctx, zoneSlug := getSacloudV2Client(d, meta)
+	client, ctx, zoneSlug := getSacloudClient(d, meta)
 	zoneOp := sacloud.NewZoneOp(client)
 
 	if v, ok := d.GetOk("name"); ok {

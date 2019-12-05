@@ -20,7 +20,6 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/sacloud/libsacloud/v2/sacloud"
-	"github.com/sacloud/libsacloud/v2/sacloud/types"
 )
 
 func resourceSakuraCloudBridge() *schema.Resource {
@@ -59,7 +58,7 @@ func resourceSakuraCloudBridge() *schema.Resource {
 }
 
 func resourceSakuraCloudBridgeCreate(d *schema.ResourceData, meta interface{}) error {
-	client, ctx, zone := getSacloudV2Client(d, meta)
+	client, ctx, zone := getSacloudClient(d, meta)
 	bridgeOp := sacloud.NewBridgeOp(client)
 
 	req := &sacloud.BridgeCreateRequest{
@@ -77,9 +76,9 @@ func resourceSakuraCloudBridgeCreate(d *schema.ResourceData, meta interface{}) e
 }
 
 func resourceSakuraCloudBridgeRead(d *schema.ResourceData, meta interface{}) error {
-	client, ctx, zone := getSacloudV2Client(d, meta)
+	client, ctx, zone := getSacloudClient(d, meta)
 	bridgeOp := sacloud.NewBridgeOp(client)
-	bridge, err := bridgeOp.Read(ctx, zone, types.StringID(d.Id()))
+	bridge, err := bridgeOp.Read(ctx, zone, sakuraCloudID(d.Id()))
 	if err != nil {
 		if sacloud.IsNotFoundError(err) {
 			d.SetId("")
@@ -91,10 +90,10 @@ func resourceSakuraCloudBridgeRead(d *schema.ResourceData, meta interface{}) err
 }
 
 func resourceSakuraCloudBridgeUpdate(d *schema.ResourceData, meta interface{}) error {
-	client, ctx, zone := getSacloudV2Client(d, meta)
+	client, ctx, zone := getSacloudClient(d, meta)
 	bridgeOp := sacloud.NewBridgeOp(client)
 
-	bridge, err := bridgeOp.Read(ctx, zone, types.StringID(d.Id()))
+	bridge, err := bridgeOp.Read(ctx, zone, sakuraCloudID(d.Id()))
 	if err != nil {
 		return fmt.Errorf("could not read SakuraCloud Bridge[%s]: %s", d.Id(), err)
 	}
@@ -112,10 +111,10 @@ func resourceSakuraCloudBridgeUpdate(d *schema.ResourceData, meta interface{}) e
 }
 
 func resourceSakuraCloudBridgeDelete(d *schema.ResourceData, meta interface{}) error {
-	client, ctx, zone := getSacloudV2Client(d, meta)
+	client, ctx, zone := getSacloudClient(d, meta)
 	bridgeOp := sacloud.NewBridgeOp(client)
 
-	bridge, err := bridgeOp.Read(ctx, zone, types.StringID(d.Id()))
+	bridge, err := bridgeOp.Read(ctx, zone, sakuraCloudID(d.Id()))
 	if err != nil {
 		if sacloud.IsNotFoundError(err) {
 			d.SetId("")
@@ -146,6 +145,6 @@ func setBridgeResourceData(ctx context.Context, d *schema.ResourceData, client *
 		return fmt.Errorf("error setting switch_ids: %v", switchIDs)
 	}
 
-	d.Set("zone", getV2Zone(d, client))
+	d.Set("zone", getZone(d, client))
 	return nil
 }

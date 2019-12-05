@@ -116,7 +116,7 @@ func resourceSakuraCloudDisk() *schema.Resource {
 }
 
 func resourceSakuraCloudDiskCreate(d *schema.ResourceData, meta interface{}) error {
-	client, ctx, zone := getSacloudV2Client(d, meta)
+	client, ctx, zone := getSacloudClient(d, meta)
 	diskOp := sacloud.NewDiskOp(client)
 
 	var planID types.ID
@@ -139,7 +139,7 @@ func resourceSakuraCloudDiskCreate(d *schema.ResourceData, meta interface{}) err
 		SizeMB:          toSizeMB(d.Get("size").(int)),
 		Name:            d.Get("name").(string),
 		Description:     d.Get("description").(string),
-		Tags:            expandTagsV2(d.Get("tags").([]interface{})),
+		Tags:            expandTags(d),
 		IconID:          expandSakuraCloudID(d, "icon_id"),
 	}
 
@@ -172,10 +172,10 @@ func resourceSakuraCloudDiskCreate(d *schema.ResourceData, meta interface{}) err
 }
 
 func resourceSakuraCloudDiskRead(d *schema.ResourceData, meta interface{}) error {
-	client, ctx, zone := getSacloudV2Client(d, meta)
+	client, ctx, zone := getSacloudClient(d, meta)
 	diskOp := sacloud.NewDiskOp(client)
 
-	disk, err := diskOp.Read(ctx, zone, types.StringID(d.Id()))
+	disk, err := diskOp.Read(ctx, zone, sakuraCloudID(d.Id()))
 	if err != nil {
 		if sacloud.IsNotFoundError(err) {
 			d.SetId("")
@@ -188,10 +188,10 @@ func resourceSakuraCloudDiskRead(d *schema.ResourceData, meta interface{}) error
 }
 
 func resourceSakuraCloudDiskUpdate(d *schema.ResourceData, meta interface{}) error {
-	client, ctx, zone := getSacloudV2Client(d, meta)
+	client, ctx, zone := getSacloudClient(d, meta)
 	diskOp := sacloud.NewDiskOp(client)
 
-	disk, err := diskOp.Read(ctx, zone, types.StringID(d.Id()))
+	disk, err := diskOp.Read(ctx, zone, sakuraCloudID(d.Id()))
 	if err != nil {
 		return fmt.Errorf("could not read SakuraCloud Disk resource: %s", err)
 	}
@@ -200,7 +200,7 @@ func resourceSakuraCloudDiskUpdate(d *schema.ResourceData, meta interface{}) err
 		Connection:  types.EDiskConnection(d.Get("connector").(string)),
 		Name:        d.Get("name").(string),
 		Description: d.Get("description").(string),
-		Tags:        expandTagsV2(d.Get("tags").([]interface{})),
+		Tags:        expandTags(d),
 		IconID:      expandSakuraCloudID(d, "icon_id"),
 	}
 
@@ -213,10 +213,10 @@ func resourceSakuraCloudDiskUpdate(d *schema.ResourceData, meta interface{}) err
 }
 
 func resourceSakuraCloudDiskDelete(d *schema.ResourceData, meta interface{}) error {
-	client, ctx, zone := getSacloudV2Client(d, meta)
+	client, ctx, zone := getSacloudClient(d, meta)
 	diskOp := sacloud.NewDiskOp(client)
 
-	disk, err := diskOp.Read(ctx, zone, types.StringID(d.Id()))
+	disk, err := diskOp.Read(ctx, zone, sakuraCloudID(d.Id()))
 	if err != nil {
 		if sacloud.IsNotFoundError(err) {
 			d.SetId("")
@@ -263,6 +263,6 @@ func setDiskResourceData(ctx context.Context, d *schema.ResourceData, client *AP
 		return err
 	}
 	d.Set("server_id", serverID)
-	d.Set("zone", getV2Zone(d, client))
+	d.Set("zone", getZone(d, client))
 	return nil
 }

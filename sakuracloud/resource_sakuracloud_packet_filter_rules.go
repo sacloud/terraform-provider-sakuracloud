@@ -98,12 +98,12 @@ func resourceSakuraCloudPacketFilterRules() *schema.Resource {
 }
 
 func resourceSakuraCloudPacketFilterRulesRead(d *schema.ResourceData, meta interface{}) error {
-	client, ctx, zone := getSacloudV2Client(d, meta)
+	client, ctx, zone := getSacloudClient(d, meta)
 	pfOp := sacloud.NewPacketFilterOp(client)
 
 	pfID := d.Get("packet_filter_id").(string)
 
-	pf, err := pfOp.Read(ctx, zone, types.StringID(pfID))
+	pf, err := pfOp.Read(ctx, zone, sakuraCloudID(pfID))
 	if err != nil {
 		if sacloud.IsNotFoundError(err) {
 			d.SetId("")
@@ -116,14 +116,14 @@ func resourceSakuraCloudPacketFilterRulesRead(d *schema.ResourceData, meta inter
 }
 
 func resourceSakuraCloudPacketFilterRulesUpdate(d *schema.ResourceData, meta interface{}) error {
-	client, ctx, zone := getSacloudV2Client(d, meta)
+	client, ctx, zone := getSacloudClient(d, meta)
 	pfOp := sacloud.NewPacketFilterOp(client)
 
 	pfID := d.Get("packet_filter_id").(string)
 	sakuraMutexKV.Lock(pfID)
 	defer sakuraMutexKV.Unlock(pfID)
 
-	pf, err := pfOp.Read(ctx, zone, types.StringID(pfID))
+	pf, err := pfOp.Read(ctx, zone, sakuraCloudID(pfID))
 	if err != nil {
 		return fmt.Errorf("could not read SakuraCloud PacketFilter: %s", err)
 	}
@@ -142,14 +142,14 @@ func resourceSakuraCloudPacketFilterRulesUpdate(d *schema.ResourceData, meta int
 }
 
 func resourceSakuraCloudPacketFilterRulesDelete(d *schema.ResourceData, meta interface{}) error {
-	client, ctx, zone := getSacloudV2Client(d, meta)
+	client, ctx, zone := getSacloudClient(d, meta)
 	pfOp := sacloud.NewPacketFilterOp(client)
 
 	pfID := d.Get("packet_filter_id").(string)
 	sakuraMutexKV.Lock(pfID)
 	defer sakuraMutexKV.Unlock(pfID)
 
-	pf, err := pfOp.Read(ctx, zone, types.StringID(pfID))
+	pf, err := pfOp.Read(ctx, zone, sakuraCloudID(pfID))
 	if err != nil {
 		if sacloud.IsNotFoundError(err) {
 			d.SetId("")
@@ -172,6 +172,6 @@ func setPacketFilterRulesResourceData(ctx context.Context, d *schema.ResourceDat
 	if err := d.Set("expressions", flattenPacketFilterExpressions(data)); err != nil {
 		return err
 	}
-	d.Set("zone", getV2Zone(d, client))
+	d.Set("zone", getZone(d, client))
 	return nil
 }

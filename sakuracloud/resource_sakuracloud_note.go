@@ -21,7 +21,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/validation"
 	"github.com/sacloud/libsacloud/v2/sacloud"
-	"github.com/sacloud/libsacloud/v2/sacloud/types"
 )
 
 func resourceSakuraCloudNote() *schema.Resource {
@@ -72,12 +71,12 @@ func resourceSakuraCloudNote() *schema.Resource {
 }
 
 func resourceSakuraCloudNoteCreate(d *schema.ResourceData, meta interface{}) error {
-	client, ctx, _ := getSacloudV2Client(d, meta)
+	client, ctx, _ := getSacloudClient(d, meta)
 	noteOp := sacloud.NewNoteOp(client)
 
 	note, err := noteOp.Create(ctx, &sacloud.NoteCreateRequest{
 		Name:    d.Get("name").(string),
-		Tags:    expandTagsV2(d.Get("tags").([]interface{})),
+		Tags:    expandTags(d),
 		IconID:  expandSakuraCloudID(d, "icon_id"),
 		Class:   d.Get("class").(string),
 		Content: d.Get("content").(string),
@@ -91,10 +90,10 @@ func resourceSakuraCloudNoteCreate(d *schema.ResourceData, meta interface{}) err
 }
 
 func resourceSakuraCloudNoteRead(d *schema.ResourceData, meta interface{}) error {
-	client, ctx, _ := getSacloudV2Client(d, meta)
+	client, ctx, _ := getSacloudClient(d, meta)
 	noteOp := sacloud.NewNoteOp(client)
 
-	note, err := noteOp.Read(ctx, types.StringID(d.Id()))
+	note, err := noteOp.Read(ctx, sakuraCloudID(d.Id()))
 	if err != nil {
 		if sacloud.IsNotFoundError(err) {
 			d.SetId("")
@@ -107,17 +106,17 @@ func resourceSakuraCloudNoteRead(d *schema.ResourceData, meta interface{}) error
 }
 
 func resourceSakuraCloudNoteUpdate(d *schema.ResourceData, meta interface{}) error {
-	client, ctx, _ := getSacloudV2Client(d, meta)
+	client, ctx, _ := getSacloudClient(d, meta)
 	noteOp := sacloud.NewNoteOp(client)
 
-	note, err := noteOp.Read(ctx, types.StringID(d.Id()))
+	note, err := noteOp.Read(ctx, sakuraCloudID(d.Id()))
 	if err != nil {
 		return fmt.Errorf("could not read SakuraCloud Note: %s", err)
 	}
 
 	_, err = noteOp.Update(ctx, note.ID, &sacloud.NoteUpdateRequest{
 		Name:    d.Get("name").(string),
-		Tags:    expandTagsV2(d.Get("tags").([]interface{})),
+		Tags:    expandTags(d),
 		IconID:  expandSakuraCloudID(d, "icon_id"),
 		Class:   d.Get("class").(string),
 		Content: d.Get("content").(string),
@@ -130,10 +129,10 @@ func resourceSakuraCloudNoteUpdate(d *schema.ResourceData, meta interface{}) err
 }
 
 func resourceSakuraCloudNoteDelete(d *schema.ResourceData, meta interface{}) error {
-	client, ctx, _ := getSacloudV2Client(d, meta)
+	client, ctx, _ := getSacloudClient(d, meta)
 	noteOp := sacloud.NewNoteOp(client)
 
-	note, err := noteOp.Read(ctx, types.StringID(d.Id()))
+	note, err := noteOp.Read(ctx, sakuraCloudID(d.Id()))
 	if err != nil {
 		if sacloud.IsNotFoundError(err) {
 			d.SetId("")

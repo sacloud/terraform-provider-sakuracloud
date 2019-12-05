@@ -23,7 +23,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/helper/resource"
 	"github.com/hashicorp/terraform-plugin-sdk/terraform"
 	"github.com/sacloud/libsacloud/v2/sacloud"
-	"github.com/sacloud/libsacloud/v2/sacloud/types"
 )
 
 func TestAccSakuraCloudNFS(t *testing.T) {
@@ -90,7 +89,7 @@ func testAccCheckSakuraCloudNFSExists(n string, nfs *sacloud.NFS) resource.TestC
 		zone := rs.Primary.Attributes["zone"]
 		nfsOp := sacloud.NewNFSOp(client)
 
-		foundNFS, err := nfsOp.Read(context.Background(), zone, types.StringID(rs.Primary.ID))
+		foundNFS, err := nfsOp.Read(context.Background(), zone, sakuraCloudID(rs.Primary.ID))
 		if err != nil {
 			return err
 		}
@@ -117,7 +116,7 @@ func testAccCheckSakuraCloudNFSDestroy(s *terraform.State) error {
 		}
 
 		zone := rs.Primary.Attributes["zone"]
-		_, err := nfsOp.Read(context.Background(), zone, types.StringID(rs.Primary.ID))
+		_, err := nfsOp.Read(context.Background(), zone, sakuraCloudID(rs.Primary.ID))
 		if err == nil {
 			return fmt.Errorf("still exists NFS: %s", rs.Primary.ID)
 		}

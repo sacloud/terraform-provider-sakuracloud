@@ -207,7 +207,7 @@ func resourceSakuraCloudServer() *schema.Resource {
 }
 
 func resourceSakuraCloudServerCreate(d *schema.ResourceData, meta interface{}) error {
-	client, ctx, zone := getSacloudV2Client(d, meta)
+	client, ctx, zone := getSacloudClient(d, meta)
 	serverOp := sacloud.NewServerOp(client)
 	diskOp := sacloud.NewDiskOp(client)
 	interfaceOp := sacloud.NewInterfaceOp(client)
@@ -226,7 +226,7 @@ func resourceSakuraCloudServerCreate(d *schema.ResourceData, meta interface{}) e
 		InterfaceDriver:      types.EInterfaceDriver(d.Get("interface_driver").(string)),
 		Name:                 d.Get("name").(string),
 		Description:          d.Get("description").(string),
-		Tags:                 expandTagsV2(d.Get("tags").([]interface{})),
+		Tags:                 expandTags(d),
 		IconID:               expandSakuraCloudID(d, "icon_id"),
 		WaitDiskMigration:    false,
 		PrivateHostID:        expandSakuraCloudID(d, "private_host_id"),
@@ -280,10 +280,10 @@ func resourceSakuraCloudServerCreate(d *schema.ResourceData, meta interface{}) e
 }
 
 func resourceSakuraCloudServerRead(d *schema.ResourceData, meta interface{}) error {
-	client, ctx, zone := getSacloudV2Client(d, meta)
+	client, ctx, zone := getSacloudClient(d, meta)
 	serverOp := sacloud.NewServerOp(client)
 
-	server, err := serverOp.Read(ctx, zone, types.StringID(d.Id()))
+	server, err := serverOp.Read(ctx, zone, sakuraCloudID(d.Id()))
 	if err != nil {
 		if sacloud.IsNotFoundError(err) {
 			d.SetId("")
@@ -296,13 +296,13 @@ func resourceSakuraCloudServerRead(d *schema.ResourceData, meta interface{}) err
 }
 
 func resourceSakuraCloudServerUpdate(d *schema.ResourceData, meta interface{}) error {
-	client, ctx, zone := getSacloudV2Client(d, meta)
+	client, ctx, zone := getSacloudClient(d, meta)
 	serverOp := sacloud.NewServerOp(client)
 
 	sakuraMutexKV.Lock(d.Id())
 	defer sakuraMutexKV.Unlock(d.Id())
 
-	server, err := serverOp.Read(ctx, zone, types.StringID(d.Id()))
+	server, err := serverOp.Read(ctx, zone, sakuraCloudID(d.Id()))
 	if err != nil {
 		return fmt.Errorf("could not read SakuraCloud Server: %s", err)
 	}
@@ -379,7 +379,7 @@ func resourceSakuraCloudServerUpdate(d *schema.ResourceData, meta interface{}) e
 	server, err = serverOp.Update(ctx, zone, server.ID, &sacloud.ServerUpdateRequest{
 		Name:            d.Get("name").(string),
 		Description:     d.Get("description").(string),
-		Tags:            expandTagsV2(d.Get("tags").([]interface{})),
+		Tags:            expandTags(d),
 		IconID:          expandSakuraCloudID(d, "icon_id"),
 		PrivateHostID:   expandSakuraCloudID(d, "private_host_id"),
 		InterfaceDriver: types.EInterfaceDriver(d.Get("interface_driver").(string)),
@@ -418,13 +418,13 @@ func resourceSakuraCloudServerUpdate(d *schema.ResourceData, meta interface{}) e
 }
 
 func resourceSakuraCloudServerDelete(d *schema.ResourceData, meta interface{}) error {
-	client, ctx, zone := getSacloudV2Client(d, meta)
+	client, ctx, zone := getSacloudClient(d, meta)
 	serverOp := sacloud.NewServerOp(client)
 
 	sakuraMutexKV.Lock(d.Id())
 	defer sakuraMutexKV.Unlock(d.Id())
 
-	server, err := serverOp.Read(ctx, zone, types.StringID(d.Id()))
+	server, err := serverOp.Read(ctx, zone, sakuraCloudID(d.Id()))
 	if err != nil {
 		if sacloud.IsNotFoundError(err) {
 			d.SetId("")
@@ -446,7 +446,7 @@ func resourceSakuraCloudServerDelete(d *schema.ResourceData, meta interface{}) e
 }
 
 func setServerResourceData(ctx context.Context, d *schema.ResourceData, client *APIClient, data *sacloud.Server) error {
-	zone := getV2Zone(d, client)
+	zone := getZone(d, client)
 
 	ip, gateway, nwMaskLen, nwAddress := flattenServerNetworkInfo(data)
 	if ip != "" {
@@ -560,7 +560,7 @@ func expandConnectedSwitches(d resourceValueGettable) []*sacloud.ConnectedSwitch
 		primary = nil
 	default:
 		primary = &sacloud.ConnectedSwitch{
-			ID: types.StringID(nic),
+			ID: sakuraCloudID(nic),
 		}
 	}
 	switches = append(switches, primary)
@@ -723,7 +723,7 @@ func isServerDiskConfigChanged(d *schema.ResourceData) bool {
 }
 
 func validateServerPlan(ctx context.Context, client *APIClient, d resourceValueGettable) error {
-	zone := getV2Zone(d, client)
+	zone := getZone(d, client)
 	_, err := serverUtil.FindPlan(ctx, sacloud.NewServerPlanOp(client), zone, &serverUtil.FindPlanRequest{
 		CPU:        d.Get("core").(int),
 		MemoryGB:   d.Get("memory").(int),
@@ -738,7 +738,7 @@ func validateServerPlan(ctx context.Context, client *APIClient, d resourceValueG
 
 func reconcileServerDisks(ctx context.Context, client *APIClient, d resourceValueGettable, server *sacloud.Server) error {
 	diskOp := sacloud.NewDiskOp(client)
-	zone := getV2Zone(d, client)
+	zone := getZone(d, client)
 
 	//disconnect all old disks
 	for _, disk := range server.Disks {
@@ -758,7 +758,7 @@ func reconcileServerDisks(ctx context.Context, client *APIClient, d resourceValu
 
 func reconcileServerPacketFilters(ctx context.Context, client *APIClient, d resourceValueGettable, server *sacloud.Server) error {
 	interfaceOp := sacloud.NewInterfaceOp(client)
-	zone := getV2Zone(d, client)
+	zone := getZone(d, client)
 	pfIDs := expandSakuraCloudIDs(d, "packet_filter_ids")
 
 	//disconnect
@@ -780,7 +780,7 @@ func reconcileServerPacketFilters(ctx context.Context, client *APIClient, d reso
 
 func reconcileServerNICs(ctx context.Context, client *APIClient, d *schema.ResourceData, server *sacloud.Server) error {
 	interfaceOp := sacloud.NewInterfaceOp(client)
-	zone := getV2Zone(d, client)
+	zone := getZone(d, client)
 
 	nicConf := []string{d.Get("nic").(string)}
 	additionalIDs := expandSakuraCloudIDs(d, "additional_nics")
@@ -857,7 +857,7 @@ func reconcileServerInterfaceConnection(ctx context.Context, client *APIClient, 
 			}
 		}
 	default:
-		switchID := types.StringID(nicConf)
+		switchID := sakuraCloudID(nicConf)
 		if !nic.GetSwitchID().IsEmpty() && nic.GetSwitchID() != switchID {
 			if err := interfaceOp.DisconnectFromSwitch(ctx, zone, nic.GetID()); err != nil {
 				return fmt.Errorf("disconnecting from Switch is failed: %s", err)

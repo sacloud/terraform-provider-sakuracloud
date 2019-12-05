@@ -24,7 +24,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/helper/resource"
 	"github.com/hashicorp/terraform-plugin-sdk/terraform"
 	"github.com/sacloud/libsacloud/v2/sacloud"
-	"github.com/sacloud/libsacloud/v2/sacloud/types"
 )
 
 const (
@@ -154,7 +153,7 @@ func testAccCheckSakuraCloudSIMExists(n string, sim *sacloud.SIM) resource.TestC
 		client := testAccProvider.Meta().(*APIClient)
 		simOp := sacloud.NewSIMOp(client)
 
-		foundSIM, err := simOp.Read(context.Background(), types.StringID(rs.Primary.ID))
+		foundSIM, err := simOp.Read(context.Background(), sakuraCloudID(rs.Primary.ID))
 		if err != nil {
 			return err
 		}
@@ -179,7 +178,7 @@ func testAccCheckSakuraCloudSIMDestroy(s *terraform.State) error {
 			continue
 		}
 
-		_, err := simOp.Read(context.Background(), types.StringID(rs.Primary.ID))
+		_, err := simOp.Read(context.Background(), sakuraCloudID(rs.Primary.ID))
 		if err == nil {
 			return fmt.Errorf("still exists SIM: %s", rs.Primary.ID)
 		}

@@ -91,7 +91,7 @@ func dataSourceSakuraCloudDNS() *schema.Resource {
 }
 
 func dataSourceSakuraCloudDNSRead(d *schema.ResourceData, meta interface{}) error {
-	client, ctx, _ := getSacloudV2Client(d, meta)
+	client, ctx, _ := getSacloudClient(d, meta)
 	searcher := sacloud.NewDNSOp(client)
 
 	findCondition := &sacloud.FindCondition{}

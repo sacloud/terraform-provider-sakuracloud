@@ -23,7 +23,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/helper/resource"
 	"github.com/hashicorp/terraform-plugin-sdk/terraform"
 	"github.com/sacloud/libsacloud/v2/sacloud"
-	"github.com/sacloud/libsacloud/v2/sacloud/types"
 )
 
 func TestAccResourceSakuraCloudSubnet(t *testing.T) {
@@ -68,7 +67,7 @@ func testAccCheckSakuraCloudSubnetExists(n string, subnet *sacloud.Subnet) resou
 		subnetOp := sacloud.NewSubnetOp(client)
 		zone := rs.Primary.Attributes["zone"]
 
-		foundSubnet, err := subnetOp.Read(context.Background(), zone, types.StringID(rs.Primary.ID))
+		foundSubnet, err := subnetOp.Read(context.Background(), zone, sakuraCloudID(rs.Primary.ID))
 		if err != nil {
 			return err
 		}
@@ -95,7 +94,7 @@ func testAccCheckSakuraCloudSubnetDestroy(s *terraform.State) error {
 		}
 
 		zone := rs.Primary.Attributes["zone"]
-		_, err := subnetOp.Read(context.Background(), zone, types.StringID(rs.Primary.ID))
+		_, err := subnetOp.Read(context.Background(), zone, sakuraCloudID(rs.Primary.ID))
 		if err == nil {
 			return fmt.Errorf("still exists Subnet: %s", rs.Primary.ID)
 		}

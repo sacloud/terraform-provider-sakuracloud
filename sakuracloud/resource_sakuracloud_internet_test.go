@@ -23,7 +23,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/helper/resource"
 	"github.com/hashicorp/terraform-plugin-sdk/terraform"
 	"github.com/sacloud/libsacloud/v2/sacloud"
-	"github.com/sacloud/libsacloud/v2/sacloud/types"
 )
 
 func TestAccResourceSakuraCloudInternet(t *testing.T) {
@@ -114,7 +113,7 @@ func testAccCheckSakuraCloudInternetExists(n string, internet *sacloud.Internet)
 		internetOp := sacloud.NewInternetOp(client)
 		zone := rs.Primary.Attributes["zone"]
 
-		foundInternet, err := internetOp.Read(context.Background(), zone, types.StringID(rs.Primary.ID))
+		foundInternet, err := internetOp.Read(context.Background(), zone, sakuraCloudID(rs.Primary.ID))
 		if err != nil {
 			return err
 		}
@@ -141,7 +140,7 @@ func testAccCheckSakuraCloudInternetDestroy(s *terraform.State) error {
 		}
 
 		zone := rs.Primary.Attributes["zone"]
-		_, err := internetOp.Read(context.Background(), zone, types.StringID(rs.Primary.ID))
+		_, err := internetOp.Read(context.Background(), zone, sakuraCloudID(rs.Primary.ID))
 		if err == nil {
 			return fmt.Errorf("still exists Internet: %s", rs.Primary.ID)
 		}

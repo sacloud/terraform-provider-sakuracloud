@@ -24,7 +24,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/helper/resource"
 	"github.com/hashicorp/terraform-plugin-sdk/terraform"
 	"github.com/sacloud/libsacloud/v2/sacloud"
-	"github.com/sacloud/libsacloud/v2/sacloud/types"
 )
 
 func TestAccResourceSakuraCloudAutoBackup(t *testing.T) {
@@ -89,7 +88,7 @@ func testAccCheckSakuraCloudAutoBackupExists(n string, auto_backup *sacloud.Auto
 		autoBackupOp := sacloud.NewAutoBackupOp(client)
 		zone := rs.Primary.Attributes["zone"]
 
-		foundAutoBackup, err := autoBackupOp.Read(context.Background(), zone, types.StringID(rs.Primary.ID))
+		foundAutoBackup, err := autoBackupOp.Read(context.Background(), zone, sakuraCloudID(rs.Primary.ID))
 
 		if err != nil {
 			return err
@@ -118,7 +117,7 @@ func testAccCheckSakuraCloudAutoBackupDestroy(s *terraform.State) error {
 
 		autoBackupOp := sacloud.NewAutoBackupOp(client)
 		zone := rs.Primary.Attributes["zone"]
-		_, err := autoBackupOp.Read(context.Background(), zone, types.StringID(rs.Primary.ID))
+		_, err := autoBackupOp.Read(context.Background(), zone, sakuraCloudID(rs.Primary.ID))
 
 		if err == nil {
 			return errors.New("AutoBackup still exists")

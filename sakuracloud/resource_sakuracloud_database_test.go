@@ -112,7 +112,7 @@ func testAccCheckSakuraCloudDatabaseExists(n string, database *sacloud.Database)
 		dbOp := sacloud.NewDatabaseOp(client)
 		zone := rs.Primary.Attributes["zone"]
 
-		foundDatabase, err := dbOp.Read(context.Background(), zone, types.StringID(rs.Primary.ID))
+		foundDatabase, err := dbOp.Read(context.Background(), zone, sakuraCloudID(rs.Primary.ID))
 		if err != nil {
 			return err
 		}
@@ -155,7 +155,7 @@ func testAccCheckSakuraCloudDatabaseDestroy(s *terraform.State) error {
 
 		dbOp := sacloud.NewDatabaseOp(client)
 		zone := rs.Primary.Attributes["zone"]
-		_, err := dbOp.Read(context.Background(), zone, types.StringID(rs.Primary.ID))
+		_, err := dbOp.Read(context.Background(), zone, sakuraCloudID(rs.Primary.ID))
 
 		if err == nil {
 			return fmt.Errorf("resource Database[%s] still exists", rs.Primary.ID)

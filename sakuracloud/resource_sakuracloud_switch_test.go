@@ -20,8 +20,6 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/sacloud/libsacloud/v2/sacloud/types"
-
 	"github.com/hashicorp/terraform-plugin-sdk/helper/resource"
 	"github.com/hashicorp/terraform-plugin-sdk/terraform"
 	"github.com/sacloud/libsacloud/v2/sacloud"
@@ -81,7 +79,7 @@ func testAccCheckSakuraCloudSwitchExists(n string, sw *sacloud.Switch) resource.
 		swOp := sacloud.NewSwitchOp(client)
 		zone := rs.Primary.Attributes["zone"]
 
-		foundSwitch, err := swOp.Read(context.Background(), zone, types.StringID(rs.Primary.ID))
+		foundSwitch, err := swOp.Read(context.Background(), zone, sakuraCloudID(rs.Primary.ID))
 		if err != nil {
 			return err
 		}
@@ -109,7 +107,7 @@ func testAccCheckSakuraCloudSwitchDestroy(s *terraform.State) error {
 		}
 
 		zone := rs.Primary.Attributes["zone"]
-		_, err := swOp.Read(context.Background(), zone, types.StringID(rs.Primary.ID))
+		_, err := swOp.Read(context.Background(), zone, sakuraCloudID(rs.Primary.ID))
 		if err == nil {
 			return fmt.Errorf("resource Switch[%s] still exists", rs.Primary.ID)
 		}

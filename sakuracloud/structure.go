@@ -16,11 +16,8 @@ package sakuracloud
 
 import (
 	"context"
-	"fmt"
 	"strconv"
-	"strings"
 
-	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/sacloud/libsacloud/v2/sacloud/search"
 	"github.com/sacloud/libsacloud/v2/sacloud/search/keys"
 	"github.com/sacloud/libsacloud/v2/sacloud/types"
@@ -119,24 +116,14 @@ func getListFromResource(d resourceValueGettable, key string) ([]interface{}, bo
 	return nil, false
 }
 
-func mergeSchemas(schemas ...map[string]*schema.Schema) map[string]*schema.Schema {
-	m := map[string]*schema.Schema{}
-	for _, schema := range schemas {
-		for k, v := range schema {
-			m[k] = v
-		}
-	}
-	return m
-}
-
-func getSacloudV2Client(d resourceValueGettable, meta interface{}) (*APIClient, context.Context, string) {
+func getSacloudClient(d resourceValueGettable, meta interface{}) (*APIClient, context.Context, string) {
 	client := meta.(*APIClient)
 	ctx := context.Background()
-	zone := getV2Zone(d, client)
+	zone := getZone(d, client)
 	return client, ctx, zone
 }
 
-func getV2Zone(d resourceValueGettable, client *APIClient) string {
+func getZone(d resourceValueGettable, client *APIClient) string {
 	zone, ok := d.GetOk("zone")
 	if ok {
 		if z, ok := zone.(string); ok && z != "" {
@@ -146,15 +133,14 @@ func getV2Zone(d resourceValueGettable, client *APIClient) string {
 	return client.defaultZone
 }
 
-func toSakuraCloudID(id string) int64 {
-	v, _ := strconv.ParseInt(id, 10, 64)
-	return v
+func sakuraCloudID(id string) types.ID {
+	return types.StringID(id)
 }
 
 func expandSakuraCloudID(d resourceValueGettable, key string) types.ID {
 	if v, ok := d.GetOk(key); ok {
 		if v, ok := v.(string); ok {
-			return types.StringID(v)
+			return sakuraCloudID(v)
 		}
 	}
 	return types.ID(0)
@@ -166,7 +152,7 @@ func expandSakuraCloudIDs(d resourceValueGettable, key string) []types.ID {
 		if v, ok := v.([]interface{}); ok {
 			for _, v := range v {
 				if v, ok := v.(string); ok {
-					ids = append(ids, types.StringID(v))
+					ids = append(ids, sakuraCloudID(v))
 				}
 			}
 		}
@@ -184,31 +170,8 @@ func expandStringList(configured []interface{}) []string {
 	return vs
 }
 
-func expandTagsV2(configured []interface{}) types.Tags {
-	return types.Tags(expandStringList(configured))
-}
-
-func flattenTags(tags types.Tags) []string {
-	return []string(tags)
-}
-
-func expandStringListWithValidateInList(fieldName string, configured []interface{}, allowWords []string) ([]string, error) {
-	vs := make([]string, 0, len(configured))
-	for _, v := range configured {
-		var found bool
-		for _, t := range allowWords {
-			if string(v.(string)) == t {
-				found = true
-				break
-			}
-		}
-		if !found {
-			return nil, fmt.Errorf("%q must be one of [%s]", fieldName, strings.Join(allowWords, "/"))
-		}
-
-		vs = append(vs, string(v.(string)))
-	}
-	return vs, nil
+func expandTags(d resourceValueGettable) types.Tags {
+	return types.Tags(expandStringList(d.Get("tags").([]interface{})))
 }
 
 func expandBackupWeekdays(configured []interface{}) []types.EBackupSpanWeekday {
@@ -227,10 +190,6 @@ func flattenBackupWeekdays(weekdays []types.EBackupSpanWeekday) []string {
 		ws = append(ws, w.String())
 	}
 	return ws
-}
-
-func extractSakuraID(d resourceValueGettable, key string) types.ID {
-	return types.StringID(d.Get(key).(string))
 }
 
 func forceString(target interface{}) string {
@@ -319,16 +278,19 @@ func expandSearchFilter(rawFilters interface{}) search.Filter {
 }
 
 func expandStringNumber(d resourceValueGettable, key string) types.StringNumber {
-	switch v := d.Get(key).(type) {
-	case string:
-		return types.StringNumber(forceAtoI(v))
-	case int:
-		return types.StringNumber(v)
-	case int64:
-		return types.StringNumber(v)
-	default:
-		return types.StringNumber(0)
+	if v, ok := d.GetOk(key); ok {
+		switch v := v.(type) {
+		case string:
+			return types.StringNumber(forceAtoI(v))
+		case int:
+			return types.StringNumber(v)
+		case int64:
+			return types.StringNumber(v)
+		default:
+			return types.StringNumber(0)
+		}
 	}
+	return types.StringNumber(0)
 }
 
 func expandStringFlag(d resourceValueGettable, key string) types.StringFlag {

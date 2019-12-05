@@ -96,7 +96,23 @@ func resourceSakuraCloudGSLB() *schema.Resource {
 				Computed: true,
 				MaxItems: 6,
 				Elem: &schema.Resource{
-					Schema: gslbServerValueSchemas(),
+					Schema: map[string]*schema.Schema{
+						"ipaddress": {
+							Type:     schema.TypeString,
+							Required: true,
+						},
+						"enabled": {
+							Type:     schema.TypeBool,
+							Optional: true,
+							Default:  true,
+						},
+						"weight": {
+							Type:         schema.TypeInt,
+							Optional:     true,
+							ValidateFunc: validation.IntBetween(1, 10000),
+							Default:      1,
+						},
+					},
 				},
 			},
 			"icon_id": {
@@ -118,28 +134,8 @@ func resourceSakuraCloudGSLB() *schema.Resource {
 	}
 }
 
-func gslbServerValueSchemas() map[string]*schema.Schema {
-	return map[string]*schema.Schema{
-		"ipaddress": {
-			Type:     schema.TypeString,
-			Required: true,
-		},
-		"enabled": {
-			Type:     schema.TypeBool,
-			Optional: true,
-			Default:  true,
-		},
-		"weight": {
-			Type:         schema.TypeInt,
-			Optional:     true,
-			ValidateFunc: validation.IntBetween(1, 10000),
-			Default:      1,
-		},
-	}
-}
-
 func resourceSakuraCloudGSLBCreate(d *schema.ResourceData, meta interface{}) error {
-	client, ctx, _ := getSacloudV2Client(d, meta)
+	client, ctx, _ := getSacloudClient(d, meta)
 	gslbOp := sacloud.NewGSLBOp(client)
 
 	gslb, err := gslbOp.Create(ctx, &sacloud.GSLBCreateRequest{
@@ -150,7 +146,7 @@ func resourceSakuraCloudGSLBCreate(d *schema.ResourceData, meta interface{}) err
 		DestinationServers: expandGSLBServers(d),
 		Name:               d.Get("name").(string),
 		Description:        d.Get("description").(string),
-		Tags:               expandTagsV2(d.Get("tags").([]interface{})),
+		Tags:               expandTags(d),
 		IconID:             expandSakuraCloudID(d, "icon_id"),
 	})
 	if err != nil {
@@ -162,10 +158,10 @@ func resourceSakuraCloudGSLBCreate(d *schema.ResourceData, meta interface{}) err
 }
 
 func resourceSakuraCloudGSLBRead(d *schema.ResourceData, meta interface{}) error {
-	client, ctx, _ := getSacloudV2Client(d, meta)
+	client, ctx, _ := getSacloudClient(d, meta)
 	gslbOp := sacloud.NewGSLBOp(client)
 
-	gslb, err := gslbOp.Read(ctx, types.StringID(d.Id()))
+	gslb, err := gslbOp.Read(ctx, sakuraCloudID(d.Id()))
 	if err != nil {
 		if sacloud.IsNotFoundError(err) {
 			d.SetId("")
@@ -178,18 +174,18 @@ func resourceSakuraCloudGSLBRead(d *schema.ResourceData, meta interface{}) error
 }
 
 func resourceSakuraCloudGSLBUpdate(d *schema.ResourceData, meta interface{}) error {
-	client, ctx, _ := getSacloudV2Client(d, meta)
+	client, ctx, _ := getSacloudClient(d, meta)
 	gslbOp := sacloud.NewGSLBOp(client)
 
-	gslb, err := gslbOp.Read(ctx, types.StringID(d.Id()))
+	gslb, err := gslbOp.Read(ctx, sakuraCloudID(d.Id()))
 	if err != nil {
 		return fmt.Errorf("could not read SakuraCloud DNS resource: %s", err)
 	}
 
-	gslb, err = gslbOp.Update(ctx, types.StringID(d.Id()), &sacloud.GSLBUpdateRequest{
+	gslb, err = gslbOp.Update(ctx, sakuraCloudID(d.Id()), &sacloud.GSLBUpdateRequest{
 		Name:               d.Get("name").(string),
 		Description:        d.Get("description").(string),
-		Tags:               expandTagsV2(d.Get("tags").([]interface{})),
+		Tags:               expandTags(d),
 		IconID:             expandSakuraCloudID(d, "icon_id"),
 		HealthCheck:        expandGSLBHealthCheckConf(d),
 		DelayLoop:          expandGSLBDelayLoop(d),
@@ -206,10 +202,10 @@ func resourceSakuraCloudGSLBUpdate(d *schema.ResourceData, meta interface{}) err
 }
 
 func resourceSakuraCloudGSLBDelete(d *schema.ResourceData, meta interface{}) error {
-	client, ctx, _ := getSacloudV2Client(d, meta)
+	client, ctx, _ := getSacloudClient(d, meta)
 	gslbOp := sacloud.NewGSLBOp(client)
 
-	gslb, err := gslbOp.Read(ctx, types.StringID(d.Id()))
+	gslb, err := gslbOp.Read(ctx, sakuraCloudID(d.Id()))
 	if err != nil {
 		if sacloud.IsNotFoundError(err) {
 			d.SetId("")

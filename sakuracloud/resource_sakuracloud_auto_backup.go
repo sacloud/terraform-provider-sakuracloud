@@ -20,7 +20,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/validation"
 	"github.com/sacloud/libsacloud/v2/sacloud"
-	"github.com/sacloud/libsacloud/v2/sacloud/types"
 )
 
 func resourceSakuraCloudAutoBackup() *schema.Resource {
@@ -84,7 +83,7 @@ func resourceSakuraCloudAutoBackup() *schema.Resource {
 }
 
 func resourceSakuraCloudAutoBackupCreate(d *schema.ResourceData, meta interface{}) error {
-	client, ctx, zone := getSacloudV2Client(d, meta)
+	client, ctx, zone := getSacloudClient(d, meta)
 	autoBackupOp := sacloud.NewAutoBackupOp(client)
 
 	if err := validateBackupWeekdays(d, "weekdays"); err != nil {
@@ -94,11 +93,11 @@ func resourceSakuraCloudAutoBackupCreate(d *schema.ResourceData, meta interface{
 	req := &sacloud.AutoBackupCreateRequest{
 		Name:                    d.Get("name").(string),
 		Description:             d.Get("description").(string),
-		Tags:                    expandTagsV2(d.Get("tags").([]interface{})),
-		DiskID:                  extractSakuraID(d, "disk_id"),
+		Tags:                    expandTags(d),
+		DiskID:                  expandSakuraCloudID(d, "disk_id"),
 		MaximumNumberOfArchives: d.Get("max_backup_num").(int),
 		BackupSpanWeekdays:      expandBackupWeekdays(d.Get("weekdays").([]interface{})),
-		IconID:                  extractSakuraID(d, "icon_id"),
+		IconID:                  expandSakuraCloudID(d, "icon_id"),
 	}
 
 	autoBackup, err := autoBackupOp.Create(ctx, zone, req)
@@ -111,10 +110,10 @@ func resourceSakuraCloudAutoBackupCreate(d *schema.ResourceData, meta interface{
 }
 
 func resourceSakuraCloudAutoBackupRead(d *schema.ResourceData, meta interface{}) error {
-	client, ctx, zone := getSacloudV2Client(d, meta)
+	client, ctx, zone := getSacloudClient(d, meta)
 	autoBackupOp := sacloud.NewAutoBackupOp(client)
 
-	autoBackup, err := autoBackupOp.Read(ctx, zone, types.StringID(d.Id()))
+	autoBackup, err := autoBackupOp.Read(ctx, zone, sakuraCloudID(d.Id()))
 	if err != nil {
 		if sacloud.IsNotFoundError(err) {
 			d.SetId("")
@@ -136,18 +135,18 @@ func setAutoBackupResourceData(d *schema.ResourceData, client *APIClient, data *
 		d.Set("icon_id", data.IconID.String())
 	}
 	d.Set("description", data.Description)
-	if err := d.Set("tags", flattenTags(data.Tags)); err != nil {
+	if err := d.Set("tags", data.Tags); err != nil {
 		return fmt.Errorf("error setting tags: %v", data.Tags)
 	}
-	d.Set("zone", getV2Zone(d, client))
+	d.Set("zone", getZone(d, client))
 	return nil
 }
 
 func resourceSakuraCloudAutoBackupUpdate(d *schema.ResourceData, meta interface{}) error {
-	client, ctx, zone := getSacloudV2Client(d, meta)
+	client, ctx, zone := getSacloudClient(d, meta)
 	autoBackupOp := sacloud.NewAutoBackupOp(client)
 
-	autoBackup, err := autoBackupOp.Read(ctx, zone, types.StringID(d.Id()))
+	autoBackup, err := autoBackupOp.Read(ctx, zone, sakuraCloudID(d.Id()))
 	if err != nil {
 		return fmt.Errorf("could not read SakuraCloud AutoBackup[%s]: %s", d.Id(), err)
 	}
@@ -159,10 +158,10 @@ func resourceSakuraCloudAutoBackupUpdate(d *schema.ResourceData, meta interface{
 	req := &sacloud.AutoBackupUpdateRequest{
 		Name:                    d.Get("name").(string),
 		Description:             d.Get("description").(string),
-		Tags:                    expandTagsV2(d.Get("tags").([]interface{})),
+		Tags:                    expandTags(d),
 		MaximumNumberOfArchives: d.Get("max_backup_num").(int),
 		BackupSpanWeekdays:      expandBackupWeekdays(d.Get("weekdays").([]interface{})),
-		IconID:                  extractSakuraID(d, "icon_id"),
+		IconID:                  expandSakuraCloudID(d, "icon_id"),
 		SettingsHash:            autoBackup.SettingsHash,
 	}
 
@@ -175,10 +174,10 @@ func resourceSakuraCloudAutoBackupUpdate(d *schema.ResourceData, meta interface{
 }
 
 func resourceSakuraCloudAutoBackupDelete(d *schema.ResourceData, meta interface{}) error {
-	client, ctx, zone := getSacloudV2Client(d, meta)
+	client, ctx, zone := getSacloudClient(d, meta)
 	autoBackupOp := sacloud.NewAutoBackupOp(client)
 
-	autoBackup, err := autoBackupOp.Read(ctx, zone, types.StringID(d.Id()))
+	autoBackup, err := autoBackupOp.Read(ctx, zone, sakuraCloudID(d.Id()))
 	if err != nil {
 		if sacloud.IsNotFoundError(err) {
 			d.SetId("")
