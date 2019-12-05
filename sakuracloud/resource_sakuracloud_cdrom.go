@@ -158,7 +158,7 @@ func resourceSakuraCloudCDROMUpdate(d *schema.ResourceData, meta interface{}) er
 	req := &sacloud.CDROMUpdateRequest{
 		Name:        d.Get("name").(string),
 		Description: d.Get("description").(string),
-		Tags:        expandTags(client, d.Get("tags").([]interface{})),
+		Tags:        expandTagsV2(d.Get("tags").([]interface{})),
 		IconID:      types.StringID(d.Get("icon_id").(string)),
 	}
 

@@ -134,7 +134,7 @@ func resourceSakuraCloudLoadBalancerServerRead(d *schema.ResourceData, meta inte
 	d.Set("check_path", server.HealthCheck.Path)
 	d.Set("check_status", server.HealthCheck.ResponseCode.String())
 	d.Set("enabled", server.Enabled)
-	d.Set("zone", client.Zone)
+	d.Set("zone", getV2Zone(d, client))
 	return nil
 }
 

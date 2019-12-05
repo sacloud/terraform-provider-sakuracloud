@@ -1,13 +1,9 @@
 package sakuracloud
 
 import (
-	"context"
 	"errors"
 	"fmt"
 	"testing"
-
-	"github.com/sacloud/libsacloud/v2/sacloud"
-	"github.com/sacloud/libsacloud/v2/sacloud/types"
 
 	"github.com/hashicorp/terraform/helper/acctest"
 	"github.com/hashicorp/terraform/helper/resource"
@@ -23,7 +19,7 @@ func TestAccSakuraCloudDataSourceSwitch_Basic(t *testing.T) {
 		PreCheck:                  func() { testAccPreCheck(t) },
 		Providers:                 testAccProviders,
 		PreventPostDestroyRefresh: true,
-		CheckDestroy:              testAccCheckSakuraCloudSwitchDataSourceDestroy,
+		CheckDestroy:              testAccCheckSakuraCloudSwitchDestroy,
 
 		Steps: []resource.TestStep{
 			{
@@ -88,30 +84,6 @@ func testAccCheckSakuraCloudSwitchDataSourceNotExists(n string) resource.TestChe
 		}
 		return nil
 	}
-}
-
-func testAccCheckSakuraCloudSwitchDataSourceDestroy(s *terraform.State) error {
-	client := testAccProvider.Meta().(*APIClient)
-
-	for _, rs := range s.RootModule().Resources {
-		if rs.Type != "sakuracloud_switch" {
-			continue
-		}
-
-		if rs.Primary.ID == "" {
-			continue
-		}
-
-		swOp := sacloud.NewSwitchOp(client)
-		zone := rs.Primary.Attributes["zone"]
-		_, err := swOp.Read(context.Background(), zone, types.StringID(rs.Primary.ID))
-
-		if err == nil {
-			return fmt.Errorf("resource Switch[%s] still exists", rs.Primary.ID)
-		}
-	}
-
-	return nil
 }
 
 func testAccCheckSakuraCloudDataSourceSwitchBase(name string) string {

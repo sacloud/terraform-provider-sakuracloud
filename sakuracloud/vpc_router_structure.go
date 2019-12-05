@@ -122,9 +122,8 @@ func flattenVPCRouterInterfaces(vpcRouter *sacloud.VPCRouter) []interface{} {
 func flattenVPCRouterGlobalAddress(vpcRouter *sacloud.VPCRouter) string {
 	if vpcRouter.PlanID == types.VPCRouterPlans.Standard {
 		return vpcRouter.Interfaces[0].IPAddress
-	} else {
-		return vpcRouter.Settings.Interfaces[0].VirtualIPAddress
 	}
+	return vpcRouter.Settings.Interfaces[0].VirtualIPAddress
 }
 
 func flattenVPCRouterSwitchID(vpcRouter *sacloud.VPCRouter) string {

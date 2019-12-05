@@ -132,6 +132,6 @@ func resourceSakuraCloudIPv4PtrDelete(d *schema.ResourceData, meta interface{}) 
 func setIPv4PtrResourceData(d *schema.ResourceData, client *APIClient, data *sacloud.IPAddress) error {
 	d.Set("ipaddress", data.IPAddress)
 	d.Set("hostname", data.HostName)
-	d.Set("zone", client.Zone)
+	d.Set("zone", getV2Zone(d, client))
 	return nil
 }

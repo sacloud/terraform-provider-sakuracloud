@@ -19,7 +19,7 @@ func TestAccSakuraCloudDataSourcePacketFilter_Basic(t *testing.T) {
 		PreCheck:                  func() { testAccPreCheck(t) },
 		Providers:                 testAccProviders,
 		PreventPostDestroyRefresh: true,
-		CheckDestroy:              testAccCheckSakuraCloudPacketFilterDataSourceDestroy,
+		CheckDestroy:              testAccCheckSakuraCloudPacketFilterDestroy,
 
 		Steps: []resource.TestStep{
 			{
@@ -73,28 +73,6 @@ func testAccCheckSakuraCloudPacketFilterDataSourceNotExists(n string) resource.T
 		}
 		return nil
 	}
-}
-
-func testAccCheckSakuraCloudPacketFilterDataSourceDestroy(s *terraform.State) error {
-	client := testAccProvider.Meta().(*APIClient)
-
-	for _, rs := range s.RootModule().Resources {
-		if rs.Type != "sakuracloud_packet_filter" {
-			continue
-		}
-
-		if rs.Primary.ID == "" {
-			continue
-		}
-
-		_, err := client.PacketFilter.Read(toSakuraCloudID(rs.Primary.ID))
-
-		if err == nil {
-			return errors.New("PacketFilter still exists")
-		}
-	}
-
-	return nil
 }
 
 func testAccCheckSakuraCloudDataSourcePacketFilterBase(name string) string {

@@ -19,7 +19,7 @@ func TestAccSakuraCloudDataSourceNFS_Basic(t *testing.T) {
 		PreCheck:                  func() { testAccPreCheck(t) },
 		Providers:                 testAccProviders,
 		PreventPostDestroyRefresh: true,
-		CheckDestroy:              testAccCheckSakuraCloudNFSDataSourceDestroy,
+		CheckDestroy:              testAccCheckSakuraCloudNFSDestroy,
 
 		Steps: []resource.TestStep{
 			{
@@ -84,28 +84,6 @@ func testAccCheckSakuraCloudNFSDataSourceNotExists(n string) resource.TestCheckF
 		}
 		return nil
 	}
-}
-
-func testAccCheckSakuraCloudNFSDataSourceDestroy(s *terraform.State) error {
-	client := testAccProvider.Meta().(*APIClient)
-
-	for _, rs := range s.RootModule().Resources {
-		if rs.Type != "sakuracloud_nfs" {
-			continue
-		}
-
-		if rs.Primary.ID == "" {
-			continue
-		}
-
-		_, err := client.NFS.Read(toSakuraCloudID(rs.Primary.ID))
-
-		if err == nil {
-			return errors.New("NFS still exists")
-		}
-	}
-
-	return nil
 }
 
 func testAccCheckSakuraCloudDataSourceNFSBase(name string) string {

@@ -240,7 +240,7 @@ func setNFSResourceData(ctx context.Context, d *schema.ResourceData, client *API
 	if err := d.Set("tags", data.Tags); err != nil {
 		return err
 	}
-	d.Set("zone", client.Zone)
+	d.Set("zone", getV2Zone(d, client))
 
 	return nil
 }

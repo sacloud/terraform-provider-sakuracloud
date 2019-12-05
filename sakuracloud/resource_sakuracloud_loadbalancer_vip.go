@@ -107,7 +107,7 @@ func resourceSakuraCloudLoadBalancerVIPRead(d *schema.ResourceData, meta interfa
 	}
 	d.Set("delay_loop", vip.DelayLoop.Int())
 	d.Set("sorry_server", vip.SorryServer)
-	d.Set("zone", client.Zone)
+	d.Set("zone", getV2Zone(d, client))
 	return nil
 }
 

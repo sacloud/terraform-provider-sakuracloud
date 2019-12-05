@@ -19,7 +19,7 @@ func TestAccSakuraCloudDataSourceVPCRouter_Basic(t *testing.T) {
 		PreCheck:                  func() { testAccPreCheck(t) },
 		Providers:                 testAccProviders,
 		PreventPostDestroyRefresh: true,
-		CheckDestroy:              testAccCheckSakuraCloudVPCRouterDataSourceDestroy,
+		CheckDestroy:              testAccCheckSakuraCloudVPCRouterDestroy,
 
 		Steps: []resource.TestStep{
 			{
@@ -84,28 +84,6 @@ func testAccCheckSakuraCloudVPCRouterDataSourceNotExists(n string) resource.Test
 		}
 		return nil
 	}
-}
-
-func testAccCheckSakuraCloudVPCRouterDataSourceDestroy(s *terraform.State) error {
-	client := testAccProvider.Meta().(*APIClient)
-
-	for _, rs := range s.RootModule().Resources {
-		if rs.Type != "sakuracloud_vpc_router" {
-			continue
-		}
-
-		if rs.Primary.ID == "" {
-			continue
-		}
-
-		_, err := client.VPCRouter.Read(toSakuraCloudID(rs.Primary.ID))
-
-		if err == nil {
-			return errors.New("VPCRouter still exists")
-		}
-	}
-
-	return nil
 }
 
 func testAccCheckSakuraCloudDataSourceVPCRouterBase(name string) string {

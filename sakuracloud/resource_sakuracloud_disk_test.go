@@ -106,13 +106,15 @@ func testAccCheckSakuraCloudDiskAttributes(disk *sacloud.Disk) resource.TestChec
 
 func testAccCheckSakuraCloudDiskDestroy(s *terraform.State) error {
 	client := testAccProvider.Meta().(*APIClient)
+	diskOp := sacloud.NewDiskOp(client)
 
 	for _, rs := range s.RootModule().Resources {
 		if rs.Type != "sakuracloud_disk" {
 			continue
 		}
 
-		_, err := client.Disk.Read(toSakuraCloudID(rs.Primary.ID))
+		zone := rs.Primary.Attributes["zone"]
+		_, err := diskOp.Read(context.Background(), zone, types.StringID(rs.Primary.ID))
 
 		if err == nil {
 			return errors.New("Disk still exists")

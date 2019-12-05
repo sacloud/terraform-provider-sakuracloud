@@ -1,13 +1,9 @@
 package sakuracloud
 
 import (
-	"context"
 	"errors"
 	"fmt"
 	"testing"
-
-	"github.com/sacloud/libsacloud/v2/sacloud"
-	"github.com/sacloud/libsacloud/v2/sacloud/types"
 
 	"github.com/hashicorp/terraform/helper/acctest"
 	"github.com/hashicorp/terraform/helper/resource"
@@ -23,7 +19,7 @@ func TestAccSakuraCloudDataSourceSSHKey_Basic(t *testing.T) {
 		PreCheck:                  func() { testAccPreCheck(t) },
 		Providers:                 testAccProviders,
 		PreventPostDestroyRefresh: true,
-		CheckDestroy:              testAccCheckSakuraCloudSSHKeyDataSourceDestroy,
+		CheckDestroy:              testAccCheckSakuraCloudSSHKeyDestroy,
 
 		Steps: []resource.TestStep{
 			{
@@ -73,28 +69,6 @@ func testAccCheckSakuraCloudSSHKeyDataSourceNotExists(n string) resource.TestChe
 		}
 		return nil
 	}
-}
-
-func testAccCheckSakuraCloudSSHKeyDataSourceDestroy(s *terraform.State) error {
-	client := testAccProvider.Meta().(*APIClient)
-	sshKeyOp := sacloud.NewSSHKeyOp(client)
-
-	for _, rs := range s.RootModule().Resources {
-		if rs.Type != "sakuracloud_ssh_key" {
-			continue
-		}
-
-		if rs.Primary.ID == "" {
-			continue
-		}
-
-		_, err := sshKeyOp.Read(context.Background(), types.StringID(rs.Primary.ID))
-		if err == nil {
-			return fmt.Errorf("still exists SSHKey: %s", rs.Primary.ID)
-		}
-	}
-
-	return nil
 }
 
 func testAccCheckSakuraCloudDataSourceSSHKeyBase(name string) string {

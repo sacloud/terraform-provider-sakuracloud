@@ -20,12 +20,11 @@ func composeCustomizeDiff(funcs ...schema.CustomizeDiffFunc) schema.CustomizeDif
 }
 
 func hasTagResourceCustomizeDiff(d *schema.ResourceDiff, meta interface{}) error {
-	client := getSacloudAPIClient(d, meta)
 	if d.HasChange("tags") {
 		o, n := d.GetChange("tags")
 		if o != nil && n != nil {
-			os := expandTags(client, o.([]interface{}))
-			ns := expandTags(client, n.([]interface{}))
+			os := expandStringList(o.([]interface{}))
+			ns := expandStringList(n.([]interface{}))
 
 			sort.Strings(os)
 			sort.Strings(ns)

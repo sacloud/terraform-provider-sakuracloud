@@ -1,15 +1,12 @@
 package sakuracloud
 
 import (
-	"context"
 	"errors"
 	"fmt"
 	"testing"
 
 	"github.com/hashicorp/terraform/helper/resource"
 	"github.com/hashicorp/terraform/terraform"
-	"github.com/sacloud/libsacloud/v2/sacloud"
-	"github.com/sacloud/libsacloud/v2/sacloud/types"
 )
 
 func TestAccSakuraCloudDataSourceCDROM_Basic(t *testing.T) {
@@ -17,7 +14,7 @@ func TestAccSakuraCloudDataSourceCDROM_Basic(t *testing.T) {
 		PreCheck:                  func() { testAccPreCheck(t) },
 		Providers:                 testAccProviders,
 		PreventPostDestroyRefresh: true,
-		CheckDestroy:              testAccCheckSakuraCloudCDROMDataSourceDestroy,
+		CheckDestroy:              testAccCheckSakuraCloudCDROMDestroy,
 
 		Steps: []resource.TestStep{
 			{
@@ -93,30 +90,6 @@ func testAccCheckSakuraCloudCDROMDataSourceNotExists(n string) resource.TestChec
 		}
 		return nil
 	}
-}
-
-func testAccCheckSakuraCloudCDROMDataSourceDestroy(s *terraform.State) error {
-	client := testAccProvider.Meta().(*APIClient)
-
-	for _, rs := range s.RootModule().Resources {
-		if rs.Type != "sakuracloud_cdrom" {
-			continue
-		}
-
-		if rs.Primary.ID == "" {
-			continue
-		}
-
-		cdromOp := sacloud.NewCDROMOp(client)
-		zone := rs.Primary.Attributes["zone"]
-		_, err := cdromOp.Read(context.Background(), zone, types.StringID(rs.Primary.ID))
-
-		if err == nil {
-			return fmt.Errorf("resource CDROM[%s] still exists", rs.Primary.ID)
-		}
-	}
-
-	return nil
 }
 
 var testAccCheckSakuraCloudDataSourceCDROMConfig = `

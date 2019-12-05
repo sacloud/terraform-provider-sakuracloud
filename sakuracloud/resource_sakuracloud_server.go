@@ -9,8 +9,7 @@ import (
 	"github.com/hashicorp/terraform/helper/schema"
 	"github.com/hashicorp/terraform/helper/validation"
 	"github.com/hashicorp/terraform/terraform"
-	"github.com/sacloud/libsacloud/sacloud"
-	v2 "github.com/sacloud/libsacloud/v2/sacloud"
+	"github.com/sacloud/libsacloud/v2/sacloud"
 	"github.com/sacloud/libsacloud/v2/sacloud/types"
 	serverUtil "github.com/sacloud/libsacloud/v2/utils/server"
 )
@@ -35,7 +34,7 @@ func resourceSakuraCloudServer() *schema.Resource {
 			if version < 1 {
 				v, exists := state.Attributes["commitment"]
 				if !exists || v == "" {
-					state.Attributes["commitment"] = string(sacloud.ECommitmentStandard)
+					state.Attributes["commitment"] = types.Commitments.Standard.String()
 				}
 			}
 			return state, nil
@@ -58,10 +57,10 @@ func resourceSakuraCloudServer() *schema.Resource {
 			"commitment": {
 				Type:     schema.TypeString,
 				Optional: true,
-				Default:  string(sacloud.ECommitmentStandard),
+				Default:  types.Commitments.Standard.String(),
 				ValidateFunc: validation.StringInSlice([]string{
-					string(sacloud.ECommitmentStandard),
-					string(sacloud.ECommitmentDedicatedCPU),
+					types.Commitments.Standard.String(),
+					types.Commitments.DedicatedCPU.String(),
 				}, false),
 			},
 			"disks": {
@@ -69,16 +68,14 @@ func resourceSakuraCloudServer() *schema.Resource {
 				Optional: true,
 				Computed: true,
 				Elem:     &schema.Schema{Type: schema.TypeString},
-				// ! Current terraform(v0.7) is not support to array validation !
-				// ValidateFunc: validateSakuracloudIDArrayType,
 			},
 			"interface_driver": {
 				Type:     schema.TypeString,
 				Optional: true,
-				Default:  string(sacloud.InterfaceDriverVirtIO),
+				Default:  types.InterfaceDrivers.VirtIO.String(),
 				ValidateFunc: validation.StringInSlice([]string{
-					string(sacloud.InterfaceDriverVirtIO),
-					string(sacloud.InterfaceDriverE1000),
+					types.InterfaceDrivers.VirtIO.String(),
+					types.InterfaceDrivers.E1000.String(),
 				}, false),
 			},
 			"nic": {
@@ -86,12 +83,6 @@ func resourceSakuraCloudServer() *schema.Resource {
 				Optional: true,
 				Default:  "shared",
 			},
-			//"display_ipaddress": {
-			//	Type:         schema.TypeString,
-			//	Optional:     true,
-			//	Computed:     true,
-			//	ValidateFunc: validateIPv4Address(),
-			//},
 			"cdrom_id": {
 				Type:         schema.TypeString,
 				Optional:     true,
@@ -113,21 +104,12 @@ func resourceSakuraCloudServer() *schema.Resource {
 				MaxItems: 3,
 				Elem:     &schema.Schema{Type: schema.TypeString},
 			},
-			//"additional_display_ipaddresses": {
-			//	Type:     schema.TypeList,
-			//	Optional: true,
-			//	Computed: true,
-			//	MaxItems: 3,
-			//	Elem:     &schema.Schema{Type: schema.TypeString},
-			//},
 			"packet_filter_ids": {
 				Type:     schema.TypeList,
 				Optional: true,
 				Computed: true,
 				MaxItems: 4,
 				Elem:     &schema.Schema{Type: schema.TypeString},
-				// ! Current terraform(v0.7) is not support to array validation !
-				// ValidateFunc: validateSakuracloudIDArrayType,
 			},
 			"icon_id": {
 				Type:         schema.TypeString,
@@ -167,8 +149,6 @@ func resourceSakuraCloudServer() *schema.Resource {
 				Type:     schema.TypeList,
 				Optional: true,
 				Elem:     &schema.Schema{Type: schema.TypeString},
-				// ! Current terraform(v0.7) is not support to array validation !
-				// ValidateFunc: validateSakuracloudIDArrayType,
 			},
 			"disable_pw_auth": {
 				Type:     schema.TypeBool,
@@ -178,8 +158,6 @@ func resourceSakuraCloudServer() *schema.Resource {
 				Type:     schema.TypeList,
 				Optional: true,
 				Elem:     &schema.Schema{Type: schema.TypeString},
-				// ! Current terraform(v0.7) is not support to array validation !
-				// ValidateFunc: validateSakuracloudIDArrayType,
 			},
 			"macaddresses": {
 				Type:     schema.TypeList,
@@ -216,16 +194,16 @@ func resourceSakuraCloudServer() *schema.Resource {
 
 func resourceSakuraCloudServerCreate(d *schema.ResourceData, meta interface{}) error {
 	client, ctx, zone := getSacloudV2Client(d, meta)
-	serverOp := v2.NewServerOp(client)
-	diskOp := v2.NewDiskOp(client)
-	interfaceOp := v2.NewInterfaceOp(client)
+	serverOp := sacloud.NewServerOp(client)
+	diskOp := sacloud.NewDiskOp(client)
+	interfaceOp := sacloud.NewInterfaceOp(client)
 
 	// validate
 	if err := validateServerPlan(ctx, client, d); err != nil {
 		return err
 	}
 
-	server, err := serverOp.Create(ctx, zone, &v2.ServerCreateRequest{
+	server, err := serverOp.Create(ctx, zone, &sacloud.ServerCreateRequest{
 		CPU:                  d.Get("core").(int),
 		MemoryMB:             d.Get("memory").(int) * 1024,
 		ServerPlanCommitment: types.ECommitment(d.Get("commitment").(string)),
@@ -273,7 +251,7 @@ func resourceSakuraCloudServerCreate(d *schema.ResourceData, meta interface{}) e
 	// cdrom
 	cdromID := expandSakuraCloudID(d, "cdrom_id")
 	if !cdromID.IsEmpty() {
-		if err := serverOp.InsertCDROM(ctx, zone, server.ID, &v2.InsertCDROMRequest{ID: cdromID}); err != nil {
+		if err := serverOp.InsertCDROM(ctx, zone, server.ID, &sacloud.InsertCDROMRequest{ID: cdromID}); err != nil {
 			return fmt.Errorf("inserting CD-ROM to server is failed: %s", err)
 		}
 	}
@@ -289,11 +267,11 @@ func resourceSakuraCloudServerCreate(d *schema.ResourceData, meta interface{}) e
 
 func resourceSakuraCloudServerRead(d *schema.ResourceData, meta interface{}) error {
 	client, ctx, zone := getSacloudV2Client(d, meta)
-	serverOp := v2.NewServerOp(client)
+	serverOp := sacloud.NewServerOp(client)
 
 	server, err := serverOp.Read(ctx, zone, types.StringID(d.Id()))
 	if err != nil {
-		if v2.IsNotFoundError(err) {
+		if sacloud.IsNotFoundError(err) {
 			d.SetId("")
 			return nil
 		}
@@ -305,7 +283,7 @@ func resourceSakuraCloudServerRead(d *schema.ResourceData, meta interface{}) err
 
 func resourceSakuraCloudServerUpdate(d *schema.ResourceData, meta interface{}) error {
 	client, ctx, zone := getSacloudV2Client(d, meta)
-	serverOp := v2.NewServerOp(client)
+	serverOp := sacloud.NewServerOp(client)
 
 	sakuraMutexKV.Lock(d.Id())
 	defer sakuraMutexKV.Unlock(d.Id())
@@ -371,7 +349,7 @@ func resourceSakuraCloudServerUpdate(d *schema.ResourceData, meta interface{}) e
 
 	// change Plan
 	if isPlanChanged {
-		s, err := serverOp.ChangePlan(ctx, zone, server.ID, &v2.ServerChangePlanRequest{
+		s, err := serverOp.ChangePlan(ctx, zone, server.ID, &sacloud.ServerChangePlanRequest{
 			CPU:                  d.Get("core").(int),
 			MemoryMB:             d.Get("memory").(int) * 1024,
 			ServerPlanCommitment: types.ECommitment(d.Get("commitment").(string)),
@@ -384,7 +362,7 @@ func resourceSakuraCloudServerUpdate(d *schema.ResourceData, meta interface{}) e
 		d.SetId(server.ID.String())
 	}
 
-	server, err = serverOp.Update(ctx, zone, server.ID, &v2.ServerUpdateRequest{
+	server, err = serverOp.Update(ctx, zone, server.ID, &sacloud.ServerUpdateRequest{
 		Name:            d.Get("name").(string),
 		Description:     d.Get("description").(string),
 		Tags:            expandTagsV2(d.Get("tags").([]interface{})),
@@ -404,13 +382,13 @@ func resourceSakuraCloudServerUpdate(d *schema.ResourceData, meta interface{}) e
 
 	if d.HasChange("cdrom_id") {
 		if !server.CDROMID.IsEmpty() {
-			if err := serverOp.EjectCDROM(ctx, zone, server.ID, &v2.EjectCDROMRequest{ID: server.CDROMID}); err != nil {
+			if err := serverOp.EjectCDROM(ctx, zone, server.ID, &sacloud.EjectCDROMRequest{ID: server.CDROMID}); err != nil {
 				return fmt.Errorf("ejecting CD-ROM is failed: %s", err)
 			}
 		}
 		cdromID := expandSakuraCloudID(d, "cdrom_id")
 		if !cdromID.IsEmpty() {
-			if err := serverOp.InsertCDROM(ctx, zone, server.ID, &v2.InsertCDROMRequest{ID: cdromID}); err != nil {
+			if err := serverOp.InsertCDROM(ctx, zone, server.ID, &sacloud.InsertCDROMRequest{ID: cdromID}); err != nil {
 				return fmt.Errorf("inserting CD-ROM is failed: %s", err)
 			}
 		}
@@ -427,14 +405,14 @@ func resourceSakuraCloudServerUpdate(d *schema.ResourceData, meta interface{}) e
 
 func resourceSakuraCloudServerDelete(d *schema.ResourceData, meta interface{}) error {
 	client, ctx, zone := getSacloudV2Client(d, meta)
-	serverOp := v2.NewServerOp(client)
+	serverOp := sacloud.NewServerOp(client)
 
 	sakuraMutexKV.Lock(d.Id())
 	defer sakuraMutexKV.Unlock(d.Id())
 
 	server, err := serverOp.Read(ctx, zone, types.StringID(d.Id()))
 	if err != nil {
-		if v2.IsNotFoundError(err) {
+		if sacloud.IsNotFoundError(err) {
 			d.SetId("")
 			return nil
 		}
@@ -453,7 +431,7 @@ func resourceSakuraCloudServerDelete(d *schema.ResourceData, meta interface{}) e
 	return nil
 }
 
-func setServerResourceData(ctx context.Context, d *schema.ResourceData, client *APIClient, data *v2.Server) error {
+func setServerResourceData(ctx context.Context, d *schema.ResourceData, client *APIClient, data *sacloud.Server) error {
 	zone := getV2Zone(d, client)
 
 	ip, gateway, nwMaskLen, nwAddress := flattenServerNetworkInfo(data)
@@ -510,12 +488,12 @@ func setServerResourceData(ctx context.Context, d *schema.ResourceData, client *
 	return nil
 }
 
-func configDiskSync(ctx context.Context, client *APIClient, zone string, id types.ID, editReq *v2.DiskEditRequest) error {
-	diskOp := v2.NewDiskOp(client)
+func configDiskSync(ctx context.Context, client *APIClient, zone string, id types.ID, editReq *sacloud.DiskEditRequest) error {
+	diskOp := sacloud.NewDiskOp(client)
 	if err := diskOp.Config(ctx, zone, id, editReq); err != nil {
 		return err
 	}
-	waiter := v2.WaiterForReady(func() (interface{}, error) {
+	waiter := sacloud.WaiterForReady(func() (interface{}, error) {
 		return diskOp.Read(ctx, zone, id)
 	})
 	if _, err := waiter.WaitForState(ctx); err != nil {
@@ -554,20 +532,20 @@ func serverNetworkAttrsCustomizeDiff(d *schema.ResourceDiff, meta interface{}) e
 	return nil
 }
 
-func expandConnectedSwitches(d resourceValueGettable) []*v2.ConnectedSwitch {
-	var switches []*v2.ConnectedSwitch
+func expandConnectedSwitches(d resourceValueGettable) []*sacloud.ConnectedSwitch {
+	var switches []*sacloud.ConnectedSwitch
 
-	var primary *v2.ConnectedSwitch
+	var primary *sacloud.ConnectedSwitch
 	nic := d.Get("nic").(string)
 	switch nic {
 	case "", "shared":
-		primary = &v2.ConnectedSwitch{
+		primary = &sacloud.ConnectedSwitch{
 			Scope: types.Scopes.Shared,
 		}
 	case "disconnect":
 		primary = nil
 	default:
-		primary = &v2.ConnectedSwitch{
+		primary = &sacloud.ConnectedSwitch{
 			ID: types.StringID(nic),
 		}
 	}
@@ -575,9 +553,9 @@ func expandConnectedSwitches(d resourceValueGettable) []*v2.ConnectedSwitch {
 
 	additionalNICs := expandSakuraCloudIDs(d, "additional_nics")
 	for _, id := range additionalNICs {
-		var cs *v2.ConnectedSwitch
+		var cs *sacloud.ConnectedSwitch
 		if !id.IsEmpty() {
-			cs = &v2.ConnectedSwitch{ID: id}
+			cs = &sacloud.ConnectedSwitch{ID: id}
 		}
 		switches = append(switches, cs)
 	}
@@ -585,7 +563,7 @@ func expandConnectedSwitches(d resourceValueGettable) []*v2.ConnectedSwitch {
 	return switches
 }
 
-func flattenServerNIC(server *v2.Server) string {
+func flattenServerNIC(server *sacloud.Server) string {
 	hasFirstInterface := len(server.Interfaces) > 0
 	if hasFirstInterface {
 		nic := server.Interfaces[0]
@@ -600,7 +578,7 @@ func flattenServerNIC(server *v2.Server) string {
 	return ""
 }
 
-func flattenServerAdditionalNICs(server *v2.Server) []string {
+func flattenServerAdditionalNICs(server *sacloud.Server) []string {
 	var additionalNICs []string
 	for i, iface := range server.Interfaces {
 		if i == 0 {
@@ -611,7 +589,7 @@ func flattenServerAdditionalNICs(server *v2.Server) []string {
 	return additionalNICs
 }
 
-func flattenServerConnectedDiskIDs(server *v2.Server) []string {
+func flattenServerConnectedDiskIDs(server *sacloud.Server) []string {
 	var ids []string
 	for _, disk := range server.Disks {
 		ids = append(ids, disk.ID.String())
@@ -619,7 +597,7 @@ func flattenServerConnectedDiskIDs(server *v2.Server) []string {
 	return ids
 }
 
-func flattenServerConnectedPacketFilterIDs(server *v2.Server) []string {
+func flattenServerConnectedPacketFilterIDs(server *sacloud.Server) []string {
 	var ids []string
 	for _, nic := range server.Interfaces {
 		ids = append(ids, nic.PacketFilterID.String())
@@ -627,7 +605,7 @@ func flattenServerConnectedPacketFilterIDs(server *v2.Server) []string {
 	return ids
 }
 
-func flattenServerMACAddresses(server *v2.Server) []string {
+func flattenServerMACAddresses(server *sacloud.Server) []string {
 	var macs []string
 	for _, nic := range server.Interfaces {
 		macs = append(macs, strings.ToLower(nic.MACAddress))
@@ -635,7 +613,7 @@ func flattenServerMACAddresses(server *v2.Server) []string {
 	return macs
 }
 
-func flattenServerNetworkInfo(server *v2.Server) (ip, gateway string, nwMaskLen int, nwAddress string) {
+func flattenServerNetworkInfo(server *sacloud.Server) (ip, gateway string, nwMaskLen int, nwAddress string) {
 	if !server.Interfaces[0].SwitchID.IsEmpty() {
 		nic := server.Interfaces[0]
 		if nic.SwitchScope == types.Scopes.Shared {
@@ -650,29 +628,29 @@ func flattenServerNetworkInfo(server *v2.Server) (ip, gateway string, nwMaskLen 
 	return
 }
 
-func expandDiskEditSSHKeys(d resourceValueGettable) []*v2.DiskEditSSHKey {
-	var keys []*v2.DiskEditSSHKey
+func expandDiskEditSSHKeys(d resourceValueGettable) []*sacloud.DiskEditSSHKey {
+	var keys []*sacloud.DiskEditSSHKey
 	ids := expandSakuraCloudIDs(d, "ssh_key_ids")
 	for _, id := range ids {
-		keys = append(keys, &v2.DiskEditSSHKey{ID: id})
+		keys = append(keys, &sacloud.DiskEditSSHKey{ID: id})
 	}
 	return keys
 }
 
-func expandDiskEditNotes(d resourceValueGettable) []*v2.DiskEditNote {
-	var notes []*v2.DiskEditNote
+func expandDiskEditNotes(d resourceValueGettable) []*sacloud.DiskEditNote {
+	var notes []*sacloud.DiskEditNote
 	ids := expandSakuraCloudIDs(d, "note_ids")
 	for _, id := range ids {
-		notes = append(notes, &v2.DiskEditNote{ID: id})
+		notes = append(notes, &sacloud.DiskEditNote{ID: id})
 	}
 	return notes
 }
 
-func expandDiskEditUserSubnet(d resourceValueGettable) *v2.DiskEditUserSubnet {
+func expandDiskEditUserSubnet(d resourceValueGettable) *sacloud.DiskEditUserSubnet {
 	maskLen := d.Get("nw_mask_len").(int)
 	gateway := d.Get("gateway").(string)
 	if maskLen != 0 && gateway != "" {
-		return &v2.DiskEditUserSubnet{
+		return &sacloud.DiskEditUserSubnet{
 			DefaultRoute:   gateway,
 			NetworkMaskLen: maskLen,
 		}
@@ -680,9 +658,9 @@ func expandDiskEditUserSubnet(d resourceValueGettable) *v2.DiskEditUserSubnet {
 	return nil
 }
 
-func expandDiskEditRequest(d resourceValueGettable) *v2.DiskEditRequest {
+func expandDiskEditRequest(d resourceValueGettable) *sacloud.DiskEditRequest {
 
-	editReq := &v2.DiskEditRequest{
+	editReq := &sacloud.DiskEditRequest{
 		Background:          true,
 		Password:            d.Get("password").(string),
 		SSHKeys:             expandDiskEditSSHKeys(d),
@@ -701,7 +679,7 @@ func expandDiskEditRequest(d resourceValueGettable) *v2.DiskEditRequest {
 	return nil
 }
 
-func isNeedDiskEdit(req *v2.DiskEditRequest) bool {
+func isNeedDiskEdit(req *sacloud.DiskEditRequest) bool {
 	return req.Password != "" ||
 		len(req.SSHKeys) > 0 ||
 		req.DisablePWAuth ||
@@ -732,7 +710,7 @@ func isServerDiskConfigChanged(d *schema.ResourceData) bool {
 
 func validateServerPlan(ctx context.Context, client *APIClient, d resourceValueGettable) error {
 	zone := getV2Zone(d, client)
-	_, err := serverUtil.FindPlan(ctx, v2.NewServerPlanOp(client), zone, &serverUtil.FindPlanRequest{
+	_, err := serverUtil.FindPlan(ctx, sacloud.NewServerPlanOp(client), zone, &serverUtil.FindPlanRequest{
 		CPU:        d.Get("core").(int),
 		MemoryGB:   d.Get("memory").(int),
 		Commitment: types.ECommitment(d.Get("commitment").(string)),
@@ -744,8 +722,8 @@ func validateServerPlan(ctx context.Context, client *APIClient, d resourceValueG
 	return nil
 }
 
-func reconcileServerDisks(ctx context.Context, client *APIClient, d resourceValueGettable, server *v2.Server) error {
-	diskOp := v2.NewDiskOp(client)
+func reconcileServerDisks(ctx context.Context, client *APIClient, d resourceValueGettable, server *sacloud.Server) error {
+	diskOp := sacloud.NewDiskOp(client)
 	zone := getV2Zone(d, client)
 
 	//disconnect all old disks
@@ -764,8 +742,8 @@ func reconcileServerDisks(ctx context.Context, client *APIClient, d resourceValu
 	return nil
 }
 
-func reconcileServerPacketFilters(ctx context.Context, client *APIClient, d resourceValueGettable, server *v2.Server) error {
-	interfaceOp := v2.NewInterfaceOp(client)
+func reconcileServerPacketFilters(ctx context.Context, client *APIClient, d resourceValueGettable, server *sacloud.Server) error {
+	interfaceOp := sacloud.NewInterfaceOp(client)
 	zone := getV2Zone(d, client)
 	pfIDs := expandSakuraCloudIDs(d, "packet_filter_ids")
 
@@ -786,8 +764,8 @@ func reconcileServerPacketFilters(ctx context.Context, client *APIClient, d reso
 	return nil
 }
 
-func reconcileServerNICs(ctx context.Context, client *APIClient, d *schema.ResourceData, server *v2.Server) error {
-	interfaceOp := v2.NewInterfaceOp(client)
+func reconcileServerNICs(ctx context.Context, client *APIClient, d *schema.ResourceData, server *sacloud.Server) error {
+	interfaceOp := sacloud.NewInterfaceOp(client)
 	zone := getV2Zone(d, client)
 
 	nicConf := []string{d.Get("nic").(string)}
@@ -829,12 +807,12 @@ type serverConnectedNIC interface {
 	GetSwitchScope() types.EScope
 }
 
-func reconcileServerInterfaceConnection(ctx context.Context, client *APIClient, zone, nicConf string, nicIndex int, server *v2.Server) error {
-	interfaceOp := v2.NewInterfaceOp(client)
+func reconcileServerInterfaceConnection(ctx context.Context, client *APIClient, zone, nicConf string, nicIndex int, server *sacloud.Server) error {
+	interfaceOp := sacloud.NewInterfaceOp(client)
 
 	var nic serverConnectedNIC
 	if len(server.Interfaces) <= nicIndex {
-		newNIC, err := interfaceOp.Create(ctx, zone, &v2.InterfaceCreateRequest{ServerID: server.ID})
+		newNIC, err := interfaceOp.Create(ctx, zone, &sacloud.InterfaceCreateRequest{ServerID: server.ID})
 		if err != nil {
 			return err
 		}

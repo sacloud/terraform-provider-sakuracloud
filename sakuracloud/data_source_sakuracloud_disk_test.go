@@ -19,7 +19,7 @@ func TestAccSakuraCloudDataSourceDisk_Basic(t *testing.T) {
 		PreCheck:                  func() { testAccPreCheck(t) },
 		Providers:                 testAccProviders,
 		PreventPostDestroyRefresh: true,
-		CheckDestroy:              testAccCheckSakuraCloudDiskDataSourceDestroy,
+		CheckDestroy:              testAccCheckSakuraCloudDiskDestroy,
 
 		Steps: []resource.TestStep{
 			{
@@ -89,28 +89,6 @@ func testAccCheckSakuraCloudDiskDataSourceNotExists(n string) resource.TestCheck
 		}
 		return nil
 	}
-}
-
-func testAccCheckSakuraCloudDiskDataSourceDestroy(s *terraform.State) error {
-	client := testAccProvider.Meta().(*APIClient)
-
-	for _, rs := range s.RootModule().Resources {
-		if rs.Type != "sakuracloud_disk" {
-			continue
-		}
-
-		if rs.Primary.ID == "" {
-			continue
-		}
-
-		_, err := client.Disk.Read(toSakuraCloudID(rs.Primary.ID))
-
-		if err == nil {
-			return errors.New("Disk still exists")
-		}
-	}
-
-	return nil
 }
 
 func testAccCheckSakuraCloudDataSourceDiskConfigBase(name string) string {

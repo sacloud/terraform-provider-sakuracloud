@@ -19,7 +19,7 @@ func TestAccSakuraCloudDataSourceNote_Basic(t *testing.T) {
 		PreCheck:                  func() { testAccPreCheck(t) },
 		Providers:                 testAccProviders,
 		PreventPostDestroyRefresh: true,
-		CheckDestroy:              testAccCheckSakuraCloudNoteDataSourceDestroy,
+		CheckDestroy:              testAccCheckSakuraCloudNoteDestroy,
 
 		Steps: []resource.TestStep{
 			{
@@ -85,28 +85,6 @@ func testAccCheckSakuraCloudNoteDataSourceNotExists(n string) resource.TestCheck
 		}
 		return nil
 	}
-}
-
-func testAccCheckSakuraCloudNoteDataSourceDestroy(s *terraform.State) error {
-	client := testAccProvider.Meta().(*APIClient)
-
-	for _, rs := range s.RootModule().Resources {
-		if rs.Type != "sakuracloud_note" {
-			continue
-		}
-
-		if rs.Primary.ID == "" {
-			continue
-		}
-
-		_, err := client.Note.Read(toSakuraCloudID(rs.Primary.ID))
-
-		if err == nil {
-			return errors.New("Note still exists")
-		}
-	}
-
-	return nil
 }
 
 func testAccCheckSakuraCloudDataSourceNoteBase(name string) string {

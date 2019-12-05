@@ -1,8 +1,8 @@
 package sakuracloud
 
 import (
-	"context"
 	"fmt"
+
 	"github.com/hashicorp/terraform/helper/schema"
 	"github.com/sacloud/libsacloud/v2/sacloud"
 )
@@ -359,10 +359,8 @@ func dataSourceSakuraCloudVPCRouter() *schema.Resource {
 }
 
 func dataSourceSakuraCloudVPCRouterRead(d *schema.ResourceData, meta interface{}) error {
-	client := getSacloudAPIClient(d, meta)
+	client, ctx, zone := getSacloudV2Client(d, meta)
 	searcher := sacloud.NewVPCRouterOp(client)
-	ctx := context.Background()
-	zone := getV2Zone(d, client)
 
 	findCondition := &sacloud.FindCondition{
 		Count: defaultSearchLimit,

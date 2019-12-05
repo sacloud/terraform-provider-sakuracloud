@@ -88,7 +88,7 @@ func resourceSakuraCloudArchiveCreate(d *schema.ResourceData, meta interface{}) 
 		Description: d.Get("description").(string),
 		SizeMB:      toSizeMB(d.Get("size").(int)),
 		IconID:      types.StringID(d.Get("icon_id").(string)),
-		Tags:        expandTags(client, d.Get("tags").([]interface{})),
+		Tags:        expandTagsV2(d.Get("tags").([]interface{})),
 	}
 
 	source := d.Get("archive_file").(string)
@@ -146,7 +146,7 @@ func resourceSakuraCloudArchiveUpdate(d *schema.ResourceData, meta interface{}) 
 	req := &sacloud.ArchiveUpdateRequest{
 		Name:        d.Get("name").(string),
 		Description: d.Get("description").(string),
-		Tags:        expandTags(client, d.Get("tags").([]interface{})),
+		Tags:        expandTagsV2(d.Get("tags").([]interface{})),
 		IconID:      types.StringID(d.Get("icon_id").(string)),
 	}
 

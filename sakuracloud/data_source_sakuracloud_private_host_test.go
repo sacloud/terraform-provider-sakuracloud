@@ -20,7 +20,7 @@ func TestAccSakuraCloudDataSourcePrivateHost_Basic(t *testing.T) {
 		PreCheck:                  func() { testAccPreCheck(t) },
 		Providers:                 testAccProviders,
 		PreventPostDestroyRefresh: true,
-		CheckDestroy:              testAccCheckSakuraCloudPrivateHostDataSourceDestroy,
+		CheckDestroy:              testAccCheckSakuraCloudPrivateHostDestroy,
 
 		Steps: []resource.TestStep{
 			{
@@ -88,31 +88,6 @@ func testAccCheckSakuraCloudPrivateHostDataSourceNotExists(n string) resource.Te
 		}
 		return nil
 	}
-}
-
-func testAccCheckSakuraCloudPrivateHostDataSourceDestroy(s *terraform.State) error {
-	client := testAccProvider.Meta().(*APIClient)
-	originalZone := client.Zone
-	client.Zone = "tk1a"
-	defer func() { client.Zone = originalZone }()
-
-	for _, rs := range s.RootModule().Resources {
-		if rs.Type != "sakuracloud_private_host" {
-			continue
-		}
-
-		if rs.Primary.ID == "" {
-			continue
-		}
-
-		_, err := client.PrivateHost.Read(toSakuraCloudID(rs.Primary.ID))
-
-		if err == nil {
-			return errors.New("PrivateHost still exists")
-		}
-	}
-
-	return nil
 }
 
 func testAccCheckSakuraCloudDataSourcePrivateHostBase(name string) string {

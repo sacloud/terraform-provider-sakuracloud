@@ -14,7 +14,7 @@ func TestAccSakuraCloudDataSourceArchive_Basic(t *testing.T) {
 		PreCheck:                  func() { testAccPreCheck(t) },
 		Providers:                 testAccProviders,
 		PreventPostDestroyRefresh: true,
-		CheckDestroy:              testAccCheckSakuraCloudArchiveDataSourceDestroy,
+		CheckDestroy:              testAccCheckSakuraCloudArchiveDestroy,
 
 		Steps: []resource.TestStep{
 			{
@@ -84,31 +84,6 @@ func testAccCheckSakuraCloudArchiveDataSourceNotExists(n string) resource.TestCh
 		}
 		return nil
 	}
-}
-
-func testAccCheckSakuraCloudArchiveDataSourceDestroy(s *terraform.State) error {
-	client := testAccProvider.Meta().(*APIClient)
-	originalZone := client.Zone
-	client.Zone = "tk1v"
-	defer func() { client.Zone = originalZone }()
-
-	for _, rs := range s.RootModule().Resources {
-		if rs.Type != "sakuracloud_archive" {
-			continue
-		}
-
-		if rs.Primary.ID == "" {
-			continue
-		}
-
-		_, err := client.Archive.Read(toSakuraCloudID(rs.Primary.ID))
-
-		if err == nil {
-			return errors.New("Archive still exists")
-		}
-	}
-
-	return nil
 }
 
 var testAccCheckSakuraCloudDataSourceArchiveConfig = `

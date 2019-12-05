@@ -1,7 +1,6 @@
 package sakuracloud
 
 import (
-	"context"
 	"fmt"
 
 	"github.com/hashicorp/terraform/helper/schema"
@@ -68,12 +67,9 @@ func dataSourceSakuraCloudSubnet() *schema.Resource {
 }
 
 func dataSourceSakuraCloudSubnetRead(d *schema.ResourceData, meta interface{}) error {
-	client := getSacloudAPIClient(d, meta)
+	client, ctx, zone := getSacloudV2Client(d, meta)
 	internetOp := sacloud.NewInternetOp(client)
 	subnetOp := sacloud.NewSubnetOp(client)
-
-	ctx := context.Background()
-	zone := getV2Zone(d, client)
 
 	internetID := types.StringID(d.Get("internet_id").(string))
 	subnetIndex := d.Get("index").(int)

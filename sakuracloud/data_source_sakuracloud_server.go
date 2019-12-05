@@ -1,15 +1,10 @@
 package sakuracloud
 
 import (
-	"context"
 	"fmt"
-	"log"
-	"strings"
 
 	"github.com/hashicorp/terraform/helper/schema"
 	"github.com/sacloud/libsacloud/v2/sacloud"
-	"github.com/sacloud/libsacloud/v2/sacloud/types"
-	"github.com/sacloud/libsacloud/v2/utils/server"
 )
 
 func dataSourceSakuraCloudServer() *schema.Resource {
@@ -143,10 +138,8 @@ func dataSourceSakuraCloudServer() *schema.Resource {
 }
 
 func dataSourceSakuraCloudServerRead(d *schema.ResourceData, meta interface{}) error {
-	client := getSacloudAPIClient(d, meta)
+	client, ctx, zone := getSacloudV2Client(d, meta)
 	searcher := sacloud.NewServerOp(client)
-	ctx := context.Background()
-	zone := getV2Zone(d, client)
 
 	findCondition := &sacloud.FindCondition{
 		Count: defaultSearchLimit,
@@ -165,125 +158,5 @@ func dataSourceSakuraCloudServerRead(d *schema.ResourceData, meta interface{}) e
 
 	targets := res.Servers
 	d.SetId(targets[0].ID.String())
-	return setServerV2ResourceData(ctx, d, client, targets[0])
-}
-
-func setServerV2ResourceData(ctx context.Context, d *schema.ResourceData, client *APIClient, data *sacloud.Server) error {
-	zone := getV2Zone(d, client)
-
-	var disks []string
-	for _, disk := range data.Disks {
-		disks = append(disks, disk.ID.String())
-	}
-
-	var nic, displayIPAddress string
-	hasFirstInterface := len(data.Interfaces) > 0
-	if hasFirstInterface {
-		switch data.Interfaces[0].UpstreamType {
-		case types.UpstreamNetworkTypes.None:
-			nic = "disconnect"
-			displayIPAddress = ""
-		case types.UpstreamNetworkTypes.Shared:
-			nic = "shared"
-			displayIPAddress = data.Interfaces[0].IPAddress
-		default:
-			nic = data.Interfaces[0].SwitchID.String()
-			ip := data.Interfaces[0].UserIPAddress
-			if ip == "0.0.0.0" {
-				ip = ""
-			}
-			displayIPAddress = ip
-		}
-	}
-
-	var additionalNICs, additionalDisplayIPs, packetFilterIDs, macAddresses []string
-	for i, iface := range data.Interfaces {
-		packetFilterIDs = append(packetFilterIDs, iface.PacketFilterID.String())
-		macAddresses = append(macAddresses, strings.ToLower(iface.MACAddress))
-
-		if i == 0 {
-			continue
-		}
-		additionalNICs = append(additionalNICs, iface.SwitchID.String())
-		ip := ""
-		if iface.SwitchScope == types.Scopes.User {
-			ip = iface.GetUserIPAddress()
-			if ip == "0.0.0.0" {
-				ip = ""
-			}
-		}
-		additionalDisplayIPs = append(additionalDisplayIPs, ip)
-	}
-
-	var ip, gateway, nwAddress string
-	var nwMaskLen int
-	if hasFirstInterface && !data.Interfaces[0].SwitchID.IsEmpty() {
-		nic := data.Interfaces[0]
-		if nic.SwitchScope == types.Scopes.Shared {
-			ip = nic.IPAddress
-		} else {
-			ip = nic.UserIPAddress
-		}
-
-		gateway = nic.UserSubnetDefaultRoute
-		nwMaskLen = nic.UserSubnetNetworkMaskLen
-		nwAddress = nic.SubnetNetworkAddress // null if connected switch(not router)
-
-		// build conninfo
-		connInfo := map[string]string{
-			"type": "ssh",
-			"host": ip,
-		}
-		userName, err := server.GetDefaultUserName(ctx, zone, server.NewSourceInfoReader(client), data.ID)
-		if err != nil {
-			log.Printf("[WARN] can't retrive connInfo from archives (server: %d).", data.ID)
-		}
-		if userName != "" {
-			connInfo["user"] = userName
-		}
-		d.SetConnInfo(connInfo)
-	}
-
-	var vncHost, vncPassword string
-	var vncPort int
-	if data.InstanceStatus.IsUp() && zone != "tk1v" {
-		serverOp := sacloud.NewServerOp(client)
-		vncRes, err := serverOp.GetVNCProxy(ctx, zone, data.ID)
-		if err != nil {
-			return fmt.Errorf("getting the vnc proxy info is failed: %s", err)
-		}
-		vncHost = vncRes.IOServerHost
-		vncPort = vncRes.Port.Int()
-		vncPassword = vncRes.Password
-	}
-
-	return setResourceData(d, map[string]interface{}{
-		"name":                           data.Name,
-		"core":                           data.CPU,
-		"memory":                         data.GetMemoryGB(),
-		"commitment":                     data.ServerPlanCommitment.String(),
-		"disks":                          disks,
-		"cdrom_id":                       data.CDROMID.String(),
-		"interface_driver":               data.InterfaceDriver.String(),
-		"private_host_id":                data.PrivateHostID.String(),
-		"private_host_name":              data.PrivateHostName,
-		"nic":                            nic,
-		"display_ipaddress":              displayIPAddress,
-		"additional_nics":                additionalNICs,
-		"additional_display_ipaddresses": additionalDisplayIPs,
-		"icon_id":                        data.IconID.String(),
-		"description":                    data.Description,
-		"tags":                           data.Tags,
-		"packet_filter_ids":              packetFilterIDs,
-		"macaddresses":                   macAddresses,
-		"ipaddress":                      ip,
-		"gateway":                        gateway,
-		"nw_address":                     nwAddress,
-		"nw_mask_len":                    nwMaskLen,
-		"dns_servers":                    data.Zone.Region.NameServers,
-		"vnc_host":                       vncHost,
-		"vnc_port":                       vncPort,
-		"vnc_password":                   vncPassword,
-		"zone":                           zone,
-	})
+	return setServerResourceData(ctx, d, client, targets[0])
 }

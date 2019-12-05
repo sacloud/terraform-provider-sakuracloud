@@ -1,13 +1,9 @@
 package sakuracloud
 
 import (
-	"context"
 	"errors"
 	"fmt"
 	"testing"
-
-	"github.com/sacloud/libsacloud/v2/sacloud"
-	"github.com/sacloud/libsacloud/v2/sacloud/types"
 
 	"github.com/hashicorp/terraform/helper/acctest"
 	"github.com/hashicorp/terraform/helper/resource"
@@ -23,7 +19,7 @@ func TestAccSakuraCloudDataSourceDatabase_Basic(t *testing.T) {
 		PreCheck:                  func() { testAccPreCheck(t) },
 		Providers:                 testAccProviders,
 		PreventPostDestroyRefresh: true,
-		CheckDestroy:              testAccCheckSakuraCloudDatabaseDataSourceDestroy,
+		CheckDestroy:              testAccCheckSakuraCloudDatabaseDestroy,
 
 		Steps: []resource.TestStep{
 			{
@@ -86,30 +82,6 @@ func testAccCheckSakuraCloudDatabaseDataSourceNotExists(n string) resource.TestC
 		}
 		return nil
 	}
-}
-
-func testAccCheckSakuraCloudDatabaseDataSourceDestroy(s *terraform.State) error {
-	client := testAccProvider.Meta().(*APIClient)
-
-	for _, rs := range s.RootModule().Resources {
-		if rs.Type != "sakuracloud_database" {
-			continue
-		}
-
-		if rs.Primary.ID == "" {
-			continue
-		}
-
-		dbOp := sacloud.NewDatabaseOp(client)
-		zone := rs.Primary.Attributes["zone"]
-		_, err := dbOp.Read(context.Background(), zone, types.StringID(rs.Primary.ID))
-
-		if err == nil {
-			return errors.New("database still exists")
-		}
-	}
-
-	return nil
 }
 
 func testAccCheckSakuraCloudDataSourceDatabaseBase(name string) string {

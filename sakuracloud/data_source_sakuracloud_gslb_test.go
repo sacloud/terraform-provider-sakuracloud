@@ -19,7 +19,7 @@ func TestAccSakuraCloudDataSourceGSLB_Basic(t *testing.T) {
 		PreCheck:                  func() { testAccPreCheck(t) },
 		Providers:                 testAccProviders,
 		PreventPostDestroyRefresh: true,
-		CheckDestroy:              testAccCheckSakuraCloudGSLBDataSourceDestroy,
+		CheckDestroy:              testAccCheckSakuraCloudGSLBDestroy,
 
 		Steps: []resource.TestStep{
 			{
@@ -88,28 +88,6 @@ func testAccCheckSakuraCloudGSLBDataSourceNotExists(n string) resource.TestCheck
 		}
 		return nil
 	}
-}
-
-func testAccCheckSakuraCloudGSLBDataSourceDestroy(s *terraform.State) error {
-	client := testAccProvider.Meta().(*APIClient)
-
-	for _, rs := range s.RootModule().Resources {
-		if rs.Type != "sakuracloud_gslb" {
-			continue
-		}
-
-		if rs.Primary.ID == "" {
-			continue
-		}
-
-		_, err := client.GSLB.Read(toSakuraCloudID(rs.Primary.ID))
-
-		if err == nil {
-			return errors.New("GSLB still exists")
-		}
-	}
-
-	return nil
 }
 
 func testAccCheckSakuraCloudDataSourceGSLBBase(name string) string {

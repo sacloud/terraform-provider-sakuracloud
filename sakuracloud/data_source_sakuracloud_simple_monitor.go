@@ -1,7 +1,6 @@
 package sakuracloud
 
 import (
-	"context"
 	"fmt"
 
 	"github.com/hashicorp/terraform/helper/schema"
@@ -125,9 +124,8 @@ func dataSourceSakuraCloudSimpleMonitor() *schema.Resource {
 }
 
 func dataSourceSakuraCloudSimpleMonitorRead(d *schema.ResourceData, meta interface{}) error {
-	client := getSacloudAPIClient(d, meta)
+	client, ctx, _ := getSacloudV2Client(d, meta)
 	searcher := sacloud.NewSimpleMonitorOp(client)
-	ctx := context.Background()
 
 	findCondition := &sacloud.FindCondition{
 		Count: defaultSearchLimit,

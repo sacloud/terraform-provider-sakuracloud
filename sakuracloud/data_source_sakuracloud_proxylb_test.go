@@ -33,7 +33,7 @@ func TestAccSakuraCloudDataSourceProxyLB_Basic(t *testing.T) {
 		PreCheck:                  func() { testAccPreCheck(t) },
 		Providers:                 testAccProviders,
 		PreventPostDestroyRefresh: true,
-		CheckDestroy:              testAccCheckSakuraCloudProxyLBDataSourceDestroy,
+		CheckDestroy:              testAccCheckSakuraCloudProxyLBDestroy,
 
 		Steps: []resource.TestStep{
 			{
@@ -110,28 +110,6 @@ func testAccCheckSakuraCloudProxyLBDataSourceNotExists(n string) resource.TestCh
 		}
 		return nil
 	}
-}
-
-func testAccCheckSakuraCloudProxyLBDataSourceDestroy(s *terraform.State) error {
-	client := testAccProvider.Meta().(*APIClient)
-
-	for _, rs := range s.RootModule().Resources {
-		if rs.Type != "sakuracloud_proxylb" {
-			continue
-		}
-
-		if rs.Primary.ID == "" {
-			continue
-		}
-
-		_, err := client.ProxyLB.Read(toSakuraCloudID(rs.Primary.ID))
-
-		if err == nil {
-			return errors.New("ProxyLB still exists")
-		}
-	}
-
-	return nil
 }
 
 func testAccCheckSakuraCloudDataSourceProxyLBBase(name, ip1, ip2 string) string {
