@@ -113,7 +113,7 @@ func resourceSakuraCloudCDROMCreate(d *schema.ResourceData, meta interface{}) er
 		Name:        d.Get("name").(string),
 		Description: d.Get("description").(string),
 		SizeMB:      toSizeMB(d.Get("size").(int)),
-		IconID:      sakuraCloudID(d.Get("icon_id").(string)),
+		IconID:      expandSakuraCloudID(d, "icon_id"),
 		Tags:        expandTags(d),
 	}
 
@@ -173,7 +173,7 @@ func resourceSakuraCloudCDROMUpdate(d *schema.ResourceData, meta interface{}) er
 		Name:        d.Get("name").(string),
 		Description: d.Get("description").(string),
 		Tags:        expandTags(d),
-		IconID:      sakuraCloudID(d.Get("icon_id").(string)),
+		IconID:      expandSakuraCloudID(d, "icon_id"),
 	}
 
 	cdrom, err = cdromOp.Update(ctx, zone, cdrom.ID, req)

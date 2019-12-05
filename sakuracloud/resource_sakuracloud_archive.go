@@ -101,7 +101,7 @@ func resourceSakuraCloudArchiveCreate(d *schema.ResourceData, meta interface{}) 
 		Name:        d.Get("name").(string),
 		Description: d.Get("description").(string),
 		SizeMB:      toSizeMB(d.Get("size").(int)),
-		IconID:      sakuraCloudID(d.Get("icon_id").(string)),
+		IconID:      expandSakuraCloudID(d, "icon_id"),
 		Tags:        expandTags(d),
 	}
 
@@ -161,7 +161,7 @@ func resourceSakuraCloudArchiveUpdate(d *schema.ResourceData, meta interface{}) 
 		Name:        d.Get("name").(string),
 		Description: d.Get("description").(string),
 		Tags:        expandTags(d),
-		IconID:      sakuraCloudID(d.Get("icon_id").(string)),
+		IconID:      expandSakuraCloudID(d, "icon_id"),
 	}
 
 	archive, err = archiveOp.Update(ctx, zone, archive.ID, req)

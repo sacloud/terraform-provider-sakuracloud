@@ -83,7 +83,7 @@ func resourceSakuraCloudSwitchCreate(d *schema.ResourceData, meta interface{}) e
 		Name:        d.Get("name").(string),
 		Description: d.Get("description").(string),
 		Tags:        expandTags(d),
-		IconID:      sakuraCloudID(d.Get("icon_id").(string)),
+		IconID:      expandSakuraCloudID(d, "icon_id"),
 	}
 
 	sw, err := swOp.Create(ctx, zone, req)
@@ -143,7 +143,7 @@ func resourceSakuraCloudSwitchUpdate(d *schema.ResourceData, meta interface{}) e
 		Name:        d.Get("name").(string),
 		Description: d.Get("description").(string),
 		Tags:        expandTags(d),
-		IconID:      sakuraCloudID(d.Get("icon_id").(string)),
+		IconID:      expandSakuraCloudID(d, "icon_id"),
 	}
 
 	sw, err = swOp.Update(ctx, zone, sw.ID, req)
