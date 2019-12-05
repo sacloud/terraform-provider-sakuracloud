@@ -31,7 +31,7 @@ var allowZones = []string{"is1a", "is1b", "tk1a", "tk1v"}
 
 // Provider returns a terraform.ResourceProvider.
 func Provider() terraform.ResourceProvider {
-	return &schema.Provider{
+	provider := &schema.Provider{
 		Schema: map[string]*schema.Schema{
 			"token": {
 				Type:        schema.TypeString,
@@ -170,11 +170,22 @@ func Provider() terraform.ResourceProvider {
 			"sakuracloud_switch":                      resourceSakuraCloudSwitch(),
 			"sakuracloud_vpc_router":                  resourceSakuraCloudVPCRouter(),
 		},
-		ConfigureFunc: providerConfigure,
 	}
+
+	provider.ConfigureFunc = func(d *schema.ResourceData) (interface{}, error) {
+		terraformVersion := provider.TerraformVersion
+		if terraformVersion == "" {
+			// Terraform 0.12 introduced this field to the protocol
+			// We can therefore assume that if it's missing it's 0.10 or 0.11
+			terraformVersion = "0.11+compatible"
+		}
+		return providerConfigure(d, terraformVersion)
+	}
+
+	return provider
 }
 
-func providerConfigure(d *schema.ResourceData) (interface{}, error) {
+func providerConfigure(d *schema.ResourceData, terraformVersion string) (interface{}, error) {
 
 	if _, ok := d.GetOk("zone"); !ok {
 		d.Set("zone", defaultZone)
@@ -193,6 +204,7 @@ func providerConfigure(d *schema.ResourceData) (interface{}, error) {
 		APIRequestRateLimit: d.Get("api_request_rate_limit").(int),
 		FakeMode:            d.Get("fake_mode").(string),
 		FakeStorePath:       d.Get("fake_store_path").(string),
+		terraformVersion:    terraformVersion,
 	}
 
 	return config.NewClient(), nil
