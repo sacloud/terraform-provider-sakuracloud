@@ -70,7 +70,7 @@ func dataSourceSakuraCloudArchive() *schema.Resource {
 }
 
 func dataSourceSakuraCloudArchiveRead(d *schema.ResourceData, meta interface{}) error {
-	client, ctx, zone := getSacloudV2Client(d, meta)
+	client, ctx, zone := getSacloudClient(d, meta)
 	searcher := sacloud.NewArchiveOp(client)
 
 	var data *sacloud.Archive
@@ -113,7 +113,7 @@ func dataSourceSakuraCloudArchiveRead(d *schema.ResourceData, meta interface{}) 
 		if err := d.Set("tags", data.Tags); err != nil {
 			return err
 		}
-		d.Set("zone", getV2Zone(d, client))
+		d.Set("zone", getZone(d, client))
 	}
 	return nil
 }

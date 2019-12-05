@@ -115,7 +115,7 @@ func dataSourceSakuraCloudDatabase() *schema.Resource {
 }
 
 func dataSourceSakuraCloudDatabaseRead(d *schema.ResourceData, meta interface{}) error {
-	client, ctx, zone := getSacloudV2Client(d, meta)
+	client, ctx, zone := getSacloudClient(d, meta)
 	searcher := sacloud.NewDatabaseOp(client)
 
 	findCondition := &sacloud.FindCondition{}

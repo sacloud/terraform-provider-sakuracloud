@@ -25,7 +25,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/helper/resource"
 	"github.com/hashicorp/terraform-plugin-sdk/terraform"
 	"github.com/sacloud/libsacloud/v2/sacloud"
-	"github.com/sacloud/libsacloud/v2/sacloud/types"
 )
 
 func TestAccResourceSakuraCloudPrivateHost(t *testing.T) {
@@ -134,7 +133,7 @@ func testAccCheckSakuraCloudPrivateHostExists(n string, private_host *sacloud.Pr
 		zone := rs.Primary.Attributes["zone"]
 		phOp := sacloud.NewPrivateHostOp(client)
 
-		foundPrivateHost, err := phOp.Read(context.Background(), zone, types.StringID(rs.Primary.ID))
+		foundPrivateHost, err := phOp.Read(context.Background(), zone, sakuraCloudID(rs.Primary.ID))
 		if err != nil {
 			return err
 		}
@@ -161,7 +160,7 @@ func testAccCheckSakuraCloudPrivateHostDestroy(s *terraform.State) error {
 		}
 
 		zone := rs.Primary.Attributes["zone"]
-		_, err := phOp.Read(context.Background(), zone, types.StringID(rs.Primary.ID))
+		_, err := phOp.Read(context.Background(), zone, sakuraCloudID(rs.Primary.ID))
 		if err == nil {
 			return fmt.Errorf("still exists PrivateHost: %s", rs.Primary.ID)
 		}

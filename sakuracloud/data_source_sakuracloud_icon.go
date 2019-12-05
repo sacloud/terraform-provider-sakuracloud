@@ -50,7 +50,7 @@ func dataSourceSakuraCloudIcon() *schema.Resource {
 }
 
 func dataSourceSakuraCloudIconRead(d *schema.ResourceData, meta interface{}) error {
-	client, ctx, _ := getSacloudV2Client(d, meta)
+	client, ctx, _ := getSacloudClient(d, meta)
 	searcher := sacloud.NewIconOp(client)
 
 	findCondition := &sacloud.FindCondition{}

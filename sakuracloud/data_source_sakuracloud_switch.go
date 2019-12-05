@@ -67,7 +67,7 @@ func dataSourceSakuraCloudSwitch() *schema.Resource {
 }
 
 func dataSourceSakuraCloudSwitchRead(d *schema.ResourceData, meta interface{}) error {
-	client, ctx, zone := getSacloudV2Client(d, meta)
+	client, ctx, zone := getSacloudClient(d, meta)
 	searcher := sacloud.NewSwitchOp(client)
 
 	findCondition := &sacloud.FindCondition{}

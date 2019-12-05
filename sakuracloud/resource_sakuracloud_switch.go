@@ -18,8 +18,6 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/sacloud/libsacloud/v2/sacloud/types"
-
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/sacloud/libsacloud/v2/sacloud"
 )
@@ -78,14 +76,14 @@ func resourceSakuraCloudSwitch() *schema.Resource {
 func resourceSakuraCloudSwitchCreate(d *schema.ResourceData, meta interface{}) error {
 	d.Partial(true)
 
-	client, ctx, zone := getSacloudV2Client(d, meta)
+	client, ctx, zone := getSacloudClient(d, meta)
 	swOp := sacloud.NewSwitchOp(client)
 
 	req := &sacloud.SwitchCreateRequest{
 		Name:        d.Get("name").(string),
 		Description: d.Get("description").(string),
-		Tags:        expandTagsV2(d.Get("tags").([]interface{})),
-		IconID:      types.StringID(d.Get("icon_id").(string)),
+		Tags:        expandTags(d),
+		IconID:      sakuraCloudID(d.Get("icon_id").(string)),
 	}
 
 	sw, err := swOp.Create(ctx, zone, req)
@@ -102,7 +100,7 @@ func resourceSakuraCloudSwitchCreate(d *schema.ResourceData, meta interface{}) e
 	if bridgeID, ok := d.GetOk("bridge_id"); ok {
 		brID := bridgeID.(string)
 		if brID != "" {
-			if err := swOp.ConnectToBridge(ctx, zone, sw.ID, types.StringID(brID)); err != nil {
+			if err := swOp.ConnectToBridge(ctx, zone, sw.ID, sakuraCloudID(brID)); err != nil {
 				return fmt.Errorf("connecting Switch[%s] to Bridge[%s] is failed: %s", sw.ID, brID, err)
 			}
 		}
@@ -114,10 +112,10 @@ func resourceSakuraCloudSwitchCreate(d *schema.ResourceData, meta interface{}) e
 }
 
 func resourceSakuraCloudSwitchRead(d *schema.ResourceData, meta interface{}) error {
-	client, ctx, zone := getSacloudV2Client(d, meta)
+	client, ctx, zone := getSacloudClient(d, meta)
 	swOp := sacloud.NewSwitchOp(client)
 
-	sw, err := swOp.Read(ctx, zone, types.StringID(d.Id()))
+	sw, err := swOp.Read(ctx, zone, sakuraCloudID(d.Id()))
 	if err != nil {
 		if sacloud.IsNotFoundError(err) {
 			d.SetId("")
@@ -130,13 +128,13 @@ func resourceSakuraCloudSwitchRead(d *schema.ResourceData, meta interface{}) err
 
 func resourceSakuraCloudSwitchUpdate(d *schema.ResourceData, meta interface{}) error {
 	d.Partial(true)
-	client, ctx, zone := getSacloudV2Client(d, meta)
+	client, ctx, zone := getSacloudClient(d, meta)
 	swOp := sacloud.NewSwitchOp(client)
 
 	sakuraMutexKV.Lock(d.Id())
 	defer sakuraMutexKV.Unlock(d.Id())
 
-	sw, err := swOp.Read(ctx, zone, types.StringID(d.Id()))
+	sw, err := swOp.Read(ctx, zone, sakuraCloudID(d.Id()))
 	if err != nil {
 		return fmt.Errorf("could not read SakuraCloud Switch[%s] : %s", d.Id(), err)
 	}
@@ -144,8 +142,8 @@ func resourceSakuraCloudSwitchUpdate(d *schema.ResourceData, meta interface{}) e
 	req := &sacloud.SwitchUpdateRequest{
 		Name:        d.Get("name").(string),
 		Description: d.Get("description").(string),
-		Tags:        expandTagsV2(d.Get("tags").([]interface{})),
-		IconID:      types.StringID(d.Get("icon_id").(string)),
+		Tags:        expandTags(d),
+		IconID:      sakuraCloudID(d.Get("icon_id").(string)),
 	}
 
 	sw, err = swOp.Update(ctx, zone, sw.ID, req)
@@ -166,7 +164,7 @@ func resourceSakuraCloudSwitchUpdate(d *schema.ResourceData, meta interface{}) e
 					return fmt.Errorf("disconnecting from Bridge[%s] is failed: %s", sw.BridgeID, err)
 				}
 			} else {
-				if err := swOp.ConnectToBridge(ctx, zone, sw.ID, types.StringID(brID)); err != nil {
+				if err := swOp.ConnectToBridge(ctx, zone, sw.ID, sakuraCloudID(brID)); err != nil {
 					return fmt.Errorf("connecting to Bridge[%s] is failed: %s", brID, err)
 				}
 			}
@@ -179,13 +177,13 @@ func resourceSakuraCloudSwitchUpdate(d *schema.ResourceData, meta interface{}) e
 }
 
 func resourceSakuraCloudSwitchDelete(d *schema.ResourceData, meta interface{}) error {
-	client, ctx, zone := getSacloudV2Client(d, meta)
+	client, ctx, zone := getSacloudClient(d, meta)
 	swOp := sacloud.NewSwitchOp(client)
 
 	sakuraMutexKV.Lock(d.Id())
 	defer sakuraMutexKV.Unlock(d.Id())
 
-	sw, err := swOp.Read(ctx, zone, types.StringID(d.Id()))
+	sw, err := swOp.Read(ctx, zone, sakuraCloudID(d.Id()))
 	if err != nil {
 		if sacloud.IsNotFoundError(err) {
 			d.SetId("")
@@ -211,7 +209,7 @@ func resourceSakuraCloudSwitchDelete(d *schema.ResourceData, meta interface{}) e
 }
 
 func setSwitchResourceData(ctx context.Context, d *schema.ResourceData, client *APIClient, data *sacloud.Switch) error {
-	zone := getV2Zone(d, client)
+	zone := getZone(d, client)
 	var serverIDs []string
 	if data.ServerCount > 0 {
 		swOp := sacloud.NewSwitchOp(client)

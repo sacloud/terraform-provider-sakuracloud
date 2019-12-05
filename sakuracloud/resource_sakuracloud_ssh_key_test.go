@@ -23,7 +23,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/helper/resource"
 	"github.com/hashicorp/terraform-plugin-sdk/terraform"
 	"github.com/sacloud/libsacloud/v2/sacloud"
-	"github.com/sacloud/libsacloud/v2/sacloud/types"
 )
 
 func TestAccResourceSakuraCloudSSHKey(t *testing.T) {
@@ -78,7 +77,7 @@ func testAccCheckSakuraCloudSSHKeyExists(n string, ssh_key *sacloud.SSHKey) reso
 		client := testAccProvider.Meta().(*APIClient)
 		keyOp := sacloud.NewSSHKeyOp(client)
 
-		foundSSHKey, err := keyOp.Read(context.Background(), types.StringID(rs.Primary.ID))
+		foundSSHKey, err := keyOp.Read(context.Background(), sakuraCloudID(rs.Primary.ID))
 		if err != nil {
 			return err
 		}
@@ -104,7 +103,7 @@ func testAccCheckSakuraCloudSSHKeyDestroy(s *terraform.State) error {
 			continue
 		}
 
-		_, err := keyOp.Read(context.Background(), types.StringID(rs.Primary.ID))
+		_, err := keyOp.Read(context.Background(), sakuraCloudID(rs.Primary.ID))
 		if err == nil {
 			return fmt.Errorf("still exists SSHKey: %s", rs.Primary.ID)
 		}

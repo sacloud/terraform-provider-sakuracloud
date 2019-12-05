@@ -18,6 +18,8 @@ import (
 	"bytes"
 	"fmt"
 
+	"github.com/hashicorp/terraform-plugin-sdk/helper/validation"
+
 	"github.com/hashicorp/terraform-plugin-sdk/helper/hashcode"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/sacloud/libsacloud/v2/sacloud"
@@ -29,40 +31,50 @@ func resourceSakuraCloudGSLBServer() *schema.Resource {
 		Create: resourceSakuraCloudGSLBServerCreate,
 		Read:   resourceSakuraCloudGSLBServerRead,
 		Delete: resourceSakuraCloudGSLBServerDelete,
-		Schema: gslbServerResourceSchema(),
-	}
-}
-
-func gslbServerResourceSchema() map[string]*schema.Schema {
-	s := mergeSchemas(map[string]*schema.Schema{
-		"gslb_id": {
-			Type:         schema.TypeString,
-			Required:     true,
-			ForceNew:     true,
-			ValidateFunc: validateSakuracloudIDType,
+		Schema: map[string]*schema.Schema{
+			"gslb_id": {
+				Type:         schema.TypeString,
+				Required:     true,
+				ForceNew:     true,
+				ValidateFunc: validateSakuracloudIDType,
+			},
+			"ipaddress": {
+				Type:     schema.TypeString,
+				Required: true,
+				ForceNew: true,
+			},
+			"enabled": {
+				Type:     schema.TypeBool,
+				Optional: true,
+				Default:  true,
+				ForceNew: true,
+			},
+			"weight": {
+				Type:         schema.TypeInt,
+				Optional:     true,
+				ValidateFunc: validation.IntBetween(1, 10000),
+				Default:      1,
+				ForceNew:     true,
+			},
 		},
-	}, gslbServerValueSchemas())
-	for _, v := range s {
-		v.ForceNew = true
 	}
-	return s
 }
 
 func resourceSakuraCloudGSLBServerCreate(d *schema.ResourceData, meta interface{}) error {
-	client, ctx, _ := getSacloudV2Client(d, meta)
+	client, ctx, _ := getSacloudClient(d, meta)
 	gslbOp := sacloud.NewGSLBOp(client)
 	gslbID := d.Get("gslb_id").(string)
 
 	sakuraMutexKV.Lock(gslbID)
 	defer sakuraMutexKV.Unlock(gslbID)
 
-	gslb, err := gslbOp.Read(ctx, types.StringID(gslbID))
+	gslb, err := gslbOp.Read(ctx, sakuraCloudID(gslbID))
 	if err != nil {
 		return fmt.Errorf("could not read SakuraCloud GSLB resource: %s", err)
 	}
 	server := expandGSLBServer(d)
 	servers := append(gslb.DestinationServers, server)
-	gslb, err = gslbOp.Update(ctx, types.StringID(gslbID), &sacloud.GSLBUpdateRequest{
+	gslb, err = gslbOp.Update(ctx, sakuraCloudID(gslbID), &sacloud.GSLBUpdateRequest{
 		Name:               gslb.Name,
 		Description:        gslb.Description,
 		Tags:               gslb.Tags,
@@ -83,11 +95,11 @@ func resourceSakuraCloudGSLBServerCreate(d *schema.ResourceData, meta interface{
 }
 
 func resourceSakuraCloudGSLBServerRead(d *schema.ResourceData, meta interface{}) error {
-	client, ctx, _ := getSacloudV2Client(d, meta)
+	client, ctx, _ := getSacloudClient(d, meta)
 	gslbOp := sacloud.NewGSLBOp(client)
 	gslbID := d.Get("gslb_id").(string)
 
-	gslb, err := gslbOp.Read(ctx, types.StringID(gslbID))
+	gslb, err := gslbOp.Read(ctx, sakuraCloudID(gslbID))
 	if err != nil {
 		if sacloud.IsNotFoundError(err) {
 			d.SetId("")
@@ -109,14 +121,14 @@ func resourceSakuraCloudGSLBServerRead(d *schema.ResourceData, meta interface{})
 }
 
 func resourceSakuraCloudGSLBServerDelete(d *schema.ResourceData, meta interface{}) error {
-	client, ctx, _ := getSacloudV2Client(d, meta)
+	client, ctx, _ := getSacloudClient(d, meta)
 	gslbOp := sacloud.NewGSLBOp(client)
 	gslbID := d.Get("gslb_id").(string)
 
 	sakuraMutexKV.Lock(gslbID)
 	defer sakuraMutexKV.Unlock(gslbID)
 
-	gslb, err := gslbOp.Read(ctx, types.StringID(gslbID))
+	gslb, err := gslbOp.Read(ctx, sakuraCloudID(gslbID))
 	if err != nil {
 		if sacloud.IsNotFoundError(err) {
 			d.SetId("")
@@ -132,7 +144,7 @@ func resourceSakuraCloudGSLBServerDelete(d *schema.ResourceData, meta interface{
 			servers = append(servers, s)
 		}
 	}
-	gslb, err = gslbOp.Update(ctx, types.StringID(gslbID), &sacloud.GSLBUpdateRequest{
+	gslb, err = gslbOp.Update(ctx, sakuraCloudID(gslbID), &sacloud.GSLBUpdateRequest{
 		Name:               gslb.Name,
 		Description:        gslb.Description,
 		Tags:               gslb.Tags,

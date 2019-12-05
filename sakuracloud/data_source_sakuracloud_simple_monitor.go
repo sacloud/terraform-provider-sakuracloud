@@ -138,7 +138,7 @@ func dataSourceSakuraCloudSimpleMonitor() *schema.Resource {
 }
 
 func dataSourceSakuraCloudSimpleMonitorRead(d *schema.ResourceData, meta interface{}) error {
-	client, ctx, _ := getSacloudV2Client(d, meta)
+	client, ctx, _ := getSacloudClient(d, meta)
 	searcher := sacloud.NewSimpleMonitorOp(client)
 
 	findCondition := &sacloud.FindCondition{}

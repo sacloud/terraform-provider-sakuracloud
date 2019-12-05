@@ -130,7 +130,7 @@ func testAccCheckSakuraCloudDNSRecordDestroy(s *terraform.State) error {
 
 		dnsID := rs.Primary.Attributes["dns_id"]
 		if dnsID != "" {
-			dns, err := dnsOp.Read(context.Background(), types.StringID(dnsID))
+			dns, err := dnsOp.Read(context.Background(), sakuraCloudID(dnsID))
 			if err == nil {
 				return fmt.Errorf("resource still exists: DNS: %s", rs.Primary.ID)
 			}

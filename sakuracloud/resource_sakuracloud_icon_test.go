@@ -20,8 +20,6 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/sacloud/libsacloud/v2/sacloud/types"
-
 	"github.com/hashicorp/terraform-plugin-sdk/helper/resource"
 	"github.com/hashicorp/terraform-plugin-sdk/terraform"
 	"github.com/sacloud/libsacloud/v2/sacloud"
@@ -101,7 +99,7 @@ func testAccCheckSakuraCloudIconExists(n string, icon *sacloud.Icon) resource.Te
 		client := testAccProvider.Meta().(*APIClient)
 		iconOp := sacloud.NewIconOp(client)
 
-		foundIcon, err := iconOp.Read(context.Background(), types.StringID(rs.Primary.ID))
+		foundIcon, err := iconOp.Read(context.Background(), sakuraCloudID(rs.Primary.ID))
 		if err != nil {
 			return err
 		}
@@ -127,7 +125,7 @@ func testAccCheckSakuraCloudIconDestroy(s *terraform.State) error {
 			continue
 		}
 
-		_, err := iconOp.Read(context.Background(), types.StringID(rs.Primary.ID))
+		_, err := iconOp.Read(context.Background(), sakuraCloudID(rs.Primary.ID))
 		if err == nil {
 			return fmt.Errorf("still exists Icon: %s", rs.Primary.ID)
 		}

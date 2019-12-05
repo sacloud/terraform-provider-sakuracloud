@@ -23,7 +23,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/helper/resource"
 	"github.com/hashicorp/terraform-plugin-sdk/terraform"
 	"github.com/sacloud/libsacloud/v2/sacloud"
-	"github.com/sacloud/libsacloud/v2/sacloud/types"
 )
 
 func TestAccResourceSakuraCloudPacketFilter(t *testing.T) {
@@ -96,7 +95,7 @@ func testAccCheckSakuraCloudPacketFilterExists(n string, filter *sacloud.PacketF
 		zone := rs.Primary.Attributes["zone"]
 		pfOp := sacloud.NewPacketFilterOp(client)
 
-		foundPacketFilter, err := pfOp.Read(context.Background(), zone, types.StringID(rs.Primary.ID))
+		foundPacketFilter, err := pfOp.Read(context.Background(), zone, sakuraCloudID(rs.Primary.ID))
 		if err != nil {
 			return err
 		}
@@ -123,7 +122,7 @@ func testAccCheckSakuraCloudPacketFilterDestroy(s *terraform.State) error {
 		}
 
 		zone := rs.Primary.Attributes["zone"]
-		_, err := pfOp.Read(context.Background(), zone, types.StringID(rs.Primary.ID))
+		_, err := pfOp.Read(context.Background(), zone, sakuraCloudID(rs.Primary.ID))
 
 		if err == nil {
 			return fmt.Errorf("still exists PacketFilter: %s", rs.Primary.ID)

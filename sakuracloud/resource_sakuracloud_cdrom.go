@@ -105,7 +105,7 @@ const (
 )
 
 func resourceSakuraCloudCDROMCreate(d *schema.ResourceData, meta interface{}) error {
-	client, ctx, zone := getSacloudV2Client(d, meta)
+	client, ctx, zone := getSacloudClient(d, meta)
 	cdromOp := sacloud.NewCDROMOp(client)
 
 	// prepare create parameters
@@ -113,8 +113,8 @@ func resourceSakuraCloudCDROMCreate(d *schema.ResourceData, meta interface{}) er
 		Name:        d.Get("name").(string),
 		Description: d.Get("description").(string),
 		SizeMB:      toSizeMB(d.Get("size").(int)),
-		IconID:      types.StringID(d.Get("icon_id").(string)),
-		Tags:        expandTagsV2(d.Get("tags").([]interface{})),
+		IconID:      sakuraCloudID(d.Get("icon_id").(string)),
+		Tags:        expandTags(d),
 	}
 
 	filePath, isTemporal, err := prepareContentFile(d)
@@ -146,10 +146,10 @@ func resourceSakuraCloudCDROMCreate(d *schema.ResourceData, meta interface{}) er
 }
 
 func resourceSakuraCloudCDROMRead(d *schema.ResourceData, meta interface{}) error {
-	client, ctx, zone := getSacloudV2Client(d, meta)
+	client, ctx, zone := getSacloudClient(d, meta)
 	cdromOp := sacloud.NewCDROMOp(client)
 
-	cdrom, err := cdromOp.Read(ctx, zone, types.StringID(d.Id()))
+	cdrom, err := cdromOp.Read(ctx, zone, sakuraCloudID(d.Id()))
 	if err != nil {
 		if sacloud.IsNotFoundError(err) {
 			d.SetId("")
@@ -161,10 +161,10 @@ func resourceSakuraCloudCDROMRead(d *schema.ResourceData, meta interface{}) erro
 }
 
 func resourceSakuraCloudCDROMUpdate(d *schema.ResourceData, meta interface{}) error {
-	client, ctx, zone := getSacloudV2Client(d, meta)
+	client, ctx, zone := getSacloudClient(d, meta)
 	cdromOp := sacloud.NewCDROMOp(client)
 
-	cdrom, err := cdromOp.Read(ctx, zone, types.StringID(d.Id()))
+	cdrom, err := cdromOp.Read(ctx, zone, sakuraCloudID(d.Id()))
 	if err != nil {
 		return fmt.Errorf("could not read SakuraCloud CDROM[%s]: %s", d.Id(), err)
 	}
@@ -172,8 +172,8 @@ func resourceSakuraCloudCDROMUpdate(d *schema.ResourceData, meta interface{}) er
 	req := &sacloud.CDROMUpdateRequest{
 		Name:        d.Get("name").(string),
 		Description: d.Get("description").(string),
-		Tags:        expandTagsV2(d.Get("tags").([]interface{})),
-		IconID:      types.StringID(d.Get("icon_id").(string)),
+		Tags:        expandTags(d),
+		IconID:      sakuraCloudID(d.Get("icon_id").(string)),
 	}
 
 	cdrom, err = cdromOp.Update(ctx, zone, cdrom.ID, req)
@@ -227,10 +227,10 @@ func resourceSakuraCloudCDROMUpdate(d *schema.ResourceData, meta interface{}) er
 }
 
 func resourceSakuraCloudCDROMDelete(d *schema.ResourceData, meta interface{}) error {
-	client, ctx, zone := getSacloudV2Client(d, meta)
+	client, ctx, zone := getSacloudClient(d, meta)
 	cdromOp := sacloud.NewCDROMOp(client)
 
-	cdrom, err := cdromOp.Read(ctx, zone, types.StringID(d.Id()))
+	cdrom, err := cdromOp.Read(ctx, zone, sakuraCloudID(d.Id()))
 	if err != nil {
 		if sacloud.IsNotFoundError(err) {
 			d.SetId("")
@@ -274,10 +274,10 @@ func setCDROMResourceData(ctx context.Context, d *schema.ResourceData, client *A
 		d.Set("icon_id", data.IconID.String())
 	}
 	d.Set("description", data.Description)
-	if err := d.Set("tags", flattenTags(data.Tags)); err != nil {
+	if err := d.Set("tags", data.Tags); err != nil {
 		return fmt.Errorf("error settings tags: %v", data.Tags)
 	}
-	d.Set("zone", getV2Zone(d, client))
+	d.Set("zone", getZone(d, client))
 	return nil
 }
 
@@ -337,7 +337,7 @@ func writeISOFile(path string, content []byte, label string) error {
 
 func ejectCDROMFromAllServers(ctx context.Context, d *schema.ResourceData, client *APIClient, cdromID types.ID) ([]types.ID, error) {
 	serverOp := sacloud.NewServerOp(client)
-	zone := getV2Zone(d, client)
+	zone := getZone(d, client)
 	searched, err := serverOp.Find(ctx, zone, &sacloud.FindCondition{})
 	if err != nil {
 		return nil, err
@@ -356,7 +356,7 @@ func ejectCDROMFromAllServers(ctx context.Context, d *schema.ResourceData, clien
 
 func insertCDROMToAllServers(ctx context.Context, d *schema.ResourceData, client *APIClient, cdromID types.ID, serverIDs []types.ID) error {
 	serverOp := sacloud.NewServerOp(client)
-	zone := getV2Zone(d, client)
+	zone := getZone(d, client)
 
 	for _, id := range serverIDs {
 		if err := serverOp.InsertCDROM(ctx, zone, id, &sacloud.InsertCDROMRequest{ID: cdromID}); err != nil {

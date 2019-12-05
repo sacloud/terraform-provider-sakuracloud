@@ -23,7 +23,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/helper/resource"
 	"github.com/hashicorp/terraform-plugin-sdk/terraform"
 	"github.com/sacloud/libsacloud/v2/sacloud"
-	"github.com/sacloud/libsacloud/v2/sacloud/types"
 )
 
 func TestAccSakuraCloudMobileGateway(t *testing.T) {
@@ -139,7 +138,7 @@ func testAccCheckSakuraCloudMobileGatewayExists(n string, mgs *sacloud.MobileGat
 		zone := rs.Primary.Attributes["zone"]
 		mgwOp := sacloud.NewMobileGatewayOp(client)
 
-		foundMobileGateway, err := mgwOp.Read(context.Background(), zone, types.StringID(rs.Primary.ID))
+		foundMobileGateway, err := mgwOp.Read(context.Background(), zone, sakuraCloudID(rs.Primary.ID))
 
 		if err != nil {
 			return err
@@ -168,7 +167,7 @@ func testAccCheckSakuraCloudMobileGatewayDestroy(s *terraform.State) error {
 		}
 
 		zone := rs.Primary.Attributes["zone"]
-		_, err := mgwOp.Read(context.Background(), zone, types.StringID(rs.Primary.ID))
+		_, err := mgwOp.Read(context.Background(), zone, sakuraCloudID(rs.Primary.ID))
 
 		if err == nil {
 			return fmt.Errorf("still exists MobileGateway: %s", rs.Primary.ID)

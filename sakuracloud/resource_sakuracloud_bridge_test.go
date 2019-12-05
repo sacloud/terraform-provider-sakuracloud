@@ -24,7 +24,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/helper/resource"
 	"github.com/hashicorp/terraform-plugin-sdk/terraform"
 	"github.com/sacloud/libsacloud/v2/sacloud"
-	"github.com/sacloud/libsacloud/v2/sacloud/types"
 )
 
 func TestAccResourceSakuraCloudBridge(t *testing.T) {
@@ -78,7 +77,7 @@ func testAccCheckSakuraCloudBridgeExists(n string, bridge *sacloud.Bridge) resou
 		client := testAccProvider.Meta().(*APIClient)
 		bridgeOp := sacloud.NewBridgeOp(client)
 		zone := rs.Primary.Attributes["zone"]
-		foundBridge, err := bridgeOp.Read(context.Background(), zone, types.StringID(rs.Primary.ID))
+		foundBridge, err := bridgeOp.Read(context.Background(), zone, sakuraCloudID(rs.Primary.ID))
 
 		if err != nil {
 			return err
@@ -107,7 +106,7 @@ func testAccCheckSakuraCloudBridgeDestroy(s *terraform.State) error {
 
 		bridgeOp := sacloud.NewBridgeOp(client)
 		zone := rs.Primary.Attributes["zone"]
-		_, err := bridgeOp.Read(context.Background(), zone, types.StringID(rs.Primary.ID))
+		_, err := bridgeOp.Read(context.Background(), zone, sakuraCloudID(rs.Primary.ID))
 
 		if err == nil {
 			return errors.New("bridge still exists")

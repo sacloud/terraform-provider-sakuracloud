@@ -21,7 +21,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/helper/hashcode"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/sacloud/libsacloud/v2/sacloud"
-	"github.com/sacloud/libsacloud/v2/sacloud/types"
 )
 
 func resourceSakuraCloudMobileGatewaySIMRoute() *schema.Resource {
@@ -60,7 +59,7 @@ func resourceSakuraCloudMobileGatewaySIMRoute() *schema.Resource {
 }
 
 func resourceSakuraCloudMobileGatewaySIMRouteCreate(d *schema.ResourceData, meta interface{}) error {
-	client, ctx, zone := getSacloudV2Client(d, meta)
+	client, ctx, zone := getSacloudClient(d, meta)
 	mgwOp := sacloud.NewMobileGatewayOp(client)
 
 	mgwID := d.Get("mobile_gateway_id").(string)
@@ -68,7 +67,7 @@ func resourceSakuraCloudMobileGatewaySIMRouteCreate(d *schema.ResourceData, meta
 	sakuraMutexKV.Lock(mgwID)
 	defer sakuraMutexKV.Unlock(mgwID)
 
-	mgw, err := mgwOp.Read(ctx, zone, types.StringID(mgwID))
+	mgw, err := mgwOp.Read(ctx, zone, sakuraCloudID(mgwID))
 	if err != nil {
 		return fmt.Errorf("could not read SakuraCloud MobileGateway: %s", err)
 	}
@@ -104,11 +103,11 @@ func resourceSakuraCloudMobileGatewaySIMRouteCreate(d *schema.ResourceData, meta
 }
 
 func resourceSakuraCloudMobileGatewaySIMRouteRead(d *schema.ResourceData, meta interface{}) error {
-	client, ctx, zone := getSacloudV2Client(d, meta)
+	client, ctx, zone := getSacloudClient(d, meta)
 	mgwOp := sacloud.NewMobileGatewayOp(client)
 
 	mgwID := d.Get("mobile_gateway_id").(string)
-	mgw, err := mgwOp.Read(ctx, zone, types.StringID(mgwID))
+	mgw, err := mgwOp.Read(ctx, zone, sakuraCloudID(mgwID))
 	if err != nil {
 		if sacloud.IsNotFoundError(err) {
 			d.SetId("")
@@ -127,7 +126,7 @@ func resourceSakuraCloudMobileGatewaySIMRouteRead(d *schema.ResourceData, meta i
 	for _, sr := range simRoutes {
 		if sr.Prefix == src.Prefix {
 			d.Set("prefix", sr.Prefix)
-			d.Set("sim_id", toSakuraCloudID(sr.ResourceID))
+			d.Set("sim_id", sakuraCloudID(sr.ResourceID))
 			exists = true
 		}
 	}
@@ -141,7 +140,7 @@ func resourceSakuraCloudMobileGatewaySIMRouteRead(d *schema.ResourceData, meta i
 }
 
 func resourceSakuraCloudMobileGatewaySIMRouteDelete(d *schema.ResourceData, meta interface{}) error {
-	client, ctx, zone := getSacloudV2Client(d, meta)
+	client, ctx, zone := getSacloudClient(d, meta)
 	mgwOp := sacloud.NewMobileGatewayOp(client)
 
 	mgwID := d.Get("mobile_gateway_id").(string)
@@ -149,7 +148,7 @@ func resourceSakuraCloudMobileGatewaySIMRouteDelete(d *schema.ResourceData, meta
 	sakuraMutexKV.Lock(mgwID)
 	defer sakuraMutexKV.Unlock(mgwID)
 
-	mgw, err := mgwOp.Read(ctx, zone, types.StringID(mgwID))
+	mgw, err := mgwOp.Read(ctx, zone, sakuraCloudID(mgwID))
 	if err != nil {
 		return fmt.Errorf("could not read SakuraCloud MobileGateway: %s", err)
 	}

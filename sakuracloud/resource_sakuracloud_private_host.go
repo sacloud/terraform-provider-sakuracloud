@@ -78,7 +78,7 @@ func resourceSakuraCloudPrivateHost() *schema.Resource {
 }
 
 func resourceSakuraCloudPrivateHostCreate(d *schema.ResourceData, meta interface{}) error {
-	client, ctx, zone := getSacloudV2Client(d, meta)
+	client, ctx, zone := getSacloudClient(d, meta)
 	phOp := sacloud.NewPrivateHostOp(client)
 
 	planID, err := expandPrivateHostPlanID(ctx, d, client, zone)
@@ -89,7 +89,7 @@ func resourceSakuraCloudPrivateHostCreate(d *schema.ResourceData, meta interface
 	ph, err := phOp.Create(ctx, zone, &sacloud.PrivateHostCreateRequest{
 		Name:        d.Get("name").(string),
 		Description: d.Get("description").(string),
-		Tags:        expandTagsV2(d.Get("tags").([]interface{})),
+		Tags:        expandTags(d),
 		IconID:      expandSakuraCloudID(d, "icon_id"),
 		PlanID:      planID,
 	})
@@ -102,10 +102,10 @@ func resourceSakuraCloudPrivateHostCreate(d *schema.ResourceData, meta interface
 }
 
 func resourceSakuraCloudPrivateHostRead(d *schema.ResourceData, meta interface{}) error {
-	client, ctx, zone := getSacloudV2Client(d, meta)
+	client, ctx, zone := getSacloudClient(d, meta)
 	phOp := sacloud.NewPrivateHostOp(client)
 
-	ph, err := phOp.Read(ctx, zone, types.StringID(d.Id()))
+	ph, err := phOp.Read(ctx, zone, sakuraCloudID(d.Id()))
 	if err != nil {
 		if sacloud.IsNotFoundError(err) {
 			d.SetId("")
@@ -117,10 +117,10 @@ func resourceSakuraCloudPrivateHostRead(d *schema.ResourceData, meta interface{}
 }
 
 func resourceSakuraCloudPrivateHostUpdate(d *schema.ResourceData, meta interface{}) error {
-	client, ctx, zone := getSacloudV2Client(d, meta)
+	client, ctx, zone := getSacloudClient(d, meta)
 	phOp := sacloud.NewPrivateHostOp(client)
 
-	ph, err := phOp.Read(ctx, zone, types.StringID(d.Id()))
+	ph, err := phOp.Read(ctx, zone, sakuraCloudID(d.Id()))
 	if err != nil {
 		return fmt.Errorf("could not read SakuraCloud PrivateHost: %s", err)
 	}
@@ -128,7 +128,7 @@ func resourceSakuraCloudPrivateHostUpdate(d *schema.ResourceData, meta interface
 	_, err = phOp.Update(ctx, zone, ph.ID, &sacloud.PrivateHostUpdateRequest{
 		Name:        d.Get("name").(string),
 		Description: d.Get("description").(string),
-		Tags:        expandTagsV2(d.Get("tags").([]interface{})),
+		Tags:        expandTags(d),
 		IconID:      expandSakuraCloudID(d, "icon_id"),
 	})
 	if err != nil {
@@ -139,11 +139,11 @@ func resourceSakuraCloudPrivateHostUpdate(d *schema.ResourceData, meta interface
 }
 
 func resourceSakuraCloudPrivateHostDelete(d *schema.ResourceData, meta interface{}) error {
-	client, ctx, zone := getSacloudV2Client(d, meta)
+	client, ctx, zone := getSacloudClient(d, meta)
 	phOp := sacloud.NewPrivateHostOp(client)
 	serverOp := sacloud.NewServerOp(client)
 
-	ph, err := phOp.Read(ctx, zone, types.StringID(d.Id()))
+	ph, err := phOp.Read(ctx, zone, sakuraCloudID(d.Id()))
 	if err != nil {
 		if sacloud.IsNotFoundError(err) {
 			d.SetId("")
@@ -219,7 +219,7 @@ func setPrivateHostResourceData(ctx context.Context, d *schema.ResourceData, cli
 	d.Set("hostname", data.GetHostName())
 	d.Set("assigned_core", data.GetAssignedCPU())
 	d.Set("assigned_memory", data.GetAssignedMemoryGB())
-	d.Set("zone", getV2Zone(d, client))
+	d.Set("zone", getZone(d, client))
 	return nil
 }
 

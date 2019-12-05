@@ -21,7 +21,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/validation"
 	"github.com/sacloud/libsacloud/v2/sacloud"
-	"github.com/sacloud/libsacloud/v2/sacloud/types"
 )
 
 func resourceSakuraCloudSSHKey() *schema.Resource {
@@ -58,7 +57,7 @@ func resourceSakuraCloudSSHKey() *schema.Resource {
 }
 
 func resourceSakuraCloudSSHKeyCreate(d *schema.ResourceData, meta interface{}) error {
-	client, ctx, _ := getSacloudV2Client(d, meta)
+	client, ctx, _ := getSacloudClient(d, meta)
 	sshKeyOp := sacloud.NewSSHKeyOp(client)
 
 	key, err := sshKeyOp.Create(ctx, &sacloud.SSHKeyCreateRequest{
@@ -75,10 +74,10 @@ func resourceSakuraCloudSSHKeyCreate(d *schema.ResourceData, meta interface{}) e
 }
 
 func resourceSakuraCloudSSHKeyRead(d *schema.ResourceData, meta interface{}) error {
-	client, ctx, _ := getSacloudV2Client(d, meta)
+	client, ctx, _ := getSacloudClient(d, meta)
 	sshKeyOp := sacloud.NewSSHKeyOp(client)
 
-	key, err := sshKeyOp.Read(ctx, types.StringID(d.Id()))
+	key, err := sshKeyOp.Read(ctx, sakuraCloudID(d.Id()))
 	if err != nil {
 		if sacloud.IsNotFoundError(err) {
 			d.SetId("")
@@ -90,10 +89,10 @@ func resourceSakuraCloudSSHKeyRead(d *schema.ResourceData, meta interface{}) err
 }
 
 func resourceSakuraCloudSSHKeyUpdate(d *schema.ResourceData, meta interface{}) error {
-	client, ctx, _ := getSacloudV2Client(d, meta)
+	client, ctx, _ := getSacloudClient(d, meta)
 	sshKeyOp := sacloud.NewSSHKeyOp(client)
 
-	key, err := sshKeyOp.Read(ctx, types.StringID(d.Id()))
+	key, err := sshKeyOp.Read(ctx, sakuraCloudID(d.Id()))
 	if err != nil {
 		return fmt.Errorf("could not read SSHKey: %s", err)
 	}
@@ -109,10 +108,10 @@ func resourceSakuraCloudSSHKeyUpdate(d *schema.ResourceData, meta interface{}) e
 }
 
 func resourceSakuraCloudSSHKeyDelete(d *schema.ResourceData, meta interface{}) error {
-	client, ctx, _ := getSacloudV2Client(d, meta)
+	client, ctx, _ := getSacloudClient(d, meta)
 	sshKeyOp := sacloud.NewSSHKeyOp(client)
 
-	key, err := sshKeyOp.Read(ctx, types.StringID(d.Id()))
+	key, err := sshKeyOp.Read(ctx, sakuraCloudID(d.Id()))
 	if err != nil {
 		if sacloud.IsNotFoundError(err) {
 			d.SetId("")

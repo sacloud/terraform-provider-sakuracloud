@@ -153,42 +153,38 @@ func loadBalancerVIPValueSchema() map[string]*schema.Schema {
 			Computed: true,
 			MaxItems: 40,
 			Elem: &schema.Resource{
-				Schema: loadBalancerServerValueSchema(),
+				Schema: map[string]*schema.Schema{
+					"ipaddress": {
+						Type:     schema.TypeString,
+						Required: true,
+					},
+					"check_protocol": {
+						Type:         schema.TypeString,
+						Required:     true,
+						ValidateFunc: validation.StringInSlice(types.LoadBalancerHealthCheckProtocolsStrings(), false),
+					},
+					"check_path": {
+						Type:     schema.TypeString,
+						Optional: true,
+					},
+					"check_status": {
+						Type:     schema.TypeString,
+						Optional: true,
+					},
+					"enabled": {
+						Type:     schema.TypeBool,
+						Optional: true,
+						Default:  true,
+						ForceNew: true,
+					},
+				},
 			},
 		},
 	}
 }
 
-func loadBalancerServerValueSchema() map[string]*schema.Schema {
-	return map[string]*schema.Schema{
-		"ipaddress": {
-			Type:     schema.TypeString,
-			Required: true,
-		},
-		"check_protocol": {
-			Type:         schema.TypeString,
-			Required:     true,
-			ValidateFunc: validation.StringInSlice(types.LoadBalancerHealthCheckProtocolsStrings(), false),
-		},
-		"check_path": {
-			Type:     schema.TypeString,
-			Optional: true,
-		},
-		"check_status": {
-			Type:     schema.TypeString,
-			Optional: true,
-		},
-		"enabled": {
-			Type:     schema.TypeBool,
-			Optional: true,
-			Default:  true,
-			ForceNew: true,
-		},
-	}
-}
-
 func resourceSakuraCloudLoadBalancerCreate(d *schema.ResourceData, meta interface{}) error {
-	client, ctx, zone := getSacloudV2Client(d, meta)
+	client, ctx, zone := getSacloudClient(d, meta)
 	lbOp := sacloud.NewLoadBalancerOp(client)
 
 	opts := &sacloud.LoadBalancerCreateRequest{
@@ -200,7 +196,7 @@ func resourceSakuraCloudLoadBalancerCreate(d *schema.ResourceData, meta interfac
 		DefaultRoute:       d.Get("default_route").(string),
 		Name:               d.Get("name").(string),
 		Description:        d.Get("description").(string),
-		Tags:               expandTagsV2(d.Get("tags").([]interface{})),
+		Tags:               expandTags(d),
 		IconID:             expandSakuraCloudID(d, "icon_id"),
 		VirtualIPAddresses: expandLoadBalancerVIPs(d),
 	}
@@ -236,10 +232,10 @@ func resourceSakuraCloudLoadBalancerCreate(d *schema.ResourceData, meta interfac
 }
 
 func resourceSakuraCloudLoadBalancerRead(d *schema.ResourceData, meta interface{}) error {
-	client, ctx, zone := getSacloudV2Client(d, meta)
+	client, ctx, zone := getSacloudClient(d, meta)
 	lbOp := sacloud.NewLoadBalancerOp(client)
 
-	loadBalancer, err := lbOp.Read(ctx, zone, types.StringID(d.Id()))
+	loadBalancer, err := lbOp.Read(ctx, zone, sakuraCloudID(d.Id()))
 	if err != nil {
 		if sacloud.IsNotFoundError(err) {
 			d.SetId("")
@@ -251,10 +247,10 @@ func resourceSakuraCloudLoadBalancerRead(d *schema.ResourceData, meta interface{
 }
 
 func resourceSakuraCloudLoadBalancerUpdate(d *schema.ResourceData, meta interface{}) error {
-	client, ctx, zone := getSacloudV2Client(d, meta)
+	client, ctx, zone := getSacloudClient(d, meta)
 	lbOp := sacloud.NewLoadBalancerOp(client)
 
-	loadBalancer, err := lbOp.Read(ctx, zone, types.StringID(d.Id()))
+	loadBalancer, err := lbOp.Read(ctx, zone, sakuraCloudID(d.Id()))
 	if err != nil {
 		return fmt.Errorf("could not read SakuraCloud LoadBalancer: %s", err)
 	}
@@ -262,7 +258,7 @@ func resourceSakuraCloudLoadBalancerUpdate(d *schema.ResourceData, meta interfac
 	opts := &sacloud.LoadBalancerUpdateRequest{
 		Name:               d.Get("name").(string),
 		Description:        d.Get("description").(string),
-		Tags:               expandTagsV2(d.Get("tags").([]interface{})),
+		Tags:               expandTags(d),
 		IconID:             expandSakuraCloudID(d, "icon_id"),
 		VirtualIPAddresses: expandLoadBalancerVIPs(d),
 		SettingsHash:       loadBalancer.SettingsHash,
@@ -276,10 +272,10 @@ func resourceSakuraCloudLoadBalancerUpdate(d *schema.ResourceData, meta interfac
 }
 
 func resourceSakuraCloudLoadBalancerDelete(d *schema.ResourceData, meta interface{}) error {
-	client, ctx, zone := getSacloudV2Client(d, meta)
+	client, ctx, zone := getSacloudClient(d, meta)
 	lbOp := sacloud.NewLoadBalancerOp(client)
 
-	loadBalancer, err := lbOp.Read(ctx, zone, types.StringID(d.Id()))
+	loadBalancer, err := lbOp.Read(ctx, zone, sakuraCloudID(d.Id()))
 	if err != nil {
 		if sacloud.IsNotFoundError(err) {
 			d.SetId("")
@@ -366,7 +362,7 @@ func setLoadBalancerResourceData(ctx context.Context, d *schema.ResourceData, cl
 	if err := d.Set("vips", vips); err != nil {
 		return err
 	}
-	d.Set("zone", getV2Zone(d, client))
+	d.Set("zone", getZone(d, client))
 
 	return nil
 }

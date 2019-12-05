@@ -21,7 +21,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/validation"
 	"github.com/sacloud/libsacloud/v2/sacloud"
-	"github.com/sacloud/libsacloud/v2/sacloud/types"
 )
 
 func resourceSakuraCloudSubnet() *schema.Resource {
@@ -86,7 +85,7 @@ func resourceSakuraCloudSubnet() *schema.Resource {
 }
 
 func resourceSakuraCloudSubnetCreate(d *schema.ResourceData, meta interface{}) error {
-	client, ctx, zone := getSacloudV2Client(d, meta)
+	client, ctx, zone := getSacloudClient(d, meta)
 	internetOp := sacloud.NewInternetOp(client)
 
 	internetID := d.Get("internet_id").(string)
@@ -94,7 +93,7 @@ func resourceSakuraCloudSubnetCreate(d *schema.ResourceData, meta interface{}) e
 	sakuraMutexKV.Lock(internetID)
 	defer sakuraMutexKV.Unlock(internetID)
 
-	internet, err := internetOp.Read(ctx, zone, types.StringID(internetID))
+	internet, err := internetOp.Read(ctx, zone, sakuraCloudID(internetID))
 	if err != nil {
 		return fmt.Errorf("could not read SakuraCloud Internet: %s", err)
 	}
@@ -112,10 +111,10 @@ func resourceSakuraCloudSubnetCreate(d *schema.ResourceData, meta interface{}) e
 }
 
 func resourceSakuraCloudSubnetRead(d *schema.ResourceData, meta interface{}) error {
-	client, ctx, zone := getSacloudV2Client(d, meta)
+	client, ctx, zone := getSacloudClient(d, meta)
 	subnetOp := sacloud.NewSubnetOp(client)
 
-	subnet, err := subnetOp.Read(ctx, zone, types.StringID(d.Id()))
+	subnet, err := subnetOp.Read(ctx, zone, sakuraCloudID(d.Id()))
 	if err != nil {
 		if sacloud.IsNotFoundError(err) {
 			d.SetId("")
@@ -127,7 +126,7 @@ func resourceSakuraCloudSubnetRead(d *schema.ResourceData, meta interface{}) err
 }
 
 func resourceSakuraCloudSubnetUpdate(d *schema.ResourceData, meta interface{}) error {
-	client, ctx, zone := getSacloudV2Client(d, meta)
+	client, ctx, zone := getSacloudClient(d, meta)
 	subnetOp := sacloud.NewSubnetOp(client)
 	internetOp := sacloud.NewInternetOp(client)
 
@@ -136,12 +135,12 @@ func resourceSakuraCloudSubnetUpdate(d *schema.ResourceData, meta interface{}) e
 	sakuraMutexKV.Lock(internetID)
 	defer sakuraMutexKV.Unlock(internetID)
 
-	subnet, err := subnetOp.Read(ctx, zone, types.StringID(d.Id()))
+	subnet, err := subnetOp.Read(ctx, zone, sakuraCloudID(d.Id()))
 	if err != nil {
 		return fmt.Errorf("could not read Subnet: %s", err)
 	}
 
-	_, err = internetOp.UpdateSubnet(ctx, zone, types.StringID(internetID), subnet.ID, &sacloud.InternetUpdateSubnetRequest{
+	_, err = internetOp.UpdateSubnet(ctx, zone, sakuraCloudID(internetID), subnet.ID, &sacloud.InternetUpdateSubnetRequest{
 		NextHop: d.Get("next_hop").(string),
 	})
 	if err != nil {
@@ -151,7 +150,7 @@ func resourceSakuraCloudSubnetUpdate(d *schema.ResourceData, meta interface{}) e
 }
 
 func resourceSakuraCloudSubnetDelete(d *schema.ResourceData, meta interface{}) error {
-	client, ctx, zone := getSacloudV2Client(d, meta)
+	client, ctx, zone := getSacloudClient(d, meta)
 	subnetOp := sacloud.NewSubnetOp(client)
 	internetOp := sacloud.NewInternetOp(client)
 
@@ -160,7 +159,7 @@ func resourceSakuraCloudSubnetDelete(d *schema.ResourceData, meta interface{}) e
 	sakuraMutexKV.Lock(internetID)
 	defer sakuraMutexKV.Unlock(internetID)
 
-	subnet, err := subnetOp.Read(ctx, zone, types.StringID(d.Id()))
+	subnet, err := subnetOp.Read(ctx, zone, sakuraCloudID(d.Id()))
 	if err != nil {
 		if sacloud.IsNotFoundError(err) {
 			d.SetId("")
@@ -169,7 +168,7 @@ func resourceSakuraCloudSubnetDelete(d *schema.ResourceData, meta interface{}) e
 		return fmt.Errorf("could not read Subnet: %s", err)
 	}
 
-	if err := internetOp.DeleteSubnet(ctx, zone, types.StringID(internetID), subnet.ID); err != nil {
+	if err := internetOp.DeleteSubnet(ctx, zone, sakuraCloudID(internetID), subnet.ID); err != nil {
 		return fmt.Errorf("deleting Subnet is failed: %s", err)
 	}
 	return nil
@@ -195,6 +194,6 @@ func setSubnetResourceData(ctx context.Context, d *schema.ResourceData, client *
 	d.Set("min_ipaddress", data.IPAddresses[0].IPAddress)
 	d.Set("max_ipaddress", data.IPAddresses[len(data.IPAddresses)-1].IPAddress)
 	d.Set("ipaddresses", addrs)
-	d.Set("zone", getV2Zone(d, client))
+	d.Set("zone", getZone(d, client))
 	return nil
 }

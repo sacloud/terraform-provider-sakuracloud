@@ -20,8 +20,6 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/sacloud/libsacloud/v2/sacloud/types"
-
 	"github.com/hashicorp/terraform-plugin-sdk/helper/acctest"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/resource"
 	"github.com/hashicorp/terraform-plugin-sdk/terraform"
@@ -94,7 +92,7 @@ func testAccCheckSakuraCloudDNSExists(n string, dns *sacloud.DNS) resource.TestC
 		dnsOp := sacloud.NewDNSOp(client)
 		ctx := context.Background()
 
-		foundDNS, err := dnsOp.Read(ctx, types.StringID(rs.Primary.ID))
+		foundDNS, err := dnsOp.Read(ctx, sakuraCloudID(rs.Primary.ID))
 
 		if err != nil {
 			return err
@@ -121,7 +119,7 @@ func testAccCheckSakuraCloudDNSDestroy(s *terraform.State) error {
 			continue
 		}
 
-		_, err := dnsOp.Read(context.Background(), types.StringID(rs.Primary.ID))
+		_, err := dnsOp.Read(context.Background(), sakuraCloudID(rs.Primary.ID))
 		if err == nil {
 			return fmt.Errorf("resource still exists: DNS: %s", rs.Primary.ID)
 		}

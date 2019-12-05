@@ -61,7 +61,7 @@ func dataSourceSakuraCloudCDROM() *schema.Resource {
 }
 
 func dataSourceSakuraCloudCDROMRead(d *schema.ResourceData, meta interface{}) error {
-	client, ctx, zone := getSacloudV2Client(d, meta)
+	client, ctx, zone := getSacloudClient(d, meta)
 	searcher := sacloud.NewCDROMOp(client)
 
 	findCondition := &sacloud.FindCondition{}

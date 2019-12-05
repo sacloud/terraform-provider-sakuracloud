@@ -69,7 +69,7 @@ func dataSourceSakuraCloudPrivateHost() *schema.Resource {
 }
 
 func dataSourceSakuraCloudPrivateHostRead(d *schema.ResourceData, meta interface{}) error {
-	client, ctx, zone := getSacloudV2Client(d, meta)
+	client, ctx, zone := getSacloudClient(d, meta)
 	searcher := sacloud.NewPrivateHostOp(client)
 
 	findCondition := &sacloud.FindCondition{}
