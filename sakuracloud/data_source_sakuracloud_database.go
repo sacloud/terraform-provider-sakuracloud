@@ -1,13 +1,10 @@
 package sakuracloud
 
 import (
-	"context"
 	"fmt"
-	"strings"
 
 	"github.com/hashicorp/terraform/helper/schema"
 	"github.com/sacloud/libsacloud/v2/sacloud"
-	"github.com/sacloud/libsacloud/v2/sacloud/types"
 )
 
 func dataSourceSakuraCloudDatabase() *schema.Resource {
@@ -104,10 +101,8 @@ func dataSourceSakuraCloudDatabase() *schema.Resource {
 }
 
 func dataSourceSakuraCloudDatabaseRead(d *schema.ResourceData, meta interface{}) error {
-	client := getSacloudAPIClient(d, meta)
+	client, ctx, zone := getSacloudV2Client(d, meta)
 	searcher := sacloud.NewDatabaseOp(client)
-	ctx := context.Background()
-	zone := getV2Zone(d, client)
 
 	findCondition := &sacloud.FindCondition{
 		Count: defaultSearchLimit,
@@ -126,64 +121,5 @@ func dataSourceSakuraCloudDatabaseRead(d *schema.ResourceData, meta interface{})
 
 	targets := res.Databases
 	d.SetId(targets[0].ID.String())
-	return setDatabaseV2ResourceData(ctx, d, client, targets[0])
-}
-
-func setDatabaseV2ResourceData(ctx context.Context, d *schema.ResourceData, client *APIClient, data *sacloud.Database) error {
-
-	if data.Availability.IsFailed() {
-		d.SetId("")
-		return fmt.Errorf("got unexpected state: Database[%d].Availability is failed", data.ID)
-	}
-
-	var databaseType string
-	switch data.Conf.DatabaseName {
-	case types.RDBMSVersions[types.RDBMSTypesPostgreSQL].Name:
-		databaseType = "postgresql"
-	case types.RDBMSVersions[types.RDBMSTypesMariaDB].Name:
-		databaseType = "mariadb"
-	}
-
-	var replicaUser, replicaPassword string
-	if data.ReplicationSetting != nil {
-		replicaUser = data.ReplicationSetting.User
-		replicaPassword = data.ReplicationSetting.Password
-	}
-
-	var backupTime string
-	var backupWeekdays []types.EBackupSpanWeekday
-	if data.BackupSetting != nil {
-		backupTime = data.BackupSetting.Time
-		backupWeekdays = data.BackupSetting.DayOfWeek
-	}
-
-	var tags []string
-	for _, t := range data.Tags {
-		if !(strings.HasPrefix(t, "@MariaDB-") || strings.HasPrefix(t, "@postgres-")) {
-			tags = append(tags, t)
-		}
-	}
-	setPowerManageTimeoutValueToState(d)
-
-	return setResourceData(d, map[string]interface{}{
-		"database_type":    databaseType,
-		"name":             data.Name,
-		"user_name":        data.CommonSetting.DefaultUser,
-		"user_password":    data.CommonSetting.UserPassword,
-		"replica_user":     replicaUser,
-		"replica_password": replicaPassword,
-		"plan":             data.PlanID.String(),
-		"allow_networks":   data.CommonSetting.SourceNetwork,
-		"port":             data.CommonSetting.ServicePort,
-		"backup_time":      backupTime,
-		"backup_weekdays":  backupWeekdays,
-		"switch_id":        data.SwitchID.String(),
-		"nw_mask_len":      data.NetworkMaskLen,
-		"default_route":    data.DefaultRoute,
-		"ipaddress1":       data.IPAddresses[0],
-		"icon_id":          data.IconID.String(),
-		"description":      data.Description,
-		"tags":             tags,
-		"zone":             getV2Zone(d, client),
-	})
+	return setDatabaseResourceData(ctx, d, client, targets[0])
 }

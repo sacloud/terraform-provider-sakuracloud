@@ -3,13 +3,11 @@ package sakuracloud
 import (
 	"bytes"
 	"fmt"
-	"strconv"
-	"strings"
 
 	"github.com/hashicorp/terraform/helper/hashcode"
 	"github.com/hashicorp/terraform/helper/schema"
-	"github.com/sacloud/libsacloud/api"
-	"github.com/sacloud/libsacloud/sacloud"
+	"github.com/sacloud/libsacloud/v2/sacloud"
+	"github.com/sacloud/libsacloud/v2/sacloud/types"
 )
 
 func resourceSakuraCloudGSLBServer() *schema.Resource {
@@ -37,27 +35,33 @@ func gslbServerResourceSchema() map[string]*schema.Schema {
 }
 
 func resourceSakuraCloudGSLBServerCreate(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*APIClient)
+	client, ctx, _ := getSacloudV2Client(d, meta)
+	gslbOp := sacloud.NewGSLBOp(client)
 	gslbID := d.Get("gslb_id").(string)
 
 	sakuraMutexKV.Lock(gslbID)
 	defer sakuraMutexKV.Unlock(gslbID)
 
-	gslb, err := client.GSLB.Read(toSakuraCloudID(gslbID))
+	gslb, err := gslbOp.Read(ctx, types.StringID(gslbID))
 	if err != nil {
-		return fmt.Errorf("Couldn't find SakuraCloud GSLB resource: %s", err)
+		return fmt.Errorf("could not read SakuraCloud GSLB resource: %s", err)
 	}
-
 	server := expandGSLBServer(d)
-
-	if r := findGSLBServerMatch(server, &gslb.Settings.GSLB.Servers); r != nil {
-		return fmt.Errorf("Failed to create SakuraCloud GSLB resource:Duplicate GSLB server: %v", server)
-	}
-
-	gslb.AddGSLBServer(server)
-	gslb, err = client.GSLB.Update(toSakuraCloudID(gslbID), gslb)
+	servers := append(gslb.DestinationServers, server)
+	gslb, err = gslbOp.Update(ctx, types.StringID(gslbID), &sacloud.GSLBUpdateRequest{
+		Name:               gslb.Name,
+		Description:        gslb.Description,
+		Tags:               gslb.Tags,
+		IconID:             gslb.IconID,
+		HealthCheck:        gslb.HealthCheck,
+		DelayLoop:          gslb.DelayLoop,
+		Weighted:           gslb.Weighted,
+		SorryServer:        gslb.SorryServer,
+		DestinationServers: servers,
+		SettingsHash:       gslb.SettingsHash,
+	})
 	if err != nil {
-		return fmt.Errorf("Failed to create SakuraCloud GSLBServer resource: %s", err)
+		return fmt.Errorf("creating SakuraCloud GSLBServer resource is failed: %s", err)
 	}
 
 	d.SetId(gslbServerIDHash(gslbID, server))
@@ -65,64 +69,84 @@ func resourceSakuraCloudGSLBServerCreate(d *schema.ResourceData, meta interface{
 }
 
 func resourceSakuraCloudGSLBServerRead(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*APIClient)
+	client, ctx, _ := getSacloudV2Client(d, meta)
+	gslbOp := sacloud.NewGSLBOp(client)
+	gslbID := d.Get("gslb_id").(string)
 
-	gslb, err := client.GSLB.Read(toSakuraCloudID(d.Get("gslb_id").(string)))
+	gslb, err := gslbOp.Read(ctx, types.StringID(gslbID))
 	if err != nil {
-		if sacloudErr, ok := err.(api.Error); ok && sacloudErr.ResponseCode() == 404 {
+		if sacloud.IsNotFoundError(err) {
 			d.SetId("")
 			return nil
 		}
-		return fmt.Errorf("Couldn't find SakuraCloud GSLB resource: %s", err)
+		return fmt.Errorf("could not read SakuraCloud GSLB resource: %s", err)
 	}
 
 	server := expandGSLBServer(d)
-	if r := findGSLBServerMatch(server, &gslb.Settings.GSLB.Servers); r == nil {
+	if r := findGSLBServerMatch(server, gslb.DestinationServers); r == nil {
 		d.SetId("")
 		return nil
 	}
 
 	d.Set("ipaddress", server.IPAddress)
-	d.Set("enabled", strings.ToLower(server.Enabled) == "true")
-	weight, _ := strconv.Atoi(server.Weight)
-	d.Set("weight", weight)
-
+	d.Set("enabled", server.Enabled.Bool())
+	d.Set("weight", server.Weight.Int64())
 	return nil
 }
 
 func resourceSakuraCloudGSLBServerDelete(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*APIClient)
+	client, ctx, _ := getSacloudV2Client(d, meta)
+	gslbOp := sacloud.NewGSLBOp(client)
 	gslbID := d.Get("gslb_id").(string)
 
 	sakuraMutexKV.Lock(gslbID)
 	defer sakuraMutexKV.Unlock(gslbID)
 
-	gslb, err := client.GSLB.Read(toSakuraCloudID(gslbID))
+	gslb, err := gslbOp.Read(ctx, types.StringID(gslbID))
 	if err != nil {
-		return fmt.Errorf("Couldn't find SakuraCloud GSLB resource: %s", err)
+		if sacloud.IsNotFoundError(err) {
+			d.SetId("")
+			return nil
+		}
+		return fmt.Errorf("could not read SakuraCloud GSLB resource: %s", err)
 	}
 
 	server := expandGSLBServer(d)
-	gslb.Settings.GSLB.DeleteServer(server.IPAddress)
-
-	gslb, err = client.GSLB.Update(toSakuraCloudID(gslbID), gslb)
+	var servers []*sacloud.GSLBServer
+	for _, s := range gslb.DestinationServers {
+		if !isSameGSLBServer(server, s) {
+			servers = append(servers, s)
+		}
+	}
+	gslb, err = gslbOp.Update(ctx, types.StringID(gslbID), &sacloud.GSLBUpdateRequest{
+		Name:               gslb.Name,
+		Description:        gslb.Description,
+		Tags:               gslb.Tags,
+		IconID:             gslb.IconID,
+		HealthCheck:        gslb.HealthCheck,
+		DelayLoop:          gslb.DelayLoop,
+		Weighted:           gslb.Weighted,
+		SorryServer:        gslb.SorryServer,
+		DestinationServers: servers,
+		SettingsHash:       gslb.SettingsHash,
+	})
 	if err != nil {
-		return fmt.Errorf("Failed to delete SakuraCloud GSLBServer resource: %s", err)
+		return fmt.Errorf("deleting SakuraCloud GSLBServer is failed: %s", err)
 	}
 
 	return nil
 }
 
-func findGSLBServerMatch(s *sacloud.GSLBServer, servers *[]sacloud.GSLBServer) *sacloud.GSLBServer {
-	for _, server := range *servers {
-		if isSameGSLBServer(s, &server) {
-			return &server
+func findGSLBServerMatch(s *sacloud.GSLBServer, servers []*sacloud.GSLBServer) *sacloud.GSLBServer {
+	for _, server := range servers {
+		if isSameGSLBServer(s, server) {
+			return server
 		}
 	}
 	return nil
 }
 
-func isSameGSLBServer(s1 *sacloud.GSLBServer, s2 *sacloud.GSLBServer) bool {
+func isSameGSLBServer(s1, s2 *sacloud.GSLBServer) bool {
 	return s1.IPAddress == s2.IPAddress
 }
 
@@ -130,31 +154,16 @@ func gslbServerIDHash(gslbID string, s *sacloud.GSLBServer) string {
 	var buf bytes.Buffer
 	buf.WriteString(fmt.Sprintf("%s-", gslbID))
 	buf.WriteString(fmt.Sprintf("%s-", s.IPAddress))
-	buf.WriteString(fmt.Sprintf("%s-", s.Weight))
-	buf.WriteString(fmt.Sprintf("%s-", s.Enabled))
+	buf.WriteString(fmt.Sprintf("%s-", s.Weight.String()))
+	buf.WriteString(fmt.Sprintf("%s-", s.Enabled.String()))
 
 	return fmt.Sprintf("gslbserver-%d", hashcode.String(buf.String()))
 }
 
 func expandGSLBServer(d resourceValueGettable) *sacloud.GSLBServer {
-	var gslb = sacloud.GSLB{}
-	var ipaddress string
-	var enabled bool
-	var weight int
-	if v, ok := d.GetOk("ipaddress"); ok {
-		ipaddress = v.(string)
+	return &sacloud.GSLBServer{
+		IPAddress: d.Get("ipaddress").(string),
+		Enabled:   types.StringFlag(d.Get("enabled").(bool)),
+		Weight:    types.StringNumber(d.Get("weight").(int)),
 	}
-	if v, ok := d.GetOk("weight"); ok {
-		weight = v.(int)
-	}
-	if v, ok := d.GetOk("enabled"); ok {
-		enabled = v.(bool)
-	}
-
-	server := gslb.CreateGSLBServer(ipaddress)
-	if !enabled {
-		server.Enabled = "False"
-	}
-	server.Weight = fmt.Sprintf("%d", weight)
-	return server
 }

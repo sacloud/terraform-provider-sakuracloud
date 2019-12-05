@@ -1,12 +1,10 @@
 package sakuracloud
 
 import (
-	"context"
 	"fmt"
 
 	"github.com/hashicorp/terraform/helper/schema"
 	"github.com/sacloud/libsacloud/v2/sacloud"
-	"github.com/sacloud/libsacloud/v2/sacloud/types"
 )
 
 func dataSourceSakuraCloudGSLB() *schema.Resource {
@@ -101,9 +99,8 @@ func dataSourceSakuraCloudGSLB() *schema.Resource {
 }
 
 func dataSourceSakuraCloudGSLBRead(d *schema.ResourceData, meta interface{}) error {
-	client := getSacloudAPIClient(d, meta)
+	client, ctx, _ := getSacloudV2Client(d, meta)
 	searcher := sacloud.NewGSLBOp(client)
-	ctx := context.Background()
 
 	findCondition := &sacloud.FindCondition{
 		Count: defaultSearchLimit,
@@ -122,42 +119,5 @@ func dataSourceSakuraCloudGSLBRead(d *schema.ResourceData, meta interface{}) err
 
 	targets := res.GSLBs
 	d.SetId(targets[0].ID.String())
-	return setGSLBV2ResourceData(ctx, d, client, targets[0])
-}
-
-func setGSLBV2ResourceData(ctx context.Context, d *schema.ResourceData, client *APIClient, data *sacloud.GSLB) error {
-
-	//health_check
-	healthCheck := map[string]interface{}{}
-	switch data.HealthCheck.Protocol {
-	case types.GSLBHealthCheckProtocols.HTTP, types.GSLBHealthCheckProtocols.HTTPS:
-		healthCheck["host_header"] = data.HealthCheck.HostHeader
-		healthCheck["path"] = data.HealthCheck.Path
-		healthCheck["status"] = data.HealthCheck.ResponseCode.String()
-	case types.GSLBHealthCheckProtocols.TCP:
-		healthCheck["port"] = data.HealthCheck.Port
-	}
-	healthCheck["protocol"] = data.HealthCheck.Protocol
-	healthCheck["delay_loop"] = data.DelayLoop
-
-	var servers []interface{}
-	for _, server := range data.DestinationServers {
-		v := map[string]interface{}{}
-		v["ipaddress"] = server.IPAddress
-		v["enabled"] = server.Enabled.Bool()
-		v["weight"] = server.Weight.Int()
-		servers = append(servers, v)
-	}
-
-	return setResourceData(d, map[string]interface{}{
-		"name":         data.Name,
-		"fqdn":         data.FQDN,
-		"sorry_server": data.SorryServer,
-		"icon_id":      data.IconID.String(),
-		"description":  data.Description,
-		"tags":         data.Tags,
-		"weighted":     data.Weighted.Bool(),
-		"health_check": []interface{}{healthCheck},
-		"servers":      servers,
-	})
+	return setGSLBResourceData(ctx, d, client, targets[0])
 }

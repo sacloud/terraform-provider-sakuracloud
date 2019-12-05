@@ -14,7 +14,7 @@ func TestAccSakuraCloudDataSourceCDROM_Basic(t *testing.T) {
 		PreCheck:                  func() { testAccPreCheck(t) },
 		Providers:                 testAccProviders,
 		PreventPostDestroyRefresh: true,
-		CheckDestroy:              testAccCheckSakuraCloudCDROMDataSourceDestroy,
+		CheckDestroy:              testAccCheckSakuraCloudCDROMDestroy,
 
 		Steps: []resource.TestStep{
 			{
@@ -86,32 +86,10 @@ func testAccCheckSakuraCloudCDROMDataSourceNotExists(n string) resource.TestChec
 	return func(s *terraform.State) error {
 		v, ok := s.RootModule().Resources[n]
 		if ok && v.Primary.ID != "" {
-			return fmt.Errorf("Found CDROM data source: %s", n)
+			return fmt.Errorf("found CDROM[%s]: %s", v.Primary.ID, n)
 		}
 		return nil
 	}
-}
-
-func testAccCheckSakuraCloudCDROMDataSourceDestroy(s *terraform.State) error {
-	client := testAccProvider.Meta().(*APIClient)
-
-	for _, rs := range s.RootModule().Resources {
-		if rs.Type != "sakuracloud_cdrom" {
-			continue
-		}
-
-		if rs.Primary.ID == "" {
-			continue
-		}
-
-		_, err := client.CDROM.Read(toSakuraCloudID(rs.Primary.ID))
-
-		if err == nil {
-			return errors.New("CDROM still exists")
-		}
-	}
-
-	return nil
 }
 
 var testAccCheckSakuraCloudDataSourceCDROMConfig = `

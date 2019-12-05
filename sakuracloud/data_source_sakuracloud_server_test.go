@@ -19,7 +19,7 @@ func TestAccSakuraCloudDataSourceServer_Basic(t *testing.T) {
 		PreCheck:                  func() { testAccPreCheck(t) },
 		Providers:                 testAccProviders,
 		PreventPostDestroyRefresh: true,
-		CheckDestroy:              testAccCheckSakuraCloudServerDataSourceDestroy,
+		CheckDestroy:              testAccCheckSakuraCloudServerDestroy,
 
 		Steps: []resource.TestStep{
 			{
@@ -91,28 +91,6 @@ func testAccCheckSakuraCloudServerDataSourceNotExists(n string) resource.TestChe
 		}
 		return nil
 	}
-}
-
-func testAccCheckSakuraCloudServerDataSourceDestroy(s *terraform.State) error {
-	client := testAccProvider.Meta().(*APIClient)
-
-	for _, rs := range s.RootModule().Resources {
-		if rs.Type != "sakuracloud_server" {
-			continue
-		}
-
-		if rs.Primary.ID == "" {
-			continue
-		}
-
-		_, err := client.Server.Read(toSakuraCloudID(rs.Primary.ID))
-
-		if err == nil {
-			return errors.New("Server still exists")
-		}
-	}
-
-	return nil
 }
 
 func testAccCheckSakuraCloudDataSourceServerBase(name string) string {

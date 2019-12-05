@@ -19,7 +19,7 @@ func TestAccSakuraCloudDataSourceInternet_Basic(t *testing.T) {
 		PreCheck:                  func() { testAccPreCheck(t) },
 		Providers:                 testAccProviders,
 		PreventPostDestroyRefresh: true,
-		CheckDestroy:              testAccCheckSakuraCloudInternetDataSourceDestroy,
+		CheckDestroy:              testAccCheckSakuraCloudInternetDestroy,
 
 		Steps: []resource.TestStep{
 			{
@@ -88,28 +88,6 @@ func testAccCheckSakuraCloudInternetDataSourceNotExists(n string) resource.TestC
 		}
 		return nil
 	}
-}
-
-func testAccCheckSakuraCloudInternetDataSourceDestroy(s *terraform.State) error {
-	client := testAccProvider.Meta().(*APIClient)
-
-	for _, rs := range s.RootModule().Resources {
-		if rs.Type != "sakuracloud_internet" {
-			continue
-		}
-
-		if rs.Primary.ID == "" {
-			continue
-		}
-
-		_, err := client.Internet.Read(toSakuraCloudID(rs.Primary.ID))
-
-		if err == nil {
-			return errors.New("the Internet resource still exists")
-		}
-	}
-
-	return nil
 }
 
 func testAccCheckSakuraCloudDataSourceInternetBase(name string) string {

@@ -1,14 +1,10 @@
 package sakuracloud
 
 import (
-	"context"
 	"fmt"
-	"strconv"
-	"strings"
 
 	"github.com/hashicorp/terraform/helper/schema"
 	"github.com/sacloud/libsacloud/v2/sacloud"
-	"github.com/sacloud/libsacloud/v2/sacloud/types"
 )
 
 func dataSourceSakuraCloudVPCRouter() *schema.Resource {
@@ -145,7 +141,7 @@ func dataSourceSakuraCloudVPCRouter() *schema.Resource {
 					},
 				},
 			},
-			"firewall": {
+			"firewalls": {
 				Type:     schema.TypeList,
 				Computed: true,
 				Elem: &schema.Resource{
@@ -363,10 +359,8 @@ func dataSourceSakuraCloudVPCRouter() *schema.Resource {
 }
 
 func dataSourceSakuraCloudVPCRouterRead(d *schema.ResourceData, meta interface{}) error {
-	client := getSacloudAPIClient(d, meta)
+	client, ctx, zone := getSacloudV2Client(d, meta)
 	searcher := sacloud.NewVPCRouterOp(client)
-	ctx := context.Background()
-	zone := getV2Zone(d, client)
 
 	findCondition := &sacloud.FindCondition{
 		Count: defaultSearchLimit,
@@ -385,223 +379,5 @@ func dataSourceSakuraCloudVPCRouterRead(d *schema.ResourceData, meta interface{}
 
 	targets := res.VPCRouters
 	d.SetId(targets[0].ID.String())
-	return setVPCRouterV2ResourceData(ctx, d, client, targets[0])
-}
-
-func setVPCRouterV2ResourceData(ctx context.Context, d *schema.ResourceData, client *APIClient, data *sacloud.VPCRouter) error {
-	if data.Availability.IsFailed() {
-		d.SetId("")
-		return fmt.Errorf("got unexpected state: VPCRouter[%d].Availability is failed", data.ID)
-	}
-
-	//plan1
-	var planName string
-	switch data.PlanID {
-	case types.VPCRouterPlans.Standard:
-		planName = "standard"
-	case types.VPCRouterPlans.Premium:
-		planName = "premium"
-	case types.VPCRouterPlans.HighSpec:
-		planName = "highspec"
-	}
-
-	var globalAddress, switchID, vip, ipaddress1, ipaddress2 string
-	var aliases []string
-	var vrid int
-	if data.PlanID == types.VPCRouterPlans.Standard {
-		globalAddress = data.Interfaces[0].IPAddress
-	} else {
-		switchID = data.Interfaces[0].SwitchID.String()
-		vip = data.Settings.Interfaces[0].VirtualIPAddress
-		ipaddress1 = data.Settings.Interfaces[0].IPAddress[0]
-		ipaddress2 = data.Settings.Interfaces[0].IPAddress[1]
-		aliases = data.Settings.Interfaces[0].IPAliases
-		vrid = data.Settings.VRID
-		globalAddress = data.Settings.Interfaces[0].VirtualIPAddress
-	}
-
-	setPowerManageTimeoutValueToState(d)
-
-	// interface
-	var interfaces []map[string]interface{}
-	if len(data.Interfaces) > 0 {
-		for _, iface := range data.Settings.Interfaces {
-			// find nic from data.Interfaces
-			var nic *sacloud.VPCRouterInterface
-			for _, n := range data.Interfaces {
-				if iface.Index == n.Index {
-					nic = n
-					break
-				}
-			}
-
-			if nic != nil {
-				interfaces = append(interfaces, map[string]interface{}{
-					"switch_id":   nic.SwitchID.String(),
-					"vip":         iface.VirtualIPAddress,
-					"ipaddresses": iface.IPAddress,
-					"nw_mask_len": iface.NetworkMaskLen,
-					"index":       iface.Index,
-				})
-			}
-		}
-	}
-
-	var dhcpServers []map[string]interface{}
-	for _, d := range data.Settings.DHCPServer {
-		dhcpServers = append(dhcpServers, map[string]interface{}{
-			"range_start":     d.RangeStart,
-			"range_stop":      d.RangeStop,
-			"interface_index": vpcRouterInterfaceNameToIndex(d.Interface),
-			"dns_servers":     d.DNSServers,
-		})
-	}
-
-	var staticMappings []map[string]interface{}
-	for _, d := range data.Settings.DHCPStaticMapping {
-		staticMappings = append(staticMappings, map[string]interface{}{
-			"ipaddress":  d.IPAddress,
-			"macaddress": d.MACAddress,
-		})
-	}
-
-	var firewallRules []map[string]interface{}
-	for i, configs := range data.Settings.Firewall {
-
-		directionRules := map[string][]*sacloud.VPCRouterFirewallRule{
-			"send":    configs.Send,
-			"receive": configs.Receive,
-		}
-
-		for direction, rules := range directionRules {
-			if len(rules) == 0 {
-				continue
-			}
-			var expressions []interface{}
-			for _, rule := range rules {
-				expression := map[string]interface{}{
-					"source_nw":   rule.SourceNetwork,
-					"source_port": rule.SourcePort,
-					"dest_nw":     rule.DestinationNetwork,
-					"dest_port":   rule.DestinationPort,
-					"allow":       rule.Action.IsAllow(),
-					"protocol":    rule.Protocol,
-					"logging":     rule.Logging.Bool(),
-					"description": rule.Description,
-				}
-				expressions = append(expressions, expression)
-			}
-			firewallRules = append(firewallRules, map[string]interface{}{
-				"interface_index": i,
-				"direction":       direction,
-				"expressions":     expressions,
-			})
-		}
-	}
-
-	var l2tp []map[string]interface{}
-	if data.Settings.L2TPIPsecServerEnabled.Bool() {
-		s := data.Settings.L2TPIPsecServer
-		l2tp = append(l2tp, map[string]interface{}{
-			"pre_shared_secret": s.PreSharedSecret,
-			"range_start":       s.RangeStart,
-			"range_stop":        s.RangeStop,
-		})
-	}
-
-	var portForwardings []map[string]interface{}
-	for _, p := range data.Settings.PortForwarding {
-		globalPort := p.GlobalPort.Int()
-		privatePort := p.PrivatePort.Int()
-		portForwardings = append(portForwardings, map[string]interface{}{
-			"protocol":        string(p.Protocol),
-			"global_port":     globalPort,
-			"private_address": p.PrivateAddress,
-			"private_port":    privatePort,
-			"description":     p.Description,
-		})
-	}
-
-	var pptp []map[string]interface{}
-	if data.Settings.PPTPServerEnabled.Bool() {
-		c := data.Settings.PPTPServer
-		pptp = append(pptp, map[string]interface{}{
-			"range_start": c.RangeStart,
-			"range_stop":  c.RangeStop,
-		})
-	}
-
-	var s2sSettings []map[string]interface{}
-	for _, s := range data.Settings.SiteToSiteIPsecVPN {
-		s2sSettings = append(s2sSettings, map[string]interface{}{
-			"local_prefix":      s.LocalPrefix,
-			"peer":              s.Peer,
-			"pre_shared_secret": s.PreSharedSecret,
-			"remote_id":         s.RemoteID,
-			"routes":            s.Routes,
-		})
-	}
-
-	var staticNATs []map[string]interface{}
-	for _, s := range data.Settings.StaticNAT {
-		staticNATs = append(staticNATs, map[string]interface{}{
-			"global_address":  s.GlobalAddress,
-			"private_address": s.PrivateAddress,
-			"description":     s.Description,
-		})
-	}
-
-	var staticRoutes []map[string]interface{}
-	for _, s := range data.Settings.StaticRoute {
-		staticRoutes = append(staticRoutes, map[string]interface{}{
-			"prefix":   s.Prefix,
-			"next_hop": s.NextHop,
-		})
-	}
-
-	var users []map[string]interface{}
-	for _, u := range data.Settings.RemoteAccessUsers {
-		users = append(users, map[string]interface{}{
-			"name":     u.UserName,
-			"password": u.Password,
-		})
-	}
-
-	return setResourceData(d, map[string]interface{}{
-		"name":                 data.Name,
-		"icon_id":              data.IconID.String(),
-		"description":          data.Description,
-		"tags":                 data.Tags,
-		"plan":                 planName,
-		"switch_id":            switchID,
-		"global_address":       globalAddress,
-		"vip":                  vip,
-		"ipaddress1":           ipaddress1,
-		"ipaddress2":           ipaddress2,
-		"aliases":              aliases,
-		"vrid":                 vrid,
-		"syslog_host":          data.Settings.SyslogHost,
-		"internet_connection":  data.Settings.InternetConnectionEnabled.Bool(),
-		"interfaces":           interfaces,
-		"dhcp_servers":         dhcpServers,
-		"dhcp_static_mappings": staticMappings,
-		"firewall":             firewallRules,
-		"l2tp":                 l2tp,
-		"pptp":                 pptp,
-		"port_forwardings":     portForwardings,
-		"site_to_site_vpn":     s2sSettings,
-		"static_nat":           staticNATs,
-		"static_routes":        staticRoutes,
-		"users":                users,
-		"zone":                 getV2Zone(d, client),
-	})
-}
-
-func vpcRouterInterfaceNameToIndex(ifName string) int {
-	strIndex := strings.Replace(ifName, "eth", "", -1)
-	index, err := strconv.Atoi(strIndex)
-	if err != nil {
-		return -1
-	}
-	return index
+	return setVPCRouterResourceData(ctx, d, client, targets[0])
 }

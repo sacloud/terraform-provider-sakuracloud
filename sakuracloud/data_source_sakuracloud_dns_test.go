@@ -19,7 +19,7 @@ func TestAccSakuraCloudDataSourceDNS_Basic(t *testing.T) {
 		PreCheck:                  func() { testAccPreCheck(t) },
 		Providers:                 testAccProviders,
 		PreventPostDestroyRefresh: true,
-		CheckDestroy:              testAccCheckSakuraCloudDNSDataSourceDestroy,
+		CheckDestroy:              testAccCheckSakuraCloudDNSDestroy,
 
 		Steps: []resource.TestStep{
 			{
@@ -84,28 +84,6 @@ func testAccCheckSakuraCloudDNSDataSourceNotExists(n string) resource.TestCheckF
 		}
 		return nil
 	}
-}
-
-func testAccCheckSakuraCloudDNSDataSourceDestroy(s *terraform.State) error {
-	client := testAccProvider.Meta().(*APIClient)
-
-	for _, rs := range s.RootModule().Resources {
-		if rs.Type != "sakuracloud_dns" {
-			continue
-		}
-
-		if rs.Primary.ID == "" {
-			continue
-		}
-
-		_, err := client.DNS.Read(toSakuraCloudID(rs.Primary.ID))
-
-		if err == nil {
-			return errors.New("DNS still exists")
-		}
-	}
-
-	return nil
 }
 
 func testAccCheckSakuraCloudDataSourceDNSBase(zone string) string {

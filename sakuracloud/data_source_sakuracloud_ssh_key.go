@@ -1,7 +1,6 @@
 package sakuracloud
 
 import (
-	"context"
 	"fmt"
 
 	"github.com/hashicorp/terraform/helper/schema"
@@ -35,9 +34,8 @@ func dataSourceSakuraCloudSSHKey() *schema.Resource {
 }
 
 func dataSourceSakuraCloudSSHKeyRead(d *schema.ResourceData, meta interface{}) error {
-	client := getSacloudAPIClient(d, meta)
+	client, ctx, _ := getSacloudV2Client(d, meta)
 	searcher := sacloud.NewSSHKeyOp(client)
-	ctx := context.Background()
 
 	findCondition := &sacloud.FindCondition{
 		Count: defaultSearchLimit,
@@ -56,14 +54,5 @@ func dataSourceSakuraCloudSSHKeyRead(d *schema.ResourceData, meta interface{}) e
 
 	targets := res.SSHKeys
 	d.SetId(targets[0].ID.String())
-	return setSSHKeyV2ResourceData(ctx, d, client, targets[0])
-}
-
-func setSSHKeyV2ResourceData(ctx context.Context, d *schema.ResourceData, client *APIClient, data *sacloud.SSHKey) error {
-	return setResourceData(d, map[string]interface{}{
-		"name":        data.Name,
-		"public_key":  data.PublicKey,
-		"fingerprint": data.Fingerprint,
-		"description": data.Description,
-	})
+	return setSSHKeyResourceData(ctx, d, client, targets[0])
 }

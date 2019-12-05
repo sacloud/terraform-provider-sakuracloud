@@ -1,7 +1,6 @@
 package sakuracloud
 
 import (
-	"context"
 	"fmt"
 
 	"github.com/hashicorp/terraform/helper/schema"
@@ -37,9 +36,8 @@ func dataSourceSakuraCloudIcon() *schema.Resource {
 }
 
 func dataSourceSakuraCloudIconRead(d *schema.ResourceData, meta interface{}) error {
-	client := getSacloudAPIClient(d, meta)
+	client, ctx, _ := getSacloudV2Client(d, meta)
 	searcher := sacloud.NewIconOp(client)
-	ctx := context.Background()
 
 	findCondition := &sacloud.FindCondition{
 		Count: defaultSearchLimit,
@@ -57,14 +55,8 @@ func dataSourceSakuraCloudIconRead(d *schema.ResourceData, meta interface{}) err
 	}
 
 	targets := res.Icons
-	d.SetId(targets[0].ID.String())
-	return setIconV2ResourceData(ctx, d, client, targets[0])
-}
+	icon := targets[0]
 
-func setIconV2ResourceData(ctx context.Context, d *schema.ResourceData, client *APIClient, data *sacloud.Icon) error {
-	return setResourceData(d, map[string]interface{}{
-		"name": data.Name,
-		"tags": data.Tags,
-		"url":  data.URL,
-	})
+	d.SetId(icon.ID.String())
+	return setIconResourceData(ctx, d, client, icon)
 }

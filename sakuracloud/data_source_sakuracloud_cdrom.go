@@ -1,7 +1,6 @@
 package sakuracloud
 
 import (
-	"context"
 	"fmt"
 
 	"github.com/hashicorp/terraform/helper/schema"
@@ -48,10 +47,8 @@ func dataSourceSakuraCloudCDROM() *schema.Resource {
 }
 
 func dataSourceSakuraCloudCDROMRead(d *schema.ResourceData, meta interface{}) error {
-	client := getSacloudAPIClient(d, meta)
+	client, ctx, zone := getSacloudV2Client(d, meta)
 	searcher := sacloud.NewCDROMOp(client)
-	ctx := context.Background()
-	zone := getV2Zone(d, client)
 
 	findCondition := &sacloud.FindCondition{
 		Count: defaultSearchLimit,
@@ -70,16 +67,5 @@ func dataSourceSakuraCloudCDROMRead(d *schema.ResourceData, meta interface{}) er
 
 	targets := res.CDROMs
 	d.SetId(targets[0].ID.String())
-	return setCDROMV2ResourceData(ctx, d, client, targets[0])
-}
-
-func setCDROMV2ResourceData(ctx context.Context, d *schema.ResourceData, client *APIClient, data *sacloud.CDROM) error {
-	return setResourceData(d, map[string]interface{}{
-		"name":        data.Name,
-		"size":        data.GetSizeGB(),
-		"icon_id":     data.IconID.String(),
-		"description": data.Description,
-		"tags":        data.Tags,
-		"zone":        getV2Zone(d, client),
-	})
+	return setCDROMResourceData(ctx, d, client, targets[0])
 }

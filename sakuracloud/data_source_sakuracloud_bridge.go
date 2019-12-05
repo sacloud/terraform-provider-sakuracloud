@@ -1,7 +1,6 @@
 package sakuracloud
 
 import (
-	"context"
 	"fmt"
 
 	"github.com/hashicorp/terraform/helper/schema"
@@ -40,10 +39,8 @@ func dataSourceSakuraCloudBridge() *schema.Resource {
 }
 
 func dataSourceSakuraCloudBridgeRead(d *schema.ResourceData, meta interface{}) error {
-	client := getSacloudAPIClient(d, meta)
+	client, ctx, zone := getSacloudV2Client(d, meta)
 	searcher := sacloud.NewBridgeOp(client)
-	ctx := context.Background()
-	zone := getV2Zone(d, client)
 
 	findCondition := &sacloud.FindCondition{
 		Count: defaultSearchLimit,
@@ -66,22 +63,5 @@ func dataSourceSakuraCloudBridgeRead(d *schema.ResourceData, meta interface{}) e
 	}
 
 	d.SetId(targets[0].ID.String())
-	return setV2BridgeResourceData(ctx, d, client, targets[0])
-}
-
-func setV2BridgeResourceData(ctx context.Context, d *schema.ResourceData, client *APIClient, data *sacloud.Bridge) error {
-	swOp := sacloud.NewSwitchOp(client)
-	var switchIDs []interface{}
-	for _, d := range data.BridgeInfo {
-		if _, err := swOp.Read(ctx, d.ZoneName, d.ID); err == nil {
-			switchIDs = append(switchIDs, d.ID.String())
-		}
-	}
-
-	return setResourceData(d, map[string]interface{}{
-		"name":        data.Name,
-		"description": data.Description,
-		"switch_ids":  switchIDs,
-		"zone":        getV2Zone(d, client),
-	})
+	return setBridgeResourceData(ctx, d, client, targets[0])
 }

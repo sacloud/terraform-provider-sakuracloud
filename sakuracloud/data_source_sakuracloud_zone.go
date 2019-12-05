@@ -1,7 +1,6 @@
 package sakuracloud
 
 import (
-	"context"
 	"fmt"
 
 	"github.com/hashicorp/terraform/helper/schema"
@@ -45,11 +44,9 @@ func dataSourceSakuraCloudZone() *schema.Resource {
 }
 
 func dataSourceSakuraCloudZoneRead(d *schema.ResourceData, meta interface{}) error {
-	client := getSacloudAPIClient(d, meta)
+	client, ctx, zoneSlug := getSacloudV2Client(d, meta)
 	zoneOp := sacloud.NewZoneOp(client)
-	ctx := context.Background()
 
-	zoneSlug := client.Zone
 	if v, ok := d.GetOk("name"); ok {
 		zoneSlug = v.(string)
 	}

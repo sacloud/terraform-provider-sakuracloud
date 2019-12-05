@@ -1,7 +1,6 @@
 package sakuracloud
 
 import (
-	"context"
 	"fmt"
 
 	"github.com/hashicorp/terraform/helper/schema"
@@ -57,11 +56,8 @@ func dataSourceSakuraCloudArchive() *schema.Resource {
 }
 
 func dataSourceSakuraCloudArchiveRead(d *schema.ResourceData, meta interface{}) error {
-	client := getSacloudAPIClient(d, meta)
+	client, ctx, zone := getSacloudV2Client(d, meta)
 	searcher := sacloud.NewArchiveOp(client)
-
-	ctx := context.Background()
-	zone := getV2Zone(d, client)
 
 	var data *sacloud.Archive
 	if osType, ok := d.GetOk("os_type"); ok {
