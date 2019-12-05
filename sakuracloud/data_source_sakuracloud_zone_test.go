@@ -15,12 +15,9 @@
 package sakuracloud
 
 import (
-	"errors"
-	"fmt"
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/resource"
-	"github.com/hashicorp/terraform-plugin-sdk/terraform"
 )
 
 func TestAccSakuraCloudDataSourceZone_Basic(t *testing.T) {
@@ -31,7 +28,7 @@ func TestAccSakuraCloudDataSourceZone_Basic(t *testing.T) {
 			{
 				Config: testAccCheckSakuraCloudDataSourceZoneBase,
 				Check: resource.ComposeTestCheckFunc(
-					testAccCheckSakuraCloudZoneDataSourceID("data.sakuracloud_zone.foobar"),
+					testAccCheckSakuraCloudDataSourceExists("data.sakuracloud_zone.foobar"),
 					resource.TestCheckResourceAttr("data.sakuracloud_zone.foobar", "name", "is1a"),
 					resource.TestCheckResourceAttr("data.sakuracloud_zone.foobar", "zone_id", "31001"),
 					resource.TestCheckResourceAttr("data.sakuracloud_zone.foobar", "description", "石狩第1ゾーン"),
@@ -43,20 +40,6 @@ func TestAccSakuraCloudDataSourceZone_Basic(t *testing.T) {
 			},
 		},
 	})
-}
-
-func testAccCheckSakuraCloudZoneDataSourceID(n string) resource.TestCheckFunc {
-	return func(s *terraform.State) error {
-		rs, ok := s.RootModule().Resources[n]
-		if !ok {
-			return fmt.Errorf("Can't find Zone data source: %s", n)
-		}
-
-		if rs.Primary.ID == "" {
-			return errors.New("Zone data source ID not set")
-		}
-		return nil
-	}
 }
 
 var testAccCheckSakuraCloudDataSourceZoneBase = `

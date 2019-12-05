@@ -75,13 +75,14 @@ func TestAccSakuraCloudLoadBalancerVIP(t *testing.T) {
 }
 
 func testAccCheckSakuraCloudLoadBalancerVIPDestroy(s *terraform.State) error {
-	// TODO IDをパースしてLBのIDを取得すべき
-
 	client := testAccProvider.Meta().(*APIClient)
 	lbOp := sacloud.NewLoadBalancerOp(client)
 
 	for _, rs := range s.RootModule().Resources {
 		if rs.Type != "sakuracloud_load_balancer" {
+			continue
+		}
+		if rs.Primary.ID == "" {
 			continue
 		}
 

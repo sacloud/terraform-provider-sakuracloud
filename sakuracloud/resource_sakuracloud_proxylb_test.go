@@ -173,6 +173,9 @@ func testAccCheckSakuraCloudProxyLBDestroy(s *terraform.State) error {
 		if rs.Type != "sakuracloud_proxylb" {
 			continue
 		}
+		if rs.Primary.ID == "" {
+			continue
+		}
 
 		_, err := proxyLBOp.Read(context.Background(), types.StringID(rs.Primary.ID))
 		if err == nil {

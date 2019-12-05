@@ -110,6 +110,9 @@ func testAccCheckSakuraCloudBucketObjectDestroy(s *terraform.State) error {
 		if rs.Type != "sakuracloud_bucket_object" {
 			continue
 		}
+		if rs.Primary.ID == "" {
+			continue
+		}
 
 		accessKey := rs.Primary.Attributes["access_key"]
 		secretKey := rs.Primary.Attributes["secret_key"]

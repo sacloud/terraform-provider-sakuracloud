@@ -149,6 +149,9 @@ func testAccCheckSakuraCloudDatabaseDestroy(s *terraform.State) error {
 		if rs.Type != "sakuracloud_database" {
 			continue
 		}
+		if rs.Primary.ID == "" {
+			continue
+		}
 
 		dbOp := sacloud.NewDatabaseOp(client)
 		zone := rs.Primary.Attributes["zone"]

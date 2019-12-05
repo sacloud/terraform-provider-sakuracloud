@@ -98,7 +98,7 @@ func dataSourceSakuraCloudBucketObject() *schema.Resource {
 func dataSourceSakuraCloudBucketObjectRead(d *schema.ResourceData, meta interface{}) error {
 	client, err := getS3Client(d)
 	if err != nil {
-		return fmt.Errorf("SakuraCloud BucketObject Read is failed: %s", err)
+		return fmt.Errorf("reading SakuraCloud BucketObject is failed: %s", err)
 	}
 
 	key := d.Get("key").(string)
@@ -108,7 +108,7 @@ func dataSourceSakuraCloudBucketObjectRead(d *schema.ResourceData, meta interfac
 	// get key-info
 	keyInfo, err := bucket.GetKey(key)
 	if err != nil {
-		return fmt.Errorf("SakuraCloud BucketObject Read is failed: %s", err)
+		return fmt.Errorf("reading SakuraCloud BucketObject is failed: %s", err)
 	}
 	d.Set("last_modified", keyInfo.LastModified)
 	d.Set("size", keyInfo.Size)
@@ -118,7 +118,7 @@ func dataSourceSakuraCloudBucketObjectRead(d *schema.ResourceData, meta interfac
 	// get head
 	head, err := bucket.Head(key)
 	if err != nil {
-		return fmt.Errorf("SakuraCloud BucketObject Read is failed: %s", err)
+		return fmt.Errorf("reading SakuraCloud BucketObject is failed: %s", err)
 	}
 	contentType := head.Header.Get("Content-Type")
 	d.Set("content_type", contentType)
@@ -126,7 +126,7 @@ func dataSourceSakuraCloudBucketObjectRead(d *schema.ResourceData, meta interfac
 	if isContentTypeAllowed(&contentType) {
 		data, err := bucket.Get(key)
 		if err != nil {
-			return fmt.Errorf("SakuraCloud BucketObject Read is failed: %s", err)
+			return fmt.Errorf("reading SakuraCloud BucketObject is failed: %s", err)
 		}
 		d.Set("body", string(data))
 	} else {

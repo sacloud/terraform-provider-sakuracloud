@@ -19,6 +19,8 @@ import (
 	"os"
 	"testing"
 
+	"github.com/hashicorp/terraform-plugin-sdk/helper/resource"
+
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/terraform"
 )
@@ -88,4 +90,28 @@ func skipIfFakeModeEnabled(t *testing.T) {
 func isFakeModeEnabled() bool {
 	fakeMode := os.Getenv("FAKE_MODE")
 	return fakeMode != ""
+}
+
+func testAccCheckSakuraCloudDataSourceExists(n string) resource.TestCheckFunc {
+	return func(s *terraform.State) error {
+		rs, ok := s.RootModule().Resources[n]
+		if !ok {
+			return fmt.Errorf("resource is not exists: %s", n)
+		}
+
+		if rs.Primary.ID == "" {
+			return fmt.Errorf("id is not set: %s", n)
+		}
+		return nil
+	}
+}
+
+func testAccCheckSakuraCloudDataSourceNotExists(n string) resource.TestCheckFunc {
+	return func(s *terraform.State) error {
+		v, ok := s.RootModule().Resources[n]
+		if ok && v.Primary.ID != "" {
+			return fmt.Errorf("resource still exists: %s", n)
+		}
+		return nil
+	}
 }

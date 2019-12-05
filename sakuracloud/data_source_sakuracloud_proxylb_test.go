@@ -15,14 +15,12 @@
 package sakuracloud
 
 import (
-	"errors"
 	"fmt"
 	"os"
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/acctest"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/resource"
-	"github.com/hashicorp/terraform-plugin-sdk/terraform"
 )
 
 func TestAccSakuraCloudDataSourceProxyLB_Basic(t *testing.T) {
@@ -52,12 +50,12 @@ func TestAccSakuraCloudDataSourceProxyLB_Basic(t *testing.T) {
 		Steps: []resource.TestStep{
 			{
 				Config: testAccCheckSakuraCloudDataSourceProxyLBBase(name, proxyLBRealServerIP0, proxyLBRealServerIP1),
-				Check:  testAccCheckSakuraCloudProxyLBDataSourceID("sakuracloud_proxylb.foobar"),
+				Check:  testAccCheckSakuraCloudDataSourceExists("sakuracloud_proxylb.foobar"),
 			},
 			{
 				Config: testAccCheckSakuraCloudDataSourceProxyLBConfig(name, proxyLBRealServerIP0, proxyLBRealServerIP1),
 				Check: resource.ComposeTestCheckFunc(
-					testAccCheckSakuraCloudProxyLBDataSourceID("data.sakuracloud_proxylb.foobar"),
+					testAccCheckSakuraCloudDataSourceExists("data.sakuracloud_proxylb.foobar"),
 					resource.TestCheckResourceAttr("data.sakuracloud_proxylb.foobar", "name", name),
 					resource.TestCheckResourceAttr("data.sakuracloud_proxylb.foobar", "plan", "100"),
 					resource.TestCheckResourceAttr("data.sakuracloud_proxylb.foobar", "description", "description_test"),
@@ -81,49 +79,25 @@ func TestAccSakuraCloudDataSourceProxyLB_Basic(t *testing.T) {
 			{
 				Config: testAccCheckSakuraCloudDataSourceProxyLBConfig_With_Tag(name, proxyLBRealServerIP0, proxyLBRealServerIP1),
 				Check: resource.ComposeTestCheckFunc(
-					testAccCheckSakuraCloudProxyLBDataSourceID("data.sakuracloud_proxylb.foobar"),
+					testAccCheckSakuraCloudDataSourceExists("data.sakuracloud_proxylb.foobar"),
 				),
 			},
 			{
 				Config: testAccCheckSakuraCloudDataSourceProxyLBConfig_NotExists(name, proxyLBRealServerIP0, proxyLBRealServerIP1),
 				Check: resource.ComposeTestCheckFunc(
-					testAccCheckSakuraCloudProxyLBDataSourceNotExists("data.sakuracloud_proxylb.foobar"),
+					testAccCheckSakuraCloudDataSourceNotExists("data.sakuracloud_proxylb.foobar"),
 				),
 				Destroy: true,
 			},
 			{
 				Config: testAccCheckSakuraCloudDataSourceProxyLBConfig_With_NotExists_Tag(name, proxyLBRealServerIP0, proxyLBRealServerIP1),
 				Check: resource.ComposeTestCheckFunc(
-					testAccCheckSakuraCloudProxyLBDataSourceNotExists("data.sakuracloud_proxylb.foobar"),
+					testAccCheckSakuraCloudDataSourceNotExists("data.sakuracloud_proxylb.foobar"),
 				),
 				Destroy: true,
 			},
 		},
 	})
-}
-
-func testAccCheckSakuraCloudProxyLBDataSourceID(n string) resource.TestCheckFunc {
-	return func(s *terraform.State) error {
-		rs, ok := s.RootModule().Resources[n]
-		if !ok {
-			return fmt.Errorf("Can't find ProxyLB data source: %s", n)
-		}
-
-		if rs.Primary.ID == "" {
-			return errors.New("ProxyLB data source ID not set")
-		}
-		return nil
-	}
-}
-
-func testAccCheckSakuraCloudProxyLBDataSourceNotExists(n string) resource.TestCheckFunc {
-	return func(s *terraform.State) error {
-		v, ok := s.RootModule().Resources[n]
-		if ok && v.Primary.ID != "" {
-			return fmt.Errorf("Found ProxyLB data source: %s", n)
-		}
-		return nil
-	}
 }
 
 func testAccCheckSakuraCloudDataSourceProxyLBBase(name, ip1, ip2 string) string {

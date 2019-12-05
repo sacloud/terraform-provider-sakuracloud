@@ -15,13 +15,11 @@
 package sakuracloud
 
 import (
-	"errors"
 	"fmt"
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/acctest"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/resource"
-	"github.com/hashicorp/terraform-plugin-sdk/terraform"
 )
 
 func TestAccSakuraCloudDataSourceVPCRouter_Basic(t *testing.T) {
@@ -38,12 +36,12 @@ func TestAccSakuraCloudDataSourceVPCRouter_Basic(t *testing.T) {
 		Steps: []resource.TestStep{
 			{
 				Config: testAccCheckSakuraCloudDataSourceVPCRouterBase(name),
-				Check:  testAccCheckSakuraCloudVPCRouterDataSourceID("sakuracloud_vpc_router.foobar"),
+				Check:  testAccCheckSakuraCloudDataSourceExists("sakuracloud_vpc_router.foobar"),
 			},
 			{
 				Config: testAccCheckSakuraCloudDataSourceVPCRouterConfig(name),
 				Check: resource.ComposeTestCheckFunc(
-					testAccCheckSakuraCloudVPCRouterDataSourceID("data.sakuracloud_vpc_router.foobar"),
+					testAccCheckSakuraCloudDataSourceExists("data.sakuracloud_vpc_router.foobar"),
 					resource.TestCheckResourceAttr("data.sakuracloud_vpc_router.foobar", "name", name),
 					resource.TestCheckResourceAttr("data.sakuracloud_vpc_router.foobar", "description", "description_test"),
 					resource.TestCheckResourceAttr("data.sakuracloud_vpc_router.foobar", "tags.#", "3"),
@@ -55,49 +53,25 @@ func TestAccSakuraCloudDataSourceVPCRouter_Basic(t *testing.T) {
 			{
 				Config: testAccCheckSakuraCloudDataSourceVPCRouterConfig_With_Tag(name),
 				Check: resource.ComposeTestCheckFunc(
-					testAccCheckSakuraCloudVPCRouterDataSourceID("data.sakuracloud_vpc_router.foobar"),
+					testAccCheckSakuraCloudDataSourceExists("data.sakuracloud_vpc_router.foobar"),
 				),
 			},
 			{
 				Config: testAccCheckSakuraCloudDataSourceVPCRouterConfig_NotExists(name),
 				Check: resource.ComposeTestCheckFunc(
-					testAccCheckSakuraCloudVPCRouterDataSourceNotExists("data.sakuracloud_vpc_router.foobar"),
+					testAccCheckSakuraCloudDataSourceNotExists("data.sakuracloud_vpc_router.foobar"),
 				),
 				Destroy: true,
 			},
 			{
 				Config: testAccCheckSakuraCloudDataSourceVPCRouterConfig_With_NotExists_Tag(name),
 				Check: resource.ComposeTestCheckFunc(
-					testAccCheckSakuraCloudVPCRouterDataSourceNotExists("data.sakuracloud_vpc_router.foobar"),
+					testAccCheckSakuraCloudDataSourceNotExists("data.sakuracloud_vpc_router.foobar"),
 				),
 				Destroy: true,
 			},
 		},
 	})
-}
-
-func testAccCheckSakuraCloudVPCRouterDataSourceID(n string) resource.TestCheckFunc {
-	return func(s *terraform.State) error {
-		rs, ok := s.RootModule().Resources[n]
-		if !ok {
-			return fmt.Errorf("Can't find VPCRouter data source: %s", n)
-		}
-
-		if rs.Primary.ID == "" {
-			return errors.New("VPCRouter data source ID not set")
-		}
-		return nil
-	}
-}
-
-func testAccCheckSakuraCloudVPCRouterDataSourceNotExists(n string) resource.TestCheckFunc {
-	return func(s *terraform.State) error {
-		v, ok := s.RootModule().Resources[n]
-		if ok && v.Primary.ID != "" {
-			return fmt.Errorf("Found VPCRouter data source: %s", n)
-		}
-		return nil
-	}
 }
 
 func testAccCheckSakuraCloudDataSourceVPCRouterBase(name string) string {

@@ -15,13 +15,11 @@
 package sakuracloud
 
 import (
-	"errors"
 	"fmt"
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/acctest"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/resource"
-	"github.com/hashicorp/terraform-plugin-sdk/terraform"
 )
 
 func TestAccSakuraCloudDataSourceSSHKey_Basic(t *testing.T) {
@@ -38,12 +36,12 @@ func TestAccSakuraCloudDataSourceSSHKey_Basic(t *testing.T) {
 		Steps: []resource.TestStep{
 			{
 				Config: testAccCheckSakuraCloudDataSourceSSHKeyBase(name),
-				Check:  testAccCheckSakuraCloudSSHKeyDataSourceID("sakuracloud_ssh_key.foobar"),
+				Check:  testAccCheckSakuraCloudDataSourceExists("sakuracloud_ssh_key.foobar"),
 			},
 			{
 				Config: testAccCheckSakuraCloudDataSourceSSHKeyConfig(name),
 				Check: resource.ComposeTestCheckFunc(
-					testAccCheckSakuraCloudSSHKeyDataSourceID("data.sakuracloud_ssh_key.foobar"),
+					testAccCheckSakuraCloudDataSourceExists("data.sakuracloud_ssh_key.foobar"),
 					resource.TestCheckResourceAttr("data.sakuracloud_ssh_key.foobar", "name", name),
 					resource.TestCheckResourceAttr("data.sakuracloud_ssh_key.foobar", "description", "description_test"),
 					resource.TestCheckResourceAttr("data.sakuracloud_ssh_key.foobar", "public_key", testAccPublicKey),
@@ -53,36 +51,12 @@ func TestAccSakuraCloudDataSourceSSHKey_Basic(t *testing.T) {
 			{
 				Config: testAccCheckSakuraCloudDataSourceSSHKeyConfig_NotExists(name),
 				Check: resource.ComposeTestCheckFunc(
-					testAccCheckSakuraCloudSSHKeyDataSourceNotExists("data.sakuracloud_ssh_key.foobar"),
+					testAccCheckSakuraCloudDataSourceNotExists("data.sakuracloud_ssh_key.foobar"),
 				),
 				Destroy: true,
 			},
 		},
 	})
-}
-
-func testAccCheckSakuraCloudSSHKeyDataSourceID(n string) resource.TestCheckFunc {
-	return func(s *terraform.State) error {
-		rs, ok := s.RootModule().Resources[n]
-		if !ok {
-			return fmt.Errorf("could not find SSHKey: %s", n)
-		}
-
-		if rs.Primary.ID == "" {
-			return errors.New("SSHKey data source ID not set")
-		}
-		return nil
-	}
-}
-
-func testAccCheckSakuraCloudSSHKeyDataSourceNotExists(n string) resource.TestCheckFunc {
-	return func(s *terraform.State) error {
-		v, ok := s.RootModule().Resources[n]
-		if ok && v.Primary.ID != "" {
-			return fmt.Errorf("Found SSHKey data source: %s", n)
-		}
-		return nil
-	}
 }
 
 func testAccCheckSakuraCloudDataSourceSSHKeyBase(name string) string {

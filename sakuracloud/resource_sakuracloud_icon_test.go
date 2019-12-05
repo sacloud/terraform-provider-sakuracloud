@@ -123,6 +123,9 @@ func testAccCheckSakuraCloudIconDestroy(s *terraform.State) error {
 		if rs.Type != "sakuracloud_icon" {
 			continue
 		}
+		if rs.Primary.ID == "" {
+			continue
+		}
 
 		_, err := iconOp.Read(context.Background(), types.StringID(rs.Primary.ID))
 		if err == nil {

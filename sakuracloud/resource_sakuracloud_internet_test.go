@@ -136,6 +136,9 @@ func testAccCheckSakuraCloudInternetDestroy(s *terraform.State) error {
 		if rs.Type != "sakuracloud_internet" {
 			continue
 		}
+		if rs.Primary.ID == "" {
+			continue
+		}
 
 		zone := rs.Primary.Attributes["zone"]
 		_, err := internetOp.Read(context.Background(), zone, types.StringID(rs.Primary.ID))

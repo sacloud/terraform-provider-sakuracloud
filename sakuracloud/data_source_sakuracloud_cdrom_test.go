@@ -15,12 +15,9 @@
 package sakuracloud
 
 import (
-	"errors"
-	"fmt"
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/resource"
-	"github.com/hashicorp/terraform-plugin-sdk/terraform"
 )
 
 func TestAccSakuraCloudDataSourceCDROM_Basic(t *testing.T) {
@@ -34,47 +31,47 @@ func TestAccSakuraCloudDataSourceCDROM_Basic(t *testing.T) {
 			{
 				Config: testAccCheckSakuraCloudDataSourceCDROMConfig,
 				Check: resource.ComposeTestCheckFunc(
-					testAccCheckSakuraCloudCDROMDataSourceID("data.sakuracloud_cdrom.foobar"),
-					resource.TestCheckResourceAttr("data.sakuracloud_cdrom.foobar", "name", "Ubuntu Server 18.04.2 LTS 64bit"),
+					testAccCheckSakuraCloudDataSourceExists("data.sakuracloud_cdrom.foobar"),
+					resource.TestCheckResourceAttr("data.sakuracloud_cdrom.foobar", "name", "Ubuntu Server 18.04.3 LTS 64bit"),
 					resource.TestCheckResourceAttr("data.sakuracloud_cdrom.foobar", "size", "5"),
 					resource.TestCheckResourceAttr("data.sakuracloud_cdrom.foobar", "tags.#", "5"),
 					resource.TestCheckResourceAttr("data.sakuracloud_cdrom.foobar", "tags.0", "arch-64bit"),
 					resource.TestCheckResourceAttr("data.sakuracloud_cdrom.foobar", "tags.1", "current-stable"),
 					resource.TestCheckResourceAttr("data.sakuracloud_cdrom.foobar", "tags.2", "distro-ubuntu"),
-					resource.TestCheckResourceAttr("data.sakuracloud_cdrom.foobar", "tags.3", "distro-ver-18.04.2"),
-					resource.TestCheckResourceAttr("data.sakuracloud_cdrom.foobar", "tags.4", "os-linux"),
+					resource.TestCheckResourceAttr("data.sakuracloud_cdrom.foobar", "tags.3", "distro-ver-18.04.3"),
+					resource.TestCheckResourceAttr("data.sakuracloud_cdrom.foobar", "tags.4", "os-unix"),
 				),
 			},
 			{
 				Config: testAccCheckSakuraCloudDataSourceCDROM_NameSelector_Exists,
 				Check: resource.ComposeTestCheckFunc(
-					testAccCheckSakuraCloudCDROMDataSourceID("data.sakuracloud_cdrom.foobar"),
+					testAccCheckSakuraCloudDataSourceExists("data.sakuracloud_cdrom.foobar"),
 				),
 			},
 			{
 				Config: testAccCheckSakuraCloudDataSourceCDROM_TagSelector_Exists,
 				Check: resource.ComposeTestCheckFunc(
-					testAccCheckSakuraCloudCDROMDataSourceID("data.sakuracloud_cdrom.foobar"),
+					testAccCheckSakuraCloudDataSourceExists("data.sakuracloud_cdrom.foobar"),
 				),
 			},
 			{
 				Config: testAccCheckSakuraCloudDataSourceCDROMConfig_NotExists,
 				Check: resource.ComposeTestCheckFunc(
-					testAccCheckSakuraCloudCDROMDataSourceNotExists("data.sakuracloud_cdrom.foobar"),
+					testAccCheckSakuraCloudDataSourceNotExists("data.sakuracloud_cdrom.foobar"),
 				),
 				Destroy: true,
 			},
 			{
 				Config: testAccCheckSakuraCloudDataSourceCDROM_NameSelector_NotExists,
 				Check: resource.ComposeTestCheckFunc(
-					testAccCheckSakuraCloudCDROMDataSourceNotExists("data.sakuracloud_cdrom.foobar"),
+					testAccCheckSakuraCloudDataSourceNotExists("data.sakuracloud_cdrom.foobar"),
 				),
 				Destroy: true,
 			},
 			{
 				Config: testAccCheckSakuraCloudDataSourceCDROM_TagSelector_NotExists,
 				Check: resource.ComposeTestCheckFunc(
-					testAccCheckSakuraCloudCDROMDataSourceNotExists("data.sakuracloud_cdrom.foobar"),
+					testAccCheckSakuraCloudDataSourceNotExists("data.sakuracloud_cdrom.foobar"),
 				),
 				Destroy: true,
 			},
@@ -82,36 +79,12 @@ func TestAccSakuraCloudDataSourceCDROM_Basic(t *testing.T) {
 	})
 }
 
-func testAccCheckSakuraCloudCDROMDataSourceID(n string) resource.TestCheckFunc {
-	return func(s *terraform.State) error {
-		rs, ok := s.RootModule().Resources[n]
-		if !ok {
-			return fmt.Errorf("Can't find CDROM data source: %s", n)
-		}
-
-		if rs.Primary.ID == "" {
-			return errors.New("CDROM data source ID not set")
-		}
-		return nil
-	}
-}
-
-func testAccCheckSakuraCloudCDROMDataSourceNotExists(n string) resource.TestCheckFunc {
-	return func(s *terraform.State) error {
-		v, ok := s.RootModule().Resources[n]
-		if ok && v.Primary.ID != "" {
-			return fmt.Errorf("found CDROM[%s]: %s", v.Primary.ID, n)
-		}
-		return nil
-	}
-}
-
 var testAccCheckSakuraCloudDataSourceCDROMConfig = `
 data "sakuracloud_cdrom" "foobar" {
   filters {
     conditions {
 	  name = "Name"
-	  values = ["Ubuntu server 18.04.2 LTS 64bit"]
+	  values = ["Ubuntu Server 18.04.3 LTS 64bit"]
     }
   }
 }`

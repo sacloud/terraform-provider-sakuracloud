@@ -15,13 +15,11 @@
 package sakuracloud
 
 import (
-	"errors"
 	"fmt"
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/acctest"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/resource"
-	"github.com/hashicorp/terraform-plugin-sdk/terraform"
 )
 
 func TestAccSakuraCloudDataSourceSimpleMonitor_Basic(t *testing.T) {
@@ -38,12 +36,12 @@ func TestAccSakuraCloudDataSourceSimpleMonitor_Basic(t *testing.T) {
 		Steps: []resource.TestStep{
 			{
 				Config: testAccCheckSakuraCloudDataSourceSimpleMonitorBase(target),
-				Check:  testAccCheckSakuraCloudSimpleMonitorDataSourceID("sakuracloud_simple_monitor.foobar"),
+				Check:  testAccCheckSakuraCloudDataSourceExists("sakuracloud_simple_monitor.foobar"),
 			},
 			{
 				Config: testAccCheckSakuraCloudDataSourceSimpleMonitorConfig(target),
 				Check: resource.ComposeTestCheckFunc(
-					testAccCheckSakuraCloudSimpleMonitorDataSourceID("data.sakuracloud_simple_monitor.foobar"),
+					testAccCheckSakuraCloudDataSourceExists("data.sakuracloud_simple_monitor.foobar"),
 					resource.TestCheckResourceAttr("data.sakuracloud_simple_monitor.foobar", "target", target),
 					resource.TestCheckResourceAttr("data.sakuracloud_simple_monitor.foobar", "description", "description_test"),
 					resource.TestCheckResourceAttr("data.sakuracloud_simple_monitor.foobar", "tags.#", "3"),
@@ -57,49 +55,25 @@ func TestAccSakuraCloudDataSourceSimpleMonitor_Basic(t *testing.T) {
 			{
 				Config: testAccCheckSakuraCloudDataSourceSimpleMonitorConfig_With_Tag(target),
 				Check: resource.ComposeTestCheckFunc(
-					testAccCheckSakuraCloudSimpleMonitorDataSourceID("data.sakuracloud_simple_monitor.foobar"),
+					testAccCheckSakuraCloudDataSourceExists("data.sakuracloud_simple_monitor.foobar"),
 				),
 			},
 			{
 				Config: testAccCheckSakuraCloudDataSourceSimpleMonitorConfig_NotExists(target),
 				Check: resource.ComposeTestCheckFunc(
-					testAccCheckSakuraCloudSimpleMonitorDataSourceNotExists("data.sakuracloud_simple_monitor.foobar"),
+					testAccCheckSakuraCloudDataSourceNotExists("data.sakuracloud_simple_monitor.foobar"),
 				),
 				Destroy: true,
 			},
 			{
 				Config: testAccCheckSakuraCloudDataSourceSimpleMonitorConfig_With_NotExists_Tag(target),
 				Check: resource.ComposeTestCheckFunc(
-					testAccCheckSakuraCloudSimpleMonitorDataSourceNotExists("data.sakuracloud_simple_monitor.foobar"),
+					testAccCheckSakuraCloudDataSourceNotExists("data.sakuracloud_simple_monitor.foobar"),
 				),
 				Destroy: true,
 			},
 		},
 	})
-}
-
-func testAccCheckSakuraCloudSimpleMonitorDataSourceID(n string) resource.TestCheckFunc {
-	return func(s *terraform.State) error {
-		rs, ok := s.RootModule().Resources[n]
-		if !ok {
-			return fmt.Errorf("Can't find SimpleMonitor data source: %s", n)
-		}
-
-		if rs.Primary.ID == "" {
-			return errors.New("SimpleMonitor data source ID not set")
-		}
-		return nil
-	}
-}
-
-func testAccCheckSakuraCloudSimpleMonitorDataSourceNotExists(n string) resource.TestCheckFunc {
-	return func(s *terraform.State) error {
-		v, ok := s.RootModule().Resources[n]
-		if ok && v.Primary.ID != "" {
-			return fmt.Errorf("Found SimpleMonitor data source: %s", n)
-		}
-		return nil
-	}
 }
 
 func testAccCheckSakuraCloudDataSourceSimpleMonitorBase(target string) string {
