@@ -15,13 +15,11 @@
 package sakuracloud
 
 import (
-	"errors"
 	"fmt"
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/acctest"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/resource"
-	"github.com/hashicorp/terraform-plugin-sdk/terraform"
 )
 
 func TestAccSakuraCloudDataSourceGSLB_Basic(t *testing.T) {
@@ -38,12 +36,12 @@ func TestAccSakuraCloudDataSourceGSLB_Basic(t *testing.T) {
 		Steps: []resource.TestStep{
 			{
 				Config: testAccCheckSakuraCloudDataSourceGSLBBase(name),
-				Check:  testAccCheckSakuraCloudGSLBDataSourceID("sakuracloud_gslb.foobar"),
+				Check:  testAccCheckSakuraCloudDataSourceExists("sakuracloud_gslb.foobar"),
 			},
 			{
 				Config: testAccCheckSakuraCloudDataSourceGSLBConfig(name),
 				Check: resource.ComposeTestCheckFunc(
-					testAccCheckSakuraCloudGSLBDataSourceID("data.sakuracloud_gslb.foobar"),
+					testAccCheckSakuraCloudDataSourceExists("data.sakuracloud_gslb.foobar"),
 					resource.TestCheckResourceAttr("data.sakuracloud_gslb.foobar", "name", name),
 					resource.TestCheckResourceAttr("data.sakuracloud_gslb.foobar", "description", "description_test"),
 					resource.TestCheckResourceAttr("data.sakuracloud_gslb.foobar", "sorry_server", "8.8.8.8"),
@@ -59,49 +57,25 @@ func TestAccSakuraCloudDataSourceGSLB_Basic(t *testing.T) {
 			{
 				Config: testAccCheckSakuraCloudDataSourceGSLBConfig_With_Tag(name),
 				Check: resource.ComposeTestCheckFunc(
-					testAccCheckSakuraCloudGSLBDataSourceID("data.sakuracloud_gslb.foobar"),
+					testAccCheckSakuraCloudDataSourceExists("data.sakuracloud_gslb.foobar"),
 				),
 			},
 			{
 				Config: testAccCheckSakuraCloudDataSourceGSLBConfig_NotExists(name),
 				Check: resource.ComposeTestCheckFunc(
-					testAccCheckSakuraCloudGSLBDataSourceNotExists("data.sakuracloud_gslb.foobar"),
+					testAccCheckSakuraCloudDataSourceNotExists("data.sakuracloud_gslb.foobar"),
 				),
 				Destroy: true,
 			},
 			{
 				Config: testAccCheckSakuraCloudDataSourceGSLBConfig_With_NotExists_Tag(name),
 				Check: resource.ComposeTestCheckFunc(
-					testAccCheckSakuraCloudGSLBDataSourceNotExists("data.sakuracloud_gslb.foobar"),
+					testAccCheckSakuraCloudDataSourceNotExists("data.sakuracloud_gslb.foobar"),
 				),
 				Destroy: true,
 			},
 		},
 	})
-}
-
-func testAccCheckSakuraCloudGSLBDataSourceID(n string) resource.TestCheckFunc {
-	return func(s *terraform.State) error {
-		rs, ok := s.RootModule().Resources[n]
-		if !ok {
-			return fmt.Errorf("Can't find GSLB data source: %s", n)
-		}
-
-		if rs.Primary.ID == "" {
-			return errors.New("GSLB data source ID not set")
-		}
-		return nil
-	}
-}
-
-func testAccCheckSakuraCloudGSLBDataSourceNotExists(n string) resource.TestCheckFunc {
-	return func(s *terraform.State) error {
-		v, ok := s.RootModule().Resources[n]
-		if ok && v.Primary.ID != "" {
-			return fmt.Errorf("Found GSLB data source: %s", n)
-		}
-		return nil
-	}
 }
 
 func testAccCheckSakuraCloudDataSourceGSLBBase(name string) string {

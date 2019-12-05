@@ -15,13 +15,11 @@
 package sakuracloud
 
 import (
-	"errors"
 	"fmt"
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/acctest"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/resource"
-	"github.com/hashicorp/terraform-plugin-sdk/terraform"
 )
 
 func TestAccSakuraCloudDataSourceBridge_Basic(t *testing.T) {
@@ -38,12 +36,12 @@ func TestAccSakuraCloudDataSourceBridge_Basic(t *testing.T) {
 		Steps: []resource.TestStep{
 			{
 				Config: testAccCheckSakuraCloudDataSourceBridgeBase(name),
-				Check:  testAccCheckSakuraCloudBridgeDataSourceID("sakuracloud_bridge.foobar"),
+				Check:  testAccCheckSakuraCloudDataSourceExists("sakuracloud_bridge.foobar"),
 			},
 			{
 				Config: testAccCheckSakuraCloudDataSourceBridgeConfig(name),
 				Check: resource.ComposeTestCheckFunc(
-					testAccCheckSakuraCloudBridgeDataSourceID("data.sakuracloud_bridge.foobar"),
+					testAccCheckSakuraCloudDataSourceExists("data.sakuracloud_bridge.foobar"),
 					resource.TestCheckResourceAttr("data.sakuracloud_bridge.foobar", "name", name),
 					resource.TestCheckResourceAttr("data.sakuracloud_bridge.foobar", "description", "description_test"),
 				),
@@ -51,7 +49,7 @@ func TestAccSakuraCloudDataSourceBridge_Basic(t *testing.T) {
 			{
 				Config: testAccCheckSakuraCloudDataSourceBridgeConfig_NameSelector_Exists(name, randString1, randString2),
 				Check: resource.ComposeTestCheckFunc(
-					testAccCheckSakuraCloudBridgeDataSourceID("data.sakuracloud_bridge.foobar"),
+					testAccCheckSakuraCloudDataSourceExists("data.sakuracloud_bridge.foobar"),
 					resource.TestCheckResourceAttr("data.sakuracloud_bridge.foobar", "name", name),
 					resource.TestCheckResourceAttr("data.sakuracloud_bridge.foobar", "description", "description_test"),
 				),
@@ -59,14 +57,14 @@ func TestAccSakuraCloudDataSourceBridge_Basic(t *testing.T) {
 			{
 				Config: testAccCheckSakuraCloudDataSourceBridgeConfig_NotExists,
 				Check: resource.ComposeTestCheckFunc(
-					testAccCheckSakuraCloudBridgeDataSourceNotExists("data.sakuracloud_bridge.foobar"),
+					testAccCheckSakuraCloudDataSourceNotExists("data.sakuracloud_bridge.foobar"),
 				),
 				Destroy: true,
 			},
 			{
 				Config: testAccCheckSakuraCloudDataSourceBridgeConfig_NameSelector_NotExists,
 				Check: resource.ComposeTestCheckFunc(
-					testAccCheckSakuraCloudBridgeDataSourceNotExists("data.sakuracloud_bridge.foobar"),
+					testAccCheckSakuraCloudDataSourceNotExists("data.sakuracloud_bridge.foobar"),
 				),
 				Destroy: true,
 			},
@@ -74,35 +72,11 @@ func TestAccSakuraCloudDataSourceBridge_Basic(t *testing.T) {
 	})
 }
 
-func testAccCheckSakuraCloudBridgeDataSourceID(n string) resource.TestCheckFunc {
-	return func(s *terraform.State) error {
-		rs, ok := s.RootModule().Resources[n]
-		if !ok {
-			return fmt.Errorf("Can't find Bridge data source: %s", n)
-		}
-
-		if rs.Primary.ID == "" {
-			return errors.New("Bridge data source ID not set")
-		}
-		return nil
-	}
-}
-
-func testAccCheckSakuraCloudBridgeDataSourceNotExists(n string) resource.TestCheckFunc {
-	return func(s *terraform.State) error {
-		v, ok := s.RootModule().Resources[n]
-		if ok && v.Primary.ID != "" {
-			return fmt.Errorf("Found Bridge data source: %s", n)
-		}
-		return nil
-	}
-}
-
 func testAccCheckSakuraCloudDataSourceBridgeBase(name string) string {
 	return fmt.Sprintf(`
 resource "sakuracloud_bridge" "foobar" {
-    name = "%s"
-    description = "description_test"
+  name        = "%s"
+  description = "description_test"
 } 
 `, name)
 }
@@ -110,8 +84,8 @@ resource "sakuracloud_bridge" "foobar" {
 func testAccCheckSakuraCloudDataSourceBridgeConfig(name string) string {
 	return fmt.Sprintf(`
 resource "sakuracloud_bridge" "foobar" {
-    name = "%s"
-    description = "description_test"
+  name        = "%s"
+  description = "description_test"
 }
 data "sakuracloud_bridge" "foobar" {
   filters {

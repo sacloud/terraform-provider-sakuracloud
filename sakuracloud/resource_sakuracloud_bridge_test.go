@@ -101,6 +101,9 @@ func testAccCheckSakuraCloudBridgeDestroy(s *terraform.State) error {
 		if rs.Type != "sakuracloud_bridge" {
 			continue
 		}
+		if rs.Primary.ID == "" {
+			continue
+		}
 
 		bridgeOp := sacloud.NewBridgeOp(client)
 		zone := rs.Primary.Attributes["zone"]

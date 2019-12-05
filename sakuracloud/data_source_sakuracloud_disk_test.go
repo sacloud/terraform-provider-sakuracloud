@@ -15,13 +15,11 @@
 package sakuracloud
 
 import (
-	"errors"
 	"fmt"
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/acctest"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/resource"
-	"github.com/hashicorp/terraform-plugin-sdk/terraform"
 )
 
 func TestAccSakuraCloudDataSourceDisk_Basic(t *testing.T) {
@@ -45,7 +43,7 @@ func TestAccSakuraCloudDataSourceDisk_Basic(t *testing.T) {
 			{
 				Config: testAccCheckSakuraCloudDataSourceDiskConfig(name, randString1, randString2),
 				Check: resource.ComposeTestCheckFunc(
-					testAccCheckSakuraCloudDiskDataSourceID("data.sakuracloud_disk.foobar"),
+					testAccCheckSakuraCloudDataSourceExists("data.sakuracloud_disk.foobar"),
 					resource.TestCheckResourceAttr("data.sakuracloud_disk.foobar", "name", name),
 					resource.TestCheckResourceAttr("data.sakuracloud_disk.foobar", "plan", "ssd"),
 					resource.TestCheckResourceAttr("data.sakuracloud_disk.foobar", "connector", "virtio"),
@@ -60,49 +58,25 @@ func TestAccSakuraCloudDataSourceDisk_Basic(t *testing.T) {
 			{
 				Config: testAccCheckSakuraCloudDataSourceDiskConfig_With_Tag(name),
 				Check: resource.ComposeTestCheckFunc(
-					testAccCheckSakuraCloudDiskDataSourceID("data.sakuracloud_disk.foobar"),
+					testAccCheckSakuraCloudDataSourceExists("data.sakuracloud_disk.foobar"),
 				),
 			},
 			{
 				Config: testAccCheckSakuraCloudDataSourceDiskConfig_NotExists(name),
 				Check: resource.ComposeTestCheckFunc(
-					testAccCheckSakuraCloudDiskDataSourceNotExists("data.sakuracloud_disk.foobar"),
+					testAccCheckSakuraCloudDataSourceNotExists("data.sakuracloud_disk.foobar"),
 				),
 				Destroy: true,
 			},
 			{
 				Config: testAccCheckSakuraCloudDataSourceDiskConfig_With_NotExists_Tag(name),
 				Check: resource.ComposeTestCheckFunc(
-					testAccCheckSakuraCloudDiskDataSourceNotExists("data.sakuracloud_disk.foobar"),
+					testAccCheckSakuraCloudDataSourceNotExists("data.sakuracloud_disk.foobar"),
 				),
 				Destroy: true,
 			},
 		},
 	})
-}
-
-func testAccCheckSakuraCloudDiskDataSourceID(n string) resource.TestCheckFunc {
-	return func(s *terraform.State) error {
-		rs, ok := s.RootModule().Resources[n]
-		if !ok {
-			return fmt.Errorf("Can't find Disk data source: %s", n)
-		}
-
-		if rs.Primary.ID == "" {
-			return errors.New("Disk data source ID not set")
-		}
-		return nil
-	}
-}
-
-func testAccCheckSakuraCloudDiskDataSourceNotExists(n string) resource.TestCheckFunc {
-	return func(s *terraform.State) error {
-		v, ok := s.RootModule().Resources[n]
-		if ok && v.Primary.ID != "" {
-			return fmt.Errorf("Found Disk data source: %s", n)
-		}
-		return nil
-	}
 }
 
 func testAccCheckSakuraCloudDataSourceDiskConfigBase(name string) string {

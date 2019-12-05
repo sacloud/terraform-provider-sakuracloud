@@ -71,13 +71,14 @@ func dataSourceSakuraCloudCDROMRead(d *schema.ResourceData, meta interface{}) er
 
 	res, err := searcher.Find(ctx, zone, findCondition)
 	if err != nil {
-		return fmt.Errorf("could not find SakuraCloud CDROM resource: %s", err)
+		return fmt.Errorf("could not find SakuraCloud CDROM: %s", err)
 	}
 	if res == nil || res.Count == 0 || len(res.CDROMs) == 0 {
 		return filterNoResultErr()
 	}
 
 	targets := res.CDROMs
+
 	d.SetId(targets[0].ID.String())
 	return setCDROMResourceData(ctx, d, client, targets[0])
 }

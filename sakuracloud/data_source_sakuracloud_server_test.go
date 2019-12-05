@@ -15,13 +15,11 @@
 package sakuracloud
 
 import (
-	"errors"
 	"fmt"
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/acctest"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/resource"
-	"github.com/hashicorp/terraform-plugin-sdk/terraform"
 )
 
 func TestAccSakuraCloudDataSourceServer_Basic(t *testing.T) {
@@ -38,12 +36,12 @@ func TestAccSakuraCloudDataSourceServer_Basic(t *testing.T) {
 		Steps: []resource.TestStep{
 			{
 				Config: testAccCheckSakuraCloudDataSourceServerBase(name),
-				Check:  testAccCheckSakuraCloudServerDataSourceID("sakuracloud_server.foobar"),
+				Check:  testAccCheckSakuraCloudDataSourceExists("sakuracloud_server.foobar"),
 			},
 			{
 				Config: testAccCheckSakuraCloudDataSourceServerConfig(name),
 				Check: resource.ComposeTestCheckFunc(
-					testAccCheckSakuraCloudServerDataSourceID("data.sakuracloud_server.foobar"),
+					testAccCheckSakuraCloudDataSourceExists("data.sakuracloud_server.foobar"),
 					resource.TestCheckResourceAttr("data.sakuracloud_server.foobar", "name", name),
 					resource.TestCheckResourceAttr("data.sakuracloud_server.foobar", "description", "description_test"),
 					resource.TestCheckResourceAttr("data.sakuracloud_server.foobar", "interface_driver", "virtio"),
@@ -62,49 +60,25 @@ func TestAccSakuraCloudDataSourceServer_Basic(t *testing.T) {
 			{
 				Config: testAccCheckSakuraCloudDataSourceServerConfig_With_Tag(name),
 				Check: resource.ComposeTestCheckFunc(
-					testAccCheckSakuraCloudServerDataSourceID("data.sakuracloud_server.foobar"),
+					testAccCheckSakuraCloudDataSourceExists("data.sakuracloud_server.foobar"),
 				),
 			},
 			{
 				Config: testAccCheckSakuraCloudDataSourceServerConfig_NotExists(name),
 				Check: resource.ComposeTestCheckFunc(
-					testAccCheckSakuraCloudServerDataSourceNotExists("data.sakuracloud_server.foobar"),
+					testAccCheckSakuraCloudDataSourceNotExists("data.sakuracloud_server.foobar"),
 				),
 				Destroy: true,
 			},
 			{
 				Config: testAccCheckSakuraCloudDataSourceServerConfig_With_NotExists_Tag(name),
 				Check: resource.ComposeTestCheckFunc(
-					testAccCheckSakuraCloudServerDataSourceNotExists("data.sakuracloud_server.foobar"),
+					testAccCheckSakuraCloudDataSourceNotExists("data.sakuracloud_server.foobar"),
 				),
 				Destroy: true,
 			},
 		},
 	})
-}
-
-func testAccCheckSakuraCloudServerDataSourceID(n string) resource.TestCheckFunc {
-	return func(s *terraform.State) error {
-		rs, ok := s.RootModule().Resources[n]
-		if !ok {
-			return fmt.Errorf("Can't find Server data source: %s", n)
-		}
-
-		if rs.Primary.ID == "" {
-			return errors.New("Server data source ID not set")
-		}
-		return nil
-	}
-}
-
-func testAccCheckSakuraCloudServerDataSourceNotExists(n string) resource.TestCheckFunc {
-	return func(s *terraform.State) error {
-		v, ok := s.RootModule().Resources[n]
-		if ok && v.Primary.ID != "" {
-			return fmt.Errorf("Found Server data source: %s", n)
-		}
-		return nil
-	}
 }
 
 func testAccCheckSakuraCloudDataSourceServerBase(name string) string {

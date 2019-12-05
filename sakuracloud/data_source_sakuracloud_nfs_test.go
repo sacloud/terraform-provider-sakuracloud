@@ -15,13 +15,11 @@
 package sakuracloud
 
 import (
-	"errors"
 	"fmt"
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/acctest"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/resource"
-	"github.com/hashicorp/terraform-plugin-sdk/terraform"
 )
 
 func TestAccSakuraCloudDataSourceNFS_Basic(t *testing.T) {
@@ -38,12 +36,12 @@ func TestAccSakuraCloudDataSourceNFS_Basic(t *testing.T) {
 		Steps: []resource.TestStep{
 			{
 				Config: testAccCheckSakuraCloudDataSourceNFSBase(name),
-				Check:  testAccCheckSakuraCloudNFSDataSourceID("sakuracloud_nfs.foobar"),
+				Check:  testAccCheckSakuraCloudDataSourceExists("sakuracloud_nfs.foobar"),
 			},
 			{
 				Config: testAccCheckSakuraCloudDataSourceNFSConfig(name),
 				Check: resource.ComposeTestCheckFunc(
-					testAccCheckSakuraCloudNFSDataSourceID("data.sakuracloud_nfs.foobar"),
+					testAccCheckSakuraCloudDataSourceExists("data.sakuracloud_nfs.foobar"),
 					resource.TestCheckResourceAttr("data.sakuracloud_nfs.foobar", "name", name),
 					resource.TestCheckResourceAttr("data.sakuracloud_nfs.foobar", "description", "description_test"),
 					resource.TestCheckResourceAttr("data.sakuracloud_nfs.foobar", "tags.#", "3"),
@@ -55,49 +53,25 @@ func TestAccSakuraCloudDataSourceNFS_Basic(t *testing.T) {
 			{
 				Config: testAccCheckSakuraCloudDataSourceNFSConfig_With_Tag(name),
 				Check: resource.ComposeTestCheckFunc(
-					testAccCheckSakuraCloudNFSDataSourceID("data.sakuracloud_nfs.foobar"),
+					testAccCheckSakuraCloudDataSourceExists("data.sakuracloud_nfs.foobar"),
 				),
 			},
 			{
 				Config: testAccCheckSakuraCloudDataSourceNFSConfig_NotExists(name),
 				Check: resource.ComposeTestCheckFunc(
-					testAccCheckSakuraCloudNFSDataSourceNotExists("data.sakuracloud_nfs.foobar"),
+					testAccCheckSakuraCloudDataSourceNotExists("data.sakuracloud_nfs.foobar"),
 				),
 				Destroy: true,
 			},
 			{
 				Config: testAccCheckSakuraCloudDataSourceNFSConfig_With_NotExists_Tag(name),
 				Check: resource.ComposeTestCheckFunc(
-					testAccCheckSakuraCloudNFSDataSourceNotExists("data.sakuracloud_nfs.foobar"),
+					testAccCheckSakuraCloudDataSourceNotExists("data.sakuracloud_nfs.foobar"),
 				),
 				Destroy: true,
 			},
 		},
 	})
-}
-
-func testAccCheckSakuraCloudNFSDataSourceID(n string) resource.TestCheckFunc {
-	return func(s *terraform.State) error {
-		rs, ok := s.RootModule().Resources[n]
-		if !ok {
-			return fmt.Errorf("Can't find NFS data source: %s", n)
-		}
-
-		if rs.Primary.ID == "" {
-			return errors.New("NFS data source ID not set")
-		}
-		return nil
-	}
-}
-
-func testAccCheckSakuraCloudNFSDataSourceNotExists(n string) resource.TestCheckFunc {
-	return func(s *terraform.State) error {
-		v, ok := s.RootModule().Resources[n]
-		if ok && v.Primary.ID != "" {
-			return fmt.Errorf("Found NFS data source: %s", n)
-		}
-		return nil
-	}
 }
 
 func testAccCheckSakuraCloudDataSourceNFSBase(name string) string {

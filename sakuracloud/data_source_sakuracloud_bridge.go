@@ -63,7 +63,7 @@ func dataSourceSakuraCloudBridgeRead(d *schema.ResourceData, meta interface{}) e
 
 	res, err := searcher.Find(ctx, zone, findCondition)
 	if err != nil {
-		return fmt.Errorf("could not find SakuraCloud Bridge resource: %s", err)
+		return fmt.Errorf("could not find SakuraCloud Bridge: %s", err)
 	}
 	if res == nil || res.Count == 0 {
 		return filterNoResultErr()

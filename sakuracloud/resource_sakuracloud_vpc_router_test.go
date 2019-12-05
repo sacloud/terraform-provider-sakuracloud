@@ -235,6 +235,9 @@ func testAccCheckSakuraCloudVPCRouterDestroy(s *terraform.State) error {
 		if rs.Type != "sakuracloud_vpc_router" {
 			continue
 		}
+		if rs.Primary.ID == "" {
+			continue
+		}
 
 		zone := rs.Primary.Attributes["zone"]
 		_, err := vrOp.Read(context.Background(), zone, types.StringID(rs.Primary.ID))

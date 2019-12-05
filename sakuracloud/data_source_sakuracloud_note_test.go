@@ -15,13 +15,11 @@
 package sakuracloud
 
 import (
-	"errors"
 	"fmt"
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/acctest"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/resource"
-	"github.com/hashicorp/terraform-plugin-sdk/terraform"
 )
 
 func TestAccSakuraCloudDataSourceNote_Basic(t *testing.T) {
@@ -38,12 +36,12 @@ func TestAccSakuraCloudDataSourceNote_Basic(t *testing.T) {
 		Steps: []resource.TestStep{
 			{
 				Config: testAccCheckSakuraCloudDataSourceNoteBase(name),
-				Check:  testAccCheckSakuraCloudNoteDataSourceID("sakuracloud_note.foobar"),
+				Check:  testAccCheckSakuraCloudDataSourceExists("sakuracloud_note.foobar"),
 			},
 			{
 				Config: testAccCheckSakuraCloudDataSourceNoteConfig(name),
 				Check: resource.ComposeTestCheckFunc(
-					testAccCheckSakuraCloudNoteDataSourceID("data.sakuracloud_note.foobar"),
+					testAccCheckSakuraCloudDataSourceExists("data.sakuracloud_note.foobar"),
 					resource.TestCheckResourceAttr("data.sakuracloud_note.foobar", "name", name),
 					resource.TestCheckResourceAttr("data.sakuracloud_note.foobar", "content", "content_test"),
 					resource.TestCheckResourceAttr("data.sakuracloud_note.foobar", "class", "shell"),
@@ -56,49 +54,25 @@ func TestAccSakuraCloudDataSourceNote_Basic(t *testing.T) {
 			{
 				Config: testAccCheckSakuraCloudDataSourceNoteConfig_With_Tag(name),
 				Check: resource.ComposeTestCheckFunc(
-					testAccCheckSakuraCloudNoteDataSourceID("data.sakuracloud_note.foobar"),
+					testAccCheckSakuraCloudDataSourceExists("data.sakuracloud_note.foobar"),
 				),
 			},
 			{
 				Config: testAccCheckSakuraCloudDataSourceNoteConfig_NotExists(name),
 				Check: resource.ComposeTestCheckFunc(
-					testAccCheckSakuraCloudNoteDataSourceNotExists("data.sakuracloud_note.foobar"),
+					testAccCheckSakuraCloudDataSourceNotExists("data.sakuracloud_note.foobar"),
 				),
 				Destroy: true,
 			},
 			{
 				Config: testAccCheckSakuraCloudDataSourceNoteConfig_With_NotExists_Tag(name),
 				Check: resource.ComposeTestCheckFunc(
-					testAccCheckSakuraCloudNoteDataSourceNotExists("data.sakuracloud_note.foobar"),
+					testAccCheckSakuraCloudDataSourceNotExists("data.sakuracloud_note.foobar"),
 				),
 				Destroy: true,
 			},
 		},
 	})
-}
-
-func testAccCheckSakuraCloudNoteDataSourceID(n string) resource.TestCheckFunc {
-	return func(s *terraform.State) error {
-		rs, ok := s.RootModule().Resources[n]
-		if !ok {
-			return fmt.Errorf("Can't find Note data source: %s", n)
-		}
-
-		if rs.Primary.ID == "" {
-			return errors.New("Note data source ID not set")
-		}
-		return nil
-	}
-}
-
-func testAccCheckSakuraCloudNoteDataSourceNotExists(n string) resource.TestCheckFunc {
-	return func(s *terraform.State) error {
-		v, ok := s.RootModule().Resources[n]
-		if ok && v.Primary.ID != "" {
-			return fmt.Errorf("Found Note data source: %s", n)
-		}
-		return nil
-	}
 }
 
 func testAccCheckSakuraCloudDataSourceNoteBase(name string) string {

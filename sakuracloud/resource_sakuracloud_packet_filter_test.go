@@ -118,6 +118,9 @@ func testAccCheckSakuraCloudPacketFilterDestroy(s *terraform.State) error {
 		if rs.Type != "sakuracloud_packet_filter" {
 			continue
 		}
+		if rs.Primary.ID == "" {
+			continue
+		}
 
 		zone := rs.Primary.Attributes["zone"]
 		_, err := pfOp.Read(context.Background(), zone, types.StringID(rs.Primary.ID))

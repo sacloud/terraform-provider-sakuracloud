@@ -84,11 +84,6 @@ func (c *Config) NewClient() *APIClient {
 	}
 	sacloud.DefaultStatePollTimeout = time.Duration(c.TimeoutMinute) * time.Minute
 
-	if c.FakeMode != "" {
-		sacloud.DefaultStatePollInterval = 10 * time.Millisecond
-		sacloud.APIDefaultRetryInterval = 10 * time.Millisecond
-	}
-
 	if c.TraceMode != "" {
 		enableAPITrace := true
 		enableHTTPTrace := true

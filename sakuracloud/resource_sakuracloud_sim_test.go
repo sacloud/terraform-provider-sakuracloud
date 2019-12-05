@@ -175,6 +175,9 @@ func testAccCheckSakuraCloudSIMDestroy(s *terraform.State) error {
 		if rs.Type != "sakuracloud_sim" {
 			continue
 		}
+		if rs.Primary.ID == "" {
+			continue
+		}
 
 		_, err := simOp.Read(context.Background(), types.StringID(rs.Primary.ID))
 		if err == nil {

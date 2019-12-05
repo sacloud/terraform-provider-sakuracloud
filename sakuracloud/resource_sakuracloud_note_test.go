@@ -126,6 +126,9 @@ func testAccCheckSakuraCloudNoteDestroy(s *terraform.State) error {
 		if rs.Type != "sakuracloud_note" {
 			continue
 		}
+		if rs.Primary.ID == "" {
+			continue
+		}
 
 		_, err := noteOp.Read(context.Background(), types.StringID(rs.Primary.ID))
 		if err == nil {

@@ -90,6 +90,9 @@ func testAccCheckSakuraCloudSubnetDestroy(s *terraform.State) error {
 		if rs.Type != "sakuracloud_subnet" {
 			continue
 		}
+		if rs.Primary.ID == "" {
+			continue
+		}
 
 		zone := rs.Primary.Attributes["zone"]
 		_, err := subnetOp.Read(context.Background(), zone, types.StringID(rs.Primary.ID))
