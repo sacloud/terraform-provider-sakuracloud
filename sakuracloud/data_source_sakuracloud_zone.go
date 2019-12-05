@@ -65,9 +65,7 @@ func dataSourceSakuraCloudZoneRead(d *schema.ResourceData, meta interface{}) err
 		zoneSlug = v.(string)
 	}
 
-	res, err := zoneOp.Find(ctx, &sacloud.FindCondition{
-		Count: defaultSearchLimit,
-	})
+	res, err := zoneOp.Find(ctx, &sacloud.FindCondition{})
 	if err != nil {
 		return fmt.Errorf("could not find SakuraCloud Zone resource: %s", err)
 	}

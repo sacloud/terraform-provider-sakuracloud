@@ -31,8 +31,6 @@ const (
 	traceAPI  = "api"
 )
 
-const defaultSearchLimit = 10000
-
 var (
 	fakeModeOnce                  sync.Once
 	v2ClientOnce                  sync.Once

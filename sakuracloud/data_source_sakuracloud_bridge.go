@@ -56,9 +56,7 @@ func dataSourceSakuraCloudBridgeRead(d *schema.ResourceData, meta interface{}) e
 	client, ctx, zone := getSacloudV2Client(d, meta)
 	searcher := sacloud.NewBridgeOp(client)
 
-	findCondition := &sacloud.FindCondition{
-		Count: defaultSearchLimit,
-	}
+	findCondition := &sacloud.FindCondition{}
 	if rawFilter, ok := d.GetOk(filterAttrName); ok {
 		findCondition.Filter = expandSearchFilter(rawFilter)
 	}
