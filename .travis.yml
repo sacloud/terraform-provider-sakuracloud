@@ -17,7 +17,7 @@ before_deploy:
 - if [ "$TRAVIS_BRANCH" == "master" ]; then
     make docker-build;
   fi
-- export TERRAFORM_VERSION=$(GO111MODULE=on go run tools/terraform-version/main.go)
+- export TERRAFORM_VERSION=0.12.7
 - go get github.com/aktau/github-release
 - mkdir -p ~/bin
 - (go get github.com/github/hub && cd $GOPATH/src/github.com/github/hub && script/build -o ~/bin/hub)

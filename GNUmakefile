@@ -1,5 +1,3 @@
-TEST1?=./
-TEST2?=./sakuracloud
 VETARGS?=-all
 
 GOFMT_FILES      ?= $$(find . -name '*.go' | grep -v vendor)
@@ -56,16 +54,10 @@ shasum:
 	(cd bin/; shasum -a 256 * > terraform-provider-sakuracloud_$(CURRENT_VERSION)_SHA256SUMS)
 
 test:
-	TF_ACC= go test $(TEST1) -v $(TESTARGS) -timeout=30s -parallel=4 ; \
-	TF_ACC= go test $(TEST2) -v $(TESTARGS) -timeout=30s -parallel=4
+	TF_ACC= go test -mod=vendor -v $(TESTARGS) -timeout=30s -parallel=4 ./...
 
 testacc:
-	TF_ACC=1 go test $(TEST1) -v $(TESTARGS) -timeout 240m ; \
-	TF_ACC=1 go test $(TEST2) -v $(TESTARGS) -timeout 240m
-
-testacc-resource:
-	TF_ACC=1 go test $(TEST1) -v $(TESTARGS) -run="^TestAccResource" -timeout 240m ; \
-	TF_ACC=1 go test $(TEST2) -v $(TESTARGS) -run="^TestAccResource" -timeout 240m
+	TF_ACC=1 go test -mod=vendor -v $(TESTARGS) -timeout 240m -parallel=4 ./...
 
 vet: golint
 	@echo "go vet $(VETARGS) ."
