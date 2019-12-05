@@ -138,7 +138,7 @@ func resourceSakuraCloudDatabaseReadReplicaCreate(d *schema.ResourceData, meta i
 		Name:           d.Get("name").(string),
 		Description:    d.Get("description").(string),
 		Tags:           expandTags(d),
-		IconID:         sakuraCloudID(d.Get("icon_id").(string)),
+		IconID:         expandSakuraCloudID(d, "icon_id"),
 		PlanID:         types.ID(masterDB.PlanID.Int64() + 1),
 		SwitchID:       sakuraCloudID(switchID),
 		IPAddresses:    []string{d.Get("ipaddress1").(string)},
@@ -224,7 +224,7 @@ func resourceSakuraCloudDatabaseReadReplicaUpdate(d *schema.ResourceData, meta i
 		Name:         d.Get("name").(string),
 		Description:  d.Get("description").(string),
 		Tags:         expandTags(d),
-		IconID:       sakuraCloudID(d.Get("icon_id").(string)),
+		IconID:       expandSakuraCloudID(d, "icon_id"),
 		SettingsHash: db.SettingsHash,
 	}
 	db, err = dbOp.Patch(ctx, zone, db.ID, req)

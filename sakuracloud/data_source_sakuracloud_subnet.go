@@ -84,7 +84,7 @@ func dataSourceSakuraCloudSubnetRead(d *schema.ResourceData, meta interface{}) e
 	internetOp := sacloud.NewInternetOp(client)
 	subnetOp := sacloud.NewSubnetOp(client)
 
-	internetID := sakuraCloudID(d.Get("internet_id").(string))
+	internetID := expandSakuraCloudID(d, "internet_id")
 	subnetIndex := d.Get("index").(int)
 
 	res, err := internetOp.Read(ctx, zone, internetID)
