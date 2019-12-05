@@ -338,7 +338,7 @@ func writeISOFile(path string, content []byte, label string) error {
 func ejectCDROMFromAllServers(ctx context.Context, d *schema.ResourceData, client *APIClient, cdromID types.ID) ([]types.ID, error) {
 	serverOp := sacloud.NewServerOp(client)
 	zone := getV2Zone(d, client)
-	searched, err := serverOp.Find(ctx, zone, &sacloud.FindCondition{Count: defaultSearchLimit})
+	searched, err := serverOp.Find(ctx, zone, &sacloud.FindCondition{})
 	if err != nil {
 		return nil, err
 	}

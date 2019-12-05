@@ -64,9 +64,7 @@ func dataSourceSakuraCloudCDROMRead(d *schema.ResourceData, meta interface{}) er
 	client, ctx, zone := getSacloudV2Client(d, meta)
 	searcher := sacloud.NewCDROMOp(client)
 
-	findCondition := &sacloud.FindCondition{
-		Count: defaultSearchLimit,
-	}
+	findCondition := &sacloud.FindCondition{}
 	if rawFilter, ok := d.GetOk(filterAttrName); ok {
 		findCondition.Filter = expandSearchFilter(rawFilter)
 	}

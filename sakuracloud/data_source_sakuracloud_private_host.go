@@ -72,9 +72,7 @@ func dataSourceSakuraCloudPrivateHostRead(d *schema.ResourceData, meta interface
 	client, ctx, zone := getSacloudV2Client(d, meta)
 	searcher := sacloud.NewPrivateHostOp(client)
 
-	findCondition := &sacloud.FindCondition{
-		Count: defaultSearchLimit,
-	}
+	findCondition := &sacloud.FindCondition{}
 	if rawFilter, ok := d.GetOk(filterAttrName); ok {
 		findCondition.Filter = expandSearchFilter(rawFilter)
 	}
