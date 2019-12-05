@@ -1,0 +1,47 @@
+sudo: required
+services: docker
+language: go
+go:
+- "1.12"
+env:
+  global:
+  - PATH=/home/travis/gopath/bin:$PATH DEBIAN_FRONTEND=noninteractive
+  - secure: SZZnrpdABMnQBZuzHIc5gTYDPPT2FhCc9/7meOxPkjgOPUv/Fm2oQl/6+xVkDOdGZDZEImA8YS5p75m1V4V55SoeCV0xFxM/CiyyVojC06RonnGPpSFlofu0m1B91ff0gsmt4ZfQCRe8o/L73JQXLjKJzeAbUPNYdPZfSMmObss1f/rwmDj+zVILU7t3m1aIEiJHf2pJN9zMJ49KtUP8rOlAtjg9knd1L8VrJL5UkROh3G8KFordDTPFWJYOhtoHTiCPK/mn7x527z6eEzxFaWLGsSLm4x6YGdUhcTJ9RijYc0t7ZSuYxXUL2KsKkJ5PTAo7DpCjYItWWBTcJIUOd0Lw6v49I/qu57ol0NTlyrDRa3Oq9fYVyj0wlripR/aBBOdtXv5/S/GSvTpnzADbuy/lub1f57JDIWGiiHmjI/9WboTiNOih8Zu3317yJr1ztMZdWLHfOsUr26bu22XeFk9UKUiI1/GbRhxNu04A2mDgidrszdAMmyibULFzqCcodb5h7Xpt1pDP45GBPbgu+wXNjZgkTSCvMrTq1NWLZL+phuEJkhyL9HuCp/UEVrSc3uOcs7pGJensHVPqGJn6IDBgqbKna8kI/M7iS2/SZDziMeh8U4T/nmdZgwTK2vgNeopsO9P5lX/iF3Z6CVOV6ygQojqBJ9npFBRwNUfzDsU=
+install:
+- go get -u golang.org/x/lint/golint
+- go get -u golang.org/x/tools/cmd/goimports
+script:
+- make test
+- make lint-docs
+before_deploy:
+- if [ "$TRAVIS_BRANCH" == "master" ]; then
+    make docker-build;
+  fi
+- export TERRAFORM_VERSION=0.12.7
+- go get github.com/aktau/github-release
+- mkdir -p ~/bin
+- (go get github.com/github/hub && cd $GOPATH/src/github.com/github/hub && script/build -o ~/bin/hub)
+- echo $TRAVIS_BRANCH
+- git config --add remote.origin.fetch '+refs/heads/*:refs/remotes/origin/*'
+- git fetch
+- git checkout master || git checkout -b master origin/master
+- git checkout $TRAVIS_BRANCH
+- git fetch --depth=1000
+- git fetch --tags --depth=1000 || true
+deploy:
+- provider: script
+  script: scripts/release.pl --task=upload-to-github-release && scripts/release.pl
+    --task=upload-master-to-github-release && scripts/release_homebrew.sh && scripts/release_docker_image.sh
+    && scripts/release_website.sh
+  skip_cleanup: true
+  on:
+    branch: master
+- provider: script
+  script: scripts/release.pl --task=create-pullrequest --current-branch=$TRAVIS_BRANCH
+  skip_cleanup: true
+  on:
+    all_branches: true
+    condition: "$TRAVIS_BRANCH =~ ^bump-version-.*$"
+notifications:
+  slack:
+    secure: MP6r347wnQxJsbiso/WpUY6xXKGLdNMmof3Pv7SEWEeQ5GtMjt6ye3gmrpB5pkrQprE/ryLzDznlmUVdHfUb+4olimv3lYfdGt15Ep2mc/5Uv1Sthoug/QWQSGEc2va7fyefoZpbLMS2nb/+KbVJyKStwNDPt5dBSB8EoTegGoFtVWoZVKuBqNiQcspSnMAwqul35Aehf/4tyk0iENIAV+N4/VEixk0oH6pEiyvXjriKTROaGTf20HQy0k+9S8U9RDf3XI+YwhO2m8JtpT6qHvSczz7vbBvhUiHJskicmXDH8vWg4Xbkpi8orQVV2B2SvpauUMYEYIuY9Nn6ZXeHtuKnNjFPRyMpAoIO0O7Ys9rZdHwHckdOFFHy5mnBPyIqtptAVjs2Pr7xKb12llHrlR9376+HdE8Jdo/NQHRt9xQ/R3xDcmPhBWfAjTVD5JNdez9K55wvVP9cTMdyg4SM+6kzO4AxFERGz6tXV6Sc0+0/ZW6Xj2aFtCl4mX3HpRvtyRXWAZY4TOZlc75ent6FcsN5xsFHdyj+pV+YBpubdiW+eDtwEGDxRA/mcjCArt95+kFC6JKzmvMUj2CrQfOjViOA2IkaIWXEvY1rJL/F+n1PNbDLTXjLxHrBt8hesfPEuBdC8i+Wxnk2er+cJB3SrBS0bApnB6VFjV276GpW46M=
