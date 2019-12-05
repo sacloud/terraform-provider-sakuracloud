@@ -38,9 +38,12 @@ func resourceSakuraCloudCDROM() *schema.Resource {
 		Importer: &schema.ResourceImporter{
 			State: schema.ImportStatePassthrough,
 		},
-		CustomizeDiff: customdiff.ComputedIf("hash", func(d *schema.ResourceDiff, meta interface{}) bool {
-			return d.HasChange("iso_image_file") || d.HasChange("content")
-		}),
+		CustomizeDiff: customdiff.All(
+			customdiff.ComputedIf("hash", func(d *schema.ResourceDiff, meta interface{}) bool {
+				return d.HasChange("iso_image_file") || d.HasChange("content")
+			}),
+			hasTagResourceCustomizeDiff,
+		),
 		Schema: map[string]*schema.Schema{
 			"name": {
 				Type:     schema.TypeString,
@@ -85,7 +88,6 @@ func resourceSakuraCloudCDROM() *schema.Resource {
 			"tags": {
 				Type:     schema.TypeList,
 				Optional: true,
-				Computed: true,
 				Elem:     &schema.Schema{Type: schema.TypeString},
 			},
 			"zone": {

@@ -67,7 +67,6 @@ func resourceSakuraCloudAutoBackup() *schema.Resource {
 			"tags": {
 				Type:     schema.TypeList,
 				Optional: true,
-				Computed: true,
 				Elem:     &schema.Schema{Type: schema.TypeString},
 			},
 			"zone": {

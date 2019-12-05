@@ -36,7 +36,6 @@ func resourceSakuraCloudVPCRouter() *schema.Resource {
 			State: schema.ImportStatePassthrough,
 		},
 		CustomizeDiff: hasTagResourceCustomizeDiff,
-
 		Schema: map[string]*schema.Schema{
 			"name": {
 				Type:         schema.TypeString,

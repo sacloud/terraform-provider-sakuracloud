@@ -20,6 +20,8 @@ import (
 	"log"
 	"strings"
 
+	"github.com/hashicorp/terraform-plugin-sdk/helper/customdiff"
+
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/validation"
 	"github.com/hashicorp/terraform-plugin-sdk/terraform"
@@ -39,7 +41,7 @@ func resourceSakuraCloudServer() *schema.Resource {
 		Importer: &schema.ResourceImporter{
 			State: schema.ImportStatePassthrough,
 		},
-		CustomizeDiff: composeCustomizeDiff(
+		CustomizeDiff: customdiff.All(
 			serverNetworkAttrsCustomizeDiff,
 			hasTagResourceCustomizeDiff,
 		),
@@ -137,7 +139,6 @@ func resourceSakuraCloudServer() *schema.Resource {
 			"tags": {
 				Type:     schema.TypeList,
 				Optional: true,
-				Computed: true,
 				Elem:     &schema.Schema{Type: schema.TypeString},
 			},
 			"zone": {
