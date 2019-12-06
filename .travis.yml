@@ -14,7 +14,7 @@ install:
 - GO111MODULE=off go get -u golang.org/x/lint/golint
 - GO111MODULE=off go get -u golang.org/x/tools/cmd/goimports
 script:
-- make test
+- FAKE_MODE=1 make testacc
 - make lint-docs
 before_deploy:
 - if [ "$TRAVIS_BRANCH" == "master" ]; then
