@@ -21,6 +21,7 @@ import (
 	"github.com/imdario/mergo"
 	"github.com/sacloud/libsacloud/v2/sacloud"
 	"github.com/sacloud/libsacloud/v2/sacloud/types"
+	"golang.org/x/crypto/ssh"
 )
 
 var (
@@ -55,7 +56,11 @@ func (o *SSHKeyOp) Create(ctx context.Context, param *sacloud.SSHKeyCreateReques
 	copySameNameField(param, result)
 	fill(result, fillID, fillCreatedAt)
 
-	result.Fingerprint = GeneratedFingerprint
+	pk, _, _, _, err := ssh.ParseAuthorizedKey([]byte(result.PublicKey))
+	if err != nil {
+		return nil, err
+	}
+	result.Fingerprint = ssh.FingerprintLegacyMD5(pk)
 
 	putSSHKey(sacloud.APIDefaultZone, result)
 	return result, nil

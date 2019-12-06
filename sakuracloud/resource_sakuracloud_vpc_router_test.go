@@ -19,24 +19,13 @@ import (
 	"errors"
 	"fmt"
 	"testing"
-	"time"
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/resource"
 	"github.com/hashicorp/terraform-plugin-sdk/terraform"
 	"github.com/sacloud/libsacloud/v2/sacloud"
-	"github.com/sacloud/libsacloud/v2/utils/vpcrouter"
 )
 
 func TestAccResourceSakuraCloudVPCRouter(t *testing.T) {
-	if isFakeModeEnabled() {
-		vpcrouter.DefaultSetupOptions = &vpcrouter.RetryableSetupParameter{
-			NICUpdateWaitDuration:     10 * time.Millisecond,
-			ProvisioningRetryInterval: 10 * time.Millisecond,
-			DeleteRetryInterval:       10 * time.Millisecond,
-			PollInterval:              10 * time.Millisecond,
-		}
-	}
-
 	var vpcRouter sacloud.VPCRouter
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
@@ -88,15 +77,6 @@ func TestAccResourceSakuraCloudVPCRouter(t *testing.T) {
 }
 
 func TestAccResourceSakuraCloudVPCRouter_Full(t *testing.T) {
-	if isFakeModeEnabled() {
-		vpcrouter.DefaultSetupOptions = &vpcrouter.RetryableSetupParameter{
-			NICUpdateWaitDuration:     10 * time.Millisecond,
-			ProvisioningRetryInterval: 10 * time.Millisecond,
-			DeleteRetryInterval:       10 * time.Millisecond,
-			PollInterval:              10 * time.Millisecond,
-		}
-	}
-
 	var vpcRouter sacloud.VPCRouter
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },

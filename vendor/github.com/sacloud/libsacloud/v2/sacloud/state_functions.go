@@ -18,7 +18,7 @@ import "github.com/sacloud/libsacloud/v2/sacloud/types"
 
 // WaiterForUp 起動完了まで待つためのStateWaiterを返す
 func WaiterForUp(readFunc StateReadFunc) StateWaiter {
-	return &StatePollWaiter{
+	return &StatePollingWaiter{
 		ReadFunc: readFunc,
 		TargetAvailability: []types.EAvailability{
 			types.Availabilities.Available,
@@ -45,7 +45,7 @@ func WaiterForUp(readFunc StateReadFunc) StateWaiter {
 //
 // アプライアンス向けに404発生時のリトライを設定可能
 func WaiterForApplianceUp(readFunc StateReadFunc, notFoundRetry int) StateWaiter {
-	return &StatePollWaiter{
+	return &StatePollingWaiter{
 		ReadFunc: readFunc,
 		TargetAvailability: []types.EAvailability{
 			types.Availabilities.Available,
@@ -71,7 +71,7 @@ func WaiterForApplianceUp(readFunc StateReadFunc, notFoundRetry int) StateWaiter
 
 // WaiterForDown シャットダウン完了まで待つためのStateWaiterを返す
 func WaiterForDown(readFunc StateReadFunc) StateWaiter {
-	return &StatePollWaiter{
+	return &StatePollingWaiter{
 		ReadFunc: readFunc,
 		TargetAvailability: []types.EAvailability{
 			types.Availabilities.Available,
@@ -92,7 +92,7 @@ func WaiterForDown(readFunc StateReadFunc) StateWaiter {
 
 // WaiterForReady リソースの利用準備完了まで待つためのStateWaiterを返す
 func WaiterForReady(readFunc StateReadFunc) StateWaiter {
-	return &StatePollWaiter{
+	return &StatePollingWaiter{
 		ReadFunc: readFunc,
 		TargetAvailability: []types.EAvailability{
 			types.Availabilities.Available,

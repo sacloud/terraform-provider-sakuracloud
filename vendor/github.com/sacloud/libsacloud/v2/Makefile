@@ -38,8 +38,18 @@ clean:
 	rm -f sacloud/trace/zz_*.go
 
 .PHONY: gen
-gen:
+gen: _gen set-license
+
+.PHONY: _gen
+_gen:
 	go generate ./...; gofmt -s -l -w $(GOFMT_FILES); goimports -l -w $(GOFMT_FILES)
+
+.PHONY: gen_fake_data
+gen_fake_data: _gen_fake_data set-license
+
+.PHONY: _gen_fake_data
+_gen_fake_data:
+	go run -mod=vendor internal/tools/gen-api-fake-data/main.go ; gofmt -s -l -w $(GOFMT_FILES); goimports -l -w $(GOFMT_FILES)
 
 vet: golint
 	go vet ./...
@@ -82,5 +92,5 @@ git-tag:
 	git tag v`gobump show -r`
 
 set-license:
-	addlicense -c $(AUTHOR) -y $(COPYRIGHT_YEAR) $(COPYRIGHT_FILES)
+	@addlicense -c $(AUTHOR) -y $(COPYRIGHT_YEAR) $(COPYRIGHT_FILES)
 

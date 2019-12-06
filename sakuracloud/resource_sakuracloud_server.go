@@ -123,7 +123,6 @@ func resourceSakuraCloudServer() *schema.Resource {
 			"packet_filter_ids": {
 				Type:     schema.TypeList,
 				Optional: true,
-				Computed: true,
 				MaxItems: 4,
 				Elem:     &schema.Schema{Type: schema.TypeString},
 			},
@@ -615,7 +614,9 @@ func flattenServerConnectedDiskIDs(server *sacloud.Server) []string {
 func flattenServerConnectedPacketFilterIDs(server *sacloud.Server) []string {
 	var ids []string
 	for _, nic := range server.Interfaces {
-		ids = append(ids, nic.PacketFilterID.String())
+		if !nic.PacketFilterID.IsEmpty() {
+			ids = append(ids, nic.PacketFilterID.String())
+		}
 	}
 	return ids
 }

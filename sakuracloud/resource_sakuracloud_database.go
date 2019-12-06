@@ -234,7 +234,7 @@ func resourceSakuraCloudDatabaseCreate(d *schema.ResourceData, meta interface{})
 
 	// HACK データベースアプライアンスの電源投入後すぐに他の操作(Updateなど)を行うと202(Accepted)が返ってくるものの無視される。
 	// この挙動はテストなどで問題となる。このためここで少しsleepすることで対応する。
-	time.Sleep(1 * time.Minute)
+	time.Sleep(client.databaseWaitAfterCreateDuration)
 
 	d.SetId(db.ID.String())
 	return resourceSakuraCloudDatabaseRead(d, meta)

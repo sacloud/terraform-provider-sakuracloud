@@ -19,11 +19,13 @@ import (
 	"fmt"
 	"math/rand"
 	"net/http"
+	"reflect"
 	"strings"
 	"time"
 
 	"github.com/sacloud/libsacloud/v2/sacloud"
 	"github.com/sacloud/libsacloud/v2/sacloud/accessor"
+	"github.com/sacloud/libsacloud/v2/sacloud/search"
 	"github.com/sacloud/libsacloud/v2/sacloud/types"
 )
 
@@ -82,6 +84,8 @@ func find(resourceKey, zone string, conditions *sacloud.FindCondition) ([]interf
 	}
 
 	targets := ds().List(resourceKey, zone)
+
+FILTER_APPLY_LOOP:
 	for i, target := range targets {
 		// count
 		if conditions.Count != 0 && len(results) >= conditions.Count {
@@ -91,6 +95,85 @@ func find(resourceKey, zone string, conditions *sacloud.FindCondition) ([]interf
 		// from
 		if i < conditions.From {
 			continue
+		}
+
+		// filter
+		for key, expression := range conditions.Filter {
+			// TODO OpGreater/OpLess is not implemented
+			if key.Op == search.OpEqual {
+				fieldName := key.String()
+
+				// only ID/Name/Tags
+				switch fieldName {
+				case "ID", "Name", "Tags.Name", "Scope":
+					exp, ok := expression.(*search.EqualExpression)
+					if !ok {
+						exp = search.OrEqual(expression)
+					}
+
+					if fieldName == "Tags.Name" {
+						var tags types.Tags
+						if v, ok := target.(accessor.Tags); ok {
+							tags = v.GetTags()
+						}
+
+						for _, cond := range exp.Conditions {
+							condTags, ok := cond.([]string)
+							if ok {
+								for _, v := range condTags {
+									exists := false
+									for _, tag := range tags {
+										if tag == v {
+											exists = true
+										}
+									}
+									if !exists {
+										continue FILTER_APPLY_LOOP
+									}
+								}
+							}
+						}
+
+					} else {
+						var value interface{}
+						switch fieldName {
+						case "ID":
+							if v, ok := target.(accessor.ID); ok {
+								value = v.GetID()
+							}
+						case "Name":
+							if v, ok := target.(accessor.Name); ok {
+								value = v.GetName()
+							}
+						case "Scope":
+							if v, ok := target.(accessor.Scope); ok {
+								value = v.GetScope()
+							}
+						}
+
+						switch exp.Op {
+						case search.OpAnd:
+							for _, v := range exp.Conditions {
+								v1, ok1 := v.(string)
+								v2, ok2 := value.(string)
+								if !ok1 || !ok2 || !strings.Contains(v2, v1) {
+									continue FILTER_APPLY_LOOP
+								}
+							}
+						case search.OpOr:
+							match := false
+							for _, v := range exp.Conditions {
+								if reflect.DeepEqual(value, v) {
+									match = true
+								}
+							}
+							if !match {
+								continue FILTER_APPLY_LOOP
+							}
+						}
+					}
+				}
+			}
 		}
 
 		results = append(results, target)

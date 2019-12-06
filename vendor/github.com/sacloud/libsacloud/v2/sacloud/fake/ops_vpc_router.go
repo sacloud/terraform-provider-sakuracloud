@@ -17,6 +17,7 @@ package fake
 import (
 	"context"
 	"fmt"
+	"net"
 	"time"
 
 	"github.com/imdario/mergo"
@@ -87,6 +88,15 @@ func (o *VPCRouterOp) Create(ctx context.Context, zone string, param *sacloud.VP
 
 	vpcRouterInterface := &sacloud.VPCRouterInterface{}
 	copySameNameField(iface, vpcRouterInterface)
+	if param.Switch.Scope == types.Scopes.Shared {
+		sharedIP := pool().nextSharedIP()
+		vpcRouterInterface.IPAddress = sharedIP.String()
+		vpcRouterInterface.SubnetNetworkMaskLen = sharedSegmentSwitch.NetworkMaskLen
+
+		ipv4Mask := net.CIDRMask(pool().SharedNetMaskLen, 32)
+		vpcRouterInterface.SubnetNetworkAddress = sharedIP.Mask(ipv4Mask).String()
+		vpcRouterInterface.SubnetDefaultRoute = pool().SharedDefaultGateway.String()
+	}
 	result.Interfaces = append(result.Interfaces, vpcRouterInterface)
 
 	putVPCRouter(zone, result)

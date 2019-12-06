@@ -24,11 +24,13 @@ import (
 	"time"
 
 	"github.com/hashicorp/terraform-plugin-sdk/httpclient"
+	"github.com/sacloud/libsacloud/v2/utils/vpcrouter"
 
 	"github.com/sacloud/libsacloud/v2/sacloud"
 
 	"github.com/sacloud/libsacloud/v2/sacloud/fake"
 	"github.com/sacloud/libsacloud/v2/sacloud/trace"
+	"github.com/sacloud/libsacloud/v2/utils/setup"
 )
 
 const (
@@ -39,10 +41,11 @@ const (
 const uaEnvVar = "SAKURACLOUD_APPEND_USER_AGENT"
 
 var (
-	fakeModeOnce                  sync.Once
-	v2ClientOnce                  sync.Once
-	deletionWaiterTimeout         = 30 * time.Minute
-	deletionWaiterPollingInterval = 5 * time.Second
+	fakeModeOnce                    sync.Once
+	v2ClientOnce                    sync.Once
+	deletionWaiterTimeout           = 30 * time.Minute
+	deletionWaiterPollingInterval   = 5 * time.Second
+	databaseWaitAfterCreateDuration = 1 * time.Minute
 )
 
 // Config type of SakuraCloud Config
@@ -68,9 +71,10 @@ type Config struct {
 // APIClient for SakuraCloud API
 type APIClient struct {
 	sacloud.APICaller
-	defaultZone                   string
-	deletionWaiterTimeout         time.Duration
-	deletionWaiterPollingInterval time.Duration
+	defaultZone                     string
+	deletionWaiterTimeout           time.Duration
+	deletionWaiterPollingInterval   time.Duration
+	databaseWaitAfterCreateDuration time.Duration
 }
 
 // NewClient returns new API Client for SakuraCloud
@@ -98,7 +102,7 @@ func (c *Config) NewClient() *APIClient {
 		RetryInterval:          time.Duration(c.RetryInterval) * time.Second,
 		HTTPClient:             httpClient,
 	}
-	sacloud.DefaultStatePollTimeout = time.Duration(c.TimeoutMinute) * time.Minute
+	sacloud.DefaultStatePollingTimeout = time.Duration(c.TimeoutMinute) * time.Minute
 
 	if c.TraceMode != "" {
 		enableAPITrace := true
@@ -134,13 +138,26 @@ func (c *Config) NewClient() *APIClient {
 
 		// TODO パラメータ化
 		deletionWaiterTimeout = 10 * time.Second
-		deletionWaiterPollingInterval = 10 * time.Millisecond
+		defaultInterval := 10 * time.Millisecond
+		deletionWaiterPollingInterval = defaultInterval
+		databaseWaitAfterCreateDuration = defaultInterval
+
+		// update default polling intervals: libsacloud/sacloud
+		sacloud.DefaultStatePollingInterval = defaultInterval
+		sacloud.APIDefaultRetryInterval = defaultInterval
+		// update default polling intervals: libsacloud/utils/setup
+		setup.DefaultDeleteWaitInterval = defaultInterval
+		setup.DefaultProvisioningWaitInterval = defaultInterval
+		setup.DefaultPollingInterval = defaultInterval
+		// update default polling intervals: libsacloud/utils/vpcrouter
+		vpcrouter.DefaultNICUpdateWaitDuration = defaultInterval
 	}
 
 	return &APIClient{
-		APICaller:                     caller,
-		defaultZone:                   c.Zone,
-		deletionWaiterTimeout:         deletionWaiterTimeout,
-		deletionWaiterPollingInterval: deletionWaiterPollingInterval,
+		APICaller:                       caller,
+		defaultZone:                     c.Zone,
+		deletionWaiterTimeout:           deletionWaiterTimeout,
+		deletionWaiterPollingInterval:   deletionWaiterPollingInterval,
+		databaseWaitAfterCreateDuration: databaseWaitAfterCreateDuration,
 	}
 }

@@ -136,7 +136,6 @@ resource sakuracloud_dns_record "record01" {
 
 resource sakuracloud_server "server" {
   name = "server"
-  graceful_shutdown_timeout = 5
 }
 
 resource "sakuracloud_ipv4_ptr" "foobar" {
@@ -161,7 +160,6 @@ resource sakuracloud_dns_record "record01" {
 
 resource sakuracloud_server "server" {
   name = "server"
-  graceful_shutdown_timeout = 5
 }
 
 resource "sakuracloud_ipv4_ptr" "foobar" {
