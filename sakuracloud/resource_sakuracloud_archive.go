@@ -16,6 +16,7 @@ package sakuracloud
 
 import (
 	"bytes"
+	"context"
 	"crypto/md5"
 	"encoding/base64"
 	"encoding/hex"
@@ -98,37 +99,20 @@ func resourceSakuraCloudArchiveCreate(d *schema.ResourceData, meta interface{}) 
 	client, ctx, zone := getSacloudClient(d, meta)
 	archiveOp := sacloud.NewArchiveOp(client)
 
-	// prepare create parameters
-	req := &sacloud.ArchiveCreateBlankRequest{
+	archive, ftpServer, err := archiveOp.CreateBlank(ctx, zone, &sacloud.ArchiveCreateBlankRequest{
 		Name:        d.Get("name").(string),
 		Description: d.Get("description").(string),
 		SizeMB:      toSizeMB(d.Get("size").(int)),
 		IconID:      expandSakuraCloudID(d, "icon_id"),
 		Tags:        expandTags(d),
-	}
-
-	source := d.Get("archive_file").(string)
-	path, err := expandHomeDir(source)
+	})
 	if err != nil {
-		return fmt.Errorf("prepare creating SakuraCloud Archive resource is failed: %s", err)
-	}
-
-	// create
-	archive, ftpServer, err := archiveOp.CreateBlank(ctx, zone, req)
-	if err != nil {
-		return fmt.Errorf("creating SakuraCloud Archive resource is failed: %s", err)
+		return fmt.Errorf("creating SakuraCloud Archive is failed: %s", err)
 	}
 
 	// upload
-	ftpClient := ftps.NewClient(ftpServer.User, ftpServer.Password, ftpServer.HostName)
-	if err := ftpClient.Upload(path); err != nil {
-		return fmt.Errorf("upload archive_file to SakuraCloud is failed: %s", err)
-	}
-
-	// close FTPS connection
-	if err := archiveOp.CloseFTP(ctx, zone, archive.ID); err != nil {
-		return fmt.Errorf("closing FTPS Connection is failed: %s", err)
-
+	if err := uploadArchiveFile(ctx, archiveOp, zone, archive.ID, d.Get("archive_file").(string), ftpServer); err != nil {
+		return err
 	}
 
 	d.SetId(archive.ID.String())
@@ -159,48 +143,20 @@ func resourceSakuraCloudArchiveUpdate(d *schema.ResourceData, meta interface{}) 
 		return fmt.Errorf("could not read SakuraCloud Archive[%s]: %s", d.Id(), err)
 	}
 
-	req := &sacloud.ArchiveUpdateRequest{
+	archive, err = archiveOp.Update(ctx, zone, archive.ID, &sacloud.ArchiveUpdateRequest{
 		Name:        d.Get("name").(string),
 		Description: d.Get("description").(string),
 		Tags:        expandTags(d),
 		IconID:      expandSakuraCloudID(d, "icon_id"),
-	}
-
-	archive, err = archiveOp.Update(ctx, zone, archive.ID, req)
+	})
 	if err != nil {
-		return fmt.Errorf("updating SakuraCloud Archive[%s] is failed: %s", d.Id(), err)
+		return fmt.Errorf("updating SakuraCloud Archive[%s] is failed: %s", archive.ID, err)
 	}
 
-	contentAttrs := []string{"archive_file", "hash"}
-	isContentChanged := false
-	for _, attr := range contentAttrs {
-		if d.HasChange(attr) {
-			isContentChanged = true
-			break
-		}
-	}
-	if isContentChanged {
-		source := d.Get("archive_file").(string)
-		path, err := expandHomeDir(source)
-		if err != nil {
-			return fmt.Errorf("prepare upload SakuraCloud Archive[%s] is failed: %s", archive.ID, err)
-		}
-
-		// open FTPS connections
-		ftpServer, err := archiveOp.OpenFTP(ctx, zone, archive.ID, &sacloud.OpenFTPRequest{ChangePassword: true})
-		if err != nil {
-			return fmt.Errorf("Failed to Open FTPS Connection: %s", err)
-		}
-
+	if isArchiveContentChanged(d) {
 		// upload
-		ftpClient := ftps.NewClient(ftpServer.User, ftpServer.Password, ftpServer.HostName)
-		if err := ftpClient.Upload(path); err != nil {
-			return fmt.Errorf("upload archive_file to SakuraCloud is failed: %s", err)
-		}
-
-		// close FTPS connection
-		if err := archiveOp.CloseFTP(ctx, zone, archive.ID); err != nil {
-			return fmt.Errorf("closing FTPS Connection is failed: %s", err)
+		if err := uploadArchiveFile(ctx, archiveOp, zone, archive.ID, d.Get("archive_file").(string), nil); err != nil {
+			return err
 		}
 	}
 
@@ -229,32 +185,30 @@ func resourceSakuraCloudArchiveDelete(d *schema.ResourceData, meta interface{}) 
 }
 
 func setArchiveResourceData(d *schema.ResourceData, client *APIClient, data *sacloud.Archive) error {
-	// NOTE 本来はAPIにてmd5ハッシュを取得できるのが望ましい。現状ではここでファイルを読んで算出する。
-	if v, ok := d.GetOk("archive_file"); ok {
-		source := v.(string)
-
-		path, err := expandHomeDir(source)
-		if err != nil {
-			return err
-		}
-		hash, err := md5CheckSumFromFile(path)
-		if err != nil {
-			return err
-		}
-		d.Set("hash", hash)
-	}
-
-	if !data.IconID.IsEmpty() {
-		d.Set("icon_id", data.IconID.String())
-	}
+	d.Set("hash", expandArchiveHash(d))
+	d.Set("icon_id", data.IconID.String())
 	if err := d.Set("tags", data.Tags); err != nil {
-		return fmt.Errorf("error setting tags: %v", data.Tags)
+		return err
 	}
 	d.Set("name", data.Name)
 	d.Set("size", data.GetSizeGB())
 	d.Set("description", data.Description)
 	d.Set("zone", getZone(d, client))
 	return nil
+}
+
+func expandArchiveHash(d *schema.ResourceData) string {
+	// NOTE 本来はAPIにてmd5ハッシュを取得できるのが望ましい。現状ではここでファイルを読んで算出する。
+	source := d.Get("archive_file").(string)
+	path, err := expandHomeDir(source)
+	if err != nil {
+		return ""
+	}
+	hash, err := md5CheckSumFromFile(path)
+	if err != nil {
+		return ""
+	}
+	return hash
 }
 
 func expandHomeDir(path string) (string, error) {
@@ -290,4 +244,45 @@ func md5CheckSumFromFile(path string) (string, error) {
 	}
 
 	return hex.EncodeToString(h.Sum(nil)), nil
+}
+
+func uploadArchiveFile(ctx context.Context, archiveOp sacloud.ArchiveAPI, zone string, id types.ID, filePath string, ftpServer *sacloud.FTPServer) error {
+	path, err := expandHomeDir(filePath)
+	if err != nil {
+		return fmt.Errorf("preparing SakuraCloud Archive creation is failed: %s", err)
+	}
+
+	if ftpServer == nil {
+		// open FTPS connections
+		fs, err := archiveOp.OpenFTP(ctx, zone, id, &sacloud.OpenFTPRequest{ChangePassword: true})
+		if err != nil {
+			return fmt.Errorf("opening FTPS connection is failed: %s", err)
+		}
+		ftpServer = fs
+	}
+
+	// upload
+	ftpClient := ftps.NewClient(ftpServer.User, ftpServer.Password, ftpServer.HostName)
+	if err := ftpClient.Upload(path); err != nil {
+		return fmt.Errorf("uploading file to SakuraCloud is failed: %s", err)
+	}
+
+	// close FTPS connection
+	if err := archiveOp.CloseFTP(ctx, zone, id); err != nil {
+		return fmt.Errorf("closing FTPS Connection is failed: %s", err)
+	}
+
+	return nil
+}
+
+func isArchiveContentChanged(d *schema.ResourceData) bool {
+	contentAttrs := []string{"archive_file", "hash"}
+	isContentChanged := false
+	for _, attr := range contentAttrs {
+		if d.HasChange(attr) {
+			isContentChanged = true
+			break
+		}
+	}
+	return isContentChanged
 }

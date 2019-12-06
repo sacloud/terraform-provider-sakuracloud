@@ -99,7 +99,7 @@ func resourceSakuraCloudIconRead(d *schema.ResourceData, meta interface{}) error
 			d.SetId("")
 			return nil
 		}
-		return fmt.Errorf("could not read SakuraCloud Icon: %s", err)
+		return fmt.Errorf("could not read SakuraCloud Icon[%s]: %s", d.Id(), err)
 	}
 
 	return setIconResourceData(ctx, d, client, icon)
@@ -111,7 +111,7 @@ func resourceSakuraCloudIconUpdate(d *schema.ResourceData, meta interface{}) err
 
 	_, err := iconOp.Read(ctx, sakuraCloudID(d.Id()))
 	if err != nil {
-		return fmt.Errorf("could not read SakuraCloud Icon: %s", err)
+		return fmt.Errorf("could not read SakuraCloud Icon[%s]: %s", d.Id(), err)
 	}
 
 	_, err = iconOp.Update(ctx, sakuraCloudID(d.Id()), &sacloud.IconUpdateRequest{
@@ -119,7 +119,7 @@ func resourceSakuraCloudIconUpdate(d *schema.ResourceData, meta interface{}) err
 		Tags: expandTags(d),
 	})
 	if err != nil {
-		return fmt.Errorf("updating SakuraCloud Icon is failed: %s", err)
+		return fmt.Errorf("updating SakuraCloud Icon[%s] is failed: %s", d.Id(), err)
 	}
 	return resourceSakuraCloudIconRead(d, meta)
 }
@@ -134,11 +134,11 @@ func resourceSakuraCloudIconDelete(d *schema.ResourceData, meta interface{}) err
 			d.SetId("")
 			return nil
 		}
-		return fmt.Errorf("could not read SakuraCloud Icon: %s", err)
+		return fmt.Errorf("could not read SakuraCloud Icon[%s]: %s", d.Id(), err)
 	}
 
 	if err := iconOp.Delete(ctx, icon.ID); err != nil {
-		return fmt.Errorf("deleting SakuraCloud Icon is failed: %s", err)
+		return fmt.Errorf("deleting SakuraCloud Icon[%s] is failed: %s", d.Id(), err)
 	}
 	return nil
 }

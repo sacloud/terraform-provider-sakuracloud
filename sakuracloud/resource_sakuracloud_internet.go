@@ -146,14 +146,14 @@ func resourceSakuraCloudInternetCreate(d *schema.ResourceData, meta interface{})
 		return internetOp.Read(ctx, zone, internet.ID)
 	}, 100)
 	if _, err := waiter.WaitForState(ctx); err != nil {
-		return fmt.Errorf("waiting for to be available is failed: %s", err)
+		return fmt.Errorf("waiting for to be available is failed: Internet[%s]: %s", internet.ID, err)
 	}
 
 	// handle ipv6 param
 	if ipv6Flag := d.Get("enable_ipv6").(bool); ipv6Flag {
 		_, err = internetOp.EnableIPv6(ctx, zone, internet.ID)
 		if err != nil {
-			return fmt.Errorf("enabling IPv6 is failed: %s", err)
+			return fmt.Errorf("enabling IPv6 on Internet[%s] is failed: %s", internet.ID, err)
 		}
 	}
 
@@ -171,7 +171,7 @@ func resourceSakuraCloudInternetRead(d *schema.ResourceData, meta interface{}) e
 			d.SetId("")
 			return nil
 		}
-		return fmt.Errorf("could not read SakuraCloud Internet: %s", err)
+		return fmt.Errorf("could not read SakuraCloud Internet[%s]: %s", d.Id(), err)
 	}
 	return setInternetResourceData(ctx, d, client, internet)
 }
@@ -182,7 +182,7 @@ func resourceSakuraCloudInternetUpdate(d *schema.ResourceData, meta interface{})
 
 	internet, err := internetOp.Read(ctx, zone, sakuraCloudID(d.Id()))
 	if err != nil {
-		return fmt.Errorf("could not read SakuraCloud Internet: %s", err)
+		return fmt.Errorf("could not read SakuraCloud Internet[%s]: %s", d.Id(), err)
 	}
 
 	internet, err = internetOp.Update(ctx, zone, internet.ID, &sacloud.InternetUpdateRequest{
@@ -192,7 +192,7 @@ func resourceSakuraCloudInternetUpdate(d *schema.ResourceData, meta interface{})
 		IconID:      expandSakuraCloudID(d, "icon_id"),
 	})
 	if err != nil {
-		return fmt.Errorf("updating SakuraCloud Internet is failed: %s", err)
+		return fmt.Errorf("updating SakuraCloud Internet[%s] is failed: %s", d.Id(), err)
 	}
 
 	if d.HasChange("band_width") {
@@ -200,7 +200,7 @@ func resourceSakuraCloudInternetUpdate(d *schema.ResourceData, meta interface{})
 			BandWidthMbps: d.Get("band_width").(int),
 		})
 		if err != nil {
-			return fmt.Errorf("updating SakuraCloud Internet bandwidth is failed: %s", err)
+			return fmt.Errorf("updating bandwidth of Internet[%s] is failed: %s", d.Id(), err)
 		}
 		// internet.ID is changed when UpdateBandWidth() is called.
 		// so call SetID here.
@@ -212,12 +212,12 @@ func resourceSakuraCloudInternetUpdate(d *schema.ResourceData, meta interface{})
 		enableIPv6 := d.Get("enable_ipv6").(bool)
 		if enableIPv6 {
 			if _, err := internetOp.EnableIPv6(ctx, zone, internet.ID); err != nil {
-				return fmt.Errorf("enabling IPv6 is failed: %s", err)
+				return fmt.Errorf("enabling IPv6 on Internet[%s] is failed: %s", d.Id(), err)
 			}
 		} else {
 			if len(internet.Switch.IPv6Nets) > 0 {
 				if err := internetOp.DisableIPv6(ctx, zone, internet.ID, internet.Switch.IPv6Nets[0].ID); err != nil {
-					return fmt.Errorf("disabling IPv6 is failed: %s", err)
+					return fmt.Errorf("disabling IPv6 on Internet[%s] is failed: %s", d.Id(), err)
 				}
 			}
 		}
@@ -236,13 +236,13 @@ func resourceSakuraCloudInternetDelete(d *schema.ResourceData, meta interface{})
 			d.SetId("")
 			return nil
 		}
-		return fmt.Errorf("could not read SakuraCloud Internet: %s", err)
+		return fmt.Errorf("could not read SakuraCloud Internet[%s]: %s", d.Id(), err)
 	}
 
 	// disable ipv6
 	if len(internet.Switch.IPv6Nets) > 0 {
 		if err := internetOp.DisableIPv6(ctx, zone, internet.ID, internet.Switch.IPv6Nets[0].ID); err != nil {
-			return fmt.Errorf("disabling IPv6 is failed: %s", err)
+			return fmt.Errorf("disabling IPv6 on Internet[%s] is failed: %s", d.Id(), err)
 		}
 	}
 
@@ -251,7 +251,7 @@ func resourceSakuraCloudInternetDelete(d *schema.ResourceData, meta interface{})
 	}
 
 	if err := internetOp.Delete(ctx, zone, internet.ID); err != nil {
-		return fmt.Errorf("deleting SakuraCloud Internet is failed: %s", err)
+		return fmt.Errorf("deleting SakuraCloud Internet[%s] is failed: %s", d.Id(), err)
 	}
 	return nil
 }
@@ -262,14 +262,14 @@ func setInternetResourceData(ctx context.Context, d *schema.ResourceData, client
 	zone := getZone(d, client)
 	sw, err := swOp.Read(ctx, zone, data.Switch.ID)
 	if err != nil {
-		return fmt.Errorf("could not read SakuraCloud Switch resource: %s", err)
+		return fmt.Errorf("could not read SakuraCloud Switch[%s]: %s", data.Switch.ID, err)
 	}
 
 	var serverIDs []string
 	if sw.ServerCount > 0 {
 		servers, err := swOp.GetServers(ctx, zone, sw.ID)
 		if err != nil {
-			return fmt.Errorf("coul not find SakuraCloud Servers: %s", err)
+			return fmt.Errorf("could not find SakuraCloud Servers: %s", err)
 		}
 		for _, s := range servers.Servers {
 			serverIDs = append(serverIDs, s.ID.String())

@@ -112,7 +112,7 @@ func resourceSakuraCloudPrivateHostRead(d *schema.ResourceData, meta interface{}
 			d.SetId("")
 			return nil
 		}
-		return fmt.Errorf("could not read SakuraCloud PrivateHost: %s", err)
+		return fmt.Errorf("could not read SakuraCloud PrivateHost[%s]: %s", d.Id(), err)
 	}
 	return setPrivateHostResourceData(ctx, d, client, ph)
 }
@@ -123,7 +123,7 @@ func resourceSakuraCloudPrivateHostUpdate(d *schema.ResourceData, meta interface
 
 	ph, err := phOp.Read(ctx, zone, sakuraCloudID(d.Id()))
 	if err != nil {
-		return fmt.Errorf("could not read SakuraCloud PrivateHost: %s", err)
+		return fmt.Errorf("could not read SakuraCloud PrivateHost[%s]: %s", d.Id(), err)
 	}
 
 	_, err = phOp.Update(ctx, zone, ph.ID, &sacloud.PrivateHostUpdateRequest{
@@ -133,7 +133,7 @@ func resourceSakuraCloudPrivateHostUpdate(d *schema.ResourceData, meta interface
 		IconID:      expandSakuraCloudID(d, "icon_id"),
 	})
 	if err != nil {
-		return fmt.Errorf("updating SakuraCloud PrivateHost is failed: %s", err)
+		return fmt.Errorf("updating SakuraCloud PrivateHost[%s] is failed: %s", d.Id(), err)
 	}
 
 	return resourceSakuraCloudPrivateHostRead(d, meta)
@@ -150,7 +150,7 @@ func resourceSakuraCloudPrivateHostDelete(d *schema.ResourceData, meta interface
 			d.SetId("")
 			return nil
 		}
-		return fmt.Errorf("could not read SakuraCloud PrivateHost: %s", err)
+		return fmt.Errorf("could not read SakuraCloud PrivateHost[%s]: %s", d.Id(), err)
 	}
 
 	searched, err := serverOp.Find(ctx, zone, &sacloud.FindCondition{})
@@ -166,7 +166,7 @@ func resourceSakuraCloudPrivateHostDelete(d *schema.ResourceData, meta interface
 	}
 
 	if err := phOp.Delete(ctx, zone, ph.ID); err != nil {
-		return fmt.Errorf("deleting SakuraCloud PrivateHost is failed: %s", err)
+		return fmt.Errorf("deleting SakuraCloud PrivateHost[%s] is failed: %s", d.Id(), err)
 	}
 	return nil
 }
@@ -179,14 +179,17 @@ func detachServerFromPrivateHost(ctx context.Context, client *APIClient, zone st
 
 	server, err := serverOp.Read(ctx, zone, serverID)
 	if err != nil {
-		return fmt.Errorf("reading SakuraCloud Server is failed: %s", err)
+		if sacloud.IsNotFoundError(err) {
+			return nil
+		}
+		return fmt.Errorf("reading SakuraCloud Server[%s] is failed: %s", serverID, err)
 	}
 	if !server.PrivateHostID.IsEmpty() {
 		isNeedRestart := false
 		if server.InstanceStatus.IsUp() {
 			isNeedRestart = true
 			if err := shutdownServerSync(ctx, client, zone, server.ID); err != nil {
-				return fmt.Errorf("stopping SakuraCloud Server is failed: %s", err)
+				return fmt.Errorf("stopping SakuraCloud Server[%s] is failed: %s", serverID, err)
 			}
 		}
 
@@ -198,12 +201,12 @@ func detachServerFromPrivateHost(ctx context.Context, client *APIClient, zone st
 			InterfaceDriver: server.InterfaceDriver,
 		})
 		if err != nil {
-			return fmt.Errorf("detaching Server From PrivateHost is failed: %s", err)
+			return fmt.Errorf("detaching Server[%s] From PrivateHost[%s] is failed: %s", serverID, server.PrivateHostID, err)
 		}
 
 		if isNeedRestart {
 			if err := bootServerSync(ctx, client, zone, server.ID); err != nil {
-				return fmt.Errorf("booting SakuraCloud Server is failed: %s", err)
+				return fmt.Errorf("booting SakuraCloud Server[%s] is failed: %s", serverID, err)
 			}
 		}
 	}
@@ -238,5 +241,4 @@ func expandPrivateHostPlanID(ctx context.Context, d resourceValueGettable, clien
 		return types.ID(0), errors.New("finding PrivateHostPlan is failed: plan is not found")
 	}
 	return searched.PrivateHostPlans[0].ID, nil
-
 }

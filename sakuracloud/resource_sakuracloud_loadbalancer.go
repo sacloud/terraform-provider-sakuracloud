@@ -182,23 +182,9 @@ func resourceSakuraCloudLoadBalancerCreate(d *schema.ResourceData, meta interfac
 	client, ctx, zone := getSacloudClient(d, meta)
 	lbOp := sacloud.NewLoadBalancerOp(client)
 
-	opts := &sacloud.LoadBalancerCreateRequest{
-		SwitchID:           expandSakuraCloudID(d, "switch_id"),
-		PlanID:             expandLoadBalancerPlanID(d),
-		VRID:               d.Get("vrid").(int),
-		IPAddresses:        expandLoadBalancerIPAddresses(d),
-		NetworkMaskLen:     d.Get("nw_mask_len").(int),
-		DefaultRoute:       d.Get("default_route").(string),
-		Name:               d.Get("name").(string),
-		Description:        d.Get("description").(string),
-		Tags:               expandTags(d),
-		IconID:             expandSakuraCloudID(d, "icon_id"),
-		VirtualIPAddresses: expandLoadBalancerVIPs(d),
-	}
-
 	builder := &setup.RetryableSetup{
 		Create: func(ctx context.Context, zone string) (accessor.ID, error) {
-			return lbOp.Create(ctx, zone, opts)
+			return lbOp.Create(ctx, zone, expandLoadBalancerCreateRequest(d))
 		},
 		Read: func(ctx context.Context, zone string, id types.ID) (interface{}, error) {
 			return lbOp.Read(ctx, zone, id)
@@ -215,11 +201,11 @@ func resourceSakuraCloudLoadBalancerCreate(d *schema.ResourceData, meta interfac
 		return fmt.Errorf("creating SakuraCloud LoadBalancer is failed: %s", err)
 	}
 
-	loadBalancer, ok := res.(*sacloud.LoadBalancer)
+	lb, ok := res.(*sacloud.LoadBalancer)
 	if !ok {
 		return fmt.Errorf("creating SakuraCloud LoadBalancer is failed: created resource is not *sacloud.LoadBalancer")
 	}
-	d.SetId(loadBalancer.ID.String())
+	d.SetId(lb.ID.String())
 	return resourceSakuraCloudLoadBalancerRead(d, meta)
 }
 
@@ -227,37 +213,28 @@ func resourceSakuraCloudLoadBalancerRead(d *schema.ResourceData, meta interface{
 	client, ctx, zone := getSacloudClient(d, meta)
 	lbOp := sacloud.NewLoadBalancerOp(client)
 
-	loadBalancer, err := lbOp.Read(ctx, zone, sakuraCloudID(d.Id()))
+	lb, err := lbOp.Read(ctx, zone, sakuraCloudID(d.Id()))
 	if err != nil {
 		if sacloud.IsNotFoundError(err) {
 			d.SetId("")
 			return nil
 		}
-		return fmt.Errorf("could not read SakuraCloud LoadBalancer: %s", err)
+		return fmt.Errorf("could not read SakuraCloud LoadBalancer[%s]: %s", d.Id(), err)
 	}
-	return setLoadBalancerResourceData(ctx, d, client, loadBalancer)
+	return setLoadBalancerResourceData(ctx, d, client, lb)
 }
 
 func resourceSakuraCloudLoadBalancerUpdate(d *schema.ResourceData, meta interface{}) error {
 	client, ctx, zone := getSacloudClient(d, meta)
 	lbOp := sacloud.NewLoadBalancerOp(client)
 
-	loadBalancer, err := lbOp.Read(ctx, zone, sakuraCloudID(d.Id()))
+	lb, err := lbOp.Read(ctx, zone, sakuraCloudID(d.Id()))
 	if err != nil {
-		return fmt.Errorf("could not read SakuraCloud LoadBalancer: %s", err)
+		return fmt.Errorf("could not read SakuraCloud LoadBalancer[%s]: %s", d.Id(), err)
 	}
 
-	opts := &sacloud.LoadBalancerUpdateRequest{
-		Name:               d.Get("name").(string),
-		Description:        d.Get("description").(string),
-		Tags:               expandTags(d),
-		IconID:             expandSakuraCloudID(d, "icon_id"),
-		VirtualIPAddresses: expandLoadBalancerVIPs(d),
-		SettingsHash:       loadBalancer.SettingsHash,
-	}
-
-	if _, err := lbOp.Update(ctx, zone, loadBalancer.ID, opts); err != nil {
-		return fmt.Errorf("updating SakuraCloud LoadBalancer is failed: %s", err)
+	if _, err := lbOp.Update(ctx, zone, lb.ID, expandLoadBalancerUpdateRequest(d, lb)); err != nil {
+		return fmt.Errorf("updating SakuraCloud LoadBalancer[%s] is failed: %s", d.Id(), err)
 	}
 
 	return resourceSakuraCloudLoadBalancerRead(d, meta)
@@ -267,27 +244,21 @@ func resourceSakuraCloudLoadBalancerDelete(d *schema.ResourceData, meta interfac
 	client, ctx, zone := getSacloudClient(d, meta)
 	lbOp := sacloud.NewLoadBalancerOp(client)
 
-	loadBalancer, err := lbOp.Read(ctx, zone, sakuraCloudID(d.Id()))
+	lb, err := lbOp.Read(ctx, zone, sakuraCloudID(d.Id()))
 	if err != nil {
 		if sacloud.IsNotFoundError(err) {
 			d.SetId("")
 			return nil
 		}
-		return fmt.Errorf("could not read SakuraCloud LoadBalancer: %s", err)
+		return fmt.Errorf("could not read SakuraCloud LoadBalancer[%s]: %s", d.Id(), err)
 	}
 
-	if err := lbOp.Shutdown(ctx, zone, loadBalancer.ID, &sacloud.ShutdownOption{Force: true}); err != nil {
-		return fmt.Errorf("stopping SakuraCloud LoadBalancer is failed: %s", err)
-	}
-	waiter := sacloud.WaiterForDown(func() (interface{}, error) {
-		return lbOp.Read(ctx, zone, loadBalancer.ID)
-	})
-	if _, err := waiter.WaitForState(ctx); err != nil {
-		return fmt.Errorf("stopping SakuraCloud LoadBalancer is failed: %s", err)
+	if err := shutdownLoadBalancerSync(ctx, lbOp, zone, lb.ID, true); err != nil {
+		return err
 	}
 
-	if err := lbOp.Delete(ctx, zone, loadBalancer.ID); err != nil {
-		return fmt.Errorf("deleting SakuraCloud LoadBalancer is failed: %s", err)
+	if err := lbOp.Delete(ctx, zone, lb.ID); err != nil {
+		return fmt.Errorf("deleting SakuraCloud LoadBalancer[%s] is failed: %s", d.Id(), err)
 	}
 
 	return nil
@@ -419,4 +390,30 @@ func expandLoadBalancerIPAddresses(d resourceValueGettable) []string {
 		ipAddresses = append(ipAddresses, ip2.(string))
 	}
 	return ipAddresses
+}
+
+func expandLoadBalancerCreateRequest(d *schema.ResourceData) *sacloud.LoadBalancerCreateRequest {
+	return &sacloud.LoadBalancerCreateRequest{
+		SwitchID:           expandSakuraCloudID(d, "switch_id"),
+		PlanID:             expandLoadBalancerPlanID(d),
+		VRID:               d.Get("vrid").(int),
+		IPAddresses:        expandLoadBalancerIPAddresses(d),
+		NetworkMaskLen:     d.Get("nw_mask_len").(int),
+		DefaultRoute:       d.Get("default_route").(string),
+		Name:               d.Get("name").(string),
+		Description:        d.Get("description").(string),
+		Tags:               expandTags(d),
+		IconID:             expandSakuraCloudID(d, "icon_id"),
+		VirtualIPAddresses: expandLoadBalancerVIPs(d),
+	}
+}
+func expandLoadBalancerUpdateRequest(d *schema.ResourceData, lb *sacloud.LoadBalancer) *sacloud.LoadBalancerUpdateRequest {
+	return &sacloud.LoadBalancerUpdateRequest{
+		Name:               d.Get("name").(string),
+		Description:        d.Get("description").(string),
+		Tags:               expandTags(d),
+		IconID:             expandSakuraCloudID(d, "icon_id"),
+		VirtualIPAddresses: expandLoadBalancerVIPs(d),
+		SettingsHash:       lb.SettingsHash,
+	}
 }

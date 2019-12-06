@@ -201,7 +201,7 @@ func resourceSakuraCloudSimpleMonitorRead(d *schema.ResourceData, meta interface
 			d.SetId("")
 			return nil
 		}
-		return fmt.Errorf("could not read SimpleMonitor: %s", err)
+		return fmt.Errorf("could not read SimpleMonitor[%s]: %s", d.Id(), err)
 	}
 
 	return setSimpleMonitorResourceData(ctx, d, client, simpleMonitor)
@@ -213,7 +213,7 @@ func resourceSakuraCloudSimpleMonitorUpdate(d *schema.ResourceData, meta interfa
 
 	simpleMonitor, err := smOp.Read(ctx, sakuraCloudID(d.Id()))
 	if err != nil {
-		return fmt.Errorf("could not read SimpleMonitor: %s", err)
+		return fmt.Errorf("could not read SimpleMonitor[%s]: %s", d.Id(), err)
 	}
 
 	simpleMonitor, err = smOp.Update(ctx, simpleMonitor.ID, &sacloud.SimpleMonitorUpdateRequest{
@@ -230,7 +230,7 @@ func resourceSakuraCloudSimpleMonitorUpdate(d *schema.ResourceData, meta interfa
 		IconID:             expandSakuraCloudID(d, "icon_id"),
 	})
 	if err != nil {
-		return fmt.Errorf("updating SimpleMonitor is failed: %s", err)
+		return fmt.Errorf("updating SimpleMonitor[%s] is failed: %s", simpleMonitor.ID, err)
 	}
 
 	return resourceSakuraCloudSimpleMonitorRead(d, meta)
@@ -246,11 +246,11 @@ func resourceSakuraCloudSimpleMonitorDelete(d *schema.ResourceData, meta interfa
 			d.SetId("")
 			return nil
 		}
-		return fmt.Errorf("could not read SimpleMonitor: %s", err)
+		return fmt.Errorf("could not read SimpleMonitor[%s]: %s", d.Id(), err)
 	}
 
 	if err := smOp.Delete(ctx, simpleMonitor.ID); err != nil {
-		return fmt.Errorf("deleting SimpleMonitor is failed: %s", err)
+		return fmt.Errorf("deleting SimpleMonitor[%s] is failed: %s", simpleMonitor.ID, err)
 	}
 	return nil
 }

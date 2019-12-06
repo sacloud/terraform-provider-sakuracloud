@@ -111,17 +111,9 @@ func resourceSakuraCloudDNSCreate(d *schema.ResourceData, meta interface{}) erro
 	client, ctx, _ := getSacloudClient(d, meta)
 	dnsOp := sacloud.NewDNSOp(client)
 
-	opts := &sacloud.DNSCreateRequest{
-		Name:        d.Get("zone").(string),
-		Description: d.Get("description").(string),
-		Tags:        expandTags(d),
-		IconID:      expandSakuraCloudID(d, "icon_id"),
-		Records:     expandDNSRecords(d, "records"),
-	}
-
-	dns, err := dnsOp.Create(ctx, opts)
+	dns, err := dnsOp.Create(ctx, expandDNSCreateRequest(d))
 	if err != nil {
-		return fmt.Errorf("creating SakuraCloud DNS resource is failed: %s", err)
+		return fmt.Errorf("creating SakuraCloud DNS is failed: %s", err)
 	}
 
 	d.SetId(dns.ID.String())
@@ -138,7 +130,7 @@ func resourceSakuraCloudDNSRead(d *schema.ResourceData, meta interface{}) error 
 			d.SetId("")
 			return nil
 		}
-		return fmt.Errorf("could not read SakuraCloud DNS resource: %s", err)
+		return fmt.Errorf("could not read SakuraCloud DNS[%s]: %s", d.Id(), err)
 	}
 
 	return setDNSResourceData(ctx, d, client, dns)
@@ -148,20 +140,16 @@ func resourceSakuraCloudDNSUpdate(d *schema.ResourceData, meta interface{}) erro
 	client, ctx, _ := getSacloudClient(d, meta)
 	dnsOp := sacloud.NewDNSOp(client)
 
+	sakuraMutexKV.Lock(d.Id())
+	defer sakuraMutexKV.Unlock(d.Id())
+
 	dns, err := dnsOp.Read(ctx, sakuraCloudID(d.Id()))
 	if err != nil {
-		return fmt.Errorf("could not read SakuraCloud DNS resource: %s", err)
+		return fmt.Errorf("could not read SakuraCloud DNS[%s]: %s", d.Id(), err)
 	}
 
-	opts := &sacloud.DNSUpdateRequest{
-		Description: d.Get("description").(string),
-		Tags:        expandTags(d),
-		IconID:      expandSakuraCloudID(d, "icon_id"),
-		Records:     expandDNSRecords(d, "records"),
-	}
-
-	if _, err := dnsOp.Update(ctx, dns.ID, opts); err != nil {
-		return fmt.Errorf("updating SakuraCloud DNS resource is failed: %s", err)
+	if _, err := dnsOp.Update(ctx, dns.ID, expandDNSUpdateRequest(d)); err != nil {
+		return fmt.Errorf("updating SakuraCloud DNS[%s] is failed: %s", d.Id(), err)
 	}
 	return resourceSakuraCloudDNSRead(d, meta)
 }
@@ -170,28 +158,25 @@ func resourceSakuraCloudDNSDelete(d *schema.ResourceData, meta interface{}) erro
 	client, ctx, _ := getSacloudClient(d, meta)
 	dnsOp := sacloud.NewDNSOp(client)
 
+	sakuraMutexKV.Lock(d.Id())
+	defer sakuraMutexKV.Unlock(d.Id())
+
 	dns, err := dnsOp.Read(ctx, sakuraCloudID(d.Id()))
 	if err != nil {
 		if sacloud.IsNotFoundError(err) {
 			d.SetId("")
 			return nil
 		}
-		return fmt.Errorf("could not read SakuraCloud DNS resource: %s", err)
+		return fmt.Errorf("could not read SakuraCloud DNS[%s]: %s", d.Id(), err)
 	}
 
 	if err := dnsOp.Delete(ctx, dns.ID); err != nil {
-		return fmt.Errorf("deleting SakuraCloud DNS resource is failed: %s", err)
+		return fmt.Errorf("deleting SakuraCloud DNS[%s] is failed: %s", d.Id(), err)
 	}
-
 	return nil
 }
 
 func setDNSResourceData(ctx context.Context, d *schema.ResourceData, client *APIClient, data *sacloud.DNS) error {
-	var records []interface{}
-	for _, record := range data.Records {
-		records = append(records, dnsRecordToState(record))
-	}
-
 	d.Set("zone", data.Name)
 	d.Set("icon_id", data.IconID.String())
 	d.Set("description", data.Description)
@@ -201,13 +186,41 @@ func setDNSResourceData(ctx context.Context, d *schema.ResourceData, client *API
 	if err := d.Set("dns_servers", data.DNSNameServers); err != nil {
 		return err
 	}
-	if err := d.Set("records", records); err != nil {
+	if err := d.Set("records", flattenDNSRecords(data)); err != nil {
 		return err
 	}
 	return nil
 }
 
-func dnsRecordToState(record *sacloud.DNSRecord) map[string]interface{} {
+func expandDNSCreateRequest(d *schema.ResourceData) *sacloud.DNSCreateRequest {
+	return &sacloud.DNSCreateRequest{
+		Name:        d.Get("zone").(string),
+		Description: d.Get("description").(string),
+		Tags:        expandTags(d),
+		IconID:      expandSakuraCloudID(d, "icon_id"),
+		Records:     expandDNSRecords(d, "records"),
+	}
+}
+
+func expandDNSUpdateRequest(d *schema.ResourceData) *sacloud.DNSUpdateRequest {
+	return &sacloud.DNSUpdateRequest{
+		Description: d.Get("description").(string),
+		Tags:        expandTags(d),
+		IconID:      expandSakuraCloudID(d, "icon_id"),
+		Records:     expandDNSRecords(d, "records"),
+	}
+}
+
+func flattenDNSRecords(dns *sacloud.DNS) []interface{} {
+	var records []interface{}
+	for _, record := range dns.Records {
+		records = append(records, flattenDNSRecord(record))
+	}
+
+	return records
+}
+
+func flattenDNSRecord(record *sacloud.DNSRecord) map[string]interface{} {
 	var r = map[string]interface{}{
 		"name":  record.Name,
 		"type":  record.Type,

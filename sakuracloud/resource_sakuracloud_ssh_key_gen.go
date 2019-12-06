@@ -92,7 +92,7 @@ func resourceSakuraCloudSSHKeyGenRead(d *schema.ResourceData, meta interface{}) 
 			d.SetId("")
 			return nil
 		}
-		return fmt.Errorf("could not read SSHKey: %s", err)
+		return fmt.Errorf("could not read SSHKey[%s]: %s", d.Id(), err)
 	}
 
 	return setSSHKeyGenResourceData(d, client, key)
@@ -108,11 +108,11 @@ func resourceSakuraCloudSSHKeyGenDelete(d *schema.ResourceData, meta interface{}
 			d.SetId("")
 			return nil
 		}
-		return fmt.Errorf("could not read SSHKey: %s", err)
+		return fmt.Errorf("could not read SSHKey[%s]: %s", d.Id(), err)
 	}
 
 	if err := sshKeyOp.Delete(ctx, key.ID); err != nil {
-		return fmt.Errorf("deleting SSHKey is failed: %s", err)
+		return fmt.Errorf("deleting SSHKey[%s] is failed: %s", key.ID, err)
 	}
 	return nil
 

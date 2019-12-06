@@ -35,6 +35,8 @@ var (
 )
 
 func TestAccResourceSakuraCloudIPv4Ptr(t *testing.T) {
+	skipIfFakeModeEnabled(t)
+
 	var ip sacloud.IPAddress
 	if domain, ok := os.LookupEnv(envTestDomain); ok {
 		testDomain = domain

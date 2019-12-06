@@ -98,7 +98,7 @@ func resourceSakuraCloudNoteRead(d *schema.ResourceData, meta interface{}) error
 			d.SetId("")
 			return nil
 		}
-		return fmt.Errorf("could not read SakuraCloud Note: %s", err)
+		return fmt.Errorf("could not read SakuraCloud Note[%s]: %s", d.Id(), err)
 	}
 
 	return setNoteResourceData(ctx, d, client, note)
@@ -110,7 +110,7 @@ func resourceSakuraCloudNoteUpdate(d *schema.ResourceData, meta interface{}) err
 
 	note, err := noteOp.Read(ctx, sakuraCloudID(d.Id()))
 	if err != nil {
-		return fmt.Errorf("could not read SakuraCloud Note: %s", err)
+		return fmt.Errorf("could not read SakuraCloud Note[%s]: %s", d.Id(), err)
 	}
 
 	_, err = noteOp.Update(ctx, note.ID, &sacloud.NoteUpdateRequest{
@@ -121,7 +121,7 @@ func resourceSakuraCloudNoteUpdate(d *schema.ResourceData, meta interface{}) err
 		Content: d.Get("content").(string),
 	})
 	if err != nil {
-		return fmt.Errorf("updating SakuraCloud Note is failed: %s", err)
+		return fmt.Errorf("updating SakuraCloud Note[%s] is failed: %s", d.Id(), err)
 	}
 
 	return resourceSakuraCloudNoteRead(d, meta)
@@ -137,11 +137,11 @@ func resourceSakuraCloudNoteDelete(d *schema.ResourceData, meta interface{}) err
 			d.SetId("")
 			return nil
 		}
-		return fmt.Errorf("could not read SakuraCloud Note: %s", err)
+		return fmt.Errorf("could not read SakuraCloud Note[%s]: %s", d.Id(), err)
 	}
 
 	if err := noteOp.Delete(ctx, note.ID); err != nil {
-		return fmt.Errorf("deleting SakuraCloud Note is failed: %s", err)
+		return fmt.Errorf("deleting SakuraCloud Note[%s] is failed: %s", d.Id(), err)
 	}
 	return nil
 }
