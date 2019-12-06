@@ -62,9 +62,17 @@ func testAccPreCheck(t *testing.T) {
 		"SACLOUD_OJS_SECRET_ACCESS_KEY",
 	}
 
-	for _, env := range requiredEnvs {
-		if v := os.Getenv(env); v == "" {
-			t.Fatal(fmt.Sprintf("%s must be set for acceptance tests", env))
+	if isFakeModeEnabled() {
+		for _, env := range requiredEnvs {
+			if err := os.Setenv(env, "dummy"); err != nil {
+				t.Fatalf("setting up dummy environment variables is failed: %s", err)
+			}
+		}
+	} else {
+		for _, env := range requiredEnvs {
+			if v := os.Getenv(env); v == "" {
+				t.Fatal(fmt.Sprintf("%s must be set for acceptance tests", env))
+			}
 		}
 	}
 
