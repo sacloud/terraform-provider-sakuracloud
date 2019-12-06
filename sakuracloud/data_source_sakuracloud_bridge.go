@@ -35,11 +35,6 @@ func dataSourceSakuraCloudBridge() *schema.Resource {
 				Type:     schema.TypeString,
 				Computed: true,
 			},
-			"switch_ids": {
-				Type:     schema.TypeList,
-				Computed: true,
-				Elem:     &schema.Schema{Type: schema.TypeString},
-			},
 			"zone": {
 				Type:         schema.TypeString,
 				Optional:     true,

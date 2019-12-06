@@ -135,7 +135,6 @@ resource "sakuracloud_server" "foobar" {
   name = "myserver"
   description = "Server from TerraForm for SAKURA CLOUD"
   additional_nics = ["${sakuracloud_switch.foobar.id}"]
-  graceful_shutdown_timeout = 3
 }
 resource "sakuracloud_switch" "foobar" {
   name = "myswitch_upd"

@@ -82,7 +82,47 @@ func (o *DiskOp) Create(ctx context.Context, zone string, param *sacloud.DiskCre
 
 // Config is fake implementation
 func (o *DiskOp) Config(ctx context.Context, zone string, id types.ID, edit *sacloud.DiskEditRequest) error {
-	// TODO ディスクに接続されたサーバのIDを拾ってInterfaces[0].UserSubnet.DefaultRoute/UserIPAddressなども書き換えた方がいいかも?
+	disk, err := o.Read(ctx, zone, id)
+	if err != nil {
+		return err
+	}
+	if disk.ServerID.IsEmpty() {
+		return nil
+	}
+
+	serverOp := NewServerOp()
+	server, err := serverOp.Read(ctx, zone, disk.ServerID)
+	if err != nil {
+		return err
+	}
+
+	if len(server.Interfaces) > 0 {
+		nic := server.Interfaces[0]
+		if nic.SwitchScope == types.Scopes.Shared {
+			nic.IPAddress = pool().nextSharedIP().String()
+		} else {
+			nic.UserIPAddress = edit.UserIPAddress
+		}
+
+		swOp := NewSwitchOp()
+		sw, err := swOp.Read(ctx, zone, nic.SwitchID)
+		if err != nil {
+			return err
+		}
+
+		if len(sw.Subnets) == 0 {
+			nic.UserSubnetDefaultRoute = edit.UserSubnet.DefaultRoute
+			nic.UserSubnetNetworkMaskLen = edit.UserSubnet.NetworkMaskLen
+		} else {
+			nic.UserSubnetDefaultRoute = sw.Subnets[0].DefaultRoute
+			nic.UserSubnetNetworkMaskLen = sw.Subnets[0].NetworkMaskLen
+			nic.SubnetDefaultRoute = sw.Subnets[0].DefaultRoute
+			nic.SubnetNetworkAddress = sw.Subnets[0].NetworkAddress
+		}
+
+		putServer(zone, server)
+	}
+
 	return nil
 }
 
@@ -99,6 +139,10 @@ func (o *DiskOp) CreateWithConfig(ctx context.Context, zone string, createParam 
 
 	result, err := o.Create(ctx, zone, createParam, distantFrom)
 	if err != nil {
+		return nil, err
+	}
+
+	if err := o.Config(ctx, zone, result.ID, editParam); err != nil {
 		return nil, err
 	}
 

@@ -216,7 +216,7 @@ func resourceSakuraCloudMobileGatewayCreate(d *schema.ResourceData, meta interfa
 
 	// connect to switch
 	if !switchID.IsEmpty() {
-		patchParam := &sacloud.MobileGatewayPatchRequest{
+		updateParam := &sacloud.MobileGatewayUpdateSettingsRequest{
 			Settings:     mgw.Settings,
 			SettingsHash: mgw.SettingsHash,
 		}
@@ -225,13 +225,13 @@ func resourceSakuraCloudMobileGatewayCreate(d *schema.ResourceData, meta interfa
 			return fmt.Errorf("connecting to switch is failed: %s", err)
 		}
 
-		patchParam.Settings.Interfaces = append(patchParam.Settings.Interfaces, &sacloud.MobileGatewayInterfaceSetting{
+		updateParam.Settings.Interfaces = append(updateParam.Settings.Interfaces, &sacloud.MobileGatewayInterfaceSetting{
 			IPAddress:      []string{ip},
 			NetworkMaskLen: nwMaskLen,
 			Index:          1,
 		})
 
-		upd, err := mgwOp.Patch(ctx, zone, mgw.ID, patchParam)
+		upd, err := mgwOp.UpdateSettings(ctx, zone, mgw.ID, updateParam)
 		if err != nil {
 			return fmt.Errorf("updating network settings is failed: %s", err)
 		}
@@ -261,13 +261,13 @@ func resourceSakuraCloudMobileGatewayCreate(d *schema.ResourceData, meta interfa
 	// static route
 	staticRoutes := expandMobileGatewayStaticRoutes(d)
 	if len(staticRoutes) > 0 {
-		patchParam := &sacloud.MobileGatewayPatchRequest{
+		updateParam := &sacloud.MobileGatewayUpdateSettingsRequest{
 			Settings:     mgw.Settings,
 			SettingsHash: mgw.SettingsHash,
 		}
-		patchParam.Settings.StaticRoute = staticRoutes
+		updateParam.Settings.StaticRoute = staticRoutes
 
-		upd, err := mgwOp.Patch(ctx, zone, mgw.ID, patchParam)
+		upd, err := mgwOp.UpdateSettings(ctx, zone, mgw.ID, updateParam)
 		if err != nil {
 			return fmt.Errorf("updating static routes is failed: %s", err)
 		}

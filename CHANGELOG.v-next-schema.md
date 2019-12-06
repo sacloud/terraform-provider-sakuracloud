@@ -29,6 +29,10 @@ data sakuracoud_server "example" {
 }
 ```
 
+- Bridgeデータソース
+
+  - `switch_ids`属性の廃止
+
 - Iconデータソース
 
   - `body`属性の廃止
@@ -56,6 +60,11 @@ data sakuracoud_server "example" {
   - サイト間VPNの詳細情報属性を除去
   
 ## リソース
+
+- Bridge
+
+  - `switch_ids`属性の廃止
+
 
 - PacketFilterルール
 

@@ -24,6 +24,7 @@ import (
 )
 
 func TestAccSakuraCloudBucketObjectDataSource_Basic(t *testing.T) {
+	skipIfFakeModeEnabled(t)
 
 	randString1 := acctest.RandStringFromCharSet(10, acctest.CharSetAlpha)
 	randString2 := acctest.RandStringFromCharSet(10, acctest.CharSetAlpha)

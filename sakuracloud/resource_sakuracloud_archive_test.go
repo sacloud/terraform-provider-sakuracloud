@@ -26,6 +26,8 @@ import (
 )
 
 func TestAccResourceSakuraCloudArchive(t *testing.T) {
+	skipIfFakeModeEnabled(t)
+
 	var archive sacloud.Archive
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
@@ -110,6 +112,8 @@ func testAccCheckSakuraCloudArchiveDestroy(s *terraform.State) error {
 }
 
 func TestAccImportSakuraCloudArchive(t *testing.T) {
+	skipIfFakeModeEnabled(t)
+
 	checkFn := func(s []*terraform.InstanceState) error {
 		if len(s) != 1 {
 			return fmt.Errorf("expected 1 state: %#v", s)

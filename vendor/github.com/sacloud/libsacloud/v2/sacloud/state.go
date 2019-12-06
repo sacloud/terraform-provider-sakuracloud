@@ -33,10 +33,10 @@ type StateWaiter interface {
 }
 
 var (
-	// DefaultStatePollTimeout StatePollWaiterでのデフォルトタイムアウト
-	DefaultStatePollTimeout = 20 * time.Minute
-	// DefaultStatePollInterval StatePollWaiterでのデフォルトポーリング間隔
-	DefaultStatePollInterval = 5 * time.Second
+	// DefaultStatePollingTimeout StatePollWaiterでのデフォルトタイムアウト
+	DefaultStatePollingTimeout = 20 * time.Minute
+	// DefaultStatePollingInterval StatePollWaiterでのデフォルトポーリング間隔
+	DefaultStatePollingInterval = 5 * time.Second
 )
 
 // StateReadFunc StatePollWaiterにより利用される、対象リソースの状態を取得するためのfunc
@@ -69,8 +69,8 @@ func (e *UnexpectedInstanceStatusError) Error() string {
 	return fmt.Sprintf("resource returns unexpected instance status value: %s", e.Err.Error())
 }
 
-// StatePollWaiter ポーリングによりリソースの状態が変わるまで待機する
-type StatePollWaiter struct {
+// StatePollingWaiter ポーリングによりリソースの状態が変わるまで待機する
+type StatePollingWaiter struct {
 	// NotFoundRetry Readで404が返ってきた場合のリトライ回数
 	//
 	// アプライアンスなどの一部のリソースでは作成~起動完了までの間に404を返すことがある。
@@ -119,36 +119,36 @@ type StatePollWaiter struct {
 
 	// Timeout タイムアウト
 	Timeout time.Duration // タイムアウト
-	// PollInterval ポーリング間隔
-	PollInterval time.Duration
+	// PollingInterval ポーリング間隔
+	PollingInterval time.Duration
 }
 
-func (w *StatePollWaiter) validateFields() {
+func (w *StatePollingWaiter) validateFields() {
 	if w.ReadFunc == nil {
-		panic(errors.New("StatePollWaiter has invalid setting: ReadFunc is required"))
+		panic(errors.New("StatePollingWaiter has invalid setting: ReadFunc is required"))
 	}
 
 	if w.StateCheckFunc != nil && (len(w.TargetAvailability) > 0 || len(w.TargetInstanceStatus) > 0) {
-		panic(errors.New("StatePollWaiter has invalid setting: StateCheckFunc and TargetAvailability/TargetInstanceStatus can not use together"))
+		panic(errors.New("StatePollingWaiter has invalid setting: StateCheckFunc and TargetAvailability/TargetInstanceStatus can not use together"))
 	}
 
 	if w.StateCheckFunc == nil && len(w.TargetAvailability) == 0 && len(w.TargetInstanceStatus) == 0 {
-		panic(errors.New("StatePollWaiter has invalid setting: TargetAvailability or TargetInstanceState must have least 1 items when StateCheckFunc is not set"))
+		panic(errors.New("StatePollingWaiter has invalid setting: TargetAvailability or TargetInstanceState must have least 1 items when StateCheckFunc is not set"))
 	}
 }
 
-func (w *StatePollWaiter) defaults() {
+func (w *StatePollingWaiter) defaults() {
 
 	if w.Timeout == time.Duration(0) {
-		w.Timeout = DefaultStatePollTimeout
+		w.Timeout = DefaultStatePollingTimeout
 	}
-	if w.PollInterval == time.Duration(0) {
-		w.PollInterval = DefaultStatePollInterval
+	if w.PollingInterval == time.Duration(0) {
+		w.PollingInterval = DefaultStatePollingInterval
 	}
 }
 
 // WaitForState リソースが指定の状態になるまで待つ
-func (w *StatePollWaiter) WaitForState(ctx context.Context) (interface{}, error) {
+func (w *StatePollingWaiter) WaitForState(ctx context.Context) (interface{}, error) {
 	c, p, e := w.AsyncWaitForState(ctx)
 	for {
 		select {
@@ -165,7 +165,7 @@ func (w *StatePollWaiter) WaitForState(ctx context.Context) (interface{}, error)
 }
 
 // AsyncWaitForState リソースが指定の状態になるまで待つ
-func (w *StatePollWaiter) AsyncWaitForState(ctx context.Context) (compCh <-chan interface{}, progressCh <-chan interface{}, errorCh <-chan error) {
+func (w *StatePollingWaiter) AsyncWaitForState(ctx context.Context) (compCh <-chan interface{}, progressCh <-chan interface{}, errorCh <-chan error) {
 
 	w.validateFields()
 	w.defaults()
@@ -174,7 +174,7 @@ func (w *StatePollWaiter) AsyncWaitForState(ctx context.Context) (compCh <-chan 
 	progChan := make(chan interface{})
 	errChan := make(chan error)
 
-	tick := time.Tick(w.PollInterval)
+	tick := time.Tick(w.PollingInterval)
 	bomb := time.After(w.Timeout)
 
 	go func() {
@@ -221,7 +221,7 @@ func (w *StatePollWaiter) AsyncWaitForState(ctx context.Context) (compCh <-chan 
 	return compChan, progChan, errChan
 }
 
-func (w *StatePollWaiter) handleState(state interface{}) (bool, error) {
+func (w *StatePollingWaiter) handleState(state interface{}) (bool, error) {
 	if w.StateCheckFunc != nil {
 		return w.StateCheckFunc(state)
 	}
@@ -252,7 +252,7 @@ func (w *StatePollWaiter) handleState(state interface{}) (bool, error) {
 	}
 }
 
-func (w *StatePollWaiter) handleAvailability(state accessor.Availability) (bool, error) {
+func (w *StatePollingWaiter) handleAvailability(state accessor.Availability) (bool, error) {
 	if len(w.TargetAvailability) == 0 {
 		return true, nil
 	}
@@ -267,7 +267,7 @@ func (w *StatePollWaiter) handleAvailability(state accessor.Availability) (bool,
 	}
 }
 
-func (w *StatePollWaiter) handleInstanceState(state accessor.InstanceStatus) (bool, error) {
+func (w *StatePollingWaiter) handleInstanceState(state accessor.InstanceStatus) (bool, error) {
 	if len(w.TargetInstanceStatus) == 0 {
 		return true, nil
 	}
@@ -282,7 +282,7 @@ func (w *StatePollWaiter) handleInstanceState(state accessor.InstanceStatus) (bo
 	}
 }
 
-func (w *StatePollWaiter) isInAvailability(v types.EAvailability, conds []types.EAvailability) bool {
+func (w *StatePollingWaiter) isInAvailability(v types.EAvailability, conds []types.EAvailability) bool {
 	for _, cond := range conds {
 		if v == cond {
 			return true
@@ -291,7 +291,7 @@ func (w *StatePollWaiter) isInAvailability(v types.EAvailability, conds []types.
 	return false
 }
 
-func (w *StatePollWaiter) isInInstanceStatus(v types.EServerInstanceStatus, conds []types.EServerInstanceStatus) bool {
+func (w *StatePollingWaiter) isInInstanceStatus(v types.EServerInstanceStatus, conds []types.EServerInstanceStatus) bool {
 	for _, cond := range conds {
 		if v == cond {
 			return true

@@ -274,6 +274,13 @@ func (o *InternetOp) UpdateSubnet(ctx context.Context, zone string, id types.ID,
 		return nil, err
 	}
 
+	rSubnet, err := NewSubnetOp().Read(ctx, zone, subnetID)
+	if err != nil {
+		return nil, err
+	}
+
+	rSubnet.NextHop = param.NextHop
+
 	var nwMaskLen int
 	var nwAddress, minAddr, maxAddr string
 	var addresses []string
@@ -308,6 +315,7 @@ func (o *InternetOp) UpdateSubnet(ctx context.Context, zone string, id types.ID,
 		i++
 	}
 
+	putSubnet(zone, rSubnet)
 	putSwitch(zone, sw)
 	putInternet(zone, value)
 	return &sacloud.InternetSubnetOperationResult{
@@ -350,6 +358,7 @@ func (o *InternetOp) DeleteSubnet(ctx context.Context, zone string, id types.ID,
 	}
 	value.Switch.Subnets = iSubnets
 
+	ds().Delete(ResourceSubnet, zone, subnetID)
 	putSwitch(zone, sw)
 	putInternet(zone, value)
 	return nil

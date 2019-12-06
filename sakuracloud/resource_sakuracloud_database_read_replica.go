@@ -189,7 +189,7 @@ func resourceSakuraCloudDatabaseReadReplicaCreate(d *schema.ResourceData, meta i
 
 	// HACK データベースアプライアンスの電源投入後すぐに他の操作(Updateなど)を行うと202(Accepted)が返ってくるものの無視される。
 	// この挙動はテストなどで問題となる。このためここで少しsleepすることで対応する。
-	time.Sleep(1 * time.Minute)
+	time.Sleep(client.databaseWaitAfterCreateDuration)
 
 	d.SetId(database.ID.String())
 	return setDatabaseReadReplicaResourceData(ctx, d, client, database)
@@ -219,14 +219,17 @@ func resourceSakuraCloudDatabaseReadReplicaUpdate(d *schema.ResourceData, meta i
 		return fmt.Errorf("could not read SakuraCloud Database[%s]: %s", d.Id(), err)
 	}
 
-	req := &sacloud.DatabasePatchRequest{
-		Name:         d.Get("name").(string),
-		Description:  d.Get("description").(string),
-		Tags:         expandTags(d),
-		IconID:       expandSakuraCloudID(d, "icon_id"),
-		SettingsHash: db.SettingsHash,
+	req := &sacloud.DatabaseUpdateRequest{
+		Name:               d.Get("name").(string),
+		Description:        d.Get("description").(string),
+		Tags:               expandTags(d),
+		IconID:             expandSakuraCloudID(d, "icon_id"),
+		CommonSetting:      db.CommonSetting,
+		BackupSetting:      db.BackupSetting,
+		ReplicationSetting: db.ReplicationSetting,
+		SettingsHash:       db.SettingsHash,
 	}
-	db, err = dbOp.Patch(ctx, zone, db.ID, req)
+	db, err = dbOp.Update(ctx, zone, db.ID, req)
 	if err != nil {
 		return fmt.Errorf("updating SakuraCloud Database[%s] is failed: %s", d.Id(), err)
 	}

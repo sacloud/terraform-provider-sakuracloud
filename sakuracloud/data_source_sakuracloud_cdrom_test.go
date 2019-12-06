@@ -102,7 +102,7 @@ data "sakuracloud_cdrom" "foobar" {
 var testAccCheckSakuraCloudDataSourceCDROM_NameSelector_Exists = `
 data "sakuracloud_cdrom" "foobar" {
   filters {
-    names = ["Ubuntu","server","18"]
+    names = ["Ubuntu","Server","18"]
   }
 }
 `

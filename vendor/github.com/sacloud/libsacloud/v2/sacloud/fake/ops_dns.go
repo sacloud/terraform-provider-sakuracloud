@@ -49,6 +49,7 @@ func (o *DNSOp) Create(ctx context.Context, param *sacloud.DNSCreateRequest) (*s
 	result.Availability = types.Availabilities.Available
 	result.SettingsHash = "settingshash"
 	result.DNSZone = param.Name
+	result.DNSNameServers = []string{"ns1.gslb4.sakura.ne.jp", "ns2.gslb4.sakura.ne.jp"}
 
 	putDNS(sacloud.APIDefaultZone, result)
 	return result, nil

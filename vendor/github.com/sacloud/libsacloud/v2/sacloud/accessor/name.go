@@ -12,21 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package types
+package accessor
 
-// EScope スコープ
-type EScope string
-
-// String スコープの文字列表現
-func (s EScope) String() string {
-	return string(s)
-}
-
-// Scopes スコープ
-var Scopes = &struct {
-	Shared EScope // 共有
-	User   EScope // ユーザー
-}{
-	Shared: EScope("shared"),
-	User:   EScope("user"),
+// Name Nameを持つリソース向けのインターフェース
+type Name interface {
+	GetName() string
+	SetName(v string)
 }

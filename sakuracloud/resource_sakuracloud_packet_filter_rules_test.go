@@ -21,7 +21,7 @@ import (
 	"github.com/sacloud/libsacloud/v2/sacloud"
 )
 
-func TestAccResourceSakuraCloudPacketFilterRule(t *testing.T) {
+func TestAccResourceSakuraCloudPacketFilterRules(t *testing.T) {
 	var filter sacloud.PacketFilter
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
@@ -33,74 +33,74 @@ func TestAccResourceSakuraCloudPacketFilterRule(t *testing.T) {
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckSakuraCloudPacketFilterExists("sakuracloud_packet_filter.foobar", &filter),
 					resource.TestCheckResourceAttr(
-						"sakuracloud_packet_filter_rule.rules", "expressions.0.protocol", "tcp"),
+						"sakuracloud_packet_filter_rules.rules", "expressions.0.protocol", "tcp"),
 					resource.TestCheckResourceAttr(
-						"sakuracloud_packet_filter_rule.rules", "expressions.0.source_network", "192.168.2.0"),
+						"sakuracloud_packet_filter_rules.rules", "expressions.0.source_network", "192.168.2.0"),
 					resource.TestCheckResourceAttr(
-						"sakuracloud_packet_filter_rule.rules", "expressions.0.source_port", "80"),
+						"sakuracloud_packet_filter_rules.rules", "expressions.0.source_port", "80"),
 					resource.TestCheckResourceAttr(
-						"sakuracloud_packet_filter_rule.rules", "expressions.0.destination_port", "80"),
+						"sakuracloud_packet_filter_rules.rules", "expressions.0.destination_port", "80"),
 					resource.TestCheckResourceAttr(
-						"sakuracloud_packet_filter_rule.rules", "expressions.0.allow", "true"),
+						"sakuracloud_packet_filter_rules.rules", "expressions.0.allow", "true"),
 
 					resource.TestCheckResourceAttr(
-						"sakuracloud_packet_filter_rule.rules", "expressions.1.protocol", "tcp"),
+						"sakuracloud_packet_filter_rules.rules", "expressions.1.protocol", "tcp"),
 					resource.TestCheckResourceAttr(
-						"sakuracloud_packet_filter_rule.rules", "expressions.1.source_network", "192.168.2.0"),
+						"sakuracloud_packet_filter_rules.rules", "expressions.1.source_network", "192.168.2.0"),
 					resource.TestCheckResourceAttr(
-						"sakuracloud_packet_filter_rule.rules", "expressions.1.source_port", "443"),
+						"sakuracloud_packet_filter_rules.rules", "expressions.1.source_port", "443"),
 					resource.TestCheckResourceAttr(
-						"sakuracloud_packet_filter_rule.rules", "expressions.1.destination_port", "443"),
+						"sakuracloud_packet_filter_rules.rules", "expressions.1.destination_port", "443"),
 					resource.TestCheckResourceAttr(
-						"sakuracloud_packet_filter_rule.rules", "expressions.1.allow", "true"),
+						"sakuracloud_packet_filter_rules.rules", "expressions.1.allow", "true"),
 
 					resource.TestCheckResourceAttr(
-						"sakuracloud_packet_filter_rule.rules", "expressions.2.protocol", "ip"),
+						"sakuracloud_packet_filter_rules.rules", "expressions.2.protocol", "ip"),
 					resource.TestCheckResourceAttr(
-						"sakuracloud_packet_filter_rule.rules", "expressions.2.source_network", ""),
+						"sakuracloud_packet_filter_rules.rules", "expressions.2.source_network", ""),
 					resource.TestCheckResourceAttr(
-						"sakuracloud_packet_filter_rule.rules", "expressions.2.source_port", ""),
+						"sakuracloud_packet_filter_rules.rules", "expressions.2.source_port", ""),
 					resource.TestCheckResourceAttr(
-						"sakuracloud_packet_filter_rule.rules", "expressions.2.destination_port", ""),
+						"sakuracloud_packet_filter_rules.rules", "expressions.2.destination_port", ""),
 					resource.TestCheckResourceAttr(
-						"sakuracloud_packet_filter_rule.rules", "expressions.2.allow", "false"),
+						"sakuracloud_packet_filter_rules.rules", "expressions.2.allow", "false"),
 				),
 			},
 			{
 				Config: testAccCheckSakuraCloudPacketFilterRuleConfig_update,
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttr(
-						"sakuracloud_packet_filter_rule.rules", "expressions.0.protocol", "udp"),
+						"sakuracloud_packet_filter_rules.rules", "expressions.0.protocol", "udp"),
 					resource.TestCheckResourceAttr(
-						"sakuracloud_packet_filter_rule.rules", "expressions.0.source_network", "192.168.2.2"),
+						"sakuracloud_packet_filter_rules.rules", "expressions.0.source_network", "192.168.2.2"),
 					resource.TestCheckResourceAttr(
-						"sakuracloud_packet_filter_rule.rules", "expressions.0.source_port", "80"),
+						"sakuracloud_packet_filter_rules.rules", "expressions.0.source_port", "80"),
 					resource.TestCheckResourceAttr(
-						"sakuracloud_packet_filter_rule.rules", "expressions.0.destination_port", "80"),
+						"sakuracloud_packet_filter_rules.rules", "expressions.0.destination_port", "80"),
 					resource.TestCheckResourceAttr(
-						"sakuracloud_packet_filter_rule.rules", "expressions.0.allow", "true"),
+						"sakuracloud_packet_filter_rules.rules", "expressions.0.allow", "true"),
 
 					resource.TestCheckResourceAttr(
-						"sakuracloud_packet_filter_rule.rules", "expressions.1.protocol", "udp"),
+						"sakuracloud_packet_filter_rules.rules", "expressions.1.protocol", "udp"),
 					resource.TestCheckResourceAttr(
-						"sakuracloud_packet_filter_rule.rules", "expressions.1.source_network", "192.168.2.2"),
+						"sakuracloud_packet_filter_rules.rules", "expressions.1.source_network", "192.168.2.2"),
 					resource.TestCheckResourceAttr(
-						"sakuracloud_packet_filter_rule.rules", "expressions.1.source_port", "443"),
+						"sakuracloud_packet_filter_rules.rules", "expressions.1.source_port", "443"),
 					resource.TestCheckResourceAttr(
-						"sakuracloud_packet_filter_rule.rules", "expressions.1.destination_port", "443"),
+						"sakuracloud_packet_filter_rules.rules", "expressions.1.destination_port", "443"),
 					resource.TestCheckResourceAttr(
-						"sakuracloud_packet_filter_rule.rules", "expressions.1.allow", "true"),
+						"sakuracloud_packet_filter_rules.rules", "expressions.1.allow", "true"),
 
 					resource.TestCheckResourceAttr(
-						"sakuracloud_packet_filter_rule.rules", "expressions.2.protocol", "ip"),
+						"sakuracloud_packet_filter_rules.rules", "expressions.2.protocol", "ip"),
 					resource.TestCheckResourceAttr(
-						"sakuracloud_packet_filter_rule.rules", "expressions.2.source_network", ""),
+						"sakuracloud_packet_filter_rules.rules", "expressions.2.source_network", ""),
 					resource.TestCheckResourceAttr(
-						"sakuracloud_packet_filter_rule.rules", "expressions.2.source_port", ""),
+						"sakuracloud_packet_filter_rules.rules", "expressions.2.source_port", ""),
 					resource.TestCheckResourceAttr(
-						"sakuracloud_packet_filter_rule.rules", "expressions.2.destination_port", ""),
+						"sakuracloud_packet_filter_rules.rules", "expressions.2.destination_port", ""),
 					resource.TestCheckResourceAttr(
-						"sakuracloud_packet_filter_rule.rules", "expressions.2.allow", "false"),
+						"sakuracloud_packet_filter_rules.rules", "expressions.2.allow", "false"),
 				),
 			},
 		},
@@ -113,7 +113,7 @@ resource "sakuracloud_packet_filter" "foobar" {
   description = "PacketFilter from TerraForm for SAKURA CLOUD"
 }
 
-resource sakuracloud_packet_filter_rule "rules" {
+resource sakuracloud_packet_filter_rules "rules" {
   packet_filter_id = "${sakuracloud_packet_filter.foobar.id}"
   expressions {
  	protocol         = "tcp"
@@ -142,7 +142,7 @@ resource "sakuracloud_packet_filter" "foobar" {
   description = "PacketFilter from TerraForm for SAKURA CLOUD"
 }
 
-resource sakuracloud_packet_filter_rule "rules" {
+resource sakuracloud_packet_filter_rules "rules" {
   packet_filter_id = "${sakuracloud_packet_filter.foobar.id}"
   expressions {
    	protocol         = "udp"
