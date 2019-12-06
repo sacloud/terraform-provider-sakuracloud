@@ -294,7 +294,6 @@ resource "sakuracloud_icon" "foobar" {
 
 resource sakuracloud_server "server01" {
   name = "terraform-test-server01"
-  graceful_shutdown_timeout = 1
 }
 `
 
@@ -326,7 +325,6 @@ resource "sakuracloud_proxylb" "foobar" {
 
 resource sakuracloud_server "server01" {
   name = "terraform-test-server01"
-  graceful_shutdown_timeout = 1
 }
 `
 

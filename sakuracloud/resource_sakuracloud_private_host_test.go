@@ -173,7 +173,6 @@ var testAccCheckSakuraCloudPrivateHostConfig_Basic = `
 resource "sakuracloud_server" "foobar" {
   name = "myserver"
   private_host_id = "${sakuracloud_private_host.foobar.id}"
-  graceful_shutdown_timeout = 5
 }
 resource "sakuracloud_private_host" "foobar" {
   name = "before"
@@ -198,7 +197,6 @@ var testAccCheckSakuraCloudPrivateHostConfig_Destroy_Basic = `
 resource "sakuracloud_server" "foobar" {
   name = "myserver"
   private_host_id = "${sakuracloud_private_host.foobar.id}"
-  graceful_shutdown_timeout = 5
 }
 resource "sakuracloud_private_host" "foobar" {
   name = "before"
@@ -210,6 +208,5 @@ resource "sakuracloud_private_host" "foobar" {
 var testAccCheckSakuraCloudPrivateHostConfig_Destroy_Update = `
 resource "sakuracloud_server" "foobar" {
   name = "myserver"
-  graceful_shutdown_timeout = 5
 }
 `

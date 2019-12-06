@@ -25,7 +25,7 @@ import (
 
 // Find is fake implementation
 func (o *PrivateHostOp) Find(ctx context.Context, zone string, conditions *sacloud.FindCondition) (*sacloud.PrivateHostFindResult, error) {
-	results, _ := find(o.key, sacloud.APIDefaultZone, conditions)
+	results, _ := find(o.key, zone, conditions)
 	var values []*sacloud.PrivateHost
 	for _, res := range results {
 		dest := &sacloud.PrivateHost{}
@@ -57,13 +57,13 @@ func (o *PrivateHostOp) Create(ctx context.Context, zone string, param *sacloud.
 	result.CPU = plan.CPU
 	result.MemoryMB = plan.MemoryMB
 	result.HostName = "sac-zone-svNNN"
-	putPrivateHost(sacloud.APIDefaultZone, result)
+	putPrivateHost(zone, result)
 	return result, nil
 }
 
 // Read is fake implementation
 func (o *PrivateHostOp) Read(ctx context.Context, zone string, id types.ID) (*sacloud.PrivateHost, error) {
-	value := getPrivateHostByID(sacloud.APIDefaultZone, id)
+	value := getPrivateHostByID(zone, id)
 	if value == nil {
 		return nil, newErrorNotFound(o.key, id)
 	}
@@ -74,7 +74,7 @@ func (o *PrivateHostOp) Read(ctx context.Context, zone string, id types.ID) (*sa
 
 // Update is fake implementation
 func (o *PrivateHostOp) Update(ctx context.Context, zone string, id types.ID, param *sacloud.PrivateHostUpdateRequest) (*sacloud.PrivateHost, error) {
-	value, err := o.Read(ctx, sacloud.APIDefaultZone, id)
+	value, err := o.Read(ctx, zone, id)
 	if err != nil {
 		return nil, err
 	}
@@ -120,11 +120,11 @@ func (o *PrivateHostOp) Patch(ctx context.Context, zone string, id types.ID, par
 
 // Delete is fake implementation
 func (o *PrivateHostOp) Delete(ctx context.Context, zone string, id types.ID) error {
-	_, err := o.Read(ctx, sacloud.APIDefaultZone, id)
+	_, err := o.Read(ctx, zone, id)
 	if err != nil {
 		return err
 	}
 
-	ds().Delete(o.key, sacloud.APIDefaultZone, id)
+	ds().Delete(o.key, zone, id)
 	return nil
 }

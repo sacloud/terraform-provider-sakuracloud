@@ -69,14 +69,13 @@ func (o *ServerOp) Create(ctx context.Context, zone string, param *sacloud.Serve
 
 		ifCreateParam := &sacloud.InterfaceCreateRequest{}
 		if cs != nil {
-			if cs.Scope == types.Scopes.Shared {
-				ifCreateParam.ServerID = result.ID
-			} else {
+			if cs.Scope != types.Scopes.Shared {
 				_, err := swOp.Read(ctx, zone, cs.ID)
 				if err != nil {
 					return nil, newErrorConflict(o.key, types.ID(0), err.Error())
 				}
 			}
+			ifCreateParam.ServerID = result.ID
 		}
 
 		iface, err := ifOp.Create(ctx, zone, ifCreateParam)
@@ -103,14 +102,33 @@ func (o *ServerOp) Create(ctx context.Context, zone string, param *sacloud.Serve
 		ifaceView := &sacloud.InterfaceView{}
 		copySameNameField(iface, ifaceView)
 
+		// note: UserIPAddressとIPAddressはディスクの修正にて設定されるためここでは空となる。
 		if cs != nil {
 			if cs.Scope == types.Scopes.Shared {
 				ifaceView.SwitchScope = sharedSegmentSwitch.Scope
 				ifaceView.SwitchID = sharedSegmentSwitch.ID
 				ifaceView.SwitchName = sharedSegmentSwitch.Name
+
+				if len(sharedSegmentSwitch.Subnets) > 0 {
+					ifaceView.UserSubnetDefaultRoute = sharedSegmentSwitch.Subnets[0].DefaultRoute
+					ifaceView.UserSubnetNetworkMaskLen = sharedSegmentSwitch.Subnets[0].NetworkMaskLen
+					ifaceView.SubnetDefaultRoute = sharedSegmentSwitch.Subnets[0].DefaultRoute
+					ifaceView.SubnetNetworkAddress = sharedSegmentSwitch.Subnets[0].NetworkAddress
+				}
 			} else {
 				ifaceView.SwitchScope = types.Scopes.User
 				ifaceView.SwitchID = cs.ID
+
+				sw, err := swOp.Read(ctx, zone, cs.ID)
+				if err != nil {
+					return nil, err
+				}
+				if len(sw.Subnets) > 0 {
+					ifaceView.UserSubnetDefaultRoute = sw.Subnets[0].DefaultRoute
+					ifaceView.UserSubnetNetworkMaskLen = sw.Subnets[0].NetworkMaskLen
+					ifaceView.SubnetDefaultRoute = sw.Subnets[0].DefaultRoute
+					ifaceView.SubnetNetworkAddress = sw.Subnets[0].NetworkAddress
+				}
 			}
 		}
 
@@ -253,6 +271,15 @@ func (o *ServerOp) ChangePlan(ctx context.Context, zone string, id types.ID, pla
 	copySameNameField(value, newServer)
 	newServer.ID = pool().generateID()
 	putServer(zone, newServer)
+
+	// DiskのServerIDも変更
+	searched, _ := NewDiskOp().Find(ctx, zone, nil)
+	for _, disk := range searched.Disks {
+		if disk.ServerID == value.ID {
+			disk.ServerID = newServer.ID
+			putDisk(zone, disk)
+		}
+	}
 
 	return newServer, nil
 }

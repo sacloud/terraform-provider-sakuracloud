@@ -27,6 +27,8 @@ import (
 )
 
 func TestAccResourceSakuraCloudCDROM(t *testing.T) {
+	skipIfFakeModeEnabled(t)
+
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
 		Providers:    testAccProviders,
@@ -64,6 +66,8 @@ func TestAccResourceSakuraCloudCDROM(t *testing.T) {
 }
 
 func TestAccResourceSakuraCloudCDROM_With_TextContent(t *testing.T) {
+	skipIfFakeModeEnabled(t)
+
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
 		Providers:    testAccProviders,
@@ -140,6 +144,8 @@ func testAccCheckSakuraCloudCDROMDestroy(s *terraform.State) error {
 }
 
 func TestAccImportSakuraCloudCDROM(t *testing.T) {
+	skipIfFakeModeEnabled(t)
+
 	checkFn := func(s []*terraform.InstanceState) error {
 		if len(s) != 1 {
 			return fmt.Errorf("expected 1 state: %#v", s)

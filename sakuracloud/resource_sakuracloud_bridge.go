@@ -40,11 +40,6 @@ func resourceSakuraCloudBridge() *schema.Resource {
 				Type:     schema.TypeString,
 				Optional: true,
 			},
-			"switch_ids": {
-				Type:     schema.TypeList,
-				Computed: true,
-				Elem:     &schema.Schema{Type: schema.TypeString},
-			},
 			"zone": {
 				Type:         schema.TypeString,
 				Optional:     true,
@@ -133,18 +128,6 @@ func resourceSakuraCloudBridgeDelete(d *schema.ResourceData, meta interface{}) e
 func setBridgeResourceData(ctx context.Context, d *schema.ResourceData, client *APIClient, data *sacloud.Bridge) error {
 	d.Set("name", data.Name)
 	d.Set("description", data.Description)
-
-	swOp := sacloud.NewSwitchOp(client)
-	var switchIDs []interface{}
-	for _, d := range data.BridgeInfo {
-		if _, err := swOp.Read(ctx, d.ZoneName, d.ID); err == nil {
-			switchIDs = append(switchIDs, d.ID.String())
-		}
-	}
-	if err := d.Set("switch_ids", switchIDs); err != nil {
-		return fmt.Errorf("error setting switch_ids: %v", switchIDs)
-	}
-
 	d.Set("zone", getZone(d, client))
 	return nil
 }

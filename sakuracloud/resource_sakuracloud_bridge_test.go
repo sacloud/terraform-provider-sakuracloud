@@ -44,13 +44,6 @@ func TestAccResourceSakuraCloudBridge(t *testing.T) {
 				),
 			},
 			{
-				Config: testAccCheckSakuraCloudBridgeConfig_withSwitch,
-				Check: resource.ComposeTestCheckFunc(
-					resource.TestCheckResourceAttr(
-						"sakuracloud_bridge.foobar", "switch_ids.#", "1"),
-				),
-			},
-			{
 				Config: testAccCheckSakuraCloudBridgeConfig_withSwitchDisconnect,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckSakuraCloudBridgeExists("sakuracloud_bridge.foobar", &bridge),
@@ -127,10 +120,7 @@ func TestAccImportSakuraCloudBridge(t *testing.T) {
 			"zone":        os.Getenv("SAKURACLOUD_ZONE"),
 		}
 
-		if err := compareStateMulti(s[0], expects); err != nil {
-			return err
-		}
-		return stateNotEmptyMulti(s[0], "switch_ids.0")
+		return compareStateMulti(s[0], expects)
 	}
 
 	resourceName := "sakuracloud_bridge.foobar"

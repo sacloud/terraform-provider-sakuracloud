@@ -88,7 +88,6 @@ resource sakuracloud_proxylb_acme "foobar" {
 
 resource sakuracloud_server "server01" {
   name = "terraform-test-server01"
-  graceful_shutdown_timeout = 10
 }
 
 data sakuracloud_dns "zone" {

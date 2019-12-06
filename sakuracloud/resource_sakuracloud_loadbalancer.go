@@ -203,9 +203,6 @@ func resourceSakuraCloudLoadBalancerCreate(d *schema.ResourceData, meta interfac
 		Read: func(ctx context.Context, zone string, id types.ID) (interface{}, error) {
 			return lbOp.Read(ctx, zone, id)
 		},
-		ProvisionBeforeUp: func(ctx context.Context, zone string, id types.ID, target interface{}) error {
-			return lbOp.Boot(ctx, zone, id)
-		},
 		Delete: func(ctx context.Context, zone string, id types.ID) error {
 			return lbOp.Delete(ctx, zone, id)
 		},

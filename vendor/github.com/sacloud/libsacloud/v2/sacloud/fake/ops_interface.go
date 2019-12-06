@@ -280,6 +280,25 @@ func (o *InterfaceOp) ConnectToPacketFilter(ctx context.Context, zone string, id
 
 	value.PacketFilterID = packetFilterID
 	putInterface(zone, value)
+
+	// server配下のInterfaceの修正
+	searched, err := NewServerOp().Find(ctx, zone, nil)
+	if err != nil {
+		return err
+	}
+	for _, server := range searched.Servers {
+		upd := false
+		for _, nic := range server.Interfaces {
+			if nic.ID == id {
+				nic.PacketFilterID = packetFilterID
+				upd = true
+			}
+		}
+		if upd {
+			putServer(zone, server)
+		}
+	}
+
 	return nil
 }
 
@@ -296,5 +315,23 @@ func (o *InterfaceOp) DisconnectFromPacketFilter(ctx context.Context, zone strin
 
 	value.PacketFilterID = types.ID(0)
 	putInterface(zone, value)
+
+	// server配下のInterfaceの修正
+	searched, err := NewServerOp().Find(ctx, zone, nil)
+	if err != nil {
+		return err
+	}
+	for _, server := range searched.Servers {
+		upd := false
+		for _, nic := range server.Interfaces {
+			if nic.ID == id {
+				nic.PacketFilterID = types.ID(0)
+				upd = true
+			}
+		}
+		if upd {
+			putServer(zone, server)
+		}
+	}
 	return nil
 }
