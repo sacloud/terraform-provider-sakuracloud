@@ -222,7 +222,7 @@ func resourceSakuraCloudMobileGatewayCreate(d *schema.ResourceData, meta interfa
 		}
 
 		if err := mgwOp.ConnectToSwitch(ctx, zone, mgw.ID, switchID); err != nil {
-			return fmt.Errorf("connecting to switch is failed: %s", err)
+			return fmt.Errorf("connecting to switch[%s] is failed: %s", switchID, err)
 		}
 
 		updateParam.Settings.Interfaces = append(updateParam.Settings.Interfaces, &sacloud.MobileGatewayInterfaceSetting{
@@ -276,14 +276,14 @@ func resourceSakuraCloudMobileGatewayCreate(d *schema.ResourceData, meta interfa
 
 	// boot
 	if err := mgwOp.Boot(ctx, zone, mgw.ID); err != nil {
-		return fmt.Errorf("booting SakuraCloud MobileGateway is failed: %s", err)
+		return fmt.Errorf("booting SakuraCloud MobileGateway[%s] is failed: %s", mgw.ID, err)
 	}
 	_, err = sacloud.WaiterForUp(func() (interface{}, error) {
 		return mgwOp.Read(ctx, zone, mgw.ID)
 	}).WaitForState(ctx)
 
 	if err != nil {
-		return fmt.Errorf("booting SakuraCloud MobileGateway is failed: %s", err)
+		return fmt.Errorf("booting SakuraCloud MobileGateway[%s] is failed: %s", mgw.ID, err)
 	}
 
 	d.SetId(mgw.ID.String())
@@ -301,7 +301,7 @@ func resourceSakuraCloudMobileGatewayRead(d *schema.ResourceData, meta interface
 			d.SetId("")
 			return nil
 		}
-		return fmt.Errorf("could not read SakuraCloud MobileGateway: %s", err)
+		return fmt.Errorf("could not read SakuraCloud MobileGateway[%s]: %s", d.Id(), err)
 	}
 
 	return setMobileGatewayResourceData(ctx, d, client, mgw)
@@ -321,7 +321,7 @@ func resourceSakuraCloudMobileGatewayUpdate(d *schema.ResourceData, meta interfa
 
 	mgw, err := mgwOp.Read(ctx, zone, sakuraCloudID(d.Id()))
 	if err != nil {
-		return fmt.Errorf("could not read SakuraCloud MobileGateway: %s", err)
+		return fmt.Errorf("could not read SakuraCloud MobileGateway[%s]: %s", d.Id(), err)
 	}
 
 	mgw, err = mgwOp.Update(ctx, zone, mgw.ID, &sacloud.MobileGatewayUpdateRequest{

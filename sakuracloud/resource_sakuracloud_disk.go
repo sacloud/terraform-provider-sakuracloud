@@ -118,34 +118,10 @@ func resourceSakuraCloudDiskCreate(d *schema.ResourceData, meta interface{}) err
 	client, ctx, zone := getSacloudClient(d, meta)
 	diskOp := sacloud.NewDiskOp(client)
 
-	var planID types.ID
-	plan := d.Get("plan").(string)
-	switch d.Get("plan").(string) {
-	case "ssd":
-		planID = types.DiskPlans.SSD
-	case "hdd":
-		planID = types.DiskPlans.HDD
-	default:
-		return fmt.Errorf("invalid disk plan [%s]", plan)
-	}
-	distantFrom := expandSakuraCloudIDs(d, "distant_from")
-
-	ops := &sacloud.DiskCreateRequest{
-		DiskPlanID:      planID,
-		Connection:      types.EDiskConnection(d.Get("connector").(string)),
-		SourceDiskID:    expandSakuraCloudID(d, "source_disk_id"),
-		SourceArchiveID: expandSakuraCloudID(d, "source_archive_id"),
-		SizeMB:          toSizeMB(d.Get("size").(int)),
-		Name:            d.Get("name").(string),
-		Description:     d.Get("description").(string),
-		Tags:            expandTags(d),
-		IconID:          expandSakuraCloudID(d, "icon_id"),
-	}
-
 	diskBuilder := &setup.RetryableSetup{
 		IsWaitForCopy: true,
 		Create: func(ctx context.Context, zone string) (accessor.ID, error) {
-			return diskOp.Create(ctx, zone, ops, distantFrom)
+			return diskOp.Create(ctx, zone, expandDiskCreateRequest(d), expandSakuraCloudIDs(d, "distant_from"))
 		},
 		Read: func(ctx context.Context, zone string, id types.ID) (interface{}, error) {
 			return diskOp.Read(ctx, zone, id)
@@ -158,12 +134,12 @@ func resourceSakuraCloudDiskCreate(d *schema.ResourceData, meta interface{}) err
 
 	res, err := diskBuilder.Setup(ctx, zone)
 	if err != nil {
-		return fmt.Errorf("creating SakuraCloud Disk resource is failed: %s", err)
+		return fmt.Errorf("creating SakuraCloud Disk is failed: %s", err)
 	}
 
 	disk, ok := res.(*sacloud.Disk)
 	if !ok {
-		return fmt.Errorf("creating SakuraCloud Disk resource is failed: created resource is not a *sacloud.Disk")
+		return fmt.Errorf("creating SakuraCloud Disk is failed: created resource is not a *sacloud.Disk")
 	}
 
 	d.SetId(disk.ID.String())
@@ -180,7 +156,7 @@ func resourceSakuraCloudDiskRead(d *schema.ResourceData, meta interface{}) error
 			d.SetId("")
 			return nil
 		}
-		return fmt.Errorf("could not find SakuraCloud Disk resource: %s", err)
+		return fmt.Errorf("could not read SakuraCloud Disk[%s]: %s", d.Id(), err)
 	}
 
 	return setDiskResourceData(ctx, d, client, disk)
@@ -192,20 +168,12 @@ func resourceSakuraCloudDiskUpdate(d *schema.ResourceData, meta interface{}) err
 
 	disk, err := diskOp.Read(ctx, zone, sakuraCloudID(d.Id()))
 	if err != nil {
-		return fmt.Errorf("could not read SakuraCloud Disk resource: %s", err)
+		return fmt.Errorf("could not read SakuraCloud Disk[%s]: %s", d.Id(), err)
 	}
 
-	ops := &sacloud.DiskUpdateRequest{
-		Connection:  types.EDiskConnection(d.Get("connector").(string)),
-		Name:        d.Get("name").(string),
-		Description: d.Get("description").(string),
-		Tags:        expandTags(d),
-		IconID:      expandSakuraCloudID(d, "icon_id"),
-	}
-
-	disk, err = diskOp.Update(ctx, zone, disk.ID, ops)
+	disk, err = diskOp.Update(ctx, zone, disk.ID, expandDiskUpdateRequest(d))
 	if err != nil {
-		return fmt.Errorf("updating SakuraCloud Disk resource is failed: %s", err)
+		return fmt.Errorf("updating SakuraCloud Disk[%s] is failed: %s", d.Id(), err)
 	}
 
 	return resourceSakuraCloudDiskRead(d, meta)
@@ -221,39 +189,20 @@ func resourceSakuraCloudDiskDelete(d *schema.ResourceData, meta interface{}) err
 			d.SetId("")
 			return nil
 		}
-		return fmt.Errorf("could not read SakuraCloud Disk resource: %s", err)
+		return fmt.Errorf("could not read SakuraCloud Disk[%s]: %s", d.Id(), err)
 	}
 
 	if err := diskOp.Delete(ctx, zone, disk.ID); err != nil {
-		return fmt.Errorf("deleting SakuraCloud Disk resource is failed: %s", err)
+		return fmt.Errorf("deleting SakuraCloud Disk[%s] is failed: %s", d.Id(), err)
 	}
 	return nil
 }
 
 func setDiskResourceData(ctx context.Context, d *schema.ResourceData, client *APIClient, data *sacloud.Disk) error {
-	var plan string
-	switch data.DiskPlanID {
-	case types.DiskPlans.SSD:
-		plan = "ssd"
-	case types.DiskPlans.HDD:
-		plan = "hdd"
-	}
-
-	var sourceDiskID, sourceArchiveID, serverID string
-	if !data.SourceDiskID.IsEmpty() {
-		sourceDiskID = data.SourceDiskID.String()
-	}
-	if !data.SourceArchiveID.IsEmpty() {
-		sourceArchiveID = data.SourceArchiveID.String()
-	}
-	if !data.ServerID.IsEmpty() {
-		serverID = data.ServerID.String()
-	}
-
 	d.Set("name", data.Name)
-	d.Set("plan", plan)
-	d.Set("source_disk_id", sourceDiskID)
-	d.Set("source_archive_id", sourceArchiveID)
+	d.Set("plan", flattenDiskPlan(data))
+	d.Set("source_disk_id", data.SourceDiskID.String())
+	d.Set("source_archive_id", data.SourceArchiveID.String())
 	d.Set("connector", data.Connection.String())
 	d.Set("size", data.GetSizeGB())
 	d.Set("icon_id", data.IconID.String())
@@ -261,7 +210,50 @@ func setDiskResourceData(ctx context.Context, d *schema.ResourceData, client *AP
 	if err := d.Set("tags", data.Tags); err != nil {
 		return err
 	}
-	d.Set("server_id", serverID)
+	d.Set("server_id", data.ServerID.String())
 	d.Set("zone", getZone(d, client))
 	return nil
+}
+
+func flattenDiskPlan(data *sacloud.Disk) string {
+	var plan string
+	switch data.DiskPlanID {
+	case types.DiskPlans.SSD:
+		plan = "ssd"
+	case types.DiskPlans.HDD:
+		plan = "hdd"
+	}
+	return plan
+}
+
+func expandDiskCreateRequest(d *schema.ResourceData) *sacloud.DiskCreateRequest {
+	var planID types.ID
+	switch d.Get("plan").(string) {
+	case "ssd":
+		planID = types.DiskPlans.SSD
+	case "hdd":
+		planID = types.DiskPlans.HDD
+	}
+
+	return &sacloud.DiskCreateRequest{
+		DiskPlanID:      planID,
+		Connection:      types.EDiskConnection(d.Get("connector").(string)),
+		SourceDiskID:    expandSakuraCloudID(d, "source_disk_id"),
+		SourceArchiveID: expandSakuraCloudID(d, "source_archive_id"),
+		SizeMB:          toSizeMB(d.Get("size").(int)),
+		Name:            d.Get("name").(string),
+		Description:     d.Get("description").(string),
+		Tags:            expandTags(d),
+		IconID:          expandSakuraCloudID(d, "icon_id"),
+	}
+}
+
+func expandDiskUpdateRequest(d *schema.ResourceData) *sacloud.DiskUpdateRequest {
+	return &sacloud.DiskUpdateRequest{
+		Connection:  types.EDiskConnection(d.Get("connector").(string)),
+		Name:        d.Get("name").(string),
+		Description: d.Get("description").(string),
+		Tags:        expandTags(d),
+		IconID:      expandSakuraCloudID(d, "icon_id"),
+	}
 }

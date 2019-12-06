@@ -121,7 +121,7 @@ func resourceSakuraCloudPacketFilterRead(d *schema.ResourceData, meta interface{
 			d.SetId("")
 			return nil
 		}
-		return fmt.Errorf("could not read SakuraCloud PacketFilter: %s", err)
+		return fmt.Errorf("could not read SakuraCloud PacketFilter[%s]: %s", d.Id(), err)
 	}
 
 	return setPacketFilterResourceData(ctx, d, client, pf)
@@ -133,7 +133,7 @@ func resourceSakuraCloudPacketFilterUpdate(d *schema.ResourceData, meta interfac
 
 	pf, err := pfOp.Read(ctx, zone, sakuraCloudID(d.Id()))
 	if err != nil {
-		return fmt.Errorf("could not read SakuraCloud PacketFilter: %s", err)
+		return fmt.Errorf("could not read SakuraCloud PacketFilter[%s]: %s", d.Id(), err)
 	}
 
 	_, err = pfOp.Update(ctx, zone, pf.ID, &sacloud.PacketFilterUpdateRequest{
@@ -142,7 +142,7 @@ func resourceSakuraCloudPacketFilterUpdate(d *schema.ResourceData, meta interfac
 		Expression:  expandPacketFilterExpressions(d),
 	})
 	if err != nil {
-		return fmt.Errorf("updating SakuraCloud PacketFilter is failed: %s", err)
+		return fmt.Errorf("updating SakuraCloud PacketFilter[%s] is failed: %s", d.Id(), err)
 	}
 
 	return resourceSakuraCloudPacketFilterRead(d, meta)
@@ -158,11 +158,11 @@ func resourceSakuraCloudPacketFilterDelete(d *schema.ResourceData, meta interfac
 			d.SetId("")
 			return nil
 		}
-		return fmt.Errorf("could not read SakuraCloud PacketFilter: %s", err)
+		return fmt.Errorf("could not read SakuraCloud PacketFilter[%s]: %s", d.Id(), err)
 	}
 
 	if err := pfOp.Delete(ctx, zone, pf.ID); err != nil {
-		return fmt.Errorf("deleting SakuraCloud PacketFilter is failed: %s", err)
+		return fmt.Errorf("deleting SakuraCloud PacketFilter[%s] is failed: %s", d.Id(), err)
 	}
 	return nil
 }

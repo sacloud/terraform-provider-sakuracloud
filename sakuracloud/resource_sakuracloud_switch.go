@@ -223,20 +223,14 @@ func setSwitchResourceData(ctx context.Context, d *schema.ResourceData, client *
 	}
 
 	d.Set("name", data.Name)
-	if !data.IconID.IsEmpty() {
-		d.Set("icon_id", data.IconID.String())
-	}
+	d.Set("icon_id", data.IconID.String())
 	d.Set("description", data.Description)
-
 	if err := d.Set("tags", data.Tags); err != nil {
-		return fmt.Errorf("error setting tags: %v", data.Tags)
+		return err
 	}
-
-	if !data.BridgeID.IsEmpty() {
-		d.Set("bridge_id", data.BridgeID.String())
-	}
+	d.Set("bridge_id", data.BridgeID.String())
 	if err := d.Set("server_ids", serverIDs); err != nil {
-		return fmt.Errorf("error setting server_ids: %v", serverIDs)
+		return err
 	}
 	d.Set("zone", zone)
 	return nil

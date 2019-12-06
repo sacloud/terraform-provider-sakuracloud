@@ -173,7 +173,7 @@ func resourceSakuraCloudNFSRead(d *schema.ResourceData, meta interface{}) error 
 			d.SetId("")
 			return nil
 		}
-		return fmt.Errorf("could not read SakuraCloud NFS resource: %s", err)
+		return fmt.Errorf("could not read SakuraCloud NFS[%s]: %s", d.Id(), err)
 	}
 
 	return setNFSResourceData(ctx, d, client, nfs)
@@ -185,7 +185,7 @@ func resourceSakuraCloudNFSUpdate(d *schema.ResourceData, meta interface{}) erro
 
 	nfs, err := nfsOp.Read(ctx, zone, sakuraCloudID(d.Id()))
 	if err != nil {
-		return fmt.Errorf("could not read SakuraCloud NFS: %s", err)
+		return fmt.Errorf("could not read SakuraCloud NFS[%s]: %s", d.Id(), err)
 	}
 
 	nfs, err = nfsOp.Update(ctx, zone, nfs.ID, &sacloud.NFSUpdateRequest{
@@ -195,7 +195,7 @@ func resourceSakuraCloudNFSUpdate(d *schema.ResourceData, meta interface{}) erro
 		IconID:      expandSakuraCloudID(d, "icon_id"),
 	})
 	if err != nil {
-		return fmt.Errorf("updating SakuraCloud NFS is failed: %s", err)
+		return fmt.Errorf("updating SakuraCloud NFS[%s] is failed: %s", d.Id(), err)
 	}
 
 	return resourceSakuraCloudNFSRead(d, meta)
@@ -211,20 +211,15 @@ func resourceSakuraCloudNFSDelete(d *schema.ResourceData, meta interface{}) erro
 			d.SetId("")
 			return nil
 		}
-		return fmt.Errorf("could not read SakuraCloud NFS: %s", err)
+		return fmt.Errorf("could not read SakuraCloud NFS[%s]: %s", d.Id(), err)
 	}
 
-	if err := nfsOp.Shutdown(ctx, zone, nfs.ID, &sacloud.ShutdownOption{Force: true}); err != nil {
-		return fmt.Errorf("stopping SakuraCloud NFS is failed: %s", err)
+	if err := shutdownNFSSync(ctx, nfsOp, zone, nfs.ID, true); err != nil {
+		return err
 	}
-	waiter := sacloud.WaiterForDown(func() (interface{}, error) {
-		return nfsOp.Read(ctx, zone, nfs.ID)
-	})
-	if _, err := waiter.WaitForState(ctx); err != nil {
-		return fmt.Errorf("waiting for NFS[%s] down is failed: %s", nfs.ID, err)
-	}
+
 	if err := nfsOp.Delete(ctx, zone, nfs.ID); err != nil {
-		return fmt.Errorf("deleting SakuraCloud NFS is failed: %s", err)
+		return fmt.Errorf("deleting SakuraCloud NFS[%s] is failed: %s", d.Id(), err)
 	}
 
 	return nil

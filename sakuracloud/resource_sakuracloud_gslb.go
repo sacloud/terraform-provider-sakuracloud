@@ -149,7 +149,7 @@ func resourceSakuraCloudGSLBCreate(d *schema.ResourceData, meta interface{}) err
 		IconID:             expandSakuraCloudID(d, "icon_id"),
 	})
 	if err != nil {
-		return fmt.Errorf("creating SakuraCloud GSLB resource is failed: %s", err)
+		return fmt.Errorf("creating SakuraCloud GSLB is failed: %s", err)
 	}
 
 	d.SetId(gslb.ID.String())
@@ -166,7 +166,7 @@ func resourceSakuraCloudGSLBRead(d *schema.ResourceData, meta interface{}) error
 			d.SetId("")
 			return nil
 		}
-		return fmt.Errorf("could not read SakuraCloud DNS resource: %s", err)
+		return fmt.Errorf("could not read SakuraCloud GSLB[%s]: %s", d.Id(), err)
 	}
 
 	return setGSLBResourceData(ctx, d, client, gslb)
@@ -178,7 +178,7 @@ func resourceSakuraCloudGSLBUpdate(d *schema.ResourceData, meta interface{}) err
 
 	gslb, err := gslbOp.Read(ctx, sakuraCloudID(d.Id()))
 	if err != nil {
-		return fmt.Errorf("could not read SakuraCloud DNS resource: %s", err)
+		return fmt.Errorf("could not read SakuraCloud GSLB[%s]: %s", d.Id(), err)
 	}
 
 	gslb, err = gslbOp.Update(ctx, sakuraCloudID(d.Id()), &sacloud.GSLBUpdateRequest{
@@ -194,7 +194,7 @@ func resourceSakuraCloudGSLBUpdate(d *schema.ResourceData, meta interface{}) err
 		SettingsHash:       gslb.SettingsHash,
 	})
 	if err != nil {
-		return fmt.Errorf("updating SakuraCloud GSLB resource is failed: %s", err)
+		return fmt.Errorf("updating SakuraCloud GSLB[%s] is failed: %s", d.Id(), err)
 	}
 
 	return resourceSakuraCloudGSLBRead(d, meta)
@@ -210,10 +210,10 @@ func resourceSakuraCloudGSLBDelete(d *schema.ResourceData, meta interface{}) err
 			d.SetId("")
 			return nil
 		}
-		return fmt.Errorf("could not read SakuraCloud DNS resource: %s", err)
+		return fmt.Errorf("could not read SakuraCloud GSLB[%s]: %s", d.Id(), err)
 	}
 	if err := gslbOp.Delete(ctx, gslb.ID); err != nil {
-		return fmt.Errorf("deleting SakuraCloud GSLB resource is failed: %s", err)
+		return fmt.Errorf("deleting SakuraCloud GSLB[%s] is failed: %s", d.Id(), err)
 	}
 
 	return nil
@@ -316,4 +316,12 @@ func flattenGSLBServer(s *sacloud.GSLBServer) interface{} {
 	v["enabled"] = s.Enabled.Bool()
 	v["weight"] = s.Weight.Int()
 	return v
+}
+
+func expandGSLBServer(d resourceValueGettable) *sacloud.GSLBServer {
+	return &sacloud.GSLBServer{
+		IPAddress: d.Get("ipaddress").(string),
+		Enabled:   types.StringFlag(d.Get("enabled").(bool)),
+		Weight:    types.StringNumber(d.Get("weight").(int)),
+	}
 }
