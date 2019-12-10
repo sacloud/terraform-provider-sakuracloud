@@ -431,7 +431,6 @@ func resourceSakuraCloudVPCRouter() *schema.Resource {
 
 func resourceSakuraCloudVPCRouterCreate(d *schema.ResourceData, meta interface{}) error {
 	client, ctx, zone := getSacloudClient(d, meta)
-	vrOp := sacloud.NewVPCRouterOp(client)
 
 	builder := vpcrouter.Builder{
 		Name:                  d.Get("name").(string),
@@ -442,13 +441,14 @@ func resourceSakuraCloudVPCRouterCreate(d *schema.ResourceData, meta interface{}
 		NICSetting:            expandVPCRouterNICSetting(d),
 		AdditionalNICSettings: expandVPCRouterAdditionalNICSettings(d),
 		RouterSetting:         expandVPCRouterSettings(d),
+		Client:                sacloud.NewVPCRouterOp(client),
 	}
 
-	if err := builder.Validate(ctx, vrOp, zone); err != nil {
+	if err := builder.Validate(ctx, zone); err != nil {
 		return fmt.Errorf("validating parameter for SakuraCloud VPCRouter is failed: %s", err)
 	}
 
-	vpcRouter, err := builder.Build(ctx, vrOp, zone)
+	vpcRouter, err := builder.Build(ctx, zone)
 	if err != nil {
 		return fmt.Errorf("creating SakuraCloud VPCRouter is failed: %s", err)
 	}
@@ -493,13 +493,14 @@ func resourceSakuraCloudVPCRouterUpdate(d *schema.ResourceData, meta interface{}
 		NICSetting:            expandVPCRouterNICSetting(d),
 		AdditionalNICSettings: expandVPCRouterAdditionalNICSettings(d),
 		RouterSetting:         expandVPCRouterSettings(d),
+		Client:                vrOp,
 	}
 
-	if err := builder.Validate(ctx, vrOp, zone); err != nil {
+	if err := builder.Validate(ctx, zone); err != nil {
 		return fmt.Errorf("validating parameter for SakuraCloud VPCRouter is failed: %s", err)
 	}
 
-	vpcRouter, err = builder.Update(ctx, vrOp, zone, vpcRouter.ID)
+	vpcRouter, err = builder.Update(ctx, zone, vpcRouter.ID)
 	if err != nil {
 		return fmt.Errorf("updating SakuraCloud VPCRouter[%s] is failed: %s", vpcRouter.ID, err)
 	}
