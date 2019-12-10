@@ -21,8 +21,10 @@ package ostype
 type ArchiveOSType int
 
 const (
+	// Custom OS種別:カスタム
+	Custom ArchiveOSType = iota
 	// CentOS OS種別:CentOS
-	CentOS ArchiveOSType = iota
+	CentOS
 	// CentOS8 OS種別:CentOS8
 	CentOS8
 	// CentOS7 OS種別:CentOS7
@@ -75,8 +77,6 @@ const (
 	Windows2016SQLServer2017StandardAll
 	// Windows2019 OS種別:Windows Server 2019 Datacenter Edition
 	Windows2019
-	// Custom OS種別:カスタム
-	Custom
 )
 
 // ArchiveOSTypes アーカイブ種別のリスト

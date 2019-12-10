@@ -65,6 +65,24 @@ func (o *DiskOp) Create(ctx context.Context, zone string, param *sacloud.DiskCre
 		}
 		result.SourceDiskAvailability = source.Availability
 	}
+	if !param.ServerID.IsEmpty() {
+		server, err := NewServerOp().Read(ctx, zone, param.ServerID)
+		if err != nil {
+			return nil, newErrorConflict(o.key, types.ID(0), "Server is not found")
+		}
+		server.Disks = append(server.Disks, &sacloud.ServerConnectedDisk{
+			ID:              result.ID,
+			Name:            result.Name,
+			Availability:    result.Availability,
+			Connection:      result.Connection,
+			ConnectionOrder: result.ConnectionOrder,
+			ReinstallCount:  result.ReinstallCount,
+			SizeMB:          result.SizeMB,
+			DiskPlanID:      result.DiskPlanID,
+			Storage:         result.Storage,
+		})
+		putServer(zone, server)
+	}
 
 	putDisk(zone, result)
 

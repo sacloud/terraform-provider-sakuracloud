@@ -50,6 +50,7 @@ type Builder struct {
 	RouterSetting         *RouterSetting
 
 	SetupOptions *RetryableSetupParameter
+	Client       sacloud.VPCRouterAPI
 }
 
 // RouterSetting VPCルータの設定
@@ -118,20 +119,20 @@ func (b *Builder) getInterfaceSettings() []*sacloud.VPCRouterInterfaceSetting {
 }
 
 // Validate 設定値の検証
-func (b *Builder) Validate(ctx context.Context, client sacloud.VPCRouterAPI, zone string) error {
-	if err := b.validateCommon(ctx, client, zone); err != nil {
+func (b *Builder) Validate(ctx context.Context, zone string) error {
+	if err := b.validateCommon(ctx, zone); err != nil {
 		return err
 	}
 
 	switch b.PlanID {
 	case types.VPCRouterPlans.Standard:
-		return b.validateForStandard(ctx, client, zone)
+		return b.validateForStandard(ctx, zone)
 	default:
-		return b.validateForPremium(ctx, client, zone)
+		return b.validateForPremium(ctx, zone)
 	}
 }
 
-func (b *Builder) validateCommon(ctx context.Context, client sacloud.VPCRouterAPI, zone string) error {
+func (b *Builder) validateCommon(ctx context.Context, zone string) error {
 	if b.NICSetting == nil {
 		return errors.New("required field is missing: NICSetting")
 	}
@@ -155,7 +156,7 @@ func (b *Builder) validateCommon(ctx context.Context, client sacloud.VPCRouterAP
 	return nil
 }
 
-func (b *Builder) validateForStandard(ctx context.Context, client sacloud.VPCRouterAPI, zone string) error {
+func (b *Builder) validateForStandard(ctx context.Context, zone string) error {
 	if _, ok := b.NICSetting.(*StandardNICSetting); !ok {
 		return fmt.Errorf("invalid NICSetting is specified: %v", b.NICSetting)
 	}
@@ -172,7 +173,7 @@ func (b *Builder) validateForStandard(ctx context.Context, client sacloud.VPCRou
 	return nil
 }
 
-func (b *Builder) validateForPremium(ctx context.Context, client sacloud.VPCRouterAPI, zone string) error {
+func (b *Builder) validateForPremium(ctx context.Context, zone string) error {
 	if _, ok := b.NICSetting.(*PremiumNICSetting); !ok {
 		return fmt.Errorf("invalid NICSetting is specified: %v", b.NICSetting)
 	}
@@ -185,16 +186,16 @@ func (b *Builder) validateForPremium(ctx context.Context, client sacloud.VPCRout
 }
 
 // Build VPCルータの作成、スイッチの接続をまとめて行う
-func (b *Builder) Build(ctx context.Context, client sacloud.VPCRouterAPI, zone string) (*sacloud.VPCRouter, error) {
+func (b *Builder) Build(ctx context.Context, zone string) (*sacloud.VPCRouter, error) {
 	b.init()
 
-	if err := b.Validate(ctx, client, zone); err != nil {
+	if err := b.Validate(ctx, zone); err != nil {
 		return nil, err
 	}
 
 	builder := &setup.RetryableSetup{
 		Create: func(ctx context.Context, zone string) (accessor.ID, error) {
-			return client.Create(ctx, zone, &sacloud.VPCRouterCreateRequest{
+			return b.Client.Create(ctx, zone, &sacloud.VPCRouterCreateRequest{
 				Name:        b.Name,
 				Description: b.Description,
 				Tags:        b.Tags,
@@ -216,7 +217,7 @@ func (b *Builder) Build(ctx context.Context, client sacloud.VPCRouterAPI, zone s
 			// スイッチの接続
 			for _, additionalNIC := range b.AdditionalNICSettings {
 				switchID, index := additionalNIC.getSwitchInfo()
-				if err := client.ConnectToSwitch(ctx, zone, id, index, switchID); err != nil {
+				if err := b.Client.ConnectToSwitch(ctx, zone, id, index, switchID); err != nil {
 					return err
 				}
 			}
@@ -225,7 +226,7 @@ func (b *Builder) Build(ctx context.Context, client sacloud.VPCRouterAPI, zone s
 			time.Sleep(b.SetupOptions.NICUpdateWaitDuration)
 
 			// 残りの設定の投入
-			_, err := client.UpdateSettings(ctx, zone, id, &sacloud.VPCRouterUpdateSettingsRequest{
+			_, err := b.Client.UpdateSettings(ctx, zone, id, &sacloud.VPCRouterUpdateSettingsRequest{
 				Settings: &sacloud.VPCRouterSetting{
 					VRID:                      b.RouterSetting.VRID,
 					InternetConnectionEnabled: b.RouterSetting.InternetConnectionEnabled,
@@ -251,15 +252,15 @@ func (b *Builder) Build(ctx context.Context, client sacloud.VPCRouterAPI, zone s
 			}
 
 			if b.SetupOptions.BootAfterBuild {
-				return client.Boot(ctx, zone, id)
+				return b.Client.Boot(ctx, zone, id)
 			}
 			return nil
 		},
 		Delete: func(ctx context.Context, zone string, id types.ID) error {
-			return client.Delete(ctx, zone, id)
+			return b.Client.Delete(ctx, zone, id)
 		},
 		Read: func(ctx context.Context, zone string, id types.ID) (interface{}, error) {
-			return client.Read(ctx, zone, id)
+			return b.Client.Read(ctx, zone, id)
 		},
 		IsWaitForCopy:             true,
 		IsWaitForUp:               b.SetupOptions.BootAfterBuild,
@@ -278,7 +279,7 @@ func (b *Builder) Build(ctx context.Context, client sacloud.VPCRouterAPI, zone s
 	vpcRouter := result.(*sacloud.VPCRouter)
 
 	// refresh
-	vpcRouter, err = client.Read(ctx, zone, vpcRouter.ID)
+	vpcRouter, err = b.Client.Read(ctx, zone, vpcRouter.ID)
 	if err != nil {
 		return nil, err
 	}
@@ -288,15 +289,15 @@ func (b *Builder) Build(ctx context.Context, client sacloud.VPCRouterAPI, zone s
 // Update VPCルータの更新(再起動を伴う場合あり)
 //
 // 接続先スイッチが変更されていた場合、VPCルータの再起動が行われます。
-func (b *Builder) Update(ctx context.Context, client sacloud.VPCRouterAPI, zone string, id types.ID) (*sacloud.VPCRouter, error) {
+func (b *Builder) Update(ctx context.Context, zone string, id types.ID) (*sacloud.VPCRouter, error) {
 	b.init()
 
-	if err := b.Validate(ctx, client, zone); err != nil {
+	if err := b.Validate(ctx, zone); err != nil {
 		return nil, err
 	}
 
 	// check VPCRouter is exists
-	vpcRouter, err := client.Read(ctx, zone, id)
+	vpcRouter, err := b.Client.Read(ctx, zone, id)
 	if err != nil {
 		return nil, err
 	}
@@ -309,7 +310,7 @@ func (b *Builder) Update(ctx context.Context, client sacloud.VPCRouterAPI, zone 
 	isNeedRestart := false
 	if vpcRouter.InstanceStatus.IsUp() && isNeedShutdown {
 		isNeedRestart = true
-		if err := b.shutdownVPCRouter(ctx, client, zone, id); err != nil {
+		if err := b.shutdownVPCRouter(ctx, zone, id); err != nil {
 			return nil, err
 		}
 	}
@@ -323,12 +324,12 @@ func (b *Builder) Update(ctx context.Context, client sacloud.VPCRouterAPI, zone 
 		newSwitchID := b.findAdditionalSwitchSettingByIndex(iface.Index) // 削除されていた場合types.ID(0)が返る
 		if iface.SwitchID != newSwitchID {
 			// disconnect
-			if err := client.DisconnectFromSwitch(ctx, zone, id, iface.Index); err != nil {
+			if err := b.Client.DisconnectFromSwitch(ctx, zone, id, iface.Index); err != nil {
 				return nil, err
 			}
 			// connect
 			if !newSwitchID.IsEmpty() {
-				if err := client.ConnectToSwitch(ctx, zone, id, iface.Index, newSwitchID); err != nil {
+				if err := b.Client.ConnectToSwitch(ctx, zone, id, iface.Index, newSwitchID); err != nil {
 					return nil, err
 				}
 			}
@@ -340,7 +341,7 @@ func (b *Builder) Update(ctx context.Context, client sacloud.VPCRouterAPI, zone 
 		switchID, index := nicSetting.getSwitchInfo()
 		iface := b.findInterfaceByIndex(vpcRouter, index)
 		if iface == nil {
-			if err := client.ConnectToSwitch(ctx, zone, id, index, switchID); err != nil {
+			if err := b.Client.ConnectToSwitch(ctx, zone, id, index, switchID); err != nil {
 				return nil, err
 			}
 		}
@@ -348,7 +349,7 @@ func (b *Builder) Update(ctx context.Context, client sacloud.VPCRouterAPI, zone 
 	// [HACK] スイッチ接続直後だとエラーになることがあるため数秒待つ
 	time.Sleep(b.SetupOptions.NICUpdateWaitDuration)
 
-	_, err = client.Update(ctx, zone, id, &sacloud.VPCRouterUpdateRequest{
+	_, err = b.Client.Update(ctx, zone, id, &sacloud.VPCRouterUpdateRequest{
 		Name:        b.Name,
 		Description: b.Description,
 		Tags:        b.Tags,
@@ -378,12 +379,12 @@ func (b *Builder) Update(ctx context.Context, client sacloud.VPCRouterAPI, zone 
 	}
 
 	if isNeedRestart {
-		if err := b.bootVPCRouter(ctx, client, zone, id); err != nil {
+		if err := b.bootVPCRouter(ctx, zone, id); err != nil {
 			return nil, err
 		}
 	}
 	// refresh
-	vpcRouter, err = client.Read(ctx, zone, id)
+	vpcRouter, err = b.Client.Read(ctx, zone, id)
 	if err != nil {
 		return nil, err
 	}
@@ -394,26 +395,26 @@ func (b *Builder) isStandardPlan() bool {
 	return b.PlanID != types.VPCRouterPlans.Standard
 }
 
-func (b *Builder) bootVPCRouter(ctx context.Context, client sacloud.VPCRouterAPI, zone string, id types.ID) error {
-	if err := client.Boot(ctx, zone, id); err != nil {
+func (b *Builder) bootVPCRouter(ctx context.Context, zone string, id types.ID) error {
+	if err := b.Client.Boot(ctx, zone, id); err != nil {
 		return err
 	}
 	// wait for down
 	waiter := sacloud.WaiterForUp(func() (state interface{}, err error) {
-		return client.Read(ctx, zone, id)
+		return b.Client.Read(ctx, zone, id)
 	})
 	if _, err := waiter.WaitForState(ctx); err != nil {
 		return err
 	}
 	return nil
 }
-func (b *Builder) shutdownVPCRouter(ctx context.Context, client sacloud.VPCRouterAPI, zone string, id types.ID) error {
-	if err := client.Shutdown(ctx, zone, id, &sacloud.ShutdownOption{Force: false}); err != nil {
+func (b *Builder) shutdownVPCRouter(ctx context.Context, zone string, id types.ID) error {
+	if err := b.Client.Shutdown(ctx, zone, id, &sacloud.ShutdownOption{Force: false}); err != nil {
 		return err
 	}
 	// wait for down
 	waiter := sacloud.WaiterForDown(func() (state interface{}, err error) {
-		return client.Read(ctx, zone, id)
+		return b.Client.Read(ctx, zone, id)
 	})
 	if _, err := waiter.WaitForState(ctx); err != nil {
 		return err

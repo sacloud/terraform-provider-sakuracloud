@@ -24,7 +24,7 @@ import (
 	"time"
 
 	"github.com/hashicorp/terraform-plugin-sdk/httpclient"
-	"github.com/sacloud/libsacloud/v2/utils/vpcrouter"
+	"github.com/sacloud/libsacloud/v2/utils/builder/vpcrouter"
 
 	"github.com/sacloud/libsacloud/v2/sacloud"
 
