@@ -21,7 +21,7 @@ import (
 
 	"github.com/sacloud/libsacloud/v2/sacloud"
 	"github.com/sacloud/libsacloud/v2/sacloud/types"
-	"github.com/sacloud/libsacloud/v2/utils/vpcrouter"
+	"github.com/sacloud/libsacloud/v2/utils/builder/vpcrouter"
 )
 
 func expandVPCRouterPlanID(d resourceValueGettable) types.ID {

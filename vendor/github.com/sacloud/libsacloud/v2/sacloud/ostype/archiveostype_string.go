@@ -22,39 +22,39 @@ func _() {
 	// An "invalid array index" compiler error signifies that the constant values have changed.
 	// Re-run the stringer command to generate them again.
 	var x [1]struct{}
-	_ = x[CentOS-0]
-	_ = x[CentOS8-1]
-	_ = x[CentOS7-2]
-	_ = x[CentOS6-3]
-	_ = x[Ubuntu-4]
-	_ = x[Ubuntu1804-5]
-	_ = x[Ubuntu1604-6]
-	_ = x[Debian-7]
-	_ = x[Debian10-8]
-	_ = x[Debian9-9]
-	_ = x[CoreOS-10]
-	_ = x[RancherOS-11]
-	_ = x[K3OS-12]
-	_ = x[Kusanagi-13]
-	_ = x[SophosUTM-14]
-	_ = x[FreeBSD-15]
-	_ = x[Netwiser-16]
-	_ = x[OPNsense-17]
-	_ = x[Windows2016-18]
-	_ = x[Windows2016RDS-19]
-	_ = x[Windows2016RDSOffice-20]
-	_ = x[Windows2016SQLServerWeb-21]
-	_ = x[Windows2016SQLServerStandard-22]
-	_ = x[Windows2016SQLServer2017Standard-23]
-	_ = x[Windows2016SQLServerStandardAll-24]
-	_ = x[Windows2016SQLServer2017StandardAll-25]
-	_ = x[Windows2019-26]
-	_ = x[Custom-27]
+	_ = x[Custom-0]
+	_ = x[CentOS-1]
+	_ = x[CentOS8-2]
+	_ = x[CentOS7-3]
+	_ = x[CentOS6-4]
+	_ = x[Ubuntu-5]
+	_ = x[Ubuntu1804-6]
+	_ = x[Ubuntu1604-7]
+	_ = x[Debian-8]
+	_ = x[Debian10-9]
+	_ = x[Debian9-10]
+	_ = x[CoreOS-11]
+	_ = x[RancherOS-12]
+	_ = x[K3OS-13]
+	_ = x[Kusanagi-14]
+	_ = x[SophosUTM-15]
+	_ = x[FreeBSD-16]
+	_ = x[Netwiser-17]
+	_ = x[OPNsense-18]
+	_ = x[Windows2016-19]
+	_ = x[Windows2016RDS-20]
+	_ = x[Windows2016RDSOffice-21]
+	_ = x[Windows2016SQLServerWeb-22]
+	_ = x[Windows2016SQLServerStandard-23]
+	_ = x[Windows2016SQLServer2017Standard-24]
+	_ = x[Windows2016SQLServerStandardAll-25]
+	_ = x[Windows2016SQLServer2017StandardAll-26]
+	_ = x[Windows2019-27]
 }
 
-const _ArchiveOSType_name = "CentOSCentOS8CentOS7CentOS6UbuntuUbuntu1804Ubuntu1604DebianDebian10Debian9CoreOSRancherOSK3OSKusanagiSophosUTMFreeBSDNetwiserOPNsenseWindows2016Windows2016RDSWindows2016RDSOfficeWindows2016SQLServerWebWindows2016SQLServerStandardWindows2016SQLServer2017StandardWindows2016SQLServerStandardAllWindows2016SQLServer2017StandardAllWindows2019Custom"
+const _ArchiveOSType_name = "CustomCentOSCentOS8CentOS7CentOS6UbuntuUbuntu1804Ubuntu1604DebianDebian10Debian9CoreOSRancherOSK3OSKusanagiSophosUTMFreeBSDNetwiserOPNsenseWindows2016Windows2016RDSWindows2016RDSOfficeWindows2016SQLServerWebWindows2016SQLServerStandardWindows2016SQLServer2017StandardWindows2016SQLServerStandardAllWindows2016SQLServer2017StandardAllWindows2019"
 
-var _ArchiveOSType_index = [...]uint16{0, 6, 13, 20, 27, 33, 43, 53, 59, 67, 74, 80, 89, 93, 101, 110, 117, 125, 133, 144, 158, 178, 201, 229, 261, 292, 327, 338, 344}
+var _ArchiveOSType_index = [...]uint16{0, 6, 12, 19, 26, 33, 39, 49, 59, 65, 73, 80, 86, 95, 99, 107, 116, 123, 131, 139, 150, 164, 184, 207, 235, 267, 298, 333, 344}
 
 func (i ArchiveOSType) String() string {
 	if i < 0 || i >= ArchiveOSType(len(_ArchiveOSType_index)-1) {
