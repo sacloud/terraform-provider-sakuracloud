@@ -219,7 +219,9 @@ resource "sakuracloud_server" "foobar" {
   name        = "myserver"
   disks       = ["${sakuracloud_disk.foobar.id}"]
   description = "Server from TerraForm for SAKURA CLOUD"
-  nic         = "${sakuracloud_internet.foobar.switch_id}"
+  nics {
+    upstream = sakuracloud_internet.foobar.switch_id
+  }
   ipaddress   = "${sakuracloud_internet.foobar.ipaddresses[0]}"
   gateway     = "${sakuracloud_internet.foobar.gateway}"
   nw_mask_len = "${sakuracloud_internet.foobar.nw_mask_len}"
@@ -245,7 +247,9 @@ resource "sakuracloud_server" "foobar" {
   name        = "myserver"
   disks       = ["${sakuracloud_disk.foobar.id}"]
   description = "Server from TerraForm for SAKURA CLOUD"
-  nic         = "${sakuracloud_internet.foobar.switch_id}"
+  nics {
+    upstream = sakuracloud_internet.foobar.switch_id
+  }
   ipaddress   = "${sakuracloud_internet.foobar.ipaddresses[0]}"
   gateway     = "${sakuracloud_internet.foobar.gateway}"
   nw_mask_len = "${sakuracloud_internet.foobar.nw_mask_len}"

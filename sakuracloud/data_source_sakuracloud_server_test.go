@@ -52,9 +52,8 @@ func TestAccSakuraCloudDataSourceServer_Basic(t *testing.T) {
 					resource.TestCheckResourceAttr("data.sakuracloud_server.foobar", "core", "1"),
 					resource.TestCheckResourceAttr("data.sakuracloud_server.foobar", "memory", "1"),
 					//resource.TestCheckResourceAttr("data.sakuracloud_server.foobar", "disks.#", "1"),
-					resource.TestCheckResourceAttr("data.sakuracloud_server.foobar", "nic", "shared"),
-					resource.TestCheckResourceAttr("data.sakuracloud_server.foobar", "additional_nics.#", "0"),
-					resource.TestCheckResourceAttr("data.sakuracloud_server.foobar", "macaddresses.#", "1"),
+					resource.TestCheckResourceAttr("data.sakuracloud_server.foobar", "nics.0.upstream", "shared"),
+					resource.TestCheckResourceAttr("data.sakuracloud_server.foobar", "nics.#", "1"),
 				),
 			},
 			{
@@ -95,6 +94,9 @@ resource "sakuracloud_server" "foobar" {
   disks = ["${sakuracloud_disk.foobar.id}"]
   description = "description_test"
   tags = ["tag1","tag2","tag3"]
+  nics {
+    upstream = "shared"
+  }
 }`, name, name)
 }
 
