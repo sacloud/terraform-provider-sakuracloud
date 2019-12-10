@@ -306,7 +306,7 @@ func resourceSakuraCloudProxyLBCreate(d *schema.ResourceData, meta interface{}) 
 			AdditionalCerts:         certs.AdditionalCerts,
 		})
 		if err != nil {
-			return fmt.Errorf("setting ProxyLB Certificates is failed: %s", err)
+			return fmt.Errorf("setting Certificates to ProxyLB[%s] is failed: %s", proxyLB.ID, err)
 		}
 	}
 
@@ -324,7 +324,7 @@ func resourceSakuraCloudProxyLBRead(d *schema.ResourceData, meta interface{}) er
 			d.SetId("")
 			return nil
 		}
-		return fmt.Errorf("could not read SakuraCloud ProxyLB: %s", err)
+		return fmt.Errorf("could not read SakuraCloud ProxyLB[%s]: %s", d.Id(), err)
 	}
 
 	return setProxyLBResourceData(ctx, d, client, proxyLB)
@@ -339,7 +339,7 @@ func resourceSakuraCloudProxyLBUpdate(d *schema.ResourceData, meta interface{}) 
 
 	proxyLB, err := proxyLBOp.Read(ctx, sakuraCloudID(d.Id()))
 	if err != nil {
-		return fmt.Errorf("could not read SakuraCloud ProxyLB: %s", err)
+		return fmt.Errorf("could not read SakuraCloud ProxyLB[%s]: %s", d.Id(), err)
 	}
 
 	proxyLB, err = proxyLBOp.Update(ctx, proxyLB.ID, &sacloud.ProxyLBUpdateRequest{
@@ -355,14 +355,14 @@ func resourceSakuraCloudProxyLBUpdate(d *schema.ResourceData, meta interface{}) 
 		IconID:        expandSakuraCloudID(d, "icon_id"),
 	})
 	if err != nil {
-		fmt.Errorf("updating SakuraCloud ProxyLB is failed: %s", err)
+		fmt.Errorf("updating SakuraCloud ProxyLB[%s] is failed: %s", d.Id(), err)
 	}
 
 	if d.HasChange("plan") {
 		newPlan := types.EProxyLBPlan(d.Get("plan").(int))
 		upd, err := proxyLBOp.ChangePlan(ctx, proxyLB.ID, &sacloud.ProxyLBChangePlanRequest{Plan: newPlan})
 		if err != nil {
-			return fmt.Errorf("changing ProxyLB plan is failed: %s", err)
+			return fmt.Errorf("changing ProxyLB[%s] plan is failed: %s", d.Id(), err)
 		}
 
 		// update ID
@@ -374,7 +374,7 @@ func resourceSakuraCloudProxyLBUpdate(d *schema.ResourceData, meta interface{}) 
 		certs := expandProxyLBCerts(d)
 		if certs == nil {
 			if err := proxyLBOp.DeleteCertificates(ctx, proxyLB.ID); err != nil {
-				return fmt.Errorf("deleting ProxyLB Certificates is failed: %s", err)
+				return fmt.Errorf("deleting Certificates of ProxyLB[%s] is failed: %s", d.Id(), err)
 			}
 		} else {
 			if _, err := proxyLBOp.SetCertificates(ctx, proxyLB.ID, &sacloud.ProxyLBSetCertificatesRequest{
@@ -383,7 +383,7 @@ func resourceSakuraCloudProxyLBUpdate(d *schema.ResourceData, meta interface{}) 
 				PrivateKey:              certs.PrivateKey,
 				AdditionalCerts:         certs.AdditionalCerts,
 			}); err != nil {
-				return fmt.Errorf("setting ProxyLB Certificates is failed: %s", err)
+				return fmt.Errorf("setting Certificates to ProxyLB[%s] is failed: %s", d.Id(), err)
 			}
 		}
 	}
@@ -403,11 +403,11 @@ func resourceSakuraCloudProxyLBDelete(d *schema.ResourceData, meta interface{}) 
 			d.SetId("")
 			return nil
 		}
-		return fmt.Errorf("could not read SakuraCloud ProxyLB: %s", err)
+		return fmt.Errorf("could not read SakuraCloud ProxyLB[%s]: %s", d.Id(), err)
 	}
 
 	if err := proxyLBOp.Delete(ctx, proxyLB.ID); err != nil {
-		return fmt.Errorf("deleting ProxyLB is failed: %s", err)
+		return fmt.Errorf("deleting ProxyLB[%s] is failed: %s", d.Id(), err)
 	}
 	return nil
 }

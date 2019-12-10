@@ -64,6 +64,9 @@ test:
 testacc:
 	TF_ACC=1 SAKURACLOUD_APPEND_USER_AGENT="(Acceptance Test)" go test -mod=vendor -v $(TESTARGS) -timeout 240m ./...
 
+testacc-fake:
+	FAKE_MODE=1 TF_ACC=1 SAKURACLOUD_APPEND_USER_AGENT="(Acceptance Test)" go test -mod=vendor -v $(TESTARGS) -timeout 240m ./...
+
 vet: golint
 	@echo "go vet $(VETARGS) ."
 	@go vet $(VETARGS) ; if [ $$? -eq 1 ]; then \

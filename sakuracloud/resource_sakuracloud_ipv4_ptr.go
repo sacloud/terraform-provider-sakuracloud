@@ -83,7 +83,7 @@ func resourceSakuraCloudIPv4PtrUpdate(d *schema.ResourceData, meta interface{}) 
 	_, err = ipAddrOp.Read(ctx, zone, ip)
 	if err != nil {
 		// includes 404 error
-		return fmt.Errorf("could not find SakuraCloud IPv4Ptr: %s", err)
+		return fmt.Errorf("could not find SakuraCloud IPv4Ptr[%s]: %s", ip, err)
 	}
 
 	i := 0
@@ -101,7 +101,7 @@ func resourceSakuraCloudIPv4PtrUpdate(d *schema.ResourceData, meta interface{}) 
 	}
 
 	if !success {
-		return fmt.Errorf("could not update SakuraCloud IPv4Ptr resource: %s", err)
+		return fmt.Errorf("could not update SakuraCloud IPv4Ptr[IP:%s Host:%s]: %s", ip, hostName, err)
 	}
 
 	d.SetId(ip)
@@ -119,7 +119,7 @@ func resourceSakuraCloudIPv4PtrRead(d *schema.ResourceData, meta interface{}) er
 			d.SetId("")
 			return nil
 		}
-		return fmt.Errorf("could not read SakuraCloud IPv4Ptr: %s", err)
+		return fmt.Errorf("could not read SakuraCloud IPv4Ptr[%s]: %s", ip, err)
 	}
 	return setIPv4PtrResourceData(d, client, ptr)
 }
@@ -138,7 +138,7 @@ func resourceSakuraCloudIPv4PtrDelete(d *schema.ResourceData, meta interface{}) 
 
 	_, err = ipAddrOp.UpdateHostName(ctx, zone, ip, "")
 	if err != nil {
-		return fmt.Errorf("could not update SakuraCloud IPv4Ptr: %s", err)
+		return fmt.Errorf("could not update SakuraCloud IPv4Ptr[%s]: %s", ip, err)
 	}
 	return nil
 }

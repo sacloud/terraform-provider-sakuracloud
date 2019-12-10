@@ -65,6 +65,14 @@ data sakuracoud_server "example" {
 
   - `switch_ids`属性の廃止
 
+- GSLBサーバ
+
+  - `sakuracloud_gslb_server`を廃止
+  
+- LoadBalancer VIP/サーバ
+
+  - `sakuracloud_loadbalancer_vip`を廃止  
+  - `sakuracloud_loadbalancer_server`を廃止  
 
 - PacketFilterルール
 

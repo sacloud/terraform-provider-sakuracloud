@@ -111,55 +111,9 @@ func resourceSakuraCloudDatabaseReadReplicaCreate(d *schema.ResourceData, meta i
 	dbOp := sacloud.NewDatabaseOp(client)
 
 	// validate master instance
-	masterID := d.Get("master_id").(string)
-	masterDB, err := dbOp.Read(ctx, zone, sakuraCloudID(masterID))
+	req, err := expandDatabaseReadReplicaCreateRequest(ctx, d, client, zone)
 	if err != nil {
-		return fmt.Errorf("master database instance[%s] is not found", masterID)
-	}
-	if masterDB.ReplicationSetting.Model != types.DatabaseReplicationModels.MasterSlave {
-		return fmt.Errorf("master database instance[%s] is not configured as ReplicationMaster", masterID)
-	}
-
-	switchID := masterDB.SwitchID.String()
-	if v, ok := d.GetOk("switch_id"); ok {
-		switchID = v.(string)
-	}
-	maskLen := masterDB.NetworkMaskLen
-	if v, ok := d.GetOk("nw_mask_len"); ok {
-		maskLen = v.(int)
-	}
-	defaultRoute := masterDB.DefaultRoute
-	if v, ok := d.GetOk("default_route"); ok {
-		defaultRoute = v.(string)
-	}
-
-	req := &sacloud.DatabaseCreateRequest{
-		Name:           d.Get("name").(string),
-		Description:    d.Get("description").(string),
-		Tags:           expandTags(d),
-		IconID:         expandSakuraCloudID(d, "icon_id"),
-		PlanID:         types.ID(masterDB.PlanID.Int64() + 1),
-		SwitchID:       sakuraCloudID(switchID),
-		IPAddresses:    []string{d.Get("ipaddress1").(string)},
-		NetworkMaskLen: maskLen,
-		DefaultRoute:   defaultRoute,
-		Conf: &sacloud.DatabaseRemarkDBConfCommon{
-			DatabaseName:     masterDB.Conf.DatabaseName,
-			DatabaseVersion:  masterDB.Conf.DatabaseVersion,
-			DatabaseRevision: masterDB.Conf.DatabaseRevision,
-		},
-		CommonSetting: &sacloud.DatabaseSettingCommon{
-			ServicePort:   masterDB.CommonSetting.ServicePort,
-			SourceNetwork: expandStringList(d.Get("allow_networks").([]interface{})),
-		},
-		ReplicationSetting: &sacloud.DatabaseReplicationSetting{
-			Model:       types.DatabaseReplicationModels.AsyncReplica,
-			IPAddress:   masterDB.IPAddresses[0],
-			Port:        masterDB.CommonSetting.ServicePort,
-			User:        masterDB.ReplicationSetting.User,
-			Password:    masterDB.ReplicationSetting.Password,
-			ApplianceID: masterDB.ID,
-		},
+		return nil
 	}
 
 	dbBuilder := &setup.RetryableSetup{
@@ -205,7 +159,7 @@ func resourceSakuraCloudDatabaseReadReplicaRead(d *schema.ResourceData, meta int
 			d.SetId("")
 			return nil
 		}
-		return fmt.Errorf("could not find SakuraCloud Database ReadReplica resource: %s", err)
+		return fmt.Errorf("could not find SakuraCloud Database ReadReplica[%s] : %s", d.Id(), err)
 	}
 	return setDatabaseReadReplicaResourceData(ctx, d, client, data)
 }
@@ -219,17 +173,7 @@ func resourceSakuraCloudDatabaseReadReplicaUpdate(d *schema.ResourceData, meta i
 		return fmt.Errorf("could not read SakuraCloud Database[%s]: %s", d.Id(), err)
 	}
 
-	req := &sacloud.DatabaseUpdateRequest{
-		Name:               d.Get("name").(string),
-		Description:        d.Get("description").(string),
-		Tags:               expandTags(d),
-		IconID:             expandSakuraCloudID(d, "icon_id"),
-		CommonSetting:      db.CommonSetting,
-		BackupSetting:      db.BackupSetting,
-		ReplicationSetting: db.ReplicationSetting,
-		SettingsHash:       db.SettingsHash,
-	}
-	db, err = dbOp.Update(ctx, zone, db.ID, req)
+	db, err = dbOp.Update(ctx, zone, db.ID, expandDatabaseReadReplicaUpdateRequest(d, db))
 	if err != nil {
 		return fmt.Errorf("updating SakuraCloud Database[%s] is failed: %s", d.Id(), err)
 	}
@@ -247,12 +191,12 @@ func resourceSakuraCloudDatabaseReadReplicaDelete(d *schema.ResourceData, meta i
 			d.SetId("")
 			return nil
 		}
-		return fmt.Errorf("could not read SakuraCloud Database resource: %s", err)
+		return fmt.Errorf("could not read SakuraCloud Database[%s]: %s", d.Id(), err)
 	}
 
 	// shutdown(force) if running
 	if data.InstanceStatus.IsUp() {
-		if err := shutdownDatabase(ctx, dbOp, zone, data.ID, true); err != nil {
+		if err := shutdownDatabaseSync(ctx, dbOp, zone, data.ID, true); err != nil {
 			return err
 		}
 	}
@@ -267,7 +211,6 @@ func resourceSakuraCloudDatabaseReadReplicaDelete(d *schema.ResourceData, meta i
 }
 
 func setDatabaseReadReplicaResourceData(ctx context.Context, d *schema.ResourceData, client *APIClient, data *sacloud.Database) error {
-
 	if data.Availability.IsFailed() {
 		d.SetId("")
 		return fmt.Errorf("got unexpected state: Database[%d].Availability is failed", data.ID)
@@ -280,7 +223,7 @@ func setDatabaseReadReplicaResourceData(ctx context.Context, d *schema.ResourceD
 		}
 	}
 	if err := d.Set("tags", tags); err != nil {
-		return fmt.Errorf("error setting tags: %v", tags)
+		return err
 	}
 
 	d.Set("master_id", data.ReplicationSetting.ApplianceID.String())
@@ -290,13 +233,79 @@ func setDatabaseReadReplicaResourceData(ctx context.Context, d *schema.ResourceD
 	d.Set("default_route", data.DefaultRoute)
 	d.Set("ipaddress1", data.IPAddresses[0])
 	if err := d.Set("allow_networks", data.CommonSetting.SourceNetwork); err != nil {
-		return fmt.Errorf("error setting allow_networks: %v", data.CommonSetting.SourceNetwork)
+		return err
 	}
-	if !data.IconID.IsEmpty() {
-		d.Set("icon_id", data.IconID.String())
-	}
+	d.Set("icon_id", data.IconID.String())
 	d.Set("description", data.Description)
 	d.Set("zone", getZone(d, client))
-
 	return nil
+}
+
+func expandDatabaseReadReplicaCreateRequest(ctx context.Context, d *schema.ResourceData, client *APIClient, zone string) (*sacloud.DatabaseCreateRequest, error) {
+	dbOp := sacloud.NewDatabaseOp(client)
+
+	// validate master instance
+	masterID := d.Get("master_id").(string)
+	masterDB, err := dbOp.Read(ctx, zone, sakuraCloudID(masterID))
+	if err != nil {
+		return nil, fmt.Errorf("master database instance[%s] is not found", masterID)
+	}
+	if masterDB.ReplicationSetting.Model != types.DatabaseReplicationModels.MasterSlave {
+		return nil, fmt.Errorf("master database instance[%s] is not configured as ReplicationMaster", masterID)
+	}
+
+	switchID := masterDB.SwitchID.String()
+	if v, ok := d.GetOk("switch_id"); ok {
+		switchID = v.(string)
+	}
+	maskLen := masterDB.NetworkMaskLen
+	if v, ok := d.GetOk("nw_mask_len"); ok {
+		maskLen = v.(int)
+	}
+	defaultRoute := masterDB.DefaultRoute
+	if v, ok := d.GetOk("default_route"); ok {
+		defaultRoute = v.(string)
+	}
+
+	return &sacloud.DatabaseCreateRequest{
+		Name:           d.Get("name").(string),
+		Description:    d.Get("description").(string),
+		Tags:           expandTags(d),
+		IconID:         expandSakuraCloudID(d, "icon_id"),
+		PlanID:         types.ID(masterDB.PlanID.Int64() + 1),
+		SwitchID:       sakuraCloudID(switchID),
+		IPAddresses:    []string{d.Get("ipaddress1").(string)},
+		NetworkMaskLen: maskLen,
+		DefaultRoute:   defaultRoute,
+		Conf: &sacloud.DatabaseRemarkDBConfCommon{
+			DatabaseName:     masterDB.Conf.DatabaseName,
+			DatabaseVersion:  masterDB.Conf.DatabaseVersion,
+			DatabaseRevision: masterDB.Conf.DatabaseRevision,
+		},
+		CommonSetting: &sacloud.DatabaseSettingCommon{
+			ServicePort:   masterDB.CommonSetting.ServicePort,
+			SourceNetwork: expandStringList(d.Get("allow_networks").([]interface{})),
+		},
+		ReplicationSetting: &sacloud.DatabaseReplicationSetting{
+			Model:       types.DatabaseReplicationModels.AsyncReplica,
+			IPAddress:   masterDB.IPAddresses[0],
+			Port:        masterDB.CommonSetting.ServicePort,
+			User:        masterDB.ReplicationSetting.User,
+			Password:    masterDB.ReplicationSetting.Password,
+			ApplianceID: masterDB.ID,
+		},
+	}, nil
+}
+
+func expandDatabaseReadReplicaUpdateRequest(d *schema.ResourceData, db *sacloud.Database) *sacloud.DatabaseUpdateRequest {
+	return &sacloud.DatabaseUpdateRequest{
+		Name:               d.Get("name").(string),
+		Description:        d.Get("description").(string),
+		Tags:               expandTags(d),
+		IconID:             expandSakuraCloudID(d, "icon_id"),
+		CommonSetting:      db.CommonSetting,
+		BackupSetting:      db.BackupSetting,
+		ReplicationSetting: db.ReplicationSetting,
+		SettingsHash:       db.SettingsHash,
+	}
 }

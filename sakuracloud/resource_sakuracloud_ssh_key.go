@@ -83,7 +83,7 @@ func resourceSakuraCloudSSHKeyRead(d *schema.ResourceData, meta interface{}) err
 			d.SetId("")
 			return nil
 		}
-		return fmt.Errorf("could not read SSHKey: %s", err)
+		return fmt.Errorf("could not read SSHKey[%s]: %s", d.Id(), err)
 	}
 	return setSSHKeyResourceData(ctx, d, client, key)
 }
@@ -94,7 +94,7 @@ func resourceSakuraCloudSSHKeyUpdate(d *schema.ResourceData, meta interface{}) e
 
 	key, err := sshKeyOp.Read(ctx, sakuraCloudID(d.Id()))
 	if err != nil {
-		return fmt.Errorf("could not read SSHKey: %s", err)
+		return fmt.Errorf("could not read SSHKey[%s]: %s", d.Id(), err)
 	}
 
 	_, err = sshKeyOp.Update(ctx, key.ID, &sacloud.SSHKeyUpdateRequest{
@@ -102,7 +102,7 @@ func resourceSakuraCloudSSHKeyUpdate(d *schema.ResourceData, meta interface{}) e
 		Description: d.Get("description").(string),
 	})
 	if err != nil {
-		return fmt.Errorf("updating SSHKey is failed: %s", err)
+		return fmt.Errorf("updating SSHKey[%s] is failed: %s", key.ID, err)
 	}
 	return resourceSakuraCloudSSHKeyRead(d, meta)
 }
@@ -117,11 +117,11 @@ func resourceSakuraCloudSSHKeyDelete(d *schema.ResourceData, meta interface{}) e
 			d.SetId("")
 			return nil
 		}
-		return fmt.Errorf("could not read SSHKey: %s", err)
+		return fmt.Errorf("could not read SSHKey[%s]: %s", d.Id(), err)
 	}
 
 	if err := sshKeyOp.Delete(ctx, key.ID); err != nil {
-		return fmt.Errorf("deleting SSHKey is failed: %s", err)
+		return fmt.Errorf("deleting SSHKey[%s] is failed: %s", key.ID, err)
 	}
 	return nil
 }

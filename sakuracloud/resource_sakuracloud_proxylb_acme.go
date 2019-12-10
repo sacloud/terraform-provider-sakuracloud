@@ -109,7 +109,7 @@ func resourceSakuraCloudProxyLBACMECreate(d *schema.ResourceData, meta interface
 
 	proxyLB, err := proxyLBOp.Read(ctx, sakuraCloudID(proxyLBID))
 	if err != nil {
-		return fmt.Errorf("could not read SakuraCloud ProxyLB: %s", err)
+		return fmt.Errorf("could not read SakuraCloud ProxyLB[%s]: %s", proxyLBID, err)
 	}
 
 	// clear
@@ -142,10 +142,10 @@ func resourceSakuraCloudProxyLBACMECreate(d *schema.ResourceData, meta interface
 		SettingsHash:  proxyLB.SettingsHash,
 	})
 	if err != nil {
-		return fmt.Errorf("setting ProxyLB ACME is failed: %s", err)
+		return fmt.Errorf("setting ProxyLB[%s] ACME is failed: %s", proxyLBID, err)
 	}
 	if err := proxyLBOp.RenewLetsEncryptCert(ctx, proxyLB.ID); err != nil {
-		return fmt.Errorf("renewing ACME Certificates is failed: %s", err)
+		return fmt.Errorf("renewing ACME Certificates at ProxyLB[%s] is failed: %s", proxyLBID, err)
 	}
 
 	d.SetId(proxyLBID)
@@ -164,7 +164,7 @@ func resourceSakuraCloudProxyLBACMERead(d *schema.ResourceData, meta interface{}
 			d.SetId("")
 			return nil
 		}
-		return fmt.Errorf("could not read SakuraCloud ProxyLBACME resource: %s", err)
+		return fmt.Errorf("could not read SakuraCloud ProxyLB[%s] : %s", proxyLBID, err)
 	}
 
 	return setProxyLBACMEResourceData(ctx, d, client, proxyLB)
@@ -181,7 +181,7 @@ func resourceSakuraCloudProxyLBACMEDelete(d *schema.ResourceData, meta interface
 
 	proxyLB, err := proxyLBOp.Read(ctx, sakuraCloudID(proxyLBID))
 	if err != nil {
-		return fmt.Errorf("could not read SakuraCloud ProxyLB: %s", err)
+		return fmt.Errorf("could not read SakuraCloud ProxyLB[%s]: %s", proxyLBID, err)
 	}
 
 	// clear
@@ -198,7 +198,7 @@ func resourceSakuraCloudProxyLBACMEDelete(d *schema.ResourceData, meta interface
 		SettingsHash:  proxyLB.SettingsHash,
 	})
 	if err != nil {
-		return fmt.Errorf("clearing ProxyLB ACME is failed: %s", err)
+		return fmt.Errorf("clearing ACME Setting of ProxyLB[%s] is failed: %s", proxyLBID, err)
 	}
 
 	d.SetId("")
@@ -227,8 +227,6 @@ func setProxyLBACMEResourceData(ctx context.Context, d *schema.ResourceData, cli
 		"server_cert":       cert.ServerCertificate,
 		"intermediate_cert": cert.IntermediateCertificate,
 		"private_key":       cert.PrivateKey,
-		//"common_name":       cert.CertificateCommonName,
-		//"end_date":          cert.CertificateEndDate.Format(time.RFC3339),
 	}
 	if len(cert.AdditionalCerts) > 0 {
 		var certs []interface{}
@@ -237,8 +235,6 @@ func setProxyLBACMEResourceData(ctx context.Context, d *schema.ResourceData, cli
 				"server_cert":       cert.ServerCertificate,
 				"intermediate_cert": cert.IntermediateCertificate,
 				"private_key":       cert.PrivateKey,
-				//"common_name":       cert.CertificateCommonName,
-				//"end_date":          cert.CertificateEndDate.Format(time.RFC3339),
 			})
 		}
 		proxylbCert["additional_certificates"] = certs

@@ -466,7 +466,7 @@ func resourceSakuraCloudVPCRouterRead(d *schema.ResourceData, meta interface{}) 
 			d.SetId("")
 			return nil
 		}
-		return fmt.Errorf("could not read SakuraCloud VPCRouter: %s", err)
+		return fmt.Errorf("could not read SakuraCloud VPCRouter[%s]: %s", d.Id(), err)
 	}
 
 	return setVPCRouterResourceData(ctx, d, client, vpcRouter)
@@ -481,7 +481,7 @@ func resourceSakuraCloudVPCRouterUpdate(d *schema.ResourceData, meta interface{}
 
 	vpcRouter, err := vrOp.Read(ctx, zone, sakuraCloudID(d.Id()))
 	if err != nil {
-		return fmt.Errorf("could not read SakuraCloud VPCRouter: %s", err)
+		return fmt.Errorf("could not read SakuraCloud VPCRouter[%s]: %s", d.Id(), err)
 	}
 
 	builder := vpcrouter.Builder{
@@ -501,7 +501,7 @@ func resourceSakuraCloudVPCRouterUpdate(d *schema.ResourceData, meta interface{}
 
 	vpcRouter, err = builder.Update(ctx, vrOp, zone, vpcRouter.ID)
 	if err != nil {
-		return fmt.Errorf("updating SakuraCloud VPCRouter is failed: %s", err)
+		return fmt.Errorf("updating SakuraCloud VPCRouter[%s] is failed: %s", vpcRouter.ID, err)
 	}
 	return resourceSakuraCloudVPCRouterRead(d, meta)
 }
@@ -519,17 +519,17 @@ func resourceSakuraCloudVPCRouterDelete(d *schema.ResourceData, meta interface{}
 			d.SetId("")
 			return nil
 		}
-		return fmt.Errorf("could not read SakuraCloud VPCRouter: %s", err)
+		return fmt.Errorf("could not read SakuraCloud VPCRouter[%s]: %s", d.Id(), err)
 	}
 
 	if vpcRouter.InstanceStatus.IsUp() {
 		if err := shutdownVPCRouterSync(ctx, client, zone, vpcRouter.ID); err != nil {
-			return fmt.Errorf("stopping VPCRouter is failed: %s", err)
+			return fmt.Errorf("stopping VPCRouter[%s] is failed: %s", vpcRouter.ID, err)
 		}
 	}
 
 	if err := vrOp.Delete(ctx, zone, vpcRouter.ID); err != nil {
-		return fmt.Errorf("deleting SakuraCloud VPCRouter is failed: %s", err)
+		return fmt.Errorf("deleting SakuraCloud VPCRouter[%s] is failed: %s", vpcRouter.ID, err)
 	}
 	return nil
 }

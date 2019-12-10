@@ -110,37 +110,27 @@ func resourceSakuraCloudCDROMCreate(d *schema.ResourceData, meta interface{}) er
 	client, ctx, zone := getSacloudClient(d, meta)
 	cdromOp := sacloud.NewCDROMOp(client)
 
-	// prepare create parameters
-	req := &sacloud.CDROMCreateRequest{
+	cdrom, ftpServer, err := cdromOp.Create(ctx, zone, &sacloud.CDROMCreateRequest{
 		Name:        d.Get("name").(string),
 		Description: d.Get("description").(string),
 		SizeMB:      toSizeMB(d.Get("size").(int)),
 		IconID:      expandSakuraCloudID(d, "icon_id"),
 		Tags:        expandTags(d),
-	}
-
-	filePath, isTemporal, err := prepareContentFile(d)
-	if isTemporal {
-		defer os.Remove(filePath)
-	}
+	})
 	if err != nil {
-		return err
-	}
-
-	cdrom, ftpServer, err := cdromOp.Create(ctx, zone, req)
-	if err != nil {
-		return fmt.Errorf("creating SakuraCloud CDROM resource is failed: %s", err)
+		return fmt.Errorf("creating SakuraCloud CDROM is failed: %s", err)
 	}
 
 	// upload
-	ftpClient := ftps.NewClient(ftpServer.User, ftpServer.Password, ftpServer.HostName)
-	if err := ftpClient.Upload(filePath); err != nil {
-		return fmt.Errorf("upload CD-ROM contents to SakuraCloud is failed: %s", err)
-	}
-
-	// close
-	if err := cdromOp.CloseFTP(ctx, zone, cdrom.ID); err != nil {
-		return fmt.Errorf("closing FTPS Connection is failed: %s", err)
+	err = uploadCDROMFile(&uploadCDROMContext{
+		Context:   ctx,
+		zone:      zone,
+		id:        cdrom.ID,
+		client:    client,
+		ftpServer: ftpServer,
+	}, d)
+	if err != nil {
+		return err
 	}
 
 	d.SetId(cdrom.ID.String())
@@ -171,57 +161,26 @@ func resourceSakuraCloudCDROMUpdate(d *schema.ResourceData, meta interface{}) er
 		return fmt.Errorf("could not read SakuraCloud CDROM[%s]: %s", d.Id(), err)
 	}
 
-	req := &sacloud.CDROMUpdateRequest{
+	cdrom, err = cdromOp.Update(ctx, zone, cdrom.ID, &sacloud.CDROMUpdateRequest{
 		Name:        d.Get("name").(string),
 		Description: d.Get("description").(string),
 		Tags:        expandTags(d),
 		IconID:      expandSakuraCloudID(d, "icon_id"),
-	}
-
-	cdrom, err = cdromOp.Update(ctx, zone, cdrom.ID, req)
+	})
 	if err != nil {
 		return fmt.Errorf("updating SakuraCloud CDROM[%s] is failed: %s", d.Id(), err)
 	}
 
-	contentAttrs := []string{"iso_image_file", "content", "content_file_name", "hash"}
-	isContentChanged := false
-	for _, attr := range contentAttrs {
-		if d.HasChange(attr) {
-			isContentChanged = true
-			break
-		}
-	}
-	if isContentChanged {
-		// eject
-		ejectedServerIDs, err := ejectCDROMFromAllServers(ctx, d, client, cdrom.ID)
-		if err != nil {
-			return fmt.Errorf("could not eject CDROM[%s] from Server: %s", cdrom.ID, err)
-		}
-
-		filePath, isTemporal, err := prepareContentFile(d)
-		if isTemporal {
-			defer os.Remove(filePath) // nolint
-		}
+	if isCDROMContentChanged(d) {
+		err = uploadCDROMFile(&uploadCDROMContext{
+			Context:   ctx,
+			zone:      zone,
+			id:        cdrom.ID,
+			client:    client,
+			ftpServer: nil,
+		}, d)
 		if err != nil {
 			return err
-		}
-		ftpServer, err := cdromOp.OpenFTP(ctx, zone, cdrom.ID, &sacloud.OpenFTPRequest{ChangePassword: false})
-		if err != nil {
-			return fmt.Errorf("opening FTPS connection to CDROM[%s] is failed: %s", cdrom.ID, err)
-		}
-		// upload
-		ftpClient := ftps.NewClient(ftpServer.User, ftpServer.Password, ftpServer.HostName)
-		if err := ftpClient.Upload(filePath); err != nil {
-			return fmt.Errorf("upload CD-ROM contents to SakuraCloud is failed: %s", err)
-		}
-		// close
-		if err := cdromOp.CloseFTP(ctx, zone, cdrom.ID); err != nil {
-			return fmt.Errorf("closing FTPS Connection is failed: %s", err)
-		}
-
-		// re-insert CDROM
-		if err := insertCDROMToAllServers(ctx, d, client, cdrom.ID, ejectedServerIDs); err != nil {
-			return fmt.Errorf("could not insert CDROM[%s] to Server: %s", cdrom.ID, err)
 		}
 	}
 
@@ -243,7 +202,7 @@ func resourceSakuraCloudCDROMDelete(d *schema.ResourceData, meta interface{}) er
 
 	// eject
 	if _, err := ejectCDROMFromAllServers(ctx, d, client, cdrom.ID); err != nil {
-		return fmt.Errorf("could not eject CDROM[%s] from Server: %s", cdrom.ID, err)
+		return fmt.Errorf("could not eject CDROM[%s] from Servers: %s", cdrom.ID, err)
 	}
 
 	if err := cdromOp.Delete(ctx, zone, cdrom.ID); err != nil {
@@ -255,32 +214,98 @@ func resourceSakuraCloudCDROMDelete(d *schema.ResourceData, meta interface{}) er
 }
 
 func setCDROMResourceData(ctx context.Context, d *schema.ResourceData, client *APIClient, data *sacloud.CDROM) error {
+	d.Set("hash", expandCDROMContentHash(d))
+	d.Set("name", data.Name)
+	d.Set("size", data.GetSizeGB())
+	d.Set("icon_id", data.IconID.String())
+	d.Set("description", data.Description)
+	if err := d.Set("tags", data.Tags); err != nil {
+		return err
+	}
+	d.Set("zone", getZone(d, client))
+	return nil
+}
+
+func expandCDROMContentHash(d *schema.ResourceData) string {
 	// NOTE 本来はAPIにてmd5ハッシュを取得できるのが望ましい。現状ではここでファイルを読んで算出する。
 	if v, ok := d.GetOk("iso_image_file"); ok {
 		source := v.(string)
 
 		path, err := expandHomeDir(source)
 		if err != nil {
-			return err
+			return ""
 		}
 		hash, err := md5CheckSumFromFile(path)
 		if err != nil {
-			return err
+			return ""
 		}
-		d.Set("hash", hash)
+		return hash
+	}
+	return ""
+}
+
+type uploadCDROMContext struct {
+	context.Context
+	zone      string
+	id        types.ID
+	client    *APIClient
+	ftpServer *sacloud.FTPServer
+}
+
+func uploadCDROMFile(ctx *uploadCDROMContext, d *schema.ResourceData) error {
+	cdromOp := sacloud.NewCDROMOp(ctx.client)
+
+	filePath, isTemporal, err := prepareContentFile(d)
+	if isTemporal {
+		defer os.Remove(filePath)
+	}
+	if err != nil {
+		return err
 	}
 
-	d.Set("name", data.Name)
-	d.Set("size", data.GetSizeGB())
-	if !data.IconID.IsEmpty() {
-		d.Set("icon_id", data.IconID.String())
+	// eject
+	ejectedServerIDs, err := ejectCDROMFromAllServers(ctx, d, ctx.client, ctx.id)
+	if err != nil {
+		return fmt.Errorf("could not eject CDROM[%s] from Server: %s", ctx.id, err)
 	}
-	d.Set("description", data.Description)
-	if err := d.Set("tags", data.Tags); err != nil {
-		return fmt.Errorf("error settings tags: %v", data.Tags)
+
+	ftpServer := ctx.ftpServer
+	if ftpServer == nil {
+		fs, err := cdromOp.OpenFTP(ctx, ctx.zone, ctx.id, &sacloud.OpenFTPRequest{ChangePassword: false})
+		if err != nil {
+			return fmt.Errorf("opening FTPS connection to CDROM[%s] is failed: %s", ctx.id, err)
+		}
+		ftpServer = fs
 	}
-	d.Set("zone", getZone(d, client))
+
+	// upload
+	ftpClient := ftps.NewClient(ftpServer.User, ftpServer.Password, ftpServer.HostName)
+	if err := ftpClient.Upload(filePath); err != nil {
+		return fmt.Errorf("upload CD-ROM contents is failed: %s", err)
+	}
+	// close
+	if err := cdromOp.CloseFTP(ctx, ctx.zone, ctx.id); err != nil {
+		return fmt.Errorf("closing FTPS Connection is failed: %s", err)
+	}
+
+	// re-insert CDROM
+	if err := insertCDROMToAllServers(ctx, d, ctx.client, ctx.id, ejectedServerIDs); err != nil {
+		return fmt.Errorf("could not insert CDROM[%s] to Server: %s", ctx.id, err)
+	}
+
 	return nil
+}
+
+func isCDROMContentChanged(d *schema.ResourceData) bool {
+	contentAttrs := []string{"iso_image_file", "content", "content_file_name", "hash"}
+	isContentChanged := false
+	for _, attr := range contentAttrs {
+		if d.HasChange(attr) {
+			isContentChanged = true
+			break
+		}
+	}
+	return isContentChanged
 }
 
 func prepareContentFile(d *schema.ResourceData) (string, bool, error) {

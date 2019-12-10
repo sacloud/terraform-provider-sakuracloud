@@ -40,7 +40,7 @@ func TestAccResourceSakuraCloudArchive(t *testing.T) {
 					testAccCheckSakuraCloudArchiveExists("sakuracloud_archive.foobar", &archive),
 					resource.TestCheckResourceAttr("sakuracloud_archive.foobar", "name", "myarchive"),
 					resource.TestCheckResourceAttr("sakuracloud_archive.foobar", "size", "20"),
-					resource.TestCheckNoResourceAttr("sakuracloud_archive.foobar", "icon_id"),
+					resource.TestCheckResourceAttr("sakuracloud_archive.foobar", "icon_id", ""),
 					resource.TestCheckResourceAttr("sakuracloud_archive.foobar", "archive_file", "test/dummy.raw"),
 					resource.TestCheckResourceAttr("sakuracloud_archive.foobar", "description", "description"),
 					resource.TestCheckResourceAttr("sakuracloud_archive.foobar", "tags.0", "tag1"),

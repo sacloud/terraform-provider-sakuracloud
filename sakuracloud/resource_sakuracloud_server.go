@@ -239,7 +239,7 @@ func resourceSakuraCloudServerCreate(d *schema.ResourceData, meta interface{}) e
 	diskIDs := expandSakuraCloudIDs(d, "disks")
 	for _, diskID := range diskIDs {
 		if err := diskOp.ConnectToServer(ctx, zone, diskID, server.ID); err != nil {
-			return fmt.Errorf("connecting Disk to Server is failed: %s", err)
+			return fmt.Errorf("connecting Disk[%s] to Server[%s] is failed: %s", diskID, server.ID, err)
 		}
 	}
 
@@ -247,7 +247,7 @@ func resourceSakuraCloudServerCreate(d *schema.ResourceData, meta interface{}) e
 	editReq := expandDiskEditRequest(d)
 	if editReq != nil && len(diskIDs) > 0 {
 		if err := configDiskSync(ctx, client, zone, diskIDs[0], editReq); err != nil {
-			return fmt.Errorf("editting Disk is failed: %s", err)
+			return fmt.Errorf("editting Disk[%s] is failed: %s", diskIDs[0], err)
 		}
 	}
 
@@ -266,13 +266,13 @@ func resourceSakuraCloudServerCreate(d *schema.ResourceData, meta interface{}) e
 	cdromID := expandSakuraCloudID(d, "cdrom_id")
 	if !cdromID.IsEmpty() {
 		if err := serverOp.InsertCDROM(ctx, zone, server.ID, &sacloud.InsertCDROMRequest{ID: cdromID}); err != nil {
-			return fmt.Errorf("inserting CD-ROM to server is failed: %s", err)
+			return fmt.Errorf("inserting CD-ROM[%s] to Server[%s] is failed: %s", cdromID, server.ID, err)
 		}
 	}
 
 	//boot
 	if err := bootServerSync(ctx, client, zone, server.ID); err != nil {
-		return fmt.Errorf("booting SakuraCloud Server is failed: %s", err)
+		return fmt.Errorf("booting SakuraCloud Server[%s] is failed: %s", server.ID, err)
 	}
 
 	d.SetId(server.ID.String())
@@ -289,7 +289,7 @@ func resourceSakuraCloudServerRead(d *schema.ResourceData, meta interface{}) err
 			d.SetId("")
 			return nil
 		}
-		return fmt.Errorf("could not read SakuraCloud Server: %s", err)
+		return fmt.Errorf("could not read SakuraCloud Server[%s]: %s", d.Id(), err)
 	}
 
 	return setServerResourceData(ctx, d, client, server)
@@ -304,7 +304,7 @@ func resourceSakuraCloudServerUpdate(d *schema.ResourceData, meta interface{}) e
 
 	server, err := serverOp.Read(ctx, zone, sakuraCloudID(d.Id()))
 	if err != nil {
-		return fmt.Errorf("could not read SakuraCloud Server: %s", err)
+		return fmt.Errorf("could not read SakuraCloud Server[%s]: %s", d.Id(), err)
 	}
 
 	isNeedRestart := false
@@ -327,7 +327,7 @@ func resourceSakuraCloudServerUpdate(d *schema.ResourceData, meta interface{}) e
 
 	if isNeedRestart && isRunning {
 		if err := shutdownServerSync(ctx, client, zone, server.ID); err != nil {
-			return fmt.Errorf("stopping SakuraCloud Server is failed: %s", err)
+			return fmt.Errorf("stopping SakuraCloud Server[%s] is failed: %s", server.ID, err)
 		}
 	}
 
@@ -347,7 +347,7 @@ func resourceSakuraCloudServerUpdate(d *schema.ResourceData, meta interface{}) e
 	//refresh server(need refresh after disk and nic edit)
 	updatedServer, err := serverOp.Read(ctx, zone, server.ID)
 	if err != nil {
-		return fmt.Errorf("could not read Server: %s", err)
+		return fmt.Errorf("could not read Server[%s]: %s", server.ID, err)
 	}
 	server = updatedServer
 
@@ -356,7 +356,7 @@ func resourceSakuraCloudServerUpdate(d *schema.ResourceData, meta interface{}) e
 		editReq := expandDiskEditRequest(d)
 		if editReq != nil {
 			if err := configDiskSync(ctx, client, zone, updatedServer.Disks[0].ID, editReq); err != nil {
-				return fmt.Errorf("editting Disk is failed: %s", err)
+				return fmt.Errorf("editting Disk[%s] is failed: %s", updatedServer.Disks[0].ID, err)
 			}
 		}
 	}
@@ -385,32 +385,32 @@ func resourceSakuraCloudServerUpdate(d *schema.ResourceData, meta interface{}) e
 		InterfaceDriver: types.EInterfaceDriver(d.Get("interface_driver").(string)),
 	})
 	if err != nil {
-		return fmt.Errorf("updating SakuraCloud Server is failed: %s", err)
+		return fmt.Errorf("updating SakuraCloud Server[%s] is failed: %s", server.ID, err)
 	}
 
 	if d.HasChange("packet_filter_ids") {
 		if err := reconcileServerPacketFilters(ctx, client, d, server); err != nil {
-			return fmt.Errorf("reconciling PacketFilter is failed: %s", err)
+			return fmt.Errorf("reconciling PacketFilters is failed: %s", err)
 		}
 	}
 
 	if d.HasChange("cdrom_id") {
 		if !server.CDROMID.IsEmpty() {
 			if err := serverOp.EjectCDROM(ctx, zone, server.ID, &sacloud.EjectCDROMRequest{ID: server.CDROMID}); err != nil {
-				return fmt.Errorf("ejecting CD-ROM is failed: %s", err)
+				return fmt.Errorf("ejecting CD-ROM[%s] is failed: %s", server.CDROMID, err)
 			}
 		}
 		cdromID := expandSakuraCloudID(d, "cdrom_id")
 		if !cdromID.IsEmpty() {
 			if err := serverOp.InsertCDROM(ctx, zone, server.ID, &sacloud.InsertCDROMRequest{ID: cdromID}); err != nil {
-				return fmt.Errorf("inserting CD-ROM is failed: %s", err)
+				return fmt.Errorf("inserting CD-ROM[%s] is failed: %s", cdromID, err)
 			}
 		}
 	}
 
 	if isNeedRestart && isRunning {
 		if err := bootServerSync(ctx, client, zone, server.ID); err != nil {
-			return fmt.Errorf("booting SakuraCloud Server is failed: %s", err)
+			return fmt.Errorf("booting SakuraCloud Server[%s] is failed: %s", server.ID, err)
 		}
 	}
 
@@ -430,17 +430,17 @@ func resourceSakuraCloudServerDelete(d *schema.ResourceData, meta interface{}) e
 			d.SetId("")
 			return nil
 		}
-		return fmt.Errorf("could not read SakuraCloud Server: %s", err)
+		return fmt.Errorf("could not read SakuraCloud Server[%s]: %s", d.Id(), err)
 	}
 
 	if server.InstanceStatus.IsUp() {
 		if err := shutdownServerSync(ctx, client, zone, server.ID); err != nil {
-			return fmt.Errorf("stopping SakuraCloud Server is failed: %s", err)
+			return fmt.Errorf("stopping SakuraCloud Server[%s] is failed: %s", server.ID, err)
 		}
 	}
 
 	if err := serverOp.Delete(ctx, zone, server.ID); err != nil {
-		return fmt.Errorf("deleting SakuraCloud Server is failed: %s", err)
+		return fmt.Errorf("deleting SakuraCloud Server[%s] is failed: %s", server.ID, err)
 	}
 	return nil
 }
@@ -745,14 +745,14 @@ func reconcileServerDisks(ctx context.Context, client *APIClient, d resourceValu
 	//disconnect all old disks
 	for _, disk := range server.Disks {
 		if err := diskOp.DisconnectFromServer(ctx, zone, disk.ID); err != nil {
-			return fmt.Errorf("disconnecting Disk from Server is failed: %s", err)
+			return fmt.Errorf("disconnecting Disk[%s] from Server[%s] is failed: %s", disk.ID, server.ID, err)
 		}
 	}
 
 	diskIDs := expandSakuraCloudIDs(d, "disks")
 	for _, diskID := range diskIDs {
 		if err := diskOp.ConnectToServer(ctx, zone, diskID, server.ID); err != nil {
-			return fmt.Errorf("connecting Disk to Server is failed: %s", err)
+			return fmt.Errorf("connecting Disk[%s] to Server[%s] is failed: %s", diskID, server.ID, err)
 		}
 	}
 	return nil
@@ -767,13 +767,13 @@ func reconcileServerPacketFilters(ctx context.Context, client *APIClient, d reso
 	for i, nic := range server.Interfaces {
 		if !nic.PacketFilterID.IsEmpty() {
 			if err := interfaceOp.DisconnectFromPacketFilter(ctx, zone, nic.ID); err != nil {
-				return fmt.Errorf("disconnecting PacketFilter is failed: %s", err)
+				return fmt.Errorf("disconnecting PacketFilter[%s] is failed: %s", nic.PacketFilterID, err)
 			}
 		}
 		if len(pfIDs) > i {
 			pfID := pfIDs[i]
 			if err := interfaceOp.ConnectToPacketFilter(ctx, zone, nic.ID, pfID); err != nil {
-				return fmt.Errorf("connecting PacketFilter is failed: %s", err)
+				return fmt.Errorf("connecting PacketFilter[%s] is failed: %s", pfID, err)
 			}
 		}
 	}
@@ -797,11 +797,11 @@ func reconcileServerNICs(ctx context.Context, client *APIClient, d *schema.Resou
 		}
 		if !nic.SwitchID.IsEmpty() {
 			if err := interfaceOp.DisconnectFromSwitch(ctx, zone, nic.ID); err != nil {
-				return fmt.Errorf("disconnecting from Switch is failed: %s", err)
+				return fmt.Errorf("disconnecting Interface[%s] from Switch[%s] is failed: %s", nic.ID, nic.SwitchID, err)
 			}
 		}
 		if err := interfaceOp.Delete(ctx, zone, nic.ID); err != nil {
-			return fmt.Errorf("deleting Interface is failed: %s", err)
+			return fmt.Errorf("deleting Interface[%s] is failed: %s", nic.ID, err)
 		}
 	}
 
@@ -843,26 +843,26 @@ func reconcileServerInterfaceConnection(ctx context.Context, client *APIClient, 
 			// disconnect if already connected
 			if !nic.GetSwitchID().IsEmpty() {
 				if err := interfaceOp.DisconnectFromSwitch(ctx, zone, nic.GetID()); err != nil {
-					return fmt.Errorf("disconnecting from Switch is failed: %s", err)
+					return fmt.Errorf("disconnecting Interface[%s] from Switch[%s] is failed: %s", nic.GetID(), nic.GetSwitchID(), err)
 				}
 			}
 			// connect to shared segment
 			if err := interfaceOp.ConnectToSharedSegment(ctx, zone, nic.GetID()); err != nil {
-				return fmt.Errorf("connecting to SharedSegment is failed: %s", err)
+				return fmt.Errorf("connecting Interface[%s] to SharedSegment is failed: %s", nic.GetID(), err)
 			}
 		}
 	case "disconnect":
 		// disconnect if already connected
 		if !nic.GetSwitchID().IsEmpty() {
 			if err := interfaceOp.DisconnectFromSwitch(ctx, zone, nic.GetID()); err != nil {
-				return fmt.Errorf("disconnecting from Switch is failed: %s", err)
+				return fmt.Errorf("disconnecting Interface[%s] from Switch[%s] is failed: %s", nic.GetID(), nic.GetSwitchID(), err)
 			}
 		}
 	default:
 		switchID := sakuraCloudID(nicConf)
 		if !nic.GetSwitchID().IsEmpty() && nic.GetSwitchID() != switchID {
 			if err := interfaceOp.DisconnectFromSwitch(ctx, zone, nic.GetID()); err != nil {
-				return fmt.Errorf("disconnecting from Switch is failed: %s", err)
+				return fmt.Errorf("disconnecting Interface[%s] from Switch[%s] is failed: %s", nic.GetID(), nic.GetSwitchID(), err)
 			}
 		}
 
@@ -870,7 +870,7 @@ func reconcileServerInterfaceConnection(ctx context.Context, client *APIClient, 
 			// connect to switch
 			if !switchID.IsEmpty() {
 				if err := interfaceOp.ConnectToSwitch(ctx, zone, nic.GetID(), switchID); err != nil {
-					return fmt.Errorf("connecting to Switch is failed: %s", err)
+					return fmt.Errorf("connecting Interface[%s] to Switch[%s] is failed: %s", nic.GetID(), switchID, err)
 				}
 			}
 		}

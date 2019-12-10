@@ -89,7 +89,7 @@ func resourceSakuraCloudAutoBackupCreate(d *schema.ResourceData, meta interface{
 		return err
 	}
 
-	req := &sacloud.AutoBackupCreateRequest{
+	autoBackup, err := autoBackupOp.Create(ctx, zone, &sacloud.AutoBackupCreateRequest{
 		Name:                    d.Get("name").(string),
 		Description:             d.Get("description").(string),
 		Tags:                    expandTags(d),
@@ -97,11 +97,9 @@ func resourceSakuraCloudAutoBackupCreate(d *schema.ResourceData, meta interface{
 		MaximumNumberOfArchives: d.Get("max_backup_num").(int),
 		BackupSpanWeekdays:      expandBackupWeekdays(d.Get("weekdays").([]interface{})),
 		IconID:                  expandSakuraCloudID(d, "icon_id"),
-	}
-
-	autoBackup, err := autoBackupOp.Create(ctx, zone, req)
+	})
 	if err != nil {
-		return fmt.Errorf("creating SakuraCloud AutoBackup resource is failed: %s", err)
+		return fmt.Errorf("creating SakuraCloud AutoBackup is failed: %s", err)
 	}
 
 	d.SetId(autoBackup.ID.String())
@@ -118,27 +116,9 @@ func resourceSakuraCloudAutoBackupRead(d *schema.ResourceData, meta interface{})
 			d.SetId("")
 			return nil
 		}
-		return fmt.Errorf("could not find SakuraCloud AutoBackup resource: %s", err)
+		return fmt.Errorf("could not find SakuraCloud AutoBackup[%s]: %s", d.Id(), err)
 	}
 	return setAutoBackupResourceData(d, client, autoBackup)
-}
-
-func setAutoBackupResourceData(d *schema.ResourceData, client *APIClient, data *sacloud.AutoBackup) error {
-	d.Set("name", data.Name)
-	d.Set("disk_id", data.DiskID.String())
-	if err := d.Set("weekdays", flattenBackupWeekdays(data.BackupSpanWeekdays)); err != nil {
-		return fmt.Errorf("error setting weekdays: %v", data.BackupSpanWeekdays)
-	}
-	d.Set("max_backup_num", data.MaximumNumberOfArchives)
-	if !data.IconID.IsEmpty() {
-		d.Set("icon_id", data.IconID.String())
-	}
-	d.Set("description", data.Description)
-	if err := d.Set("tags", data.Tags); err != nil {
-		return fmt.Errorf("error setting tags: %v", data.Tags)
-	}
-	d.Set("zone", getZone(d, client))
-	return nil
 }
 
 func resourceSakuraCloudAutoBackupUpdate(d *schema.ResourceData, meta interface{}) error {
@@ -154,7 +134,7 @@ func resourceSakuraCloudAutoBackupUpdate(d *schema.ResourceData, meta interface{
 		return err
 	}
 
-	req := &sacloud.AutoBackupUpdateRequest{
+	autoBackup, err = autoBackupOp.Update(ctx, zone, autoBackup.ID, &sacloud.AutoBackupUpdateRequest{
 		Name:                    d.Get("name").(string),
 		Description:             d.Get("description").(string),
 		Tags:                    expandTags(d),
@@ -162,11 +142,9 @@ func resourceSakuraCloudAutoBackupUpdate(d *schema.ResourceData, meta interface{
 		BackupSpanWeekdays:      expandBackupWeekdays(d.Get("weekdays").([]interface{})),
 		IconID:                  expandSakuraCloudID(d, "icon_id"),
 		SettingsHash:            autoBackup.SettingsHash,
-	}
-
-	autoBackup, err = autoBackupOp.Update(ctx, zone, autoBackup.ID, req)
+	})
 	if err != nil {
-		return fmt.Errorf("updating SakuraCloud AutoBackup[%s] is failed: %s", d.Id(), err)
+		return fmt.Errorf("updating SakuraCloud AutoBackup[%s] is failed: %s", autoBackup.ID, err)
 	}
 
 	return resourceSakuraCloudAutoBackupRead(d, meta)
@@ -190,5 +168,21 @@ func resourceSakuraCloudAutoBackupDelete(d *schema.ResourceData, meta interface{
 	}
 
 	d.SetId("")
+	return nil
+}
+
+func setAutoBackupResourceData(d *schema.ResourceData, client *APIClient, data *sacloud.AutoBackup) error {
+	d.Set("name", data.Name)
+	d.Set("disk_id", data.DiskID.String())
+	if err := d.Set("weekdays", flattenBackupWeekdays(data.BackupSpanWeekdays)); err != nil {
+		return err
+	}
+	d.Set("max_backup_num", data.MaximumNumberOfArchives)
+	d.Set("icon_id", data.IconID.String())
+	d.Set("description", data.Description)
+	if err := d.Set("tags", data.Tags); err != nil {
+		return err
+	}
+	d.Set("zone", getZone(d, client))
 	return nil
 }

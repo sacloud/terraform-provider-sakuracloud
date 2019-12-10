@@ -33,57 +33,53 @@ func resourceSakuraCloudDNSRecord() *schema.Resource {
 		Create: resourceSakuraCloudDNSRecordCreate,
 		Read:   resourceSakuraCloudDNSRecordRead,
 		Delete: resourceSakuraCloudDNSRecordDelete,
-		Schema: dnsRecordResourceSchema(),
-	}
-}
-
-func dnsRecordResourceSchema() map[string]*schema.Schema {
-	return map[string]*schema.Schema{
-		"dns_id": {
-			Type:         schema.TypeString,
-			Required:     true,
-			ForceNew:     true,
-			ValidateFunc: validateSakuracloudIDType,
-		},
-		"name": {
-			Type:     schema.TypeString,
-			Required: true,
-			ForceNew: true,
-		},
-		"type": {
-			Type:         schema.TypeString,
-			Required:     true,
-			ValidateFunc: validation.StringInSlice(types.DNSRecordTypesStrings(), false),
-			ForceNew:     true,
-		},
-		"value": {
-			Type:     schema.TypeString,
-			Required: true,
-			ForceNew: true,
-		},
-		"ttl": {
-			Type:     schema.TypeInt,
-			Optional: true,
-			Default:  defaultTTL,
-			ForceNew: true,
-		},
-		"priority": {
-			Type:         schema.TypeInt,
-			Optional:     true,
-			ValidateFunc: validation.IntBetween(0, 65535),
-			ForceNew:     true,
-		},
-		"weight": {
-			Type:         schema.TypeInt,
-			Optional:     true,
-			ValidateFunc: validation.IntBetween(0, 65535),
-			ForceNew:     true,
-		},
-		"port": {
-			Type:         schema.TypeInt,
-			Optional:     true,
-			ValidateFunc: validation.IntBetween(1, 65535),
-			ForceNew:     true,
+		Schema: map[string]*schema.Schema{
+			"dns_id": {
+				Type:         schema.TypeString,
+				Required:     true,
+				ForceNew:     true,
+				ValidateFunc: validateSakuracloudIDType,
+			},
+			"name": {
+				Type:     schema.TypeString,
+				Required: true,
+				ForceNew: true,
+			},
+			"type": {
+				Type:         schema.TypeString,
+				Required:     true,
+				ValidateFunc: validation.StringInSlice(types.DNSRecordTypesStrings(), false),
+				ForceNew:     true,
+			},
+			"value": {
+				Type:     schema.TypeString,
+				Required: true,
+				ForceNew: true,
+			},
+			"ttl": {
+				Type:     schema.TypeInt,
+				Optional: true,
+				Default:  defaultTTL,
+				ForceNew: true,
+			},
+			"priority": {
+				Type:         schema.TypeInt,
+				Optional:     true,
+				ValidateFunc: validation.IntBetween(0, 65535),
+				ForceNew:     true,
+			},
+			"weight": {
+				Type:         schema.TypeInt,
+				Optional:     true,
+				ValidateFunc: validation.IntBetween(0, 65535),
+				ForceNew:     true,
+			},
+			"port": {
+				Type:         schema.TypeInt,
+				Optional:     true,
+				ValidateFunc: validation.IntBetween(1, 65535),
+				ForceNew:     true,
+			},
 		},
 	}
 }
@@ -98,20 +94,13 @@ func resourceSakuraCloudDNSRecordCreate(d *schema.ResourceData, meta interface{}
 
 	dns, err := dnsOp.Read(ctx, sakuraCloudID(dnsID))
 	if err != nil {
-		return fmt.Errorf("could not read SakuraCloud DNS resource: %s", err)
+		return fmt.Errorf("could not read SakuraCloud DNS[%s]: %s", dnsID, err)
 	}
 
-	record := expandDNSRecord(d)
-	records := append(dns.Records, record)
-	dns, err = dnsOp.Update(ctx, sakuraCloudID(dnsID), &sacloud.DNSUpdateRequest{
-		Description:  dns.Description,
-		Tags:         dns.Tags,
-		IconID:       dns.IconID,
-		Records:      records,
-		SettingsHash: dns.SettingsHash,
-	})
+	record, req := expandDNSRecordCreateRequest(d, dns)
+	dns, err = dnsOp.UpdateSettings(ctx, sakuraCloudID(dnsID), req)
 	if err != nil {
-		return fmt.Errorf("creating SakuraCloud DNSRecord resource is failed: %s", err)
+		return fmt.Errorf("creating SakuraCloud DNSRecord is failed: %s", err)
 	}
 
 	d.SetId(dnsRecordIDHash(dnsID, record))
@@ -129,7 +118,7 @@ func resourceSakuraCloudDNSRecordRead(d *schema.ResourceData, meta interface{}) 
 			d.SetId("")
 			return nil
 		}
-		return fmt.Errorf("could not read SakuraCloud DNS resource: %s", err)
+		return fmt.Errorf("could not read SakuraCloud DNS[%s]: %s", d.Id(), err)
 	}
 
 	record := expandDNSRecord(d)
@@ -138,7 +127,7 @@ func resourceSakuraCloudDNSRecordRead(d *schema.ResourceData, meta interface{}) 
 		return nil
 	}
 
-	r := dnsRecordToState(record)
+	r := flattenDNSRecord(record)
 	for k, v := range r {
 		if err := d.Set(k, v); err != nil {
 			return err
@@ -162,27 +151,12 @@ func resourceSakuraCloudDNSRecordDelete(d *schema.ResourceData, meta interface{}
 			d.SetId("")
 			return nil
 		}
-		return fmt.Errorf("could not read SakuraCloud DNS resource: %s", err)
+		return fmt.Errorf("could not read SakuraCloud DNS[%s]: %s", dnsID, err)
 	}
 
-	record := expandDNSRecord(d)
-	var records []*sacloud.DNSRecord
-
-	for _, r := range dns.Records {
-		if !isSameDNSRecord(r, record) {
-			records = append(records, r)
-		}
-	}
-
-	dns, err = dnsOp.Update(ctx, sakuraCloudID(dnsID), &sacloud.DNSUpdateRequest{
-		Description:  dns.Description,
-		Tags:         dns.Tags,
-		IconID:       dns.IconID,
-		Records:      records,
-		SettingsHash: dns.SettingsHash,
-	})
+	dns, err = dnsOp.UpdateSettings(ctx, sakuraCloudID(dnsID), expandDNSRecordDeleteRequest(d, dns))
 	if err != nil {
-		return fmt.Errorf("deleting SakuraCloud DNSRecord resource is failed: %s", err)
+		return fmt.Errorf("deleting SakuraCloud DNSRecord[%s] is failed: %s", dnsID, err)
 	}
 
 	return nil
@@ -209,4 +183,30 @@ func dnsRecordIDHash(dns_id string, r *sacloud.DNSRecord) string {
 	buf.WriteString(fmt.Sprintf("%s-", r.Name))
 
 	return fmt.Sprintf("dnsrecord-%d", hashcode.String(buf.String()))
+}
+
+func expandDNSRecordCreateRequest(d *schema.ResourceData, dns *sacloud.DNS) (*sacloud.DNSRecord, *sacloud.DNSUpdateSettingsRequest) {
+	record := expandDNSRecord(d)
+	records := append(dns.Records, record)
+
+	return record, &sacloud.DNSUpdateSettingsRequest{
+		Records:      records,
+		SettingsHash: dns.SettingsHash,
+	}
+}
+
+func expandDNSRecordDeleteRequest(d *schema.ResourceData, dns *sacloud.DNS) *sacloud.DNSUpdateSettingsRequest {
+	record := expandDNSRecord(d)
+	var records []*sacloud.DNSRecord
+
+	for _, r := range dns.Records {
+		if !isSameDNSRecord(r, record) {
+			records = append(records, r)
+		}
+	}
+
+	return &sacloud.DNSUpdateSettingsRequest{
+		Records:      records,
+		SettingsHash: dns.SettingsHash,
+	}
 }

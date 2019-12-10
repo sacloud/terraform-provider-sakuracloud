@@ -56,12 +56,10 @@ func resourceSakuraCloudBridgeCreate(d *schema.ResourceData, meta interface{}) e
 	client, ctx, zone := getSacloudClient(d, meta)
 	bridgeOp := sacloud.NewBridgeOp(client)
 
-	req := &sacloud.BridgeCreateRequest{
+	bridge, err := bridgeOp.Create(ctx, zone, &sacloud.BridgeCreateRequest{
 		Name:        d.Get("name").(string),
 		Description: d.Get("description").(string),
-	}
-
-	bridge, err := bridgeOp.Create(ctx, zone, req)
+	})
 	if err != nil {
 		return fmt.Errorf("creating SakuraCloud Bridge is failed: %s", err)
 	}
@@ -73,6 +71,7 @@ func resourceSakuraCloudBridgeCreate(d *schema.ResourceData, meta interface{}) e
 func resourceSakuraCloudBridgeRead(d *schema.ResourceData, meta interface{}) error {
 	client, ctx, zone := getSacloudClient(d, meta)
 	bridgeOp := sacloud.NewBridgeOp(client)
+
 	bridge, err := bridgeOp.Read(ctx, zone, sakuraCloudID(d.Id()))
 	if err != nil {
 		if sacloud.IsNotFoundError(err) {
@@ -93,14 +92,12 @@ func resourceSakuraCloudBridgeUpdate(d *schema.ResourceData, meta interface{}) e
 		return fmt.Errorf("could not read SakuraCloud Bridge[%s]: %s", d.Id(), err)
 	}
 
-	req := &sacloud.BridgeUpdateRequest{
+	bridge, err = bridgeOp.Update(ctx, zone, bridge.ID, &sacloud.BridgeUpdateRequest{
 		Name:        d.Get("name").(string),
 		Description: d.Get("description").(string),
-	}
-
-	bridge, err = bridgeOp.Update(ctx, zone, bridge.ID, req)
+	})
 	if err != nil {
-		return fmt.Errorf("updating SakuraCloud Bridge[%s] is failed: %s", d.Id(), err)
+		return fmt.Errorf("updating SakuraCloud Bridge[%s] is failed: %s", bridge.ID, err)
 	}
 	return resourceSakuraCloudBridgeRead(d, meta)
 }
@@ -119,7 +116,7 @@ func resourceSakuraCloudBridgeDelete(d *schema.ResourceData, meta interface{}) e
 	}
 
 	if err := bridgeOp.Delete(ctx, zone, bridge.ID); err != nil {
-		return fmt.Errorf("deleting SakuraCloud AutoBackup[%s] is failed: %s", d.Id(), err)
+		return fmt.Errorf("deleting SakuraCloud Bridge[%s] is failed: %s", d.Id(), err)
 	}
 	d.SetId("")
 	return nil
