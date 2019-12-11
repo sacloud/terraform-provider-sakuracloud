@@ -16,6 +16,7 @@ package sakuracloud
 
 import (
 	"fmt"
+	"github.com/sacloud/libsacloud/v2/utils/builder"
 	"log"
 	"net/http"
 	"os"
@@ -24,8 +25,6 @@ import (
 	"time"
 
 	"github.com/hashicorp/terraform-plugin-sdk/httpclient"
-	"github.com/sacloud/libsacloud/v2/utils/builder/vpcrouter"
-
 	"github.com/sacloud/libsacloud/v2/sacloud"
 
 	"github.com/sacloud/libsacloud/v2/sacloud/fake"
@@ -149,8 +148,8 @@ func (c *Config) NewClient() *APIClient {
 		setup.DefaultDeleteWaitInterval = defaultInterval
 		setup.DefaultProvisioningWaitInterval = defaultInterval
 		setup.DefaultPollingInterval = defaultInterval
-		// update default polling intervals: libsacloud/utils/vpcrouter
-		vpcrouter.DefaultNICUpdateWaitDuration = defaultInterval
+		// update default polling intervals: libsacloud/utils/builder
+		builder.DefaultNICUpdateWaitDuration = defaultInterval
 	}
 
 	return &APIClient{
