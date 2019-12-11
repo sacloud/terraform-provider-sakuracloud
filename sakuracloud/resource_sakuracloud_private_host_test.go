@@ -197,7 +197,7 @@ var testAccCheckSakuraCloudPrivateHostConfig_Destroy_Basic = `
 resource "sakuracloud_server" "foobar" {
   name = "myserver"
   private_host_id = "${sakuracloud_private_host.foobar.id}"
-  nics {
+  interfaces {
     upstream = "shared"
   }
 
@@ -214,7 +214,7 @@ var testAccCheckSakuraCloudPrivateHostConfig_Destroy_Update = `
 resource "sakuracloud_server" "foobar" {
   name = "myserver"
 
-  nics {
+  interfaces {
     upstream = "shared"
   }
 

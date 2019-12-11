@@ -219,7 +219,7 @@ resource "sakuracloud_server" "foobar" {
   name        = "myserver"
   disks       = ["${sakuracloud_disk.foobar.id}"]
   description = "Server from TerraForm for SAKURA CLOUD"
-  nics {
+  interfaces {
     upstream = sakuracloud_internet.foobar.switch_id
   }
   ipaddress   = "${sakuracloud_internet.foobar.ipaddresses[0]}"
@@ -247,7 +247,7 @@ resource "sakuracloud_server" "foobar" {
   name        = "myserver"
   disks       = ["${sakuracloud_disk.foobar.id}"]
   description = "Server from TerraForm for SAKURA CLOUD"
-  nics {
+  interfaces {
     upstream = sakuracloud_internet.foobar.switch_id
   }
   ipaddress   = "${sakuracloud_internet.foobar.ipaddresses[0]}"
