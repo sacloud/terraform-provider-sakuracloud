@@ -169,6 +169,12 @@ func TestAccImportSakuraCloudMobileGateway(t *testing.T) {
 			"traffic_control.0.enable_slack":         "true",
 			"traffic_control.0.slack_webhook":        "https://hooks.slack.com/services/xxx/xxx/xxx",
 			"traffic_control.0.auto_traffic_shaping": "true",
+			"static_routes.0.prefix":                 "192.168.10.0/24",
+			"static_routes.0.next_hop":               "192.168.11.1",
+			"static_routes.1.prefix":                 "192.168.10.0/25",
+			"static_routes.1.next_hop":               "192.168.11.2",
+			"static_routes.2.prefix":                 "192.168.10.0/26",
+			"static_routes.2.next_hop":               "192.168.11.3",
 		}
 
 		if err := compareStateMulti(s[0], expects); err != nil {
@@ -180,14 +186,18 @@ func TestAccImportSakuraCloudMobileGateway(t *testing.T) {
 	resourceName := "sakuracloud_mobile_gateway.foobar"
 
 	resource.ParallelTest(t, resource.TestCase{
-		PreCheck:     func() { testAccPreCheck(t) },
-		Providers:    testAccProviders,
-		CheckDestroy: testAccCheckSakuraCloudMobileGatewayDestroy,
+		PreCheck:  func() { testAccPreCheck(t) },
+		Providers: testAccProviders,
+		CheckDestroy: resource.ComposeTestCheckFunc(
+			testAccCheckSakuraCloudMobileGatewayDestroy,
+			testAccCheckSakuraCloudSwitchDestroy,
+			testAccCheckSakuraCloudIconDestroy,
+		),
 		Steps: []resource.TestStep{
-			resource.TestStep{
+			{
 				Config: testAccCheckSakuraCloudMobileGatewayConfig_basic,
 			},
-			resource.TestStep{
+			{
 				ResourceName:      resourceName,
 				ImportState:       true,
 				ImportStateCheck:  checkFn,

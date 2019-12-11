@@ -247,7 +247,7 @@ func resourceSakuraCloudInternetDelete(d *schema.ResourceData, meta interface{})
 	}
 
 	if err := waitForDeletionBySwitchID(ctx, client, zone, internet.Switch.ID); err != nil {
-		return fmt.Errorf("waiting deletion is failed: %s", err)
+		return fmt.Errorf("waiting deletion is failed: Internet[%s] still used by others: %s", internet.ID, err)
 	}
 
 	if err := internetOp.Delete(ctx, zone, internet.ID); err != nil {

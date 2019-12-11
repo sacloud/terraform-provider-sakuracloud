@@ -170,7 +170,7 @@ func resourceSakuraCloudSIMDelete(d *schema.ResourceData, meta interface{}) erro
 	}
 
 	if err := waitForDeletionBySIMID(ctx, client, sim.ID); err != nil {
-		return fmt.Errorf("waiting deletion is failed: %s", err)
+		return fmt.Errorf("waiting deletion is failed: SIM[%s] still used by MobileGateway: %s", sim.ID, err)
 	}
 
 	if err := simUtil.Delete(ctx, simOp, sim.ID); err != nil {
