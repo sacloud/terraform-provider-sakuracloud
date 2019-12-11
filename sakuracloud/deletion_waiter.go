@@ -87,7 +87,7 @@ func waitForDeletion(ctx context.Context, client *APIClient, zone string, id typ
 		case <-compCh:
 			return nil
 		case <-time.After(client.deletionWaiterTimeout):
-			return errors.New("waiting deletion is failed: timeout")
+			return errors.New("timeout")
 		}
 	}
 }
@@ -122,7 +122,7 @@ func waitForDeletionAllZone(ctx context.Context, client *APIClient, id types.ID,
 		case <-compCh:
 			return nil
 		case <-time.After(client.deletionWaiterTimeout):
-			return errors.New("waiting deletion is failed: timeout")
+			return errors.New("timeout")
 		}
 	}
 }
@@ -143,7 +143,7 @@ func waitForDeletionByFunc(ctx context.Context, client *APIClient, zone string, 
 			}
 
 		case <-time.After(client.deletionWaiterTimeout):
-			return errors.New("waiting deletion is failed: timeout")
+			return errors.New("timeout")
 		}
 	}
 }

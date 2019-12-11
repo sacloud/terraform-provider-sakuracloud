@@ -80,7 +80,7 @@ golint: goimports
 	test -z "$(GOLINT_TARGETS)"
 
 goimports: fmt
-	goimports -w $(GOFMT_FILES)
+	goimports -l -w $(GOFMT_FILES)
 
 fmt:
 	gofmt -w $(GOFMT_FILES)

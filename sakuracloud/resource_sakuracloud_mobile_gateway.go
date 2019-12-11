@@ -17,13 +17,13 @@ package sakuracloud
 import (
 	"context"
 	"fmt"
-	"github.com/sacloud/libsacloud/v2/utils/builder"
 	"math"
 	"regexp"
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/validation"
 	"github.com/sacloud/libsacloud/v2/sacloud"
+	"github.com/sacloud/libsacloud/v2/utils/builder"
 	mobileGatewayBuilder "github.com/sacloud/libsacloud/v2/utils/builder/mobilegateway"
 	mobileGatewayUtil "github.com/sacloud/libsacloud/v2/utils/mobilegateway"
 )

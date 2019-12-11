@@ -16,7 +16,6 @@ package sakuracloud
 
 import (
 	"fmt"
-	"github.com/sacloud/libsacloud/v2/utils/builder"
 	"log"
 	"net/http"
 	"os"
@@ -26,9 +25,9 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-sdk/httpclient"
 	"github.com/sacloud/libsacloud/v2/sacloud"
-
 	"github.com/sacloud/libsacloud/v2/sacloud/fake"
 	"github.com/sacloud/libsacloud/v2/sacloud/trace"
+	"github.com/sacloud/libsacloud/v2/utils/builder"
 	"github.com/sacloud/libsacloud/v2/utils/setup"
 )
 
