@@ -161,6 +161,10 @@ func resourceSakuraCloudPacketFilterDelete(d *schema.ResourceData, meta interfac
 		return fmt.Errorf("could not read SakuraCloud PacketFilter[%s]: %s", d.Id(), err)
 	}
 
+	if err := waitForDeletionByPacketFilterID(ctx, client, zone, pf.ID); err != nil {
+		return fmt.Errorf("waiting deletion is failed: PacketFilter[%s] still used by Server: %s", pf.ID, err)
+	}
+
 	if err := pfOp.Delete(ctx, zone, pf.ID); err != nil {
 		return fmt.Errorf("deleting SakuraCloud PacketFilter[%s] is failed: %s", d.Id(), err)
 	}

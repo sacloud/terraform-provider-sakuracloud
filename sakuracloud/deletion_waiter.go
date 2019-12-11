@@ -33,6 +33,12 @@ func waitForDeletionByPrivateHostID(ctx context.Context, client *APIClient, zone
 	})
 }
 
+func waitForDeletionByPacketFilterID(ctx context.Context, client *APIClient, zone string, packetFilterID types.ID) error {
+	return waitForDeletion(ctx, client, zone, packetFilterID, []deletionWaiterFindFunc{
+		findServerByPacketFilterID,
+	})
+}
+
 func waitForDeletionBySwitchID(ctx context.Context, client *APIClient, zone string, switchID types.ID) error {
 	return waitForDeletion(ctx, client, zone, switchID, []deletionWaiterFindFunc{
 		findServerBySwitchID,
@@ -119,6 +125,24 @@ func findServerByPrivateHostID(ctx context.Context, client *APIClient, zone stri
 	for _, s := range searched.Servers {
 		if s.PrivateHostID == id {
 			return true, nil
+		}
+	}
+	return false, nil
+}
+
+func findServerByPacketFilterID(ctx context.Context, client *APIClient, zone string, id types.ID) (bool, error) {
+	serverOp := sacloud.NewServerOp(client)
+
+	searched, err := serverOp.Find(ctx, zone, &sacloud.FindCondition{})
+	if err != nil {
+		return false, fmt.Errorf("finding Server is failed: %s", err)
+	}
+
+	for _, s := range searched.Servers {
+		for _, iface := range s.Interfaces {
+			if iface.PacketFilterID == id {
+				return true, nil
+			}
 		}
 	}
 	return false, nil
