@@ -52,7 +52,7 @@ func dataSourceSakuraCloudServer() *schema.Resource {
 				Type:     schema.TypeString,
 				Computed: true,
 			},
-			"nics": {
+			"interfaces": {
 				Type:     schema.TypeList,
 				Computed: true,
 				Elem: &schema.Resource{

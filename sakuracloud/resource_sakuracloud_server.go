@@ -80,7 +80,7 @@ func resourceSakuraCloudServer() *schema.Resource {
 					types.InterfaceDrivers.E1000.String(),
 				}, false),
 			},
-			"nics": {
+			"interfaces": {
 				Type:     schema.TypeList,
 				Optional: true,
 				MaxItems: 10,
@@ -317,7 +317,7 @@ func setServerResourceData(ctx context.Context, d *schema.ResourceData, client *
 	d.Set("interface_driver", data.InterfaceDriver.String())
 	d.Set("private_host_id", data.PrivateHostID.String())
 	d.Set("private_host_name", data.PrivateHostName)
-	if err := d.Set("nics", flattenServerNICs(data)); err != nil {
+	if err := d.Set("interfaces", flattenServerNICs(data)); err != nil {
 		return err
 	}
 	d.Set("icon_id", data.IconID.String())
@@ -387,7 +387,7 @@ func expandServerDisks(d *schema.ResourceData, client *APIClient) []diskBuilder.
 }
 
 func expandServerNIC(d resourceValueGettable) serverBuilder.NICSettingHolder {
-	nics := d.Get("nics").([]interface{})
+	nics := d.Get("interfaces").([]interface{})
 	if len(nics) == 0 {
 		return nil
 	}
@@ -412,7 +412,7 @@ func expandServerNIC(d resourceValueGettable) serverBuilder.NICSettingHolder {
 func expandServerAdditionalNICs(d resourceValueGettable) []serverBuilder.AdditionalNICSettingHolder {
 	var results []serverBuilder.AdditionalNICSettingHolder
 
-	nics := d.Get("nics").([]interface{})
+	nics := d.Get("interfaces").([]interface{})
 	if len(nics) < 2 {
 		return results
 	}
@@ -482,7 +482,7 @@ func flattenServerNetworkInfo(server *sacloud.Server) (ip, gateway string, nwMas
 
 func isServerDiskConfigChanged(d *schema.ResourceData) bool {
 	return d.HasChange("disks") ||
-		d.HasChange("nics") ||
+		d.HasChange("interfaces") ||
 		d.HasChange("ipaddress") ||
 		d.HasChange("gateway") ||
 		d.HasChange("nw_mask_len") ||

@@ -83,10 +83,10 @@ data sakuracoud_server "example" {
 
   - VNC関連項目を除去
   - 表示用IP(Interfaces.Switch.UserIPAddress)の設定を除去
-  - NIC/追加NICを統合
+  - NIC/追加NICを統合し`interfaces`を新設
     - `nic`に文字列を指定からオブジェクトを指定するように変更
-    - *`nic`*がオブジェクトになることでデフォルト値が設定できなくなる。`nics`を明示的に書く必要がある。
-    - パケットフィルタとMACアドレスを`nics`配下の各要素内に配置
+    - *`nic`*がオブジェクトになることでデフォルト値が設定できなくなる。`interfaces`を明示的に書く必要がある。
+    - パケットフィルタとMACアドレスを`interfaces`配下の各要素内に配置
     
 #### 変更前
 
@@ -111,15 +111,15 @@ resource sakuracloud_server "foobar" {
 ```hcl
 resource sakuracloud_server "foobar" {
   name = "foobar"
-  nics {
+  interfaces {
     upstream         = "shared"
     packet_filter_id = "200000000001"
   }
-  nics {
+  interfaces {
     upstream         = "100000000002" # スイッチID
     packet_filter_id = "200000000002" # パケットフィルタID
   }
-  nics {
+  interfaces {
     upstream         = "100000000003" # スイッチID
     packet_filter_id = "200000000003" # パケットフィルタID
   }

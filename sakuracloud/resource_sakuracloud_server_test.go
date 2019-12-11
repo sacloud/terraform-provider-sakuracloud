@@ -65,11 +65,11 @@ func TestAccResourceSakuraCloudServer(t *testing.T) {
 					resource.TestCheckResourceAttr(
 						"sakuracloud_server.foobar", "note_ids.0", "100000000000"),
 					resource.TestCheckResourceAttr(
-						"sakuracloud_server.foobar", "nics.#", "1"),
+						"sakuracloud_server.foobar", "interfaces.#", "1"),
 					resource.TestCheckResourceAttr(
-						"sakuracloud_server.foobar", "nics.0.upstream", "shared"),
+						"sakuracloud_server.foobar", "interfaces.0.upstream", "shared"),
 					resource.TestMatchResourceAttr("sakuracloud_server.foobar",
-						"nics.0.macaddress",
+						"interfaces.0.macaddress",
 						regexp.MustCompile(".+")), // should be not empty
 					resource.TestMatchResourceAttr("sakuracloud_server.foobar",
 						"ipaddress",
@@ -96,7 +96,7 @@ func TestAccResourceSakuraCloudServer(t *testing.T) {
 					resource.TestCheckResourceAttr(
 						"sakuracloud_server.foobar", "tags.0", "tag2"),
 					resource.TestCheckResourceAttr(
-						"sakuracloud_server.foobar", "nics.0.upstream", "shared"),
+						"sakuracloud_server.foobar", "interfaces.0.upstream", "shared"),
 					resource.TestMatchResourceAttr("sakuracloud_server.foobar",
 						"nw_address",
 						regexp.MustCompile(".+")), // should be not empty
@@ -120,9 +120,9 @@ func TestAccSakuraCloudServer_EditConnections(t *testing.T) {
 					testAccCheckSakuraCloudServerExists("sakuracloud_server.foobar", &server),
 					testAccCheckSakuraCloudServerAttributes(&server),
 					resource.TestCheckResourceAttr(
-						"sakuracloud_server.foobar", "nics.#", "1"),
+						"sakuracloud_server.foobar", "interfaces.#", "1"),
 					resource.TestCheckResourceAttr(
-						"sakuracloud_server.foobar", "nics.0.upstream", "shared"),
+						"sakuracloud_server.foobar", "interfaces.0.upstream", "shared"),
 				),
 			},
 			{
@@ -131,9 +131,9 @@ func TestAccSakuraCloudServer_EditConnections(t *testing.T) {
 					testAccCheckSakuraCloudServerExists("sakuracloud_server.foobar", &server),
 					testAccCheckSakuraCloudServerAttributes(&server),
 					resource.TestCheckResourceAttr(
-						"sakuracloud_server.foobar", "nics.#", "2"),
+						"sakuracloud_server.foobar", "interfaces.#", "2"),
 					resource.TestCheckResourceAttr(
-						"sakuracloud_server.foobar", "nics.0.upstream", "shared"),
+						"sakuracloud_server.foobar", "interfaces.0.upstream", "shared"),
 				),
 			},
 			{
@@ -142,9 +142,9 @@ func TestAccSakuraCloudServer_EditConnections(t *testing.T) {
 					testAccCheckSakuraCloudServerExists("sakuracloud_server.foobar", &server),
 					testAccCheckSakuraCloudServerAttributes(&server),
 					resource.TestCheckResourceAttr(
-						"sakuracloud_server.foobar", "nics.#", "4"),
+						"sakuracloud_server.foobar", "interfaces.#", "4"),
 					resource.TestCheckResourceAttr(
-						"sakuracloud_server.foobar", "nics.0.upstream", "shared"),
+						"sakuracloud_server.foobar", "interfaces.0.upstream", "shared"),
 				),
 			},
 			{
@@ -153,9 +153,9 @@ func TestAccSakuraCloudServer_EditConnections(t *testing.T) {
 					testAccCheckSakuraCloudServerExists("sakuracloud_server.foobar", &server),
 					testAccCheckSakuraCloudServerAttributesWithoutSharedInterface(&server),
 					resource.TestCheckResourceAttr(
-						"sakuracloud_server.foobar", "nics.#", "2"),
+						"sakuracloud_server.foobar", "interfaces.#", "2"),
 					resource.TestCheckResourceAttr(
-						"sakuracloud_server.foobar", "nics.0.upstream", "disconnect"),
+						"sakuracloud_server.foobar", "interfaces.0.upstream", "disconnect"),
 				),
 			},
 		},
@@ -172,13 +172,13 @@ func TestAccSakuraCloudServer_ConnectPacketFilters(t *testing.T) {
 				Config: testAccCheckSakuraCloudServerConfig_with_packet_filter,
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttr(
-						"sakuracloud_server.foobar", "nics.#", "2"),
+						"sakuracloud_server.foobar", "interfaces.#", "2"),
 					resource.TestCheckResourceAttrPair(
-						"sakuracloud_server.foobar", "nics.0.packet_filter_id",
+						"sakuracloud_server.foobar", "interfaces.0.packet_filter_id",
 						"sakuracloud_packet_filter.foobar", "id",
 					),
 					resource.TestCheckResourceAttrPair(
-						"sakuracloud_server.foobar", "nics.1.packet_filter_id",
+						"sakuracloud_server.foobar", "interfaces.1.packet_filter_id",
 						"sakuracloud_packet_filter.foobar", "id",
 					),
 				),
@@ -187,9 +187,9 @@ func TestAccSakuraCloudServer_ConnectPacketFilters(t *testing.T) {
 				Config: testAccCheckSakuraCloudServerConfig_with_packet_filter_upd,
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttr(
-						"sakuracloud_server.foobar", "nics.#", "1"),
+						"sakuracloud_server.foobar", "interfaces.#", "1"),
 					resource.TestCheckResourceAttrPair(
-						"sakuracloud_server.foobar", "nics.0.packet_filter_id",
+						"sakuracloud_server.foobar", "interfaces.0.packet_filter_id",
 						"sakuracloud_packet_filter.foobar", "id",
 					),
 				),
@@ -198,9 +198,9 @@ func TestAccSakuraCloudServer_ConnectPacketFilters(t *testing.T) {
 				Config: testAccCheckSakuraCloudServerConfig_with_packet_filter_del,
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttr(
-						"sakuracloud_server.foobar", "nics.#", "1"),
+						"sakuracloud_server.foobar", "interfaces.#", "1"),
 					resource.TestCheckResourceAttr(
-						"sakuracloud_server.foobar", "nics.0.packet_filter_id", ""),
+						"sakuracloud_server.foobar", "interfaces.0.packet_filter_id", ""),
 				),
 			},
 		},
@@ -267,11 +267,11 @@ func TestAccSakuraCloudServer_EditConnect_With_Same_Switch(t *testing.T) {
 					testAccCheckSakuraCloudServerExists("sakuracloud_server.foobar", &server),
 					testAccCheckSakuraCloudServerAttributes(&server),
 					resource.TestCheckResourceAttr(
-						"sakuracloud_server.foobar", "nics.#", "2"),
+						"sakuracloud_server.foobar", "interfaces.#", "2"),
 					resource.TestCheckResourceAttr(
-						"sakuracloud_server.foobar", "nics.0.upstream", "shared"),
+						"sakuracloud_server.foobar", "interfaces.0.upstream", "shared"),
 					resource.TestCheckResourceAttrPair(
-						"sakuracloud_server.foobar", "nics.1.upstream",
+						"sakuracloud_server.foobar", "interfaces.1.upstream",
 						"sakuracloud_switch.foobar", "id",
 					),
 					func(s *terraform.State) error {
@@ -287,9 +287,9 @@ func TestAccSakuraCloudServer_EditConnect_With_Same_Switch(t *testing.T) {
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckSakuraCloudServerExists("sakuracloud_server.foobar", &server),
 					resource.TestCheckResourceAttr(
-						"sakuracloud_server.foobar", "nics.#", "2"),
+						"sakuracloud_server.foobar", "interfaces.#", "2"),
 					resource.TestCheckResourceAttr(
-						"sakuracloud_server.foobar", "nics.0.upstream", "shared"),
+						"sakuracloud_server.foobar", "interfaces.0.upstream", "shared"),
 					func(s *terraform.State) error {
 						if !server.Interfaces[1].SwitchID.IsEmpty() {
 							return errors.New("Server.Interfaces[1].Switch is not empty")
@@ -427,7 +427,7 @@ resource "sakuracloud_server" "foobar" {
   description = "Server from TerraForm for SAKURA CLOUD"
   tags = ["tag1"]
   icon_id = "${sakuracloud_icon.foobar.id}"
-  nics {
+  interfaces {
     upstream = "shared"
   }
 
@@ -462,7 +462,7 @@ resource "sakuracloud_server" "foobar" {
   description = "Server from TerraForm for SAKURA CLOUD"
   tags = ["tag2"]
   interface_driver = "e1000"
-  nics {
+  interfaces {
     upstream = "shared"
   }
 }
@@ -473,7 +473,7 @@ resource "sakuracloud_server" "foobar" {
   name = "myserver"
   description = "Server from TerraForm for SAKURA CLOUD"
   tags = ["tag1"]
-  nics {
+  interfaces {
     upstream = "shared"
   }
 
@@ -491,10 +491,10 @@ const testAccCheckSakuraCloudServerConfig_swiched_NIC_added = `
 resource "sakuracloud_server" "foobar" {
   name = "myserver"
   description = "Server from TerraForm for SAKURA CLOUD"
-  nics {
+  interfaces {
     upstream = "shared"
   }
-  nics {
+  interfaces {
     upstream = sakuracloud_switch.sw1.id
   }
 
@@ -508,16 +508,16 @@ const testAccCheckSakuraCloudServerConfig_swiched_NIC_updated = `
 resource "sakuracloud_server" "foobar" {
   name = "myserver"
   description = "Server from TerraForm for SAKURA CLOUD"
-  nics {
+  interfaces {
     upstream = "shared"
   }
-  nics {
+  interfaces {
     upstream = sakuracloud_switch.sw1.id
   }
-  nics {
+  interfaces {
     upstream = sakuracloud_switch.sw2.id
   }
-  nics {
+  interfaces {
     upstream = sakuracloud_switch.sw3.id
   }
 
@@ -539,10 +539,10 @@ const testAccCheckSakuraCloudServerConfig_nw_nothing = `
 resource "sakuracloud_server" "foobar" {
   name = "myserver"
   description = "Server from TerraForm for SAKURA CLOUD"
-  nics {
+  interfaces {
     upstream = "disconnect"
   }
-  nics {
+  interfaces {
     upstream = sakuracloud_switch.sw1.id
   }
 
@@ -566,11 +566,11 @@ resource "sakuracloud_packet_filter" "foobar" {
 }
 resource "sakuracloud_server" "foobar" {
   name = "terraform-test-server"
-  nics {
+  interfaces {
     upstream = "shared"
     packet_filter_id = sakuracloud_packet_filter.foobar.id
   }
-  nics {
+  interfaces {
     upstream = sakuracloud_switch.foobar.id
     packet_filter_id = sakuracloud_packet_filter.foobar.id
   }
@@ -597,7 +597,7 @@ resource "sakuracloud_packet_filter" "foobar" {
 }
 resource "sakuracloud_server" "foobar" {
   name = "myserver_upd"
-  nics {
+  interfaces {
     upstream = "shared"
     packet_filter_id = sakuracloud_packet_filter.foobar.id
   }
@@ -609,7 +609,7 @@ resource "sakuracloud_server" "foobar" {
 const testAccCheckSakuraCloudServerConfig_with_packet_filter_del = `
 resource "sakuracloud_server" "foobar" {
   name = "myserver_del"
-  nics {
+  interfaces {
     upstream = "shared"
   }
   force_shutdown = true
@@ -619,7 +619,7 @@ const testAccCheckSakuraCloudServerConfig_with_blank_disk = `
 resource "sakuracloud_server" "foobar" {
   name = "myserver_with_blank"
   disks = ["${sakuracloud_disk.foobar.id}"]
-  nics {
+  interfaces {
     upstream = "shared"
   }
   force_shutdown = true
@@ -635,10 +635,10 @@ resource "sakuracloud_switch" "foobar" {
 }
 resource "sakuracloud_server" "foobar" {
   name = "foobar"
-  nics {
+  interfaces {
     upstream = "shared"
   }
-  nics {
+  interfaces {
     upstream = sakuracloud_switch.foobar.id
   }
   force_shutdown = true
@@ -651,10 +651,10 @@ resource "sakuracloud_switch" "foobar" {
 }
 resource "sakuracloud_server" "foobar" {
   name = "foobar"
-  nics {
+  interfaces {
     upstream = "shared"
   }
-  nics {
+  interfaces {
     upstream = "disconnect"
   }
 
@@ -685,7 +685,7 @@ resource "sakuracloud_switch" "foobar" {
 resource "sakuracloud_server" "foobar" {
   name        = "foobar"
   disks       = ["${sakuracloud_disk.foobar.id}"]
-  nics {
+  interfaces {
     upstream = sakuracloud_switch.foobar.id
   }
   ipaddress   = "192.168.0.2"
