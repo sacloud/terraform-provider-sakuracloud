@@ -638,8 +638,10 @@ func (b *Builder) reconcileInterfaces(ctx context.Context, zone string, server *
 					return err
 				}
 			}
-			if err := b.Client.Interface.ConnectToPacketFilter(ctx, zone, nic.ID, desired.packetFilterID); err != nil {
-				return err
+			if !desired.packetFilterID.IsEmpty() {
+				if err := b.Client.Interface.ConnectToPacketFilter(ctx, zone, nic.ID, desired.packetFilterID); err != nil {
+					return err
+				}
 			}
 		}
 		if desired.displayIP != nic.UserIPAddress {
