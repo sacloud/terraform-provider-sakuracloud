@@ -605,6 +605,12 @@ func (d *ConnectedDiskBuilder) Build(ctx context.Context, zone string, serverID 
 		if err := d.Client.Disk.Config(ctx, zone, d.ID, req); err != nil {
 			return nil, err
 		}
+		waiter := sacloud.WaiterForReady(func() (interface{}, error) {
+			return d.Client.Disk.Read(ctx, zone, d.ID)
+		})
+		if _, err := waiter.WaitForState(ctx); err != nil {
+			return nil, err
+		}
 	}
 	return res, nil
 }
@@ -622,6 +628,12 @@ func (d *ConnectedDiskBuilder) Update(ctx context.Context, zone string) (*Update
 			return nil, err
 		}
 		if err := d.Client.Disk.Config(ctx, zone, d.ID, req); err != nil {
+			return nil, err
+		}
+		waiter := sacloud.WaiterForReady(func() (interface{}, error) {
+			return d.Client.Disk.Read(ctx, zone, d.ID)
+		})
+		if _, err := waiter.WaitForState(ctx); err != nil {
 			return nil, err
 		}
 	}
