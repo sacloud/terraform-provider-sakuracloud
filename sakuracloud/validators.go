@@ -42,6 +42,22 @@ func validateSakuracloudIDType(v interface{}, k string) ([]string, []error) {
 	return ws, errors
 }
 
+func validateSakuraCloudServerNIC(v interface{}, k string) ([]string, []error) {
+	var ws []string
+	var errors []error
+
+	value := v.(string)
+	if value == "" || value == "shared" || value == "disconnect" {
+		return ws, errors
+	}
+	_, err := strconv.ParseInt(value, 10, 64)
+	if err != nil {
+		errors = append(errors, fmt.Errorf("%q must be ID string(number only): %s", k, err))
+
+	}
+	return ws, errors
+}
+
 func validateBackupWeekdays(d resourceValueGettable, k string) error {
 	weekdays, ok := d.GetOk(k)
 	if !ok || len(weekdays.([]interface{})) == 0 {

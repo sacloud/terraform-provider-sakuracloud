@@ -52,13 +52,25 @@ func dataSourceSakuraCloudServer() *schema.Resource {
 				Type:     schema.TypeString,
 				Computed: true,
 			},
-			"nic": {
-				Type:     schema.TypeString,
+			"interfaces": {
+				Type:     schema.TypeList,
 				Computed: true,
-			},
-			"display_ipaddress": {
-				Type:     schema.TypeString,
-				Computed: true,
+				Elem: &schema.Resource{
+					Schema: map[string]*schema.Schema{
+						"upstream": {
+							Type:     schema.TypeString,
+							Computed: true,
+						},
+						"packet_filter_id": {
+							Type:     schema.TypeString,
+							Computed: true,
+						},
+						"macaddress": {
+							Type:     schema.TypeString,
+							Computed: true,
+						},
+					},
+				},
 			},
 			"cdrom_id": {
 				Type:     schema.TypeString,
@@ -71,21 +83,6 @@ func dataSourceSakuraCloudServer() *schema.Resource {
 			"private_host_name": {
 				Type:     schema.TypeString,
 				Computed: true,
-			},
-			"additional_nics": {
-				Type:     schema.TypeList,
-				Computed: true,
-				Elem:     &schema.Schema{Type: schema.TypeString},
-			},
-			"additional_display_ipaddresses": {
-				Type:     schema.TypeList,
-				Computed: true,
-				Elem:     &schema.Schema{Type: schema.TypeString},
-			},
-			"packet_filter_ids": {
-				Type:     schema.TypeList,
-				Computed: true,
-				Elem:     &schema.Schema{Type: schema.TypeString},
 			},
 			"icon_id": {
 				Type:     schema.TypeString,
@@ -108,11 +105,6 @@ func dataSourceSakuraCloudServer() *schema.Resource {
 				Description:  "target SakuraCloud zone",
 				ValidateFunc: validateZone([]string{"is1a", "is1b", "tk1a", "tk1v"}),
 			},
-			"macaddresses": {
-				Type:     schema.TypeList,
-				Computed: true,
-				Elem:     &schema.Schema{Type: schema.TypeString},
-			},
 			"ipaddress": {
 				Type:     schema.TypeString,
 				Computed: true,
@@ -133,19 +125,6 @@ func dataSourceSakuraCloudServer() *schema.Resource {
 			"nw_mask_len": {
 				Type:     schema.TypeInt,
 				Computed: true,
-			},
-			"vnc_host": {
-				Type:     schema.TypeString,
-				Computed: true,
-			},
-			"vnc_port": {
-				Type:     schema.TypeInt,
-				Computed: true,
-			},
-			"vnc_password": {
-				Type:      schema.TypeString,
-				Computed:  true,
-				Sensitive: true,
 			},
 		},
 	}

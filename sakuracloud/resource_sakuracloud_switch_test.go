@@ -134,7 +134,12 @@ var testAccCheckSakuraCloudSwitchConfig_update = `
 resource "sakuracloud_server" "foobar" {
   name = "myserver"
   description = "Server from TerraForm for SAKURA CLOUD"
-  additional_nics = ["${sakuracloud_switch.foobar.id}"]
+  interfaces {
+    upstream = "shared"
+  }
+  interfaces {
+    upstream = sakuracloud_switch.foobar.id
+  }
 }
 resource "sakuracloud_switch" "foobar" {
   name = "myswitch_upd"

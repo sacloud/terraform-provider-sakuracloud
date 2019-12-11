@@ -27,16 +27,30 @@ import (
 
 type deletionWaiterFindFunc func(context.Context, *APIClient, string, types.ID) (bool, error)
 
+func waitForDeletionByPrivateHostID(ctx context.Context, client *APIClient, zone string, privateHostID types.ID) error {
+	return waitForDeletion(ctx, client, zone, privateHostID, []deletionWaiterFindFunc{
+		findServerByPrivateHostID,
+	})
+}
+
+func waitForDeletionByPacketFilterID(ctx context.Context, client *APIClient, zone string, packetFilterID types.ID) error {
+	return waitForDeletion(ctx, client, zone, packetFilterID, []deletionWaiterFindFunc{
+		findServerByPacketFilterID,
+	})
+}
+
 func waitForDeletionBySwitchID(ctx context.Context, client *APIClient, zone string, switchID types.ID) error {
-	finder := []deletionWaiterFindFunc{
+	return waitForDeletion(ctx, client, zone, switchID, []deletionWaiterFindFunc{
 		findServerBySwitchID,
 		findLoadBalancerBySwitchID,
 		findVPCRouterBySwitchID,
 		findDatabaseBySwitchID,
 		findNFSBySwitchID,
 		findMobileGatewayBySwitchID,
-	}
+	})
+}
 
+func waitForDeletion(ctx context.Context, client *APIClient, zone string, id types.ID, finder []deletionWaiterFindFunc) error {
 	var wg sync.WaitGroup
 	wg.Add(len(finder))
 
@@ -45,7 +59,7 @@ func waitForDeletionBySwitchID(ctx context.Context, client *APIClient, zone stri
 
 	for _, f := range finder {
 		go func(f deletionWaiterFindFunc) {
-			if err := waitForDeletionByFunc(ctx, client, zone, switchID, f); err != nil {
+			if err := waitForDeletionByFunc(ctx, client, zone, id, f); err != nil {
 				errCh <- err
 			}
 			wg.Done()
@@ -98,6 +112,40 @@ func findServerBySwitchID(ctx context.Context, client *APIClient, zone string, i
 		return false, fmt.Errorf("finding server is failed: %s", err)
 	}
 	return searched.Count != 0, nil
+}
+
+func findServerByPrivateHostID(ctx context.Context, client *APIClient, zone string, id types.ID) (bool, error) {
+	serverOp := sacloud.NewServerOp(client)
+
+	searched, err := serverOp.Find(ctx, zone, &sacloud.FindCondition{})
+	if err != nil {
+		return false, fmt.Errorf("finding Server is failed: %s", err)
+	}
+
+	for _, s := range searched.Servers {
+		if s.PrivateHostID == id {
+			return true, nil
+		}
+	}
+	return false, nil
+}
+
+func findServerByPacketFilterID(ctx context.Context, client *APIClient, zone string, id types.ID) (bool, error) {
+	serverOp := sacloud.NewServerOp(client)
+
+	searched, err := serverOp.Find(ctx, zone, &sacloud.FindCondition{})
+	if err != nil {
+		return false, fmt.Errorf("finding Server is failed: %s", err)
+	}
+
+	for _, s := range searched.Servers {
+		for _, iface := range s.Interfaces {
+			if iface.PacketFilterID == id {
+				return true, nil
+			}
+		}
+	}
+	return false, nil
 }
 
 func findVPCRouterBySwitchID(ctx context.Context, client *APIClient, zone string, id types.ID) (bool, error) {

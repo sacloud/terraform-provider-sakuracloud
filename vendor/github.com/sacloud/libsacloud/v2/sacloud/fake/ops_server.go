@@ -280,6 +280,13 @@ func (o *ServerOp) ChangePlan(ctx context.Context, zone string, id types.ID, pla
 			putDisk(zone, disk)
 		}
 	}
+	for _, nic := range newServer.Interfaces {
+		iface, err := NewInterfaceOp().Read(ctx, zone, nic.ID)
+		if err == nil {
+			iface.ServerID = newServer.ID
+			putInterface(zone, iface)
+		}
+	}
 
 	return newServer, nil
 }
