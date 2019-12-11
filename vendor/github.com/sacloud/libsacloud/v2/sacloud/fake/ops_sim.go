@@ -172,6 +172,7 @@ func (o *SIMOp) AssignIP(ctx context.Context, id types.ID, param *sacloud.SIMAss
 	}
 	value.Info.IP = param.IP
 	putSIM(sacloud.APIDefaultZone, value)
+
 	return nil
 }
 
