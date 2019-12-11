@@ -39,25 +39,11 @@ var (
 )
 
 func TestAccResourceSakuraCloudSIM(t *testing.T) {
+	skipIfEnvIsNotSet(t, envICCID, envPasscode, envIMEI)
 
-	if id, ok := os.LookupEnv(envICCID); ok {
-		iccid = id
-	} else {
-		t.Skipf("ENV %q is requilred. skip", envICCID)
-		return
-	}
-	if pass, ok := os.LookupEnv(envPasscode); ok {
-		passcode = pass
-	} else {
-		t.Skipf("ENV %q is requilred. skip", envPasscode)
-		return
-	}
-	if envimei, ok := os.LookupEnv(envIMEI); ok {
-		imei = envimei
-	} else {
-		t.Skipf("ENV %q is requilred. skip", envIMEI)
-		return
-	}
+	iccid = os.Getenv(envICCID)
+	passcode = os.Getenv(envPasscode)
+	imei = os.Getenv(envIMEI)
 
 	var sim sacloud.SIM
 	resource.ParallelTest(t, resource.TestCase{
@@ -85,8 +71,6 @@ func TestAccResourceSakuraCloudSIM(t *testing.T) {
 						"sakuracloud_sim.foobar", "tags.1", "hoge2"),
 					resource.TestCheckResourceAttr(
 						"sakuracloud_sim.foobar", "enabled", "true"),
-					resource.TestCheckResourceAttr(
-						"sakuracloud_sim.foobar", "ipaddress", "192.168.100.1"),
 					resource.TestCheckResourceAttrPair(
 						"sakuracloud_sim.foobar", "icon_id",
 						"sakuracloud_icon.foobar", "id",
@@ -113,25 +97,83 @@ func TestAccResourceSakuraCloudSIM(t *testing.T) {
 						"sakuracloud_sim.foobar", "tags.1", "hoge2_after"),
 					resource.TestCheckResourceAttr(
 						"sakuracloud_sim.foobar", "enabled", "false"),
-					resource.TestCheckResourceAttr(
-						"sakuracloud_sim.foobar", "ipaddress", "192.168.100.2"),
 					resource.TestCheckResourceAttr("sakuracloud_sim.foobar", "icon_id", ""),
+				),
+			},
+		},
+	})
+}
+
+func TestAccResourceSakuraCloudSIMWithMobileGateway(t *testing.T) {
+	skipIfFakeModeEnabled(t)
+	skipIfEnvIsNotSet(t, envICCID, envPasscode, envIMEI)
+
+	iccid = os.Getenv(envICCID)
+	passcode = os.Getenv(envPasscode)
+	imei = os.Getenv(envIMEI)
+
+	resource.ParallelTest(t, resource.TestCase{
+		PreCheck:  func() { testAccPreCheck(t) },
+		Providers: testAccProviders,
+		CheckDestroy: resource.ComposeTestCheckFunc(
+			testAccCheckSakuraCloudSIMDestroy,
+			testAccCheckSakuraCloudMobileGatewayDestroy,
+		),
+		Steps: []resource.TestStep{
+			{
+				Config: fmt.Sprintf(testAccCheckSakuraCloudSIMWithMobileGateway_basic, iccid, passcode, imei),
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr("sakuracloud_sim.foobar", "name", "terraform-sakuracloud-sim"),
+					resource.TestCheckResourceAttr("sakuracloud_mobile_gateway.foobar", "sims.#", "1"),
 					resource.TestCheckResourceAttrPair(
+						"sakuracloud_mobile_gateway.foobar", "sims.0.sim_id",
 						"sakuracloud_sim.foobar", "id",
-						"sakuracloud_mobile_gateway.mgw", "sim_ids.0",
+					),
+					resource.TestCheckResourceAttr("sakuracloud_mobile_gateway.foobar", "sims.0.ipaddress", "192.168.0.11"),
+					resource.TestCheckResourceAttr("sakuracloud_mobile_gateway.foobar", "sim_routes.#", "2"),
+					resource.TestCheckResourceAttrPair(
+						"sakuracloud_mobile_gateway.foobar", "sim_routes.0.sim_id",
+						"sakuracloud_sim.foobar", "id",
+					),
+					resource.TestCheckResourceAttr("sakuracloud_mobile_gateway.foobar", "sim_routes.0.prefix", "192.168.1.0/24"),
+					resource.TestCheckResourceAttrPair(
+						"sakuracloud_mobile_gateway.foobar", "sim_routes.1.sim_id",
+						"sakuracloud_sim.foobar", "id",
+					),
+					resource.TestCheckResourceAttr("sakuracloud_mobile_gateway.foobar", "sim_routes.1.prefix", "192.168.2.0/24"),
+				),
+			},
+			{
+				Config: fmt.Sprintf(testAccCheckSakuraCloudSIMWithMobileGateway_upd, iccid, passcode, imei),
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr("sakuracloud_sim.foobar", "name", "terraform-sakuracloud-sim"),
+					resource.TestCheckResourceAttr("sakuracloud_mobile_gateway.foobar", "sims.#", "1"),
+					resource.TestCheckResourceAttrPair(
+						"sakuracloud_mobile_gateway.foobar", "sims.0.sim_id",
+						"sakuracloud_sim.foobar", "id",
+					),
+					resource.TestCheckResourceAttr("sakuracloud_mobile_gateway.foobar", "sims.0.ipaddress", "192.168.0.11"),
+					resource.TestCheckResourceAttr("sakuracloud_mobile_gateway.foobar", "sim_routes.#", "1"),
+					resource.TestCheckResourceAttrPair(
+						"sakuracloud_mobile_gateway.foobar", "sim_routes.0.sim_id",
+						"sakuracloud_sim.foobar", "id",
+					),
+					resource.TestCheckResourceAttr("sakuracloud_mobile_gateway.foobar", "sim_routes.0.prefix", "192.168.2.0/24"),
+					resource.TestCheckResourceAttrPair(
+						"sakuracloud_sim.foobar", "mobile_gateway_id",
+						"sakuracloud_mobile_gateway.foobar", "id",
+					),
+					resource.TestCheckResourceAttrPair(
+						"sakuracloud_sim.foobar", "ipaddress",
+						"sakuracloud_mobile_gateway.foobar", "sims.0.ipaddress",
 					),
 				),
 			},
 			{
-				Config: fmt.Sprintf(testAccCheckSakuraCloudSIMConfig_disconnect, iccid, passcode, imei),
-				Check:  testAccCheckSakuraCloudSIMExists("sakuracloud_sim.foobar", &sim),
-			},
-			{
-				Config: fmt.Sprintf(testAccCheckSakuraCloudSIMConfig_disconnect, iccid, passcode, imei),
+				Config: testAccCheckSakuraCloudSIMWithMobileGateway_del,
 				Check: resource.ComposeTestCheckFunc(
-					testAccCheckSakuraCloudSIMExists("sakuracloud_sim.foobar", &sim),
-					resource.TestCheckResourceAttr(
-						"sakuracloud_mobile_gateway.mgw", "sim_ids.#", "0"),
+					resource.TestCheckResourceAttr("sakuracloud_mobile_gateway.foobar", "sims.#", "0"),
+					resource.TestCheckResourceAttr("sakuracloud_mobile_gateway.foobar", "sim_routes.#", "0"),
 				),
 			},
 		},
@@ -188,10 +230,6 @@ func testAccCheckSakuraCloudSIMDestroy(s *terraform.State) error {
 }
 
 var testAccCheckSakuraCloudSIMConfig_basic = `
-resource sakuracloud_mobile_gateway "mgw" {
-  name = "name"
-  zone = "is1b"
-}
 resource "sakuracloud_sim" "foobar" {
   name = "name_before"
   description = "description_before"
@@ -204,9 +242,6 @@ resource "sakuracloud_sim" "foobar" {
   carrier = ["softbank"]
 
   enabled = true
-  mobile_gateway_id = "${sakuracloud_mobile_gateway.mgw.id}"
-  mobile_gateway_zone = "is1b"
-  ipaddress = "192.168.100.1"
 }
 
 resource "sakuracloud_icon" "foobar" {
@@ -215,10 +250,6 @@ resource "sakuracloud_icon" "foobar" {
 }`
 
 var testAccCheckSakuraCloudSIMConfig_update = `
-resource sakuracloud_mobile_gateway "mgw" {
-  name = "name"
-  zone = "is1b"
-}
 resource "sakuracloud_sim" "foobar" {
   name = "name_after"
   description = "description_after"
@@ -231,21 +262,103 @@ resource "sakuracloud_sim" "foobar" {
   carrier = ["kddi"]
 
   enabled = false
-  mobile_gateway_id = "${sakuracloud_mobile_gateway.mgw.id}"
-  mobile_gateway_zone = "is1b"
-  ipaddress = "192.168.100.2"
 }`
 
-var testAccCheckSakuraCloudSIMConfig_disconnect = `
-resource sakuracloud_mobile_gateway "mgw" {
-  name = "name"
-  zone = "is1b"
-}
+var testAccCheckSakuraCloudSIMWithMobileGateway_basic = `
 resource "sakuracloud_sim" "foobar" {
-  name = "name_disconnect"
-  iccid = "%s"
+  name = "terraform-sakuracloud-sim"
+
+  iccid    = "%s"
   passcode = "%s"
-  imei = "%s"
-  carrier = ["softbank"]
-  enabled = false
+  imei     = "%s"
+  carrier  = ["softbank"]
+
+  enabled = true
+}
+
+data sakuracloud_zone "zone" {}
+
+resource "sakuracloud_switch" "foobar" {
+  name = "terraform-saukracloud-switch"
+}
+resource "sakuracloud_mobile_gateway" "foobar" {
+  private_interface {
+    switch_id   = sakuracloud_switch.foobar.id
+    ipaddress   = "192.168.0.1"
+    nw_mask_len = 24
+  }
+  internet_connection = true
+  name                = "terraform-sakuracloud-mobile-gateway"
+  dns_server1         = data.sakuracloud_zone.zone.dns_servers[0]
+  dns_server2         = data.sakuracloud_zone.zone.dns_servers[1]
+
+  sims {
+    sim_id    = sakuracloud_sim.foobar.id
+    ipaddress = "192.168.0.11"
+  }
+
+  sim_routes {
+    sim_id = sakuracloud_sim.foobar.id
+    prefix = "192.168.1.0/24"
+  }
+  sim_routes {
+    sim_id = sakuracloud_sim.foobar.id
+    prefix = "192.168.2.0/24"
+  }
+}`
+
+var testAccCheckSakuraCloudSIMWithMobileGateway_upd = `
+resource "sakuracloud_sim" "foobar" {
+  name = "terraform-sakuracloud-sim"
+
+  iccid    = "%s"
+  passcode = "%s"
+  imei     = "%s"
+  carrier  = ["softbank"]
+
+  enabled = true
+}
+
+data sakuracloud_zone "zone" {}
+
+resource "sakuracloud_switch" "foobar" {
+  name = "terraform-saukracloud-switch"
+}
+resource "sakuracloud_mobile_gateway" "foobar" {
+  private_interface {
+    switch_id   = sakuracloud_switch.foobar.id
+    ipaddress   = "192.168.0.1"
+    nw_mask_len = 24
+  }
+  internet_connection = true
+  name                = "terraform-sakuracloud-mobile-gateway"
+  dns_server1         = data.sakuracloud_zone.zone.dns_servers[0]
+  dns_server2         = data.sakuracloud_zone.zone.dns_servers[1]
+
+  sims {
+    sim_id    = sakuracloud_sim.foobar.id
+    ipaddress = "192.168.0.11"
+  }
+  sim_routes {
+    sim_id = sakuracloud_sim.foobar.id
+    prefix = "192.168.2.0/24"
+  }
+}`
+
+var testAccCheckSakuraCloudSIMWithMobileGateway_del = `
+data sakuracloud_zone "zone" {}
+
+resource "sakuracloud_switch" "foobar" {
+  name = "terraform-saukracloud-switch"
+}
+resource "sakuracloud_mobile_gateway" "foobar" {
+  private_interface {
+    switch_id   = sakuracloud_switch.foobar.id
+    ipaddress   = "192.168.0.1"
+    nw_mask_len = 24
+  }
+  internet_connection = true
+  name                = "terraform-sakuracloud-mobile-gateway"
+  dns_server1         = data.sakuracloud_zone.zone.dns_servers[0]
+  dns_server2         = data.sakuracloud_zone.zone.dns_servers[1]
 }`
