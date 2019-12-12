@@ -35,6 +35,8 @@ var SpecialTags = struct {
 	BootCDROM SpecialTag
 	// BootNetwork 優先ブートデバイスをPXE bootに設定します
 	BootNetwork SpecialTag
+	// CPUTopology CPUソケット数を1と認識させる
+	CPUTopology SpecialTag
 }{
 	GroupA:      SpecialTag("@group=a"),
 	GroupB:      SpecialTag("@group=b"),
@@ -44,4 +46,5 @@ var SpecialTags = struct {
 	KeyboardUS:  SpecialTag("@keyboard-us"),
 	BootCDROM:   SpecialTag("@boot-cdrom"),
 	BootNetwork: SpecialTag("@boot-network"),
+	CPUTopology: SpecialTag("@cpu-topology"),
 }
