@@ -227,11 +227,11 @@ var testAccCheckSakuraCloudGSLBConfig_basic = `
 resource "sakuracloud_gslb" "foobar" {
   name = "terraform.io"
   health_check {
-    protocol = "http"
-    delay_loop = 10
+    protocol    = "http"
+    delay_loop  = 10
     host_header = "terraform.io"
-    path = "/"
-    status = "200"
+    path        = "/"
+    status      = "200"
   }
   sorry_server = "8.8.8.8"
   servers {
@@ -259,11 +259,11 @@ var testAccCheckSakuraCloudGSLBConfig_update = `
 resource "sakuracloud_gslb" "foobar" {
   name = "terraform.io"
   health_check {
-    protocol = "https"
-    delay_loop = 20
+    protocol    = "https"
+    delay_loop  = 20
     host_header = "update.terraform.io"
-    path = "/"
-    status = "200"
+    path        = "/"
+    status      = "200"
   }
   servers {
     ipaddress = "2.2.2.2"
@@ -276,21 +276,21 @@ resource "sakuracloud_gslb" "foobar" {
     enabled   = false
   }
   sorry_server = "8.8.4.4"
-  description = "GSLB from TerraForm for SAKURA CLOUD"
-  tags = ["hoge1", "hoge2"]
+  description  = "GSLB from TerraForm for SAKURA CLOUD"
+  tags         = ["hoge1", "hoge2"]
 }`
 
 var testAccCheckSakuraCloudGSLBConfig_added = `
 resource "sakuracloud_gslb" "foobar" {
   name = "terraform.io"
   health_check {
-    protocol = "https"
-    delay_loop = 20
+    protocol    = "https"
+    delay_loop  = 20
     host_header = "update.terraform.io"
-    path = "/"
-    status = "200"
+    path        = "/"
+    status      = "200"
   }
   sorry_server = "8.8.4.4"
-  description = "GSLB from TerraForm for SAKURA CLOUD"
-  tags = ["hoge1", "hoge2"]
+  description  = "GSLB from TerraForm for SAKURA CLOUD"
+  tags         = ["hoge1", "hoge2"]
 }`

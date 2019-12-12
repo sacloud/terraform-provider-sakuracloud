@@ -60,11 +60,11 @@ resource sakuracloud_internet "foobar" {
 }
 resource "sakuracloud_subnet" "foobar" {
   internet_id = "${sakuracloud_internet.foobar.id}"
-  next_hop = "${sakuracloud_internet.foobar.ipaddresses[0]}"
+  next_hop    = "${sakuracloud_internet.foobar.ipaddresses[0]}"
 }
 resource "sakuracloud_subnet" "foobar2" {
   internet_id = "${sakuracloud_internet.foobar.id}"
-  next_hop = "${sakuracloud_internet.foobar.ipaddresses[1]}"
+  next_hop    = "${sakuracloud_internet.foobar.ipaddresses[1]}"
 }
 `
 
@@ -74,16 +74,16 @@ resource sakuracloud_internet "foobar" {
 }
 resource "sakuracloud_subnet" "foobar" {
   internet_id = "${sakuracloud_internet.foobar.id}"
-  next_hop = "${sakuracloud_internet.foobar.ipaddresses[0]}"
+  next_hop    = "${sakuracloud_internet.foobar.ipaddresses[0]}"
 }
 resource "sakuracloud_subnet" "foobar2" {
   internet_id = "${sakuracloud_internet.foobar.id}"
-  next_hop = "${sakuracloud_internet.foobar.ipaddresses[1]}"
+  next_hop    = "${sakuracloud_internet.foobar.ipaddresses[1]}"
 }
 
 data sakuracloud_subnet "foobar" {
   internet_id = "${sakuracloud_internet.foobar.id}"
-  index = 1
+  index       = 1
 }
 `
 
@@ -93,14 +93,14 @@ resource sakuracloud_internet "foobar" {
 }
 resource "sakuracloud_subnet" "foobar" {
   internet_id = "${sakuracloud_internet.foobar.id}"
-  next_hop = "${sakuracloud_internet.foobar.ipaddresses[0]}"
+  next_hop    = "${sakuracloud_internet.foobar.ipaddresses[0]}"
 }
 resource "sakuracloud_subnet" "foobar2" {
   internet_id = "${sakuracloud_internet.foobar.id}"
-  next_hop = "${sakuracloud_internet.foobar.ipaddresses[1]}"
+  next_hop    = "${sakuracloud_internet.foobar.ipaddresses[1]}"
 }
 data sakuracloud_subnet "foobar" {
   internet_id = "${sakuracloud_internet.foobar.id}"
-  index = 2
+  index       = 2
 }
 `
