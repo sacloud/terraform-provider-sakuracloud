@@ -22,6 +22,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/helper/validation"
 	"github.com/sacloud/libsacloud/v2/sacloud"
 	"github.com/sacloud/libsacloud/v2/sacloud/types"
+	internetUtil "github.com/sacloud/libsacloud/v2/utils/internet"
 )
 
 func resourceSakuraCloudInternet() *schema.Resource {
@@ -127,27 +128,11 @@ func resourceSakuraCloudInternet() *schema.Resource {
 
 func resourceSakuraCloudInternetCreate(d *schema.ResourceData, meta interface{}) error {
 	client, ctx, zone := getSacloudClient(d, meta)
-	internetOp := sacloud.NewInternetOp(client)
+	builder := expandInternetBuilder(d, client)
 
-	internet, err := internetOp.Create(ctx, zone, expandInternetCreateRequest(d))
+	internet, err := builder.Build(ctx, zone)
 	if err != nil {
 		return fmt.Errorf("creating SakuraCloud Internet is failed: %s", err)
-	}
-
-	// [HACK] ルータ作成直後は GET /internet/:id が404を返すことへの対応
-	waiter := sacloud.WaiterForApplianceUp(func() (interface{}, error) {
-		return internetOp.Read(ctx, zone, internet.ID)
-	}, 100)
-	if _, err := waiter.WaitForState(ctx); err != nil {
-		return fmt.Errorf("waiting for to be available is failed: Internet[%s]: %s", internet.ID, err)
-	}
-
-	// handle ipv6 param
-	if ipv6Flag := d.Get("enable_ipv6").(bool); ipv6Flag {
-		_, err = internetOp.EnableIPv6(ctx, zone, internet.ID)
-		if err != nil {
-			return fmt.Errorf("enabling IPv6 on Internet[%s] is failed: %s", internet.ID, err)
-		}
 	}
 
 	d.SetId(internet.ID.String())
@@ -178,38 +163,13 @@ func resourceSakuraCloudInternetUpdate(d *schema.ResourceData, meta interface{})
 		return fmt.Errorf("could not read SakuraCloud Internet[%s]: %s", d.Id(), err)
 	}
 
-	internet, err = internetOp.Update(ctx, zone, internet.ID, expandInternetUpdateRequest(d))
+	builder := expandInternetBuilder(d, client)
+	internet, err = builder.Update(ctx, zone, internet.ID)
 	if err != nil {
 		return fmt.Errorf("updating SakuraCloud Internet[%s] is failed: %s", d.Id(), err)
 	}
 
-	if d.HasChange("band_width") {
-		internet, err = internetOp.UpdateBandWidth(ctx, zone, internet.ID, &sacloud.InternetUpdateBandWidthRequest{
-			BandWidthMbps: d.Get("band_width").(int),
-		})
-		if err != nil {
-			return fmt.Errorf("updating bandwidth of Internet[%s] is failed: %s", d.Id(), err)
-		}
-		// internet.ID is changed when UpdateBandWidth() is called, so we call d.SetID here.
-		d.SetId(internet.ID.String())
-	}
-
-	// handle ipv6 param
-	if d.HasChange("enable_ipv6") {
-		enableIPv6 := d.Get("enable_ipv6").(bool)
-		if enableIPv6 {
-			if _, err := internetOp.EnableIPv6(ctx, zone, internet.ID); err != nil {
-				return fmt.Errorf("enabling IPv6 on Internet[%s] is failed: %s", d.Id(), err)
-			}
-		} else {
-			if len(internet.Switch.IPv6Nets) > 0 {
-				if err := internetOp.DisableIPv6(ctx, zone, internet.ID, internet.Switch.IPv6Nets[0].ID); err != nil {
-					return fmt.Errorf("disabling IPv6 on Internet[%s] is failed: %s", d.Id(), err)
-				}
-			}
-		}
-	}
-
+	d.SetId(internet.ID.String()) // 帯域変更後はIDが変更になるため
 	return resourceSakuraCloudInternetRead(d, meta)
 }
 
@@ -226,18 +186,11 @@ func resourceSakuraCloudInternetDelete(d *schema.ResourceData, meta interface{})
 		return fmt.Errorf("could not read SakuraCloud Internet[%s]: %s", d.Id(), err)
 	}
 
-	// disable ipv6
-	if len(internet.Switch.IPv6Nets) > 0 {
-		if err := internetOp.DisableIPv6(ctx, zone, internet.ID, internet.Switch.IPv6Nets[0].ID); err != nil {
-			return fmt.Errorf("disabling IPv6 on Internet[%s] is failed: %s", d.Id(), err)
-		}
-	}
-
 	if err := waitForDeletionBySwitchID(ctx, client, zone, internet.Switch.ID); err != nil {
 		return fmt.Errorf("waiting deletion is failed: Internet[%s] still used by others: %s", internet.ID, err)
 	}
 
-	if err := internetOp.Delete(ctx, zone, internet.ID); err != nil {
+	if err := internetUtil.Delete(ctx, internetOp, zone, internet.ID); err != nil {
 		return fmt.Errorf("deleting SakuraCloud Internet[%s] is failed: %s", d.Id(), err)
 	}
 	return nil
