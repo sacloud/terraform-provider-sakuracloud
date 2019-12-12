@@ -140,6 +140,8 @@ resource "sakuracloud_server" "foobar" {
   interfaces {
     upstream = sakuracloud_switch.foobar.id
   }
+
+  force_shutdown = true
 }
 resource "sakuracloud_switch" "foobar" {
   name        = "myswitch_upd"

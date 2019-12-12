@@ -173,6 +173,8 @@ var testAccCheckSakuraCloudPrivateHostConfig_Basic = `
 resource "sakuracloud_server" "foobar" {
   name            = "myserver"
   private_host_id = "${sakuracloud_private_host.foobar.id}"
+
+  force_shutdown = true
 }
 
 resource "sakuracloud_private_host" "foobar" {
