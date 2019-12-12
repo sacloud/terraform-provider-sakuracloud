@@ -74,8 +74,6 @@ func resourceSakuraCloudSwitch() *schema.Resource {
 }
 
 func resourceSakuraCloudSwitchCreate(d *schema.ResourceData, meta interface{}) error {
-	d.Partial(true)
-
 	client, ctx, zone := getSacloudClient(d, meta)
 	swOp := sacloud.NewSwitchOp(client)
 
@@ -91,12 +89,6 @@ func resourceSakuraCloudSwitchCreate(d *schema.ResourceData, meta interface{}) e
 		return fmt.Errorf("creating SakuraCloud Switch is failed: %s", err)
 	}
 
-	d.SetId(sw.ID.String())
-	d.SetPartial("name")
-	d.SetPartial("description")
-	d.SetPartial("tags")
-	d.SetPartial("icon_id")
-
 	if bridgeID, ok := d.GetOk("bridge_id"); ok {
 		brID := bridgeID.(string)
 		if brID != "" {
@@ -104,10 +96,8 @@ func resourceSakuraCloudSwitchCreate(d *schema.ResourceData, meta interface{}) e
 				return fmt.Errorf("connecting Switch[%s] to Bridge[%s] is failed: %s", sw.ID, brID, err)
 			}
 		}
-		d.SetPartial("bridge_id")
 	}
-
-	d.Partial(false)
+	d.SetId(sw.ID.String())
 	return resourceSakuraCloudSwitchRead(d, meta)
 }
 
@@ -127,7 +117,6 @@ func resourceSakuraCloudSwitchRead(d *schema.ResourceData, meta interface{}) err
 }
 
 func resourceSakuraCloudSwitchUpdate(d *schema.ResourceData, meta interface{}) error {
-	d.Partial(true)
 	client, ctx, zone := getSacloudClient(d, meta)
 	swOp := sacloud.NewSwitchOp(client)
 
@@ -151,11 +140,6 @@ func resourceSakuraCloudSwitchUpdate(d *schema.ResourceData, meta interface{}) e
 		return fmt.Errorf("updating SakuraCloud Switch[%s] is failed : %s", d.Id(), err)
 	}
 
-	d.SetPartial("name")
-	d.SetPartial("icon_id")
-	d.SetPartial("description")
-	d.SetPartial("tags")
-
 	if d.HasChange("bridge_id") {
 		if bridgeID, ok := d.GetOk("bridge_id"); ok {
 			brID := bridgeID.(string)
@@ -169,10 +153,8 @@ func resourceSakuraCloudSwitchUpdate(d *schema.ResourceData, meta interface{}) e
 				}
 			}
 		}
-		d.SetPartial("bridge_id")
 	}
 
-	d.Partial(false)
 	return resourceSakuraCloudSwitchRead(d, meta)
 }
 
