@@ -22,9 +22,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/validation"
 	"github.com/sacloud/libsacloud/v2/sacloud"
-	"github.com/sacloud/libsacloud/v2/sacloud/accessor"
-	"github.com/sacloud/libsacloud/v2/sacloud/types"
-	"github.com/sacloud/libsacloud/v2/utils/setup"
 )
 
 func resourceSakuraCloudDatabase() *schema.Resource {
@@ -146,32 +143,16 @@ func resourceSakuraCloudDatabase() *schema.Resource {
 
 func resourceSakuraCloudDatabaseCreate(d *schema.ResourceData, meta interface{}) error {
 	client, ctx, zone := getSacloudClient(d, meta)
-	dbOp := sacloud.NewDatabaseOp(client)
 
 	if err := validateDatabaseParameters(d); err != nil {
 		return err
 	}
 
-	dbBuilder := &setup.RetryableSetup{
-		IsWaitForCopy: true,
-		IsWaitForUp:   true,
-		Create: func(ctx context.Context, zone string) (accessor.ID, error) {
-			return dbOp.Create(ctx, zone, expandDatabaseCreateRequest(d))
-		},
-		Delete: func(ctx context.Context, zone string, id types.ID) error {
-			return dbOp.Delete(ctx, zone, id)
-		},
-		Read: func(ctx context.Context, zone string, id types.ID) (interface{}, error) {
-			return dbOp.Read(ctx, zone, id)
-		},
-		RetryCount: 3,
-	}
-
-	res, err := dbBuilder.Setup(ctx, zone)
+	dbBuilder := expandDatabaseBuilder(d, client)
+	db, err := dbBuilder.Build(ctx, zone)
 	if err != nil {
 		return fmt.Errorf("creating SakuraCloud Database is failed: %s", err)
 	}
-	db := res.(*sacloud.Database)
 
 	// HACK データベースアプライアンスの電源投入後すぐに他の操作(Updateなど)を行うと202(Accepted)が返ってくるものの無視される。
 	// この挙動はテストなどで問題となる。このためここで少しsleepすることで対応する。
@@ -205,28 +186,11 @@ func resourceSakuraCloudDatabaseUpdate(d *schema.ResourceData, meta interface{})
 		return fmt.Errorf("could not read SakuraCloud Database[%s]: %s", d.Id(), err)
 	}
 
-	if err := validateDatabaseParameters(d); err != nil {
-		return err
+	dbBuilder := expandDatabaseBuilder(d, client)
+	if _, err := dbBuilder.Update(ctx, zone, db.ID); err != nil {
+		return fmt.Errorf("updating SakuraCloud Database[%s] is failed: %s", db.ID, err)
 	}
 
-	needRestart := false
-	if d.HasChange("replica_password") && db.InstanceStatus.IsUp() {
-		if err := shutdownDatabaseSync(ctx, dbOp, zone, db.ID, false); err != nil {
-			return err
-		}
-		needRestart = true
-	}
-
-	db, err = dbOp.Update(ctx, zone, db.ID, expandDatabaseUpdateRequest(d, db.SettingsHash))
-	if err != nil {
-		return fmt.Errorf("updating SakuraCloud Database[%s] is failed: %s", d.Id(), err)
-	}
-
-	if needRestart && !db.InstanceStatus.IsUp() {
-		if err := bootDatabaseSync(ctx, dbOp, zone, db.ID); err != nil {
-			return err
-		}
-	}
 	return resourceSakuraCloudDatabaseRead(d, meta)
 }
 

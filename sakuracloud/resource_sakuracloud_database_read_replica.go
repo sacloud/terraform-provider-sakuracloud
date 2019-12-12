@@ -19,10 +19,6 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/sacloud/libsacloud/v2/sacloud/accessor"
-	"github.com/sacloud/libsacloud/v2/sacloud/types"
-	"github.com/sacloud/libsacloud/v2/utils/setup"
-
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/validation"
 	"github.com/sacloud/libsacloud/v2/sacloud"
@@ -107,45 +103,24 @@ func resourceSakuraCloudDatabaseReadReplica() *schema.Resource {
 
 func resourceSakuraCloudDatabaseReadReplicaCreate(d *schema.ResourceData, meta interface{}) error {
 	client, ctx, zone := getSacloudClient(d, meta)
-	dbOp := sacloud.NewDatabaseOp(client)
 
 	// validate master instance
-	req, err := expandDatabaseReadReplicaCreateRequest(ctx, d, client, zone)
+	builder, err := expandDatabaseReadReplicaBuilder(ctx, d, client, zone)
 	if err != nil {
 		return nil
 	}
 
-	dbBuilder := &setup.RetryableSetup{
-		IsWaitForCopy: true,
-		IsWaitForUp:   true,
-		Create: func(ctx context.Context, zone string) (accessor.ID, error) {
-			return dbOp.Create(ctx, zone, req)
-		},
-		Read: func(ctx context.Context, zone string, id types.ID) (interface{}, error) {
-			return dbOp.Read(ctx, zone, id)
-		},
-		Delete: func(ctx context.Context, zone string, id types.ID) error {
-			return dbOp.Delete(ctx, zone, id)
-		},
-		RetryCount: 3,
-	}
-
-	res, err := dbBuilder.Setup(ctx, zone)
+	db, err := builder.Build(ctx, zone)
 	if err != nil {
 		return fmt.Errorf("creating SakuraCloud Database ReadReplica is failed: %s", err)
-	}
-
-	database, ok := res.(*sacloud.Database)
-	if !ok {
-		return fmt.Errorf("creating SakuraCloud Database ReadReplica is failed: resource is not *sacloud.Database")
 	}
 
 	// HACK データベースアプライアンスの電源投入後すぐに他の操作(Updateなど)を行うと202(Accepted)が返ってくるものの無視される。
 	// この挙動はテストなどで問題となる。このためここで少しsleepすることで対応する。
 	time.Sleep(client.databaseWaitAfterCreateDuration)
 
-	d.SetId(database.ID.String())
-	return setDatabaseReadReplicaResourceData(ctx, d, client, database)
+	d.SetId(db.ID.String())
+	return setDatabaseReadReplicaResourceData(ctx, d, client, db)
 }
 
 func resourceSakuraCloudDatabaseReadReplicaRead(d *schema.ResourceData, meta interface{}) error {
@@ -172,9 +147,14 @@ func resourceSakuraCloudDatabaseReadReplicaUpdate(d *schema.ResourceData, meta i
 		return fmt.Errorf("could not read SakuraCloud Database[%s]: %s", d.Id(), err)
 	}
 
-	db, err = dbOp.Update(ctx, zone, db.ID, expandDatabaseReadReplicaUpdateRequest(d, db))
+	builder, err := expandDatabaseReadReplicaBuilder(ctx, d, client, zone)
 	if err != nil {
-		return fmt.Errorf("updating SakuraCloud Database[%s] is failed: %s", d.Id(), err)
+		return nil
+	}
+
+	db, err = builder.Update(ctx, zone, db.ID)
+	if err != nil {
+		return fmt.Errorf("updating SakuraCloud Database ReadReplica[%s] is failed: %s", db.ID, err)
 	}
 
 	return setDatabaseReadReplicaResourceData(ctx, d, client, db)

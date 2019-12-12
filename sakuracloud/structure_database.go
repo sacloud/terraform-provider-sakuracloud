@@ -22,6 +22,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/sacloud/libsacloud/v2/sacloud"
 	"github.com/sacloud/libsacloud/v2/sacloud/types"
+	databaseBuilder "github.com/sacloud/libsacloud/v2/utils/builder/database"
 )
 
 func databasePlanIDToName(planID types.ID) string {
@@ -60,7 +61,7 @@ func databasePlanNameToID(planName string) types.ID {
 	return types.ID(0)
 }
 
-func expandDatabaseCreateRequest(d *schema.ResourceData) *sacloud.DatabaseCreateRequest {
+func expandDatabaseBuilder(d *schema.ResourceData, client *APIClient) *databaseBuilder.Builder {
 	var dbVersion *types.RDBMSVersion
 	dbType := d.Get("database_type").(string)
 	switch dbType {
@@ -73,11 +74,7 @@ func expandDatabaseCreateRequest(d *schema.ResourceData) *sacloud.DatabaseCreate
 	replicaUser := d.Get("replica_user").(string)
 	replicaPassword := d.Get("replica_password").(string)
 
-	req := &sacloud.DatabaseCreateRequest{
-		Name:           d.Get("name").(string),
-		Description:    d.Get("description").(string),
-		Tags:           expandTags(d),
-		IconID:         expandSakuraCloudID(d, "icon_id"),
+	req := &databaseBuilder.Builder{
 		PlanID:         databasePlanNameToID(d.Get("plan").(string)),
 		SwitchID:       expandSakuraCloudID(d, "switch_id"),
 		IPAddresses:    []string{d.Get("ipaddress1").(string)},
@@ -98,6 +95,14 @@ func expandDatabaseCreateRequest(d *schema.ResourceData) *sacloud.DatabaseCreate
 			ReplicaUser:     replicaUser,
 			ReplicaPassword: replicaPassword,
 		},
+		Name:        d.Get("name").(string),
+		Description: d.Get("description").(string),
+		Tags:        expandTags(d),
+		IconID:      expandSakuraCloudID(d, "icon_id"),
+		Client:      databaseBuilder.NewAPIClient(client),
+		// 後で設定する
+		BackupSetting:      &sacloud.DatabaseSettingBackup{},
+		ReplicationSetting: &sacloud.DatabaseReplicationSetting{},
 	}
 
 	backupTime := d.Get("backup_time").(string)
@@ -119,45 +124,7 @@ func expandDatabaseCreateRequest(d *schema.ResourceData) *sacloud.DatabaseCreate
 	return req
 }
 
-func expandDatabaseUpdateRequest(d *schema.ResourceData, currentSettingsHash string) *sacloud.DatabaseUpdateRequest {
-	replicaUser := d.Get("replica_user").(string)
-	replicaPassword := d.Get("replica_password").(string)
-
-	req := &sacloud.DatabaseUpdateRequest{
-		Name:        d.Get("name").(string),
-		Description: d.Get("description").(string),
-		Tags:        expandTags(d),
-		IconID:      expandSakuraCloudID(d, "icon_id"),
-		CommonSetting: &sacloud.DatabaseSettingCommon{
-			ServicePort:     d.Get("port").(int),
-			SourceNetwork:   expandStringList(d.Get("allow_networks").([]interface{})),
-			DefaultUser:     d.Get("user_name").(string),
-			UserPassword:    d.Get("user_password").(string),
-			ReplicaUser:     replicaUser,
-			ReplicaPassword: replicaPassword,
-		},
-		BackupSetting:      &sacloud.DatabaseSettingBackup{},
-		ReplicationSetting: &sacloud.DatabaseReplicationSetting{},
-		SettingsHash:       currentSettingsHash,
-	}
-	backupTime := d.Get("backup_time").(string)
-	backupWeekdays := expandBackupWeekdays(d.Get("backup_weekdays").([]interface{}))
-	if backupTime != "" && len(backupWeekdays) > 0 {
-		req.BackupSetting = &sacloud.DatabaseSettingBackup{
-			Time:      backupTime,
-			DayOfWeek: backupWeekdays,
-		}
-	}
-
-	if replicaUser != "" && replicaPassword != "" {
-		req.ReplicationSetting = &sacloud.DatabaseReplicationSetting{
-			Model: types.DatabaseReplicationModels.MasterSlave,
-		}
-	}
-	return req
-}
-
-func expandDatabaseReadReplicaCreateRequest(ctx context.Context, d *schema.ResourceData, client *APIClient, zone string) (*sacloud.DatabaseCreateRequest, error) {
+func expandDatabaseReadReplicaBuilder(ctx context.Context, d *schema.ResourceData, client *APIClient, zone string) (*databaseBuilder.Builder, error) {
 	dbOp := sacloud.NewDatabaseOp(client)
 
 	// validate master instance
@@ -183,7 +150,7 @@ func expandDatabaseReadReplicaCreateRequest(ctx context.Context, d *schema.Resou
 		defaultRoute = v.(string)
 	}
 
-	return &sacloud.DatabaseCreateRequest{
+	return &databaseBuilder.Builder{
 		Name:           d.Get("name").(string),
 		Description:    d.Get("description").(string),
 		Tags:           expandTags(d),
@@ -210,20 +177,8 @@ func expandDatabaseReadReplicaCreateRequest(ctx context.Context, d *schema.Resou
 			Password:    masterDB.ReplicationSetting.Password,
 			ApplianceID: masterDB.ID,
 		},
+		Client: databaseBuilder.NewAPIClient(client),
 	}, nil
-}
-
-func expandDatabaseReadReplicaUpdateRequest(d *schema.ResourceData, db *sacloud.Database) *sacloud.DatabaseUpdateRequest {
-	return &sacloud.DatabaseUpdateRequest{
-		Name:               d.Get("name").(string),
-		Description:        d.Get("description").(string),
-		Tags:               expandTags(d),
-		IconID:             expandSakuraCloudID(d, "icon_id"),
-		CommonSetting:      db.CommonSetting,
-		BackupSetting:      db.BackupSetting,
-		ReplicationSetting: db.ReplicationSetting,
-		SettingsHash:       db.SettingsHash,
-	}
 }
 
 func flattenDatabaseType(db *sacloud.Database) string {
