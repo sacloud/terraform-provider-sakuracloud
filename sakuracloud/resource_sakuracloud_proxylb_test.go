@@ -294,6 +294,8 @@ resource "sakuracloud_icon" "foobar" {
 
 resource sakuracloud_server "server01" {
   name = "terraform-test-server01"
+
+  force_shutdown = true
 }
 `
 
@@ -325,6 +327,8 @@ resource "sakuracloud_proxylb" "foobar" {
 
 resource sakuracloud_server "server01" {
   name = "terraform-test-server01"
+
+  force_shutdown = true
 }
 `
 
