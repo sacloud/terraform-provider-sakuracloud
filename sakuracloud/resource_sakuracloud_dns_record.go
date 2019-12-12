@@ -184,29 +184,3 @@ func dnsRecordIDHash(dns_id string, r *sacloud.DNSRecord) string {
 
 	return fmt.Sprintf("dnsrecord-%d", hashcode.String(buf.String()))
 }
-
-func expandDNSRecordCreateRequest(d *schema.ResourceData, dns *sacloud.DNS) (*sacloud.DNSRecord, *sacloud.DNSUpdateSettingsRequest) {
-	record := expandDNSRecord(d)
-	records := append(dns.Records, record)
-
-	return record, &sacloud.DNSUpdateSettingsRequest{
-		Records:      records,
-		SettingsHash: dns.SettingsHash,
-	}
-}
-
-func expandDNSRecordDeleteRequest(d *schema.ResourceData, dns *sacloud.DNS) *sacloud.DNSUpdateSettingsRequest {
-	record := expandDNSRecord(d)
-	var records []*sacloud.DNSRecord
-
-	for _, r := range dns.Records {
-		if !isSameDNSRecord(r, record) {
-			records = append(records, r)
-		}
-	}
-
-	return &sacloud.DNSUpdateSettingsRequest{
-		Records:      records,
-		SettingsHash: dns.SettingsHash,
-	}
-}

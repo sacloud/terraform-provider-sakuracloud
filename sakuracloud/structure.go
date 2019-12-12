@@ -15,26 +15,22 @@
 package sakuracloud
 
 import (
+	"bytes"
 	"context"
+	"crypto/md5"
+	"encoding/base64"
+	"encoding/hex"
+	"fmt"
+	"io"
+	"os"
 	"strconv"
+
+	"github.com/mitchellh/go-homedir"
 
 	"github.com/sacloud/libsacloud/v2/sacloud/search"
 	"github.com/sacloud/libsacloud/v2/sacloud/search/keys"
 	"github.com/sacloud/libsacloud/v2/sacloud/types"
 )
-
-type resourceValueSettable interface {
-	Set(key string, value interface{}) error
-}
-
-func setResourceData(d resourceValueSettable, data map[string]interface{}) error {
-	for k, v := range data {
-		if err := d.Set(k, v); err != nil {
-			return err
-		}
-	}
-	return nil
-}
 
 type resourceValueGettable interface {
 	Get(key string) interface{}
@@ -92,17 +88,6 @@ func stringListOrDefault(d resourceValueGettable, key string) []string {
 		}
 	}
 	return []string{}
-}
-
-func getMapFromResource(d resourceValueGettable, key string) (map[string]interface{}, bool) {
-	v, ok := d.GetOk(key)
-	if !ok {
-		return nil, false
-	}
-	if v, ok := v.(map[string]interface{}); ok {
-		return v, true
-	}
-	return nil, false
 }
 
 func getListFromResource(d resourceValueGettable, key string) ([]interface{}, bool) {
@@ -295,4 +280,39 @@ func expandStringNumber(d resourceValueGettable, key string) types.StringNumber 
 
 func expandStringFlag(d resourceValueGettable, key string) types.StringFlag {
 	return types.StringFlag(d.Get(key).(bool))
+}
+
+func expandHomeDir(path string) (string, error) {
+	expanded, err := homedir.Expand(path)
+	if err != nil {
+		return "", fmt.Errorf("expanding homedir in path[%s] is failed: %s", expanded, err)
+	}
+	// file exists?
+	if _, err := os.Stat(expanded); err != nil {
+		return "", fmt.Errorf("opening file[%s] is failed: %s", expanded, err)
+	}
+	return expanded, nil
+}
+
+func md5CheckSumFromFile(path string) (string, error) {
+	f, err := os.Open(path)
+	if err != nil {
+		return "", fmt.Errorf("opening file[%s] is failed: %s", path, err)
+	}
+	defer f.Close() // nolint
+
+	b := base64.NewEncoder(base64.StdEncoding, f)
+	defer b.Close() // nolint
+
+	var buf bytes.Buffer
+	if _, err := io.Copy(&buf, f); err != nil {
+		return "", fmt.Errorf("encoding to base64 from file[%s] is failed: %s", path, err)
+	}
+
+	h := md5.New()
+	if _, err := io.Copy(h, &buf); err != nil {
+		return "", fmt.Errorf("calculating md5 from file[%s] is failed: %s", path, err)
+	}
+
+	return hex.EncodeToString(h.Sum(nil)), nil
 }

@@ -128,11 +128,7 @@ func resourceSakuraCloudPacketFilterRulesUpdate(d *schema.ResourceData, meta int
 		return fmt.Errorf("could not read SakuraCloud PacketFilter[%s]: %s", pfID, err)
 	}
 
-	_, err = pfOp.Update(ctx, zone, pf.ID, &sacloud.PacketFilterUpdateRequest{
-		Name:        pf.Name,
-		Description: pf.Description,
-		Expression:  expandPacketFilterExpressions(d),
-	})
+	_, err = pfOp.Update(ctx, zone, pf.ID, expandPacketFilterRulesUpdateRequest(d, pf))
 	if err != nil {
 		return fmt.Errorf("updating SakuraCloud PacketFilter[%s] is failed: %s", pfID, err)
 	}
@@ -157,11 +153,7 @@ func resourceSakuraCloudPacketFilterRulesDelete(d *schema.ResourceData, meta int
 		}
 		return fmt.Errorf("could not read SakuraCloud PacketFilter[%s]: %s", pfID, err)
 	}
-	_, err = pfOp.Update(ctx, zone, pf.ID, &sacloud.PacketFilterUpdateRequest{
-		Name:        pf.Name,
-		Description: pf.Description,
-		Expression:  []*sacloud.PacketFilterExpression{},
-	})
+	_, err = pfOp.Update(ctx, zone, pf.ID, expandPacketFilterRulesDeleteRequest(d, pf))
 	if err != nil {
 		return fmt.Errorf("updating SakuraCloud PacketFilter[%s] is failed: %s", pfID, err)
 	}
@@ -169,9 +161,6 @@ func resourceSakuraCloudPacketFilterRulesDelete(d *schema.ResourceData, meta int
 }
 
 func setPacketFilterRulesResourceData(ctx context.Context, d *schema.ResourceData, client *APIClient, data *sacloud.PacketFilter) error {
-	if err := d.Set("expressions", flattenPacketFilterExpressions(data)); err != nil {
-		return err
-	}
 	d.Set("zone", getZone(d, client))
-	return nil
+	return d.Set("expressions", flattenPacketFilterExpressions(data))
 }

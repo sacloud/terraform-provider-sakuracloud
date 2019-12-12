@@ -15,19 +15,12 @@
 package sakuracloud
 
 import (
-	"bytes"
 	"context"
-	"crypto/md5"
-	"encoding/base64"
-	"encoding/hex"
 	"fmt"
-	"io"
-	"os"
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/customdiff"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/validation"
-	"github.com/mitchellh/go-homedir"
 	"github.com/sacloud/ftps"
 	"github.com/sacloud/libsacloud/v2/sacloud"
 	"github.com/sacloud/libsacloud/v2/sacloud/types"
@@ -99,13 +92,7 @@ func resourceSakuraCloudArchiveCreate(d *schema.ResourceData, meta interface{}) 
 	client, ctx, zone := getSacloudClient(d, meta)
 	archiveOp := sacloud.NewArchiveOp(client)
 
-	archive, ftpServer, err := archiveOp.CreateBlank(ctx, zone, &sacloud.ArchiveCreateBlankRequest{
-		Name:        d.Get("name").(string),
-		Description: d.Get("description").(string),
-		SizeMB:      toSizeMB(d.Get("size").(int)),
-		IconID:      expandSakuraCloudID(d, "icon_id"),
-		Tags:        expandTags(d),
-	})
+	archive, ftpServer, err := archiveOp.CreateBlank(ctx, zone, expandArchiveCreateRequest(d))
 	if err != nil {
 		return fmt.Errorf("creating SakuraCloud Archive is failed: %s", err)
 	}
@@ -143,12 +130,7 @@ func resourceSakuraCloudArchiveUpdate(d *schema.ResourceData, meta interface{}) 
 		return fmt.Errorf("could not read SakuraCloud Archive[%s]: %s", d.Id(), err)
 	}
 
-	archive, err = archiveOp.Update(ctx, zone, archive.ID, &sacloud.ArchiveUpdateRequest{
-		Name:        d.Get("name").(string),
-		Description: d.Get("description").(string),
-		Tags:        expandTags(d),
-		IconID:      expandSakuraCloudID(d, "icon_id"),
-	})
+	archive, err = archiveOp.Update(ctx, zone, archive.ID, expandArchiveUpdateRequest(d))
 	if err != nil {
 		return fmt.Errorf("updating SakuraCloud Archive[%s] is failed: %s", archive.ID, err)
 	}
@@ -195,55 +177,6 @@ func setArchiveResourceData(d *schema.ResourceData, client *APIClient, data *sac
 	d.Set("description", data.Description)
 	d.Set("zone", getZone(d, client))
 	return nil
-}
-
-func expandArchiveHash(d *schema.ResourceData) string {
-	// NOTE 本来はAPIにてmd5ハッシュを取得できるのが望ましい。現状ではここでファイルを読んで算出する。
-	source := d.Get("archive_file").(string)
-	path, err := expandHomeDir(source)
-	if err != nil {
-		return ""
-	}
-	hash, err := md5CheckSumFromFile(path)
-	if err != nil {
-		return ""
-	}
-	return hash
-}
-
-func expandHomeDir(path string) (string, error) {
-	expanded, err := homedir.Expand(path)
-	if err != nil {
-		return "", fmt.Errorf("expanding homedir in path[%s] is failed: %s", expanded, err)
-	}
-	// file exists?
-	if _, err := os.Stat(expanded); err != nil {
-		return "", fmt.Errorf("opening archive_file[%s] is failed: %s", expanded, err)
-	}
-	return expanded, nil
-}
-
-func md5CheckSumFromFile(path string) (string, error) {
-	f, err := os.Open(path)
-	if err != nil {
-		return "", fmt.Errorf("opening archive_file[%s] is failed: %s", path, err)
-	}
-	defer f.Close() // nolint
-
-	b := base64.NewEncoder(base64.StdEncoding, f)
-	defer b.Close() // nolint
-
-	var buf bytes.Buffer
-	if _, err := io.Copy(&buf, f); err != nil {
-		return "", fmt.Errorf("encoding to base64 from archive_file[%s] is failed: %s", path, err)
-	}
-
-	h := md5.New()
-	if _, err := io.Copy(h, &buf); err != nil {
-		return "", fmt.Errorf("calculating md5 from archive_file[%s] is failed: %s", path, err)
-	}
-
-	return hex.EncodeToString(h.Sum(nil)), nil
 }
 
 func uploadArchiveFile(ctx context.Context, archiveOp sacloud.ArchiveAPI, zone string, id types.ID, filePath string, ftpServer *sacloud.FTPServer) error {

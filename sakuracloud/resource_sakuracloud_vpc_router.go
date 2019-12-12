@@ -21,11 +21,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/validation"
 	"github.com/sacloud/libsacloud/v2/sacloud"
-	"github.com/sacloud/libsacloud/v2/utils/builder"
-	"github.com/sacloud/libsacloud/v2/utils/builder/vpcrouter"
 )
-
-const vpcRouterPowerAPILockKey = "sakuracloud_vpc_router.power.%d.lock"
 
 func resourceSakuraCloudVPCRouter() *schema.Resource {
 	return &schema.Resource{
@@ -573,22 +569,4 @@ func setVPCRouterResourceData(ctx context.Context, d *schema.ResourceData, clien
 	}
 	d.Set("zone", getZone(d, client))
 	return nil
-}
-
-func expandVPCRouterBuilder(d resourceValueGettable, client *APIClient) *vpcrouter.Builder {
-	return &vpcrouter.Builder{
-		Name:                  d.Get("name").(string),
-		Description:           d.Get("description").(string),
-		Tags:                  expandTags(d),
-		IconID:                expandSakuraCloudID(d, "icon_id"),
-		PlanID:                expandVPCRouterPlanID(d),
-		NICSetting:            expandVPCRouterNICSetting(d),
-		AdditionalNICSettings: expandVPCRouterAdditionalNICSettings(d),
-		RouterSetting:         expandVPCRouterSettings(d),
-		SetupOptions: &builder.RetryableSetupParameter{
-			BootAfterBuild:        true,
-			NICUpdateWaitDuration: builder.DefaultNICUpdateWaitDuration,
-		},
-		Client: sacloud.NewVPCRouterOp(client),
-	}
 }

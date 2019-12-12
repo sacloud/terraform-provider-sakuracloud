@@ -15,6 +15,7 @@
 package sakuracloud
 
 import (
+	"errors"
 	"fmt"
 	"net"
 	"os"
@@ -119,4 +120,37 @@ func validateZone(allowZones []string) schema.SchemaValidateFunc {
 		return func(interface{}, string) (ws []string, errors []error) { return }
 	}
 	return validation.StringInSlice(allowZones, false)
+}
+
+func validateDatabaseParameters(d *schema.ResourceData) error {
+	if err := validateBackupWeekdays(d, "backup_weekdays"); err != nil {
+		return err
+	}
+
+	dbType := d.Get("database_type").(string)
+	if dbType != "postgresql" && dbType != "mariadb" {
+		return fmt.Errorf("unknown database_type[%s]", dbType)
+	}
+
+	return nil
+}
+
+func validateCarrier(d resourceValueGettable) error {
+	carriers := d.Get("carrier").([]interface{})
+	if len(carriers) == 0 {
+		return errors.New("carrier is required")
+	}
+
+	for _, c := range carriers {
+		if c == nil {
+			return errors.New(`carrier[""] is invalid`)
+		}
+
+		c := c.(string)
+		if _, ok := types.SIMOperatorShortNameMap[c]; !ok {
+			return fmt.Errorf("carrier[%q] is invalid", c)
+		}
+	}
+
+	return nil
 }

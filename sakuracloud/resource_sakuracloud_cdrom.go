@@ -110,13 +110,7 @@ func resourceSakuraCloudCDROMCreate(d *schema.ResourceData, meta interface{}) er
 	client, ctx, zone := getSacloudClient(d, meta)
 	cdromOp := sacloud.NewCDROMOp(client)
 
-	cdrom, ftpServer, err := cdromOp.Create(ctx, zone, &sacloud.CDROMCreateRequest{
-		Name:        d.Get("name").(string),
-		Description: d.Get("description").(string),
-		SizeMB:      toSizeMB(d.Get("size").(int)),
-		IconID:      expandSakuraCloudID(d, "icon_id"),
-		Tags:        expandTags(d),
-	})
+	cdrom, ftpServer, err := cdromOp.Create(ctx, zone, expandCDROMCreateRequest(d))
 	if err != nil {
 		return fmt.Errorf("creating SakuraCloud CDROM is failed: %s", err)
 	}
@@ -161,12 +155,7 @@ func resourceSakuraCloudCDROMUpdate(d *schema.ResourceData, meta interface{}) er
 		return fmt.Errorf("could not read SakuraCloud CDROM[%s]: %s", d.Id(), err)
 	}
 
-	cdrom, err = cdromOp.Update(ctx, zone, cdrom.ID, &sacloud.CDROMUpdateRequest{
-		Name:        d.Get("name").(string),
-		Description: d.Get("description").(string),
-		Tags:        expandTags(d),
-		IconID:      expandSakuraCloudID(d, "icon_id"),
-	})
+	cdrom, err = cdromOp.Update(ctx, zone, cdrom.ID, expandCDROMUpdateRequest(d))
 	if err != nil {
 		return fmt.Errorf("updating SakuraCloud CDROM[%s] is failed: %s", d.Id(), err)
 	}
@@ -223,24 +212,6 @@ func setCDROMResourceData(ctx context.Context, d *schema.ResourceData, client *A
 	}
 	d.Set("zone", getZone(d, client))
 	return nil
-}
-
-func expandCDROMContentHash(d *schema.ResourceData) string {
-	// NOTE 本来はAPIにてmd5ハッシュを取得できるのが望ましい。現状ではここでファイルを読んで算出する。
-	if v, ok := d.GetOk("iso_image_file"); ok {
-		source := v.(string)
-
-		path, err := expandHomeDir(source)
-		if err != nil {
-			return ""
-		}
-		hash, err := md5CheckSumFromFile(path)
-		if err != nil {
-			return ""
-		}
-		return hash
-	}
-	return ""
 }
 
 type uploadCDROMContext struct {

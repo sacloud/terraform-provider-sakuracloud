@@ -46,11 +46,3 @@ func toSizeMB(sizeGB int) int {
 	sizeGB64 := int64(sizeGB)
 	return int(sizeGB64 * GiB / MiB)
 }
-
-func toSizeGB(sizeMB int) int {
-	if sizeMB == 0 {
-		return 0
-	}
-	sizeMB64 := int64(sizeMB)
-	return int(sizeMB64 * MiB / GiB)
-}
