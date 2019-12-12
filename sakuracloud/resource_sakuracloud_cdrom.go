@@ -200,9 +200,8 @@ func resourceSakuraCloudCDROMDelete(d *schema.ResourceData, meta interface{}) er
 		return fmt.Errorf("could not read SakuraCloud CDROM[%s]: %s", d.Id(), err)
 	}
 
-	// eject
-	if _, err := ejectCDROMFromAllServers(ctx, d, client, cdrom.ID); err != nil {
-		return fmt.Errorf("could not eject CDROM[%s] from Servers: %s", cdrom.ID, err)
+	if err := waitForDeletionByCDROMID(ctx, client, zone, cdrom.ID); err != nil {
+		return fmt.Errorf("waiting deletion is failed: CDROM[%s] still used by Servers: %s", cdrom.ID, err)
 	}
 
 	if err := cdromOp.Delete(ctx, zone, cdrom.ID); err != nil {

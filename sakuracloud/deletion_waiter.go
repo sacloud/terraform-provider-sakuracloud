@@ -48,6 +48,24 @@ func waitForDeletionBySIMID(ctx context.Context, client *APIClient, simID types.
 	})
 }
 
+func waitForDeletionByBridgeID(ctx context.Context, client *APIClient, bridgeID types.ID) error {
+	return waitForDeletionAllZone(ctx, client, bridgeID, []deletionWaiterFindFunc{
+		findSwitchByBridgeID,
+	})
+}
+
+func waitForDeletionByCDROMID(ctx context.Context, client *APIClient, zone string, cdromID types.ID) error {
+	return waitForDeletion(ctx, client, zone, cdromID, []deletionWaiterFindFunc{
+		findServerByCDROMID,
+	})
+}
+
+func waitForDeletionByDiskID(ctx context.Context, client *APIClient, zone string, diskID types.ID) error {
+	return waitForDeletion(ctx, client, zone, diskID, []deletionWaiterFindFunc{
+		findServerByDiskID,
+	})
+}
+
 func waitForDeletionBySwitchID(ctx context.Context, client *APIClient, zone string, switchID types.ID) error {
 	return waitForDeletion(ctx, client, zone, switchID, []deletionWaiterFindFunc{
 		findServerBySwitchID,
@@ -187,6 +205,56 @@ func findServerByPacketFilterID(ctx context.Context, client *APIClient, zone str
 			if iface.PacketFilterID == id {
 				return true, nil
 			}
+		}
+	}
+	return false, nil
+}
+
+func findServerByCDROMID(ctx context.Context, client *APIClient, zone string, id types.ID) (bool, error) {
+	serverOp := sacloud.NewServerOp(client)
+
+	searched, err := serverOp.Find(ctx, zone, &sacloud.FindCondition{})
+	if err != nil {
+		return false, fmt.Errorf("finding Server is failed: %s", err)
+	}
+
+	for _, server := range searched.Servers {
+		if server.CDROMID == id {
+			return true, nil
+		}
+	}
+	return false, nil
+}
+
+func findServerByDiskID(ctx context.Context, client *APIClient, zone string, id types.ID) (bool, error) {
+	serverOp := sacloud.NewServerOp(client)
+
+	searched, err := serverOp.Find(ctx, zone, &sacloud.FindCondition{})
+	if err != nil {
+		return false, fmt.Errorf("finding Server is failed: %s", err)
+	}
+
+	for _, server := range searched.Servers {
+		for _, disk := range server.Disks {
+			if disk.ID == id {
+				return true, nil
+			}
+		}
+	}
+	return false, nil
+}
+
+func findSwitchByBridgeID(ctx context.Context, client *APIClient, zone string, id types.ID) (bool, error) {
+	swOp := sacloud.NewSwitchOp(client)
+
+	searched, err := swOp.Find(ctx, zone, &sacloud.FindCondition{})
+	if err != nil {
+		return false, fmt.Errorf("finding Switch is failed: %s", err)
+	}
+
+	for _, sw := range searched.Switches {
+		if sw.BridgeID == id {
+			return true, nil
 		}
 	}
 	return false, nil
