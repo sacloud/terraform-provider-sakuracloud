@@ -24,7 +24,6 @@ import (
 	"github.com/sacloud/libsacloud/v2/sacloud"
 	"github.com/sacloud/libsacloud/v2/sacloud/accessor"
 	"github.com/sacloud/libsacloud/v2/sacloud/types"
-	"github.com/sacloud/libsacloud/v2/utils/nfs"
 	"github.com/sacloud/libsacloud/v2/utils/setup"
 )
 
@@ -122,21 +121,9 @@ func resourceSakuraCloudNFSCreate(d *schema.ResourceData, meta interface{}) erro
 		return fmt.Errorf("finding NFS plans is failed: %s", err)
 	}
 
-	opts := &sacloud.NFSCreateRequest{
-		SwitchID:       expandSakuraCloudID(d, "switch_id"),
-		PlanID:         planID,
-		IPAddresses:    []string{d.Get("ipaddress").(string)},
-		NetworkMaskLen: d.Get("nw_mask_len").(int),
-		DefaultRoute:   d.Get("default_route").(string),
-		Name:           d.Get("name").(string),
-		Description:    d.Get("description").(string),
-		Tags:           expandTags(d),
-		IconID:         expandSakuraCloudID(d, "icon_id"),
-	}
-
 	builder := &setup.RetryableSetup{
 		Create: func(ctx context.Context, zone string) (accessor.ID, error) {
-			return nfsOp.Create(ctx, zone, opts)
+			return nfsOp.Create(ctx, zone, expandNFSCreateRequest(d, planID))
 		},
 		Delete: func(ctx context.Context, zone string, id types.ID) error {
 			return nfsOp.Delete(ctx, zone, id)
@@ -188,12 +175,7 @@ func resourceSakuraCloudNFSUpdate(d *schema.ResourceData, meta interface{}) erro
 		return fmt.Errorf("could not read SakuraCloud NFS[%s]: %s", d.Id(), err)
 	}
 
-	nfs, err = nfsOp.Update(ctx, zone, nfs.ID, &sacloud.NFSUpdateRequest{
-		Name:        d.Get("name").(string),
-		Description: d.Get("description").(string),
-		Tags:        expandTags(d),
-		IconID:      expandSakuraCloudID(d, "icon_id"),
-	})
+	nfs, err = nfsOp.Update(ctx, zone, nfs.ID, expandNFSUpdateRequest(d))
 	if err != nil {
 		return fmt.Errorf("updating SakuraCloud NFS[%s] is failed: %s", d.Id(), err)
 	}
@@ -251,36 +233,4 @@ func setNFSResourceData(ctx context.Context, d *schema.ResourceData, client *API
 	d.Set("zone", getZone(d, client))
 
 	return nil
-}
-
-func expandNFSDiskPlanID(ctx context.Context, client *APIClient, d resourceValueGettable) (types.ID, error) {
-	var planID types.ID
-	planName := d.Get("plan").(string)
-	switch planName {
-	case "hdd":
-		planID = types.NFSPlans.HDD
-	case "ssd":
-		planID = types.NFSPlans.SSD
-	}
-	size := d.Get("size").(int)
-
-	return nfs.FindNFSPlanID(ctx, sacloud.NewNoteOp(client), planID, types.ENFSSize(size))
-}
-
-func flattenNFSDiskPlan(ctx context.Context, client *APIClient, planID types.ID) (string, int, error) {
-	planInfo, err := nfs.GetPlanInfo(ctx, sacloud.NewNoteOp(client), planID)
-	if err != nil {
-		return "", 0, err
-	}
-	var planName string
-	size := int(planInfo.Size)
-
-	switch planInfo.DiskPlanID {
-	case types.NFSPlans.HDD:
-		planName = "hdd"
-	case types.NFSPlans.SSD:
-		planName = "ssd"
-	}
-
-	return planName, size, nil
 }

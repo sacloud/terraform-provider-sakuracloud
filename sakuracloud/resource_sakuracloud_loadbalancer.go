@@ -270,47 +270,11 @@ func setLoadBalancerResourceData(ctx context.Context, d *schema.ResourceData, cl
 		return fmt.Errorf("got unexpected state: LoadBalancer[%d].Availability is failed", data.ID)
 	}
 
-	var ha bool
-	var ipaddress1, ipaddress2 string
-	ipaddress1 = data.IPAddresses[0]
-	if len(data.IPAddresses) > 1 {
-		ha = true
-		ipaddress2 = data.IPAddresses[1]
-	}
-
-	var plan string
-	switch data.PlanID {
-	case types.LoadBalancerPlans.Standard:
-		plan = "standard"
-	case types.LoadBalancerPlans.Premium:
-		plan = "highspec"
-	}
-
-	var vips []interface{}
-	for _, v := range data.VirtualIPAddresses {
-		vip := map[string]interface{}{
-			"vip":          v.VirtualIPAddress,
-			"port":         v.Port.Int(),
-			"delay_loop":   v.DelayLoop.Int(),
-			"sorry_server": v.SorryServer,
-		}
-		var servers []interface{}
-		for _, server := range v.Servers {
-			s := map[string]interface{}{}
-			s["ipaddress"] = server.IPAddress
-			s["check_protocol"] = server.HealthCheck.Protocol
-			s["check_path"] = server.HealthCheck.Path
-			s["check_status"] = server.HealthCheck.ResponseCode.String()
-			s["enabled"] = server.Enabled.Bool()
-			servers = append(servers, s)
-		}
-		vip["servers"] = servers
-		vips = append(vips, vip)
-	}
+	ha, ipaddress1, ipaddress2 := flattenLoadBalancerIPAddresses(data)
 
 	d.Set("switch_id", data.SwitchID.String())
 	d.Set("vrid", data.VRID)
-	d.Set("plan", plan)
+	d.Set("plan", flattenLoadBalancerPlanID(data))
 	d.Set("high_availability", ha)
 	d.Set("ipaddress1", ipaddress1)
 	d.Set("ipaddress2", ipaddress2)
@@ -322,98 +286,10 @@ func setLoadBalancerResourceData(ctx context.Context, d *schema.ResourceData, cl
 	if err := d.Set("tags", data.Tags); err != nil {
 		return err
 	}
-	if err := d.Set("vips", vips); err != nil {
+	if err := d.Set("vips", flattenLoadBalancerVIPs(data)); err != nil {
 		return err
 	}
 	d.Set("zone", getZone(d, client))
 
 	return nil
-}
-
-func expandLoadBalancerVIPs(d resourceValueGettable) []*sacloud.LoadBalancerVirtualIPAddress {
-	var vips []*sacloud.LoadBalancerVirtualIPAddress
-	vipsConf := d.Get("vips").([]interface{})
-	for _, vip := range vipsConf {
-		v := &resourceMapValue{vip.(map[string]interface{})}
-		vips = append(vips, expandLoadBalancerVIP(v))
-	}
-	return vips
-}
-
-func expandLoadBalancerVIP(d resourceValueGettable) *sacloud.LoadBalancerVirtualIPAddress {
-	servers := expandLoadBalancerServers(d, d.Get("port").(int))
-	return &sacloud.LoadBalancerVirtualIPAddress{
-		VirtualIPAddress: d.Get("vip").(string),
-		Port:             types.StringNumber(d.Get("port").(int)),
-		DelayLoop:        types.StringNumber(d.Get("delay_loop").(int)),
-		SorryServer:      d.Get("sorry_server").(string),
-		Description:      d.Get("description").(string),
-		Servers:          servers,
-	}
-}
-
-func expandLoadBalancerServers(d resourceValueGettable, vipPort int) []*sacloud.LoadBalancerServer {
-	var servers []*sacloud.LoadBalancerServer
-	for _, v := range d.Get("servers").([]interface{}) {
-		data := &resourceMapValue{v.(map[string]interface{})}
-		server := expandLoadBalancerServer(data, vipPort)
-		servers = append(servers, server)
-	}
-	return servers
-}
-
-func expandLoadBalancerServer(d resourceValueGettable, vipPort int) *sacloud.LoadBalancerServer {
-	return &sacloud.LoadBalancerServer{
-		IPAddress: d.Get("ipaddress").(string),
-		Port:      types.StringNumber(vipPort),
-		Enabled:   expandStringFlag(d, "enabled"),
-		HealthCheck: &sacloud.LoadBalancerServerHealthCheck{
-			Protocol:     types.ELoadBalancerHealthCheckProtocol(d.Get("check_protocol").(string)),
-			Path:         d.Get("check_path").(string),
-			ResponseCode: expandStringNumber(d, "check_status"),
-		},
-	}
-}
-
-func expandLoadBalancerPlanID(d resourceValueGettable) types.ID {
-	plan := d.Get("plan").(string)
-	if plan == "standard" {
-		return types.LoadBalancerPlans.Standard
-	}
-
-	return types.LoadBalancerPlans.Premium
-}
-
-func expandLoadBalancerIPAddresses(d resourceValueGettable) []string {
-	ipAddresses := []string{d.Get("ipaddress1").(string)}
-	if ip2, ok := d.GetOk("ipaddress2"); ok {
-		ipAddresses = append(ipAddresses, ip2.(string))
-	}
-	return ipAddresses
-}
-
-func expandLoadBalancerCreateRequest(d *schema.ResourceData) *sacloud.LoadBalancerCreateRequest {
-	return &sacloud.LoadBalancerCreateRequest{
-		SwitchID:           expandSakuraCloudID(d, "switch_id"),
-		PlanID:             expandLoadBalancerPlanID(d),
-		VRID:               d.Get("vrid").(int),
-		IPAddresses:        expandLoadBalancerIPAddresses(d),
-		NetworkMaskLen:     d.Get("nw_mask_len").(int),
-		DefaultRoute:       d.Get("default_route").(string),
-		Name:               d.Get("name").(string),
-		Description:        d.Get("description").(string),
-		Tags:               expandTags(d),
-		IconID:             expandSakuraCloudID(d, "icon_id"),
-		VirtualIPAddresses: expandLoadBalancerVIPs(d),
-	}
-}
-func expandLoadBalancerUpdateRequest(d *schema.ResourceData, lb *sacloud.LoadBalancer) *sacloud.LoadBalancerUpdateRequest {
-	return &sacloud.LoadBalancerUpdateRequest{
-		Name:               d.Get("name").(string),
-		Description:        d.Get("description").(string),
-		Tags:               expandTags(d),
-		IconID:             expandSakuraCloudID(d, "icon_id"),
-		VirtualIPAddresses: expandLoadBalancerVIPs(d),
-		SettingsHash:       lb.SettingsHash,
-	}
 }

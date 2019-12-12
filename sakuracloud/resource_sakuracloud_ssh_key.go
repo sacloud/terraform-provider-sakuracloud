@@ -60,11 +60,7 @@ func resourceSakuraCloudSSHKeyCreate(d *schema.ResourceData, meta interface{}) e
 	client, ctx, _ := getSacloudClient(d, meta)
 	sshKeyOp := sacloud.NewSSHKeyOp(client)
 
-	key, err := sshKeyOp.Create(ctx, &sacloud.SSHKeyCreateRequest{
-		Name:        d.Get("name").(string),
-		Description: d.Get("description").(string),
-		PublicKey:   d.Get("public_key").(string),
-	})
+	key, err := sshKeyOp.Create(ctx, expandSSHKeyCreateRequest(d))
 	if err != nil {
 		return fmt.Errorf("creating SSHKey is failed: %s", err)
 	}
@@ -97,10 +93,7 @@ func resourceSakuraCloudSSHKeyUpdate(d *schema.ResourceData, meta interface{}) e
 		return fmt.Errorf("could not read SSHKey[%s]: %s", d.Id(), err)
 	}
 
-	_, err = sshKeyOp.Update(ctx, key.ID, &sacloud.SSHKeyUpdateRequest{
-		Name:        d.Get("name").(string),
-		Description: d.Get("description").(string),
-	})
+	_, err = sshKeyOp.Update(ctx, key.ID, expandSSHKeyUpdateRequest(d))
 	if err != nil {
 		return fmt.Errorf("updating SSHKey[%s] is failed: %s", key.ID, err)
 	}

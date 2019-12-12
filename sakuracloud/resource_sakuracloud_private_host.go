@@ -16,13 +16,10 @@ package sakuracloud
 
 import (
 	"context"
-	"errors"
 	"fmt"
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/sacloud/libsacloud/v2/sacloud"
-	"github.com/sacloud/libsacloud/v2/sacloud/search"
-	"github.com/sacloud/libsacloud/v2/sacloud/types"
 )
 
 func resourceSakuraCloudPrivateHost() *schema.Resource {
@@ -87,13 +84,7 @@ func resourceSakuraCloudPrivateHostCreate(d *schema.ResourceData, meta interface
 		return fmt.Errorf("creating SakuraCloud PrivateHost is failed: %s", err)
 	}
 
-	ph, err := phOp.Create(ctx, zone, &sacloud.PrivateHostCreateRequest{
-		Name:        d.Get("name").(string),
-		Description: d.Get("description").(string),
-		Tags:        expandTags(d),
-		IconID:      expandSakuraCloudID(d, "icon_id"),
-		PlanID:      planID,
-	})
+	ph, err := phOp.Create(ctx, zone, expandPrivateHostCreateRequest(d, planID))
 	if err != nil {
 		return fmt.Errorf("creating SakuraCloud PrivateHost is failed: %s", err)
 	}
@@ -126,12 +117,7 @@ func resourceSakuraCloudPrivateHostUpdate(d *schema.ResourceData, meta interface
 		return fmt.Errorf("could not read SakuraCloud PrivateHost[%s]: %s", d.Id(), err)
 	}
 
-	_, err = phOp.Update(ctx, zone, ph.ID, &sacloud.PrivateHostUpdateRequest{
-		Name:        d.Get("name").(string),
-		Description: d.Get("description").(string),
-		Tags:        expandTags(d),
-		IconID:      expandSakuraCloudID(d, "icon_id"),
-	})
+	_, err = phOp.Update(ctx, zone, ph.ID, expandPrivateHostUpdateRequest(d))
 	if err != nil {
 		return fmt.Errorf("updating SakuraCloud PrivateHost[%s] is failed: %s", d.Id(), err)
 	}
@@ -166,28 +152,9 @@ func setPrivateHostResourceData(ctx context.Context, d *schema.ResourceData, cli
 	d.Set("name", data.Name)
 	d.Set("icon_id", data.IconID.String())
 	d.Set("description", data.Description)
-	if err := d.Set("tags", data.Tags); err != nil {
-		return err
-	}
 	d.Set("hostname", data.GetHostName())
 	d.Set("assigned_core", data.GetAssignedCPU())
 	d.Set("assigned_memory", data.GetAssignedMemoryGB())
 	d.Set("zone", getZone(d, client))
-	return nil
-}
-
-func expandPrivateHostPlanID(ctx context.Context, d resourceValueGettable, client *APIClient, zone string) (types.ID, error) {
-	op := sacloud.NewPrivateHostPlanOp(client)
-	searched, err := op.Find(ctx, zone, &sacloud.FindCondition{
-		Filter: search.Filter{
-			search.Key("Class"): search.ExactMatch("dynamic"),
-		},
-	})
-	if err != nil {
-		return types.ID(0), err
-	}
-	if searched.Count == 0 {
-		return types.ID(0), errors.New("finding PrivateHostPlan is failed: plan is not found")
-	}
-	return searched.PrivateHostPlans[0].ID, nil
+	return d.Set("tags", data.Tags)
 }

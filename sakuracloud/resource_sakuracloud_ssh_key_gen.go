@@ -67,11 +67,7 @@ func resourceSakuraCloudSSHKeyGenCreate(d *schema.ResourceData, meta interface{}
 	client, ctx, _ := getSacloudClient(d, meta)
 	sshKeyOp := sacloud.NewSSHKeyOp(client)
 
-	key, err := sshKeyOp.Generate(ctx, &sacloud.SSHKeyGenerateRequest{
-		Name:        d.Get("name").(string),
-		Description: d.Get("description").(string),
-		PassPhrase:  d.Get("pass_phrase").(string),
-	})
+	key, err := sshKeyOp.Generate(ctx, expandSSHKeyGenerateRequest(d))
 	if err != nil {
 		return fmt.Errorf("generating SSHKey is failed: %s", err)
 	}
@@ -119,19 +115,16 @@ func resourceSakuraCloudSSHKeyGenDelete(d *schema.ResourceData, meta interface{}
 }
 
 func setSSHKeyGenResourceData(d *schema.ResourceData, _ *APIClient, data interface{}) error {
-
 	if key, ok := data.(sshKeyType); ok {
 		d.Set("name", key.GetName())
 		d.Set("public_key", key.GetPublicKey())
 		d.Set("fingerprint", key.GetFingerprint())
 		d.Set("description", key.GetDescription())
 
-		// has private key?
 		if pKey, ok := data.(sshKeyGenType); ok {
 			d.Set("private_key", pKey.GetPrivateKey())
 		}
 	}
-
 	return nil
 }
 

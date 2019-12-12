@@ -85,12 +85,10 @@ func dataSourceSakuraCloudZoneRead(d *schema.ResourceData, meta interface{}) err
 	}
 
 	d.SetId(data.ID.String())
-	return setResourceData(d, map[string]interface{}{
-		"name":        data.Name,
-		"zone_id":     data.ID.String(),
-		"description": data.Description,
-		"region_id":   data.Region.ID.String(),
-		"region_name": data.Region.Name,
-		"dns_servers": data.Region.NameServers,
-	})
+	d.Set("name", data.Name)
+	d.Set("zone_id", data.ID.String())
+	d.Set("description", data.Description)
+	d.Set("region_id", data.Region.ID.String())
+	d.Set("region_name", data.Region.Name)
+	return d.Set("dns_servers", data.Region.NameServers)
 }

@@ -129,14 +129,7 @@ func resourceSakuraCloudInternetCreate(d *schema.ResourceData, meta interface{})
 	client, ctx, zone := getSacloudClient(d, meta)
 	internetOp := sacloud.NewInternetOp(client)
 
-	internet, err := internetOp.Create(ctx, zone, &sacloud.InternetCreateRequest{
-		Name:           d.Get("name").(string),
-		Description:    d.Get("description").(string),
-		Tags:           expandTags(d),
-		IconID:         expandSakuraCloudID(d, "icon_id"),
-		NetworkMaskLen: d.Get("nw_mask_len").(int),
-		BandWidthMbps:  d.Get("band_width").(int),
-	})
+	internet, err := internetOp.Create(ctx, zone, expandInternetCreateRequest(d))
 	if err != nil {
 		return fmt.Errorf("creating SakuraCloud Internet is failed: %s", err)
 	}
@@ -185,12 +178,7 @@ func resourceSakuraCloudInternetUpdate(d *schema.ResourceData, meta interface{})
 		return fmt.Errorf("could not read SakuraCloud Internet[%s]: %s", d.Id(), err)
 	}
 
-	internet, err = internetOp.Update(ctx, zone, internet.ID, &sacloud.InternetUpdateRequest{
-		Name:        d.Get("name").(string),
-		Description: d.Get("description").(string),
-		Tags:        expandTags(d),
-		IconID:      expandSakuraCloudID(d, "icon_id"),
-	})
+	internet, err = internetOp.Update(ctx, zone, internet.ID, expandInternetUpdateRequest(d))
 	if err != nil {
 		return fmt.Errorf("updating SakuraCloud Internet[%s] is failed: %s", d.Id(), err)
 	}
@@ -202,8 +190,7 @@ func resourceSakuraCloudInternetUpdate(d *schema.ResourceData, meta interface{})
 		if err != nil {
 			return fmt.Errorf("updating bandwidth of Internet[%s] is failed: %s", d.Id(), err)
 		}
-		// internet.ID is changed when UpdateBandWidth() is called.
-		// so call SetID here.
+		// internet.ID is changed when UpdateBandWidth() is called, so we call d.SetID here.
 		d.SetId(internet.ID.String())
 	}
 
@@ -257,9 +244,9 @@ func resourceSakuraCloudInternetDelete(d *schema.ResourceData, meta interface{})
 }
 
 func setInternetResourceData(ctx context.Context, d *schema.ResourceData, client *APIClient, data *sacloud.Internet) error {
-
 	swOp := sacloud.NewSwitchOp(client)
 	zone := getZone(d, client)
+
 	sw, err := swOp.Read(ctx, zone, data.Switch.ID)
 	if err != nil {
 		return fmt.Errorf("could not read SakuraCloud Switch[%s]: %s", data.Switch.ID, err)
