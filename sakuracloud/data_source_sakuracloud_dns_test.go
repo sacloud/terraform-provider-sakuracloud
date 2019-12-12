@@ -86,13 +86,13 @@ resource "sakuracloud_dns" "foobar" {
 func testAccCheckSakuraCloudDataSourceDNSConfig(zone string) string {
 	return fmt.Sprintf(`
 resource "sakuracloud_dns" "foobar" {
-  zone = "%s"
+  zone        = "%s"
   description = "description_test"
-  tags = ["tag1","tag2","tag3"]
+  tags        = ["tag1", "tag2", "tag3"]
 }
 data "sakuracloud_dns" "foobar" {
   filters {
-	names = ["%s"]
+    names = ["%s"]
   }
 }`, zone, zone)
 }
@@ -100,9 +100,9 @@ data "sakuracloud_dns" "foobar" {
 func testAccCheckSakuraCloudDataSourceDNSConfig_With_Tag(zone string) string {
 	return fmt.Sprintf(`
 resource "sakuracloud_dns" "foobar" {
-  zone = "%s"
+  zone        = "%s"
   description = "description_test"
-  tags = ["tag1","tag2","tag3"]
+  tags        = ["tag1", "tag2", "tag3"]
 }
 data "sakuracloud_dns" "foobar" {
   filters {
@@ -114,9 +114,9 @@ data "sakuracloud_dns" "foobar" {
 func testAccCheckSakuraCloudDataSourceDNSConfig_With_NotExists_Tag(zone string) string {
 	return fmt.Sprintf(`
 resource "sakuracloud_dns" "foobar" {
-  zone = "%s"
+  zone        = "%s"
   description = "description_test"
-  tags = ["tag1","tag2","tag3"]
+  tags        = ["tag1", "tag2", "tag3"]
 }
 data "sakuracloud_dns" "foobar" {
   filters {
@@ -128,9 +128,9 @@ data "sakuracloud_dns" "foobar" {
 func testAccCheckSakuraCloudDataSourceDNSConfig_NotExists(zone string) string {
 	return fmt.Sprintf(`
 resource "sakuracloud_dns" "foobar" {
-  zone = "%s"
+  zone        = "%s"
   description = "description_test"
-  tags = ["tag1","tag2","tag3"]
+  tags        = ["tag1", "tag2", "tag3"]
 }
 data "sakuracloud_dns" "foobar" {
   filters {

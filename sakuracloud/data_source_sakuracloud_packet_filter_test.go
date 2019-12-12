@@ -66,21 +66,21 @@ func TestAccSakuraCloudDataSourcePacketFilter_Basic(t *testing.T) {
 func testAccCheckSakuraCloudDataSourcePacketFilterBase(name string) string {
 	return fmt.Sprintf(`
 resource "sakuracloud_packet_filter" "foobar" {
-  name = "%s"
+  name        = "%s"
   description = "description_test"
   expressions {
-  	protocol = "tcp"
-  	source_network = "0.0.0.0"
-  	source_port = "0-65535"
-  	destination_port = "80"
-  	allow = true
+    protocol         = "tcp"
+    source_network   = "0.0.0.0"
+    source_port      = "0-65535"
+    destination_port = "80"
+    allow            = true
   }
   expressions {
-  	protocol = "udp"
-  	source_network = "0.0.0.0"
-  	source_port = "0-65535"
-  	destination_port = "80"
-  	allow = true
+    protocol         = "udp"
+    source_network   = "0.0.0.0"
+    source_port      = "0-65535"
+    destination_port = "80"
+    allow            = true
   }
 }`, name)
 }
@@ -88,23 +88,24 @@ resource "sakuracloud_packet_filter" "foobar" {
 func testAccCheckSakuraCloudDataSourcePacketFilterConfig(name string) string {
 	return fmt.Sprintf(`
 resource "sakuracloud_packet_filter" "foobar" {
-  name = "%s"
+  name        = "%s"
   description = "description_test"
   expressions {
-  	protocol = "tcp"
-  	source_network = "0.0.0.0"
-  	source_port = "0-65535"
-  	destination_port = "80"
-  	allow = true
+    protocol         = "tcp"
+    source_network   = "0.0.0.0"
+    source_port      = "0-65535"
+    destination_port = "80"
+    allow            = true
   }
   expressions {
-  	protocol = "udp"
-  	source_network = "0.0.0.0"
-  	source_port = "0-65535"
-  	destination_port = "80"
-  	allow = true
+    protocol         = "udp"
+    source_network   = "0.0.0.0"
+    source_port      = "0-65535"
+    destination_port = "80"
+    allow            = true
   }
 }
+
 data "sakuracloud_packet_filter" "foobar" {
   filters {
 	names = ["%s"]

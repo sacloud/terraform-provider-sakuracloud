@@ -83,7 +83,7 @@ var testAccCheckSakuraCloudDataSourceCDROMConfig = `
 data "sakuracloud_cdrom" "foobar" {
   filters {
     conditions {
-	  name = "Name"
+	  name    = "Name"
 	  values = ["Ubuntu Server 18.04.3 LTS 64bit"]
     }
   }
@@ -93,7 +93,7 @@ var testAccCheckSakuraCloudDataSourceCDROMConfig_NotExists = `
 data "sakuracloud_cdrom" "foobar" {
   filters {
     conditions {
-	  name = "Name"
+	  name   = "Name"
 	  values = ["xxxxxxxxxxxxxxxxxx"]
     }
   }

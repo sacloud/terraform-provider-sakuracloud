@@ -81,21 +81,22 @@ func TestAccSakuraCloudDataSourcePrivateHost_Basic(t *testing.T) {
 func testAccCheckSakuraCloudDataSourcePrivateHostBase(name string) string {
 	return fmt.Sprintf(`
 resource "sakuracloud_private_host" "foobar" {
-  name = "%s"
+  name        = "%s"
   description = "description_test"
-  tags = ["tag1","tag2","tag3"]
-  zone = "tk1a"
+  tags        = ["tag1", "tag2", "tag3"]
+  zone        = "tk1a"
 }`, name)
 }
 
 func testAccCheckSakuraCloudDataSourcePrivateHostConfig(name string) string {
 	return fmt.Sprintf(`
 resource "sakuracloud_private_host" "foobar" {
-  name = "%s"
+  name        = "%s"
   description = "description_test"
-  tags = ["tag1","tag2","tag3"]
-  zone = "tk1a"
+  tags        = ["tag1", "tag2", "tag3"]
+  zone        = "tk1a"
 }
+
 data "sakuracloud_private_host" "foobar" {
   filters {
 	names = ["%s"]
@@ -107,11 +108,12 @@ data "sakuracloud_private_host" "foobar" {
 func testAccCheckSakuraCloudDataSourcePrivateHostConfig_With_Tag(name string) string {
 	return fmt.Sprintf(`
 resource "sakuracloud_private_host" "foobar" {
-  name = "%s"
+  name        = "%s"
   description = "description_test"
-  tags = ["tag1","tag2","tag3"]
-  zone = "tk1a"
+  tags        = ["tag1", "tag2", "tag3"]
+  zone        = "tk1a"
 }
+
 data "sakuracloud_private_host" "foobar" {
   filters {
 	tags = ["tag1","tag3"]
@@ -123,11 +125,12 @@ data "sakuracloud_private_host" "foobar" {
 func testAccCheckSakuraCloudDataSourcePrivateHostConfig_With_NotExists_Tag(name string) string {
 	return fmt.Sprintf(`
 resource "sakuracloud_private_host" "foobar" {
-  name = "%s"
+  name        = "%s"
   description = "description_test"
-  tags = ["tag1","tag2","tag3"]
-  zone = "tk1a"
+  tags        = ["tag1", "tag2", "tag3"]
+  zone        = "tk1a"
 }
+
 data "sakuracloud_private_host" "foobar" {
   filters {
 	tags = ["tag1-xxxxxxx","tag3-xxxxxxxx"]
@@ -139,11 +142,12 @@ data "sakuracloud_private_host" "foobar" {
 func testAccCheckSakuraCloudDataSourcePrivateHostConfig_NotExists(name string) string {
 	return fmt.Sprintf(`
 resource "sakuracloud_private_host" "foobar" {
-  name = "%s"
+  name        = "%s"
   description = "description_test"
-  tags = ["tag1","tag2","tag3"]
-  zone = "tk1a"
+  tags        = ["tag1", "tag2", "tag3"]
+  zone        = "tk1a"
 }
+
 data "sakuracloud_private_host" "foobar" {
   filters {
 	names = ["xxxxxxxxxxxxxxxxxx"]

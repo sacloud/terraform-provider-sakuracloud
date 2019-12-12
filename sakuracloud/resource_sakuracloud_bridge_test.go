@@ -145,17 +145,17 @@ func TestAccImportSakuraCloudBridge(t *testing.T) {
 
 var testAccCheckSakuraCloudBridgeConfig_withSwitch = `
 resource "sakuracloud_switch" "foobar" {
-  name = "myswitch"
+  name        = "myswitch"
   description = "Switch from TerraForm for SAKURA CLOUD"
-  bridge_id = "${sakuracloud_bridge.foobar.id}"
+  bridge_id   = "${sakuracloud_bridge.foobar.id}"
 }
 resource "sakuracloud_bridge" "foobar" {
-  name = "mybridge"
+  name        = "mybridge"
   description = "Bridge from TerraForm for SAKURA CLOUD"
 }`
 
 var testAccCheckSakuraCloudBridgeConfig_withSwitchDisconnect = `
 resource "sakuracloud_bridge" "foobar" {
-  name = "mybridge_upd"
+  name        = "mybridge_upd"
   description = "Bridge from TerraForm for SAKURA CLOUD"
 }`

@@ -78,24 +78,21 @@ resource "sakuracloud_switch" "sw" {
   name = "%s"
 }
 resource "sakuracloud_database" "foobar" {
-  name = "%s"
+  name        = "%s"
   description = "description_test"
-  tags = ["tag1","tag2","tag3"]
+  tags        = ["tag1", "tag2", "tag3"]
 
-  user_name = "defuser"
+  user_name     = "defuser"
   user_password = "DatabasePasswordUser397"
 
-  allow_networks = ["192.168.11.0/24","192.168.12.0/24"]
-
-  switch_id = "${sakuracloud_switch.sw.id}"
-  ipaddress1 = "192.168.11.101"
-  nw_mask_len = 24
-  default_route = "192.168.11.1"
-
-  port = 54321
-
+  switch_id       = "${sakuracloud_switch.sw.id}"
+  ipaddress1      = "192.168.11.101"
+  nw_mask_len     = 24
+  default_route   = "192.168.11.1"
+  allow_networks  = ["192.168.11.0/24", "192.168.12.0/24"]
+  port            = 54321
   backup_weekdays = ["mon", "tue"]
-  backup_time = "00:00"
+  backup_time     = "00:00"
 }`, name, name)
 }
 
@@ -104,29 +101,28 @@ func testAccCheckSakuraCloudDataSourceDatabaseConfig(name string) string {
 resource "sakuracloud_switch" "sw" {
   name = "%s"
 }
-resource "sakuracloud_database" "foobar" {
-  name = "%s"
-  description = "description_test"
-  tags = ["tag1","tag2","tag3"]
 
-  user_name = "defuser"
+resource "sakuracloud_database" "foobar" {
+  name        = "%s"
+  description = "description_test"
+  tags        = ["tag1", "tag2", "tag3"]
+
+  user_name     = "defuser"
   user_password = "DatabasePasswordUser397"
 
-  allow_networks = ["192.168.11.0/24","192.168.12.0/24"]
-
-  switch_id = "${sakuracloud_switch.sw.id}"
-  ipaddress1 = "192.168.11.101"
-  nw_mask_len = 24
-  default_route = "192.168.11.1"
-
-  port = 54321
-
+  switch_id       = "${sakuracloud_switch.sw.id}"
+  ipaddress1      = "192.168.11.101"
+  nw_mask_len     = 24
+  default_route   = "192.168.11.1"
+  allow_networks  = ["192.168.11.0/24", "192.168.12.0/24"]
+  port            = 54321
   backup_weekdays = ["mon", "tue"]
-  backup_time = "00:00"
+  backup_time     = "00:00"
 }
+
 data "sakuracloud_database" "foobar" {
   filters {
-	names = ["%s"]
+    names = ["%s"]
   }
 }`, name, name, name)
 }
@@ -136,29 +132,28 @@ func testAccCheckSakuraCloudDataSourceDatabaseConfig_With_Tag(name string) strin
 resource "sakuracloud_switch" "sw" {
   name = "%s"
 }
-resource "sakuracloud_database" "foobar" {
-  name = "%s"
-  description = "description_test"
-  tags = ["tag1","tag2","tag3"]
 
-  user_name = "defuser"
+resource "sakuracloud_database" "foobar" {
+  name        = "%s"
+  description = "description_test"
+  tags        = ["tag1", "tag2", "tag3"]
+
+  user_name     = "defuser"
   user_password = "DatabasePasswordUser397"
 
-  allow_networks = ["192.168.11.0/24","192.168.12.0/24"]
-
-  switch_id = "${sakuracloud_switch.sw.id}"
-  ipaddress1 = "192.168.11.101"
-  nw_mask_len = 24
-  default_route = "192.168.11.1"
-
-  port = 54321
-
+  switch_id       = "${sakuracloud_switch.sw.id}"
+  ipaddress1      = "192.168.11.101"
+  nw_mask_len     = 24
+  default_route   = "192.168.11.1"
+  allow_networks  = ["192.168.11.0/24", "192.168.12.0/24"]
+  port            = 54321
   backup_weekdays = ["mon", "tue"]
-  backup_time = "00:00"
+  backup_time     = "00:00"
 }
+
 data "sakuracloud_database" "foobar" {
   filters {
-	tags = ["tag1","tag3"]
+    tags = ["tag1", "tag3"]
   }
 }`, name, name)
 }
@@ -168,29 +163,28 @@ func testAccCheckSakuraCloudDataSourceDatabaseConfig_With_NotExists_Tag(name str
 resource "sakuracloud_switch" "sw" {
   name = "%s"
 }
-resource "sakuracloud_database" "foobar" {
-  name = "%s"
-  description = "description_test"
-  tags = ["tag1","tag2","tag3"]
 
-  user_name = "defuser"
+resource "sakuracloud_database" "foobar" {
+  name        = "%s"
+  description = "description_test"
+  tags        = ["tag1", "tag2", "tag3"]
+
+  user_name     = "defuser"
   user_password = "DatabasePasswordUser397"
 
-  allow_networks = ["192.168.11.0/24","192.168.12.0/24"]
-
-  switch_id = "${sakuracloud_switch.sw.id}"
-  ipaddress1 = "192.168.11.101"
-  nw_mask_len = 24
-  default_route = "192.168.11.1"
-
-  port = 54321
-
+  switch_id       = "${sakuracloud_switch.sw.id}"
+  ipaddress1      = "192.168.11.101"
+  nw_mask_len     = 24
+  default_route   = "192.168.11.1"
+  allow_networks  = ["192.168.11.0/24", "192.168.12.0/24"]
+  port            = 54321
   backup_weekdays = ["mon", "tue"]
-  backup_time = "00:00"
+  backup_time     = "00:00"
 }
+
 data "sakuracloud_database" "foobar" {
   filters {
-	tags = ["tag1-xxxxxxx","tag3-xxxxxxxx"]
+    tags = ["tag1-xxxxxxx", "tag3-xxxxxxxx"]
   }
 }`, name, name)
 }
@@ -201,29 +195,29 @@ func testAccCheckSakuraCloudDataSourceDatabaseConfig_NotExists(name string) stri
 resource "sakuracloud_switch" "sw" {
   name = "%s"
 }
-resource "sakuracloud_database" "foobar" {
-  name = "%s"
-  description = "description_test"
-  tags = ["tag1","tag2","tag3"]
 
-  user_name = "defuser"
+resource "sakuracloud_database" "foobar" {
+  name        = "%s"
+  description = "description_test"
+  tags        = ["tag1", "tag2", "tag3"]
+
+  user_name     = "defuser"
   user_password = "DatabasePasswordUser397"
 
-  allow_networks = ["192.168.11.0/24","192.168.12.0/24"]
 
-  switch_id = "${sakuracloud_switch.sw.id}"
-  ipaddress1 = "192.168.11.101"
-  nw_mask_len = 24
-  default_route = "192.168.11.1"
-
-  port = 54321
-
+  switch_id       = "${sakuracloud_switch.sw.id}"
+  ipaddress1      = "192.168.11.101"
+  nw_mask_len     = 24
+  default_route   = "192.168.11.1"
+  allow_networks  = ["192.168.11.0/24", "192.168.12.0/24"]
+  port            = 54321
   backup_weekdays = ["mon", "tue"]
-  backup_time = "00:00"
+  backup_time     = "00:00"
 }
+
 data "sakuracloud_database" "foobar" {
   filters {
-	names = ["xxxxxxxxxxxxxxxxxx"]
+    names = ["xxxxxxxxxxxxxxxxxx"]
   }
 }`, name, name)
 }

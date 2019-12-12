@@ -90,7 +90,7 @@ resource "sakuracloud_bridge" "foobar" {
 data "sakuracloud_bridge" "foobar" {
   filters {
     conditions {
-      name = "Name"
+      name   = "Name"
       values = ["%s"]
     }
   }
@@ -101,7 +101,7 @@ var testAccCheckSakuraCloudDataSourceBridgeConfig_NotExists = `
 data "sakuracloud_bridge" "foobar" {
   filters {
     conditions {
-      name = "Name"
+      name   = "Name"
       values = ["xxxxxxxxxxxxxxxxxx"]
     }
   }
@@ -110,7 +110,7 @@ data "sakuracloud_bridge" "foobar" {
 func testAccCheckSakuraCloudDataSourceBridgeConfig_NameSelector_Exists(name, p1, p2 string) string {
 	return fmt.Sprintf(`
 resource "sakuracloud_bridge" "foobar" {
-  name = "%s"
+  name        = "%s"
   description = "description_test"
 }
 data "sakuracloud_bridge" "foobar" {
