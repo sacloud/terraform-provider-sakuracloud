@@ -29,8 +29,6 @@ import (
 	serverUtil "github.com/sacloud/libsacloud/v2/utils/server"
 )
 
-const serverAPILockKey = "sakuracloud_server.lock"
-
 func resourceSakuraCloudServer() *schema.Resource {
 	return &schema.Resource{
 		Create: resourceSakuraCloudServerCreate,
@@ -275,7 +273,7 @@ func resourceSakuraCloudServerDelete(d *schema.ResourceData, meta interface{}) e
 	}
 
 	if server.InstanceStatus.IsUp() {
-		if err := shutdownServerSync(ctx, client, zone, server.ID); err != nil {
+		if err := shutdownServerSync(ctx, client, zone, server.ID, d.Get("force_shutdown").(bool)); err != nil {
 			return fmt.Errorf("stopping SakuraCloud Server[%s] is failed: %s", server.ID, err)
 		}
 	}

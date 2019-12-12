@@ -22,23 +22,9 @@ import (
 	"github.com/sacloud/libsacloud/v2/sacloud/types"
 )
 
-const serverPowerAPILockKey = "sakuracloud_server.power.%d.lock"
-
-func bootServerSync(ctx context.Context, client *APIClient, zone string, id types.ID) error {
+func shutdownServerSync(ctx context.Context, client *APIClient, zone string, id types.ID, force bool) error {
 	serverOp := sacloud.NewServerOp(client)
-	if err := bootServer(ctx, client, zone, id); err != nil {
-		return err
-	}
-	waiter := sacloud.WaiterForUp(func() (interface{}, error) { return serverOp.Read(ctx, zone, id) })
-	if _, err := waiter.WaitForState(ctx); err != nil {
-		return err
-	}
-	return nil
-}
-
-func shutdownServerSync(ctx context.Context, client *APIClient, zone string, id types.ID) error {
-	serverOp := sacloud.NewServerOp(client)
-	if err := shutdownServer(ctx, client, zone, id); err != nil {
+	if err := serverOp.Shutdown(ctx, zone, id, &sacloud.ShutdownOption{Force: force}); err != nil {
 		return err
 	}
 	waiter := sacloud.WaiterForDown(func() (interface{}, error) { return serverOp.Read(ctx, zone, id) })
@@ -48,50 +34,8 @@ func shutdownServerSync(ctx context.Context, client *APIClient, zone string, id 
 	return nil
 }
 
-func bootServer(ctx context.Context, client *APIClient, zone string, id types.ID) error {
-	serverOp := sacloud.NewServerOp(client)
-
-	lockServerPowerState(id)
-	defer unlockServerPowerState(id)
-
-	if err := serverOp.Boot(ctx, zone, id); err != nil {
-		return err
-	}
-	return nil
-}
-
-func shutdownServer(ctx context.Context, client *APIClient, zone string, id types.ID) error {
-	serverOp := sacloud.NewServerOp(client)
-
-	lockServerPowerState(id)
-	defer unlockServerPowerState(id)
-
-	if err := serverOp.Shutdown(ctx, zone, id, &sacloud.ShutdownOption{
-		Force: true, // TODO 後で
-	}); err != nil {
-		return err
-	}
-	return nil
-
-}
-
-func lockServerPowerState(id types.ID) {
-	sakuraMutexKV.Lock(getServerPowerAPILockKey(id.Int64()))
-	sakuraMutexKV.Lock(serverAPILockKey)
-}
-
-func unlockServerPowerState(id types.ID) {
-	sakuraMutexKV.Unlock(serverAPILockKey)
-	sakuraMutexKV.Unlock(getServerPowerAPILockKey(id.Int64()))
-}
-
-func getServerPowerAPILockKey(id int64) string {
-	return fmt.Sprintf(serverPowerAPILockKey, id)
-}
-
 func shutdownVPCRouterSync(ctx context.Context, client *APIClient, zone string, id types.ID) error {
 	vrOp := sacloud.NewVPCRouterOp(client)
-
 	if err := vrOp.Shutdown(ctx, zone, id, &sacloud.ShutdownOption{}); err != nil {
 		return err
 	}
@@ -103,12 +47,9 @@ func shutdownVPCRouterSync(ctx context.Context, client *APIClient, zone string, 
 }
 
 func bootDatabaseSync(ctx context.Context, dbOp sacloud.DatabaseAPI, zone string, id types.ID) error {
-	// boot
 	if err := dbOp.Boot(ctx, zone, id); err != nil {
 		return fmt.Errorf("booting Database[%s] is failed: %s", id, err)
 	}
-
-	// wait
 	waiter := sacloud.WaiterForUp(func() (interface{}, error) {
 		return dbOp.Read(ctx, zone, id)
 	})
@@ -119,12 +60,9 @@ func bootDatabaseSync(ctx context.Context, dbOp sacloud.DatabaseAPI, zone string
 }
 
 func shutdownDatabaseSync(ctx context.Context, dbOp sacloud.DatabaseAPI, zone string, id types.ID, forceShutdown bool) error {
-	// shutdown
 	if err := dbOp.Shutdown(ctx, zone, id, &sacloud.ShutdownOption{Force: forceShutdown}); err != nil {
 		return fmt.Errorf("stopping Database[%s] is failed: %s", id, err)
 	}
-
-	// wait
 	waiter := sacloud.WaiterForDown(func() (interface{}, error) {
 		return dbOp.Read(ctx, zone, id)
 	})
