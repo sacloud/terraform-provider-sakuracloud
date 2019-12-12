@@ -46,19 +46,6 @@ func shutdownVPCRouterSync(ctx context.Context, client *APIClient, zone string, 
 	return nil
 }
 
-func bootDatabaseSync(ctx context.Context, dbOp sacloud.DatabaseAPI, zone string, id types.ID) error {
-	if err := dbOp.Boot(ctx, zone, id); err != nil {
-		return fmt.Errorf("booting Database[%s] is failed: %s", id, err)
-	}
-	waiter := sacloud.WaiterForUp(func() (interface{}, error) {
-		return dbOp.Read(ctx, zone, id)
-	})
-	if _, err := waiter.WaitForState(ctx); err != nil {
-		return fmt.Errorf("waiting for Database[%s] up is failed: %s", id, err)
-	}
-	return nil
-}
-
 func shutdownDatabaseSync(ctx context.Context, dbOp sacloud.DatabaseAPI, zone string, id types.ID, forceShutdown bool) error {
 	if err := dbOp.Shutdown(ctx, zone, id, &sacloud.ShutdownOption{Force: forceShutdown}); err != nil {
 		return fmt.Errorf("stopping Database[%s] is failed: %s", id, err)
