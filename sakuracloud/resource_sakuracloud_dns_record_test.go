@@ -41,40 +41,26 @@ func TestAccResourceSakuraCloudDNSRecord_Basic(t *testing.T) {
 				Config: testAccCheckSakuraCloudDNSRecordConfig_basic(zone),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckSakuraCloudDNSExists("sakuracloud_dns.foobar", &dns),
-					resource.TestCheckResourceAttr(
-						"sakuracloud_dns.foobar", "zone", zone),
-					resource.TestCheckResourceAttr(
-						"sakuracloud_dns_record.foobar", "name", "test1"),
-					resource.TestCheckResourceAttr(
-						"sakuracloud_dns_record.foobar", "type", "A"),
-					resource.TestCheckResourceAttr(
-						"sakuracloud_dns_record.foobar", "value", "192.168.0.1"),
-					resource.TestCheckResourceAttr(
-						"sakuracloud_dns_record.foobar1", "name", "_sip._tls"),
-					resource.TestCheckResourceAttr(
-						"sakuracloud_dns_record.foobar1", "type", "SRV"),
-					resource.TestCheckResourceAttr(
-						"sakuracloud_dns_record.foobar1", "value", "www.sakura.ne.jp."),
-					resource.TestCheckResourceAttr(
-						"sakuracloud_dns_record.foobar1", "priority", "1"),
-					resource.TestCheckResourceAttr(
-						"sakuracloud_dns_record.foobar1", "weight", "2"),
-					resource.TestCheckResourceAttr(
-						"sakuracloud_dns_record.foobar1", "port", "3"),
+					resource.TestCheckResourceAttr("sakuracloud_dns.foobar", "zone", zone),
+					resource.TestCheckResourceAttr("sakuracloud_dns_record.foobar", "name", "test1"),
+					resource.TestCheckResourceAttr("sakuracloud_dns_record.foobar", "type", "A"),
+					resource.TestCheckResourceAttr("sakuracloud_dns_record.foobar", "value", "192.168.0.1"),
+					resource.TestCheckResourceAttr("sakuracloud_dns_record.foobar1", "name", "_sip._tls"),
+					resource.TestCheckResourceAttr("sakuracloud_dns_record.foobar1", "type", "SRV"),
+					resource.TestCheckResourceAttr("sakuracloud_dns_record.foobar1", "value", "www.sakura.ne.jp."),
+					resource.TestCheckResourceAttr("sakuracloud_dns_record.foobar1", "priority", "1"),
+					resource.TestCheckResourceAttr("sakuracloud_dns_record.foobar1", "weight", "2"),
+					resource.TestCheckResourceAttr("sakuracloud_dns_record.foobar1", "port", "3"),
 				),
 			},
 			{
 				Config: testAccCheckSakuraCloudDNSRecordConfig_update(zone),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckSakuraCloudDNSExists("sakuracloud_dns.foobar", &dns),
-					resource.TestCheckResourceAttr(
-						"sakuracloud_dns.foobar", "zone", zone),
-					resource.TestCheckResourceAttr(
-						"sakuracloud_dns_record.foobar", "name", "test2"),
-					resource.TestCheckResourceAttr(
-						"sakuracloud_dns_record.foobar", "type", "A"),
-					resource.TestCheckResourceAttr(
-						"sakuracloud_dns_record.foobar", "value", "192.168.0.2"),
+					resource.TestCheckResourceAttr("sakuracloud_dns.foobar", "zone", zone),
+					resource.TestCheckResourceAttr("sakuracloud_dns_record.foobar", "name", "test2"),
+					resource.TestCheckResourceAttr("sakuracloud_dns_record.foobar", "type", "A"),
+					resource.TestCheckResourceAttr("sakuracloud_dns_record.foobar", "value", "192.168.0.2"),
 				),
 			},
 		},
@@ -187,7 +173,7 @@ func testAccCheckSakuraCloudDNSRecordConfig_update(zone string) string {
 	return fmt.Sprintf(`
 resource "sakuracloud_dns" "foobar" {
   zone = "%s"
-  description = "DNS from TerraForm for SAKURA CLOUD"
+  description = "DNS from TerraForm for SAKURA CLOUD-upd"
   tags = ["hoge1"]
 }
 

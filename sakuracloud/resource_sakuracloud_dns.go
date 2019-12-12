@@ -148,7 +148,7 @@ func resourceSakuraCloudDNSUpdate(d *schema.ResourceData, meta interface{}) erro
 		return fmt.Errorf("could not read SakuraCloud DNS[%s]: %s", d.Id(), err)
 	}
 
-	if _, err := dnsOp.Update(ctx, dns.ID, expandDNSUpdateRequest(d)); err != nil {
+	if _, err := dnsOp.Update(ctx, dns.ID, expandDNSUpdateRequest(d, dns)); err != nil {
 		return fmt.Errorf("updating SakuraCloud DNS[%s] is failed: %s", d.Id(), err)
 	}
 	return resourceSakuraCloudDNSRead(d, meta)
@@ -202,12 +202,16 @@ func expandDNSCreateRequest(d *schema.ResourceData) *sacloud.DNSCreateRequest {
 	}
 }
 
-func expandDNSUpdateRequest(d *schema.ResourceData) *sacloud.DNSUpdateRequest {
+func expandDNSUpdateRequest(d *schema.ResourceData, dns *sacloud.DNS) *sacloud.DNSUpdateRequest {
+	records := dns.Records
+	if d.HasChange("records") {
+		records = expandDNSRecords(d, "records")
+	}
 	return &sacloud.DNSUpdateRequest{
 		Description: d.Get("description").(string),
 		Tags:        expandTags(d),
 		IconID:      expandSakuraCloudID(d, "icon_id"),
-		Records:     expandDNSRecords(d, "records"),
+		Records:     records,
 	}
 }
 

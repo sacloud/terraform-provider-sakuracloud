@@ -155,7 +155,7 @@ resource "sakuracloud_packet_filter" "foobar" {
 var testAccCheckSakuraCloudPacketFilterConfig_update = `
 resource "sakuracloud_packet_filter" "foobar" {
   name        = "mypacket_filter_upd"
-  description = "PacketFilter from TerraForm for SAKURA CLOUD"
+  description = "PacketFilter from TerraForm for SAKURA CLOUD-upd"
   expressions {
     protocol         = "tcp"
     source_network   = "192.168.2.0"
