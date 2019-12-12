@@ -73,13 +73,7 @@ func resourceSakuraCloudNoteCreate(d *schema.ResourceData, meta interface{}) err
 	client, ctx, _ := getSacloudClient(d, meta)
 	noteOp := sacloud.NewNoteOp(client)
 
-	note, err := noteOp.Create(ctx, &sacloud.NoteCreateRequest{
-		Name:    d.Get("name").(string),
-		Tags:    expandTags(d),
-		IconID:  expandSakuraCloudID(d, "icon_id"),
-		Class:   d.Get("class").(string),
-		Content: d.Get("content").(string),
-	})
+	note, err := noteOp.Create(ctx, expandNoteCreateRequest(d))
 	if err != nil {
 		return fmt.Errorf("creating SakuraCloud Note is failed: %s", err)
 	}
@@ -113,13 +107,7 @@ func resourceSakuraCloudNoteUpdate(d *schema.ResourceData, meta interface{}) err
 		return fmt.Errorf("could not read SakuraCloud Note[%s]: %s", d.Id(), err)
 	}
 
-	_, err = noteOp.Update(ctx, note.ID, &sacloud.NoteUpdateRequest{
-		Name:    d.Get("name").(string),
-		Tags:    expandTags(d),
-		IconID:  expandSakuraCloudID(d, "icon_id"),
-		Class:   d.Get("class").(string),
-		Content: d.Get("content").(string),
-	})
+	_, err = noteOp.Update(ctx, note.ID, expandNoteUpdateRequest(d))
 	if err != nil {
 		return fmt.Errorf("updating SakuraCloud Note[%s] is failed: %s", d.Id(), err)
 	}
@@ -152,8 +140,5 @@ func setNoteResourceData(ctx context.Context, d *schema.ResourceData, client *AP
 	d.Set("class", data.Class)
 	d.Set("icon_id", data.IconID.String())
 	d.Set("description", data.Description)
-	if err := d.Set("tags", data.Tags); err != nil {
-		return err
-	}
-	return nil
+	return d.Set("tags", data.Tags)
 }

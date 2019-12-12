@@ -17,7 +17,6 @@ package sakuracloud
 import (
 	"context"
 	"fmt"
-	"strings"
 	"time"
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
@@ -265,14 +264,7 @@ func setDatabaseResourceData(ctx context.Context, d *schema.ResourceData, client
 		return fmt.Errorf("got unexpected state: Database[%d].Availability is failed", data.ID)
 	}
 
-	var databaseType string
-	switch data.Conf.DatabaseName {
-	case types.RDBMSVersions[types.RDBMSTypesPostgreSQL].Name:
-		databaseType = "postgresql"
-	case types.RDBMSVersions[types.RDBMSTypesMariaDB].Name:
-		databaseType = "mariadb"
-	}
-	d.Set("database_type", databaseType)
+	d.Set("database_type", flattenDatabaseType(data))
 
 	if data.ReplicationSetting != nil {
 		d.Set("replica_user", data.CommonSetting.ReplicaUser)
@@ -282,17 +274,11 @@ func setDatabaseResourceData(ctx context.Context, d *schema.ResourceData, client
 	if data.BackupSetting != nil {
 		d.Set("backup_time", data.BackupSetting.Time)
 		if err := d.Set("backup_weekdays", data.BackupSetting.DayOfWeek); err != nil {
-			return fmt.Errorf("error setting backup_weekdays: %v", data.BackupSetting.DayOfWeek)
+			return err
 		}
 	}
 
-	var tags []string
-	for _, t := range data.Tags {
-		if !(strings.HasPrefix(t, "@MariaDB-") || strings.HasPrefix(t, "@postgres-")) {
-			tags = append(tags, t)
-		}
-	}
-	if err := d.Set("tags", tags); err != nil {
+	if err := d.Set("tags", flattenDatabaseTags(data)); err != nil {
 		return err
 	}
 
@@ -313,150 +299,4 @@ func setDatabaseResourceData(ctx context.Context, d *schema.ResourceData, client
 	d.Set("zone", getZone(d, client))
 
 	return nil
-}
-
-func databasePlanIDToName(planID types.ID) string {
-	switch planID {
-	case types.DatabasePlans.DB10GB:
-		return "10g"
-	case types.DatabasePlans.DB30GB:
-		return "30g"
-	case types.DatabasePlans.DB90GB:
-		return "90g"
-	case types.DatabasePlans.DB240GB:
-		return "240g"
-	case types.DatabasePlans.DB500GB:
-		return "500g"
-	case types.DatabasePlans.DB1TB:
-		return "1t"
-	}
-	return ""
-}
-
-func databasePlanNameToID(planName string) types.ID {
-	switch planName {
-	case "10g":
-		return types.DatabasePlans.DB10GB
-	case "30g":
-		return types.DatabasePlans.DB30GB
-	case "90g":
-		return types.DatabasePlans.DB90GB
-	case "240g":
-		return types.DatabasePlans.DB240GB
-	case "500g":
-		return types.DatabasePlans.DB500GB
-	case "1t":
-		return types.DatabasePlans.DB1TB
-	}
-	return types.ID(0)
-}
-
-func validateDatabaseParameters(d *schema.ResourceData) error {
-	if err := validateBackupWeekdays(d, "backup_weekdays"); err != nil {
-		return err
-	}
-
-	dbType := d.Get("database_type").(string)
-	if dbType != "postgresql" && dbType != "mariadb" {
-		return fmt.Errorf("unknown database_type[%s]", dbType)
-	}
-
-	return nil
-}
-
-func expandDatabaseCreateRequest(d *schema.ResourceData) *sacloud.DatabaseCreateRequest {
-	var dbVersion *types.RDBMSVersion
-	dbType := d.Get("database_type").(string)
-	switch dbType {
-	case "postgresql":
-		dbVersion = types.RDBMSVersions[types.RDBMSTypesPostgreSQL]
-	case "mariadb":
-		dbVersion = types.RDBMSVersions[types.RDBMSTypesMariaDB]
-	}
-
-	replicaUser := d.Get("replica_user").(string)
-	replicaPassword := d.Get("replica_password").(string)
-
-	req := &sacloud.DatabaseCreateRequest{
-		Name:           d.Get("name").(string),
-		Description:    d.Get("description").(string),
-		Tags:           expandTags(d),
-		IconID:         expandSakuraCloudID(d, "icon_id"),
-		PlanID:         databasePlanNameToID(d.Get("plan").(string)),
-		SwitchID:       expandSakuraCloudID(d, "switch_id"),
-		IPAddresses:    []string{d.Get("ipaddress1").(string)},
-		NetworkMaskLen: d.Get("nw_mask_len").(int),
-		DefaultRoute:   d.Get("default_route").(string),
-		Conf: &sacloud.DatabaseRemarkDBConfCommon{
-			DatabaseName:     dbVersion.Name,
-			DatabaseVersion:  dbVersion.Version,
-			DatabaseRevision: dbVersion.Revision,
-			DefaultUser:      d.Get("user_name").(string),
-			UserPassword:     d.Get("user_password").(string),
-		},
-		CommonSetting: &sacloud.DatabaseSettingCommon{
-			ServicePort:     d.Get("port").(int),
-			SourceNetwork:   expandStringList(d.Get("allow_networks").([]interface{})),
-			DefaultUser:     d.Get("user_name").(string),
-			UserPassword:    d.Get("user_password").(string),
-			ReplicaUser:     replicaUser,
-			ReplicaPassword: replicaPassword,
-		},
-	}
-
-	backupTime := d.Get("backup_time").(string)
-	backupWeekdays := expandBackupWeekdays(d.Get("backup_weekdays").([]interface{}))
-	if backupTime != "" && len(backupWeekdays) > 0 {
-		req.BackupSetting = &sacloud.DatabaseSettingBackup{
-			Time:      backupTime,
-			DayOfWeek: backupWeekdays,
-		}
-	}
-
-	if replicaUser != "" && replicaPassword != "" {
-		req.ReplicationSetting = &sacloud.DatabaseReplicationSetting{
-			Model:    types.DatabaseReplicationModels.MasterSlave,
-			User:     replicaUser,
-			Password: replicaPassword,
-		}
-	}
-	return req
-}
-
-func expandDatabaseUpdateRequest(d *schema.ResourceData, currentSettingsHash string) *sacloud.DatabaseUpdateRequest {
-	replicaUser := d.Get("replica_user").(string)
-	replicaPassword := d.Get("replica_password").(string)
-
-	req := &sacloud.DatabaseUpdateRequest{
-		Name:        d.Get("name").(string),
-		Description: d.Get("description").(string),
-		Tags:        expandTags(d),
-		IconID:      expandSakuraCloudID(d, "icon_id"),
-		CommonSetting: &sacloud.DatabaseSettingCommon{
-			ServicePort:     d.Get("port").(int),
-			SourceNetwork:   expandStringList(d.Get("allow_networks").([]interface{})),
-			DefaultUser:     d.Get("user_name").(string),
-			UserPassword:    d.Get("user_password").(string),
-			ReplicaUser:     replicaUser,
-			ReplicaPassword: replicaPassword,
-		},
-		BackupSetting:      &sacloud.DatabaseSettingBackup{},
-		ReplicationSetting: &sacloud.DatabaseReplicationSetting{},
-		SettingsHash:       currentSettingsHash,
-	}
-	backupTime := d.Get("backup_time").(string)
-	backupWeekdays := expandBackupWeekdays(d.Get("backup_weekdays").([]interface{}))
-	if backupTime != "" && len(backupWeekdays) > 0 {
-		req.BackupSetting = &sacloud.DatabaseSettingBackup{
-			Time:      backupTime,
-			DayOfWeek: backupWeekdays,
-		}
-	}
-
-	if replicaUser != "" && replicaPassword != "" {
-		req.ReplicationSetting = &sacloud.DatabaseReplicationSetting{
-			Model: types.DatabaseReplicationModels.MasterSlave,
-		}
-	}
-	return req
 }

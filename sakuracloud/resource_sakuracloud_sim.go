@@ -16,13 +16,11 @@ package sakuracloud
 
 import (
 	"context"
-	"errors"
 	"fmt"
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/sacloud/libsacloud/v2/sacloud"
 	"github.com/sacloud/libsacloud/v2/sacloud/types"
-	simBuilder "github.com/sacloud/libsacloud/v2/utils/builder/sim"
 	simUtil "github.com/sacloud/libsacloud/v2/utils/sim"
 )
 
@@ -204,67 +202,4 @@ func setSIMResourceData(ctx context.Context, d *schema.ResourceData, client *API
 	}
 
 	return nil
-}
-
-func validateCarrier(d resourceValueGettable) error {
-	carriers := d.Get("carrier").([]interface{})
-	if len(carriers) == 0 {
-		return errors.New("carrier is required")
-	}
-
-	for _, c := range carriers {
-		if c == nil {
-			return errors.New(`carrier[""] is invalid`)
-		}
-
-		c := c.(string)
-		if _, ok := types.SIMOperatorShortNameMap[c]; !ok {
-			return fmt.Errorf("carrier[%q] is invalid", c)
-		}
-	}
-
-	return nil
-}
-
-func expandSIMCarrier(d resourceValueGettable) []*sacloud.SIMNetworkOperatorConfig {
-	// carriers
-	var carriers []*sacloud.SIMNetworkOperatorConfig
-	rawCarriers := d.Get("carrier").([]interface{})
-	for _, carrier := range rawCarriers {
-		carriers = append(carriers, &sacloud.SIMNetworkOperatorConfig{
-			Allow: true,
-			Name:  types.SIMOperatorShortNameMap[carrier.(string)].String(),
-		})
-	}
-	return carriers
-}
-
-func flattenSIMCarrier(carrierInfo []*sacloud.SIMNetworkOperatorConfig) []interface{} {
-	var carriers []interface{}
-	for _, c := range carrierInfo {
-		if !c.Allow {
-			continue
-		}
-		for k, v := range types.SIMOperatorShortNameMap {
-			if v.String() == c.Name {
-				carriers = append(carriers, k)
-			}
-		}
-	}
-	return carriers
-}
-
-func expandSIMBuilder(d resourceValueGettable, client *APIClient) *simBuilder.Builder {
-	return &simBuilder.Builder{
-		Name:        d.Get("name").(string),
-		Description: d.Get("description").(string),
-		Tags:        expandTags(d),
-		IconID:      expandSakuraCloudID(d, "icon_id"),
-		ICCID:       d.Get("iccid").(string),
-		PassCode:    d.Get("passcode").(string),
-		Activate:    d.Get("enabled").(bool),
-		IMEI:        d.Get("imei").(string),
-		Carrier:     expandSIMCarrier(d),
-		Client:      simBuilder.NewAPIClient(client),
-	}
 }

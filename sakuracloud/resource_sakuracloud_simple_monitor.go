@@ -169,20 +169,7 @@ func resourceSakuraCloudSimpleMonitorCreate(d *schema.ResourceData, meta interfa
 	client, ctx, _ := getSacloudClient(d, meta)
 	smOp := sacloud.NewSimpleMonitorOp(client)
 
-	simpleMonitor, err := smOp.Create(ctx, &sacloud.SimpleMonitorCreateRequest{
-		Target:             d.Get("target").(string),
-		Enabled:            types.StringFlag(d.Get("enabled").(bool)),
-		HealthCheck:        expandSimpleMonitorHealthCheck(d),
-		DelayLoop:          d.Get("delay_loop").(int),
-		NotifyEmailEnabled: types.StringFlag(d.Get("notify_email_enabled").(bool)),
-		NotifyEmailHTML:    types.StringFlag(d.Get("notify_email_html").(bool)),
-		NotifySlackEnabled: types.StringFlag(d.Get("notify_slack_enabled").(bool)),
-		SlackWebhooksURL:   d.Get("notify_slack_webhook").(string),
-		NotifyInterval:     d.Get("notify_interval").(int) * 60 * 60, // hours => seconds
-		Description:        d.Get("description").(string),
-		Tags:               expandTags(d),
-		IconID:             expandSakuraCloudID(d, "icon_id"),
-	})
+	simpleMonitor, err := smOp.Create(ctx, expandSimpleMonitorCreateRequest(d))
 	if err != nil {
 		return fmt.Errorf("creating SimpleMonitor is failed: %s", err)
 	}
@@ -216,19 +203,7 @@ func resourceSakuraCloudSimpleMonitorUpdate(d *schema.ResourceData, meta interfa
 		return fmt.Errorf("could not read SimpleMonitor[%s]: %s", d.Id(), err)
 	}
 
-	simpleMonitor, err = smOp.Update(ctx, simpleMonitor.ID, &sacloud.SimpleMonitorUpdateRequest{
-		Enabled:            types.StringFlag(d.Get("enabled").(bool)),
-		HealthCheck:        expandSimpleMonitorHealthCheck(d),
-		DelayLoop:          d.Get("delay_loop").(int),
-		NotifyEmailEnabled: types.StringFlag(d.Get("notify_email_enabled").(bool)),
-		NotifyEmailHTML:    types.StringFlag(d.Get("notify_email_html").(bool)),
-		NotifySlackEnabled: types.StringFlag(d.Get("notify_slack_enabled").(bool)),
-		SlackWebhooksURL:   d.Get("notify_slack_webhook").(string),
-		NotifyInterval:     d.Get("notify_interval").(int) * 60 * 60, // hours => seconds
-		Description:        d.Get("description").(string),
-		Tags:               expandTags(d),
-		IconID:             expandSakuraCloudID(d, "icon_id"),
-	})
+	simpleMonitor, err = smOp.Update(ctx, simpleMonitor.ID, expandSimpleMonitorUpdateRequest(d))
 	if err != nil {
 		return fmt.Errorf("updating SimpleMonitor[%s] is failed: %s", simpleMonitor.ID, err)
 	}
@@ -263,156 +238,14 @@ func setSimpleMonitorResourceData(ctx context.Context, d *schema.ResourceData, c
 	}
 	d.Set("icon_id", data.IconID.String())
 	d.Set("description", data.Description)
-	d.Set("tags", data.Tags)
+	if err := d.Set("tags", data.Tags); err != nil {
+		return err
+	}
 	d.Set("enabled", data.Enabled.Bool())
 	d.Set("notify_email_enabled", data.NotifyEmailEnabled.Bool())
 	d.Set("notify_email_html", data.NotifyEmailHTML.Bool())
 	d.Set("notify_slack_enabled", data.NotifySlackEnabled.Bool())
 	d.Set("notify_slack_webhook", data.SlackWebhooksURL)
 	d.Set("notify_interval", flattenSimpleMonitorNotifyInterval(data))
-	return nil
-}
-
-func flattenSimpleMonitorNotifyInterval(simpleMonitor *sacloud.SimpleMonitor) int {
-	interval := simpleMonitor.NotifyInterval
-	if interval == 0 {
-		return 0
-	}
-	// seconds => hours
-	return int(interval / 60 / 60)
-}
-
-func flattenSimpleMonitorHealthCheck(simpleMonitor *sacloud.SimpleMonitor) []interface{} {
-	healthCheck := map[string]interface{}{}
-	hc := simpleMonitor.HealthCheck
-	switch hc.Protocol {
-	case types.SimpleMonitorProtocols.HTTP:
-		healthCheck["path"] = hc.Path
-		healthCheck["status"] = hc.Status.Int()
-		healthCheck["host_header"] = hc.Host
-		healthCheck["port"] = hc.Port.Int()
-		healthCheck["username"] = hc.BasicAuthUsername
-		healthCheck["password"] = hc.BasicAuthPassword
-	case types.SimpleMonitorProtocols.HTTPS:
-		healthCheck["path"] = hc.Path
-		healthCheck["status"] = hc.Status.Int()
-		healthCheck["host_header"] = hc.Host
-		healthCheck["port"] = hc.Port.Int()
-		healthCheck["sni"] = hc.SNI.Bool()
-		healthCheck["username"] = hc.BasicAuthUsername
-		healthCheck["password"] = hc.BasicAuthPassword
-	case types.SimpleMonitorProtocols.TCP, types.SimpleMonitorProtocols.SSH, types.SimpleMonitorProtocols.SMTP, types.SimpleMonitorProtocols.POP3:
-		healthCheck["port"] = hc.Port.Int()
-	case types.SimpleMonitorProtocols.SNMP:
-		healthCheck["community"] = hc.Community
-		healthCheck["snmp_version"] = hc.SNMPVersion
-		healthCheck["oid"] = hc.OID
-		healthCheck["expected_data"] = hc.ExpectedData
-	case types.SimpleMonitorProtocols.DNS:
-		healthCheck["qname"] = hc.QName
-		healthCheck["expected_data"] = hc.ExpectedData
-	case types.SimpleMonitorProtocols.SSLCertificate:
-	}
-	days := hc.RemainingDays
-	if days == 0 {
-		days = 30
-	}
-	healthCheck["remaining_days"] = days
-	healthCheck["protocol"] = hc.Protocol
-	return []interface{}{healthCheck}
-}
-
-func expandSimpleMonitorHealthCheck(d resourceValueGettable) *sacloud.SimpleMonitorHealthCheck {
-	healthCheckConf := d.Get("health_check").([]interface{})
-	conf := healthCheckConf[0].(map[string]interface{})
-	protocol := conf["protocol"].(string)
-	port := conf["port"].(int)
-
-	switch protocol {
-	case "http":
-		if port == 0 {
-			port = 80
-		}
-		return &sacloud.SimpleMonitorHealthCheck{
-			Protocol:          types.SimpleMonitorProtocols.HTTP,
-			Port:              types.StringNumber(port),
-			Path:              forceString(conf["path"]),
-			Status:            types.StringNumber(conf["status"].(int)),
-			Host:              forceString(conf["host_header"]),
-			BasicAuthUsername: forceString(conf["username"]),
-			BasicAuthPassword: forceString(conf["password"]),
-		}
-	case "https":
-		if port == 0 {
-			port = 443
-		}
-		return &sacloud.SimpleMonitorHealthCheck{
-			Protocol:          types.SimpleMonitorProtocols.HTTPS,
-			Port:              types.StringNumber(port),
-			Path:              forceString(conf["path"]),
-			Status:            types.StringNumber(conf["status"].(int)),
-			SNI:               types.StringFlag(forceBool(conf["sni"])),
-			Host:              forceString(conf["host_header"]),
-			BasicAuthUsername: forceString(conf["username"]),
-			BasicAuthPassword: forceString(conf["password"]),
-		}
-
-	case "dns":
-		return &sacloud.SimpleMonitorHealthCheck{
-			Protocol:     types.SimpleMonitorProtocols.DNS,
-			QName:        forceString(conf["qname"]),
-			ExpectedData: forceString(conf["expected_data"]),
-		}
-	case "snmp":
-		return &sacloud.SimpleMonitorHealthCheck{
-			Protocol:     types.SimpleMonitorProtocols.SNMP,
-			Community:    forceString(conf["community"]),
-			SNMPVersion:  forceString(conf["snmp_version"]),
-			OID:          forceString(conf["oid"]),
-			ExpectedData: forceString(conf["expected_data"]),
-		}
-	case "tcp":
-		return &sacloud.SimpleMonitorHealthCheck{
-			Protocol: types.SimpleMonitorProtocols.TCP,
-			Port:     types.StringNumber(port),
-		}
-	case "ssh":
-		if port == 0 {
-			port = 22
-		}
-		return &sacloud.SimpleMonitorHealthCheck{
-			Protocol: types.SimpleMonitorProtocols.SSH,
-			Port:     types.StringNumber(port),
-		}
-	case "smtp":
-		if port == 0 {
-			port = 25
-		}
-		return &sacloud.SimpleMonitorHealthCheck{
-			Protocol: types.SimpleMonitorProtocols.SMTP,
-			Port:     types.StringNumber(port),
-		}
-	case "pop3":
-		if port == 0 {
-			port = 110
-		}
-		return &sacloud.SimpleMonitorHealthCheck{
-			Protocol: types.SimpleMonitorProtocols.POP3,
-			Port:     types.StringNumber(port),
-		}
-	case "ping":
-		return &sacloud.SimpleMonitorHealthCheck{
-			Protocol: types.SimpleMonitorProtocols.Ping,
-		}
-	case "sslcertificate":
-		days := 0
-		if v, ok := conf["remaining_days"]; ok {
-			days = v.(int)
-		}
-		return &sacloud.SimpleMonitorHealthCheck{
-			Protocol:      types.SimpleMonitorProtocols.SSLCertificate,
-			RemainingDays: days,
-		}
-	}
 	return nil
 }

@@ -137,17 +137,7 @@ func resourceSakuraCloudGSLBCreate(d *schema.ResourceData, meta interface{}) err
 	client, ctx, _ := getSacloudClient(d, meta)
 	gslbOp := sacloud.NewGSLBOp(client)
 
-	gslb, err := gslbOp.Create(ctx, &sacloud.GSLBCreateRequest{
-		HealthCheck:        expandGSLBHealthCheckConf(d),
-		DelayLoop:          expandGSLBDelayLoop(d),
-		Weighted:           types.StringFlag(d.Get("weighted").(bool)),
-		SorryServer:        d.Get("sorry_server").(string),
-		DestinationServers: expandGSLBServers(d),
-		Name:               d.Get("name").(string),
-		Description:        d.Get("description").(string),
-		Tags:               expandTags(d),
-		IconID:             expandSakuraCloudID(d, "icon_id"),
-	})
+	gslb, err := gslbOp.Create(ctx, expandGSLBCreateRequest(d))
 	if err != nil {
 		return fmt.Errorf("creating SakuraCloud GSLB is failed: %s", err)
 	}
@@ -181,18 +171,7 @@ func resourceSakuraCloudGSLBUpdate(d *schema.ResourceData, meta interface{}) err
 		return fmt.Errorf("could not read SakuraCloud GSLB[%s]: %s", d.Id(), err)
 	}
 
-	gslb, err = gslbOp.Update(ctx, sakuraCloudID(d.Id()), &sacloud.GSLBUpdateRequest{
-		Name:               d.Get("name").(string),
-		Description:        d.Get("description").(string),
-		Tags:               expandTags(d),
-		IconID:             expandSakuraCloudID(d, "icon_id"),
-		HealthCheck:        expandGSLBHealthCheckConf(d),
-		DelayLoop:          expandGSLBDelayLoop(d),
-		Weighted:           types.StringFlag(d.Get("weighted").(bool)),
-		SorryServer:        d.Get("sorry_server").(string),
-		DestinationServers: expandGSLBServers(d),
-		SettingsHash:       gslb.SettingsHash,
-	})
+	gslb, err = gslbOp.Update(ctx, sakuraCloudID(d.Id()), expandGSLBUpdateRequest(d, gslb))
 	if err != nil {
 		return fmt.Errorf("updating SakuraCloud GSLB[%s] is failed: %s", d.Id(), err)
 	}
@@ -225,8 +204,10 @@ func setGSLBResourceData(ctx context.Context, d *schema.ResourceData, client *AP
 	d.Set("sorry_server", data.SorryServer)
 	d.Set("icon_id", data.IconID.String())
 	d.Set("description", data.Description)
-	d.Set("tags", data.Tags)
 	d.Set("weighted", data.Weighted.Bool())
+	if err := d.Set("tags", data.Tags); err != nil {
+		return err
+	}
 	if err := d.Set("health_check", flattenGSLBHealthCheck(data)); err != nil {
 		return err
 	}
@@ -234,94 +215,4 @@ func setGSLBResourceData(ctx context.Context, d *schema.ResourceData, client *AP
 		return err
 	}
 	return nil
-}
-
-func expandGSLBHealthCheckConf(d resourceValueGettable) *sacloud.GSLBHealthCheck {
-	healthCheckConf := d.Get("health_check").([]interface{})
-	if len(healthCheckConf) == 0 {
-		return nil
-	}
-
-	conf := healthCheckConf[0].(map[string]interface{})
-	protocol := conf["protocol"].(string)
-	switch protocol {
-	case "http", "https":
-		return &sacloud.GSLBHealthCheck{
-			Protocol:     types.EGSLBHealthCheckProtocol(protocol),
-			HostHeader:   conf["host_header"].(string),
-			Path:         conf["path"].(string),
-			ResponseCode: types.StringNumber(forceAtoI(conf["status"].(string))),
-		}
-	case "tcp":
-		return &sacloud.GSLBHealthCheck{
-			Protocol: types.EGSLBHealthCheckProtocol(protocol),
-			Port:     types.StringNumber(conf["port"].(int)),
-		}
-	case "ping":
-		return &sacloud.GSLBHealthCheck{
-			Protocol: types.EGSLBHealthCheckProtocol(protocol),
-		}
-	}
-	return nil
-}
-
-func expandGSLBDelayLoop(d resourceValueGettable) int {
-	healthCheckConf := d.Get("health_check").([]interface{})
-	if len(healthCheckConf) == 0 {
-		return 0
-	}
-
-	conf := healthCheckConf[0].(map[string]interface{})
-	return conf["delay_loop"].(int)
-}
-
-func expandGSLBServers(d resourceValueGettable) []*sacloud.GSLBServer {
-	var servers []*sacloud.GSLBServer
-	for _, s := range d.Get("servers").([]interface{}) {
-		v := s.(map[string]interface{})
-		server := expandGSLBServer(&resourceMapValue{value: v})
-		servers = append(servers, server)
-	}
-	return servers
-}
-
-func flattenGSLBHealthCheck(data *sacloud.GSLB) []interface{} {
-	//health_check
-	healthCheck := map[string]interface{}{}
-	switch data.HealthCheck.Protocol {
-	case types.GSLBHealthCheckProtocols.HTTP, types.GSLBHealthCheckProtocols.HTTPS:
-		healthCheck["host_header"] = data.HealthCheck.HostHeader
-		healthCheck["path"] = data.HealthCheck.Path
-		healthCheck["status"] = data.HealthCheck.ResponseCode.String()
-	case types.GSLBHealthCheckProtocols.TCP:
-		healthCheck["port"] = data.HealthCheck.Port
-	}
-	healthCheck["protocol"] = data.HealthCheck.Protocol
-	healthCheck["delay_loop"] = data.DelayLoop
-
-	return []interface{}{healthCheck}
-}
-
-func flattenGSLBServers(data *sacloud.GSLB) []interface{} {
-	var servers []interface{}
-	for _, server := range data.DestinationServers {
-		servers = append(servers, flattenGSLBServer(server))
-	}
-	return servers
-}
-
-func flattenGSLBServer(s *sacloud.GSLBServer) interface{} {
-	v := map[string]interface{}{}
-	v["ipaddress"] = s.IPAddress
-	v["enabled"] = s.Enabled.Bool()
-	v["weight"] = s.Weight.Int()
-	return v
-}
-
-func expandGSLBServer(d resourceValueGettable) *sacloud.GSLBServer {
-	return &sacloud.GSLBServer{
-		IPAddress: d.Get("ipaddress").(string),
-		Enabled:   types.StringFlag(d.Get("enabled").(bool)),
-		Weight:    types.StringNumber(d.Get("weight").(int)),
-	}
 }

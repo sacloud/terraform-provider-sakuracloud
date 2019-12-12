@@ -89,15 +89,7 @@ func resourceSakuraCloudAutoBackupCreate(d *schema.ResourceData, meta interface{
 		return err
 	}
 
-	autoBackup, err := autoBackupOp.Create(ctx, zone, &sacloud.AutoBackupCreateRequest{
-		Name:                    d.Get("name").(string),
-		Description:             d.Get("description").(string),
-		Tags:                    expandTags(d),
-		DiskID:                  expandSakuraCloudID(d, "disk_id"),
-		MaximumNumberOfArchives: d.Get("max_backup_num").(int),
-		BackupSpanWeekdays:      expandBackupWeekdays(d.Get("weekdays").([]interface{})),
-		IconID:                  expandSakuraCloudID(d, "icon_id"),
-	})
+	autoBackup, err := autoBackupOp.Create(ctx, zone, expandAutoBackupCreateRequest(d))
 	if err != nil {
 		return fmt.Errorf("creating SakuraCloud AutoBackup is failed: %s", err)
 	}
@@ -134,15 +126,7 @@ func resourceSakuraCloudAutoBackupUpdate(d *schema.ResourceData, meta interface{
 		return err
 	}
 
-	autoBackup, err = autoBackupOp.Update(ctx, zone, autoBackup.ID, &sacloud.AutoBackupUpdateRequest{
-		Name:                    d.Get("name").(string),
-		Description:             d.Get("description").(string),
-		Tags:                    expandTags(d),
-		MaximumNumberOfArchives: d.Get("max_backup_num").(int),
-		BackupSpanWeekdays:      expandBackupWeekdays(d.Get("weekdays").([]interface{})),
-		IconID:                  expandSakuraCloudID(d, "icon_id"),
-		SettingsHash:            autoBackup.SettingsHash,
-	})
+	autoBackup, err = autoBackupOp.Update(ctx, zone, autoBackup.ID, expandAutoBackupUpdateRequest(d, autoBackup))
 	if err != nil {
 		return fmt.Errorf("updating SakuraCloud AutoBackup[%s] is failed: %s", autoBackup.ID, err)
 	}
