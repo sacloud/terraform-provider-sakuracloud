@@ -192,6 +192,10 @@ func resourceSakuraCloudDiskDelete(d *schema.ResourceData, meta interface{}) err
 		return fmt.Errorf("could not read SakuraCloud Disk[%s]: %s", d.Id(), err)
 	}
 
+	if err := waitForDeletionByDiskID(ctx, client, zone, disk.ID); err != nil {
+		return fmt.Errorf("waiting deletion is failed: Disk[%s] still used by Servers: %s", disk.ID, err)
+	}
+
 	if err := diskOp.Delete(ctx, zone, disk.ID); err != nil {
 		return fmt.Errorf("deleting SakuraCloud Disk[%s] is failed: %s", d.Id(), err)
 	}
