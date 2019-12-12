@@ -79,16 +79,16 @@ func TestAccSakuraCloudDataSourceSimpleMonitor_Basic(t *testing.T) {
 func testAccCheckSakuraCloudDataSourceSimpleMonitorBase(target string) string {
 	return fmt.Sprintf(`
 resource "sakuracloud_simple_monitor" "foobar" {
-  target = "%s"
+  target     = "%s"
   delay_loop = 60
   health_check {
-      protocol = "http"
-      path = "/"
-      status = 200
-      host_header = "sakuracloud.com"
+    protocol    = "http"
+    path        = "/"
+    status      = 200
+    host_header = "sakuracloud.com"
   }
-  description = "description_test"
-  tags = ["tag1","tag2","tag3"]
+  description          = "description_test"
+  tags                 = ["tag1", "tag2", "tag3"]
   notify_email_enabled = true
   notify_slack_enabled = true
   notify_slack_webhook = "%s"

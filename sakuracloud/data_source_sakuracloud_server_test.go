@@ -86,14 +86,14 @@ data "sakuracloud_archive" "ubuntu" {
   os_type = "ubuntu"
 }
 resource "sakuracloud_disk" "foobar" {
-  name = "%s"
+  name              = "%s"
   source_archive_id = "${data.sakuracloud_archive.ubuntu.id}"
 }
 resource "sakuracloud_server" "foobar" {
-  name = "%s"
-  disks = ["${sakuracloud_disk.foobar.id}"]
+  name        = "%s"
+  disks       = ["${sakuracloud_disk.foobar.id}"]
   description = "description_test"
-  tags = ["tag1","tag2","tag3"]
+  tags        = ["tag1", "tag2", "tag3"]
   interfaces {
     upstream = "shared"
   }

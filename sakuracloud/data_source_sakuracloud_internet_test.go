@@ -81,18 +81,18 @@ func TestAccSakuraCloudDataSourceInternet_Basic(t *testing.T) {
 func testAccCheckSakuraCloudDataSourceInternetBase(name string) string {
 	return fmt.Sprintf(`
 resource "sakuracloud_internet" "foobar" {
-  name = "%s"
+  name        = "%s"
   description = "description_test"
-  tags = ["tag1","tag2","tag3"]
+  tags        = ["tag1","tag2","tag3"]
 }`, name)
 }
 
 func testAccCheckSakuraCloudDataSourceInternetConfig(name string) string {
 	return fmt.Sprintf(`
 resource "sakuracloud_internet" "foobar" {
-  name = "%s"
+  name        = "%s"
   description = "description_test"
-  tags = ["tag1","tag2","tag3"]
+  tags        = ["tag1","tag2","tag3"]
 }
 
 data "sakuracloud_internet" "foobar" {
@@ -105,10 +105,11 @@ data "sakuracloud_internet" "foobar" {
 func testAccCheckSakuraCloudDataSourceInternetConfig_With_Tag(name string) string {
 	return fmt.Sprintf(`
 resource "sakuracloud_internet" "foobar" {
-  name = "%s"
+  name        = "%s"
   description = "description_test"
-  tags = ["tag1","tag2","tag3"]
+  tags        = ["tag1","tag2","tag3"]
 }
+
 data "sakuracloud_internet" "foobar" {
   filters {
 	tags = ["tag1","tag3"]
@@ -119,10 +120,11 @@ data "sakuracloud_internet" "foobar" {
 func testAccCheckSakuraCloudDataSourceInternetConfig_With_NotExists_Tag(name string) string {
 	return fmt.Sprintf(`
 resource "sakuracloud_internet" "foobar" {
-  name = "%s"
+  name        = "%s"
   description = "description_test"
-  tags = ["tag1","tag2","tag3"]
+  tags        = ["tag1","tag2","tag3"]
 }
+
 data "sakuracloud_internet" "foobar" {
   filters {
 	tags = ["tag1-xxxxxxx","tag3-xxxxxxxx"]
@@ -133,10 +135,11 @@ data "sakuracloud_internet" "foobar" {
 func testAccCheckSakuraCloudDataSourceInternetConfig_NotExists(name string) string {
 	return fmt.Sprintf(`
 resource "sakuracloud_internet" "foobar" {
-  name = "%s"
+  name        = "%s"
   description = "description_test"
-  tags = ["tag1","tag2","tag3"]
+  tags        = ["tag1","tag2","tag3"]
 }
+
 data "sakuracloud_internet" "foobar" {
   filters {
 	names = ["xxxxxxxxxxxxxxxxxx"]

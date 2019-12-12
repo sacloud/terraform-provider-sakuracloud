@@ -82,8 +82,8 @@ func TestAccSakuraCloudDataSourceDisk_Basic(t *testing.T) {
 func testAccCheckSakuraCloudDataSourceDiskConfigBase(name string) string {
 	return fmt.Sprintf(`
 resource "sakuracloud_disk" "disk01"{
-  name = "%s"
-  tags = ["tag1","tag2","tag3"]
+  name        = "%s"
+  tags        = ["tag1","tag2","tag3"]
   description = "source_disk_description"
 }`, name)
 }
@@ -91,8 +91,8 @@ resource "sakuracloud_disk" "disk01"{
 func testAccCheckSakuraCloudDataSourceDiskConfig(name, p1, p2 string) string {
 	return fmt.Sprintf(`
 resource "sakuracloud_disk" "disk01"{
-  name = "%s"
-  tags = ["tag1","tag2","tag3"]
+  name        = "%s"
+  tags        = ["tag1","tag2","tag3"]
   description = "source_disk_description"
 }
 
@@ -106,8 +106,8 @@ data "sakuracloud_disk" "foobar" {
 func testAccCheckSakuraCloudDataSourceDiskConfig_With_Tag(name string) string {
 	return fmt.Sprintf(`
 resource "sakuracloud_disk" "disk01"{
-  name = "%s"
-  tags = ["tag1","tag2","tag3"]
+  name        = "%s"
+  tags        = ["tag1","tag2","tag3"]
   description = "source_disk_description"
 }
 
@@ -121,8 +121,8 @@ data "sakuracloud_disk" "foobar" {
 func testAccCheckSakuraCloudDataSourceDiskConfig_With_NotExists_Tag(name string) string {
 	return fmt.Sprintf(`
 resource "sakuracloud_disk" "disk01"{
-  name = "%s"
-  tags = ["tag1","tag2","tag3"]
+  name        = "%s"
+  tags        = ["tag1","tag2","tag3"]
   description = "source_disk_description"
 }
 
@@ -136,8 +136,8 @@ data "sakuracloud_disk" "foobar" {
 func testAccCheckSakuraCloudDataSourceDiskConfig_NotExists(name string) string {
 	return fmt.Sprintf(`
 resource "sakuracloud_disk" "disk01"{
-  name = "%s"
-  tags = ["tag1","tag2","tag3"]
+  name        = "%s"
+  tags        = ["tag1","tag2","tag3"]
   description = "source_disk_description"
 }
 

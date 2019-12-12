@@ -142,8 +142,8 @@ func testAccCheckSakuraCloudBucketObjectDestroy(s *terraform.State) error {
 func testAccCheckSakuraCloudBucketObjectConfig_basic(bucket, key string) string {
 	return fmt.Sprintf(`
 resource "sakuracloud_bucket_object" "foobar" {
-  bucket = "%s"
-  key = "%s"
+  bucket  = "%s"
+  key     = "%s"
   content = "content"
 }`, bucket, key)
 }
@@ -151,8 +151,8 @@ resource "sakuracloud_bucket_object" "foobar" {
 func testAccCheckSakuraCloudBucketObjectConfig_update(bucket, key string) string {
 	return fmt.Sprintf(`
 resource "sakuracloud_bucket_object" "foobar" {
-  bucket = "%s"
-  key = "%s"
+  bucket  = "%s"
+  key     = "%s"
   content = "content-upd"
 }`, bucket, key)
 }

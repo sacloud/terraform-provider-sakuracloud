@@ -145,26 +145,26 @@ func testAccCheckSakuraCloudDNSRecordDestroy(s *terraform.State) error {
 func testAccCheckSakuraCloudDNSRecordConfig_basic(zone string) string {
 	return fmt.Sprintf(`
 resource "sakuracloud_dns" "foobar" {
-  zone = "%s"
+  zone        = "%s"
   description = "DNS from TerraForm for SAKURA CLOUD"
-  tags = ["hoge1"]
+  tags        = ["hoge1"]
 }
 
 resource "sakuracloud_dns_record" "foobar" {
   dns_id = "${sakuracloud_dns.foobar.id}"
-  name = "test1"
-  type = "A"
-  value = "192.168.0.1"
+  name   = "test1"
+  type   = "A"
+  value  = "192.168.0.1"
 }
 
 resource "sakuracloud_dns_record" "foobar1" {
-  dns_id = "${sakuracloud_dns.foobar.id}"
-  name = "_sip._tls"
-  type = "SRV"
-  value = "www.sakura.ne.jp."
+  dns_id   = "${sakuracloud_dns.foobar.id}"
+  name     = "_sip._tls"
+  type     = "SRV"
+  value    = "www.sakura.ne.jp."
   priority = 1
-  weight = 2
-  port = 3
+  weight   = 2
+  port     = 3
 }
 `, zone)
 }
@@ -172,34 +172,36 @@ resource "sakuracloud_dns_record" "foobar1" {
 func testAccCheckSakuraCloudDNSRecordConfig_update(zone string) string {
 	return fmt.Sprintf(`
 resource "sakuracloud_dns" "foobar" {
-  zone = "%s"
+  zone        = "%s"
   description = "DNS from TerraForm for SAKURA CLOUD-upd"
-  tags = ["hoge1"]
+  tags        = ["hoge1"]
 }
 
 resource "sakuracloud_dns_record" "foobar" {
   dns_id = "${sakuracloud_dns.foobar.id}"
-  name = "test2"
-  type = "A"
-  value = "192.168.0.2"
+  name   = "test2"
+  type   = "A"
+  value  = "192.168.0.2"
 }`, zone)
 }
 
 func testAccCheckSakuraCloudDNSRecordConfig_with_count(zone string) string {
 	return fmt.Sprintf(`
 resource "sakuracloud_dns" "foobar" {
-  zone = "%s"
+  zone        = "%s"
   description = "DNS from TerraForm for SAKURA CLOUD"
-  tags = ["hoge1"]
+  tags        = ["hoge1"]
 }
+
 variable "ip_list" {
-  default = ["192.168.0.1","192.168.0.2"]
+  default = ["192.168.0.1", "192.168.0.2"]
 }
+
 resource "sakuracloud_dns_record" "foobar" {
-  count = 2
+  count  = 2
   dns_id = "${sakuracloud_dns.foobar.id}"
-  name = "test"
-  type = "A"
-  value = "${var.ip_list[count.index]}"
+  name   = "test"
+  type   = "A"
+  value  = "${var.ip_list[count.index]}"
 }`, zone)
 }

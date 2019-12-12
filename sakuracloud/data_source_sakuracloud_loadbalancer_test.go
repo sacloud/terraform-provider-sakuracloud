@@ -76,38 +76,41 @@ func TestAccSakuraCloudDataSourceLoadBalancer_Basic(t *testing.T) {
 
 func testAccCheckSakuraCloudDataSourceLoadBalancerBase(name string) string {
 	return fmt.Sprintf(`
-resource sakuracloud_switch "sw"{
+resource sakuracloud_switch "sw" {
   name = "%s"
 }
+
 resource "sakuracloud_load_balancer" "foobar" {
-  switch_id = "${sakuracloud_switch.sw.id}"
-  vrid = 1
-  ipaddress1 = "192.168.11.101"
-  nw_mask_len = 24
+  switch_id     = "${sakuracloud_switch.sw.id}"
+  vrid          = 1
+  ipaddress1    = "192.168.11.101"
+  nw_mask_len   = 24
   default_route = "192.168.11.1"
 
-  name = "%s"
+  name        = "%s"
   description = "description_test"
-  tags = ["tag1","tag2","tag3"]
+  tags        = ["tag1", "tag2", "tag3"]
 }`, name, name)
 }
 
 func testAccCheckSakuraCloudDataSourceLoadBalancerConfig(name string) string {
 	return fmt.Sprintf(`
-resource sakuracloud_switch "sw"{
+resource sakuracloud_switch "sw" {
   name = "%s"
 }
+
 resource "sakuracloud_load_balancer" "foobar" {
-  switch_id = "${sakuracloud_switch.sw.id}"
-  vrid = 1
-  ipaddress1 = "192.168.11.101"
-  nw_mask_len = 24
+  switch_id     = "${sakuracloud_switch.sw.id}"
+  vrid          = 1
+  ipaddress1    = "192.168.11.101"
+  nw_mask_len   = 24
   default_route = "192.168.11.1"
 
-  name = "%s"
+  name        = "%s"
   description = "description_test"
-  tags = ["tag1","tag2","tag3"]
+  tags        = ["tag1", "tag2", "tag3"]
 }
+
 data "sakuracloud_load_balancer" "foobar" {
   filters {
 	names = ["%s"]
@@ -117,20 +120,22 @@ data "sakuracloud_load_balancer" "foobar" {
 
 func testAccCheckSakuraCloudDataSourceLoadBalancerConfig_With_Tag(name string) string {
 	return fmt.Sprintf(`
-resource sakuracloud_switch "sw"{
+resource sakuracloud_switch "sw" {
   name = "%s"
 }
+
 resource "sakuracloud_load_balancer" "foobar" {
-  switch_id = "${sakuracloud_switch.sw.id}"
-  vrid = 1
-  ipaddress1 = "192.168.11.101"
-  nw_mask_len = 24
+  switch_id     = "${sakuracloud_switch.sw.id}"
+  vrid          = 1
+  ipaddress1    = "192.168.11.101"
+  nw_mask_len   = 24
   default_route = "192.168.11.1"
 
-  name = "%s"
+  name        = "%s"
   description = "description_test"
-  tags = ["tag1","tag2","tag3"]
+  tags        = ["tag1", "tag2", "tag3"]
 }
+
 data "sakuracloud_load_balancer" "foobar" {
   filters {
 	tags = ["tag1","tag3"]
@@ -140,20 +145,22 @@ data "sakuracloud_load_balancer" "foobar" {
 
 func testAccCheckSakuraCloudDataSourceLoadBalancerConfig_With_NotExists_Tag(name string) string {
 	return fmt.Sprintf(`
-resource sakuracloud_switch "sw"{
+resource sakuracloud_switch "sw" {
   name = "%s"
 }
+
 resource "sakuracloud_load_balancer" "foobar" {
-  switch_id = "${sakuracloud_switch.sw.id}"
-  vrid = 1
-  ipaddress1 = "192.168.11.101"
-  nw_mask_len = 24
+  switch_id     = "${sakuracloud_switch.sw.id}"
+  vrid          = 1
+  ipaddress1    = "192.168.11.101"
+  nw_mask_len   = 24
   default_route = "192.168.11.1"
 
-  name = "%s"
+  name        = "%s"
   description = "description_test"
-  tags = ["tag1","tag2","tag3"]
+  tags        = ["tag1", "tag2", "tag3"]
 }
+
 data "sakuracloud_load_balancer" "foobar" {
   filters {
 	tags = ["tag1-xxxxxxx","tag3-xxxxxxxx"]
@@ -163,20 +170,22 @@ data "sakuracloud_load_balancer" "foobar" {
 
 func testAccCheckSakuraCloudDataSourceLoadBalancerConfig_NotExists(name string) string {
 	return fmt.Sprintf(`
-resource sakuracloud_switch "sw"{
+resource sakuracloud_switch "sw" {
   name = "%s"
 }
+
 resource "sakuracloud_load_balancer" "foobar" {
-  switch_id = "${sakuracloud_switch.sw.id}"
-  vrid = 1
-  ipaddress1 = "192.168.11.101"
-  nw_mask_len = 24
+  switch_id     = "${sakuracloud_switch.sw.id}"
+  vrid          = 1
+  ipaddress1    = "192.168.11.101"
+  nw_mask_len   = 24
   default_route = "192.168.11.1"
 
-  name = "%s"
+  name        = "%s"
   description = "description_test"
-  tags = ["tag1","tag2","tag3"]
+  tags        = ["tag1", "tag2", "tag3"]
 }
+
 data "sakuracloud_load_balancer" "foobar" {
   filters {
 	names = ["xxxxxxxxxxxxxxxxxx"]

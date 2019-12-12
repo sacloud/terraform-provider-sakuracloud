@@ -56,14 +56,14 @@ func TestAccResourceSakuraCloudProxyLBACME(t *testing.T) {
 
 var testAccCheckSakuraCloudProxyLBConfig_acme = `
 resource "sakuracloud_proxylb" "foobar" {
-  name = "terraform-test-proxylb-acme"
-  plan = 100
+  name         = "terraform-test-proxylb-acme"
+  plan         = 100
   vip_failover = true
   health_check {
-    protocol = "http"
-    delay_loop = 10
+    protocol    = "http"
+    delay_loop  = 10
     host_header = "usacloud.jp"
-    path = "/"
+    path        = "/"
   }
   bind_ports {
     proxy_mode = "http"
@@ -74,15 +74,15 @@ resource "sakuracloud_proxylb" "foobar" {
     port       = 443
   }
   servers {
-      ipaddress = "${sakuracloud_server.server01.ipaddress}"
-      port = 80
+    ipaddress = "${sakuracloud_server.server01.ipaddress}"
+    port      = 80
   }
 }
 
 resource sakuracloud_proxylb_acme "foobar" {
-  proxylb_id = sakuracloud_proxylb.foobar.id
-  accept_tos = true
-  common_name = "acme-acctest.%s"
+  proxylb_id       = sakuracloud_proxylb.foobar.id
+  accept_tos       = true
+  common_name      = "acme-acctest.%s"
   update_delay_sec = 120
 }
 

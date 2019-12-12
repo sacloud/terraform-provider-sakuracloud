@@ -105,7 +105,7 @@ func testAccCheckSakuraCloudDataSourceProxyLBBase(name, ip1, ip2 string) string 
 resource "sakuracloud_proxylb" "foobar" {
   name = "%s"
   health_check {
-    protocol = "tcp"
+    protocol   = "tcp"
     delay_loop = 20
   }
   bind_ports {
@@ -113,15 +113,15 @@ resource "sakuracloud_proxylb" "foobar" {
     port       = 80
   }
   servers {
-      ipaddress = "%s"
-      port = 80
+    ipaddress = "%s"
+    port      = 80
   }
   servers {
-      ipaddress = "%s"
-      port = 80
+    ipaddress = "%s"
+    port      = 80
   }
   description = "description_test"
-  tags = ["tag1","tag2","tag3"]
+  tags        = ["tag1", "tag2", "tag3"]
 }`, name, ip1, ip2)
 }
 
@@ -130,7 +130,7 @@ func testAccCheckSakuraCloudDataSourceProxyLBConfig(name, ip1, ip2 string) strin
 resource "sakuracloud_proxylb" "foobar" {
   name = "%s"
   health_check {
-    protocol = "tcp"
+    protocol   = "tcp"
     delay_loop = 20
   }
   bind_ports {
@@ -138,16 +138,17 @@ resource "sakuracloud_proxylb" "foobar" {
     port       = 80
   }
   servers {
-      ipaddress = "%s"
-      port = 80
+    ipaddress = "%s"
+    port      = 80
   }
   servers {
-      ipaddress = "%s"
-      port = 80
+    ipaddress = "%s"
+    port      = 80
   }
   description = "description_test"
-  tags = ["tag1","tag2","tag3"]
+  tags        = ["tag1", "tag2", "tag3"]
 }
+
 data "sakuracloud_proxylb" "foobar" {
   filters {
 	names = ["%s"]
@@ -160,7 +161,7 @@ func testAccCheckSakuraCloudDataSourceProxyLBConfig_With_Tag(name, ip1, ip2 stri
 resource "sakuracloud_proxylb" "foobar" {
   name = "%s"
   health_check {
-    protocol = "tcp"
+    protocol   = "tcp"
     delay_loop = 20
   }
   bind_ports {
@@ -168,16 +169,17 @@ resource "sakuracloud_proxylb" "foobar" {
     port       = 80
   }
   servers {
-      ipaddress = "%s"
-      port = 80
+    ipaddress = "%s"
+    port      = 80
   }
   servers {
-      ipaddress = "%s"
-      port = 80
+    ipaddress = "%s"
+    port      = 80
   }
   description = "description_test"
-  tags = ["tag1","tag2","tag3"]
+  tags        = ["tag1", "tag2", "tag3"]
 }
+
 data "sakuracloud_proxylb" "foobar" {
   filters {
 	tags = ["tag1","tag3"]
@@ -190,7 +192,7 @@ func testAccCheckSakuraCloudDataSourceProxyLBConfig_With_NotExists_Tag(name, ip1
 resource "sakuracloud_proxylb" "foobar" {
   name = "%s"
   health_check {
-    protocol = "tcp"
+    protocol   = "tcp"
     delay_loop = 20
   }
   bind_ports {
@@ -198,16 +200,17 @@ resource "sakuracloud_proxylb" "foobar" {
     port       = 80
   }
   servers {
-      ipaddress = "%s"
-      port = 80
+    ipaddress = "%s"
+    port      = 80
   }
   servers {
-      ipaddress = "%s"
-      port = 80
+    ipaddress = "%s"
+    port      = 80
   }
   description = "description_test"
-  tags = ["tag1","tag2","tag3"]
+  tags        = ["tag1", "tag2", "tag3"]
 }
+
 data "sakuracloud_proxylb" "foobar" {
   filters {
 	tags = ["tag1-xxxxxxx","tag3-xxxxxxxx"]
@@ -220,7 +223,7 @@ func testAccCheckSakuraCloudDataSourceProxyLBConfig_NotExists(name, ip1, ip2 str
 resource "sakuracloud_proxylb" "foobar" {
   name = "%s"
   health_check {
-    protocol = "tcp"
+    protocol   = "tcp"
     delay_loop = 20
   }
   bind_ports {
@@ -228,15 +231,15 @@ resource "sakuracloud_proxylb" "foobar" {
     port       = 80
   }
   servers {
-      ipaddress = "%s"
-      port = 80
+    ipaddress = "%s"
+    port      = 80
   }
   servers {
-      ipaddress = "%s"
-      port = 80
+    ipaddress = "%s"
+    port      = 80
   }
   description = "description_test"
-  tags = ["tag1","tag2","tag3"]
+  tags        = ["tag1", "tag2", "tag3"]
 }
 data "sakuracloud_proxylb" "foobar" {
   filters {

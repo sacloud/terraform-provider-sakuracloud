@@ -62,9 +62,9 @@ func TestAccSakuraCloudDataSourceSSHKey_Basic(t *testing.T) {
 func testAccCheckSakuraCloudDataSourceSSHKeyBase(name string) string {
 	return fmt.Sprintf(`
 resource "sakuracloud_ssh_key" "foobar" {
-  name = "%s"
+  name        = "%s"
   description = "description_test"
-  public_key = "%s"
+  public_key  = "%s"
 }`, name, testAccPublicKey)
 }
 

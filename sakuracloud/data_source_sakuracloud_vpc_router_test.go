@@ -77,11 +77,10 @@ func TestAccSakuraCloudDataSourceVPCRouter_Basic(t *testing.T) {
 func testAccCheckSakuraCloudDataSourceVPCRouterBase(name string) string {
 	return fmt.Sprintf(`
 resource sakuracloud_vpc_router "foobar" {
-  plan = "standard"
-
-  name = "%s"
+  plan        = "standard"
+  name        = "%s"
   description = "description_test"
-  tags = ["tag1","tag2","tag3"]
+  tags        = ["tag1", "tag2", "tag3"]
 }
 `, name)
 }
@@ -89,12 +88,12 @@ resource sakuracloud_vpc_router "foobar" {
 func testAccCheckSakuraCloudDataSourceVPCRouterConfig(name string) string {
 	return fmt.Sprintf(`
 resource sakuracloud_vpc_router "foobar" {
-  plan = "standard"
-
-  name = "%s"
+  plan        = "standard"
+  name        = "%s"
   description = "description_test"
-  tags = ["tag1","tag2","tag3"]
+  tags        = ["tag1", "tag2", "tag3"]
 }
+
 data "sakuracloud_vpc_router" "foobar" {
   filters {
 	names = ["%s"]
@@ -105,12 +104,12 @@ data "sakuracloud_vpc_router" "foobar" {
 func testAccCheckSakuraCloudDataSourceVPCRouterConfig_With_Tag(name string) string {
 	return fmt.Sprintf(`
 resource sakuracloud_vpc_router "foobar" {
-  plan = "standard"
-
-  name = "%s"
+  plan        = "standard"
+  name        = "%s"
   description = "description_test"
-  tags = ["tag1","tag2","tag3"]
+  tags        = ["tag1", "tag2", "tag3"]
 }
+
 data "sakuracloud_vpc_router" "foobar" {
   filters {
 	tags = ["tag1","tag3"]
@@ -121,12 +120,12 @@ data "sakuracloud_vpc_router" "foobar" {
 func testAccCheckSakuraCloudDataSourceVPCRouterConfig_With_NotExists_Tag(name string) string {
 	return fmt.Sprintf(`
 resource sakuracloud_vpc_router "foobar" {
-  plan = "standard"
-
-  name = "%s"
+  plan        = "standard"
+  name        = "%s"
   description = "description_test"
-  tags = ["tag1","tag2","tag3"]
+  tags        = ["tag1", "tag2", "tag3"]
 }
+
 data "sakuracloud_vpc_router" "foobar" {
   filters {
 	tags = ["tag1-xxxxxxx","tag3-xxxxxxxx"]
@@ -137,12 +136,12 @@ data "sakuracloud_vpc_router" "foobar" {
 func testAccCheckSakuraCloudDataSourceVPCRouterConfig_NotExists(name string) string {
 	return fmt.Sprintf(`
 resource sakuracloud_vpc_router "foobar" {
-  plan = "standard"
-
-  name = "%s"
+  plan        = "standard"
+  name        = "%s"
   description = "description_test"
-  tags = ["tag1","tag2","tag3"]
+  tags        = ["tag1", "tag2", "tag3"]
 }
+
 data "sakuracloud_vpc_router" "foobar" {
   filters {
 	names = ["xxxxxxxxxxxxxxxxxx"]

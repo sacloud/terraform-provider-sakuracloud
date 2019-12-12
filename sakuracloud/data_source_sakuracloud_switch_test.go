@@ -77,9 +77,9 @@ func TestAccSakuraCloudDataSourceSwitch_Basic(t *testing.T) {
 func testAccCheckSakuraCloudDataSourceSwitchBase(name string) string {
 	return fmt.Sprintf(`
 resource "sakuracloud_switch" "foobar" {
-  name = "%s"
+  name        = "%s"
   description = "description_test"
-  tags = ["tag1","tag2","tag3"]
+  tags        = ["tag1", "tag2", "tag3"]
 }
 `, name)
 }
@@ -87,10 +87,11 @@ resource "sakuracloud_switch" "foobar" {
 func testAccCheckSakuraCloudDataSourceSwitchConfig(name string) string {
 	return fmt.Sprintf(`
 resource "sakuracloud_switch" "foobar" {
-  name = "%s"
+  name        = "%s"
   description = "description_test"
-  tags = ["tag1","tag2","tag3"]
+  tags        = ["tag1", "tag2", "tag3"]
 }
+
 data "sakuracloud_switch" "foobar" {
   filters {
 	names = ["%s"]
@@ -101,10 +102,11 @@ data "sakuracloud_switch" "foobar" {
 func testAccCheckSakuraCloudDataSourceSwitchConfig_With_Tag(name string) string {
 	return fmt.Sprintf(`
 resource "sakuracloud_switch" "foobar" {
-  name = "%s"
+  name        = "%s"
   description = "description_test"
-  tags = ["tag1","tag2","tag3"]
+  tags        = ["tag1", "tag2", "tag3"]
 }
+
 data "sakuracloud_switch" "foobar" {
   filters {
 	tags = ["tag1","tag3"]
@@ -115,10 +117,11 @@ data "sakuracloud_switch" "foobar" {
 func testAccCheckSakuraCloudDataSourceSwitchConfig_With_NotExists_Tag(name string) string {
 	return fmt.Sprintf(`
 resource "sakuracloud_switch" "foobar" {
-  name = "%s"
+  name        = "%s"
   description = "description_test"
-  tags = ["tag1","tag2","tag3"]
+  tags        = ["tag1", "tag2", "tag3"]
 }
+
 data "sakuracloud_switch" "foobar" {
   filters {
 	tags = ["tag1-xxxxxxx","tag3-xxxxxxxx"]
@@ -129,10 +132,11 @@ data "sakuracloud_switch" "foobar" {
 func testAccCheckSakuraCloudDataSourceSwitchConfig_NotExists(name string) string {
 	return fmt.Sprintf(`
 resource "sakuracloud_switch" "foobar" {
-  name = "%s"
+  name        = "%s"
   description = "description_test"
-  tags = ["tag1","tag2","tag3"]
+  tags        = ["tag1", "tag2", "tag3"]
 }
+
 data "sakuracloud_switch" "foobar" {
   filters {
 	names = ["xxxxxxxxxxxxxxxxxx"]
