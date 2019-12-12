@@ -20,23 +20,13 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/sacloud/libsacloud/v2/utils/builder"
+
 	"github.com/sacloud/libsacloud/v2/sacloud"
 	"github.com/sacloud/libsacloud/v2/sacloud/accessor"
 	"github.com/sacloud/libsacloud/v2/sacloud/types"
 	"github.com/sacloud/libsacloud/v2/utils/setup"
 )
-
-var (
-	// DefaultNICUpdateWaitDuration NIC切断/削除後の待ち時間デフォルト値
-	DefaultNICUpdateWaitDuration = 5 * time.Second
-)
-
-// DefaultSetupOptions RetryableSetupのデフォルトオプション
-func DefaultSetupOptions() *RetryableSetupParameter {
-	return &RetryableSetupParameter{
-		NICUpdateWaitDuration: DefaultNICUpdateWaitDuration,
-	}
-}
 
 // Builder VPCルータの構築を行う
 type Builder struct {
@@ -49,7 +39,7 @@ type Builder struct {
 	AdditionalNICSettings []AdditionalNICSettingHolder
 	RouterSetting         *RouterSetting
 
-	SetupOptions *RetryableSetupParameter
+	SetupOptions *builder.RetryableSetupParameter
 	Client       sacloud.VPCRouterAPI
 }
 
@@ -70,27 +60,9 @@ type RouterSetting struct {
 	SyslogHost                string
 }
 
-// RetryableSetupParameter VPCルータ作成時に利用するsetup.RetryableSetupのパラメータ
-type RetryableSetupParameter struct {
-	// BootAfterBuild Buildの後に再起動を行うか
-	BootAfterBuild bool
-	// NICUpdateWaitDuration NIC接続切断操作の後の待ち時間
-	NICUpdateWaitDuration time.Duration
-	// RetryCount リトライ回数
-	RetryCount int
-	// ProvisioningRetryInterval
-	ProvisioningRetryInterval time.Duration
-	// DeleteRetryCount 削除リトライ回数
-	DeleteRetryCount int
-	// DeleteRetryInterval 削除リトライ間隔
-	DeleteRetryInterval time.Duration
-	// sacloud.StateWaiterによるステート待ちの間隔
-	PollingInterval time.Duration
-}
-
 func (b *Builder) init() {
 	if b.SetupOptions == nil {
-		b.SetupOptions = DefaultSetupOptions()
+		b.SetupOptions = builder.DefaultSetupOptions()
 	}
 	if b.RouterSetting == nil {
 		b.RouterSetting = &RouterSetting{

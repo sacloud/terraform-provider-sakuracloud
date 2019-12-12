@@ -100,6 +100,14 @@ func isFakeModeEnabled() bool {
 	return fakeMode != ""
 }
 
+func skipIfEnvIsNotSet(t *testing.T, key ...string) {
+	for _, k := range key {
+		if os.Getenv(k) == "" {
+			t.Skipf("Environment valiable %q is not set", k)
+		}
+	}
+}
+
 func testAccCheckSakuraCloudDataSourceExists(n string) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
 		rs, ok := s.RootModule().Resources[n]

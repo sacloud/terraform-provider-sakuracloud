@@ -14739,8 +14739,8 @@ func (o *MobileGatewayInterface) SetIndex(v int) {
 
 // MobileGatewaySetting represents API parameter/response structure
 type MobileGatewaySetting struct {
-	Interfaces                      []*MobileGatewayInterfaceSetting `json:",omitempty" mapconv:"MobileGateway.[]Interfaces,omitempty,recursive"`
-	StaticRoute                     []*MobileGatewayStaticRoute      `json:",omitempty" mapconv:"MobileGateway.[]StaticRoutes,omitempty,recursive"`
+	Interfaces                      []*MobileGatewayInterfaceSetting `mapconv:"MobileGateway.[]Interfaces,recursive"`
+	StaticRoute                     []*MobileGatewayStaticRoute      `mapconv:"MobileGateway.[]StaticRoutes,recursive"`
 	InternetConnectionEnabled       types.StringFlag                 `mapconv:"MobileGateway.InternetConnection.Enabled"`
 	InterDeviceCommunicationEnabled types.StringFlag                 `mapconv:"MobileGateway.InterDeviceCommunication.Enabled"`
 }
@@ -14753,8 +14753,8 @@ func (o *MobileGatewaySetting) Validate() error {
 // setDefaults implements sacloud.argumentDefaulter
 func (o *MobileGatewaySetting) setDefaults() interface{} {
 	return &struct {
-		Interfaces                      []*MobileGatewayInterfaceSetting `json:",omitempty" mapconv:"MobileGateway.[]Interfaces,omitempty,recursive"`
-		StaticRoute                     []*MobileGatewayStaticRoute      `json:",omitempty" mapconv:"MobileGateway.[]StaticRoutes,omitempty,recursive"`
+		Interfaces                      []*MobileGatewayInterfaceSetting `mapconv:"MobileGateway.[]Interfaces,recursive"`
+		StaticRoute                     []*MobileGatewayStaticRoute      `mapconv:"MobileGateway.[]StaticRoutes,recursive"`
 		InternetConnectionEnabled       types.StringFlag                 `mapconv:"MobileGateway.InternetConnection.Enabled"`
 		InterDeviceCommunicationEnabled types.StringFlag                 `mapconv:"MobileGateway.InterDeviceCommunication.Enabled"`
 	}{

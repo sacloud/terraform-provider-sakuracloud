@@ -131,6 +131,13 @@ resource sakuracloud_server "foobar" {
   - `health_check`.`status`属性をstringからintへデータ型変更
   - `health_check`.`delay_loop`をトップレベルへ移動
   
+- セキュアモバイル
+
+  - `sakuracloud_sim`のモバイルゲートウェイ関連の属性を読み取り専用(`Computed: true`)へ変更
+  - `sakuracloud_mobile_gateway`でSIMの登録(IDとIPアドレス)ができるように変更
+  - SIMルート/スタティックルートを`sakuracloud_mobile_gateway`に統合
+  - `sakuracloud_mobile_gateway`のネットワーク周りの属性を1つのオブジェクト型属性に統合(`public_interface`/`private_interface`)
+  
 - VPCルータ
 
   - 子リソース(`sakuracloud_vpc_router_xxx`)を廃止

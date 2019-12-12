@@ -24,12 +24,10 @@ import (
 	"time"
 
 	"github.com/hashicorp/terraform-plugin-sdk/httpclient"
-	"github.com/sacloud/libsacloud/v2/utils/builder/vpcrouter"
-
 	"github.com/sacloud/libsacloud/v2/sacloud"
-
 	"github.com/sacloud/libsacloud/v2/sacloud/fake"
 	"github.com/sacloud/libsacloud/v2/sacloud/trace"
+	"github.com/sacloud/libsacloud/v2/utils/builder"
 	"github.com/sacloud/libsacloud/v2/utils/setup"
 )
 
@@ -149,8 +147,8 @@ func (c *Config) NewClient() *APIClient {
 		setup.DefaultDeleteWaitInterval = defaultInterval
 		setup.DefaultProvisioningWaitInterval = defaultInterval
 		setup.DefaultPollingInterval = defaultInterval
-		// update default polling intervals: libsacloud/utils/vpcrouter
-		vpcrouter.DefaultNICUpdateWaitDuration = defaultInterval
+		// update default polling intervals: libsacloud/utils/builder
+		builder.DefaultNICUpdateWaitDuration = defaultInterval
 	}
 
 	return &APIClient{

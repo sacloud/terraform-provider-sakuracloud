@@ -199,7 +199,7 @@ func resourceSakuraCloudSwitchDelete(d *schema.ResourceData, meta interface{}) e
 	}
 
 	if err := waitForDeletionBySwitchID(ctx, client, zone, sw.ID); err != nil {
-		return fmt.Errorf("waiting deletion is failed: %s", err)
+		return fmt.Errorf("waiting deletion is failed: Switch[%s] still used by others: %s", sw.ID, err)
 	}
 
 	if err := swOp.Delete(ctx, zone, sw.ID); err != nil {

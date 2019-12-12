@@ -25,6 +25,9 @@ import (
 	"github.com/sacloud/libsacloud/v2/sacloud/types"
 )
 
+// TODO ゾーンの扱いを検討
+var deletionWaiterTargetZones = []string{"is1a", "is1b", "tk1a", "tk1v"}
+
 type deletionWaiterFindFunc func(context.Context, *APIClient, string, types.ID) (bool, error)
 
 func waitForDeletionByPrivateHostID(ctx context.Context, client *APIClient, zone string, privateHostID types.ID) error {
@@ -36,6 +39,12 @@ func waitForDeletionByPrivateHostID(ctx context.Context, client *APIClient, zone
 func waitForDeletionByPacketFilterID(ctx context.Context, client *APIClient, zone string, packetFilterID types.ID) error {
 	return waitForDeletion(ctx, client, zone, packetFilterID, []deletionWaiterFindFunc{
 		findServerByPacketFilterID,
+	})
+}
+
+func waitForDeletionBySIMID(ctx context.Context, client *APIClient, simID types.ID) error {
+	return waitForDeletionAllZone(ctx, client, simID, []deletionWaiterFindFunc{
+		findMobileGatewayBySIMID,
 	})
 }
 
@@ -78,7 +87,42 @@ func waitForDeletion(ctx context.Context, client *APIClient, zone string, id typ
 		case <-compCh:
 			return nil
 		case <-time.After(client.deletionWaiterTimeout):
-			return errors.New("waiting deletion is failed: timeout")
+			return errors.New("timeout")
+		}
+	}
+}
+
+func waitForDeletionAllZone(ctx context.Context, client *APIClient, id types.ID, finder []deletionWaiterFindFunc) error {
+	var wg sync.WaitGroup
+
+	errCh := make(chan error)
+	compCh := make(chan struct{})
+
+	for _, zone := range deletionWaiterTargetZones {
+		for _, f := range finder {
+			wg.Add(1)
+			go func(f deletionWaiterFindFunc, zone string) {
+				if err := waitForDeletionByFunc(ctx, client, zone, id, f); err != nil {
+					errCh <- err
+				}
+				wg.Done()
+			}(f, zone)
+		}
+	}
+
+	go func() {
+		wg.Wait()
+		compCh <- struct{}{}
+	}()
+
+	for {
+		select {
+		case err := <-errCh:
+			return err
+		case <-compCh:
+			return nil
+		case <-time.After(client.deletionWaiterTimeout):
+			return errors.New("timeout")
 		}
 	}
 }
@@ -99,7 +143,7 @@ func waitForDeletionByFunc(ctx context.Context, client *APIClient, zone string, 
 			}
 
 		case <-time.After(client.deletionWaiterTimeout):
-			return errors.New("waiting deletion is failed: timeout")
+			return errors.New("timeout")
 		}
 	}
 }
@@ -141,6 +185,31 @@ func findServerByPacketFilterID(ctx context.Context, client *APIClient, zone str
 	for _, s := range searched.Servers {
 		for _, iface := range s.Interfaces {
 			if iface.PacketFilterID == id {
+				return true, nil
+			}
+		}
+	}
+	return false, nil
+}
+
+func findMobileGatewayBySIMID(ctx context.Context, client *APIClient, zone string, id types.ID) (bool, error) {
+	mgwOp := sacloud.NewMobileGatewayOp(client)
+
+	searched, err := mgwOp.Find(ctx, zone, &sacloud.FindCondition{})
+	if err != nil {
+		return false, fmt.Errorf("finding MobileGateway is failed: %s", err)
+	}
+
+	for _, mgw := range searched.MobileGateways {
+		sims, err := mgwOp.ListSIM(ctx, zone, mgw.ID)
+		if err != nil {
+			if sacloud.IsNotFoundError(err) {
+				return false, nil
+			}
+			return false, fmt.Errorf("finding SIMs is failed: %s", err)
+		}
+		for _, sim := range sims {
+			if sim.ResourceID == id.String() {
 				return true, nil
 			}
 		}
