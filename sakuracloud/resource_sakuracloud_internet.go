@@ -158,6 +158,9 @@ func resourceSakuraCloudInternetUpdate(d *schema.ResourceData, meta interface{})
 	client, ctx, zone := getSacloudClient(d, meta)
 	internetOp := sacloud.NewInternetOp(client)
 
+	sakuraMutexKV.Lock(d.Id())
+	defer sakuraMutexKV.Unlock(d.Id())
+
 	internet, err := internetOp.Read(ctx, zone, sakuraCloudID(d.Id()))
 	if err != nil {
 		return fmt.Errorf("could not read SakuraCloud Internet[%s]: %s", d.Id(), err)
@@ -176,6 +179,9 @@ func resourceSakuraCloudInternetUpdate(d *schema.ResourceData, meta interface{})
 func resourceSakuraCloudInternetDelete(d *schema.ResourceData, meta interface{}) error {
 	client, ctx, zone := getSacloudClient(d, meta)
 	internetOp := sacloud.NewInternetOp(client)
+
+	sakuraMutexKV.Lock(d.Id())
+	defer sakuraMutexKV.Unlock(d.Id())
 
 	internet, err := internetOp.Read(ctx, zone, sakuraCloudID(d.Id()))
 	if err != nil {

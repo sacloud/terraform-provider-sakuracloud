@@ -15,135 +15,47 @@
 package sakuracloud
 
 import (
-	"fmt"
 	"testing"
 
-	"github.com/hashicorp/terraform-plugin-sdk/helper/acctest"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/resource"
 )
 
-func TestAccSakuraCloudDataSourceDisk_Basic(t *testing.T) {
-	randString1 := acctest.RandStringFromCharSet(10, acctest.CharSetAlpha)
-	randString2 := acctest.RandStringFromCharSet(10, acctest.CharSetAlpha)
-	name := fmt.Sprintf("%s_%s", randString1, randString2)
+func TestAccSakuraCloudDataSourceDisk_basic(t *testing.T) {
+	resourceName := "data.sakuracloud_disk.foobar"
+	rand := randomName()
 
 	resource.ParallelTest(t, resource.TestCase{
-		PreCheck:                  func() { testAccPreCheck(t) },
-		Providers:                 testAccProviders,
-		PreventPostDestroyRefresh: true,
-		CheckDestroy:              testAccCheckSakuraCloudDiskDestroy,
-
+		PreCheck:  func() { testAccPreCheck(t) },
+		Providers: testAccProviders,
 		Steps: []resource.TestStep{
 			{
-				Config: testAccCheckSakuraCloudDataSourceDiskConfigBase(name),
+				Config: buildConfigWithArgs(testAccSakuraCloudDataSourceDisk_basic, rand),
 				Check: resource.ComposeTestCheckFunc(
-					resource.TestCheckResourceAttr("sakuracloud_disk.disk01", "name", name),
+					testCheckSakuraCloudDataSourceExists(resourceName),
+					resource.TestCheckResourceAttr(resourceName, "name", rand),
+					resource.TestCheckResourceAttr(resourceName, "plan", "ssd"),
+					resource.TestCheckResourceAttr(resourceName, "connector", "virtio"),
+					resource.TestCheckResourceAttr(resourceName, "size", "20"),
+					resource.TestCheckResourceAttr(resourceName, "description", "description"),
+					resource.TestCheckResourceAttr(resourceName, "tags.#", "3"),
+					resource.TestCheckResourceAttr(resourceName, "tags.0", "tag1"),
+					resource.TestCheckResourceAttr(resourceName, "tags.1", "tag2"),
+					resource.TestCheckResourceAttr(resourceName, "tags.2", "tag3"),
 				),
-			},
-			{
-				Config: testAccCheckSakuraCloudDataSourceDiskConfig(name, randString1, randString2),
-				Check: resource.ComposeTestCheckFunc(
-					testAccCheckSakuraCloudDataSourceExists("data.sakuracloud_disk.foobar"),
-					resource.TestCheckResourceAttr("data.sakuracloud_disk.foobar", "name", name),
-					resource.TestCheckResourceAttr("data.sakuracloud_disk.foobar", "plan", "ssd"),
-					resource.TestCheckResourceAttr("data.sakuracloud_disk.foobar", "connector", "virtio"),
-					resource.TestCheckResourceAttr("data.sakuracloud_disk.foobar", "size", "20"),
-					resource.TestCheckResourceAttr("data.sakuracloud_disk.foobar", "description", "source_disk_description"),
-					resource.TestCheckResourceAttr("data.sakuracloud_disk.foobar", "tags.#", "3"),
-					resource.TestCheckResourceAttr("data.sakuracloud_disk.foobar", "tags.0", "tag1"),
-					resource.TestCheckResourceAttr("data.sakuracloud_disk.foobar", "tags.1", "tag2"),
-					resource.TestCheckResourceAttr("data.sakuracloud_disk.foobar", "tags.2", "tag3"),
-				),
-			},
-			{
-				Config: testAccCheckSakuraCloudDataSourceDiskConfig_With_Tag(name),
-				Check: resource.ComposeTestCheckFunc(
-					testAccCheckSakuraCloudDataSourceExists("data.sakuracloud_disk.foobar"),
-				),
-			},
-			{
-				Config: testAccCheckSakuraCloudDataSourceDiskConfig_NotExists(name),
-				Check: resource.ComposeTestCheckFunc(
-					testAccCheckSakuraCloudDataSourceNotExists("data.sakuracloud_disk.foobar"),
-				),
-				Destroy: true,
-			},
-			{
-				Config: testAccCheckSakuraCloudDataSourceDiskConfig_With_NotExists_Tag(name),
-				Check: resource.ComposeTestCheckFunc(
-					testAccCheckSakuraCloudDataSourceNotExists("data.sakuracloud_disk.foobar"),
-				),
-				Destroy: true,
 			},
 		},
 	})
 }
 
-func testAccCheckSakuraCloudDataSourceDiskConfigBase(name string) string {
-	return fmt.Sprintf(`
-resource "sakuracloud_disk" "disk01"{
-  name        = "%s"
-  tags        = ["tag1","tag2","tag3"]
-  description = "source_disk_description"
-}`, name)
-}
-
-func testAccCheckSakuraCloudDataSourceDiskConfig(name, p1, p2 string) string {
-	return fmt.Sprintf(`
-resource "sakuracloud_disk" "disk01"{
-  name        = "%s"
-  tags        = ["tag1","tag2","tag3"]
-  description = "source_disk_description"
+var testAccSakuraCloudDataSourceDisk_basic = `
+resource "sakuracloud_disk" "foobar"{
+  name        = "{{ .arg0 }}"
+  tags        = ["tag1", "tag2", "tag3"]
+  description = "description"
 }
 
 data "sakuracloud_disk" "foobar" {
   filters {
-	names = ["%s", "%s"]
+	names = [sakuracloud_disk.foobar.name]
   }
-}`, name, p1, p2)
-}
-
-func testAccCheckSakuraCloudDataSourceDiskConfig_With_Tag(name string) string {
-	return fmt.Sprintf(`
-resource "sakuracloud_disk" "disk01"{
-  name        = "%s"
-  tags        = ["tag1","tag2","tag3"]
-  description = "source_disk_description"
-}
-
-data "sakuracloud_disk" "foobar" {
-  filters {
-	tags = ["tag2","tag3"]
-  }
-}`, name)
-}
-
-func testAccCheckSakuraCloudDataSourceDiskConfig_With_NotExists_Tag(name string) string {
-	return fmt.Sprintf(`
-resource "sakuracloud_disk" "disk01"{
-  name        = "%s"
-  tags        = ["tag1","tag2","tag3"]
-  description = "source_disk_description"
-}
-
-data "sakuracloud_disk" "foobar" {
-  filters {
-	tags = ["tag2","tag4"]
-  }
-}`, name)
-}
-
-func testAccCheckSakuraCloudDataSourceDiskConfig_NotExists(name string) string {
-	return fmt.Sprintf(`
-resource "sakuracloud_disk" "disk01"{
-  name        = "%s"
-  tags        = ["tag1","tag2","tag3"]
-  description = "source_disk_description"
-}
-
-data "sakuracloud_disk" "foobar" {
-  filters {
-	names = ["xxxxxxxxxxxxxxxxxx"]
-  }
-}`, name)
-}
+}`

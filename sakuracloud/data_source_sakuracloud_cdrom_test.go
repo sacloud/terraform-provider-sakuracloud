@@ -20,110 +20,36 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/helper/resource"
 )
 
-func TestAccSakuraCloudDataSourceCDROM_Basic(t *testing.T) {
+func TestAccSakuraCloudDataSourceCDROM_basic(t *testing.T) {
+	resourceName := "data.sakuracloud_cdrom.foobar"
 	resource.ParallelTest(t, resource.TestCase{
-		PreCheck:                  func() { testAccPreCheck(t) },
-		Providers:                 testAccProviders,
-		PreventPostDestroyRefresh: true,
-		CheckDestroy:              testAccCheckSakuraCloudCDROMDestroy,
-
+		PreCheck:  func() { testAccPreCheck(t) },
+		Providers: testAccProviders,
 		Steps: []resource.TestStep{
 			{
-				Config: testAccCheckSakuraCloudDataSourceCDROMConfig,
+				Config: testAccSakuraCloudDataSourceCDROM_basic,
 				Check: resource.ComposeTestCheckFunc(
-					testAccCheckSakuraCloudDataSourceExists("data.sakuracloud_cdrom.foobar"),
-					resource.TestCheckResourceAttr("data.sakuracloud_cdrom.foobar", "name", "Ubuntu Server 18.04.3 LTS 64bit"),
-					resource.TestCheckResourceAttr("data.sakuracloud_cdrom.foobar", "size", "5"),
-					resource.TestCheckResourceAttr("data.sakuracloud_cdrom.foobar", "tags.#", "5"),
-					resource.TestCheckResourceAttr("data.sakuracloud_cdrom.foobar", "tags.0", "arch-64bit"),
-					resource.TestCheckResourceAttr("data.sakuracloud_cdrom.foobar", "tags.1", "current-stable"),
-					resource.TestCheckResourceAttr("data.sakuracloud_cdrom.foobar", "tags.2", "distro-ubuntu"),
-					resource.TestCheckResourceAttr("data.sakuracloud_cdrom.foobar", "tags.3", "distro-ver-18.04.3"),
-					resource.TestCheckResourceAttr("data.sakuracloud_cdrom.foobar", "tags.4", "os-unix"),
+					testCheckSakuraCloudDataSourceExists(resourceName),
+					resource.TestCheckResourceAttr(resourceName, "name", "Parted Magic 2013_08_01"),
+					resource.TestCheckResourceAttr(resourceName, "size", "5"),
+					resource.TestCheckResourceAttr(resourceName, "tags.#", "5"),
+					resource.TestCheckResourceAttr(resourceName, "tags.0", "arch-64bit"),
+					resource.TestCheckResourceAttr(resourceName, "tags.1", "current-stable"),
+					resource.TestCheckResourceAttr(resourceName, "tags.2", "distro-parted_magic"),
+					resource.TestCheckResourceAttr(resourceName, "tags.3", "distro-ver-2013.08.01"),
+					resource.TestCheckResourceAttr(resourceName, "tags.4", "os-linux"),
 				),
-			},
-			{
-				Config: testAccCheckSakuraCloudDataSourceCDROM_NameSelector_Exists,
-				Check: resource.ComposeTestCheckFunc(
-					testAccCheckSakuraCloudDataSourceExists("data.sakuracloud_cdrom.foobar"),
-				),
-			},
-			{
-				Config: testAccCheckSakuraCloudDataSourceCDROM_TagSelector_Exists,
-				Check: resource.ComposeTestCheckFunc(
-					testAccCheckSakuraCloudDataSourceExists("data.sakuracloud_cdrom.foobar"),
-				),
-			},
-			{
-				Config: testAccCheckSakuraCloudDataSourceCDROMConfig_NotExists,
-				Check: resource.ComposeTestCheckFunc(
-					testAccCheckSakuraCloudDataSourceNotExists("data.sakuracloud_cdrom.foobar"),
-				),
-				Destroy: true,
-			},
-			{
-				Config: testAccCheckSakuraCloudDataSourceCDROM_NameSelector_NotExists,
-				Check: resource.ComposeTestCheckFunc(
-					testAccCheckSakuraCloudDataSourceNotExists("data.sakuracloud_cdrom.foobar"),
-				),
-				Destroy: true,
-			},
-			{
-				Config: testAccCheckSakuraCloudDataSourceCDROM_TagSelector_NotExists,
-				Check: resource.ComposeTestCheckFunc(
-					testAccCheckSakuraCloudDataSourceNotExists("data.sakuracloud_cdrom.foobar"),
-				),
-				Destroy: true,
 			},
 		},
 	})
 }
 
-var testAccCheckSakuraCloudDataSourceCDROMConfig = `
+var testAccSakuraCloudDataSourceCDROM_basic = `
 data "sakuracloud_cdrom" "foobar" {
   filters {
     conditions {
 	  name    = "Name"
-	  values = ["Ubuntu Server 18.04.3 LTS 64bit"]
+	  values = ["Parted Magic 2013_08_01"]
     }
-  }
-}`
-
-var testAccCheckSakuraCloudDataSourceCDROMConfig_NotExists = `
-data "sakuracloud_cdrom" "foobar" {
-  filters {
-    conditions {
-	  name   = "Name"
-	  values = ["xxxxxxxxxxxxxxxxxx"]
-    }
-  }
-}`
-
-var testAccCheckSakuraCloudDataSourceCDROM_NameSelector_Exists = `
-data "sakuracloud_cdrom" "foobar" {
-  filters {
-    names = ["Ubuntu","Server","18"]
-  }
-}
-`
-var testAccCheckSakuraCloudDataSourceCDROM_NameSelector_NotExists = `
-data "sakuracloud_cdrom" "foobar" {
-  filters {
-    names = ["xxxxxxxxxx"]
-  }
-}
-`
-
-var testAccCheckSakuraCloudDataSourceCDROM_TagSelector_Exists = `
-data "sakuracloud_cdrom" "foobar" {
-  filters {
-	tags = ["distro-ubuntu","os-unix"]
-  }
-}`
-
-var testAccCheckSakuraCloudDataSourceCDROM_TagSelector_NotExists = `
-data "sakuracloud_cdrom" "foobar" {
-  filters {
-	tags = ["xxxxxxxxxx"]
   }
 }`

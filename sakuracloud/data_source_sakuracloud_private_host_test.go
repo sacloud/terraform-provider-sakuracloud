@@ -15,143 +15,46 @@
 package sakuracloud
 
 import (
-	"fmt"
-	"regexp"
 	"testing"
 
-	"github.com/hashicorp/terraform-plugin-sdk/helper/acctest"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/resource"
 )
 
-func TestAccSakuraCloudDataSourcePrivateHost_Basic(t *testing.T) {
-	randString1 := acctest.RandStringFromCharSet(5, acctest.CharSetAlpha)
-	randString2 := acctest.RandStringFromCharSet(20, acctest.CharSetAlpha)
-	name := fmt.Sprintf("%s_%s", randString1, randString2)
+func TestAccSakuraCloudDataSourcePrivateHost_basic(t *testing.T) {
+	skipIfZoneIsDummy(t)
 
+	resourceName := "data.sakuracloud_private_host.foobar"
+	rand := randomName()
 	resource.ParallelTest(t, resource.TestCase{
-		PreCheck:                  func() { testAccPreCheck(t) },
-		Providers:                 testAccProviders,
-		PreventPostDestroyRefresh: true,
-		CheckDestroy:              testAccCheckSakuraCloudPrivateHostDestroy,
-
+		PreCheck:  func() { testAccPreCheck(t) },
+		Providers: testAccProviders,
 		Steps: []resource.TestStep{
 			{
-				Config: testAccCheckSakuraCloudDataSourcePrivateHostBase(name),
-				Check:  testAccCheckSakuraCloudDataSourceExists("sakuracloud_private_host.foobar"),
-			},
-			{
-				Config: testAccCheckSakuraCloudDataSourcePrivateHostConfig(name),
+				Config: buildConfigWithArgs(testAccSakuraCloudDataSourcePrivateHost_basic, rand),
 				Check: resource.ComposeTestCheckFunc(
-					testAccCheckSakuraCloudDataSourceExists("data.sakuracloud_private_host.foobar"),
-					resource.TestCheckResourceAttr("data.sakuracloud_private_host.foobar", "name", name),
-					resource.TestCheckResourceAttr("data.sakuracloud_private_host.foobar", "description", "description_test"),
-					resource.TestCheckResourceAttr("data.sakuracloud_private_host.foobar", "tags.#", "3"),
-					resource.TestCheckResourceAttr("data.sakuracloud_private_host.foobar", "tags.0", "tag1"),
-					resource.TestCheckResourceAttr("data.sakuracloud_private_host.foobar", "tags.1", "tag2"),
-					resource.TestCheckResourceAttr("data.sakuracloud_private_host.foobar", "tags.2", "tag3"),
-					resource.TestMatchResourceAttr("data.sakuracloud_private_host.foobar",
-						"hostname",
-						regexp.MustCompile(".+")), // should be not empty
+					testCheckSakuraCloudDataSourceExists(resourceName),
+					resource.TestCheckResourceAttr(resourceName, "name", rand),
+					resource.TestCheckResourceAttr(resourceName, "description", "description"),
+					resource.TestCheckResourceAttr(resourceName, "tags.#", "3"),
+					resource.TestCheckResourceAttr(resourceName, "tags.0", "tag1"),
+					resource.TestCheckResourceAttr(resourceName, "tags.1", "tag2"),
+					resource.TestCheckResourceAttr(resourceName, "tags.2", "tag3"),
+					resource.TestCheckResourceAttrSet(resourceName, "hostname"),
 				),
-			},
-			{
-				Config: testAccCheckSakuraCloudDataSourcePrivateHostConfig_With_Tag(name),
-				Check: resource.ComposeTestCheckFunc(
-					testAccCheckSakuraCloudDataSourceExists("data.sakuracloud_private_host.foobar"),
-				),
-			},
-			{
-				Config: testAccCheckSakuraCloudDataSourcePrivateHostConfig_NotExists(name),
-				Check: resource.ComposeTestCheckFunc(
-					testAccCheckSakuraCloudDataSourceNotExists("data.sakuracloud_private_host.foobar"),
-				),
-				Destroy: true,
-			},
-			{
-				Config: testAccCheckSakuraCloudDataSourcePrivateHostConfig_With_NotExists_Tag(name),
-				Check: resource.ComposeTestCheckFunc(
-					testAccCheckSakuraCloudDataSourceNotExists("data.sakuracloud_private_host.foobar"),
-				),
-				Destroy: true,
 			},
 		},
 	})
 }
 
-func testAccCheckSakuraCloudDataSourcePrivateHostBase(name string) string {
-	return fmt.Sprintf(`
+var testAccSakuraCloudDataSourcePrivateHost_basic = `
 resource "sakuracloud_private_host" "foobar" {
-  name        = "%s"
-  description = "description_test"
+  name        = "{{ .arg0 }}"
+  description = "description"
   tags        = ["tag1", "tag2", "tag3"]
-  zone        = "tk1a"
-}`, name)
-}
-
-func testAccCheckSakuraCloudDataSourcePrivateHostConfig(name string) string {
-	return fmt.Sprintf(`
-resource "sakuracloud_private_host" "foobar" {
-  name        = "%s"
-  description = "description_test"
-  tags        = ["tag1", "tag2", "tag3"]
-  zone        = "tk1a"
 }
 
 data "sakuracloud_private_host" "foobar" {
   filters {
-	names = ["%s"]
+	names = [sakuracloud_private_host.foobar.name]
   }
-  zone = "tk1a"
-}`, name, name)
-}
-
-func testAccCheckSakuraCloudDataSourcePrivateHostConfig_With_Tag(name string) string {
-	return fmt.Sprintf(`
-resource "sakuracloud_private_host" "foobar" {
-  name        = "%s"
-  description = "description_test"
-  tags        = ["tag1", "tag2", "tag3"]
-  zone        = "tk1a"
-}
-
-data "sakuracloud_private_host" "foobar" {
-  filters {
-	tags = ["tag1","tag3"]
-  }
-  zone = "tk1a"
-}`, name)
-}
-
-func testAccCheckSakuraCloudDataSourcePrivateHostConfig_With_NotExists_Tag(name string) string {
-	return fmt.Sprintf(`
-resource "sakuracloud_private_host" "foobar" {
-  name        = "%s"
-  description = "description_test"
-  tags        = ["tag1", "tag2", "tag3"]
-  zone        = "tk1a"
-}
-
-data "sakuracloud_private_host" "foobar" {
-  filters {
-	tags = ["tag1-xxxxxxx","tag3-xxxxxxxx"]
-  }
-  zone = "tk1a"
-}`, name)
-}
-
-func testAccCheckSakuraCloudDataSourcePrivateHostConfig_NotExists(name string) string {
-	return fmt.Sprintf(`
-resource "sakuracloud_private_host" "foobar" {
-  name        = "%s"
-  description = "description_test"
-  tags        = ["tag1", "tag2", "tag3"]
-  zone        = "tk1a"
-}
-
-data "sakuracloud_private_host" "foobar" {
-  filters {
-	names = ["xxxxxxxxxxxxxxxxxx"]
-  }
-  zone = "tk1a"
-}`, name)
-}
+}`

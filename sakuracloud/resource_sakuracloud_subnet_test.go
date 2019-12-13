@@ -25,42 +25,46 @@ import (
 	"github.com/sacloud/libsacloud/v2/sacloud"
 )
 
-func TestAccResourceSakuraCloudSubnet(t *testing.T) {
+func TestAccSakuraCloudSubnet_basic(t *testing.T) {
+	resourceName := "sakuracloud_subnet.foobar"
+	rand := randomName()
+
 	var subnet sacloud.Subnet
 	resource.Test(t, resource.TestCase{
-		PreCheck:     func() { testAccPreCheck(t) },
-		Providers:    testAccProviders,
-		CheckDestroy: testAccCheckSakuraCloudSubnetDestroy,
+		PreCheck:  func() { testAccPreCheck(t) },
+		Providers: testAccProviders,
+		CheckDestroy: resource.ComposeTestCheckFunc(
+			testCheckSakuraCloudInternetDestroy,
+			testCheckSakuraCloudSubnetDestroy,
+		),
 		Steps: []resource.TestStep{
 			{
-				Config: testAccCheckSakuraCloudSubnetConfig_basic,
+				Config: buildConfigWithArgs(testAccSakuraCloudSubnet_basic, rand),
 				Check: resource.ComposeTestCheckFunc(
-					testAccCheckSakuraCloudSubnetExists("sakuracloud_subnet.foobar", &subnet),
-					resource.TestCheckResourceAttr(
-						"sakuracloud_subnet.foobar", "ipaddresses.#", "16"),
+					testCheckSakuraCloudSubnetExists(resourceName, &subnet),
+					resource.TestCheckResourceAttr(resourceName, "ipaddresses.#", "16"),
 				),
 			},
 			{
-				Config: testAccCheckSakuraCloudSubnetConfig_update,
+				Config: buildConfigWithArgs(testAccSakuraCloudSubnet_update, rand),
 				Check: resource.ComposeTestCheckFunc(
-					testAccCheckSakuraCloudSubnetExists("sakuracloud_subnet.foobar", &subnet),
-					resource.TestCheckResourceAttr(
-						"sakuracloud_subnet.foobar", "ipaddresses.#", "16"),
+					testCheckSakuraCloudSubnetExists(resourceName, &subnet),
+					resource.TestCheckResourceAttr(resourceName, "ipaddresses.#", "16"),
 				),
 			},
 		},
 	})
 }
 
-func testAccCheckSakuraCloudSubnetExists(n string, subnet *sacloud.Subnet) resource.TestCheckFunc {
+func testCheckSakuraCloudSubnetExists(n string, subnet *sacloud.Subnet) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
 		rs, ok := s.RootModule().Resources[n]
 		if !ok {
-			return fmt.Errorf("Not found: %s", n)
+			return fmt.Errorf("not found: %s", n)
 		}
 
 		if rs.Primary.ID == "" {
-			return errors.New("No Subnet ID is set")
+			return errors.New("no Subnet ID is set")
 		}
 
 		client := testAccProvider.Meta().(*APIClient)
@@ -81,7 +85,7 @@ func testAccCheckSakuraCloudSubnetExists(n string, subnet *sacloud.Subnet) resou
 	}
 }
 
-func testAccCheckSakuraCloudSubnetDestroy(s *terraform.State) error {
+func testCheckSakuraCloudSubnetDestroy(s *terraform.State) error {
 	client := testAccProvider.Meta().(*APIClient)
 	subnetOp := sacloud.NewSubnetOp(client)
 
@@ -103,20 +107,20 @@ func testAccCheckSakuraCloudSubnetDestroy(s *terraform.State) error {
 	return nil
 }
 
-var testAccCheckSakuraCloudSubnetConfig_basic = `
+var testAccSakuraCloudSubnet_basic = `
 resource sakuracloud_internet "foobar" {
-  name = "myinternet"
+  name = "{{ .arg0 }}"
 }
 resource "sakuracloud_subnet" "foobar" {
-  internet_id = "${sakuracloud_internet.foobar.id}"
-  next_hop    = "${sakuracloud_internet.foobar.min_ipaddress}"
+  internet_id = sakuracloud_internet.foobar.id
+  next_hop    = sakuracloud_internet.foobar.min_ipaddress
 }`
 
-var testAccCheckSakuraCloudSubnetConfig_update = `
+var testAccSakuraCloudSubnet_update = `
 resource sakuracloud_internet "foobar" {
-  name = "myinternet"
+  name = "{{ .arg0 }}"
 }
 resource "sakuracloud_subnet" "foobar" {
-  internet_id = "${sakuracloud_internet.foobar.id}"
-  next_hop    = "${sakuracloud_internet.foobar.max_ipaddress}"
+  internet_id = sakuracloud_internet.foobar.id
+  next_hop    = sakuracloud_internet.foobar.max_ipaddress
 }`

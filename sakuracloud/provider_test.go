@@ -19,8 +19,6 @@ import (
 	"os"
 	"testing"
 
-	"github.com/hashicorp/terraform-plugin-sdk/helper/resource"
-
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/terraform"
 )
@@ -86,48 +84,5 @@ func testAccPreCheck(t *testing.T) {
 
 	if v := os.Getenv("SAKURACLOUD_RATE_LIMIT"); v == "" {
 		os.Setenv("SAKURACLOUD_RATE_LIMIT", testDefaultAPIRateLimit)
-	}
-}
-
-func skipIfFakeModeEnabled(t *testing.T) {
-	if isFakeModeEnabled() {
-		t.Skip("This test runs only without FAKE_MODE environment variables")
-	}
-}
-
-func isFakeModeEnabled() bool {
-	fakeMode := os.Getenv("FAKE_MODE")
-	return fakeMode != ""
-}
-
-func skipIfEnvIsNotSet(t *testing.T, key ...string) {
-	for _, k := range key {
-		if os.Getenv(k) == "" {
-			t.Skipf("Environment valiable %q is not set", k)
-		}
-	}
-}
-
-func testAccCheckSakuraCloudDataSourceExists(n string) resource.TestCheckFunc {
-	return func(s *terraform.State) error {
-		rs, ok := s.RootModule().Resources[n]
-		if !ok {
-			return fmt.Errorf("resource is not exists: %s", n)
-		}
-
-		if rs.Primary.ID == "" {
-			return fmt.Errorf("id is not set: %s", n)
-		}
-		return nil
-	}
-}
-
-func testAccCheckSakuraCloudDataSourceNotExists(n string) resource.TestCheckFunc {
-	return func(s *terraform.State) error {
-		v, ok := s.RootModule().Resources[n]
-		if ok && v.Primary.ID != "" {
-			return fmt.Errorf("resource still exists: %s", n)
-		}
-		return nil
 	}
 }

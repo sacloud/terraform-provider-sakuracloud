@@ -48,12 +48,12 @@ func TestAccResourceSakuraCloudIPv4Ptr(t *testing.T) {
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
 		Providers:    testAccProviders,
-		CheckDestroy: testAccCheckSakuraCloudIPv4PtrDestroy,
+		CheckDestroy: testCheckSakuraCloudIPv4PtrDestroy,
 		Steps: []resource.TestStep{
 			{
 				Config: fmt.Sprintf(testAccCheckSakuraCloudIPv4PtrConfig_basic, testDomain, testDomain),
 				Check: resource.ComposeTestCheckFunc(
-					testAccCheckSakuraCloudIPv4PtrExists("sakuracloud_ipv4_ptr.foobar", &ip),
+					testCheckSakuraCloudIPv4PtrExists("sakuracloud_ipv4_ptr.foobar", &ip),
 					resource.TestCheckResourceAttr(
 						"sakuracloud_ipv4_ptr.foobar", "hostname", fmt.Sprintf("terraform-test-domain01.%s", testDomain)),
 				),
@@ -61,7 +61,7 @@ func TestAccResourceSakuraCloudIPv4Ptr(t *testing.T) {
 			{
 				Config: fmt.Sprintf(testAccCheckSakuraCloudIPv4PtrConfig_update, testDomain, testDomain),
 				Check: resource.ComposeTestCheckFunc(
-					testAccCheckSakuraCloudIPv4PtrExists("sakuracloud_ipv4_ptr.foobar", &ip),
+					testCheckSakuraCloudIPv4PtrExists("sakuracloud_ipv4_ptr.foobar", &ip),
 					resource.TestCheckResourceAttr(
 						"sakuracloud_ipv4_ptr.foobar", "hostname", fmt.Sprintf("terraform-test-domain02.%s", testDomain)),
 				),
@@ -70,7 +70,7 @@ func TestAccResourceSakuraCloudIPv4Ptr(t *testing.T) {
 	})
 }
 
-func testAccCheckSakuraCloudIPv4PtrExists(n string, ip *sacloud.IPAddress) resource.TestCheckFunc {
+func testCheckSakuraCloudIPv4PtrExists(n string, ip *sacloud.IPAddress) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
 		rs, ok := s.RootModule().Resources[n]
 		if !ok {
@@ -102,7 +102,7 @@ func testAccCheckSakuraCloudIPv4PtrExists(n string, ip *sacloud.IPAddress) resou
 	}
 }
 
-func testAccCheckSakuraCloudIPv4PtrDestroy(s *terraform.State) error {
+func testCheckSakuraCloudIPv4PtrDestroy(s *terraform.State) error {
 	client := testAccProvider.Meta().(*APIClient)
 	ipAddrOp := sacloud.NewIPAddressOp(client)
 
@@ -130,10 +130,10 @@ data sakuracloud_dns "dns" {
 }
 
 resource sakuracloud_dns_record "record01" {
-  dns_id = "${data.sakuracloud_dns.dns.id}"
+  dns_id = data.sakuracloud_dns.dns.id
   name   = "terraform-test-domain01"
   type   = "A"
-  value  = "${sakuracloud_server.server.ipaddress}"
+  value  = sakuracloud_server.server.ipaddress
 }
 
 resource sakuracloud_server "server" {
@@ -143,7 +143,7 @@ resource sakuracloud_server "server" {
 }
 
 resource "sakuracloud_ipv4_ptr" "foobar" {
-  ipaddress = "${sakuracloud_server.server.ipaddress}"
+  ipaddress = sakuracloud_server.server.ipaddress
   hostname  = "terraform-test-domain01.%s"
 }
 `
@@ -156,7 +156,7 @@ data sakuracloud_dns "dns" {
 }
 
 resource sakuracloud_dns_record "record01" {
-  dns_id = "${data.sakuracloud_dns.dns.id}"
+  dns_id = data.sakuracloud_dns.dns.id
   name   = "terraform-test-domain02"
   type   = "A"
   value  = sakuracloud_server.server.ipaddress
@@ -169,7 +169,7 @@ resource sakuracloud_server "server" {
 }
 
 resource "sakuracloud_ipv4_ptr" "foobar" {
-  ipaddress = "${sakuracloud_server.server.ipaddress}"
+  ipaddress = sakuracloud_server.server.ipaddress
   hostname  = "terraform-test-domain02.%s"
 }
 `
