@@ -20,53 +20,73 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/helper/resource"
 )
 
-func TestAccSakuraCloudDataSourceArchive_Basic(t *testing.T) {
+func TestAccSakuraCloudDataSourceArchive_basic(t *testing.T) {
+	resourceName := "data.sakuracloud_archive.foobar"
 	resource.ParallelTest(t, resource.TestCase{
-		PreCheck:                  func() { testAccPreCheck(t) },
-		Providers:                 testAccProviders,
-		PreventPostDestroyRefresh: true,
-		CheckDestroy:              testAccCheckSakuraCloudArchiveDestroy,
-
+		PreCheck:  func() { testAccPreCheck(t) },
+		Providers: testAccProviders,
 		Steps: []resource.TestStep{
 			{
-				Config: testAccCheckSakuraCloudDataSourceArchiveConfig,
+				Config: testAccSakuraCloudDataSourceArchive_basic,
 				Check: resource.ComposeTestCheckFunc(
-					testAccCheckSakuraCloudDataSourceExists("data.sakuracloud_archive.foobar"),
-					resource.TestCheckResourceAttr("data.sakuracloud_archive.foobar", "name", "Ubuntu Server 16.04.6 LTS 64bit"),
-					resource.TestCheckResourceAttr("data.sakuracloud_archive.foobar", "size", "20"),
-					resource.TestCheckResourceAttr("data.sakuracloud_archive.foobar", "zone", "tk1v"),
-					resource.TestCheckResourceAttr("data.sakuracloud_archive.foobar", "tags.#", "6"),
-					resource.TestCheckResourceAttr("data.sakuracloud_archive.foobar", "tags.0", "@size-extendable"),
-					resource.TestCheckResourceAttr("data.sakuracloud_archive.foobar", "tags.1", "arch-64bit"),
-					resource.TestCheckResourceAttr("data.sakuracloud_archive.foobar", "tags.2", "distro-ubuntu"),
-					resource.TestCheckResourceAttr("data.sakuracloud_archive.foobar", "tags.3", "distro-ver-16.04.5"),
-					resource.TestCheckResourceAttr("data.sakuracloud_archive.foobar", "tags.4", "os-linux"),
-					resource.TestCheckResourceAttr("data.sakuracloud_archive.foobar", "tags.5", "ubuntu-16.04-latest"),
+					testCheckSakuraCloudDataSourceExists(resourceName),
+					resource.TestCheckResourceAttr(resourceName, "name", "Ubuntu Server 16.04.6 LTS 64bit"),
+					resource.TestCheckResourceAttr(resourceName, "size", "20"),
+					resource.TestCheckResourceAttr(resourceName, "tags.#", "6"),
+					resource.TestCheckResourceAttr(resourceName, "tags.0", "@size-extendable"),
+					resource.TestCheckResourceAttr(resourceName, "tags.1", "arch-64bit"),
+					resource.TestCheckResourceAttr(resourceName, "tags.2", "distro-ubuntu"),
+					resource.TestCheckResourceAttr(resourceName, "tags.3", "distro-ver-16.04.5"),
+					resource.TestCheckResourceAttr(resourceName, "tags.4", "os-linux"),
+					resource.TestCheckResourceAttr(resourceName, "tags.5", "ubuntu-16.04-latest"),
 				),
 			},
+		},
+	})
+}
+
+func TestAccSakuraCloudDataSourceArchive_osType(t *testing.T) {
+	resourceName := "data.sakuracloud_archive.foobar"
+	resource.ParallelTest(t, resource.TestCase{
+		PreCheck:  func() { testAccPreCheck(t) },
+		Providers: testAccProviders,
+		Steps: []resource.TestStep{
 			{
-				Config: testAccCheckSakuraCloudDataSourceArchive_OSType,
+				Config: testAccCheckSakuraCloudDataSourceArchive_osType,
 				Check: resource.ComposeTestCheckFunc(
-					testAccCheckSakuraCloudDataSourceExists("data.sakuracloud_archive.foobar"),
+					testCheckSakuraCloudDataSourceExists(resourceName),
 				),
 			},
+		},
+	})
+}
+
+func TestAccSakuraCloudDataSourceArchive_withTag(t *testing.T) {
+	resourceName := "data.sakuracloud_archive.foobar"
+	resource.ParallelTest(t, resource.TestCase{
+		PreCheck:  func() { testAccPreCheck(t) },
+		Providers: testAccProviders,
+		Steps: []resource.TestStep{
 			{
-				Config: testAccCheckSakuraCloudDataSourceArchiveConfig_With_Tag,
+				Config: testAccCheckSakuraCloudDataSourceArchive_withTag,
 				Check: resource.ComposeTestCheckFunc(
-					testAccCheckSakuraCloudDataSourceExists("data.sakuracloud_archive.foobar"),
+					testCheckSakuraCloudDataSourceExists(resourceName),
 				),
 			},
+		},
+	})
+}
+
+func TestAccSakuraCloudDataSourceArchive_notExists(t *testing.T) {
+	name := "data.sakuracloud_archive.foobar"
+	resource.ParallelTest(t, resource.TestCase{
+		PreCheck:  func() { testAccPreCheck(t) },
+		Providers: testAccProviders,
+		Steps: []resource.TestStep{
 			{
-				Config: testAccCheckSakuraCloudDataSourceArchiveConfig_NotExists,
+				Config: testAccCheckSakuraCloudDataSourceArchive_notExists,
 				Check: resource.ComposeTestCheckFunc(
-					testAccCheckSakuraCloudDataSourceNotExists("data.sakuracloud_archive.foobar"),
-				),
-				Destroy: true,
-			},
-			{
-				Config: testAccCheckSakuraCloudDataSourceArchiveConfig_With_NotExists_Tag,
-				Check: resource.ComposeTestCheckFunc(
-					testAccCheckSakuraCloudDataSourceNotExists("data.sakuracloud_archive.foobar"),
+					testCheckSakuraCloudDataSourceNotExists(name),
 				),
 				Destroy: true,
 			},
@@ -74,41 +94,53 @@ func TestAccSakuraCloudDataSourceArchive_Basic(t *testing.T) {
 	})
 }
 
-var testAccCheckSakuraCloudDataSourceArchiveConfig = `
+func TestAccSakuraCloudDataSourceArchive_tagNotExists(t *testing.T) {
+	name := "data.sakuracloud_archive.foobar"
+	resource.ParallelTest(t, resource.TestCase{
+		PreCheck:  func() { testAccPreCheck(t) },
+		Providers: testAccProviders,
+		Steps: []resource.TestStep{
+			{
+				Config: testAccCheckSakuraCloudDataSourceArchive_tagNotExists,
+				Check: resource.ComposeTestCheckFunc(
+					testCheckSakuraCloudDataSourceNotExists(name),
+				),
+				Destroy: true,
+			},
+		},
+	})
+}
+
+var testAccSakuraCloudDataSourceArchive_basic = `
 data "sakuracloud_archive" "foobar" {
   filters {
     names = ["Ubuntu Server 16"]
   }
-  zone = "tk1v"
 }`
 
-var testAccCheckSakuraCloudDataSourceArchiveConfig_With_Tag = `
+var testAccCheckSakuraCloudDataSourceArchive_withTag = `
 data "sakuracloud_archive" "foobar" {
   filters {
     tags = ["distro-ubuntu","os-linux"]
   }
-  zone = "tk1v"
 }`
 
-var testAccCheckSakuraCloudDataSourceArchiveConfig_With_NotExists_Tag = `
+var testAccCheckSakuraCloudDataSourceArchive_tagNotExists = `
 data "sakuracloud_archive" "foobar" {
   filters {
     tags = ["distro-ubuntu-xxxxxxxxxxx","os-linux-xxxxxxxx"]
   }
-  zone = "tk1v"
 }`
 
-var testAccCheckSakuraCloudDataSourceArchiveConfig_NotExists = `
+var testAccCheckSakuraCloudDataSourceArchive_notExists = `
 data "sakuracloud_archive" "foobar" {
   filters {
     names = ["xxxxxxxxxxxxxxxxxx"]
   }
-  zone = "tk1v"
 }`
 
-var testAccCheckSakuraCloudDataSourceArchive_OSType = `
+var testAccCheckSakuraCloudDataSourceArchive_osType = `
 data "sakuracloud_archive" "foobar" {
     os_type = "rancheros"
-    zone    = "tk1v"
 }
 `

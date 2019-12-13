@@ -15,127 +15,54 @@
 package sakuracloud
 
 import (
-	"fmt"
 	"testing"
 
-	"github.com/hashicorp/terraform-plugin-sdk/helper/acctest"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/resource"
 )
 
-func TestAccSakuraCloudDataSourceServer_Basic(t *testing.T) {
-	randString1 := acctest.RandStringFromCharSet(5, acctest.CharSetAlpha)
-	randString2 := acctest.RandStringFromCharSet(20, acctest.CharSetAlpha)
-	name := fmt.Sprintf("%s_%s", randString1, randString2)
+func TestAccSakuraCloudDataSourceServer_basic(t *testing.T) {
+	resourceName := "data.sakuracloud_server.foobar"
+	rand := randomName()
 
 	resource.ParallelTest(t, resource.TestCase{
-		PreCheck:                  func() { testAccPreCheck(t) },
-		Providers:                 testAccProviders,
-		PreventPostDestroyRefresh: true,
-		CheckDestroy:              testAccCheckSakuraCloudServerDestroy,
-
+		PreCheck:  func() { testAccPreCheck(t) },
+		Providers: testAccProviders,
 		Steps: []resource.TestStep{
 			{
-				Config: testAccCheckSakuraCloudDataSourceServerBase(name),
-				Check:  testAccCheckSakuraCloudDataSourceExists("sakuracloud_server.foobar"),
-			},
-			{
-				Config: testAccCheckSakuraCloudDataSourceServerConfig(name),
+				Config: buildConfigWithArgs(testAccSakuraCloudDataSourceServer_basic, rand),
 				Check: resource.ComposeTestCheckFunc(
-					testAccCheckSakuraCloudDataSourceExists("data.sakuracloud_server.foobar"),
-					resource.TestCheckResourceAttr("data.sakuracloud_server.foobar", "name", name),
-					resource.TestCheckResourceAttr("data.sakuracloud_server.foobar", "description", "description_test"),
-					resource.TestCheckResourceAttr("data.sakuracloud_server.foobar", "interface_driver", "virtio"),
-					resource.TestCheckResourceAttr("data.sakuracloud_server.foobar", "tags.#", "3"),
-					resource.TestCheckResourceAttr("data.sakuracloud_server.foobar", "tags.0", "tag1"),
-					resource.TestCheckResourceAttr("data.sakuracloud_server.foobar", "tags.1", "tag2"),
-					resource.TestCheckResourceAttr("data.sakuracloud_server.foobar", "tags.2", "tag3"),
-					resource.TestCheckResourceAttr("data.sakuracloud_server.foobar", "core", "1"),
-					resource.TestCheckResourceAttr("data.sakuracloud_server.foobar", "memory", "1"),
-					//resource.TestCheckResourceAttr("data.sakuracloud_server.foobar", "disks.#", "1"),
-					resource.TestCheckResourceAttr("data.sakuracloud_server.foobar", "interfaces.0.upstream", "shared"),
-					resource.TestCheckResourceAttr("data.sakuracloud_server.foobar", "interfaces.#", "1"),
+					testCheckSakuraCloudDataSourceExists(resourceName),
+					resource.TestCheckResourceAttr(resourceName, "name", rand),
+					resource.TestCheckResourceAttr(resourceName, "description", "description"),
+					resource.TestCheckResourceAttr(resourceName, "interface_driver", "virtio"),
+					resource.TestCheckResourceAttr(resourceName, "tags.#", "3"),
+					resource.TestCheckResourceAttr(resourceName, "tags.0", "tag1"),
+					resource.TestCheckResourceAttr(resourceName, "tags.1", "tag2"),
+					resource.TestCheckResourceAttr(resourceName, "tags.2", "tag3"),
+					resource.TestCheckResourceAttr(resourceName, "core", "1"),
+					resource.TestCheckResourceAttr(resourceName, "memory", "1"),
+					resource.TestCheckResourceAttr(resourceName, "interfaces.0.upstream", "shared"),
+					resource.TestCheckResourceAttr(resourceName, "interfaces.#", "1"),
 				),
-			},
-			{
-				Config: testAccCheckSakuraCloudDataSourceServerConfig_With_Tag(name),
-				Check: resource.ComposeTestCheckFunc(
-					testAccCheckSakuraCloudDataSourceExists("data.sakuracloud_server.foobar"),
-				),
-			},
-			{
-				Config: testAccCheckSakuraCloudDataSourceServerConfig_NotExists(name),
-				Check: resource.ComposeTestCheckFunc(
-					testAccCheckSakuraCloudDataSourceNotExists("data.sakuracloud_server.foobar"),
-				),
-				Destroy: true,
-			},
-			{
-				Config: testAccCheckSakuraCloudDataSourceServerConfig_With_NotExists_Tag(name),
-				Check: resource.ComposeTestCheckFunc(
-					testAccCheckSakuraCloudDataSourceNotExists("data.sakuracloud_server.foobar"),
-				),
-				Destroy: true,
 			},
 		},
 	})
 }
 
-func testAccCheckSakuraCloudDataSourceServerBase(name string) string {
-	return fmt.Sprintf(`
-data "sakuracloud_archive" "ubuntu" {
-  os_type = "ubuntu"
-}
-resource "sakuracloud_disk" "foobar" {
-  name              = "%s"
-  source_archive_id = "${data.sakuracloud_archive.ubuntu.id}"
-}
+var testAccSakuraCloudDataSourceServer_basic = `
 resource "sakuracloud_server" "foobar" {
-  name        = "%s"
-  disks       = ["${sakuracloud_disk.foobar.id}"]
-  description = "description_test"
+  name        = "{{ .arg0 }}"
+  description = "description"
   tags        = ["tag1", "tag2", "tag3"]
   interfaces {
     upstream = "shared"
   }
-}`, name, name)
+
+  force_shutdown = true
 }
 
-func testAccCheckSakuraCloudDataSourceServerConfig(name string) string {
-	return fmt.Sprintf(`
-%s
 data "sakuracloud_server" "foobar" {
   filters {
-	names = ["%s"]
+	names = [sakuracloud_server.foobar.name]
   }
-}`, testAccCheckSakuraCloudDataSourceServerBase(name), name)
-}
-
-func testAccCheckSakuraCloudDataSourceServerConfig_With_Tag(name string) string {
-	return fmt.Sprintf(`
-%s
-data "sakuracloud_server" "foobar" {
-  filters {
-	tags = ["tag1","tag3"]
-  }
-}`, testAccCheckSakuraCloudDataSourceServerBase(name))
-}
-
-func testAccCheckSakuraCloudDataSourceServerConfig_With_NotExists_Tag(name string) string {
-	return fmt.Sprintf(`
-%s
-data "sakuracloud_server" "foobar" {
-  filters {
-	tags = ["tag1-xxxxxxx","tag3-xxxxxxxx"]
-  }
-}`, testAccCheckSakuraCloudDataSourceServerBase(name))
-}
-
-func testAccCheckSakuraCloudDataSourceServerConfig_NotExists(name string) string {
-	return fmt.Sprintf(`
-%s
-data "sakuracloud_server" "foobar" {
-  filters {
-	names = ["xxxxxxxxxxxxxxxxxx"]
-  }
-}`, testAccCheckSakuraCloudDataSourceServerBase(name))
-}
+}`

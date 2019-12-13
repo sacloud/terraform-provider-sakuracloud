@@ -26,36 +26,40 @@ import (
 	"github.com/sacloud/libsacloud/v2/sacloud"
 )
 
-func TestAccResourceSakuraCloudBridge(t *testing.T) {
+func TestAccSakuraCloudBridge_basic(t *testing.T) {
+	resourceName := "sakuracloud_bridge.foobar"
+	rand := randomName()
+
 	var bridge sacloud.Bridge
 	resource.ParallelTest(t, resource.TestCase{
-		PreCheck:     func() { testAccPreCheck(t) },
-		Providers:    testAccProviders,
-		CheckDestroy: testAccCheckSakuraCloudBridgeDestroy,
+		PreCheck:  func() { testAccPreCheck(t) },
+		Providers: testAccProviders,
+		CheckDestroy: resource.ComposeTestCheckFunc(
+			testCheckSakuraCloudBridgeDestroy,
+			testCheckSakuraCloudSwitchDestroy,
+		),
 		Steps: []resource.TestStep{
 			{
-				Config: testAccCheckSakuraCloudBridgeConfig_withSwitch,
+				Config: buildConfigWithArgs(testAccSakuraCloudBridge_basic, rand),
 				Check: resource.ComposeTestCheckFunc(
-					testAccCheckSakuraCloudBridgeExists("sakuracloud_bridge.foobar", &bridge),
-					resource.TestCheckResourceAttr(
-						"sakuracloud_bridge.foobar", "name", "mybridge"),
-					resource.TestCheckResourceAttr(
-						"sakuracloud_switch.foobar", "name", "myswitch"),
+					testCheckSakuraCloudBridgeExists(resourceName, &bridge),
+					resource.TestCheckResourceAttr(resourceName, "name", rand),
+					resource.TestCheckResourceAttr(resourceName, "description", "description"),
 				),
 			},
 			{
-				Config: testAccCheckSakuraCloudBridgeConfig_withSwitchDisconnect,
+				Config: buildConfigWithArgs(testAccSakuraCloudBridge_disconnectSwitch, rand),
 				Check: resource.ComposeTestCheckFunc(
-					testAccCheckSakuraCloudBridgeExists("sakuracloud_bridge.foobar", &bridge),
-					resource.TestCheckResourceAttr(
-						"sakuracloud_bridge.foobar", "name", "mybridge_upd"),
+					testCheckSakuraCloudBridgeExists(resourceName, &bridge),
+					resource.TestCheckResourceAttr(resourceName, "name", rand+"-upd"),
+					resource.TestCheckResourceAttr(resourceName, "description", "description-upd"),
 				),
 			},
 		},
 	})
 }
 
-func testAccCheckSakuraCloudBridgeExists(n string, bridge *sacloud.Bridge) resource.TestCheckFunc {
+func testCheckSakuraCloudBridgeExists(n string, bridge *sacloud.Bridge) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
 		rs, ok := s.RootModule().Resources[n]
 
@@ -86,7 +90,7 @@ func testAccCheckSakuraCloudBridgeExists(n string, bridge *sacloud.Bridge) resou
 	}
 }
 
-func testAccCheckSakuraCloudBridgeDestroy(s *terraform.State) error {
+func testCheckSakuraCloudBridgeDestroy(s *terraform.State) error {
 	client := testAccProvider.Meta().(*APIClient)
 
 	for _, rs := range s.RootModule().Resources {
@@ -110,13 +114,14 @@ func testAccCheckSakuraCloudBridgeDestroy(s *terraform.State) error {
 }
 
 func TestAccImportSakuraCloudBridge(t *testing.T) {
+	rand := randomName()
 	checkFn := func(s []*terraform.InstanceState) error {
 		if len(s) != 1 {
 			return fmt.Errorf("expected 1 state: %#v", s)
 		}
 		expects := map[string]string{
-			"name":        "mybridge",
-			"description": "Bridge from TerraForm for SAKURA CLOUD",
+			"name":        rand,
+			"description": "description",
 			"zone":        os.Getenv("SAKURACLOUD_ZONE"),
 		}
 
@@ -126,12 +131,15 @@ func TestAccImportSakuraCloudBridge(t *testing.T) {
 	resourceName := "sakuracloud_bridge.foobar"
 
 	resource.ParallelTest(t, resource.TestCase{
-		PreCheck:     func() { testAccPreCheck(t) },
-		Providers:    testAccProviders,
-		CheckDestroy: testAccCheckSakuraCloudBridgeDestroy,
+		PreCheck:  func() { testAccPreCheck(t) },
+		Providers: testAccProviders,
+		CheckDestroy: resource.ComposeTestCheckFunc(
+			testCheckSakuraCloudBridgeDestroy,
+			testCheckSakuraCloudSwitchDestroy,
+		),
 		Steps: []resource.TestStep{
 			{
-				Config: testAccCheckSakuraCloudBridgeConfig_withSwitch,
+				Config: buildConfigWithArgs(testAccSakuraCloudBridge_basic, rand),
 			},
 			{
 				ResourceName:      resourceName,
@@ -143,19 +151,19 @@ func TestAccImportSakuraCloudBridge(t *testing.T) {
 	})
 }
 
-var testAccCheckSakuraCloudBridgeConfig_withSwitch = `
+var testAccSakuraCloudBridge_basic = `
 resource "sakuracloud_switch" "foobar" {
-  name        = "myswitch"
-  description = "Switch from TerraForm for SAKURA CLOUD"
-  bridge_id   = "${sakuracloud_bridge.foobar.id}"
+  name        = "{{ .arg0 }}"
+  description = "description"
+  bridge_id   = sakuracloud_bridge.foobar.id
 }
 resource "sakuracloud_bridge" "foobar" {
-  name        = "mybridge"
-  description = "Bridge from TerraForm for SAKURA CLOUD"
+  name        = "{{ .arg0 }}"
+  description = "description"
 }`
 
-var testAccCheckSakuraCloudBridgeConfig_withSwitchDisconnect = `
+var testAccSakuraCloudBridge_disconnectSwitch = `
 resource "sakuracloud_bridge" "foobar" {
-  name        = "mybridge_upd"
-  description = "Bridge from TerraForm for SAKURA CLOUD"
+  name        = "{{ .arg0 }}-upd"
+  description = "description-upd"
 }`

@@ -15,175 +15,60 @@
 package sakuracloud
 
 import (
-	"fmt"
 	"testing"
 
-	"github.com/hashicorp/terraform-plugin-sdk/helper/acctest"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/resource"
 )
 
-func TestAccSakuraCloudDataSourceNFS_Basic(t *testing.T) {
-	randString1 := acctest.RandStringFromCharSet(5, acctest.CharSetAlpha)
-	randString2 := acctest.RandStringFromCharSet(20, acctest.CharSetAlpha)
-	name := fmt.Sprintf("%s_%s", randString1, randString2)
+func TestAccSakuraCloudDataSourceNFS_basic(t *testing.T) {
+	resourceName := "data.sakuracloud_nfs.foobar"
+	rand := randomName()
 
 	resource.ParallelTest(t, resource.TestCase{
-		PreCheck:                  func() { testAccPreCheck(t) },
-		Providers:                 testAccProviders,
-		PreventPostDestroyRefresh: true,
-		CheckDestroy:              testAccCheckSakuraCloudNFSDestroy,
-
+		PreCheck:  func() { testAccPreCheck(t) },
+		Providers: testAccProviders,
 		Steps: []resource.TestStep{
 			{
-				Config: testAccCheckSakuraCloudDataSourceNFSBase(name),
-				Check:  testAccCheckSakuraCloudDataSourceExists("sakuracloud_nfs.foobar"),
-			},
-			{
-				Config: testAccCheckSakuraCloudDataSourceNFSConfig(name),
+				Config: buildConfigWithArgs(testAccSakuraCloudDataSourceNFS_basic, rand),
 				Check: resource.ComposeTestCheckFunc(
-					testAccCheckSakuraCloudDataSourceExists("data.sakuracloud_nfs.foobar"),
-					resource.TestCheckResourceAttr("data.sakuracloud_nfs.foobar", "name", name),
-					resource.TestCheckResourceAttr("data.sakuracloud_nfs.foobar", "description", "description_test"),
-					resource.TestCheckResourceAttr("data.sakuracloud_nfs.foobar", "tags.#", "3"),
-					resource.TestCheckResourceAttr("data.sakuracloud_nfs.foobar", "tags.0", "tag1"),
-					resource.TestCheckResourceAttr("data.sakuracloud_nfs.foobar", "tags.1", "tag2"),
-					resource.TestCheckResourceAttr("data.sakuracloud_nfs.foobar", "tags.2", "tag3"),
+					testCheckSakuraCloudDataSourceExists(resourceName),
+					resource.TestCheckResourceAttr(resourceName, "name", rand),
+					resource.TestCheckResourceAttr(resourceName, "description", "description"),
+					resource.TestCheckResourceAttr(resourceName, "tags.#", "3"),
+					resource.TestCheckResourceAttr(resourceName, "tags.0", "tag1"),
+					resource.TestCheckResourceAttr(resourceName, "tags.1", "tag2"),
+					resource.TestCheckResourceAttr(resourceName, "tags.2", "tag3"),
+					resource.TestCheckResourceAttrPair(
+						resourceName, "switch_id",
+						"sakuracloud_switch.foobar", "id",
+					),
+					resource.TestCheckResourceAttr(resourceName, "ipaddress", "192.168.11.101"),
+					resource.TestCheckResourceAttr(resourceName, "nw_mask_len", "24"),
+					resource.TestCheckResourceAttr(resourceName, "default_route", "192.168.11.1"),
 				),
-			},
-			{
-				Config: testAccCheckSakuraCloudDataSourceNFSConfig_With_Tag(name),
-				Check: resource.ComposeTestCheckFunc(
-					testAccCheckSakuraCloudDataSourceExists("data.sakuracloud_nfs.foobar"),
-				),
-			},
-			{
-				Config: testAccCheckSakuraCloudDataSourceNFSConfig_NotExists(name),
-				Check: resource.ComposeTestCheckFunc(
-					testAccCheckSakuraCloudDataSourceNotExists("data.sakuracloud_nfs.foobar"),
-				),
-				Destroy: true,
-			},
-			{
-				Config: testAccCheckSakuraCloudDataSourceNFSConfig_With_NotExists_Tag(name),
-				Check: resource.ComposeTestCheckFunc(
-					testAccCheckSakuraCloudDataSourceNotExists("data.sakuracloud_nfs.foobar"),
-				),
-				Destroy: true,
 			},
 		},
 	})
 }
 
-func testAccCheckSakuraCloudDataSourceNFSBase(name string) string {
-	return fmt.Sprintf(`
-resource sakuracloud_switch "sw" {
-  name = "%s"
+var testAccSakuraCloudDataSourceNFS_basic = `
+resource sakuracloud_switch "foobar" {
+  name = "{{ .arg0 }}"
 }
 
 resource "sakuracloud_nfs" "foobar" {
-  switch_id     = "${sakuracloud_switch.sw.id}"
+  name          = "{{ .arg0 }}"
+  description   = "description"
+  tags          = ["tag1", "tag2", "tag3"]
+  switch_id     = sakuracloud_switch.foobar.id
   ipaddress     = "192.168.11.101"
   nw_mask_len   = 24
   default_route = "192.168.11.1"
 
-  name        = "%s"
-  description = "description_test"
-  tags        = ["tag1", "tag2", "tag3"]
-}`, name, name)
-}
-
-func testAccCheckSakuraCloudDataSourceNFSConfig(name string) string {
-	return fmt.Sprintf(`
-resource sakuracloud_switch "sw" {
-  name = "%s"
-}
-
-resource "sakuracloud_nfs" "foobar" {
-  switch_id     = "${sakuracloud_switch.sw.id}"
-  ipaddress     = "192.168.11.101"
-  nw_mask_len   = 24
-  default_route = "192.168.11.1"
-
-  name        = "%s"
-  description = "description_test"
-  tags        = ["tag1", "tag2", "tag3"]
 }
 
 data "sakuracloud_nfs" "foobar" {
   filters {
-	names = ["%s"]
+	names = [sakuracloud_nfs.foobar.name]
   }
-}`, name, name, name)
-}
-
-func testAccCheckSakuraCloudDataSourceNFSConfig_With_Tag(name string) string {
-	return fmt.Sprintf(`
-resource sakuracloud_switch "sw" {
-  name = "%s"
-}
-
-resource "sakuracloud_nfs" "foobar" {
-  switch_id     = "${sakuracloud_switch.sw.id}"
-  ipaddress     = "192.168.11.101"
-  nw_mask_len   = 24
-  default_route = "192.168.11.1"
-
-  name        = "%s"
-  description = "description_test"
-  tags        = ["tag1", "tag2", "tag3"]
-}
-
-data "sakuracloud_nfs" "foobar" {
-  filters {
-	tags = ["tag1","tag3"]
-  }
-}`, name, name)
-}
-
-func testAccCheckSakuraCloudDataSourceNFSConfig_With_NotExists_Tag(name string) string {
-	return fmt.Sprintf(`
-resource sakuracloud_switch "sw" {
-  name = "%s"
-}
-
-resource "sakuracloud_nfs" "foobar" {
-  switch_id     = "${sakuracloud_switch.sw.id}"
-  ipaddress     = "192.168.11.101"
-  nw_mask_len   = 24
-  default_route = "192.168.11.1"
-
-  name        = "%s"
-  description = "description_test"
-  tags        = ["tag1", "tag2", "tag3"]
-}
-
-data "sakuracloud_nfs" "foobar" {
-  filters {
-	tags = ["tag1-xxxxxxx","tag3-xxxxxxxx"]
-  }
-}`, name, name)
-}
-
-func testAccCheckSakuraCloudDataSourceNFSConfig_NotExists(name string) string {
-	return fmt.Sprintf(`
-resource sakuracloud_switch "sw" {
-  name = "%s"
-}
-
-resource "sakuracloud_nfs" "foobar" {
-  switch_id     = "${sakuracloud_switch.sw.id}"
-  ipaddress     = "192.168.11.101"
-  nw_mask_len   = 24
-  default_route = "192.168.11.1"
-
-  name        = "%s"
-  description = "description_test"
-  tags        = ["tag1", "tag2", "tag3"]
-}
-
-data "sakuracloud_nfs" "foobar" {
-  filters {
-	names = ["xxxxxxxxxxxxxxxxxx"]
-  }
-}`, name, name)
-}
+}`

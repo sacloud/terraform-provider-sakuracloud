@@ -25,46 +25,41 @@ import (
 	"github.com/sacloud/libsacloud/v2/sacloud"
 )
 
-func TestAccResourceSakuraCloudSSHKeyGen(t *testing.T) {
-	var ssh_key sacloud.SSHKey
+func TestAccSakuraCloudSSHKeyGen_basic(t *testing.T) {
+	resourceName := "sakuracloud_ssh_key_gen.foobar"
+	rand := randomName()
+
+	var sshKey sacloud.SSHKey
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
 		Providers:    testAccProviders,
-		CheckDestroy: testAccCheckSakuraCloudSSHKeyGenDestroy,
+		CheckDestroy: testCheckSakuraCloudSSHKeyGenDestroy,
 		Steps: []resource.TestStep{
 			{
-				Config: testAccCheckSakuraCloudSSHKeyGenConfig_basic,
+				Config: buildConfigWithArgs(testAccSakuraCloudSSHKeyGen_basic, rand),
 				Check: resource.ComposeTestCheckFunc(
-					testAccCheckSakuraCloudSSHKeyGenExists("sakuracloud_ssh_key_gen.foobar", &ssh_key),
-					resource.TestCheckResourceAttr(
-						"sakuracloud_ssh_key_gen.foobar", "name", "mykey"),
-					resource.TestCheckResourceAttrSet(
-						"sakuracloud_ssh_key_gen.foobar", "public_key"),
-					resource.TestCheckResourceAttrSet(
-						"sakuracloud_ssh_key_gen.foobar", "fingerprint"),
-					resource.TestCheckResourceAttrSet(
-						"sakuracloud_ssh_key_gen.foobar", "private_key"),
+					testCheckSakuraCloudSSHKeyGenExists(resourceName, &sshKey),
+					resource.TestCheckResourceAttr(resourceName, "name", rand),
+					resource.TestCheckResourceAttrSet(resourceName, "public_key"),
+					resource.TestCheckResourceAttrSet(resourceName, "fingerprint"),
+					resource.TestCheckResourceAttrSet(resourceName, "private_key"),
 				),
 			},
 			{
-				Config: testAccCheckSakuraCloudSSHKeyGenConfig_with_pass_phrase,
+				Config: buildConfigWithArgs(testAccSakuraCloudSSHKeyGen_passPhrase, rand),
 				Check: resource.ComposeTestCheckFunc(
-					testAccCheckSakuraCloudSSHKeyGenExists("sakuracloud_ssh_key_gen.foobar", &ssh_key),
-					resource.TestCheckResourceAttr(
-						"sakuracloud_ssh_key_gen.foobar", "name", "mykey"),
-					resource.TestCheckResourceAttrSet(
-						"sakuracloud_ssh_key_gen.foobar", "public_key"),
-					resource.TestCheckResourceAttrSet(
-						"sakuracloud_ssh_key_gen.foobar", "fingerprint"),
-					resource.TestCheckResourceAttrSet(
-						"sakuracloud_ssh_key_gen.foobar", "private_key"),
+					testCheckSakuraCloudSSHKeyGenExists(resourceName, &sshKey),
+					resource.TestCheckResourceAttr(resourceName, "name", rand),
+					resource.TestCheckResourceAttrSet(resourceName, "public_key"),
+					resource.TestCheckResourceAttrSet(resourceName, "fingerprint"),
+					resource.TestCheckResourceAttrSet(resourceName, "private_key"),
 				),
 			},
 		},
 	})
 }
 
-func testAccCheckSakuraCloudSSHKeyGenExists(n string, ssh_key *sacloud.SSHKey) resource.TestCheckFunc {
+func testCheckSakuraCloudSSHKeyGenExists(n string, sshKey *sacloud.SSHKey) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
 		rs, ok := s.RootModule().Resources[n]
 
@@ -88,12 +83,12 @@ func testAccCheckSakuraCloudSSHKeyGenExists(n string, ssh_key *sacloud.SSHKey) r
 			return fmt.Errorf("not found SSHKey: %s", rs.Primary)
 		}
 
-		*ssh_key = *foundSSHKey
+		*sshKey = *foundSSHKey
 		return nil
 	}
 }
 
-func testAccCheckSakuraCloudSSHKeyGenDestroy(s *terraform.State) error {
+func testCheckSakuraCloudSSHKeyGenDestroy(s *terraform.State) error {
 	client := testAccProvider.Meta().(*APIClient)
 	keyOp := sacloud.NewSSHKeyOp(client)
 
@@ -115,15 +110,15 @@ func testAccCheckSakuraCloudSSHKeyGenDestroy(s *terraform.State) error {
 	return nil
 }
 
-var testAccCheckSakuraCloudSSHKeyGenConfig_basic = `
+var testAccSakuraCloudSSHKeyGen_basic = `
 resource "sakuracloud_ssh_key_gen" "foobar" {
-  name        = "mykey"
-  description = "SSHKey from TerraForm for SAKURA CLOUD"
+  name        = "{{ .arg0 }}"
+  description = "description"
 }`
 
-var testAccCheckSakuraCloudSSHKeyGenConfig_with_pass_phrase = `
+var testAccSakuraCloudSSHKeyGen_passPhrase = `
 resource "sakuracloud_ssh_key_gen" "foobar" {
-  name        = "mykey"
+  name        = "{{ .arg0 }}"
   pass_phrase = "DummyPassphrase"
-  description = "SSHKey from TerraForm for SAKURA CLOUD"
+  description = "description"
 }`

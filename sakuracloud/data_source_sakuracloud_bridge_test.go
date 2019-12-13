@@ -15,114 +15,44 @@
 package sakuracloud
 
 import (
-	"fmt"
 	"testing"
 
-	"github.com/hashicorp/terraform-plugin-sdk/helper/acctest"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/resource"
 )
 
-func TestAccSakuraCloudDataSourceBridge_Basic(t *testing.T) {
-	randString1 := acctest.RandStringFromCharSet(10, acctest.CharSetAlpha)
-	randString2 := acctest.RandStringFromCharSet(10, acctest.CharSetAlpha)
-	name := fmt.Sprintf("%s_%s", randString1, randString2)
+func TestAccSakuraCloudDataSourceBridge_basic(t *testing.T) {
+	resourceName := "data.sakuracloud_bridge.foobar"
+	rand := randomName()
 
 	resource.ParallelTest(t, resource.TestCase{
-		PreCheck:                  func() { testAccPreCheck(t) },
-		Providers:                 testAccProviders,
-		PreventPostDestroyRefresh: true,
-		CheckDestroy:              testAccCheckSakuraCloudBridgeDestroy,
-
+		PreCheck:  func() { testAccPreCheck(t) },
+		Providers: testAccProviders,
 		Steps: []resource.TestStep{
 			{
-				Config: testAccCheckSakuraCloudDataSourceBridgeBase(name),
-				Check:  testAccCheckSakuraCloudDataSourceExists("sakuracloud_bridge.foobar"),
-			},
-			{
-				Config: testAccCheckSakuraCloudDataSourceBridgeConfig(name),
+				Config: buildConfigWithArgs(testAccSakuraCloudDataSourceBridge_basic, rand),
 				Check: resource.ComposeTestCheckFunc(
-					testAccCheckSakuraCloudDataSourceExists("data.sakuracloud_bridge.foobar"),
-					resource.TestCheckResourceAttr("data.sakuracloud_bridge.foobar", "name", name),
-					resource.TestCheckResourceAttr("data.sakuracloud_bridge.foobar", "description", "description_test"),
+					testCheckSakuraCloudDataSourceExists(resourceName),
+					resource.TestCheckResourceAttr(resourceName, "name", rand),
+					resource.TestCheckResourceAttr(resourceName, "description", "description"),
 				),
-			},
-			{
-				Config: testAccCheckSakuraCloudDataSourceBridgeConfig_NameSelector_Exists(name, randString1, randString2),
-				Check: resource.ComposeTestCheckFunc(
-					testAccCheckSakuraCloudDataSourceExists("data.sakuracloud_bridge.foobar"),
-					resource.TestCheckResourceAttr("data.sakuracloud_bridge.foobar", "name", name),
-					resource.TestCheckResourceAttr("data.sakuracloud_bridge.foobar", "description", "description_test"),
-				),
-			},
-			{
-				Config: testAccCheckSakuraCloudDataSourceBridgeConfig_NotExists,
-				Check: resource.ComposeTestCheckFunc(
-					testAccCheckSakuraCloudDataSourceNotExists("data.sakuracloud_bridge.foobar"),
-				),
-				Destroy: true,
-			},
-			{
-				Config: testAccCheckSakuraCloudDataSourceBridgeConfig_NameSelector_NotExists,
-				Check: resource.ComposeTestCheckFunc(
-					testAccCheckSakuraCloudDataSourceNotExists("data.sakuracloud_bridge.foobar"),
-				),
-				Destroy: true,
 			},
 		},
 	})
 }
 
-func testAccCheckSakuraCloudDataSourceBridgeBase(name string) string {
-	return fmt.Sprintf(`
+var testAccSakuraCloudDataSourceBridge_pre = `
 resource "sakuracloud_bridge" "foobar" {
-  name        = "%s"
-  description = "description_test"
-} 
-`, name)
-}
-
-func testAccCheckSakuraCloudDataSourceBridgeConfig(name string) string {
-	return fmt.Sprintf(`
-resource "sakuracloud_bridge" "foobar" {
-  name        = "%s"
-  description = "description_test"
-}
-data "sakuracloud_bridge" "foobar" {
-  filters {
-    conditions {
-      name   = "Name"
-      values = ["%s"]
-    }
-  }
-}`, name, name)
-}
-
-var testAccCheckSakuraCloudDataSourceBridgeConfig_NotExists = `
-data "sakuracloud_bridge" "foobar" {
-  filters {
-    conditions {
-      name   = "Name"
-      values = ["xxxxxxxxxxxxxxxxxx"]
-    }
-  }
+  name        = "{{ .arg0 }}"
+  description = "description"
 }`
 
-func testAccCheckSakuraCloudDataSourceBridgeConfig_NameSelector_Exists(name, p1, p2 string) string {
-	return fmt.Sprintf(`
+var testAccSakuraCloudDataSourceBridge_basic = `
 resource "sakuracloud_bridge" "foobar" {
-  name        = "%s"
-  description = "description_test"
+  name        = "{{ .arg0 }}"
+  description = "description"
 }
 data "sakuracloud_bridge" "foobar" {
   filters {
-    names = ["%s", "%s"]
-  }
-}`, name, p1, p2)
-}
-
-var testAccCheckSakuraCloudDataSourceBridgeConfig_NameSelector_NotExists = `
-data "sakuracloud_bridge" "foobar" {
-  filters {
-    names = ["xxxxxxxx"]
+    names = [sakuracloud_bridge.foobar.name]
   }
 }`

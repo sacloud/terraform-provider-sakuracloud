@@ -15,131 +15,45 @@
 package sakuracloud
 
 import (
-	"fmt"
 	"testing"
 
-	"github.com/hashicorp/terraform-plugin-sdk/helper/acctest"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/resource"
 )
 
 func TestAccSakuraCloudDataSourceNote_Basic(t *testing.T) {
-	randString1 := acctest.RandStringFromCharSet(5, acctest.CharSetAlpha)
-	randString2 := acctest.RandStringFromCharSet(20, acctest.CharSetAlpha)
-	name := fmt.Sprintf("%s_%s", randString1, randString2)
+	resourceName := "data.sakuracloud_note.foobar"
+	rand := randomName()
 
 	resource.ParallelTest(t, resource.TestCase{
-		PreCheck:                  func() { testAccPreCheck(t) },
-		Providers:                 testAccProviders,
-		PreventPostDestroyRefresh: true,
-		CheckDestroy:              testAccCheckSakuraCloudNoteDestroy,
-
+		PreCheck:  func() { testAccPreCheck(t) },
+		Providers: testAccProviders,
 		Steps: []resource.TestStep{
 			{
-				Config: testAccCheckSakuraCloudDataSourceNoteBase(name),
-				Check:  testAccCheckSakuraCloudDataSourceExists("sakuracloud_note.foobar"),
-			},
-			{
-				Config: testAccCheckSakuraCloudDataSourceNoteConfig(name),
+				Config: buildConfigWithArgs(testAccCheckSakuraCloudDataSourceNoteConfig, rand),
 				Check: resource.ComposeTestCheckFunc(
-					testAccCheckSakuraCloudDataSourceExists("data.sakuracloud_note.foobar"),
-					resource.TestCheckResourceAttr("data.sakuracloud_note.foobar", "name", name),
-					resource.TestCheckResourceAttr("data.sakuracloud_note.foobar", "content", "content_test"),
-					resource.TestCheckResourceAttr("data.sakuracloud_note.foobar", "class", "shell"),
-					resource.TestCheckResourceAttr("data.sakuracloud_note.foobar", "tags.#", "3"),
-					resource.TestCheckResourceAttr("data.sakuracloud_note.foobar", "tags.0", "tag1"),
-					resource.TestCheckResourceAttr("data.sakuracloud_note.foobar", "tags.1", "tag2"),
-					resource.TestCheckResourceAttr("data.sakuracloud_note.foobar", "tags.2", "tag3"),
+					testCheckSakuraCloudDataSourceExists(resourceName),
+					resource.TestCheckResourceAttr(resourceName, "name", rand),
+					resource.TestCheckResourceAttr(resourceName, "content", "content"),
+					resource.TestCheckResourceAttr(resourceName, "class", "shell"),
+					resource.TestCheckResourceAttr(resourceName, "tags.#", "3"),
+					resource.TestCheckResourceAttr(resourceName, "tags.0", "tag1"),
+					resource.TestCheckResourceAttr(resourceName, "tags.1", "tag2"),
+					resource.TestCheckResourceAttr(resourceName, "tags.2", "tag3"),
 				),
-			},
-			{
-				Config: testAccCheckSakuraCloudDataSourceNoteConfig_With_Tag(name),
-				Check: resource.ComposeTestCheckFunc(
-					testAccCheckSakuraCloudDataSourceExists("data.sakuracloud_note.foobar"),
-				),
-			},
-			{
-				Config: testAccCheckSakuraCloudDataSourceNoteConfig_NotExists(name),
-				Check: resource.ComposeTestCheckFunc(
-					testAccCheckSakuraCloudDataSourceNotExists("data.sakuracloud_note.foobar"),
-				),
-				Destroy: true,
-			},
-			{
-				Config: testAccCheckSakuraCloudDataSourceNoteConfig_With_NotExists_Tag(name),
-				Check: resource.ComposeTestCheckFunc(
-					testAccCheckSakuraCloudDataSourceNotExists("data.sakuracloud_note.foobar"),
-				),
-				Destroy: true,
 			},
 		},
 	})
 }
 
-func testAccCheckSakuraCloudDataSourceNoteBase(name string) string {
-	return fmt.Sprintf(`
+var testAccCheckSakuraCloudDataSourceNoteConfig = `
 resource "sakuracloud_note" "foobar" {
-  name    = "%s"
-  content = "content_test"
-  tags    = ["tag1", "tag2", "tag3"]
-}`, name)
-}
-
-func testAccCheckSakuraCloudDataSourceNoteConfig(name string) string {
-	return fmt.Sprintf(`
-resource "sakuracloud_note" "foobar" {
-  name    = "%s"
-  content = "content_test"
+  name    = "{{ .arg0 }}"
+  content = "content"
   tags    = ["tag1", "tag2", "tag3"]
 }
 
 data "sakuracloud_note" "foobar" {
   filters {
-	names = ["%s"]
+	names = [sakuracloud_note.foobar.name]
   }
-}`, name, name)
-}
-
-func testAccCheckSakuraCloudDataSourceNoteConfig_With_Tag(name string) string {
-	return fmt.Sprintf(`
-resource "sakuracloud_note" "foobar" {
-  name    = "%s"
-  content = "content_test"
-  tags    = ["tag1", "tag2", "tag3"]
-}
-
-data "sakuracloud_note" "foobar" {
-  filters {
-	tags = ["tag1","tag3"]
-  }
-}`, name)
-}
-
-func testAccCheckSakuraCloudDataSourceNoteConfig_With_NotExists_Tag(name string) string {
-	return fmt.Sprintf(`
-resource "sakuracloud_note" "foobar" {
-  name    = "%s"
-  content = "content_test"
-  tags    = ["tag1", "tag2", "tag3"]
-}
-
-data "sakuracloud_note" "foobar" {
-  filters {
-	tags = ["tag1-xxxxxxx","tag3-xxxxxxxx"]
-  }
-}`, name)
-}
-
-func testAccCheckSakuraCloudDataSourceNoteConfig_NotExists(name string) string {
-	return fmt.Sprintf(`
-resource "sakuracloud_note" "foobar" {
-  name    = "%s"
-  content = "content_test"
-  tags    = ["tag1", "tag2", "tag3"]
-}
-
-data "sakuracloud_note" "foobar" {
-  filters {
-	names = ["xxxxxxxxxxxxxxxxxx"]
-  }
-}`, name)
-}
+}`

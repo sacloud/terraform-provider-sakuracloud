@@ -15,134 +15,48 @@
 package sakuracloud
 
 import (
-	"fmt"
 	"testing"
 
-	"github.com/hashicorp/terraform-plugin-sdk/helper/acctest"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/resource"
 )
 
-func TestAccSakuraCloudDataSourceInternet_Basic(t *testing.T) {
-	randString1 := acctest.RandStringFromCharSet(5, acctest.CharSetAlpha)
-	randString2 := acctest.RandStringFromCharSet(20, acctest.CharSetAlpha)
-	name := fmt.Sprintf("%s_%s", randString1, randString2)
+func TestAccSakuraCloudDataSourceInternet_basic(t *testing.T) {
+	resourceName := "data.sakuracloud_internet.foobar"
+	rand := randomName()
 
 	resource.ParallelTest(t, resource.TestCase{
-		PreCheck:                  func() { testAccPreCheck(t) },
-		Providers:                 testAccProviders,
-		PreventPostDestroyRefresh: true,
-		CheckDestroy:              testAccCheckSakuraCloudInternetDestroy,
-
+		PreCheck:  func() { testAccPreCheck(t) },
+		Providers: testAccProviders,
 		Steps: []resource.TestStep{
 			{
-				Config: testAccCheckSakuraCloudDataSourceInternetBase(name),
-				Check:  testAccCheckSakuraCloudDataSourceExists("sakuracloud_internet.foobar"),
-			},
-			{
-				Config: testAccCheckSakuraCloudDataSourceInternetConfig(name),
+				Config: buildConfigWithArgs(testAccSakuraCloudDataSourceInternet_basic, rand),
 				Check: resource.ComposeTestCheckFunc(
-					testAccCheckSakuraCloudDataSourceExists("data.sakuracloud_internet.foobar"),
-					resource.TestCheckResourceAttr("data.sakuracloud_internet.foobar", "name", name),
-					resource.TestCheckResourceAttr("data.sakuracloud_internet.foobar", "description", "description_test"),
-					resource.TestCheckResourceAttr("data.sakuracloud_internet.foobar", "tags.#", "3"),
-					resource.TestCheckResourceAttr("data.sakuracloud_internet.foobar", "tags.0", "tag1"),
-					resource.TestCheckResourceAttr("data.sakuracloud_internet.foobar", "tags.1", "tag2"),
-					resource.TestCheckResourceAttr("data.sakuracloud_internet.foobar", "tags.2", "tag3"),
-					resource.TestCheckResourceAttr("data.sakuracloud_internet.foobar", "nw_mask_len", "28"),
-					resource.TestCheckResourceAttr("data.sakuracloud_internet.foobar", "band_width", "100"),
-					resource.TestCheckResourceAttr("data.sakuracloud_internet.foobar", "server_ids.#", "0"),
-					resource.TestCheckResourceAttr("data.sakuracloud_internet.foobar", "ipaddresses.#", "11"),
+					testCheckSakuraCloudDataSourceExists(resourceName),
+					resource.TestCheckResourceAttr(resourceName, "name", rand),
+					resource.TestCheckResourceAttr(resourceName, "description", "description"),
+					resource.TestCheckResourceAttr(resourceName, "tags.#", "3"),
+					resource.TestCheckResourceAttr(resourceName, "tags.0", "tag1"),
+					resource.TestCheckResourceAttr(resourceName, "tags.1", "tag2"),
+					resource.TestCheckResourceAttr(resourceName, "tags.2", "tag3"),
+					resource.TestCheckResourceAttr(resourceName, "nw_mask_len", "28"),
+					resource.TestCheckResourceAttr(resourceName, "band_width", "100"),
+					resource.TestCheckResourceAttr(resourceName, "server_ids.#", "0"),
+					resource.TestCheckResourceAttr(resourceName, "ipaddresses.#", "11"),
 				),
-			},
-			{
-				Config: testAccCheckSakuraCloudDataSourceInternetConfig_With_Tag(name),
-				Check: resource.ComposeTestCheckFunc(
-					testAccCheckSakuraCloudDataSourceExists("data.sakuracloud_internet.foobar"),
-				),
-			},
-			{
-				Config: testAccCheckSakuraCloudDataSourceInternetConfig_NotExists(name),
-				Check: resource.ComposeTestCheckFunc(
-					testAccCheckSakuraCloudDataSourceNotExists("data.sakuracloud_internet.foobar"),
-				),
-				Destroy: true,
-			},
-			{
-				Config: testAccCheckSakuraCloudDataSourceInternetConfig_With_NotExists_Tag(name),
-				Check: resource.ComposeTestCheckFunc(
-					testAccCheckSakuraCloudDataSourceNotExists("data.sakuracloud_internet.foobar"),
-				),
-				Destroy: true,
 			},
 		},
 	})
 }
 
-func testAccCheckSakuraCloudDataSourceInternetBase(name string) string {
-	return fmt.Sprintf(`
+var testAccSakuraCloudDataSourceInternet_basic = `
 resource "sakuracloud_internet" "foobar" {
-  name        = "%s"
-  description = "description_test"
-  tags        = ["tag1","tag2","tag3"]
-}`, name)
-}
-
-func testAccCheckSakuraCloudDataSourceInternetConfig(name string) string {
-	return fmt.Sprintf(`
-resource "sakuracloud_internet" "foobar" {
-  name        = "%s"
-  description = "description_test"
-  tags        = ["tag1","tag2","tag3"]
+  name        = "{{ .arg0 }}"
+  description = "description"
+  tags        = ["tag1", "tag2", "tag3"]
 }
 
 data "sakuracloud_internet" "foobar" {
   filters {
-	names = ["%s"]
+	names = [sakuracloud_internet.foobar.name]
   }
-}`, name, name)
-}
-
-func testAccCheckSakuraCloudDataSourceInternetConfig_With_Tag(name string) string {
-	return fmt.Sprintf(`
-resource "sakuracloud_internet" "foobar" {
-  name        = "%s"
-  description = "description_test"
-  tags        = ["tag1","tag2","tag3"]
-}
-
-data "sakuracloud_internet" "foobar" {
-  filters {
-	tags = ["tag1","tag3"]
-  }
-}`, name)
-}
-
-func testAccCheckSakuraCloudDataSourceInternetConfig_With_NotExists_Tag(name string) string {
-	return fmt.Sprintf(`
-resource "sakuracloud_internet" "foobar" {
-  name        = "%s"
-  description = "description_test"
-  tags        = ["tag1","tag2","tag3"]
-}
-
-data "sakuracloud_internet" "foobar" {
-  filters {
-	tags = ["tag1-xxxxxxx","tag3-xxxxxxxx"]
-  }
-}`, name)
-}
-
-func testAccCheckSakuraCloudDataSourceInternetConfig_NotExists(name string) string {
-	return fmt.Sprintf(`
-resource "sakuracloud_internet" "foobar" {
-  name        = "%s"
-  description = "description_test"
-  tags        = ["tag1","tag2","tag3"]
-}
-
-data "sakuracloud_internet" "foobar" {
-  filters {
-	names = ["xxxxxxxxxxxxxxxxxx"]
-  }
-}`, name)
-}
+}`
