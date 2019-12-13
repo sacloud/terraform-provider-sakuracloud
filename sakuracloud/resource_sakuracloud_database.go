@@ -22,6 +22,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/validation"
 	"github.com/sacloud/libsacloud/v2/sacloud"
+	"github.com/sacloud/libsacloud/v2/utils/power"
 )
 
 func resourceSakuraCloudDatabase() *schema.Resource {
@@ -208,7 +209,7 @@ func resourceSakuraCloudDatabaseDelete(d *schema.ResourceData, meta interface{})
 	}
 
 	if data.InstanceStatus.IsUp() {
-		if err := shutdownDatabaseSync(ctx, dbOp, zone, data.ID, true); err != nil {
+		if err := power.ShutdownDatabase(ctx, dbOp, zone, data.ID, true); err != nil {
 			return err
 		}
 	}

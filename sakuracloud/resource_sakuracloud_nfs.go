@@ -24,6 +24,7 @@ import (
 	"github.com/sacloud/libsacloud/v2/sacloud"
 	"github.com/sacloud/libsacloud/v2/sacloud/accessor"
 	"github.com/sacloud/libsacloud/v2/sacloud/types"
+	"github.com/sacloud/libsacloud/v2/utils/power"
 	"github.com/sacloud/libsacloud/v2/utils/setup"
 )
 
@@ -196,7 +197,7 @@ func resourceSakuraCloudNFSDelete(d *schema.ResourceData, meta interface{}) erro
 		return fmt.Errorf("could not read SakuraCloud NFS[%s]: %s", d.Id(), err)
 	}
 
-	if err := shutdownNFSSync(ctx, nfsOp, zone, nfs.ID, true); err != nil {
+	if err := power.ShutdownNFS(ctx, nfsOp, zone, nfs.ID, true); err != nil {
 		return err
 	}
 

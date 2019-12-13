@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package server
+package query
 
 import (
 	"context"
@@ -23,20 +23,15 @@ import (
 	"github.com/sacloud/libsacloud/v2/sacloud/types"
 )
 
-// PlanFinder .
-type PlanFinder interface {
-	Find(ctx context.Context, zone string, conditions *sacloud.FindCondition) (*sacloud.ServerPlanFindResult, error)
-}
-
-// FindPlanRequest サーバプラン検索パラメータ
-type FindPlanRequest struct {
+// FindServerPlanRequest サーバプラン検索パラメータ
+type FindServerPlanRequest struct {
 	CPU        int
 	MemoryGB   int
 	Commitment types.ECommitment
 	Generation types.EPlanGeneration
 }
 
-func (f *FindPlanRequest) findCondition() *sacloud.FindCondition {
+func (f *FindServerPlanRequest) findCondition() *sacloud.FindCondition {
 	cond := &sacloud.FindCondition{
 		Sort: search.SortKeys{
 			{Key: "Generation", Order: search.SortDesc},
@@ -61,8 +56,8 @@ func (f *FindPlanRequest) findCondition() *sacloud.FindCondition {
 	return cond
 }
 
-// FindPlan サーバプラン検索
-func FindPlan(ctx context.Context, finder PlanFinder, zone string, param *FindPlanRequest) (*sacloud.ServerPlan, error) {
+// FindServerPlan サーバプラン検索
+func FindServerPlan(ctx context.Context, finder ServerPlanFinder, zone string, param *FindServerPlanRequest) (*sacloud.ServerPlan, error) {
 	var cond *sacloud.FindCondition
 	if param != nil {
 		cond = param.findCondition()

@@ -12,17 +12,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package mobilegateway
+package cleanup
 
 import (
 	"context"
 
 	"github.com/sacloud/libsacloud/v2/sacloud"
 	"github.com/sacloud/libsacloud/v2/sacloud/types"
+	"github.com/sacloud/libsacloud/v2/utils/power"
 )
 
-// Delete 削除
-func Delete(ctx context.Context, mgwAPI sacloud.MobileGatewayAPI, simAPI sacloud.SIMAPI, zone string, id types.ID) error {
+// DeleteMobileGateway 削除
+func DeleteMobileGateway(ctx context.Context, mgwAPI sacloud.MobileGatewayAPI, simAPI sacloud.SIMAPI, zone string, id types.ID) error {
 	// check MobileGateway is exists
 	mgw, err := mgwAPI.Read(ctx, zone, id)
 	if err != nil {
@@ -30,14 +31,7 @@ func Delete(ctx context.Context, mgwAPI sacloud.MobileGatewayAPI, simAPI sacloud
 	}
 
 	if mgw.InstanceStatus.IsUp() {
-		if err := mgwAPI.Shutdown(ctx, zone, id, &sacloud.ShutdownOption{Force: true}); err != nil {
-			return err
-		}
-		// wait for down
-		waiter := sacloud.WaiterForDown(func() (state interface{}, err error) {
-			return mgwAPI.Read(ctx, zone, id)
-		})
-		if _, err := waiter.WaitForState(ctx); err != nil {
+		if err := power.ShutdownMobileGateway(ctx, mgwAPI, zone, id, true); err != nil {
 			return err
 		}
 	}

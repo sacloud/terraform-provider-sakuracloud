@@ -22,6 +22,7 @@ import (
 	"github.com/sacloud/libsacloud/v2/sacloud/accessor"
 	"github.com/sacloud/libsacloud/v2/sacloud/types"
 	"github.com/sacloud/libsacloud/v2/utils/builder"
+	"github.com/sacloud/libsacloud/v2/utils/power"
 	"github.com/sacloud/libsacloud/v2/utils/setup"
 )
 
@@ -147,7 +148,7 @@ func (b *Builder) Update(ctx context.Context, zone string, id types.ID) (*saclou
 	isNeedRestart := false
 	if db.InstanceStatus.IsUp() && isNeedShutdown {
 		isNeedRestart = true
-		if err := b.shutdown(ctx, zone, id, false); err != nil {
+		if err := power.ShutdownDatabase(ctx, b.Client.Database, zone, id, false); err != nil {
 			return nil, err
 		}
 	}
@@ -166,7 +167,7 @@ func (b *Builder) Update(ctx context.Context, zone string, id types.ID) (*saclou
 		return nil, err
 	}
 	if isNeedRestart {
-		if err := b.boot(ctx, zone, id); err != nil {
+		if err := power.BootDatabase(ctx, b.Client.Database, zone, id); err != nil {
 			return nil, err
 		}
 	}
@@ -182,32 +183,4 @@ func (b *Builder) Update(ctx context.Context, zone string, id types.ID) (*saclou
 func (b *Builder) collectUpdateInfo(db *sacloud.Database) (isNeedShutdown bool, err error) {
 	isNeedShutdown = b.CommonSetting.ReplicaPassword != db.CommonSetting.ReplicaPassword
 	return
-}
-
-func (b *Builder) boot(ctx context.Context, zone string, id types.ID) error {
-	if err := b.Client.Database.Boot(ctx, zone, id); err != nil {
-		return err
-	}
-	// wait for down
-	waiter := sacloud.WaiterForUp(func() (state interface{}, err error) {
-		return b.Client.Database.Read(ctx, zone, id)
-	})
-	if _, err := waiter.WaitForState(ctx); err != nil {
-		return err
-	}
-	return nil
-}
-
-func (b *Builder) shutdown(ctx context.Context, zone string, id types.ID, force bool) error {
-	if err := b.Client.Database.Shutdown(ctx, zone, id, &sacloud.ShutdownOption{Force: force}); err != nil {
-		return err
-	}
-	// wait for down
-	waiter := sacloud.WaiterForDown(func() (state interface{}, err error) {
-		return b.Client.Database.Read(ctx, zone, id)
-	})
-	if _, err := waiter.WaitForState(ctx); err != nil {
-		return err
-	}
-	return nil
 }

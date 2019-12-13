@@ -17,10 +17,9 @@ package server
 import (
 	"context"
 
-	"github.com/sacloud/libsacloud/v2/utils/server"
-
 	"github.com/sacloud/libsacloud/v2/sacloud"
 	"github.com/sacloud/libsacloud/v2/sacloud/types"
+	"github.com/sacloud/libsacloud/v2/utils/query"
 )
 
 // APIClient builderが利用するAPIクライアント群
@@ -29,7 +28,7 @@ type APIClient struct {
 	Interface    InterfaceHandler
 	PacketFilter PacketFilterReader
 	Server       CreateServerHandler
-	ServerPlan   server.PlanFinder
+	ServerPlan   query.ServerPlanFinder
 	Switch       SwitchReader
 }
 

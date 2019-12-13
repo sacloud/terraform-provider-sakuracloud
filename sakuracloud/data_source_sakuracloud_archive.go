@@ -21,7 +21,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/helper/validation"
 	"github.com/sacloud/libsacloud/v2/sacloud"
 	"github.com/sacloud/libsacloud/v2/sacloud/ostype"
-	"github.com/sacloud/libsacloud/v2/utils/archive"
+	"github.com/sacloud/libsacloud/v2/utils/query"
 )
 
 func dataSourceSakuraCloudArchive() *schema.Resource {
@@ -77,7 +77,7 @@ func dataSourceSakuraCloudArchiveRead(d *schema.ResourceData, meta interface{}) 
 	if osType, ok := d.GetOk("os_type"); ok {
 		strOSType := osType.(string)
 		if strOSType != "" {
-			res, err := archive.FindByOSType(ctx, searcher, zone, ostype.StrToOSType(strOSType))
+			res, err := query.FindArchiveByOSType(ctx, searcher, zone, ostype.StrToOSType(strOSType))
 			if err != nil {
 				return err
 			}

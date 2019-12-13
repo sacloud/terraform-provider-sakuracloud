@@ -23,7 +23,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/validation"
 	"github.com/sacloud/libsacloud/v2/sacloud"
-	mobileGatewayUtil "github.com/sacloud/libsacloud/v2/utils/mobilegateway"
+	"github.com/sacloud/libsacloud/v2/utils/cleanup"
 )
 
 func resourceSakuraCloudMobileGateway() *schema.Resource {
@@ -285,7 +285,7 @@ func resourceSakuraCloudMobileGatewayDelete(d *schema.ResourceData, meta interfa
 		return fmt.Errorf("could not read SakuraCloud MobileGateway: %s", err)
 	}
 
-	if err := mobileGatewayUtil.Delete(ctx, mgwOp, simOp, zone, mgw.ID); err != nil {
+	if err := cleanup.DeleteMobileGateway(ctx, mgwOp, simOp, zone, mgw.ID); err != nil {
 		return fmt.Errorf("deleting SakuraCloud MobileGateway[%s] is failed: %s", mgw.ID, err)
 	}
 	return nil

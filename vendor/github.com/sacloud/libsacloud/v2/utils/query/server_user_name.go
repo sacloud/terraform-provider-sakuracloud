@@ -12,48 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package server
+package query
 
 import (
 	"context"
 
-	"github.com/sacloud/libsacloud/v2/sacloud"
 	"github.com/sacloud/libsacloud/v2/sacloud/types"
 )
 
-// SourceInfoReader サーバのコピー元情報を参照するためのリーダー
-type SourceInfoReader struct {
-	ServerReader  SourceServerReader
-	ArchiveReader SourceArchiveReader
-	DiskReader    SourceDiskReader
-}
-
-// NewSourceInfoReader デフォルトのリーダーを返す
-func NewSourceInfoReader(caller sacloud.APICaller) *SourceInfoReader {
-	return &SourceInfoReader{
-		ServerReader:  sacloud.NewServerOp(caller),
-		ArchiveReader: sacloud.NewArchiveOp(caller),
-		DiskReader:    sacloud.NewDiskOp(caller),
-	}
-}
-
-// SourceServerReader サーバ参照インターフェース
-type SourceServerReader interface {
-	Read(ctx context.Context, zone string, id types.ID) (*sacloud.Server, error)
-}
-
-// SourceArchiveReader アーカイブ参照インターフェース
-type SourceArchiveReader interface {
-	Read(ctx context.Context, zone string, id types.ID) (*sacloud.Archive, error)
-}
-
-// SourceDiskReader ディスク参照インターフェース
-type SourceDiskReader interface {
-	Read(ctx context.Context, zone string, id types.ID) (*sacloud.Disk, error)
-}
-
-// GetDefaultUserName returns default admin user name from source archives/disks
-func GetDefaultUserName(ctx context.Context, zone string, reader *SourceInfoReader, serverID types.ID) (string, error) {
+// ServerDefaultUserName returns default admin user name from source archives/disks
+func ServerDefaultUserName(ctx context.Context, zone string, reader *ServerSourceReader, serverID types.ID) (string, error) {
 	// read server
 	server, err := reader.ServerReader.Read(ctx, zone, serverID)
 	if err != nil {
@@ -67,7 +35,7 @@ func GetDefaultUserName(ctx context.Context, zone string, reader *SourceInfoRead
 	return getSSHDefaultUserNameDiskRec(ctx, zone, reader, server.Disks[0].ID)
 }
 
-func getSSHDefaultUserNameDiskRec(ctx context.Context, zone string, reader *SourceInfoReader, diskID types.ID) (string, error) {
+func getSSHDefaultUserNameDiskRec(ctx context.Context, zone string, reader *ServerSourceReader, diskID types.ID) (string, error) {
 	disk, err := reader.DiskReader.Read(ctx, zone, diskID)
 	if err != nil {
 		return "", err
@@ -82,7 +50,7 @@ func getSSHDefaultUserNameDiskRec(ctx context.Context, zone string, reader *Sour
 	return "", nil
 }
 
-func getSSHDefaultUserNameArchiveRec(ctx context.Context, zone string, reader *SourceInfoReader, archiveID types.ID) (string, error) {
+func getSSHDefaultUserNameArchiveRec(ctx context.Context, zone string, reader *ServerSourceReader, archiveID types.ID) (string, error) {
 	// read archive
 	archive, err := reader.ArchiveReader.Read(ctx, zone, archiveID)
 	if err != nil {

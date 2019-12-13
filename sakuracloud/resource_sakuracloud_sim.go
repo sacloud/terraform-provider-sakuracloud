@@ -21,7 +21,8 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/sacloud/libsacloud/v2/sacloud"
 	"github.com/sacloud/libsacloud/v2/sacloud/types"
-	simUtil "github.com/sacloud/libsacloud/v2/utils/sim"
+	"github.com/sacloud/libsacloud/v2/utils/cleanup"
+	"github.com/sacloud/libsacloud/v2/utils/query"
 )
 
 func resourceSakuraCloudSIM() *schema.Resource {
@@ -116,7 +117,7 @@ func resourceSakuraCloudSIMRead(d *schema.ResourceData, meta interface{}) error 
 	client, ctx, _ := getSacloudClient(d, meta)
 	simOp := sacloud.NewSIMOp(client)
 
-	sim, err := simUtil.FindByID(ctx, simOp, sakuraCloudID(d.Id()))
+	sim, err := query.FindSIMByID(ctx, simOp, sakuraCloudID(d.Id()))
 	if err != nil {
 		if sacloud.IsNotFoundError(err) {
 			d.SetId("")
@@ -135,7 +136,7 @@ func resourceSakuraCloudSIMUpdate(d *schema.ResourceData, meta interface{}) erro
 		return err
 	}
 
-	sim, err := simUtil.FindByID(ctx, simOp, types.StringID(d.Id()))
+	sim, err := query.FindSIMByID(ctx, simOp, types.StringID(d.Id()))
 	if err != nil {
 		return fmt.Errorf("could not read SakuraCloud SIM[%s]: %s", d.Id(), err)
 	}
@@ -158,7 +159,7 @@ func resourceSakuraCloudSIMDelete(d *schema.ResourceData, meta interface{}) erro
 	simOp := sacloud.NewSIMOp(client)
 
 	// read sim info
-	sim, err := simUtil.FindByID(ctx, simOp, sakuraCloudID(d.Id()))
+	sim, err := query.FindSIMByID(ctx, simOp, sakuraCloudID(d.Id()))
 	if err != nil {
 		if sacloud.IsNotFoundError(err) {
 			d.SetId("")
@@ -171,7 +172,7 @@ func resourceSakuraCloudSIMDelete(d *schema.ResourceData, meta interface{}) erro
 		return fmt.Errorf("waiting deletion is failed: SIM[%s] still used by MobileGateway: %s", sim.ID, err)
 	}
 
-	if err := simUtil.Delete(ctx, simOp, sim.ID); err != nil {
+	if err := cleanup.DeleteSIM(ctx, simOp, sim.ID); err != nil {
 		return fmt.Errorf("deleting SIM[%s] is failed: %s", sim.ID, err)
 	}
 

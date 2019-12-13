@@ -20,7 +20,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/sacloud/libsacloud/v2/sacloud"
 	"github.com/sacloud/libsacloud/v2/sacloud/types"
-	nfsUtil "github.com/sacloud/libsacloud/v2/utils/nfs"
+	"github.com/sacloud/libsacloud/v2/utils/query"
 )
 
 func expandNFSDiskPlanID(ctx context.Context, client *APIClient, d resourceValueGettable) (types.ID, error) {
@@ -34,11 +34,11 @@ func expandNFSDiskPlanID(ctx context.Context, client *APIClient, d resourceValue
 	}
 	size := d.Get("size").(int)
 
-	return nfsUtil.FindNFSPlanID(ctx, sacloud.NewNoteOp(client), planID, types.ENFSSize(size))
+	return query.FindNFSPlanID(ctx, sacloud.NewNoteOp(client), planID, types.ENFSSize(size))
 }
 
 func flattenNFSDiskPlan(ctx context.Context, client *APIClient, planID types.ID) (string, int, error) {
-	planInfo, err := nfsUtil.GetPlanInfo(ctx, sacloud.NewNoteOp(client), planID)
+	planInfo, err := query.GetNFSPlanInfo(ctx, sacloud.NewNoteOp(client), planID)
 	if err != nil {
 		return "", 0, err
 	}
