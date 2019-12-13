@@ -21,6 +21,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/validation"
 	"github.com/sacloud/libsacloud/v2/sacloud"
+	"github.com/sacloud/libsacloud/v2/utils/power"
 )
 
 func resourceSakuraCloudVPCRouter() *schema.Resource {
@@ -499,7 +500,7 @@ func resourceSakuraCloudVPCRouterDelete(d *schema.ResourceData, meta interface{}
 	}
 
 	if vpcRouter.InstanceStatus.IsUp() {
-		if err := shutdownVPCRouterSync(ctx, client, zone, vpcRouter.ID); err != nil {
+		if err := power.ShutdownVPCRouter(ctx, vrOp, zone, vpcRouter.ID, true); err != nil {
 			return fmt.Errorf("stopping VPCRouter[%s] is failed: %s", vpcRouter.ID, err)
 		}
 	}

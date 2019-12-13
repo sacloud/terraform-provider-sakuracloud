@@ -23,7 +23,8 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/helper/validation"
 	"github.com/sacloud/libsacloud/v2/sacloud"
 	"github.com/sacloud/libsacloud/v2/sacloud/types"
-	serverUtil "github.com/sacloud/libsacloud/v2/utils/server"
+	"github.com/sacloud/libsacloud/v2/utils/power"
+	"github.com/sacloud/libsacloud/v2/utils/query"
 )
 
 func resourceSakuraCloudServer() *schema.Resource {
@@ -270,7 +271,7 @@ func resourceSakuraCloudServerDelete(d *schema.ResourceData, meta interface{}) e
 	}
 
 	if server.InstanceStatus.IsUp() {
-		if err := shutdownServerSync(ctx, client, zone, server.ID, d.Get("force_shutdown").(bool)); err != nil {
+		if err := power.ShutdownServer(ctx, serverOp, zone, server.ID, d.Get("force_shutdown").(bool)); err != nil {
 			return fmt.Errorf("stopping SakuraCloud Server[%s] is failed: %s", server.ID, err)
 		}
 	}
@@ -291,7 +292,7 @@ func setServerResourceData(ctx context.Context, d *schema.ResourceData, client *
 			"type": "ssh",
 			"host": ip,
 		}
-		userName, err := serverUtil.GetDefaultUserName(ctx, zone, serverUtil.NewSourceInfoReader(client), data.ID)
+		userName, err := query.ServerDefaultUserName(ctx, zone, query.NewServerSourceReader(client), data.ID)
 		if err != nil {
 			log.Printf("[WARN] can't retrive connInfo from archives (server: %d).", data.ID)
 		}

@@ -20,7 +20,7 @@ import (
 
 	"github.com/sacloud/libsacloud/v2/sacloud"
 	"github.com/sacloud/libsacloud/v2/sacloud/types"
-	simUtil "github.com/sacloud/libsacloud/v2/utils/sim"
+	"github.com/sacloud/libsacloud/v2/utils/query"
 )
 
 // Builder SIMのセットアップを行う
@@ -88,7 +88,7 @@ func (b *Builder) Build(ctx context.Context) (*sacloud.SIM, error) {
 	}
 
 	// reload
-	sim, err = simUtil.FindByID(ctx, b.Client.SIM, sim.ID)
+	sim, err = query.FindSIMByID(ctx, b.Client.SIM, sim.ID)
 	if err != nil {
 		return nil, err
 	}
@@ -101,7 +101,7 @@ func (b *Builder) Update(ctx context.Context, id types.ID) (*sacloud.SIM, error)
 		return nil, err
 	}
 
-	sim, err := simUtil.FindByID(ctx, b.Client.SIM, id)
+	sim, err := query.FindSIMByID(ctx, b.Client.SIM, id)
 	if err != nil {
 		return nil, err
 	}
@@ -143,7 +143,7 @@ func (b *Builder) Update(ctx context.Context, id types.ID) (*sacloud.SIM, error)
 	}
 
 	// reload
-	sim, err = simUtil.FindByID(ctx, b.Client.SIM, id)
+	sim, err = query.FindSIMByID(ctx, b.Client.SIM, id)
 	if err != nil {
 		return nil, err
 	}
