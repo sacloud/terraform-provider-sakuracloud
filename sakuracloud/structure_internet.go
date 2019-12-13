@@ -16,25 +16,18 @@ package sakuracloud
 
 import (
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
-	"github.com/sacloud/libsacloud/v2/sacloud"
+	internetBuilder "github.com/sacloud/libsacloud/v2/utils/builder/internet"
 )
 
-func expandInternetCreateRequest(d *schema.ResourceData) *sacloud.InternetCreateRequest {
-	return &sacloud.InternetCreateRequest{
+func expandInternetBuilder(d *schema.ResourceData, client *APIClient) *internetBuilder.Builder {
+	return &internetBuilder.Builder{
 		Name:           d.Get("name").(string),
 		Description:    d.Get("description").(string),
 		Tags:           expandTags(d),
 		IconID:         expandSakuraCloudID(d, "icon_id"),
 		NetworkMaskLen: d.Get("nw_mask_len").(int),
 		BandWidthMbps:  d.Get("band_width").(int),
-	}
-}
-
-func expandInternetUpdateRequest(d *schema.ResourceData) *sacloud.InternetUpdateRequest {
-	return &sacloud.InternetUpdateRequest{
-		Name:        d.Get("name").(string),
-		Description: d.Get("description").(string),
-		Tags:        expandTags(d),
-		IconID:      expandSakuraCloudID(d, "icon_id"),
+		EnableIPv6:     d.Get("enable_ipv6").(bool),
+		Client:         internetBuilder.NewAPIClient(client),
 	}
 }

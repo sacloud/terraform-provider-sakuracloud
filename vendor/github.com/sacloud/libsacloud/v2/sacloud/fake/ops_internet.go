@@ -235,6 +235,8 @@ func (o *InternetOp) AddSubnet(ctx context.Context, zone string, id types.ID, pa
 		DefaultRoute:   sSubnet.DefaultRoute,
 		NetworkAddress: sSubnet.NetworkAddress,
 		NetworkMaskLen: sSubnet.NetworkMaskLen,
+		NextHop:        param.NextHop,
+		StaticRoute:    param.NextHop,
 	}
 	value.Switch.Subnets = append(value.Switch.Subnets, iSubnet)
 
