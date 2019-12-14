@@ -29,28 +29,45 @@ type filterSchemaOption struct {
 	excludeTags bool
 }
 
+var (
+	filterConfigKeys = []string{
+		"filters.0.id",
+		"filters.0.names",
+		"filters.0.conditions",
+	}
+	filterConfigKeysWithTags = append(filterConfigKeys, "filters.0.tags")
+)
+
 func filterSchema(opt *filterSchemaOption) *schema.Schema {
 	if opt == nil {
 		opt = &filterSchemaOption{}
 	}
+	keys := filterConfigKeysWithTags
+	if opt.excludeTags {
+		keys = filterConfigKeys
+	}
 	s := map[string]*schema.Schema{
 		"id": {
-			Type:     schema.TypeString,
-			Optional: true,
+			Type:         schema.TypeString,
+			Optional:     true,
+			ExactlyOneOf: keys,
 		},
 		"names": {
-			Type:     schema.TypeList,
-			Optional: true,
-			Elem:     &schema.Schema{Type: schema.TypeString},
+			Type:         schema.TypeList,
+			Optional:     true,
+			ExactlyOneOf: keys,
+			Elem:         &schema.Schema{Type: schema.TypeString},
 		},
 		"tags": {
-			Type:     schema.TypeList,
-			Optional: true,
-			Elem:     &schema.Schema{Type: schema.TypeString},
+			Type:         schema.TypeList,
+			Optional:     true,
+			ExactlyOneOf: keys,
+			Elem:         &schema.Schema{Type: schema.TypeString},
 		},
 		"conditions": {
-			Type:     schema.TypeList,
-			Optional: true,
+			Type:         schema.TypeList,
+			Optional:     true,
+			ExactlyOneOf: keys,
 			Elem: &schema.Resource{
 				Schema: map[string]*schema.Schema{
 					"name": {
