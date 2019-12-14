@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package nfs
+package query
 
 import (
 	"context"
@@ -25,11 +25,6 @@ import (
 	"github.com/sacloud/libsacloud/v2/sacloud/search/keys"
 	"github.com/sacloud/libsacloud/v2/sacloud/types"
 )
-
-// NoteFinder スタートアップスクリプト(Note)検索インターフェース
-type NoteFinder interface {
-	Find(ctx context.Context, conditions *sacloud.FindCondition) (*sacloud.NoteFindResult, error)
-}
 
 type nfsPlansEnvelope struct {
 	Plans *nfsPlans `json:"plans"`
@@ -60,10 +55,10 @@ func (p *nfsPlans) findPlanID(diskPlanID types.ID, size types.ENFSSize) types.ID
 	return types.ID(0)
 }
 
-func (p *nfsPlans) findByPlanID(planID types.ID) *PlanInfo {
+func (p *nfsPlans) findByPlanID(planID types.ID) *NFSPlanInfo {
 	for _, p := range p.HDD {
 		if p.PlanID == planID {
-			return &PlanInfo{
+			return &NFSPlanInfo{
 				NFSPlanID:  planID,
 				DiskPlanID: types.NFSPlans.HDD,
 				Size:       types.ENFSSize(p.Size),
@@ -72,7 +67,7 @@ func (p *nfsPlans) findByPlanID(planID types.ID) *PlanInfo {
 	}
 	for _, p := range p.SSD {
 		if p.PlanID == planID {
-			return &PlanInfo{
+			return &NFSPlanInfo{
 				NFSPlanID:  planID,
 				DiskPlanID: types.NFSPlans.SSD,
 				Size:       types.ENFSSize(p.Size),
@@ -121,15 +116,15 @@ func findNFSPlans(ctx context.Context, finder NoteFinder) (*nfsPlans, error) {
 	return pe.Plans, nil
 }
 
-// PlanInfo NFSプランIDに対応するプラン情報
-type PlanInfo struct {
+// NFSPlanInfo NFSプランIDに対応するプラン情報
+type NFSPlanInfo struct {
 	NFSPlanID  types.ID
 	Size       types.ENFSSize
 	DiskPlanID types.ID
 }
 
-// GetPlanInfo NFSプランIDから対応するプラン情報を取得
-func GetPlanInfo(ctx context.Context, finder NoteFinder, nfsPlanID types.ID) (*PlanInfo, error) {
+// GetNFSPlanInfo NFSプランIDから対応するプラン情報を取得
+func GetNFSPlanInfo(ctx context.Context, finder NoteFinder, nfsPlanID types.ID) (*NFSPlanInfo, error) {
 	plans, err := findNFSPlans(ctx, finder)
 	if err != nil {
 		return nil, err

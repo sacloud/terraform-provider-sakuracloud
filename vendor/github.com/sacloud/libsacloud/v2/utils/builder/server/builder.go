@@ -20,13 +20,12 @@ import (
 	"fmt"
 	"reflect"
 
-	"github.com/sacloud/libsacloud/v2/utils/builder"
-	"github.com/sacloud/libsacloud/v2/utils/builder/disk"
-
-	"github.com/sacloud/libsacloud/v2/utils/server"
-
 	"github.com/sacloud/libsacloud/v2/sacloud"
 	"github.com/sacloud/libsacloud/v2/sacloud/types"
+	"github.com/sacloud/libsacloud/v2/utils/builder"
+	"github.com/sacloud/libsacloud/v2/utils/builder/disk"
+	"github.com/sacloud/libsacloud/v2/utils/power"
+	"github.com/sacloud/libsacloud/v2/utils/query"
 )
 
 // Builder サーバ作成時のパラメータ
@@ -91,7 +90,7 @@ func (b *Builder) Validate(ctx context.Context, zone string) error {
 	}
 
 	// Field values
-	_, err := server.FindPlan(ctx, b.Client.ServerPlan, zone, &server.FindPlanRequest{
+	_, err := query.FindServerPlan(ctx, b.Client.ServerPlan, zone, &query.FindServerPlanRequest{
 		CPU:        b.CPU,
 		MemoryGB:   b.MemoryGB,
 		Commitment: b.Commitment,
@@ -152,19 +151,9 @@ func (b *Builder) Build(ctx context.Context, zone string) (*BuildResult, error) 
 
 	// bool
 	if b.BootAfterCreate {
-		if err := b.Client.Server.Boot(ctx, zone, server.ID); err != nil {
+		if err := power.BootServer(ctx, b.Client.Server, zone, server.ID); err != nil {
 			return nil, err
 		}
-		// wait
-		waiter := sacloud.WaiterForUp(func() (interface{}, error) {
-			return b.Client.Server.Read(ctx, zone, server.ID)
-		})
-
-		lastState, err := waiter.WaitForState(ctx)
-		if err != nil {
-			return nil, err
-		}
-		server = lastState.(*sacloud.Server)
 	}
 
 	b.ServerID = result.ServerID
@@ -231,13 +220,7 @@ func (b *Builder) Update(ctx context.Context, zone string) (*BuildResult, error)
 
 	// shutdown
 	if isNeedShutdown && server.InstanceStatus.IsUp() {
-		if err := b.Client.Server.Shutdown(ctx, zone, server.ID, &sacloud.ShutdownOption{Force: b.ForceShutdown}); err != nil {
-			return nil, err
-		}
-		waiter := sacloud.WaiterForDown(func() (interface{}, error) {
-			return b.Client.Server.Read(ctx, zone, server.ID)
-		})
-		if _, err := waiter.WaitForState(ctx); err != nil {
+		if err := power.ShutdownServer(ctx, b.Client.Server, zone, server.ID, b.ForceShutdown); err != nil {
 			return nil, err
 		}
 	}
@@ -294,15 +277,7 @@ func (b *Builder) Update(ctx context.Context, zone string) (*BuildResult, error)
 
 	// bool
 	if isNeedShutdown && server.InstanceStatus.IsDown() {
-		if err := b.Client.Server.Boot(ctx, zone, server.ID); err != nil {
-			return nil, err
-		}
-		// wait
-		waiter := sacloud.WaiterForUp(func() (interface{}, error) {
-			return b.Client.Server.Read(ctx, zone, server.ID)
-		})
-		_, err := waiter.WaitForState(ctx)
-		if err != nil {
+		if err := power.BootServer(ctx, b.Client.Server, zone, server.ID); err != nil {
 			return nil, err
 		}
 	}

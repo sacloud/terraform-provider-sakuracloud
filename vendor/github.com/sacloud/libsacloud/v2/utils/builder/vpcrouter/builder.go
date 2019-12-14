@@ -20,11 +20,11 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/sacloud/libsacloud/v2/utils/builder"
-
 	"github.com/sacloud/libsacloud/v2/sacloud"
 	"github.com/sacloud/libsacloud/v2/sacloud/accessor"
 	"github.com/sacloud/libsacloud/v2/sacloud/types"
+	"github.com/sacloud/libsacloud/v2/utils/builder"
+	"github.com/sacloud/libsacloud/v2/utils/power"
 	"github.com/sacloud/libsacloud/v2/utils/setup"
 )
 
@@ -224,7 +224,7 @@ func (b *Builder) Build(ctx context.Context, zone string) (*sacloud.VPCRouter, e
 			}
 
 			if b.SetupOptions.BootAfterBuild {
-				return b.Client.Boot(ctx, zone, id)
+				return power.BootVPCRouter(ctx, b.Client, zone, id)
 			}
 			return nil
 		},
@@ -282,7 +282,7 @@ func (b *Builder) Update(ctx context.Context, zone string, id types.ID) (*saclou
 	isNeedRestart := false
 	if vpcRouter.InstanceStatus.IsUp() && isNeedShutdown {
 		isNeedRestart = true
-		if err := b.shutdownVPCRouter(ctx, zone, id); err != nil {
+		if err := power.ShutdownVPCRouter(ctx, b.Client, zone, id, false); err != nil {
 			return nil, err
 		}
 	}
@@ -351,7 +351,7 @@ func (b *Builder) Update(ctx context.Context, zone string, id types.ID) (*saclou
 	}
 
 	if isNeedRestart {
-		if err := b.bootVPCRouter(ctx, zone, id); err != nil {
+		if err := power.BootVPCRouter(ctx, b.Client, zone, id); err != nil {
 			return nil, err
 		}
 	}
@@ -365,33 +365,6 @@ func (b *Builder) Update(ctx context.Context, zone string, id types.ID) (*saclou
 
 func (b *Builder) isStandardPlan() bool {
 	return b.PlanID != types.VPCRouterPlans.Standard
-}
-
-func (b *Builder) bootVPCRouter(ctx context.Context, zone string, id types.ID) error {
-	if err := b.Client.Boot(ctx, zone, id); err != nil {
-		return err
-	}
-	// wait for down
-	waiter := sacloud.WaiterForUp(func() (state interface{}, err error) {
-		return b.Client.Read(ctx, zone, id)
-	})
-	if _, err := waiter.WaitForState(ctx); err != nil {
-		return err
-	}
-	return nil
-}
-func (b *Builder) shutdownVPCRouter(ctx context.Context, zone string, id types.ID) error {
-	if err := b.Client.Shutdown(ctx, zone, id, &sacloud.ShutdownOption{Force: false}); err != nil {
-		return err
-	}
-	// wait for down
-	waiter := sacloud.WaiterForDown(func() (state interface{}, err error) {
-		return b.Client.Read(ctx, zone, id)
-	})
-	if _, err := waiter.WaitForState(ctx); err != nil {
-		return err
-	}
-	return nil
 }
 
 func (b *Builder) collectUpdateInfo(vpcRouter *sacloud.VPCRouter) (isNeedShutdown bool, err error) {

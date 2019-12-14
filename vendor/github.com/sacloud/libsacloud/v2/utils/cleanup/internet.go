@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package internet
+package cleanup
 
 import (
 	"context"
@@ -21,8 +21,8 @@ import (
 	"github.com/sacloud/libsacloud/v2/sacloud/types"
 )
 
-// Delete スイッチ+ルータの削除 IPv6の無効化やサブネットの削除を一括して行う
-func Delete(ctx context.Context, client sacloud.InternetAPI, zone string, id types.ID) error {
+// DeleteInternet スイッチ+ルータの削除 IPv6の無効化やサブネットの削除を一括して行う
+func DeleteInternet(ctx context.Context, client sacloud.InternetAPI, zone string, id types.ID) error {
 	internet, err := client.Read(ctx, zone, id)
 	if err != nil {
 		return err

@@ -23,6 +23,7 @@ import (
 	"github.com/sacloud/libsacloud/v2/sacloud"
 	"github.com/sacloud/libsacloud/v2/sacloud/accessor"
 	"github.com/sacloud/libsacloud/v2/sacloud/types"
+	"github.com/sacloud/libsacloud/v2/utils/power"
 	"github.com/sacloud/libsacloud/v2/utils/setup"
 )
 
@@ -253,7 +254,7 @@ func resourceSakuraCloudLoadBalancerDelete(d *schema.ResourceData, meta interfac
 		return fmt.Errorf("could not read SakuraCloud LoadBalancer[%s]: %s", d.Id(), err)
 	}
 
-	if err := shutdownLoadBalancerSync(ctx, lbOp, zone, lb.ID, true); err != nil {
+	if err := power.ShutdownLoadBalancer(ctx, lbOp, zone, lb.ID, true); err != nil {
 		return err
 	}
 

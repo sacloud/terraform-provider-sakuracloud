@@ -12,20 +12,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package sim
+package cleanup
 
 import (
 	"context"
-	"fmt"
-	"net/http"
 
 	"github.com/sacloud/libsacloud/v2/sacloud"
 	"github.com/sacloud/libsacloud/v2/sacloud/types"
+	"github.com/sacloud/libsacloud/v2/utils/query"
 )
 
-// Delete SIMの無効化&削除
-func Delete(ctx context.Context, client sacloud.SIMAPI, id types.ID) error {
-	sim, err := FindByID(ctx, client, id)
+// DeleteSIM SIMの無効化&削除
+func DeleteSIM(ctx context.Context, client sacloud.SIMAPI, id types.ID) error {
+	sim, err := query.FindSIMByID(ctx, client, id)
 	if err != nil {
 		return err
 	}
@@ -35,25 +34,4 @@ func Delete(ctx context.Context, client sacloud.SIMAPI, id types.ID) error {
 		}
 	}
 	return client.Delete(ctx, id)
-}
-
-// FindByID SIM+詳細情報をIDから検索
-func FindByID(ctx context.Context, client sacloud.SIMAPI, id types.ID) (*sacloud.SIM, error) {
-	var sim *sacloud.SIM
-	searched, err := client.Find(ctx, &sacloud.FindCondition{
-		Include: []string{"*", "Status.sim"},
-	})
-	if err != nil {
-		return nil, fmt.Errorf("could not find SakuraCloud SIM[%s]: %s", id, err)
-	}
-	for _, s := range searched.SIMs {
-		if s.ID == id {
-			sim = s
-			break
-		}
-	}
-	if sim == nil {
-		return nil, sacloud.NewAPIError(http.MethodGet, nil, "", http.StatusNotFound, nil)
-	}
-	return sim, nil
 }

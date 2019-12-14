@@ -22,7 +22,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/helper/validation"
 	"github.com/sacloud/libsacloud/v2/sacloud"
 	"github.com/sacloud/libsacloud/v2/sacloud/types"
-	internetUtil "github.com/sacloud/libsacloud/v2/utils/internet"
+	"github.com/sacloud/libsacloud/v2/utils/cleanup"
 )
 
 func resourceSakuraCloudInternet() *schema.Resource {
@@ -190,7 +190,7 @@ func resourceSakuraCloudInternetDelete(d *schema.ResourceData, meta interface{})
 		return fmt.Errorf("waiting deletion is failed: Internet[%s] still used by others: %s", internet.ID, err)
 	}
 
-	if err := internetUtil.Delete(ctx, internetOp, zone, internet.ID); err != nil {
+	if err := cleanup.DeleteInternet(ctx, internetOp, zone, internet.ID); err != nil {
 		return fmt.Errorf("deleting SakuraCloud Internet[%s] is failed: %s", d.Id(), err)
 	}
 	return nil

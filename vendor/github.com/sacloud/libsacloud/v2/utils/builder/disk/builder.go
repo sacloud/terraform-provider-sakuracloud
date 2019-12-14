@@ -25,7 +25,7 @@ import (
 	"github.com/sacloud/libsacloud/v2/sacloud"
 	"github.com/sacloud/libsacloud/v2/sacloud/ostype"
 	"github.com/sacloud/libsacloud/v2/sacloud/types"
-	archiveUtil "github.com/sacloud/libsacloud/v2/utils/archive"
+	archiveUtil "github.com/sacloud/libsacloud/v2/utils/query"
 )
 
 // Builder ディスクの構築インターフェース
@@ -141,7 +141,7 @@ func (d *FromUnixBuilder) updateDiskParameter() *sacloud.DiskUpdateRequest {
 }
 
 func (d *FromUnixBuilder) createDiskParameter(ctx context.Context, client *APIClient, zone string, serverID types.ID) (*sacloud.DiskCreateRequest, *sacloud.DiskEditRequest, error) {
-	archive, err := archiveUtil.FindByOSType(ctx, client.Archive, zone, d.OSType)
+	archive, err := archiveUtil.FindArchiveByOSType(ctx, client.Archive, zone, d.OSType)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -248,7 +248,7 @@ func (d *FromFixedArchiveBuilder) updateDiskParameter() *sacloud.DiskUpdateReque
 }
 
 func (d *FromFixedArchiveBuilder) createDiskParameter(ctx context.Context, client *APIClient, zone string, serverID types.ID) (*sacloud.DiskCreateRequest, *sacloud.DiskEditRequest, error) {
-	archive, err := archiveUtil.FindByOSType(ctx, client.Archive, zone, d.OSType)
+	archive, err := archiveUtil.FindArchiveByOSType(ctx, client.Archive, zone, d.OSType)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -334,7 +334,7 @@ func (d *FromWindowsBuilder) updateDiskParameter() *sacloud.DiskUpdateRequest {
 }
 
 func (d *FromWindowsBuilder) createDiskParameter(ctx context.Context, client *APIClient, zone string, serverID types.ID) (*sacloud.DiskCreateRequest, *sacloud.DiskEditRequest, error) {
-	archive, err := archiveUtil.FindByOSType(ctx, client.Archive, zone, d.OSType)
+	archive, err := archiveUtil.FindArchiveByOSType(ctx, client.Archive, zone, d.OSType)
 	if err != nil {
 		return nil, nil, err
 	}

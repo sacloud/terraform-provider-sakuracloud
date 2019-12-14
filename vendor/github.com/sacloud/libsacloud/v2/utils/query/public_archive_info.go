@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package archive
+package query
 
 import (
 	"context"
@@ -22,30 +22,6 @@ import (
 	"github.com/sacloud/libsacloud/v2/sacloud"
 	"github.com/sacloud/libsacloud/v2/sacloud/types"
 )
-
-// SourceInfoReader アーカイブソースを取得するためのインターフェース
-type SourceInfoReader struct {
-	ArchiveReader SourceArchiveReader
-	DiskReader    SourceDiskReader
-}
-
-// NewSourceInfoReader デフォルトのリーダーを返す
-func NewSourceInfoReader(caller sacloud.APICaller) *SourceInfoReader {
-	return &SourceInfoReader{
-		ArchiveReader: sacloud.NewArchiveOp(caller),
-		DiskReader:    sacloud.NewDiskOp(caller),
-	}
-}
-
-// SourceArchiveReader アーカイブ参照インターフェース
-type SourceArchiveReader interface {
-	Read(ctx context.Context, zone string, id types.ID) (*sacloud.Archive, error)
-}
-
-// SourceDiskReader ディスク参照インターフェース
-type SourceDiskReader interface {
-	Read(ctx context.Context, zone string, id types.ID) (*sacloud.Disk, error)
-}
 
 var (
 	// allowDiskEditTags ディスクの編集可否判定に用いるタグ
@@ -67,7 +43,7 @@ func isSophosUTM(archive *sacloud.Archive) bool {
 }
 
 // CanEditDisk ディスクの修正が可能か判定
-func CanEditDisk(ctx context.Context, zone string, reader *SourceInfoReader, id types.ID) (bool, error) {
+func CanEditDisk(ctx context.Context, zone string, reader *ArchiveSourceReader, id types.ID) (bool, error) {
 	archive, err := getPublicArchiveFromAncestors(ctx, zone, reader, id)
 	if err != nil {
 		return false, err
@@ -76,7 +52,7 @@ func CanEditDisk(ctx context.Context, zone string, reader *SourceInfoReader, id 
 }
 
 // GetPublicArchiveIDFromAncestors ソースアーカイブ/ディスクを辿りパブリックアーカイブのIDを検索
-func GetPublicArchiveIDFromAncestors(ctx context.Context, zone string, reader *SourceInfoReader, id types.ID) (types.ID, error) {
+func GetPublicArchiveIDFromAncestors(ctx context.Context, zone string, reader *ArchiveSourceReader, id types.ID) (types.ID, error) {
 	archive, err := getPublicArchiveFromAncestors(ctx, zone, reader, id)
 	if err != nil {
 		return 0, err
@@ -87,7 +63,7 @@ func GetPublicArchiveIDFromAncestors(ctx context.Context, zone string, reader *S
 	return archive.ID, nil
 }
 
-func getPublicArchiveFromAncestors(ctx context.Context, zone string, reader *SourceInfoReader, id types.ID) (*sacloud.Archive, error) {
+func getPublicArchiveFromAncestors(ctx context.Context, zone string, reader *ArchiveSourceReader, id types.ID) (*sacloud.Archive, error) {
 	disk, err := reader.DiskReader.Read(ctx, zone, id)
 	if err != nil {
 		if !sacloud.IsNotFoundError(err) {

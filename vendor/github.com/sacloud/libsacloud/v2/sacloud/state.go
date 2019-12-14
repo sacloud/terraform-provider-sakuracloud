@@ -153,7 +153,7 @@ func (w *StatePollingWaiter) WaitForState(ctx context.Context) (interface{}, err
 	for {
 		select {
 		case <-ctx.Done():
-			return nil, errors.New("WaitForState is canceled")
+			return nil, ctx.Err()
 		case lastState := <-c:
 			return lastState, nil
 		case <-p:
@@ -178,11 +178,14 @@ func (w *StatePollingWaiter) AsyncWaitForState(ctx context.Context) (compCh <-ch
 	bomb := time.After(w.Timeout)
 
 	go func() {
+		defer close(compChan)
+		defer close(progChan)
+		defer close(errChan)
 		notFoundCounter := w.NotFoundRetry
 		for {
 			select {
 			case <-ctx.Done():
-				errChan <- errors.New("AsyncWaitForState is canceled")
+				errChan <- fmt.Errorf("AsyncWaitForState is canceled: %s", ctx.Err())
 				return
 			case <-tick:
 				state, err := w.ReadFunc()
