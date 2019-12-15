@@ -89,7 +89,7 @@ func expandMobileGatewayDNSSetting(d resourceValueGettable) *sacloud.MobileGatew
 }
 
 func expandMobileGatewayPrivateNetworks(d resourceValueGettable) *mobileGatewayBuilder.PrivateInterfaceSetting {
-	if raw, ok := d.Get("private_interface").([]interface{}); ok && len(raw) > 0 {
+	if raw, ok := d.Get("network_interface").([]interface{}); ok && len(raw) > 0 {
 		d := mapToResourceData(raw[0].(map[string]interface{}))
 		return &mobileGatewayBuilder.PrivateInterfaceSetting{
 			SwitchID:       expandSakuraCloudID(d, "switch_id"),
@@ -122,15 +122,18 @@ func flattenMobileGatewayPrivateNetworks(mgw *sacloud.MobileGateway) []interface
 	return nil
 }
 
-func flattenMobileGatewayPublicNetworks(mgw *sacloud.MobileGateway) []interface{} {
-	var results []interface{}
+func flattenMobileGatewayPublicNetmask(mgw *sacloud.MobileGateway) int {
 	if len(mgw.Interfaces) > 0 {
-		results = append(results, map[string]interface{}{
-			"ipaddress":   mgw.Interfaces[0].IPAddress,
-			"nw_mask_len": mgw.Interfaces[0].SubnetNetworkMaskLen,
-		})
+		return mgw.Interfaces[0].SubnetNetworkMaskLen
 	}
-	return results
+	return 0
+}
+
+func flattenMobileGatewayPublicIPAddress(mgw *sacloud.MobileGateway) string {
+	if len(mgw.Interfaces) > 0 {
+		return mgw.Interfaces[0].IPAddress
+	}
+	return ""
 }
 
 func expandMobileGatewaySIMRoutes(d resourceValueGettable) []*mobileGatewayBuilder.SIMRouteSetting {
@@ -203,7 +206,7 @@ func flattenMobileGatewayTrafficConfigs(tc *sacloud.MobileGatewayTrafficControl)
 
 func expandMobileGatewayStaticRoutes(d resourceValueGettable) []*sacloud.MobileGatewayStaticRoute {
 	var routes []*sacloud.MobileGatewayStaticRoute
-	if staticRoutes, ok := d.Get("static_routes").([]interface{}); ok && len(staticRoutes) > 0 {
+	if staticRoutes, ok := d.Get("static_route").([]interface{}); ok && len(staticRoutes) > 0 {
 		for _, v := range staticRoutes {
 			route := expandMobileGatewayStaticRoute(&resourceMapValue{v.(map[string]interface{})})
 			routes = append(routes, route)

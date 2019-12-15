@@ -101,48 +101,48 @@ func TestAccResourceSakuraCloudVPCRouter_Full(t *testing.T) {
 				Check: resource.ComposeTestCheckFunc(
 					testCheckSakuraCloudVPCRouterExists(resourceName, &vpcRouter),
 					resource.TestCheckResourceAttr(resourceName, "name", rand),
-					resource.TestCheckResourceAttr(resourceName, "interfaces.#", "1"),
-					resource.TestCheckResourceAttr(resourceName, "interfaces.0.vip", "192.168.11.1"),
-					resource.TestCheckResourceAttr(resourceName, "interfaces.0.ipaddresses.#", "2"),
-					resource.TestCheckResourceAttr(resourceName, "interfaces.0.ipaddresses.0", "192.168.11.2"),
-					resource.TestCheckResourceAttr(resourceName, "interfaces.0.ipaddresses.1", "192.168.11.3"),
-					resource.TestCheckResourceAttr(resourceName, "interfaces.0.nw_mask_len", "24"),
-					resource.TestCheckResourceAttr(resourceName, "dhcp_servers.#", "1"),
-					resource.TestCheckResourceAttr(resourceName, "dhcp_servers.0.interface_index", "1"),
-					resource.TestCheckResourceAttr(resourceName, "dhcp_servers.0.range_start", "192.168.11.11"),
-					resource.TestCheckResourceAttr(resourceName, "dhcp_servers.0.range_stop", "192.168.11.20"),
-					resource.TestCheckResourceAttr(resourceName, "dhcp_servers.0.dns_servers.#", "2"),
-					resource.TestCheckResourceAttr(resourceName, "dhcp_servers.0.dns_servers.0", "8.8.8.8"),
-					resource.TestCheckResourceAttr(resourceName, "dhcp_servers.0.dns_servers.1", "8.8.4.4"),
-					resource.TestCheckResourceAttr(resourceName, "dhcp_static_mappings.#", "1"),
-					resource.TestCheckResourceAttr(resourceName, "dhcp_static_mappings.0.ipaddress", "192.168.11.10"),
-					resource.TestCheckResourceAttr(resourceName, "dhcp_static_mappings.0.macaddress", "aa:bb:cc:aa:bb:cc"),
-					resource.TestCheckResourceAttr(resourceName, "firewalls.#", "1"),
-					resource.TestCheckResourceAttr(resourceName, "firewalls.0.interface_index", "1"),
-					resource.TestCheckResourceAttr(resourceName, "firewalls.0.direction", "send"),
-					resource.TestCheckResourceAttr(resourceName, "firewalls.0.expressions.#", "2"),
-					resource.TestCheckResourceAttr(resourceName, "firewalls.0.expressions.0.protocol", "tcp"),
-					resource.TestCheckResourceAttr(resourceName, "firewalls.0.expressions.0.allow", "true"),
-					resource.TestCheckResourceAttr(resourceName, "firewalls.0.expressions.0.source_network", ""),
-					resource.TestCheckResourceAttr(resourceName, "firewalls.0.expressions.0.source_port", "80"),
-					resource.TestCheckResourceAttr(resourceName, "firewalls.0.expressions.0.destination_network", ""),
-					resource.TestCheckResourceAttr(resourceName, "firewalls.0.expressions.0.destination_port", ""),
-					resource.TestCheckResourceAttr(resourceName, "firewalls.0.expressions.1.protocol", "ip"),
-					resource.TestCheckResourceAttr(resourceName, "firewalls.0.expressions.1.allow", "false"),
-					resource.TestCheckResourceAttr(resourceName, "firewalls.0.expressions.1.source_network", ""),
-					resource.TestCheckResourceAttr(resourceName, "firewalls.0.expressions.1.source_port", ""),
-					resource.TestCheckResourceAttr(resourceName, "firewalls.0.expressions.1.destination_network", ""),
-					resource.TestCheckResourceAttr(resourceName, "firewalls.0.expressions.1.destination_port", ""),
+					resource.TestCheckResourceAttr(resourceName, "network_interface.#", "1"),
+					resource.TestCheckResourceAttr(resourceName, "network_interface.0.vip", "192.168.11.1"),
+					resource.TestCheckResourceAttr(resourceName, "network_interface.0.ipaddresses.#", "2"),
+					resource.TestCheckResourceAttr(resourceName, "network_interface.0.ipaddresses.0", "192.168.11.2"),
+					resource.TestCheckResourceAttr(resourceName, "network_interface.0.ipaddresses.1", "192.168.11.3"),
+					resource.TestCheckResourceAttr(resourceName, "network_interface.0.nw_mask_len", "24"),
+					resource.TestCheckResourceAttr(resourceName, "dhcp_server.#", "1"),
+					resource.TestCheckResourceAttr(resourceName, "dhcp_server.0.interface_index", "1"),
+					resource.TestCheckResourceAttr(resourceName, "dhcp_server.0.range_start", "192.168.11.11"),
+					resource.TestCheckResourceAttr(resourceName, "dhcp_server.0.range_stop", "192.168.11.20"),
+					resource.TestCheckResourceAttr(resourceName, "dhcp_server.0.dns_servers.#", "2"),
+					resource.TestCheckResourceAttr(resourceName, "dhcp_server.0.dns_servers.0", "8.8.8.8"),
+					resource.TestCheckResourceAttr(resourceName, "dhcp_server.0.dns_servers.1", "8.8.4.4"),
+					resource.TestCheckResourceAttr(resourceName, "dhcp_static_mapping.#", "1"),
+					resource.TestCheckResourceAttr(resourceName, "dhcp_static_mapping.0.ipaddress", "192.168.11.10"),
+					resource.TestCheckResourceAttr(resourceName, "dhcp_static_mapping.0.macaddress", "aa:bb:cc:aa:bb:cc"),
+					resource.TestCheckResourceAttr(resourceName, "firewall.#", "1"),
+					resource.TestCheckResourceAttr(resourceName, "firewall.0.interface_index", "1"),
+					resource.TestCheckResourceAttr(resourceName, "firewall.0.direction", "send"),
+					resource.TestCheckResourceAttr(resourceName, "firewall.0.expression.#", "2"),
+					resource.TestCheckResourceAttr(resourceName, "firewall.0.expression.0.protocol", "tcp"),
+					resource.TestCheckResourceAttr(resourceName, "firewall.0.expression.0.allow", "true"),
+					resource.TestCheckResourceAttr(resourceName, "firewall.0.expression.0.source_network", ""),
+					resource.TestCheckResourceAttr(resourceName, "firewall.0.expression.0.source_port", "80"),
+					resource.TestCheckResourceAttr(resourceName, "firewall.0.expression.0.destination_network", ""),
+					resource.TestCheckResourceAttr(resourceName, "firewall.0.expression.0.destination_port", ""),
+					resource.TestCheckResourceAttr(resourceName, "firewall.0.expression.1.protocol", "ip"),
+					resource.TestCheckResourceAttr(resourceName, "firewall.0.expression.1.allow", "false"),
+					resource.TestCheckResourceAttr(resourceName, "firewall.0.expression.1.source_network", ""),
+					resource.TestCheckResourceAttr(resourceName, "firewall.0.expression.1.source_port", ""),
+					resource.TestCheckResourceAttr(resourceName, "firewall.0.expression.1.destination_network", ""),
+					resource.TestCheckResourceAttr(resourceName, "firewall.0.expression.1.destination_port", ""),
 					resource.TestCheckResourceAttr(resourceName, "l2tp.#", "1"),
 					resource.TestCheckResourceAttr(resourceName, "l2tp.0.pre_shared_secret", "example"),
 					resource.TestCheckResourceAttr(resourceName, "l2tp.0.range_start", "192.168.11.21"),
 					resource.TestCheckResourceAttr(resourceName, "l2tp.0.range_stop", "192.168.11.30"),
-					resource.TestCheckResourceAttr(resourceName, "port_forwardings.#", "1"),
-					resource.TestCheckResourceAttr(resourceName, "port_forwardings.0.protocol", "udp"),
-					resource.TestCheckResourceAttr(resourceName, "port_forwardings.0.global_port", "10022"),
-					resource.TestCheckResourceAttr(resourceName, "port_forwardings.0.private_address", "192.168.11.11"),
-					resource.TestCheckResourceAttr(resourceName, "port_forwardings.0.private_port", "22"),
-					resource.TestCheckResourceAttr(resourceName, "port_forwardings.0.description", "desc"),
+					resource.TestCheckResourceAttr(resourceName, "port_forwarding.#", "1"),
+					resource.TestCheckResourceAttr(resourceName, "port_forwarding.0.protocol", "udp"),
+					resource.TestCheckResourceAttr(resourceName, "port_forwarding.0.global_port", "10022"),
+					resource.TestCheckResourceAttr(resourceName, "port_forwarding.0.private_address", "192.168.11.11"),
+					resource.TestCheckResourceAttr(resourceName, "port_forwarding.0.private_port", "22"),
+					resource.TestCheckResourceAttr(resourceName, "port_forwarding.0.description", "desc"),
 					resource.TestCheckResourceAttr(resourceName, "pptp.#", "1"),
 					resource.TestCheckResourceAttr(resourceName, "pptp.0.range_start", "192.168.11.31"),
 					resource.TestCheckResourceAttr(resourceName, "pptp.0.range_stop", "192.168.11.40"),
@@ -160,12 +160,12 @@ func TestAccResourceSakuraCloudVPCRouter_Full(t *testing.T) {
 						"sakuracloud_internet.foobar", "ipaddresses.3"),
 					resource.TestCheckResourceAttr(resourceName, "static_nat.0.private_address", "192.168.11.12"),
 					resource.TestCheckResourceAttr(resourceName, "static_nat.0.description", "desc"),
-					resource.TestCheckResourceAttr(resourceName, "static_routes.#", "1"),
-					resource.TestCheckResourceAttr(resourceName, "static_routes.0.prefix", "172.16.0.0/16"),
-					resource.TestCheckResourceAttr(resourceName, "static_routes.0.next_hop", "192.168.11.99"),
-					resource.TestCheckResourceAttr(resourceName, "users.#", "1"),
-					resource.TestCheckResourceAttr(resourceName, "users.0.name", "username"),
-					resource.TestCheckResourceAttr(resourceName, "users.0.password", "password"),
+					resource.TestCheckResourceAttr(resourceName, "static_route.#", "1"),
+					resource.TestCheckResourceAttr(resourceName, "static_route.0.prefix", "172.16.0.0/16"),
+					resource.TestCheckResourceAttr(resourceName, "static_route.0.next_hop", "192.168.11.99"),
+					resource.TestCheckResourceAttr(resourceName, "user.#", "1"),
+					resource.TestCheckResourceAttr(resourceName, "user.0.name", "username"),
+					resource.TestCheckResourceAttr(resourceName, "user.0.password", "password"),
 				),
 			},
 			{
@@ -173,17 +173,17 @@ func TestAccResourceSakuraCloudVPCRouter_Full(t *testing.T) {
 				Check: resource.ComposeTestCheckFunc(
 					testCheckSakuraCloudVPCRouterExists(resourceName, &vpcRouter),
 					resource.TestCheckResourceAttr(resourceName, "name", rand+"-upd"),
-					resource.TestCheckNoResourceAttr(resourceName, "interfaces"),
-					resource.TestCheckNoResourceAttr(resourceName, "dhcp_servers"),
-					resource.TestCheckNoResourceAttr(resourceName, "dhcp_static_mappings"),
-					resource.TestCheckNoResourceAttr(resourceName, "firewalls"),
+					resource.TestCheckNoResourceAttr(resourceName, "network_interface"),
+					resource.TestCheckNoResourceAttr(resourceName, "dhcp_server"),
+					resource.TestCheckNoResourceAttr(resourceName, "dhcp_static_mapping"),
+					resource.TestCheckNoResourceAttr(resourceName, "firewall"),
 					resource.TestCheckNoResourceAttr(resourceName, "l2tp"),
-					resource.TestCheckNoResourceAttr(resourceName, "port_forwardings"),
+					resource.TestCheckNoResourceAttr(resourceName, "port_forwarding"),
 					resource.TestCheckNoResourceAttr(resourceName, "pptp"),
 					resource.TestCheckNoResourceAttr(resourceName, "site_to_site_vpn"),
 					resource.TestCheckNoResourceAttr(resourceName, "static_nat"),
-					resource.TestCheckNoResourceAttr(resourceName, "static_routes"),
-					resource.TestCheckNoResourceAttr(resourceName, "users"),
+					resource.TestCheckNoResourceAttr(resourceName, "static_route"),
+					resource.TestCheckNoResourceAttr(resourceName, "user"),
 				),
 			},
 		},
@@ -289,7 +289,7 @@ resource "sakuracloud_vpc_router" "foobar" {
   aliases    = [sakuracloud_internet.foobar.ipaddresses[3]]
   vrid       = 1
 
-  interfaces {
+  network_interface {
     index       = 1
     switch_id   = sakuracloud_switch.foobar.id
     vip         = "192.168.11.1"
@@ -297,7 +297,7 @@ resource "sakuracloud_vpc_router" "foobar" {
     nw_mask_len = 24 
   }
 
-  dhcp_servers {
+  dhcp_server {
     interface_index = 1
 
     range_start = "192.168.11.11"
@@ -305,16 +305,16 @@ resource "sakuracloud_vpc_router" "foobar" {
     dns_servers = ["8.8.8.8", "8.8.4.4"]
   }
 
-  dhcp_static_mappings {
+  dhcp_static_mapping {
     ipaddress  = "192.168.11.10"
     macaddress = "aa:bb:cc:aa:bb:cc"
   }
 
-  firewalls {
+  firewall {
     interface_index = 1
 
     direction = "send"
-    expressions {
+    expression {
         protocol            = "tcp"
         source_network      = ""
         source_port         = "80"
@@ -325,7 +325,7 @@ resource "sakuracloud_vpc_router" "foobar" {
         description         = "desc"
     }
 
-    expressions {
+    expression {
         protocol            = "ip"
         source_network      = ""
         source_port         = ""
@@ -343,7 +343,7 @@ resource "sakuracloud_vpc_router" "foobar" {
     range_stop        = "192.168.11.30"
   }
 
-  port_forwardings {
+  port_forwarding {
     protocol        = "udp"
     global_port     = 10022
     private_address = "192.168.11.11"
@@ -370,12 +370,12 @@ resource "sakuracloud_vpc_router" "foobar" {
     description     = "desc"
   }
 
-  static_routes {
+  static_route {
     prefix   = "172.16.0.0/16"
     next_hop = "192.168.11.99"
   }
 
-  users {
+  user {
     name     = "username"
     password = "password"
   }

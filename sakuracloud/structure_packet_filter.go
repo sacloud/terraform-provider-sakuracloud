@@ -30,7 +30,7 @@ func expandPacketFilterCreateRequest(d *schema.ResourceData) *sacloud.PacketFilt
 
 func expandPacketFilterUpdateRequest(d *schema.ResourceData, pf *sacloud.PacketFilter) *sacloud.PacketFilterUpdateRequest {
 	expressions := pf.Expression
-	if d.HasChange("expressions") {
+	if d.HasChange("expression") {
 		expressions = expandPacketFilterExpressions(d)
 	}
 
@@ -43,7 +43,7 @@ func expandPacketFilterUpdateRequest(d *schema.ResourceData, pf *sacloud.PacketF
 
 func expandPacketFilterExpressions(d resourceValueGettable) []*sacloud.PacketFilterExpression {
 	var expressions []*sacloud.PacketFilterExpression
-	for _, e := range d.Get("expressions").([]interface{}) {
+	for _, e := range d.Get("expression").([]interface{}) {
 		expressions = append(expressions, expandPacketFilterExpression(&resourceMapValue{value: e.(map[string]interface{})}))
 	}
 	return expressions

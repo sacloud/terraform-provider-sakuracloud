@@ -109,7 +109,7 @@ func resourceSakuraCloudLoadBalancer() *schema.Resource {
 				Description:  "target SakuraCloud zone",
 				ValidateFunc: validateZone([]string{"is1a", "is1b", "tk1a", "tk1v"}),
 			},
-			"vips": {
+			"vip": {
 				Type:     schema.TypeList,
 				Optional: true,
 				Computed: true,
@@ -139,7 +139,7 @@ func resourceSakuraCloudLoadBalancer() *schema.Resource {
 							Type:     schema.TypeString,
 							Optional: true,
 						},
-						"servers": {
+						"server": {
 							Type:     schema.TypeList,
 							Optional: true,
 							Computed: true,
@@ -287,7 +287,7 @@ func setLoadBalancerResourceData(ctx context.Context, d *schema.ResourceData, cl
 	if err := d.Set("tags", data.Tags); err != nil {
 		return err
 	}
-	if err := d.Set("vips", flattenLoadBalancerVIPs(data)); err != nil {
+	if err := d.Set("vip", flattenLoadBalancerVIPs(data)); err != nil {
 		return err
 	}
 	d.Set("zone", getZone(d, client))

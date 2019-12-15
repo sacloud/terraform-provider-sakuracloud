@@ -22,7 +22,7 @@ import (
 
 func expandLoadBalancerVIPs(d resourceValueGettable) []*sacloud.LoadBalancerVirtualIPAddress {
 	var vips []*sacloud.LoadBalancerVirtualIPAddress
-	vipsConf := d.Get("vips").([]interface{})
+	vipsConf := d.Get("vip").([]interface{})
 	for _, vip := range vipsConf {
 		v := &resourceMapValue{vip.(map[string]interface{})}
 		vips = append(vips, expandLoadBalancerVIP(v))
@@ -56,13 +56,13 @@ func flattenLoadBalancerVIP(vip *sacloud.LoadBalancerVirtualIPAddress) interface
 		"port":         vip.Port.Int(),
 		"delay_loop":   vip.DelayLoop.Int(),
 		"sorry_server": vip.SorryServer,
-		"servers":      flattenLoadBalancerServers(vip.Servers),
+		"server":       flattenLoadBalancerServers(vip.Servers),
 	}
 }
 
 func expandLoadBalancerServers(d resourceValueGettable, vipPort int) []*sacloud.LoadBalancerServer {
 	var servers []*sacloud.LoadBalancerServer
-	for _, v := range d.Get("servers").([]interface{}) {
+	for _, v := range d.Get("server").([]interface{}) {
 		data := &resourceMapValue{v.(map[string]interface{})}
 		server := expandLoadBalancerServer(data, vipPort)
 		servers = append(servers, server)

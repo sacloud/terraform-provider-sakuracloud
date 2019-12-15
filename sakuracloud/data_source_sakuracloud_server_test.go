@@ -41,8 +41,8 @@ func TestAccSakuraCloudDataSourceServer_basic(t *testing.T) {
 					resource.TestCheckResourceAttr(resourceName, "tags.2", "tag3"),
 					resource.TestCheckResourceAttr(resourceName, "core", "1"),
 					resource.TestCheckResourceAttr(resourceName, "memory", "1"),
-					resource.TestCheckResourceAttr(resourceName, "interfaces.0.upstream", "shared"),
-					resource.TestCheckResourceAttr(resourceName, "interfaces.#", "1"),
+					resource.TestCheckResourceAttr(resourceName, "network_interface.0.upstream", "shared"),
+					resource.TestCheckResourceAttr(resourceName, "network_interface.#", "1"),
 				),
 			},
 		},
@@ -54,7 +54,7 @@ resource "sakuracloud_server" "foobar" {
   name        = "{{ .arg0 }}"
   description = "description"
   tags        = ["tag1", "tag2", "tag3"]
-  interfaces {
+  network_interface {
     upstream = "shared"
   }
 

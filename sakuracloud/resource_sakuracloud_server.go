@@ -76,7 +76,7 @@ func resourceSakuraCloudServer() *schema.Resource {
 					types.InterfaceDrivers.E1000.String(),
 				}, false),
 			},
-			"interfaces": {
+			"network_interface": {
 				Type:     schema.TypeList,
 				Optional: true,
 				MaxItems: 10,
@@ -313,7 +313,7 @@ func setServerResourceData(ctx context.Context, d *schema.ResourceData, client *
 	d.Set("interface_driver", data.InterfaceDriver.String())
 	d.Set("private_host_id", data.PrivateHostID.String())
 	d.Set("private_host_name", data.PrivateHostName)
-	if err := d.Set("interfaces", flattenServerNICs(data)); err != nil {
+	if err := d.Set("network_interface", flattenServerNICs(data)); err != nil {
 		return err
 	}
 	d.Set("icon_id", data.IconID.String())
@@ -334,7 +334,7 @@ func setServerResourceData(ctx context.Context, d *schema.ResourceData, client *
 
 func isServerDiskConfigChanged(d *schema.ResourceData) bool {
 	return d.HasChange("disks") ||
-		d.HasChange("interfaces") ||
+		d.HasChange("network_interface") ||
 		d.HasChange("ipaddress") ||
 		d.HasChange("gateway") ||
 		d.HasChange("nw_mask_len") ||

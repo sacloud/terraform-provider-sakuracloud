@@ -90,7 +90,7 @@ func resourceSakuraCloudGSLB() *schema.Resource {
 				Type:     schema.TypeString,
 				Optional: true,
 			},
-			"servers": {
+			"server": {
 				Type:     schema.TypeList,
 				Optional: true,
 				Computed: true,
@@ -211,7 +211,7 @@ func setGSLBResourceData(ctx context.Context, d *schema.ResourceData, client *AP
 	if err := d.Set("health_check", flattenGSLBHealthCheck(data)); err != nil {
 		return err
 	}
-	if err := d.Set("servers", flattenGSLBServers(data)); err != nil {
+	if err := d.Set("server", flattenGSLBServers(data)); err != nil {
 		return err
 	}
 	return nil

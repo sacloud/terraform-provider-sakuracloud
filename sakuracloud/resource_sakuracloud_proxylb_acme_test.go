@@ -66,15 +66,15 @@ resource "sakuracloud_proxylb" "foobar" {
     host_header = "usacloud.jp"
     path        = "/"
   }
-  bind_ports {
+  bind_port {
     proxy_mode = "http"
     port       = 80
   }
-  bind_ports {
+  bind_port {
     proxy_mode = "https"
     port       = 443
   }
-  servers {
+  server {
     ipaddress = sakuracloud_server.foobar.ipaddress
     port      = 80
   }

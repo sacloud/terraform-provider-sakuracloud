@@ -34,12 +34,12 @@ func TestAccSakuraCloudDataSourcePacketFilter_basic(t *testing.T) {
 					testCheckSakuraCloudDataSourceExists(resourceName),
 					resource.TestCheckResourceAttr(resourceName, "name", rand),
 					resource.TestCheckResourceAttr(resourceName, "description", "description"),
-					resource.TestCheckResourceAttr(resourceName, "expressions.#", "2"),
-					resource.TestCheckResourceAttr(resourceName, "expressions.0.protocol", "tcp"),
-					resource.TestCheckResourceAttr(resourceName, "expressions.0.source_network", "0.0.0.0/0"),
-					resource.TestCheckResourceAttr(resourceName, "expressions.0.source_port", "0-65535"),
-					resource.TestCheckResourceAttr(resourceName, "expressions.0.destination_port", "80"),
-					resource.TestCheckResourceAttr(resourceName, "expressions.0.allow", "true"),
+					resource.TestCheckResourceAttr(resourceName, "expression.#", "2"),
+					resource.TestCheckResourceAttr(resourceName, "expression.0.protocol", "tcp"),
+					resource.TestCheckResourceAttr(resourceName, "expression.0.source_network", "0.0.0.0/0"),
+					resource.TestCheckResourceAttr(resourceName, "expression.0.source_port", "0-65535"),
+					resource.TestCheckResourceAttr(resourceName, "expression.0.destination_port", "80"),
+					resource.TestCheckResourceAttr(resourceName, "expression.0.allow", "true"),
 				),
 			},
 		},
@@ -50,14 +50,14 @@ var testAccSakuraCloudDataSourcePacketFilter_basic = `
 resource "sakuracloud_packet_filter" "foobar" {
   name        = "{{ .arg0 }}"
   description = "description"
-  expressions {
+  expression {
     protocol         = "tcp"
     source_network   = "0.0.0.0/0"
     source_port      = "0-65535"
     destination_port = "80"
     allow            = true
   }
-  expressions {
+  expression {
     protocol         = "udp"
     source_network   = "0.0.0.0/0"
     source_port      = "0-65535"
