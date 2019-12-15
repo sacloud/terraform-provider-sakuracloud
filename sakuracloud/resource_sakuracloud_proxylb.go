@@ -77,7 +77,7 @@ func resourceSakuraCloudProxyLB() *schema.Resource {
 				}, false),
 				ForceNew: true,
 			},
-			"bind_ports": {
+			"bind_port": {
 				Type:     schema.TypeList,
 				Required: true,
 				MaxItems: 2,
@@ -196,7 +196,7 @@ func resourceSakuraCloudProxyLB() *schema.Resource {
 							Optional: true,
 							Computed: true,
 						},
-						"additional_certificates": {
+						"additional_certificate": {
 							Type:     schema.TypeList,
 							Optional: true,
 							Computed: true,
@@ -220,7 +220,7 @@ func resourceSakuraCloudProxyLB() *schema.Resource {
 					},
 				},
 			},
-			"servers": {
+			"server": {
 				Type:     schema.TypeList,
 				Optional: true,
 				MaxItems: 40,
@@ -403,7 +403,7 @@ func setProxyLBResourceData(ctx context.Context, d *schema.ResourceData, client 
 	d.Set("sticky_session", flattenProxyLBStickySession(data))
 	d.Set("timeout", flattenProxyLBTimeout(data))
 	d.Set("region", data.Region.String())
-	if err := d.Set("bind_ports", flattenProxyLBBindPorts(data)); err != nil {
+	if err := d.Set("bind_port", flattenProxyLBBindPorts(data)); err != nil {
 		return err
 	}
 	if err := d.Set("health_check", flattenProxyLBHealthCheck(data)); err != nil {
@@ -412,7 +412,7 @@ func setProxyLBResourceData(ctx context.Context, d *schema.ResourceData, client 
 	if err := d.Set("sorry_server", flattenProxyLBSorryServer(data)); err != nil {
 		return err
 	}
-	if err := d.Set("servers", flattenProxyLBServers(data)); err != nil {
+	if err := d.Set("server", flattenProxyLBServers(data)); err != nil {
 		return err
 	}
 	d.Set("fqdn", data.FQDN)

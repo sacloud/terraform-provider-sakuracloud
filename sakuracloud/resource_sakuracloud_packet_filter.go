@@ -43,7 +43,7 @@ func resourceSakuraCloudPacketFilter() *schema.Resource {
 				Type:     schema.TypeString,
 				Optional: true,
 			},
-			"expressions": {
+			"expression": {
 				Type:     schema.TypeList,
 				Optional: true,
 				Computed: true,
@@ -167,5 +167,5 @@ func setPacketFilterResourceData(ctx context.Context, d *schema.ResourceData, cl
 	d.Set("name", data.Name)
 	d.Set("description", data.Description)
 	d.Set("zone", getZone(d, client))
-	return d.Set("expressions", flattenPacketFilterExpressions(data))
+	return d.Set("expression", flattenPacketFilterExpressions(data))
 }

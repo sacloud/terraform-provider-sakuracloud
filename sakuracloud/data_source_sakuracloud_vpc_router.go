@@ -85,7 +85,7 @@ func dataSourceSakuraCloudVPCRouter() *schema.Resource {
 				Type:     schema.TypeBool,
 				Computed: true,
 			},
-			"interfaces": {
+			"network_interface": {
 				Type:     schema.TypeList,
 				Computed: true,
 				Elem: &schema.Resource{
@@ -114,7 +114,7 @@ func dataSourceSakuraCloudVPCRouter() *schema.Resource {
 					},
 				},
 			},
-			"dhcp_servers": {
+			"dhcp_server": {
 				Type:     schema.TypeList,
 				Computed: true,
 				Elem: &schema.Resource{
@@ -139,7 +139,7 @@ func dataSourceSakuraCloudVPCRouter() *schema.Resource {
 					},
 				},
 			},
-			"dhcp_static_mappings": {
+			"dhcp_static_mapping": {
 				Type:     schema.TypeList,
 				Computed: true,
 				Elem: &schema.Resource{
@@ -155,7 +155,7 @@ func dataSourceSakuraCloudVPCRouter() *schema.Resource {
 					},
 				},
 			},
-			"firewalls": {
+			"firewall": {
 				Type:     schema.TypeList,
 				Computed: true,
 				Elem: &schema.Resource{
@@ -168,7 +168,7 @@ func dataSourceSakuraCloudVPCRouter() *schema.Resource {
 							Type:     schema.TypeString,
 							Computed: true,
 						},
-						"expressions": {
+						"expression": {
 							Type:     schema.TypeList,
 							Computed: true,
 							Elem: &schema.Resource{
@@ -232,7 +232,7 @@ func dataSourceSakuraCloudVPCRouter() *schema.Resource {
 					},
 				},
 			},
-			"port_forwardings": {
+			"port_forwarding": {
 				Type:     schema.TypeList,
 				Computed: true,
 				Elem: &schema.Resource{
@@ -327,7 +327,7 @@ func dataSourceSakuraCloudVPCRouter() *schema.Resource {
 					},
 				},
 			},
-			"static_routes": {
+			"static_route": {
 				Type:     schema.TypeList,
 				Computed: true,
 				Elem: &schema.Resource{
@@ -343,7 +343,7 @@ func dataSourceSakuraCloudVPCRouter() *schema.Resource {
 					},
 				},
 			},
-			"users": {
+			"user": {
 				Type:     schema.TypeList,
 				Computed: true,
 				Elem: &schema.Resource{

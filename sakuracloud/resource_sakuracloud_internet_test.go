@@ -214,7 +214,7 @@ resource "sakuracloud_disk" "foobar" {
 resource "sakuracloud_server" "foobar" {
   name        = "{{ .arg0 }}"
   disks       = [sakuracloud_disk.foobar.id]
-  interfaces {
+  network_interface {
     upstream = sakuracloud_internet.foobar.switch_id
   }
   ipaddress   = sakuracloud_internet.foobar.ipaddresses[0]

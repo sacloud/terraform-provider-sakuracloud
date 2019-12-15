@@ -46,14 +46,14 @@ func TestAccSakuraCloudDataSourceProxyLB_basic(t *testing.T) {
 					resource.TestCheckResourceAttr(resourceName, "tags.2", "tag3"),
 					resource.TestCheckResourceAttr(resourceName, "health_check.0.protocol", "tcp"),
 					resource.TestCheckResourceAttr(resourceName, "health_check.0.delay_loop", "20"),
-					resource.TestCheckResourceAttr(resourceName, "bind_ports.0.proxy_mode", "http"),
-					resource.TestCheckResourceAttr(resourceName, "bind_ports.0.port", "80"),
-					resource.TestCheckResourceAttr(resourceName, "servers.0.ipaddress", ip0),
-					resource.TestCheckResourceAttr(resourceName, "servers.0.port", "80"),
-					resource.TestCheckResourceAttr(resourceName, "servers.0.enabled", "true"),
-					resource.TestCheckResourceAttr(resourceName, "servers.1.ipaddress", ip1),
-					resource.TestCheckResourceAttr(resourceName, "servers.1.port", "80"),
-					resource.TestCheckResourceAttr(resourceName, "servers.1.enabled", "true"),
+					resource.TestCheckResourceAttr(resourceName, "bind_port.0.proxy_mode", "http"),
+					resource.TestCheckResourceAttr(resourceName, "bind_port.0.port", "80"),
+					resource.TestCheckResourceAttr(resourceName, "server.0.ipaddress", ip0),
+					resource.TestCheckResourceAttr(resourceName, "server.0.port", "80"),
+					resource.TestCheckResourceAttr(resourceName, "server.0.enabled", "true"),
+					resource.TestCheckResourceAttr(resourceName, "server.1.ipaddress", ip1),
+					resource.TestCheckResourceAttr(resourceName, "server.1.port", "80"),
+					resource.TestCheckResourceAttr(resourceName, "server.1.enabled", "true"),
 				),
 			},
 		},
@@ -71,16 +71,16 @@ resource "sakuracloud_proxylb" "foobar" {
     delay_loop = 20
   }
 
-  bind_ports {
+  bind_port {
     proxy_mode = "http"
     port       = 80
   }
 
-  servers {
+  server {
     ipaddress = "{{ .arg1 }}"
     port      = 80
   }
-  servers {
+  server {
     ipaddress = "{{ .arg2 }}"
     port      = 80
   }

@@ -51,7 +51,7 @@ func dataSourceSakuraCloudProxyLB() *schema.Resource {
 				Type:     schema.TypeString,
 				Computed: true,
 			},
-			"bind_ports": {
+			"bind_port": {
 				Type:     schema.TypeList,
 				Computed: true,
 				Elem: &schema.Resource{
@@ -152,7 +152,7 @@ func dataSourceSakuraCloudProxyLB() *schema.Resource {
 							Type:     schema.TypeString,
 							Computed: true,
 						},
-						"additional_certificates": {
+						"additional_certificate": {
 							Type:     schema.TypeList,
 							Optional: true,
 							Elem: &schema.Resource{
@@ -175,7 +175,7 @@ func dataSourceSakuraCloudProxyLB() *schema.Resource {
 					},
 				},
 			},
-			"servers": {
+			"server": {
 				Type:     schema.TypeList,
 				Computed: true,
 				Elem: &schema.Resource{

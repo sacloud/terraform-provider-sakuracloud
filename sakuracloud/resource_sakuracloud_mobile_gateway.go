@@ -41,7 +41,7 @@ func resourceSakuraCloudMobileGateway() *schema.Resource {
 				Type:     schema.TypeString,
 				Required: true,
 			},
-			"private_interface": {
+			"network_interface": {
 				Type:     schema.TypeList,
 				Optional: true,
 				MaxItems: 1,
@@ -65,22 +65,13 @@ func resourceSakuraCloudMobileGateway() *schema.Resource {
 					},
 				},
 			},
-			"public_interface": {
-				Type:     schema.TypeList,
+			"public_ip": {
+				Type:     schema.TypeString,
 				Computed: true,
-				MaxItems: 1,
-				Elem: &schema.Resource{
-					Schema: map[string]*schema.Schema{
-						"ipaddress": {
-							Type:     schema.TypeString,
-							Computed: true,
-						},
-						"nw_mask_len": {
-							Type:     schema.TypeInt,
-							Computed: true,
-						},
-					},
-				},
+			},
+			"public_netmask": {
+				Type:     schema.TypeInt,
+				Computed: true,
 			},
 			"internet_connection": {
 				Type:     schema.TypeBool,
@@ -138,7 +129,7 @@ func resourceSakuraCloudMobileGateway() *schema.Resource {
 					},
 				},
 			},
-			"static_routes": {
+			"static_route": {
 				Type:     schema.TypeList,
 				Optional: true,
 				Elem: &schema.Resource{
@@ -319,12 +310,11 @@ func setMobileGatewayResourceData(ctx context.Context, d *schema.ResourceData, c
 	}
 
 	// set data
-	if err := d.Set("private_interface", flattenMobileGatewayPrivateNetworks(data)); err != nil {
+	if err := d.Set("network_interface", flattenMobileGatewayPrivateNetworks(data)); err != nil {
 		return err
 	}
-	if err := d.Set("public_interface", flattenMobileGatewayPublicNetworks(data)); err != nil {
-		return err
-	}
+	d.Set("public_ip", flattenMobileGatewayPublicIPAddress(data))
+	d.Set("public_netmask", flattenMobileGatewayPublicNetmask(data))
 	d.Set("internet_connection", data.Settings.InternetConnectionEnabled.Bool())
 	d.Set("inter_device_communication", data.Settings.InterDeviceCommunicationEnabled.Bool())
 
@@ -333,7 +323,7 @@ func setMobileGatewayResourceData(ctx context.Context, d *schema.ResourceData, c
 	}
 	d.Set("dns_server1", resolver.DNS1)
 	d.Set("dns_server2", resolver.DNS2)
-	if err := d.Set("static_routes", flattenMobileGatewayStaticRoutes(data.Settings.StaticRoute)); err != nil {
+	if err := d.Set("static_route", flattenMobileGatewayStaticRoutes(data.Settings.StaticRoute)); err != nil {
 		return err
 	}
 	d.Set("name", data.Name)

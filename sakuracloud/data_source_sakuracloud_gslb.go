@@ -88,7 +88,7 @@ func dataSourceSakuraCloudGSLB() *schema.Resource {
 				Computed: true,
 				Elem:     &schema.Schema{Type: schema.TypeString},
 			},
-			"servers": {
+			"server": {
 				Type:     schema.TypeList,
 				Computed: true,
 				Elem: &schema.Resource{

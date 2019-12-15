@@ -45,7 +45,7 @@ func resourceSakuraCloudDNS() *schema.Resource {
 				Computed: true,
 				Elem:     &schema.Schema{Type: schema.TypeString},
 			},
-			"records": {
+			"record": {
 				Type:     schema.TypeList,
 				Optional: true,
 				Computed: true,
@@ -185,7 +185,7 @@ func setDNSResourceData(ctx context.Context, d *schema.ResourceData, client *API
 	if err := d.Set("dns_servers", data.DNSNameServers); err != nil {
 		return err
 	}
-	if err := d.Set("records", flattenDNSRecords(data)); err != nil {
+	if err := d.Set("record", flattenDNSRecords(data)); err != nil {
 		return err
 	}
 	return nil

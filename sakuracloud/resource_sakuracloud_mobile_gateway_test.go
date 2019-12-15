@@ -50,11 +50,11 @@ func TestAccSakuraCloudMobileGateway_basic(t *testing.T) {
 					resource.TestCheckResourceAttr(resourceName, "tags.0", "tag1"),
 					resource.TestCheckResourceAttr(resourceName, "tags.1", "tag2"),
 					resource.TestCheckResourceAttrPair(
-						resourceName, "private_interface.0.switch_id",
+						resourceName, "network_interface.0.switch_id",
 						"sakuracloud_switch.foobar", "id",
 					),
-					resource.TestCheckResourceAttr(resourceName, "private_interface.0.ipaddress", "192.168.11.101"),
-					resource.TestCheckResourceAttr(resourceName, "private_interface.0.nw_mask_len", "24"),
+					resource.TestCheckResourceAttr(resourceName, "network_interface.0.ipaddress", "192.168.11.101"),
+					resource.TestCheckResourceAttr(resourceName, "network_interface.0.nw_mask_len", "24"),
 					resource.TestCheckResourceAttrPair(
 						resourceName, "icon_id",
 						"sakuracloud_icon.foobar", "id",
@@ -66,13 +66,13 @@ func TestAccSakuraCloudMobileGateway_basic(t *testing.T) {
 					resource.TestCheckResourceAttr(resourceName, "traffic_control.0.enable_slack", "true"),
 					resource.TestCheckResourceAttr(resourceName, "traffic_control.0.slack_webhook", "https://hooks.slack.com/services/xxx/xxx/xxx"),
 					resource.TestCheckResourceAttr(resourceName, "traffic_control.0.auto_traffic_shaping", "true"),
-					resource.TestCheckResourceAttr(resourceName, "static_routes.#", "3"),
-					resource.TestCheckResourceAttr(resourceName, "static_routes.0.prefix", "192.168.10.0/24"),
-					resource.TestCheckResourceAttr(resourceName, "static_routes.0.next_hop", "192.168.11.1"),
-					resource.TestCheckResourceAttr(resourceName, "static_routes.1.prefix", "192.168.10.0/25"),
-					resource.TestCheckResourceAttr(resourceName, "static_routes.1.next_hop", "192.168.11.2"),
-					resource.TestCheckResourceAttr(resourceName, "static_routes.2.prefix", "192.168.10.0/26"),
-					resource.TestCheckResourceAttr(resourceName, "static_routes.2.next_hop", "192.168.11.3"),
+					resource.TestCheckResourceAttr(resourceName, "static_route.#", "3"),
+					resource.TestCheckResourceAttr(resourceName, "static_route.0.prefix", "192.168.10.0/24"),
+					resource.TestCheckResourceAttr(resourceName, "static_route.0.next_hop", "192.168.11.1"),
+					resource.TestCheckResourceAttr(resourceName, "static_route.1.prefix", "192.168.10.0/25"),
+					resource.TestCheckResourceAttr(resourceName, "static_route.1.next_hop", "192.168.11.2"),
+					resource.TestCheckResourceAttr(resourceName, "static_route.2.prefix", "192.168.10.0/26"),
+					resource.TestCheckResourceAttr(resourceName, "static_route.2.next_hop", "192.168.11.3"),
 				),
 			},
 			{
@@ -88,11 +88,11 @@ func TestAccSakuraCloudMobileGateway_basic(t *testing.T) {
 					resource.TestCheckResourceAttr(resourceName, "icon_id", ""),
 					resource.TestCheckResourceAttr(resourceName, "traffic_control.#", "0"),
 					resource.TestCheckResourceAttrPair(
-						resourceName, "private_interface.0.switch_id",
+						resourceName, "network_interface.0.switch_id",
 						"sakuracloud_switch.foobar", "id"),
-					resource.TestCheckResourceAttr(resourceName, "private_interface.0.ipaddress", "192.168.11.101"),
-					resource.TestCheckResourceAttr(resourceName, "private_interface.0.nw_mask_len", "24"),
-					resource.TestCheckResourceAttr(resourceName, "static_routes.#", "0"),
+					resource.TestCheckResourceAttr(resourceName, "network_interface.0.ipaddress", "192.168.11.101"),
+					resource.TestCheckResourceAttr(resourceName, "network_interface.0.nw_mask_len", "24"),
+					resource.TestCheckResourceAttr(resourceName, "static_route.#", "0"),
 					resource.TestCheckResourceAttr(resourceName, "sims.#", "0"),
 					resource.TestCheckResourceAttr(resourceName, "sim_routes.#", "0"),
 				),
@@ -165,8 +165,8 @@ func TestAccImportSakuraCloudMobileGateway(t *testing.T) {
 		}
 		expects := map[string]string{
 			"name":                                   rand,
-			"private_interface.0.ipaddress":          "192.168.11.101",
-			"private_interface.0.nw_mask_len":        "24",
+			"network_interface.0.ipaddress":          "192.168.11.101",
+			"network_interface.0.nw_mask_len":        "24",
 			"description":                            "description",
 			"internet_connection":                    "true",
 			"inter_device_communication":             "false",
@@ -178,18 +178,18 @@ func TestAccImportSakuraCloudMobileGateway(t *testing.T) {
 			"traffic_control.0.enable_slack":         "true",
 			"traffic_control.0.slack_webhook":        "https://hooks.slack.com/services/xxx/xxx/xxx",
 			"traffic_control.0.auto_traffic_shaping": "true",
-			"static_routes.0.prefix":                 "192.168.10.0/24",
-			"static_routes.0.next_hop":               "192.168.11.1",
-			"static_routes.1.prefix":                 "192.168.10.0/25",
-			"static_routes.1.next_hop":               "192.168.11.2",
-			"static_routes.2.prefix":                 "192.168.10.0/26",
-			"static_routes.2.next_hop":               "192.168.11.3",
+			"static_route.0.prefix":                  "192.168.10.0/24",
+			"static_route.0.next_hop":                "192.168.11.1",
+			"static_route.1.prefix":                  "192.168.10.0/25",
+			"static_route.1.next_hop":                "192.168.11.2",
+			"static_route.2.prefix":                  "192.168.10.0/26",
+			"static_route.2.next_hop":                "192.168.11.3",
 		}
 
 		if err := compareStateMulti(s[0], expects); err != nil {
 			return err
 		}
-		return stateNotEmptyMulti(s[0], "private_interface.0.switch_id", "icon_id")
+		return stateNotEmptyMulti(s[0], "network_interface.0.switch_id", "icon_id")
 	}
 
 	resourceName := "sakuracloud_mobile_gateway.foobar"
@@ -224,7 +224,7 @@ resource "sakuracloud_switch" "foobar" {
 }
 
 resource "sakuracloud_mobile_gateway" "foobar" {
-  private_interface {
+  network_interface {
     switch_id   = sakuracloud_switch.foobar.id
     ipaddress   = "192.168.11.101"
     nw_mask_len = 24
@@ -246,15 +246,15 @@ resource "sakuracloud_mobile_gateway" "foobar" {
     auto_traffic_shaping = true
   }
 
-  static_routes {
+  static_route {
     prefix   = "192.168.10.0/24"
     next_hop = "192.168.11.1"
   }
-  static_routes {
+  static_route {
     prefix   = "192.168.10.0/25"
     next_hop = "192.168.11.2"
   }
-  static_routes {
+  static_route {
     prefix   = "192.168.10.0/26"
     next_hop = "192.168.11.3"
   }
@@ -273,7 +273,7 @@ resource "sakuracloud_switch" "foobar" {
   name = "{{ .arg0 }}"
 }
 resource "sakuracloud_mobile_gateway" "foobar" {
-  private_interface {
+  network_interface {
     switch_id   = sakuracloud_switch.foobar.id
     ipaddress   = "192.168.11.101"
     nw_mask_len = 24

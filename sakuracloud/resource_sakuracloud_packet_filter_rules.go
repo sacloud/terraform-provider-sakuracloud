@@ -40,7 +40,7 @@ func resourceSakuraCloudPacketFilterRules() *schema.Resource {
 				ForceNew:     true,
 				ValidateFunc: validateSakuracloudIDType,
 			},
-			"expressions": {
+			"expression": {
 				Type:     schema.TypeList,
 				Optional: true,
 				ForceNew: true,
@@ -162,5 +162,5 @@ func resourceSakuraCloudPacketFilterRulesDelete(d *schema.ResourceData, meta int
 
 func setPacketFilterRulesResourceData(ctx context.Context, d *schema.ResourceData, client *APIClient, data *sacloud.PacketFilter) error {
 	d.Set("zone", getZone(d, client))
-	return d.Set("expressions", flattenPacketFilterExpressions(data))
+	return d.Set("expression", flattenPacketFilterExpressions(data))
 }

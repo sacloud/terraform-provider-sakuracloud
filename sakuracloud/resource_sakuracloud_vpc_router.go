@@ -88,7 +88,7 @@ func resourceSakuraCloudVPCRouter() *schema.Resource {
 				Optional: true,
 				Default:  true,
 			},
-			"interfaces": {
+			"network_interface": {
 				Type:     schema.TypeList,
 				Optional: true,
 				MaxItems: 7,
@@ -123,7 +123,7 @@ func resourceSakuraCloudVPCRouter() *schema.Resource {
 					},
 				},
 			},
-			"dhcp_servers": {
+			"dhcp_server": {
 				Type:     schema.TypeList,
 				Optional: true,
 				Elem: &schema.Resource{
@@ -151,7 +151,7 @@ func resourceSakuraCloudVPCRouter() *schema.Resource {
 					},
 				},
 			},
-			"dhcp_static_mappings": {
+			"dhcp_static_mapping": {
 				Type:     schema.TypeList,
 				Optional: true,
 				Elem: &schema.Resource{
@@ -167,7 +167,7 @@ func resourceSakuraCloudVPCRouter() *schema.Resource {
 					},
 				},
 			},
-			"firewalls": {
+			"firewall": {
 				Type:     schema.TypeList,
 				Optional: true,
 				Elem: &schema.Resource{
@@ -182,7 +182,7 @@ func resourceSakuraCloudVPCRouter() *schema.Resource {
 							Required:     true,
 							ValidateFunc: validation.StringInSlice([]string{"send", "receive"}, false),
 						},
-						"expressions": {
+						"expression": {
 							Type:     schema.TypeList,
 							Required: true,
 							Elem: &schema.Resource{
@@ -252,7 +252,7 @@ func resourceSakuraCloudVPCRouter() *schema.Resource {
 					},
 				},
 			},
-			"port_forwardings": {
+			"port_forwarding": {
 				Type:     schema.TypeList,
 				Optional: true,
 				Elem: &schema.Resource{
@@ -359,7 +359,7 @@ func resourceSakuraCloudVPCRouter() *schema.Resource {
 					},
 				},
 			},
-			"static_routes": {
+			"static_route": {
 				Type:     schema.TypeList,
 				Optional: true,
 				Elem: &schema.Resource{
@@ -376,7 +376,7 @@ func resourceSakuraCloudVPCRouter() *schema.Resource {
 					},
 				},
 			},
-			"users": {
+			"user": {
 				Type:     schema.TypeList,
 				Optional: true,
 				MaxItems: 100,
@@ -535,16 +535,16 @@ func setVPCRouterResourceData(ctx context.Context, d *schema.ResourceData, clien
 	d.Set("vrid", flattenVPCRouterVRID(data))
 	d.Set("syslog_host", data.Settings.SyslogHost)
 	d.Set("internet_connection", data.Settings.InternetConnectionEnabled.Bool())
-	if err := d.Set("interfaces", flattenVPCRouterInterfaces(data)); err != nil {
+	if err := d.Set("network_interface", flattenVPCRouterInterfaces(data)); err != nil {
 		return err
 	}
-	if err := d.Set("dhcp_servers", flattenVPCRouterDHCPServers(data)); err != nil {
+	if err := d.Set("dhcp_server", flattenVPCRouterDHCPServers(data)); err != nil {
 		return err
 	}
-	if err := d.Set("dhcp_static_mappings", flattenVPCRouterDHCPStaticMappings(data)); err != nil {
+	if err := d.Set("dhcp_static_mapping", flattenVPCRouterDHCPStaticMappings(data)); err != nil {
 		return err
 	}
-	if err := d.Set("firewalls", flattenVPCRouterFirewalls(data)); err != nil {
+	if err := d.Set("firewall", flattenVPCRouterFirewalls(data)); err != nil {
 		return err
 	}
 	if err := d.Set("l2tp", flattenVPCRouterL2TP(data)); err != nil {
@@ -553,7 +553,7 @@ func setVPCRouterResourceData(ctx context.Context, d *schema.ResourceData, clien
 	if err := d.Set("pptp", flattenVPCRouterPPTP(data)); err != nil {
 		return err
 	}
-	if err := d.Set("port_forwardings", flattenVPCRouterPortForwardings(data)); err != nil {
+	if err := d.Set("port_forwarding", flattenVPCRouterPortForwardings(data)); err != nil {
 		return err
 	}
 	if err := d.Set("site_to_site_vpn", flattenVPCRouterSiteToSite(data)); err != nil {
@@ -562,10 +562,10 @@ func setVPCRouterResourceData(ctx context.Context, d *schema.ResourceData, clien
 	if err := d.Set("static_nat", flattenVPCRouterStaticNAT(data)); err != nil {
 		return err
 	}
-	if err := d.Set("static_routes", flattenVPCRouterStaticRoutes(data)); err != nil {
+	if err := d.Set("static_route", flattenVPCRouterStaticRoutes(data)); err != nil {
 		return err
 	}
-	if err := d.Set("users", flattenVPCRouterUsers(data)); err != nil {
+	if err := d.Set("user", flattenVPCRouterUsers(data)); err != nil {
 		return err
 	}
 	d.Set("zone", getZone(d, client))

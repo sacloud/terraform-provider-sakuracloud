@@ -61,7 +61,7 @@ func expandGSLBDelayLoop(d resourceValueGettable) int {
 
 func expandGSLBServers(d resourceValueGettable) []*sacloud.GSLBServer {
 	var servers []*sacloud.GSLBServer
-	for _, s := range d.Get("servers").([]interface{}) {
+	for _, s := range d.Get("server").([]interface{}) {
 		v := s.(map[string]interface{})
 		server := expandGSLBServer(&resourceMapValue{value: v})
 		servers = append(servers, server)

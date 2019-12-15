@@ -35,45 +35,45 @@ func TestAccSakuraCloudPacketFilterRules_basic(t *testing.T) {
 				Config: buildConfigWithArgs(testAccSakuraCloudPacketFilterRules_basic, rand),
 				Check: resource.ComposeTestCheckFunc(
 					testCheckSakuraCloudPacketFilterExists("sakuracloud_packet_filter.foobar", &filter),
-					resource.TestCheckResourceAttr(resourceName, "expressions.0.protocol", "tcp"),
-					resource.TestCheckResourceAttr(resourceName, "expressions.0.source_network", "192.168.2.0"),
-					resource.TestCheckResourceAttr(resourceName, "expressions.0.source_port", "80"),
-					resource.TestCheckResourceAttr(resourceName, "expressions.0.destination_port", "80"),
-					resource.TestCheckResourceAttr(resourceName, "expressions.0.allow", "true"),
+					resource.TestCheckResourceAttr(resourceName, "expression.0.protocol", "tcp"),
+					resource.TestCheckResourceAttr(resourceName, "expression.0.source_network", "192.168.2.0"),
+					resource.TestCheckResourceAttr(resourceName, "expression.0.source_port", "80"),
+					resource.TestCheckResourceAttr(resourceName, "expression.0.destination_port", "80"),
+					resource.TestCheckResourceAttr(resourceName, "expression.0.allow", "true"),
 
-					resource.TestCheckResourceAttr(resourceName, "expressions.1.protocol", "tcp"),
-					resource.TestCheckResourceAttr(resourceName, "expressions.1.source_network", "192.168.2.0"),
-					resource.TestCheckResourceAttr(resourceName, "expressions.1.source_port", "443"),
-					resource.TestCheckResourceAttr(resourceName, "expressions.1.destination_port", "443"),
-					resource.TestCheckResourceAttr(resourceName, "expressions.1.allow", "true"),
+					resource.TestCheckResourceAttr(resourceName, "expression.1.protocol", "tcp"),
+					resource.TestCheckResourceAttr(resourceName, "expression.1.source_network", "192.168.2.0"),
+					resource.TestCheckResourceAttr(resourceName, "expression.1.source_port", "443"),
+					resource.TestCheckResourceAttr(resourceName, "expression.1.destination_port", "443"),
+					resource.TestCheckResourceAttr(resourceName, "expression.1.allow", "true"),
 
-					resource.TestCheckResourceAttr(resourceName, "expressions.2.protocol", "ip"),
-					resource.TestCheckResourceAttr(resourceName, "expressions.2.source_network", ""),
-					resource.TestCheckResourceAttr(resourceName, "expressions.2.source_port", ""),
-					resource.TestCheckResourceAttr(resourceName, "expressions.2.destination_port", ""),
-					resource.TestCheckResourceAttr(resourceName, "expressions.2.allow", "false"),
+					resource.TestCheckResourceAttr(resourceName, "expression.2.protocol", "ip"),
+					resource.TestCheckResourceAttr(resourceName, "expression.2.source_network", ""),
+					resource.TestCheckResourceAttr(resourceName, "expression.2.source_port", ""),
+					resource.TestCheckResourceAttr(resourceName, "expression.2.destination_port", ""),
+					resource.TestCheckResourceAttr(resourceName, "expression.2.allow", "false"),
 				),
 			},
 			{
 				Config: buildConfigWithArgs(testAccSakuraCloudPacketFilterRules_update, rand),
 				Check: resource.ComposeTestCheckFunc(
-					resource.TestCheckResourceAttr(resourceName, "expressions.0.protocol", "udp"),
-					resource.TestCheckResourceAttr(resourceName, "expressions.0.source_network", "192.168.2.2"),
-					resource.TestCheckResourceAttr(resourceName, "expressions.0.source_port", "80"),
-					resource.TestCheckResourceAttr(resourceName, "expressions.0.destination_port", "80"),
-					resource.TestCheckResourceAttr(resourceName, "expressions.0.allow", "true"),
+					resource.TestCheckResourceAttr(resourceName, "expression.0.protocol", "udp"),
+					resource.TestCheckResourceAttr(resourceName, "expression.0.source_network", "192.168.2.2"),
+					resource.TestCheckResourceAttr(resourceName, "expression.0.source_port", "80"),
+					resource.TestCheckResourceAttr(resourceName, "expression.0.destination_port", "80"),
+					resource.TestCheckResourceAttr(resourceName, "expression.0.allow", "true"),
 
-					resource.TestCheckResourceAttr(resourceName, "expressions.1.protocol", "udp"),
-					resource.TestCheckResourceAttr(resourceName, "expressions.1.source_network", "192.168.2.2"),
-					resource.TestCheckResourceAttr(resourceName, "expressions.1.source_port", "443"),
-					resource.TestCheckResourceAttr(resourceName, "expressions.1.destination_port", "443"),
-					resource.TestCheckResourceAttr(resourceName, "expressions.1.allow", "true"),
+					resource.TestCheckResourceAttr(resourceName, "expression.1.protocol", "udp"),
+					resource.TestCheckResourceAttr(resourceName, "expression.1.source_network", "192.168.2.2"),
+					resource.TestCheckResourceAttr(resourceName, "expression.1.source_port", "443"),
+					resource.TestCheckResourceAttr(resourceName, "expression.1.destination_port", "443"),
+					resource.TestCheckResourceAttr(resourceName, "expression.1.allow", "true"),
 
-					resource.TestCheckResourceAttr(resourceName, "expressions.2.protocol", "ip"),
-					resource.TestCheckResourceAttr(resourceName, "expressions.2.source_network", ""),
-					resource.TestCheckResourceAttr(resourceName, "expressions.2.source_port", ""),
-					resource.TestCheckResourceAttr(resourceName, "expressions.2.destination_port", ""),
-					resource.TestCheckResourceAttr(resourceName, "expressions.2.allow", "false"),
+					resource.TestCheckResourceAttr(resourceName, "expression.2.protocol", "ip"),
+					resource.TestCheckResourceAttr(resourceName, "expression.2.source_network", ""),
+					resource.TestCheckResourceAttr(resourceName, "expression.2.source_port", ""),
+					resource.TestCheckResourceAttr(resourceName, "expression.2.destination_port", ""),
+					resource.TestCheckResourceAttr(resourceName, "expression.2.allow", "false"),
 				),
 			},
 		},
@@ -87,21 +87,21 @@ resource "sakuracloud_packet_filter" "foobar" {
 
 resource sakuracloud_packet_filter_rules "rules" {
   packet_filter_id = sakuracloud_packet_filter.foobar.id
-  expressions {
+  expression {
  	protocol         = "tcp"
 	source_network   = "192.168.2.0"
 	source_port      = "80"
 	destination_port = "80"
 	allow            = true
   }
-  expressions {
+  expression {
 	protocol         = "tcp"
 	source_network   = "192.168.2.0"
 	source_port      = "443"
 	destination_port = "443"
 	allow            = true
   }
-  expressions {
+  expression {
  	protocol = "ip"
 	allow    = false
   }
@@ -115,21 +115,21 @@ resource "sakuracloud_packet_filter" "foobar" {
 
 resource sakuracloud_packet_filter_rules "rules" {
   packet_filter_id = sakuracloud_packet_filter.foobar.id
-  expressions {
+  expression {
    	protocol         = "udp"
   	source_network   = "192.168.2.2"
   	source_port      = "80"
   	destination_port = "80"
    	allow            = true
   }
-  expressions {
+  expression {
    	protocol         = "udp"
   	source_network   = "192.168.2.2"
   	source_port      = "443"
   	destination_port = "443"
   	allow            = true
   }
-  expressions {
+  expression {
   	protocol = "ip"
 	allow    = false
   }

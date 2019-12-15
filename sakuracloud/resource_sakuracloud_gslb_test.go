@@ -51,12 +51,12 @@ func TestAccSakuraCloudGSLB_basic(t *testing.T) {
 					resource.TestCheckResourceAttr(resourceName, "health_check.0.protocol", "http"),
 					resource.TestCheckResourceAttr(resourceName, "health_check.0.delay_loop", "10"),
 					resource.TestCheckResourceAttr(resourceName, "health_check.0.host_header", "usacloud.jp"),
-					resource.TestCheckResourceAttr(resourceName, "servers.0.ipaddress", "1.1.1.1"),
-					resource.TestCheckResourceAttr(resourceName, "servers.0.weight", "1"),
-					resource.TestCheckResourceAttr(resourceName, "servers.0.enabled", "true"),
-					resource.TestCheckResourceAttr(resourceName, "servers.1.ipaddress", "2.2.2.2"),
-					resource.TestCheckResourceAttr(resourceName, "servers.1.weight", "2"),
-					resource.TestCheckResourceAttr(resourceName, "servers.1.enabled", "false"),
+					resource.TestCheckResourceAttr(resourceName, "server.0.ipaddress", "1.1.1.1"),
+					resource.TestCheckResourceAttr(resourceName, "server.0.weight", "1"),
+					resource.TestCheckResourceAttr(resourceName, "server.0.enabled", "true"),
+					resource.TestCheckResourceAttr(resourceName, "server.1.ipaddress", "2.2.2.2"),
+					resource.TestCheckResourceAttr(resourceName, "server.1.weight", "2"),
+					resource.TestCheckResourceAttr(resourceName, "server.1.enabled", "false"),
 					resource.TestCheckResourceAttrPair(
 						resourceName, "icon_id",
 						"sakuracloud_icon.foobar", "id",
@@ -76,12 +76,12 @@ func TestAccSakuraCloudGSLB_basic(t *testing.T) {
 					resource.TestCheckResourceAttr(resourceName, "health_check.0.protocol", "https"),
 					resource.TestCheckResourceAttr(resourceName, "health_check.0.delay_loop", "20"),
 					resource.TestCheckResourceAttr(resourceName, "health_check.0.host_header", "usacloud.jp-upd"),
-					resource.TestCheckResourceAttr(resourceName, "servers.0.ipaddress", "2.2.2.2"),
-					resource.TestCheckResourceAttr(resourceName, "servers.0.weight", "2"),
-					resource.TestCheckResourceAttr(resourceName, "servers.0.enabled", "true"),
-					resource.TestCheckResourceAttr(resourceName, "servers.1.ipaddress", "3.3.3.3"),
-					resource.TestCheckResourceAttr(resourceName, "servers.1.weight", "3"),
-					resource.TestCheckResourceAttr(resourceName, "servers.1.enabled", "false"),
+					resource.TestCheckResourceAttr(resourceName, "server.0.ipaddress", "2.2.2.2"),
+					resource.TestCheckResourceAttr(resourceName, "server.0.weight", "2"),
+					resource.TestCheckResourceAttr(resourceName, "server.0.enabled", "true"),
+					resource.TestCheckResourceAttr(resourceName, "server.1.ipaddress", "3.3.3.3"),
+					resource.TestCheckResourceAttr(resourceName, "server.1.weight", "3"),
+					resource.TestCheckResourceAttr(resourceName, "server.1.enabled", "false"),
 					resource.TestCheckResourceAttr(resourceName, "icon_id", ""),
 				),
 			},
@@ -98,12 +98,12 @@ func TestAccSakuraCloudGSLB_basic(t *testing.T) {
 					resource.TestCheckResourceAttr(resourceName, "health_check.0.protocol", "https"),
 					resource.TestCheckResourceAttr(resourceName, "health_check.0.delay_loop", "20"),
 					resource.TestCheckResourceAttr(resourceName, "health_check.0.host_header", "usacloud.jp-upd"),
-					resource.TestCheckResourceAttr(resourceName, "servers.0.ipaddress", "2.2.2.2"),
-					resource.TestCheckResourceAttr(resourceName, "servers.0.weight", "2"),
-					resource.TestCheckResourceAttr(resourceName, "servers.0.enabled", "true"),
-					resource.TestCheckResourceAttr(resourceName, "servers.1.ipaddress", "3.3.3.3"),
-					resource.TestCheckResourceAttr(resourceName, "servers.1.weight", "3"),
-					resource.TestCheckResourceAttr(resourceName, "servers.1.enabled", "false"),
+					resource.TestCheckResourceAttr(resourceName, "server.0.ipaddress", "2.2.2.2"),
+					resource.TestCheckResourceAttr(resourceName, "server.0.weight", "2"),
+					resource.TestCheckResourceAttr(resourceName, "server.0.enabled", "true"),
+					resource.TestCheckResourceAttr(resourceName, "server.1.ipaddress", "3.3.3.3"),
+					resource.TestCheckResourceAttr(resourceName, "server.1.weight", "3"),
+					resource.TestCheckResourceAttr(resourceName, "server.1.enabled", "false"),
 				),
 			},
 		},
@@ -221,12 +221,12 @@ resource "sakuracloud_gslb" "foobar" {
     status      = "200"
   }
   sorry_server = "8.8.8.8"
-  servers {
+  server {
     ipaddress = "1.1.1.1"
     weight    = 1
     enabled   = true
   }
-  servers {
+  server {
     ipaddress = "2.2.2.2"
     weight    = 2
     enabled   = false
@@ -252,12 +252,12 @@ resource "sakuracloud_gslb" "foobar" {
     path        = "/"
     status      = "200"
   }
-  servers {
+  server {
     ipaddress = "2.2.2.2"
     weight    = 2
     enabled   = true
   }
-  servers {
+  server {
     ipaddress = "3.3.3.3"
     weight    = 3
     enabled   = false
