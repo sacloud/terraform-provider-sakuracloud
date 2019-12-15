@@ -100,7 +100,7 @@ func (e *apiError) Code() string {
 	return ""
 }
 
-// Message エラー発生時のメッセージ(
+// Message エラー発生時のメッセージ
 func (e *apiError) Message() string {
 	if e.origErr != nil {
 		return e.origErr.ErrorMessage
