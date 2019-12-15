@@ -15,180 +15,54 @@
 package sakuracloud
 
 import (
-	"fmt"
 	"testing"
 
-	"github.com/hashicorp/terraform-plugin-sdk/helper/acctest"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/resource"
 )
 
-func TestAccSakuraCloudDataSourceLoadBalancer_Basic(t *testing.T) {
-	randString1 := acctest.RandStringFromCharSet(5, acctest.CharSetAlpha)
-	randString2 := acctest.RandStringFromCharSet(20, acctest.CharSetAlpha)
-	name := fmt.Sprintf("%s_%s", randString1, randString2)
+func TestAccSakuraCloudDataSourceLoadBalancer_basic(t *testing.T) {
+	resourceName := "data.sakuracloud_load_balancer.foobar"
+	rand := randomName()
 
 	resource.ParallelTest(t, resource.TestCase{
-		PreCheck:                  func() { testAccPreCheck(t) },
-		Providers:                 testAccProviders,
-		PreventPostDestroyRefresh: true,
-		CheckDestroy:              testAccCheckSakuraCloudLoadBalancerDestroy,
-
+		PreCheck:  func() { testAccPreCheck(t) },
+		Providers: testAccProviders,
 		Steps: []resource.TestStep{
 			{
-				Config: testAccCheckSakuraCloudDataSourceLoadBalancerBase(name),
-				Check:  testAccCheckSakuraCloudDataSourceExists("sakuracloud_load_balancer.foobar"),
-			},
-			{
-				Config: testAccCheckSakuraCloudDataSourceLoadBalancerConfig(name),
+				Config: buildConfigWithArgs(testAccSakuraCloudDataSourceLoadBalancer_basic, rand),
 				Check: resource.ComposeTestCheckFunc(
-					testAccCheckSakuraCloudDataSourceExists("data.sakuracloud_load_balancer.foobar"),
-					resource.TestCheckResourceAttr("data.sakuracloud_load_balancer.foobar", "name", name),
-					resource.TestCheckResourceAttr("data.sakuracloud_load_balancer.foobar", "description", "description_test"),
-					resource.TestCheckResourceAttr("data.sakuracloud_load_balancer.foobar", "tags.#", "3"),
-					resource.TestCheckResourceAttr("data.sakuracloud_load_balancer.foobar", "tags.0", "tag1"),
-					resource.TestCheckResourceAttr("data.sakuracloud_load_balancer.foobar", "tags.1", "tag2"),
-					resource.TestCheckResourceAttr("data.sakuracloud_load_balancer.foobar", "tags.2", "tag3"),
+					testCheckSakuraCloudDataSourceExists(resourceName),
+					resource.TestCheckResourceAttr(resourceName, "name", rand),
+					resource.TestCheckResourceAttr(resourceName, "description", "description"),
+					resource.TestCheckResourceAttr(resourceName, "tags.#", "3"),
+					resource.TestCheckResourceAttr(resourceName, "tags.0", "tag1"),
+					resource.TestCheckResourceAttr(resourceName, "tags.1", "tag2"),
+					resource.TestCheckResourceAttr(resourceName, "tags.2", "tag3"),
 				),
-			},
-			{
-				Config: testAccCheckSakuraCloudDataSourceLoadBalancerConfig_With_Tag(name),
-				Check: resource.ComposeTestCheckFunc(
-					testAccCheckSakuraCloudDataSourceExists("data.sakuracloud_load_balancer.foobar"),
-				),
-			},
-			{
-				Config: testAccCheckSakuraCloudDataSourceLoadBalancerConfig_NotExists(name),
-				Check: resource.ComposeTestCheckFunc(
-					testAccCheckSakuraCloudDataSourceNotExists("data.sakuracloud_load_balancer.foobar"),
-				),
-				Destroy: true,
-			},
-			{
-				Config: testAccCheckSakuraCloudDataSourceLoadBalancerConfig_With_NotExists_Tag(name),
-				Check: resource.ComposeTestCheckFunc(
-					testAccCheckSakuraCloudDataSourceNotExists("data.sakuracloud_load_balancer.foobar"),
-				),
-				Destroy: true,
 			},
 		},
 	})
 }
 
-func testAccCheckSakuraCloudDataSourceLoadBalancerBase(name string) string {
-	return fmt.Sprintf(`
-resource sakuracloud_switch "sw" {
-  name = "%s"
+var testAccSakuraCloudDataSourceLoadBalancer_basic = `
+resource sakuracloud_switch "foobar" {
+  name = "{{ .arg0 }}"
 }
 
 resource "sakuracloud_load_balancer" "foobar" {
-  switch_id     = "${sakuracloud_switch.sw.id}"
+  switch_id     = sakuracloud_switch.foobar.id
   vrid          = 1
   ipaddress1    = "192.168.11.101"
   nw_mask_len   = 24
   default_route = "192.168.11.1"
 
-  name        = "%s"
-  description = "description_test"
-  tags        = ["tag1", "tag2", "tag3"]
-}`, name, name)
-}
-
-func testAccCheckSakuraCloudDataSourceLoadBalancerConfig(name string) string {
-	return fmt.Sprintf(`
-resource sakuracloud_switch "sw" {
-  name = "%s"
-}
-
-resource "sakuracloud_load_balancer" "foobar" {
-  switch_id     = "${sakuracloud_switch.sw.id}"
-  vrid          = 1
-  ipaddress1    = "192.168.11.101"
-  nw_mask_len   = 24
-  default_route = "192.168.11.1"
-
-  name        = "%s"
-  description = "description_test"
+  name        = "{{ .arg0 }}"
+  description = "description"
   tags        = ["tag1", "tag2", "tag3"]
 }
 
 data "sakuracloud_load_balancer" "foobar" {
   filters {
-	names = ["%s"]
+	names = [sakuracloud_load_balancer.foobar.name]
   }
-}`, name, name, name)
-}
-
-func testAccCheckSakuraCloudDataSourceLoadBalancerConfig_With_Tag(name string) string {
-	return fmt.Sprintf(`
-resource sakuracloud_switch "sw" {
-  name = "%s"
-}
-
-resource "sakuracloud_load_balancer" "foobar" {
-  switch_id     = "${sakuracloud_switch.sw.id}"
-  vrid          = 1
-  ipaddress1    = "192.168.11.101"
-  nw_mask_len   = 24
-  default_route = "192.168.11.1"
-
-  name        = "%s"
-  description = "description_test"
-  tags        = ["tag1", "tag2", "tag3"]
-}
-
-data "sakuracloud_load_balancer" "foobar" {
-  filters {
-	tags = ["tag1","tag3"]
-  }
-}`, name, name)
-}
-
-func testAccCheckSakuraCloudDataSourceLoadBalancerConfig_With_NotExists_Tag(name string) string {
-	return fmt.Sprintf(`
-resource sakuracloud_switch "sw" {
-  name = "%s"
-}
-
-resource "sakuracloud_load_balancer" "foobar" {
-  switch_id     = "${sakuracloud_switch.sw.id}"
-  vrid          = 1
-  ipaddress1    = "192.168.11.101"
-  nw_mask_len   = 24
-  default_route = "192.168.11.1"
-
-  name        = "%s"
-  description = "description_test"
-  tags        = ["tag1", "tag2", "tag3"]
-}
-
-data "sakuracloud_load_balancer" "foobar" {
-  filters {
-	tags = ["tag1-xxxxxxx","tag3-xxxxxxxx"]
-  }
-}`, name, name)
-}
-
-func testAccCheckSakuraCloudDataSourceLoadBalancerConfig_NotExists(name string) string {
-	return fmt.Sprintf(`
-resource sakuracloud_switch "sw" {
-  name = "%s"
-}
-
-resource "sakuracloud_load_balancer" "foobar" {
-  switch_id     = "${sakuracloud_switch.sw.id}"
-  vrid          = 1
-  ipaddress1    = "192.168.11.101"
-  nw_mask_len   = 24
-  default_route = "192.168.11.1"
-
-  name        = "%s"
-  description = "description_test"
-  tags        = ["tag1", "tag2", "tag3"]
-}
-
-data "sakuracloud_load_balancer" "foobar" {
-  filters {
-	names = ["xxxxxxxxxxxxxxxxxx"]
-  }
-}`, name, name)
-}
+}`

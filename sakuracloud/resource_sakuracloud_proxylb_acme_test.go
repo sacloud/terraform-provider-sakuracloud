@@ -15,7 +15,6 @@
 package sakuracloud
 
 import (
-	"fmt"
 	"os"
 	"testing"
 
@@ -29,34 +28,36 @@ const (
 
 var proxyLBDomain string
 
-func TestAccResourceSakuraCloudProxyLBACME(t *testing.T) {
+func TestAccSakuraCloudProxyLBACME_basic(t *testing.T) {
 	skipIfFakeModeEnabled(t)
+	skipIfEnvIsNotSet(t, envProxyLBACMEDomain)
 
-	if domain, ok := os.LookupEnv(envProxyLBACMEDomain); ok {
-		proxyLBDomain = domain
-	} else {
-		t.Skipf("ENV %q is requilred. skip", envProxyLBACMEDomain)
-		return
-	}
+	rand := randomName()
+	proxyLBDomain = os.Getenv(envProxyLBACMEDomain)
 
 	var proxylb sacloud.ProxyLB
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:  func() { testAccPreCheck(t) },
 		Providers: testAccProviders,
+		CheckDestroy: resource.ComposeTestCheckFunc(
+			testCheckSakuraCloudDNSRecordDestroy,
+			testCheckSakuraCloudProxyLBDestroy,
+			testCheckSakuraCloudServerDestroy,
+		),
 		Steps: []resource.TestStep{
 			{
-				Config: fmt.Sprintf(testAccCheckSakuraCloudProxyLBConfig_acme, proxyLBDomain, proxyLBDomain),
+				Config: buildConfigWithArgs(testAccSakuraCloudProxyLBACME_basic, rand, proxyLBDomain),
 				Check: resource.ComposeTestCheckFunc(
-					testAccCheckSakuraCloudProxyLBExists("sakuracloud_proxylb.foobar", &proxylb),
+					testCheckSakuraCloudProxyLBExists("sakuracloud_proxylb.foobar", &proxylb),
 				),
 			},
 		},
 	})
 }
 
-var testAccCheckSakuraCloudProxyLBConfig_acme = `
+var testAccSakuraCloudProxyLBACME_basic = `
 resource "sakuracloud_proxylb" "foobar" {
-  name         = "terraform-test-proxylb-acme"
+  name         = "{{ .arg0 }}"
   plan         = 100
   vip_failover = true
   health_check {
@@ -74,7 +75,7 @@ resource "sakuracloud_proxylb" "foobar" {
     port       = 443
   }
   servers {
-    ipaddress = "${sakuracloud_server.server01.ipaddress}"
+    ipaddress = sakuracloud_server.foobar.ipaddress
     port      = 80
   }
 }
@@ -82,19 +83,19 @@ resource "sakuracloud_proxylb" "foobar" {
 resource sakuracloud_proxylb_acme "foobar" {
   proxylb_id       = sakuracloud_proxylb.foobar.id
   accept_tos       = true
-  common_name      = "acme-acctest.%s"
+  common_name      = "acme-acctest.{{ .arg1 }}"
   update_delay_sec = 120
 }
 
-resource sakuracloud_server "server01" {
-  name = "terraform-test-server01"
+resource sakuracloud_server "foobar" {
+  name = "{{ .arg0 }}"
 
   force_shutdown = true
 }
 
 data sakuracloud_dns "zone" {
   filters {
-    names = ["%s"]
+    names = ["{{ .arg1 }}"]
   }
 }
 

@@ -25,61 +25,50 @@ import (
 	"github.com/sacloud/libsacloud/v2/sacloud"
 )
 
-func TestAccResourceSakuraCloudPacketFilter(t *testing.T) {
+func TestAccSakuraCloudPacketFilter_basic(t *testing.T) {
+	resourceName := "sakuracloud_packet_filter.foobar"
+	rand := randomName()
+
 	var filter sacloud.PacketFilter
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
 		Providers:    testAccProviders,
-		CheckDestroy: testAccCheckSakuraCloudPacketFilterDestroy,
+		CheckDestroy: testCheckSakuraCloudPacketFilterDestroy,
 		Steps: []resource.TestStep{
 			{
-				Config: testAccCheckSakuraCloudPacketFilterConfig_basic,
+				Config: buildConfigWithArgs(testAccSakuraCloudPacketFilter_basic, rand),
 				Check: resource.ComposeTestCheckFunc(
-					testAccCheckSakuraCloudPacketFilterExists("sakuracloud_packet_filter.foobar", &filter),
-					resource.TestCheckResourceAttr(
-						"sakuracloud_packet_filter.foobar", "name", "mypacket_filter"),
-					resource.TestCheckResourceAttr(
-						"sakuracloud_packet_filter.foobar", "expressions.#", "2"),
-					resource.TestCheckResourceAttr(
-						"sakuracloud_packet_filter.foobar", "expressions.0.protocol", "tcp"),
-					resource.TestCheckResourceAttr(
-						"sakuracloud_packet_filter.foobar", "expressions.0.source_network", "0.0.0.0"),
-					resource.TestCheckResourceAttr(
-						"sakuracloud_packet_filter.foobar", "expressions.0.source_port", "0-65535"),
-					resource.TestCheckResourceAttr(
-						"sakuracloud_packet_filter.foobar", "expressions.0.destination_port", "80"),
-					resource.TestCheckResourceAttr(
-						"sakuracloud_packet_filter.foobar", "expressions.0.allow", "true"),
+					testCheckSakuraCloudPacketFilterExists(resourceName, &filter),
+					resource.TestCheckResourceAttr(resourceName, "name", rand),
+					resource.TestCheckResourceAttr(resourceName, "description", "description"),
+					resource.TestCheckResourceAttr(resourceName, "expressions.#", "2"),
+					resource.TestCheckResourceAttr(resourceName, "expressions.0.protocol", "tcp"),
+					resource.TestCheckResourceAttr(resourceName, "expressions.0.source_network", "0.0.0.0"),
+					resource.TestCheckResourceAttr(resourceName, "expressions.0.source_port", "0-65535"),
+					resource.TestCheckResourceAttr(resourceName, "expressions.0.destination_port", "80"),
+					resource.TestCheckResourceAttr(resourceName, "expressions.0.allow", "true"),
 				),
 			},
 			{
-				Config: testAccCheckSakuraCloudPacketFilterConfig_update,
+				Config: buildConfigWithArgs(testAccSakuraCloudPacketFilter_update, rand),
 				Check: resource.ComposeTestCheckFunc(
-					resource.TestCheckResourceAttr(
-						"sakuracloud_packet_filter.foobar", "name", "mypacket_filter_upd"),
-					resource.TestCheckResourceAttr(
-						"sakuracloud_packet_filter.foobar", "expressions.#", "5"),
-					resource.TestCheckResourceAttr(
-						"sakuracloud_packet_filter.foobar", "expressions.0.protocol", "tcp"),
-					resource.TestCheckResourceAttr(
-						"sakuracloud_packet_filter.foobar", "expressions.0.source_network", "192.168.2.0"),
-					resource.TestCheckResourceAttr(
-						"sakuracloud_packet_filter.foobar", "expressions.0.source_port", "8080"),
-					resource.TestCheckResourceAttr(
-						"sakuracloud_packet_filter.foobar", "expressions.0.destination_port", "8080"),
-					resource.TestCheckResourceAttr(
-						"sakuracloud_packet_filter.foobar", "expressions.0.allow", "false"),
-					resource.TestCheckResourceAttr(
-						"sakuracloud_packet_filter.foobar", "expressions.4.protocol", "ip"),
-					resource.TestCheckResourceAttr(
-						"sakuracloud_packet_filter.foobar", "expressions.4.allow", "true"),
+					resource.TestCheckResourceAttr(resourceName, "name", rand+"-upd"),
+					resource.TestCheckResourceAttr(resourceName, "description", "description-upd"),
+					resource.TestCheckResourceAttr(resourceName, "expressions.#", "5"),
+					resource.TestCheckResourceAttr(resourceName, "expressions.0.protocol", "tcp"),
+					resource.TestCheckResourceAttr(resourceName, "expressions.0.source_network", "192.168.2.0"),
+					resource.TestCheckResourceAttr(resourceName, "expressions.0.source_port", "8080"),
+					resource.TestCheckResourceAttr(resourceName, "expressions.0.destination_port", "8080"),
+					resource.TestCheckResourceAttr(resourceName, "expressions.0.allow", "false"),
+					resource.TestCheckResourceAttr(resourceName, "expressions.4.protocol", "ip"),
+					resource.TestCheckResourceAttr(resourceName, "expressions.4.allow", "true"),
 				),
 			},
 		},
 	})
 }
 
-func testAccCheckSakuraCloudPacketFilterExists(n string, filter *sacloud.PacketFilter) resource.TestCheckFunc {
+func testCheckSakuraCloudPacketFilterExists(n string, filter *sacloud.PacketFilter) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
 		rs, ok := s.RootModule().Resources[n]
 
@@ -109,7 +98,7 @@ func testAccCheckSakuraCloudPacketFilterExists(n string, filter *sacloud.PacketF
 	}
 }
 
-func testAccCheckSakuraCloudPacketFilterDestroy(s *terraform.State) error {
+func testCheckSakuraCloudPacketFilterDestroy(s *terraform.State) error {
 	client := testAccProvider.Meta().(*APIClient)
 	pfOp := sacloud.NewPacketFilterOp(client)
 
@@ -132,10 +121,10 @@ func testAccCheckSakuraCloudPacketFilterDestroy(s *terraform.State) error {
 	return nil
 }
 
-var testAccCheckSakuraCloudPacketFilterConfig_basic = `
+var testAccSakuraCloudPacketFilter_basic = `
 resource "sakuracloud_packet_filter" "foobar" {
-  name        = "mypacket_filter"
-  description = "PacketFilter from TerraForm for SAKURA CLOUD"
+  name        = "{{ .arg0 }}"
+  description = "description"
   expressions {
     protocol         = "tcp"
     source_network   = "0.0.0.0"
@@ -152,10 +141,10 @@ resource "sakuracloud_packet_filter" "foobar" {
   }
 }`
 
-var testAccCheckSakuraCloudPacketFilterConfig_update = `
+var testAccSakuraCloudPacketFilter_update = `
 resource "sakuracloud_packet_filter" "foobar" {
-  name        = "mypacket_filter_upd"
-  description = "PacketFilter from TerraForm for SAKURA CLOUD-upd"
+  name        = "{{ .arg0 }}-upd"
+  description = "description-upd"
   expressions {
     protocol         = "tcp"
     source_network   = "192.168.2.0"

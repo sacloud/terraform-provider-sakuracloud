@@ -25,44 +25,41 @@ import (
 	"github.com/sacloud/libsacloud/v2/sacloud"
 )
 
-func TestAccResourceSakuraCloudSSHKey(t *testing.T) {
+func TestAccSakuraCloudSSHKey_basic(t *testing.T) {
 	skipIfFakeModeEnabled(t)
 
-	var ssh_key sacloud.SSHKey
+	resourceName := "sakuracloud_ssh_key.foobar"
+	rand := randomName()
+
+	var sshKey sacloud.SSHKey
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
 		Providers:    testAccProviders,
-		CheckDestroy: testAccCheckSakuraCloudSSHKeyDestroy,
+		CheckDestroy: testCheckSakuraCloudSSHKeyDestroy,
 		Steps: []resource.TestStep{
 			{
-				Config: testAccCheckSakuraCloudSSHKeyConfig_basic,
+				Config: buildConfigWithArgs(testAccSakuraCloudSSHKey_basic, rand),
 				Check: resource.ComposeTestCheckFunc(
-					testAccCheckSakuraCloudSSHKeyExists("sakuracloud_ssh_key.foobar", &ssh_key),
-					resource.TestCheckResourceAttr(
-						"sakuracloud_ssh_key.foobar", "name", "mykey"),
-					resource.TestCheckResourceAttr(
-						"sakuracloud_ssh_key.foobar", "public_key", testAccPublicKey),
-					resource.TestCheckResourceAttr(
-						"sakuracloud_ssh_key.foobar", "fingerprint", testAccFingerprint),
+					testCheckSakuraCloudSSHKeyExists(resourceName, &sshKey),
+					resource.TestCheckResourceAttr(resourceName, "name", rand),
+					resource.TestCheckResourceAttr(resourceName, "public_key", testAccPublicKey),
+					resource.TestCheckResourceAttr(resourceName, "fingerprint", testAccFingerprint),
 				),
 			},
 			{
-				Config: testAccCheckSakuraCloudSSHKeyConfig_update,
+				Config: buildConfigWithArgs(testAccSakuraCloudSSHKey_update, rand),
 				Check: resource.ComposeTestCheckFunc(
-					testAccCheckSakuraCloudSSHKeyExists("sakuracloud_ssh_key.foobar", &ssh_key),
-					resource.TestCheckResourceAttr(
-						"sakuracloud_ssh_key.foobar", "name", "mykey"),
-					resource.TestCheckResourceAttr(
-						"sakuracloud_ssh_key.foobar", "public_key", testAccPublicKeyUpd),
-					resource.TestCheckResourceAttr(
-						"sakuracloud_ssh_key.foobar", "fingerprint", testAccFingerprintUpd),
+					testCheckSakuraCloudSSHKeyExists(resourceName, &sshKey),
+					resource.TestCheckResourceAttr(resourceName, "name", rand+"-upd"),
+					resource.TestCheckResourceAttr(resourceName, "public_key", testAccPublicKeyUpd),
+					resource.TestCheckResourceAttr(resourceName, "fingerprint", testAccFingerprintUpd),
 				),
 			},
 		},
 	})
 }
 
-func testAccCheckSakuraCloudSSHKeyExists(n string, ssh_key *sacloud.SSHKey) resource.TestCheckFunc {
+func testCheckSakuraCloudSSHKeyExists(n string, ssh_key *sacloud.SSHKey) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
 		rs, ok := s.RootModule().Resources[n]
 
@@ -91,7 +88,7 @@ func testAccCheckSakuraCloudSSHKeyExists(n string, ssh_key *sacloud.SSHKey) reso
 	}
 }
 
-func testAccCheckSakuraCloudSSHKeyDestroy(s *terraform.State) error {
+func testCheckSakuraCloudSSHKeyDestroy(s *terraform.State) error {
 	client := testAccProvider.Meta().(*APIClient)
 	keyOp := sacloud.NewSSHKeyOp(client)
 
@@ -112,18 +109,18 @@ func testAccCheckSakuraCloudSSHKeyDestroy(s *terraform.State) error {
 	return nil
 }
 
-var testAccCheckSakuraCloudSSHKeyConfig_basic = fmt.Sprintf(`
+var testAccSakuraCloudSSHKey_basic = fmt.Sprintf(`
 resource "sakuracloud_ssh_key" "foobar" {
-  name        = "mykey"
+  name        = "{{ .arg0 }}"
   public_key  = "%s"
-  description = "SSHKey from TerraForm for SAKURA CLOUD"
+  description = "description"
 }`, testAccPublicKey)
 
-var testAccCheckSakuraCloudSSHKeyConfig_update = fmt.Sprintf(`
+var testAccSakuraCloudSSHKey_update = fmt.Sprintf(`
 resource "sakuracloud_ssh_key" "foobar" {
-  name        = "mykey"
+  name        = "{{ .arg0 }}-upd"
   public_key  = "%s"
-  description = "SSHKey from TerraForm for SAKURA CLOUD"
+  description = "description-upd"
 }`, testAccPublicKeyUpd)
 
 const testAccPublicKey = `ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDq94EJW1+KAQLHNLC1KKdJq2aTIg/FSYeuKBiA7HWsCeG384uPo9afBS/+flXZfYzLlphQuS3HNC94CqlpNny3h7UdeUXcM0NOlhUBEuY5asVi60LnTAFCemlySXl0lQNKN/ly6oTVVe5auOFKl+wmRzJWETM71wg6908+n4M8BLzJcxoHWJ6m4KLXAS7WMbzsB+KyDQ/vp84hsvfhdgUj5NLt/WrVtdSY7CguNkV/P/ws7Fhi86qxu2V34e9/blZYTNqISTkwRriYYT0aCBB2vaN56pDcVzt+Wz41dXKymyheuTMPRUljFUfjIzgH5/vWSHpUEWDKTOwfjsCD6rv1`

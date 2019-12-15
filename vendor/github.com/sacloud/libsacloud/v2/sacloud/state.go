@@ -174,30 +174,35 @@ func (w *StatePollingWaiter) AsyncWaitForState(ctx context.Context) (compCh <-ch
 	progChan := make(chan interface{})
 	errChan := make(chan error)
 
-	tick := time.Tick(w.PollingInterval)
-	bomb := time.After(w.Timeout)
+	ticker := time.NewTicker(w.PollingInterval)
 
 	go func() {
+		ctx, cancel := context.WithTimeout(ctx, w.Timeout)
+		defer cancel()
+
+		defer ticker.Stop()
+
 		defer close(compChan)
 		defer close(progChan)
 		defer close(errChan)
+
 		notFoundCounter := w.NotFoundRetry
 		for {
 			select {
 			case <-ctx.Done():
-				errChan <- fmt.Errorf("AsyncWaitForState is canceled: %s", ctx.Err())
+				errChan <- ctx.Err()
 				return
-			case <-tick:
+			case <-ticker.C:
 				state, err := w.ReadFunc()
 
 				if err != nil {
 					if IsNotFoundError(err) {
 						notFoundCounter--
-						if notFoundCounter > 0 {
+						if notFoundCounter >= 0 {
 							continue
 						}
 					}
-					errChan <- fmt.Errorf("AsyncWaitForState is failed: %s", err)
+					errChan <- err
 					return
 				}
 
@@ -215,13 +220,14 @@ func (w *StatePollingWaiter) AsyncWaitForState(ctx context.Context) (compCh <-ch
 				if state != nil {
 					progChan <- state
 				}
-			case <-bomb:
-				errChan <- errors.New("AsyncWaitForState is timed out")
-				return
 			}
 		}
 	}()
-	return compChan, progChan, errChan
+
+	compCh = compChan
+	progressCh = progChan
+	errorCh = errChan
+	return
 }
 
 func (w *StatePollingWaiter) handleState(state interface{}) (bool, error) {

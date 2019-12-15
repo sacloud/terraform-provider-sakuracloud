@@ -20,29 +20,30 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/helper/resource"
 )
 
-func TestAccSakuraCloudDataSourceZone_Basic(t *testing.T) {
+func TestAccSakuraCloudDataSourceZone_basic(t *testing.T) {
+	resourceName := "data.sakuracloud_zone.foobar"
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:  func() { testAccPreCheck(t) },
 		Providers: testAccProviders,
 		Steps: []resource.TestStep{
 			{
-				Config: testAccCheckSakuraCloudDataSourceZoneBase,
+				Config: testAccSakuraCloudDataSourceZone_basic,
 				Check: resource.ComposeTestCheckFunc(
-					testAccCheckSakuraCloudDataSourceExists("data.sakuracloud_zone.foobar"),
-					resource.TestCheckResourceAttr("data.sakuracloud_zone.foobar", "name", "is1a"),
-					resource.TestCheckResourceAttr("data.sakuracloud_zone.foobar", "zone_id", "31001"),
-					resource.TestCheckResourceAttr("data.sakuracloud_zone.foobar", "description", "石狩第1ゾーン"),
-					resource.TestCheckResourceAttr("data.sakuracloud_zone.foobar", "region_id", "310"),
-					resource.TestCheckResourceAttr("data.sakuracloud_zone.foobar", "region_name", "石狩"),
-					resource.TestCheckResourceAttr("data.sakuracloud_zone.foobar", "dns_servers.0", "133.242.0.3"),
-					resource.TestCheckResourceAttr("data.sakuracloud_zone.foobar", "dns_servers.1", "133.242.0.4"),
+					testCheckSakuraCloudDataSourceExists(resourceName),
+					resource.TestCheckResourceAttr(resourceName, "name", "is1a"),
+					resource.TestCheckResourceAttr(resourceName, "zone_id", "31001"),
+					resource.TestCheckResourceAttr(resourceName, "description", "石狩第1ゾーン"),
+					resource.TestCheckResourceAttr(resourceName, "region_id", "310"),
+					resource.TestCheckResourceAttr(resourceName, "region_name", "石狩"),
+					resource.TestCheckResourceAttr(resourceName, "dns_servers.0", "133.242.0.3"),
+					resource.TestCheckResourceAttr(resourceName, "dns_servers.1", "133.242.0.4"),
 				),
 			},
 		},
 	})
 }
 
-var testAccCheckSakuraCloudDataSourceZoneBase = `
+var testAccSakuraCloudDataSourceZone_basic = `
 data "sakuracloud_zone" "foobar" { 
   name = "is1a"
 }`
