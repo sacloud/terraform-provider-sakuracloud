@@ -22,6 +22,9 @@ import (
 	"github.com/sacloud/libsacloud/v2/sacloud/types"
 )
 
+// DefaultNotFoundRetry スイッチ+ルータ作成後のReadで404が返ってこなくなるまでに許容する404エラーの回数
+var DefaultNotFoundRetry = 360 // デフォルトの5秒おきリトライの場合30分
+
 // Builder スイッチ+ルータの構築を行う
 type Builder struct {
 	Name           string
@@ -31,6 +34,8 @@ type Builder struct {
 	NetworkMaskLen int
 	BandWidthMbps  int
 	EnableIPv6     bool
+
+	NotFoundRetry int
 
 	Client *APIClient
 }
@@ -51,6 +56,10 @@ func (b *Builder) Validate(ctx context.Context, zone string) error {
 
 // Build ルータ+スイッチの作成や設定をまとめて行う
 func (b *Builder) Build(ctx context.Context, zone string) (*sacloud.Internet, error) {
+	if b.NotFoundRetry == 0 {
+		b.NotFoundRetry = DefaultNotFoundRetry
+	}
+
 	if err := b.Validate(ctx, zone); err != nil {
 		return nil, err
 	}
@@ -70,7 +79,7 @@ func (b *Builder) Build(ctx context.Context, zone string) (*sacloud.Internet, er
 	// [HACK] ルータ作成直後は GET /internet/:id が404を返すことへの対応
 	waiter := sacloud.WaiterForApplianceUp(func() (interface{}, error) {
 		return b.Client.Internet.Read(ctx, zone, internet.ID)
-	}, 100)
+	}, b.NotFoundRetry)
 	if _, err := waiter.WaitForState(ctx); err != nil {
 		return nil, err
 	}
