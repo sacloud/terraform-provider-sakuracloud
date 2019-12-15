@@ -81,7 +81,7 @@ func dataSourceSakuraCloudLoadBalancer() *schema.Resource {
 				Computed: true,
 				Elem:     &schema.Schema{Type: schema.TypeString},
 			},
-			"vips": {
+			"vip": {
 				Type:     schema.TypeList,
 				Computed: true,
 				Elem: &schema.Resource{
@@ -106,7 +106,7 @@ func dataSourceSakuraCloudLoadBalancer() *schema.Resource {
 							Type:     schema.TypeString,
 							Computed: true,
 						},
-						"servers": {
+						"server": {
 							Type:     schema.TypeList,
 							Computed: true,
 							Elem: &schema.Resource{

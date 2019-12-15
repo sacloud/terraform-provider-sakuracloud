@@ -47,12 +47,12 @@ func TestAccSakuraCloudDNS_basic(t *testing.T) {
 					resource.TestCheckResourceAttr(resourceName, "tags.#", "2"),
 					resource.TestCheckResourceAttr(resourceName, "tags.0", "tag1"),
 					resource.TestCheckResourceAttr(resourceName, "tags.1", "tag2"),
-					resource.TestCheckResourceAttr(resourceName, "records.0.name", "www"),
-					resource.TestCheckResourceAttr(resourceName, "records.0.type", "A"),
-					resource.TestCheckResourceAttr(resourceName, "records.0.value", "192.168.11.1"),
-					resource.TestCheckResourceAttr(resourceName, "records.1.name", "www2"),
-					resource.TestCheckResourceAttr(resourceName, "records.1.type", "A"),
-					resource.TestCheckResourceAttr(resourceName, "records.1.value", "192.168.11.2"),
+					resource.TestCheckResourceAttr(resourceName, "record.0.name", "www"),
+					resource.TestCheckResourceAttr(resourceName, "record.0.type", "A"),
+					resource.TestCheckResourceAttr(resourceName, "record.0.value", "192.168.11.1"),
+					resource.TestCheckResourceAttr(resourceName, "record.1.name", "www2"),
+					resource.TestCheckResourceAttr(resourceName, "record.1.type", "A"),
+					resource.TestCheckResourceAttr(resourceName, "record.1.value", "192.168.11.2"),
 					resource.TestCheckResourceAttrPair(
 						resourceName, "icon_id",
 						"sakuracloud_icon.foobar", "id",
@@ -68,9 +68,9 @@ func TestAccSakuraCloudDNS_basic(t *testing.T) {
 					resource.TestCheckResourceAttr(resourceName, "tags.#", "2"),
 					resource.TestCheckResourceAttr(resourceName, "tags.0", "tag1-upd"),
 					resource.TestCheckResourceAttr(resourceName, "tags.1", "tag2-upd"),
-					resource.TestCheckResourceAttr(resourceName, "records.0.name", "www"),
-					resource.TestCheckResourceAttr(resourceName, "records.0.type", "A"),
-					resource.TestCheckResourceAttr(resourceName, "records.0.value", "192.168.11.1"),
+					resource.TestCheckResourceAttr(resourceName, "record.0.name", "www"),
+					resource.TestCheckResourceAttr(resourceName, "record.0.type", "A"),
+					resource.TestCheckResourceAttr(resourceName, "record.0.value", "192.168.11.1"),
 					resource.TestCheckResourceAttr(resourceName, "icon_id", ""),
 				),
 			},
@@ -139,16 +139,16 @@ func TestAccImportSakuraCloudDNS(t *testing.T) {
 			return fmt.Errorf("expected 1 state: %#v", s)
 		}
 		expects := map[string]string{
-			"zone":            zone,
-			"description":     "description",
-			"tags.0":          "tag1",
-			"tags.1":          "tag2",
-			"records.0.name":  "www",
-			"records.0.type":  "A",
-			"records.0.value": "192.168.11.1",
-			"records.1.name":  "www2",
-			"records.1.type":  "A",
-			"records.1.value": "192.168.11.2",
+			"zone":           zone,
+			"description":    "description",
+			"tags.0":         "tag1",
+			"tags.1":         "tag2",
+			"record.0.name":  "www",
+			"record.0.type":  "A",
+			"record.0.value": "192.168.11.1",
+			"record.1.name":  "www2",
+			"record.1.type":  "A",
+			"record.1.value": "192.168.11.2",
 		}
 
 		if err := compareStateMulti(s[0], expects); err != nil {
@@ -186,12 +186,12 @@ resource "sakuracloud_dns" "foobar" {
   description = "description"
   tags        = ["tag1", "tag2"]
   icon_id     = sakuracloud_icon.foobar.id
-  records {
+  record {
     name  = "www"
     type  = "A"
     value = "192.168.11.1"
   }
-  records {
+  record {
     name  = "www2"
     type  = "A"
     value = "192.168.11.2"
@@ -209,7 +209,7 @@ resource "sakuracloud_dns" "foobar" {
   zone        = "{{ .arg0 }}"
   description = "description-upd"
   tags        = ["tag1-upd", "tag2-upd"]
-  records {
+  record {
     name  = "www"
     type  = "A"
     value = "192.168.11.1"

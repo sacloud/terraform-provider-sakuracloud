@@ -191,7 +191,7 @@ var testAccSakuraCloudPrivateHost_destroy = `
 resource "sakuracloud_server" "foobar" {
   name            = "{{ .arg0 }}"
   private_host_id = sakuracloud_private_host.foobar.id
-  interfaces {
+  network_interface {
     upstream = "shared"
   }
 
@@ -206,7 +206,7 @@ var testAccSakuraCloudPrivateHost_destroyed = `
 resource "sakuracloud_server" "foobar" {
   name = "{{ .arg0 }}"
 
-  interfaces {
+  network_interface {
     upstream = "shared"
   }
 

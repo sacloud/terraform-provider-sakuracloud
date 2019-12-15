@@ -71,7 +71,7 @@ func resourceSakuraCloudProxyLBACME() *schema.Resource {
 							Type:     schema.TypeString,
 							Computed: true,
 						},
-						"additional_certificates": {
+						"additional_certificate": {
 							Type:     schema.TypeList,
 							Computed: true,
 							Elem: &schema.Resource{
@@ -237,7 +237,7 @@ func setProxyLBACMEResourceData(ctx context.Context, d *schema.ResourceData, cli
 				"private_key":       cert.PrivateKey,
 			})
 		}
-		proxylbCert["additional_certificates"] = certs
+		proxylbCert["additional_certificate"] = certs
 	}
 
 	if err := d.Set("certificate", []interface{}{proxylbCert}); err != nil {

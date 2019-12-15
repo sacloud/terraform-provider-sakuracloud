@@ -58,9 +58,9 @@ func TestAccSakuraCloudServer_basic(t *testing.T) {
 					resource.TestCheckResourceAttr(resourceName, "disable_pw_auth", "true"),
 					resource.TestCheckResourceAttr(resourceName, "note_ids.#", "2"),
 					resource.TestCheckResourceAttr(resourceName, "note_ids.0", "100000000000"),
-					resource.TestCheckResourceAttr(resourceName, "interfaces.#", "1"),
-					resource.TestCheckResourceAttr(resourceName, "interfaces.0.upstream", "shared"),
-					resource.TestCheckResourceAttrSet(resourceName, "interfaces.0.macaddress"),
+					resource.TestCheckResourceAttr(resourceName, "network_interface.#", "1"),
+					resource.TestCheckResourceAttr(resourceName, "network_interface.0.upstream", "shared"),
+					resource.TestCheckResourceAttrSet(resourceName, "network_interface.0.macaddress"),
 					resource.TestCheckResourceAttrSet(resourceName, "ipaddress"),
 					resource.TestCheckResourceAttrPair(
 						resourceName, "icon_id",
@@ -82,7 +82,7 @@ func TestAccSakuraCloudServer_basic(t *testing.T) {
 					resource.TestCheckResourceAttr(resourceName, "tags.#", "2"),
 					resource.TestCheckResourceAttr(resourceName, "tags.0", "tag1-upd"),
 					resource.TestCheckResourceAttr(resourceName, "tags.1", "tag2-upd"),
-					resource.TestCheckResourceAttr(resourceName, "interfaces.0.upstream", "shared"),
+					resource.TestCheckResourceAttr(resourceName, "network_interface.0.upstream", "shared"),
 					resource.TestCheckResourceAttrSet(resourceName, "nw_address"),
 					resource.TestCheckResourceAttr(resourceName, "icon_id", ""),
 				),
@@ -106,8 +106,8 @@ func TestAccSakuraCloudServer_interfaces(t *testing.T) {
 				Check: resource.ComposeTestCheckFunc(
 					testCheckSakuraCloudServerExists(resourceName, &server),
 					testCheckSakuraCloudServerAttributes(&server),
-					resource.TestCheckResourceAttr(resourceName, "interfaces.#", "1"),
-					resource.TestCheckResourceAttr(resourceName, "interfaces.0.upstream", "shared"),
+					resource.TestCheckResourceAttr(resourceName, "network_interface.#", "1"),
+					resource.TestCheckResourceAttr(resourceName, "network_interface.0.upstream", "shared"),
 				),
 			},
 			{
@@ -115,8 +115,8 @@ func TestAccSakuraCloudServer_interfaces(t *testing.T) {
 				Check: resource.ComposeTestCheckFunc(
 					testCheckSakuraCloudServerExists(resourceName, &server),
 					testCheckSakuraCloudServerAttributes(&server),
-					resource.TestCheckResourceAttr(resourceName, "interfaces.#", "2"),
-					resource.TestCheckResourceAttr(resourceName, "interfaces.0.upstream", "shared"),
+					resource.TestCheckResourceAttr(resourceName, "network_interface.#", "2"),
+					resource.TestCheckResourceAttr(resourceName, "network_interface.0.upstream", "shared"),
 				),
 			},
 			{
@@ -124,8 +124,8 @@ func TestAccSakuraCloudServer_interfaces(t *testing.T) {
 				Check: resource.ComposeTestCheckFunc(
 					testCheckSakuraCloudServerExists(resourceName, &server),
 					testCheckSakuraCloudServerAttributes(&server),
-					resource.TestCheckResourceAttr(resourceName, "interfaces.#", "4"),
-					resource.TestCheckResourceAttr(resourceName, "interfaces.0.upstream", "shared"),
+					resource.TestCheckResourceAttr(resourceName, "network_interface.#", "4"),
+					resource.TestCheckResourceAttr(resourceName, "network_interface.0.upstream", "shared"),
 				),
 			},
 			{
@@ -133,8 +133,8 @@ func TestAccSakuraCloudServer_interfaces(t *testing.T) {
 				Check: resource.ComposeTestCheckFunc(
 					testCheckSakuraCloudServerExists(resourceName, &server),
 					testCheckSakuraCloudServerSharedInterface(&server),
-					resource.TestCheckResourceAttr(resourceName, "interfaces.#", "2"),
-					resource.TestCheckResourceAttr(resourceName, "interfaces.0.upstream", "disconnect"),
+					resource.TestCheckResourceAttr(resourceName, "network_interface.#", "2"),
+					resource.TestCheckResourceAttr(resourceName, "network_interface.0.upstream", "disconnect"),
 				),
 			},
 		},
@@ -153,13 +153,13 @@ func TestAccSakuraCloudServer_packetFilter(t *testing.T) {
 			{
 				Config: buildConfigWithArgs(testAccSakuraCloudServer_packetFilter, rand),
 				Check: resource.ComposeTestCheckFunc(
-					resource.TestCheckResourceAttr(resourceName, "interfaces.#", "2"),
+					resource.TestCheckResourceAttr(resourceName, "network_interface.#", "2"),
 					resource.TestCheckResourceAttrPair(
-						resourceName, "interfaces.0.packet_filter_id",
+						resourceName, "network_interface.0.packet_filter_id",
 						"sakuracloud_packet_filter.foobar", "id",
 					),
 					resource.TestCheckResourceAttrPair(
-						resourceName, "interfaces.1.packet_filter_id",
+						resourceName, "network_interface.1.packet_filter_id",
 						"sakuracloud_packet_filter.foobar", "id",
 					),
 				),
@@ -167,9 +167,9 @@ func TestAccSakuraCloudServer_packetFilter(t *testing.T) {
 			{
 				Config: buildConfigWithArgs(testAccSakuraCloudServer_packetFilterUpdate, rand),
 				Check: resource.ComposeTestCheckFunc(
-					resource.TestCheckResourceAttr(resourceName, "interfaces.#", "1"),
+					resource.TestCheckResourceAttr(resourceName, "network_interface.#", "1"),
 					resource.TestCheckResourceAttrPair(
-						resourceName, "interfaces.0.packet_filter_id",
+						resourceName, "network_interface.0.packet_filter_id",
 						"sakuracloud_packet_filter.foobar", "id",
 					),
 				),
@@ -177,8 +177,8 @@ func TestAccSakuraCloudServer_packetFilter(t *testing.T) {
 			{
 				Config: buildConfigWithArgs(testAccSakuraCloudServer_packetFilterDelete, rand),
 				Check: resource.ComposeTestCheckFunc(
-					resource.TestCheckResourceAttr(resourceName, "interfaces.#", "1"),
-					resource.TestCheckResourceAttr(resourceName, "interfaces.0.packet_filter_id", ""),
+					resource.TestCheckResourceAttr(resourceName, "network_interface.#", "1"),
+					resource.TestCheckResourceAttr(resourceName, "network_interface.0.packet_filter_id", ""),
 				),
 			},
 		},
@@ -331,7 +331,7 @@ resource "sakuracloud_server" "foobar" {
   description = "description"
   tags        = ["tag1", "tag2"]
   icon_id     = sakuracloud_icon.foobar.id
-  interfaces {
+  network_interface {
     upstream = "shared"
   }
 
@@ -366,7 +366,7 @@ resource "sakuracloud_server" "foobar" {
   description      = "description-upd"
   tags             = ["tag1-upd", "tag2-upd"]
   interface_driver = "e1000"
-  interfaces {
+  network_interface {
     upstream = "shared"
   }
 }
@@ -376,7 +376,7 @@ const testAccSakuraCloudServer_interfaces = `
 resource "sakuracloud_server" "foobar" {
   name = "{{ .arg0 }}"
 
-  interfaces {
+  network_interface {
     upstream = "shared"
   }
 
@@ -388,10 +388,10 @@ const testAccSakuraCloudServer_interfacesAdded = `
 resource "sakuracloud_server" "foobar" {
   name = "{{ .arg0 }}"
 
-  interfaces {
+  network_interface {
     upstream = "shared"
   }
-  interfaces {
+  network_interface {
     upstream = sakuracloud_switch.foobar0.id
   }
 
@@ -406,16 +406,16 @@ const testAccSakuraCloudServer_interfacesUpdated = `
 resource "sakuracloud_server" "foobar" {
   name = "{{ .arg0 }}"
 
-  interfaces {
+  network_interface {
     upstream = "shared"
   }
-  interfaces {
+  network_interface {
     upstream = sakuracloud_switch.foobar0.id
   }
-  interfaces {
+  network_interface {
     upstream = sakuracloud_switch.foobar1.id
   }
-  interfaces {
+  network_interface {
     upstream = sakuracloud_switch.foobar2.id
   }
 
@@ -437,10 +437,10 @@ const testAccSakuraCloudServer_interfacesDisconnect = `
 resource "sakuracloud_server" "foobar" {
   name = "{{ .arg0 }}"
 
-  interfaces {
+  network_interface {
     upstream = "disconnect"
   }
-  interfaces {
+  network_interface {
     upstream = sakuracloud_switch.foobar0.id
   }
 
@@ -454,7 +454,7 @@ resource "sakuracloud_switch" "foobar0" {
 const testAccSakuraCloudServer_packetFilter = `
 resource "sakuracloud_packet_filter" "foobar" {
   name = "{{ .arg0 }}"
-  expressions {
+  expression {
     protocol         = "tcp"
     source_network   = "0.0.0.0"
     source_port      = "0-65535"
@@ -465,11 +465,11 @@ resource "sakuracloud_packet_filter" "foobar" {
 
 resource "sakuracloud_server" "foobar" {
   name = "{{ .arg0 }}"
-  interfaces {
+  network_interface {
     upstream         = "shared"
     packet_filter_id = sakuracloud_packet_filter.foobar.id
   }
-  interfaces {
+  network_interface {
     upstream         = sakuracloud_switch.foobar.id
     packet_filter_id = sakuracloud_packet_filter.foobar.id
   }
@@ -486,7 +486,7 @@ const testAccSakuraCloudServer_packetFilterUpdate = `
 resource "sakuracloud_packet_filter" "foobar" {
   name = "{{ .arg0 }}-upd"
 
-  expressions {
+  expression {
     protocol         = "udp"
     source_network   = "0.0.0.0"
     source_port      = "0-65535"
@@ -498,7 +498,7 @@ resource "sakuracloud_packet_filter" "foobar" {
 resource "sakuracloud_server" "foobar" {
   name = "{{ .arg0 }}-upd"
 
-  interfaces {
+  network_interface {
     upstream         = "shared"
     packet_filter_id = sakuracloud_packet_filter.foobar.id
   }
@@ -510,7 +510,7 @@ resource "sakuracloud_server" "foobar" {
 const testAccSakuraCloudServer_packetFilterDelete = `
 resource "sakuracloud_server" "foobar" {
   name = "{{ .arg0 }}-del"
-  interfaces {
+  network_interface {
     upstream = "shared"
   }
   force_shutdown = true
@@ -521,7 +521,7 @@ resource "sakuracloud_server" "foobar" {
   name  = "{{ .arg0 }}"
   disks = [sakuracloud_disk.foobar.id]
 
-  interfaces {
+  network_interface {
     upstream = "shared"
   }
   force_shutdown = true
@@ -549,7 +549,7 @@ resource "sakuracloud_server" "foobar" {
   name  = "{{ .arg0 }}"
   disks = [sakuracloud_disk.foobar.id]
 
-  interfaces {
+  network_interface {
     upstream = sakuracloud_switch.foobar.id
   }
 

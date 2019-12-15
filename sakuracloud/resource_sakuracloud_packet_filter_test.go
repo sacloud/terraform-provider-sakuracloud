@@ -41,12 +41,12 @@ func TestAccSakuraCloudPacketFilter_basic(t *testing.T) {
 					testCheckSakuraCloudPacketFilterExists(resourceName, &filter),
 					resource.TestCheckResourceAttr(resourceName, "name", rand),
 					resource.TestCheckResourceAttr(resourceName, "description", "description"),
-					resource.TestCheckResourceAttr(resourceName, "expressions.#", "2"),
-					resource.TestCheckResourceAttr(resourceName, "expressions.0.protocol", "tcp"),
-					resource.TestCheckResourceAttr(resourceName, "expressions.0.source_network", "0.0.0.0"),
-					resource.TestCheckResourceAttr(resourceName, "expressions.0.source_port", "0-65535"),
-					resource.TestCheckResourceAttr(resourceName, "expressions.0.destination_port", "80"),
-					resource.TestCheckResourceAttr(resourceName, "expressions.0.allow", "true"),
+					resource.TestCheckResourceAttr(resourceName, "expression.#", "2"),
+					resource.TestCheckResourceAttr(resourceName, "expression.0.protocol", "tcp"),
+					resource.TestCheckResourceAttr(resourceName, "expression.0.source_network", "0.0.0.0"),
+					resource.TestCheckResourceAttr(resourceName, "expression.0.source_port", "0-65535"),
+					resource.TestCheckResourceAttr(resourceName, "expression.0.destination_port", "80"),
+					resource.TestCheckResourceAttr(resourceName, "expression.0.allow", "true"),
 				),
 			},
 			{
@@ -54,14 +54,14 @@ func TestAccSakuraCloudPacketFilter_basic(t *testing.T) {
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttr(resourceName, "name", rand+"-upd"),
 					resource.TestCheckResourceAttr(resourceName, "description", "description-upd"),
-					resource.TestCheckResourceAttr(resourceName, "expressions.#", "5"),
-					resource.TestCheckResourceAttr(resourceName, "expressions.0.protocol", "tcp"),
-					resource.TestCheckResourceAttr(resourceName, "expressions.0.source_network", "192.168.2.0"),
-					resource.TestCheckResourceAttr(resourceName, "expressions.0.source_port", "8080"),
-					resource.TestCheckResourceAttr(resourceName, "expressions.0.destination_port", "8080"),
-					resource.TestCheckResourceAttr(resourceName, "expressions.0.allow", "false"),
-					resource.TestCheckResourceAttr(resourceName, "expressions.4.protocol", "ip"),
-					resource.TestCheckResourceAttr(resourceName, "expressions.4.allow", "true"),
+					resource.TestCheckResourceAttr(resourceName, "expression.#", "5"),
+					resource.TestCheckResourceAttr(resourceName, "expression.0.protocol", "tcp"),
+					resource.TestCheckResourceAttr(resourceName, "expression.0.source_network", "192.168.2.0"),
+					resource.TestCheckResourceAttr(resourceName, "expression.0.source_port", "8080"),
+					resource.TestCheckResourceAttr(resourceName, "expression.0.destination_port", "8080"),
+					resource.TestCheckResourceAttr(resourceName, "expression.0.allow", "false"),
+					resource.TestCheckResourceAttr(resourceName, "expression.4.protocol", "ip"),
+					resource.TestCheckResourceAttr(resourceName, "expression.4.allow", "true"),
 				),
 			},
 		},
@@ -125,14 +125,14 @@ var testAccSakuraCloudPacketFilter_basic = `
 resource "sakuracloud_packet_filter" "foobar" {
   name        = "{{ .arg0 }}"
   description = "description"
-  expressions {
+  expression {
     protocol         = "tcp"
     source_network   = "0.0.0.0"
     source_port      = "0-65535"
     destination_port = "80"
     allow            = true
   }
-  expressions {
+  expression {
     protocol         = "udp"
     source_network   = "0.0.0.0"
     source_port      = "0-65535"
@@ -145,31 +145,31 @@ var testAccSakuraCloudPacketFilter_update = `
 resource "sakuracloud_packet_filter" "foobar" {
   name        = "{{ .arg0 }}-upd"
   description = "description-upd"
-  expressions {
+  expression {
     protocol         = "tcp"
     source_network   = "192.168.2.0"
     source_port      = "8080"
     destination_port = "8080"
     allow            = false
   }
-  expressions {
+  expression {
     protocol         = "udp"
     source_network   = "0.0.0.0"
     source_port      = "0-65535"
     destination_port = "80"
     allow            = true
   }
-  expressions {
+  expression {
     protocol       = "icmp"
     source_network = "0.0.0.0"
     allow          = true
   }
-  expressions {
+  expression {
     protocol       = "fragment"
     source_network = "0.0.0.0"
     allow          = true
   }
-  expressions {
+  expression {
     protocol       = "ip"
     source_network = "0.0.0.0"
     allow          = true

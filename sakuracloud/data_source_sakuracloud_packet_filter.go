@@ -35,7 +35,7 @@ func dataSourceSakuraCloudPacketFilter() *schema.Resource {
 				Type:     schema.TypeString,
 				Computed: true,
 			},
-			"expressions": {
+			"expression": {
 				Type:     schema.TypeList,
 				Optional: true,
 				Elem: &schema.Resource{

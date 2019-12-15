@@ -133,7 +133,7 @@ func flattenProxyLBCerts(certs *sacloud.ProxyLBCertificates) []interface{} {
 				"private_key":       cert.PrivateKey,
 			})
 		}
-		proxylbCert["additional_certificates"] = additionalCerts
+		proxylbCert["additional_certificate"] = additionalCerts
 	}
 	return []interface{}{proxylbCert}
 }
@@ -165,7 +165,7 @@ func expandProxyLBStickySession(d resourceValueGettable) *sacloud.ProxyLBStickyS
 
 func expandProxyLBBindPorts(d resourceValueGettable) []*sacloud.ProxyLBBindPort {
 	var results []*sacloud.ProxyLBBindPort
-	if bindPorts, ok := getListFromResource(d, "bind_ports"); ok {
+	if bindPorts, ok := getListFromResource(d, "bind_port"); ok {
 		for _, bindPort := range bindPorts {
 			values := mapToResourceData(bindPort.(map[string]interface{}))
 			var headers []*sacloud.ProxyLBResponseHeader
@@ -229,7 +229,7 @@ func expandProxyLBSorryServer(d resourceValueGettable) *sacloud.ProxyLBSorryServ
 
 func expandProxyLBServers(d resourceValueGettable) []*sacloud.ProxyLBServer {
 	var results []*sacloud.ProxyLBServer
-	if servers, ok := getListFromResource(d, "servers"); ok && len(servers) > 0 {
+	if servers, ok := getListFromResource(d, "server"); ok && len(servers) > 0 {
 		for _, server := range servers {
 			v := mapToResourceData(server.(map[string]interface{}))
 			results = append(results, &sacloud.ProxyLBServer{
@@ -256,7 +256,7 @@ func expandProxyLBCerts(d resourceValueGettable) *sacloud.ProxyLBCertificates {
 			PrivateKey:              values.Get("private_key").(string),
 		}
 
-		if rawAdditionalCerts, ok := getListFromResource(values, "additional_certificates"); ok && len(rawAdditionalCerts) > 0 {
+		if rawAdditionalCerts, ok := getListFromResource(values, "additional_certificate"); ok && len(rawAdditionalCerts) > 0 {
 			for _, rawCert := range rawAdditionalCerts {
 				values := mapToResourceData(rawCert.(map[string]interface{}))
 				cert.AdditionalCerts = append(cert.AdditionalCerts, &sacloud.ProxyLBAdditionalCert{

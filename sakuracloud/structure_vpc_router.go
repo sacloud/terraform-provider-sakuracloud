@@ -93,7 +93,7 @@ func expandVPCRouterNICSetting(d resourceValueGettable) vpcrouter.NICSettingHold
 func expandVPCRouterAdditionalNICSettings(d resourceValueGettable) []vpcrouter.AdditionalNICSettingHolder {
 	var results []vpcrouter.AdditionalNICSettingHolder
 	planID := expandVPCRouterPlanID(d)
-	interfaces := d.Get("interfaces").([]interface{})
+	interfaces := d.Get("network_interface").([]interface{})
 	for _, iface := range interfaces {
 		d = mapToResourceData(iface.(map[string]interface{}))
 		var nicSetting vpcrouter.AdditionalNICSettingHolder
@@ -252,7 +252,7 @@ func flattenVPCRouterStaticNAT(vpcRouter *sacloud.VPCRouter) []interface{} {
 }
 
 func expandVPCRouterDHCPServerList(d resourceValueGettable) []*sacloud.VPCRouterDHCPServer {
-	if values, ok := getListFromResource(d, "dhcp_servers"); ok && len(values) > 0 {
+	if values, ok := getListFromResource(d, "dhcp_server"); ok && len(values) > 0 {
 		var results []*sacloud.VPCRouterDHCPServer
 		for _, raw := range values {
 			v := mapToResourceData(raw.(map[string]interface{}))
@@ -295,7 +295,7 @@ func vpcRouterInterfaceNameToIndex(ifName string) int {
 }
 
 func expandVPCRouterDHCPStaticMappingList(d resourceValueGettable) []*sacloud.VPCRouterDHCPStaticMapping {
-	if values, ok := getListFromResource(d, "dhcp_static_mappings"); ok && len(values) > 0 {
+	if values, ok := getListFromResource(d, "dhcp_static_mapping"); ok && len(values) > 0 {
 		var results []*sacloud.VPCRouterDHCPStaticMapping
 		for _, raw := range values {
 			v := mapToResourceData(raw.(map[string]interface{}))
@@ -325,7 +325,7 @@ func flattenVPCRouterDHCPStaticMappings(vpcRouter *sacloud.VPCRouter) []interfac
 }
 
 func expandVPCRouterFirewallList(d resourceValueGettable) []*sacloud.VPCRouterFirewall {
-	if values, ok := getListFromResource(d, "firewalls"); ok && len(values) > 0 {
+	if values, ok := getListFromResource(d, "firewall"); ok && len(values) > 0 {
 		var results []*sacloud.VPCRouterFirewall
 		for _, raw := range values {
 			v := mapToResourceData(raw.(map[string]interface{}))
@@ -373,7 +373,7 @@ func expandVPCRouterFirewall(d resourceValueGettable) *sacloud.VPCRouterFirewall
 }
 
 func expandVPCRouterFirewallRuleList(d resourceValueGettable) []*sacloud.VPCRouterFirewallRule {
-	if values, ok := getListFromResource(d, "expressions"); ok && len(values) > 0 {
+	if values, ok := getListFromResource(d, "expression"); ok && len(values) > 0 {
 		var results []*sacloud.VPCRouterFirewallRule
 		for _, raw := range values {
 			v := mapToResourceData(raw.(map[string]interface{}))
@@ -433,7 +433,7 @@ func flattenVPCRouterFirewalls(vpcRouter *sacloud.VPCRouter) []interface{} {
 			firewallRules = append(firewallRules, map[string]interface{}{
 				"interface_index": i,
 				"direction":       direction,
-				"expressions":     expressions,
+				"expression":      expressions,
 			})
 		}
 	}
@@ -491,7 +491,7 @@ func flattenVPCRouterL2TP(vpcRouter *sacloud.VPCRouter) []interface{} {
 }
 
 func expandVPCRouterPortForwardingList(d resourceValueGettable) []*sacloud.VPCRouterPortForwarding {
-	if values, ok := getListFromResource(d, "port_forwardings"); ok && len(values) > 0 {
+	if values, ok := getListFromResource(d, "port_forwarding"); ok && len(values) > 0 {
 		var results []*sacloud.VPCRouterPortForwarding
 		for _, raw := range values {
 			v := mapToResourceData(raw.(map[string]interface{}))
@@ -565,7 +565,7 @@ func flattenVPCRouterSiteToSite(vpcRouter *sacloud.VPCRouter) []interface{} {
 }
 
 func expandVPCRouterStaticRouteList(d resourceValueGettable) []*sacloud.VPCRouterStaticRoute {
-	if values, ok := getListFromResource(d, "static_routes"); ok && len(values) > 0 {
+	if values, ok := getListFromResource(d, "static_route"); ok && len(values) > 0 {
 		var results []*sacloud.VPCRouterStaticRoute
 		for _, raw := range values {
 			v := mapToResourceData(raw.(map[string]interface{}))
@@ -595,7 +595,7 @@ func flattenVPCRouterStaticRoutes(vpcRouter *sacloud.VPCRouter) []interface{} {
 }
 
 func expandVPCRouterUserList(d resourceValueGettable) []*sacloud.VPCRouterRemoteAccessUser {
-	if values, ok := getListFromResource(d, "users"); ok && len(values) > 0 {
+	if values, ok := getListFromResource(d, "user"); ok && len(values) > 0 {
 		var results []*sacloud.VPCRouterRemoteAccessUser
 		for _, raw := range values {
 			v := mapToResourceData(raw.(map[string]interface{}))

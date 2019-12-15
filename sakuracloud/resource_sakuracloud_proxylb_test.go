@@ -68,15 +68,15 @@ func TestAccSakuraCloudProxyLB_basic(t *testing.T) {
 					resource.TestCheckResourceAttr(resourceName, "health_check.0.path", "/"),
 					resource.TestCheckResourceAttr(resourceName, "sorry_server.0.ipaddress", ip),
 					resource.TestCheckResourceAttr(resourceName, "sorry_server.0.port", "80"),
-					resource.TestCheckResourceAttr(resourceName, "bind_ports.0.proxy_mode", "http"),
-					resource.TestCheckResourceAttr(resourceName, "bind_ports.0.port", "80"),
-					resource.TestCheckResourceAttr(resourceName, "bind_ports.0.response_header.#", "1"),
-					resource.TestCheckResourceAttr(resourceName, "bind_ports.0.response_header.0.header", "Cache-Control"),
-					resource.TestCheckResourceAttr(resourceName, "bind_ports.0.response_header.0.value", "public, max-age=10"),
-					resource.TestCheckResourceAttr(resourceName, "servers.0.port", "80"),
-					resource.TestCheckResourceAttr(resourceName, "servers.0.enabled", "true"),
+					resource.TestCheckResourceAttr(resourceName, "bind_port.0.proxy_mode", "http"),
+					resource.TestCheckResourceAttr(resourceName, "bind_port.0.port", "80"),
+					resource.TestCheckResourceAttr(resourceName, "bind_port.0.response_header.#", "1"),
+					resource.TestCheckResourceAttr(resourceName, "bind_port.0.response_header.0.header", "Cache-Control"),
+					resource.TestCheckResourceAttr(resourceName, "bind_port.0.response_header.0.value", "public, max-age=10"),
+					resource.TestCheckResourceAttr(resourceName, "server.0.port", "80"),
+					resource.TestCheckResourceAttr(resourceName, "server.0.enabled", "true"),
 					resource.TestCheckResourceAttrPair(
-						resourceName, "servers.0.ipaddress",
+						resourceName, "server.0.ipaddress",
 						"sakuracloud_server.foobar", "ipaddress",
 					),
 					resource.TestCheckResourceAttrPair(
@@ -100,13 +100,13 @@ func TestAccSakuraCloudProxyLB_basic(t *testing.T) {
 					resource.TestCheckResourceAttr(resourceName, "health_check.0.host_header", ""),
 					resource.TestCheckResourceAttr(resourceName, "health_check.0.path", ""),
 					resource.TestCheckNoResourceAttr(resourceName, "sorry_server.0.ipaddress.#"),
-					resource.TestCheckResourceAttr(resourceName, "bind_ports.0.proxy_mode", "https"),
-					resource.TestCheckResourceAttr(resourceName, "bind_ports.0.port", "443"),
-					resource.TestCheckResourceAttr(resourceName, "bind_ports.0.response_header.#", "0"),
-					resource.TestCheckResourceAttr(resourceName, "servers.0.port", "443"),
-					resource.TestCheckResourceAttr(resourceName, "servers.0.enabled", "true"),
+					resource.TestCheckResourceAttr(resourceName, "bind_port.0.proxy_mode", "https"),
+					resource.TestCheckResourceAttr(resourceName, "bind_port.0.port", "443"),
+					resource.TestCheckResourceAttr(resourceName, "bind_port.0.response_header.#", "0"),
+					resource.TestCheckResourceAttr(resourceName, "server.0.port", "443"),
+					resource.TestCheckResourceAttr(resourceName, "server.0.enabled", "true"),
 					resource.TestCheckResourceAttrPair(
-						resourceName, "servers.0.ipaddress",
+						resourceName, "server.0.ipaddress",
 						"sakuracloud_server.foobar", "ipaddress",
 					),
 				),
@@ -186,15 +186,15 @@ func TestAccImportSakuraCloudProxyLB(t *testing.T) {
 			"description":               "description",
 			"tags.0":                    "tag1",
 			"tags.1":                    "tag2",
-			"bind_ports.0.proxy_mode":   "https",
-			"bind_ports.0.port":         "443",
-			"servers.#":                 "2",
-			"servers.0.ipaddress":       ip0,
-			"servers.0.port":            "80",
-			"servers.0.enabled":         "true",
-			"servers.1.ipaddress":       ip1,
-			"servers.1.port":            "80",
-			"servers.1.enabled":         "true",
+			"bind_port.0.proxy_mode":    "https",
+			"bind_port.0.port":          "443",
+			"server.#":                  "2",
+			"server.0.ipaddress":        ip0,
+			"server.0.port":             "80",
+			"server.0.enabled":          "true",
+			"server.1.ipaddress":        ip1,
+			"server.1.port":             "80",
+			"server.1.enabled":          "true",
 		}
 
 		if err := compareStateMulti(s[0], expects); err != nil {
@@ -241,7 +241,7 @@ resource "sakuracloud_proxylb" "foobar" {
     ipaddress = "{{ .arg1 }}"
     port      = 80
   }
-  bind_ports {
+  bind_port {
     proxy_mode = "http"
     port       = 80
     response_header {
@@ -249,7 +249,7 @@ resource "sakuracloud_proxylb" "foobar" {
       value  = "public, max-age=10"
     }
   }
-  servers {
+  server {
     ipaddress = sakuracloud_server.foobar.ipaddress
     port      = 80
   }
@@ -266,7 +266,7 @@ resource "sakuracloud_icon" "foobar" {
 resource sakuracloud_server "foobar" {
   name = "{{ .arg0 }}"
 
-  interfaces {
+  network_interface {
     upstream = "shared"
   }
 
@@ -286,12 +286,12 @@ resource "sakuracloud_proxylb" "foobar" {
     protocol   = "tcp"
     delay_loop = 20
   }
-  bind_ports {
+  bind_port {
     proxy_mode = "https"
     port       = 443
   }
 
-  servers {
+  server {
     ipaddress = sakuracloud_server.foobar.ipaddress
     port      = 443
   }
@@ -303,7 +303,7 @@ resource "sakuracloud_proxylb" "foobar" {
 resource sakuracloud_server "foobar" {
   name = "{{ .arg0 }}"
 
-  interfaces {
+  network_interface {
     upstream = "shared"
   }
 
@@ -322,15 +322,15 @@ resource "sakuracloud_proxylb" "foobar" {
     protocol   = "tcp"
     delay_loop = 20
   }
-  bind_ports {
+  bind_port {
     proxy_mode = "https"
     port       = 443
   }
-  servers {
+  server {
     ipaddress = "{{ .arg1 }}"
     port      = 80
   }
-  servers {
+  server {
     ipaddress = "{{ .arg2 }}"
     port      = 80
   }

@@ -75,7 +75,7 @@ func expandServerDisks(d *schema.ResourceData, client *APIClient) []diskBuilder.
 }
 
 func expandServerNIC(d resourceValueGettable) serverBuilder.NICSettingHolder {
-	nics := d.Get("interfaces").([]interface{})
+	nics := d.Get("network_interface").([]interface{})
 	if len(nics) == 0 {
 		return nil
 	}
@@ -100,7 +100,7 @@ func expandServerNIC(d resourceValueGettable) serverBuilder.NICSettingHolder {
 func expandServerAdditionalNICs(d resourceValueGettable) []serverBuilder.AdditionalNICSettingHolder {
 	var results []serverBuilder.AdditionalNICSettingHolder
 
-	nics := d.Get("interfaces").([]interface{})
+	nics := d.Get("network_interface").([]interface{})
 	if len(nics) < 2 {
 		return results
 	}

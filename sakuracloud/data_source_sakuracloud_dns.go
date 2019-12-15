@@ -50,7 +50,7 @@ func dataSourceSakuraCloudDNS() *schema.Resource {
 				Computed: true,
 				Elem:     &schema.Schema{Type: schema.TypeString},
 			},
-			"records": {
+			"record": {
 				Type:     schema.TypeList,
 				Computed: true,
 				Elem: &schema.Resource{

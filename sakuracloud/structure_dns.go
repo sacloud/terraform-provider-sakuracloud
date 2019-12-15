@@ -29,14 +29,14 @@ func expandDNSCreateRequest(d *schema.ResourceData) *sacloud.DNSCreateRequest {
 		Description: d.Get("description").(string),
 		Tags:        expandTags(d),
 		IconID:      expandSakuraCloudID(d, "icon_id"),
-		Records:     expandDNSRecords(d, "records"),
+		Records:     expandDNSRecords(d, "record"),
 	}
 }
 
 func expandDNSUpdateRequest(d *schema.ResourceData, dns *sacloud.DNS) *sacloud.DNSUpdateRequest {
 	records := dns.Records
-	if d.HasChange("records") {
-		records = expandDNSRecords(d, "records")
+	if d.HasChange("record") {
+		records = expandDNSRecords(d, "record")
 	}
 	return &sacloud.DNSUpdateRequest{
 		Description: d.Get("description").(string),

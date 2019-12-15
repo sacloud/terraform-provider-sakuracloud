@@ -146,10 +146,10 @@ resource "sakuracloud_icon" "foobar" {
 var testAccSakuraCloudSwitch_update = `
 resource "sakuracloud_server" "foobar" {
   name        = "{{ .arg0 }}"
-  interfaces {
+  network_interface {
     upstream = "shared"
   }
-  interfaces {
+  network_interface {
     upstream = sakuracloud_switch.foobar.id
   }
 
