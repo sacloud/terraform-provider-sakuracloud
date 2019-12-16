@@ -93,7 +93,7 @@ func TestAccSakuraCloudMobileGateway_basic(t *testing.T) {
 					resource.TestCheckResourceAttr(resourceName, "private_network_interface.0.ip_address", "192.168.11.101"),
 					resource.TestCheckResourceAttr(resourceName, "private_network_interface.0.netmask", "24"),
 					resource.TestCheckResourceAttr(resourceName, "static_route.#", "0"),
-					resource.TestCheckResourceAttr(resourceName, "sims.#", "0"),
+					resource.TestCheckResourceAttr(resourceName, "sim.#", "0"),
 					resource.TestCheckResourceAttr(resourceName, "sim_routes.#", "0"),
 				),
 			},

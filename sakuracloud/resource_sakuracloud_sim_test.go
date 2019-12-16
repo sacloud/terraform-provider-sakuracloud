@@ -110,12 +110,12 @@ func TestAccSakuraCloudSIM_withMobileGateway(t *testing.T) {
 				Config: buildConfigWithArgs(testAccSakuraCloudSIM_withMobileGateway, rand, iccid, passcode, imei),
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttr(simResourceName, "name", rand),
-					resource.TestCheckResourceAttr(mgwResourceName, "sims.#", "1"),
+					resource.TestCheckResourceAttr(mgwResourceName, "sim.#", "1"),
 					resource.TestCheckResourceAttrPair(
-						mgwResourceName, "sims.0.sim_id",
+						mgwResourceName, "sim.0.sim_id",
 						simResourceName, "id",
 					),
-					resource.TestCheckResourceAttr(mgwResourceName, "sims.0.ip_address", "192.168.0.11"),
+					resource.TestCheckResourceAttr(mgwResourceName, "sim.0.ip_address", "192.168.0.11"),
 					resource.TestCheckResourceAttr(mgwResourceName, "sim_routes.#", "2"),
 					resource.TestCheckResourceAttrPair(
 						mgwResourceName, "sim_routes.0.sim_id",
@@ -133,12 +133,12 @@ func TestAccSakuraCloudSIM_withMobileGateway(t *testing.T) {
 				Config: buildConfigWithArgs(testAccSakuraCloudSIM_withMobileGatewayUpdate, rand, iccid, passcode, imei),
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttr(simResourceName, "name", rand+"-upd"),
-					resource.TestCheckResourceAttr(mgwResourceName, "sims.#", "1"),
+					resource.TestCheckResourceAttr(mgwResourceName, "sim.#", "1"),
 					resource.TestCheckResourceAttrPair(
-						mgwResourceName, "sims.0.sim_id",
+						mgwResourceName, "sim.0.sim_id",
 						simResourceName, "id",
 					),
-					resource.TestCheckResourceAttr(mgwResourceName, "sims.0.ip_address", "192.168.0.11"),
+					resource.TestCheckResourceAttr(mgwResourceName, "sim.0.ip_address", "192.168.0.11"),
 					resource.TestCheckResourceAttr(mgwResourceName, "sim_routes.#", "1"),
 					resource.TestCheckResourceAttrPair(
 						mgwResourceName, "sim_routes.0.sim_id",
@@ -151,14 +151,14 @@ func TestAccSakuraCloudSIM_withMobileGateway(t *testing.T) {
 					),
 					resource.TestCheckResourceAttrPair(
 						simResourceName, "ip_address",
-						mgwResourceName, "sims.0.ip_address",
+						mgwResourceName, "sim.0.ip_address",
 					),
 				),
 			},
 			{
 				Config: buildConfigWithArgs(testAccSakuraCloudSIM_withMobileGatewayDeleted, rand),
 				Check: resource.ComposeTestCheckFunc(
-					resource.TestCheckResourceAttr(mgwResourceName, "sims.#", "0"),
+					resource.TestCheckResourceAttr(mgwResourceName, "sim.#", "0"),
 					resource.TestCheckResourceAttr(mgwResourceName, "sim_routes.#", "0"),
 				),
 			},
@@ -277,7 +277,7 @@ resource "sakuracloud_mobile_gateway" "foobar" {
   name                = "{{ .arg0 }}"
   dns_servers         = data.sakuracloud_zone.zone.dns_servers
 
-  sims {
+  sim {
     sim_id     = sakuracloud_sim.foobar.id
     ip_address = "192.168.0.11"
   }
@@ -320,7 +320,7 @@ resource "sakuracloud_mobile_gateway" "foobar" {
   name                = "{{ .arg0 }}-upd"
   dns_servers         = data.sakuracloud_zone.zone.dns_servers
 
-  sims {
+  sim {
     sim_id     = sakuracloud_sim.foobar.id
     ip_address = "192.168.0.11"
   }

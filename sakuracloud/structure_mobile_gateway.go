@@ -45,7 +45,7 @@ func expandMobileGatewayBuilder(d *schema.ResourceData, client *APIClient) *mobi
 
 func expandMobileGatewaySIMs(d resourceValueGettable) []*mobileGatewayBuilder.SIMSetting {
 	var results []*mobileGatewayBuilder.SIMSetting
-	if sims, ok := d.Get("sims").([]interface{}); ok && len(sims) > 0 {
+	if sims, ok := d.Get("sim").([]interface{}); ok && len(sims) > 0 {
 		for _, v := range sims {
 			sim := expandMobileGatewaySIM(mapToResourceData(v.(map[string]interface{})))
 			results = append(results, sim)
