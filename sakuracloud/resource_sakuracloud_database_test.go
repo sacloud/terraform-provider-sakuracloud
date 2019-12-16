@@ -53,19 +53,20 @@ func TestAccSakuraCloudDatabase_basic(t *testing.T) {
 					resource.TestCheckResourceAttr(resourceName, "tags.#", "2"),
 					resource.TestCheckResourceAttr(resourceName, "tags.0", "tag1"),
 					resource.TestCheckResourceAttr(resourceName, "tags.1", "tag2"),
-					resource.TestCheckResourceAttr(resourceName, "user_name", "defuser"),
-					resource.TestCheckResourceAttr(resourceName, "user_password", password),
+					resource.TestCheckResourceAttr(resourceName, "username", "defuser"),
+					resource.TestCheckResourceAttr(resourceName, "password", password),
 					resource.TestCheckResourceAttr(resourceName, "replica_password", password),
-					resource.TestCheckResourceAttr(resourceName, "allow_networks.#", "2"),
-					resource.TestCheckResourceAttr(resourceName, "allow_networks.0", "192.168.11.0/24"),
-					resource.TestCheckResourceAttr(resourceName, "allow_networks.1", "192.168.12.0/24"),
+					resource.TestCheckResourceAttr(resourceName, "source_ranges.#", "2"),
+					resource.TestCheckResourceAttr(resourceName, "source_ranges.0", "192.168.11.0/24"),
+					resource.TestCheckResourceAttr(resourceName, "source_ranges.1", "192.168.12.0/24"),
 					resource.TestCheckResourceAttr(resourceName, "port", "33061"),
 					resource.TestCheckResourceAttr(resourceName, "backup_time", "00:00"),
 					resource.TestCheckResourceAttr(resourceName, "backup_weekdays.0", "mon"),
 					resource.TestCheckResourceAttr(resourceName, "backup_weekdays.1", "tue"),
-					resource.TestCheckResourceAttr(resourceName, "ipaddress1", "192.168.11.101"),
-					resource.TestCheckResourceAttr(resourceName, "nw_mask_len", "24"),
-					resource.TestCheckResourceAttr(resourceName, "default_route", "192.168.11.1"),
+					resource.TestCheckResourceAttr(resourceName, "ip_addresses.#", "1"),
+					resource.TestCheckResourceAttr(resourceName, "ip_addresses.0", "192.168.11.101"),
+					resource.TestCheckResourceAttr(resourceName, "netmask", "24"),
+					resource.TestCheckResourceAttr(resourceName, "gateway", "192.168.11.1"),
 					resource.TestCheckResourceAttrPair(
 						resourceName, "icon_id",
 						"sakuracloud_icon.foobar", "id",
@@ -84,18 +85,19 @@ func TestAccSakuraCloudDatabase_basic(t *testing.T) {
 					resource.TestCheckResourceAttr(resourceName, "tags.#", "2"),
 					resource.TestCheckResourceAttr(resourceName, "tags.0", "tag1-upd"),
 					resource.TestCheckResourceAttr(resourceName, "tags.1", "tag2-upd"),
-					resource.TestCheckResourceAttr(resourceName, "user_name", "defuser"),
-					resource.TestCheckResourceAttr(resourceName, "user_password", password+"-upd"),
-					resource.TestCheckResourceAttr(resourceName, "allow_networks.#", "2"),
-					resource.TestCheckResourceAttr(resourceName, "allow_networks.0", "192.168.110.0/24"),
-					resource.TestCheckResourceAttr(resourceName, "allow_networks.1", "192.168.120.0/24"),
+					resource.TestCheckResourceAttr(resourceName, "username", "defuser"),
+					resource.TestCheckResourceAttr(resourceName, "password", password+"-upd"),
+					resource.TestCheckResourceAttr(resourceName, "source_ranges.#", "2"),
+					resource.TestCheckResourceAttr(resourceName, "source_ranges.0", "192.168.110.0/24"),
+					resource.TestCheckResourceAttr(resourceName, "source_ranges.1", "192.168.120.0/24"),
 					resource.TestCheckResourceAttr(resourceName, "port", "33062"),
 					resource.TestCheckResourceAttr(resourceName, "backup_time", "00:30"),
 					resource.TestCheckResourceAttr(resourceName, "backup_weekdays.0", "sun"),
 					resource.TestCheckResourceAttr(resourceName, "backup_weekdays.1", "sat"),
-					resource.TestCheckResourceAttr(resourceName, "ipaddress1", "192.168.11.101"),
-					resource.TestCheckResourceAttr(resourceName, "nw_mask_len", "24"),
-					resource.TestCheckResourceAttr(resourceName, "default_route", "192.168.11.1"),
+					resource.TestCheckResourceAttr(resourceName, "ip_addresses.#", "1"),
+					resource.TestCheckResourceAttr(resourceName, "ip_addresses.0", "192.168.11.101"),
+					resource.TestCheckResourceAttr(resourceName, "netmask", "24"),
+					resource.TestCheckResourceAttr(resourceName, "gateway", "192.168.11.1"),
 					resource.TestCheckResourceAttr(resourceName, "icon_id", ""),
 				),
 			},
@@ -185,18 +187,18 @@ func TestAccImportSakuraCloudDatabase(t *testing.T) {
 			"database_type":     "mariadb",
 			"description":       "description",
 			"plan":              "30g",
-			"user_name":         "defuser",
-			"user_password":     password,
+			"username":          "defuser",
+			"password":          password,
 			"replica_password":  password,
-			"allow_networks.0":  "192.168.11.0/24",
-			"allow_networks.1":  "192.168.12.0/24",
+			"source_ranges.0":   "192.168.11.0/24",
+			"source_ranges.1":   "192.168.12.0/24",
 			"port":              "33061",
 			"backup_time":       "00:00",
 			"backup_weekdays.0": "mon",
 			"backup_weekdays.1": "tue",
-			"ipaddress1":        "192.168.11.101",
-			"nw_mask_len":       "24",
-			"default_route":     "192.168.11.1",
+			"ip_addresses.0":    "192.168.11.101",
+			"netmask":           "24",
+			"gateway":           "192.168.11.1",
 			"tags.0":            "tag1",
 			"tags.1":            "tag2",
 		}
@@ -240,21 +242,22 @@ resource "sakuracloud_database" "foobar" {
   database_type = "mariadb"
   plan          = "30g"
 
-  user_name        = "defuser"
-  user_password    = "{{ .arg1 }}"
+  username = "defuser"
+  password = "{{ .arg1 }}"
+
   replica_password = "{{ .arg1 }}"
 
-  allow_networks = ["192.168.11.0/24", "192.168.12.0/24"]
+  source_ranges = ["192.168.11.0/24", "192.168.12.0/24"]
 
   port = 33061
 
   backup_time     = "00:00"
   backup_weekdays = ["mon", "tue"]
 
-  switch_id     = sakuracloud_switch.foobar.id
-  ipaddress1    = "192.168.11.101"
-  nw_mask_len   = 24
-  default_route = "192.168.11.1"
+  switch_id    = sakuracloud_switch.foobar.id
+  ip_addresses = ["192.168.11.101"]
+  netmask      = 24
+  gateway      = "192.168.11.1"
 
   name        = "{{ .arg0 }}"
   description = "description"
@@ -275,11 +278,11 @@ resource "sakuracloud_switch" "foobar" {
 resource "sakuracloud_database" "foobar" {
   database_type = "mariadb"
 
-  plan          = "30g"
-  user_name     = "defuser"
-  user_password = "{{ .arg1 }}-upd"
+  plan     = "30g"
+  username = "defuser"
+  password = "{{ .arg1 }}-upd"
 
-  allow_networks = ["192.168.110.0/24", "192.168.120.0/24"]
+  source_ranges = ["192.168.110.0/24", "192.168.120.0/24"]
 
   port = 33062
 
@@ -290,8 +293,8 @@ resource "sakuracloud_database" "foobar" {
   description = "description-upd"
   tags        = ["tag1-upd", "tag2-upd"]
 
-  switch_id     = sakuracloud_switch.foobar.id
-  ipaddress1    = "192.168.11.101"
-  nw_mask_len   = 24
-  default_route = "192.168.11.1"
+  switch_id    = sakuracloud_switch.foobar.id
+  ip_addresses = ["192.168.11.101"]
+  netmask      = 24
+  gateway      = "192.168.11.1"
 }`

@@ -23,13 +23,14 @@ import (
 func TestAccSakuraCloudDataSourceDatabase_basic(t *testing.T) {
 	resourceName := "data.sakuracloud_database.foobar"
 	rand := randomName()
+	password := randomPassword()
 
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:  func() { testAccPreCheck(t) },
 		Providers: testAccProviders,
 		Steps: []resource.TestStep{
 			{
-				Config: buildConfigWithArgs(testAccSakuraCloudDataSourceDatabase_basic, rand),
+				Config: buildConfigWithArgs(testAccSakuraCloudDataSourceDatabase_basic, rand, password),
 				Check: resource.ComposeTestCheckFunc(
 					testCheckSakuraCloudDataSourceExists(resourceName),
 					resource.TestCheckResourceAttr(resourceName, "name", rand),
@@ -55,14 +56,14 @@ resource "sakuracloud_database" "foobar" {
   description = "description"
   tags        = ["tag1", "tag2", "tag3"]
 
-  user_name     = "defuser"
-  user_password = "DatabasePasswordUser397"
+  username = "defuser"
+  password = "{{ .arg1 }}"
 
   switch_id       = "${sakuracloud_switch.foobar.id}"
-  ipaddress1      = "192.168.11.101"
-  nw_mask_len     = 24
-  default_route   = "192.168.11.1"
-  allow_networks  = ["192.168.11.0/24", "192.168.12.0/24"]
+  ip_addresses    = ["192.168.11.101"]
+  netmask         = 24
+  gateway         = "192.168.11.1"
+  source_ranges   = ["192.168.11.0/24", "192.168.12.0/24"]
   port            = 54321
   backup_weekdays = ["mon", "tue"]
   backup_time     = "00:00"

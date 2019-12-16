@@ -58,15 +58,13 @@ func resourceSakuraCloudVPCRouter() *schema.Resource {
 				ForceNew: true,
 				Optional: true,
 			},
-			"ipaddress1": {
-				Type:     schema.TypeString,
+			"ip_addresses": {
+				Type:     schema.TypeList,
 				ForceNew: true,
 				Optional: true,
-			},
-			"ipaddress2": {
-				Type:     schema.TypeString,
-				ForceNew: true,
-				Optional: true,
+				MinItems: 2,
+				MaxItems: 2,
+				Elem:     &schema.Schema{Type: schema.TypeString},
 			},
 			"vrid": {
 				Type:     schema.TypeInt,
@@ -108,14 +106,14 @@ func resourceSakuraCloudVPCRouter() *schema.Resource {
 							Type:     schema.TypeString,
 							Optional: true,
 						},
-						"ipaddresses": {
+						"ip_addresses": {
 							Type:     schema.TypeList,
 							Required: true,
 							Elem:     &schema.Schema{Type: schema.TypeString},
 							MinItems: 1,
 							MaxItems: 2,
 						},
-						"nw_mask_len": {
+						"netmask": {
 							Type:         schema.TypeInt,
 							Required:     true,
 							ValidateFunc: validation.IntBetween(16, 28),
@@ -156,11 +154,11 @@ func resourceSakuraCloudVPCRouter() *schema.Resource {
 				Optional: true,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
-						"ipaddress": {
+						"ip_address": {
 							Type:     schema.TypeString,
 							Required: true,
 						},
-						"macaddress": {
+						"mac_address": {
 							Type:     schema.TypeString,
 							Required: true,
 						},
@@ -262,12 +260,12 @@ func resourceSakuraCloudVPCRouter() *schema.Resource {
 							Required:     true,
 							ValidateFunc: validation.StringInSlice([]string{"tcp", "udp"}, false),
 						},
-						"global_port": {
+						"public_port": {
 							Type:         schema.TypeInt,
 							Required:     true,
 							ValidateFunc: validation.IntBetween(1, 65535),
 						},
-						"private_address": {
+						"private_ip": {
 							Type:         schema.TypeString,
 							Required:     true,
 							ValidateFunc: validateIPv4Address(),
@@ -341,12 +339,12 @@ func resourceSakuraCloudVPCRouter() *schema.Resource {
 				Optional: true,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
-						"global_address": {
+						"public_ip": {
 							Type:         schema.TypeString,
 							Required:     true,
 							ValidateFunc: validateIPv4Address(),
 						},
-						"private_address": {
+						"private_ip": {
 							Type:         schema.TypeString,
 							Required:     true,
 							ValidateFunc: validateIPv4Address(),
@@ -419,7 +417,7 @@ func resourceSakuraCloudVPCRouter() *schema.Resource {
 				Description:  "target SakuraCloud zone",
 				ValidateFunc: validateZone([]string{"is1a", "is1b", "tk1a", "tk1v"}),
 			},
-			"global_address": {
+			"public_ip": {
 				Type:     schema.TypeString,
 				Computed: true,
 			},
@@ -525,10 +523,11 @@ func setVPCRouterResourceData(ctx context.Context, d *schema.ResourceData, clien
 	}
 	d.Set("plan", flattenVPCRouterPlan(data))
 	d.Set("switch_id", flattenVPCRouterSwitchID(data))
-	d.Set("global_address", flattenVPCRouterGlobalAddress(data))
+	d.Set("public_ip", flattenVPCRouterGlobalAddress(data))
 	d.Set("vip", flattenVPCRouterVIP(data))
-	d.Set("ipaddress1", flattenVPCRouterIPAddress1(data))
-	d.Set("ipaddress2", flattenVPCRouterIPAddress2(data))
+	if err := d.Set("ip_addresses", flattenVPCRouterIPAddresses(data)); err != nil {
+		return err
+	}
 	if err := d.Set("aliases", flattenVPCRouterIPAliases(data)); err != nil {
 		return err
 	}

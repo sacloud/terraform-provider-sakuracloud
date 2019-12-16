@@ -71,18 +71,18 @@ func resourceSakuraCloudNFS() *schema.Resource {
 					int(types.NFSHDDSizes.Size12TB),
 				}),
 			},
-			"ipaddress": {
+			"ip_address": {
 				Type:     schema.TypeString,
 				ForceNew: true,
 				Required: true,
 			},
-			"nw_mask_len": {
+			"netmask": {
 				Type:         schema.TypeInt,
 				ForceNew:     true,
 				Required:     true,
 				ValidateFunc: validation.IntBetween(8, 29),
 			},
-			"default_route": {
+			"gateway": {
 				Type:     schema.TypeString,
 				ForceNew: true,
 				Optional: true,
@@ -220,9 +220,9 @@ func setNFSResourceData(ctx context.Context, d *schema.ResourceData, client *API
 	}
 
 	d.Set("switch_id", data.SwitchID.String())
-	d.Set("ipaddress", data.IPAddresses[0])
-	d.Set("nw_mask_len", data.NetworkMaskLen)
-	d.Set("default_route", data.DefaultRoute)
+	d.Set("ip_address", data.IPAddresses[0])
+	d.Set("netmask", data.NetworkMaskLen)
+	d.Set("gateway", data.DefaultRoute)
 	d.Set("plan", plan)
 	d.Set("size", size)
 	d.Set("name", data.Name)

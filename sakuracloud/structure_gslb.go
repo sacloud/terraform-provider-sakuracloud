@@ -96,7 +96,7 @@ func flattenGSLBServers(data *sacloud.GSLB) []interface{} {
 
 func flattenGSLBServer(s *sacloud.GSLBServer) interface{} {
 	v := map[string]interface{}{}
-	v["ipaddress"] = s.IPAddress
+	v["ip_address"] = s.IPAddress
 	v["enabled"] = s.Enabled.Bool()
 	v["weight"] = s.Weight.Int()
 	return v
@@ -104,7 +104,7 @@ func flattenGSLBServer(s *sacloud.GSLBServer) interface{} {
 
 func expandGSLBServer(d resourceValueGettable) *sacloud.GSLBServer {
 	return &sacloud.GSLBServer{
-		IPAddress: d.Get("ipaddress").(string),
+		IPAddress: d.Get("ip_address").(string),
 		Enabled:   types.StringFlag(d.Get("enabled").(bool)),
 		Weight:    types.StringNumber(d.Get("weight").(int)),
 	}

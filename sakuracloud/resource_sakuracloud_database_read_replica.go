@@ -53,25 +53,28 @@ func resourceSakuraCloudDatabaseReadReplica() *schema.Resource {
 				Computed:     true,
 				ValidateFunc: validateSakuracloudIDType,
 			},
-			"ipaddress1": {
-				Type:     schema.TypeString,
+			"ip_addresses": {
+				Type:     schema.TypeList,
 				ForceNew: true,
 				Required: true,
+				MinItems: 1,
+				MaxItems: 1,
+				Elem:     &schema.Schema{Type: schema.TypeString},
 			},
-			"nw_mask_len": {
+			"netmask": {
 				Type:         schema.TypeInt,
 				ForceNew:     true,
 				Optional:     true,
 				Computed:     true,
 				ValidateFunc: validation.IntBetween(8, 29),
 			},
-			"default_route": {
+			"gateway": {
 				Type:     schema.TypeString,
 				ForceNew: true,
 				Optional: true,
 				Computed: true,
 			},
-			"allow_networks": {
+			"source_ranges": {
 				Type:     schema.TypeList,
 				Optional: true,
 				Elem:     &schema.Schema{Type: schema.TypeString},
@@ -203,10 +206,12 @@ func setDatabaseReadReplicaResourceData(ctx context.Context, d *schema.ResourceD
 	d.Set("master_id", data.ReplicationSetting.ApplianceID.String())
 	d.Set("name", data.Name)
 	d.Set("switch_id", data.SwitchID.String())
-	d.Set("nw_mask_len", data.NetworkMaskLen)
-	d.Set("default_route", data.DefaultRoute)
-	d.Set("ipaddress1", data.IPAddresses[0])
-	if err := d.Set("allow_networks", data.CommonSetting.SourceNetwork); err != nil {
+	d.Set("netmask", data.NetworkMaskLen)
+	d.Set("gateway", data.DefaultRoute)
+	if err := d.Set("ip_addresses", data.IPAddresses); err != nil {
+		return err
+	}
+	if err := d.Set("source_ranges", data.CommonSetting.SourceNetwork); err != nil {
 		return err
 	}
 	d.Set("icon_id", data.IconID.String())

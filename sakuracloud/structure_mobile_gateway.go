@@ -45,7 +45,7 @@ func expandMobileGatewayBuilder(d *schema.ResourceData, client *APIClient) *mobi
 
 func expandMobileGatewaySIMs(d resourceValueGettable) []*mobileGatewayBuilder.SIMSetting {
 	var results []*mobileGatewayBuilder.SIMSetting
-	if sims, ok := d.Get("sims").([]interface{}); ok && len(sims) > 0 {
+	if sims, ok := d.Get("sim").([]interface{}); ok && len(sims) > 0 {
 		for _, v := range sims {
 			sim := expandMobileGatewaySIM(mapToResourceData(v.(map[string]interface{})))
 			results = append(results, sim)
@@ -57,7 +57,7 @@ func expandMobileGatewaySIMs(d resourceValueGettable) []*mobileGatewayBuilder.SI
 func expandMobileGatewaySIM(d resourceValueGettable) *mobileGatewayBuilder.SIMSetting {
 	return &mobileGatewayBuilder.SIMSetting{
 		SIMID:     expandSakuraCloudID(d, "sim_id"),
-		IPAddress: d.Get("ipaddress").(string),
+		IPAddress: d.Get("ip_address").(string),
 	}
 }
 
@@ -71,30 +71,29 @@ func flattenMobileGatewaySIMs(sims []*sacloud.MobileGatewaySIMInfo) []interface{
 
 func flattenMobileGatewaySIM(sim *sacloud.MobileGatewaySIMInfo) interface{} {
 	return map[string]interface{}{
-		"sim_id":    sim.ResourceID,
-		"ipaddress": sim.IP,
+		"sim_id":     sim.ResourceID,
+		"ip_address": sim.IP,
 	}
 }
 
 func expandMobileGatewayDNSSetting(d resourceValueGettable) *sacloud.MobileGatewayDNSSetting {
-	dns1 := d.Get("dns_server1").(string)
-	dns2 := d.Get("dns_server2").(string)
-	if dns1 != "" || dns2 != "" {
+	servers := d.Get("dns_servers").([]interface{})
+	if len(servers) == 2 && servers[0].(string) != "" && servers[1].(string) != "" {
 		return &sacloud.MobileGatewayDNSSetting{
-			DNS1: dns1,
-			DNS2: dns2,
+			DNS1: servers[0].(string),
+			DNS2: servers[1].(string),
 		}
 	}
 	return nil
 }
 
 func expandMobileGatewayPrivateNetworks(d resourceValueGettable) *mobileGatewayBuilder.PrivateInterfaceSetting {
-	if raw, ok := d.Get("network_interface").([]interface{}); ok && len(raw) > 0 {
+	if raw, ok := d.Get("private_network_interface").([]interface{}); ok && len(raw) > 0 {
 		d := mapToResourceData(raw[0].(map[string]interface{}))
 		return &mobileGatewayBuilder.PrivateInterfaceSetting{
 			SwitchID:       expandSakuraCloudID(d, "switch_id"),
-			IPAddress:      d.Get("ipaddress").(string),
-			NetworkMaskLen: d.Get("nw_mask_len").(int),
+			IPAddress:      d.Get("ip_address").(string),
+			NetworkMaskLen: d.Get("netmask").(int),
 		}
 	}
 	return nil
@@ -112,9 +111,9 @@ func flattenMobileGatewayPrivateNetworks(mgw *sacloud.MobileGateway) []interface
 		if setting != nil {
 			return []interface{}{
 				map[string]interface{}{
-					"switch_id":   switchID.String(),
-					"ipaddress":   setting.IPAddress[0],
-					"nw_mask_len": setting.NetworkMaskLen,
+					"switch_id":  switchID.String(),
+					"ip_address": setting.IPAddress[0],
+					"netmask":    setting.NetworkMaskLen,
 				},
 			}
 		}
@@ -138,7 +137,7 @@ func flattenMobileGatewayPublicIPAddress(mgw *sacloud.MobileGateway) string {
 
 func expandMobileGatewaySIMRoutes(d resourceValueGettable) []*mobileGatewayBuilder.SIMRouteSetting {
 	var routes []*mobileGatewayBuilder.SIMRouteSetting
-	if simRoutes, ok := d.Get("sim_routes").([]interface{}); ok && len(simRoutes) > 0 {
+	if simRoutes, ok := d.Get("sim_route").([]interface{}); ok && len(simRoutes) > 0 {
 		for _, v := range simRoutes {
 			route := expandMobileGatewaySIMRoute(mapToResourceData(v.(map[string]interface{})))
 			routes = append(routes, route)

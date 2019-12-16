@@ -51,8 +51,7 @@ func TestAccSakuraCloudVPCRouter_basic(t *testing.T) {
 					resource.TestCheckResourceAttr(resourceName, "internet_connection", "true"),
 					resource.TestCheckResourceAttr(resourceName, "switch_id", ""),
 					resource.TestCheckResourceAttr(resourceName, "vip", ""),
-					resource.TestCheckResourceAttr(resourceName, "ipaddress1", ""),
-					resource.TestCheckResourceAttr(resourceName, "ipaddress2", ""),
+					resource.TestCheckResourceAttr(resourceName, "ip_addresses.#", "0"),
 					resource.TestCheckResourceAttrPair(
 						resourceName, "icon_id",
 						"sakuracloud_icon.foobar", "id",
@@ -72,8 +71,7 @@ func TestAccSakuraCloudVPCRouter_basic(t *testing.T) {
 					resource.TestCheckResourceAttr(resourceName, "internet_connection", "false"),
 					resource.TestCheckResourceAttr(resourceName, "switch_id", ""),
 					resource.TestCheckResourceAttr(resourceName, "vip", ""),
-					resource.TestCheckResourceAttr(resourceName, "ipaddress1", ""),
-					resource.TestCheckResourceAttr(resourceName, "ipaddress2", ""),
+					resource.TestCheckResourceAttr(resourceName, "ip_addresses.#", "0"),
 					resource.TestCheckResourceAttr(resourceName, "syslog_host", "192.168.0.2"),
 					resource.TestCheckResourceAttr(resourceName, "icon_id", ""),
 				),
@@ -103,10 +101,10 @@ func TestAccResourceSakuraCloudVPCRouter_Full(t *testing.T) {
 					resource.TestCheckResourceAttr(resourceName, "name", rand),
 					resource.TestCheckResourceAttr(resourceName, "network_interface.#", "1"),
 					resource.TestCheckResourceAttr(resourceName, "network_interface.0.vip", "192.168.11.1"),
-					resource.TestCheckResourceAttr(resourceName, "network_interface.0.ipaddresses.#", "2"),
-					resource.TestCheckResourceAttr(resourceName, "network_interface.0.ipaddresses.0", "192.168.11.2"),
-					resource.TestCheckResourceAttr(resourceName, "network_interface.0.ipaddresses.1", "192.168.11.3"),
-					resource.TestCheckResourceAttr(resourceName, "network_interface.0.nw_mask_len", "24"),
+					resource.TestCheckResourceAttr(resourceName, "network_interface.0.ip_addresses.#", "2"),
+					resource.TestCheckResourceAttr(resourceName, "network_interface.0.ip_addresses.0", "192.168.11.2"),
+					resource.TestCheckResourceAttr(resourceName, "network_interface.0.ip_addresses.1", "192.168.11.3"),
+					resource.TestCheckResourceAttr(resourceName, "network_interface.0.netmask", "24"),
 					resource.TestCheckResourceAttr(resourceName, "dhcp_server.#", "1"),
 					resource.TestCheckResourceAttr(resourceName, "dhcp_server.0.interface_index", "1"),
 					resource.TestCheckResourceAttr(resourceName, "dhcp_server.0.range_start", "192.168.11.11"),
@@ -115,8 +113,8 @@ func TestAccResourceSakuraCloudVPCRouter_Full(t *testing.T) {
 					resource.TestCheckResourceAttr(resourceName, "dhcp_server.0.dns_servers.0", "8.8.8.8"),
 					resource.TestCheckResourceAttr(resourceName, "dhcp_server.0.dns_servers.1", "8.8.4.4"),
 					resource.TestCheckResourceAttr(resourceName, "dhcp_static_mapping.#", "1"),
-					resource.TestCheckResourceAttr(resourceName, "dhcp_static_mapping.0.ipaddress", "192.168.11.10"),
-					resource.TestCheckResourceAttr(resourceName, "dhcp_static_mapping.0.macaddress", "aa:bb:cc:aa:bb:cc"),
+					resource.TestCheckResourceAttr(resourceName, "dhcp_static_mapping.0.ip_address", "192.168.11.10"),
+					resource.TestCheckResourceAttr(resourceName, "dhcp_static_mapping.0.mac_address", "aa:bb:cc:aa:bb:cc"),
 					resource.TestCheckResourceAttr(resourceName, "firewall.#", "1"),
 					resource.TestCheckResourceAttr(resourceName, "firewall.0.interface_index", "1"),
 					resource.TestCheckResourceAttr(resourceName, "firewall.0.direction", "send"),
@@ -139,8 +137,8 @@ func TestAccResourceSakuraCloudVPCRouter_Full(t *testing.T) {
 					resource.TestCheckResourceAttr(resourceName, "l2tp.0.range_stop", "192.168.11.30"),
 					resource.TestCheckResourceAttr(resourceName, "port_forwarding.#", "1"),
 					resource.TestCheckResourceAttr(resourceName, "port_forwarding.0.protocol", "udp"),
-					resource.TestCheckResourceAttr(resourceName, "port_forwarding.0.global_port", "10022"),
-					resource.TestCheckResourceAttr(resourceName, "port_forwarding.0.private_address", "192.168.11.11"),
+					resource.TestCheckResourceAttr(resourceName, "port_forwarding.0.public_port", "10022"),
+					resource.TestCheckResourceAttr(resourceName, "port_forwarding.0.private_ip", "192.168.11.11"),
 					resource.TestCheckResourceAttr(resourceName, "port_forwarding.0.private_port", "22"),
 					resource.TestCheckResourceAttr(resourceName, "port_forwarding.0.description", "desc"),
 					resource.TestCheckResourceAttr(resourceName, "pptp.#", "1"),
@@ -156,9 +154,9 @@ func TestAccResourceSakuraCloudVPCRouter_Full(t *testing.T) {
 					resource.TestCheckResourceAttr(resourceName, "site_to_site_vpn.0.local_prefix.0", "192.168.21.0/24"),
 					resource.TestCheckResourceAttr(resourceName, "static_nat.#", "1"),
 					resource.TestCheckResourceAttrPair(
-						resourceName, "static_nat.0.global_address",
-						"sakuracloud_internet.foobar", "ipaddresses.3"),
-					resource.TestCheckResourceAttr(resourceName, "static_nat.0.private_address", "192.168.11.12"),
+						resourceName, "static_nat.0.public_ip",
+						"sakuracloud_internet.foobar", "ip_addresses.3"),
+					resource.TestCheckResourceAttr(resourceName, "static_nat.0.private_ip", "192.168.11.12"),
 					resource.TestCheckResourceAttr(resourceName, "static_nat.0.description", "desc"),
 					resource.TestCheckResourceAttr(resourceName, "static_route.#", "1"),
 					resource.TestCheckResourceAttr(resourceName, "static_route.0.prefix", "172.16.0.0/16"),
@@ -282,19 +280,18 @@ resource "sakuracloud_vpc_router" "foobar" {
 
   internet_connection = true
 
-  switch_id  = sakuracloud_internet.foobar.switch_id
-  vip        = sakuracloud_internet.foobar.ipaddresses[0]
-  ipaddress1 = sakuracloud_internet.foobar.ipaddresses[1]
-  ipaddress2 = sakuracloud_internet.foobar.ipaddresses[2]
-  aliases    = [sakuracloud_internet.foobar.ipaddresses[3]]
-  vrid       = 1
+  switch_id    = sakuracloud_internet.foobar.switch_id
+  vip          = sakuracloud_internet.foobar.ip_addresses[0]
+  ip_addresses = [sakuracloud_internet.foobar.ip_addresses[1], sakuracloud_internet.foobar.ip_addresses[2]]
+  aliases      = [sakuracloud_internet.foobar.ip_addresses[3]]
+  vrid         = 1
 
   network_interface {
-    index       = 1
-    switch_id   = sakuracloud_switch.foobar.id
-    vip         = "192.168.11.1"
-    ipaddresses = ["192.168.11.2", "192.168.11.3"]
-    nw_mask_len = 24 
+    index        = 1
+    switch_id    = sakuracloud_switch.foobar.id
+    vip          = "192.168.11.1"
+    ip_addresses = ["192.168.11.2", "192.168.11.3"]
+    netmask      = 24 
   }
 
   dhcp_server {
@@ -306,8 +303,8 @@ resource "sakuracloud_vpc_router" "foobar" {
   }
 
   dhcp_static_mapping {
-    ipaddress  = "192.168.11.10"
-    macaddress = "aa:bb:cc:aa:bb:cc"
+    ip_address  = "192.168.11.10"
+    mac_address = "aa:bb:cc:aa:bb:cc"
   }
 
   firewall {
@@ -344,11 +341,11 @@ resource "sakuracloud_vpc_router" "foobar" {
   }
 
   port_forwarding {
-    protocol        = "udp"
-    global_port     = 10022
-    private_address = "192.168.11.11"
-    private_port    = 22
-    description     = "desc"
+    protocol     = "udp"
+    public_port  = 10022
+    private_ip   = "192.168.11.11"
+    private_port = 22
+    description  = "desc"
   }
 
   pptp {
@@ -365,9 +362,9 @@ resource "sakuracloud_vpc_router" "foobar" {
   }
 
   static_nat {
-    global_address  = sakuracloud_internet.foobar.ipaddresses[3]
-    private_address = "192.168.11.12"
-    description     = "desc"
+    public_ip   = sakuracloud_internet.foobar.ip_addresses[3]
+    private_ip  = "192.168.11.12"
+    description = "desc"
   }
 
   static_route {
@@ -397,11 +394,10 @@ resource "sakuracloud_vpc_router" "foobar" {
 
   internet_connection = true
 
-  switch_id  = sakuracloud_internet.foobar.switch_id
-  vip        = sakuracloud_internet.foobar.ipaddresses[0]
-  ipaddress1 = sakuracloud_internet.foobar.ipaddresses[1]
-  ipaddress2 = sakuracloud_internet.foobar.ipaddresses[2]
-  aliases    = [sakuracloud_internet.foobar.ipaddresses[3]]
-  vrid       = 1
+  switch_id    = sakuracloud_internet.foobar.switch_id
+  vip          = sakuracloud_internet.foobar.ip_addresses[0]
+  ip_addresses = [sakuracloud_internet.foobar.ip_addresses[1], sakuracloud_internet.foobar.ip_addresses[2]]
+  aliases      = [sakuracloud_internet.foobar.ip_addresses[3]]
+  vrid         = 1
 }
 `

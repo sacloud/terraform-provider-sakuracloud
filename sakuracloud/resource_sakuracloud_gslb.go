@@ -97,7 +97,7 @@ func resourceSakuraCloudGSLB() *schema.Resource {
 				MaxItems: 12,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
-						"ipaddress": {
+						"ip_address": {
 							Type:     schema.TypeString,
 							Required: true,
 						},

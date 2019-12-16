@@ -41,7 +41,7 @@ func resourceSakuraCloudMobileGateway() *schema.Resource {
 				Type:     schema.TypeString,
 				Required: true,
 			},
-			"network_interface": {
+			"private_network_interface": {
 				Type:     schema.TypeList,
 				Optional: true,
 				MaxItems: 1,
@@ -52,12 +52,12 @@ func resourceSakuraCloudMobileGateway() *schema.Resource {
 							ValidateFunc: validateSakuracloudIDType,
 							Required:     true,
 						},
-						"ipaddress": {
+						"ip_address": {
 							Type:         schema.TypeString,
 							ValidateFunc: validateIPv4Address(),
 							Required:     true,
 						},
-						"nw_mask_len": {
+						"netmask": {
 							Type:         schema.TypeInt,
 							Required:     true,
 							ValidateFunc: validation.IntBetween(8, 29),
@@ -83,15 +83,12 @@ func resourceSakuraCloudMobileGateway() *schema.Resource {
 				Optional: true,
 				Default:  false,
 			},
-			"dns_server1": {
-				Type:         schema.TypeString,
-				Required:     true,
-				ValidateFunc: validateIPv4Address(),
-			},
-			"dns_server2": {
-				Type:         schema.TypeString,
-				Required:     true,
-				ValidateFunc: validateIPv4Address(),
+			"dns_servers": {
+				Type:     schema.TypeList,
+				Required: true,
+				MaxItems: 2,
+				MinItems: 2,
+				Elem:     &schema.Schema{Type: schema.TypeString},
 			},
 			"traffic_control": {
 				Type:     schema.TypeList,
@@ -145,7 +142,7 @@ func resourceSakuraCloudMobileGateway() *schema.Resource {
 					},
 				},
 			},
-			"sims": {
+			"sim": {
 				Type:     schema.TypeList,
 				Optional: true,
 				Elem: &schema.Resource{
@@ -155,7 +152,7 @@ func resourceSakuraCloudMobileGateway() *schema.Resource {
 							ValidateFunc: validateSakuracloudIDType,
 							Required:     true,
 						},
-						"ipaddress": {
+						"ip_address": {
 							Type:         schema.TypeString,
 							ValidateFunc: validateIPv4Address(),
 							Required:     true,
@@ -163,7 +160,7 @@ func resourceSakuraCloudMobileGateway() *schema.Resource {
 					},
 				},
 			},
-			"sim_routes": {
+			"sim_route": {
 				Type:     schema.TypeList,
 				Optional: true,
 				Elem: &schema.Resource{
@@ -310,7 +307,7 @@ func setMobileGatewayResourceData(ctx context.Context, d *schema.ResourceData, c
 	}
 
 	// set data
-	if err := d.Set("network_interface", flattenMobileGatewayPrivateNetworks(data)); err != nil {
+	if err := d.Set("private_network_interface", flattenMobileGatewayPrivateNetworks(data)); err != nil {
 		return err
 	}
 	d.Set("public_ip", flattenMobileGatewayPublicIPAddress(data))
@@ -321,8 +318,7 @@ func setMobileGatewayResourceData(ctx context.Context, d *schema.ResourceData, c
 	if err := d.Set("traffic_control", flattenMobileGatewayTrafficConfigs(tc)); err != nil {
 		return err
 	}
-	d.Set("dns_server1", resolver.DNS1)
-	d.Set("dns_server2", resolver.DNS2)
+	d.Set("dns_servers", []string{resolver.DNS1, resolver.DNS2})
 	if err := d.Set("static_route", flattenMobileGatewayStaticRoutes(data.Settings.StaticRoute)); err != nil {
 		return err
 	}
@@ -332,10 +328,10 @@ func setMobileGatewayResourceData(ctx context.Context, d *schema.ResourceData, c
 	if err := d.Set("tags", data.Tags); err != nil {
 		return err
 	}
-	if err := d.Set("sims", flattenMobileGatewaySIMs(sims)); err != nil {
+	if err := d.Set("sim", flattenMobileGatewaySIMs(sims)); err != nil {
 		return err
 	}
-	if err := d.Set("sim_routes", flattenMobileGatewaySIMRoutes(simRoutes)); err != nil {
+	if err := d.Set("sim_route", flattenMobileGatewaySIMRoutes(simRoutes)); err != nil {
 		return err
 	}
 	d.Set("zone", zone)

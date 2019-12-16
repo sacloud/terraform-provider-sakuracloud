@@ -52,19 +52,16 @@ func dataSourceSakuraCloudLoadBalancer() *schema.Resource {
 				Type:     schema.TypeString,
 				Computed: true,
 			},
-			"ipaddress1": {
-				Type:     schema.TypeString,
+			"ip_addresses": {
+				Type:     schema.TypeList,
 				Computed: true,
+				Elem:     &schema.Schema{Type: schema.TypeString},
 			},
-			"ipaddress2": {
-				Type:     schema.TypeString,
-				Computed: true,
-			},
-			"nw_mask_len": {
+			"netmask": {
 				Type:     schema.TypeInt,
 				Computed: true,
 			},
-			"default_route": {
+			"gateway": {
 				Type:     schema.TypeString,
 				Computed: true,
 			},
@@ -111,7 +108,7 @@ func dataSourceSakuraCloudLoadBalancer() *schema.Resource {
 							Computed: true,
 							Elem: &schema.Resource{
 								Schema: map[string]*schema.Schema{
-									"ipaddress": {
+									"ip_address": {
 										Type:     schema.TypeString,
 										Computed: true,
 									},
