@@ -53,10 +53,13 @@ func resourceSakuraCloudDatabaseReadReplica() *schema.Resource {
 				Computed:     true,
 				ValidateFunc: validateSakuracloudIDType,
 			},
-			"ipaddress1": {
-				Type:     schema.TypeString,
+			"ip_addresses": {
+				Type:     schema.TypeList,
 				ForceNew: true,
 				Required: true,
+				MinItems: 1,
+				MaxItems: 1,
+				Elem:     &schema.Schema{Type: schema.TypeString},
 			},
 			"nw_mask_len": {
 				Type:         schema.TypeInt,
@@ -205,7 +208,9 @@ func setDatabaseReadReplicaResourceData(ctx context.Context, d *schema.ResourceD
 	d.Set("switch_id", data.SwitchID.String())
 	d.Set("nw_mask_len", data.NetworkMaskLen)
 	d.Set("gateway", data.DefaultRoute)
-	d.Set("ipaddress1", data.IPAddresses[0])
+	if err := d.Set("ip_addresses", data.IPAddresses); err != nil {
+		return err
+	}
 	if err := d.Set("source_ranges", data.CommonSetting.SourceNetwork); err != nil {
 		return err
 	}
