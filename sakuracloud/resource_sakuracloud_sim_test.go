@@ -110,56 +110,56 @@ func TestAccSakuraCloudSIM_withMobileGateway(t *testing.T) {
 				Config: buildConfigWithArgs(testAccSakuraCloudSIM_withMobileGateway, rand, iccid, passcode, imei),
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttr(simResourceName, "name", rand),
-					resource.TestCheckResourceAttr(mgwResourceName, "sims.#", "1"),
+					resource.TestCheckResourceAttr(mgwResourceName, "sim.#", "1"),
 					resource.TestCheckResourceAttrPair(
-						mgwResourceName, "sims.0.sim_id",
+						mgwResourceName, "sim.0.sim_id",
 						simResourceName, "id",
 					),
-					resource.TestCheckResourceAttr(mgwResourceName, "sims.0.ipaddress", "192.168.0.11"),
-					resource.TestCheckResourceAttr(mgwResourceName, "sim_routes.#", "2"),
+					resource.TestCheckResourceAttr(mgwResourceName, "sim.0.ip_address", "192.168.0.11"),
+					resource.TestCheckResourceAttr(mgwResourceName, "sim_route.#", "2"),
 					resource.TestCheckResourceAttrPair(
-						mgwResourceName, "sim_routes.0.sim_id",
+						mgwResourceName, "sim_route.0.sim_id",
 						simResourceName, "id",
 					),
-					resource.TestCheckResourceAttr(mgwResourceName, "sim_routes.0.prefix", "192.168.1.0/24"),
+					resource.TestCheckResourceAttr(mgwResourceName, "sim_route.0.prefix", "192.168.1.0/24"),
 					resource.TestCheckResourceAttrPair(
-						mgwResourceName, "sim_routes.1.sim_id",
+						mgwResourceName, "sim_route.1.sim_id",
 						simResourceName, "id",
 					),
-					resource.TestCheckResourceAttr(mgwResourceName, "sim_routes.1.prefix", "192.168.2.0/24"),
+					resource.TestCheckResourceAttr(mgwResourceName, "sim_route.1.prefix", "192.168.2.0/24"),
 				),
 			},
 			{
 				Config: buildConfigWithArgs(testAccSakuraCloudSIM_withMobileGatewayUpdate, rand, iccid, passcode, imei),
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttr(simResourceName, "name", rand+"-upd"),
-					resource.TestCheckResourceAttr(mgwResourceName, "sims.#", "1"),
+					resource.TestCheckResourceAttr(mgwResourceName, "sim.#", "1"),
 					resource.TestCheckResourceAttrPair(
-						mgwResourceName, "sims.0.sim_id",
+						mgwResourceName, "sim.0.sim_id",
 						simResourceName, "id",
 					),
-					resource.TestCheckResourceAttr(mgwResourceName, "sims.0.ipaddress", "192.168.0.11"),
-					resource.TestCheckResourceAttr(mgwResourceName, "sim_routes.#", "1"),
+					resource.TestCheckResourceAttr(mgwResourceName, "sim.0.ip_address", "192.168.0.11"),
+					resource.TestCheckResourceAttr(mgwResourceName, "sim_route.#", "1"),
 					resource.TestCheckResourceAttrPair(
-						mgwResourceName, "sim_routes.0.sim_id",
+						mgwResourceName, "sim_route.0.sim_id",
 						simResourceName, "id",
 					),
-					resource.TestCheckResourceAttr(mgwResourceName, "sim_routes.0.prefix", "192.168.2.0/24"),
+					resource.TestCheckResourceAttr(mgwResourceName, "sim_route.0.prefix", "192.168.2.0/24"),
 					resource.TestCheckResourceAttrPair(
 						simResourceName, "mobile_gateway_id",
 						mgwResourceName, "id",
 					),
 					resource.TestCheckResourceAttrPair(
-						simResourceName, "ipaddress",
-						mgwResourceName, "sims.0.ipaddress",
+						simResourceName, "ip_address",
+						mgwResourceName, "sim.0.ip_address",
 					),
 				),
 			},
 			{
 				Config: buildConfigWithArgs(testAccSakuraCloudSIM_withMobileGatewayDeleted, rand),
 				Check: resource.ComposeTestCheckFunc(
-					resource.TestCheckResourceAttr(mgwResourceName, "sims.#", "0"),
-					resource.TestCheckResourceAttr(mgwResourceName, "sim_routes.#", "0"),
+					resource.TestCheckResourceAttr(mgwResourceName, "sim.#", "0"),
+					resource.TestCheckResourceAttr(mgwResourceName, "sim_route.#", "0"),
 				),
 			},
 		},
@@ -268,26 +268,25 @@ resource "sakuracloud_switch" "foobar" {
   name = "{{ .arg0 }}"
 }
 resource "sakuracloud_mobile_gateway" "foobar" {
-  network_interface {
-    switch_id   = sakuracloud_switch.foobar.id
-    ipaddress   = "192.168.0.1"
-    nw_mask_len = 24
+  private_network_interface {
+    switch_id  = sakuracloud_switch.foobar.id
+    ip_address = "192.168.0.1"
+    netmask    = 24
   }
   internet_connection = true
   name                = "{{ .arg0 }}"
-  dns_server1         = data.sakuracloud_zone.zone.dns_servers[0]
-  dns_server2         = data.sakuracloud_zone.zone.dns_servers[1]
+  dns_servers         = data.sakuracloud_zone.zone.dns_servers
 
-  sims {
-    sim_id    = sakuracloud_sim.foobar.id
-    ipaddress = "192.168.0.11"
+  sim {
+    sim_id     = sakuracloud_sim.foobar.id
+    ip_address = "192.168.0.11"
   }
 
-  sim_routes {
+  sim_route {
     sim_id = sakuracloud_sim.foobar.id
     prefix = "192.168.1.0/24"
   }
-  sim_routes {
+  sim_route {
     sim_id = sakuracloud_sim.foobar.id
     prefix = "192.168.2.0/24"
   }
@@ -312,21 +311,20 @@ resource "sakuracloud_switch" "foobar" {
 }
 
 resource "sakuracloud_mobile_gateway" "foobar" {
-  network_interface {
-    switch_id   = sakuracloud_switch.foobar.id
-    ipaddress   = "192.168.0.1"
-    nw_mask_len = 24
+  private_network_interface {
+    switch_id  = sakuracloud_switch.foobar.id
+    ip_address = "192.168.0.1"
+    netmask    = 24
   }
   internet_connection = true
   name                = "{{ .arg0 }}-upd"
-  dns_server1         = data.sakuracloud_zone.zone.dns_servers[0]
-  dns_server2         = data.sakuracloud_zone.zone.dns_servers[1]
+  dns_servers         = data.sakuracloud_zone.zone.dns_servers
 
-  sims {
-    sim_id    = sakuracloud_sim.foobar.id
-    ipaddress = "192.168.0.11"
+  sim {
+    sim_id     = sakuracloud_sim.foobar.id
+    ip_address = "192.168.0.11"
   }
-  sim_routes {
+  sim_route {
     sim_id = sakuracloud_sim.foobar.id
     prefix = "192.168.2.0/24"
   }
@@ -339,13 +337,12 @@ resource "sakuracloud_switch" "foobar" {
   name = "{{ .arg0 }}"
 }
 resource "sakuracloud_mobile_gateway" "foobar" {
-  network_interface {
-    switch_id   = sakuracloud_switch.foobar.id
-    ipaddress   = "192.168.0.1"
-    nw_mask_len = 24
+  private_network_interface {
+    switch_id  = sakuracloud_switch.foobar.id
+    ip_address = "192.168.0.1"
+    netmask    = 24
   }
   internet_connection = true
   name                = "{{ .arg0 }}"
-  dns_server1         = data.sakuracloud_zone.zone.dns_servers[0]
-  dns_server2         = data.sakuracloud_zone.zone.dns_servers[1]
+  dns_servers         = data.sakuracloud_zone.zone.dns_servers
 }`

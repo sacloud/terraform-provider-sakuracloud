@@ -43,13 +43,10 @@ func dataSourceSakuraCloudVPCRouter() *schema.Resource {
 				Type:     schema.TypeString,
 				Computed: true,
 			},
-			"ipaddress1": {
-				Type:     schema.TypeString,
+			"ip_addresses": {
+				Type:     schema.TypeList,
 				Computed: true,
-			},
-			"ipaddress2": {
-				Type:     schema.TypeString,
-				Computed: true,
+				Elem:     &schema.Schema{Type: schema.TypeString},
 			},
 			"vrid": {
 				Type:     schema.TypeInt,
@@ -73,7 +70,7 @@ func dataSourceSakuraCloudVPCRouter() *schema.Resource {
 				Computed: true,
 				Elem:     &schema.Schema{Type: schema.TypeString},
 			},
-			"global_address": {
+			"public_ip": {
 				Type:     schema.TypeString,
 				Computed: true,
 			},
@@ -102,12 +99,12 @@ func dataSourceSakuraCloudVPCRouter() *schema.Resource {
 							Type:     schema.TypeString,
 							Computed: true,
 						},
-						"ipaddresses": {
+						"ip_addresses": {
 							Type:     schema.TypeList,
 							Elem:     &schema.Schema{Type: schema.TypeString},
 							Computed: true,
 						},
-						"nw_mask_len": {
+						"netmask": {
 							Type:     schema.TypeInt,
 							Computed: true,
 						},
@@ -144,11 +141,11 @@ func dataSourceSakuraCloudVPCRouter() *schema.Resource {
 				Computed: true,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
-						"ipaddress": {
+						"ip_address": {
 							Type:     schema.TypeString,
 							Computed: true,
 						},
-						"macaddress": {
+						"mac_address": {
 							Type:     schema.TypeString,
 							Computed: true,
 						},
@@ -241,11 +238,11 @@ func dataSourceSakuraCloudVPCRouter() *schema.Resource {
 							Type:     schema.TypeString,
 							Computed: true,
 						},
-						"global_port": {
+						"public_port": {
 							Type:     schema.TypeInt,
 							Computed: true,
 						},
-						"private_address": {
+						"private_ip": {
 							Type:     schema.TypeString,
 							Computed: true,
 						},
@@ -312,11 +309,11 @@ func dataSourceSakuraCloudVPCRouter() *schema.Resource {
 				Computed: true,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
-						"global_address": {
+						"public_ip": {
 							Type:     schema.TypeString,
 							Computed: true,
 						},
-						"private_address": {
+						"private_ip": {
 							Type:     schema.TypeString,
 							Computed: true,
 						},

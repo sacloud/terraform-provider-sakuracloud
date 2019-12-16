@@ -66,23 +66,21 @@ func resourceSakuraCloudLoadBalancer() *schema.Resource {
 				Default:      "standard",
 				ValidateFunc: validation.StringInSlice([]string{"standard", "highspec"}, false),
 			},
-			"ipaddress1": {
-				Type:     schema.TypeString,
+			"ip_addresses": {
+				Type:     schema.TypeList,
 				ForceNew: true,
 				Required: true,
+				MinItems: 1,
+				MaxItems: 2,
+				Elem:     &schema.Schema{Type: schema.TypeString},
 			},
-			"ipaddress2": {
-				Type:     schema.TypeString,
-				ForceNew: true,
-				Optional: true,
-			},
-			"nw_mask_len": {
+			"netmask": {
 				Type:         schema.TypeInt,
 				ForceNew:     true,
 				Required:     true,
 				ValidateFunc: validation.IntBetween(8, 29),
 			},
-			"default_route": {
+			"gateway": {
 				Type:     schema.TypeString,
 				ForceNew: true,
 				Optional: true,
@@ -146,7 +144,7 @@ func resourceSakuraCloudLoadBalancer() *schema.Resource {
 							MaxItems: 40,
 							Elem: &schema.Resource{
 								Schema: map[string]*schema.Schema{
-									"ipaddress": {
+									"ip_address": {
 										Type:     schema.TypeString,
 										Required: true,
 									},
@@ -271,16 +269,17 @@ func setLoadBalancerResourceData(ctx context.Context, d *schema.ResourceData, cl
 		return fmt.Errorf("got unexpected state: LoadBalancer[%d].Availability is failed", data.ID)
 	}
 
-	ha, ipaddress1, ipaddress2 := flattenLoadBalancerIPAddresses(data)
+	ha, ipAddresses := flattenLoadBalancerIPAddresses(data)
 
 	d.Set("switch_id", data.SwitchID.String())
 	d.Set("vrid", data.VRID)
 	d.Set("plan", flattenLoadBalancerPlanID(data))
 	d.Set("high_availability", ha)
-	d.Set("ipaddress1", ipaddress1)
-	d.Set("ipaddress2", ipaddress2)
-	d.Set("nw_mask_len", data.NetworkMaskLen)
-	d.Set("default_route", data.DefaultRoute)
+	if err := d.Set("ip_addresses", ipAddresses); err != nil {
+		return err
+	}
+	d.Set("netmask", data.NetworkMaskLen)
+	d.Set("gateway", data.DefaultRoute)
 	d.Set("name", data.Name)
 	d.Set("icon_id", data.IconID.String())
 	d.Set("description", data.Description)

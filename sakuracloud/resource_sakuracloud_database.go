@@ -54,12 +54,12 @@ func resourceSakuraCloudDatabase() *schema.Resource {
 				Default:      "10g",
 				ValidateFunc: validation.StringInSlice([]string{"10g", "30g", "90g", "240g", "500g", "1t"}, false),
 			},
-			"user_name": {
+			"username": {
 				Type:     schema.TypeString,
 				ForceNew: true,
 				Required: true,
 			},
-			"user_password": {
+			"password": {
 				Type:     schema.TypeString,
 				Required: true,
 			},
@@ -73,7 +73,7 @@ func resourceSakuraCloudDatabase() *schema.Resource {
 				Optional:  true,
 				Sensitive: true,
 			},
-			"allow_networks": {
+			"source_ranges": {
 				Type:     schema.TypeList,
 				Optional: true,
 				Elem:     &schema.Schema{Type: schema.TypeString},
@@ -100,18 +100,21 @@ func resourceSakuraCloudDatabase() *schema.Resource {
 				Required:     true,
 				ValidateFunc: validateSakuracloudIDType,
 			},
-			"ipaddress1": {
-				Type:     schema.TypeString,
+			"ip_addresses": {
+				Type:     schema.TypeList,
 				ForceNew: true,
 				Required: true,
+				MinItems: 1,
+				MaxItems: 1,
+				Elem:     &schema.Schema{Type: schema.TypeString},
 			},
-			"nw_mask_len": {
+			"netmask": {
 				Type:         schema.TypeInt,
 				ForceNew:     true,
 				Required:     true,
 				ValidateFunc: validation.IntBetween(8, 29),
 			},
-			"default_route": {
+			"gateway": {
 				Type:     schema.TypeString,
 				ForceNew: true,
 				Required: true,
@@ -248,17 +251,19 @@ func setDatabaseResourceData(ctx context.Context, d *schema.ResourceData, client
 	}
 
 	d.Set("name", data.Name)
-	d.Set("user_name", data.CommonSetting.DefaultUser)
-	d.Set("user_password", data.CommonSetting.UserPassword)
+	d.Set("username", data.CommonSetting.DefaultUser)
+	d.Set("password", data.CommonSetting.UserPassword)
 	d.Set("plan", databasePlanIDToName(data.PlanID))
-	if err := d.Set("allow_networks", data.CommonSetting.SourceNetwork); err != nil {
+	if err := d.Set("source_ranges", data.CommonSetting.SourceNetwork); err != nil {
 		return err
 	}
 	d.Set("port", data.CommonSetting.ServicePort)
 	d.Set("switch_id", data.SwitchID.String())
-	d.Set("nw_mask_len", data.NetworkMaskLen)
-	d.Set("default_route", data.DefaultRoute)
-	d.Set("ipaddress1", data.IPAddresses[0])
+	d.Set("netmask", data.NetworkMaskLen)
+	d.Set("gateway", data.DefaultRoute)
+	if err := d.Set("ip_addresses", data.IPAddresses); err != nil {
+		return err
+	}
 	d.Set("icon_id", data.IconID.String())
 	d.Set("description", data.Description)
 	d.Set("zone", getZone(d, client))

@@ -163,7 +163,7 @@ func resourceSakuraCloudProxyLB() *schema.Resource {
 				MaxItems: 1,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
-						"ipaddress": {
+						"ip_address": {
 							Type:     schema.TypeString,
 							Required: true,
 						},
@@ -226,7 +226,7 @@ func resourceSakuraCloudProxyLB() *schema.Resource {
 				MaxItems: 40,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
-						"ipaddress": {
+						"ip_address": {
 							Type:     schema.TypeString,
 							Required: true,
 						},

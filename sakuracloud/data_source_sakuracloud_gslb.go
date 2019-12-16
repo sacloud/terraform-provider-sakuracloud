@@ -93,7 +93,7 @@ func dataSourceSakuraCloudGSLB() *schema.Resource {
 				Computed: true,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
-						"ipaddress": {
+						"ip_address": {
 							Type:     schema.TypeString,
 							Computed: true,
 						},

@@ -93,7 +93,7 @@ func resourceSakuraCloudServer() *schema.Resource {
 							Optional:     true,
 							ValidateFunc: validateSakuracloudIDType,
 						},
-						"macaddress": {
+						"mac_address": {
 							Type:     schema.TypeString,
 							Computed: true,
 						},
@@ -167,7 +167,7 @@ func resourceSakuraCloudServer() *schema.Resource {
 				Computed: true,
 				Elem:     &schema.Schema{Type: schema.TypeString},
 			},
-			"ipaddress": {
+			"ip_address": {
 				Type:     schema.TypeString,
 				Optional: true,
 				Computed: true,
@@ -177,11 +177,11 @@ func resourceSakuraCloudServer() *schema.Resource {
 				Optional: true,
 				Computed: true,
 			},
-			"nw_address": {
+			"network_address": {
 				Type:     schema.TypeString,
 				Computed: true,
 			},
-			"nw_mask_len": {
+			"netmask": {
 				Type:     schema.TypeInt,
 				Optional: true,
 				Computed: true,
@@ -321,10 +321,10 @@ func setServerResourceData(ctx context.Context, d *schema.ResourceData, client *
 	if err := d.Set("tags", data.Tags); err != nil {
 		return err
 	}
-	d.Set("ipaddress", ip)
+	d.Set("ip_address", ip)
 	d.Set("gateway", gateway)
-	d.Set("nw_address", nwAddress)
-	d.Set("nw_mask_len", nwMaskLen)
+	d.Set("network_address", nwAddress)
+	d.Set("netmask", nwMaskLen)
 	if err := d.Set("dns_servers", data.Zone.Region.NameServers); err != nil {
 		return err
 	}
@@ -335,9 +335,9 @@ func setServerResourceData(ctx context.Context, d *schema.ResourceData, client *
 func isServerDiskConfigChanged(d *schema.ResourceData) bool {
 	return d.HasChange("disks") ||
 		d.HasChange("network_interface") ||
-		d.HasChange("ipaddress") ||
+		d.HasChange("ip_address") ||
 		d.HasChange("gateway") ||
-		d.HasChange("nw_mask_len") ||
+		d.HasChange("netmask") ||
 		d.HasChange("hostname") ||
 		d.HasChange("password") ||
 		d.HasChange("ssh_key_ids") ||

@@ -48,10 +48,10 @@ func TestAccSakuraCloudDataSourceProxyLB_basic(t *testing.T) {
 					resource.TestCheckResourceAttr(resourceName, "health_check.0.delay_loop", "20"),
 					resource.TestCheckResourceAttr(resourceName, "bind_port.0.proxy_mode", "http"),
 					resource.TestCheckResourceAttr(resourceName, "bind_port.0.port", "80"),
-					resource.TestCheckResourceAttr(resourceName, "server.0.ipaddress", ip0),
+					resource.TestCheckResourceAttr(resourceName, "server.0.ip_address", ip0),
 					resource.TestCheckResourceAttr(resourceName, "server.0.port", "80"),
 					resource.TestCheckResourceAttr(resourceName, "server.0.enabled", "true"),
-					resource.TestCheckResourceAttr(resourceName, "server.1.ipaddress", ip1),
+					resource.TestCheckResourceAttr(resourceName, "server.1.ip_address", ip1),
 					resource.TestCheckResourceAttr(resourceName, "server.1.port", "80"),
 					resource.TestCheckResourceAttr(resourceName, "server.1.enabled", "true"),
 				),
@@ -77,12 +77,12 @@ resource "sakuracloud_proxylb" "foobar" {
   }
 
   server {
-    ipaddress = "{{ .arg1 }}"
-    port      = 80
+    ip_address = "{{ .arg1 }}"
+    port       = 80
   }
   server {
-    ipaddress = "{{ .arg2 }}"
-    port      = 80
+    ip_address = "{{ .arg2 }}"
+    port       = 80
   }
 }
 

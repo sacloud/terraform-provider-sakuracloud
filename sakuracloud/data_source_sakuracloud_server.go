@@ -65,7 +65,7 @@ func dataSourceSakuraCloudServer() *schema.Resource {
 							Type:     schema.TypeString,
 							Computed: true,
 						},
-						"macaddress": {
+						"mac_address": {
 							Type:     schema.TypeString,
 							Computed: true,
 						},
@@ -105,7 +105,7 @@ func dataSourceSakuraCloudServer() *schema.Resource {
 				Description:  "target SakuraCloud zone",
 				ValidateFunc: validateZone([]string{"is1a", "is1b", "tk1a", "tk1v"}),
 			},
-			"ipaddress": {
+			"ip_address": {
 				Type:     schema.TypeString,
 				Computed: true,
 			},
@@ -118,11 +118,11 @@ func dataSourceSakuraCloudServer() *schema.Resource {
 				Type:     schema.TypeString,
 				Computed: true,
 			},
-			"nw_address": {
+			"network_address": {
 				Type:     schema.TypeString,
 				Computed: true,
 			},
-			"nw_mask_len": {
+			"netmask": {
 				Type:     schema.TypeInt,
 				Computed: true,
 			},

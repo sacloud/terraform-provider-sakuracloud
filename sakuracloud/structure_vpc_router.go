@@ -80,10 +80,18 @@ func expandVPCRouterNICSetting(d resourceValueGettable) vpcrouter.NICSettingHold
 	case types.VPCRouterPlans.Standard:
 		return &vpcrouter.StandardNICSetting{}
 	default:
+		ipAddresses := expandStringList(d.Get("ip_addresses").([]interface{}))
+		var ip1, ip2 string
+		if len(ipAddresses) > 0 {
+			ip1 = ipAddresses[0]
+		}
+		if len(ipAddresses) > 1 {
+			ip2 = ipAddresses[1]
+		}
 		return &vpcrouter.PremiumNICSetting{
 			SwitchID:         expandSakuraCloudID(d, "switch_id"),
-			IPAddress1:       d.Get("ipaddress1").(string),
-			IPAddress2:       d.Get("ipaddress2").(string),
+			IPAddress1:       ip1,
+			IPAddress2:       ip2,
 			VirtualIPAddress: d.Get("vip").(string),
 			IPAliases:        expandStringList(d.Get("aliases").([]interface{})),
 		}
@@ -97,22 +105,22 @@ func expandVPCRouterAdditionalNICSettings(d resourceValueGettable) []vpcrouter.A
 	for _, iface := range interfaces {
 		d = mapToResourceData(iface.(map[string]interface{}))
 		var nicSetting vpcrouter.AdditionalNICSettingHolder
-		ipaddresses := expandStringList(d.Get("ipaddresses").([]interface{}))
+		ipAddresses := expandStringList(d.Get("ip_addresses").([]interface{}))
 
 		switch planID {
 		case types.VPCRouterPlans.Standard:
 			nicSetting = &vpcrouter.AdditionalStandardNICSetting{
 				SwitchID:       expandSakuraCloudID(d, "switch_id"),
-				IPAddress:      ipaddresses[0],
-				NetworkMaskLen: d.Get("nw_mask_len").(int),
+				IPAddress:      ipAddresses[0],
+				NetworkMaskLen: d.Get("netmask").(int),
 				Index:          d.Get("index").(int),
 			}
 		default:
 			nicSetting = &vpcrouter.AdditionalPremiumNICSetting{
 				SwitchID:         expandSakuraCloudID(d, "switch_id"),
-				NetworkMaskLen:   d.Get("nw_mask_len").(int),
-				IPAddress1:       ipaddresses[0],
-				IPAddress2:       ipaddresses[1],
+				NetworkMaskLen:   d.Get("netmask").(int),
+				IPAddress1:       ipAddresses[0],
+				IPAddress2:       ipAddresses[1],
 				VirtualIPAddress: d.Get("vip").(string),
 				Index:            d.Get("index").(int),
 			}
@@ -140,11 +148,11 @@ func flattenVPCRouterInterfaces(vpcRouter *sacloud.VPCRouter) []interface{} {
 
 			if nic != nil {
 				interfaces = append(interfaces, map[string]interface{}{
-					"switch_id":   nic.SwitchID.String(),
-					"vip":         iface.VirtualIPAddress,
-					"ipaddresses": iface.IPAddress,
-					"nw_mask_len": iface.NetworkMaskLen,
-					"index":       iface.Index,
+					"switch_id":    nic.SwitchID.String(),
+					"vip":          iface.VirtualIPAddress,
+					"ip_addresses": iface.IPAddress,
+					"netmask":      iface.NetworkMaskLen,
+					"index":        iface.Index,
 				})
 			}
 		}
@@ -173,18 +181,11 @@ func flattenVPCRouterVIP(vpcRouter *sacloud.VPCRouter) string {
 	return ""
 }
 
-func flattenVPCRouterIPAddress1(vpcRouter *sacloud.VPCRouter) string {
+func flattenVPCRouterIPAddresses(vpcRouter *sacloud.VPCRouter) []string {
 	if vpcRouter.PlanID != types.VPCRouterPlans.Standard {
-		return vpcRouter.Settings.Interfaces[0].IPAddress[0]
+		return vpcRouter.Settings.Interfaces[0].IPAddress
 	}
-	return ""
-}
-
-func flattenVPCRouterIPAddress2(vpcRouter *sacloud.VPCRouter) string {
-	if vpcRouter.PlanID != types.VPCRouterPlans.Standard {
-		return vpcRouter.Settings.Interfaces[0].IPAddress[1]
-	}
-	return ""
+	return []string{}
 }
 
 func flattenVPCRouterIPAliases(vpcRouter *sacloud.VPCRouter) []string {
@@ -233,8 +234,8 @@ func expandVPCRouterStaticNATList(d resourceValueGettable) []*sacloud.VPCRouterS
 
 func expandVPCRouterStaticNAT(d resourceValueGettable) *sacloud.VPCRouterStaticNAT {
 	return &sacloud.VPCRouterStaticNAT{
-		GlobalAddress:  d.Get("global_address").(string),
-		PrivateAddress: d.Get("private_address").(string),
+		GlobalAddress:  d.Get("public_ip").(string),
+		PrivateAddress: d.Get("private_ip").(string),
 		Description:    d.Get("description").(string),
 	}
 }
@@ -243,9 +244,9 @@ func flattenVPCRouterStaticNAT(vpcRouter *sacloud.VPCRouter) []interface{} {
 	var staticNATs []interface{}
 	for _, s := range vpcRouter.Settings.StaticNAT {
 		staticNATs = append(staticNATs, map[string]interface{}{
-			"global_address":  s.GlobalAddress,
-			"private_address": s.PrivateAddress,
-			"description":     s.Description,
+			"public_ip":   s.GlobalAddress,
+			"private_ip":  s.PrivateAddress,
+			"description": s.Description,
 		})
 	}
 	return staticNATs
@@ -308,8 +309,8 @@ func expandVPCRouterDHCPStaticMappingList(d resourceValueGettable) []*sacloud.VP
 
 func expandVPCRouterDHCPStaticMapping(d resourceValueGettable) *sacloud.VPCRouterDHCPStaticMapping {
 	return &sacloud.VPCRouterDHCPStaticMapping{
-		IPAddress:  d.Get("ipaddress").(string),
-		MACAddress: d.Get("macaddress").(string),
+		IPAddress:  d.Get("ip_address").(string),
+		MACAddress: d.Get("mac_address").(string),
 	}
 }
 
@@ -317,8 +318,8 @@ func flattenVPCRouterDHCPStaticMappings(vpcRouter *sacloud.VPCRouter) []interfac
 	var staticMappings []interface{}
 	for _, d := range vpcRouter.Settings.DHCPStaticMapping {
 		staticMappings = append(staticMappings, map[string]interface{}{
-			"ipaddress":  d.IPAddress,
-			"macaddress": d.MACAddress,
+			"ip_address":  d.IPAddress,
+			"mac_address": d.MACAddress,
 		})
 	}
 	return staticMappings
@@ -505,8 +506,8 @@ func expandVPCRouterPortForwardingList(d resourceValueGettable) []*sacloud.VPCRo
 func expandVPCRouterPortForwarding(d resourceValueGettable) *sacloud.VPCRouterPortForwarding {
 	return &sacloud.VPCRouterPortForwarding{
 		Protocol:       types.EVPCRouterPortForwardingProtocol(d.Get("protocol").(string)),
-		GlobalPort:     types.StringNumber(intOrDefault(d, "global_port")),
-		PrivateAddress: stringOrDefault(d, "private_address"),
+		GlobalPort:     types.StringNumber(intOrDefault(d, "public_port")),
+		PrivateAddress: stringOrDefault(d, "private_ip"),
 		PrivatePort:    types.StringNumber(intOrDefault(d, "private_port")),
 		Description:    stringOrDefault(d, "description"),
 	}
@@ -518,11 +519,11 @@ func flattenVPCRouterPortForwardings(vpcRouter *sacloud.VPCRouter) []interface{}
 		globalPort := p.GlobalPort.Int()
 		privatePort := p.PrivatePort.Int()
 		portForwardings = append(portForwardings, map[string]interface{}{
-			"protocol":        string(p.Protocol),
-			"global_port":     globalPort,
-			"private_address": p.PrivateAddress,
-			"private_port":    privatePort,
-			"description":     p.Description,
+			"protocol":     string(p.Protocol),
+			"public_port":  globalPort,
+			"private_ip":   p.PrivateAddress,
+			"private_port": privatePort,
+			"description":  p.Description,
 		})
 	}
 	return portForwardings

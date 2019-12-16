@@ -75,8 +75,8 @@ resource "sakuracloud_proxylb" "foobar" {
     port       = 443
   }
   server {
-    ipaddress = sakuracloud_server.foobar.ipaddress
-    port      = 80
+    ip_address = sakuracloud_server.foobar.ip_address
+    port       = 80
   }
 }
 

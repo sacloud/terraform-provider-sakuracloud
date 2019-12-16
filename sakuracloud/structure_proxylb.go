@@ -95,8 +95,8 @@ func flattenProxyLBSorryServer(proxyLB *sacloud.ProxyLB) []interface{} {
 	if proxyLB.SorryServer != nil && proxyLB.SorryServer.IPAddress != "" {
 		results = []interface{}{
 			map[string]interface{}{
-				"ipaddress": proxyLB.SorryServer.IPAddress,
-				"port":      proxyLB.SorryServer.Port,
+				"ip_address": proxyLB.SorryServer.IPAddress,
+				"port":       proxyLB.SorryServer.Port,
 			},
 		}
 	}
@@ -107,9 +107,9 @@ func flattenProxyLBServers(proxyLB *sacloud.ProxyLB) []interface{} {
 	var results []interface{}
 	for _, server := range proxyLB.Servers {
 		results = append(results, map[string]interface{}{
-			"ipaddress": server.IPAddress,
-			"port":      server.Port,
-			"enabled":   server.Enabled,
+			"ip_address": server.IPAddress,
+			"port":       server.Port,
+			"enabled":    server.Enabled,
 		})
 	}
 	return results
@@ -220,7 +220,7 @@ func expandProxyLBSorryServer(d resourceValueGettable) *sacloud.ProxyLBSorryServ
 	if sorryServers, ok := getListFromResource(d, "sorry_server"); ok && len(sorryServers) > 0 {
 		v := mapToResourceData(sorryServers[0].(map[string]interface{}))
 		return &sacloud.ProxyLBSorryServer{
-			IPAddress: v.Get("ipaddress").(string),
+			IPAddress: v.Get("ip_address").(string),
 			Port:      v.Get("port").(int),
 		}
 	}
@@ -233,7 +233,7 @@ func expandProxyLBServers(d resourceValueGettable) []*sacloud.ProxyLBServer {
 		for _, server := range servers {
 			v := mapToResourceData(server.(map[string]interface{}))
 			results = append(results, &sacloud.ProxyLBServer{
-				IPAddress: v.Get("ipaddress").(string),
+				IPAddress: v.Get("ip_address").(string),
 				Port:      v.Get("port").(int),
 				Enabled:   v.Get("enabled").(bool),
 			})

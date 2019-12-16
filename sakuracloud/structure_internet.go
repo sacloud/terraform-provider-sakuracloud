@@ -25,7 +25,7 @@ func expandInternetBuilder(d *schema.ResourceData, client *APIClient) *internetB
 		Description:    d.Get("description").(string),
 		Tags:           expandTags(d),
 		IconID:         expandSakuraCloudID(d, "icon_id"),
-		NetworkMaskLen: d.Get("nw_mask_len").(int),
+		NetworkMaskLen: d.Get("netmask").(int),
 		BandWidthMbps:  d.Get("band_width").(int),
 		EnableIPv6:     d.Get("enable_ipv6").(bool),
 		Client:         internetBuilder.NewAPIClient(client),

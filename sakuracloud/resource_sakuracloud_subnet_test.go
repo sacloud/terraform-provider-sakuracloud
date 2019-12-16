@@ -42,14 +42,14 @@ func TestAccSakuraCloudSubnet_basic(t *testing.T) {
 				Config: buildConfigWithArgs(testAccSakuraCloudSubnet_basic, rand),
 				Check: resource.ComposeTestCheckFunc(
 					testCheckSakuraCloudSubnetExists(resourceName, &subnet),
-					resource.TestCheckResourceAttr(resourceName, "ipaddresses.#", "16"),
+					resource.TestCheckResourceAttr(resourceName, "ip_addresses.#", "16"),
 				),
 			},
 			{
 				Config: buildConfigWithArgs(testAccSakuraCloudSubnet_update, rand),
 				Check: resource.ComposeTestCheckFunc(
 					testCheckSakuraCloudSubnetExists(resourceName, &subnet),
-					resource.TestCheckResourceAttr(resourceName, "ipaddresses.#", "16"),
+					resource.TestCheckResourceAttr(resourceName, "ip_addresses.#", "16"),
 				),
 			},
 		},
@@ -113,7 +113,7 @@ resource sakuracloud_internet "foobar" {
 }
 resource "sakuracloud_subnet" "foobar" {
   internet_id = sakuracloud_internet.foobar.id
-  next_hop    = sakuracloud_internet.foobar.min_ipaddress
+  next_hop    = sakuracloud_internet.foobar.min_ip_address
 }`
 
 var testAccSakuraCloudSubnet_update = `
@@ -122,5 +122,5 @@ resource sakuracloud_internet "foobar" {
 }
 resource "sakuracloud_subnet" "foobar" {
   internet_id = sakuracloud_internet.foobar.id
-  next_hop    = sakuracloud_internet.foobar.max_ipaddress
+  next_hop    = sakuracloud_internet.foobar.max_ip_address
 }`

@@ -44,7 +44,7 @@ func dataSourceSakuraCloudInternet() *schema.Resource {
 				Computed: true,
 				Elem:     &schema.Schema{Type: schema.TypeString},
 			},
-			"nw_mask_len": {
+			"netmask": {
 				Type:     schema.TypeInt,
 				Computed: true,
 			},
@@ -61,7 +61,7 @@ func dataSourceSakuraCloudInternet() *schema.Resource {
 				Computed: true,
 				Elem:     &schema.Schema{Type: schema.TypeString},
 			},
-			"nw_address": {
+			"network_address": {
 				Type:     schema.TypeString,
 				Computed: true,
 			},
@@ -69,15 +69,15 @@ func dataSourceSakuraCloudInternet() *schema.Resource {
 				Type:     schema.TypeString,
 				Computed: true,
 			},
-			"min_ipaddress": {
+			"min_ip_address": {
 				Type:     schema.TypeString,
 				Computed: true,
 			},
-			"max_ipaddress": {
+			"max_ip_address": {
 				Type:     schema.TypeString,
 				Computed: true,
 			},
-			"ipaddresses": {
+			"ip_addresses": {
 				Type:     schema.TypeList,
 				Computed: true,
 				Elem:     &schema.Schema{Type: schema.TypeString},
@@ -94,7 +94,7 @@ func dataSourceSakuraCloudInternet() *schema.Resource {
 				Type:     schema.TypeInt,
 				Computed: true,
 			},
-			"ipv6_nw_address": {
+			"ipv6_network_address": {
 				Type:     schema.TypeString,
 				Computed: true,
 			},

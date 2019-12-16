@@ -38,7 +38,7 @@ func TestAccSakuraCloudDataSourceVPCRouter_Basic(t *testing.T) {
 					resource.TestCheckResourceAttr(resourceName, "tags.0", "tag1"),
 					resource.TestCheckResourceAttr(resourceName, "tags.1", "tag2"),
 					resource.TestCheckResourceAttr(resourceName, "tags.2", "tag3"),
-					resource.TestCheckResourceAttrSet(resourceName, "global_address"),
+					resource.TestCheckResourceAttrSet(resourceName, "public_ip"),
 					resource.TestCheckResourceAttrSet(resourceName, "internet_connection"),
 				),
 			},

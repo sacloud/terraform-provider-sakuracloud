@@ -54,7 +54,7 @@ func resourceSakuraCloudInternet() *schema.Resource {
 				Optional: true,
 				Elem:     &schema.Schema{Type: schema.TypeString},
 			},
-			"nw_mask_len": {
+			"netmask": {
 				Type:         schema.TypeInt,
 				ForceNew:     true,
 				Optional:     true,
@@ -89,7 +89,7 @@ func resourceSakuraCloudInternet() *schema.Resource {
 				Computed: true,
 				Elem:     &schema.Schema{Type: schema.TypeString},
 			},
-			"nw_address": {
+			"network_address": {
 				Type:     schema.TypeString,
 				Computed: true,
 			},
@@ -97,15 +97,15 @@ func resourceSakuraCloudInternet() *schema.Resource {
 				Type:     schema.TypeString,
 				Computed: true,
 			},
-			"min_ipaddress": {
+			"min_ip_address": {
 				Type:     schema.TypeString,
 				Computed: true,
 			},
-			"max_ipaddress": {
+			"max_ip_address": {
 				Type:     schema.TypeString,
 				Computed: true,
 			},
-			"ipaddresses": {
+			"ip_addresses": {
 				Type:     schema.TypeList,
 				Computed: true,
 				Elem:     &schema.Schema{Type: schema.TypeString},
@@ -118,7 +118,7 @@ func resourceSakuraCloudInternet() *schema.Resource {
 				Type:     schema.TypeInt,
 				Computed: true,
 			},
-			"ipv6_nw_address": {
+			"ipv6_network_address": {
 				Type:     schema.TypeString,
 				Computed: true,
 			},
@@ -238,14 +238,14 @@ func setInternetResourceData(ctx context.Context, d *schema.ResourceData, client
 	if err := d.Set("tags", data.Tags); err != nil {
 		return err
 	}
-	d.Set("nw_mask_len", data.NetworkMaskLen)
+	d.Set("netmask", data.NetworkMaskLen)
 	d.Set("band_width", data.BandWidthMbps)
 	d.Set("switch_id", sw.ID.String())
-	d.Set("nw_address", sw.Subnets[0].NetworkAddress)
+	d.Set("network_address", sw.Subnets[0].NetworkAddress)
 	d.Set("gateway", sw.Subnets[0].DefaultRoute)
-	d.Set("min_ipaddress", sw.Subnets[0].AssignedIPAddressMin)
-	d.Set("max_ipaddress", sw.Subnets[0].AssignedIPAddressMax)
-	if err := d.Set("ipaddresses", sw.Subnets[0].GetAssignedIPAddresses()); err != nil {
+	d.Set("min_ip_address", sw.Subnets[0].AssignedIPAddressMin)
+	d.Set("max_ip_address", sw.Subnets[0].AssignedIPAddressMax)
+	if err := d.Set("ip_addresses", sw.Subnets[0].GetAssignedIPAddresses()); err != nil {
 		return err
 	}
 	if err := d.Set("server_ids", serverIDs); err != nil {
@@ -254,7 +254,7 @@ func setInternetResourceData(ctx context.Context, d *schema.ResourceData, client
 	d.Set("enable_ipv6", enableIPv6)
 	d.Set("ipv6_prefix", ipv6Prefix)
 	d.Set("ipv6_prefix_len", ipv6PrefixLen)
-	d.Set("ipv6_nw_address", ipv6NetworkAddress)
+	d.Set("ipv6_network_address", ipv6NetworkAddress)
 	d.Set("zone", zone)
 	return nil
 }

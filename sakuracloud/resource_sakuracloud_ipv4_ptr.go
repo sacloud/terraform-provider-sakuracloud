@@ -34,7 +34,7 @@ func resourceSakuraCloudIPv4Ptr() *schema.Resource {
 		},
 		CustomizeDiff: hasTagResourceCustomizeDiff,
 		Schema: map[string]*schema.Schema{
-			"ipaddress": {
+			"ip_address": {
 				Type:         schema.TypeString,
 				Required:     true,
 				ValidateFunc: validateIPv4Address(),
@@ -72,7 +72,7 @@ func resourceSakuraCloudIPv4PtrUpdate(d *schema.ResourceData, meta interface{}) 
 	client, ctx, zone := getSacloudClient(d, meta)
 	ipAddrOp := sacloud.NewIPAddressOp(client)
 
-	ip := d.Get("ipaddress").(string)
+	ip := d.Get("ip_address").(string)
 	hostName := d.Get("hostname").(string)
 
 	retryMax := d.Get("retry_max").(int)
@@ -144,7 +144,7 @@ func resourceSakuraCloudIPv4PtrDelete(d *schema.ResourceData, meta interface{}) 
 }
 
 func setIPv4PtrResourceData(d *schema.ResourceData, client *APIClient, data *sacloud.IPAddress) error {
-	d.Set("ipaddress", data.IPAddress)
+	d.Set("ip_address", data.IPAddress)
 	d.Set("hostname", data.HostName)
 	d.Set("zone", getZone(d, client))
 	return nil
