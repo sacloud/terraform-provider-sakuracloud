@@ -17,6 +17,7 @@ package sakuracloud
 import (
 	"context"
 	"fmt"
+	"time"
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/sacloud/libsacloud/v2/sacloud"
@@ -29,6 +30,14 @@ func resourceSakuraCloudIcon() *schema.Resource {
 		Update:        resourceSakuraCloudIconUpdate,
 		Delete:        resourceSakuraCloudIconDelete,
 		CustomizeDiff: hasTagResourceCustomizeDiff,
+
+		Timeouts: &schema.ResourceTimeout{
+			Create: schema.DefaultTimeout(5 * time.Minute),
+			Read:   schema.DefaultTimeout(5 * time.Minute),
+			Update: schema.DefaultTimeout(5 * time.Minute),
+			Delete: schema.DefaultTimeout(5 * time.Minute),
+		},
+
 		Schema: map[string]*schema.Schema{
 			"name": {
 				Type:     schema.TypeString,
@@ -64,7 +73,10 @@ func resourceSakuraCloudIcon() *schema.Resource {
 }
 
 func resourceSakuraCloudIconCreate(d *schema.ResourceData, meta interface{}) error {
-	client, ctx, _ := getSacloudClient(d, meta)
+	client, _ := getSacloudClient(d, meta)
+	ctx, cancel := operationContext(d, schema.TimeoutCreate)
+	defer cancel()
+
 	iconOp := sacloud.NewIconOp(client)
 
 	req, err := expandIconCreateRequest(d)
@@ -81,7 +93,10 @@ func resourceSakuraCloudIconCreate(d *schema.ResourceData, meta interface{}) err
 }
 
 func resourceSakuraCloudIconRead(d *schema.ResourceData, meta interface{}) error {
-	client, ctx, _ := getSacloudClient(d, meta)
+	client, _ := getSacloudClient(d, meta)
+	ctx, cancel := operationContext(d, schema.TimeoutRead)
+	defer cancel()
+
 	iconOp := sacloud.NewIconOp(client)
 
 	icon, err := iconOp.Read(ctx, sakuraCloudID(d.Id()))
@@ -97,7 +112,10 @@ func resourceSakuraCloudIconRead(d *schema.ResourceData, meta interface{}) error
 }
 
 func resourceSakuraCloudIconUpdate(d *schema.ResourceData, meta interface{}) error {
-	client, ctx, _ := getSacloudClient(d, meta)
+	client, _ := getSacloudClient(d, meta)
+	ctx, cancel := operationContext(d, schema.TimeoutUpdate)
+	defer cancel()
+
 	iconOp := sacloud.NewIconOp(client)
 
 	_, err := iconOp.Read(ctx, sakuraCloudID(d.Id()))
@@ -113,7 +131,10 @@ func resourceSakuraCloudIconUpdate(d *schema.ResourceData, meta interface{}) err
 }
 
 func resourceSakuraCloudIconDelete(d *schema.ResourceData, meta interface{}) error {
-	client, ctx, _ := getSacloudClient(d, meta)
+	client, _ := getSacloudClient(d, meta)
+	ctx, cancel := operationContext(d, schema.TimeoutDelete)
+	defer cancel()
+
 	iconOp := sacloud.NewIconOp(client)
 
 	icon, err := iconOp.Read(ctx, sakuraCloudID(d.Id()))

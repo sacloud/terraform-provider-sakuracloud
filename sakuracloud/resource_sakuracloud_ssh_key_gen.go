@@ -16,6 +16,7 @@ package sakuracloud
 
 import (
 	"fmt"
+	"time"
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/validation"
@@ -27,6 +28,13 @@ func resourceSakuraCloudSSHKeyGen() *schema.Resource {
 		Create: resourceSakuraCloudSSHKeyGenCreate,
 		Read:   resourceSakuraCloudSSHKeyGenRead,
 		Delete: resourceSakuraCloudSSHKeyGenDelete,
+
+		Timeouts: &schema.ResourceTimeout{
+			Create: schema.DefaultTimeout(5 * time.Minute),
+			Read:   schema.DefaultTimeout(5 * time.Minute),
+			Update: schema.DefaultTimeout(5 * time.Minute),
+			Delete: schema.DefaultTimeout(5 * time.Minute),
+		},
 
 		Schema: map[string]*schema.Schema{
 			"name": {
@@ -64,7 +72,10 @@ func resourceSakuraCloudSSHKeyGen() *schema.Resource {
 }
 
 func resourceSakuraCloudSSHKeyGenCreate(d *schema.ResourceData, meta interface{}) error {
-	client, ctx, _ := getSacloudClient(d, meta)
+	client, _ := getSacloudClient(d, meta)
+	ctx, cancel := operationContext(d, schema.TimeoutCreate)
+	defer cancel()
+
 	sshKeyOp := sacloud.NewSSHKeyOp(client)
 
 	key, err := sshKeyOp.Generate(ctx, expandSSHKeyGenerateRequest(d))
@@ -79,7 +90,10 @@ func resourceSakuraCloudSSHKeyGenCreate(d *schema.ResourceData, meta interface{}
 }
 
 func resourceSakuraCloudSSHKeyGenRead(d *schema.ResourceData, meta interface{}) error {
-	client, ctx, _ := getSacloudClient(d, meta)
+	client, _ := getSacloudClient(d, meta)
+	ctx, cancel := operationContext(d, schema.TimeoutRead)
+	defer cancel()
+
 	sshKeyOp := sacloud.NewSSHKeyOp(client)
 
 	key, err := sshKeyOp.Read(ctx, sakuraCloudID(d.Id()))
@@ -95,7 +109,10 @@ func resourceSakuraCloudSSHKeyGenRead(d *schema.ResourceData, meta interface{}) 
 }
 
 func resourceSakuraCloudSSHKeyGenDelete(d *schema.ResourceData, meta interface{}) error {
-	client, ctx, _ := getSacloudClient(d, meta)
+	client, _ := getSacloudClient(d, meta)
+	ctx, cancel := operationContext(d, schema.TimeoutDelete)
+	defer cancel()
+
 	sshKeyOp := sacloud.NewSSHKeyOp(client)
 
 	key, err := sshKeyOp.Read(ctx, sakuraCloudID(d.Id()))

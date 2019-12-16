@@ -18,6 +18,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"time"
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/validation"
@@ -38,6 +39,14 @@ func resourceSakuraCloudNFS() *schema.Resource {
 			State: schema.ImportStatePassthrough,
 		},
 		CustomizeDiff: hasTagResourceCustomizeDiff,
+
+		Timeouts: &schema.ResourceTimeout{
+			Create: schema.DefaultTimeout(24 * time.Hour),
+			Read:   schema.DefaultTimeout(5 * time.Minute),
+			Update: schema.DefaultTimeout(24 * time.Hour),
+			Delete: schema.DefaultTimeout(5 * time.Minute),
+		},
+
 		Schema: map[string]*schema.Schema{
 			"name": {
 				Type:     schema.TypeString,
@@ -114,7 +123,10 @@ func resourceSakuraCloudNFS() *schema.Resource {
 }
 
 func resourceSakuraCloudNFSCreate(d *schema.ResourceData, meta interface{}) error {
-	client, ctx, zone := getSacloudClient(d, meta)
+	client, zone := getSacloudClient(d, meta)
+	ctx, cancel := operationContext(d, schema.TimeoutCreate)
+	defer cancel()
+
 	nfsOp := sacloud.NewNFSOp(client)
 
 	planID, err := expandNFSDiskPlanID(ctx, client, d)
@@ -152,7 +164,10 @@ func resourceSakuraCloudNFSCreate(d *schema.ResourceData, meta interface{}) erro
 }
 
 func resourceSakuraCloudNFSRead(d *schema.ResourceData, meta interface{}) error {
-	client, ctx, zone := getSacloudClient(d, meta)
+	client, zone := getSacloudClient(d, meta)
+	ctx, cancel := operationContext(d, schema.TimeoutRead)
+	defer cancel()
+
 	nfsOp := sacloud.NewNFSOp(client)
 
 	nfs, err := nfsOp.Read(ctx, zone, sakuraCloudID(d.Id()))
@@ -168,7 +183,10 @@ func resourceSakuraCloudNFSRead(d *schema.ResourceData, meta interface{}) error 
 }
 
 func resourceSakuraCloudNFSUpdate(d *schema.ResourceData, meta interface{}) error {
-	client, ctx, zone := getSacloudClient(d, meta)
+	client, zone := getSacloudClient(d, meta)
+	ctx, cancel := operationContext(d, schema.TimeoutUpdate)
+	defer cancel()
+
 	nfsOp := sacloud.NewNFSOp(client)
 
 	nfs, err := nfsOp.Read(ctx, zone, sakuraCloudID(d.Id()))
@@ -185,7 +203,10 @@ func resourceSakuraCloudNFSUpdate(d *schema.ResourceData, meta interface{}) erro
 }
 
 func resourceSakuraCloudNFSDelete(d *schema.ResourceData, meta interface{}) error {
-	client, ctx, zone := getSacloudClient(d, meta)
+	client, zone := getSacloudClient(d, meta)
+	ctx, cancel := operationContext(d, schema.TimeoutDelete)
+	defer cancel()
+
 	nfsOp := sacloud.NewNFSOp(client)
 
 	nfs, err := nfsOp.Read(ctx, zone, sakuraCloudID(d.Id()))

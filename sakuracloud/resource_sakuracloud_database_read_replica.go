@@ -35,6 +35,12 @@ func resourceSakuraCloudDatabaseReadReplica() *schema.Resource {
 			State: schema.ImportStatePassthrough,
 		},
 		CustomizeDiff: hasTagResourceCustomizeDiff,
+		Timeouts: &schema.ResourceTimeout{
+			Create: schema.DefaultTimeout(60 * time.Minute),
+			Read:   schema.DefaultTimeout(5 * time.Minute),
+			Update: schema.DefaultTimeout(60 * time.Minute),
+			Delete: schema.DefaultTimeout(20 * time.Minute),
+		},
 		Schema: map[string]*schema.Schema{
 			"master_id": {
 				Type:         schema.TypeString,
@@ -106,7 +112,9 @@ func resourceSakuraCloudDatabaseReadReplica() *schema.Resource {
 }
 
 func resourceSakuraCloudDatabaseReadReplicaCreate(d *schema.ResourceData, meta interface{}) error {
-	client, ctx, zone := getSacloudClient(d, meta)
+	client, zone := getSacloudClient(d, meta)
+	ctx, cancel := operationContext(d, schema.TimeoutCreate)
+	defer cancel()
 
 	// validate master instance
 	builder, err := expandDatabaseReadReplicaBuilder(ctx, d, client, zone)
@@ -128,7 +136,10 @@ func resourceSakuraCloudDatabaseReadReplicaCreate(d *schema.ResourceData, meta i
 }
 
 func resourceSakuraCloudDatabaseReadReplicaRead(d *schema.ResourceData, meta interface{}) error {
-	client, ctx, zone := getSacloudClient(d, meta)
+	client, zone := getSacloudClient(d, meta)
+	ctx, cancel := operationContext(d, schema.TimeoutRead)
+	defer cancel()
+
 	dbOp := sacloud.NewDatabaseOp(client)
 
 	data, err := dbOp.Read(ctx, zone, sakuraCloudID(d.Id()))
@@ -143,7 +154,10 @@ func resourceSakuraCloudDatabaseReadReplicaRead(d *schema.ResourceData, meta int
 }
 
 func resourceSakuraCloudDatabaseReadReplicaUpdate(d *schema.ResourceData, meta interface{}) error {
-	client, ctx, zone := getSacloudClient(d, meta)
+	client, zone := getSacloudClient(d, meta)
+	ctx, cancel := operationContext(d, schema.TimeoutUpdate)
+	defer cancel()
+
 	dbOp := sacloud.NewDatabaseOp(client)
 
 	db, err := dbOp.Read(ctx, zone, sakuraCloudID(d.Id()))
@@ -165,7 +179,10 @@ func resourceSakuraCloudDatabaseReadReplicaUpdate(d *schema.ResourceData, meta i
 }
 
 func resourceSakuraCloudDatabaseReadReplicaDelete(d *schema.ResourceData, meta interface{}) error {
-	client, ctx, zone := getSacloudClient(d, meta)
+	client, zone := getSacloudClient(d, meta)
+	ctx, cancel := operationContext(d, schema.TimeoutDelete)
+	defer cancel()
+
 	dbOp := sacloud.NewDatabaseOp(client)
 
 	data, err := dbOp.Read(ctx, zone, sakuraCloudID(d.Id()))

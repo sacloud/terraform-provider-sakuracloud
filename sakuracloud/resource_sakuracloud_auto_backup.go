@@ -16,6 +16,7 @@ package sakuracloud
 
 import (
 	"fmt"
+	"time"
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/validation"
@@ -32,6 +33,14 @@ func resourceSakuraCloudAutoBackup() *schema.Resource {
 			State: schema.ImportStatePassthrough,
 		},
 		CustomizeDiff: hasTagResourceCustomizeDiff,
+
+		Timeouts: &schema.ResourceTimeout{
+			Create: schema.DefaultTimeout(5 * time.Minute),
+			Read:   schema.DefaultTimeout(5 * time.Minute),
+			Update: schema.DefaultTimeout(5 * time.Minute),
+			Delete: schema.DefaultTimeout(5 * time.Minute),
+		},
+
 		Schema: map[string]*schema.Schema{
 			"name": {
 				Type:     schema.TypeString,
@@ -82,7 +91,10 @@ func resourceSakuraCloudAutoBackup() *schema.Resource {
 }
 
 func resourceSakuraCloudAutoBackupCreate(d *schema.ResourceData, meta interface{}) error {
-	client, ctx, zone := getSacloudClient(d, meta)
+	client, zone := getSacloudClient(d, meta)
+	ctx, cancel := operationContext(d, schema.TimeoutCreate)
+	defer cancel()
+
 	autoBackupOp := sacloud.NewAutoBackupOp(client)
 
 	if err := validateBackupWeekdays(d, "weekdays"); err != nil {
@@ -99,7 +111,10 @@ func resourceSakuraCloudAutoBackupCreate(d *schema.ResourceData, meta interface{
 }
 
 func resourceSakuraCloudAutoBackupRead(d *schema.ResourceData, meta interface{}) error {
-	client, ctx, zone := getSacloudClient(d, meta)
+	client, zone := getSacloudClient(d, meta)
+	ctx, cancel := operationContext(d, schema.TimeoutRead)
+	defer cancel()
+
 	autoBackupOp := sacloud.NewAutoBackupOp(client)
 
 	autoBackup, err := autoBackupOp.Read(ctx, zone, sakuraCloudID(d.Id()))
@@ -114,7 +129,10 @@ func resourceSakuraCloudAutoBackupRead(d *schema.ResourceData, meta interface{})
 }
 
 func resourceSakuraCloudAutoBackupUpdate(d *schema.ResourceData, meta interface{}) error {
-	client, ctx, zone := getSacloudClient(d, meta)
+	client, zone := getSacloudClient(d, meta)
+	ctx, cancel := operationContext(d, schema.TimeoutUpdate)
+	defer cancel()
+
 	autoBackupOp := sacloud.NewAutoBackupOp(client)
 
 	autoBackup, err := autoBackupOp.Read(ctx, zone, sakuraCloudID(d.Id()))
@@ -135,7 +153,10 @@ func resourceSakuraCloudAutoBackupUpdate(d *schema.ResourceData, meta interface{
 }
 
 func resourceSakuraCloudAutoBackupDelete(d *schema.ResourceData, meta interface{}) error {
-	client, ctx, zone := getSacloudClient(d, meta)
+	client, zone := getSacloudClient(d, meta)
+	ctx, cancel := operationContext(d, schema.TimeoutDelete)
+	defer cancel()
+
 	autoBackupOp := sacloud.NewAutoBackupOp(client)
 
 	autoBackup, err := autoBackupOp.Read(ctx, zone, sakuraCloudID(d.Id()))

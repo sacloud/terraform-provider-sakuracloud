@@ -19,6 +19,7 @@ import (
 	"fmt"
 	"math"
 	"regexp"
+	"time"
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/validation"
@@ -36,6 +37,14 @@ func resourceSakuraCloudMobileGateway() *schema.Resource {
 			State: schema.ImportStatePassthrough,
 		},
 		CustomizeDiff: hasTagResourceCustomizeDiff,
+
+		Timeouts: &schema.ResourceTimeout{
+			Create: schema.DefaultTimeout(60 * time.Minute),
+			Read:   schema.DefaultTimeout(5 * time.Minute),
+			Update: schema.DefaultTimeout(60 * time.Minute),
+			Delete: schema.DefaultTimeout(5 * time.Minute),
+		},
+
 		Schema: map[string]*schema.Schema{
 			"name": {
 				Type:     schema.TypeString,
@@ -204,7 +213,9 @@ func resourceSakuraCloudMobileGateway() *schema.Resource {
 }
 
 func resourceSakuraCloudMobileGatewayCreate(d *schema.ResourceData, meta interface{}) error {
-	client, ctx, zone := getSacloudClient(d, meta)
+	client, zone := getSacloudClient(d, meta)
+	ctx, cancel := operationContext(d, schema.TimeoutCreate)
+	defer cancel()
 
 	builder := expandMobileGatewayBuilder(d, client)
 	if err := builder.Validate(ctx, zone); err != nil {
@@ -222,7 +233,10 @@ func resourceSakuraCloudMobileGatewayCreate(d *schema.ResourceData, meta interfa
 }
 
 func resourceSakuraCloudMobileGatewayRead(d *schema.ResourceData, meta interface{}) error {
-	client, ctx, zone := getSacloudClient(d, meta)
+	client, zone := getSacloudClient(d, meta)
+	ctx, cancel := operationContext(d, schema.TimeoutRead)
+	defer cancel()
+
 	mgwOp := sacloud.NewMobileGatewayOp(client)
 
 	mgw, err := mgwOp.Read(ctx, zone, sakuraCloudID(d.Id()))
@@ -238,7 +252,10 @@ func resourceSakuraCloudMobileGatewayRead(d *schema.ResourceData, meta interface
 }
 
 func resourceSakuraCloudMobileGatewayUpdate(d *schema.ResourceData, meta interface{}) error {
-	client, ctx, zone := getSacloudClient(d, meta)
+	client, zone := getSacloudClient(d, meta)
+	ctx, cancel := operationContext(d, schema.TimeoutUpdate)
+	defer cancel()
+
 	mgwOp := sacloud.NewMobileGatewayOp(client)
 
 	mgw, err := mgwOp.Read(ctx, zone, sakuraCloudID(d.Id()))
@@ -260,7 +277,10 @@ func resourceSakuraCloudMobileGatewayUpdate(d *schema.ResourceData, meta interfa
 }
 
 func resourceSakuraCloudMobileGatewayDelete(d *schema.ResourceData, meta interface{}) error {
-	client, ctx, zone := getSacloudClient(d, meta)
+	client, zone := getSacloudClient(d, meta)
+	ctx, cancel := operationContext(d, schema.TimeoutDelete)
+	defer cancel()
+
 	mgwOp := sacloud.NewMobileGatewayOp(client)
 	simOp := sacloud.NewSIMOp(client)
 

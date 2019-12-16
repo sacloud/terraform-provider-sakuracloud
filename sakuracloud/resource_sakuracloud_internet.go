@@ -17,6 +17,7 @@ package sakuracloud
 import (
 	"context"
 	"fmt"
+	"time"
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/validation"
@@ -35,6 +36,14 @@ func resourceSakuraCloudInternet() *schema.Resource {
 			State: schema.ImportStatePassthrough,
 		},
 		CustomizeDiff: hasTagResourceCustomizeDiff,
+
+		Timeouts: &schema.ResourceTimeout{
+			Create: schema.DefaultTimeout(60 * time.Minute),
+			Read:   schema.DefaultTimeout(5 * time.Minute),
+			Update: schema.DefaultTimeout(60 * time.Minute),
+			Delete: schema.DefaultTimeout(5 * time.Minute),
+		},
+
 		Schema: map[string]*schema.Schema{
 			"name": {
 				Type:     schema.TypeString,
@@ -127,7 +136,10 @@ func resourceSakuraCloudInternet() *schema.Resource {
 }
 
 func resourceSakuraCloudInternetCreate(d *schema.ResourceData, meta interface{}) error {
-	client, ctx, zone := getSacloudClient(d, meta)
+	client, zone := getSacloudClient(d, meta)
+	ctx, cancel := operationContext(d, schema.TimeoutCreate)
+	defer cancel()
+
 	builder := expandInternetBuilder(d, client)
 
 	internet, err := builder.Build(ctx, zone)
@@ -140,7 +152,10 @@ func resourceSakuraCloudInternetCreate(d *schema.ResourceData, meta interface{})
 }
 
 func resourceSakuraCloudInternetRead(d *schema.ResourceData, meta interface{}) error {
-	client, ctx, zone := getSacloudClient(d, meta)
+	client, zone := getSacloudClient(d, meta)
+	ctx, cancel := operationContext(d, schema.TimeoutRead)
+	defer cancel()
+
 	internetOp := sacloud.NewInternetOp(client)
 
 	internet, err := internetOp.Read(ctx, zone, sakuraCloudID(d.Id()))
@@ -155,7 +170,10 @@ func resourceSakuraCloudInternetRead(d *schema.ResourceData, meta interface{}) e
 }
 
 func resourceSakuraCloudInternetUpdate(d *schema.ResourceData, meta interface{}) error {
-	client, ctx, zone := getSacloudClient(d, meta)
+	client, zone := getSacloudClient(d, meta)
+	ctx, cancel := operationContext(d, schema.TimeoutUpdate)
+	defer cancel()
+
 	internetOp := sacloud.NewInternetOp(client)
 
 	sakuraMutexKV.Lock(d.Id())
@@ -177,7 +195,10 @@ func resourceSakuraCloudInternetUpdate(d *schema.ResourceData, meta interface{})
 }
 
 func resourceSakuraCloudInternetDelete(d *schema.ResourceData, meta interface{}) error {
-	client, ctx, zone := getSacloudClient(d, meta)
+	client, zone := getSacloudClient(d, meta)
+	ctx, cancel := operationContext(d, schema.TimeoutDelete)
+	defer cancel()
+
 	internetOp := sacloud.NewInternetOp(client)
 
 	sakuraMutexKV.Lock(d.Id())
