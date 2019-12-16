@@ -88,7 +88,7 @@ func expandMobileGatewayDNSSetting(d resourceValueGettable) *sacloud.MobileGatew
 }
 
 func expandMobileGatewayPrivateNetworks(d resourceValueGettable) *mobileGatewayBuilder.PrivateInterfaceSetting {
-	if raw, ok := d.Get("network_interface").([]interface{}); ok && len(raw) > 0 {
+	if raw, ok := d.Get("private_network_interface").([]interface{}); ok && len(raw) > 0 {
 		d := mapToResourceData(raw[0].(map[string]interface{}))
 		return &mobileGatewayBuilder.PrivateInterfaceSetting{
 			SwitchID:       expandSakuraCloudID(d, "switch_id"),

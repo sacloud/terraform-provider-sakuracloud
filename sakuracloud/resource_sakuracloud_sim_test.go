@@ -268,7 +268,7 @@ resource "sakuracloud_switch" "foobar" {
   name = "{{ .arg0 }}"
 }
 resource "sakuracloud_mobile_gateway" "foobar" {
-  network_interface {
+  private_network_interface {
     switch_id  = sakuracloud_switch.foobar.id
     ip_address = "192.168.0.1"
     netmask    = 24
@@ -311,7 +311,7 @@ resource "sakuracloud_switch" "foobar" {
 }
 
 resource "sakuracloud_mobile_gateway" "foobar" {
-  network_interface {
+  private_network_interface {
     switch_id  = sakuracloud_switch.foobar.id
     ip_address = "192.168.0.1"
     netmask    = 24
@@ -337,7 +337,7 @@ resource "sakuracloud_switch" "foobar" {
   name = "{{ .arg0 }}"
 }
 resource "sakuracloud_mobile_gateway" "foobar" {
-  network_interface {
+  private_network_interface {
     switch_id  = sakuracloud_switch.foobar.id
     ip_address = "192.168.0.1"
     netmask    = 24

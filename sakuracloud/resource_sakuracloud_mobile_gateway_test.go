@@ -50,11 +50,11 @@ func TestAccSakuraCloudMobileGateway_basic(t *testing.T) {
 					resource.TestCheckResourceAttr(resourceName, "tags.0", "tag1"),
 					resource.TestCheckResourceAttr(resourceName, "tags.1", "tag2"),
 					resource.TestCheckResourceAttrPair(
-						resourceName, "network_interface.0.switch_id",
+						resourceName, "private_network_interface.0.switch_id",
 						"sakuracloud_switch.foobar", "id",
 					),
-					resource.TestCheckResourceAttr(resourceName, "network_interface.0.ip_address", "192.168.11.101"),
-					resource.TestCheckResourceAttr(resourceName, "network_interface.0.netmask", "24"),
+					resource.TestCheckResourceAttr(resourceName, "private_network_interface.0.ip_address", "192.168.11.101"),
+					resource.TestCheckResourceAttr(resourceName, "private_network_interface.0.netmask", "24"),
 					resource.TestCheckResourceAttrPair(
 						resourceName, "icon_id",
 						"sakuracloud_icon.foobar", "id",
@@ -88,10 +88,10 @@ func TestAccSakuraCloudMobileGateway_basic(t *testing.T) {
 					resource.TestCheckResourceAttr(resourceName, "icon_id", ""),
 					resource.TestCheckResourceAttr(resourceName, "traffic_control.#", "0"),
 					resource.TestCheckResourceAttrPair(
-						resourceName, "network_interface.0.switch_id",
+						resourceName, "private_network_interface.0.switch_id",
 						"sakuracloud_switch.foobar", "id"),
-					resource.TestCheckResourceAttr(resourceName, "network_interface.0.ip_address", "192.168.11.101"),
-					resource.TestCheckResourceAttr(resourceName, "network_interface.0.netmask", "24"),
+					resource.TestCheckResourceAttr(resourceName, "private_network_interface.0.ip_address", "192.168.11.101"),
+					resource.TestCheckResourceAttr(resourceName, "private_network_interface.0.netmask", "24"),
 					resource.TestCheckResourceAttr(resourceName, "static_route.#", "0"),
 					resource.TestCheckResourceAttr(resourceName, "sims.#", "0"),
 					resource.TestCheckResourceAttr(resourceName, "sim_routes.#", "0"),
@@ -165,8 +165,8 @@ func TestAccImportSakuraCloudMobileGateway(t *testing.T) {
 		}
 		expects := map[string]string{
 			"name":                                   rand,
-			"network_interface.0.ip_address":         "192.168.11.101",
-			"network_interface.0.netmask":            "24",
+			"private_network_interface.0.ip_address": "192.168.11.101",
+			"private_network_interface.0.netmask":    "24",
 			"description":                            "description",
 			"internet_connection":                    "true",
 			"inter_device_communication":             "false",
@@ -189,7 +189,7 @@ func TestAccImportSakuraCloudMobileGateway(t *testing.T) {
 		if err := compareStateMulti(s[0], expects); err != nil {
 			return err
 		}
-		return stateNotEmptyMulti(s[0], "network_interface.0.switch_id", "icon_id")
+		return stateNotEmptyMulti(s[0], "private_network_interface.0.switch_id", "icon_id")
 	}
 
 	resourceName := "sakuracloud_mobile_gateway.foobar"
@@ -224,7 +224,7 @@ resource "sakuracloud_switch" "foobar" {
 }
 
 resource "sakuracloud_mobile_gateway" "foobar" {
-  network_interface {
+  private_network_interface {
     switch_id  = sakuracloud_switch.foobar.id
     ip_address = "192.168.11.101"
     netmask    = 24
@@ -272,7 +272,7 @@ resource "sakuracloud_switch" "foobar" {
   name = "{{ .arg0 }}"
 }
 resource "sakuracloud_mobile_gateway" "foobar" {
-  network_interface {
+  private_network_interface {
     switch_id  = sakuracloud_switch.foobar.id
     ip_address = "192.168.11.101"
     netmask    = 24

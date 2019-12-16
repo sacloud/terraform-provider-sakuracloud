@@ -41,7 +41,7 @@ func resourceSakuraCloudMobileGateway() *schema.Resource {
 				Type:     schema.TypeString,
 				Required: true,
 			},
-			"network_interface": {
+			"private_network_interface": {
 				Type:     schema.TypeList,
 				Optional: true,
 				MaxItems: 1,
@@ -307,7 +307,7 @@ func setMobileGatewayResourceData(ctx context.Context, d *schema.ResourceData, c
 	}
 
 	// set data
-	if err := d.Set("network_interface", flattenMobileGatewayPrivateNetworks(data)); err != nil {
+	if err := d.Set("private_network_interface", flattenMobileGatewayPrivateNetworks(data)); err != nil {
 		return err
 	}
 	d.Set("public_ip", flattenMobileGatewayPublicIPAddress(data))
