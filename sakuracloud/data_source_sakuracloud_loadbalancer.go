@@ -64,7 +64,7 @@ func dataSourceSakuraCloudLoadBalancer() *schema.Resource {
 				Type:     schema.TypeInt,
 				Computed: true,
 			},
-			"default_route": {
+			"gateway": {
 				Type:     schema.TypeString,
 				Computed: true,
 			},

@@ -65,7 +65,7 @@ func TestAccSakuraCloudDatabase_basic(t *testing.T) {
 					resource.TestCheckResourceAttr(resourceName, "backup_weekdays.1", "tue"),
 					resource.TestCheckResourceAttr(resourceName, "ipaddress1", "192.168.11.101"),
 					resource.TestCheckResourceAttr(resourceName, "nw_mask_len", "24"),
-					resource.TestCheckResourceAttr(resourceName, "default_route", "192.168.11.1"),
+					resource.TestCheckResourceAttr(resourceName, "gateway", "192.168.11.1"),
 					resource.TestCheckResourceAttrPair(
 						resourceName, "icon_id",
 						"sakuracloud_icon.foobar", "id",
@@ -95,7 +95,7 @@ func TestAccSakuraCloudDatabase_basic(t *testing.T) {
 					resource.TestCheckResourceAttr(resourceName, "backup_weekdays.1", "sat"),
 					resource.TestCheckResourceAttr(resourceName, "ipaddress1", "192.168.11.101"),
 					resource.TestCheckResourceAttr(resourceName, "nw_mask_len", "24"),
-					resource.TestCheckResourceAttr(resourceName, "default_route", "192.168.11.1"),
+					resource.TestCheckResourceAttr(resourceName, "gateway", "192.168.11.1"),
 					resource.TestCheckResourceAttr(resourceName, "icon_id", ""),
 				),
 			},
@@ -196,7 +196,7 @@ func TestAccImportSakuraCloudDatabase(t *testing.T) {
 			"backup_weekdays.1": "tue",
 			"ipaddress1":        "192.168.11.101",
 			"nw_mask_len":       "24",
-			"default_route":     "192.168.11.1",
+			"gateway":           "192.168.11.1",
 			"tags.0":            "tag1",
 			"tags.1":            "tag2",
 		}
@@ -251,10 +251,10 @@ resource "sakuracloud_database" "foobar" {
   backup_time     = "00:00"
   backup_weekdays = ["mon", "tue"]
 
-  switch_id     = sakuracloud_switch.foobar.id
-  ipaddress1    = "192.168.11.101"
-  nw_mask_len   = 24
-  default_route = "192.168.11.1"
+  switch_id   = sakuracloud_switch.foobar.id
+  ipaddress1  = "192.168.11.101"
+  nw_mask_len = 24
+  gateway     = "192.168.11.1"
 
   name        = "{{ .arg0 }}"
   description = "description"
@@ -290,8 +290,8 @@ resource "sakuracloud_database" "foobar" {
   description = "description-upd"
   tags        = ["tag1-upd", "tag2-upd"]
 
-  switch_id     = sakuracloud_switch.foobar.id
-  ipaddress1    = "192.168.11.101"
-  nw_mask_len   = 24
-  default_route = "192.168.11.1"
+  switch_id   = sakuracloud_switch.foobar.id
+  ipaddress1  = "192.168.11.101"
+  nw_mask_len = 24
+  gateway     = "192.168.11.1"
 }`

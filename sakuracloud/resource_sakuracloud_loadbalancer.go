@@ -82,7 +82,7 @@ func resourceSakuraCloudLoadBalancer() *schema.Resource {
 				Required:     true,
 				ValidateFunc: validation.IntBetween(8, 29),
 			},
-			"default_route": {
+			"gateway": {
 				Type:     schema.TypeString,
 				ForceNew: true,
 				Optional: true,
@@ -280,7 +280,7 @@ func setLoadBalancerResourceData(ctx context.Context, d *schema.ResourceData, cl
 	d.Set("ipaddress1", ipaddress1)
 	d.Set("ipaddress2", ipaddress2)
 	d.Set("nw_mask_len", data.NetworkMaskLen)
-	d.Set("default_route", data.DefaultRoute)
+	d.Set("gateway", data.DefaultRoute)
 	d.Set("name", data.Name)
 	d.Set("icon_id", data.IconID.String())
 	d.Set("description", data.Description)

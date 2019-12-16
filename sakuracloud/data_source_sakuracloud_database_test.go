@@ -61,7 +61,7 @@ resource "sakuracloud_database" "foobar" {
   switch_id       = "${sakuracloud_switch.foobar.id}"
   ipaddress1      = "192.168.11.101"
   nw_mask_len     = 24
-  default_route   = "192.168.11.1"
+  gateway         = "192.168.11.1"
   source_ranges   = ["192.168.11.0/24", "192.168.12.0/24"]
   port            = 54321
   backup_weekdays = ["mon", "tue"]

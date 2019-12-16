@@ -65,7 +65,7 @@ func resourceSakuraCloudDatabaseReadReplica() *schema.Resource {
 				Computed:     true,
 				ValidateFunc: validation.IntBetween(8, 29),
 			},
-			"default_route": {
+			"gateway": {
 				Type:     schema.TypeString,
 				ForceNew: true,
 				Optional: true,
@@ -204,7 +204,7 @@ func setDatabaseReadReplicaResourceData(ctx context.Context, d *schema.ResourceD
 	d.Set("name", data.Name)
 	d.Set("switch_id", data.SwitchID.String())
 	d.Set("nw_mask_len", data.NetworkMaskLen)
-	d.Set("default_route", data.DefaultRoute)
+	d.Set("gateway", data.DefaultRoute)
 	d.Set("ipaddress1", data.IPAddresses[0])
 	if err := d.Set("source_ranges", data.CommonSetting.SourceNetwork); err != nil {
 		return err

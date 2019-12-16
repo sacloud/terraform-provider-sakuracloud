@@ -61,7 +61,7 @@ func expandNFSCreateRequest(d *schema.ResourceData, planID types.ID) *sacloud.NF
 		PlanID:         planID,
 		IPAddresses:    []string{d.Get("ipaddress").(string)},
 		NetworkMaskLen: d.Get("nw_mask_len").(int),
-		DefaultRoute:   d.Get("default_route").(string),
+		DefaultRoute:   d.Get("gateway").(string),
 		Name:           d.Get("name").(string),
 		Description:    d.Get("description").(string),
 		Tags:           expandTags(d),

@@ -111,7 +111,7 @@ func resourceSakuraCloudDatabase() *schema.Resource {
 				Required:     true,
 				ValidateFunc: validation.IntBetween(8, 29),
 			},
-			"default_route": {
+			"gateway": {
 				Type:     schema.TypeString,
 				ForceNew: true,
 				Required: true,
@@ -257,7 +257,7 @@ func setDatabaseResourceData(ctx context.Context, d *schema.ResourceData, client
 	d.Set("port", data.CommonSetting.ServicePort)
 	d.Set("switch_id", data.SwitchID.String())
 	d.Set("nw_mask_len", data.NetworkMaskLen)
-	d.Set("default_route", data.DefaultRoute)
+	d.Set("gateway", data.DefaultRoute)
 	d.Set("ipaddress1", data.IPAddresses[0])
 	d.Set("icon_id", data.IconID.String())
 	d.Set("description", data.Description)

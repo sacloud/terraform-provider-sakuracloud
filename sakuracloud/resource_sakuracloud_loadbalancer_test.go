@@ -53,7 +53,7 @@ func TestAccSakuraCloudLoadBalancer_basic(t *testing.T) {
 					resource.TestCheckResourceAttr(resourceName, "ipaddress1", "192.168.11.101"),
 					resource.TestCheckResourceAttr(resourceName, "ipaddress2", ""),
 					resource.TestCheckResourceAttr(resourceName, "nw_mask_len", "24"),
-					resource.TestCheckResourceAttr(resourceName, "default_route", "192.168.11.1"),
+					resource.TestCheckResourceAttr(resourceName, "gateway", "192.168.11.1"),
 					resource.TestCheckResourceAttr(resourceName, "vip.0.vip", "192.168.11.201"),
 					resource.TestCheckResourceAttr(resourceName, "vip.0.port", "80"),
 					resource.TestCheckResourceAttr(resourceName, "vip.0.delay_loop", "10"),
@@ -89,7 +89,7 @@ func TestAccSakuraCloudLoadBalancer_basic(t *testing.T) {
 					resource.TestCheckResourceAttr(resourceName, "ipaddress1", "192.168.11.101"),
 					resource.TestCheckResourceAttr(resourceName, "ipaddress2", ""),
 					resource.TestCheckResourceAttr(resourceName, "nw_mask_len", "24"),
-					resource.TestCheckResourceAttr(resourceName, "default_route", "192.168.11.1"),
+					resource.TestCheckResourceAttr(resourceName, "gateway", "192.168.11.1"),
 					resource.TestCheckResourceAttr(resourceName, "vip.0.vip", "192.168.11.201"),
 					resource.TestCheckResourceAttr(resourceName, "vip.0.port", "8080"),
 					resource.TestCheckResourceAttr(resourceName, "vip.0.delay_loop", "10"),
@@ -204,7 +204,7 @@ func TestAccImportSakuraCloudLoadBalancer(t *testing.T) {
 			"ipaddress1":        "192.168.11.101",
 			"ipaddress2":        "",
 			"nw_mask_len":       "24",
-			"default_route":     "192.168.11.1",
+			"gateway":           "192.168.11.1",
 			"description":       "description",
 			"tags.0":            "tag1",
 			"tags.1":            "tag2",
@@ -242,11 +242,11 @@ resource "sakuracloud_switch" "foobar" {
   name = "{{ .arg0 }}"
 }
 resource "sakuracloud_load_balancer" "foobar" {
-  switch_id     = sakuracloud_switch.foobar.id
-  vrid          = 1
-  ipaddress1    = "192.168.11.101"
-  nw_mask_len   = 24
-  default_route = "192.168.11.1"
+  switch_id   = sakuracloud_switch.foobar.id
+  vrid        = 1
+  ipaddress1  = "192.168.11.101"
+  nw_mask_len = 24
+  gateway     = "192.168.11.1"
 
   name        = "{{ .arg0 }}"
   description = "description"
@@ -291,11 +291,11 @@ resource "sakuracloud_switch" "foobar" {
   name = "{{ .arg0 }}"
 }
 resource "sakuracloud_load_balancer" "foobar" {
-  switch_id     = sakuracloud_switch.foobar.id
-  vrid          = 1
-  ipaddress1    = "192.168.11.101"
-  nw_mask_len   = 24
-  default_route = "192.168.11.1"
+  switch_id   = sakuracloud_switch.foobar.id
+  vrid        = 1
+  ipaddress1  = "192.168.11.101"
+  nw_mask_len = 24
+  gateway     = "192.168.11.1"
 
   name        = "{{ .arg0 }}-upd"
   description = "description-upd"
@@ -331,13 +331,14 @@ resource "sakuracloud_internet" "foobar" {
 
 resource "sakuracloud_load_balancer" "foobar" {
   switch_id         = sakuracloud_internet.foobar.switch_id
-  high_availability = true
   plan              = "highspec"
-  vrid              = 1
-  ipaddress1        = sakuracloud_internet.foobar.ipaddresses[0]
-  ipaddress2        = sakuracloud_internet.foobar.ipaddresses[1]
-  nw_mask_len       = sakuracloud_internet.foobar.nw_mask_len
-  default_route     = sakuracloud_internet.foobar.gateway
+  high_availability = true
+
+  vrid         = 1
+  ipaddress1   = sakuracloud_internet.foobar.ipaddresses[0]
+  ipaddress2   = sakuracloud_internet.foobar.ipaddresses[1]
+  nw_mask_len  = sakuracloud_internet.foobar.nw_mask_len
+  gateway      = sakuracloud_internet.foobar.gateway
 
   name        = "{{ .arg0 }}"
   description = "description"

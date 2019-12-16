@@ -52,7 +52,7 @@ func TestAccSakuraCloudNFS_basic(t *testing.T) {
 					resource.TestCheckResourceAttr(resourceName, "tags.1", "tag2"),
 					resource.TestCheckResourceAttr(resourceName, "ipaddress", "192.168.11.101"),
 					resource.TestCheckResourceAttr(resourceName, "nw_mask_len", "24"),
-					resource.TestCheckResourceAttr(resourceName, "default_route", "192.168.11.1"),
+					resource.TestCheckResourceAttr(resourceName, "gateway", "192.168.11.1"),
 					resource.TestCheckResourceAttrPair(
 						resourceName, "icon_id",
 						"sakuracloud_icon.foobar", "id",
@@ -72,7 +72,7 @@ func TestAccSakuraCloudNFS_basic(t *testing.T) {
 					resource.TestCheckResourceAttr(resourceName, "tags.1", "tag2-upd"),
 					resource.TestCheckResourceAttr(resourceName, "ipaddress", "192.168.11.101"),
 					resource.TestCheckResourceAttr(resourceName, "nw_mask_len", "24"),
-					resource.TestCheckResourceAttr(resourceName, "default_route", "192.168.11.1"),
+					resource.TestCheckResourceAttr(resourceName, "gateway", "192.168.11.1"),
 					resource.TestCheckResourceAttr(resourceName, "icon_id", ""),
 				),
 			},
@@ -137,16 +137,16 @@ resource "sakuracloud_switch" "foobar" {
   name = "{{ .arg0 }}"
 }
 resource "sakuracloud_nfs" "foobar" {
-  switch_id     = sakuracloud_switch.foobar.id
-  plan          = "ssd"
-  size          = "500"
-  ipaddress     = "192.168.11.101"
-  nw_mask_len   = 24
-  default_route = "192.168.11.1"
-  name          = "{{ .arg0 }}"
-  description   = "description"
-  tags          = ["tag1" , "tag2"]
-  icon_id       = sakuracloud_icon.foobar.id
+  switch_id   = sakuracloud_switch.foobar.id
+  plan        = "ssd"
+  size        = "500"
+  ipaddress   = "192.168.11.101"
+  nw_mask_len = 24
+  gateway     = "192.168.11.1"
+  name        = "{{ .arg0 }}"
+  description = "description"
+  tags        = ["tag1" , "tag2"]
+  icon_id     = sakuracloud_icon.foobar.id
 }
 
 resource "sakuracloud_icon" "foobar" {
@@ -160,13 +160,13 @@ resource "sakuracloud_switch" "foobar" {
   name = "{{ .arg0 }}"
 }
 resource "sakuracloud_nfs" "foobar" {
-  switch_id     = sakuracloud_switch.foobar.id
-  plan          = "ssd"
-  size          = "500"
-  ipaddress     = "192.168.11.101"
-  nw_mask_len   = 24
-  default_route = "192.168.11.1"
-  name          = "{{ .arg0 }}-upd"
-  description   = "description-upd"
-  tags          = ["tag1-upd" , "tag2-upd"]
+  switch_id   = sakuracloud_switch.foobar.id
+  plan        = "ssd"
+  size        = "500"
+  ipaddress   = "192.168.11.101"
+  nw_mask_len = 24
+  gateway     = "192.168.11.1"
+  name        = "{{ .arg0 }}-upd"
+  description = "description-upd"
+  tags        = ["tag1-upd" , "tag2-upd"]
 }`
