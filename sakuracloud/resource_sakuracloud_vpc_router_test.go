@@ -139,8 +139,8 @@ func TestAccResourceSakuraCloudVPCRouter_Full(t *testing.T) {
 					resource.TestCheckResourceAttr(resourceName, "l2tp.0.range_stop", "192.168.11.30"),
 					resource.TestCheckResourceAttr(resourceName, "port_forwarding.#", "1"),
 					resource.TestCheckResourceAttr(resourceName, "port_forwarding.0.protocol", "udp"),
-					resource.TestCheckResourceAttr(resourceName, "port_forwarding.0.global_port", "10022"),
-					resource.TestCheckResourceAttr(resourceName, "port_forwarding.0.private_address", "192.168.11.11"),
+					resource.TestCheckResourceAttr(resourceName, "port_forwarding.0.public_port", "10022"),
+					resource.TestCheckResourceAttr(resourceName, "port_forwarding.0.private_ip", "192.168.11.11"),
 					resource.TestCheckResourceAttr(resourceName, "port_forwarding.0.private_port", "22"),
 					resource.TestCheckResourceAttr(resourceName, "port_forwarding.0.description", "desc"),
 					resource.TestCheckResourceAttr(resourceName, "pptp.#", "1"),
@@ -156,9 +156,9 @@ func TestAccResourceSakuraCloudVPCRouter_Full(t *testing.T) {
 					resource.TestCheckResourceAttr(resourceName, "site_to_site_vpn.0.local_prefix.0", "192.168.21.0/24"),
 					resource.TestCheckResourceAttr(resourceName, "static_nat.#", "1"),
 					resource.TestCheckResourceAttrPair(
-						resourceName, "static_nat.0.global_address",
+						resourceName, "static_nat.0.public_ip",
 						"sakuracloud_internet.foobar", "ipaddresses.3"),
-					resource.TestCheckResourceAttr(resourceName, "static_nat.0.private_address", "192.168.11.12"),
+					resource.TestCheckResourceAttr(resourceName, "static_nat.0.private_ip", "192.168.11.12"),
 					resource.TestCheckResourceAttr(resourceName, "static_nat.0.description", "desc"),
 					resource.TestCheckResourceAttr(resourceName, "static_route.#", "1"),
 					resource.TestCheckResourceAttr(resourceName, "static_route.0.prefix", "172.16.0.0/16"),
@@ -344,11 +344,11 @@ resource "sakuracloud_vpc_router" "foobar" {
   }
 
   port_forwarding {
-    protocol        = "udp"
-    global_port     = 10022
-    private_address = "192.168.11.11"
-    private_port    = 22
-    description     = "desc"
+    protocol     = "udp"
+    public_port  = 10022
+    private_ip   = "192.168.11.11"
+    private_port = 22
+    description  = "desc"
   }
 
   pptp {
@@ -365,9 +365,9 @@ resource "sakuracloud_vpc_router" "foobar" {
   }
 
   static_nat {
-    global_address  = sakuracloud_internet.foobar.ipaddresses[3]
-    private_address = "192.168.11.12"
-    description     = "desc"
+    public_ip   = sakuracloud_internet.foobar.ipaddresses[3]
+    private_ip  = "192.168.11.12"
+    description = "desc"
   }
 
   static_route {

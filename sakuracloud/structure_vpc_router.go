@@ -233,8 +233,8 @@ func expandVPCRouterStaticNATList(d resourceValueGettable) []*sacloud.VPCRouterS
 
 func expandVPCRouterStaticNAT(d resourceValueGettable) *sacloud.VPCRouterStaticNAT {
 	return &sacloud.VPCRouterStaticNAT{
-		GlobalAddress:  d.Get("global_address").(string),
-		PrivateAddress: d.Get("private_address").(string),
+		GlobalAddress:  d.Get("public_ip").(string),
+		PrivateAddress: d.Get("private_ip").(string),
 		Description:    d.Get("description").(string),
 	}
 }
@@ -243,9 +243,9 @@ func flattenVPCRouterStaticNAT(vpcRouter *sacloud.VPCRouter) []interface{} {
 	var staticNATs []interface{}
 	for _, s := range vpcRouter.Settings.StaticNAT {
 		staticNATs = append(staticNATs, map[string]interface{}{
-			"global_address":  s.GlobalAddress,
-			"private_address": s.PrivateAddress,
-			"description":     s.Description,
+			"public_ip":   s.GlobalAddress,
+			"private_ip":  s.PrivateAddress,
+			"description": s.Description,
 		})
 	}
 	return staticNATs
@@ -505,8 +505,8 @@ func expandVPCRouterPortForwardingList(d resourceValueGettable) []*sacloud.VPCRo
 func expandVPCRouterPortForwarding(d resourceValueGettable) *sacloud.VPCRouterPortForwarding {
 	return &sacloud.VPCRouterPortForwarding{
 		Protocol:       types.EVPCRouterPortForwardingProtocol(d.Get("protocol").(string)),
-		GlobalPort:     types.StringNumber(intOrDefault(d, "global_port")),
-		PrivateAddress: stringOrDefault(d, "private_address"),
+		GlobalPort:     types.StringNumber(intOrDefault(d, "public_port")),
+		PrivateAddress: stringOrDefault(d, "private_ip"),
 		PrivatePort:    types.StringNumber(intOrDefault(d, "private_port")),
 		Description:    stringOrDefault(d, "description"),
 	}
@@ -518,11 +518,11 @@ func flattenVPCRouterPortForwardings(vpcRouter *sacloud.VPCRouter) []interface{}
 		globalPort := p.GlobalPort.Int()
 		privatePort := p.PrivatePort.Int()
 		portForwardings = append(portForwardings, map[string]interface{}{
-			"protocol":        string(p.Protocol),
-			"global_port":     globalPort,
-			"private_address": p.PrivateAddress,
-			"private_port":    privatePort,
-			"description":     p.Description,
+			"protocol":     string(p.Protocol),
+			"public_port":  globalPort,
+			"private_ip":   p.PrivateAddress,
+			"private_port": privatePort,
+			"description":  p.Description,
 		})
 	}
 	return portForwardings

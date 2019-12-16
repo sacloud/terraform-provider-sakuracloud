@@ -73,7 +73,7 @@ func dataSourceSakuraCloudVPCRouter() *schema.Resource {
 				Computed: true,
 				Elem:     &schema.Schema{Type: schema.TypeString},
 			},
-			"global_address": {
+			"public_ip": {
 				Type:     schema.TypeString,
 				Computed: true,
 			},
@@ -241,11 +241,11 @@ func dataSourceSakuraCloudVPCRouter() *schema.Resource {
 							Type:     schema.TypeString,
 							Computed: true,
 						},
-						"global_port": {
+						"public_port": {
 							Type:     schema.TypeInt,
 							Computed: true,
 						},
-						"private_address": {
+						"private_ip": {
 							Type:     schema.TypeString,
 							Computed: true,
 						},
@@ -312,11 +312,11 @@ func dataSourceSakuraCloudVPCRouter() *schema.Resource {
 				Computed: true,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
-						"global_address": {
+						"public_ip": {
 							Type:     schema.TypeString,
 							Computed: true,
 						},
-						"private_address": {
+						"private_ip": {
 							Type:     schema.TypeString,
 							Computed: true,
 						},
