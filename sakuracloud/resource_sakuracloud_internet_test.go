@@ -156,7 +156,7 @@ func TestAccImportSakuraCloudInternet(t *testing.T) {
 		return stateNotEmptyMulti(s[0],
 			"icon_id",
 			"switch_id",
-			"nw_address",
+			"network_address",
 			"gateway",
 			"min_ip_address",
 			"max_ip_address",

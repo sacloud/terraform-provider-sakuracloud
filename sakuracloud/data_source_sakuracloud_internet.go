@@ -61,7 +61,7 @@ func dataSourceSakuraCloudInternet() *schema.Resource {
 				Computed: true,
 				Elem:     &schema.Schema{Type: schema.TypeString},
 			},
-			"nw_address": {
+			"network_address": {
 				Type:     schema.TypeString,
 				Computed: true,
 			},

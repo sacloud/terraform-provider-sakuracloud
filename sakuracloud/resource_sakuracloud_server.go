@@ -177,7 +177,7 @@ func resourceSakuraCloudServer() *schema.Resource {
 				Optional: true,
 				Computed: true,
 			},
-			"nw_address": {
+			"network_address": {
 				Type:     schema.TypeString,
 				Computed: true,
 			},
@@ -323,7 +323,7 @@ func setServerResourceData(ctx context.Context, d *schema.ResourceData, client *
 	}
 	d.Set("ip_address", ip)
 	d.Set("gateway", gateway)
-	d.Set("nw_address", nwAddress)
+	d.Set("network_address", nwAddress)
 	d.Set("netmask", nwMaskLen)
 	if err := d.Set("dns_servers", data.Zone.Region.NameServers); err != nil {
 		return err

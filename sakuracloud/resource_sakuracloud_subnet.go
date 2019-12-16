@@ -63,7 +63,7 @@ func resourceSakuraCloudSubnet() *schema.Resource {
 				Type:     schema.TypeString,
 				Computed: true,
 			},
-			"nw_address": {
+			"network_address": {
 				Type:     schema.TypeString,
 				Computed: true,
 			},
@@ -190,7 +190,7 @@ func setSubnetResourceData(ctx context.Context, d *schema.ResourceData, client *
 	d.Set("internet_id", data.InternetID.String())
 	d.Set("netmask", data.NetworkMaskLen)
 	d.Set("next_hop", data.NextHop)
-	d.Set("nw_address", data.NetworkAddress)
+	d.Set("network_address", data.NetworkAddress)
 	d.Set("min_ip_address", data.IPAddresses[0].IPAddress)
 	d.Set("max_ip_address", data.IPAddresses[len(data.IPAddresses)-1].IPAddress)
 	d.Set("ip_addresses", addrs)
