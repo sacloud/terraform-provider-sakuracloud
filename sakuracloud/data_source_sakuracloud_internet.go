@@ -94,7 +94,7 @@ func dataSourceSakuraCloudInternet() *schema.Resource {
 				Type:     schema.TypeInt,
 				Computed: true,
 			},
-			"ipv6_nw_address": {
+			"ipv6_network_address": {
 				Type:     schema.TypeString,
 				Computed: true,
 			},

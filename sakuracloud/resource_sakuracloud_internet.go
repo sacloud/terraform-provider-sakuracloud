@@ -118,7 +118,7 @@ func resourceSakuraCloudInternet() *schema.Resource {
 				Type:     schema.TypeInt,
 				Computed: true,
 			},
-			"ipv6_nw_address": {
+			"ipv6_network_address": {
 				Type:     schema.TypeString,
 				Computed: true,
 			},
@@ -254,7 +254,7 @@ func setInternetResourceData(ctx context.Context, d *schema.ResourceData, client
 	d.Set("enable_ipv6", enableIPv6)
 	d.Set("ipv6_prefix", ipv6Prefix)
 	d.Set("ipv6_prefix_len", ipv6PrefixLen)
-	d.Set("ipv6_nw_address", ipv6NetworkAddress)
+	d.Set("ipv6_network_address", ipv6NetworkAddress)
 	d.Set("zone", zone)
 	return nil
 }
