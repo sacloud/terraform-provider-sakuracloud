@@ -97,11 +97,11 @@ func resourceSakuraCloudInternet() *schema.Resource {
 				Type:     schema.TypeString,
 				Computed: true,
 			},
-			"min_ipaddress": {
+			"min_ip_address": {
 				Type:     schema.TypeString,
 				Computed: true,
 			},
-			"max_ipaddress": {
+			"max_ip_address": {
 				Type:     schema.TypeString,
 				Computed: true,
 			},
@@ -243,8 +243,8 @@ func setInternetResourceData(ctx context.Context, d *schema.ResourceData, client
 	d.Set("switch_id", sw.ID.String())
 	d.Set("nw_address", sw.Subnets[0].NetworkAddress)
 	d.Set("gateway", sw.Subnets[0].DefaultRoute)
-	d.Set("min_ipaddress", sw.Subnets[0].AssignedIPAddressMin)
-	d.Set("max_ipaddress", sw.Subnets[0].AssignedIPAddressMax)
+	d.Set("min_ip_address", sw.Subnets[0].AssignedIPAddressMin)
+	d.Set("max_ip_address", sw.Subnets[0].AssignedIPAddressMax)
 	if err := d.Set("ip_addresses", sw.Subnets[0].GetAssignedIPAddresses()); err != nil {
 		return err
 	}

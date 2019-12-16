@@ -158,8 +158,8 @@ func TestAccImportSakuraCloudInternet(t *testing.T) {
 			"switch_id",
 			"nw_address",
 			"gateway",
-			"min_ipaddress",
-			"max_ipaddress",
+			"min_ip_address",
+			"max_ip_address",
 			"ip_addresses.0",
 		)
 	}

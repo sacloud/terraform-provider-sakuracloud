@@ -69,11 +69,11 @@ func dataSourceSakuraCloudInternet() *schema.Resource {
 				Type:     schema.TypeString,
 				Computed: true,
 			},
-			"min_ipaddress": {
+			"min_ip_address": {
 				Type:     schema.TypeString,
 				Computed: true,
 			},
-			"max_ipaddress": {
+			"max_ip_address": {
 				Type:     schema.TypeString,
 				Computed: true,
 			},

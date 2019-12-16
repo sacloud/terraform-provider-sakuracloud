@@ -113,7 +113,7 @@ resource sakuracloud_internet "foobar" {
 }
 resource "sakuracloud_subnet" "foobar" {
   internet_id = sakuracloud_internet.foobar.id
-  next_hop    = sakuracloud_internet.foobar.min_ipaddress
+  next_hop    = sakuracloud_internet.foobar.min_ip_address
 }`
 
 var testAccSakuraCloudSubnet_update = `
@@ -122,5 +122,5 @@ resource sakuracloud_internet "foobar" {
 }
 resource "sakuracloud_subnet" "foobar" {
   internet_id = sakuracloud_internet.foobar.id
-  next_hop    = sakuracloud_internet.foobar.max_ipaddress
+  next_hop    = sakuracloud_internet.foobar.max_ip_address
 }`
