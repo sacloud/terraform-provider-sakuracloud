@@ -137,7 +137,7 @@ func flattenMobileGatewayPublicIPAddress(mgw *sacloud.MobileGateway) string {
 
 func expandMobileGatewaySIMRoutes(d resourceValueGettable) []*mobileGatewayBuilder.SIMRouteSetting {
 	var routes []*mobileGatewayBuilder.SIMRouteSetting
-	if simRoutes, ok := d.Get("sim_routes").([]interface{}); ok && len(simRoutes) > 0 {
+	if simRoutes, ok := d.Get("sim_route").([]interface{}); ok && len(simRoutes) > 0 {
 		for _, v := range simRoutes {
 			route := expandMobileGatewaySIMRoute(mapToResourceData(v.(map[string]interface{})))
 			routes = append(routes, route)

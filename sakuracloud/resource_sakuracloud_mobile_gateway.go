@@ -160,7 +160,7 @@ func resourceSakuraCloudMobileGateway() *schema.Resource {
 					},
 				},
 			},
-			"sim_routes": {
+			"sim_route": {
 				Type:     schema.TypeList,
 				Optional: true,
 				Elem: &schema.Resource{
@@ -331,7 +331,7 @@ func setMobileGatewayResourceData(ctx context.Context, d *schema.ResourceData, c
 	if err := d.Set("sim", flattenMobileGatewaySIMs(sims)); err != nil {
 		return err
 	}
-	if err := d.Set("sim_routes", flattenMobileGatewaySIMRoutes(simRoutes)); err != nil {
+	if err := d.Set("sim_route", flattenMobileGatewaySIMRoutes(simRoutes)); err != nil {
 		return err
 	}
 	d.Set("zone", zone)
