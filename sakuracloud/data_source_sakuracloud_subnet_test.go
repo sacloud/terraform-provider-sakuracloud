@@ -35,7 +35,7 @@ func TestAccSakuraCloudSubnetDataSource_basic(t *testing.T) {
 				Config: buildConfigWithArgs(testAccSakuraCloudSubnetDataSource_basic, rand),
 				Check: resource.ComposeTestCheckFunc(
 					testCheckSakuraCloudDataSourceExists(resourceName),
-					resource.TestCheckResourceAttr(resourceName, "ipaddresses.#", "16"),
+					resource.TestCheckResourceAttr(resourceName, "ip_addresses.#", "16"),
 				),
 				Destroy: true,
 			},
@@ -56,11 +56,11 @@ resource sakuracloud_internet "foobar" {
 }
 resource "sakuracloud_subnet" "foobar" {
   internet_id = sakuracloud_internet.foobar.id
-  next_hop    = sakuracloud_internet.foobar.ipaddresses[0]
+  next_hop    = sakuracloud_internet.foobar.ip_addresses[0]
 }
 resource "sakuracloud_subnet" "foobar2" {
   internet_id = sakuracloud_internet.foobar.id
-  next_hop    = sakuracloud_internet.foobar.ipaddresses[1]
+  next_hop    = sakuracloud_internet.foobar.ip_addresses[1]
 }
 `
 
@@ -70,11 +70,11 @@ resource sakuracloud_internet "foobar" {
 }
 resource "sakuracloud_subnet" "foobar" {
   internet_id = sakuracloud_internet.foobar.id
-  next_hop    = sakuracloud_internet.foobar.ipaddresses[0]
+  next_hop    = sakuracloud_internet.foobar.ip_addresses[0]
 }
 resource "sakuracloud_subnet" "foobar2" {
   internet_id = sakuracloud_internet.foobar.id
-  next_hop    = sakuracloud_internet.foobar.ipaddresses[1]
+  next_hop    = sakuracloud_internet.foobar.ip_addresses[1]
 }
 
 data sakuracloud_subnet "foobar" {
@@ -89,11 +89,11 @@ resource sakuracloud_internet "foobar" {
 }
 resource "sakuracloud_subnet" "foobar" {
   internet_id = sakuracloud_internet.foobar.id
-  next_hop    = sakuracloud_internet.foobar.ipaddresses[0]
+  next_hop    = sakuracloud_internet.foobar.ip_addresses[0]
 }
 resource "sakuracloud_subnet" "foobar2" {
   internet_id = sakuracloud_internet.foobar.id
-  next_hop    = sakuracloud_internet.foobar.ipaddresses[1]
+  next_hop    = sakuracloud_internet.foobar.ip_addresses[1]
 }
 
 data sakuracloud_subnet "foobar" {

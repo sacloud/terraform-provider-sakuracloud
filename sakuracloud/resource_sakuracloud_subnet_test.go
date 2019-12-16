@@ -42,14 +42,14 @@ func TestAccSakuraCloudSubnet_basic(t *testing.T) {
 				Config: buildConfigWithArgs(testAccSakuraCloudSubnet_basic, rand),
 				Check: resource.ComposeTestCheckFunc(
 					testCheckSakuraCloudSubnetExists(resourceName, &subnet),
-					resource.TestCheckResourceAttr(resourceName, "ipaddresses.#", "16"),
+					resource.TestCheckResourceAttr(resourceName, "ip_addresses.#", "16"),
 				),
 			},
 			{
 				Config: buildConfigWithArgs(testAccSakuraCloudSubnet_update, rand),
 				Check: resource.ComposeTestCheckFunc(
 					testCheckSakuraCloudSubnetExists(resourceName, &subnet),
-					resource.TestCheckResourceAttr(resourceName, "ipaddresses.#", "16"),
+					resource.TestCheckResourceAttr(resourceName, "ip_addresses.#", "16"),
 				),
 			},
 		},

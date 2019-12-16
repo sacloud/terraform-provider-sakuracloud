@@ -52,7 +52,7 @@ func TestAccSakuraCloudInternet_basic(t *testing.T) {
 					resource.TestCheckResourceAttr(resourceName, "nw_mask_len", "28"),
 					resource.TestCheckResourceAttr(resourceName, "band_width", "100"),
 					resource.TestCheckResourceAttr(resourceName, "server_ids.#", "0"),
-					resource.TestCheckResourceAttr(resourceName, "ipaddresses.#", "11"),
+					resource.TestCheckResourceAttr(resourceName, "ip_addresses.#", "11"),
 					resource.TestCheckResourceAttrPair(
 						resourceName, "icon_id",
 						"sakuracloud_icon.foobar", "id",
@@ -71,7 +71,7 @@ func TestAccSakuraCloudInternet_basic(t *testing.T) {
 					resource.TestCheckResourceAttr(resourceName, "nw_mask_len", "28"),
 					resource.TestCheckResourceAttr(resourceName, "band_width", "500"),
 					resource.TestCheckResourceAttr(resourceName, "server_ids.#", "0"),
-					resource.TestCheckResourceAttr(resourceName, "ipaddresses.#", "11"),
+					resource.TestCheckResourceAttr(resourceName, "ip_addresses.#", "11"),
 					resource.TestCheckResourceAttr(resourceName, "enable_ipv6", "true"),
 					resource.TestCheckResourceAttr(resourceName, "ipv6_prefix_len", "64"),
 					resource.TestCheckResourceAttr(resourceName, "icon_id", ""),
@@ -160,7 +160,7 @@ func TestAccImportSakuraCloudInternet(t *testing.T) {
 			"gateway",
 			"min_ipaddress",
 			"max_ipaddress",
-			"ipaddresses.0",
+			"ip_addresses.0",
 		)
 	}
 
@@ -217,7 +217,7 @@ resource "sakuracloud_server" "foobar" {
   network_interface {
     upstream = sakuracloud_internet.foobar.switch_id
   }
-  ipaddress   = sakuracloud_internet.foobar.ipaddresses[0]
+  ipaddress   = sakuracloud_internet.foobar.ip_addresses[0]
   gateway     = sakuracloud_internet.foobar.gateway
   nw_mask_len = sakuracloud_internet.foobar.nw_mask_len
 }

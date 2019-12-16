@@ -335,8 +335,8 @@ resource "sakuracloud_load_balancer" "foobar" {
   high_availability = true
 
   vrid         = 1
-  ipaddress1   = sakuracloud_internet.foobar.ipaddresses[0]
-  ipaddress2   = sakuracloud_internet.foobar.ipaddresses[1]
+  ipaddress1   = sakuracloud_internet.foobar.ip_addresses[0]
+  ipaddress2   = sakuracloud_internet.foobar.ip_addresses[1]
   nw_mask_len  = sakuracloud_internet.foobar.nw_mask_len
   gateway      = sakuracloud_internet.foobar.gateway
 

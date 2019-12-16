@@ -97,13 +97,13 @@ func expandVPCRouterAdditionalNICSettings(d resourceValueGettable) []vpcrouter.A
 	for _, iface := range interfaces {
 		d = mapToResourceData(iface.(map[string]interface{}))
 		var nicSetting vpcrouter.AdditionalNICSettingHolder
-		ipaddresses := expandStringList(d.Get("ipaddresses").([]interface{}))
+		ipAddresses := expandStringList(d.Get("ip_addresses").([]interface{}))
 
 		switch planID {
 		case types.VPCRouterPlans.Standard:
 			nicSetting = &vpcrouter.AdditionalStandardNICSetting{
 				SwitchID:       expandSakuraCloudID(d, "switch_id"),
-				IPAddress:      ipaddresses[0],
+				IPAddress:      ipAddresses[0],
 				NetworkMaskLen: d.Get("nw_mask_len").(int),
 				Index:          d.Get("index").(int),
 			}
@@ -111,8 +111,8 @@ func expandVPCRouterAdditionalNICSettings(d resourceValueGettable) []vpcrouter.A
 			nicSetting = &vpcrouter.AdditionalPremiumNICSetting{
 				SwitchID:         expandSakuraCloudID(d, "switch_id"),
 				NetworkMaskLen:   d.Get("nw_mask_len").(int),
-				IPAddress1:       ipaddresses[0],
-				IPAddress2:       ipaddresses[1],
+				IPAddress1:       ipAddresses[0],
+				IPAddress2:       ipAddresses[1],
 				VirtualIPAddress: d.Get("vip").(string),
 				Index:            d.Get("index").(int),
 			}
@@ -140,11 +140,11 @@ func flattenVPCRouterInterfaces(vpcRouter *sacloud.VPCRouter) []interface{} {
 
 			if nic != nil {
 				interfaces = append(interfaces, map[string]interface{}{
-					"switch_id":   nic.SwitchID.String(),
-					"vip":         iface.VirtualIPAddress,
-					"ipaddresses": iface.IPAddress,
-					"nw_mask_len": iface.NetworkMaskLen,
-					"index":       iface.Index,
+					"switch_id":    nic.SwitchID.String(),
+					"vip":          iface.VirtualIPAddress,
+					"ip_addresses": iface.IPAddress,
+					"nw_mask_len":  iface.NetworkMaskLen,
+					"index":        iface.Index,
 				})
 			}
 		}
