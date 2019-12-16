@@ -60,7 +60,7 @@ func TestAccSakuraCloudServer_basic(t *testing.T) {
 					resource.TestCheckResourceAttr(resourceName, "note_ids.0", "100000000000"),
 					resource.TestCheckResourceAttr(resourceName, "network_interface.#", "1"),
 					resource.TestCheckResourceAttr(resourceName, "network_interface.0.upstream", "shared"),
-					resource.TestCheckResourceAttrSet(resourceName, "network_interface.0.macaddress"),
+					resource.TestCheckResourceAttrSet(resourceName, "network_interface.0.mac_address"),
 					resource.TestCheckResourceAttrSet(resourceName, "ip_address"),
 					resource.TestCheckResourceAttrPair(
 						resourceName, "icon_id",

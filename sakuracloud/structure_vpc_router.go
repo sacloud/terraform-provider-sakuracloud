@@ -310,7 +310,7 @@ func expandVPCRouterDHCPStaticMappingList(d resourceValueGettable) []*sacloud.VP
 func expandVPCRouterDHCPStaticMapping(d resourceValueGettable) *sacloud.VPCRouterDHCPStaticMapping {
 	return &sacloud.VPCRouterDHCPStaticMapping{
 		IPAddress:  d.Get("ip_address").(string),
-		MACAddress: d.Get("macaddress").(string),
+		MACAddress: d.Get("mac_address").(string),
 	}
 }
 
@@ -318,8 +318,8 @@ func flattenVPCRouterDHCPStaticMappings(vpcRouter *sacloud.VPCRouter) []interfac
 	var staticMappings []interface{}
 	for _, d := range vpcRouter.Settings.DHCPStaticMapping {
 		staticMappings = append(staticMappings, map[string]interface{}{
-			"ip_address": d.IPAddress,
-			"macaddress": d.MACAddress,
+			"ip_address":  d.IPAddress,
+			"mac_address": d.MACAddress,
 		})
 	}
 	return staticMappings

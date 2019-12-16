@@ -139,7 +139,7 @@ func flattenServerNICs(server *sacloud.Server) []interface{} {
 		results = append(results, map[string]interface{}{
 			"upstream":         upstream,
 			"packet_filter_id": nic.PacketFilterID.String(),
-			"macaddress":       strings.ToLower(nic.MACAddress),
+			"mac_address":      strings.ToLower(nic.MACAddress),
 		})
 	}
 	return results

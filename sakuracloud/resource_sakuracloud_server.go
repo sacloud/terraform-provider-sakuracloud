@@ -93,7 +93,7 @@ func resourceSakuraCloudServer() *schema.Resource {
 							Optional:     true,
 							ValidateFunc: validateSakuracloudIDType,
 						},
-						"macaddress": {
+						"mac_address": {
 							Type:     schema.TypeString,
 							Computed: true,
 						},

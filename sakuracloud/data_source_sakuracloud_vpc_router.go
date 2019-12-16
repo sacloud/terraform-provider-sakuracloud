@@ -145,7 +145,7 @@ func dataSourceSakuraCloudVPCRouter() *schema.Resource {
 							Type:     schema.TypeString,
 							Computed: true,
 						},
-						"macaddress": {
+						"mac_address": {
 							Type:     schema.TypeString,
 							Computed: true,
 						},
