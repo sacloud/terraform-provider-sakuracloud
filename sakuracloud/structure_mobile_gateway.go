@@ -77,12 +77,11 @@ func flattenMobileGatewaySIM(sim *sacloud.MobileGatewaySIMInfo) interface{} {
 }
 
 func expandMobileGatewayDNSSetting(d resourceValueGettable) *sacloud.MobileGatewayDNSSetting {
-	dns1 := d.Get("dns_server1").(string)
-	dns2 := d.Get("dns_server2").(string)
-	if dns1 != "" || dns2 != "" {
+	servers := d.Get("dns_servers").([]interface{})
+	if len(servers) == 2 && servers[0].(string) != "" && servers[1].(string) != "" {
 		return &sacloud.MobileGatewayDNSSetting{
-			DNS1: dns1,
-			DNS2: dns2,
+			DNS1: servers[0].(string),
+			DNS2: servers[1].(string),
 		}
 	}
 	return nil

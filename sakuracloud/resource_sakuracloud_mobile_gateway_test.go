@@ -234,8 +234,7 @@ resource "sakuracloud_mobile_gateway" "foobar" {
   description         = "description"
   tags                = ["tag1", "tag2"]
   icon_id             = sakuracloud_icon.foobar.id
-  dns_server1         = data.sakuracloud_zone.zone.dns_servers[0]
-  dns_server2         = data.sakuracloud_zone.zone.dns_servers[1]
+  dns_servers         = data.sakuracloud_zone.zone.dns_servers
 
   traffic_control {
     quota                = 256
@@ -282,6 +281,5 @@ resource "sakuracloud_mobile_gateway" "foobar" {
   name                = "{{ .arg0 }}-upd"
   description         = "description-upd"
   tags                = ["tag1-upd", "tag2-upd"]
-  dns_server1         = data.sakuracloud_zone.zone.dns_servers[0]
-  dns_server2         = data.sakuracloud_zone.zone.dns_servers[1]
+  dns_servers         = data.sakuracloud_zone.zone.dns_servers
 }`

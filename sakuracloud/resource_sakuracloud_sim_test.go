@@ -275,8 +275,7 @@ resource "sakuracloud_mobile_gateway" "foobar" {
   }
   internet_connection = true
   name                = "{{ .arg0 }}"
-  dns_server1         = data.sakuracloud_zone.zone.dns_servers[0]
-  dns_server2         = data.sakuracloud_zone.zone.dns_servers[1]
+  dns_servers         = data.sakuracloud_zone.zone.dns_servers
 
   sims {
     sim_id    = sakuracloud_sim.foobar.id
@@ -319,8 +318,7 @@ resource "sakuracloud_mobile_gateway" "foobar" {
   }
   internet_connection = true
   name                = "{{ .arg0 }}-upd"
-  dns_server1         = data.sakuracloud_zone.zone.dns_servers[0]
-  dns_server2         = data.sakuracloud_zone.zone.dns_servers[1]
+  dns_servers         = data.sakuracloud_zone.zone.dns_servers
 
   sims {
     sim_id    = sakuracloud_sim.foobar.id
@@ -346,6 +344,5 @@ resource "sakuracloud_mobile_gateway" "foobar" {
   }
   internet_connection = true
   name                = "{{ .arg0 }}"
-  dns_server1         = data.sakuracloud_zone.zone.dns_servers[0]
-  dns_server2         = data.sakuracloud_zone.zone.dns_servers[1]
+  dns_servers         = data.sakuracloud_zone.zone.dns_servers
 }`
