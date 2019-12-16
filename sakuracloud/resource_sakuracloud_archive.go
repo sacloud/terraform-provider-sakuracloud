@@ -21,7 +21,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/helper/customdiff"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/validation"
-	"github.com/sacloud/ftps"
 	"github.com/sacloud/libsacloud/v2/sacloud"
 	"github.com/sacloud/libsacloud/v2/sacloud/types"
 )
@@ -195,8 +194,7 @@ func uploadArchiveFile(ctx context.Context, archiveOp sacloud.ArchiveAPI, zone s
 	}
 
 	// upload
-	ftpClient := ftps.NewClient(ftpServer.User, ftpServer.Password, ftpServer.HostName)
-	if err := ftpClient.Upload(path); err != nil {
+	if err := uploadFileViaFTPS(ctx, ftpServer.User, ftpServer.Password, ftpServer.HostName, path); err != nil {
 		return fmt.Errorf("uploading file to SakuraCloud is failed: %s", err)
 	}
 

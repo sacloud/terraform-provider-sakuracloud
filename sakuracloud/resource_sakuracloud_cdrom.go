@@ -23,7 +23,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/helper/customdiff"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/mitchellh/go-homedir"
-	"github.com/sacloud/ftps"
 	"github.com/sacloud/iso9660wrap"
 	"github.com/sacloud/libsacloud/v2/sacloud"
 	"github.com/sacloud/libsacloud/v2/sacloud/types"
@@ -249,10 +248,10 @@ func uploadCDROMFile(ctx *uploadCDROMContext, d *schema.ResourceData) error {
 	}
 
 	// upload
-	ftpClient := ftps.NewClient(ftpServer.User, ftpServer.Password, ftpServer.HostName)
-	if err := ftpClient.Upload(filePath); err != nil {
+	if err := uploadFileViaFTPS(ctx, ftpServer.User, ftpServer.Password, ftpServer.HostName, filePath); err != nil {
 		return fmt.Errorf("upload CD-ROM contents is failed: %s", err)
 	}
+
 	// close
 	if err := cdromOp.CloseFTP(ctx, ctx.zone, ctx.id); err != nil {
 		return fmt.Errorf("closing FTPS Connection is failed: %s", err)
