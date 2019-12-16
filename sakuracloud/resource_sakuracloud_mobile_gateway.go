@@ -57,7 +57,7 @@ func resourceSakuraCloudMobileGateway() *schema.Resource {
 							ValidateFunc: validateIPv4Address(),
 							Required:     true,
 						},
-						"nw_mask_len": {
+						"netmask": {
 							Type:         schema.TypeInt,
 							Required:     true,
 							ValidateFunc: validation.IntBetween(8, 29),

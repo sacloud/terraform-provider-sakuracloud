@@ -221,7 +221,7 @@ func TestAccSakuraCloudServer_switch(t *testing.T) {
 				Check: resource.ComposeTestCheckFunc(
 					testCheckSakuraCloudServerExists(resourceName, &server),
 					resource.TestCheckResourceAttr(resourceName, "ip_address", "192.168.0.2"),
-					resource.TestCheckResourceAttr(resourceName, "nw_mask_len", "24"),
+					resource.TestCheckResourceAttr(resourceName, "netmask", "24"),
 					resource.TestCheckResourceAttr(resourceName, "gateway", "192.168.0.1"),
 				),
 			},
@@ -553,8 +553,8 @@ resource "sakuracloud_server" "foobar" {
     upstream = sakuracloud_switch.foobar.id
   }
 
-  ip_address  = "192.168.0.2"
-  nw_mask_len = 24
-  gateway     = "192.168.0.1"
+  ip_address = "192.168.0.2"
+  netmask    = 24
+  gateway    = "192.168.0.1"
 }
 `

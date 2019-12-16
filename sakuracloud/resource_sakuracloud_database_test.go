@@ -65,7 +65,7 @@ func TestAccSakuraCloudDatabase_basic(t *testing.T) {
 					resource.TestCheckResourceAttr(resourceName, "backup_weekdays.1", "tue"),
 					resource.TestCheckResourceAttr(resourceName, "ip_addresses.#", "1"),
 					resource.TestCheckResourceAttr(resourceName, "ip_addresses.0", "192.168.11.101"),
-					resource.TestCheckResourceAttr(resourceName, "nw_mask_len", "24"),
+					resource.TestCheckResourceAttr(resourceName, "netmask", "24"),
 					resource.TestCheckResourceAttr(resourceName, "gateway", "192.168.11.1"),
 					resource.TestCheckResourceAttrPair(
 						resourceName, "icon_id",
@@ -96,7 +96,7 @@ func TestAccSakuraCloudDatabase_basic(t *testing.T) {
 					resource.TestCheckResourceAttr(resourceName, "backup_weekdays.1", "sat"),
 					resource.TestCheckResourceAttr(resourceName, "ip_addresses.#", "1"),
 					resource.TestCheckResourceAttr(resourceName, "ip_addresses.0", "192.168.11.101"),
-					resource.TestCheckResourceAttr(resourceName, "nw_mask_len", "24"),
+					resource.TestCheckResourceAttr(resourceName, "netmask", "24"),
 					resource.TestCheckResourceAttr(resourceName, "gateway", "192.168.11.1"),
 					resource.TestCheckResourceAttr(resourceName, "icon_id", ""),
 				),
@@ -197,7 +197,7 @@ func TestAccImportSakuraCloudDatabase(t *testing.T) {
 			"backup_weekdays.0": "mon",
 			"backup_weekdays.1": "tue",
 			"ip_addresses.0":    "192.168.11.101",
-			"nw_mask_len":       "24",
+			"netmask":           "24",
 			"gateway":           "192.168.11.1",
 			"tags.0":            "tag1",
 			"tags.1":            "tag2",
@@ -255,7 +255,7 @@ resource "sakuracloud_database" "foobar" {
 
   switch_id    = sakuracloud_switch.foobar.id
   ip_addresses = ["192.168.11.101"]
-  nw_mask_len  = 24
+  netmask      = 24
   gateway      = "192.168.11.1"
 
   name        = "{{ .arg0 }}"
@@ -294,6 +294,6 @@ resource "sakuracloud_database" "foobar" {
 
   switch_id    = sakuracloud_switch.foobar.id
   ip_addresses = ["192.168.11.101"]
-  nw_mask_len  = 24
+  netmask      = 24
   gateway      = "192.168.11.1"
 }`

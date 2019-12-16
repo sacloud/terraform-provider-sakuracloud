@@ -76,7 +76,7 @@ func resourceSakuraCloudNFS() *schema.Resource {
 				ForceNew: true,
 				Required: true,
 			},
-			"nw_mask_len": {
+			"netmask": {
 				Type:         schema.TypeInt,
 				ForceNew:     true,
 				Required:     true,
@@ -221,7 +221,7 @@ func setNFSResourceData(ctx context.Context, d *schema.ResourceData, client *API
 
 	d.Set("switch_id", data.SwitchID.String())
 	d.Set("ip_address", data.IPAddresses[0])
-	d.Set("nw_mask_len", data.NetworkMaskLen)
+	d.Set("netmask", data.NetworkMaskLen)
 	d.Set("gateway", data.DefaultRoute)
 	d.Set("plan", plan)
 	d.Set("size", size)

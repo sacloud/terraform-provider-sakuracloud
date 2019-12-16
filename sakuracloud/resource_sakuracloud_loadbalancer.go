@@ -74,7 +74,7 @@ func resourceSakuraCloudLoadBalancer() *schema.Resource {
 				MaxItems: 2,
 				Elem:     &schema.Schema{Type: schema.TypeString},
 			},
-			"nw_mask_len": {
+			"netmask": {
 				Type:         schema.TypeInt,
 				ForceNew:     true,
 				Required:     true,
@@ -278,7 +278,7 @@ func setLoadBalancerResourceData(ctx context.Context, d *schema.ResourceData, cl
 	if err := d.Set("ip_addresses", ipAddresses); err != nil {
 		return err
 	}
-	d.Set("nw_mask_len", data.NetworkMaskLen)
+	d.Set("netmask", data.NetworkMaskLen)
 	d.Set("gateway", data.DefaultRoute)
 	d.Set("name", data.Name)
 	d.Set("icon_id", data.IconID.String())

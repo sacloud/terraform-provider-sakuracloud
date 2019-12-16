@@ -112,13 +112,13 @@ func expandVPCRouterAdditionalNICSettings(d resourceValueGettable) []vpcrouter.A
 			nicSetting = &vpcrouter.AdditionalStandardNICSetting{
 				SwitchID:       expandSakuraCloudID(d, "switch_id"),
 				IPAddress:      ipAddresses[0],
-				NetworkMaskLen: d.Get("nw_mask_len").(int),
+				NetworkMaskLen: d.Get("netmask").(int),
 				Index:          d.Get("index").(int),
 			}
 		default:
 			nicSetting = &vpcrouter.AdditionalPremiumNICSetting{
 				SwitchID:         expandSakuraCloudID(d, "switch_id"),
-				NetworkMaskLen:   d.Get("nw_mask_len").(int),
+				NetworkMaskLen:   d.Get("netmask").(int),
 				IPAddress1:       ipAddresses[0],
 				IPAddress2:       ipAddresses[1],
 				VirtualIPAddress: d.Get("vip").(string),
@@ -151,7 +151,7 @@ func flattenVPCRouterInterfaces(vpcRouter *sacloud.VPCRouter) []interface{} {
 					"switch_id":    nic.SwitchID.String(),
 					"vip":          iface.VirtualIPAddress,
 					"ip_addresses": iface.IPAddress,
-					"nw_mask_len":  iface.NetworkMaskLen,
+					"netmask":      iface.NetworkMaskLen,
 					"index":        iface.Index,
 				})
 			}

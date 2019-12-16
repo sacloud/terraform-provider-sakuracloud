@@ -181,7 +181,7 @@ func resourceSakuraCloudServer() *schema.Resource {
 				Type:     schema.TypeString,
 				Computed: true,
 			},
-			"nw_mask_len": {
+			"netmask": {
 				Type:     schema.TypeInt,
 				Optional: true,
 				Computed: true,
@@ -324,7 +324,7 @@ func setServerResourceData(ctx context.Context, d *schema.ResourceData, client *
 	d.Set("ip_address", ip)
 	d.Set("gateway", gateway)
 	d.Set("nw_address", nwAddress)
-	d.Set("nw_mask_len", nwMaskLen)
+	d.Set("netmask", nwMaskLen)
 	if err := d.Set("dns_servers", data.Zone.Region.NameServers); err != nil {
 		return err
 	}
@@ -337,7 +337,7 @@ func isServerDiskConfigChanged(d *schema.ResourceData) bool {
 		d.HasChange("network_interface") ||
 		d.HasChange("ip_address") ||
 		d.HasChange("gateway") ||
-		d.HasChange("nw_mask_len") ||
+		d.HasChange("netmask") ||
 		d.HasChange("hostname") ||
 		d.HasChange("password") ||
 		d.HasChange("ssh_key_ids") ||

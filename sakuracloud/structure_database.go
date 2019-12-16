@@ -78,7 +78,7 @@ func expandDatabaseBuilder(d *schema.ResourceData, client *APIClient) *databaseB
 		PlanID:         databasePlanNameToID(d.Get("plan").(string)),
 		SwitchID:       expandSakuraCloudID(d, "switch_id"),
 		IPAddresses:    expandStringList(d.Get("ip_addresses").([]interface{})),
-		NetworkMaskLen: d.Get("nw_mask_len").(int),
+		NetworkMaskLen: d.Get("netmask").(int),
 		DefaultRoute:   d.Get("gateway").(string),
 		Conf: &sacloud.DatabaseRemarkDBConfCommon{
 			DatabaseName:     dbVersion.Name,
@@ -142,7 +142,7 @@ func expandDatabaseReadReplicaBuilder(ctx context.Context, d *schema.ResourceDat
 		switchID = v.(string)
 	}
 	maskLen := masterDB.NetworkMaskLen
-	if v, ok := d.GetOk("nw_mask_len"); ok {
+	if v, ok := d.GetOk("netmask"); ok {
 		maskLen = v.(int)
 	}
 	defaultRoute := masterDB.DefaultRoute

@@ -47,7 +47,7 @@ func dataSourceSakuraCloudNFS() *schema.Resource {
 				Type:     schema.TypeString,
 				Computed: true,
 			},
-			"nw_mask_len": {
+			"netmask": {
 				Type:     schema.TypeInt,
 				Computed: true,
 			},

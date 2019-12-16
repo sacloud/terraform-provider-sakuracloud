@@ -269,9 +269,9 @@ resource "sakuracloud_switch" "foobar" {
 }
 resource "sakuracloud_mobile_gateway" "foobar" {
   network_interface {
-    switch_id   = sakuracloud_switch.foobar.id
-    ip_address  = "192.168.0.1"
-    nw_mask_len = 24
+    switch_id  = sakuracloud_switch.foobar.id
+    ip_address = "192.168.0.1"
+    netmask    = 24
   }
   internet_connection = true
   name                = "{{ .arg0 }}"
@@ -312,9 +312,9 @@ resource "sakuracloud_switch" "foobar" {
 
 resource "sakuracloud_mobile_gateway" "foobar" {
   network_interface {
-    switch_id   = sakuracloud_switch.foobar.id
-    ip_address  = "192.168.0.1"
-    nw_mask_len = 24
+    switch_id  = sakuracloud_switch.foobar.id
+    ip_address = "192.168.0.1"
+    netmask    = 24
   }
   internet_connection = true
   name                = "{{ .arg0 }}-upd"
@@ -338,9 +338,9 @@ resource "sakuracloud_switch" "foobar" {
 }
 resource "sakuracloud_mobile_gateway" "foobar" {
   network_interface {
-    switch_id   = sakuracloud_switch.foobar.id
-    ip_address  = "192.168.0.1"
-    nw_mask_len = 24
+    switch_id  = sakuracloud_switch.foobar.id
+    ip_address = "192.168.0.1"
+    netmask    = 24
   }
   internet_connection = true
   name                = "{{ .arg0 }}"

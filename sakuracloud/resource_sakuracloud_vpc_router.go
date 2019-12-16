@@ -113,7 +113,7 @@ func resourceSakuraCloudVPCRouter() *schema.Resource {
 							MinItems: 1,
 							MaxItems: 2,
 						},
-						"nw_mask_len": {
+						"netmask": {
 							Type:         schema.TypeInt,
 							Required:     true,
 							ValidateFunc: validation.IntBetween(16, 28),

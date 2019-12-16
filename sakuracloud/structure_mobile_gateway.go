@@ -93,7 +93,7 @@ func expandMobileGatewayPrivateNetworks(d resourceValueGettable) *mobileGatewayB
 		return &mobileGatewayBuilder.PrivateInterfaceSetting{
 			SwitchID:       expandSakuraCloudID(d, "switch_id"),
 			IPAddress:      d.Get("ip_address").(string),
-			NetworkMaskLen: d.Get("nw_mask_len").(int),
+			NetworkMaskLen: d.Get("netmask").(int),
 		}
 	}
 	return nil
@@ -111,9 +111,9 @@ func flattenMobileGatewayPrivateNetworks(mgw *sacloud.MobileGateway) []interface
 		if setting != nil {
 			return []interface{}{
 				map[string]interface{}{
-					"switch_id":   switchID.String(),
-					"ip_address":  setting.IPAddress[0],
-					"nw_mask_len": setting.NetworkMaskLen,
+					"switch_id":  switchID.String(),
+					"ip_address": setting.IPAddress[0],
+					"netmask":    setting.NetworkMaskLen,
 				},
 			}
 		}

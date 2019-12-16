@@ -104,7 +104,7 @@ func TestAccResourceSakuraCloudVPCRouter_Full(t *testing.T) {
 					resource.TestCheckResourceAttr(resourceName, "network_interface.0.ip_addresses.#", "2"),
 					resource.TestCheckResourceAttr(resourceName, "network_interface.0.ip_addresses.0", "192.168.11.2"),
 					resource.TestCheckResourceAttr(resourceName, "network_interface.0.ip_addresses.1", "192.168.11.3"),
-					resource.TestCheckResourceAttr(resourceName, "network_interface.0.nw_mask_len", "24"),
+					resource.TestCheckResourceAttr(resourceName, "network_interface.0.netmask", "24"),
 					resource.TestCheckResourceAttr(resourceName, "dhcp_server.#", "1"),
 					resource.TestCheckResourceAttr(resourceName, "dhcp_server.0.interface_index", "1"),
 					resource.TestCheckResourceAttr(resourceName, "dhcp_server.0.range_start", "192.168.11.11"),
@@ -291,7 +291,7 @@ resource "sakuracloud_vpc_router" "foobar" {
     switch_id    = sakuracloud_switch.foobar.id
     vip          = "192.168.11.1"
     ip_addresses = ["192.168.11.2", "192.168.11.3"]
-    nw_mask_len  = 24 
+    netmask      = 24 
   }
 
   dhcp_server {

@@ -40,7 +40,7 @@ func resourceSakuraCloudSubnet() *schema.Resource {
 				Required:     true,
 				ValidateFunc: validateSakuracloudIDType,
 			},
-			"nw_mask_len": {
+			"netmask": {
 				Type:         schema.TypeInt,
 				ForceNew:     true,
 				Optional:     true,
@@ -99,7 +99,7 @@ func resourceSakuraCloudSubnetCreate(d *schema.ResourceData, meta interface{}) e
 	}
 
 	subnet, err := internetOp.AddSubnet(ctx, zone, internet.ID, &sacloud.InternetAddSubnetRequest{
-		NetworkMaskLen: d.Get("nw_mask_len").(int),
+		NetworkMaskLen: d.Get("netmask").(int),
 		NextHop:        d.Get("next_hop").(string),
 	})
 	if err != nil {
@@ -188,7 +188,7 @@ func setSubnetResourceData(ctx context.Context, d *schema.ResourceData, client *
 
 	d.Set("switch_id", data.SwitchID.String())
 	d.Set("internet_id", data.InternetID.String())
-	d.Set("nw_mask_len", data.NetworkMaskLen)
+	d.Set("netmask", data.NetworkMaskLen)
 	d.Set("next_hop", data.NextHop)
 	d.Set("nw_address", data.NetworkAddress)
 	d.Set("min_ip_address", data.IPAddresses[0].IPAddress)

@@ -54,7 +54,7 @@ func TestAccSakuraCloudMobileGateway_basic(t *testing.T) {
 						"sakuracloud_switch.foobar", "id",
 					),
 					resource.TestCheckResourceAttr(resourceName, "network_interface.0.ip_address", "192.168.11.101"),
-					resource.TestCheckResourceAttr(resourceName, "network_interface.0.nw_mask_len", "24"),
+					resource.TestCheckResourceAttr(resourceName, "network_interface.0.netmask", "24"),
 					resource.TestCheckResourceAttrPair(
 						resourceName, "icon_id",
 						"sakuracloud_icon.foobar", "id",
@@ -91,7 +91,7 @@ func TestAccSakuraCloudMobileGateway_basic(t *testing.T) {
 						resourceName, "network_interface.0.switch_id",
 						"sakuracloud_switch.foobar", "id"),
 					resource.TestCheckResourceAttr(resourceName, "network_interface.0.ip_address", "192.168.11.101"),
-					resource.TestCheckResourceAttr(resourceName, "network_interface.0.nw_mask_len", "24"),
+					resource.TestCheckResourceAttr(resourceName, "network_interface.0.netmask", "24"),
 					resource.TestCheckResourceAttr(resourceName, "static_route.#", "0"),
 					resource.TestCheckResourceAttr(resourceName, "sims.#", "0"),
 					resource.TestCheckResourceAttr(resourceName, "sim_routes.#", "0"),
@@ -166,7 +166,7 @@ func TestAccImportSakuraCloudMobileGateway(t *testing.T) {
 		expects := map[string]string{
 			"name":                                   rand,
 			"network_interface.0.ip_address":         "192.168.11.101",
-			"network_interface.0.nw_mask_len":        "24",
+			"network_interface.0.netmask":            "24",
 			"description":                            "description",
 			"internet_connection":                    "true",
 			"inter_device_communication":             "false",
@@ -225,9 +225,9 @@ resource "sakuracloud_switch" "foobar" {
 
 resource "sakuracloud_mobile_gateway" "foobar" {
   network_interface {
-    switch_id   = sakuracloud_switch.foobar.id
-    ip_address  = "192.168.11.101"
-    nw_mask_len = 24
+    switch_id  = sakuracloud_switch.foobar.id
+    ip_address = "192.168.11.101"
+    netmask    = 24
   }
   internet_connection = true
   name                = "{{ .arg0 }}"
@@ -273,9 +273,9 @@ resource "sakuracloud_switch" "foobar" {
 }
 resource "sakuracloud_mobile_gateway" "foobar" {
   network_interface {
-    switch_id   = sakuracloud_switch.foobar.id
-    ip_address  = "192.168.11.101"
-    nw_mask_len = 24
+    switch_id  = sakuracloud_switch.foobar.id
+    ip_address = "192.168.11.101"
+    netmask    = 24
   }
   internet_connection = false
   name                = "{{ .arg0 }}-upd"

@@ -38,7 +38,7 @@ func dataSourceSakuraCloudSubnet() *schema.Resource {
 				Required: true,
 			},
 
-			"nw_mask_len": {
+			"netmask": {
 				Type:     schema.TypeInt,
 				Computed: true,
 			},

@@ -38,7 +38,7 @@ func TestAccSakuraCloudDataSourceInternet_basic(t *testing.T) {
 					resource.TestCheckResourceAttr(resourceName, "tags.0", "tag1"),
 					resource.TestCheckResourceAttr(resourceName, "tags.1", "tag2"),
 					resource.TestCheckResourceAttr(resourceName, "tags.2", "tag3"),
-					resource.TestCheckResourceAttr(resourceName, "nw_mask_len", "28"),
+					resource.TestCheckResourceAttr(resourceName, "netmask", "28"),
 					resource.TestCheckResourceAttr(resourceName, "band_width", "100"),
 					resource.TestCheckResourceAttr(resourceName, "server_ids.#", "0"),
 					resource.TestCheckResourceAttr(resourceName, "ip_addresses.#", "11"),

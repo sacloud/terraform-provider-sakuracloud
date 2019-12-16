@@ -44,7 +44,7 @@ func dataSourceSakuraCloudInternet() *schema.Resource {
 				Computed: true,
 				Elem:     &schema.Schema{Type: schema.TypeString},
 			},
-			"nw_mask_len": {
+			"netmask": {
 				Type:     schema.TypeInt,
 				Computed: true,
 			},

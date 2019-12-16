@@ -141,7 +141,7 @@ func expandLoadBalancerCreateRequest(d *schema.ResourceData) *sacloud.LoadBalanc
 		PlanID:             expandLoadBalancerPlanID(d),
 		VRID:               d.Get("vrid").(int),
 		IPAddresses:        expandLoadBalancerIPAddresses(d),
-		NetworkMaskLen:     d.Get("nw_mask_len").(int),
+		NetworkMaskLen:     d.Get("netmask").(int),
 		DefaultRoute:       d.Get("gateway").(string),
 		Name:               d.Get("name").(string),
 		Description:        d.Get("description").(string),

@@ -60,7 +60,7 @@ func expandNFSCreateRequest(d *schema.ResourceData, planID types.ID) *sacloud.NF
 		SwitchID:       expandSakuraCloudID(d, "switch_id"),
 		PlanID:         planID,
 		IPAddresses:    []string{d.Get("ip_address").(string)},
-		NetworkMaskLen: d.Get("nw_mask_len").(int),
+		NetworkMaskLen: d.Get("netmask").(int),
 		DefaultRoute:   d.Get("gateway").(string),
 		Name:           d.Get("name").(string),
 		Description:    d.Get("description").(string),

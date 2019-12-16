@@ -54,7 +54,7 @@ func resourceSakuraCloudInternet() *schema.Resource {
 				Optional: true,
 				Elem:     &schema.Schema{Type: schema.TypeString},
 			},
-			"nw_mask_len": {
+			"netmask": {
 				Type:         schema.TypeInt,
 				ForceNew:     true,
 				Optional:     true,
@@ -238,7 +238,7 @@ func setInternetResourceData(ctx context.Context, d *schema.ResourceData, client
 	if err := d.Set("tags", data.Tags); err != nil {
 		return err
 	}
-	d.Set("nw_mask_len", data.NetworkMaskLen)
+	d.Set("netmask", data.NetworkMaskLen)
 	d.Set("band_width", data.BandWidthMbps)
 	d.Set("switch_id", sw.ID.String())
 	d.Set("nw_address", sw.Subnets[0].NetworkAddress)

@@ -50,7 +50,7 @@ func TestAccSakuraCloudDatabaseReplica_basic(t *testing.T) {
 					resource.TestCheckResourceAttr(resourceName, "tags.1", "tag2"),
 					resource.TestCheckResourceAttr(resourceName, "ip_addresses.#", "1"),
 					resource.TestCheckResourceAttr(resourceName, "ip_addresses.0", "192.168.11.111"),
-					resource.TestCheckResourceAttr(resourceName, "nw_mask_len", "24"),
+					resource.TestCheckResourceAttr(resourceName, "netmask", "24"),
 					resource.TestCheckResourceAttr(resourceName, "gateway", "192.168.11.1"),
 					resource.TestCheckResourceAttrPair(
 						resourceName, "icon_id",
@@ -68,7 +68,7 @@ func TestAccSakuraCloudDatabaseReplica_basic(t *testing.T) {
 					resource.TestCheckResourceAttr(resourceName, "tags.1", "tag2-upd"),
 					resource.TestCheckResourceAttr(resourceName, "ip_addresses.#", "1"),
 					resource.TestCheckResourceAttr(resourceName, "ip_addresses.0", "192.168.11.111"),
-					resource.TestCheckResourceAttr(resourceName, "nw_mask_len", "24"),
+					resource.TestCheckResourceAttr(resourceName, "netmask", "24"),
 					resource.TestCheckResourceAttr(resourceName, "gateway", "192.168.11.1"),
 					resource.TestCheckResourceAttr(resourceName, "icon_id", ""),
 				),
@@ -89,7 +89,7 @@ func TestAccImportSakuraCloudDatabaseReadReplica(t *testing.T) {
 			"name":           rand,
 			"description":    "description",
 			"ip_addresses.0": "192.168.11.111",
-			"nw_mask_len":    "24",
+			"netmask":        "24",
 			"gateway":        "192.168.11.1",
 			"tags.0":         "tag1",
 			"tags.1":         "tag2",
@@ -163,7 +163,7 @@ resource "sakuracloud_database" "foobar" {
 
   switch_id    = sakuracloud_switch.foobar.id
   ip_addresses = ["192.168.11.101"]
-  nw_mask_len  = 24
+  netmask      = 24
   gateway      = "192.168.11.1"
 
   name = "{{ .arg0 }}"
@@ -200,7 +200,7 @@ resource "sakuracloud_database" "foobar" {
 
   switch_id    = sakuracloud_switch.foobar.id
   ip_addresses = ["192.168.11.101"]
-  nw_mask_len  = 24
+  netmask      = 24
   gateway      = "192.168.11.1"
 
   name = "{{ .arg0 }}"

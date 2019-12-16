@@ -53,7 +53,7 @@ resource "sakuracloud_load_balancer" "foobar" {
   switch_id    = sakuracloud_switch.foobar.id
   vrid         = 1
   ip_addresses = ["192.168.11.101"]
-  nw_mask_len  = 24
+  netmask      = 24
   gateway      = "192.168.11.1"
 
   name        = "{{ .arg0 }}"

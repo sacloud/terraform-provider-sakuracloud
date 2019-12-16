@@ -108,7 +108,7 @@ func resourceSakuraCloudDatabase() *schema.Resource {
 				MaxItems: 1,
 				Elem:     &schema.Schema{Type: schema.TypeString},
 			},
-			"nw_mask_len": {
+			"netmask": {
 				Type:         schema.TypeInt,
 				ForceNew:     true,
 				Required:     true,
@@ -259,7 +259,7 @@ func setDatabaseResourceData(ctx context.Context, d *schema.ResourceData, client
 	}
 	d.Set("port", data.CommonSetting.ServicePort)
 	d.Set("switch_id", data.SwitchID.String())
-	d.Set("nw_mask_len", data.NetworkMaskLen)
+	d.Set("netmask", data.NetworkMaskLen)
 	d.Set("gateway", data.DefaultRoute)
 	if err := d.Set("ip_addresses", data.IPAddresses); err != nil {
 		return err
