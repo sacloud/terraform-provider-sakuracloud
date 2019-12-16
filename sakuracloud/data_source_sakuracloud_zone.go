@@ -16,6 +16,7 @@ package sakuracloud
 
 import (
 	"fmt"
+	"time"
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/sacloud/libsacloud/v2/sacloud"
@@ -24,6 +25,10 @@ import (
 func dataSourceSakuraCloudZone() *schema.Resource {
 	return &schema.Resource{
 		Read: dataSourceSakuraCloudZoneRead,
+
+		Timeouts: &schema.ResourceTimeout{
+			Read: schema.DefaultTimeout(5 * time.Minute),
+		},
 
 		Schema: map[string]*schema.Schema{
 			"name": {
@@ -58,7 +63,10 @@ func dataSourceSakuraCloudZone() *schema.Resource {
 }
 
 func dataSourceSakuraCloudZoneRead(d *schema.ResourceData, meta interface{}) error {
-	client, ctx, zoneSlug := getSacloudClient(d, meta)
+	client, zoneSlug := getSacloudClient(d, meta)
+	ctx, cancel := operationContext(d, schema.TimeoutRead)
+	defer cancel()
+
 	zoneOp := sacloud.NewZoneOp(client)
 
 	if v, ok := d.GetOk("name"); ok {

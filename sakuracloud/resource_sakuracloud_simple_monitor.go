@@ -17,6 +17,7 @@ package sakuracloud
 import (
 	"context"
 	"fmt"
+	"time"
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/validation"
@@ -34,6 +35,14 @@ func resourceSakuraCloudSimpleMonitor() *schema.Resource {
 			State: schema.ImportStatePassthrough,
 		},
 		CustomizeDiff: hasTagResourceCustomizeDiff,
+
+		Timeouts: &schema.ResourceTimeout{
+			Create: schema.DefaultTimeout(5 * time.Minute),
+			Read:   schema.DefaultTimeout(5 * time.Minute),
+			Update: schema.DefaultTimeout(5 * time.Minute),
+			Delete: schema.DefaultTimeout(5 * time.Minute),
+		},
+
 		Schema: map[string]*schema.Schema{
 			"target": {
 				Type:     schema.TypeString,
@@ -166,7 +175,10 @@ func resourceSakuraCloudSimpleMonitor() *schema.Resource {
 }
 
 func resourceSakuraCloudSimpleMonitorCreate(d *schema.ResourceData, meta interface{}) error {
-	client, ctx, _ := getSacloudClient(d, meta)
+	client, _ := getSacloudClient(d, meta)
+	ctx, cancel := operationContext(d, schema.TimeoutCreate)
+	defer cancel()
+
 	smOp := sacloud.NewSimpleMonitorOp(client)
 
 	simpleMonitor, err := smOp.Create(ctx, expandSimpleMonitorCreateRequest(d))
@@ -179,7 +191,10 @@ func resourceSakuraCloudSimpleMonitorCreate(d *schema.ResourceData, meta interfa
 }
 
 func resourceSakuraCloudSimpleMonitorRead(d *schema.ResourceData, meta interface{}) error {
-	client, ctx, _ := getSacloudClient(d, meta)
+	client, _ := getSacloudClient(d, meta)
+	ctx, cancel := operationContext(d, schema.TimeoutRead)
+	defer cancel()
+
 	smOp := sacloud.NewSimpleMonitorOp(client)
 
 	simpleMonitor, err := smOp.Read(ctx, sakuraCloudID(d.Id()))
@@ -195,7 +210,10 @@ func resourceSakuraCloudSimpleMonitorRead(d *schema.ResourceData, meta interface
 }
 
 func resourceSakuraCloudSimpleMonitorUpdate(d *schema.ResourceData, meta interface{}) error {
-	client, ctx, _ := getSacloudClient(d, meta)
+	client, _ := getSacloudClient(d, meta)
+	ctx, cancel := operationContext(d, schema.TimeoutUpdate)
+	defer cancel()
+
 	smOp := sacloud.NewSimpleMonitorOp(client)
 
 	simpleMonitor, err := smOp.Read(ctx, sakuraCloudID(d.Id()))
@@ -212,7 +230,10 @@ func resourceSakuraCloudSimpleMonitorUpdate(d *schema.ResourceData, meta interfa
 }
 
 func resourceSakuraCloudSimpleMonitorDelete(d *schema.ResourceData, meta interface{}) error {
-	client, ctx, _ := getSacloudClient(d, meta)
+	client, _ := getSacloudClient(d, meta)
+	ctx, cancel := operationContext(d, schema.TimeoutDelete)
+	defer cancel()
+
 	smOp := sacloud.NewSimpleMonitorOp(client)
 
 	simpleMonitor, err := smOp.Read(ctx, sakuraCloudID(d.Id()))

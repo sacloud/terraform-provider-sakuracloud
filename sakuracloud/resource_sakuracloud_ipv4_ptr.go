@@ -32,6 +32,14 @@ func resourceSakuraCloudIPv4Ptr() *schema.Resource {
 		Importer: &schema.ResourceImporter{
 			State: schema.ImportStatePassthrough,
 		},
+
+		Timeouts: &schema.ResourceTimeout{
+			Create: schema.DefaultTimeout(60 * time.Minute),
+			Read:   schema.DefaultTimeout(5 * time.Minute),
+			Update: schema.DefaultTimeout(60 * time.Minute),
+			Delete: schema.DefaultTimeout(5 * time.Minute),
+		},
+
 		CustomizeDiff: hasTagResourceCustomizeDiff,
 		Schema: map[string]*schema.Schema{
 			"ip_address": {
@@ -69,7 +77,15 @@ func resourceSakuraCloudIPv4Ptr() *schema.Resource {
 
 func resourceSakuraCloudIPv4PtrUpdate(d *schema.ResourceData, meta interface{}) error {
 	var err error
-	client, ctx, zone := getSacloudClient(d, meta)
+
+	client, zone := getSacloudClient(d, meta)
+	op := schema.TimeoutUpdate
+	if d.IsNewResource() {
+		op = schema.TimeoutCreate
+	}
+	ctx, cancel := operationContext(d, op)
+	defer cancel()
+
 	ipAddrOp := sacloud.NewIPAddressOp(client)
 
 	ip := d.Get("ip_address").(string)
@@ -109,7 +125,10 @@ func resourceSakuraCloudIPv4PtrUpdate(d *schema.ResourceData, meta interface{}) 
 }
 
 func resourceSakuraCloudIPv4PtrRead(d *schema.ResourceData, meta interface{}) error {
-	client, ctx, zone := getSacloudClient(d, meta)
+	client, zone := getSacloudClient(d, meta)
+	ctx, cancel := operationContext(d, schema.TimeoutRead)
+	defer cancel()
+
 	ipAddrOp := sacloud.NewIPAddressOp(client)
 	ip := d.Id()
 
@@ -126,7 +145,11 @@ func resourceSakuraCloudIPv4PtrRead(d *schema.ResourceData, meta interface{}) er
 
 func resourceSakuraCloudIPv4PtrDelete(d *schema.ResourceData, meta interface{}) error {
 	var err error
-	client, ctx, zone := getSacloudClient(d, meta)
+
+	client, zone := getSacloudClient(d, meta)
+	ctx, cancel := operationContext(d, schema.TimeoutDelete)
+	defer cancel()
+
 	ipAddrOp := sacloud.NewIPAddressOp(client)
 	ip := d.Id()
 

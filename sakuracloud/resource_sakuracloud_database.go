@@ -35,6 +35,14 @@ func resourceSakuraCloudDatabase() *schema.Resource {
 			State: schema.ImportStatePassthrough,
 		},
 		CustomizeDiff: hasTagResourceCustomizeDiff,
+
+		Timeouts: &schema.ResourceTimeout{
+			Create: schema.DefaultTimeout(60 * time.Minute),
+			Read:   schema.DefaultTimeout(5 * time.Minute),
+			Update: schema.DefaultTimeout(60 * time.Minute),
+			Delete: schema.DefaultTimeout(20 * time.Minute),
+		},
+
 		Schema: map[string]*schema.Schema{
 			"name": {
 				Type:     schema.TypeString,
@@ -146,7 +154,9 @@ func resourceSakuraCloudDatabase() *schema.Resource {
 }
 
 func resourceSakuraCloudDatabaseCreate(d *schema.ResourceData, meta interface{}) error {
-	client, ctx, zone := getSacloudClient(d, meta)
+	client, zone := getSacloudClient(d, meta)
+	ctx, cancel := operationContext(d, schema.TimeoutCreate)
+	defer cancel()
 
 	if err := validateDatabaseParameters(d); err != nil {
 		return err
@@ -167,7 +177,10 @@ func resourceSakuraCloudDatabaseCreate(d *schema.ResourceData, meta interface{})
 }
 
 func resourceSakuraCloudDatabaseRead(d *schema.ResourceData, meta interface{}) error {
-	client, ctx, zone := getSacloudClient(d, meta)
+	client, zone := getSacloudClient(d, meta)
+	ctx, cancel := operationContext(d, schema.TimeoutRead)
+	defer cancel()
+
 	dbOp := sacloud.NewDatabaseOp(client)
 
 	data, err := dbOp.Read(ctx, zone, sakuraCloudID(d.Id()))
@@ -182,7 +195,10 @@ func resourceSakuraCloudDatabaseRead(d *schema.ResourceData, meta interface{}) e
 }
 
 func resourceSakuraCloudDatabaseUpdate(d *schema.ResourceData, meta interface{}) error {
-	client, ctx, zone := getSacloudClient(d, meta)
+	client, zone := getSacloudClient(d, meta)
+	ctx, cancel := operationContext(d, schema.TimeoutUpdate)
+	defer cancel()
+
 	dbOp := sacloud.NewDatabaseOp(client)
 
 	db, err := dbOp.Read(ctx, zone, sakuraCloudID(d.Id()))
@@ -199,7 +215,10 @@ func resourceSakuraCloudDatabaseUpdate(d *schema.ResourceData, meta interface{})
 }
 
 func resourceSakuraCloudDatabaseDelete(d *schema.ResourceData, meta interface{}) error {
-	client, ctx, zone := getSacloudClient(d, meta)
+	client, zone := getSacloudClient(d, meta)
+	ctx, cancel := operationContext(d, schema.TimeoutDelete)
+	defer cancel()
+
 	dbOp := sacloud.NewDatabaseOp(client)
 
 	data, err := dbOp.Read(ctx, zone, sakuraCloudID(d.Id()))

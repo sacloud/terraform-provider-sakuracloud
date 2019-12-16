@@ -17,6 +17,7 @@ package sakuracloud
 import (
 	"context"
 	"fmt"
+	"time"
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/validation"
@@ -34,6 +35,14 @@ func resourceSakuraCloudDNS() *schema.Resource {
 			State: schema.ImportStatePassthrough,
 		},
 		CustomizeDiff: hasTagResourceCustomizeDiff,
+
+		Timeouts: &schema.ResourceTimeout{
+			Create: schema.DefaultTimeout(5 * time.Minute),
+			Read:   schema.DefaultTimeout(5 * time.Minute),
+			Update: schema.DefaultTimeout(5 * time.Minute),
+			Delete: schema.DefaultTimeout(5 * time.Minute),
+		},
+
 		Schema: map[string]*schema.Schema{
 			"zone": {
 				Type:     schema.TypeString,
@@ -107,7 +116,10 @@ func resourceSakuraCloudDNS() *schema.Resource {
 }
 
 func resourceSakuraCloudDNSCreate(d *schema.ResourceData, meta interface{}) error {
-	client, ctx, _ := getSacloudClient(d, meta)
+	client, _ := getSacloudClient(d, meta)
+	ctx, cancel := operationContext(d, schema.TimeoutCreate)
+	defer cancel()
+
 	dnsOp := sacloud.NewDNSOp(client)
 
 	dns, err := dnsOp.Create(ctx, expandDNSCreateRequest(d))
@@ -120,7 +132,10 @@ func resourceSakuraCloudDNSCreate(d *schema.ResourceData, meta interface{}) erro
 }
 
 func resourceSakuraCloudDNSRead(d *schema.ResourceData, meta interface{}) error {
-	client, ctx, _ := getSacloudClient(d, meta)
+	client, _ := getSacloudClient(d, meta)
+	ctx, cancel := operationContext(d, schema.TimeoutRead)
+	defer cancel()
+
 	dnsOp := sacloud.NewDNSOp(client)
 
 	dns, err := dnsOp.Read(ctx, sakuraCloudID(d.Id()))
@@ -136,7 +151,10 @@ func resourceSakuraCloudDNSRead(d *schema.ResourceData, meta interface{}) error 
 }
 
 func resourceSakuraCloudDNSUpdate(d *schema.ResourceData, meta interface{}) error {
-	client, ctx, _ := getSacloudClient(d, meta)
+	client, _ := getSacloudClient(d, meta)
+	ctx, cancel := operationContext(d, schema.TimeoutUpdate)
+	defer cancel()
+
 	dnsOp := sacloud.NewDNSOp(client)
 
 	sakuraMutexKV.Lock(d.Id())
@@ -154,7 +172,10 @@ func resourceSakuraCloudDNSUpdate(d *schema.ResourceData, meta interface{}) erro
 }
 
 func resourceSakuraCloudDNSDelete(d *schema.ResourceData, meta interface{}) error {
-	client, ctx, _ := getSacloudClient(d, meta)
+	client, _ := getSacloudClient(d, meta)
+	ctx, cancel := operationContext(d, schema.TimeoutDelete)
+	defer cancel()
+
 	dnsOp := sacloud.NewDNSOp(client)
 
 	sakuraMutexKV.Lock(d.Id())

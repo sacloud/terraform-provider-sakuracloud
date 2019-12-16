@@ -16,6 +16,7 @@ package sakuracloud
 
 import (
 	"fmt"
+	"time"
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/sacloud/libsacloud/v2/sacloud"
@@ -24,6 +25,10 @@ import (
 func dataSourceSakuraCloudNote() *schema.Resource {
 	return &schema.Resource{
 		Read: dataSourceSakuraCloudNoteRead,
+
+		Timeouts: &schema.ResourceTimeout{
+			Read: schema.DefaultTimeout(5 * time.Minute),
+		},
 
 		Schema: map[string]*schema.Schema{
 			filterAttrName: filterSchema(&filterSchemaOption{}),
@@ -57,7 +62,10 @@ func dataSourceSakuraCloudNote() *schema.Resource {
 }
 
 func dataSourceSakuraCloudNoteRead(d *schema.ResourceData, meta interface{}) error {
-	client, ctx, _ := getSacloudClient(d, meta)
+	client, _ := getSacloudClient(d, meta)
+	ctx, cancel := operationContext(d, schema.TimeoutRead)
+	defer cancel()
+
 	searcher := sacloud.NewNoteOp(client)
 
 	findCondition := &sacloud.FindCondition{}

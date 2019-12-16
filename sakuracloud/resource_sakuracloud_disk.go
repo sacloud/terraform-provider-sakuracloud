@@ -17,6 +17,7 @@ package sakuracloud
 import (
 	"context"
 	"fmt"
+	"time"
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/validation"
@@ -36,6 +37,14 @@ func resourceSakuraCloudDisk() *schema.Resource {
 			State: schema.ImportStatePassthrough,
 		},
 		CustomizeDiff: hasTagResourceCustomizeDiff,
+
+		Timeouts: &schema.ResourceTimeout{
+			Create: schema.DefaultTimeout(24 * time.Hour),
+			Read:   schema.DefaultTimeout(5 * time.Minute),
+			Update: schema.DefaultTimeout(24 * time.Hour),
+			Delete: schema.DefaultTimeout(20 * time.Minute),
+		},
+
 		Schema: map[string]*schema.Schema{
 			"name": {
 				Type:     schema.TypeString,
@@ -115,7 +124,10 @@ func resourceSakuraCloudDisk() *schema.Resource {
 }
 
 func resourceSakuraCloudDiskCreate(d *schema.ResourceData, meta interface{}) error {
-	client, ctx, zone := getSacloudClient(d, meta)
+	client, zone := getSacloudClient(d, meta)
+	ctx, cancel := operationContext(d, schema.TimeoutCreate)
+	defer cancel()
+
 	diskOp := sacloud.NewDiskOp(client)
 
 	diskBuilder := &setup.RetryableSetup{
@@ -147,7 +159,10 @@ func resourceSakuraCloudDiskCreate(d *schema.ResourceData, meta interface{}) err
 }
 
 func resourceSakuraCloudDiskRead(d *schema.ResourceData, meta interface{}) error {
-	client, ctx, zone := getSacloudClient(d, meta)
+	client, zone := getSacloudClient(d, meta)
+	ctx, cancel := operationContext(d, schema.TimeoutRead)
+	defer cancel()
+
 	diskOp := sacloud.NewDiskOp(client)
 
 	disk, err := diskOp.Read(ctx, zone, sakuraCloudID(d.Id()))
@@ -163,7 +178,10 @@ func resourceSakuraCloudDiskRead(d *schema.ResourceData, meta interface{}) error
 }
 
 func resourceSakuraCloudDiskUpdate(d *schema.ResourceData, meta interface{}) error {
-	client, ctx, zone := getSacloudClient(d, meta)
+	client, zone := getSacloudClient(d, meta)
+	ctx, cancel := operationContext(d, schema.TimeoutUpdate)
+	defer cancel()
+
 	diskOp := sacloud.NewDiskOp(client)
 
 	disk, err := diskOp.Read(ctx, zone, sakuraCloudID(d.Id()))
@@ -180,7 +198,10 @@ func resourceSakuraCloudDiskUpdate(d *schema.ResourceData, meta interface{}) err
 }
 
 func resourceSakuraCloudDiskDelete(d *schema.ResourceData, meta interface{}) error {
-	client, ctx, zone := getSacloudClient(d, meta)
+	client, zone := getSacloudClient(d, meta)
+	ctx, cancel := operationContext(d, schema.TimeoutDelete)
+	defer cancel()
+
 	diskOp := sacloud.NewDiskOp(client)
 
 	disk, err := diskOp.Read(ctx, zone, sakuraCloudID(d.Id()))

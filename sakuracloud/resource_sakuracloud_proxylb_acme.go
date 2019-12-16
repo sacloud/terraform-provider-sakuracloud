@@ -31,6 +31,13 @@ func resourceSakuraCloudProxyLBACME() *schema.Resource {
 		Importer: &schema.ResourceImporter{
 			State: schema.ImportStatePassthrough,
 		},
+
+		Timeouts: &schema.ResourceTimeout{
+			Create: schema.DefaultTimeout(20 * time.Minute),
+			Read:   schema.DefaultTimeout(5 * time.Minute),
+			Delete: schema.DefaultTimeout(5 * time.Minute),
+		},
+
 		Schema: map[string]*schema.Schema{
 			"proxylb_id": {
 				Type:         schema.TypeString,
@@ -99,7 +106,10 @@ func resourceSakuraCloudProxyLBACME() *schema.Resource {
 }
 
 func resourceSakuraCloudProxyLBACMECreate(d *schema.ResourceData, meta interface{}) error {
-	client, ctx, _ := getSacloudClient(d, meta)
+	client, _ := getSacloudClient(d, meta)
+	ctx, cancel := operationContext(d, schema.TimeoutCreate)
+	defer cancel()
+
 	proxyLBOp := sacloud.NewProxyLBOp(client)
 
 	proxyLBID := d.Get("proxylb_id").(string)
@@ -153,7 +163,10 @@ func resourceSakuraCloudProxyLBACMECreate(d *schema.ResourceData, meta interface
 }
 
 func resourceSakuraCloudProxyLBACMERead(d *schema.ResourceData, meta interface{}) error {
-	client, ctx, _ := getSacloudClient(d, meta)
+	client, _ := getSacloudClient(d, meta)
+	ctx, cancel := operationContext(d, schema.TimeoutRead)
+	defer cancel()
+
 	proxyLBOp := sacloud.NewProxyLBOp(client)
 
 	proxyLBID := d.Get("proxylb_id").(string)
@@ -171,7 +184,10 @@ func resourceSakuraCloudProxyLBACMERead(d *schema.ResourceData, meta interface{}
 }
 
 func resourceSakuraCloudProxyLBACMEDelete(d *schema.ResourceData, meta interface{}) error {
-	client, ctx, _ := getSacloudClient(d, meta)
+	client, _ := getSacloudClient(d, meta)
+	ctx, cancel := operationContext(d, schema.TimeoutDelete)
+	defer cancel()
+
 	proxyLBOp := sacloud.NewProxyLBOp(client)
 
 	proxyLBID := d.Get("proxylb_id").(string)

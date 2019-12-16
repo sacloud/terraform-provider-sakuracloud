@@ -17,6 +17,7 @@ package sakuracloud
 import (
 	"context"
 	"fmt"
+	"time"
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/validation"
@@ -31,6 +32,13 @@ func resourceSakuraCloudSubnet() *schema.Resource {
 		Delete: resourceSakuraCloudSubnetDelete,
 		Importer: &schema.ResourceImporter{
 			State: schema.ImportStatePassthrough,
+		},
+
+		Timeouts: &schema.ResourceTimeout{
+			Create: schema.DefaultTimeout(60 * time.Minute),
+			Read:   schema.DefaultTimeout(5 * time.Minute),
+			Update: schema.DefaultTimeout(60 * time.Minute),
+			Delete: schema.DefaultTimeout(5 * time.Minute),
 		},
 
 		Schema: map[string]*schema.Schema{
@@ -85,7 +93,10 @@ func resourceSakuraCloudSubnet() *schema.Resource {
 }
 
 func resourceSakuraCloudSubnetCreate(d *schema.ResourceData, meta interface{}) error {
-	client, ctx, zone := getSacloudClient(d, meta)
+	client, zone := getSacloudClient(d, meta)
+	ctx, cancel := operationContext(d, schema.TimeoutCreate)
+	defer cancel()
+
 	internetOp := sacloud.NewInternetOp(client)
 
 	internetID := d.Get("internet_id").(string)
@@ -111,7 +122,10 @@ func resourceSakuraCloudSubnetCreate(d *schema.ResourceData, meta interface{}) e
 }
 
 func resourceSakuraCloudSubnetRead(d *schema.ResourceData, meta interface{}) error {
-	client, ctx, zone := getSacloudClient(d, meta)
+	client, zone := getSacloudClient(d, meta)
+	ctx, cancel := operationContext(d, schema.TimeoutRead)
+	defer cancel()
+
 	subnetOp := sacloud.NewSubnetOp(client)
 
 	subnet, err := subnetOp.Read(ctx, zone, sakuraCloudID(d.Id()))
@@ -126,7 +140,10 @@ func resourceSakuraCloudSubnetRead(d *schema.ResourceData, meta interface{}) err
 }
 
 func resourceSakuraCloudSubnetUpdate(d *schema.ResourceData, meta interface{}) error {
-	client, ctx, zone := getSacloudClient(d, meta)
+	client, zone := getSacloudClient(d, meta)
+	ctx, cancel := operationContext(d, schema.TimeoutUpdate)
+	defer cancel()
+
 	subnetOp := sacloud.NewSubnetOp(client)
 	internetOp := sacloud.NewInternetOp(client)
 
@@ -150,7 +167,10 @@ func resourceSakuraCloudSubnetUpdate(d *schema.ResourceData, meta interface{}) e
 }
 
 func resourceSakuraCloudSubnetDelete(d *schema.ResourceData, meta interface{}) error {
-	client, ctx, zone := getSacloudClient(d, meta)
+	client, zone := getSacloudClient(d, meta)
+	ctx, cancel := operationContext(d, schema.TimeoutDelete)
+	defer cancel()
+
 	subnetOp := sacloud.NewSubnetOp(client)
 	internetOp := sacloud.NewInternetOp(client)
 

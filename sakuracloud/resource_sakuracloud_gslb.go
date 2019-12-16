@@ -17,6 +17,7 @@ package sakuracloud
 import (
 	"context"
 	"fmt"
+	"time"
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/validation"
@@ -34,6 +35,14 @@ func resourceSakuraCloudGSLB() *schema.Resource {
 			State: schema.ImportStatePassthrough,
 		},
 		CustomizeDiff: hasTagResourceCustomizeDiff,
+
+		Timeouts: &schema.ResourceTimeout{
+			Create: schema.DefaultTimeout(5 * time.Minute),
+			Read:   schema.DefaultTimeout(5 * time.Minute),
+			Update: schema.DefaultTimeout(5 * time.Minute),
+			Delete: schema.DefaultTimeout(5 * time.Minute),
+		},
+
 		Schema: map[string]*schema.Schema{
 			"name": {
 				Type:     schema.TypeString,
@@ -134,7 +143,10 @@ func resourceSakuraCloudGSLB() *schema.Resource {
 }
 
 func resourceSakuraCloudGSLBCreate(d *schema.ResourceData, meta interface{}) error {
-	client, ctx, _ := getSacloudClient(d, meta)
+	client, _ := getSacloudClient(d, meta)
+	ctx, cancel := operationContext(d, schema.TimeoutCreate)
+	defer cancel()
+
 	gslbOp := sacloud.NewGSLBOp(client)
 
 	gslb, err := gslbOp.Create(ctx, expandGSLBCreateRequest(d))
@@ -147,7 +159,10 @@ func resourceSakuraCloudGSLBCreate(d *schema.ResourceData, meta interface{}) err
 }
 
 func resourceSakuraCloudGSLBRead(d *schema.ResourceData, meta interface{}) error {
-	client, ctx, _ := getSacloudClient(d, meta)
+	client, _ := getSacloudClient(d, meta)
+	ctx, cancel := operationContext(d, schema.TimeoutRead)
+	defer cancel()
+
 	gslbOp := sacloud.NewGSLBOp(client)
 
 	gslb, err := gslbOp.Read(ctx, sakuraCloudID(d.Id()))
@@ -163,7 +178,10 @@ func resourceSakuraCloudGSLBRead(d *schema.ResourceData, meta interface{}) error
 }
 
 func resourceSakuraCloudGSLBUpdate(d *schema.ResourceData, meta interface{}) error {
-	client, ctx, _ := getSacloudClient(d, meta)
+	client, _ := getSacloudClient(d, meta)
+	ctx, cancel := operationContext(d, schema.TimeoutUpdate)
+	defer cancel()
+
 	gslbOp := sacloud.NewGSLBOp(client)
 
 	gslb, err := gslbOp.Read(ctx, sakuraCloudID(d.Id()))
@@ -180,7 +198,10 @@ func resourceSakuraCloudGSLBUpdate(d *schema.ResourceData, meta interface{}) err
 }
 
 func resourceSakuraCloudGSLBDelete(d *schema.ResourceData, meta interface{}) error {
-	client, ctx, _ := getSacloudClient(d, meta)
+	client, _ := getSacloudClient(d, meta)
+	ctx, cancel := operationContext(d, schema.TimeoutDelete)
+	defer cancel()
+
 	gslbOp := sacloud.NewGSLBOp(client)
 
 	gslb, err := gslbOp.Read(ctx, sakuraCloudID(d.Id()))

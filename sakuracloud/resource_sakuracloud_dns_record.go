@@ -17,6 +17,7 @@ package sakuracloud
 import (
 	"bytes"
 	"fmt"
+	"time"
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/validation"
 
@@ -33,6 +34,13 @@ func resourceSakuraCloudDNSRecord() *schema.Resource {
 		Create: resourceSakuraCloudDNSRecordCreate,
 		Read:   resourceSakuraCloudDNSRecordRead,
 		Delete: resourceSakuraCloudDNSRecordDelete,
+
+		Timeouts: &schema.ResourceTimeout{
+			Create: schema.DefaultTimeout(5 * time.Minute),
+			Read:   schema.DefaultTimeout(5 * time.Minute),
+			Delete: schema.DefaultTimeout(5 * time.Minute),
+		},
+
 		Schema: map[string]*schema.Schema{
 			"dns_id": {
 				Type:         schema.TypeString,
@@ -85,7 +93,10 @@ func resourceSakuraCloudDNSRecord() *schema.Resource {
 }
 
 func resourceSakuraCloudDNSRecordCreate(d *schema.ResourceData, meta interface{}) error {
-	client, ctx, _ := getSacloudClient(d, meta)
+	client, _ := getSacloudClient(d, meta)
+	ctx, cancel := operationContext(d, schema.TimeoutCreate)
+	defer cancel()
+
 	dnsOp := sacloud.NewDNSOp(client)
 	dnsID := d.Get("dns_id").(string)
 
@@ -108,7 +119,10 @@ func resourceSakuraCloudDNSRecordCreate(d *schema.ResourceData, meta interface{}
 }
 
 func resourceSakuraCloudDNSRecordRead(d *schema.ResourceData, meta interface{}) error {
-	client, ctx, _ := getSacloudClient(d, meta)
+	client, _ := getSacloudClient(d, meta)
+	ctx, cancel := operationContext(d, schema.TimeoutRead)
+	defer cancel()
+
 	dnsOp := sacloud.NewDNSOp(client)
 	dnsID := d.Get("dns_id").(string)
 
@@ -138,7 +152,10 @@ func resourceSakuraCloudDNSRecordRead(d *schema.ResourceData, meta interface{}) 
 }
 
 func resourceSakuraCloudDNSRecordDelete(d *schema.ResourceData, meta interface{}) error {
-	client, ctx, _ := getSacloudClient(d, meta)
+	client, _ := getSacloudClient(d, meta)
+	ctx, cancel := operationContext(d, schema.TimeoutDelete)
+	defer cancel()
+
 	dnsOp := sacloud.NewDNSOp(client)
 	dnsID := d.Get("dns_id").(string)
 

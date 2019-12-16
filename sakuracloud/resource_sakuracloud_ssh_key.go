@@ -17,6 +17,7 @@ package sakuracloud
 import (
 	"context"
 	"fmt"
+	"time"
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/validation"
@@ -32,6 +33,14 @@ func resourceSakuraCloudSSHKey() *schema.Resource {
 		Importer: &schema.ResourceImporter{
 			State: schema.ImportStatePassthrough,
 		},
+
+		Timeouts: &schema.ResourceTimeout{
+			Create: schema.DefaultTimeout(5 * time.Minute),
+			Read:   schema.DefaultTimeout(5 * time.Minute),
+			Update: schema.DefaultTimeout(5 * time.Minute),
+			Delete: schema.DefaultTimeout(5 * time.Minute),
+		},
+
 		Schema: map[string]*schema.Schema{
 			"name": {
 				Type:         schema.TypeString,
@@ -57,7 +66,10 @@ func resourceSakuraCloudSSHKey() *schema.Resource {
 }
 
 func resourceSakuraCloudSSHKeyCreate(d *schema.ResourceData, meta interface{}) error {
-	client, ctx, _ := getSacloudClient(d, meta)
+	client, _ := getSacloudClient(d, meta)
+	ctx, cancel := operationContext(d, schema.TimeoutCreate)
+	defer cancel()
+
 	sshKeyOp := sacloud.NewSSHKeyOp(client)
 
 	key, err := sshKeyOp.Create(ctx, expandSSHKeyCreateRequest(d))
@@ -70,7 +82,10 @@ func resourceSakuraCloudSSHKeyCreate(d *schema.ResourceData, meta interface{}) e
 }
 
 func resourceSakuraCloudSSHKeyRead(d *schema.ResourceData, meta interface{}) error {
-	client, ctx, _ := getSacloudClient(d, meta)
+	client, _ := getSacloudClient(d, meta)
+	ctx, cancel := operationContext(d, schema.TimeoutRead)
+	defer cancel()
+
 	sshKeyOp := sacloud.NewSSHKeyOp(client)
 
 	key, err := sshKeyOp.Read(ctx, sakuraCloudID(d.Id()))
@@ -85,7 +100,10 @@ func resourceSakuraCloudSSHKeyRead(d *schema.ResourceData, meta interface{}) err
 }
 
 func resourceSakuraCloudSSHKeyUpdate(d *schema.ResourceData, meta interface{}) error {
-	client, ctx, _ := getSacloudClient(d, meta)
+	client, _ := getSacloudClient(d, meta)
+	ctx, cancel := operationContext(d, schema.TimeoutUpdate)
+	defer cancel()
+
 	sshKeyOp := sacloud.NewSSHKeyOp(client)
 
 	key, err := sshKeyOp.Read(ctx, sakuraCloudID(d.Id()))
@@ -101,7 +119,10 @@ func resourceSakuraCloudSSHKeyUpdate(d *schema.ResourceData, meta interface{}) e
 }
 
 func resourceSakuraCloudSSHKeyDelete(d *schema.ResourceData, meta interface{}) error {
-	client, ctx, _ := getSacloudClient(d, meta)
+	client, _ := getSacloudClient(d, meta)
+	ctx, cancel := operationContext(d, schema.TimeoutDelete)
+	defer cancel()
+
 	sshKeyOp := sacloud.NewSSHKeyOp(client)
 
 	key, err := sshKeyOp.Read(ctx, sakuraCloudID(d.Id()))

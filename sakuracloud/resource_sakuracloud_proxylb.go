@@ -17,6 +17,7 @@ package sakuracloud
 import (
 	"context"
 	"fmt"
+	"time"
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/validation"
@@ -34,6 +35,14 @@ func resourceSakuraCloudProxyLB() *schema.Resource {
 			State: schema.ImportStatePassthrough,
 		},
 		CustomizeDiff: hasTagResourceCustomizeDiff,
+
+		Timeouts: &schema.ResourceTimeout{
+			Create: schema.DefaultTimeout(5 * time.Minute),
+			Read:   schema.DefaultTimeout(5 * time.Minute),
+			Update: schema.DefaultTimeout(5 * time.Minute),
+			Delete: schema.DefaultTimeout(5 * time.Minute),
+		},
+
 		Schema: map[string]*schema.Schema{
 			"name": {
 				Type:     schema.TypeString,
@@ -275,7 +284,10 @@ func resourceSakuraCloudProxyLB() *schema.Resource {
 }
 
 func resourceSakuraCloudProxyLBCreate(d *schema.ResourceData, meta interface{}) error {
-	client, ctx, _ := getSacloudClient(d, meta)
+	client, _ := getSacloudClient(d, meta)
+	ctx, cancel := operationContext(d, schema.TimeoutCreate)
+	defer cancel()
+
 	proxyLBOp := sacloud.NewProxyLBOp(client)
 
 	proxyLB, err := proxyLBOp.Create(ctx, expandProxyLBCreateRequest(d))
@@ -301,7 +313,10 @@ func resourceSakuraCloudProxyLBCreate(d *schema.ResourceData, meta interface{}) 
 }
 
 func resourceSakuraCloudProxyLBRead(d *schema.ResourceData, meta interface{}) error {
-	client, ctx, _ := getSacloudClient(d, meta)
+	client, _ := getSacloudClient(d, meta)
+	ctx, cancel := operationContext(d, schema.TimeoutRead)
+	defer cancel()
+
 	proxyLBOp := sacloud.NewProxyLBOp(client)
 
 	proxyLB, err := proxyLBOp.Read(ctx, sakuraCloudID(d.Id()))
@@ -317,7 +332,10 @@ func resourceSakuraCloudProxyLBRead(d *schema.ResourceData, meta interface{}) er
 }
 
 func resourceSakuraCloudProxyLBUpdate(d *schema.ResourceData, meta interface{}) error {
-	client, ctx, _ := getSacloudClient(d, meta)
+	client, _ := getSacloudClient(d, meta)
+	ctx, cancel := operationContext(d, schema.TimeoutUpdate)
+	defer cancel()
+
 	proxyLBOp := sacloud.NewProxyLBOp(client)
 
 	sakuraMutexKV.Lock(d.Id())
@@ -366,7 +384,10 @@ func resourceSakuraCloudProxyLBUpdate(d *schema.ResourceData, meta interface{}) 
 }
 
 func resourceSakuraCloudProxyLBDelete(d *schema.ResourceData, meta interface{}) error {
-	client, ctx, _ := getSacloudClient(d, meta)
+	client, _ := getSacloudClient(d, meta)
+	ctx, cancel := operationContext(d, schema.TimeoutDelete)
+	defer cancel()
+
 	proxyLBOp := sacloud.NewProxyLBOp(client)
 
 	sakuraMutexKV.Lock(d.Id())

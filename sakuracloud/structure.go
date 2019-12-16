@@ -25,6 +25,8 @@ import (
 	"os"
 	"strconv"
 
+	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
+
 	"github.com/mitchellh/go-homedir"
 
 	"github.com/sacloud/libsacloud/v2/sacloud/search"
@@ -101,11 +103,10 @@ func getListFromResource(d resourceValueGettable, key string) ([]interface{}, bo
 	return nil, false
 }
 
-func getSacloudClient(d resourceValueGettable, meta interface{}) (*APIClient, context.Context, string) {
+func getSacloudClient(d resourceValueGettable, meta interface{}) (*APIClient, string) {
 	client := meta.(*APIClient)
-	ctx := context.Background()
 	zone := getZone(d, client)
-	return client, ctx, zone
+	return client, zone
 }
 
 func getZone(d resourceValueGettable, client *APIClient) string {
@@ -116,6 +117,10 @@ func getZone(d resourceValueGettable, client *APIClient) string {
 		}
 	}
 	return client.defaultZone
+}
+
+func operationContext(d *schema.ResourceData, opKey string) (context.Context, context.CancelFunc) {
+	return context.WithTimeout(context.Background(), d.Timeout(opKey))
 }
 
 func sakuraCloudID(id string) types.ID {

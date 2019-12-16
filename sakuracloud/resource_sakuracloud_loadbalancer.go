@@ -17,6 +17,7 @@ package sakuracloud
 import (
 	"context"
 	"fmt"
+	"time"
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/validation"
@@ -37,6 +38,14 @@ func resourceSakuraCloudLoadBalancer() *schema.Resource {
 			State: schema.ImportStatePassthrough,
 		},
 		CustomizeDiff: hasTagResourceCustomizeDiff,
+
+		Timeouts: &schema.ResourceTimeout{
+			Create: schema.DefaultTimeout(60 * time.Minute),
+			Read:   schema.DefaultTimeout(5 * time.Minute),
+			Update: schema.DefaultTimeout(60 * time.Minute),
+			Delete: schema.DefaultTimeout(5 * time.Minute),
+		},
+
 		Schema: map[string]*schema.Schema{
 			"name": {
 				Type:     schema.TypeString,
@@ -178,7 +187,10 @@ func resourceSakuraCloudLoadBalancer() *schema.Resource {
 }
 
 func resourceSakuraCloudLoadBalancerCreate(d *schema.ResourceData, meta interface{}) error {
-	client, ctx, zone := getSacloudClient(d, meta)
+	client, zone := getSacloudClient(d, meta)
+	ctx, cancel := operationContext(d, schema.TimeoutCreate)
+	defer cancel()
+
 	lbOp := sacloud.NewLoadBalancerOp(client)
 
 	builder := &setup.RetryableSetup{
@@ -209,7 +221,10 @@ func resourceSakuraCloudLoadBalancerCreate(d *schema.ResourceData, meta interfac
 }
 
 func resourceSakuraCloudLoadBalancerRead(d *schema.ResourceData, meta interface{}) error {
-	client, ctx, zone := getSacloudClient(d, meta)
+	client, zone := getSacloudClient(d, meta)
+	ctx, cancel := operationContext(d, schema.TimeoutRead)
+	defer cancel()
+
 	lbOp := sacloud.NewLoadBalancerOp(client)
 
 	lb, err := lbOp.Read(ctx, zone, sakuraCloudID(d.Id()))
@@ -224,7 +239,10 @@ func resourceSakuraCloudLoadBalancerRead(d *schema.ResourceData, meta interface{
 }
 
 func resourceSakuraCloudLoadBalancerUpdate(d *schema.ResourceData, meta interface{}) error {
-	client, ctx, zone := getSacloudClient(d, meta)
+	client, zone := getSacloudClient(d, meta)
+	ctx, cancel := operationContext(d, schema.TimeoutUpdate)
+	defer cancel()
+
 	lbOp := sacloud.NewLoadBalancerOp(client)
 
 	lb, err := lbOp.Read(ctx, zone, sakuraCloudID(d.Id()))
@@ -240,7 +258,10 @@ func resourceSakuraCloudLoadBalancerUpdate(d *schema.ResourceData, meta interfac
 }
 
 func resourceSakuraCloudLoadBalancerDelete(d *schema.ResourceData, meta interface{}) error {
-	client, ctx, zone := getSacloudClient(d, meta)
+	client, zone := getSacloudClient(d, meta)
+	ctx, cancel := operationContext(d, schema.TimeoutDelete)
+	defer cancel()
+
 	lbOp := sacloud.NewLoadBalancerOp(client)
 
 	lb, err := lbOp.Read(ctx, zone, sakuraCloudID(d.Id()))
