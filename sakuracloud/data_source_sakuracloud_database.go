@@ -39,11 +39,11 @@ func dataSourceSakuraCloudDatabase() *schema.Resource {
 				Type:     schema.TypeString,
 				Computed: true,
 			},
-			"user_name": {
+			"username": {
 				Type:     schema.TypeString,
 				Computed: true,
 			},
-			"user_password": {
+			"password": {
 				Type:     schema.TypeString,
 				Computed: true,
 			},

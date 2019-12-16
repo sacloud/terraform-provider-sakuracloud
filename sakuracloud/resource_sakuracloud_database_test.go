@@ -53,8 +53,8 @@ func TestAccSakuraCloudDatabase_basic(t *testing.T) {
 					resource.TestCheckResourceAttr(resourceName, "tags.#", "2"),
 					resource.TestCheckResourceAttr(resourceName, "tags.0", "tag1"),
 					resource.TestCheckResourceAttr(resourceName, "tags.1", "tag2"),
-					resource.TestCheckResourceAttr(resourceName, "user_name", "defuser"),
-					resource.TestCheckResourceAttr(resourceName, "user_password", password),
+					resource.TestCheckResourceAttr(resourceName, "username", "defuser"),
+					resource.TestCheckResourceAttr(resourceName, "password", password),
 					resource.TestCheckResourceAttr(resourceName, "replica_password", password),
 					resource.TestCheckResourceAttr(resourceName, "source_ranges.#", "2"),
 					resource.TestCheckResourceAttr(resourceName, "source_ranges.0", "192.168.11.0/24"),
@@ -85,8 +85,8 @@ func TestAccSakuraCloudDatabase_basic(t *testing.T) {
 					resource.TestCheckResourceAttr(resourceName, "tags.#", "2"),
 					resource.TestCheckResourceAttr(resourceName, "tags.0", "tag1-upd"),
 					resource.TestCheckResourceAttr(resourceName, "tags.1", "tag2-upd"),
-					resource.TestCheckResourceAttr(resourceName, "user_name", "defuser"),
-					resource.TestCheckResourceAttr(resourceName, "user_password", password+"-upd"),
+					resource.TestCheckResourceAttr(resourceName, "username", "defuser"),
+					resource.TestCheckResourceAttr(resourceName, "password", password+"-upd"),
 					resource.TestCheckResourceAttr(resourceName, "source_ranges.#", "2"),
 					resource.TestCheckResourceAttr(resourceName, "source_ranges.0", "192.168.110.0/24"),
 					resource.TestCheckResourceAttr(resourceName, "source_ranges.1", "192.168.120.0/24"),
@@ -187,8 +187,8 @@ func TestAccImportSakuraCloudDatabase(t *testing.T) {
 			"database_type":     "mariadb",
 			"description":       "description",
 			"plan":              "30g",
-			"user_name":         "defuser",
-			"user_password":     password,
+			"username":          "defuser",
+			"password":          password,
 			"replica_password":  password,
 			"source_ranges.0":   "192.168.11.0/24",
 			"source_ranges.1":   "192.168.12.0/24",
@@ -242,8 +242,9 @@ resource "sakuracloud_database" "foobar" {
   database_type = "mariadb"
   plan          = "30g"
 
-  user_name        = "defuser"
-  user_password    = "{{ .arg1 }}"
+  username = "defuser"
+  password = "{{ .arg1 }}"
+
   replica_password = "{{ .arg1 }}"
 
   source_ranges = ["192.168.11.0/24", "192.168.12.0/24"]
@@ -277,9 +278,9 @@ resource "sakuracloud_switch" "foobar" {
 resource "sakuracloud_database" "foobar" {
   database_type = "mariadb"
 
-  plan          = "30g"
-  user_name     = "defuser"
-  user_password = "{{ .arg1 }}-upd"
+  plan     = "30g"
+  username = "defuser"
+  password = "{{ .arg1 }}-upd"
 
   source_ranges = ["192.168.110.0/24", "192.168.120.0/24"]
 

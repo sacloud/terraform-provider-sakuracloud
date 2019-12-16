@@ -54,12 +54,12 @@ func resourceSakuraCloudDatabase() *schema.Resource {
 				Default:      "10g",
 				ValidateFunc: validation.StringInSlice([]string{"10g", "30g", "90g", "240g", "500g", "1t"}, false),
 			},
-			"user_name": {
+			"username": {
 				Type:     schema.TypeString,
 				ForceNew: true,
 				Required: true,
 			},
-			"user_password": {
+			"password": {
 				Type:     schema.TypeString,
 				Required: true,
 			},
@@ -251,8 +251,8 @@ func setDatabaseResourceData(ctx context.Context, d *schema.ResourceData, client
 	}
 
 	d.Set("name", data.Name)
-	d.Set("user_name", data.CommonSetting.DefaultUser)
-	d.Set("user_password", data.CommonSetting.UserPassword)
+	d.Set("username", data.CommonSetting.DefaultUser)
+	d.Set("password", data.CommonSetting.UserPassword)
 	d.Set("plan", databasePlanIDToName(data.PlanID))
 	if err := d.Set("source_ranges", data.CommonSetting.SourceNetwork); err != nil {
 		return err

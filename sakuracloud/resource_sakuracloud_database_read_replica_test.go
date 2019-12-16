@@ -157,8 +157,9 @@ resource "sakuracloud_database" "foobar" {
   database_type = "postgresql"
   plan          = "10g"
 
-  user_name        = "defuser"
-  user_password    = "{{ .arg1 }}"
+  username = "defuser"
+  password = "{{ .arg1 }}"
+
   replica_password = "{{ .arg1 }}"
 
   switch_id    = sakuracloud_switch.foobar.id
@@ -194,8 +195,9 @@ resource "sakuracloud_database" "foobar" {
   database_type = "postgresql"
   plan          = "10g"
 
-  user_name        = "defuser"
-  user_password    = "{{ .arg1 }}"
+  username = "defuser"
+  password = "{{ .arg1 }}"
+
   replica_password = "{{ .arg1 }}"
 
   switch_id    = sakuracloud_switch.foobar.id
