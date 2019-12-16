@@ -75,11 +75,6 @@ func Provider() terraform.ResourceProvider {
 				DefaultFunc:  schema.MultiEnvDefaultFunc([]string{"SAKURACLOUD_RETRY_INTERVAL"}, 5),
 				ValidateFunc: validation.IntBetween(0, 600),
 			},
-			"timeout": {
-				Type:        schema.TypeInt,
-				Optional:    true,
-				DefaultFunc: schema.MultiEnvDefaultFunc([]string{"SAKURACLOUD_TIMEOUT"}, 20),
-			},
 			"api_request_timeout": {
 				Type:        schema.TypeInt,
 				Optional:    true,
@@ -190,7 +185,6 @@ func providerConfigure(d *schema.ResourceData, terraformVersion string) (interfa
 		AccessToken:         d.Get("token").(string),
 		AccessTokenSecret:   d.Get("secret").(string),
 		Zone:                d.Get("zone").(string),
-		TimeoutMinute:       d.Get("timeout").(int),
 		TraceMode:           d.Get("trace").(string),
 		APIRootURL:          d.Get("api_root_url").(string),
 		RetryMax:            d.Get("retry_max").(int),

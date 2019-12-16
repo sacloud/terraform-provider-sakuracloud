@@ -43,7 +43,7 @@ func resourceSakuraCloudServer() *schema.Resource {
 			Create: schema.DefaultTimeout(5 * time.Minute),
 			Read:   schema.DefaultTimeout(5 * time.Minute),
 			Update: schema.DefaultTimeout(5 * time.Minute),
-			Delete: schema.DefaultTimeout(5 * time.Minute),
+			Delete: schema.DefaultTimeout(20 * time.Minute),
 		},
 
 		Schema: map[string]*schema.Schema{

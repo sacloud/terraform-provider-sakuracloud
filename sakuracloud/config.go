@@ -51,7 +51,6 @@ type Config struct {
 	AccessToken         string
 	AccessTokenSecret   string
 	Zone                string
-	TimeoutMinute       int
 	TraceMode           string
 	FakeMode            string
 	FakeStorePath       string
@@ -91,16 +90,15 @@ func (c *Config) NewClient() *APIClient {
 		Transport: &sacloud.RateLimitRoundTripper{RateLimitPerSec: c.APIRequestRateLimit},
 	}
 	caller := &sacloud.Client{
-		AccessToken:            c.AccessToken,
-		AccessTokenSecret:      c.AccessTokenSecret,
-		DefaultTimeoutDuration: time.Duration(c.TimeoutMinute) * time.Minute,
-		UserAgent:              ua,
-		AcceptLanguage:         c.AcceptLanguage,
-		RetryMax:               c.RetryMax,
-		RetryInterval:          time.Duration(c.RetryInterval) * time.Second,
-		HTTPClient:             httpClient,
+		AccessToken:       c.AccessToken,
+		AccessTokenSecret: c.AccessTokenSecret,
+		UserAgent:         ua,
+		AcceptLanguage:    c.AcceptLanguage,
+		RetryMax:          c.RetryMax,
+		RetryInterval:     time.Duration(c.RetryInterval) * time.Second,
+		HTTPClient:        httpClient,
 	}
-	sacloud.DefaultStatePollingTimeout = time.Duration(c.TimeoutMinute) * time.Minute
+	sacloud.DefaultStatePollingTimeout = 72 * time.Hour
 
 	if c.TraceMode != "" {
 		enableAPITrace := true
