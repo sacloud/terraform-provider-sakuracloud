@@ -73,7 +73,7 @@ func resourceSakuraCloudDatabase() *schema.Resource {
 				Optional:  true,
 				Sensitive: true,
 			},
-			"allow_networks": {
+			"source_ranges": {
 				Type:     schema.TypeList,
 				Optional: true,
 				Elem:     &schema.Schema{Type: schema.TypeString},
@@ -251,7 +251,7 @@ func setDatabaseResourceData(ctx context.Context, d *schema.ResourceData, client
 	d.Set("user_name", data.CommonSetting.DefaultUser)
 	d.Set("user_password", data.CommonSetting.UserPassword)
 	d.Set("plan", databasePlanIDToName(data.PlanID))
-	if err := d.Set("allow_networks", data.CommonSetting.SourceNetwork); err != nil {
+	if err := d.Set("source_ranges", data.CommonSetting.SourceNetwork); err != nil {
 		return err
 	}
 	d.Set("port", data.CommonSetting.ServicePort)

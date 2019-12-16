@@ -56,9 +56,9 @@ func TestAccSakuraCloudDatabase_basic(t *testing.T) {
 					resource.TestCheckResourceAttr(resourceName, "user_name", "defuser"),
 					resource.TestCheckResourceAttr(resourceName, "user_password", password),
 					resource.TestCheckResourceAttr(resourceName, "replica_password", password),
-					resource.TestCheckResourceAttr(resourceName, "allow_networks.#", "2"),
-					resource.TestCheckResourceAttr(resourceName, "allow_networks.0", "192.168.11.0/24"),
-					resource.TestCheckResourceAttr(resourceName, "allow_networks.1", "192.168.12.0/24"),
+					resource.TestCheckResourceAttr(resourceName, "source_ranges.#", "2"),
+					resource.TestCheckResourceAttr(resourceName, "source_ranges.0", "192.168.11.0/24"),
+					resource.TestCheckResourceAttr(resourceName, "source_ranges.1", "192.168.12.0/24"),
 					resource.TestCheckResourceAttr(resourceName, "port", "33061"),
 					resource.TestCheckResourceAttr(resourceName, "backup_time", "00:00"),
 					resource.TestCheckResourceAttr(resourceName, "backup_weekdays.0", "mon"),
@@ -86,9 +86,9 @@ func TestAccSakuraCloudDatabase_basic(t *testing.T) {
 					resource.TestCheckResourceAttr(resourceName, "tags.1", "tag2-upd"),
 					resource.TestCheckResourceAttr(resourceName, "user_name", "defuser"),
 					resource.TestCheckResourceAttr(resourceName, "user_password", password+"-upd"),
-					resource.TestCheckResourceAttr(resourceName, "allow_networks.#", "2"),
-					resource.TestCheckResourceAttr(resourceName, "allow_networks.0", "192.168.110.0/24"),
-					resource.TestCheckResourceAttr(resourceName, "allow_networks.1", "192.168.120.0/24"),
+					resource.TestCheckResourceAttr(resourceName, "source_ranges.#", "2"),
+					resource.TestCheckResourceAttr(resourceName, "source_ranges.0", "192.168.110.0/24"),
+					resource.TestCheckResourceAttr(resourceName, "source_ranges.1", "192.168.120.0/24"),
 					resource.TestCheckResourceAttr(resourceName, "port", "33062"),
 					resource.TestCheckResourceAttr(resourceName, "backup_time", "00:30"),
 					resource.TestCheckResourceAttr(resourceName, "backup_weekdays.0", "sun"),
@@ -188,8 +188,8 @@ func TestAccImportSakuraCloudDatabase(t *testing.T) {
 			"user_name":         "defuser",
 			"user_password":     password,
 			"replica_password":  password,
-			"allow_networks.0":  "192.168.11.0/24",
-			"allow_networks.1":  "192.168.12.0/24",
+			"source_ranges.0":   "192.168.11.0/24",
+			"source_ranges.1":   "192.168.12.0/24",
 			"port":              "33061",
 			"backup_time":       "00:00",
 			"backup_weekdays.0": "mon",
@@ -244,7 +244,7 @@ resource "sakuracloud_database" "foobar" {
   user_password    = "{{ .arg1 }}"
   replica_password = "{{ .arg1 }}"
 
-  allow_networks = ["192.168.11.0/24", "192.168.12.0/24"]
+  source_ranges = ["192.168.11.0/24", "192.168.12.0/24"]
 
   port = 33061
 
@@ -279,7 +279,7 @@ resource "sakuracloud_database" "foobar" {
   user_name     = "defuser"
   user_password = "{{ .arg1 }}-upd"
 
-  allow_networks = ["192.168.110.0/24", "192.168.120.0/24"]
+  source_ranges = ["192.168.110.0/24", "192.168.120.0/24"]
 
   port = 33062
 

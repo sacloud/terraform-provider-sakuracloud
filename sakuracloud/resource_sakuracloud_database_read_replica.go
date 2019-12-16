@@ -71,7 +71,7 @@ func resourceSakuraCloudDatabaseReadReplica() *schema.Resource {
 				Optional: true,
 				Computed: true,
 			},
-			"allow_networks": {
+			"source_ranges": {
 				Type:     schema.TypeList,
 				Optional: true,
 				Elem:     &schema.Schema{Type: schema.TypeString},
@@ -206,7 +206,7 @@ func setDatabaseReadReplicaResourceData(ctx context.Context, d *schema.ResourceD
 	d.Set("nw_mask_len", data.NetworkMaskLen)
 	d.Set("default_route", data.DefaultRoute)
 	d.Set("ipaddress1", data.IPAddresses[0])
-	if err := d.Set("allow_networks", data.CommonSetting.SourceNetwork); err != nil {
+	if err := d.Set("source_ranges", data.CommonSetting.SourceNetwork); err != nil {
 		return err
 	}
 	d.Set("icon_id", data.IconID.String())

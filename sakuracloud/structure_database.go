@@ -89,7 +89,7 @@ func expandDatabaseBuilder(d *schema.ResourceData, client *APIClient) *databaseB
 		},
 		CommonSetting: &sacloud.DatabaseSettingCommon{
 			ServicePort:     d.Get("port").(int),
-			SourceNetwork:   expandStringList(d.Get("allow_networks").([]interface{})),
+			SourceNetwork:   expandStringList(d.Get("source_ranges").([]interface{})),
 			DefaultUser:     d.Get("user_name").(string),
 			UserPassword:    d.Get("user_password").(string),
 			ReplicaUser:     replicaUser,
@@ -167,7 +167,7 @@ func expandDatabaseReadReplicaBuilder(ctx context.Context, d *schema.ResourceDat
 		},
 		CommonSetting: &sacloud.DatabaseSettingCommon{
 			ServicePort:   masterDB.CommonSetting.ServicePort,
-			SourceNetwork: expandStringList(d.Get("allow_networks").([]interface{})),
+			SourceNetwork: expandStringList(d.Get("source_ranges").([]interface{})),
 		},
 		ReplicationSetting: &sacloud.DatabaseReplicationSetting{
 			Model:       types.DatabaseReplicationModels.AsyncReplica,

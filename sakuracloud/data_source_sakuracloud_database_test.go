@@ -62,7 +62,7 @@ resource "sakuracloud_database" "foobar" {
   ipaddress1      = "192.168.11.101"
   nw_mask_len     = 24
   default_route   = "192.168.11.1"
-  allow_networks  = ["192.168.11.0/24", "192.168.12.0/24"]
+  source_ranges   = ["192.168.11.0/24", "192.168.12.0/24"]
   port            = 54321
   backup_weekdays = ["mon", "tue"]
   backup_time     = "00:00"

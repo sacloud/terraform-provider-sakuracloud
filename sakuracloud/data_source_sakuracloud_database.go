@@ -55,7 +55,7 @@ func dataSourceSakuraCloudDatabase() *schema.Resource {
 				Type:     schema.TypeString,
 				Computed: true,
 			},
-			"allow_networks": {
+			"source_ranges": {
 				Type:     schema.TypeList,
 				Computed: true,
 				Elem:     &schema.Schema{Type: schema.TypeString},
