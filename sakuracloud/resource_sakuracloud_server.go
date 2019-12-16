@@ -167,7 +167,7 @@ func resourceSakuraCloudServer() *schema.Resource {
 				Computed: true,
 				Elem:     &schema.Schema{Type: schema.TypeString},
 			},
-			"ipaddress": {
+			"ip_address": {
 				Type:     schema.TypeString,
 				Optional: true,
 				Computed: true,
@@ -321,7 +321,7 @@ func setServerResourceData(ctx context.Context, d *schema.ResourceData, client *
 	if err := d.Set("tags", data.Tags); err != nil {
 		return err
 	}
-	d.Set("ipaddress", ip)
+	d.Set("ip_address", ip)
 	d.Set("gateway", gateway)
 	d.Set("nw_address", nwAddress)
 	d.Set("nw_mask_len", nwMaskLen)
@@ -335,7 +335,7 @@ func setServerResourceData(ctx context.Context, d *schema.ResourceData, client *
 func isServerDiskConfigChanged(d *schema.ResourceData) bool {
 	return d.HasChange("disks") ||
 		d.HasChange("network_interface") ||
-		d.HasChange("ipaddress") ||
+		d.HasChange("ip_address") ||
 		d.HasChange("gateway") ||
 		d.HasChange("nw_mask_len") ||
 		d.HasChange("hostname") ||

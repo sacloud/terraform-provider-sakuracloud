@@ -66,7 +66,7 @@ func TestAccSakuraCloudProxyLB_basic(t *testing.T) {
 					resource.TestCheckResourceAttr(resourceName, "health_check.0.delay_loop", "10"),
 					resource.TestCheckResourceAttr(resourceName, "health_check.0.host_header", "usacloud.jp"),
 					resource.TestCheckResourceAttr(resourceName, "health_check.0.path", "/"),
-					resource.TestCheckResourceAttr(resourceName, "sorry_server.0.ipaddress", ip),
+					resource.TestCheckResourceAttr(resourceName, "sorry_server.0.ip_address", ip),
 					resource.TestCheckResourceAttr(resourceName, "sorry_server.0.port", "80"),
 					resource.TestCheckResourceAttr(resourceName, "bind_port.0.proxy_mode", "http"),
 					resource.TestCheckResourceAttr(resourceName, "bind_port.0.port", "80"),
@@ -76,8 +76,8 @@ func TestAccSakuraCloudProxyLB_basic(t *testing.T) {
 					resource.TestCheckResourceAttr(resourceName, "server.0.port", "80"),
 					resource.TestCheckResourceAttr(resourceName, "server.0.enabled", "true"),
 					resource.TestCheckResourceAttrPair(
-						resourceName, "server.0.ipaddress",
-						"sakuracloud_server.foobar", "ipaddress",
+						resourceName, "server.0.ip_address",
+						"sakuracloud_server.foobar", "ip_address",
 					),
 					resource.TestCheckResourceAttrPair(
 						resourceName, "icon_id",
@@ -99,15 +99,15 @@ func TestAccSakuraCloudProxyLB_basic(t *testing.T) {
 					resource.TestCheckResourceAttr(resourceName, "health_check.0.delay_loop", "20"),
 					resource.TestCheckResourceAttr(resourceName, "health_check.0.host_header", ""),
 					resource.TestCheckResourceAttr(resourceName, "health_check.0.path", ""),
-					resource.TestCheckNoResourceAttr(resourceName, "sorry_server.0.ipaddress.#"),
+					resource.TestCheckNoResourceAttr(resourceName, "sorry_server.0.ip_address.#"),
 					resource.TestCheckResourceAttr(resourceName, "bind_port.0.proxy_mode", "https"),
 					resource.TestCheckResourceAttr(resourceName, "bind_port.0.port", "443"),
 					resource.TestCheckResourceAttr(resourceName, "bind_port.0.response_header.#", "0"),
 					resource.TestCheckResourceAttr(resourceName, "server.0.port", "443"),
 					resource.TestCheckResourceAttr(resourceName, "server.0.enabled", "true"),
 					resource.TestCheckResourceAttrPair(
-						resourceName, "server.0.ipaddress",
-						"sakuracloud_server.foobar", "ipaddress",
+						resourceName, "server.0.ip_address",
+						"sakuracloud_server.foobar", "ip_address",
 					),
 				),
 			},
@@ -189,10 +189,10 @@ func TestAccImportSakuraCloudProxyLB(t *testing.T) {
 			"bind_port.0.proxy_mode":    "https",
 			"bind_port.0.port":          "443",
 			"server.#":                  "2",
-			"server.0.ipaddress":        ip0,
+			"server.0.ip_address":       ip0,
 			"server.0.port":             "80",
 			"server.0.enabled":          "true",
-			"server.1.ipaddress":        ip1,
+			"server.1.ip_address":       ip1,
 			"server.1.port":             "80",
 			"server.1.enabled":          "true",
 		}
@@ -231,16 +231,19 @@ resource "sakuracloud_proxylb" "foobar" {
   sticky_session = true
   timeout        = 10
   region         = "is1"
+
   health_check {
     protocol    = "http"
     delay_loop  = 10
     host_header = "usacloud.jp"
     path        = "/"
   }
+
   sorry_server {
-    ipaddress = "{{ .arg1 }}"
-    port      = 80
+    ip_address = "{{ .arg1 }}"
+    port       = 80
   }
+
   bind_port {
     proxy_mode = "http"
     port       = 80
@@ -249,9 +252,10 @@ resource "sakuracloud_proxylb" "foobar" {
       value  = "public, max-age=10"
     }
   }
+
   server {
-    ipaddress = sakuracloud_server.foobar.ipaddress
-    port      = 80
+    ip_address = sakuracloud_server.foobar.ip_address
+    port       = 80
   }
   description = "description"
   tags        = ["tag1", "tag2"]
@@ -282,18 +286,20 @@ resource "sakuracloud_proxylb" "foobar" {
   sticky_session = false
   timeout        = 10
   region         = "is1"
+
   health_check {
     protocol   = "tcp"
     delay_loop = 20
   }
+
   bind_port {
     proxy_mode = "https"
     port       = 443
   }
 
   server {
-    ipaddress = sakuracloud_server.foobar.ipaddress
-    port      = 443
+    ip_address = sakuracloud_server.foobar.ip_address
+    port       = 443
   }
 
   description = "description-upd"
@@ -327,12 +333,12 @@ resource "sakuracloud_proxylb" "foobar" {
     port       = 443
   }
   server {
-    ipaddress = "{{ .arg1 }}"
-    port      = 80
+    ip_address = "{{ .arg1 }}"
+    port       = 80
   }
   server {
-    ipaddress = "{{ .arg2 }}"
-    port      = 80
+    ip_address = "{{ .arg2 }}"
+    port       = 80
   }
 
   description = "description"

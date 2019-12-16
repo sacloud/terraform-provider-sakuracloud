@@ -42,7 +42,7 @@ func TestAccSakuraCloudDataSourceNFS_basic(t *testing.T) {
 						resourceName, "switch_id",
 						"sakuracloud_switch.foobar", "id",
 					),
-					resource.TestCheckResourceAttr(resourceName, "ipaddress", "192.168.11.101"),
+					resource.TestCheckResourceAttr(resourceName, "ip_address", "192.168.11.101"),
 					resource.TestCheckResourceAttr(resourceName, "nw_mask_len", "24"),
 					resource.TestCheckResourceAttr(resourceName, "gateway", "192.168.11.1"),
 				),
@@ -61,7 +61,7 @@ resource "sakuracloud_nfs" "foobar" {
   description = "description"
   tags        = ["tag1", "tag2", "tag3"]
   switch_id   = sakuracloud_switch.foobar.id
-  ipaddress   = "192.168.11.101"
+  ip_address  = "192.168.11.101"
   nw_mask_len = 24
   gateway     = "192.168.11.1"
 

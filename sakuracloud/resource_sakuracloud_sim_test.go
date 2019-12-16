@@ -115,7 +115,7 @@ func TestAccSakuraCloudSIM_withMobileGateway(t *testing.T) {
 						mgwResourceName, "sims.0.sim_id",
 						simResourceName, "id",
 					),
-					resource.TestCheckResourceAttr(mgwResourceName, "sims.0.ipaddress", "192.168.0.11"),
+					resource.TestCheckResourceAttr(mgwResourceName, "sims.0.ip_address", "192.168.0.11"),
 					resource.TestCheckResourceAttr(mgwResourceName, "sim_routes.#", "2"),
 					resource.TestCheckResourceAttrPair(
 						mgwResourceName, "sim_routes.0.sim_id",
@@ -138,7 +138,7 @@ func TestAccSakuraCloudSIM_withMobileGateway(t *testing.T) {
 						mgwResourceName, "sims.0.sim_id",
 						simResourceName, "id",
 					),
-					resource.TestCheckResourceAttr(mgwResourceName, "sims.0.ipaddress", "192.168.0.11"),
+					resource.TestCheckResourceAttr(mgwResourceName, "sims.0.ip_address", "192.168.0.11"),
 					resource.TestCheckResourceAttr(mgwResourceName, "sim_routes.#", "1"),
 					resource.TestCheckResourceAttrPair(
 						mgwResourceName, "sim_routes.0.sim_id",
@@ -150,8 +150,8 @@ func TestAccSakuraCloudSIM_withMobileGateway(t *testing.T) {
 						mgwResourceName, "id",
 					),
 					resource.TestCheckResourceAttrPair(
-						simResourceName, "ipaddress",
-						mgwResourceName, "sims.0.ipaddress",
+						simResourceName, "ip_address",
+						mgwResourceName, "sims.0.ip_address",
 					),
 				),
 			},
@@ -270,7 +270,7 @@ resource "sakuracloud_switch" "foobar" {
 resource "sakuracloud_mobile_gateway" "foobar" {
   network_interface {
     switch_id   = sakuracloud_switch.foobar.id
-    ipaddress   = "192.168.0.1"
+    ip_address  = "192.168.0.1"
     nw_mask_len = 24
   }
   internet_connection = true
@@ -278,8 +278,8 @@ resource "sakuracloud_mobile_gateway" "foobar" {
   dns_servers         = data.sakuracloud_zone.zone.dns_servers
 
   sims {
-    sim_id    = sakuracloud_sim.foobar.id
-    ipaddress = "192.168.0.11"
+    sim_id     = sakuracloud_sim.foobar.id
+    ip_address = "192.168.0.11"
   }
 
   sim_routes {
@@ -313,7 +313,7 @@ resource "sakuracloud_switch" "foobar" {
 resource "sakuracloud_mobile_gateway" "foobar" {
   network_interface {
     switch_id   = sakuracloud_switch.foobar.id
-    ipaddress   = "192.168.0.1"
+    ip_address  = "192.168.0.1"
     nw_mask_len = 24
   }
   internet_connection = true
@@ -321,8 +321,8 @@ resource "sakuracloud_mobile_gateway" "foobar" {
   dns_servers         = data.sakuracloud_zone.zone.dns_servers
 
   sims {
-    sim_id    = sakuracloud_sim.foobar.id
-    ipaddress = "192.168.0.11"
+    sim_id     = sakuracloud_sim.foobar.id
+    ip_address = "192.168.0.11"
   }
   sim_routes {
     sim_id = sakuracloud_sim.foobar.id
@@ -339,7 +339,7 @@ resource "sakuracloud_switch" "foobar" {
 resource "sakuracloud_mobile_gateway" "foobar" {
   network_interface {
     switch_id   = sakuracloud_switch.foobar.id
-    ipaddress   = "192.168.0.1"
+    ip_address  = "192.168.0.1"
     nw_mask_len = 24
   }
   internet_connection = true

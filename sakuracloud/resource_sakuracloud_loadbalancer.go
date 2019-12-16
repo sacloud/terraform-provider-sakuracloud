@@ -144,7 +144,7 @@ func resourceSakuraCloudLoadBalancer() *schema.Resource {
 							MaxItems: 40,
 							Elem: &schema.Resource{
 								Schema: map[string]*schema.Schema{
-									"ipaddress": {
+									"ip_address": {
 										Type:     schema.TypeString,
 										Required: true,
 									},

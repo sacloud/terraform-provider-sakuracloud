@@ -52,7 +52,7 @@ func resourceSakuraCloudMobileGateway() *schema.Resource {
 							ValidateFunc: validateSakuracloudIDType,
 							Required:     true,
 						},
-						"ipaddress": {
+						"ip_address": {
 							Type:         schema.TypeString,
 							ValidateFunc: validateIPv4Address(),
 							Required:     true,
@@ -152,7 +152,7 @@ func resourceSakuraCloudMobileGateway() *schema.Resource {
 							ValidateFunc: validateSakuracloudIDType,
 							Required:     true,
 						},
-						"ipaddress": {
+						"ip_address": {
 							Type:         schema.TypeString,
 							ValidateFunc: validateIPv4Address(),
 							Required:     true,

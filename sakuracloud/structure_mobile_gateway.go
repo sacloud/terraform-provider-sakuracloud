@@ -57,7 +57,7 @@ func expandMobileGatewaySIMs(d resourceValueGettable) []*mobileGatewayBuilder.SI
 func expandMobileGatewaySIM(d resourceValueGettable) *mobileGatewayBuilder.SIMSetting {
 	return &mobileGatewayBuilder.SIMSetting{
 		SIMID:     expandSakuraCloudID(d, "sim_id"),
-		IPAddress: d.Get("ipaddress").(string),
+		IPAddress: d.Get("ip_address").(string),
 	}
 }
 
@@ -71,8 +71,8 @@ func flattenMobileGatewaySIMs(sims []*sacloud.MobileGatewaySIMInfo) []interface{
 
 func flattenMobileGatewaySIM(sim *sacloud.MobileGatewaySIMInfo) interface{} {
 	return map[string]interface{}{
-		"sim_id":    sim.ResourceID,
-		"ipaddress": sim.IP,
+		"sim_id":     sim.ResourceID,
+		"ip_address": sim.IP,
 	}
 }
 
@@ -92,7 +92,7 @@ func expandMobileGatewayPrivateNetworks(d resourceValueGettable) *mobileGatewayB
 		d := mapToResourceData(raw[0].(map[string]interface{}))
 		return &mobileGatewayBuilder.PrivateInterfaceSetting{
 			SwitchID:       expandSakuraCloudID(d, "switch_id"),
-			IPAddress:      d.Get("ipaddress").(string),
+			IPAddress:      d.Get("ip_address").(string),
 			NetworkMaskLen: d.Get("nw_mask_len").(int),
 		}
 	}
@@ -112,7 +112,7 @@ func flattenMobileGatewayPrivateNetworks(mgw *sacloud.MobileGateway) []interface
 			return []interface{}{
 				map[string]interface{}{
 					"switch_id":   switchID.String(),
-					"ipaddress":   setting.IPAddress[0],
+					"ip_address":  setting.IPAddress[0],
 					"nw_mask_len": setting.NetworkMaskLen,
 				},
 			}

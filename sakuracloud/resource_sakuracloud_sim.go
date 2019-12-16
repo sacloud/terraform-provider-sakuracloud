@@ -84,7 +84,7 @@ func resourceSakuraCloudSIM() *schema.Resource {
 				Type:     schema.TypeString,
 				Computed: true,
 			},
-			"ipaddress": {
+			"ip_address": {
 				Type:     schema.TypeString,
 				Computed: true,
 			},
@@ -195,7 +195,7 @@ func setSIMResourceData(ctx context.Context, d *schema.ResourceData, client *API
 	}
 	d.Set("iccid", data.ICCID)
 	if data.Info != nil {
-		d.Set("ipaddress", data.Info.IP)
+		d.Set("ip_address", data.Info.IP)
 		d.Set("mobile_gateway_id", data.Info.SIMGroupID)
 	}
 	if err := d.Set("carrier", flattenSIMCarrier(carrierInfo)); err != nil {

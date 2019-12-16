@@ -217,9 +217,9 @@ resource "sakuracloud_server" "foobar" {
   network_interface {
     upstream = sakuracloud_internet.foobar.switch_id
   }
-  ipaddress   = sakuracloud_internet.foobar.ip_addresses[0]
-  gateway     = sakuracloud_internet.foobar.gateway
-  nw_mask_len = sakuracloud_internet.foobar.nw_mask_len
+  ip_address   = sakuracloud_internet.foobar.ip_addresses[0]
+  gateway      = sakuracloud_internet.foobar.gateway
+  nw_mask_len  = sakuracloud_internet.foobar.nw_mask_len
 }
 
 resource "sakuracloud_internet" "foobar" {

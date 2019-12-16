@@ -50,7 +50,7 @@ func TestAccSakuraCloudNFS_basic(t *testing.T) {
 					resource.TestCheckResourceAttr(resourceName, "tags.#", "2"),
 					resource.TestCheckResourceAttr(resourceName, "tags.0", "tag1"),
 					resource.TestCheckResourceAttr(resourceName, "tags.1", "tag2"),
-					resource.TestCheckResourceAttr(resourceName, "ipaddress", "192.168.11.101"),
+					resource.TestCheckResourceAttr(resourceName, "ip_address", "192.168.11.101"),
 					resource.TestCheckResourceAttr(resourceName, "nw_mask_len", "24"),
 					resource.TestCheckResourceAttr(resourceName, "gateway", "192.168.11.1"),
 					resource.TestCheckResourceAttrPair(
@@ -70,7 +70,7 @@ func TestAccSakuraCloudNFS_basic(t *testing.T) {
 					resource.TestCheckResourceAttr(resourceName, "tags.#", "2"),
 					resource.TestCheckResourceAttr(resourceName, "tags.0", "tag1-upd"),
 					resource.TestCheckResourceAttr(resourceName, "tags.1", "tag2-upd"),
-					resource.TestCheckResourceAttr(resourceName, "ipaddress", "192.168.11.101"),
+					resource.TestCheckResourceAttr(resourceName, "ip_address", "192.168.11.101"),
 					resource.TestCheckResourceAttr(resourceName, "nw_mask_len", "24"),
 					resource.TestCheckResourceAttr(resourceName, "gateway", "192.168.11.1"),
 					resource.TestCheckResourceAttr(resourceName, "icon_id", ""),
@@ -140,7 +140,7 @@ resource "sakuracloud_nfs" "foobar" {
   switch_id   = sakuracloud_switch.foobar.id
   plan        = "ssd"
   size        = "500"
-  ipaddress   = "192.168.11.101"
+  ip_address  = "192.168.11.101"
   nw_mask_len = 24
   gateway     = "192.168.11.1"
   name        = "{{ .arg0 }}"
@@ -163,7 +163,7 @@ resource "sakuracloud_nfs" "foobar" {
   switch_id   = sakuracloud_switch.foobar.id
   plan        = "ssd"
   size        = "500"
-  ipaddress   = "192.168.11.101"
+  ip_address  = "192.168.11.101"
   nw_mask_len = 24
   gateway     = "192.168.11.1"
   name        = "{{ .arg0 }}-upd"

@@ -58,11 +58,11 @@ func TestAccSakuraCloudLoadBalancer_basic(t *testing.T) {
 					resource.TestCheckResourceAttr(resourceName, "vip.0.port", "80"),
 					resource.TestCheckResourceAttr(resourceName, "vip.0.delay_loop", "10"),
 					resource.TestCheckResourceAttr(resourceName, "vip.0.sorry_server", "192.168.11.21"),
-					resource.TestCheckResourceAttr(resourceName, "vip.0.server.0.ipaddress", "192.168.11.51"),
+					resource.TestCheckResourceAttr(resourceName, "vip.0.server.0.ip_address", "192.168.11.51"),
 					resource.TestCheckResourceAttr(resourceName, "vip.0.server.0.check_protocol", "http"),
 					resource.TestCheckResourceAttr(resourceName, "vip.0.server.0.check_path", "/ping.html"),
 					resource.TestCheckResourceAttr(resourceName, "vip.0.server.0.check_status", "200"),
-					resource.TestCheckResourceAttr(resourceName, "vip.0.server.1.ipaddress", "192.168.11.52"),
+					resource.TestCheckResourceAttr(resourceName, "vip.0.server.1.ip_address", "192.168.11.52"),
 					resource.TestCheckResourceAttr(resourceName, "vip.0.server.1.check_protocol", "http"),
 					resource.TestCheckResourceAttr(resourceName, "vip.0.server.1.check_path", "/ping.html"),
 					resource.TestCheckResourceAttr(resourceName, "vip.0.server.1.check_status", "200"),
@@ -94,9 +94,9 @@ func TestAccSakuraCloudLoadBalancer_basic(t *testing.T) {
 					resource.TestCheckResourceAttr(resourceName, "vip.0.port", "8080"),
 					resource.TestCheckResourceAttr(resourceName, "vip.0.delay_loop", "10"),
 					resource.TestCheckResourceAttr(resourceName, "vip.0.sorry_server", "192.168.11.21"),
-					resource.TestCheckResourceAttr(resourceName, "vip.0.server.0.ipaddress", "192.168.11.51"),
+					resource.TestCheckResourceAttr(resourceName, "vip.0.server.0.ip_address", "192.168.11.51"),
 					resource.TestCheckResourceAttr(resourceName, "vip.0.server.0.check_protocol", "ping"),
-					resource.TestCheckResourceAttr(resourceName, "vip.0.server.1.ipaddress", "192.168.11.52"),
+					resource.TestCheckResourceAttr(resourceName, "vip.0.server.1.ip_address", "192.168.11.52"),
 					resource.TestCheckResourceAttr(resourceName, "vip.0.server.1.check_protocol", "ping"),
 					resource.TestCheckResourceAttr(resourceName, "vip.1.vip", "192.168.11.202"),
 					resource.TestCheckResourceAttr(resourceName, "vip.1.port", "6443"),
@@ -258,13 +258,13 @@ resource "sakuracloud_load_balancer" "foobar" {
     delay_loop   = 10
     sorry_server = "192.168.11.21"
     server {
-      ipaddress      = "192.168.11.51"
+      ip_address     = "192.168.11.51"
       check_protocol = "http"
       check_path     = "/ping.html"
       check_status   = 200
     }
     server {
-      ipaddress      = "192.168.11.52"
+      ip_address     = "192.168.11.52"
       check_protocol = "http"
       check_path     = "/ping.html"
       check_status   = 200
@@ -306,11 +306,11 @@ resource "sakuracloud_load_balancer" "foobar" {
     delay_loop   = 10
     sorry_server = "192.168.11.21"
     server {
-      ipaddress      = "192.168.11.51"
+      ip_address     = "192.168.11.51"
       check_protocol = "ping"
     }
     server {
-      ipaddress      = "192.168.11.52"
+      ip_address     = "192.168.11.52"
       check_protocol = "ping"
     }
   }

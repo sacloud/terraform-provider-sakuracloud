@@ -62,7 +62,7 @@ func expandServerDisks(d *schema.ResourceData, client *APIClient) []diskBuilder.
 				DisablePWAuth:       d.Get("disable_pw_auth").(bool),
 				EnableDHCP:          false, // 項目追加
 				ChangePartitionUUID: false, // 項目追加
-				IPAddress:           d.Get("ipaddress").(string),
+				IPAddress:           d.Get("ip_address").(string),
 				NetworkMaskLen:      d.Get("nw_mask_len").(int),
 				DefaultRoute:        d.Get("gateway").(string),
 				SSHKeyIDs:           expandSakuraCloudIDs(d, "ssh_key_ids"),

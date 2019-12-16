@@ -113,7 +113,7 @@ func TestAccResourceSakuraCloudVPCRouter_Full(t *testing.T) {
 					resource.TestCheckResourceAttr(resourceName, "dhcp_server.0.dns_servers.0", "8.8.8.8"),
 					resource.TestCheckResourceAttr(resourceName, "dhcp_server.0.dns_servers.1", "8.8.4.4"),
 					resource.TestCheckResourceAttr(resourceName, "dhcp_static_mapping.#", "1"),
-					resource.TestCheckResourceAttr(resourceName, "dhcp_static_mapping.0.ipaddress", "192.168.11.10"),
+					resource.TestCheckResourceAttr(resourceName, "dhcp_static_mapping.0.ip_address", "192.168.11.10"),
 					resource.TestCheckResourceAttr(resourceName, "dhcp_static_mapping.0.macaddress", "aa:bb:cc:aa:bb:cc"),
 					resource.TestCheckResourceAttr(resourceName, "firewall.#", "1"),
 					resource.TestCheckResourceAttr(resourceName, "firewall.0.interface_index", "1"),
@@ -303,7 +303,7 @@ resource "sakuracloud_vpc_router" "foobar" {
   }
 
   dhcp_static_mapping {
-    ipaddress  = "192.168.11.10"
+    ip_address  = "192.168.11.10"
     macaddress = "aa:bb:cc:aa:bb:cc"
   }
 

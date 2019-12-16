@@ -43,7 +43,7 @@ func dataSourceSakuraCloudNFS() *schema.Resource {
 				Type:     schema.TypeInt,
 				Computed: true,
 			},
-			"ipaddress": {
+			"ip_address": {
 				Type:     schema.TypeString,
 				Computed: true,
 			},

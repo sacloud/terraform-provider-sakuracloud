@@ -61,7 +61,7 @@ func TestAccSakuraCloudServer_basic(t *testing.T) {
 					resource.TestCheckResourceAttr(resourceName, "network_interface.#", "1"),
 					resource.TestCheckResourceAttr(resourceName, "network_interface.0.upstream", "shared"),
 					resource.TestCheckResourceAttrSet(resourceName, "network_interface.0.macaddress"),
-					resource.TestCheckResourceAttrSet(resourceName, "ipaddress"),
+					resource.TestCheckResourceAttrSet(resourceName, "ip_address"),
 					resource.TestCheckResourceAttrPair(
 						resourceName, "icon_id",
 						"sakuracloud_icon.foobar", "id",
@@ -220,7 +220,7 @@ func TestAccSakuraCloudServer_switch(t *testing.T) {
 				Config: buildConfigWithArgs(testAccSakuraCloudServer_switch, rand),
 				Check: resource.ComposeTestCheckFunc(
 					testCheckSakuraCloudServerExists(resourceName, &server),
-					resource.TestCheckResourceAttr(resourceName, "ipaddress", "192.168.0.2"),
+					resource.TestCheckResourceAttr(resourceName, "ip_address", "192.168.0.2"),
 					resource.TestCheckResourceAttr(resourceName, "nw_mask_len", "24"),
 					resource.TestCheckResourceAttr(resourceName, "gateway", "192.168.0.1"),
 				),
@@ -553,7 +553,7 @@ resource "sakuracloud_server" "foobar" {
     upstream = sakuracloud_switch.foobar.id
   }
 
-  ipaddress   = "192.168.0.2"
+  ip_address  = "192.168.0.2"
   nw_mask_len = 24
   gateway     = "192.168.0.1"
 }
