@@ -122,18 +122,15 @@ func flattenLoadBalancerPlanID(lb *sacloud.LoadBalancer) string {
 }
 
 func expandLoadBalancerIPAddresses(d resourceValueGettable) []string {
-	ipAddresses := []string{d.Get("ipaddress1").(string)}
-	if ip2, ok := d.GetOk("ipaddress2"); ok {
-		ipAddresses = append(ipAddresses, ip2.(string))
-	}
-	return ipAddresses
+	return expandStringList(d.Get("ip_addresses").([]interface{}))
 }
 
-func flattenLoadBalancerIPAddresses(lb *sacloud.LoadBalancer) (ha bool, ipaddress1, ipaddress2 string) {
-	ipaddress1 = lb.IPAddresses[0]
-	if len(lb.IPAddresses) > 1 {
+func flattenLoadBalancerIPAddresses(lb *sacloud.LoadBalancer) (ha bool, ipAddresses []interface{}) {
+	for _, ip := range lb.IPAddresses {
+		ipAddresses = append(ipAddresses, ip)
+	}
+	if len(ipAddresses) > 1 {
 		ha = true
-		ipaddress2 = lb.IPAddresses[1]
 	}
 	return
 }

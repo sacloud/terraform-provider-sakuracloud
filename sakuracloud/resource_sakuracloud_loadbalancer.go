@@ -66,15 +66,13 @@ func resourceSakuraCloudLoadBalancer() *schema.Resource {
 				Default:      "standard",
 				ValidateFunc: validation.StringInSlice([]string{"standard", "highspec"}, false),
 			},
-			"ipaddress1": {
-				Type:     schema.TypeString,
+			"ip_addresses": {
+				Type:     schema.TypeList,
 				ForceNew: true,
 				Required: true,
-			},
-			"ipaddress2": {
-				Type:     schema.TypeString,
-				ForceNew: true,
-				Optional: true,
+				MinItems: 1,
+				MaxItems: 2,
+				Elem:     &schema.Schema{Type: schema.TypeString},
 			},
 			"nw_mask_len": {
 				Type:         schema.TypeInt,
@@ -271,14 +269,15 @@ func setLoadBalancerResourceData(ctx context.Context, d *schema.ResourceData, cl
 		return fmt.Errorf("got unexpected state: LoadBalancer[%d].Availability is failed", data.ID)
 	}
 
-	ha, ipaddress1, ipaddress2 := flattenLoadBalancerIPAddresses(data)
+	ha, ipAddresses := flattenLoadBalancerIPAddresses(data)
 
 	d.Set("switch_id", data.SwitchID.String())
 	d.Set("vrid", data.VRID)
 	d.Set("plan", flattenLoadBalancerPlanID(data))
 	d.Set("high_availability", ha)
-	d.Set("ipaddress1", ipaddress1)
-	d.Set("ipaddress2", ipaddress2)
+	if err := d.Set("ip_addresses", ipAddresses); err != nil {
+		return err
+	}
 	d.Set("nw_mask_len", data.NetworkMaskLen)
 	d.Set("gateway", data.DefaultRoute)
 	d.Set("name", data.Name)

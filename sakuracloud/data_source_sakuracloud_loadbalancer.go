@@ -52,13 +52,10 @@ func dataSourceSakuraCloudLoadBalancer() *schema.Resource {
 				Type:     schema.TypeString,
 				Computed: true,
 			},
-			"ipaddress1": {
-				Type:     schema.TypeString,
+			"ip_addresses": {
+				Type:     schema.TypeList,
 				Computed: true,
-			},
-			"ipaddress2": {
-				Type:     schema.TypeString,
-				Computed: true,
+				Elem:     &schema.Schema{Type: schema.TypeString},
 			},
 			"nw_mask_len": {
 				Type:     schema.TypeInt,
