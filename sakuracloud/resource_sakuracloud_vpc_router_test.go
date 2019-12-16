@@ -51,8 +51,7 @@ func TestAccSakuraCloudVPCRouter_basic(t *testing.T) {
 					resource.TestCheckResourceAttr(resourceName, "internet_connection", "true"),
 					resource.TestCheckResourceAttr(resourceName, "switch_id", ""),
 					resource.TestCheckResourceAttr(resourceName, "vip", ""),
-					resource.TestCheckResourceAttr(resourceName, "ipaddress1", ""),
-					resource.TestCheckResourceAttr(resourceName, "ipaddress2", ""),
+					resource.TestCheckResourceAttr(resourceName, "ip_addresses.#", "0"),
 					resource.TestCheckResourceAttrPair(
 						resourceName, "icon_id",
 						"sakuracloud_icon.foobar", "id",
@@ -72,8 +71,7 @@ func TestAccSakuraCloudVPCRouter_basic(t *testing.T) {
 					resource.TestCheckResourceAttr(resourceName, "internet_connection", "false"),
 					resource.TestCheckResourceAttr(resourceName, "switch_id", ""),
 					resource.TestCheckResourceAttr(resourceName, "vip", ""),
-					resource.TestCheckResourceAttr(resourceName, "ipaddress1", ""),
-					resource.TestCheckResourceAttr(resourceName, "ipaddress2", ""),
+					resource.TestCheckResourceAttr(resourceName, "ip_addresses.#", "0"),
 					resource.TestCheckResourceAttr(resourceName, "syslog_host", "192.168.0.2"),
 					resource.TestCheckResourceAttr(resourceName, "icon_id", ""),
 				),
@@ -282,12 +280,11 @@ resource "sakuracloud_vpc_router" "foobar" {
 
   internet_connection = true
 
-  switch_id  = sakuracloud_internet.foobar.switch_id
-  vip        = sakuracloud_internet.foobar.ip_addresses[0]
-  ipaddress1 = sakuracloud_internet.foobar.ip_addresses[1]
-  ipaddress2 = sakuracloud_internet.foobar.ip_addresses[2]
-  aliases    = [sakuracloud_internet.foobar.ip_addresses[3]]
-  vrid       = 1
+  switch_id    = sakuracloud_internet.foobar.switch_id
+  vip          = sakuracloud_internet.foobar.ip_addresses[0]
+  ip_addresses = [sakuracloud_internet.foobar.ip_addresses[1], sakuracloud_internet.foobar.ip_addresses[2]]
+  aliases      = [sakuracloud_internet.foobar.ip_addresses[3]]
+  vrid         = 1
 
   network_interface {
     index        = 1
@@ -397,11 +394,10 @@ resource "sakuracloud_vpc_router" "foobar" {
 
   internet_connection = true
 
-  switch_id  = sakuracloud_internet.foobar.switch_id
-  vip        = sakuracloud_internet.foobar.ip_addresses[0]
-  ipaddress1 = sakuracloud_internet.foobar.ip_addresses[1]
-  ipaddress2 = sakuracloud_internet.foobar.ip_addresses[2]
-  aliases    = [sakuracloud_internet.foobar.ip_addresses[3]]
-  vrid       = 1
+  switch_id    = sakuracloud_internet.foobar.switch_id
+  vip          = sakuracloud_internet.foobar.ip_addresses[0]
+  ip_addresses = [sakuracloud_internet.foobar.ip_addresses[1], sakuracloud_internet.foobar.ip_addresses[2]]
+  aliases      = [sakuracloud_internet.foobar.ip_addresses[3]]
+  vrid         = 1
 }
 `

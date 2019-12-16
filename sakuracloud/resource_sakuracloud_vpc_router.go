@@ -58,15 +58,13 @@ func resourceSakuraCloudVPCRouter() *schema.Resource {
 				ForceNew: true,
 				Optional: true,
 			},
-			"ipaddress1": {
-				Type:     schema.TypeString,
+			"ip_addresses": {
+				Type:     schema.TypeList,
 				ForceNew: true,
 				Optional: true,
-			},
-			"ipaddress2": {
-				Type:     schema.TypeString,
-				ForceNew: true,
-				Optional: true,
+				MinItems: 2,
+				MaxItems: 2,
+				Elem:     &schema.Schema{Type: schema.TypeString},
 			},
 			"vrid": {
 				Type:     schema.TypeInt,
@@ -527,8 +525,9 @@ func setVPCRouterResourceData(ctx context.Context, d *schema.ResourceData, clien
 	d.Set("switch_id", flattenVPCRouterSwitchID(data))
 	d.Set("public_ip", flattenVPCRouterGlobalAddress(data))
 	d.Set("vip", flattenVPCRouterVIP(data))
-	d.Set("ipaddress1", flattenVPCRouterIPAddress1(data))
-	d.Set("ipaddress2", flattenVPCRouterIPAddress2(data))
+	if err := d.Set("ip_addresses", flattenVPCRouterIPAddresses(data)); err != nil {
+		return err
+	}
 	if err := d.Set("aliases", flattenVPCRouterIPAliases(data)); err != nil {
 		return err
 	}
