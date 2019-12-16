@@ -43,7 +43,7 @@ func resourceSakuraCloudLoadBalancer() *schema.Resource {
 			Create: schema.DefaultTimeout(60 * time.Minute),
 			Read:   schema.DefaultTimeout(5 * time.Minute),
 			Update: schema.DefaultTimeout(60 * time.Minute),
-			Delete: schema.DefaultTimeout(5 * time.Minute),
+			Delete: schema.DefaultTimeout(20 * time.Minute),
 		},
 
 		Schema: map[string]*schema.Schema{
