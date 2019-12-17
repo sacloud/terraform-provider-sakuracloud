@@ -143,44 +143,70 @@ func resourceSakuraCloudServer() *schema.Resource {
 				ForceNew:    true,
 				Description: "target SakuraCloud zone",
 			},
-			"hostname": {
-				Type:         schema.TypeString,
-				Optional:     true,
-				ValidateFunc: validation.StringLenBetween(1, 64),
-			},
-			"password": {
-				Type:         schema.TypeString,
-				Optional:     true,
-				ValidateFunc: validation.StringLenBetween(8, 64),
-				Sensitive:    true,
-			},
-			"ssh_key_ids": {
+			"disk_edit_parameter": {
 				Type:     schema.TypeList,
 				Optional: true,
-				Elem:     &schema.Schema{Type: schema.TypeString},
-			},
-			"disable_pw_auth": {
-				Type:     schema.TypeBool,
-				Optional: true,
-			},
-			"note_ids": {
-				Type:     schema.TypeList,
-				Optional: true,
-				Elem:     &schema.Schema{Type: schema.TypeString},
-			},
-			"dns_servers": {
-				Type:     schema.TypeList,
-				Computed: true,
-				Elem:     &schema.Schema{Type: schema.TypeString},
+				MaxItems: 1,
+				MinItems: 1,
+				Elem: &schema.Resource{
+					Schema: map[string]*schema.Schema{
+						"hostname": {
+							Type:         schema.TypeString,
+							Optional:     true,
+							ValidateFunc: validation.StringLenBetween(1, 64),
+						},
+						"password": {
+							Type:         schema.TypeString,
+							Optional:     true,
+							ValidateFunc: validation.StringLenBetween(8, 64),
+							Sensitive:    true,
+						},
+						"ssh_key_ids": {
+							Type:     schema.TypeList,
+							Optional: true,
+							Elem:     &schema.Schema{Type: schema.TypeString},
+						},
+						"disable_pw_auth": {
+							Type:     schema.TypeBool,
+							Optional: true,
+						},
+						"enable_dhcp": {
+							Type:     schema.TypeBool,
+							Optional: true,
+						},
+						"change_partition_uuid": {
+							Type:     schema.TypeBool,
+							Optional: true,
+						},
+						"note_ids": {
+							Type:     schema.TypeList,
+							Optional: true,
+							Elem:     &schema.Schema{Type: schema.TypeString},
+						},
+						"ip_address": {
+							Type:     schema.TypeString,
+							Optional: true,
+							Computed: true,
+						},
+						"gateway": {
+							Type:     schema.TypeString,
+							Optional: true,
+							Computed: true,
+						},
+						"netmask": {
+							Type:     schema.TypeInt,
+							Optional: true,
+							Computed: true,
+						},
+					},
+				},
 			},
 			"ip_address": {
 				Type:     schema.TypeString,
-				Optional: true,
 				Computed: true,
 			},
 			"gateway": {
 				Type:     schema.TypeString,
-				Optional: true,
 				Computed: true,
 			},
 			"network_address": {
@@ -189,8 +215,12 @@ func resourceSakuraCloudServer() *schema.Resource {
 			},
 			"netmask": {
 				Type:     schema.TypeInt,
-				Optional: true,
 				Computed: true,
+			},
+			"dns_servers": {
+				Type:     schema.TypeList,
+				Computed: true,
+				Elem:     &schema.Schema{Type: schema.TypeString},
 			},
 			"force_shutdown": {
 				Type:     schema.TypeBool,
@@ -365,12 +395,5 @@ func setServerResourceData(ctx context.Context, d *schema.ResourceData, client *
 func isServerDiskConfigChanged(d *schema.ResourceData) bool {
 	return d.HasChange("disks") ||
 		d.HasChange("network_interface") ||
-		d.HasChange("ip_address") ||
-		d.HasChange("gateway") ||
-		d.HasChange("netmask") ||
-		d.HasChange("hostname") ||
-		d.HasChange("password") ||
-		d.HasChange("ssh_key_ids") ||
-		d.HasChange("disable_pw_auth") ||
-		d.HasChange("note_ids")
+		d.HasChange("disk_edit_parameter")
 }

@@ -217,9 +217,11 @@ resource "sakuracloud_server" "foobar" {
   network_interface {
     upstream = sakuracloud_internet.foobar.switch_id
   }
-  ip_address = sakuracloud_internet.foobar.ip_addresses[0]
-  gateway    = sakuracloud_internet.foobar.gateway
-  netmask    = sakuracloud_internet.foobar.netmask
+  disk_edit_parameter {
+    ip_address = sakuracloud_internet.foobar.ip_addresses[0]
+    gateway    = sakuracloud_internet.foobar.gateway
+    netmask    = sakuracloud_internet.foobar.netmask
+  }
 }
 
 resource "sakuracloud_internet" "foobar" {
