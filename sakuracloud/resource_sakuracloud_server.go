@@ -354,7 +354,7 @@ func setServerResourceData(ctx context.Context, d *schema.ResourceData, client *
 		}
 		userName, err := query.ServerDefaultUserName(ctx, zone, query.NewServerSourceReader(client), data.ID)
 		if err != nil {
-			log.Printf("[WARN] can't retrive connInfo from archives (server: %d).", data.ID)
+			log.Printf("[WARN] can't retrieve connInfo from archives (server: %d).", data.ID)
 		}
 		if userName != "" {
 			connInfo["user"] = userName
