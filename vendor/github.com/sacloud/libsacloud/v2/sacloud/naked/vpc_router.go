@@ -249,7 +249,6 @@ func (i *VPCRouterFirewallConfigs) UnmarshalJSON(b []byte) error {
 
 // MarshalJSON 配列中にnullが入る場合(VPCルータなど)への対応
 func (i *VPCRouterFirewallConfigs) MarshalJSON() ([]byte, error) {
-
 	var dest [8]*VPCRouterFirewallConfig
 	for _, iface := range *i {
 		if iface != nil {

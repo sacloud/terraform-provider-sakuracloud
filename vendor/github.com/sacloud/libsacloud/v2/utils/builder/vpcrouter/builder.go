@@ -363,10 +363,6 @@ func (b *Builder) Update(ctx context.Context, zone string, id types.ID) (*saclou
 	return vpcRouter, err
 }
 
-func (b *Builder) isStandardPlan() bool {
-	return b.PlanID != types.VPCRouterPlans.Standard
-}
-
 func (b *Builder) collectUpdateInfo(vpcRouter *sacloud.VPCRouter) (isNeedShutdown bool, err error) {
 	// プランの変更はエラーとする
 	if vpcRouter.PlanID != b.PlanID {

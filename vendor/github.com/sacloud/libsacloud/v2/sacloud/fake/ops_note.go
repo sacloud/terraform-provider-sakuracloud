@@ -16,9 +16,7 @@ package fake
 
 import (
 	"context"
-	"fmt"
 
-	"github.com/imdario/mergo"
 	"github.com/sacloud/libsacloud/v2/sacloud"
 	"github.com/sacloud/libsacloud/v2/sacloud/types"
 )
@@ -70,42 +68,6 @@ func (o *NoteOp) Update(ctx context.Context, id types.ID, param *sacloud.NoteUpd
 
 	copySameNameField(param, value)
 	fill(value, fillModifiedAt)
-
-	putNote(sacloud.APIDefaultZone, value)
-	return value, nil
-}
-
-// Patch is API call
-func (o *NoteOp) Patch(ctx context.Context, id types.ID, param *sacloud.NotePatchRequest) (*sacloud.Note, error) {
-	value, err := o.Read(ctx, id)
-	if err != nil {
-		return nil, err
-	}
-
-	patchParam := make(map[string]interface{})
-	if err := mergo.Map(&patchParam, value); err != nil {
-		return nil, fmt.Errorf("patch is failed: %s", err)
-	}
-	if err := mergo.Map(&patchParam, param); err != nil {
-		return nil, fmt.Errorf("patch is failed: %s", err)
-	}
-	if err := mergo.Map(param, &patchParam); err != nil {
-		return nil, fmt.Errorf("patch is failed: %s", err)
-	}
-	copySameNameField(param, value)
-
-	if param.PatchEmptyToTags {
-		value.Tags = nil
-	}
-	if param.PatchEmptyToIconID {
-		value.IconID = types.ID(int64(0))
-	}
-	if param.PatchEmptyToClass {
-		value.Class = ""
-	}
-	if param.PatchEmptyToContent {
-		value.Content = ""
-	}
 
 	putNote(sacloud.APIDefaultZone, value)
 	return value, nil

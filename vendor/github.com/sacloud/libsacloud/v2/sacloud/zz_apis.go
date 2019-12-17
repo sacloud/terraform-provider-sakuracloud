@@ -33,7 +33,6 @@ type ArchiveAPI interface {
 	CreateBlank(ctx context.Context, zone string, param *ArchiveCreateBlankRequest) (*Archive, *FTPServer, error)
 	Read(ctx context.Context, zone string, id types.ID) (*Archive, error)
 	Update(ctx context.Context, zone string, id types.ID, param *ArchiveUpdateRequest) (*Archive, error)
-	Patch(ctx context.Context, zone string, id types.ID, param *ArchivePatchRequest) (*Archive, error)
 	Delete(ctx context.Context, zone string, id types.ID) error
 	OpenFTP(ctx context.Context, zone string, id types.ID, openOption *OpenFTPRequest) (*FTPServer, error)
 	CloseFTP(ctx context.Context, zone string, id types.ID) error
@@ -58,9 +57,7 @@ type AutoBackupAPI interface {
 	Create(ctx context.Context, zone string, param *AutoBackupCreateRequest) (*AutoBackup, error)
 	Read(ctx context.Context, zone string, id types.ID) (*AutoBackup, error)
 	Update(ctx context.Context, zone string, id types.ID, param *AutoBackupUpdateRequest) (*AutoBackup, error)
-	Patch(ctx context.Context, zone string, id types.ID, param *AutoBackupPatchRequest) (*AutoBackup, error)
 	UpdateSettings(ctx context.Context, zone string, id types.ID, param *AutoBackupUpdateSettingsRequest) (*AutoBackup, error)
-	PatchSettings(ctx context.Context, zone string, id types.ID, param *AutoBackupPatchSettingsRequest) (*AutoBackup, error)
 	Delete(ctx context.Context, zone string, id types.ID) error
 }
 
@@ -88,7 +85,6 @@ type BridgeAPI interface {
 	Create(ctx context.Context, zone string, param *BridgeCreateRequest) (*Bridge, error)
 	Read(ctx context.Context, zone string, id types.ID) (*Bridge, error)
 	Update(ctx context.Context, zone string, id types.ID, param *BridgeUpdateRequest) (*Bridge, error)
-	Patch(ctx context.Context, zone string, id types.ID, param *BridgePatchRequest) (*Bridge, error)
 	Delete(ctx context.Context, zone string, id types.ID) error
 }
 
@@ -102,7 +98,6 @@ type CDROMAPI interface {
 	Create(ctx context.Context, zone string, param *CDROMCreateRequest) (*CDROM, *FTPServer, error)
 	Read(ctx context.Context, zone string, id types.ID) (*CDROM, error)
 	Update(ctx context.Context, zone string, id types.ID, param *CDROMUpdateRequest) (*CDROM, error)
-	Patch(ctx context.Context, zone string, id types.ID, param *CDROMPatchRequest) (*CDROM, error)
 	Delete(ctx context.Context, zone string, id types.ID) error
 	OpenFTP(ctx context.Context, zone string, id types.ID, openOption *OpenFTPRequest) (*FTPServer, error)
 	CloseFTP(ctx context.Context, zone string, id types.ID) error
@@ -128,8 +123,6 @@ type DatabaseAPI interface {
 	Read(ctx context.Context, zone string, id types.ID) (*Database, error)
 	Update(ctx context.Context, zone string, id types.ID, param *DatabaseUpdateRequest) (*Database, error)
 	UpdateSettings(ctx context.Context, zone string, id types.ID, param *DatabaseUpdateSettingsRequest) (*Database, error)
-	Patch(ctx context.Context, zone string, id types.ID, param *DatabasePatchRequest) (*Database, error)
-	PatchSettings(ctx context.Context, zone string, id types.ID, param *DatabasePatchSettingsRequest) (*Database, error)
 	Delete(ctx context.Context, zone string, id types.ID) error
 	Config(ctx context.Context, zone string, id types.ID) error
 	Boot(ctx context.Context, zone string, id types.ID) error
@@ -159,7 +152,6 @@ type DiskAPI interface {
 	Install(ctx context.Context, zone string, id types.ID, installParam *DiskInstallRequest, distantFrom []types.ID) (*Disk, error)
 	Read(ctx context.Context, zone string, id types.ID) (*Disk, error)
 	Update(ctx context.Context, zone string, id types.ID, param *DiskUpdateRequest) (*Disk, error)
-	Patch(ctx context.Context, zone string, id types.ID, param *DiskPatchRequest) (*Disk, error)
 	Delete(ctx context.Context, zone string, id types.ID) error
 	Monitor(ctx context.Context, zone string, id types.ID, condition *MonitorCondition) (*DiskActivity, error)
 }
@@ -185,8 +177,6 @@ type DNSAPI interface {
 	Read(ctx context.Context, id types.ID) (*DNS, error)
 	Update(ctx context.Context, id types.ID, param *DNSUpdateRequest) (*DNS, error)
 	UpdateSettings(ctx context.Context, id types.ID, param *DNSUpdateSettingsRequest) (*DNS, error)
-	Patch(ctx context.Context, id types.ID, param *DNSPatchRequest) (*DNS, error)
-	PatchSettings(ctx context.Context, id types.ID, param *DNSPatchSettingsRequest) (*DNS, error)
 	Delete(ctx context.Context, id types.ID) error
 }
 
@@ -201,8 +191,6 @@ type GSLBAPI interface {
 	Read(ctx context.Context, id types.ID) (*GSLB, error)
 	Update(ctx context.Context, id types.ID, param *GSLBUpdateRequest) (*GSLB, error)
 	UpdateSettings(ctx context.Context, id types.ID, param *GSLBUpdateSettingsRequest) (*GSLB, error)
-	Patch(ctx context.Context, id types.ID, param *GSLBPatchRequest) (*GSLB, error)
-	PatchSettings(ctx context.Context, id types.ID, param *GSLBPatchSettingsRequest) (*GSLB, error)
 	Delete(ctx context.Context, id types.ID) error
 }
 
@@ -216,7 +204,6 @@ type IconAPI interface {
 	Create(ctx context.Context, param *IconCreateRequest) (*Icon, error)
 	Read(ctx context.Context, id types.ID) (*Icon, error)
 	Update(ctx context.Context, id types.ID, param *IconUpdateRequest) (*Icon, error)
-	Patch(ctx context.Context, id types.ID, param *IconPatchRequest) (*Icon, error)
 	Delete(ctx context.Context, id types.ID) error
 }
 
@@ -230,7 +217,6 @@ type InterfaceAPI interface {
 	Create(ctx context.Context, zone string, param *InterfaceCreateRequest) (*Interface, error)
 	Read(ctx context.Context, zone string, id types.ID) (*Interface, error)
 	Update(ctx context.Context, zone string, id types.ID, param *InterfaceUpdateRequest) (*Interface, error)
-	Patch(ctx context.Context, zone string, id types.ID, param *InterfacePatchRequest) (*Interface, error)
 	Delete(ctx context.Context, zone string, id types.ID) error
 	Monitor(ctx context.Context, zone string, id types.ID, condition *MonitorCondition) (*InterfaceActivity, error)
 	ConnectToSharedSegment(ctx context.Context, zone string, id types.ID) error
@@ -250,7 +236,6 @@ type InternetAPI interface {
 	Create(ctx context.Context, zone string, param *InternetCreateRequest) (*Internet, error)
 	Read(ctx context.Context, zone string, id types.ID) (*Internet, error)
 	Update(ctx context.Context, zone string, id types.ID, param *InternetUpdateRequest) (*Internet, error)
-	Patch(ctx context.Context, zone string, id types.ID, param *InternetPatchRequest) (*Internet, error)
 	Delete(ctx context.Context, zone string, id types.ID) error
 	UpdateBandWidth(ctx context.Context, zone string, id types.ID, param *InternetUpdateBandWidthRequest) (*Internet, error)
 	AddSubnet(ctx context.Context, zone string, id types.ID, param *InternetAddSubnetRequest) (*InternetSubnetOperationResult, error)
@@ -315,7 +300,6 @@ type LicenseAPI interface {
 	Create(ctx context.Context, param *LicenseCreateRequest) (*License, error)
 	Read(ctx context.Context, id types.ID) (*License, error)
 	Update(ctx context.Context, id types.ID, param *LicenseUpdateRequest) (*License, error)
-	Patch(ctx context.Context, id types.ID, param *LicensePatchRequest) (*License, error)
 	Delete(ctx context.Context, id types.ID) error
 }
 
@@ -340,8 +324,6 @@ type LoadBalancerAPI interface {
 	Read(ctx context.Context, zone string, id types.ID) (*LoadBalancer, error)
 	Update(ctx context.Context, zone string, id types.ID, param *LoadBalancerUpdateRequest) (*LoadBalancer, error)
 	UpdateSettings(ctx context.Context, zone string, id types.ID, param *LoadBalancerUpdateSettingsRequest) (*LoadBalancer, error)
-	Patch(ctx context.Context, zone string, id types.ID, param *LoadBalancerPatchRequest) (*LoadBalancer, error)
-	PatchSettings(ctx context.Context, zone string, id types.ID, param *LoadBalancerPatchSettingsRequest) (*LoadBalancer, error)
 	Delete(ctx context.Context, zone string, id types.ID) error
 	Config(ctx context.Context, zone string, id types.ID) error
 	Boot(ctx context.Context, zone string, id types.ID) error
@@ -362,8 +344,6 @@ type MobileGatewayAPI interface {
 	Read(ctx context.Context, zone string, id types.ID) (*MobileGateway, error)
 	Update(ctx context.Context, zone string, id types.ID, param *MobileGatewayUpdateRequest) (*MobileGateway, error)
 	UpdateSettings(ctx context.Context, zone string, id types.ID, param *MobileGatewayUpdateSettingsRequest) (*MobileGateway, error)
-	Patch(ctx context.Context, zone string, id types.ID, param *MobileGatewayPatchRequest) (*MobileGateway, error)
-	PatchSettings(ctx context.Context, zone string, id types.ID, param *MobileGatewayPatchSettingsRequest) (*MobileGateway, error)
 	Delete(ctx context.Context, zone string, id types.ID) error
 	Config(ctx context.Context, zone string, id types.ID) error
 	Boot(ctx context.Context, zone string, id types.ID) error
@@ -396,7 +376,6 @@ type NFSAPI interface {
 	Create(ctx context.Context, zone string, param *NFSCreateRequest) (*NFS, error)
 	Read(ctx context.Context, zone string, id types.ID) (*NFS, error)
 	Update(ctx context.Context, zone string, id types.ID, param *NFSUpdateRequest) (*NFS, error)
-	Patch(ctx context.Context, zone string, id types.ID, param *NFSPatchRequest) (*NFS, error)
 	Delete(ctx context.Context, zone string, id types.ID) error
 	Boot(ctx context.Context, zone string, id types.ID) error
 	Shutdown(ctx context.Context, zone string, id types.ID, shutdownOption *ShutdownOption) error
@@ -415,7 +394,6 @@ type NoteAPI interface {
 	Create(ctx context.Context, param *NoteCreateRequest) (*Note, error)
 	Read(ctx context.Context, id types.ID) (*Note, error)
 	Update(ctx context.Context, id types.ID, param *NoteUpdateRequest) (*Note, error)
-	Patch(ctx context.Context, id types.ID, param *NotePatchRequest) (*Note, error)
 	Delete(ctx context.Context, id types.ID) error
 }
 
@@ -429,7 +407,6 @@ type PacketFilterAPI interface {
 	Create(ctx context.Context, zone string, param *PacketFilterCreateRequest) (*PacketFilter, error)
 	Read(ctx context.Context, zone string, id types.ID) (*PacketFilter, error)
 	Update(ctx context.Context, zone string, id types.ID, param *PacketFilterUpdateRequest) (*PacketFilter, error)
-	Patch(ctx context.Context, zone string, id types.ID, param *PacketFilterPatchRequest) (*PacketFilter, error)
 	Delete(ctx context.Context, zone string, id types.ID) error
 }
 
@@ -443,7 +420,6 @@ type PrivateHostAPI interface {
 	Create(ctx context.Context, zone string, param *PrivateHostCreateRequest) (*PrivateHost, error)
 	Read(ctx context.Context, zone string, id types.ID) (*PrivateHost, error)
 	Update(ctx context.Context, zone string, id types.ID, param *PrivateHostUpdateRequest) (*PrivateHost, error)
-	Patch(ctx context.Context, zone string, id types.ID, param *PrivateHostPatchRequest) (*PrivateHost, error)
 	Delete(ctx context.Context, zone string, id types.ID) error
 }
 
@@ -468,8 +444,6 @@ type ProxyLBAPI interface {
 	Read(ctx context.Context, id types.ID) (*ProxyLB, error)
 	Update(ctx context.Context, id types.ID, param *ProxyLBUpdateRequest) (*ProxyLB, error)
 	UpdateSettings(ctx context.Context, id types.ID, param *ProxyLBUpdateSettingsRequest) (*ProxyLB, error)
-	Patch(ctx context.Context, id types.ID, param *ProxyLBPatchRequest) (*ProxyLB, error)
-	PatchSettings(ctx context.Context, id types.ID, param *ProxyLBPatchSettingsRequest) (*ProxyLB, error)
 	Delete(ctx context.Context, id types.ID) error
 	ChangePlan(ctx context.Context, id types.ID, param *ProxyLBChangePlanRequest) (*ProxyLB, error)
 	GetCertificates(ctx context.Context, id types.ID) (*ProxyLBCertificates, error)
@@ -500,7 +474,6 @@ type ServerAPI interface {
 	Create(ctx context.Context, zone string, param *ServerCreateRequest) (*Server, error)
 	Read(ctx context.Context, zone string, id types.ID) (*Server, error)
 	Update(ctx context.Context, zone string, id types.ID, param *ServerUpdateRequest) (*Server, error)
-	Patch(ctx context.Context, zone string, id types.ID, param *ServerPatchRequest) (*Server, error)
 	Delete(ctx context.Context, zone string, id types.ID) error
 	DeleteWithDisks(ctx context.Context, zone string, id types.ID, disks *ServerDeleteWithDisksRequest) error
 	ChangePlan(ctx context.Context, zone string, id types.ID, plan *ServerChangePlanRequest) (*Server, error)
@@ -543,7 +516,6 @@ type SIMAPI interface {
 	Create(ctx context.Context, param *SIMCreateRequest) (*SIM, error)
 	Read(ctx context.Context, id types.ID) (*SIM, error)
 	Update(ctx context.Context, id types.ID, param *SIMUpdateRequest) (*SIM, error)
-	Patch(ctx context.Context, id types.ID, param *SIMPatchRequest) (*SIM, error)
 	Delete(ctx context.Context, id types.ID) error
 	Activate(ctx context.Context, id types.ID) error
 	Deactivate(ctx context.Context, id types.ID) error
@@ -569,8 +541,6 @@ type SimpleMonitorAPI interface {
 	Read(ctx context.Context, id types.ID) (*SimpleMonitor, error)
 	Update(ctx context.Context, id types.ID, param *SimpleMonitorUpdateRequest) (*SimpleMonitor, error)
 	UpdateSettings(ctx context.Context, id types.ID, param *SimpleMonitorUpdateSettingsRequest) (*SimpleMonitor, error)
-	Patch(ctx context.Context, id types.ID, param *SimpleMonitorPatchRequest) (*SimpleMonitor, error)
-	PatchSettings(ctx context.Context, id types.ID, param *SimpleMonitorPatchSettingsRequest) (*SimpleMonitor, error)
 	Delete(ctx context.Context, id types.ID) error
 	MonitorResponseTime(ctx context.Context, id types.ID, condition *MonitorCondition) (*ResponseTimeSecActivity, error)
 	HealthStatus(ctx context.Context, id types.ID) (*SimpleMonitorHealthStatus, error)
@@ -587,7 +557,6 @@ type SSHKeyAPI interface {
 	Generate(ctx context.Context, param *SSHKeyGenerateRequest) (*SSHKeyGenerated, error)
 	Read(ctx context.Context, id types.ID) (*SSHKey, error)
 	Update(ctx context.Context, id types.ID, param *SSHKeyUpdateRequest) (*SSHKey, error)
-	Patch(ctx context.Context, id types.ID, param *SSHKeyPatchRequest) (*SSHKey, error)
 	Delete(ctx context.Context, id types.ID) error
 }
 
@@ -611,7 +580,6 @@ type SwitchAPI interface {
 	Create(ctx context.Context, zone string, param *SwitchCreateRequest) (*Switch, error)
 	Read(ctx context.Context, zone string, id types.ID) (*Switch, error)
 	Update(ctx context.Context, zone string, id types.ID, param *SwitchUpdateRequest) (*Switch, error)
-	Patch(ctx context.Context, zone string, id types.ID, param *SwitchPatchRequest) (*Switch, error)
 	Delete(ctx context.Context, zone string, id types.ID) error
 	ConnectToBridge(ctx context.Context, zone string, id types.ID, bridgeID types.ID) error
 	DisconnectFromBridge(ctx context.Context, zone string, id types.ID) error
@@ -629,8 +597,6 @@ type VPCRouterAPI interface {
 	Read(ctx context.Context, zone string, id types.ID) (*VPCRouter, error)
 	Update(ctx context.Context, zone string, id types.ID, param *VPCRouterUpdateRequest) (*VPCRouter, error)
 	UpdateSettings(ctx context.Context, zone string, id types.ID, param *VPCRouterUpdateSettingsRequest) (*VPCRouter, error)
-	Patch(ctx context.Context, zone string, id types.ID, param *VPCRouterPatchRequest) (*VPCRouter, error)
-	PatchSettings(ctx context.Context, zone string, id types.ID, param *VPCRouterPatchSettingsRequest) (*VPCRouter, error)
 	Delete(ctx context.Context, zone string, id types.ID) error
 	Config(ctx context.Context, zone string, id types.ID) error
 	Boot(ctx context.Context, zone string, id types.ID) error

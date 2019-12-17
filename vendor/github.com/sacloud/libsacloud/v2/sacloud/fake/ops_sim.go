@@ -17,11 +17,9 @@ package fake
 import (
 	"context"
 	"errors"
-	"fmt"
 	"strings"
 	"time"
 
-	"github.com/imdario/mergo"
 	"github.com/sacloud/libsacloud/v2/sacloud"
 	"github.com/sacloud/libsacloud/v2/sacloud/types"
 )
@@ -81,39 +79,6 @@ func (o *SIMOp) Update(ctx context.Context, id types.ID, param *sacloud.SIMUpdat
 	}
 	copySameNameField(param, value)
 	fill(value, fillModifiedAt)
-	putSIM(sacloud.APIDefaultZone, value)
-	return value, nil
-}
-
-// Patch is fake implementation
-func (o *SIMOp) Patch(ctx context.Context, id types.ID, param *sacloud.SIMPatchRequest) (*sacloud.SIM, error) {
-	value, err := o.Read(ctx, id)
-	if err != nil {
-		return nil, err
-	}
-
-	patchParam := make(map[string]interface{})
-	if err := mergo.Map(&patchParam, value); err != nil {
-		return nil, fmt.Errorf("patch is failed: %s", err)
-	}
-	if err := mergo.Map(&patchParam, param); err != nil {
-		return nil, fmt.Errorf("patch is failed: %s", err)
-	}
-	if err := mergo.Map(param, &patchParam); err != nil {
-		return nil, fmt.Errorf("patch is failed: %s", err)
-	}
-	copySameNameField(param, value)
-
-	if param.PatchEmptyToDescription {
-		value.Description = ""
-	}
-	if param.PatchEmptyToTags {
-		value.Tags = nil
-	}
-	if param.PatchEmptyToIconID {
-		value.IconID = types.ID(int64(0))
-	}
-
 	putSIM(sacloud.APIDefaultZone, value)
 	return value, nil
 }
@@ -253,9 +218,7 @@ func (o *SIMOp) GetNetworkOperator(ctx context.Context, id types.ID) ([]*sacloud
 	if v != nil {
 		var res []*sacloud.SIMNetworkOperatorConfig
 		configs := v.(*[]*sacloud.SIMNetworkOperatorConfig)
-		for _, c := range *configs {
-			res = append(res, c)
-		}
+		res = append(res, *configs...)
 		return res, nil
 	}
 

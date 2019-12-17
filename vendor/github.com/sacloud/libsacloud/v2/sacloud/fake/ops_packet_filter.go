@@ -16,9 +16,7 @@ package fake
 
 import (
 	"context"
-	"fmt"
 
-	"github.com/imdario/mergo"
 	"github.com/sacloud/libsacloud/v2/sacloud"
 	"github.com/sacloud/libsacloud/v2/sacloud/types"
 )
@@ -69,36 +67,6 @@ func (o *PacketFilterOp) Update(ctx context.Context, zone string, id types.ID, p
 	}
 	copySameNameField(param, value)
 	fill(value, fillModifiedAt)
-
-	putPacketFilter(zone, value)
-	return value, nil
-}
-
-// Patch is fake implementation
-func (o *PacketFilterOp) Patch(ctx context.Context, zone string, id types.ID, param *sacloud.PacketFilterPatchRequest) (*sacloud.PacketFilter, error) {
-	value, err := o.Read(ctx, zone, id)
-	if err != nil {
-		return nil, err
-	}
-
-	patchParam := make(map[string]interface{})
-	if err := mergo.Map(&patchParam, value); err != nil {
-		return nil, fmt.Errorf("patch is failed: %s", err)
-	}
-	if err := mergo.Map(&patchParam, param); err != nil {
-		return nil, fmt.Errorf("patch is failed: %s", err)
-	}
-	if err := mergo.Map(param, &patchParam); err != nil {
-		return nil, fmt.Errorf("patch is failed: %s", err)
-	}
-	copySameNameField(param, value)
-
-	if param.PatchEmptyToDescription {
-		value.Description = ""
-	}
-	if param.PatchEmptyToExpression {
-		value.Expression = nil
-	}
 
 	putPacketFilter(zone, value)
 	return value, nil

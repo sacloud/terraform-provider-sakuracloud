@@ -75,5 +75,4 @@ func ParseStringNumber(s string) (StringNumber, error) {
 		return StringNumber(0), err
 	}
 	return StringNumber(n), nil
-
 }

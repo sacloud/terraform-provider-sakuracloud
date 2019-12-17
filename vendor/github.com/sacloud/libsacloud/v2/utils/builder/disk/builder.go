@@ -194,7 +194,6 @@ type FromFixedArchiveBuilder struct {
 	ID types.ID
 
 	generatedSSHKey *sacloud.SSHKeyGenerated
-	generatedNotes  []*sacloud.Note
 }
 
 // Validate 設定値の検証

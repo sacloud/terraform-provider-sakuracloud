@@ -29,8 +29,8 @@ var Availabilities = struct {
 	Failed EAvailability // 失敗
 	// Migrating マイグレーション中
 	Migrating EAvailability
-	// Transfering 転送中(他ゾーンからのアーカイブコピー作成など)
-	Transfering EAvailability
+	// Transferring 転送中(他ゾーンからのアーカイブコピー作成など)
+	Transferring EAvailability
 	// Discontinued 切断(ソースアーカイブ/ソースディスクなどで利用される)
 	Discontinued EAvailability
 }{
@@ -39,7 +39,7 @@ var Availabilities = struct {
 	Uploading:    EAvailability("uploading"),
 	Failed:       EAvailability("failed"),
 	Migrating:    EAvailability("migrating"),
-	Transfering:  EAvailability("transfering"),
+	Transferring: EAvailability("transfering"), // nolint : 綴りが違うがさくらのクラウド側に合わせる(transferring)
 	Discontinued: EAvailability("discontinued"),
 }
 
@@ -65,7 +65,7 @@ func (e EAvailability) IsMigrating() bool {
 
 // IsTransfering 有効状態が"転送中"か判定
 func (e EAvailability) IsTransfering() bool {
-	return e == Availabilities.Transfering
+	return e == Availabilities.Transferring
 }
 
 // IsDiscontinued 有効状態が"切断"か判定

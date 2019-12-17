@@ -119,7 +119,7 @@ func (i *Interface) UnmarshalJSON(b []byte) error {
 	}
 
 	// calculate UpstreamType
-	var upstreamType = types.UpstreamNetworkTypes.Unknown
+	var upstreamType types.EUpstreamNetworkType
 	sw := tmp.Switch
 	switch {
 	case sw == nil:

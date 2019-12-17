@@ -16,10 +16,8 @@ package fake
 
 import (
 	"context"
-	"fmt"
 	"time"
 
-	"github.com/imdario/mergo"
 	"github.com/sacloud/libsacloud/v2/sacloud"
 	"github.com/sacloud/libsacloud/v2/sacloud/types"
 )
@@ -83,48 +81,6 @@ func (o *DatabaseOp) Update(ctx context.Context, zone string, id types.ID, param
 	return value, nil
 }
 
-// Patch is fake implementation
-func (o *DatabaseOp) Patch(ctx context.Context, zone string, id types.ID, param *sacloud.DatabasePatchRequest) (*sacloud.Database, error) {
-	value, err := o.Read(ctx, zone, id)
-	if err != nil {
-		return nil, err
-	}
-
-	patchParam := make(map[string]interface{})
-	if err := mergo.Map(&patchParam, value); err != nil {
-		return nil, fmt.Errorf("patch is failed: %s", err)
-	}
-	if err := mergo.Map(&patchParam, param); err != nil {
-		return nil, fmt.Errorf("patch is failed: %s", err)
-	}
-	if err := mergo.Map(param, &patchParam); err != nil {
-		return nil, fmt.Errorf("patch is failed: %s", err)
-	}
-	copySameNameField(param, value)
-
-	if param.PatchEmptyToDescription {
-		value.Description = ""
-	}
-	if param.PatchEmptyToTags {
-		value.Tags = nil
-	}
-	if param.PatchEmptyToIconID {
-		value.IconID = types.ID(int64(0))
-	}
-	if param.PatchEmptyToCommonSetting {
-		value.CommonSetting = nil
-	}
-	if param.PatchEmptyToBackupSetting {
-		value.BackupSetting = nil
-	}
-	if param.PatchEmptyToReplicationSetting {
-		value.ReplicationSetting = nil
-	}
-
-	putDatabase(zone, value)
-	return value, nil
-}
-
 // UpdateSettings is fake implementation
 func (o *DatabaseOp) UpdateSettings(ctx context.Context, zone string, id types.ID, param *sacloud.DatabaseUpdateSettingsRequest) (*sacloud.Database, error) {
 	value, err := o.Read(ctx, zone, id)
@@ -136,13 +92,6 @@ func (o *DatabaseOp) UpdateSettings(ctx context.Context, zone string, id types.I
 
 	putDatabase(zone, value)
 	return value, nil
-}
-
-// PatchSettings is fake implementation
-func (o *DatabaseOp) PatchSettings(ctx context.Context, zone string, id types.ID, param *sacloud.DatabasePatchSettingsRequest) (*sacloud.Database, error) {
-	patchParam := &sacloud.DatabasePatchRequest{}
-	copySameNameField(param, patchParam)
-	return o.Patch(ctx, zone, id, patchParam)
 }
 
 // Delete is fake implementation

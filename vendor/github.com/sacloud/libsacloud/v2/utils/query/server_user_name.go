@@ -83,5 +83,4 @@ func getSSHDefaultUserNameArchiveRec(ctx context.Context, zone string, reader *S
 		return getSSHDefaultUserNameArchiveRec(ctx, zone, reader, archive.SourceArchiveID)
 	}
 	return "", nil
-
 }

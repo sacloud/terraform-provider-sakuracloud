@@ -51,7 +51,6 @@ type JSONFileStoreData map[string]map[string]interface{}
 
 // MarshalJSON .
 func (d JSONFileStoreData) MarshalJSON() ([]byte, error) {
-
 	var transformed []map[string]interface{}
 	for cacheKey, resources := range d {
 		resourceKey, zone := d.parseKey(cacheKey)
@@ -216,7 +215,9 @@ func (s *JSONFileStore) startWatcher() {
 					}
 
 					if event.Op&fsnotify.Rename == fsnotify.Rename {
-						watcher.Add(s.Path)
+						if err := watcher.Add(s.Path); err != nil {
+							panic(err)
+						}
 					}
 					log.Printf("reloaded: %q\n", s.Path)
 				}
@@ -230,7 +231,9 @@ func (s *JSONFileStore) startWatcher() {
 			}
 		}
 	}()
-	watcher.Add(s.Path)
+	if err := watcher.Add(s.Path); err != nil {
+		panic(err)
+	}
 }
 
 // NeedInitData .
@@ -253,7 +256,7 @@ func (s *JSONFileStore) Put(resourceKey, zone string, id types.ID, value interfa
 	values[id.String()] = value
 	s.cache[s.key(resourceKey, zone)] = values
 
-	s.store()
+	s.store() // nolint
 }
 
 // Get .
@@ -290,7 +293,7 @@ func (s *JSONFileStore) Delete(resourceKey, zone string, id types.ID) {
 	if values != nil {
 		delete(values, id.String())
 	}
-	s.store()
+	s.store() // nolint
 }
 
 var jsonResourceTypeMap = map[string]func() interface{}{

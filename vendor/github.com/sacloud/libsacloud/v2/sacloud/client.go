@@ -68,8 +68,6 @@ type Client struct {
 	AccessToken string `validate:"required"`
 	// AccessTokenSecret アクセストークンシークレット
 	AccessTokenSecret string `validate:"required"`
-	// DefaultTimeoutDuration デフォルトタイムアウト間隔
-	DefaultTimeoutDuration time.Duration
 	// ユーザーエージェント
 	UserAgent string
 	// Accept-Language
@@ -85,13 +83,12 @@ type Client struct {
 // NewClient APIクライアント作成
 func NewClient(token, secret string) *Client {
 	c := &Client{
-		AccessToken:            token,
-		AccessTokenSecret:      secret,
-		DefaultTimeoutDuration: APIDefaultTimeoutDuration,
-		UserAgent:              APIDefaultUserAgent,
-		AcceptLanguage:         APIDefaultAcceptLanguage,
-		RetryMax:               APIDefaultRetryMax,
-		RetryInterval:          APIDefaultRetryInterval,
+		AccessToken:       token,
+		AccessTokenSecret: secret,
+		UserAgent:         APIDefaultUserAgent,
+		AcceptLanguage:    APIDefaultAcceptLanguage,
+		RetryMax:          APIDefaultRetryMax,
+		RetryInterval:     APIDefaultRetryInterval,
 	}
 	return c
 }
@@ -181,7 +178,6 @@ func (c *Client) Do(ctx context.Context, method, uri string, body interface{}) (
 			return nil, fmt.Errorf("error in response: %s", string(data))
 		}
 		return nil, NewAPIError(req.Method, req.URL, strBody, resp.StatusCode, errResponse)
-
 	}
 
 	return data, nil
@@ -230,7 +226,6 @@ func (c *retryableHTTPClient) Do(req *request) (*http.Response, error) {
 		c.Client = http.DefaultClient
 	}
 	for i := 0; ; i++ {
-
 		if req.body != nil {
 			if _, err := req.body.Seek(0, 0); err != nil {
 				return nil, fmt.Errorf("failed to seek body: %v", err)

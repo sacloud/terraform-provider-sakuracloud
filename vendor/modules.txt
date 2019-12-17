@@ -186,8 +186,6 @@ github.com/hashicorp/terraform-svchost/auth
 github.com/hashicorp/terraform-svchost/disco
 # github.com/hashicorp/yamux v0.0.0-20181012175058-2f1d1f20f75d
 github.com/hashicorp/yamux
-# github.com/imdario/mergo v0.3.8-0.20190722133502-4c317f2286be
-github.com/imdario/mergo
 # github.com/jmespath/go-jmespath v0.0.0-20180206201540-c2b33e8439af
 github.com/jmespath/go-jmespath
 # github.com/leodido/go-urn v1.1.0
@@ -228,7 +226,7 @@ github.com/posener/complete/match
 github.com/sacloud/ftps
 # github.com/sacloud/iso9660wrap v0.0.0-20171031075302-eda21f77f6a8
 github.com/sacloud/iso9660wrap
-# github.com/sacloud/libsacloud/v2 v2.0.0-beta6.0.20191215034453-b94d5a16f549
+# github.com/sacloud/libsacloud/v2 v2.0.0-beta7
 github.com/sacloud/libsacloud/v2
 github.com/sacloud/libsacloud/v2/pkg/cidr
 github.com/sacloud/libsacloud/v2/pkg/mapconv

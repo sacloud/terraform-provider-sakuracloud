@@ -24,7 +24,6 @@ import (
 
 // FindArchiveByOSType OS種別ごとの最新安定板のアーカイブを取得
 func FindArchiveByOSType(ctx context.Context, api ArchiveFinder, zone string, os ostype.ArchiveOSType) (*sacloud.Archive, error) {
-
 	filter, ok := ostype.ArchiveCriteria[os]
 	if !ok {
 		return nil, fmt.Errorf("unsupported ostype.ArchiveOSType: %v", os)

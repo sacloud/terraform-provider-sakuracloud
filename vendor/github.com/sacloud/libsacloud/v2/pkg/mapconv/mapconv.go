@@ -54,7 +54,10 @@ func ConvertTo(source interface{}, dest interface{}) error {
 
 			if tags.Squash {
 				d := Map(make(map[string]interface{}))
-				ConvertTo(value, &d)
+				err := ConvertTo(value, &d)
+				if err != nil {
+					return err
+				}
 				for k, v := range d {
 					destMap.Set(k, v)
 				}
@@ -165,7 +168,6 @@ func ConvertFrom(source interface{}, dest interface{}) error {
 
 			destMap.Set(f.Name(), value)
 		}
-
 	}
 	config := &mapstructure.DecoderConfig{
 		WeaklyTypedInput: true,
@@ -221,7 +223,6 @@ func ParseMapConvTag(tagBody string) TagInfo {
 				defaultValue = strings.Join(keyValue[1:], "")
 			}
 		}
-
 	}
 	return TagInfo{
 		SourceFields: keys,
