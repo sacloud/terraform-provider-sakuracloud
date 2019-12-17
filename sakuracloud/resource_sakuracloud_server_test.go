@@ -38,7 +38,7 @@ func TestAccSakuraCloudServer_basic(t *testing.T) {
 		CheckDestroy: testCheckSakuraCloudServerDestroy,
 		Steps: []resource.TestStep{
 			{
-				Config: buildConfigWithArgs(testAccCheckSakuraCloudServerConfig_basic, rand, password),
+				Config: buildConfigWithArgs(testAccSakuraCloudServer_basic, rand, password),
 				Check: resource.ComposeTestCheckFunc(
 					testCheckSakuraCloudServerExists(resourceName, &server),
 					testCheckSakuraCloudServerAttributes(&server),
@@ -51,13 +51,13 @@ func TestAccSakuraCloudServer_basic(t *testing.T) {
 					resource.TestCheckResourceAttr(resourceName, "tags.#", "2"),
 					resource.TestCheckResourceAttr(resourceName, "tags.0", "tag1"),
 					resource.TestCheckResourceAttr(resourceName, "tags.1", "tag2"),
-					resource.TestCheckResourceAttr(resourceName, "hostname", rand),
-					resource.TestCheckResourceAttr(resourceName, "password", password),
-					resource.TestCheckResourceAttr(resourceName, "ssh_key_ids.#", "2"),
-					resource.TestCheckResourceAttr(resourceName, "ssh_key_ids.0", "100000000000"),
-					resource.TestCheckResourceAttr(resourceName, "disable_pw_auth", "true"),
-					resource.TestCheckResourceAttr(resourceName, "note_ids.#", "2"),
-					resource.TestCheckResourceAttr(resourceName, "note_ids.0", "100000000000"),
+					resource.TestCheckResourceAttr(resourceName, "disk_edit_parameter.0.hostname", rand),
+					resource.TestCheckResourceAttr(resourceName, "disk_edit_parameter.0.password", password),
+					resource.TestCheckResourceAttr(resourceName, "disk_edit_parameter.0.ssh_key_ids.#", "2"),
+					resource.TestCheckResourceAttr(resourceName, "disk_edit_parameter.0.ssh_key_ids.0", "100000000000"),
+					resource.TestCheckResourceAttr(resourceName, "disk_edit_parameter.0.disable_pw_auth", "true"),
+					resource.TestCheckResourceAttr(resourceName, "disk_edit_parameter.0.note_ids.#", "2"),
+					resource.TestCheckResourceAttr(resourceName, "disk_edit_parameter.0.note_ids.0", "100000000000"),
 					resource.TestCheckResourceAttr(resourceName, "network_interface.#", "1"),
 					resource.TestCheckResourceAttr(resourceName, "network_interface.0.upstream", "shared"),
 					resource.TestCheckResourceAttrSet(resourceName, "network_interface.0.mac_address"),
@@ -69,7 +69,7 @@ func TestAccSakuraCloudServer_basic(t *testing.T) {
 				),
 			},
 			{
-				Config: buildConfigWithArgs(testAccCheckSakuraCloudServerConfig_update, rand, password),
+				Config: buildConfigWithArgs(testAccSakuraCloudServer_update, rand, password),
 				Check: resource.ComposeTestCheckFunc(
 					testCheckSakuraCloudServerExists(resourceName, &server),
 					testCheckSakuraCloudServerAttributes(&server),
@@ -316,7 +316,7 @@ func testCheckSakuraCloudServerDestroy(s *terraform.State) error {
 	return nil
 }
 
-const testAccCheckSakuraCloudServerConfig_basic = `
+const testAccSakuraCloudServer_basic = `
 data "sakuracloud_archive" "ubuntu" {
   os_type = "ubuntu"
 }
@@ -335,11 +335,13 @@ resource "sakuracloud_server" "foobar" {
     upstream = "shared"
   }
 
-  hostname        = "{{ .arg0 }}"
-  password        = "{{ .arg1 }}"
-  ssh_key_ids     = ["100000000000", "200000000000"]
-  disable_pw_auth = true
-  note_ids        = ["100000000000", "200000000000"]
+  disk_edit_parameter {
+    hostname        = "{{ .arg0 }}"
+    password        = "{{ .arg1 }}"
+    ssh_key_ids     = ["100000000000", "200000000000"]
+    disable_pw_auth = true
+    note_ids        = ["100000000000", "200000000000"]
+  }
 }
 
 resource "sakuracloud_icon" "foobar" {
@@ -348,7 +350,7 @@ resource "sakuracloud_icon" "foobar" {
 }
 `
 
-const testAccCheckSakuraCloudServerConfig_update = `
+const testAccSakuraCloudServer_update = `
 data "sakuracloud_archive" "ubuntu" {
   os_type = "ubuntu"
 }
@@ -552,9 +554,11 @@ resource "sakuracloud_server" "foobar" {
   network_interface {
     upstream = sakuracloud_switch.foobar.id
   }
-
-  ip_address = "192.168.0.2"
-  netmask    = 24
-  gateway    = "192.168.0.1"
+  
+  disk_edit_parameter {
+    ip_address = "192.168.0.2"
+    netmask    = 24
+    gateway    = "192.168.0.1"
+  }
 }
 `

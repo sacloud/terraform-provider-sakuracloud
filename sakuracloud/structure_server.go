@@ -15,6 +15,7 @@
 package sakuracloud
 
 import (
+	"log"
 	"strings"
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
@@ -56,18 +57,23 @@ func expandServerDisks(d *schema.ResourceData, client *APIClient) []diskBuilder.
 			Client: diskBuilder.NewBuildersAPIClient(client),
 		}
 		if i == 0 && isServerDiskConfigChanged(d) {
-			b.EditParameter = &diskBuilder.UnixEditRequest{
-				HostName:            d.Get("hostname").(string),
-				Password:            d.Get("password").(string),
-				DisablePWAuth:       d.Get("disable_pw_auth").(bool),
-				EnableDHCP:          false, // 項目追加
-				ChangePartitionUUID: false, // 項目追加
-				IPAddress:           d.Get("ip_address").(string),
-				NetworkMaskLen:      d.Get("netmask").(int),
-				DefaultRoute:        d.Get("gateway").(string),
-				SSHKeyIDs:           expandSakuraCloudIDs(d, "ssh_key_ids"),
-				NoteIDs:             expandSakuraCloudIDs(d, "note_ids"),
+			if diskEdit, ok := d.GetOk("disk_edit_parameter"); ok {
+				v := mapToResourceData(diskEdit.([]interface{})[0].(map[string]interface{}))
+				log.Printf("[INFO] disk_edit_parameter is specified for Disk[%s]", diskID)
+				b.EditParameter = &diskBuilder.UnixEditRequest{
+					HostName:            stringOrDefault(v, "hostname"),
+					Password:            stringOrDefault(v, "password"),
+					DisablePWAuth:       boolOrDefault(v, "disable_pw_auth"),
+					EnableDHCP:          boolOrDefault(v, "enable_dhcp"),
+					ChangePartitionUUID: boolOrDefault(v, "change_partition_uuid"),
+					IPAddress:           stringOrDefault(v, "ip_address"),
+					NetworkMaskLen:      intOrDefault(v, "netmask"),
+					DefaultRoute:        stringOrDefault(v, "gateway"),
+					SSHKeyIDs:           expandSakuraCloudIDs(d, "ssh_key_ids"),
+					NoteIDs:             expandSakuraCloudIDs(d, "note_ids"),
+				}
 			}
+
 		}
 		builders = append(builders, b)
 	}
