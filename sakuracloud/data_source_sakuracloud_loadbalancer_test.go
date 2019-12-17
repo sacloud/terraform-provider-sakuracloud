@@ -62,7 +62,7 @@ resource "sakuracloud_load_balancer" "foobar" {
 }
 
 data "sakuracloud_load_balancer" "foobar" {
-  filters {
+  filter {
 	names = [sakuracloud_load_balancer.foobar.name]
   }
 }`

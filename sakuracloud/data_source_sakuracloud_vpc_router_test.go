@@ -55,7 +55,7 @@ resource sakuracloud_vpc_router "foobar" {
 }
 
 data "sakuracloud_vpc_router" "foobar" {
-  filters {
+  filter {
 	names = [sakuracloud_vpc_router.foobar.name]
   }
 }`

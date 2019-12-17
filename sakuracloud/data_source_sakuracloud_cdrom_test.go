@@ -46,8 +46,8 @@ func TestAccSakuraCloudDataSourceCDROM_basic(t *testing.T) {
 
 var testAccSakuraCloudDataSourceCDROM_basic = `
 data "sakuracloud_cdrom" "foobar" {
-  filters {
-    conditions {
+  filter {
+    condition {
 	  name    = "Name"
 	  values = ["Parted Magic 2013_08_01"]
     }

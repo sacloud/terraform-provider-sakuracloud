@@ -53,7 +53,7 @@ resource "sakuracloud_dns" "foobar" {
 }
 
 data "sakuracloud_dns" "foobar" {
-  filters {
+  filter {
     names = [sakuracloud_dns.foobar.zone]
   }
 }`

@@ -55,7 +55,7 @@ resource "sakuracloud_disk" "foobar"{
 }
 
 data "sakuracloud_disk" "foobar" {
-  filters {
+  filter {
 	names = [sakuracloud_disk.foobar.name]
   }
 }`

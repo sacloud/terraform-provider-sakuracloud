@@ -68,7 +68,7 @@ resource "sakuracloud_nfs" "foobar" {
 }
 
 data "sakuracloud_nfs" "foobar" {
-  filters {
+  filter {
 	names = [sakuracloud_nfs.foobar.name]
   }
 }`
