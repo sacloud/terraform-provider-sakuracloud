@@ -1,9 +1,6 @@
-VETARGS?=-all
+PKG_NAME         ?= sakuracloud
+CURRENT_VERSION  ?= $(shell gobump show -r sakuracloud/)
 
-GOFMT_FILES      ?= $$(find . -name '*.go' | grep -v vendor)
-GOLINT_TARGETS   ?= $$(golint github.com/sacloud/terraform-provider-sakuracloud/sakuracloud | grep -v 'underscores in Go names' | tee /dev/stderr)
-
-CURRENT_VERSION  ?= $(shell git log --merges --oneline | perl -ne 'if(m/^.+Merge pull request \#[0-9]+ from .+\/bump-version-([0-9\.]+)/){print $$1;exit}')
 AUTHOR          ?="terraform-provider-sakuracloud authors"
 COPYRIGHT_YEAR  ?="2016-2019"
 COPYRIGHT_FILES ?=$$(find . \( -name "*.dockerfile" -or -name "*.go" -or -name "*.sh" -or -name "*.pl" -or -name "*.bash" \) -print | grep -v "/vendor/")
@@ -11,10 +8,9 @@ COPYRIGHT_FILES ?=$$(find . \( -name "*.dockerfile" -or -name "*.go" -or -name "
 BUILD_LDFLAGS = "-s -w \
 	  -X github.com/sacloud/terraform-provider-sakuracloud/sakuracloud.Revision=`git rev-parse --short HEAD` \
 	  -X github.com/sacloud/terraform-provider-sakuracloud/sakuracloud.Version=$(CURRENT_VERSION)"
-
 export GO111MODULE=on
 
-default: vet build
+default: fmt goimports lint tflint
 
 clean:
 	rm -Rf $(CURDIR)/bin/*
@@ -23,8 +19,10 @@ clean:
 tools:
 	GO111MODULE=off go get -u golang.org/x/tools/cmd/goimports
 	GO111MODULE=off go get -u github.com/motemen/gobump/cmd/gobump
-	GO111MODULE=off go get -u golang.org/x/lint/golint
 	GO111MODULE=off go get github.com/sacloud/addlicense
+	GO111MODULE=off go get -u github.com/client9/misspell/cmd/misspell
+	GO111MODULE=off go get -u github.com/golangci/golangci-lint/cmd/golangci-lint
+	GO111MODULE=off go get -u github.com/bflad/tfproviderlint/cmd/tfproviderlint
 
 build:
 	OS="`go env GOOS`" ARCH="`go env GOARCH`" ARCHIVE= BUILD_LDFLAGS=$(BUILD_LDFLAGS) CURRENT_VERSION=$(CURRENT_VERSION) sh -c "'$(CURDIR)/scripts/build.sh'"
@@ -67,23 +65,21 @@ testacc:
 testfake:
 	FAKE_MODE=1 TF_ACC=1 SAKURACLOUD_APPEND_USER_AGENT="(Acceptance Test)" go test -mod=vendor -v $(TESTARGS) -timeout 240m ./...
 
-vet: golint
-	@echo "go vet $(VETARGS) ."
-	@go vet $(VETARGS) ; if [ $$? -eq 1 ]; then \
-		echo ""; \
-		echo "Vet found suspicious constructs. Please check the reported constructs"; \
-		echo "and fix them if necessary before submitting the code for review."; \
-		exit 1; \
-	fi
+lint:
+	golangci-lint run ./...
 
-golint: goimports
-	test -z "$(GOLINT_TARGETS)"
+tflint:
+	@tfproviderlint \
+        -AT001 -AT002 -AT003 -AT004\
+        -R001 -R002 -R004\
+        -S001 -S002 -S003 -S004 -S005 -S006 -S007 -S008 -S009 -S010 -S011 -S012 -S013 -S014 -S015 -S016 -S017 -S018 -S019\
+        ./$(PKG_NAME)
 
-goimports: fmt
-	goimports -l -w $(GOFMT_FILES)
+goimports:
+	goimports -l -w $(PKG_NAME)/
 
 fmt:
-	gofmt -w $(GOFMT_FILES)
+	find . -name '*.go' | grep -v vendor | xargs gofmt -s -w
 
 .PHONY: build-docs serve-docs lint-docs
 build-docs:
