@@ -52,7 +52,7 @@ resource "sakuracloud_bridge" "foobar" {
   description = "description"
 }
 data "sakuracloud_bridge" "foobar" {
-  filters {
+  filter {
     names = [sakuracloud_bridge.foobar.name]
   }
 }`

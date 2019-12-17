@@ -70,7 +70,7 @@ resource "sakuracloud_database" "foobar" {
 }
 
 data "sakuracloud_database" "foobar" {
-  filters {
+  filter {
     names = [sakuracloud_database.foobar.name]
   }
 }`

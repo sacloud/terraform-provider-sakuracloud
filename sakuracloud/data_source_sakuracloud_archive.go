@@ -39,7 +39,7 @@ func dataSourceSakuraCloudArchive() *schema.Resource {
 				Type:          schema.TypeString,
 				Optional:      true,
 				ValidateFunc:  validation.StringInSlice(ostype.OSTypeShortNames, false),
-				ConflictsWith: []string{"filters"},
+				ConflictsWith: []string{"filter"},
 			},
 			"name": {
 				Type:     schema.TypeString,

@@ -66,7 +66,7 @@ resource "sakuracloud_gslb" "foobar" {
 }
 
 data "sakuracloud_gslb" "foobar" {
-  filters {
+  filter {
 	names = [sakuracloud_gslb.foobar.name]
   }
 }`

@@ -94,7 +94,7 @@ resource sakuracloud_server "foobar" {
 }
 
 data sakuracloud_dns "zone" {
-  filters {
+  filter {
     names = ["{{ .arg1 }}"]
   }
 }

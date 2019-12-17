@@ -124,7 +124,7 @@ func testCheckSakuraCloudIPv4PtrDestroy(s *terraform.State) error {
 
 var testAccCheckSakuraCloudIPv4PtrConfig_basic = `
 data sakuracloud_dns "dns" {
-  filters {
+  filter {
     names = ["%s"]
   }
 }
@@ -150,7 +150,7 @@ resource "sakuracloud_ipv4_ptr" "foobar" {
 
 var testAccCheckSakuraCloudIPv4PtrConfig_update = `
 data sakuracloud_dns "dns" {
-  filters {
+  filter {
     names = ["%s"]
   }
 }

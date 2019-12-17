@@ -245,7 +245,7 @@ func expandSearchFilter(rawFilters interface{}) search.Filter {
 		}
 	}
 	// others
-	if rawConditions, ok := mv["conditions"]; ok {
+	if rawConditions, ok := mv["condition"]; ok {
 		for _, rawCondition := range rawConditions.([]interface{}) {
 			mv := rawCondition.(map[string]interface{})
 
