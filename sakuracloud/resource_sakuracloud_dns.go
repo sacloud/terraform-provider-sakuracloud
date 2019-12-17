@@ -197,17 +197,14 @@ func resourceSakuraCloudDNSDelete(d *schema.ResourceData, meta interface{}) erro
 }
 
 func setDNSResourceData(ctx context.Context, d *schema.ResourceData, client *APIClient, data *sacloud.DNS) error {
-	d.Set("zone", data.Name)
-	d.Set("icon_id", data.IconID.String())
-	d.Set("description", data.Description)
-	if err := d.Set("tags", data.Tags); err != nil {
-		return err
-	}
+	d.Set("zone", data.Name)               // nolint
+	d.Set("icon_id", data.IconID.String()) // nolint
+	d.Set("description", data.Description) // nolint
 	if err := d.Set("dns_servers", data.DNSNameServers); err != nil {
 		return err
 	}
 	if err := d.Set("record", flattenDNSRecords(data)); err != nil {
 		return err
 	}
-	return nil
+	return d.Set("tags", data.Tags)
 }

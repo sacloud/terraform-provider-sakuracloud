@@ -231,20 +231,17 @@ func resourceSakuraCloudGSLBDelete(d *schema.ResourceData, meta interface{}) err
 }
 
 func setGSLBResourceData(ctx context.Context, d *schema.ResourceData, client *APIClient, data *sacloud.GSLB) error {
-	d.Set("name", data.Name)
-	d.Set("fqdn", data.FQDN)
-	d.Set("sorry_server", data.SorryServer)
-	d.Set("icon_id", data.IconID.String())
-	d.Set("description", data.Description)
-	d.Set("weighted", data.Weighted.Bool())
-	if err := d.Set("tags", data.Tags); err != nil {
-		return err
-	}
+	d.Set("name", data.Name)                // nolint
+	d.Set("fqdn", data.FQDN)                // nolint
+	d.Set("sorry_server", data.SorryServer) // nolint
+	d.Set("icon_id", data.IconID.String())  // nolint
+	d.Set("description", data.Description)  // nolint
+	d.Set("weighted", data.Weighted.Bool()) // nolint
 	if err := d.Set("health_check", flattenGSLBHealthCheck(data)); err != nil {
 		return err
 	}
 	if err := d.Set("server", flattenGSLBServers(data)); err != nil {
 		return err
 	}
-	return nil
+	return d.Set("tags", data.Tags)
 }

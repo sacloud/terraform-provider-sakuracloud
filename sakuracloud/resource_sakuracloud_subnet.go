@@ -205,7 +205,7 @@ func resourceSakuraCloudSubnetDelete(d *schema.ResourceData, meta interface{}) e
 	return nil
 }
 
-func setSubnetResourceData(ctx context.Context, d *schema.ResourceData, client *APIClient, data *sacloud.Subnet) error {
+func setSubnetResourceData(_ context.Context, d *schema.ResourceData, client *APIClient, data *sacloud.Subnet) error {
 	if data.SwitchID.IsEmpty() {
 		return fmt.Errorf("error reading SakuraCloud Subnet[%s]: %s", data.ID, "switch is nil")
 	}
@@ -217,14 +217,14 @@ func setSubnetResourceData(ctx context.Context, d *schema.ResourceData, client *
 		addrs = append(addrs, ip.IPAddress)
 	}
 
-	d.Set("switch_id", data.SwitchID.String())
-	d.Set("internet_id", data.InternetID.String())
-	d.Set("netmask", data.NetworkMaskLen)
-	d.Set("next_hop", data.NextHop)
-	d.Set("network_address", data.NetworkAddress)
-	d.Set("min_ip_address", data.IPAddresses[0].IPAddress)
-	d.Set("max_ip_address", data.IPAddresses[len(data.IPAddresses)-1].IPAddress)
-	d.Set("ip_addresses", addrs)
-	d.Set("zone", getZone(d, client))
+	d.Set("switch_id", data.SwitchID.String())                                   // nolint
+	d.Set("internet_id", data.InternetID.String())                               // nolint
+	d.Set("netmask", data.NetworkMaskLen)                                        // nolint
+	d.Set("next_hop", data.NextHop)                                              // nolint
+	d.Set("network_address", data.NetworkAddress)                                // nolint
+	d.Set("min_ip_address", data.IPAddresses[0].IPAddress)                       // nolint
+	d.Set("max_ip_address", data.IPAddresses[len(data.IPAddresses)-1].IPAddress) // nolint
+	d.Set("ip_addresses", addrs)                                                 // nolint
+	d.Set("zone", getZone(d, client))                                            // nolint
 	return nil
 }

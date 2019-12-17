@@ -159,8 +159,8 @@ func resourceSakuraCloudBridgeDelete(d *schema.ResourceData, meta interface{}) e
 }
 
 func setBridgeResourceData(ctx context.Context, d *schema.ResourceData, client *APIClient, data *sacloud.Bridge) error {
-	d.Set("name", data.Name)
-	d.Set("description", data.Description)
-	d.Set("zone", getZone(d, client))
+	d.Set("name", data.Name)               // nolint
+	d.Set("description", data.Description) // nolint
+	d.Set("zone", getZone(d, client))      // nolint
 	return nil
 }

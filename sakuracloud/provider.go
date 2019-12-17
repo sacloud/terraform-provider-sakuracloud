@@ -46,8 +46,8 @@ func Provider() terraform.ResourceProvider {
 			},
 			"zone": {
 				Type:         schema.TypeString,
-				Optional:     true,
-				DefaultFunc:  schema.MultiEnvDefaultFunc([]string{"SAKURACLOUD_ZONE"}, nil),
+				Required:     true,
+				DefaultFunc:  schema.MultiEnvDefaultFunc([]string{"SAKURACLOUD_ZONE"}, defaultZone),
 				Description:  "Target SakuraCloud Zone(is1a | is1b | tk1a | tk1v)",
 				InputDefault: defaultZone,
 			},
@@ -180,11 +180,6 @@ func Provider() terraform.ResourceProvider {
 }
 
 func providerConfigure(d *schema.ResourceData, terraformVersion string) (interface{}, error) {
-
-	if _, ok := d.GetOk("zone"); !ok {
-		d.Set("zone", defaultZone)
-	}
-
 	config := Config{
 		AccessToken:         d.Get("token").(string),
 		AccessTokenSecret:   d.Get("secret").(string),

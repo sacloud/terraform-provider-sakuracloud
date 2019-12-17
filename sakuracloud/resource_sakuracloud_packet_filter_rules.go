@@ -185,6 +185,6 @@ func resourceSakuraCloudPacketFilterRulesDelete(d *schema.ResourceData, meta int
 }
 
 func setPacketFilterRulesResourceData(ctx context.Context, d *schema.ResourceData, client *APIClient, data *sacloud.PacketFilter) error {
-	d.Set("zone", getZone(d, client))
+	d.Set("zone", getZone(d, client)) // nolint
 	return d.Set("expression", flattenPacketFilterExpressions(data))
 }

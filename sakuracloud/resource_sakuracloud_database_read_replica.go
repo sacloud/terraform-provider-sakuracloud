@@ -231,19 +231,19 @@ func setDatabaseReadReplicaResourceData(ctx context.Context, d *schema.ResourceD
 		return err
 	}
 
-	d.Set("master_id", data.ReplicationSetting.ApplianceID.String())
-	d.Set("name", data.Name)
-	d.Set("switch_id", data.SwitchID.String())
-	d.Set("netmask", data.NetworkMaskLen)
-	d.Set("gateway", data.DefaultRoute)
+	d.Set("master_id", data.ReplicationSetting.ApplianceID.String()) // nolint
+	d.Set("name", data.Name)                                         // nolint
+	d.Set("switch_id", data.SwitchID.String())                       // nolint
+	d.Set("netmask", data.NetworkMaskLen)                            // nolint
+	d.Set("gateway", data.DefaultRoute)                              // nolint
 	if err := d.Set("ip_addresses", data.IPAddresses); err != nil {
 		return err
 	}
 	if err := d.Set("source_ranges", data.CommonSetting.SourceNetwork); err != nil {
 		return err
 	}
-	d.Set("icon_id", data.IconID.String())
-	d.Set("description", data.Description)
-	d.Set("zone", getZone(d, client))
+	d.Set("icon_id", data.IconID.String()) // nolint
+	d.Set("description", data.Description) // nolint
+	d.Set("zone", getZone(d, client))      // nolint
 	return nil
 }

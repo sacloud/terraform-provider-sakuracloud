@@ -142,12 +142,19 @@ func resourceSakuraCloudDNSRecordRead(d *schema.ResourceData, meta interface{}) 
 	}
 
 	r := flattenDNSRecord(record)
-	for k, v := range r {
-		if err := d.Set(k, v); err != nil {
-			return err
-		}
-	}
+	d.Set("name", r["name"])   // nolint
+	d.Set("type", r["type"])   // nolint
+	d.Set("value", r["value"]) // nolint
+	d.Set("ttl", r["ttl"])     // nolint
 
+	switch record.Type {
+	case "MX":
+		d.Set("priority", r["priority"]) // nolint
+	case "SRV":
+		d.Set("priority", r["priority"]) // nolint
+		d.Set("weight", r["weight"])     // nolint
+		d.Set("port", r["port"])         // nolint
+	}
 	return nil
 }
 
