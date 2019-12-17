@@ -63,7 +63,6 @@ type Config struct {
 	APIRequestRateLimit int
 
 	terraformVersion string
-	initOnce         sync.Once
 }
 
 // APIClient for SakuraCloud API
