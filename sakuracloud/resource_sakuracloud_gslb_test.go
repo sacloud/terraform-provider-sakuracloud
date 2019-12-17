@@ -156,7 +156,7 @@ func testCheckSakuraCloudGSLBDestroy(s *terraform.State) error {
 	return nil
 }
 
-func TestAccImportSakuraCloudGSLB(t *testing.T) {
+func TestAccImportSakuraCloudGSLB_basic(t *testing.T) {
 	rand := randomName()
 	checkFn := func(s []*terraform.InstanceState) error {
 		if len(s) != 1 {

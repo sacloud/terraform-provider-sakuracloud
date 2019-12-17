@@ -59,7 +59,7 @@ func TestAccSakuraCloudIcon_basic(t *testing.T) {
 	})
 }
 
-func TestAccResourceSakuraCloudIconWithResource(t *testing.T) {
+func TestAccSakuraCloudIcon_withSwitch(t *testing.T) {
 	resourceName := "sakuracloud_icon.foobar"
 	name := randomName()
 
