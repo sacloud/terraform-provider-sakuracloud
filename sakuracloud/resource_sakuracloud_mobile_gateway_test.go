@@ -156,7 +156,7 @@ func testCheckSakuraCloudMobileGatewayDestroy(s *terraform.State) error {
 	return nil
 }
 
-func TestAccImportSakuraCloudMobileGateway(t *testing.T) {
+func TestAccImportSakuraCloudMobileGateway_basic(t *testing.T) {
 	rand := randomName()
 
 	checkFn := func(s []*terraform.InstanceState) error {

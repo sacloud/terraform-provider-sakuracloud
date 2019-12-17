@@ -117,7 +117,7 @@ func testCheckSakuraCloudArchiveDestroy(s *terraform.State) error {
 	return nil
 }
 
-func TestAccImportSakuraCloudArchive(t *testing.T) {
+func TestAccImportSakuraCloudArchive_basic(t *testing.T) {
 	skipIfFakeModeEnabled(t)
 
 	rand := randomName()

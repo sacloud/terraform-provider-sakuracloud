@@ -34,7 +34,7 @@ var (
 	testDomain string
 )
 
-func TestAccResourceSakuraCloudIPv4Ptr(t *testing.T) {
+func TestAccSakuraCloudIPv4Ptr_basic(t *testing.T) {
 	skipIfFakeModeEnabled(t)
 
 	var ip sacloud.IPAddress

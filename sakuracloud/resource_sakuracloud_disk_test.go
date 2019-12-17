@@ -146,7 +146,7 @@ func testCheckSakuraCloudDiskDestroy(s *terraform.State) error {
 	return nil
 }
 
-func TestAccImportSakuraCloudDisk(t *testing.T) {
+func TestAccImportSakuraCloudDisk_basic(t *testing.T) {
 	rand := randomName()
 	checkFn := func(s []*terraform.InstanceState) error {
 		if len(s) != 1 {

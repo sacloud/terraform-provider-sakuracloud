@@ -80,7 +80,7 @@ func TestAccSakuraCloudVPCRouter_basic(t *testing.T) {
 	})
 }
 
-func TestAccResourceSakuraCloudVPCRouter_Full(t *testing.T) {
+func TestAccSakuraCloudVPCRouter_Full(t *testing.T) {
 	resourceName := "sakuracloud_vpc_router.foobar"
 	rand := randomName()
 
