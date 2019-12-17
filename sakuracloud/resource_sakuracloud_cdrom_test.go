@@ -188,10 +188,10 @@ func TestAccImportSakuraCloudCDROM(t *testing.T) {
 			testCheckSakuraCloudIconDestroy,
 		),
 		Steps: []resource.TestStep{
-			resource.TestStep{
+			{
 				Config: buildConfigWithArgs(testAccSakuraCloudCDROM_basic, rand),
 			},
-			resource.TestStep{
+			{
 				ResourceName:      resourceName,
 				ImportState:       true,
 				ImportStateCheck:  checkFn,
