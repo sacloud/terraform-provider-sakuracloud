@@ -202,7 +202,7 @@ func resourceSakuraCloudNFSUpdate(d *schema.ResourceData, meta interface{}) erro
 		return fmt.Errorf("could not read SakuraCloud NFS[%s]: %s", d.Id(), err)
 	}
 
-	nfs, err = nfsOp.Update(ctx, zone, nfs.ID, expandNFSUpdateRequest(d))
+	_, err = nfsOp.Update(ctx, zone, nfs.ID, expandNFSUpdateRequest(d))
 	if err != nil {
 		return fmt.Errorf("updating SakuraCloud NFS[%s] is failed: %s", d.Id(), err)
 	}

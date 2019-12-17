@@ -197,7 +197,7 @@ func resourceSakuraCloudDiskUpdate(d *schema.ResourceData, meta interface{}) err
 		return fmt.Errorf("could not read SakuraCloud Disk[%s]: %s", d.Id(), err)
 	}
 
-	disk, err = diskOp.Update(ctx, zone, disk.ID, expandDiskUpdateRequest(d))
+	_, err = diskOp.Update(ctx, zone, disk.ID, expandDiskUpdateRequest(d))
 	if err != nil {
 		return fmt.Errorf("updating SakuraCloud Disk[%s] is failed: %s", d.Id(), err)
 	}

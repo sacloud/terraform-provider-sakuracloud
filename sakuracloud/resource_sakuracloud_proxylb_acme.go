@@ -210,7 +210,7 @@ func resourceSakuraCloudProxyLBACMEDelete(d *schema.ResourceData, meta interface
 	}
 
 	// clear
-	proxyLB, err = proxyLBOp.UpdateSettings(ctx, proxyLB.ID, &sacloud.ProxyLBUpdateSettingsRequest{
+	_, err = proxyLBOp.UpdateSettings(ctx, proxyLB.ID, &sacloud.ProxyLBUpdateSettingsRequest{
 		HealthCheck: proxyLB.HealthCheck,
 		SorryServer: proxyLB.SorryServer,
 		BindPorts:   proxyLB.BindPorts,
