@@ -160,7 +160,7 @@ func expandSakuraCloudIDs(d resourceValueGettable, key string) []types.ID {
 func expandStringList(configured []interface{}) []string {
 	vs := make([]string, 0, len(configured))
 	for _, v := range configured {
-		vs = append(vs, string(v.(string)))
+		vs = append(vs, v.(string))
 	}
 	return vs
 }

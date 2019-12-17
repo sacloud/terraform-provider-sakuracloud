@@ -63,7 +63,7 @@ func flattenSimpleMonitorNotifyInterval(simpleMonitor *sacloud.SimpleMonitor) in
 		return 0
 	}
 	// seconds => hours
-	return int(interval / 60 / 60)
+	return interval / 60 / 60
 }
 
 func flattenSimpleMonitorHealthCheck(simpleMonitor *sacloud.SimpleMonitor) []interface{} {
