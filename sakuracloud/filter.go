@@ -107,8 +107,6 @@ func filterNoResultErr() error {
 	return fmt.Errorf(filterNoResultMessage)
 }
 
-type filterFunc func(target interface{}, cond []string) bool
-
 type nameFilterable interface {
 	GetName() string
 }
