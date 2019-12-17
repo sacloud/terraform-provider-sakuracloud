@@ -139,12 +139,11 @@ func resourceSakuraCloudServer() *schema.Resource {
 				Elem:     &schema.Schema{Type: schema.TypeString},
 			},
 			"zone": {
-				Type:         schema.TypeString,
-				Optional:     true,
-				Computed:     true,
-				ForceNew:     true,
-				Description:  "target SakuraCloud zone",
-				ValidateFunc: validateZone([]string{"is1a", "is1b", "tk1a", "tk1v"}),
+				Type:        schema.TypeString,
+				Optional:    true,
+				Computed:    true,
+				ForceNew:    true,
+				Description: "target SakuraCloud zone",
 			},
 			"hostname": {
 				Type:         schema.TypeString,
@@ -204,7 +203,10 @@ func resourceSakuraCloudServer() *schema.Resource {
 }
 
 func resourceSakuraCloudServerCreate(d *schema.ResourceData, meta interface{}) error {
-	client, zone := getSacloudClient(d, meta)
+	client, zone, err := sakuraCloudClient(d, meta)
+	if err != nil {
+		return err
+	}
 	ctx, cancel := operationContext(d, schema.TimeoutCreate)
 	defer cancel()
 
@@ -224,7 +226,10 @@ func resourceSakuraCloudServerCreate(d *schema.ResourceData, meta interface{}) e
 }
 
 func resourceSakuraCloudServerRead(d *schema.ResourceData, meta interface{}) error {
-	client, zone := getSacloudClient(d, meta)
+	client, zone, err := sakuraCloudClient(d, meta)
+	if err != nil {
+		return err
+	}
 	ctx, cancel := operationContext(d, schema.TimeoutRead)
 	defer cancel()
 
@@ -243,7 +248,10 @@ func resourceSakuraCloudServerRead(d *schema.ResourceData, meta interface{}) err
 }
 
 func resourceSakuraCloudServerUpdate(d *schema.ResourceData, meta interface{}) error {
-	client, zone := getSacloudClient(d, meta)
+	client, zone, err := sakuraCloudClient(d, meta)
+	if err != nil {
+		return err
+	}
 	ctx, cancel := operationContext(d, schema.TimeoutUpdate)
 	defer cancel()
 
@@ -273,7 +281,10 @@ func resourceSakuraCloudServerUpdate(d *schema.ResourceData, meta interface{}) e
 }
 
 func resourceSakuraCloudServerDelete(d *schema.ResourceData, meta interface{}) error {
-	client, zone := getSacloudClient(d, meta)
+	client, zone, err := sakuraCloudClient(d, meta)
+	if err != nil {
+		return err
+	}
 	ctx, cancel := operationContext(d, schema.TimeoutDelete)
 	defer cancel()
 

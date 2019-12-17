@@ -79,7 +79,10 @@ func resourceSakuraCloudNote() *schema.Resource {
 }
 
 func resourceSakuraCloudNoteCreate(d *schema.ResourceData, meta interface{}) error {
-	client, _ := getSacloudClient(d, meta)
+	client, _, err := sakuraCloudClient(d, meta)
+	if err != nil {
+		return err
+	}
 	ctx, cancel := operationContext(d, schema.TimeoutCreate)
 	defer cancel()
 
@@ -95,7 +98,10 @@ func resourceSakuraCloudNoteCreate(d *schema.ResourceData, meta interface{}) err
 }
 
 func resourceSakuraCloudNoteRead(d *schema.ResourceData, meta interface{}) error {
-	client, _ := getSacloudClient(d, meta)
+	client, _, err := sakuraCloudClient(d, meta)
+	if err != nil {
+		return err
+	}
 	ctx, cancel := operationContext(d, schema.TimeoutRead)
 	defer cancel()
 
@@ -114,7 +120,10 @@ func resourceSakuraCloudNoteRead(d *schema.ResourceData, meta interface{}) error
 }
 
 func resourceSakuraCloudNoteUpdate(d *schema.ResourceData, meta interface{}) error {
-	client, _ := getSacloudClient(d, meta)
+	client, _, err := sakuraCloudClient(d, meta)
+	if err != nil {
+		return err
+	}
 	ctx, cancel := operationContext(d, schema.TimeoutUpdate)
 	defer cancel()
 
@@ -134,7 +143,10 @@ func resourceSakuraCloudNoteUpdate(d *schema.ResourceData, meta interface{}) err
 }
 
 func resourceSakuraCloudNoteDelete(d *schema.ResourceData, meta interface{}) error {
-	client, _ := getSacloudClient(d, meta)
+	client, _, err := sakuraCloudClient(d, meta)
+	if err != nil {
+		return err
+	}
 	ctx, cancel := operationContext(d, schema.TimeoutDelete)
 	defer cancel()
 

@@ -25,9 +25,6 @@ import (
 	"github.com/sacloud/libsacloud/v2/sacloud/types"
 )
 
-// TODO ゾーンの扱いを検討
-var deletionWaiterTargetZones = []string{"is1a", "is1b", "tk1a", "tk1v"}
-
 type deletionWaiterFindFunc func(context.Context, *APIClient, string, types.ID) (bool, error)
 
 func waitForDeletionByPrivateHostID(ctx context.Context, client *APIClient, zone string, privateHostID types.ID) error {
@@ -116,7 +113,7 @@ func waitForDeletionAllZone(ctx context.Context, client *APIClient, id types.ID,
 	errCh := make(chan error)
 	compCh := make(chan struct{})
 
-	for _, zone := range deletionWaiterTargetZones {
+	for _, zone := range client.zones {
 		for _, f := range finder {
 			wg.Add(1)
 			go func(f deletionWaiterFindFunc, zone string) {

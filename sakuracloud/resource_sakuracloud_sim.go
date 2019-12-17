@@ -102,7 +102,10 @@ func resourceSakuraCloudSIM() *schema.Resource {
 }
 
 func resourceSakuraCloudSIMCreate(d *schema.ResourceData, meta interface{}) error {
-	client, _ := getSacloudClient(d, meta)
+	client, _, err := sakuraCloudClient(d, meta)
+	if err != nil {
+		return err
+	}
 	ctx, cancel := operationContext(d, schema.TimeoutCreate)
 	defer cancel()
 
@@ -125,7 +128,10 @@ func resourceSakuraCloudSIMCreate(d *schema.ResourceData, meta interface{}) erro
 }
 
 func resourceSakuraCloudSIMRead(d *schema.ResourceData, meta interface{}) error {
-	client, _ := getSacloudClient(d, meta)
+	client, _, err := sakuraCloudClient(d, meta)
+	if err != nil {
+		return err
+	}
 	ctx, cancel := operationContext(d, schema.TimeoutRead)
 	defer cancel()
 
@@ -143,7 +149,10 @@ func resourceSakuraCloudSIMRead(d *schema.ResourceData, meta interface{}) error 
 }
 
 func resourceSakuraCloudSIMUpdate(d *schema.ResourceData, meta interface{}) error {
-	client, _ := getSacloudClient(d, meta)
+	client, _, err := sakuraCloudClient(d, meta)
+	if err != nil {
+		return err
+	}
 	ctx, cancel := operationContext(d, schema.TimeoutUpdate)
 	defer cancel()
 
@@ -172,7 +181,10 @@ func resourceSakuraCloudSIMUpdate(d *schema.ResourceData, meta interface{}) erro
 }
 
 func resourceSakuraCloudSIMDelete(d *schema.ResourceData, meta interface{}) error {
-	client, _ := getSacloudClient(d, meta)
+	client, _, err := sakuraCloudClient(d, meta)
+	if err != nil {
+		return err
+	}
 	ctx, cancel := operationContext(d, schema.TimeoutDelete)
 	defer cancel()
 

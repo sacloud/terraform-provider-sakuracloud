@@ -73,19 +73,21 @@ func resourceSakuraCloudPrivateHost() *schema.Resource {
 				Computed: true,
 			},
 			"zone": {
-				Type:         schema.TypeString,
-				Optional:     true,
-				Computed:     true,
-				ForceNew:     true,
-				Description:  "target SakuraCloud zone",
-				ValidateFunc: validateZone([]string{"is1a", "is1b", "tk1a"}),
+				Type:        schema.TypeString,
+				Optional:    true,
+				Computed:    true,
+				ForceNew:    true,
+				Description: "target SakuraCloud zone",
 			},
 		},
 	}
 }
 
 func resourceSakuraCloudPrivateHostCreate(d *schema.ResourceData, meta interface{}) error {
-	client, zone := getSacloudClient(d, meta)
+	client, zone, err := sakuraCloudClient(d, meta)
+	if err != nil {
+		return err
+	}
 	ctx, cancel := operationContext(d, schema.TimeoutCreate)
 	defer cancel()
 
@@ -106,7 +108,10 @@ func resourceSakuraCloudPrivateHostCreate(d *schema.ResourceData, meta interface
 }
 
 func resourceSakuraCloudPrivateHostRead(d *schema.ResourceData, meta interface{}) error {
-	client, zone := getSacloudClient(d, meta)
+	client, zone, err := sakuraCloudClient(d, meta)
+	if err != nil {
+		return err
+	}
 	ctx, cancel := operationContext(d, schema.TimeoutRead)
 	defer cancel()
 
@@ -124,7 +129,10 @@ func resourceSakuraCloudPrivateHostRead(d *schema.ResourceData, meta interface{}
 }
 
 func resourceSakuraCloudPrivateHostUpdate(d *schema.ResourceData, meta interface{}) error {
-	client, zone := getSacloudClient(d, meta)
+	client, zone, err := sakuraCloudClient(d, meta)
+	if err != nil {
+		return err
+	}
 	ctx, cancel := operationContext(d, schema.TimeoutUpdate)
 	defer cancel()
 
@@ -144,7 +152,10 @@ func resourceSakuraCloudPrivateHostUpdate(d *schema.ResourceData, meta interface
 }
 
 func resourceSakuraCloudPrivateHostDelete(d *schema.ResourceData, meta interface{}) error {
-	client, zone := getSacloudClient(d, meta)
+	client, zone, err := sakuraCloudClient(d, meta)
+	if err != nil {
+		return err
+	}
 	ctx, cancel := operationContext(d, schema.TimeoutDelete)
 	defer cancel()
 

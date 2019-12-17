@@ -106,7 +106,10 @@ func resourceSakuraCloudProxyLBACME() *schema.Resource {
 }
 
 func resourceSakuraCloudProxyLBACMECreate(d *schema.ResourceData, meta interface{}) error {
-	client, _ := getSacloudClient(d, meta)
+	client, _, err := sakuraCloudClient(d, meta)
+	if err != nil {
+		return err
+	}
 	ctx, cancel := operationContext(d, schema.TimeoutCreate)
 	defer cancel()
 
@@ -163,7 +166,10 @@ func resourceSakuraCloudProxyLBACMECreate(d *schema.ResourceData, meta interface
 }
 
 func resourceSakuraCloudProxyLBACMERead(d *schema.ResourceData, meta interface{}) error {
-	client, _ := getSacloudClient(d, meta)
+	client, _, err := sakuraCloudClient(d, meta)
+	if err != nil {
+		return err
+	}
 	ctx, cancel := operationContext(d, schema.TimeoutRead)
 	defer cancel()
 
@@ -184,7 +190,10 @@ func resourceSakuraCloudProxyLBACMERead(d *schema.ResourceData, meta interface{}
 }
 
 func resourceSakuraCloudProxyLBACMEDelete(d *schema.ResourceData, meta interface{}) error {
-	client, _ := getSacloudClient(d, meta)
+	client, _, err := sakuraCloudClient(d, meta)
+	if err != nil {
+		return err
+	}
 	ctx, cancel := operationContext(d, schema.TimeoutDelete)
 	defer cancel()
 
