@@ -25,9 +25,8 @@ var (
 	defaultZone          = "is1b"
 	defaultRetryMax      = 10
 	defaultRetryInterval = 5
+	defaultZones         = []string{"is1a", "is1b", "tk1a", "tk1v"}
 )
-
-var allowZones = []string{"is1a", "is1b", "tk1a", "tk1v"}
 
 // Provider returns a terraform.ResourceProvider.
 func Provider() terraform.ResourceProvider {
@@ -51,7 +50,12 @@ func Provider() terraform.ResourceProvider {
 				DefaultFunc:  schema.MultiEnvDefaultFunc([]string{"SAKURACLOUD_ZONE"}, nil),
 				Description:  "Target SakuraCloud Zone(is1a | is1b | tk1a | tk1v)",
 				InputDefault: defaultZone,
-				ValidateFunc: validateZone(allowZones),
+			},
+			"zones": {
+				Type:        schema.TypeList,
+				Optional:    true,
+				Elem:        &schema.Schema{Type: schema.TypeString},
+				Description: "Available SakuraCloud Zones(default: [is1a, is1b, tk1a, tk1v])",
 			},
 			"accept_language": {
 				Type:        schema.TypeString,
@@ -66,13 +70,13 @@ func Provider() terraform.ResourceProvider {
 			"retry_max": {
 				Type:         schema.TypeInt,
 				Optional:     true,
-				DefaultFunc:  schema.MultiEnvDefaultFunc([]string{"SAKURACLOUD_RETRY_MAX"}, 10),
+				DefaultFunc:  schema.MultiEnvDefaultFunc([]string{"SAKURACLOUD_RETRY_MAX"}, defaultRetryMax),
 				ValidateFunc: validation.IntBetween(0, 100),
 			},
 			"retry_interval": {
 				Type:         schema.TypeInt,
 				Optional:     true,
-				DefaultFunc:  schema.MultiEnvDefaultFunc([]string{"SAKURACLOUD_RETRY_INTERVAL"}, 5),
+				DefaultFunc:  schema.MultiEnvDefaultFunc([]string{"SAKURACLOUD_RETRY_INTERVAL"}, defaultRetryInterval),
 				ValidateFunc: validation.IntBetween(0, 600),
 			},
 			"api_request_timeout": {
@@ -185,6 +189,7 @@ func providerConfigure(d *schema.ResourceData, terraformVersion string) (interfa
 		AccessToken:         d.Get("token").(string),
 		AccessTokenSecret:   d.Get("secret").(string),
 		Zone:                d.Get("zone").(string),
+		Zones:               expandStringList(d.Get("zones").([]interface{})),
 		TraceMode:           d.Get("trace").(string),
 		APIRootURL:          d.Get("api_root_url").(string),
 		RetryMax:            d.Get("retry_max").(int),

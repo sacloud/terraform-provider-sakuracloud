@@ -32,10 +32,9 @@ func dataSourceSakuraCloudZone() *schema.Resource {
 
 		Schema: map[string]*schema.Schema{
 			"name": {
-				Type:         schema.TypeString,
-				Optional:     true,
-				Computed:     true,
-				ValidateFunc: validateZone(allowZones),
+				Type:     schema.TypeString,
+				Optional: true,
+				Computed: true,
 			},
 			"zone_id": {
 				Type:     schema.TypeString,
@@ -63,7 +62,10 @@ func dataSourceSakuraCloudZone() *schema.Resource {
 }
 
 func dataSourceSakuraCloudZoneRead(d *schema.ResourceData, meta interface{}) error {
-	client, zoneSlug := getSacloudClient(d, meta)
+	client, zoneSlug, err := sakuraCloudClient(d, meta)
+	if err != nil {
+		return err
+	}
 	ctx, cancel := operationContext(d, schema.TimeoutRead)
 	defer cancel()
 

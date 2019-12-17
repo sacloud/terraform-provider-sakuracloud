@@ -26,6 +26,7 @@ import (
 	"strconv"
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/helper/validation"
 
 	"github.com/mitchellh/go-homedir"
 
@@ -103,10 +104,14 @@ func getListFromResource(d resourceValueGettable, key string) ([]interface{}, bo
 	return nil, false
 }
 
-func getSacloudClient(d resourceValueGettable, meta interface{}) (*APIClient, string) {
+func sakuraCloudClient(d resourceValueGettable, meta interface{}) (*APIClient, string, error) {
 	client := meta.(*APIClient)
 	zone := getZone(d, client)
-	return client, zone
+	if _, errs := validation.StringInSlice(client.zones, false)(zone, "zone"); len(errs) > 0 {
+		return nil, "", errs[0]
+	}
+
+	return client, zone, nil
 }
 
 func getZone(d resourceValueGettable, client *APIClient) string {

@@ -93,7 +93,7 @@ func resourceSakuraCloudDNSRecord() *schema.Resource {
 }
 
 func resourceSakuraCloudDNSRecordCreate(d *schema.ResourceData, meta interface{}) error {
-	client, _ := getSacloudClient(d, meta)
+	client := meta.(*APIClient)
 	ctx, cancel := operationContext(d, schema.TimeoutCreate)
 	defer cancel()
 
@@ -119,7 +119,7 @@ func resourceSakuraCloudDNSRecordCreate(d *schema.ResourceData, meta interface{}
 }
 
 func resourceSakuraCloudDNSRecordRead(d *schema.ResourceData, meta interface{}) error {
-	client, _ := getSacloudClient(d, meta)
+	client := meta.(*APIClient)
 	ctx, cancel := operationContext(d, schema.TimeoutRead)
 	defer cancel()
 
@@ -152,7 +152,7 @@ func resourceSakuraCloudDNSRecordRead(d *schema.ResourceData, meta interface{}) 
 }
 
 func resourceSakuraCloudDNSRecordDelete(d *schema.ResourceData, meta interface{}) error {
-	client, _ := getSacloudClient(d, meta)
+	client := meta.(*APIClient)
 	ctx, cancel := operationContext(d, schema.TimeoutDelete)
 	defer cancel()
 
