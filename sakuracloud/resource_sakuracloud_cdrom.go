@@ -233,16 +233,13 @@ func resourceSakuraCloudCDROMDelete(d *schema.ResourceData, meta interface{}) er
 }
 
 func setCDROMResourceData(ctx context.Context, d *schema.ResourceData, client *APIClient, data *sacloud.CDROM) error {
-	d.Set("hash", expandCDROMContentHash(d))
-	d.Set("name", data.Name)
-	d.Set("size", data.GetSizeGB())
-	d.Set("icon_id", data.IconID.String())
-	d.Set("description", data.Description)
-	if err := d.Set("tags", data.Tags); err != nil {
-		return err
-	}
-	d.Set("zone", getZone(d, client))
-	return nil
+	d.Set("hash", expandCDROMContentHash(d)) // nolint
+	d.Set("name", data.Name)                 // nolint
+	d.Set("size", data.GetSizeGB())          // nolint
+	d.Set("icon_id", data.IconID.String())   // nolint
+	d.Set("description", data.Description)   // nolint
+	d.Set("zone", getZone(d, client))        // nolint
+	return d.Set("tags", data.Tags)
 }
 
 type uploadCDROMContext struct {
@@ -346,7 +343,6 @@ func prepareContentFile(d *schema.ResourceData) (string, bool, error) {
 		if err != nil {
 			return "", isTemporal, fmt.Errorf("error writing temp-file : %s", err)
 		}
-
 	} else {
 		return "", isTemporal, fmt.Errorf("must specify \"iso_image_file\" or \"content\" field")
 	}

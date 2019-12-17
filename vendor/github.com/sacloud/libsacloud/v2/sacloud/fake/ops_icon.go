@@ -18,7 +18,6 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/imdario/mergo"
 	"github.com/sacloud/libsacloud/v2/sacloud"
 	"github.com/sacloud/libsacloud/v2/sacloud/types"
 )
@@ -74,31 +73,6 @@ func (o *IconOp) Update(ctx context.Context, id types.ID, param *sacloud.IconUpd
 	copySameNameField(param, value)
 	fill(value, fillModifiedAt)
 
-	putIcon(sacloud.APIDefaultZone, value)
-	return value, nil
-}
-
-// Patch is fake implementation
-func (o *IconOp) Patch(ctx context.Context, id types.ID, param *sacloud.IconPatchRequest) (*sacloud.Icon, error) {
-	value, err := o.Read(ctx, id)
-	if err != nil {
-		return nil, err
-	}
-
-	patchParam := make(map[string]interface{})
-	if err := mergo.Map(&patchParam, value); err != nil {
-		return nil, fmt.Errorf("patch is failed: %s", err)
-	}
-	if err := mergo.Map(&patchParam, param); err != nil {
-		return nil, fmt.Errorf("patch is failed: %s", err)
-	}
-	if err := mergo.Map(param, &patchParam); err != nil {
-		return nil, fmt.Errorf("patch is failed: %s", err)
-	}
-	copySameNameField(param, value)
-	if param.PatchEmptyToTags {
-		param.Tags = nil
-	}
 	putIcon(sacloud.APIDefaultZone, value)
 	return value, nil
 }

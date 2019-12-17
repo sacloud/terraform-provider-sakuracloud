@@ -77,7 +77,7 @@ func TestAccSakuraCloudDatabaseReplica_basic(t *testing.T) {
 	})
 }
 
-func TestAccImportSakuraCloudDatabaseReadReplica(t *testing.T) {
+func TestAccImportSakuraCloudDatabaseReadReplica_basic(t *testing.T) {
 	rand := randomName()
 	password := randomPassword()
 

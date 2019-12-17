@@ -73,7 +73,7 @@ func TestAccSakuraCloudCDROM_basic(t *testing.T) {
 	})
 }
 
-func TestAccResourceSakuraCloudCDROM_textContent(t *testing.T) {
+func TestAccSakuraCloudCDROM_textContent(t *testing.T) {
 	skipIfFakeModeEnabled(t)
 
 	resourceName := "sakuracloud_cdrom.foobar"
@@ -154,7 +154,7 @@ func testCheckSakuraCloudCDROMDestroy(s *terraform.State) error {
 	return nil
 }
 
-func TestAccImportSakuraCloudCDROM(t *testing.T) {
+func TestAccImportSakuraCloudCDROM_basic(t *testing.T) {
 	skipIfFakeModeEnabled(t)
 
 	rand := randomName()
@@ -188,10 +188,10 @@ func TestAccImportSakuraCloudCDROM(t *testing.T) {
 			testCheckSakuraCloudIconDestroy,
 		),
 		Steps: []resource.TestStep{
-			resource.TestStep{
+			{
 				Config: buildConfigWithArgs(testAccSakuraCloudCDROM_basic, rand),
 			},
-			resource.TestStep{
+			{
 				ResourceName:      resourceName,
 				ImportState:       true,
 				ImportStateCheck:  checkFn,

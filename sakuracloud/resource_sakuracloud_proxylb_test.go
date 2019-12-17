@@ -164,7 +164,7 @@ func testCheckSakuraCloudProxyLBDestroy(s *terraform.State) error {
 	return nil
 }
 
-func TestAccImportSakuraCloudProxyLB(t *testing.T) {
+func TestAccImportSakuraCloudProxyLB_basic(t *testing.T) {
 	skipIfEnvIsNotSet(t, envProxyLBRealServerIP0, envProxyLBRealServerIP1)
 
 	ip0 := os.Getenv(envProxyLBRealServerIP0)

@@ -133,7 +133,7 @@ func testCheckSakuraCloudInternetDestroy(s *terraform.State) error {
 	return nil
 }
 
-func TestAccImportSakuraCloudInternet(t *testing.T) {
+func TestAccImportSakuraCloudInternet_basic(t *testing.T) {
 	rand := randomName()
 
 	checkFn := func(s []*terraform.InstanceState) error {

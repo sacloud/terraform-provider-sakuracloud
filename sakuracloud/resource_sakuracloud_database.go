@@ -262,15 +262,15 @@ func setDatabaseResourceData(ctx context.Context, d *schema.ResourceData, client
 		return fmt.Errorf("got unexpected state: Database[%d].Availability is failed", data.ID)
 	}
 
-	d.Set("database_type", flattenDatabaseType(data))
+	d.Set("database_type", flattenDatabaseType(data)) // nolint
 
 	if data.ReplicationSetting != nil {
-		d.Set("replica_user", data.CommonSetting.ReplicaUser)
-		d.Set("replica_password", data.CommonSetting.ReplicaPassword)
+		d.Set("replica_user", data.CommonSetting.ReplicaUser)         // nolint
+		d.Set("replica_password", data.CommonSetting.ReplicaPassword) // nolint
 	}
 
 	if data.BackupSetting != nil {
-		d.Set("backup_time", data.BackupSetting.Time)
+		d.Set("backup_time", data.BackupSetting.Time) // nolint
 		if err := d.Set("backup_weekdays", data.BackupSetting.DayOfWeek); err != nil {
 			return err
 		}
@@ -280,23 +280,23 @@ func setDatabaseResourceData(ctx context.Context, d *schema.ResourceData, client
 		return err
 	}
 
-	d.Set("name", data.Name)
-	d.Set("username", data.CommonSetting.DefaultUser)
-	d.Set("password", data.CommonSetting.UserPassword)
-	d.Set("plan", databasePlanIDToName(data.PlanID))
+	d.Set("name", data.Name)                           // nolint
+	d.Set("username", data.CommonSetting.DefaultUser)  // nolint
+	d.Set("password", data.CommonSetting.UserPassword) // nolint
+	d.Set("plan", databasePlanIDToName(data.PlanID))   // nolint
 	if err := d.Set("source_ranges", data.CommonSetting.SourceNetwork); err != nil {
 		return err
 	}
-	d.Set("port", data.CommonSetting.ServicePort)
-	d.Set("switch_id", data.SwitchID.String())
-	d.Set("netmask", data.NetworkMaskLen)
-	d.Set("gateway", data.DefaultRoute)
+	d.Set("port", data.CommonSetting.ServicePort) // nolint
+	d.Set("switch_id", data.SwitchID.String())    // nolint
+	d.Set("netmask", data.NetworkMaskLen)         // nolint
+	d.Set("gateway", data.DefaultRoute)           // nolint
 	if err := d.Set("ip_addresses", data.IPAddresses); err != nil {
 		return err
 	}
-	d.Set("icon_id", data.IconID.String())
-	d.Set("description", data.Description)
-	d.Set("zone", getZone(d, client))
+	d.Set("icon_id", data.IconID.String()) // nolint
+	d.Set("description", data.Description) // nolint
+	d.Set("zone", getZone(d, client))      // nolint
 
 	return nil
 }

@@ -96,7 +96,6 @@ func testCheckSakuraCloudBucketObjectExists(n string) resource.TestCheckFunc {
 }
 
 func testCheckSakuraCloudBucketObjectDestroy(s *terraform.State) error {
-
 	for _, rs := range s.RootModule().Resources {
 		if rs.Type != "sakuracloud_bucket_object" {
 			continue

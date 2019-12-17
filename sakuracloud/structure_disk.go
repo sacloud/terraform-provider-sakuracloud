@@ -43,7 +43,6 @@ func expandDiskPlan(d *schema.ResourceData) types.ID {
 }
 
 func expandDiskCreateRequest(d *schema.ResourceData) *sacloud.DiskCreateRequest {
-
 	return &sacloud.DiskCreateRequest{
 		DiskPlanID:      expandDiskPlan(d),
 		Connection:      types.EDiskConnection(d.Get("connector").(string)),

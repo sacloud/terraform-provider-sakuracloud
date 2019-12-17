@@ -177,7 +177,6 @@ func (r *RetryableSetup) createResource(ctx context.Context, zone string) (acces
 }
 
 func (r *RetryableSetup) waitForCopyWithCleanup(ctx context.Context, zone string, id types.ID) (interface{}, error) {
-
 	waiter := &sacloud.StatePollingWaiter{
 		ReadFunc: func() (interface{}, error) {
 			return r.Read(ctx, zone, id)
@@ -190,7 +189,7 @@ func (r *RetryableSetup) waitForCopyWithCleanup(ctx context.Context, zone string
 			types.Availabilities.Unknown,
 			types.Availabilities.Migrating,
 			types.Availabilities.Uploading,
-			types.Availabilities.Transfering,
+			types.Availabilities.Transferring,
 			types.Availabilities.Discontinued,
 		},
 		PollingInterval: r.PollingInterval,
@@ -268,7 +267,7 @@ func (r *RetryableSetup) waitForUp(ctx context.Context, zone string, id types.ID
 				types.Availabilities.Unknown,
 				types.Availabilities.Migrating,
 				types.Availabilities.Uploading,
-				types.Availabilities.Transfering,
+				types.Availabilities.Transferring,
 				types.Availabilities.Discontinued,
 			},
 			TargetInstanceStatus: []types.EServerInstanceStatus{

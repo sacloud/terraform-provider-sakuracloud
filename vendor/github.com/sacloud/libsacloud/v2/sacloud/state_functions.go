@@ -27,7 +27,7 @@ func WaiterForUp(readFunc StateReadFunc) StateWaiter {
 			types.Availabilities.Unknown,
 			types.Availabilities.Migrating,
 			types.Availabilities.Uploading,
-			types.Availabilities.Transfering,
+			types.Availabilities.Transferring,
 			types.Availabilities.Discontinued,
 		},
 		TargetInstanceStatus: []types.EServerInstanceStatus{
@@ -54,7 +54,7 @@ func WaiterForApplianceUp(readFunc StateReadFunc, notFoundRetry int) StateWaiter
 			types.Availabilities.Unknown,
 			types.Availabilities.Migrating,
 			types.Availabilities.Uploading,
-			types.Availabilities.Transfering,
+			types.Availabilities.Transferring,
 			types.Availabilities.Discontinued,
 		},
 		TargetInstanceStatus: []types.EServerInstanceStatus{
@@ -101,7 +101,7 @@ func WaiterForReady(readFunc StateReadFunc) StateWaiter {
 			types.Availabilities.Unknown,
 			types.Availabilities.Migrating,
 			types.Availabilities.Uploading,
-			types.Availabilities.Transfering,
+			types.Availabilities.Transferring,
 			types.Availabilities.Discontinued,
 		},
 	}

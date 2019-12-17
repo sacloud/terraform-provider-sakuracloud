@@ -197,7 +197,7 @@ func resourceSakuraCloudDiskUpdate(d *schema.ResourceData, meta interface{}) err
 		return fmt.Errorf("could not read SakuraCloud Disk[%s]: %s", d.Id(), err)
 	}
 
-	disk, err = diskOp.Update(ctx, zone, disk.ID, expandDiskUpdateRequest(d))
+	_, err = diskOp.Update(ctx, zone, disk.ID, expandDiskUpdateRequest(d))
 	if err != nil {
 		return fmt.Errorf("updating SakuraCloud Disk[%s] is failed: %s", d.Id(), err)
 	}
@@ -235,18 +235,15 @@ func resourceSakuraCloudDiskDelete(d *schema.ResourceData, meta interface{}) err
 }
 
 func setDiskResourceData(ctx context.Context, d *schema.ResourceData, client *APIClient, data *sacloud.Disk) error {
-	d.Set("name", data.Name)
-	d.Set("plan", flattenDiskPlan(data))
-	d.Set("source_disk_id", data.SourceDiskID.String())
-	d.Set("source_archive_id", data.SourceArchiveID.String())
-	d.Set("connector", data.Connection.String())
-	d.Set("size", data.GetSizeGB())
-	d.Set("icon_id", data.IconID.String())
-	d.Set("description", data.Description)
-	if err := d.Set("tags", data.Tags); err != nil {
-		return err
-	}
-	d.Set("server_id", data.ServerID.String())
-	d.Set("zone", getZone(d, client))
-	return nil
+	d.Set("name", data.Name)                                  // nolint
+	d.Set("plan", flattenDiskPlan(data))                      // nolint
+	d.Set("source_disk_id", data.SourceDiskID.String())       // nolint
+	d.Set("source_archive_id", data.SourceArchiveID.String()) // nolint
+	d.Set("connector", data.Connection.String())              // nolint
+	d.Set("size", data.GetSizeGB())                           // nolint
+	d.Set("icon_id", data.IconID.String())                    // nolint
+	d.Set("description", data.Description)                    // nolint
+	d.Set("server_id", data.ServerID.String())                // nolint
+	d.Set("zone", getZone(d, client))                         // nolint
+	return d.Set("tags", data.Tags)
 }

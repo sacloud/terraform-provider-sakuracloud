@@ -127,11 +127,9 @@ func (o *BillOp) DetailsCSV(ctx context.Context, MemberCode string, id types.ID)
 	}
 
 	results := rawResults.(*[]*sacloud.BillDetail)
-	var values []*sacloud.BillDetail
 	for _, res := range *results {
 		dest := &sacloud.BillDetail{}
 		copySameNameField(res, dest)
-		values = append(values, dest)
 	}
 
 	return &sacloud.BillDetailCSV{

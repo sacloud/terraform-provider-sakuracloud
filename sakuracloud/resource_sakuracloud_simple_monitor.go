@@ -264,21 +264,18 @@ func resourceSakuraCloudSimpleMonitorDelete(d *schema.ResourceData, meta interfa
 }
 
 func setSimpleMonitorResourceData(ctx context.Context, d *schema.ResourceData, client *APIClient, data *sacloud.SimpleMonitor) error {
-	d.Set("target", data.Target)
-	d.Set("delay_loop", data.DelayLoop)
+	d.Set("target", data.Target)                                       // nolint
+	d.Set("delay_loop", data.DelayLoop)                                // nolint
+	d.Set("icon_id", data.IconID.String())                             // nolint
+	d.Set("description", data.Description)                             // nolint
+	d.Set("enabled", data.Enabled.Bool())                              // nolint
+	d.Set("notify_email_enabled", data.NotifyEmailEnabled.Bool())      // nolint
+	d.Set("notify_email_html", data.NotifyEmailHTML.Bool())            // nolint
+	d.Set("notify_slack_enabled", data.NotifySlackEnabled.Bool())      // nolint
+	d.Set("notify_slack_webhook", data.SlackWebhooksURL)               // nolint
+	d.Set("notify_interval", flattenSimpleMonitorNotifyInterval(data)) // nolint
 	if err := d.Set("health_check", flattenSimpleMonitorHealthCheck(data)); err != nil {
 		return err
 	}
-	d.Set("icon_id", data.IconID.String())
-	d.Set("description", data.Description)
-	if err := d.Set("tags", data.Tags); err != nil {
-		return err
-	}
-	d.Set("enabled", data.Enabled.Bool())
-	d.Set("notify_email_enabled", data.NotifyEmailEnabled.Bool())
-	d.Set("notify_email_html", data.NotifyEmailHTML.Bool())
-	d.Set("notify_slack_enabled", data.NotifySlackEnabled.Bool())
-	d.Set("notify_slack_webhook", data.SlackWebhooksURL)
-	d.Set("notify_interval", flattenSimpleMonitorNotifyInterval(data))
-	return nil
+	return d.Set("tags", data.Tags)
 }

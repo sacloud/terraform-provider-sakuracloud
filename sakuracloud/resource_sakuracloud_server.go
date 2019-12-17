@@ -354,7 +354,7 @@ func setServerResourceData(ctx context.Context, d *schema.ResourceData, client *
 		}
 		userName, err := query.ServerDefaultUserName(ctx, zone, query.NewServerSourceReader(client), data.ID)
 		if err != nil {
-			log.Printf("[WARN] can't retrive connInfo from archives (server: %d).", data.ID)
+			log.Printf("[WARN] can't retrieve connInfo from archives (server: %d).", data.ID)
 		}
 		if userName != "" {
 			connInfo["user"] = userName
@@ -362,34 +362,31 @@ func setServerResourceData(ctx context.Context, d *schema.ResourceData, client *
 		d.SetConnInfo(connInfo)
 	}
 
-	d.Set("name", data.Name)
-	d.Set("core", data.CPU)
-	d.Set("memory", data.GetMemoryGB())
-	d.Set("commitment", data.ServerPlanCommitment.String())
+	d.Set("name", data.Name)                                // nolint
+	d.Set("core", data.CPU)                                 // nolint
+	d.Set("memory", data.GetMemoryGB())                     // nolint
+	d.Set("commitment", data.ServerPlanCommitment.String()) // nolint
 	if err := d.Set("disks", flattenServerConnectedDiskIDs(data)); err != nil {
 		return err
 	}
-	d.Set("cdrom_id", data.CDROMID.String())
-	d.Set("interface_driver", data.InterfaceDriver.String())
-	d.Set("private_host_id", data.PrivateHostID.String())
-	d.Set("private_host_name", data.PrivateHostName)
+	d.Set("cdrom_id", data.CDROMID.String())                 // nolint
+	d.Set("interface_driver", data.InterfaceDriver.String()) // nolint
+	d.Set("private_host_id", data.PrivateHostID.String())    // nolint
+	d.Set("private_host_name", data.PrivateHostName)         // nolint
 	if err := d.Set("network_interface", flattenServerNICs(data)); err != nil {
 		return err
 	}
-	d.Set("icon_id", data.IconID.String())
-	d.Set("description", data.Description)
-	if err := d.Set("tags", data.Tags); err != nil {
-		return err
-	}
-	d.Set("ip_address", ip)
-	d.Set("gateway", gateway)
-	d.Set("network_address", nwAddress)
-	d.Set("netmask", nwMaskLen)
+	d.Set("icon_id", data.IconID.String()) // nolint
+	d.Set("description", data.Description) // nolint
+	d.Set("ip_address", ip)                // nolint
+	d.Set("gateway", gateway)              // nolint
+	d.Set("network_address", nwAddress)    // nolint
+	d.Set("netmask", nwMaskLen)            // nolint
 	if err := d.Set("dns_servers", data.Zone.Region.NameServers); err != nil {
 		return err
 	}
-	d.Set("zone", zone)
-	return nil
+	d.Set("zone", zone) // nolint
+	return d.Set("tags", data.Tags)
 }
 
 func isServerDiskConfigChanged(d *schema.ResourceData) bool {

@@ -134,7 +134,7 @@ func testCheckSakuraCloudAutoBackupDestroy(s *terraform.State) error {
 	return nil
 }
 
-func TestAccImportSakuraCloudAutoBackup(t *testing.T) {
+func TestAccImportSakuraCloudAutoBackup_basic(t *testing.T) {
 	rand := randomName()
 
 	checkFn := func(s []*terraform.InstanceState) error {

@@ -137,18 +137,17 @@ func resourceSakuraCloudSSHKeyGenDelete(d *schema.ResourceData, meta interface{}
 		return fmt.Errorf("deleting SSHKey[%s] is failed: %s", key.ID, err)
 	}
 	return nil
-
 }
 
 func setSSHKeyGenResourceData(d *schema.ResourceData, _ *APIClient, data interface{}) error {
 	if key, ok := data.(sshKeyType); ok {
-		d.Set("name", key.GetName())
-		d.Set("public_key", key.GetPublicKey())
-		d.Set("fingerprint", key.GetFingerprint())
-		d.Set("description", key.GetDescription())
+		d.Set("name", key.GetName())               // nolint
+		d.Set("public_key", key.GetPublicKey())    // nolint
+		d.Set("fingerprint", key.GetFingerprint()) // nolint
+		d.Set("description", key.GetDescription()) // nolint
 
 		if pKey, ok := data.(sshKeyGenType); ok {
-			d.Set("private_key", pKey.GetPrivateKey())
+			d.Set("private_key", pKey.GetPrivateKey()) // nolint
 		}
 	}
 	return nil

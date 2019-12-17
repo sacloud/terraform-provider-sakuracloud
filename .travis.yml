@@ -8,19 +8,25 @@ env:
   - PATH=/home/travis/gopath/bin:$PATH DEBIAN_FRONTEND=noninteractive
   - secure: SZZnrpdABMnQBZuzHIc5gTYDPPT2FhCc9/7meOxPkjgOPUv/Fm2oQl/6+xVkDOdGZDZEImA8YS5p75m1V4V55SoeCV0xFxM/CiyyVojC06RonnGPpSFlofu0m1B91ff0gsmt4ZfQCRe8o/L73JQXLjKJzeAbUPNYdPZfSMmObss1f/rwmDj+zVILU7t3m1aIEiJHf2pJN9zMJ49KtUP8rOlAtjg9knd1L8VrJL5UkROh3G8KFordDTPFWJYOhtoHTiCPK/mn7x527z6eEzxFaWLGsSLm4x6YGdUhcTJ9RijYc0t7ZSuYxXUL2KsKkJ5PTAo7DpCjYItWWBTcJIUOd0Lw6v49I/qu57ol0NTlyrDRa3Oq9fYVyj0wlripR/aBBOdtXv5/S/GSvTpnzADbuy/lub1f57JDIWGiiHmjI/9WboTiNOih8Zu3317yJr1ztMZdWLHfOsUr26bu22XeFk9UKUiI1/GbRhxNu04A2mDgidrszdAMmyibULFzqCcodb5h7Xpt1pDP45GBPbgu+wXNjZgkTSCvMrTq1NWLZL+phuEJkhyL9HuCp/UEVrSc3uOcs7pGJensHVPqGJn6IDBgqbKna8kI/M7iS2/SZDziMeh8U4T/nmdZgwTK2vgNeopsO9P5lX/iF3Z6CVOV6ygQojqBJ9npFBRwNUfzDsU=
   - GOPROXY=https://proxy.golang.org
+  - TERRAFORM_VERSION=0.12.18
 before_install:
   - sudo apt-get install bzr
 install:
-- GO111MODULE=off go get -u golang.org/x/lint/golint
 - GO111MODULE=off go get -u golang.org/x/tools/cmd/goimports
+- GO111MODULE=off go get -u github.com/motemen/gobump/cmd/gobump
+- GO111MODULE=off go get github.com/sacloud/addlicense
+- GO111MODULE=off go get -u github.com/client9/misspell/cmd/misspell
+- GO111MODULE=off go get -u github.com/golangci/golangci-lint/cmd/golangci-lint
+- GO111MODULE=off go get -u github.com/bflad/tfproviderlint/cmd/tfproviderlint
 script:
+- make lint
+- make tflint
 - FAKE_MODE=1 make testacc
 - make lint-docs
 before_deploy:
 - if [ "$TRAVIS_BRANCH" == "master" ]; then
     make docker-build;
   fi
-- export TERRAFORM_VERSION=0.12.7
 - GO111MODULE=off go get github.com/aktau/github-release
 - mkdir -p ~/bin
 - (GO111MODULE=off go get github.com/github/hub && cd $GOPATH/src/github.com/github/hub && script/build -o ~/bin/hub)

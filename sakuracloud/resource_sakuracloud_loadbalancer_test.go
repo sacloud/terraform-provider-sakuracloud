@@ -109,7 +109,7 @@ func TestAccSakuraCloudLoadBalancer_basic(t *testing.T) {
 	})
 }
 
-func TestAccSakuraCloudLoadBalancer_WithRouter(t *testing.T) {
+func TestAccSakuraCloudLoadBalancer_withRouter(t *testing.T) {
 	resourceName := "sakuracloud_load_balancer.foobar"
 	name := randomName()
 
@@ -189,7 +189,7 @@ func testCheckSakuraCloudLoadBalancerDestroy(s *terraform.State) error {
 	return nil
 }
 
-func TestAccImportSakuraCloudLoadBalancer(t *testing.T) {
+func TestAccImportSakuraCloudLoadBalancer_basic(t *testing.T) {
 	rand := randomName()
 
 	checkFn := func(s []*terraform.InstanceState) error {

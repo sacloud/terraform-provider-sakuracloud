@@ -10,7 +10,6 @@ require (
 	github.com/go-playground/universal-translator v0.16.0 // indirect
 	github.com/hashicorp/go-multierror v1.0.1-0.20190722213833-bdca7bb83f60
 	github.com/huandu/xstrings v1.2.0
-	github.com/imdario/mergo v0.3.8-0.20190722133502-4c317f2286be
 	github.com/leodido/go-urn v1.1.0 // indirect
 	github.com/mitchellh/mapstructure v1.1.2
 	github.com/pmezard/go-difflib v1.0.0 // indirect
@@ -21,5 +20,4 @@ require (
 	golang.org/x/crypto v0.0.0-20190701094942-4def268fd1a4
 	gopkg.in/go-playground/assert.v1 v1.2.1 // indirect
 	gopkg.in/go-playground/validator.v9 v9.29.0
-	gopkg.in/yaml.v2 v2.2.2 // indirect
 )

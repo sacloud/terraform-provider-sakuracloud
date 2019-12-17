@@ -40,12 +40,6 @@ func TestAccSakuraCloudDataSourceBridge_basic(t *testing.T) {
 	})
 }
 
-var testAccSakuraCloudDataSourceBridge_pre = `
-resource "sakuracloud_bridge" "foobar" {
-  name        = "{{ .arg0 }}"
-  description = "description"
-}`
-
 var testAccSakuraCloudDataSourceBridge_basic = `
 resource "sakuracloud_bridge" "foobar" {
   name        = "{{ .arg0 }}"

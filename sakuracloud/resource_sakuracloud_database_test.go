@@ -174,7 +174,7 @@ func testCheckSakuraCloudDatabaseDestroy(s *terraform.State) error {
 	return nil
 }
 
-func TestAccImportSakuraCloudDatabase(t *testing.T) {
+func TestAccImportSakuraCloudDatabase_basic(t *testing.T) {
 	name := randomName()
 	password := randomPassword()
 

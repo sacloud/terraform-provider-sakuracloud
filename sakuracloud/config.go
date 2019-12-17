@@ -63,7 +63,6 @@ type Config struct {
 	APIRequestRateLimit int
 
 	terraformVersion string
-	initOnce         sync.Once
 }
 
 // APIClient for SakuraCloud API
@@ -78,7 +77,6 @@ type APIClient struct {
 
 // NewClient returns new API Client for SakuraCloud
 func (c *Config) NewClient() *APIClient {
-
 	tfUserAgent := httpclient.TerraformUserAgent(c.terraformVersion)
 	providerUserAgent := fmt.Sprintf("%s/v%s", "terraform-provider-sakuracloud", Version)
 	ua := fmt.Sprintf("%s %s", tfUserAgent, providerUserAgent)

@@ -116,14 +116,14 @@ func dataSourceSakuraCloudArchiveRead(d *schema.ResourceData, meta interface{}) 
 
 	if data != nil {
 		d.SetId(data.ID.String())
-		d.Set("name", data.Name)
-		d.Set("size", data.GetSizeGB())
-		d.Set("icon_id", data.IconID.String())
-		d.Set("description", data.Description)
+		d.Set("name", data.Name)               // nolint
+		d.Set("size", data.GetSizeGB())        // nolint
+		d.Set("icon_id", data.IconID.String()) // nolint
+		d.Set("description", data.Description) // nolint
 		if err := d.Set("tags", data.Tags); err != nil {
 			return err
 		}
-		d.Set("zone", getZone(d, client))
+		d.Set("zone", getZone(d, client)) // nolint
 	}
 	return nil
 }

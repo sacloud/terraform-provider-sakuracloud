@@ -109,7 +109,7 @@ func resourceSakuraCloudDNSRecordCreate(d *schema.ResourceData, meta interface{}
 	}
 
 	record, req := expandDNSRecordCreateRequest(d, dns)
-	dns, err = dnsOp.UpdateSettings(ctx, sakuraCloudID(dnsID), req)
+	_, err = dnsOp.UpdateSettings(ctx, sakuraCloudID(dnsID), req)
 	if err != nil {
 		return fmt.Errorf("creating SakuraCloud DNSRecord is failed: %s", err)
 	}
@@ -142,12 +142,19 @@ func resourceSakuraCloudDNSRecordRead(d *schema.ResourceData, meta interface{}) 
 	}
 
 	r := flattenDNSRecord(record)
-	for k, v := range r {
-		if err := d.Set(k, v); err != nil {
-			return err
-		}
-	}
+	d.Set("name", r["name"])   // nolint
+	d.Set("type", r["type"])   // nolint
+	d.Set("value", r["value"]) // nolint
+	d.Set("ttl", r["ttl"])     // nolint
 
+	switch record.Type {
+	case "MX":
+		d.Set("priority", r["priority"]) // nolint
+	case "SRV":
+		d.Set("priority", r["priority"]) // nolint
+		d.Set("weight", r["weight"])     // nolint
+		d.Set("port", r["port"])         // nolint
+	}
 	return nil
 }
 
@@ -171,7 +178,7 @@ func resourceSakuraCloudDNSRecordDelete(d *schema.ResourceData, meta interface{}
 		return fmt.Errorf("could not read SakuraCloud DNS[%s]: %s", dnsID, err)
 	}
 
-	dns, err = dnsOp.UpdateSettings(ctx, sakuraCloudID(dnsID), expandDNSRecordDeleteRequest(d, dns))
+	_, err = dnsOp.UpdateSettings(ctx, sakuraCloudID(dnsID), expandDNSRecordDeleteRequest(d, dns))
 	if err != nil {
 		return fmt.Errorf("deleting SakuraCloud DNSRecord[%s] is failed: %s", dnsID, err)
 	}

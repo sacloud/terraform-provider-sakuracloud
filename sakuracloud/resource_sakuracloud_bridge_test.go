@@ -113,7 +113,7 @@ func testCheckSakuraCloudBridgeDestroy(s *terraform.State) error {
 	return nil
 }
 
-func TestAccImportSakuraCloudBridge(t *testing.T) {
+func TestAccImportSakuraCloudBridge_basic(t *testing.T) {
 	rand := randomName()
 	checkFn := func(s []*terraform.InstanceState) error {
 		if len(s) != 1 {
