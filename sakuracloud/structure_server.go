@@ -73,7 +73,6 @@ func expandServerDisks(d *schema.ResourceData, client *APIClient) []diskBuilder.
 					NoteIDs:             expandSakuraCloudIDs(d, "note_ids"),
 				}
 			}
-
 		}
 		builders = append(builders, b)
 	}

@@ -407,7 +407,6 @@ func expandVPCRouterFirewallRule(d resourceValueGettable) *sacloud.VPCRouterFire
 func flattenVPCRouterFirewalls(vpcRouter *sacloud.VPCRouter) []interface{} {
 	var firewallRules []interface{}
 	for i, configs := range vpcRouter.Settings.Firewall {
-
 		directionRules := map[string][]*sacloud.VPCRouterFirewallRule{
 			"send":    configs.Send,
 			"receive": configs.Receive,

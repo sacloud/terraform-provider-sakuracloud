@@ -137,7 +137,6 @@ func resourceSakuraCloudSSHKeyGenDelete(d *schema.ResourceData, meta interface{}
 		return fmt.Errorf("deleting SSHKey[%s] is failed: %s", key.ID, err)
 	}
 	return nil
-
 }
 
 func setSSHKeyGenResourceData(d *schema.ResourceData, _ *APIClient, data interface{}) error {

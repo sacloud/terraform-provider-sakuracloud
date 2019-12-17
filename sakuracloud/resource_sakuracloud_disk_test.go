@@ -112,7 +112,6 @@ func testCheckSakuraCloudDiskExists(n string, disk *sacloud.Disk) resource.TestC
 
 func testCheckSakuraCloudDiskAttributes(disk *sacloud.Disk) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
-
 		if disk.Connection != types.DiskConnections.VirtIO {
 			return fmt.Errorf("got bad disk connector: %v", disk.Connection)
 		}

@@ -343,7 +343,6 @@ func prepareContentFile(d *schema.ResourceData) (string, bool, error) {
 		if err != nil {
 			return "", isTemporal, fmt.Errorf("error writing temp-file : %s", err)
 		}
-
 	} else {
 		return "", isTemporal, fmt.Errorf("must specify \"iso_image_file\" or \"content\" field")
 	}
