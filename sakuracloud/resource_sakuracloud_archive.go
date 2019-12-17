@@ -17,6 +17,7 @@ package sakuracloud
 import (
 	"context"
 	"fmt"
+	"time"
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/customdiff"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
@@ -40,6 +41,14 @@ func resourceSakuraCloudArchive() *schema.Resource {
 		Importer: &schema.ResourceImporter{
 			State: schema.ImportStatePassthrough,
 		},
+
+		Timeouts: &schema.ResourceTimeout{
+			Create: schema.DefaultTimeout(24 * time.Hour),
+			Read:   schema.DefaultTimeout(5 * time.Minute),
+			Update: schema.DefaultTimeout(24 * time.Hour),
+			Delete: schema.DefaultTimeout(5 * time.Minute),
+		},
+
 		Schema: map[string]*schema.Schema{
 			"name": {
 				Type:     schema.TypeString,
@@ -88,7 +97,10 @@ func resourceSakuraCloudArchive() *schema.Resource {
 }
 
 func resourceSakuraCloudArchiveCreate(d *schema.ResourceData, meta interface{}) error {
-	client, ctx, zone := getSacloudClient(d, meta)
+	client, zone := getSacloudClient(d, meta)
+	ctx, cancel := operationContext(d, schema.TimeoutCreate)
+	defer cancel()
+
 	archiveOp := sacloud.NewArchiveOp(client)
 
 	archive, ftpServer, err := archiveOp.CreateBlank(ctx, zone, expandArchiveCreateRequest(d))
@@ -106,7 +118,10 @@ func resourceSakuraCloudArchiveCreate(d *schema.ResourceData, meta interface{}) 
 }
 
 func resourceSakuraCloudArchiveRead(d *schema.ResourceData, meta interface{}) error {
-	client, ctx, zone := getSacloudClient(d, meta)
+	client, zone := getSacloudClient(d, meta)
+	ctx, cancel := operationContext(d, schema.TimeoutRead)
+	defer cancel()
+
 	archiveOp := sacloud.NewArchiveOp(client)
 
 	archive, err := archiveOp.Read(ctx, zone, sakuraCloudID(d.Id()))
@@ -121,7 +136,10 @@ func resourceSakuraCloudArchiveRead(d *schema.ResourceData, meta interface{}) er
 }
 
 func resourceSakuraCloudArchiveUpdate(d *schema.ResourceData, meta interface{}) error {
-	client, ctx, zone := getSacloudClient(d, meta)
+	client, zone := getSacloudClient(d, meta)
+	ctx, cancel := operationContext(d, schema.TimeoutUpdate)
+	defer cancel()
+
 	archiveOp := sacloud.NewArchiveOp(client)
 
 	archive, err := archiveOp.Read(ctx, zone, sakuraCloudID(d.Id()))
@@ -145,7 +163,10 @@ func resourceSakuraCloudArchiveUpdate(d *schema.ResourceData, meta interface{}) 
 }
 
 func resourceSakuraCloudArchiveDelete(d *schema.ResourceData, meta interface{}) error {
-	client, ctx, zone := getSacloudClient(d, meta)
+	client, zone := getSacloudClient(d, meta)
+	ctx, cancel := operationContext(d, schema.TimeoutDelete)
+	defer cancel()
+
 	archiveOp := sacloud.NewArchiveOp(client)
 
 	archive, err := archiveOp.Read(ctx, zone, sakuraCloudID(d.Id()))

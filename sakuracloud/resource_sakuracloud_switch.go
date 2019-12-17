@@ -17,6 +17,7 @@ package sakuracloud
 import (
 	"context"
 	"fmt"
+	"time"
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/sacloud/libsacloud/v2/sacloud"
@@ -32,6 +33,14 @@ func resourceSakuraCloudSwitch() *schema.Resource {
 			State: schema.ImportStatePassthrough,
 		},
 		CustomizeDiff: hasTagResourceCustomizeDiff,
+
+		Timeouts: &schema.ResourceTimeout{
+			Create: schema.DefaultTimeout(5 * time.Minute),
+			Read:   schema.DefaultTimeout(5 * time.Minute),
+			Update: schema.DefaultTimeout(5 * time.Minute),
+			Delete: schema.DefaultTimeout(20 * time.Minute),
+		},
+
 		Schema: map[string]*schema.Schema{
 			"name": {
 				Type:     schema.TypeString,
@@ -74,7 +83,10 @@ func resourceSakuraCloudSwitch() *schema.Resource {
 }
 
 func resourceSakuraCloudSwitchCreate(d *schema.ResourceData, meta interface{}) error {
-	client, ctx, zone := getSacloudClient(d, meta)
+	client, zone := getSacloudClient(d, meta)
+	ctx, cancel := operationContext(d, schema.TimeoutCreate)
+	defer cancel()
+
 	swOp := sacloud.NewSwitchOp(client)
 
 	req := &sacloud.SwitchCreateRequest{
@@ -102,7 +114,10 @@ func resourceSakuraCloudSwitchCreate(d *schema.ResourceData, meta interface{}) e
 }
 
 func resourceSakuraCloudSwitchRead(d *schema.ResourceData, meta interface{}) error {
-	client, ctx, zone := getSacloudClient(d, meta)
+	client, zone := getSacloudClient(d, meta)
+	ctx, cancel := operationContext(d, schema.TimeoutRead)
+	defer cancel()
+
 	swOp := sacloud.NewSwitchOp(client)
 
 	sw, err := swOp.Read(ctx, zone, sakuraCloudID(d.Id()))
@@ -117,7 +132,10 @@ func resourceSakuraCloudSwitchRead(d *schema.ResourceData, meta interface{}) err
 }
 
 func resourceSakuraCloudSwitchUpdate(d *schema.ResourceData, meta interface{}) error {
-	client, ctx, zone := getSacloudClient(d, meta)
+	client, zone := getSacloudClient(d, meta)
+	ctx, cancel := operationContext(d, schema.TimeoutUpdate)
+	defer cancel()
+
 	swOp := sacloud.NewSwitchOp(client)
 
 	sakuraMutexKV.Lock(d.Id())
@@ -159,7 +177,10 @@ func resourceSakuraCloudSwitchUpdate(d *schema.ResourceData, meta interface{}) e
 }
 
 func resourceSakuraCloudSwitchDelete(d *schema.ResourceData, meta interface{}) error {
-	client, ctx, zone := getSacloudClient(d, meta)
+	client, zone := getSacloudClient(d, meta)
+	ctx, cancel := operationContext(d, schema.TimeoutDelete)
+	defer cancel()
+
 	swOp := sacloud.NewSwitchOp(client)
 
 	sakuraMutexKV.Lock(d.Id())

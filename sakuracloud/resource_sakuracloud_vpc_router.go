@@ -17,6 +17,7 @@ package sakuracloud
 import (
 	"context"
 	"fmt"
+	"time"
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/validation"
@@ -34,6 +35,14 @@ func resourceSakuraCloudVPCRouter() *schema.Resource {
 			State: schema.ImportStatePassthrough,
 		},
 		CustomizeDiff: hasTagResourceCustomizeDiff,
+
+		Timeouts: &schema.ResourceTimeout{
+			Create: schema.DefaultTimeout(60 * time.Minute),
+			Read:   schema.DefaultTimeout(5 * time.Minute),
+			Update: schema.DefaultTimeout(60 * time.Minute),
+			Delete: schema.DefaultTimeout(20 * time.Minute),
+		},
+
 		Schema: map[string]*schema.Schema{
 			"name": {
 				Type:         schema.TypeString,
@@ -426,7 +435,9 @@ func resourceSakuraCloudVPCRouter() *schema.Resource {
 }
 
 func resourceSakuraCloudVPCRouterCreate(d *schema.ResourceData, meta interface{}) error {
-	client, ctx, zone := getSacloudClient(d, meta)
+	client, zone := getSacloudClient(d, meta)
+	ctx, cancel := operationContext(d, schema.TimeoutCreate)
+	defer cancel()
 
 	builder := expandVPCRouterBuilder(d, client)
 	if err := builder.Validate(ctx, zone); err != nil {
@@ -442,7 +453,10 @@ func resourceSakuraCloudVPCRouterCreate(d *schema.ResourceData, meta interface{}
 }
 
 func resourceSakuraCloudVPCRouterRead(d *schema.ResourceData, meta interface{}) error {
-	client, ctx, zone := getSacloudClient(d, meta)
+	client, zone := getSacloudClient(d, meta)
+	ctx, cancel := operationContext(d, schema.TimeoutRead)
+	defer cancel()
+
 	vrOp := sacloud.NewVPCRouterOp(client)
 
 	vpcRouter, err := vrOp.Read(ctx, zone, sakuraCloudID(d.Id()))
@@ -458,7 +472,10 @@ func resourceSakuraCloudVPCRouterRead(d *schema.ResourceData, meta interface{}) 
 }
 
 func resourceSakuraCloudVPCRouterUpdate(d *schema.ResourceData, meta interface{}) error {
-	client, ctx, zone := getSacloudClient(d, meta)
+	client, zone := getSacloudClient(d, meta)
+	ctx, cancel := operationContext(d, schema.TimeoutUpdate)
+	defer cancel()
+
 	vrOp := sacloud.NewVPCRouterOp(client)
 
 	sakuraMutexKV.Lock(d.Id())
@@ -482,7 +499,10 @@ func resourceSakuraCloudVPCRouterUpdate(d *schema.ResourceData, meta interface{}
 }
 
 func resourceSakuraCloudVPCRouterDelete(d *schema.ResourceData, meta interface{}) error {
-	client, ctx, zone := getSacloudClient(d, meta)
+	client, zone := getSacloudClient(d, meta)
+	ctx, cancel := operationContext(d, schema.TimeoutDelete)
+	defer cancel()
+
 	vrOp := sacloud.NewVPCRouterOp(client)
 
 	sakuraMutexKV.Lock(d.Id())

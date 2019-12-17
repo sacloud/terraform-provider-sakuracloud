@@ -17,6 +17,7 @@ package sakuracloud
 import (
 	"context"
 	"fmt"
+	"time"
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/sacloud/libsacloud/v2/sacloud"
@@ -32,6 +33,14 @@ func resourceSakuraCloudPrivateHost() *schema.Resource {
 			State: schema.ImportStatePassthrough,
 		},
 		CustomizeDiff: hasTagResourceCustomizeDiff,
+
+		Timeouts: &schema.ResourceTimeout{
+			Create: schema.DefaultTimeout(5 * time.Minute),
+			Read:   schema.DefaultTimeout(5 * time.Minute),
+			Update: schema.DefaultTimeout(5 * time.Minute),
+			Delete: schema.DefaultTimeout(20 * time.Minute),
+		},
+
 		Schema: map[string]*schema.Schema{
 			"name": {
 				Type:     schema.TypeString,
@@ -76,7 +85,10 @@ func resourceSakuraCloudPrivateHost() *schema.Resource {
 }
 
 func resourceSakuraCloudPrivateHostCreate(d *schema.ResourceData, meta interface{}) error {
-	client, ctx, zone := getSacloudClient(d, meta)
+	client, zone := getSacloudClient(d, meta)
+	ctx, cancel := operationContext(d, schema.TimeoutCreate)
+	defer cancel()
+
 	phOp := sacloud.NewPrivateHostOp(client)
 
 	planID, err := expandPrivateHostPlanID(ctx, d, client, zone)
@@ -94,7 +106,10 @@ func resourceSakuraCloudPrivateHostCreate(d *schema.ResourceData, meta interface
 }
 
 func resourceSakuraCloudPrivateHostRead(d *schema.ResourceData, meta interface{}) error {
-	client, ctx, zone := getSacloudClient(d, meta)
+	client, zone := getSacloudClient(d, meta)
+	ctx, cancel := operationContext(d, schema.TimeoutRead)
+	defer cancel()
+
 	phOp := sacloud.NewPrivateHostOp(client)
 
 	ph, err := phOp.Read(ctx, zone, sakuraCloudID(d.Id()))
@@ -109,7 +124,10 @@ func resourceSakuraCloudPrivateHostRead(d *schema.ResourceData, meta interface{}
 }
 
 func resourceSakuraCloudPrivateHostUpdate(d *schema.ResourceData, meta interface{}) error {
-	client, ctx, zone := getSacloudClient(d, meta)
+	client, zone := getSacloudClient(d, meta)
+	ctx, cancel := operationContext(d, schema.TimeoutUpdate)
+	defer cancel()
+
 	phOp := sacloud.NewPrivateHostOp(client)
 
 	ph, err := phOp.Read(ctx, zone, sakuraCloudID(d.Id()))
@@ -126,7 +144,10 @@ func resourceSakuraCloudPrivateHostUpdate(d *schema.ResourceData, meta interface
 }
 
 func resourceSakuraCloudPrivateHostDelete(d *schema.ResourceData, meta interface{}) error {
-	client, ctx, zone := getSacloudClient(d, meta)
+	client, zone := getSacloudClient(d, meta)
+	ctx, cancel := operationContext(d, schema.TimeoutDelete)
+	defer cancel()
+
 	phOp := sacloud.NewPrivateHostOp(client)
 
 	ph, err := phOp.Read(ctx, zone, sakuraCloudID(d.Id()))

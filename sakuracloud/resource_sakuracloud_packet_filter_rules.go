@@ -17,6 +17,7 @@ package sakuracloud
 import (
 	"context"
 	"fmt"
+	"time"
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/validation"
@@ -31,6 +32,12 @@ func resourceSakuraCloudPacketFilterRules() *schema.Resource {
 		Delete: resourceSakuraCloudPacketFilterRulesDelete,
 		Importer: &schema.ResourceImporter{
 			State: schema.ImportStatePassthrough,
+		},
+
+		Timeouts: &schema.ResourceTimeout{
+			Create: schema.DefaultTimeout(5 * time.Minute),
+			Read:   schema.DefaultTimeout(5 * time.Minute),
+			Delete: schema.DefaultTimeout(5 * time.Minute),
 		},
 
 		Schema: map[string]*schema.Schema{
@@ -98,7 +105,10 @@ func resourceSakuraCloudPacketFilterRules() *schema.Resource {
 }
 
 func resourceSakuraCloudPacketFilterRulesRead(d *schema.ResourceData, meta interface{}) error {
-	client, ctx, zone := getSacloudClient(d, meta)
+	client, zone := getSacloudClient(d, meta)
+	ctx, cancel := operationContext(d, schema.TimeoutRead)
+	defer cancel()
+
 	pfOp := sacloud.NewPacketFilterOp(client)
 
 	pfID := d.Get("packet_filter_id").(string)
@@ -116,7 +126,10 @@ func resourceSakuraCloudPacketFilterRulesRead(d *schema.ResourceData, meta inter
 }
 
 func resourceSakuraCloudPacketFilterRulesUpdate(d *schema.ResourceData, meta interface{}) error {
-	client, ctx, zone := getSacloudClient(d, meta)
+	client, zone := getSacloudClient(d, meta)
+	ctx, cancel := operationContext(d, schema.TimeoutCreate)
+	defer cancel()
+
 	pfOp := sacloud.NewPacketFilterOp(client)
 
 	pfID := d.Get("packet_filter_id").(string)
@@ -138,7 +151,10 @@ func resourceSakuraCloudPacketFilterRulesUpdate(d *schema.ResourceData, meta int
 }
 
 func resourceSakuraCloudPacketFilterRulesDelete(d *schema.ResourceData, meta interface{}) error {
-	client, ctx, zone := getSacloudClient(d, meta)
+	client, zone := getSacloudClient(d, meta)
+	ctx, cancel := operationContext(d, schema.TimeoutDelete)
+	defer cancel()
+
 	pfOp := sacloud.NewPacketFilterOp(client)
 
 	pfID := d.Get("packet_filter_id").(string)

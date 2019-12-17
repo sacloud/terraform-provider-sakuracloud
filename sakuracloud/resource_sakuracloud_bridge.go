@@ -17,6 +17,7 @@ package sakuracloud
 import (
 	"context"
 	"fmt"
+	"time"
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/sacloud/libsacloud/v2/sacloud"
@@ -31,6 +32,14 @@ func resourceSakuraCloudBridge() *schema.Resource {
 		Importer: &schema.ResourceImporter{
 			State: schema.ImportStatePassthrough,
 		},
+
+		Timeouts: &schema.ResourceTimeout{
+			Create: schema.DefaultTimeout(20 * time.Minute),
+			Read:   schema.DefaultTimeout(5 * time.Minute),
+			Update: schema.DefaultTimeout(20 * time.Minute),
+			Delete: schema.DefaultTimeout(20 * time.Minute),
+		},
+
 		Schema: map[string]*schema.Schema{
 			"name": {
 				Type:     schema.TypeString,
@@ -53,7 +62,10 @@ func resourceSakuraCloudBridge() *schema.Resource {
 }
 
 func resourceSakuraCloudBridgeCreate(d *schema.ResourceData, meta interface{}) error {
-	client, ctx, zone := getSacloudClient(d, meta)
+	client, zone := getSacloudClient(d, meta)
+	ctx, cancel := operationContext(d, schema.TimeoutCreate)
+	defer cancel()
+
 	bridgeOp := sacloud.NewBridgeOp(client)
 
 	bridge, err := bridgeOp.Create(ctx, zone, &sacloud.BridgeCreateRequest{
@@ -69,7 +81,10 @@ func resourceSakuraCloudBridgeCreate(d *schema.ResourceData, meta interface{}) e
 }
 
 func resourceSakuraCloudBridgeRead(d *schema.ResourceData, meta interface{}) error {
-	client, ctx, zone := getSacloudClient(d, meta)
+	client, zone := getSacloudClient(d, meta)
+	ctx, cancel := operationContext(d, schema.TimeoutRead)
+	defer cancel()
+
 	bridgeOp := sacloud.NewBridgeOp(client)
 
 	bridge, err := bridgeOp.Read(ctx, zone, sakuraCloudID(d.Id()))
@@ -84,7 +99,10 @@ func resourceSakuraCloudBridgeRead(d *schema.ResourceData, meta interface{}) err
 }
 
 func resourceSakuraCloudBridgeUpdate(d *schema.ResourceData, meta interface{}) error {
-	client, ctx, zone := getSacloudClient(d, meta)
+	client, zone := getSacloudClient(d, meta)
+	ctx, cancel := operationContext(d, schema.TimeoutUpdate)
+	defer cancel()
+
 	bridgeOp := sacloud.NewBridgeOp(client)
 
 	bridge, err := bridgeOp.Read(ctx, zone, sakuraCloudID(d.Id()))
@@ -103,7 +121,10 @@ func resourceSakuraCloudBridgeUpdate(d *schema.ResourceData, meta interface{}) e
 }
 
 func resourceSakuraCloudBridgeDelete(d *schema.ResourceData, meta interface{}) error {
-	client, ctx, zone := getSacloudClient(d, meta)
+	client, zone := getSacloudClient(d, meta)
+	ctx, cancel := operationContext(d, schema.TimeoutDelete)
+	defer cancel()
+
 	bridgeOp := sacloud.NewBridgeOp(client)
 
 	bridge, err := bridgeOp.Read(ctx, zone, sakuraCloudID(d.Id()))

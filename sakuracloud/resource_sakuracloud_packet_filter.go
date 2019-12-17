@@ -17,6 +17,7 @@ package sakuracloud
 import (
 	"context"
 	"fmt"
+	"time"
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/validation"
@@ -32,6 +33,13 @@ func resourceSakuraCloudPacketFilter() *schema.Resource {
 		Delete: resourceSakuraCloudPacketFilterDelete,
 		Importer: &schema.ResourceImporter{
 			State: schema.ImportStatePassthrough,
+		},
+
+		Timeouts: &schema.ResourceTimeout{
+			Create: schema.DefaultTimeout(5 * time.Minute),
+			Read:   schema.DefaultTimeout(5 * time.Minute),
+			Update: schema.DefaultTimeout(5 * time.Minute),
+			Delete: schema.DefaultTimeout(20 * time.Minute),
 		},
 
 		Schema: map[string]*schema.Schema{
@@ -95,7 +103,10 @@ func resourceSakuraCloudPacketFilter() *schema.Resource {
 }
 
 func resourceSakuraCloudPacketFilterCreate(d *schema.ResourceData, meta interface{}) error {
-	client, ctx, zone := getSacloudClient(d, meta)
+	client, zone := getSacloudClient(d, meta)
+	ctx, cancel := operationContext(d, schema.TimeoutCreate)
+	defer cancel()
+
 	pfOp := sacloud.NewPacketFilterOp(client)
 
 	pf, err := pfOp.Create(ctx, zone, expandPacketFilterCreateRequest(d))
@@ -108,7 +119,10 @@ func resourceSakuraCloudPacketFilterCreate(d *schema.ResourceData, meta interfac
 }
 
 func resourceSakuraCloudPacketFilterRead(d *schema.ResourceData, meta interface{}) error {
-	client, ctx, zone := getSacloudClient(d, meta)
+	client, zone := getSacloudClient(d, meta)
+	ctx, cancel := operationContext(d, schema.TimeoutRead)
+	defer cancel()
+
 	pfOp := sacloud.NewPacketFilterOp(client)
 
 	pf, err := pfOp.Read(ctx, zone, sakuraCloudID(d.Id()))
@@ -124,7 +138,10 @@ func resourceSakuraCloudPacketFilterRead(d *schema.ResourceData, meta interface{
 }
 
 func resourceSakuraCloudPacketFilterUpdate(d *schema.ResourceData, meta interface{}) error {
-	client, ctx, zone := getSacloudClient(d, meta)
+	client, zone := getSacloudClient(d, meta)
+	ctx, cancel := operationContext(d, schema.TimeoutUpdate)
+	defer cancel()
+
 	pfOp := sacloud.NewPacketFilterOp(client)
 
 	pf, err := pfOp.Read(ctx, zone, sakuraCloudID(d.Id()))
@@ -141,7 +158,10 @@ func resourceSakuraCloudPacketFilterUpdate(d *schema.ResourceData, meta interfac
 }
 
 func resourceSakuraCloudPacketFilterDelete(d *schema.ResourceData, meta interface{}) error {
-	client, ctx, zone := getSacloudClient(d, meta)
+	client, zone := getSacloudClient(d, meta)
+	ctx, cancel := operationContext(d, schema.TimeoutDelete)
+	defer cancel()
+
 	pfOp := sacloud.NewPacketFilterOp(client)
 
 	pf, err := pfOp.Read(ctx, zone, sakuraCloudID(d.Id()))

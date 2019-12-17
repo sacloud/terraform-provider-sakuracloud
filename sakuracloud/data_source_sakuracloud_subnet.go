@@ -16,6 +16,7 @@ package sakuracloud
 
 import (
 	"fmt"
+	"time"
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/sacloud/libsacloud/v2/sacloud"
@@ -24,6 +25,10 @@ import (
 func dataSourceSakuraCloudSubnet() *schema.Resource {
 	return &schema.Resource{
 		Read: dataSourceSakuraCloudSubnetRead,
+
+		Timeouts: &schema.ResourceTimeout{
+			Read: schema.DefaultTimeout(5 * time.Minute),
+		},
 
 		Schema: map[string]*schema.Schema{
 			"internet_id": {
@@ -80,7 +85,10 @@ func dataSourceSakuraCloudSubnet() *schema.Resource {
 }
 
 func dataSourceSakuraCloudSubnetRead(d *schema.ResourceData, meta interface{}) error {
-	client, ctx, zone := getSacloudClient(d, meta)
+	client, zone := getSacloudClient(d, meta)
+	ctx, cancel := operationContext(d, schema.TimeoutRead)
+	defer cancel()
+
 	internetOp := sacloud.NewInternetOp(client)
 	subnetOp := sacloud.NewSubnetOp(client)
 

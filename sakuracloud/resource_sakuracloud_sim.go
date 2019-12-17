@@ -17,6 +17,7 @@ package sakuracloud
 import (
 	"context"
 	"fmt"
+	"time"
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/sacloud/libsacloud/v2/sacloud"
@@ -35,6 +36,14 @@ func resourceSakuraCloudSIM() *schema.Resource {
 			State: schema.ImportStatePassthrough,
 		},
 		CustomizeDiff: hasTagResourceCustomizeDiff,
+
+		Timeouts: &schema.ResourceTimeout{
+			Create: schema.DefaultTimeout(5 * time.Minute),
+			Read:   schema.DefaultTimeout(5 * time.Minute),
+			Update: schema.DefaultTimeout(5 * time.Minute),
+			Delete: schema.DefaultTimeout(5 * time.Minute),
+		},
+
 		Schema: map[string]*schema.Schema{
 			"name": {
 				Type:     schema.TypeString,
@@ -93,7 +102,9 @@ func resourceSakuraCloudSIM() *schema.Resource {
 }
 
 func resourceSakuraCloudSIMCreate(d *schema.ResourceData, meta interface{}) error {
-	client, ctx, _ := getSacloudClient(d, meta)
+	client, _ := getSacloudClient(d, meta)
+	ctx, cancel := operationContext(d, schema.TimeoutCreate)
+	defer cancel()
 
 	if err := validateCarrier(d); err != nil {
 		return err
@@ -114,7 +125,10 @@ func resourceSakuraCloudSIMCreate(d *schema.ResourceData, meta interface{}) erro
 }
 
 func resourceSakuraCloudSIMRead(d *schema.ResourceData, meta interface{}) error {
-	client, ctx, _ := getSacloudClient(d, meta)
+	client, _ := getSacloudClient(d, meta)
+	ctx, cancel := operationContext(d, schema.TimeoutRead)
+	defer cancel()
+
 	simOp := sacloud.NewSIMOp(client)
 
 	sim, err := query.FindSIMByID(ctx, simOp, sakuraCloudID(d.Id()))
@@ -129,7 +143,10 @@ func resourceSakuraCloudSIMRead(d *schema.ResourceData, meta interface{}) error 
 }
 
 func resourceSakuraCloudSIMUpdate(d *schema.ResourceData, meta interface{}) error {
-	client, ctx, _ := getSacloudClient(d, meta)
+	client, _ := getSacloudClient(d, meta)
+	ctx, cancel := operationContext(d, schema.TimeoutUpdate)
+	defer cancel()
+
 	simOp := sacloud.NewSIMOp(client)
 
 	if err := validateCarrier(d); err != nil {
@@ -155,7 +172,10 @@ func resourceSakuraCloudSIMUpdate(d *schema.ResourceData, meta interface{}) erro
 }
 
 func resourceSakuraCloudSIMDelete(d *schema.ResourceData, meta interface{}) error {
-	client, ctx, _ := getSacloudClient(d, meta)
+	client, _ := getSacloudClient(d, meta)
+	ctx, cancel := operationContext(d, schema.TimeoutDelete)
+	defer cancel()
+
 	simOp := sacloud.NewSIMOp(client)
 
 	// read sim info

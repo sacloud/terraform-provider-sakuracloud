@@ -18,6 +18,7 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"time"
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/validation"
@@ -37,6 +38,14 @@ func resourceSakuraCloudServer() *schema.Resource {
 			State: schema.ImportStatePassthrough,
 		},
 		CustomizeDiff: hasTagResourceCustomizeDiff,
+
+		Timeouts: &schema.ResourceTimeout{
+			Create: schema.DefaultTimeout(5 * time.Minute),
+			Read:   schema.DefaultTimeout(5 * time.Minute),
+			Update: schema.DefaultTimeout(5 * time.Minute),
+			Delete: schema.DefaultTimeout(20 * time.Minute),
+		},
+
 		Schema: map[string]*schema.Schema{
 			"name": {
 				Type:     schema.TypeString,
@@ -195,7 +204,10 @@ func resourceSakuraCloudServer() *schema.Resource {
 }
 
 func resourceSakuraCloudServerCreate(d *schema.ResourceData, meta interface{}) error {
-	client, ctx, zone := getSacloudClient(d, meta)
+	client, zone := getSacloudClient(d, meta)
+	ctx, cancel := operationContext(d, schema.TimeoutCreate)
+	defer cancel()
+
 	builder := expandServerBuilder(d, client)
 
 	if err := builder.Validate(ctx, zone); err != nil {
@@ -212,7 +224,10 @@ func resourceSakuraCloudServerCreate(d *schema.ResourceData, meta interface{}) e
 }
 
 func resourceSakuraCloudServerRead(d *schema.ResourceData, meta interface{}) error {
-	client, ctx, zone := getSacloudClient(d, meta)
+	client, zone := getSacloudClient(d, meta)
+	ctx, cancel := operationContext(d, schema.TimeoutRead)
+	defer cancel()
+
 	serverOp := sacloud.NewServerOp(client)
 
 	server, err := serverOp.Read(ctx, zone, sakuraCloudID(d.Id()))
@@ -228,7 +243,10 @@ func resourceSakuraCloudServerRead(d *schema.ResourceData, meta interface{}) err
 }
 
 func resourceSakuraCloudServerUpdate(d *schema.ResourceData, meta interface{}) error {
-	client, ctx, zone := getSacloudClient(d, meta)
+	client, zone := getSacloudClient(d, meta)
+	ctx, cancel := operationContext(d, schema.TimeoutUpdate)
+	defer cancel()
+
 	serverOp := sacloud.NewServerOp(client)
 
 	sakuraMutexKV.Lock(d.Id())
@@ -255,7 +273,10 @@ func resourceSakuraCloudServerUpdate(d *schema.ResourceData, meta interface{}) e
 }
 
 func resourceSakuraCloudServerDelete(d *schema.ResourceData, meta interface{}) error {
-	client, ctx, zone := getSacloudClient(d, meta)
+	client, zone := getSacloudClient(d, meta)
+	ctx, cancel := operationContext(d, schema.TimeoutDelete)
+	defer cancel()
+
 	serverOp := sacloud.NewServerOp(client)
 
 	sakuraMutexKV.Lock(d.Id())

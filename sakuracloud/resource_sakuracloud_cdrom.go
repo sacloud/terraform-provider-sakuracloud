@@ -19,6 +19,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
+	"time"
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/customdiff"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
@@ -43,6 +44,14 @@ func resourceSakuraCloudCDROM() *schema.Resource {
 			}),
 			hasTagResourceCustomizeDiff,
 		),
+
+		Timeouts: &schema.ResourceTimeout{
+			Create: schema.DefaultTimeout(24 * time.Hour),
+			Read:   schema.DefaultTimeout(5 * time.Minute),
+			Update: schema.DefaultTimeout(24 * time.Hour),
+			Delete: schema.DefaultTimeout(20 * time.Minute),
+		},
+
 		Schema: map[string]*schema.Schema{
 			"name": {
 				Type:     schema.TypeString,
@@ -106,7 +115,10 @@ const (
 )
 
 func resourceSakuraCloudCDROMCreate(d *schema.ResourceData, meta interface{}) error {
-	client, ctx, zone := getSacloudClient(d, meta)
+	client, zone := getSacloudClient(d, meta)
+	ctx, cancel := operationContext(d, schema.TimeoutCreate)
+	defer cancel()
+
 	cdromOp := sacloud.NewCDROMOp(client)
 
 	cdrom, ftpServer, err := cdromOp.Create(ctx, zone, expandCDROMCreateRequest(d))
@@ -131,7 +143,10 @@ func resourceSakuraCloudCDROMCreate(d *schema.ResourceData, meta interface{}) er
 }
 
 func resourceSakuraCloudCDROMRead(d *schema.ResourceData, meta interface{}) error {
-	client, ctx, zone := getSacloudClient(d, meta)
+	client, zone := getSacloudClient(d, meta)
+	ctx, cancel := operationContext(d, schema.TimeoutRead)
+	defer cancel()
+
 	cdromOp := sacloud.NewCDROMOp(client)
 
 	cdrom, err := cdromOp.Read(ctx, zone, sakuraCloudID(d.Id()))
@@ -146,7 +161,10 @@ func resourceSakuraCloudCDROMRead(d *schema.ResourceData, meta interface{}) erro
 }
 
 func resourceSakuraCloudCDROMUpdate(d *schema.ResourceData, meta interface{}) error {
-	client, ctx, zone := getSacloudClient(d, meta)
+	client, zone := getSacloudClient(d, meta)
+	ctx, cancel := operationContext(d, schema.TimeoutUpdate)
+	defer cancel()
+
 	cdromOp := sacloud.NewCDROMOp(client)
 
 	cdrom, err := cdromOp.Read(ctx, zone, sakuraCloudID(d.Id()))
@@ -176,7 +194,10 @@ func resourceSakuraCloudCDROMUpdate(d *schema.ResourceData, meta interface{}) er
 }
 
 func resourceSakuraCloudCDROMDelete(d *schema.ResourceData, meta interface{}) error {
-	client, ctx, zone := getSacloudClient(d, meta)
+	client, zone := getSacloudClient(d, meta)
+	ctx, cancel := operationContext(d, schema.TimeoutDelete)
+	defer cancel()
+
 	cdromOp := sacloud.NewCDROMOp(client)
 
 	cdrom, err := cdromOp.Read(ctx, zone, sakuraCloudID(d.Id()))

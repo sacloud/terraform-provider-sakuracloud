@@ -17,6 +17,7 @@ package sakuracloud
 import (
 	"context"
 	"fmt"
+	"time"
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/validation"
@@ -33,6 +34,14 @@ func resourceSakuraCloudNote() *schema.Resource {
 			State: schema.ImportStatePassthrough,
 		},
 		CustomizeDiff: hasTagResourceCustomizeDiff,
+
+		Timeouts: &schema.ResourceTimeout{
+			Create: schema.DefaultTimeout(5 * time.Minute),
+			Read:   schema.DefaultTimeout(5 * time.Minute),
+			Update: schema.DefaultTimeout(5 * time.Minute),
+			Delete: schema.DefaultTimeout(5 * time.Minute),
+		},
+
 		Schema: map[string]*schema.Schema{
 			"name": {
 				Type:     schema.TypeString,
@@ -70,7 +79,10 @@ func resourceSakuraCloudNote() *schema.Resource {
 }
 
 func resourceSakuraCloudNoteCreate(d *schema.ResourceData, meta interface{}) error {
-	client, ctx, _ := getSacloudClient(d, meta)
+	client, _ := getSacloudClient(d, meta)
+	ctx, cancel := operationContext(d, schema.TimeoutCreate)
+	defer cancel()
+
 	noteOp := sacloud.NewNoteOp(client)
 
 	note, err := noteOp.Create(ctx, expandNoteCreateRequest(d))
@@ -83,7 +95,10 @@ func resourceSakuraCloudNoteCreate(d *schema.ResourceData, meta interface{}) err
 }
 
 func resourceSakuraCloudNoteRead(d *schema.ResourceData, meta interface{}) error {
-	client, ctx, _ := getSacloudClient(d, meta)
+	client, _ := getSacloudClient(d, meta)
+	ctx, cancel := operationContext(d, schema.TimeoutRead)
+	defer cancel()
+
 	noteOp := sacloud.NewNoteOp(client)
 
 	note, err := noteOp.Read(ctx, sakuraCloudID(d.Id()))
@@ -99,7 +114,10 @@ func resourceSakuraCloudNoteRead(d *schema.ResourceData, meta interface{}) error
 }
 
 func resourceSakuraCloudNoteUpdate(d *schema.ResourceData, meta interface{}) error {
-	client, ctx, _ := getSacloudClient(d, meta)
+	client, _ := getSacloudClient(d, meta)
+	ctx, cancel := operationContext(d, schema.TimeoutUpdate)
+	defer cancel()
+
 	noteOp := sacloud.NewNoteOp(client)
 
 	note, err := noteOp.Read(ctx, sakuraCloudID(d.Id()))
@@ -116,7 +134,10 @@ func resourceSakuraCloudNoteUpdate(d *schema.ResourceData, meta interface{}) err
 }
 
 func resourceSakuraCloudNoteDelete(d *schema.ResourceData, meta interface{}) error {
-	client, ctx, _ := getSacloudClient(d, meta)
+	client, _ := getSacloudClient(d, meta)
+	ctx, cancel := operationContext(d, schema.TimeoutDelete)
+	defer cancel()
+
 	noteOp := sacloud.NewNoteOp(client)
 
 	note, err := noteOp.Read(ctx, sakuraCloudID(d.Id()))
