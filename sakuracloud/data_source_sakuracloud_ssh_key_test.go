@@ -50,7 +50,7 @@ resource "sakuracloud_ssh_key" "foobar" {
 }
 
 data "sakuracloud_ssh_key" "foobar" {
-  filters {
+  filter {
 	names = [sakuracloud_ssh_key.foobar.name]
   }
 }`

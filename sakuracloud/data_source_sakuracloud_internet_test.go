@@ -56,7 +56,7 @@ resource "sakuracloud_internet" "foobar" {
 }
 
 data "sakuracloud_internet" "foobar" {
-  filters {
+  filter {
 	names = [sakuracloud_internet.foobar.name]
   }
 }`

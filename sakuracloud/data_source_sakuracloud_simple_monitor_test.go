@@ -71,7 +71,7 @@ resource "sakuracloud_simple_monitor" "foobar" {
 }
 
 data "sakuracloud_simple_monitor" "foobar" {
-  filters {
+  filter {
 	names = [sakuracloud_simple_monitor.foobar.target]
   }
 }`

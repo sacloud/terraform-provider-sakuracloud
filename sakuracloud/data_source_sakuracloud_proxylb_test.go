@@ -87,7 +87,7 @@ resource "sakuracloud_proxylb" "foobar" {
 }
 
 data "sakuracloud_proxylb" "foobar" {
-  filters {
+  filter {
 	names = [sakuracloud_proxylb.foobar.name]
   }
 }`

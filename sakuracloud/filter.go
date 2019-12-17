@@ -23,7 +23,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 )
 
-const filterAttrName = "filters"
+const filterAttrName = "filter"
 
 type filterSchemaOption struct {
 	excludeTags bool
@@ -31,11 +31,11 @@ type filterSchemaOption struct {
 
 var (
 	filterConfigKeys = []string{
-		"filters.0.id",
-		"filters.0.names",
-		"filters.0.conditions",
+		"filter.0.id",
+		"filter.0.names",
+		"filter.0.condition",
 	}
-	filterConfigKeysWithTags = append(filterConfigKeys, "filters.0.tags")
+	filterConfigKeysWithTags = append(filterConfigKeys, "filter.0.tags")
 )
 
 func filterSchema(opt *filterSchemaOption) *schema.Schema {
@@ -64,7 +64,7 @@ func filterSchema(opt *filterSchemaOption) *schema.Schema {
 			ExactlyOneOf: keys,
 			Elem:         &schema.Schema{Type: schema.TypeString},
 		},
-		"conditions": {
+		"condition": {
 			Type:         schema.TypeList,
 			Optional:     true,
 			ExactlyOneOf: keys,
@@ -98,7 +98,7 @@ func filterSchema(opt *filterSchemaOption) *schema.Schema {
 	}
 }
 
-var filterNoResultMessage = "Your query returned no results. Please change your filters or selectors and try again"
+var filterNoResultMessage = "Your query returned no results. Please change your filter or selectors and try again"
 
 func filterNoResultErr() error {
 	if os.Getenv(resource.TestEnvVar) != "" {

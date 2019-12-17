@@ -52,7 +52,7 @@ resource "sakuracloud_switch" "foobar" {
 }
 
 data "sakuracloud_switch" "foobar" {
-  filters {
+  filter {
 	names = [sakuracloud_switch.foobar.name]
   }
 }`

@@ -54,7 +54,7 @@ resource "sakuracloud_private_host" "foobar" {
 }
 
 data "sakuracloud_private_host" "foobar" {
-  filters {
+  filter {
 	names = [sakuracloud_private_host.foobar.name]
   }
 }`

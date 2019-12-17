@@ -67,7 +67,7 @@ resource "sakuracloud_packet_filter" "foobar" {
 }
 
 data "sakuracloud_packet_filter" "foobar" {
-  filters {
+  filter {
 	names = [sakuracloud_packet_filter.foobar.name]
   }
 }`

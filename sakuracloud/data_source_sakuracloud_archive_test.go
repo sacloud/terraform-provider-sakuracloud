@@ -113,28 +113,28 @@ func TestAccSakuraCloudDataSourceArchive_tagNotExists(t *testing.T) {
 
 var testAccSakuraCloudDataSourceArchive_basic = `
 data "sakuracloud_archive" "foobar" {
-  filters {
+  filter {
     names = ["Ubuntu Server 16"]
   }
 }`
 
 var testAccCheckSakuraCloudDataSourceArchive_withTag = `
 data "sakuracloud_archive" "foobar" {
-  filters {
+  filter {
     tags = ["distro-ubuntu","os-linux"]
   }
 }`
 
 var testAccCheckSakuraCloudDataSourceArchive_tagNotExists = `
 data "sakuracloud_archive" "foobar" {
-  filters {
+  filter {
     tags = ["distro-ubuntu-xxxxxxxxxxx","os-linux-xxxxxxxx"]
   }
 }`
 
 var testAccCheckSakuraCloudDataSourceArchive_notExists = `
 data "sakuracloud_archive" "foobar" {
-  filters {
+  filter {
     names = ["xxxxxxxxxxxxxxxxxx"]
   }
 }`
