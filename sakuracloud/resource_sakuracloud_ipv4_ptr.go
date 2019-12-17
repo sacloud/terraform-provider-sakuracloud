@@ -107,7 +107,6 @@ func resourceSakuraCloudIPv4PtrUpdate(d *schema.ResourceData, meta interface{}) 
 	i := 0
 	success := false
 	for i < retryMax {
-
 		// set
 		if _, err = ipAddrOp.UpdateHostName(ctx, zone, ip, hostName); err == nil {
 			success = true

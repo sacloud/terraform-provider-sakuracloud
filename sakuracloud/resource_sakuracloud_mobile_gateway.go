@@ -231,7 +231,6 @@ func resourceSakuraCloudMobileGatewayCreate(d *schema.ResourceData, meta interfa
 
 	d.SetId(mgw.ID.String())
 	return resourceSakuraCloudMobileGatewayRead(d, meta)
-
 }
 
 func resourceSakuraCloudMobileGatewayRead(d *schema.ResourceData, meta interface{}) error {

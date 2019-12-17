@@ -261,7 +261,6 @@ func testCheckSakuraCloudServerExists(n string, server *sacloud.Server) resource
 
 func testCheckSakuraCloudServerAttributes(server *sacloud.Server) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
-
 		if !server.InstanceStatus.IsUp() {
 			return fmt.Errorf("unexpected server status: status=%v", server.InstanceStatus)
 		}
@@ -280,7 +279,6 @@ func testCheckSakuraCloudServerAttributes(server *sacloud.Server) resource.TestC
 
 func testCheckSakuraCloudServerSharedInterface(server *sacloud.Server) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
-
 		if !server.InstanceStatus.IsUp() {
 			return fmt.Errorf("unexpected server status: status=%v", server.InstanceStatus)
 		}

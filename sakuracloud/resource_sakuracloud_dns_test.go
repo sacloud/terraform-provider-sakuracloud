@@ -131,7 +131,6 @@ func testCheckSakuraCloudDNSDestroy(s *terraform.State) error {
 }
 
 func TestAccImportSakuraCloudDNS(t *testing.T) {
-
 	zone := fmt.Sprintf("%s.com", randomName())
 
 	checkFn := func(s []*terraform.InstanceState) error {

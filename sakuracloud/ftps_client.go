@@ -10,7 +10,6 @@ import (
 )
 
 func uploadFileViaFTPS(ctx context.Context, user, pass, host, file string) error {
-
 	f, err := os.Open(file)
 	if err != nil {
 		return fmt.Errorf("opening file[%s] failed: %s", file, err)

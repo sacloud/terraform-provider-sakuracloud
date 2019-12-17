@@ -125,7 +125,6 @@ func testCheckSakuraCloudDNSRecordDestroy(s *terraform.State) error {
 					}
 				}
 			}
-
 		}
 	}
 
