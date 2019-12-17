@@ -66,7 +66,10 @@ func resourceSakuraCloudSSHKey() *schema.Resource {
 }
 
 func resourceSakuraCloudSSHKeyCreate(d *schema.ResourceData, meta interface{}) error {
-	client, _ := getSacloudClient(d, meta)
+	client, _, err := sakuraCloudClient(d, meta)
+	if err != nil {
+		return err
+	}
 	ctx, cancel := operationContext(d, schema.TimeoutCreate)
 	defer cancel()
 
@@ -82,7 +85,10 @@ func resourceSakuraCloudSSHKeyCreate(d *schema.ResourceData, meta interface{}) e
 }
 
 func resourceSakuraCloudSSHKeyRead(d *schema.ResourceData, meta interface{}) error {
-	client, _ := getSacloudClient(d, meta)
+	client, _, err := sakuraCloudClient(d, meta)
+	if err != nil {
+		return err
+	}
 	ctx, cancel := operationContext(d, schema.TimeoutRead)
 	defer cancel()
 
@@ -100,7 +106,10 @@ func resourceSakuraCloudSSHKeyRead(d *schema.ResourceData, meta interface{}) err
 }
 
 func resourceSakuraCloudSSHKeyUpdate(d *schema.ResourceData, meta interface{}) error {
-	client, _ := getSacloudClient(d, meta)
+	client, _, err := sakuraCloudClient(d, meta)
+	if err != nil {
+		return err
+	}
 	ctx, cancel := operationContext(d, schema.TimeoutUpdate)
 	defer cancel()
 
@@ -119,7 +128,10 @@ func resourceSakuraCloudSSHKeyUpdate(d *schema.ResourceData, meta interface{}) e
 }
 
 func resourceSakuraCloudSSHKeyDelete(d *schema.ResourceData, meta interface{}) error {
-	client, _ := getSacloudClient(d, meta)
+	client, _, err := sakuraCloudClient(d, meta)
+	if err != nil {
+		return err
+	}
 	ctx, cancel := operationContext(d, schema.TimeoutDelete)
 	defer cancel()
 

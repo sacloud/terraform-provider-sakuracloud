@@ -73,7 +73,10 @@ func resourceSakuraCloudIcon() *schema.Resource {
 }
 
 func resourceSakuraCloudIconCreate(d *schema.ResourceData, meta interface{}) error {
-	client, _ := getSacloudClient(d, meta)
+	client, _, err := sakuraCloudClient(d, meta)
+	if err != nil {
+		return err
+	}
 	ctx, cancel := operationContext(d, schema.TimeoutCreate)
 	defer cancel()
 
@@ -93,7 +96,10 @@ func resourceSakuraCloudIconCreate(d *schema.ResourceData, meta interface{}) err
 }
 
 func resourceSakuraCloudIconRead(d *schema.ResourceData, meta interface{}) error {
-	client, _ := getSacloudClient(d, meta)
+	client, _, err := sakuraCloudClient(d, meta)
+	if err != nil {
+		return err
+	}
 	ctx, cancel := operationContext(d, schema.TimeoutRead)
 	defer cancel()
 
@@ -112,13 +118,16 @@ func resourceSakuraCloudIconRead(d *schema.ResourceData, meta interface{}) error
 }
 
 func resourceSakuraCloudIconUpdate(d *schema.ResourceData, meta interface{}) error {
-	client, _ := getSacloudClient(d, meta)
+	client, _, err := sakuraCloudClient(d, meta)
+	if err != nil {
+		return err
+	}
 	ctx, cancel := operationContext(d, schema.TimeoutUpdate)
 	defer cancel()
 
 	iconOp := sacloud.NewIconOp(client)
 
-	_, err := iconOp.Read(ctx, sakuraCloudID(d.Id()))
+	_, err = iconOp.Read(ctx, sakuraCloudID(d.Id()))
 	if err != nil {
 		return fmt.Errorf("could not read SakuraCloud Icon[%s]: %s", d.Id(), err)
 	}
@@ -131,7 +140,10 @@ func resourceSakuraCloudIconUpdate(d *schema.ResourceData, meta interface{}) err
 }
 
 func resourceSakuraCloudIconDelete(d *schema.ResourceData, meta interface{}) error {
-	client, _ := getSacloudClient(d, meta)
+	client, _, err := sakuraCloudClient(d, meta)
+	if err != nil {
+		return err
+	}
 	ctx, cancel := operationContext(d, schema.TimeoutDelete)
 	defer cancel()
 

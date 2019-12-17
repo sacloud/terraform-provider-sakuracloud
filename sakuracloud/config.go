@@ -51,6 +51,7 @@ type Config struct {
 	AccessToken         string
 	AccessTokenSecret   string
 	Zone                string
+	Zones               []string
 	TraceMode           string
 	FakeMode            string
 	FakeStorePath       string
@@ -69,6 +70,7 @@ type Config struct {
 type APIClient struct {
 	sacloud.APICaller
 	defaultZone                     string
+	zones                           []string
 	deletionWaiterTimeout           time.Duration
 	deletionWaiterPollingInterval   time.Duration
 	databaseWaitAfterCreateDuration time.Duration
@@ -149,9 +151,21 @@ func (c *Config) NewClient() *APIClient {
 		builder.DefaultNICUpdateWaitDuration = defaultInterval
 	}
 
+	zones := c.Zones
+	if len(zones) == 0 {
+		zones = defaultZones
+	}
+	if c.APIRootURL != "" {
+		if strings.HasSuffix(c.APIRootURL, "/") {
+			c.APIRootURL = strings.TrimRight(c.APIRootURL, "/")
+		}
+		sacloud.SakuraCloudAPIRoot = c.APIRootURL
+	}
+
 	return &APIClient{
 		APICaller:                       caller,
 		defaultZone:                     c.Zone,
+		zones:                           zones,
 		deletionWaiterTimeout:           deletionWaiterTimeout,
 		deletionWaiterPollingInterval:   deletionWaiterPollingInterval,
 		databaseWaitAfterCreateDuration: databaseWaitAfterCreateDuration,

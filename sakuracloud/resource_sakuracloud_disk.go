@@ -112,19 +112,21 @@ func resourceSakuraCloudDisk() *schema.Resource {
 				Elem:     &schema.Schema{Type: schema.TypeString},
 			},
 			"zone": {
-				Type:         schema.TypeString,
-				Optional:     true,
-				Computed:     true,
-				ForceNew:     true,
-				Description:  "target SakuraCloud zone",
-				ValidateFunc: validateZone([]string{"is1a", "is1b", "tk1a", "tk1v"}),
+				Type:        schema.TypeString,
+				Optional:    true,
+				Computed:    true,
+				ForceNew:    true,
+				Description: "target SakuraCloud zone",
 			},
 		},
 	}
 }
 
 func resourceSakuraCloudDiskCreate(d *schema.ResourceData, meta interface{}) error {
-	client, zone := getSacloudClient(d, meta)
+	client, zone, err := sakuraCloudClient(d, meta)
+	if err != nil {
+		return err
+	}
 	ctx, cancel := operationContext(d, schema.TimeoutCreate)
 	defer cancel()
 
@@ -159,7 +161,10 @@ func resourceSakuraCloudDiskCreate(d *schema.ResourceData, meta interface{}) err
 }
 
 func resourceSakuraCloudDiskRead(d *schema.ResourceData, meta interface{}) error {
-	client, zone := getSacloudClient(d, meta)
+	client, zone, err := sakuraCloudClient(d, meta)
+	if err != nil {
+		return err
+	}
 	ctx, cancel := operationContext(d, schema.TimeoutRead)
 	defer cancel()
 
@@ -178,7 +183,10 @@ func resourceSakuraCloudDiskRead(d *schema.ResourceData, meta interface{}) error
 }
 
 func resourceSakuraCloudDiskUpdate(d *schema.ResourceData, meta interface{}) error {
-	client, zone := getSacloudClient(d, meta)
+	client, zone, err := sakuraCloudClient(d, meta)
+	if err != nil {
+		return err
+	}
 	ctx, cancel := operationContext(d, schema.TimeoutUpdate)
 	defer cancel()
 
@@ -198,7 +206,10 @@ func resourceSakuraCloudDiskUpdate(d *schema.ResourceData, meta interface{}) err
 }
 
 func resourceSakuraCloudDiskDelete(d *schema.ResourceData, meta interface{}) error {
-	client, zone := getSacloudClient(d, meta)
+	client, zone, err := sakuraCloudClient(d, meta)
+	if err != nil {
+		return err
+	}
 	ctx, cancel := operationContext(d, schema.TimeoutDelete)
 	defer cancel()
 

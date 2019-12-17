@@ -100,19 +100,21 @@ func resourceSakuraCloudDatabaseReadReplica() *schema.Resource {
 				Elem:     &schema.Schema{Type: schema.TypeString},
 			},
 			"zone": {
-				Type:         schema.TypeString,
-				Optional:     true,
-				Computed:     true,
-				ForceNew:     true,
-				Description:  "target SakuraCloud zone",
-				ValidateFunc: validateZone([]string{"tk1a", "is1b", "is1a"}),
+				Type:        schema.TypeString,
+				Optional:    true,
+				Computed:    true,
+				ForceNew:    true,
+				Description: "target SakuraCloud zone",
 			},
 		},
 	}
 }
 
 func resourceSakuraCloudDatabaseReadReplicaCreate(d *schema.ResourceData, meta interface{}) error {
-	client, zone := getSacloudClient(d, meta)
+	client, zone, err := sakuraCloudClient(d, meta)
+	if err != nil {
+		return err
+	}
 	ctx, cancel := operationContext(d, schema.TimeoutCreate)
 	defer cancel()
 
@@ -136,7 +138,10 @@ func resourceSakuraCloudDatabaseReadReplicaCreate(d *schema.ResourceData, meta i
 }
 
 func resourceSakuraCloudDatabaseReadReplicaRead(d *schema.ResourceData, meta interface{}) error {
-	client, zone := getSacloudClient(d, meta)
+	client, zone, err := sakuraCloudClient(d, meta)
+	if err != nil {
+		return err
+	}
 	ctx, cancel := operationContext(d, schema.TimeoutRead)
 	defer cancel()
 
@@ -154,7 +159,10 @@ func resourceSakuraCloudDatabaseReadReplicaRead(d *schema.ResourceData, meta int
 }
 
 func resourceSakuraCloudDatabaseReadReplicaUpdate(d *schema.ResourceData, meta interface{}) error {
-	client, zone := getSacloudClient(d, meta)
+	client, zone, err := sakuraCloudClient(d, meta)
+	if err != nil {
+		return err
+	}
 	ctx, cancel := operationContext(d, schema.TimeoutUpdate)
 	defer cancel()
 
@@ -179,7 +187,10 @@ func resourceSakuraCloudDatabaseReadReplicaUpdate(d *schema.ResourceData, meta i
 }
 
 func resourceSakuraCloudDatabaseReadReplicaDelete(d *schema.ResourceData, meta interface{}) error {
-	client, zone := getSacloudClient(d, meta)
+	client, zone, err := sakuraCloudClient(d, meta)
+	if err != nil {
+		return err
+	}
 	ctx, cancel := operationContext(d, schema.TimeoutDelete)
 	defer cancel()
 

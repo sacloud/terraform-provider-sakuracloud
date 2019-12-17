@@ -64,12 +64,11 @@ func resourceSakuraCloudIPv4Ptr() *schema.Resource {
 				ValidateFunc: validation.IntBetween(1, 600),
 			},
 			"zone": {
-				Type:         schema.TypeString,
-				Optional:     true,
-				Computed:     true,
-				ForceNew:     true,
-				Description:  "target SakuraCloud zone",
-				ValidateFunc: validateZone([]string{"is1a", "is1b", "tk1a", "tk1v"}),
+				Type:        schema.TypeString,
+				Optional:    true,
+				Computed:    true,
+				ForceNew:    true,
+				Description: "target SakuraCloud zone",
 			},
 		},
 	}
@@ -78,7 +77,10 @@ func resourceSakuraCloudIPv4Ptr() *schema.Resource {
 func resourceSakuraCloudIPv4PtrUpdate(d *schema.ResourceData, meta interface{}) error {
 	var err error
 
-	client, zone := getSacloudClient(d, meta)
+	client, zone, err := sakuraCloudClient(d, meta)
+	if err != nil {
+		return err
+	}
 	op := schema.TimeoutUpdate
 	if d.IsNewResource() {
 		op = schema.TimeoutCreate
@@ -125,7 +127,10 @@ func resourceSakuraCloudIPv4PtrUpdate(d *schema.ResourceData, meta interface{}) 
 }
 
 func resourceSakuraCloudIPv4PtrRead(d *schema.ResourceData, meta interface{}) error {
-	client, zone := getSacloudClient(d, meta)
+	client, zone, err := sakuraCloudClient(d, meta)
+	if err != nil {
+		return err
+	}
 	ctx, cancel := operationContext(d, schema.TimeoutRead)
 	defer cancel()
 
@@ -146,7 +151,10 @@ func resourceSakuraCloudIPv4PtrRead(d *schema.ResourceData, meta interface{}) er
 func resourceSakuraCloudIPv4PtrDelete(d *schema.ResourceData, meta interface{}) error {
 	var err error
 
-	client, zone := getSacloudClient(d, meta)
+	client, zone, err := sakuraCloudClient(d, meta)
+	if err != nil {
+		return err
+	}
 	ctx, cancel := operationContext(d, schema.TimeoutDelete)
 	defer cancel()
 

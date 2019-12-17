@@ -99,12 +99,11 @@ func resourceSakuraCloudCDROM() *schema.Resource {
 				Elem:     &schema.Schema{Type: schema.TypeString},
 			},
 			"zone": {
-				Type:         schema.TypeString,
-				Optional:     true,
-				Computed:     true,
-				ForceNew:     true,
-				Description:  "target SakuraCloud zone",
-				ValidateFunc: validateZone([]string{"is1a", "is1b", "tk1a", "tk1v"}),
+				Type:        schema.TypeString,
+				Optional:    true,
+				Computed:    true,
+				ForceNew:    true,
+				Description: "target SakuraCloud zone",
 			},
 		},
 	}
@@ -115,7 +114,10 @@ const (
 )
 
 func resourceSakuraCloudCDROMCreate(d *schema.ResourceData, meta interface{}) error {
-	client, zone := getSacloudClient(d, meta)
+	client, zone, err := sakuraCloudClient(d, meta)
+	if err != nil {
+		return err
+	}
 	ctx, cancel := operationContext(d, schema.TimeoutCreate)
 	defer cancel()
 
@@ -143,7 +145,10 @@ func resourceSakuraCloudCDROMCreate(d *schema.ResourceData, meta interface{}) er
 }
 
 func resourceSakuraCloudCDROMRead(d *schema.ResourceData, meta interface{}) error {
-	client, zone := getSacloudClient(d, meta)
+	client, zone, err := sakuraCloudClient(d, meta)
+	if err != nil {
+		return err
+	}
 	ctx, cancel := operationContext(d, schema.TimeoutRead)
 	defer cancel()
 
@@ -161,7 +166,10 @@ func resourceSakuraCloudCDROMRead(d *schema.ResourceData, meta interface{}) erro
 }
 
 func resourceSakuraCloudCDROMUpdate(d *schema.ResourceData, meta interface{}) error {
-	client, zone := getSacloudClient(d, meta)
+	client, zone, err := sakuraCloudClient(d, meta)
+	if err != nil {
+		return err
+	}
 	ctx, cancel := operationContext(d, schema.TimeoutUpdate)
 	defer cancel()
 
@@ -194,7 +202,10 @@ func resourceSakuraCloudCDROMUpdate(d *schema.ResourceData, meta interface{}) er
 }
 
 func resourceSakuraCloudCDROMDelete(d *schema.ResourceData, meta interface{}) error {
-	client, zone := getSacloudClient(d, meta)
+	client, zone, err := sakuraCloudClient(d, meta)
+	if err != nil {
+		return err
+	}
 	ctx, cancel := operationContext(d, schema.TimeoutDelete)
 	defer cancel()
 

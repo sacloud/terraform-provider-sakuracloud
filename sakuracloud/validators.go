@@ -18,7 +18,6 @@ import (
 	"errors"
 	"fmt"
 	"net"
-	"os"
 	"strconv"
 	"strings"
 
@@ -113,13 +112,6 @@ func validateIPv4Address() schema.SchemaValidateFunc {
 		}
 		return
 	}
-}
-
-func validateZone(allowZones []string) schema.SchemaValidateFunc {
-	if os.Getenv("SAKURACLOUD_FORCE_USE_ZONES") != "" {
-		return func(interface{}, string) (ws []string, errors []error) { return }
-	}
-	return validation.StringInSlice(allowZones, false)
 }
 
 func validateDatabaseParameters(d *schema.ResourceData) error {
