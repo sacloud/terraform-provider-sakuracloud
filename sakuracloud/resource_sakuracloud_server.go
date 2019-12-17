@@ -73,7 +73,6 @@ func resourceSakuraCloudServer() *schema.Resource {
 			"disks": {
 				Type:     schema.TypeList,
 				Optional: true,
-				Computed: true,
 				Elem:     &schema.Schema{Type: schema.TypeString},
 			},
 			"interface_driver": {
@@ -112,7 +111,6 @@ func resourceSakuraCloudServer() *schema.Resource {
 			"cdrom_id": {
 				Type:         schema.TypeString,
 				Optional:     true,
-				Computed:     true,
 				ValidateFunc: validateSakuracloudIDType,
 			},
 			"private_host_id": {

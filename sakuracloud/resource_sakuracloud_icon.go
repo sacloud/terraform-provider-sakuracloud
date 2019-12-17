@@ -55,10 +55,6 @@ func resourceSakuraCloudIcon() *schema.Resource {
 				ConflictsWith: []string{"source"},
 				ForceNew:      true,
 			},
-			"body": {
-				Type:     schema.TypeString,
-				Computed: true,
-			},
 			"tags": {
 				Type:     schema.TypeList,
 				Optional: true,

@@ -79,7 +79,6 @@ func resourceSakuraCloudInternet() *schema.Resource {
 			"enable_ipv6": {
 				Type:     schema.TypeBool,
 				Optional: true,
-				Computed: true,
 			},
 			"zone": {
 				Type:        schema.TypeString,
