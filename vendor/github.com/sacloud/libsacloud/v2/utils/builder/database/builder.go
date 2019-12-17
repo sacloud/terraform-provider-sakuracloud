@@ -153,7 +153,7 @@ func (b *Builder) Update(ctx context.Context, zone string, id types.ID) (*saclou
 		}
 	}
 
-	db, err = b.Client.Database.Update(ctx, zone, id, &sacloud.DatabaseUpdateRequest{
+	_, err = b.Client.Database.Update(ctx, zone, id, &sacloud.DatabaseUpdateRequest{
 		Name:               b.Name,
 		Description:        b.Description,
 		Tags:               b.Tags,

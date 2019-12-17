@@ -40,7 +40,6 @@ func (r *APIResult) UnmarshalJSON(data []byte) error {
 	// try bool
 	var b bool
 	if err := json.Unmarshal(data, &b); err != nil {
-
 		// try string
 		var s string
 		if err := json.Unmarshal(data, &s); err != nil {

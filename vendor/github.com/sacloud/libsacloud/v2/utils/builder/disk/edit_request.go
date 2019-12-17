@@ -91,7 +91,6 @@ func (u *UnixEditRequest) Validate(ctx context.Context, client *APIClient) error
 }
 
 func (u *UnixEditRequest) prepareDiskEditParameter(ctx context.Context, client *APIClient) (*sacloud.DiskEditRequest, *sacloud.SSHKeyGenerated, []*sacloud.Note, error) {
-
 	editReq := &sacloud.DiskEditRequest{
 		Background:          true,
 		Password:            u.Password,

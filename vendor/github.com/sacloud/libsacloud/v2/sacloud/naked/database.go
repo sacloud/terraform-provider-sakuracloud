@@ -203,7 +203,6 @@ func (h *DatabaseBackupHistory) FormatRecoveredAt(layout string) string {
 
 // UnmarshalJSON JSON復号処理
 func (h *DatabaseBackupHistory) UnmarshalJSON(data []byte) error {
-
 	var tmpMap = map[string]interface{}{}
 	if err := json.Unmarshal(data, &tmpMap); err != nil {
 		return err

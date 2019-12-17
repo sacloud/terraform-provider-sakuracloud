@@ -53,7 +53,7 @@ func startDiskCopy(resourceKey, zone string, readFunc func() (interface{}, error
 				if counter == 0 {
 					target.SetMigratedMB(0)
 				} else {
-					target.SetMigratedMB(int(target.GetSizeMB() / counter))
+					target.SetMigratedMB(target.GetSizeMB() / counter)
 				}
 			} else {
 				target.SetAvailability(types.Availabilities.Available)

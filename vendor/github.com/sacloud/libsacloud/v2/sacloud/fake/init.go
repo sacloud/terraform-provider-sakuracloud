@@ -48,7 +48,9 @@ func InitDataStore() {
 		p := initValuePool(DataStore)
 
 		if DataStore.NeedInitData() {
-			initData(DataStore, p)
+			if err := initData(DataStore, p); err != nil {
+				panic(err)
+			}
 		}
 	})
 }

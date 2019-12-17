@@ -16,11 +16,9 @@ package fake
 
 import (
 	"context"
-	"fmt"
 	"net"
 	"time"
 
-	"github.com/imdario/mergo"
 	"github.com/sacloud/libsacloud/v2/sacloud"
 	"github.com/sacloud/libsacloud/v2/sacloud/types"
 )
@@ -132,71 +130,6 @@ func (o *ProxyLBOp) Update(ctx context.Context, id types.ID, param *sacloud.Prox
 	return value, nil
 }
 
-// Patch is fake implementation
-func (o *ProxyLBOp) Patch(ctx context.Context, id types.ID, param *sacloud.ProxyLBPatchRequest) (*sacloud.ProxyLB, error) {
-	value, err := o.Read(ctx, id)
-	if err != nil {
-		return nil, err
-	}
-
-	patchParam := make(map[string]interface{})
-	if err := mergo.Map(&patchParam, value); err != nil {
-		return nil, fmt.Errorf("patch is failed: %s", err)
-	}
-	if err := mergo.Map(&patchParam, param); err != nil {
-		return nil, fmt.Errorf("patch is failed: %s", err)
-	}
-	if err := mergo.Map(param, &patchParam); err != nil {
-		return nil, fmt.Errorf("patch is failed: %s", err)
-	}
-	copySameNameField(param, value)
-
-	if param.PatchEmptyToHealthCheck {
-		value.HealthCheck = nil
-	}
-	if param.PatchEmptyToSorryServer {
-		value.SorryServer = nil
-	}
-	if param.PatchEmptyToBindPorts {
-		value.BindPorts = nil
-	}
-	if param.PatchEmptyToServers {
-		value.Servers = nil
-	}
-	if param.PatchEmptyToLetsEncrypt {
-		value.LetsEncrypt = nil
-	}
-	if param.PatchEmptyToStickySession {
-		value.StickySession = nil
-	}
-	if param.PatchEmptyToDescription {
-		value.Description = ""
-	}
-	if param.PatchEmptyToTags {
-		value.Tags = nil
-	}
-	if param.PatchEmptyToIconID {
-		value.IconID = types.ID(int64(0))
-	}
-
-	putProxyLB(sacloud.APIDefaultZone, value)
-
-	status := ds().Get(ResourceProxyLB+"Status", sacloud.APIDefaultZone, id).(*sacloud.ProxyLBHealth)
-	status.Servers = []*sacloud.LoadBalancerServerStatus{}
-	for _, server := range param.Servers {
-		status.Servers = append(status.Servers, &sacloud.LoadBalancerServerStatus{
-			ActiveConn: 10,
-			Status:     types.ServerInstanceStatuses.Up,
-			IPAddress:  server.IPAddress,
-			Port:       types.StringNumber(server.Port),
-			CPS:        10,
-		})
-	}
-	ds().Put(ResourceProxyLB+"Status", sacloud.APIDefaultZone, id, status)
-
-	return value, nil
-}
-
 // UpdateSettings is fake implementation
 func (o *ProxyLBOp) UpdateSettings(ctx context.Context, id types.ID, param *sacloud.ProxyLBUpdateSettingsRequest) (*sacloud.ProxyLB, error) {
 	value, err := o.Read(ctx, id)
@@ -230,13 +163,6 @@ func (o *ProxyLBOp) UpdateSettings(ctx context.Context, id types.ID, param *sacl
 	ds().Put(ResourceProxyLB+"Status", sacloud.APIDefaultZone, id, status)
 
 	return value, nil
-}
-
-// PatchSettings is fake implementation
-func (o *ProxyLBOp) PatchSettings(ctx context.Context, id types.ID, param *sacloud.ProxyLBPatchSettingsRequest) (*sacloud.ProxyLB, error) {
-	patchParam := &sacloud.ProxyLBPatchRequest{}
-	copySameNameField(param, patchParam)
-	return o.Patch(ctx, id, patchParam)
 }
 
 // Delete is fake implementation
