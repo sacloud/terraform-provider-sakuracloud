@@ -110,10 +110,10 @@ func dataSourceSakuraCloudBucketObjectRead(d *schema.ResourceData, meta interfac
 	if err != nil {
 		return fmt.Errorf("reading SakuraCloud BucketObject is failed: %s", err)
 	}
-	d.Set("last_modified", keyInfo.LastModified)
-	d.Set("size", keyInfo.Size)
+	d.Set("last_modified", keyInfo.LastModified) // nolint
+	d.Set("size", keyInfo.Size)                  // nolint
 	// See https://forums.aws.amazon.com/thread.jspa?threadID=44003
-	d.Set("etag", strings.Trim(keyInfo.ETag, `"`))
+	d.Set("etag", strings.Trim(keyInfo.ETag, `"`)) // nolint
 
 	// get head
 	head, err := bucket.Head(key)
@@ -121,14 +121,14 @@ func dataSourceSakuraCloudBucketObjectRead(d *schema.ResourceData, meta interfac
 		return fmt.Errorf("reading SakuraCloud BucketObject is failed: %s", err)
 	}
 	contentType := head.Header.Get("Content-Type")
-	d.Set("content_type", contentType)
+	d.Set("content_type", contentType) // nolint
 
 	if isContentTypeAllowed(&contentType) {
 		data, err := bucket.Get(key)
 		if err != nil {
 			return fmt.Errorf("reading SakuraCloud BucketObject is failed: %s", err)
 		}
-		d.Set("body", string(data))
+		d.Set("body", string(data)) // nolint
 	} else {
 		out := ""
 		if contentType == "" {
@@ -146,12 +146,12 @@ func dataSourceSakuraCloudBucketObjectRead(d *schema.ResourceData, meta interfac
 	if strings.HasPrefix(key, "/") {
 		key = strings.TrimLeft(key, "/")
 	}
-	d.Set("http_url", fmt.Sprintf("http://%s.%s/%s", strBucket, objectStorageAPIHost, key))
-	d.Set("https_url", fmt.Sprintf("https://%s.%s/%s", strBucket, objectStorageAPIHost, key))
-	d.Set("http_path_url", fmt.Sprintf("http://%s/%s/%s", objectStorageAPIHost, strBucket, key))
-	d.Set("https_path_url", fmt.Sprintf("https://%s/%s/%s", objectStorageAPIHost, strBucket, key))
-	d.Set("http_cache_url", fmt.Sprintf("http://%s.%s/%s", strBucket, objectStorageCachedHost, key))
-	d.Set("https_cache_url", fmt.Sprintf("https://%s.%s/%s", strBucket, objectStorageCachedHost, key))
+	d.Set("http_url", fmt.Sprintf("http://%s.%s/%s", strBucket, objectStorageAPIHost, key))            // nolint
+	d.Set("https_url", fmt.Sprintf("https://%s.%s/%s", strBucket, objectStorageAPIHost, key))          // nolint
+	d.Set("http_path_url", fmt.Sprintf("http://%s/%s/%s", objectStorageAPIHost, strBucket, key))       // nolint
+	d.Set("https_path_url", fmt.Sprintf("https://%s/%s/%s", objectStorageAPIHost, strBucket, key))     // nolint
+	d.Set("http_cache_url", fmt.Sprintf("http://%s.%s/%s", strBucket, objectStorageCachedHost, key))   // nolint
+	d.Set("https_cache_url", fmt.Sprintf("https://%s.%s/%s", strBucket, objectStorageCachedHost, key)) // nolint
 
 	return nil
 }

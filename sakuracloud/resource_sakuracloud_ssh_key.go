@@ -153,9 +153,9 @@ func resourceSakuraCloudSSHKeyDelete(d *schema.ResourceData, meta interface{}) e
 }
 
 func setSSHKeyResourceData(_ context.Context, d *schema.ResourceData, _ *APIClient, data *sacloud.SSHKey) error {
-	d.Set("name", data.Name)
-	d.Set("public_key", data.PublicKey)
-	d.Set("fingerprint", data.Fingerprint)
-	d.Set("description", data.Description)
+	d.Set("name", data.Name)               // nolint
+	d.Set("public_key", data.PublicKey)    // nolint
+	d.Set("fingerprint", data.Fingerprint) // nolint
+	d.Set("description", data.Description) // nolint
 	return nil
 }

@@ -195,8 +195,8 @@ func resourceSakuraCloudPacketFilterDelete(d *schema.ResourceData, meta interfac
 }
 
 func setPacketFilterResourceData(ctx context.Context, d *schema.ResourceData, client *APIClient, data *sacloud.PacketFilter) error {
-	d.Set("name", data.Name)
-	d.Set("description", data.Description)
-	d.Set("zone", getZone(d, client))
+	d.Set("name", data.Name)               // nolint
+	d.Set("description", data.Description) // nolint
+	d.Set("zone", getZone(d, client))      // nolint
 	return d.Set("expression", flattenPacketFilterExpressions(data))
 }

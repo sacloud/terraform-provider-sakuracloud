@@ -168,10 +168,10 @@ func resourceSakuraCloudNoteDelete(d *schema.ResourceData, meta interface{}) err
 }
 
 func setNoteResourceData(ctx context.Context, d *schema.ResourceData, client *APIClient, data *sacloud.Note) error {
-	d.Set("name", data.Name)
-	d.Set("content", data.Content)
-	d.Set("class", data.Class)
-	d.Set("icon_id", data.IconID.String())
-	d.Set("description", data.Description)
+	d.Set("name", data.Name)               // nolint
+	d.Set("content", data.Content)         // nolint
+	d.Set("class", data.Class)             // nolint
+	d.Set("icon_id", data.IconID.String()) // nolint
+	d.Set("description", data.Description) // nolint
 	return d.Set("tags", data.Tags)
 }

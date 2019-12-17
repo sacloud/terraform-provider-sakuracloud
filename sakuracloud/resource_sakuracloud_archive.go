@@ -199,16 +199,13 @@ func resourceSakuraCloudArchiveDelete(d *schema.ResourceData, meta interface{}) 
 }
 
 func setArchiveResourceData(d *schema.ResourceData, client *APIClient, data *sacloud.Archive) error {
-	d.Set("hash", expandArchiveHash(d))
-	d.Set("icon_id", data.IconID.String())
-	if err := d.Set("tags", data.Tags); err != nil {
-		return err
-	}
-	d.Set("name", data.Name)
-	d.Set("size", data.GetSizeGB())
-	d.Set("description", data.Description)
-	d.Set("zone", getZone(d, client))
-	return nil
+	d.Set("hash", expandArchiveHash(d))    // nolint
+	d.Set("icon_id", data.IconID.String()) // nolint
+	d.Set("name", data.Name)               // nolint
+	d.Set("size", data.GetSizeGB())        // nolint
+	d.Set("description", data.Description) // nolint
+	d.Set("zone", getZone(d, client))      // nolint
+	return d.Set("tags", data.Tags)
 }
 
 func uploadArchiveFile(ctx context.Context, archiveOp sacloud.ArchiveAPI, zone string, id types.ID, filePath string, ftpServer *sacloud.FTPServer) error {

@@ -263,29 +263,26 @@ func setInternetResourceData(ctx context.Context, d *schema.ResourceData, client
 		ipv6NetworkAddress = fmt.Sprintf("%s/%d", ipv6Prefix, ipv6PrefixLen)
 	}
 
-	d.Set("name", data.Name)
-	d.Set("icon_id", data.IconID.String())
-	d.Set("description", data.Description)
-	if err := d.Set("tags", data.Tags); err != nil {
-		return err
-	}
-	d.Set("netmask", data.NetworkMaskLen)
-	d.Set("band_width", data.BandWidthMbps)
-	d.Set("switch_id", sw.ID.String())
-	d.Set("network_address", sw.Subnets[0].NetworkAddress)
-	d.Set("gateway", sw.Subnets[0].DefaultRoute)
-	d.Set("min_ip_address", sw.Subnets[0].AssignedIPAddressMin)
-	d.Set("max_ip_address", sw.Subnets[0].AssignedIPAddressMax)
+	d.Set("name", data.Name)                                    // nolint
+	d.Set("icon_id", data.IconID.String())                      // nolint
+	d.Set("description", data.Description)                      // nolint
+	d.Set("netmask", data.NetworkMaskLen)                       // nolint
+	d.Set("band_width", data.BandWidthMbps)                     // nolint
+	d.Set("switch_id", sw.ID.String())                          // nolint
+	d.Set("network_address", sw.Subnets[0].NetworkAddress)      // nolint
+	d.Set("gateway", sw.Subnets[0].DefaultRoute)                // nolint
+	d.Set("min_ip_address", sw.Subnets[0].AssignedIPAddressMin) // nolint
+	d.Set("max_ip_address", sw.Subnets[0].AssignedIPAddressMax) // nolint
+	d.Set("enable_ipv6", enableIPv6)                            // nolint
+	d.Set("ipv6_prefix", ipv6Prefix)                            // nolint
+	d.Set("ipv6_prefix_len", ipv6PrefixLen)                     // nolint
+	d.Set("ipv6_network_address", ipv6NetworkAddress)           // nolint
+	d.Set("zone", zone)                                         // nolint
 	if err := d.Set("ip_addresses", sw.Subnets[0].GetAssignedIPAddresses()); err != nil {
 		return err
 	}
 	if err := d.Set("server_ids", serverIDs); err != nil {
 		return err
 	}
-	d.Set("enable_ipv6", enableIPv6)
-	d.Set("ipv6_prefix", ipv6Prefix)
-	d.Set("ipv6_prefix_len", ipv6PrefixLen)
-	d.Set("ipv6_network_address", ipv6NetworkAddress)
-	d.Set("zone", zone)
-	return nil
+	return d.Set("tags", data.Tags)
 }

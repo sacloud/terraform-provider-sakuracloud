@@ -251,19 +251,16 @@ func setNFSResourceData(ctx context.Context, d *schema.ResourceData, client *API
 		return err
 	}
 
-	d.Set("switch_id", data.SwitchID.String())
-	d.Set("ip_address", data.IPAddresses[0])
-	d.Set("netmask", data.NetworkMaskLen)
-	d.Set("gateway", data.DefaultRoute)
-	d.Set("plan", plan)
-	d.Set("size", size)
-	d.Set("name", data.Name)
-	d.Set("icon_id", data.IconID.String())
-	d.Set("description", data.Description)
-	if err := d.Set("tags", data.Tags); err != nil {
-		return err
-	}
-	d.Set("zone", getZone(d, client))
+	d.Set("switch_id", data.SwitchID.String()) // nolint
+	d.Set("ip_address", data.IPAddresses[0])   // nolint
+	d.Set("netmask", data.NetworkMaskLen)      // nolint
+	d.Set("gateway", data.DefaultRoute)        // nolint
+	d.Set("plan", plan)                        // nolint
+	d.Set("size", size)                        // nolint
+	d.Set("name", data.Name)                   // nolint
+	d.Set("icon_id", data.IconID.String())     // nolint
+	d.Set("description", data.Description)     // nolint
+	d.Set("zone", getZone(d, client))          // nolint
 
-	return nil
+	return d.Set("tags", data.Tags)
 }

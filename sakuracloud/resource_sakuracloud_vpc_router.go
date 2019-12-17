@@ -540,31 +540,31 @@ func resourceSakuraCloudVPCRouterDelete(d *schema.ResourceData, meta interface{}
 	return nil
 }
 
-func setVPCRouterResourceData(ctx context.Context, d *schema.ResourceData, client *APIClient, data *sacloud.VPCRouter) error {
+func setVPCRouterResourceData(_ context.Context, d *schema.ResourceData, client *APIClient, data *sacloud.VPCRouter) error {
 	if data.Availability.IsFailed() {
 		d.SetId("")
 		return fmt.Errorf("got unexpected state: VPCRouter[%d].Availability is failed", data.ID)
 	}
 
-	d.Set("name", data.Name)
-	d.Set("icon_id", data.IconID.String())
-	d.Set("description", data.Description)
+	d.Set("name", data.Name)               // nolint
+	d.Set("icon_id", data.IconID.String()) // nolint
+	d.Set("description", data.Description) // nolint
 	if err := d.Set("tags", data.Tags); err != nil {
 		return err
 	}
-	d.Set("plan", flattenVPCRouterPlan(data))
-	d.Set("switch_id", flattenVPCRouterSwitchID(data))
-	d.Set("public_ip", flattenVPCRouterGlobalAddress(data))
-	d.Set("vip", flattenVPCRouterVIP(data))
+	d.Set("plan", flattenVPCRouterPlan(data))               // nolint
+	d.Set("switch_id", flattenVPCRouterSwitchID(data))      // nolint
+	d.Set("public_ip", flattenVPCRouterGlobalAddress(data)) // nolint
+	d.Set("vip", flattenVPCRouterVIP(data))                 // nolint
 	if err := d.Set("ip_addresses", flattenVPCRouterIPAddresses(data)); err != nil {
 		return err
 	}
 	if err := d.Set("aliases", flattenVPCRouterIPAliases(data)); err != nil {
 		return err
 	}
-	d.Set("vrid", flattenVPCRouterVRID(data))
-	d.Set("syslog_host", data.Settings.SyslogHost)
-	d.Set("internet_connection", data.Settings.InternetConnectionEnabled.Bool())
+	d.Set("vrid", flattenVPCRouterVRID(data))                                    // nolint
+	d.Set("syslog_host", data.Settings.SyslogHost)                               // nolint
+	d.Set("internet_connection", data.Settings.InternetConnectionEnabled.Bool()) // nolint
 	if err := d.Set("network_interface", flattenVPCRouterInterfaces(data)); err != nil {
 		return err
 	}
@@ -598,6 +598,6 @@ func setVPCRouterResourceData(ctx context.Context, d *schema.ResourceData, clien
 	if err := d.Set("user", flattenVPCRouterUsers(data)); err != nil {
 		return err
 	}
-	d.Set("zone", getZone(d, client))
+	d.Set("zone", getZone(d, client)) // nolint
 	return nil
 }

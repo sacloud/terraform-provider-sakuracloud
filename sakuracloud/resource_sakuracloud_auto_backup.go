@@ -188,17 +188,14 @@ func resourceSakuraCloudAutoBackupDelete(d *schema.ResourceData, meta interface{
 }
 
 func setAutoBackupResourceData(d *schema.ResourceData, client *APIClient, data *sacloud.AutoBackup) error {
-	d.Set("name", data.Name)
-	d.Set("disk_id", data.DiskID.String())
+	d.Set("name", data.Name)                              // nolint
+	d.Set("disk_id", data.DiskID.String())                // nolint
+	d.Set("max_backup_num", data.MaximumNumberOfArchives) // nolint
+	d.Set("icon_id", data.IconID.String())                // nolint
+	d.Set("description", data.Description)                // nolint
+	d.Set("zone", getZone(d, client))                     // nolint
 	if err := d.Set("weekdays", flattenBackupWeekdays(data.BackupSpanWeekdays)); err != nil {
 		return err
 	}
-	d.Set("max_backup_num", data.MaximumNumberOfArchives)
-	d.Set("icon_id", data.IconID.String())
-	d.Set("description", data.Description)
-	if err := d.Set("tags", data.Tags); err != nil {
-		return err
-	}
-	d.Set("zone", getZone(d, client))
-	return nil
+	return d.Set("tags", data.Tags)
 }

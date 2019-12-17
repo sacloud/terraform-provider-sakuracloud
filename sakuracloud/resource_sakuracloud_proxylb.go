@@ -357,7 +357,7 @@ func resourceSakuraCloudProxyLBUpdate(d *schema.ResourceData, meta interface{}) 
 
 	proxyLB, err = proxyLBOp.Update(ctx, proxyLB.ID, expandProxyLBUpdateRequest(d))
 	if err != nil {
-		fmt.Errorf("updating SakuraCloud ProxyLB[%s] is failed: %s", d.Id(), err)
+		return fmt.Errorf("updating SakuraCloud ProxyLB[%s] is failed: %s", d.Id(), err)
 	}
 
 	if d.HasChange("plan") {
@@ -430,12 +430,17 @@ func setProxyLBResourceData(ctx context.Context, d *schema.ResourceData, client 
 		return err
 	}
 
-	d.Set("name", data.Name)
-	d.Set("plan", int(data.Plan))
-	d.Set("vip_failover", data.UseVIPFailover)
-	d.Set("sticky_session", flattenProxyLBStickySession(data))
-	d.Set("timeout", flattenProxyLBTimeout(data))
-	d.Set("region", data.Region.String())
+	d.Set("name", data.Name)                                   // nolint
+	d.Set("plan", int(data.Plan))                              // nolint
+	d.Set("vip_failover", data.UseVIPFailover)                 // nolint
+	d.Set("sticky_session", flattenProxyLBStickySession(data)) // nolint
+	d.Set("timeout", flattenProxyLBTimeout(data))              // nolint
+	d.Set("region", data.Region.String())                      // nolint
+	d.Set("fqdn", data.FQDN)                                   // nolint
+	d.Set("vip", data.VirtualIPAddress)                        // nolint
+	d.Set("proxy_networks", data.ProxyNetworks)                // nolint
+	d.Set("icon_id", data.IconID.String())                     // nolint
+	d.Set("description", data.Description)                     // nolint
 	if err := d.Set("bind_port", flattenProxyLBBindPorts(data)); err != nil {
 		return err
 	}
@@ -448,16 +453,8 @@ func setProxyLBResourceData(ctx context.Context, d *schema.ResourceData, client 
 	if err := d.Set("server", flattenProxyLBServers(data)); err != nil {
 		return err
 	}
-	d.Set("fqdn", data.FQDN)
-	d.Set("vip", data.VirtualIPAddress)
-	d.Set("proxy_networks", data.ProxyNetworks)
-	d.Set("icon_id", data.IconID.String())
-	d.Set("description", data.Description)
-	if err := d.Set("tags", data.Tags); err != nil {
-		return err
-	}
 	if err := d.Set("certificate", flattenProxyLBCerts(certs)); err != nil {
 		return err
 	}
-	return nil
+	return d.Set("tags", data.Tags)
 }

@@ -175,8 +175,8 @@ func resourceSakuraCloudIPv4PtrDelete(d *schema.ResourceData, meta interface{}) 
 }
 
 func setIPv4PtrResourceData(d *schema.ResourceData, client *APIClient, data *sacloud.IPAddress) error {
-	d.Set("ip_address", data.IPAddress)
-	d.Set("hostname", data.HostName)
-	d.Set("zone", getZone(d, client))
+	d.Set("ip_address", data.IPAddress) // nolint
+	d.Set("hostname", data.HostName)    // nolint
+	d.Set("zone", getZone(d, client))   // nolint
 	return nil
 }

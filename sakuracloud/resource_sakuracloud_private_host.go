@@ -181,12 +181,12 @@ func resourceSakuraCloudPrivateHostDelete(d *schema.ResourceData, meta interface
 }
 
 func setPrivateHostResourceData(ctx context.Context, d *schema.ResourceData, client *APIClient, data *sacloud.PrivateHost) error {
-	d.Set("name", data.Name)
-	d.Set("icon_id", data.IconID.String())
-	d.Set("description", data.Description)
-	d.Set("hostname", data.GetHostName())
-	d.Set("assigned_core", data.GetAssignedCPU())
-	d.Set("assigned_memory", data.GetAssignedMemoryGB())
-	d.Set("zone", getZone(d, client))
+	d.Set("name", data.Name)                             // nolint
+	d.Set("icon_id", data.IconID.String())               // nolint
+	d.Set("description", data.Description)               // nolint
+	d.Set("hostname", data.GetHostName())                // nolint
+	d.Set("assigned_core", data.GetAssignedCPU())        // nolint
+	d.Set("assigned_memory", data.GetAssignedMemoryGB()) // nolint
+	d.Set("zone", getZone(d, client))                    // nolint
 	return d.Set("tags", data.Tags)
 }
