@@ -19,11 +19,12 @@ func uploadFileViaFTPS(ctx context.Context, user, pass, host, file string) error
 
 	compCh := make(chan struct{})
 	errCh := make(chan error)
-	defer close(compCh)
-	defer close(errCh)
 
 	ftpClient := ftps.NewClient(user, pass, host)
 	go func() {
+		defer close(compCh)
+		defer close(errCh)
+
 		if err := ftpClient.UploadFile(filepath.Base(file), f); err != nil {
 			errCh <- err
 		}
