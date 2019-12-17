@@ -197,7 +197,7 @@ func resourceSakuraCloudGSLBUpdate(d *schema.ResourceData, meta interface{}) err
 		return fmt.Errorf("could not read SakuraCloud GSLB[%s]: %s", d.Id(), err)
 	}
 
-	gslb, err = gslbOp.Update(ctx, sakuraCloudID(d.Id()), expandGSLBUpdateRequest(d, gslb))
+	_, err = gslbOp.Update(ctx, sakuraCloudID(d.Id()), expandGSLBUpdateRequest(d, gslb))
 	if err != nil {
 		return fmt.Errorf("updating SakuraCloud GSLB[%s] is failed: %s", d.Id(), err)
 	}
