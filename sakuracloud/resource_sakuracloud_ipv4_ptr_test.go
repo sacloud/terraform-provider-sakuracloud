@@ -44,6 +44,7 @@ func TestAccSakuraCloudIPv4Ptr_basic(t *testing.T) {
 		t.Skipf("ENV %q is requilred. skip", envTestDomain)
 		return
 	}
+	rand := randomName()
 
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
@@ -51,7 +52,7 @@ func TestAccSakuraCloudIPv4Ptr_basic(t *testing.T) {
 		CheckDestroy: testCheckSakuraCloudIPv4PtrDestroy,
 		Steps: []resource.TestStep{
 			{
-				Config: fmt.Sprintf(testAccCheckSakuraCloudIPv4PtrConfig_basic, testDomain, testDomain),
+				Config: buildConfigWithArgs(testAccCheckSakuraCloudIPv4PtrConfig_basic, rand, testDomain),
 				Check: resource.ComposeTestCheckFunc(
 					testCheckSakuraCloudIPv4PtrExists("sakuracloud_ipv4_ptr.foobar", &ip),
 					resource.TestCheckResourceAttr(
@@ -59,7 +60,7 @@ func TestAccSakuraCloudIPv4Ptr_basic(t *testing.T) {
 				),
 			},
 			{
-				Config: fmt.Sprintf(testAccCheckSakuraCloudIPv4PtrConfig_update, testDomain, testDomain),
+				Config: buildConfigWithArgs(testAccCheckSakuraCloudIPv4PtrConfig_update, rand, testDomain),
 				Check: resource.ComposeTestCheckFunc(
 					testCheckSakuraCloudIPv4PtrExists("sakuracloud_ipv4_ptr.foobar", &ip),
 					resource.TestCheckResourceAttr(
@@ -125,7 +126,7 @@ func testCheckSakuraCloudIPv4PtrDestroy(s *terraform.State) error {
 var testAccCheckSakuraCloudIPv4PtrConfig_basic = `
 data sakuracloud_dns "dns" {
   filter {
-    names = ["%s"]
+    names = ["{{ .arg1 }}"]
   }
 }
 
@@ -134,24 +135,36 @@ resource sakuracloud_dns_record "record01" {
   name   = "terraform-test-domain01"
   type   = "A"
   value  = sakuracloud_server.server.ip_address
+  ttl    = 10
+}
+
+data sakuracloud_archive "ubuntu" {
+  os_type = "ubuntu"
+}
+
+resource sakuracloud_disk "foobar" {
+  name              = "{{ .arg0 }}"
+  source_archive_id = data.sakuracloud_archive.ubuntu.id
 }
 
 resource sakuracloud_server "server" {
-  name = "server"
-  
-  force_shutdown = true
+  name  = "{{ .arg0 }}"
+  disks = [sakuracloud_disk.foobar.id]
+  network_interface {
+    upstream = "shared"
+  }
 }
 
 resource "sakuracloud_ipv4_ptr" "foobar" {
   ip_address = sakuracloud_server.server.ip_address
-  hostname  = "terraform-test-domain01.%s"
+  hostname  = "terraform-test-domain01.{{ .arg1 }}"
 }
 `
 
 var testAccCheckSakuraCloudIPv4PtrConfig_update = `
 data sakuracloud_dns "dns" {
   filter {
-    names = ["%s"]
+    names = ["{{ .arg1 }}"]
   }
 }
 
@@ -160,16 +173,28 @@ resource sakuracloud_dns_record "record01" {
   name   = "terraform-test-domain02"
   type   = "A"
   value  = sakuracloud_server.server.ip_address
+  ttl    = 10
+}
+
+data sakuracloud_archive "ubuntu" {
+  os_type = "ubuntu"
+}
+
+resource sakuracloud_disk "foobar" {
+  name              = "{{ .arg0 }}"
+  source_archive_id = data.sakuracloud_archive.ubuntu.id
 }
 
 resource sakuracloud_server "server" {
-  name = "server"
-
-  force_shutdown = true
+  name  = "{{ .arg0 }}"
+  disks = [sakuracloud_disk.foobar.id]
+  network_interface {
+    upstream = "shared"
+  }
 }
 
 resource "sakuracloud_ipv4_ptr" "foobar" {
   ip_address = sakuracloud_server.server.ip_address
-  hostname  = "terraform-test-domain02.%s"
+  hostname  = "terraform-test-domain02.{{ .arg1 }}"
 }
 `

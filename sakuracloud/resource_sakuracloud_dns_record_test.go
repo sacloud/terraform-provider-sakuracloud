@@ -107,10 +107,9 @@ func testCheckSakuraCloudDNSRecordDestroy(s *terraform.State) error {
 		dnsID := rs.Primary.Attributes["dns_id"]
 		if dnsID != "" {
 			dns, err := dnsOp.Read(context.Background(), sakuraCloudID(dnsID))
-			if err == nil {
+			if err != nil && !sacloud.IsNotFoundError(err) {
 				return fmt.Errorf("resource still exists: DNS: %s", rs.Primary.ID)
 			}
-
 			if dns != nil {
 				record := &sacloud.DNSRecord{
 					Name:  rs.Primary.Attributes["name"],
