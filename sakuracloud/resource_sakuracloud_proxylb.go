@@ -365,9 +365,11 @@ func resourceSakuraCloudProxyLBCreate(d *schema.ResourceData, meta interface{}) 
 	if certs, ok := getListFromResource(d, "certificate"); ok && len(certs) > 0 {
 		values := mapToResourceData(certs[0].(map[string]interface{}))
 		cert := &sacloud.ProxyLBCertificates{
-			ServerCertificate:       values.Get("server_cert").(string),
-			IntermediateCertificate: values.Get("intermediate_cert").(string),
-			PrivateKey:              values.Get("private_key").(string),
+			PrimaryCert: &sacloud.ProxyLBCertificate{
+				ServerCertificate:       values.Get("server_cert").(string),
+				IntermediateCertificate: values.Get("intermediate_cert").(string),
+				PrivateKey:              values.Get("private_key").(string),
+			},
 		}
 
 		if rawAdditionalCerts, ok := getListFromResource(values, "additional_certificates"); ok && len(rawAdditionalCerts) > 0 {
@@ -573,10 +575,12 @@ func resourceSakuraCloudProxyLBUpdate(d *schema.ResourceData, meta interface{}) 
 			if certs, ok := getListFromResource(d, "certificate"); ok && len(certs) > 0 {
 				values := mapToResourceData(certs[0].(map[string]interface{}))
 				cert := &sacloud.ProxyLBCertificates{
-					ServerCertificate:       values.Get("server_cert").(string),
-					IntermediateCertificate: values.Get("intermediate_cert").(string),
-					PrivateKey:              values.Get("private_key").(string),
-					AdditionalCerts:         []*sacloud.ProxyLBCertificate{},
+					PrimaryCert: &sacloud.ProxyLBCertificate{
+						ServerCertificate:       values.Get("server_cert").(string),
+						IntermediateCertificate: values.Get("intermediate_cert").(string),
+						PrivateKey:              values.Get("private_key").(string),
+					},
+					AdditionalCerts: []*sacloud.ProxyLBCertificate{},
 				}
 
 				if rawAdditionalCerts, ok := getListFromResource(values, "additional_certificates"); ok && len(rawAdditionalCerts) > 0 {
@@ -698,9 +702,9 @@ func setProxyLBResourceData(d *schema.ResourceData, client *APIClient, data *sac
 	}
 
 	proxylbCert := map[string]interface{}{
-		"server_cert":       cert.ServerCertificate,
-		"intermediate_cert": cert.IntermediateCertificate,
-		"private_key":       cert.PrivateKey,
+		"server_cert":       cert.PrimaryCert.ServerCertificate,
+		"intermediate_cert": cert.PrimaryCert.IntermediateCertificate,
+		"private_key":       cert.PrimaryCert.PrivateKey,
 		//"common_name":       cert.CertificateCommonName,
 		//"end_date":          cert.CertificateEndDate.Format(time.RFC3339),
 	}
