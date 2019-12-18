@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.20.2 (2019-12-18)
+
+* Update v2 design doc #560 (yamamoto-febc)
+* エンハンスドロードバランサのスキーマ変更 #595 (yamamoto-febc)
+
+
 ## 1.20.1 (2019-11-27)
 
 * 検索APIでページングを無効化 #553 (yamamoto-febc)
