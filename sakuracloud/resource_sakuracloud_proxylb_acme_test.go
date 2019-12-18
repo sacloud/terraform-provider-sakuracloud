@@ -40,6 +40,7 @@ func TestAccSakuraCloudProxyLBACME_basic(t *testing.T) {
 		PreCheck:  func() { testAccPreCheck(t) },
 		Providers: testAccProviders,
 		CheckDestroy: resource.ComposeTestCheckFunc(
+			testCheckSakuraCloudDiskDestroy,
 			testCheckSakuraCloudDNSRecordDestroy,
 			testCheckSakuraCloudProxyLBDestroy,
 			testCheckSakuraCloudServerDestroy,
@@ -87,10 +88,21 @@ resource sakuracloud_proxylb_acme "foobar" {
   update_delay_sec = 120
 }
 
-resource sakuracloud_server "foobar" {
-  name = "{{ .arg0 }}"
+data sakuracloud_archive "ubuntu" {
+  os_type = "ubuntu"
+}
 
-  force_shutdown = true
+resource sakuracloud_disk "foobar" {
+  name              = "{{ .arg0 }}"
+  source_archive_id = data.sakuracloud_archive.ubuntu.id
+}
+
+resource sakuracloud_server "foobar" {
+  name  = "{{ .arg0 }}"
+  disks = [sakuracloud_disk.foobar.id]
+  network_interface {
+    upstream = "shared"
+  }
 }
 
 data sakuracloud_dns "zone" {
