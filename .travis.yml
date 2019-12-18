@@ -12,17 +12,20 @@ env:
 before_install:
   - sudo apt-get install bzr
 install:
-- GO111MODULE=off go get -u golang.org/x/tools/cmd/goimports
-- GO111MODULE=off go get -u github.com/motemen/gobump/cmd/gobump
-- GO111MODULE=off go get github.com/sacloud/addlicense
-- GO111MODULE=off go get -u github.com/client9/misspell/cmd/misspell
-- GO111MODULE=off go get -u github.com/golangci/golangci-lint/cmd/golangci-lint
-- GO111MODULE=off go get -u github.com/bflad/tfproviderlint/cmd/tfproviderlint
-script:
-- make lint
-- make tflint
-- FAKE_MODE=1 make testacc
-- make lint-docs
+- make tools
+matrix:
+  fast_finish: true
+  allow_failures:
+    - go: tip
+  include:
+    - name: "make lint"
+      script: make lint
+    - name: "make tflint"
+      script: make tflint
+    - name: "make testfake"
+      script: make testfake
+    - name: "make lint-docs"
+      script: make lint-docs
 before_deploy:
 - if [ "$TRAVIS_BRANCH" == "master" ]; then
     make docker-build;
