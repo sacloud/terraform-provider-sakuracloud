@@ -1,13 +1,12 @@
 PKG_NAME         ?= sakuracloud
-CURRENT_VERSION  ?= $(shell gobump show -r sakuracloud/)
 
 AUTHOR          ?="terraform-provider-sakuracloud authors"
 COPYRIGHT_YEAR  ?="2016-2019"
 COPYRIGHT_FILES ?=$$(find . \( -name "*.dockerfile" -or -name "*.go" -or -name "*.sh" -or -name "*.pl" -or -name "*.bash" \) -print | grep -v "/vendor/")
 
-BUILD_LDFLAGS = "-s -w \
-	  -X github.com/sacloud/terraform-provider-sakuracloud/sakuracloud.Revision=`git rev-parse --short HEAD` \
-	  -X github.com/sacloud/terraform-provider-sakuracloud/sakuracloud.Version=$(CURRENT_VERSION)"
+UNIT_TEST_UA ?= (Unit Test)
+ACC_TEST_UA ?= (Acceptance Test)
+
 export GO111MODULE=on
 
 default: fmt goimports lint tflint
@@ -24,46 +23,52 @@ tools:
 	GO111MODULE=off go get -u github.com/golangci/golangci-lint/cmd/golangci-lint
 	GO111MODULE=off go get -u github.com/bflad/tfproviderlint/cmd/tfproviderlint
 
-build:
+build-envs:
+	$(eval CURRENT_VERSION := $(shell gobump show -r sakuracloud/))
+	$(eval BUILD_LDFLAGS := "-s -w \
+           -X github.com/sacloud/terraform-provider-sakuracloud/sakuracloud.Revision=`git rev-parse --short HEAD` \
+           -X github.com/sacloud/terraform-provider-sakuracloud/sakuracloud.Version=$(CURRENT_VERSION)")
+
+build: build-envs
 	OS="`go env GOOS`" ARCH="`go env GOARCH`" ARCHIVE= BUILD_LDFLAGS=$(BUILD_LDFLAGS) CURRENT_VERSION=$(CURRENT_VERSION) sh -c "'$(CURDIR)/scripts/build.sh'"
 
-build-x: build-darwin build-windows build-linux shasum
+build-x: build-envs build-darwin build-windows build-linux shasum
 
-build-darwin: bin/terraform-provider-sakuracloud_$(CURRENT_VERSION)_darwin-386.zip bin/terraform-provider-sakuracloud_$(CURRENT_VERSION)_darwin-amd64.zip
+build-darwin: build-envs bin/terraform-provider-sakuracloud_$(CURRENT_VERSION)_darwin-386.zip bin/terraform-provider-sakuracloud_$(CURRENT_VERSION)_darwin-amd64.zip
 
-build-windows: bin/terraform-provider-sakuracloud_$(CURRENT_VERSION)_windows-386.zip bin/terraform-provider-sakuracloud_$(CURRENT_VERSION)_windows-amd64.zip
+build-windows: build-envs bin/terraform-provider-sakuracloud_$(CURRENT_VERSION)_windows-386.zip bin/terraform-provider-sakuracloud_$(CURRENT_VERSION)_windows-amd64.zip
 
-build-linux: bin/terraform-provider-sakuracloud_$(CURRENT_VERSION)_linux-386.zip bin/terraform-provider-sakuracloud_$(CURRENT_VERSION)_linux-amd64.zip
+build-linux: build-envs bin/terraform-provider-sakuracloud_$(CURRENT_VERSION)_linux-386.zip bin/terraform-provider-sakuracloud_$(CURRENT_VERSION)_linux-amd64.zip
 
-bin/terraform-provider-sakuracloud_$(CURRENT_VERSION)_darwin-386.zip:
+bin/terraform-provider-sakuracloud_$(CURRENT_VERSION)_darwin-386.zip: build-envs
 	OS="darwin"  ARCH="386"   ARCHIVE=1 BUILD_LDFLAGS=$(BUILD_LDFLAGS) CURRENT_VERSION=$(CURRENT_VERSION) sh -c "'$(CURDIR)/scripts/build.sh'"
 
-bin/terraform-provider-sakuracloud_$(CURRENT_VERSION)_darwin-amd64.zip:
+bin/terraform-provider-sakuracloud_$(CURRENT_VERSION)_darwin-amd64.zip: build-envs
 	OS="darwin"  ARCH="amd64" ARCHIVE=1 BUILD_LDFLAGS=$(BUILD_LDFLAGS) CURRENT_VERSION=$(CURRENT_VERSION) sh -c "'$(CURDIR)/scripts/build.sh'"
 
-bin/terraform-provider-sakuracloud_$(CURRENT_VERSION)_windows-386.zip:
+bin/terraform-provider-sakuracloud_$(CURRENT_VERSION)_windows-386.zip: build-envs
 	OS="windows" ARCH="386"   ARCHIVE=1 BUILD_LDFLAGS=$(BUILD_LDFLAGS) CURRENT_VERSION=$(CURRENT_VERSION) sh -c "'$(CURDIR)/scripts/build.sh'"
 
-bin/terraform-provider-sakuracloud_$(CURRENT_VERSION)_windows-amd64.zip:
+bin/terraform-provider-sakuracloud_$(CURRENT_VERSION)_windows-amd64.zip: build-envs
 	OS="windows" ARCH="amd64" ARCHIVE=1 BUILD_LDFLAGS=$(BUILD_LDFLAGS) CURRENT_VERSION=$(CURRENT_VERSION) sh -c "'$(CURDIR)/scripts/build.sh'"
 
-bin/terraform-provider-sakuracloud_$(CURRENT_VERSION)_linux-386.zip:
+bin/terraform-provider-sakuracloud_$(CURRENT_VERSION)_linux-386.zip: build-envs
 	OS="linux"   ARCH="386"   ARCHIVE=1 BUILD_LDFLAGS=$(BUILD_LDFLAGS) CURRENT_VERSION=$(CURRENT_VERSION) sh -c "'$(CURDIR)/scripts/build.sh'"
 
-bin/terraform-provider-sakuracloud_$(CURRENT_VERSION)_linux-amd64.zip:
+bin/terraform-provider-sakuracloud_$(CURRENT_VERSION)_linux-amd64.zip: build-envs
 	OS="linux"   ARCH="amd64" ARCHIVE=1 BUILD_LDFLAGS=$(BUILD_LDFLAGS) CURRENT_VERSION=$(CURRENT_VERSION) sh -c "'$(CURDIR)/scripts/build.sh'"
 
 shasum:
 	(cd bin/; shasum -a 256 * > terraform-provider-sakuracloud_$(CURRENT_VERSION)_SHA256SUMS)
 
 test:
-	TF_ACC= SAKURACLOUD_APPEND_USER_AGENT="(Unit Test)" go test -mod=vendor -v $(TESTARGS) -timeout=30s ./...
+	TF_ACC= SAKURACLOUD_APPEND_USER_AGENT="$(UNIT_TEST_UA)" go test -mod=vendor -v $(TESTARGS) -timeout=30s ./...
 
 testacc:
-	TF_ACC=1 SAKURACLOUD_APPEND_USER_AGENT="(Acceptance Test)" go test -mod=vendor -v $(TESTARGS) -timeout 240m ./...
+	TF_ACC=1 SAKURACLOUD_APPEND_USER_AGENT="$(ACC_TEST_UA)" go test -mod=vendor -v $(TESTARGS) -timeout 240m ./...
 
 testfake:
-	FAKE_MODE=1 TF_ACC=1 SAKURACLOUD_APPEND_USER_AGENT="(Acceptance Test)" go test -mod=vendor -v $(TESTARGS) -timeout 240m ./...
+	FAKE_MODE=1 TF_ACC=1 SAKURACLOUD_APPEND_USER_AGENT="$(ACC_TEST_UA)" go test -mod=vendor -v $(TESTARGS) -timeout 240m ./...
 
 lint:
 	golangci-lint run ./...
