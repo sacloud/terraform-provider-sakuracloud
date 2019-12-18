@@ -27,7 +27,7 @@ import (
 )
 
 const (
-	envTestDomain = "SAKURACLOUD_TEST_DOMAIN"
+	envTestDomain = "SAKURACLOUD_IPV4_PTR_DOMAIN"
 )
 
 var (
