@@ -143,12 +143,8 @@ type ProxyLBAdditionalCerts []*ProxyLBCertificate
 
 // ProxyLBCertificates ProxyLBのSSL証明書
 type ProxyLBCertificates struct {
-	ServerCertificate       string                 `yaml:"server_certificate"`                                                       // サーバ証明書
-	IntermediateCertificate string                 `yaml:"intermediate_certificate"`                                                 // 中間証明書
-	PrivateKey              string                 `yaml:"private_key"`                                                              // 秘密鍵
-	CertificateEndDate      *time.Time             `json:",omitempty" yaml:"certificate_end_date,omitempty" structs:",omitempty"`    // 有効期限
-	CertificateCommonName   string                 `json:",omitempty" yaml:"certificate_common_name,omitempty" structs:",omitempty"` // CommonName
-	AdditionalCerts         ProxyLBAdditionalCerts `json:",omitempty" yaml:"additional_certs,omitempty" structs:",omitempty"`
+	PrimaryCert     *ProxyLBCertificate    `yaml:"primary_cert"`
+	AdditionalCerts ProxyLBAdditionalCerts `yaml:"additional_certs"`
 }
 
 // UnmarshalJSON UnmarshalJSON(AdditionalCertsが空の場合に空文字を返す問題への対応)
@@ -164,41 +160,6 @@ func (p *ProxyLBAdditionalCerts) UnmarshalJSON(data []byte) error {
 	}
 
 	*p = certs
-	return nil
-}
-
-// UnmarshalJSON UnmarshalJSON(CertificateEndDateのtime.TimeへのUnmarshal対応)
-func (p *ProxyLBCertificates) UnmarshalJSON(data []byte) error {
-	var tmp map[string]interface{}
-	if err := json.Unmarshal(data, &tmp); err != nil {
-		return err
-	}
-
-	p.ServerCertificate = tmp["ServerCertificate"].(string)
-	p.IntermediateCertificate = tmp["IntermediateCertificate"].(string)
-	p.PrivateKey = tmp["PrivateKey"].(string)
-	p.CertificateCommonName = tmp["CertificateCommonName"].(string)
-	endDate := tmp["CertificateEndDate"].(string)
-	if endDate != "" {
-		date, err := time.Parse("Jan _2 15:04:05 2006 MST", endDate)
-		if err != nil {
-			return err
-		}
-		p.CertificateEndDate = &date
-	}
-
-	if _, ok := tmp["AdditionalCerts"].(string); !ok {
-		rawCerts, err := json.Marshal(tmp["AdditionalCerts"])
-		if err != nil {
-			return err
-		}
-		var additionalCerts ProxyLBAdditionalCerts
-		if err := json.Unmarshal(rawCerts, &additionalCerts); err != nil {
-			return err
-		}
-		p.AdditionalCerts = additionalCerts
-	}
-
 	return nil
 }
 
