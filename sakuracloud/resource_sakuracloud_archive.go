@@ -85,12 +85,11 @@ func resourceSakuraCloudArchive() *schema.Resource {
 				Elem:     &schema.Schema{Type: schema.TypeString},
 			},
 			"zone": {
-				Type:         schema.TypeString,
-				Optional:     true,
-				Computed:     true,
-				ForceNew:     true,
-				Description:  "target SakuraCloud zone",
-				ValidateFunc: validation.StringInSlice([]string{"is1a", "is1b", "tk1a", "tk1v"}, false),
+				Type:        schema.TypeString,
+				Optional:    true,
+				Computed:    true,
+				ForceNew:    true,
+				Description: "target SakuraCloud zone",
 			},
 		},
 	}
