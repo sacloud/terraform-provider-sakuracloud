@@ -69,8 +69,8 @@ func expandServerDisks(d *schema.ResourceData, client *APIClient) []diskBuilder.
 					IPAddress:           stringOrDefault(v, "ip_address"),
 					NetworkMaskLen:      intOrDefault(v, "netmask"),
 					DefaultRoute:        stringOrDefault(v, "gateway"),
-					SSHKeyIDs:           expandSakuraCloudIDs(d, "ssh_key_ids"),
-					NoteIDs:             expandSakuraCloudIDs(d, "note_ids"),
+					SSHKeyIDs:           expandSakuraCloudIDs(v, "ssh_key_ids"),
+					NoteIDs:             expandSakuraCloudIDs(v, "note_ids"),
 				}
 			}
 		}
