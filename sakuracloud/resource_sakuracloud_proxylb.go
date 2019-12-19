@@ -34,7 +34,6 @@ func resourceSakuraCloudProxyLB() *schema.Resource {
 		Importer: &schema.ResourceImporter{
 			State: schema.ImportStatePassthrough,
 		},
-		CustomizeDiff: hasTagResourceCustomizeDiff,
 
 		Timeouts: &schema.ResourceTimeout{
 			Create: schema.DefaultTimeout(5 * time.Minute),
@@ -262,9 +261,10 @@ func resourceSakuraCloudProxyLB() *schema.Resource {
 				Optional: true,
 			},
 			"tags": {
-				Type:     schema.TypeList,
+				Type:     schema.TypeSet,
 				Optional: true,
 				Elem:     &schema.Schema{Type: schema.TypeString},
+				Set:      schema.HashString,
 			},
 			"fqdn": {
 				Type:     schema.TypeString,
@@ -456,5 +456,5 @@ func setProxyLBResourceData(ctx context.Context, d *schema.ResourceData, client 
 	if err := d.Set("certificate", flattenProxyLBCerts(certs)); err != nil {
 		return err
 	}
-	return d.Set("tags", data.Tags)
+	return d.Set("tags", flattenTags(data.Tags))
 }

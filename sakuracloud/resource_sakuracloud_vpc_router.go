@@ -34,7 +34,6 @@ func resourceSakuraCloudVPCRouter() *schema.Resource {
 		Importer: &schema.ResourceImporter{
 			State: schema.ImportStatePassthrough,
 		},
-		CustomizeDiff: hasTagResourceCustomizeDiff,
 
 		Timeouts: &schema.ResourceTimeout{
 			Create: schema.DefaultTimeout(60 * time.Minute),
@@ -414,9 +413,10 @@ func resourceSakuraCloudVPCRouter() *schema.Resource {
 				ValidateFunc: validation.StringLenBetween(0, 512),
 			},
 			"tags": {
-				Type:     schema.TypeList,
+				Type:     schema.TypeSet,
 				Optional: true,
 				Elem:     &schema.Schema{Type: schema.TypeString},
+				Set:      schema.HashString,
 			},
 			"zone": {
 				Type:        schema.TypeString,
@@ -549,7 +549,7 @@ func setVPCRouterResourceData(_ context.Context, d *schema.ResourceData, client 
 	d.Set("name", data.Name)               // nolint
 	d.Set("icon_id", data.IconID.String()) // nolint
 	d.Set("description", data.Description) // nolint
-	if err := d.Set("tags", data.Tags); err != nil {
+	if err := d.Set("tags", flattenTags(data.Tags)); err != nil {
 		return err
 	}
 	d.Set("plan", flattenVPCRouterPlan(data))               // nolint

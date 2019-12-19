@@ -25,11 +25,10 @@ import (
 
 func resourceSakuraCloudIcon() *schema.Resource {
 	return &schema.Resource{
-		Create:        resourceSakuraCloudIconCreate,
-		Read:          resourceSakuraCloudIconRead,
-		Update:        resourceSakuraCloudIconUpdate,
-		Delete:        resourceSakuraCloudIconDelete,
-		CustomizeDiff: hasTagResourceCustomizeDiff,
+		Create: resourceSakuraCloudIconCreate,
+		Read:   resourceSakuraCloudIconRead,
+		Update: resourceSakuraCloudIconUpdate,
+		Delete: resourceSakuraCloudIconDelete,
 
 		Timeouts: &schema.ResourceTimeout{
 			Create: schema.DefaultTimeout(5 * time.Minute),
@@ -56,9 +55,10 @@ func resourceSakuraCloudIcon() *schema.Resource {
 				ForceNew:      true,
 			},
 			"tags": {
-				Type:     schema.TypeList,
+				Type:     schema.TypeSet,
 				Optional: true,
 				Elem:     &schema.Schema{Type: schema.TypeString},
+				Set:      schema.HashString,
 			},
 			"url": {
 				Type:     schema.TypeString,
@@ -163,5 +163,5 @@ func resourceSakuraCloudIconDelete(d *schema.ResourceData, meta interface{}) err
 func setIconResourceData(ctx context.Context, d *schema.ResourceData, client *APIClient, data *sacloud.Icon) error {
 	d.Set("name", data.Name) // nolint
 	d.Set("url", data.URL)   // nolint
-	return d.Set("tags", data.Tags)
+	return d.Set("tags", flattenTags(data.Tags))
 }

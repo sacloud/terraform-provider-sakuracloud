@@ -46,8 +46,8 @@ func TestAccSakuraCloudDatabaseReplica_basic(t *testing.T) {
 					resource.TestCheckResourceAttr(resourceName, "name", rand),
 					resource.TestCheckResourceAttr(resourceName, "description", "description"),
 					resource.TestCheckResourceAttr(resourceName, "tags.#", "2"),
-					resource.TestCheckResourceAttr(resourceName, "tags.0", "tag1"),
-					resource.TestCheckResourceAttr(resourceName, "tags.1", "tag2"),
+					resource.TestCheckResourceAttr(resourceName, "tags.4151227546", "tag1"),
+					resource.TestCheckResourceAttr(resourceName, "tags.1852302624", "tag2"),
 					resource.TestCheckResourceAttr(resourceName, "ip_addresses.#", "1"),
 					resource.TestCheckResourceAttr(resourceName, "ip_addresses.0", "192.168.11.111"),
 					resource.TestCheckResourceAttr(resourceName, "netmask", "24"),
@@ -64,8 +64,8 @@ func TestAccSakuraCloudDatabaseReplica_basic(t *testing.T) {
 					resource.TestCheckResourceAttr(resourceName, "name", rand+"-upd"),
 					resource.TestCheckResourceAttr(resourceName, "description", "description-upd"),
 					resource.TestCheckResourceAttr(resourceName, "tags.#", "2"),
-					resource.TestCheckResourceAttr(resourceName, "tags.0", "tag1-upd"),
-					resource.TestCheckResourceAttr(resourceName, "tags.1", "tag2-upd"),
+					resource.TestCheckResourceAttr(resourceName, "tags.2362157161", "tag1-upd"),
+					resource.TestCheckResourceAttr(resourceName, "tags.3412841145", "tag2-upd"),
 					resource.TestCheckResourceAttr(resourceName, "ip_addresses.#", "1"),
 					resource.TestCheckResourceAttr(resourceName, "ip_addresses.0", "192.168.11.111"),
 					resource.TestCheckResourceAttr(resourceName, "netmask", "24"),
@@ -86,13 +86,13 @@ func TestAccImportSakuraCloudDatabaseReadReplica_basic(t *testing.T) {
 			return fmt.Errorf("expected 1 state: %#v", s)
 		}
 		expects := map[string]string{
-			"name":           rand,
-			"description":    "description",
-			"ip_addresses.0": "192.168.11.111",
-			"netmask":        "24",
-			"gateway":        "192.168.11.1",
-			"tags.0":         "tag1",
-			"tags.1":         "tag2",
+			"name":            rand,
+			"description":     "description",
+			"ip_addresses.0":  "192.168.11.111",
+			"netmask":         "24",
+			"gateway":         "192.168.11.1",
+			"tags.4151227546": "tag1",
+			"tags.1852302624": "tag2",
 		}
 
 		if err := compareStateMulti(s[0], expects); err != nil {

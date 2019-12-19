@@ -37,7 +37,6 @@ func resourceSakuraCloudServer() *schema.Resource {
 		Importer: &schema.ResourceImporter{
 			State: schema.ImportStatePassthrough,
 		},
-		CustomizeDiff: hasTagResourceCustomizeDiff,
 
 		Timeouts: &schema.ResourceTimeout{
 			Create: schema.DefaultTimeout(5 * time.Minute),
@@ -132,9 +131,10 @@ func resourceSakuraCloudServer() *schema.Resource {
 				Optional: true,
 			},
 			"tags": {
-				Type:     schema.TypeList,
+				Type:     schema.TypeSet,
 				Optional: true,
 				Elem:     &schema.Schema{Type: schema.TypeString},
+				Set:      schema.HashString,
 			},
 			"zone": {
 				Type:        schema.TypeString,
@@ -386,7 +386,7 @@ func setServerResourceData(ctx context.Context, d *schema.ResourceData, client *
 		return err
 	}
 	d.Set("zone", zone) // nolint
-	return d.Set("tags", data.Tags)
+	return d.Set("tags", flattenTags(data.Tags))
 }
 
 func isServerDiskConfigChanged(d *schema.ResourceData) bool {

@@ -40,7 +40,6 @@ func resourceSakuraCloudIPv4Ptr() *schema.Resource {
 			Delete: schema.DefaultTimeout(5 * time.Minute),
 		},
 
-		CustomizeDiff: hasTagResourceCustomizeDiff,
 		Schema: map[string]*schema.Schema{
 			"ip_address": {
 				Type:         schema.TypeString,

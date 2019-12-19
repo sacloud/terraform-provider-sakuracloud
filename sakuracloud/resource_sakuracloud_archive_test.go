@@ -49,8 +49,8 @@ func TestAccSakuraCloudArchive_basic(t *testing.T) {
 					resource.TestCheckResourceAttr(resourceName, "icon_id", ""),
 					resource.TestCheckResourceAttr(resourceName, "archive_file", "test/dummy.raw"),
 					resource.TestCheckResourceAttr(resourceName, "description", "description"),
-					resource.TestCheckResourceAttr(resourceName, "tags.0", "tag1"),
-					resource.TestCheckResourceAttr(resourceName, "tags.1", "tag2"),
+					resource.TestCheckResourceAttr(resourceName, "tags.4151227546", "tag1"),
+					resource.TestCheckResourceAttr(resourceName, "tags.1852302624", "tag2"),
 				),
 			},
 			{
@@ -64,8 +64,8 @@ func TestAccSakuraCloudArchive_basic(t *testing.T) {
 					),
 					resource.TestCheckResourceAttr(resourceName, "archive_file", "test/dummy-upd.raw"),
 					resource.TestCheckResourceAttr(resourceName, "description", "description-upd"),
-					resource.TestCheckResourceAttr(resourceName, "tags.0", "tag1-upd"),
-					resource.TestCheckResourceAttr(resourceName, "tags.1", "tag2-upd"),
+					resource.TestCheckResourceAttr(resourceName, "tags.2362157161", "tag1-upd"),
+					resource.TestCheckResourceAttr(resourceName, "tags.3412841145", "tag2-upd"),
 				),
 			},
 		},
@@ -128,13 +128,13 @@ func TestAccImportSakuraCloudArchive_basic(t *testing.T) {
 		}
 
 		expects := map[string]string{
-			"name":         rand,
-			"size":         "20",
-			"icon_id":      "",
-			"archive_file": "",
-			"description":  "description",
-			"tags.0":       "tag1",
-			"tags.1":       "tag2",
+			"name":            rand,
+			"size":            "20",
+			"icon_id":         "",
+			"archive_file":    "",
+			"description":     "description",
+			"tags.4151227546": "tag1",
+			"tags.1852302624": "tag2",
 		}
 
 		return compareStateMulti(s[0], expects)
