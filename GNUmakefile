@@ -109,7 +109,7 @@ docker-testacc-resource:
 	sh -c "'$(CURDIR)/scripts/build_on_docker.sh' 'testacc-resource'"
 
 docker-build: clean 
-	sh -c "'$(CURDIR)/scripts/build_on_docker.sh' 'build-x'"
+	sh -c "'$(CURDIR)/scripts/build_on_docker.sh' 'tools' 'build-x'"
 
 
 .PHONY: default test vet testacc fmt fmtcheck
