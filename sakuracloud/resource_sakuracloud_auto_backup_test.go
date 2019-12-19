@@ -51,8 +51,8 @@ func TestAccSakuraCloudAutoBackup_basic(t *testing.T) {
 					resource.TestCheckResourceAttr(resourceName, "max_backup_num", "1"),
 					resource.TestCheckResourceAttr(resourceName, "description", "description"),
 					resource.TestCheckResourceAttr(resourceName, "tags.#", "2"),
-					resource.TestCheckResourceAttr(resourceName, "tags.0", "tag1"),
-					resource.TestCheckResourceAttr(resourceName, "tags.1", "tag2"),
+					resource.TestCheckResourceAttr(resourceName, "tags.4151227546", "tag1"),
+					resource.TestCheckResourceAttr(resourceName, "tags.1852302624", "tag2"),
 					resource.TestCheckResourceAttrPair(
 						resourceName, "icon_id",
 						"sakuracloud_icon.foobar", "id",
@@ -70,8 +70,8 @@ func TestAccSakuraCloudAutoBackup_basic(t *testing.T) {
 					resource.TestCheckResourceAttr(resourceName, "max_backup_num", "2"),
 					resource.TestCheckResourceAttr(resourceName, "description", "description-upd"),
 					resource.TestCheckResourceAttr(resourceName, "tags.#", "2"),
-					resource.TestCheckResourceAttr(resourceName, "tags.0", "tag1-upd"),
-					resource.TestCheckResourceAttr(resourceName, "tags.1", "tag2-upd"),
+					resource.TestCheckResourceAttr(resourceName, "tags.2362157161", "tag1-upd"),
+					resource.TestCheckResourceAttr(resourceName, "tags.3412841145", "tag2-upd"),
 					resource.TestCheckResourceAttr(resourceName, "icon_id", ""),
 				),
 			},
@@ -142,14 +142,14 @@ func TestAccImportSakuraCloudAutoBackup_basic(t *testing.T) {
 			return fmt.Errorf("expected 1 state: %#v", s)
 		}
 		expects := map[string]string{
-			"name":           rand,
-			"weekdays.0":     "wed",
-			"weekdays.1":     "fri",
-			"max_backup_num": "1",
-			"description":    "description",
-			"tags.0":         "tag1",
-			"tags.1":         "tag2",
-			"zone":           os.Getenv("SAKURACLOUD_ZONE"),
+			"name":            rand,
+			"weekdays.0":      "wed",
+			"weekdays.1":      "fri",
+			"max_backup_num":  "1",
+			"description":     "description",
+			"tags.4151227546": "tag1",
+			"tags.1852302624": "tag2",
+			"zone":            os.Getenv("SAKURACLOUD_ZONE"),
 		}
 
 		if err := compareStateMulti(s[0], expects); err != nil {

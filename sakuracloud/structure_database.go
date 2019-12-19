@@ -192,12 +192,12 @@ func flattenDatabaseType(db *sacloud.Database) string {
 	return databaseType
 }
 
-func flattenDatabaseTags(db *sacloud.Database) []interface{} {
-	var tags []interface{}
+func flattenDatabaseTags(db *sacloud.Database) *schema.Set {
+	var tags types.Tags
 	for _, t := range db.Tags {
 		if !(strings.HasPrefix(t, "@MariaDB-") || strings.HasPrefix(t, "@postgres-")) {
 			tags = append(tags, t)
 		}
 	}
-	return tags
+	return flattenTags(tags)
 }

@@ -166,7 +166,23 @@ func expandStringList(configured []interface{}) []string {
 }
 
 func expandTags(d resourceValueGettable) types.Tags {
-	return types.Tags(expandStringList(d.Get("tags").([]interface{})))
+	var tags []string
+	rawTags := d.Get("tags").(*schema.Set).List()
+	for _, v := range rawTags {
+		v := v.(string)
+		if v != "" {
+			tags = append(tags, v)
+		}
+	}
+	return types.Tags(tags)
+}
+
+func flattenTags(tags types.Tags) *schema.Set {
+	set := &schema.Set{F: schema.HashString}
+	for _, v := range tags {
+		set.Add(v)
+	}
+	return set
 }
 
 func expandBackupWeekdays(configured []interface{}) []types.EBackupSpanWeekday {
@@ -239,7 +255,7 @@ func expandSearchFilter(rawFilters interface{}) search.Filter {
 	// Tags
 	if rawTags, ok := mv["tags"]; ok {
 		var tags []string
-		for _, rawTag := range rawTags.([]interface{}) {
+		for _, rawTag := range rawTags.(*schema.Set).List() {
 			tag := rawTag.(string)
 			if tag != "" {
 				tags = append(tags, tag)

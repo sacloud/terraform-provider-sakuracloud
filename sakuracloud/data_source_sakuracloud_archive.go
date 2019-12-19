@@ -58,9 +58,10 @@ func dataSourceSakuraCloudArchive() *schema.Resource {
 				Computed: true,
 			},
 			"tags": {
-				Type:     schema.TypeList,
+				Type:     schema.TypeSet,
 				Computed: true,
 				Elem:     &schema.Schema{Type: schema.TypeString},
+				Set:      schema.HashString,
 			},
 			"zone": {
 				Type:        schema.TypeString,
@@ -120,7 +121,7 @@ func dataSourceSakuraCloudArchiveRead(d *schema.ResourceData, meta interface{}) 
 		d.Set("size", data.GetSizeGB())        // nolint
 		d.Set("icon_id", data.IconID.String()) // nolint
 		d.Set("description", data.Description) // nolint
-		if err := d.Set("tags", data.Tags); err != nil {
+		if err := d.Set("tags", flattenTags(data.Tags)); err != nil {
 			return err
 		}
 		d.Set("zone", getZone(d, client)) // nolint

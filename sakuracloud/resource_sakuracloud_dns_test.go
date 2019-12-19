@@ -45,8 +45,8 @@ func TestAccSakuraCloudDNS_basic(t *testing.T) {
 					resource.TestCheckResourceAttr(resourceName, "zone", zone),
 					resource.TestCheckResourceAttr(resourceName, "description", "description"),
 					resource.TestCheckResourceAttr(resourceName, "tags.#", "2"),
-					resource.TestCheckResourceAttr(resourceName, "tags.0", "tag1"),
-					resource.TestCheckResourceAttr(resourceName, "tags.1", "tag2"),
+					resource.TestCheckResourceAttr(resourceName, "tags.4151227546", "tag1"),
+					resource.TestCheckResourceAttr(resourceName, "tags.1852302624", "tag2"),
 					resource.TestCheckResourceAttr(resourceName, "record.0.name", "www"),
 					resource.TestCheckResourceAttr(resourceName, "record.0.type", "A"),
 					resource.TestCheckResourceAttr(resourceName, "record.0.value", "192.168.11.1"),
@@ -66,8 +66,8 @@ func TestAccSakuraCloudDNS_basic(t *testing.T) {
 					resource.TestCheckResourceAttr(resourceName, "zone", zone),
 					resource.TestCheckResourceAttr(resourceName, "description", "description-upd"),
 					resource.TestCheckResourceAttr(resourceName, "tags.#", "2"),
-					resource.TestCheckResourceAttr(resourceName, "tags.0", "tag1-upd"),
-					resource.TestCheckResourceAttr(resourceName, "tags.1", "tag2-upd"),
+					resource.TestCheckResourceAttr(resourceName, "tags.2362157161", "tag1-upd"),
+					resource.TestCheckResourceAttr(resourceName, "tags.3412841145", "tag2-upd"),
 					resource.TestCheckResourceAttr(resourceName, "record.0.name", "www"),
 					resource.TestCheckResourceAttr(resourceName, "record.0.type", "A"),
 					resource.TestCheckResourceAttr(resourceName, "record.0.value", "192.168.11.1"),
@@ -138,16 +138,16 @@ func TestAccImportSakuraCloudDNS_basic(t *testing.T) {
 			return fmt.Errorf("expected 1 state: %#v", s)
 		}
 		expects := map[string]string{
-			"zone":           zone,
-			"description":    "description",
-			"tags.0":         "tag1",
-			"tags.1":         "tag2",
-			"record.0.name":  "www",
-			"record.0.type":  "A",
-			"record.0.value": "192.168.11.1",
-			"record.1.name":  "www2",
-			"record.1.type":  "A",
-			"record.1.value": "192.168.11.2",
+			"zone":            zone,
+			"description":     "description",
+			"tags.4151227546": "tag1",
+			"tags.1852302624": "tag2",
+			"record.0.name":   "www",
+			"record.0.type":   "A",
+			"record.0.value":  "192.168.11.1",
+			"record.1.name":   "www2",
+			"record.1.type":   "A",
+			"record.1.value":  "192.168.11.2",
 		}
 
 		if err := compareStateMulti(s[0], expects); err != nil {

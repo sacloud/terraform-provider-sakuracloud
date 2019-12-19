@@ -51,8 +51,8 @@ func TestAccSakuraCloudDatabase_basic(t *testing.T) {
 					resource.TestCheckResourceAttr(resourceName, "plan", "30g"),
 					resource.TestCheckResourceAttr(resourceName, "description", "description"),
 					resource.TestCheckResourceAttr(resourceName, "tags.#", "2"),
-					resource.TestCheckResourceAttr(resourceName, "tags.0", "tag1"),
-					resource.TestCheckResourceAttr(resourceName, "tags.1", "tag2"),
+					resource.TestCheckResourceAttr(resourceName, "tags.4151227546", "tag1"),
+					resource.TestCheckResourceAttr(resourceName, "tags.1852302624", "tag2"),
 					resource.TestCheckResourceAttr(resourceName, "username", "defuser"),
 					resource.TestCheckResourceAttr(resourceName, "password", password),
 					resource.TestCheckResourceAttr(resourceName, "replica_password", password),
@@ -83,8 +83,8 @@ func TestAccSakuraCloudDatabase_basic(t *testing.T) {
 					resource.TestCheckResourceAttr(resourceName, "plan", "30g"),
 					resource.TestCheckResourceAttr(resourceName, "description", "description-upd"),
 					resource.TestCheckResourceAttr(resourceName, "tags.#", "2"),
-					resource.TestCheckResourceAttr(resourceName, "tags.0", "tag1-upd"),
-					resource.TestCheckResourceAttr(resourceName, "tags.1", "tag2-upd"),
+					resource.TestCheckResourceAttr(resourceName, "tags.2362157161", "tag1-upd"),
+					resource.TestCheckResourceAttr(resourceName, "tags.3412841145", "tag2-upd"),
 					resource.TestCheckResourceAttr(resourceName, "username", "defuser"),
 					resource.TestCheckResourceAttr(resourceName, "password", password+"-upd"),
 					resource.TestCheckResourceAttr(resourceName, "source_ranges.#", "2"),
@@ -199,8 +199,8 @@ func TestAccImportSakuraCloudDatabase_basic(t *testing.T) {
 			"ip_addresses.0":    "192.168.11.101",
 			"netmask":           "24",
 			"gateway":           "192.168.11.1",
-			"tags.0":            "tag1",
-			"tags.1":            "tag2",
+			"tags.4151227546":   "tag1",
+			"tags.1852302624":   "tag2",
 		}
 
 		if err := compareStateMulti(s[0], expects); err != nil {
