@@ -36,7 +36,6 @@ func resourceSakuraCloudMobileGateway() *schema.Resource {
 		Importer: &schema.ResourceImporter{
 			State: schema.ImportStatePassthrough,
 		},
-		CustomizeDiff: hasTagResourceCustomizeDiff,
 
 		Timeouts: &schema.ResourceTimeout{
 			Create: schema.DefaultTimeout(60 * time.Minute),
@@ -196,9 +195,10 @@ func resourceSakuraCloudMobileGateway() *schema.Resource {
 				Optional: true,
 			},
 			"tags": {
-				Type:     schema.TypeList,
+				Type:     schema.TypeSet,
 				Optional: true,
 				Elem:     &schema.Schema{Type: schema.TypeString},
+				Set:      schema.HashString,
 			},
 			"zone": {
 				Type:        schema.TypeString,
@@ -355,7 +355,7 @@ func setMobileGatewayResourceData(ctx context.Context, d *schema.ResourceData, c
 	d.Set("name", data.Name)               // nolint
 	d.Set("icon_id", data.IconID.String()) // nolint
 	d.Set("description", data.Description) // nolint
-	if err := d.Set("tags", data.Tags); err != nil {
+	if err := d.Set("tags", flattenTags(data.Tags)); err != nil {
 		return err
 	}
 	if err := d.Set("sim", flattenMobileGatewaySIMs(sims)); err != nil {

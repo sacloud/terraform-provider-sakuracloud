@@ -34,7 +34,6 @@ func resourceSakuraCloudGSLB() *schema.Resource {
 		Importer: &schema.ResourceImporter{
 			State: schema.ImportStatePassthrough,
 		},
-		CustomizeDiff: hasTagResourceCustomizeDiff,
 
 		Timeouts: &schema.ResourceTimeout{
 			Create: schema.DefaultTimeout(5 * time.Minute),
@@ -133,9 +132,10 @@ func resourceSakuraCloudGSLB() *schema.Resource {
 				Optional: true,
 			},
 			"tags": {
-				Type:     schema.TypeList,
+				Type:     schema.TypeSet,
 				Optional: true,
 				Elem:     &schema.Schema{Type: schema.TypeString},
+				Set:      schema.HashString,
 			},
 		},
 	}
@@ -243,5 +243,5 @@ func setGSLBResourceData(ctx context.Context, d *schema.ResourceData, client *AP
 	if err := d.Set("server", flattenGSLBServers(data)); err != nil {
 		return err
 	}
-	return d.Set("tags", data.Tags)
+	return d.Set("tags", flattenTags(data.Tags))
 }

@@ -59,10 +59,11 @@ func filterSchema(opt *filterSchemaOption) *schema.Schema {
 			Elem:         &schema.Schema{Type: schema.TypeString},
 		},
 		"tags": {
-			Type:         schema.TypeList,
+			Type:         schema.TypeSet,
 			Optional:     true,
 			ExactlyOneOf: keys,
 			Elem:         &schema.Schema{Type: schema.TypeString},
+			Set:          schema.HashString,
 		},
 		"condition": {
 			Type:         schema.TypeList,

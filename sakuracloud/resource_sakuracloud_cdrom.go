@@ -38,12 +38,9 @@ func resourceSakuraCloudCDROM() *schema.Resource {
 		Importer: &schema.ResourceImporter{
 			State: schema.ImportStatePassthrough,
 		},
-		CustomizeDiff: customdiff.All(
-			customdiff.ComputedIf("hash", func(d *schema.ResourceDiff, meta interface{}) bool {
-				return d.HasChange("iso_image_file") || d.HasChange("content")
-			}),
-			hasTagResourceCustomizeDiff,
-		),
+		CustomizeDiff: customdiff.ComputedIf("hash", func(d *schema.ResourceDiff, meta interface{}) bool {
+			return d.HasChange("iso_image_file") || d.HasChange("content")
+		}),
 
 		Timeouts: &schema.ResourceTimeout{
 			Create: schema.DefaultTimeout(24 * time.Hour),
@@ -94,9 +91,10 @@ func resourceSakuraCloudCDROM() *schema.Resource {
 				Optional: true,
 			},
 			"tags": {
-				Type:     schema.TypeList,
+				Type:     schema.TypeSet,
 				Optional: true,
 				Elem:     &schema.Schema{Type: schema.TypeString},
+				Set:      schema.HashString,
 			},
 			"zone": {
 				Type:        schema.TypeString,
@@ -239,7 +237,7 @@ func setCDROMResourceData(ctx context.Context, d *schema.ResourceData, client *A
 	d.Set("icon_id", data.IconID.String())   // nolint
 	d.Set("description", data.Description)   // nolint
 	d.Set("zone", getZone(d, client))        // nolint
-	return d.Set("tags", data.Tags)
+	return d.Set("tags", flattenTags(data.Tags))
 }
 
 type uploadCDROMContext struct {

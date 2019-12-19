@@ -32,12 +32,9 @@ func resourceSakuraCloudArchive() *schema.Resource {
 		Read:   resourceSakuraCloudArchiveRead,
 		Update: resourceSakuraCloudArchiveUpdate,
 		Delete: resourceSakuraCloudArchiveDelete,
-		CustomizeDiff: customdiff.All(
-			customdiff.ComputedIf("hash", func(d *schema.ResourceDiff, meta interface{}) bool {
-				return d.HasChange("archive_file")
-			}),
-			hasTagResourceCustomizeDiff,
-		),
+		CustomizeDiff: customdiff.ComputedIf("hash", func(d *schema.ResourceDiff, meta interface{}) bool {
+			return d.HasChange("archive_file")
+		}),
 		Importer: &schema.ResourceImporter{
 			State: schema.ImportStatePassthrough,
 		},
@@ -80,9 +77,10 @@ func resourceSakuraCloudArchive() *schema.Resource {
 				Optional: true,
 			},
 			"tags": {
-				Type:     schema.TypeList,
+				Type:     schema.TypeSet,
 				Optional: true,
 				Elem:     &schema.Schema{Type: schema.TypeString},
+				Set:      schema.HashString,
 			},
 			"zone": {
 				Type:        schema.TypeString,
@@ -204,7 +202,7 @@ func setArchiveResourceData(d *schema.ResourceData, client *APIClient, data *sac
 	d.Set("size", data.GetSizeGB())        // nolint
 	d.Set("description", data.Description) // nolint
 	d.Set("zone", getZone(d, client))      // nolint
-	return d.Set("tags", data.Tags)
+	return d.Set("tags", flattenTags(data.Tags))
 }
 
 func uploadArchiveFile(ctx context.Context, archiveOp sacloud.ArchiveAPI, zone string, id types.ID, filePath string, ftpServer *sacloud.FTPServer) error {

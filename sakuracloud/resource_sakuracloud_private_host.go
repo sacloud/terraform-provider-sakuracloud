@@ -32,7 +32,6 @@ func resourceSakuraCloudPrivateHost() *schema.Resource {
 		Importer: &schema.ResourceImporter{
 			State: schema.ImportStatePassthrough,
 		},
-		CustomizeDiff: hasTagResourceCustomizeDiff,
 
 		Timeouts: &schema.ResourceTimeout{
 			Create: schema.DefaultTimeout(5 * time.Minute),
@@ -56,9 +55,10 @@ func resourceSakuraCloudPrivateHost() *schema.Resource {
 				Optional: true,
 			},
 			"tags": {
-				Type:     schema.TypeList,
+				Type:     schema.TypeSet,
 				Optional: true,
 				Elem:     &schema.Schema{Type: schema.TypeString},
+				Set:      schema.HashString,
 			},
 			"hostname": {
 				Type:     schema.TypeString,
@@ -188,5 +188,5 @@ func setPrivateHostResourceData(ctx context.Context, d *schema.ResourceData, cli
 	d.Set("assigned_core", data.GetAssignedCPU())        // nolint
 	d.Set("assigned_memory", data.GetAssignedMemoryGB()) // nolint
 	d.Set("zone", getZone(d, client))                    // nolint
-	return d.Set("tags", data.Tags)
+	return d.Set("tags", flattenTags(data.Tags))
 }

@@ -38,7 +38,6 @@ func resourceSakuraCloudNFS() *schema.Resource {
 		Importer: &schema.ResourceImporter{
 			State: schema.ImportStatePassthrough,
 		},
-		CustomizeDiff: hasTagResourceCustomizeDiff,
 
 		Timeouts: &schema.ResourceTimeout{
 			Create: schema.DefaultTimeout(24 * time.Hour),
@@ -106,9 +105,10 @@ func resourceSakuraCloudNFS() *schema.Resource {
 				Optional: true,
 			},
 			"tags": {
-				Type:     schema.TypeList,
+				Type:     schema.TypeSet,
 				Optional: true,
 				Elem:     &schema.Schema{Type: schema.TypeString},
+				Set:      schema.HashString,
 			},
 			"zone": {
 				Type:        schema.TypeString,
@@ -262,5 +262,5 @@ func setNFSResourceData(ctx context.Context, d *schema.ResourceData, client *API
 	d.Set("description", data.Description)     // nolint
 	d.Set("zone", getZone(d, client))          // nolint
 
-	return d.Set("tags", data.Tags)
+	return d.Set("tags", flattenTags(data.Tags))
 }

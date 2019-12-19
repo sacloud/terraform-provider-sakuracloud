@@ -35,7 +35,6 @@ func resourceSakuraCloudInternet() *schema.Resource {
 		Importer: &schema.ResourceImporter{
 			State: schema.ImportStatePassthrough,
 		},
-		CustomizeDiff: hasTagResourceCustomizeDiff,
 
 		Timeouts: &schema.ResourceTimeout{
 			Create: schema.DefaultTimeout(60 * time.Minute),
@@ -59,9 +58,10 @@ func resourceSakuraCloudInternet() *schema.Resource {
 				Optional: true,
 			},
 			"tags": {
-				Type:     schema.TypeList,
+				Type:     schema.TypeSet,
 				Optional: true,
 				Elem:     &schema.Schema{Type: schema.TypeString},
+				Set:      schema.HashString,
 			},
 			"netmask": {
 				Type:         schema.TypeInt,
@@ -284,5 +284,5 @@ func setInternetResourceData(ctx context.Context, d *schema.ResourceData, client
 	if err := d.Set("server_ids", serverIDs); err != nil {
 		return err
 	}
-	return d.Set("tags", data.Tags)
+	return d.Set("tags", flattenTags(data.Tags))
 }

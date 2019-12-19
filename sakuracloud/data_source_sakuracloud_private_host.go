@@ -45,9 +45,10 @@ func dataSourceSakuraCloudPrivateHost() *schema.Resource {
 				Computed: true,
 			},
 			"tags": {
-				Type:     schema.TypeList,
-				Elem:     &schema.Schema{Type: schema.TypeString},
+				Type:     schema.TypeSet,
 				Computed: true,
+				Elem:     &schema.Schema{Type: schema.TypeString},
+				Set:      schema.HashString,
 			},
 			"hostname": {
 				Type:     schema.TypeString,
