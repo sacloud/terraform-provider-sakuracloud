@@ -38,3 +38,6 @@ var ProxyLBProxyModes = struct {
 func (m EProxyLBProxyMode) String() string {
 	return string(m)
 }
+
+// ProxyLBProxyModeStrings プロキシ方式を表す文字列
+var ProxyLBProxyModeStrings = []string{"http", "https", "tcp"}

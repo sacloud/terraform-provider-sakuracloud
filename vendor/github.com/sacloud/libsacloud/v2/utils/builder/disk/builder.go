@@ -20,6 +20,7 @@ import (
 	"fmt"
 	"reflect"
 
+	"github.com/sacloud/libsacloud/v2/pkg/size"
 	"github.com/sacloud/libsacloud/v2/utils/builder"
 
 	"github.com/sacloud/libsacloud/v2/sacloud"
@@ -148,7 +149,7 @@ func (d *FromUnixBuilder) createDiskParameter(ctx context.Context, client *APICl
 
 	createReq := &sacloud.DiskCreateRequest{
 		DiskPlanID:      d.PlanID,
-		SizeMB:          d.SizeGB * 1024,
+		SizeMB:          d.SizeGB * size.GiB,
 		Connection:      d.Connection,
 		SourceArchiveID: archive.ID,
 		ServerID:        serverID,
@@ -254,7 +255,7 @@ func (d *FromFixedArchiveBuilder) createDiskParameter(ctx context.Context, clien
 
 	createReq := &sacloud.DiskCreateRequest{
 		DiskPlanID:      d.PlanID,
-		SizeMB:          d.SizeGB * 1024,
+		SizeMB:          d.SizeGB * size.GiB,
 		Connection:      d.Connection,
 		SourceArchiveID: archive.ID,
 		ServerID:        serverID,
@@ -340,7 +341,7 @@ func (d *FromWindowsBuilder) createDiskParameter(ctx context.Context, client *AP
 
 	createReq := &sacloud.DiskCreateRequest{
 		DiskPlanID:      d.PlanID,
-		SizeMB:          d.SizeGB * 1024,
+		SizeMB:          d.SizeGB * size.GiB,
 		Connection:      d.Connection,
 		SourceArchiveID: archive.ID,
 		ServerID:        serverID,
@@ -462,7 +463,7 @@ func (d *FromDiskOrArchiveBuilder) updateDiskParameter() *sacloud.DiskUpdateRequ
 func (d *FromDiskOrArchiveBuilder) createDiskParameter(ctx context.Context, client *APIClient, zone string, serverID types.ID) (*sacloud.DiskCreateRequest, *sacloud.DiskEditRequest, error) {
 	createReq := &sacloud.DiskCreateRequest{
 		DiskPlanID:      d.PlanID,
-		SizeMB:          d.SizeGB * 1024,
+		SizeMB:          d.SizeGB * size.GiB,
 		Connection:      d.Connection,
 		SourceArchiveID: d.SourceArchiveID,
 		SourceDiskID:    d.SourceDiskID,
@@ -553,7 +554,7 @@ func (d *BlankBuilder) updateDiskParameter() *sacloud.DiskUpdateRequest {
 func (d *BlankBuilder) createDiskParameter(ctx context.Context, client *APIClient, zone string, serverID types.ID) (*sacloud.DiskCreateRequest, *sacloud.DiskEditRequest, error) {
 	createReq := &sacloud.DiskCreateRequest{
 		DiskPlanID:  d.PlanID,
-		SizeMB:      d.SizeGB * 1024,
+		SizeMB:      d.SizeGB * size.GiB,
 		Connection:  d.Connection,
 		ServerID:    serverID,
 		Name:        d.Name,

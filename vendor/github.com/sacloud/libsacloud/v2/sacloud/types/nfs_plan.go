@@ -27,3 +27,12 @@ var NFSPlans = struct {
 	HDD: ID(1),
 	SSD: ID(2),
 }
+
+// NFSPlanStrings NFSプランを表す文字列
+var NFSPlanStrings = []string{"hdd", "ssd"}
+
+// NFSPlanIDMap 文字列とNFSプランIDのマップ
+var NFSPlanIDMap = map[string]ID{
+	"hdd": NFSPlans.HDD,
+	"ssd": NFSPlans.SSD,
+}

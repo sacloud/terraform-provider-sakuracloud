@@ -22,8 +22,8 @@ func (c EDiskConnection) String() string {
 	return string(c)
 }
 
-// DiskConnections ディスク接続方法
 var (
+	// DiskConnections ディスク接続方法
 	DiskConnections = struct {
 		// VirtIO virtio
 		VirtIO EDiskConnection
@@ -39,7 +39,7 @@ var (
 		DiskConnections.IDE.String():    DiskConnections.IDE,
 	}
 
-	DiskConnectionValues = []string{
+	DiskConnectionStrings = []string{
 		DiskConnections.VirtIO.String(),
 		DiskConnections.IDE.String(),
 	}
