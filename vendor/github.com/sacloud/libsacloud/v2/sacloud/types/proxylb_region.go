@@ -35,3 +35,6 @@ var ProxyLBRegions = struct {
 	TK1:     EProxyLBRegion("tk1"),
 	IS1:     EProxyLBRegion("is1"),
 }
+
+// ProxyLBRegionStrings 設置先リージョンを表す文字列
+var ProxyLBRegionStrings = []string{"tk1", "is1"}

@@ -43,3 +43,6 @@ var (
 		InterfaceDrivers.E1000.String(),
 	}
 )
+
+// InterfaceDriverStrings インターフェースドライバを表す文字列
+var InterfaceDriverStrings = []string{"virtio", "e1000"}

@@ -41,3 +41,26 @@ var DatabasePlans = struct {
 func SlaveDatabasePlanID(masterPlanID ID) ID {
 	return ID(int64(masterPlanID) + 1)
 }
+
+// DatabasePlanStrings データベースプランを示す文字列
+var DatabasePlanStrings = []string{"10g", "30g", "90g", "240g", "500g", "1t"}
+
+// DatabasePlanIDMap 文字列とデータベースプランのマップ、キーはDatabasePlanStringsから参照すること
+var DatabasePlanIDMap = map[string]ID{
+	"10g":  DatabasePlans.DB10GB,
+	"30g":  DatabasePlans.DB30GB,
+	"90g":  DatabasePlans.DB90GB,
+	"240g": DatabasePlans.DB240GB,
+	"500g": DatabasePlans.DB500GB,
+	"1t":   DatabasePlans.DB1TB,
+}
+
+// DatabasePlanNameMap プランIDと名称のマップ
+var DatabasePlanNameMap = map[ID]string{
+	DatabasePlans.DB10GB:  "10g",
+	DatabasePlans.DB30GB:  "30g",
+	DatabasePlans.DB90GB:  "90g",
+	DatabasePlans.DB240GB: "240g",
+	DatabasePlans.DB500GB: "500g",
+	DatabasePlans.DB1TB:   "1t",
+}
