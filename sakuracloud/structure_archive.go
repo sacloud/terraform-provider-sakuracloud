@@ -16,6 +16,7 @@ package sakuracloud
 
 import (
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
+	"github.com/sacloud/libsacloud/v2/pkg/size"
 	"github.com/sacloud/libsacloud/v2/sacloud"
 )
 
@@ -37,7 +38,7 @@ func expandArchiveCreateRequest(d *schema.ResourceData) *sacloud.ArchiveCreateBl
 	return &sacloud.ArchiveCreateBlankRequest{
 		Name:        d.Get("name").(string),
 		Description: d.Get("description").(string),
-		SizeMB:      toSizeMB(d.Get("size").(int)),
+		SizeMB:      d.Get("size").(int) * size.GiB,
 		IconID:      expandSakuraCloudID(d, "icon_id"),
 		Tags:        expandTags(d),
 	}

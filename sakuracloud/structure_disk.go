@@ -16,6 +16,7 @@ package sakuracloud
 
 import (
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
+	"github.com/sacloud/libsacloud/v2/pkg/size"
 	"github.com/sacloud/libsacloud/v2/sacloud"
 	"github.com/sacloud/libsacloud/v2/sacloud/types"
 )
@@ -38,7 +39,7 @@ func expandDiskCreateRequest(d *schema.ResourceData) *sacloud.DiskCreateRequest 
 		Connection:      types.EDiskConnection(d.Get("connector").(string)),
 		SourceDiskID:    expandSakuraCloudID(d, "source_disk_id"),
 		SourceArchiveID: expandSakuraCloudID(d, "source_archive_id"),
-		SizeMB:          toSizeMB(d.Get("size").(int)),
+		SizeMB:          d.Get("size").(int) * size.GiB,
 		Name:            d.Get("name").(string),
 		Description:     d.Get("description").(string),
 		Tags:            expandTags(d),
