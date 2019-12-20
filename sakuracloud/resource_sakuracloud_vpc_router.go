@@ -22,6 +22,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/validation"
 	"github.com/sacloud/libsacloud/v2/sacloud"
+	"github.com/sacloud/libsacloud/v2/sacloud/types"
 	"github.com/sacloud/libsacloud/v2/utils/power"
 )
 
@@ -53,7 +54,7 @@ func resourceSakuraCloudVPCRouter() *schema.Resource {
 				ForceNew:     true,
 				Optional:     true,
 				Default:      "standard",
-				ValidateFunc: validation.StringInSlice([]string{"standard", "premium", "highspec", "highspec4000"}, false),
+				ValidateFunc: validation.StringInSlice(types.VPCRouterPlanStrings, false),
 			},
 			"switch_id": {
 				Type:         schema.TypeString,
@@ -196,7 +197,7 @@ func resourceSakuraCloudVPCRouter() *schema.Resource {
 									"protocol": {
 										Type:         schema.TypeString,
 										Required:     true,
-										ValidateFunc: validation.StringInSlice([]string{"tcp", "udp", "icmp", "ip"}, false),
+										ValidateFunc: validation.StringInSlice(types.VPCRouterFirewallProtocolStrings, false),
 									},
 									"source_network": {
 										Type:     schema.TypeString,

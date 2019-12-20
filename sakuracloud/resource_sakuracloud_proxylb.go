@@ -48,18 +48,10 @@ func resourceSakuraCloudProxyLB() *schema.Resource {
 				Required: true,
 			},
 			"plan": {
-				Type:     schema.TypeInt,
-				Optional: true,
-				Default:  100,
-				ValidateFunc: validation.IntInSlice([]int{
-					int(types.ProxyLBPlans.CPS100),
-					int(types.ProxyLBPlans.CPS500),
-					int(types.ProxyLBPlans.CPS1000),
-					int(types.ProxyLBPlans.CPS5000),
-					int(types.ProxyLBPlans.CPS10000),
-					int(types.ProxyLBPlans.CPS50000),
-					int(types.ProxyLBPlans.CPS100000),
-				}),
+				Type:         schema.TypeInt,
+				Optional:     true,
+				Default:      types.ProxyLBPlans.CPS100.Int(),
+				ValidateFunc: validation.IntInSlice(types.ProxyLBPlanValues),
 			},
 			"vip_failover": {
 				Type:     schema.TypeBool,
@@ -76,14 +68,11 @@ func resourceSakuraCloudProxyLB() *schema.Resource {
 				Optional: true,
 			},
 			"region": {
-				Type:     schema.TypeString,
-				Optional: true,
-				Default:  types.ProxyLBRegions.IS1.String(),
-				ValidateFunc: validation.StringInSlice([]string{
-					types.ProxyLBRegions.IS1.String(),
-					types.ProxyLBRegions.TK1.String(),
-				}, false),
-				ForceNew: true,
+				Type:         schema.TypeString,
+				Optional:     true,
+				Default:      types.ProxyLBRegions.IS1.String(),
+				ValidateFunc: validation.StringInSlice(types.ProxyLBRegionStrings, false),
+				ForceNew:     true,
 			},
 			"bind_port": {
 				Type:     schema.TypeList,
@@ -93,13 +82,9 @@ func resourceSakuraCloudProxyLB() *schema.Resource {
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
 						"proxy_mode": {
-							Type:     schema.TypeString,
-							Required: true,
-							ValidateFunc: validation.StringInSlice([]string{
-								types.ProxyLBProxyModes.TCP.String(),
-								types.ProxyLBProxyModes.HTTP.String(),
-								types.ProxyLBProxyModes.HTTPS.String(),
-							}, false),
+							Type:         schema.TypeString,
+							Required:     true,
+							ValidateFunc: validation.StringInSlice(types.ProxyLBProxyModeStrings, false),
 						},
 						"port": {
 							Type:     schema.TypeInt,
@@ -141,12 +126,9 @@ func resourceSakuraCloudProxyLB() *schema.Resource {
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
 						"protocol": {
-							Type:     schema.TypeString,
-							Required: true,
-							ValidateFunc: validation.StringInSlice([]string{
-								types.ProxyLBProtocols.HTTP.String(),
-								types.ProxyLBProtocols.TCP.String(),
-							}, false),
+							Type:         schema.TypeString,
+							Required:     true,
+							ValidateFunc: validation.StringInSlice(types.ProxyLBProtocolStrings, false),
 						},
 						"delay_loop": {
 							Type:         schema.TypeInt,
@@ -427,7 +409,7 @@ func setProxyLBResourceData(ctx context.Context, d *schema.ResourceData, client 
 	}
 
 	d.Set("name", data.Name)                                   // nolint
-	d.Set("plan", int(data.Plan))                              // nolint
+	d.Set("plan", data.Plan.Int())                             // nolint
 	d.Set("vip_failover", data.UseVIPFailover)                 // nolint
 	d.Set("sticky_session", flattenProxyLBStickySession(data)) // nolint
 	d.Set("timeout", flattenProxyLBTimeout(data))              // nolint

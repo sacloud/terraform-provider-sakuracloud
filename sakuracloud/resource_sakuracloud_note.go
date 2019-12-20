@@ -22,6 +22,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/validation"
 	"github.com/sacloud/libsacloud/v2/sacloud"
+	"github.com/sacloud/libsacloud/v2/sacloud/types"
 )
 
 func resourceSakuraCloudNote() *schema.Resource {
@@ -60,13 +61,10 @@ func resourceSakuraCloudNote() *schema.Resource {
 				Computed: true,
 			},
 			"class": {
-				Type:     schema.TypeString,
-				Optional: true,
-				Default:  "shell",
-				ValidateFunc: validation.StringInSlice([]string{
-					"shell",
-					"yaml_cloud_config",
-				}, false),
+				Type:         schema.TypeString,
+				Optional:     true,
+				Default:      "shell",
+				ValidateFunc: validation.StringInSlice(types.NoteClassStrings, false),
 			},
 			"tags": {
 				Type:     schema.TypeSet,
