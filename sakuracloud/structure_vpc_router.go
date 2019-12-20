@@ -44,34 +44,11 @@ func expandVPCRouterBuilder(d resourceValueGettable, client *APIClient) *vpcrout
 }
 
 func expandVPCRouterPlanID(d resourceValueGettable) types.ID {
-	plan := d.Get("plan").(string)
-	switch plan {
-	case "standard":
-		return types.VPCRouterPlans.Standard
-	case "premium":
-		return types.VPCRouterPlans.Premium
-	case "highspec":
-		return types.VPCRouterPlans.HighSpec
-	case "highspec4000":
-		return types.VPCRouterPlans.HighSpec4000
-	default:
-		return types.VPCRouterPlans.Standard
-	}
+	return types.VPCRouterPlanIDMap[d.Get("plan").(string)]
 }
 
 func flattenVPCRouterPlan(vpcRouter *sacloud.VPCRouter) string {
-	switch vpcRouter.PlanID {
-	case types.VPCRouterPlans.Standard:
-		return "standard"
-	case types.VPCRouterPlans.Premium:
-		return "premium"
-	case types.VPCRouterPlans.HighSpec:
-		return "highspec"
-	case types.VPCRouterPlans.HighSpec4000:
-		return "highspec4000"
-	default:
-		return "standard"
-	}
+	return types.VPCRouterPlanNameMap[vpcRouter.PlanID]
 }
 
 func expandVPCRouterNICSetting(d resourceValueGettable) vpcrouter.NICSettingHolder {

@@ -16,6 +16,7 @@ package sakuracloud
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/sacloud/libsacloud/v2/sacloud"
@@ -26,11 +27,9 @@ import (
 func expandNFSDiskPlanID(ctx context.Context, client *APIClient, d resourceValueGettable) (types.ID, error) {
 	var planID types.ID
 	planName := d.Get("plan").(string)
-	switch planName {
-	case "hdd":
-		planID = types.NFSPlans.HDD
-	case "ssd":
-		planID = types.NFSPlans.SSD
+	planID, ok := types.NFSPlanIDMap[planName]
+	if !ok {
+		return types.ID(0), fmt.Errorf("plan is not found: %s", planName)
 	}
 	size := d.Get("size").(int)
 

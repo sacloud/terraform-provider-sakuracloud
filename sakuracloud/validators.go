@@ -116,12 +116,6 @@ func validateDatabaseParameters(d *schema.ResourceData) error {
 	if err := validateBackupWeekdays(d, "backup_weekdays"); err != nil {
 		return err
 	}
-
-	dbType := d.Get("database_type").(string)
-	if dbType != "postgresql" && dbType != "mariadb" {
-		return fmt.Errorf("unknown database_type[%s]", dbType)
-	}
-
 	return nil
 }
 

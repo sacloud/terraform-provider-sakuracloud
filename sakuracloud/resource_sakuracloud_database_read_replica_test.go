@@ -154,7 +154,7 @@ resource "sakuracloud_switch" "foobar" {
     name = "{{ .arg0 }}"
 }
 resource "sakuracloud_database" "foobar" {
-  database_type = "postgresql"
+  database_type = "postgres"
   plan          = "10g"
 
   username = "defuser"
@@ -192,7 +192,7 @@ resource "sakuracloud_switch" "foobar" {
 }
 
 resource "sakuracloud_database" "foobar" {
-  database_type = "postgresql"
+  database_type = "postgres"
   plan          = "10g"
 
   username = "defuser"

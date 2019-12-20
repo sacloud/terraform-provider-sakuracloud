@@ -61,13 +61,10 @@ func resourceSakuraCloudServer() *schema.Resource {
 				Default:  1,
 			},
 			"commitment": {
-				Type:     schema.TypeString,
-				Optional: true,
-				Default:  types.Commitments.Standard.String(),
-				ValidateFunc: validation.StringInSlice([]string{
-					types.Commitments.Standard.String(),
-					types.Commitments.DedicatedCPU.String(),
-				}, false),
+				Type:         schema.TypeString,
+				Optional:     true,
+				Default:      types.Commitments.Standard.String(),
+				ValidateFunc: validation.StringInSlice(types.CommitmentStrings, false),
 			},
 			"disks": {
 				Type:     schema.TypeList,
@@ -75,13 +72,10 @@ func resourceSakuraCloudServer() *schema.Resource {
 				Elem:     &schema.Schema{Type: schema.TypeString},
 			},
 			"interface_driver": {
-				Type:     schema.TypeString,
-				Optional: true,
-				Default:  types.InterfaceDrivers.VirtIO.String(),
-				ValidateFunc: validation.StringInSlice([]string{
-					types.InterfaceDrivers.VirtIO.String(),
-					types.InterfaceDrivers.E1000.String(),
-				}, false),
+				Type:         schema.TypeString,
+				Optional:     true,
+				Default:      types.InterfaceDrivers.VirtIO.String(),
+				ValidateFunc: validation.StringInSlice(types.InterfaceDriverStrings, false),
 			},
 			"network_interface": {
 				Type:     schema.TypeList,

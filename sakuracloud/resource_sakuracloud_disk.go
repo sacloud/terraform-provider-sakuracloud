@@ -54,17 +54,14 @@ func resourceSakuraCloudDisk() *schema.Resource {
 				Optional:     true,
 				ForceNew:     true,
 				Default:      "ssd",
-				ValidateFunc: validation.StringInSlice([]string{"ssd", "hdd"}, false),
+				ValidateFunc: validation.StringInSlice(types.DiskPlanStrings, false),
 			},
 			"connector": {
-				Type:     schema.TypeString,
-				Optional: true,
-				ForceNew: true,
-				Default:  types.DiskConnections.VirtIO,
-				ValidateFunc: validation.StringInSlice([]string{
-					types.DiskConnections.VirtIO.String(),
-					types.DiskConnections.IDE.String(),
-				}, false),
+				Type:         schema.TypeString,
+				Optional:     true,
+				ForceNew:     true,
+				Default:      types.DiskConnections.VirtIO,
+				ValidateFunc: validation.StringInSlice(types.DiskConnectionStrings, false),
 			},
 			"source_archive_id": {
 				Type:          schema.TypeString,
