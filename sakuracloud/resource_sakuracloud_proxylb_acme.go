@@ -242,16 +242,17 @@ func setProxyLBACMEResourceData(ctx context.Context, d *schema.ResourceData, cli
 			// even if certificate is deleted, it will not result in an error
 			return err
 		}
-		if cert.ServerCertificate != "" {
+		if cert.PrimaryCert != nil && cert.PrimaryCert.ServerCertificate != "" {
 			break
 		}
 		time.Sleep(10 * time.Second)
 	}
 
-	proxylbCert := map[string]interface{}{
-		"server_cert":       cert.ServerCertificate,
-		"intermediate_cert": cert.IntermediateCertificate,
-		"private_key":       cert.PrivateKey,
+	proxylbCert := make(map[string]interface{})
+	if cert.PrimaryCert != nil {
+		proxylbCert["server_cert"] = cert.PrimaryCert.ServerCertificate
+		proxylbCert["intermediate_cert"] = cert.PrimaryCert.IntermediateCertificate
+		proxylbCert["private_key"] = cert.PrimaryCert.PrivateKey
 	}
 	if len(cert.AdditionalCerts) > 0 {
 		var certs []interface{}

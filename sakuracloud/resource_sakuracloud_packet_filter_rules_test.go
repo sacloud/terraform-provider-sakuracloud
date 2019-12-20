@@ -40,6 +40,7 @@ func TestAccSakuraCloudPacketFilterRules_basic(t *testing.T) {
 					resource.TestCheckResourceAttr(resourceName, "expression.0.source_port", "80"),
 					resource.TestCheckResourceAttr(resourceName, "expression.0.destination_port", "80"),
 					resource.TestCheckResourceAttr(resourceName, "expression.0.allow", "true"),
+					resource.TestCheckResourceAttr(resourceName, "expression.0.description", "description"),
 
 					resource.TestCheckResourceAttr(resourceName, "expression.1.protocol", "tcp"),
 					resource.TestCheckResourceAttr(resourceName, "expression.1.source_network", "192.168.2.0"),
@@ -62,6 +63,7 @@ func TestAccSakuraCloudPacketFilterRules_basic(t *testing.T) {
 					resource.TestCheckResourceAttr(resourceName, "expression.0.source_port", "80"),
 					resource.TestCheckResourceAttr(resourceName, "expression.0.destination_port", "80"),
 					resource.TestCheckResourceAttr(resourceName, "expression.0.allow", "true"),
+					resource.TestCheckResourceAttr(resourceName, "expression.0.description", ""),
 
 					resource.TestCheckResourceAttr(resourceName, "expression.1.protocol", "udp"),
 					resource.TestCheckResourceAttr(resourceName, "expression.1.source_network", "192.168.2.2"),
@@ -93,6 +95,7 @@ resource sakuracloud_packet_filter_rules "rules" {
 	source_port      = "80"
 	destination_port = "80"
 	allow            = true
+    description      = "description"
   }
   expression {
 	protocol         = "tcp"

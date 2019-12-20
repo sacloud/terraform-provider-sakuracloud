@@ -17020,12 +17020,8 @@ func (o *ProxyLBChangePlanRequest) SetPlan(v types.EProxyLBPlan) {
 
 // ProxyLBCertificates represents API parameter/response structure
 type ProxyLBCertificates struct {
-	ServerCertificate       string
-	IntermediateCertificate string
-	PrivateKey              string
-	CertificateEndDate      time.Time
-	CertificateCommonName   string
-	AdditionalCerts         []*ProxyLBAdditionalCert `mapconv:"[]AdditionalCerts, recursive"`
+	PrimaryCert     *ProxyLBPrimaryCert
+	AdditionalCerts []*ProxyLBAdditionalCert `mapconv:"[]AdditionalCerts, recursive"`
 }
 
 // Validate validates by field tags
@@ -17036,70 +17032,22 @@ func (o *ProxyLBCertificates) Validate() error {
 // setDefaults implements sacloud.argumentDefaulter
 func (o *ProxyLBCertificates) setDefaults() interface{} {
 	return &struct {
-		ServerCertificate       string
-		IntermediateCertificate string
-		PrivateKey              string
-		CertificateEndDate      time.Time
-		CertificateCommonName   string
-		AdditionalCerts         []*ProxyLBAdditionalCert `mapconv:"[]AdditionalCerts, recursive"`
+		PrimaryCert     *ProxyLBPrimaryCert
+		AdditionalCerts []*ProxyLBAdditionalCert `mapconv:"[]AdditionalCerts, recursive"`
 	}{
-		ServerCertificate:       o.GetServerCertificate(),
-		IntermediateCertificate: o.GetIntermediateCertificate(),
-		PrivateKey:              o.GetPrivateKey(),
-		CertificateEndDate:      o.GetCertificateEndDate(),
-		CertificateCommonName:   o.GetCertificateCommonName(),
-		AdditionalCerts:         o.GetAdditionalCerts(),
+		PrimaryCert:     o.GetPrimaryCert(),
+		AdditionalCerts: o.GetAdditionalCerts(),
 	}
 }
 
-// GetServerCertificate returns value of ServerCertificate
-func (o *ProxyLBCertificates) GetServerCertificate() string {
-	return o.ServerCertificate
+// GetPrimaryCert returns value of PrimaryCert
+func (o *ProxyLBCertificates) GetPrimaryCert() *ProxyLBPrimaryCert {
+	return o.PrimaryCert
 }
 
-// SetServerCertificate sets value to ServerCertificate
-func (o *ProxyLBCertificates) SetServerCertificate(v string) {
-	o.ServerCertificate = v
-}
-
-// GetIntermediateCertificate returns value of IntermediateCertificate
-func (o *ProxyLBCertificates) GetIntermediateCertificate() string {
-	return o.IntermediateCertificate
-}
-
-// SetIntermediateCertificate sets value to IntermediateCertificate
-func (o *ProxyLBCertificates) SetIntermediateCertificate(v string) {
-	o.IntermediateCertificate = v
-}
-
-// GetPrivateKey returns value of PrivateKey
-func (o *ProxyLBCertificates) GetPrivateKey() string {
-	return o.PrivateKey
-}
-
-// SetPrivateKey sets value to PrivateKey
-func (o *ProxyLBCertificates) SetPrivateKey(v string) {
-	o.PrivateKey = v
-}
-
-// GetCertificateEndDate returns value of CertificateEndDate
-func (o *ProxyLBCertificates) GetCertificateEndDate() time.Time {
-	return o.CertificateEndDate
-}
-
-// SetCertificateEndDate sets value to CertificateEndDate
-func (o *ProxyLBCertificates) SetCertificateEndDate(v time.Time) {
-	o.CertificateEndDate = v
-}
-
-// GetCertificateCommonName returns value of CertificateCommonName
-func (o *ProxyLBCertificates) GetCertificateCommonName() string {
-	return o.CertificateCommonName
-}
-
-// SetCertificateCommonName sets value to CertificateCommonName
-func (o *ProxyLBCertificates) SetCertificateCommonName(v string) {
-	o.CertificateCommonName = v
+// SetPrimaryCert sets value to PrimaryCert
+func (o *ProxyLBCertificates) SetPrimaryCert(v *ProxyLBPrimaryCert) {
+	o.PrimaryCert = v
 }
 
 // GetAdditionalCerts returns value of AdditionalCerts
@@ -17110,6 +17058,91 @@ func (o *ProxyLBCertificates) GetAdditionalCerts() []*ProxyLBAdditionalCert {
 // SetAdditionalCerts sets value to AdditionalCerts
 func (o *ProxyLBCertificates) SetAdditionalCerts(v []*ProxyLBAdditionalCert) {
 	o.AdditionalCerts = v
+}
+
+/*************************************************
+* ProxyLBPrimaryCert
+*************************************************/
+
+// ProxyLBPrimaryCert represents API parameter/response structure
+type ProxyLBPrimaryCert struct {
+	ServerCertificate       string
+	IntermediateCertificate string
+	PrivateKey              string
+	CertificateEndDate      time.Time
+	CertificateCommonName   string
+}
+
+// Validate validates by field tags
+func (o *ProxyLBPrimaryCert) Validate() error {
+	return validator.New().Struct(o)
+}
+
+// setDefaults implements sacloud.argumentDefaulter
+func (o *ProxyLBPrimaryCert) setDefaults() interface{} {
+	return &struct {
+		ServerCertificate       string
+		IntermediateCertificate string
+		PrivateKey              string
+		CertificateEndDate      time.Time
+		CertificateCommonName   string
+	}{
+		ServerCertificate:       o.GetServerCertificate(),
+		IntermediateCertificate: o.GetIntermediateCertificate(),
+		PrivateKey:              o.GetPrivateKey(),
+		CertificateEndDate:      o.GetCertificateEndDate(),
+		CertificateCommonName:   o.GetCertificateCommonName(),
+	}
+}
+
+// GetServerCertificate returns value of ServerCertificate
+func (o *ProxyLBPrimaryCert) GetServerCertificate() string {
+	return o.ServerCertificate
+}
+
+// SetServerCertificate sets value to ServerCertificate
+func (o *ProxyLBPrimaryCert) SetServerCertificate(v string) {
+	o.ServerCertificate = v
+}
+
+// GetIntermediateCertificate returns value of IntermediateCertificate
+func (o *ProxyLBPrimaryCert) GetIntermediateCertificate() string {
+	return o.IntermediateCertificate
+}
+
+// SetIntermediateCertificate sets value to IntermediateCertificate
+func (o *ProxyLBPrimaryCert) SetIntermediateCertificate(v string) {
+	o.IntermediateCertificate = v
+}
+
+// GetPrivateKey returns value of PrivateKey
+func (o *ProxyLBPrimaryCert) GetPrivateKey() string {
+	return o.PrivateKey
+}
+
+// SetPrivateKey sets value to PrivateKey
+func (o *ProxyLBPrimaryCert) SetPrivateKey(v string) {
+	o.PrivateKey = v
+}
+
+// GetCertificateEndDate returns value of CertificateEndDate
+func (o *ProxyLBPrimaryCert) GetCertificateEndDate() time.Time {
+	return o.CertificateEndDate
+}
+
+// SetCertificateEndDate sets value to CertificateEndDate
+func (o *ProxyLBPrimaryCert) SetCertificateEndDate(v time.Time) {
+	o.CertificateEndDate = v
+}
+
+// GetCertificateCommonName returns value of CertificateCommonName
+func (o *ProxyLBPrimaryCert) GetCertificateCommonName() string {
+	return o.CertificateCommonName
+}
+
+// SetCertificateCommonName sets value to CertificateCommonName
+func (o *ProxyLBPrimaryCert) SetCertificateCommonName(v string) {
+	o.CertificateCommonName = v
 }
 
 /*************************************************
@@ -17203,10 +17236,8 @@ func (o *ProxyLBAdditionalCert) SetCertificateCommonName(v string) {
 
 // ProxyLBSetCertificatesRequest represents API parameter/response structure
 type ProxyLBSetCertificatesRequest struct {
-	ServerCertificate       string
-	IntermediateCertificate string
-	PrivateKey              string
-	AdditionalCerts         []*ProxyLBAdditionalCert `mapconv:"[]AdditionalCerts, recursive"`
+	PrimaryCerts    *ProxyLBPrimaryCert
+	AdditionalCerts []*ProxyLBAdditionalCert `mapconv:"[]AdditionalCerts, recursive"`
 }
 
 // Validate validates by field tags
@@ -17217,46 +17248,22 @@ func (o *ProxyLBSetCertificatesRequest) Validate() error {
 // setDefaults implements sacloud.argumentDefaulter
 func (o *ProxyLBSetCertificatesRequest) setDefaults() interface{} {
 	return &struct {
-		ServerCertificate       string
-		IntermediateCertificate string
-		PrivateKey              string
-		AdditionalCerts         []*ProxyLBAdditionalCert `mapconv:"[]AdditionalCerts, recursive"`
+		PrimaryCerts    *ProxyLBPrimaryCert
+		AdditionalCerts []*ProxyLBAdditionalCert `mapconv:"[]AdditionalCerts, recursive"`
 	}{
-		ServerCertificate:       o.GetServerCertificate(),
-		IntermediateCertificate: o.GetIntermediateCertificate(),
-		PrivateKey:              o.GetPrivateKey(),
-		AdditionalCerts:         o.GetAdditionalCerts(),
+		PrimaryCerts:    o.GetPrimaryCerts(),
+		AdditionalCerts: o.GetAdditionalCerts(),
 	}
 }
 
-// GetServerCertificate returns value of ServerCertificate
-func (o *ProxyLBSetCertificatesRequest) GetServerCertificate() string {
-	return o.ServerCertificate
+// GetPrimaryCerts returns value of PrimaryCerts
+func (o *ProxyLBSetCertificatesRequest) GetPrimaryCerts() *ProxyLBPrimaryCert {
+	return o.PrimaryCerts
 }
 
-// SetServerCertificate sets value to ServerCertificate
-func (o *ProxyLBSetCertificatesRequest) SetServerCertificate(v string) {
-	o.ServerCertificate = v
-}
-
-// GetIntermediateCertificate returns value of IntermediateCertificate
-func (o *ProxyLBSetCertificatesRequest) GetIntermediateCertificate() string {
-	return o.IntermediateCertificate
-}
-
-// SetIntermediateCertificate sets value to IntermediateCertificate
-func (o *ProxyLBSetCertificatesRequest) SetIntermediateCertificate(v string) {
-	o.IntermediateCertificate = v
-}
-
-// GetPrivateKey returns value of PrivateKey
-func (o *ProxyLBSetCertificatesRequest) GetPrivateKey() string {
-	return o.PrivateKey
-}
-
-// SetPrivateKey sets value to PrivateKey
-func (o *ProxyLBSetCertificatesRequest) SetPrivateKey(v string) {
-	o.PrivateKey = v
+// SetPrimaryCerts sets value to PrimaryCerts
+func (o *ProxyLBSetCertificatesRequest) SetPrimaryCerts(v *ProxyLBPrimaryCert) {
+	o.PrimaryCerts = v
 }
 
 // GetAdditionalCerts returns value of AdditionalCerts

@@ -53,6 +53,7 @@ type PacketFilterExpression struct {
 	DestinationPort types.PacketFilterPort    `yaml:"destination_port"`
 	Action          types.Action              `yaml:"action"`
 	SourcePort      types.PacketFilterPort    `yaml:"source_port"`
+	Description     string                    `yaml:"description"`
 }
 
 // PacketFilterInfo パケットフィルタ - Interface配下などでの参照用

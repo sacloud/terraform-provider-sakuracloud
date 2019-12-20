@@ -214,8 +214,8 @@ func (o *ProxyLBOp) SetCertificates(ctx context.Context, id types.ID, param *sac
 
 	cert := &sacloud.ProxyLBCertificates{}
 	copySameNameField(param, cert)
-	cert.CertificateCommonName = "dummy-common-name.org"
-	cert.CertificateEndDate = time.Now().Add(365 * 24 * time.Hour)
+	cert.PrimaryCert.CertificateCommonName = "dummy-common-name.org"
+	cert.PrimaryCert.CertificateEndDate = time.Now().Add(365 * 24 * time.Hour)
 
 	ds().Put(ResourceProxyLB+"Certs", sacloud.APIDefaultZone, id, cert)
 	return cert, nil
