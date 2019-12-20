@@ -85,10 +85,10 @@ func (c *Config) NewClient() *APIClient {
 		log.Printf("[DEBUG] Using modified User-Agent: %s", ua)
 	}
 
-	httpClient := &http.Client{
-		Timeout:   time.Duration(c.APIRequestTimeout) * time.Second,
-		Transport: &sacloud.RateLimitRoundTripper{RateLimitPerSec: c.APIRequestRateLimit},
-	}
+	httpClient := http.DefaultClient
+	httpClient.Timeout = time.Duration(c.APIRequestTimeout) * time.Second
+	httpClient.Transport = &sacloud.RateLimitRoundTripper{RateLimitPerSec: c.APIRequestRateLimit}
+
 	caller := &sacloud.Client{
 		AccessToken:       c.AccessToken,
 		AccessTokenSecret: c.AccessTokenSecret,
