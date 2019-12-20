@@ -119,10 +119,11 @@ func flattenProxyLBCerts(certs *sacloud.ProxyLBCertificates) []interface{} {
 	if certs == nil {
 		return nil
 	}
-	proxylbCert := map[string]interface{}{
-		"server_cert":       certs.ServerCertificate,
-		"intermediate_cert": certs.IntermediateCertificate,
-		"private_key":       certs.PrivateKey,
+	proxylbCert := make(map[string]interface{})
+	if certs.PrimaryCert != nil {
+		proxylbCert["server_cert"] = certs.PrimaryCert.ServerCertificate
+		proxylbCert["intermediate_cert"] = certs.PrimaryCert.IntermediateCertificate
+		proxylbCert["private_key"] = certs.PrimaryCert.PrivateKey
 	}
 	if len(certs.AdditionalCerts) > 0 {
 		var additionalCerts []interface{}
@@ -251,9 +252,11 @@ func expandProxyLBCerts(d resourceValueGettable) *sacloud.ProxyLBCertificates {
 	if certs, ok := getListFromResource(d, "certificate"); ok && len(certs) > 0 {
 		values := mapToResourceData(certs[0].(map[string]interface{}))
 		cert := &sacloud.ProxyLBCertificates{
-			ServerCertificate:       values.Get("server_cert").(string),
-			IntermediateCertificate: values.Get("intermediate_cert").(string),
-			PrivateKey:              values.Get("private_key").(string),
+			PrimaryCert: &sacloud.ProxyLBPrimaryCert{
+				ServerCertificate:       values.Get("server_cert").(string),
+				IntermediateCertificate: values.Get("intermediate_cert").(string),
+				PrivateKey:              values.Get("private_key").(string),
+			},
 		}
 
 		if rawAdditionalCerts, ok := getListFromResource(values, "additional_certificate"); ok && len(rawAdditionalCerts) > 0 {

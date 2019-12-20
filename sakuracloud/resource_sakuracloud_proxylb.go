@@ -301,10 +301,8 @@ func resourceSakuraCloudProxyLBCreate(d *schema.ResourceData, meta interface{}) 
 	certs := expandProxyLBCerts(d)
 	if certs != nil {
 		_, err := proxyLBOp.SetCertificates(ctx, proxyLB.ID, &sacloud.ProxyLBSetCertificatesRequest{
-			ServerCertificate:       certs.ServerCertificate,
-			IntermediateCertificate: certs.IntermediateCertificate,
-			PrivateKey:              certs.PrivateKey,
-			AdditionalCerts:         certs.AdditionalCerts,
+			PrimaryCerts:    certs.PrimaryCert,
+			AdditionalCerts: certs.AdditionalCerts,
 		})
 		if err != nil {
 			return fmt.Errorf("setting Certificates to ProxyLB[%s] is failed: %s", proxyLB.ID, err)
@@ -380,10 +378,8 @@ func resourceSakuraCloudProxyLBUpdate(d *schema.ResourceData, meta interface{}) 
 			}
 		} else {
 			if _, err := proxyLBOp.SetCertificates(ctx, proxyLB.ID, &sacloud.ProxyLBSetCertificatesRequest{
-				ServerCertificate:       certs.ServerCertificate,
-				IntermediateCertificate: certs.IntermediateCertificate,
-				PrivateKey:              certs.PrivateKey,
-				AdditionalCerts:         certs.AdditionalCerts,
+				PrimaryCerts:    certs.PrimaryCert,
+				AdditionalCerts: certs.AdditionalCerts,
 			}); err != nil {
 				return fmt.Errorf("setting Certificates to ProxyLB[%s] is failed: %s", d.Id(), err)
 			}
