@@ -18,6 +18,7 @@ import (
 	"context"
 	"errors"
 
+	"github.com/sacloud/libsacloud/v2/pkg/size"
 	"github.com/sacloud/libsacloud/v2/sacloud"
 	"github.com/sacloud/libsacloud/v2/sacloud/search"
 	"github.com/sacloud/libsacloud/v2/sacloud/types"
@@ -45,7 +46,7 @@ func (f *FindServerPlanRequest) findCondition() *sacloud.FindCondition {
 		cond.Filter[search.Key("CPU")] = f.CPU
 	}
 	if f.MemoryGB > 0 {
-		cond.Filter[search.Key("MemoryMB")] = f.MemoryGB * 1024
+		cond.Filter[search.Key("MemoryMB")] = size.GiBToMiB(f.MemoryGB)
 	}
 	if f.Generation != types.PlanGenerations.Default {
 		cond.Filter[search.Key("Generation")] = f.Generation

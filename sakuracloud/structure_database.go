@@ -25,47 +25,11 @@ import (
 	databaseBuilder "github.com/sacloud/libsacloud/v2/utils/builder/database"
 )
 
-func databasePlanIDToName(planID types.ID) string {
-	switch planID {
-	case types.DatabasePlans.DB10GB:
-		return "10g"
-	case types.DatabasePlans.DB30GB:
-		return "30g"
-	case types.DatabasePlans.DB90GB:
-		return "90g"
-	case types.DatabasePlans.DB240GB:
-		return "240g"
-	case types.DatabasePlans.DB500GB:
-		return "500g"
-	case types.DatabasePlans.DB1TB:
-		return "1t"
-	}
-	return ""
-}
-
-func databasePlanNameToID(planName string) types.ID {
-	switch planName {
-	case "10g":
-		return types.DatabasePlans.DB10GB
-	case "30g":
-		return types.DatabasePlans.DB30GB
-	case "90g":
-		return types.DatabasePlans.DB90GB
-	case "240g":
-		return types.DatabasePlans.DB240GB
-	case "500g":
-		return types.DatabasePlans.DB500GB
-	case "1t":
-		return types.DatabasePlans.DB1TB
-	}
-	return types.ID(0)
-}
-
 func expandDatabaseBuilder(d *schema.ResourceData, client *APIClient) *databaseBuilder.Builder {
 	var dbVersion *types.RDBMSVersion
 	dbType := d.Get("database_type").(string)
 	switch dbType {
-	case "postgresql":
+	case "postgres":
 		dbVersion = types.RDBMSVersions[types.RDBMSTypesPostgreSQL]
 	case "mariadb":
 		dbVersion = types.RDBMSVersions[types.RDBMSTypesMariaDB]
@@ -75,7 +39,7 @@ func expandDatabaseBuilder(d *schema.ResourceData, client *APIClient) *databaseB
 	replicaPassword := d.Get("replica_password").(string)
 
 	req := &databaseBuilder.Builder{
-		PlanID:         databasePlanNameToID(d.Get("plan").(string)),
+		PlanID:         types.DatabasePlanIDMap[d.Get("plan").(string)],
 		SwitchID:       expandSakuraCloudID(d, "switch_id"),
 		IPAddresses:    expandStringList(d.Get("ip_addresses").([]interface{})),
 		NetworkMaskLen: d.Get("netmask").(int),
@@ -185,7 +149,7 @@ func flattenDatabaseType(db *sacloud.Database) string {
 	var databaseType string
 	switch db.Conf.DatabaseName {
 	case types.RDBMSVersions[types.RDBMSTypesPostgreSQL].Name:
-		databaseType = "postgresql"
+		databaseType = "postgres"
 	case types.RDBMSVersions[types.RDBMSTypesMariaDB].Name:
 		databaseType = "mariadb"
 	}

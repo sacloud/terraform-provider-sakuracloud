@@ -20,6 +20,7 @@ import (
 	"fmt"
 	"reflect"
 
+	"github.com/sacloud/libsacloud/v2/pkg/size"
 	"github.com/sacloud/libsacloud/v2/sacloud"
 	"github.com/sacloud/libsacloud/v2/sacloud/types"
 	"github.com/sacloud/libsacloud/v2/utils/builder"
@@ -239,7 +240,7 @@ func (b *Builder) Update(ctx context.Context, zone string) (*BuildResult, error)
 	if b.isPlanChanged(server) {
 		updated, err := b.Client.Server.ChangePlan(ctx, zone, server.ID, &sacloud.ServerChangePlanRequest{
 			CPU:                  b.CPU,
-			MemoryMB:             b.MemoryGB * 1024,
+			MemoryMB:             b.MemoryGB * size.GiB,
 			ServerPlanGeneration: b.Generation,
 			ServerPlanCommitment: b.Commitment,
 		})
@@ -391,7 +392,7 @@ func (b *Builder) currentState(server *sacloud.Server) *serverState {
 func (b *Builder) createServer(ctx context.Context, zone string) (*sacloud.Server, error) {
 	param := &sacloud.ServerCreateRequest{
 		CPU:                  b.CPU,
-		MemoryMB:             b.MemoryGB * 1024,
+		MemoryMB:             b.MemoryGB * size.GiB,
 		ServerPlanCommitment: b.Commitment,
 		ServerPlanGeneration: b.Generation,
 		InterfaceDriver:      b.InterfaceDriver,

@@ -14,6 +14,8 @@
 
 package accessor
 
+import "github.com/sacloud/libsacloud/v2/pkg/size"
+
 /************************************************
  MigratedMB - MigratedGB
 ************************************************/
@@ -30,10 +32,10 @@ func GetMigratedGB(target MigratedMB) int {
 	if sizeMB == 0 {
 		return 0
 	}
-	return sizeMB / 1024
+	return size.MiBToGiB(sizeMB)
 }
 
 // SetMigratedGB sets MigratedMB from GB
-func SetMigratedGB(target MigratedMB, size int) {
-	target.SetMigratedMB(size * 1024)
+func SetMigratedGB(target MigratedMB, sizeGB int) {
+	target.SetMigratedMB(size.GiBToMiB(sizeGB))
 }

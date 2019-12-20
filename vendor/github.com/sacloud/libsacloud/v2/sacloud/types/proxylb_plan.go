@@ -28,6 +28,11 @@ import (
 // プラン名とServiceClassでの文字列表現とで相互変換可能とする。
 type EProxyLBPlan int
 
+// Int EProxyLBPlanのint表現
+func (p EProxyLBPlan) Int() int {
+	return int(p)
+}
+
 // ProxyLBPlans エンハンスドロードバランサのプラン
 var ProxyLBPlans = struct {
 	CPS100    EProxyLBPlan
@@ -45,6 +50,17 @@ var ProxyLBPlans = struct {
 	CPS10000:  EProxyLBPlan(10000),
 	CPS50000:  EProxyLBPlan(50000),
 	CPS100000: EProxyLBPlan(100000),
+}
+
+// ProxyLBPlanValues プランを表すint値
+var ProxyLBPlanValues = []int{
+	int(ProxyLBPlans.CPS100),
+	int(ProxyLBPlans.CPS500),
+	int(ProxyLBPlans.CPS1000),
+	int(ProxyLBPlans.CPS5000),
+	int(ProxyLBPlans.CPS10000),
+	int(ProxyLBPlans.CPS50000),
+	int(ProxyLBPlans.CPS100000),
 }
 
 const (

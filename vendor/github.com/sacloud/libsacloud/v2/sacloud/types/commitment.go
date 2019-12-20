@@ -47,3 +47,6 @@ func (c ECommitment) IsDedicatedCPU() bool {
 func (c ECommitment) String() string {
 	return string(c)
 }
+
+// CommitmentStrings サーバプランCPUコミットメントを表す文字列
+var CommitmentStrings = []string{"standard", "dedicatedcpu"}

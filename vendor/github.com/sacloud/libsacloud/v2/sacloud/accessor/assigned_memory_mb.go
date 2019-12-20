@@ -14,6 +14,8 @@
 
 package accessor
 
+import "github.com/sacloud/libsacloud/v2/pkg/size"
+
 /************************************************
  AssignedMemoryMB - MemoryGB
 ************************************************/
@@ -30,10 +32,10 @@ func GetAssignedMemoryGB(target AssignedMemoryMB) int {
 	if sizeMB == 0 {
 		return 0
 	}
-	return sizeMB / 1024
+	return size.MiBToGiB(sizeMB)
 }
 
 // SetAssignedMemoryGB sets MemoryMB from GB
-func SetAssignedMemoryGB(target AssignedMemoryMB, size int) {
-	target.SetAssignedMemoryMB(size * 1024)
+func SetAssignedMemoryGB(target AssignedMemoryMB, sizeGB int) {
+	target.SetAssignedMemoryMB(size.GiBToMiB(sizeGB))
 }

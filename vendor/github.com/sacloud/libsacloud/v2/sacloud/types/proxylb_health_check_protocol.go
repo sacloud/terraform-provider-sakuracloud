@@ -35,3 +35,6 @@ var ProxyLBProtocols = struct {
 	HTTP:    EProxyLBHealthCheckProtocol("http"),
 	TCP:     EProxyLBHealthCheckProtocol("tcp"),
 }
+
+// ProxyLBProtocolStrings 監視プロトコルを表す文字列
+var ProxyLBProtocolStrings = []string{"http", "tcp"}

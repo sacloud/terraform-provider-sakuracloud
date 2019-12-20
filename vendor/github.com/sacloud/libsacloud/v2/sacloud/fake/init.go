@@ -20,6 +20,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/sacloud/libsacloud/v2/pkg/size"
 	"github.com/sacloud/libsacloud/v2/sacloud"
 	"github.com/sacloud/libsacloud/v2/sacloud/types"
 )
@@ -339,7 +340,7 @@ func initServerPlan(s Store, p *valuePool) {
 			ID:           p.generateID(),
 			Name:         "プラン/1Core-1GB",
 			CPU:          1,
-			MemoryMB:     1024,
+			MemoryMB:     1 * size.MiB,
 			Commitment:   types.Commitments.Standard,
 			Generation:   100,
 			Availability: types.Availabilities.Available,
@@ -348,7 +349,7 @@ func initServerPlan(s Store, p *valuePool) {
 			ID:           p.generateID(),
 			Name:         "プラン/2Core-4GB",
 			CPU:          2,
-			MemoryMB:     4 * 1024,
+			MemoryMB:     4 * size.MiB,
 			Commitment:   types.Commitments.Standard,
 			Generation:   100,
 			Availability: types.Availabilities.Available,
@@ -396,13 +397,13 @@ func initDiskPlan(s Store, p *valuePool) {
 					Availability:  types.Availabilities.Available,
 					DisplaySize:   20,
 					DisplaySuffix: "GB",
-					SizeMB:        20 * 1024,
+					SizeMB:        20 * size.GiB,
 				},
 				{
 					Availability:  types.Availabilities.Available,
 					DisplaySize:   40,
 					DisplaySuffix: "GB",
-					SizeMB:        40 * 1024,
+					SizeMB:        40 * size.GiB,
 				},
 			},
 		},
@@ -416,13 +417,13 @@ func initDiskPlan(s Store, p *valuePool) {
 					Availability:  types.Availabilities.Available,
 					DisplaySize:   20,
 					DisplaySuffix: "GB",
-					SizeMB:        20 * 1024,
+					SizeMB:        20 * size.GiB,
 				},
 				{
 					Availability:  types.Availabilities.Available,
 					DisplaySize:   40,
 					DisplaySuffix: "GB",
-					SizeMB:        40 * 1024,
+					SizeMB:        40 * size.GiB,
 				},
 			},
 		},

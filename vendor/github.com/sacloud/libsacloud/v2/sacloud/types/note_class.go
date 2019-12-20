@@ -14,28 +14,8 @@
 
 package types
 
-// DiskPlans ディスクプランID 利用可能なサイズはDiskPlanAPIで取得すること
-var DiskPlans = struct {
-	// SSD ssdプラン
-	SSD ID
-	// HDD hddプラン
-	HDD ID
-}{
-	SSD: ID(4),
-	HDD: ID(2),
-}
-
-// DiskPlanStrings ディスクプランを表す文字列
-var DiskPlanStrings = []string{"ssd", "hdd"}
-
-// DiskPlanIDMap ディスクプランと文字列のマップ
-var DiskPlanIDMap = map[string]ID{
-	"ssd": DiskPlans.SSD,
-	"hdd": DiskPlans.HDD,
-}
-
-// DiskPlanNameMap ディスクプランIDと文字列のマップ
-var DiskPlanNameMap = map[ID]string{
-	DiskPlans.SSD: "ssd",
-	DiskPlans.HDD: "hdd",
+// NoteClassStrings スタートアップスクリプクラスを表す文字列
+var NoteClassStrings = []string{
+	"shell",
+	"yaml_cloud_config",
 }

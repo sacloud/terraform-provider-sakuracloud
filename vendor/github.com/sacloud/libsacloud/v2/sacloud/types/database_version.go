@@ -14,8 +14,15 @@
 
 package types
 
+import "strings"
+
 // RDBMSType データベースアプライアンスでのRDBMS種別
 type RDBMSType string
+
+// String RDBMSTypeの文字列表現
+func (t RDBMSType) String() string {
+	return string(t)
+}
 
 const (
 	// RDBMSTypesMariaDB MariaDB
@@ -43,4 +50,18 @@ var RDBMSVersions = map[RDBMSType]*RDBMSVersion{
 		Version:  "11",
 		Revision: "",
 	},
+}
+
+// RDBMSypeStrings 有効なRDBMS種別を示す文字列
+var RDBMSTypeStrings = []string{
+	strings.ToLower(RDBMSTypesMariaDB.String()),
+	strings.ToLower(RDBMSTypesPostgreSQL.String()),
+}
+
+// RDBMSTypeFromString 文字列からRDBMSTypeを取得
+func RDBMSTypeFromString(s string) RDBMSType {
+	if s == strings.ToLower(RDBMSTypesMariaDB.String()) {
+		return RDBMSTypesMariaDB
+	}
+	return RDBMSType(s)
 }

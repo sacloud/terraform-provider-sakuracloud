@@ -22,6 +22,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/validation"
 	"github.com/sacloud/libsacloud/v2/sacloud"
+	"github.com/sacloud/libsacloud/v2/sacloud/types"
 	"github.com/sacloud/libsacloud/v2/utils/power"
 )
 
@@ -51,15 +52,15 @@ func resourceSakuraCloudDatabase() *schema.Resource {
 				Type:         schema.TypeString,
 				Optional:     true,
 				ForceNew:     true,
-				ValidateFunc: validation.StringInSlice([]string{"postgresql", "mariadb"}, false),
-				Default:      "postgresql",
+				ValidateFunc: validation.StringInSlice(types.RDBMSTypeStrings, false),
+				Default:      "postgres",
 			},
 			"plan": {
 				Type:         schema.TypeString,
 				ForceNew:     true,
 				Optional:     true,
 				Default:      "10g",
-				ValidateFunc: validation.StringInSlice([]string{"10g", "30g", "90g", "240g", "500g", "1t"}, false),
+				ValidateFunc: validation.StringInSlice(types.DatabasePlanStrings, false),
 			},
 			"username": {
 				Type:     schema.TypeString,
@@ -280,10 +281,10 @@ func setDatabaseResourceData(ctx context.Context, d *schema.ResourceData, client
 		return err
 	}
 
-	d.Set("name", data.Name)                           // nolint
-	d.Set("username", data.CommonSetting.DefaultUser)  // nolint
-	d.Set("password", data.CommonSetting.UserPassword) // nolint
-	d.Set("plan", databasePlanIDToName(data.PlanID))   // nolint
+	d.Set("name", data.Name)                              // nolint
+	d.Set("username", data.CommonSetting.DefaultUser)     // nolint
+	d.Set("password", data.CommonSetting.UserPassword)    // nolint
+	d.Set("plan", types.DatabasePlanNameMap[data.PlanID]) // nolint
 	if err := d.Set("source_ranges", data.CommonSetting.SourceNetwork); err != nil {
 		return err
 	}

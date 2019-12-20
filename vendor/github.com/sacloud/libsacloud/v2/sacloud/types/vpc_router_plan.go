@@ -30,3 +30,22 @@ var VPCRouterPlans = struct {
 	HighSpec:     ID(3),
 	HighSpec4000: ID(4),
 }
+
+// VPCRouterPlanStrings VPCルータのプランを表す文字列
+var VPCRouterPlanStrings = []string{"standard", "premium", "highspec", "highspec4000"}
+
+// VPCRouterPlanIDMap 文字列とVPCルータのプランIDのマップ
+var VPCRouterPlanIDMap = map[string]ID{
+	"standard":     VPCRouterPlans.Standard,
+	"premium":      VPCRouterPlans.Premium,
+	"highspec":     VPCRouterPlans.HighSpec,
+	"highspec4000": VPCRouterPlans.HighSpec4000,
+}
+
+// VPCRouterPlanNameMap プランIDと文字列のマップ
+var VPCRouterPlanNameMap = map[ID]string{
+	VPCRouterPlans.Standard:     "standard",
+	VPCRouterPlans.Premium:      "premium",
+	VPCRouterPlans.HighSpec:     "highspec",
+	VPCRouterPlans.HighSpec4000: "highspec4000",
+}

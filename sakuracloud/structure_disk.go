@@ -16,30 +16,21 @@ package sakuracloud
 
 import (
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
+	"github.com/sacloud/libsacloud/v2/pkg/size"
 	"github.com/sacloud/libsacloud/v2/sacloud"
 	"github.com/sacloud/libsacloud/v2/sacloud/types"
 )
 
 func flattenDiskPlan(data *sacloud.Disk) string {
-	var plan string
-	switch data.DiskPlanID {
-	case types.DiskPlans.SSD:
-		plan = "ssd"
-	case types.DiskPlans.HDD:
-		plan = "hdd"
+	plan, ok := types.DiskPlanNameMap[data.DiskPlanID]
+	if !ok {
+		return ""
 	}
 	return plan
 }
 
 func expandDiskPlan(d *schema.ResourceData) types.ID {
-	var planID types.ID
-	switch d.Get("plan").(string) {
-	case "ssd":
-		planID = types.DiskPlans.SSD
-	case "hdd":
-		planID = types.DiskPlans.HDD
-	}
-	return planID
+	return types.DiskPlanIDMap[d.Get("plan").(string)]
 }
 
 func expandDiskCreateRequest(d *schema.ResourceData) *sacloud.DiskCreateRequest {
@@ -48,7 +39,7 @@ func expandDiskCreateRequest(d *schema.ResourceData) *sacloud.DiskCreateRequest 
 		Connection:      types.EDiskConnection(d.Get("connector").(string)),
 		SourceDiskID:    expandSakuraCloudID(d, "source_disk_id"),
 		SourceArchiveID: expandSakuraCloudID(d, "source_archive_id"),
-		SizeMB:          toSizeMB(d.Get("size").(int)),
+		SizeMB:          d.Get("size").(int) * size.GiB,
 		Name:            d.Get("name").(string),
 		Description:     d.Get("description").(string),
 		Tags:            expandTags(d),
