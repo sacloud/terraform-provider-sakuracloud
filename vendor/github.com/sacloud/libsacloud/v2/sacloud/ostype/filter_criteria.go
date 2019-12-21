@@ -63,17 +63,8 @@ var ArchiveCriteria = map[ArchiveOSType]search.Filter{
 	Kusanagi: {
 		search.Key(keys.Tags): search.TagsAndEqual("current-stable", "pkg-kusanagi"),
 	},
-	SophosUTM: {
-		search.Key(keys.Tags): search.TagsAndEqual("current-stable", "pkg-sophosutm"),
-	},
 	FreeBSD: {
 		search.Key(keys.Tags): search.TagsAndEqual("current-stable", "distro-freebsd"),
-	},
-	Netwiser: {
-		search.Key(keys.Tags): search.TagsAndEqual("current-stable", "pkg-netwiserve"),
-	},
-	OPNsense: {
-		search.Key(keys.Tags): search.TagsAndEqual("current-stable", "distro-opnsense"),
 	},
 	Windows2016: {
 		search.Key(keys.Tags): search.TagsAndEqual("os-windows", "distro-ver-2016"),
@@ -99,6 +90,10 @@ var ArchiveCriteria = map[ArchiveOSType]search.Filter{
 		search.Key(keys.Tags): search.TagsAndEqual("os-windows", "distro-ver-2016", "windows-sqlserver", "sqlserver-2017", "edition-standard"),
 		search.Key(keys.Name): search.OrEqual("Windows Server 2016 for MS SQL 2017(Standard)"),
 	},
+	Windows2016SQLServer2017Enterprise: {
+		search.Key(keys.Tags): search.TagsAndEqual("os-windows", "distro-ver-2016", "windows-sqlserver", "sqlserver-2017", "edition-enterprise"),
+		search.Key(keys.Name): search.OrEqual("Windows Server 2016 for MS SQL 2017(Enterprise)"),
+	},
 	Windows2016SQLServerStandardAll: {
 		search.Key(keys.Tags): search.TagsAndEqual("os-windows", "distro-ver-2016", "windows-sqlserver", "sqlserver-2016", "edition-standard", "windows-rds", "with-office"),
 		search.Key(keys.Name): search.OrEqual("Windows Server 2016 for MS SQL 2016(Std) with RDS / MS Office"),
@@ -110,5 +105,49 @@ var ArchiveCriteria = map[ArchiveOSType]search.Filter{
 	Windows2019: {
 		search.Key(keys.Tags): search.TagsAndEqual("os-windows", "distro-ver-2019"),
 		search.Key(keys.Name): search.OrEqual("Windows Server 2019 Datacenter Edition"),
+	},
+	Windows2019RDS: {
+		search.Key(keys.Tags): search.TagsAndEqual("os-windows", "distro-ver-2019", "windows-rds"),
+		search.Key(keys.Name): search.OrEqual("Windows Server 2019 for RDS"),
+	},
+	Windows2019RDSOffice2016: {
+		search.Key(keys.Tags): search.TagsAndEqual("os-windows", "distro-ver-2019", "windows-rds", "with-office"),
+		search.Key(keys.Name): search.OrEqual("Windows Server 2019 for RDS(MS Office付)"),
+	},
+	Windows2019RDSOffice2019: {
+		search.Key(keys.Tags): search.TagsAndEqual("os-windows", "distro-ver-2019", "windows-rds", "with-office"),
+		search.Key(keys.Name): search.OrEqual("Windows Server 2019 for RDS(MS Office2019付)"),
+	},
+	Windows2019SQLServer2017Web: {
+		search.Key(keys.Tags): search.TagsAndEqual("os-windows", "distro-ver-2019", "windows-sqlserver", "sqlserver-2017", "edition-web"),
+		search.Key(keys.Name): search.OrEqual("Windows Server 2019 for MS SQL 2017(Web)"),
+	},
+	Windows2019SQLServer2019Web: {
+		search.Key(keys.Tags): search.TagsAndEqual("os-windows", "distro-ver-2019", "windows-sqlserver", "sqlserver-2019", "edition-web"),
+		search.Key(keys.Name): search.OrEqual("Windows Server 2019 for MS SQL 2019(Web)"),
+	},
+	Windows2019SQLServer2017Standard: {
+		search.Key(keys.Tags): search.TagsAndEqual("os-windows", "distro-ver-2019", "windows-sqlserver", "sqlserver-2017", "edition-standard"),
+		search.Key(keys.Name): search.OrEqual("Windows Server 2019 for MS SQL 2017(Standard)"),
+	},
+	Windows2019SQLServer2019Standard: {
+		search.Key(keys.Tags): search.TagsAndEqual("os-windows", "distro-ver-2019", "windows-sqlserver", "sqlserver-2019", "edition-standard"),
+		search.Key(keys.Name): search.OrEqual("Windows Server 2019 for MS SQL 2019(Standard)"),
+	},
+	Windows2019SQLServer2017Enterprise: {
+		search.Key(keys.Tags): search.TagsAndEqual("os-windows", "distro-ver-2019", "windows-sqlserver", "sqlserver-2017", "edition-enterprise"),
+		search.Key(keys.Name): search.OrEqual("Windows Server 2019 for MS SQL 2017(Enterprise)"),
+	},
+	Windows2019SQLServer2019Enterprise: {
+		search.Key(keys.Tags): search.TagsAndEqual("os-windows", "distro-ver-2019", "windows-sqlserver", "sqlserver-2019", "edition-enterprise"),
+		search.Key(keys.Name): search.OrEqual("Windows Server 2019 for MS SQL 2019(Enterprise)"),
+	},
+	Windows2019SQLServer2017StandardAll: {
+		search.Key(keys.Tags): search.TagsAndEqual("os-windows", "distro-ver-2019", "windows-sqlserver", "sqlserver-2017", "edition-standard", "windows-rds", "with-office"),
+		search.Key(keys.Name): search.OrEqual("Windows Server 2019 for MS SQL 2017(Std) with RDS / MS Office"),
+	},
+	Windows2019SQLServer2019StandardAll: {
+		search.Key(keys.Tags): search.TagsAndEqual("os-windows", "distro-ver-2019", "windows-sqlserver", "sqlserver-2019", "edition-standard", "windows-rds", "with-office"),
+		search.Key(keys.Name): search.OrEqual("Windows Server 2019 for MS SQL 2019(Std) with RDS / MS Office"),
 	},
 }

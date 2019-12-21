@@ -319,9 +319,9 @@ func initPrivateHostPlan(s Store, p *valuePool) {
 			Availability: types.Availabilities.Available,
 		},
 		{
-			ID:           112900526366,
-			Name:         "200Core 224GB 標準",
-			Class:        "dynamic",
+			ID:           113102196877,
+			Name:         "200Core 224GB Windows",
+			Class:        "ms_windows",
 			CPU:          200,
 			MemoryMB:     229376,
 			Availability: types.Availabilities.Available,

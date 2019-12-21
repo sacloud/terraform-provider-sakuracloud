@@ -25,12 +25,17 @@ import (
 	"os"
 	"time"
 
+	"github.com/hashicorp/go-retryablehttp"
+
 	"github.com/sacloud/libsacloud/v2"
 )
 
 var (
 	// SakuraCloudAPIRoot APIリクエスト送信先ルートURL(末尾にスラッシュを含まない)
 	SakuraCloudAPIRoot = "https://secure.sakura.ad.jp/cloud/zone"
+
+	// SakuraCloudZones 利用可能なゾーンのデフォルト値
+	SakuraCloudZones = []string{"is1a", "is1b", "tk1a", "tk1v"}
 )
 
 var (
@@ -44,8 +49,10 @@ var (
 	APIDefaultAcceptLanguage = ""
 	// APIDefaultRetryMax デフォルトのリトライ回数
 	APIDefaultRetryMax = 0
-	// APIDefaultRetryInterval デフォルトのリトライ間隔
-	APIDefaultRetryInterval = 5 * time.Second
+	// APIDefaultRetryWaitMin デフォルトのリトライ間隔(最小)
+	APIDefaultRetryWaitMin = 1 * time.Second
+	// APIDefaultRetryWaitMax デフォルトのリトライ間隔(最大)
+	APIDefaultRetryWaitMax = 64 * time.Second
 )
 
 const (
@@ -62,7 +69,10 @@ type APICaller interface {
 
 // Client APIクライアント、APICallerインターフェースを実装する
 //
-// スレッドセーフではないため複数スレッドから利用する場合は複数のインスタンス生成を推奨
+// レスポンスステータスコード423、または503を受け取った場合、RetryMax回リトライする
+// リトライ間隔はRetryMinからRetryMaxまで指数的に増加する(Exponential Backoff)
+//
+// リトライ時にcontext.Canceled、またはcontext.DeadlineExceededの場合はリトライしない
 type Client struct {
 	// AccessToken アクセストークン
 	AccessToken string `validate:"required"`
@@ -72,10 +82,12 @@ type Client struct {
 	UserAgent string
 	// Accept-Language
 	AcceptLanguage string
-	// 503エラー時のリトライ回数
+	// 423/503エラー時のリトライ回数
 	RetryMax int
-	// 503エラー時のリトライ待ち時間
-	RetryInterval time.Duration
+	// 423/503エラー時のリトライ待ち時間(最小)
+	RetryWaitMin time.Duration
+	// 423/503エラー時のリトライ待ち時間(最大)
+	RetryWaitMax time.Duration
 	// APIコール時に利用される*http.Client 未指定の場合http.DefaultClientが利用される
 	HTTPClient *http.Client
 }
@@ -88,7 +100,8 @@ func NewClient(token, secret string) *Client {
 		UserAgent:         APIDefaultUserAgent,
 		AcceptLanguage:    APIDefaultAcceptLanguage,
 		RetryMax:          APIDefaultRetryMax,
-		RetryInterval:     APIDefaultRetryInterval,
+		RetryWaitMin:      APIDefaultRetryWaitMin,
+		RetryWaitMax:      APIDefaultRetryWaitMax,
 	}
 	return c
 }
@@ -117,16 +130,33 @@ func (c *Client) isOkStatus(code int) bool {
 	return ok
 }
 
+func (c *Client) httpClient() *retryablehttp.Client {
+	return &retryablehttp.Client{
+		HTTPClient:   c.HTTPClient,
+		RetryWaitMin: c.RetryWaitMin,
+		RetryWaitMax: c.RetryWaitMax,
+		RetryMax:     c.RetryMax,
+		CheckRetry: func(ctx context.Context, resp *http.Response, err error) (bool, error) {
+			if ctx.Err() != nil {
+				return false, ctx.Err()
+			}
+			if err != nil {
+				return false, err
+			}
+			if resp.StatusCode == 0 || resp.StatusCode == http.StatusServiceUnavailable || resp.StatusCode == http.StatusLocked {
+				return true, nil
+			}
+			return false, nil
+		},
+		Backoff: retryablehttp.DefaultBackoff,
+	}
+}
+
 // Do APIコール実施
 func (c *Client) Do(ctx context.Context, method, uri string, body interface{}) ([]byte, error) {
 	var (
-		client = &retryableHTTPClient{
-			Client:        c.HTTPClient,
-			retryMax:      c.RetryMax,
-			retryInterval: c.RetryInterval,
-		}
+		client  = c.httpClient()
 		err     error
-		req     *request
 		strBody string
 	)
 
@@ -145,10 +175,11 @@ func (c *Client) Do(ctx context.Context, method, uri string, body interface{}) (
 			bodyReader = bytes.NewReader(bodyJSON)
 		}
 	}
-	req, err = newRequest(ctx, method, url, bodyReader)
+	req, err := retryablehttp.NewRequest(method, url, bodyReader)
 	if err != nil {
 		return nil, fmt.Errorf("error with request: %v - %q", url, err)
 	}
+	req = req.WithContext(ctx)
 
 	// set headers
 	req.SetBasicAuth(c.AccessToken, c.AccessTokenSecret)
@@ -181,76 +212,4 @@ func (c *Client) Do(ctx context.Context, method, uri string, body interface{}) (
 	}
 
 	return data, nil
-}
-
-type lenReader interface {
-	Len() int
-}
-
-type request struct {
-	// body is a seekable reader over the request body payload. This is
-	// used to rewind the request data in between retries.
-	body io.ReadSeeker
-
-	// Embed an HTTP request directly. This makes a *Request act exactly
-	// like an *http.Request so that all meta methods are supported.
-	*http.Request
-}
-
-func newRequest(ctx context.Context, method, url string, body io.ReadSeeker) (*request, error) {
-	var rcBody io.ReadCloser
-	if body != nil {
-		rcBody = ioutil.NopCloser(body)
-	}
-
-	httpReq, err := http.NewRequest(method, url, rcBody)
-	if err != nil {
-		return nil, err
-	}
-
-	if lr, ok := body.(lenReader); ok {
-		httpReq.ContentLength = int64(lr.Len())
-	}
-
-	return &request{body, httpReq.WithContext(ctx)}, nil
-}
-
-type retryableHTTPClient struct {
-	*http.Client
-	retryInterval time.Duration
-	retryMax      int
-}
-
-func (c *retryableHTTPClient) Do(req *request) (*http.Response, error) {
-	if c.Client == nil {
-		c.Client = http.DefaultClient
-	}
-	for i := 0; ; i++ {
-		if req.body != nil {
-			if _, err := req.body.Seek(0, 0); err != nil {
-				return nil, fmt.Errorf("failed to seek body: %v", err)
-			}
-		}
-
-		res, err := c.Client.Do(req.Request)
-		if res != nil && res.StatusCode != http.StatusServiceUnavailable && res.StatusCode != http.StatusLocked {
-			return res, err
-		}
-		if res != nil && res.Body != nil {
-			res.Body.Close()
-		}
-
-		if err != nil {
-			return res, err
-		}
-
-		remain := c.retryMax - i
-		if remain == 0 {
-			break
-		}
-		time.Sleep(c.retryInterval)
-	}
-
-	return nil, fmt.Errorf("%s %s giving up after %d attempts",
-		req.Method, req.URL, c.retryMax+1)
 }

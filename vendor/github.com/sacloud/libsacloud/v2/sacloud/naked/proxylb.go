@@ -58,6 +58,7 @@ type ProxyLBSetting struct {
 	SorryServer   ProxyLBSorryServer   `yaml:"sorry_server"`                                                  // ソーリーサーバー
 	BindPorts     []*ProxyLBBindPorts  `yaml:"bind_ports"`                                                    // プロキシ方式(プロトコル&ポート)
 	Servers       []ProxyLBServer      `yaml:"servers"`                                                       // サーバー
+	Rules         []ProxyLBRule        `yaml:"rules"`                                                         // 振り分けルール
 	LetsEncrypt   *ProxyLBACMESetting  `json:",omitempty" yaml:"lets_encrypt,omitempty" structs:",omitempty"` // Let's encryptでの証明書取得設定
 	StickySession ProxyLBStickySession `yaml:"sticky_session"`                                                // StickySession
 	Timeout       ProxyLBTimeout       `json:",omitempty" yaml:"timeout,omitempty" structs:",omitempty"`      // タイムアウト
@@ -70,6 +71,9 @@ func (s ProxyLBSetting) MarshalJSON() ([]byte, error) {
 	}
 	if s.Servers == nil {
 		s.Servers = make([]ProxyLBServer, 0)
+	}
+	if s.Rules == nil {
+		s.Rules = make([]ProxyLBRule, 0)
 	}
 
 	type alias ProxyLBSetting
@@ -108,9 +112,17 @@ type ProxyLBResponseHeader struct {
 
 // ProxyLBServer ProxyLB配下のサーバー
 type ProxyLBServer struct {
-	IPAddress string `json:",omitempty" yaml:"ip_address,omitempty" structs:",omitempty"` // IPアドレス
-	Port      int    `json:",omitempty" yaml:"port,omitempty" structs:",omitempty"`       // ポート
-	Enabled   bool   // 有効/無効
+	IPAddress   string `json:",omitempty" yaml:"ip_address,omitempty" structs:",omitempty"` // IPアドレス
+	Port        int    `json:",omitempty" yaml:"port,omitempty" structs:",omitempty"`       // ポート
+	ServerGroup string `yaml:"server_group"`                                                // サーバグループ
+	Enabled     bool   // 有効/無効
+}
+
+// ProxyLBRule ProxyLBの振り分けルール
+type ProxyLBRule struct {
+	Host        string `json:",omitempty" yaml:"host,omitempty" structs:",omitempty"` // ホストヘッダのパターン(ワイルドカードとして?と*が利用可能)
+	Path        string `json:",omitempty" yaml:"path,omitempty" structs:",omitempty"` // パス
+	ServerGroup string `yaml:"server_group"`
 }
 
 // ProxyLBACMESetting Let's Encryptでの証明書取得設定
