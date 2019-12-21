@@ -58,7 +58,8 @@ type Config struct {
 	AcceptLanguage      string
 	APIRootURL          string
 	RetryMax            int
-	RetryInterval       int
+	RetryWaitMin        int
+	RetryWaitMax        int
 	APIRequestTimeout   int
 	APIRequestRateLimit int
 
@@ -89,13 +90,23 @@ func (c *Config) NewClient() *APIClient {
 	httpClient.Timeout = time.Duration(c.APIRequestTimeout) * time.Second
 	httpClient.Transport = &sacloud.RateLimitRoundTripper{RateLimitPerSec: c.APIRequestRateLimit}
 
+	retryWaitMax := sacloud.APIDefaultRetryWaitMax
+	retryWaitMin := sacloud.APIDefaultRetryWaitMin
+	if c.RetryWaitMax > 0 {
+		retryWaitMax = time.Duration(c.RetryWaitMax) * time.Second
+	}
+	if c.RetryWaitMin > 0 {
+		retryWaitMin = time.Duration(c.RetryWaitMin) * time.Second
+	}
+
 	caller := &sacloud.Client{
 		AccessToken:       c.AccessToken,
 		AccessTokenSecret: c.AccessTokenSecret,
 		UserAgent:         ua,
 		AcceptLanguage:    c.AcceptLanguage,
 		RetryMax:          c.RetryMax,
-		RetryInterval:     time.Duration(c.RetryInterval) * time.Second,
+		RetryWaitMax:      retryWaitMax,
+		RetryWaitMin:      retryWaitMin,
 		HTTPClient:        httpClient,
 	}
 	sacloud.DefaultStatePollingTimeout = 72 * time.Hour
@@ -140,7 +151,6 @@ func (c *Config) NewClient() *APIClient {
 
 		// update default polling intervals: libsacloud/sacloud
 		sacloud.DefaultStatePollingInterval = defaultInterval
-		sacloud.APIDefaultRetryInterval = defaultInterval
 		// update default polling intervals: libsacloud/utils/setup
 		setup.DefaultDeleteWaitInterval = defaultInterval
 		setup.DefaultProvisioningWaitInterval = defaultInterval

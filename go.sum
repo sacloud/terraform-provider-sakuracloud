@@ -93,6 +93,8 @@ github.com/hashicorp/go-multierror v1.0.1-0.20190722213833-bdca7bb83f60 h1:5Ng5F
 github.com/hashicorp/go-multierror v1.0.1-0.20190722213833-bdca7bb83f60/go.mod h1:dHtQlpGsu+cZNNAkkCN/P3hoUDHhCYQXV3UM06sGGrk=
 github.com/hashicorp/go-plugin v1.0.1 h1:4OtAfUGbnKC6yS48p0CtMX2oFYtzFZVv6rok3cRWgnE=
 github.com/hashicorp/go-plugin v1.0.1/go.mod h1:++UyYGoz3o5w9ZzAdZxtQKrWWP+iqPBn3cQptSMzBuY=
+github.com/hashicorp/go-retryablehttp v0.6.4 h1:BbgctKO892xEyOXnGiaAwIoSq1QZ/SS4AhjoAh9DnfY=
+github.com/hashicorp/go-retryablehttp v0.6.4/go.mod h1:vAew36LZh98gCBJNLH42IQ1ER/9wtLZZ8meHqQvEYWY=
 github.com/hashicorp/go-safetemp v1.0.0 h1:2HR189eFNrjHQyENnQMMpCiBAsRxzbTMIgBhEyExpmo=
 github.com/hashicorp/go-safetemp v1.0.0/go.mod h1:oaerMy3BhqiTbVye6QuFhFtIceqFoDHxNAB65b+Rj1I=
 github.com/hashicorp/go-uuid v1.0.1 h1:fv1ep09latC32wFoVwnqcnKJGnMSdBanPczbHAYm1BE=
@@ -187,8 +189,8 @@ github.com/sacloud/ftps v0.0.0-20171205062625-42fc0f9886fe h1:JSZLn4B8X9V1ynSEht
 github.com/sacloud/ftps v0.0.0-20171205062625-42fc0f9886fe/go.mod h1:sdVeG85LaUt1f+0meZqSf6hSQYlwdgFLI8tJqLZ58VM=
 github.com/sacloud/iso9660wrap v0.0.0-20171031075302-eda21f77f6a8 h1:5piK7EELHKRxGqBjgVEHsdfsFwEzF/Kds/bMWLS6gCw=
 github.com/sacloud/iso9660wrap v0.0.0-20171031075302-eda21f77f6a8/go.mod h1:1jHHCa624cG5rODkWmourombJaNmkY9/SBHWhLJcg+w=
-github.com/sacloud/libsacloud/v2 v2.0.0-beta8 h1:nb/9ZNH0pijQDXPEalIetXn1ZDW5DqvcY4002j6B4I4=
-github.com/sacloud/libsacloud/v2 v2.0.0-beta8/go.mod h1:uMejmNUIIMSYcd1rtU6TWQJBdpJuJQ1KtY/ImkDXzks=
+github.com/sacloud/libsacloud/v2 v2.0.0-rc1 h1:wYQbILABRfqV5YnoFB3d2ufOIcUWjvZNgmVwA9PJ6w8=
+github.com/sacloud/libsacloud/v2 v2.0.0-rc1/go.mod h1:BG2crADa3HJrADiZK2zK1/UxsVUtWSy6q7nd6YqleD4=
 github.com/sergi/go-diff v1.0.0 h1:Kpca3qRNrduNnOQeazBd0ysaKrUJiIuISHxogkT9RPQ=
 github.com/sergi/go-diff v1.0.0/go.mod h1:0CfEIISq7TuYL3j771MWULgwwjU+GofnZX9QAmXWZgo=
 github.com/spf13/afero v1.2.2 h1:5jhuqJyZCZf2JRofRvN/nIFgIWNzPa3/Vz8mYylgbWc=

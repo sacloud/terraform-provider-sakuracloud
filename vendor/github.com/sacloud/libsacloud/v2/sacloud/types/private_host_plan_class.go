@@ -12,7 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package libsacloud
+package types
 
-// Version バージョン
-const Version = "2.0.0-rc1"
+const (
+	PrivateHostClassDynamic = "dynamic"    // 標準
+	PrivateHostClassWindows = "ms_windows" // Windows
+)
