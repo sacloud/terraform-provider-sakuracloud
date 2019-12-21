@@ -15674,6 +15674,7 @@ type ProxyLB struct {
 	SorryServer      *ProxyLBSorryServer   `mapconv:"Settings.ProxyLB.SorryServer,recursive"`
 	BindPorts        []*ProxyLBBindPort    `mapconv:"Settings.ProxyLB.[]BindPorts,recursive"`
 	Servers          []*ProxyLBServer      `mapconv:"Settings.ProxyLB.[]Servers,recursive"`
+	Rules            []*ProxyLBRule        `mapconv:"Settings.ProxyLB.[]Rules,recursive"`
 	LetsEncrypt      *ProxyLBACMESetting   `mapconv:"Settings.ProxyLB.LetsEncrypt,recursive"`
 	StickySession    *ProxyLBStickySession `mapconv:"Settings.ProxyLB.StickySession,recursive"`
 	Timeout          *ProxyLBTimeout       `json:",omitempty" mapconv:"Settings.ProxyLB.Timeout,recursive,omitempty"`
@@ -15706,6 +15707,7 @@ func (o *ProxyLB) setDefaults() interface{} {
 		SorryServer      *ProxyLBSorryServer   `mapconv:"Settings.ProxyLB.SorryServer,recursive"`
 		BindPorts        []*ProxyLBBindPort    `mapconv:"Settings.ProxyLB.[]BindPorts,recursive"`
 		Servers          []*ProxyLBServer      `mapconv:"Settings.ProxyLB.[]Servers,recursive"`
+		Rules            []*ProxyLBRule        `mapconv:"Settings.ProxyLB.[]Rules,recursive"`
 		LetsEncrypt      *ProxyLBACMESetting   `mapconv:"Settings.ProxyLB.LetsEncrypt,recursive"`
 		StickySession    *ProxyLBStickySession `mapconv:"Settings.ProxyLB.StickySession,recursive"`
 		Timeout          *ProxyLBTimeout       `json:",omitempty" mapconv:"Settings.ProxyLB.Timeout,recursive,omitempty"`
@@ -15729,6 +15731,7 @@ func (o *ProxyLB) setDefaults() interface{} {
 		SorryServer:      o.GetSorryServer(),
 		BindPorts:        o.GetBindPorts(),
 		Servers:          o.GetServers(),
+		Rules:            o.GetRules(),
 		LetsEncrypt:      o.GetLetsEncrypt(),
 		StickySession:    o.GetStickySession(),
 		Timeout:          o.GetTimeout(),
@@ -15909,6 +15912,16 @@ func (o *ProxyLB) GetServers() []*ProxyLBServer {
 // SetServers sets value to Servers
 func (o *ProxyLB) SetServers(v []*ProxyLBServer) {
 	o.Servers = v
+}
+
+// GetRules returns value of Rules
+func (o *ProxyLB) GetRules() []*ProxyLBRule {
+	return o.Rules
+}
+
+// SetRules sets value to Rules
+func (o *ProxyLB) SetRules(v []*ProxyLBRule) {
+	o.Rules = v
 }
 
 // GetLetsEncrypt returns value of LetsEncrypt
@@ -16256,9 +16269,10 @@ func (o *ProxyLBResponseHeader) SetValue(v string) {
 
 // ProxyLBServer represents API parameter/response structure
 type ProxyLBServer struct {
-	IPAddress string `validate:"ipv4"`
-	Port      int    `validate:"min=0,max=65535"`
-	Enabled   bool
+	IPAddress   string `validate:"ipv4"`
+	Port        int    `validate:"min=0,max=65535"`
+	ServerGroup string
+	Enabled     bool
 }
 
 // Validate validates by field tags
@@ -16269,13 +16283,15 @@ func (o *ProxyLBServer) Validate() error {
 // setDefaults implements sacloud.argumentDefaulter
 func (o *ProxyLBServer) setDefaults() interface{} {
 	return &struct {
-		IPAddress string `validate:"ipv4"`
-		Port      int    `validate:"min=0,max=65535"`
-		Enabled   bool
+		IPAddress   string `validate:"ipv4"`
+		Port        int    `validate:"min=0,max=65535"`
+		ServerGroup string
+		Enabled     bool
 	}{
-		IPAddress: o.GetIPAddress(),
-		Port:      o.GetPort(),
-		Enabled:   o.GetEnabled(),
+		IPAddress:   o.GetIPAddress(),
+		Port:        o.GetPort(),
+		ServerGroup: o.GetServerGroup(),
+		Enabled:     o.GetEnabled(),
 	}
 }
 
@@ -16299,6 +16315,16 @@ func (o *ProxyLBServer) SetPort(v int) {
 	o.Port = v
 }
 
+// GetServerGroup returns value of ServerGroup
+func (o *ProxyLBServer) GetServerGroup() string {
+	return o.ServerGroup
+}
+
+// SetServerGroup sets value to ServerGroup
+func (o *ProxyLBServer) SetServerGroup(v string) {
+	o.ServerGroup = v
+}
+
 // GetEnabled returns value of Enabled
 func (o *ProxyLBServer) GetEnabled() bool {
 	return o.Enabled
@@ -16307,6 +16333,65 @@ func (o *ProxyLBServer) GetEnabled() bool {
 // SetEnabled sets value to Enabled
 func (o *ProxyLBServer) SetEnabled(v bool) {
 	o.Enabled = v
+}
+
+/*************************************************
+* ProxyLBRule
+*************************************************/
+
+// ProxyLBRule represents API parameter/response structure
+type ProxyLBRule struct {
+	Host        string
+	Path        string
+	ServerGroup string
+}
+
+// Validate validates by field tags
+func (o *ProxyLBRule) Validate() error {
+	return validator.New().Struct(o)
+}
+
+// setDefaults implements sacloud.argumentDefaulter
+func (o *ProxyLBRule) setDefaults() interface{} {
+	return &struct {
+		Host        string
+		Path        string
+		ServerGroup string
+	}{
+		Host:        o.GetHost(),
+		Path:        o.GetPath(),
+		ServerGroup: o.GetServerGroup(),
+	}
+}
+
+// GetHost returns value of Host
+func (o *ProxyLBRule) GetHost() string {
+	return o.Host
+}
+
+// SetHost sets value to Host
+func (o *ProxyLBRule) SetHost(v string) {
+	o.Host = v
+}
+
+// GetPath returns value of Path
+func (o *ProxyLBRule) GetPath() string {
+	return o.Path
+}
+
+// SetPath sets value to Path
+func (o *ProxyLBRule) SetPath(v string) {
+	o.Path = v
+}
+
+// GetServerGroup returns value of ServerGroup
+func (o *ProxyLBRule) GetServerGroup() string {
+	return o.ServerGroup
+}
+
+// SetServerGroup sets value to ServerGroup
+func (o *ProxyLBRule) SetServerGroup(v string) {
+	o.ServerGroup = v
 }
 
 /*************************************************
@@ -16448,6 +16533,7 @@ type ProxyLBCreateRequest struct {
 	SorryServer    *ProxyLBSorryServer   `mapconv:"Settings.ProxyLB.SorryServer,recursive"`
 	BindPorts      []*ProxyLBBindPort    `mapconv:"Settings.ProxyLB.[]BindPorts,recursive"`
 	Servers        []*ProxyLBServer      `mapconv:"Settings.ProxyLB.[]Servers,recursive"`
+	Rules          []*ProxyLBRule        `mapconv:"Settings.ProxyLB.[]Rules,recursive"`
 	LetsEncrypt    *ProxyLBACMESetting   `mapconv:"Settings.ProxyLB.LetsEncrypt,recursive"`
 	StickySession  *ProxyLBStickySession `mapconv:"Settings.ProxyLB.StickySession,recursive"`
 	Timeout        *ProxyLBTimeout       `json:",omitempty" mapconv:"Settings.ProxyLB.Timeout,recursive,omitempty"`
@@ -16472,6 +16558,7 @@ func (o *ProxyLBCreateRequest) setDefaults() interface{} {
 		SorryServer    *ProxyLBSorryServer   `mapconv:"Settings.ProxyLB.SorryServer,recursive"`
 		BindPorts      []*ProxyLBBindPort    `mapconv:"Settings.ProxyLB.[]BindPorts,recursive"`
 		Servers        []*ProxyLBServer      `mapconv:"Settings.ProxyLB.[]Servers,recursive"`
+		Rules          []*ProxyLBRule        `mapconv:"Settings.ProxyLB.[]Rules,recursive"`
 		LetsEncrypt    *ProxyLBACMESetting   `mapconv:"Settings.ProxyLB.LetsEncrypt,recursive"`
 		StickySession  *ProxyLBStickySession `mapconv:"Settings.ProxyLB.StickySession,recursive"`
 		Timeout        *ProxyLBTimeout       `json:",omitempty" mapconv:"Settings.ProxyLB.Timeout,recursive,omitempty"`
@@ -16488,6 +16575,7 @@ func (o *ProxyLBCreateRequest) setDefaults() interface{} {
 		SorryServer:    o.GetSorryServer(),
 		BindPorts:      o.GetBindPorts(),
 		Servers:        o.GetServers(),
+		Rules:          o.GetRules(),
 		LetsEncrypt:    o.GetLetsEncrypt(),
 		StickySession:  o.GetStickySession(),
 		Timeout:        o.GetTimeout(),
@@ -16549,6 +16637,16 @@ func (o *ProxyLBCreateRequest) GetServers() []*ProxyLBServer {
 // SetServers sets value to Servers
 func (o *ProxyLBCreateRequest) SetServers(v []*ProxyLBServer) {
 	o.Servers = v
+}
+
+// GetRules returns value of Rules
+func (o *ProxyLBCreateRequest) GetRules() []*ProxyLBRule {
+	return o.Rules
+}
+
+// SetRules sets value to Rules
+func (o *ProxyLBCreateRequest) SetRules(v []*ProxyLBRule) {
+	o.Rules = v
 }
 
 // GetLetsEncrypt returns value of LetsEncrypt
@@ -16671,6 +16769,7 @@ type ProxyLBUpdateRequest struct {
 	SorryServer   *ProxyLBSorryServer   `mapconv:"Settings.ProxyLB.SorryServer,recursive"`
 	BindPorts     []*ProxyLBBindPort    `mapconv:"Settings.ProxyLB.[]BindPorts,recursive"`
 	Servers       []*ProxyLBServer      `mapconv:"Settings.ProxyLB.[]Servers,recursive"`
+	Rules         []*ProxyLBRule        `mapconv:"Settings.ProxyLB.[]Rules,recursive"`
 	LetsEncrypt   *ProxyLBACMESetting   `mapconv:"Settings.ProxyLB.LetsEncrypt,recursive"`
 	StickySession *ProxyLBStickySession `mapconv:"Settings.ProxyLB.StickySession,recursive"`
 	Timeout       *ProxyLBTimeout       `json:",omitempty" mapconv:"Settings.ProxyLB.Timeout,recursive,omitempty"`
@@ -16693,6 +16792,7 @@ func (o *ProxyLBUpdateRequest) setDefaults() interface{} {
 		SorryServer   *ProxyLBSorryServer   `mapconv:"Settings.ProxyLB.SorryServer,recursive"`
 		BindPorts     []*ProxyLBBindPort    `mapconv:"Settings.ProxyLB.[]BindPorts,recursive"`
 		Servers       []*ProxyLBServer      `mapconv:"Settings.ProxyLB.[]Servers,recursive"`
+		Rules         []*ProxyLBRule        `mapconv:"Settings.ProxyLB.[]Rules,recursive"`
 		LetsEncrypt   *ProxyLBACMESetting   `mapconv:"Settings.ProxyLB.LetsEncrypt,recursive"`
 		StickySession *ProxyLBStickySession `mapconv:"Settings.ProxyLB.StickySession,recursive"`
 		Timeout       *ProxyLBTimeout       `json:",omitempty" mapconv:"Settings.ProxyLB.Timeout,recursive,omitempty"`
@@ -16706,6 +16806,7 @@ func (o *ProxyLBUpdateRequest) setDefaults() interface{} {
 		SorryServer:   o.GetSorryServer(),
 		BindPorts:     o.GetBindPorts(),
 		Servers:       o.GetServers(),
+		Rules:         o.GetRules(),
 		LetsEncrypt:   o.GetLetsEncrypt(),
 		StickySession: o.GetStickySession(),
 		Timeout:       o.GetTimeout(),
@@ -16755,6 +16856,16 @@ func (o *ProxyLBUpdateRequest) GetServers() []*ProxyLBServer {
 // SetServers sets value to Servers
 func (o *ProxyLBUpdateRequest) SetServers(v []*ProxyLBServer) {
 	o.Servers = v
+}
+
+// GetRules returns value of Rules
+func (o *ProxyLBUpdateRequest) GetRules() []*ProxyLBRule {
+	return o.Rules
+}
+
+// SetRules sets value to Rules
+func (o *ProxyLBUpdateRequest) SetRules(v []*ProxyLBRule) {
+	o.Rules = v
 }
 
 // GetLetsEncrypt returns value of LetsEncrypt
@@ -16867,6 +16978,7 @@ type ProxyLBUpdateSettingsRequest struct {
 	SorryServer   *ProxyLBSorryServer   `mapconv:"Settings.ProxyLB.SorryServer,recursive"`
 	BindPorts     []*ProxyLBBindPort    `mapconv:"Settings.ProxyLB.[]BindPorts,recursive"`
 	Servers       []*ProxyLBServer      `mapconv:"Settings.ProxyLB.[]Servers,recursive"`
+	Rules         []*ProxyLBRule        `mapconv:"Settings.ProxyLB.[]Rules,recursive"`
 	LetsEncrypt   *ProxyLBACMESetting   `mapconv:"Settings.ProxyLB.LetsEncrypt,recursive"`
 	StickySession *ProxyLBStickySession `mapconv:"Settings.ProxyLB.StickySession,recursive"`
 	Timeout       *ProxyLBTimeout       `json:",omitempty" mapconv:"Settings.ProxyLB.Timeout,recursive,omitempty"`
@@ -16885,6 +16997,7 @@ func (o *ProxyLBUpdateSettingsRequest) setDefaults() interface{} {
 		SorryServer   *ProxyLBSorryServer   `mapconv:"Settings.ProxyLB.SorryServer,recursive"`
 		BindPorts     []*ProxyLBBindPort    `mapconv:"Settings.ProxyLB.[]BindPorts,recursive"`
 		Servers       []*ProxyLBServer      `mapconv:"Settings.ProxyLB.[]Servers,recursive"`
+		Rules         []*ProxyLBRule        `mapconv:"Settings.ProxyLB.[]Rules,recursive"`
 		LetsEncrypt   *ProxyLBACMESetting   `mapconv:"Settings.ProxyLB.LetsEncrypt,recursive"`
 		StickySession *ProxyLBStickySession `mapconv:"Settings.ProxyLB.StickySession,recursive"`
 		Timeout       *ProxyLBTimeout       `json:",omitempty" mapconv:"Settings.ProxyLB.Timeout,recursive,omitempty"`
@@ -16894,6 +17007,7 @@ func (o *ProxyLBUpdateSettingsRequest) setDefaults() interface{} {
 		SorryServer:   o.GetSorryServer(),
 		BindPorts:     o.GetBindPorts(),
 		Servers:       o.GetServers(),
+		Rules:         o.GetRules(),
 		LetsEncrypt:   o.GetLetsEncrypt(),
 		StickySession: o.GetStickySession(),
 		Timeout:       o.GetTimeout(),
@@ -16939,6 +17053,16 @@ func (o *ProxyLBUpdateSettingsRequest) GetServers() []*ProxyLBServer {
 // SetServers sets value to Servers
 func (o *ProxyLBUpdateSettingsRequest) SetServers(v []*ProxyLBServer) {
 	o.Servers = v
+}
+
+// GetRules returns value of Rules
+func (o *ProxyLBUpdateSettingsRequest) GetRules() []*ProxyLBRule {
+	return o.Rules
+}
+
+// SetRules sets value to Rules
+func (o *ProxyLBUpdateSettingsRequest) SetRules(v []*ProxyLBRule) {
+	o.Rules = v
 }
 
 // GetLetsEncrypt returns value of LetsEncrypt

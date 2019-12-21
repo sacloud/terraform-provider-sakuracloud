@@ -108,7 +108,7 @@ func (d *Director) Builder() Builder {
 			Client:        d.Client,
 		}
 	default:
-		// ディスクの修正をサポートしないものが指定された場合
+		// 現在はOSTypeにディスクの修正不可のアーカイブはないためここには到達しない
 		return &FromFixedArchiveBuilder{
 			OSType:      d.OSType,
 			Name:        d.Name,
