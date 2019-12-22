@@ -1,6 +1,7 @@
 .mailmap
 .env
 bin/terraform-provider-sakuracloud*
+**/.usacloud
 plugin.log
 terraform-provider-sakuracloud
 terraform.tfstate
