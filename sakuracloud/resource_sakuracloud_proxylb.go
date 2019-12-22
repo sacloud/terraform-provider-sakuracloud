@@ -189,7 +189,7 @@ func resourceSakuraCloudProxyLB() *schema.Resource {
 						"additional_certificate": {
 							Type:     schema.TypeList,
 							Optional: true,
-							Computed: true,
+							MaxItems: 19,
 							Elem: &schema.Resource{
 								Schema: map[string]*schema.Schema{
 									"server_cert": {
