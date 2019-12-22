@@ -193,8 +193,32 @@ func dataSourceSakuraCloudProxyLB() *schema.Resource {
 							Type:     schema.TypeInt,
 							Computed: true,
 						},
+						"group": {
+							Type:     schema.TypeString,
+							Computed: true,
+						},
 						"enabled": {
 							Type:     schema.TypeBool,
+							Computed: true,
+						},
+					},
+				},
+			},
+			"rule": {
+				Type:     schema.TypeList,
+				Computed: true,
+				Elem: &schema.Resource{
+					Schema: map[string]*schema.Schema{
+						"host": {
+							Type:     schema.TypeString,
+							Computed: true,
+						},
+						"path": {
+							Type:     schema.TypeString,
+							Computed: true,
+						},
+						"group": {
+							Type:     schema.TypeString,
 							Computed: true,
 						},
 					},

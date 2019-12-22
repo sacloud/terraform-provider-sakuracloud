@@ -50,10 +50,18 @@ func TestAccSakuraCloudDataSourceProxyLB_basic(t *testing.T) {
 					resource.TestCheckResourceAttr(resourceName, "bind_port.0.port", "80"),
 					resource.TestCheckResourceAttr(resourceName, "server.0.ip_address", ip0),
 					resource.TestCheckResourceAttr(resourceName, "server.0.port", "80"),
+					resource.TestCheckResourceAttr(resourceName, "server.0.group", "group1"),
 					resource.TestCheckResourceAttr(resourceName, "server.0.enabled", "true"),
 					resource.TestCheckResourceAttr(resourceName, "server.1.ip_address", ip1),
 					resource.TestCheckResourceAttr(resourceName, "server.1.port", "80"),
+					resource.TestCheckResourceAttr(resourceName, "server.1.group", "group2"),
 					resource.TestCheckResourceAttr(resourceName, "server.1.enabled", "true"),
+					resource.TestCheckResourceAttr(resourceName, "rule.0.host", ""),
+					resource.TestCheckResourceAttr(resourceName, "rule.0.path", "/path1"),
+					resource.TestCheckResourceAttr(resourceName, "rule.0.group", "group1"),
+					resource.TestCheckResourceAttr(resourceName, "rule.1.host", ""),
+					resource.TestCheckResourceAttr(resourceName, "rule.1.path", "/path2"),
+					resource.TestCheckResourceAttr(resourceName, "rule.1.group", "group2"),
 				),
 			},
 		},
@@ -79,10 +87,21 @@ resource "sakuracloud_proxylb" "foobar" {
   server {
     ip_address = "{{ .arg1 }}"
     port       = 80
+    group      = "group1"
   }
   server {
     ip_address = "{{ .arg2 }}"
     port       = 80
+    group      = "group2"
+  }
+
+  rule {
+    path  = "/path1"
+    group = "group1"
+  }
+  rule {
+    path  = "/path2"
+    group = "group2"
   }
 }
 

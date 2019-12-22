@@ -75,6 +75,10 @@ func TestAccSakuraCloudProxyLB_basic(t *testing.T) {
 					resource.TestCheckResourceAttr(resourceName, "bind_port.0.response_header.0.value", "public, max-age=10"),
 					resource.TestCheckResourceAttr(resourceName, "server.0.port", "80"),
 					resource.TestCheckResourceAttr(resourceName, "server.0.enabled", "true"),
+					resource.TestCheckResourceAttr(resourceName, "server.0.group", "group1"),
+					resource.TestCheckResourceAttr(resourceName, "rule.0.host", "usacloud.jp"),
+					resource.TestCheckResourceAttr(resourceName, "rule.0.path", "/path"),
+					resource.TestCheckResourceAttr(resourceName, "rule.0.group", "group1"),
 					resource.TestCheckResourceAttrPair(
 						resourceName, "server.0.ip_address",
 						"sakuracloud_server.foobar", "ip_address",
@@ -105,6 +109,10 @@ func TestAccSakuraCloudProxyLB_basic(t *testing.T) {
 					resource.TestCheckResourceAttr(resourceName, "bind_port.0.response_header.#", "0"),
 					resource.TestCheckResourceAttr(resourceName, "server.0.port", "443"),
 					resource.TestCheckResourceAttr(resourceName, "server.0.enabled", "true"),
+					resource.TestCheckResourceAttr(resourceName, "server.0.group", "group2"),
+					resource.TestCheckResourceAttr(resourceName, "rule.0.host", "upd.usacloud.jp"),
+					resource.TestCheckResourceAttr(resourceName, "rule.0.path", "/path-upd"),
+					resource.TestCheckResourceAttr(resourceName, "rule.0.group", "group2"),
 					resource.TestCheckResourceAttrPair(
 						resourceName, "server.0.ip_address",
 						"sakuracloud_server.foobar", "ip_address",
@@ -256,7 +264,14 @@ resource "sakuracloud_proxylb" "foobar" {
   server {
     ip_address = sakuracloud_server.foobar.ip_address
     port       = 80
+    group      = "group1"
   }
+  rule {
+    host  = "usacloud.jp"
+    path  = "/path"
+    group = "group1"
+  }
+
   description = "description"
   tags        = ["tag1", "tag2"]
   icon_id     = sakuracloud_icon.foobar.id
@@ -300,6 +315,13 @@ resource "sakuracloud_proxylb" "foobar" {
   server {
     ip_address = sakuracloud_server.foobar.ip_address
     port       = 443
+    group      = "group2"
+  }
+
+  rule {
+    host  = "upd.usacloud.jp"
+    path  = "/path-upd"
+    group = "group2"
   }
 
   description = "description-upd"
