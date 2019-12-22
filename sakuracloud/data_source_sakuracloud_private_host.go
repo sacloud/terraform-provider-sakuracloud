@@ -36,6 +36,10 @@ func dataSourceSakuraCloudPrivateHost() *schema.Resource {
 				Type:     schema.TypeString,
 				Computed: true,
 			},
+			"class": {
+				Type:     schema.TypeString,
+				Computed: true,
+			},
 			"icon_id": {
 				Type:     schema.TypeString,
 				Computed: true,

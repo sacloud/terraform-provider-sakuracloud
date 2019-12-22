@@ -28,7 +28,7 @@ func expandPrivateHostPlanID(ctx context.Context, d resourceValueGettable, clien
 	op := sacloud.NewPrivateHostPlanOp(client)
 	searched, err := op.Find(ctx, zone, &sacloud.FindCondition{
 		Filter: search.Filter{
-			search.Key("Class"): search.ExactMatch("dynamic"),
+			search.Key("Class"): search.ExactMatch(d.Get("class").(string)),
 		},
 	})
 	if err != nil {

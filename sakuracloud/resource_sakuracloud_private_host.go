@@ -20,7 +20,9 @@ import (
 	"time"
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/helper/validation"
 	"github.com/sacloud/libsacloud/v2/sacloud"
+	"github.com/sacloud/libsacloud/v2/sacloud/types"
 )
 
 func resourceSakuraCloudPrivateHost() *schema.Resource {
@@ -44,6 +46,12 @@ func resourceSakuraCloudPrivateHost() *schema.Resource {
 			"name": {
 				Type:     schema.TypeString,
 				Required: true,
+			},
+			"class": {
+				Type:         schema.TypeString,
+				Optional:     true,
+				Default:      types.PrivateHostClassDynamic,
+				ValidateFunc: validation.StringInSlice([]string{types.PrivateHostClassDynamic, types.PrivateHostClassWindows}, false),
 			},
 			"icon_id": {
 				Type:         schema.TypeString,
@@ -182,6 +190,7 @@ func resourceSakuraCloudPrivateHostDelete(d *schema.ResourceData, meta interface
 
 func setPrivateHostResourceData(ctx context.Context, d *schema.ResourceData, client *APIClient, data *sacloud.PrivateHost) error {
 	d.Set("name", data.Name)                             // nolint
+	d.Set("class", data.PlanClass)                       // nolint
 	d.Set("icon_id", data.IconID.String())               // nolint
 	d.Set("description", data.Description)               // nolint
 	d.Set("hostname", data.GetHostName())                // nolint
