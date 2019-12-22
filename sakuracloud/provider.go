@@ -22,30 +22,38 @@ import (
 )
 
 var (
-	defaultZone     = "is1b"
-	defaultRetryMax = 10
-	defaultZones    = []string{"is1a", "is1b", "tk1a", "tk1v"}
+	defaultZone                = "is1b"
+	defaultRetryMax            = 10
+	defaultZones               = []string{"is1a", "is1b", "tk1a", "tk1v"}
+	defaultAPIRequestTimeout   = 300
+	defaultAPIRequestRateLimit = 10
 )
 
 // Provider returns a terraform.ResourceProvider.
 func Provider() terraform.ResourceProvider {
 	provider := &schema.Provider{
 		Schema: map[string]*schema.Schema{
+			"profile": {
+				Type:        schema.TypeString,
+				Optional:    true,
+				DefaultFunc: schema.EnvDefaultFunc("SAKURACLOUD_PROFILE", nil),
+				Description: "Your SakuraCloud Profile Name",
+			},
 			"token": {
 				Type:        schema.TypeString,
-				Required:    true,
+				Optional:    true,
 				DefaultFunc: schema.EnvDefaultFunc("SAKURACLOUD_ACCESS_TOKEN", nil),
 				Description: "Your SakuraCloud APIKey(token)",
 			},
 			"secret": {
 				Type:        schema.TypeString,
-				Required:    true,
+				Optional:    true,
 				DefaultFunc: schema.EnvDefaultFunc("SAKURACLOUD_ACCESS_TOKEN_SECRET", nil),
 				Description: "Your SakuraCloud APIKey(secret)",
 			},
 			"zone": {
 				Type:         schema.TypeString,
-				Required:     true,
+				Optional:     true,
 				DefaultFunc:  schema.MultiEnvDefaultFunc([]string{"SAKURACLOUD_ZONE"}, defaultZone),
 				Description:  "Target SakuraCloud Zone(is1a | is1b | tk1a | tk1v)",
 				InputDefault: defaultZone,
@@ -85,12 +93,12 @@ func Provider() terraform.ResourceProvider {
 			"api_request_timeout": {
 				Type:        schema.TypeInt,
 				Optional:    true,
-				DefaultFunc: schema.MultiEnvDefaultFunc([]string{"SAKURACLOUD_API_REQUEST_TIMEOUT"}, 300),
+				DefaultFunc: schema.MultiEnvDefaultFunc([]string{"SAKURACLOUD_API_REQUEST_TIMEOUT"}, defaultAPIRequestTimeout),
 			},
 			"api_request_rate_limit": {
 				Type:         schema.TypeInt,
 				Optional:     true,
-				DefaultFunc:  schema.MultiEnvDefaultFunc([]string{"SAKURACLOUD_RATE_LIMIT"}, 5),
+				DefaultFunc:  schema.MultiEnvDefaultFunc([]string{"SAKURACLOUD_RATE_LIMIT"}, defaultAPIRequestRateLimit),
 				ValidateFunc: validation.IntBetween(1, 10),
 			},
 			"trace": {
@@ -184,6 +192,7 @@ func Provider() terraform.ResourceProvider {
 
 func providerConfigure(d *schema.ResourceData, terraformVersion string) (interface{}, error) {
 	config := Config{
+		Profile:             d.Get("profile").(string),
 		AccessToken:         d.Get("token").(string),
 		AccessTokenSecret:   d.Get("secret").(string),
 		Zone:                d.Get("zone").(string),
@@ -200,7 +209,7 @@ func providerConfigure(d *schema.ResourceData, terraformVersion string) (interfa
 		terraformVersion:    terraformVersion,
 	}
 
-	return config.NewClient(), nil
+	return config.NewClient()
 }
 
 var sakuraMutexKV = mutexkv.NewMutexKV()

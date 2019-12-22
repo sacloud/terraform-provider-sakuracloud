@@ -15,17 +15,22 @@
 package sakuracloud
 
 import (
+	"errors"
 	"fmt"
 	"log"
 	"net/http"
 	"os"
+	"reflect"
+	"sort"
 	"strings"
 	"sync"
 	"time"
 
+	"github.com/hashicorp/go-multierror"
 	"github.com/hashicorp/terraform-plugin-sdk/httpclient"
 	"github.com/sacloud/libsacloud/v2/sacloud"
 	"github.com/sacloud/libsacloud/v2/sacloud/fake"
+	"github.com/sacloud/libsacloud/v2/sacloud/profile"
 	"github.com/sacloud/libsacloud/v2/sacloud/trace"
 	"github.com/sacloud/libsacloud/v2/utils/builder"
 	"github.com/sacloud/libsacloud/v2/utils/setup"
@@ -48,6 +53,7 @@ var (
 
 // Config type of SakuraCloud Config
 type Config struct {
+	Profile             string
 	AccessToken         string
 	AccessTokenSecret   string
 	Zone                string
@@ -76,8 +82,87 @@ type APIClient struct {
 	databaseWaitAfterCreateDuration time.Duration
 }
 
+func (c *Config) loadFromProfile() error {
+	if c.Profile == "" {
+		c.Profile = profile.DefaultProfileName
+	}
+	if c.Profile != profile.DefaultProfileName {
+		log.Printf("[DEBUG] using profile %q", c.Profile)
+	}
+
+	pcv := &profile.ConfigValue{}
+	if err := profile.Load(c.Profile, pcv); err != nil {
+		return fmt.Errorf("loading profile %q is failed: %s", c.Profile, err)
+	}
+
+	if c.AccessToken == "" {
+		c.AccessToken = pcv.AccessToken
+	}
+	if c.AccessTokenSecret == "" {
+		c.AccessTokenSecret = pcv.AccessTokenSecret
+	}
+	if c.Zone == defaultZone && pcv.Zone != "" {
+		c.Zone = pcv.Zone
+	}
+
+	sort.Strings(c.Zones)
+	sort.Strings(pcv.Zones)
+	if reflect.DeepEqual(defaultZones, c.Zones) && !reflect.DeepEqual(c.Zones, pcv.Zones) && len(pcv.Zones) > 0 {
+		c.Zones = pcv.Zones
+	}
+	if c.TraceMode == "" {
+		c.TraceMode = pcv.TraceMode
+	}
+	if c.FakeMode == "" && pcv.FakeMode {
+		c.FakeMode = "1"
+	}
+	if c.FakeStorePath == "" {
+		c.FakeStorePath = pcv.FakeStorePath
+	}
+	if c.AcceptLanguage == "" {
+		c.AcceptLanguage = pcv.AcceptLanguage
+	}
+	if c.APIRootURL == "" {
+		c.APIRootURL = pcv.APIRootURL
+	}
+	if c.RetryMax == defaultRetryMax && pcv.RetryMax > 0 {
+		c.RetryMax = pcv.RetryMax
+	}
+	if c.RetryWaitMax == 0 {
+		c.RetryWaitMax = pcv.RetryWaitMax
+	}
+	if c.RetryWaitMin == 0 {
+		c.RetryWaitMin = pcv.RetryWaitMin
+	}
+	if c.APIRequestTimeout == defaultAPIRequestTimeout && pcv.HTTPRequestTimeout > 0 {
+		c.APIRequestTimeout = pcv.HTTPRequestTimeout
+	}
+	if c.APIRequestRateLimit == defaultAPIRequestRateLimit && pcv.HTTPRequestRateLimit > 0 {
+		c.APIRequestRateLimit = pcv.HTTPRequestRateLimit
+	}
+	return nil
+}
+
+func (c *Config) validate() error {
+	var err error
+	if c.AccessToken == "" {
+		err = multierror.Append(err, errors.New("AccessToken is required"))
+	}
+	if c.AccessTokenSecret == "" {
+		err = multierror.Append(err, errors.New("AccessTokenSecret is required"))
+	}
+	return err
+}
+
 // NewClient returns new API Client for SakuraCloud
-func (c *Config) NewClient() *APIClient {
+func (c *Config) NewClient() (*APIClient, error) {
+	if err := c.loadFromProfile(); err != nil {
+		return nil, err
+	}
+	if err := c.validate(); err != nil {
+		return nil, err
+	}
+
 	tfUserAgent := httpclient.TerraformUserAgent(c.terraformVersion)
 	providerUserAgent := fmt.Sprintf("%s/v%s", "terraform-provider-sakuracloud", Version)
 	ua := fmt.Sprintf("%s %s", tfUserAgent, providerUserAgent)
@@ -177,5 +262,5 @@ func (c *Config) NewClient() *APIClient {
 		deletionWaiterTimeout:           deletionWaiterTimeout,
 		deletionWaiterPollingInterval:   deletionWaiterPollingInterval,
 		databaseWaitAfterCreateDuration: databaseWaitAfterCreateDuration,
-	}
+	}, nil
 }
