@@ -225,10 +225,36 @@ func resourceSakuraCloudProxyLB() *schema.Resource {
 							Required:     true,
 							ValidateFunc: validation.IntBetween(1, 65535),
 						},
+						"group": {
+							Type:         schema.TypeString,
+							Optional:     true,
+							ValidateFunc: validation.StringLenBetween(1, 10),
+						},
 						"enabled": {
 							Type:     schema.TypeBool,
 							Optional: true,
 							Default:  true,
+						},
+					},
+				},
+			},
+			"rule": {
+				Type:     schema.TypeList,
+				Optional: true,
+				Elem: &schema.Resource{
+					Schema: map[string]*schema.Schema{
+						"host": {
+							Type:     schema.TypeString,
+							Optional: true,
+						},
+						"path": {
+							Type:     schema.TypeString,
+							Optional: true,
+						},
+						"group": {
+							Type:         schema.TypeString,
+							Optional:     true,
+							ValidateFunc: validation.StringLenBetween(1, 10),
 						},
 					},
 				},
@@ -429,6 +455,9 @@ func setProxyLBResourceData(ctx context.Context, d *schema.ResourceData, client 
 		return err
 	}
 	if err := d.Set("server", flattenProxyLBServers(data)); err != nil {
+		return err
+	}
+	if err := d.Set("rule", flattenProxyLBRules(data)); err != nil {
 		return err
 	}
 	if err := d.Set("certificate", flattenProxyLBCerts(certs)); err != nil {
