@@ -47,6 +47,7 @@ func TestAccSakuraCloudPrivateHost_basic(t *testing.T) {
 					testCheckSakuraCloudPrivateHostExists(resourceName, &privateHost),
 					resource.TestCheckResourceAttr(resourceName, "name", rand),
 					resource.TestCheckResourceAttr(resourceName, "description", "description"),
+					resource.TestCheckResourceAttr(resourceName, "class", "dynamic"),
 					resource.TestCheckResourceAttr(resourceName, "tags.#", "2"),
 					resource.TestCheckResourceAttr(resourceName, "tags.4151227546", "tag1"),
 					resource.TestCheckResourceAttr(resourceName, "tags.1852302624", "tag2"),
@@ -69,6 +70,39 @@ func TestAccSakuraCloudPrivateHost_basic(t *testing.T) {
 					resource.TestCheckResourceAttr(resourceName, "description", "description-upd"),
 					resource.TestCheckResourceAttr(resourceName, "tags.#", "0"),
 					resource.TestCheckResourceAttr(resourceName, "icon_id", ""),
+					resource.TestCheckResourceAttrSet(resourceName, "hostname"),
+				),
+			},
+		},
+	})
+}
+
+func TestAccSakuraCloudPrivateHost_windows(t *testing.T) {
+	skipIfZoneIsDummy(t)
+
+	resourceName := "sakuracloud_private_host.foobar"
+	rand := randomName()
+
+	var privateHost sacloud.PrivateHost
+	resource.ParallelTest(t, resource.TestCase{
+		PreCheck:  func() { testAccPreCheck(t) },
+		Providers: testAccProviders,
+		CheckDestroy: resource.ComposeTestCheckFunc(
+			testCheckSakuraCloudPrivateHostDestroy,
+			testCheckSakuraCloudIconDestroy,
+			testCheckSakuraCloudServerDestroy,
+		),
+		Steps: []resource.TestStep{
+			{
+				Config: buildConfigWithArgs(testAccSakuraCloudPrivateHost_windows, rand),
+				Check: resource.ComposeTestCheckFunc(
+					testCheckSakuraCloudPrivateHostExists(resourceName, &privateHost),
+					resource.TestCheckResourceAttr(resourceName, "name", rand),
+					resource.TestCheckResourceAttr(resourceName, "description", "description"),
+					resource.TestCheckResourceAttr(resourceName, "class", "ms_windows"),
+					resource.TestCheckResourceAttr(resourceName, "tags.#", "2"),
+					resource.TestCheckResourceAttr(resourceName, "tags.4151227546", "tag1"),
+					resource.TestCheckResourceAttr(resourceName, "tags.1852302624", "tag2"),
 					resource.TestCheckResourceAttrSet(resourceName, "hostname"),
 				),
 			},
@@ -184,6 +218,15 @@ var testAccSakuraCloudPrivateHost_update = `
 resource "sakuracloud_private_host" "foobar" {
   name        = "{{ .arg0 }}-upd"
   description = "description-upd"
+}
+`
+
+var testAccSakuraCloudPrivateHost_windows = `
+resource "sakuracloud_private_host" "foobar" {
+  name        = "{{ .arg0 }}"
+  class       = "ms_windows"
+  description = "description"
+  tags        = ["tag1", "tag2"]
 }
 `
 
