@@ -105,7 +105,7 @@ FILTER_APPLY_LOOP:
 
 				// only ID/Name/Tags
 				switch fieldName {
-				case "ID", "Name", "Tags.Name", "Scope":
+				case "ID", "Name", "Tags.Name", "Scope", "Class":
 					exp, ok := expression.(*search.EqualExpression)
 					if !ok {
 						exp = search.OrEqual(expression)
@@ -147,6 +147,10 @@ FILTER_APPLY_LOOP:
 						case "Scope":
 							if v, ok := target.(accessor.Scope); ok {
 								value = v.GetScope()
+							}
+						case "Class":
+							if v, ok := target.(accessor.Class); ok {
+								value = v.GetClass()
 							}
 						}
 

@@ -15081,10 +15081,10 @@ type PrivateHost struct {
 	IconID           types.ID `mapconv:"Icon.ID"`
 	CreatedAt        time.Time
 	PlanID           types.ID `mapconv:"Plan.ID,omitempty"`
-	PlanName         string
-	PlanClass        string
-	CPU              int `mapconv:"Plan.CPU"`
-	MemoryMB         int `mapconv:"Plan.MemoryMB"`
+	PlanName         string   `mapconv:"Plan.Name"`
+	PlanClass        string   `mapconv:"Plan.Class"`
+	CPU              int      `mapconv:"Plan.CPU"`
+	MemoryMB         int      `mapconv:"Plan.MemoryMB"`
 	AssignedCPU      int
 	AssignedMemoryMB int
 	HostName         string `mapconv:"Host.Name"`
@@ -15105,10 +15105,10 @@ func (o *PrivateHost) setDefaults() interface{} {
 		IconID           types.ID `mapconv:"Icon.ID"`
 		CreatedAt        time.Time
 		PlanID           types.ID `mapconv:"Plan.ID,omitempty"`
-		PlanName         string
-		PlanClass        string
-		CPU              int `mapconv:"Plan.CPU"`
-		MemoryMB         int `mapconv:"Plan.MemoryMB"`
+		PlanName         string   `mapconv:"Plan.Name"`
+		PlanClass        string   `mapconv:"Plan.Class"`
+		CPU              int      `mapconv:"Plan.CPU"`
+		MemoryMB         int      `mapconv:"Plan.MemoryMB"`
 		AssignedCPU      int
 		AssignedMemoryMB int
 		HostName         string `mapconv:"Host.Name"`
