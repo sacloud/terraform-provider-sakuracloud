@@ -27,6 +27,7 @@ func expandProxyLBCreateRequest(d *schema.ResourceData) *sacloud.ProxyLBCreateRe
 		SorryServer:    expandProxyLBSorryServer(d),
 		BindPorts:      expandProxyLBBindPorts(d),
 		Servers:        expandProxyLBServers(d),
+		Rules:          expandProxyLBRules(d),
 		StickySession:  expandProxyLBStickySession(d),
 		Timeout:        expandProxyLBTimeout(d),
 		UseVIPFailover: d.Get("vip_failover").(bool),
@@ -44,6 +45,7 @@ func expandProxyLBUpdateRequest(d *schema.ResourceData) *sacloud.ProxyLBUpdateRe
 		SorryServer:   expandProxyLBSorryServer(d),
 		BindPorts:     expandProxyLBBindPorts(d),
 		Servers:       expandProxyLBServers(d),
+		Rules:         expandProxyLBRules(d),
 		StickySession: expandProxyLBStickySession(d),
 		Timeout:       expandProxyLBTimeout(d),
 		Name:          d.Get("name").(string),
@@ -110,6 +112,19 @@ func flattenProxyLBServers(proxyLB *sacloud.ProxyLB) []interface{} {
 			"ip_address": server.IPAddress,
 			"port":       server.Port,
 			"enabled":    server.Enabled,
+			"group":      server.ServerGroup,
+		})
+	}
+	return results
+}
+
+func flattenProxyLBRules(proxyLB *sacloud.ProxyLB) []interface{} {
+	var results []interface{}
+	for _, rule := range proxyLB.Rules {
+		results = append(results, map[string]interface{}{
+			"host":  rule.Host,
+			"path":  rule.Path,
+			"group": rule.ServerGroup,
 		})
 	}
 	return results
@@ -234,9 +249,25 @@ func expandProxyLBServers(d resourceValueGettable) []*sacloud.ProxyLBServer {
 		for _, server := range servers {
 			v := mapToResourceData(server.(map[string]interface{}))
 			results = append(results, &sacloud.ProxyLBServer{
-				IPAddress: v.Get("ip_address").(string),
-				Port:      v.Get("port").(int),
-				Enabled:   v.Get("enabled").(bool),
+				IPAddress:   v.Get("ip_address").(string),
+				Port:        v.Get("port").(int),
+				Enabled:     v.Get("enabled").(bool),
+				ServerGroup: v.Get("group").(string),
+			})
+		}
+	}
+	return results
+}
+
+func expandProxyLBRules(d resourceValueGettable) []*sacloud.ProxyLBRule {
+	var results []*sacloud.ProxyLBRule
+	if rules, ok := getListFromResource(d, "rule"); ok && len(rules) > 0 {
+		for _, rule := range rules {
+			v := mapToResourceData(rule.(map[string]interface{}))
+			results = append(results, &sacloud.ProxyLBRule{
+				Host:        v.Get("host").(string),
+				Path:        v.Get("path").(string),
+				ServerGroup: v.Get("group").(string),
 			})
 		}
 	}
