@@ -225,6 +225,50 @@ type cDROMOpenFTPResult struct {
 	FTPServer *FTPServer `json:",omitempty" mapconv:"FTPServer,omitempty,recursive"`
 }
 
+// ContainerRegistryFindResult represents the Result of API
+type ContainerRegistryFindResult struct {
+	Total int `json:",omitempty"` // Total count of target resources
+	From  int `json:",omitempty"` // Current page number
+	Count int `json:",omitempty"` // Count of current page
+
+	ContainerRegistries []*ContainerRegistry `json:",omitempty" mapconv:"[]CommonServiceItems,omitempty,recursive"`
+}
+
+// containerRegistryCreateResult represents the Result of API
+type containerRegistryCreateResult struct {
+	IsOk bool `json:",omitempty"` // is_ok
+
+	ContainerRegistry *ContainerRegistry `json:",omitempty" mapconv:"CommonServiceItem,omitempty,recursive"`
+}
+
+// containerRegistryReadResult represents the Result of API
+type containerRegistryReadResult struct {
+	IsOk bool `json:",omitempty"` // is_ok
+
+	ContainerRegistry *ContainerRegistry `json:",omitempty" mapconv:"CommonServiceItem,omitempty,recursive"`
+}
+
+// containerRegistryUpdateResult represents the Result of API
+type containerRegistryUpdateResult struct {
+	IsOk bool `json:",omitempty"` // is_ok
+
+	ContainerRegistry *ContainerRegistry `json:",omitempty" mapconv:"CommonServiceItem,omitempty,recursive"`
+}
+
+// containerRegistryUpdateSettingsResult represents the Result of API
+type containerRegistryUpdateSettingsResult struct {
+	IsOk bool `json:",omitempty"` // is_ok
+
+	ContainerRegistry *ContainerRegistry `json:",omitempty" mapconv:"CommonServiceItem,omitempty,recursive"`
+}
+
+// containerRegistryListUsersResult represents the Result of API
+type containerRegistryListUsersResult struct {
+	IsOk bool `json:",omitempty"` // is_ok
+
+	ContainerRegistryUsers *ContainerRegistryUsers `json:",omitempty" mapconv:"ContainerRegistry,omitempty,recursive"`
+}
+
 // CouponFindResult represents the Result of API
 type CouponFindResult struct {
 	Total int `json:",omitempty"` // Total count of target resources

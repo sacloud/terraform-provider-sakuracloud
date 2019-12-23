@@ -190,6 +190,34 @@ func putCDROM(zone string, value *sacloud.CDROM) {
 	ds().Put(ResourceCDROM, zone, 0, value)
 }
 
+func getContainerRegistry(zone string) []*sacloud.ContainerRegistry {
+	values := ds().List(ResourceContainerRegistry, zone)
+	var ret []*sacloud.ContainerRegistry
+	for _, v := range values {
+		if v, ok := v.(*sacloud.ContainerRegistry); ok {
+			ret = append(ret, v)
+		}
+	}
+	return ret
+}
+
+func getContainerRegistryByID(zone string, id types.ID) *sacloud.ContainerRegistry {
+	v := ds().Get(ResourceContainerRegistry, zone, id)
+	if v, ok := v.(*sacloud.ContainerRegistry); ok {
+		return v
+	}
+	return nil
+}
+
+func putContainerRegistry(zone string, value *sacloud.ContainerRegistry) {
+	var v interface{} = value
+	if id, ok := v.(accessor.ID); ok {
+		ds().Put(ResourceContainerRegistry, zone, id.GetID(), value)
+		return
+	}
+	ds().Put(ResourceContainerRegistry, zone, 0, value)
+}
+
 func getCoupon(zone string) []*sacloud.Coupon {
 	values := ds().List(ResourceCoupon, zone)
 	var ret []*sacloud.Coupon

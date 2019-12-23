@@ -45,6 +45,9 @@ func AddClientFactoryHooks() {
 	sacloud.AddClientFacotyHookFunc("CDROM", func(in interface{}) interface{} {
 		return NewCDROMTracer(in.(sacloud.CDROMAPI))
 	})
+	sacloud.AddClientFacotyHookFunc("ContainerRegistry", func(in interface{}) interface{} {
+		return NewContainerRegistryTracer(in.(sacloud.ContainerRegistryAPI))
+	})
 	sacloud.AddClientFacotyHookFunc("Coupon", func(in interface{}) interface{} {
 		return NewCouponTracer(in.(sacloud.CouponAPI))
 	})
@@ -1324,6 +1327,336 @@ func (t *CDROMTracer) CloseFTP(ctx context.Context, zone string, id types.ID) er
 	}()
 
 	err := t.Internal.CloseFTP(ctx, zone, id)
+	targetResults := struct {
+		Error error
+	}{
+		Error: err,
+	}
+	if d, err := json.Marshal(targetResults); err == nil {
+		log.Printf("[TRACE] \tresults: %s\n", string(d))
+	}
+
+	return err
+}
+
+/*************************************************
+* ContainerRegistryTracer
+*************************************************/
+
+// ContainerRegistryTracer is for trace ContainerRegistryOp operations
+type ContainerRegistryTracer struct {
+	Internal sacloud.ContainerRegistryAPI
+}
+
+// NewContainerRegistryTracer creates new ContainerRegistryTracer instance
+func NewContainerRegistryTracer(in sacloud.ContainerRegistryAPI) sacloud.ContainerRegistryAPI {
+	return &ContainerRegistryTracer{
+		Internal: in,
+	}
+}
+
+// Find is API call with trace log
+func (t *ContainerRegistryTracer) Find(ctx context.Context, conditions *sacloud.FindCondition) (*sacloud.ContainerRegistryFindResult, error) {
+	log.Println("[TRACE] ContainerRegistryAPI.Find start")
+	targetArguments := struct {
+		Argconditions *sacloud.FindCondition `json:"conditions"`
+	}{
+		Argconditions: conditions,
+	}
+	if d, err := json.Marshal(targetArguments); err == nil {
+		log.Printf("[TRACE] \targs: %s\n", string(d))
+	}
+
+	defer func() {
+		log.Println("[TRACE] ContainerRegistryAPI.Find end")
+	}()
+
+	result, err := t.Internal.Find(ctx, conditions)
+	targetResults := struct {
+		Result *sacloud.ContainerRegistryFindResult
+		Error  error
+	}{
+		Result: result,
+		Error:  err,
+	}
+	if d, err := json.Marshal(targetResults); err == nil {
+		log.Printf("[TRACE] \tresults: %s\n", string(d))
+	}
+
+	return result, err
+}
+
+// Create is API call with trace log
+func (t *ContainerRegistryTracer) Create(ctx context.Context, param *sacloud.ContainerRegistryCreateRequest) (*sacloud.ContainerRegistry, error) {
+	log.Println("[TRACE] ContainerRegistryAPI.Create start")
+	targetArguments := struct {
+		Argparam *sacloud.ContainerRegistryCreateRequest `json:"param"`
+	}{
+		Argparam: param,
+	}
+	if d, err := json.Marshal(targetArguments); err == nil {
+		log.Printf("[TRACE] \targs: %s\n", string(d))
+	}
+
+	defer func() {
+		log.Println("[TRACE] ContainerRegistryAPI.Create end")
+	}()
+
+	resultContainerRegistry, err := t.Internal.Create(ctx, param)
+	targetResults := struct {
+		ContainerRegistry *sacloud.ContainerRegistry
+		Error             error
+	}{
+		ContainerRegistry: resultContainerRegistry,
+		Error:             err,
+	}
+	if d, err := json.Marshal(targetResults); err == nil {
+		log.Printf("[TRACE] \tresults: %s\n", string(d))
+	}
+
+	return resultContainerRegistry, err
+}
+
+// Read is API call with trace log
+func (t *ContainerRegistryTracer) Read(ctx context.Context, id types.ID) (*sacloud.ContainerRegistry, error) {
+	log.Println("[TRACE] ContainerRegistryAPI.Read start")
+	targetArguments := struct {
+		Argid types.ID `json:"id"`
+	}{
+		Argid: id,
+	}
+	if d, err := json.Marshal(targetArguments); err == nil {
+		log.Printf("[TRACE] \targs: %s\n", string(d))
+	}
+
+	defer func() {
+		log.Println("[TRACE] ContainerRegistryAPI.Read end")
+	}()
+
+	resultContainerRegistry, err := t.Internal.Read(ctx, id)
+	targetResults := struct {
+		ContainerRegistry *sacloud.ContainerRegistry
+		Error             error
+	}{
+		ContainerRegistry: resultContainerRegistry,
+		Error:             err,
+	}
+	if d, err := json.Marshal(targetResults); err == nil {
+		log.Printf("[TRACE] \tresults: %s\n", string(d))
+	}
+
+	return resultContainerRegistry, err
+}
+
+// Update is API call with trace log
+func (t *ContainerRegistryTracer) Update(ctx context.Context, id types.ID, param *sacloud.ContainerRegistryUpdateRequest) (*sacloud.ContainerRegistry, error) {
+	log.Println("[TRACE] ContainerRegistryAPI.Update start")
+	targetArguments := struct {
+		Argid    types.ID                                `json:"id"`
+		Argparam *sacloud.ContainerRegistryUpdateRequest `json:"param"`
+	}{
+		Argid:    id,
+		Argparam: param,
+	}
+	if d, err := json.Marshal(targetArguments); err == nil {
+		log.Printf("[TRACE] \targs: %s\n", string(d))
+	}
+
+	defer func() {
+		log.Println("[TRACE] ContainerRegistryAPI.Update end")
+	}()
+
+	resultContainerRegistry, err := t.Internal.Update(ctx, id, param)
+	targetResults := struct {
+		ContainerRegistry *sacloud.ContainerRegistry
+		Error             error
+	}{
+		ContainerRegistry: resultContainerRegistry,
+		Error:             err,
+	}
+	if d, err := json.Marshal(targetResults); err == nil {
+		log.Printf("[TRACE] \tresults: %s\n", string(d))
+	}
+
+	return resultContainerRegistry, err
+}
+
+// UpdateSettings is API call with trace log
+func (t *ContainerRegistryTracer) UpdateSettings(ctx context.Context, id types.ID, param *sacloud.ContainerRegistryUpdateSettingsRequest) (*sacloud.ContainerRegistry, error) {
+	log.Println("[TRACE] ContainerRegistryAPI.UpdateSettings start")
+	targetArguments := struct {
+		Argid    types.ID                                        `json:"id"`
+		Argparam *sacloud.ContainerRegistryUpdateSettingsRequest `json:"param"`
+	}{
+		Argid:    id,
+		Argparam: param,
+	}
+	if d, err := json.Marshal(targetArguments); err == nil {
+		log.Printf("[TRACE] \targs: %s\n", string(d))
+	}
+
+	defer func() {
+		log.Println("[TRACE] ContainerRegistryAPI.UpdateSettings end")
+	}()
+
+	resultContainerRegistry, err := t.Internal.UpdateSettings(ctx, id, param)
+	targetResults := struct {
+		ContainerRegistry *sacloud.ContainerRegistry
+		Error             error
+	}{
+		ContainerRegistry: resultContainerRegistry,
+		Error:             err,
+	}
+	if d, err := json.Marshal(targetResults); err == nil {
+		log.Printf("[TRACE] \tresults: %s\n", string(d))
+	}
+
+	return resultContainerRegistry, err
+}
+
+// Delete is API call with trace log
+func (t *ContainerRegistryTracer) Delete(ctx context.Context, id types.ID) error {
+	log.Println("[TRACE] ContainerRegistryAPI.Delete start")
+	targetArguments := struct {
+		Argid types.ID `json:"id"`
+	}{
+		Argid: id,
+	}
+	if d, err := json.Marshal(targetArguments); err == nil {
+		log.Printf("[TRACE] \targs: %s\n", string(d))
+	}
+
+	defer func() {
+		log.Println("[TRACE] ContainerRegistryAPI.Delete end")
+	}()
+
+	err := t.Internal.Delete(ctx, id)
+	targetResults := struct {
+		Error error
+	}{
+		Error: err,
+	}
+	if d, err := json.Marshal(targetResults); err == nil {
+		log.Printf("[TRACE] \tresults: %s\n", string(d))
+	}
+
+	return err
+}
+
+// ListUsers is API call with trace log
+func (t *ContainerRegistryTracer) ListUsers(ctx context.Context, id types.ID) (*sacloud.ContainerRegistryUsers, error) {
+	log.Println("[TRACE] ContainerRegistryAPI.ListUsers start")
+	targetArguments := struct {
+		Argid types.ID `json:"id"`
+	}{
+		Argid: id,
+	}
+	if d, err := json.Marshal(targetArguments); err == nil {
+		log.Printf("[TRACE] \targs: %s\n", string(d))
+	}
+
+	defer func() {
+		log.Println("[TRACE] ContainerRegistryAPI.ListUsers end")
+	}()
+
+	resultContainerRegistryUsers, err := t.Internal.ListUsers(ctx, id)
+	targetResults := struct {
+		ContainerRegistryUsers *sacloud.ContainerRegistryUsers
+		Error                  error
+	}{
+		ContainerRegistryUsers: resultContainerRegistryUsers,
+		Error:                  err,
+	}
+	if d, err := json.Marshal(targetResults); err == nil {
+		log.Printf("[TRACE] \tresults: %s\n", string(d))
+	}
+
+	return resultContainerRegistryUsers, err
+}
+
+// AddUser is API call with trace log
+func (t *ContainerRegistryTracer) AddUser(ctx context.Context, id types.ID, param *sacloud.ContainerRegistryUserCreateRequest) error {
+	log.Println("[TRACE] ContainerRegistryAPI.AddUser start")
+	targetArguments := struct {
+		Argid    types.ID                                    `json:"id"`
+		Argparam *sacloud.ContainerRegistryUserCreateRequest `json:"param"`
+	}{
+		Argid:    id,
+		Argparam: param,
+	}
+	if d, err := json.Marshal(targetArguments); err == nil {
+		log.Printf("[TRACE] \targs: %s\n", string(d))
+	}
+
+	defer func() {
+		log.Println("[TRACE] ContainerRegistryAPI.AddUser end")
+	}()
+
+	err := t.Internal.AddUser(ctx, id, param)
+	targetResults := struct {
+		Error error
+	}{
+		Error: err,
+	}
+	if d, err := json.Marshal(targetResults); err == nil {
+		log.Printf("[TRACE] \tresults: %s\n", string(d))
+	}
+
+	return err
+}
+
+// UpdateUser is API call with trace log
+func (t *ContainerRegistryTracer) UpdateUser(ctx context.Context, id types.ID, username string, param *sacloud.ContainerRegistryUserUpdateRequest) error {
+	log.Println("[TRACE] ContainerRegistryAPI.UpdateUser start")
+	targetArguments := struct {
+		Argid       types.ID                                    `json:"id"`
+		Argusername string                                      `json:"username"`
+		Argparam    *sacloud.ContainerRegistryUserUpdateRequest `json:"param"`
+	}{
+		Argid:       id,
+		Argusername: username,
+		Argparam:    param,
+	}
+	if d, err := json.Marshal(targetArguments); err == nil {
+		log.Printf("[TRACE] \targs: %s\n", string(d))
+	}
+
+	defer func() {
+		log.Println("[TRACE] ContainerRegistryAPI.UpdateUser end")
+	}()
+
+	err := t.Internal.UpdateUser(ctx, id, username, param)
+	targetResults := struct {
+		Error error
+	}{
+		Error: err,
+	}
+	if d, err := json.Marshal(targetResults); err == nil {
+		log.Printf("[TRACE] \tresults: %s\n", string(d))
+	}
+
+	return err
+}
+
+// DeleteUser is API call with trace log
+func (t *ContainerRegistryTracer) DeleteUser(ctx context.Context, id types.ID, username string) error {
+	log.Println("[TRACE] ContainerRegistryAPI.DeleteUser start")
+	targetArguments := struct {
+		Argid       types.ID `json:"id"`
+		Argusername string   `json:"username"`
+	}{
+		Argid:       id,
+		Argusername: username,
+	}
+	if d, err := json.Marshal(targetArguments); err == nil {
+		log.Printf("[TRACE] \targs: %s\n", string(d))
+	}
+
+	defer func() {
+		log.Println("[TRACE] ContainerRegistryAPI.DeleteUser end")
+	}()
+
+	err := t.Internal.DeleteUser(ctx, id, username)
 	targetResults := struct {
 		Error error
 	}{

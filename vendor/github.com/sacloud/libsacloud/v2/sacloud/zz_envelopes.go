@@ -351,6 +351,90 @@ type cDROMOpenFTPResponseEnvelope struct {
 	FTPServer *naked.OpeningFTPServer `json:",omitempty"`
 }
 
+// containerRegistryFindRequestEnvelope is envelop of API request
+type containerRegistryFindRequestEnvelope struct {
+	Count   int             `mapconv:",omitempty"`
+	From    int             `mapconv:",omitempty"`
+	Sort    search.SortKeys `json:",omitempty" mapconv:",omitempty"`
+	Filter  search.Filter   `json:",omitempty" mapconv:",omitempty"`
+	Include []string        `json:",omitempty" mapconv:",omitempty"`
+	Exclude []string        `json:",omitempty" mapconv:",omitempty"`
+}
+
+// containerRegistryFindResponseEnvelope is envelop of API response
+type containerRegistryFindResponseEnvelope struct {
+	Total int `json:",omitempty"` // トータル件数
+	From  int `json:",omitempty"` // ページング開始ページ
+	Count int `json:",omitempty"` // 件数
+
+	CommonServiceItems []*naked.ContainerRegistry `json:",omitempty"`
+}
+
+// containerRegistryCreateRequestEnvelope is envelop of API request
+type containerRegistryCreateRequestEnvelope struct {
+	CommonServiceItem *naked.ContainerRegistry `json:",omitempty"`
+}
+
+// containerRegistryCreateResponseEnvelope is envelop of API response
+type containerRegistryCreateResponseEnvelope struct {
+	IsOk    bool            `json:"is_ok,omitempty"` // is_ok項目
+	Success types.APIResult `json:",omitempty"`      // success項目
+
+	CommonServiceItem *naked.ContainerRegistry `json:",omitempty"`
+}
+
+// containerRegistryReadResponseEnvelope is envelop of API response
+type containerRegistryReadResponseEnvelope struct {
+	IsOk    bool            `json:"is_ok,omitempty"` // is_ok項目
+	Success types.APIResult `json:",omitempty"`      // success項目
+
+	CommonServiceItem *naked.ContainerRegistry `json:",omitempty"`
+}
+
+// containerRegistryUpdateRequestEnvelope is envelop of API request
+type containerRegistryUpdateRequestEnvelope struct {
+	CommonServiceItem *naked.ContainerRegistry `json:",omitempty"`
+}
+
+// containerRegistryUpdateResponseEnvelope is envelop of API response
+type containerRegistryUpdateResponseEnvelope struct {
+	IsOk    bool            `json:"is_ok,omitempty"` // is_ok項目
+	Success types.APIResult `json:",omitempty"`      // success項目
+
+	CommonServiceItem *naked.ContainerRegistry `json:",omitempty"`
+}
+
+// containerRegistryUpdateSettingsRequestEnvelope is envelop of API request
+type containerRegistryUpdateSettingsRequestEnvelope struct {
+	CommonServiceItem *naked.ContainerRegistrySettingsUpdate `json:",omitempty"`
+}
+
+// containerRegistryUpdateSettingsResponseEnvelope is envelop of API response
+type containerRegistryUpdateSettingsResponseEnvelope struct {
+	IsOk    bool            `json:"is_ok,omitempty"` // is_ok項目
+	Success types.APIResult `json:",omitempty"`      // success項目
+
+	CommonServiceItem *naked.ContainerRegistry `json:",omitempty"`
+}
+
+// containerRegistryListUsersResponseEnvelope is envelop of API response
+type containerRegistryListUsersResponseEnvelope struct {
+	IsOk    bool            `json:"is_ok,omitempty"` // is_ok項目
+	Success types.APIResult `json:",omitempty"`      // success項目
+
+	ContainerRegistry *naked.ContainerRegistryUsers `json:",omitempty"`
+}
+
+// containerRegistryAddUserRequestEnvelope is envelop of API request
+type containerRegistryAddUserRequestEnvelope struct {
+	ContainerRegistry *naked.ContainerRegistryUser `json:",omitempty"`
+}
+
+// containerRegistryUpdateUserRequestEnvelope is envelop of API request
+type containerRegistryUpdateUserRequestEnvelope struct {
+	ContainerRegistry *naked.ContainerRegistryUser `json:",omitempty"`
+}
+
 // couponFindResponseEnvelope is envelop of API response
 type couponFindResponseEnvelope struct {
 	Total int `json:",omitempty"` // トータル件数

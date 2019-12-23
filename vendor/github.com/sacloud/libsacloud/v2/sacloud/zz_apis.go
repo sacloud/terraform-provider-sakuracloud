@@ -104,6 +104,24 @@ type CDROMAPI interface {
 }
 
 /*************************************************
+* ContainerRegistryAPI
+*************************************************/
+
+// ContainerRegistryAPI is interface for operate ContainerRegistry resource
+type ContainerRegistryAPI interface {
+	Find(ctx context.Context, conditions *FindCondition) (*ContainerRegistryFindResult, error)
+	Create(ctx context.Context, param *ContainerRegistryCreateRequest) (*ContainerRegistry, error)
+	Read(ctx context.Context, id types.ID) (*ContainerRegistry, error)
+	Update(ctx context.Context, id types.ID, param *ContainerRegistryUpdateRequest) (*ContainerRegistry, error)
+	UpdateSettings(ctx context.Context, id types.ID, param *ContainerRegistryUpdateSettingsRequest) (*ContainerRegistry, error)
+	Delete(ctx context.Context, id types.ID) error
+	ListUsers(ctx context.Context, id types.ID) (*ContainerRegistryUsers, error)
+	AddUser(ctx context.Context, id types.ID, param *ContainerRegistryUserCreateRequest) error
+	UpdateUser(ctx context.Context, id types.ID, username string, param *ContainerRegistryUserUpdateRequest) error
+	DeleteUser(ctx context.Context, id types.ID, username string) error
+}
+
+/*************************************************
 * CouponAPI
 *************************************************/
 
