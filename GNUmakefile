@@ -23,21 +23,27 @@ tools:
 	GO111MODULE=off go get -u github.com/golangci/golangci-lint/cmd/golangci-lint
 	GO111MODULE=off go get -u github.com/bflad/tfproviderlint/cmd/tfproviderlint
 
+.PHONY: build-envs
 build-envs:
 	$(eval CURRENT_VERSION ?= $(shell gobump show -r sakuracloud/))
 	$(eval BUILD_LDFLAGS := "-s -w \
            -X github.com/sacloud/terraform-provider-sakuracloud/sakuracloud.Revision=`git rev-parse --short HEAD` \
            -X github.com/sacloud/terraform-provider-sakuracloud/sakuracloud.Version=$(CURRENT_VERSION)")
 
+.PHONY: build
 build: build-envs
 	OS="`go env GOOS`" ARCH="`go env GOARCH`" ARCHIVE= BUILD_LDFLAGS=$(BUILD_LDFLAGS) CURRENT_VERSION=$(CURRENT_VERSION) sh -c "'$(CURDIR)/scripts/build.sh'"
 
+.PHONY: build-x
 build-x: build-envs build-darwin build-windows build-linux shasum
 
+.PHONY: build-darwin
 build-darwin: build-envs bin/terraform-provider-sakuracloud_$(CURRENT_VERSION)_darwin-386.zip bin/terraform-provider-sakuracloud_$(CURRENT_VERSION)_darwin-amd64.zip
 
+.PHONY: build-windows
 build-windows: build-envs bin/terraform-provider-sakuracloud_$(CURRENT_VERSION)_windows-386.zip bin/terraform-provider-sakuracloud_$(CURRENT_VERSION)_windows-amd64.zip
 
+.PHONY: build-linux
 build-linux: build-envs bin/terraform-provider-sakuracloud_$(CURRENT_VERSION)_linux-386.zip bin/terraform-provider-sakuracloud_$(CURRENT_VERSION)_linux-amd64.zip
 
 bin/terraform-provider-sakuracloud_$(CURRENT_VERSION)_darwin-386.zip: build-envs
@@ -58,21 +64,27 @@ bin/terraform-provider-sakuracloud_$(CURRENT_VERSION)_linux-386.zip: build-envs
 bin/terraform-provider-sakuracloud_$(CURRENT_VERSION)_linux-amd64.zip: build-envs
 	OS="linux"   ARCH="amd64" ARCHIVE=1 BUILD_LDFLAGS=$(BUILD_LDFLAGS) CURRENT_VERSION=$(CURRENT_VERSION) sh -c "'$(CURDIR)/scripts/build.sh'"
 
+.PHONY: shasum
 shasum:
 	(cd bin/; shasum -a 256 * > terraform-provider-sakuracloud_$(CURRENT_VERSION)_SHA256SUMS)
 
+.PHONY: test
 test:
 	TF_ACC= SAKURACLOUD_APPEND_USER_AGENT="$(UNIT_TEST_UA)" go test -mod=vendor -v $(TESTARGS) -timeout=30s ./...
 
+.PHONY: testacc
 testacc:
 	TF_ACC=1 SAKURACLOUD_APPEND_USER_AGENT="$(ACC_TEST_UA)" go test -mod=vendor -v $(TESTARGS) -timeout 240m ./...
 
+.PHONY: testfake
 testfake:
 	FAKE_MODE=1 TF_ACC=1 SAKURACLOUD_APPEND_USER_AGENT="$(ACC_TEST_UA)" go test -mod=vendor -v $(TESTARGS) -timeout 240m ./...
 
+.PHONY: lint
 lint:
 	golangci-lint run ./...
 
+.PHONY: tflint
 tflint:
 	tfproviderlint \
         -AT001 -AT002 -AT003 -AT004\
@@ -80,39 +92,22 @@ tflint:
         -S001 -S002 -S003 -S004 -S005 -S006 -S007 -S008 -S009 -S010 -S011 -S012 -S013 -S014 -S015 -S016 -S017 -S018 -S019\
         ./$(PKG_NAME)
 
+.PHONY: goimports
 goimports:
 	goimports -l -w $(PKG_NAME)/
 
+.PHONY: fmt
 fmt:
 	find . -name '*.go' | grep -v vendor | xargs gofmt -s -w
 
-.PHONY: build-docs serve-docs lint-docs
-build-docs:
-	sh -c "'$(CURDIR)/scripts/build_docs.sh'"
-
-serve-docs:
-	sh -c "'$(CURDIR)/scripts/serve_docs.sh'"
-
-lint-docs:
-	sh -c "'$(CURDIR)/scripts/lint_docs.sh'"
-
-serve-english-docs:
+.PHONY: preview-docs
+preview-docs:
 	sh -c "'$(CURDIR)/scripts/serve_english_docs.sh'"
 
-docker-test: 
-	sh -c "'$(CURDIR)/scripts/build_on_docker.sh' 'test'"
-
-docker-testacc: 
-	sh -c "'$(CURDIR)/scripts/build_on_docker.sh' 'testacc'"
-
-docker-testacc-resource:
-	sh -c "'$(CURDIR)/scripts/build_on_docker.sh' 'testacc-resource'"
-
-docker-build: clean 
+.PHONY: docker-build
+docker-build: clean
 	sh -c "'$(CURDIR)/scripts/build_on_docker.sh' 'tools' 'build-x'"
 
-
-.PHONY: default test vet testacc fmt fmtcheck
-
+.PHONY: set-license
 set-license:
 	@addlicense -c $(AUTHOR) -y $(COPYRIGHT_YEAR) $(COPYRIGHT_FILES)

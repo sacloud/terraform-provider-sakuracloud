@@ -24,8 +24,6 @@ matrix:
       script: make tflint
     - name: "make testfake"
       script: make testfake
-    - name: "make lint-docs"
-      script: make lint-docs
 before_deploy:
 - if [ "$TRAVIS_BRANCH" == "master" ]; then
     make docker-build;
