@@ -40,6 +40,9 @@ func SwitchFactoryFuncToFake() {
 	sacloud.SetClientFactoryFunc(ResourceCDROM, func(caller sacloud.APICaller) interface{} {
 		return NewCDROMOp()
 	})
+	sacloud.SetClientFactoryFunc(ResourceContainerRegistry, func(caller sacloud.APICaller) interface{} {
+		return NewContainerRegistryOp()
+	})
 	sacloud.SetClientFactoryFunc(ResourceCoupon, func(caller sacloud.APICaller) interface{} {
 		return NewCouponOp()
 	})
@@ -240,6 +243,22 @@ type CDROMOp struct {
 func NewCDROMOp() sacloud.CDROMAPI {
 	return &CDROMOp{
 		key: ResourceCDROM,
+	}
+}
+
+/*************************************************
+* ContainerRegistryOp
+*************************************************/
+
+// ContainerRegistryOp is fake implementation of ContainerRegistryAPI interface
+type ContainerRegistryOp struct {
+	key string
+}
+
+// NewContainerRegistryOp creates new ContainerRegistryOp instance
+func NewContainerRegistryOp() sacloud.ContainerRegistryAPI {
+	return &ContainerRegistryOp{
+		key: ResourceContainerRegistry,
 	}
 }
 

@@ -29,6 +29,8 @@ const (
 	ResourceBridge = "Bridge"
 	// ResourceCDROM is resource key of fake store
 	ResourceCDROM = "CDROM"
+	// ResourceContainerRegistry is resource key of fake store
+	ResourceContainerRegistry = "ContainerRegistry"
 	// ResourceCoupon is resource key of fake store
 	ResourceCoupon = "Coupon"
 	// ResourceDatabase is resource key of fake store

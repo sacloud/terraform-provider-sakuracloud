@@ -75,6 +75,14 @@ func init() {
 		}
 	})
 
+	SetClientFactoryFunc("ContainerRegistry", func(caller APICaller) interface{} {
+		return &ContainerRegistryOp{
+			Client:     caller,
+			PathSuffix: "api/cloud/1.1",
+			PathName:   "commonserviceitem",
+		}
+	})
+
 	SetClientFactoryFunc("Coupon", func(caller APICaller) interface{} {
 		return &CouponOp{
 			Client:     caller,
@@ -1582,6 +1590,369 @@ func (o *CDROMOp) CloseFTP(ctx context.Context, zone string, id types.ID) error 
 	}
 
 	url, err := buildURL("{{.rootURL}}/{{.zone}}/{{.pathSuffix}}/{{.pathName}}/{{.id}}/ftp", pathBuildParameter)
+	if err != nil {
+		return err
+	}
+	// build request body
+	var body interface{}
+
+	// do request
+	_, err = o.Client.Do(ctx, "DELETE", url, body)
+	if err != nil {
+		return err
+	}
+
+	// build results
+
+	return nil
+}
+
+/*************************************************
+* ContainerRegistryOp
+*************************************************/
+
+// ContainerRegistryOp implements ContainerRegistryAPI interface
+type ContainerRegistryOp struct {
+	// Client APICaller
+	Client APICaller
+	// PathSuffix is used when building URL
+	PathSuffix string
+	// PathName is used when building URL
+	PathName string
+}
+
+// NewContainerRegistryOp creates new ContainerRegistryOp instance
+func NewContainerRegistryOp(caller APICaller) ContainerRegistryAPI {
+	return GetClientFactoryFunc("ContainerRegistry")(caller).(ContainerRegistryAPI)
+}
+
+// Find is API call
+func (o *ContainerRegistryOp) Find(ctx context.Context, conditions *FindCondition) (*ContainerRegistryFindResult, error) {
+	// build request URL
+	pathBuildParameter := map[string]interface{}{
+		"rootURL":    SakuraCloudAPIRoot,
+		"pathSuffix": o.PathSuffix,
+		"pathName":   o.PathName,
+		"zone":       APIDefaultZone,
+		"conditions": conditions,
+	}
+
+	url, err := buildURL("{{.rootURL}}/{{.zone}}/{{.pathSuffix}}/{{.pathName}}", pathBuildParameter)
+	if err != nil {
+		return nil, err
+	}
+	// build request body
+	var body interface{}
+	v, err := o.transformFindArgs(conditions)
+	if err != nil {
+		return nil, err
+	}
+	body = v
+
+	// do request
+	data, err := o.Client.Do(ctx, "GET", url, body)
+	if err != nil {
+		return nil, err
+	}
+
+	// build results
+	results, err := o.transformFindResults(data)
+	if err != nil {
+		return nil, err
+	}
+	return results, err
+}
+
+// Create is API call
+func (o *ContainerRegistryOp) Create(ctx context.Context, param *ContainerRegistryCreateRequest) (*ContainerRegistry, error) {
+	// build request URL
+	pathBuildParameter := map[string]interface{}{
+		"rootURL":    SakuraCloudAPIRoot,
+		"pathSuffix": o.PathSuffix,
+		"pathName":   o.PathName,
+		"zone":       APIDefaultZone,
+		"param":      param,
+	}
+
+	url, err := buildURL("{{.rootURL}}/{{.zone}}/{{.pathSuffix}}/{{.pathName}}", pathBuildParameter)
+	if err != nil {
+		return nil, err
+	}
+	// build request body
+	var body interface{}
+	v, err := o.transformCreateArgs(param)
+	if err != nil {
+		return nil, err
+	}
+	body = v
+
+	// do request
+	data, err := o.Client.Do(ctx, "POST", url, body)
+	if err != nil {
+		return nil, err
+	}
+
+	// build results
+	results, err := o.transformCreateResults(data)
+	if err != nil {
+		return nil, err
+	}
+	return results.ContainerRegistry, nil
+}
+
+// Read is API call
+func (o *ContainerRegistryOp) Read(ctx context.Context, id types.ID) (*ContainerRegistry, error) {
+	// build request URL
+	pathBuildParameter := map[string]interface{}{
+		"rootURL":    SakuraCloudAPIRoot,
+		"pathSuffix": o.PathSuffix,
+		"pathName":   o.PathName,
+		"zone":       APIDefaultZone,
+		"id":         id,
+	}
+
+	url, err := buildURL("{{.rootURL}}/{{.zone}}/{{.pathSuffix}}/{{.pathName}}/{{.id}}", pathBuildParameter)
+	if err != nil {
+		return nil, err
+	}
+	// build request body
+	var body interface{}
+
+	// do request
+	data, err := o.Client.Do(ctx, "GET", url, body)
+	if err != nil {
+		return nil, err
+	}
+
+	// build results
+	results, err := o.transformReadResults(data)
+	if err != nil {
+		return nil, err
+	}
+	return results.ContainerRegistry, nil
+}
+
+// Update is API call
+func (o *ContainerRegistryOp) Update(ctx context.Context, id types.ID, param *ContainerRegistryUpdateRequest) (*ContainerRegistry, error) {
+	// build request URL
+	pathBuildParameter := map[string]interface{}{
+		"rootURL":    SakuraCloudAPIRoot,
+		"pathSuffix": o.PathSuffix,
+		"pathName":   o.PathName,
+		"zone":       APIDefaultZone,
+		"id":         id,
+		"param":      param,
+	}
+
+	url, err := buildURL("{{.rootURL}}/{{.zone}}/{{.pathSuffix}}/{{.pathName}}/{{.id}}", pathBuildParameter)
+	if err != nil {
+		return nil, err
+	}
+	// build request body
+	var body interface{}
+	v, err := o.transformUpdateArgs(id, param)
+	if err != nil {
+		return nil, err
+	}
+	body = v
+
+	// do request
+	data, err := o.Client.Do(ctx, "PUT", url, body)
+	if err != nil {
+		return nil, err
+	}
+
+	// build results
+	results, err := o.transformUpdateResults(data)
+	if err != nil {
+		return nil, err
+	}
+	return results.ContainerRegistry, nil
+}
+
+// UpdateSettings is API call
+func (o *ContainerRegistryOp) UpdateSettings(ctx context.Context, id types.ID, param *ContainerRegistryUpdateSettingsRequest) (*ContainerRegistry, error) {
+	// build request URL
+	pathBuildParameter := map[string]interface{}{
+		"rootURL":    SakuraCloudAPIRoot,
+		"pathSuffix": o.PathSuffix,
+		"pathName":   o.PathName,
+		"zone":       APIDefaultZone,
+		"id":         id,
+		"param":      param,
+	}
+
+	url, err := buildURL("{{.rootURL}}/{{.zone}}/{{.pathSuffix}}/{{.pathName}}/{{.id}}", pathBuildParameter)
+	if err != nil {
+		return nil, err
+	}
+	// build request body
+	var body interface{}
+	v, err := o.transformUpdateSettingsArgs(id, param)
+	if err != nil {
+		return nil, err
+	}
+	body = v
+
+	// do request
+	data, err := o.Client.Do(ctx, "PUT", url, body)
+	if err != nil {
+		return nil, err
+	}
+
+	// build results
+	results, err := o.transformUpdateSettingsResults(data)
+	if err != nil {
+		return nil, err
+	}
+	return results.ContainerRegistry, nil
+}
+
+// Delete is API call
+func (o *ContainerRegistryOp) Delete(ctx context.Context, id types.ID) error {
+	// build request URL
+	pathBuildParameter := map[string]interface{}{
+		"rootURL":    SakuraCloudAPIRoot,
+		"pathSuffix": o.PathSuffix,
+		"pathName":   o.PathName,
+		"zone":       APIDefaultZone,
+		"id":         id,
+	}
+
+	url, err := buildURL("{{.rootURL}}/{{.zone}}/{{.pathSuffix}}/{{.pathName}}/{{.id}}", pathBuildParameter)
+	if err != nil {
+		return err
+	}
+	// build request body
+	var body interface{}
+
+	// do request
+	_, err = o.Client.Do(ctx, "DELETE", url, body)
+	if err != nil {
+		return err
+	}
+
+	// build results
+
+	return nil
+}
+
+// ListUsers is API call
+func (o *ContainerRegistryOp) ListUsers(ctx context.Context, id types.ID) (*ContainerRegistryUsers, error) {
+	// build request URL
+	pathBuildParameter := map[string]interface{}{
+		"rootURL":    SakuraCloudAPIRoot,
+		"pathSuffix": o.PathSuffix,
+		"pathName":   o.PathName,
+		"zone":       APIDefaultZone,
+		"id":         id,
+	}
+
+	url, err := buildURL("{{.rootURL}}/{{.zone}}/{{.pathSuffix}}/{{.pathName}}/{{.id}}/containerregistry/users", pathBuildParameter)
+	if err != nil {
+		return nil, err
+	}
+	// build request body
+	var body interface{}
+
+	// do request
+	data, err := o.Client.Do(ctx, "GET", url, body)
+	if err != nil {
+		return nil, err
+	}
+
+	// build results
+	results, err := o.transformListUsersResults(data)
+	if err != nil {
+		return nil, err
+	}
+	return results.ContainerRegistryUsers, nil
+}
+
+// AddUser is API call
+func (o *ContainerRegistryOp) AddUser(ctx context.Context, id types.ID, param *ContainerRegistryUserCreateRequest) error {
+	// build request URL
+	pathBuildParameter := map[string]interface{}{
+		"rootURL":    SakuraCloudAPIRoot,
+		"pathSuffix": o.PathSuffix,
+		"pathName":   o.PathName,
+		"zone":       APIDefaultZone,
+		"id":         id,
+		"param":      param,
+	}
+
+	url, err := buildURL("{{.rootURL}}/{{.zone}}/{{.pathSuffix}}/{{.pathName}}/{{.id}}/containerregistry/users", pathBuildParameter)
+	if err != nil {
+		return err
+	}
+	// build request body
+	var body interface{}
+	v, err := o.transformAddUserArgs(id, param)
+	if err != nil {
+		return err
+	}
+	body = v
+
+	// do request
+	_, err = o.Client.Do(ctx, "POST", url, body)
+	if err != nil {
+		return err
+	}
+
+	// build results
+
+	return nil
+}
+
+// UpdateUser is API call
+func (o *ContainerRegistryOp) UpdateUser(ctx context.Context, id types.ID, username string, param *ContainerRegistryUserUpdateRequest) error {
+	// build request URL
+	pathBuildParameter := map[string]interface{}{
+		"rootURL":    SakuraCloudAPIRoot,
+		"pathSuffix": o.PathSuffix,
+		"pathName":   o.PathName,
+		"zone":       APIDefaultZone,
+		"id":         id,
+		"username":   username,
+		"param":      param,
+	}
+
+	url, err := buildURL("{{.rootURL}}/{{.zone}}/{{.pathSuffix}}/{{.pathName}}/{{.id}}/containerregistry/users/{{.username}}", pathBuildParameter)
+	if err != nil {
+		return err
+	}
+	// build request body
+	var body interface{}
+	v, err := o.transformUpdateUserArgs(id, username, param)
+	if err != nil {
+		return err
+	}
+	body = v
+
+	// do request
+	_, err = o.Client.Do(ctx, "PUT", url, body)
+	if err != nil {
+		return err
+	}
+
+	// build results
+
+	return nil
+}
+
+// DeleteUser is API call
+func (o *ContainerRegistryOp) DeleteUser(ctx context.Context, id types.ID, username string) error {
+	// build request URL
+	pathBuildParameter := map[string]interface{}{
+		"rootURL":    SakuraCloudAPIRoot,
+		"pathSuffix": o.PathSuffix,
+		"pathName":   o.PathName,
+		"zone":       APIDefaultZone,
+		"id":         id,
+		"username":   username,
+	}
+
+	url, err := buildURL("{{.rootURL}}/{{.zone}}/{{.pathSuffix}}/{{.pathName}}/{{.id}}/containerregistry/users/{{.username}}", pathBuildParameter)
 	if err != nil {
 		return err
 	}

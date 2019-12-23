@@ -773,6 +773,255 @@ func (o *CDROMOp) transformOpenFTPResults(data []byte) (*cDROMOpenFTPResult, err
 	return results, nil
 }
 
+func (o *ContainerRegistryOp) transformFindArgs(conditions *FindCondition) (*containerRegistryFindRequestEnvelope, error) {
+	if conditions == nil {
+		conditions = &FindCondition{}
+	}
+	var arg0 interface{} = conditions
+	if v, ok := arg0.(argumentDefaulter); ok {
+		arg0 = v.setDefaults()
+	}
+	args := &struct {
+		Arg0 interface{} `mapconv:",squash"`
+	}{
+		Arg0: arg0,
+	}
+
+	v := &containerRegistryFindRequestEnvelope{}
+	if err := mapconv.ConvertTo(args, v); err != nil {
+		return nil, err
+	}
+	return v, nil
+}
+
+func (o *ContainerRegistryOp) transformFindResults(data []byte) (*ContainerRegistryFindResult, error) {
+	nakedResponse := &containerRegistryFindResponseEnvelope{}
+	if err := json.Unmarshal(data, nakedResponse); err != nil {
+		return nil, err
+	}
+
+	results := &ContainerRegistryFindResult{}
+	if err := mapconv.ConvertFrom(nakedResponse, results); err != nil {
+		return nil, err
+	}
+	return results, nil
+}
+
+func (o *ContainerRegistryOp) transformCreateArgs(param *ContainerRegistryCreateRequest) (*containerRegistryCreateRequestEnvelope, error) {
+	if param == nil {
+		param = &ContainerRegistryCreateRequest{}
+	}
+	var arg0 interface{} = param
+	if v, ok := arg0.(argumentDefaulter); ok {
+		arg0 = v.setDefaults()
+	}
+	args := &struct {
+		Arg0 interface{} `mapconv:"CommonServiceItem,recursive"`
+	}{
+		Arg0: arg0,
+	}
+
+	v := &containerRegistryCreateRequestEnvelope{}
+	if err := mapconv.ConvertTo(args, v); err != nil {
+		return nil, err
+	}
+	return v, nil
+}
+
+func (o *ContainerRegistryOp) transformCreateResults(data []byte) (*containerRegistryCreateResult, error) {
+	nakedResponse := &containerRegistryCreateResponseEnvelope{}
+	if err := json.Unmarshal(data, nakedResponse); err != nil {
+		return nil, err
+	}
+
+	results := &containerRegistryCreateResult{}
+	if err := mapconv.ConvertFrom(nakedResponse, results); err != nil {
+		return nil, err
+	}
+	return results, nil
+}
+
+func (o *ContainerRegistryOp) transformReadResults(data []byte) (*containerRegistryReadResult, error) {
+	nakedResponse := &containerRegistryReadResponseEnvelope{}
+	if err := json.Unmarshal(data, nakedResponse); err != nil {
+		return nil, err
+	}
+
+	results := &containerRegistryReadResult{}
+	if err := mapconv.ConvertFrom(nakedResponse, results); err != nil {
+		return nil, err
+	}
+	return results, nil
+}
+
+func (o *ContainerRegistryOp) transformUpdateArgs(id types.ID, param *ContainerRegistryUpdateRequest) (*containerRegistryUpdateRequestEnvelope, error) {
+	if id == types.ID(int64(0)) {
+		id = types.ID(int64(0))
+	}
+	var arg0 interface{} = id
+	if v, ok := arg0.(argumentDefaulter); ok {
+		arg0 = v.setDefaults()
+	}
+	if param == nil {
+		param = &ContainerRegistryUpdateRequest{}
+	}
+	var arg1 interface{} = param
+	if v, ok := arg1.(argumentDefaulter); ok {
+		arg1 = v.setDefaults()
+	}
+	args := &struct {
+		Arg0 interface{}
+		Arg1 interface{} `mapconv:"CommonServiceItem,recursive"`
+	}{
+		Arg0: arg0,
+		Arg1: arg1,
+	}
+
+	v := &containerRegistryUpdateRequestEnvelope{}
+	if err := mapconv.ConvertTo(args, v); err != nil {
+		return nil, err
+	}
+	return v, nil
+}
+
+func (o *ContainerRegistryOp) transformUpdateResults(data []byte) (*containerRegistryUpdateResult, error) {
+	nakedResponse := &containerRegistryUpdateResponseEnvelope{}
+	if err := json.Unmarshal(data, nakedResponse); err != nil {
+		return nil, err
+	}
+
+	results := &containerRegistryUpdateResult{}
+	if err := mapconv.ConvertFrom(nakedResponse, results); err != nil {
+		return nil, err
+	}
+	return results, nil
+}
+
+func (o *ContainerRegistryOp) transformUpdateSettingsArgs(id types.ID, param *ContainerRegistryUpdateSettingsRequest) (*containerRegistryUpdateSettingsRequestEnvelope, error) {
+	if id == types.ID(int64(0)) {
+		id = types.ID(int64(0))
+	}
+	var arg0 interface{} = id
+	if v, ok := arg0.(argumentDefaulter); ok {
+		arg0 = v.setDefaults()
+	}
+	if param == nil {
+		param = &ContainerRegistryUpdateSettingsRequest{}
+	}
+	var arg1 interface{} = param
+	if v, ok := arg1.(argumentDefaulter); ok {
+		arg1 = v.setDefaults()
+	}
+	args := &struct {
+		Arg0 interface{}
+		Arg1 interface{} `mapconv:"CommonServiceItem,recursive"`
+	}{
+		Arg0: arg0,
+		Arg1: arg1,
+	}
+
+	v := &containerRegistryUpdateSettingsRequestEnvelope{}
+	if err := mapconv.ConvertTo(args, v); err != nil {
+		return nil, err
+	}
+	return v, nil
+}
+
+func (o *ContainerRegistryOp) transformUpdateSettingsResults(data []byte) (*containerRegistryUpdateSettingsResult, error) {
+	nakedResponse := &containerRegistryUpdateSettingsResponseEnvelope{}
+	if err := json.Unmarshal(data, nakedResponse); err != nil {
+		return nil, err
+	}
+
+	results := &containerRegistryUpdateSettingsResult{}
+	if err := mapconv.ConvertFrom(nakedResponse, results); err != nil {
+		return nil, err
+	}
+	return results, nil
+}
+
+func (o *ContainerRegistryOp) transformListUsersResults(data []byte) (*containerRegistryListUsersResult, error) {
+	nakedResponse := &containerRegistryListUsersResponseEnvelope{}
+	if err := json.Unmarshal(data, nakedResponse); err != nil {
+		return nil, err
+	}
+
+	results := &containerRegistryListUsersResult{}
+	if err := mapconv.ConvertFrom(nakedResponse, results); err != nil {
+		return nil, err
+	}
+	return results, nil
+}
+
+func (o *ContainerRegistryOp) transformAddUserArgs(id types.ID, param *ContainerRegistryUserCreateRequest) (*containerRegistryAddUserRequestEnvelope, error) {
+	if id == types.ID(int64(0)) {
+		id = types.ID(int64(0))
+	}
+	var arg0 interface{} = id
+	if v, ok := arg0.(argumentDefaulter); ok {
+		arg0 = v.setDefaults()
+	}
+	if param == nil {
+		param = &ContainerRegistryUserCreateRequest{}
+	}
+	var arg1 interface{} = param
+	if v, ok := arg1.(argumentDefaulter); ok {
+		arg1 = v.setDefaults()
+	}
+	args := &struct {
+		Arg0 interface{}
+		Arg1 interface{} `mapconv:"ContainerRegistry,recursive"`
+	}{
+		Arg0: arg0,
+		Arg1: arg1,
+	}
+
+	v := &containerRegistryAddUserRequestEnvelope{}
+	if err := mapconv.ConvertTo(args, v); err != nil {
+		return nil, err
+	}
+	return v, nil
+}
+
+func (o *ContainerRegistryOp) transformUpdateUserArgs(id types.ID, username string, param *ContainerRegistryUserUpdateRequest) (*containerRegistryUpdateUserRequestEnvelope, error) {
+	if id == types.ID(int64(0)) {
+		id = types.ID(int64(0))
+	}
+	var arg0 interface{} = id
+	if v, ok := arg0.(argumentDefaulter); ok {
+		arg0 = v.setDefaults()
+	}
+	if username == "" {
+		username = ""
+	}
+	var arg1 interface{} = username
+	if v, ok := arg1.(argumentDefaulter); ok {
+		arg1 = v.setDefaults()
+	}
+	if param == nil {
+		param = &ContainerRegistryUserUpdateRequest{}
+	}
+	var arg2 interface{} = param
+	if v, ok := arg2.(argumentDefaulter); ok {
+		arg2 = v.setDefaults()
+	}
+	args := &struct {
+		Arg0 interface{}
+		Arg1 interface{}
+		Arg2 interface{} `mapconv:"ContainerRegistry,recursive"`
+	}{
+		Arg0: arg0,
+		Arg1: arg1,
+		Arg2: arg2,
+	}
+
+	v := &containerRegistryUpdateUserRequestEnvelope{}
+	if err := mapconv.ConvertTo(args, v); err != nil {
+		return nil, err
+	}
+	return v, nil
+}
+
 func (o *CouponOp) transformFindResults(data []byte) (*CouponFindResult, error) {
 	nakedResponse := &couponFindResponseEnvelope{}
 	if err := json.Unmarshal(data, nakedResponse); err != nil {
