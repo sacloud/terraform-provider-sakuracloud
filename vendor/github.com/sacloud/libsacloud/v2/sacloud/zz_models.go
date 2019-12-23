@@ -3241,6 +3241,651 @@ func (o *CDROMUpdateRequest) SetIconID(v types.ID) {
 }
 
 /*************************************************
+* ContainerRegistry
+*************************************************/
+
+// ContainerRegistry represents API parameter/response structure
+type ContainerRegistry struct {
+	ID           types.ID
+	Name         string `validate:"required"`
+	Description  string `validate:"min=0,max=512"`
+	Tags         types.Tags
+	Availability types.EAvailability
+	IconID       types.ID `mapconv:"Icon.ID"`
+	CreatedAt    time.Time
+	ModifiedAt   time.Time
+	Visibility   types.EContainerRegistryVisibility `mapconv:"Settings.ContainerRegistry.Public"`
+	SettingsHash string                             `json:",omitempty" mapconv:",omitempty"`
+	NamePrefix   string                             `mapconv:"Status.RegistryName"`
+	FQDN         string                             `mapconv:"Status.FQDN"`
+}
+
+// Validate validates by field tags
+func (o *ContainerRegistry) Validate() error {
+	return validator.New().Struct(o)
+}
+
+// setDefaults implements sacloud.argumentDefaulter
+func (o *ContainerRegistry) setDefaults() interface{} {
+	return &struct {
+		ID           types.ID
+		Name         string `validate:"required"`
+		Description  string `validate:"min=0,max=512"`
+		Tags         types.Tags
+		Availability types.EAvailability
+		IconID       types.ID `mapconv:"Icon.ID"`
+		CreatedAt    time.Time
+		ModifiedAt   time.Time
+		Visibility   types.EContainerRegistryVisibility `mapconv:"Settings.ContainerRegistry.Public"`
+		SettingsHash string                             `json:",omitempty" mapconv:",omitempty"`
+		NamePrefix   string                             `mapconv:"Status.RegistryName"`
+		FQDN         string                             `mapconv:"Status.FQDN"`
+	}{
+		ID:           o.GetID(),
+		Name:         o.GetName(),
+		Description:  o.GetDescription(),
+		Tags:         o.GetTags(),
+		Availability: o.GetAvailability(),
+		IconID:       o.GetIconID(),
+		CreatedAt:    o.GetCreatedAt(),
+		ModifiedAt:   o.GetModifiedAt(),
+		Visibility:   o.GetVisibility(),
+		SettingsHash: o.GetSettingsHash(),
+		NamePrefix:   o.GetNamePrefix(),
+		FQDN:         o.GetFQDN(),
+	}
+}
+
+// GetID returns value of ID
+func (o *ContainerRegistry) GetID() types.ID {
+	return o.ID
+}
+
+// SetID sets value to ID
+func (o *ContainerRegistry) SetID(v types.ID) {
+	o.ID = v
+}
+
+// SetStringID .
+func (o *ContainerRegistry) SetStringID(id string) {
+	accessor.SetStringID(o, id)
+}
+
+// GetStringID .
+func (o *ContainerRegistry) GetStringID() string {
+	return accessor.GetStringID(o)
+}
+
+// SetInt64ID .
+func (o *ContainerRegistry) SetInt64ID(id int64) {
+	accessor.SetInt64ID(o, id)
+}
+
+// GetInt64ID .
+func (o *ContainerRegistry) GetInt64ID() int64 {
+	return accessor.GetInt64ID(o)
+}
+
+// GetName returns value of Name
+func (o *ContainerRegistry) GetName() string {
+	return o.Name
+}
+
+// SetName sets value to Name
+func (o *ContainerRegistry) SetName(v string) {
+	o.Name = v
+}
+
+// GetDescription returns value of Description
+func (o *ContainerRegistry) GetDescription() string {
+	return o.Description
+}
+
+// SetDescription sets value to Description
+func (o *ContainerRegistry) SetDescription(v string) {
+	o.Description = v
+}
+
+// GetTags returns value of Tags
+func (o *ContainerRegistry) GetTags() types.Tags {
+	return o.Tags
+}
+
+// SetTags sets value to Tags
+func (o *ContainerRegistry) SetTags(v types.Tags) {
+	o.Tags = v
+}
+
+// HasTag 指定のタグが存在する場合trueを返す
+func (o *ContainerRegistry) HasTag(tag string) bool {
+	return accessor.HasTag(o, tag)
+}
+
+// AppendTag 指定のタグを追加
+func (o *ContainerRegistry) AppendTag(tag string) {
+	accessor.AppendTag(o, tag)
+}
+
+// RemoveTag 指定のタグを削除
+func (o *ContainerRegistry) RemoveTag(tag string) {
+	accessor.RemoveTag(o, tag)
+}
+
+// ClearTags タグを全クリア
+func (o *ContainerRegistry) ClearTags() {
+	accessor.ClearTags(o)
+}
+
+// GetAvailability returns value of Availability
+func (o *ContainerRegistry) GetAvailability() types.EAvailability {
+	return o.Availability
+}
+
+// SetAvailability sets value to Availability
+func (o *ContainerRegistry) SetAvailability(v types.EAvailability) {
+	o.Availability = v
+}
+
+// GetIconID returns value of IconID
+func (o *ContainerRegistry) GetIconID() types.ID {
+	return o.IconID
+}
+
+// SetIconID sets value to IconID
+func (o *ContainerRegistry) SetIconID(v types.ID) {
+	o.IconID = v
+}
+
+// GetCreatedAt returns value of CreatedAt
+func (o *ContainerRegistry) GetCreatedAt() time.Time {
+	return o.CreatedAt
+}
+
+// SetCreatedAt sets value to CreatedAt
+func (o *ContainerRegistry) SetCreatedAt(v time.Time) {
+	o.CreatedAt = v
+}
+
+// GetModifiedAt returns value of ModifiedAt
+func (o *ContainerRegistry) GetModifiedAt() time.Time {
+	return o.ModifiedAt
+}
+
+// SetModifiedAt sets value to ModifiedAt
+func (o *ContainerRegistry) SetModifiedAt(v time.Time) {
+	o.ModifiedAt = v
+}
+
+// GetVisibility returns value of Visibility
+func (o *ContainerRegistry) GetVisibility() types.EContainerRegistryVisibility {
+	return o.Visibility
+}
+
+// SetVisibility sets value to Visibility
+func (o *ContainerRegistry) SetVisibility(v types.EContainerRegistryVisibility) {
+	o.Visibility = v
+}
+
+// GetSettingsHash returns value of SettingsHash
+func (o *ContainerRegistry) GetSettingsHash() string {
+	return o.SettingsHash
+}
+
+// SetSettingsHash sets value to SettingsHash
+func (o *ContainerRegistry) SetSettingsHash(v string) {
+	o.SettingsHash = v
+}
+
+// GetNamePrefix returns value of NamePrefix
+func (o *ContainerRegistry) GetNamePrefix() string {
+	return o.NamePrefix
+}
+
+// SetNamePrefix sets value to NamePrefix
+func (o *ContainerRegistry) SetNamePrefix(v string) {
+	o.NamePrefix = v
+}
+
+// GetFQDN returns value of FQDN
+func (o *ContainerRegistry) GetFQDN() string {
+	return o.FQDN
+}
+
+// SetFQDN sets value to FQDN
+func (o *ContainerRegistry) SetFQDN(v string) {
+	o.FQDN = v
+}
+
+/*************************************************
+* ContainerRegistryCreateRequest
+*************************************************/
+
+// ContainerRegistryCreateRequest represents API parameter/response structure
+type ContainerRegistryCreateRequest struct {
+	Name        string `validate:"required"`
+	Description string `validate:"min=0,max=512"`
+	Tags        types.Tags
+	IconID      types.ID                           `mapconv:"Icon.ID"`
+	Visibility  types.EContainerRegistryVisibility `mapconv:"Settings.ContainerRegistry.Public"`
+	NamePrefix  string                             `mapconv:"Status.RegistryName"`
+}
+
+// Validate validates by field tags
+func (o *ContainerRegistryCreateRequest) Validate() error {
+	return validator.New().Struct(o)
+}
+
+// setDefaults implements sacloud.argumentDefaulter
+func (o *ContainerRegistryCreateRequest) setDefaults() interface{} {
+	return &struct {
+		Name        string `validate:"required"`
+		Description string `validate:"min=0,max=512"`
+		Tags        types.Tags
+		IconID      types.ID                           `mapconv:"Icon.ID"`
+		Visibility  types.EContainerRegistryVisibility `mapconv:"Settings.ContainerRegistry.Public"`
+		NamePrefix  string                             `mapconv:"Status.RegistryName"`
+		Class       string                             `mapconv:"Provider.Class"`
+	}{
+		Name:        o.GetName(),
+		Description: o.GetDescription(),
+		Tags:        o.GetTags(),
+		IconID:      o.GetIconID(),
+		Visibility:  o.GetVisibility(),
+		NamePrefix:  o.GetNamePrefix(),
+		Class:       "containerregistry",
+	}
+}
+
+// GetName returns value of Name
+func (o *ContainerRegistryCreateRequest) GetName() string {
+	return o.Name
+}
+
+// SetName sets value to Name
+func (o *ContainerRegistryCreateRequest) SetName(v string) {
+	o.Name = v
+}
+
+// GetDescription returns value of Description
+func (o *ContainerRegistryCreateRequest) GetDescription() string {
+	return o.Description
+}
+
+// SetDescription sets value to Description
+func (o *ContainerRegistryCreateRequest) SetDescription(v string) {
+	o.Description = v
+}
+
+// GetTags returns value of Tags
+func (o *ContainerRegistryCreateRequest) GetTags() types.Tags {
+	return o.Tags
+}
+
+// SetTags sets value to Tags
+func (o *ContainerRegistryCreateRequest) SetTags(v types.Tags) {
+	o.Tags = v
+}
+
+// HasTag 指定のタグが存在する場合trueを返す
+func (o *ContainerRegistryCreateRequest) HasTag(tag string) bool {
+	return accessor.HasTag(o, tag)
+}
+
+// AppendTag 指定のタグを追加
+func (o *ContainerRegistryCreateRequest) AppendTag(tag string) {
+	accessor.AppendTag(o, tag)
+}
+
+// RemoveTag 指定のタグを削除
+func (o *ContainerRegistryCreateRequest) RemoveTag(tag string) {
+	accessor.RemoveTag(o, tag)
+}
+
+// ClearTags タグを全クリア
+func (o *ContainerRegistryCreateRequest) ClearTags() {
+	accessor.ClearTags(o)
+}
+
+// GetIconID returns value of IconID
+func (o *ContainerRegistryCreateRequest) GetIconID() types.ID {
+	return o.IconID
+}
+
+// SetIconID sets value to IconID
+func (o *ContainerRegistryCreateRequest) SetIconID(v types.ID) {
+	o.IconID = v
+}
+
+// GetVisibility returns value of Visibility
+func (o *ContainerRegistryCreateRequest) GetVisibility() types.EContainerRegistryVisibility {
+	return o.Visibility
+}
+
+// SetVisibility sets value to Visibility
+func (o *ContainerRegistryCreateRequest) SetVisibility(v types.EContainerRegistryVisibility) {
+	o.Visibility = v
+}
+
+// GetNamePrefix returns value of NamePrefix
+func (o *ContainerRegistryCreateRequest) GetNamePrefix() string {
+	return o.NamePrefix
+}
+
+// SetNamePrefix sets value to NamePrefix
+func (o *ContainerRegistryCreateRequest) SetNamePrefix(v string) {
+	o.NamePrefix = v
+}
+
+/*************************************************
+* ContainerRegistryUpdateRequest
+*************************************************/
+
+// ContainerRegistryUpdateRequest represents API parameter/response structure
+type ContainerRegistryUpdateRequest struct {
+	Name         string `validate:"required"`
+	Description  string `validate:"min=0,max=512"`
+	Tags         types.Tags
+	IconID       types.ID                           `mapconv:"Icon.ID"`
+	Visibility   types.EContainerRegistryVisibility `mapconv:"Settings.ContainerRegistry.Public"`
+	SettingsHash string                             `json:",omitempty" mapconv:",omitempty"`
+}
+
+// Validate validates by field tags
+func (o *ContainerRegistryUpdateRequest) Validate() error {
+	return validator.New().Struct(o)
+}
+
+// setDefaults implements sacloud.argumentDefaulter
+func (o *ContainerRegistryUpdateRequest) setDefaults() interface{} {
+	return &struct {
+		Name         string `validate:"required"`
+		Description  string `validate:"min=0,max=512"`
+		Tags         types.Tags
+		IconID       types.ID                           `mapconv:"Icon.ID"`
+		Visibility   types.EContainerRegistryVisibility `mapconv:"Settings.ContainerRegistry.Public"`
+		SettingsHash string                             `json:",omitempty" mapconv:",omitempty"`
+	}{
+		Name:         o.GetName(),
+		Description:  o.GetDescription(),
+		Tags:         o.GetTags(),
+		IconID:       o.GetIconID(),
+		Visibility:   o.GetVisibility(),
+		SettingsHash: o.GetSettingsHash(),
+	}
+}
+
+// GetName returns value of Name
+func (o *ContainerRegistryUpdateRequest) GetName() string {
+	return o.Name
+}
+
+// SetName sets value to Name
+func (o *ContainerRegistryUpdateRequest) SetName(v string) {
+	o.Name = v
+}
+
+// GetDescription returns value of Description
+func (o *ContainerRegistryUpdateRequest) GetDescription() string {
+	return o.Description
+}
+
+// SetDescription sets value to Description
+func (o *ContainerRegistryUpdateRequest) SetDescription(v string) {
+	o.Description = v
+}
+
+// GetTags returns value of Tags
+func (o *ContainerRegistryUpdateRequest) GetTags() types.Tags {
+	return o.Tags
+}
+
+// SetTags sets value to Tags
+func (o *ContainerRegistryUpdateRequest) SetTags(v types.Tags) {
+	o.Tags = v
+}
+
+// HasTag 指定のタグが存在する場合trueを返す
+func (o *ContainerRegistryUpdateRequest) HasTag(tag string) bool {
+	return accessor.HasTag(o, tag)
+}
+
+// AppendTag 指定のタグを追加
+func (o *ContainerRegistryUpdateRequest) AppendTag(tag string) {
+	accessor.AppendTag(o, tag)
+}
+
+// RemoveTag 指定のタグを削除
+func (o *ContainerRegistryUpdateRequest) RemoveTag(tag string) {
+	accessor.RemoveTag(o, tag)
+}
+
+// ClearTags タグを全クリア
+func (o *ContainerRegistryUpdateRequest) ClearTags() {
+	accessor.ClearTags(o)
+}
+
+// GetIconID returns value of IconID
+func (o *ContainerRegistryUpdateRequest) GetIconID() types.ID {
+	return o.IconID
+}
+
+// SetIconID sets value to IconID
+func (o *ContainerRegistryUpdateRequest) SetIconID(v types.ID) {
+	o.IconID = v
+}
+
+// GetVisibility returns value of Visibility
+func (o *ContainerRegistryUpdateRequest) GetVisibility() types.EContainerRegistryVisibility {
+	return o.Visibility
+}
+
+// SetVisibility sets value to Visibility
+func (o *ContainerRegistryUpdateRequest) SetVisibility(v types.EContainerRegistryVisibility) {
+	o.Visibility = v
+}
+
+// GetSettingsHash returns value of SettingsHash
+func (o *ContainerRegistryUpdateRequest) GetSettingsHash() string {
+	return o.SettingsHash
+}
+
+// SetSettingsHash sets value to SettingsHash
+func (o *ContainerRegistryUpdateRequest) SetSettingsHash(v string) {
+	o.SettingsHash = v
+}
+
+/*************************************************
+* ContainerRegistryUpdateSettingsRequest
+*************************************************/
+
+// ContainerRegistryUpdateSettingsRequest represents API parameter/response structure
+type ContainerRegistryUpdateSettingsRequest struct {
+	Visibility   types.EContainerRegistryVisibility `mapconv:"Settings.ContainerRegistry.Public"`
+	SettingsHash string                             `json:",omitempty" mapconv:",omitempty"`
+}
+
+// Validate validates by field tags
+func (o *ContainerRegistryUpdateSettingsRequest) Validate() error {
+	return validator.New().Struct(o)
+}
+
+// setDefaults implements sacloud.argumentDefaulter
+func (o *ContainerRegistryUpdateSettingsRequest) setDefaults() interface{} {
+	return &struct {
+		Visibility   types.EContainerRegistryVisibility `mapconv:"Settings.ContainerRegistry.Public"`
+		SettingsHash string                             `json:",omitempty" mapconv:",omitempty"`
+	}{
+		Visibility:   o.GetVisibility(),
+		SettingsHash: o.GetSettingsHash(),
+	}
+}
+
+// GetVisibility returns value of Visibility
+func (o *ContainerRegistryUpdateSettingsRequest) GetVisibility() types.EContainerRegistryVisibility {
+	return o.Visibility
+}
+
+// SetVisibility sets value to Visibility
+func (o *ContainerRegistryUpdateSettingsRequest) SetVisibility(v types.EContainerRegistryVisibility) {
+	o.Visibility = v
+}
+
+// GetSettingsHash returns value of SettingsHash
+func (o *ContainerRegistryUpdateSettingsRequest) GetSettingsHash() string {
+	return o.SettingsHash
+}
+
+// SetSettingsHash sets value to SettingsHash
+func (o *ContainerRegistryUpdateSettingsRequest) SetSettingsHash(v string) {
+	o.SettingsHash = v
+}
+
+/*************************************************
+* ContainerRegistryUsers
+*************************************************/
+
+// ContainerRegistryUsers represents API parameter/response structure
+type ContainerRegistryUsers struct {
+	Users []*ContainerRegistryUser
+}
+
+// Validate validates by field tags
+func (o *ContainerRegistryUsers) Validate() error {
+	return validator.New().Struct(o)
+}
+
+// setDefaults implements sacloud.argumentDefaulter
+func (o *ContainerRegistryUsers) setDefaults() interface{} {
+	return &struct {
+		Users []*ContainerRegistryUser
+	}{
+		Users: o.GetUsers(),
+	}
+}
+
+// GetUsers returns value of Users
+func (o *ContainerRegistryUsers) GetUsers() []*ContainerRegistryUser {
+	return o.Users
+}
+
+// SetUsers sets value to Users
+func (o *ContainerRegistryUsers) SetUsers(v []*ContainerRegistryUser) {
+	o.Users = v
+}
+
+/*************************************************
+* ContainerRegistryUser
+*************************************************/
+
+// ContainerRegistryUser represents API parameter/response structure
+type ContainerRegistryUser struct {
+	UserName string
+}
+
+// Validate validates by field tags
+func (o *ContainerRegistryUser) Validate() error {
+	return validator.New().Struct(o)
+}
+
+// setDefaults implements sacloud.argumentDefaulter
+func (o *ContainerRegistryUser) setDefaults() interface{} {
+	return &struct {
+		UserName string
+	}{
+		UserName: o.GetUserName(),
+	}
+}
+
+// GetUserName returns value of UserName
+func (o *ContainerRegistryUser) GetUserName() string {
+	return o.UserName
+}
+
+// SetUserName sets value to UserName
+func (o *ContainerRegistryUser) SetUserName(v string) {
+	o.UserName = v
+}
+
+/*************************************************
+* ContainerRegistryUserCreateRequest
+*************************************************/
+
+// ContainerRegistryUserCreateRequest represents API parameter/response structure
+type ContainerRegistryUserCreateRequest struct {
+	UserName string
+	Password string
+}
+
+// Validate validates by field tags
+func (o *ContainerRegistryUserCreateRequest) Validate() error {
+	return validator.New().Struct(o)
+}
+
+// setDefaults implements sacloud.argumentDefaulter
+func (o *ContainerRegistryUserCreateRequest) setDefaults() interface{} {
+	return &struct {
+		UserName string
+		Password string
+	}{
+		UserName: o.GetUserName(),
+		Password: o.GetPassword(),
+	}
+}
+
+// GetUserName returns value of UserName
+func (o *ContainerRegistryUserCreateRequest) GetUserName() string {
+	return o.UserName
+}
+
+// SetUserName sets value to UserName
+func (o *ContainerRegistryUserCreateRequest) SetUserName(v string) {
+	o.UserName = v
+}
+
+// GetPassword returns value of Password
+func (o *ContainerRegistryUserCreateRequest) GetPassword() string {
+	return o.Password
+}
+
+// SetPassword sets value to Password
+func (o *ContainerRegistryUserCreateRequest) SetPassword(v string) {
+	o.Password = v
+}
+
+/*************************************************
+* ContainerRegistryUserUpdateRequest
+*************************************************/
+
+// ContainerRegistryUserUpdateRequest represents API parameter/response structure
+type ContainerRegistryUserUpdateRequest struct {
+	Password string
+}
+
+// Validate validates by field tags
+func (o *ContainerRegistryUserUpdateRequest) Validate() error {
+	return validator.New().Struct(o)
+}
+
+// setDefaults implements sacloud.argumentDefaulter
+func (o *ContainerRegistryUserUpdateRequest) setDefaults() interface{} {
+	return &struct {
+		Password string
+	}{
+		Password: o.GetPassword(),
+	}
+}
+
+// GetPassword returns value of Password
+func (o *ContainerRegistryUserUpdateRequest) GetPassword() string {
+	return o.Password
+}
+
+// SetPassword sets value to Password
+func (o *ContainerRegistryUserUpdateRequest) SetPassword(v string) {
+	o.Password = v
+}
+
+/*************************************************
 * Coupon
 *************************************************/
 
