@@ -24,7 +24,7 @@ tools:
 	GO111MODULE=off go get -u github.com/bflad/tfproviderlint/cmd/tfproviderlint
 
 build-envs:
-	$(eval CURRENT_VERSION := $(shell gobump show -r sakuracloud/))
+	$(eval CURRENT_VERSION ?= $(shell gobump show -r sakuracloud/))
 	$(eval BUILD_LDFLAGS := "-s -w \
            -X github.com/sacloud/terraform-provider-sakuracloud/sakuracloud.Revision=`git rev-parse --short HEAD` \
            -X github.com/sacloud/terraform-provider-sakuracloud/sakuracloud.Version=$(CURRENT_VERSION)")
