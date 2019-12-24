@@ -9,7 +9,7 @@ ACC_TEST_UA ?= (Acceptance Test)
 
 export GO111MODULE=on
 
-default: fmt goimports lint tflint
+default: fmt goimports set-license lint tflint
 
 clean:
 	rm -Rf $(CURDIR)/bin/*
@@ -110,4 +110,4 @@ docker-build: clean
 
 .PHONY: set-license
 set-license:
-	@addlicense -c $(AUTHOR) -y $(COPYRIGHT_YEAR) $(COPYRIGHT_FILES)
+	addlicense -c $(AUTHOR) -y $(COPYRIGHT_YEAR) $(COPYRIGHT_FILES)
