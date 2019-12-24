@@ -44,12 +44,12 @@ func resourceSakuraCloudContainerRegistry() *schema.Resource {
 				Type:     schema.TypeString,
 				Required: true,
 			},
-			"visibility": {
+			"access_level": {
 				Type:         schema.TypeString,
 				Required:     true,
 				ValidateFunc: validation.StringInSlice(types.ContainerRegistryVisibilityStrings, false),
 			},
-			"prefix": {
+			"subdomain_label": {
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
@@ -182,11 +182,11 @@ func resourceSakuraCloudContainerRegistryDelete(d *schema.ResourceData, meta int
 }
 
 func setContainerRegistryResourceData(ctx context.Context, d *schema.ResourceData, client *APIClient, data *sacloud.ContainerRegistry) error {
-	d.Set("name", data.Name)               // nolint
-	d.Set("visibility", data.Visibility)   // nolint
-	d.Set("prefix", data.NamePrefix)       // nolint
-	d.Set("fqdn", data.FQDN)               // nolint
-	d.Set("icon_id", data.IconID.String()) // nolint
-	d.Set("description", data.Description) // nolint
+	d.Set("name", data.Name)                         // nolint
+	d.Set("access_level", data.AccessLevel.String()) // nolint
+	d.Set("subdomain_label", data.SubDomainLabel)    // nolint
+	d.Set("fqdn", data.FQDN)                         // nolint
+	d.Set("icon_id", data.IconID.String())           // nolint
+	d.Set("description", data.Description)           // nolint
 	return d.Set("tags", flattenTags(data.Tags))
 }

@@ -36,11 +36,11 @@ func dataSourceSakuraCloudContainerRegistry() *schema.Resource {
 				Type:     schema.TypeString,
 				Computed: true,
 			},
-			"visibility": {
+			"access_level": {
 				Type:     schema.TypeString,
 				Computed: true,
 			},
-			"prefix": {
+			"subdomain_label": {
 				Type:     schema.TypeString,
 				Computed: true,
 			},

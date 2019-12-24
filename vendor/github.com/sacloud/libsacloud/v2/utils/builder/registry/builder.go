@@ -22,15 +22,15 @@ import (
 	"github.com/sacloud/libsacloud/v2/sacloud/types"
 )
 
-// Builder SIMのセットアップを行う
+// Builder コンテナレジストリのセットアップを行う
 type Builder struct {
-	Name        string
-	Description string
-	Tags        types.Tags
-	IconID      types.ID
-	Visibility  types.EContainerRegistryVisibility
-	NamePrefix  string
-	Users       []*User
+	Name           string
+	Description    string
+	Tags           types.Tags
+	IconID         types.ID
+	AccessLevel    types.EContainerRegistryAccessLevel
+	SubDomainLabel string
+	Users          []*User
 
 	SettingsHash string
 	Client       *APIClient
@@ -44,7 +44,7 @@ type User struct {
 
 // Validate 値の検証
 func (b *Builder) Validate(ctx context.Context) error {
-	if b.NamePrefix == "" {
+	if b.SubDomainLabel == "" {
 		return fmt.Errorf("name prefix is required")
 	}
 	return nil
@@ -57,12 +57,12 @@ func (b *Builder) Build(ctx context.Context) (*sacloud.ContainerRegistry, error)
 	}
 
 	reg, err := b.Client.ContainerRegistry.Create(ctx, &sacloud.ContainerRegistryCreateRequest{
-		Name:        b.Name,
-		Description: b.Description,
-		Tags:        b.Tags,
-		IconID:      b.IconID,
-		Visibility:  b.Visibility,
-		NamePrefix:  b.NamePrefix,
+		Name:           b.Name,
+		Description:    b.Description,
+		Tags:           b.Tags,
+		IconID:         b.IconID,
+		AccessLevel:    b.AccessLevel,
+		SubDomainLabel: b.SubDomainLabel,
 	})
 	if err != nil {
 		return nil, err
@@ -82,7 +82,7 @@ func (b *Builder) Build(ctx context.Context) (*sacloud.ContainerRegistry, error)
 	return reg, nil
 }
 
-// Update SIMの更新
+// Update コンテナレジストリの更新
 func (b *Builder) Update(ctx context.Context, id types.ID) (*sacloud.ContainerRegistry, error) {
 	if err := b.Validate(ctx); err != nil {
 		return nil, err
@@ -99,7 +99,7 @@ func (b *Builder) Update(ctx context.Context, id types.ID) (*sacloud.ContainerRe
 		Description:  b.Description,
 		Tags:         b.Tags,
 		IconID:       b.IconID,
-		Visibility:   b.Visibility,
+		AccessLevel:  b.AccessLevel,
 		SettingsHash: b.SettingsHash,
 	})
 	if err != nil {

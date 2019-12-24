@@ -29,7 +29,7 @@ import (
 func TestAccSakuraCloudContainerRegistry_basic(t *testing.T) {
 	resourceName := "sakuracloud_container_registry.foobar"
 	rand := randomName()
-	prefix := acctest.RandStringFromCharSet(60, acctest.CharSetAlpha)
+	subDomainLabel := acctest.RandStringFromCharSet(60, acctest.CharSetAlpha)
 	password := randomPassword()
 
 	var reg sacloud.ContainerRegistry
@@ -42,13 +42,13 @@ func TestAccSakuraCloudContainerRegistry_basic(t *testing.T) {
 		),
 		Steps: []resource.TestStep{
 			{
-				Config: buildConfigWithArgs(testAccSakuraCloudContainerRegistry_basic, rand, prefix, password),
+				Config: buildConfigWithArgs(testAccSakuraCloudContainerRegistry_basic, rand, subDomainLabel, password),
 				Check: resource.ComposeTestCheckFunc(
 					testCheckSakuraCloudContainerRegistryExists(resourceName, &reg),
 					resource.TestCheckResourceAttr(resourceName, "name", rand),
-					resource.TestCheckResourceAttr(resourceName, "prefix", prefix),
-					resource.TestCheckResourceAttr(resourceName, "fqdn", prefix+".sakuracr.jp"),
-					resource.TestCheckResourceAttr(resourceName, "visibility", "readwrite"),
+					resource.TestCheckResourceAttr(resourceName, "subdomain_label", subDomainLabel),
+					resource.TestCheckResourceAttr(resourceName, "fqdn", subDomainLabel+".sakuracr.jp"),
+					resource.TestCheckResourceAttr(resourceName, "access_level", "readwrite"),
 					resource.TestCheckResourceAttr(resourceName, "description", "description"),
 					resource.TestCheckResourceAttr(resourceName, "tags.#", "2"),
 					resource.TestCheckResourceAttr(resourceName, "tags.4151227546", "tag1"),
@@ -63,13 +63,13 @@ func TestAccSakuraCloudContainerRegistry_basic(t *testing.T) {
 				),
 			},
 			{
-				Config: buildConfigWithArgs(testAccSakuraCloudContainerRegistry_update, rand, prefix, password),
+				Config: buildConfigWithArgs(testAccSakuraCloudContainerRegistry_update, rand, subDomainLabel, password),
 				Check: resource.ComposeTestCheckFunc(
 					testCheckSakuraCloudContainerRegistryExists(resourceName, &reg),
 					resource.TestCheckResourceAttr(resourceName, "name", rand+"-upd"),
-					resource.TestCheckResourceAttr(resourceName, "prefix", prefix),
-					resource.TestCheckResourceAttr(resourceName, "fqdn", prefix+".sakuracr.jp"),
-					resource.TestCheckResourceAttr(resourceName, "visibility", "readonly"),
+					resource.TestCheckResourceAttr(resourceName, "subdomain_label", subDomainLabel),
+					resource.TestCheckResourceAttr(resourceName, "fqdn", subDomainLabel+".sakuracr.jp"),
+					resource.TestCheckResourceAttr(resourceName, "access_level", "readonly"),
 					resource.TestCheckResourceAttr(resourceName, "description", "description-upd"),
 					resource.TestCheckResourceAttr(resourceName, "tags.#", "2"),
 					resource.TestCheckResourceAttr(resourceName, "tags.2362157161", "tag1-upd"),
@@ -138,9 +138,9 @@ func testCheckSakuraCloudContainerRegistryDestroy(s *terraform.State) error {
 
 var testAccSakuraCloudContainerRegistry_basic = `
 resource "sakuracloud_container_registry" "foobar" {
-  name        = "{{ .arg0 }}"
-  prefix      = "{{ .arg1 }}"
-  visibility  = "readwrite"
+  name            = "{{ .arg0 }}"
+  subdomain_label = "{{ .arg1 }}"
+  access_level    = "readwrite"
 
   description = "description"
   tags        = ["tag1", "tag2"]
@@ -164,9 +164,9 @@ resource "sakuracloud_icon" "foobar" {
 
 var testAccSakuraCloudContainerRegistry_update = `
 resource "sakuracloud_container_registry" "foobar" {
-  name        = "{{ .arg0 }}-upd"
-  prefix      = "{{ .arg1 }}"
-  visibility  = "readonly"
+  name            = "{{ .arg0 }}-upd"
+  subdomain_label = "{{ .arg1 }}"
+  access_level    = "readonly"
 
   description = "description-upd"
   tags        = ["tag1-upd", "tag2-upd"]
