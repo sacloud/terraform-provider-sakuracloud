@@ -45,9 +45,9 @@ func TestAccSakuraCloudDataSourceContainerRegistry_basic(t *testing.T) {
 
 var testAccSakuraCloudDataSourceContainerRegistry_basic = `
 resource "sakuracloud_container_registry" "foobar" {
-  name        = "{{ .arg0 }}"
-  prefix      = "{{ .arg1 }}"
-  visibility  = "readwrite"
+  name            = "{{ .arg0 }}"
+  subdomain_label = "{{ .arg1 }}"
+  access_level    = "readwrite"
 
   description = "description"
   tags        = ["tag1", "tag2"]

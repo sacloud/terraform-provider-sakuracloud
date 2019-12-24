@@ -44,7 +44,7 @@ func (o *ContainerRegistryOp) Create(ctx context.Context, param *sacloud.Contain
 	copySameNameField(param, result)
 	fill(result, fillID, fillCreatedAt)
 
-	result.FQDN = result.NamePrefix + ".sakuracr.jp"
+	result.FQDN = result.SubDomainLabel + ".sakuracr.jp"
 	result.Availability = types.Availabilities.Available
 	putContainerRegistry(sacloud.APIDefaultZone, result)
 	return result, nil

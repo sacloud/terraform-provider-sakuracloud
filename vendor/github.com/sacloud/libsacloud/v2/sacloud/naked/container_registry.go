@@ -50,14 +50,14 @@ type ContainerRegistrySettings struct {
 
 // ContainerRegistrySetting セッティング
 type ContainerRegistrySetting struct {
-	Public        types.EContainerRegistryVisibility `json:"public" yaml:"public"` // readwrite or readonly or none
-	VirtualDomain string                             `json:"virtual_domain" yaml:"virtual_domain"`
+	Public        types.EContainerRegistryAccessLevel `json:"public" yaml:"public"` // readwrite or readonly or none
+	VirtualDomain string                              `json:"virtual_domain" yaml:"virtual_domain"`
 }
 
 // ContainerRegistryStatus ステータス
 type ContainerRegistryStatus struct {
 	RegistryName string `json:"registry_name" yaml:"registry_name"`
-	FQDN         string `json:"hostname,omitempty" yanl:"hostname,omitempty"`
+	FQDN         string `json:"hostname,omitempty" yaml:"hostname,omitempty"`
 }
 
 // ContainerRegistryUser コンテナレジストリのユーザ
