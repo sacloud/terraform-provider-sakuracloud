@@ -14,18 +14,18 @@
 
 package types
 
-type EContainerRegistryVisibility string
+type EContainerRegistryAccessLevel string
 
 // String EContainerRegistryVisibilityの文字列表現
-func (v EContainerRegistryVisibility) String() string {
+func (v EContainerRegistryAccessLevel) String() string {
 	return string(v)
 }
 
-// ContainerRegistryVisibilities コンテナレジストリのアクセス範囲
-var ContainerRegistryVisibilities = struct {
-	ReadWrite EContainerRegistryVisibility
-	ReadOnly  EContainerRegistryVisibility
-	None      EContainerRegistryVisibility
+// ContainerRegistryAccessLevels コンテナレジストリのアクセス範囲
+var ContainerRegistryAccessLevels = struct {
+	ReadWrite EContainerRegistryAccessLevel
+	ReadOnly  EContainerRegistryAccessLevel
+	None      EContainerRegistryAccessLevel
 }{
 	ReadWrite: "readwrite",
 	ReadOnly:  "readonly",
@@ -34,14 +34,14 @@ var ContainerRegistryVisibilities = struct {
 
 // ContainerRegistryVisibilityStrings アクセス範囲に指定可能な文字列
 var ContainerRegistryVisibilityStrings = []string{
-	ContainerRegistryVisibilities.ReadWrite.String(),
-	ContainerRegistryVisibilities.ReadOnly.String(),
-	ContainerRegistryVisibilities.None.String(),
+	ContainerRegistryAccessLevels.ReadWrite.String(),
+	ContainerRegistryAccessLevels.ReadOnly.String(),
+	ContainerRegistryAccessLevels.None.String(),
 }
 
 // ContainerRegistryVisibilityMap 文字列とEContainerRegistryVisibilityのマップ
-var ContainerRegistryVisibilityMap = map[string]EContainerRegistryVisibility{
-	ContainerRegistryVisibilities.ReadWrite.String(): ContainerRegistryVisibilities.ReadWrite,
-	ContainerRegistryVisibilities.ReadOnly.String():  ContainerRegistryVisibilities.ReadOnly,
-	ContainerRegistryVisibilities.None.String():      ContainerRegistryVisibilities.None,
+var ContainerRegistryVisibilityMap = map[string]EContainerRegistryAccessLevel{
+	ContainerRegistryAccessLevels.ReadWrite.String(): ContainerRegistryAccessLevels.ReadWrite,
+	ContainerRegistryAccessLevels.ReadOnly.String():  ContainerRegistryAccessLevels.ReadOnly,
+	ContainerRegistryAccessLevels.None.String():      ContainerRegistryAccessLevels.None,
 }

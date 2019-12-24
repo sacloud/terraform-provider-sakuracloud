@@ -22,15 +22,15 @@ import (
 
 func expandContainerRegistryBuilder(d *schema.ResourceData, client *APIClient, settingsHash string) *registryUtil.Builder {
 	return &registryUtil.Builder{
-		Name:         d.Get("name").(string),
-		Description:  d.Get("description").(string),
-		Tags:         expandTags(d),
-		IconID:       expandSakuraCloudID(d, "icon_id"),
-		Visibility:   types.EContainerRegistryVisibility(d.Get("visibility").(string)),
-		NamePrefix:   d.Get("prefix").(string),
-		Users:        expandContainerRegistryUsers(d),
-		SettingsHash: settingsHash,
-		Client:       registryUtil.NewAPIClient(client),
+		Name:           d.Get("name").(string),
+		Description:    d.Get("description").(string),
+		Tags:           expandTags(d),
+		IconID:         expandSakuraCloudID(d, "icon_id"),
+		AccessLevel:    types.EContainerRegistryAccessLevel(d.Get("access_level").(string)),
+		SubDomainLabel: d.Get("subdomain_label").(string),
+		Users:          expandContainerRegistryUsers(d),
+		SettingsHash:   settingsHash,
+		Client:         registryUtil.NewAPIClient(client),
 	}
 }
 
