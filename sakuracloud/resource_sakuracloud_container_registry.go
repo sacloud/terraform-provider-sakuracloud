@@ -91,6 +91,8 @@ func resourceSakuraCloudContainerRegistry() *schema.Resource {
 				},
 			},
 		},
+
+		DeprecationMessage: "sakuracloud_container_registry is an experimental resource. Please note that you will need to update the tfstate manually if the resource schema is changed.",
 	}
 }
 
