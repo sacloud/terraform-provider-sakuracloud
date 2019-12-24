@@ -1,0 +1,234 @@
+<% wrap_layout :inner do %>
+  <% content_for :sidebar do %>
+    <div class="docs-sidebar hidden-print affix-top" role="complementary">
+      <ul class="nav docs-sidenav">
+        <li>
+          <a href="/docs/providers/index.html">All Providers</a>
+        </li>
+
+        <li>
+          <a href="/docs/providers/sakuracloud/index.html">SakuraCloud Providers</a>
+        </li>
+
+        <li>
+          <a href="#">Data Sources</a>
+          <ul class="nav">
+            <li>
+              <a href="/docs/providers/sakuracloud/d/archive.html">sakuracloud_archive</a>
+            </li>
+            <li>
+              <a href="/docs/providers/sakuracloud/d/bridge.html">sakuracloud_bridge</a>
+            </li>
+            <li>
+              <a href="/docs/providers/sakuracloud/d/bucket_object.html">sakuracloud_bucket_object</a>
+            </li>
+            <li>
+              <a href="/docs/providers/sakuracloud/d/cdrom.html">sakuracloud_cdrom</a>
+            </li>
+            <li>
+              <a href="/docs/providers/sakuracloud/d/database.html">sakuracloud_database</a>
+            </li>
+            <li>
+              <a href="/docs/providers/sakuracloud/d/disk.html">sakuracloud_disk</a>
+            </li>
+            <li>
+              <a href="/docs/providers/sakuracloud/d/dns.html">sakuracloud_dns</a>
+            </li>
+            <li>
+              <a href="/docs/providers/sakuracloud/d/gslb.html">sakuracloud_gslb</a>
+            </li>
+            <li>
+              <a href="/docs/providers/sakuracloud/d/icon.html">sakuracloud_icon</a>
+            </li>
+            <li>
+              <a href="/docs/providers/sakuracloud/d/internet.html">sakuracloud_internet</a>
+            </li>
+            <li>
+              <a href="/docs/providers/sakuracloud/d/load_balancer.html">sakuracloud_load_balancer</a>
+            </li>
+            <li>
+              <a href="/docs/providers/sakuracloud/d/nfs.html">sakuracloud_nfs</a>
+            </li>
+            <li>
+              <a href="/docs/providers/sakuracloud/d/note.html">sakuracloud_note</a>
+            </li>
+            <li>
+              <a href="/docs/providers/sakuracloud/d/packet_filter.html">sakuracloud_packet_filter</a>
+            </li>
+            <li>
+              <a href="/docs/providers/sakuracloud/d/proxylb.html">sakuracloud_proxylb</a>
+            </li>
+            <li>
+              <a href="/docs/providers/sakuracloud/d/private_host.html">sakuracloud_private_host</a>
+            </li>
+            <li>
+              <a href="/docs/providers/sakuracloud/d/server.html">sakuracloud_server</a>
+            </li>
+            <li>
+              <a href="/docs/providers/sakuracloud/d/simple_monitor.html">sakuracloud_simple_monitor</a>
+            </li>
+            <li>
+              <a href="/docs/providers/sakuracloud/d/ssh_key.html">sakuracloud_ssh_key</a>
+            </li>
+            <li>
+              <a href="/docs/providers/sakuracloud/d/subnet.html">sakuracloud_subnet</a>
+            </li>
+            <li>
+              <a href="/docs/providers/sakuracloud/d/switch.html">sakuracloud_switch</a>
+            </li>
+            <li>
+              <a href="/docs/providers/sakuracloud/d/vpc_router.html">sakuracloud_vpc_router</a>
+            </li>
+            <li>
+              <a href="/docs/providers/sakuracloud/d/zone.html">sakuracloud_zone</a>
+            </li>
+          </ul>
+        </li>
+
+        <li>
+          <a href="#">Compute</a>
+          <ul class="nav">
+            <li>
+              <a href="/docs/providers/sakuracloud/r/server.html">sakuracloud_server</a>
+            </li>
+            <li>
+              <a href="/docs/providers/sakuracloud/r/private_host.html">sakuracloud_private_host</a>
+            </li>
+          </ul>
+        </li>
+
+        <li>
+          <a href="#">Storage<a>
+          <ul class="nav">
+            <li>
+              <a href="/docs/providers/sakuracloud/r/disk.html">sakuracloud_disk</a>
+            </li>
+            <li>
+              <a href="/docs/providers/sakuracloud/r/archive.html">sakuracloud_archive</a>
+            </li>
+            <li>
+              <a href="/docs/providers/sakuracloud/r/cdrom.html">sakuracloud_cdrom</a>
+            </li>
+          </ul>
+        </li>
+
+        <li>
+          <a href="#">Networking</a>
+          <ul class="nav">
+            <li>
+              <a href="/docs/providers/sakuracloud/r/switch.html">sakuracloud_switch</a>
+            </li>
+            <li>
+              <a href="/docs/providers/sakuracloud/r/internet.html">sakuracloud_internet</a>
+            </li>
+            <li>
+              <a href="/docs/providers/sakuracloud/r/subnet.html">sakuracloud_subnet</a>
+            </li>
+            <li>
+              <a href="/docs/providers/sakuracloud/r/ipv4_ptr.html">sakuracloud_ipv4_ptr</a>
+            </li>
+            <li>
+              <a href="/docs/providers/sakuracloud/r/packet_filter.html">sakuracloud_packet_filter</a>
+            </li>
+            <li>
+              <a href="/docs/providers/sakuracloud/r/packet_filter_rule.html">sakuracloud_packet_filter_rule</a>
+            </li>
+            <li>
+              <a href="/docs/providers/sakuracloud/r/bridge.html">sakuracloud_bridge</a>
+            </li>
+          </ul>
+        </li>
+
+        <li>
+          <a href="#">Appliance</a>
+          <ul class="nav">
+            <li>
+              <a href="/docs/providers/sakuracloud/r/auto_backup.html">sakuracloud_auto_backup</a>
+            </li>
+            <li>
+              <a href="/docs/providers/sakuracloud/r/database.html">sakuracloud_database</a>
+            </li>
+            <li>
+              <a href="/docs/providers/sakuracloud/r/database.html">sakuracloud_database_read_replica</a>
+            </li>
+            <li>
+              <a href="/docs/providers/sakuracloud/r/nfs.html">sakuracloud_nfs</a>
+            </li>
+            <li>
+              <a href="/docs/providers/sakuracloud/r/load_balancer.html">sakuracloud_load_balancer</a>
+            </li>
+            <li>
+              <a href="/docs/providers/sakuracloud/r/vpc_router.html">sakuracloud_vpc_router</a>
+            </li>
+          </ul>
+        </li>
+
+
+        <li>
+          <a href="#">Global Resources</a>
+          <ul class="nav">
+            <li>
+              <a href="/docs/providers/sakuracloud/r/proxylb.html">sakuracloud_proxylb</a>
+            </li>
+            <li>
+              <a href="/docs/providers/sakuracloud/r/proxylb_acme.html">sakuracloud_proxylb_acme</a>
+            </li>
+            <li>
+              <a href="/docs/providers/sakuracloud/r/gslb.html">sakuracloud_gslb</a>
+            </li>
+            <li>
+              <a href="/docs/providers/sakuracloud/r/dns.html">sakuracloud_dns</a>
+            </li>
+            <li>
+              <a href="/docs/providers/sakuracloud/r/dns_record.html">sakuracloud_dns_record</a>
+            </li>
+            <li>
+              <a href="/docs/providers/sakuracloud/r/simple_monitor.html">sakuracloud_simple_monitor</a>
+            </li>
+          </ul>
+        </li>
+
+        <li>
+          <a href="#">Secure Mobile</a>
+          <ul class="nav">
+            <li>
+              <a href="/docs/providers/sakuracloud/r/sim.html">sakuracloud_sim</a>
+            </li>
+            <li>
+              <a href="/docs/providers/sakuracloud/r/mobile_gateway.html">sakuracloud_mobile_gateway</a>
+            </li>
+          </ul>
+        </li>
+
+        <li>
+          <a href="#">Misc</a>
+          <ul class="nav">
+            <li>
+              <a href="/docs/providers/sakuracloud/r/ssh_key.html">sakuracloud_ssh_key</a>
+            </li>
+            <li>
+              <a href="/docs/providers/sakuracloud/r/ssh_key_gen.html">sakuracloud_ssh_key_gen</a>
+            </li>
+            <li>
+              <a href="/docs/providers/sakuracloud/r/note.html">sakuracloud_note</a>
+            </li>
+            <li>
+              <a href="/docs/providers/sakuracloud/r/icon.html">sakuracloud_icon</a>
+            </li>
+          </ul>
+        </li>
+
+        <li>
+          <a href="#">Object Storage</a>
+          <ul class="nav">
+            <li>
+              <a href="/docs/providers/sakuracloud/r/bucket_object.html">sakuracloud_bucket_object</a>
+            </li>
+          </ul>
+        </li>
+      </ul>
+    </div>
+  <% end %>
+
+  <%= yield %>
+<% end %>
