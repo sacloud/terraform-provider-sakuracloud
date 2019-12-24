@@ -103,14 +103,10 @@ goimports:
 fmt:
 	find . -name '*.go' | grep -v vendor | xargs gofmt -s -w
 
+.PHONY: docscheck
 docscheck:
 	tfproviderdocs check \
 		-require-resource-subcategory
-
-
-.PHONY: preview-docs
-preview-docs:
-	sh -c "'$(CURDIR)/scripts/serve_english_docs.sh'"
 
 .PHONY: docker-build
 docker-build: clean
