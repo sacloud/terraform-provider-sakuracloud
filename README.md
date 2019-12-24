@@ -10,7 +10,55 @@
 ## Usage Example
 
 ```hcl
-# TODO add example here
+# Configure the SakuraCloud Provider
+provider "sakuracloud" {
+  # We recommend pinning to the specific version of the SakuraCloud Provider you're using
+  # since new versions are released frequently
+  version = "=2.0.0"
+
+  # More information on the authentication methods supported by
+  # the SakuraCloud Provider can be found here:
+  # https://docs.usacloud.jp/terraform/configuration/provider/
+
+  # profile = "..."
+}
+
+variable password {}
+
+data "sakuracloud_archive" "ubuntu" {
+  os_type = "ubuntu"
+}
+
+resource "sakuracloud_disk" "example" {
+  name              = "example"
+  source_archive_id = data.sakuracloud_archive.ubuntu.id
+
+  # If you want to prevent re-creation of the disk
+  # when archive id is changed, please uncomment this.
+  # lifecycle {
+  #   ignore_changes = [
+  #     source_archive_id,
+  #   ]
+  # }
+}
+
+resource "sakuracloud_server" "example" {
+  name        = "example"
+  disks       = [sakuracloud_disk.example.id]
+  core        = 1
+  memory      = 2
+  description = "description"
+  tags        = ["app=web", "stage=staging"]
+
+  network_interface {
+    upstream = "shared"
+  }
+
+  disk_edit_parameter {
+    hostname        = "example"
+    password        = var.password
+  }
+}
 ```
 
 ## Requirements
