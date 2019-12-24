@@ -1,4 +1,5 @@
-PKG_NAME         ?= sakuracloud
+PKG_NAME     ?= sakuracloud
+WEBSITE_REPO  = github.com/hashicorp/terraform-website
 
 AUTHOR          ?="terraform-provider-sakuracloud authors"
 COPYRIGHT_YEAR  ?="2016-2019"
@@ -16,12 +17,14 @@ clean:
 
 .PHONY: tools
 tools:
-	GO111MODULE=off go get -u golang.org/x/tools/cmd/goimports
 	GO111MODULE=off go get -u github.com/motemen/gobump/cmd/gobump
+	GO111MODULE=off go get -u golang.org/x/tools/cmd/goimports
 	GO111MODULE=off go get github.com/sacloud/addlicense
-	GO111MODULE=off go get -u github.com/client9/misspell/cmd/misspell
-	GO111MODULE=off go get -u github.com/golangci/golangci-lint/cmd/golangci-lint
-	GO111MODULE=off go get -u github.com/bflad/tfproviderlint/cmd/tfproviderlint
+	GO111MODULE=on go install github.com/bflad/tfproviderdocs
+	GO111MODULE=on go install github.com/bflad/tfproviderlint/cmd/tfproviderlint
+	GO111MODULE=on go install github.com/client9/misspell/cmd/misspell
+	GO111MODULE=on go install github.com/golangci/golangci-lint/cmd/golangci-lint
+
 
 .PHONY: build-envs
 build-envs:
@@ -100,6 +103,11 @@ goimports:
 fmt:
 	find . -name '*.go' | grep -v vendor | xargs gofmt -s -w
 
+docscheck:
+	tfproviderdocs check \
+		-require-resource-subcategory
+
+
 .PHONY: preview-docs
 preview-docs:
 	sh -c "'$(CURDIR)/scripts/serve_english_docs.sh'"
@@ -111,3 +119,33 @@ docker-build: clean
 .PHONY: set-license
 set-license:
 	addlicense -c $(AUTHOR) -y $(COPYRIGHT_YEAR) $(COPYRIGHT_FILES)
+
+.PHONY: website
+website:
+ifeq (,$(wildcard $(GOPATH)/src/$(WEBSITE_REPO)))
+	echo "$(WEBSITE_REPO) not found in your GOPATH (necessary for layouts and assets), get-ting..."
+	git clone https://$(WEBSITE_REPO) $(GOPATH)/src/$(WEBSITE_REPO)
+	(cd $(GOPATH)/src/$(WEBSITE_REPO); \
+	  ln -s ../../../ext/providers/sakuracloud/website/sakuracloud.erb content/source/layouts/sakuracloud.erb; \
+	  ln -s ../../../../ext/providers/sakuracloud/website/docs content/source/docs/providers/sakuracloud \
+	)
+endif
+	$(MAKE) -C $(GOPATH)/src/$(WEBSITE_REPO) website-provider PROVIDER_PATH=$(shell pwd) PROVIDER_NAME=$(PKG_NAME)
+
+.PHONY: website-lint
+website-lint:
+	@echo "==> Checking website against linters..."
+	misspell -error -source=text website/
+
+.PHONY: website-test
+website-test:
+ifeq (,$(wildcard $(GOPATH)/src/$(WEBSITE_REPO)))
+	echo "$(WEBSITE_REPO) not found in your GOPATH (necessary for layouts and assets), get-ting..."
+	git clone https://$(WEBSITE_REPO) $(GOPATH)/src/$(WEBSITE_REPO)
+	(cd $(GOPATH)/src/$(WEBSITE_REPO); \
+	  ln -s ../../../ext/providers/sakuracloud/website/sakuracloud.erb content/source/layouts/sakuracloud.erb; \
+	  ln -s ../../../../ext/providers/sakuracloud/website/docs source/docs/providers/sakuracloud \
+	)
+endif
+	@$(MAKE) -C $(GOPATH)/src/$(WEBSITE_REPO) website-provider-test PROVIDER_PATH=$(shell pwd) PROVIDER_NAME=$(PKG_NAME)
+
