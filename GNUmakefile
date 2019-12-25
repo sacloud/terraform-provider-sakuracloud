@@ -145,3 +145,7 @@ ifeq (,$(wildcard $(GOPATH)/src/$(WEBSITE_REPO)))
 endif
 	@$(MAKE) -C $(GOPATH)/src/$(WEBSITE_REPO) website-provider-test PROVIDER_PATH=$(shell pwd) PROVIDER_NAME=$(PKG_NAME)
 
+.PHONY: website-scaffold
+website-scaffold:
+	go run tools/docsgen/cmd/gen-sakuracloud-docs/main.go website-scaffold
+
