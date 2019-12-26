@@ -1,13 +1,14 @@
 ---
 layout: "sakuracloud"
 page_title: "SakuraCloud: sakuracloud_load_balancer"
+subcategory: "Appliance"
 description: |-
-  Get information about an existing sakuracloud_load_balancer.
+  Get information about an existing LoadBalancer.
 ---
 
 # Data Source: sakuracloud_load_balancer
 
-Get information about an existing sakuracloud_load_balancer.
+Get information about an existing LoadBalancer.
 
 ## Argument Reference
 
@@ -34,7 +35,7 @@ A `condition` block supports the following:
 
 ## Attribute Reference
 
-* `id` - The ID of the sakuracloud_load_balancer.
+* `id` - The ID of the LoadBalancer.
 * `description` - .
 * `gateway` - .
 * `high_availability` - .

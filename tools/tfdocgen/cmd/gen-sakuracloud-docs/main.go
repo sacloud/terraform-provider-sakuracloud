@@ -156,7 +156,7 @@ var definitions = map[string]definition{
 		displayName: "IPv4 PTR",
 		category:    CategoryNetworking,
 	},
-	"sakuracloud_loadbalancer": {
+	"sakuracloud_load_balancer": {
 		displayName: "LoadBalancer",
 		category:    CategoryAppliance,
 	},
