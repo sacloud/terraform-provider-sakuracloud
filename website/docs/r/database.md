@@ -50,7 +50,7 @@ The `timeouts` block allows you to specify [timeouts](https://www.terraform.io/d
 
 ## Attribute Reference
 
-* `id` - The ID of the Database.
+* `id` - The id of the Database.
 
 
 

@@ -40,7 +40,7 @@ The `timeouts` block allows you to specify [timeouts](https://www.terraform.io/d
 
 ## Attribute Reference
 
-* `id` - The ID of the SIM.
+* `id` - The id of the SIM.
 * `ip_address` - .
 * `mobile_gateway_id` - .
 

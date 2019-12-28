@@ -3,12 +3,12 @@ layout: "sakuracloud"
 page_title: "SakuraCloud: sakuracloud_private_host"
 subcategory: "Compute"
 description: |-
-  Manages a SakuraCloud PrivateHost.
+  Manages a SakuraCloud Private Host.
 ---
 
 # sakuracloud_private_host
 
-Manages a SakuraCloud PrivateHost.
+Manages a SakuraCloud Private Host.
 
 ## Argument Reference
 
@@ -25,19 +25,19 @@ Manages a SakuraCloud PrivateHost.
 
 The `timeouts` block allows you to specify [timeouts](https://www.terraform.io/docs/configuration/resources.html#timeouts) for certain actions:
 
-* `create` - (Defaults to 5 minutes) Used when creating the PrivateHost
+* `create` - (Defaults to 5 minutes) Used when creating the Private Host
 
-* `read` -   (Defaults to 5 minutes) Used when reading the PrivateHost
+* `read` -   (Defaults to 5 minutes) Used when reading the Private Host
 
-* `update` - (Defaults to 5 minutes) Used when updating the PrivateHost
+* `update` - (Defaults to 5 minutes) Used when updating the Private Host
 
-* `delete` - (Defaults to 20 minutes) Used when deregistering PrivateHost
+* `delete` - (Defaults to 20 minutes) Used when deregistering Private Host
 
 
 
 ## Attribute Reference
 
-* `id` - The ID of the PrivateHost.
+* `id` - The id of the Private Host.
 * `assigned_core` - .
 * `assigned_memory` - .
 * `hostname` - .

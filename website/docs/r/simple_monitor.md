@@ -3,12 +3,12 @@ layout: "sakuracloud"
 page_title: "SakuraCloud: sakuracloud_simple_monitor"
 subcategory: "Global"
 description: |-
-  Manages a SakuraCloud SimpleMonitor.
+  Manages a SakuraCloud Simple Monitor.
 ---
 
 # sakuracloud_simple_monitor
 
-Manages a SakuraCloud SimpleMonitor.
+Manages a SakuraCloud Simple Monitor.
 
 ## Argument Reference
 
@@ -50,19 +50,19 @@ A `health_check` block supports the following:
 
 The `timeouts` block allows you to specify [timeouts](https://www.terraform.io/docs/configuration/resources.html#timeouts) for certain actions:
 
-* `create` - (Defaults to 5 minutes) Used when creating the SimpleMonitor
+* `create` - (Defaults to 5 minutes) Used when creating the Simple Monitor
 
-* `read` -   (Defaults to 5 minutes) Used when reading the SimpleMonitor
+* `read` -   (Defaults to 5 minutes) Used when reading the Simple Monitor
 
-* `update` - (Defaults to 5 minutes) Used when updating the SimpleMonitor
+* `update` - (Defaults to 5 minutes) Used when updating the Simple Monitor
 
-* `delete` - (Defaults to 5 minutes) Used when deregistering SimpleMonitor
+* `delete` - (Defaults to 5 minutes) Used when deregistering Simple Monitor
 
 
 
 ## Attribute Reference
 
-* `id` - The ID of the SimpleMonitor.
+* `id` - The id of the Simple Monitor.
 
 
 

@@ -23,6 +23,8 @@ import (
 )
 
 func dataSourceSakuraCloudBridge() *schema.Resource {
+	resourceName := "bridge"
+
 	return &schema.Resource{
 		Read: dataSourceSakuraCloudBridgeRead,
 
@@ -32,21 +34,9 @@ func dataSourceSakuraCloudBridge() *schema.Resource {
 
 		Schema: map[string]*schema.Schema{
 			filterAttrName: filterSchema(&filterSchemaOption{excludeTags: true}),
-			"name": {
-				Type:     schema.TypeString,
-				Computed: true,
-			},
-			"description": {
-				Type:     schema.TypeString,
-				Computed: true,
-			},
-			"zone": {
-				Type:        schema.TypeString,
-				Optional:    true,
-				Computed:    true,
-				ForceNew:    true,
-				Description: "target SakuraCloud zone",
-			},
+			"name":         schemaDataSourceName(resourceName),
+			"description":  schemaDataSourceDescription(resourceName),
+			"zone":         schemaDataSourceZone(resourceName),
 		},
 	}
 }

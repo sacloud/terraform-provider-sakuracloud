@@ -32,30 +32,32 @@ func dataSourceSakuraCloudZone() *schema.Resource {
 
 		Schema: map[string]*schema.Schema{
 			"name": {
-				Type:     schema.TypeString,
-				Optional: true,
-				Computed: true,
+				Type:        schema.TypeString,
+				Optional:    true,
+				Computed:    true,
+				Description: "The name of the zone (e.g. `is1a`,`tk1a`)",
 			},
 			"zone_id": {
-				Type:     schema.TypeString,
-				Computed: true,
+				Type:        schema.TypeString,
+				Computed:    true,
+				Description: "The id of the zone",
 			},
-			"description": {
-				Type:     schema.TypeString,
-				Computed: true,
-			},
+			"description": schemaDataSourceDescription("zone"),
 			"region_id": {
-				Type:     schema.TypeString,
-				Computed: true,
+				Type:        schema.TypeString,
+				Computed:    true,
+				Description: "The id of the region that the zone belongs",
 			},
 			"region_name": {
-				Type:     schema.TypeString,
-				Computed: true,
+				Type:        schema.TypeString,
+				Computed:    true,
+				Description: "The name of the region that the zone belongs",
 			},
 			"dns_servers": {
-				Type:     schema.TypeList,
-				Computed: true,
-				Elem:     &schema.Schema{Type: schema.TypeString},
+				Type:        schema.TypeList,
+				Computed:    true,
+				Elem:        &schema.Schema{Type: schema.TypeString},
+				Description: "A list of IP address of DNS server in the zone",
 			},
 		},
 	}

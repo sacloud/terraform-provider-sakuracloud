@@ -3,12 +3,12 @@ layout: "sakuracloud"
 page_title: "SakuraCloud: sakuracloud_auto_backup"
 subcategory: "Appliance"
 description: |-
-  Manages a SakuraCloud AutoBackup.
+  Manages a SakuraCloud Auto Backup.
 ---
 
 # sakuracloud_auto_backup
 
-Manages a SakuraCloud AutoBackup.
+Manages a SakuraCloud Auto Backup.
 
 ## Argument Reference
 
@@ -27,19 +27,19 @@ Manages a SakuraCloud AutoBackup.
 
 The `timeouts` block allows you to specify [timeouts](https://www.terraform.io/docs/configuration/resources.html#timeouts) for certain actions:
 
-* `create` - (Defaults to 5 minutes) Used when creating the AutoBackup
+* `create` - (Defaults to 5 minutes) Used when creating the Auto Backup
 
-* `read` -   (Defaults to 5 minutes) Used when reading the AutoBackup
+* `read` -   (Defaults to 5 minutes) Used when reading the Auto Backup
 
-* `update` - (Defaults to 5 minutes) Used when updating the AutoBackup
+* `update` - (Defaults to 5 minutes) Used when updating the Auto Backup
 
-* `delete` - (Defaults to 5 minutes) Used when deregistering AutoBackup
+* `delete` - (Defaults to 5 minutes) Used when deregistering Auto Backup
 
 
 
 ## Attribute Reference
 
-* `id` - The ID of the AutoBackup.
+* `id` - The id of the Auto Backup.
 
 
 

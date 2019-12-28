@@ -23,6 +23,7 @@ import (
 )
 
 func dataSourceSakuraCloudSwitch() *schema.Resource {
+	resourceName := "switch"
 	return &schema.Resource{
 		Read: dataSourceSakuraCloudSwitchRead,
 
@@ -32,41 +33,18 @@ func dataSourceSakuraCloudSwitch() *schema.Resource {
 
 		Schema: map[string]*schema.Schema{
 			filterAttrName: filterSchema(&filterSchemaOption{}),
-			"name": {
-				Type:     schema.TypeString,
-				Computed: true,
-			},
-			"icon_id": {
-				Type:     schema.TypeString,
-				Computed: true,
-			},
-			"description": {
-				Type:     schema.TypeString,
-				Computed: true,
-			},
-			"tags": {
-				Type:     schema.TypeSet,
-				Computed: true,
-				Elem:     &schema.Schema{Type: schema.TypeString},
-				Set:      schema.HashString,
-			},
-			"bridge_id": {
-				Type:     schema.TypeString,
-				Computed: true,
-			},
+			"name":         schemaDataSourceName(resourceName),
+			"icon_id":      schemaDataSourceIconID(resourceName),
+			"description":  schemaDataSourceDescription(resourceName),
+			"tags":         schemaDataSourceTags(resourceName),
+			"bridge_id":    schemaDataSourceBridgeID(resourceName),
 			"server_ids": {
-				Type:     schema.TypeList,
-				Computed: true,
-				Elem:     &schema.Schema{Type: schema.TypeString},
-			},
-
-			"zone": {
-				Type:        schema.TypeString,
-				Optional:    true,
+				Type:        schema.TypeList,
 				Computed:    true,
-				ForceNew:    true,
-				Description: "target SakuraCloud zone",
+				Elem:        &schema.Schema{Type: schema.TypeString},
+				Description: "A list of server id connected to the switch",
 			},
+			"zone": schemaDataSourceZone(resourceName),
 		},
 	}
 }

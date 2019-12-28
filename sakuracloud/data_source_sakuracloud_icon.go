@@ -23,6 +23,7 @@ import (
 )
 
 func dataSourceSakuraCloudIcon() *schema.Resource {
+	resourceName := "icon"
 	return &schema.Resource{
 		Read: dataSourceSakuraCloudIconRead,
 
@@ -32,19 +33,12 @@ func dataSourceSakuraCloudIcon() *schema.Resource {
 
 		Schema: map[string]*schema.Schema{
 			filterAttrName: filterSchema(&filterSchemaOption{}),
-			"name": {
-				Type:     schema.TypeString,
-				Computed: true,
-			},
+			"name":         schemaDataSourceName(resourceName),
+			"tags":         schemaDataSourceTags(resourceName),
 			"url": {
-				Type:     schema.TypeString,
-				Computed: true,
-			},
-			"tags": {
-				Type:     schema.TypeSet,
-				Computed: true,
-				Elem:     &schema.Schema{Type: schema.TypeString},
-				Set:      schema.HashString,
+				Type:        schema.TypeString,
+				Computed:    true,
+				Description: "The URL for getting the icon's raw data",
 			},
 		},
 	}

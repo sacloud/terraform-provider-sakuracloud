@@ -3,12 +3,12 @@ layout: "sakuracloud"
 page_title: "SakuraCloud: sakuracloud_ssh_key_gen"
 subcategory: "Misc"
 description: |-
-  Manages a SakuraCloud SSHKey Gen.
+  Manages a SakuraCloud SSH Key Gen.
 ---
 
 # sakuracloud_ssh_key_gen
 
-Manages a SakuraCloud SSHKey Gen.
+Manages a SakuraCloud SSH Key Gen.
 
 ## Argument Reference
 
@@ -22,19 +22,19 @@ Manages a SakuraCloud SSHKey Gen.
 
 The `timeouts` block allows you to specify [timeouts](https://www.terraform.io/docs/configuration/resources.html#timeouts) for certain actions:
 
-* `create` - (Defaults to 5 minutes) Used when creating the SSHKey Gen
+* `create` - (Defaults to 5 minutes) Used when creating the SSH Key Gen
 
-* `read` -   (Defaults to 5 minutes) Used when reading the SSHKey Gen
+* `read` -   (Defaults to 5 minutes) Used when reading the SSH Key Gen
 
-* `update` - (Defaults to 5 minutes) Used when updating the SSHKey Gen
+* `update` - (Defaults to 5 minutes) Used when updating the SSH Key Gen
 
-* `delete` - (Defaults to 5 minutes) Used when deregistering SSHKey Gen
+* `delete` - (Defaults to 5 minutes) Used when deregistering SSH Key Gen
 
 
 
 ## Attribute Reference
 
-* `id` - The ID of the SSHKey Gen.
+* `id` - The id of the SSH Key Gen.
 * `fingerprint` - .
 * `private_key` - .
 * `public_key` - .

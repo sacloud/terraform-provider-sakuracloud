@@ -38,7 +38,7 @@ The `timeouts` block allows you to specify [timeouts](https://www.terraform.io/d
 
 ## Attribute Reference
 
-* `id` - The ID of the DNS Record.
+* `id` - The id of the DNS Record.
 
 
 

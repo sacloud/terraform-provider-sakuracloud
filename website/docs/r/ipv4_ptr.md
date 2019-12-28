@@ -36,7 +36,7 @@ The `timeouts` block allows you to specify [timeouts](https://www.terraform.io/d
 
 ## Attribute Reference
 
-* `id` - The ID of the IPv4 PTR.
+* `id` - The id of the IPv4 PTR.
 
 
 

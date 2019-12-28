@@ -25,7 +25,7 @@ Manages a SakuraCloud Bucket Object.
 
 ## Attribute Reference
 
-* `id` - The ID of the Bucket Object.
+* `id` - The id of the Bucket Object.
 * `http_cache_url` - .
 * `http_path_url` - .
 * `http_url` - .

@@ -20,9 +20,11 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/sacloud/libsacloud/v2/sacloud"
+	"github.com/sacloud/libsacloud/v2/sacloud/types"
 )
 
 func dataSourceSakuraCloudPrivateHost() *schema.Resource {
+	resourceName := "private host"
 	return &schema.Resource{
 		Read: dataSourceSakuraCloudPrivateHostRead,
 
@@ -32,47 +34,27 @@ func dataSourceSakuraCloudPrivateHost() *schema.Resource {
 
 		Schema: map[string]*schema.Schema{
 			filterAttrName: filterSchema(&filterSchemaOption{}),
-			"name": {
-				Type:     schema.TypeString,
-				Computed: true,
-			},
-			"class": {
-				Type:     schema.TypeString,
-				Computed: true,
-			},
-			"icon_id": {
-				Type:     schema.TypeString,
-				Computed: true,
-			},
-			"description": {
-				Type:     schema.TypeString,
-				Computed: true,
-			},
-			"tags": {
-				Type:     schema.TypeSet,
-				Computed: true,
-				Elem:     &schema.Schema{Type: schema.TypeString},
-				Set:      schema.HashString,
-			},
+			"name":         schemaDataSourceName(resourceName),
+			"class":        schemaDataSourceClass(resourceName, []string{types.PrivateHostClassDynamic, types.PrivateHostClassWindows}),
+			"icon_id":      schemaDataSourceIconID(resourceName),
+			"description":  schemaDataSourceDescription(resourceName),
+			"tags":         schemaDataSourceTags(resourceName),
 			"hostname": {
-				Type:     schema.TypeString,
-				Computed: true,
+				Type:        schema.TypeString,
+				Computed:    true,
+				Description: "The hostname of the private host",
 			},
 			"assigned_core": {
-				Type:     schema.TypeInt,
-				Computed: true,
+				Type:        schema.TypeInt,
+				Computed:    true,
+				Description: "The total number of CPUs assigned to servers on the private host",
 			},
 			"assigned_memory": {
-				Type:     schema.TypeInt,
-				Computed: true,
-			},
-			"zone": {
-				Type:        schema.TypeString,
-				Optional:    true,
+				Type:        schema.TypeInt,
 				Computed:    true,
-				ForceNew:    true,
-				Description: "target SakuraCloud zone",
+				Description: "The total size of memory assigned to servers on the private host",
 			},
+			"zone": schemaDataSourceZone(resourceName),
 		},
 	}
 }

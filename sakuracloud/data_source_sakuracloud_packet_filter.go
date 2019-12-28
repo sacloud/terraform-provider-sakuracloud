@@ -20,9 +20,11 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/sacloud/libsacloud/v2/sacloud"
+	"github.com/sacloud/libsacloud/v2/sacloud/types"
 )
 
 func dataSourceSakuraCloudPacketFilter() *schema.Resource {
+	resourceName := "packet filter"
 	return &schema.Resource{
 		Read: dataSourceSakuraCloudPacketFilterRead,
 
@@ -32,14 +34,8 @@ func dataSourceSakuraCloudPacketFilter() *schema.Resource {
 
 		Schema: map[string]*schema.Schema{
 			filterAttrName: filterSchema(&filterSchemaOption{excludeTags: true}),
-			"name": {
-				Type:     schema.TypeString,
-				Computed: true,
-			},
-			"description": {
-				Type:     schema.TypeString,
-				Computed: true,
-			},
+			"name":         schemaDataSourceName(resourceName),
+			"description":  schemaDataSourceDescription(resourceName),
 			"expression": {
 				Type:     schema.TypeList,
 				Optional: true,
@@ -48,40 +44,36 @@ func dataSourceSakuraCloudPacketFilter() *schema.Resource {
 						"protocol": {
 							Type:     schema.TypeString,
 							Computed: true,
+							Description: descf(
+								"The protocol used for filtering. This will be one of [%s]",
+								types.PacketFilterProtocolsStrings(),
+							),
 						},
-
 						"source_network": {
-							Type:     schema.TypeString,
-							Computed: true,
+							Type:        schema.TypeString,
+							Computed:    true,
+							Description: "A source IP address or CIDR block used for filtering (e.g. `192.0.2.1`, `192.0.2.0/24`)",
 						},
-
 						"source_port": {
-							Type:     schema.TypeString,
-							Computed: true,
+							Type:        schema.TypeString,
+							Computed:    true,
+							Description: "A source port number or port range used for filtering (e.g. `1024`, `1024-2048`)",
 						},
 						"destination_port": {
-							Type:     schema.TypeString,
-							Computed: true,
+							Type:        schema.TypeString,
+							Computed:    true,
+							Description: "A destination port number or port range used for filtering (e.g. `1024`, `1024-2048`)",
 						},
 						"allow": {
-							Type:     schema.TypeBool,
-							Computed: true,
+							Type:        schema.TypeBool,
+							Computed:    true,
+							Description: "The flag to allow the packet through the filter",
 						},
-						"description": {
-							Type:     schema.TypeString,
-							Computed: true,
-						},
+						"description": schemaDataSourceDescription("expression"),
 					},
 				},
 			},
-
-			"zone": {
-				Type:        schema.TypeString,
-				Optional:    true,
-				Computed:    true,
-				ForceNew:    true,
-				Description: "target SakuraCloud zone",
-			},
+			"zone": schemaDataSourceZone(resourceName),
 		},
 	}
 }

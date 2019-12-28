@@ -20,9 +20,11 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/sacloud/libsacloud/v2/sacloud"
+	"github.com/sacloud/libsacloud/v2/sacloud/types"
 )
 
 func dataSourceSakuraCloudNFS() *schema.Resource {
+	resourceName := "NFS"
 	return &schema.Resource{
 		Read: dataSourceSakuraCloudNFSRead,
 
@@ -32,55 +34,17 @@ func dataSourceSakuraCloudNFS() *schema.Resource {
 
 		Schema: map[string]*schema.Schema{
 			filterAttrName: filterSchema(&filterSchemaOption{}),
-			"name": {
-				Type:     schema.TypeString,
-				Computed: true,
-			},
-			"switch_id": {
-				Type:     schema.TypeString,
-				Computed: true,
-			},
-			"plan": {
-				Type:     schema.TypeString,
-				Computed: true,
-			},
-			"size": {
-				Type:     schema.TypeInt,
-				Computed: true,
-			},
-			"ip_address": {
-				Type:     schema.TypeString,
-				Computed: true,
-			},
-			"netmask": {
-				Type:     schema.TypeInt,
-				Computed: true,
-			},
-			"gateway": {
-				Type:     schema.TypeString,
-				Computed: true,
-			},
-			"icon_id": {
-				Type:     schema.TypeString,
-				Computed: true,
-			},
-			"description": {
-				Type:     schema.TypeString,
-				Computed: true,
-			},
-			"tags": {
-				Type:     schema.TypeSet,
-				Computed: true,
-				Elem:     &schema.Schema{Type: schema.TypeString},
-				Set:      schema.HashString,
-			},
-			"zone": {
-				Type:        schema.TypeString,
-				Optional:    true,
-				Computed:    true,
-				ForceNew:    true,
-				Description: "target SakuraCloud zone",
-			},
+			"name":         schemaDataSourceName(resourceName),
+			"plan":         schemaDataSourcePlan(resourceName, types.NFSPlanStrings),
+			"size":         schemaDataSourceSize(resourceName),
+			"switch_id":    schemaDataSourceSwitchID(resourceName),
+			"ip_address":   schemaDataSourceIPAddress(resourceName),
+			"netmask":      schemaDataSourceNetMask(resourceName),
+			"gateway":      schemaDataSourceGateway(resourceName),
+			"icon_id":      schemaDataSourceIconID(resourceName),
+			"description":  schemaDataSourceDescription(resourceName),
+			"tags":         schemaDataSourceTags(resourceName),
+			"zone":         schemaDataSourceZone(resourceName),
 		},
 	}
 }

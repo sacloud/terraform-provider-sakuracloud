@@ -20,9 +20,11 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/sacloud/libsacloud/v2/sacloud"
+	"github.com/sacloud/libsacloud/v2/sacloud/types"
 )
 
 func dataSourceSakuraCloudProxyLB() *schema.Resource {
+	resourceName := "proxy LB"
 	return &schema.Resource{
 		Read: dataSourceSakuraCloudProxyLBRead,
 
@@ -32,29 +34,30 @@ func dataSourceSakuraCloudProxyLB() *schema.Resource {
 
 		Schema: map[string]*schema.Schema{
 			filterAttrName: filterSchema(&filterSchemaOption{}),
-			"name": {
-				Type:     schema.TypeString,
-				Computed: true,
-			},
-			"plan": {
-				Type:     schema.TypeInt,
-				Computed: true,
-			},
+			"name":         schemaDataSourceName(resourceName),
+			"plan":         schemaDataSourceIntPlan(resourceName, types.ProxyLBPlanValues),
 			"vip_failover": {
-				Type:     schema.TypeBool,
-				Computed: true,
+				Type:        schema.TypeBool,
+				Computed:    true,
+				Description: "The flag to enable VIP fail-over",
 			},
 			"sticky_session": {
-				Type:     schema.TypeBool,
-				Computed: true,
+				Type:        schema.TypeBool,
+				Computed:    true,
+				Description: "The flag to enable sticky session",
 			},
 			"timeout": {
-				Type:     schema.TypeInt,
-				Computed: true,
+				Type:        schema.TypeInt,
+				Computed:    true,
+				Description: "The timeout duration in seconds",
 			},
 			"region": {
 				Type:     schema.TypeString,
 				Computed: true,
+				Description: descf(
+					"The name of region that the proxy LB is in. This will be one of [%s]",
+					types.ProxyLBProxyModeStrings,
+				),
 			},
 			"bind_port": {
 				Type:     schema.TypeList,
@@ -64,18 +67,25 @@ func dataSourceSakuraCloudProxyLB() *schema.Resource {
 						"proxy_mode": {
 							Type:     schema.TypeString,
 							Computed: true,
+							Description: descf(
+								"The proxy mode. This will be one of [%s]",
+								types.ProxyLBProxyModeStrings,
+							),
 						},
 						"port": {
-							Type:     schema.TypeInt,
-							Computed: true,
+							Type:        schema.TypeInt,
+							Computed:    true,
+							Description: "The number of listening port",
 						},
 						"redirect_to_https": {
-							Type:     schema.TypeBool,
-							Computed: true,
+							Type:        schema.TypeBool,
+							Computed:    true,
+							Description: "The flag to enable redirection from http to https. This flag is used only when `proxy_mode` is `http`",
 						},
 						"support_http2": {
-							Type:     schema.TypeBool,
-							Computed: true,
+							Type:        schema.TypeBool,
+							Computed:    true,
+							Description: "The flag to enable HTTP/2. This flag is used only when `proxy_mode` is `https`",
 						},
 						"response_header": {
 							Type:     schema.TypeList,
@@ -83,12 +93,14 @@ func dataSourceSakuraCloudProxyLB() *schema.Resource {
 							Elem: &schema.Resource{
 								Schema: map[string]*schema.Schema{
 									"header": {
-										Type:     schema.TypeString,
-										Computed: true,
+										Type:        schema.TypeString,
+										Computed:    true,
+										Description: "The field name of HTTP header added to response by proxyLB",
 									},
 									"value": {
-										Type:     schema.TypeString,
-										Computed: true,
+										Type:        schema.TypeString,
+										Computed:    true,
+										Description: "The field value of HTTP header added to response by proxyLB",
 									},
 								},
 							},
@@ -104,22 +116,30 @@ func dataSourceSakuraCloudProxyLB() *schema.Resource {
 						"protocol": {
 							Type:     schema.TypeString,
 							Computed: true,
+							Description: descf(
+								"The protocol used for health checks. This will be one of [%s]",
+								types.ProxyLBProtocolStrings,
+							),
 						},
 						"delay_loop": {
-							Type:     schema.TypeInt,
-							Computed: true,
+							Type:        schema.TypeInt,
+							Computed:    true,
+							Description: "The interval in seconds between checks",
 						},
 						"host_header": {
-							Type:     schema.TypeString,
-							Computed: true,
+							Type:        schema.TypeString,
+							Computed:    true,
+							Description: "The value of host header send when checking by HTTP",
 						},
 						"path": {
-							Type:     schema.TypeString,
-							Computed: true,
+							Type:        schema.TypeString,
+							Computed:    true,
+							Description: "The path used when checking by HTTP",
 						},
 						"port": {
-							Type:     schema.TypeInt,
-							Computed: true,
+							Type:        schema.TypeInt,
+							Computed:    true,
+							Description: "The port number used when checking by TCP",
 						},
 					},
 				},
@@ -130,12 +150,14 @@ func dataSourceSakuraCloudProxyLB() *schema.Resource {
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
 						"ip_address": {
-							Type:     schema.TypeString,
-							Computed: true,
+							Type:        schema.TypeString,
+							Computed:    true,
+							Description: "The IP address of the SorryServer. This will be used when all servers are down",
 						},
 						"port": {
-							Type:     schema.TypeInt,
-							Computed: true,
+							Type:        schema.TypeInt,
+							Computed:    true,
+							Description: "The port number of the SorryServer. This will be used when all servers are down",
 						},
 					},
 				},
@@ -146,16 +168,19 @@ func dataSourceSakuraCloudProxyLB() *schema.Resource {
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
 						"server_cert": {
-							Type:     schema.TypeString,
-							Computed: true,
+							Type:        schema.TypeString,
+							Computed:    true,
+							Description: "The certificate for a server",
 						},
 						"intermediate_cert": {
-							Type:     schema.TypeString,
-							Computed: true,
+							Type:        schema.TypeString,
+							Computed:    true,
+							Description: "The intermediate certificate for a server",
 						},
 						"private_key": {
-							Type:     schema.TypeString,
-							Computed: true,
+							Type:        schema.TypeString,
+							Computed:    true,
+							Description: "The private key for a server",
 						},
 						"additional_certificate": {
 							Type:     schema.TypeList,
@@ -163,16 +188,19 @@ func dataSourceSakuraCloudProxyLB() *schema.Resource {
 							Elem: &schema.Resource{
 								Schema: map[string]*schema.Schema{
 									"server_cert": {
-										Type:     schema.TypeString,
-										Computed: true,
+										Type:        schema.TypeString,
+										Computed:    true,
+										Description: "The certificate for a server",
 									},
 									"intermediate_cert": {
-										Type:     schema.TypeString,
-										Computed: true,
+										Type:        schema.TypeString,
+										Computed:    true,
+										Description: "The intermediate certificate for a server",
 									},
 									"private_key": {
-										Type:     schema.TypeString,
-										Computed: true,
+										Type:        schema.TypeString,
+										Computed:    true,
+										Description: "The private key for a server",
 									},
 								},
 							},
@@ -186,20 +214,24 @@ func dataSourceSakuraCloudProxyLB() *schema.Resource {
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
 						"ip_address": {
-							Type:     schema.TypeString,
-							Computed: true,
+							Type:        schema.TypeString,
+							Computed:    true,
+							Description: "The IP address of the destination server",
 						},
 						"port": {
-							Type:     schema.TypeInt,
-							Computed: true,
+							Type:        schema.TypeInt,
+							Computed:    true,
+							Description: "The port number of the destination server",
 						},
 						"group": {
-							Type:     schema.TypeString,
-							Computed: true,
+							Type:        schema.TypeString,
+							Computed:    true,
+							Description: "The name of load balancing group. This is used when using rule-based load balancing",
 						},
 						"enabled": {
-							Type:     schema.TypeBool,
-							Computed: true,
+							Type:        schema.TypeBool,
+							Computed:    true,
+							Description: "The flag to enable as destination of load balancing",
 						},
 					},
 				},
@@ -210,46 +242,41 @@ func dataSourceSakuraCloudProxyLB() *schema.Resource {
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
 						"host": {
-							Type:     schema.TypeString,
-							Computed: true,
+							Type:        schema.TypeString,
+							Computed:    true,
+							Description: "The value of HTTP host header that is used as condition of rule-based balancing",
 						},
 						"path": {
-							Type:     schema.TypeString,
-							Computed: true,
+							Type:        schema.TypeString,
+							Computed:    true,
+							Description: "The request path that is used as condition of rule-based balancing",
 						},
 						"group": {
-							Type:     schema.TypeString,
-							Computed: true,
+							Type:        schema.TypeString,
+							Computed:    true,
+							Description: "The name of load balancing group. When proxyLB received request which matched to `host` and `path`, proxyLB forwards the request to servers that having same group name",
 						},
 					},
 				},
 			},
-			"icon_id": {
-				Type:     schema.TypeString,
-				Computed: true,
-			},
-			"description": {
-				Type:     schema.TypeString,
-				Computed: true,
-			},
-			"tags": {
-				Type:     schema.TypeSet,
-				Computed: true,
-				Elem:     &schema.Schema{Type: schema.TypeString},
-				Set:      schema.HashString,
-			},
+			"icon_id":     schemaDataSourceIconID(resourceName),
+			"description": schemaDataSourceDescription(resourceName),
+			"tags":        schemaDataSourceTags(resourceName),
 			"fqdn": {
-				Type:     schema.TypeString,
-				Computed: true,
+				Type:        schema.TypeString,
+				Computed:    true,
+				Description: "The FQDN for accessing to the proxyLB. This is typically used as value of CNAME record",
 			},
 			"vip": {
-				Type:     schema.TypeString,
-				Computed: true,
+				Type:        schema.TypeString,
+				Computed:    true,
+				Description: "The virtual IP address assigned to the proxyLB",
 			},
 			"proxy_networks": {
-				Type:     schema.TypeList,
-				Elem:     &schema.Schema{Type: schema.TypeString},
-				Computed: true,
+				Type:        schema.TypeList,
+				Elem:        &schema.Schema{Type: schema.TypeString},
+				Computed:    true,
+				Description: "A list of CIDR block used by proxyLB to access the server",
 			},
 		},
 	}

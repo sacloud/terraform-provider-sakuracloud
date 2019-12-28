@@ -378,7 +378,7 @@ The ` + "`" + `timeouts` + "`" + ` block allows you to specify [timeouts](https:
 
 ## Attribute Reference
 
-* ` + "`" + `id` + "`" + ` - The ID of the {{ .DisplayName }}.
+* ` + "`" + `id` + "`" + ` - The id of the {{ .DisplayName }}.
 {{ range .Schema.Attributes -}}
 * ` + "`" + `{{ .Name }}` + "`" + ` - {{ .Description }}.
 {{ end }}
