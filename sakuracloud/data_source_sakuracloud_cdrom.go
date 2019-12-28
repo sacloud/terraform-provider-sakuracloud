@@ -23,6 +23,7 @@ import (
 )
 
 func dataSourceSakuraCloudCDROM() *schema.Resource {
+	resourceName := "CD-ROM"
 	return &schema.Resource{
 		Read: dataSourceSakuraCloudCDROMRead,
 
@@ -32,35 +33,12 @@ func dataSourceSakuraCloudCDROM() *schema.Resource {
 
 		Schema: map[string]*schema.Schema{
 			filterAttrName: filterSchema(&filterSchemaOption{}),
-			"name": {
-				Type:     schema.TypeString,
-				Computed: true,
-			},
-			"size": {
-				Type:     schema.TypeInt,
-				Computed: true,
-			},
-			"icon_id": {
-				Type:     schema.TypeString,
-				Computed: true,
-			},
-			"description": {
-				Type:     schema.TypeString,
-				Computed: true,
-			},
-			"tags": {
-				Type:     schema.TypeSet,
-				Computed: true,
-				Elem:     &schema.Schema{Type: schema.TypeString},
-				Set:      schema.HashString,
-			},
-			"zone": {
-				Type:        schema.TypeString,
-				Optional:    true,
-				Computed:    true,
-				ForceNew:    true,
-				Description: "target SakuraCloud zone",
-			},
+			"name":         schemaDataSourceName(resourceName),
+			"size":         schemaDataSourceSize(resourceName),
+			"icon_id":      schemaDataSourceIconID(resourceName),
+			"description":  schemaDataSourceDescription(resourceName),
+			"tags":         schemaDataSourceTags(resourceName),
+			"zone":         schemaDataSourceZone(resourceName),
 		},
 	}
 }

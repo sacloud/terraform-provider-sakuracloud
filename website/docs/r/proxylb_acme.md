@@ -34,7 +34,7 @@ The `timeouts` block allows you to specify [timeouts](https://www.terraform.io/d
 
 ## Attribute Reference
 
-* `id` - The ID of the ProxyLB ACME Setting.
+* `id` - The id of the ProxyLB ACME Setting.
 * `certificate` - A list of `certificate` blocks as defined below.
 
 

@@ -23,6 +23,7 @@ import (
 )
 
 func dataSourceSakuraCloudSSHKey() *schema.Resource {
+	resourceName := "ssh key"
 	return &schema.Resource{
 		Read: dataSourceSakuraCloudSSHKeyRead,
 
@@ -32,21 +33,17 @@ func dataSourceSakuraCloudSSHKey() *schema.Resource {
 
 		Schema: map[string]*schema.Schema{
 			filterAttrName: filterSchema(&filterSchemaOption{excludeTags: true}),
-			"name": {
-				Type:     schema.TypeString,
-				Computed: true,
-			},
+			"name":         schemaDataSourceName(resourceName),
+			"description":  schemaDataSourceDescription(resourceName),
 			"public_key": {
-				Type:     schema.TypeString,
-				Computed: true,
-			},
-			"description": {
-				Type:     schema.TypeString,
-				Computed: true,
+				Type:        schema.TypeString,
+				Computed:    true,
+				Description: "The value of public key",
 			},
 			"fingerprint": {
-				Type:     schema.TypeString,
-				Computed: true,
+				Type:        schema.TypeString,
+				Computed:    true,
+				Description: "The fingerprint of public key",
 			},
 		},
 	}

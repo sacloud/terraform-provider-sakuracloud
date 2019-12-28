@@ -47,7 +47,7 @@ provider "sakuracloud" {
 
 ## Attribute Reference
 
-* `id` - The ID of the SakuraCloud.
+* `id` - The id of the SakuraCloud.
 
 
 

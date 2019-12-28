@@ -3,12 +3,12 @@ layout: "sakuracloud"
 page_title: "SakuraCloud: sakuracloud_vpc_router"
 subcategory: "Appliance"
 description: |-
-  Manages a SakuraCloud VPCRouter.
+  Manages a SakuraCloud VPC Router.
 ---
 
 # sakuracloud_vpc_router
 
-Manages a SakuraCloud VPCRouter.
+Manages a SakuraCloud VPC Router.
 
 ## Argument Reference
 
@@ -147,19 +147,19 @@ A `user` block supports the following:
 
 The `timeouts` block allows you to specify [timeouts](https://www.terraform.io/docs/configuration/resources.html#timeouts) for certain actions:
 
-* `create` - (Defaults to 60 minutes) Used when creating the VPCRouter
+* `create` - (Defaults to 60 minutes) Used when creating the VPC Router
 
-* `read` -   (Defaults to 5 minutes) Used when reading the VPCRouter
+* `read` -   (Defaults to 5 minutes) Used when reading the VPC Router
 
-* `update` - (Defaults to 60 minutes) Used when updating the VPCRouter
+* `update` - (Defaults to 60 minutes) Used when updating the VPC Router
 
-* `delete` - (Defaults to 20 minutes) Used when deregistering VPCRouter
+* `delete` - (Defaults to 20 minutes) Used when deregistering VPC Router
 
 
 
 ## Attribute Reference
 
-* `id` - The ID of the VPCRouter.
+* `id` - The id of the VPC Router.
 * `public_ip` - .
 
 

@@ -3,12 +3,12 @@ layout: "sakuracloud"
 page_title: "SakuraCloud: sakuracloud_load_balancer"
 subcategory: "Appliance"
 description: |-
-  Manages a SakuraCloud LoadBalancer.
+  Manages a SakuraCloud Load Balancer.
 ---
 
 # sakuracloud_load_balancer
 
-Manages a SakuraCloud LoadBalancer.
+Manages a SakuraCloud Load Balancer.
 
 ## Argument Reference
 
@@ -53,19 +53,19 @@ A `server` block supports the following:
 
 The `timeouts` block allows you to specify [timeouts](https://www.terraform.io/docs/configuration/resources.html#timeouts) for certain actions:
 
-* `create` - (Defaults to 60 minutes) Used when creating the LoadBalancer
+* `create` - (Defaults to 60 minutes) Used when creating the Load Balancer
 
-* `read` -   (Defaults to 5 minutes) Used when reading the LoadBalancer
+* `read` -   (Defaults to 5 minutes) Used when reading the Load Balancer
 
-* `update` - (Defaults to 60 minutes) Used when updating the LoadBalancer
+* `update` - (Defaults to 60 minutes) Used when updating the Load Balancer
 
-* `delete` - (Defaults to 20 minutes) Used when deregistering LoadBalancer
+* `delete` - (Defaults to 20 minutes) Used when deregistering Load Balancer
 
 
 
 ## Attribute Reference
 
-* `id` - The ID of the LoadBalancer.
+* `id` - The id of the Load Balancer.
 
 
 

@@ -39,7 +39,7 @@ The `timeouts` block allows you to specify [timeouts](https://www.terraform.io/d
 
 ## Attribute Reference
 
-* `id` - The ID of the Internet.
+* `id` - The id of the Internet.
 * `gateway` - .
 * `ip_addresses` - .
 * `ipv6_network_address` - .

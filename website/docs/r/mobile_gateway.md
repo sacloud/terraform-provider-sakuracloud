@@ -3,12 +3,12 @@ layout: "sakuracloud"
 page_title: "SakuraCloud: sakuracloud_mobile_gateway"
 subcategory: "SecureMobile"
 description: |-
-  Manages a SakuraCloud MobileGateway.
+  Manages a SakuraCloud Mobile Gateway.
 ---
 
 # sakuracloud_mobile_gateway
 
-Manages a SakuraCloud MobileGateway.
+Manages a SakuraCloud Mobile Gateway.
 
 ## Argument Reference
 
@@ -72,19 +72,19 @@ A `traffic_control` block supports the following:
 
 The `timeouts` block allows you to specify [timeouts](https://www.terraform.io/docs/configuration/resources.html#timeouts) for certain actions:
 
-* `create` - (Defaults to 60 minutes) Used when creating the MobileGateway
+* `create` - (Defaults to 60 minutes) Used when creating the Mobile Gateway
 
-* `read` -   (Defaults to 5 minutes) Used when reading the MobileGateway
+* `read` -   (Defaults to 5 minutes) Used when reading the Mobile Gateway
 
-* `update` - (Defaults to 60 minutes) Used when updating the MobileGateway
+* `update` - (Defaults to 60 minutes) Used when updating the Mobile Gateway
 
-* `delete` - (Defaults to 20 minutes) Used when deregistering MobileGateway
+* `delete` - (Defaults to 20 minutes) Used when deregistering Mobile Gateway
 
 
 
 ## Attribute Reference
 
-* `id` - The ID of the MobileGateway.
+* `id` - The id of the Mobile Gateway.
 * `public_ip` - .
 * `public_netmask` - .
 

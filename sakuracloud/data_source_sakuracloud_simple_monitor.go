@@ -16,6 +16,7 @@ package sakuracloud
 
 import (
 	"fmt"
+	"github.com/sacloud/libsacloud/v2/sacloud/types"
 	"time"
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
@@ -23,6 +24,7 @@ import (
 )
 
 func dataSourceSakuraCloudSimpleMonitor() *schema.Resource {
+	resourceName := "simple monitor"
 	return &schema.Resource{
 		Read: dataSourceSakuraCloudSimpleMonitorRead,
 
@@ -33,12 +35,14 @@ func dataSourceSakuraCloudSimpleMonitor() *schema.Resource {
 		Schema: map[string]*schema.Schema{
 			filterAttrName: filterSchema(&filterSchemaOption{}),
 			"target": {
-				Type:     schema.TypeString,
-				Computed: true,
+				Type:        schema.TypeString,
+				Computed:    true,
+				Description: "The monitoring target of the simple monitor. This will be IP address or FQDN",
 			},
 			"delay_loop": {
-				Type:     schema.TypeInt,
-				Computed: true,
+				Type:        schema.TypeInt,
+				Computed:    true,
+				Description: "The interval in seconds between checks",
 			},
 			"health_check": {
 				Type:     schema.TypeList,
@@ -48,96 +52,107 @@ func dataSourceSakuraCloudSimpleMonitor() *schema.Resource {
 						"protocol": {
 							Type:     schema.TypeString,
 							Computed: true,
+							Description: descf(
+								"The protocol used for health checks. This will be one of [%s]",
+								types.SimpleMonitorProtocolsStrings,
+							),
 						},
 						"host_header": {
-							Type:     schema.TypeString,
-							Computed: true,
+							Type:        schema.TypeString,
+							Computed:    true,
+							Description: "The value of host header send when checking by HTTP/HTTPS",
 						},
 						"path": {
-							Type:     schema.TypeString,
-							Computed: true,
+							Type:        schema.TypeString,
+							Computed:    true,
+							Description: "The path used when checking by HTTP/HTTPS",
 						},
 						"status": {
-							Type:     schema.TypeInt,
-							Computed: true,
+							Type:        schema.TypeInt,
+							Computed:    true,
+							Description: "The response-code to expect when checking by HTTP/HTTPS",
 						},
 						"sni": {
-							Type:     schema.TypeBool,
-							Computed: true,
+							Type:        schema.TypeBool,
+							Computed:    true,
+							Description: "The flag to enable SNI when checking by HTTP/HTTPS",
 						},
 						"username": {
-							Type:     schema.TypeString,
-							Optional: true,
+							Type:        schema.TypeString,
+							Computed:    true,
+							Description: "The user name for basic auth used when checking by HTTP/HTTPS",
 						},
 						"password": {
-							Type:     schema.TypeString,
-							Optional: true,
+							Type:        schema.TypeString,
+							Computed:    true,
+							Description: "The password for basic auth used when checking by HTTP/HTTPS",
 						},
 						"port": {
-							Type:     schema.TypeInt,
-							Computed: true,
+							Type:        schema.TypeInt,
+							Computed:    true,
+							Description: "The target port number",
 						},
 						"qname": {
-							Type:     schema.TypeString,
-							Computed: true,
+							Type:        schema.TypeString,
+							Computed:    true,
+							Description: "The FQDN used when checking by DNS",
 						},
 						"excepcted_data": {
-							Type:     schema.TypeString,
-							Computed: true,
+							Type:        schema.TypeString,
+							Computed:    true,
+							Description: "The expected value used when checking by DNS",
 						},
 						"community": {
-							Type:     schema.TypeString,
-							Computed: true,
+							Type:        schema.TypeString,
+							Computed:    true,
+							Description: "The SNMP community string used when checking by SNMP",
 						},
 						"snmp_version": {
-							Type:     schema.TypeString,
-							Computed: true,
+							Type:        schema.TypeString,
+							Computed:    true,
+							Description: "The SNMP version used when checking by SNMP",
 						},
 						"oid": {
-							Type:     schema.TypeString,
-							Computed: true,
+							Type:        schema.TypeString,
+							Computed:    true,
+							Description: "The SNMP OID used when checking by SNMP",
 						},
 						"remaining_days": {
-							Type:     schema.TypeInt,
-							Computed: true,
+							Type:        schema.TypeInt,
+							Computed:    true,
+							Description: "The number of remaining days until certificate expiration used when checking SSL certificates",
 						},
 					},
 				},
 			},
-			"icon_id": {
-				Type:     schema.TypeString,
-				Computed: true,
-			},
-			"description": {
-				Type:     schema.TypeString,
-				Computed: true,
-			},
-			"tags": {
-				Type:     schema.TypeSet,
-				Computed: true,
-				Elem:     &schema.Schema{Type: schema.TypeString},
-				Set:      schema.HashString,
-			},
+			"icon_id":     schemaDataSourceIconID(resourceName),
+			"description": schemaDataSourceDescription(resourceName),
+			"tags":        schemaDataSourceTags(resourceName),
 			"notify_email_enabled": {
-				Type:     schema.TypeBool,
-				Computed: true,
+				Type:        schema.TypeBool,
+				Computed:    true,
+				Description: "The flag to enable notification by email",
 			},
 			"notify_email_html": {
-				Type:     schema.TypeBool,
-				Computed: true,
+				Type:        schema.TypeBool,
+				Computed:    true,
+				Description: "The flag to enable HTML format instead of text format",
 			},
 			"notify_slack_enabled": {
-				Type:     schema.TypeBool,
-				Computed: true,
+				Type:        schema.TypeBool,
+				Computed:    true,
+				Description: "The flag to enable notification by slack/discord",
 			},
 			"notify_slack_webhook": {
-				Type:     schema.TypeString,
-				Computed: true,
+				Type:        schema.TypeString,
+				Computed:    true,
+				Description: "The webhook URL for sending notification by slack/discord",
 			},
 
 			"enabled": {
-				Type:     schema.TypeBool,
-				Computed: true,
+				Type:        schema.TypeBool,
+				Computed:    true,
+				Description: "The flag to enable monitoring by the simple monitor",
 			},
 		},
 	}

@@ -3,12 +3,12 @@ layout: "sakuracloud"
 page_title: "SakuraCloud: sakuracloud_packet_filter_rules"
 subcategory: "Networking"
 description: |-
-  Manages a SakuraCloud PacketFilter Rules.
+  Manages a SakuraCloud Packet Filter Rules.
 ---
 
 # sakuracloud_packet_filter_rules
 
-Manages a SakuraCloud PacketFilter Rules.
+Manages a SakuraCloud Packet Filter Rules.
 
 ## Argument Reference
 
@@ -33,18 +33,18 @@ A `expression` block supports the following:
 
 The `timeouts` block allows you to specify [timeouts](https://www.terraform.io/docs/configuration/resources.html#timeouts) for certain actions:
 
-* `create` - (Defaults to 5 minutes) Used when creating the PacketFilter Rules
+* `create` - (Defaults to 5 minutes) Used when creating the Packet Filter Rules
 
-* `read` -   (Defaults to 5 minutes) Used when reading the PacketFilter Rules
+* `read` -   (Defaults to 5 minutes) Used when reading the Packet Filter Rules
 
 
-* `delete` - (Defaults to 5 minutes) Used when deregistering PacketFilter Rules
+* `delete` - (Defaults to 5 minutes) Used when deregistering Packet Filter Rules
 
 
 
 ## Attribute Reference
 
-* `id` - The ID of the PacketFilter Rules.
+* `id` - The id of the Packet Filter Rules.
 
 
 
