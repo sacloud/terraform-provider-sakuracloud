@@ -42,6 +42,7 @@ A `condition` block supports the following:
 * `icon_id` - The icon id attached to the simple monitor.
 * `notify_email_enabled` - The flag to enable notification by email.
 * `notify_email_html` - The flag to enable HTML format instead of text format.
+* `notify_interval` - The interval in hours between notification.
 * `notify_slack_enabled` - The flag to enable notification by slack/discord.
 * `notify_slack_webhook` - The webhook URL for sending notification by slack/discord.
 * `tags` - Any tags assigned to the simple monitor.

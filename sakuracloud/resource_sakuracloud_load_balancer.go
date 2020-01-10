@@ -29,6 +29,8 @@ import (
 )
 
 func resourceSakuraCloudLoadBalancer() *schema.Resource {
+	resourceName := "LoadBalancer"
+
 	return &schema.Resource{
 		Create: resourceSakuraCloudLoadBalancerCreate,
 		Read:   resourceSakuraCloudLoadBalancerRead,
@@ -40,81 +42,56 @@ func resourceSakuraCloudLoadBalancer() *schema.Resource {
 
 		Timeouts: &schema.ResourceTimeout{
 			Create: schema.DefaultTimeout(60 * time.Minute),
-			Read:   schema.DefaultTimeout(5 * time.Minute),
 			Update: schema.DefaultTimeout(60 * time.Minute),
 			Delete: schema.DefaultTimeout(20 * time.Minute),
 		},
 
 		Schema: map[string]*schema.Schema{
-			"name": {
-				Type:     schema.TypeString,
-				Required: true,
-			},
-			"switch_id": {
-				Type:         schema.TypeString,
-				ForceNew:     true,
-				Required:     true,
-				ValidateFunc: validateSakuracloudIDType,
-			},
+			"name":      schemaResourceName(resourceName),
+			"switch_id": schemaResourceSwitchID(resourceName),
 			"vrid": {
-				Type:     schema.TypeInt,
-				ForceNew: true,
-				Required: true,
+				Type:        schema.TypeInt,
+				ForceNew:    true,
+				Required:    true,
+				Description: "The Virtual Router Identifier. This is only used when `high_availability` is set `true`",
 			},
 			"high_availability": {
-				Type:     schema.TypeBool,
-				ForceNew: true,
-				Optional: true,
-				Default:  false,
+				Type:        schema.TypeBool,
+				ForceNew:    true,
+				Optional:    true,
+				Default:     false,
+				Description: "The flag to enable HA mode",
 			},
-			"plan": {
-				Type:         schema.TypeString,
-				ForceNew:     true,
-				Optional:     true,
-				Default:      "standard",
-				ValidateFunc: validation.StringInSlice([]string{"standard", "highspec"}, false),
-			},
+			"plan": schemaResourcePlan(resourceName, "standard", []string{"standard", "highspec"}),
 			"ip_addresses": {
-				Type:     schema.TypeList,
-				ForceNew: true,
-				Required: true,
-				MinItems: 1,
-				MaxItems: 2,
-				Elem:     &schema.Schema{Type: schema.TypeString},
+				Type:        schema.TypeList,
+				ForceNew:    true,
+				Required:    true,
+				MinItems:    1,
+				MaxItems:    2,
+				Elem:        &schema.Schema{Type: schema.TypeString},
+				Description: descf("A list of IP address to assign to the %s. ", resourceName),
 			},
 			"netmask": {
 				Type:         schema.TypeInt,
 				ForceNew:     true,
 				Required:     true,
 				ValidateFunc: validation.IntBetween(8, 29),
+				Description: descf(
+					"The bit length of the subnet assigned to the %s. %s", resourceName,
+					descRange(8, 29),
+				),
 			},
 			"gateway": {
-				Type:     schema.TypeString,
-				ForceNew: true,
-				Optional: true,
-			},
-			"icon_id": {
-				Type:         schema.TypeString,
-				Optional:     true,
-				ValidateFunc: validateSakuracloudIDType,
-			},
-			"description": {
-				Type:     schema.TypeString,
-				Optional: true,
-			},
-			"tags": {
-				Type:     schema.TypeSet,
-				Optional: true,
-				Elem:     &schema.Schema{Type: schema.TypeString},
-				Set:      schema.HashString,
-			},
-			"zone": {
 				Type:        schema.TypeString,
-				Optional:    true,
-				Computed:    true,
 				ForceNew:    true,
-				Description: "target SakuraCloud zone",
+				Optional:    true,
+				Description: descf("The IP address of the gateway used by %s", resourceName),
 			},
+			"icon_id":     schemaResourceIconID(resourceName),
+			"description": schemaResourceDescription(resourceName),
+			"tags":        schemaResourceTags(resourceName),
+			"zone":        schemaResourceZone(resourceName),
 			"vip": {
 				Type:     schema.TypeList,
 				Optional: true,
@@ -122,28 +99,35 @@ func resourceSakuraCloudLoadBalancer() *schema.Resource {
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
 						"vip": {
-							Type:     schema.TypeString,
-							Required: true,
+							Type:        schema.TypeString,
+							Required:    true,
+							Description: "The virtual IP address",
 						},
 						"port": {
 							Type:         schema.TypeInt,
 							Required:     true,
 							ValidateFunc: validation.IntBetween(1, 65535),
+							Description: descf(
+								"The target port number for load-balancing. %s",
+								descRange(1, 65535),
+							),
 						},
 						"delay_loop": {
 							Type:         schema.TypeInt,
 							Optional:     true,
 							ValidateFunc: validation.IntBetween(10, 2147483647),
 							Default:      10,
+							Description: descf(
+								"The interval in seconds between checks. %s",
+								descRange(10, 2147483647),
+							),
 						},
 						"sorry_server": {
-							Type:     schema.TypeString,
-							Optional: true,
+							Type:        schema.TypeString,
+							Optional:    true,
+							Description: "The IP address of the SorryServer. This will be used when all servers under this VIP are down",
 						},
-						"description": {
-							Type:     schema.TypeString,
-							Optional: true,
-						},
+						"description": schemaResourceDescription("VIP"),
 						"server": {
 							Type:     schema.TypeList,
 							Optional: true,
@@ -151,27 +135,34 @@ func resourceSakuraCloudLoadBalancer() *schema.Resource {
 							Elem: &schema.Resource{
 								Schema: map[string]*schema.Schema{
 									"ip_address": {
-										Type:     schema.TypeString,
-										Required: true,
+										Type:        schema.TypeString,
+										Required:    true,
+										Description: "The IP address of the destination server",
 									},
 									"check_protocol": {
 										Type:         schema.TypeString,
 										Required:     true,
 										ValidateFunc: validation.StringInSlice(types.LoadBalancerHealthCheckProtocolsStrings(), false),
+										Description: descf(
+											"The protocol used for health checks. This must be one of [%s]",
+											types.LoadBalancerHealthCheckProtocolsStrings(),
+										),
 									},
 									"check_path": {
-										Type:     schema.TypeString,
-										Optional: true,
+										Type:        schema.TypeString,
+										Optional:    true,
+										Description: "The path used when checking by HTTP/HTTPS",
 									},
 									"check_status": {
-										Type:     schema.TypeString,
-										Optional: true,
+										Type:        schema.TypeString,
+										Optional:    true,
+										Description: "The response code to expect when checking by HTTP/HTTPS",
 									},
 									"enabled": {
-										Type:     schema.TypeBool,
-										Optional: true,
-										Default:  true,
-										ForceNew: true,
+										Type:        schema.TypeBool,
+										Optional:    true,
+										Default:     true,
+										Description: "The flag to enable as destination of load balancing",
 									},
 								},
 							},

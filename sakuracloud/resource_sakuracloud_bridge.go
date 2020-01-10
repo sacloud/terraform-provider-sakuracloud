@@ -24,6 +24,7 @@ import (
 )
 
 func resourceSakuraCloudBridge() *schema.Resource {
+	resourceName := "Bridge"
 	return &schema.Resource{
 		Create: resourceSakuraCloudBridgeCreate,
 		Read:   resourceSakuraCloudBridgeRead,
@@ -35,27 +36,14 @@ func resourceSakuraCloudBridge() *schema.Resource {
 
 		Timeouts: &schema.ResourceTimeout{
 			Create: schema.DefaultTimeout(20 * time.Minute),
-			Read:   schema.DefaultTimeout(5 * time.Minute),
 			Update: schema.DefaultTimeout(20 * time.Minute),
 			Delete: schema.DefaultTimeout(20 * time.Minute),
 		},
 
 		Schema: map[string]*schema.Schema{
-			"name": {
-				Type:     schema.TypeString,
-				Required: true,
-			},
-			"description": {
-				Type:     schema.TypeString,
-				Optional: true,
-			},
-			"zone": {
-				Type:        schema.TypeString,
-				Optional:    true,
-				Computed:    true,
-				ForceNew:    true,
-				Description: "target SakuraCloud zone",
-			},
+			"name":        schemaResourceName(resourceName),
+			"description": schemaResourceDescription(resourceName),
+			"zone":        schemaResourceZone(resourceName),
 		},
 	}
 }

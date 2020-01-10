@@ -10,7 +10,7 @@ ACC_TEST_UA ?= (Acceptance Test)
 
 export GO111MODULE=on
 
-default: fmt goimports set-license lint tflint
+default: fmt goimports set-license lint tflint docscheck
 
 clean:
 	rm -Rf $(CURDIR)/bin/*

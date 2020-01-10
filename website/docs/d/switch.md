@@ -41,7 +41,7 @@ A `condition` block supports the following:
 * `name` - The name of the switch.
 * `server_ids` - A list of server id connected to the switch.
 * `tags` - Any tags assigned to the switch.
-* `zone` - The name of zone that the switch is in (e.g. `is1a`,`tk1a`).
+* `zone` - The name of zone that the switch is in (e.g. `is1a`, `tk1a`).
 
 
 

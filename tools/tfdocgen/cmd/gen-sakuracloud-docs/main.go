@@ -149,7 +149,7 @@ var definitions = map[string]definition{
 		category:    CategoryMisc,
 	},
 	"sakuracloud_internet": {
-		displayName: "Internet",
+		displayName: "Switch+Router",
 		category:    CategoryNetworking,
 	},
 	"sakuracloud_ipv4_ptr": {

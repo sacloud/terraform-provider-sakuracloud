@@ -16,7 +16,6 @@ package sakuracloud
 
 import (
 	"fmt"
-	"time"
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/sacloud/libsacloud/v2/sacloud"
@@ -27,10 +26,6 @@ func dataSourceSakuraCloudContainerRegistry() *schema.Resource {
 	resourceName := "container registry"
 	return &schema.Resource{
 		Read: dataSourceSakuraCloudContainerRegistryRead,
-
-		Timeouts: &schema.ResourceTimeout{
-			Read: schema.DefaultTimeout(5 * time.Minute),
-		},
 
 		Schema: map[string]*schema.Schema{
 			filterAttrName: filterSchema(&filterSchemaOption{excludeTags: true}),
@@ -46,7 +41,7 @@ func dataSourceSakuraCloudContainerRegistry() *schema.Resource {
 			"subdomain_label": {
 				Type:        schema.TypeString,
 				Computed:    true,
-				Description: "The label of FQDN when be accessed from users.",
+				Description: "The label at the lowest of the FQDN used when be accessed from users",
 			},
 			"fqdn": {
 				Type:        schema.TypeString,

@@ -12,26 +12,25 @@ Manages a SakuraCloud CD-ROM.
 
 ## Argument Reference
 
-* `content` - (Optional) .
-* `content_file_name` - (Optional) . Defaults to `config`.
-* `description` - (Optional) .
-* `hash` - (Optional) .
-* `icon_id` - (Optional) .
-* `iso_image_file` - (Optional) .
-* `name` - (Required) .
-* `size` - (Optional) . Changing this forces a new resource to be created. Defaults to `5`.
-* `tags` - (Optional) .
-* `zone` - (Optional) target SakuraCloud zone. Changing this forces a new resource to be created.
+* `content` - (Optional) The content to upload to as the CD-ROM. This conflicts with [`iso_image_file`].
+* `content_file_name` - (Optional) The name of content file to upload to as the CD-ROM. This is only used when `content` is specified. This conflicts with [`iso_image_file`]. Default:`config`.
+* `description` - (Optional) The description of the CD-ROM. The length of this value must be in the range [`1`-`512`].
+* `hash` - (Optional) The md5 checksum calculated from the base64 encoded file body.
+* `icon_id` - (Optional) The icon id to attach to the CD-ROM.
+* `iso_image_file` - (Optional) The file path to upload to as the CD-ROM. This conflicts with [`content`].
+* `name` - (Required) The name of the CD-ROM. The length of this value must be in the range [`1`-`64`].
+* `size` - (Optional) The size of CD-ROM in GiB. This must be one of [`5`/`10`]. Changing this forces a new resource to be created. Default:`5`.
+* `tags` - (Optional) Any tags to assign to the CD-ROM.
+* `zone` - (Optional) The name of zone that the CD-ROM will be created. (e.g. `is1a`, `tk1a`). Changing this forces a new resource to be created.
 
 
 
 ### Timeouts
 
-The `timeouts` block allows you to specify [timeouts](https://www.terraform.io/docs/configuration/resources.html#timeouts) for certain actions:
+The `timeouts` block allows you to specify [timeouts](https://www.terraform.io/docs/configuration/resources.html#operation-timeouts) for certain actions:
 
 * `create` - (Defaults to 24 hours) Used when creating the CD-ROM
 
-* `read` -   (Defaults to 5 minutes) Used when reading the CD-ROM
 
 * `update` - (Defaults to 24 hours) Used when updating the CD-ROM
 

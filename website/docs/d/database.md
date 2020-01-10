@@ -35,13 +35,13 @@ A `condition` block supports the following:
 ## Attribute Reference
 
 * `id` - The id of the Database.
-* `backup_time` - The time to doing backup. This will formatted in `HH:mm`.
+* `backup_time` - The time to take backup. This will be formatted with `HH:mm`.
 * `backup_weekdays` - The list of name of weekday that doing backup. This will be in [`sun`/`mon`/`tue`/`wed`/`thu`/`fri`/`sat`].
 * `database_type` - The type of the database. This will be one of [`mariadb`/`postgres`].
 * `description` - The description of the database.
 * `gateway` - The IP address of the gateway used by database.
 * `icon_id` - The icon id attached to the database.
-* `ip_addresses` - The list of the IP address assigned to the database.
+* `ip_addresses` - The list of IP address assigned to the database.
 * `name` - The name of the database.
 * `netmask` - The bit length of the subnet assigned to the database.
 * `password` - The password of default user on the database.
@@ -53,7 +53,7 @@ A `condition` block supports the following:
 * `switch_id` - The id of the switch connected from the database.
 * `tags` - Any tags assigned to the database.
 * `username` - The name of default user on the database.
-* `zone` - The name of zone that the database is in (e.g. `is1a`,`tk1a`).
+* `zone` - The name of zone that the database is in (e.g. `is1a`, `tk1a`).
 
 
 

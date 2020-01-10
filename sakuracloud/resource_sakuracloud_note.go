@@ -19,13 +19,15 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/validation"
-	"github.com/sacloud/libsacloud/v2/sacloud"
 	"github.com/sacloud/libsacloud/v2/sacloud/types"
+
+	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
+	"github.com/sacloud/libsacloud/v2/sacloud"
 )
 
 func resourceSakuraCloudNote() *schema.Resource {
+	resourceName := "Note"
 	return &schema.Resource{
 		Create: resourceSakuraCloudNoteCreate,
 		Read:   resourceSakuraCloudNoteRead,
@@ -37,40 +39,33 @@ func resourceSakuraCloudNote() *schema.Resource {
 
 		Timeouts: &schema.ResourceTimeout{
 			Create: schema.DefaultTimeout(5 * time.Minute),
-			Read:   schema.DefaultTimeout(5 * time.Minute),
 			Update: schema.DefaultTimeout(5 * time.Minute),
 			Delete: schema.DefaultTimeout(5 * time.Minute),
 		},
 
 		Schema: map[string]*schema.Schema{
-			"name": {
-				Type:     schema.TypeString,
-				Required: true,
-			},
+			"name": schemaResourceName(resourceName),
 			"content": {
 				Type:     schema.TypeString,
 				Required: true,
-			},
-			"icon_id": {
-				Type:         schema.TypeString,
-				Optional:     true,
-				ValidateFunc: validateSakuracloudIDType,
-			},
-			"description": {
-				Type:     schema.TypeString,
-				Computed: true,
+				Description: descf(
+					"The content of the %s. This must be specified as a shell script or as a cloud-config",
+					resourceName,
+				),
 			},
 			"class": {
 				Type:         schema.TypeString,
 				Optional:     true,
 				Default:      "shell",
 				ValidateFunc: validation.StringInSlice(types.NoteClassStrings, false),
+				Description:  descf("The class of the %s. This must be one of %s", resourceName, types.NoteClassStrings),
 			},
-			"tags": {
-				Type:     schema.TypeSet,
-				Optional: true,
-				Elem:     &schema.Schema{Type: schema.TypeString},
-				Set:      schema.HashString,
+			"icon_id": schemaResourceIconID(resourceName),
+			"tags":    schemaResourceTags(resourceName),
+			"description": {
+				Type:        schema.TypeString,
+				Computed:    true,
+				Description: descf("The description of the %s. This will be computed from special tags within body of `content`", resourceName),
 			},
 		},
 	}

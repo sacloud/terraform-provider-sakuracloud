@@ -26,6 +26,7 @@ import (
 )
 
 func resourceSakuraCloudContainerRegistry() *schema.Resource {
+	resourceName := "Container Registry"
 	return &schema.Resource{
 		Create: resourceSakuraCloudContainerRegistryCreate,
 		Read:   resourceSakuraCloudContainerRegistryRead,
@@ -40,52 +41,49 @@ func resourceSakuraCloudContainerRegistry() *schema.Resource {
 		},
 
 		Schema: map[string]*schema.Schema{
-			"name": {
-				Type:     schema.TypeString,
-				Required: true,
-			},
+			"name": schemaResourceName(resourceName),
 			"access_level": {
 				Type:         schema.TypeString,
 				Required:     true,
 				ValidateFunc: validation.StringInSlice(types.ContainerRegistryVisibilityStrings, false),
+				Description: descf(
+					"The level of access that allow to users. This must be one of [%s]",
+					types.ContainerRegistryVisibilityStrings,
+				),
 			},
 			"subdomain_label": {
-				Type:     schema.TypeString,
-				Required: true,
-				ForceNew: true,
+				Type:         schema.TypeString,
+				Required:     true,
+				ForceNew:     true,
+				ValidateFunc: validation.StringLenBetween(1, 64),
+				Description: descf(
+					"The label at the lowest of the FQDN used when be accessed from users. %s",
+					descLength(1, 64),
+				),
 			},
 			"fqdn": {
-				Type:     schema.TypeString,
-				Computed: true,
+				Type:        schema.TypeString,
+				Computed:    true,
+				Description: "The FQDN for accessing the Container Registry. FQDN is built from `subdomain_label` + `.sakuracr.jp`",
 			},
-			"icon_id": {
-				Type:         schema.TypeString,
-				Optional:     true,
-				ValidateFunc: validateSakuracloudIDType,
-			},
-			"description": {
-				Type:     schema.TypeString,
-				Optional: true,
-			},
-			"tags": {
-				Type:     schema.TypeSet,
-				Optional: true,
-				Elem:     &schema.Schema{Type: schema.TypeString},
-				Set:      schema.HashString,
-			},
+			"icon_id":     schemaResourceIconID(resourceName),
+			"description": schemaResourceDescription(resourceName),
+			"tags":        schemaResourceTags(resourceName),
 			"user": {
 				Type:     schema.TypeList,
 				Optional: true,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
 						"name": {
-							Type:     schema.TypeString,
-							Required: true,
+							Type:        schema.TypeString,
+							Required:    true,
+							Description: "The user name used to authenticate remote access",
 						},
 						"password": {
-							Type:      schema.TypeString,
-							Required:  true,
-							Sensitive: true,
+							Type:        schema.TypeString,
+							Required:    true,
+							Sensitive:   true,
+							Description: "The password used to authenticate remote access",
 						},
 					},
 				},

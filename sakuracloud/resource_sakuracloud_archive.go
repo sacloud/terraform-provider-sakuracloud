@@ -21,12 +21,13 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/customdiff"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
-	"github.com/hashicorp/terraform-plugin-sdk/helper/validation"
 	"github.com/sacloud/libsacloud/v2/sacloud"
 	"github.com/sacloud/libsacloud/v2/sacloud/types"
 )
 
 func resourceSakuraCloudArchive() *schema.Resource {
+	resourceName := "archive"
+
 	return &schema.Resource{
 		Create: resourceSakuraCloudArchiveCreate,
 		Read:   resourceSakuraCloudArchiveRead,
@@ -41,54 +42,28 @@ func resourceSakuraCloudArchive() *schema.Resource {
 
 		Timeouts: &schema.ResourceTimeout{
 			Create: schema.DefaultTimeout(24 * time.Hour),
-			Read:   schema.DefaultTimeout(5 * time.Minute),
 			Update: schema.DefaultTimeout(24 * time.Hour),
 			Delete: schema.DefaultTimeout(5 * time.Minute),
 		},
 
 		Schema: map[string]*schema.Schema{
-			"name": {
-				Type:     schema.TypeString,
-				Required: true,
-			},
-			"size": {
-				Type:         schema.TypeInt,
-				Optional:     true,
-				ForceNew:     true,
-				Default:      20,
-				ValidateFunc: validation.IntInSlice(types.ValidArchiveSizes),
-			},
+			"name": schemaResourceName(resourceName),
+			"size": schemaResourceSize(resourceName, 20, types.ValidArchiveSizes...),
 			"archive_file": {
-				Type:     schema.TypeString,
-				Required: true,
+				Type:        schema.TypeString,
+				Required:    true,
+				Description: "The file path to upload to the SakuraCloud",
 			},
 			"hash": {
-				Type:     schema.TypeString,
-				Optional: true,
-				Computed: true,
-			},
-			"icon_id": {
-				Type:         schema.TypeString,
-				Optional:     true,
-				ValidateFunc: validateSakuracloudIDType,
-			},
-			"description": {
-				Type:     schema.TypeString,
-				Optional: true,
-			},
-			"tags": {
-				Type:     schema.TypeSet,
-				Optional: true,
-				Elem:     &schema.Schema{Type: schema.TypeString},
-				Set:      schema.HashString,
-			},
-			"zone": {
 				Type:        schema.TypeString,
 				Optional:    true,
 				Computed:    true,
-				ForceNew:    true,
-				Description: "target SakuraCloud zone",
+				Description: "The md5 checksum calculated from the base64 encoded file body",
 			},
+			"icon_id":     schemaResourceIconID(resourceName),
+			"description": schemaResourceDescription(resourceName),
+			"tags":        schemaResourceTags(resourceName),
+			"zone":        schemaResourceZone(resourceName),
 		},
 	}
 }

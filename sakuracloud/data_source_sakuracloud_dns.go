@@ -16,7 +16,6 @@ package sakuracloud
 
 import (
 	"fmt"
-	"time"
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/sacloud/libsacloud/v2/sacloud"
@@ -28,10 +27,6 @@ func dataSourceSakuraCloudDNS() *schema.Resource {
 	return &schema.Resource{
 		Read: dataSourceSakuraCloudDNSRead,
 
-		Timeouts: &schema.ResourceTimeout{
-			Read: schema.DefaultTimeout(5 * time.Minute),
-		},
-
 		Schema: map[string]*schema.Schema{
 			filterAttrName: filterSchema(&filterSchemaOption{}),
 			"zone": {
@@ -39,12 +34,11 @@ func dataSourceSakuraCloudDNS() *schema.Resource {
 				Computed:    true,
 				Description: "The name of managed domain",
 			},
-
 			"dns_servers": {
 				Type:        schema.TypeList,
 				Computed:    true,
 				Elem:        &schema.Schema{Type: schema.TypeString},
-				Description: "The list of IP addresses of DNS server that manage this zone",
+				Description: "A list of IP address of DNS server that manage this zone",
 			},
 			"icon_id":     schemaDataSourceIconID(resourceName),
 			"description": schemaDataSourceDescription(resourceName),

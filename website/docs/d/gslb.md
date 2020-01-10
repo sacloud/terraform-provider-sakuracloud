@@ -41,7 +41,7 @@ A `condition` block supports the following:
 * `icon_id` - The icon id attached to the GSLB.
 * `name` - The name of the GSLB.
 * `server` - A list of `server` blocks as defined below.
-* `sorry_server` - The URL of the SorryServer. This will be used when all servers are down.
+* `sorry_server` - The IP address of the SorryServer. This will be used when all servers are down.
 * `tags` - Any tags assigned to the GSLB.
 * `weighted` - The flag to enable weighted load-balancing.
 

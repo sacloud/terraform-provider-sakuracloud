@@ -12,25 +12,24 @@ Manages a SakuraCloud SIM.
 
 ## Argument Reference
 
-* `carrier` - (Required) .
-* `description` - (Optional) .
-* `enabled` - (Optional) . Defaults to `true`.
-* `iccid` - (Required) . Changing this forces a new resource to be created.
-* `icon_id` - (Optional) .
-* `imei` - (Optional) .
-* `name` - (Required) .
-* `passcode` - (Required) . Changing this forces a new resource to be created.
-* `tags` - (Optional) .
+* `carrier` - (Required) A list of a communication company. Each element must be one of `kddi`/`docomo`/`softbank`.
+* `description` - (Optional) The description of the SIM. The length of this value must be in the range [`1`-`512`].
+* `enabled` - (Optional) The flag to enable the SIM. Default:`true`.
+* `iccid` - (Required) ICCID(Integrated Circuit Card ID) assigned to the SIM. Changing this forces a new resource to be created.
+* `icon_id` - (Optional) The icon id to attach to the SIM.
+* `imei` - (Optional) The id of the device to restrict devices that can use the SIM.
+* `name` - (Required) The name of the SIM. The length of this value must be in the range [`1`-`64`].
+* `passcode` - (Required) The passcord to authenticate the SIM. Changing this forces a new resource to be created.
+* `tags` - (Optional) Any tags to assign to the SIM.
 
 
 
 ### Timeouts
 
-The `timeouts` block allows you to specify [timeouts](https://www.terraform.io/docs/configuration/resources.html#timeouts) for certain actions:
+The `timeouts` block allows you to specify [timeouts](https://www.terraform.io/docs/configuration/resources.html#operation-timeouts) for certain actions:
 
 * `create` - (Defaults to 5 minutes) Used when creating the SIM
 
-* `read` -   (Defaults to 5 minutes) Used when reading the SIM
 
 * `update` - (Defaults to 5 minutes) Used when updating the SIM
 
@@ -41,8 +40,8 @@ The `timeouts` block allows you to specify [timeouts](https://www.terraform.io/d
 ## Attribute Reference
 
 * `id` - The id of the SIM.
-* `ip_address` - .
-* `mobile_gateway_id` - .
+* `ip_address` - The IP address assigned to the SIM.
+* `mobile_gateway_id` - The id of the MobileGateway which the SIM is assigned.
 
 
 

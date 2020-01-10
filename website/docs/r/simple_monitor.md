@@ -12,47 +12,46 @@ Manages a SakuraCloud Simple Monitor.
 
 ## Argument Reference
 
-* `delay_loop` - (Optional) . Defaults to `60`.
-* `description` - (Optional) .
-* `enabled` - (Optional) . Defaults to `true`.
+* `delay_loop` - (Optional) The interval in seconds between checks. This must be in the range [`60`-`3600`]. Default:`60`.
+* `description` - (Optional) The description of the SimpleMonitor. The length of this value must be in the range [`1`-`512`].
+* `enabled` - (Optional) The flag to enable monitoring by the simple monitor. Default:`true`.
 * `health_check` - (Required) A `health_check` block as defined below.
-* `icon_id` - (Optional) .
-* `notify_email_enabled` - (Optional) . Defaults to `true`.
-* `notify_email_html` - (Optional) .
-* `notify_interval` - (Optional) Unit: Hours. Defaults to `2`.
-* `notify_slack_enabled` - (Optional) .
-* `notify_slack_webhook` - (Optional) .
-* `tags` - (Optional) .
-* `target` - (Required) . Changing this forces a new resource to be created.
+* `icon_id` - (Optional) The icon id to attach to the SimpleMonitor.
+* `notify_email_enabled` - (Optional) The flag to enable notification by email. Default:`true`.
+* `notify_email_html` - (Optional) The flag to enable HTML format instead of text format.
+* `notify_interval` - (Optional) The interval in hours between notification. Default:`2`.
+* `notify_slack_enabled` - (Optional) The flag to enable notification by slack/discord.
+* `notify_slack_webhook` - (Optional) The webhook URL for sending notification by slack/discord.
+* `tags` - (Optional) Any tags to assign to the SimpleMonitor.
+* `target` - (Required) The monitoring target of the simple monitor. This must be IP address or FQDN. Changing this forces a new resource to be created.
 
 
 ---
 
 A `health_check` block supports the following:
 
-* `community` - (Optional) .
-* `excepcted_data` - (Optional) .
-* `host_header` - (Optional) .
-* `oid` - (Optional) .
-* `password` - (Optional) .
-* `path` - (Optional) .
-* `port` - (Optional) .
-* `protocol` - (Required) .
-* `qname` - (Optional) .
-* `remaining_days` - (Optional) .
-* `sni` - (Optional) .
-* `snmp_version` - (Optional) .
-* `status` - (Optional) .
-* `username` - (Optional) .
+* `community` - (Optional) The SNMP community string used when checking by SNMP.
+* `excepcted_data` - (Optional) The expected value used when checking by DNS.
+* `host_header` - (Optional) The value of host header send when checking by HTTP/HTTPS.
+* `oid` - (Optional) The SNMP OID used when checking by SNMP.
+* `password` - (Optional) The password for basic auth used when checking by HTTP/HTTPS.
+* `path` - (Optional) The path used when checking by HTTP/HTTPS.
+* `port` - (Optional) The target port number.
+* `protocol` - (Required) The protocol used for health checks. This must be one of [`http`/`https`/`ping`/`tcp`/`dns`/`ssh`/`smtp`/`pop3`/`snmp`/`sslcertificate`].
+* `qname` - (Optional) The FQDN used when checking by DNS.
+* `remaining_days` - (Optional) The number of remaining days until certificate expiration used when checking SSL certificates. This must be in the range [`1`-`9999`].
+* `sni` - (Optional) The flag to enable SNI when checking by HTTP/HTTPS.
+* `snmp_version` - (Optional) The SNMP version used when checking by SNMP. This must be one of `1`/`2c`.
+* `status` - (Optional) The response-code to expect when checking by HTTP/HTTPS.
+* `username` - (Optional) The user name for basic auth used when checking by HTTP/HTTPS.
 
 
 ### Timeouts
 
-The `timeouts` block allows you to specify [timeouts](https://www.terraform.io/docs/configuration/resources.html#timeouts) for certain actions:
+The `timeouts` block allows you to specify [timeouts](https://www.terraform.io/docs/configuration/resources.html#operation-timeouts) for certain actions:
 
 * `create` - (Defaults to 5 minutes) Used when creating the Simple Monitor
 
-* `read` -   (Defaults to 5 minutes) Used when reading the Simple Monitor
 
 * `update` - (Defaults to 5 minutes) Used when updating the Simple Monitor
 

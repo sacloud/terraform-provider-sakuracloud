@@ -16,21 +16,16 @@ package sakuracloud
 
 import (
 	"fmt"
-	"github.com/sacloud/libsacloud/v2/sacloud/types"
-	"time"
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/sacloud/libsacloud/v2/sacloud"
+	"github.com/sacloud/libsacloud/v2/sacloud/types"
 )
 
 func dataSourceSakuraCloudVPCRouter() *schema.Resource {
 	resourceName := "VPC Router"
 	return &schema.Resource{
 		Read: dataSourceSakuraCloudVPCRouterRead,
-
-		Timeouts: &schema.ResourceTimeout{
-			Read: schema.DefaultTimeout(5 * time.Minute),
-		},
 
 		Schema: map[string]*schema.Schema{
 			filterAttrName: filterSchema(&filterSchemaOption{}),

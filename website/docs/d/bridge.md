@@ -36,7 +36,7 @@ A `condition` block supports the following:
 * `id` - The id of the Bridge.
 * `description` - The description of the bridge.
 * `name` - The name of the bridge.
-* `zone` - The name of zone that the bridge is in (e.g. `is1a`,`tk1a`).
+* `zone` - The name of zone that the bridge is in (e.g. `is1a`, `tk1a`).
 
 
 

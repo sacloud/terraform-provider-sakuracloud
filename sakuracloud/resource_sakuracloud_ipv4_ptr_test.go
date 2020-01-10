@@ -157,7 +157,8 @@ resource sakuracloud_server "server" {
 
 resource "sakuracloud_ipv4_ptr" "foobar" {
   ip_address = sakuracloud_server.server.ip_address
-  hostname  = "terraform-test-domain01.{{ .arg1 }}"
+  hostname   = "terraform-test-domain01.{{ .arg1 }}"
+  retry_max  = 100
 }
 `
 
@@ -195,6 +196,7 @@ resource sakuracloud_server "server" {
 
 resource "sakuracloud_ipv4_ptr" "foobar" {
   ip_address = sakuracloud_server.server.ip_address
-  hostname  = "terraform-test-domain02.{{ .arg1 }}"
+  hostname   = "terraform-test-domain02.{{ .arg1 }}"
+  retry_max  = 100
 }
 `

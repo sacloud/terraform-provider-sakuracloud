@@ -12,69 +12,68 @@ Manages a SakuraCloud Mobile Gateway.
 
 ## Argument Reference
 
-* `description` - (Optional) .
-* `dns_servers` - (Required) .
-* `icon_id` - (Optional) .
-* `inter_device_communication` - (Optional) .
-* `internet_connection` - (Optional) .
-* `name` - (Required) .
+* `description` - (Optional) The description of the MobileGateway. The length of this value must be in the range [`1`-`512`].
+* `dns_servers` - (Required) A list of IP address used by each connected devices.
+* `icon_id` - (Optional) The icon id to attach to the MobileGateway.
+* `inter_device_communication` - (Optional) The flag to allow communication between each connected devices.
+* `internet_connection` - (Optional) The flag to enable connect to the Internet.
+* `name` - (Required) The name of the MobileGateway. The length of this value must be in the range [`1`-`64`].
 * `private_network_interface` - (Optional) An `private_network_interface` block as defined below.
 * `sim` - (Optional) One or more `sim` blocks as defined below.
 * `sim_route` - (Optional) One or more `sim_route` blocks as defined below.
 * `static_route` - (Optional) One or more `static_route` blocks as defined below.
-* `tags` - (Optional) .
+* `tags` - (Optional) Any tags to assign to the MobileGateway.
 * `traffic_control` - (Optional) A `traffic_control` block as defined below.
-* `zone` - (Optional) target SakuraCloud zone. Changing this forces a new resource to be created.
+* `zone` - (Optional) The name of zone that the MobileGateway will be created. (e.g. `is1a`, `tk1a`). Changing this forces a new resource to be created.
 
 
 ---
 
 A `private_network_interface` block supports the following:
 
-* `ip_address` - (Required) .
-* `netmask` - (Required) .
-* `switch_id` - (Required) .
+* `ip_address` - (Required) The IP address to assign to the MobileGateway.
+* `netmask` - (Required) The bit length of the subnet to assign to the MobileGateway. This must be in the range [`8`-`29`].
+* `switch_id` - (Required) The id of the switch to which the MobileGateway connects.
 
 ---
 
 A `sim` block supports the following:
 
-* `ip_address` - (Required) .
-* `sim_id` - (Required) .
+* `ip_address` - (Required) The IP address to assign to the SIM.
+* `sim_id` - (Required) The id of the Switch connected to the MobileGateway.
 
 ---
 
 A `sim_route` block supports the following:
 
-* `prefix` - (Required) .
-* `sim_id` - (Required) .
+* `prefix` - (Required) The destination network prefix used by the sim routing. This must be specified by CIDR block formatted string.
+* `sim_id` - (Required) The id of the routing destination SIM.
 
 ---
 
 A `static_route` block supports the following:
 
-* `next_hop` - (Required) .
-* `prefix` - (Required) .
+* `next_hop` - (Required) The IP address of next hop.
+* `prefix` - (Required) The destination network prefix used by static routing. This must be specified by CIDR block formatted string.
 
 ---
 
 A `traffic_control` block supports the following:
 
-* `auto_traffic_shaping` - (Optional) .
-* `band_width_limit` - (Optional) .
-* `enable_email` - (Optional) .
-* `enable_slack` - (Optional) .
-* `quota` - (Required) .
-* `slack_webhook` - (Optional) .
+* `auto_traffic_shaping` - (Optional) The flag to enable the traffic shaping.
+* `band_width_limit` - (Optional) The bandwidth allowed when the traffic shaping is enabled.
+* `enable_email` - (Optional) The flag to enable email notification when the traffic shaping is enabled.
+* `enable_slack` - (Optional) The flag to enable slack notification when the traffic shaping is enabled.
+* `quota` - (Required) The threshold of monthly traffic usage to enable to the traffic shaping.
+* `slack_webhook` - (Optional) The webhook URL used when sends notification. It will only used when `enable_slack` is set `true`.
 
 
 ### Timeouts
 
-The `timeouts` block allows you to specify [timeouts](https://www.terraform.io/docs/configuration/resources.html#timeouts) for certain actions:
+The `timeouts` block allows you to specify [timeouts](https://www.terraform.io/docs/configuration/resources.html#operation-timeouts) for certain actions:
 
 * `create` - (Defaults to 60 minutes) Used when creating the Mobile Gateway
 
-* `read` -   (Defaults to 5 minutes) Used when reading the Mobile Gateway
 
 * `update` - (Defaults to 60 minutes) Used when updating the Mobile Gateway
 
@@ -85,8 +84,8 @@ The `timeouts` block allows you to specify [timeouts](https://www.terraform.io/d
 ## Attribute Reference
 
 * `id` - The id of the Mobile Gateway.
-* `public_ip` - .
-* `public_netmask` - .
+* `public_ip` - The public IP address assigned to the MobileGateway.
+* `public_netmask` - The bit length of the subnet assigned to the MobileGateway.
 
 
 

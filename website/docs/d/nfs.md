@@ -45,7 +45,7 @@ A `condition` block supports the following:
 * `size` - The size of NFS in GiB.
 * `switch_id` - The id of the switch connected from the NFS.
 * `tags` - Any tags assigned to the NFS.
-* `zone` - The name of zone that the NFS is in (e.g. `is1a`,`tk1a`).
+* `zone` - The name of zone that the NFS is in (e.g. `is1a`, `tk1a`).
 
 
 

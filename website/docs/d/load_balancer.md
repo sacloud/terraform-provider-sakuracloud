@@ -39,7 +39,7 @@ A `condition` block supports the following:
 * `gateway` - The IP address of the gateway used by load balancer.
 * `high_availability` - The flag to enable HA mode.
 * `icon_id` - The icon id attached to the load balancer.
-* `ip_addresses` - The list of the IP address assigned to the load balancer.
+* `ip_addresses` - The list of IP address assigned to the load balancer.
 * `name` - The name of the load balancer.
 * `netmask` - The bit length of the subnet assigned to the load balancer.
 * `plan` - The plan name of the load balancer. This will be one of [`standard`/`highspec`].
@@ -47,7 +47,7 @@ A `condition` block supports the following:
 * `tags` - Any tags assigned to the load balancer.
 * `vip` - A list of `vip` blocks as defined below.
 * `vrid` - The Virtual Router Identifier. This is only used when `high_availability` is set `true`.
-* `zone` - The name of zone that the load balancer is in (e.g. `is1a`,`tk1a`).
+* `zone` - The name of zone that the load balancer is in (e.g. `is1a`, `tk1a`).
 
 
 ---
@@ -67,7 +67,7 @@ A `server` block exports the following:
 
 * `check_path` - The path used when checking by HTTP/HTTPS.
 * `check_protocol` - The protocol used for health checks. This will be one of [`http`/`https`/`tcp`/`ping`].
-* `check_status` - The response-code to expect when checking by HTTP/HTTPS.
+* `check_status` - The response code to expect when checking by HTTP/HTTPS.
 * `enabled` - The flag to enable as destination of load balancing.
 * `ip_address` - The IP address of the destination server.
 

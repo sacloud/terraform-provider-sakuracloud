@@ -20,11 +20,11 @@ import (
 	"time"
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
-	"github.com/hashicorp/terraform-plugin-sdk/helper/validation"
 	"github.com/sacloud/libsacloud/v2/sacloud"
 )
 
 func resourceSakuraCloudSSHKey() *schema.Resource {
+	resourceName := "SSHKey"
 	return &schema.Resource{
 		Create: resourceSakuraCloudSSHKeyCreate,
 		Read:   resourceSakuraCloudSSHKeyRead,
@@ -36,30 +36,23 @@ func resourceSakuraCloudSSHKey() *schema.Resource {
 
 		Timeouts: &schema.ResourceTimeout{
 			Create: schema.DefaultTimeout(5 * time.Minute),
-			Read:   schema.DefaultTimeout(5 * time.Minute),
 			Update: schema.DefaultTimeout(5 * time.Minute),
 			Delete: schema.DefaultTimeout(5 * time.Minute),
 		},
 
 		Schema: map[string]*schema.Schema{
-			"name": {
-				Type:         schema.TypeString,
-				Required:     true,
-				ValidateFunc: validation.StringLenBetween(1, 64),
-			},
+			"name":        schemaResourceName(resourceName),
+			"description": schemaResourceDescription(resourceName),
 			"public_key": {
-				Type:     schema.TypeString,
-				Required: true,
-				ForceNew: true,
-			},
-			"description": {
-				Type:         schema.TypeString,
-				Optional:     true,
-				ValidateFunc: validation.StringLenBetween(1, 512),
+				Type:        schema.TypeString,
+				Required:    true,
+				ForceNew:    true,
+				Description: "The body of the public key",
 			},
 			"fingerprint": {
-				Type:     schema.TypeString,
-				Computed: true,
+				Type:        schema.TypeString,
+				Computed:    true,
+				Description: "The fingerprint of the public key",
 			},
 		},
 	}
