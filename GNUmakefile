@@ -147,5 +147,5 @@ endif
 
 .PHONY: website-scaffold
 website-scaffold:
-	go run tools/docsgen/cmd/gen-sakuracloud-docs/main.go website-scaffold
+	go run tools/tfdocgen/cmd/gen-sakuracloud-docs/main.go website-scaffold
 
