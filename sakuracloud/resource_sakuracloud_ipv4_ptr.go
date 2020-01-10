@@ -35,7 +35,6 @@ func resourceSakuraCloudIPv4Ptr() *schema.Resource {
 
 		Timeouts: &schema.ResourceTimeout{
 			Create: schema.DefaultTimeout(60 * time.Minute),
-			Read:   schema.DefaultTimeout(5 * time.Minute),
 			Update: schema.DefaultTimeout(60 * time.Minute),
 			Delete: schema.DefaultTimeout(5 * time.Minute),
 		},
@@ -45,30 +44,28 @@ func resourceSakuraCloudIPv4Ptr() *schema.Resource {
 				Type:         schema.TypeString,
 				Required:     true,
 				ValidateFunc: validateIPv4Address(),
+				Description:  "The IP address to which the PTR record is set",
 			},
 			"hostname": {
-				Type:     schema.TypeString,
-				Required: true,
+				Type:        schema.TypeString,
+				Required:    true,
+				Description: "The value of the PTR record. This must be FQDN",
 			},
 			"retry_max": {
 				Type:         schema.TypeInt,
 				Optional:     true,
 				Default:      30,
 				ValidateFunc: validation.IntBetween(1, 100),
+				Description:  "The maximum number of API call retries used when SakuraCloud API returns any errors",
 			},
 			"retry_interval": {
 				Type:         schema.TypeInt,
 				Optional:     true,
 				Default:      10,
 				ValidateFunc: validation.IntBetween(1, 600),
+				Description:  "The wait interval(in seconds) for retrying API call used when SakuraCloud API returns any errors",
 			},
-			"zone": {
-				Type:        schema.TypeString,
-				Optional:    true,
-				Computed:    true,
-				ForceNew:    true,
-				Description: "target SakuraCloud zone",
-			},
+			"zone": schemaResourceZone("IPv4 PTR"),
 		},
 	}
 }

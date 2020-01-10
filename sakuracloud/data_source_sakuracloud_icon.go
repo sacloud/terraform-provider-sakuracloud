@@ -16,7 +16,6 @@ package sakuracloud
 
 import (
 	"fmt"
-	"time"
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/sacloud/libsacloud/v2/sacloud"
@@ -26,10 +25,6 @@ func dataSourceSakuraCloudIcon() *schema.Resource {
 	resourceName := "icon"
 	return &schema.Resource{
 		Read: dataSourceSakuraCloudIconRead,
-
-		Timeouts: &schema.ResourceTimeout{
-			Read: schema.DefaultTimeout(5 * time.Minute),
-		},
 
 		Schema: map[string]*schema.Schema{
 			filterAttrName: filterSchema(&filterSchemaOption{}),

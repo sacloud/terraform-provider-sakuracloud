@@ -16,7 +16,6 @@ package sakuracloud
 
 import (
 	"fmt"
-	"time"
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/sacloud/libsacloud/v2/sacloud"
@@ -28,10 +27,6 @@ func dataSourceSakuraCloudDatabase() *schema.Resource {
 
 	return &schema.Resource{
 		Read: dataSourceSakuraCloudDatabaseRead,
-
-		Timeouts: &schema.ResourceTimeout{
-			Read: schema.DefaultTimeout(5 * time.Minute),
-		},
 
 		Schema: map[string]*schema.Schema{
 			filterAttrName: filterSchema(&filterSchemaOption{}),
@@ -81,7 +76,7 @@ func dataSourceSakuraCloudDatabase() *schema.Resource {
 			"backup_time": {
 				Type:        schema.TypeString,
 				Computed:    true,
-				Description: "The time to doing backup. This will formatted in `HH:mm`",
+				Description: "The time to take backup. This will be formatted with `HH:mm`",
 			},
 			"switch_id":    schemaDataSourceSwitchID(resourceName),
 			"ip_addresses": schemaDataSourceIPAddresses(resourceName),

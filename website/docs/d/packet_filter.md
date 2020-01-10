@@ -37,7 +37,7 @@ A `condition` block supports the following:
 * `id` - The id of the Packet Filter.
 * `description` - The description of the packet filter.
 * `name` - The name of the packet filter.
-* `zone` - The name of zone that the packet filter is in (e.g. `is1a`,`tk1a`).
+* `zone` - The name of zone that the packet filter is in (e.g. `is1a`, `tk1a`).
 
 
 ---

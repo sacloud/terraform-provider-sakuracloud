@@ -59,7 +59,7 @@ A `condition` block supports the following:
 * `user` - A list of `user` blocks as defined below.
 * `vip` - The virtual IP address of the VPC Router. This is only used when `plan` is not `standard`.
 * `vrid` - The Virtual Router Identifier. This is only used when `plan` is not `standard`.
-* `zone` - The name of zone that the VPC Router is in (e.g. `is1a`,`tk1a`).
+* `zone` - The name of zone that the VPC Router is in (e.g. `is1a`, `tk1a`).
 
 
 ---

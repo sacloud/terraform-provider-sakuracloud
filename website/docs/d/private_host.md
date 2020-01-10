@@ -43,7 +43,7 @@ A `condition` block supports the following:
 * `icon_id` - The icon id attached to the private host.
 * `name` - The name of the private host.
 * `tags` - Any tags assigned to the private host.
-* `zone` - The name of zone that the private host is in (e.g. `is1a`,`tk1a`).
+* `zone` - The name of zone that the private host is in (e.g. `is1a`, `tk1a`).
 
 
 

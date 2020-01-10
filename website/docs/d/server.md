@@ -53,7 +53,7 @@ A `condition` block supports the following:
 * `private_host_id` - The id of the private host which the server is assigned.
 * `private_host_name` - The name of the private host which the server is assigned.
 * `tags` - Any tags assigned to the server.
-* `zone` - The name of zone that the server is in (e.g. `is1a`,`tk1a`).
+* `zone` - The name of zone that the server is in (e.g. `is1a`, `tk1a`).
 
 
 ---

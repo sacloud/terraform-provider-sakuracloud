@@ -3,53 +3,52 @@ layout: "sakuracloud"
 page_title: "SakuraCloud: sakuracloud_internet"
 subcategory: "Networking"
 description: |-
-  Manages a SakuraCloud Internet.
+  Manages a SakuraCloud Switch+Router.
 ---
 
 # sakuracloud_internet
 
-Manages a SakuraCloud Internet.
+Manages a SakuraCloud Switch+Router.
 
 ## Argument Reference
 
-* `band_width` - (Optional) . Defaults to `100`.
-* `description` - (Optional) .
-* `enable_ipv6` - (Optional) .
-* `icon_id` - (Optional) .
-* `name` - (Required) .
-* `netmask` - (Optional) . Changing this forces a new resource to be created. Defaults to `28`.
-* `tags` - (Optional) .
-* `zone` - (Optional) target SakuraCloud zone. Changing this forces a new resource to be created.
+* `band_width` - (Optional) The bandwidth of the network connected to the Internet in Mbps. `100`/`250`/`500`/`1000`/`1500`/`2000`/`2500`/`3000`/`5000`. Default:`100`.
+* `description` - (Optional) The description of the Switch+Router. The length of this value must be in the range [`1`-`512`].
+* `enable_ipv6` - (Optional) The flag to enable IPv6.
+* `icon_id` - (Optional) The icon id to attach to the Switch+Router.
+* `name` - (Required) The name of the Switch+Router. The length of this value must be in the range [`1`-`64`].
+* `netmask` - (Optional) The bit length of the subnet assigned to the Switch+Router. `26`/`27`/`28`. Changing this forces a new resource to be created. Default:`28`.
+* `tags` - (Optional) Any tags to assign to the Switch+Router.
+* `zone` - (Optional) The name of zone that the Switch+Router will be created. (e.g. `is1a`, `tk1a`). Changing this forces a new resource to be created.
 
 
 
 ### Timeouts
 
-The `timeouts` block allows you to specify [timeouts](https://www.terraform.io/docs/configuration/resources.html#timeouts) for certain actions:
+The `timeouts` block allows you to specify [timeouts](https://www.terraform.io/docs/configuration/resources.html#operation-timeouts) for certain actions:
 
-* `create` - (Defaults to 60 minutes) Used when creating the Internet
+* `create` - (Defaults to 60 minutes) Used when creating the Switch+Router
 
-* `read` -   (Defaults to 5 minutes) Used when reading the Internet
 
-* `update` - (Defaults to 60 minutes) Used when updating the Internet
+* `update` - (Defaults to 60 minutes) Used when updating the Switch+Router
 
-* `delete` - (Defaults to 20 minutes) Used when deregistering Internet
+* `delete` - (Defaults to 20 minutes) Used when deregistering Switch+Router
 
 
 
 ## Attribute Reference
 
-* `id` - The id of the Internet.
-* `gateway` - .
-* `ip_addresses` - .
-* `ipv6_network_address` - .
-* `ipv6_prefix` - .
-* `ipv6_prefix_len` - .
-* `max_ip_address` - .
-* `min_ip_address` - .
-* `network_address` - .
-* `server_ids` - .
-* `switch_id` - .
+* `id` - The id of the Switch+Router.
+* `gateway` - The IP address of the gateway used by the Switch+Router.
+* `ip_addresses` - A list of assigned global address to the Switch+Router.
+* `ipv6_network_address` - The IPv6 network address assigned to the Switch+Router.
+* `ipv6_prefix` - The network prefix of assigned IPv6 addresses to the Switch+Router.
+* `ipv6_prefix_len` - The bit length of IPv6 network prefix.
+* `max_ip_address` - Maximum IP address in assigned global addresses to the Switch+Router.
+* `min_ip_address` - Minimum IP address in assigned global addresses to the Switch+Router.
+* `network_address` - The IPv4 network address assigned to the Switch+Router.
+* `server_ids` - A list of the ID of Servers connected to the Switch+Router.
+* `switch_id` - The id of the switch.
 
 
 

@@ -30,6 +30,7 @@ import (
 )
 
 func resourceSakuraCloudNFS() *schema.Resource {
+	resourceName := "NFS"
 	return &schema.Resource{
 		Create: resourceSakuraCloudNFSCreate,
 		Read:   resourceSakuraCloudNFSRead,
@@ -41,73 +42,42 @@ func resourceSakuraCloudNFS() *schema.Resource {
 
 		Timeouts: &schema.ResourceTimeout{
 			Create: schema.DefaultTimeout(24 * time.Hour),
-			Read:   schema.DefaultTimeout(5 * time.Minute),
 			Update: schema.DefaultTimeout(24 * time.Hour),
 			Delete: schema.DefaultTimeout(20 * time.Minute),
 		},
 
 		Schema: map[string]*schema.Schema{
-			"name": {
-				Type:     schema.TypeString,
-				Required: true,
-			},
-			"switch_id": {
-				Type:         schema.TypeString,
-				ForceNew:     true,
-				Required:     true,
-				ValidateFunc: validateSakuracloudIDType,
-			},
-			"plan": {
-				Type:         schema.TypeString,
-				ForceNew:     true,
-				Optional:     true,
-				Default:      "hdd",
-				ValidateFunc: validation.StringInSlice(types.NFSPlanStrings, false),
-			},
-			"size": {
-				Type:     schema.TypeInt,
-				ForceNew: true,
-				Optional: true,
-				Default:  100,
-			},
+			"name":      schemaResourceName(resourceName),
+			"switch_id": schemaResourceSwitchID(resourceName),
+			"plan":      schemaResourcePlan(resourceName, "hdd", types.NFSPlanStrings),
+			"size":      schemaResourceSize(resourceName, 100),
 			"ip_address": {
-				Type:     schema.TypeString,
-				ForceNew: true,
-				Required: true,
+				Type:        schema.TypeString,
+				ForceNew:    true,
+				Required:    true,
+				Description: descf("The IP address to assign to the %s", resourceName),
 			},
 			"netmask": {
 				Type:         schema.TypeInt,
 				ForceNew:     true,
 				Required:     true,
 				ValidateFunc: validation.IntBetween(8, 29),
+				Description: descf(
+					"The bit length of the subnet to assign to the %s. %s",
+					resourceName,
+					descRange(8, 29),
+				),
 			},
 			"gateway": {
-				Type:     schema.TypeString,
-				ForceNew: true,
-				Optional: true,
-			},
-			"icon_id": {
-				Type:         schema.TypeString,
-				Optional:     true,
-				ValidateFunc: validateSakuracloudIDType,
-			},
-			"description": {
-				Type:     schema.TypeString,
-				Optional: true,
-			},
-			"tags": {
-				Type:     schema.TypeSet,
-				Optional: true,
-				Elem:     &schema.Schema{Type: schema.TypeString},
-				Set:      schema.HashString,
-			},
-			"zone": {
 				Type:        schema.TypeString,
-				Optional:    true,
-				Computed:    true,
 				ForceNew:    true,
-				Description: "target SakuraCloud zone",
+				Optional:    true,
+				Description: descf("The IP address of the gateway used by %s", resourceName),
 			},
+			"icon_id":     schemaResourceIconID(resourceName),
+			"description": schemaResourceDescription(resourceName),
+			"tags":        schemaResourceTags(resourceName),
+			"zone":        schemaResourceZone(resourceName),
 		},
 	}
 }

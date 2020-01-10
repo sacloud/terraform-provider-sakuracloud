@@ -26,6 +26,7 @@ import (
 )
 
 func resourceSakuraCloudDNS() *schema.Resource {
+	resourceName := "DNS"
 	return &schema.Resource{
 		Create: resourceSakuraCloudDNSCreate,
 		Read:   resourceSakuraCloudDNSRead,
@@ -37,21 +38,22 @@ func resourceSakuraCloudDNS() *schema.Resource {
 
 		Timeouts: &schema.ResourceTimeout{
 			Create: schema.DefaultTimeout(5 * time.Minute),
-			Read:   schema.DefaultTimeout(5 * time.Minute),
 			Update: schema.DefaultTimeout(5 * time.Minute),
 			Delete: schema.DefaultTimeout(5 * time.Minute),
 		},
 
 		Schema: map[string]*schema.Schema{
 			"zone": {
-				Type:     schema.TypeString,
-				Required: true,
-				ForceNew: true,
+				Type:        schema.TypeString,
+				Required:    true,
+				ForceNew:    true,
+				Description: "The target zone. (e.g. `example.com`)",
 			},
 			"dns_servers": {
-				Type:     schema.TypeList,
-				Computed: true,
-				Elem:     &schema.Schema{Type: schema.TypeString},
+				Type:        schema.TypeList,
+				Computed:    true,
+				Elem:        &schema.Schema{Type: schema.TypeString},
+				Description: "A list of IP address of DNS server that manage this zone",
 			},
 			"record": {
 				Type:     schema.TypeList,
@@ -60,57 +62,51 @@ func resourceSakuraCloudDNS() *schema.Resource {
 				MaxItems: 1000,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
-						"name": {
-							Type:     schema.TypeString,
-							Required: true,
-						},
+						"name": schemaResourceName("DNS Record"),
 						"type": {
 							Type:         schema.TypeString,
 							Required:     true,
 							ValidateFunc: validation.StringInSlice(types.DNSRecordTypesStrings(), false),
+							Description: descf(
+								"The type of DNS Record. This must be one of [%s]",
+								types.DNSRecordTypesStrings(),
+							),
 						},
 						"value": {
-							Type:     schema.TypeString,
-							Required: true,
+							Type:        schema.TypeString,
+							Required:    true,
+							Description: "The value of the DNS Record",
 						},
 						"ttl": {
-							Type:     schema.TypeInt,
-							Optional: true,
-							Default:  defaultTTL,
+							Type:        schema.TypeInt,
+							Optional:    true,
+							Default:     defaultTTL,
+							Description: "The number of the TTL",
 						},
 						"priority": {
 							Type:         schema.TypeInt,
 							Optional:     true,
 							ValidateFunc: validation.IntBetween(0, 65535),
+							Description:  descf("The priority of target DNS Record. %s", descRange(0, 65535)),
 						},
 						"weight": {
 							Type:         schema.TypeInt,
 							Optional:     true,
 							ValidateFunc: validation.IntBetween(0, 65535),
+							Description:  descf("The weight of target DNS Record. %s", descRange(0, 65535)),
 						},
 						"port": {
 							Type:         schema.TypeInt,
 							Optional:     true,
 							ValidateFunc: validation.IntBetween(1, 65535),
+							Description:  descf("The number of port. %s", descRange(1, 65535)),
 						},
 					},
 				},
 			},
-			"icon_id": {
-				Type:         schema.TypeString,
-				Optional:     true,
-				ValidateFunc: validateSakuracloudIDType,
-			},
-			"description": {
-				Type:     schema.TypeString,
-				Optional: true,
-			},
-			"tags": {
-				Type:     schema.TypeSet,
-				Optional: true,
-				Elem:     &schema.Schema{Type: schema.TypeString},
-				Set:      schema.HashString,
-			},
+			"icon_id":     schemaResourceIconID(resourceName),
+			"description": schemaResourceDescription(resourceName),
+			"tags":        schemaResourceTags(resourceName),
 		},
 	}
 }

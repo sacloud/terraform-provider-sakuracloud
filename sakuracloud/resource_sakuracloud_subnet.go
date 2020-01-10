@@ -25,6 +25,7 @@ import (
 )
 
 func resourceSakuraCloudSubnet() *schema.Resource {
+	resourceName := "Subnet"
 	return &schema.Resource{
 		Create: resourceSakuraCloudSubnetCreate,
 		Read:   resourceSakuraCloudSubnetRead,
@@ -36,7 +37,6 @@ func resourceSakuraCloudSubnet() *schema.Resource {
 
 		Timeouts: &schema.ResourceTimeout{
 			Create: schema.DefaultTimeout(60 * time.Minute),
-			Read:   schema.DefaultTimeout(5 * time.Minute),
 			Update: schema.DefaultTimeout(60 * time.Minute),
 			Delete: schema.DefaultTimeout(5 * time.Minute),
 		},
@@ -47,6 +47,7 @@ func resourceSakuraCloudSubnet() *schema.Resource {
 				ForceNew:     true,
 				Required:     true,
 				ValidateFunc: validateSakuracloudIDType,
+				Description:  "The id of the switch+router resource that the subnet belongs",
 			},
 			"netmask": {
 				Type:         schema.TypeInt,
@@ -54,38 +55,42 @@ func resourceSakuraCloudSubnet() *schema.Resource {
 				Optional:     true,
 				ValidateFunc: validation.IntInSlice([]int{28, 27, 26}),
 				Default:      28,
+				Description: descf(
+					"The bit length of the subnet to assign to the %s. %s", resourceName,
+					descRange(26, 28),
+				),
 			},
 			"next_hop": {
-				Type:     schema.TypeString,
-				Required: true,
-			},
-			"zone": {
 				Type:        schema.TypeString,
-				Optional:    true,
-				Computed:    true,
-				ForceNew:    true,
-				Description: "target SakuraCloud zone",
+				Required:    true,
+				Description: "The ip address of the next-hop at the subnet",
 			},
+			"zone": schemaResourceZone(resourceName),
 			"switch_id": {
-				Type:     schema.TypeString,
-				Computed: true,
+				Type:        schema.TypeString,
+				Computed:    true,
+				Description: descf("The id of the switch connected from the %s", resourceName),
 			},
 			"network_address": {
-				Type:     schema.TypeString,
-				Computed: true,
+				Type:        schema.TypeString,
+				Computed:    true,
+				Description: "The IPv4 network address assigned to the Subnet",
 			},
 			"min_ip_address": {
-				Type:     schema.TypeString,
-				Computed: true,
+				Type:        schema.TypeString,
+				Computed:    true,
+				Description: "Minimum IP address in assigned global addresses to the subnet",
 			},
 			"max_ip_address": {
-				Type:     schema.TypeString,
-				Computed: true,
+				Type:        schema.TypeString,
+				Computed:    true,
+				Description: "Maximum IP address in assigned global addresses to the subnet",
 			},
 			"ip_addresses": {
-				Type:     schema.TypeList,
-				Computed: true,
-				Elem:     &schema.Schema{Type: schema.TypeString},
+				Type:        schema.TypeList,
+				Computed:    true,
+				Elem:        &schema.Schema{Type: schema.TypeString},
+				Description: "A list of assigned global address to the subnet",
 			},
 		},
 	}

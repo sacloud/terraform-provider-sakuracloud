@@ -39,7 +39,7 @@ A `condition` block supports the following:
 * `fqdn` - The FQDN for accessing the container registry. FQDN is built from `subdomain_label` + `.sakuracr.jp`.
 * `icon_id` - The icon id attached to the container registry.
 * `name` - The name of the container registry.
-* `subdomain_label` - The label of FQDN when be accessed from users..
+* `subdomain_label` - The label at the lowest of the FQDN used when be accessed from users.
 * `tags` - Any tags assigned to the container registry.
 
 

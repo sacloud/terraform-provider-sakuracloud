@@ -16,21 +16,16 @@ package sakuracloud
 
 import (
 	"fmt"
-	"github.com/sacloud/libsacloud/v2/sacloud/types"
-	"time"
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/sacloud/libsacloud/v2/sacloud"
+	"github.com/sacloud/libsacloud/v2/sacloud/types"
 )
 
 func dataSourceSakuraCloudSimpleMonitor() *schema.Resource {
 	resourceName := "simple monitor"
 	return &schema.Resource{
 		Read: dataSourceSakuraCloudSimpleMonitorRead,
-
-		Timeouts: &schema.ResourceTimeout{
-			Read: schema.DefaultTimeout(5 * time.Minute),
-		},
 
 		Schema: map[string]*schema.Schema{
 			filterAttrName: filterSchema(&filterSchemaOption{}),
@@ -148,7 +143,11 @@ func dataSourceSakuraCloudSimpleMonitor() *schema.Resource {
 				Computed:    true,
 				Description: "The webhook URL for sending notification by slack/discord",
 			},
-
+			"notify_interval": {
+				Type:        schema.TypeInt,
+				Computed:    true,
+				Description: "The interval in hours between notification",
+			},
 			"enabled": {
 				Type:        schema.TypeBool,
 				Computed:    true,

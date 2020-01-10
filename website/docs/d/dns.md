@@ -36,7 +36,7 @@ A `condition` block supports the following:
 
 * `id` - The id of the DNS.
 * `description` - The description of the DNS.
-* `dns_servers` - The list of IP addresses of DNS server that manage this zone.
+* `dns_servers` - A list of IP address of DNS server that manage this zone.
 * `icon_id` - The icon id attached to the DNS.
 * `record` - A list of `record` blocks as defined below.
 * `tags` - Any tags assigned to the DNS.

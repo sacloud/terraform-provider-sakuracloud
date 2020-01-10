@@ -40,7 +40,7 @@ A `condition` block supports the following:
 * `name` - The name of the CD-ROM.
 * `size` - The size of CD-ROM in GiB.
 * `tags` - Any tags assigned to the CD-ROM.
-* `zone` - The name of zone that the CD-ROM is in (e.g. `is1a`,`tk1a`).
+* `zone` - The name of zone that the CD-ROM is in (e.g. `is1a`, `tk1a`).
 
 
 

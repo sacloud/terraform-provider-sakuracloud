@@ -44,20 +44,20 @@ A `condition` block supports the following:
 * `bind_port` - A list of `bind_port` blocks as defined below.
 * `certificate` - A list of `certificate` blocks as defined below.
 * `description` - The description of the proxy LB.
-* `fqdn` - The FQDN for accessing to the proxyLB. This is typically used as value of CNAME record.
+* `fqdn` - The FQDN for accessing to the proxy LB. This is typically used as value of CNAME record.
 * `health_check` - A list of `health_check` blocks as defined below.
 * `icon_id` - The icon id attached to the proxy LB.
 * `name` - The name of the proxy LB.
 * `plan` - The plan name of the proxy LB. This will be one of [`100`/`500`/`1000`/`5000`/`10000`/`50000`/`100000`].
-* `proxy_networks` - A list of CIDR block used by proxyLB to access the server.
-* `region` - The name of region that the proxy LB is in. This will be one of [`http`/`https`/`tcp`].
+* `proxy_networks` - A list of CIDR block used by the proxy LB to access the server.
+* `region` - The name of region that the proxy LB is in. This will be one of [`tk1`/`is1`].
 * `rule` - A list of `rule` blocks as defined below.
 * `server` - A list of `server` blocks as defined below.
 * `sorry_server` - A list of `sorry_server` blocks as defined below.
 * `sticky_session` - The flag to enable sticky session.
 * `tags` - Any tags assigned to the proxy LB.
 * `timeout` - The timeout duration in seconds.
-* `vip` - The virtual IP address assigned to the proxyLB.
+* `vip` - The virtual IP address assigned to the proxy LB.
 * `vip_failover` - The flag to enable VIP fail-over.
 
 
@@ -75,8 +75,8 @@ A `bind_port` block exports the following:
 
 A `response_header` block exports the following:
 
-* `header` - The field name of HTTP header added to response by proxyLB.
-* `value` - The field value of HTTP header added to response by proxyLB.
+* `header` - The field name of HTTP header added to response by the proxy LB.
+* `value` - The field value of HTTP header added to response by the proxy LB.
 
 ---
 

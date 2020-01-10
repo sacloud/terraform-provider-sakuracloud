@@ -34,7 +34,6 @@ func resourceSakuraCloudProxyLBACME() *schema.Resource {
 
 		Timeouts: &schema.ResourceTimeout{
 			Create: schema.DefaultTimeout(20 * time.Minute),
-			Read:   schema.DefaultTimeout(5 * time.Minute),
 			Delete: schema.DefaultTimeout(5 * time.Minute),
 		},
 
@@ -44,22 +43,25 @@ func resourceSakuraCloudProxyLBACME() *schema.Resource {
 				Required:     true,
 				ForceNew:     true,
 				ValidateFunc: validateSakuracloudIDType,
+				Description:  "The id of the ProxyLB that set ACME settings to",
 			},
 			"accept_tos": {
 				Type:        schema.TypeBool,
 				Required:    true,
 				ForceNew:    true,
-				Description: "If you set this flag to true, you accept the current Let's Encrypt terms of service(see: https://letsencrypt.org/repository/)",
+				Description: "The flag to accept the current Let's Encrypt terms of service(see: https://letsencrypt.org/repository/). This must be set `true` explicitly",
 			},
 			"common_name": {
-				Type:     schema.TypeString,
-				Required: true,
-				ForceNew: true,
+				Type:        schema.TypeString,
+				Required:    true,
+				ForceNew:    true,
+				Description: "The FQDN used by ACME. This must set resolvable value",
 			},
 			"update_delay_sec": {
-				Type:     schema.TypeInt,
-				Optional: true,
-				ForceNew: true,
+				Type:        schema.TypeInt,
+				Optional:    true,
+				ForceNew:    true,
+				Description: "The wait time in seconds. This typically used for waiting for a DNS propagation",
 			},
 			"certificate": {
 				Type:     schema.TypeList,
@@ -67,16 +69,19 @@ func resourceSakuraCloudProxyLBACME() *schema.Resource {
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
 						"server_cert": {
-							Type:     schema.TypeString,
-							Computed: true,
+							Type:        schema.TypeString,
+							Computed:    true,
+							Description: "The certificate for a server",
 						},
 						"intermediate_cert": {
-							Type:     schema.TypeString,
-							Computed: true,
+							Type:        schema.TypeString,
+							Computed:    true,
+							Description: "The intermediate certificate for a server",
 						},
 						"private_key": {
-							Type:     schema.TypeString,
-							Computed: true,
+							Type:        schema.TypeString,
+							Computed:    true,
+							Description: "The private key for a server",
 						},
 						"additional_certificate": {
 							Type:     schema.TypeList,
@@ -84,16 +89,19 @@ func resourceSakuraCloudProxyLBACME() *schema.Resource {
 							Elem: &schema.Resource{
 								Schema: map[string]*schema.Schema{
 									"server_cert": {
-										Type:     schema.TypeString,
-										Computed: true,
+										Type:        schema.TypeString,
+										Computed:    true,
+										Description: "The certificate for a server",
 									},
 									"intermediate_cert": {
-										Type:     schema.TypeString,
-										Computed: true,
+										Type:        schema.TypeString,
+										Computed:    true,
+										Description: "The intermediate certificate for a server",
 									},
 									"private_key": {
-										Type:     schema.TypeString,
-										Computed: true,
+										Type:        schema.TypeString,
+										Computed:    true,
+										Description: "The private key for a server",
 									},
 								},
 							},

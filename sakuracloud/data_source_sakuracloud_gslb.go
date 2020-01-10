@@ -16,7 +16,6 @@ package sakuracloud
 
 import (
 	"fmt"
-	"time"
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/sacloud/libsacloud/v2/sacloud"
@@ -27,10 +26,6 @@ func dataSourceSakuraCloudGSLB() *schema.Resource {
 	resourceName := "GSLB"
 	return &schema.Resource{
 		Read: dataSourceSakuraCloudGSLBRead,
-
-		Timeouts: &schema.ResourceTimeout{
-			Read: schema.DefaultTimeout(5 * time.Minute),
-		},
 
 		Schema: map[string]*schema.Schema{
 			filterAttrName: filterSchema(&filterSchemaOption{}),
@@ -89,7 +84,7 @@ func dataSourceSakuraCloudGSLB() *schema.Resource {
 			"sorry_server": {
 				Type:        schema.TypeString,
 				Computed:    true,
-				Description: "The URL of the SorryServer. This will be used when all servers are down",
+				Description: "The IP address of the SorryServer. This will be used when all servers are down",
 			},
 			"icon_id":     schemaDataSourceIconID(resourceName),
 			"description": schemaDataSourceDescription(resourceName),

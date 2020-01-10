@@ -16,7 +16,6 @@ package sakuracloud
 
 import (
 	"fmt"
-	"time"
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/sacloud/libsacloud/v2/sacloud"
@@ -27,10 +26,6 @@ func dataSourceSakuraCloudProxyLB() *schema.Resource {
 	resourceName := "proxy LB"
 	return &schema.Resource{
 		Read: dataSourceSakuraCloudProxyLBRead,
-
-		Timeouts: &schema.ResourceTimeout{
-			Read: schema.DefaultTimeout(5 * time.Minute),
-		},
 
 		Schema: map[string]*schema.Schema{
 			filterAttrName: filterSchema(&filterSchemaOption{}),
@@ -56,7 +51,7 @@ func dataSourceSakuraCloudProxyLB() *schema.Resource {
 				Computed: true,
 				Description: descf(
 					"The name of region that the proxy LB is in. This will be one of [%s]",
-					types.ProxyLBProxyModeStrings,
+					types.ProxyLBRegionStrings,
 				),
 			},
 			"bind_port": {
@@ -95,12 +90,12 @@ func dataSourceSakuraCloudProxyLB() *schema.Resource {
 									"header": {
 										Type:        schema.TypeString,
 										Computed:    true,
-										Description: "The field name of HTTP header added to response by proxyLB",
+										Description: descf("The field name of HTTP header added to response by the %s", resourceName),
 									},
 									"value": {
 										Type:        schema.TypeString,
 										Computed:    true,
-										Description: "The field value of HTTP header added to response by proxyLB",
+										Description: descf("The field value of HTTP header added to response by the %s", resourceName),
 									},
 								},
 							},
@@ -265,18 +260,18 @@ func dataSourceSakuraCloudProxyLB() *schema.Resource {
 			"fqdn": {
 				Type:        schema.TypeString,
 				Computed:    true,
-				Description: "The FQDN for accessing to the proxyLB. This is typically used as value of CNAME record",
+				Description: descf("The FQDN for accessing to the %s. This is typically used as value of CNAME record", resourceName),
 			},
 			"vip": {
 				Type:        schema.TypeString,
 				Computed:    true,
-				Description: "The virtual IP address assigned to the proxyLB",
+				Description: descf("The virtual IP address assigned to the %s", resourceName),
 			},
 			"proxy_networks": {
 				Type:        schema.TypeList,
 				Elem:        &schema.Schema{Type: schema.TypeString},
 				Computed:    true,
-				Description: "A list of CIDR block used by proxyLB to access the server",
+				Description: descf("A list of CIDR block used by the %s to access the server", resourceName),
 			},
 		},
 	}

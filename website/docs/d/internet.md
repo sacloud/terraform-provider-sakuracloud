@@ -3,12 +3,12 @@ layout: "sakuracloud"
 page_title: "SakuraCloud: sakuracloud_internet"
 subcategory: "Networking"
 description: |-
-  Get information about an existing Internet.
+  Get information about an existing Switch+Router.
 ---
 
 # Data Source: sakuracloud_internet
 
-Get information about an existing Internet.
+Get information about an existing Switch+Router.
 
 ## Argument Reference
 
@@ -34,25 +34,25 @@ A `condition` block supports the following:
 
 ## Attribute Reference
 
-* `id` - The id of the Internet.
+* `id` - The id of the Switch+Router.
 * `band_width` - The bandwidth of the network connected to the Internet in Mbps.
-* `description` - The description of the switch+router.
+* `description` - The description of the Switch+Router.
 * `enable_ipv6` - The flag to enable IPv6.
-* `gateway` - The IP address of the gateway used by switch+router.
-* `icon_id` - The icon id attached to the switch+router.
-* `ip_addresses` - A list of assigned global address to the switch+router.
-* `ipv6_network_address` - The IPv6 network address assigned to the switch+router.
-* `ipv6_prefix` - The network prefix of assigned IPv6 addresses to the switch+router.
+* `gateway` - The IP address of the gateway used by Switch+Router.
+* `icon_id` - The icon id attached to the Switch+Router.
+* `ip_addresses` - A list of assigned global address to the Switch+Router.
+* `ipv6_network_address` - The IPv6 network address assigned to the Switch+Router.
+* `ipv6_prefix` - The network prefix of assigned IPv6 addresses to the Switch+Router.
 * `ipv6_prefix_len` - The bit length of IPv6 network prefix.
-* `max_ip_address` - Maximum IP address in assigned global addresses to the switch+router.
-* `min_ip_address` - Minimum IP address in assigned global addresses to the switch+router.
-* `name` - The name of the switch+router.
-* `netmask` - The bit length of the subnet assigned to the switch+router.
-* `network_address` - The IPv4 network address assigned to the switch+router.
-* `server_ids` - A list of the ID of Servers connected to the switch+router.
-* `switch_id` - The id of the switch connected from the switch+router.
-* `tags` - Any tags assigned to the switch+router.
-* `zone` - The name of zone that the switch+router is in (e.g. `is1a`,`tk1a`).
+* `max_ip_address` - Maximum IP address in assigned global addresses to the Switch+Router.
+* `min_ip_address` - Minimum IP address in assigned global addresses to the Switch+Router.
+* `name` - The name of the Switch+Router.
+* `netmask` - The bit length of the subnet assigned to the Switch+Router.
+* `network_address` - The IPv4 network address assigned to the Switch+Router.
+* `server_ids` - A list of the ID of Servers connected to the Switch+Router.
+* `switch_id` - The id of the switch connected from the Switch+Router.
+* `tags` - Any tags assigned to the Switch+Router.
+* `zone` - The name of zone that the Switch+Router is in (e.g. `is1a`, `tk1a`).
 
 
 

@@ -12,19 +12,18 @@ Manages a SakuraCloud SSH Key Gen.
 
 ## Argument Reference
 
-* `description` - (Optional) . Changing this forces a new resource to be created.
-* `name` - (Required) . Changing this forces a new resource to be created.
-* `pass_phrase` - (Optional) . Changing this forces a new resource to be created.
+* `description` - (Optional) The description of the SSHKey. The length of this value must be in the range [`1`-`512`]. Changing this forces a new resource to be created.
+* `name` - (Required) The name of the SSHKey. The length of this value must be in the range [`1`-`64`]. Changing this forces a new resource to be created.
+* `pass_phrase` - (Optional) The pass phrase of the private key. The length of this value must be in the range [`8`-`64`]. Changing this forces a new resource to be created.
 
 
 
 ### Timeouts
 
-The `timeouts` block allows you to specify [timeouts](https://www.terraform.io/docs/configuration/resources.html#timeouts) for certain actions:
+The `timeouts` block allows you to specify [timeouts](https://www.terraform.io/docs/configuration/resources.html#operation-timeouts) for certain actions:
 
 * `create` - (Defaults to 5 minutes) Used when creating the SSH Key Gen
 
-* `read` -   (Defaults to 5 minutes) Used when reading the SSH Key Gen
 
 * `update` - (Defaults to 5 minutes) Used when updating the SSH Key Gen
 
@@ -35,9 +34,9 @@ The `timeouts` block allows you to specify [timeouts](https://www.terraform.io/d
 ## Attribute Reference
 
 * `id` - The id of the SSH Key Gen.
-* `fingerprint` - .
-* `private_key` - .
-* `public_key` - .
+* `fingerprint` - The fingerprint of the public key.
+* `private_key` - The body of the private key.
+* `public_key` - The body of the public key.
 
 
 

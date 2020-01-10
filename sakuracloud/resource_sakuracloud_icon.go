@@ -24,6 +24,7 @@ import (
 )
 
 func resourceSakuraCloudIcon() *schema.Resource {
+	resourceName := "Icon"
 	return &schema.Resource{
 		Create: resourceSakuraCloudIconCreate,
 		Read:   resourceSakuraCloudIconRead,
@@ -32,37 +33,37 @@ func resourceSakuraCloudIcon() *schema.Resource {
 
 		Timeouts: &schema.ResourceTimeout{
 			Create: schema.DefaultTimeout(5 * time.Minute),
-			Read:   schema.DefaultTimeout(5 * time.Minute),
 			Update: schema.DefaultTimeout(5 * time.Minute),
 			Delete: schema.DefaultTimeout(5 * time.Minute),
 		},
 
 		Schema: map[string]*schema.Schema{
-			"name": {
-				Type:     schema.TypeString,
-				Required: true,
-			},
+			"name": schemaResourceName(resourceName),
 			"source": {
 				Type:          schema.TypeString,
 				Optional:      true,
 				ConflictsWith: []string{"base64content"},
 				ForceNew:      true,
+				Description: descf(
+					"The file path to upload to as the Icon. %s",
+					descConflicts("base64content"),
+				),
 			},
 			"base64content": {
 				Type:          schema.TypeString,
 				Optional:      true,
 				ConflictsWith: []string{"source"},
 				ForceNew:      true,
+				Description: descf(
+					"The base64 encoded content to upload to as the Icon. %s",
+					descConflicts("source"),
+				),
 			},
-			"tags": {
-				Type:     schema.TypeSet,
-				Optional: true,
-				Elem:     &schema.Schema{Type: schema.TypeString},
-				Set:      schema.HashString,
-			},
+			"tags": schemaResourceTags(resourceName),
 			"url": {
-				Type:     schema.TypeString,
-				Computed: true,
+				Type:        schema.TypeString,
+				Computed:    true,
+				Description: "The URL for getting the icon's raw data",
 			},
 		},
 	}

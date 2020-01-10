@@ -28,6 +28,8 @@ import (
 )
 
 func resourceSakuraCloudMobileGateway() *schema.Resource {
+	resourceName := "MobileGateway"
+
 	return &schema.Resource{
 		Create: resourceSakuraCloudMobileGatewayCreate,
 		Read:   resourceSakuraCloudMobileGatewayRead,
@@ -39,16 +41,12 @@ func resourceSakuraCloudMobileGateway() *schema.Resource {
 
 		Timeouts: &schema.ResourceTimeout{
 			Create: schema.DefaultTimeout(60 * time.Minute),
-			Read:   schema.DefaultTimeout(5 * time.Minute),
 			Update: schema.DefaultTimeout(60 * time.Minute),
 			Delete: schema.DefaultTimeout(20 * time.Minute),
 		},
 
 		Schema: map[string]*schema.Schema{
-			"name": {
-				Type:     schema.TypeString,
-				Required: true,
-			},
+			"name": schemaResourceName(resourceName),
 			"private_network_interface": {
 				Type:     schema.TypeList,
 				Optional: true,
@@ -59,44 +57,56 @@ func resourceSakuraCloudMobileGateway() *schema.Resource {
 							Type:         schema.TypeString,
 							ValidateFunc: validateSakuracloudIDType,
 							Required:     true,
+							Description:  descf("The id of the switch to which the %s connects", resourceName),
 						},
 						"ip_address": {
 							Type:         schema.TypeString,
 							ValidateFunc: validateIPv4Address(),
 							Required:     true,
+							Description:  descf("The IP address to assign to the %s", resourceName),
 						},
 						"netmask": {
 							Type:         schema.TypeInt,
 							Required:     true,
 							ValidateFunc: validation.IntBetween(8, 29),
+							Description: descf(
+								"The bit length of the subnet to assign to the %s. %s",
+								resourceName,
+								descRange(8, 29),
+							),
 						},
 					},
 				},
 			},
 			"public_ip": {
-				Type:     schema.TypeString,
-				Computed: true,
+				Type:        schema.TypeString,
+				Computed:    true,
+				Description: descf("The public IP address assigned to the %s", resourceName),
 			},
 			"public_netmask": {
-				Type:     schema.TypeInt,
-				Computed: true,
+				Type:        schema.TypeInt,
+				Computed:    true,
+				Description: descf("The bit length of the subnet assigned to the %s", resourceName),
 			},
 			"internet_connection": {
-				Type:     schema.TypeBool,
-				Optional: true,
-				Default:  false,
+				Type:        schema.TypeBool,
+				Optional:    true,
+				Default:     false,
+				Description: "The flag to enable connect to the Internet",
 			},
 			"inter_device_communication": {
-				Type:     schema.TypeBool,
-				Optional: true,
-				Default:  false,
+				Type:        schema.TypeBool,
+				Optional:    true,
+				Default:     false,
+				Description: "The flag to allow communication between each connected devices",
 			},
 			"dns_servers": {
-				Type:     schema.TypeList,
-				Required: true,
-				MaxItems: 2,
-				MinItems: 2,
-				Elem:     &schema.Schema{Type: schema.TypeString},
+				Type:        schema.TypeList,
+				Required:    true,
+				MaxItems:    2,
+				MinItems:    2,
+				Elem:        &schema.Schema{Type: schema.TypeString},
+				Description: "A list of IP address used by each connected devices",
 			},
 			"traffic_control": {
 				Type:     schema.TypeList,
@@ -108,28 +118,34 @@ func resourceSakuraCloudMobileGateway() *schema.Resource {
 							Type:         schema.TypeInt,
 							Required:     true,
 							ValidateFunc: validation.IntBetween(1, math.MaxInt32),
+							Description:  "The threshold of monthly traffic usage to enable to the traffic shaping",
 						},
 						"band_width_limit": {
 							Type:         schema.TypeInt,
 							Optional:     true,
 							ValidateFunc: validation.IntBetween(1, math.MaxInt32),
+							Description:  "The bandwidth allowed when the traffic shaping is enabled",
 						},
 						"enable_email": {
-							Type:     schema.TypeBool,
-							Optional: true,
+							Type:        schema.TypeBool,
+							Optional:    true,
+							Description: "The flag to enable email notification when the traffic shaping is enabled",
 						},
 						"enable_slack": {
-							Type:     schema.TypeBool,
-							Optional: true,
+							Type:        schema.TypeBool,
+							Optional:    true,
+							Description: "The flag to enable slack notification when the traffic shaping is enabled",
 						},
 						"slack_webhook": {
 							Type:         schema.TypeString,
 							Optional:     true,
 							ValidateFunc: validation.StringMatch(regexp.MustCompile(`^https://hooks.slack.com/services/\w+/\w+/\w+$`), ""),
+							Description:  "The webhook URL used when sends notification. It will only used when `enable_slack` is set `true`",
 						},
 						"auto_traffic_shaping": {
-							Type:     schema.TypeBool,
-							Optional: true,
+							Type:        schema.TypeBool,
+							Optional:    true,
+							Description: "The flag to enable the traffic shaping",
 						},
 					},
 				},
@@ -140,12 +156,15 @@ func resourceSakuraCloudMobileGateway() *schema.Resource {
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
 						"prefix": {
-							Type:     schema.TypeString,
-							Required: true,
+							Type:        schema.TypeString,
+							Required:    true,
+							Description: "The destination network prefix used by static routing. This must be specified by CIDR block formatted string",
 						},
 						"next_hop": {
-							Type:     schema.TypeString,
-							Required: true,
+							Type:         schema.TypeString,
+							Required:     true,
+							ValidateFunc: validation.SingleIP(),
+							Description:  "The IP address of next hop",
 						},
 					},
 				},
@@ -159,11 +178,13 @@ func resourceSakuraCloudMobileGateway() *schema.Resource {
 							Type:         schema.TypeString,
 							ValidateFunc: validateSakuracloudIDType,
 							Required:     true,
+							Description:  descf("The id of the Switch connected to the %s", resourceName),
 						},
 						"ip_address": {
 							Type:         schema.TypeString,
 							ValidateFunc: validateIPv4Address(),
 							Required:     true,
+							Description:  "The IP address to assign to the SIM",
 						},
 					},
 				},
@@ -177,36 +198,20 @@ func resourceSakuraCloudMobileGateway() *schema.Resource {
 							Type:         schema.TypeString,
 							ValidateFunc: validateSakuracloudIDType,
 							Required:     true,
+							Description:  "The id of the routing destination SIM",
 						},
 						"prefix": {
-							Type:     schema.TypeString,
-							Required: true,
+							Type:        schema.TypeString,
+							Required:    true,
+							Description: "The destination network prefix used by the sim routing. This must be specified by CIDR block formatted string",
 						},
 					},
 				},
 			},
-			"icon_id": {
-				Type:         schema.TypeString,
-				Optional:     true,
-				ValidateFunc: validateSakuracloudIDType,
-			},
-			"description": {
-				Type:     schema.TypeString,
-				Optional: true,
-			},
-			"tags": {
-				Type:     schema.TypeSet,
-				Optional: true,
-				Elem:     &schema.Schema{Type: schema.TypeString},
-				Set:      schema.HashString,
-			},
-			"zone": {
-				Type:        schema.TypeString,
-				Optional:    true,
-				Computed:    true,
-				ForceNew:    true,
-				Description: "target SakuraCloud zone",
-			},
+			"icon_id":     schemaResourceIconID(resourceName),
+			"description": schemaResourceDescription(resourceName),
+			"tags":        schemaResourceTags(resourceName),
+			"zone":        schemaResourceZone(resourceName),
 		},
 	}
 }

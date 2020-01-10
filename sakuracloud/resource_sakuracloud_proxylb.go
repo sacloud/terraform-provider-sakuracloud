@@ -26,6 +26,8 @@ import (
 )
 
 func resourceSakuraCloudProxyLB() *schema.Resource {
+	resourceName := "ProxyLB"
+
 	return &schema.Resource{
 		Create: resourceSakuraCloudProxyLBCreate,
 		Read:   resourceSakuraCloudProxyLBRead,
@@ -37,35 +39,29 @@ func resourceSakuraCloudProxyLB() *schema.Resource {
 
 		Timeouts: &schema.ResourceTimeout{
 			Create: schema.DefaultTimeout(5 * time.Minute),
-			Read:   schema.DefaultTimeout(5 * time.Minute),
 			Update: schema.DefaultTimeout(5 * time.Minute),
 			Delete: schema.DefaultTimeout(5 * time.Minute),
 		},
 
 		Schema: map[string]*schema.Schema{
-			"name": {
-				Type:     schema.TypeString,
-				Required: true,
-			},
-			"plan": {
-				Type:         schema.TypeInt,
-				Optional:     true,
-				Default:      types.ProxyLBPlans.CPS100.Int(),
-				ValidateFunc: validation.IntInSlice(types.ProxyLBPlanValues),
-			},
+			"name": schemaResourceName(resourceName),
+			"plan": schemaResourceIntPlan(resourceName, types.ProxyLBPlans.CPS100.Int(), types.ProxyLBPlanValues),
 			"vip_failover": {
-				Type:     schema.TypeBool,
-				Optional: true,
-				ForceNew: true,
+				Type:        schema.TypeBool,
+				Optional:    true,
+				ForceNew:    true,
+				Description: "The flag to enable VIP fail-over",
 			},
 			"sticky_session": {
-				Type:     schema.TypeBool,
-				Optional: true,
+				Type:        schema.TypeBool,
+				Optional:    true,
+				Description: "The flag to enable sticky session",
 			},
 			"timeout": {
-				Type:     schema.TypeInt,
-				Default:  10,
-				Optional: true,
+				Type:        schema.TypeInt,
+				Default:     10,
+				Optional:    true,
+				Description: "The timeout duration in seconds",
 			},
 			"region": {
 				Type:         schema.TypeString,
@@ -73,6 +69,10 @@ func resourceSakuraCloudProxyLB() *schema.Resource {
 				Default:      types.ProxyLBRegions.IS1.String(),
 				ValidateFunc: validation.StringInSlice(types.ProxyLBRegionStrings, false),
 				ForceNew:     true,
+				Description: descf(
+					"The name of region that the proxy LB is in. This must be one of [%s]",
+					types.ProxyLBRegionStrings,
+				),
 			},
 			"bind_port": {
 				Type:     schema.TypeList,
@@ -85,18 +85,25 @@ func resourceSakuraCloudProxyLB() *schema.Resource {
 							Type:         schema.TypeString,
 							Required:     true,
 							ValidateFunc: validation.StringInSlice(types.ProxyLBProxyModeStrings, false),
+							Description: descf(
+								"The proxy mode. This must be one of [%s]",
+								types.ProxyLBProxyModeStrings,
+							),
 						},
 						"port": {
-							Type:     schema.TypeInt,
-							Optional: true,
+							Type:        schema.TypeInt,
+							Optional:    true,
+							Description: "The number of listening port",
 						},
 						"redirect_to_https": {
-							Type:     schema.TypeBool,
-							Optional: true,
+							Type:        schema.TypeBool,
+							Optional:    true,
+							Description: "The flag to enable redirection from http to https. This flag is used only when `proxy_mode` is `http`",
 						},
 						"support_http2": {
-							Type:     schema.TypeBool,
-							Optional: true,
+							Type:        schema.TypeBool,
+							Optional:    true,
+							Description: "The flag to enable HTTP/2. This flag is used only when `proxy_mode` is `https`",
 						},
 						"response_header": {
 							Type:     schema.TypeList,
@@ -105,12 +112,14 @@ func resourceSakuraCloudProxyLB() *schema.Resource {
 							Elem: &schema.Resource{
 								Schema: map[string]*schema.Schema{
 									"header": {
-										Type:     schema.TypeString,
-										Required: true,
+										Type:        schema.TypeString,
+										Required:    true,
+										Description: descf("The field name of HTTP header added to response by the %s", resourceName),
 									},
 									"value": {
-										Type:     schema.TypeString,
-										Required: true,
+										Type:        schema.TypeString,
+										Required:    true,
+										Description: descf("The field value of HTTP header added to response by the %s", resourceName),
 									},
 								},
 							},
@@ -129,20 +138,35 @@ func resourceSakuraCloudProxyLB() *schema.Resource {
 							Type:         schema.TypeString,
 							Required:     true,
 							ValidateFunc: validation.StringInSlice(types.ProxyLBProtocolStrings, false),
+							Description: descf(
+								"The protocol used for health checks. This must be one of [%s]",
+								types.ProxyLBProtocolStrings,
+							),
 						},
 						"delay_loop": {
 							Type:         schema.TypeInt,
 							Optional:     true,
 							ValidateFunc: validation.IntBetween(10, 60),
 							Default:      10,
+							Description: descf(
+								"The interval in seconds between checks. %s",
+								descRange(10, 60),
+							),
 						},
 						"host_header": {
-							Type:     schema.TypeString,
-							Optional: true,
+							Type:        schema.TypeString,
+							Optional:    true,
+							Description: "The value of host header send when checking by HTTP",
 						},
 						"path": {
-							Type:     schema.TypeString,
-							Optional: true,
+							Type:        schema.TypeString,
+							Optional:    true,
+							Description: "The path used when checking by HTTP",
+						},
+						"port": {
+							Type:        schema.TypeInt,
+							Optional:    true,
+							Description: "The port number used when checking by TCP",
 						},
 					},
 				},
@@ -154,12 +178,14 @@ func resourceSakuraCloudProxyLB() *schema.Resource {
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
 						"ip_address": {
-							Type:     schema.TypeString,
-							Required: true,
+							Type:        schema.TypeString,
+							Required:    true,
+							Description: "The IP address of the SorryServer. This will be used when all servers are down",
 						},
 						"port": {
-							Type:     schema.TypeInt,
-							Optional: true,
+							Type:        schema.TypeInt,
+							Optional:    true,
+							Description: "The port number of the SorryServer. This will be used when all servers are down",
 						},
 					},
 				},
@@ -172,19 +198,22 @@ func resourceSakuraCloudProxyLB() *schema.Resource {
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
 						"server_cert": {
-							Type:     schema.TypeString,
-							Optional: true,
-							Computed: true,
+							Type:        schema.TypeString,
+							Optional:    true,
+							Computed:    true,
+							Description: "The certificate for a server",
 						},
 						"intermediate_cert": {
-							Type:     schema.TypeString,
-							Optional: true,
-							Computed: true,
+							Type:        schema.TypeString,
+							Optional:    true,
+							Computed:    true,
+							Description: "The intermediate certificate for a server",
 						},
 						"private_key": {
-							Type:     schema.TypeString,
-							Optional: true,
-							Computed: true,
+							Type:        schema.TypeString,
+							Optional:    true,
+							Computed:    true,
+							Description: "The private key for a server",
 						},
 						"additional_certificate": {
 							Type:     schema.TypeList,
@@ -193,16 +222,19 @@ func resourceSakuraCloudProxyLB() *schema.Resource {
 							Elem: &schema.Resource{
 								Schema: map[string]*schema.Schema{
 									"server_cert": {
-										Type:     schema.TypeString,
-										Required: true,
+										Type:        schema.TypeString,
+										Required:    true,
+										Description: "The certificate for a server",
 									},
 									"intermediate_cert": {
-										Type:     schema.TypeString,
-										Optional: true,
+										Type:        schema.TypeString,
+										Optional:    true,
+										Description: "The intermediate certificate for a server",
 									},
 									"private_key": {
-										Type:     schema.TypeString,
-										Required: true,
+										Type:        schema.TypeString,
+										Required:    true,
+										Description: "The private key for a server",
 									},
 								},
 							},
@@ -217,23 +249,30 @@ func resourceSakuraCloudProxyLB() *schema.Resource {
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
 						"ip_address": {
-							Type:     schema.TypeString,
-							Required: true,
+							Type:        schema.TypeString,
+							Required:    true,
+							Description: "The IP address of the destination server",
 						},
 						"port": {
 							Type:         schema.TypeInt,
 							Required:     true,
 							ValidateFunc: validation.IntBetween(1, 65535),
+							Description:  descf("The port number of the destination server. %s", descRange(1, 65535)),
 						},
 						"group": {
 							Type:         schema.TypeString,
 							Optional:     true,
 							ValidateFunc: validation.StringLenBetween(1, 10),
+							Description: descf(
+								"The name of load balancing group. This is used when using rule-based load balancing. %s",
+								descLength(1, 10),
+							),
 						},
 						"enabled": {
-							Type:     schema.TypeBool,
-							Optional: true,
-							Default:  true,
+							Type:        schema.TypeBool,
+							Optional:    true,
+							Default:     true,
+							Description: "The flag to enable as destination of load balancing",
 						},
 					},
 				},
@@ -244,48 +283,45 @@ func resourceSakuraCloudProxyLB() *schema.Resource {
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
 						"host": {
-							Type:     schema.TypeString,
-							Optional: true,
+							Type:        schema.TypeString,
+							Optional:    true,
+							Description: "The value of HTTP host header that is used as condition of rule-based balancing",
 						},
 						"path": {
-							Type:     schema.TypeString,
-							Optional: true,
+							Type:        schema.TypeString,
+							Optional:    true,
+							Description: "The request path that is used as condition of rule-based balancing",
 						},
 						"group": {
 							Type:         schema.TypeString,
 							Optional:     true,
 							ValidateFunc: validation.StringLenBetween(1, 10),
+							Description: descf(
+								"The name of load balancing group. When proxyLB received request which matched to `host` and `path`, proxyLB forwards the request to servers that having same group name. %s",
+								descLength(1, 10),
+							),
 						},
 					},
 				},
 			},
-			"icon_id": {
-				Type:         schema.TypeString,
-				Optional:     true,
-				ValidateFunc: validateSakuracloudIDType,
-			},
-			"description": {
-				Type:     schema.TypeString,
-				Optional: true,
-			},
-			"tags": {
-				Type:     schema.TypeSet,
-				Optional: true,
-				Elem:     &schema.Schema{Type: schema.TypeString},
-				Set:      schema.HashString,
-			},
+			"icon_id":     schemaResourceIconID(resourceName),
+			"description": schemaResourceDescription(resourceName),
+			"tags":        schemaResourceTags(resourceName),
 			"fqdn": {
-				Type:     schema.TypeString,
-				Computed: true,
+				Type:        schema.TypeString,
+				Computed:    true,
+				Description: descf("The FQDN for accessing to the %s. This is typically used as value of CNAME record", resourceName),
 			},
 			"vip": {
-				Type:     schema.TypeString,
-				Computed: true,
+				Type:        schema.TypeString,
+				Computed:    true,
+				Description: descf("The virtual IP address assigned to the %s", resourceName),
 			},
 			"proxy_networks": {
-				Type:     schema.TypeList,
-				Elem:     &schema.Schema{Type: schema.TypeString},
-				Computed: true,
+				Type:        schema.TypeList,
+				Elem:        &schema.Schema{Type: schema.TypeString},
+				Computed:    true,
+				Description: descf("A list of CIDR block used by the %s to access the server", resourceName),
 			},
 		},
 	}

@@ -27,7 +27,7 @@ Get information about an existing Subnet.
 * `network_address` - The IPv4 network address assigned to the subnet.
 * `next_hop` - The ip address of the next-hop at the subnet.
 * `switch_id` - The id of the switch connected from the subnet.
-* `zone` - The name of zone that the subnet is in (e.g. `is1a`,`tk1a`).
+* `zone` - The name of zone that the subnet is in (e.g. `is1a`, `tk1a`).
 
 
 

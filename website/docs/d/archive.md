@@ -42,7 +42,7 @@ A `condition` block supports the following:
 * `name` - The name of the archive.
 * `size` - The size of archive in GiB.
 * `tags` - Any tags assigned to the archive.
-* `zone` - The name of zone that the archive is in (e.g. `is1a`,`tk1a`).
+* `zone` - The name of zone that the archive is in (e.g. `is1a`, `tk1a`).
 
 
 

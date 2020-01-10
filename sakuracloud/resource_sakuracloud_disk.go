@@ -28,6 +28,7 @@ import (
 )
 
 func resourceSakuraCloudDisk() *schema.Resource {
+	resourceName := "disk"
 	return &schema.Resource{
 		Create: resourceSakuraCloudDiskCreate,
 		Read:   resourceSakuraCloudDiskRead,
@@ -39,29 +40,23 @@ func resourceSakuraCloudDisk() *schema.Resource {
 
 		Timeouts: &schema.ResourceTimeout{
 			Create: schema.DefaultTimeout(24 * time.Hour),
-			Read:   schema.DefaultTimeout(5 * time.Minute),
 			Update: schema.DefaultTimeout(24 * time.Hour),
 			Delete: schema.DefaultTimeout(20 * time.Minute),
 		},
 
 		Schema: map[string]*schema.Schema{
-			"name": {
-				Type:     schema.TypeString,
-				Required: true,
-			},
-			"plan": {
-				Type:         schema.TypeString,
-				Optional:     true,
-				ForceNew:     true,
-				Default:      "ssd",
-				ValidateFunc: validation.StringInSlice(types.DiskPlanStrings, false),
-			},
+			"name": schemaResourceName(resourceName),
+			"plan": schemaResourcePlan(resourceName, types.DiskPlanNameMap[types.DiskPlans.SSD], types.DiskPlanStrings),
 			"connector": {
 				Type:         schema.TypeString,
 				Optional:     true,
 				ForceNew:     true,
 				Default:      types.DiskConnections.VirtIO,
 				ValidateFunc: validation.StringInSlice(types.DiskConnectionStrings, false),
+				Description: descf(
+					"The name of the disk connector. This must be one of [%s]",
+					types.DiskConnectionStrings,
+				),
 			},
 			"source_archive_id": {
 				Type:          schema.TypeString,
@@ -69,6 +64,10 @@ func resourceSakuraCloudDisk() *schema.Resource {
 				Optional:      true,
 				ConflictsWith: []string{"source_disk_id"},
 				ValidateFunc:  validateSakuracloudIDType,
+				Description: descf(
+					"The id of the source archive. %s",
+					descConflicts("source_disk_id"),
+				),
 			},
 			"source_disk_id": {
 				Type:          schema.TypeString,
@@ -76,45 +75,24 @@ func resourceSakuraCloudDisk() *schema.Resource {
 				Optional:      true,
 				ConflictsWith: []string{"source_archive_id"},
 				ValidateFunc:  validateSakuracloudIDType,
+				Description: descf(
+					"The id of the source disk. %s",
+					descConflicts("source_archive_id"),
+				),
 			},
-			"size": {
-				Type:     schema.TypeInt,
-				Optional: true,
-				ForceNew: true,
-				Default:  20,
-			},
+			"size": schemaResourceSize(resourceName, 20),
 			"distant_from": {
-				Type:     schema.TypeList,
-				Optional: true,
-				Elem:     &schema.Schema{Type: schema.TypeString},
-				ForceNew: true,
-			},
-			"server_id": {
-				Type:     schema.TypeString,
-				Computed: true, //ReadOnly
-			},
-			"icon_id": {
-				Type:         schema.TypeString,
-				Optional:     true,
-				ValidateFunc: validateSakuracloudIDType,
-			},
-			"description": {
-				Type:     schema.TypeString,
-				Optional: true,
-			},
-			"tags": {
-				Type:     schema.TypeSet,
-				Optional: true,
-				Elem:     &schema.Schema{Type: schema.TypeString},
-				Set:      schema.HashString,
-			},
-			"zone": {
-				Type:        schema.TypeString,
+				Type:        schema.TypeList,
 				Optional:    true,
-				Computed:    true,
+				Elem:        &schema.Schema{Type: schema.TypeString},
 				ForceNew:    true,
-				Description: "target SakuraCloud zone",
+				Description: "A list of disk id. The disk will be located to different storage from these disks",
 			},
+			"server_id":   schemaDataSourceServerID(resourceName),
+			"icon_id":     schemaResourceIconID(resourceName),
+			"description": schemaResourceDescription(resourceName),
+			"tags":        schemaResourceTags(resourceName),
+			"zone":        schemaResourceZone(resourceName),
 		},
 	}
 }
