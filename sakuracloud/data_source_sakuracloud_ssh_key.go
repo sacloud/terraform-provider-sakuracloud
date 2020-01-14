@@ -22,7 +22,7 @@ import (
 )
 
 func dataSourceSakuraCloudSSHKey() *schema.Resource {
-	resourceName := "ssh key"
+	resourceName := "SSHKey"
 	return &schema.Resource{
 		Read: dataSourceSakuraCloudSSHKeyRead,
 

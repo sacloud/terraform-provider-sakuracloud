@@ -22,7 +22,7 @@ import (
 )
 
 func dataSourceSakuraCloudSwitch() *schema.Resource {
-	resourceName := "switch"
+	resourceName := "Switch"
 	return &schema.Resource{
 		Read: dataSourceSakuraCloudSwitchRead,
 
@@ -37,7 +37,7 @@ func dataSourceSakuraCloudSwitch() *schema.Resource {
 				Type:        schema.TypeList,
 				Computed:    true,
 				Elem:        &schema.Schema{Type: schema.TypeString},
-				Description: "A list of server id connected to the switch",
+				Description: "A list of server id connected to the Switch",
 			},
 			"zone": schemaDataSourceZone(resourceName),
 		},

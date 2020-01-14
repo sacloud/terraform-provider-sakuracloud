@@ -10,6 +10,15 @@ description: |-
 
 Get information about an existing Private Host.
 
+## Example Usage
+
+```hcl
+data "sakuracloud_private_host" "foobar" {
+  filter {
+    names = ["foobar"]
+  }
+}
+```
 ## Argument Reference
 
 * `filter` - (Optional) One or more values used for filtering, as defined below.
@@ -37,13 +46,13 @@ A `condition` block supports the following:
 * `id` - The id of the Private Host.
 * `assigned_core` - The total number of CPUs assigned to servers on the private host.
 * `assigned_memory` - The total size of memory assigned to servers on the private host.
-* `class` - The class of the private host. This will be one of [`dynamic`/`ms_windows`].
-* `description` - The description of the private host.
+* `class` - The class of the PrivateHost. This will be one of [`dynamic`/`ms_windows`].
+* `description` - The description of the PrivateHost.
 * `hostname` - The hostname of the private host.
-* `icon_id` - The icon id attached to the private host.
-* `name` - The name of the private host.
-* `tags` - Any tags assigned to the private host.
-* `zone` - The name of zone that the private host is in (e.g. `is1a`, `tk1a`).
+* `icon_id` - The icon id attached to the PrivateHost.
+* `name` - The name of the PrivateHost.
+* `tags` - Any tags assigned to the PrivateHost.
+* `zone` - The name of zone that the PrivateHost is in (e.g. `is1a`, `tk1a`).
 
 
 

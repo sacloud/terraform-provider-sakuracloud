@@ -22,7 +22,7 @@ import (
 )
 
 func dataSourceSakuraCloudIcon() *schema.Resource {
-	resourceName := "icon"
+	resourceName := "Icon"
 	return &schema.Resource{
 		Read: dataSourceSakuraCloudIconRead,
 

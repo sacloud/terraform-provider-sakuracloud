@@ -23,7 +23,7 @@ import (
 )
 
 func dataSourceSakuraCloudPrivateHost() *schema.Resource {
-	resourceName := "private host"
+	resourceName := "PrivateHost"
 	return &schema.Resource{
 		Read: dataSourceSakuraCloudPrivateHostRead,
 

@@ -10,6 +10,15 @@ description: |-
 
 Manages a SakuraCloud SSH Key Gen.
 
+## Example Usage
+
+```hcl
+resource "sakuracloud_ssh_key_gen" "foobar" {
+  name = "foobar"
+  #pass_phrase = "your-pass-phrase"
+  description = "description"
+}
+```
 ## Argument Reference
 
 * `description` - (Optional) The description of the SSHKey. The length of this value must be in the range [`1`-`512`]. Changing this forces a new resource to be created.

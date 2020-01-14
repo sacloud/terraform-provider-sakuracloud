@@ -10,6 +10,15 @@ description: |-
 
 Manages a SakuraCloud Private Host.
 
+## Example Usage
+
+```hcl
+resource "sakuracloud_private_host" "foobar" {
+  name        = "foobar"
+  description = "description"
+  tags        = ["tag1", "tag2"]
+}
+```
 ## Argument Reference
 
 * `class` - (Optional) The class of the PrivateHost. This will be one of [`dynamic`/`ms_windows`]. Default:`dynamic`.

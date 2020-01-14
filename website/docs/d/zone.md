@@ -10,6 +10,15 @@ description: |-
 
 Get information about an existing Zone.
 
+## Example Usage
+
+```hcl
+data "sakuracloud_zone" "current" {}
+
+data "sakuracloud_zone" "is1a" {
+  name = "is1a"
+}
+```
 ## Argument Reference
 
 * `name` - (Optional) The name of the zone (e.g. `is1a`,`tk1a`).

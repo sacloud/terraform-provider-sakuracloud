@@ -10,6 +10,18 @@ description: |-
 
 Manages a SakuraCloud Subnet.
 
+## Example Usage
+
+```hcl
+resource sakuracloud_internet "foobar" {
+  name = "foobar"
+}
+
+resource "sakuracloud_subnet" "foobar" {
+  internet_id = sakuracloud_internet.foobar.id
+  next_hop    = sakuracloud_internet.foobar.min_ip_address
+}
+```
 ## Argument Reference
 
 * `internet_id` - (Required) The id of the switch+router resource that the subnet belongs. Changing this forces a new resource to be created.

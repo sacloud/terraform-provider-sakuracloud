@@ -10,6 +10,17 @@ description: |-
 
 Manages a SakuraCloud Archive.
 
+## Example Usage
+
+```hcl
+resource "sakuracloud_archive" "foobar" {
+  name         = "foobar"
+  description  = "description"
+  tags         = ["tag1", "tag2"]
+  size         = 20
+  archive_file = "test/dummy.raw"
+}
+```
 ## Argument Reference
 
 * `archive_file` - (Required) The file path to upload to the SakuraCloud.

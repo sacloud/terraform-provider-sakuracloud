@@ -10,6 +10,15 @@ description: |-
 
 Get information about an existing Load Balancer.
 
+## Example Usage
+
+```hcl
+data "sakuracloud_load_balancer" "foobar" {
+  filter {
+    names = ["foobar"]
+  }
+}
+```
 ## Argument Reference
 
 * `filter` - (Optional) One or more values used for filtering, as defined below.
@@ -35,19 +44,19 @@ A `condition` block supports the following:
 ## Attribute Reference
 
 * `id` - The id of the Load Balancer.
-* `description` - The description of the load balancer.
-* `gateway` - The IP address of the gateway used by load balancer.
+* `description` - The description of the LoadBalancer.
+* `gateway` - The IP address of the gateway used by LoadBalancer.
 * `high_availability` - The flag to enable HA mode.
-* `icon_id` - The icon id attached to the load balancer.
-* `ip_addresses` - The list of IP address assigned to the load balancer.
-* `name` - The name of the load balancer.
-* `netmask` - The bit length of the subnet assigned to the load balancer.
-* `plan` - The plan name of the load balancer. This will be one of [`standard`/`highspec`].
-* `switch_id` - The id of the switch connected from the load balancer.
-* `tags` - Any tags assigned to the load balancer.
+* `icon_id` - The icon id attached to the LoadBalancer.
+* `ip_addresses` - The list of IP address assigned to the LoadBalancer.
+* `name` - The name of the LoadBalancer.
+* `netmask` - The bit length of the subnet assigned to the LoadBalancer.
+* `plan` - The plan name of the LoadBalancer. This will be one of [`standard`/`highspec`].
+* `switch_id` - The id of the switch connected from the LoadBalancer.
+* `tags` - Any tags assigned to the LoadBalancer.
 * `vip` - A list of `vip` blocks as defined below.
 * `vrid` - The Virtual Router Identifier. This is only used when `high_availability` is set `true`.
-* `zone` - The name of zone that the load balancer is in (e.g. `is1a`, `tk1a`).
+* `zone` - The name of zone that the LoadBalancer is in (e.g. `is1a`, `tk1a`).
 
 
 ---

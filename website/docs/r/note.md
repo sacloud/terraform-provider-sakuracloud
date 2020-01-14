@@ -10,6 +10,14 @@ description: |-
 
 Manages a SakuraCloud Note.
 
+## Example Usage
+
+```hcl
+resource "sakuracloud_note" "foobar" {
+  name    = "foobar"
+  content = file("startup-script.sh")
+}
+```
 ## Argument Reference
 
 * `class` - (Optional) The class of the Note. This must be one of `shell`/`yaml_cloud_config`. Default:`shell`.

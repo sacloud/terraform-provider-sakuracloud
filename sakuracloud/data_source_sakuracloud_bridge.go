@@ -22,7 +22,7 @@ import (
 )
 
 func dataSourceSakuraCloudBridge() *schema.Resource {
-	resourceName := "bridge"
+	resourceName := "Bridge"
 
 	return &schema.Resource{
 		Read: dataSourceSakuraCloudBridgeRead,

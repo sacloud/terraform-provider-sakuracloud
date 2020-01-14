@@ -22,7 +22,7 @@ import (
 )
 
 func dataSourceSakuraCloudSubnet() *schema.Resource {
-	resourceName := "subnet"
+	resourceName := "Subnet"
 
 	return &schema.Resource{
 		Read: dataSourceSakuraCloudSubnetRead,
@@ -33,42 +33,42 @@ func dataSourceSakuraCloudSubnet() *schema.Resource {
 				Required:     true,
 				ForceNew:     true,
 				ValidateFunc: validateSakuracloudIDType,
-				Description:  "The id of the switch+router resource that the subnet belongs",
+				Description:  "The id of the switch+router resource that the Subnet belongs",
 			},
 			"index": {
 				Type:        schema.TypeInt,
 				ForceNew:    true,
 				Required:    true,
-				Description: "The index of the subnet in assigned to the switch+router",
+				Description: "The index of the subnet in assigned to the Switch+Router",
 			},
 
 			"netmask": schemaDataSourceNetMask(resourceName),
 			"next_hop": {
 				Type:        schema.TypeString,
 				Computed:    true,
-				Description: "The ip address of the next-hop at the subnet",
+				Description: "The ip address of the next-hop at the Subnet",
 			},
 			"switch_id": schemaDataSourceSwitchID(resourceName),
 			"network_address": {
 				Type:        schema.TypeString,
 				Computed:    true,
-				Description: "The IPv4 network address assigned to the subnet",
+				Description: "The IPv4 network address assigned to the Subnet",
 			},
 			"min_ip_address": {
 				Type:        schema.TypeString,
 				Computed:    true,
-				Description: "Minimum IP address in assigned global addresses to the subnet",
+				Description: "Minimum IP address in assigned global addresses to the Subnet",
 			},
 			"max_ip_address": {
 				Type:        schema.TypeString,
 				Computed:    true,
-				Description: "Maximum IP address in assigned global addresses to the subnet",
+				Description: "Maximum IP address in assigned global addresses to the Subnet",
 			},
 			"ip_addresses": {
 				Type:        schema.TypeList,
 				Computed:    true,
 				Elem:        &schema.Schema{Type: schema.TypeString},
-				Description: "A list of assigned global address to the subnet",
+				Description: "A list of assigned global address to the Subnet",
 			},
 			"zone": schemaDataSourceZone(resourceName),
 		},

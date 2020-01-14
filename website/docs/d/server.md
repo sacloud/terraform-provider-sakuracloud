@@ -10,6 +10,15 @@ description: |-
 
 Get information about an existing Server.
 
+## Example Usage
+
+```hcl
+data "sakuracloud_server" "foobar" {
+  filter {
+    names = ["foobar"]
+  }
+}
+```
 ## Argument Reference
 
 * `filter` - (Optional) One or more values used for filtering, as defined below.
@@ -38,22 +47,22 @@ A `condition` block supports the following:
 * `cdrom_id` - The id of the CD-ROM attached to the server.
 * `commitment` - The policy of how to allocate virtual CPUs to the server. This will be one of [`standard`/`dedicatedcpu`].
 * `core` - The number of virtual CPUs.
-* `description` - The description of the server.
+* `description` - The description of the Server.
 * `disks` - A list of disk id connected to the server.
 * `dns_servers` - A list of IP address of DNS server in the zone.
-* `gateway` - The IP address of the gateway used by server.
-* `icon_id` - The icon id attached to the server.
+* `gateway` - The IP address of the gateway used by Server.
+* `icon_id` - The icon id attached to the Server.
 * `interface_driver` - The driver name of network interface. This will be one of [`virtio`/`e1000`].
-* `ip_address` - The IP address assigned to the server.
+* `ip_address` - The IP address assigned to the Server.
 * `memory` - The size of memory in GiB.
-* `name` - The name of the server.
-* `netmask` - The bit length of the subnet assigned to the server.
+* `name` - The name of the Server.
+* `netmask` - The bit length of the subnet assigned to the Server.
 * `network_address` - The network address which the `ip_address` belongs.
 * `network_interface` - A list of `network_interface` blocks as defined below.
 * `private_host_id` - The id of the private host which the server is assigned.
 * `private_host_name` - The name of the private host which the server is assigned.
-* `tags` - Any tags assigned to the server.
-* `zone` - The name of zone that the server is in (e.g. `is1a`, `tk1a`).
+* `tags` - Any tags assigned to the Server.
+* `zone` - The name of zone that the Server is in (e.g. `is1a`, `tk1a`).
 
 
 ---

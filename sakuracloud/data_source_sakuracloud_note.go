@@ -23,7 +23,7 @@ import (
 )
 
 func dataSourceSakuraCloudNote() *schema.Resource {
-	resourceName := "note"
+	resourceName := "Note"
 
 	return &schema.Resource{
 		Read: dataSourceSakuraCloudNoteRead,
