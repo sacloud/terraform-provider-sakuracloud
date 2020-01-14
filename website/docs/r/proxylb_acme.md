@@ -10,6 +10,22 @@ description: |-
 
 Manages a SakuraCloud ProxyLB ACME Setting.
 
+## Example Usage
+
+```hcl
+resource sakuracloud_proxylb_acme "foobar" {
+  proxylb_id       = sakuracloud_proxylb.foobar.id
+  accept_tos       = true
+  common_name      = "www.example.com"
+  update_delay_sec = 120
+}
+
+data "sakuracloud_proxylb" "foobar" {
+  filter {
+    names = ["foobar"]
+  }
+}
+```
 ## Argument Reference
 
 * `accept_tos` - (Required) The flag to accept the current Let's Encrypt terms of service(see: https://letsencrypt.org/repository/). This must be set `true` explicitly. Changing this forces a new resource to be created.

@@ -25,7 +25,7 @@ import (
 )
 
 func dataSourceSakuraCloudArchive() *schema.Resource {
-	resourceName := "archive"
+	resourceName := "Archive"
 
 	return &schema.Resource{
 		Read: dataSourceSakuraCloudArchiveRead,

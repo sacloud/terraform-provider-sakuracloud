@@ -10,6 +10,23 @@ description: |-
 
 Manages a SakuraCloud Database Read Replica.
 
+## Example Usage
+
+```hcl
+resource "sakuracloud_database_read_replica" "foobar" {
+  master_id    = data.sakuracloud_database.master.id
+  ip_addresses = ["192.168.11.111"]
+  name         = "foobar"
+  description  = "description"
+  tags         = ["tag1", "tag2"]
+}
+
+data sakuracloud_database "master" {
+  filter {
+    names = ["master-database-name"]
+  }
+}
+```
 ## Argument Reference
 
 * `description` - (Optional) The description of the read-replica database. The length of this value must be in the range [`1`-`512`].

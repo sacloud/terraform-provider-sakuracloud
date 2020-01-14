@@ -10,6 +10,15 @@ description: |-
 
 Get information about an existing Disk.
 
+## Example Usage
+
+```hcl
+data "sakuracloud_disk" "foobar" {
+  filter {
+    names = ["foobar"]
+  }
+}
+```
 ## Argument Reference
 
 * `filter` - (Optional) One or more values used for filtering, as defined below.
@@ -36,16 +45,16 @@ A `condition` block supports the following:
 
 * `id` - The id of the Disk.
 * `connector` - The name of the disk connector. This will be one of [`virtio`/`ide`].
-* `description` - The description of the disk.
-* `icon_id` - The icon id attached to the disk.
-* `name` - The name of the disk.
-* `plan` - The plan name of the disk. This will be one of [`ssd`/`hdd`].
-* `server_id` - The id of the Server connected to the disk.
-* `size` - The size of disk in GiB.
+* `description` - The description of the Disk.
+* `icon_id` - The icon id attached to the Disk.
+* `name` - The name of the Disk.
+* `plan` - The plan name of the Disk. This will be one of [`ssd`/`hdd`].
+* `server_id` - The id of the Server connected to the Disk.
+* `size` - The size of Disk in GiB.
 * `source_archive_id` - The id of the source archive.
 * `source_disk_id` - The id of the source disk.
-* `tags` - Any tags assigned to the disk.
-* `zone` - The name of zone that the disk is in (e.g. `is1a`, `tk1a`).
+* `tags` - Any tags assigned to the Disk.
+* `zone` - The name of zone that the Disk is in (e.g. `is1a`, `tk1a`).
 
 
 

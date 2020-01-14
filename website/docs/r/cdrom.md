@@ -10,6 +10,17 @@ description: |-
 
 Manages a SakuraCloud CD-ROM.
 
+## Example Usage
+
+```hcl
+resource "sakuracloud_cdrom" "foobar" {
+  name           = "foobar"
+  size           = 5
+  iso_image_file = "example.iso"
+  description    = "description"
+  tags           = ["tag1", "tag2"]
+}
+```
 ## Argument Reference
 
 * `content` - (Optional) The content to upload to as the CD-ROM. This conflicts with [`iso_image_file`].

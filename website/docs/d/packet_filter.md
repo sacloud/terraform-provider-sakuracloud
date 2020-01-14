@@ -10,6 +10,15 @@ description: |-
 
 Get information about an existing Packet Filter.
 
+## Example Usage
+
+```hcl
+data "sakuracloud_packet_filter" "foobar" {
+  filter {
+    names = ["foobar"]
+  }
+}
+```
 ## Argument Reference
 
 * `expression` - (Optional) One or more `expression` blocks as defined below.
@@ -35,9 +44,9 @@ A `condition` block supports the following:
 ## Attribute Reference
 
 * `id` - The id of the Packet Filter.
-* `description` - The description of the packet filter.
-* `name` - The name of the packet filter.
-* `zone` - The name of zone that the packet filter is in (e.g. `is1a`, `tk1a`).
+* `description` - The description of the PacketFilter.
+* `name` - The name of the PacketFilter.
+* `zone` - The name of zone that the PacketFilter is in (e.g. `is1a`, `tk1a`).
 
 
 ---

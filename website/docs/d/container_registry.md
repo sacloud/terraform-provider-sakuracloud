@@ -10,6 +10,15 @@ description: |-
 
 Get information about an existing Container Registry.
 
+## Example Usage
+
+```hcl
+data "sakuracloud_container_registry" "foobar" {
+  filter {
+    names = ["foobar"]
+  }
+}
+```
 ## Argument Reference
 
 * `filter` - (Optional) One or more values used for filtering, as defined below.
@@ -35,12 +44,12 @@ A `condition` block supports the following:
 
 * `id` - The id of the Container Registry.
 * `access_level` - The level of access that allow to users. This will be one of [`readwrite`/`readonly`/`none`].
-* `description` - The description of the container registry.
+* `description` - The description of the ContainerRegistry.
 * `fqdn` - The FQDN for accessing the container registry. FQDN is built from `subdomain_label` + `.sakuracr.jp`.
-* `icon_id` - The icon id attached to the container registry.
-* `name` - The name of the container registry.
+* `icon_id` - The icon id attached to the ContainerRegistry.
+* `name` - The name of the ContainerRegistry.
 * `subdomain_label` - The label at the lowest of the FQDN used when be accessed from users.
-* `tags` - Any tags assigned to the container registry.
+* `tags` - Any tags assigned to the ContainerRegistry.
 
 
 

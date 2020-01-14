@@ -10,6 +10,15 @@ description: |-
 
 Get information about an existing SSH Key.
 
+## Example Usage
+
+```hcl
+data "sakuracloud_ssh_key" "foobar" {
+  filter {
+    names = ["foobar"]
+  }
+}
+```
 ## Argument Reference
 
 * `filter` - (Optional) One or more values used for filtering, as defined below.
@@ -34,9 +43,9 @@ A `condition` block supports the following:
 ## Attribute Reference
 
 * `id` - The id of the SSH Key.
-* `description` - The description of the ssh key.
+* `description` - The description of the SSHKey.
 * `fingerprint` - The fingerprint of public key.
-* `name` - The name of the ssh key.
+* `name` - The name of the SSHKey.
 * `public_key` - The value of public key.
 
 

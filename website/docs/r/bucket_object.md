@@ -10,6 +10,15 @@ description: |-
 
 Manages a SakuraCloud Bucket Object.
 
+## Example Usage
+
+```hcl
+resource "sakuracloud_bucket_object" "foobar" {
+  bucket  = "foobar"
+  key     = "example.txt"
+  content = file("example.txt")
+}
+```
 ## Argument Reference
 
 * `access_key` - (Required) The access key for using SakuraCloud Object Storage API.

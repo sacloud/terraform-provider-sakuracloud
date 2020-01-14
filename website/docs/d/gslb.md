@@ -10,6 +10,15 @@ description: |-
 
 Get information about an existing GSLB.
 
+## Example Usage
+
+```hcl
+data "sakuracloud_gslb" "foobar" {
+  filter {
+    names = ["foobar"]
+  }
+}
+```
 ## Argument Reference
 
 * `filter` - (Optional) One or more values used for filtering, as defined below.

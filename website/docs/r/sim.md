@@ -10,9 +10,25 @@ description: |-
 
 Manages a SakuraCloud SIM.
 
+## Example Usage
+
+```hcl
+resource "sakuracloud_sim" "foobar" {
+  name        = "foobar"
+  description = "description"
+  tags        = ["tag1", "tag2"]
+
+  iccid    = "your-iccid"
+  passcode = "your-password"
+  #imei     = "your-imei"
+  carrier = ["softbank", "docomo", "kddi"]
+
+  enabled = true
+}
+```
 ## Argument Reference
 
-* `carrier` - (Required) A list of a communication company. Each element must be one of `kddi`/`docomo`/`softbank`.
+* `carrier` - (Required) A list of a communication company. Each element must be one of `docomo`/`softbank`/`kddi`.
 * `description` - (Optional) The description of the SIM. The length of this value must be in the range [`1`-`512`].
 * `enabled` - (Optional) The flag to enable the SIM. Default:`true`.
 * `iccid` - (Required) ICCID(Integrated Circuit Card ID) assigned to the SIM. Changing this forces a new resource to be created.

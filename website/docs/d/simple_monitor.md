@@ -10,6 +10,15 @@ description: |-
 
 Get information about an existing Simple Monitor.
 
+## Example Usage
+
+```hcl
+data "sakuracloud_simple_monitor" "foobar" {
+  filter {
+    names = ["foobar"]
+  }
+}
+```
 ## Argument Reference
 
 * `filter` - (Optional) One or more values used for filtering, as defined below.
@@ -36,16 +45,16 @@ A `condition` block supports the following:
 
 * `id` - The id of the Simple Monitor.
 * `delay_loop` - The interval in seconds between checks.
-* `description` - The description of the simple monitor.
+* `description` - The description of the SimpleMonitor.
 * `enabled` - The flag to enable monitoring by the simple monitor.
 * `health_check` - A list of `health_check` blocks as defined below.
-* `icon_id` - The icon id attached to the simple monitor.
+* `icon_id` - The icon id attached to the SimpleMonitor.
 * `notify_email_enabled` - The flag to enable notification by email.
 * `notify_email_html` - The flag to enable HTML format instead of text format.
 * `notify_interval` - The interval in hours between notification.
 * `notify_slack_enabled` - The flag to enable notification by slack/discord.
 * `notify_slack_webhook` - The webhook URL for sending notification by slack/discord.
-* `tags` - Any tags assigned to the simple monitor.
+* `tags` - Any tags assigned to the SimpleMonitor.
 * `target` - The monitoring target of the simple monitor. This will be IP address or FQDN.
 
 

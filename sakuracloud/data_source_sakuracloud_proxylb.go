@@ -23,7 +23,7 @@ import (
 )
 
 func dataSourceSakuraCloudProxyLB() *schema.Resource {
-	resourceName := "proxy LB"
+	resourceName := "ProxyLB"
 	return &schema.Resource{
 		Read: dataSourceSakuraCloudProxyLBRead,
 

@@ -10,6 +10,18 @@ description: |-
 
 Get information about an existing CD-ROM.
 
+## Example Usage
+
+```hcl
+data "sakuracloud_cdrom" "foobar" {
+  filter {
+    condition {
+      name   = "Name"
+      values = ["Parted Magic 2013_08_01"]
+    }
+  }
+}
+```
 ## Argument Reference
 
 * `filter` - (Optional) One or more values used for filtering, as defined below.

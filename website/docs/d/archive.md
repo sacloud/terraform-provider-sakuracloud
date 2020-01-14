@@ -10,6 +10,13 @@ description: |-
 
 Get information about an existing Archive.
 
+## Example Usage
+
+```hcl
+data "sakuracloud_archive" "foobar" {
+  os_type = "centos8"
+}
+```
 ## Argument Reference
 
 * `filter` - (Optional) One or more values used for filtering, as defined below.
@@ -37,12 +44,12 @@ A `condition` block supports the following:
 ## Attribute Reference
 
 * `id` - The id of the Archive.
-* `description` - The description of the archive.
-* `icon_id` - The icon id attached to the archive.
-* `name` - The name of the archive.
-* `size` - The size of archive in GiB.
-* `tags` - Any tags assigned to the archive.
-* `zone` - The name of zone that the archive is in (e.g. `is1a`, `tk1a`).
+* `description` - The description of the Archive.
+* `icon_id` - The icon id attached to the Archive.
+* `name` - The name of the Archive.
+* `size` - The size of Archive in GiB.
+* `tags` - Any tags assigned to the Archive.
+* `zone` - The name of zone that the Archive is in (e.g. `is1a`, `tk1a`).
 
 
 

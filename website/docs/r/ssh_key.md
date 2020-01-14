@@ -10,6 +10,14 @@ description: |-
 
 Manages a SakuraCloud SSH Key.
 
+## Example Usage
+
+```hcl
+resource "sakuracloud_ssh_key" "foobar" {
+  name       = "foobar"
+  public_key = file("~/.ssh/id_rsa.pub")
+}
+```
 ## Argument Reference
 
 * `description` - (Optional) The description of the SSHKey. The length of this value must be in the range [`1`-`512`].

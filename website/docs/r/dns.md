@@ -10,6 +10,25 @@ description: |-
 
 Manages a SakuraCloud DNS.
 
+## Example Usage
+
+```hcl
+resource "sakuracloud_dns" "foobar" {
+  zone        = "example.com"
+  description = "description"
+  tags        = ["tag1", "tag2"]
+  record {
+    name  = "www"
+    type  = "A"
+    value = "192.168.11.1"
+  }
+  record {
+    name  = "www"
+    type  = "A"
+    value = "192.168.11.2"
+  }
+}
+```
 ## Argument Reference
 
 * `description` - (Optional) The description of the DNS. The length of this value must be in the range [`1`-`512`].

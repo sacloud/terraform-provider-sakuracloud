@@ -10,6 +10,15 @@ description: |-
 
 Get information about an existing Icon.
 
+## Example Usage
+
+```hcl
+data "sakuracloud_icon" "foobar" {
+  filter {
+    names = ["foobar"]
+  }
+}
+```
 ## Argument Reference
 
 * `filter` - (Optional) One or more values used for filtering, as defined below.
@@ -35,8 +44,8 @@ A `condition` block supports the following:
 ## Attribute Reference
 
 * `id` - The id of the Icon.
-* `name` - The name of the icon.
-* `tags` - Any tags assigned to the icon.
+* `name` - The name of the Icon.
+* `tags` - Any tags assigned to the Icon.
 * `url` - The URL for getting the icon's raw data.
 
 

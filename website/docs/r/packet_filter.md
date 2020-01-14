@@ -10,6 +10,58 @@ description: |-
 
 Manages a SakuraCloud Packet Filter.
 
+## Example Usage
+
+```hcl
+resource "sakuracloud_packet_filter" "foobar" {
+  name        = "foobar"
+  description = "description"
+
+  expression {
+    protocol  = "tcp"
+    dest_port = "22"
+  }
+
+  expression {
+    protocol  = "tcp"
+    dest_port = "80"
+  }
+
+  expression {
+    protocol  = "tcp"
+    dest_port = "443"
+  }
+
+  expression {
+    protocol = "icmp"
+  }
+
+  expression {
+    protocol = "fragment"
+  }
+
+  expression {
+    protocol    = "udp"
+    source_port = "123"
+  }
+
+  expression {
+    protocol  = "tcp"
+    dest_port = "32768-61000"
+  }
+
+  expression {
+    protocol  = "udp"
+    dest_port = "32768-61000"
+  }
+
+  expression {
+    protocol    = "ip"
+    allow       = false
+    description = "Deny ALL"
+  }
+}
+```
 ## Argument Reference
 
 * `description` - (Optional) The description of the packetFilter. The length of this value must be in the range [`1`-`512`].

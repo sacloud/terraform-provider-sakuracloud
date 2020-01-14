@@ -23,7 +23,7 @@ import (
 )
 
 func dataSourceSakuraCloudLoadBalancer() *schema.Resource {
-	resourceName := "load balancer"
+	resourceName := "LoadBalancer"
 	return &schema.Resource{
 		Read: dataSourceSakuraCloudLoadBalancerRead,
 

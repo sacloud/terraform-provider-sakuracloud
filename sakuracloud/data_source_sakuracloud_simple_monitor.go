@@ -23,7 +23,7 @@ import (
 )
 
 func dataSourceSakuraCloudSimpleMonitor() *schema.Resource {
-	resourceName := "simple monitor"
+	resourceName := "SimpleMonitor"
 	return &schema.Resource{
 		Read: dataSourceSakuraCloudSimpleMonitorRead,
 
