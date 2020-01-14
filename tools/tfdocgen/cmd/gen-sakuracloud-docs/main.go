@@ -101,7 +101,7 @@ var definitions = map[string]definition{
 		category:    CategoryStorage,
 	},
 	"sakuracloud_auto_backup": {
-		displayName: "AutoBackup",
+		displayName: "Auto Backup",
 		category:    CategoryAppliance,
 	},
 	"sakuracloud_bridge": {
@@ -149,7 +149,7 @@ var definitions = map[string]definition{
 		category:    CategoryMisc,
 	},
 	"sakuracloud_internet": {
-		displayName: "Internet",
+		displayName: "Switch+Router",
 		category:    CategoryNetworking,
 	},
 	"sakuracloud_ipv4_ptr": {
@@ -157,11 +157,11 @@ var definitions = map[string]definition{
 		category:    CategoryNetworking,
 	},
 	"sakuracloud_load_balancer": {
-		displayName: "LoadBalancer",
+		displayName: "Load Balancer",
 		category:    CategoryAppliance,
 	},
 	"sakuracloud_mobile_gateway": {
-		displayName: "MobileGateway",
+		displayName: "Mobile Gateway",
 		category:    CategorySecureMobile,
 	},
 	"sakuracloud_nfs": {
@@ -173,15 +173,15 @@ var definitions = map[string]definition{
 		category:    CategoryMisc,
 	},
 	"sakuracloud_packet_filter": {
-		displayName: "PacketFilter",
+		displayName: "Packet Filter",
 		category:    CategoryNetworking,
 	},
 	"sakuracloud_packet_filter_rules": {
-		displayName: "PacketFilter Rules",
+		displayName: "Packet Filter Rules",
 		category:    CategoryNetworking,
 	},
 	"sakuracloud_private_host": {
-		displayName: "PrivateHost",
+		displayName: "Private Host",
 		category:    CategoryCompute,
 	},
 	"sakuracloud_proxylb": {
@@ -201,15 +201,15 @@ var definitions = map[string]definition{
 		category:    CategorySecureMobile,
 	},
 	"sakuracloud_simple_monitor": {
-		displayName: "SimpleMonitor",
+		displayName: "Simple Monitor",
 		category:    CategoryGlobal,
 	},
 	"sakuracloud_ssh_key": {
-		displayName: "SSHKey",
+		displayName: "SSH Key",
 		category:    CategoryMisc,
 	},
 	"sakuracloud_ssh_key_gen": {
-		displayName: "SSHKey Gen",
+		displayName: "SSH Key Gen",
 		category:    CategoryMisc,
 	},
 	"sakuracloud_subnet": {
@@ -221,7 +221,7 @@ var definitions = map[string]definition{
 		category:    CategoryNetworking,
 	},
 	"sakuracloud_vpc_router": {
-		displayName: "VPCRouter",
+		displayName: "VPC Router",
 		category:    CategoryAppliance,
 	},
 	"sakuracloud_zone": {

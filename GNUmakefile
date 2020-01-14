@@ -10,7 +10,7 @@ ACC_TEST_UA ?= (Acceptance Test)
 
 export GO111MODULE=on
 
-default: fmt goimports set-license lint tflint
+default: fmt goimports set-license lint tflint docscheck
 
 clean:
 	rm -Rf $(CURDIR)/bin/*
@@ -147,5 +147,5 @@ endif
 
 .PHONY: website-scaffold
 website-scaffold:
-	go run tools/docsgen/cmd/gen-sakuracloud-docs/main.go website-scaffold
+	go run tools/tfdocgen/cmd/gen-sakuracloud-docs/main.go website-scaffold
 

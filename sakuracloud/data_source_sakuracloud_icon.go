@@ -16,35 +16,24 @@ package sakuracloud
 
 import (
 	"fmt"
-	"time"
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/sacloud/libsacloud/v2/sacloud"
 )
 
 func dataSourceSakuraCloudIcon() *schema.Resource {
+	resourceName := "icon"
 	return &schema.Resource{
 		Read: dataSourceSakuraCloudIconRead,
 
-		Timeouts: &schema.ResourceTimeout{
-			Read: schema.DefaultTimeout(5 * time.Minute),
-		},
-
 		Schema: map[string]*schema.Schema{
 			filterAttrName: filterSchema(&filterSchemaOption{}),
-			"name": {
-				Type:     schema.TypeString,
-				Computed: true,
-			},
+			"name":         schemaDataSourceName(resourceName),
+			"tags":         schemaDataSourceTags(resourceName),
 			"url": {
-				Type:     schema.TypeString,
-				Computed: true,
-			},
-			"tags": {
-				Type:     schema.TypeSet,
-				Computed: true,
-				Elem:     &schema.Schema{Type: schema.TypeString},
-				Set:      schema.HashString,
+				Type:        schema.TypeString,
+				Computed:    true,
+				Description: "The URL for getting the icon's raw data",
 			},
 		},
 	}

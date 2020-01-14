@@ -24,6 +24,7 @@ import (
 )
 
 func resourceSakuraCloudSwitch() *schema.Resource {
+	resourceName := "Switch"
 	return &schema.Resource{
 		Create: resourceSakuraCloudSwitchCreate,
 		Read:   resourceSakuraCloudSwitchRead,
@@ -35,48 +36,28 @@ func resourceSakuraCloudSwitch() *schema.Resource {
 
 		Timeouts: &schema.ResourceTimeout{
 			Create: schema.DefaultTimeout(5 * time.Minute),
-			Read:   schema.DefaultTimeout(5 * time.Minute),
 			Update: schema.DefaultTimeout(5 * time.Minute),
 			Delete: schema.DefaultTimeout(20 * time.Minute),
 		},
 
 		Schema: map[string]*schema.Schema{
-			"name": {
-				Type:     schema.TypeString,
-				Required: true,
-			},
-			"icon_id": {
-				Type:         schema.TypeString,
-				Optional:     true,
-				ValidateFunc: validateSakuracloudIDType,
-			},
-			"description": {
-				Type:     schema.TypeString,
-				Optional: true,
-			},
-			"tags": {
-				Type:     schema.TypeSet,
-				Optional: true,
-				Elem:     &schema.Schema{Type: schema.TypeString},
-				Set:      schema.HashString,
-			},
+			"name":        schemaResourceName(resourceName),
+			"icon_id":     schemaResourceIconID(resourceName),
+			"description": schemaResourceDescription(resourceName),
+			"tags":        schemaResourceTags(resourceName),
 			"bridge_id": {
 				Type:         schema.TypeString,
 				Optional:     true,
 				ValidateFunc: validateSakuracloudIDType,
+				Description:  descf("The bridge id attached to the %s", resourceName),
 			},
 			"server_ids": {
-				Type:     schema.TypeList,
-				Computed: true,
-				Elem:     &schema.Schema{Type: schema.TypeString},
-			},
-			"zone": {
-				Type:        schema.TypeString,
-				Optional:    true,
+				Type:        schema.TypeList,
 				Computed:    true,
-				ForceNew:    true,
-				Description: "target SakuraCloud zone",
+				Elem:        &schema.Schema{Type: schema.TypeString},
+				Description: "A list of server id connected to the switch",
 			},
+			"zone": schemaResourceZone(resourceName),
 		},
 	}
 }

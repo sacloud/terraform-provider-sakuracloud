@@ -16,7 +16,6 @@ package sakuracloud
 
 import (
 	"fmt"
-	"time"
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/sacloud/libsacloud/v2/sacloud"
@@ -26,36 +25,34 @@ func dataSourceSakuraCloudZone() *schema.Resource {
 	return &schema.Resource{
 		Read: dataSourceSakuraCloudZoneRead,
 
-		Timeouts: &schema.ResourceTimeout{
-			Read: schema.DefaultTimeout(5 * time.Minute),
-		},
-
 		Schema: map[string]*schema.Schema{
 			"name": {
-				Type:     schema.TypeString,
-				Optional: true,
-				Computed: true,
+				Type:        schema.TypeString,
+				Optional:    true,
+				Computed:    true,
+				Description: "The name of the zone (e.g. `is1a`,`tk1a`)",
 			},
 			"zone_id": {
-				Type:     schema.TypeString,
-				Computed: true,
+				Type:        schema.TypeString,
+				Computed:    true,
+				Description: "The id of the zone",
 			},
-			"description": {
-				Type:     schema.TypeString,
-				Computed: true,
-			},
+			"description": schemaDataSourceDescription("zone"),
 			"region_id": {
-				Type:     schema.TypeString,
-				Computed: true,
+				Type:        schema.TypeString,
+				Computed:    true,
+				Description: "The id of the region that the zone belongs",
 			},
 			"region_name": {
-				Type:     schema.TypeString,
-				Computed: true,
+				Type:        schema.TypeString,
+				Computed:    true,
+				Description: "The name of the region that the zone belongs",
 			},
 			"dns_servers": {
-				Type:     schema.TypeList,
-				Computed: true,
-				Elem:     &schema.Schema{Type: schema.TypeString},
+				Type:        schema.TypeList,
+				Computed:    true,
+				Elem:        &schema.Schema{Type: schema.TypeString},
+				Description: "A list of IP address of DNS server in the zone",
 			},
 		},
 	}

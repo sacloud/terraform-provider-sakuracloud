@@ -12,22 +12,21 @@ Manages a SakuraCloud Switch.
 
 ## Argument Reference
 
-* `bridge_id` - (Optional) .
-* `description` - (Optional) .
-* `icon_id` - (Optional) .
-* `name` - (Required) .
-* `tags` - (Optional) .
-* `zone` - (Optional) target SakuraCloud zone. Changing this forces a new resource to be created.
+* `bridge_id` - (Optional) The bridge id attached to the Switch.
+* `description` - (Optional) The description of the Switch. The length of this value must be in the range [`1`-`512`].
+* `icon_id` - (Optional) The icon id to attach to the Switch.
+* `name` - (Required) The name of the Switch. The length of this value must be in the range [`1`-`64`].
+* `tags` - (Optional) Any tags to assign to the Switch.
+* `zone` - (Optional) The name of zone that the Switch will be created. (e.g. `is1a`, `tk1a`). Changing this forces a new resource to be created.
 
 
 
 ### Timeouts
 
-The `timeouts` block allows you to specify [timeouts](https://www.terraform.io/docs/configuration/resources.html#timeouts) for certain actions:
+The `timeouts` block allows you to specify [timeouts](https://www.terraform.io/docs/configuration/resources.html#operation-timeouts) for certain actions:
 
 * `create` - (Defaults to 5 minutes) Used when creating the Switch
 
-* `read` -   (Defaults to 5 minutes) Used when reading the Switch
 
 * `update` - (Defaults to 5 minutes) Used when updating the Switch
 
@@ -37,8 +36,8 @@ The `timeouts` block allows you to specify [timeouts](https://www.terraform.io/d
 
 ## Attribute Reference
 
-* `id` - The ID of the Switch.
-* `server_ids` - .
+* `id` - The id of the Switch.
+* `server_ids` - A list of server id connected to the switch.
 
 
 

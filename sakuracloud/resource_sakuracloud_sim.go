@@ -27,6 +27,8 @@ import (
 )
 
 func resourceSakuraCloudSIM() *schema.Resource {
+	resourceName := "SIM"
+
 	return &schema.Resource{
 		Create: resourceSakuraCloudSIMCreate,
 		Read:   resourceSakuraCloudSIMRead,
@@ -38,29 +40,28 @@ func resourceSakuraCloudSIM() *schema.Resource {
 
 		Timeouts: &schema.ResourceTimeout{
 			Create: schema.DefaultTimeout(5 * time.Minute),
-			Read:   schema.DefaultTimeout(5 * time.Minute),
 			Update: schema.DefaultTimeout(5 * time.Minute),
 			Delete: schema.DefaultTimeout(5 * time.Minute),
 		},
 
 		Schema: map[string]*schema.Schema{
-			"name": {
-				Type:     schema.TypeString,
-				Required: true,
-			},
+			"name": schemaResourceName(resourceName),
 			"iccid": {
-				Type:     schema.TypeString,
-				Required: true,
-				ForceNew: true,
+				Type:        schema.TypeString,
+				Required:    true,
+				ForceNew:    true,
+				Description: "ICCID(Integrated Circuit Card ID) assigned to the SIM",
 			},
 			"passcode": {
-				Type:     schema.TypeString,
-				Required: true,
-				ForceNew: true,
+				Type:        schema.TypeString,
+				Required:    true,
+				ForceNew:    true,
+				Description: "The passcord to authenticate the SIM",
 			},
 			"imei": {
-				Type:     schema.TypeString,
-				Optional: true,
+				Type:        schema.TypeString,
+				Optional:    true,
+				Description: "The id of the device to restrict devices that can use the SIM",
 			},
 			"carrier": {
 				Type:     schema.TypeList,
@@ -68,34 +69,29 @@ func resourceSakuraCloudSIM() *schema.Resource {
 				Elem:     &schema.Schema{Type: schema.TypeString},
 				MinItems: 1,
 				MaxItems: 3,
+				Description: descf(
+					"A list of a communication company. Each element must be one of %s",
+					types.SIMOperatorShortNames(),
+				),
 			},
 			"enabled": {
-				Type:     schema.TypeBool,
-				Optional: true,
-				Default:  true,
+				Type:        schema.TypeBool,
+				Optional:    true,
+				Default:     true,
+				Description: "The flag to enable the SIM",
 			},
-			"description": {
-				Type:     schema.TypeString,
-				Optional: true,
-			},
-			"tags": {
-				Type:     schema.TypeSet,
-				Optional: true,
-				Elem:     &schema.Schema{Type: schema.TypeString},
-				Set:      schema.HashString,
-			},
-			"icon_id": {
-				Type:         schema.TypeString,
-				Optional:     true,
-				ValidateFunc: validateSakuracloudIDType,
-			},
+			"icon_id":     schemaResourceIconID(resourceName),
+			"description": schemaResourceDescription(resourceName),
+			"tags":        schemaResourceTags(resourceName),
 			"mobile_gateway_id": {
-				Type:     schema.TypeString,
-				Computed: true,
+				Type:        schema.TypeString,
+				Computed:    true,
+				Description: "The id of the MobileGateway which the SIM is assigned",
 			},
 			"ip_address": {
-				Type:     schema.TypeString,
-				Computed: true,
+				Type:        schema.TypeString,
+				Computed:    true,
+				Description: "The IP address assigned to the SIM",
 			},
 		},
 	}

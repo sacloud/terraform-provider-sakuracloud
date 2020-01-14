@@ -12,20 +12,19 @@ Manages a SakuraCloud Icon.
 
 ## Argument Reference
 
-* `base64content` - (Optional) . Changing this forces a new resource to be created.
-* `name` - (Required) .
-* `source` - (Optional) . Changing this forces a new resource to be created.
-* `tags` - (Optional) .
+* `base64content` - (Optional) The base64 encoded content to upload to as the Icon. This conflicts with [`source`]. Changing this forces a new resource to be created.
+* `name` - (Required) The name of the Icon. The length of this value must be in the range [`1`-`64`].
+* `source` - (Optional) The file path to upload to as the Icon. This conflicts with [`base64content`]. Changing this forces a new resource to be created.
+* `tags` - (Optional) Any tags to assign to the Icon.
 
 
 
 ### Timeouts
 
-The `timeouts` block allows you to specify [timeouts](https://www.terraform.io/docs/configuration/resources.html#timeouts) for certain actions:
+The `timeouts` block allows you to specify [timeouts](https://www.terraform.io/docs/configuration/resources.html#operation-timeouts) for certain actions:
 
 * `create` - (Defaults to 5 minutes) Used when creating the Icon
 
-* `read` -   (Defaults to 5 minutes) Used when reading the Icon
 
 * `update` - (Defaults to 5 minutes) Used when updating the Icon
 
@@ -35,8 +34,8 @@ The `timeouts` block allows you to specify [timeouts](https://www.terraform.io/d
 
 ## Attribute Reference
 
-* `id` - The ID of the Icon.
-* `url` - .
+* `id` - The id of the Icon.
+* `url` - The URL for getting the icon's raw data.
 
 
 

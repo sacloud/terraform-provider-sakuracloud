@@ -16,37 +16,22 @@ package sakuracloud
 
 import (
 	"fmt"
-	"time"
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/sacloud/libsacloud/v2/sacloud"
 )
 
 func dataSourceSakuraCloudBridge() *schema.Resource {
+	resourceName := "bridge"
+
 	return &schema.Resource{
 		Read: dataSourceSakuraCloudBridgeRead,
 
-		Timeouts: &schema.ResourceTimeout{
-			Read: schema.DefaultTimeout(5 * time.Minute),
-		},
-
 		Schema: map[string]*schema.Schema{
 			filterAttrName: filterSchema(&filterSchemaOption{excludeTags: true}),
-			"name": {
-				Type:     schema.TypeString,
-				Computed: true,
-			},
-			"description": {
-				Type:     schema.TypeString,
-				Computed: true,
-			},
-			"zone": {
-				Type:        schema.TypeString,
-				Optional:    true,
-				Computed:    true,
-				ForceNew:    true,
-				Description: "target SakuraCloud zone",
-			},
+			"name":         schemaDataSourceName(resourceName),
+			"description":  schemaDataSourceDescription(resourceName),
+			"zone":         schemaDataSourceZone(resourceName),
 		},
 	}
 }

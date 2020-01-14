@@ -16,101 +16,78 @@ package sakuracloud
 
 import (
 	"fmt"
-	"time"
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/sacloud/libsacloud/v2/sacloud"
 )
 
 func dataSourceSakuraCloudInternet() *schema.Resource {
+	resourceName := "Switch+Router"
 	return &schema.Resource{
 		Read: dataSourceSakuraCloudInternetRead,
 
-		Timeouts: &schema.ResourceTimeout{
-			Read: schema.DefaultTimeout(5 * time.Minute),
-		},
-
 		Schema: map[string]*schema.Schema{
 			filterAttrName: filterSchema(&filterSchemaOption{}),
-			"name": {
-				Type:     schema.TypeString,
-				Computed: true,
-			},
-			"icon_id": {
-				Type:     schema.TypeString,
-				Computed: true,
-			},
-			"description": {
-				Type:     schema.TypeString,
-				Computed: true,
-			},
-			"tags": {
-				Type:     schema.TypeSet,
-				Computed: true,
-				Elem:     &schema.Schema{Type: schema.TypeString},
-				Set:      schema.HashString,
-			},
-			"netmask": {
-				Type:     schema.TypeInt,
-				Computed: true,
-			},
+			"name":         schemaDataSourceName(resourceName),
+			"icon_id":      schemaDataSourceIconID(resourceName),
+			"description":  schemaDataSourceDescription(resourceName),
+			"tags":         schemaDataSourceTags(resourceName),
+			"netmask":      schemaDataSourceNetMask(resourceName),
 			"band_width": {
-				Type:     schema.TypeInt,
-				Computed: true,
+				Type:        schema.TypeInt,
+				Computed:    true,
+				Description: "The bandwidth of the network connected to the Internet in Mbps",
 			},
-			"switch_id": {
-				Type:     schema.TypeString,
-				Computed: true,
-			},
+			"switch_id": schemaDataSourceSwitchID(resourceName),
 			"server_ids": {
-				Type:     schema.TypeList,
-				Computed: true,
-				Elem:     &schema.Schema{Type: schema.TypeString},
+				Type:        schema.TypeList,
+				Computed:    true,
+				Elem:        &schema.Schema{Type: schema.TypeString},
+				Description: descf("A list of the ID of Servers connected to the %s", resourceName),
 			},
 			"network_address": {
-				Type:     schema.TypeString,
-				Computed: true,
+				Type:        schema.TypeString,
+				Computed:    true,
+				Description: descf("The IPv4 network address assigned to the %s", resourceName),
 			},
-			"gateway": {
-				Type:     schema.TypeString,
-				Computed: true,
-			},
+			"gateway": schemaDataSourceGateway(resourceName),
 			"min_ip_address": {
-				Type:     schema.TypeString,
-				Computed: true,
+				Type:        schema.TypeString,
+				Computed:    true,
+				Description: descf("Minimum IP address in assigned global addresses to the %s", resourceName),
 			},
 			"max_ip_address": {
-				Type:     schema.TypeString,
-				Computed: true,
+				Type:        schema.TypeString,
+				Computed:    true,
+				Description: descf("Maximum IP address in assigned global addresses to the %s", resourceName),
 			},
 			"ip_addresses": {
-				Type:     schema.TypeList,
-				Computed: true,
-				Elem:     &schema.Schema{Type: schema.TypeString},
+				Type:        schema.TypeList,
+				Computed:    true,
+				Elem:        &schema.Schema{Type: schema.TypeString},
+				Description: descf("A list of assigned global address to the %s", resourceName),
 			},
 			"enable_ipv6": {
-				Type:     schema.TypeBool,
-				Computed: true,
+				Type:        schema.TypeBool,
+				Computed:    true,
+				Description: "The flag to enable IPv6",
 			},
 			"ipv6_prefix": {
-				Type:     schema.TypeString,
-				Computed: true,
+				Type:        schema.TypeString,
+				Computed:    true,
+				Description: descf("The network prefix of assigned IPv6 addresses to the %s", resourceName),
 			},
 			"ipv6_prefix_len": {
-				Type:     schema.TypeInt,
-				Computed: true,
+				Type:        schema.TypeInt,
+				Computed:    true,
+				Description: "The bit length of IPv6 network prefix",
 			},
 			"ipv6_network_address": {
-				Type:     schema.TypeString,
-				Computed: true,
-			},
-			"zone": {
 				Type:        schema.TypeString,
-				Optional:    true,
 				Computed:    true,
-				ForceNew:    true,
-				Description: "target SakuraCloud zone",
+				Description: descf("The IPv6 network address assigned to the %s", resourceName),
 			},
+			"zone": schemaDataSourceZone(resourceName),
 		},
 	}
 }

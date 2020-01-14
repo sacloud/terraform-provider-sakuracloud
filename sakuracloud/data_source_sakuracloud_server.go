@@ -16,46 +16,52 @@ package sakuracloud
 
 import (
 	"fmt"
-	"time"
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/sacloud/libsacloud/v2/sacloud"
+	"github.com/sacloud/libsacloud/v2/sacloud/types"
 )
 
 func dataSourceSakuraCloudServer() *schema.Resource {
+	resourceName := "server"
+
 	return &schema.Resource{
 		Read: dataSourceSakuraCloudServerRead,
 
-		Timeouts: &schema.ResourceTimeout{
-			Read: schema.DefaultTimeout(5 * time.Minute),
-		},
-
 		Schema: map[string]*schema.Schema{
 			filterAttrName: filterSchema(&filterSchemaOption{}),
-			"name": {
-				Type:     schema.TypeString,
-				Computed: true,
-			},
+			"name":         schemaDataSourceName(resourceName),
 			"core": {
-				Type:     schema.TypeInt,
-				Computed: true,
+				Type:        schema.TypeInt,
+				Computed:    true,
+				Description: "The number of virtual CPUs",
 			},
 			"memory": {
-				Type:     schema.TypeInt,
-				Computed: true,
+				Type:        schema.TypeInt,
+				Computed:    true,
+				Description: "The size of memory in GiB",
 			},
 			"commitment": {
 				Type:     schema.TypeString,
 				Computed: true,
+				Description: descf(
+					"The policy of how to allocate virtual CPUs to the server. This will be one of [%s]",
+					types.CommitmentStrings,
+				),
 			},
 			"disks": {
-				Type:     schema.TypeList,
-				Computed: true,
-				Elem:     &schema.Schema{Type: schema.TypeString},
+				Type:        schema.TypeList,
+				Computed:    true,
+				Elem:        &schema.Schema{Type: schema.TypeString},
+				Description: "A list of disk id connected to the server",
 			},
 			"interface_driver": {
 				Type:     schema.TypeString,
 				Computed: true,
+				Description: descf(
+					"The driver name of network interface. This will be one of [%s]",
+					types.InterfaceDriverStrings,
+				),
 			},
 			"network_interface": {
 				Type:     schema.TypeList,
@@ -65,71 +71,56 @@ func dataSourceSakuraCloudServer() *schema.Resource {
 						"upstream": {
 							Type:     schema.TypeString,
 							Computed: true,
+							Description: descf(
+								"The upstream type or upstream switch id. This will be one of [%s]",
+								[]string{"shared", "disconnect", "<switch id>"},
+							),
 						},
 						"packet_filter_id": {
-							Type:     schema.TypeString,
-							Computed: true,
+							Type:        schema.TypeString,
+							Computed:    true,
+							Description: "The id of the packet filter attached to the network interface",
 						},
 						"mac_address": {
-							Type:     schema.TypeString,
-							Computed: true,
+							Type:        schema.TypeString,
+							Computed:    true,
+							Description: "The MAC address",
 						},
 					},
 				},
 			},
 			"cdrom_id": {
-				Type:     schema.TypeString,
-				Computed: true,
+				Type:        schema.TypeString,
+				Computed:    true,
+				Description: "The id of the CD-ROM attached to the server",
 			},
 			"private_host_id": {
-				Type:     schema.TypeString,
-				Computed: true,
+				Type:        schema.TypeString,
+				Computed:    true,
+				Description: "The id of the private host which the server is assigned",
 			},
 			"private_host_name": {
-				Type:     schema.TypeString,
-				Computed: true,
-			},
-			"icon_id": {
-				Type:     schema.TypeString,
-				Computed: true,
-			},
-			"description": {
-				Type:     schema.TypeString,
-				Computed: true,
-			},
-			"tags": {
-				Type:     schema.TypeSet,
-				Computed: true,
-				Elem:     &schema.Schema{Type: schema.TypeString},
-				Set:      schema.HashString,
-			},
-			"zone": {
 				Type:        schema.TypeString,
-				Optional:    true,
 				Computed:    true,
-				ForceNew:    true,
-				Description: "target SakuraCloud zone",
+				Description: "The name of the private host which the server is assigned",
 			},
-			"ip_address": {
-				Type:     schema.TypeString,
-				Computed: true,
+			"icon_id":     schemaDataSourceIconID(resourceName),
+			"description": schemaDataSourceDescription(resourceName),
+			"tags":        schemaDataSourceTags(resourceName),
+			"zone":        schemaDataSourceZone(resourceName),
+			"ip_address":  schemaDataSourceIPAddress(resourceName),
+			"gateway":     schemaDataSourceGateway(resourceName),
+			"netmask":     schemaDataSourceNetMask(resourceName),
+			"network_address": {
+				Type:        schema.TypeString,
+				Computed:    true,
+				Description: "The network address which the `ip_address` belongs",
 			},
 			"dns_servers": {
-				Type:     schema.TypeList,
-				Computed: true,
-				Elem:     &schema.Schema{Type: schema.TypeString},
-			},
-			"gateway": {
-				Type:     schema.TypeString,
-				Computed: true,
-			},
-			"network_address": {
-				Type:     schema.TypeString,
-				Computed: true,
-			},
-			"netmask": {
-				Type:     schema.TypeInt,
-				Computed: true,
+				Type:        schema.TypeList,
+				Computed:    true,
+				Elem:        &schema.Schema{Type: schema.TypeString},
+				Description: "A list of IP address of DNS server in the zone",
 			},
 		},
 	}

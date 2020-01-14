@@ -16,19 +16,16 @@ package sakuracloud
 
 import (
 	"fmt"
-	"time"
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/sacloud/libsacloud/v2/sacloud"
 )
 
 func dataSourceSakuraCloudSubnet() *schema.Resource {
+	resourceName := "subnet"
+
 	return &schema.Resource{
 		Read: dataSourceSakuraCloudSubnetRead,
-
-		Timeouts: &schema.ResourceTimeout{
-			Read: schema.DefaultTimeout(5 * time.Minute),
-		},
 
 		Schema: map[string]*schema.Schema{
 			"internet_id": {
@@ -36,49 +33,44 @@ func dataSourceSakuraCloudSubnet() *schema.Resource {
 				Required:     true,
 				ForceNew:     true,
 				ValidateFunc: validateSakuracloudIDType,
+				Description:  "The id of the switch+router resource that the subnet belongs",
 			},
 			"index": {
-				Type:     schema.TypeInt,
-				ForceNew: true,
-				Required: true,
+				Type:        schema.TypeInt,
+				ForceNew:    true,
+				Required:    true,
+				Description: "The index of the subnet in assigned to the switch+router",
 			},
 
-			"netmask": {
-				Type:     schema.TypeInt,
-				Computed: true,
-			},
+			"netmask": schemaDataSourceNetMask(resourceName),
 			"next_hop": {
-				Type:     schema.TypeString,
-				Computed: true,
+				Type:        schema.TypeString,
+				Computed:    true,
+				Description: "The ip address of the next-hop at the subnet",
 			},
-			"switch_id": {
-				Type:     schema.TypeString,
-				Computed: true,
-			},
+			"switch_id": schemaDataSourceSwitchID(resourceName),
 			"network_address": {
-				Type:     schema.TypeString,
-				Computed: true,
+				Type:        schema.TypeString,
+				Computed:    true,
+				Description: "The IPv4 network address assigned to the subnet",
 			},
 			"min_ip_address": {
-				Type:     schema.TypeString,
-				Computed: true,
+				Type:        schema.TypeString,
+				Computed:    true,
+				Description: "Minimum IP address in assigned global addresses to the subnet",
 			},
 			"max_ip_address": {
-				Type:     schema.TypeString,
-				Computed: true,
+				Type:        schema.TypeString,
+				Computed:    true,
+				Description: "Maximum IP address in assigned global addresses to the subnet",
 			},
 			"ip_addresses": {
-				Type:     schema.TypeList,
-				Computed: true,
-				Elem:     &schema.Schema{Type: schema.TypeString},
-			},
-			"zone": {
-				Type:        schema.TypeString,
-				Optional:    true,
+				Type:        schema.TypeList,
 				Computed:    true,
-				ForceNew:    true,
-				Description: "target SakuraCloud zone",
+				Elem:        &schema.Schema{Type: schema.TypeString},
+				Description: "A list of assigned global address to the subnet",
 			},
+			"zone": schemaDataSourceZone(resourceName),
 		},
 	}
 }

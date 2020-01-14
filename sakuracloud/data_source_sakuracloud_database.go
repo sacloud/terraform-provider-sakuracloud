@@ -16,106 +16,76 @@ package sakuracloud
 
 import (
 	"fmt"
-	"time"
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/sacloud/libsacloud/v2/sacloud"
+	"github.com/sacloud/libsacloud/v2/sacloud/types"
 )
 
 func dataSourceSakuraCloudDatabase() *schema.Resource {
+	resourceName := "database"
+
 	return &schema.Resource{
 		Read: dataSourceSakuraCloudDatabaseRead,
 
-		Timeouts: &schema.ResourceTimeout{
-			Read: schema.DefaultTimeout(5 * time.Minute),
-		},
-
 		Schema: map[string]*schema.Schema{
 			filterAttrName: filterSchema(&filterSchemaOption{}),
-			"name": {
-				Type:     schema.TypeString,
-				Computed: true,
-			},
+			"name":         schemaDataSourceName(resourceName),
 			"database_type": {
 				Type:     schema.TypeString,
 				Computed: true,
+				Description: descf(
+					"The type of the database. This will be one of [%s]",
+					types.RDBMSTypeStrings,
+				),
 			},
-			"plan": {
-				Type:     schema.TypeString,
-				Computed: true,
-			},
+			"plan": schemaDataSourcePlan(resourceName, types.DatabasePlanStrings),
 			"username": {
-				Type:     schema.TypeString,
-				Computed: true,
+				Type:        schema.TypeString,
+				Computed:    true,
+				Description: "The name of default user on the database",
 			},
 			"password": {
-				Type:     schema.TypeString,
-				Computed: true,
+				Type:        schema.TypeString,
+				Computed:    true,
+				Sensitive:   true,
+				Description: "The password of default user on the database",
 			},
 			"replica_user": {
-				Type:     schema.TypeString,
-				Computed: true,
+				Type:        schema.TypeString,
+				Computed:    true,
+				Description: "The name of user that processing a replication",
 			},
 			"replica_password": {
-				Type:     schema.TypeString,
-				Computed: true,
+				Type:        schema.TypeString,
+				Computed:    true,
+				Sensitive:   true,
+				Description: "The password of user that processing a replication",
 			},
-			"source_ranges": {
-				Type:     schema.TypeList,
-				Computed: true,
-				Elem:     &schema.Schema{Type: schema.TypeString},
-			},
-			"port": {
-				Type:     schema.TypeInt,
-				Computed: true,
-			},
+			"source_ranges": schemaDataSourceSourceRanges(resourceName),
+			"port":          schemaDataSourcePort(),
 			"backup_weekdays": {
 				Type:     schema.TypeList,
 				Elem:     &schema.Schema{Type: schema.TypeString},
 				Computed: true,
+				Description: descf(
+					"The list of name of weekday that doing backup. This will be in [%s]",
+					types.ValidAutoBackupWeekdaysInString,
+				),
 			},
 			"backup_time": {
-				Type:     schema.TypeString,
-				Computed: true,
-			},
-			"switch_id": {
-				Type:     schema.TypeString,
-				Computed: true,
-			},
-			"ip_addresses": {
-				Type:     schema.TypeList,
-				Elem:     &schema.Schema{Type: schema.TypeString},
-				Computed: true,
-			},
-			"netmask": {
-				Type:     schema.TypeInt,
-				Computed: true,
-			},
-			"gateway": {
-				Type:     schema.TypeString,
-				Computed: true,
-			},
-			"icon_id": {
-				Type:     schema.TypeString,
-				Computed: true,
-			},
-			"description": {
-				Type:     schema.TypeString,
-				Computed: true,
-			},
-			"tags": {
-				Type:     schema.TypeSet,
-				Computed: true,
-				Elem:     &schema.Schema{Type: schema.TypeString},
-				Set:      schema.HashString,
-			},
-			"zone": {
 				Type:        schema.TypeString,
-				Optional:    true,
 				Computed:    true,
-				ForceNew:    true,
-				Description: "target SakuraCloud zone",
+				Description: "The time to take backup. This will be formatted with `HH:mm`",
 			},
+			"switch_id":    schemaDataSourceSwitchID(resourceName),
+			"ip_addresses": schemaDataSourceIPAddresses(resourceName),
+			"netmask":      schemaDataSourceNetMask(resourceName),
+			"gateway":      schemaDataSourceGateway(resourceName),
+			"icon_id":      schemaDataSourceIconID(resourceName),
+			"description":  schemaDataSourceDescription(resourceName),
+			"tags":         schemaDataSourceTags(resourceName),
+			"zone":         schemaDataSourceZone(resourceName),
 		},
 	}
 }

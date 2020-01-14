@@ -30,6 +30,7 @@ import (
 )
 
 func resourceSakuraCloudCDROM() *schema.Resource {
+	resourceName := "CD-ROM"
 	return &schema.Resource{
 		Create: resourceSakuraCloudCDROMCreate,
 		Read:   resourceSakuraCloudCDROMRead,
@@ -44,65 +45,51 @@ func resourceSakuraCloudCDROM() *schema.Resource {
 
 		Timeouts: &schema.ResourceTimeout{
 			Create: schema.DefaultTimeout(24 * time.Hour),
-			Read:   schema.DefaultTimeout(5 * time.Minute),
 			Update: schema.DefaultTimeout(24 * time.Hour),
 			Delete: schema.DefaultTimeout(20 * time.Minute),
 		},
 
 		Schema: map[string]*schema.Schema{
-			"name": {
-				Type:     schema.TypeString,
-				Required: true,
-			},
-			"size": {
-				Type:     schema.TypeInt,
-				Optional: true,
-				ForceNew: true,
-				Default:  5,
-			},
+			"name": schemaResourceName(resourceName),
+			"size": schemaResourceSize(resourceName, 5, []int{5, 10}...),
 			"iso_image_file": {
 				Type:          schema.TypeString,
 				Optional:      true,
 				ConflictsWith: []string{"content"},
+				Description: descf(
+					"The file path to upload to as the CD-ROM. %s",
+					descConflicts("content"),
+				),
 			},
 			"content": {
 				Type:          schema.TypeString,
 				Optional:      true,
 				ConflictsWith: []string{"iso_image_file"},
+				Description: descf(
+					"The content to upload to as the CD-ROM. %s",
+					descConflicts("iso_image_file"),
+				),
 			},
 			"content_file_name": {
 				Type:          schema.TypeString,
 				Optional:      true,
 				Default:       cdromDefaultISOLabel,
 				ConflictsWith: []string{"iso_image_file"},
+				Description: descf(
+					"The name of content file to upload to as the CD-ROM. This is only used when `content` is specified. %s",
+					descConflicts("iso_image_file"),
+				),
 			},
 			"hash": {
-				Type:     schema.TypeString,
-				Optional: true,
-				Computed: true,
-			},
-			"icon_id": {
-				Type:         schema.TypeString,
-				Optional:     true,
-				ValidateFunc: validateSakuracloudIDType,
-			},
-			"description": {
-				Type:     schema.TypeString,
-				Optional: true,
-			},
-			"tags": {
-				Type:     schema.TypeSet,
-				Optional: true,
-				Elem:     &schema.Schema{Type: schema.TypeString},
-				Set:      schema.HashString,
-			},
-			"zone": {
 				Type:        schema.TypeString,
 				Optional:    true,
 				Computed:    true,
-				ForceNew:    true,
-				Description: "target SakuraCloud zone",
+				Description: "The md5 checksum calculated from the base64 encoded file body",
 			},
+			"icon_id":     schemaResourceIconID(resourceName),
+			"description": schemaResourceDescription(resourceName),
+			"tags":        schemaResourceTags(resourceName),
+			"zone":        schemaResourceZone(resourceName),
 		},
 	}
 }

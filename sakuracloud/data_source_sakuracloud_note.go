@@ -16,48 +16,30 @@ package sakuracloud
 
 import (
 	"fmt"
-	"time"
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/sacloud/libsacloud/v2/sacloud"
+	"github.com/sacloud/libsacloud/v2/sacloud/types"
 )
 
 func dataSourceSakuraCloudNote() *schema.Resource {
+	resourceName := "note"
+
 	return &schema.Resource{
 		Read: dataSourceSakuraCloudNoteRead,
 
-		Timeouts: &schema.ResourceTimeout{
-			Read: schema.DefaultTimeout(5 * time.Minute),
-		},
-
 		Schema: map[string]*schema.Schema{
 			filterAttrName: filterSchema(&filterSchemaOption{}),
-			"name": {
-				Type:     schema.TypeString,
-				Computed: true,
-			},
+			"name":         schemaDataSourceName(resourceName),
 			"content": {
-				Type:     schema.TypeString,
-				Computed: true,
+				Type:        schema.TypeString,
+				Computed:    true,
+				Description: "The content of the Note",
 			},
-			"icon_id": {
-				Type:     schema.TypeString,
-				Computed: true,
-			},
-			"description": {
-				Type:     schema.TypeString,
-				Computed: true,
-			},
-			"class": {
-				Type:     schema.TypeString,
-				Computed: true,
-			},
-			"tags": {
-				Type:     schema.TypeSet,
-				Computed: true,
-				Elem:     &schema.Schema{Type: schema.TypeString},
-				Set:      schema.HashString,
-			},
+			"icon_id":     schemaDataSourceIconID(resourceName),
+			"description": schemaDataSourceDescription(resourceName),
+			"tags":        schemaDataSourceTags(resourceName),
+			"class":       schemaDataSourceClass(resourceName, types.NoteClassStrings),
 		},
 	}
 }

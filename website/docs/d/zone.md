@@ -12,18 +12,18 @@ Get information about an existing Zone.
 
 ## Argument Reference
 
-* `name` - (Optional) .
+* `name` - (Optional) The name of the zone (e.g. `is1a`,`tk1a`).
 
 
 
 ## Attribute Reference
 
-* `id` - The ID of the Zone.
-* `description` - .
-* `dns_servers` - .
-* `region_id` - .
-* `region_name` - .
-* `zone_id` - .
+* `id` - The id of the Zone.
+* `description` - The description of the zone.
+* `dns_servers` - A list of IP address of DNS server in the zone.
+* `region_id` - The id of the region that the zone belongs.
+* `region_name` - The name of the region that the zone belongs.
+* `zone_id` - The id of the zone.
 
 
 

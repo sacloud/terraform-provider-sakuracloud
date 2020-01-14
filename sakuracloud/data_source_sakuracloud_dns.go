@@ -16,78 +16,71 @@ package sakuracloud
 
 import (
 	"fmt"
-	"time"
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/sacloud/libsacloud/v2/sacloud"
+	"github.com/sacloud/libsacloud/v2/sacloud/types"
 )
 
 func dataSourceSakuraCloudDNS() *schema.Resource {
+	resourceName := "DNS"
 	return &schema.Resource{
 		Read: dataSourceSakuraCloudDNSRead,
-
-		Timeouts: &schema.ResourceTimeout{
-			Read: schema.DefaultTimeout(5 * time.Minute),
-		},
 
 		Schema: map[string]*schema.Schema{
 			filterAttrName: filterSchema(&filterSchemaOption{}),
 			"zone": {
-				Type:     schema.TypeString,
-				Computed: true,
+				Type:        schema.TypeString,
+				Computed:    true,
+				Description: "The name of managed domain",
 			},
-
 			"dns_servers": {
-				Type:     schema.TypeList,
-				Computed: true,
-				Elem:     &schema.Schema{Type: schema.TypeString},
+				Type:        schema.TypeList,
+				Computed:    true,
+				Elem:        &schema.Schema{Type: schema.TypeString},
+				Description: "A list of IP address of DNS server that manage this zone",
 			},
-			"icon_id": {
-				Type:     schema.TypeString,
-				Computed: true,
-			},
-			"description": {
-				Type:     schema.TypeString,
-				Computed: true,
-			},
-			"tags": {
-				Type:     schema.TypeSet,
-				Computed: true,
-				Elem:     &schema.Schema{Type: schema.TypeString},
-				Set:      schema.HashString,
-			},
+			"icon_id":     schemaDataSourceIconID(resourceName),
+			"description": schemaDataSourceDescription(resourceName),
+			"tags":        schemaDataSourceTags(resourceName),
 			"record": {
 				Type:     schema.TypeList,
 				Computed: true,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
-						"name": {
-							Type:     schema.TypeString,
-							Computed: true,
-						},
+						"name": schemaDataSourceName("DNS Record"),
 						"type": {
 							Type:     schema.TypeString,
 							Computed: true,
+							Description: descf(
+								"The type of DNS Record. This will be one of [%s]",
+								types.DNSRecordTypesStrings(),
+							),
 						},
 						"value": {
-							Type:     schema.TypeString,
-							Computed: true,
+							Type:        schema.TypeString,
+							Computed:    true,
+							Description: "The value of the DNS Record",
 						},
 						"ttl": {
-							Type:     schema.TypeInt,
-							Computed: true,
+							Type:        schema.TypeInt,
+							Computed:    true,
+							Description: "The number of the TTL",
 						},
 						"priority": {
-							Type:     schema.TypeInt,
-							Computed: true,
+							Type:        schema.TypeInt,
+							Computed:    true,
+							Description: "The priority of target DNS Record",
 						},
 						"weight": {
-							Type:     schema.TypeInt,
-							Computed: true,
+							Type:        schema.TypeInt,
+							Computed:    true,
+							Description: "The weight of target DNS Record",
 						},
 						"port": {
-							Type:     schema.TypeInt,
-							Computed: true,
+							Type:        schema.TypeInt,
+							Computed:    true,
+							Description: "The number of port",
 						},
 					},
 				},

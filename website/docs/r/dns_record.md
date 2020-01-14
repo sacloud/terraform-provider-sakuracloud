@@ -12,20 +12,20 @@ Manages a SakuraCloud DNS Record.
 
 ## Argument Reference
 
-* `dns_id` - (Required) . Changing this forces a new resource to be created.
-* `name` - (Required) . Changing this forces a new resource to be created.
-* `port` - (Optional) . Changing this forces a new resource to be created.
-* `priority` - (Optional) . Changing this forces a new resource to be created.
-* `ttl` - (Optional) . Changing this forces a new resource to be created. Defaults to `3600`.
-* `type` - (Required) . Changing this forces a new resource to be created.
-* `value` - (Required) . Changing this forces a new resource to be created.
-* `weight` - (Optional) . Changing this forces a new resource to be created.
+* `dns_id` - (Required) The id of the DNS resource. Changing this forces a new resource to be created.
+* `name` - (Required) The name of the DNS Record resource. Changing this forces a new resource to be created.
+* `port` - (Optional) The number of port. This must be in the range [`1`-`65535`]. Changing this forces a new resource to be created.
+* `priority` - (Optional) The priority of target DNS Record. This must be in the range [`0`-`65535`]. Changing this forces a new resource to be created.
+* `ttl` - (Optional) The number of the TTL. Changing this forces a new resource to be created. Default:`3600`.
+* `type` - (Required) The type of DNS Record. This must be one of [`A`/`AAAA`/`ALIAS`/`CNAME`/`NS`/`MX`/`TXT`/`SRV`/`CAA`/`PTR`]. Changing this forces a new resource to be created.
+* `value` - (Required) The value of the DNS Record. Changing this forces a new resource to be created.
+* `weight` - (Optional) The weight of target DNS Record. This must be in the range [`0`-`65535`]. Changing this forces a new resource to be created.
 
 
 
 ### Timeouts
 
-The `timeouts` block allows you to specify [timeouts](https://www.terraform.io/docs/configuration/resources.html#timeouts) for certain actions:
+The `timeouts` block allows you to specify [timeouts](https://www.terraform.io/docs/configuration/resources.html#operation-timeouts) for certain actions:
 
 * `create` - (Defaults to 5 minutes) Used when creating the DNS Record
 
@@ -38,7 +38,7 @@ The `timeouts` block allows you to specify [timeouts](https://www.terraform.io/d
 
 ## Attribute Reference
 
-* `id` - The ID of the DNS Record.
+* `id` - The id of the DNS Record.
 
 
 

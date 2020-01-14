@@ -26,6 +26,8 @@ import (
 )
 
 func resourceSakuraCloudGSLB() *schema.Resource {
+	resourceName := "GSLB"
+
 	return &schema.Resource{
 		Create: resourceSakuraCloudGSLBCreate,
 		Read:   resourceSakuraCloudGSLBRead,
@@ -37,20 +39,16 @@ func resourceSakuraCloudGSLB() *schema.Resource {
 
 		Timeouts: &schema.ResourceTimeout{
 			Create: schema.DefaultTimeout(5 * time.Minute),
-			Read:   schema.DefaultTimeout(5 * time.Minute),
 			Update: schema.DefaultTimeout(5 * time.Minute),
 			Delete: schema.DefaultTimeout(5 * time.Minute),
 		},
 
 		Schema: map[string]*schema.Schema{
-			"name": {
-				Type:     schema.TypeString,
-				Required: true,
-				ForceNew: true,
-			},
+			"name": schemaResourceName(resourceName),
 			"fqdn": {
-				Type:     schema.TypeString,
-				Computed: true,
+				Type:        schema.TypeString,
+				Computed:    true,
+				Description: "The FQDN for accessing to the GSLB. This is typically used as value of CNAME record",
 			},
 			"health_check": {
 				Type:     schema.TypeList,
@@ -63,40 +61,50 @@ func resourceSakuraCloudGSLB() *schema.Resource {
 							Type:         schema.TypeString,
 							Required:     true,
 							ValidateFunc: validation.StringInSlice(types.GSLBHealthCheckProtocolsStrings(), false),
+							Description: descf(
+								"The protocol used for health checks. This must be one of [%s]",
+								types.GSLBHealthCheckProtocolsStrings(),
+							),
 						},
 						"delay_loop": {
 							Type:         schema.TypeInt,
 							Optional:     true,
 							ValidateFunc: validation.IntBetween(10, 60),
 							Default:      10,
+							Description:  descf("The interval in seconds between checks. %s", descRange(10, 60)),
 						},
 						"host_header": {
-							Type:     schema.TypeString,
-							Optional: true,
+							Type:        schema.TypeString,
+							Optional:    true,
+							Description: "The value of host header send when checking by HTTP/HTTPS",
 						},
 						"path": {
-							Type:     schema.TypeString,
-							Optional: true,
+							Type:        schema.TypeString,
+							Optional:    true,
+							Description: "The path used when checking by HTTP/HTTPS",
 						},
 						"status": {
-							Type:     schema.TypeString,
-							Optional: true,
+							Type:        schema.TypeString,
+							Optional:    true,
+							Description: "The response-code to expect when checking by HTTP/HTTPS",
 						},
 						"port": {
-							Type:     schema.TypeInt,
-							Optional: true,
+							Type:        schema.TypeInt,
+							Optional:    true,
+							Description: "The port number used when checking by TCP",
 						},
 					},
 				},
 			},
 			"weighted": {
-				Type:     schema.TypeBool,
-				Optional: true,
-				Default:  false,
+				Type:        schema.TypeBool,
+				Optional:    true,
+				Description: "The flag to enable weighted load-balancing",
 			},
 			"sorry_server": {
-				Type:     schema.TypeString,
-				Optional: true,
+				Type:        schema.TypeString,
+				Optional:    true,
+				Description: "The IP address of the SorryServer. This will be used when all servers are down",
 			},
 			"server": {
 				Type:     schema.TypeList,
@@ -105,38 +113,33 @@ func resourceSakuraCloudGSLB() *schema.Resource {
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
 						"ip_address": {
-							Type:     schema.TypeString,
-							Required: true,
+							Type:         schema.TypeString,
+							Required:     true,
+							Description:  "The IP address of the server",
+							ValidateFunc: validation.SingleIP(),
 						},
 						"enabled": {
-							Type:     schema.TypeBool,
-							Optional: true,
-							Default:  true,
+							Type:        schema.TypeBool,
+							Optional:    true,
+							Default:     true,
+							Description: "The flag to enable as destination of load balancing",
 						},
 						"weight": {
 							Type:         schema.TypeInt,
 							Optional:     true,
 							ValidateFunc: validation.IntBetween(1, 10000),
 							Default:      1,
+							Description: descf(
+								"The weight used when weighted load balancing is enabled. %s",
+								descRange(1, 10000),
+							),
 						},
 					},
 				},
 			},
-			"icon_id": {
-				Type:         schema.TypeString,
-				Optional:     true,
-				ValidateFunc: validateSakuracloudIDType,
-			},
-			"description": {
-				Type:     schema.TypeString,
-				Optional: true,
-			},
-			"tags": {
-				Type:     schema.TypeSet,
-				Optional: true,
-				Elem:     &schema.Schema{Type: schema.TypeString},
-				Set:      schema.HashString,
-			},
+			"icon_id":     schemaResourceIconID(resourceName),
+			"description": schemaResourceDescription(resourceName),
+			"tags":        schemaResourceTags(resourceName),
 		},
 	}
 }

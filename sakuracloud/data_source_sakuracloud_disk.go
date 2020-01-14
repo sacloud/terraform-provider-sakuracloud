@@ -16,71 +16,46 @@ package sakuracloud
 
 import (
 	"fmt"
-	"time"
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/sacloud/libsacloud/v2/sacloud"
+	"github.com/sacloud/libsacloud/v2/sacloud/types"
 )
 
 func dataSourceSakuraCloudDisk() *schema.Resource {
+	resourceName := "disk"
+
 	return &schema.Resource{
 		Read: dataSourceSakuraCloudDiskRead,
 
-		Timeouts: &schema.ResourceTimeout{
-			Read: schema.DefaultTimeout(5 * time.Minute),
-		},
-
 		Schema: map[string]*schema.Schema{
 			filterAttrName: filterSchema(&filterSchemaOption{}),
-			"name": {
-				Type:     schema.TypeString,
-				Computed: true,
-			},
-			"plan": {
-				Type:     schema.TypeString,
-				Computed: true,
-			},
+			"name":         schemaDataSourceName(resourceName),
+			"plan":         schemaDataSourcePlan(resourceName, types.DiskPlanStrings),
 			"connector": {
 				Type:     schema.TypeString,
 				Computed: true,
+				Description: descf(
+					"The name of the disk connector. This will be one of [%s]",
+					types.DiskConnectionStrings,
+				),
 			},
 			"source_archive_id": {
-				Type:     schema.TypeString,
-				Computed: true,
+				Type:        schema.TypeString,
+				Computed:    true,
+				Description: "The id of the source archive",
 			},
 			"source_disk_id": {
-				Type:     schema.TypeString,
-				Computed: true,
-			},
-			"size": {
-				Type:     schema.TypeInt,
-				Computed: true,
-			},
-			"server_id": {
-				Type:     schema.TypeString,
-				Computed: true,
-			},
-			"icon_id": {
-				Type:     schema.TypeString,
-				Computed: true,
-			},
-			"description": {
-				Type:     schema.TypeString,
-				Computed: true,
-			},
-			"tags": {
-				Type:     schema.TypeSet,
-				Computed: true,
-				Elem:     &schema.Schema{Type: schema.TypeString},
-				Set:      schema.HashString,
-			},
-			"zone": {
 				Type:        schema.TypeString,
-				Optional:    true,
 				Computed:    true,
-				ForceNew:    true,
-				Description: "target SakuraCloud zone",
+				Description: "The id of the source disk",
 			},
+			"size":        schemaDataSourceSize(resourceName),
+			"server_id":   schemaDataSourceServerID(resourceName),
+			"icon_id":     schemaDataSourceIconID(resourceName),
+			"description": schemaDataSourceDescription(resourceName),
+			"tags":        schemaDataSourceTags(resourceName),
+			"zone":        schemaDataSourceZone(resourceName),
 		},
 	}
 }

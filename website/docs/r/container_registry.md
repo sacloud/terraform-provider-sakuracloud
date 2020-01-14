@@ -12,12 +12,12 @@ Manages a SakuraCloud Container Registry.
 
 ## Argument Reference
 
-* `access_level` - (Required) .
-* `description` - (Optional) .
-* `icon_id` - (Optional) .
-* `name` - (Required) .
-* `subdomain_label` - (Required) . Changing this forces a new resource to be created.
-* `tags` - (Optional) .
+* `access_level` - (Required) The level of access that allow to users. This must be one of [`readwrite`/`readonly`/`none`].
+* `description` - (Optional) The description of the Container Registry. The length of this value must be in the range [`1`-`512`].
+* `icon_id` - (Optional) The icon id to attach to the Container Registry.
+* `name` - (Required) The name of the Container Registry. The length of this value must be in the range [`1`-`64`].
+* `subdomain_label` - (Required) The label at the lowest of the FQDN used when be accessed from users. The length of this value must be in the range [`1`-`64`]. Changing this forces a new resource to be created.
+* `tags` - (Optional) Any tags to assign to the Container Registry.
 * `user` - (Optional) One or more `user` blocks as defined below.
 
 
@@ -25,13 +25,13 @@ Manages a SakuraCloud Container Registry.
 
 A `user` block supports the following:
 
-* `name` - (Required) .
-* `password` - (Required) .
+* `name` - (Required) The user name used to authenticate remote access.
+* `password` - (Required) The password used to authenticate remote access.
 
 
 ### Timeouts
 
-The `timeouts` block allows you to specify [timeouts](https://www.terraform.io/docs/configuration/resources.html#timeouts) for certain actions:
+The `timeouts` block allows you to specify [timeouts](https://www.terraform.io/docs/configuration/resources.html#operation-timeouts) for certain actions:
 
 * `create` - (Defaults to 5 minutes) Used when creating the Container Registry
 
@@ -45,8 +45,8 @@ The `timeouts` block allows you to specify [timeouts](https://www.terraform.io/d
 
 ## Attribute Reference
 
-* `id` - The ID of the Container Registry.
-* `fqdn` - .
+* `id` - The id of the Container Registry.
+* `fqdn` - The FQDN for accessing the Container Registry. FQDN is built from `subdomain_label` + `.sakuracr.jp`.
 
 
 

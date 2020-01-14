@@ -26,6 +26,7 @@ import (
 )
 
 func resourceSakuraCloudDatabaseReadReplica() *schema.Resource {
+	resourceName := "read-replica database"
 	return &schema.Resource{
 		Create: resourceSakuraCloudDatabaseReadReplicaCreate,
 		Read:   resourceSakuraCloudDatabaseReadReplicaRead,
@@ -48,25 +49,25 @@ func resourceSakuraCloudDatabaseReadReplica() *schema.Resource {
 				Required:     true,
 				ForceNew:     true,
 				ValidateFunc: validateSakuracloudIDType,
+				Description:  "The id of the replication master database",
 			},
-			"name": {
-				Type:     schema.TypeString,
-				Required: true,
-			},
+			"name": schemaResourceName(resourceName),
 			"switch_id": {
 				Type:         schema.TypeString,
 				ForceNew:     true,
 				Optional:     true,
 				Computed:     true,
 				ValidateFunc: validateSakuracloudIDType,
+				Description:  descf("The id of the switch to which the %s connects. If `switch_id` isn't specified, it will be set to the same value of the master database", resourceName),
 			},
 			"ip_addresses": {
-				Type:     schema.TypeList,
-				ForceNew: true,
-				Required: true,
-				MinItems: 1,
-				MaxItems: 1,
-				Elem:     &schema.Schema{Type: schema.TypeString},
+				Type:        schema.TypeList,
+				ForceNew:    true,
+				Required:    true,
+				MinItems:    1,
+				MaxItems:    1,
+				Elem:        &schema.Schema{Type: schema.TypeString},
+				Description: descf("The list of IP address to assign to the %s", resourceName),
 			},
 			"netmask": {
 				Type:         schema.TypeInt,
@@ -74,40 +75,32 @@ func resourceSakuraCloudDatabaseReadReplica() *schema.Resource {
 				Optional:     true,
 				Computed:     true,
 				ValidateFunc: validation.IntBetween(8, 29),
+				Description: descf(
+					"The bit length of the subnet to assign to the %s. %s. If `netmask` isn't specified, it will be set to the same value of the master database",
+					resourceName,
+					descRange(8, 29),
+				),
 			},
 			"gateway": {
-				Type:     schema.TypeString,
-				ForceNew: true,
-				Optional: true,
-				Computed: true,
+				Type:        schema.TypeString,
+				ForceNew:    true,
+				Optional:    true,
+				Computed:    true,
+				Description: descf("The IP address of the gateway used by %s. If `gateway` isn't specified, it will be set to the same value of the master database", resourceName),
 			},
 			"source_ranges": {
 				Type:     schema.TypeList,
 				Optional: true,
 				Elem:     &schema.Schema{Type: schema.TypeString},
+				Description: descf(
+					"The range of source IP addresses that allow to access to the %s via network",
+					resourceName,
+				),
 			},
-			"icon_id": {
-				Type:         schema.TypeString,
-				Optional:     true,
-				ValidateFunc: validateSakuracloudIDType,
-			},
-			"description": {
-				Type:     schema.TypeString,
-				Optional: true,
-			},
-			"tags": {
-				Type:     schema.TypeSet,
-				Optional: true,
-				Elem:     &schema.Schema{Type: schema.TypeString},
-				Set:      schema.HashString,
-			},
-			"zone": {
-				Type:        schema.TypeString,
-				Optional:    true,
-				Computed:    true,
-				ForceNew:    true,
-				Description: "target SakuraCloud zone",
-			},
+			"icon_id":     schemaResourceIconID(resourceName),
+			"description": schemaResourceDescription(resourceName),
+			"tags":        schemaResourceTags(resourceName),
+			"zone":        schemaResourceZone(resourceName),
 		},
 	}
 }

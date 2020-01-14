@@ -347,7 +347,7 @@ description: |-
 ## Argument Reference
 
 {{ range .Schema.Arguments -}}
-* ` + "`" + `{{ .Name }}` + "`" + ` - ({{ .RequiredOrOptional }}) {{ .Description }}.{{if .ForceNew }} Changing this forces a new resource to be created.{{ end }}{{ if .Default }} Defaults to {{ .DefaultString }}.{{ end }}
+* ` + "`" + `{{ .Name }}` + "`" + ` - ({{ .RequiredOrOptional }}) {{ .Description }}.{{if .ForceNew }} Changing this forces a new resource to be created.{{ end }}{{ if .Default }} Default:{{ .DefaultString }}.{{ end }}
 {{ end }}
 
 {{ range .Schema.ArgumentBlocks -}}
@@ -362,7 +362,7 @@ A ` + "`" + `{{ .Name }}` + "`" + ` block supports the following:
 {{ if .HasTimeouts }}
 ### Timeouts
 
-The ` + "`" + `timeouts` + "`" + ` block allows you to specify [timeouts](https://www.terraform.io/docs/configuration/resources.html#timeouts) for certain actions:
+The ` + "`" + `timeouts` + "`" + ` block allows you to specify [timeouts](https://www.terraform.io/docs/configuration/resources.html#operation-timeouts) for certain actions:
 
 {{ if .TimeoutsCreate }}* ` + "`" + `create` + "`" + ` - (Defaults to {{ .TimeoutsCreate }}) Used when creating the {{ .DisplayName }}
 {{ end }}
@@ -378,7 +378,7 @@ The ` + "`" + `timeouts` + "`" + ` block allows you to specify [timeouts](https:
 
 ## Attribute Reference
 
-* ` + "`" + `id` + "`" + ` - The ID of the {{ .DisplayName }}.
+* ` + "`" + `id` + "`" + ` - The id of the {{ .DisplayName }}.
 {{ range .Schema.Attributes -}}
 * ` + "`" + `{{ .Name }}` + "`" + ` - {{ .Description }}.
 {{ end }}

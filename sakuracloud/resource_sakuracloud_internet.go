@@ -27,6 +27,7 @@ import (
 )
 
 func resourceSakuraCloudInternet() *schema.Resource {
+	resourceName := "Switch+Router"
 	return &schema.Resource{
 		Create: resourceSakuraCloudInternetCreate,
 		Read:   resourceSakuraCloudInternetRead,
@@ -38,96 +39,93 @@ func resourceSakuraCloudInternet() *schema.Resource {
 
 		Timeouts: &schema.ResourceTimeout{
 			Create: schema.DefaultTimeout(60 * time.Minute),
-			Read:   schema.DefaultTimeout(5 * time.Minute),
 			Update: schema.DefaultTimeout(60 * time.Minute),
 			Delete: schema.DefaultTimeout(20 * time.Minute),
 		},
 
 		Schema: map[string]*schema.Schema{
-			"name": {
-				Type:     schema.TypeString,
-				Required: true,
-			},
-			"icon_id": {
-				Type:         schema.TypeString,
-				Optional:     true,
-				ValidateFunc: validateSakuracloudIDType,
-			},
-			"description": {
-				Type:     schema.TypeString,
-				Optional: true,
-			},
-			"tags": {
-				Type:     schema.TypeSet,
-				Optional: true,
-				Elem:     &schema.Schema{Type: schema.TypeString},
-				Set:      schema.HashString,
-			},
+			"name":        schemaResourceName(resourceName),
+			"icon_id":     schemaResourceIconID(resourceName),
+			"description": schemaResourceDescription(resourceName),
+			"tags":        schemaResourceTags(resourceName),
+			"zone":        schemaResourceZone(resourceName),
 			"netmask": {
 				Type:         schema.TypeInt,
 				ForceNew:     true,
 				Optional:     true,
 				ValidateFunc: validation.IntInSlice(types.AllowInternetNetworkMaskLen()),
 				Default:      28,
+				Description: descf(
+					"The bit length of the subnet assigned to the %s. %s", resourceName,
+					types.AllowInternetNetworkMaskLen(),
+				),
 			},
 			"band_width": {
 				Type:         schema.TypeInt,
 				Optional:     true,
 				ValidateFunc: validation.IntInSlice(types.AllowInternetBandWidth()),
 				Default:      100,
+				Description: descf(
+					"The bandwidth of the network connected to the Internet in Mbps. %s",
+					types.AllowInternetBandWidth(),
+				),
 			},
 			"enable_ipv6": {
-				Type:     schema.TypeBool,
-				Optional: true,
-			},
-			"zone": {
-				Type:        schema.TypeString,
+				Type:        schema.TypeBool,
 				Optional:    true,
-				Computed:    true,
-				ForceNew:    true,
-				Description: "target SakuraCloud zone",
+				Description: "The flag to enable IPv6",
 			},
 			"switch_id": {
-				Type:     schema.TypeString,
-				Computed: true,
+				Type:        schema.TypeString,
+				Computed:    true,
+				Description: descf("The id of the switch"),
 			},
 			"server_ids": {
-				Type:     schema.TypeList,
-				Computed: true,
-				Elem:     &schema.Schema{Type: schema.TypeString},
+				Type:        schema.TypeList,
+				Computed:    true,
+				Elem:        &schema.Schema{Type: schema.TypeString},
+				Description: descf("A list of the ID of Servers connected to the %s", resourceName),
 			},
 			"network_address": {
-				Type:     schema.TypeString,
-				Computed: true,
+				Type:        schema.TypeString,
+				Computed:    true,
+				Description: descf("The IPv4 network address assigned to the %s", resourceName),
 			},
 			"gateway": {
-				Type:     schema.TypeString,
-				Computed: true,
+				Type:        schema.TypeString,
+				Computed:    true,
+				Description: descf("The IP address of the gateway used by the %s", resourceName),
 			},
 			"min_ip_address": {
-				Type:     schema.TypeString,
-				Computed: true,
+				Type:        schema.TypeString,
+				Computed:    true,
+				Description: descf("Minimum IP address in assigned global addresses to the %s", resourceName),
 			},
 			"max_ip_address": {
-				Type:     schema.TypeString,
-				Computed: true,
+				Type:        schema.TypeString,
+				Computed:    true,
+				Description: descf("Maximum IP address in assigned global addresses to the %s", resourceName),
 			},
 			"ip_addresses": {
-				Type:     schema.TypeList,
-				Computed: true,
-				Elem:     &schema.Schema{Type: schema.TypeString},
+				Type:        schema.TypeList,
+				Computed:    true,
+				Elem:        &schema.Schema{Type: schema.TypeString},
+				Description: descf("A list of assigned global address to the %s", resourceName),
 			},
 			"ipv6_prefix": {
-				Type:     schema.TypeString,
-				Computed: true,
+				Type:        schema.TypeString,
+				Computed:    true,
+				Description: descf("The network prefix of assigned IPv6 addresses to the %s", resourceName),
 			},
 			"ipv6_prefix_len": {
-				Type:     schema.TypeInt,
-				Computed: true,
+				Type:        schema.TypeInt,
+				Computed:    true,
+				Description: "The bit length of IPv6 network prefix",
 			},
 			"ipv6_network_address": {
-				Type:     schema.TypeString,
-				Computed: true,
+				Type:        schema.TypeString,
+				Computed:    true,
+				Description: descf("The IPv6 network address assigned to the %s", resourceName),
 			},
 		},
 	}

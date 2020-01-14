@@ -26,6 +26,8 @@ import (
 )
 
 func resourceSakuraCloudPacketFilter() *schema.Resource {
+	resourceName := "packetFilter"
+
 	return &schema.Resource{
 		Create: resourceSakuraCloudPacketFilterCreate,
 		Read:   resourceSakuraCloudPacketFilterRead,
@@ -37,20 +39,13 @@ func resourceSakuraCloudPacketFilter() *schema.Resource {
 
 		Timeouts: &schema.ResourceTimeout{
 			Create: schema.DefaultTimeout(5 * time.Minute),
-			Read:   schema.DefaultTimeout(5 * time.Minute),
 			Update: schema.DefaultTimeout(5 * time.Minute),
 			Delete: schema.DefaultTimeout(20 * time.Minute),
 		},
 
 		Schema: map[string]*schema.Schema{
-			"name": {
-				Type:     schema.TypeString,
-				Required: true,
-			},
-			"description": {
-				Type:     schema.TypeString,
-				Optional: true,
-			},
+			"name":        schemaResourceName(resourceName),
+			"description": schemaResourceDescription(resourceName),
 			"expression": {
 				Type:     schema.TypeList,
 				Optional: true,
@@ -61,42 +56,44 @@ func resourceSakuraCloudPacketFilter() *schema.Resource {
 							Type:         schema.TypeString,
 							Required:     true,
 							ValidateFunc: validation.StringInSlice(types.PacketFilterProtocolsStrings(), false),
+							Description: descf(
+								"The protocol used for filtering. This must be one of [%s]",
+								types.PacketFilterProtocolsStrings(),
+							),
 						},
 						"source_network": {
-							Type:     schema.TypeString,
-							Optional: true,
-							Default:  "",
+							Type:        schema.TypeString,
+							Optional:    true,
+							Default:     "",
+							Description: "A source IP address or CIDR block used for filtering (e.g. `192.0.2.1`, `192.0.2.0/24`)",
 						},
 						"source_port": {
-							Type:     schema.TypeString,
-							Optional: true,
-							Default:  "",
+							Type:        schema.TypeString,
+							Optional:    true,
+							Default:     "",
+							Description: "A source port number or port range used for filtering (e.g. `1024`, `1024-2048`)",
 						},
 						"destination_port": {
-							Type:     schema.TypeString,
-							Optional: true,
-							Default:  "",
+							Type:        schema.TypeString,
+							Optional:    true,
+							Default:     "",
+							Description: "A destination port number or port range used for filtering (e.g. `1024`, `1024-2048`)",
 						},
 						"allow": {
-							Type:     schema.TypeBool,
-							Optional: true,
-							Default:  true,
+							Type:        schema.TypeBool,
+							Optional:    true,
+							Default:     true,
+							Description: "The flag to allow the packet through the filter",
 						},
 						"description": {
-							Type:     schema.TypeString,
-							Optional: true,
-							Default:  "",
+							Type:        schema.TypeString,
+							Optional:    true,
+							Description: "The description of the expression",
 						},
 					},
 				},
 			},
-			"zone": {
-				Type:        schema.TypeString,
-				Optional:    true,
-				Computed:    true,
-				ForceNew:    true,
-				Description: "target SakuraCloud zone",
-			},
+			"zone": schemaResourceZone(resourceName),
 		},
 	}
 }

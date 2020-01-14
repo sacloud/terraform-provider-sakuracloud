@@ -27,6 +27,7 @@ import (
 )
 
 func resourceSakuraCloudDatabase() *schema.Resource {
+	resourceName := "Database"
 	return &schema.Resource{
 		Create: resourceSakuraCloudDatabaseCreate,
 		Read:   resourceSakuraCloudDatabaseRead,
@@ -38,117 +39,113 @@ func resourceSakuraCloudDatabase() *schema.Resource {
 
 		Timeouts: &schema.ResourceTimeout{
 			Create: schema.DefaultTimeout(60 * time.Minute),
-			Read:   schema.DefaultTimeout(5 * time.Minute),
 			Update: schema.DefaultTimeout(60 * time.Minute),
 			Delete: schema.DefaultTimeout(20 * time.Minute),
 		},
 
 		Schema: map[string]*schema.Schema{
-			"name": {
-				Type:     schema.TypeString,
-				Required: true,
-			},
+			"name": schemaResourceName(resourceName),
 			"database_type": {
 				Type:         schema.TypeString,
 				Optional:     true,
 				ForceNew:     true,
 				ValidateFunc: validation.StringInSlice(types.RDBMSTypeStrings, false),
 				Default:      "postgres",
+				Description: descf(
+					"The type of the database. This must be one of [%s]",
+					types.RDBMSTypeStrings,
+				),
 			},
-			"plan": {
-				Type:         schema.TypeString,
-				ForceNew:     true,
-				Optional:     true,
-				Default:      "10g",
-				ValidateFunc: validation.StringInSlice(types.DatabasePlanStrings, false),
-			},
+			"plan": schemaResourcePlan(resourceName, "10g", types.DatabasePlanStrings),
 			"username": {
-				Type:     schema.TypeString,
-				ForceNew: true,
-				Required: true,
+				Type:        schema.TypeString,
+				ForceNew:    true,
+				Required:    true,
+				Description: "The name of default user on the database",
 			},
 			"password": {
-				Type:     schema.TypeString,
-				Required: true,
+				Type:        schema.TypeString,
+				Required:    true,
+				Sensitive:   true,
+				Description: "The password of default user on the database",
 			},
 			"replica_user": {
-				Type:     schema.TypeString,
-				Optional: true,
-				Default:  "replica",
+				Type:        schema.TypeString,
+				Optional:    true,
+				Default:     "replica",
+				Description: "The name of user that processing a replication",
 			},
 			"replica_password": {
-				Type:      schema.TypeString,
-				Optional:  true,
-				Sensitive: true,
+				Type:        schema.TypeString,
+				Optional:    true,
+				Sensitive:   true,
+				Description: "The password of user that processing a replication",
 			},
 			"source_ranges": {
 				Type:     schema.TypeList,
 				Optional: true,
 				Elem:     &schema.Schema{Type: schema.TypeString},
+				Description: descf(
+					"The range of source IP addresses that allow to access to the %s via network",
+					resourceName,
+				),
 			},
 			"port": {
 				Type:         schema.TypeInt,
 				Optional:     true,
 				Default:      5432,
 				ValidateFunc: validation.IntBetween(1024, 65535),
+				Description: descf(
+					"The number of the listening port. %s",
+					descRange(1024, 65535),
+				),
 			},
 			"backup_weekdays": {
 				Type:     schema.TypeList,
 				Optional: true,
 				Elem:     &schema.Schema{Type: schema.TypeString},
+				Description: descf(
+					"A list of weekdays to backed up. The values in the list must be in [%s]",
+					types.ValidAutoBackupWeekdaysInString,
+				),
 			},
 			"backup_time": {
 				Type:         schema.TypeString,
 				Optional:     true,
 				ValidateFunc: validateBackupTime(),
+				Description:  "The time to take backup. This must be formatted with `HH:mm`",
 			},
-			"switch_id": {
-				Type:         schema.TypeString,
-				ForceNew:     true,
-				Required:     true,
-				ValidateFunc: validateSakuracloudIDType,
-			},
+			"switch_id": schemaResourceSwitchID(resourceName),
 			"ip_addresses": {
-				Type:     schema.TypeList,
-				ForceNew: true,
-				Required: true,
-				MinItems: 1,
-				MaxItems: 1,
-				Elem:     &schema.Schema{Type: schema.TypeString},
+				Type:        schema.TypeList,
+				ForceNew:    true,
+				Required:    true,
+				MinItems:    1,
+				MaxItems:    1,
+				Elem:        &schema.Schema{Type: schema.TypeString},
+				Description: descf("A list of IP address to assign to the %s", resourceName),
 			},
 			"netmask": {
 				Type:         schema.TypeInt,
 				ForceNew:     true,
 				Required:     true,
 				ValidateFunc: validation.IntBetween(8, 29),
+				Description: descf(
+					"The bit length of the subnet to assign to the %s. %s",
+					resourceName,
+					descRange(8, 29),
+				),
 			},
 			"gateway": {
-				Type:     schema.TypeString,
-				ForceNew: true,
-				Required: true,
-			},
-			"icon_id": {
-				Type:         schema.TypeString,
-				Optional:     true,
-				ValidateFunc: validateSakuracloudIDType,
-			},
-			"description": {
-				Type:     schema.TypeString,
-				Optional: true,
-			},
-			"tags": {
-				Type:     schema.TypeSet,
-				Optional: true,
-				Elem:     &schema.Schema{Type: schema.TypeString},
-				Set:      schema.HashString,
-			},
-			"zone": {
 				Type:        schema.TypeString,
-				Optional:    true,
-				Computed:    true,
 				ForceNew:    true,
-				Description: "target SakuraCloud zone",
+				Required:    true,
+				Description: descf("The IP address of the gateway used by %s", resourceName),
 			},
+			"icon_id":     schemaResourceIconID(resourceName),
+			"description": schemaResourceDescription(resourceName),
+			"tags":        schemaResourceTags(resourceName),
+			"zone":        schemaResourceZone(resourceName),
 		},
 	}
 }

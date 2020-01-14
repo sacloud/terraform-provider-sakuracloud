@@ -16,73 +16,34 @@ package sakuracloud
 
 import (
 	"fmt"
-	"time"
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/sacloud/libsacloud/v2/sacloud"
+	"github.com/sacloud/libsacloud/v2/sacloud/types"
 )
 
 func dataSourceSakuraCloudLoadBalancer() *schema.Resource {
+	resourceName := "load balancer"
 	return &schema.Resource{
 		Read: dataSourceSakuraCloudLoadBalancerRead,
 
-		Timeouts: &schema.ResourceTimeout{
-			Read: schema.DefaultTimeout(5 * time.Minute),
-		},
-
 		Schema: map[string]*schema.Schema{
 			filterAttrName: filterSchema(&filterSchemaOption{}),
-			"name": {
-				Type:     schema.TypeString,
-				Computed: true,
-			},
-			"switch_id": {
-				Type:     schema.TypeString,
-				Computed: true,
-			},
+			"name":         schemaDataSourceName(resourceName),
+			"plan":         schemaDataSourcePlan(resourceName, []string{"standard", "highspec"}),
+			"switch_id":    schemaDataSourceSwitchID(resourceName),
+			"ip_addresses": schemaDataSourceIPAddresses(resourceName),
+			"netmask":      schemaDataSourceNetMask(resourceName),
+			"gateway":      schemaDataSourceGateway(resourceName),
 			"vrid": {
-				Type:     schema.TypeInt,
-				Computed: true,
-			},
-			"is_double": {
-				Type:     schema.TypeBool,
-				Computed: true,
-				Removed:  "Use field 'high_availability' instead",
+				Type:        schema.TypeInt,
+				Computed:    true,
+				Description: "The Virtual Router Identifier. This is only used when `high_availability` is set `true`",
 			},
 			"high_availability": {
-				Type:     schema.TypeBool,
-				Computed: true,
-			},
-			"plan": {
-				Type:     schema.TypeString,
-				Computed: true,
-			},
-			"ip_addresses": {
-				Type:     schema.TypeList,
-				Computed: true,
-				Elem:     &schema.Schema{Type: schema.TypeString},
-			},
-			"netmask": {
-				Type:     schema.TypeInt,
-				Computed: true,
-			},
-			"gateway": {
-				Type:     schema.TypeString,
-				Computed: true,
-			},
-			"icon_id": {
-				Type:     schema.TypeString,
-				Computed: true,
-			},
-			"description": {
-				Type:     schema.TypeString,
-				Computed: true,
-			},
-			"tags": {
-				Type:     schema.TypeSet,
-				Computed: true,
-				Elem:     &schema.Schema{Type: schema.TypeString},
-				Set:      schema.HashString,
+				Type:        schema.TypeBool,
+				Computed:    true,
+				Description: "The flag to enable HA mode",
 			},
 			"vip": {
 				Type:     schema.TypeList,
@@ -90,49 +51,58 @@ func dataSourceSakuraCloudLoadBalancer() *schema.Resource {
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
 						"vip": {
-							Type:     schema.TypeString,
-							Computed: true,
+							Type:        schema.TypeString,
+							Computed:    true,
+							Description: "The virtual IP address",
 						},
 						"port": {
-							Type:     schema.TypeInt,
-							Computed: true,
+							Type:        schema.TypeInt,
+							Computed:    true,
+							Description: "The target port number for load-balancing",
 						},
 						"delay_loop": {
-							Type:     schema.TypeInt,
-							Computed: true,
+							Type:        schema.TypeInt,
+							Computed:    true,
+							Description: "The interval in seconds between checks",
 						},
 						"sorry_server": {
-							Type:     schema.TypeString,
-							Computed: true,
+							Type:        schema.TypeString,
+							Computed:    true,
+							Description: "The IP address of the SorryServer. This will be used when all servers under this VIP are down",
 						},
-						"description": {
-							Type:     schema.TypeString,
-							Computed: true,
-						},
+						"description": schemaDataSourceDescription("VIP"),
 						"server": {
 							Type:     schema.TypeList,
 							Computed: true,
 							Elem: &schema.Resource{
 								Schema: map[string]*schema.Schema{
 									"ip_address": {
-										Type:     schema.TypeString,
-										Computed: true,
+										Type:        schema.TypeString,
+										Computed:    true,
+										Description: "The IP address of the destination server",
 									},
 									"check_protocol": {
 										Type:     schema.TypeString,
 										Computed: true,
+										Description: descf(
+											"The protocol used for health checks. This will be one of [%s]",
+											types.LoadBalancerHealthCheckProtocolsStrings(),
+										),
 									},
 									"check_path": {
-										Type:     schema.TypeString,
-										Computed: true,
+										Type:        schema.TypeString,
+										Computed:    true,
+										Description: "The path used when checking by HTTP/HTTPS",
 									},
 									"check_status": {
-										Type:     schema.TypeString,
-										Computed: true,
+										Type:        schema.TypeString,
+										Computed:    true,
+										Description: "The response code to expect when checking by HTTP/HTTPS",
 									},
 									"enabled": {
-										Type:     schema.TypeBool,
-										Computed: true,
+										Type:        schema.TypeBool,
+										Computed:    true,
+										Description: "The flag to enable as destination of load balancing",
 									},
 								},
 							},
@@ -140,13 +110,10 @@ func dataSourceSakuraCloudLoadBalancer() *schema.Resource {
 					},
 				},
 			},
-			"zone": {
-				Type:        schema.TypeString,
-				Optional:    true,
-				Computed:    true,
-				ForceNew:    true,
-				Description: "target SakuraCloud zone",
-			},
+			"icon_id":     schemaDataSourceIconID(resourceName),
+			"description": schemaDataSourceDescription(resourceName),
+			"tags":        schemaDataSourceTags(resourceName),
+			"zone":        schemaDataSourceZone(resourceName),
 		},
 	}
 }

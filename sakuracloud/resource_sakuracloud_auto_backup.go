@@ -18,12 +18,15 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/sacloud/libsacloud/v2/sacloud/types"
+
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/validation"
 	"github.com/sacloud/libsacloud/v2/sacloud"
 )
 
 func resourceSakuraCloudAutoBackup() *schema.Resource {
+	resourceName := "AutoBackup"
 	return &schema.Resource{
 		Create: resourceSakuraCloudAutoBackupCreate,
 		Read:   resourceSakuraCloudAutoBackupRead,
@@ -35,56 +38,39 @@ func resourceSakuraCloudAutoBackup() *schema.Resource {
 
 		Timeouts: &schema.ResourceTimeout{
 			Create: schema.DefaultTimeout(5 * time.Minute),
-			Read:   schema.DefaultTimeout(5 * time.Minute),
 			Update: schema.DefaultTimeout(5 * time.Minute),
 			Delete: schema.DefaultTimeout(5 * time.Minute),
 		},
 
 		Schema: map[string]*schema.Schema{
-			"name": {
-				Type:     schema.TypeString,
-				Required: true,
-				ForceNew: true,
-			},
+			"name": schemaResourceName(resourceName),
 			"disk_id": {
 				Type:         schema.TypeString,
 				Required:     true,
 				ForceNew:     true,
 				ValidateFunc: validateSakuracloudIDType,
+				Description:  "The disk id to backed up",
 			},
 			"weekdays": {
 				Type:     schema.TypeList,
 				Required: true,
 				Elem:     &schema.Schema{Type: schema.TypeString},
+				Description: descf(
+					"A list of weekdays to backed up. The values in the list must be in [%s]",
+					types.ValidAutoBackupWeekdaysInString,
+				),
 			},
 			"max_backup_num": {
 				Type:         schema.TypeInt,
 				Optional:     true,
 				Default:      1,
 				ValidateFunc: validation.IntBetween(1, 10),
+				Description:  descf("The number backup files to keep. %s", descRange(1, 10)),
 			},
-			"icon_id": {
-				Type:         schema.TypeString,
-				Optional:     true,
-				ValidateFunc: validateSakuracloudIDType,
-			},
-			"description": {
-				Type:     schema.TypeString,
-				Optional: true,
-			},
-			"tags": {
-				Type:     schema.TypeSet,
-				Optional: true,
-				Elem:     &schema.Schema{Type: schema.TypeString},
-				Set:      schema.HashString,
-			},
-			"zone": {
-				Type:        schema.TypeString,
-				Optional:    true,
-				Computed:    true,
-				ForceNew:    true,
-				Description: "target SakuraCloud zone",
-			},
+			"icon_id":     schemaResourceIconID(resourceName),
+			"description": schemaResourceDescription(resourceName),
+			"tags":        schemaResourceTags(resourceName),
+			"zone":        schemaResourceZone(resourceName),
 		},
 	}
 }

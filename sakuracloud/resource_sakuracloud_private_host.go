@@ -26,6 +26,9 @@ import (
 )
 
 func resourceSakuraCloudPrivateHost() *schema.Resource {
+	resourceName := "PrivateHost"
+	classes := []string{types.PrivateHostClassDynamic, types.PrivateHostClassWindows}
+
 	return &schema.Resource{
 		Create: resourceSakuraCloudPrivateHostCreate,
 		Read:   resourceSakuraCloudPrivateHostRead,
@@ -37,56 +40,38 @@ func resourceSakuraCloudPrivateHost() *schema.Resource {
 
 		Timeouts: &schema.ResourceTimeout{
 			Create: schema.DefaultTimeout(5 * time.Minute),
-			Read:   schema.DefaultTimeout(5 * time.Minute),
 			Update: schema.DefaultTimeout(5 * time.Minute),
 			Delete: schema.DefaultTimeout(20 * time.Minute),
 		},
 
 		Schema: map[string]*schema.Schema{
-			"name": {
-				Type:     schema.TypeString,
-				Required: true,
-			},
+			"name": schemaResourceName(resourceName),
 			"class": {
 				Type:         schema.TypeString,
 				Optional:     true,
 				Default:      types.PrivateHostClassDynamic,
-				ValidateFunc: validation.StringInSlice([]string{types.PrivateHostClassDynamic, types.PrivateHostClassWindows}, false),
+				ValidateFunc: validation.StringInSlice(classes, false),
+				Description:  descf("The class of the %s. This will be one of [%s]", resourceName, classes),
 			},
-			"icon_id": {
-				Type:         schema.TypeString,
-				Optional:     true,
-				ValidateFunc: validateSakuracloudIDType,
-			},
-			"description": {
-				Type:     schema.TypeString,
-				Optional: true,
-			},
-			"tags": {
-				Type:     schema.TypeSet,
-				Optional: true,
-				Elem:     &schema.Schema{Type: schema.TypeString},
-				Set:      schema.HashString,
-			},
+			"icon_id":     schemaResourceIconID(resourceName),
+			"description": schemaResourceDescription(resourceName),
+			"tags":        schemaResourceTags(resourceName),
 			"hostname": {
-				Type:     schema.TypeString,
-				Computed: true,
+				Type:        schema.TypeString,
+				Computed:    true,
+				Description: "The hostname of the private host",
 			},
 			"assigned_core": {
-				Type:     schema.TypeInt,
-				Computed: true,
+				Type:        schema.TypeInt,
+				Computed:    true,
+				Description: "The total number of CPUs assigned to servers on the private host",
 			},
 			"assigned_memory": {
-				Type:     schema.TypeInt,
-				Computed: true,
-			},
-			"zone": {
-				Type:        schema.TypeString,
-				Optional:    true,
+				Type:        schema.TypeInt,
 				Computed:    true,
-				ForceNew:    true,
-				Description: "target SakuraCloud zone",
+				Description: "The total size of memory assigned to servers on the private host",
 			},
+			"zone": schemaResourceZone(resourceName),
 		},
 	}
 }
