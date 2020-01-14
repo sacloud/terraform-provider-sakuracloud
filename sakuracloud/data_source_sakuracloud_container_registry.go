@@ -23,7 +23,7 @@ import (
 )
 
 func dataSourceSakuraCloudContainerRegistry() *schema.Resource {
-	resourceName := "container registry"
+	resourceName := "ContainerRegistry"
 	return &schema.Resource{
 		Read: dataSourceSakuraCloudContainerRegistryRead,
 

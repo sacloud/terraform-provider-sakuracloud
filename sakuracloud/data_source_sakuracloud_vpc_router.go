@@ -23,7 +23,7 @@ import (
 )
 
 func dataSourceSakuraCloudVPCRouter() *schema.Resource {
-	resourceName := "VPC Router"
+	resourceName := "VPCRouter"
 	return &schema.Resource{
 		Read: dataSourceSakuraCloudVPCRouterRead,
 

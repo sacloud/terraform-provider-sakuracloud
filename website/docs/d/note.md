@@ -10,6 +10,15 @@ description: |-
 
 Get information about an existing Note.
 
+## Example Usage
+
+```hcl
+data "sakuracloud_note" "foobar" {
+  filter {
+    names = ["foobar"]
+  }
+}
+```
 ## Argument Reference
 
 * `filter` - (Optional) One or more values used for filtering, as defined below.
@@ -35,12 +44,12 @@ A `condition` block supports the following:
 ## Attribute Reference
 
 * `id` - The id of the Note.
-* `class` - The class of the note. This will be one of [`shell`/`yaml_cloud_config`].
+* `class` - The class of the Note. This will be one of [`shell`/`yaml_cloud_config`].
 * `content` - The content of the Note.
-* `description` - The description of the note.
-* `icon_id` - The icon id attached to the note.
-* `name` - The name of the note.
-* `tags` - Any tags assigned to the note.
+* `description` - The description of the Note.
+* `icon_id` - The icon id attached to the Note.
+* `name` - The name of the Note.
+* `tags` - Any tags assigned to the Note.
 
 
 

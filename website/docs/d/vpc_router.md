@@ -10,6 +10,15 @@ description: |-
 
 Get information about an existing VPC Router.
 
+## Example Usage
+
+```hcl
+data "sakuracloud_vpc_router" "foobar" {
+  filter {
+    names = ["foobar"]
+  }
+}
+```
 ## Argument Reference
 
 * `filter` - (Optional) One or more values used for filtering, as defined below.
@@ -36,30 +45,30 @@ A `condition` block supports the following:
 
 * `id` - The id of the VPC Router.
 * `aliases` - A list of ip alias assigned to the VPC Router. This is only used when `plan` is not `standard`.
-* `description` - The description of the VPC Router.
+* `description` - The description of the VPCRouter.
 * `dhcp_server` - A list of `dhcp_server` blocks as defined below.
 * `dhcp_static_mapping` - A list of `dhcp_static_mapping` blocks as defined below.
 * `firewall` - A list of `firewall` blocks as defined below.
-* `icon_id` - The icon id attached to the VPC Router.
+* `icon_id` - The icon id attached to the VPCRouter.
 * `internet_connection` - The flag to enable connecting to the Internet from the VPC Router.
 * `ip_addresses` - The list of the IP address assigned to the VPC Router. This will be only one value when `plan` is `standard`, two values otherwise.
 * `l2tp` - A list of `l2tp` blocks as defined below.
-* `name` - The id of the switch connected from the VPC Router.
+* `name` - The id of the switch connected from the VPCRouter.
 * `network_interface` - A list of additional network interface setting. This doesn't include primary network interface setting.
-* `plan` - The plan name of the VPC Router. This will be one of [`standard`/`premium`/`highspec`/`highspec4000`].
+* `plan` - The plan name of the VPCRouter. This will be one of [`standard`/`premium`/`highspec`/`highspec4000`].
 * `port_forwarding` - A list of `port_forwarding` blocks as defined below. This represents a `Reverse NAT`.
 * `pptp` - A list of `pptp` blocks as defined below.
 * `public_ip` - The public ip address of the VPC Router.
 * `site_to_site_vpn` - A list of `site_to_site_vpn` blocks as defined below.
 * `static_nat` - A list of `static_nat` blocks as defined below. This represents a `1:1 NAT`, doing static mapping to both send/receive to/from the Internet. This is only used when `plan` is not `standard`.
 * `static_route` - A list of `static_route` blocks as defined below.
-* `switch_id` - The id of the switch connected from the VPC Router.
+* `switch_id` - The id of the switch connected from the VPCRouter.
 * `syslog_host` - The ip address of the syslog host to which the VPC Router sends logs.
-* `tags` - Any tags assigned to the VPC Router.
+* `tags` - Any tags assigned to the VPCRouter.
 * `user` - A list of `user` blocks as defined below.
 * `vip` - The virtual IP address of the VPC Router. This is only used when `plan` is not `standard`.
 * `vrid` - The Virtual Router Identifier. This is only used when `plan` is not `standard`.
-* `zone` - The name of zone that the VPC Router is in (e.g. `is1a`, `tk1a`).
+* `zone` - The name of zone that the VPCRouter is in (e.g. `is1a`, `tk1a`).
 
 
 ---

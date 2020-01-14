@@ -10,6 +10,15 @@ description: |-
 
 Get information about an existing DNS.
 
+## Example Usage
+
+```hcl
+data "sakuracloud_dns" "foobar" {
+  filter {
+    names = ["foobar"]
+  }
+}
+```
 ## Argument Reference
 
 * `filter` - (Optional) One or more values used for filtering, as defined below.

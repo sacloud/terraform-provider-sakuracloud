@@ -23,7 +23,7 @@ import (
 )
 
 func dataSourceSakuraCloudDisk() *schema.Resource {
-	resourceName := "disk"
+	resourceName := "Disk"
 
 	return &schema.Resource{
 		Read: dataSourceSakuraCloudDiskRead,

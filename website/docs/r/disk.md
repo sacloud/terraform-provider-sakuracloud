@@ -10,6 +10,25 @@ description: |-
 
 Manages a SakuraCloud Disk.
 
+## Example Usage
+
+```hcl
+data "sakuracloud_archive" "ubuntu" {
+  os_type = "ubuntu"
+}
+
+resource "sakuracloud_disk" "foobar" {
+  name              = "foobar"
+  plan              = "ssd"
+  connector         = "virtio"
+  size              = 20
+  source_archive_id = data.sakuracloud_archive.ubuntu.id
+  #distant_from      = ["111111111111"]
+
+  description = "description"
+  tags        = ["tag1", "tag2"]
+}
+```
 ## Argument Reference
 
 * `connector` - (Optional) The name of the disk connector. This must be one of [`virtio`/`ide`]. Changing this forces a new resource to be created. Default:`virtio`.

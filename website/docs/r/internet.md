@@ -10,6 +10,20 @@ description: |-
 
 Manages a SakuraCloud Switch+Router.
 
+## Example Usage
+
+```hcl
+resource "sakuracloud_internet" "foobar" {
+  name = "foobar"
+
+  netmask     = 28
+  band_width  = 100
+  enable_ipv6 = false
+
+  description = "description"
+  tags        = ["tag1", "tag2"]
+}
+```
 ## Argument Reference
 
 * `band_width` - (Optional) The bandwidth of the network connected to the Internet in Mbps. `100`/`250`/`500`/`1000`/`1500`/`2000`/`2500`/`3000`/`5000`. Default:`100`.

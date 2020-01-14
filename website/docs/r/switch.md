@@ -10,6 +10,15 @@ description: |-
 
 Manages a SakuraCloud Switch.
 
+## Example Usage
+
+```hcl
+resource "sakuracloud_switch" "foobar" {
+  name        = "foobar"
+  description = "description"
+  tags        = ["tag1", "tag2"]
+}
+```
 ## Argument Reference
 
 * `bridge_id` - (Optional) The bridge id attached to the Switch.

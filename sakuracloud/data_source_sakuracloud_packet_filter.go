@@ -23,7 +23,7 @@ import (
 )
 
 func dataSourceSakuraCloudPacketFilter() *schema.Resource {
-	resourceName := "packet filter"
+	resourceName := "PacketFilter"
 	return &schema.Resource{
 		Read: dataSourceSakuraCloudPacketFilterRead,
 
