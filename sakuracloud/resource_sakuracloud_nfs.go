@@ -16,7 +16,6 @@ package sakuracloud
 
 import (
 	"fmt"
-	"strconv"
 	"strings"
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
@@ -58,16 +57,7 @@ func resourceSakuraCloudNFS() *schema.Resource {
 				Type:     schema.TypeInt,
 				ForceNew: true,
 				Optional: true,
-				Default:  "100",
-				ValidateFunc: validateIntInWord([]string{
-					strconv.Itoa(int(sacloud.NFSSize100G)),
-					strconv.Itoa(int(sacloud.NFSSize500G)),
-					strconv.Itoa(int(sacloud.NFSSize1T)),
-					strconv.Itoa(int(sacloud.NFSSize2T)),
-					strconv.Itoa(int(sacloud.NFSSize4T)),
-					strconv.Itoa(int(sacloud.NFSSize8T)),
-					strconv.Itoa(int(sacloud.NFSSize12T)),
-				}),
+				Default:  100,
 			},
 			"ipaddress": {
 				Type:     schema.TypeString,
@@ -132,9 +122,6 @@ func resourceSakuraCloudNFSCreate(d *schema.ResourceData, meta interface{}) erro
 	plan := sacloud.NFSPlanHDD
 	if strPlan == "ssd" {
 		plan = sacloud.NFSPlanSSD
-		if _, errs := validation.IntInSlice(sacloud.AllowNFSSSDPlanSizes())(intSize, "size"); len(errs) != 0 {
-			return errs[0]
-		}
 	}
 	size := sacloud.NFSSize(intSize)
 
