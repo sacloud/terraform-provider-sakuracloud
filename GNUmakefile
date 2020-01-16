@@ -1,5 +1,5 @@
 #
-# Copyright 2016-2019 The terraform-provider-sakuracloud Authors
+# Copyright 2016-2020 The terraform-provider-sakuracloud Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -21,7 +21,7 @@ GOGEN_FILES     ?=$$(go list ./... | grep -v vendor)
 GOLINT_TARGETS  ?= $$(golint github.com/sacloud/terraform-provider-sakuracloud/sakuracloud | grep -v 'underscores in Go names' | tee /dev/stderr)
 CURRENT_VERSION ?= $(shell git log --merges --oneline | perl -ne 'if(m/^.+Merge pull request \#[0-9]+ from .+\/bump-version-([0-9\.]+)/){print $$1;exit}')
 AUTHOR          ?="terraform-provider-sakuracloud authors"
-COPYRIGHT_YEAR  ?="2016-2019"
+COPYRIGHT_YEAR  ?="2016-2020"
 COPYRIGHT_FILES ?=$$(find . \( -name "*.dockerfile" -or -name "*.go" -or -name "*.sh" -or -name "*.pl" -or -name "*.bash" \) -print | grep -v "/vendor/")
 
 BUILD_LDFLAGS = "-s -w \
