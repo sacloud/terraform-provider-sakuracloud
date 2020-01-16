@@ -36,4 +36,3 @@ data "sakuracloud_zone" "is1a" {
 
 
 
-

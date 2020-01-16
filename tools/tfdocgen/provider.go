@@ -343,6 +343,7 @@ description: |-
 ` + "```" + `
 {{ end -}}
 
+
 {{ if .Schema.Arguments -}}
 ## Argument Reference
 
@@ -376,6 +377,7 @@ The ` + "`" + `timeouts` + "`" + ` block allows you to specify [timeouts](https:
 {{ end }}
 {{ end -}}
 
+{{ if not .IsProvider -}}
 ## Attribute Reference
 
 * ` + "`" + `id` + "`" + ` - The id of the {{ .DisplayName }}.
@@ -392,5 +394,5 @@ A ` + "`" + `{{ .Name }}` + "`" + ` block exports the following:
 * ` + "`" + `{{ .Name }}` + "`" + ` - {{ .Description }}.
 {{ end }}
 {{ end }}
-
+{{ end -}}
 `

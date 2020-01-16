@@ -46,4 +46,3 @@ resource "sakuracloud_bucket_object" "foobar" {
 
 
 
-

@@ -75,4 +75,3 @@ A `server` block exports the following:
 * `weight` - The weight used when weighted load balancing is enabled.
 
 
-

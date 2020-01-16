@@ -122,4 +122,3 @@ A `network_interface` block exports the following:
 * `mac_address` - The MAC address.
 
 
-

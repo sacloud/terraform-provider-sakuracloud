@@ -74,4 +74,3 @@ A `network_interface` block exports the following:
 * `upstream` - The upstream type or upstream switch id. This will be one of [`shared`/`disconnect`/`<switch id>`].
 
 
-
