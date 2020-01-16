@@ -79,7 +79,7 @@ func dataSourceSakuraCloudDatabase() *schema.Resource {
 				Description: "The time to take backup. This will be formatted with `HH:mm`",
 			},
 			"switch_id":    schemaDataSourceSwitchID(resourceName),
-			"ip_addresses": schemaDataSourceIPAddresses(resourceName),
+			"ip_addresses": schemaDataSourceIPAddress(resourceName),
 			"netmask":      schemaDataSourceNetMask(resourceName),
 			"gateway":      schemaDataSourceGateway(resourceName),
 			"icon_id":      schemaDataSourceIconID(resourceName),

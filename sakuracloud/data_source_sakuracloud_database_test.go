@@ -60,7 +60,7 @@ resource "sakuracloud_database" "foobar" {
   password = "{{ .arg1 }}"
 
   switch_id       = "${sakuracloud_switch.foobar.id}"
-  ip_addresses    = ["192.168.11.101"]
+  ip_address      = "192.168.11.101"
   netmask         = 24
   gateway         = "192.168.11.1"
   source_ranges   = ["192.168.11.0/24", "192.168.12.0/24"]

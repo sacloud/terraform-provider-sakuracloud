@@ -33,7 +33,7 @@ resource "sakuracloud_database" "foobar" {
   backup_weekdays = ["mon", "tue"]
 
   switch_id    = sakuracloud_switch.foobar.id
-  ip_addresses = ["192.168.11.11"]
+  ip_address   = "192.168.11.11"
   netmask      = 24
   gateway      = "192.168.11.1"
 
@@ -54,7 +54,7 @@ resource "sakuracloud_switch" "foobar" {
 * `description` - (Optional) The description of the Database. The length of this value must be in the range [`1`-`512`].
 * `gateway` - (Required) The IP address of the gateway used by Database. Changing this forces a new resource to be created.
 * `icon_id` - (Optional) The icon id to attach to the Database.
-* `ip_addresses` - (Required) A list of IP address to assign to the Database. Changing this forces a new resource to be created.
+* `ip_address` - (Required) The IP address to assign to the Database. Changing this forces a new resource to be created.
 * `name` - (Required) The name of the Database. The length of this value must be in the range [`1`-`64`].
 * `netmask` - (Required) The bit length of the subnet to assign to the Database. This must be in the range [`8`-`29`]. Changing this forces a new resource to be created.
 * `password` - (Required) The password of default user on the database.

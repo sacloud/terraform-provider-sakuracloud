@@ -60,14 +60,11 @@ func resourceSakuraCloudDatabaseReadReplica() *schema.Resource {
 				ValidateFunc: validateSakuracloudIDType,
 				Description:  descf("The id of the switch to which the %s connects. If `switch_id` isn't specified, it will be set to the same value of the master database", resourceName),
 			},
-			"ip_addresses": {
-				Type:        schema.TypeList,
+			"ip_address": {
+				Type:        schema.TypeString,
 				ForceNew:    true,
 				Required:    true,
-				MinItems:    1,
-				MaxItems:    1,
-				Elem:        &schema.Schema{Type: schema.TypeString},
-				Description: descf("The list of IP address to assign to the %s", resourceName),
+				Description: descf("The IP address to assign to the %s", resourceName),
 			},
 			"netmask": {
 				Type:         schema.TypeInt,
@@ -231,8 +228,8 @@ func setDatabaseReadReplicaResourceData(ctx context.Context, d *schema.ResourceD
 	d.Set("switch_id", data.SwitchID.String())                       // nolint
 	d.Set("netmask", data.NetworkMaskLen)                            // nolint
 	d.Set("gateway", data.DefaultRoute)                              // nolint
-	if err := d.Set("ip_addresses", data.IPAddresses); err != nil {
-		return err
+	if len(data.IPAddresses) > 0 {
+		d.Set("ip_address", data.IPAddresses[0]) // nolint
 	}
 	if err := d.Set("source_ranges", data.CommonSetting.SourceNetwork); err != nil {
 		return err
