@@ -74,11 +74,11 @@ A `vip` block exports the following:
 
 A `server` block exports the following:
 
-* `check_path` - The path used when checking by HTTP/HTTPS.
-* `check_protocol` - The protocol used for health checks. This will be one of [`http`/`https`/`tcp`/`ping`].
-* `check_status` - The response code to expect when checking by HTTP/HTTPS.
 * `enabled` - The flag to enable as destination of load balancing.
 * `ip_address` - The IP address of the destination server.
+* `path` - The path used when checking by HTTP/HTTPS.
+* `protocol` - The protocol used for health checks. This will be one of [`http`/`https`/`tcp`/`ping`].
+* `status` - The response code to expect when checking by HTTP/HTTPS.
 
 
 

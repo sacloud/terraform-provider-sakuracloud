@@ -82,11 +82,11 @@ A `vip` block supports the following:
 
 A `server` block supports the following:
 
-* `check_path` - (Optional) The path used when checking by HTTP/HTTPS.
-* `check_protocol` - (Required) The protocol used for health checks. This must be one of [`http`/`https`/`tcp`/`ping`].
-* `check_status` - (Optional) The response code to expect when checking by HTTP/HTTPS.
 * `enabled` - (Optional) The flag to enable as destination of load balancing.
 * `ip_address` - (Required) The IP address of the destination server.
+* `path` - (Optional) The path used when checking by HTTP/HTTPS.
+* `protocol` - (Required) The protocol used for health checks. This must be one of [`http`/`https`/`tcp`/`ping`].
+* `status` - (Optional) The response code to expect when checking by HTTP/HTTPS.
 
 
 ### Timeouts
