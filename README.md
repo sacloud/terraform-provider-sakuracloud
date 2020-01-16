@@ -72,6 +72,6 @@ TODO add docs here
 
 ## License
 
- `terraform-proivder-sakuracloud` Copyright (C) 2016-2019 terraform-provider-sakuraclou authors.
+ `terraform-proivder-sakuracloud` Copyright (C) 2016-2020 terraform-provider-sakuraclou authors.
  
   This project is published under [Apache 2.0 License](LICENSE).

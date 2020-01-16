@@ -2,7 +2,7 @@ PKG_NAME     ?= sakuracloud
 WEBSITE_REPO  = github.com/hashicorp/terraform-website
 
 AUTHOR          ?="terraform-provider-sakuracloud authors"
-COPYRIGHT_YEAR  ?="2016-2019"
+COPYRIGHT_YEAR  ?="2016-2020"
 COPYRIGHT_FILES ?=$$(find . \( -name "*.dockerfile" -or -name "*.go" -or -name "*.sh" -or -name "*.pl" -or -name "*.bash" \) -print | grep -v "/vendor/")
 
 UNIT_TEST_UA ?= (Unit Test)
