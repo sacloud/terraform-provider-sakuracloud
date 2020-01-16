@@ -116,14 +116,11 @@ func resourceSakuraCloudDatabase() *schema.Resource {
 				Description:  "The time to take backup. This must be formatted with `HH:mm`",
 			},
 			"switch_id": schemaResourceSwitchID(resourceName),
-			"ip_addresses": {
-				Type:        schema.TypeList,
+			"ip_address": {
+				Type:        schema.TypeString,
 				ForceNew:    true,
 				Required:    true,
-				MinItems:    1,
-				MaxItems:    1,
-				Elem:        &schema.Schema{Type: schema.TypeString},
-				Description: descf("A list of IP address to assign to the %s", resourceName),
+				Description: descf("The IP address to assign to the %s", resourceName),
 			},
 			"netmask": {
 				Type:         schema.TypeInt,
@@ -289,8 +286,8 @@ func setDatabaseResourceData(ctx context.Context, d *schema.ResourceData, client
 	d.Set("switch_id", data.SwitchID.String())    // nolint
 	d.Set("netmask", data.NetworkMaskLen)         // nolint
 	d.Set("gateway", data.DefaultRoute)           // nolint
-	if err := d.Set("ip_addresses", data.IPAddresses); err != nil {
-		return err
+	if len(data.IPAddresses) > 0 {
+		d.Set("ip_address", data.IPAddresses[0]) // nolint
 	}
 	d.Set("icon_id", data.IconID.String()) // nolint
 	d.Set("description", data.Description) // nolint
