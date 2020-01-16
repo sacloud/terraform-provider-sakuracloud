@@ -81,4 +81,3 @@ A `server` block exports the following:
 * `status` - The response code to expect when checking by HTTP/HTTPS.
 
 
-

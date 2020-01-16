@@ -65,4 +65,3 @@ A `record` block exports the following:
 * `weight` - The weight of target DNS Record.
 
 
-
