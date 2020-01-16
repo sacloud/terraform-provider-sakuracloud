@@ -76,7 +76,7 @@ func TestAccSakuraCloudSimpleMonitor_basic(t *testing.T) {
 	})
 }
 
-func TestSakuraCloudSimpleMonitor_certMonitor(t *testing.T) {
+func TestAccSakuraCloudSimpleMonitor_certMonitor(t *testing.T) {
 	resourceName := "sakuracloud_simple_monitor.foobar"
 	zone := randomName() + ".com"
 
