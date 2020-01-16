@@ -139,7 +139,7 @@ func resourceSakuraCloudLoadBalancer() *schema.Resource {
 										Required:    true,
 										Description: "The IP address of the destination server",
 									},
-									"check_protocol": {
+									"protocol": {
 										Type:         schema.TypeString,
 										Required:     true,
 										ValidateFunc: validation.StringInSlice(types.LoadBalancerHealthCheckProtocolStrings, false),
@@ -148,12 +148,12 @@ func resourceSakuraCloudLoadBalancer() *schema.Resource {
 											types.LoadBalancerHealthCheckProtocolStrings,
 										),
 									},
-									"check_path": {
+									"path": {
 										Type:        schema.TypeString,
 										Optional:    true,
 										Description: "The path used when checking by HTTP/HTTPS",
 									},
-									"check_status": {
+									"status": {
 										Type:        schema.TypeString,
 										Optional:    true,
 										Description: "The response code to expect when checking by HTTP/HTTPS",

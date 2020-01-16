@@ -76,9 +76,9 @@ func expandLoadBalancerServer(d resourceValueGettable, vipPort int) *sacloud.Loa
 		Port:      types.StringNumber(vipPort),
 		Enabled:   expandStringFlag(d, "enabled"),
 		HealthCheck: &sacloud.LoadBalancerServerHealthCheck{
-			Protocol:     types.ELoadBalancerHealthCheckProtocol(d.Get("check_protocol").(string)),
-			Path:         d.Get("check_path").(string),
-			ResponseCode: expandStringNumber(d, "check_status"),
+			Protocol:     types.ELoadBalancerHealthCheckProtocol(d.Get("protocol").(string)),
+			Path:         d.Get("path").(string),
+			ResponseCode: expandStringNumber(d, "status"),
 		},
 	}
 }
@@ -93,11 +93,11 @@ func flattenLoadBalancerServers(servers []*sacloud.LoadBalancerServer) []interfa
 
 func flattenLoadBalancerServer(server *sacloud.LoadBalancerServer) interface{} {
 	return map[string]interface{}{
-		"ip_address":     server.IPAddress,
-		"check_protocol": server.HealthCheck.Protocol,
-		"check_path":     server.HealthCheck.Path,
-		"check_status":   server.HealthCheck.ResponseCode.String(),
-		"enabled":        server.Enabled.Bool(),
+		"ip_address": server.IPAddress,
+		"protocol":   server.HealthCheck.Protocol,
+		"path":       server.HealthCheck.Path,
+		"status":     server.HealthCheck.ResponseCode.String(),
+		"enabled":    server.Enabled.Bool(),
 	}
 }
 

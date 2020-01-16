@@ -81,7 +81,7 @@ func dataSourceSakuraCloudLoadBalancer() *schema.Resource {
 										Computed:    true,
 										Description: "The IP address of the destination server",
 									},
-									"check_protocol": {
+									"protocol": {
 										Type:     schema.TypeString,
 										Computed: true,
 										Description: descf(
@@ -89,12 +89,12 @@ func dataSourceSakuraCloudLoadBalancer() *schema.Resource {
 											types.LoadBalancerHealthCheckProtocolStrings,
 										),
 									},
-									"check_path": {
+									"path": {
 										Type:        schema.TypeString,
 										Computed:    true,
 										Description: "The path used when checking by HTTP/HTTPS",
 									},
-									"check_status": {
+									"status": {
 										Type:        schema.TypeString,
 										Computed:    true,
 										Description: "The response code to expect when checking by HTTP/HTTPS",
