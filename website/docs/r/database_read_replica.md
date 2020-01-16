@@ -15,7 +15,7 @@ Manages a SakuraCloud Database Read Replica.
 ```hcl
 resource "sakuracloud_database_read_replica" "foobar" {
   master_id    = data.sakuracloud_database.master.id
-  ip_addresses = ["192.168.11.111"]
+  ip_address   = "192.168.11.111"
   name         = "foobar"
   description  = "description"
   tags         = ["tag1", "tag2"]
@@ -32,7 +32,7 @@ data sakuracloud_database "master" {
 * `description` - (Optional) The description of the read-replica database. The length of this value must be in the range [`1`-`512`].
 * `gateway` - (Optional) The IP address of the gateway used by read-replica database. If `gateway` isn't specified, it will be set to the same value of the master database. Changing this forces a new resource to be created.
 * `icon_id` - (Optional) The icon id to attach to the read-replica database.
-* `ip_addresses` - (Required) The list of IP address to assign to the read-replica database. Changing this forces a new resource to be created.
+* `ip_address` - (Required) The IP address to assign to the read-replica database. Changing this forces a new resource to be created.
 * `master_id` - (Required) The id of the replication master database. Changing this forces a new resource to be created.
 * `name` - (Required) The name of the read-replica database. The length of this value must be in the range [`1`-`64`].
 * `netmask` - (Optional) The bit length of the subnet to assign to the read-replica database. This must be in the range [`8`-`29`]. If `netmask` isn't specified, it will be set to the same value of the master database. Changing this forces a new resource to be created.

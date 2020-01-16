@@ -50,7 +50,7 @@ A `condition` block supports the following:
 * `description` - The description of the Database.
 * `gateway` - The IP address of the gateway used by Database.
 * `icon_id` - The icon id attached to the Database.
-* `ip_addresses` - The list of IP address assigned to the Database.
+* `ip_addresses` - The IP address assigned to the Database.
 * `name` - The name of the Database.
 * `netmask` - The bit length of the subnet assigned to the Database.
 * `password` - The password of default user on the database.
