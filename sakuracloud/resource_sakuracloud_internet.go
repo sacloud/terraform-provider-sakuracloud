@@ -53,21 +53,21 @@ func resourceSakuraCloudInternet() *schema.Resource {
 				Type:         schema.TypeInt,
 				ForceNew:     true,
 				Optional:     true,
-				ValidateFunc: validation.IntInSlice(types.AllowInternetNetworkMaskLen()),
+				ValidateFunc: validation.IntInSlice(types.InternetNetworkMaskLengths()),
 				Default:      28,
 				Description: descf(
 					"The bit length of the subnet assigned to the %s. %s", resourceName,
-					types.AllowInternetNetworkMaskLen(),
+					types.InternetNetworkMaskLengths(),
 				),
 			},
 			"band_width": {
 				Type:         schema.TypeInt,
 				Optional:     true,
-				ValidateFunc: validation.IntInSlice(types.AllowInternetBandWidth()),
+				ValidateFunc: validation.IntInSlice(types.InternetBandWidths()),
 				Default:      100,
 				Description: descf(
 					"The bandwidth of the network connected to the Internet in Mbps. %s",
-					types.AllowInternetBandWidth(),
+					types.InternetBandWidths(),
 				),
 			},
 			"enable_ipv6": {

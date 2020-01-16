@@ -142,10 +142,10 @@ func resourceSakuraCloudLoadBalancer() *schema.Resource {
 									"check_protocol": {
 										Type:         schema.TypeString,
 										Required:     true,
-										ValidateFunc: validation.StringInSlice(types.LoadBalancerHealthCheckProtocolsStrings(), false),
+										ValidateFunc: validation.StringInSlice(types.LoadBalancerHealthCheckProtocolStrings, false),
 										Description: descf(
 											"The protocol used for health checks. This must be one of [%s]",
-											types.LoadBalancerHealthCheckProtocolsStrings(),
+											types.LoadBalancerHealthCheckProtocolStrings,
 										),
 									},
 									"check_path": {

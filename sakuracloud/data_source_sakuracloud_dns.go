@@ -54,7 +54,7 @@ func dataSourceSakuraCloudDNS() *schema.Resource {
 							Computed: true,
 							Description: descf(
 								"The type of DNS Record. This will be one of [%s]",
-								types.DNSRecordTypesStrings(),
+								types.DNSRecordTypeStrings,
 							),
 						},
 						"value": {

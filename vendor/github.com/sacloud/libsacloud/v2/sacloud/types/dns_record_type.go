@@ -1,4 +1,4 @@
-// Copyright 2016-2019 The Libsacloud Authors
+// Copyright 2016-2020 The Libsacloud Authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -60,20 +60,18 @@ func (t EDNSRecordType) String() string {
 	return string(t)
 }
 
-// DNSRecordTypesStrings 有効なDNSレコードタイプを示す文字列のリスト
+// DNSRecordTypeStrings 有効なDNSレコードタイプを示す文字列のリスト
 //
 // Unknown(空文字)は含まない
-func DNSRecordTypesStrings() []string {
-	return []string{
-		DNSRecordTypes.A.String(),
-		DNSRecordTypes.AAAA.String(),
-		DNSRecordTypes.ALIAS.String(),
-		DNSRecordTypes.CNAME.String(),
-		DNSRecordTypes.NS.String(),
-		DNSRecordTypes.MX.String(),
-		DNSRecordTypes.TXT.String(),
-		DNSRecordTypes.SRV.String(),
-		DNSRecordTypes.CAA.String(),
-		DNSRecordTypes.PTR.String(),
-	}
+var DNSRecordTypeStrings = []string{
+	DNSRecordTypes.A.String(),
+	DNSRecordTypes.AAAA.String(),
+	DNSRecordTypes.ALIAS.String(),
+	DNSRecordTypes.CNAME.String(),
+	DNSRecordTypes.NS.String(),
+	DNSRecordTypes.MX.String(),
+	DNSRecordTypes.TXT.String(),
+	DNSRecordTypes.SRV.String(),
+	DNSRecordTypes.CAA.String(),
+	DNSRecordTypes.PTR.String(),
 }

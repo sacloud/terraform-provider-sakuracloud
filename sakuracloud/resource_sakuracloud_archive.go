@@ -48,7 +48,7 @@ func resourceSakuraCloudArchive() *schema.Resource {
 
 		Schema: map[string]*schema.Schema{
 			"name": schemaResourceName(resourceName),
-			"size": schemaResourceSize(resourceName, 20, types.ValidArchiveSizes...),
+			"size": schemaResourceSize(resourceName, 20, types.ArchiveSizes...),
 			"archive_file": {
 				Type:        schema.TypeString,
 				Required:    true,

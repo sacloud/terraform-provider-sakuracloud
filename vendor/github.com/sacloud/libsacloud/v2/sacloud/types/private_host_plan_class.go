@@ -1,4 +1,4 @@
-// Copyright 2016-2019 The Libsacloud Authors
+// Copyright 2016-2020 The Libsacloud Authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -18,3 +18,6 @@ const (
 	PrivateHostClassDynamic = "dynamic"    // 標準
 	PrivateHostClassWindows = "ms_windows" // Windows
 )
+
+// PrivateHostClasses PrivateHost.Classに指定できる有効な文字列
+var PrivateHostClasses = []string{PrivateHostClassDynamic, PrivateHostClassWindows}

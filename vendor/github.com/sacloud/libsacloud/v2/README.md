@@ -18,6 +18,6 @@ Then import the `sacloud` package into your own code.
 
 ## License
 
-  `libsacloud` Copyright (C) 2016-2019 The Libsacloud Authors.
+  `libsacloud` Copyright (C) 2016-2020 The Libsacloud Authors.
 
   This project is published under [Apache 2.0 License](LICENSE).

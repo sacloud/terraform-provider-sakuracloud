@@ -1,4 +1,4 @@
-// Copyright 2016-2019 The Libsacloud Authors
+// Copyright 2016-2020 The Libsacloud Authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -17,6 +17,11 @@ package types
 // Action パケットフィルタでのAllow/Denyアクション
 type Action string
 
+// String Actionの文字列表現
+func (a Action) String() string {
+	return string(a)
+}
+
 // Actions パケットフィルタでのAllow/Denyアクション
 var Actions = &struct {
 	Allow Action
@@ -34,4 +39,10 @@ func (a Action) IsAllow() bool {
 // IsDeny Denyであるか判定
 func (a Action) IsDeny() bool {
 	return a == Actions.Deny
+}
+
+// ActionStrings Actionに指定可能な文字列
+var ActionStrings = []string{
+	Actions.Allow.String(),
+	Actions.Deny.String(),
 }

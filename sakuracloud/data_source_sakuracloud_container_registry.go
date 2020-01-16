@@ -35,7 +35,7 @@ func dataSourceSakuraCloudContainerRegistry() *schema.Resource {
 				Computed: true,
 				Description: descf(
 					"The level of access that allow to users. This will be one of [%s]",
-					types.ContainerRegistryVisibilityStrings,
+					types.ContainerRegistryAccessLevelStrings,
 				),
 			},
 			"subdomain_label": {
