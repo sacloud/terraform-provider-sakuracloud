@@ -49,21 +49,31 @@ resource "sakuracloud_disk" "foobar" {
   source_archive_id = data.sakuracloud_archive.ubuntu.id
 }
 ```
+
 ## Argument Reference
 
+* `name` - (Required) The name of the Server. The length of this value must be in the range [`1`-`64`].
 * `cdrom_id` - (Optional) The id of the CD-ROM to attach to the Server.
+* `force_shutdown` - (Optional) The flag to use force shutdown when need to reboot/shutdown while applying.
+
+#### Spec
+
 * `commitment` - (Optional) The policy of how to allocate virtual CPUs to the server. This must be one of [`standard`/`dedicatedcpu`]. Default:`standard`.
 * `core` - (Optional) The number of virtual CPUs. Default:`1`.
-* `description` - (Optional) The description of the Server. The length of this value must be in the range [`1`-`512`].
+* `memory` - (Optional) The size of memory in GiB. Default:`1`.
+* `network_interface` - (Optional) One or more `network_interface` blocks as defined below.
+* `interface_driver` - (Optional) The driver name of network interface. This must be one of [`virtio`/`e1000`]. Default:`virtio`.
+* `private_host_id` - (Optional) The id of the PrivateHost which the Server is assigned.
+
+#### Disks
+
 * `disk_edit_parameter` - (Optional) A `disk_edit_parameter` block as defined below.
 * `disks` - (Optional) A list of disk id connected to the server.
-* `force_shutdown` - (Optional) The flag to use force shutdown when need to reboot/shutdown while applying.
+
+#### Common Arguments
+
+* `description` - (Optional) The description of the Server. The length of this value must be in the range [`1`-`512`].
 * `icon_id` - (Optional) The icon id to attach to the Server.
-* `interface_driver` - (Optional) The driver name of network interface. This must be one of [`virtio`/`e1000`]. Default:`virtio`.
-* `memory` - (Optional) The size of memory in GiB. Default:`1`.
-* `name` - (Required) The name of the Server. The length of this value must be in the range [`1`-`64`].
-* `network_interface` - (Optional) One or more `network_interface` blocks as defined below.
-* `private_host_id` - (Optional) The id of the PrivateHost which the Server is assigned.
 * `tags` - (Optional) Any tags to assign to the Server.
 * `zone` - (Optional) The name of zone that the Server will be created. (e.g. `is1a`, `tk1a`). Changing this forces a new resource to be created.
 
@@ -87,8 +97,8 @@ A `disk_edit_parameter` block supports the following:
 
 A `network_interface` block supports the following:
 
-* `packet_filter_id` - (Optional) The id of the packet filter to attach to the network interface.
 * `upstream` - (Required) The upstream type or upstream switch id. This must be one of [`shared`/`disconnect`/`<switch id>`].
+* `packet_filter_id` - (Optional) The id of the packet filter to attach to the network interface.
 
 
 ### Timeouts
@@ -96,13 +106,8 @@ A `network_interface` block supports the following:
 The `timeouts` block allows you to specify [timeouts](https://www.terraform.io/docs/configuration/resources.html#operation-timeouts) for certain actions:
 
 * `create` - (Defaults to 5 minutes) Used when creating the Server
-
-
 * `update` - (Defaults to 5 minutes) Used when updating the Server
-
-* `delete` - (Defaults to 20 minutes) Used when deregistering Server
-
-
+* `delete` - (Defaults to 20 minutes) Used when deleting Server
 
 ## Attribute Reference
 
@@ -114,11 +119,9 @@ The `timeouts` block allows you to specify [timeouts](https://www.terraform.io/d
 * `network_address` - The network address which the `ip_address` belongs.
 * `private_host_name` - The id of the PrivateHost which the Server is assigned.
 
-
 ---
 
 A `network_interface` block exports the following:
 
 * `mac_address` - The MAC address.
-
 

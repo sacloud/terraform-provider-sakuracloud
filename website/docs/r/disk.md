@@ -29,17 +29,27 @@ resource "sakuracloud_disk" "foobar" {
   tags        = ["tag1", "tag2"]
 }
 ```
+
 ## Argument Reference
 
-* `connector` - (Optional) The name of the disk connector. This must be one of [`virtio`/`ide`]. Changing this forces a new resource to be created. Default:`virtio`.
-* `description` - (Optional) The description of the disk. The length of this value must be in the range [`1`-`512`].
-* `distant_from` - (Optional) A list of disk id. The disk will be located to different storage from these disks. Changing this forces a new resource to be created.
-* `icon_id` - (Optional) The icon id to attach to the disk.
 * `name` - (Required) The name of the disk. The length of this value must be in the range [`1`-`64`].
+
+#### Disk Spec
+
+* `connector` - (Optional) The name of the disk connector. This must be one of [`virtio`/`ide`]. Changing this forces a new resource to be created. Default:`virtio`.
 * `plan` - (Optional) The plan name of the disk. This must be one of [`ssd`/`hdd`]. Changing this forces a new resource to be created. Default:`ssd`.
 * `size` - (Optional) The size of disk in GiB. Changing this forces a new resource to be created. Default:`20`.
+* `distant_from` - (Optional) A list of disk id. The disk will be located to different storage from these disks. Changing this forces a new resource to be created.
+
+#### Disk Source
+
 * `source_archive_id` - (Optional) The id of the source archive. This conflicts with [`source_disk_id`]. Changing this forces a new resource to be created.
 * `source_disk_id` - (Optional) The id of the source disk. This conflicts with [`source_archive_id`]. Changing this forces a new resource to be created.
+
+#### Common Arguments
+
+* `description` - (Optional) The description of the disk. The length of this value must be in the range [`1`-`512`].
+* `icon_id` - (Optional) The icon id to attach to the disk.
 * `tags` - (Optional) Any tags to assign to the disk.
 * `zone` - (Optional) The name of zone that the disk will be created. (e.g. `is1a`, `tk1a`). Changing this forces a new resource to be created.
 
@@ -50,18 +60,11 @@ resource "sakuracloud_disk" "foobar" {
 The `timeouts` block allows you to specify [timeouts](https://www.terraform.io/docs/configuration/resources.html#operation-timeouts) for certain actions:
 
 * `create` - (Defaults to 24 hours) Used when creating the Disk
-
-
 * `update` - (Defaults to 24 hours) Used when updating the Disk
-
-* `delete` - (Defaults to 20 minutes) Used when deregistering Disk
-
-
+* `delete` - (Defaults to 20 minutes) Used when deleting Disk
 
 ## Attribute Reference
 
 * `id` - The id of the Disk.
 * `server_id` - The id of the Server connected to the disk.
-
-
 

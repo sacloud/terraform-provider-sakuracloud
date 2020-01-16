@@ -56,22 +56,25 @@ resource "sakuracloud_switch" "foobar" {
   name = "foobar"
 }
 ```
+
 ## Argument Reference
 
-* `description` - (Optional) The description of the MobileGateway. The length of this value must be in the range [`1`-`512`].
+* `name` - (Required) The name of the MobileGateway. The length of this value must be in the range [`1`-`64`].
 * `dns_servers` - (Required) A list of IP address used by each connected devices.
-* `icon_id` - (Optional) The icon id to attach to the MobileGateway.
 * `inter_device_communication` - (Optional) The flag to allow communication between each connected devices.
 * `internet_connection` - (Optional) The flag to enable connect to the Internet.
-* `name` - (Required) The name of the MobileGateway. The length of this value must be in the range [`1`-`64`].
 * `private_network_interface` - (Optional) An `private_network_interface` block as defined below.
 * `sim` - (Optional) One or more `sim` blocks as defined below.
 * `sim_route` - (Optional) One or more `sim_route` blocks as defined below.
 * `static_route` - (Optional) One or more `static_route` blocks as defined below.
-* `tags` - (Optional) Any tags to assign to the MobileGateway.
 * `traffic_control` - (Optional) A `traffic_control` block as defined below.
-* `zone` - (Optional) The name of zone that the MobileGateway will be created. (e.g. `is1a`, `tk1a`). Changing this forces a new resource to be created.
 
+#### Common Arguments
+
+* `description` - (Optional) The description of the MobileGateway. The length of this value must be in the range [`1`-`512`].
+* `icon_id` - (Optional) The icon id to attach to the MobileGateway.
+* `tags` - (Optional) Any tags to assign to the MobileGateway.
+* `zone` - (Optional) The name of zone that the MobileGateway will be created. (e.g. `is1a`, `tk1a`). Changing this forces a new resource to be created.
 
 ---
 
@@ -106,11 +109,11 @@ A `static_route` block supports the following:
 
 A `traffic_control` block supports the following:
 
+* `quota` - (Required) The threshold of monthly traffic usage to enable to the traffic shaping.
 * `auto_traffic_shaping` - (Optional) The flag to enable the traffic shaping.
 * `band_width_limit` - (Optional) The bandwidth allowed when the traffic shaping is enabled.
 * `enable_email` - (Optional) The flag to enable email notification when the traffic shaping is enabled.
 * `enable_slack` - (Optional) The flag to enable slack notification when the traffic shaping is enabled.
-* `quota` - (Required) The threshold of monthly traffic usage to enable to the traffic shaping.
 * `slack_webhook` - (Optional) The webhook URL used when sends notification. It will only used when `enable_slack` is set `true`.
 
 
@@ -119,19 +122,12 @@ A `traffic_control` block supports the following:
 The `timeouts` block allows you to specify [timeouts](https://www.terraform.io/docs/configuration/resources.html#operation-timeouts) for certain actions:
 
 * `create` - (Defaults to 60 minutes) Used when creating the Mobile Gateway
-
-
 * `update` - (Defaults to 60 minutes) Used when updating the Mobile Gateway
-
-* `delete` - (Defaults to 20 minutes) Used when deregistering Mobile Gateway
-
-
+* `delete` - (Defaults to 20 minutes) Used when deleting Mobile Gateway
 
 ## Attribute Reference
 
 * `id` - The id of the Mobile Gateway.
 * `public_ip` - The public IP address assigned to the MobileGateway.
 * `public_netmask` - The bit length of the subnet assigned to the MobileGateway.
-
-
 

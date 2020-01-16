@@ -49,14 +49,16 @@ resource "sakuracloud_container_registry" "foobar" {
 ```
 ## Argument Reference
 
-* `access_level` - (Required) The level of access that allow to users. This must be one of [`readwrite`/`readonly`/`none`].
-* `description` - (Optional) The description of the Container Registry. The length of this value must be in the range [`1`-`512`].
-* `icon_id` - (Optional) The icon id to attach to the Container Registry.
 * `name` - (Required) The name of the Container Registry. The length of this value must be in the range [`1`-`64`].
+* `access_level` - (Required) The level of access that allow to users. This must be one of [`readwrite`/`readonly`/`none`].
 * `subdomain_label` - (Required) The label at the lowest of the FQDN used when be accessed from users. The length of this value must be in the range [`1`-`64`]. Changing this forces a new resource to be created.
-* `tags` - (Optional) Any tags to assign to the Container Registry.
 * `user` - (Optional) One or more `user` blocks as defined below.
 
+#### Common Arguments
+
+* `description` - (Optional) The description of the Container Registry. The length of this value must be in the range [`1`-`512`].
+* `icon_id` - (Optional) The icon id to attach to the Container Registry.
+* `tags` - (Optional) Any tags to assign to the Container Registry.
 
 ---
 
@@ -65,20 +67,13 @@ A `user` block supports the following:
 * `name` - (Required) The user name used to authenticate remote access.
 * `password` - (Required) The password used to authenticate remote access.
 
-
 ### Timeouts
 
 The `timeouts` block allows you to specify [timeouts](https://www.terraform.io/docs/configuration/resources.html#operation-timeouts) for certain actions:
 
 * `create` - (Defaults to 5 minutes) Used when creating the Container Registry
-
-* `read` -   (Defaults to 5 minutes) Used when reading the Container Registry
-
 * `update` - (Defaults to 5 minutes) Used when updating the Container Registry
-
-* `delete` - (Defaults to 5 minutes) Used when deregistering Container Registry
-
-
+* `delete` - (Defaults to 5 minutes) Used when deleting Container Registry
 
 ## Attribute Reference
 
