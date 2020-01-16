@@ -90,9 +90,10 @@ lint:
 .PHONY: tflint
 tflint:
 	tfproviderlint \
-        -AT001 -AT002 -AT003 -AT004\
-        -R001 -R002 -R004\
-        -S001 -S002 -S003 -S004 -S005 -S006 -S007 -S008 -S009 -S010 -S011 -S012 -S013 -S014 -S015 -S016 -S017 -S018 -S019\
+        -AT001 -AT002 -AT003 -AT004 -AT005 -AT006 -AT007 \
+        -R001 -R002 -R004 -R005 -R006 \
+        -S001 -S002 -S003 -S004 -S005 -S006 -S007 -S008 -S009 -S010 -S011 -S012 -S013 -S014 -S015 -S016 -S017 -S018 -S019 -S020 -S021 -S022 -S023\
+        -V001 \
         ./$(PKG_NAME)
 
 .PHONY: goimports
