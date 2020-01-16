@@ -38,7 +38,7 @@ resource "sakuracloud_switch" "sw" {
 | `name`          | ◯   | NFS名 | -        | 文字列                         | - |
 | `switch_id`     | ◯   | スイッチID      | -        | 文字列                         | - |
 | `plan`          | -   | プラン          |`hdd`| `hdd`<br />`ssd`<br />|- |
-| `size`          | -   | サイズ          |`100`| `100`<br />`500`<br />`1024`<br />`2048`<br />`4096`<br />`8192`(HDDのみ)<br />`12288`(HDDのみ)<br />|- |
+| `size`          | -   | サイズ          |`100`| `20`(SSDのみ)<br />100`<br />`500`<br />`1024`<br />`2048`<br />`4096`<br />`8192`(HDDのみ)<br />`12288`(HDDのみ)<br />|- |
 | `ipaddress`     | ◯   | IPアドレス     | -        | 文字列                         | - |
 | `nw_mask_len`   | ◯   | ネットマスク     | -        | 数値                          | - |
 | `default_route` | -   | ゲートウェイ     | -        | 文字列                        | - |
