@@ -1,4 +1,4 @@
-// Copyright 2016-2019 The Libsacloud Authors
+// Copyright 2016-2020 The Libsacloud Authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,5 +14,5 @@
 
 package types
 
-// ValidArchiveSizes 有効なアーカイブのサイズ
-var ValidArchiveSizes = []int{20, 40, 60, 80, 100, 250, 500, 750, 1024}
+// ArchiveSizes 有効なアーカイブのサイズ
+var ArchiveSizes = []int{20, 40, 60, 80, 100, 250, 500, 750, 1024}

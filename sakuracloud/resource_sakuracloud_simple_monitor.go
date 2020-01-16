@@ -70,10 +70,10 @@ func resourceSakuraCloudSimpleMonitor() *schema.Resource {
 						"protocol": {
 							Type:         schema.TypeString,
 							Required:     true,
-							ValidateFunc: validation.StringInSlice(types.SimpleMonitorProtocolsStrings, false),
+							ValidateFunc: validation.StringInSlice(types.SimpleMonitorProtocolStrings, false),
 							Description: descf(
 								"The protocol used for health checks. This must be one of [%s]",
-								types.SimpleMonitorProtocolsStrings,
+								types.SimpleMonitorProtocolStrings,
 							),
 						},
 						"host_header": {

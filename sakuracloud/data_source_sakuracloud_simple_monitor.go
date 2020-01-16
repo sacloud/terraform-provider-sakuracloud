@@ -49,7 +49,7 @@ func dataSourceSakuraCloudSimpleMonitor() *schema.Resource {
 							Computed: true,
 							Description: descf(
 								"The protocol used for health checks. This will be one of [%s]",
-								types.SimpleMonitorProtocolsStrings,
+								types.SimpleMonitorProtocolStrings,
 							),
 						},
 						"host_header": {

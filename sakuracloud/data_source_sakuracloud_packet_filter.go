@@ -41,7 +41,7 @@ func dataSourceSakuraCloudPacketFilter() *schema.Resource {
 							Computed: true,
 							Description: descf(
 								"The protocol used for filtering. This will be one of [%s]",
-								types.PacketFilterProtocolsStrings(),
+								types.PacketFilterProtocolStrings,
 							),
 						},
 						"source_network": {

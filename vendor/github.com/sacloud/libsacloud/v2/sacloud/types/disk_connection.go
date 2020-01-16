@@ -1,4 +1,4 @@
-// Copyright 2016-2019 The Libsacloud Authors
+// Copyright 2016-2020 The Libsacloud Authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -34,11 +34,13 @@ var (
 		IDE:    EDiskConnection("ide"),
 	}
 
+	// DiskConnectionMap 文字列とDiskConnectionのマップ
 	DiskConnectionMap = map[string]EDiskConnection{
 		DiskConnections.VirtIO.String(): DiskConnections.VirtIO,
 		DiskConnections.IDE.String():    DiskConnections.IDE,
 	}
 
+	// DiskConnectionStrings DiskConnectionに指定できる有効な文字列
 	DiskConnectionStrings = []string{
 		DiskConnections.VirtIO.String(),
 		DiskConnections.IDE.String(),

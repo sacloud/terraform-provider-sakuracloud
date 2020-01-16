@@ -1,4 +1,4 @@
-// Copyright 2016-2019 The Libsacloud Authors
+// Copyright 2016-2020 The Libsacloud Authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -41,17 +41,15 @@ func (p Protocol) String() string {
 	return string(p)
 }
 
-// PacketFilterProtocolsStrings 有効なパケットフィルタプロトコルを示す文字列のリスト
+// PacketFilterProtocolStrings 有効なパケットフィルタプロトコルを示す文字列のリスト
 //
 // Unknown(空文字)は含まない
-func PacketFilterProtocolsStrings() []string {
-	return []string{
-		Protocols.HTTP.String(),
-		Protocols.HTTPS.String(),
-		Protocols.TCP.String(),
-		Protocols.UDP.String(),
-		Protocols.ICMP.String(),
-		Protocols.Fragment.String(),
-		Protocols.IP.String(),
-	}
+var PacketFilterProtocolStrings = []string{
+	Protocols.HTTP.String(),
+	Protocols.HTTPS.String(),
+	Protocols.TCP.String(),
+	Protocols.UDP.String(),
+	Protocols.ICMP.String(),
+	Protocols.Fragment.String(),
+	Protocols.IP.String(),
 }

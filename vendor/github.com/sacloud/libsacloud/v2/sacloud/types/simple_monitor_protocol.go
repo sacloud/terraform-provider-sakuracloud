@@ -1,4 +1,4 @@
-// Copyright 2016-2019 The Libsacloud Authors
+// Copyright 2016-2020 The Libsacloud Authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -60,8 +60,8 @@ var SimpleMonitorProtocols = struct {
 	SSLCertificate: ESimpleMonitorProtocol("sslcertificate"),
 }
 
-// SimpleMonitorProtocolsStrings シンプル監視プロトコルの文字列リスト
-var SimpleMonitorProtocolsStrings = []string{
+// SimpleMonitorProtocolStrings シンプル監視プロトコルの文字列リスト
+var SimpleMonitorProtocolStrings = []string{
 	SimpleMonitorProtocols.HTTP.String(),
 	SimpleMonitorProtocols.HTTPS.String(),
 	SimpleMonitorProtocols.Ping.String(),

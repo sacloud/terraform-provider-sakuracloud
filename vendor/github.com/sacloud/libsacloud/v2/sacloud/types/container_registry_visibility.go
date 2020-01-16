@@ -1,4 +1,4 @@
-// Copyright 2016-2019 The Libsacloud Authors
+// Copyright 2016-2020 The Libsacloud Authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -32,15 +32,15 @@ var ContainerRegistryAccessLevels = struct {
 	None:      "none",
 }
 
-// ContainerRegistryVisibilityStrings アクセス範囲に指定可能な文字列
-var ContainerRegistryVisibilityStrings = []string{
+// ContainerRegistryAccessLevelStrings アクセス範囲に指定可能な文字列
+var ContainerRegistryAccessLevelStrings = []string{
 	ContainerRegistryAccessLevels.ReadWrite.String(),
 	ContainerRegistryAccessLevels.ReadOnly.String(),
 	ContainerRegistryAccessLevels.None.String(),
 }
 
-// ContainerRegistryVisibilityMap 文字列とEContainerRegistryVisibilityのマップ
-var ContainerRegistryVisibilityMap = map[string]EContainerRegistryAccessLevel{
+// ContainerRegistryAccessLevelMap 文字列とEContainerRegistryVisibilityのマップ
+var ContainerRegistryAccessLevelMap = map[string]EContainerRegistryAccessLevel{
 	ContainerRegistryAccessLevels.ReadWrite.String(): ContainerRegistryAccessLevels.ReadWrite,
 	ContainerRegistryAccessLevels.ReadOnly.String():  ContainerRegistryAccessLevels.ReadOnly,
 	ContainerRegistryAccessLevels.None.String():      ContainerRegistryAccessLevels.None,

@@ -60,10 +60,10 @@ func resourceSakuraCloudGSLB() *schema.Resource {
 						"protocol": {
 							Type:         schema.TypeString,
 							Required:     true,
-							ValidateFunc: validation.StringInSlice(types.GSLBHealthCheckProtocolsStrings(), false),
+							ValidateFunc: validation.StringInSlice(types.GSLBHealthCheckProtocolStrings, false),
 							Description: descf(
 								"The protocol used for health checks. This must be one of [%s]",
-								types.GSLBHealthCheckProtocolsStrings(),
+								types.GSLBHealthCheckProtocolStrings,
 							),
 						},
 						"delay_loop": {

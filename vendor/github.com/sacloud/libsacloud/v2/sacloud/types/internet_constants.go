@@ -1,4 +1,4 @@
-// Copyright 2016-2019 The Libsacloud Authors
+// Copyright 2016-2020 The Libsacloud Authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,12 +14,12 @@
 
 package types
 
-// AllowInternetBandWidth 設定可能な帯域幅の値リスト
-func AllowInternetBandWidth() []int {
+// InternetBandWidths 設定可能な帯域幅の値リスト
+func InternetBandWidths() []int {
 	return []int{100, 250, 500, 1000, 1500, 2000, 2500, 3000, 5000}
 }
 
-// AllowInternetNetworkMaskLen 設定可能なネットワークマスク長の値リスト
-func AllowInternetNetworkMaskLen() []int {
+// InternetNetworkMaskLengths 設定可能なネットワークマスク長の値リスト
+func InternetNetworkMaskLengths() []int {
 	return []int{26, 27, 28}
 }
