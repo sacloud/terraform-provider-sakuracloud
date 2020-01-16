@@ -2,7 +2,7 @@ site_name: Terraform for さくらのクラウド
 site_url: https://sacloud.github.io/terraform-provider-sakuracloud
 site_description: Terrform for さくらのクラウド
 site_author: '@yamamoto-febc'
-copyright: Copyright (C) 2016-2019 terraform-provider-sakuracloud authors
+copyright: Copyright (C) 2016-2020 terraform-provider-sakuracloud authors
 google_analytics: ['UA-63739336-5','auto']
 theme: readthedocs
 extra_css:
