@@ -57,11 +57,11 @@ func resourceSakuraCloudPacketFilterRules() *schema.Resource {
 						"protocol": {
 							Type:         schema.TypeString,
 							Required:     true,
-							ValidateFunc: validation.StringInSlice(types.PacketFilterProtocolsStrings(), false),
+							ValidateFunc: validation.StringInSlice(types.PacketFilterProtocolStrings, false),
 							ForceNew:     true,
 							Description: descf(
 								"The protocol used for filtering. This must be one of [%s]",
-								types.PacketFilterProtocolsStrings(),
+								types.PacketFilterProtocolStrings,
 							),
 						},
 						"source_network": {

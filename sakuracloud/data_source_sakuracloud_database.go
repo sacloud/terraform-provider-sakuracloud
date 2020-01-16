@@ -70,7 +70,7 @@ func dataSourceSakuraCloudDatabase() *schema.Resource {
 				Computed: true,
 				Description: descf(
 					"The list of name of weekday that doing backup. This will be in [%s]",
-					types.ValidAutoBackupWeekdaysInString,
+					types.BackupWeekdayStrings,
 				),
 			},
 			"backup_time": {

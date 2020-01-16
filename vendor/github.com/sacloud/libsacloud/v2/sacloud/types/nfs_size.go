@@ -1,4 +1,4 @@
-// Copyright 2016-2019 The Libsacloud Authors
+// Copyright 2016-2020 The Libsacloud Authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -27,7 +27,6 @@ var NFSHDDSizes = struct {
 	Size8TB   ENFSSize
 	Size12TB  ENFSSize
 }{
-
 	Size100GB: ENFSSize(100),
 	Size500GB: ENFSSize(500),
 	Size1TB:   ENFSSize(1024 * 1),
@@ -39,13 +38,14 @@ var NFSHDDSizes = struct {
 
 // NFSSSDSizes NFSのSSDプランで指定可能なサイズ
 var NFSSSDSizes = struct {
+	Size20GB  ENFSSize
 	Size100GB ENFSSize
 	Size500GB ENFSSize
 	Size1TB   ENFSSize
 	Size2TB   ENFSSize
 	Size4TB   ENFSSize
 }{
-
+	Size20GB:  ENFSSize(20),
 	Size100GB: ENFSSize(100),
 	Size500GB: ENFSSize(500),
 	Size1TB:   ENFSSize(1024 * 1),

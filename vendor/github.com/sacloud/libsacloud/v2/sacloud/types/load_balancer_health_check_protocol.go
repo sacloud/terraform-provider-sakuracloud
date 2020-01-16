@@ -1,4 +1,4 @@
-// Copyright 2016-2019 The Libsacloud Authors
+// Copyright 2016-2020 The Libsacloud Authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -42,14 +42,12 @@ var LoadBalancerHealthCheckProtocols = struct {
 	Ping:    ELoadBalancerHealthCheckProtocol("ping"),
 }
 
-// LoadBalancerHealthCheckProtocolsStrings 有効なロードバランサ監視プロトコルを示す文字列のリスト
+// LoadBalancerHealthCheckProtocolStrings 有効なロードバランサ監視プロトコルを示す文字列のリスト
 //
 // Unknown(空文字)は含まない
-func LoadBalancerHealthCheckProtocolsStrings() []string {
-	return []string{
-		LoadBalancerHealthCheckProtocols.HTTP.String(),
-		LoadBalancerHealthCheckProtocols.HTTPS.String(),
-		LoadBalancerHealthCheckProtocols.TCP.String(),
-		LoadBalancerHealthCheckProtocols.Ping.String(),
-	}
+var LoadBalancerHealthCheckProtocolStrings = []string{
+	LoadBalancerHealthCheckProtocols.HTTP.String(),
+	LoadBalancerHealthCheckProtocols.HTTPS.String(),
+	LoadBalancerHealthCheckProtocols.TCP.String(),
+	LoadBalancerHealthCheckProtocols.Ping.String(),
 }

@@ -1,5 +1,5 @@
 #
-# Copyright 2016-2019 The Libsacloud Authors
+# Copyright 2016-2020 The Libsacloud Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -16,7 +16,7 @@
 TEST            ?=$$(go list ./... | grep -v vendor)
 
 AUTHOR          ?="The Libsacloud Authors"
-COPYRIGHT_YEAR  ?="2016-2019"
+COPYRIGHT_YEAR  ?="2016-2020"
 COPYRIGHT_FILES ?=$$(find . -name "*.go" -print | grep -v "/vendor/")
 export GO111MODULE=on
 

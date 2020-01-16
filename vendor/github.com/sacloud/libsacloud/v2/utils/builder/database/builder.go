@@ -1,4 +1,4 @@
-// Copyright 2016-2019 The Libsacloud Authors
+// Copyright 2016-2020 The Libsacloud Authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -71,7 +71,7 @@ func (b *Builder) Validate(ctx context.Context, zone string) error {
 	return nil
 }
 
-// Build モバイルゲートウェイの作成や設定をまとめて行う
+// Build データベースの作成や設定をまとめて行う
 func (b *Builder) Build(ctx context.Context, zone string) (*sacloud.Database, error) {
 	b.init()
 

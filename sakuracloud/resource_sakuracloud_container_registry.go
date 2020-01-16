@@ -45,10 +45,10 @@ func resourceSakuraCloudContainerRegistry() *schema.Resource {
 			"access_level": {
 				Type:         schema.TypeString,
 				Required:     true,
-				ValidateFunc: validation.StringInSlice(types.ContainerRegistryVisibilityStrings, false),
+				ValidateFunc: validation.StringInSlice(types.ContainerRegistryAccessLevelStrings, false),
 				Description: descf(
 					"The level of access that allow to users. This must be one of [%s]",
-					types.ContainerRegistryVisibilityStrings,
+					types.ContainerRegistryAccessLevelStrings,
 				),
 			},
 			"subdomain_label": {

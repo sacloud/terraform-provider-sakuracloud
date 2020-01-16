@@ -66,10 +66,10 @@ func resourceSakuraCloudDNS() *schema.Resource {
 						"type": {
 							Type:         schema.TypeString,
 							Required:     true,
-							ValidateFunc: validation.StringInSlice(types.DNSRecordTypesStrings(), false),
+							ValidateFunc: validation.StringInSlice(types.DNSRecordTypeStrings, false),
 							Description: descf(
 								"The type of DNS Record. This must be one of [%s]",
-								types.DNSRecordTypesStrings(),
+								types.DNSRecordTypeStrings,
 							),
 						},
 						"value": {
