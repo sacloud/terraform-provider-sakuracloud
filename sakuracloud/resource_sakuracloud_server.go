@@ -396,7 +396,5 @@ func setServerResourceData(ctx context.Context, d *schema.ResourceData, client *
 }
 
 func isServerDiskConfigChanged(d *schema.ResourceData) bool {
-	return d.HasChange("disks") ||
-		d.HasChange("network_interface") ||
-		d.HasChange("disk_edit_parameter")
+	return d.HasChanges("disks", "network_interface", "disk_edit_parameter")
 }
