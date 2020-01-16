@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.21.0 (2020-01-16)
+
+* Update copyright #632 (yamamoto-febc)
+* Remove NFS size validation #633 (yamamoto-febc)
+
+
 ## 1.20.2 (2019-12-18)
 
 * Update v2 design doc #560 (yamamoto-febc)
