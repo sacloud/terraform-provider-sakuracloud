@@ -71,4 +71,3 @@ A `additional_certificate` block exports the following:
 * `server_cert` - The certificate for a server.
 
 
-

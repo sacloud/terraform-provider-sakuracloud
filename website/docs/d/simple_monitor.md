@@ -78,4 +78,3 @@ A `health_check` block exports the following:
 * `username` - The user name for basic auth used when checking by HTTP/HTTPS.
 
 
-

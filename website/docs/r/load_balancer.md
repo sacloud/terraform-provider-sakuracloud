@@ -31,17 +31,17 @@ resource "sakuracloud_load_balancer" "foobar" {
     sorry_server = "192.168.11.21"
 
     server {
-      ip_address     = "192.168.11.51"
-      check_protocol = "http"
-      check_path     = "/health"
-      check_status   = 200
+      ip_address = "192.168.11.51"
+      protocol   = "http"
+      path       = "/health"
+      status     = 200
     }
 
     server {
-      ip_address     = "192.168.11.52"
-      check_protocol = "http"
-      check_path     = "/health"
-      check_status   = 200
+      ip_address = "192.168.11.52"
+      protocol   = "http"
+      path       = "/health"
+      status     = 200
     }
   }
 }
@@ -105,7 +105,6 @@ The `timeouts` block allows you to specify [timeouts](https://www.terraform.io/d
 ## Attribute Reference
 
 * `id` - The id of the Load Balancer.
-
 
 
 

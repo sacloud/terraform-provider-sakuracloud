@@ -40,4 +40,3 @@ data sakuracloud_subnet "foobar" {
 
 
 
-

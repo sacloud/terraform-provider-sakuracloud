@@ -28,7 +28,7 @@ resource "sakuracloud_sim" "foobar" {
 ```
 ## Argument Reference
 
-* `carrier` - (Required) A list of a communication company. Each element must be one of `docomo`/`softbank`/`kddi`.
+* `carrier` - (Required) A list of a communication company. Each element must be one of `kddi`/`docomo`/`softbank`.
 * `description` - (Optional) The description of the SIM. The length of this value must be in the range [`1`-`512`].
 * `enabled` - (Optional) The flag to enable the SIM. Default:`true`.
 * `iccid` - (Required) ICCID(Integrated Circuit Card ID) assigned to the SIM. Changing this forces a new resource to be created.
@@ -58,7 +58,6 @@ The `timeouts` block allows you to specify [timeouts](https://www.terraform.io/d
 * `id` - The id of the SIM.
 * `ip_address` - The IP address assigned to the SIM.
 * `mobile_gateway_id` - The id of the MobileGateway which the SIM is assigned.
-
 
 
 

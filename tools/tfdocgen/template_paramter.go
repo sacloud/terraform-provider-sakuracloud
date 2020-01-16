@@ -195,3 +195,15 @@ func (p *TemplateParameter) Link() string {
 func (p *TemplateParameter) ShortName() string {
 	return strings.Replace(p.Name, p.ProviderName+"_", "", -1)
 }
+
+func (p *TemplateParameter) IsProvider() bool {
+	return p.Type == TypeProvider
+}
+
+func (p *TemplateParameter) IsResource() bool {
+	return p.Type == TypeResource
+}
+
+func (p *TemplateParameter) IsDataSource() bool {
+	return p.Type == TypeDataSource
+}

@@ -45,10 +45,3 @@ provider "sakuracloud" {
 
 
 
-## Attribute Reference
-
-* `id` - The id of the SakuraCloud.
-
-
-
-
