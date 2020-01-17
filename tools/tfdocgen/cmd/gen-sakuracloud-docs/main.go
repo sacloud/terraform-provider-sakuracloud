@@ -196,6 +196,10 @@ var definitions = map[string]definition{
 		displayName: "Server",
 		category:    CategoryCompute,
 	},
+	"sakuracloud_server_vnc_info": {
+		displayName: "Server VNC Information",
+		category:    CategoryCompute,
+	},
 	"sakuracloud_sim": {
 		displayName: "SIM",
 		category:    CategorySecureMobile,
