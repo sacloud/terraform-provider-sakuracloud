@@ -153,6 +153,7 @@ func Provider() terraform.ResourceProvider {
 			"sakuracloud_private_host":       dataSourceSakuraCloudPrivateHost(),
 			"sakuracloud_simple_monitor":     dataSourceSakuraCloudSimpleMonitor(),
 			"sakuracloud_server":             dataSourceSakuraCloudServer(),
+			"sakuracloud_server_vnc_info":    dataSourceSakuraCloudServerVNCInfo(),
 			"sakuracloud_ssh_key":            dataSourceSakuraCloudSSHKey(),
 			"sakuracloud_subnet":             dataSourceSakuraCloudSubnet(),
 			"sakuracloud_switch":             dataSourceSakuraCloudSwitch(),
