@@ -22,7 +22,7 @@ data "sakuracloud_database" "foobar" {
 ## Argument Reference
 
 * `filter` - (Optional) One or more values used for filtering, as defined below.
-
+* `zone` - The name of zone that the Database is in (e.g. `is1a`, `tk1a`).
 
 ---
 
