@@ -22,7 +22,7 @@ data "sakuracloud_internet" "foobar" {
 ## Argument Reference
 
 * `filter` - (Optional) One or more values used for filtering, as defined below.
-
+* `zone` - (Optional) The name of zone that the Switch+Router is in (e.g. `is1a`, `tk1a`).
 
 ---
 
@@ -61,7 +61,6 @@ A `condition` block supports the following:
 * `server_ids` - A list of the ID of Servers connected to the Switch+Router.
 * `switch_id` - The id of the switch connected from the Switch+Router.
 * `tags` - Any tags assigned to the Switch+Router.
-* `zone` - The name of zone that the Switch+Router is in (e.g. `is1a`, `tk1a`).
 
 
 

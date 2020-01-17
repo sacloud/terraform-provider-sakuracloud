@@ -22,7 +22,7 @@ data "sakuracloud_private_host" "foobar" {
 ## Argument Reference
 
 * `filter` - (Optional) One or more values used for filtering, as defined below.
-
+* `zone` - (Optional) The name of zone that the PrivateHost is in (e.g. `is1a`, `tk1a`).
 
 ---
 
@@ -52,7 +52,6 @@ A `condition` block supports the following:
 * `icon_id` - The icon id attached to the PrivateHost.
 * `name` - The name of the PrivateHost.
 * `tags` - Any tags assigned to the PrivateHost.
-* `zone` - The name of zone that the PrivateHost is in (e.g. `is1a`, `tk1a`).
 
 
 

@@ -22,7 +22,7 @@ data "sakuracloud_bridge" "foobar" {
 ## Argument Reference
 
 * `filter` - (Optional) One or more values used for filtering, as defined below.
-
+* `zone` - (Optional) The name of zone that the Bridge is in (e.g. `is1a`, `tk1a`).
 
 ---
 
@@ -45,7 +45,6 @@ A `condition` block supports the following:
 * `id` - The id of the Bridge.
 * `description` - The description of the Bridge.
 * `name` - The name of the Bridge.
-* `zone` - The name of zone that the Bridge is in (e.g. `is1a`, `tk1a`).
 
 
 

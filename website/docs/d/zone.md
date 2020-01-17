@@ -23,8 +23,6 @@ data "sakuracloud_zone" "is1a" {
 
 * `name` - (Optional) The name of the zone (e.g. `is1a`,`tk1a`).
 
-
-
 ## Attribute Reference
 
 * `id` - The id of the Zone.

@@ -22,7 +22,7 @@ data "sakuracloud_load_balancer" "foobar" {
 ## Argument Reference
 
 * `filter` - (Optional) One or more values used for filtering, as defined below.
-
+* `zone` - (Optional) The name of zone that the LoadBalancer is in (e.g. `is1a`, `tk1a`).
 
 ---
 
@@ -56,7 +56,6 @@ A `condition` block supports the following:
 * `tags` - Any tags assigned to the LoadBalancer.
 * `vip` - A list of `vip` blocks as defined below.
 * `vrid` - The Virtual Router Identifier. This is only used when `high_availability` is set `true`.
-* `zone` - The name of zone that the LoadBalancer is in (e.g. `is1a`, `tk1a`).
 
 
 ---

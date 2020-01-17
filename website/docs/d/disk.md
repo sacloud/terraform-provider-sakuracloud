@@ -22,7 +22,7 @@ data "sakuracloud_disk" "foobar" {
 ## Argument Reference
 
 * `filter` - (Optional) One or more values used for filtering, as defined below.
-
+* `zone` - (Optional) The name of zone that the Disk is in (e.g. `is1a`, `tk1a`).
 
 ---
 

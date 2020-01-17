@@ -21,7 +21,7 @@ data "sakuracloud_server_vnc_info" "foobar" {
 ## Argument Reference
 
 * `server_id` - (Required) The id of the Server.
-* `zone` - (Optional) The name of zone that the Server VNC Information will be created. (e.g. `is1a`, `tk1a`).
+* `zone` - (Optional) The name of zone that the Server is in (e.g. `is1a`, `tk1a`).
 
 ## Attribute Reference
 

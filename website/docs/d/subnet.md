@@ -23,7 +23,7 @@ data sakuracloud_subnet "foobar" {
 
 * `index` - (Required) The index of the subnet in assigned to the Switch+Router. Changing this forces a new resource to be created.
 * `internet_id` - (Required) The id of the switch+router resource that the Subnet belongs. Changing this forces a new resource to be created.
-
+* `zone` - (Optional) The name of zone that the Subnet is in (e.g. `is1a`, `tk1a`).
 
 
 ## Attribute Reference
@@ -36,7 +36,6 @@ data sakuracloud_subnet "foobar" {
 * `network_address` - The IPv4 network address assigned to the Subnet.
 * `next_hop` - The ip address of the next-hop at the Subnet.
 * `switch_id` - The id of the switch connected from the Subnet.
-* `zone` - The name of zone that the Subnet is in (e.g. `is1a`, `tk1a`).
 
 
 

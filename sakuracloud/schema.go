@@ -126,7 +126,9 @@ func schemaResourceTags(resourceName string) *schema.Schema {
 func schemaDataSourceZone(resourceName string) *schema.Schema {
 	return &schema.Schema{
 		Type:        schema.TypeString,
+		Optional:    true,
 		Computed:    true,
+		ForceNew:    true,
 		Description: descf("The name of zone that the %s is in (e.g. `is1a`, `tk1a`)", resourceName),
 	}
 }
@@ -137,7 +139,7 @@ func schemaResourceZone(resourceName string) *schema.Schema {
 		Optional:    true,
 		Computed:    true,
 		ForceNew:    true,
-		Description: descf("The name of zone that the %s will be created. (e.g. `is1a`, `tk1a`)", resourceName),
+		Description: descf("The name of zone that the %s will be created (e.g. `is1a`, `tk1a`)", resourceName),
 	}
 }
 
