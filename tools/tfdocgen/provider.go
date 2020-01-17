@@ -371,7 +371,7 @@ The ` + "`" + `timeouts` + "`" + ` block allows you to specify [timeouts](https:
 {{ end }}
 {{ if .TimeoutsUpdate }}* ` + "`" + `update` + "`" + ` - (Defaults to {{ .TimeoutsUpdate }}) Used when updating the {{ .DisplayName }}
 {{ end }}
-{{ if .TimeoutsDelete }}* ` + "`" + `delete` + "`" + ` - (Defaults to {{ .TimeoutsDelete }}) Used when deregistering {{ .DisplayName }}
+{{ if .TimeoutsDelete }}* ` + "`" + `delete` + "`" + ` - (Defaults to {{ .TimeoutsDelete }}) Used when deleting {{ .DisplayName }}
 {{ end }}
 
 {{ end }}

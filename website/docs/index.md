@@ -25,6 +25,68 @@ provider "sakuracloud" {
   # profile = "..."
 }
 ```
+
+## Authentication Methods
+
+The SakuraCloud provider supports following authentication methods:
+
+- Static credentials
+- Shared credentials file
+- Environment variables
+
+### Static credentials ###
+
+!> **Warning:** Hard-coding credentials into any Terraform configuration is not
+recommended, and risks secret leakage should this file ever be committed to a
+public version control system.
+
+Static credentials can be provided by adding a `token` and `secret`
+in-line in the SakuraCloud provider block:
+
+Usage:
+
+```hcl
+provider "sakuracloud" {
+  token  = "my-access-token"
+  secret = "my-access-secret"
+  zone   = "is1a"
+}
+```
+### Environment variables
+
+You can provide your credentials via the `SAKURACLOUD_ACCESS_TOKEN` and
+`SAKURACLOUD_ACCESS_TOKEN_SECRET`, environment variables, representing your 
+Access Token and your Access Secret, respectively. 
+
+```hcl
+provider "sakuracloud" {}
+```
+
+Usage:
+
+```sh
+$ export SAKURACLOUD_ACCESS_TOKEN="my-access-token"
+$ export SAKURACLOUD_ACCESS_TOKEN_SECRET="my-access-secret"
+$ export SAKURACLOUD_ZONE="is1a"
+$ terraform plan
+```
+
+### Shared credentials file
+
+You can use a shared credentials file by specifying `profile` parameter.
+A shared credentials file is formatted as JSON, the default location is `$HOME/.usacloud/<profile name>/config.json` on Linux and OS X, or
+`"%USERPROFILE%\.usacloud\<profile name>/config.json"` for Windows users.
+
+Example shared credentials file is follows:
+
+```json
+{
+	"AccessToken": "my-access-token",
+	"AccessTokenSecret": "my-access-secret",
+	"Zone": "is1a"
+}
+```
+
 ## Argument Reference
 
 * `accept_language` - (Optional) The value of AcceptLanguage header used when calling SakuraCloud API. It can also be sourced from the `SAKURACLOUD_ACCEPT_LANGUAGE` environment variables, or via a shared credentials file if `profile` is specified..
@@ -42,6 +104,5 @@ provider "sakuracloud" {
 * `trace` - (Optional) The flag to enable output trace log. It can also be sourced from the `SAKURACLOUD_TRACE` environment variables, or via a shared credentials file if `profile` is specified..
 * `zone` - (Optional) The name of zone to use as default. It must be provided, but it can also be sourced from the `SAKURACLOUD_ZONE` environment variables, or via a shared credentials file if `profile` is specified..
 * `zones` - (Optional) A list of available SakuraCloud zone name. It can also be sourced via a shared credentials file if `profile` is specified. Default:[`is1a`, `is1b`, `tk1a`, `tk1v`].
-
 
 
