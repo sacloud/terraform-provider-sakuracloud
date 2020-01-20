@@ -21,7 +21,6 @@ data "sakuracloud_packet_filter" "foobar" {
 ```
 ## Argument Reference
 
-* `expression` - (Optional) One or more `expression` blocks as defined below.
 * `filter` - (Optional) One or more values used for filtering, as defined below.
 * `zone` - (Optional) The name of zone that the PacketFilter is in (e.g. `is1a`, `tk1a`).
 
@@ -45,8 +44,8 @@ A `condition` block supports the following:
 
 * `id` - The id of the Packet Filter.
 * `description` - The description of the PacketFilter.
+* `expression` - One or more `expression` blocks as defined below.
 * `name` - The name of the PacketFilter.
-
 
 ---
 

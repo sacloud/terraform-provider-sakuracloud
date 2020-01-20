@@ -54,7 +54,6 @@ A `condition` block supports the following:
 * `source_archive_id` - The id of the source archive.
 * `source_disk_id` - The id of the source disk.
 * `tags` - Any tags assigned to the Disk.
-* `zone` - The name of zone that the Disk is in (e.g. `is1a`, `tk1a`).
 
 
 

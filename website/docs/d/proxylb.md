@@ -23,13 +23,6 @@ data "sakuracloud_proxylb" "foobar" {
 
 * `filter` - (Optional) One or more values used for filtering, as defined below.
 
-
----
-
-A `certificate` block supports the following:
-
-* `additional_certificate` - (Optional) One or more `additional_certificate` blocks as defined below.
-
 ---
 
 A `filter` block supports the following:
