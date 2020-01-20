@@ -28,7 +28,7 @@ func dataSourceSakuraCloudContainerRegistry() *schema.Resource {
 		Read: dataSourceSakuraCloudContainerRegistryRead,
 
 		Schema: map[string]*schema.Schema{
-			filterAttrName: filterSchema(&filterSchemaOption{excludeTags: true}),
+			filterAttrName: filterSchema(&filterSchemaOption{}),
 			"name":         schemaDataSourceName(resourceName),
 			"access_level": {
 				Type:     schema.TypeString,
