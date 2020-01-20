@@ -51,7 +51,7 @@ func resourceSakuraCloudVPCRouter() *schema.Resource {
 				ForceNew:     true,
 				Optional:     true,
 				ValidateFunc: validateSakuracloudIDType,
-				Description:  descf("The id of the switch to connect. This is only required when when `plan` is not `standard`", resourceName),
+				Description:  "The id of the switch to connect. This is only required when when `plan` is not `standard`",
 			},
 			"vip": {
 				Type:        schema.TypeString,

@@ -6,7 +6,7 @@ provider "sakuracloud" {
 
   # More information on the authentication methods supported by
   # the SakuraCloud Provider can be found here:
-  # https://docs.usacloud.jp/terraform/configuration/provider/
+  # https://docs.usacloud.jp/terraform/provider/
 
   # profile = "..."
 }

@@ -148,7 +148,7 @@ resource sakuracloud_switch "foobar" {
 * `aliases` - (Optional) A list of ip alias to assign to the VPC Router. This can only be specified if `plan` is not `standard`.
 * `ip_addresses` - (Optional) The list of the IP address to assign to the VPC Router. This is required only one value when `plan` is `standard`, two values otherwise. Changing this forces a new resource to be created.
 * `network_interface` - (Optional) A list of additional network interface setting. This doesn't include primary network interface setting.
-* `switch_id` - (Optional) The id of the switch to connect. This is only required when when `plan` is not `standard`%!(EXTRA string=VPCRouter). Changing this forces a new resource to be created.
+* `switch_id` - (Optional) The id of the switch to connect. This is only required when when `plan` is not `standard`. Changing this forces a new resource to be created.
 * `vip` - (Optional) The virtual IP address of the VPC Router. This is only required when `plan` is not `standard`. Changing this forces a new resource to be created.
 
 #### Static Route
