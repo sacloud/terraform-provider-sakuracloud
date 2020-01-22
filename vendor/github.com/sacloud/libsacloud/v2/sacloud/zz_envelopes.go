@@ -1392,6 +1392,94 @@ type loadBalancerStatusResponseEnvelope struct {
 	LoadBalancer []*naked.LoadBalancerStatus `json:",omitempty"`
 }
 
+// localRouterFindRequestEnvelope is envelop of API request
+type localRouterFindRequestEnvelope struct {
+	Count   int             `mapconv:",omitempty"`
+	From    int             `mapconv:",omitempty"`
+	Sort    search.SortKeys `json:",omitempty" mapconv:",omitempty"`
+	Filter  search.Filter   `json:",omitempty" mapconv:",omitempty"`
+	Include []string        `json:",omitempty" mapconv:",omitempty"`
+	Exclude []string        `json:",omitempty" mapconv:",omitempty"`
+}
+
+// localRouterFindResponseEnvelope is envelop of API response
+type localRouterFindResponseEnvelope struct {
+	Total int `json:",omitempty"` // トータル件数
+	From  int `json:",omitempty"` // ページング開始ページ
+	Count int `json:",omitempty"` // 件数
+
+	CommonServiceItems []*naked.LocalRouter `json:",omitempty"`
+}
+
+// localRouterCreateRequestEnvelope is envelop of API request
+type localRouterCreateRequestEnvelope struct {
+	CommonServiceItem *naked.LocalRouter `json:",omitempty"`
+}
+
+// localRouterCreateResponseEnvelope is envelop of API response
+type localRouterCreateResponseEnvelope struct {
+	IsOk    bool            `json:"is_ok,omitempty"` // is_ok項目
+	Success types.APIResult `json:",omitempty"`      // success項目
+
+	CommonServiceItem *naked.LocalRouter `json:",omitempty"`
+}
+
+// localRouterReadResponseEnvelope is envelop of API response
+type localRouterReadResponseEnvelope struct {
+	IsOk    bool            `json:"is_ok,omitempty"` // is_ok項目
+	Success types.APIResult `json:",omitempty"`      // success項目
+
+	CommonServiceItem *naked.LocalRouter `json:",omitempty"`
+}
+
+// localRouterUpdateRequestEnvelope is envelop of API request
+type localRouterUpdateRequestEnvelope struct {
+	CommonServiceItem *naked.LocalRouter `json:",omitempty"`
+}
+
+// localRouterUpdateResponseEnvelope is envelop of API response
+type localRouterUpdateResponseEnvelope struct {
+	IsOk    bool            `json:"is_ok,omitempty"` // is_ok項目
+	Success types.APIResult `json:",omitempty"`      // success項目
+
+	CommonServiceItem *naked.LocalRouter `json:",omitempty"`
+}
+
+// localRouterUpdateSettingsRequestEnvelope is envelop of API request
+type localRouterUpdateSettingsRequestEnvelope struct {
+	CommonServiceItem *naked.LocalRouterSettingsUpdate `json:",omitempty"`
+}
+
+// localRouterUpdateSettingsResponseEnvelope is envelop of API response
+type localRouterUpdateSettingsResponseEnvelope struct {
+	IsOk    bool            `json:"is_ok,omitempty"` // is_ok項目
+	Success types.APIResult `json:",omitempty"`      // success項目
+
+	CommonServiceItem *naked.LocalRouter `json:",omitempty"`
+}
+
+// localRouterHealthStatusResponseEnvelope is envelop of API response
+type localRouterHealthStatusResponseEnvelope struct {
+	IsOk    bool            `json:"is_ok,omitempty"` // is_ok項目
+	Success types.APIResult `json:",omitempty"`      // success項目
+
+	LocalRouter *naked.LocalRouterHealth `json:",omitempty"`
+}
+
+// localRouterMonitorLocalRouterRequestEnvelope is envelop of API request
+type localRouterMonitorLocalRouterRequestEnvelope struct {
+	Start time.Time `json:",omitempty"`
+	End   time.Time `json:",omitempty"`
+}
+
+// localRouterMonitorLocalRouterResponseEnvelope is envelop of API response
+type localRouterMonitorLocalRouterResponseEnvelope struct {
+	IsOk    bool            `json:"is_ok,omitempty"` // is_ok項目
+	Success types.APIResult `json:",omitempty"`      // success項目
+
+	Data *naked.MonitorValues `json:",omitempty"`
+}
+
 // mobileGatewayFindRequestEnvelope is envelop of API request
 type mobileGatewayFindRequestEnvelope struct {
 	Count   int             `mapconv:",omitempty"`

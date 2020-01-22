@@ -352,6 +352,22 @@ type LoadBalancerAPI interface {
 }
 
 /*************************************************
+* LocalRouterAPI
+*************************************************/
+
+// LocalRouterAPI is interface for operate LocalRouter resource
+type LocalRouterAPI interface {
+	Find(ctx context.Context, conditions *FindCondition) (*LocalRouterFindResult, error)
+	Create(ctx context.Context, param *LocalRouterCreateRequest) (*LocalRouter, error)
+	Read(ctx context.Context, id types.ID) (*LocalRouter, error)
+	Update(ctx context.Context, id types.ID, param *LocalRouterUpdateRequest) (*LocalRouter, error)
+	UpdateSettings(ctx context.Context, id types.ID, param *LocalRouterUpdateSettingsRequest) (*LocalRouter, error)
+	Delete(ctx context.Context, id types.ID) error
+	HealthStatus(ctx context.Context, id types.ID) (*LocalRouterHealth, error)
+	MonitorLocalRouter(ctx context.Context, id types.ID, condition *MonitorCondition) (*LocalRouterActivity, error)
+}
+
+/*************************************************
 * MobileGatewayAPI
 *************************************************/
 

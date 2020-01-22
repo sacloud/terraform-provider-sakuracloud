@@ -12,7 +12,21 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package libsacloud
+package naked
 
-// Version バージョン
-const Version = "2.0.0-rc5"
+import "github.com/sacloud/libsacloud/v2/sacloud/types"
+
+// HybridConnection ハイブリッドコネクション
+type HybridConnection struct {
+	ID       types.ID
+	Services []*HybridConnectionService
+}
+
+// HybridConnectionService ハイブリッドコネクションにて接続されているサービスの情報
+type HybridConnectionService struct {
+	ServiceCategory string
+	ServiceName     string
+	ServiceCode     string
+	CloudZone       string
+	IsMyself        bool
+}
