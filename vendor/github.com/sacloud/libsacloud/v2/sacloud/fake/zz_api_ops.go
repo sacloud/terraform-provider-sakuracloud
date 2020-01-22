@@ -91,6 +91,9 @@ func SwitchFactoryFuncToFake() {
 	sacloud.SetClientFactoryFunc(ResourceLoadBalancer, func(caller sacloud.APICaller) interface{} {
 		return NewLoadBalancerOp()
 	})
+	sacloud.SetClientFactoryFunc(ResourceLocalRouter, func(caller sacloud.APICaller) interface{} {
+		return NewLocalRouterOp()
+	})
 	sacloud.SetClientFactoryFunc(ResourceMobileGateway, func(caller sacloud.APICaller) interface{} {
 		return NewMobileGatewayOp()
 	})
@@ -515,6 +518,22 @@ type LoadBalancerOp struct {
 func NewLoadBalancerOp() sacloud.LoadBalancerAPI {
 	return &LoadBalancerOp{
 		key: ResourceLoadBalancer,
+	}
+}
+
+/*************************************************
+* LocalRouterOp
+*************************************************/
+
+// LocalRouterOp is fake implementation of LocalRouterAPI interface
+type LocalRouterOp struct {
+	key string
+}
+
+// NewLocalRouterOp creates new LocalRouterOp instance
+func NewLocalRouterOp() sacloud.LocalRouterAPI {
+	return &LocalRouterOp{
+		key: ResourceLocalRouter,
 	}
 }
 

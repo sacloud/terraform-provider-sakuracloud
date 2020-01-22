@@ -96,6 +96,9 @@ func AddClientFactoryHooks() {
 	sacloud.AddClientFacotyHookFunc("LoadBalancer", func(in interface{}) interface{} {
 		return NewLoadBalancerTracer(in.(sacloud.LoadBalancerAPI))
 	})
+	sacloud.AddClientFacotyHookFunc("LocalRouter", func(in interface{}) interface{} {
+		return NewLocalRouterTracer(in.(sacloud.LocalRouterAPI))
+	})
 	sacloud.AddClientFacotyHookFunc("MobileGateway", func(in interface{}) interface{} {
 		return NewMobileGatewayTracer(in.(sacloud.MobileGatewayAPI))
 	})
@@ -5259,6 +5262,274 @@ func (t *LoadBalancerTracer) Status(ctx context.Context, zone string, id types.I
 	}
 
 	return result, err
+}
+
+/*************************************************
+* LocalRouterTracer
+*************************************************/
+
+// LocalRouterTracer is for trace LocalRouterOp operations
+type LocalRouterTracer struct {
+	Internal sacloud.LocalRouterAPI
+}
+
+// NewLocalRouterTracer creates new LocalRouterTracer instance
+func NewLocalRouterTracer(in sacloud.LocalRouterAPI) sacloud.LocalRouterAPI {
+	return &LocalRouterTracer{
+		Internal: in,
+	}
+}
+
+// Find is API call with trace log
+func (t *LocalRouterTracer) Find(ctx context.Context, conditions *sacloud.FindCondition) (*sacloud.LocalRouterFindResult, error) {
+	log.Println("[TRACE] LocalRouterAPI.Find start")
+	targetArguments := struct {
+		Argconditions *sacloud.FindCondition `json:"conditions"`
+	}{
+		Argconditions: conditions,
+	}
+	if d, err := json.Marshal(targetArguments); err == nil {
+		log.Printf("[TRACE] \targs: %s\n", string(d))
+	}
+
+	defer func() {
+		log.Println("[TRACE] LocalRouterAPI.Find end")
+	}()
+
+	result, err := t.Internal.Find(ctx, conditions)
+	targetResults := struct {
+		Result *sacloud.LocalRouterFindResult
+		Error  error
+	}{
+		Result: result,
+		Error:  err,
+	}
+	if d, err := json.Marshal(targetResults); err == nil {
+		log.Printf("[TRACE] \tresults: %s\n", string(d))
+	}
+
+	return result, err
+}
+
+// Create is API call with trace log
+func (t *LocalRouterTracer) Create(ctx context.Context, param *sacloud.LocalRouterCreateRequest) (*sacloud.LocalRouter, error) {
+	log.Println("[TRACE] LocalRouterAPI.Create start")
+	targetArguments := struct {
+		Argparam *sacloud.LocalRouterCreateRequest `json:"param"`
+	}{
+		Argparam: param,
+	}
+	if d, err := json.Marshal(targetArguments); err == nil {
+		log.Printf("[TRACE] \targs: %s\n", string(d))
+	}
+
+	defer func() {
+		log.Println("[TRACE] LocalRouterAPI.Create end")
+	}()
+
+	resultLocalRouter, err := t.Internal.Create(ctx, param)
+	targetResults := struct {
+		LocalRouter *sacloud.LocalRouter
+		Error       error
+	}{
+		LocalRouter: resultLocalRouter,
+		Error:       err,
+	}
+	if d, err := json.Marshal(targetResults); err == nil {
+		log.Printf("[TRACE] \tresults: %s\n", string(d))
+	}
+
+	return resultLocalRouter, err
+}
+
+// Read is API call with trace log
+func (t *LocalRouterTracer) Read(ctx context.Context, id types.ID) (*sacloud.LocalRouter, error) {
+	log.Println("[TRACE] LocalRouterAPI.Read start")
+	targetArguments := struct {
+		Argid types.ID `json:"id"`
+	}{
+		Argid: id,
+	}
+	if d, err := json.Marshal(targetArguments); err == nil {
+		log.Printf("[TRACE] \targs: %s\n", string(d))
+	}
+
+	defer func() {
+		log.Println("[TRACE] LocalRouterAPI.Read end")
+	}()
+
+	resultLocalRouter, err := t.Internal.Read(ctx, id)
+	targetResults := struct {
+		LocalRouter *sacloud.LocalRouter
+		Error       error
+	}{
+		LocalRouter: resultLocalRouter,
+		Error:       err,
+	}
+	if d, err := json.Marshal(targetResults); err == nil {
+		log.Printf("[TRACE] \tresults: %s\n", string(d))
+	}
+
+	return resultLocalRouter, err
+}
+
+// Update is API call with trace log
+func (t *LocalRouterTracer) Update(ctx context.Context, id types.ID, param *sacloud.LocalRouterUpdateRequest) (*sacloud.LocalRouter, error) {
+	log.Println("[TRACE] LocalRouterAPI.Update start")
+	targetArguments := struct {
+		Argid    types.ID                          `json:"id"`
+		Argparam *sacloud.LocalRouterUpdateRequest `json:"param"`
+	}{
+		Argid:    id,
+		Argparam: param,
+	}
+	if d, err := json.Marshal(targetArguments); err == nil {
+		log.Printf("[TRACE] \targs: %s\n", string(d))
+	}
+
+	defer func() {
+		log.Println("[TRACE] LocalRouterAPI.Update end")
+	}()
+
+	resultLocalRouter, err := t.Internal.Update(ctx, id, param)
+	targetResults := struct {
+		LocalRouter *sacloud.LocalRouter
+		Error       error
+	}{
+		LocalRouter: resultLocalRouter,
+		Error:       err,
+	}
+	if d, err := json.Marshal(targetResults); err == nil {
+		log.Printf("[TRACE] \tresults: %s\n", string(d))
+	}
+
+	return resultLocalRouter, err
+}
+
+// UpdateSettings is API call with trace log
+func (t *LocalRouterTracer) UpdateSettings(ctx context.Context, id types.ID, param *sacloud.LocalRouterUpdateSettingsRequest) (*sacloud.LocalRouter, error) {
+	log.Println("[TRACE] LocalRouterAPI.UpdateSettings start")
+	targetArguments := struct {
+		Argid    types.ID                                  `json:"id"`
+		Argparam *sacloud.LocalRouterUpdateSettingsRequest `json:"param"`
+	}{
+		Argid:    id,
+		Argparam: param,
+	}
+	if d, err := json.Marshal(targetArguments); err == nil {
+		log.Printf("[TRACE] \targs: %s\n", string(d))
+	}
+
+	defer func() {
+		log.Println("[TRACE] LocalRouterAPI.UpdateSettings end")
+	}()
+
+	resultLocalRouter, err := t.Internal.UpdateSettings(ctx, id, param)
+	targetResults := struct {
+		LocalRouter *sacloud.LocalRouter
+		Error       error
+	}{
+		LocalRouter: resultLocalRouter,
+		Error:       err,
+	}
+	if d, err := json.Marshal(targetResults); err == nil {
+		log.Printf("[TRACE] \tresults: %s\n", string(d))
+	}
+
+	return resultLocalRouter, err
+}
+
+// Delete is API call with trace log
+func (t *LocalRouterTracer) Delete(ctx context.Context, id types.ID) error {
+	log.Println("[TRACE] LocalRouterAPI.Delete start")
+	targetArguments := struct {
+		Argid types.ID `json:"id"`
+	}{
+		Argid: id,
+	}
+	if d, err := json.Marshal(targetArguments); err == nil {
+		log.Printf("[TRACE] \targs: %s\n", string(d))
+	}
+
+	defer func() {
+		log.Println("[TRACE] LocalRouterAPI.Delete end")
+	}()
+
+	err := t.Internal.Delete(ctx, id)
+	targetResults := struct {
+		Error error
+	}{
+		Error: err,
+	}
+	if d, err := json.Marshal(targetResults); err == nil {
+		log.Printf("[TRACE] \tresults: %s\n", string(d))
+	}
+
+	return err
+}
+
+// HealthStatus is API call with trace log
+func (t *LocalRouterTracer) HealthStatus(ctx context.Context, id types.ID) (*sacloud.LocalRouterHealth, error) {
+	log.Println("[TRACE] LocalRouterAPI.HealthStatus start")
+	targetArguments := struct {
+		Argid types.ID `json:"id"`
+	}{
+		Argid: id,
+	}
+	if d, err := json.Marshal(targetArguments); err == nil {
+		log.Printf("[TRACE] \targs: %s\n", string(d))
+	}
+
+	defer func() {
+		log.Println("[TRACE] LocalRouterAPI.HealthStatus end")
+	}()
+
+	resultLocalRouterHealth, err := t.Internal.HealthStatus(ctx, id)
+	targetResults := struct {
+		LocalRouterHealth *sacloud.LocalRouterHealth
+		Error             error
+	}{
+		LocalRouterHealth: resultLocalRouterHealth,
+		Error:             err,
+	}
+	if d, err := json.Marshal(targetResults); err == nil {
+		log.Printf("[TRACE] \tresults: %s\n", string(d))
+	}
+
+	return resultLocalRouterHealth, err
+}
+
+// MonitorLocalRouter is API call with trace log
+func (t *LocalRouterTracer) MonitorLocalRouter(ctx context.Context, id types.ID, condition *sacloud.MonitorCondition) (*sacloud.LocalRouterActivity, error) {
+	log.Println("[TRACE] LocalRouterAPI.MonitorLocalRouter start")
+	targetArguments := struct {
+		Argid        types.ID                  `json:"id"`
+		Argcondition *sacloud.MonitorCondition `json:"condition"`
+	}{
+		Argid:        id,
+		Argcondition: condition,
+	}
+	if d, err := json.Marshal(targetArguments); err == nil {
+		log.Printf("[TRACE] \targs: %s\n", string(d))
+	}
+
+	defer func() {
+		log.Println("[TRACE] LocalRouterAPI.MonitorLocalRouter end")
+	}()
+
+	resultLocalRouterActivity, err := t.Internal.MonitorLocalRouter(ctx, id, condition)
+	targetResults := struct {
+		LocalRouterActivity *sacloud.LocalRouterActivity
+		Error               error
+	}{
+		LocalRouterActivity: resultLocalRouterActivity,
+		Error:               err,
+	}
+	if d, err := json.Marshal(targetResults); err == nil {
+		log.Printf("[TRACE] \tresults: %s\n", string(d))
+	}
+
+	return resultLocalRouterActivity, err
 }
 
 /*************************************************

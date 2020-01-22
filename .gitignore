@@ -4,3 +4,5 @@
 terraform.tfstate
 terraform.tfstate.backup
 releases-terraform
+website-current
+website-scaffold

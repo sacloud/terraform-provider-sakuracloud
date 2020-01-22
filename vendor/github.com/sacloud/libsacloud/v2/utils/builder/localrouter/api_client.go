@@ -12,7 +12,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package libsacloud
+package localrouter
 
-// Version バージョン
-const Version = "2.0.0-rc5"
+import "github.com/sacloud/libsacloud/v2/sacloud"
+
+// APIClient builderが利用するAPIクライアント
+type APIClient struct {
+	LocalRouter sacloud.LocalRouterAPI
+}
+
+// NewAPIClient builderが利用するAPIクライアントを返す
+func NewAPIClient(caller sacloud.APICaller) *APIClient {
+	return &APIClient{
+		LocalRouter: sacloud.NewLocalRouterOp(caller),
+	}
+}

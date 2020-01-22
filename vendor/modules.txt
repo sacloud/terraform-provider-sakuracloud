@@ -228,7 +228,7 @@ github.com/posener/complete/match
 github.com/sacloud/ftps
 # github.com/sacloud/iso9660wrap v0.0.0-20171031075302-eda21f77f6a8
 github.com/sacloud/iso9660wrap
-# github.com/sacloud/libsacloud/v2 v2.0.0-rc3
+# github.com/sacloud/libsacloud/v2 v2.0.0-rc5
 github.com/sacloud/libsacloud/v2
 github.com/sacloud/libsacloud/v2/pkg/cidr
 github.com/sacloud/libsacloud/v2/pkg/mapconv
@@ -248,6 +248,7 @@ github.com/sacloud/libsacloud/v2/utils/builder
 github.com/sacloud/libsacloud/v2/utils/builder/database
 github.com/sacloud/libsacloud/v2/utils/builder/disk
 github.com/sacloud/libsacloud/v2/utils/builder/internet
+github.com/sacloud/libsacloud/v2/utils/builder/localrouter
 github.com/sacloud/libsacloud/v2/utils/builder/mobilegateway
 github.com/sacloud/libsacloud/v2/utils/builder/registry
 github.com/sacloud/libsacloud/v2/utils/builder/server

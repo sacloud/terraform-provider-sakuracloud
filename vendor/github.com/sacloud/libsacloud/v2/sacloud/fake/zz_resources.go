@@ -63,6 +63,8 @@ const (
 	ResourceLicenseInfo = "LicenseInfo"
 	// ResourceLoadBalancer is resource key of fake store
 	ResourceLoadBalancer = "LoadBalancer"
+	// ResourceLocalRouter is resource key of fake store
+	ResourceLocalRouter = "LocalRouter"
 	// ResourceMobileGateway is resource key of fake store
 	ResourceMobileGateway = "MobileGateway"
 	// ResourceNFS is resource key of fake store

@@ -65,6 +65,7 @@ func waitForDeletionByDiskID(ctx context.Context, client *APIClient, zone string
 
 func waitForDeletionBySwitchID(ctx context.Context, client *APIClient, zone string, switchID types.ID) error {
 	return waitForDeletion(ctx, client, zone, switchID, []deletionWaiterFindFunc{
+		switchHasHybridConnection,
 		findServerBySwitchID,
 		findLoadBalancerBySwitchID,
 		findVPCRouterBySwitchID,
@@ -161,6 +162,15 @@ func waitForDeletionByFunc(ctx context.Context, client *APIClient, zone string, 
 			return errors.New("timeout")
 		}
 	}
+}
+
+func switchHasHybridConnection(ctx context.Context, client *APIClient, zone string, id types.ID) (bool, error) {
+	swOp := sacloud.NewSwitchOp(client)
+	sw, err := swOp.Read(ctx, zone, id)
+	if err != nil {
+		return false, fmt.Errorf("reading switch is failed: %s", err)
+	}
+	return !sw.HybridConnectionID.IsEmpty(), nil
 }
 
 func findServerBySwitchID(ctx context.Context, client *APIClient, zone string, id types.ID) (bool, error) {
