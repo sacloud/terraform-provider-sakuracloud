@@ -27,7 +27,7 @@ resource "sakuracloud_local_router" "foobar" {
 
   peer {
     peer_id     = data.sakuracloud_local_router.peer.id
-    secret_key  = data.sakuracloud_local_router.secret_keys[0]
+    secret_key  = data.sakuracloud_local_router.peer.secret_keys[0]
     description = "description"
   }
 }
