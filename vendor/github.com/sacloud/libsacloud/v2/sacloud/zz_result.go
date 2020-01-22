@@ -807,6 +807,57 @@ type LoadBalancerStatusResult struct {
 	Status []*LoadBalancerStatus `json:",omitempty" mapconv:"[]LoadBalancer,omitempty,recursive"`
 }
 
+// LocalRouterFindResult represents the Result of API
+type LocalRouterFindResult struct {
+	Total int `json:",omitempty"` // Total count of target resources
+	From  int `json:",omitempty"` // Current page number
+	Count int `json:",omitempty"` // Count of current page
+
+	LocalRouters []*LocalRouter `json:",omitempty" mapconv:"[]CommonServiceItems,omitempty,recursive"`
+}
+
+// localRouterCreateResult represents the Result of API
+type localRouterCreateResult struct {
+	IsOk bool `json:",omitempty"` // is_ok
+
+	LocalRouter *LocalRouter `json:",omitempty" mapconv:"CommonServiceItem,omitempty,recursive"`
+}
+
+// localRouterReadResult represents the Result of API
+type localRouterReadResult struct {
+	IsOk bool `json:",omitempty"` // is_ok
+
+	LocalRouter *LocalRouter `json:",omitempty" mapconv:"CommonServiceItem,omitempty,recursive"`
+}
+
+// localRouterUpdateResult represents the Result of API
+type localRouterUpdateResult struct {
+	IsOk bool `json:",omitempty"` // is_ok
+
+	LocalRouter *LocalRouter `json:",omitempty" mapconv:"CommonServiceItem,omitempty,recursive"`
+}
+
+// localRouterUpdateSettingsResult represents the Result of API
+type localRouterUpdateSettingsResult struct {
+	IsOk bool `json:",omitempty"` // is_ok
+
+	LocalRouter *LocalRouter `json:",omitempty" mapconv:"CommonServiceItem,omitempty,recursive"`
+}
+
+// localRouterHealthStatusResult represents the Result of API
+type localRouterHealthStatusResult struct {
+	IsOk bool `json:",omitempty"` // is_ok
+
+	LocalRouterHealth *LocalRouterHealth `json:",omitempty" mapconv:"LocalRouter,omitempty,recursive"`
+}
+
+// localRouterMonitorLocalRouterResult represents the Result of API
+type localRouterMonitorLocalRouterResult struct {
+	IsOk bool `json:",omitempty"` // is_ok
+
+	LocalRouterActivity *LocalRouterActivity `json:",omitempty" mapconv:"Data,omitempty,recursive"`
+}
+
 // MobileGatewayFindResult represents the Result of API
 type MobileGatewayFindResult struct {
 	Total int `json:",omitempty"` // Total count of target resources

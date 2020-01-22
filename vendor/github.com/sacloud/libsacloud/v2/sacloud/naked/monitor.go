@@ -41,6 +41,8 @@ type MonitorValues struct {
 	Link MonitorLinkValues
 	// Connection 接続数
 	Connection MonitorConnectionValues
+	// LocalRouter Receive/Send bytes per sec
+	LocalRouter MonitorLocalRouterValues
 }
 
 // UnmarshalJSON アクティビティモニタ向けUnmarshalJSON実装
@@ -128,6 +130,14 @@ func (m *MonitorValues) UnmarshalJSON(data []byte) error {
 		return nil
 	}
 
+	//	LocalRouter
+	if err := json.Unmarshal(data, &v.LocalRouter); err != nil {
+		return nil
+	}
+	if len(v.LocalRouter) > 0 {
+		*m = v
+		return nil
+	}
 	return nil
 }
 
@@ -440,29 +450,65 @@ func (m *MonitorConnectionValues) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
+/************************************************
+ * LocalRouter(Receive/Send BytesPerSec)
+************************************************/
+
+// MonitorLocalRouterValue アクティビティモニタ
+type MonitorLocalRouterValue struct {
+	Time               time.Time
+	ReceiveBytesPerSec float64
+	SendBytesPerSec    float64
+}
+
+// MonitorRouterValues アクティビティモニタ
+type MonitorLocalRouterValues []*MonitorLocalRouterValue
+
+// UnmarshalJSON アクティビティモニタ向けUnmarshalJSON実装
+func (m *MonitorLocalRouterValues) UnmarshalJSON(data []byte) error {
+	targetData := strings.Replace(strings.Replace(string(data), " ", "", -1), "\n", "", -1)
+	if targetData == `[]` {
+		return nil
+	}
+
+	var rawMonitorValues rawMonitorValues
+	if err := json.Unmarshal(data, &rawMonitorValues); err != nil {
+		return err
+	}
+	values, err := rawMonitorValues.monitorLocalRouterValues()
+	if err != nil {
+		return err
+	}
+
+	*m = values
+	return nil
+}
+
 // rawMonitorValue アクティビティモニター
 type rawMonitorValue struct {
-	CPUTime           *float64 `json:"CPU-TIME,omitempty" yaml:"cpu_timme,omitempty" structs:",omitempty"`                     // CPU時間
-	Write             *float64 `json:",omitempty" yaml:"write,omitempty" structs:",omitempty"`                                 // ディスク書き込み
-	Read              *float64 `json:",omitempty" yaml:"read,omitempty" structs:",omitempty"`                                  // ディスク読み取り
-	Receive           *float64 `json:",omitempty" yaml:"receive,omitempty" structs:",omitempty"`                               // パケット受信
-	Send              *float64 `json:",omitempty" yaml:"send,omitempty" structs:",omitempty"`                                  // パケット送信
-	In                *float64 `json:",omitempty" yaml:"in,omitempty" structs:",omitempty"`                                    // パケット受信
-	Out               *float64 `json:",omitempty" yaml:"out,omitempty" structs:",omitempty"`                                   // パケット送信
-	TotalMemorySize   *float64 `json:"Total-Memory-Size,omitempty" yaml:"total_memory_size,omitempty" structs:",omitempty"`    // 総メモリサイズ
-	UsedMemorySize    *float64 `json:"Used-Memory-Size,omitempty" yaml:"used_memory_size,omitempty" structs:",omitempty"`      // 使用済みメモリサイズ
-	TotalDisk1Size    *float64 `json:"Total-Disk1-Size,omitempty" yaml:"total_disk1_size,omitempty" structs:",omitempty"`      // 総ディスクサイズ
-	UsedDisk1Size     *float64 `json:"Used-Disk1-Size,omitempty" yaml:"used_disk1_size,omitempty" structs:",omitempty"`        // 使用済みディスクサイズ
-	TotalDisk2Size    *float64 `json:"Total-Disk2-Size,omitempty" yaml:"total_disk2_size,omitempty" structs:",omitempty"`      // 総ディスクサイズ
-	UsedDisk2Size     *float64 `json:"Used-Disk2-Size,omitempty" yaml:"used_disk2_size,omitempty" structs:",omitempty"`        // 使用済みディスクサイズ
-	BinlogUsedSizeKiB *float64 `json:"binlogUsedSizeKiB,omitempty" yaml:"binlog_used_size_kib,omitempty" structs:",omitempty"` // バイナリログのサイズ(レプリケーション有効時のみ、master/slave両方で利用可能)
-	DelayTimeSec      *float64 `json:"delayTimeSec,omitempty" yaml:"delay_time_sec,omitempty" structs:",omitempty"`            // レプリケーション遅延時間(レプリケーション有効時のみ、slave側のみ)
-	FreeDiskSize      *float64 `json:"Free-Disk-Size,omitempty" yaml:"free_disk_size,omitempty" structs:",omitempty"`          // 空きディスクサイズ(NFS)
-	ResponseTimeSec   *float64 `json:"responsetimesec,omitempty" yaml:"response_time_sec,omitempty" structs:",omitempty"`      // レスポンスタイム(シンプル監視)
-	UplinkBPS         *float64 `json:"UplinkBps,omitempty" yaml:"uplink_bps,omitempty" structs:",omitempty"`                   // 上り方向トラフィック
-	DownlinkBPS       *float64 `json:"DownlinkBps,omitempty" yaml:"downlink_bps,omitempty" structs:",omitempty"`               // 下り方向トラフィック
-	ActiveConnections *float64 `json:"activeConnections,omitempty" yaml:"active_connections,omitempty" structs:",omitempty"`   // アクティブコネクション(プロキシLB)
-	ConnectionsPerSec *float64 `json:"connectionsPerSec,omitempty" yaml:"connections_per_sec,omitempty" structs:",omitempty"`  // 秒間コネクション数
+	CPUTime            *float64 `json:"CPU-TIME,omitempty" yaml:"cpu_timme,omitempty" structs:",omitempty"`                       // CPU時間
+	Write              *float64 `json:",omitempty" yaml:"write,omitempty" structs:",omitempty"`                                   // ディスク書き込み
+	Read               *float64 `json:",omitempty" yaml:"read,omitempty" structs:",omitempty"`                                    // ディスク読み取り
+	Receive            *float64 `json:",omitempty" yaml:"receive,omitempty" structs:",omitempty"`                                 // パケット受信
+	Send               *float64 `json:",omitempty" yaml:"send,omitempty" structs:",omitempty"`                                    // パケット送信
+	In                 *float64 `json:",omitempty" yaml:"in,omitempty" structs:",omitempty"`                                      // パケット受信
+	Out                *float64 `json:",omitempty" yaml:"out,omitempty" structs:",omitempty"`                                     // パケット送信
+	TotalMemorySize    *float64 `json:"Total-Memory-Size,omitempty" yaml:"total_memory_size,omitempty" structs:",omitempty"`      // 総メモリサイズ
+	UsedMemorySize     *float64 `json:"Used-Memory-Size,omitempty" yaml:"used_memory_size,omitempty" structs:",omitempty"`        // 使用済みメモリサイズ
+	TotalDisk1Size     *float64 `json:"Total-Disk1-Size,omitempty" yaml:"total_disk1_size,omitempty" structs:",omitempty"`        // 総ディスクサイズ
+	UsedDisk1Size      *float64 `json:"Used-Disk1-Size,omitempty" yaml:"used_disk1_size,omitempty" structs:",omitempty"`          // 使用済みディスクサイズ
+	TotalDisk2Size     *float64 `json:"Total-Disk2-Size,omitempty" yaml:"total_disk2_size,omitempty" structs:",omitempty"`        // 総ディスクサイズ
+	UsedDisk2Size      *float64 `json:"Used-Disk2-Size,omitempty" yaml:"used_disk2_size,omitempty" structs:",omitempty"`          // 使用済みディスクサイズ
+	BinlogUsedSizeKiB  *float64 `json:"binlogUsedSizeKiB,omitempty" yaml:"binlog_used_size_kib,omitempty" structs:",omitempty"`   // バイナリログのサイズ(レプリケーション有効時のみ、master/slave両方で利用可能)
+	DelayTimeSec       *float64 `json:"delayTimeSec,omitempty" yaml:"delay_time_sec,omitempty" structs:",omitempty"`              // レプリケーション遅延時間(レプリケーション有効時のみ、slave側のみ)
+	FreeDiskSize       *float64 `json:"Free-Disk-Size,omitempty" yaml:"free_disk_size,omitempty" structs:",omitempty"`            // 空きディスクサイズ(NFS)
+	ResponseTimeSec    *float64 `json:"responsetimesec,omitempty" yaml:"response_time_sec,omitempty" structs:",omitempty"`        // レスポンスタイム(シンプル監視)
+	UplinkBPS          *float64 `json:"UplinkBps,omitempty" yaml:"uplink_bps,omitempty" structs:",omitempty"`                     // 上り方向トラフィック
+	DownlinkBPS        *float64 `json:"DownlinkBps,omitempty" yaml:"downlink_bps,omitempty" structs:",omitempty"`                 // 下り方向トラフィック
+	ActiveConnections  *float64 `json:"activeConnections,omitempty" yaml:"active_connections,omitempty" structs:",omitempty"`     // アクティブコネクション(プロキシLB)
+	ConnectionsPerSec  *float64 `json:"connectionsPerSec,omitempty" yaml:"connections_per_sec,omitempty" structs:",omitempty"`    // 秒間コネクション数
+	ReceiveBytesPerSec *float64 `json:"receiveBytesPerSec,omitempty" yaml:"receive_bytes_per_sec,omitempty" structs:",omitempty"` // 秒間受信バイト数
+	SendBytesPerSec    *float64 `json:"sendBytesPerSec,omitempty" yaml:"send_bytes_per_sec,omitempty" structs:",omitempty"`       // 秒間送信バイト数
 }
 
 // UnmarshalJSON JSONアンマーシャル(配列、オブジェクトが混在するためここで対応)
@@ -473,27 +519,29 @@ func (m *rawMonitorValue) UnmarshalJSON(data []byte) error {
 	}
 
 	tmp := &struct {
-		CPUTime           *float64 `json:"CPU-TIME,omitempty" yaml:"cpu_timme,omitempty" structs:",omitempty"`
-		Write             *float64 `json:",omitempty" yaml:"write,omitempty" structs:",omitempty"`
-		Read              *float64 `json:",omitempty" yaml:"read,omitempty" structs:",omitempty"`
-		Receive           *float64 `json:",omitempty" yaml:"receive,omitempty" structs:",omitempty"`
-		Send              *float64 `json:",omitempty" yaml:"send,omitempty" structs:",omitempty"`
-		In                *float64 `json:",omitempty" yaml:"in,omitempty" structs:",omitempty"`
-		Out               *float64 `json:",omitempty" yaml:"out,omitempty" structs:",omitempty"`
-		TotalMemorySize   *float64 `json:"Total-Memory-Size,omitempty" yaml:"total_memory_size,omitempty" structs:",omitempty"`
-		UsedMemorySize    *float64 `json:"Used-Memory-Size,omitempty" yaml:"used_memory_size,omitempty" structs:",omitempty"`
-		TotalDisk1Size    *float64 `json:"Total-Disk1-Size,omitempty" yaml:"total_disk1_size,omitempty" structs:",omitempty"`
-		UsedDisk1Size     *float64 `json:"Used-Disk1-Size,omitempty" yaml:"used_disk1_size,omitempty" structs:",omitempty"`
-		TotalDisk2Size    *float64 `json:"Total-Disk2-Size,omitempty" yaml:"total_disk2_size,omitempty" structs:",omitempty"`
-		UsedDisk2Size     *float64 `json:"Used-Disk2-Size,omitempty" yaml:"used_disk2_size,omitempty" structs:",omitempty"`
-		BinlogUsedSizeKiB *float64 `json:"binlogUsedSizeKiB,omitempty" yaml:"binlog_used_size_kib,omitempty" structs:",omitempty"`
-		DelayTimeSec      *float64 `json:"delayTimeSec,omitempty" yaml:"delay_time_sec,omitempty" structs:",omitempty"`
-		FreeDiskSize      *float64 `json:"Free-Disk-Size,omitempty" yaml:"free_disk_size,omitempty" structs:",omitempty"`
-		ResponseTimeSec   *float64 `json:"responsetimesec,omitempty" yaml:"response_time_sec,omitempty" structs:",omitempty"`
-		UplinkBPS         *float64 `json:"UplinkBps,omitempty" yaml:"uplink_bps,omitempty" structs:",omitempty"`
-		DownlinkBPS       *float64 `json:"DownlinkBps,omitempty" yaml:"downlink_bps,omitempty" structs:",omitempty"`
-		ActiveConnections *float64 `json:"activeConnections,omitempty" yaml:"active_connections,omitempty" structs:",omitempty"`
-		ConnectionsPerSec *float64 `json:"connectionsPerSec,omitempty" yaml:"connections_per_sec,omitempty" structs:",omitempty"`
+		CPUTime            *float64 `json:"CPU-TIME,omitempty" yaml:"cpu_timme,omitempty" structs:",omitempty"`
+		Write              *float64 `json:",omitempty" yaml:"write,omitempty" structs:",omitempty"`
+		Read               *float64 `json:",omitempty" yaml:"read,omitempty" structs:",omitempty"`
+		Receive            *float64 `json:",omitempty" yaml:"receive,omitempty" structs:",omitempty"`
+		Send               *float64 `json:",omitempty" yaml:"send,omitempty" structs:",omitempty"`
+		In                 *float64 `json:",omitempty" yaml:"in,omitempty" structs:",omitempty"`
+		Out                *float64 `json:",omitempty" yaml:"out,omitempty" structs:",omitempty"`
+		TotalMemorySize    *float64 `json:"Total-Memory-Size,omitempty" yaml:"total_memory_size,omitempty" structs:",omitempty"`
+		UsedMemorySize     *float64 `json:"Used-Memory-Size,omitempty" yaml:"used_memory_size,omitempty" structs:",omitempty"`
+		TotalDisk1Size     *float64 `json:"Total-Disk1-Size,omitempty" yaml:"total_disk1_size,omitempty" structs:",omitempty"`
+		UsedDisk1Size      *float64 `json:"Used-Disk1-Size,omitempty" yaml:"used_disk1_size,omitempty" structs:",omitempty"`
+		TotalDisk2Size     *float64 `json:"Total-Disk2-Size,omitempty" yaml:"total_disk2_size,omitempty" structs:",omitempty"`
+		UsedDisk2Size      *float64 `json:"Used-Disk2-Size,omitempty" yaml:"used_disk2_size,omitempty" structs:",omitempty"`
+		BinlogUsedSizeKiB  *float64 `json:"binlogUsedSizeKiB,omitempty" yaml:"binlog_used_size_kib,omitempty" structs:",omitempty"`
+		DelayTimeSec       *float64 `json:"delayTimeSec,omitempty" yaml:"delay_time_sec,omitempty" structs:",omitempty"`
+		FreeDiskSize       *float64 `json:"Free-Disk-Size,omitempty" yaml:"free_disk_size,omitempty" structs:",omitempty"`
+		ResponseTimeSec    *float64 `json:"responsetimesec,omitempty" yaml:"response_time_sec,omitempty" structs:",omitempty"`
+		UplinkBPS          *float64 `json:"UplinkBps,omitempty" yaml:"uplink_bps,omitempty" structs:",omitempty"`
+		DownlinkBPS        *float64 `json:"DownlinkBps,omitempty" yaml:"downlink_bps,omitempty" structs:",omitempty"`
+		ActiveConnections  *float64 `json:"activeConnections,omitempty" yaml:"active_connections,omitempty" structs:",omitempty"`
+		ConnectionsPerSec  *float64 `json:"connectionsPerSec,omitempty" yaml:"connections_per_sec,omitempty" structs:",omitempty"`
+		ReceiveBytesPerSec *float64 `json:"receiveBytesPerSec,omitempty" yaml:"receive_bytes_per_sec,omitempty" structs:",omitempty"`
+		SendBytesPerSec    *float64 `json:"sendBytesPerSec,omitempty" yaml:"send_bytes_per_sec,omitempty" structs:",omitempty"`
 	}{}
 	if err := json.Unmarshal(data, &tmp); err != nil {
 		return err
@@ -520,6 +568,8 @@ func (m *rawMonitorValue) UnmarshalJSON(data []byte) error {
 	m.DownlinkBPS = tmp.DownlinkBPS
 	m.ActiveConnections = tmp.ActiveConnections
 	m.ConnectionsPerSec = tmp.ConnectionsPerSec
+	m.ReceiveBytesPerSec = tmp.ReceiveBytesPerSec
+	m.SendBytesPerSec = tmp.SendBytesPerSec
 
 	return nil
 }
@@ -723,6 +773,28 @@ func (m *rawMonitorValues) monitorConnectionValues() (MonitorConnectionValues, e
 			Time:              time,
 			ActiveConnections: *v.ActiveConnections,
 			ConnectionsPerSec: *v.ConnectionsPerSec,
+		})
+	}
+
+	sort.Slice(values, func(i, j int) bool { return values[i].Time.Before(values[j].Time) })
+	return values, nil
+}
+
+func (m *rawMonitorValues) monitorLocalRouterValues() (MonitorLocalRouterValues, error) {
+	var values MonitorLocalRouterValues
+
+	for k, v := range *m {
+		if v.ReceiveBytesPerSec == nil || v.SendBytesPerSec == nil {
+			continue
+		}
+		time, err := time.Parse(time.RFC3339, k) // RFC3339 ≒ ISO8601
+		if err != nil {
+			return nil, err
+		}
+		values = append(values, &MonitorLocalRouterValue{
+			Time:               time,
+			ReceiveBytesPerSec: *v.ReceiveBytesPerSec,
+			SendBytesPerSec:    *v.SendBytesPerSec,
 		})
 	}
 

@@ -131,7 +131,7 @@ func ConvertFrom(source interface{}, dest interface{}) error {
 			if err != nil {
 				return err
 			}
-			if value == nil {
+			if value == nil || reflect.ValueOf(value).IsZero() {
 				continue
 			}
 

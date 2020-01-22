@@ -666,6 +666,34 @@ func putLoadBalancer(zone string, value *sacloud.LoadBalancer) {
 	ds().Put(ResourceLoadBalancer, zone, 0, value)
 }
 
+func getLocalRouter(zone string) []*sacloud.LocalRouter {
+	values := ds().List(ResourceLocalRouter, zone)
+	var ret []*sacloud.LocalRouter
+	for _, v := range values {
+		if v, ok := v.(*sacloud.LocalRouter); ok {
+			ret = append(ret, v)
+		}
+	}
+	return ret
+}
+
+func getLocalRouterByID(zone string, id types.ID) *sacloud.LocalRouter {
+	v := ds().Get(ResourceLocalRouter, zone, id)
+	if v, ok := v.(*sacloud.LocalRouter); ok {
+		return v
+	}
+	return nil
+}
+
+func putLocalRouter(zone string, value *sacloud.LocalRouter) {
+	var v interface{} = value
+	if id, ok := v.(accessor.ID); ok {
+		ds().Put(ResourceLocalRouter, zone, id.GetID(), value)
+		return
+	}
+	ds().Put(ResourceLocalRouter, zone, 0, value)
+}
+
 func getMobileGateway(zone string) []*sacloud.MobileGateway {
 	values := ds().List(ResourceMobileGateway, zone)
 	var ret []*sacloud.MobileGateway

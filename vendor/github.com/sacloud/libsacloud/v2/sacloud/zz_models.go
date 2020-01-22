@@ -12551,6 +12551,1017 @@ func (o *LoadBalancerServerStatus) SetCPS(v types.StringNumber) {
 }
 
 /*************************************************
+* LocalRouter
+*************************************************/
+
+// LocalRouter represents API parameter/response structure
+type LocalRouter struct {
+	ID           types.ID
+	Name         string `validate:"required"`
+	Description  string `validate:"min=0,max=512"`
+	Tags         types.Tags
+	Availability types.EAvailability
+	IconID       types.ID `mapconv:"Icon.ID"`
+	CreatedAt    time.Time
+	ModifiedAt   time.Time
+	Switch       *LocalRouterSwitch        `mapconv:"Settings.LocalRouter.Switch,recursive"`
+	Interface    *LocalRouterInterface     `mapconv:"Settings.LocalRouter.Interface,recursive"`
+	Peers        []*LocalRouterPeer        `mapconv:"Settings.LocalRouter.[]Peers,recursive"`
+	StaticRoutes []*LocalRouterStaticRoute `mapconv:"Settings.LocalRouter.[]StaticRoutes,recursive"`
+	SettingsHash string                    `json:",omitempty" mapconv:",omitempty"`
+	SecretKeys   []string                  `mapconv:"Status.SecretKeys"`
+}
+
+// Validate validates by field tags
+func (o *LocalRouter) Validate() error {
+	return validator.New().Struct(o)
+}
+
+// setDefaults implements sacloud.argumentDefaulter
+func (o *LocalRouter) setDefaults() interface{} {
+	return &struct {
+		ID           types.ID
+		Name         string `validate:"required"`
+		Description  string `validate:"min=0,max=512"`
+		Tags         types.Tags
+		Availability types.EAvailability
+		IconID       types.ID `mapconv:"Icon.ID"`
+		CreatedAt    time.Time
+		ModifiedAt   time.Time
+		Switch       *LocalRouterSwitch        `mapconv:"Settings.LocalRouter.Switch,recursive"`
+		Interface    *LocalRouterInterface     `mapconv:"Settings.LocalRouter.Interface,recursive"`
+		Peers        []*LocalRouterPeer        `mapconv:"Settings.LocalRouter.[]Peers,recursive"`
+		StaticRoutes []*LocalRouterStaticRoute `mapconv:"Settings.LocalRouter.[]StaticRoutes,recursive"`
+		SettingsHash string                    `json:",omitempty" mapconv:",omitempty"`
+		SecretKeys   []string                  `mapconv:"Status.SecretKeys"`
+	}{
+		ID:           o.GetID(),
+		Name:         o.GetName(),
+		Description:  o.GetDescription(),
+		Tags:         o.GetTags(),
+		Availability: o.GetAvailability(),
+		IconID:       o.GetIconID(),
+		CreatedAt:    o.GetCreatedAt(),
+		ModifiedAt:   o.GetModifiedAt(),
+		Switch:       o.GetSwitch(),
+		Interface:    o.GetInterface(),
+		Peers:        o.GetPeers(),
+		StaticRoutes: o.GetStaticRoutes(),
+		SettingsHash: o.GetSettingsHash(),
+		SecretKeys:   o.GetSecretKeys(),
+	}
+}
+
+// GetID returns value of ID
+func (o *LocalRouter) GetID() types.ID {
+	return o.ID
+}
+
+// SetID sets value to ID
+func (o *LocalRouter) SetID(v types.ID) {
+	o.ID = v
+}
+
+// SetStringID .
+func (o *LocalRouter) SetStringID(id string) {
+	accessor.SetStringID(o, id)
+}
+
+// GetStringID .
+func (o *LocalRouter) GetStringID() string {
+	return accessor.GetStringID(o)
+}
+
+// SetInt64ID .
+func (o *LocalRouter) SetInt64ID(id int64) {
+	accessor.SetInt64ID(o, id)
+}
+
+// GetInt64ID .
+func (o *LocalRouter) GetInt64ID() int64 {
+	return accessor.GetInt64ID(o)
+}
+
+// GetName returns value of Name
+func (o *LocalRouter) GetName() string {
+	return o.Name
+}
+
+// SetName sets value to Name
+func (o *LocalRouter) SetName(v string) {
+	o.Name = v
+}
+
+// GetDescription returns value of Description
+func (o *LocalRouter) GetDescription() string {
+	return o.Description
+}
+
+// SetDescription sets value to Description
+func (o *LocalRouter) SetDescription(v string) {
+	o.Description = v
+}
+
+// GetTags returns value of Tags
+func (o *LocalRouter) GetTags() types.Tags {
+	return o.Tags
+}
+
+// SetTags sets value to Tags
+func (o *LocalRouter) SetTags(v types.Tags) {
+	o.Tags = v
+}
+
+// HasTag 指定のタグが存在する場合trueを返す
+func (o *LocalRouter) HasTag(tag string) bool {
+	return accessor.HasTag(o, tag)
+}
+
+// AppendTag 指定のタグを追加
+func (o *LocalRouter) AppendTag(tag string) {
+	accessor.AppendTag(o, tag)
+}
+
+// RemoveTag 指定のタグを削除
+func (o *LocalRouter) RemoveTag(tag string) {
+	accessor.RemoveTag(o, tag)
+}
+
+// ClearTags タグを全クリア
+func (o *LocalRouter) ClearTags() {
+	accessor.ClearTags(o)
+}
+
+// GetAvailability returns value of Availability
+func (o *LocalRouter) GetAvailability() types.EAvailability {
+	return o.Availability
+}
+
+// SetAvailability sets value to Availability
+func (o *LocalRouter) SetAvailability(v types.EAvailability) {
+	o.Availability = v
+}
+
+// GetIconID returns value of IconID
+func (o *LocalRouter) GetIconID() types.ID {
+	return o.IconID
+}
+
+// SetIconID sets value to IconID
+func (o *LocalRouter) SetIconID(v types.ID) {
+	o.IconID = v
+}
+
+// GetCreatedAt returns value of CreatedAt
+func (o *LocalRouter) GetCreatedAt() time.Time {
+	return o.CreatedAt
+}
+
+// SetCreatedAt sets value to CreatedAt
+func (o *LocalRouter) SetCreatedAt(v time.Time) {
+	o.CreatedAt = v
+}
+
+// GetModifiedAt returns value of ModifiedAt
+func (o *LocalRouter) GetModifiedAt() time.Time {
+	return o.ModifiedAt
+}
+
+// SetModifiedAt sets value to ModifiedAt
+func (o *LocalRouter) SetModifiedAt(v time.Time) {
+	o.ModifiedAt = v
+}
+
+// GetSwitch returns value of Switch
+func (o *LocalRouter) GetSwitch() *LocalRouterSwitch {
+	return o.Switch
+}
+
+// SetSwitch sets value to Switch
+func (o *LocalRouter) SetSwitch(v *LocalRouterSwitch) {
+	o.Switch = v
+}
+
+// GetInterface returns value of Interface
+func (o *LocalRouter) GetInterface() *LocalRouterInterface {
+	return o.Interface
+}
+
+// SetInterface sets value to Interface
+func (o *LocalRouter) SetInterface(v *LocalRouterInterface) {
+	o.Interface = v
+}
+
+// GetPeers returns value of Peers
+func (o *LocalRouter) GetPeers() []*LocalRouterPeer {
+	return o.Peers
+}
+
+// SetPeers sets value to Peers
+func (o *LocalRouter) SetPeers(v []*LocalRouterPeer) {
+	o.Peers = v
+}
+
+// GetStaticRoutes returns value of StaticRoutes
+func (o *LocalRouter) GetStaticRoutes() []*LocalRouterStaticRoute {
+	return o.StaticRoutes
+}
+
+// SetStaticRoutes sets value to StaticRoutes
+func (o *LocalRouter) SetStaticRoutes(v []*LocalRouterStaticRoute) {
+	o.StaticRoutes = v
+}
+
+// GetSettingsHash returns value of SettingsHash
+func (o *LocalRouter) GetSettingsHash() string {
+	return o.SettingsHash
+}
+
+// SetSettingsHash sets value to SettingsHash
+func (o *LocalRouter) SetSettingsHash(v string) {
+	o.SettingsHash = v
+}
+
+// GetSecretKeys returns value of SecretKeys
+func (o *LocalRouter) GetSecretKeys() []string {
+	return o.SecretKeys
+}
+
+// SetSecretKeys sets value to SecretKeys
+func (o *LocalRouter) SetSecretKeys(v []string) {
+	o.SecretKeys = v
+}
+
+/*************************************************
+* LocalRouterSwitch
+*************************************************/
+
+// LocalRouterSwitch represents API parameter/response structure
+type LocalRouterSwitch struct {
+	Code     string
+	Category string
+	ZoneID   string
+}
+
+// Validate validates by field tags
+func (o *LocalRouterSwitch) Validate() error {
+	return validator.New().Struct(o)
+}
+
+// setDefaults implements sacloud.argumentDefaulter
+func (o *LocalRouterSwitch) setDefaults() interface{} {
+	return &struct {
+		Code     string
+		Category string
+		ZoneID   string
+	}{
+		Code:     o.GetCode(),
+		Category: o.GetCategory(),
+		ZoneID:   o.GetZoneID(),
+	}
+}
+
+// GetCode returns value of Code
+func (o *LocalRouterSwitch) GetCode() string {
+	return o.Code
+}
+
+// SetCode sets value to Code
+func (o *LocalRouterSwitch) SetCode(v string) {
+	o.Code = v
+}
+
+// GetCategory returns value of Category
+func (o *LocalRouterSwitch) GetCategory() string {
+	return o.Category
+}
+
+// SetCategory sets value to Category
+func (o *LocalRouterSwitch) SetCategory(v string) {
+	o.Category = v
+}
+
+// GetZoneID returns value of ZoneID
+func (o *LocalRouterSwitch) GetZoneID() string {
+	return o.ZoneID
+}
+
+// SetZoneID sets value to ZoneID
+func (o *LocalRouterSwitch) SetZoneID(v string) {
+	o.ZoneID = v
+}
+
+/*************************************************
+* LocalRouterInterface
+*************************************************/
+
+// LocalRouterInterface represents API parameter/response structure
+type LocalRouterInterface struct {
+	VirtualIPAddress string
+	IPAddress        []string
+	NetworkMaskLen   int
+	VRID             int
+}
+
+// Validate validates by field tags
+func (o *LocalRouterInterface) Validate() error {
+	return validator.New().Struct(o)
+}
+
+// setDefaults implements sacloud.argumentDefaulter
+func (o *LocalRouterInterface) setDefaults() interface{} {
+	return &struct {
+		VirtualIPAddress string
+		IPAddress        []string
+		NetworkMaskLen   int
+		VRID             int
+	}{
+		VirtualIPAddress: o.GetVirtualIPAddress(),
+		IPAddress:        o.GetIPAddress(),
+		NetworkMaskLen:   o.GetNetworkMaskLen(),
+		VRID:             o.GetVRID(),
+	}
+}
+
+// GetVirtualIPAddress returns value of VirtualIPAddress
+func (o *LocalRouterInterface) GetVirtualIPAddress() string {
+	return o.VirtualIPAddress
+}
+
+// SetVirtualIPAddress sets value to VirtualIPAddress
+func (o *LocalRouterInterface) SetVirtualIPAddress(v string) {
+	o.VirtualIPAddress = v
+}
+
+// GetIPAddress returns value of IPAddress
+func (o *LocalRouterInterface) GetIPAddress() []string {
+	return o.IPAddress
+}
+
+// SetIPAddress sets value to IPAddress
+func (o *LocalRouterInterface) SetIPAddress(v []string) {
+	o.IPAddress = v
+}
+
+// GetNetworkMaskLen returns value of NetworkMaskLen
+func (o *LocalRouterInterface) GetNetworkMaskLen() int {
+	return o.NetworkMaskLen
+}
+
+// SetNetworkMaskLen sets value to NetworkMaskLen
+func (o *LocalRouterInterface) SetNetworkMaskLen(v int) {
+	o.NetworkMaskLen = v
+}
+
+// GetVRID returns value of VRID
+func (o *LocalRouterInterface) GetVRID() int {
+	return o.VRID
+}
+
+// SetVRID sets value to VRID
+func (o *LocalRouterInterface) SetVRID(v int) {
+	o.VRID = v
+}
+
+/*************************************************
+* LocalRouterPeer
+*************************************************/
+
+// LocalRouterPeer represents API parameter/response structure
+type LocalRouterPeer struct {
+	ID          types.ID
+	SecretKey   string
+	Enabled     bool
+	Description string
+}
+
+// Validate validates by field tags
+func (o *LocalRouterPeer) Validate() error {
+	return validator.New().Struct(o)
+}
+
+// setDefaults implements sacloud.argumentDefaulter
+func (o *LocalRouterPeer) setDefaults() interface{} {
+	return &struct {
+		ID          types.ID
+		SecretKey   string
+		Enabled     bool
+		Description string
+	}{
+		ID:          o.GetID(),
+		SecretKey:   o.GetSecretKey(),
+		Enabled:     o.GetEnabled(),
+		Description: o.GetDescription(),
+	}
+}
+
+// GetID returns value of ID
+func (o *LocalRouterPeer) GetID() types.ID {
+	return o.ID
+}
+
+// SetID sets value to ID
+func (o *LocalRouterPeer) SetID(v types.ID) {
+	o.ID = v
+}
+
+// GetSecretKey returns value of SecretKey
+func (o *LocalRouterPeer) GetSecretKey() string {
+	return o.SecretKey
+}
+
+// SetSecretKey sets value to SecretKey
+func (o *LocalRouterPeer) SetSecretKey(v string) {
+	o.SecretKey = v
+}
+
+// GetEnabled returns value of Enabled
+func (o *LocalRouterPeer) GetEnabled() bool {
+	return o.Enabled
+}
+
+// SetEnabled sets value to Enabled
+func (o *LocalRouterPeer) SetEnabled(v bool) {
+	o.Enabled = v
+}
+
+// GetDescription returns value of Description
+func (o *LocalRouterPeer) GetDescription() string {
+	return o.Description
+}
+
+// SetDescription sets value to Description
+func (o *LocalRouterPeer) SetDescription(v string) {
+	o.Description = v
+}
+
+/*************************************************
+* LocalRouterStaticRoute
+*************************************************/
+
+// LocalRouterStaticRoute represents API parameter/response structure
+type LocalRouterStaticRoute struct {
+	Prefix  string
+	NextHop string
+}
+
+// Validate validates by field tags
+func (o *LocalRouterStaticRoute) Validate() error {
+	return validator.New().Struct(o)
+}
+
+// setDefaults implements sacloud.argumentDefaulter
+func (o *LocalRouterStaticRoute) setDefaults() interface{} {
+	return &struct {
+		Prefix  string
+		NextHop string
+	}{
+		Prefix:  o.GetPrefix(),
+		NextHop: o.GetNextHop(),
+	}
+}
+
+// GetPrefix returns value of Prefix
+func (o *LocalRouterStaticRoute) GetPrefix() string {
+	return o.Prefix
+}
+
+// SetPrefix sets value to Prefix
+func (o *LocalRouterStaticRoute) SetPrefix(v string) {
+	o.Prefix = v
+}
+
+// GetNextHop returns value of NextHop
+func (o *LocalRouterStaticRoute) GetNextHop() string {
+	return o.NextHop
+}
+
+// SetNextHop sets value to NextHop
+func (o *LocalRouterStaticRoute) SetNextHop(v string) {
+	o.NextHop = v
+}
+
+/*************************************************
+* LocalRouterCreateRequest
+*************************************************/
+
+// LocalRouterCreateRequest represents API parameter/response structure
+type LocalRouterCreateRequest struct {
+	Name        string `validate:"required"`
+	Description string `validate:"min=0,max=512"`
+	Tags        types.Tags
+	IconID      types.ID `mapconv:"Icon.ID"`
+}
+
+// Validate validates by field tags
+func (o *LocalRouterCreateRequest) Validate() error {
+	return validator.New().Struct(o)
+}
+
+// setDefaults implements sacloud.argumentDefaulter
+func (o *LocalRouterCreateRequest) setDefaults() interface{} {
+	return &struct {
+		Name        string `validate:"required"`
+		Description string `validate:"min=0,max=512"`
+		Tags        types.Tags
+		IconID      types.ID `mapconv:"Icon.ID"`
+		Class       string   `mapconv:"Provider.Class"`
+	}{
+		Name:        o.GetName(),
+		Description: o.GetDescription(),
+		Tags:        o.GetTags(),
+		IconID:      o.GetIconID(),
+		Class:       "localrouter",
+	}
+}
+
+// GetName returns value of Name
+func (o *LocalRouterCreateRequest) GetName() string {
+	return o.Name
+}
+
+// SetName sets value to Name
+func (o *LocalRouterCreateRequest) SetName(v string) {
+	o.Name = v
+}
+
+// GetDescription returns value of Description
+func (o *LocalRouterCreateRequest) GetDescription() string {
+	return o.Description
+}
+
+// SetDescription sets value to Description
+func (o *LocalRouterCreateRequest) SetDescription(v string) {
+	o.Description = v
+}
+
+// GetTags returns value of Tags
+func (o *LocalRouterCreateRequest) GetTags() types.Tags {
+	return o.Tags
+}
+
+// SetTags sets value to Tags
+func (o *LocalRouterCreateRequest) SetTags(v types.Tags) {
+	o.Tags = v
+}
+
+// HasTag 指定のタグが存在する場合trueを返す
+func (o *LocalRouterCreateRequest) HasTag(tag string) bool {
+	return accessor.HasTag(o, tag)
+}
+
+// AppendTag 指定のタグを追加
+func (o *LocalRouterCreateRequest) AppendTag(tag string) {
+	accessor.AppendTag(o, tag)
+}
+
+// RemoveTag 指定のタグを削除
+func (o *LocalRouterCreateRequest) RemoveTag(tag string) {
+	accessor.RemoveTag(o, tag)
+}
+
+// ClearTags タグを全クリア
+func (o *LocalRouterCreateRequest) ClearTags() {
+	accessor.ClearTags(o)
+}
+
+// GetIconID returns value of IconID
+func (o *LocalRouterCreateRequest) GetIconID() types.ID {
+	return o.IconID
+}
+
+// SetIconID sets value to IconID
+func (o *LocalRouterCreateRequest) SetIconID(v types.ID) {
+	o.IconID = v
+}
+
+/*************************************************
+* LocalRouterUpdateRequest
+*************************************************/
+
+// LocalRouterUpdateRequest represents API parameter/response structure
+type LocalRouterUpdateRequest struct {
+	Switch       *LocalRouterSwitch        `mapconv:"Settings.LocalRouter.Switch,recursive"`
+	Interface    *LocalRouterInterface     `mapconv:"Settings.LocalRouter.Interface,recursive"`
+	Peers        []*LocalRouterPeer        `mapconv:"Settings.LocalRouter.[]Peers,recursive"`
+	StaticRoutes []*LocalRouterStaticRoute `mapconv:"Settings.LocalRouter.[]StaticRoutes,recursive"`
+	SettingsHash string                    `json:",omitempty" mapconv:",omitempty"`
+	Name         string                    `validate:"required"`
+	Description  string                    `validate:"min=0,max=512"`
+	Tags         types.Tags
+	IconID       types.ID `mapconv:"Icon.ID"`
+}
+
+// Validate validates by field tags
+func (o *LocalRouterUpdateRequest) Validate() error {
+	return validator.New().Struct(o)
+}
+
+// setDefaults implements sacloud.argumentDefaulter
+func (o *LocalRouterUpdateRequest) setDefaults() interface{} {
+	return &struct {
+		Switch       *LocalRouterSwitch        `mapconv:"Settings.LocalRouter.Switch,recursive"`
+		Interface    *LocalRouterInterface     `mapconv:"Settings.LocalRouter.Interface,recursive"`
+		Peers        []*LocalRouterPeer        `mapconv:"Settings.LocalRouter.[]Peers,recursive"`
+		StaticRoutes []*LocalRouterStaticRoute `mapconv:"Settings.LocalRouter.[]StaticRoutes,recursive"`
+		SettingsHash string                    `json:",omitempty" mapconv:",omitempty"`
+		Name         string                    `validate:"required"`
+		Description  string                    `validate:"min=0,max=512"`
+		Tags         types.Tags
+		IconID       types.ID `mapconv:"Icon.ID"`
+	}{
+		Switch:       o.GetSwitch(),
+		Interface:    o.GetInterface(),
+		Peers:        o.GetPeers(),
+		StaticRoutes: o.GetStaticRoutes(),
+		SettingsHash: o.GetSettingsHash(),
+		Name:         o.GetName(),
+		Description:  o.GetDescription(),
+		Tags:         o.GetTags(),
+		IconID:       o.GetIconID(),
+	}
+}
+
+// GetSwitch returns value of Switch
+func (o *LocalRouterUpdateRequest) GetSwitch() *LocalRouterSwitch {
+	return o.Switch
+}
+
+// SetSwitch sets value to Switch
+func (o *LocalRouterUpdateRequest) SetSwitch(v *LocalRouterSwitch) {
+	o.Switch = v
+}
+
+// GetInterface returns value of Interface
+func (o *LocalRouterUpdateRequest) GetInterface() *LocalRouterInterface {
+	return o.Interface
+}
+
+// SetInterface sets value to Interface
+func (o *LocalRouterUpdateRequest) SetInterface(v *LocalRouterInterface) {
+	o.Interface = v
+}
+
+// GetPeers returns value of Peers
+func (o *LocalRouterUpdateRequest) GetPeers() []*LocalRouterPeer {
+	return o.Peers
+}
+
+// SetPeers sets value to Peers
+func (o *LocalRouterUpdateRequest) SetPeers(v []*LocalRouterPeer) {
+	o.Peers = v
+}
+
+// GetStaticRoutes returns value of StaticRoutes
+func (o *LocalRouterUpdateRequest) GetStaticRoutes() []*LocalRouterStaticRoute {
+	return o.StaticRoutes
+}
+
+// SetStaticRoutes sets value to StaticRoutes
+func (o *LocalRouterUpdateRequest) SetStaticRoutes(v []*LocalRouterStaticRoute) {
+	o.StaticRoutes = v
+}
+
+// GetSettingsHash returns value of SettingsHash
+func (o *LocalRouterUpdateRequest) GetSettingsHash() string {
+	return o.SettingsHash
+}
+
+// SetSettingsHash sets value to SettingsHash
+func (o *LocalRouterUpdateRequest) SetSettingsHash(v string) {
+	o.SettingsHash = v
+}
+
+// GetName returns value of Name
+func (o *LocalRouterUpdateRequest) GetName() string {
+	return o.Name
+}
+
+// SetName sets value to Name
+func (o *LocalRouterUpdateRequest) SetName(v string) {
+	o.Name = v
+}
+
+// GetDescription returns value of Description
+func (o *LocalRouterUpdateRequest) GetDescription() string {
+	return o.Description
+}
+
+// SetDescription sets value to Description
+func (o *LocalRouterUpdateRequest) SetDescription(v string) {
+	o.Description = v
+}
+
+// GetTags returns value of Tags
+func (o *LocalRouterUpdateRequest) GetTags() types.Tags {
+	return o.Tags
+}
+
+// SetTags sets value to Tags
+func (o *LocalRouterUpdateRequest) SetTags(v types.Tags) {
+	o.Tags = v
+}
+
+// HasTag 指定のタグが存在する場合trueを返す
+func (o *LocalRouterUpdateRequest) HasTag(tag string) bool {
+	return accessor.HasTag(o, tag)
+}
+
+// AppendTag 指定のタグを追加
+func (o *LocalRouterUpdateRequest) AppendTag(tag string) {
+	accessor.AppendTag(o, tag)
+}
+
+// RemoveTag 指定のタグを削除
+func (o *LocalRouterUpdateRequest) RemoveTag(tag string) {
+	accessor.RemoveTag(o, tag)
+}
+
+// ClearTags タグを全クリア
+func (o *LocalRouterUpdateRequest) ClearTags() {
+	accessor.ClearTags(o)
+}
+
+// GetIconID returns value of IconID
+func (o *LocalRouterUpdateRequest) GetIconID() types.ID {
+	return o.IconID
+}
+
+// SetIconID sets value to IconID
+func (o *LocalRouterUpdateRequest) SetIconID(v types.ID) {
+	o.IconID = v
+}
+
+/*************************************************
+* LocalRouterUpdateSettingsRequest
+*************************************************/
+
+// LocalRouterUpdateSettingsRequest represents API parameter/response structure
+type LocalRouterUpdateSettingsRequest struct {
+	Switch       *LocalRouterSwitch        `mapconv:"Settings.LocalRouter.Switch,recursive"`
+	Interface    *LocalRouterInterface     `mapconv:"Settings.LocalRouter.Interface,recursive"`
+	Peers        []*LocalRouterPeer        `mapconv:"Settings.LocalRouter.[]Peers,recursive"`
+	StaticRoutes []*LocalRouterStaticRoute `mapconv:"Settings.LocalRouter.[]StaticRoutes,recursive"`
+	SettingsHash string                    `json:",omitempty" mapconv:",omitempty"`
+}
+
+// Validate validates by field tags
+func (o *LocalRouterUpdateSettingsRequest) Validate() error {
+	return validator.New().Struct(o)
+}
+
+// setDefaults implements sacloud.argumentDefaulter
+func (o *LocalRouterUpdateSettingsRequest) setDefaults() interface{} {
+	return &struct {
+		Switch       *LocalRouterSwitch        `mapconv:"Settings.LocalRouter.Switch,recursive"`
+		Interface    *LocalRouterInterface     `mapconv:"Settings.LocalRouter.Interface,recursive"`
+		Peers        []*LocalRouterPeer        `mapconv:"Settings.LocalRouter.[]Peers,recursive"`
+		StaticRoutes []*LocalRouterStaticRoute `mapconv:"Settings.LocalRouter.[]StaticRoutes,recursive"`
+		SettingsHash string                    `json:",omitempty" mapconv:",omitempty"`
+	}{
+		Switch:       o.GetSwitch(),
+		Interface:    o.GetInterface(),
+		Peers:        o.GetPeers(),
+		StaticRoutes: o.GetStaticRoutes(),
+		SettingsHash: o.GetSettingsHash(),
+	}
+}
+
+// GetSwitch returns value of Switch
+func (o *LocalRouterUpdateSettingsRequest) GetSwitch() *LocalRouterSwitch {
+	return o.Switch
+}
+
+// SetSwitch sets value to Switch
+func (o *LocalRouterUpdateSettingsRequest) SetSwitch(v *LocalRouterSwitch) {
+	o.Switch = v
+}
+
+// GetInterface returns value of Interface
+func (o *LocalRouterUpdateSettingsRequest) GetInterface() *LocalRouterInterface {
+	return o.Interface
+}
+
+// SetInterface sets value to Interface
+func (o *LocalRouterUpdateSettingsRequest) SetInterface(v *LocalRouterInterface) {
+	o.Interface = v
+}
+
+// GetPeers returns value of Peers
+func (o *LocalRouterUpdateSettingsRequest) GetPeers() []*LocalRouterPeer {
+	return o.Peers
+}
+
+// SetPeers sets value to Peers
+func (o *LocalRouterUpdateSettingsRequest) SetPeers(v []*LocalRouterPeer) {
+	o.Peers = v
+}
+
+// GetStaticRoutes returns value of StaticRoutes
+func (o *LocalRouterUpdateSettingsRequest) GetStaticRoutes() []*LocalRouterStaticRoute {
+	return o.StaticRoutes
+}
+
+// SetStaticRoutes sets value to StaticRoutes
+func (o *LocalRouterUpdateSettingsRequest) SetStaticRoutes(v []*LocalRouterStaticRoute) {
+	o.StaticRoutes = v
+}
+
+// GetSettingsHash returns value of SettingsHash
+func (o *LocalRouterUpdateSettingsRequest) GetSettingsHash() string {
+	return o.SettingsHash
+}
+
+// SetSettingsHash sets value to SettingsHash
+func (o *LocalRouterUpdateSettingsRequest) SetSettingsHash(v string) {
+	o.SettingsHash = v
+}
+
+/*************************************************
+* LocalRouterHealth
+*************************************************/
+
+// LocalRouterHealth represents API parameter/response structure
+type LocalRouterHealth struct {
+	Peers []*LocalRouterHealthPeer `mapconv:"LocalRouter.[]Peers,recursive"`
+}
+
+// Validate validates by field tags
+func (o *LocalRouterHealth) Validate() error {
+	return validator.New().Struct(o)
+}
+
+// setDefaults implements sacloud.argumentDefaulter
+func (o *LocalRouterHealth) setDefaults() interface{} {
+	return &struct {
+		Peers []*LocalRouterHealthPeer `mapconv:"LocalRouter.[]Peers,recursive"`
+	}{
+		Peers: o.GetPeers(),
+	}
+}
+
+// GetPeers returns value of Peers
+func (o *LocalRouterHealth) GetPeers() []*LocalRouterHealthPeer {
+	return o.Peers
+}
+
+// SetPeers sets value to Peers
+func (o *LocalRouterHealth) SetPeers(v []*LocalRouterHealthPeer) {
+	o.Peers = v
+}
+
+/*************************************************
+* LocalRouterHealthPeer
+*************************************************/
+
+// LocalRouterHealthPeer represents API parameter/response structure
+type LocalRouterHealthPeer struct {
+	ID     types.ID
+	Status types.EServerInstanceStatus
+	Routes []string
+}
+
+// Validate validates by field tags
+func (o *LocalRouterHealthPeer) Validate() error {
+	return validator.New().Struct(o)
+}
+
+// setDefaults implements sacloud.argumentDefaulter
+func (o *LocalRouterHealthPeer) setDefaults() interface{} {
+	return &struct {
+		ID     types.ID
+		Status types.EServerInstanceStatus
+		Routes []string
+	}{
+		ID:     o.GetID(),
+		Status: o.GetStatus(),
+		Routes: o.GetRoutes(),
+	}
+}
+
+// GetID returns value of ID
+func (o *LocalRouterHealthPeer) GetID() types.ID {
+	return o.ID
+}
+
+// SetID sets value to ID
+func (o *LocalRouterHealthPeer) SetID(v types.ID) {
+	o.ID = v
+}
+
+// GetStatus returns value of Status
+func (o *LocalRouterHealthPeer) GetStatus() types.EServerInstanceStatus {
+	return o.Status
+}
+
+// SetStatus sets value to Status
+func (o *LocalRouterHealthPeer) SetStatus(v types.EServerInstanceStatus) {
+	o.Status = v
+}
+
+// GetRoutes returns value of Routes
+func (o *LocalRouterHealthPeer) GetRoutes() []string {
+	return o.Routes
+}
+
+// SetRoutes sets value to Routes
+func (o *LocalRouterHealthPeer) SetRoutes(v []string) {
+	o.Routes = v
+}
+
+/*************************************************
+* LocalRouterActivity
+*************************************************/
+
+// LocalRouterActivity represents API parameter/response structure
+type LocalRouterActivity struct {
+	Values []*MonitorLocalRouterValue `mapconv:"[]LocalRouter"`
+}
+
+// Validate validates by field tags
+func (o *LocalRouterActivity) Validate() error {
+	return validator.New().Struct(o)
+}
+
+// setDefaults implements sacloud.argumentDefaulter
+func (o *LocalRouterActivity) setDefaults() interface{} {
+	return &struct {
+		Values []*MonitorLocalRouterValue `mapconv:"[]LocalRouter"`
+	}{
+		Values: o.GetValues(),
+	}
+}
+
+// GetValues returns value of Values
+func (o *LocalRouterActivity) GetValues() []*MonitorLocalRouterValue {
+	return o.Values
+}
+
+// SetValues sets value to Values
+func (o *LocalRouterActivity) SetValues(v []*MonitorLocalRouterValue) {
+	o.Values = v
+}
+
+/*************************************************
+* MonitorLocalRouterValue
+*************************************************/
+
+// MonitorLocalRouterValue represents API parameter/response structure
+type MonitorLocalRouterValue struct {
+	Time               time.Time `json:",omitempty" mapconv:",omitempty"`
+	ReceiveBytesPerSec float64   `json:",omitempty" mapconv:",omitempty"`
+	SendBytesPerSec    float64   `json:",omitempty" mapconv:",omitempty"`
+}
+
+// Validate validates by field tags
+func (o *MonitorLocalRouterValue) Validate() error {
+	return validator.New().Struct(o)
+}
+
+// setDefaults implements sacloud.argumentDefaulter
+func (o *MonitorLocalRouterValue) setDefaults() interface{} {
+	return &struct {
+		Time               time.Time `json:",omitempty" mapconv:",omitempty"`
+		ReceiveBytesPerSec float64   `json:",omitempty" mapconv:",omitempty"`
+		SendBytesPerSec    float64   `json:",omitempty" mapconv:",omitempty"`
+	}{
+		Time:               o.GetTime(),
+		ReceiveBytesPerSec: o.GetReceiveBytesPerSec(),
+		SendBytesPerSec:    o.GetSendBytesPerSec(),
+	}
+}
+
+// GetTime returns value of Time
+func (o *MonitorLocalRouterValue) GetTime() time.Time {
+	return o.Time
+}
+
+// SetTime sets value to Time
+func (o *MonitorLocalRouterValue) SetTime(v time.Time) {
+	o.Time = v
+}
+
+// GetReceiveBytesPerSec returns value of ReceiveBytesPerSec
+func (o *MonitorLocalRouterValue) GetReceiveBytesPerSec() float64 {
+	return o.ReceiveBytesPerSec
+}
+
+// SetReceiveBytesPerSec sets value to ReceiveBytesPerSec
+func (o *MonitorLocalRouterValue) SetReceiveBytesPerSec(v float64) {
+	o.ReceiveBytesPerSec = v
+}
+
+// GetSendBytesPerSec returns value of SendBytesPerSec
+func (o *MonitorLocalRouterValue) GetSendBytesPerSec() float64 {
+	return o.SendBytesPerSec
+}
+
+// SetSendBytesPerSec sets value to SendBytesPerSec
+func (o *MonitorLocalRouterValue) SetSendBytesPerSec(v float64) {
+	o.SendBytesPerSec = v
+}
+
+/*************************************************
 * MobileGateway
 *************************************************/
 
@@ -22911,19 +23922,20 @@ func (o *SubnetIPAddress) SetIPAddress(v string) {
 
 // Switch represents API parameter/response structure
 type Switch struct {
-	ID             types.ID
-	Name           string `validate:"required"`
-	Description    string `validate:"min=0,max=512"`
-	Tags           types.Tags
-	IconID         types.ID `mapconv:"Icon.ID"`
-	CreatedAt      time.Time
-	ModifiedAt     time.Time
-	Scope          types.EScope
-	ServerCount    int
-	NetworkMaskLen int             `mapconv:"UserSubnet.NetworkMaskLen" validate:"min=1,max=32"`
-	DefaultRoute   string          `mapconv:"UserSubnet.DefaultRoute" validate:"ipv4"`
-	Subnets        []*SwitchSubnet `json:",omitempty" mapconv:"[]Subnets,omitempty,recursive"`
-	BridgeID       types.ID        `mapconv:"Bridge.ID,omitempty"`
+	ID                 types.ID
+	Name               string `validate:"required"`
+	Description        string `validate:"min=0,max=512"`
+	Tags               types.Tags
+	IconID             types.ID `mapconv:"Icon.ID"`
+	CreatedAt          time.Time
+	ModifiedAt         time.Time
+	Scope              types.EScope
+	ServerCount        int
+	NetworkMaskLen     int             `mapconv:"UserSubnet.NetworkMaskLen" validate:"min=1,max=32"`
+	DefaultRoute       string          `mapconv:"UserSubnet.DefaultRoute" validate:"ipv4"`
+	Subnets            []*SwitchSubnet `json:",omitempty" mapconv:"[]Subnets,omitempty,recursive"`
+	BridgeID           types.ID        `mapconv:"Bridge.ID,omitempty"`
+	HybridConnectionID types.ID        `mapconv:"HybridConnection.ID,omitempty"`
 }
 
 // Validate validates by field tags
@@ -22934,33 +23946,35 @@ func (o *Switch) Validate() error {
 // setDefaults implements sacloud.argumentDefaulter
 func (o *Switch) setDefaults() interface{} {
 	return &struct {
-		ID             types.ID
-		Name           string `validate:"required"`
-		Description    string `validate:"min=0,max=512"`
-		Tags           types.Tags
-		IconID         types.ID `mapconv:"Icon.ID"`
-		CreatedAt      time.Time
-		ModifiedAt     time.Time
-		Scope          types.EScope
-		ServerCount    int
-		NetworkMaskLen int             `mapconv:"UserSubnet.NetworkMaskLen" validate:"min=1,max=32"`
-		DefaultRoute   string          `mapconv:"UserSubnet.DefaultRoute" validate:"ipv4"`
-		Subnets        []*SwitchSubnet `json:",omitempty" mapconv:"[]Subnets,omitempty,recursive"`
-		BridgeID       types.ID        `mapconv:"Bridge.ID,omitempty"`
+		ID                 types.ID
+		Name               string `validate:"required"`
+		Description        string `validate:"min=0,max=512"`
+		Tags               types.Tags
+		IconID             types.ID `mapconv:"Icon.ID"`
+		CreatedAt          time.Time
+		ModifiedAt         time.Time
+		Scope              types.EScope
+		ServerCount        int
+		NetworkMaskLen     int             `mapconv:"UserSubnet.NetworkMaskLen" validate:"min=1,max=32"`
+		DefaultRoute       string          `mapconv:"UserSubnet.DefaultRoute" validate:"ipv4"`
+		Subnets            []*SwitchSubnet `json:",omitempty" mapconv:"[]Subnets,omitempty,recursive"`
+		BridgeID           types.ID        `mapconv:"Bridge.ID,omitempty"`
+		HybridConnectionID types.ID        `mapconv:"HybridConnection.ID,omitempty"`
 	}{
-		ID:             o.GetID(),
-		Name:           o.GetName(),
-		Description:    o.GetDescription(),
-		Tags:           o.GetTags(),
-		IconID:         o.GetIconID(),
-		CreatedAt:      o.GetCreatedAt(),
-		ModifiedAt:     o.GetModifiedAt(),
-		Scope:          o.GetScope(),
-		ServerCount:    o.GetServerCount(),
-		NetworkMaskLen: o.GetNetworkMaskLen(),
-		DefaultRoute:   o.GetDefaultRoute(),
-		Subnets:        o.GetSubnets(),
-		BridgeID:       o.GetBridgeID(),
+		ID:                 o.GetID(),
+		Name:               o.GetName(),
+		Description:        o.GetDescription(),
+		Tags:               o.GetTags(),
+		IconID:             o.GetIconID(),
+		CreatedAt:          o.GetCreatedAt(),
+		ModifiedAt:         o.GetModifiedAt(),
+		Scope:              o.GetScope(),
+		ServerCount:        o.GetServerCount(),
+		NetworkMaskLen:     o.GetNetworkMaskLen(),
+		DefaultRoute:       o.GetDefaultRoute(),
+		Subnets:            o.GetSubnets(),
+		BridgeID:           o.GetBridgeID(),
+		HybridConnectionID: o.GetHybridConnectionID(),
 	}
 }
 
@@ -23132,6 +24146,16 @@ func (o *Switch) GetBridgeID() types.ID {
 // SetBridgeID sets value to BridgeID
 func (o *Switch) SetBridgeID(v types.ID) {
 	o.BridgeID = v
+}
+
+// GetHybridConnectionID returns value of HybridConnectionID
+func (o *Switch) GetHybridConnectionID() types.ID {
+	return o.HybridConnectionID
+}
+
+// SetHybridConnectionID sets value to HybridConnectionID
+func (o *Switch) SetHybridConnectionID(v types.ID) {
+	o.HybridConnectionID = v
 }
 
 /*************************************************
