@@ -160,6 +160,10 @@ var definitions = map[string]definition{
 		displayName: "Load Balancer",
 		category:    CategoryAppliance,
 	},
+	"sakuracloud_local_router": {
+		displayName: "Local Router",
+		category:    CategoryNetworking,
+	},
 	"sakuracloud_mobile_gateway": {
 		displayName: "Mobile Gateway",
 		category:    CategorySecureMobile,
