@@ -1,4 +1,4 @@
-// Copyright 2016-2019 The Libsacloud Authors
+// Copyright 2016-2020 The Libsacloud Authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -36,13 +36,18 @@ type Database struct {
 // DatabaseRemark データベースリマーク
 type DatabaseRemark struct {
 	*ApplianceRemarkBase
-	propPlanID                             // プランID
-	DBConf          *DatabaseCommonRemarks // コンフィグ
-	Network         *DatabaseRemarkNetwork // ネットワーク
-	SourceAppliance *Resource              // クローン元DB
-	Zone            struct {               // ゾーン
+	propPlanID                               // プランID
+	DBConf          *DatabaseCommonRemarks   // コンフィグ
+	Network         *DatabaseRemarkNetwork   // ネットワーク
+	SourceAppliance *DatabaseSourceAppliance `json:",omitempty"` // クローン元DB
+	Zone            struct {                 // ゾーン
 		ID json.Number `json:",omitempty"` // ゾーンID
 	}
+}
+
+// DatabaseSourceAppliance ソースアプライアンス(クローン元DB)
+type DatabaseSourceAppliance struct {
+	ID json.Number `json:",omitempty"`
 }
 
 // DatabaseRemarkNetwork ネットワーク
@@ -195,9 +200,7 @@ type DatabaseReplicationSetting struct {
 	// Model レプリケーションモデル
 	Model DatabaseReplicationModels `json:",omitempty"`
 	// Appliance マスター側アプライアンス
-	Appliance *struct {
-		ID string
-	} `json:",omitempty"`
+	Appliance *DatabaseSourceAppliance `json:",omitempty"`
 	// IPAddress IPアドレス
 	IPAddress string `json:",omitempty"`
 	// Port ポート
@@ -344,8 +347,7 @@ func CreateNewDatabase(values *CreateDatabaseValue) *Database {
 				},
 			},
 			// Plan
-			propPlanID:      propPlanID{Plan: &Resource{ID: int64(values.Plan)}},
-			SourceAppliance: values.SourceAppliance,
+			propPlanID: propPlanID{Plan: &Resource{ID: int64(values.Plan)}},
 		},
 		// Settings
 		Settings: &DatabaseSettings{
@@ -372,6 +374,10 @@ func CreateNewDatabase(values *CreateDatabaseValue) *Database {
 				},
 			},
 		},
+	}
+
+	if values.SourceAppliance.GetStrID() != "" {
+		db.Remark.SourceAppliance = &DatabaseSourceAppliance{ID: json.Number(values.SourceAppliance.GetStrID())}
 	}
 
 	if values.ServicePort > 0 {
@@ -472,7 +478,7 @@ func NewSlaveDatabaseValue(values *SlaveDatabaseValue) *Database {
 				// Replication
 				Replication: &DatabaseReplicationSetting{
 					Model:     DatabaseReplicationModelAsyncReplica,
-					Appliance: &struct{ ID string }{ID: fmt.Sprintf("%d", values.MasterApplianceID)},
+					Appliance: &DatabaseSourceAppliance{ID: json.Number(fmt.Sprintf("%d", values.MasterApplianceID))},
 					IPAddress: values.MasterIPAddress,
 					Port:      values.MasterPort,
 					User:      "replica",

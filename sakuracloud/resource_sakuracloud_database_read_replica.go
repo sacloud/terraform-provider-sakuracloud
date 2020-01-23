@@ -281,7 +281,9 @@ func setDatabaseReadReplicaResourceData(d *schema.ResourceData, client *APIClien
 	d.Set("ipaddress1", data.Remark.Servers[0].(map[string]interface{})["IPAddress"])
 	d.Set("icon_id", data.GetIconStrID())
 	d.Set("description", data.Description)
-	d.Set("master_id", data.Settings.DBConf.Replication.Appliance.ID)
+	if data.Settings.DBConf.Replication != nil && data.Settings.DBConf.Replication.Appliance != nil {
+		d.Set("master_id", data.Settings.DBConf.Replication.Appliance.ID.String())
+	}
 	tags := []string{}
 	for _, t := range data.Tags {
 		if !(strings.HasPrefix(t, "@MariaDB-") || strings.HasPrefix(t, "@postgres-")) {

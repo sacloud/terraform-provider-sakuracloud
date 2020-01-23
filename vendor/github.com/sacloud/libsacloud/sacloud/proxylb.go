@@ -1,4 +1,4 @@
-// Copyright 2016-2019 The Libsacloud Authors
+// Copyright 2016-2020 The Libsacloud Authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -196,8 +196,8 @@ func (p *ProxyLB) ClearBindPorts() {
 }
 
 // AddServer ProxyLB配下のサーバーを追加
-func (p *ProxyLB) AddServer(ip string, port int, enabled bool) {
-	p.Settings.ProxyLB.AddServer(ip, port, enabled)
+func (p *ProxyLB) AddServer(ip string, port int, enabled bool, serverGroup string) {
+	p.Settings.ProxyLB.AddServer(ip, port, enabled, serverGroup)
 }
 
 // DeleteServer ProxyLB配下のサーバーを削除
@@ -207,13 +207,14 @@ func (p *ProxyLB) DeleteServer(ip string, port int) {
 
 // ProxyLBSetting ProxyLBセッティング
 type ProxyLBSetting struct {
-	HealthCheck   ProxyLBHealthCheck    `json:",omitempty"` // ヘルスチェック
-	SorryServer   ProxyLBSorryServer    `json:",omitempty"` // ソーリーサーバー
-	BindPorts     []*ProxyLBBindPorts   `json:",omitempty"` // プロキシ方式(プロトコル&ポート)
-	Servers       []ProxyLBServer       `json:",omitempty"` // サーバー
-	LetsEncrypt   *ProxyLBACMESetting   `json:",omitempty"` // Let's encryptでの証明書取得設定
-	StickySession ProxyLBSessionSetting `json:",omitempty"`
-	Timeout       *ProxyLBTimeout       `json:",omitempty"` // タイムアウト
+	HealthCheck   ProxyLBHealthCheck  // ヘルスチェック
+	SorryServer   ProxyLBSorryServer  // ソーリーサーバー
+	BindPorts     []*ProxyLBBindPorts // プロキシ方式(プロトコル&ポート)
+	Servers       []ProxyLBServer     // サーバー
+	Rules         []ProxyLBRule       // 振り分けルール
+	LetsEncrypt   *ProxyLBACMESetting `json:",omitempty"` // Let's encryptでの証明書取得設定
+	StickySession ProxyLBSessionSetting
+	Timeout       *ProxyLBTimeout `json:",omitempty"` // タイムアウト
 }
 
 // ProxyLBSorryServer ソーリーサーバ
@@ -254,7 +255,7 @@ func (s *ProxyLBSetting) DeleteBindPort(mode string, port int) {
 }
 
 // AddServer ProxyLB配下のサーバーを追加
-func (s *ProxyLBSetting) AddServer(ip string, port int, enabled bool) {
+func (s *ProxyLBSetting) AddServer(ip string, port int, enabled bool, serverGroup string) {
 	var record ProxyLBServer
 	var isExist = false
 	for i := range s.Servers {
@@ -266,9 +267,10 @@ func (s *ProxyLBSetting) AddServer(ip string, port int, enabled bool) {
 
 	if !isExist {
 		record = ProxyLBServer{
-			IPAddress: ip,
-			Port:      port,
-			Enabled:   enabled,
+			IPAddress:   ip,
+			Port:        port,
+			Enabled:     enabled,
+			ServerGroup: serverGroup,
 		}
 		s.Servers = append(s.Servers, record)
 	}
@@ -306,9 +308,10 @@ type ProxyLBResponseHeader struct {
 
 // ProxyLBServer ProxyLB配下のサーバー
 type ProxyLBServer struct {
-	IPAddress string `json:",omitempty"` // IPアドレス
-	Port      int    `json:",omitempty"` // ポート
-	Enabled   bool   // 有効/無効
+	IPAddress   string `json:",omitempty"` // IPアドレス
+	Port        int    `json:",omitempty"` // ポート
+	ServerGroup string // サーバグループ
+	Enabled     bool   // 有効/無効
 }
 
 // NewProxyLBServer ProxyLB配下のサーバ作成
@@ -318,6 +321,13 @@ func NewProxyLBServer(ipaddress string, port int) *ProxyLBServer {
 		Port:      port,
 		Enabled:   true,
 	}
+}
+
+// ProxyLBRule ProxyLBの振り分けルール
+type ProxyLBRule struct {
+	Host        string `json:",omitempty"` // ホストヘッダのパターン(ワイルドカードとして?と*が利用可能)
+	Path        string `json:",omitempty"` // パス
+	ServerGroup string
 }
 
 // ProxyLBACMESetting Let's Encryptでの証明書取得設定
