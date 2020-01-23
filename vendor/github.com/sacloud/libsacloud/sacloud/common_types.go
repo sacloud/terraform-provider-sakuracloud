@@ -1,4 +1,4 @@
-// Copyright 2016-2019 The Libsacloud Authors
+// Copyright 2016-2020 The Libsacloud Authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -383,6 +383,9 @@ var (
 	TagBootCDROM = "@boot-cdrom"
 	// TagBootNetwork 優先ブートデバイスをPXE bootに設定します
 	TagBootNetwork = "@boot-network"
+
+	// TagCPUTopology CPUソケット数を1と認識させる
+	TagCPUTopology = "@cpu-topology"
 )
 
 // DatetimeLayout さくらのクラウドAPIで利用される日付型のレイアウト(RFC3339)
