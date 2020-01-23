@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.21.1 (2020-01-23)
+
+* Use libsacloud v1.35.0 #650 (yamamoto-febc)
+
+
 ## 1.21.0 (2020-01-16)
 
 * Update copyright #632 (yamamoto-febc)
