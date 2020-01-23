@@ -81,19 +81,19 @@ func Provider() terraform.ResourceProvider {
 				Optional:     true,
 				DefaultFunc:  schema.MultiEnvDefaultFunc([]string{"SAKURACLOUD_RETRY_MAX"}, defaultRetryMax),
 				ValidateFunc: validation.IntBetween(0, 100),
-				Description:  "The maximum number of API call retries used when SakuraCloud API returns status code `429` or `503`. It can also be sourced from the `SAKURACLOUD_RETRY_MAX` environment variables, or via a shared credentials file if `profile` is specified. Default:`100`",
+				Description:  "The maximum number of API call retries used when SakuraCloud API returns status code `423` or `503`. It can also be sourced from the `SAKURACLOUD_RETRY_MAX` environment variables, or via a shared credentials file if `profile` is specified. Default:`100`",
 			},
 			"retry_wait_max": {
 				Type:        schema.TypeInt,
 				Optional:    true,
 				DefaultFunc: schema.MultiEnvDefaultFunc([]string{"SAKURACLOUD_RETRY_WAIT_MAX"}, 0),
-				Description: "The maximum wait interval(in seconds) for retrying API call used when SakuraCloud API returns status code `429` or `503`.  It can also be sourced from the `SAKURACLOUD_RETRY_WAIT_MAX` environment variables, or via a shared credentials file if `profile` is specified",
+				Description: "The maximum wait interval(in seconds) for retrying API call used when SakuraCloud API returns status code `423` or `503`.  It can also be sourced from the `SAKURACLOUD_RETRY_WAIT_MAX` environment variables, or via a shared credentials file if `profile` is specified",
 			},
 			"retry_wait_min": {
 				Type:        schema.TypeInt,
 				Optional:    true,
 				DefaultFunc: schema.MultiEnvDefaultFunc([]string{"SAKURACLOUD_RETRY_WAIT_MIN"}, 0),
-				Description: "The minimum wait interval(in seconds) for retrying API call used when SakuraCloud API returns status code `429` or `503`. It can also be sourced from the `SAKURACLOUD_RETRY_WAIT_MIN` environment variables, or via a shared credentials file if `profile` is specified",
+				Description: "The minimum wait interval(in seconds) for retrying API call used when SakuraCloud API returns status code `423` or `503`. It can also be sourced from the `SAKURACLOUD_RETRY_WAIT_MIN` environment variables, or via a shared credentials file if `profile` is specified",
 			},
 			"api_request_timeout": {
 				Type:        schema.TypeInt,
