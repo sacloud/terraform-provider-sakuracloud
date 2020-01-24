@@ -25,17 +25,19 @@ resource "sakuracloud_database" "foobar" {
 
   replica_password = var.replica_password
 
-  source_ranges = ["192.168.11.0/24", "192.168.12.0/24"]
+  network_interface {
+    switch_id     = sakuracloud_switch.foobar.id
+    ip_address    = "192.168.11.11"
+    netmask       = 24
+    gateway       = "192.168.11.1"
+    port          = 3306
+    source_ranges = ["192.168.11.0/24", "192.168.12.0/24"]
+  }
 
-  port = 3306
-
-  backup_time     = "00:00"
-  backup_weekdays = ["mon", "tue"]
-
-  switch_id    = sakuracloud_switch.foobar.id
-  ip_address   = "192.168.11.11"
-  netmask      = 24
-  gateway      = "192.168.11.1"
+  backup {
+    time     = "00:00"
+    weekdays = ["mon", "tue"]
+  }
 
   name        = "foobar"
   description = "description"
@@ -59,17 +61,31 @@ resource "sakuracloud_switch" "foobar" {
 * `password` - (Required) The password of default user on the database.
 
 #### Network
-* `switch_id` - (Required) The id of the switch to which the Database connects. Changing this forces a new resource to be created.
-* `gateway` - (Required) The IP address of the gateway used by Database. Changing this forces a new resource to be created.
-* `ip_address` - (Required) The IP address to assign to the Database. Changing this forces a new resource to be created.
-* `netmask` - (Required) The bit length of the subnet to assign to the Database. This must be in the range [`8`-`29`]. Changing this forces a new resource to be created.
-* `port` - (Optional) The number of the listening port. This must be in the range [`1024`-`65535`]. Default:`5432`.
+
+* `network_interface` - (Required) An `network_interface` block as defined below.
+
+---
+
+A `network_interface` block supports the following:
+
+* `gateway` - (Required) The IP address of the gateway used by Database.
+* `ip_address` - (Required) The IP address to assign to the Database.
+* `netmask` - (Required) The bit length of the subnet to assign to the Database. This must be in the range [`8`-`29`].
+* `switch_id` - (Required) The id of the switch to which the Database connects.
+* `port` - (Optional) The number of the listening port. This must be in the range [`1024`-`65535`].
 * `source_ranges` - (Optional) The range of source IP addresses that allow to access to the Database via network.
 
 #### Backup
 
-* `backup_time` - (Optional) The time to take backup. This must be formatted with `HH:mm`.
-* `backup_weekdays` - (Optional) A list of weekdays to backed up. The values in the list must be in [`sun`/`mon`/`tue`/`wed`/`thu`/`fri`/`sat`].
+* `backup` - (Optional) A `backup` block as defined below.
+
+---
+
+A `backup` block supports the following:
+
+* `time` - (Optional) The time to take backup. This must be formatted with `HH:mm`.
+* `weekdays` - (Optional) A list of weekdays to backed up. The values in the list must be in [`sun`/`mon`/`tue`/`wed`/`thu`/`fri`/`sat`].
+
 
 #### Replication
 
