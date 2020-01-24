@@ -44,24 +44,36 @@ A `condition` block supports the following:
 ## Attribute Reference
 
 * `id` - The id of the Database.
-* `backup_time` - The time to take backup. This will be formatted with `HH:mm`.
-* `backup_weekdays` - The list of name of weekday that doing backup. This will be in [`sun`/`mon`/`tue`/`wed`/`thu`/`fri`/`sat`].
+* `backup` - A list of `backup` blocks as defined below.
 * `database_type` - The type of the database. This will be one of [`mariadb`/`postgres`].
 * `description` - The description of the Database.
-* `gateway` - The IP address of the gateway used by Database.
 * `icon_id` - The icon id attached to the Database.
-* `ip_address` - The IP address assigned to the Database.
 * `name` - The name of the Database.
-* `netmask` - The bit length of the subnet assigned to the Database.
+* `network_interface` - A list of `network_interface` blocks as defined below.
 * `password` - The password of default user on the database.
 * `plan` - The plan name of the Database. This will be one of [`10g`/`30g`/`90g`/`240g`/`500g`/`1t`].
 * `port` - The number of the listening port.
 * `replica_password` - The password of user that processing a replication.
 * `replica_user` - The name of user that processing a replication.
-* `source_ranges` - The range of source IP addresses that allow to access to the Database via network.
-* `switch_id` - The id of the switch connected from the Database.
 * `tags` - Any tags assigned to the Database.
 * `username` - The name of default user on the database.
 
+---
+
+A `backup` block exports the following:
+
+* `time` - The time to take backup. This will be formatted with `HH:mm`.
+* `weekdays` - The list of name of weekday that doing backup. This will be in [`sun`/`mon`/`tue`/`wed`/`thu`/`fri`/`sat`].
+
+---
+
+A `network_interface` block exports the following:
+
+* `gateway` - The IP address of the gateway used by Database.
+* `ip_address` - The IP address assigned to the Database.
+* `netmask` - The bit length of the subnet assigned to the Database.
+* `port` - The number of the listening port.
+* `source_ranges` - The range of source IP addresses that allow to access to the Database via network.
+* `switch_id` - The id of the switch connected from the Database.
 
 

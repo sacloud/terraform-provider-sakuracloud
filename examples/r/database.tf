@@ -10,17 +10,19 @@ resource "sakuracloud_database" "foobar" {
 
   replica_password = var.replica_password
 
-  source_ranges = ["192.168.11.0/24", "192.168.12.0/24"]
+  network_interface {
+    switch_id     = sakuracloud_switch.foobar.id
+    ip_address    = "192.168.11.11"
+    netmask       = 24
+    gateway       = "192.168.11.1"
+    port          = 3306
+    source_ranges = ["192.168.11.0/24", "192.168.12.0/24"]
+  }
 
-  port = 3306
-
-  backup_time     = "00:00"
-  backup_weekdays = ["mon", "tue"]
-
-  switch_id  = sakuracloud_switch.foobar.id
-  ip_address = "192.168.11.11"
-  netmask    = 24
-  gateway    = "192.168.11.1"
+  backup {
+    time     = "00:00"
+    weekdays = ["mon", "tue"]
+  }
 
   name        = "foobar"
   description = "description"
