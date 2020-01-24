@@ -13,13 +13,15 @@ resource "sakuracloud_vpc_router" "premium" {
 
   internet_connection = true
 
-  switch_id    = sakuracloud_internet.foobar.switch_id
-  vip          = sakuracloud_internet.foobar.ip_addresses[0]
-  ip_addresses = [sakuracloud_internet.foobar.ip_addresses[1], sakuracloud_internet.foobar.ip_addresses[2]]
-  aliases      = [sakuracloud_internet.foobar.ip_addresses[3]]
-  vrid         = 1
+  public_network_interface {
+    switch_id    = sakuracloud_internet.foobar.switch_id
+    vip          = sakuracloud_internet.foobar.ip_addresses[0]
+    ip_addresses = [sakuracloud_internet.foobar.ip_addresses[1], sakuracloud_internet.foobar.ip_addresses[2]]
+    aliases      = [sakuracloud_internet.foobar.ip_addresses[3]]
+    vrid         = 1
+  }
 
-  network_interface {
+  private_network_interface {
     index        = 1
     switch_id    = sakuracloud_switch.foobar.id
     vip          = "192.168.11.1"

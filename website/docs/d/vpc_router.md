@@ -44,31 +44,27 @@ A `condition` block supports the following:
 ## Attribute Reference
 
 * `id` - The id of the VPC Router.
-* `aliases` - A list of ip alias assigned to the VPC Router. This is only used when `plan` is not `standard`.
 * `description` - The description of the VPCRouter.
 * `dhcp_server` - A list of `dhcp_server` blocks as defined below.
 * `dhcp_static_mapping` - A list of `dhcp_static_mapping` blocks as defined below.
 * `firewall` - A list of `firewall` blocks as defined below.
 * `icon_id` - The icon id attached to the VPCRouter.
 * `internet_connection` - The flag to enable connecting to the Internet from the VPC Router.
-* `ip_addresses` - The list of the IP address assigned to the VPC Router. This will be only one value when `plan` is `standard`, two values otherwise.
 * `l2tp` - A list of `l2tp` blocks as defined below.
 * `name` - The id of the switch connected from the VPCRouter.
-* `network_interface` - A list of additional network interface setting. This doesn't include primary network interface setting.
 * `plan` - The plan name of the VPCRouter. This will be one of [`standard`/`premium`/`highspec`/`highspec4000`].
 * `port_forwarding` - A list of `port_forwarding` blocks as defined below. This represents a `Reverse NAT`.
 * `pptp` - A list of `pptp` blocks as defined below.
+* `private_network_interface` - A list of additional network interface setting. This doesn't include primary network interface setting.
 * `public_ip` - The public ip address of the VPC Router.
+* `public_netmask` - The bit length of the subnet to assign to the public network interface.
+* `public_network_interface` - A list of additional network interface setting. This doesn't include primary network interface setting.
 * `site_to_site_vpn` - A list of `site_to_site_vpn` blocks as defined below.
 * `static_nat` - A list of `static_nat` blocks as defined below. This represents a `1:1 NAT`, doing static mapping to both send/receive to/from the Internet. This is only used when `plan` is not `standard`.
 * `static_route` - A list of `static_route` blocks as defined below.
-* `switch_id` - The id of the switch connected from the VPCRouter.
 * `syslog_host` - The ip address of the syslog host to which the VPC Router sends logs.
 * `tags` - Any tags assigned to the VPCRouter.
 * `user` - A list of `user` blocks as defined below.
-* `vip` - The virtual IP address of the VPC Router. This is only used when `plan` is not `standard`.
-* `vrid` - The Virtual Router Identifier. This is only used when `plan` is not `standard`.
-
 
 ---
 
@@ -117,16 +113,6 @@ A `l2tp` block exports the following:
 
 ---
 
-A `network_interface` block exports the following:
-
-* `index` - The index of the network interface. This will be between `1`-`7`.
-* `ip_addresses` - A list of ip address assigned to the network interface. This will be only one value when `plan` is `standard`, two values otherwise.
-* `netmask` - The bit length of the subnet assigned to the network interface.
-* `switch_id` - The id of the connected switch.
-* `vip` - The virtual IP address assigned to the network interface. This is only used when `plan` is not `standard`.
-
----
-
 A `port_forwarding` block exports the following:
 
 * `description` - The description of the port forwarding.
@@ -141,6 +127,26 @@ A `pptp` block exports the following:
 
 * `range_start` - The start value of IP address range to assign to PPTP client.
 * `range_stop` - The end value of IP address range to assign to PPTP client.
+
+---
+
+A `private_network_interface` block exports the following:
+
+* `index` - The index of the network interface. This will be between `1`-`7`.
+* `ip_addresses` - A list of ip address assigned to the network interface. This will be only one value when `plan` is `standard`, two values otherwise.
+* `netmask` - The bit length of the subnet assigned to the network interface.
+* `switch_id` - The id of the connected switch.
+* `vip` - The virtual IP address assigned to the network interface. This is only used when `plan` is not `standard`.
+
+---
+
+A `public_network_interface` block exports the following:
+
+* `aliases` - A list of ip alias assigned to the VPC Router. This is only used when `plan` is not `standard`.
+* `ip_addresses` - The list of the IP address assigned to the VPC Router. This will be only one value when `plan` is `standard`, two values otherwise.
+* `switch_id` - The id of the switch connected from the VPCRouter.
+* `vip` - The virtual IP address of the VPC Router. This is only used when `plan` is not `standard`.
+* `vrid` - The Virtual Router Identifier. This is only used when `plan` is not `standard`.
 
 ---
 
