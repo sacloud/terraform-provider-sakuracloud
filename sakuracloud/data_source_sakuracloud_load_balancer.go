@@ -31,19 +31,22 @@ func dataSourceSakuraCloudLoadBalancer() *schema.Resource {
 			filterAttrName: filterSchema(&filterSchemaOption{}),
 			"name":         schemaDataSourceName(resourceName),
 			"plan":         schemaDataSourcePlan(resourceName, []string{"standard", "highspec"}),
-			"switch_id":    schemaDataSourceSwitchID(resourceName),
-			"ip_addresses": schemaDataSourceIPAddresses(resourceName),
-			"netmask":      schemaDataSourceNetMask(resourceName),
-			"gateway":      schemaDataSourceGateway(resourceName),
-			"vrid": {
-				Type:        schema.TypeInt,
-				Computed:    true,
-				Description: "The Virtual Router Identifier. This is only used when `high_availability` is set `true`",
-			},
-			"high_availability": {
-				Type:        schema.TypeBool,
-				Computed:    true,
-				Description: "The flag to enable HA mode",
+			"network_interface": {
+				Type:     schema.TypeList,
+				Computed: true,
+				Elem: &schema.Resource{
+					Schema: map[string]*schema.Schema{
+						"switch_id":    schemaDataSourceSwitchID(resourceName),
+						"ip_addresses": schemaDataSourceIPAddresses(resourceName),
+						"netmask":      schemaDataSourceNetMask(resourceName),
+						"gateway":      schemaDataSourceGateway(resourceName),
+						"vrid": {
+							Type:        schema.TypeInt,
+							Computed:    true,
+							Description: "The Virtual Router Identifier",
+						},
+					},
+				},
 			},
 			"vip": {
 				Type:     schema.TypeList,

@@ -81,63 +81,83 @@ func resourceSakuraCloudDatabase() *schema.Resource {
 				Sensitive:   true,
 				Description: "The password of user that processing a replication",
 			},
-			"source_ranges": {
+			"network_interface": {
+				Type:     schema.TypeList,
+				Required: true,
+				MinItems: 1,
+				MaxItems: 1,
+				Elem: &schema.Resource{
+					Schema: map[string]*schema.Schema{
+						"switch_id": schemaResourceSwitchID(resourceName),
+						"ip_address": {
+							Type:        schema.TypeString,
+							ForceNew:    true,
+							Required:    true,
+							Description: descf("The IP address to assign to the %s", resourceName),
+						},
+						"netmask": {
+							Type:         schema.TypeInt,
+							ForceNew:     true,
+							Required:     true,
+							ValidateFunc: validation.IntBetween(8, 29),
+							Description: descf(
+								"The bit length of the subnet to assign to the %s. %s",
+								resourceName,
+								descRange(8, 29),
+							),
+						},
+						"gateway": {
+							Type:        schema.TypeString,
+							ForceNew:    true,
+							Required:    true,
+							Description: descf("The IP address of the gateway used by %s", resourceName),
+						},
+						"port": {
+							Type:         schema.TypeInt,
+							Optional:     true,
+							Default:      5432,
+							ValidateFunc: validation.IntBetween(1024, 65535),
+							Description: descf(
+								"The number of the listening port. %s",
+								descRange(1024, 65535),
+							),
+						},
+						"source_ranges": {
+							Type:     schema.TypeList,
+							Optional: true,
+							Elem:     &schema.Schema{Type: schema.TypeString},
+							Description: descf(
+								"The range of source IP addresses that allow to access to the %s via network",
+								resourceName,
+							),
+						},
+					},
+				},
+			},
+			"backup": {
 				Type:     schema.TypeList,
 				Optional: true,
-				Elem:     &schema.Schema{Type: schema.TypeString},
-				Description: descf(
-					"The range of source IP addresses that allow to access to the %s via network",
-					resourceName,
-				),
-			},
-			"port": {
-				Type:         schema.TypeInt,
-				Optional:     true,
-				Default:      5432,
-				ValidateFunc: validation.IntBetween(1024, 65535),
-				Description: descf(
-					"The number of the listening port. %s",
-					descRange(1024, 65535),
-				),
-			},
-			"backup_weekdays": {
-				Type:     schema.TypeList,
-				Optional: true,
-				Elem:     &schema.Schema{Type: schema.TypeString},
-				Description: descf(
-					"A list of weekdays to backed up. The values in the list must be in [%s]",
-					types.BackupWeekdayStrings,
-				),
-			},
-			"backup_time": {
-				Type:         schema.TypeString,
-				Optional:     true,
-				ValidateFunc: validateBackupTime(),
-				Description:  "The time to take backup. This must be formatted with `HH:mm`",
-			},
-			"switch_id": schemaResourceSwitchID(resourceName),
-			"ip_address": {
-				Type:        schema.TypeString,
-				ForceNew:    true,
-				Required:    true,
-				Description: descf("The IP address to assign to the %s", resourceName),
-			},
-			"netmask": {
-				Type:         schema.TypeInt,
-				ForceNew:     true,
-				Required:     true,
-				ValidateFunc: validation.IntBetween(8, 29),
-				Description: descf(
-					"The bit length of the subnet to assign to the %s. %s",
-					resourceName,
-					descRange(8, 29),
-				),
-			},
-			"gateway": {
-				Type:        schema.TypeString,
-				ForceNew:    true,
-				Required:    true,
-				Description: descf("The IP address of the gateway used by %s", resourceName),
+				MinItems: 1,
+				MaxItems: 1,
+				Elem: &schema.Resource{
+					Schema: map[string]*schema.Schema{
+						"weekdays": {
+							Type:     schema.TypeList,
+							Optional: true,
+							Elem:     &schema.Schema{Type: schema.TypeString},
+							Description: descf(
+								"A list of weekdays to backed up. The values in the list must be in [%s]",
+								types.BackupWeekdayStrings,
+							),
+						},
+						"time": {
+							Type:         schema.TypeString,
+							Optional:     true,
+							ValidateFunc: validateBackupTime(),
+							Description:  "The time to take backup. This must be formatted with `HH:mm`",
+						},
+					},
+				},
 			},
 			"icon_id":     schemaResourceIconID(resourceName),
 			"description": schemaResourceDescription(resourceName),
@@ -258,40 +278,25 @@ func setDatabaseResourceData(ctx context.Context, d *schema.ResourceData, client
 	}
 
 	d.Set("database_type", flattenDatabaseType(data)) // nolint
-
 	if data.ReplicationSetting != nil {
 		d.Set("replica_user", data.CommonSetting.ReplicaUser)         // nolint
 		d.Set("replica_password", data.CommonSetting.ReplicaPassword) // nolint
 	}
-
-	if data.BackupSetting != nil {
-		d.Set("backup_time", data.BackupSetting.Time) // nolint
-		if err := d.Set("backup_weekdays", data.BackupSetting.DayOfWeek); err != nil {
-			return err
-		}
+	if err := d.Set("backup", flattenDatabaseBackupSetting(data)); err != nil {
+		return err
 	}
-
 	if err := d.Set("tags", flattenDatabaseTags(data)); err != nil {
 		return err
 	}
-
 	d.Set("name", data.Name)                              // nolint
 	d.Set("username", data.CommonSetting.DefaultUser)     // nolint
 	d.Set("password", data.CommonSetting.UserPassword)    // nolint
 	d.Set("plan", types.DatabasePlanNameMap[data.PlanID]) // nolint
-	if err := d.Set("source_ranges", data.CommonSetting.SourceNetwork); err != nil {
+	if err := d.Set("network_interface", flattenDatabaseNetworkInterface(data)); err != nil {
 		return err
-	}
-	d.Set("port", data.CommonSetting.ServicePort) // nolint
-	d.Set("switch_id", data.SwitchID.String())    // nolint
-	d.Set("netmask", data.NetworkMaskLen)         // nolint
-	d.Set("gateway", data.DefaultRoute)           // nolint
-	if len(data.IPAddresses) > 0 {
-		d.Set("ip_address", data.IPAddresses[0]) // nolint
 	}
 	d.Set("icon_id", data.IconID.String()) // nolint
 	d.Set("description", data.Description) // nolint
 	d.Set("zone", getZone(d, client))      // nolint
-
 	return nil
 }

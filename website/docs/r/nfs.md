@@ -14,16 +14,20 @@ Manages a SakuraCloud NFS.
 
 ```hcl
 resource "sakuracloud_nfs" "foobar" {
-  name        = "foobar"
-  switch_id   = sakuracloud_switch.foobar.id
-  plan        = "ssd"
-  size        = "500"
-  ip_address  = "192.168.11.101"
-  netmask     = 24
-  gateway     = "192.168.11.1"
+  name = "foobar"
+  plan = "ssd"
+  size = "500"
+
+  network_interface {
+    switch_id   = sakuracloud_switch.foobar.id
+    ip_address  = "192.168.11.101"
+    netmask     = 24
+    gateway     = "192.168.11.1"
+  }
+
   description = "description"
   tags        = ["tag1", "tag2"]
-}
+}}
 
 resource "sakuracloud_switch" "foobar" {
   name = "foobar"
@@ -38,10 +42,16 @@ resource "sakuracloud_switch" "foobar" {
 
 #### Network
 
-* `switch_id` - (Required) The id of the switch to which the NFS connects. Changing this forces a new resource to be created.
-* `ip_address` - (Required) The IP address to assign to the NFS. Changing this forces a new resource to be created.
-* `netmask` - (Required) The bit length of the subnet to assign to the NFS. This must be in the range [`8`-`29`]. Changing this forces a new resource to be created.
-* `gateway` - (Optional) The IP address of the gateway used by NFS. Changing this forces a new resource to be created.
+* `network_interface` - (Required) An `network_interface` block as defined below.
+
+---
+
+A `network_interface` block supports the following:
+
+* `ip_address` - (Required) The IP address to assign to the NFS.
+* `netmask` - (Required) The bit length of the subnet to assign to the NFS. This must be in the range [`8`-`29`].
+* `switch_id` - (Required) The id of the switch to which the NFS connects.
+* `gateway` - (Optional) The IP address of the gateway used by NFS.
 
 #### Common Arguments
 

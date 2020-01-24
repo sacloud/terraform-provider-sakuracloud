@@ -35,15 +35,17 @@ func expandDatabaseBuilder(d *schema.ResourceData, client *APIClient) *databaseB
 		dbVersion = types.RDBMSVersions[types.RDBMSTypesMariaDB]
 	}
 
+	nic := expandDatabaseNetworkInterface(d)
+
 	replicaUser := d.Get("replica_user").(string)
 	replicaPassword := d.Get("replica_password").(string)
 
 	req := &databaseBuilder.Builder{
 		PlanID:         types.DatabasePlanIDMap[d.Get("plan").(string)],
-		SwitchID:       expandSakuraCloudID(d, "switch_id"),
-		IPAddresses:    []string{d.Get("ip_address").(string)},
-		NetworkMaskLen: d.Get("netmask").(int),
-		DefaultRoute:   d.Get("gateway").(string),
+		SwitchID:       nic.switchID,
+		IPAddresses:    []string{nic.ipAddress},
+		NetworkMaskLen: nic.netmask,
+		DefaultRoute:   nic.gateway,
 		Conf: &sacloud.DatabaseRemarkDBConfCommon{
 			DatabaseName:     dbVersion.Name,
 			DatabaseVersion:  dbVersion.Version,
@@ -52,8 +54,8 @@ func expandDatabaseBuilder(d *schema.ResourceData, client *APIClient) *databaseB
 			UserPassword:     d.Get("password").(string),
 		},
 		CommonSetting: &sacloud.DatabaseSettingCommon{
-			ServicePort:     d.Get("port").(int),
-			SourceNetwork:   expandStringList(d.Get("source_ranges").([]interface{})),
+			ServicePort:     nic.port,
+			SourceNetwork:   nic.sourceRanges,
 			DefaultUser:     d.Get("username").(string),
 			UserPassword:    d.Get("password").(string),
 			ReplicaUser:     replicaUser,
@@ -65,17 +67,8 @@ func expandDatabaseBuilder(d *schema.ResourceData, client *APIClient) *databaseB
 		IconID:      expandSakuraCloudID(d, "icon_id"),
 		Client:      databaseBuilder.NewAPIClient(client),
 		// 後で設定する
-		BackupSetting:      &sacloud.DatabaseSettingBackup{},
+		BackupSetting:      expandDatabaseBackupSetting(d),
 		ReplicationSetting: &sacloud.DatabaseReplicationSetting{},
-	}
-
-	backupTime := d.Get("backup_time").(string)
-	backupWeekdays := expandBackupWeekdays(d.Get("backup_weekdays").([]interface{}))
-	if backupTime != "" && len(backupWeekdays) > 0 {
-		req.BackupSetting = &sacloud.DatabaseSettingBackup{
-			Time:      backupTime,
-			DayOfWeek: backupWeekdays,
-		}
 	}
 
 	if replicaUser != "" && replicaPassword != "" {
@@ -101,17 +94,18 @@ func expandDatabaseReadReplicaBuilder(ctx context.Context, d *schema.ResourceDat
 		return nil, fmt.Errorf("master database instance[%s] is not configured as ReplicationMaster", masterID)
 	}
 
+	nic := expandDatabaseNetworkInterface(d)
 	switchID := masterDB.SwitchID.String()
-	if v, ok := d.GetOk("switch_id"); ok {
-		switchID = v.(string)
+	if !nic.switchID.IsEmpty() {
+		switchID = nic.switchID.String()
 	}
 	maskLen := masterDB.NetworkMaskLen
-	if v, ok := d.GetOk("netmask"); ok {
-		maskLen = v.(int)
+	if nic.netmask > 0 {
+		maskLen = nic.netmask
 	}
 	defaultRoute := masterDB.DefaultRoute
-	if v, ok := d.GetOk("gateway"); ok {
-		defaultRoute = v.(string)
+	if nic.gateway != "" {
+		defaultRoute = nic.gateway
 	}
 
 	return &databaseBuilder.Builder{
@@ -121,7 +115,7 @@ func expandDatabaseReadReplicaBuilder(ctx context.Context, d *schema.ResourceDat
 		IconID:         expandSakuraCloudID(d, "icon_id"),
 		PlanID:         types.ID(masterDB.PlanID.Int64() + 1),
 		SwitchID:       sakuraCloudID(switchID),
-		IPAddresses:    []string{d.Get("ip_address").(string)},
+		IPAddresses:    []string{nic.ipAddress},
 		NetworkMaskLen: maskLen,
 		DefaultRoute:   defaultRoute,
 		Conf: &sacloud.DatabaseRemarkDBConfCommon{
@@ -131,7 +125,7 @@ func expandDatabaseReadReplicaBuilder(ctx context.Context, d *schema.ResourceDat
 		},
 		CommonSetting: &sacloud.DatabaseSettingCommon{
 			ServicePort:   masterDB.CommonSetting.ServicePort,
-			SourceNetwork: expandStringList(d.Get("source_ranges").([]interface{})),
+			SourceNetwork: nic.sourceRanges,
 		},
 		ReplicationSetting: &sacloud.DatabaseReplicationSetting{
 			Model:       types.DatabaseReplicationModels.AsyncReplica,
@@ -164,4 +158,79 @@ func flattenDatabaseTags(db *sacloud.Database) *schema.Set {
 		}
 	}
 	return flattenTags(tags)
+}
+
+func expandDatabaseBackupSetting(d resourceValueGettable) *sacloud.DatabaseSettingBackup {
+	d = mapFromFirstElement(d, "backup")
+	if d != nil {
+		backupTime := d.Get("time").(string)
+		backupWeekdays := expandBackupWeekdays(d.Get("weekdays").([]interface{}))
+		if backupTime != "" && len(backupWeekdays) > 0 {
+			return &sacloud.DatabaseSettingBackup{
+				Time:      backupTime,
+				DayOfWeek: backupWeekdays,
+			}
+		}
+	}
+	return nil
+}
+
+func flattenDatabaseBackupSetting(db *sacloud.Database) []interface{} {
+	if db.BackupSetting != nil {
+		setting := map[string]interface{}{
+			"time":     db.BackupSetting.Time,
+			"weekdays": db.BackupSetting.DayOfWeek,
+		}
+		return []interface{}{setting}
+	}
+	return nil
+}
+
+type databaseNetworkInterface struct {
+	switchID     types.ID
+	ipAddress    string
+	netmask      int
+	gateway      string
+	port         int
+	sourceRanges []string
+}
+
+func expandDatabaseNetworkInterface(d resourceValueGettable) *databaseNetworkInterface {
+	d = mapFromFirstElement(d, "network_interface")
+	if d == nil {
+		return nil
+	}
+	return &databaseNetworkInterface{
+		switchID:     expandSakuraCloudID(d, "switch_id"),
+		ipAddress:    stringOrDefault(d, "ip_address"),
+		netmask:      intOrDefault(d, "netmask"),
+		gateway:      stringOrDefault(d, "gateway"),
+		port:         intOrDefault(d, "port"),
+		sourceRanges: stringListOrDefault(d, "source_ranges"),
+	}
+}
+
+func flattenDatabaseNetworkInterface(db *sacloud.Database) []interface{} {
+	return []interface{}{
+		map[string]interface{}{
+			"switch_id":     db.SwitchID.String(),
+			"netmask":       db.NetworkMaskLen,
+			"source_ranges": db.CommonSetting.SourceNetwork,
+			"port":          db.CommonSetting.ServicePort,
+			"gateway":       db.DefaultRoute,
+			"ip_address":    db.IPAddresses[0],
+		},
+	}
+}
+
+func flattenDatabaseReadReplicaNetworkInterface(db *sacloud.Database) []interface{} {
+	return []interface{}{
+		map[string]interface{}{
+			"switch_id":     db.SwitchID.String(),
+			"netmask":       db.NetworkMaskLen,
+			"source_ranges": db.CommonSetting.SourceNetwork,
+			"gateway":       db.DefaultRoute,
+			"ip_address":    db.IPAddresses[0],
+		},
+	}
 }

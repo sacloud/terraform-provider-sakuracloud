@@ -48,9 +48,9 @@ func TestAccSakuraCloudDatabaseReplica_basic(t *testing.T) {
 					resource.TestCheckResourceAttr(resourceName, "tags.#", "2"),
 					resource.TestCheckResourceAttr(resourceName, "tags.4151227546", "tag1"),
 					resource.TestCheckResourceAttr(resourceName, "tags.1852302624", "tag2"),
-					resource.TestCheckResourceAttr(resourceName, "ip_address", "192.168.11.111"),
-					resource.TestCheckResourceAttr(resourceName, "netmask", "24"),
-					resource.TestCheckResourceAttr(resourceName, "gateway", "192.168.11.1"),
+					resource.TestCheckResourceAttr(resourceName, "network_interface.0.ip_address", "192.168.11.111"),
+					resource.TestCheckResourceAttr(resourceName, "network_interface.0.netmask", "24"),
+					resource.TestCheckResourceAttr(resourceName, "network_interface.0.gateway", "192.168.11.1"),
 					resource.TestCheckResourceAttrPair(
 						resourceName, "icon_id",
 						"sakuracloud_icon.foobar", "id",
@@ -65,9 +65,9 @@ func TestAccSakuraCloudDatabaseReplica_basic(t *testing.T) {
 					resource.TestCheckResourceAttr(resourceName, "tags.#", "2"),
 					resource.TestCheckResourceAttr(resourceName, "tags.2362157161", "tag1-upd"),
 					resource.TestCheckResourceAttr(resourceName, "tags.3412841145", "tag2-upd"),
-					resource.TestCheckResourceAttr(resourceName, "ip_address", "192.168.11.111"),
-					resource.TestCheckResourceAttr(resourceName, "netmask", "24"),
-					resource.TestCheckResourceAttr(resourceName, "gateway", "192.168.11.1"),
+					resource.TestCheckResourceAttr(resourceName, "network_interface.0.ip_address", "192.168.11.111"),
+					resource.TestCheckResourceAttr(resourceName, "network_interface.0.netmask", "24"),
+					resource.TestCheckResourceAttr(resourceName, "network_interface.0.gateway", "192.168.11.1"),
 					resource.TestCheckResourceAttr(resourceName, "icon_id", ""),
 				),
 			},
@@ -84,19 +84,19 @@ func TestAccImportSakuraCloudDatabaseReadReplica_basic(t *testing.T) {
 			return fmt.Errorf("expected 1 state: %#v", s)
 		}
 		expects := map[string]string{
-			"name":            rand,
-			"description":     "description",
-			"ip_address":      "192.168.11.111",
-			"netmask":         "24",
-			"gateway":         "192.168.11.1",
-			"tags.4151227546": "tag1",
-			"tags.1852302624": "tag2",
+			"name":                           rand,
+			"description":                    "description",
+			"network_interface.0.ip_address": "192.168.11.111",
+			"network_interface.0.netmask":    "24",
+			"network_interface.0.gateway":    "192.168.11.1",
+			"tags.4151227546":                "tag1",
+			"tags.1852302624":                "tag2",
 		}
 
 		if err := compareStateMulti(s[0], expects); err != nil {
 			return err
 		}
-		return stateNotEmptyMulti(s[0], "icon_id", "switch_id", "master_id")
+		return stateNotEmptyMulti(s[0], "icon_id", "network_interface.0.switch_id", "master_id")
 	}
 
 	resourceName := "sakuracloud_database_read_replica.foobar"
@@ -160,10 +160,12 @@ resource "sakuracloud_database" "foobar" {
 
   replica_password = "{{ .arg1 }}"
 
-  switch_id    = sakuracloud_switch.foobar.id
-  ip_address   = "192.168.11.101"
-  netmask      = 24
-  gateway      = "192.168.11.1"
+  network_interface{
+    switch_id    = sakuracloud_switch.foobar.id
+    ip_address   = "192.168.11.101"
+    netmask      = 24
+    gateway      = "192.168.11.1"
+  }
 
   name = "{{ .arg0 }}"
   icon_id = sakuracloud_icon.foobar.id
@@ -171,7 +173,9 @@ resource "sakuracloud_database" "foobar" {
 
 resource "sakuracloud_database_read_replica" "foobar" {
   master_id    = sakuracloud_database.foobar.id
-  ip_address   = "192.168.11.111"
+  network_interface {
+    ip_address   = "192.168.11.111"
+  }
   name         = "{{ .arg0 }}"
   description  = "description"
   tags         = ["tag1" , "tag2"]
@@ -198,17 +202,21 @@ resource "sakuracloud_database" "foobar" {
 
   replica_password = "{{ .arg1 }}"
 
-  switch_id    = sakuracloud_switch.foobar.id
-  ip_address   = "192.168.11.101"
-  netmask      = 24
-  gateway      = "192.168.11.1"
+  network_interface {
+    switch_id    = sakuracloud_switch.foobar.id
+    ip_address   = "192.168.11.101"
+    netmask      = 24
+    gateway      = "192.168.11.1"
+  }
 
   name = "{{ .arg0 }}"
 }
 
 resource "sakuracloud_database_read_replica" "foobar" {
   master_id    = sakuracloud_database.foobar.id
-  ip_address   = "192.168.11.111"
+  network_interface {
+    ip_address   = "192.168.11.111"
+  }
   name         = "{{ .arg0 }}-upd"
   description  = "description-upd"
   tags         = ["tag1-upd" , "tag2-upd"]

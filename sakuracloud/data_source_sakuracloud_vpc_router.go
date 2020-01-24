@@ -31,28 +31,37 @@ func dataSourceSakuraCloudVPCRouter() *schema.Resource {
 			filterAttrName: filterSchema(&filterSchemaOption{}),
 			"name":         schemaDataSourceSwitchID(resourceName),
 			"plan":         schemaDataSourcePlan(resourceName, types.VPCRouterPlanStrings),
-			"switch_id":    schemaDataSourceSwitchID(resourceName),
-			"vip": {
-				Type:        schema.TypeString,
-				Computed:    true,
-				Description: "The virtual IP address of the VPC Router. This is only used when `plan` is not `standard`",
-			},
-			"ip_addresses": {
-				Type:        schema.TypeList,
-				Elem:        &schema.Schema{Type: schema.TypeString},
-				Computed:    true,
-				Description: "The list of the IP address assigned to the VPC Router. This will be only one value when `plan` is `standard`, two values otherwise",
-			},
-			"vrid": {
-				Type:        schema.TypeInt,
-				Computed:    true,
-				Description: "The Virtual Router Identifier. This is only used when `plan` is not `standard`",
-			},
-			"aliases": {
+			"public_network_interface": {
 				Type:        schema.TypeList,
 				Computed:    true,
-				Elem:        &schema.Schema{Type: schema.TypeString},
-				Description: "A list of ip alias assigned to the VPC Router. This is only used when `plan` is not `standard`",
+				Description: "A list of additional network interface setting. This doesn't include primary network interface setting",
+				Elem: &schema.Resource{
+					Schema: map[string]*schema.Schema{
+						"switch_id": schemaDataSourceSwitchID(resourceName),
+						"vip": {
+							Type:        schema.TypeString,
+							Computed:    true,
+							Description: "The virtual IP address of the VPC Router. This is only used when `plan` is not `standard`",
+						},
+						"ip_addresses": {
+							Type:        schema.TypeList,
+							Elem:        &schema.Schema{Type: schema.TypeString},
+							Computed:    true,
+							Description: "The list of the IP address assigned to the VPC Router. This will be only one value when `plan` is `standard`, two values otherwise",
+						},
+						"vrid": {
+							Type:        schema.TypeInt,
+							Computed:    true,
+							Description: "The Virtual Router Identifier. This is only used when `plan` is not `standard`",
+						},
+						"aliases": {
+							Type:        schema.TypeList,
+							Computed:    true,
+							Elem:        &schema.Schema{Type: schema.TypeString},
+							Description: "A list of ip alias assigned to the VPC Router. This is only used when `plan` is not `standard`",
+						},
+					},
+				},
 			},
 			"icon_id":     schemaDataSourceIconID(resourceName),
 			"description": schemaDataSourceDescription(resourceName),
@@ -61,6 +70,11 @@ func dataSourceSakuraCloudVPCRouter() *schema.Resource {
 				Type:        schema.TypeString,
 				Computed:    true,
 				Description: "The public ip address of the VPC Router",
+			},
+			"public_netmask": {
+				Type:        schema.TypeInt,
+				Computed:    true,
+				Description: "The bit length of the subnet to assign to the public network interface",
 			},
 			"syslog_host": {
 				Type:        schema.TypeString,
@@ -72,7 +86,7 @@ func dataSourceSakuraCloudVPCRouter() *schema.Resource {
 				Computed:    true,
 				Description: "The flag to enable connecting to the Internet from the VPC Router",
 			},
-			"network_interface": {
+			"private_network_interface": {
 				Type:        schema.TypeList,
 				Computed:    true,
 				Description: "A list of additional network interface setting. This doesn't include primary network interface setting",

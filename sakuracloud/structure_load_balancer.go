@@ -121,28 +121,52 @@ func flattenLoadBalancerPlanID(lb *sacloud.LoadBalancer) string {
 	return plan
 }
 
-func expandLoadBalancerIPAddresses(d resourceValueGettable) []string {
-	return expandStringList(d.Get("ip_addresses").([]interface{}))
+type loadBalancerNetworkInterface struct {
+	isHAEnabled bool
+	switchID    types.ID
+	vrid        int
+	ipAddresses []string
+	netmask     int
+	gateway     string
 }
 
-func flattenLoadBalancerIPAddresses(lb *sacloud.LoadBalancer) (ha bool, ipAddresses []interface{}) {
-	for _, ip := range lb.IPAddresses {
-		ipAddresses = append(ipAddresses, ip)
+func expandLoadBalancerNetworkInterface(d resourceValueGettable) *loadBalancerNetworkInterface {
+	d = mapFromFirstElement(d, "network_interface")
+	if d == nil {
+		return nil
 	}
-	if len(ipAddresses) > 1 {
-		ha = true
+	ipAddresses := stringListOrDefault(d, "ip_addresses")
+	return &loadBalancerNetworkInterface{
+		isHAEnabled: len(ipAddresses) > 1,
+		switchID:    expandSakuraCloudID(d, "switch_id"),
+		vrid:        intOrDefault(d, "vrid"),
+		ipAddresses: ipAddresses,
+		netmask:     intOrDefault(d, "netmask"),
+		gateway:     stringOrDefault(d, "gateway"),
 	}
-	return
+}
+
+func flattenLoadBalancerNetworkInterface(lb *sacloud.LoadBalancer) []interface{} {
+	return []interface{}{
+		map[string]interface{}{
+			"switch_id":    lb.SwitchID.String(),
+			"vrid":         lb.VRID,
+			"ip_addresses": lb.IPAddresses,
+			"netmask":      lb.NetworkMaskLen,
+			"gateway":      lb.DefaultRoute,
+		},
+	}
 }
 
 func expandLoadBalancerCreateRequest(d *schema.ResourceData) *sacloud.LoadBalancerCreateRequest {
+	nic := expandLoadBalancerNetworkInterface(d)
 	return &sacloud.LoadBalancerCreateRequest{
-		SwitchID:           expandSakuraCloudID(d, "switch_id"),
+		SwitchID:           nic.switchID,
 		PlanID:             expandLoadBalancerPlanID(d),
-		VRID:               d.Get("vrid").(int),
-		IPAddresses:        expandLoadBalancerIPAddresses(d),
-		NetworkMaskLen:     d.Get("netmask").(int),
-		DefaultRoute:       d.Get("gateway").(string),
+		VRID:               nic.vrid,
+		IPAddresses:        nic.ipAddresses,
+		NetworkMaskLen:     nic.netmask,
+		DefaultRoute:       nic.gateway,
 		Name:               d.Get("name").(string),
 		Description:        d.Get("description").(string),
 		Tags:               expandTags(d),

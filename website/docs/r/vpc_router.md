@@ -28,13 +28,15 @@ resource "sakuracloud_vpc_router" "premium" {
 
   internet_connection = true
 
-  switch_id    = sakuracloud_internet.foobar.switch_id
-  vip          = sakuracloud_internet.foobar.ip_addresses[0]
-  ip_addresses = [sakuracloud_internet.foobar.ip_addresses[1], sakuracloud_internet.foobar.ip_addresses[2]]
-  aliases      = [sakuracloud_internet.foobar.ip_addresses[3]]
-  vrid         = 1
+  public_network_interface {
+    switch_id    = sakuracloud_internet.foobar.switch_id
+    vip          = sakuracloud_internet.foobar.ip_addresses[0]
+    ip_addresses = [sakuracloud_internet.foobar.ip_addresses[1], sakuracloud_internet.foobar.ip_addresses[2]]
+    aliases      = [sakuracloud_internet.foobar.ip_addresses[3]]
+    vrid         = 1
+  }
 
-  network_interface {
+  private_network_interface {
     index        = 1
     switch_id    = sakuracloud_switch.foobar.id
     vip          = "192.168.11.1"
@@ -141,64 +143,50 @@ resource sakuracloud_switch "foobar" {
 * `internet_connection` - (Optional) The flag to enable connecting to the Internet from the VPC Router. Default:`true`.
 * `plan` - (Optional) The plan name of the VPCRouter. This must be one of [`standard`/`premium`/`highspec`/`highspec4000`]. Changing this forces a new resource to be created. Default:`standard`.
 * `syslog_host` - (Optional) The ip address of the syslog host to which the VPC Router sends logs.
-* `vrid` - (Optional) The Virtual Router Identifier. This is only required when `plan` is not `standard`. Changing this forces a new resource to be created.
 
 #### Network
 
+* `public_network_interface` - (Optional) An `public_network_interface` block as defined below. This block is required when `plan` is not `standard`.
+* `private_network_interface` - (Optional) A list of additional network interface setting. This doesn't include primary network interface setting.
+
+---
+
+A `public_network_interface` block supports the following:
+
 * `aliases` - (Optional) A list of ip alias to assign to the VPC Router. This can only be specified if `plan` is not `standard`.
-* `ip_addresses` - (Optional) The list of the IP address to assign to the VPC Router. This is required only one value when `plan` is `standard`, two values otherwise. Changing this forces a new resource to be created.
-* `network_interface` - (Optional) A list of additional network interface setting. This doesn't include primary network interface setting.
-* `switch_id` - (Optional) The id of the switch to connect. This is only required when when `plan` is not `standard`. Changing this forces a new resource to be created.
-* `vip` - (Optional) The virtual IP address of the VPC Router. This is only required when `plan` is not `standard`. Changing this forces a new resource to be created.
+* `ip_addresses` - (Optional) The list of the IP address to assign to the VPC Router. This is required only one value when `plan` is `standard`, two values otherwise.
+* `switch_id` - (Optional) The id of the switch to connect. This is only required when when `plan` is not `standard`.
+* `vip` - (Optional) The virtual IP address of the VPC Router. This is only required when `plan` is not `standard`.
+* `vrid` - (Optional) The Virtual Router Identifier. This is only required when `plan` is not `standard`.
+
+---
+
+A `private_network_interface` block supports the following:
+
+* `index` - (Required) The index of the network interface. This must be in the range [`1`-`7`].
+* `ip_addresses` - (Required) A list of ip address to assign to the network interface. This is required only one value when `plan` is `standard`, two values otherwise.
+* `netmask` - (Required) The bit length of the subnet to assign to the network interface.
+* `switch_id` - (Required) The id of the connected switch.
+* `vip` - (Optional) The virtual IP address to assign to the network interface. This is only required when `plan` is not `standard`.
+
+---
 
 #### Static Route
 
 * `static_route` - (Optional) One or more `static_route` blocks as defined below.
 
+---
+
+A `static_route` block supports the following:
+
+* `next_hop` - (Required) The IP address of the next hop.
+* `prefix` - (Required) The CIDR block of destination.
+
+---
+
 #### Firewall
 
 * `firewall` - (Optional) One or more `firewall` blocks as defined below.
-
-#### Site to Site VPN
-
-* `site_to_site_vpn` - (Optional) One or more `site_to_site_vpn` blocks as defined below.
-
-#### DHCP/NAT/Forwarding
-
-* `dhcp_server` - (Optional) One or more `dhcp_server` blocks as defined below.
-* `dhcp_static_mapping` - (Optional) One or more `dhcp_static_mapping` blocks as defined below.
-* `port_forwarding` - (Optional) One or more `port_forwarding` blocks as defined below.
-* `static_nat` - (Optional) One or more `static_nat` blocks as defined below.
-
-#### Remote Access
-
-* `l2tp` - (Optional) A `l2tp` block as defined below.
-* `pptp` - (Optional) A `pptp` block as defined below.
-* `user` - (Optional) One or more `user` blocks as defined below.
-
-#### Common Arguments
-
-* `description` - (Optional) The description of the VPCRouter. The length of this value must be in the range [`1`-`512`].
-* `icon_id` - (Optional) The icon id to attach to the VPCRouter.
-* `tags` - (Optional) Any tags to assign to the VPCRouter.
-* `zone` - (Optional) The name of zone that the VPCRouter will be created. (e.g. `is1a`, `tk1a`). Changing this forces a new resource to be created.
-
-
----
-
-A `dhcp_server` block supports the following:
-
-* `interface_index` - (Required) The index of the network interface on which to enable the DHCP service. This must be in the range [`1`-`7`].
-* `range_start` - (Required) The start value of IP address range to assign to DHCP client.
-* `range_stop` - (Required) The end value of IP address range to assign to DHCP client.
-* `dns_servers` - (Optional) A list of IP address of DNS server to assign to DHCP client.
-
----
-
-A `dhcp_static_mapping` block supports the following:
-
-* `ip_address` - (Required) The static IP address to assign to DHCP client.
-* `mac_address` - (Required) The source MAC address of static mapping.
 
 ---
 
@@ -223,38 +211,9 @@ A `expression` block supports the following:
 
 ---
 
-A `l2tp` block supports the following:
+#### Site to Site VPN
 
-* `pre_shared_secret` - (Required) The pre shared secret for L2TP/IPsec.
-* `range_start` - (Required) The start value of IP address range to assign to L2TP/IPsec client.
-* `range_stop` - (Required) The end value of IP address range to assign to L2TP/IPsec client.
-
----
-
-A `network_interface` block supports the following:
-
-* `index` - (Required) The index of the network interface. This must be in the range [`1`-`7`].
-* `ip_addresses` - (Required) A list of ip address to assign to the network interface. This is required only one value when `plan` is `standard`, two values otherwise.
-* `netmask` - (Required) The bit length of the subnet to assign to the network interface.
-* `switch_id` - (Required) The id of the connected switch.
-* `vip` - (Optional) The virtual IP address to assign to the network interface. This is only required when `plan` is not `standard`.
-
----
-
-A `port_forwarding` block supports the following:
-
-* `private_ip` - (Required) The destination ip address of the port forwarding.
-* `private_port` - (Required) The destination port number of the port forwarding. This will be a port number on a private network.
-* `protocol` - (Required) The protocol used for port forwarding. This must be one of [`tcp`/`udp`].
-* `public_port` - (Required) The source port number of the port forwarding. This must be a port number on a public network.
-* `description` - (Optional) The description of the port forwarding. The length of this value must be in the range [`0`-`512`].
-
----
-
-A `pptp` block supports the following:
-
-* `range_start` - (Required) The start value of IP address range to assign to PPTP client.
-* `range_stop` - (Required) The end value of IP address range to assign to PPTP client.
+* `site_to_site_vpn` - (Optional) One or more `site_to_site_vpn` blocks as defined below.
 
 ---
 
@@ -268,6 +227,41 @@ A `site_to_site_vpn` block supports the following:
 
 ---
 
+#### DHCP/NAT/Forwarding
+
+* `dhcp_server` - (Optional) One or more `dhcp_server` blocks as defined below.
+* `dhcp_static_mapping` - (Optional) One or more `dhcp_static_mapping` blocks as defined below.
+* `port_forwarding` - (Optional) One or more `port_forwarding` blocks as defined below.
+* `static_nat` - (Optional) One or more `static_nat` blocks as defined below.
+
+---
+
+A `dhcp_server` block supports the following:
+
+* `interface_index` - (Required) The index of the network interface on which to enable the DHCP service. This must be in the range [`1`-`7`].
+* `range_start` - (Required) The start value of IP address range to assign to DHCP client.
+* `range_stop` - (Required) The end value of IP address range to assign to DHCP client.
+* `dns_servers` - (Optional) A list of IP address of DNS server to assign to DHCP client.
+
+---
+
+A `dhcp_static_mapping` block supports the following:
+
+* `ip_address` - (Required) The static IP address to assign to DHCP client.
+* `mac_address` - (Required) The source MAC address of static mapping.
+
+---
+
+A `port_forwarding` block supports the following:
+
+* `private_ip` - (Required) The destination ip address of the port forwarding.
+* `private_port` - (Required) The destination port number of the port forwarding. This will be a port number on a private network.
+* `protocol` - (Required) The protocol used for port forwarding. This must be one of [`tcp`/`udp`].
+* `public_port` - (Required) The source port number of the port forwarding. This must be a port number on a public network.
+* `description` - (Optional) The description of the port forwarding. The length of this value must be in the range [`0`-`512`].
+
+---
+
 A `static_nat` block supports the following:
 
 * `private_ip` - (Required) The private IP address used for the static NAT.
@@ -276,10 +270,26 @@ A `static_nat` block supports the following:
 
 ---
 
-A `static_route` block supports the following:
+#### Remote Access
 
-* `next_hop` - (Required) The IP address of the next hop.
-* `prefix` - (Required) The CIDR block of destination.
+* `l2tp` - (Optional) A `l2tp` block as defined below.
+* `pptp` - (Optional) A `pptp` block as defined below.
+* `user` - (Optional) One or more `user` blocks as defined below.
+
+---
+
+A `l2tp` block supports the following:
+
+* `pre_shared_secret` - (Required) The pre shared secret for L2TP/IPsec.
+* `range_start` - (Required) The start value of IP address range to assign to L2TP/IPsec client.
+* `range_stop` - (Required) The end value of IP address range to assign to L2TP/IPsec client.
+
+---
+
+A `pptp` block supports the following:
+
+* `range_start` - (Required) The start value of IP address range to assign to PPTP client.
+* `range_stop` - (Required) The end value of IP address range to assign to PPTP client.
 
 ---
 
@@ -287,6 +297,15 @@ A `user` block supports the following:
 
 * `name` - (Required) The user name used to authenticate remote access.
 * `password` - (Required) The password used to authenticate remote access.
+
+---
+
+#### Common Arguments
+
+* `description` - (Optional) The description of the VPCRouter. The length of this value must be in the range [`1`-`512`].
+* `icon_id` - (Optional) The icon id to attach to the VPCRouter.
+* `tags` - (Optional) Any tags to assign to the VPCRouter.
+* `zone` - (Optional) The name of zone that the VPCRouter will be created. (e.g. `is1a`, `tk1a`). Changing this forces a new resource to be created.
 
 
 ### Timeouts
@@ -301,4 +320,6 @@ The `timeouts` block allows you to specify [timeouts](https://www.terraform.io/d
 
 * `id` - The id of the VPC Router.
 * `public_ip` - The public ip address of the VPC Router.
+* `public_netmask` - The bit length of the subnet to assign to the public network interface.
+
 

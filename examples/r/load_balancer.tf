@@ -1,10 +1,14 @@
 resource "sakuracloud_load_balancer" "foobar" {
-  name         = "foobar"
-  switch_id    = sakuracloud_switch.foobar.id
-  vrid         = 1
-  ip_addresses = ["192.168.11.101"]
-  netmask      = 24
-  gateway      = "192.168.11.1"
+  name = "foobar"
+  plan = "standard"
+
+  network_interface {
+    switch_id    = sakuracloud_switch.foobar.id
+    vrid         = 1
+    ip_addresses = ["192.168.11.101"]
+    netmask      = 24
+    gateway      = "192.168.11.1"
+  }
 
   description = "description"
   tags        = ["tag1", "tag2"]
