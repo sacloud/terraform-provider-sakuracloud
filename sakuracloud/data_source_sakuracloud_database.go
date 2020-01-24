@@ -62,26 +62,42 @@ func dataSourceSakuraCloudDatabase() *schema.Resource {
 				Sensitive:   true,
 				Description: "The password of user that processing a replication",
 			},
-			"source_ranges": schemaDataSourceSourceRanges(resourceName),
-			"port":          schemaDataSourcePort(),
-			"backup_weekdays": {
+			"network_interface": {
 				Type:     schema.TypeList,
-				Elem:     &schema.Schema{Type: schema.TypeString},
 				Computed: true,
-				Description: descf(
-					"The list of name of weekday that doing backup. This will be in [%s]",
-					types.BackupWeekdayStrings,
-				),
+				Elem: &schema.Resource{
+					Schema: map[string]*schema.Schema{
+						"switch_id":     schemaDataSourceSwitchID(resourceName),
+						"ip_address":    schemaDataSourceIPAddress(resourceName),
+						"netmask":       schemaDataSourceNetMask(resourceName),
+						"gateway":       schemaDataSourceGateway(resourceName),
+						"port":          schemaDataSourcePort(),
+						"source_ranges": schemaDataSourceSourceRanges(resourceName),
+					},
+				},
 			},
-			"backup_time": {
-				Type:        schema.TypeString,
-				Computed:    true,
-				Description: "The time to take backup. This will be formatted with `HH:mm`",
+			"backup": {
+				Type:     schema.TypeList,
+				Computed: true,
+				Elem: &schema.Resource{
+					Schema: map[string]*schema.Schema{
+						"weekdays": {
+							Type:     schema.TypeList,
+							Elem:     &schema.Schema{Type: schema.TypeString},
+							Computed: true,
+							Description: descf(
+								"The list of name of weekday that doing backup. This will be in [%s]",
+								types.BackupWeekdayStrings,
+							),
+						},
+						"time": {
+							Type:        schema.TypeString,
+							Computed:    true,
+							Description: "The time to take backup. This will be formatted with `HH:mm`",
+						},
+					},
+				},
 			},
-			"switch_id":   schemaDataSourceSwitchID(resourceName),
-			"ip_address":  schemaDataSourceIPAddress(resourceName),
-			"netmask":     schemaDataSourceNetMask(resourceName),
-			"gateway":     schemaDataSourceGateway(resourceName),
 			"icon_id":     schemaDataSourceIconID(resourceName),
 			"description": schemaDataSourceDescription(resourceName),
 			"tags":        schemaDataSourceTags(resourceName),
