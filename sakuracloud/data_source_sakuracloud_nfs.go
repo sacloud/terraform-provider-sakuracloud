@@ -32,14 +32,22 @@ func dataSourceSakuraCloudNFS() *schema.Resource {
 			"name":         schemaDataSourceName(resourceName),
 			"plan":         schemaDataSourcePlan(resourceName, types.NFSPlanStrings),
 			"size":         schemaDataSourceSize(resourceName),
-			"switch_id":    schemaDataSourceSwitchID(resourceName),
-			"ip_address":   schemaDataSourceIPAddress(resourceName),
-			"netmask":      schemaDataSourceNetMask(resourceName),
-			"gateway":      schemaDataSourceGateway(resourceName),
-			"icon_id":      schemaDataSourceIconID(resourceName),
-			"description":  schemaDataSourceDescription(resourceName),
-			"tags":         schemaDataSourceTags(resourceName),
-			"zone":         schemaDataSourceZone(resourceName),
+			"network_interface": {
+				Type:     schema.TypeList,
+				Computed: true,
+				Elem: &schema.Resource{
+					Schema: map[string]*schema.Schema{
+						"switch_id":  schemaDataSourceSwitchID(resourceName),
+						"ip_address": schemaDataSourceIPAddress(resourceName),
+						"netmask":    schemaDataSourceNetMask(resourceName),
+						"gateway":    schemaDataSourceGateway(resourceName),
+					},
+				},
+			},
+			"icon_id":     schemaDataSourceIconID(resourceName),
+			"description": schemaDataSourceDescription(resourceName),
+			"tags":        schemaDataSourceTags(resourceName),
+			"zone":        schemaDataSourceZone(resourceName),
 		},
 	}
 }

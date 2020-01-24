@@ -47,32 +47,42 @@ func resourceSakuraCloudNFS() *schema.Resource {
 		},
 
 		Schema: map[string]*schema.Schema{
-			"name":      schemaResourceName(resourceName),
-			"switch_id": schemaResourceSwitchID(resourceName),
-			"plan":      schemaResourcePlan(resourceName, "hdd", types.NFSPlanStrings),
-			"size":      schemaResourceSize(resourceName, 100),
-			"ip_address": {
-				Type:        schema.TypeString,
-				ForceNew:    true,
-				Required:    true,
-				Description: descf("The IP address to assign to the %s", resourceName),
-			},
-			"netmask": {
-				Type:         schema.TypeInt,
-				ForceNew:     true,
-				Required:     true,
-				ValidateFunc: validation.IntBetween(8, 29),
-				Description: descf(
-					"The bit length of the subnet to assign to the %s. %s",
-					resourceName,
-					descRange(8, 29),
-				),
-			},
-			"gateway": {
-				Type:        schema.TypeString,
-				ForceNew:    true,
-				Optional:    true,
-				Description: descf("The IP address of the gateway used by %s", resourceName),
+			"name": schemaResourceName(resourceName),
+			"plan": schemaResourcePlan(resourceName, "hdd", types.NFSPlanStrings),
+			"size": schemaResourceSize(resourceName, 100),
+			"network_interface": {
+				Type:     schema.TypeList,
+				Required: true,
+				MinItems: 1,
+				MaxItems: 1,
+				Elem: &schema.Resource{
+					Schema: map[string]*schema.Schema{
+						"switch_id": schemaResourceSwitchID(resourceName),
+						"ip_address": {
+							Type:        schema.TypeString,
+							ForceNew:    true,
+							Required:    true,
+							Description: descf("The IP address to assign to the %s", resourceName),
+						},
+						"netmask": {
+							Type:         schema.TypeInt,
+							ForceNew:     true,
+							Required:     true,
+							ValidateFunc: validation.IntBetween(8, 29),
+							Description: descf(
+								"The bit length of the subnet to assign to the %s. %s",
+								resourceName,
+								descRange(8, 29),
+							),
+						},
+						"gateway": {
+							Type:        schema.TypeString,
+							ForceNew:    true,
+							Optional:    true,
+							Description: descf("The IP address of the gateway used by %s", resourceName),
+						},
+					},
+				},
 			},
 			"icon_id":     schemaResourceIconID(resourceName),
 			"description": schemaResourceDescription(resourceName),
@@ -211,17 +221,14 @@ func setNFSResourceData(ctx context.Context, d *schema.ResourceData, client *API
 	if err != nil {
 		return err
 	}
-
-	d.Set("switch_id", data.SwitchID.String()) // nolint
-	d.Set("ip_address", data.IPAddresses[0])   // nolint
-	d.Set("netmask", data.NetworkMaskLen)      // nolint
-	d.Set("gateway", data.DefaultRoute)        // nolint
-	d.Set("plan", plan)                        // nolint
-	d.Set("size", size)                        // nolint
-	d.Set("name", data.Name)                   // nolint
-	d.Set("icon_id", data.IconID.String())     // nolint
-	d.Set("description", data.Description)     // nolint
-	d.Set("zone", getZone(d, client))          // nolint
-
+	d.Set("plan", plan) // nolint
+	d.Set("size", size) // nolint
+	if err := d.Set("network_interface", flattenNFSNetworkInterface(data)); err != nil {
+		return err
+	}
+	d.Set("name", data.Name)               // nolint
+	d.Set("icon_id", data.IconID.String()) // nolint
+	d.Set("description", data.Description) // nolint
+	d.Set("zone", getZone(d, client))      // nolint
 	return d.Set("tags", flattenTags(data.Tags))
 }

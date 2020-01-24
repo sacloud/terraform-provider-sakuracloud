@@ -39,12 +39,12 @@ func TestAccSakuraCloudDataSourceNFS_basic(t *testing.T) {
 					resource.TestCheckResourceAttr(resourceName, "tags.1852302624", "tag2"),
 					resource.TestCheckResourceAttr(resourceName, "tags.425776566", "tag3"),
 					resource.TestCheckResourceAttrPair(
-						resourceName, "switch_id",
+						resourceName, "network_interface.0.switch_id",
 						"sakuracloud_switch.foobar", "id",
 					),
-					resource.TestCheckResourceAttr(resourceName, "ip_address", "192.168.11.101"),
-					resource.TestCheckResourceAttr(resourceName, "netmask", "24"),
-					resource.TestCheckResourceAttr(resourceName, "gateway", "192.168.11.1"),
+					resource.TestCheckResourceAttr(resourceName, "network_interface.0.ip_address", "192.168.11.101"),
+					resource.TestCheckResourceAttr(resourceName, "network_interface.0.netmask", "24"),
+					resource.TestCheckResourceAttr(resourceName, "network_interface.0.gateway", "192.168.11.1"),
 				),
 			},
 		},
@@ -60,11 +60,13 @@ resource "sakuracloud_nfs" "foobar" {
   name        = "{{ .arg0 }}"
   description = "description"
   tags        = ["tag1", "tag2", "tag3"]
-  switch_id   = sakuracloud_switch.foobar.id
-  ip_address  = "192.168.11.101"
-  netmask     = 24
-  gateway     = "192.168.11.1"
 
+  network_interface {
+    switch_id   = sakuracloud_switch.foobar.id
+    ip_address  = "192.168.11.101"
+    netmask     = 24
+    gateway     = "192.168.11.1"
+  }
 }
 
 data "sakuracloud_nfs" "foobar" {

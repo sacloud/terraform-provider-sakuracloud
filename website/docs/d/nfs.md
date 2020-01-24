@@ -45,15 +45,21 @@ A `condition` block supports the following:
 
 * `id` - The id of the NFS.
 * `description` - The description of the NFS.
-* `gateway` - The IP address of the gateway used by NFS.
 * `icon_id` - The icon id attached to the NFS.
-* `ip_address` - The IP address assigned to the NFS.
+* `network_interface` - A list of `network_interface` blocks as defined below.
 * `name` - The name of the NFS.
-* `netmask` - The bit length of the subnet assigned to the NFS.
 * `plan` - The plan name of the NFS. This will be one of [`hdd`/`ssd`].
 * `size` - The size of NFS in GiB.
-* `switch_id` - The id of the switch connected from the NFS.
 * `tags` - Any tags assigned to the NFS.
+
+---
+
+A `network_interface` block exports the following:
+
+* `gateway` - The IP address of the gateway used by NFS.
+* `ip_address` - The IP address assigned to the NFS.
+* `netmask` - The bit length of the subnet assigned to the NFS.
+* `switch_id` - The id of the switch connected from the NFS.
 
 
 
