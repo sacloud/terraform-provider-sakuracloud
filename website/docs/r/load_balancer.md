@@ -14,12 +14,16 @@ Manages a SakuraCloud Load Balancer.
 
 ```hcl
 resource "sakuracloud_load_balancer" "foobar" {
-  name         = "foobar"
-  switch_id    = sakuracloud_switch.foobar.id
-  vrid         = 1
-  ip_addresses = ["192.168.11.101"]
-  netmask      = 24
-  gateway      = "192.168.11.1"
+  name = "foobar"
+  plan = "standard"
+
+  network_interface {
+    switch_id    = sakuracloud_switch.foobar.id
+    vrid         = 1
+    ip_addresses = ["192.168.11.101"]
+    netmask      = 24
+    gateway      = "192.168.11.1"
+  }
 
   description = "description"
   tags        = ["tag1", "tag2"]
@@ -54,24 +58,22 @@ resource "sakuracloud_switch" "foobar" {
 ## Argument Reference
 
 * `name` - (Required) The name of the LoadBalancer. The length of this value must be in the range [`1`-`64`].
-* `vrid` - (Required) The Virtual Router Identifier. This is only used when `high_availability` is set `true`. Changing this forces a new resource to be created.
-* `high_availability` - (Optional) The flag to enable HA mode. Changing this forces a new resource to be created.
 * `plan` - (Optional) The plan name of the LoadBalancer. This must be one of [`standard`/`highspec`]. Changing this forces a new resource to be created. Default:`standard`.
-* `vip` - (Optional) One or more `vip` blocks as defined below.
 
 #### Network
 
-* `ip_addresses` - (Required) A list of IP address to assign to the LoadBalancer. . Changing this forces a new resource to be created.
-* `netmask` - (Required) The bit length of the subnet assigned to the LoadBalancer. This must be in the range [`8`-`29`]. Changing this forces a new resource to be created.
-* `gateway` - (Optional) The IP address of the gateway used by LoadBalancer. Changing this forces a new resource to be created.
-* `switch_id` - (Required) The id of the switch to which the LoadBalancer connects. Changing this forces a new resource to be created.
+* `network_interface` - (Required) An `network_interface` block as defined below.
+* `vip` - (Optional) One or more `vip` blocks as defined below.
 
-#### Common Arguments
+---
 
-* `description` - (Optional) The description of the LoadBalancer. The length of this value must be in the range [`1`-`512`].
-* `icon_id` - (Optional) The icon id to attach to the LoadBalancer.
-* `tags` - (Optional) Any tags to assign to the LoadBalancer.
-* `zone` - (Optional) The name of zone that the LoadBalancer will be created. (e.g. `is1a`, `tk1a`). Changing this forces a new resource to be created.
+A `network_interface` block supports the following:
+
+* `gateway` - (Optional) The IP address of the gateway used by LoadBalancer.
+* `ip_addresses` - (Required) A list of IP address to assign to the LoadBalancer. .
+* `netmask` - (Required) The bit length of the subnet assigned to the LoadBalancer. This must be in the range [`8`-`29`].
+* `switch_id` - (Required) The id of the switch to which the LoadBalancer connects.
+* `vrid` - (Required) The Virtual Router Identifier.
 
 ---
 
@@ -94,6 +96,13 @@ A `server` block supports the following:
 * `path` - (Optional) The path used when checking by HTTP/HTTPS.
 * `status` - (Optional) The response code to expect when checking by HTTP/HTTPS.
 
+
+#### Common Arguments
+
+* `description` - (Optional) The description of the LoadBalancer. The length of this value must be in the range [`1`-`512`].
+* `icon_id` - (Optional) The icon id to attach to the LoadBalancer.
+* `tags` - (Optional) Any tags to assign to the LoadBalancer.
+* `zone` - (Optional) The name of zone that the LoadBalancer will be created. (e.g. `is1a`, `tk1a`). Changing this forces a new resource to be created.
 
 ### Timeouts
 

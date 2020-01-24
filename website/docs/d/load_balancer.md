@@ -45,18 +45,22 @@ A `condition` block supports the following:
 
 * `id` - The id of the Load Balancer.
 * `description` - The description of the LoadBalancer.
-* `gateway` - The IP address of the gateway used by LoadBalancer.
-* `high_availability` - The flag to enable HA mode.
+* `network_interface` - A list of `network_interface` blocks as defined below.
 * `icon_id` - The icon id attached to the LoadBalancer.
-* `ip_addresses` - The list of IP address assigned to the LoadBalancer.
 * `name` - The name of the LoadBalancer.
-* `netmask` - The bit length of the subnet assigned to the LoadBalancer.
 * `plan` - The plan name of the LoadBalancer. This will be one of [`standard`/`highspec`].
-* `switch_id` - The id of the switch connected from the LoadBalancer.
 * `tags` - Any tags assigned to the LoadBalancer.
 * `vip` - A list of `vip` blocks as defined below.
-* `vrid` - The Virtual Router Identifier. This is only used when `high_availability` is set `true`.
 
+---
+
+A `network_interface` block exports the following:
+
+* `gateway` - The IP address of the gateway used by LoadBalancer.
+* `ip_addresses` - The list of IP address assigned to the LoadBalancer.
+* `netmask` - The bit length of the subnet assigned to the LoadBalancer.
+* `switch_id` - The id of the switch connected from the LoadBalancer.
+* `vrid` - The Virtual Router Identifier.
 
 ---
 
