@@ -55,12 +55,13 @@ func flattenNFSDiskPlan(ctx context.Context, client *APIClient, planID types.ID)
 }
 
 func expandNFSCreateRequest(d *schema.ResourceData, planID types.ID) *sacloud.NFSCreateRequest {
+	nic := expandNFSNetworkInterface(d)
 	return &sacloud.NFSCreateRequest{
-		SwitchID:       expandSakuraCloudID(d, "switch_id"),
+		SwitchID:       nic.switchID,
 		PlanID:         planID,
-		IPAddresses:    []string{d.Get("ip_address").(string)},
-		NetworkMaskLen: d.Get("netmask").(int),
-		DefaultRoute:   d.Get("gateway").(string),
+		IPAddresses:    []string{nic.ipAddress},
+		NetworkMaskLen: nic.netmask,
+		DefaultRoute:   nic.gateway,
 		Name:           d.Get("name").(string),
 		Description:    d.Get("description").(string),
 		Tags:           expandTags(d),
@@ -74,5 +75,36 @@ func expandNFSUpdateRequest(d *schema.ResourceData) *sacloud.NFSUpdateRequest {
 		Description: d.Get("description").(string),
 		Tags:        expandTags(d),
 		IconID:      expandSakuraCloudID(d, "icon_id"),
+	}
+}
+
+type nfsNetworkInterface struct {
+	switchID  types.ID
+	ipAddress string
+	netmask   int
+	gateway   string
+}
+
+func expandNFSNetworkInterface(d resourceValueGettable) *nfsNetworkInterface {
+	d = mapFromFirstElement(d, "network_interface")
+	if d == nil {
+		return nil
+	}
+	return &nfsNetworkInterface{
+		switchID:  expandSakuraCloudID(d, "switch_id"),
+		ipAddress: stringOrDefault(d, "ip_address"),
+		netmask:   intOrDefault(d, "netmask"),
+		gateway:   stringOrDefault(d, "gateway"),
+	}
+}
+
+func flattenNFSNetworkInterface(nfs *sacloud.NFS) []interface{} {
+	return []interface{}{
+		map[string]interface{}{
+			"switch_id":  nfs.SwitchID.String(),
+			"ip_address": nfs.IPAddresses[0],
+			"netmask":    nfs.NetworkMaskLen,
+			"gateway":    nfs.DefaultRoute,
+		},
 	}
 }
