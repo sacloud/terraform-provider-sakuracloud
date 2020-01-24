@@ -68,11 +68,6 @@ resource "sakuracloud_packet_filter" "foobar" {
 * `name` - (Required) The name of the packetFilter. The length of this value must be in the range [`1`-`64`].
 * `expression` - (Optional) One or more `expression` blocks as defined below.
 
-#### Common Arguments
-
-* `description` - (Optional) The description of the packetFilter. The length of this value must be in the range [`1`-`512`].
-* `zone` - (Optional) The name of zone that the packetFilter will be created. (e.g. `is1a`, `tk1a`). Changing this forces a new resource to be created.
-
 ---
 
 A `expression` block supports the following:
@@ -84,6 +79,10 @@ A `expression` block supports the following:
 * `source_port` - (Optional) A source port number or port range used for filtering (e.g. `1024`, `1024-2048`).
 * `description` - (Optional) The description of the expression.
 
+#### Common Arguments
+
+* `description` - (Optional) The description of the packetFilter. The length of this value must be in the range [`1`-`512`].
+* `zone` - (Optional) The name of zone that the packetFilter will be created. (e.g. `is1a`, `tk1a`). Changing this forces a new resource to be created.
 
 ### Timeouts
 

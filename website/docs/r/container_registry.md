@@ -54,18 +54,19 @@ resource "sakuracloud_container_registry" "foobar" {
 * `subdomain_label` - (Required) The label at the lowest of the FQDN used when be accessed from users. The length of this value must be in the range [`1`-`64`]. Changing this forces a new resource to be created.
 * `user` - (Optional) One or more `user` blocks as defined below.
 
-#### Common Arguments
-
-* `description` - (Optional) The description of the Container Registry. The length of this value must be in the range [`1`-`512`].
-* `icon_id` - (Optional) The icon id to attach to the Container Registry.
-* `tags` - (Optional) Any tags to assign to the Container Registry.
-
 ---
 
 A `user` block supports the following:
 
 * `name` - (Required) The user name used to authenticate remote access.
 * `password` - (Required) The password used to authenticate remote access.
+
+#### Common Arguments
+
+* `description` - (Optional) The description of the Container Registry. The length of this value must be in the range [`1`-`512`].
+* `icon_id` - (Optional) The icon id to attach to the Container Registry.
+* `tags` - (Optional) Any tags to assign to the Container Registry.
+
 
 ### Timeouts
 

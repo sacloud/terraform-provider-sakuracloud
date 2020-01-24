@@ -69,13 +69,6 @@ resource "sakuracloud_switch" "foobar" {
 * `static_route` - (Optional) One or more `static_route` blocks as defined below.
 * `traffic_control` - (Optional) A `traffic_control` block as defined below.
 
-#### Common Arguments
-
-* `description` - (Optional) The description of the MobileGateway. The length of this value must be in the range [`1`-`512`].
-* `icon_id` - (Optional) The icon id to attach to the MobileGateway.
-* `tags` - (Optional) Any tags to assign to the MobileGateway.
-* `zone` - (Optional) The name of zone that the MobileGateway will be created. (e.g. `is1a`, `tk1a`). Changing this forces a new resource to be created.
-
 ---
 
 A `private_network_interface` block supports the following:
@@ -115,6 +108,13 @@ A `traffic_control` block supports the following:
 * `enable_email` - (Optional) The flag to enable email notification when the traffic shaping is enabled.
 * `enable_slack` - (Optional) The flag to enable slack notification when the traffic shaping is enabled.
 * `slack_webhook` - (Optional) The webhook URL used when sends notification. It will only used when `enable_slack` is set `true`.
+
+#### Common Arguments
+
+* `description` - (Optional) The description of the MobileGateway. The length of this value must be in the range [`1`-`512`].
+* `icon_id` - (Optional) The icon id to attach to the MobileGateway.
+* `tags` - (Optional) Any tags to assign to the MobileGateway.
+* `zone` - (Optional) The name of zone that the MobileGateway will be created. (e.g. `is1a`, `tk1a`). Changing this forces a new resource to be created.
 
 
 ### Timeouts

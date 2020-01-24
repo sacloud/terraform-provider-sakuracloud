@@ -49,7 +49,6 @@ A `network_interface` block supports the following:
 * `source_ranges` - (Optional) The range of source IP addresses that allow to access to the read-replica database via network.
 * `switch_id` - (Optional) The id of the switch to which the read-replica database connects. If `switch_id` isn't specified, it will be set to the same value of the master database.
 
-
 #### Common Arguments
 
 * `description` - (Optional) The description of the read-replica database. The length of this value must be in the range [`1`-`512`].

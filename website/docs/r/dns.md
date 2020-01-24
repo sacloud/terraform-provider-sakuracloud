@@ -35,12 +35,6 @@ resource "sakuracloud_dns" "foobar" {
 * `zone` - (Required) The target zone. (e.g. `example.com`). Changing this forces a new resource to be created.
 * `record` - (Optional) One or more `record` blocks as defined below.
 
-#### Common Arguments
-
-* `description` - (Optional) The description of the DNS. The length of this value must be in the range [`1`-`512`].
-* `icon_id` - (Optional) The icon id to attach to the DNS.
-* `tags` - (Optional) Any tags to assign to the DNS.
-
 ---
 
 A `record` block supports the following:
@@ -50,14 +44,21 @@ A `record` block supports the following:
 * `value` - (Required) The value of the DNS Record.
 * `ttl` - (Optional) The number of the TTL.
 
-#### For MX/SRV Record
+##### MX/SRV Record
 
 * `priority` - (Optional) The priority of target DNS Record. This must be in the range [`0`-`65535`].
 
-#### For SRV record
+##### SRV record
 
 * `port` - (Optional) The number of port. This must be in the range [`1`-`65535`].
 * `weight` - (Optional) The weight of target DNS Record. This must be in the range [`0`-`65535`].
+
+#### Common Arguments
+
+* `description` - (Optional) The description of the DNS. The length of this value must be in the range [`1`-`512`].
+* `icon_id` - (Optional) The icon id to attach to the DNS.
+* `tags` - (Optional) Any tags to assign to the DNS.
+
 
 ### Timeouts
 
