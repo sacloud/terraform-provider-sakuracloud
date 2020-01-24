@@ -47,46 +47,49 @@ func resourceSakuraCloudLoadBalancer() *schema.Resource {
 		},
 
 		Schema: map[string]*schema.Schema{
-			"name":      schemaResourceName(resourceName),
-			"switch_id": schemaResourceSwitchID(resourceName),
-			"vrid": {
-				Type:        schema.TypeInt,
-				ForceNew:    true,
-				Required:    true,
-				Description: "The Virtual Router Identifier. This is only used when `high_availability` is set `true`",
-			},
-			"high_availability": {
-				Type:        schema.TypeBool,
-				ForceNew:    true,
-				Optional:    true,
-				Default:     false,
-				Description: "The flag to enable HA mode",
-			},
+			"name": schemaResourceName(resourceName),
 			"plan": schemaResourcePlan(resourceName, "standard", []string{"standard", "highspec"}),
-			"ip_addresses": {
-				Type:        schema.TypeList,
-				ForceNew:    true,
-				Required:    true,
-				MinItems:    1,
-				MaxItems:    2,
-				Elem:        &schema.Schema{Type: schema.TypeString},
-				Description: descf("A list of IP address to assign to the %s. ", resourceName),
-			},
-			"netmask": {
-				Type:         schema.TypeInt,
-				ForceNew:     true,
-				Required:     true,
-				ValidateFunc: validation.IntBetween(8, 29),
-				Description: descf(
-					"The bit length of the subnet assigned to the %s. %s", resourceName,
-					descRange(8, 29),
-				),
-			},
-			"gateway": {
-				Type:        schema.TypeString,
-				ForceNew:    true,
-				Optional:    true,
-				Description: descf("The IP address of the gateway used by %s", resourceName),
+			"network_interface": {
+				Type:     schema.TypeList,
+				Required: true,
+				MinItems: 1,
+				MaxItems: 1,
+				Elem: &schema.Resource{
+					Schema: map[string]*schema.Schema{
+						"switch_id": schemaResourceSwitchID(resourceName),
+						"vrid": {
+							Type:        schema.TypeInt,
+							ForceNew:    true,
+							Required:    true,
+							Description: "The Virtual Router Identifier",
+						},
+						"ip_addresses": {
+							Type:        schema.TypeList,
+							ForceNew:    true,
+							Required:    true,
+							MinItems:    1,
+							MaxItems:    2,
+							Elem:        &schema.Schema{Type: schema.TypeString},
+							Description: descf("A list of IP address to assign to the %s. ", resourceName),
+						},
+						"netmask": {
+							Type:         schema.TypeInt,
+							ForceNew:     true,
+							Required:     true,
+							ValidateFunc: validation.IntBetween(8, 29),
+							Description: descf(
+								"The bit length of the subnet assigned to the %s. %s", resourceName,
+								descRange(8, 29),
+							),
+						},
+						"gateway": {
+							Type:        schema.TypeString,
+							ForceNew:    true,
+							Optional:    true,
+							Description: descf("The IP address of the gateway used by %s", resourceName),
+						},
+					},
+				},
 			},
 			"icon_id":     schemaResourceIconID(resourceName),
 			"description": schemaResourceDescription(resourceName),
@@ -290,21 +293,14 @@ func setLoadBalancerResourceData(ctx context.Context, d *schema.ResourceData, cl
 		return fmt.Errorf("got unexpected state: LoadBalancer[%d].Availability is failed", data.ID)
 	}
 
-	ha, ipAddresses := flattenLoadBalancerIPAddresses(data)
-
-	d.Set("switch_id", data.SwitchID.String())     // nolint
-	d.Set("vrid", data.VRID)                       // nolint
+	if err := d.Set("network_interface", flattenLoadBalancerNetworkInterface(data)); err != nil {
+		return err
+	}
 	d.Set("plan", flattenLoadBalancerPlanID(data)) // nolint
-	d.Set("high_availability", ha)                 // nolint
-	d.Set("netmask", data.NetworkMaskLen)          // nolint
-	d.Set("gateway", data.DefaultRoute)            // nolint
 	d.Set("name", data.Name)                       // nolint
 	d.Set("icon_id", data.IconID.String())         // nolint
 	d.Set("description", data.Description)         // nolint
 	d.Set("zone", getZone(d, client))              // nolint
-	if err := d.Set("ip_addresses", ipAddresses); err != nil {
-		return err
-	}
 	if err := d.Set("vip", flattenLoadBalancerVIPs(data)); err != nil {
 		return err
 	}

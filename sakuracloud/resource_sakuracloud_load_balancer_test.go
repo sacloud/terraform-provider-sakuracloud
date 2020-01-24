@@ -49,11 +49,11 @@ func TestAccSakuraCloudLoadBalancer_basic(t *testing.T) {
 					resource.TestCheckResourceAttr(resourceName, "tags.#", "2"),
 					resource.TestCheckResourceAttr(resourceName, "tags.4151227546", "tag1"),
 					resource.TestCheckResourceAttr(resourceName, "tags.1852302624", "tag2"),
-					resource.TestCheckResourceAttr(resourceName, "vrid", "1"),
-					resource.TestCheckResourceAttr(resourceName, "ip_addresses.#", "1"),
-					resource.TestCheckResourceAttr(resourceName, "ip_addresses.0", "192.168.11.101"),
-					resource.TestCheckResourceAttr(resourceName, "netmask", "24"),
-					resource.TestCheckResourceAttr(resourceName, "gateway", "192.168.11.1"),
+					resource.TestCheckResourceAttr(resourceName, "network_interface.0.vrid", "1"),
+					resource.TestCheckResourceAttr(resourceName, "network_interface.0.ip_addresses.#", "1"),
+					resource.TestCheckResourceAttr(resourceName, "network_interface.0.ip_addresses.0", "192.168.11.101"),
+					resource.TestCheckResourceAttr(resourceName, "network_interface.0.netmask", "24"),
+					resource.TestCheckResourceAttr(resourceName, "network_interface.0.gateway", "192.168.11.1"),
 					resource.TestCheckResourceAttr(resourceName, "vip.0.vip", "192.168.11.201"),
 					resource.TestCheckResourceAttr(resourceName, "vip.0.port", "80"),
 					resource.TestCheckResourceAttr(resourceName, "vip.0.delay_loop", "10"),
@@ -85,11 +85,11 @@ func TestAccSakuraCloudLoadBalancer_basic(t *testing.T) {
 					resource.TestCheckResourceAttr(resourceName, "tags.#", "2"),
 					resource.TestCheckResourceAttr(resourceName, "tags.2362157161", "tag1-upd"),
 					resource.TestCheckResourceAttr(resourceName, "tags.3412841145", "tag2-upd"),
-					resource.TestCheckResourceAttr(resourceName, "vrid", "1"),
-					resource.TestCheckResourceAttr(resourceName, "ip_addresses.#", "1"),
-					resource.TestCheckResourceAttr(resourceName, "ip_addresses.0", "192.168.11.101"),
-					resource.TestCheckResourceAttr(resourceName, "netmask", "24"),
-					resource.TestCheckResourceAttr(resourceName, "gateway", "192.168.11.1"),
+					resource.TestCheckResourceAttr(resourceName, "network_interface.0.vrid", "1"),
+					resource.TestCheckResourceAttr(resourceName, "network_interface.0.ip_addresses.#", "1"),
+					resource.TestCheckResourceAttr(resourceName, "network_interface.0.ip_addresses.0", "192.168.11.101"),
+					resource.TestCheckResourceAttr(resourceName, "network_interface.0.netmask", "24"),
+					resource.TestCheckResourceAttr(resourceName, "network_interface.0.gateway", "192.168.11.1"),
 					resource.TestCheckResourceAttr(resourceName, "vip.0.vip", "192.168.11.201"),
 					resource.TestCheckResourceAttr(resourceName, "vip.0.port", "8080"),
 					resource.TestCheckResourceAttr(resourceName, "vip.0.delay_loop", "10"),
@@ -197,23 +197,22 @@ func TestAccImportSakuraCloudLoadBalancer_basic(t *testing.T) {
 			return fmt.Errorf("expected 1 state: %#v", s)
 		}
 		expects := map[string]string{
-			"name":              rand,
-			"vrid":              "1",
-			"high_availability": "false",
-			"plan":              "standard",
-			"ip_addresses.0":    "192.168.11.101",
-			"netmask":           "24",
-			"gateway":           "192.168.11.1",
-			"description":       "description",
-			"tags.4151227546":   "tag1",
-			"tags.1852302624":   "tag2",
-			"zone":              os.Getenv("SAKURACLOUD_ZONE"),
+			"name":                               rand,
+			"plan":                               "standard",
+			"network_interface.0.vrid":           "1",
+			"network_interface.0.ip_addresses.0": "192.168.11.101",
+			"network_interface.0.netmask":        "24",
+			"network_interface.0.gateway":        "192.168.11.1",
+			"description":                        "description",
+			"tags.4151227546":                    "tag1",
+			"tags.1852302624":                    "tag2",
+			"zone":                               os.Getenv("SAKURACLOUD_ZONE"),
 		}
 
 		if err := compareStateMulti(s[0], expects); err != nil {
 			return err
 		}
-		return stateNotEmptyMulti(s[0], "switch_id", "icon_id")
+		return stateNotEmptyMulti(s[0], "network_interface.0.switch_id", "icon_id")
 	}
 
 	resourceName := "sakuracloud_load_balancer.foobar"
@@ -241,11 +240,13 @@ resource "sakuracloud_switch" "foobar" {
   name = "{{ .arg0 }}"
 }
 resource "sakuracloud_load_balancer" "foobar" {
-  switch_id    = sakuracloud_switch.foobar.id
-  vrid         = 1
-  ip_addresses = ["192.168.11.101"]
-  netmask      = 24
-  gateway      = "192.168.11.1"
+  network_interface {
+    switch_id    = sakuracloud_switch.foobar.id
+    vrid         = 1
+    ip_addresses = ["192.168.11.101"]
+    netmask      = 24
+    gateway      = "192.168.11.1"
+  }
 
   name        = "{{ .arg0 }}"
   description = "description"
@@ -290,11 +291,13 @@ resource "sakuracloud_switch" "foobar" {
   name = "{{ .arg0 }}"
 }
 resource "sakuracloud_load_balancer" "foobar" {
-  switch_id    = sakuracloud_switch.foobar.id
-  vrid         = 1
-  ip_addresses = ["192.168.11.101"]
-  netmask      = 24
-  gateway      = "192.168.11.1"
+  network_interface {
+    switch_id    = sakuracloud_switch.foobar.id
+    vrid         = 1
+    ip_addresses = ["192.168.11.101"]
+    netmask      = 24
+    gateway      = "192.168.11.1"
+  }
 
   name        = "{{ .arg0 }}-upd"
   description = "description-upd"
@@ -329,14 +332,14 @@ resource "sakuracloud_internet" "foobar" {
 }
 
 resource "sakuracloud_load_balancer" "foobar" {
-  switch_id         = sakuracloud_internet.foobar.switch_id
-  plan              = "highspec"
-  high_availability = true
-
-  vrid         = 1
-  ip_addresses = [sakuracloud_internet.foobar.ip_addresses[0], sakuracloud_internet.foobar.ip_addresses[1]]
-  netmask      = sakuracloud_internet.foobar.netmask
-  gateway      = sakuracloud_internet.foobar.gateway
+  plan = "highspec"
+  network_interface {
+    switch_id    = sakuracloud_internet.foobar.switch_id
+    vrid         = 1
+    ip_addresses = [sakuracloud_internet.foobar.ip_addresses[0], sakuracloud_internet.foobar.ip_addresses[1]]
+    netmask      = sakuracloud_internet.foobar.netmask
+    gateway      = sakuracloud_internet.foobar.gateway
+  }
 
   name        = "{{ .arg0 }}"
   description = "description"
