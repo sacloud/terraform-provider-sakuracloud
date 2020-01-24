@@ -46,40 +46,50 @@ func resourceSakuraCloudVPCRouter() *schema.Resource {
 		Schema: map[string]*schema.Schema{
 			"name": schemaResourceName(resourceName),
 			"plan": schemaResourcePlan(resourceName, "standard", types.VPCRouterPlanStrings),
-			"switch_id": {
-				Type:         schema.TypeString,
-				ForceNew:     true,
-				Optional:     true,
-				ValidateFunc: validateSakuracloudIDType,
-				Description:  "The id of the switch to connect. This is only required when when `plan` is not `standard`",
-			},
-			"vip": {
-				Type:        schema.TypeString,
-				ForceNew:    true,
-				Optional:    true,
-				Description: "The virtual IP address of the VPC Router. This is only required when `plan` is not `standard`",
-			},
-			"ip_addresses": {
-				Type:        schema.TypeList,
-				ForceNew:    true,
-				Optional:    true,
-				MinItems:    2,
-				MaxItems:    2,
-				Elem:        &schema.Schema{Type: schema.TypeString},
-				Description: "The list of the IP address to assign to the VPC Router. This is required only one value when `plan` is `standard`, two values otherwise",
-			},
-			"vrid": {
-				Type:        schema.TypeInt,
-				ForceNew:    true,
-				Optional:    true,
-				Description: "The Virtual Router Identifier. This is only required when `plan` is not `standard`",
-			},
-			"aliases": {
-				Type:        schema.TypeList,
-				Optional:    true,
-				Elem:        &schema.Schema{Type: schema.TypeString},
-				MaxItems:    19,
-				Description: "A list of ip alias to assign to the VPC Router. This can only be specified if `plan` is not `standard`",
+			"public_network_interface": {
+				Type:     schema.TypeList,
+				Optional: true, // only required when `plan` is not `standard`
+				MinItems: 1,
+				MaxItems: 1,
+				Elem: &schema.Resource{
+					Schema: map[string]*schema.Schema{
+						"switch_id": {
+							Type:         schema.TypeString,
+							ForceNew:     true,
+							Optional:     true,
+							ValidateFunc: validateSakuracloudIDType,
+							Description:  "The id of the switch to connect. This is only required when when `plan` is not `standard`",
+						},
+						"vip": {
+							Type:        schema.TypeString,
+							ForceNew:    true,
+							Optional:    true,
+							Description: "The virtual IP address of the VPC Router. This is only required when `plan` is not `standard`",
+						},
+						"ip_addresses": {
+							Type:        schema.TypeList,
+							ForceNew:    true,
+							Optional:    true,
+							MinItems:    2,
+							MaxItems:    2,
+							Elem:        &schema.Schema{Type: schema.TypeString},
+							Description: "The list of the IP address to assign to the VPC Router. This is required only one value when `plan` is `standard`, two values otherwise",
+						},
+						"vrid": {
+							Type:        schema.TypeInt,
+							ForceNew:    true,
+							Optional:    true,
+							Description: "The Virtual Router Identifier. This is only required when `plan` is not `standard`",
+						},
+						"aliases": {
+							Type:        schema.TypeList,
+							Optional:    true,
+							Elem:        &schema.Schema{Type: schema.TypeString},
+							MaxItems:    19,
+							Description: "A list of ip alias to assign to the VPC Router. This can only be specified if `plan` is not `standard`",
+						},
+					},
+				},
 			},
 			"syslog_host": {
 				Type:        schema.TypeString,
@@ -92,7 +102,7 @@ func resourceSakuraCloudVPCRouter() *schema.Resource {
 				Default:     true,
 				Description: "The flag to enable connecting to the Internet from the VPC Router",
 			},
-			"network_interface": {
+			"private_network_interface": {
 				Type:        schema.TypeList,
 				Optional:    true,
 				MaxItems:    7,
@@ -468,6 +478,11 @@ func resourceSakuraCloudVPCRouter() *schema.Resource {
 				Computed:    true,
 				Description: "The public ip address of the VPC Router",
 			},
+			"public_netmask": {
+				Type:        schema.TypeInt,
+				Computed:    true,
+				Description: "The bit length of the subnet to assign to the public network interface",
+			},
 		},
 	}
 }
@@ -591,20 +606,16 @@ func setVPCRouterResourceData(_ context.Context, d *schema.ResourceData, client 
 	if err := d.Set("tags", flattenTags(data.Tags)); err != nil {
 		return err
 	}
-	d.Set("plan", flattenVPCRouterPlan(data))               // nolint
-	d.Set("switch_id", flattenVPCRouterSwitchID(data))      // nolint
-	d.Set("public_ip", flattenVPCRouterGlobalAddress(data)) // nolint
-	d.Set("vip", flattenVPCRouterVIP(data))                 // nolint
-	if err := d.Set("ip_addresses", flattenVPCRouterIPAddresses(data)); err != nil {
+	d.Set("plan", flattenVPCRouterPlan(data))                           // nolint
+	d.Set("public_ip", flattenVPCRouterGlobalAddress(data))             // nolint
+	d.Set("public_netmask", flattenVPCRouterGlobalNetworkMaskLen(data)) // nolint
+	if err := d.Set("public_network_interface", flattenVPCRouterPublicNetworkInterface(data)); err != nil {
 		return err
 	}
-	if err := d.Set("aliases", flattenVPCRouterIPAliases(data)); err != nil {
-		return err
-	}
-	d.Set("vrid", flattenVPCRouterVRID(data))                                    // nolint
+
 	d.Set("syslog_host", data.Settings.SyslogHost)                               // nolint
 	d.Set("internet_connection", data.Settings.InternetConnectionEnabled.Bool()) // nolint
-	if err := d.Set("network_interface", flattenVPCRouterInterfaces(data)); err != nil {
+	if err := d.Set("private_network_interface", flattenVPCRouterInterfaces(data)); err != nil {
 		return err
 	}
 	if err := d.Set("dhcp_server", flattenVPCRouterDHCPServers(data)); err != nil {

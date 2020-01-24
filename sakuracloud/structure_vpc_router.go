@@ -57,28 +57,57 @@ func expandVPCRouterNICSetting(d resourceValueGettable) vpcrouter.NICSettingHold
 	case types.VPCRouterPlans.Standard:
 		return &vpcrouter.StandardNICSetting{}
 	default:
-		ipAddresses := expandStringList(d.Get("ip_addresses").([]interface{}))
-		var ip1, ip2 string
-		if len(ipAddresses) > 0 {
-			ip1 = ipAddresses[0]
-		}
-		if len(ipAddresses) > 1 {
-			ip2 = ipAddresses[1]
-		}
+		nic := expandVPCRouterPublicNetworkInterface(d)
 		return &vpcrouter.PremiumNICSetting{
-			SwitchID:         expandSakuraCloudID(d, "switch_id"),
-			IPAddress1:       ip1,
-			IPAddress2:       ip2,
-			VirtualIPAddress: d.Get("vip").(string),
-			IPAliases:        expandStringList(d.Get("aliases").([]interface{})),
+			SwitchID:         nic.switchID,
+			IPAddress1:       nic.ipAddresses[0],
+			IPAddress2:       nic.ipAddresses[1],
+			VirtualIPAddress: nic.vip,
+			IPAliases:        nic.ipAliases,
 		}
+	}
+}
+
+type vpcRouterPublicNetworkInterface struct {
+	switchID    types.ID
+	ipAddresses []string
+	vip         string
+	ipAliases   []string
+	vrid        int
+}
+
+func expandVPCRouterPublicNetworkInterface(d resourceValueGettable) *vpcRouterPublicNetworkInterface {
+	d = mapFromFirstElement(d, "public_network_interface")
+	if d == nil {
+		return nil
+	}
+	return &vpcRouterPublicNetworkInterface{
+		switchID:    expandSakuraCloudID(d, "switch_id"),
+		ipAddresses: stringListOrDefault(d, "ip_addresses"),
+		vip:         stringOrDefault(d, "vip"),
+		ipAliases:   stringListOrDefault(d, "aliases"),
+		vrid:        intOrDefault(d, "vrid"),
+	}
+}
+func flattenVPCRouterPublicNetworkInterface(vpcRouter *sacloud.VPCRouter) []interface{} {
+	if vpcRouter.PlanID == types.VPCRouterPlans.Standard {
+		return nil
+	}
+	return []interface{}{
+		map[string]interface{}{
+			"switch_id":    flattenVPCRouterSwitchID(vpcRouter),
+			"vip":          flattenVPCRouterVIP(vpcRouter),
+			"ip_addresses": flattenVPCRouterIPAddresses(vpcRouter),
+			"aliases":      flattenVPCRouterIPAliases(vpcRouter),
+			"vrid":         flattenVPCRouterVRID(vpcRouter),
+		},
 	}
 }
 
 func expandVPCRouterAdditionalNICSettings(d resourceValueGettable) []vpcrouter.AdditionalNICSettingHolder {
 	var results []vpcrouter.AdditionalNICSettingHolder
 	planID := expandVPCRouterPlanID(d)
-	interfaces := d.Get("network_interface").([]interface{})
+	interfaces := d.Get("private_network_interface").([]interface{})
 	for _, iface := range interfaces {
 		d = mapToResourceData(iface.(map[string]interface{}))
 		var nicSetting vpcrouter.AdditionalNICSettingHolder
@@ -144,6 +173,13 @@ func flattenVPCRouterGlobalAddress(vpcRouter *sacloud.VPCRouter) string {
 	return vpcRouter.Settings.Interfaces[0].VirtualIPAddress
 }
 
+func flattenVPCRouterGlobalNetworkMaskLen(vpcRouter *sacloud.VPCRouter) int {
+	if vpcRouter.PlanID == types.VPCRouterPlans.Standard {
+		return vpcRouter.Interfaces[0].SubnetNetworkMaskLen
+	}
+	return vpcRouter.Settings.Interfaces[0].NetworkMaskLen
+}
+
 func flattenVPCRouterSwitchID(vpcRouter *sacloud.VPCRouter) string {
 	if vpcRouter.PlanID != types.VPCRouterPlans.Standard {
 		return vpcRouter.Interfaces[0].SwitchID.String()
@@ -180,8 +216,13 @@ func flattenVPCRouterVRID(vpcRouter *sacloud.VPCRouter) int {
 }
 
 func expandVPCRouterSettings(d resourceValueGettable) *vpcrouter.RouterSetting {
+	nic := expandVPCRouterPublicNetworkInterface(d)
+	vrid := 0
+	if nic != nil {
+		vrid = nic.vrid
+	}
 	return &vpcrouter.RouterSetting{
-		VRID:                      d.Get("vrid").(int),
+		VRID:                      vrid,
 		InternetConnectionEnabled: types.StringFlag(d.Get("internet_connection").(bool)),
 		StaticNAT:                 expandVPCRouterStaticNATList(d),
 		PortForwarding:            expandVPCRouterPortForwardingList(d),
