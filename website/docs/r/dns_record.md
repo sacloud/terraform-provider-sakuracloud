@@ -39,11 +39,11 @@ resource "sakuracloud_dns_record" "record2" {
 * `value` - (Required) The value of the DNS Record. Changing this forces a new resource to be created.
 * `ttl` - (Optional) The number of the TTL. Changing this forces a new resource to be created. Default:`3600`.
 
-#### For MX/SRV Record
+#### MX/SRV Record
 
 * `priority` - (Optional) The priority of target DNS Record. This must be in the range [`0`-`65535`]. Changing this forces a new resource to be created.
 
-#### For SRV Record
+#### SRV Record
 
 * `port` - (Optional) The number of port. This must be in the range [`1`-`65535`]. Changing this forces a new resource to be created.
 * `weight` - (Optional) The weight of target DNS Record. This must be in the range [`0`-`65535`]. Changing this forces a new resource to be created.

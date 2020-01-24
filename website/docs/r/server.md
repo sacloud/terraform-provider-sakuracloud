@@ -65,18 +65,17 @@ resource "sakuracloud_disk" "foobar" {
 * `interface_driver` - (Optional) The driver name of network interface. This must be one of [`virtio`/`e1000`]. Default:`virtio`.
 * `private_host_id` - (Optional) The id of the PrivateHost which the Server is assigned.
 
+---
+
+A `network_interface` block supports the following:
+
+* `upstream` - (Required) The upstream type or upstream switch id. This must be one of [`shared`/`disconnect`/`<switch id>`].
+* `packet_filter_id` - (Optional) The id of the packet filter to attach to the network interface.
+
 #### Disks
 
 * `disk_edit_parameter` - (Optional) A `disk_edit_parameter` block as defined below.
 * `disks` - (Optional) A list of disk id connected to the server.
-
-#### Common Arguments
-
-* `description` - (Optional) The description of the Server. The length of this value must be in the range [`1`-`512`].
-* `icon_id` - (Optional) The icon id to attach to the Server.
-* `tags` - (Optional) Any tags to assign to the Server.
-* `zone` - (Optional) The name of zone that the Server will be created. (e.g. `is1a`, `tk1a`). Changing this forces a new resource to be created.
-
 
 ---
 
@@ -93,13 +92,12 @@ A `disk_edit_parameter` block supports the following:
 * `password` - (Optional) The password of default user. The length of this value must be in the range [`8`-`64`].
 * `ssh_key_ids` - (Optional) A list of the SSHKey id.
 
----
+#### Common Arguments
 
-A `network_interface` block supports the following:
-
-* `upstream` - (Required) The upstream type or upstream switch id. This must be one of [`shared`/`disconnect`/`<switch id>`].
-* `packet_filter_id` - (Optional) The id of the packet filter to attach to the network interface.
-
+* `description` - (Optional) The description of the Server. The length of this value must be in the range [`1`-`512`].
+* `icon_id` - (Optional) The icon id to attach to the Server.
+* `tags` - (Optional) Any tags to assign to the Server.
+* `zone` - (Optional) The name of zone that the Server will be created. (e.g. `is1a`, `tk1a`). Changing this forces a new resource to be created.
 
 ### Timeouts
 

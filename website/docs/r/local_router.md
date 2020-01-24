@@ -66,12 +66,6 @@ data "sakuracloud_local_router" "peer" {
 * `peer` - (Optional) One or more `peer` blocks as defined below.
 * `static_route` - (Optional) One or more `static_route` blocks as defined below.
 
-#### Common Arguments
-
-* `description` - (Optional) The description of the LoadBalancer. The length of this value must be in the range [`1`-`512`].
-* `icon_id` - (Optional) The icon id to attach to the LoadBalancer.
-* `tags` - (Optional) Any tags to assign to the LoadBalancer.
-
 ---
 
 A `network_interface` block supports the following:
@@ -104,6 +98,12 @@ A `switch` block supports the following:
 * `category` - (Optional) The category name of connected services (e.g. `cloud`, `vps`).
 * `code` - (Required) The resource ID of the Switch.
 * `zone_id` - (Required) The id of the Zone.
+
+#### Common Arguments
+
+* `description` - (Optional) The description of the LoadBalancer. The length of this value must be in the range [`1`-`512`].
+* `icon_id` - (Optional) The icon id to attach to the LoadBalancer.
+* `tags` - (Optional) Any tags to assign to the LoadBalancer.
 
 
 ### Timeouts
