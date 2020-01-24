@@ -59,14 +59,18 @@ resource "sakuracloud_database" "foobar" {
   username = "defuser"
   password = "{{ .arg1 }}"
 
-  switch_id       = "${sakuracloud_switch.foobar.id}"
-  ip_address      = "192.168.11.101"
-  netmask         = 24
-  gateway         = "192.168.11.1"
-  source_ranges   = ["192.168.11.0/24", "192.168.12.0/24"]
-  port            = 54321
-  backup_weekdays = ["mon", "tue"]
-  backup_time     = "00:00"
+  network_interface {
+    switch_id       = "${sakuracloud_switch.foobar.id}"
+    ip_address      = "192.168.11.101"
+    netmask         = 24
+    gateway         = "192.168.11.1"
+    port            = 54321
+    source_ranges   = ["192.168.11.0/24", "192.168.12.0/24"]
+  }
+  backup {
+    weekdays = ["mon", "tue"]
+    time     = "00:00"
+  }
 }
 
 data "sakuracloud_database" "foobar" {

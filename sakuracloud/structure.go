@@ -104,6 +104,16 @@ func getListFromResource(d resourceValueGettable, key string) ([]interface{}, bo
 	return nil, false
 }
 
+func mapFromFirstElement(d resourceValueGettable, key string) resourceValueGettable {
+	list, ok := getListFromResource(d, key)
+	if ok && len(list) > 0 {
+		if m, ok := list[0].(map[string]interface{}); ok {
+			return mapToResourceData(m)
+		}
+	}
+	return nil
+}
+
 func sakuraCloudClient(d resourceValueGettable, meta interface{}) (*APIClient, string, error) {
 	client := meta.(*APIClient)
 	zone := getZone(d, client)
