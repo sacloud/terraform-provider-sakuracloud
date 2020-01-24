@@ -45,6 +45,37 @@ resource "sakuracloud_simple_monitor" "foobar" {
 * `delay_loop` - (Optional) The interval in seconds between checks. This must be in the range [`60`-`3600`]. Default:`60`.
 * `enabled` - (Optional) The flag to enable monitoring by the simple monitor. Default:`true`.
 
+---
+
+A `health_check` block supports the following:
+
+* `protocol` - (Required) The protocol used for health checks. This must be one of [`http`/`https`/`ping`/`tcp`/`dns`/`ssh`/`smtp`/`pop3`/`snmp`/`sslcertificate`].
+* `port` - (Optional) The target port number.
+
+##### DNS
+
+* `excepcted_data` - (Optional) The expected value used when checking by DNS.
+* `qname` - (Optional) The FQDN used when checking by DNS.
+
+##### HTTP/HTTPS
+
+* `host_header` - (Optional) The value of host header send when checking by HTTP/HTTPS.
+* `password` - (Optional) The password for basic auth used when checking by HTTP/HTTPS.
+* `username` - (Optional) The user name for basic auth used when checking by HTTP/HTTPS.
+* `path` - (Optional) The path used when checking by HTTP/HTTPS.
+* `sni` - (Optional) The flag to enable SNI when checking by HTTP/HTTPS.
+* `status` - (Optional) The response-code to expect when checking by HTTP/HTTPS.
+
+##### Certificate
+
+* `remaining_days` - (Optional) The number of remaining days until certificate expiration used when checking SSL certificates. This must be in the range [`1`-`9999`].
+
+##### SNMP 
+
+* `community` - (Optional) The SNMP community string used when checking by SNMP.
+* `oid` - (Optional) The SNMP OID used when checking by SNMP.
+* `snmp_version` - (Optional) The SNMP version used when checking by SNMP. This must be one of `1`/`2c`.
+
 #### Notification
 
 * `notify_email_enabled` - (Optional) The flag to enable notification by email. Default:`true`.
@@ -59,38 +90,6 @@ resource "sakuracloud_simple_monitor" "foobar" {
 * `icon_id` - (Optional) The icon id to attach to the SimpleMonitor.
 * `tags` - (Optional) Any tags to assign to the SimpleMonitor.
 
-
----
-
-A `health_check` block supports the following:
-
-* `protocol` - (Required) The protocol used for health checks. This must be one of [`http`/`https`/`ping`/`tcp`/`dns`/`ssh`/`smtp`/`pop3`/`snmp`/`sslcertificate`].
-* `port` - (Optional) The target port number.
-
-#### DNS
-
-* `excepcted_data` - (Optional) The expected value used when checking by DNS.
-* `qname` - (Optional) The FQDN used when checking by DNS.
-
-#### HTTP/HTTPS
-
-* `host_header` - (Optional) The value of host header send when checking by HTTP/HTTPS.
-* `password` - (Optional) The password for basic auth used when checking by HTTP/HTTPS.
-* `username` - (Optional) The user name for basic auth used when checking by HTTP/HTTPS.
-* `path` - (Optional) The path used when checking by HTTP/HTTPS.
-* `sni` - (Optional) The flag to enable SNI when checking by HTTP/HTTPS.
-* `status` - (Optional) The response-code to expect when checking by HTTP/HTTPS.
-
-#### Certificate
-
-* `remaining_days` - (Optional) The number of remaining days until certificate expiration used when checking SSL certificates. This must be in the range [`1`-`9999`].
-
-
-#### SNMP 
-
-* `community` - (Optional) The SNMP community string used when checking by SNMP.
-* `oid` - (Optional) The SNMP OID used when checking by SNMP.
-* `snmp_version` - (Optional) The SNMP version used when checking by SNMP. This must be one of `1`/`2c`.
 
 ### Timeouts
 

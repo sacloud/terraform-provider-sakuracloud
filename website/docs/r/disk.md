@@ -53,8 +53,6 @@ resource "sakuracloud_disk" "foobar" {
 * `tags` - (Optional) Any tags to assign to the disk.
 * `zone` - (Optional) The name of zone that the disk will be created. (e.g. `is1a`, `tk1a`). Changing this forces a new resource to be created.
 
-
-
 ### Timeouts
 
 The `timeouts` block allows you to specify [timeouts](https://www.terraform.io/docs/configuration/resources.html#operation-timeouts) for certain actions:

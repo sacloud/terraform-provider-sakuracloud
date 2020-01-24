@@ -50,12 +50,6 @@ resource "sakuracloud_gslb" "foobar" {
 * `weighted` - (Optional) The flag to enable weighted load-balancing.
 * `sorry_server` - (Optional) The IP address of the SorryServer. This will be used when all servers are down.
 
-#### Common Arguments
-
-* `description` - (Optional) The description of the GSLB. The length of this value must be in the range [`1`-`512`].
-* `icon_id` - (Optional) The icon id to attach to the GSLB.
-* `tags` - (Optional) Any tags to assign to the GSLB.
-
 ---
 
 A `health_check` block supports the following:
@@ -75,6 +69,11 @@ A `server` block supports the following:
 * `enabled` - (Optional) The flag to enable as destination of load balancing.
 * `weight` - (Optional) The weight used when weighted load balancing is enabled. This must be in the range [`1`-`10000`].
 
+#### Common Arguments
+
+* `description` - (Optional) The description of the GSLB. The length of this value must be in the range [`1`-`512`].
+* `icon_id` - (Optional) The icon id to attach to the GSLB.
+* `tags` - (Optional) Any tags to assign to the GSLB.
 
 ### Timeouts
 
