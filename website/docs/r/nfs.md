@@ -27,7 +27,7 @@ resource "sakuracloud_nfs" "foobar" {
 
   description = "description"
   tags        = ["tag1", "tag2"]
-}}
+}
 
 resource "sakuracloud_switch" "foobar" {
   name = "foobar"
