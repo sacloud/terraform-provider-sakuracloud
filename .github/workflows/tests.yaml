@@ -74,3 +74,82 @@ jobs:
 
       - name: make testfake
         run: make testfake
+
+  build:
+    name: build
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [macos-latest, windows-latest, ubuntu-18.04]
+        include:
+          - os: macos-latest
+            goos: darwin
+            arch: amd64
+          - os: ubuntu-18.04
+            goos: linux
+            arch: amd64
+          - os: ubuntu-18.04
+            goos: linux
+            arch: 386
+          - os: windows-latest
+            goos: windows
+            arch: amd64
+          - os: windows-latest
+            goos: windows
+            arch: 386
+    steps:
+      - name: Set up Go 1.13
+        uses: actions/setup-go@v1
+        with:
+          go-version: 1.13
+
+      - name: Set up Go environemnt variables
+        run: |
+          echo "::set-env name=GOPATH::$(go env GOPATH)"
+          echo "::add-path::$(go env GOPATH)/bin"
+
+      - name: Check out code into the Go module directory
+        uses: actions/checkout@v1
+
+      - name: Setup tools
+        run: make tools
+
+      - name: make build
+        env:
+          OS: ${{ matrix.goos }}
+          ARCH: ${{ matrix.arch }}
+          ARCHIVE: 1
+        run: make build
+
+      - name: Upload artifact for other jobs
+        uses: actions/upload-artifact@v1
+        with:
+          name: bin
+          path: bin
+
+  shasum:
+    name: shasum
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Set up Go 1.13
+        uses: actions/setup-go@v1
+        with:
+          go-version: 1.13
+
+      - name: Set up Go environemnt variables
+        run: |
+          echo "::set-env name=GOPATH::$(go env GOPATH)"
+          echo "::add-path::$(go env GOPATH)/bin"
+
+      - name: Check out code into the Go module directory
+        uses: actions/checkout@v1
+
+      - name: Download artifacts
+        uses: actions/download-artifact@v1
+        with:
+          name: bin
+          path: bin
+
+      - name: make shasum
+        run: make shasum

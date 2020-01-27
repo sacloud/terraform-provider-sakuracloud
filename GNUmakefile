@@ -35,7 +35,7 @@ build-envs:
 
 .PHONY: build
 build: build-envs
-	OS="`go env GOOS`" ARCH="`go env GOARCH`" ARCHIVE= BUILD_LDFLAGS=$(BUILD_LDFLAGS) CURRENT_VERSION=$(CURRENT_VERSION) sh -c "'$(CURDIR)/scripts/build.sh'"
+	OS=$${OS:-"`go env GOOS`"} ARCH=$${ARCH:-"`go env GOARCH`"} BUILD_LDFLAGS=$(BUILD_LDFLAGS) CURRENT_VERSION=$(CURRENT_VERSION) sh -c "'$(CURDIR)/scripts/build.sh'"
 
 .PHONY: build-x
 build-x: build-envs build-darwin build-windows build-linux shasum
