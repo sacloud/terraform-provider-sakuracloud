@@ -75,27 +75,3 @@ jobs:
       - name: make testfake
         run: make testfake
 
-  build:
-    name: build
-    needs: [lint, tflint, test]
-    runs-on: ubuntu-18.04
-    steps:
-      - name: Set up Go 1.13
-        uses: actions/setup-go@v1
-        with:
-          go-version: 1.13
-
-      - name: Set up Go environemnt variables
-        run: |
-          echo "::set-env name=GOPATH::$(go env GOPATH)"
-          echo "::add-path::$(go env GOPATH)/bin"
-
-      - name: Check out code into the Go module directory
-        uses: actions/checkout@v1
-
-      - name: Setup tools
-        run: make tools
-
-      - name: make build-x
-        run: make build-x
-

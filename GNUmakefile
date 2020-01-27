@@ -74,7 +74,7 @@ shasum:
 
 .PHONY: release
 release: build-envs
-	ghr ${CURRENT_VERSION} bin/
+	ghr v${CURRENT_VERSION} bin/
 
 .PHONY: test
 test:
