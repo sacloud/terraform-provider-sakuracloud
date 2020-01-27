@@ -1,7 +1,6 @@
 # Terraform for Sakura Cloud
 
-[![Build Status](https://travis-ci.org/sacloud/terraform-provider-sakuracloud.svg?branch=master)](https://travis-ci.org/sacloud/terraform-provider-sakuracloud)
-[![Build status](https://ci.appveyor.com/api/projects/status/paynsb52uauq1jl8?svg=true)](https://ci.appveyor.com/project/sacloud-bot/terraform-provider-sakuracloud)
+![Test Status](https://github.com/sacloud/terraform-provider-sakuracloud/workflows/Tests/badge.svg)
 [![Slack](https://slack.usacloud.jp/badge.svg)](https://slack.usacloud.jp/)
 
 It is a plugin for operating `Sakura Cloud` from Terraform.

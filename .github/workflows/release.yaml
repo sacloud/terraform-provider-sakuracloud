@@ -1,0 +1,36 @@
+name: Release
+on:
+  push:
+    tags: 'v[0-9]+.[0-9]+.[0-9]+'
+env:
+  GOPROXY: https://proxy.golang.org
+jobs:
+  build:
+    name: build
+    runs-on: ubuntu-18.04
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      - name: Set up Go 1.13
+        uses: actions/setup-go@v1
+        with:
+          go-version: 1.13
+
+      - name: Set up Go environemnt variables
+        run: |
+          echo "::set-env name=GOPATH::$(go env GOPATH)"
+          echo "::add-path::$(go env GOPATH)/bin"
+
+      - name: Check out code into the Go module directory
+        uses: actions/checkout@v1
+
+      - name: Setup tools
+        run: |
+          go get github.com/x-motemen/gobump/cmd/gobump
+          make tools
+
+      - name: make build-x
+        run: make build-x
+
+      - name: make release
+        run: make release
