@@ -109,16 +109,6 @@ goimports: fmt
 fmt:
 	gofmt -w $(GOFMT_FILES)
 
-.PHONY: build-docs serve-docs lint-docs
-build-docs:
-	sh -c "'$(CURDIR)/scripts/build_docs.sh'"
-
-serve-docs:
-	sh -c "'$(CURDIR)/scripts/serve_docs.sh'"
-
-lint-docs:
-	sh -c "'$(CURDIR)/scripts/lint_docs.sh'"
-
 serve-english-docs:
 	sh -c "'$(CURDIR)/scripts/serve_english_docs.sh'"
 
