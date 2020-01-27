@@ -1,6 +1,6 @@
 # Terraform Provider for SakuraCloud
 
-[![Build Status](https://travis-ci.org/sacloud/terraform-provider-sakuracloud.svg?branch=master)](https://travis-ci.org/sacloud/terraform-provider-sakuracloud)
+![Test Status](https://github.com/sacloud/terraform-provider-sakuracloud/workflows/Tests/badge.svg)
 [![Slack](https://slack.usacloud.jp/badge.svg)](https://slack.usacloud.jp/)
 
 - Terraform Website: https://terraform.io
