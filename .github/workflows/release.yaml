@@ -9,6 +9,8 @@ jobs:
   build:
     name: build
     runs-on: ubuntu-18.04
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
       - name: Set up Go 1.13
         uses: actions/setup-go@v1
