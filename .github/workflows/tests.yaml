@@ -1,5 +1,8 @@
 name: Tests
 on: push
+env:
+  GOPROXY=https://proxy.golang.org
+  TERRAFORM_VERSION=0.12.18
 jobs:
   lint:
     name: lint
@@ -9,6 +12,12 @@ jobs:
         uses: actions/setup-go@v1
         with:
           go-version: 1.13
+
+      - name: Set up Go environemnt variables
+        run: |
+          echo "::set-env name=GOPATH::$(go env GOPATH)"
+          echo "::add-path::$(go env GOPATH)/bin"
+        shell: bash
 
       - name: Check out code into the Go module directory
         uses: actions/checkout@v1
@@ -27,6 +36,11 @@ jobs:
         with:
           go-version: 1.13
 
+      - name: Set up Go environemnt variables
+        run: |
+          echo "::set-env name=GOPATH::$(go env GOPATH)"
+          echo "::add-path::$(go env GOPATH)/bin"
+
       - name: Check out code into the Go module directory
         uses: actions/checkout@v1
 
@@ -37,12 +51,20 @@ jobs:
         run: make tflint
   test:
     name: test
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [macos-latest, windows-latest, ubuntu-18.04]
     steps:
       - name: Set up Go 1.13
         uses: actions/setup-go@v1
         with:
           go-version: 1.13
+
+      - name: Set up Go environemnt variables
+        run: |
+          echo "::set-env name=GOPATH::$(go env GOPATH)"
+          echo "::add-path::$(go env GOPATH)/bin"
 
       - name: Check out code into the Go module directory
         uses: actions/checkout@v1
