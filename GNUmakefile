@@ -41,6 +41,7 @@ tools:
 	GO111MODULE=off go get -u github.com/motemen/gobump/cmd/gobump
 	GO111MODULE=off go get -u golang.org/x/lint/golint
 	GO111MODULE=off go get github.com/sacloud/addlicense
+	GO111MODULE=off go get github.com/tcnksm/ghr
 
 build:
 	OS="`go env GOOS`" ARCH="`go env GOARCH`" ARCHIVE= BUILD_LDFLAGS=$(BUILD_LDFLAGS) CURRENT_VERSION=$(CURRENT_VERSION) sh -c "'$(CURDIR)/scripts/build.sh'"
