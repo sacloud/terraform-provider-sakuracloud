@@ -5,6 +5,7 @@ site_author: '@yamamoto-febc'
 copyright: Copyright (C) 2016-2020 terraform-provider-sakuracloud authors
 google_analytics: ['UA-63739336-5','auto']
 theme: readthedocs
+theme_dir: theme_for_redirect
 extra_css:
   - css/extra.css
 pages:
