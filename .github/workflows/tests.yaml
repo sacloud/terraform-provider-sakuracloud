@@ -81,21 +81,21 @@ jobs:
     runs-on: ubuntu-18.04
     strategy:
       matrix:
-        os: [macos-latest, windows-latest, ubuntu-18.04]
+        os: [darwin-amd64, linux-amd64, linux-386, windows-amd64, windows-386]
         include:
-          - os: macos-latest
+          - os: darwin-amd64
             goos: darwin
             arch: amd64
-          - os: ubuntu-18.04
+          - os: linux-amd64
             goos: linux
             arch: amd64
-          - os: ubuntu-18.04
+          - os: linux-386
             goos: linux
             arch: 386
-          - os: windows-latest
+          - os: windows-amd64
             goos: windows
             arch: amd64
-          - os: windows-latest
+          - os: windows-386
             goos: windows
             arch: 386
     steps:
@@ -125,7 +125,7 @@ jobs:
       - name: Upload artifact for other jobs
         uses: actions/upload-artifact@v1
         with:
-          name: artifacts-${{matrix.goos}}-$${{matrix.arch}}
+          name: artifacts
           path: bin
 
   shasum:
@@ -134,21 +134,21 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        os: [macos-latest, windows-latest, ubuntu-18.04]
+        os: [darwin-amd64, linux-amd64, linux-386, windows-amd64, windows-386]
         include:
-          - os: macos-latest
+          - os: darwin-amd64
             goos: darwin
             arch: amd64
-          - os: ubuntu-18.04
+          - os: linux-amd64
             goos: linux
             arch: amd64
-          - os: ubuntu-18.04
+          - os: linux-386
             goos: linux
             arch: 386
-          - os: windows-latest
+          - os: windows-amd64
             goos: windows
             arch: amd64
-          - os: windows-latest
+          - os: windows-386
             goos: windows
             arch: 386
     steps:
@@ -168,7 +168,7 @@ jobs:
       - name: Download artifacts
         uses: actions/download-artifact@v1
         with:
-          name: artifacts-${{matrix.goos}}-$${{matrix.arch}}
+          name: artifacts
           path: bin
 
       - name: make shasum
