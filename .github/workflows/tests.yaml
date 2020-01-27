@@ -125,13 +125,32 @@ jobs:
       - name: Upload artifact for other jobs
         uses: actions/upload-artifact@v1
         with:
-          name: bin
+          name: artifacts-${{matrix.goos}}-$${{matrix.arch}}
           path: bin
 
   shasum:
     name: shasum
     needs: build
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        os: [macos-latest, windows-latest, ubuntu-18.04]
+        include:
+          - os: macos-latest
+            goos: darwin
+            arch: amd64
+          - os: ubuntu-18.04
+            goos: linux
+            arch: amd64
+          - os: ubuntu-18.04
+            goos: linux
+            arch: 386
+          - os: windows-latest
+            goos: windows
+            arch: amd64
+          - os: windows-latest
+            goos: windows
+            arch: 386
     steps:
       - name: Set up Go 1.13
         uses: actions/setup-go@v1
@@ -149,8 +168,14 @@ jobs:
       - name: Download artifacts
         uses: actions/download-artifact@v1
         with:
-          name: bin
+          name: artifacts-${{matrix.goos}}-$${{matrix.arch}}
           path: bin
 
       - name: make shasum
         run: make shasum
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v1
+        with:
+          name: artifacts
+          path: bin
