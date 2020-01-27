@@ -38,8 +38,8 @@ clean:
 .PHONY: tools
 tools:
 	GO111MODULE=off go get -u golang.org/x/tools/cmd/goimports
-	GO111MODULE=off go get -u github.com/motemen/gobump/cmd/gobump
 	GO111MODULE=off go get -u golang.org/x/lint/golint
+	GO111MODULE=off go get github.com/x-motemen/gobump/cmd/gobump
 	GO111MODULE=off go get github.com/sacloud/addlicense
 	GO111MODULE=off go get github.com/tcnksm/ghr
 
@@ -74,6 +74,10 @@ bin/terraform-provider-sakuracloud_$(CURRENT_VERSION)_linux-amd64.zip:
 
 shasum:
 	(cd bin/; shasum -a 256 * > terraform-provider-sakuracloud_$(CURRENT_VERSION)_SHA256SUMS)
+
+.PHONY: release
+release:
+	ghr v${CURRENT_VERSION} bin/
 
 test:
 	TF_ACC= go test $(TEST1) -v $(TESTARGS) -timeout=30s -parallel=4 ; \

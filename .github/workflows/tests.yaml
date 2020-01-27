@@ -25,7 +25,7 @@ jobs:
 
       - name: Setup tools
         run: |
-          GO111MODULE=off go get -u github.com/motemen/gobump/cmd/gobump
+          go get github.com/x-motemen/gobump/cmd/gobump
           make tools
 
       - name: make test
