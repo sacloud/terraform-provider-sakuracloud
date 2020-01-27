@@ -1,8 +1,8 @@
 name: Tests
 on: push
 env:
-  GOPROXY=https://proxy.golang.org
-  TERRAFORM_VERSION=0.12.18
+  GOPROXY: https://proxy.golang.org
+  TERRAFORM_VERSION: 0.12.20
 jobs:
   lint:
     name: lint
