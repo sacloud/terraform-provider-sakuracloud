@@ -12,14 +12,23 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-FROM golang:1.13
-LABEL maintainer="Kazumichi Yamamoto <yamamoto.febc@gmail.com>"
-MAINTAINER Kazumichi Yamamoto <yamamoto.febc@gmail.com>
+FROM golang:1.13 as builder
 
 RUN  apt-get update && apt-get -y install bash git make zip bzr && apt-get clean && rm -rf /var/cache/apt/archives/* /var/lib/apt/lists/*
-RUN go get -u golang.org/x/lint/golint
-RUN go get -u golang.org/x/tools/cmd/goimports
-
 ADD . /go/src/github.com/sacloud/terraform-provider-sakuracloud
 WORKDIR /go/src/github.com/sacloud/terraform-provider-sakuracloud
-CMD ["make"]
+ENV GOPROXY=https://proxy.golang.org
+RUN ["make", "tools", "build"]
+
+###
+
+FROM hashicorp/terraform:0.12.20
+
+COPY --from=builder /go/src/github.com/sacloud/terraform-provider-sakuracloud/bin/* /bin/
+
+VOLUME ["/workdir"]
+WORKDIR /workdir
+
+ENTRYPOINT ["/bin/terraform"]
+CMD ["--help"]
+
