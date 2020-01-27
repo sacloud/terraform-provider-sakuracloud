@@ -117,19 +117,6 @@ lint-docs:
 serve-english-docs:
 	sh -c "'$(CURDIR)/scripts/serve_english_docs.sh'"
 
-docker-test: 
-	sh -c "'$(CURDIR)/scripts/build_on_docker.sh' 'test'"
-
-docker-testacc: 
-	sh -c "'$(CURDIR)/scripts/build_on_docker.sh' 'testacc'"
-
-docker-testacc-resource:
-	sh -c "'$(CURDIR)/scripts/build_on_docker.sh' 'testacc-resource'"
-
-docker-build: clean 
-	sh -c "'$(CURDIR)/scripts/build_on_docker.sh' 'build-x'"
-
-
 .PHONY: default test vet testacc fmt fmtcheck
 
 set-license:
