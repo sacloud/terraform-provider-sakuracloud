@@ -77,7 +77,7 @@ jobs:
 
   build:
     name: build
-    needs: [lint, tflint, build]
+    needs: [lint, tflint, test]
     runs-on: ubuntu-18.04
     strategy:
       matrix:
