@@ -8,47 +8,22 @@ jobs:
     name: lint
     runs-on: ubuntu-latest
     steps:
-      - name: Set up Go 1.13
-        uses: actions/setup-go@v1
-        with:
-          go-version: 1.13
-
-      - name: Set up Go environemnt variables
-        run: |
-          echo "::set-env name=GOPATH::$(go env GOPATH)"
-          echo "::add-path::$(go env GOPATH)/bin"
-        shell: bash
-
       - name: Check out code into the Go module directory
         uses: actions/checkout@v1
-
-      - name: Setup tools
-        run: make tools
-
-      - name: make lint
-        run: make lint
+      - name: tflint on docker
+        uses: ./.github/actions/make
+        with:
+          goal: 'lint'
   tflint:
     name: tflint
     runs-on: ubuntu-latest
     steps:
-      - name: Set up Go 1.13
-        uses: actions/setup-go@v1
-        with:
-          go-version: 1.13
-
-      - name: Set up Go environemnt variables
-        run: |
-          echo "::set-env name=GOPATH::$(go env GOPATH)"
-          echo "::add-path::$(go env GOPATH)/bin"
-
       - name: Check out code into the Go module directory
         uses: actions/checkout@v1
-
-      - name: Setup tools
-        run: make tools
-
-      - name: make tflint
-        run: make tflint
+      - name: tflint on docker
+        uses: ./.github/actions/make
+        with:
+          goal: 'tflint'
   test:
     name: test
     runs-on: ${{ matrix.os }}
