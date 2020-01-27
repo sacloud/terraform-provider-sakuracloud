@@ -30,7 +30,7 @@ BUILD_LDFLAGS = "-s -w \
 
 export GO111MODULE=on
 
-default: vet build
+default: vet set-license build
 
 clean:
 	rm -Rf $(CURDIR)/bin/*
