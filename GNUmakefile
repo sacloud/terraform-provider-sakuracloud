@@ -24,6 +24,9 @@ AUTHOR          ?="terraform-provider-sakuracloud authors"
 COPYRIGHT_YEAR  ?="2016-2020"
 COPYRIGHT_FILES ?=$$(find . \( -name "*.dockerfile" -or -name "*.go" -or -name "*.sh" -or -name "*.pl" -or -name "*.bash" \) -print | grep -v "/vendor/")
 
+PKG_NAME     ?= sakuracloud
+WEBSITE_REPO  = github.com/hashicorp/terraform-website
+
 BUILD_LDFLAGS = "-s -w \
 	  -X github.com/sacloud/terraform-provider-sakuracloud/sakuracloud.Revision=`git rev-parse --short HEAD` \
 	  -X github.com/sacloud/terraform-provider-sakuracloud/sakuracloud.Version=$(CURRENT_VERSION)"
@@ -116,3 +119,27 @@ serve-english-docs:
 
 set-license:
 	@addlicense -c $(AUTHOR) -y $(COPYRIGHT_YEAR) $(COPYRIGHT_FILES)
+
+.PHONY: website
+website:
+ifeq (,$(wildcard $(GOPATH)/src/$(WEBSITE_REPO)))
+	echo "$(WEBSITE_REPO) not found in your GOPATH (necessary for layouts and assets), get-ting..."
+	git clone https://$(WEBSITE_REPO) $(GOPATH)/src/$(WEBSITE_REPO)
+	(cd $(GOPATH)/src/$(WEBSITE_REPO); \
+	  ln -s ../../../ext/providers/sakuracloud/website/sakuracloud.erb content/source/layouts/sakuracloud.erb; \
+	  ln -s ../../../../ext/providers/sakuracloud/website/docs content/source/docs/providers/sakuracloud \
+	)
+endif
+	$(MAKE) -C $(GOPATH)/src/$(WEBSITE_REPO) website-provider PROVIDER_PATH=$(shell pwd) PROVIDER_NAME=$(PKG_NAME)
+
+.PHONY: website-test
+website-test:
+ifeq (,$(wildcard $(GOPATH)/src/$(WEBSITE_REPO)))
+	echo "$(WEBSITE_REPO) not found in your GOPATH (necessary for layouts and assets), get-ting..."
+	git clone https://$(WEBSITE_REPO) $(GOPATH)/src/$(WEBSITE_REPO)
+	(cd $(GOPATH)/src/$(WEBSITE_REPO); \
+	  ln -s ../../../ext/providers/sakuracloud/website/sakuracloud.erb content/source/layouts/sakuracloud.erb; \
+	  ln -s ../../../../ext/providers/sakuracloud/website/docs source/docs/providers/sakuracloud \
+	)
+endif
+	@$(MAKE) -C $(GOPATH)/src/$(WEBSITE_REPO) website-provider-test PROVIDER_PATH=$(shell pwd) PROVIDER_NAME=$(PKG_NAME)
