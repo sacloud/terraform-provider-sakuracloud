@@ -1,0 +1,53 @@
+name: Tests
+jobs:
+  lint:
+    name: lint
+    runs-on: ubuntu-latest
+    steps:
+      - name: Set up Go 1.13
+        uses: actions/setup-go@v1
+        with:
+          go-version: 1.13
+
+      - name: Check out code into the Go module directory
+        uses: actions/checkout@v1
+
+      - name: Setup tools
+        run: make tools
+
+      - name: make lint
+        run: make lint
+  tflint:
+    name: tflint
+    runs-on: ubuntu-latest
+    steps:
+      - name: Set up Go 1.13
+        uses: actions/setup-go@v1
+        with:
+          go-version: 1.13
+
+      - name: Check out code into the Go module directory
+        uses: actions/checkout@v1
+
+      - name: Setup tools
+        run: make tools
+
+      - name: make tflint
+        run: make tflint
+  test:
+    name: test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Set up Go 1.13
+        uses: actions/setup-go@v1
+        with:
+          go-version: 1.13
+
+      - name: Check out code into the Go module directory
+        uses: actions/checkout@v1
+
+      - name: Setup tools
+        run: make tools
+
+      - name: make testfake
+        run: make testfake
