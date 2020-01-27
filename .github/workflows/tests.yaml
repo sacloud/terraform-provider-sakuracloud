@@ -77,7 +77,8 @@ jobs:
 
   build:
     name: build
-    runs-on: ${{ matrix.os }}
+    needs: [lint, tflint, build]
+    runs-on: ubuntu-18.04
     strategy:
       matrix:
         os: [macos-latest, windows-latest, ubuntu-18.04]
