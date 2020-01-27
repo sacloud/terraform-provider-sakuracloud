@@ -42,85 +42,83 @@ func (f *testTagFilterable) HasTag(tag string) bool {
 }
 
 func TestHasNamesFilter(t *testing.T) {
-
 	expects := []struct {
 		targetName string
 		conds      []string
-		expect     bool
+		hit        bool
 	}{
 		{
 			targetName: "foobar",
 			conds:      []string{"bar"},
-			expect:     true,
+			hit:        true,
 		},
 		{
 			targetName: "foobar",
 			conds:      []string{"foo"},
-			expect:     true,
+			hit:        true,
 		},
 		{
 			targetName: "foobar",
 			conds:      []string{"foo", "bar"},
-			expect:     true,
+			hit:        true,
 		},
 		{
 			targetName: "foobar",
 			conds:      []string{"foo1", "bar2"},
-			expect:     false,
+			hit:        false,
 		},
 		{
 			targetName: "foobar",
 			conds:      []string{"foo1", "bar"},
-			expect:     false,
+			hit:        false,
 		},
 		{
 			targetName: "foobar",
 			conds:      []string{"foo", "bar1"},
-			expect:     false,
+			hit:        false,
 		},
 	}
 
 	for _, e := range expects {
 		target := &testNameFilterable{name: e.targetName}
-		assert.Equal(t, e.expect, hasNames(target, e.conds))
+		assert.Equal(t, e.hit, hasNames(target, e.conds))
 	}
-
 }
 
 func TestHasTagsFilter(t *testing.T) {
 	expects := []struct {
-		tags   []string
-		conds  []string
-		expect bool
+		sources    []string
+		conditions []string
+		hit        bool
 	}{
 		{
-			tags:   []string{"tag1"},
-			conds:  []string{"tag1"},
-			expect: true,
+			sources:    []string{"tag1"},
+			conditions: []string{"tag1"},
+			hit:        true,
 		},
 		{
-			tags:   []string{"tag1"},
-			conds:  []string{"tag2"},
-			expect: false,
+			sources:    []string{"tag1"},
+			conditions: []string{"tag2"},
+			hit:        false,
 		},
 		{
-			tags:   []string{"tag1"},
-			conds:  []string{"t"},
-			expect: false,
+			sources:    []string{"tag1"},
+			conditions: []string{"t"},
+			hit:        false,
 		},
 		{
-			tags:   []string{"tag1", "tag2"},
-			conds:  []string{"tag2"},
-			expect: true,
+			sources:    []string{"tag1", "tag2"},
+			conditions: []string{"tag2"},
+			hit:        true,
 		},
 		{
-			tags:   []string{"tag1", "tag2"},
-			conds:  []string{"tag1", "t"},
-			expect: false,
+			sources:    []string{"tag1", "tag2"},
+			conditions: []string{"tag1", "t"},
+			hit:        false,
 		},
 	}
 	for _, e := range expects {
-		target := &testTagFilterable{tags: e.tags}
-		assert.Equal(t, e.expect, hasTags(target, e.conds))
+		target := &testTagFilterable{tags: e.sources}
+		assert.Equal(t, e.hit, hasTags(target, e.conditions))
 	}
 }

@@ -15,12 +15,12 @@
 package sakuracloud
 
 import (
+	"context"
 	"fmt"
 	"time"
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
-	"github.com/sacloud/libsacloud/api"
-	"github.com/sacloud/libsacloud/sacloud"
+	"github.com/sacloud/libsacloud/v2/sacloud"
 )
 
 func resourceSakuraCloudProxyLBACME() *schema.Resource {
@@ -31,28 +31,37 @@ func resourceSakuraCloudProxyLBACME() *schema.Resource {
 		Importer: &schema.ResourceImporter{
 			State: schema.ImportStatePassthrough,
 		},
+
+		Timeouts: &schema.ResourceTimeout{
+			Create: schema.DefaultTimeout(20 * time.Minute),
+			Delete: schema.DefaultTimeout(5 * time.Minute),
+		},
+
 		Schema: map[string]*schema.Schema{
 			"proxylb_id": {
 				Type:         schema.TypeString,
 				Required:     true,
 				ForceNew:     true,
 				ValidateFunc: validateSakuracloudIDType,
+				Description:  "The id of the ProxyLB that set ACME settings to",
 			},
 			"accept_tos": {
 				Type:        schema.TypeBool,
 				Required:    true,
 				ForceNew:    true,
-				Description: "If you set this flag to true, you accept the current Let's Encrypt terms of service(see: https://letsencrypt.org/repository/)",
+				Description: "The flag to accept the current Let's Encrypt terms of service(see: https://letsencrypt.org/repository/). This must be set `true` explicitly",
 			},
 			"common_name": {
-				Type:     schema.TypeString,
-				Required: true,
-				ForceNew: true,
+				Type:        schema.TypeString,
+				Required:    true,
+				ForceNew:    true,
+				Description: "The FQDN used by ACME. This must set resolvable value",
 			},
 			"update_delay_sec": {
-				Type:     schema.TypeInt,
-				Optional: true,
-				ForceNew: true,
+				Type:        schema.TypeInt,
+				Optional:    true,
+				ForceNew:    true,
+				Description: "The wait time in seconds. This typically used for waiting for a DNS propagation",
 			},
 			"certificate": {
 				Type:     schema.TypeList,
@@ -60,33 +69,39 @@ func resourceSakuraCloudProxyLBACME() *schema.Resource {
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
 						"server_cert": {
-							Type:     schema.TypeString,
-							Computed: true,
+							Type:        schema.TypeString,
+							Computed:    true,
+							Description: "The certificate for a server",
 						},
 						"intermediate_cert": {
-							Type:     schema.TypeString,
-							Computed: true,
+							Type:        schema.TypeString,
+							Computed:    true,
+							Description: "The intermediate certificate for a server",
 						},
 						"private_key": {
-							Type:     schema.TypeString,
-							Computed: true,
+							Type:        schema.TypeString,
+							Computed:    true,
+							Description: "The private key for a server",
 						},
-						"additional_certificates": {
+						"additional_certificate": {
 							Type:     schema.TypeList,
 							Computed: true,
 							Elem: &schema.Resource{
 								Schema: map[string]*schema.Schema{
 									"server_cert": {
-										Type:     schema.TypeString,
-										Computed: true,
+										Type:        schema.TypeString,
+										Computed:    true,
+										Description: "The certificate for a server",
 									},
 									"intermediate_cert": {
-										Type:     schema.TypeString,
-										Computed: true,
+										Type:        schema.TypeString,
+										Computed:    true,
+										Description: "The intermediate certificate for a server",
 									},
 									"private_key": {
-										Type:     schema.TypeString,
-										Computed: true,
+										Type:        schema.TypeString,
+										Computed:    true,
+										Description: "The private key for a server",
 									},
 								},
 							},
@@ -99,39 +114,59 @@ func resourceSakuraCloudProxyLBACME() *schema.Resource {
 }
 
 func resourceSakuraCloudProxyLBACMECreate(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*APIClient)
+	client, _, err := sakuraCloudClient(d, meta)
+	if err != nil {
+		return err
+	}
+	ctx, cancel := operationContext(d, schema.TimeoutCreate)
+	defer cancel()
+
+	proxyLBOp := sacloud.NewProxyLBOp(client)
+
 	proxyLBID := d.Get("proxylb_id").(string)
 
 	sakuraMutexKV.Lock(proxyLBID)
 	defer sakuraMutexKV.Unlock(proxyLBID)
-	proxyLB, err := client.ProxyLB.Read(toSakuraCloudID(proxyLBID))
+
+	proxyLB, err := proxyLBOp.Read(ctx, sakuraCloudID(proxyLBID))
 	if err != nil {
-		return fmt.Errorf("Couldn't find SakuraCloud ProxyLB resource: %s", err)
+		return fmt.Errorf("could not read SakuraCloud ProxyLB[%s]: %s", proxyLBID, err)
 	}
 
 	// clear
-	proxyLB.Settings.ProxyLB.LetsEncrypt = &sacloud.ProxyLBACMESetting{
+	le := &sacloud.ProxyLBACMESetting{
 		Enabled: false,
 	}
 
 	tos := d.Get("accept_tos").(bool)
 	commonName := d.Get("common_name").(string)
-	updateDelaySec := d.Get("update_delay_sec").(int)
 	if tos {
-		proxyLB.Settings.ProxyLB.LetsEncrypt = &sacloud.ProxyLBACMESetting{
+		le = &sacloud.ProxyLBACMESetting{
 			Enabled:    true,
 			CommonName: commonName,
 		}
 	}
 
+	updateDelaySec := d.Get("update_delay_sec").(int)
 	if updateDelaySec > 0 {
 		time.Sleep(time.Duration(updateDelaySec) * time.Second)
 	}
-	if _, err := client.ProxyLB.Update(proxyLB.ID, proxyLB); err != nil {
-		return fmt.Errorf("Error creating SakuraCloud ProxyLB ACME resource: %s", err)
+
+	proxyLB, err = proxyLBOp.UpdateSettings(ctx, proxyLB.ID, &sacloud.ProxyLBUpdateSettingsRequest{
+		HealthCheck:   proxyLB.HealthCheck,
+		SorryServer:   proxyLB.SorryServer,
+		BindPorts:     proxyLB.BindPorts,
+		Servers:       proxyLB.Servers,
+		LetsEncrypt:   le,
+		StickySession: proxyLB.StickySession,
+		Timeout:       proxyLB.Timeout,
+		SettingsHash:  proxyLB.SettingsHash,
+	})
+	if err != nil {
+		return fmt.Errorf("setting ProxyLB[%s] ACME is failed: %s", proxyLBID, err)
 	}
-	if _, err := client.ProxyLB.RenewLetsEncryptCert(proxyLB.ID); err != nil {
-		return fmt.Errorf("Error updating SakuraCloud ProxyLB ACME resource: %s", err)
+	if err := proxyLBOp.RenewLetsEncryptCert(ctx, proxyLB.ID); err != nil {
+		return fmt.Errorf("renewing ACME Certificates at ProxyLB[%s] is failed: %s", proxyLBID, err)
 	}
 
 	d.SetId(proxyLBID)
@@ -139,53 +174,78 @@ func resourceSakuraCloudProxyLBACMECreate(d *schema.ResourceData, meta interface
 }
 
 func resourceSakuraCloudProxyLBACMERead(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*APIClient)
-	proxyLB, err := client.ProxyLB.Read(toSakuraCloudID(d.Id()))
+	client, _, err := sakuraCloudClient(d, meta)
 	if err != nil {
-		if sacloudErr, ok := err.(api.Error); ok && sacloudErr.ResponseCode() == 404 {
+		return err
+	}
+	ctx, cancel := operationContext(d, schema.TimeoutRead)
+	defer cancel()
+
+	proxyLBOp := sacloud.NewProxyLBOp(client)
+
+	proxyLBID := d.Get("proxylb_id").(string)
+
+	proxyLB, err := proxyLBOp.Read(ctx, sakuraCloudID(proxyLBID))
+	if err != nil {
+		if sacloud.IsNotFoundError(err) {
 			d.SetId("")
 			return nil
 		}
-		return fmt.Errorf("Couldn't find SakuraCloud ProxyLBACME resource: %s", err)
+		return fmt.Errorf("could not read SakuraCloud ProxyLB[%s] : %s", proxyLBID, err)
 	}
 
-	return setProxyLBACMEResourceData(d, client, proxyLB)
+	return setProxyLBACMEResourceData(ctx, d, client, proxyLB)
 }
 
 func resourceSakuraCloudProxyLBACMEDelete(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*APIClient)
+	client, _, err := sakuraCloudClient(d, meta)
+	if err != nil {
+		return err
+	}
+	ctx, cancel := operationContext(d, schema.TimeoutDelete)
+	defer cancel()
+
+	proxyLBOp := sacloud.NewProxyLBOp(client)
+
 	proxyLBID := d.Get("proxylb_id").(string)
 
 	sakuraMutexKV.Lock(proxyLBID)
 	defer sakuraMutexKV.Unlock(proxyLBID)
-	proxyLB, err := client.ProxyLB.Read(toSakuraCloudID(proxyLBID))
+
+	proxyLB, err := proxyLBOp.Read(ctx, sakuraCloudID(proxyLBID))
 	if err != nil {
-		if sacloudErr, ok := err.(api.Error); ok && sacloudErr.ResponseCode() == 404 {
-			d.SetId("")
-			return nil
-		}
-		return fmt.Errorf("Couldn't find SakuraCloud ProxyLBACME resource: %s", err)
+		return fmt.Errorf("could not read SakuraCloud ProxyLB[%s]: %s", proxyLBID, err)
 	}
 
 	// clear
-	proxyLB.Settings.ProxyLB.LetsEncrypt = &sacloud.ProxyLBACMESetting{
-		Enabled: false,
-	}
-
-	if _, err := client.ProxyLB.Update(proxyLB.ID, proxyLB); err != nil {
-		return fmt.Errorf("Error deleting SakuraCloud ProxyLB ACME resource: %s", err)
+	_, err = proxyLBOp.UpdateSettings(ctx, proxyLB.ID, &sacloud.ProxyLBUpdateSettingsRequest{
+		HealthCheck: proxyLB.HealthCheck,
+		SorryServer: proxyLB.SorryServer,
+		BindPorts:   proxyLB.BindPorts,
+		Servers:     proxyLB.Servers,
+		LetsEncrypt: &sacloud.ProxyLBACMESetting{
+			Enabled: false,
+		},
+		StickySession: proxyLB.StickySession,
+		Timeout:       proxyLB.Timeout,
+		SettingsHash:  proxyLB.SettingsHash,
+	})
+	if err != nil {
+		return fmt.Errorf("clearing ACME Setting of ProxyLB[%s] is failed: %s", proxyLBID, err)
 	}
 
 	d.SetId("")
 	return nil
 }
 
-func setProxyLBACMEResourceData(d *schema.ResourceData, client *APIClient, data *sacloud.ProxyLB) error {
+func setProxyLBACMEResourceData(ctx context.Context, d *schema.ResourceData, client *APIClient, data *sacloud.ProxyLB) error {
+	proxyLBOp := sacloud.NewProxyLBOp(client)
+
 	// certificates
 	var cert *sacloud.ProxyLBCertificates
 	var err error
 	for i := 0; i < 5; i++ { // 作成直後はcertが空になるため数回リトライする
-		cert, err = client.ProxyLB.GetCertificates(data.ID)
+		cert, err = proxyLBOp.GetCertificates(ctx, data.ID)
 		if err != nil {
 			// even if certificate is deleted, it will not result in an error
 			return err
@@ -196,12 +256,11 @@ func setProxyLBACMEResourceData(d *schema.ResourceData, client *APIClient, data 
 		time.Sleep(10 * time.Second)
 	}
 
-	proxylbCert := map[string]interface{}{
-		"server_cert":       cert.PrimaryCert.ServerCertificate,
-		"intermediate_cert": cert.PrimaryCert.IntermediateCertificate,
-		"private_key":       cert.PrimaryCert.PrivateKey,
-		//"common_name":       cert.CertificateCommonName,
-		//"end_date":          cert.CertificateEndDate.Format(time.RFC3339),
+	proxylbCert := make(map[string]interface{})
+	if cert.PrimaryCert != nil {
+		proxylbCert["server_cert"] = cert.PrimaryCert.ServerCertificate
+		proxylbCert["intermediate_cert"] = cert.PrimaryCert.IntermediateCertificate
+		proxylbCert["private_key"] = cert.PrimaryCert.PrivateKey
 	}
 	if len(cert.AdditionalCerts) > 0 {
 		var certs []interface{}
@@ -210,15 +269,13 @@ func setProxyLBACMEResourceData(d *schema.ResourceData, client *APIClient, data 
 				"server_cert":       cert.ServerCertificate,
 				"intermediate_cert": cert.IntermediateCertificate,
 				"private_key":       cert.PrivateKey,
-				//"common_name":       cert.CertificateCommonName,
-				//"end_date":          cert.CertificateEndDate.Format(time.RFC3339),
 			})
 		}
-		proxylbCert["additional_certificates"] = certs
-	} else {
-		proxylbCert["additional_certificates"] = []interface{}{}
+		proxylbCert["additional_certificate"] = certs
 	}
 
-	d.Set("certificate", []interface{}{proxylbCert})
+	if err := d.Set("certificate", []interface{}{proxylbCert}); err != nil {
+		return err
+	}
 	return nil
 }

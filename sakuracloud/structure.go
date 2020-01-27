@@ -15,17 +15,27 @@
 package sakuracloud
 
 import (
+	"bytes"
+	"context"
+	"crypto/md5"
+	"encoding/base64"
+	"encoding/hex"
 	"fmt"
+	"io"
+	"os"
 	"strconv"
-	"strings"
-	"time"
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
-	"github.com/hashicorp/terraform-plugin-sdk/terraform"
-	"github.com/sacloud/libsacloud/sacloud"
+	"github.com/hashicorp/terraform-plugin-sdk/helper/validation"
+
+	"github.com/mitchellh/go-homedir"
+
+	"github.com/sacloud/libsacloud/v2/sacloud/search"
+	"github.com/sacloud/libsacloud/v2/sacloud/search/keys"
+	"github.com/sacloud/libsacloud/v2/sacloud/types"
 )
 
-type resourceValueGetable interface {
+type resourceValueGettable interface {
 	Get(key string) interface{}
 	GetOk(key string) (interface{}, bool)
 }
@@ -43,22 +53,47 @@ func (r *resourceMapValue) GetOk(key string) (interface{}, bool) {
 	return v, ok
 }
 
-func mapToResourceData(v map[string]interface{}) resourceValueGetable {
+func mapToResourceData(v map[string]interface{}) resourceValueGettable {
 	return &resourceMapValue{value: v}
 }
 
-func getMapFromResource(d resourceValueGetable, key string) (map[string]interface{}, bool) {
-	v, ok := d.GetOk(key)
-	if !ok {
-		return nil, false
+func boolOrDefault(d resourceValueGettable, key string) bool {
+	if v, ok := d.GetOk(key); ok {
+		if v, ok := v.(bool); ok {
+			return v
+		}
 	}
-	if v, ok := v.(map[string]interface{}); ok {
-		return v, true
-	}
-	return nil, false
+	return false
 }
 
-func getListFromResource(d resourceValueGetable, key string) ([]interface{}, bool) {
+func intOrDefault(d resourceValueGettable, key string) int {
+	if v, ok := d.GetOk(key); ok {
+		if v, ok := v.(int); ok {
+			return v
+		}
+	}
+	return 0
+}
+
+func stringOrDefault(d resourceValueGettable, key string) string {
+	if v, ok := d.GetOk(key); ok {
+		if v, ok := v.(string); ok {
+			return v
+		}
+	}
+	return ""
+}
+
+func stringListOrDefault(d resourceValueGettable, key string) []string {
+	if v, ok := d.GetOk(key); ok {
+		if v, ok := v.([]interface{}); ok {
+			return expandStringList(v)
+		}
+	}
+	return []string{}
+}
+
+func getListFromResource(d resourceValueGettable, key string) ([]interface{}, bool) {
 	v, ok := d.GetOk(key)
 	if !ok {
 		return nil, false
@@ -69,32 +104,65 @@ func getListFromResource(d resourceValueGetable, key string) ([]interface{}, boo
 	return nil, false
 }
 
-func mergeSchemas(schemas ...map[string]*schema.Schema) map[string]*schema.Schema {
-	m := map[string]*schema.Schema{}
-	for _, schema := range schemas {
-		for k, v := range schema {
-			m[k] = v
+func mapFromFirstElement(d resourceValueGettable, key string) resourceValueGettable {
+	list, ok := getListFromResource(d, key)
+	if ok && len(list) > 0 {
+		if m, ok := list[0].(map[string]interface{}); ok {
+			return mapToResourceData(m)
 		}
 	}
-	return m
+	return nil
 }
 
-func getSacloudAPIClient(d resourceValueGetable, meta interface{}) *APIClient {
-	c := meta.(*APIClient)
-	client := c.Clone()
+func sakuraCloudClient(d resourceValueGettable, meta interface{}) (*APIClient, string, error) {
+	client := meta.(*APIClient)
+	zone := getZone(d, client)
+	if _, errs := validation.StringInSlice(client.zones, false)(zone, "zone"); len(errs) > 0 {
+		return nil, "", errs[0]
+	}
 
+	return client, zone, nil
+}
+
+func getZone(d resourceValueGettable, client *APIClient) string {
 	zone, ok := d.GetOk("zone")
 	if ok {
-		client.Zone = zone.(string)
+		if z, ok := zone.(string); ok && z != "" {
+			return z
+		}
 	}
-	return &APIClient{
-		Client: client,
-	}
+	return client.defaultZone
 }
 
-func toSakuraCloudID(id string) int64 {
-	v, _ := strconv.ParseInt(id, 10, 64)
-	return v
+func operationContext(d *schema.ResourceData, opKey string) (context.Context, context.CancelFunc) {
+	return context.WithTimeout(context.Background(), d.Timeout(opKey))
+}
+
+func sakuraCloudID(id string) types.ID {
+	return types.StringID(id)
+}
+
+func expandSakuraCloudID(d resourceValueGettable, key string) types.ID {
+	if v, ok := d.GetOk(key); ok {
+		if v, ok := v.(string); ok {
+			return sakuraCloudID(v)
+		}
+	}
+	return types.ID(0)
+}
+
+func expandSakuraCloudIDs(d resourceValueGettable, key string) []types.ID {
+	var ids []types.ID
+	if v, ok := d.GetOk(key); ok {
+		if v, ok := v.([]interface{}); ok {
+			for _, v := range v {
+				if v, ok := v.(string); ok {
+					ids = append(ids, sakuraCloudID(v))
+				}
+			}
+		}
+	}
+	return ids
 }
 
 // Takes the result of flatmap.Expand for an array of strings
@@ -102,155 +170,47 @@ func toSakuraCloudID(id string) int64 {
 func expandStringList(configured []interface{}) []string {
 	vs := make([]string, 0, len(configured))
 	for _, v := range configured {
-		vs = append(vs, string(v.(string)))
+		vs = append(vs, v.(string))
 	}
 	return vs
 }
 
-func expandTags(_ *APIClient, configured []interface{}) []string {
-	return expandStringList(configured)
+func expandTags(d resourceValueGettable) types.Tags {
+	var tags []string
+	rawTags := d.Get("tags").(*schema.Set).List()
+	for _, v := range rawTags {
+		v := v.(string)
+		if v != "" {
+			tags = append(tags, v)
+		}
+	}
+	return types.Tags(tags)
 }
 
-func expandStringListWithValidateInList(fieldName string, configured []interface{}, allowWords []string) ([]string, error) {
-	vs := make([]string, 0, len(configured))
-	for _, v := range configured {
-		var found bool
-		for _, t := range allowWords {
-			if string(v.(string)) == t {
-				found = true
-				break
-			}
-		}
-		if !found {
-			return nil, fmt.Errorf("%q must be one of [%s]", fieldName, strings.Join(allowWords, "/"))
-		}
-
-		vs = append(vs, string(v.(string)))
+func flattenTags(tags types.Tags) *schema.Set {
+	set := &schema.Set{F: schema.HashString}
+	for _, v := range tags {
+		set.Add(v)
 	}
-	return vs, nil
+	return set
 }
 
-// Takes the result of schema.Set of strings and returns a []*string
-//func expandStringSet(configured *schema.Set) []string {
-//	return expandStringList(configured.List())
-//}
-
-// Takes list of pointers to strings. Expand to an array
-// of raw strings and returns a []interface{}
-// to keep compatibility w/ schema.NewSetschema.NewSet
-//func flattenStringList(list []string) []interface{} {
-//	vs := make([]interface{}, 0, len(list))
-//	for _, v := range list {
-//		vs = append(vs, v)
-//	}
-//	return vs
-//}
-
-func flattenDisks(disks []sacloud.Disk) []string {
-	var ids []string
-	for _, d := range disks {
-		ids = append(ids, d.GetStrID())
+func expandBackupWeekdays(configured []interface{}) []types.EBackupSpanWeekday {
+	var vs []types.EBackupSpanWeekday
+	for _, w := range expandStringList(configured) {
+		vs = append(vs, types.EBackupSpanWeekday(w))
 	}
-	return ids
+	types.SortBackupSpanWeekdays(vs)
+	return vs
 }
 
-func flattenServers(servers []sacloud.Server) []string {
-	var ids []string
-	for _, d := range servers {
-		ids = append(ids, d.GetStrID())
+func flattenBackupWeekdays(weekdays []types.EBackupSpanWeekday) []string {
+	types.SortBackupSpanWeekdays(weekdays)
+	var ws []string
+	for _, w := range weekdays {
+		ws = append(ws, w.String())
 	}
-	return ids
-
-}
-
-func flattenInterfaces(interfaces []sacloud.Interface) []interface{} {
-	var ret []interface{}
-	for index, i := range interfaces {
-		if index == 0 {
-			continue
-		}
-		if i.Switch == nil {
-			ret = append(ret, "")
-		} else {
-			switch i.Switch.Scope {
-			case sacloud.ESCopeUser:
-				ret = append(ret, i.Switch.GetStrID())
-			}
-
-		}
-	}
-	return ret
-}
-
-func flattenDisplayIPAddress(interfaces []sacloud.Interface) []interface{} {
-	var ret []interface{}
-	for index, i := range interfaces {
-		if index == 0 {
-			continue
-		}
-		if i.Switch == nil {
-			ret = append(ret, "")
-		} else {
-			switch i.Switch.Scope {
-			case sacloud.ESCopeUser:
-				ip := i.GetUserIPAddress()
-				if ip == "0.0.0.0" {
-					ip = ""
-				}
-				ret = append(ret, ip)
-			}
-		}
-	}
-	exists := false
-	for _, v := range ret {
-		if v.(string) != "" {
-			exists = true
-			break
-		}
-	}
-	if exists {
-		return ret
-	}
-	return []interface{}{}
-}
-
-func flattenPacketFilters(interfaces []sacloud.Interface) []string {
-	var ret []string
-	for _, i := range interfaces {
-		var id string
-		if i.PacketFilter != nil {
-			id = i.PacketFilter.GetStrID()
-		}
-		ret = append(ret, id)
-	}
-
-	if len(interfaces) == 0 {
-		return ret
-	}
-
-	exists := false
-	for i := 1; i < len(interfaces); i++ {
-		if ret[i] != "" {
-			exists = true
-			break
-		}
-	}
-	if !exists {
-		if ret[0] != "" {
-			return []string{ret[0]}
-		}
-		return []string{}
-	}
-
-	return ret
-}
-
-func flattenMacAddresses(interfaces []sacloud.Interface) []string {
-	var ret []string
-	for _, i := range interfaces {
-		ret = append(ret, strings.ToLower(i.MACAddress))
-	}
-	return ret
+	return ws
 }
 
 func forceString(target interface{}) string {
@@ -274,79 +234,121 @@ func forceAtoI(target string) int {
 	return v
 }
 
-func expandFilters(filter interface{}) map[string]interface{} {
-
-	ret := map[string]interface{}{}
-	filterSet := filter.(*schema.Set)
-	for _, v := range filterSet.List() {
-		m := v.(map[string]interface{})
-		name := m["name"].(string)
-		if name == "Tags" {
-			var filterValues []string
-			for _, e := range m["values"].([]interface{}) {
-				filterValues = append(filterValues, e.(string))
+func expandSearchFilter(rawFilters interface{}) search.Filter {
+	ret := search.Filter{}
+	filters, ok := rawFilters.([]interface{})
+	if !ok {
+		return ret
+	}
+	mv := filters[0].(map[string]interface{})
+	// ID
+	if rawID, ok := mv["id"]; ok {
+		id := rawID.(string)
+		if id != "" {
+			ret[search.Key(keys.ID)] = search.AndEqual(id)
+		}
+	}
+	// Names
+	if rawNames, ok := mv["names"]; ok {
+		var names []string
+		for _, rawName := range rawNames.([]interface{}) {
+			name := rawName.(string)
+			if name != "" {
+				names = append(names, name)
 			}
-			ret["Tags.Name"] = []interface{}{filterValues}
+		}
+		if len(names) > 0 {
+			ret[search.Key(keys.Name)] = search.AndEqual(names...)
+		}
+	}
 
-		} else {
-			var filterValues string
-			for _, e := range m["values"].([]interface{}) {
-				if filterValues == "" {
-					filterValues = e.(string)
-				} else {
-					filterValues = fmt.Sprintf("%s %s", filterValues, e.(string))
+	// Tags
+	if rawTags, ok := mv["tags"]; ok {
+		var tags []string
+		for _, rawTag := range rawTags.(*schema.Set).List() {
+			tag := rawTag.(string)
+			if tag != "" {
+				tags = append(tags, tag)
+			}
+		}
+		if len(tags) > 0 {
+			ret[search.Key(keys.Tags)] = search.TagsAndEqual(tags...)
+		}
+	}
+	// others
+	if rawConditions, ok := mv["condition"]; ok {
+		for _, rawCondition := range rawConditions.([]interface{}) {
+			mv := rawCondition.(map[string]interface{})
+
+			keyName := mv["name"].(string)
+			values := mv["values"].([]interface{})
+			var conditions []string
+			for _, value := range values {
+				v := value.(string)
+				if v != "" {
+					conditions = append(conditions, v)
 				}
 			}
-			ret[name] = filterValues
+			if len(conditions) > 0 {
+				ret[search.Key(keyName)] = search.AndEqual(conditions...)
+			}
 		}
-
 	}
 
 	return ret
 }
 
-type migrateSchemaDef struct {
-	source      string
-	destination string
-}
-
-type resourceData interface {
-	UnsafeSetFieldRaw(key string, value string)
-	Get(key string) interface{}
-	GetChange(key string) (interface{}, interface{})
-	GetOk(key string) (interface{}, bool)
-	HasChange(key string) bool
-	Partial(on bool)
-	Set(key string, value interface{}) error
-	SetPartial(k string)
-	MarkNewResource()
-	IsNewResource() bool
-	Id() string
-	ConnInfo() map[string]string
-	SetId(v string)
-	SetConnInfo(v map[string]string)
-	SetType(t string)
-	State() *terraform.InstanceState
-	Timeout(key string) time.Duration
-
-	RawResourceData() *schema.ResourceData
-}
-type resourceDataWrapper struct {
-	*schema.ResourceData
-	migrateDefs []migrateSchemaDef
-}
-
-func (d *resourceDataWrapper) HasChange(key string) bool {
-	origFunc := d.ResourceData.HasChange
-
-	for _, def := range d.migrateDefs {
-		if def.source == key || def.destination == key {
-			return origFunc(def.source) || origFunc(def.destination)
+func expandStringNumber(d resourceValueGettable, key string) types.StringNumber {
+	if v, ok := d.GetOk(key); ok {
+		switch v := v.(type) {
+		case string:
+			return types.StringNumber(forceAtoI(v))
+		case int:
+			return types.StringNumber(v)
+		case int64:
+			return types.StringNumber(v)
+		default:
+			return types.StringNumber(0)
 		}
 	}
-	return origFunc(key)
+	return types.StringNumber(0)
 }
 
-func (d *resourceDataWrapper) RawResourceData() *schema.ResourceData {
-	return d.ResourceData
+func expandStringFlag(d resourceValueGettable, key string) types.StringFlag {
+	return types.StringFlag(d.Get(key).(bool))
+}
+
+func expandHomeDir(path string) (string, error) {
+	expanded, err := homedir.Expand(path)
+	if err != nil {
+		return "", fmt.Errorf("expanding homedir in path[%s] is failed: %s", expanded, err)
+	}
+	// file exists?
+	if _, err := os.Stat(expanded); err != nil {
+		return "", fmt.Errorf("opening file[%s] is failed: %s", expanded, err)
+	}
+	return expanded, nil
+}
+
+func md5CheckSumFromFile(path string) (string, error) {
+	f, err := os.Open(path)
+	if err != nil {
+		return "", fmt.Errorf("opening file[%s] is failed: %s", path, err)
+	}
+	defer f.Close() // nolint
+
+	b := base64.NewEncoder(base64.StdEncoding, f)
+	defer b.Close() // nolint
+
+	var buf bytes.Buffer
+	if _, err := io.Copy(&buf, f); err != nil {
+		return "", fmt.Errorf("encoding to base64 from file[%s] is failed: %s", path, err)
+	}
+
+	h := md5.New()
+	if _, err := io.Copy(h, &buf); err != nil {
+		return "", fmt.Errorf("calculating md5 from file[%s] is failed: %s", path, err)
+	}
+
+	return hex.EncodeToString(h.Sum(nil)), nil
 }

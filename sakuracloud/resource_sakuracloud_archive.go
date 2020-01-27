@@ -15,189 +15,201 @@
 package sakuracloud
 
 import (
-	"bytes"
-	"crypto/md5"
-	"encoding/base64"
+	"context"
 	"fmt"
-	"io"
-	"os"
+	"time"
 
+	"github.com/hashicorp/terraform-plugin-sdk/helper/customdiff"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
-	"github.com/hashicorp/terraform-plugin-sdk/helper/validation"
-	homedir "github.com/mitchellh/go-homedir"
-	"github.com/sacloud/ftps"
-	"github.com/sacloud/libsacloud/api"
-	"github.com/sacloud/libsacloud/sacloud"
+	"github.com/sacloud/libsacloud/v2/sacloud"
+	"github.com/sacloud/libsacloud/v2/sacloud/types"
 )
 
-var allowArchiveSizes = []string{"20", "40", "60", "80", "100", "250", "500", "750", "1024"}
-
 func resourceSakuraCloudArchive() *schema.Resource {
+	resourceName := "archive"
+
 	return &schema.Resource{
 		Create: resourceSakuraCloudArchiveCreate,
 		Read:   resourceSakuraCloudArchiveRead,
 		Update: resourceSakuraCloudArchiveUpdate,
 		Delete: resourceSakuraCloudArchiveDelete,
+		CustomizeDiff: customdiff.ComputedIf("hash", func(d *schema.ResourceDiff, meta interface{}) bool {
+			return d.HasChange("archive_file")
+		}),
 		Importer: &schema.ResourceImporter{
 			State: schema.ImportStatePassthrough,
 		},
-		CustomizeDiff: hasTagResourceCustomizeDiff,
+
+		Timeouts: &schema.ResourceTimeout{
+			Create: schema.DefaultTimeout(24 * time.Hour),
+			Update: schema.DefaultTimeout(24 * time.Hour),
+			Delete: schema.DefaultTimeout(5 * time.Minute),
+		},
+
 		Schema: map[string]*schema.Schema{
-			"name": {
-				Type:     schema.TypeString,
-				Required: true,
-			},
-			"size": {
-				Type:         schema.TypeInt,
-				Optional:     true,
-				ForceNew:     true,
-				Default:      20,
-				ValidateFunc: validateIntInWord(allowArchiveSizes),
-			},
+			"name": schemaResourceName(resourceName),
+			"size": schemaResourceSize(resourceName, 20, types.ArchiveSizes...),
 			"archive_file": {
-				Type:     schema.TypeString,
-				Required: true,
+				Type:        schema.TypeString,
+				Required:    true,
+				Description: "The file path to upload to the SakuraCloud",
 			},
 			"hash": {
-				Type:     schema.TypeString,
-				Optional: true,
-				Computed: true,
+				Type:        schema.TypeString,
+				Optional:    true,
+				Computed:    true,
+				Description: "The md5 checksum calculated from the base64 encoded file body",
 			},
-			"icon_id": {
-				Type:         schema.TypeString,
-				Optional:     true,
-				ValidateFunc: validateSakuracloudIDType,
-			},
-			"description": {
-				Type:     schema.TypeString,
-				Optional: true,
-			},
-			"tags": {
-				Type:     schema.TypeList,
-				Optional: true,
-				Computed: true,
-				Elem:     &schema.Schema{Type: schema.TypeString},
-			},
-			"zone": {
-				Type:         schema.TypeString,
-				Optional:     true,
-				Computed:     true,
-				ForceNew:     true,
-				Description:  "target SakuraCloud zone",
-				ValidateFunc: validation.StringInSlice([]string{"is1a", "is1b", "tk1a", "tk1v"}, false),
-			},
+			"icon_id":     schemaResourceIconID(resourceName),
+			"description": schemaResourceDescription(resourceName),
+			"tags":        schemaResourceTags(resourceName),
+			"zone":        schemaResourceZone(resourceName),
 		},
 	}
 }
 
 func resourceSakuraCloudArchiveCreate(d *schema.ResourceData, meta interface{}) error {
-	client := getSacloudAPIClient(d, meta)
-
-	opts := client.Archive.New()
-
-	opts.Name = d.Get("name").(string)
-
-	source := d.Get("archive_file").(string)
-	path, err := homedir.Expand(source)
+	client, zone, err := sakuraCloudClient(d, meta)
 	if err != nil {
-		return fmt.Errorf("Error expanding homedir in source (%s): %s", source, err)
+		return err
 	}
-	// file exists?
-	if _, err := os.Stat(path); err != nil {
-		return fmt.Errorf("Error opening archive_file (%s): %s", source, err)
-	}
+	ctx, cancel := operationContext(d, schema.TimeoutCreate)
+	defer cancel()
 
-	opts.SizeMB = toSizeMB(d.Get("size").(int))
-	if iconID, ok := d.GetOk("icon_id"); ok {
-		opts.SetIconByID(toSakuraCloudID(iconID.(string)))
-	}
-	if description, ok := d.GetOk("description"); ok {
-		opts.Description = description.(string)
-	}
-	rawTags := d.Get("tags").([]interface{})
-	if rawTags != nil {
-		opts.Tags = expandTags(client, rawTags)
-	}
+	archiveOp := sacloud.NewArchiveOp(client)
 
-	archive, err := client.Archive.Create(opts)
+	archive, ftpServer, err := archiveOp.CreateBlank(ctx, zone, expandArchiveCreateRequest(d))
 	if err != nil {
-		return fmt.Errorf("Failed to create SakuraCloud Archive resource: %s", err)
+		return fmt.Errorf("creating SakuraCloud Archive is failed: %s", err)
 	}
 
 	// upload
-	ftpServer, err := client.Archive.OpenFTP(archive.ID)
-	if err != nil {
-		return fmt.Errorf("Failed to Open FTPS Connection: %s", err)
+	if err := uploadArchiveFile(ctx, archiveOp, zone, archive.ID, d.Get("archive_file").(string), ftpServer); err != nil {
+		return err
 	}
 
-	ftpClient := ftps.NewClient(ftpServer.User, ftpServer.Password, ftpServer.HostName)
-	if err := ftpClient.Upload(path); err != nil {
-		return fmt.Errorf("Failed to upload SakuraCloud Archive resource: %s", err)
-	}
-
-	// close
-	if _, err := client.Archive.CloseFTP(archive.ID); err != nil {
-		return fmt.Errorf("Failed to Close FTPS Connection from Archive resource: %s", err)
-
-	}
-
-	d.SetId(archive.GetStrID())
+	d.SetId(archive.ID.String())
 	return resourceSakuraCloudArchiveRead(d, meta)
 }
 
 func resourceSakuraCloudArchiveRead(d *schema.ResourceData, meta interface{}) error {
-	client := getSacloudAPIClient(d, meta)
-
-	archive, err := client.Archive.Read(toSakuraCloudID(d.Id()))
+	client, zone, err := sakuraCloudClient(d, meta)
 	if err != nil {
-		if sacloudErr, ok := err.(api.Error); ok && sacloudErr.ResponseCode() == 404 {
+		return err
+	}
+	ctx, cancel := operationContext(d, schema.TimeoutRead)
+	defer cancel()
+
+	archiveOp := sacloud.NewArchiveOp(client)
+
+	archive, err := archiveOp.Read(ctx, zone, sakuraCloudID(d.Id()))
+	if err != nil {
+		if sacloud.IsNotFoundError(err) {
 			d.SetId("")
 			return nil
 		}
-		return fmt.Errorf("Couldn't find SakuraCloud Archive resource: %s", err)
+		return fmt.Errorf("could not read SakuraCloud Archive[%s]: %s", d.Id(), err)
 	}
-
 	return setArchiveResourceData(d, client, archive)
 }
 
 func resourceSakuraCloudArchiveUpdate(d *schema.ResourceData, meta interface{}) error {
-	client := getSacloudAPIClient(d, meta)
+	client, zone, err := sakuraCloudClient(d, meta)
+	if err != nil {
+		return err
+	}
+	ctx, cancel := operationContext(d, schema.TimeoutUpdate)
+	defer cancel()
 
-	archive, err := client.Archive.Read(toSakuraCloudID(d.Id()))
+	archiveOp := sacloud.NewArchiveOp(client)
+
+	archive, err := archiveOp.Read(ctx, zone, sakuraCloudID(d.Id()))
 	if err != nil {
-		return fmt.Errorf("Couldn't find SakuraCloud Archive resource: %s", err)
-	}
-	if d.HasChange("name") {
-		archive.Name = d.Get("name").(string)
-	}
-	if d.HasChange("icon_id") {
-		if iconID, ok := d.GetOk("icon_id"); ok {
-			archive.SetIconByID(toSakuraCloudID(iconID.(string)))
-		} else {
-			archive.ClearIcon()
-		}
-	}
-	if d.HasChange("description") {
-		if description, ok := d.GetOk("description"); ok {
-			archive.Description = description.(string)
-		} else {
-			archive.Description = ""
-		}
-	}
-	if d.HasChange("tags") {
-		rawTags := d.Get("tags").([]interface{})
-		if rawTags != nil {
-			archive.Tags = expandTags(client, rawTags)
-		} else {
-			archive.Tags = expandTags(client, []interface{}{})
-		}
-	}
-	archive, err = client.Archive.Update(archive.ID, archive)
-	if err != nil {
-		return fmt.Errorf("Error updating SakuraCloud Archive resource: %s", err)
+		return fmt.Errorf("could not read SakuraCloud Archive[%s]: %s", d.Id(), err)
 	}
 
-	contentAttrs := []string{"iso_image_file", "hash"}
+	archive, err = archiveOp.Update(ctx, zone, archive.ID, expandArchiveUpdateRequest(d))
+	if err != nil {
+		return fmt.Errorf("updating SakuraCloud Archive[%s] is failed: %s", archive.ID, err)
+	}
+
+	if isArchiveContentChanged(d) {
+		// upload
+		if err := uploadArchiveFile(ctx, archiveOp, zone, archive.ID, d.Get("archive_file").(string), nil); err != nil {
+			return err
+		}
+	}
+
+	return resourceSakuraCloudArchiveRead(d, meta)
+}
+
+func resourceSakuraCloudArchiveDelete(d *schema.ResourceData, meta interface{}) error {
+	client, zone, err := sakuraCloudClient(d, meta)
+	if err != nil {
+		return err
+	}
+	ctx, cancel := operationContext(d, schema.TimeoutDelete)
+	defer cancel()
+
+	archiveOp := sacloud.NewArchiveOp(client)
+
+	archive, err := archiveOp.Read(ctx, zone, sakuraCloudID(d.Id()))
+	if err != nil {
+		if sacloud.IsNotFoundError(err) {
+			d.SetId("")
+			return nil
+		}
+		return fmt.Errorf("could not read SakuraCloud Archive[%s]: %s", d.Id(), err)
+	}
+
+	if err := archiveOp.Delete(ctx, zone, archive.ID); err != nil {
+		return fmt.Errorf("deleting SakuraCloud Archive[%s] is failed: %s", archive.ID, err)
+	}
+
+	d.SetId("")
+	return nil
+}
+
+func setArchiveResourceData(d *schema.ResourceData, client *APIClient, data *sacloud.Archive) error {
+	d.Set("hash", expandArchiveHash(d))    // nolint
+	d.Set("icon_id", data.IconID.String()) // nolint
+	d.Set("name", data.Name)               // nolint
+	d.Set("size", data.GetSizeGB())        // nolint
+	d.Set("description", data.Description) // nolint
+	d.Set("zone", getZone(d, client))      // nolint
+	return d.Set("tags", flattenTags(data.Tags))
+}
+
+func uploadArchiveFile(ctx context.Context, archiveOp sacloud.ArchiveAPI, zone string, id types.ID, filePath string, ftpServer *sacloud.FTPServer) error {
+	path, err := expandHomeDir(filePath)
+	if err != nil {
+		return fmt.Errorf("preparing SakuraCloud Archive creation is failed: %s", err)
+	}
+
+	if ftpServer == nil {
+		// open FTPS connections
+		fs, err := archiveOp.OpenFTP(ctx, zone, id, &sacloud.OpenFTPRequest{ChangePassword: true})
+		if err != nil {
+			return fmt.Errorf("opening FTPS connection is failed: %s", err)
+		}
+		ftpServer = fs
+	}
+
+	// upload
+	if err := uploadFileViaFTPS(ctx, ftpServer.User, ftpServer.Password, ftpServer.HostName, path); err != nil {
+		return fmt.Errorf("uploading file to SakuraCloud is failed: %s", err)
+	}
+
+	// close FTPS connection
+	if err := archiveOp.CloseFTP(ctx, zone, id); err != nil {
+		return fmt.Errorf("closing FTPS Connection is failed: %s", err)
+	}
+
+	return nil
+}
+
+func isArchiveContentChanged(d *schema.ResourceData) bool {
+	contentAttrs := []string{"archive_file", "hash"}
 	isContentChanged := false
 	for _, attr := range contentAttrs {
 		if d.HasChange(attr) {
@@ -205,99 +217,5 @@ func resourceSakuraCloudArchiveUpdate(d *schema.ResourceData, meta interface{}) 
 			break
 		}
 	}
-	if isContentChanged {
-
-		source := d.Get("archive_file").(string)
-		path, err := homedir.Expand(source)
-		if err != nil {
-			return fmt.Errorf("Error expanding homedir in source (%s): %s", source, err)
-		}
-		// file exists?
-		if _, err := os.Stat(path); err != nil {
-			return fmt.Errorf("Error opening archive_file (%s): %s", source, err)
-		}
-
-		// upload
-		ftpServer, err := client.Archive.OpenFTP(archive.ID)
-		if err != nil {
-			return fmt.Errorf("Failed to Open FTPS Connection: %s", err)
-		}
-
-		ftpClient := ftps.NewClient(ftpServer.User, ftpServer.Password, ftpServer.HostName)
-		if err := ftpClient.Upload(path); err != nil {
-			return fmt.Errorf("Failed to upload SakuraCloud Archive resource: %s", err)
-		}
-
-		// close
-		if _, err := client.Archive.CloseFTP(archive.ID); err != nil {
-			return fmt.Errorf("Failed to Close FTPS Connection from Archive resource: %s", err)
-
-		}
-
-	}
-
-	return resourceSakuraCloudArchiveRead(d, meta)
-}
-
-func resourceSakuraCloudArchiveDelete(d *schema.ResourceData, meta interface{}) error {
-	client := getSacloudAPIClient(d, meta)
-
-	_, err := client.Archive.Read(toSakuraCloudID(d.Id()))
-	if err != nil {
-		return fmt.Errorf("Couldn't find SakuraCloud Archive resource: %s", err)
-	}
-
-	_, err = client.Archive.Delete(toSakuraCloudID(d.Id()))
-
-	if err != nil {
-		return fmt.Errorf("Error deleting SakuraCloud Archive resource: %s", err)
-	}
-
-	return nil
-}
-
-func setArchiveResourceData(d *schema.ResourceData, client *APIClient, data *sacloud.Archive) error {
-
-	d.Set("name", data.Name)
-	d.Set("size", toSizeGB(data.SizeMB))
-	d.Set("icon_id", data.GetIconStrID())
-	d.Set("description", data.Description)
-	d.Set("tags", data.Tags)
-
-	// NOTE 本来はAPIにてmd5ハッシュを取得できるのが望ましい
-	if v, ok := d.GetOk("archive_file"); ok {
-		source := v.(string)
-		path, err := homedir.Expand(source)
-		if err != nil {
-			return fmt.Errorf("Error expanding homedir in source (%s): %s", source, err)
-		}
-		// file exists?
-		if _, err := os.Stat(path); err != nil {
-			return fmt.Errorf("Error opening archive_file (%s): %s", source, err)
-		}
-
-		f, err := os.Open(path)
-		if err != nil {
-			return fmt.Errorf("Error opening archive_file(%s): %s", source, err)
-		}
-		defer f.Close()
-
-		b := base64.NewEncoder(base64.StdEncoding, f)
-		defer b.Close()
-
-		var buf bytes.Buffer
-		if _, err := io.Copy(&buf, f); err != nil {
-			return fmt.Errorf("Error encoding to base64 from archive_file (%s): %s", source, err)
-		}
-
-		h := md5.New()
-		if _, err := io.Copy(h, &buf); err != nil {
-			return fmt.Errorf("Error calculate md5 from archive_file (%s): %s", source, err)
-		}
-
-		d.Set("hash", h.Sum(nil))
-	}
-
-	d.Set("zone", client.Zone)
-	return nil
+	return isContentChanged
 }

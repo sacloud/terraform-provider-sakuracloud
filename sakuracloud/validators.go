@@ -15,19 +15,20 @@
 package sakuracloud
 
 import (
+	"errors"
 	"fmt"
 	"net"
-	"os"
 	"strconv"
 	"strings"
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/validation"
+	"github.com/sacloud/libsacloud/v2/sacloud/types"
 )
 
 func validateSakuracloudIDType(v interface{}, k string) ([]string, []error) {
-	ws := []string{}
-	errors := []error{}
+	var ws []string
+	var errors []error
 
 	value := v.(string)
 	if value == "" {
@@ -36,53 +37,48 @@ func validateSakuracloudIDType(v interface{}, k string) ([]string, []error) {
 	_, err := strconv.ParseInt(value, 10, 64)
 	if err != nil {
 		errors = append(errors, fmt.Errorf("%q must be ID string(number only): %s", k, err))
-
 	}
 	return ws, errors
 }
 
-func validateIntInWord(allowWords []string) schema.SchemaValidateFunc {
-	return func(v interface{}, k string) (ws []string, errors []error) {
+func validateSakuraCloudServerNIC(v interface{}, k string) ([]string, []error) {
+	var ws []string
+	var errors []error
+
+	value := v.(string)
+	if value == "" || value == "shared" || value == "disconnect" {
+		return ws, errors
+	}
+	_, err := strconv.ParseInt(value, 10, 64)
+	if err != nil {
+		errors = append(errors, fmt.Errorf("%q must be ID string(number only): %s", k, err))
+	}
+	return ws, errors
+}
+
+func validateBackupWeekdays(d resourceValueGettable, k string) error {
+	weekdays, ok := d.GetOk(k)
+	if !ok || len(weekdays.([]interface{})) == 0 {
+		return nil
+	}
+
+	for _, v := range weekdays.([]interface{}) {
 		var found bool
-		for _, t := range allowWords {
-			if fmt.Sprintf("%d", v.(int)) == t {
+		for _, t := range types.BackupWeekdayStrings {
+			if v.(string) == t {
 				found = true
+				break
 			}
 		}
 		if !found {
-			errors = append(errors, fmt.Errorf("%q must be one of [%s]", k, strings.Join(allowWords, "/")))
-
+			return fmt.Errorf("%q must be one of [%s]", k, strings.Join(types.BackupWeekdayStrings, "/"))
 		}
-		return
 	}
+	return nil
 }
 
-//func validateDNSRecordValue() schema.SchemaValidateFunc {
-//	return func(v interface{}, k string) (ws []string, errors []error) {
-//		var rtype, value string
-//
-//		values := v.(map[string]interface{})
-//		rtype = values["type"].(string)
-//		value = values["value"].(string)
-//		switch rtype {
-//		case "MX", "NS", "CNAME":
-//			if rtype == "MX" {
-//				if values["priority"] == nil {
-//					errors = append(errors, fmt.Errorf("%q required when TYPE was MX", k))
-//				}
-//			}
-//			if !strings.HasSuffix(value, ".") {
-//				errors = append(errors, fmt.Errorf("%q must be period at the end [%s]", k, value))
-//			}
-//		}
-//		return
-//	}
-//
-//}
-
 func validateBackupTime() schema.SchemaValidateFunc {
-	timeStrings := []string{}
-
+	var timeStrings []string
 	minutes := []int{0, 15, 30, 45}
 
 	// create list [00:00 ,,, 23:45]
@@ -116,62 +112,29 @@ func validateIPv4Address() schema.SchemaValidateFunc {
 	}
 }
 
-func validateIPv6Address() schema.SchemaValidateFunc {
-	return func(v interface{}, k string) (ws []string, errors []error) {
-		// if target is nil , return OK(Use required attr if necessary)
-		if v == nil {
-			return
-		}
-
-		if value, ok := v.(string); ok {
-			if value == "" {
-				return
-			}
-
-			ip := net.ParseIP(value)
-			if ip == nil || !strings.Contains(value, ":") {
-				errors = append(errors, fmt.Errorf("%q Invalid IPv6 address format", k))
-			}
-		}
-		return
+func validateDatabaseParameters(d *schema.ResourceData) error {
+	if err := validateBackupWeekdays(d, "backup_weekdays"); err != nil {
+		return err
 	}
+	return nil
 }
 
-func validateMulti(validators ...schema.SchemaValidateFunc) schema.SchemaValidateFunc {
-	return func(v interface{}, k string) (ws []string, errors []error) {
-		for _, validator := range validators {
-			w, errs := validator(v, k)
-			if len(w) > 0 {
-				ws = append(ws, w...)
-			}
-			if len(errs) > 0 {
-				errors = append(errors, errs...)
-			}
-		}
-		return
+func validateCarrier(d resourceValueGettable) error {
+	carriers := d.Get("carrier").([]interface{})
+	if len(carriers) == 0 {
+		return errors.New("carrier is required")
 	}
-}
 
-func validateList(validator schema.SchemaValidateFunc) schema.SchemaValidateFunc {
-	return func(v interface{}, k string) (ws []string, errors []error) {
-		if values, ok := v.([]interface{}); ok {
-			for _, value := range values {
-				w, errs := validator(value, k)
-				if len(w) > 0 {
-					ws = append(ws, w...)
-				}
-				if len(errs) > 0 {
-					errors = append(errors, errs...)
-				}
-			}
+	for _, c := range carriers {
+		if c == nil {
+			return errors.New(`carrier[""] is invalid`)
 		}
-		return
-	}
-}
 
-func validateZone(allowZones []string) schema.SchemaValidateFunc {
-	if os.Getenv("SAKURACLOUD_FORCE_USE_ZONES") != "" {
-		return func(interface{}, string) (ws []string, errors []error) { return }
+		c := c.(string)
+		if _, ok := types.SIMOperatorShortNameMap[c]; !ok {
+			return fmt.Errorf("carrier[%q] is invalid", c)
+		}
 	}
-	return validation.StringInSlice(allowZones, false)
+
+	return nil
 }

@@ -15,10 +15,10 @@
 FROM golang:1.13 as builder
 
 RUN  apt-get update && apt-get -y install bash git make zip bzr && apt-get clean && rm -rf /var/cache/apt/archives/* /var/lib/apt/lists/*
-RUN GO111MODULE=off go get -u github.com/motemen/gobump/cmd/gobump
 ADD . /go/src/github.com/sacloud/terraform-provider-sakuracloud
 WORKDIR /go/src/github.com/sacloud/terraform-provider-sakuracloud
-RUN ["make", "build"]
+ENV GOPROXY=https://proxy.golang.org
+RUN ["make", "tools", "build"]
 
 ###
 
@@ -31,5 +31,4 @@ WORKDIR /workdir
 
 ENTRYPOINT ["/bin/terraform"]
 CMD ["--help"]
-
 

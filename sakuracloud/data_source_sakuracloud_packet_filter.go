@@ -18,131 +18,85 @@ import (
 	"fmt"
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
-	"github.com/sacloud/libsacloud/sacloud"
+	"github.com/sacloud/libsacloud/v2/sacloud"
+	"github.com/sacloud/libsacloud/v2/sacloud/types"
 )
 
 func dataSourceSakuraCloudPacketFilter() *schema.Resource {
+	resourceName := "PacketFilter"
 	return &schema.Resource{
 		Read: dataSourceSakuraCloudPacketFilterRead,
 
 		Schema: map[string]*schema.Schema{
-			"name_selectors": {
+			filterAttrName: filterSchema(&filterSchemaOption{excludeTags: true}),
+			"name":         schemaDataSourceName(resourceName),
+			"description":  schemaDataSourceDescription(resourceName),
+			"expression": {
 				Type:     schema.TypeList,
-				Optional: true,
-				ForceNew: true,
-				Elem:     &schema.Schema{Type: schema.TypeString},
-			},
-			"filter": {
-				Type:     schema.TypeSet,
-				Optional: true,
-				ForceNew: true,
-				Elem: &schema.Resource{
-					Schema: map[string]*schema.Schema{
-						"name": {
-							Type:     schema.TypeString,
-							Required: true,
-						},
-
-						"values": {
-							Type:     schema.TypeList,
-							Required: true,
-							Elem:     &schema.Schema{Type: schema.TypeString},
-						},
-					},
-				},
-			},
-			"name": {
-				Type:     schema.TypeString,
 				Computed: true,
-			},
-			"description": {
-				Type:     schema.TypeString,
-				Computed: true,
-			},
-			"expressions": {
-				Type:     schema.TypeList,
-				Optional: true,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
 						"protocol": {
 							Type:     schema.TypeString,
 							Computed: true,
+							Description: descf(
+								"The protocol used for filtering. This will be one of [%s]",
+								types.PacketFilterProtocolStrings,
+							),
 						},
-
-						"source_nw": {
-							Type:     schema.TypeString,
-							Computed: true,
+						"source_network": {
+							Type:        schema.TypeString,
+							Computed:    true,
+							Description: "A source IP address or CIDR block used for filtering (e.g. `192.0.2.1`, `192.0.2.0/24`)",
 						},
-
 						"source_port": {
-							Type:     schema.TypeString,
-							Computed: true,
+							Type:        schema.TypeString,
+							Computed:    true,
+							Description: "A source port number or port range used for filtering (e.g. `1024`, `1024-2048`)",
 						},
-						"dest_port": {
-							Type:     schema.TypeString,
-							Computed: true,
+						"destination_port": {
+							Type:        schema.TypeString,
+							Computed:    true,
+							Description: "A destination port number or port range used for filtering (e.g. `1024`, `1024-2048`)",
 						},
 						"allow": {
-							Type:     schema.TypeBool,
-							Computed: true,
+							Type:        schema.TypeBool,
+							Computed:    true,
+							Description: "The flag to allow the packet through the filter",
 						},
-						"description": {
-							Type:     schema.TypeString,
-							Computed: true,
-						},
+						"description": schemaDataSourceDescription("expression"),
 					},
 				},
 			},
-
-			"zone": {
-				Type:         schema.TypeString,
-				Optional:     true,
-				Computed:     true,
-				ForceNew:     true,
-				Description:  "target SakuraCloud zone",
-				ValidateFunc: validateZone([]string{"is1a", "is1b", "tk1a", "tk1v"}),
-			},
+			"zone": schemaDataSourceZone(resourceName),
 		},
 	}
 }
 
 func dataSourceSakuraCloudPacketFilterRead(d *schema.ResourceData, meta interface{}) error {
-	client := getSacloudAPIClient(d, meta)
-
-	//filters
-	if rawFilter, filterOk := d.GetOk("filter"); filterOk {
-		filters := expandFilters(rawFilter)
-		for key, f := range filters {
-			client.PacketFilter.FilterBy(key, f)
-		}
-	}
-
-	res, err := client.PacketFilter.Find()
+	client, zone, err := sakuraCloudClient(d, meta)
 	if err != nil {
-		return fmt.Errorf("Couldn't find SakuraCloud PacketFilter resource: %s", err)
+		return err
 	}
-	if res == nil || res.Count == 0 {
+	ctx, cancel := operationContext(d, schema.TimeoutRead)
+	defer cancel()
+
+	searcher := sacloud.NewPacketFilterOp(client)
+
+	findCondition := &sacloud.FindCondition{}
+	if rawFilter, ok := d.GetOk(filterAttrName); ok {
+		findCondition.Filter = expandSearchFilter(rawFilter)
+	}
+
+	res, err := searcher.Find(ctx, zone, findCondition)
+	if err != nil {
+		return fmt.Errorf("could not find SakuraCloud PacketFilter resource: %s", err)
+	}
+	if res == nil || res.Count == 0 || len(res.PacketFilters) == 0 {
 		return filterNoResultErr()
 	}
-	var data *sacloud.PacketFilter
+
 	targets := res.PacketFilters
-
-	if rawNameSelector, ok := d.GetOk("name_selectors"); ok {
-		selectors := expandStringList(rawNameSelector.([]interface{}))
-		var filtered []sacloud.PacketFilter
-		for _, a := range targets {
-			if hasNames(&a, selectors) {
-				filtered = append(filtered, a)
-			}
-		}
-		targets = filtered
-	}
-
-	if len(targets) == 0 {
-		return filterNoResultErr()
-	}
-	data = &targets[0]
-
-	d.SetId(data.GetStrID())
-	return setPacketFilterResourceData(d, client, data)
+	d.SetId(targets[0].ID.String())
+	return setPacketFilterResourceData(ctx, d, client, targets[0])
 }

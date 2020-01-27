@@ -27,68 +27,59 @@ import (
 	"github.com/mitchellh/goamz/s3"
 )
 
-func TestAccResourceSakuraCloudBucketObject(t *testing.T) {
-	randString1 := acctest.RandStringFromCharSet(10, acctest.CharSetAlpha)
-	randString2 := acctest.RandStringFromCharSet(10, acctest.CharSetAlpha)
-	randString3 := acctest.RandStringFromCharSet(10, acctest.CharSetAlpha)
-	key := fmt.Sprintf("%s/%s/%s.txt", randString1, randString2, randString3)
+func TestAccSakuraCloudBucketObject_basic(t *testing.T) {
+	skipIfFakeModeEnabled(t)
+
+	resourceName := "sakuracloud_bucket_object.foobar"
+
+	rand1 := acctest.RandStringFromCharSet(10, acctest.CharSetAlpha)
+	rand2 := acctest.RandStringFromCharSet(10, acctest.CharSetAlpha)
+	rand3 := acctest.RandStringFromCharSet(10, acctest.CharSetAlpha)
+	key := fmt.Sprintf("%s/%s/%s.txt", rand1, rand2, rand3)
 	bucket := os.Getenv("SACLOUD_OJS_ACCESS_KEY_ID")
+
+	httpURL := fmt.Sprintf("http://%s.b.sakurastorage.jp/%s", bucket, key)
+	httpsURL := fmt.Sprintf("https://%s.b.sakurastorage.jp/%s", bucket, key)
+	httpPathURL := fmt.Sprintf("http://b.sakurastorage.jp/%s/%s", bucket, key)
+	httpsPathURL := fmt.Sprintf("https://b.sakurastorage.jp/%s/%s", bucket, key)
+	httpCacheURL := fmt.Sprintf("http://%s.c.sakurastorage.jp/%s", bucket, key)
+	httpsCacheURL := fmt.Sprintf("https://%s.c.sakurastorage.jp/%s", bucket, key)
 
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
 		Providers:    testAccProviders,
-		CheckDestroy: testAccCheckSakuraCloudBucketObjectDestroy,
+		CheckDestroy: testCheckSakuraCloudBucketObjectDestroy,
 		Steps: []resource.TestStep{
 			{
-				Config: testAccCheckSakuraCloudBucketObjectConfig_basic(bucket, key),
+				Config: buildConfigWithArgs(testAccSakuraCloudBucketObject_basic, bucket, key),
 				Check: resource.ComposeTestCheckFunc(
-					testAccCheckSakuraCloudBucketObjectExists("sakuracloud_bucket_object.foobar"),
-					resource.TestCheckResourceAttr(
-						"sakuracloud_bucket_object.foobar", "key", key),
-					resource.TestCheckResourceAttr(
-						"sakuracloud_bucket_object.foobar", "size", "7"),
-					resource.TestCheckResourceAttr(
-						"sakuracloud_bucket_object.foobar", "content_type", "text/plain"),
-					// etag = `echo -n content | md5`
-					resource.TestCheckResourceAttr(
-						"sakuracloud_bucket_object.foobar", "etag", "9a0364b9e99bb480dd25e1f0284c8555"),
-					resource.TestCheckResourceAttr(
-						"sakuracloud_bucket_object.foobar",
-						"http_url", fmt.Sprintf("http://%s.b.sakurastorage.jp/%s", bucket, key)),
-					resource.TestCheckResourceAttr(
-						"sakuracloud_bucket_object.foobar",
-						"https_url", fmt.Sprintf("https://%s.b.sakurastorage.jp/%s", bucket, key)),
-					resource.TestCheckResourceAttr(
-						"sakuracloud_bucket_object.foobar",
-						"http_path_url", fmt.Sprintf("http://b.sakurastorage.jp/%s/%s", bucket, key)),
-					resource.TestCheckResourceAttr(
-						"sakuracloud_bucket_object.foobar",
-						"https_path_url", fmt.Sprintf("https://b.sakurastorage.jp/%s/%s", bucket, key)),
-					resource.TestCheckResourceAttr(
-						"sakuracloud_bucket_object.foobar",
-						"http_cache_url", fmt.Sprintf("http://%s.c.sakurastorage.jp/%s", bucket, key)),
-					resource.TestCheckResourceAttr(
-						"sakuracloud_bucket_object.foobar",
-						"https_cache_url", fmt.Sprintf("https://%s.c.sakurastorage.jp/%s", bucket, key)),
+					testCheckSakuraCloudBucketObjectExists(resourceName),
+					resource.TestCheckResourceAttr(resourceName, "key", key),
+					resource.TestCheckResourceAttr(resourceName, "size", "7"),
+					resource.TestCheckResourceAttr(resourceName, "content_type", "text/plain"),
+					resource.TestCheckResourceAttr(resourceName, "etag", "9a0364b9e99bb480dd25e1f0284c8555"), // etag = `echo -n content | md5`
+					resource.TestCheckResourceAttr(resourceName, "http_url", httpURL),
+					resource.TestCheckResourceAttr(resourceName, "https_url", httpsURL),
+					resource.TestCheckResourceAttr(resourceName, "http_path_url", httpPathURL),
+					resource.TestCheckResourceAttr(resourceName, "https_path_url", httpsPathURL),
+					resource.TestCheckResourceAttr(resourceName, "http_cache_url", httpCacheURL),
+					resource.TestCheckResourceAttr(resourceName, "https_cache_url", httpsCacheURL),
 				),
 			},
 			{
-				Config: testAccCheckSakuraCloudBucketObjectConfig_update(bucket, key),
+				Config: buildConfigWithArgs(testAccSakuraCloudBucketObject_update, bucket, key),
 				Check: resource.ComposeTestCheckFunc(
-					testAccCheckSakuraCloudBucketObjectExists("sakuracloud_bucket_object.foobar"),
-					resource.TestCheckResourceAttr(
-						"sakuracloud_bucket_object.foobar", "key", key),
-					resource.TestCheckResourceAttr(
-						"sakuracloud_bucket_object.foobar", "size", "11"),
-					resource.TestCheckResourceAttr(
-						"sakuracloud_bucket_object.foobar", "etag", "63438b4e5a535fd413b24cdc3e380f3d"),
+					testCheckSakuraCloudBucketObjectExists(resourceName),
+					resource.TestCheckResourceAttr(resourceName, "key", key),
+					resource.TestCheckResourceAttr(resourceName, "size", "11"),
+					resource.TestCheckResourceAttr(resourceName, "etag", "63438b4e5a535fd413b24cdc3e380f3d"),
 				),
 			},
 		},
 	})
 }
 
-func testAccCheckSakuraCloudBucketObjectExists(n string) resource.TestCheckFunc {
+func testCheckSakuraCloudBucketObjectExists(n string) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
 		rs, ok := s.RootModule().Resources[n]
 
@@ -104,10 +95,12 @@ func testAccCheckSakuraCloudBucketObjectExists(n string) resource.TestCheckFunc 
 	}
 }
 
-func testAccCheckSakuraCloudBucketObjectDestroy(s *terraform.State) error {
-
+func testCheckSakuraCloudBucketObjectDestroy(s *terraform.State) error {
 	for _, rs := range s.RootModule().Resources {
 		if rs.Type != "sakuracloud_bucket_object" {
+			continue
+		}
+		if rs.Primary.ID == "" {
 			continue
 		}
 
@@ -134,20 +127,16 @@ func testAccCheckSakuraCloudBucketObjectDestroy(s *terraform.State) error {
 	return nil
 }
 
-func testAccCheckSakuraCloudBucketObjectConfig_basic(bucket, key string) string {
-	return fmt.Sprintf(`
+var testAccSakuraCloudBucketObject_basic = `
 resource "sakuracloud_bucket_object" "foobar" {
-  bucket = "%s"
-  key = "%s"
+  bucket  = "{{ .arg0 }}"
+  key     = "{{ .arg1 }}"
   content = "content"
-}`, bucket, key)
-}
+}`
 
-func testAccCheckSakuraCloudBucketObjectConfig_update(bucket, key string) string {
-	return fmt.Sprintf(`
+var testAccSakuraCloudBucketObject_update = `
 resource "sakuracloud_bucket_object" "foobar" {
-  bucket = "%s"
-  key = "%s"
+  bucket  = "{{ .arg0 }}"
+  key     = "{{ .arg1 }}"
   content = "content-upd"
-}`, bucket, key)
-}
+}`

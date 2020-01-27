@@ -18,175 +18,104 @@ import (
 	"fmt"
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
-	"github.com/sacloud/libsacloud/sacloud"
+	"github.com/sacloud/libsacloud/v2/sacloud"
 )
 
 func dataSourceSakuraCloudInternet() *schema.Resource {
+	resourceName := "Switch+Router"
 	return &schema.Resource{
 		Read: dataSourceSakuraCloudInternetRead,
 
 		Schema: map[string]*schema.Schema{
-			"name_selectors": {
-				Type:     schema.TypeList,
-				Optional: true,
-				ForceNew: true,
-				Elem:     &schema.Schema{Type: schema.TypeString},
-			},
-			"tag_selectors": {
-				Type:     schema.TypeList,
-				Optional: true,
-				ForceNew: true,
-				Elem:     &schema.Schema{Type: schema.TypeString},
-			},
-			"filter": {
-				Type:     schema.TypeSet,
-				Optional: true,
-				ForceNew: true,
-				Elem: &schema.Resource{
-					Schema: map[string]*schema.Schema{
-						"name": {
-							Type:     schema.TypeString,
-							Required: true,
-						},
-
-						"values": {
-							Type:     schema.TypeList,
-							Required: true,
-							Elem:     &schema.Schema{Type: schema.TypeString},
-						},
-					},
-				},
-			},
-			"name": {
-				Type:     schema.TypeString,
-				Computed: true,
-			},
-			"icon_id": {
-				Type:     schema.TypeString,
-				Computed: true,
-			},
-			"description": {
-				Type:     schema.TypeString,
-				Computed: true,
-			},
-			"tags": {
-				Type:     schema.TypeList,
-				Computed: true,
-				Elem:     &schema.Schema{Type: schema.TypeString},
-			},
-			"nw_mask_len": {
-				Type:     schema.TypeInt,
-				Computed: true,
-			},
+			filterAttrName: filterSchema(&filterSchemaOption{}),
+			"name":         schemaDataSourceName(resourceName),
+			"icon_id":      schemaDataSourceIconID(resourceName),
+			"description":  schemaDataSourceDescription(resourceName),
+			"tags":         schemaDataSourceTags(resourceName),
+			"netmask":      schemaDataSourceNetMask(resourceName),
 			"band_width": {
-				Type:     schema.TypeInt,
-				Computed: true,
+				Type:        schema.TypeInt,
+				Computed:    true,
+				Description: "The bandwidth of the network connected to the Internet in Mbps",
 			},
-			"switch_id": {
-				Type:     schema.TypeString,
-				Computed: true,
-			},
+			"switch_id": schemaDataSourceSwitchID(resourceName),
 			"server_ids": {
-				Type:     schema.TypeList,
-				Computed: true,
-				Elem:     &schema.Schema{Type: schema.TypeString},
+				Type:        schema.TypeList,
+				Computed:    true,
+				Elem:        &schema.Schema{Type: schema.TypeString},
+				Description: descf("A list of the ID of Servers connected to the %s", resourceName),
 			},
-			"nw_address": {
-				Type:     schema.TypeString,
-				Computed: true,
+			"network_address": {
+				Type:        schema.TypeString,
+				Computed:    true,
+				Description: descf("The IPv4 network address assigned to the %s", resourceName),
 			},
-			"gateway": {
-				Type:     schema.TypeString,
-				Computed: true,
+			"gateway": schemaDataSourceGateway(resourceName),
+			"min_ip_address": {
+				Type:        schema.TypeString,
+				Computed:    true,
+				Description: descf("Minimum IP address in assigned global addresses to the %s", resourceName),
 			},
-			"min_ipaddress": {
-				Type:     schema.TypeString,
-				Computed: true,
+			"max_ip_address": {
+				Type:        schema.TypeString,
+				Computed:    true,
+				Description: descf("Maximum IP address in assigned global addresses to the %s", resourceName),
 			},
-			"max_ipaddress": {
-				Type:     schema.TypeString,
-				Computed: true,
-			},
-			"ipaddresses": {
-				Type:     schema.TypeList,
-				Computed: true,
-				Elem:     &schema.Schema{Type: schema.TypeString},
+			"ip_addresses": {
+				Type:        schema.TypeList,
+				Computed:    true,
+				Elem:        &schema.Schema{Type: schema.TypeString},
+				Description: descf("A list of assigned global address to the %s", resourceName),
 			},
 			"enable_ipv6": {
-				Type:     schema.TypeBool,
-				Computed: true,
+				Type:        schema.TypeBool,
+				Computed:    true,
+				Description: "The flag to enable IPv6",
 			},
 			"ipv6_prefix": {
-				Type:     schema.TypeString,
-				Computed: true,
+				Type:        schema.TypeString,
+				Computed:    true,
+				Description: descf("The network prefix of assigned IPv6 addresses to the %s", resourceName),
 			},
 			"ipv6_prefix_len": {
-				Type:     schema.TypeInt,
-				Computed: true,
+				Type:        schema.TypeInt,
+				Computed:    true,
+				Description: "The bit length of IPv6 network prefix",
 			},
-			"ipv6_nw_address": {
-				Type:     schema.TypeString,
-				Computed: true,
+			"ipv6_network_address": {
+				Type:        schema.TypeString,
+				Computed:    true,
+				Description: descf("The IPv6 network address assigned to the %s", resourceName),
 			},
-			"zone": {
-				Type:         schema.TypeString,
-				Optional:     true,
-				Computed:     true,
-				ForceNew:     true,
-				Description:  "target SakuraCloud zone",
-				ValidateFunc: validateZone([]string{"is1a", "is1b", "tk1a", "tk1v"}),
-			},
+			"zone": schemaDataSourceZone(resourceName),
 		},
 	}
 }
 
 func dataSourceSakuraCloudInternetRead(d *schema.ResourceData, meta interface{}) error {
-	client := getSacloudAPIClient(d, meta)
-
-	//filters
-	if rawFilter, filterOk := d.GetOk("filter"); filterOk {
-		filters := expandFilters(rawFilter)
-		for key, f := range filters {
-			client.Internet.FilterBy(key, f)
-		}
-	}
-
-	res, err := client.Internet.Find()
+	client, zone, err := sakuraCloudClient(d, meta)
 	if err != nil {
-		return fmt.Errorf("Couldn't find SakuraCloud Internet resource: %s", err)
+		return err
 	}
-	if res == nil || res.Count == 0 {
+	ctx, cancel := operationContext(d, schema.TimeoutRead)
+	defer cancel()
+
+	searcher := sacloud.NewInternetOp(client)
+
+	findCondition := &sacloud.FindCondition{}
+	if rawFilter, ok := d.GetOk(filterAttrName); ok {
+		findCondition.Filter = expandSearchFilter(rawFilter)
+	}
+
+	res, err := searcher.Find(ctx, zone, findCondition)
+	if err != nil {
+		return fmt.Errorf("could not find SakuraCloud Internet resource: %s", err)
+	}
+	if res == nil || res.Count == 0 || len(res.Internet) == 0 {
 		return filterNoResultErr()
 	}
-	var data *sacloud.Internet
+
 	targets := res.Internet
-
-	if rawNameSelector, ok := d.GetOk("name_selectors"); ok {
-		selectors := expandStringList(rawNameSelector.([]interface{}))
-		var filtered []sacloud.Internet
-		for _, a := range targets {
-			if hasNames(&a, selectors) {
-				filtered = append(filtered, a)
-			}
-		}
-		targets = filtered
-	}
-	if rawTagSelector, ok := d.GetOk("tag_selectors"); ok {
-		selectors := expandStringList(rawTagSelector.([]interface{}))
-		var filtered []sacloud.Internet
-		for _, a := range targets {
-			if hasTags(&a, selectors) {
-				filtered = append(filtered, a)
-			}
-		}
-		targets = filtered
-	}
-
-	if len(targets) == 0 {
-		return filterNoResultErr()
-	}
-	data = &targets[0]
-
-	d.SetId(data.GetStrID())
-	return setInternetResourceData(d, client, data)
+	d.SetId(targets[0].ID.String())
+	return setInternetResourceData(ctx, d, client, targets[0])
 }

@@ -15,110 +15,110 @@
 package sakuracloud
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/resource"
 	"github.com/hashicorp/terraform-plugin-sdk/terraform"
-	"github.com/sacloud/libsacloud/sacloud"
+	"github.com/sacloud/libsacloud/v2/sacloud"
 )
 
-func TestAccResourceSakuraCloudSSHKeyGen(t *testing.T) {
-	var ssh_key sacloud.SSHKey
+func TestAccSakuraCloudSSHKeyGen_basic(t *testing.T) {
+	resourceName := "sakuracloud_ssh_key_gen.foobar"
+	rand := randomName()
+
+	var sshKey sacloud.SSHKey
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
 		Providers:    testAccProviders,
-		CheckDestroy: testAccCheckSakuraCloudSSHKeyGenDestroy,
+		CheckDestroy: testCheckSakuraCloudSSHKeyGenDestroy,
 		Steps: []resource.TestStep{
 			{
-				Config: testAccCheckSakuraCloudSSHKeyGenConfig_basic,
+				Config: buildConfigWithArgs(testAccSakuraCloudSSHKeyGen_basic, rand),
 				Check: resource.ComposeTestCheckFunc(
-					testAccCheckSakuraCloudSSHKeyGenExists("sakuracloud_ssh_key_gen.foobar", &ssh_key),
-					resource.TestCheckResourceAttr(
-						"sakuracloud_ssh_key_gen.foobar", "name", "mykey"),
-					resource.TestCheckResourceAttrSet(
-						"sakuracloud_ssh_key_gen.foobar", "public_key"),
-					resource.TestCheckResourceAttrSet(
-						"sakuracloud_ssh_key_gen.foobar", "fingerprint"),
-					resource.TestCheckResourceAttrSet(
-						"sakuracloud_ssh_key_gen.foobar", "private_key"),
+					testCheckSakuraCloudSSHKeyGenExists(resourceName, &sshKey),
+					resource.TestCheckResourceAttr(resourceName, "name", rand),
+					resource.TestCheckResourceAttrSet(resourceName, "public_key"),
+					resource.TestCheckResourceAttrSet(resourceName, "fingerprint"),
+					resource.TestCheckResourceAttrSet(resourceName, "private_key"),
 				),
 			},
 			{
-				Config: testAccCheckSakuraCloudSSHKeyGenConfig_with_pass_phrase,
+				Config: buildConfigWithArgs(testAccSakuraCloudSSHKeyGen_passPhrase, rand),
 				Check: resource.ComposeTestCheckFunc(
-					testAccCheckSakuraCloudSSHKeyGenExists("sakuracloud_ssh_key_gen.foobar", &ssh_key),
-					resource.TestCheckResourceAttr(
-						"sakuracloud_ssh_key_gen.foobar", "name", "mykey"),
-					resource.TestCheckResourceAttrSet(
-						"sakuracloud_ssh_key_gen.foobar", "public_key"),
-					resource.TestCheckResourceAttrSet(
-						"sakuracloud_ssh_key_gen.foobar", "fingerprint"),
-					resource.TestCheckResourceAttrSet(
-						"sakuracloud_ssh_key_gen.foobar", "private_key"),
+					testCheckSakuraCloudSSHKeyGenExists(resourceName, &sshKey),
+					resource.TestCheckResourceAttr(resourceName, "name", rand),
+					resource.TestCheckResourceAttrSet(resourceName, "public_key"),
+					resource.TestCheckResourceAttrSet(resourceName, "fingerprint"),
+					resource.TestCheckResourceAttrSet(resourceName, "private_key"),
 				),
 			},
 		},
 	})
 }
 
-func testAccCheckSakuraCloudSSHKeyGenExists(n string, ssh_key *sacloud.SSHKey) resource.TestCheckFunc {
+func testCheckSakuraCloudSSHKeyGenExists(n string, sshKey *sacloud.SSHKey) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
 		rs, ok := s.RootModule().Resources[n]
 
 		if !ok {
-			return fmt.Errorf("Not found: %s", n)
+			return fmt.Errorf("not found: %s", n)
 		}
 
 		if rs.Primary.ID == "" {
-			return errors.New("No SSHKey ID is set")
+			return errors.New("no SSHKey ID is set")
 		}
 
 		client := testAccProvider.Meta().(*APIClient)
-		foundSSHKey, err := client.SSHKey.Read(toSakuraCloudID(rs.Primary.ID))
+		keyOp := sacloud.NewSSHKeyOp(client)
 
+		foundSSHKey, err := keyOp.Read(context.Background(), sakuraCloudID(rs.Primary.ID))
 		if err != nil {
 			return err
 		}
 
-		if foundSSHKey.ID != toSakuraCloudID(rs.Primary.ID) {
-			return errors.New("SSHKey not found")
+		if foundSSHKey.ID.String() != rs.Primary.ID {
+			return fmt.Errorf("not found SSHKey: %s", rs.Primary)
 		}
 
-		*ssh_key = *foundSSHKey
-
+		*sshKey = *foundSSHKey
 		return nil
 	}
 }
 
-func testAccCheckSakuraCloudSSHKeyGenDestroy(s *terraform.State) error {
+func testCheckSakuraCloudSSHKeyGenDestroy(s *terraform.State) error {
 	client := testAccProvider.Meta().(*APIClient)
+	keyOp := sacloud.NewSSHKeyOp(client)
 
 	for _, rs := range s.RootModule().Resources {
 		if rs.Type != "sakuracloud_ssh_key_gen" {
 			continue
 		}
+		if rs.Primary.ID == "" {
+			continue
+		}
 
-		_, err := client.SSHKey.Read(toSakuraCloudID(rs.Primary.ID))
+		_, err := keyOp.Read(context.Background(), sakuraCloudID(rs.Primary.ID))
 
 		if err == nil {
-			return errors.New("SSHKey still exists")
+			return fmt.Errorf("still exists SSHKey: %s", rs.Primary)
 		}
 	}
 
 	return nil
 }
 
-var testAccCheckSakuraCloudSSHKeyGenConfig_basic = `
+var testAccSakuraCloudSSHKeyGen_basic = `
 resource "sakuracloud_ssh_key_gen" "foobar" {
-    name = "mykey"
-    description = "SSHKey from TerraForm for SAKURA CLOUD"
+  name        = "{{ .arg0 }}"
+  description = "description"
 }`
 
-var testAccCheckSakuraCloudSSHKeyGenConfig_with_pass_phrase = `
+var testAccSakuraCloudSSHKeyGen_passPhrase = `
 resource "sakuracloud_ssh_key_gen" "foobar" {
-    name = "mykey"
-    pass_phrase = "DummyPassphrase"
-    description = "SSHKey from TerraForm for SAKURA CLOUD"
+  name        = "{{ .arg0 }}"
+  pass_phrase = "DummyPassphrase"
+  description = "description"
 }`

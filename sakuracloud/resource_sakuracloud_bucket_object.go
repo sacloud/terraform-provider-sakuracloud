@@ -44,81 +44,102 @@ func resourceSakuraCloudBucketObject() *schema.Resource {
 				Type:        schema.TypeString,
 				Required:    true,
 				DefaultFunc: schema.MultiEnvDefaultFunc([]string{"SACLOUD_OJS_ACCESS_KEY_ID", "AWS_ACCESS_KEY_ID"}, nil),
+				Description: "The access key for using SakuraCloud Object Storage API",
 			},
 			"secret_key": {
 				Type:        schema.TypeString,
 				Required:    true,
 				DefaultFunc: schema.MultiEnvDefaultFunc([]string{"SACLOUD_OJS_SECRET_ACCESS_KEY", "AWS_SECRET_ACCESS_KEY"}, nil),
 				Sensitive:   true,
+				Description: "The secret key for using SakuraCloud Object Storage API",
 			},
 			"bucket": {
-				Type:     schema.TypeString,
-				Required: true,
-				ForceNew: true,
+				Type:        schema.TypeString,
+				Required:    true,
+				ForceNew:    true,
+				Description: "The name of the bucket",
 			},
 			"key": {
-				Type:     schema.TypeString,
-				Required: true,
-				ForceNew: true,
+				Type:        schema.TypeString,
+				Required:    true,
+				ForceNew:    true,
+				Description: "The name of the bucket object",
 			},
 			"source": {
 				Type:          schema.TypeString,
 				Optional:      true,
 				ConflictsWith: []string{"content"},
+				Description: descf(
+					"The file path to upload to as the bucket object. %s",
+					descConflicts("content"),
+				),
 			},
 			"content": {
 				Type:          schema.TypeString,
 				Optional:      true,
 				ConflictsWith: []string{"source"},
+				Description: descf(
+					"The content to upload to as the bucket object. %s",
+					descConflicts("source"),
+				),
 			},
 			"content_type": {
-				Type:     schema.TypeString,
-				Optional: true,
-				Computed: true,
+				Type:        schema.TypeString,
+				Optional:    true,
+				Computed:    true,
+				Description: "The content-type of the bucket object",
 			},
 			"etag": {
-				Type:     schema.TypeString,
-				Optional: true,
-				Computed: true,
+				Type:        schema.TypeString,
+				Optional:    true,
+				Computed:    true,
+				Description: "The etag of the bucket object",
 			},
 			"size": {
-				Type:     schema.TypeInt,
-				Computed: true,
+				Type:        schema.TypeInt,
+				Computed:    true,
+				Description: "The size of the bucket object in bytes",
 			},
 			"last_modified": {
-				Type:     schema.TypeString,
-				Computed: true,
+				Type:        schema.TypeString,
+				Computed:    true,
+				Description: "The time when the bucket object last modified",
 			},
 			"http_url": {
-				Type:     schema.TypeString,
-				Computed: true,
+				Type:        schema.TypeString,
+				Computed:    true,
+				Description: "The URL for accessing the bucket object via HTTP",
 			},
 			"https_url": {
-				Type:     schema.TypeString,
-				Computed: true,
+				Type:        schema.TypeString,
+				Computed:    true,
+				Description: "The URL for accessing the bucket object via HTTPS",
 			},
 			"http_path_url": {
-				Type:     schema.TypeString,
-				Computed: true,
+				Type:        schema.TypeString,
+				Computed:    true,
+				Description: "The URL with path-format for accessing the bucket object via HTTP",
 			},
 			"https_path_url": {
-				Type:     schema.TypeString,
-				Computed: true,
+				Type:        schema.TypeString,
+				Computed:    true,
+				Description: "The URL with path-format for accessing the bucket object via HTTPS",
 			},
 			"http_cache_url": {
-				Type:     schema.TypeString,
-				Computed: true,
+				Type:        schema.TypeString,
+				Computed:    true,
+				Description: "The URL for cached access to the bucket object via HTTP",
 			},
 			"https_cache_url": {
-				Type:     schema.TypeString,
-				Computed: true,
+				Type:        schema.TypeString,
+				Computed:    true,
+				Description: "The URL for cached access to the bucket object via HTTPS",
 			},
 		},
 	}
 }
 
 func resourceSakuraCloudBucketObjectPut(d *schema.ResourceData, meta interface{}) error {
-
 	client, err := getS3Client(d)
 	if err != nil {
 		return fmt.Errorf("SakuraCloud BucketObject Put is failed: %s", err)
@@ -190,10 +211,10 @@ func resourceSakuraCloudBucketObjectRead(d *schema.ResourceData, meta interface{
 	if err != nil {
 		return fmt.Errorf("SakuraCloud BucketObject Read is failed: %s", err)
 	}
-	d.Set("last_modified", keyInfo.LastModified)
-	d.Set("size", keyInfo.Size)
+	d.Set("last_modified", keyInfo.LastModified) // nolint
+	d.Set("size", keyInfo.Size)                  // nolint
 	// See https://forums.aws.amazon.com/thread.jspa?threadID=44003
-	d.Set("etag", strings.Trim(keyInfo.ETag, `"`))
+	d.Set("etag", strings.Trim(keyInfo.ETag, `"`)) // nolint
 
 	// get head
 	head, err := bucket.Head(d.Id())
@@ -201,19 +222,19 @@ func resourceSakuraCloudBucketObjectRead(d *schema.ResourceData, meta interface{
 		return fmt.Errorf("SakuraCloud BucketObject Read is failed: %s", err)
 	}
 	contentType := head.Header.Get("Content-Type")
-	d.Set("content_type", contentType)
+	d.Set("content_type", contentType) // nolint
 
 	// calc URLs
 	key := d.Id()
 	if strings.HasPrefix(key, "/") {
 		key = strings.TrimLeft(key, "/")
 	}
-	d.Set("http_url", fmt.Sprintf("http://%s.%s/%s", strBucket, objectStorageAPIHost, key))
-	d.Set("https_url", fmt.Sprintf("https://%s.%s/%s", strBucket, objectStorageAPIHost, key))
-	d.Set("http_path_url", fmt.Sprintf("http://%s/%s/%s", objectStorageAPIHost, strBucket, key))
-	d.Set("https_path_url", fmt.Sprintf("https://%s/%s/%s", objectStorageAPIHost, strBucket, key))
-	d.Set("http_cache_url", fmt.Sprintf("http://%s.%s/%s", strBucket, objectStorageCachedHost, key))
-	d.Set("https_cache_url", fmt.Sprintf("https://%s.%s/%s", strBucket, objectStorageCachedHost, key))
+	d.Set("http_url", fmt.Sprintf("http://%s.%s/%s", strBucket, objectStorageAPIHost, key))            // nolint
+	d.Set("https_url", fmt.Sprintf("https://%s.%s/%s", strBucket, objectStorageAPIHost, key))          // nolint
+	d.Set("http_path_url", fmt.Sprintf("http://%s/%s/%s", objectStorageAPIHost, strBucket, key))       // nolint
+	d.Set("https_path_url", fmt.Sprintf("https://%s/%s/%s", objectStorageAPIHost, strBucket, key))     // nolint
+	d.Set("http_cache_url", fmt.Sprintf("http://%s.%s/%s", strBucket, objectStorageCachedHost, key))   // nolint
+	d.Set("https_cache_url", fmt.Sprintf("https://%s.%s/%s", strBucket, objectStorageCachedHost, key)) // nolint
 
 	return nil
 }
@@ -231,7 +252,6 @@ func resourceSakuraCloudBucketObjectDelete(d *schema.ResourceData, meta interfac
 }
 
 func getS3Client(d *schema.ResourceData) (*s3.S3, error) {
-
 	accessKey := d.Get("access_key").(string)
 	secretKey := d.Get("secret_key").(string)
 
@@ -243,5 +263,4 @@ func getS3Client(d *schema.ResourceData) (*s3.S3, error) {
 		Name:       "us-west-2",
 		S3Endpoint: "https://b.sakurastorage.jp",
 	}), nil
-
 }

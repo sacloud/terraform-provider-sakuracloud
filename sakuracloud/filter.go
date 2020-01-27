@@ -20,9 +20,93 @@ import (
 	"strings"
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/resource"
+	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 )
 
-var filterNoResultMessage = "Your query returned no results. Please change your filters or selectors and try again"
+const filterAttrName = "filter"
+
+type filterSchemaOption struct {
+	excludeTags bool
+}
+
+var (
+	filterConfigKeys = []string{
+		"filter.0.id",
+		"filter.0.names",
+		"filter.0.condition",
+	}
+	filterConfigKeysWithTags = append(filterConfigKeys, "filter.0.tags")
+)
+
+func filterSchema(opt *filterSchemaOption) *schema.Schema {
+	if opt == nil {
+		opt = &filterSchemaOption{}
+	}
+	keys := filterConfigKeysWithTags
+	if opt.excludeTags {
+		keys = filterConfigKeys
+	}
+	s := map[string]*schema.Schema{
+		"id": {
+			Type:         schema.TypeString,
+			Optional:     true,
+			ExactlyOneOf: keys,
+			Description:  "The resource id on SakuraCloud used for filtering",
+		},
+		"names": {
+			Type:         schema.TypeList,
+			Optional:     true,
+			ExactlyOneOf: keys,
+			Elem:         &schema.Schema{Type: schema.TypeString},
+			Description:  "The resource names on SakuraCloud used for filtering. If multiple values ​​are specified, they combined as AND condition",
+		},
+		"tags": {
+			Type:         schema.TypeSet,
+			Optional:     true,
+			ExactlyOneOf: keys,
+			Elem:         &schema.Schema{Type: schema.TypeString},
+			Set:          schema.HashString,
+			Description:  "The resource tags on SakuraCloud used for filtering. If multiple values ​​are specified, they combined as AND condition",
+		},
+		"condition": {
+			Type:         schema.TypeList,
+			Optional:     true,
+			ExactlyOneOf: keys,
+			Elem: &schema.Resource{
+				Schema: map[string]*schema.Schema{
+					"name": {
+						Type:        schema.TypeString,
+						Required:    true,
+						Description: "The name of the target field. This value is case-sensitive",
+					},
+
+					"values": {
+						Type:        schema.TypeList,
+						Required:    true,
+						Elem:        &schema.Schema{Type: schema.TypeString},
+						Description: "The values of the condition. If multiple values ​​are specified, they combined as AND condition",
+					},
+				},
+			},
+			Description: "One or more name/values pairs used for filtering. There are several valid keys, for a full reference, check out finding section in the [SakuraCloud API reference](https://developer.sakura.ad.jp/cloud/api/1.1/)",
+		},
+	}
+	if opt.excludeTags {
+		delete(s, "tags")
+	}
+	return &schema.Schema{
+		Type:     schema.TypeList,
+		Optional: true,
+		MaxItems: 1,
+		MinItems: 1,
+		Elem: &schema.Resource{
+			Schema: s,
+		},
+		Description: "One or more values used for filtering, as defined below",
+	}
+}
+
+var filterNoResultMessage = "Your query returned no results. Please change your filter or selectors and try again"
 
 func filterNoResultErr() error {
 	if os.Getenv(resource.TestEnvVar) != "" {
@@ -30,8 +114,6 @@ func filterNoResultErr() error {
 	}
 	return fmt.Errorf(filterNoResultMessage)
 }
-
-type filterFunc func(target interface{}, cond []string) bool
 
 type nameFilterable interface {
 	GetName() string
@@ -66,5 +148,4 @@ func hasTags(target interface{}, cond []string) bool {
 		}
 	}
 	return true
-
 }

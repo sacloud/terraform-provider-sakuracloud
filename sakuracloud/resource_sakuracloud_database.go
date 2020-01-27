@@ -15,18 +15,19 @@
 package sakuracloud
 
 import (
-	"encoding/json"
+	"context"
 	"fmt"
-	"strings"
+	"time"
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/validation"
-	"github.com/sacloud/libsacloud/api"
-	"github.com/sacloud/libsacloud/sacloud"
-	"github.com/sacloud/libsacloud/utils/setup"
+	"github.com/sacloud/libsacloud/v2/sacloud"
+	"github.com/sacloud/libsacloud/v2/sacloud/types"
+	"github.com/sacloud/libsacloud/v2/utils/power"
 )
 
 func resourceSakuraCloudDatabase() *schema.Resource {
+	resourceName := "Database"
 	return &schema.Resource{
 		Create: resourceSakuraCloudDatabaseCreate,
 		Read:   resourceSakuraCloudDatabaseRead,
@@ -35,475 +36,267 @@ func resourceSakuraCloudDatabase() *schema.Resource {
 		Importer: &schema.ResourceImporter{
 			State: schema.ImportStatePassthrough,
 		},
-		CustomizeDiff: hasTagResourceCustomizeDiff,
+
+		Timeouts: &schema.ResourceTimeout{
+			Create: schema.DefaultTimeout(60 * time.Minute),
+			Update: schema.DefaultTimeout(60 * time.Minute),
+			Delete: schema.DefaultTimeout(20 * time.Minute),
+		},
+
 		Schema: map[string]*schema.Schema{
-			"name": {
-				Type:     schema.TypeString,
-				Required: true,
-			},
+			"name": schemaResourceName(resourceName),
 			"database_type": {
 				Type:         schema.TypeString,
 				Optional:     true,
 				ForceNew:     true,
-				ValidateFunc: validation.StringInSlice([]string{"postgresql", "mariadb"}, false),
-				Default:      "postgresql",
+				ValidateFunc: validation.StringInSlice(types.RDBMSTypeStrings, false),
+				Default:      "postgres",
+				Description: descf(
+					"The type of the database. This must be one of [%s]",
+					types.RDBMSTypeStrings,
+				),
 			},
-			//"is_double": {
-			//	Type:     schema.TypeBool,
-			//	ForceNew: true,
-			//	Optional: true,
-			//	Default:  false,
-			//},
-			"plan": {
-				Type:         schema.TypeString,
-				ForceNew:     true,
-				Optional:     true,
-				Default:      "10g",
-				ValidateFunc: validation.StringInSlice([]string{"10g", "30g", "90g", "240g", "500g", "1t"}, false),
+			"plan": schemaResourcePlan(resourceName, "10g", types.DatabasePlanStrings),
+			"username": {
+				Type:        schema.TypeString,
+				ForceNew:    true,
+				Required:    true,
+				Description: "The name of default user on the database",
 			},
-			"user_name": {
-				Type:     schema.TypeString,
-				ForceNew: true,
-				Required: true,
-			},
-			"user_password": {
-				Type:     schema.TypeString,
-				Required: true,
+			"password": {
+				Type:        schema.TypeString,
+				Required:    true,
+				Sensitive:   true,
+				Description: "The password of default user on the database",
 			},
 			"replica_user": {
-				Type:     schema.TypeString,
-				Computed: true,
+				Type:        schema.TypeString,
+				Optional:    true,
+				Default:     "replica",
+				Description: "The name of user that processing a replication",
 			},
 			"replica_password": {
-				Type:      schema.TypeString,
-				Optional:  true,
-				Sensitive: true,
+				Type:        schema.TypeString,
+				Optional:    true,
+				Sensitive:   true,
+				Description: "The password of user that processing a replication",
 			},
-			"allow_networks": {
+			"network_interface": {
 				Type:     schema.TypeList,
-				Optional: true,
-				Elem:     &schema.Schema{Type: schema.TypeString},
-			},
-			"port": {
-				Type:         schema.TypeInt,
-				Optional:     true,
-				Default:      5432,
-				ValidateFunc: validation.IntBetween(1024, 65535),
-			},
-			"backup_weekdays": {
-				Type:     schema.TypeList,
-				Optional: true,
-				Elem:     &schema.Schema{Type: schema.TypeString},
-			},
-			"backup_time": {
-				Type:         schema.TypeString,
-				Optional:     true,
-				ValidateFunc: validateBackupTime(),
-			},
-			"switch_id": {
-				Type:         schema.TypeString,
-				ForceNew:     true,
-				Required:     true,
-				ValidateFunc: validateSakuracloudIDType,
-			},
-			"ipaddress1": {
-				Type:     schema.TypeString,
-				ForceNew: true,
 				Required: true,
+				MinItems: 1,
+				MaxItems: 1,
+				Elem: &schema.Resource{
+					Schema: map[string]*schema.Schema{
+						"switch_id": schemaResourceSwitchID(resourceName),
+						"ip_address": {
+							Type:        schema.TypeString,
+							ForceNew:    true,
+							Required:    true,
+							Description: descf("The IP address to assign to the %s", resourceName),
+						},
+						"netmask": {
+							Type:         schema.TypeInt,
+							ForceNew:     true,
+							Required:     true,
+							ValidateFunc: validation.IntBetween(8, 29),
+							Description: descf(
+								"The bit length of the subnet to assign to the %s. %s",
+								resourceName,
+								descRange(8, 29),
+							),
+						},
+						"gateway": {
+							Type:        schema.TypeString,
+							ForceNew:    true,
+							Required:    true,
+							Description: descf("The IP address of the gateway used by %s", resourceName),
+						},
+						"port": {
+							Type:         schema.TypeInt,
+							Optional:     true,
+							Default:      5432,
+							ValidateFunc: validation.IntBetween(1024, 65535),
+							Description: descf(
+								"The number of the listening port. %s",
+								descRange(1024, 65535),
+							),
+						},
+						"source_ranges": {
+							Type:     schema.TypeList,
+							Optional: true,
+							Elem:     &schema.Schema{Type: schema.TypeString},
+							Description: descf(
+								"The range of source IP addresses that allow to access to the %s via network",
+								resourceName,
+							),
+						},
+					},
+				},
 			},
-			"nw_mask_len": {
-				Type:         schema.TypeInt,
-				ForceNew:     true,
-				Required:     true,
-				ValidateFunc: validation.IntBetween(8, 29),
-			},
-			"default_route": {
-				Type:     schema.TypeString,
-				ForceNew: true,
-				Required: true,
-			},
-			"icon_id": {
-				Type:         schema.TypeString,
-				Optional:     true,
-				ValidateFunc: validateSakuracloudIDType,
-			},
-			"description": {
-				Type:     schema.TypeString,
-				Optional: true,
-			},
-			"tags": {
+			"backup": {
 				Type:     schema.TypeList,
 				Optional: true,
-				Computed: true,
-				Elem:     &schema.Schema{Type: schema.TypeString},
+				MinItems: 1,
+				MaxItems: 1,
+				Elem: &schema.Resource{
+					Schema: map[string]*schema.Schema{
+						"weekdays": {
+							Type:     schema.TypeList,
+							Optional: true,
+							Elem:     &schema.Schema{Type: schema.TypeString},
+							Description: descf(
+								"A list of weekdays to backed up. The values in the list must be in [%s]",
+								types.BackupWeekdayStrings,
+							),
+						},
+						"time": {
+							Type:         schema.TypeString,
+							Optional:     true,
+							ValidateFunc: validateBackupTime(),
+							Description:  "The time to take backup. This must be formatted with `HH:mm`",
+						},
+					},
+				},
 			},
-			powerManageTimeoutKey: powerManageTimeoutParam,
-			"zone": {
-				Type:         schema.TypeString,
-				Optional:     true,
-				Computed:     true,
-				ForceNew:     true,
-				Description:  "target SakuraCloud zone",
-				ValidateFunc: validateZone([]string{"tk1a", "is1b", "is1a"}),
-			},
+			"icon_id":     schemaResourceIconID(resourceName),
+			"description": schemaResourceDescription(resourceName),
+			"tags":        schemaResourceTags(resourceName),
+			"zone":        schemaResourceZone(resourceName),
 		},
 	}
 }
 
 func resourceSakuraCloudDatabaseCreate(d *schema.ResourceData, meta interface{}) error {
-	client := getSacloudAPIClient(d, meta)
-
-	var opts *sacloud.CreateDatabaseValue
-	dbType := d.Get("database_type").(string)
-	switch dbType {
-	case "postgresql":
-		opts = sacloud.NewCreatePostgreSQLDatabaseValue()
-		break
-	case "mariadb":
-		opts = sacloud.NewCreateMariaDBDatabaseValue()
-		break
-	default:
-		return fmt.Errorf("Unknown database_type [%s]", dbType)
-	}
-
-	opts.Name = d.Get("name").(string)
-	opts.DefaultUser = d.Get("user_name").(string)
-	opts.UserPassword = d.Get("user_password").(string)
-
-	replicaPassword := d.Get("replica_password").(string)
-	if replicaPassword != "" {
-		opts.ReplicaPassword = replicaPassword
-	}
-
-	if rawNetworks, ok := d.GetOk("allow_networks"); ok {
-		if rawNetworks != nil {
-			opts.SourceNetwork = expandStringList(rawNetworks.([]interface{}))
-		}
-	}
-	opts.ServicePort = d.Get("port").(int)
-
-	opts.BackupTime = d.Get("backup_time").(string)
-	rawBackupWeekdays := d.Get("backup_weekdays").([]interface{})
-	backupWeekdays, err := expandStringListWithValidateInList("backup_weekdays", rawBackupWeekdays, sacloud.AllowDatabaseBackupWeekdays())
+	client, zone, err := sakuraCloudClient(d, meta)
 	if err != nil {
 		return err
 	}
-	opts.BackupDayOfWeek = backupWeekdays
-	if opts.BackupTime != "" && len(backupWeekdays) > 0 {
-		opts.EnableBackup = true
+	ctx, cancel := operationContext(d, schema.TimeoutCreate)
+	defer cancel()
+
+	if err := validateDatabaseParameters(d); err != nil {
+		return err
 	}
 
-	opts.SwitchID = d.Get("switch_id").(string)
-	ipAddress1 := d.Get("ipaddress1").(string)
-	nwMaskLen := d.Get("nw_mask_len").(int)
-	defaultRoute := ""
-	if df, ok := d.GetOk("default_route"); ok {
-		defaultRoute = df.(string)
-	}
-
-	opts.IPAddress1 = ipAddress1
-	opts.MaskLen = nwMaskLen
-	opts.DefaultRoute = defaultRoute
-
-	//
-	strPlan := d.Get("plan").(string)
-	switch strPlan {
-	case "10g":
-		opts.Plan = sacloud.DatabasePlan10G
-	case "30g":
-		opts.Plan = sacloud.DatabasePlan30G
-	case "90g":
-		opts.Plan = sacloud.DatabasePlan90G
-	case "240g":
-		opts.Plan = sacloud.DatabasePlan240G
-	case "500g":
-		opts.Plan = sacloud.DatabasePlan500G
-	case "1t":
-		opts.Plan = sacloud.DatabasePlan1T
-	}
-
-	if iconID, ok := d.GetOk("icon_id"); ok {
-		opts.Icon = sacloud.NewResource(toSakuraCloudID(iconID.(string)))
-	}
-
-	if description, ok := d.GetOk("description"); ok {
-		opts.Description = description.(string)
-	}
-	if rawTags, ok := d.GetOk("tags"); ok {
-		if rawTags != nil {
-			opts.Tags = expandTags(client, rawTags.([]interface{}))
-		}
-	}
-
-	createDB := sacloud.CreateNewDatabase(opts)
-
-	dbBuilder := &setup.RetryableSetup{
-		Create: func() (sacloud.ResourceIDHolder, error) {
-			return client.Database.Create(createDB)
-		},
-		AsyncWaitForCopy: func(id int64) (chan interface{}, chan interface{}, chan error) {
-			return client.Database.AsyncSleepWhileCopying(id, client.DefaultTimeoutDuration, 20)
-		},
-		Delete: func(id int64) error {
-			_, err := client.Database.Delete(id)
-			return err
-		},
-		WaitForUp: func(id int64) error {
-			return client.Database.SleepUntilUp(id, client.DefaultTimeoutDuration)
-		},
-		RetryCount: 3,
-	}
-
-	res, err := dbBuilder.Setup()
+	dbBuilder := expandDatabaseBuilder(d, client)
+	db, err := dbBuilder.Build(ctx, zone)
 	if err != nil {
-		return fmt.Errorf("Failed to create SakuraCloud Database resource: %s", err)
+		return fmt.Errorf("creating SakuraCloud Database is failed: %s", err)
 	}
 
-	database, ok := res.(*sacloud.Database)
-	if !ok {
-		return fmt.Errorf("Failed to create SakuraCloud Database resource: created resource is not *sacloud.Database")
-	}
+	// HACK データベースアプライアンスの電源投入後すぐに他の操作(Updateなど)を行うと202(Accepted)が返ってくるものの無視される。
+	// この挙動はテストなどで問題となる。このためここで少しsleepすることで対応する。
+	time.Sleep(client.databaseWaitAfterCreateDuration)
 
-	err = client.Database.SleepUntilDatabaseRunning(database.ID, client.DefaultTimeoutDuration, 5)
-	if err != nil {
-		return fmt.Errorf("Failed to wait SakuraCloud Database start: %s", err)
-	}
-
-	d.SetId(database.GetStrID())
+	d.SetId(db.ID.String())
 	return resourceSakuraCloudDatabaseRead(d, meta)
 }
 
 func resourceSakuraCloudDatabaseRead(d *schema.ResourceData, meta interface{}) error {
-	client := getSacloudAPIClient(d, meta)
-
-	data, err := client.Database.Read(toSakuraCloudID(d.Id()))
+	client, zone, err := sakuraCloudClient(d, meta)
 	if err != nil {
-		if sacloudErr, ok := err.(api.Error); ok && sacloudErr.ResponseCode() == 404 {
+		return err
+	}
+	ctx, cancel := operationContext(d, schema.TimeoutRead)
+	defer cancel()
+
+	dbOp := sacloud.NewDatabaseOp(client)
+
+	data, err := dbOp.Read(ctx, zone, sakuraCloudID(d.Id()))
+	if err != nil {
+		if sacloud.IsNotFoundError(err) {
 			d.SetId("")
 			return nil
 		}
-		return fmt.Errorf("Couldn't find SakuraCloud Database resource: %s", err)
+		return fmt.Errorf("could not find SakuraCloud Database[%s]: %s", d.Id(), err)
 	}
-
-	return setDatabaseResourceData(d, client, data)
+	return setDatabaseResourceData(ctx, d, client, data)
 }
 
 func resourceSakuraCloudDatabaseUpdate(d *schema.ResourceData, meta interface{}) error {
-	client := getSacloudAPIClient(d, meta)
-
-	database, err := client.Database.Read(toSakuraCloudID(d.Id()))
+	client, zone, err := sakuraCloudClient(d, meta)
 	if err != nil {
-		return fmt.Errorf("Couldn't find SakuraCloud Database resource: %s", err)
+		return err
 	}
+	ctx, cancel := operationContext(d, schema.TimeoutUpdate)
+	defer cancel()
 
-	needRestart := false
-	if d.HasChange("replica_password") {
-		if database.IsUp() {
-			needRestart = true
-			err = handleShutdown(client.Database, database.ID, d, client.DefaultTimeoutDuration)
-			if err != nil {
-				return fmt.Errorf("Error updating SakuraCloud Database resource: %s", err)
-			}
-			err = client.Database.SleepUntilDown(database.ID, client.DefaultTimeoutDuration)
-			if err != nil {
-				return fmt.Errorf("Error updating SakuraCloud Database resource: %s", err)
-			}
-		}
-	}
+	dbOp := sacloud.NewDatabaseOp(client)
 
-	if d.HasChange("name") {
-		database.Name = d.Get("name").(string)
-	}
-	if d.HasChange("icon_id") {
-		if iconID, ok := d.GetOk("icon_id"); ok {
-			database.SetIconByID(toSakuraCloudID(iconID.(string)))
-		} else {
-			database.ClearIcon()
-		}
-	}
-	if d.HasChange("description") {
-		if description, ok := d.GetOk("description"); ok {
-			database.Description = description.(string)
-		} else {
-			database.Description = ""
-		}
-	}
-
-	if d.HasChange("tags") {
-		rawTags := d.Get("tags").([]interface{})
-		if rawTags != nil {
-			database.Tags = expandTags(client, rawTags)
-		} else {
-			database.Tags = expandTags(client, []interface{}{})
-		}
-	}
-
-	database, err = client.Database.Update(database.ID, database)
+	db, err := dbOp.Read(ctx, zone, sakuraCloudID(d.Id()))
 	if err != nil {
-		return fmt.Errorf("Error updating SakuraCloud Database resource: %s", err)
+		return fmt.Errorf("could not read SakuraCloud Database[%s]: %s", d.Id(), err)
 	}
 
-	if d.HasChange("user_password") {
-		database.Settings.DBConf.Common.UserPassword = d.Get("user_password").(string)
-	}
-
-	if d.HasChange("replica_password") {
-		replicaPassword := d.Get("replica_password").(string)
-		if replicaPassword == "" {
-			database.Settings.DBConf.Common.ReplicaPassword = ""
-			database.Settings.DBConf.Replication = nil
-		} else {
-			database.Settings.DBConf.Common.ReplicaPassword = replicaPassword
-			database.Settings.DBConf.Replication = &sacloud.DatabaseReplicationSetting{
-				Model: sacloud.DatabaseReplicationModelMasterSlave,
-			}
-		}
-	}
-
-	if d.HasChange("allow_networks") {
-		if rawNetworks, ok := d.GetOk("allow_networks"); ok {
-			if rawNetworks != nil {
-				database.Settings.DBConf.Common.SourceNetwork = expandStringList(rawNetworks.([]interface{}))
-			} else {
-				database.Settings.DBConf.Common.SourceNetwork = nil
-			}
-		}
-
-	}
-	if d.HasChange("port") {
-		rawPort := d.Get("port").(int)
-		database.Settings.DBConf.Common.ServicePort = json.Number(fmt.Sprintf("%d", rawPort))
-	}
-	if d.HasChange("backup_weekdays") {
-		rawBackupWeekdays := d.Get("backup_weekdays").([]interface{})
-		backupWeekdays, err := expandStringListWithValidateInList("backup_weekdays", rawBackupWeekdays, sacloud.AllowDatabaseBackupWeekdays())
-		if err != nil {
-			return err
-		}
-
-		if database.Settings.DBConf.Backup == nil {
-			database.Settings.DBConf.Backup = &sacloud.DatabaseBackupSetting{}
-		}
-		database.Settings.DBConf.Backup.DayOfWeek = backupWeekdays
-	}
-
-	if d.HasChange("backup_time") {
-		backupTime := d.Get("backup_time").(string)
-		if database.Settings.DBConf.Backup == nil {
-			database.Settings.DBConf.Backup = &sacloud.DatabaseBackupSetting{}
-		}
-		database.Settings.DBConf.Backup.Time = backupTime
-	}
-	if database.Settings.DBConf.Backup != nil &&
-		(len(database.Settings.DBConf.Backup.DayOfWeek) == 0 || database.Settings.DBConf.Backup.Time == "") {
-
-		database.Settings.DBConf.Backup = nil
-	}
-
-	database, err = client.Database.UpdateSetting(database.ID, database)
-	if err != nil {
-		return fmt.Errorf("Error updating SakuraCloud Database resource: %s", err)
-	}
-	_, err = client.Database.Config(database.ID)
-	if err != nil {
-		return fmt.Errorf("Error updating SakuraCloud Database resource: %s", err)
-	}
-
-	if needRestart {
-		_, err = client.Database.Boot(database.ID)
-		if err != nil {
-			return fmt.Errorf("Error updating SakuraCloud Database resource: %s", err)
-		}
-		err = client.Database.SleepUntilDatabaseRunning(database.ID, client.DefaultTimeoutDuration, 5)
-		if err != nil {
-			return fmt.Errorf("Error updating SakuraCloud Database resource: %s", err)
-		}
+	dbBuilder := expandDatabaseBuilder(d, client)
+	if _, err := dbBuilder.Update(ctx, zone, db.ID); err != nil {
+		return fmt.Errorf("updating SakuraCloud Database[%s] is failed: %s", db.ID, err)
 	}
 
 	return resourceSakuraCloudDatabaseRead(d, meta)
 }
 
 func resourceSakuraCloudDatabaseDelete(d *schema.ResourceData, meta interface{}) error {
-	client := getSacloudAPIClient(d, meta)
-
-	err := handleShutdown(client.Database, toSakuraCloudID(d.Id()), d, client.DefaultTimeoutDuration)
+	client, zone, err := sakuraCloudClient(d, meta)
 	if err != nil {
-		return fmt.Errorf("Error stopping SakuraCloud Database resource: %s", err)
+		return err
+	}
+	ctx, cancel := operationContext(d, schema.TimeoutDelete)
+	defer cancel()
+
+	dbOp := sacloud.NewDatabaseOp(client)
+
+	data, err := dbOp.Read(ctx, zone, sakuraCloudID(d.Id()))
+	if err != nil {
+		if sacloud.IsNotFoundError(err) {
+			d.SetId("")
+			return nil
+		}
+		return fmt.Errorf("could not read SakuraCloud Database[%s]: %s", d.Id(), err)
 	}
 
-	_, err = client.Database.Delete(toSakuraCloudID(d.Id()))
-	if err != nil {
-		return fmt.Errorf("Error deleting SakuraCloud Database resource: %s", err)
+	if data.InstanceStatus.IsUp() {
+		if err := power.ShutdownDatabase(ctx, dbOp, zone, data.ID, true); err != nil {
+			return err
+		}
 	}
 
+	// delete
+	if err = dbOp.Delete(ctx, zone, data.ID); err != nil {
+		return fmt.Errorf("deleting SakuraCloud Database[%s] is failed: %s", data.ID, err)
+	}
+
+	d.SetId("")
 	return nil
 }
 
-func setDatabaseResourceData(d *schema.ResourceData, client *APIClient, data *sacloud.Database) error {
-
-	if data.IsFailed() {
+func setDatabaseResourceData(ctx context.Context, d *schema.ResourceData, client *APIClient, data *sacloud.Database) error {
+	if data.Availability.IsFailed() {
 		d.SetId("")
-		return fmt.Errorf("Database[%d] state is failed", data.ID)
+		return fmt.Errorf("got unexpected state: Database[%d].Availability is failed", data.ID)
 	}
 
-	switch data.Remark.DBConf.Common.DatabaseName {
-	case "postgres":
-		d.Set("database_type", "postgresql")
-		break
-	case "MariaDB":
-		d.Set("database_type", "mariadb")
-		break
+	d.Set("database_type", flattenDatabaseType(data)) // nolint
+	if data.ReplicationSetting != nil {
+		d.Set("replica_user", data.CommonSetting.ReplicaUser)         // nolint
+		d.Set("replica_password", data.CommonSetting.ReplicaPassword) // nolint
 	}
-
-	d.Set("name", data.Name)
-	d.Set("user_name", data.Settings.DBConf.Common.DefaultUser)
-	d.Set("user_password", data.Settings.DBConf.Common.UserPassword)
-	d.Set("replica_user", data.Settings.DBConf.Common.ReplicaUser)
-	d.Set("replica_password", data.Settings.DBConf.Common.ReplicaPassword)
-
-	//plan
-	switch data.Plan.ID {
-	case int64(sacloud.DatabasePlan10G):
-		d.Set("plan", "10g")
-	case int64(sacloud.DatabasePlan30G):
-		d.Set("plan", "30g")
-	case int64(sacloud.DatabasePlan90G):
-		d.Set("plan", "90g")
-	case int64(sacloud.DatabasePlan240G):
-		d.Set("plan", "240g")
-	case int64(sacloud.DatabasePlan500G):
-		d.Set("plan", "500g")
-	case int64(sacloud.DatabasePlan1T):
-		d.Set("plan", "1t")
-
+	if err := d.Set("backup", flattenDatabaseBackupSetting(data)); err != nil {
+		return err
 	}
-
-	d.Set("allow_networks", data.Settings.DBConf.Common.SourceNetwork)
-	port, _ := data.Settings.DBConf.Common.ServicePort.Int64()
-	d.Set("port", port)
-
-	if data.Settings.DBConf.Backup != nil {
-		d.Set("backup_time", data.Settings.DBConf.Backup.Time)
-		d.Set("backup_weekdays", data.Settings.DBConf.Backup.DayOfWeek)
+	if err := d.Set("tags", flattenDatabaseTags(data)); err != nil {
+		return err
 	}
-
-	d.Set("switch_id", "")
-	d.Set("switch_id", data.Interfaces[0].Switch.GetStrID())
-	d.Set("nw_mask_len", data.Remark.Network.NetworkMaskLen)
-	d.Set("default_route", data.Remark.Network.DefaultRoute)
-	d.Set("ipaddress1", data.Remark.Servers[0].(map[string]interface{})["IPAddress"])
-
-	d.Set("icon_id", data.GetIconStrID())
-	d.Set("description", data.Description)
-	tags := []string{}
-	for _, t := range data.Tags {
-		if !(strings.HasPrefix(t, "@MariaDB-") || strings.HasPrefix(t, "@postgres-")) {
-			tags = append(tags, t)
-		}
+	d.Set("name", data.Name)                              // nolint
+	d.Set("username", data.CommonSetting.DefaultUser)     // nolint
+	d.Set("password", data.CommonSetting.UserPassword)    // nolint
+	d.Set("plan", types.DatabasePlanNameMap[data.PlanID]) // nolint
+	if err := d.Set("network_interface", flattenDatabaseNetworkInterface(data)); err != nil {
+		return err
 	}
-	d.Set("tags", tags)
-	setPowerManageTimeoutValueToState(d)
-
-	d.Set("zone", client.Zone)
+	d.Set("icon_id", data.IconID.String()) // nolint
+	d.Set("description", data.Description) // nolint
+	d.Set("zone", getZone(d, client))      // nolint
 	return nil
 }

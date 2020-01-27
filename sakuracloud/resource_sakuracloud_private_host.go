@@ -15,14 +15,20 @@
 package sakuracloud
 
 import (
+	"context"
 	"fmt"
+	"time"
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
-	"github.com/sacloud/libsacloud/api"
-	"github.com/sacloud/libsacloud/sacloud"
+	"github.com/hashicorp/terraform-plugin-sdk/helper/validation"
+	"github.com/sacloud/libsacloud/v2/sacloud"
+	"github.com/sacloud/libsacloud/v2/sacloud/types"
 )
 
 func resourceSakuraCloudPrivateHost() *schema.Resource {
+	resourceName := "PrivateHost"
+	classes := []string{types.PrivateHostClassDynamic, types.PrivateHostClassWindows}
+
 	return &schema.Resource{
 		Create: resourceSakuraCloudPrivateHostCreate,
 		Read:   resourceSakuraCloudPrivateHostRead,
@@ -31,202 +37,150 @@ func resourceSakuraCloudPrivateHost() *schema.Resource {
 		Importer: &schema.ResourceImporter{
 			State: schema.ImportStatePassthrough,
 		},
-		CustomizeDiff: hasTagResourceCustomizeDiff,
+
+		Timeouts: &schema.ResourceTimeout{
+			Create: schema.DefaultTimeout(5 * time.Minute),
+			Update: schema.DefaultTimeout(5 * time.Minute),
+			Delete: schema.DefaultTimeout(20 * time.Minute),
+		},
+
 		Schema: map[string]*schema.Schema{
-			"name": {
-				Type:     schema.TypeString,
-				Required: true,
-			},
-			"icon_id": {
+			"name": schemaResourceName(resourceName),
+			"class": {
 				Type:         schema.TypeString,
 				Optional:     true,
-				ValidateFunc: validateSakuracloudIDType,
+				Default:      types.PrivateHostClassDynamic,
+				ValidateFunc: validation.StringInSlice(classes, false),
+				Description:  descf("The class of the %s. This will be one of [%s]", resourceName, classes),
 			},
-			"description": {
-				Type:     schema.TypeString,
-				Optional: true,
-			},
-			"tags": {
-				Type:     schema.TypeList,
-				Optional: true,
-				Computed: true,
-				Elem:     &schema.Schema{Type: schema.TypeString},
-			},
-			powerManageTimeoutKey: powerManageTimeoutParam,
+			"icon_id":     schemaResourceIconID(resourceName),
+			"description": schemaResourceDescription(resourceName),
+			"tags":        schemaResourceTags(resourceName),
 			"hostname": {
-				Type:     schema.TypeString,
-				Computed: true,
+				Type:        schema.TypeString,
+				Computed:    true,
+				Description: "The hostname of the private host",
 			},
 			"assigned_core": {
-				Type:     schema.TypeInt,
-				Computed: true,
+				Type:        schema.TypeInt,
+				Computed:    true,
+				Description: "The total number of CPUs assigned to servers on the private host",
 			},
 			"assigned_memory": {
-				Type:     schema.TypeInt,
-				Computed: true,
+				Type:        schema.TypeInt,
+				Computed:    true,
+				Description: "The total size of memory assigned to servers on the private host",
 			},
-			"zone": {
-				Type:         schema.TypeString,
-				Optional:     true,
-				Computed:     true,
-				ForceNew:     true,
-				Description:  "target SakuraCloud zone",
-				ValidateFunc: validateZone([]string{"is1a", "is1b", "tk1a"}),
-			},
+			"zone": schemaResourceZone(resourceName),
 		},
 	}
 }
 
 func resourceSakuraCloudPrivateHostCreate(d *schema.ResourceData, meta interface{}) error {
-	client := getSacloudAPIClient(d, meta)
-
-	opts := client.PrivateHost.New()
-
-	opts.Name = d.Get("name").(string)
-	if iconID, ok := d.GetOk("icon_id"); ok {
-		opts.SetIconByID(toSakuraCloudID(iconID.(string)))
-	}
-	if description, ok := d.GetOk("description"); ok {
-		opts.Description = description.(string)
-	}
-	if rawTags, ok := d.GetOk("tags"); ok {
-		if rawTags != nil {
-			opts.Tags = expandTags(client, rawTags.([]interface{}))
-		}
-	}
-
-	plans, err := client.Product.GetProductPrivateHostAPI().FilterBy("Class", "dynamic").Find()
-	if err != nil || len(plans.PrivateHostPlans) == 0 {
-		return fmt.Errorf("Failed to create SakuraCloud PrivateHost resource: %s", err)
-	}
-	plan := plans.PrivateHostPlans[0]
-	opts.SetPrivateHostPlan(&plan)
-
-	privateHost, err := client.PrivateHost.Create(opts)
+	client, zone, err := sakuraCloudClient(d, meta)
 	if err != nil {
-		return fmt.Errorf("plan is not found on zone[%s]: %s", client.Zone, err)
+		return err
 	}
-	d.SetId(privateHost.GetStrID())
+	ctx, cancel := operationContext(d, schema.TimeoutCreate)
+	defer cancel()
+
+	phOp := sacloud.NewPrivateHostOp(client)
+
+	planID, err := expandPrivateHostPlanID(ctx, d, client, zone)
+	if err != nil {
+		return fmt.Errorf("creating SakuraCloud PrivateHost is failed: %s", err)
+	}
+
+	ph, err := phOp.Create(ctx, zone, expandPrivateHostCreateRequest(d, planID))
+	if err != nil {
+		return fmt.Errorf("creating SakuraCloud PrivateHost is failed: %s", err)
+	}
+
+	d.SetId(ph.ID.String())
 	return resourceSakuraCloudPrivateHostRead(d, meta)
 }
 
 func resourceSakuraCloudPrivateHostRead(d *schema.ResourceData, meta interface{}) error {
-	client := getSacloudAPIClient(d, meta)
-
-	privateHost, err := client.PrivateHost.Read(toSakuraCloudID(d.Id()))
+	client, zone, err := sakuraCloudClient(d, meta)
 	if err != nil {
-		if sacloudErr, ok := err.(api.Error); ok && sacloudErr.ResponseCode() == 404 {
+		return err
+	}
+	ctx, cancel := operationContext(d, schema.TimeoutRead)
+	defer cancel()
+
+	phOp := sacloud.NewPrivateHostOp(client)
+
+	ph, err := phOp.Read(ctx, zone, sakuraCloudID(d.Id()))
+	if err != nil {
+		if sacloud.IsNotFoundError(err) {
 			d.SetId("")
 			return nil
 		}
-		return fmt.Errorf("Couldn't find SakuraCloud Server PrivateHost resource: %s", err)
+		return fmt.Errorf("could not read SakuraCloud PrivateHost[%s]: %s", d.Id(), err)
 	}
-
-	return setPrivateHostResourceData(d, client, privateHost)
+	return setPrivateHostResourceData(ctx, d, client, ph)
 }
 
 func resourceSakuraCloudPrivateHostUpdate(d *schema.ResourceData, meta interface{}) error {
-	client := getSacloudAPIClient(d, meta)
-
-	privateHost, err := client.PrivateHost.Read(toSakuraCloudID(d.Id()))
+	client, zone, err := sakuraCloudClient(d, meta)
 	if err != nil {
-		return fmt.Errorf("Couldn't find SakuraCloud PrivateHost resource: %s", err)
+		return err
 	}
+	ctx, cancel := operationContext(d, schema.TimeoutUpdate)
+	defer cancel()
 
-	if d.HasChange("name") {
-		privateHost.Name = d.Get("name").(string)
-	}
-	if d.HasChange("icon_id") {
-		if iconID, ok := d.GetOk("icon_id"); ok {
-			privateHost.SetIconByID(toSakuraCloudID(iconID.(string)))
-		} else {
-			privateHost.ClearIcon()
-		}
-	}
-	if d.HasChange("description") {
-		if description, ok := d.GetOk("description"); ok {
-			privateHost.Description = description.(string)
-		} else {
-			privateHost.Description = ""
-		}
-	}
-	if d.HasChange("tags") {
-		rawTags := d.Get("tags").([]interface{})
-		if rawTags != nil {
-			privateHost.Tags = expandTags(client, rawTags)
-		} else {
-			privateHost.Tags = expandTags(client, []interface{}{})
-		}
-	}
+	phOp := sacloud.NewPrivateHostOp(client)
 
-	privateHost, err = client.PrivateHost.Update(privateHost.ID, privateHost)
+	ph, err := phOp.Read(ctx, zone, sakuraCloudID(d.Id()))
 	if err != nil {
-		return fmt.Errorf("Error updating SakuraCloud PrivateHost resource: %s", err)
+		return fmt.Errorf("could not read SakuraCloud PrivateHost[%s]: %s", d.Id(), err)
+	}
+
+	_, err = phOp.Update(ctx, zone, ph.ID, expandPrivateHostUpdateRequest(d))
+	if err != nil {
+		return fmt.Errorf("updating SakuraCloud PrivateHost[%s] is failed: %s", d.Id(), err)
 	}
 
 	return resourceSakuraCloudPrivateHostRead(d, meta)
 }
 
 func resourceSakuraCloudPrivateHostDelete(d *schema.ResourceData, meta interface{}) error {
-	client := getSacloudAPIClient(d, meta)
-
-	id := toSakuraCloudID(d.Id())
-	// shutdown connected servers
-	res, err := client.Server.Find()
+	client, zone, err := sakuraCloudClient(d, meta)
 	if err != nil {
-		return fmt.Errorf("Error deleting SakuraCloud PrivateHost resource: finding server is failed: %s", err)
+		return err
 	}
-	var needRestartServers []int64
+	ctx, cancel := operationContext(d, schema.TimeoutDelete)
+	defer cancel()
 
-	for _, s := range res.Servers {
-		if s.PrivateHost != nil && s.PrivateHost.ID == id {
+	phOp := sacloud.NewPrivateHostOp(client)
 
-			// still running?
-			isNeedRestart := false
-			if s.IsUp() {
-				isNeedRestart = true
-				err := stopServer(client, s.ID, d)
-				if err != nil {
-					return fmt.Errorf("Error deleting SakuraCloud PrivateHost resource: shutdown server is failed: %s", err)
-				}
-			}
-
-			s.ClearPrivateHost()
-			_, err := client.Server.Update(s.ID, &s)
-			if err != nil {
-				return fmt.Errorf("Error deleting SakuraCloud PrivateHost resource: clear private-host is failed: %s", err)
-			}
-
-			if isNeedRestart {
-				needRestartServers = append(needRestartServers, s.ID)
-			}
-		}
-	}
-
-	_, err = client.PrivateHost.Delete(toSakuraCloudID(d.Id()))
+	ph, err := phOp.Read(ctx, zone, sakuraCloudID(d.Id()))
 	if err != nil {
-		return fmt.Errorf("Error deleting SakuraCloud PrivateHost resource: %s", err)
-	}
-
-	for _, serverID := range needRestartServers {
-		err := bootServer(client, serverID)
-		if err != nil {
-			return fmt.Errorf("Error deleting SakuraCloud PrivateHost resource: booting server is failed: %s", err)
+		if sacloud.IsNotFoundError(err) {
+			d.SetId("")
+			return nil
 		}
+		return fmt.Errorf("could not read SakuraCloud PrivateHost[%s]: %s", d.Id(), err)
 	}
 
+	if err := waitForDeletionByPrivateHostID(ctx, client, zone, ph.ID); err != nil {
+		return fmt.Errorf("waiting deletion is failed: PrivateHost[%s] still used by Server: %s", ph.ID, err)
+	}
+
+	if err := phOp.Delete(ctx, zone, ph.ID); err != nil {
+		return fmt.Errorf("deleting SakuraCloud PrivateHost[%s] is failed: %s", d.Id(), err)
+	}
 	return nil
 }
 
-func setPrivateHostResourceData(d *schema.ResourceData, client *APIClient, data *sacloud.PrivateHost) error {
-	d.Set("name", data.Name)
-	d.Set("icon_id", data.GetIconStrID())
-	d.Set("description", data.Description)
-	d.Set("tags", data.Tags)
-	d.Set("hostname", data.GetHostName())
-	d.Set("assigned_core", data.GetAssignedCPU())
-	d.Set("assigned_memory", data.GetAssignedMemoryGB())
-	setPowerManageTimeoutValueToState(d)
-	d.Set("zone", client.Zone)
-	return nil
+func setPrivateHostResourceData(ctx context.Context, d *schema.ResourceData, client *APIClient, data *sacloud.PrivateHost) error {
+	d.Set("name", data.Name)                             // nolint
+	d.Set("class", data.PlanClass)                       // nolint
+	d.Set("icon_id", data.IconID.String())               // nolint
+	d.Set("description", data.Description)               // nolint
+	d.Set("hostname", data.GetHostName())                // nolint
+	d.Set("assigned_core", data.GetAssignedCPU())        // nolint
+	d.Set("assigned_memory", data.GetAssignedMemoryGB()) // nolint
+	d.Set("zone", getZone(d, client))                    // nolint
+	return d.Set("tags", flattenTags(data.Tags))
 }

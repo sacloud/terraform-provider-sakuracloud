@@ -15,17 +15,19 @@
 package sakuracloud
 
 import (
+	"context"
 	"fmt"
-	"strconv"
-	"strings"
+	"time"
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/validation"
-	"github.com/sacloud/libsacloud/api"
-	"github.com/sacloud/libsacloud/sacloud"
+	"github.com/sacloud/libsacloud/v2/sacloud"
+	"github.com/sacloud/libsacloud/v2/sacloud/types"
 )
 
 func resourceSakuraCloudGSLB() *schema.Resource {
+	resourceName := "GSLB"
+
 	return &schema.Resource{
 		Create: resourceSakuraCloudGSLBCreate,
 		Read:   resourceSakuraCloudGSLBRead,
@@ -34,16 +36,19 @@ func resourceSakuraCloudGSLB() *schema.Resource {
 		Importer: &schema.ResourceImporter{
 			State: schema.ImportStatePassthrough,
 		},
-		CustomizeDiff: hasTagResourceCustomizeDiff,
+
+		Timeouts: &schema.ResourceTimeout{
+			Create: schema.DefaultTimeout(5 * time.Minute),
+			Update: schema.DefaultTimeout(5 * time.Minute),
+			Delete: schema.DefaultTimeout(5 * time.Minute),
+		},
+
 		Schema: map[string]*schema.Schema{
-			"name": {
-				Type:     schema.TypeString,
-				Required: true,
-				ForceNew: true,
-			},
+			"name": schemaResourceName(resourceName),
 			"fqdn": {
-				Type:     schema.TypeString,
-				Computed: true,
+				Type:        schema.TypeString,
+				Computed:    true,
+				Description: "The FQDN for accessing to the GSLB. This is typically used as value of CNAME record",
 			},
 			"health_check": {
 				Type:     schema.TypeList,
@@ -55,307 +60,191 @@ func resourceSakuraCloudGSLB() *schema.Resource {
 						"protocol": {
 							Type:         schema.TypeString,
 							Required:     true,
-							ValidateFunc: validation.StringInSlice(sacloud.AllowGSLBHealthCheckProtocol(), false),
+							ValidateFunc: validation.StringInSlice(types.GSLBHealthCheckProtocolStrings, false),
+							Description: descf(
+								"The protocol used for health checks. This must be one of [%s]",
+								types.GSLBHealthCheckProtocolStrings,
+							),
 						},
 						"delay_loop": {
 							Type:         schema.TypeInt,
 							Optional:     true,
 							ValidateFunc: validation.IntBetween(10, 60),
 							Default:      10,
+							Description:  descf("The interval in seconds between checks. %s", descRange(10, 60)),
 						},
 						"host_header": {
-							Type:     schema.TypeString,
-							Optional: true,
+							Type:        schema.TypeString,
+							Optional:    true,
+							Description: "The value of host header send when checking by HTTP/HTTPS",
 						},
 						"path": {
-							Type:     schema.TypeString,
-							Optional: true,
+							Type:        schema.TypeString,
+							Optional:    true,
+							Description: "The path used when checking by HTTP/HTTPS",
 						},
 						"status": {
-							Type:     schema.TypeString,
-							Optional: true,
+							Type:        schema.TypeString,
+							Optional:    true,
+							Description: "The response-code to expect when checking by HTTP/HTTPS",
 						},
 						"port": {
-							Type:     schema.TypeInt,
-							Optional: true,
+							Type:        schema.TypeInt,
+							Optional:    true,
+							Description: "The port number used when checking by TCP",
 						},
 					},
 				},
 			},
 			"weighted": {
-				Type:     schema.TypeBool,
-				Optional: true,
-				Default:  false,
+				Type:        schema.TypeBool,
+				Optional:    true,
+				Description: "The flag to enable weighted load-balancing",
 			},
 			"sorry_server": {
-				Type:     schema.TypeString,
-				Optional: true,
+				Type:        schema.TypeString,
+				Optional:    true,
+				Description: "The IP address of the SorryServer. This will be used when all servers are down",
 			},
-			"servers": {
+			"server": {
 				Type:     schema.TypeList,
 				Optional: true,
-				Computed: true,
 				MaxItems: 12,
 				Elem: &schema.Resource{
-					Schema: gslbServerValueSchemas(),
+					Schema: map[string]*schema.Schema{
+						"ip_address": {
+							Type:         schema.TypeString,
+							Required:     true,
+							Description:  "The IP address of the server",
+							ValidateFunc: validation.SingleIP(),
+						},
+						"enabled": {
+							Type:        schema.TypeBool,
+							Optional:    true,
+							Default:     true,
+							Description: "The flag to enable as destination of load balancing",
+						},
+						"weight": {
+							Type:         schema.TypeInt,
+							Optional:     true,
+							ValidateFunc: validation.IntBetween(1, 10000),
+							Default:      1,
+							Description: descf(
+								"The weight used when weighted load balancing is enabled. %s",
+								descRange(1, 10000),
+							),
+						},
+					},
 				},
 			},
-			"icon_id": {
-				Type:         schema.TypeString,
-				Optional:     true,
-				ValidateFunc: validateSakuracloudIDType,
-			},
-			"description": {
-				Type:     schema.TypeString,
-				Optional: true,
-			},
-			"tags": {
-				Type:     schema.TypeList,
-				Optional: true,
-				Computed: true,
-				Elem:     &schema.Schema{Type: schema.TypeString},
-			},
-		},
-	}
-}
-
-func gslbServerValueSchemas() map[string]*schema.Schema {
-	return map[string]*schema.Schema{
-		"ipaddress": {
-			Type:     schema.TypeString,
-			Required: true,
-		},
-		"enabled": {
-			Type:     schema.TypeBool,
-			Optional: true,
-			Default:  true,
-		},
-		"weight": {
-			Type:         schema.TypeInt,
-			Optional:     true,
-			ValidateFunc: validation.IntBetween(1, 10000),
-			Default:      1,
+			"icon_id":     schemaResourceIconID(resourceName),
+			"description": schemaResourceDescription(resourceName),
+			"tags":        schemaResourceTags(resourceName),
 		},
 	}
 }
 
 func resourceSakuraCloudGSLBCreate(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*APIClient)
-
-	opts := client.GSLB.New(d.Get("name").(string))
-
-	healthCheckConf := d.Get("health_check").([]interface{})
-	conf := healthCheckConf[0].(map[string]interface{})
-	protocol := conf["protocol"].(string)
-	switch protocol {
-	case "http", "https":
-		opts.Settings.GSLB.HealthCheck = sacloud.GSLBHealthCheck{
-			Protocol: protocol,
-			Host:     conf["host_header"].(string),
-			Path:     conf["path"].(string),
-			Status:   conf["status"].(string),
-		}
-	case "tcp":
-		opts.Settings.GSLB.HealthCheck = sacloud.GSLBHealthCheck{
-			Protocol: protocol,
-			Port:     fmt.Sprintf("%d", conf["port"].(int)),
-		}
-	case "ping":
-		opts.Settings.GSLB.HealthCheck = sacloud.GSLBHealthCheck{
-			Protocol: protocol,
-		}
-	}
-
-	opts.Settings.GSLB.DelayLoop = conf["delay_loop"].(int)
-
-	if d.Get("weighted").(bool) {
-		opts.Settings.GSLB.Weighted = "True"
-	} else {
-		opts.Settings.GSLB.Weighted = "False"
-	}
-
-	if sorryServer, ok := d.GetOk("sorry_server"); ok {
-		opts.Settings.GSLB.SorryServer = sorryServer.(string)
-	}
-	if iconID, ok := d.GetOk("icon_id"); ok {
-		opts.SetIconByID(toSakuraCloudID(iconID.(string)))
-	}
-	if description, ok := d.GetOk("description"); ok {
-		opts.Description = description.(string)
-	}
-	rawTags := d.Get("tags").([]interface{})
-	if rawTags != nil {
-		opts.Tags = expandTags(client, rawTags)
-	}
-
-	for _, s := range d.Get("servers").([]interface{}) {
-		v := s.(map[string]interface{})
-		server := expandGSLBServer(&resourceMapValue{value: v})
-		opts.AddGSLBServer(server)
-	}
-
-	gslb, err := client.GSLB.Create(opts)
+	client, _, err := sakuraCloudClient(d, meta)
 	if err != nil {
-		return fmt.Errorf("Failed to create SakuraCloud GSLB resource: %s", err)
+		return err
+	}
+	ctx, cancel := operationContext(d, schema.TimeoutCreate)
+	defer cancel()
+
+	gslbOp := sacloud.NewGSLBOp(client)
+
+	gslb, err := gslbOp.Create(ctx, expandGSLBCreateRequest(d))
+	if err != nil {
+		return fmt.Errorf("creating SakuraCloud GSLB is failed: %s", err)
 	}
 
-	d.SetId(gslb.GetStrID())
+	d.SetId(gslb.ID.String())
 	return resourceSakuraCloudGSLBRead(d, meta)
 }
 
 func resourceSakuraCloudGSLBRead(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*APIClient)
-
-	gslb, err := client.GSLB.Read(toSakuraCloudID(d.Id()))
+	client, _, err := sakuraCloudClient(d, meta)
 	if err != nil {
-		if sacloudErr, ok := err.(api.Error); ok && sacloudErr.ResponseCode() == 404 {
+		return err
+	}
+	ctx, cancel := operationContext(d, schema.TimeoutRead)
+	defer cancel()
+
+	gslbOp := sacloud.NewGSLBOp(client)
+
+	gslb, err := gslbOp.Read(ctx, sakuraCloudID(d.Id()))
+	if err != nil {
+		if sacloud.IsNotFoundError(err) {
 			d.SetId("")
 			return nil
 		}
-		return fmt.Errorf("Couldn't find SakuraCloud GSLB resource: %s", err)
+		return fmt.Errorf("could not read SakuraCloud GSLB[%s]: %s", d.Id(), err)
 	}
 
-	return setGSLBResourceData(d, client, gslb)
+	return setGSLBResourceData(ctx, d, client, gslb)
 }
 
 func resourceSakuraCloudGSLBUpdate(d *schema.ResourceData, meta interface{}) error {
-
-	client := meta.(*APIClient)
-
-	gslb, err := client.GSLB.Read(toSakuraCloudID(d.Id()))
+	client, _, err := sakuraCloudClient(d, meta)
 	if err != nil {
-		return fmt.Errorf("Couldn't find SakuraCloud GSLB resource: %s", err)
+		return err
 	}
+	ctx, cancel := operationContext(d, schema.TimeoutUpdate)
+	defer cancel()
 
-	if d.HasChange("health_check") {
-		healthCheckConf := d.Get("health_check").([]interface{})
-		conf := healthCheckConf[0].(map[string]interface{})
-		protocol := conf["protocol"].(string)
-		switch protocol {
-		case "http", "https":
-			gslb.Settings.GSLB.HealthCheck = sacloud.GSLBHealthCheck{
-				Protocol: protocol,
-				Host:     conf["host_header"].(string),
-				Path:     conf["path"].(string),
-				Status:   conf["status"].(string),
-			}
-		case "tcp":
-			gslb.Settings.GSLB.HealthCheck = sacloud.GSLBHealthCheck{
-				Protocol: protocol,
-				Port:     fmt.Sprintf("%d", conf["port"].(int)),
-			}
-		case "ping":
-			gslb.Settings.GSLB.HealthCheck = sacloud.GSLBHealthCheck{
-				Protocol: protocol,
-			}
-		}
+	gslbOp := sacloud.NewGSLBOp(client)
 
-		gslb.Settings.GSLB.DelayLoop = conf["delay_loop"].(int)
-	}
-
-	if d.Get("weighted").(bool) {
-		gslb.Settings.GSLB.Weighted = "True"
-	} else {
-		gslb.Settings.GSLB.Weighted = "False"
-	}
-
-	if d.HasChange("sorry_server") {
-		if sorryServer, ok := d.GetOk("sorry_server"); ok {
-			gslb.Settings.GSLB.SorryServer = sorryServer.(string)
-		} else {
-			gslb.Settings.GSLB.SorryServer = ""
-		}
-	}
-
-	if d.HasChange("icon_id") {
-		if iconID, ok := d.GetOk("icon_id"); ok {
-			gslb.SetIconByID(toSakuraCloudID(iconID.(string)))
-		} else {
-			gslb.ClearIcon()
-		}
-	}
-	if d.HasChange("description") {
-		if description, ok := d.GetOk("description"); ok {
-			gslb.Description = description.(string)
-		} else {
-			gslb.Description = ""
-		}
-	}
-	if d.HasChange("tags") {
-		rawTags := d.Get("tags").([]interface{})
-		if rawTags != nil {
-			gslb.Tags = expandTags(client, rawTags)
-		} else {
-			gslb.Tags = expandTags(client, []interface{}{})
-		}
-	}
-
-	if d.HasChange("servers") {
-		gslb.ClearGSLBServer()
-
-		for _, s := range d.Get("servers").([]interface{}) {
-			v := s.(map[string]interface{})
-			server := expandGSLBServer(&resourceMapValue{value: v})
-			gslb.AddGSLBServer(server)
-		}
-	}
-
-	gslb, err = client.GSLB.Update(gslb.ID, gslb)
+	gslb, err := gslbOp.Read(ctx, sakuraCloudID(d.Id()))
 	if err != nil {
-		return fmt.Errorf("Failed to create SakuraCloud GSLB resource: %s", err)
+		return fmt.Errorf("could not read SakuraCloud GSLB[%s]: %s", d.Id(), err)
+	}
+
+	_, err = gslbOp.Update(ctx, sakuraCloudID(d.Id()), expandGSLBUpdateRequest(d, gslb))
+	if err != nil {
+		return fmt.Errorf("updating SakuraCloud GSLB[%s] is failed: %s", d.Id(), err)
 	}
 
 	return resourceSakuraCloudGSLBRead(d, meta)
-
 }
 
 func resourceSakuraCloudGSLBDelete(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*APIClient)
-
-	_, err := client.GSLB.Delete(toSakuraCloudID(d.Id()))
-
+	client, _, err := sakuraCloudClient(d, meta)
 	if err != nil {
-		return fmt.Errorf("Error deleting SakuraCloud GSLB resource: %s", err)
+		return err
+	}
+	ctx, cancel := operationContext(d, schema.TimeoutDelete)
+	defer cancel()
+
+	gslbOp := sacloud.NewGSLBOp(client)
+
+	gslb, err := gslbOp.Read(ctx, sakuraCloudID(d.Id()))
+	if err != nil {
+		if sacloud.IsNotFoundError(err) {
+			d.SetId("")
+			return nil
+		}
+		return fmt.Errorf("could not read SakuraCloud GSLB[%s]: %s", d.Id(), err)
+	}
+	if err := gslbOp.Delete(ctx, gslb.ID); err != nil {
+		return fmt.Errorf("deleting SakuraCloud GSLB[%s] is failed: %s", d.Id(), err)
 	}
 
 	return nil
 }
 
-func setGSLBResourceData(d *schema.ResourceData, client *APIClient, data *sacloud.GSLB) error {
-
-	d.Set("name", data.Name)
-	d.Set("fqdn", data.Status.FQDN)
-
-	//health_check
-	healthCheck := map[string]interface{}{}
-	switch data.Settings.GSLB.HealthCheck.Protocol {
-	case "http", "https":
-		healthCheck["host_header"] = data.Settings.GSLB.HealthCheck.Host
-		healthCheck["path"] = data.Settings.GSLB.HealthCheck.Path
-		healthCheck["status"] = data.Settings.GSLB.HealthCheck.Status
-	case "tcp":
-		healthCheck["port"] = data.Settings.GSLB.HealthCheck.Port
+func setGSLBResourceData(ctx context.Context, d *schema.ResourceData, client *APIClient, data *sacloud.GSLB) error {
+	d.Set("name", data.Name)                // nolint
+	d.Set("fqdn", data.FQDN)                // nolint
+	d.Set("sorry_server", data.SorryServer) // nolint
+	d.Set("icon_id", data.IconID.String())  // nolint
+	d.Set("description", data.Description)  // nolint
+	d.Set("weighted", data.Weighted.Bool()) // nolint
+	if err := d.Set("health_check", flattenGSLBHealthCheck(data)); err != nil {
+		return err
 	}
-	healthCheck["protocol"] = data.Settings.GSLB.HealthCheck.Protocol
-	healthCheck["delay_loop"] = data.Settings.GSLB.DelayLoop
-	d.Set("health_check", []interface{}{healthCheck})
-
-	var servers []interface{}
-	for _, server := range data.Settings.GSLB.Servers {
-		v := map[string]interface{}{}
-		v["ipaddress"] = server.IPAddress
-		v["enabled"] = strings.ToLower(server.Enabled) == "true"
-		weight, _ := strconv.Atoi(server.Weight)
-		v["weight"] = weight
-		servers = append(servers, v)
+	if err := d.Set("server", flattenGSLBServers(data)); err != nil {
+		return err
 	}
-	d.Set("servers", servers)
-
-	d.Set("sorry_server", data.Settings.GSLB.SorryServer)
-	d.Set("icon_id", data.GetIconStrID())
-	d.Set("description", data.Description)
-	d.Set("tags", data.Tags)
-	d.Set("weighted", strings.ToLower(data.Settings.GSLB.Weighted) == "true")
-
-	return nil
+	return d.Set("tags", flattenTags(data.Tags))
 }

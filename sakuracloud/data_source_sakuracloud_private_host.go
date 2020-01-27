@@ -18,130 +18,66 @@ import (
 	"fmt"
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
-	"github.com/sacloud/libsacloud/sacloud"
+	"github.com/sacloud/libsacloud/v2/sacloud"
+	"github.com/sacloud/libsacloud/v2/sacloud/types"
 )
 
 func dataSourceSakuraCloudPrivateHost() *schema.Resource {
+	resourceName := "PrivateHost"
 	return &schema.Resource{
 		Read: dataSourceSakuraCloudPrivateHostRead,
 
 		Schema: map[string]*schema.Schema{
-			"name_selectors": {
-				Type:     schema.TypeList,
-				Optional: true,
-				ForceNew: true,
-				Elem:     &schema.Schema{Type: schema.TypeString},
-			},
-			"tag_selectors": {
-				Type:     schema.TypeList,
-				Optional: true,
-				ForceNew: true,
-				Elem:     &schema.Schema{Type: schema.TypeString},
-			},
-			"filter": {
-				Type:     schema.TypeSet,
-				Optional: true,
-				ForceNew: true,
-				Elem: &schema.Resource{
-					Schema: map[string]*schema.Schema{
-						"name": {
-							Type:     schema.TypeString,
-							Required: true,
-						},
-
-						"values": {
-							Type:     schema.TypeList,
-							Required: true,
-							Elem:     &schema.Schema{Type: schema.TypeString},
-						},
-					},
-				},
-			},
-			"name": {
-				Type:     schema.TypeString,
-				Computed: true,
-			},
-			"description": {
-				Type:     schema.TypeString,
-				Computed: true,
-			},
-			"tags": {
-				Type:     schema.TypeList,
-				Elem:     &schema.Schema{Type: schema.TypeString},
-				Computed: true,
-			},
+			filterAttrName: filterSchema(&filterSchemaOption{}),
+			"name":         schemaDataSourceName(resourceName),
+			"class":        schemaDataSourceClass(resourceName, []string{types.PrivateHostClassDynamic, types.PrivateHostClassWindows}),
+			"icon_id":      schemaDataSourceIconID(resourceName),
+			"description":  schemaDataSourceDescription(resourceName),
+			"tags":         schemaDataSourceTags(resourceName),
 			"hostname": {
-				Type:     schema.TypeString,
-				Computed: true,
+				Type:        schema.TypeString,
+				Computed:    true,
+				Description: "The hostname of the private host",
 			},
 			"assigned_core": {
-				Type:     schema.TypeInt,
-				Computed: true,
+				Type:        schema.TypeInt,
+				Computed:    true,
+				Description: "The total number of CPUs assigned to servers on the private host",
 			},
 			"assigned_memory": {
-				Type:     schema.TypeInt,
-				Computed: true,
+				Type:        schema.TypeInt,
+				Computed:    true,
+				Description: "The total size of memory assigned to servers on the private host",
 			},
-			"zone": {
-				Type:         schema.TypeString,
-				Optional:     true,
-				Computed:     true,
-				ForceNew:     true,
-				Description:  "target SakuraCloud zone",
-				ValidateFunc: validateZone([]string{"is1a", "is1b", "tk1a"}),
-			},
+			"zone": schemaDataSourceZone(resourceName),
 		},
 	}
 }
 
 func dataSourceSakuraCloudPrivateHostRead(d *schema.ResourceData, meta interface{}) error {
-	client := getSacloudAPIClient(d, meta)
-
-	//filters
-	if rawFilter, filterOk := d.GetOk("filter"); filterOk {
-		filters := expandFilters(rawFilter)
-		for key, f := range filters {
-			client.PrivateHost.FilterBy(key, f)
-		}
-	}
-
-	res, err := client.PrivateHost.Find()
+	client, zone, err := sakuraCloudClient(d, meta)
 	if err != nil {
-		return fmt.Errorf("Couldn't find SakuraCloud PrivateHost resource: %s", err)
+		return err
 	}
-	if res == nil || res.Count == 0 {
+	ctx, cancel := operationContext(d, schema.TimeoutRead)
+	defer cancel()
+
+	searcher := sacloud.NewPrivateHostOp(client)
+
+	findCondition := &sacloud.FindCondition{}
+	if rawFilter, ok := d.GetOk(filterAttrName); ok {
+		findCondition.Filter = expandSearchFilter(rawFilter)
+	}
+
+	res, err := searcher.Find(ctx, zone, findCondition)
+	if err != nil {
+		return fmt.Errorf("could not find SakuraCloud PrivateHost resource: %s", err)
+	}
+	if res == nil || res.Count == 0 || len(res.PrivateHosts) == 0 {
 		return filterNoResultErr()
 	}
 
-	var data *sacloud.PrivateHost
 	targets := res.PrivateHosts
-
-	if rawNameSelector, ok := d.GetOk("name_selectors"); ok {
-		selectors := expandStringList(rawNameSelector.([]interface{}))
-		var filtered []sacloud.PrivateHost
-		for _, a := range targets {
-			if hasNames(&a, selectors) {
-				filtered = append(filtered, a)
-			}
-		}
-		targets = filtered
-	}
-	if rawTagSelector, ok := d.GetOk("tag_selectors"); ok {
-		selectors := expandStringList(rawTagSelector.([]interface{}))
-		var filtered []sacloud.PrivateHost
-		for _, a := range targets {
-			if hasTags(&a, selectors) {
-				filtered = append(filtered, a)
-			}
-		}
-		targets = filtered
-	}
-
-	if len(targets) == 0 {
-		return filterNoResultErr()
-	}
-	data = &targets[0]
-
-	d.SetId(data.GetStrID())
-	return setPrivateHostResourceData(d, client, data)
+	d.SetId(targets[0].ID.String())
+	return setPrivateHostResourceData(ctx, d, client, targets[0])
 }

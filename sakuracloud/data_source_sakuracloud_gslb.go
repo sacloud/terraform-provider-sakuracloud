@@ -18,52 +18,22 @@ import (
 	"fmt"
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
-	"github.com/sacloud/libsacloud/sacloud"
+	"github.com/sacloud/libsacloud/v2/sacloud"
+	"github.com/sacloud/libsacloud/v2/sacloud/types"
 )
 
 func dataSourceSakuraCloudGSLB() *schema.Resource {
+	resourceName := "GSLB"
 	return &schema.Resource{
 		Read: dataSourceSakuraCloudGSLBRead,
 
 		Schema: map[string]*schema.Schema{
-			"name_selectors": {
-				Type:     schema.TypeList,
-				Optional: true,
-				ForceNew: true,
-				Elem:     &schema.Schema{Type: schema.TypeString},
-			},
-			"tag_selectors": {
-				Type:     schema.TypeList,
-				Optional: true,
-				ForceNew: true,
-				Elem:     &schema.Schema{Type: schema.TypeString},
-			},
-			"filter": {
-				Type:     schema.TypeSet,
-				Optional: true,
-				ForceNew: true,
-				Elem: &schema.Resource{
-					Schema: map[string]*schema.Schema{
-						"name": {
-							Type:     schema.TypeString,
-							Required: true,
-						},
-
-						"values": {
-							Type:     schema.TypeList,
-							Required: true,
-							Elem:     &schema.Schema{Type: schema.TypeString},
-						},
-					},
-				},
-			},
-			"name": {
-				Type:     schema.TypeString,
-				Computed: true,
-			},
+			filterAttrName: filterSchema(&filterSchemaOption{}),
+			"name":         schemaDataSourceName(resourceName),
 			"fqdn": {
-				Type:     schema.TypeString,
-				Computed: true,
+				Type:        schema.TypeString,
+				Computed:    true,
+				Description: "The FQDN for accessing to the GSLB. This is typically used as value of CNAME record",
 			},
 			"health_check": {
 				Type:     schema.TypeList,
@@ -73,102 +43,103 @@ func dataSourceSakuraCloudGSLB() *schema.Resource {
 						"protocol": {
 							Type:     schema.TypeString,
 							Computed: true,
+							Description: descf(
+								"The protocol used for health checks. This will be one of [%s]",
+								types.GSLBHealthCheckProtocolStrings,
+							),
 						},
 						"delay_loop": {
-							Type:     schema.TypeInt,
-							Computed: true,
+							Type:        schema.TypeInt,
+							Computed:    true,
+							Description: "The interval in seconds between checks",
 						},
 						"host_header": {
-							Type:     schema.TypeString,
-							Computed: true,
+							Type:        schema.TypeString,
+							Computed:    true,
+							Description: "The value of host header send when checking by HTTP/HTTPS",
 						},
 						"path": {
-							Type:     schema.TypeString,
-							Computed: true,
+							Type:        schema.TypeString,
+							Computed:    true,
+							Description: "The path used when checking by HTTP/HTTPS",
 						},
 						"status": {
-							Type:     schema.TypeString,
-							Computed: true,
+							Type:        schema.TypeString,
+							Computed:    true,
+							Description: "The response-code to expect when checking by HTTP/HTTPS",
 						},
 						"port": {
-							Type:     schema.TypeInt,
-							Computed: true,
+							Type:        schema.TypeInt,
+							Computed:    true,
+							Description: "The port number used when checking by TCP",
 						},
 					},
 				},
 			},
 			"weighted": {
-				Type:     schema.TypeBool,
-				Computed: true,
+				Type:        schema.TypeBool,
+				Computed:    true,
+				Description: "The flag to enable weighted load-balancing",
 			},
 			"sorry_server": {
-				Type:     schema.TypeString,
-				Computed: true,
+				Type:        schema.TypeString,
+				Computed:    true,
+				Description: "The IP address of the SorryServer. This will be used when all servers are down",
 			},
-			"icon_id": {
-				Type:     schema.TypeString,
-				Computed: true,
-			},
-			"description": {
-				Type:     schema.TypeString,
-				Computed: true,
-			},
-			"tags": {
+			"icon_id":     schemaDataSourceIconID(resourceName),
+			"description": schemaDataSourceDescription(resourceName),
+			"tags":        schemaDataSourceTags(resourceName),
+			"server": {
 				Type:     schema.TypeList,
 				Computed: true,
-				Elem:     &schema.Schema{Type: schema.TypeString},
+				Elem: &schema.Resource{
+					Schema: map[string]*schema.Schema{
+						"ip_address": {
+							Type:        schema.TypeString,
+							Computed:    true,
+							Description: "The IP address of the server",
+						},
+						"enabled": {
+							Type:        schema.TypeBool,
+							Computed:    true,
+							Description: "The flag to enable as destination of load balancing",
+						},
+						"weight": {
+							Type:        schema.TypeInt,
+							Computed:    true,
+							Description: "The weight used when weighted load balancing is enabled",
+						},
+					},
+				},
 			},
 		},
 	}
 }
 
 func dataSourceSakuraCloudGSLBRead(d *schema.ResourceData, meta interface{}) error {
-	client := getSacloudAPIClient(d, meta)
-
-	//filters
-	if rawFilter, filterOk := d.GetOk("filter"); filterOk {
-		filters := expandFilters(rawFilter)
-		for key, f := range filters {
-			client.GSLB.FilterBy(key, f)
-		}
-	}
-
-	res, err := client.GSLB.Find()
+	client, _, err := sakuraCloudClient(d, meta)
 	if err != nil {
-		return fmt.Errorf("Couldn't find SakuraCloud GSLB resource: %s", err)
+		return err
 	}
-	if res == nil || res.Count == 0 {
+	ctx, cancel := operationContext(d, schema.TimeoutRead)
+	defer cancel()
+
+	searcher := sacloud.NewGSLBOp(client)
+
+	findCondition := &sacloud.FindCondition{}
+	if rawFilter, ok := d.GetOk(filterAttrName); ok {
+		findCondition.Filter = expandSearchFilter(rawFilter)
+	}
+
+	res, err := searcher.Find(ctx, findCondition)
+	if err != nil {
+		return fmt.Errorf("could not find SakuraCloud GSLB resource: %s", err)
+	}
+	if res == nil || res.Count == 0 || len(res.GSLBs) == 0 {
 		return filterNoResultErr()
 	}
-	var data *sacloud.GSLB
-	targets := res.CommonServiceGSLBItems
 
-	if rawNameSelector, ok := d.GetOk("name_selectors"); ok {
-		selectors := expandStringList(rawNameSelector.([]interface{}))
-		var filtered []sacloud.GSLB
-		for _, a := range targets {
-			if hasNames(&a, selectors) {
-				filtered = append(filtered, a)
-			}
-		}
-		targets = filtered
-	}
-	if rawTagSelector, ok := d.GetOk("tag_selectors"); ok {
-		selectors := expandStringList(rawTagSelector.([]interface{}))
-		var filtered []sacloud.GSLB
-		for _, a := range targets {
-			if hasTags(&a, selectors) {
-				filtered = append(filtered, a)
-			}
-		}
-		targets = filtered
-	}
-
-	if len(targets) == 0 {
-		return filterNoResultErr()
-	}
-	data = &targets[0]
-
-	d.SetId(data.GetStrID())
-	return setGSLBResourceData(d, client, data)
+	targets := res.GSLBs
+	d.SetId(targets[0].ID.String())
+	return setGSLBResourceData(ctx, d, client, targets[0])
 }

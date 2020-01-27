@@ -18,66 +18,43 @@ import (
 	"fmt"
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
-	"github.com/sacloud/libsacloud/sacloud"
+	"github.com/sacloud/libsacloud/v2/sacloud"
+	"github.com/sacloud/libsacloud/v2/sacloud/types"
 )
 
 func dataSourceSakuraCloudProxyLB() *schema.Resource {
+	resourceName := "ProxyLB"
 	return &schema.Resource{
 		Read: dataSourceSakuraCloudProxyLBRead,
 
 		Schema: map[string]*schema.Schema{
-			"name_selectors": {
-				Type:     schema.TypeList,
-				Optional: true,
-				ForceNew: true,
-				Elem:     &schema.Schema{Type: schema.TypeString},
-			},
-			"tag_selectors": {
-				Type:     schema.TypeList,
-				Optional: true,
-				ForceNew: true,
-				Elem:     &schema.Schema{Type: schema.TypeString},
-			},
-			"filter": {
-				Type:     schema.TypeSet,
-				Optional: true,
-				ForceNew: true,
-				Elem: &schema.Resource{
-					Schema: map[string]*schema.Schema{
-						"name": {
-							Type:     schema.TypeString,
-							Required: true,
-						},
-
-						"values": {
-							Type:     schema.TypeList,
-							Required: true,
-							Elem:     &schema.Schema{Type: schema.TypeString},
-						},
-					},
-				},
-			},
-			"name": {
-				Type:     schema.TypeString,
-				Computed: true,
-			},
-			"plan": {
-				Type:     schema.TypeInt,
-				Computed: true,
-			},
+			filterAttrName: filterSchema(&filterSchemaOption{}),
+			"name":         schemaDataSourceName(resourceName),
+			"plan":         schemaDataSourceIntPlan(resourceName, types.ProxyLBPlanValues),
 			"vip_failover": {
-				Type:     schema.TypeBool,
-				Computed: true,
+				Type:        schema.TypeBool,
+				Computed:    true,
+				Description: "The flag to enable VIP fail-over",
 			},
 			"sticky_session": {
-				Type:     schema.TypeBool,
-				Computed: true,
+				Type:        schema.TypeBool,
+				Computed:    true,
+				Description: "The flag to enable sticky session",
 			},
 			"timeout": {
-				Type:     schema.TypeInt,
-				Computed: true,
+				Type:        schema.TypeInt,
+				Computed:    true,
+				Description: "The timeout duration in seconds",
 			},
-			"bind_ports": {
+			"region": {
+				Type:     schema.TypeString,
+				Computed: true,
+				Description: descf(
+					"The name of region that the proxy LB is in. This will be one of [%s]",
+					types.ProxyLBRegionStrings,
+				),
+			},
+			"bind_port": {
 				Type:     schema.TypeList,
 				Computed: true,
 				Elem: &schema.Resource{
@@ -85,18 +62,25 @@ func dataSourceSakuraCloudProxyLB() *schema.Resource {
 						"proxy_mode": {
 							Type:     schema.TypeString,
 							Computed: true,
+							Description: descf(
+								"The proxy mode. This will be one of [%s]",
+								types.ProxyLBProxyModeStrings,
+							),
 						},
 						"port": {
-							Type:     schema.TypeInt,
-							Computed: true,
+							Type:        schema.TypeInt,
+							Computed:    true,
+							Description: "The number of listening port",
 						},
 						"redirect_to_https": {
-							Type:     schema.TypeBool,
-							Computed: true,
+							Type:        schema.TypeBool,
+							Computed:    true,
+							Description: "The flag to enable redirection from http to https. This flag is used only when `proxy_mode` is `http`",
 						},
 						"support_http2": {
-							Type:     schema.TypeBool,
-							Computed: true,
+							Type:        schema.TypeBool,
+							Computed:    true,
+							Description: "The flag to enable HTTP/2. This flag is used only when `proxy_mode` is `https`",
 						},
 						"response_header": {
 							Type:     schema.TypeList,
@@ -104,12 +88,14 @@ func dataSourceSakuraCloudProxyLB() *schema.Resource {
 							Elem: &schema.Resource{
 								Schema: map[string]*schema.Schema{
 									"header": {
-										Type:     schema.TypeString,
-										Computed: true,
+										Type:        schema.TypeString,
+										Computed:    true,
+										Description: descf("The field name of HTTP header added to response by the %s", resourceName),
 									},
 									"value": {
-										Type:     schema.TypeString,
-										Computed: true,
+										Type:        schema.TypeString,
+										Computed:    true,
+										Description: descf("The field value of HTTP header added to response by the %s", resourceName),
 									},
 								},
 							},
@@ -125,22 +111,30 @@ func dataSourceSakuraCloudProxyLB() *schema.Resource {
 						"protocol": {
 							Type:     schema.TypeString,
 							Computed: true,
+							Description: descf(
+								"The protocol used for health checks. This will be one of [%s]",
+								types.ProxyLBProtocolStrings,
+							),
 						},
 						"delay_loop": {
-							Type:     schema.TypeInt,
-							Computed: true,
+							Type:        schema.TypeInt,
+							Computed:    true,
+							Description: "The interval in seconds between checks",
 						},
 						"host_header": {
-							Type:     schema.TypeString,
-							Computed: true,
+							Type:        schema.TypeString,
+							Computed:    true,
+							Description: "The value of host header send when checking by HTTP",
 						},
 						"path": {
-							Type:     schema.TypeString,
-							Computed: true,
+							Type:        schema.TypeString,
+							Computed:    true,
+							Description: "The path used when checking by HTTP",
 						},
 						"port": {
-							Type:     schema.TypeInt,
-							Computed: true,
+							Type:        schema.TypeInt,
+							Computed:    true,
+							Description: "The port number used when checking by TCP",
 						},
 					},
 				},
@@ -150,13 +144,15 @@ func dataSourceSakuraCloudProxyLB() *schema.Resource {
 				Computed: true,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
-						"ipaddress": {
-							Type:     schema.TypeString,
-							Computed: true,
+						"ip_address": {
+							Type:        schema.TypeString,
+							Computed:    true,
+							Description: "The IP address of the SorryServer. This will be used when all servers are down",
 						},
 						"port": {
-							Type:     schema.TypeInt,
-							Computed: true,
+							Type:        schema.TypeInt,
+							Computed:    true,
+							Description: "The port number of the SorryServer. This will be used when all servers are down",
 						},
 					},
 				},
@@ -167,33 +163,39 @@ func dataSourceSakuraCloudProxyLB() *schema.Resource {
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
 						"server_cert": {
-							Type:     schema.TypeString,
-							Computed: true,
+							Type:        schema.TypeString,
+							Computed:    true,
+							Description: "The certificate for a server",
 						},
 						"intermediate_cert": {
-							Type:     schema.TypeString,
-							Computed: true,
+							Type:        schema.TypeString,
+							Computed:    true,
+							Description: "The intermediate certificate for a server",
 						},
 						"private_key": {
-							Type:     schema.TypeString,
-							Computed: true,
+							Type:        schema.TypeString,
+							Computed:    true,
+							Description: "The private key for a server",
 						},
-						"additional_certificates": {
+						"additional_certificate": {
 							Type:     schema.TypeList,
-							Optional: true,
+							Computed: true,
 							Elem: &schema.Resource{
 								Schema: map[string]*schema.Schema{
 									"server_cert": {
-										Type:     schema.TypeString,
-										Computed: true,
+										Type:        schema.TypeString,
+										Computed:    true,
+										Description: "The certificate for a server",
 									},
 									"intermediate_cert": {
-										Type:     schema.TypeString,
-										Computed: true,
+										Type:        schema.TypeString,
+										Computed:    true,
+										Description: "The intermediate certificate for a server",
 									},
 									"private_key": {
-										Type:     schema.TypeString,
-										Computed: true,
+										Type:        schema.TypeString,
+										Computed:    true,
+										Description: "The private key for a server",
 									},
 								},
 							},
@@ -201,103 +203,104 @@ func dataSourceSakuraCloudProxyLB() *schema.Resource {
 					},
 				},
 			},
-			"servers": {
+			"server": {
 				Type:     schema.TypeList,
 				Computed: true,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
-						"ipaddress": {
-							Type:     schema.TypeString,
-							Computed: true,
+						"ip_address": {
+							Type:        schema.TypeString,
+							Computed:    true,
+							Description: "The IP address of the destination server",
 						},
 						"port": {
-							Type:     schema.TypeInt,
-							Computed: true,
+							Type:        schema.TypeInt,
+							Computed:    true,
+							Description: "The port number of the destination server",
+						},
+						"group": {
+							Type:        schema.TypeString,
+							Computed:    true,
+							Description: "The name of load balancing group. This is used when using rule-based load balancing",
 						},
 						"enabled": {
-							Type:     schema.TypeBool,
-							Computed: true,
+							Type:        schema.TypeBool,
+							Computed:    true,
+							Description: "The flag to enable as destination of load balancing",
 						},
 					},
 				},
 			},
-			"icon_id": {
-				Type:     schema.TypeString,
-				Computed: true,
-			},
-			"description": {
-				Type:     schema.TypeString,
-				Computed: true,
-			},
-			"tags": {
+			"rule": {
 				Type:     schema.TypeList,
 				Computed: true,
-				Elem:     &schema.Schema{Type: schema.TypeString},
+				Elem: &schema.Resource{
+					Schema: map[string]*schema.Schema{
+						"host": {
+							Type:        schema.TypeString,
+							Computed:    true,
+							Description: "The value of HTTP host header that is used as condition of rule-based balancing",
+						},
+						"path": {
+							Type:        schema.TypeString,
+							Computed:    true,
+							Description: "The request path that is used as condition of rule-based balancing",
+						},
+						"group": {
+							Type:        schema.TypeString,
+							Computed:    true,
+							Description: "The name of load balancing group. When proxyLB received request which matched to `host` and `path`, proxyLB forwards the request to servers that having same group name",
+						},
+					},
+				},
 			},
+			"icon_id":     schemaDataSourceIconID(resourceName),
+			"description": schemaDataSourceDescription(resourceName),
+			"tags":        schemaDataSourceTags(resourceName),
 			"fqdn": {
-				Type:     schema.TypeString,
-				Computed: true,
+				Type:        schema.TypeString,
+				Computed:    true,
+				Description: descf("The FQDN for accessing to the %s. This is typically used as value of CNAME record", resourceName),
 			},
 			"vip": {
-				Type:     schema.TypeString,
-				Computed: true,
+				Type:        schema.TypeString,
+				Computed:    true,
+				Description: descf("The virtual IP address assigned to the %s", resourceName),
 			},
 			"proxy_networks": {
-				Type:     schema.TypeList,
-				Elem:     &schema.Schema{Type: schema.TypeString},
-				Computed: true,
+				Type:        schema.TypeList,
+				Elem:        &schema.Schema{Type: schema.TypeString},
+				Computed:    true,
+				Description: descf("A list of CIDR block used by the %s to access the server", resourceName),
 			},
 		},
 	}
 }
 
 func dataSourceSakuraCloudProxyLBRead(d *schema.ResourceData, meta interface{}) error {
-	client := getSacloudAPIClient(d, meta)
-
-	//filters
-	if rawFilter, filterOk := d.GetOk("filter"); filterOk {
-		filters := expandFilters(rawFilter)
-		for key, f := range filters {
-			client.ProxyLB.FilterBy(key, f)
-		}
-	}
-
-	res, err := client.ProxyLB.Find()
+	client, _, err := sakuraCloudClient(d, meta)
 	if err != nil {
-		return fmt.Errorf("Couldn't find SakuraCloud ProxyLB resource: %s", err)
+		return err
 	}
-	if res == nil || res.Count == 0 {
+	ctx, cancel := operationContext(d, schema.TimeoutRead)
+	defer cancel()
+
+	searcher := sacloud.NewProxyLBOp(client)
+
+	findCondition := &sacloud.FindCondition{}
+	if rawFilter, ok := d.GetOk(filterAttrName); ok {
+		findCondition.Filter = expandSearchFilter(rawFilter)
+	}
+
+	res, err := searcher.Find(ctx, findCondition)
+	if err != nil {
+		return fmt.Errorf("could not find SakuraCloud ProxyLB resource: %s", err)
+	}
+	if res == nil || res.Count == 0 || len(res.ProxyLBs) == 0 {
 		return filterNoResultErr()
 	}
-	var data *sacloud.ProxyLB
-	targets := res.CommonServiceProxyLBItems
 
-	if rawNameSelector, ok := d.GetOk("name_selectors"); ok {
-		selectors := expandStringList(rawNameSelector.([]interface{}))
-		var filtered []sacloud.ProxyLB
-		for _, a := range targets {
-			if hasNames(&a, selectors) {
-				filtered = append(filtered, a)
-			}
-		}
-		targets = filtered
-	}
-	if rawTagSelector, ok := d.GetOk("tag_selectors"); ok {
-		selectors := expandStringList(rawTagSelector.([]interface{}))
-		var filtered []sacloud.ProxyLB
-		for _, a := range targets {
-			if hasTags(&a, selectors) {
-				filtered = append(filtered, a)
-			}
-		}
-		targets = filtered
-	}
-
-	if len(targets) == 0 {
-		return filterNoResultErr()
-	}
-	data = &targets[0]
-
-	d.SetId(data.GetStrID())
-	return setProxyLBResourceData(d, client, data)
+	targets := res.ProxyLBs
+	d.SetId(targets[0].ID.String())
+	return setProxyLBResourceData(ctx, d, client, targets[0])
 }

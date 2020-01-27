@@ -15,172 +15,154 @@
 package sakuracloud
 
 import (
-	"encoding/base64"
+	"context"
 	"fmt"
-	"io/ioutil"
-	"os"
+	"time"
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
-	homedir "github.com/mitchellh/go-homedir"
-	"github.com/sacloud/libsacloud/api"
-	"github.com/sacloud/libsacloud/sacloud"
+	"github.com/sacloud/libsacloud/v2/sacloud"
 )
 
 func resourceSakuraCloudIcon() *schema.Resource {
+	resourceName := "Icon"
 	return &schema.Resource{
 		Create: resourceSakuraCloudIconCreate,
 		Read:   resourceSakuraCloudIconRead,
 		Update: resourceSakuraCloudIconUpdate,
 		Delete: resourceSakuraCloudIconDelete,
-		Importer: &schema.ResourceImporter{
-			State: schema.ImportStatePassthrough,
+
+		Timeouts: &schema.ResourceTimeout{
+			Create: schema.DefaultTimeout(5 * time.Minute),
+			Update: schema.DefaultTimeout(5 * time.Minute),
+			Delete: schema.DefaultTimeout(5 * time.Minute),
 		},
-		CustomizeDiff: hasTagResourceCustomizeDiff,
+
 		Schema: map[string]*schema.Schema{
-			"name": {
-				Type:     schema.TypeString,
-				Required: true,
-			},
+			"name": schemaResourceName(resourceName),
 			"source": {
 				Type:          schema.TypeString,
 				Optional:      true,
 				ConflictsWith: []string{"base64content"},
 				ForceNew:      true,
+				Description: descf(
+					"The file path to upload to as the Icon. %s",
+					descConflicts("base64content"),
+				),
 			},
 			"base64content": {
 				Type:          schema.TypeString,
 				Optional:      true,
 				ConflictsWith: []string{"source"},
 				ForceNew:      true,
+				Description: descf(
+					"The base64 encoded content to upload to as the Icon. %s",
+					descConflicts("source"),
+				),
 			},
-			"body": {
-				Type:     schema.TypeString,
-				Computed: true,
-			},
-			"tags": {
-				Type:     schema.TypeList,
-				Optional: true,
-				Computed: true,
-				Elem:     &schema.Schema{Type: schema.TypeString},
-			},
+			"tags": schemaResourceTags(resourceName),
 			"url": {
-				Type:     schema.TypeString,
-				Computed: true,
+				Type:        schema.TypeString,
+				Computed:    true,
+				Description: "The URL for getting the icon's raw data",
 			},
 		},
 	}
 }
 
 func resourceSakuraCloudIconCreate(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*APIClient)
-
-	opts := client.Icon.New()
-
-	opts.Name = d.Get("name").(string)
-
-	var body string
-	if v, ok := d.GetOk("source"); ok {
-		source := v.(string)
-		path, err := homedir.Expand(source)
-		if err != nil {
-			return fmt.Errorf("Error expanding homedir in source (%s): %s", source, err)
-		}
-		file, err := os.Open(path)
-		if err != nil {
-			return fmt.Errorf("Error opening SakuraCloud Icon source (%s): %s", source, err)
-		}
-		data, err := ioutil.ReadAll(file)
-		if err != nil {
-			return fmt.Errorf("Error opening SakuraCloud Icon source : %s", err)
-		}
-		body = base64.StdEncoding.EncodeToString(data)
-	} else if v, ok := d.GetOk("base64content"); ok {
-		body = v.(string)
-	} else {
-		return fmt.Errorf("Must specify \"source\" or \"base64content\" field")
-	}
-	opts.SetImage(body)
-
-	if rawTags, ok := d.GetOk("tags"); ok {
-		if rawTags != nil {
-			opts.Tags = expandTags(client, rawTags.([]interface{}))
-		}
-	}
-
-	icon, err := client.Icon.Create(opts)
+	client, _, err := sakuraCloudClient(d, meta)
 	if err != nil {
-		return fmt.Errorf("Failed to create SakuraCloud Icon resource: %s", err)
+		return err
+	}
+	ctx, cancel := operationContext(d, schema.TimeoutCreate)
+	defer cancel()
+
+	iconOp := sacloud.NewIconOp(client)
+
+	req, err := expandIconCreateRequest(d)
+	if err != nil {
+		return fmt.Errorf("creating SakuraCloud Icon is failed: %s", err)
+	}
+	icon, err := iconOp.Create(ctx, req)
+	if err != nil {
+		return fmt.Errorf("creating SakuraCloud Icon is failed: %s", err)
 	}
 
-	d.SetId(icon.GetStrID())
+	d.SetId(icon.ID.String())
 	return resourceSakuraCloudIconRead(d, meta)
 }
 
 func resourceSakuraCloudIconRead(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*APIClient)
-	icon, err := client.Icon.Read(toSakuraCloudID(d.Id()))
+	client, _, err := sakuraCloudClient(d, meta)
 	if err != nil {
-		if sacloudErr, ok := err.(api.Error); ok && sacloudErr.ResponseCode() == 404 {
+		return err
+	}
+	ctx, cancel := operationContext(d, schema.TimeoutRead)
+	defer cancel()
+
+	iconOp := sacloud.NewIconOp(client)
+
+	icon, err := iconOp.Read(ctx, sakuraCloudID(d.Id()))
+	if err != nil {
+		if sacloud.IsNotFoundError(err) {
 			d.SetId("")
 			return nil
 		}
-		return fmt.Errorf("Couldn't find SakuraCloud Icon resource: %s", err)
+		return fmt.Errorf("could not read SakuraCloud Icon[%s]: %s", d.Id(), err)
 	}
 
-	return setIconResourceData(d, client, icon)
+	return setIconResourceData(ctx, d, client, icon)
 }
 
 func resourceSakuraCloudIconUpdate(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*APIClient)
-
-	icon, err := client.Icon.Read(toSakuraCloudID(d.Id()))
+	client, _, err := sakuraCloudClient(d, meta)
 	if err != nil {
-		return fmt.Errorf("Couldn't find SakuraCloud Icon resource: %s", err)
+		return err
 	}
+	ctx, cancel := operationContext(d, schema.TimeoutUpdate)
+	defer cancel()
 
-	if d.HasChange("name") {
-		icon.Name = d.Get("name").(string)
-	}
+	iconOp := sacloud.NewIconOp(client)
 
-	if d.HasChange("tags") {
-		rawTags := d.Get("tags").([]interface{})
-		if rawTags != nil {
-			icon.Tags = expandTags(client, rawTags)
-		} else {
-			icon.Tags = expandTags(client, []interface{}{})
-		}
-	}
-
-	icon, err = client.Icon.Update(icon.ID, icon)
+	_, err = iconOp.Read(ctx, sakuraCloudID(d.Id()))
 	if err != nil {
-		return fmt.Errorf("Error updating SakuraCloud Icon resource: %s", err)
+		return fmt.Errorf("could not read SakuraCloud Icon[%s]: %s", d.Id(), err)
+	}
+
+	_, err = iconOp.Update(ctx, sakuraCloudID(d.Id()), expandIconUpdateRequest(d))
+	if err != nil {
+		return fmt.Errorf("updating SakuraCloud Icon[%s] is failed: %s", d.Id(), err)
 	}
 	return resourceSakuraCloudIconRead(d, meta)
 }
 
 func resourceSakuraCloudIconDelete(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*APIClient)
-
-	_, err := client.Icon.Delete(toSakuraCloudID(d.Id()))
+	client, _, err := sakuraCloudClient(d, meta)
 	if err != nil {
-		return fmt.Errorf("Error deleting SakuraCloud Icon resource: %s", err)
+		return err
+	}
+	ctx, cancel := operationContext(d, schema.TimeoutDelete)
+	defer cancel()
+
+	iconOp := sacloud.NewIconOp(client)
+
+	icon, err := iconOp.Read(ctx, sakuraCloudID(d.Id()))
+	if err != nil {
+		if sacloud.IsNotFoundError(err) {
+			d.SetId("")
+			return nil
+		}
+		return fmt.Errorf("could not read SakuraCloud Icon[%s]: %s", d.Id(), err)
 	}
 
+	if err := iconOp.Delete(ctx, icon.ID); err != nil {
+		return fmt.Errorf("deleting SakuraCloud Icon[%s] is failed: %s", d.Id(), err)
+	}
 	return nil
 }
 
-func setIconResourceData(d *schema.ResourceData, client *APIClient, data *sacloud.Icon) error {
-
-	d.Set("name", data.Name)
-
-	body, err := client.Icon.GetImage(data.ID, "small")
-	if err != nil {
-		return fmt.Errorf("Error reading SakuraCloud Icon Resource: %s", err)
-	}
-
-	d.Set("body", body)
-	d.Set("tags", data.Tags)
-	d.Set("url", data.URL)
-
-	return nil
+func setIconResourceData(ctx context.Context, d *schema.ResourceData, client *APIClient, data *sacloud.Icon) error {
+	d.Set("name", data.Name) // nolint
+	d.Set("url", data.URL)   // nolint
+	return d.Set("tags", flattenTags(data.Tags))
 }

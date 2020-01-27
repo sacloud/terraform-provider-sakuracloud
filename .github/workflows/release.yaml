@@ -25,9 +25,7 @@ jobs:
         uses: actions/checkout@v1
 
       - name: Setup tools
-        run: |
-          go get github.com/x-motemen/gobump/cmd/gobump
-          make tools
+        run: make tools
 
       - name: make build-x
         run: make build-x

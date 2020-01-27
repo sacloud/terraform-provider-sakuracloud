@@ -18,216 +18,138 @@ import (
 	"fmt"
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
-	"github.com/sacloud/libsacloud/sacloud"
+	"github.com/sacloud/libsacloud/v2/sacloud"
+	"github.com/sacloud/libsacloud/v2/sacloud/types"
 )
 
 func dataSourceSakuraCloudServer() *schema.Resource {
+	resourceName := "Server"
+
 	return &schema.Resource{
 		Read: dataSourceSakuraCloudServerRead,
 
 		Schema: map[string]*schema.Schema{
-			"name_selectors": {
-				Type:     schema.TypeList,
-				Optional: true,
-				ForceNew: true,
-				Elem:     &schema.Schema{Type: schema.TypeString},
-			},
-			"tag_selectors": {
-				Type:     schema.TypeList,
-				Optional: true,
-				ForceNew: true,
-				Elem:     &schema.Schema{Type: schema.TypeString},
-			},
-			"filter": {
-				Type:     schema.TypeSet,
-				Optional: true,
-				ForceNew: true,
-				Elem: &schema.Resource{
-					Schema: map[string]*schema.Schema{
-						"name": {
-							Type:     schema.TypeString,
-							Required: true,
-						},
-
-						"values": {
-							Type:     schema.TypeList,
-							Required: true,
-							Elem:     &schema.Schema{Type: schema.TypeString},
-						},
-					},
-				},
-			},
-			"name": {
-				Type:     schema.TypeString,
-				Computed: true,
-			},
+			filterAttrName: filterSchema(&filterSchemaOption{}),
+			"name":         schemaDataSourceName(resourceName),
 			"core": {
-				Type:     schema.TypeInt,
-				Computed: true,
+				Type:        schema.TypeInt,
+				Computed:    true,
+				Description: "The number of virtual CPUs",
 			},
 			"memory": {
-				Type:     schema.TypeInt,
-				Computed: true,
+				Type:        schema.TypeInt,
+				Computed:    true,
+				Description: "The size of memory in GiB",
 			},
 			"commitment": {
 				Type:     schema.TypeString,
 				Computed: true,
+				Description: descf(
+					"The policy of how to allocate virtual CPUs to the server. This will be one of [%s]",
+					types.CommitmentStrings,
+				),
 			},
 			"disks": {
-				Type:     schema.TypeList,
-				Computed: true,
-				Elem:     &schema.Schema{Type: schema.TypeString},
+				Type:        schema.TypeList,
+				Computed:    true,
+				Elem:        &schema.Schema{Type: schema.TypeString},
+				Description: "A list of disk id connected to the server",
 			},
 			"interface_driver": {
 				Type:     schema.TypeString,
 				Computed: true,
+				Description: descf(
+					"The driver name of network interface. This will be one of [%s]",
+					types.InterfaceDriverStrings,
+				),
 			},
-			"nic": {
-				Type:     schema.TypeString,
+			"network_interface": {
+				Type:     schema.TypeList,
 				Computed: true,
-			},
-			"display_ipaddress": {
-				Type:     schema.TypeString,
-				Computed: true,
+				Elem: &schema.Resource{
+					Schema: map[string]*schema.Schema{
+						"upstream": {
+							Type:     schema.TypeString,
+							Computed: true,
+							Description: descf(
+								"The upstream type or upstream switch id. This will be one of [%s]",
+								[]string{"shared", "disconnect", "<switch id>"},
+							),
+						},
+						"packet_filter_id": {
+							Type:        schema.TypeString,
+							Computed:    true,
+							Description: "The id of the packet filter attached to the network interface",
+						},
+						"mac_address": {
+							Type:        schema.TypeString,
+							Computed:    true,
+							Description: "The MAC address",
+						},
+					},
+				},
 			},
 			"cdrom_id": {
-				Type:     schema.TypeString,
-				Computed: true,
+				Type:        schema.TypeString,
+				Computed:    true,
+				Description: "The id of the CD-ROM attached to the server",
 			},
 			"private_host_id": {
-				Type:     schema.TypeString,
-				Computed: true,
+				Type:        schema.TypeString,
+				Computed:    true,
+				Description: "The id of the private host which the server is assigned",
 			},
 			"private_host_name": {
-				Type:     schema.TypeString,
-				Computed: true,
+				Type:        schema.TypeString,
+				Computed:    true,
+				Description: "The name of the private host which the server is assigned",
 			},
-			"additional_nics": {
-				Type:     schema.TypeList,
-				Computed: true,
-				Elem:     &schema.Schema{Type: schema.TypeString},
-			},
-			"additional_display_ipaddresses": {
-				Type:     schema.TypeList,
-				Computed: true,
-				Elem:     &schema.Schema{Type: schema.TypeString},
-			},
-			"packet_filter_ids": {
-				Type:     schema.TypeList,
-				Computed: true,
-				Elem:     &schema.Schema{Type: schema.TypeString},
-			},
-			"icon_id": {
-				Type:     schema.TypeString,
-				Computed: true,
-			},
-			"description": {
-				Type:     schema.TypeString,
-				Computed: true,
-			},
-			"tags": {
-				Type:     schema.TypeList,
-				Computed: true,
-				Elem:     &schema.Schema{Type: schema.TypeString},
-			},
-			"zone": {
-				Type:         schema.TypeString,
-				Optional:     true,
-				Computed:     true,
-				ForceNew:     true,
-				Description:  "target SakuraCloud zone",
-				ValidateFunc: validateZone([]string{"is1a", "is1b", "tk1a", "tk1v"}),
-			},
-			"macaddresses": {
-				Type:     schema.TypeList,
-				Computed: true,
-				Elem:     &schema.Schema{Type: schema.TypeString},
-			},
-			"ipaddress": {
-				Type:     schema.TypeString,
-				Computed: true,
+			"icon_id":     schemaDataSourceIconID(resourceName),
+			"description": schemaDataSourceDescription(resourceName),
+			"tags":        schemaDataSourceTags(resourceName),
+			"zone":        schemaDataSourceZone(resourceName),
+			"ip_address":  schemaDataSourceIPAddress(resourceName),
+			"gateway":     schemaDataSourceGateway(resourceName),
+			"netmask":     schemaDataSourceNetMask(resourceName),
+			"network_address": {
+				Type:        schema.TypeString,
+				Computed:    true,
+				Description: "The network address which the `ip_address` belongs",
 			},
 			"dns_servers": {
-				Type:     schema.TypeList,
-				Computed: true,
-				Elem:     &schema.Schema{Type: schema.TypeString},
-			},
-			"gateway": {
-				Type:     schema.TypeString,
-				Computed: true,
-			},
-			"nw_address": {
-				Type:     schema.TypeString,
-				Computed: true,
-			},
-			"nw_mask_len": {
-				Type:     schema.TypeString,
-				Computed: true,
-			},
-			"vnc_host": {
-				Type:     schema.TypeString,
-				Computed: true,
-			},
-			"vnc_port": {
-				Type:     schema.TypeInt,
-				Computed: true,
-			},
-			"vnc_password": {
-				Type:      schema.TypeString,
-				Computed:  true,
-				Sensitive: true,
+				Type:        schema.TypeList,
+				Computed:    true,
+				Elem:        &schema.Schema{Type: schema.TypeString},
+				Description: "A list of IP address of DNS server in the zone",
 			},
 		},
 	}
 }
 
 func dataSourceSakuraCloudServerRead(d *schema.ResourceData, meta interface{}) error {
-	client := getSacloudAPIClient(d, meta)
-
-	//filters
-	if rawFilter, filterOk := d.GetOk("filter"); filterOk {
-		filters := expandFilters(rawFilter)
-		for key, f := range filters {
-			client.Server.FilterBy(key, f)
-		}
-	}
-
-	res, err := client.Server.Find()
+	client, zone, err := sakuraCloudClient(d, meta)
 	if err != nil {
-		return fmt.Errorf("Couldn't find SakuraCloud Server resource: %s", err)
+		return err
 	}
-	if res == nil || res.Count == 0 {
+	ctx, cancel := operationContext(d, schema.TimeoutRead)
+	defer cancel()
+
+	searcher := sacloud.NewServerOp(client)
+
+	findCondition := &sacloud.FindCondition{}
+	if rawFilter, ok := d.GetOk(filterAttrName); ok {
+		findCondition.Filter = expandSearchFilter(rawFilter)
+	}
+
+	res, err := searcher.Find(ctx, zone, findCondition)
+	if err != nil {
+		return fmt.Errorf("could not find SakuraCloud Server resource: %s", err)
+	}
+	if res == nil || res.Count == 0 || len(res.Servers) == 0 {
 		return filterNoResultErr()
 	}
-	var data *sacloud.Server
+
 	targets := res.Servers
-
-	if rawNameSelector, ok := d.GetOk("name_selectors"); ok {
-		selectors := expandStringList(rawNameSelector.([]interface{}))
-		var filtered []sacloud.Server
-		for _, a := range targets {
-			if hasNames(&a, selectors) {
-				filtered = append(filtered, a)
-			}
-		}
-		targets = filtered
-	}
-	if rawTagSelector, ok := d.GetOk("tag_selectors"); ok {
-		selectors := expandStringList(rawTagSelector.([]interface{}))
-		var filtered []sacloud.Server
-		for _, a := range targets {
-			if hasTags(&a, selectors) {
-				filtered = append(filtered, a)
-			}
-		}
-		targets = filtered
-	}
-
-	if len(targets) == 0 {
-		return filterNoResultErr()
-	}
-	data = &targets[0]
-
-	d.SetId(data.GetStrID())
-	return setServerResourceData(d, client, data)
+	d.SetId(targets[0].ID.String())
+	return setServerResourceData(ctx, d, client, targets[0])
 }

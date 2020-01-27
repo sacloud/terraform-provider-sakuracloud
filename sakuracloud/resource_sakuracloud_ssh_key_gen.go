@@ -16,17 +16,25 @@ package sakuracloud
 
 import (
 	"fmt"
+	"time"
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/validation"
-	"github.com/sacloud/libsacloud/api"
+	"github.com/sacloud/libsacloud/v2/sacloud"
 )
 
 func resourceSakuraCloudSSHKeyGen() *schema.Resource {
+	resourceName := "SSHKey"
 	return &schema.Resource{
 		Create: resourceSakuraCloudSSHKeyGenCreate,
 		Read:   resourceSakuraCloudSSHKeyGenRead,
 		Delete: resourceSakuraCloudSSHKeyGenDelete,
+
+		Timeouts: &schema.ResourceTimeout{
+			Create: schema.DefaultTimeout(5 * time.Minute),
+			Update: schema.DefaultTimeout(5 * time.Minute),
+			Delete: schema.DefaultTimeout(5 * time.Minute),
+		},
 
 		Schema: map[string]*schema.Schema{
 			"name": {
@@ -34,102 +42,127 @@ func resourceSakuraCloudSSHKeyGen() *schema.Resource {
 				Required:     true,
 				ForceNew:     true,
 				ValidateFunc: validation.StringLenBetween(1, 64),
+				Description:  descf("The name of the %s. %s", resourceName, descLength(1, 64)),
 			},
 			"description": {
 				Type:         schema.TypeString,
 				Optional:     true,
 				ForceNew:     true,
 				ValidateFunc: validation.StringLenBetween(1, 512),
+				Description:  descf("The description of the %s. %s", resourceName, descLength(1, 512)),
 			},
 			"pass_phrase": {
 				Type:         schema.TypeString,
 				Optional:     true,
 				ForceNew:     true,
 				ValidateFunc: validation.StringLenBetween(8, 64),
+				Description: descf(
+					"The pass phrase of the private key. %s",
+					descLength(8, 64),
+				),
 			},
 			"private_key": {
-				Type:     schema.TypeString,
-				Computed: true,
+				Type:        schema.TypeString,
+				Computed:    true,
+				Description: "The body of the private key",
 			},
 			"public_key": {
-				Type:     schema.TypeString,
-				Computed: true,
+				Type:        schema.TypeString,
+				Computed:    true,
+				Description: "The body of the public key",
 			},
 			"fingerprint": {
-				Type:     schema.TypeString,
-				Computed: true,
+				Type:        schema.TypeString,
+				Computed:    true,
+				Description: "The fingerprint of the public key",
 			},
 		},
 	}
 }
 
 func resourceSakuraCloudSSHKeyGenCreate(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*APIClient)
-
-	name := d.Get("name").(string)
-	passPhrase := ""
-	if p, ok := d.GetOk("pass_phrase"); ok {
-		passPhrase = p.(string)
-	}
-
-	description := ""
-	if d, ok := d.GetOk("description"); ok {
-		description = d.(string)
-	}
-
-	key, err := client.SSHKey.Generate(name, passPhrase, description)
+	client, _, err := sakuraCloudClient(d, meta)
 	if err != nil {
-		return fmt.Errorf("Failed to create SakuraCloud SSHKey resource: %s", err)
+		return err
+	}
+	ctx, cancel := operationContext(d, schema.TimeoutCreate)
+	defer cancel()
+
+	sshKeyOp := sacloud.NewSSHKeyOp(client)
+
+	key, err := sshKeyOp.Generate(ctx, expandSSHKeyGenerateRequest(d))
+	if err != nil {
+		return fmt.Errorf("generating SSHKey is failed: %s", err)
 	}
 
-	d.SetId(key.GetStrID())
+	d.SetId(key.ID.String())
+
+	// Note: CreateのレスポンスにのみPrivateKeyが含まれる
 	return setSSHKeyGenResourceData(d, client, key)
 }
 
 func resourceSakuraCloudSSHKeyGenRead(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*APIClient)
-	key, err := client.SSHKey.Read(toSakuraCloudID(d.Id()))
+	client, _, err := sakuraCloudClient(d, meta)
 	if err != nil {
-		if sacloudErr, ok := err.(api.Error); ok && sacloudErr.ResponseCode() == 404 {
+		return err
+	}
+	ctx, cancel := operationContext(d, schema.TimeoutRead)
+	defer cancel()
+
+	sshKeyOp := sacloud.NewSSHKeyOp(client)
+
+	key, err := sshKeyOp.Read(ctx, sakuraCloudID(d.Id()))
+	if err != nil {
+		if sacloud.IsNotFoundError(err) {
 			d.SetId("")
 			return nil
 		}
-		return fmt.Errorf("Couldn't find SakuraCloud SSHKey resource: %s", err)
+		return fmt.Errorf("could not read SSHKey[%s]: %s", d.Id(), err)
 	}
 
 	return setSSHKeyGenResourceData(d, client, key)
 }
 
 func resourceSakuraCloudSSHKeyGenDelete(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*APIClient)
-
-	_, err := client.SSHKey.Delete(toSakuraCloudID(d.Id()))
+	client, _, err := sakuraCloudClient(d, meta)
 	if err != nil {
-		return fmt.Errorf("Error deleting SakuraCloud SSHKey resource: %s", err)
+		return err
+	}
+	ctx, cancel := operationContext(d, schema.TimeoutDelete)
+	defer cancel()
+
+	sshKeyOp := sacloud.NewSSHKeyOp(client)
+
+	key, err := sshKeyOp.Read(ctx, sakuraCloudID(d.Id()))
+	if err != nil {
+		if sacloud.IsNotFoundError(err) {
+			d.SetId("")
+			return nil
+		}
+		return fmt.Errorf("could not read SSHKey[%s]: %s", d.Id(), err)
 	}
 
+	if err := sshKeyOp.Delete(ctx, key.ID); err != nil {
+		return fmt.Errorf("deleting SSHKey[%s] is failed: %s", key.ID, err)
+	}
 	return nil
 }
 
 func setSSHKeyGenResourceData(d *schema.ResourceData, _ *APIClient, data interface{}) error {
-
 	if key, ok := data.(sshKeyType); ok {
-		d.Set("name", key.GetName())
-		d.Set("public_key", key.GetPublicKey())
-		d.Set("fingerprint", key.GetFingerprint())
-		d.Set("description", key.GetDescription())
+		d.Set("name", key.GetName())               // nolint
+		d.Set("public_key", key.GetPublicKey())    // nolint
+		d.Set("fingerprint", key.GetFingerprint()) // nolint
+		d.Set("description", key.GetDescription()) // nolint
 
-		// has private key?
 		if pKey, ok := data.(sshKeyGenType); ok {
-			d.Set("private_key", pKey.GetPrivateKey())
+			d.Set("private_key", pKey.GetPrivateKey()) // nolint
 		}
 	}
-
 	return nil
 }
 
 type sshKeyType interface {
-	GetStrID() string
 	GetName() string
 	GetPublicKey() string
 	GetFingerprint() string

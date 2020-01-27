@@ -15,14 +15,16 @@
 package sakuracloud
 
 import (
+	"context"
 	"fmt"
+	"time"
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
-	"github.com/sacloud/libsacloud/api"
-	"github.com/sacloud/libsacloud/sacloud"
+	"github.com/sacloud/libsacloud/v2/sacloud"
 )
 
 func resourceSakuraCloudBridge() *schema.Resource {
+	resourceName := "Bridge"
 	return &schema.Resource{
 		Create: resourceSakuraCloudBridgeCreate,
 		Read:   resourceSakuraCloudBridgeRead,
@@ -31,144 +33,122 @@ func resourceSakuraCloudBridge() *schema.Resource {
 		Importer: &schema.ResourceImporter{
 			State: schema.ImportStatePassthrough,
 		},
+
+		Timeouts: &schema.ResourceTimeout{
+			Create: schema.DefaultTimeout(20 * time.Minute),
+			Update: schema.DefaultTimeout(20 * time.Minute),
+			Delete: schema.DefaultTimeout(20 * time.Minute),
+		},
+
 		Schema: map[string]*schema.Schema{
-			"name": {
-				Type:     schema.TypeString,
-				Required: true,
-			},
-			"description": {
-				Type:     schema.TypeString,
-				Optional: true,
-			},
-			"switch_ids": {
-				Type:     schema.TypeList,
-				Computed: true,
-				Elem:     &schema.Schema{Type: schema.TypeString},
-			},
-			"zone": {
-				Type:         schema.TypeString,
-				Optional:     true,
-				Computed:     true,
-				ForceNew:     true,
-				Description:  "target SakuraCloud zone",
-				ValidateFunc: validateZone([]string{"is1a", "is1b", "tk1a"}),
-			},
+			"name":        schemaResourceName(resourceName),
+			"description": schemaResourceDescription(resourceName),
+			"zone":        schemaResourceZone(resourceName),
 		},
 	}
 }
 
 func resourceSakuraCloudBridgeCreate(d *schema.ResourceData, meta interface{}) error {
-	client := getSacloudAPIClient(d, meta)
-
-	opts := client.Bridge.New()
-
-	opts.Name = d.Get("name").(string)
-	if description, ok := d.GetOk("description"); ok {
-		opts.Description = description.(string)
-	}
-
-	bridge, err := client.Bridge.Create(opts)
+	client, zone, err := sakuraCloudClient(d, meta)
 	if err != nil {
-		return fmt.Errorf("Failed to create SakuraCloud Bridge resource: %s", err)
+		return err
+	}
+	ctx, cancel := operationContext(d, schema.TimeoutCreate)
+	defer cancel()
+
+	bridgeOp := sacloud.NewBridgeOp(client)
+
+	bridge, err := bridgeOp.Create(ctx, zone, &sacloud.BridgeCreateRequest{
+		Name:        d.Get("name").(string),
+		Description: d.Get("description").(string),
+	})
+	if err != nil {
+		return fmt.Errorf("creating SakuraCloud Bridge is failed: %s", err)
 	}
 
-	d.SetId(bridge.GetStrID())
+	d.SetId(bridge.ID.String())
 	return resourceSakuraCloudBridgeRead(d, meta)
 }
 
 func resourceSakuraCloudBridgeRead(d *schema.ResourceData, meta interface{}) error {
-	client := getSacloudAPIClient(d, meta)
-
-	bridge, err := client.Bridge.Read(toSakuraCloudID(d.Id()))
+	client, zone, err := sakuraCloudClient(d, meta)
 	if err != nil {
-		if sacloudErr, ok := err.(api.Error); ok && sacloudErr.ResponseCode() == 404 {
+		return err
+	}
+	ctx, cancel := operationContext(d, schema.TimeoutRead)
+	defer cancel()
+
+	bridgeOp := sacloud.NewBridgeOp(client)
+
+	bridge, err := bridgeOp.Read(ctx, zone, sakuraCloudID(d.Id()))
+	if err != nil {
+		if sacloud.IsNotFoundError(err) {
 			d.SetId("")
 			return nil
 		}
-		return fmt.Errorf("Couldn't find SakuraCloud Bridge resource: %s", err)
+		return fmt.Errorf("could not read SakuraCloud Bridge[%s]: %s", d.Id(), err)
 	}
-
-	return setBridgeResourceData(d, client, bridge)
+	return setBridgeResourceData(ctx, d, client, bridge)
 }
 
 func resourceSakuraCloudBridgeUpdate(d *schema.ResourceData, meta interface{}) error {
-	client := getSacloudAPIClient(d, meta)
-
-	bridge, err := client.Bridge.Read(toSakuraCloudID(d.Id()))
+	client, zone, err := sakuraCloudClient(d, meta)
 	if err != nil {
-		return fmt.Errorf("Couldn't find SakuraCloud Bridge resource: %s", err)
+		return err
 	}
+	ctx, cancel := operationContext(d, schema.TimeoutUpdate)
+	defer cancel()
 
-	if d.HasChange("name") {
-		bridge.Name = d.Get("name").(string)
-	}
-	if d.HasChange("description") {
-		if description, ok := d.GetOk("description"); ok {
-			bridge.Description = description.(string)
-		} else {
-			bridge.Description = ""
-		}
-	}
+	bridgeOp := sacloud.NewBridgeOp(client)
 
-	bridge, err = client.Bridge.Update(bridge.ID, bridge)
+	bridge, err := bridgeOp.Read(ctx, zone, sakuraCloudID(d.Id()))
 	if err != nil {
-		return fmt.Errorf("Error updating SakuraCloud Bridge resource: %s", err)
+		return fmt.Errorf("could not read SakuraCloud Bridge[%s]: %s", d.Id(), err)
 	}
 
+	bridge, err = bridgeOp.Update(ctx, zone, bridge.ID, &sacloud.BridgeUpdateRequest{
+		Name:        d.Get("name").(string),
+		Description: d.Get("description").(string),
+	})
+	if err != nil {
+		return fmt.Errorf("updating SakuraCloud Bridge[%s] is failed: %s", bridge.ID, err)
+	}
 	return resourceSakuraCloudBridgeRead(d, meta)
 }
 
 func resourceSakuraCloudBridgeDelete(d *schema.ResourceData, meta interface{}) error {
-	client := getSacloudAPIClient(d, meta)
-
-	br, err := client.Bridge.Read(toSakuraCloudID(d.Id()))
+	client, zone, err := sakuraCloudClient(d, meta)
 	if err != nil {
-		return fmt.Errorf("Couldn't find SakuraCloud Bridge resource: %s", err)
+		return err
 	}
+	ctx, cancel := operationContext(d, schema.TimeoutDelete)
+	defer cancel()
 
-	if br.Info != nil && br.Info.Switches != nil && len(br.Info.Switches) > 0 {
-		for _, s := range br.Info.Switches {
-			switchID, _ := s.ID.Int64()
-			strSwitchID := s.ID.String()
-			sakuraMutexKV.Lock(strSwitchID)
-			defer sakuraMutexKV.Unlock(strSwitchID)
+	bridgeOp := sacloud.NewBridgeOp(client)
 
-			if _, err := client.Switch.Read(switchID); err == nil {
-				_, err = client.Switch.DisconnectFromBridge(switchID)
-			}
-		}
-		if err != nil {
-			return fmt.Errorf("Error disconnecting Bridge resource: %s", err)
-		}
-	}
-
-	_, err = client.Bridge.Delete(toSakuraCloudID(d.Id()))
+	bridge, err := bridgeOp.Read(ctx, zone, sakuraCloudID(d.Id()))
 	if err != nil {
-		return fmt.Errorf("Error deleting SakuraCloud Bridge resource: %s", err)
+		if sacloud.IsNotFoundError(err) {
+			d.SetId("")
+			return nil
+		}
+		return fmt.Errorf("could not read SakuraCloud Bridge[%s]: %s", d.Id(), err)
 	}
+
+	if err := waitForDeletionByBridgeID(ctx, client, bridge.ID); err != nil {
+		return fmt.Errorf("waiting deletion is failed: Bridge[%s] still used by Switches: %s", bridge.ID, err)
+	}
+
+	if err := bridgeOp.Delete(ctx, zone, bridge.ID); err != nil {
+		return fmt.Errorf("deleting SakuraCloud Bridge[%s] is failed: %s", d.Id(), err)
+	}
+	d.SetId("")
 	return nil
 }
 
-func setBridgeResourceData(d *schema.ResourceData, client *APIClient, data *sacloud.Bridge) error {
-	d.Set("name", data.Name)
-	d.Set("description", data.Description)
-
-	var switchIDs []interface{}
-	if data.Info != nil && data.Info.Switches != nil && len(data.Info.Switches) > 0 {
-
-		for _, d := range data.Info.Switches {
-			swID := d.ID.String()
-			sakuraMutexKV.Lock(swID)
-			defer sakuraMutexKV.Unlock(swID)
-
-			id, _ := d.ID.Int64()
-			if _, err := client.Switch.Read(id); err == nil {
-				switchIDs = append(switchIDs, d.ID.String())
-			}
-		}
-	}
-	d.Set("switch_ids", switchIDs)
-
-	d.Set("zone", client.Zone)
+func setBridgeResourceData(ctx context.Context, d *schema.ResourceData, client *APIClient, data *sacloud.Bridge) error {
+	d.Set("name", data.Name)               // nolint
+	d.Set("description", data.Description) // nolint
+	d.Set("zone", getZone(d, client))      // nolint
 	return nil
 }

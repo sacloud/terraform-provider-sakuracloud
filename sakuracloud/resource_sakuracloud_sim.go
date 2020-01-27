@@ -15,21 +15,20 @@
 package sakuracloud
 
 import (
-	"errors"
+	"context"
 	"fmt"
+	"time"
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
-	"github.com/sacloud/libsacloud/api"
-	"github.com/sacloud/libsacloud/sacloud"
+	"github.com/sacloud/libsacloud/v2/sacloud"
+	"github.com/sacloud/libsacloud/v2/sacloud/types"
+	"github.com/sacloud/libsacloud/v2/utils/cleanup"
+	"github.com/sacloud/libsacloud/v2/utils/query"
 )
 
-var simCarrier = map[string]string{
-	"kddi":     sacloud.SIMOperatorsKDDI,
-	"docomo":   sacloud.SIMOperatorsDOCOMO,
-	"softbank": sacloud.SIMOperatorsSoftBank,
-}
-
 func resourceSakuraCloudSIM() *schema.Resource {
+	resourceName := "SIM"
+
 	return &schema.Resource{
 		Create: resourceSakuraCloudSIMCreate,
 		Read:   resourceSakuraCloudSIMRead,
@@ -38,25 +37,31 @@ func resourceSakuraCloudSIM() *schema.Resource {
 		Importer: &schema.ResourceImporter{
 			State: schema.ImportStatePassthrough,
 		},
-		CustomizeDiff: hasTagResourceCustomizeDiff,
+
+		Timeouts: &schema.ResourceTimeout{
+			Create: schema.DefaultTimeout(5 * time.Minute),
+			Update: schema.DefaultTimeout(5 * time.Minute),
+			Delete: schema.DefaultTimeout(5 * time.Minute),
+		},
+
 		Schema: map[string]*schema.Schema{
-			"name": {
-				Type:     schema.TypeString,
-				Required: true,
-			},
+			"name": schemaResourceName(resourceName),
 			"iccid": {
-				Type:     schema.TypeString,
-				Required: true,
-				ForceNew: true,
+				Type:        schema.TypeString,
+				Required:    true,
+				ForceNew:    true,
+				Description: "ICCID(Integrated Circuit Card ID) assigned to the SIM",
 			},
 			"passcode": {
-				Type:     schema.TypeString,
-				Required: true,
-				ForceNew: true,
+				Type:        schema.TypeString,
+				Required:    true,
+				ForceNew:    true,
+				Description: "The passcord to authenticate the SIM",
 			},
 			"imei": {
-				Type:     schema.TypeString,
-				Optional: true,
+				Type:        schema.TypeString,
+				Optional:    true,
+				Description: "The id of the device to restrict devices that can use the SIM",
 			},
 			"carrier": {
 				Type:     schema.TypeList,
@@ -64,403 +69,163 @@ func resourceSakuraCloudSIM() *schema.Resource {
 				Elem:     &schema.Schema{Type: schema.TypeString},
 				MinItems: 1,
 				MaxItems: 3,
+				Description: descf(
+					"A list of a communication company. Each element must be one of %s",
+					types.SIMOperatorShortNames(),
+				),
 			},
 			"enabled": {
-				Type:     schema.TypeBool,
-				Optional: true,
-				Default:  true,
+				Type:        schema.TypeBool,
+				Optional:    true,
+				Default:     true,
+				Description: "The flag to enable the SIM",
 			},
-			"description": {
-				Type:     schema.TypeString,
-				Optional: true,
-			},
-			"tags": {
-				Type:     schema.TypeList,
-				Optional: true,
-				Computed: true,
-				Elem:     &schema.Schema{Type: schema.TypeString},
-			},
-			"icon_id": {
-				Type:         schema.TypeString,
-				Optional:     true,
-				ValidateFunc: validateSakuracloudIDType,
-			},
+			"icon_id":     schemaResourceIconID(resourceName),
+			"description": schemaResourceDescription(resourceName),
+			"tags":        schemaResourceTags(resourceName),
 			"mobile_gateway_id": {
-				Type:         schema.TypeString,
-				Optional:     true,
-				ForceNew:     true,
-				ValidateFunc: validateSakuracloudIDType,
+				Type:        schema.TypeString,
+				Computed:    true,
+				Description: "The id of the MobileGateway which the SIM is assigned",
 			},
-			"ipaddress": {
-				Type:         schema.TypeString,
-				ValidateFunc: validateIPv4Address(),
-				Optional:     true,
+			"ip_address": {
+				Type:        schema.TypeString,
+				Computed:    true,
+				Description: "The IP address assigned to the SIM",
 			},
 		},
 	}
 }
 
 func resourceSakuraCloudSIMCreate(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*APIClient)
+	client, _, err := sakuraCloudClient(d, meta)
+	if err != nil {
+		return err
+	}
+	ctx, cancel := operationContext(d, schema.TimeoutCreate)
+	defer cancel()
 
 	if err := validateCarrier(d); err != nil {
 		return err
 	}
 
-	var mgwID int64
-	var ip string
-	if rawMgwID, ok := d.GetOk("mobile_gateway_id"); ok {
-		mgwID = toSakuraCloudID(rawMgwID.(string))
-		ip = d.Get("ipaddress").(string)
-	}
-	if mgwID > 0 && ip == "" {
-		return errors.New("SIM needs ipaddress when mobile_gateeway_id is specified")
+	builder := expandSIMBuilder(d, client)
+	if err := builder.Validate(ctx); err != nil {
+		return fmt.Errorf("validating SakuraCloud SIM is failed: %s", err)
 	}
 
-	name := d.Get("name").(string)
-	iccid := d.Get("iccid").(string)
-	passcode := d.Get("passcode").(string)
-
-	opts := client.SIM.New(name, iccid, passcode)
-
-	if iconID, ok := d.GetOk("icon_id"); ok {
-		opts.SetIconByID(toSakuraCloudID(iconID.(string)))
-	}
-	if description, ok := d.GetOk("description"); ok {
-		opts.Description = description.(string)
-	}
-	rawTags := d.Get("tags").([]interface{})
-	if rawTags != nil {
-		opts.Tags = expandTags(client, rawTags)
-	}
-
-	sim, err := client.SIM.Create(opts)
+	sim, err := builder.Build(ctx)
 	if err != nil {
-		return fmt.Errorf("Failed to create SakuraCloud SIM resource: %s", err)
+		return fmt.Errorf("creating SakuraCloud SIM is failed: %s", err)
 	}
 
-	// carriers
-	var carriers []*sacloud.SIMNetworkOperatorConfig
-	rawCarriers := d.Get("carrier").([]interface{})
-	for _, carrier := range rawCarriers {
-		carriers = append(carriers, &sacloud.SIMNetworkOperatorConfig{
-			Allow: true,
-			Name:  simCarrier[carrier.(string)],
-		})
-	}
-	if _, err := client.SIM.SetNetworkOperator(sim.ID, carriers...); err != nil {
-		return fmt.Errorf("Failed to create SakuraCloud SIM resource: %s", err)
-	}
-
-	// activate/deactivate
-	enabled := d.Get("enabled").(bool)
-	if enabled {
-		_, err = client.SIM.Activate(sim.ID)
-		if err != nil {
-			return fmt.Errorf("Failed to create SakuraCloud SIM resource: %s", err)
-		}
-	}
-
-	// imei lock
-	imei := d.Get("imei").(string)
-	if imei != "" {
-		_, err = client.SIM.IMEILock(sim.ID, imei)
-		if err != nil {
-			return fmt.Errorf("Failed to create SakuraCloud SIM resource: %s", err)
-		}
-	}
-
-	// connect to MobileGateway
-	if mgwID > 0 {
-		sakuraMutexKV.Lock(fmt.Sprintf("%d", mgwID))
-		defer sakuraMutexKV.Unlock(fmt.Sprintf("%d", mgwID))
-
-		_, err = client.MobileGateway.AddSIM(mgwID, sim.ID)
-		if err != nil {
-			return fmt.Errorf("Failed to create SakuraCloud SIM resource: %s", err)
-		}
-		_, err = client.SIM.AssignIP(sim.ID, ip)
-		if err != nil {
-			return fmt.Errorf("Failed to create SakuraCloud SIM resource: %s", err)
-		}
-	}
-
-	d.SetId(sim.GetStrID())
+	d.SetId(sim.ID.String())
 	return resourceSakuraCloudSIMRead(d, meta)
 }
 
 func resourceSakuraCloudSIMRead(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*APIClient)
-
-	var sim *sacloud.SIM
-	res, err := client.SIM.Reset().Include("*").Include("Status.sim").Find()
+	client, _, err := sakuraCloudClient(d, meta)
 	if err != nil {
-		return fmt.Errorf("Couldn't find SakuraCloud SIM resource: %s", err)
+		return err
 	}
-	for _, s := range res.CommonServiceSIMItems {
-		if s.ID == toSakuraCloudID(d.Id()) {
-			sim = &s
-			break
+	ctx, cancel := operationContext(d, schema.TimeoutRead)
+	defer cancel()
+
+	simOp := sacloud.NewSIMOp(client)
+
+	sim, err := query.FindSIMByID(ctx, simOp, sakuraCloudID(d.Id()))
+	if err != nil {
+		if sacloud.IsNotFoundError(err) {
+			d.SetId("")
+			return nil
 		}
+		return fmt.Errorf("could not read SakuraCloud SIM[%s]: %s", d.Id(), err)
 	}
-
-	if sim == nil {
-		d.SetId("")
-		return nil
-	}
-
-	return setSIMResourceData(d, client, sim)
+	return setSIMResourceData(ctx, d, client, sim)
 }
 
 func resourceSakuraCloudSIMUpdate(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*APIClient)
+	client, _, err := sakuraCloudClient(d, meta)
+	if err != nil {
+		return err
+	}
+	ctx, cancel := operationContext(d, schema.TimeoutUpdate)
+	defer cancel()
+
+	simOp := sacloud.NewSIMOp(client)
+
 	if err := validateCarrier(d); err != nil {
 		return err
 	}
 
-	var mgwID int64
-	var ip string
-	if rawMgwID, ok := d.GetOk("mobile_gateway_id"); ok {
-		mgwID = toSakuraCloudID(rawMgwID.(string))
-		ip = d.Get("ipaddress").(string)
-	}
-	if mgwID > 0 && ip == "" {
-		return errors.New("SIM needs ipaddress when mobile_gateeway_id is specified")
-	}
-
-	// read sim info
-	var sim *sacloud.SIM
-	res, err := client.SIM.Reset().Include("*").Include("Status.sim").Find()
+	sim, err := query.FindSIMByID(ctx, simOp, types.StringID(d.Id()))
 	if err != nil {
-		return fmt.Errorf("Couldn't find SakuraCloud SIM resource: %s", err)
-	}
-	for _, s := range res.CommonServiceSIMItems {
-		if s.ID == toSakuraCloudID(d.Id()) {
-			sim = &s
-			break
-		}
-	}
-	if sim == nil {
-		d.SetId("")
-		return nil
+		return fmt.Errorf("could not read SakuraCloud SIM[%s]: %s", d.Id(), err)
 	}
 
-	if d.HasChange("name") {
-		sim.Name = d.Get("name").(string)
+	builder := expandSIMBuilder(d, client)
+	if err := builder.Validate(ctx); err != nil {
+		return fmt.Errorf("validating SakuraCloud SIM[%s] is failed: %s", sim.ID, err)
 	}
 
-	if d.HasChange("icon_id") {
-		if iconID, ok := d.GetOk("icon_id"); ok {
-			sim.SetIconByID(toSakuraCloudID(iconID.(string)))
-		} else {
-			sim.ClearIcon()
-		}
-	}
-	if d.HasChange("description") {
-		if description, ok := d.GetOk("description"); ok {
-			sim.Description = description.(string)
-		} else {
-			sim.Description = ""
-		}
-	}
-	if d.HasChange("tags") {
-		rawTags := d.Get("tags").([]interface{})
-		if rawTags != nil {
-			sim.Tags = expandTags(client, rawTags)
-		} else {
-			sim.Tags = expandTags(client, []interface{}{})
-		}
-	}
-
-	_, err = client.SIM.Update(sim.ID, sim)
+	_, err = builder.Update(ctx, sim.ID)
 	if err != nil {
-		return fmt.Errorf("Failed to update SakuraCloud SIM resource: %s", err)
-	}
-
-	// carriers
-	if d.HasChange("carrier") {
-		var carriers []*sacloud.SIMNetworkOperatorConfig
-		rawCarriers := d.Get("carrier").([]interface{})
-		for _, carrier := range rawCarriers {
-			carriers = append(carriers, &sacloud.SIMNetworkOperatorConfig{
-				Allow: true,
-				Name:  simCarrier[carrier.(string)],
-			})
-		}
-		if _, err := client.SIM.SetNetworkOperator(sim.ID, carriers...); err != nil {
-			return fmt.Errorf("Failed to activate SakuraCloud SIM resource: %s", err)
-		}
-	}
-
-	// activate/deactivate
-	if d.HasChange("enabled") {
-		enabled := d.Get("enabled").(bool)
-		if enabled {
-			_, err = client.SIM.Activate(sim.ID)
-			if err != nil {
-				return fmt.Errorf("Failed to activate SakuraCloud SIM resource: %s", err)
-			}
-		}
-	}
-
-	// imei lock
-	if d.HasChange("imei") {
-		imei := d.Get("imei").(string)
-
-		if sim.Status.SIMInfo.IMEILock {
-			_, err = client.SIM.IMEIUnlock(sim.ID)
-			if err != nil {
-				return fmt.Errorf("Failed to IMEIUnlock: %s", err)
-			}
-		}
-
-		if imei != "" {
-			_, err = client.SIM.IMEILock(sim.ID, imei)
-			if err != nil {
-				return fmt.Errorf("Failed to IMEILock: %s", err)
-			}
-		}
-	}
-
-	// connect to MobileGateway
-	if d.HasChange("ipaddress") {
-		if sim.Status.SIMInfo.IP != "" {
-			_, err = client.SIM.ClearIP(sim.ID)
-			if err != nil {
-				return fmt.Errorf("Failed to ClearIP: %s", err)
-			}
-		}
-		_, err = client.SIM.AssignIP(sim.ID, ip)
-		if err != nil {
-			return fmt.Errorf("Failed to AssignIP: %s", err)
-		}
+		return fmt.Errorf("updating SakuraCloud SIM[%s] is failed: %s", sim.ID, err)
 	}
 
 	return resourceSakuraCloudSIMRead(d, meta)
-
 }
 
 func resourceSakuraCloudSIMDelete(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*APIClient)
-
-	var sim *sacloud.SIM
-	res, err := client.SIM.Reset().Include("*").Include("Status.sim").Find()
+	client, _, err := sakuraCloudClient(d, meta)
 	if err != nil {
-		return fmt.Errorf("Couldn't find SakuraCloud SIM resource: %s", err)
+		return err
 	}
-	for _, s := range res.CommonServiceSIMItems {
-		if s.ID == toSakuraCloudID(d.Id()) {
-			sim = &s
-			break
-		}
-	}
-	if sim == nil {
-		d.SetId("")
-		return nil
-	}
+	ctx, cancel := operationContext(d, schema.TimeoutDelete)
+	defer cancel()
 
-	mgwID := toSakuraCloudID(d.Get("mobile_gateway_id").(string))
-	if mgwID > 0 {
-		sakuraMutexKV.Lock(fmt.Sprintf("%d", mgwID))
-		defer sakuraMutexKV.Unlock(fmt.Sprintf("%d", mgwID))
+	simOp := sacloud.NewSIMOp(client)
 
-		mgw, err := client.MobileGateway.Read(mgwID)
-		if err != nil {
-			if sacloudErr, ok := err.(api.Error); ok && sacloudErr.ResponseCode() == 404 {
-				// noop
-			} else {
-				return fmt.Errorf("Couldn't find SakuraCloud MobileGateway resource: %s", err)
-			}
-		}
-		if mgw != nil {
-			sims, err := client.MobileGateway.ListSIM(mgwID, nil)
-			if err != nil {
-				return fmt.Errorf("Couldn't find SakuraCloud MobileGateway SIMs: %s", err)
-			}
-
-			for _, s := range sims {
-				if s.ResourceID == fmt.Sprintf("%d", sim.ID) {
-
-					if sim.Status.SIMInfo.Activated {
-						_, err = client.SIM.Deactivate(sim.ID)
-						if err != nil {
-							return fmt.Errorf("Failed to deactivate SakuraCloud SIM resource: %s", err)
-						}
-					}
-
-					if sim.Status.SIMInfo.IP != "" {
-						_, err = client.SIM.ClearIP(sim.ID)
-						if err != nil {
-							return fmt.Errorf("Failed to ClearIP SakuraCloud SIM resource: %s", err)
-						}
-					}
-					_, err = client.MobileGateway.DeleteSIM(mgwID, sim.ID)
-					if err != nil {
-						return fmt.Errorf("Couldn't deleteSIM from MobileGateway: %s", err)
-					}
-					break
-				}
-			}
-		}
-	}
-
-	_, err = client.SIM.Delete(toSakuraCloudID(d.Id()))
+	// read sim info
+	sim, err := query.FindSIMByID(ctx, simOp, sakuraCloudID(d.Id()))
 	if err != nil {
-		return fmt.Errorf("Error deleting SakuraCloud SIM resource: %s", err)
+		if sacloud.IsNotFoundError(err) {
+			d.SetId("")
+			return nil
+		}
+		return fmt.Errorf("could not read SakuraCloud SIM[%s]: %s", d.Id(), err)
+	}
+
+	if err := waitForDeletionBySIMID(ctx, client, sim.ID); err != nil {
+		return fmt.Errorf("waiting deletion is failed: SIM[%s] still used by MobileGateway: %s", sim.ID, err)
+	}
+
+	if err := cleanup.DeleteSIM(ctx, simOp, sim.ID); err != nil {
+		return fmt.Errorf("deleting SIM[%s] is failed: %s", sim.ID, err)
 	}
 
 	return nil
 }
 
-func setSIMResourceData(d *schema.ResourceData, client *APIClient, data *sacloud.SIM) error {
+func setSIMResourceData(ctx context.Context, d *schema.ResourceData, client *APIClient, data *sacloud.SIM) error {
+	simOp := sacloud.NewSIMOp(client)
 
-	d.Set("name", data.Name)
-	d.Set("icon_id", data.GetIconStrID())
-	d.Set("description", data.Description)
-	d.Set("tags", data.Tags)
-	d.Set("iccid", data.Status.ICCID)
-
-	if data.Status.SIMInfo != nil {
-		d.Set("ipaddress", data.Status.SIMInfo.IP)
-	}
-
-	carrierInfo, err := client.SIM.GetNetworkOperator(data.ID)
+	carrierInfo, err := simOp.GetNetworkOperator(ctx, data.ID)
 	if err != nil {
-		return fmt.Errorf("Error reading SakuraCloud SIM resource: %s", err)
-	}
-	var carriers []string
-	for _, c := range carrierInfo.NetworkOperatorConfigs {
-		if !c.Allow {
-			continue
-		}
-		for k, v := range simCarrier {
-			if v == c.Name {
-				carriers = append(carriers, k)
-			}
-		}
-	}
-	d.Set("carrier", carriers)
-
-	return nil
-}
-
-func validateCarrier(d *schema.ResourceData) error {
-
-	carrier, ok := d.GetOk("carrier")
-	if !ok {
-		return errors.New("carrier is required")
+		return fmt.Errorf("reading SIM[%s] NetworkOperator is failed: %s", data.ID, err)
 	}
 
-	for _, c := range carrier.([]interface{}) {
-		if c == nil {
-			return errors.New(`carrier[""] is invalid`)
-		}
-
-		c := c.(string)
-		if _, ok := simCarrier[c]; !ok {
-			return fmt.Errorf("carrier[%q] is invalid", c)
-		}
+	d.Set("name", data.Name)               // nolint
+	d.Set("icon_id", data.IconID.String()) // nolint
+	d.Set("description", data.Description) // nolint
+	d.Set("iccid", data.ICCID)             // nolint
+	if data.Info != nil {
+		d.Set("ip_address", data.Info.IP)                // nolint
+		d.Set("mobile_gateway_id", data.Info.SIMGroupID) // nolint
+	}
+	if err := d.Set("carrier", flattenSIMCarrier(carrierInfo)); err != nil {
+		return err
 	}
 
-	return nil
+	return d.Set("tags", flattenTags(data.Tags))
 }

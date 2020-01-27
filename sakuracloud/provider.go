@@ -19,185 +19,218 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/validation"
 	"github.com/hashicorp/terraform-plugin-sdk/terraform"
+	"github.com/sacloud/libsacloud/v2/sacloud/profile"
 )
 
 var (
-	defaultZone          = "is1b"
-	defaultRetryMax      = 10
-	defaultRetryInterval = 5
+	defaultZone                = "is1b"
+	defaultRetryMax            = 10
+	defaultZones               = []string{"is1a", "is1b", "tk1a", "tk1v"}
+	defaultAPIRequestTimeout   = 300
+	defaultAPIRequestRateLimit = 10
 )
-
-var allowZones = []string{"is1a", "is1b", "tk1a", "tk1v"}
 
 // Provider returns a terraform.ResourceProvider.
 func Provider() terraform.ResourceProvider {
-	return &schema.Provider{
+	provider := &schema.Provider{
 		Schema: map[string]*schema.Schema{
+			"profile": {
+				Type:        schema.TypeString,
+				Optional:    true,
+				DefaultFunc: schema.EnvDefaultFunc("SAKURACLOUD_PROFILE", profile.DefaultProfileName),
+				Description: "The profile name of your SakuraCloud account. Default:`default`",
+			},
 			"token": {
 				Type:        schema.TypeString,
-				Required:    true,
+				Optional:    true,
 				DefaultFunc: schema.EnvDefaultFunc("SAKURACLOUD_ACCESS_TOKEN", nil),
-				Description: "Your SakuraCloud APIKey(token)",
+				Description: "The API token of your SakuraCloud account. It must be provided, but it can also be sourced from the `SAKURACLOUD_ACCESS_TOKEN` environment variables, or via a shared credentials file if `profile` is specified",
 			},
 			"secret": {
 				Type:        schema.TypeString,
-				Required:    true,
+				Optional:    true,
 				DefaultFunc: schema.EnvDefaultFunc("SAKURACLOUD_ACCESS_TOKEN_SECRET", nil),
-				Description: "Your SakuraCloud APIKey(secret)",
+				Description: "The API secret of your SakuraCloud account. It must be provided, but it can also be sourced from the `SAKURACLOUD_ACCESS_TOKEN_SECRET` environment variables, or via a shared credentials file if `profile` is specified",
 			},
 			"zone": {
-				Type:         schema.TypeString,
-				Optional:     true,
-				DefaultFunc:  schema.MultiEnvDefaultFunc([]string{"SAKURACLOUD_ZONE"}, nil),
-				Description:  "Target SakuraCloud Zone(is1a | is1b | tk1a | tk1v)",
-				InputDefault: defaultZone,
-				ValidateFunc: validateZone(allowZones),
+				Type:        schema.TypeString,
+				Optional:    true,
+				DefaultFunc: schema.MultiEnvDefaultFunc([]string{"SAKURACLOUD_ZONE"}, defaultZone),
+				Description: "The name of zone to use as default. It must be provided, but it can also be sourced from the `SAKURACLOUD_ZONE` environment variables, or via a shared credentials file if `profile` is specified",
+			},
+			"zones": {
+				Type:        schema.TypeList,
+				Optional:    true,
+				Elem:        &schema.Schema{Type: schema.TypeString},
+				Description: "A list of available SakuraCloud zone name. It can also be sourced via a shared credentials file if `profile` is specified. Default:[`is1a`, `is1b`, `tk1a`, `tk1v`]",
 			},
 			"accept_language": {
 				Type:        schema.TypeString,
 				Optional:    true,
 				DefaultFunc: schema.MultiEnvDefaultFunc([]string{"SAKURACLOUD_ACCEPT_LANGUAGE"}, ""),
+				Description: "The value of AcceptLanguage header used when calling SakuraCloud API. It can also be sourced from the `SAKURACLOUD_ACCEPT_LANGUAGE` environment variables, or via a shared credentials file if `profile` is specified",
 			},
 			"api_root_url": {
 				Type:        schema.TypeString,
 				Optional:    true,
 				DefaultFunc: schema.MultiEnvDefaultFunc([]string{"SAKURACLOUD_API_ROOT_URL"}, ""),
+				Description: "The root URL of SakuraCloud API. It can also be sourced from the `SAKURACLOUD_API_ROOT_URL` environment variables, or via a shared credentials file if `profile` is specified. Default:`https://secure.sakura.ad.jp/cloud/zone`",
 			},
 			"retry_max": {
 				Type:         schema.TypeInt,
 				Optional:     true,
-				DefaultFunc:  schema.MultiEnvDefaultFunc([]string{"SAKURACLOUD_RETRY_MAX"}, 10),
+				DefaultFunc:  schema.MultiEnvDefaultFunc([]string{"SAKURACLOUD_RETRY_MAX"}, defaultRetryMax),
 				ValidateFunc: validation.IntBetween(0, 100),
+				Description:  "The maximum number of API call retries used when SakuraCloud API returns status code `423` or `503`. It can also be sourced from the `SAKURACLOUD_RETRY_MAX` environment variables, or via a shared credentials file if `profile` is specified. Default:`100`",
 			},
-			"retry_interval": {
-				Type:         schema.TypeInt,
-				Optional:     true,
-				DefaultFunc:  schema.MultiEnvDefaultFunc([]string{"SAKURACLOUD_RETRY_INTERVAL"}, 5),
-				ValidateFunc: validation.IntBetween(0, 600),
-			},
-			"timeout": {
+			"retry_wait_max": {
 				Type:        schema.TypeInt,
 				Optional:    true,
-				DefaultFunc: schema.MultiEnvDefaultFunc([]string{"SAKURACLOUD_TIMEOUT"}, 20),
+				DefaultFunc: schema.MultiEnvDefaultFunc([]string{"SAKURACLOUD_RETRY_WAIT_MAX"}, 0),
+				Description: "The maximum wait interval(in seconds) for retrying API call used when SakuraCloud API returns status code `423` or `503`.  It can also be sourced from the `SAKURACLOUD_RETRY_WAIT_MAX` environment variables, or via a shared credentials file if `profile` is specified",
+			},
+			"retry_wait_min": {
+				Type:        schema.TypeInt,
+				Optional:    true,
+				DefaultFunc: schema.MultiEnvDefaultFunc([]string{"SAKURACLOUD_RETRY_WAIT_MIN"}, 0),
+				Description: "The minimum wait interval(in seconds) for retrying API call used when SakuraCloud API returns status code `423` or `503`. It can also be sourced from the `SAKURACLOUD_RETRY_WAIT_MIN` environment variables, or via a shared credentials file if `profile` is specified",
 			},
 			"api_request_timeout": {
 				Type:        schema.TypeInt,
 				Optional:    true,
-				DefaultFunc: schema.MultiEnvDefaultFunc([]string{"SAKURACLOUD_API_REQUEST_TIMEOUT"}, 300),
+				DefaultFunc: schema.MultiEnvDefaultFunc([]string{"SAKURACLOUD_API_REQUEST_TIMEOUT"}, defaultAPIRequestTimeout),
+				Description: descf(
+					"The timeout seconds for each SakuraCloud API call. It can also be sourced from the `SAKURACLOUD_API_REQUEST_TIMEOUT` environment variables, or via a shared credentials file if `profile` is specified. Default:`%s`",
+					defaultAPIRequestTimeout,
+				),
 			},
 			"api_request_rate_limit": {
 				Type:         schema.TypeInt,
 				Optional:     true,
-				DefaultFunc:  schema.MultiEnvDefaultFunc([]string{"SAKURACLOUD_RATE_LIMIT"}, 5),
+				DefaultFunc:  schema.MultiEnvDefaultFunc([]string{"SAKURACLOUD_RATE_LIMIT"}, defaultAPIRequestRateLimit),
 				ValidateFunc: validation.IntBetween(1, 10),
+				Description: descf(
+					"The maximum number of SakuraCloud API calls per second. It can also be sourced from the `SAKURACLOUD_RATE_LIMIT` environment variables, or via a shared credentials file if `profile` is specified. Default:`%s`",
+					defaultAPIRequestRateLimit,
+				),
 			},
 			"trace": {
-				Type:        schema.TypeBool,
+				Type:        schema.TypeString,
 				Optional:    true,
-				DefaultFunc: schema.EnvDefaultFunc("SAKURACLOUD_TRACE_MODE", false),
+				DefaultFunc: schema.MultiEnvDefaultFunc([]string{"SAKURACLOUD_TRACE", "SAKURACLOUD_TRACE_MODE"}, ""),
+				Description: "The flag to enable output trace log. It can also be sourced from the `SAKURACLOUD_TRACE` environment variables, or via a shared credentials file if `profile` is specified",
+			},
+			"fake_mode": {
+				Type:        schema.TypeString,
+				Optional:    true,
+				DefaultFunc: schema.EnvDefaultFunc("FAKE_MODE", ""),
+				Description: "The flag to enable fake of SakuraCloud API call. It is for debugging or developping the provider. It can also be sourced from the `FAKE_MODE` environment variables, or via a shared credentials file if `profile` is specified",
+			},
+			"fake_store_path": {
+				Type:        schema.TypeString,
+				Optional:    true,
+				DefaultFunc: schema.EnvDefaultFunc("FAKE_STORE_PATH", ""),
+				Description: "The file path used by SakuraCloud API fake driver for storing fake data. It is for debugging or developping the provider. It can also be sourced from the `FAKE_STORE_PATH` environment variables, or via a shared credentials file if `profile` is specified",
 			},
 		},
 		DataSourcesMap: map[string]*schema.Resource{
-			"sakuracloud_archive":        dataSourceSakuraCloudArchive(),
-			"sakuracloud_bridge":         dataSourceSakuraCloudBridge(),
-			"sakuracloud_bucket_object":  dataSourceSakuraCloudBucketObject(),
-			"sakuracloud_cdrom":          dataSourceSakuraCloudCDROM(),
-			"sakuracloud_database":       dataSourceSakuraCloudDatabase(),
-			"sakuracloud_disk":           dataSourceSakuraCloudDisk(),
-			"sakuracloud_dns":            dataSourceSakuraCloudDNS(),
-			"sakuracloud_gslb":           dataSourceSakuraCloudGSLB(),
-			"sakuracloud_icon":           dataSourceSakuraCloudIcon(),
-			"sakuracloud_internet":       dataSourceSakuraCloudInternet(),
-			"sakuracloud_load_balancer":  dataSourceSakuraCloudLoadBalancer(),
-			"sakuracloud_note":           dataSourceSakuraCloudNote(),
-			"sakuracloud_nfs":            dataSourceSakuraCloudNFS(),
-			"sakuracloud_packet_filter":  dataSourceSakuraCloudPacketFilter(),
-			"sakuracloud_proxylb":        dataSourceSakuraCloudProxyLB(),
-			"sakuracloud_private_host":   dataSourceSakuraCloudPrivateHost(),
-			"sakuracloud_simple_monitor": dataSourceSakuraCloudSimpleMonitor(),
-			"sakuracloud_server":         dataSourceSakuraCloudServer(),
-			"sakuracloud_ssh_key":        dataSourceSakuraCloudSSHKey(),
-			"sakuracloud_subnet":         dataSourceSakuraCloudSubnet(),
-			"sakuracloud_switch":         dataSourceSakuraCloudSwitch(),
-			"sakuracloud_vpc_router":     dataSourceSakuraCloudVPCRouter(),
-			"sakuracloud_webaccel":       dataSourceSakuraCloudWebAccel(),
-			"sakuracloud_zone":           dataSourceSakuraCloudZone(),
+			"sakuracloud_archive":            dataSourceSakuraCloudArchive(),
+			"sakuracloud_bridge":             dataSourceSakuraCloudBridge(),
+			"sakuracloud_bucket_object":      dataSourceSakuraCloudBucketObject(),
+			"sakuracloud_cdrom":              dataSourceSakuraCloudCDROM(),
+			"sakuracloud_container_registry": dataSourceSakuraCloudContainerRegistry(),
+			"sakuracloud_database":           dataSourceSakuraCloudDatabase(),
+			"sakuracloud_disk":               dataSourceSakuraCloudDisk(),
+			"sakuracloud_dns":                dataSourceSakuraCloudDNS(),
+			"sakuracloud_gslb":               dataSourceSakuraCloudGSLB(),
+			"sakuracloud_icon":               dataSourceSakuraCloudIcon(),
+			"sakuracloud_internet":           dataSourceSakuraCloudInternet(),
+			"sakuracloud_load_balancer":      dataSourceSakuraCloudLoadBalancer(),
+			"sakuracloud_local_router":       dataSourceSakuraCloudLocalRouter(),
+			"sakuracloud_note":               dataSourceSakuraCloudNote(),
+			"sakuracloud_nfs":                dataSourceSakuraCloudNFS(),
+			"sakuracloud_packet_filter":      dataSourceSakuraCloudPacketFilter(),
+			"sakuracloud_proxylb":            dataSourceSakuraCloudProxyLB(),
+			"sakuracloud_private_host":       dataSourceSakuraCloudPrivateHost(),
+			"sakuracloud_simple_monitor":     dataSourceSakuraCloudSimpleMonitor(),
+			"sakuracloud_server":             dataSourceSakuraCloudServer(),
+			"sakuracloud_server_vnc_info":    dataSourceSakuraCloudServerVNCInfo(),
+			"sakuracloud_ssh_key":            dataSourceSakuraCloudSSHKey(),
+			"sakuracloud_subnet":             dataSourceSakuraCloudSubnet(),
+			"sakuracloud_switch":             dataSourceSakuraCloudSwitch(),
+			"sakuracloud_vpc_router":         dataSourceSakuraCloudVPCRouter(),
+			"sakuracloud_zone":               dataSourceSakuraCloudZone(),
 		},
 		ResourcesMap: map[string]*schema.Resource{
-			"sakuracloud_auto_backup":                    resourceSakuraCloudAutoBackup(),
-			"sakuracloud_archive":                        resourceSakuraCloudArchive(),
-			"sakuracloud_bridge":                         resourceSakuraCloudBridge(),
-			"sakuracloud_bucket_object":                  resourceSakuraCloudBucketObject(),
-			"sakuracloud_cdrom":                          resourceSakuraCloudCDROM(),
-			"sakuracloud_database":                       resourceSakuraCloudDatabase(),
-			"sakuracloud_database_read_replica":          resourceSakuraCloudDatabaseReadReplica(),
-			"sakuracloud_disk":                           resourceSakuraCloudDisk(),
-			"sakuracloud_dns":                            resourceSakuraCloudDNS(),
-			"sakuracloud_dns_record":                     resourceSakuraCloudDNSRecord(),
-			"sakuracloud_gslb":                           resourceSakuraCloudGSLB(),
-			"sakuracloud_gslb_server":                    resourceSakuraCloudGSLBServer(),
-			"sakuracloud_icon":                           resourceSakuraCloudIcon(),
-			"sakuracloud_internet":                       resourceSakuraCloudInternet(),
-			"sakuracloud_ipv4_ptr":                       resourceSakuraCloudIPv4Ptr(),
-			"sakuracloud_load_balancer":                  resourceSakuraCloudLoadBalancer(),
-			"sakuracloud_load_balancer_vip":              resourceSakuraCloudLoadBalancerVIP(),
-			"sakuracloud_load_balancer_server":           resourceSakuraCloudLoadBalancerServer(),
-			"sakuracloud_mobile_gateway":                 resourceSakuraCloudMobileGateway(),
-			"sakuracloud_mobile_gateway_static_route":    resourceSakuraCloudMobileGatewayStaticRoute(),
-			"sakuracloud_mobile_gateway_sim_route":       resourceSakuraCloudMobileGatewaySIMRoute(),
-			"sakuracloud_note":                           resourceSakuraCloudNote(),
-			"sakuracloud_nfs":                            resourceSakuraCloudNFS(),
-			"sakuracloud_packet_filter":                  resourceSakuraCloudPacketFilter(),
-			"sakuracloud_packet_filter_rule":             resourceSakuraCloudPacketFilterRule(),
-			"sakuracloud_proxylb":                        resourceSakuraCloudProxyLB(),
-			"sakuracloud_proxylb_acme":                   resourceSakuraCloudProxyLBACME(),
-			"sakuracloud_private_host":                   resourceSakuraCloudPrivateHost(),
-			"sakuracloud_sim":                            resourceSakuraCloudSIM(),
-			"sakuracloud_simple_monitor":                 resourceSakuraCloudSimpleMonitor(),
-			"sakuracloud_server":                         resourceSakuraCloudServer(),
-			"sakuracloud_server_connector":               resourceSakuraCloudServerConnector(),
-			"sakuracloud_ssh_key":                        resourceSakuraCloudSSHKey(),
-			"sakuracloud_ssh_key_gen":                    resourceSakuraCloudSSHKeyGen(),
-			"sakuracloud_subnet":                         resourceSakuraCloudSubnet(),
-			"sakuracloud_switch":                         resourceSakuraCloudSwitch(),
-			"sakuracloud_vpc_router":                     resourceSakuraCloudVPCRouter(),
-			"sakuracloud_vpc_router_interface":           resourceSakuraCloudVPCRouterInterface(),
-			"sakuracloud_vpc_router_firewall":            resourceSakuraCloudVPCRouterFirewall(),
-			"sakuracloud_vpc_router_dhcp_server":         resourceSakuraCloudVPCRouterDHCPServer(),
-			"sakuracloud_vpc_router_dhcp_static_mapping": resourceSakuraCloudVPCRouterDHCPStaticMapping(),
-			"sakuracloud_vpc_router_port_forwarding":     resourceSakuraCloudVPCRouterPortForwarding(),
-			"sakuracloud_vpc_router_pptp":                resourceSakuraCloudVPCRouterPPTP(),
-			"sakuracloud_vpc_router_l2tp":                resourceSakuraCloudVPCRouterL2TP(),
-			"sakuracloud_vpc_router_static_nat":          resourceSakuraCloudVPCRouterStaticNAT(),
-			"sakuracloud_vpc_router_user":                resourceSakuraCloudVPCRouterRemoteAccessUser(),
-			"sakuracloud_vpc_router_site_to_site_vpn":    resourceSakuraCloudVPCRouterSiteToSiteIPsecVPN(),
-			"sakuracloud_vpc_router_static_route":        resourceSakuraCloudVPCRouterStaticRoute(),
-			"sakuracloud_webaccel_certificate":           resourceSakuraCloudWebAccelCertificate(),
+			"sakuracloud_auto_backup":           resourceSakuraCloudAutoBackup(),
+			"sakuracloud_archive":               resourceSakuraCloudArchive(),
+			"sakuracloud_bridge":                resourceSakuraCloudBridge(),
+			"sakuracloud_bucket_object":         resourceSakuraCloudBucketObject(),
+			"sakuracloud_cdrom":                 resourceSakuraCloudCDROM(),
+			"sakuracloud_container_registry":    resourceSakuraCloudContainerRegistry(),
+			"sakuracloud_database":              resourceSakuraCloudDatabase(),
+			"sakuracloud_database_read_replica": resourceSakuraCloudDatabaseReadReplica(),
+			"sakuracloud_disk":                  resourceSakuraCloudDisk(),
+			"sakuracloud_dns":                   resourceSakuraCloudDNS(),
+			"sakuracloud_dns_record":            resourceSakuraCloudDNSRecord(),
+			"sakuracloud_gslb":                  resourceSakuraCloudGSLB(),
+			"sakuracloud_icon":                  resourceSakuraCloudIcon(),
+			"sakuracloud_internet":              resourceSakuraCloudInternet(),
+			"sakuracloud_ipv4_ptr":              resourceSakuraCloudIPv4Ptr(),
+			"sakuracloud_load_balancer":         resourceSakuraCloudLoadBalancer(),
+			"sakuracloud_local_router":          resourceSakuraCloudLocalRouter(),
+			"sakuracloud_mobile_gateway":        resourceSakuraCloudMobileGateway(),
+			"sakuracloud_note":                  resourceSakuraCloudNote(),
+			"sakuracloud_nfs":                   resourceSakuraCloudNFS(),
+			"sakuracloud_packet_filter":         resourceSakuraCloudPacketFilter(),
+			"sakuracloud_packet_filter_rules":   resourceSakuraCloudPacketFilterRules(),
+			"sakuracloud_proxylb":               resourceSakuraCloudProxyLB(),
+			"sakuracloud_proxylb_acme":          resourceSakuraCloudProxyLBACME(),
+			"sakuracloud_private_host":          resourceSakuraCloudPrivateHost(),
+			"sakuracloud_sim":                   resourceSakuraCloudSIM(),
+			"sakuracloud_simple_monitor":        resourceSakuraCloudSimpleMonitor(),
+			"sakuracloud_server":                resourceSakuraCloudServer(),
+			"sakuracloud_ssh_key":               resourceSakuraCloudSSHKey(),
+			"sakuracloud_ssh_key_gen":           resourceSakuraCloudSSHKeyGen(),
+			"sakuracloud_subnet":                resourceSakuraCloudSubnet(),
+			"sakuracloud_switch":                resourceSakuraCloudSwitch(),
+			"sakuracloud_vpc_router":            resourceSakuraCloudVPCRouter(),
 		},
-		ConfigureFunc: providerConfigure,
 	}
+
+	provider.ConfigureFunc = func(d *schema.ResourceData) (interface{}, error) {
+		terraformVersion := provider.TerraformVersion
+		if terraformVersion == "" {
+			// Terraform 0.12 introduced this field to the protocol
+			// We can therefore assume that if it's missing it's 0.10 or 0.11
+			terraformVersion = "0.11+compatible"
+		}
+		return providerConfigure(d, terraformVersion)
+	}
+
+	return provider
 }
 
-func providerConfigure(d *schema.ResourceData) (interface{}, error) {
-
-	if _, ok := d.GetOk("zone"); !ok {
-		d.Set("zone", defaultZone)
-	}
-
+func providerConfigure(d *schema.ResourceData, terraformVersion string) (interface{}, error) {
 	config := Config{
+		Profile:             d.Get("profile").(string),
 		AccessToken:         d.Get("token").(string),
 		AccessTokenSecret:   d.Get("secret").(string),
 		Zone:                d.Get("zone").(string),
-		TimeoutMinute:       d.Get("timeout").(int),
-		TraceMode:           d.Get("trace").(bool),
+		Zones:               expandStringList(d.Get("zones").([]interface{})),
+		TraceMode:           d.Get("trace").(string),
 		APIRootURL:          d.Get("api_root_url").(string),
 		RetryMax:            d.Get("retry_max").(int),
-		RetryInterval:       d.Get("retry_interval").(int),
+		RetryWaitMax:        d.Get("retry_wait_max").(int),
+		RetryWaitMin:        d.Get("retry_wait_min").(int),
 		APIRequestTimeout:   d.Get("api_request_timeout").(int),
 		APIRequestRateLimit: d.Get("api_request_rate_limit").(int),
+		FakeMode:            d.Get("fake_mode").(string),
+		FakeStorePath:       d.Get("fake_store_path").(string),
+		terraformVersion:    terraformVersion,
 	}
 
-	return config.NewClient(), nil
+	return config.NewClient()
 }
 
 var sakuraMutexKV = mutexkv.NewMutexKV()

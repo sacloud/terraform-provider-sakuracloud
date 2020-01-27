@@ -29,6 +29,7 @@ for GOOS in $OS; do
         GOOS=$GOOS GOARCH=$GOARCH CGO_ENABLED=0 \
             go build \
                 -ldflags "$BUILD_LDFLAGS" \
+                -mod=vendor \
                 -o bin/$binary \
                 main.go
         if [ -n "$ARCHIVE" ]; then

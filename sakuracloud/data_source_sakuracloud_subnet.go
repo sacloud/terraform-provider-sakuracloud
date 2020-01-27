@@ -18,9 +18,12 @@ import (
 	"fmt"
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
+	"github.com/sacloud/libsacloud/v2/sacloud"
 )
 
 func dataSourceSakuraCloudSubnet() *schema.Resource {
+	resourceName := "Subnet"
+
 	return &schema.Resource{
 		Read: dataSourceSakuraCloudSubnetRead,
 
@@ -30,74 +33,76 @@ func dataSourceSakuraCloudSubnet() *schema.Resource {
 				Required:     true,
 				ForceNew:     true,
 				ValidateFunc: validateSakuracloudIDType,
+				Description:  "The id of the switch+router resource that the Subnet belongs",
 			},
 			"index": {
-				Type:     schema.TypeInt,
-				ForceNew: true,
-				Required: true,
+				Type:        schema.TypeInt,
+				ForceNew:    true,
+				Required:    true,
+				Description: "The index of the subnet in assigned to the Switch+Router",
 			},
 
-			"nw_mask_len": {
-				Type:     schema.TypeInt,
-				Computed: true,
-			},
+			"netmask": schemaDataSourceNetMask(resourceName),
 			"next_hop": {
-				Type:     schema.TypeString,
-				Computed: true,
+				Type:        schema.TypeString,
+				Computed:    true,
+				Description: "The ip address of the next-hop at the Subnet",
 			},
-			"switch_id": {
-				Type:     schema.TypeString,
-				Computed: true,
+			"switch_id": schemaDataSourceSwitchID(resourceName),
+			"network_address": {
+				Type:        schema.TypeString,
+				Computed:    true,
+				Description: "The IPv4 network address assigned to the Subnet",
 			},
-			"nw_address": {
-				Type:     schema.TypeString,
-				Computed: true,
+			"min_ip_address": {
+				Type:        schema.TypeString,
+				Computed:    true,
+				Description: "Minimum IP address in assigned global addresses to the Subnet",
 			},
-			"min_ipaddress": {
-				Type:     schema.TypeString,
-				Computed: true,
+			"max_ip_address": {
+				Type:        schema.TypeString,
+				Computed:    true,
+				Description: "Maximum IP address in assigned global addresses to the Subnet",
 			},
-			"max_ipaddress": {
-				Type:     schema.TypeString,
-				Computed: true,
+			"ip_addresses": {
+				Type:        schema.TypeList,
+				Computed:    true,
+				Elem:        &schema.Schema{Type: schema.TypeString},
+				Description: "A list of assigned global address to the Subnet",
 			},
-			"ipaddresses": {
-				Type:     schema.TypeList,
-				Computed: true,
-				Elem:     &schema.Schema{Type: schema.TypeString},
-			},
-			"zone": {
-				Type:         schema.TypeString,
-				Optional:     true,
-				Computed:     true,
-				ForceNew:     true,
-				Description:  "target SakuraCloud zone",
-				ValidateFunc: validateZone([]string{"is1a", "is1b", "tk1a", "tk1v"}),
-			},
+			"zone": schemaDataSourceZone(resourceName),
 		},
 	}
 }
 
 func dataSourceSakuraCloudSubnetRead(d *schema.ResourceData, meta interface{}) error {
-	client := getSacloudAPIClient(d, meta)
+	client, zone, err := sakuraCloudClient(d, meta)
+	if err != nil {
+		return err
+	}
+	ctx, cancel := operationContext(d, schema.TimeoutRead)
+	defer cancel()
 
-	internetID := toSakuraCloudID(d.Get("internet_id").(string))
+	internetOp := sacloud.NewInternetOp(client)
+	subnetOp := sacloud.NewSubnetOp(client)
+
+	internetID := expandSakuraCloudID(d, "internet_id")
 	subnetIndex := d.Get("index").(int)
 
-	res, err := client.Internet.Read(internetID)
+	res, err := internetOp.Read(ctx, zone, internetID)
 	if err != nil {
-		return fmt.Errorf("Couldn't find SakuraCloud Internet resource(id:%d): %s", internetID, err)
+		return fmt.Errorf("could not find SakuraCloud Internet[%d]: %s", internetID, err)
 	}
 	if subnetIndex >= len(res.Switch.Subnets) {
-		return fmt.Errorf("Couldn't find SakuraCloud Subnet: invalid subneet index: %d", subnetIndex)
+		return fmt.Errorf("could not find SakuraCloud Subnet: invalid subneet index: %d", subnetIndex)
 	}
 
 	subnetID := res.Switch.Subnets[subnetIndex].ID
-	subnet, err := client.Subnet.Read(subnetID)
+	subnet, err := subnetOp.Read(ctx, zone, subnetID)
 	if err != nil {
-		return fmt.Errorf("Couldn't find SakuraCloud Subnet(id:%d) resource: %s", subnetID, err)
+		return fmt.Errorf("could not find SakuraCloud Subnet[%d]: %s", subnetID, err)
 	}
 
-	d.SetId(subnet.GetStrID())
-	return setSubnetResourceData(d, client, subnet)
+	d.SetId(subnetID.String())
+	return setSubnetResourceData(ctx, d, client, subnet)
 }

@@ -18,176 +18,118 @@ import (
 	"fmt"
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
-	"github.com/sacloud/libsacloud/sacloud"
+	"github.com/sacloud/libsacloud/v2/sacloud"
+	"github.com/sacloud/libsacloud/v2/sacloud/types"
 )
 
 func dataSourceSakuraCloudDatabase() *schema.Resource {
+	resourceName := "Database"
+
 	return &schema.Resource{
 		Read: dataSourceSakuraCloudDatabaseRead,
 
 		Schema: map[string]*schema.Schema{
-			"name_selectors": {
-				Type:     schema.TypeList,
-				Optional: true,
-				ForceNew: true,
-				Elem:     &schema.Schema{Type: schema.TypeString},
+			filterAttrName: filterSchema(&filterSchemaOption{}),
+			"name":         schemaDataSourceName(resourceName),
+			"database_type": {
+				Type:     schema.TypeString,
+				Computed: true,
+				Description: descf(
+					"The type of the database. This will be one of [%s]",
+					types.RDBMSTypeStrings,
+				),
 			},
-			"tag_selectors": {
-				Type:     schema.TypeList,
-				Optional: true,
-				ForceNew: true,
-				Elem:     &schema.Schema{Type: schema.TypeString},
+			"plan": schemaDataSourcePlan(resourceName, types.DatabasePlanStrings),
+			"username": {
+				Type:        schema.TypeString,
+				Computed:    true,
+				Description: "The name of default user on the database",
 			},
-			"filter": {
-				Type:     schema.TypeSet,
-				Optional: true,
-				ForceNew: true,
+			"password": {
+				Type:        schema.TypeString,
+				Computed:    true,
+				Sensitive:   true,
+				Description: "The password of default user on the database",
+			},
+			"replica_user": {
+				Type:        schema.TypeString,
+				Computed:    true,
+				Description: "The name of user that processing a replication",
+			},
+			"replica_password": {
+				Type:        schema.TypeString,
+				Computed:    true,
+				Sensitive:   true,
+				Description: "The password of user that processing a replication",
+			},
+			"network_interface": {
+				Type:     schema.TypeList,
+				Computed: true,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
-						"name": {
-							Type:     schema.TypeString,
-							Required: true,
-						},
-
-						"values": {
+						"switch_id":     schemaDataSourceSwitchID(resourceName),
+						"ip_address":    schemaDataSourceIPAddress(resourceName),
+						"netmask":       schemaDataSourceNetMask(resourceName),
+						"gateway":       schemaDataSourceGateway(resourceName),
+						"port":          schemaDataSourcePort(),
+						"source_ranges": schemaDataSourceSourceRanges(resourceName),
+					},
+				},
+			},
+			"backup": {
+				Type:     schema.TypeList,
+				Computed: true,
+				Elem: &schema.Resource{
+					Schema: map[string]*schema.Schema{
+						"weekdays": {
 							Type:     schema.TypeList,
-							Required: true,
 							Elem:     &schema.Schema{Type: schema.TypeString},
+							Computed: true,
+							Description: descf(
+								"The list of name of weekday that doing backup. This will be in [%s]",
+								types.BackupWeekdayStrings,
+							),
+						},
+						"time": {
+							Type:        schema.TypeString,
+							Computed:    true,
+							Description: "The time to take backup. This will be formatted with `HH:mm`",
 						},
 					},
 				},
 			},
-			"name": {
-				Type:     schema.TypeString,
-				Computed: true,
-			},
-			"plan": {
-				Type:     schema.TypeString,
-				Computed: true,
-			},
-			"user_name": {
-				Type:     schema.TypeString,
-				Computed: true,
-			},
-			"user_password": {
-				Type:     schema.TypeString,
-				Computed: true,
-			},
-			"replica_user": {
-				Type:     schema.TypeString,
-				Computed: true,
-			},
-			"replica_password": {
-				Type:     schema.TypeString,
-				Computed: true,
-			},
-			"allow_networks": {
-				Type:     schema.TypeList,
-				Computed: true,
-				Elem:     &schema.Schema{Type: schema.TypeString},
-			},
-			"port": {
-				Type:     schema.TypeInt,
-				Computed: true,
-			},
-			"backup_weekdays": {
-				Type:     schema.TypeList,
-				Elem:     &schema.Schema{Type: schema.TypeString},
-				Computed: true,
-			},
-			"backup_time": {
-				Type:     schema.TypeString,
-				Computed: true,
-			},
-			"switch_id": {
-				Type:     schema.TypeString,
-				Computed: true,
-			},
-			"ipaddress1": {
-				Type:     schema.TypeString,
-				Computed: true,
-			},
-			"nw_mask_len": {
-				Type:     schema.TypeInt,
-				Computed: true,
-			},
-			"default_route": {
-				Type:     schema.TypeString,
-				Computed: true,
-			},
-			"icon_id": {
-				Type:     schema.TypeString,
-				Computed: true,
-			},
-			"description": {
-				Type:     schema.TypeString,
-				Computed: true,
-			},
-			"tags": {
-				Type:     schema.TypeList,
-				Computed: true,
-				Elem:     &schema.Schema{Type: schema.TypeString},
-			},
-			"zone": {
-				Type:         schema.TypeString,
-				Optional:     true,
-				Computed:     true,
-				ForceNew:     true,
-				Description:  "target SakuraCloud zone",
-				ValidateFunc: validateZone([]string{"tk1a", "is1b", "is1a"}),
-			},
+			"icon_id":     schemaDataSourceIconID(resourceName),
+			"description": schemaDataSourceDescription(resourceName),
+			"tags":        schemaDataSourceTags(resourceName),
+			"zone":        schemaDataSourceZone(resourceName),
 		},
 	}
 }
 
 func dataSourceSakuraCloudDatabaseRead(d *schema.ResourceData, meta interface{}) error {
-	client := getSacloudAPIClient(d, meta)
-
-	//filters
-	if rawFilter, filterOk := d.GetOk("filter"); filterOk {
-		filters := expandFilters(rawFilter)
-		for key, f := range filters {
-			client.Database.FilterBy(key, f)
-		}
-	}
-
-	res, err := client.Database.Find()
+	client, zone, err := sakuraCloudClient(d, meta)
 	if err != nil {
-		return fmt.Errorf("Couldn't find SakuraCloud Database resource: %s", err)
+		return err
 	}
-	if res == nil || res.Count == 0 {
+	ctx, cancel := operationContext(d, schema.TimeoutRead)
+	defer cancel()
+
+	searcher := sacloud.NewDatabaseOp(client)
+
+	findCondition := &sacloud.FindCondition{}
+	if rawFilter, ok := d.GetOk(filterAttrName); ok {
+		findCondition.Filter = expandSearchFilter(rawFilter)
+	}
+
+	res, err := searcher.Find(ctx, zone, findCondition)
+	if err != nil {
+		return fmt.Errorf("could not find SakuraCloud Database resource: %s", err)
+	}
+	if res == nil || res.Count == 0 || len(res.Databases) == 0 {
 		return filterNoResultErr()
 	}
 
-	var data *sacloud.Database
 	targets := res.Databases
-
-	if rawNameSelector, ok := d.GetOk("name_selectors"); ok {
-		selectors := expandStringList(rawNameSelector.([]interface{}))
-		var filtered []sacloud.Database
-		for _, a := range targets {
-			if hasNames(&a, selectors) {
-				filtered = append(filtered, a)
-			}
-		}
-		targets = filtered
-	}
-	if rawTagSelector, ok := d.GetOk("tag_selectors"); ok {
-		selectors := expandStringList(rawTagSelector.([]interface{}))
-		var filtered []sacloud.Database
-		for _, a := range targets {
-			if hasTags(&a, selectors) {
-				filtered = append(filtered, a)
-			}
-		}
-		targets = filtered
-	}
-
-	if len(targets) == 0 {
-		return filterNoResultErr()
-	}
-	data = &targets[0]
-
-	d.SetId(data.GetStrID())
-	return setDatabaseResourceData(d, client, data)
+	d.SetId(targets[0].ID.String())
+	return setDatabaseResourceData(ctx, d, client, targets[0])
 }

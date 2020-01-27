@@ -20,8 +20,7 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/validation"
-	"github.com/sacloud/libsacloud/api"
-	"github.com/sacloud/libsacloud/sacloud"
+	"github.com/sacloud/libsacloud/v2/sacloud"
 )
 
 func resourceSakuraCloudIPv4Ptr() *schema.Resource {
@@ -33,49 +32,61 @@ func resourceSakuraCloudIPv4Ptr() *schema.Resource {
 		Importer: &schema.ResourceImporter{
 			State: schema.ImportStatePassthrough,
 		},
-		CustomizeDiff: hasTagResourceCustomizeDiff,
+
+		Timeouts: &schema.ResourceTimeout{
+			Create: schema.DefaultTimeout(60 * time.Minute),
+			Update: schema.DefaultTimeout(60 * time.Minute),
+			Delete: schema.DefaultTimeout(5 * time.Minute),
+		},
+
 		Schema: map[string]*schema.Schema{
-			"ipaddress": {
+			"ip_address": {
 				Type:         schema.TypeString,
 				Required:     true,
 				ValidateFunc: validateIPv4Address(),
+				Description:  "The IP address to which the PTR record is set",
 			},
 			"hostname": {
-				Type:     schema.TypeString,
-				Required: true,
+				Type:        schema.TypeString,
+				Required:    true,
+				Description: "The value of the PTR record. This must be FQDN",
 			},
 			"retry_max": {
 				Type:         schema.TypeInt,
 				Optional:     true,
 				Default:      30,
-				ValidateFunc: validation.IntBetween(0, 100),
+				ValidateFunc: validation.IntBetween(1, 100),
+				Description:  "The maximum number of API call retries used when SakuraCloud API returns any errors",
 			},
 			"retry_interval": {
 				Type:         schema.TypeInt,
 				Optional:     true,
 				Default:      10,
-				ValidateFunc: validation.IntBetween(0, 600),
+				ValidateFunc: validation.IntBetween(1, 600),
+				Description:  "The wait interval(in seconds) for retrying API call used when SakuraCloud API returns any errors",
 			},
-			"zone": {
-				Type:         schema.TypeString,
-				Optional:     true,
-				Computed:     true,
-				ForceNew:     true,
-				Description:  "target SakuraCloud zone",
-				ValidateFunc: validateZone([]string{"is1a", "is1b", "tk1a", "tk1v"}),
-			},
+			"zone": schemaResourceZone("IPv4 PTR"),
 		},
 	}
 }
 
 func resourceSakuraCloudIPv4PtrUpdate(d *schema.ResourceData, meta interface{}) error {
 	var err error
-	client := getSacloudAPIClient(d, meta)
 
-	client.TraceMode = true
-	defer func() { client.TraceMode = false }()
+	client, zone, err := sakuraCloudClient(d, meta)
+	if err != nil {
+		return err
+	}
+	op := schema.TimeoutUpdate
+	if d.IsNewResource() {
+		op = schema.TimeoutCreate
+	}
+	ctx, cancel := operationContext(d, op)
+	defer cancel()
 
-	ip := d.Get("ipaddress").(string)
+	ipAddrOp := sacloud.NewIPAddressOp(client)
+
+	ip := d.Get("ip_address").(string)
 	hostName := d.Get("hostname").(string)
 
 	retryMax := d.Get("retry_max").(int)
@@ -83,18 +94,17 @@ func resourceSakuraCloudIPv4PtrUpdate(d *schema.ResourceData, meta interface{}) 
 	interval := time.Duration(retrySec) * time.Second
 
 	// check IP exists
-	_, err = client.IPAddress.Read(ip)
+	_, err = ipAddrOp.Read(ctx, zone, ip)
 	if err != nil {
 		// includes 404 error
-		return fmt.Errorf("Couldn't find SakuraCloud IPv4Ptr resource: %s", err)
+		return fmt.Errorf("could not find SakuraCloud IPv4Ptr[%s]: %s", ip, err)
 	}
 
 	i := 0
 	success := false
 	for i < retryMax {
-
 		// set
-		if _, err = client.IPAddress.Update(ip, hostName); err == nil {
+		if _, err = ipAddrOp.UpdateHostName(ctx, zone, ip, hostName); err == nil {
 			success = true
 			break
 		}
@@ -104,7 +114,7 @@ func resourceSakuraCloudIPv4PtrUpdate(d *schema.ResourceData, meta interface{}) 
 	}
 
 	if !success {
-		return fmt.Errorf("Couldn't update SakuraCloud IPv4Ptr resource: %s", err)
+		return fmt.Errorf("could not update SakuraCloud IPv4Ptr[IP:%s Host:%s]: %s", ip, hostName, err)
 	}
 
 	d.SetId(ip)
@@ -112,42 +122,56 @@ func resourceSakuraCloudIPv4PtrUpdate(d *schema.ResourceData, meta interface{}) 
 }
 
 func resourceSakuraCloudIPv4PtrRead(d *schema.ResourceData, meta interface{}) error {
-	client := getSacloudAPIClient(d, meta)
-
-	ptr, err := client.IPAddress.Read(d.Id())
+	client, zone, err := sakuraCloudClient(d, meta)
 	if err != nil {
-		if sacloudErr, ok := err.(api.Error); ok && sacloudErr.ResponseCode() == 404 {
+		return err
+	}
+	ctx, cancel := operationContext(d, schema.TimeoutRead)
+	defer cancel()
+
+	ipAddrOp := sacloud.NewIPAddressOp(client)
+	ip := d.Id()
+
+	ptr, err := ipAddrOp.Read(ctx, zone, ip)
+	if err != nil {
+		if sacloud.IsNotFoundError(err) {
 			d.SetId("")
 			return nil
 		}
-		return fmt.Errorf("Couldn't find SakuraCloud IPv4Ptr resource: %s", err)
+		return fmt.Errorf("could not read SakuraCloud IPv4Ptr[%s]: %s", ip, err)
 	}
-
 	return setIPv4PtrResourceData(d, client, ptr)
 }
 
 func resourceSakuraCloudIPv4PtrDelete(d *schema.ResourceData, meta interface{}) error {
 	var err error
-	client := getSacloudAPIClient(d, meta)
 
-	_, err = client.IPAddress.Read(d.Id())
+	client, zone, err := sakuraCloudClient(d, meta)
+	if err != nil {
+		return err
+	}
+	ctx, cancel := operationContext(d, schema.TimeoutDelete)
+	defer cancel()
+
+	ipAddrOp := sacloud.NewIPAddressOp(client)
+	ip := d.Id()
+
+	_, err = ipAddrOp.Read(ctx, zone, ip)
 	if err != nil {
 		d.SetId("")
 		return nil
 	}
 
-	_, err = client.IPAddress.Update(d.Id(), "")
+	_, err = ipAddrOp.UpdateHostName(ctx, zone, ip, "")
 	if err != nil {
-		return fmt.Errorf("Couldn't update SakuraCloud IPv4Ptr resource: %s", err)
+		return fmt.Errorf("could not update SakuraCloud IPv4Ptr[%s]: %s", ip, err)
 	}
-
 	return nil
 }
 
 func setIPv4PtrResourceData(d *schema.ResourceData, client *APIClient, data *sacloud.IPAddress) error {
-
-	d.Set("ipaddress", data.IPAddress)
-	d.Set("hostname", data.HostName)
-	d.Set("zone", client.Zone)
+	d.Set("ip_address", data.IPAddress) // nolint
+	d.Set("hostname", data.HostName)    // nolint
+	d.Set("zone", getZone(d, client))   // nolint
 	return nil
 }

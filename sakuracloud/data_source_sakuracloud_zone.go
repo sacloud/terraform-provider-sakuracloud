@@ -18,7 +18,7 @@ import (
 	"fmt"
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
-	"github.com/sacloud/libsacloud/sacloud"
+	"github.com/sacloud/libsacloud/v2/sacloud"
 )
 
 func dataSourceSakuraCloudZone() *schema.Resource {
@@ -27,46 +27,54 @@ func dataSourceSakuraCloudZone() *schema.Resource {
 
 		Schema: map[string]*schema.Schema{
 			"name": {
-				Type:         schema.TypeString,
-				Optional:     true,
-				Computed:     true,
-				ValidateFunc: validateZone(allowZones),
+				Type:        schema.TypeString,
+				Optional:    true,
+				Computed:    true,
+				Description: "The name of the zone (e.g. `is1a`,`tk1a`)",
 			},
 			"zone_id": {
-				Type:     schema.TypeString,
-				Computed: true,
+				Type:        schema.TypeString,
+				Computed:    true,
+				Description: "The id of the zone",
 			},
-			"description": {
-				Type:     schema.TypeString,
-				Computed: true,
-			},
+			"description": schemaDataSourceDescription("zone"),
 			"region_id": {
-				Type:     schema.TypeString,
-				Computed: true,
+				Type:        schema.TypeString,
+				Computed:    true,
+				Description: "The id of the region that the zone belongs",
 			},
 			"region_name": {
-				Type:     schema.TypeString,
-				Computed: true,
+				Type:        schema.TypeString,
+				Computed:    true,
+				Description: "The name of the region that the zone belongs",
 			},
 			"dns_servers": {
-				Type:     schema.TypeList,
-				Computed: true,
-				Elem:     &schema.Schema{Type: schema.TypeString},
+				Type:        schema.TypeList,
+				Computed:    true,
+				Elem:        &schema.Schema{Type: schema.TypeString},
+				Description: "A list of IP address of DNS server in the zone",
 			},
 		},
 	}
 }
 
 func dataSourceSakuraCloudZoneRead(d *schema.ResourceData, meta interface{}) error {
-	client := getSacloudAPIClient(d, meta)
-	zoneSlug := client.Zone
+	client, zoneSlug, err := sakuraCloudClient(d, meta)
+	if err != nil {
+		return err
+	}
+	ctx, cancel := operationContext(d, schema.TimeoutRead)
+	defer cancel()
+
+	zoneOp := sacloud.NewZoneOp(client)
+
 	if v, ok := d.GetOk("name"); ok {
 		zoneSlug = v.(string)
 	}
 
-	res, err := client.GetZoneAPI().Find()
+	res, err := zoneOp.Find(ctx, &sacloud.FindCondition{})
 	if err != nil {
-		return fmt.Errorf("Couldn't find SakuraCloud Zone resource: %s", err)
+		return fmt.Errorf("could not find SakuraCloud Zone resource: %s", err)
 	}
 	if res == nil || len(res.Zones) == 0 {
 		return filterNoResultErr()
@@ -75,7 +83,7 @@ func dataSourceSakuraCloudZoneRead(d *schema.ResourceData, meta interface{}) err
 
 	for _, z := range res.Zones {
 		if z.Name == zoneSlug {
-			data = &z
+			data = z
 			break
 		}
 	}
@@ -83,13 +91,11 @@ func dataSourceSakuraCloudZoneRead(d *schema.ResourceData, meta interface{}) err
 		return filterNoResultErr()
 	}
 
-	d.SetId(data.GetStrID())
-	d.Set("name", data.Name)
-	d.Set("zone_id", data.GetStrID())
-	d.Set("description", data.Description)
-	d.Set("region_id", data.Region.GetStrID())
-	d.Set("region_name", data.GetRegionName())
-	d.Set("dns_servers", data.Region.NameServers)
-
-	return nil
+	d.SetId(data.ID.String())
+	d.Set("name", data.Name)                    // nolint
+	d.Set("zone_id", data.ID.String())          // nolint
+	d.Set("description", data.Description)      // nolint
+	d.Set("region_id", data.Region.ID.String()) // nolint
+	d.Set("region_name", data.Region.Name)      // nolint
+	return d.Set("dns_servers", data.Region.NameServers)
 }
