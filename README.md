@@ -17,7 +17,7 @@ Terraformからさくらのクラウドを操作するためのプラグイン�
   - SSH接続時のパスワード/チャレンジレスポンス認証を無効化(公開鍵認証のみに)
   - SSH用の公開鍵はさくらのクラウド上で生成(作成された秘密鍵はローカルマシンへ保存する)
 
-[Installation / インストール](https://sacloud.github.io/terraform-provider-sakuracloud/installation/)を参考に
+[Installation / インストール](https://docs.usacloud.jp/terraform-v1/installation/)を参考に
 TerraformとTerraform for さくらのクラウドを手元のマシンにインストールしてください。
 
 インストール後、以下のコマンドを実行することでインフラ構築が行われます。
@@ -92,50 +92,13 @@ terraform apply
 ## ドキュメント
 
 * Terraform for さくらのクラウド ドキュメント
-    * https://sacloud.github.io/terraform-provider-sakuracloud/
-
-### サポートしているリソース/データリソース
-
-#### リソース
-  - [サーバー](https://sacloud.github.io/terraform-provider-sakuracloud/configuration/resources/server/)
-  - [ディスク](https://sacloud.github.io/terraform-provider-sakuracloud/configuration/resources/disk/)
-  - [アーカイブ](https://sacloud.github.io/terraform-provider-sakuracloud/configuration/resources/archive/)
-  - [ISOイメージ(CD-ROM)](https://sacloud.github.io/terraform-provider-sakuracloud/configuration/resources/cdrom/)
-  - [スイッチ](https://sacloud.github.io/terraform-provider-sakuracloud/configuration/resources/switch/)
-  - [ルーター](https://sacloud.github.io/terraform-provider-sakuracloud/configuration/resources/internet/)
-  - [サブネット](https://sacloud.github.io/terraform-provider-sakuracloud/configuration/resources/subnet/)
-  - [パケットフィルタ](https://sacloud.github.io/terraform-provider-sakuracloud/configuration/resources/packet_filter/)
-  - [パケットフィルタ(ルール)](https://sacloud.github.io/terraform-provider-sakuracloud/configuration/resources/packet_filter_rule/)
-  - [ブリッジ](https://sacloud.github.io/terraform-provider-sakuracloud/configuration/resources/bridge/)
-  - [ロードバランサー](https://sacloud.github.io/terraform-provider-sakuracloud/configuration/resources/load_balancer/)
-  - [VPCルーター](https://sacloud.github.io/terraform-provider-sakuracloud/configuration/resources/vpc_router/)
-  - [データベース](https://sacloud.github.io/terraform-provider-sakuracloud/configuration/resources/database/)
-  - [データベース(リードレプリカ)](https://sacloud.github.io/terraform-provider-sakuracloud/configuration/resources/database_read_replica/)
-  - [NFS](https://sacloud.github.io/terraform-provider-sakuracloud/configuration/resources/nfs/)
-  - [SIM(セキュアモバイル)](http://sacloud.github.io/terraform-provider-sakuracloud/configuration/resources/sim/)
-  - [モバイルゲートウェイ](http://sacloud.github.io/terraform-provider-sakuracloud/configuration/resources/mobile_gateway/)
-  - [スタートアップスクリプト](https://sacloud.github.io/terraform-provider-sakuracloud/configuration/resources/note/)
-  - [公開鍵](https://sacloud.github.io/terraform-provider-sakuracloud/configuration/resources/ssh_key/)
-  - [公開鍵(生成)](https://sacloud.github.io/terraform-provider-sakuracloud/configuration/resources/ssh_key_gen/)
-  - [アイコン](https://sacloud.github.io/terraform-provider-sakuracloud/configuration/resources/icon/)
-  - [専有ホスト](https://sacloud.github.io/terraform-provider-sakuracloud/configuration/resources/private_host/)
-  - [DNS](https://sacloud.github.io/terraform-provider-sakuracloud/configuration/resources/dns/)
-  - [IPv4逆引きレコード](https://sacloud.github.io/terraform-provider-sakuracloud/configuration/resources/ipv4_ptr/)
-  - [エンハンスドロードバランサ](https://sacloud.github.io/terraform-provider-sakuracloud/configuration/resources/proxylb/)
-  - [GSLB](https://sacloud.github.io/terraform-provider-sakuracloud/configuration/resources/gslb/)
-  - [シンプル監視](https://sacloud.github.io/terraform-provider-sakuracloud/configuration/resources/simple_monitor/)
-  - [自動バックアップ](https://sacloud.github.io/terraform-provider-sakuracloud/configuration/resources/auto_backup/)
-  - [オブジェクトストレージ](https://sacloud.github.io/terraform-provider-sakuracloud/configuration/resources/bucket_object/)
-  - [サーバ コネクタ](https://sacloud.github.io/terraform-provider-sakuracloud/configuration/resources/server_connector)
-
-#### データリソース
-  - [データリソース](http://sacloud.github.io/terraform-provider-sakuracloud/configuration/resources/data_resource/)
+    * https://docs.usacloud.jp/terraform-v1/
 
 #### サポートしていないリソース
 
 以下のリソースはさくらのクラウド側でAPIが提供されていないため未サポートです。
 
-  - ローカルルータ
+  - ローカルルータ(terraform-provider-sakuracloud v2で対応済み)
   - リソースマネージャ
   - ウェブアクセラレータ
   - オブジェクトストレージ(バケット作成)
@@ -165,20 +128,6 @@ terraform apply
 
     make testacc
     
-#### ドキュメント
-
-ドキュメントはGithub Pagesを利用しています。(masterブランチの`docs`ディレクトリ配下)  
-静的ファイルの生成は`mkdocs`コマンドで行なっています。  
-
-**ドキュメントのPRの際は`build_docs`ディレクトリ配下のみ修正を行い、`docs`ディレクトリ配下は変更しないでください。  
-`docs`ディレクトリはリリース時に一括更新されます。**
-
-    # ドキュメントのプレビュー用サーバー起動(http://localhost/でプレビュー可能)
-    make serve-docs
-    
-    # ドキュメントの検証(textlint)
-    make lint-docs
-
 #### 英語版ドキュメント(terraform.ioスタイル)
 
 [terraform.io](https://terraform.io)スタイルの英語版ドキュメントのプレビューが行えます。  
