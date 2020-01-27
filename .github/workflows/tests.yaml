@@ -1,4 +1,5 @@
 name: Tests
+on: push
 jobs:
   lint:
     name: lint
