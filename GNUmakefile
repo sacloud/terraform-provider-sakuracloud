@@ -73,7 +73,7 @@ shasum:
 	(cd bin/; shasum -a 256 * > terraform-provider-sakuracloud_$(CURRENT_VERSION)_SHA256SUMS)
 
 .PHONY: release
-release:
+release: build-envs
 	ghr ${CURRENT_VERSION} bin/
 
 .PHONY: test
