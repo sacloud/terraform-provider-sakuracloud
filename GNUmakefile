@@ -17,9 +17,10 @@ clean:
 
 .PHONY: tools
 tools:
-	GO111MODULE=off go get -u github.com/motemen/gobump/cmd/gobump
-	GO111MODULE=off go get -u golang.org/x/tools/cmd/goimports
+	GO111MODULE=off go get github.com/x-motemen/gobump/cmd/gobump
+	GO111MODULE=off go get golang.org/x/tools/cmd/goimports
 	GO111MODULE=off go get github.com/sacloud/addlicense
+	GO111MODULE=off go get github.com/tcnksm/ghr
 	GO111MODULE=on go install github.com/bflad/tfproviderdocs
 	GO111MODULE=on go install github.com/bflad/tfproviderlint/cmd/tfproviderlint
 	GO111MODULE=on go install github.com/client9/misspell/cmd/misspell
@@ -35,7 +36,7 @@ build-envs:
 
 .PHONY: build
 build: build-envs
-	OS="`go env GOOS`" ARCH="`go env GOARCH`" ARCHIVE= BUILD_LDFLAGS=$(BUILD_LDFLAGS) CURRENT_VERSION=$(CURRENT_VERSION) sh -c "'$(CURDIR)/scripts/build.sh'"
+	OS=$${OS:-"`go env GOOS`"} ARCH=$${ARCH:-"`go env GOARCH`"} BUILD_LDFLAGS=$(BUILD_LDFLAGS) CURRENT_VERSION=$(CURRENT_VERSION) sh -c "'$(CURDIR)/scripts/build.sh'"
 
 .PHONY: build-x
 build-x: build-envs build-darwin build-windows build-linux shasum
@@ -70,6 +71,10 @@ bin/terraform-provider-sakuracloud_$(CURRENT_VERSION)_linux-amd64.zip: build-env
 .PHONY: shasum
 shasum:
 	(cd bin/; shasum -a 256 * > terraform-provider-sakuracloud_$(CURRENT_VERSION)_SHA256SUMS)
+
+.PHONY: release
+release: build-envs
+	ghr v${CURRENT_VERSION} bin/
 
 .PHONY: test
 test:
