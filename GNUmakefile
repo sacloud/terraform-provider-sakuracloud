@@ -114,10 +114,6 @@ docscheck:
 	tfproviderdocs check \
 		-require-resource-subcategory
 
-.PHONY: docker-build
-docker-build: clean
-	sh -c "'$(CURDIR)/scripts/build_on_docker.sh' 'tools' 'build-x'"
-
 .PHONY: set-license
 set-license:
 	addlicense -c $(AUTHOR) -y $(COPYRIGHT_YEAR) $(COPYRIGHT_FILES)
