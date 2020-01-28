@@ -15,12 +15,17 @@
 package sakuracloud
 
 import (
+	"fmt"
 	"log"
 	"net/http"
+	"os"
 	"time"
 
+	"github.com/hashicorp/terraform-plugin-sdk/httpclient"
 	"github.com/sacloud/libsacloud/api"
 )
+
+const uaEnvVar = "SAKURACLOUD_APPEND_USER_AGENT"
 
 // Config type of SakuraCloud Config
 type Config struct {
@@ -35,6 +40,7 @@ type Config struct {
 	RetryInterval       int
 	APIRequestTimeout   int
 	APIRequestRateLimit int
+	terraformVersion    string
 }
 
 // APIClient for SakuraCloud API
@@ -62,7 +68,7 @@ func (c *Config) NewClient() *APIClient {
 		client.DefaultTimeoutDuration = time.Duration(c.TimeoutMinute) * time.Minute
 	}
 
-	httpClient := &http.Client{}
+	httpClient := http.DefaultClient
 	if c.APIRequestTimeout > 0 {
 		httpClient.Timeout = time.Duration(c.APIRequestTimeout) * time.Second
 	}
@@ -75,7 +81,14 @@ func (c *Config) NewClient() *APIClient {
 		client.TraceMode = true
 		log.SetPrefix("[DEBUG] ")
 	}
-	client.UserAgent = "Terraform for SakuraCloud/v" + Version
+	tfUserAgent := httpclient.TerraformUserAgent(c.terraformVersion)
+	providerUserAgent := fmt.Sprintf("%s/v%s", "terraform-provider-sakuracloud", Version)
+	ua := fmt.Sprintf("%s %s", tfUserAgent, providerUserAgent)
+	if add := os.Getenv(uaEnvVar); add != "" {
+		ua += " " + add
+		log.Printf("[DEBUG] Using modified User-Agent: %s", ua)
+	}
+	client.UserAgent = ua
 
 	return &APIClient{
 		Client: client,
