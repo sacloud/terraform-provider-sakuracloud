@@ -13383,7 +13383,7 @@ func (o *LocalRouterUpdateSettingsRequest) SetSettingsHash(v string) {
 
 // LocalRouterHealth represents API parameter/response structure
 type LocalRouterHealth struct {
-	Peers []*LocalRouterHealthPeer `mapconv:"LocalRouter.[]Peers,recursive"`
+	Peers []*LocalRouterHealthPeer `mapconv:"[]Peers,recursive"`
 }
 
 // Validate validates by field tags
@@ -13394,7 +13394,7 @@ func (o *LocalRouterHealth) Validate() error {
 // setDefaults implements sacloud.argumentDefaulter
 func (o *LocalRouterHealth) setDefaults() interface{} {
 	return &struct {
-		Peers []*LocalRouterHealthPeer `mapconv:"LocalRouter.[]Peers,recursive"`
+		Peers []*LocalRouterHealthPeer `mapconv:"[]Peers,recursive"`
 	}{
 		Peers: o.GetPeers(),
 	}

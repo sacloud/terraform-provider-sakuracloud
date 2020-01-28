@@ -437,12 +437,14 @@ func (b *Builder) collectInterfaceParameters() []*updateInterfaceRequest {
 		reqs = append(reqs, &updateInterfaceRequest{
 			index:          0,
 			packetFilterID: b.NIC.GetPacketFilterID(),
+			displayIP:      b.NIC.GetDisplayIPAddress(),
 		})
 	}
 	for i, nic := range b.AdditionalNICs {
 		reqs = append(reqs, &updateInterfaceRequest{
 			index:          i + 1,
 			packetFilterID: nic.GetPacketFilterID(),
+			displayIP:      nic.GetDisplayIPAddress(),
 		})
 	}
 	return reqs

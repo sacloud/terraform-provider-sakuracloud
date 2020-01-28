@@ -86,6 +86,19 @@ func (o *InterfaceOp) Update(ctx context.Context, zone string, id types.ID, para
 	copySameNameField(param, value)
 	fill(value, fillModifiedAt)
 
+	serverOp := NewServerOp()
+	searched, err := serverOp.Find(ctx, zone, nil)
+	if err == nil {
+		for _, server := range searched.Servers {
+			for _, iface := range server.Interfaces {
+				if iface.ID == id {
+					iface.UserIPAddress = param.UserIPAddress
+					putServer(zone, server)
+				}
+			}
+		}
+	}
+
 	putInterface(zone, value)
 	return value, nil
 }

@@ -15,6 +15,8 @@
 package naked
 
 import (
+	"encoding/json"
+	"fmt"
 	"time"
 
 	"github.com/sacloud/libsacloud/v2/sacloud/types"
@@ -63,6 +65,36 @@ type LocalRouterSettingSwitch struct {
 	ZoneID   string `json:",omitempty" yaml:",omitempty" structs:",omitempty"` // クラウドの場合is1aなど Note: VPSの場合は数値型となる
 }
 
+// UnmarshalJSON ZoneIDに数値/文字列が混在する問題への対応
+func (l *LocalRouterSettingSwitch) UnmarshalJSON(b []byte) error {
+	type alias struct {
+		Code     string      `json:",omitempty" yaml:",omitempty" structs:",omitempty"` // リソースIDなど
+		Category string      `json:",omitempty" yaml:",omitempty" structs:",omitempty"` // cloud/vps/専用サーバなどを表す
+		ZoneID   interface{} `json:",omitempty" yaml:",omitempty" structs:",omitempty"` // クラウドの場合is1aなど Note: VPSの場合は数値型となる
+	}
+
+	var a alias
+	if err := json.Unmarshal(b, &a); err != nil {
+		return err
+	}
+	zoneID := ""
+	switch v := a.ZoneID.(type) {
+	case string:
+		zoneID = v
+	case int, int8, int16, int32, int64:
+		zoneID = fmt.Sprintf("%d", v)
+	case float32, float64:
+		zoneID = fmt.Sprintf("%d", int(v.(float64)))
+	}
+
+	*l = LocalRouterSettingSwitch{
+		Code:     a.Code,
+		Category: a.Category,
+		ZoneID:   zoneID,
+	}
+	return nil
+}
+
 // LocalRouterSettingInterface インターフェース設定
 type LocalRouterSettingInterface struct {
 	VirtualIPAddress string   `json:",omitempty" yaml:",omitempty" structs:",omitempty"`
@@ -92,11 +124,9 @@ type LocalRouterStatus struct {
 
 // LocalRouterHealth ローカルルータのヘルスチェック結果
 type LocalRouterHealth struct {
-	LocalRouter *struct {
-		Peers []*struct {
-			ID     types.ID
-			Status types.EServerInstanceStatus
-			Routes []string
-		} `yaml:"peers"`
-	}
+	Peers []*struct {
+		ID     types.ID
+		Status types.EServerInstanceStatus
+		Routes []string
+	} `yaml:"peers"`
 }
