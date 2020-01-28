@@ -1111,7 +1111,9 @@ func stopServer(client *APIClient, id int64, d *schema.ResourceData) error {
 		return err
 	}
 	if !s.IsDown() {
-		handleShutdown(client.Server, id, d, client.DefaultTimeoutDuration)
+		if err := handleShutdown(client.Server, id, d, client.DefaultTimeoutDuration); err != nil {
+			return err
+		}
 	}
 	sakuraMutexKV.Unlock(serverAPILockKey)
 
@@ -1154,7 +1156,7 @@ func serverNetworkAttrsCustomizeDiff(d *schema.ResourceDiff, meta interface{}) e
 		for _, t := range targets {
 			o, n := d.GetChange(t)
 			if o != nil && o.(string) != "" && n != nil {
-				d.Clear(t)
+				d.Clear(t) // nolint
 			}
 		}
 	}
