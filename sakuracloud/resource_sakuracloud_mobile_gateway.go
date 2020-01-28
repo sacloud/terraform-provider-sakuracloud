@@ -251,7 +251,6 @@ func resourceSakuraCloudMobileGatewayCreate(d *schema.ResourceData, meta interfa
 		if err != nil {
 			return fmt.Errorf("MobileGatewayInterfaceConnect is failed: %s", err)
 		}
-
 	}
 
 	rawTrafficControl := d.Get("traffic_control").([]interface{})
@@ -415,7 +414,7 @@ func resourceSakuraCloudMobileGatewayUpdate(d *schema.ResourceData, meta interfa
 
 	// need shutdown fields
 	needRestart := false
-	if d.HasChange("switch_id") || d.HasChange("private_ipaddress") || d.HasChange("private_nw_mask_len") {
+	if d.HasChanges("switch_id", "private_ipaddress", "private_nw_mask_len") {
 		// shutdown required for changing network settings
 		if mgw.IsUp() {
 			needRestart = true
@@ -461,7 +460,6 @@ func resourceSakuraCloudMobileGatewayUpdate(d *schema.ResourceData, meta interfa
 		if err != nil {
 			return fmt.Errorf("MobileGatewayInterfaceConnect is failed: %s", err)
 		}
-
 	}
 
 	if d.HasChange("traffic_control") {
@@ -493,7 +491,7 @@ func resourceSakuraCloudMobileGatewayUpdate(d *schema.ResourceData, meta interfa
 		}
 	}
 
-	if d.HasChange("dns1") || d.HasChange("dns2") {
+	if d.HasChanges("dns1", "dns2") {
 		dns1 := d.Get("dns_server1").(string)
 		dns2 := d.Get("dns_server2").(string)
 		if dns1 != "" || dns2 != "" {
@@ -530,7 +528,6 @@ func resourceSakuraCloudMobileGatewayUpdate(d *schema.ResourceData, meta interfa
 		if err != nil {
 			return fmt.Errorf("Couldn'd apply SakuraCloud MobileGateway config: %s", err)
 		}
-
 	}
 
 	if needRestart {
@@ -599,7 +596,6 @@ func resourceSakuraCloudMobileGatewayDelete(d *schema.ResourceData, meta interfa
 }
 
 func setMobileGatewayResourceData(d *schema.ResourceData, client *APIClient, data *sacloud.MobileGateway) error {
-
 	if data.IsFailed() {
 		d.SetId("")
 		return fmt.Errorf("MobileGateway[%d] state is failed", data.ID)

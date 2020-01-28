@@ -39,7 +39,6 @@ func init() {
 	testAccProviders = map[string]terraform.ResourceProvider{
 		"sakuracloud": testAccProvider,
 	}
-
 }
 
 func TestProvider(t *testing.T) {
@@ -53,7 +52,6 @@ func TestProvider_impl(t *testing.T) {
 }
 
 func testAccPreCheck(t *testing.T) {
-
 	requiredEnvs := []string{
 		"SAKURACLOUD_ACCESS_TOKEN",
 		"SAKURACLOUD_ACCESS_TOKEN_SECRET",

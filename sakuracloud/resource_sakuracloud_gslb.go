@@ -219,7 +219,6 @@ func resourceSakuraCloudGSLBRead(d *schema.ResourceData, meta interface{}) error
 }
 
 func resourceSakuraCloudGSLBUpdate(d *schema.ResourceData, meta interface{}) error {
-
 	client := meta.(*APIClient)
 
 	gslb, err := client.GSLB.Read(toSakuraCloudID(d.Id()))
@@ -300,13 +299,12 @@ func resourceSakuraCloudGSLBUpdate(d *schema.ResourceData, meta interface{}) err
 		}
 	}
 
-	gslb, err = client.GSLB.Update(gslb.ID, gslb)
+	_, err = client.GSLB.Update(gslb.ID, gslb)
 	if err != nil {
 		return fmt.Errorf("Failed to create SakuraCloud GSLB resource: %s", err)
 	}
 
 	return resourceSakuraCloudGSLBRead(d, meta)
-
 }
 
 func resourceSakuraCloudGSLBDelete(d *schema.ResourceData, meta interface{}) error {
@@ -322,7 +320,6 @@ func resourceSakuraCloudGSLBDelete(d *schema.ResourceData, meta interface{}) err
 }
 
 func setGSLBResourceData(d *schema.ResourceData, client *APIClient, data *sacloud.GSLB) error {
-
 	d.Set("name", data.Name)
 	d.Set("fqdn", data.Status.FQDN)
 

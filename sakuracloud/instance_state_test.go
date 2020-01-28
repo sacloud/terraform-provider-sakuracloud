@@ -22,7 +22,6 @@ import (
 )
 
 func TestStringSliceFromState(t *testing.T) {
-
 	expects := []struct {
 		should      string
 		state       *terraform.InstanceState
@@ -55,5 +54,4 @@ func TestStringSliceFromState(t *testing.T) {
 			assert.EqualValues(t, expect.expectValue, state)
 		})
 	}
-
 }

@@ -24,7 +24,7 @@ import (
 	"github.com/sacloud/libsacloud/sacloud"
 )
 
-func TestAccResourceSakuraCloudPacketFilter(t *testing.T) {
+func TestAccResourceSakuraCloudPacketFilter_basic(t *testing.T) {
 	var filter sacloud.PacketFilter
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },

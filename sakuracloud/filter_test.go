@@ -42,7 +42,6 @@ func (f *testTagFilterable) HasTag(tag string) bool {
 }
 
 func TestHasNamesFilter(t *testing.T) {
-
 	expects := []struct {
 		targetName string
 		conds      []string
@@ -84,7 +83,6 @@ func TestHasNamesFilter(t *testing.T) {
 		target := &testNameFilterable{name: e.targetName}
 		assert.Equal(t, e.expect, hasNames(target, e.conds))
 	}
-
 }
 
 func TestHasTagsFilter(t *testing.T) {

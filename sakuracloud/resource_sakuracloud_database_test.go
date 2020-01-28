@@ -24,7 +24,7 @@ import (
 	"github.com/sacloud/libsacloud/sacloud"
 )
 
-func TestAccResourceSakuraCloudDatabase_WithSwitch(t *testing.T) {
+func TestAccResourceSakuraCloudDatabase_withSwitch(t *testing.T) {
 	var database sacloud.Database
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
@@ -155,7 +155,7 @@ func testAccCheckSakuraCloudDatabaseDestroy(s *terraform.State) error {
 	return nil
 }
 
-func TestAccImportSakuraCloudDatabase(t *testing.T) {
+func TestAccImportSakuraCloudDatabase_basic(t *testing.T) {
 	checkFn := func(s []*terraform.InstanceState) error {
 		if len(s) != 1 {
 			return fmt.Errorf("expected 1 state: %#v", s)
@@ -194,10 +194,10 @@ func TestAccImportSakuraCloudDatabase(t *testing.T) {
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckSakuraCloudDatabaseDestroy,
 		Steps: []resource.TestStep{
-			resource.TestStep{
+			{
 				Config: testAccCheckSakuraCloudDatabaseConfig_WithSwitch,
 			},
-			resource.TestStep{
+			{
 				ResourceName:      resourceName,
 				ImportState:       true,
 				ImportStateCheck:  checkFn,

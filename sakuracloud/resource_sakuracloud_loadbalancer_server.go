@@ -96,7 +96,7 @@ func resourceSakuraCloudLoadBalancerServerCreate(d *schema.ResourceData, meta in
 	server.Port = port
 	vipSetting.AddServer(server)
 
-	loadBalancer, err = client.LoadBalancer.Update(toSakuraCloudID(lbID), loadBalancer)
+	_, err = client.LoadBalancer.Update(toSakuraCloudID(lbID), loadBalancer)
 	if err != nil {
 		return fmt.Errorf("Failed to create SakuraCloud LoadBalancerServer resource: %s", err)
 	}
@@ -176,7 +176,7 @@ func resourceSakuraCloudLoadBalancerServerDelete(d *schema.ResourceData, meta in
 	server := expandLoadBalancerServer(d)
 	vipSetting.DeleteServer(server.IPAddress, port)
 
-	loadBalancer, err = client.LoadBalancer.Update(toSakuraCloudID(lbID), loadBalancer)
+	_, err = client.LoadBalancer.Update(toSakuraCloudID(lbID), loadBalancer)
 	if err != nil {
 		return fmt.Errorf("Failed to delete SakuraCloud LoadBalancerServer resource: %s", err)
 	}
@@ -206,7 +206,7 @@ func isSameLoadBalancerVIPByValue(vip string, port string, s2 *sacloud.LoadBalan
 }
 
 func findLoadBalancerServer(server *sacloud.LoadBalancerServer, servers []*sacloud.LoadBalancerServer) *sacloud.LoadBalancerServer {
-	if servers == nil || len(servers) == 0 {
+	if len(servers) == 0 {
 		return nil
 	}
 	for _, s := range servers {
@@ -215,14 +215,13 @@ func findLoadBalancerServer(server *sacloud.LoadBalancerServer, servers []*saclo
 		}
 	}
 	return nil
-
 }
 
 func loadBalancerServerIDHash(vipID string, s *sacloud.LoadBalancerServer) string {
 	var buf bytes.Buffer
 	buf.WriteString(fmt.Sprintf("%s-", vipID))
 	buf.WriteString(fmt.Sprintf("%s-", s.IPAddress))
-	buf.WriteString(fmt.Sprintf("%s", s.Port))
+	buf.WriteString(s.Port)
 
 	return fmt.Sprintf("%d", hashcode.String(buf.String()))
 }

@@ -146,7 +146,7 @@ Run following command and open `http://localhost:4567/docs/providers/sakuracloud
 
 ```bash
 # preview terraform.io style docs
-make serve-english-docs 
+make website
 ```
 
 ## License

@@ -52,7 +52,7 @@ func resourceSakuraCloudVPCRouterPortForwardingCreate(d *schema.ResourceData, me
 	}
 
 	vpcRouter.Settings.Router.AddPortForwarding(pf.Protocol, pf.GlobalPort, pf.PrivateAddress, pf.PrivatePort, pf.Description)
-	vpcRouter, err = client.VPCRouter.UpdateSetting(toSakuraCloudID(routerID), vpcRouter)
+	_, err = client.VPCRouter.UpdateSetting(toSakuraCloudID(routerID), vpcRouter)
 	if err != nil {
 		return fmt.Errorf("Failed to enable SakuraCloud VPCRouterPortForwarding resource: %s", err)
 	}
@@ -104,7 +104,6 @@ func resourceSakuraCloudVPCRouterPortForwardingRead(d *schema.ResourceData, meta
 }
 
 func resourceSakuraCloudVPCRouterPortForwardingDelete(d *schema.ResourceData, meta interface{}) error {
-
 	client := getSacloudAPIClient(d, meta)
 
 	routerID := d.Get("vpc_router_id").(string)
@@ -117,11 +116,10 @@ func resourceSakuraCloudVPCRouterPortForwardingDelete(d *schema.ResourceData, me
 	}
 
 	if vpcRouter.Settings.Router.PortForwarding != nil {
-
 		pf := expandVPCRouterPortForwarding(d)
 		vpcRouter.Settings.Router.RemovePortForwarding(pf.Protocol, pf.GlobalPort, pf.PrivateAddress, pf.PrivatePort)
 
-		vpcRouter, err = client.VPCRouter.UpdateSetting(toSakuraCloudID(routerID), vpcRouter)
+		_, err = client.VPCRouter.UpdateSetting(toSakuraCloudID(routerID), vpcRouter)
 		if err != nil {
 			return fmt.Errorf("Failed to delete SakuraCloud VPCRouterPortForwarding resource: %s", err)
 		}
@@ -140,7 +138,7 @@ func vpcRouterPortForwardingIDHash(routerID string, s *sacloud.VPCRouterPortForw
 	buf.WriteString(fmt.Sprintf("%s-", routerID))
 	buf.WriteString(fmt.Sprintf("%s-", s.Protocol))
 	buf.WriteString(fmt.Sprintf("%s-", s.GlobalPort))
-	buf.WriteString(fmt.Sprintf("%s", s.PrivateAddress))
+	buf.WriteString(fmt.Sprintf("%s-", s.PrivateAddress))
 	buf.WriteString(fmt.Sprintf("%s-", s.PrivatePort))
 	buf.WriteString(fmt.Sprintf("%s-", s.Description))
 
@@ -148,7 +146,6 @@ func vpcRouterPortForwardingIDHash(routerID string, s *sacloud.VPCRouterPortForw
 }
 
 func expandVPCRouterPortForwarding(d resourceValueGetable) *sacloud.VPCRouterPortForwardingConfig {
-
 	var portForwarding = &sacloud.VPCRouterPortForwardingConfig{
 		Protocol:       d.Get("protocol").(string),
 		GlobalPort:     fmt.Sprintf("%d", d.Get("global_port").(int)),

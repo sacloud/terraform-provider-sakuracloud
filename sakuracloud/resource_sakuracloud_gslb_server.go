@@ -69,7 +69,7 @@ func resourceSakuraCloudGSLBServerCreate(d *schema.ResourceData, meta interface{
 	}
 
 	gslb.AddGSLBServer(server)
-	gslb, err = client.GSLB.Update(toSakuraCloudID(gslbID), gslb)
+	_, err = client.GSLB.Update(toSakuraCloudID(gslbID), gslb)
 	if err != nil {
 		return fmt.Errorf("Failed to create SakuraCloud GSLBServer resource: %s", err)
 	}
@@ -119,7 +119,7 @@ func resourceSakuraCloudGSLBServerDelete(d *schema.ResourceData, meta interface{
 	server := expandGSLBServer(d)
 	gslb.Settings.GSLB.DeleteServer(server.IPAddress)
 
-	gslb, err = client.GSLB.Update(toSakuraCloudID(gslbID), gslb)
+	_, err = client.GSLB.Update(toSakuraCloudID(gslbID), gslb)
 	if err != nil {
 		return fmt.Errorf("Failed to delete SakuraCloud GSLBServer resource: %s", err)
 	}

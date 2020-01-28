@@ -51,7 +51,7 @@ func resourceSakuraCloudVPCRouterRemoteAccessUserCreate(d *schema.ResourceData, 
 	}
 
 	vpcRouter.Settings.Router.AddRemoteAccessUser(remoteAccessUser.UserName, remoteAccessUser.Password)
-	vpcRouter, err = client.VPCRouter.UpdateSetting(toSakuraCloudID(routerID), vpcRouter)
+	_, err = client.VPCRouter.UpdateSetting(toSakuraCloudID(routerID), vpcRouter)
 	if err != nil {
 		return fmt.Errorf("Failed to enable SakuraCloud VPCRouterRemoteAccessUser resource: %s", err)
 	}
@@ -97,7 +97,6 @@ func resourceSakuraCloudVPCRouterRemoteAccessUserRead(d *schema.ResourceData, me
 }
 
 func resourceSakuraCloudVPCRouterRemoteAccessUserDelete(d *schema.ResourceData, meta interface{}) error {
-
 	client := getSacloudAPIClient(d, meta)
 
 	routerID := d.Get("vpc_router_id").(string)
@@ -110,11 +109,10 @@ func resourceSakuraCloudVPCRouterRemoteAccessUserDelete(d *schema.ResourceData, 
 	}
 
 	if vpcRouter.Settings.Router.RemoteAccessUsers != nil {
-
 		remoteAccessUser := expandVPCRouterRemoteAccessUser(d)
 		vpcRouter.Settings.Router.RemoveRemoteAccessUser(remoteAccessUser.UserName, remoteAccessUser.Password)
 
-		vpcRouter, err = client.VPCRouter.UpdateSetting(toSakuraCloudID(routerID), vpcRouter)
+		_, err = client.VPCRouter.UpdateSetting(toSakuraCloudID(routerID), vpcRouter)
 		if err != nil {
 			return fmt.Errorf("Failed to delete SakuraCloud VPCRouterRemoteAccessUser resource: %s", err)
 		}
@@ -132,13 +130,12 @@ func vpcRouterRemoteAccessUserIDHash(routerID string, s *sacloud.VPCRouterRemote
 	var buf bytes.Buffer
 	buf.WriteString(fmt.Sprintf("%s-", routerID))
 	buf.WriteString(fmt.Sprintf("%s-", s.UserName))
-	buf.WriteString(fmt.Sprintf("%s", s.Password))
+	buf.WriteString(s.Password)
 
 	return fmt.Sprintf("%d", hashcode.String(buf.String()))
 }
 
 func expandVPCRouterRemoteAccessUser(d resourceValueGetable) *sacloud.VPCRouterRemoteAccessUsersConfig {
-
 	var remoteAccessUser = &sacloud.VPCRouterRemoteAccessUsersConfig{
 		UserName: d.Get("name").(string),
 		Password: d.Get("password").(string),

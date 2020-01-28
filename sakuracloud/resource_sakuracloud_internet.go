@@ -257,6 +257,9 @@ func resourceSakuraCloudInternetUpdate(d *schema.ResourceData, meta interface{})
 		} else {
 			if len(internet.Switch.IPv6Nets) > 0 {
 				_, err = client.Internet.DisableIPv6(internet.ID, internet.Switch.IPv6Nets[0].ID)
+				if err != nil {
+					return fmt.Errorf("Failed to Disable IPv6 address: %s", err)
+				}
 			}
 		}
 	}
@@ -294,7 +297,6 @@ func resourceSakuraCloudInternetDelete(d *schema.ResourceData, meta interface{})
 					}
 				}
 			}
-
 		}
 	}
 
@@ -320,14 +322,12 @@ func resourceSakuraCloudInternetDelete(d *schema.ResourceData, meta interface{})
 		if err != nil {
 			return fmt.Errorf("Error booting SakuraCloud Server resource: %s", err)
 		}
-
 	}
 
 	return nil
 }
 
 func setInternetResourceData(d *schema.ResourceData, client *APIClient, data *sacloud.Internet) error {
-
 	d.Set("name", data.Name)
 	d.Set("icon_id", data.GetIconStrID())
 	d.Set("description", data.Description)

@@ -109,7 +109,6 @@ func dataSourceSakuraCloudArchiveRead(d *schema.ResourceData, meta interface{}) 
 	if osType, ok := d.GetOk("os_type"); ok {
 		strOSType := osType.(string)
 		if strOSType != "" {
-
 			res, err := client.Archive.FindByOSType(strToOSType(strOSType))
 			if err != nil {
 				return filterNoResultErr()
@@ -117,7 +116,6 @@ func dataSourceSakuraCloudArchiveRead(d *schema.ResourceData, meta interface{}) 
 			data = res
 		}
 	} else {
-
 		//filters
 		if rawFilter, filterOk := d.GetOk("filter"); filterOk {
 			filters := expandFilters(rawFilter)
@@ -164,7 +162,6 @@ func dataSourceSakuraCloudArchiveRead(d *schema.ResourceData, meta interface{}) 
 	}
 
 	if data != nil {
-
 		d.SetId(data.GetStrID())
 		d.Set("name", data.Name)
 		d.Set("size", toSizeGB(data.SizeMB))

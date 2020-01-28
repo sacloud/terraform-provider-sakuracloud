@@ -18,10 +18,8 @@ import (
 	"fmt"
 	"strconv"
 	"strings"
-	"time"
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
-	"github.com/hashicorp/terraform-plugin-sdk/terraform"
 	"github.com/sacloud/libsacloud/sacloud"
 )
 
@@ -45,17 +43,6 @@ func (r *resourceMapValue) GetOk(key string) (interface{}, bool) {
 
 func mapToResourceData(v map[string]interface{}) resourceValueGetable {
 	return &resourceMapValue{value: v}
-}
-
-func getMapFromResource(d resourceValueGetable, key string) (map[string]interface{}, bool) {
-	v, ok := d.GetOk(key)
-	if !ok {
-		return nil, false
-	}
-	if v, ok := v.(map[string]interface{}); ok {
-		return v, true
-	}
-	return nil, false
 }
 
 func getListFromResource(d resourceValueGetable, key string) ([]interface{}, bool) {
@@ -102,7 +89,7 @@ func toSakuraCloudID(id string) int64 {
 func expandStringList(configured []interface{}) []string {
 	vs := make([]string, 0, len(configured))
 	for _, v := range configured {
-		vs = append(vs, string(v.(string)))
+		vs = append(vs, v.(string))
 	}
 	return vs
 }
@@ -116,7 +103,7 @@ func expandStringListWithValidateInList(fieldName string, configured []interface
 	for _, v := range configured {
 		var found bool
 		for _, t := range allowWords {
-			if string(v.(string)) == t {
+			if v.(string) == t {
 				found = true
 				break
 			}
@@ -125,7 +112,7 @@ func expandStringListWithValidateInList(fieldName string, configured []interface
 			return nil, fmt.Errorf("%q must be one of [%s]", fieldName, strings.Join(allowWords, "/"))
 		}
 
-		vs = append(vs, string(v.(string)))
+		vs = append(vs, v.(string))
 	}
 	return vs, nil
 }
@@ -160,7 +147,6 @@ func flattenServers(servers []sacloud.Server) []string {
 		ids = append(ids, d.GetStrID())
 	}
 	return ids
-
 }
 
 func flattenInterfaces(interfaces []sacloud.Interface) []interface{} {
@@ -176,7 +162,6 @@ func flattenInterfaces(interfaces []sacloud.Interface) []interface{} {
 			case sacloud.ESCopeUser:
 				ret = append(ret, i.Switch.GetStrID())
 			}
-
 		}
 	}
 	return ret
@@ -275,7 +260,6 @@ func forceAtoI(target string) int {
 }
 
 func expandFilters(filter interface{}) map[string]interface{} {
-
 	ret := map[string]interface{}{}
 	filterSet := filter.(*schema.Set)
 	for _, v := range filterSet.List() {
@@ -287,7 +271,6 @@ func expandFilters(filter interface{}) map[string]interface{} {
 				filterValues = append(filterValues, e.(string))
 			}
 			ret["Tags.Name"] = []interface{}{filterValues}
-
 		} else {
 			var filterValues string
 			for _, e := range m["values"].([]interface{}) {
@@ -299,54 +282,7 @@ func expandFilters(filter interface{}) map[string]interface{} {
 			}
 			ret[name] = filterValues
 		}
-
 	}
 
 	return ret
-}
-
-type migrateSchemaDef struct {
-	source      string
-	destination string
-}
-
-type resourceData interface {
-	UnsafeSetFieldRaw(key string, value string)
-	Get(key string) interface{}
-	GetChange(key string) (interface{}, interface{})
-	GetOk(key string) (interface{}, bool)
-	HasChange(key string) bool
-	Partial(on bool)
-	Set(key string, value interface{}) error
-	SetPartial(k string)
-	MarkNewResource()
-	IsNewResource() bool
-	Id() string
-	ConnInfo() map[string]string
-	SetId(v string)
-	SetConnInfo(v map[string]string)
-	SetType(t string)
-	State() *terraform.InstanceState
-	Timeout(key string) time.Duration
-
-	RawResourceData() *schema.ResourceData
-}
-type resourceDataWrapper struct {
-	*schema.ResourceData
-	migrateDefs []migrateSchemaDef
-}
-
-func (d *resourceDataWrapper) HasChange(key string) bool {
-	origFunc := d.ResourceData.HasChange
-
-	for _, def := range d.migrateDefs {
-		if def.source == key || def.destination == key {
-			return origFunc(def.source) || origFunc(def.destination)
-		}
-	}
-	return origFunc(key)
-}
-
-func (d *resourceDataWrapper) RawResourceData() *schema.ResourceData {
-	return d.ResourceData
 }

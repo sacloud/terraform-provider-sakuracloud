@@ -134,7 +134,7 @@ terraform apply
 以下のコマンドを実行し、`http://localhost:4567/docs/providers/sakuracloud`へアクセスしてください。  
 
     # 英語版ドキュメントのプレビュー
-    make serve-english-docs 
+    make website
 
 
 ## License

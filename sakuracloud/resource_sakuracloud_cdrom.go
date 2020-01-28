@@ -145,7 +145,6 @@ func resourceSakuraCloudCDROMCreate(d *schema.ResourceData, meta interface{}) er
 	// close
 	if _, err := client.CDROM.CloseFTP(cdrom.ID); err != nil {
 		return fmt.Errorf("Failed to Close FTPS Connection from CDROM resource: %s", err)
-
 	}
 
 	d.SetId(cdrom.GetStrID())
@@ -248,7 +247,6 @@ func resourceSakuraCloudCDROMUpdate(d *schema.ResourceData, meta interface{}) er
 		// close
 		if _, err := client.CDROM.CloseFTP(cdrom.ID); err != nil {
 			return fmt.Errorf("Failed to Close FTPS Connection from CDROM resource: %s", err)
-
 		}
 
 		// re-insert CDROM
@@ -294,7 +292,6 @@ func resourceSakuraCloudCDROMDelete(d *schema.ResourceData, meta interface{}) er
 }
 
 func setCDROMResourceData(d *schema.ResourceData, client *APIClient, data *sacloud.CDROM) error {
-
 	d.Set("name", data.Name)
 	d.Set("size", toSizeGB(data.SizeMB))
 	d.Set("icon_id", data.GetIconStrID())
@@ -332,7 +329,7 @@ func setCDROMResourceData(d *schema.ResourceData, client *APIClient, data *saclo
 			return fmt.Errorf("Error calculate md5 from iso_image_file (%s): %s", source, err)
 		}
 
-		d.Set("hash", h.Sum(nil))
+		d.Set("hash", string(h.Sum(nil)))
 	}
 
 	d.Set("zone", client.Zone)
@@ -376,7 +373,6 @@ func prepareContentFile(d *schema.ResourceData) (string, bool, error) {
 		if err != nil {
 			return "", isTemporal, fmt.Errorf("Error writing temp-file : %s", err)
 		}
-
 	} else {
 		return "", isTemporal, fmt.Errorf("Must specify \"iso_image_file\" or \"content\" field")
 	}

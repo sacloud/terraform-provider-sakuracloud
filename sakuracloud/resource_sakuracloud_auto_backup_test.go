@@ -25,7 +25,7 @@ import (
 	"github.com/sacloud/libsacloud/sacloud"
 )
 
-func TestAccResourceSakuraCloudAutoBackup(t *testing.T) {
+func TestAccResourceSakuraCloudAutoBackup_basic(t *testing.T) {
 	var autoBackup sacloud.AutoBackup
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
@@ -119,7 +119,7 @@ func testAccCheckSakuraCloudAutoBackupDestroy(s *terraform.State) error {
 	return nil
 }
 
-func TestAccImportSakuraCloudAutoBackup(t *testing.T) {
+func TestAccImportSakuraCloudAutoBackup_basic(t *testing.T) {
 	checkFn := func(s []*terraform.InstanceState) error {
 		if len(s) != 1 {
 			return fmt.Errorf("expected 1 state: %#v", s)

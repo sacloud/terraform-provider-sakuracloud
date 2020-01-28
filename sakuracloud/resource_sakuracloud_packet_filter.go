@@ -133,7 +133,6 @@ func resourceSakuraCloudPacketFilterCreate(d *schema.ResourceData, meta interfac
 			if err != nil {
 				return err
 			}
-
 		}
 	}
 
@@ -210,13 +209,11 @@ func resourceSakuraCloudPacketFilterUpdate(d *schema.ResourceData, meta interfac
 				if err != nil {
 					return err
 				}
-
 			}
 		}
-
 	}
 
-	filter, err = client.PacketFilter.Update(filter.ID, filter)
+	_, err = client.PacketFilter.Update(filter.ID, filter)
 	if err != nil {
 		return fmt.Errorf("Error updating SakuraCloud PacketFilter resource: %s", err)
 	}

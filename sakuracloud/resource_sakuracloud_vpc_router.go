@@ -220,7 +220,6 @@ func resourceSakuraCloudVPCRouter() *schema.Resource {
 }
 
 func resourceSakuraCloudVPCRouterCreate(d *schema.ResourceData, meta interface{}) error {
-
 	client := getSacloudAPIClient(d, meta)
 
 	opts := client.VPCRouter.New()
@@ -234,8 +233,8 @@ func resourceSakuraCloudVPCRouterCreate(d *schema.ResourceData, meta interface{}
 		vip := ""
 		ipaddress1 := ""
 		ipaddress2 := ""
-		vrid := -1
-		aliases := []string{}
+		var vrid int
+		var aliases []string
 
 		//validate
 		errFormat := "Failed to create SakuraCloud VPCRouter resource : %s is Required when plan is 'premium' or 'highspec' or 'highspec4000'"
@@ -545,7 +544,6 @@ func resourceSakuraCloudVPCRouterRead(d *schema.ResourceData, meta interface{}) 
 }
 
 func setVPCRouterResourceData(d *schema.ResourceData, client *APIClient, data *sacloud.VPCRouter) error {
-
 	if data.IsFailed() {
 		d.SetId("")
 		return fmt.Errorf("VPCRouter[%d] state is failed", data.ID)
@@ -563,7 +561,6 @@ func setVPCRouterResourceData(d *schema.ResourceData, client *APIClient, data *s
 		} else {
 			d.Set("internet_connection", false)
 		}
-
 	} else {
 		d.Set("syslog_host", "")
 		d.Set("internet_connection", false)
@@ -641,7 +638,6 @@ func setVPCRouterResourceData(d *schema.ResourceData, client *APIClient, data *s
 	var firewallRules []map[string]interface{}
 	if data.HasFirewall() {
 		for i, configs := range data.Settings.Router.Firewall.Config {
-
 			directionRules := map[string][]*sacloud.VPCRouterFirewallRule{
 				"send":    configs.Send,
 				"receive": configs.Receive,
@@ -811,20 +807,17 @@ func resourceSakuraCloudVPCRouterUpdate(d *schema.ResourceData, meta interface{}
 		sakuraMutexKV.Lock(lockKey)
 		defer sakuraMutexKV.Unlock(lockKey)
 
-		err = nil
 		for i := 0; i < 10; i++ {
 			vpcRouter, err := client.VPCRouter.Read(vpcRouter.ID)
 			if err != nil {
 				return fmt.Errorf("Couldn't find SakuraCloud VPCRouter resource: %s", err)
 			}
 			if vpcRouter.Instance.IsDown() {
-				err = nil
 				break
 			}
-			err = handleShutdown(client.VPCRouter, vpcRouter.ID, d, 60*time.Second)
-		}
-		if err != nil {
-			return fmt.Errorf("Error stopping SakuraCloud VPCRouter resource: %s", err)
+			if err := handleShutdown(client.VPCRouter, vpcRouter.ID, d, 60*time.Second); err != nil {
+				return fmt.Errorf("Error stopping SakuraCloud VPCRouter resource: %s", err)
+			}
 		}
 	}
 
@@ -854,7 +847,6 @@ func resourceSakuraCloudVPCRouterUpdate(d *schema.ResourceData, meta interface{}
 		}
 	}
 	if d.HasChange("syslog_host") {
-
 		if vpcRouter.Settings == nil || vpcRouter.Settings.Router == nil {
 			vpcRouter.InitVPCRouterSetting()
 		}

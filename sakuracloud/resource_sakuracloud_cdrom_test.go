@@ -22,10 +22,9 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/resource"
 	"github.com/hashicorp/terraform-plugin-sdk/terraform"
-	"github.com/sacloud/libsacloud/sacloud"
 )
 
-func TestAccResourceSakuraCloudCDROM(t *testing.T) {
+func TestAccResourceSakuraCloudCDROM_basic(t *testing.T) {
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
 		Providers:    testAccProviders,
@@ -62,7 +61,7 @@ func TestAccResourceSakuraCloudCDROM(t *testing.T) {
 	})
 }
 
-func TestAccResourceSakuraCloudCDROM_With_TextContent(t *testing.T) {
+func TestAccResourceSakuraCloudCDROM_withTextContent(t *testing.T) {
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
 		Providers:    testAccProviders,
@@ -84,35 +83,6 @@ func TestAccResourceSakuraCloudCDROM_With_TextContent(t *testing.T) {
 	})
 }
 
-func testAccCheckSakuraCloudCDROMExists(n string, cdrom *sacloud.CDROM) resource.TestCheckFunc {
-	return func(s *terraform.State) error {
-		rs, ok := s.RootModule().Resources[n]
-
-		if !ok {
-			return fmt.Errorf("Not found: %s", n)
-		}
-
-		if rs.Primary.ID == "" {
-			return errors.New("No CDROM ID is set")
-		}
-
-		client := testAccProvider.Meta().(*APIClient)
-		foundCDROM, err := client.CDROM.Read(toSakuraCloudID(rs.Primary.ID))
-
-		if err != nil {
-			return err
-		}
-
-		if foundCDROM.ID != toSakuraCloudID(rs.Primary.ID) {
-			return errors.New("CDROM not found")
-		}
-
-		*cdrom = *foundCDROM
-
-		return nil
-	}
-}
-
 func testAccCheckSakuraCloudCDROMDestroy(s *terraform.State) error {
 	client := testAccProvider.Meta().(*APIClient)
 
@@ -131,7 +101,7 @@ func testAccCheckSakuraCloudCDROMDestroy(s *terraform.State) error {
 	return nil
 }
 
-func TestAccImportSakuraCloudCDROM(t *testing.T) {
+func TestAccImportSakuraCloudCDROM_basic(t *testing.T) {
 	checkFn := func(s []*terraform.InstanceState) error {
 		if len(s) != 1 {
 			return fmt.Errorf("expected 1 state: %#v", s)
@@ -158,10 +128,10 @@ func TestAccImportSakuraCloudCDROM(t *testing.T) {
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckSakuraCloudCDROMDestroy,
 		Steps: []resource.TestStep{
-			resource.TestStep{
+			{
 				Config: testAccCheckSakuraCloudCDROMConfig_basic,
 			},
-			resource.TestStep{
+			{
 				ResourceName:      resourceName,
 				ImportState:       true,
 				ImportStateCheck:  checkFn,

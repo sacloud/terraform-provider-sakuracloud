@@ -159,7 +159,7 @@ func resourceSakuraCloudPrivateHostUpdate(d *schema.ResourceData, meta interface
 		}
 	}
 
-	privateHost, err = client.PrivateHost.Update(privateHost.ID, privateHost)
+	_, err = client.PrivateHost.Update(privateHost.ID, privateHost)
 	if err != nil {
 		return fmt.Errorf("Error updating SakuraCloud PrivateHost resource: %s", err)
 	}
@@ -180,7 +180,6 @@ func resourceSakuraCloudPrivateHostDelete(d *schema.ResourceData, meta interface
 
 	for _, s := range res.Servers {
 		if s.PrivateHost != nil && s.PrivateHost.ID == id {
-
 			// still running?
 			isNeedRestart := false
 			if s.IsUp() {

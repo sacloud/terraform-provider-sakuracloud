@@ -154,9 +154,7 @@ func resourceSakuraCloudServerConnectorCreate(d *schema.ResourceData, meta inter
 
 				i++
 			}
-
 		}
-
 	} else {
 		if server.Interfaces != nil {
 			for _, i := range server.Interfaces {
@@ -263,7 +261,6 @@ func resourceSakuraCloudServerConnectorUpdate(d *schema.ResourceData, meta inter
 					return fmt.Errorf("Error connecting disk to SakuraCloud ServerConnector resource: %s", err)
 				}
 			}
-
 		}
 	}
 
@@ -304,9 +301,7 @@ func resourceSakuraCloudServerConnectorUpdate(d *schema.ResourceData, meta inter
 
 					i++
 				}
-
 			}
-
 		} else {
 			if server.Interfaces != nil {
 				for _, i := range server.Interfaces {
@@ -349,7 +344,6 @@ func resourceSakuraCloudServerConnectorUpdate(d *schema.ResourceData, meta inter
 }
 
 func resourceSakuraCloudServerConnectorDelete(d *schema.ResourceData, meta interface{}) error {
-
 	client := getSacloudAPIClient(d, meta)
 
 	server, err := client.Server.Read(toSakuraCloudID(d.Id()))

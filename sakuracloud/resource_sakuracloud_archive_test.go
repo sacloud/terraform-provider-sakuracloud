@@ -24,7 +24,7 @@ import (
 	"github.com/sacloud/libsacloud/sacloud"
 )
 
-func TestAccResourceSakuraCloudArchive(t *testing.T) {
+func TestAccResourceSakuraCloudArchive_basic(t *testing.T) {
 	var archive sacloud.Archive
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
@@ -110,7 +110,7 @@ func testAccCheckSakuraCloudArchiveDestroy(s *terraform.State) error {
 	return nil
 }
 
-func TestAccImportSakuraCloudArchive(t *testing.T) {
+func TestAccImportSakuraCloudArchive_basic(t *testing.T) {
 	checkFn := func(s []*terraform.InstanceState) error {
 		if len(s) != 1 {
 			return fmt.Errorf("expected 1 state: %#v", s)

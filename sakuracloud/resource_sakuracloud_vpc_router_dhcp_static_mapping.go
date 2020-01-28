@@ -51,7 +51,7 @@ func resourceSakuraCloudVPCRouterDHCPStaticMappingCreate(d *schema.ResourceData,
 	}
 
 	vpcRouter.Settings.Router.AddDHCPStaticMapping(dhcpStaticMapping.IPAddress, dhcpStaticMapping.MACAddress)
-	vpcRouter, err = client.VPCRouter.UpdateSetting(toSakuraCloudID(routerID), vpcRouter)
+	_, err = client.VPCRouter.UpdateSetting(toSakuraCloudID(routerID), vpcRouter)
 	if err != nil {
 		return fmt.Errorf("Failed to enable SakuraCloud VPCRouterDHCPStaticMapping resource: %s", err)
 	}
@@ -99,7 +99,6 @@ func resourceSakuraCloudVPCRouterDHCPStaticMappingRead(d *schema.ResourceData, m
 }
 
 func resourceSakuraCloudVPCRouterDHCPStaticMappingDelete(d *schema.ResourceData, meta interface{}) error {
-
 	client := getSacloudAPIClient(d, meta)
 
 	routerID := d.Get("vpc_router_id").(string)
@@ -112,11 +111,10 @@ func resourceSakuraCloudVPCRouterDHCPStaticMappingDelete(d *schema.ResourceData,
 	}
 
 	if vpcRouter.Settings.Router.DHCPStaticMapping != nil {
-
 		dhcpStaticMapping := expandVPCRouterDHCPStaticMapping(d)
 		vpcRouter.Settings.Router.RemoveDHCPStaticMapping(dhcpStaticMapping.IPAddress, dhcpStaticMapping.MACAddress)
 
-		vpcRouter, err = client.VPCRouter.UpdateSetting(toSakuraCloudID(routerID), vpcRouter)
+		_, err = client.VPCRouter.UpdateSetting(toSakuraCloudID(routerID), vpcRouter)
 		if err != nil {
 			return fmt.Errorf("Failed to delete SakuraCloud VPCRouterDHCPStaticMapping resource: %s", err)
 		}
@@ -134,13 +132,12 @@ func vpcRouterDHCPStaticMappingIDHash(routerID string, s *sacloud.VPCRouterDHCPS
 	var buf bytes.Buffer
 	buf.WriteString(fmt.Sprintf("%s-", routerID))
 	buf.WriteString(fmt.Sprintf("%s-", s.IPAddress))
-	buf.WriteString(fmt.Sprintf("%s", s.MACAddress))
+	buf.WriteString(s.MACAddress)
 
 	return fmt.Sprintf("%d", hashcode.String(buf.String()))
 }
 
 func expandVPCRouterDHCPStaticMapping(d resourceValueGetable) *sacloud.VPCRouterDHCPStaticMappingConfig {
-
 	var dhcpStaticMapping = &sacloud.VPCRouterDHCPStaticMappingConfig{
 		IPAddress:  d.Get("ipaddress").(string),
 		MACAddress: d.Get("macaddress").(string),

@@ -158,7 +158,7 @@ func resourceSakuraCloudNoteUpdate(d *schema.ResourceData, meta interface{}) err
 		}
 	}
 
-	note, err = client.Note.Update(note.ID, note)
+	_, err = client.Note.Update(note.ID, note)
 	if err != nil {
 		return fmt.Errorf("Error updating SakuraCloud Note resource: %s", err)
 	}

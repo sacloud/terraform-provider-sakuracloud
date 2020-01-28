@@ -24,7 +24,7 @@ import (
 	"github.com/sacloud/libsacloud/sacloud"
 )
 
-func TestAccResourceSakuraCloudDatabaseReplica(t *testing.T) {
+func TestAccResourceSakuraCloudDatabaseReplica_basic(t *testing.T) {
 	var database sacloud.Database
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
@@ -68,7 +68,7 @@ func TestAccResourceSakuraCloudDatabaseReplica(t *testing.T) {
 	})
 }
 
-func TestAccImportSakuraCloudDatabaseReadReplica(t *testing.T) {
+func TestAccImportSakuraCloudDatabaseReadReplica_basic(t *testing.T) {
 	checkFn := func(s []*terraform.InstanceState) error {
 		if len(s) != 1 {
 			return fmt.Errorf("expected 1 state: %#v", s)

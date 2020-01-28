@@ -24,7 +24,7 @@ import (
 	"github.com/sacloud/libsacloud/sacloud"
 )
 
-func TestAccResourceSakuraCloudVPCRouter(t *testing.T) {
+func TestAccResourceSakuraCloudVPCRouter_basic(t *testing.T) {
 	var vpcRouter sacloud.VPCRouter
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
@@ -98,7 +98,7 @@ func TestAccResourceSakuraCloudVPCRouter(t *testing.T) {
 	})
 }
 
-func TestAccResourceSakuraCloudVPCRouter_Full(t *testing.T) {
+func TestAccResourceSakuraCloudVPCRouter_full(t *testing.T) {
 	var vpcRouter sacloud.VPCRouter
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },

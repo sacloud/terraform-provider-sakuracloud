@@ -25,7 +25,7 @@ import (
 	"github.com/sacloud/libsacloud/sacloud"
 )
 
-func TestAccResourceSakuraCloudDNSRecord_Basic(t *testing.T) {
+func TestAccResourceSakuraCloudDNSRecord_basic(t *testing.T) {
 	randString1 := acctest.RandStringFromCharSet(5, acctest.CharSetAlpha)
 	randString2 := acctest.RandStringFromCharSet(20, acctest.CharSetAlpha)
 	zone := fmt.Sprintf("%s.%s.com", randString1, randString2)
@@ -80,7 +80,7 @@ func TestAccResourceSakuraCloudDNSRecord_Basic(t *testing.T) {
 	})
 }
 
-func TestAccResourceSakuraCloudDNSRecord_With_Count(t *testing.T) {
+func TestAccResourceSakuraCloudDNSRecord_withCount(t *testing.T) {
 	randString1 := acctest.RandStringFromCharSet(5, acctest.CharSetAlpha)
 	randString2 := acctest.RandStringFromCharSet(20, acctest.CharSetAlpha)
 	zone := fmt.Sprintf("%s.%s.com", randString1, randString2)

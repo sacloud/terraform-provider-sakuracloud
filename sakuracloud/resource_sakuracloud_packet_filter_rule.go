@@ -164,7 +164,7 @@ func resourceSakuraCloudPacketFilterRuleUpdate(d *schema.ResourceData, meta inte
 		return fmt.Errorf("Failed to Update SakuraCloud PacketFilter rules: %s", err)
 	}
 
-	filter, err = client.PacketFilter.Update(toSakuraCloudID(pfID), filter)
+	_, err = client.PacketFilter.Update(toSakuraCloudID(pfID), filter)
 	if err != nil {
 		return fmt.Errorf("Failed to Update SakuraCloud PacketFilter resource: %s", err)
 	}
@@ -196,7 +196,6 @@ func resourceSakuraCloudPacketFilterRuleDelete(d *schema.ResourceData, meta inte
 }
 
 func setPacketFilterRuleResourceData(d *schema.ResourceData, client *APIClient, data *sacloud.PacketFilter) error {
-
 	hash := d.Id()
 
 	if data.Expression != nil && len(data.Expression) > 0 {

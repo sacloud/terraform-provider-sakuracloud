@@ -446,13 +446,12 @@ func resourceSakuraCloudSimpleMonitorUpdate(d *schema.ResourceData, meta interfa
 		simpleMonitor.SetNotifyInterval(notifyInterval)
 	}
 
-	simpleMonitor, err = client.SimpleMonitor.Update(simpleMonitor.ID, simpleMonitor)
+	_, err = client.SimpleMonitor.Update(simpleMonitor.ID, simpleMonitor)
 	if err != nil {
 		return fmt.Errorf("Failed to create SakuraCloud SimpleMonitor resource: %s", err)
 	}
 
 	return resourceSakuraCloudSimpleMonitorRead(d, meta)
-
 }
 
 func resourceSakuraCloudSimpleMonitorDelete(d *schema.ResourceData, meta interface{}) error {
@@ -468,7 +467,6 @@ func resourceSakuraCloudSimpleMonitorDelete(d *schema.ResourceData, meta interfa
 }
 
 func setSimpleMonitorResourceData(d *schema.ResourceData, client *APIClient, data *sacloud.SimpleMonitor) error {
-
 	d.Set("target", data.Status.Target)
 
 	healthCheck := map[string]interface{}{}

@@ -289,7 +289,6 @@ data "sakuracloud_database" "foobar" {
 }
 
 func testAccCheckSakuraCloudDataSourceDatabaseConfig_NotExists(name string) string {
-
 	return fmt.Sprintf(`
 resource "sakuracloud_switch" "sw" {
     name = "%s"

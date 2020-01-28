@@ -118,7 +118,6 @@ func resourceSakuraCloudBucketObject() *schema.Resource {
 }
 
 func resourceSakuraCloudBucketObjectPut(d *schema.ResourceData, meta interface{}) error {
-
 	client, err := getS3Client(d)
 	if err != nil {
 		return fmt.Errorf("SakuraCloud BucketObject Put is failed: %s", err)
@@ -231,7 +230,6 @@ func resourceSakuraCloudBucketObjectDelete(d *schema.ResourceData, meta interfac
 }
 
 func getS3Client(d *schema.ResourceData) (*s3.S3, error) {
-
 	accessKey := d.Get("access_key").(string)
 	secretKey := d.Get("secret_key").(string)
 
@@ -243,5 +241,4 @@ func getS3Client(d *schema.ResourceData) (*s3.S3, error) {
 		Name:       "us-west-2",
 		S3Endpoint: "https://b.sakurastorage.jp",
 	}), nil
-
 }

@@ -23,14 +23,14 @@ import (
 	"github.com/sacloud/libsacloud/sacloud"
 )
 
-func TestAccSakuraCloudVPCRouterInterface_Basic(t *testing.T) {
+func TestAccSakuraCloudVPCRouterInterface_basic(t *testing.T) {
 	var vpcRouter sacloud.VPCRouter
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckSakuraCloudVPCRouterInterfaceDestroy,
 		Steps: []resource.TestStep{
-			resource.TestStep{
+			{
 				Config: testAccCheckSakuraCloudVPCRouterInterfaceConfig_basic,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckSakuraCloudVPCRouterExists("sakuracloud_vpc_router.foobar", &vpcRouter),
@@ -50,14 +50,14 @@ func TestAccSakuraCloudVPCRouterInterface_Basic(t *testing.T) {
 	})
 }
 
-func TestAccSakuraCloudVPCRouterInterface_Update(t *testing.T) {
+func TestAccSakuraCloudVPCRouterInterface_update(t *testing.T) {
 	var vpcRouter sacloud.VPCRouter
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckSakuraCloudVPCRouterInterfaceDestroy,
 		Steps: []resource.TestStep{
-			resource.TestStep{
+			{
 				Config: testAccCheckSakuraCloudVPCRouterInterfaceConfig_basic,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckSakuraCloudVPCRouterExists("sakuracloud_vpc_router.foobar", &vpcRouter),
@@ -73,7 +73,7 @@ func TestAccSakuraCloudVPCRouterInterface_Update(t *testing.T) {
 						"sakuracloud_vpc_router_interface.eth1", "nw_mask_len", "24"),
 				),
 			},
-			resource.TestStep{
+			{
 				Config: testAccCheckSakuraCloudVPCRouterInterfaceConfig_update,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckSakuraCloudVPCRouterExists("sakuracloud_vpc_router.foobar", &vpcRouter),
@@ -103,14 +103,14 @@ func TestAccSakuraCloudVPCRouterInterface_Update(t *testing.T) {
 	})
 }
 
-func TestAccSakuraCloudVPCRouterInterface_WithRouter(t *testing.T) {
+func TestAccSakuraCloudVPCRouterInterface_withRouter(t *testing.T) {
 	var vpcRouter sacloud.VPCRouter
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckSakuraCloudVPCRouterInterfaceDestroy,
 		Steps: []resource.TestStep{
-			resource.TestStep{
+			{
 				Config: testAccCheckSakuraCloudVPCRouterInterfaceConfig_WithRouter,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckSakuraCloudVPCRouterExists("sakuracloud_vpc_router.foobar", &vpcRouter),

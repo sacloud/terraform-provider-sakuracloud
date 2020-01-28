@@ -17,6 +17,7 @@ package sakuracloud
 import (
 	"bytes"
 	"fmt"
+	"strings"
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/hashcode"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
@@ -69,7 +70,7 @@ func resourceSakuraCloudDNSRecordCreate(d *schema.ResourceData, meta interface{}
 	}
 
 	dns.AddRecord(record)
-	dns, err = client.DNS.Update(toSakuraCloudID(dnsID), dns)
+	_, err = client.DNS.Update(toSakuraCloudID(dnsID), dns)
 	if err != nil {
 		return fmt.Errorf("Failed to create SakuraCloud DNSRecord resource: %s", err)
 	}
@@ -96,9 +97,23 @@ func resourceSakuraCloudDNSRecordRead(d *schema.ResourceData, meta interface{}) 
 		return nil
 	}
 
-	r := dnsRecordToState(record)
-	for k, v := range r {
-		d.Set(k, v)
+	d.Set("name", record.Name)
+	d.Set("type", record.Type)
+	d.Set("value", record.RData)
+	d.Set("ttl", record.TTL)
+
+	switch record.Type {
+	case "MX":
+		// ex. record.RData = "10 example.com."
+		values := strings.SplitN(record.RData, " ", 2)
+		d.Set("value", values[1])
+		d.Set("priority", forceAtoI(values[0]))
+	case "SRV":
+		values := strings.SplitN(record.RData, " ", 4)
+		d.Set("value", values[3])
+		d.Set("priority", forceAtoI(values[0]))
+		d.Set("weight", forceAtoI(values[1]))
+		d.Set("port", forceAtoI(values[2]))
 	}
 
 	return nil
@@ -126,7 +141,7 @@ func resourceSakuraCloudDNSRecordDelete(d *schema.ResourceData, meta interface{}
 		}
 	}
 
-	dns, err = client.DNS.Update(toSakuraCloudID(dnsID), dns)
+	_, err = client.DNS.Update(toSakuraCloudID(dnsID), dns)
 	if err != nil {
 		return fmt.Errorf("Failed to delete SakuraCloud DNSRecord resource: %s", err)
 	}
@@ -136,7 +151,6 @@ func resourceSakuraCloudDNSRecordDelete(d *schema.ResourceData, meta interface{}
 
 func findRecordMatch(r *sacloud.DNSRecordSet, records *[]sacloud.DNSRecordSet) *sacloud.DNSRecordSet {
 	for _, record := range *records {
-
 		if isSameDNSRecord(r, &record) {
 			return &record
 		}

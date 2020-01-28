@@ -62,7 +62,6 @@ func resourceSakuraCloudVPCRouterFirewallCreate(d *schema.ResourceData, meta int
 		case "receive":
 			vpcRouter.Settings.Router.Firewall.Config[ifIndex].Receive = nil
 		}
-
 	}
 
 	if rawExpressions, ok := d.GetOk("expressions"); ok {
@@ -91,7 +90,7 @@ func resourceSakuraCloudVPCRouterFirewallCreate(d *schema.ResourceData, meta int
 		}
 	}
 
-	vpcRouter, err = client.VPCRouter.UpdateSetting(toSakuraCloudID(routerID), vpcRouter)
+	_, err = client.VPCRouter.UpdateSetting(toSakuraCloudID(routerID), vpcRouter)
 	if err != nil {
 		return fmt.Errorf("Failed to enable SakuraCloud VPCRouterFirewall resource: %s", err)
 	}
@@ -121,7 +120,6 @@ func resourceSakuraCloudVPCRouterFirewallRead(d *schema.ResourceData, meta inter
 	direction := d.Get("direction").(string)
 	if vpcRouter.Settings != nil && vpcRouter.Settings.Router != nil && vpcRouter.Settings.Router.Firewall != nil &&
 		vpcRouter.Settings.Router.Firewall.Config != nil {
-
 		expressions := []interface{}{}
 
 		var rules []*sacloud.VPCRouterFirewallRule
@@ -158,7 +156,6 @@ func resourceSakuraCloudVPCRouterFirewallRead(d *schema.ResourceData, meta inter
 }
 
 func resourceSakuraCloudVPCRouterFirewallDelete(d *schema.ResourceData, meta interface{}) error {
-
 	client := getSacloudAPIClient(d, meta)
 
 	routerID := d.Get("vpc_router_id").(string)
@@ -174,7 +171,6 @@ func resourceSakuraCloudVPCRouterFirewallDelete(d *schema.ResourceData, meta int
 	direction := d.Get("direction").(string)
 	if vpcRouter.Settings != nil && vpcRouter.Settings.Router != nil && vpcRouter.Settings.Router.Firewall != nil &&
 		vpcRouter.Settings.Router.Firewall.Config != nil {
-
 		switch direction {
 		case "send":
 			vpcRouter.Settings.Router.Firewall.Config[ifIndex].Send = []*sacloud.VPCRouterFirewallRule{}
@@ -182,7 +178,7 @@ func resourceSakuraCloudVPCRouterFirewallDelete(d *schema.ResourceData, meta int
 			vpcRouter.Settings.Router.Firewall.Config[ifIndex].Receive = []*sacloud.VPCRouterFirewallRule{}
 		}
 
-		vpcRouter, err = client.VPCRouter.UpdateSetting(toSakuraCloudID(routerID), vpcRouter)
+		_, err = client.VPCRouter.UpdateSetting(toSakuraCloudID(routerID), vpcRouter)
 		if err != nil {
 			return fmt.Errorf("Failed to delete SakuraCloud VPCRouterFirewall resource: %s", err)
 		}

@@ -25,7 +25,7 @@ import (
 	"github.com/sacloud/libsacloud/sacloud"
 )
 
-func TestAccResourceSakuraCloudDisk(t *testing.T) {
+func TestAccResourceSakuraCloudDisk_basic(t *testing.T) {
 	var disk sacloud.Disk
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
@@ -102,7 +102,6 @@ func testAccCheckSakuraCloudDiskExists(n string, disk *sacloud.Disk) resource.Te
 
 func testAccCheckSakuraCloudDiskAttributes(disk *sacloud.Disk) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
-
 		if disk.Connection != sacloud.DiskConnectionVirtio {
 			return fmt.Errorf("Bad disk connector: %v", disk.Connection)
 		}
@@ -132,7 +131,7 @@ func testAccCheckSakuraCloudDiskDestroy(s *terraform.State) error {
 	return nil
 }
 
-func TestAccImportSakuraCloudDisk(t *testing.T) {
+func TestAccImportSakuraCloudDisk_basic(t *testing.T) {
 	checkFn := func(s []*terraform.InstanceState) error {
 		if len(s) != 1 {
 			return fmt.Errorf("expected 1 state: %#v", s)
@@ -164,10 +163,10 @@ func TestAccImportSakuraCloudDisk(t *testing.T) {
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckSakuraCloudDiskDestroy,
 		Steps: []resource.TestStep{
-			resource.TestStep{
+			{
 				Config: testAccCheckSakuraCloudDiskConfig_basic,
 			},
-			resource.TestStep{
+			{
 				ResourceName:      resourceName,
 				ImportState:       true,
 				ImportStateCheck:  checkFn,

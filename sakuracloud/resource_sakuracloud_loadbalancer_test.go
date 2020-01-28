@@ -25,7 +25,7 @@ import (
 	"github.com/sacloud/libsacloud/sacloud"
 )
 
-func TestAccSakuraCloudLoadBalancer(t *testing.T) {
+func TestAccSakuraCloudLoadBalancer_basic(t *testing.T) {
 	var loadBalancer sacloud.LoadBalancer
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
@@ -129,7 +129,7 @@ func TestAccSakuraCloudLoadBalancer(t *testing.T) {
 	})
 }
 
-func TestAccSakuraCloudLoadBalancer_WithRouter(t *testing.T) {
+func TestAccSakuraCloudLoadBalancer_withRouter(t *testing.T) {
 	var loadBalancer sacloud.LoadBalancer
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
@@ -199,7 +199,7 @@ func testAccCheckSakuraCloudLoadBalancerDestroy(s *terraform.State) error {
 	return nil
 }
 
-func TestAccImportSakuraCloudLoadBalancer(t *testing.T) {
+func TestAccImportSakuraCloudLoadBalancer_basic(t *testing.T) {
 	checkFn := func(s []*terraform.InstanceState) error {
 		if len(s) != 1 {
 			return fmt.Errorf("expected 1 state: %#v", s)
@@ -233,10 +233,10 @@ func TestAccImportSakuraCloudLoadBalancer(t *testing.T) {
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckSakuraCloudLoadBalancerDestroy,
 		Steps: []resource.TestStep{
-			resource.TestStep{
+			{
 				Config: testAccCheckSakuraCloudLoadBalancerConfig_basic,
 			},
-			resource.TestStep{
+			{
 				ResourceName:      resourceName,
 				ImportState:       true,
 				ImportStateCheck:  checkFn,

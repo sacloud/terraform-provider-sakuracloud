@@ -123,7 +123,7 @@ func resourceSakuraCloudWebAccelCertificateUpdate(d *schema.ResourceData, meta i
 	client := meta.(*APIClient)
 	siteID := d.Id()
 
-	if d.HasChange("certificate_chain") || d.HasChange("private_key") {
+	if d.HasChanges("certificate_chain", "private_key") {
 		res, err := client.WebAccel.UpdateCertificate(siteID, &sacloud.WebAccelCertRequest{
 			CertificateChain: d.Get("certificate_chain").(string),
 			Key:              d.Get("private_key").(string),
@@ -151,8 +151,8 @@ func resourceSakuraCloudWebAccelCertificateDelete(d *schema.ResourceData, meta i
 }
 
 func setWebAccelCertificateResourceData(d *schema.ResourceData, client *APIClient, data *sacloud.WebAccelCert) error {
-	notBefore := time.Unix(int64(data.NotBefore/1000), 0).Format(time.RFC3339)
-	notAfter := time.Unix(int64(data.NotAfter/1000), 0).Format(time.RFC3339)
+	notBefore := time.Unix(data.NotBefore/1000, 0).Format(time.RFC3339)
+	notAfter := time.Unix(data.NotAfter/1000, 0).Format(time.RFC3339)
 
 	d.Set("site_id", data.SiteID)
 	d.Set("serial_number", data.SerialNumber)

@@ -24,7 +24,6 @@ import (
 )
 
 func TestAccSakuraCloudBucketObjectDataSource_Basic(t *testing.T) {
-
 	randString1 := acctest.RandStringFromCharSet(10, acctest.CharSetAlpha)
 	randString2 := acctest.RandStringFromCharSet(10, acctest.CharSetAlpha)
 	randString3 := acctest.RandStringFromCharSet(10, acctest.CharSetAlpha)

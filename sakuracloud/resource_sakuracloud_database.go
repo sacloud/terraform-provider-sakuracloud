@@ -158,10 +158,8 @@ func resourceSakuraCloudDatabaseCreate(d *schema.ResourceData, meta interface{})
 	switch dbType {
 	case "postgresql":
 		opts = sacloud.NewCreatePostgreSQLDatabaseValue()
-		break
 	case "mariadb":
 		opts = sacloud.NewCreateMariaDBDatabaseValue()
-		break
 	default:
 		return fmt.Errorf("Unknown database_type [%s]", dbType)
 	}
@@ -368,7 +366,6 @@ func resourceSakuraCloudDatabaseUpdate(d *schema.ResourceData, meta interface{})
 				database.Settings.DBConf.Common.SourceNetwork = nil
 			}
 		}
-
 	}
 	if d.HasChange("port") {
 		rawPort := d.Get("port").(int)
@@ -396,7 +393,6 @@ func resourceSakuraCloudDatabaseUpdate(d *schema.ResourceData, meta interface{})
 	}
 	if database.Settings.DBConf.Backup != nil &&
 		(len(database.Settings.DBConf.Backup.DayOfWeek) == 0 || database.Settings.DBConf.Backup.Time == "") {
-
 		database.Settings.DBConf.Backup = nil
 	}
 
@@ -440,7 +436,6 @@ func resourceSakuraCloudDatabaseDelete(d *schema.ResourceData, meta interface{})
 }
 
 func setDatabaseResourceData(d *schema.ResourceData, client *APIClient, data *sacloud.Database) error {
-
 	if data.IsFailed() {
 		d.SetId("")
 		return fmt.Errorf("Database[%d] state is failed", data.ID)
@@ -449,10 +444,8 @@ func setDatabaseResourceData(d *schema.ResourceData, client *APIClient, data *sa
 	switch data.Remark.DBConf.Common.DatabaseName {
 	case "postgres":
 		d.Set("database_type", "postgresql")
-		break
 	case "MariaDB":
 		d.Set("database_type", "mariadb")
-		break
 	}
 
 	d.Set("name", data.Name)
@@ -475,7 +468,6 @@ func setDatabaseResourceData(d *schema.ResourceData, client *APIClient, data *sa
 		d.Set("plan", "500g")
 	case int64(sacloud.DatabasePlan1T):
 		d.Set("plan", "1t")
-
 	}
 
 	d.Set("allow_networks", data.Settings.DBConf.Common.SourceNetwork)

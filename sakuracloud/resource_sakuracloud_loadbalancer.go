@@ -250,7 +250,6 @@ func resourceSakuraCloudLoadBalancerCreate(d *schema.ResourceData, meta interfac
 		if err != nil {
 			return fmt.Errorf("Failed to create SakuraCloud LoadBalancer resource: %s", err)
 		}
-
 	} else {
 		createLb, err = sacloud.CreateNewLoadBalancerSingle(opts, nil)
 		if err != nil {
@@ -353,7 +352,7 @@ func resourceSakuraCloudLoadBalancerUpdate(d *schema.ResourceData, meta interfac
 		}
 	}
 
-	loadBalancer, err = client.LoadBalancer.Update(loadBalancer.ID, loadBalancer)
+	_, err = client.LoadBalancer.Update(loadBalancer.ID, loadBalancer)
 	if err != nil {
 		return fmt.Errorf("Error updating SakuraCloud LoadBalancer resource: %s", err)
 	}
@@ -378,7 +377,6 @@ func resourceSakuraCloudLoadBalancerDelete(d *schema.ResourceData, meta interfac
 }
 
 func setLoadBalancerResourceData(d *schema.ResourceData, client *APIClient, data *sacloud.LoadBalancer) error {
-
 	if data.IsFailed() {
 		d.SetId("")
 		return fmt.Errorf("LoadBalancer[%d] state is failed", data.ID)
@@ -487,7 +485,6 @@ func expandLoadBalancerVIP(d resourceValueGetable) *sacloud.LoadBalancerSetting 
 }
 
 func expandLoadBalancerServer(d resourceValueGetable) *sacloud.LoadBalancerServer {
-
 	var server = &sacloud.LoadBalancerServer{}
 	if v, ok := d.GetOk("ipaddress"); ok {
 		server.IPAddress = v.(string)

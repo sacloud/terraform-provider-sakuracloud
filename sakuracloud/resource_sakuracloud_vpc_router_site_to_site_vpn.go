@@ -52,7 +52,7 @@ func resourceSakuraCloudVPCRouterSiteToSiteIPsecVPNCreate(d *schema.ResourceData
 	}
 
 	vpcRouter.Settings.Router.AddSiteToSiteIPsecVPN(s2s.LocalPrefix, s2s.Peer, s2s.PreSharedSecret, s2s.RemoteID, s2s.Routes)
-	vpcRouter, err = client.VPCRouter.UpdateSetting(toSakuraCloudID(routerID), vpcRouter)
+	_, err = client.VPCRouter.UpdateSetting(toSakuraCloudID(routerID), vpcRouter)
 	if err != nil {
 		return fmt.Errorf("Failed to enable SakuraCloud VPCRouterSiteToSiteIPsecVPN resource: %s", err)
 	}
@@ -102,29 +102,23 @@ func resourceSakuraCloudVPCRouterSiteToSiteIPsecVPNRead(d *schema.ResourceData, 
 	}
 	if connInfo != nil && len(connInfo.Details.Config) > 0 {
 		conf := connInfo.Details.Config[0]
-		values := map[string]interface{}{
-			"esp_authentication_protocol":  conf.ESP.AuthenticationProtocol,
-			"esp_dh_group":                 conf.ESP.DHGroup,
-			"esp_encryption_protocol":      conf.ESP.EncryptionProtocol,
-			"esp_lifetime":                 conf.ESP.Lifetime,
-			"esp_mode":                     conf.ESP.Mode,
-			"esp_perfect_forward_secrecy":  conf.ESP.PerfectForwardSecrecy,
-			"ike_authentication_protocol":  conf.IKE.AuthenticationProtocol,
-			"ike_encryption_protocol":      conf.IKE.EncryptionProtocol,
-			"ike_lifetime":                 conf.IKE.Lifetime,
-			"ike_mode":                     conf.IKE.Mode,
-			"ike_perfect_forward_secrecy":  conf.IKE.PerfectForwardSecrecy,
-			"ike_pre_shared_secret":        conf.IKE.PreSharedSecret,
-			"peer_id":                      conf.Peer.ID,
-			"peer_inside_networks":         conf.Peer.InsideNetworks,
-			"peer_outside_ipaddress":       conf.Peer.OutsideIPAddress,
-			"vpc_router_inside_networks":   conf.VPCRouter.InsideNetworks,
-			"vpc_router_outside_ipaddress": conf.VPCRouter.OutsideIPAddress,
-		}
-
-		for k, v := range values {
-			d.Set(k, v)
-		}
+		d.Set("esp_authentication_protocol", conf.ESP.AuthenticationProtocol)
+		d.Set("esp_dh_group", conf.ESP.DHGroup)
+		d.Set("esp_encryption_protocol", conf.ESP.EncryptionProtocol)
+		d.Set("esp_lifetime", conf.ESP.Lifetime)
+		d.Set("esp_mode", conf.ESP.Mode)
+		d.Set("esp_perfect_forward_secrecy", conf.ESP.PerfectForwardSecrecy)
+		d.Set("ike_authentication_protocol", conf.IKE.AuthenticationProtocol)
+		d.Set("ike_encryption_protocol", conf.IKE.EncryptionProtocol)
+		d.Set("ike_lifetime", conf.IKE.Lifetime)
+		d.Set("ike_mode", conf.IKE.Mode)
+		d.Set("ike_perfect_forward_secrecy", conf.IKE.PerfectForwardSecrecy)
+		d.Set("ike_pre_shared_secret", conf.IKE.PreSharedSecret)
+		d.Set("peer_id", conf.Peer.ID)
+		d.Set("peer_inside_networks", conf.Peer.InsideNetworks)
+		d.Set("peer_outside_ipaddress", conf.Peer.OutsideIPAddress)
+		d.Set("vpc_router_inside_networks", conf.VPCRouter.InsideNetworks)
+		d.Set("vpc_router_outside_ipaddress", conf.VPCRouter.OutsideIPAddress)
 	}
 
 	d.Set("zone", client.Zone)
@@ -133,7 +127,6 @@ func resourceSakuraCloudVPCRouterSiteToSiteIPsecVPNRead(d *schema.ResourceData, 
 }
 
 func resourceSakuraCloudVPCRouterSiteToSiteIPsecVPNDelete(d *schema.ResourceData, meta interface{}) error {
-
 	client := getSacloudAPIClient(d, meta)
 
 	routerID := d.Get("vpc_router_id").(string)
@@ -146,11 +139,10 @@ func resourceSakuraCloudVPCRouterSiteToSiteIPsecVPNDelete(d *schema.ResourceData
 	}
 
 	if vpcRouter.Settings.Router.SiteToSiteIPsecVPN != nil {
-
 		s2s := expandVPCRouterSiteToSiteIPsecVPN(d)
 		vpcRouter.Settings.Router.RemoveSiteToSiteIPsecVPN(s2s.LocalPrefix, s2s.Peer, s2s.PreSharedSecret, s2s.RemoteID, s2s.Routes)
 
-		vpcRouter, err = client.VPCRouter.UpdateSetting(toSakuraCloudID(routerID), vpcRouter)
+		_, err = client.VPCRouter.UpdateSetting(toSakuraCloudID(routerID), vpcRouter)
 		if err != nil {
 			return fmt.Errorf("Failed to delete SakuraCloud VPCRouterSiteToSiteIPsecVPN resource: %s", err)
 		}
@@ -171,13 +163,12 @@ func vpcRouterSiteToSiteIPsecVPNIDHash(routerID string, s *sacloud.VPCRouterSite
 	buf.WriteString(fmt.Sprintf("%s-", s.PreSharedSecret))
 	buf.WriteString(fmt.Sprintf("%s-", s.RemoteID))
 	buf.WriteString(fmt.Sprintf("%s-", strings.Join(s.Routes, "")))
-	buf.WriteString(fmt.Sprintf("%s", strings.Join(s.LocalPrefix, "")))
+	buf.WriteString(strings.Join(s.LocalPrefix, ""))
 
 	return fmt.Sprintf("%d", hashcode.String(buf.String()))
 }
 
 func expandVPCRouterSiteToSiteIPsecVPN(d resourceValueGetable) *sacloud.VPCRouterSiteToSiteIPsecVPNConfig {
-
 	var s2sIPsecVPN = &sacloud.VPCRouterSiteToSiteIPsecVPNConfig{
 		Peer:            d.Get("peer").(string),
 		PreSharedSecret: d.Get("pre_shared_secret").(string),

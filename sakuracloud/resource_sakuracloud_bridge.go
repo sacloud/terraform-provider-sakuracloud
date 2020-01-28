@@ -110,7 +110,7 @@ func resourceSakuraCloudBridgeUpdate(d *schema.ResourceData, meta interface{}) e
 		}
 	}
 
-	bridge, err = client.Bridge.Update(bridge.ID, bridge)
+	_, err = client.Bridge.Update(bridge.ID, bridge)
 	if err != nil {
 		return fmt.Errorf("Error updating SakuraCloud Bridge resource: %s", err)
 	}
@@ -133,12 +133,14 @@ func resourceSakuraCloudBridgeDelete(d *schema.ResourceData, meta interface{}) e
 			sakuraMutexKV.Lock(strSwitchID)
 			defer sakuraMutexKV.Unlock(strSwitchID)
 
-			if _, err := client.Switch.Read(switchID); err == nil {
-				_, err = client.Switch.DisconnectFromBridge(switchID)
+			if _, err := client.Switch.Read(switchID); err != nil {
+				if err != nil {
+					return fmt.Errorf("Error disconnecting Bridge resource: %s", err)
+				}
 			}
-		}
-		if err != nil {
-			return fmt.Errorf("Error disconnecting Bridge resource: %s", err)
+			if _, err := client.Switch.DisconnectFromBridge(switchID); err != nil {
+				return fmt.Errorf("Error disconnecting Bridge resource: %s", err)
+			}
 		}
 	}
 
@@ -155,7 +157,6 @@ func setBridgeResourceData(d *schema.ResourceData, client *APIClient, data *sacl
 
 	var switchIDs []interface{}
 	if data.Info != nil && data.Info.Switches != nil && len(data.Info.Switches) > 0 {
-
 		for _, d := range data.Info.Switches {
 			swID := d.ID.String()
 			sakuraMutexKV.Lock(swID)

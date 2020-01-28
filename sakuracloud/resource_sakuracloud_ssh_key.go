@@ -113,7 +113,7 @@ func resourceSakuraCloudSSHKeyUpdate(d *schema.ResourceData, meta interface{}) e
 		}
 	}
 
-	key, err = client.SSHKey.Update(key.ID, key)
+	_, err = client.SSHKey.Update(key.ID, key)
 	if err != nil {
 		return fmt.Errorf("Error updating SakuraCloud SSHKey resource: %s", err)
 	}

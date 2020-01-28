@@ -394,7 +394,6 @@ func vpcRouterPowerManageSchema(forceNew bool) map[string]*schema.Schema {
 	return map[string]*schema.Schema{
 		powerManageTimeoutKey: powerManageTimeoutParam,
 	}
-
 }
 
 func vpcRouterInterfaceValueSchema(t vpcRouterSchemaTypes) map[string]*schema.Schema {

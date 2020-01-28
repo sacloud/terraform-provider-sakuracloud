@@ -138,7 +138,6 @@ func resourceSakuraCloudArchiveCreate(d *schema.ResourceData, meta interface{}) 
 	// close
 	if _, err := client.Archive.CloseFTP(archive.ID); err != nil {
 		return fmt.Errorf("Failed to Close FTPS Connection from Archive resource: %s", err)
-
 	}
 
 	d.SetId(archive.GetStrID())
@@ -206,7 +205,6 @@ func resourceSakuraCloudArchiveUpdate(d *schema.ResourceData, meta interface{}) 
 		}
 	}
 	if isContentChanged {
-
 		source := d.Get("archive_file").(string)
 		path, err := homedir.Expand(source)
 		if err != nil {
@@ -231,9 +229,7 @@ func resourceSakuraCloudArchiveUpdate(d *schema.ResourceData, meta interface{}) 
 		// close
 		if _, err := client.Archive.CloseFTP(archive.ID); err != nil {
 			return fmt.Errorf("Failed to Close FTPS Connection from Archive resource: %s", err)
-
 		}
-
 	}
 
 	return resourceSakuraCloudArchiveRead(d, meta)
@@ -257,7 +253,6 @@ func resourceSakuraCloudArchiveDelete(d *schema.ResourceData, meta interface{}) 
 }
 
 func setArchiveResourceData(d *schema.ResourceData, client *APIClient, data *sacloud.Archive) error {
-
 	d.Set("name", data.Name)
 	d.Set("size", toSizeGB(data.SizeMB))
 	d.Set("icon_id", data.GetIconStrID())
@@ -295,7 +290,7 @@ func setArchiveResourceData(d *schema.ResourceData, client *APIClient, data *sac
 			return fmt.Errorf("Error calculate md5 from archive_file (%s): %s", source, err)
 		}
 
-		d.Set("hash", h.Sum(nil))
+		d.Set("hash", string(h.Sum(nil)))
 	}
 
 	d.Set("zone", client.Zone)

@@ -23,7 +23,7 @@ import (
 	"github.com/sacloud/libsacloud/sacloud"
 )
 
-func TestAccSakuraCloudLoadBalancerVIP(t *testing.T) {
+func TestAccSakuraCloudLoadBalancerVIP_basic(t *testing.T) {
 	var loadBalancer sacloud.LoadBalancer
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },

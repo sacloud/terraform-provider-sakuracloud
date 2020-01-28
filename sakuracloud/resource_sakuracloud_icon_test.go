@@ -24,7 +24,7 @@ import (
 	"github.com/sacloud/libsacloud/sacloud"
 )
 
-func TestAccResourceSakuraCloudIcon(t *testing.T) {
+func TestAccResourceSakuraCloudIcon_basic(t *testing.T) {
 	var icon sacloud.Icon
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
@@ -55,7 +55,7 @@ func TestAccResourceSakuraCloudIcon(t *testing.T) {
 	})
 }
 
-func TestAccResourceSakuraCloudIconWithResource(t *testing.T) {
+func TestAccResourceSakuraCloudIcon_withResource(t *testing.T) {
 	var icon sacloud.Icon
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
@@ -130,7 +130,7 @@ func testAccCheckSakuraCloudIconDestroy(s *terraform.State) error {
 	return nil
 }
 
-func TestAccImportSakuraCloudIcon(t *testing.T) {
+func TestAccImportSakuraCloudIcon_basic(t *testing.T) {
 	checkFn := func(s []*terraform.InstanceState) error {
 		if len(s) != 1 {
 			return fmt.Errorf("expected 1 state: %#v", s)
@@ -154,10 +154,10 @@ func TestAccImportSakuraCloudIcon(t *testing.T) {
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckSakuraCloudIconDestroy,
 		Steps: []resource.TestStep{
-			resource.TestStep{
+			{
 				Config: testAccCheckSakuraCloudIconConfig_basic,
 			},
-			resource.TestStep{
+			{
 				ResourceName:      resourceName,
 				ImportState:       true,
 				ImportStateCheck:  checkFn,

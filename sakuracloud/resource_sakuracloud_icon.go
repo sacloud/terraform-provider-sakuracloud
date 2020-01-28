@@ -151,7 +151,7 @@ func resourceSakuraCloudIconUpdate(d *schema.ResourceData, meta interface{}) err
 		}
 	}
 
-	icon, err = client.Icon.Update(icon.ID, icon)
+	_, err = client.Icon.Update(icon.ID, icon)
 	if err != nil {
 		return fmt.Errorf("Error updating SakuraCloud Icon resource: %s", err)
 	}
@@ -170,7 +170,6 @@ func resourceSakuraCloudIconDelete(d *schema.ResourceData, meta interface{}) err
 }
 
 func setIconResourceData(d *schema.ResourceData, client *APIClient, data *sacloud.Icon) error {
-
 	d.Set("name", data.Name)
 
 	body, err := client.Icon.GetImage(data.ID, "small")
@@ -178,7 +177,7 @@ func setIconResourceData(d *schema.ResourceData, client *APIClient, data *saclou
 		return fmt.Errorf("Error reading SakuraCloud Icon Resource: %s", err)
 	}
 
-	d.Set("body", body)
+	d.Set("body", string(*body))
 	d.Set("tags", data.Tags)
 	d.Set("url", data.URL)
 

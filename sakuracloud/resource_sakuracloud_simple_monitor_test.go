@@ -24,7 +24,7 @@ import (
 	"github.com/sacloud/libsacloud/sacloud"
 )
 
-func TestAccResourceSakuraCloudSimpleMonitor(t *testing.T) {
+func TestAccResourceSakuraCloudSimpleMonitor_basic(t *testing.T) {
 	var monitor sacloud.SimpleMonitor
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
@@ -95,7 +95,7 @@ func TestAccResourceSakuraCloudSimpleMonitor(t *testing.T) {
 	})
 }
 
-func TestAccResourceSakuraCloudSimpleMonitor_SSLCertificate(t *testing.T) {
+func TestAccResourceSakuraCloudSimpleMonitor_sslCertificate(t *testing.T) {
 	var monitor sacloud.SimpleMonitor
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },

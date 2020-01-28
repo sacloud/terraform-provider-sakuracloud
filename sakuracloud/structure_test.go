@@ -21,7 +21,6 @@ import (
 )
 
 func TestGetSacloudAPIClient(t *testing.T) {
-
 	config := &Config{
 		AccessToken:       "token",
 		AccessTokenSecret: "secret",

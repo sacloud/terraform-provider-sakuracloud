@@ -27,7 +27,7 @@ import (
 	"github.com/mitchellh/goamz/s3"
 )
 
-func TestAccResourceSakuraCloudBucketObject(t *testing.T) {
+func TestAccResourceSakuraCloudBucketObject_basic(t *testing.T) {
 	randString1 := acctest.RandStringFromCharSet(10, acctest.CharSetAlpha)
 	randString2 := acctest.RandStringFromCharSet(10, acctest.CharSetAlpha)
 	randString3 := acctest.RandStringFromCharSet(10, acctest.CharSetAlpha)
@@ -105,7 +105,6 @@ func testAccCheckSakuraCloudBucketObjectExists(n string) resource.TestCheckFunc 
 }
 
 func testAccCheckSakuraCloudBucketObjectDestroy(s *terraform.State) error {
-
 	for _, rs := range s.RootModule().Resources {
 		if rs.Type != "sakuracloud_bucket_object" {
 			continue

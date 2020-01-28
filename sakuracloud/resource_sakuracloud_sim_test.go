@@ -37,8 +37,7 @@ var (
 	imei     string
 )
 
-func TestAccResourceSakuraCloudSIM(t *testing.T) {
-
+func TestAccResourceSakuraCloudSIM_basic(t *testing.T) {
 	if id, ok := os.LookupEnv(envICCID); ok {
 		iccid = id
 	} else {

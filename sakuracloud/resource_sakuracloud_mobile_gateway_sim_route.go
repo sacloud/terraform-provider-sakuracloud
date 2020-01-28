@@ -136,7 +136,6 @@ func resourceSakuraCloudMobileGatewaySIMRouteRead(d *schema.ResourceData, meta i
 }
 
 func resourceSakuraCloudMobileGatewaySIMRouteDelete(d *schema.ResourceData, meta interface{}) error {
-
 	client := getSacloudAPIClient(d, meta)
 
 	mgwID := d.Get("mobile_gateway_id").(string)
@@ -161,13 +160,12 @@ func mgwSIMRouteIDHash(mgwID string, s *sacloud.MobileGatewaySIMRoute) string {
 	var buf bytes.Buffer
 	buf.WriteString(fmt.Sprintf("%s-", mgwID))
 	buf.WriteString(fmt.Sprintf("%s-", s.Prefix))
-	buf.WriteString(fmt.Sprintf("%s", s.ResourceID))
+	buf.WriteString(s.ResourceID)
 
 	return fmt.Sprintf("%d", hashcode.String(buf.String()))
 }
 
 func expandMobileGatewaySIMRoute(d resourceValueGetable) *sacloud.MobileGatewaySIMRoute {
-
 	var simRoute = &sacloud.MobileGatewaySIMRoute{
 		Prefix:     d.Get("prefix").(string),
 		ResourceID: d.Get("sim_id").(string),

@@ -411,7 +411,6 @@ func resourceSakuraCloudServerCreate(d *schema.ResourceData, meta interface{}) e
 						if err := client.Disk.SleepWhileCopying(toSakuraCloudID(diskID), client.DefaultTimeoutDuration); err != nil {
 							return fmt.Errorf("Error editting SakuraCloud DiskConfig: timeout: %s", err)
 						}
-
 					} else {
 						log.Printf("[WARN] Disk[%s] does not support modify disk", diskID)
 					}
@@ -479,7 +478,7 @@ func resourceSakuraCloudServerUpdate(d *schema.ResourceData, meta interface{}) e
 	isNeedRestart := false
 	isRunning := server.Instance.IsUp()
 
-	isPlanChanged := d.HasChange("core") || d.HasChange("memory") || d.HasChange("commitment")
+	isPlanChanged := d.HasChanges("core", "memory", "commitment")
 
 	if isPlanChanged {
 		// If planID changed , server ID will change.
@@ -499,10 +498,8 @@ func resourceSakuraCloudServerUpdate(d *schema.ResourceData, meta interface{}) e
 		isNeedRestart = true
 	}
 	isDiskConfigChanged := false
-	if d.HasChange("disks") || d.HasChange("nic") || d.HasChange("ipaddress") ||
-		d.HasChange("gateway") || d.HasChange("nw_mask_len") || d.HasChange("hostname") ||
-		d.HasChange("password") || d.HasChange("ssh_key_ids") || d.HasChange("disable_pw_auth") ||
-		d.HasChange("note_ids") {
+	if d.HasChanges("disks", "nic", "ipaddress", "gateway", "nw_mask_len",
+		"hostname", "password", "ssh_key_ids", "disable_pw_auth", "note_ids") {
 		isDiskConfigChanged = true
 	}
 
@@ -537,13 +534,11 @@ func resourceSakuraCloudServerUpdate(d *schema.ResourceData, meta interface{}) e
 					return fmt.Errorf("Error connecting disk to SakuraCloud Server resource: %s", err)
 				}
 			}
-
 		}
 	}
 
 	// NIC
-	if d.HasChange("nic") || d.HasChange("additional_nics") {
-
+	if d.HasChanges("nic", "additional_nics") {
 		var conf []interface{}
 		if c, ok := d.GetOk("additional_nics"); ok {
 			conf = c.([]interface{})
@@ -611,9 +606,7 @@ func resourceSakuraCloudServerUpdate(d *schema.ResourceData, meta interface{}) e
 				if err != nil {
 					return fmt.Errorf("Error creating NIC to SakuraCloud Server resource: %s", err)
 				}
-
 			} else {
-
 				if switchID != "" {
 					_, err := client.Interface.ConnectToSwitch(server.Interfaces[i+1].ID, toSakuraCloudID(switchID))
 					if err != nil {
@@ -678,7 +671,7 @@ func resourceSakuraCloudServerUpdate(d *schema.ResourceData, meta interface{}) e
 			diskEditConfig := client.Disk.NewCondig()
 			diskEditConfig.SetBackground(true)
 
-			if d.HasChange("nic") || d.HasChange("ipaddress") || d.HasChange("gateway") || d.HasChange("nw_mask_len") {
+			if d.HasChanges("nic", "ipaddress", "gateway", "nw_mask_len") {
 				if len(updatedServer.Interfaces) > 0 && updatedServer.Interfaces[0].Switch != nil {
 					if updatedServer.Interfaces[0].Switch.Scope == sacloud.ESCopeShared {
 						isNeedEditDisk = true
@@ -822,7 +815,6 @@ func resourceSakuraCloudServerUpdate(d *schema.ResourceData, meta interface{}) e
 	}
 
 	if d.HasChange("packet_filter_ids") {
-
 		if rawPacketFilterIDs, ok := d.GetOk("packet_filter_ids"); ok {
 			packetFilterIDs := rawPacketFilterIDs.([]interface{})
 			for i, filterID := range packetFilterIDs {
@@ -859,9 +851,7 @@ func resourceSakuraCloudServerUpdate(d *schema.ResourceData, meta interface{}) e
 
 					i++
 				}
-
 			}
-
 		} else {
 			if server.Interfaces != nil {
 				for _, i := range server.Interfaces {
@@ -904,7 +894,6 @@ func resourceSakuraCloudServerUpdate(d *schema.ResourceData, meta interface{}) e
 }
 
 func resourceSakuraCloudServerDelete(d *schema.ResourceData, meta interface{}) error {
-
 	lockKey := getServerDeleteAPILockKey(toSakuraCloudID(d.Id()))
 	sakuraMutexKV.Lock(lockKey)
 	defer sakuraMutexKV.Unlock(lockKey)
@@ -930,11 +919,9 @@ func resourceSakuraCloudServerDelete(d *schema.ResourceData, meta interface{}) e
 	}
 
 	return nil
-
 }
 
 func setServerResourceData(d *schema.ResourceData, client *APIClient, data *sacloud.Server) error {
-
 	d.Set("name", data.Name)
 	d.Set("core", data.ServerPlan.CPU)
 	d.Set("memory", toSizeGB(data.ServerPlan.MemoryMB))
@@ -945,7 +932,7 @@ func setServerResourceData(d *schema.ResourceData, client *APIClient, data *sacl
 	if data.Instance.CDROM != nil && data.Instance.CDROM.ID > 0 {
 		d.Set("cdrom_id", data.Instance.CDROM.GetStrID())
 	}
-	d.Set("interface_driver", string(data.GetInterfaceDriverString()))
+	d.Set("interface_driver", data.GetInterfaceDriverString())
 
 	if data.PrivateHost != nil && data.PrivateHost.ID > 0 {
 		d.Set("private_host_id", data.PrivateHost.GetStrID())
@@ -1030,7 +1017,7 @@ func setServerResourceData(d *schema.ResourceData, client *APIClient, data *sacl
 		}
 		userName, err := serverutils.GetDefaultUserName(client.Client, data.ID)
 		if err != nil {
-			log.Printf("[WARN] can't retrive connInfo from archives (server: %d).", data.ID)
+			log.Printf("[WARN] can't retrieve connInfo from archives (server: %d).", data.ID)
 		}
 
 		if userName != "" {
@@ -1111,7 +1098,9 @@ func stopServer(client *APIClient, id int64, d *schema.ResourceData) error {
 		return err
 	}
 	if !s.IsDown() {
-		handleShutdown(client.Server, id, d, client.DefaultTimeoutDuration)
+		if err := handleShutdown(client.Server, id, d, client.DefaultTimeoutDuration); err != nil {
+			return err
+		}
 	}
 	sakuraMutexKV.Unlock(serverAPILockKey)
 
@@ -1154,7 +1143,7 @@ func serverNetworkAttrsCustomizeDiff(d *schema.ResourceDiff, meta interface{}) e
 		for _, t := range targets {
 			o, n := d.GetChange(t)
 			if o != nil && o.(string) != "" && n != nil {
-				d.Clear(t)
+				d.Clear(t) // nolint
 			}
 		}
 	}

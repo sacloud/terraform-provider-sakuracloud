@@ -24,7 +24,7 @@ import (
 	"github.com/sacloud/libsacloud/sacloud"
 )
 
-func TestAccResourceSakuraCloudSubnet(t *testing.T) {
+func TestAccResourceSakuraCloudSubnet_basic(t *testing.T) {
 	var subnet sacloud.Subnet
 	resource.Test(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },

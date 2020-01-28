@@ -20,6 +20,8 @@ import (
 	"regexp"
 	"testing"
 
+	"github.com/hashicorp/terraform-plugin-sdk/terraform"
+
 	"github.com/hashicorp/terraform-plugin-sdk/helper/resource"
 )
 
@@ -30,7 +32,7 @@ const (
 	envWebAccelCertificateKeyUpd = "SAKURACLOUD_WEBACCEL_KEY_PATH_UPD"
 )
 
-func TestAccResourceSakuraCloudWebAccelCertificate(t *testing.T) {
+func TestAccResourceSakuraCloudWebAccelCertificate_basic(t *testing.T) {
 	envKeys := []string{
 		envWebAccelSiteName,
 		envWebAccelCertificateCrt,
@@ -56,6 +58,9 @@ func TestAccResourceSakuraCloudWebAccelCertificate(t *testing.T) {
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:  func() { testAccPreCheck(t) },
 		Providers: testAccProviders,
+		CheckDestroy: func(*terraform.State) error {
+			return nil
+		},
 		Steps: []resource.TestStep{
 			{
 				Config: testAccCheckSakuraCloudWebAccelCertificateConfig(siteName, crt, key),

@@ -33,7 +33,7 @@ var (
 	testDomain string
 )
 
-func TestAccResourceSakuraCloudIPv4Ptr(t *testing.T) {
+func TestAccResourceSakuraCloudIPv4Ptr_basic(t *testing.T) {
 	var ip sacloud.IPAddress
 	if domain, ok := os.LookupEnv(envTestDomain); ok {
 		testDomain = domain

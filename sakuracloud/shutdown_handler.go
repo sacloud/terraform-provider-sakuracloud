@@ -43,7 +43,6 @@ var (
 )
 
 func handleShutdown(handler shutdownHandler, id int64, d *schema.ResourceData, defaultTimeOut time.Duration) error {
-
 	timeout := defaultTimeOut
 	if v, ok := d.GetOk(powerManageTimeoutKey); ok {
 		s := v.(int)
@@ -69,6 +68,6 @@ func handleShutdown(handler shutdownHandler, id int64, d *schema.ResourceData, d
 
 func setPowerManageTimeoutValueToState(d *schema.ResourceData) {
 	if _, ok := d.GetOk(powerManageTimeoutKey); !ok {
-		d.Set(powerManageTimeoutKey, defaultPowerManageTimeout)
+		d.Set("graceful_shutdown_timeout", defaultPowerManageTimeout)
 	}
 }
