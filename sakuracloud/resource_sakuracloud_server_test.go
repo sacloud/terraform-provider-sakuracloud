@@ -26,7 +26,7 @@ import (
 	"github.com/sacloud/libsacloud/sacloud"
 )
 
-func TestAccResourceSakuraCloudServer(t *testing.T) {
+func TestAccResourceSakuraCloudServer_basic(t *testing.T) {
 	var server sacloud.Server
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
@@ -108,7 +108,7 @@ func TestAccResourceSakuraCloudServer(t *testing.T) {
 	})
 }
 
-func TestAccSakuraCloudServer_EditConnections(t *testing.T) {
+func TestAccSakuraCloudServer_editConnections(t *testing.T) {
 	var server sacloud.Server
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
@@ -171,7 +171,7 @@ func TestAccSakuraCloudServer_EditConnections(t *testing.T) {
 	})
 }
 
-func TestAccSakuraCloudServer_ConnectPacketFilters(t *testing.T) {
+func TestAccSakuraCloudServer_connectPacketFilters(t *testing.T) {
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
 		Providers:    testAccProviders,
@@ -216,7 +216,7 @@ func TestAccSakuraCloudServer_ConnectPacketFilters(t *testing.T) {
 	})
 }
 
-func TestAccSakuraCloudServer_With_PrivateHost(t *testing.T) {
+func TestAccSakuraCloudServer_withPrivateHost(t *testing.T) {
 	privateHostID, ok := os.LookupEnv("SAKURACLOUD_PRIVATE_HOST_ID")
 	if !ok {
 		t.Log("Private host ID($SAKURACLOUD_PRIVATE_HOST_ID) is empty. Skip this test.")
@@ -243,7 +243,7 @@ func TestAccSakuraCloudServer_With_PrivateHost(t *testing.T) {
 	})
 }
 
-func TestAccSakuraCloudServer_With_BlankDisk(t *testing.T) {
+func TestAccSakuraCloudServer_withBlankDisk(t *testing.T) {
 	var server sacloud.Server
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
@@ -261,7 +261,7 @@ func TestAccSakuraCloudServer_With_BlankDisk(t *testing.T) {
 	})
 }
 
-func TestAccSakuraCloudServer_EditConnect_With_Same_Switch(t *testing.T) {
+func TestAccSakuraCloudServer_editConnectionWithSameSwitch(t *testing.T) {
 	var server sacloud.Server
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
@@ -314,7 +314,7 @@ func TestAccSakuraCloudServer_EditConnect_With_Same_Switch(t *testing.T) {
 	})
 }
 
-func TestAccResourceSakuraCloudServer_DisplayIPAddress(t *testing.T) {
+func TestAccResourceSakuraCloudServer_displayIPAddress(t *testing.T) {
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
 		Providers:    testAccProviders,
@@ -346,7 +346,7 @@ func TestAccResourceSakuraCloudServer_DisplayIPAddress(t *testing.T) {
 	})
 }
 
-func TestAccSakuraCloudServer_NIC_CustomDiff(t *testing.T) {
+func TestAccSakuraCloudServer_CustomDiffForNIC(t *testing.T) {
 	var server sacloud.Server
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
@@ -367,7 +367,7 @@ func TestAccSakuraCloudServer_NIC_CustomDiff(t *testing.T) {
 	})
 }
 
-func TestAccSakuraCloudServer_NIC_CustomDiffReference(t *testing.T) {
+func TestAccSakuraCloudServer_customDiffReferenceForNIC(t *testing.T) {
 	var server sacloud.Server
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
@@ -398,7 +398,7 @@ func TestAccSakuraCloudServer_NIC_CustomDiffReference(t *testing.T) {
 	})
 }
 
-func TestAccSakuraCloudServer_Switched_eth0(t *testing.T) {
+func TestAccSakuraCloudServer_switchedEth0(t *testing.T) {
 	var server sacloud.Server
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },

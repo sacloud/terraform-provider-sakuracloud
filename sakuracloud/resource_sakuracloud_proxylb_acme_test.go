@@ -29,7 +29,7 @@ const (
 
 var proxyLBDomain string
 
-func TestAccResourceSakuraCloudProxyLBACME(t *testing.T) {
+func TestAccResourceSakuraCloudProxyLBACME_basic(t *testing.T) {
 	if domain, ok := os.LookupEnv(envProxyLBACMEDomain); ok {
 		proxyLBDomain = domain
 	} else {
@@ -39,8 +39,9 @@ func TestAccResourceSakuraCloudProxyLBACME(t *testing.T) {
 
 	var proxylb sacloud.ProxyLB
 	resource.ParallelTest(t, resource.TestCase{
-		PreCheck:  func() { testAccPreCheck(t) },
-		Providers: testAccProviders,
+		PreCheck:     func() { testAccPreCheck(t) },
+		Providers:    testAccProviders,
+		CheckDestroy: testAccCheckSakuraCloudProxyLBDestroy,
 		Steps: []resource.TestStep{
 			{
 				Config: fmt.Sprintf(testAccCheckSakuraCloudProxyLBConfig_acme, proxyLBDomain, proxyLBDomain),

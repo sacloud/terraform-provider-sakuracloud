@@ -24,7 +24,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/terraform"
 )
 
-func TestAccResourceSakuraCloudCDROM(t *testing.T) {
+func TestAccResourceSakuraCloudCDROM_basic(t *testing.T) {
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
 		Providers:    testAccProviders,
@@ -61,7 +61,7 @@ func TestAccResourceSakuraCloudCDROM(t *testing.T) {
 	})
 }
 
-func TestAccResourceSakuraCloudCDROM_With_TextContent(t *testing.T) {
+func TestAccResourceSakuraCloudCDROM_withTextContent(t *testing.T) {
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
 		Providers:    testAccProviders,
@@ -101,7 +101,7 @@ func testAccCheckSakuraCloudCDROMDestroy(s *terraform.State) error {
 	return nil
 }
 
-func TestAccImportSakuraCloudCDROM(t *testing.T) {
+func TestAccImportSakuraCloudCDROM_basic(t *testing.T) {
 	checkFn := func(s []*terraform.InstanceState) error {
 		if len(s) != 1 {
 			return fmt.Errorf("expected 1 state: %#v", s)

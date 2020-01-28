@@ -24,7 +24,7 @@ import (
 	"github.com/sacloud/libsacloud/sacloud"
 )
 
-func TestAccResourceSakuraCloudInternet(t *testing.T) {
+func TestAccResourceSakuraCloudInternet_basic(t *testing.T) {
 	var internet sacloud.Internet
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
@@ -156,7 +156,7 @@ resource "sakuracloud_icon" "foobar" {
 }
 `
 
-func TestAccImportSakuraCloudInternet(t *testing.T) {
+func TestAccImportSakuraCloudInternet_basic(t *testing.T) {
 	checkFn := func(s []*terraform.InstanceState) error {
 		if len(s) != 1 {
 			return fmt.Errorf("expected 1 state: %#v", s)

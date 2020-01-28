@@ -24,7 +24,7 @@ import (
 	"github.com/sacloud/libsacloud/sacloud"
 )
 
-func TestAccSakuraCloudMobileGateway(t *testing.T) {
+func TestAccSakuraCloudMobileGateway_basic(t *testing.T) {
 	var mgs sacloud.MobileGateway
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
@@ -91,7 +91,7 @@ func TestAccSakuraCloudMobileGateway(t *testing.T) {
 	})
 }
 
-func TestAccSakuraCloudMobileGateway_Full(t *testing.T) {
+func TestAccSakuraCloudMobileGateway_full(t *testing.T) {
 	var mgs sacloud.MobileGateway
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
@@ -169,7 +169,7 @@ func testAccCheckSakuraCloudMobileGatewayDestroy(s *terraform.State) error {
 	return nil
 }
 
-func TestAccImportSakuraCloudMobileGateway(t *testing.T) {
+func TestAccImportSakuraCloudMobileGateway_basic(t *testing.T) {
 	checkFn := func(s []*terraform.InstanceState) error {
 		if len(s) != 1 {
 			return fmt.Errorf("expected 1 state: %#v", s)

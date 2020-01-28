@@ -25,7 +25,7 @@ import (
 	"github.com/sacloud/libsacloud/sacloud"
 )
 
-func TestAccResourceSakuraCloudDisk(t *testing.T) {
+func TestAccResourceSakuraCloudDisk_basic(t *testing.T) {
 	var disk sacloud.Disk
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
@@ -131,7 +131,7 @@ func testAccCheckSakuraCloudDiskDestroy(s *terraform.State) error {
 	return nil
 }
 
-func TestAccImportSakuraCloudDisk(t *testing.T) {
+func TestAccImportSakuraCloudDisk_basic(t *testing.T) {
 	checkFn := func(s []*terraform.InstanceState) error {
 		if len(s) != 1 {
 			return fmt.Errorf("expected 1 state: %#v", s)

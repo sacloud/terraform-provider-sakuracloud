@@ -24,7 +24,7 @@ import (
 	"github.com/sacloud/libsacloud/sacloud"
 )
 
-func TestAccResourceSakuraCloudNote(t *testing.T) {
+func TestAccResourceSakuraCloudNote_basic(t *testing.T) {
 	var note sacloud.Note
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
@@ -64,7 +64,7 @@ func TestAccResourceSakuraCloudNote(t *testing.T) {
 	})
 }
 
-func TestAccResourceSakuraCloudNote_WithYAML(t *testing.T) {
+func TestAccResourceSakuraCloudNote_withYAML(t *testing.T) {
 	var note sacloud.Note
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },

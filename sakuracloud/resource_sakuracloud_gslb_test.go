@@ -24,7 +24,7 @@ import (
 	"github.com/sacloud/libsacloud/sacloud"
 )
 
-func TestAccResourceSakuraCloudGSLB(t *testing.T) {
+func TestAccResourceSakuraCloudGSLB_basic(t *testing.T) {
 	var gslb sacloud.GSLB
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
@@ -174,7 +174,7 @@ func testAccCheckSakuraCloudGSLBDestroy(s *terraform.State) error {
 	return nil
 }
 
-func TestAccImportSakuraCloudGSLB(t *testing.T) {
+func TestAccImportSakuraCloudGSLB_basic(t *testing.T) {
 	checkFn := func(s []*terraform.InstanceState) error {
 		if len(s) != 1 {
 			return fmt.Errorf("expected 1 state: %#v", s)

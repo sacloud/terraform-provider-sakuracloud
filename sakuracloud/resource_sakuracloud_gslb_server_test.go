@@ -23,7 +23,7 @@ import (
 	"github.com/sacloud/libsacloud/sacloud"
 )
 
-func TestAccResourceSakuraCloudGSLBServer(t *testing.T) {
+func TestAccResourceSakuraCloudGSLBServer_basic(t *testing.T) {
 	var gslb sacloud.GSLB
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },

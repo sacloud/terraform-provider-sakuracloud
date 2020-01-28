@@ -24,7 +24,7 @@ import (
 	"github.com/sacloud/libsacloud/sacloud"
 )
 
-func TestAccResourceSakuraCloudSSHKeyGen(t *testing.T) {
+func TestAccResourceSakuraCloudSSHKeyGen_basic(t *testing.T) {
 	var ssh_key sacloud.SSHKey
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },

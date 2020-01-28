@@ -24,7 +24,7 @@ import (
 	"github.com/sacloud/libsacloud/sacloud"
 )
 
-func TestAccSakuraCloudNFS(t *testing.T) {
+func TestAccSakuraCloudNFS_basic(t *testing.T) {
 	var nfs sacloud.NFS
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },

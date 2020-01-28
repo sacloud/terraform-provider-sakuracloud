@@ -24,7 +24,7 @@ import (
 	"github.com/sacloud/libsacloud/sacloud"
 )
 
-func TestAccResourceSakuraCloudSwitch(t *testing.T) {
+func TestAccResourceSakuraCloudSwitch_basic(t *testing.T) {
 	var sw sacloud.Switch
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
@@ -62,7 +62,7 @@ func TestAccResourceSakuraCloudSwitch(t *testing.T) {
 		},
 	})
 }
-func TestAccResourceSakuraCloudSwitchCustomiezeDiff(t *testing.T) {
+func TestAccResourceSakuraCloudSwitch_customiezeDiff(t *testing.T) {
 	var sw sacloud.Switch
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
@@ -97,7 +97,7 @@ func TestAccResourceSakuraCloudSwitchCustomiezeDiff(t *testing.T) {
 	})
 }
 
-func TestAccResourceSakuraCloudSwitchCustomiezeDiff_AddTags(t *testing.T) {
+func TestAccResourceSakuraCloudSwitch_customiezeDiffAddTags(t *testing.T) {
 	var sw sacloud.Switch
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },

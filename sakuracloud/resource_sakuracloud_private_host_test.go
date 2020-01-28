@@ -25,7 +25,7 @@ import (
 	"github.com/sacloud/libsacloud/sacloud"
 )
 
-func TestAccResourceSakuraCloudPrivateHost(t *testing.T) {
+func TestAccResourceSakuraCloudPrivateHost_basic(t *testing.T) {
 	var private_host sacloud.PrivateHost
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
@@ -75,7 +75,7 @@ func TestAccResourceSakuraCloudPrivateHost(t *testing.T) {
 	})
 }
 
-func TestAccResourceSakuraCloudPrivateHost_DestroyWithRunningServers(t *testing.T) {
+func TestAccResourceSakuraCloudPrivateHost_destroyWithRunningServers(t *testing.T) {
 	var private_host sacloud.PrivateHost
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
