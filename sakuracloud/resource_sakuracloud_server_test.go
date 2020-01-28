@@ -60,6 +60,7 @@ func TestAccSakuraCloudServer_basic(t *testing.T) {
 					resource.TestCheckResourceAttr(resourceName, "disk_edit_parameter.0.note_ids.0", "100000000000"),
 					resource.TestCheckResourceAttr(resourceName, "network_interface.#", "1"),
 					resource.TestCheckResourceAttr(resourceName, "network_interface.0.upstream", "shared"),
+					resource.TestCheckResourceAttr(resourceName, "hostname", rand),
 					resource.TestCheckResourceAttrSet(resourceName, "network_interface.0.mac_address"),
 					resource.TestCheckResourceAttrSet(resourceName, "ip_address"),
 					resource.TestCheckResourceAttrPair(
@@ -220,6 +221,8 @@ func TestAccSakuraCloudServer_switch(t *testing.T) {
 				Config: buildConfigWithArgs(testAccSakuraCloudServer_switch, rand),
 				Check: resource.ComposeTestCheckFunc(
 					testCheckSakuraCloudServerExists(resourceName, &server),
+					resource.TestCheckResourceAttr(resourceName, "network_interface.0.user_ip_address", "192.168.0.2"),
+					resource.TestCheckResourceAttr(resourceName, "network_interface.1.user_ip_address", "192.168.1.2"),
 					resource.TestCheckResourceAttr(resourceName, "ip_address", "192.168.0.2"),
 					resource.TestCheckResourceAttr(resourceName, "netmask", "24"),
 					resource.TestCheckResourceAttr(resourceName, "gateway", "192.168.0.1"),
@@ -541,7 +544,11 @@ resource "sakuracloud_disk" "foobar" {
   source_archive_id = data.sakuracloud_archive.ubuntu.id
 }
 
-resource "sakuracloud_switch" "foobar" {
+resource "sakuracloud_switch" "foobar1" {
+  name = "{{ .arg0 }}"
+}
+
+resource "sakuracloud_switch" "foobar2" {
   name = "{{ .arg0 }}"
 }
 
@@ -550,7 +557,11 @@ resource "sakuracloud_server" "foobar" {
   disks = [sakuracloud_disk.foobar.id]
 
   network_interface {
-    upstream = sakuracloud_switch.foobar.id
+    upstream = sakuracloud_switch.foobar1.id
+  }
+  network_interface {
+    upstream        = sakuracloud_switch.foobar2.id
+    user_ip_address = "192.168.1.2"
   }
   
   disk_edit_parameter {

@@ -96,8 +96,9 @@ func expandServerNIC(d resourceValueGettable) serverBuilder.NICSettingHolder {
 		return &serverBuilder.DisconnectedNICSetting{}
 	default:
 		return &serverBuilder.ConnectedNICSetting{
-			SwitchID:       sakuraCloudID(upstream),
-			PacketFilterID: expandSakuraCloudID(d, "packet_filter_id"),
+			SwitchID:         sakuraCloudID(upstream),
+			PacketFilterID:   expandSakuraCloudID(d, "packet_filter_id"),
+			DisplayIPAddress: stringOrDefault(d, "user_ip_address"),
 		}
 	}
 }
@@ -121,8 +122,9 @@ func expandServerAdditionalNICs(d resourceValueGettable) []serverBuilder.Additio
 			results = append(results, &serverBuilder.DisconnectedNICSetting{})
 		default:
 			results = append(results, &serverBuilder.ConnectedNICSetting{
-				SwitchID:       sakuraCloudID(upstream),
-				PacketFilterID: expandSakuraCloudID(d, "packet_filter_id"),
+				SwitchID:         sakuraCloudID(upstream),
+				PacketFilterID:   expandSakuraCloudID(d, "packet_filter_id"),
+				DisplayIPAddress: stringOrDefault(d, "user_ip_address"),
 			})
 		}
 	}
@@ -145,6 +147,7 @@ func flattenServerNICs(server *sacloud.Server) []interface{} {
 			"upstream":         upstream,
 			"packet_filter_id": nic.PacketFilterID.String(),
 			"mac_address":      strings.ToLower(nic.MACAddress),
+			"user_ip_address":  nic.UserIPAddress,
 		})
 	}
 	return results
