@@ -469,6 +469,10 @@ func setProxyLBResourceData(ctx context.Context, d *schema.ResourceData, client 
 		// even if certificate is deleted, it will not result in an error
 		return err
 	}
+	health, err := proxyLBOp.HealthStatus(ctx, data.ID)
+	if err != nil {
+		return err
+	}
 
 	d.Set("name", data.Name)                                   // nolint
 	d.Set("plan", data.Plan.Int())                             // nolint
@@ -477,7 +481,7 @@ func setProxyLBResourceData(ctx context.Context, d *schema.ResourceData, client 
 	d.Set("timeout", flattenProxyLBTimeout(data))              // nolint
 	d.Set("region", data.Region.String())                      // nolint
 	d.Set("fqdn", data.FQDN)                                   // nolint
-	d.Set("vip", data.VirtualIPAddress)                        // nolint
+	d.Set("vip", health.CurrentVIP)                            // nolint
 	d.Set("proxy_networks", data.ProxyNetworks)                // nolint
 	d.Set("icon_id", data.IconID.String())                     // nolint
 	d.Set("description", data.Description)                     // nolint

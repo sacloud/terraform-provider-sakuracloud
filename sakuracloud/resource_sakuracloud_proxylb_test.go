@@ -79,6 +79,7 @@ func TestAccSakuraCloudProxyLB_basic(t *testing.T) {
 					resource.TestCheckResourceAttr(resourceName, "rule.0.host", "usacloud.jp"),
 					resource.TestCheckResourceAttr(resourceName, "rule.0.path", "/path"),
 					resource.TestCheckResourceAttr(resourceName, "rule.0.group", "group1"),
+					resource.TestCheckResourceAttrSet(resourceName, "vip"),
 					resource.TestCheckResourceAttrPair(
 						resourceName, "server.0.ip_address",
 						"sakuracloud_server.foobar", "ip_address",
@@ -113,6 +114,7 @@ func TestAccSakuraCloudProxyLB_basic(t *testing.T) {
 					resource.TestCheckResourceAttr(resourceName, "rule.0.host", "upd.usacloud.jp"),
 					resource.TestCheckResourceAttr(resourceName, "rule.0.path", "/path-upd"),
 					resource.TestCheckResourceAttr(resourceName, "rule.0.group", "group2"),
+					resource.TestCheckResourceAttrSet(resourceName, "vip"),
 					resource.TestCheckResourceAttrPair(
 						resourceName, "server.0.ip_address",
 						"sakuracloud_server.foobar", "ip_address",
