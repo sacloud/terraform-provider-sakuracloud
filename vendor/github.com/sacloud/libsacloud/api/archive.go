@@ -175,6 +175,10 @@ func (api *ArchiveAPI) CanEditDisk(id int64) (bool, error) {
 	if archive.HasTag("pkg-netwiserve") {
 		return false, nil
 	}
+	// Juniper vSRXであれば編集不可
+	if archive.HasTag("pkg-vsrx") {
+		return false, nil
+	}
 
 	for _, t := range allowDiskEditTags {
 		if archive.HasTag(t) {
@@ -224,6 +228,10 @@ func (api *ArchiveAPI) GetPublicArchiveIDFromAncestors(id int64) (int64, bool) {
 	}
 	// Netwiser VEであれば編集不可
 	if archive.HasTag("pkg-netwiserve") {
+		return emptyID, false
+	}
+	// Juniper vSRXであれば編集不可
+	if archive.HasTag("pkg-vsrx") {
 		return emptyID, false
 	}
 
