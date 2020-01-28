@@ -5,7 +5,7 @@
 
 - Terraform Website: https://terraform.io
 - Documentation: https://docs.usacloud.jp/terraform
-- Slack Workspace for Users: [![Slack](https://slack.usacloud.jp/badge.svg)](https://slack.usacloud.jp/)
+- Slack Workspace for Users: https://slack.usacloud.jp
 
 ## Usage Example
 
