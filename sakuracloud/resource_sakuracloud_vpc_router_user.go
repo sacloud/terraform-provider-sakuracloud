@@ -132,7 +132,7 @@ func vpcRouterRemoteAccessUserIDHash(routerID string, s *sacloud.VPCRouterRemote
 	var buf bytes.Buffer
 	buf.WriteString(fmt.Sprintf("%s-", routerID))
 	buf.WriteString(fmt.Sprintf("%s-", s.UserName))
-	buf.WriteString(fmt.Sprintf("%s", s.Password))
+	buf.WriteString(s.Password)
 
 	return fmt.Sprintf("%d", hashcode.String(buf.String()))
 }

@@ -129,7 +129,7 @@ func vpcRouterPPTPIDHash(routerID string, s *sacloud.VPCRouterPPTPServer) string
 	var buf bytes.Buffer
 	buf.WriteString(fmt.Sprintf("%s-", routerID))
 	buf.WriteString(fmt.Sprintf("%s-", s.Config.RangeStart))
-	buf.WriteString(fmt.Sprintf("%s", s.Config.RangeStop))
+	buf.WriteString(s.Config.RangeStop)
 
 	return fmt.Sprintf("%d", hashcode.String(buf.String()))
 }

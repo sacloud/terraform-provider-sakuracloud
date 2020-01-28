@@ -53,8 +53,8 @@ func resourceSakuraCloudDisk() *schema.Resource {
 				ForceNew: true,
 				Default:  sacloud.DiskConnectionVirtio,
 				ValidateFunc: validation.StringInSlice([]string{
-					fmt.Sprintf("%s", sacloud.DiskConnectionVirtio),
-					fmt.Sprintf("%s", sacloud.DiskConnectionIDE),
+					string(sacloud.DiskConnectionVirtio),
+					string(sacloud.DiskConnectionIDE),
 				}, false),
 			},
 			"source_archive_id": {
@@ -160,10 +160,8 @@ func resourceSakuraCloudDiskCreate(d *schema.ResourceData, meta interface{}) err
 	switch plan {
 	case "ssd":
 		opts.SetDiskPlanToSSD()
-		break
 	case "hdd":
 		opts.SetDiskPlanToHDD()
-		break
 	default:
 		return fmt.Errorf("invalid disk plan [%s]", plan)
 	}
@@ -476,17 +474,13 @@ func resourceSakuraCloudDiskDelete(d *schema.ResourceData, meta interface{}) err
 }
 
 func setDiskResourceData(d *schema.ResourceData, client *APIClient, data *sacloud.Disk) error {
-
 	d.Set("name", data.Name)
 
 	switch data.Plan.ID {
 	case sacloud.DiskPlanSSD.ID:
 		d.Set("plan", "ssd")
-		break
 	case sacloud.DiskPlanHDD.ID:
 		d.Set("plan", "hdd")
-		break
-
 	}
 
 	if data.SourceDisk != nil {
@@ -495,7 +489,7 @@ func setDiskResourceData(d *schema.ResourceData, client *APIClient, data *saclou
 		d.Set("source_archive_id", data.SourceArchive.GetStrID())
 	}
 
-	d.Set("connector", fmt.Sprintf("%s", data.Connection))
+	d.Set("connector", string(data.Connection))
 	d.Set("size", toSizeGB(data.SizeMB))
 	d.Set("icon_id", data.GetIconStrID())
 	d.Set("description", data.Description)

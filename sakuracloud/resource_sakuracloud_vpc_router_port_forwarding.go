@@ -140,7 +140,7 @@ func vpcRouterPortForwardingIDHash(routerID string, s *sacloud.VPCRouterPortForw
 	buf.WriteString(fmt.Sprintf("%s-", routerID))
 	buf.WriteString(fmt.Sprintf("%s-", s.Protocol))
 	buf.WriteString(fmt.Sprintf("%s-", s.GlobalPort))
-	buf.WriteString(fmt.Sprintf("%s", s.PrivateAddress))
+	buf.WriteString(fmt.Sprintf("%s-", s.PrivateAddress))
 	buf.WriteString(fmt.Sprintf("%s-", s.PrivatePort))
 	buf.WriteString(fmt.Sprintf("%s-", s.Description))
 

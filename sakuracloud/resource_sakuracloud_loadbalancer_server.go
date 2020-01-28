@@ -206,7 +206,7 @@ func isSameLoadBalancerVIPByValue(vip string, port string, s2 *sacloud.LoadBalan
 }
 
 func findLoadBalancerServer(server *sacloud.LoadBalancerServer, servers []*sacloud.LoadBalancerServer) *sacloud.LoadBalancerServer {
-	if servers == nil || len(servers) == 0 {
+	if len(servers) == 0 {
 		return nil
 	}
 	for _, s := range servers {
@@ -222,7 +222,7 @@ func loadBalancerServerIDHash(vipID string, s *sacloud.LoadBalancerServer) strin
 	var buf bytes.Buffer
 	buf.WriteString(fmt.Sprintf("%s-", vipID))
 	buf.WriteString(fmt.Sprintf("%s-", s.IPAddress))
-	buf.WriteString(fmt.Sprintf("%s", s.Port))
+	buf.WriteString(s.Port)
 
 	return fmt.Sprintf("%d", hashcode.String(buf.String()))
 }

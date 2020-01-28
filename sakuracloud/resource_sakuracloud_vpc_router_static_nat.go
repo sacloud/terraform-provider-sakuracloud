@@ -133,8 +133,8 @@ func vpcRouterStaticNATIDHash(routerID string, s *sacloud.VPCRouterStaticNATConf
 	var buf bytes.Buffer
 	buf.WriteString(fmt.Sprintf("%s-", routerID))
 	buf.WriteString(fmt.Sprintf("%s-", s.GlobalAddress))
-	buf.WriteString(fmt.Sprintf("%s", s.PrivateAddress))
-	buf.WriteString(fmt.Sprintf("%s", s.Description))
+	buf.WriteString(fmt.Sprintf("%s-", s.PrivateAddress))
+	buf.WriteString(s.Description)
 
 	return fmt.Sprintf("%d", hashcode.String(buf.String()))
 }

@@ -134,7 +134,7 @@ func vpcRouterDHCPStaticMappingIDHash(routerID string, s *sacloud.VPCRouterDHCPS
 	var buf bytes.Buffer
 	buf.WriteString(fmt.Sprintf("%s-", routerID))
 	buf.WriteString(fmt.Sprintf("%s-", s.IPAddress))
-	buf.WriteString(fmt.Sprintf("%s", s.MACAddress))
+	buf.WriteString(s.MACAddress)
 
 	return fmt.Sprintf("%d", hashcode.String(buf.String()))
 }

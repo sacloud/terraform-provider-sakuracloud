@@ -158,10 +158,8 @@ func resourceSakuraCloudDatabaseCreate(d *schema.ResourceData, meta interface{})
 	switch dbType {
 	case "postgresql":
 		opts = sacloud.NewCreatePostgreSQLDatabaseValue()
-		break
 	case "mariadb":
 		opts = sacloud.NewCreateMariaDBDatabaseValue()
-		break
 	default:
 		return fmt.Errorf("Unknown database_type [%s]", dbType)
 	}
@@ -449,10 +447,8 @@ func setDatabaseResourceData(d *schema.ResourceData, client *APIClient, data *sa
 	switch data.Remark.DBConf.Common.DatabaseName {
 	case "postgres":
 		d.Set("database_type", "postgresql")
-		break
 	case "MariaDB":
 		d.Set("database_type", "mariadb")
-		break
 	}
 
 	d.Set("name", data.Name)

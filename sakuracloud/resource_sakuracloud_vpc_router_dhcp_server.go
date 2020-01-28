@@ -136,7 +136,7 @@ func vpcRouterDHCPServerIDHash(routerID string, s *sacloud.VPCRouterDHCPServerCo
 	buf.WriteString(fmt.Sprintf("%s-", routerID))
 	buf.WriteString(fmt.Sprintf("%s-", s.Interface))
 	buf.WriteString(fmt.Sprintf("%s-", s.RangeStart))
-	buf.WriteString(fmt.Sprintf("%s", s.RangeStop))
+	buf.WriteString(s.RangeStop)
 
 	return fmt.Sprintf("%d", hashcode.String(buf.String()))
 }

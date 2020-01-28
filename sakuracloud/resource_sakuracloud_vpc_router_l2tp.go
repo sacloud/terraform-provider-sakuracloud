@@ -130,7 +130,7 @@ func vpcRouterL2TPIDHash(routerID string, s *sacloud.VPCRouterL2TPIPsecServer) s
 	buf.WriteString(fmt.Sprintf("%s-", routerID))
 	buf.WriteString(fmt.Sprintf("%s-", s.Config.PreSharedSecret))
 	buf.WriteString(fmt.Sprintf("%s-", s.Config.RangeStart))
-	buf.WriteString(fmt.Sprintf("%s", s.Config.RangeStop))
+	buf.WriteString(s.Config.RangeStop)
 
 	return fmt.Sprintf("%d", hashcode.String(buf.String()))
 }

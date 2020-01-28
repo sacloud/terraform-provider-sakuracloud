@@ -171,7 +171,7 @@ func vpcRouterSiteToSiteIPsecVPNIDHash(routerID string, s *sacloud.VPCRouterSite
 	buf.WriteString(fmt.Sprintf("%s-", s.PreSharedSecret))
 	buf.WriteString(fmt.Sprintf("%s-", s.RemoteID))
 	buf.WriteString(fmt.Sprintf("%s-", strings.Join(s.Routes, "")))
-	buf.WriteString(fmt.Sprintf("%s", strings.Join(s.LocalPrefix, "")))
+	buf.WriteString(strings.Join(s.LocalPrefix, ""))
 
 	return fmt.Sprintf("%d", hashcode.String(buf.String()))
 }

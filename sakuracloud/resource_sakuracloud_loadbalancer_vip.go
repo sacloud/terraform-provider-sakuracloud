@@ -216,7 +216,7 @@ func loadBalancerVIPIDHash(loadBalancerID string, s *sacloud.LoadBalancerSetting
 	var buf bytes.Buffer
 	buf.WriteString(fmt.Sprintf("%s-", loadBalancerID))
 	buf.WriteString(fmt.Sprintf("%s-", s.VirtualIPAddress))
-	buf.WriteString(fmt.Sprintf("%s", s.Port))
+	buf.WriteString(s.Port)
 
 	return buf.String()
 }
