@@ -66,13 +66,13 @@ func Provider() terraform.ResourceProvider {
 			"retry_max": {
 				Type:         schema.TypeInt,
 				Optional:     true,
-				DefaultFunc:  schema.MultiEnvDefaultFunc([]string{"SAKURACLOUD_RETRY_MAX"}, 10),
+				DefaultFunc:  schema.MultiEnvDefaultFunc([]string{"SAKURACLOUD_RETRY_MAX"}, defaultRetryMax),
 				ValidateFunc: validation.IntBetween(0, 100),
 			},
 			"retry_interval": {
 				Type:         schema.TypeInt,
 				Optional:     true,
-				DefaultFunc:  schema.MultiEnvDefaultFunc([]string{"SAKURACLOUD_RETRY_INTERVAL"}, 5),
+				DefaultFunc:  schema.MultiEnvDefaultFunc([]string{"SAKURACLOUD_RETRY_INTERVAL"}, defaultRetryInterval),
 				ValidateFunc: validation.IntBetween(0, 600),
 			},
 			"timeout": {

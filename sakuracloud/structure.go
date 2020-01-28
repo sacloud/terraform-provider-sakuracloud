@@ -18,10 +18,8 @@ import (
 	"fmt"
 	"strconv"
 	"strings"
-	"time"
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
-	"github.com/hashicorp/terraform-plugin-sdk/terraform"
 	"github.com/sacloud/libsacloud/sacloud"
 )
 
@@ -45,17 +43,6 @@ func (r *resourceMapValue) GetOk(key string) (interface{}, bool) {
 
 func mapToResourceData(v map[string]interface{}) resourceValueGetable {
 	return &resourceMapValue{value: v}
-}
-
-func getMapFromResource(d resourceValueGetable, key string) (map[string]interface{}, bool) {
-	v, ok := d.GetOk(key)
-	if !ok {
-		return nil, false
-	}
-	if v, ok := v.(map[string]interface{}); ok {
-		return v, true
-	}
-	return nil, false
 }
 
 func getListFromResource(d resourceValueGetable, key string) ([]interface{}, bool) {
@@ -303,50 +290,4 @@ func expandFilters(filter interface{}) map[string]interface{} {
 	}
 
 	return ret
-}
-
-type migrateSchemaDef struct {
-	source      string
-	destination string
-}
-
-type resourceData interface {
-	UnsafeSetFieldRaw(key string, value string)
-	Get(key string) interface{}
-	GetChange(key string) (interface{}, interface{})
-	GetOk(key string) (interface{}, bool)
-	HasChange(key string) bool
-	Partial(on bool)
-	Set(key string, value interface{}) error
-	SetPartial(k string)
-	MarkNewResource()
-	IsNewResource() bool
-	Id() string
-	ConnInfo() map[string]string
-	SetId(v string)
-	SetConnInfo(v map[string]string)
-	SetType(t string)
-	State() *terraform.InstanceState
-	Timeout(key string) time.Duration
-
-	RawResourceData() *schema.ResourceData
-}
-type resourceDataWrapper struct {
-	*schema.ResourceData
-	migrateDefs []migrateSchemaDef
-}
-
-func (d *resourceDataWrapper) HasChange(key string) bool {
-	origFunc := d.ResourceData.HasChange
-
-	for _, def := range d.migrateDefs {
-		if def.source == key || def.destination == key {
-			return origFunc(def.source) || origFunc(def.destination)
-		}
-	}
-	return origFunc(key)
-}
-
-func (d *resourceDataWrapper) RawResourceData() *schema.ResourceData {
-	return d.ResourceData
 }
