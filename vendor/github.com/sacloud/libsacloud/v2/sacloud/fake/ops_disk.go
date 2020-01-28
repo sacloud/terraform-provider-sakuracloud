@@ -113,6 +113,11 @@ func (o *DiskOp) Config(ctx context.Context, zone string, id types.ID, edit *sac
 		return err
 	}
 
+	if edit.HostName != "" {
+		server.HostName = edit.HostName
+		putServer(zone, server)
+	}
+
 	if len(server.Interfaces) > 0 {
 		nic := server.Interfaces[0]
 		if nic.SwitchScope == types.Scopes.Shared {

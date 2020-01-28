@@ -33,6 +33,7 @@ type nicState struct {
 // NICSettingHolder NIC設定を保持するためのインターフェース
 type NICSettingHolder interface {
 	GetConnectedSwitchParam() *sacloud.ConnectedSwitch
+	GetDisplayIPAddress() string
 
 	GetPacketFilterID() types.ID
 	Validate(ctx context.Context, client *APIClient, zone string) error
@@ -74,6 +75,11 @@ func (c *SharedNICSetting) Validate(ctx context.Context, client *APIClient, zone
 		}
 	}
 	return nil
+}
+
+// GetDisplayIPAddress 表示用IPアドレスを返す
+func (c *SharedNICSetting) GetDisplayIPAddress() string {
+	return ""
 }
 
 func (c *SharedNICSetting) state() *nicState {

@@ -100,6 +100,13 @@ func resourceSakuraCloudServer() *schema.Resource {
 								[]string{"shared", "disconnect", "<switch id>"},
 							),
 						},
+						"user_ip_address": {
+							Type:         schema.TypeString,
+							Optional:     true,
+							Computed:     true,
+							ValidateFunc: validation.SingleIP(),
+							Description:  "The IP address for only display. This value doesn't affect actual NIC settings",
+						},
 						"packet_filter_id": {
 							Type:         schema.TypeString,
 							Optional:     true,
@@ -226,6 +233,11 @@ func resourceSakuraCloudServer() *schema.Resource {
 				Computed:    true,
 				Elem:        &schema.Schema{Type: schema.TypeString},
 				Description: "A list of IP address of DNS server in the zone",
+			},
+			"hostname": {
+				Type:        schema.TypeString,
+				Computed:    true,
+				Description: "The hostname of the Server",
 			},
 			"force_shutdown": {
 				Type:        schema.TypeBool,
@@ -388,6 +400,7 @@ func setServerResourceData(ctx context.Context, d *schema.ResourceData, client *
 	d.Set("gateway", gateway)              // nolint
 	d.Set("network_address", nwAddress)    // nolint
 	d.Set("netmask", nwMaskLen)            // nolint
+	d.Set("hostname", data.HostName)       // nolint
 	if err := d.Set("dns_servers", data.Zone.Region.NameServers); err != nil {
 		return err
 	}

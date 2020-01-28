@@ -103,11 +103,6 @@ func getPublicArchiveFromAncestors(ctx context.Context, zone string, reader *Arc
 		return nil, nil
 	}
 
-	// vSrXであれば編集不可
-	if archive.HasTag("pkg-vsrx") {
-		return nil, nil
-	}
-
 	// SophosUTMであれば編集不可
 	if archive.HasTag("pkg-sophosutm") || isSophosUTM(archive) {
 		return nil, nil
@@ -118,6 +113,10 @@ func getPublicArchiveFromAncestors(ctx context.Context, zone string, reader *Arc
 	}
 	// Netwiser VEであれば編集不可
 	if archive.HasTag("pkg-netwiserve") {
+		return nil, nil
+	}
+	// Juniper vSRXであれば編集不可
+	if archive.HasTag("pkg-vsrx") {
 		return nil, nil
 	}
 

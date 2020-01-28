@@ -76,6 +76,11 @@ func dataSourceSakuraCloudServer() *schema.Resource {
 								[]string{"shared", "disconnect", "<switch id>"},
 							),
 						},
+						"user_ip_address": {
+							Type:        schema.TypeString,
+							Computed:    true,
+							Description: "The IP address for only display. This value doesn't affect actual NIC settings",
+						},
 						"packet_filter_id": {
 							Type:        schema.TypeString,
 							Computed:    true,
@@ -115,6 +120,11 @@ func dataSourceSakuraCloudServer() *schema.Resource {
 				Type:        schema.TypeString,
 				Computed:    true,
 				Description: "The network address which the `ip_address` belongs",
+			},
+			"hostname": {
+				Type:        schema.TypeString,
+				Computed:    true,
+				Description: "The hostname of the Server",
 			},
 			"dns_servers": {
 				Type:        schema.TypeList,

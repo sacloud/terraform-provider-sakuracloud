@@ -51,6 +51,7 @@ A `condition` block supports the following:
 * `disks` - A list of disk id connected to the server.
 * `dns_servers` - A list of IP address of DNS server in the zone.
 * `gateway` - The IP address of the gateway used by Server.
+* `hostname` - The hostname of the Server.
 * `icon_id` - The icon id attached to the Server.
 * `interface_driver` - The driver name of network interface. This will be one of [`virtio`/`e1000`].
 * `ip_address` - The IP address assigned to the Server.
@@ -70,5 +71,7 @@ A `network_interface` block exports the following:
 * `mac_address` - The MAC address.
 * `packet_filter_id` - The id of the packet filter attached to the network interface.
 * `upstream` - The upstream type or upstream switch id. This will be one of [`shared`/`disconnect`/`<switch id>`].
+* `user_ip_address` - The IP address for only display. This value doesn't affect actual NIC settings.
+
 
 

@@ -154,6 +154,16 @@ func (s sIMFindRequestEnvelope) MarshalJSON() ([]byte, error) {
 	return json.Marshal(tmp)
 }
 
+func (s localRouterFindRequestEnvelope) MarshalJSON() ([]byte, error) {
+	type alias localRouterFindRequestEnvelope
+	tmp := alias(s)
+	if tmp.Filter == nil {
+		tmp.Filter = search.Filter{}
+	}
+	tmp.Filter[search.Key("Provider.Class")] = "localrouter"
+	return json.Marshal(tmp)
+}
+
 func (s databaseFindRequestEnvelope) MarshalJSON() ([]byte, error) {
 	type alias databaseFindRequestEnvelope
 	tmp := alias(s)
