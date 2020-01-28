@@ -1,6 +1,7 @@
-## 1.21.4 (Unreleased)
+## 1.22.0 (Unreleased)
 
-*
+* Use SDK-style User-Agent #679 (@yamamoto-febc)
+* Improve release processes #678 (@yamamoto-febc)
 
 ## 1.21.3 (2020-01-28)
 
