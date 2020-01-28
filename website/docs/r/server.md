@@ -71,6 +71,9 @@ A `network_interface` block supports the following:
 
 * `upstream` - (Required) The upstream type or upstream switch id. This must be one of [`shared`/`disconnect`/`<switch id>`].
 * `packet_filter_id` - (Optional) The id of the packet filter to attach to the network interface.
+* `user_ip_address` - (Optional) The IP address for only display. This value doesn't affect actual NIC settings.
+
+
 
 #### Disks
 
@@ -112,6 +115,7 @@ The `timeouts` block allows you to specify [timeouts](https://www.terraform.io/d
 * `id` - The id of the Server.
 * `dns_servers` - A list of IP address of DNS server in the zone.
 * `gateway` - The IP address of the gateway used by Server.
+* `hostname` - The hostname of the Server.
 * `ip_address` - The IP address assigned to the Server.
 * `netmask` - The bit length of the subnet assigned to the Server.
 * `network_address` - The network address which the `ip_address` belongs.
