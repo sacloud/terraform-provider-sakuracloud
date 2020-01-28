@@ -446,7 +446,7 @@ func resourceSakuraCloudSimpleMonitorUpdate(d *schema.ResourceData, meta interfa
 		simpleMonitor.SetNotifyInterval(notifyInterval)
 	}
 
-	simpleMonitor, err = client.SimpleMonitor.Update(simpleMonitor.ID, simpleMonitor)
+	_, err = client.SimpleMonitor.Update(simpleMonitor.ID, simpleMonitor)
 	if err != nil {
 		return fmt.Errorf("Failed to create SakuraCloud SimpleMonitor resource: %s", err)
 	}

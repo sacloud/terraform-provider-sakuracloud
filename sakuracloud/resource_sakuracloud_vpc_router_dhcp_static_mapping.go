@@ -51,7 +51,7 @@ func resourceSakuraCloudVPCRouterDHCPStaticMappingCreate(d *schema.ResourceData,
 	}
 
 	vpcRouter.Settings.Router.AddDHCPStaticMapping(dhcpStaticMapping.IPAddress, dhcpStaticMapping.MACAddress)
-	vpcRouter, err = client.VPCRouter.UpdateSetting(toSakuraCloudID(routerID), vpcRouter)
+	_, err = client.VPCRouter.UpdateSetting(toSakuraCloudID(routerID), vpcRouter)
 	if err != nil {
 		return fmt.Errorf("Failed to enable SakuraCloud VPCRouterDHCPStaticMapping resource: %s", err)
 	}
@@ -116,7 +116,7 @@ func resourceSakuraCloudVPCRouterDHCPStaticMappingDelete(d *schema.ResourceData,
 		dhcpStaticMapping := expandVPCRouterDHCPStaticMapping(d)
 		vpcRouter.Settings.Router.RemoveDHCPStaticMapping(dhcpStaticMapping.IPAddress, dhcpStaticMapping.MACAddress)
 
-		vpcRouter, err = client.VPCRouter.UpdateSetting(toSakuraCloudID(routerID), vpcRouter)
+		_, err = client.VPCRouter.UpdateSetting(toSakuraCloudID(routerID), vpcRouter)
 		if err != nil {
 			return fmt.Errorf("Failed to delete SakuraCloud VPCRouterDHCPStaticMapping resource: %s", err)
 		}

@@ -91,7 +91,7 @@ func resourceSakuraCloudVPCRouterFirewallCreate(d *schema.ResourceData, meta int
 		}
 	}
 
-	vpcRouter, err = client.VPCRouter.UpdateSetting(toSakuraCloudID(routerID), vpcRouter)
+	_, err = client.VPCRouter.UpdateSetting(toSakuraCloudID(routerID), vpcRouter)
 	if err != nil {
 		return fmt.Errorf("Failed to enable SakuraCloud VPCRouterFirewall resource: %s", err)
 	}
@@ -182,7 +182,7 @@ func resourceSakuraCloudVPCRouterFirewallDelete(d *schema.ResourceData, meta int
 			vpcRouter.Settings.Router.Firewall.Config[ifIndex].Receive = []*sacloud.VPCRouterFirewallRule{}
 		}
 
-		vpcRouter, err = client.VPCRouter.UpdateSetting(toSakuraCloudID(routerID), vpcRouter)
+		_, err = client.VPCRouter.UpdateSetting(toSakuraCloudID(routerID), vpcRouter)
 		if err != nil {
 			return fmt.Errorf("Failed to delete SakuraCloud VPCRouterFirewall resource: %s", err)
 		}

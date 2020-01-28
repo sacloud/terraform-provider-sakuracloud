@@ -353,7 +353,7 @@ func resourceSakuraCloudLoadBalancerUpdate(d *schema.ResourceData, meta interfac
 		}
 	}
 
-	loadBalancer, err = client.LoadBalancer.Update(loadBalancer.ID, loadBalancer)
+	_, err = client.LoadBalancer.Update(loadBalancer.ID, loadBalancer)
 	if err != nil {
 		return fmt.Errorf("Error updating SakuraCloud LoadBalancer resource: %s", err)
 	}

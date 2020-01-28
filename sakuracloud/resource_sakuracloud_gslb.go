@@ -300,7 +300,7 @@ func resourceSakuraCloudGSLBUpdate(d *schema.ResourceData, meta interface{}) err
 		}
 	}
 
-	gslb, err = client.GSLB.Update(gslb.ID, gslb)
+	_, err = client.GSLB.Update(gslb.ID, gslb)
 	if err != nil {
 		return fmt.Errorf("Failed to create SakuraCloud GSLB resource: %s", err)
 	}

@@ -110,7 +110,7 @@ func resourceSakuraCloudBridgeUpdate(d *schema.ResourceData, meta interface{}) e
 		}
 	}
 
-	bridge, err = client.Bridge.Update(bridge.ID, bridge)
+	_, err = client.Bridge.Update(bridge.ID, bridge)
 	if err != nil {
 		return fmt.Errorf("Error updating SakuraCloud Bridge resource: %s", err)
 	}

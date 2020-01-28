@@ -51,7 +51,7 @@ func resourceSakuraCloudVPCRouterStaticRouteCreate(d *schema.ResourceData, meta 
 	}
 
 	vpcRouter.Settings.Router.AddStaticRoute(staticRoute.Prefix, staticRoute.NextHop)
-	vpcRouter, err = client.VPCRouter.UpdateSetting(toSakuraCloudID(routerID), vpcRouter)
+	_, err = client.VPCRouter.UpdateSetting(toSakuraCloudID(routerID), vpcRouter)
 	if err != nil {
 		return fmt.Errorf("Failed to enable SakuraCloud VPCRouterStaticRoute resource: %s", err)
 	}
@@ -114,7 +114,7 @@ func resourceSakuraCloudVPCRouterStaticRouteDelete(d *schema.ResourceData, meta 
 		staticRoute := expandVPCRouterStaticRoute(d)
 		vpcRouter.Settings.Router.RemoveStaticRoute(staticRoute.Prefix, staticRoute.NextHop)
 
-		vpcRouter, err = client.VPCRouter.UpdateSetting(toSakuraCloudID(routerID), vpcRouter)
+		_, err = client.VPCRouter.UpdateSetting(toSakuraCloudID(routerID), vpcRouter)
 		if err != nil {
 			return fmt.Errorf("Failed to delete SakuraCloud VPCRouterStaticRoute resource: %s", err)
 		}

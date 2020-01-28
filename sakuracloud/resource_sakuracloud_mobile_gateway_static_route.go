@@ -81,7 +81,7 @@ func resourceSakuraCloudMobileGatewayStaticRouteCreate(d *schema.ResourceData, m
 
 	mgw.Settings.MobileGateway.StaticRoutes = append(mgw.Settings.MobileGateway.StaticRoutes, staticRoute)
 
-	mgw, err = client.MobileGateway.UpdateSetting(toSakuraCloudID(mgwID), mgw)
+	_, err = client.MobileGateway.UpdateSetting(toSakuraCloudID(mgwID), mgw)
 	if err != nil {
 		return fmt.Errorf("Failed to enable SakuraCloud MobileGatewayStaticRoute resource: %s", err)
 	}
@@ -155,7 +155,7 @@ func resourceSakuraCloudMobileGatewayStaticRouteDelete(d *schema.ResourceData, m
 	}
 
 	mgw.Settings.MobileGateway.StaticRoutes = routes
-	mgw, err = client.MobileGateway.UpdateSetting(toSakuraCloudID(mgwID), mgw)
+	_, err = client.MobileGateway.UpdateSetting(toSakuraCloudID(mgwID), mgw)
 	if err != nil {
 		return fmt.Errorf("Failed to update SakuraCloud MobileGateway StaticRoute: %s", err)
 	}

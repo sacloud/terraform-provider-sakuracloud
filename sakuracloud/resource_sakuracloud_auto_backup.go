@@ -183,7 +183,7 @@ func resourceSakuraCloudAutoBackupUpdate(d *schema.ResourceData, meta interface{
 		autoBackup.Tags = expandTags(client, []interface{}{})
 	}
 
-	autoBackup, err = client.AutoBackup.Update(autoBackup.ID, autoBackup)
+	_, err = client.AutoBackup.Update(autoBackup.ID, autoBackup)
 	if err != nil {
 		return fmt.Errorf("Failed to create SakuraCloud AutoBackup resource: %s", err)
 	}

@@ -96,7 +96,7 @@ func resourceSakuraCloudLoadBalancerServerCreate(d *schema.ResourceData, meta in
 	server.Port = port
 	vipSetting.AddServer(server)
 
-	loadBalancer, err = client.LoadBalancer.Update(toSakuraCloudID(lbID), loadBalancer)
+	_, err = client.LoadBalancer.Update(toSakuraCloudID(lbID), loadBalancer)
 	if err != nil {
 		return fmt.Errorf("Failed to create SakuraCloud LoadBalancerServer resource: %s", err)
 	}
@@ -176,7 +176,7 @@ func resourceSakuraCloudLoadBalancerServerDelete(d *schema.ResourceData, meta in
 	server := expandLoadBalancerServer(d)
 	vipSetting.DeleteServer(server.IPAddress, port)
 
-	loadBalancer, err = client.LoadBalancer.Update(toSakuraCloudID(lbID), loadBalancer)
+	_, err = client.LoadBalancer.Update(toSakuraCloudID(lbID), loadBalancer)
 	if err != nil {
 		return fmt.Errorf("Failed to delete SakuraCloud LoadBalancerServer resource: %s", err)
 	}

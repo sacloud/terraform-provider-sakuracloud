@@ -216,7 +216,7 @@ func resourceSakuraCloudPacketFilterUpdate(d *schema.ResourceData, meta interfac
 
 	}
 
-	filter, err = client.PacketFilter.Update(filter.ID, filter)
+	_, err = client.PacketFilter.Update(filter.ID, filter)
 	if err != nil {
 		return fmt.Errorf("Error updating SakuraCloud PacketFilter resource: %s", err)
 	}

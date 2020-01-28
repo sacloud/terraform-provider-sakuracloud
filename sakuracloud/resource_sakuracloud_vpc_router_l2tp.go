@@ -111,7 +111,7 @@ func resourceSakuraCloudVPCRouterL2TPDelete(d *schema.ResourceData, meta interfa
 	if vpcRouter.Settings.Router.L2TPIPsecServer != nil {
 		vpcRouter.Settings.Router.DisableL2TPIPsecServer()
 
-		vpcRouter, err = client.VPCRouter.UpdateSetting(toSakuraCloudID(routerID), vpcRouter)
+		_, err = client.VPCRouter.UpdateSetting(toSakuraCloudID(routerID), vpcRouter)
 		if err != nil {
 			return fmt.Errorf("Failed to delete SakuraCloud VPCRouterL2TP resource: %s", err)
 		}

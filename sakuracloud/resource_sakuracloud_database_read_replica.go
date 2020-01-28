@@ -243,7 +243,7 @@ func resourceSakuraCloudDatabaseReadReplicaUpdate(d *schema.ResourceData, meta i
 		}
 	}
 
-	database, err = client.Database.Update(database.ID, database)
+	_, err = client.Database.Update(database.ID, database)
 	if err != nil {
 		return fmt.Errorf("Error updating SakuraCloud Database ReadReplica resource: %s", err)
 	}

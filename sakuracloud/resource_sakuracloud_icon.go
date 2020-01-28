@@ -151,7 +151,7 @@ func resourceSakuraCloudIconUpdate(d *schema.ResourceData, meta interface{}) err
 		}
 	}
 
-	icon, err = client.Icon.Update(icon.ID, icon)
+	_, err = client.Icon.Update(icon.ID, icon)
 	if err != nil {
 		return fmt.Errorf("Error updating SakuraCloud Icon resource: %s", err)
 	}

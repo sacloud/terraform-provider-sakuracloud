@@ -111,7 +111,7 @@ func resourceSakuraCloudVPCRouterPPTPDelete(d *schema.ResourceData, meta interfa
 	if vpcRouter.Settings.Router.PPTPServer != nil {
 		vpcRouter.Settings.Router.DisablePPTPServer()
 
-		vpcRouter, err = client.VPCRouter.UpdateSetting(toSakuraCloudID(routerID), vpcRouter)
+		_, err = client.VPCRouter.UpdateSetting(toSakuraCloudID(routerID), vpcRouter)
 		if err != nil {
 			return fmt.Errorf("Failed to delete SakuraCloud VPCRouterPPTP resource: %s", err)
 		}

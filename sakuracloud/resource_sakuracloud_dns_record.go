@@ -69,7 +69,7 @@ func resourceSakuraCloudDNSRecordCreate(d *schema.ResourceData, meta interface{}
 	}
 
 	dns.AddRecord(record)
-	dns, err = client.DNS.Update(toSakuraCloudID(dnsID), dns)
+	_, err = client.DNS.Update(toSakuraCloudID(dnsID), dns)
 	if err != nil {
 		return fmt.Errorf("Failed to create SakuraCloud DNSRecord resource: %s", err)
 	}
@@ -126,7 +126,7 @@ func resourceSakuraCloudDNSRecordDelete(d *schema.ResourceData, meta interface{}
 		}
 	}
 
-	dns, err = client.DNS.Update(toSakuraCloudID(dnsID), dns)
+	_, err = client.DNS.Update(toSakuraCloudID(dnsID), dns)
 	if err != nil {
 		return fmt.Errorf("Failed to delete SakuraCloud DNSRecord resource: %s", err)
 	}

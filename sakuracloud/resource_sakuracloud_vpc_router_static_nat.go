@@ -51,7 +51,7 @@ func resourceSakuraCloudVPCRouterStaticNATCreate(d *schema.ResourceData, meta in
 	}
 
 	vpcRouter.Settings.Router.AddStaticNAT(staticNAT.GlobalAddress, staticNAT.PrivateAddress, staticNAT.Description)
-	vpcRouter, err = client.VPCRouter.UpdateSetting(toSakuraCloudID(routerID), vpcRouter)
+	_, err = client.VPCRouter.UpdateSetting(toSakuraCloudID(routerID), vpcRouter)
 	if err != nil {
 		return fmt.Errorf("Failed to enable SakuraCloud VPCRouterStaticNAT resource: %s", err)
 	}
@@ -115,7 +115,7 @@ func resourceSakuraCloudVPCRouterStaticNATDelete(d *schema.ResourceData, meta in
 		staticNAT := expandVPCRouterStaticNAT(d)
 		vpcRouter.Settings.Router.RemoveStaticNAT(staticNAT.GlobalAddress, staticNAT.PrivateAddress)
 
-		vpcRouter, err = client.VPCRouter.UpdateSetting(toSakuraCloudID(routerID), vpcRouter)
+		_, err = client.VPCRouter.UpdateSetting(toSakuraCloudID(routerID), vpcRouter)
 		if err != nil {
 			return fmt.Errorf("Failed to delete SakuraCloud VPCRouterStaticNAT resource: %s", err)
 		}

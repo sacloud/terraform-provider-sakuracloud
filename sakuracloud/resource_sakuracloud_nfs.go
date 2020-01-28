@@ -221,7 +221,7 @@ func resourceSakuraCloudNFSUpdate(d *schema.ResourceData, meta interface{}) erro
 		}
 	}
 
-	nfs, err = client.NFS.Update(nfs.ID, nfs)
+	_, err = client.NFS.Update(nfs.ID, nfs)
 	if err != nil {
 		return fmt.Errorf("Error updating SakuraCloud NFS resource: %s", err)
 	}

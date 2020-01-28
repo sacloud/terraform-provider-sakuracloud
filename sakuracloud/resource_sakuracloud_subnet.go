@@ -125,7 +125,7 @@ func resourceSakuraCloudSubnetUpdate(d *schema.ResourceData, meta interface{}) e
 			return fmt.Errorf("Couldn't find SakuraCloud Subnet resource: %s", err)
 		}
 
-		subnet, err = client.Internet.UpdateSubnet(internetID, subnet.ID, d.Get("next_hop").(string))
+		_, err = client.Internet.UpdateSubnet(internetID, subnet.ID, d.Get("next_hop").(string))
 		if err != nil {
 			return fmt.Errorf("Error updating SakuraCloud Subnet resource: %s", err)
 		}

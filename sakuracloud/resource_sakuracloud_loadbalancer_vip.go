@@ -83,7 +83,7 @@ func resourceSakuraCloudLoadBalancerVIPCreate(d *schema.ResourceData, meta inter
 	}
 
 	loadBalancer.AddLoadBalancerSetting(vipSetting)
-	loadBalancer, err = client.LoadBalancer.Update(toSakuraCloudID(lbID), loadBalancer)
+	_, err = client.LoadBalancer.Update(toSakuraCloudID(lbID), loadBalancer)
 	if err != nil {
 		return fmt.Errorf("Failed to create SakuraCloud LoadBalancerVIP resource: %s", err)
 	}
@@ -154,7 +154,7 @@ func resourceSakuraCloudLoadBalancerVIPUpdate(d *schema.ResourceData, meta inter
 	currentVIP.DelayLoop = vipSetting.DelayLoop
 	currentVIP.SorryServer = vipSetting.SorryServer
 
-	loadBalancer, err = client.LoadBalancer.Update(toSakuraCloudID(lbID), loadBalancer)
+	_, err = client.LoadBalancer.Update(toSakuraCloudID(lbID), loadBalancer)
 	if err != nil {
 		return fmt.Errorf("Failed to create SakuraCloud LoadBalancerVIP resource: %s", err)
 	}
@@ -183,7 +183,7 @@ func resourceSakuraCloudLoadBalancerVIPDelete(d *schema.ResourceData, meta inter
 	vipSetting := expandLoadBalancerVIP(d)
 	loadBalancer.DeleteLoadBalancerSetting(vipSetting.VirtualIPAddress, vipSetting.Port)
 
-	loadBalancer, err = client.LoadBalancer.Update(toSakuraCloudID(lbID), loadBalancer)
+	_, err = client.LoadBalancer.Update(toSakuraCloudID(lbID), loadBalancer)
 	if err != nil {
 		return fmt.Errorf("Failed to delete SakuraCloud LoadBalancerVIP resource: %s", err)
 	}
