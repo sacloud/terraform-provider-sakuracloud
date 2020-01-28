@@ -1,4 +1,6 @@
-## 1.21.2 (Unreleased)
+## 1.21.3 (Unreleased)
+
+## 1.21.2 (2020-01-28)
 
 * Use libsacloud v1.35.1 #672 (@yamamoto-febc)
 
