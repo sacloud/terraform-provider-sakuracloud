@@ -228,7 +228,6 @@ func (c *Config) NewClient() (*APIClient, error) {
 			fake.SwitchFactoryFuncToFake()
 		})
 
-		// TODO パラメータ化
 		deletionWaiterTimeout = 10 * time.Second
 		defaultInterval := 10 * time.Millisecond
 		deletionWaiterPollingInterval = defaultInterval
