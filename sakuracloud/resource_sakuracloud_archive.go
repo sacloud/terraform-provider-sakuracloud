@@ -290,7 +290,7 @@ func setArchiveResourceData(d *schema.ResourceData, client *APIClient, data *sac
 			return fmt.Errorf("Error calculate md5 from archive_file (%s): %s", source, err)
 		}
 
-		d.Set("hash", h.Sum(nil))
+		d.Set("hash", string(h.Sum(nil)))
 	}
 
 	d.Set("zone", client.Zone)

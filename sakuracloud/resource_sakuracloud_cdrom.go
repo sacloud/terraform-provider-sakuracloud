@@ -329,7 +329,7 @@ func setCDROMResourceData(d *schema.ResourceData, client *APIClient, data *saclo
 			return fmt.Errorf("Error calculate md5 from iso_image_file (%s): %s", source, err)
 		}
 
-		d.Set("hash", h.Sum(nil))
+		d.Set("hash", string(h.Sum(nil)))
 	}
 
 	d.Set("zone", client.Zone)

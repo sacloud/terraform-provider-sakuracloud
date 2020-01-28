@@ -102,29 +102,23 @@ func resourceSakuraCloudVPCRouterSiteToSiteIPsecVPNRead(d *schema.ResourceData, 
 	}
 	if connInfo != nil && len(connInfo.Details.Config) > 0 {
 		conf := connInfo.Details.Config[0]
-		values := map[string]interface{}{
-			"esp_authentication_protocol":  conf.ESP.AuthenticationProtocol,
-			"esp_dh_group":                 conf.ESP.DHGroup,
-			"esp_encryption_protocol":      conf.ESP.EncryptionProtocol,
-			"esp_lifetime":                 conf.ESP.Lifetime,
-			"esp_mode":                     conf.ESP.Mode,
-			"esp_perfect_forward_secrecy":  conf.ESP.PerfectForwardSecrecy,
-			"ike_authentication_protocol":  conf.IKE.AuthenticationProtocol,
-			"ike_encryption_protocol":      conf.IKE.EncryptionProtocol,
-			"ike_lifetime":                 conf.IKE.Lifetime,
-			"ike_mode":                     conf.IKE.Mode,
-			"ike_perfect_forward_secrecy":  conf.IKE.PerfectForwardSecrecy,
-			"ike_pre_shared_secret":        conf.IKE.PreSharedSecret,
-			"peer_id":                      conf.Peer.ID,
-			"peer_inside_networks":         conf.Peer.InsideNetworks,
-			"peer_outside_ipaddress":       conf.Peer.OutsideIPAddress,
-			"vpc_router_inside_networks":   conf.VPCRouter.InsideNetworks,
-			"vpc_router_outside_ipaddress": conf.VPCRouter.OutsideIPAddress,
-		}
-
-		for k, v := range values {
-			d.Set(k, v)
-		}
+		d.Set("esp_authentication_protocol", conf.ESP.AuthenticationProtocol)
+		d.Set("esp_dh_group", conf.ESP.DHGroup)
+		d.Set("esp_encryption_protocol", conf.ESP.EncryptionProtocol)
+		d.Set("esp_lifetime", conf.ESP.Lifetime)
+		d.Set("esp_mode", conf.ESP.Mode)
+		d.Set("esp_perfect_forward_secrecy", conf.ESP.PerfectForwardSecrecy)
+		d.Set("ike_authentication_protocol", conf.IKE.AuthenticationProtocol)
+		d.Set("ike_encryption_protocol", conf.IKE.EncryptionProtocol)
+		d.Set("ike_lifetime", conf.IKE.Lifetime)
+		d.Set("ike_mode", conf.IKE.Mode)
+		d.Set("ike_perfect_forward_secrecy", conf.IKE.PerfectForwardSecrecy)
+		d.Set("ike_pre_shared_secret", conf.IKE.PreSharedSecret)
+		d.Set("peer_id", conf.Peer.ID)
+		d.Set("peer_inside_networks", conf.Peer.InsideNetworks)
+		d.Set("peer_outside_ipaddress", conf.Peer.OutsideIPAddress)
+		d.Set("vpc_router_inside_networks", conf.VPCRouter.InsideNetworks)
+		d.Set("vpc_router_outside_ipaddress", conf.VPCRouter.OutsideIPAddress)
 	}
 
 	d.Set("zone", client.Zone)

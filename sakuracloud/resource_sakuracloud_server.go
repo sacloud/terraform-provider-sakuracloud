@@ -478,7 +478,7 @@ func resourceSakuraCloudServerUpdate(d *schema.ResourceData, meta interface{}) e
 	isNeedRestart := false
 	isRunning := server.Instance.IsUp()
 
-	isPlanChanged := d.HasChange("core") || d.HasChange("memory") || d.HasChange("commitment")
+	isPlanChanged := d.HasChanges("core", "memory", "commitment")
 
 	if isPlanChanged {
 		// If planID changed , server ID will change.
@@ -498,10 +498,8 @@ func resourceSakuraCloudServerUpdate(d *schema.ResourceData, meta interface{}) e
 		isNeedRestart = true
 	}
 	isDiskConfigChanged := false
-	if d.HasChange("disks") || d.HasChange("nic") || d.HasChange("ipaddress") ||
-		d.HasChange("gateway") || d.HasChange("nw_mask_len") || d.HasChange("hostname") ||
-		d.HasChange("password") || d.HasChange("ssh_key_ids") || d.HasChange("disable_pw_auth") ||
-		d.HasChange("note_ids") {
+	if d.HasChanges("disks", "nic", "ipaddress", "gateway", "nw_mask_len",
+		"hostname", "password", "ssh_key_ids", "disable_pw_auth", "note_ids") {
 		isDiskConfigChanged = true
 	}
 
@@ -540,7 +538,7 @@ func resourceSakuraCloudServerUpdate(d *schema.ResourceData, meta interface{}) e
 	}
 
 	// NIC
-	if d.HasChange("nic") || d.HasChange("additional_nics") {
+	if d.HasChanges("nic", "additional_nics") {
 		var conf []interface{}
 		if c, ok := d.GetOk("additional_nics"); ok {
 			conf = c.([]interface{})
@@ -673,7 +671,7 @@ func resourceSakuraCloudServerUpdate(d *schema.ResourceData, meta interface{}) e
 			diskEditConfig := client.Disk.NewCondig()
 			diskEditConfig.SetBackground(true)
 
-			if d.HasChange("nic") || d.HasChange("ipaddress") || d.HasChange("gateway") || d.HasChange("nw_mask_len") {
+			if d.HasChanges("nic", "ipaddress", "gateway", "nw_mask_len") {
 				if len(updatedServer.Interfaces) > 0 && updatedServer.Interfaces[0].Switch != nil {
 					if updatedServer.Interfaces[0].Switch.Scope == sacloud.ESCopeShared {
 						isNeedEditDisk = true

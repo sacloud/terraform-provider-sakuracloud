@@ -123,7 +123,7 @@ func resourceSakuraCloudWebAccelCertificateUpdate(d *schema.ResourceData, meta i
 	client := meta.(*APIClient)
 	siteID := d.Id()
 
-	if d.HasChange("certificate_chain") || d.HasChange("private_key") {
+	if d.HasChanges("certificate_chain", "private_key") {
 		res, err := client.WebAccel.UpdateCertificate(siteID, &sacloud.WebAccelCertRequest{
 			CertificateChain: d.Get("certificate_chain").(string),
 			Key:              d.Get("private_key").(string),

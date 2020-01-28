@@ -177,7 +177,7 @@ func setIconResourceData(d *schema.ResourceData, client *APIClient, data *saclou
 		return fmt.Errorf("Error reading SakuraCloud Icon Resource: %s", err)
 	}
 
-	d.Set("body", body)
+	d.Set("body", string(*body))
 	d.Set("tags", data.Tags)
 	d.Set("url", data.URL)
 
