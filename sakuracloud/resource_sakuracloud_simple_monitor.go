@@ -452,7 +452,6 @@ func resourceSakuraCloudSimpleMonitorUpdate(d *schema.ResourceData, meta interfa
 	}
 
 	return resourceSakuraCloudSimpleMonitorRead(d, meta)
-
 }
 
 func resourceSakuraCloudSimpleMonitorDelete(d *schema.ResourceData, meta interface{}) error {
@@ -468,7 +467,6 @@ func resourceSakuraCloudSimpleMonitorDelete(d *schema.ResourceData, meta interfa
 }
 
 func setSimpleMonitorResourceData(d *schema.ResourceData, client *APIClient, data *sacloud.SimpleMonitor) error {
-
 	d.Set("target", data.Status.Target)
 
 	healthCheck := map[string]interface{}{}

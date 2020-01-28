@@ -30,7 +30,6 @@ const (
 var proxyLBDomain string
 
 func TestAccResourceSakuraCloudProxyLBACME(t *testing.T) {
-
 	if domain, ok := os.LookupEnv(envProxyLBACMEDomain); ok {
 		proxyLBDomain = domain
 	} else {

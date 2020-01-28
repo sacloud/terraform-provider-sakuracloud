@@ -108,7 +108,6 @@ func resourceSakuraCloudMobileGatewayStaticRouteRead(d *schema.ResourceData, met
 
 	staticRoute := expandMobileGatewayStaticRoute(d)
 	if mgw.Settings != nil && mgw.Settings.MobileGateway != nil && mgw.Settings.MobileGateway.StaticRoutes != nil {
-
 		exists := false
 		for _, sr := range mgw.Settings.MobileGateway.StaticRoutes {
 			if sr.Prefix == staticRoute.Prefix {
@@ -132,7 +131,6 @@ func resourceSakuraCloudMobileGatewayStaticRouteRead(d *schema.ResourceData, met
 }
 
 func resourceSakuraCloudMobileGatewayStaticRouteDelete(d *schema.ResourceData, meta interface{}) error {
-
 	client := getSacloudAPIClient(d, meta)
 
 	mgwID := d.Get("mobile_gateway_id").(string)
@@ -177,7 +175,6 @@ func mgwStaticRouteIDHash(mgwID string, s *sacloud.MGWStaticRoute) string {
 }
 
 func expandMobileGatewayStaticRoute(d resourceValueGetable) *sacloud.MGWStaticRoute {
-
 	var staticRoute = &sacloud.MGWStaticRoute{
 		Prefix:  d.Get("prefix").(string),
 		NextHop: d.Get("next_hop").(string),

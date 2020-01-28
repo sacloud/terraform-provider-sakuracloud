@@ -97,7 +97,6 @@ func resourceSakuraCloudVPCRouterStaticRouteRead(d *schema.ResourceData, meta in
 }
 
 func resourceSakuraCloudVPCRouterStaticRouteDelete(d *schema.ResourceData, meta interface{}) error {
-
 	client := getSacloudAPIClient(d, meta)
 
 	routerID := d.Get("vpc_router_id").(string)
@@ -110,7 +109,6 @@ func resourceSakuraCloudVPCRouterStaticRouteDelete(d *schema.ResourceData, meta 
 	}
 
 	if vpcRouter.Settings.Router.StaticRoutes != nil {
-
 		staticRoute := expandVPCRouterStaticRoute(d)
 		vpcRouter.Settings.Router.RemoveStaticRoute(staticRoute.Prefix, staticRoute.NextHop)
 
@@ -138,7 +136,6 @@ func vpcRouterStaticRouteIDHash(routerID string, s *sacloud.VPCRouterStaticRoute
 }
 
 func expandVPCRouterStaticRoute(d resourceValueGetable) *sacloud.VPCRouterStaticRoutesConfig {
-
 	var staticRoute = &sacloud.VPCRouterStaticRoutesConfig{
 		Prefix:  d.Get("prefix").(string),
 		NextHop: d.Get("next_hop").(string),

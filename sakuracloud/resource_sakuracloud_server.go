@@ -411,7 +411,6 @@ func resourceSakuraCloudServerCreate(d *schema.ResourceData, meta interface{}) e
 						if err := client.Disk.SleepWhileCopying(toSakuraCloudID(diskID), client.DefaultTimeoutDuration); err != nil {
 							return fmt.Errorf("Error editting SakuraCloud DiskConfig: timeout: %s", err)
 						}
-
 					} else {
 						log.Printf("[WARN] Disk[%s] does not support modify disk", diskID)
 					}
@@ -537,13 +536,11 @@ func resourceSakuraCloudServerUpdate(d *schema.ResourceData, meta interface{}) e
 					return fmt.Errorf("Error connecting disk to SakuraCloud Server resource: %s", err)
 				}
 			}
-
 		}
 	}
 
 	// NIC
 	if d.HasChange("nic") || d.HasChange("additional_nics") {
-
 		var conf []interface{}
 		if c, ok := d.GetOk("additional_nics"); ok {
 			conf = c.([]interface{})
@@ -611,9 +608,7 @@ func resourceSakuraCloudServerUpdate(d *schema.ResourceData, meta interface{}) e
 				if err != nil {
 					return fmt.Errorf("Error creating NIC to SakuraCloud Server resource: %s", err)
 				}
-
 			} else {
-
 				if switchID != "" {
 					_, err := client.Interface.ConnectToSwitch(server.Interfaces[i+1].ID, toSakuraCloudID(switchID))
 					if err != nil {
@@ -822,7 +817,6 @@ func resourceSakuraCloudServerUpdate(d *schema.ResourceData, meta interface{}) e
 	}
 
 	if d.HasChange("packet_filter_ids") {
-
 		if rawPacketFilterIDs, ok := d.GetOk("packet_filter_ids"); ok {
 			packetFilterIDs := rawPacketFilterIDs.([]interface{})
 			for i, filterID := range packetFilterIDs {
@@ -859,9 +853,7 @@ func resourceSakuraCloudServerUpdate(d *schema.ResourceData, meta interface{}) e
 
 					i++
 				}
-
 			}
-
 		} else {
 			if server.Interfaces != nil {
 				for _, i := range server.Interfaces {
@@ -904,7 +896,6 @@ func resourceSakuraCloudServerUpdate(d *schema.ResourceData, meta interface{}) e
 }
 
 func resourceSakuraCloudServerDelete(d *schema.ResourceData, meta interface{}) error {
-
 	lockKey := getServerDeleteAPILockKey(toSakuraCloudID(d.Id()))
 	sakuraMutexKV.Lock(lockKey)
 	defer sakuraMutexKV.Unlock(lockKey)
@@ -930,11 +921,9 @@ func resourceSakuraCloudServerDelete(d *schema.ResourceData, meta interface{}) e
 	}
 
 	return nil
-
 }
 
 func setServerResourceData(d *schema.ResourceData, client *APIClient, data *sacloud.Server) error {
-
 	d.Set("name", data.Name)
 	d.Set("core", data.ServerPlan.CPU)
 	d.Set("memory", toSizeGB(data.ServerPlan.MemoryMB))

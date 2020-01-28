@@ -180,7 +180,6 @@ func resourceSakuraCloudPrivateHostDelete(d *schema.ResourceData, meta interface
 
 	for _, s := range res.Servers {
 		if s.PrivateHost != nil && s.PrivateHost.ID == id {
-
 			// still running?
 			isNeedRestart := false
 			if s.IsUp() {

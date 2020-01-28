@@ -337,7 +337,6 @@ func resourceSakuraCloudSIMUpdate(d *schema.ResourceData, meta interface{}) erro
 	}
 
 	return resourceSakuraCloudSIMRead(d, meta)
-
 }
 
 func resourceSakuraCloudSIMDelete(d *schema.ResourceData, meta interface{}) error {
@@ -380,7 +379,6 @@ func resourceSakuraCloudSIMDelete(d *schema.ResourceData, meta interface{}) erro
 
 			for _, s := range sims {
 				if s.ResourceID == fmt.Sprintf("%d", sim.ID) {
-
 					if sim.Status.SIMInfo.Activated {
 						_, err = client.SIM.Deactivate(sim.ID)
 						if err != nil {
@@ -413,7 +411,6 @@ func resourceSakuraCloudSIMDelete(d *schema.ResourceData, meta interface{}) erro
 }
 
 func setSIMResourceData(d *schema.ResourceData, client *APIClient, data *sacloud.SIM) error {
-
 	d.Set("name", data.Name)
 	d.Set("icon_id", data.GetIconStrID())
 	d.Set("description", data.Description)
@@ -445,7 +442,6 @@ func setSIMResourceData(d *schema.ResourceData, client *APIClient, data *sacloud
 }
 
 func validateCarrier(d *schema.ResourceData) error {
-
 	carrier, ok := d.GetOk("carrier")
 	if !ok {
 		return errors.New("carrier is required")

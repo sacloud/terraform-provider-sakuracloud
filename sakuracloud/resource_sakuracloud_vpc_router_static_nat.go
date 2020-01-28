@@ -98,7 +98,6 @@ func resourceSakuraCloudVPCRouterStaticNATRead(d *schema.ResourceData, meta inte
 }
 
 func resourceSakuraCloudVPCRouterStaticNATDelete(d *schema.ResourceData, meta interface{}) error {
-
 	client := getSacloudAPIClient(d, meta)
 
 	routerID := d.Get("vpc_router_id").(string)
@@ -111,7 +110,6 @@ func resourceSakuraCloudVPCRouterStaticNATDelete(d *schema.ResourceData, meta in
 	}
 
 	if vpcRouter.Settings.Router.StaticNAT != nil {
-
 		staticNAT := expandVPCRouterStaticNAT(d)
 		vpcRouter.Settings.Router.RemoveStaticNAT(staticNAT.GlobalAddress, staticNAT.PrivateAddress)
 
@@ -140,7 +138,6 @@ func vpcRouterStaticNATIDHash(routerID string, s *sacloud.VPCRouterStaticNATConf
 }
 
 func expandVPCRouterStaticNAT(d resourceValueGetable) *sacloud.VPCRouterStaticNATConfig {
-
 	var staticNAT = &sacloud.VPCRouterStaticNATConfig{
 		GlobalAddress:  d.Get("global_address").(string),
 		PrivateAddress: d.Get("private_address").(string),

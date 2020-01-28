@@ -379,7 +379,6 @@ func resourceSakuraCloudDiskUpdate(d *schema.ResourceData, meta interface{}) err
 		} else {
 			log.Printf("[WARN] Disk[%d] does not support modify disk", disk.ID)
 		}
-
 	}
 
 	if d.HasChange("name") {
@@ -433,7 +432,6 @@ func resourceSakuraCloudDiskDelete(d *schema.ResourceData, meta interface{}) err
 
 	isRunning := false
 	if disk.Server != nil {
-
 		// lock during server delete operation
 		lockKey := getServerDeleteAPILockKey(disk.Server.ID)
 		sakuraMutexKV.Lock(lockKey)
@@ -454,7 +452,6 @@ func resourceSakuraCloudDiskDelete(d *schema.ResourceData, meta interface{}) err
 				return fmt.Errorf("Error disconnecting Disk from SakuraCloud Server: %s", err)
 			}
 		}
-
 	}
 
 	_, err = client.Disk.Delete(toSakuraCloudID(d.Id()))

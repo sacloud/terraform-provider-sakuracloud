@@ -34,7 +34,6 @@ const (
 var proxyLBRealServerIP0, proxyLBRealServerIP1 string
 
 func TestAccResourceSakuraCloudProxyLB(t *testing.T) {
-
 	if ip, ok := os.LookupEnv(envProxyLBRealServerIP0); ok {
 		proxyLBRealServerIP0 = ip
 	} else {
@@ -140,7 +139,6 @@ func TestAccResourceSakuraCloudProxyLB(t *testing.T) {
 }
 
 func TestAccResourceSakuraCloudProxyLB_TCP(t *testing.T) {
-
 	if ip, ok := os.LookupEnv(envProxyLBRealServerIP0); ok {
 		proxyLBRealServerIP0 = ip
 	} else {
@@ -244,7 +242,6 @@ func testAccCheckSakuraCloudProxyLBDestroy(s *terraform.State) error {
 }
 
 func TestAccImportSakuraCloudProxyLB(t *testing.T) {
-
 	if ip, ok := os.LookupEnv(envProxyLBRealServerIP0); ok {
 		proxyLBRealServerIP0 = ip
 	} else {

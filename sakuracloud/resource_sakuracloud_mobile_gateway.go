@@ -251,7 +251,6 @@ func resourceSakuraCloudMobileGatewayCreate(d *schema.ResourceData, meta interfa
 		if err != nil {
 			return fmt.Errorf("MobileGatewayInterfaceConnect is failed: %s", err)
 		}
-
 	}
 
 	rawTrafficControl := d.Get("traffic_control").([]interface{})
@@ -461,7 +460,6 @@ func resourceSakuraCloudMobileGatewayUpdate(d *schema.ResourceData, meta interfa
 		if err != nil {
 			return fmt.Errorf("MobileGatewayInterfaceConnect is failed: %s", err)
 		}
-
 	}
 
 	if d.HasChange("traffic_control") {
@@ -530,7 +528,6 @@ func resourceSakuraCloudMobileGatewayUpdate(d *schema.ResourceData, meta interfa
 		if err != nil {
 			return fmt.Errorf("Couldn'd apply SakuraCloud MobileGateway config: %s", err)
 		}
-
 	}
 
 	if needRestart {
@@ -599,7 +596,6 @@ func resourceSakuraCloudMobileGatewayDelete(d *schema.ResourceData, meta interfa
 }
 
 func setMobileGatewayResourceData(d *schema.ResourceData, client *APIClient, data *sacloud.MobileGateway) error {
-
 	if data.IsFailed() {
 		d.SetId("")
 		return fmt.Errorf("MobileGateway[%d] state is failed", data.ID)

@@ -196,7 +196,6 @@ func resourceSakuraCloudPacketFilterRuleDelete(d *schema.ResourceData, meta inte
 }
 
 func setPacketFilterRuleResourceData(d *schema.ResourceData, client *APIClient, data *sacloud.PacketFilter) error {
-
 	hash := d.Id()
 
 	if data.Expression != nil && len(data.Expression) > 0 {

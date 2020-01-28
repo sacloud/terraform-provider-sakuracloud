@@ -64,5 +64,4 @@ func hasTags(target interface{}, cond []string) bool {
 		}
 	}
 	return true
-
 }

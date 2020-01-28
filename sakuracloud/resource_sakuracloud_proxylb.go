@@ -408,7 +408,6 @@ func resourceSakuraCloudProxyLBRead(d *schema.ResourceData, meta interface{}) er
 }
 
 func resourceSakuraCloudProxyLBUpdate(d *schema.ResourceData, meta interface{}) error {
-
 	client := meta.(*APIClient)
 	sakuraMutexKV.Lock(d.Id())
 	defer sakuraMutexKV.Unlock(d.Id())
@@ -600,13 +599,11 @@ func resourceSakuraCloudProxyLBUpdate(d *schema.ResourceData, meta interface{}) 
 				if _, err := client.ProxyLB.DeleteCertificates(proxyLB.ID); err != nil {
 					return fmt.Errorf("Failed to remove SakuraCloud ProxyLB certificates: %s", err)
 				}
-
 			}
 		}
 	}
 
 	return resourceSakuraCloudProxyLBRead(d, meta)
-
 }
 
 func resourceSakuraCloudProxyLBDelete(d *schema.ResourceData, meta interface{}) error {
@@ -624,7 +621,6 @@ func resourceSakuraCloudProxyLBDelete(d *schema.ResourceData, meta interface{}) 
 }
 
 func setProxyLBResourceData(d *schema.ResourceData, client *APIClient, data *sacloud.ProxyLB) error {
-
 	d.Set("name", data.Name)
 	d.Set("plan", int(data.GetPlan()))
 	d.Set("vip_failover", data.Status.UseVIPFailover)

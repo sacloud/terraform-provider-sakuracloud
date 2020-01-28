@@ -179,7 +179,6 @@ func Provider() terraform.ResourceProvider {
 }
 
 func providerConfigure(d *schema.ResourceData) (interface{}, error) {
-
 	if _, ok := d.GetOk("zone"); !ok {
 		d.Set("zone", defaultZone)
 	}

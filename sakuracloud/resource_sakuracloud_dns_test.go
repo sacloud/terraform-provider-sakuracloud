@@ -124,7 +124,6 @@ func testAccCheckSakuraCloudDNSDestroy(s *terraform.State) error {
 }
 
 func TestAccImportSakuraCloudDNS(t *testing.T) {
-
 	randString1 := acctest.RandStringFromCharSet(5, acctest.CharSetAlpha)
 	randString2 := acctest.RandStringFromCharSet(20, acctest.CharSetAlpha)
 	zone := fmt.Sprintf("%s.%s.com", randString1, randString2)

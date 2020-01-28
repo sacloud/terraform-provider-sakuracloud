@@ -35,7 +35,6 @@ func resourceSakuraCloudVPCRouterInterface() *schema.Resource {
 }
 
 func resourceSakuraCloudVPCRouterInterfaceCreate(d *schema.ResourceData, meta interface{}) error {
-
 	client := getSacloudAPIClient(d, meta)
 
 	routerID := d.Get("vpc_router_id").(string)
@@ -134,7 +133,6 @@ func resourceSakuraCloudVPCRouterInterfaceRead(d *schema.ResourceData, meta inte
 
 	index := d.Get("index").(int)
 	if index < len(vpcRouter.Settings.Router.Interfaces) {
-
 		vpcInterface := vpcRouter.Settings.Router.Interfaces[index]
 		d.Set("vpc_router_id", vpcRouter.GetStrID())
 		d.Set("index", index)
@@ -153,7 +151,6 @@ func resourceSakuraCloudVPCRouterInterfaceRead(d *schema.ResourceData, meta inte
 }
 
 func resourceSakuraCloudVPCRouterInterfaceDelete(d *schema.ResourceData, meta interface{}) error {
-
 	client := getSacloudAPIClient(d, meta)
 
 	routerID := d.Get("vpc_router_id").(string)

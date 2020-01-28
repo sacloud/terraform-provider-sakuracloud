@@ -96,7 +96,6 @@ func resourceSakuraCloudVPCRouterL2TPRead(d *schema.ResourceData, meta interface
 }
 
 func resourceSakuraCloudVPCRouterL2TPDelete(d *schema.ResourceData, meta interface{}) error {
-
 	client := getSacloudAPIClient(d, meta)
 
 	routerID := d.Get("vpc_router_id").(string)
@@ -136,7 +135,6 @@ func vpcRouterL2TPIDHash(routerID string, s *sacloud.VPCRouterL2TPIPsecServer) s
 }
 
 func expandVPCRouterL2TP(d resourceValueGetable) *sacloud.VPCRouterL2TPIPsecServerConfig {
-
 	var l2tpSetting = &sacloud.VPCRouterL2TPIPsecServerConfig{
 		PreSharedSecret: d.Get("pre_shared_secret").(string),
 		RangeStart:      d.Get("range_start").(string),

@@ -217,7 +217,6 @@ func TestAccSakuraCloudServer_ConnectPacketFilters(t *testing.T) {
 }
 
 func TestAccSakuraCloudServer_With_PrivateHost(t *testing.T) {
-
 	privateHostID, ok := os.LookupEnv("SAKURACLOUD_PRIVATE_HOST_ID")
 	if !ok {
 		t.Log("Private host ID($SAKURACLOUD_PRIVATE_HOST_ID) is empty. Skip this test.")
@@ -451,7 +450,6 @@ func testAccCheckSakuraCloudServerExists(n string, server *sacloud.Server) resou
 
 func testAccCheckSakuraCloudServerAttributes(server *sacloud.Server) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
-
 		if !server.Instance.IsUp() {
 			return fmt.Errorf("Bad server status. Server must be running.: %v", server.Instance.Status)
 		}
@@ -468,7 +466,6 @@ func testAccCheckSakuraCloudServerAttributes(server *sacloud.Server) resource.Te
 
 func testAccCheckSakuraCloudServerAttributesWithoutSharedInterface(server *sacloud.Server) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
-
 		if !server.Instance.IsUp() {
 			return fmt.Errorf("Bad server status. Server must be running.: %v", server.Instance.Status)
 		}

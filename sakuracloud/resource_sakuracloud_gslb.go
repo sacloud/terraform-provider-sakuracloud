@@ -219,7 +219,6 @@ func resourceSakuraCloudGSLBRead(d *schema.ResourceData, meta interface{}) error
 }
 
 func resourceSakuraCloudGSLBUpdate(d *schema.ResourceData, meta interface{}) error {
-
 	client := meta.(*APIClient)
 
 	gslb, err := client.GSLB.Read(toSakuraCloudID(d.Id()))
@@ -306,7 +305,6 @@ func resourceSakuraCloudGSLBUpdate(d *schema.ResourceData, meta interface{}) err
 	}
 
 	return resourceSakuraCloudGSLBRead(d, meta)
-
 }
 
 func resourceSakuraCloudGSLBDelete(d *schema.ResourceData, meta interface{}) error {
@@ -322,7 +320,6 @@ func resourceSakuraCloudGSLBDelete(d *schema.ResourceData, meta interface{}) err
 }
 
 func setGSLBResourceData(d *schema.ResourceData, client *APIClient, data *sacloud.GSLB) error {
-
 	d.Set("name", data.Name)
 	d.Set("fqdn", data.Status.FQDN)
 

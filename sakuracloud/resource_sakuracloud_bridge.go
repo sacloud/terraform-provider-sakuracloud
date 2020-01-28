@@ -157,7 +157,6 @@ func setBridgeResourceData(d *schema.ResourceData, client *APIClient, data *sacl
 
 	var switchIDs []interface{}
 	if data.Info != nil && data.Info.Switches != nil && len(data.Info.Switches) > 0 {
-
 		for _, d := range data.Info.Switches {
 			swID := d.ID.String()
 			sakuraMutexKV.Lock(swID)

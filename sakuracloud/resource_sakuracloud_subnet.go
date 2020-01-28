@@ -84,7 +84,6 @@ func resourceSakuraCloudSubnet() *schema.Resource {
 }
 
 func resourceSakuraCloudSubnetCreate(d *schema.ResourceData, meta interface{}) error {
-
 	client := getSacloudAPIClient(d, meta)
 
 	internetID := toSakuraCloudID(d.Get("internet_id").(string))
@@ -129,7 +128,6 @@ func resourceSakuraCloudSubnetUpdate(d *schema.ResourceData, meta interface{}) e
 		if err != nil {
 			return fmt.Errorf("Error updating SakuraCloud Subnet resource: %s", err)
 		}
-
 	}
 
 	return resourceSakuraCloudSubnetRead(d, meta)
@@ -148,7 +146,6 @@ func resourceSakuraCloudSubnetDelete(d *schema.ResourceData, meta interface{}) e
 }
 
 func setSubnetResourceData(d *schema.ResourceData, client *APIClient, data *sacloud.Subnet) error {
-
 	if data.Switch == nil {
 		return fmt.Errorf("Error reading SakuraCloud Subnet resource: %s", "switch is nil")
 	}

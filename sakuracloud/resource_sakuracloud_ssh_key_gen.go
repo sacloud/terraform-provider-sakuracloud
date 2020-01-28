@@ -112,7 +112,6 @@ func resourceSakuraCloudSSHKeyGenDelete(d *schema.ResourceData, meta interface{}
 }
 
 func setSSHKeyGenResourceData(d *schema.ResourceData, _ *APIClient, data interface{}) error {
-
 	if key, ok := data.(sshKeyType); ok {
 		d.Set("name", key.GetName())
 		d.Set("public_key", key.GetPublicKey())

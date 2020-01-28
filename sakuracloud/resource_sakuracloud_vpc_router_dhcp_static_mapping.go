@@ -99,7 +99,6 @@ func resourceSakuraCloudVPCRouterDHCPStaticMappingRead(d *schema.ResourceData, m
 }
 
 func resourceSakuraCloudVPCRouterDHCPStaticMappingDelete(d *schema.ResourceData, meta interface{}) error {
-
 	client := getSacloudAPIClient(d, meta)
 
 	routerID := d.Get("vpc_router_id").(string)
@@ -112,7 +111,6 @@ func resourceSakuraCloudVPCRouterDHCPStaticMappingDelete(d *schema.ResourceData,
 	}
 
 	if vpcRouter.Settings.Router.DHCPStaticMapping != nil {
-
 		dhcpStaticMapping := expandVPCRouterDHCPStaticMapping(d)
 		vpcRouter.Settings.Router.RemoveDHCPStaticMapping(dhcpStaticMapping.IPAddress, dhcpStaticMapping.MACAddress)
 
@@ -140,7 +138,6 @@ func vpcRouterDHCPStaticMappingIDHash(routerID string, s *sacloud.VPCRouterDHCPS
 }
 
 func expandVPCRouterDHCPStaticMapping(d resourceValueGetable) *sacloud.VPCRouterDHCPStaticMappingConfig {
-
 	var dhcpStaticMapping = &sacloud.VPCRouterDHCPStaticMappingConfig{
 		IPAddress:  d.Get("ipaddress").(string),
 		MACAddress: d.Get("macaddress").(string),

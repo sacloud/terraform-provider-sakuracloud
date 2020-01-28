@@ -189,7 +189,6 @@ func resourceSakuraCloudAutoBackupUpdate(d *schema.ResourceData, meta interface{
 	}
 
 	return resourceSakuraCloudAutoBackupRead(d, meta)
-
 }
 
 func resourceSakuraCloudAutoBackupDelete(d *schema.ResourceData, meta interface{}) error {

@@ -220,7 +220,6 @@ func resourceSakuraCloudVPCRouter() *schema.Resource {
 }
 
 func resourceSakuraCloudVPCRouterCreate(d *schema.ResourceData, meta interface{}) error {
-
 	client := getSacloudAPIClient(d, meta)
 
 	opts := client.VPCRouter.New()
@@ -545,7 +544,6 @@ func resourceSakuraCloudVPCRouterRead(d *schema.ResourceData, meta interface{}) 
 }
 
 func setVPCRouterResourceData(d *schema.ResourceData, client *APIClient, data *sacloud.VPCRouter) error {
-
 	if data.IsFailed() {
 		d.SetId("")
 		return fmt.Errorf("VPCRouter[%d] state is failed", data.ID)
@@ -563,7 +561,6 @@ func setVPCRouterResourceData(d *schema.ResourceData, client *APIClient, data *s
 		} else {
 			d.Set("internet_connection", false)
 		}
-
 	} else {
 		d.Set("syslog_host", "")
 		d.Set("internet_connection", false)
@@ -641,7 +638,6 @@ func setVPCRouterResourceData(d *schema.ResourceData, client *APIClient, data *s
 	var firewallRules []map[string]interface{}
 	if data.HasFirewall() {
 		for i, configs := range data.Settings.Router.Firewall.Config {
-
 			directionRules := map[string][]*sacloud.VPCRouterFirewallRule{
 				"send":    configs.Send,
 				"receive": configs.Receive,
@@ -851,7 +847,6 @@ func resourceSakuraCloudVPCRouterUpdate(d *schema.ResourceData, meta interface{}
 		}
 	}
 	if d.HasChange("syslog_host") {
-
 		if vpcRouter.Settings == nil || vpcRouter.Settings.Router == nil {
 			vpcRouter.InitVPCRouterSetting()
 		}

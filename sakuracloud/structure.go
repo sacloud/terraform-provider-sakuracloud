@@ -147,7 +147,6 @@ func flattenServers(servers []sacloud.Server) []string {
 		ids = append(ids, d.GetStrID())
 	}
 	return ids
-
 }
 
 func flattenInterfaces(interfaces []sacloud.Interface) []interface{} {
@@ -163,7 +162,6 @@ func flattenInterfaces(interfaces []sacloud.Interface) []interface{} {
 			case sacloud.ESCopeUser:
 				ret = append(ret, i.Switch.GetStrID())
 			}
-
 		}
 	}
 	return ret
@@ -262,7 +260,6 @@ func forceAtoI(target string) int {
 }
 
 func expandFilters(filter interface{}) map[string]interface{} {
-
 	ret := map[string]interface{}{}
 	filterSet := filter.(*schema.Set)
 	for _, v := range filterSet.List() {
@@ -274,7 +271,6 @@ func expandFilters(filter interface{}) map[string]interface{} {
 				filterValues = append(filterValues, e.(string))
 			}
 			ret["Tags.Name"] = []interface{}{filterValues}
-
 		} else {
 			var filterValues string
 			for _, e := range m["values"].([]interface{}) {
@@ -286,7 +282,6 @@ func expandFilters(filter interface{}) map[string]interface{} {
 			}
 			ret[name] = filterValues
 		}
-
 	}
 
 	return ret

@@ -92,7 +92,6 @@ func resourceSakuraCloudIPv4PtrUpdate(d *schema.ResourceData, meta interface{}) 
 	i := 0
 	success := false
 	for i < retryMax {
-
 		// set
 		if _, err = client.IPAddress.Update(ip, hostName); err == nil {
 			success = true
@@ -145,7 +144,6 @@ func resourceSakuraCloudIPv4PtrDelete(d *schema.ResourceData, meta interface{}) 
 }
 
 func setIPv4PtrResourceData(d *schema.ResourceData, client *APIClient, data *sacloud.IPAddress) error {
-
 	d.Set("ipaddress", data.IPAddress)
 	d.Set("hostname", data.HostName)
 	d.Set("zone", client.Zone)

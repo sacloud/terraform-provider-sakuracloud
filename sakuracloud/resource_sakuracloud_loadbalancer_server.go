@@ -215,7 +215,6 @@ func findLoadBalancerServer(server *sacloud.LoadBalancerServer, servers []*saclo
 		}
 	}
 	return nil
-
 }
 
 func loadBalancerServerIDHash(vipID string, s *sacloud.LoadBalancerServer) string {

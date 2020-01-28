@@ -97,7 +97,6 @@ func resourceSakuraCloudVPCRouterRemoteAccessUserRead(d *schema.ResourceData, me
 }
 
 func resourceSakuraCloudVPCRouterRemoteAccessUserDelete(d *schema.ResourceData, meta interface{}) error {
-
 	client := getSacloudAPIClient(d, meta)
 
 	routerID := d.Get("vpc_router_id").(string)
@@ -110,7 +109,6 @@ func resourceSakuraCloudVPCRouterRemoteAccessUserDelete(d *schema.ResourceData, 
 	}
 
 	if vpcRouter.Settings.Router.RemoteAccessUsers != nil {
-
 		remoteAccessUser := expandVPCRouterRemoteAccessUser(d)
 		vpcRouter.Settings.Router.RemoveRemoteAccessUser(remoteAccessUser.UserName, remoteAccessUser.Password)
 
@@ -138,7 +136,6 @@ func vpcRouterRemoteAccessUserIDHash(routerID string, s *sacloud.VPCRouterRemote
 }
 
 func expandVPCRouterRemoteAccessUser(d resourceValueGetable) *sacloud.VPCRouterRemoteAccessUsersConfig {
-
 	var remoteAccessUser = &sacloud.VPCRouterRemoteAccessUsersConfig{
 		UserName: d.Get("name").(string),
 		Password: d.Get("password").(string),

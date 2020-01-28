@@ -136,7 +136,6 @@ func resourceSakuraCloudDNSRecordDelete(d *schema.ResourceData, meta interface{}
 
 func findRecordMatch(r *sacloud.DNSRecordSet, records *[]sacloud.DNSRecordSet) *sacloud.DNSRecordSet {
 	for _, record := range *records {
-
 		if isSameDNSRecord(r, &record) {
 			return &record
 		}

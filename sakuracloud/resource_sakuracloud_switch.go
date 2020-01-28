@@ -76,7 +76,6 @@ func resourceSakuraCloudSwitch() *schema.Resource {
 }
 
 func resourceSakuraCloudSwitchCreate(d *schema.ResourceData, meta interface{}) error {
-
 	d.Partial(true)
 
 	client := getSacloudAPIClient(d, meta)
@@ -246,7 +245,6 @@ func resourceSakuraCloudSwitchDelete(d *schema.ResourceData, meta interface{}) e
 		if err != nil {
 			return fmt.Errorf("Couldn't disconnect from bridge: %s", err)
 		}
-
 	}
 
 	_, err = client.Switch.Delete(toSakuraCloudID(d.Id()))
@@ -263,14 +261,12 @@ func resourceSakuraCloudSwitchDelete(d *schema.ResourceData, meta interface{}) e
 		if err != nil {
 			return fmt.Errorf("Error booting SakuraCloud Server resource: %s", err)
 		}
-
 	}
 
 	return nil
 }
 
 func setSwitchResourceData(d *schema.ResourceData, client *APIClient, data *sacloud.Switch) error {
-
 	d.Set("name", data.Name)
 	d.Set("icon_id", data.GetIconStrID())
 	d.Set("description", data.Description)

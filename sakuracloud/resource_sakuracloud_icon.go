@@ -170,7 +170,6 @@ func resourceSakuraCloudIconDelete(d *schema.ResourceData, meta interface{}) err
 }
 
 func setIconResourceData(d *schema.ResourceData, client *APIClient, data *sacloud.Icon) error {
-
 	d.Set("name", data.Name)
 
 	body, err := client.Icon.GetImage(data.ID, "small")

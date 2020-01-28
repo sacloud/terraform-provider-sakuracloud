@@ -133,7 +133,6 @@ func resourceSakuraCloudVPCRouterSiteToSiteIPsecVPNRead(d *schema.ResourceData, 
 }
 
 func resourceSakuraCloudVPCRouterSiteToSiteIPsecVPNDelete(d *schema.ResourceData, meta interface{}) error {
-
 	client := getSacloudAPIClient(d, meta)
 
 	routerID := d.Get("vpc_router_id").(string)
@@ -146,7 +145,6 @@ func resourceSakuraCloudVPCRouterSiteToSiteIPsecVPNDelete(d *schema.ResourceData
 	}
 
 	if vpcRouter.Settings.Router.SiteToSiteIPsecVPN != nil {
-
 		s2s := expandVPCRouterSiteToSiteIPsecVPN(d)
 		vpcRouter.Settings.Router.RemoveSiteToSiteIPsecVPN(s2s.LocalPrefix, s2s.Peer, s2s.PreSharedSecret, s2s.RemoteID, s2s.Routes)
 
@@ -177,7 +175,6 @@ func vpcRouterSiteToSiteIPsecVPNIDHash(routerID string, s *sacloud.VPCRouterSite
 }
 
 func expandVPCRouterSiteToSiteIPsecVPN(d resourceValueGetable) *sacloud.VPCRouterSiteToSiteIPsecVPNConfig {
-
 	var s2sIPsecVPN = &sacloud.VPCRouterSiteToSiteIPsecVPNConfig{
 		Peer:            d.Get("peer").(string),
 		PreSharedSecret: d.Get("pre_shared_secret").(string),

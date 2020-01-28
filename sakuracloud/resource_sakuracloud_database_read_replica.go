@@ -268,7 +268,6 @@ func resourceSakuraCloudDatabaseReadReplicaDelete(d *schema.ResourceData, meta i
 }
 
 func setDatabaseReadReplicaResourceData(d *schema.ResourceData, client *APIClient, data *sacloud.Database) error {
-
 	if data.IsFailed() {
 		d.SetId("")
 		return fmt.Errorf("Database[%d] state is failed", data.ID)

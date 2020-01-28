@@ -245,7 +245,6 @@ func resourceSakuraCloudNFSDelete(d *schema.ResourceData, meta interface{}) erro
 }
 
 func setNFSResourceData(d *schema.ResourceData, client *APIClient, data *sacloud.NFS) error {
-
 	if data.IsFailed() {
 		d.SetId("")
 		return fmt.Errorf("NFS[%d] state is failed", data.ID)

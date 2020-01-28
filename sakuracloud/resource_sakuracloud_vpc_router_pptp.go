@@ -96,7 +96,6 @@ func resourceSakuraCloudVPCRouterPPTPRead(d *schema.ResourceData, meta interface
 }
 
 func resourceSakuraCloudVPCRouterPPTPDelete(d *schema.ResourceData, meta interface{}) error {
-
 	client := getSacloudAPIClient(d, meta)
 
 	routerID := d.Get("vpc_router_id").(string)
@@ -135,7 +134,6 @@ func vpcRouterPPTPIDHash(routerID string, s *sacloud.VPCRouterPPTPServer) string
 }
 
 func expandVPCRouterPPTP(d resourceValueGetable) *sacloud.VPCRouterPPTPServerConfig {
-
 	var pptpSetting = &sacloud.VPCRouterPPTPServerConfig{
 		RangeStart: d.Get("range_start").(string),
 		RangeStop:  d.Get("range_stop").(string),

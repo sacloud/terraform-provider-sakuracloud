@@ -38,7 +38,6 @@ var (
 )
 
 func TestAccResourceSakuraCloudSIM(t *testing.T) {
-
 	if id, ok := os.LookupEnv(envICCID); ok {
 		iccid = id
 	} else {

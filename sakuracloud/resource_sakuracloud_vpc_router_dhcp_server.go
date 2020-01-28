@@ -102,7 +102,6 @@ func resourceSakuraCloudVPCRouterDHCPServerRead(d *schema.ResourceData, meta int
 }
 
 func resourceSakuraCloudVPCRouterDHCPServerDelete(d *schema.ResourceData, meta interface{}) error {
-
 	client := getSacloudAPIClient(d, meta)
 
 	routerID := d.Get("vpc_router_id").(string)
@@ -115,7 +114,6 @@ func resourceSakuraCloudVPCRouterDHCPServerDelete(d *schema.ResourceData, meta i
 	}
 
 	if vpcRouter.Settings.Router.DHCPServer != nil {
-
 		vpcRouter.Settings.Router.RemoveDHCPServer(d.Get("vpc_router_interface_index").(int))
 		_, err = client.VPCRouter.UpdateSetting(toSakuraCloudID(routerID), vpcRouter)
 		if err != nil {
@@ -142,7 +140,6 @@ func vpcRouterDHCPServerIDHash(routerID string, s *sacloud.VPCRouterDHCPServerCo
 }
 
 func expandVPCRouterDHCPServer(d resourceValueGetable) *sacloud.VPCRouterDHCPServerConfig {
-
 	var dhcpServer = &sacloud.VPCRouterDHCPServerConfig{
 		Interface:  fmt.Sprintf("eth%d", d.Get("vpc_router_interface_index").(int)),
 		RangeStart: d.Get("range_start").(string),

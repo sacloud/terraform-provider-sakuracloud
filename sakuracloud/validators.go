@@ -36,7 +36,6 @@ func validateSakuracloudIDType(v interface{}, k string) ([]string, []error) {
 	_, err := strconv.ParseInt(value, 10, 64)
 	if err != nil {
 		errors = append(errors, fmt.Errorf("%q must be ID string(number only): %s", k, err))
-
 	}
 	return ws, errors
 }
@@ -51,7 +50,6 @@ func validateIntInWord(allowWords []string) schema.SchemaValidateFunc {
 		}
 		if !found {
 			errors = append(errors, fmt.Errorf("%q must be one of [%s]", k, strings.Join(allowWords, "/")))
-
 		}
 		return
 	}
