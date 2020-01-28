@@ -112,9 +112,6 @@ goimports: fmt
 fmt:
 	gofmt -w $(GOFMT_FILES)
 
-serve-english-docs:
-	sh -c "'$(CURDIR)/scripts/serve_english_docs.sh'"
-
 .PHONY: default test vet testacc fmt fmtcheck
 
 set-license:
