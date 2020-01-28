@@ -89,7 +89,7 @@ func toSakuraCloudID(id string) int64 {
 func expandStringList(configured []interface{}) []string {
 	vs := make([]string, 0, len(configured))
 	for _, v := range configured {
-		vs = append(vs, string(v.(string)))
+		vs = append(vs, v.(string))
 	}
 	return vs
 }
@@ -103,7 +103,7 @@ func expandStringListWithValidateInList(fieldName string, configured []interface
 	for _, v := range configured {
 		var found bool
 		for _, t := range allowWords {
-			if string(v.(string)) == t {
+			if v.(string) == t {
 				found = true
 				break
 			}
@@ -112,7 +112,7 @@ func expandStringListWithValidateInList(fieldName string, configured []interface
 			return nil, fmt.Errorf("%q must be one of [%s]", fieldName, strings.Join(allowWords, "/"))
 		}
 
-		vs = append(vs, string(v.(string)))
+		vs = append(vs, v.(string))
 	}
 	return vs, nil
 }

@@ -945,7 +945,7 @@ func setServerResourceData(d *schema.ResourceData, client *APIClient, data *sacl
 	if data.Instance.CDROM != nil && data.Instance.CDROM.ID > 0 {
 		d.Set("cdrom_id", data.Instance.CDROM.GetStrID())
 	}
-	d.Set("interface_driver", string(data.GetInterfaceDriverString()))
+	d.Set("interface_driver", data.GetInterfaceDriverString())
 
 	if data.PrivateHost != nil && data.PrivateHost.ID > 0 {
 		d.Set("private_host_id", data.PrivateHost.GetStrID())

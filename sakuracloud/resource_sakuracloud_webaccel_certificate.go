@@ -151,8 +151,8 @@ func resourceSakuraCloudWebAccelCertificateDelete(d *schema.ResourceData, meta i
 }
 
 func setWebAccelCertificateResourceData(d *schema.ResourceData, client *APIClient, data *sacloud.WebAccelCert) error {
-	notBefore := time.Unix(int64(data.NotBefore/1000), 0).Format(time.RFC3339)
-	notAfter := time.Unix(int64(data.NotAfter/1000), 0).Format(time.RFC3339)
+	notBefore := time.Unix(data.NotBefore/1000, 0).Format(time.RFC3339)
+	notAfter := time.Unix(data.NotAfter/1000, 0).Format(time.RFC3339)
 
 	d.Set("site_id", data.SiteID)
 	d.Set("serial_number", data.SerialNumber)
