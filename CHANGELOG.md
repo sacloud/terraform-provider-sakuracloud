@@ -1,8 +1,14 @@
-## 1.21.3 (Unreleased)
+## 1.21.4 (Unreleased)
+
+*
+
+## 1.21.3 (2020-01-28)
+
+* Use libsacloud v1.35.1 #672 (@yamamoto-febc)
 
 ## 1.21.2 (2020-01-28)
 
-* Use libsacloud v1.35.1 #672 (@yamamoto-febc)
+* リリース作業誤りにより欠番
 
 ## 1.21.1 (2020-01-23)
 
