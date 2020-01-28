@@ -234,8 +234,8 @@ func resourceSakuraCloudVPCRouterCreate(d *schema.ResourceData, meta interface{}
 		vip := ""
 		ipaddress1 := ""
 		ipaddress2 := ""
-		vrid := -1
-		aliases := []string{}
+		var vrid int
+		var aliases []string
 
 		//validate
 		errFormat := "Failed to create SakuraCloud VPCRouter resource : %s is Required when plan is 'premium' or 'highspec' or 'highspec4000'"
@@ -811,20 +811,17 @@ func resourceSakuraCloudVPCRouterUpdate(d *schema.ResourceData, meta interface{}
 		sakuraMutexKV.Lock(lockKey)
 		defer sakuraMutexKV.Unlock(lockKey)
 
-		err = nil
 		for i := 0; i < 10; i++ {
 			vpcRouter, err := client.VPCRouter.Read(vpcRouter.ID)
 			if err != nil {
 				return fmt.Errorf("Couldn't find SakuraCloud VPCRouter resource: %s", err)
 			}
 			if vpcRouter.Instance.IsDown() {
-				err = nil
 				break
 			}
-			err = handleShutdown(client.VPCRouter, vpcRouter.ID, d, 60*time.Second)
-		}
-		if err != nil {
-			return fmt.Errorf("Error stopping SakuraCloud VPCRouter resource: %s", err)
+			if err := handleShutdown(client.VPCRouter, vpcRouter.ID, d, 60*time.Second); err != nil {
+				return fmt.Errorf("Error stopping SakuraCloud VPCRouter resource: %s", err)
+			}
 		}
 	}
 

@@ -257,6 +257,9 @@ func resourceSakuraCloudInternetUpdate(d *schema.ResourceData, meta interface{})
 		} else {
 			if len(internet.Switch.IPv6Nets) > 0 {
 				_, err = client.Internet.DisableIPv6(internet.ID, internet.Switch.IPv6Nets[0].ID)
+				if err != nil {
+					return fmt.Errorf("Failed to Disable IPv6 address: %s", err)
+				}
 			}
 		}
 	}
