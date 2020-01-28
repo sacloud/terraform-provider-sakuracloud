@@ -3,7 +3,7 @@ module github.com/sacloud/terraform-provider-sakuracloud
 go 1.13
 
 require (
-	github.com/hashicorp/terraform-plugin-sdk v1.0.0
+	github.com/hashicorp/terraform-plugin-sdk v1.5.0
 	github.com/mattn/go-isatty v0.0.7 // indirect
 	github.com/mattn/go-tty v0.0.0-20190418143243-a87bf4b22d6e // indirect
 	github.com/mitchellh/go-homedir v1.1.0
