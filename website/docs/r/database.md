@@ -13,6 +13,7 @@ Manages a SakuraCloud Database.
 ## Example Usage
 
 ```hcl
+variable username {}
 variable password {}
 variable replica_password {}
 
@@ -20,7 +21,7 @@ resource "sakuracloud_database" "foobar" {
   database_type = "mariadb"
   plan          = "30g"
 
-  username = "your-user-name"
+  username = var.username
   password = var.password
 
   replica_password = var.replica_password
@@ -57,7 +58,7 @@ resource "sakuracloud_switch" "foobar" {
 
 #### User
 
-* `username` - (Required) The name of default user on the database. Changing this forces a new resource to be created.
+* `username` - (Required) The name of default user on the database. The length of this value must be in the range [`3`-`20`]. Changing this forces a new resource to be created.
 * `password` - (Required) The password of default user on the database.
 
 #### Network
