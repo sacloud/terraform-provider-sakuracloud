@@ -388,13 +388,15 @@ func resourceSakuraCloudVPCRouter() *schema.Resource {
 							Description:  descf("The pre shared secret for the VPN. %s", descLength(0, 40)),
 						},
 						"routes": {
-							Type:        schema.TypeList,
+							Type:        schema.TypeSet,
+							Set:         schema.HashString,
 							Required:    true,
 							Elem:        &schema.Schema{Type: schema.TypeString},
 							Description: "A list of CIDR block of VPN connected networks",
 						},
 						"local_prefix": {
-							Type:        schema.TypeList,
+							Type:        schema.TypeSet,
+							Set:         schema.HashString,
 							Required:    true,
 							Elem:        &schema.Schema{Type: schema.TypeString},
 							Description: "A list of CIDR block of the network under the VPC Router",

@@ -93,6 +93,27 @@ func stringListOrDefault(d resourceValueGettable, key string) []string {
 	return []string{}
 }
 
+func stringSetOrDefault(d resourceValueGettable, key string) []string {
+	if v, ok := d.GetOk(key); ok {
+		if v, ok := v.(*schema.Set); ok {
+			var res []string
+			for _, v := range v.List() {
+				res = append(res, v.(string))
+			}
+			return res
+		}
+	}
+	return nil
+}
+
+func stringListToSet(values []string) *schema.Set {
+	set := &schema.Set{F: schema.HashString}
+	for _, v := range values {
+		set.Add(v)
+	}
+	return set
+}
+
 func getListFromResource(d resourceValueGettable, key string) ([]interface{}, bool) {
 	v, ok := d.GetOk(key)
 	if !ok {
@@ -188,11 +209,7 @@ func expandTags(d resourceValueGettable) types.Tags {
 }
 
 func flattenTags(tags types.Tags) *schema.Set {
-	set := &schema.Set{F: schema.HashString}
-	for _, v := range tags {
-		set.Add(v)
-	}
-	return set
+	return stringListToSet(tags)
 }
 
 func expandBackupWeekdays(d resourceValueGettable, key string) []types.EBackupSpanWeekday {

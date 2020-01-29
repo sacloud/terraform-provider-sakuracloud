@@ -333,13 +333,15 @@ func dataSourceSakuraCloudVPCRouter() *schema.Resource {
 							Description: "The pre shared secret for the VPN",
 						},
 						"routes": {
-							Type:        schema.TypeList,
+							Type:        schema.TypeSet,
+							Set:         schema.HashString,
 							Elem:        &schema.Schema{Type: schema.TypeString},
 							Computed:    true,
 							Description: "A list of CIDR block of VPN connected networks",
 						},
 						"local_prefix": {
-							Type:        schema.TypeList,
+							Type:        schema.TypeSet,
+							Set:         schema.HashString,
 							Elem:        &schema.Schema{Type: schema.TypeString},
 							Computed:    true,
 							Description: "A list of CIDR block of the network under the VPC Router",

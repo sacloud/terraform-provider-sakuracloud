@@ -145,9 +145,9 @@ func TestAccSakuraCloudVPCRouter_Full(t *testing.T) {
 					resource.TestCheckResourceAttr(resourceName, "site_to_site_vpn.0.remote_id", "8.8.8.8"),
 					resource.TestCheckResourceAttr(resourceName, "site_to_site_vpn.0.pre_shared_secret", "example"),
 					resource.TestCheckResourceAttr(resourceName, "site_to_site_vpn.0.routes.#", "1"),
-					resource.TestCheckResourceAttr(resourceName, "site_to_site_vpn.0.routes.0", "10.0.0.0/8"),
+					resource.TestCheckResourceAttr(resourceName, "site_to_site_vpn.0.routes.3423270202", "10.0.0.0/8"),
 					resource.TestCheckResourceAttr(resourceName, "site_to_site_vpn.0.local_prefix.#", "1"),
-					resource.TestCheckResourceAttr(resourceName, "site_to_site_vpn.0.local_prefix.0", "192.168.21.0/24"),
+					resource.TestCheckResourceAttr(resourceName, "site_to_site_vpn.0.local_prefix.1172524555", "192.168.21.0/24"),
 					resource.TestCheckResourceAttr(resourceName, "static_nat.#", "1"),
 					resource.TestCheckResourceAttrPair(
 						resourceName, "static_nat.0.public_ip",
