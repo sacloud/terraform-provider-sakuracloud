@@ -64,9 +64,10 @@ func resourceSakuraCloudSIM() *schema.Resource {
 				Description: "The id of the device to restrict devices that can use the SIM",
 			},
 			"carrier": {
-				Type:     schema.TypeList,
+				Type:     schema.TypeSet,
 				Required: true,
 				Elem:     &schema.Schema{Type: schema.TypeString},
+				Set:      schema.HashString,
 				MinItems: 1,
 				MaxItems: 3,
 				Description: descf(

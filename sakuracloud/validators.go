@@ -57,15 +57,19 @@ func validateSakuraCloudServerNIC(v interface{}, k string) ([]string, []error) {
 }
 
 func validateBackupWeekdays(d resourceValueGettable, k string) error {
-	weekdays, ok := d.GetOk(k)
-	if !ok || len(weekdays.([]interface{})) == 0 {
+	_, ok := d.GetOk(k)
+	if !ok {
+		return nil
+	}
+	weekdays := expandBackupWeekdays(d, k)
+	if len(weekdays) == 0 {
 		return nil
 	}
 
-	for _, v := range weekdays.([]interface{}) {
+	for _, v := range weekdays {
 		var found bool
 		for _, t := range types.BackupWeekdayStrings {
-			if v.(string) == t {
+			if v.String() == t {
 				found = true
 				break
 			}
@@ -120,7 +124,7 @@ func validateDatabaseParameters(d *schema.ResourceData) error {
 }
 
 func validateCarrier(d resourceValueGettable) error {
-	carriers := d.Get("carrier").([]interface{})
+	carriers := d.Get("carrier").(*schema.Set).List()
 	if len(carriers) == 0 {
 		return errors.New("carrier is required")
 	}

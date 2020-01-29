@@ -15,6 +15,7 @@
 package sakuracloud
 
 import (
+	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/sacloud/libsacloud/v2/sacloud"
 	"github.com/sacloud/libsacloud/v2/sacloud/types"
 	simBuilder "github.com/sacloud/libsacloud/v2/utils/builder/sim"
@@ -23,7 +24,7 @@ import (
 func expandSIMCarrier(d resourceValueGettable) []*sacloud.SIMNetworkOperatorConfig {
 	// carriers
 	var carriers []*sacloud.SIMNetworkOperatorConfig
-	rawCarriers := d.Get("carrier").([]interface{})
+	rawCarriers := d.Get("carrier").(*schema.Set).List()
 	for _, carrier := range rawCarriers {
 		carriers = append(carriers, &sacloud.SIMNetworkOperatorConfig{
 			Allow: true,
@@ -33,19 +34,19 @@ func expandSIMCarrier(d resourceValueGettable) []*sacloud.SIMNetworkOperatorConf
 	return carriers
 }
 
-func flattenSIMCarrier(carrierInfo []*sacloud.SIMNetworkOperatorConfig) []interface{} {
-	var carriers []interface{}
+func flattenSIMCarrier(carrierInfo []*sacloud.SIMNetworkOperatorConfig) *schema.Set {
+	set := &schema.Set{F: schema.HashString}
 	for _, c := range carrierInfo {
 		if !c.Allow {
 			continue
 		}
-		for k, v := range types.SIMOperatorShortNameMap {
-			if v.String() == c.Name {
-				carriers = append(carriers, k)
+		for k := range types.SIMOperatorShortNameMap {
+			if k == c.Name {
+				set.Add(c.Name)
 			}
 		}
 	}
-	return carriers
+	return set
 }
 
 func expandSIMBuilder(d resourceValueGettable, client *APIClient) *simBuilder.Builder {

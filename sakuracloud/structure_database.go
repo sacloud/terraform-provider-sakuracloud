@@ -164,7 +164,7 @@ func expandDatabaseBackupSetting(d resourceValueGettable) *sacloud.DatabaseSetti
 	d = mapFromFirstElement(d, "backup")
 	if d != nil {
 		backupTime := d.Get("time").(string)
-		backupWeekdays := expandBackupWeekdays(d.Get("weekdays").([]interface{}))
+		backupWeekdays := expandBackupWeekdays(d, "weekdays")
 		if backupTime != "" && len(backupWeekdays) > 0 {
 			return &sacloud.DatabaseSettingBackup{
 				Time:      backupTime,
@@ -179,7 +179,7 @@ func flattenDatabaseBackupSetting(db *sacloud.Database) []interface{} {
 	if db.BackupSetting != nil {
 		setting := map[string]interface{}{
 			"time":     db.BackupSetting.Time,
-			"weekdays": db.BackupSetting.DayOfWeek,
+			"weekdays": flattenBackupWeekdays(db.BackupSetting.DayOfWeek),
 		}
 		return []interface{}{setting}
 	}

@@ -82,9 +82,10 @@ func dataSourceSakuraCloudDatabase() *schema.Resource {
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
 						"weekdays": {
-							Type:     schema.TypeList,
-							Elem:     &schema.Schema{Type: schema.TypeString},
+							Type:     schema.TypeSet,
 							Computed: true,
+							Elem:     &schema.Schema{Type: schema.TypeString},
+							Set:      schema.HashString,
 							Description: descf(
 								"The list of name of weekday that doing backup. This will be in [%s]",
 								types.BackupWeekdayStrings,

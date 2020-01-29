@@ -563,8 +563,8 @@ func expandVPCRouterSiteToSite(d resourceValueGettable) *sacloud.VPCRouterSiteTo
 		Peer:            stringOrDefault(d, "peer"),
 		RemoteID:        stringOrDefault(d, "remote_id"),
 		PreSharedSecret: stringOrDefault(d, "pre_shared_secret"),
-		Routes:          stringListOrDefault(d, "routes"),
-		LocalPrefix:     stringListOrDefault(d, "local_prefix"),
+		Routes:          stringSetOrDefault(d, "routes"),
+		LocalPrefix:     stringSetOrDefault(d, "local_prefix"),
 	}
 }
 
@@ -572,11 +572,11 @@ func flattenVPCRouterSiteToSite(vpcRouter *sacloud.VPCRouter) []interface{} {
 	var s2sSettings []interface{}
 	for _, s := range vpcRouter.Settings.SiteToSiteIPsecVPN {
 		s2sSettings = append(s2sSettings, map[string]interface{}{
-			"local_prefix":      s.LocalPrefix,
+			"local_prefix":      stringListToSet(s.LocalPrefix),
 			"peer":              s.Peer,
 			"pre_shared_secret": s.PreSharedSecret,
 			"remote_id":         s.RemoteID,
-			"routes":            s.Routes,
+			"routes":            stringListToSet(s.Routes),
 		})
 	}
 	return s2sSettings
