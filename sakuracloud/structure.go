@@ -195,22 +195,23 @@ func flattenTags(tags types.Tags) *schema.Set {
 	return set
 }
 
-func expandBackupWeekdays(configured []interface{}) []types.EBackupSpanWeekday {
+func expandBackupWeekdays(d resourceValueGettable, key string) []types.EBackupSpanWeekday {
 	var vs []types.EBackupSpanWeekday
-	for _, w := range expandStringList(configured) {
-		vs = append(vs, types.EBackupSpanWeekday(w))
+
+	for _, w := range d.Get(key).(*schema.Set).List() {
+		v := w.(string)
+		vs = append(vs, types.EBackupSpanWeekday(v))
 	}
 	types.SortBackupSpanWeekdays(vs)
 	return vs
 }
 
-func flattenBackupWeekdays(weekdays []types.EBackupSpanWeekday) []string {
-	types.SortBackupSpanWeekdays(weekdays)
-	var ws []string
+func flattenBackupWeekdays(weekdays []types.EBackupSpanWeekday) *schema.Set {
+	set := &schema.Set{F: schema.HashString}
 	for _, w := range weekdays {
-		ws = append(ws, w.String())
+		set.Add(w.String())
 	}
-	return ws
+	return set
 }
 
 func forceString(target interface{}) string {

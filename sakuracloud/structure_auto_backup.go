@@ -26,7 +26,7 @@ func expandAutoBackupCreateRequest(d *schema.ResourceData) *sacloud.AutoBackupCr
 		Tags:                    expandTags(d),
 		DiskID:                  expandSakuraCloudID(d, "disk_id"),
 		MaximumNumberOfArchives: d.Get("max_backup_num").(int),
-		BackupSpanWeekdays:      expandBackupWeekdays(d.Get("weekdays").([]interface{})),
+		BackupSpanWeekdays:      expandBackupWeekdays(d, "weekdays"),
 		IconID:                  expandSakuraCloudID(d, "icon_id"),
 	}
 }
@@ -37,7 +37,7 @@ func expandAutoBackupUpdateRequest(d *schema.ResourceData, autoBackup *sacloud.A
 		Description:             d.Get("description").(string),
 		Tags:                    expandTags(d),
 		MaximumNumberOfArchives: d.Get("max_backup_num").(int),
-		BackupSpanWeekdays:      expandBackupWeekdays(d.Get("weekdays").([]interface{})),
+		BackupSpanWeekdays:      expandBackupWeekdays(d, "weekdays"),
 		IconID:                  expandSakuraCloudID(d, "icon_id"),
 		SettingsHash:            autoBackup.SettingsHash,
 	}

@@ -52,9 +52,10 @@ func resourceSakuraCloudAutoBackup() *schema.Resource {
 				Description:  "The disk id to backed up",
 			},
 			"weekdays": {
-				Type:     schema.TypeList,
+				Type:     schema.TypeSet,
 				Required: true,
 				Elem:     &schema.Schema{Type: schema.TypeString},
+				Set:      schema.HashString,
 				Description: descf(
 					"A list of weekdays to backed up. The values in the list must be in [%s]",
 					types.BackupWeekdayStrings,
