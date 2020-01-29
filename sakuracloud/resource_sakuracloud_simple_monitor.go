@@ -181,10 +181,11 @@ func resourceSakuraCloudSimpleMonitor() *schema.Resource {
 				Description: "The webhook URL for sending notification by slack/discord",
 			},
 			"notify_interval": {
-				Type:        schema.TypeInt,
-				Optional:    true,
-				Default:     2,
-				Description: "The interval in hours between notification",
+				Type:         schema.TypeInt,
+				Optional:     true,
+				Default:      2,
+				ValidateFunc: validation.IntBetween(1, 72),
+				Description:  descf("The interval in hours between notification. %s", descRange(1, 72)),
 			},
 			"enabled": {
 				Type:        schema.TypeBool,

@@ -58,10 +58,11 @@ func resourceSakuraCloudDatabase() *schema.Resource {
 			},
 			"plan": schemaResourcePlan(resourceName, "10g", types.DatabasePlanStrings),
 			"username": {
-				Type:        schema.TypeString,
-				ForceNew:    true,
-				Required:    true,
-				Description: "The name of default user on the database",
+				Type:         schema.TypeString,
+				ForceNew:     true,
+				Required:     true,
+				ValidateFunc: validation.StringLenBetween(3, 20),
+				Description:  descf("The name of default user on the database. %s", descLength(3, 20)),
 			},
 			"password": {
 				Type:        schema.TypeString,

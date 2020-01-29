@@ -80,7 +80,7 @@ A `health_check` block supports the following:
 
 * `notify_email_enabled` - (Optional) The flag to enable notification by email. Default:`true`.
 * `notify_email_html` - (Optional) The flag to enable HTML format instead of text format.
-* `notify_interval` - (Optional) The interval in hours between notification. Default:`2`.
+* `notify_interval` - (Optional) The interval in hours between notification. This must be in the range [`1`-`72`]. Default:`2`.
 * `notify_slack_enabled` - (Optional) The flag to enable notification by slack/discord.
 * `notify_slack_webhook` - (Optional) The webhook URL for sending notification by slack/discord.
 

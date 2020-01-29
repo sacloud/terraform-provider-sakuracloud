@@ -1,8 +1,10 @@
 .env
 **/terraform-provider-sakuracloud*
 **/.usacloud
-terraform.tfstate
-terraform.tfstate.backup
-releases-terraform
+
+.terraform*
+terraform.tfstate*
+terraform.tfvars*
+
 website-current
 website-scaffold
