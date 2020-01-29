@@ -126,9 +126,9 @@ func (p *TemplateParameter) ExamplePath() string {
 	case TypeProvider:
 		return "provider.tf"
 	case TypeResource:
-		return filepath.Join("r", fmt.Sprintf("%s.tf", p.ShortName()))
+		return filepath.Join("r", p.ShortName(), fmt.Sprintf("%s.tf", p.ShortName()))
 	case TypeDataSource:
-		return filepath.Join("d", fmt.Sprintf("%s.tf", p.ShortName()))
+		return filepath.Join("d", p.ShortName(), fmt.Sprintf("%s.tf", p.ShortName()))
 	default:
 		log.Fatal("unknown parameter type:", p.Type)
 	}
