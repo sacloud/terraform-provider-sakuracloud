@@ -124,7 +124,7 @@ func validateDatabaseParameters(d *schema.ResourceData) error {
 }
 
 func validateCarrier(d resourceValueGettable) error {
-	carriers := d.Get("carrier").([]interface{})
+	carriers := d.Get("carrier").(*schema.Set).List()
 	if len(carriers) == 0 {
 		return errors.New("carrier is required")
 	}
