@@ -50,6 +50,8 @@ func TestAccSakuraCloudVPCRouter_basic(t *testing.T) {
 					resource.TestCheckResourceAttr(resourceName, "plan", "standard"),
 					resource.TestCheckResourceAttr(resourceName, "internet_connection", "true"),
 					resource.TestCheckNoResourceAttr(resourceName, "public_network_interface"),
+					resource.TestCheckResourceAttrSet(resourceName, "public_ip"),
+					resource.TestCheckResourceAttrSet(resourceName, "public_netmask"),
 					resource.TestCheckResourceAttrPair(
 						resourceName, "icon_id",
 						"sakuracloud_icon.foobar", "id",
@@ -70,6 +72,8 @@ func TestAccSakuraCloudVPCRouter_basic(t *testing.T) {
 					resource.TestCheckNoResourceAttr(resourceName, "public_network_interface"),
 					resource.TestCheckResourceAttr(resourceName, "syslog_host", "192.168.0.2"),
 					resource.TestCheckResourceAttr(resourceName, "icon_id", ""),
+					resource.TestCheckResourceAttrSet(resourceName, "public_ip"),
+					resource.TestCheckResourceAttrSet(resourceName, "public_netmask"),
 				),
 			},
 		},
@@ -95,6 +99,8 @@ func TestAccSakuraCloudVPCRouter_Full(t *testing.T) {
 				Check: resource.ComposeTestCheckFunc(
 					testCheckSakuraCloudVPCRouterExists(resourceName, &vpcRouter),
 					resource.TestCheckResourceAttr(resourceName, "name", rand),
+					resource.TestCheckResourceAttrSet(resourceName, "public_ip"),
+					resource.TestCheckResourceAttrSet(resourceName, "public_netmask"),
 					resource.TestCheckResourceAttr(resourceName, "private_network_interface.#", "1"),
 					resource.TestCheckResourceAttr(resourceName, "private_network_interface.0.vip", "192.168.11.1"),
 					resource.TestCheckResourceAttr(resourceName, "private_network_interface.0.ip_addresses.#", "2"),
@@ -167,6 +173,8 @@ func TestAccSakuraCloudVPCRouter_Full(t *testing.T) {
 				Check: resource.ComposeTestCheckFunc(
 					testCheckSakuraCloudVPCRouterExists(resourceName, &vpcRouter),
 					resource.TestCheckResourceAttr(resourceName, "name", rand+"-upd"),
+					resource.TestCheckResourceAttrSet(resourceName, "public_ip"),
+					resource.TestCheckResourceAttrSet(resourceName, "public_netmask"),
 					resource.TestCheckNoResourceAttr(resourceName, "private_network_interface"),
 					resource.TestCheckNoResourceAttr(resourceName, "dhcp_server"),
 					resource.TestCheckNoResourceAttr(resourceName, "dhcp_static_mapping"),
