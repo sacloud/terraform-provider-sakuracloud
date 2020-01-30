@@ -461,7 +461,7 @@ type MonitorLocalRouterValue struct {
 	SendBytesPerSec    float64
 }
 
-// MonitorRouterValues アクティビティモニタ
+// MonitorLocalRouterValues アクティビティモニタ
 type MonitorLocalRouterValues []*MonitorLocalRouterValue
 
 // UnmarshalJSON アクティビティモニタ向けUnmarshalJSON実装

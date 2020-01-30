@@ -26,9 +26,12 @@ import (
 )
 
 const (
-	DirectoryNameEnv    = "SAKURACLOUD_PROFILE_DIR" // プロファイルの格納先を指定する環境変数
-	DirectoryNameEnvOld = "USACLOUD_PROFILE_DIR"    // プロファイルの格納先を指定する環境変数(後方互換)
-	DefaultProfileName  = "default"                 // デフォルトのプロファイル名
+	// DirectoryNameEnv プロファイルの格納先を指定する環境変数
+	DirectoryNameEnv = "SAKURACLOUD_PROFILE_DIR"
+	// DirectoryNameEnvOld プロファイルの格納先を指定する環境変数(後方互換)
+	DirectoryNameEnvOld = "USACLOUD_PROFILE_DIR"
+	// DefaultProfileName デフォルトのプロファイル名
+	DefaultProfileName = "default"
 )
 
 var (
@@ -37,6 +40,7 @@ var (
 	currentFileName = "current"
 )
 
+// ValidateName プロファイル名が有効か検証
 func ValidateName(profileName string, invalidRunes ...rune) error {
 	invalids := invalidRunes
 	if len(invalids) == 0 {
@@ -92,6 +96,7 @@ func baseDir() (string, error) {
 	return homeDir, nil
 }
 
+// ConfigFilePath 指定のプロファイル名のコンフィグファイルパスを取得
 func ConfigFilePath(profileName string) (string, error) {
 	if err := ValidateName(profileName); err != nil {
 		return "", err
@@ -263,6 +268,7 @@ func Remove(profileName string) error {
 	return nil
 }
 
+// CurrentName カレントプロファイル名
 func CurrentName() (string, error) {
 	baseDir, err := baseDir()
 	if err != nil {
@@ -299,6 +305,7 @@ func cleanupProfileName(profileName string) string {
 	return strings.Trim(res, " ")
 }
 
+// SetCurrentName カレントプロファイル名を設定する
 func SetCurrentName(profileName string) error {
 	if err := ValidateName(profileName); err != nil {
 		return err
@@ -334,6 +341,7 @@ func SetCurrentName(profileName string) error {
 	return nil
 }
 
+// List プロファイル名の一覧を返す
 func List() ([]string, error) {
 	res := []string{"default"}
 

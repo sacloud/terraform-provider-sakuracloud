@@ -14,6 +14,7 @@
 
 package types
 
+// EContainerRegistryAccessLevel コンテナレジストリへアクセスレベル
 type EContainerRegistryAccessLevel string
 
 // String EContainerRegistryVisibilityの文字列表現
