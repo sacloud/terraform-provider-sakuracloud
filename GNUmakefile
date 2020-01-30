@@ -36,7 +36,7 @@ tools:
 	GO111MODULE=off go get github.com/sacloud/addlicense
 	GO111MODULE=off go get github.com/tcnksm/ghr
 	GO111MODULE=on go install github.com/bflad/tfproviderdocs
-	GO111MODULE=on go install github.com/bflad/tfproviderlint/cmd/tfproviderlint
+	GO111MODULE=on go install github.com/bflad/tfproviderlint/cmd/tfproviderlintx
 	GO111MODULE=on go install github.com/client9/misspell/cmd/misspell
 	GO111MODULE=on go install github.com/golangci/golangci-lint/cmd/golangci-lint
 
@@ -108,11 +108,12 @@ lint:
 
 .PHONY: tflint
 tflint:
-	tfproviderlint \
+	tfproviderlintx \
         -AT001 -AT002 -AT003 -AT004 -AT005 -AT006 -AT007 \
         -R001 -R002 -R004 -R005 -R006 \
         -S001 -S002 -S003 -S004 -S005 -S006 -S007 -S008 -S009 -S010 -S011 -S012 -S013 -S014 -S015 -S016 -S017 -S018 -S019 -S020 -S021 -S022 -S023\
         -V001 \
+        -XR001 -XR004 \
         ./$(PKG_NAME)
 
 .PHONY: goimports
