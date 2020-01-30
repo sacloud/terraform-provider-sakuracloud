@@ -174,10 +174,7 @@ func flattenVPCRouterGlobalAddress(vpcRouter *sacloud.VPCRouter) string {
 }
 
 func flattenVPCRouterGlobalNetworkMaskLen(vpcRouter *sacloud.VPCRouter) int {
-	if vpcRouter.PlanID == types.VPCRouterPlans.Standard {
-		return vpcRouter.Interfaces[0].SubnetNetworkMaskLen
-	}
-	return vpcRouter.Settings.Interfaces[0].NetworkMaskLen
+	return vpcRouter.Interfaces[0].SubnetNetworkMaskLen
 }
 
 func flattenVPCRouterSwitchID(vpcRouter *sacloud.VPCRouter) string {

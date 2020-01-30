@@ -244,10 +244,10 @@ func (r *RetryableSetup) provisionBeforeUp(ctx context.Context, zone string, id 
 	if r.ProvisionBeforeUp != nil && created != nil {
 		var err error
 		for i := 0; i < r.ProvisioningRetryCount; i++ {
-			time.Sleep(r.ProvisioningRetryInterval)
 			if err = r.ProvisionBeforeUp(ctx, zone, id, created); err == nil {
 				break
 			}
+			time.Sleep(r.ProvisioningRetryInterval)
 		}
 		return err
 	}
