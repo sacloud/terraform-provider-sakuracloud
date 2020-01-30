@@ -13,8 +13,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-TEST            ?=$$(go list ./... | grep -v vendor)
-
 AUTHOR          ?="The Libsacloud Authors"
 COPYRIGHT_YEAR  ?="2016-2020"
 COPYRIGHT_FILES ?=$$(find . -name "*.go" -print | grep -v "/vendor/")
@@ -37,7 +35,7 @@ tools:
 	GO111MODULE=off go get github.com/motemen/gobump
 	GO111MODULE=off go get github.com/sacloud/addlicense
 	GO111MODULE=off go get -u github.com/client9/misspell/cmd/misspell
-	GO111MODULE=off go get -u github.com/golangci/golangci-lint/cmd/golangci-lint
+	curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/v1.19.1/install.sh | sh -s -- -b $$(go env GOPATH)/bin v1.19.1
 
 .PHONY: clean
 clean:

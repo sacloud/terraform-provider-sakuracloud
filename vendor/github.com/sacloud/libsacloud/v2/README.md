@@ -1,7 +1,7 @@
 # libsacloud
 
 [![GoDoc](https://godoc.org/github.com/sacloud/libsacloud?status.svg)](https://godoc.org/github.com/sacloud/libsacloud)
-[![Build Status](https://travis-ci.org/sacloud/libsacloud.svg?branch=master)](https://travis-ci.org/sacloud/libsacloud)
+![Tests](https://github.com/sacloud/libsacloud/workflows/Tests/badge.svg)
 [![Go Report Card](https://goreportcard.com/badge/github.com/sacloud/libsacloud)](https://goreportcard.com/report/github.com/sacloud/libsacloud)
 
 Library for SakuraCloud API

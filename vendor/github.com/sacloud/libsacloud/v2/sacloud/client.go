@@ -141,7 +141,7 @@ func (c *Client) httpClient() *retryablehttp.Client {
 				return false, ctx.Err()
 			}
 			if err != nil {
-				return false, err
+				return retryablehttp.DefaultRetryPolicy(ctx, resp, err)
 			}
 			if resp.StatusCode == 0 || resp.StatusCode == http.StatusServiceUnavailable || resp.StatusCode == http.StatusLocked {
 				return true, nil
