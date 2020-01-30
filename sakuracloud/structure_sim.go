@@ -40,9 +40,9 @@ func flattenSIMCarrier(carrierInfo []*sacloud.SIMNetworkOperatorConfig) *schema.
 		if !c.Allow {
 			continue
 		}
-		for k := range types.SIMOperatorShortNameMap {
-			if k == c.Name {
-				set.Add(c.Name)
+		for k, v := range types.SIMOperatorShortNameMap {
+			if v.String() == c.Name {
+				set.Add(k)
 			}
 		}
 	}
