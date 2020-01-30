@@ -25,7 +25,7 @@ import (
 
 const (
 	templateDir = "templates"
-	exampleDir  = "examples"
+	exampleDir  = "examples/website"
 )
 
 func main() {
