@@ -69,18 +69,18 @@ const (
 )
 
 // MarshalJSON implements json.Marshaler
-func (n *EProxyLBPlan) MarshalJSON() ([]byte, error) {
-	if n == nil || int(*n) == 0 {
+func (p *EProxyLBPlan) MarshalJSON() ([]byte, error) {
+	if p == nil || int(*p) == 0 {
 		return []byte(`""`), nil
 	}
-	return []byte(fmt.Sprintf(`"%s%d"`, proxyLBServiceClassPrefix, int(*n))), nil
+	return []byte(fmt.Sprintf(`"%s%d"`, proxyLBServiceClassPrefix, int(*p))), nil
 }
 
 // UnmarshalJSON implements json.Unmarshaler
-func (n *EProxyLBPlan) UnmarshalJSON(b []byte) error {
+func (p *EProxyLBPlan) UnmarshalJSON(b []byte) error {
 	strPlan := string(b)
 	if strPlan == `""` {
-		*n = EProxyLBPlan(0)
+		*p = EProxyLBPlan(0)
 		return nil
 	}
 
@@ -93,6 +93,6 @@ func (n *EProxyLBPlan) UnmarshalJSON(b []byte) error {
 		return err
 	}
 
-	*n = EProxyLBPlan(plan)
+	*p = EProxyLBPlan(plan)
 	return nil
 }

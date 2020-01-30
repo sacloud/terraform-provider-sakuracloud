@@ -52,7 +52,7 @@ var RDBMSVersions = map[RDBMSType]*RDBMSVersion{
 	},
 }
 
-// RDBMSypeStrings 有効なRDBMS種別を示す文字列
+// RDBMSTypeStrings 有効なRDBMS種別を示す文字列
 var RDBMSTypeStrings = []string{
 	strings.ToLower(RDBMSTypesMariaDB.String()),
 	strings.ToLower(RDBMSTypesPostgreSQL.String()),

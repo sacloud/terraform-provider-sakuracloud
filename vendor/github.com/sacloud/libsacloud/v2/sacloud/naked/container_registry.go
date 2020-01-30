@@ -66,7 +66,7 @@ type ContainerRegistryUser struct {
 	Password string `json:"password,omitempty" yaml:"password,omitempty"`
 }
 
-// ContainerRegistryUser コンテナレジストリのユーザ
+// ContainerRegistryUsers コンテナレジストリのユーザ
 type ContainerRegistryUsers struct {
 	Users []*ContainerRegistryUser `json:"users,omitempty"`
 }

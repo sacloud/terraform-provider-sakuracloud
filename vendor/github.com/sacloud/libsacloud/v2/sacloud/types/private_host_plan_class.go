@@ -15,8 +15,10 @@
 package types
 
 const (
-	PrivateHostClassDynamic = "dynamic"    // 標準
-	PrivateHostClassWindows = "ms_windows" // Windows
+	// PrivateHostClassDynamic 標準
+	PrivateHostClassDynamic = "dynamic"
+	// PrivateHostClassWindows Windows
+	PrivateHostClassWindows = "ms_windows"
 )
 
 // PrivateHostClasses PrivateHost.Classに指定できる有効な文字列
