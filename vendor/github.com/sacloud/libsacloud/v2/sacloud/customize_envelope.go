@@ -104,6 +104,16 @@ func (s autoBackupFindRequestEnvelope) MarshalJSON() ([]byte, error) {
 	return json.Marshal(tmp)
 }
 
+func (s containerRegistryFindRequestEnvelope) MarshalJSON() ([]byte, error) {
+	type alias containerRegistryFindRequestEnvelope
+	tmp := alias(s)
+	if tmp.Filter == nil {
+		tmp.Filter = search.Filter{}
+	}
+	tmp.Filter[search.Key("Provider.Class")] = "containerregistry"
+	return json.Marshal(tmp)
+}
+
 func (s dNSFindRequestEnvelope) MarshalJSON() ([]byte, error) {
 	type alias dNSFindRequestEnvelope
 	tmp := alias(s)
