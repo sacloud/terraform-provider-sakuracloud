@@ -229,7 +229,9 @@ func setSubnetResourceData(_ context.Context, d *schema.ResourceData, client *AP
 	d.Set("network_address", data.NetworkAddress)                                // nolint
 	d.Set("min_ip_address", data.IPAddresses[0].IPAddress)                       // nolint
 	d.Set("max_ip_address", data.IPAddresses[len(data.IPAddresses)-1].IPAddress) // nolint
-	d.Set("ip_addresses", addrs)                                                 // nolint
-	d.Set("zone", getZone(d, client))                                            // nolint
+	if err := d.Set("ip_addresses", addrs); err != nil {
+		return err
+	}
+	d.Set("zone", getZone(d, client)) // nolint
 	return nil
 }
