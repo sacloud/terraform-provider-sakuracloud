@@ -17,6 +17,7 @@ package sakuracloud
 import (
 	"bytes"
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/validation"
@@ -151,19 +152,23 @@ func resourceSakuraCloudDNSRecordRead(d *schema.ResourceData, meta interface{}) 
 		return nil
 	}
 
-	r := flattenDNSRecord(record)
-	d.Set("name", r["name"])   // nolint
-	d.Set("type", r["type"])   // nolint
-	d.Set("value", r["value"]) // nolint
-	d.Set("ttl", r["ttl"])     // nolint
+	d.Set("name", record.Name)          // nolint
+	d.Set("type", record.Type.String()) // nolint
+	d.Set("value", record.RData)        // nolint
+	d.Set("ttl", record.TTL)            // nolint
 
 	switch record.Type {
 	case "MX":
-		d.Set("priority", r["priority"]) // nolint
+		// ex. record.RData = "10 example.com."
+		values := strings.SplitN(record.RData, " ", 2)
+		d.Set("value", values[1])               // nolint
+		d.Set("priority", forceAtoI(values[0])) // nolint
 	case "SRV":
-		d.Set("priority", r["priority"]) // nolint
-		d.Set("weight", r["weight"])     // nolint
-		d.Set("port", r["port"])         // nolint
+		values := strings.SplitN(record.RData, " ", 4)
+		d.Set("value", values[3])               // nolint
+		d.Set("priority", forceAtoI(values[0])) // nolint
+		d.Set("weight", forceAtoI(values[1]))   // nolint
+		d.Set("port", forceAtoI(values[2]))     // nolint
 	}
 	return nil
 }

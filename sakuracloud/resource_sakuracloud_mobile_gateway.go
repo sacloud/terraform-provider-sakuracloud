@@ -353,7 +353,9 @@ func setMobileGatewayResourceData(ctx context.Context, d *schema.ResourceData, c
 	if err := d.Set("traffic_control", flattenMobileGatewayTrafficConfigs(tc)); err != nil {
 		return err
 	}
-	d.Set("dns_servers", []string{resolver.DNS1, resolver.DNS2}) // nolint
+	if err := d.Set("dns_servers", []string{resolver.DNS1, resolver.DNS2}); err != nil {
+		return err
+	}
 	if err := d.Set("static_route", flattenMobileGatewayStaticRoutes(data.Settings.StaticRoute)); err != nil {
 		return err
 	}

@@ -482,9 +482,11 @@ func setProxyLBResourceData(ctx context.Context, d *schema.ResourceData, client 
 	d.Set("region", data.Region.String())                      // nolint
 	d.Set("fqdn", data.FQDN)                                   // nolint
 	d.Set("vip", health.CurrentVIP)                            // nolint
-	d.Set("proxy_networks", data.ProxyNetworks)                // nolint
-	d.Set("icon_id", data.IconID.String())                     // nolint
-	d.Set("description", data.Description)                     // nolint
+	if err := d.Set("proxy_networks", data.ProxyNetworks); err != nil {
+		return err
+	}
+	d.Set("icon_id", data.IconID.String()) // nolint
+	d.Set("description", data.Description) // nolint
 	if err := d.Set("bind_port", flattenProxyLBBindPorts(data)); err != nil {
 		return err
 	}
