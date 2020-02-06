@@ -80,7 +80,7 @@ func resourceSakuraCloudLocalRouter() *schema.Resource {
 						"vip": {
 							Type:         schema.TypeString,
 							Required:     true,
-							ValidateFunc: validation.SingleIP(),
+							ValidateFunc: validation.IsIPv4Address,
 							Description:  "The virtual IP address",
 						},
 						"ip_addresses": {
@@ -148,7 +148,7 @@ func resourceSakuraCloudLocalRouter() *schema.Resource {
 						"next_hop": {
 							Type:         schema.TypeString,
 							Required:     true,
-							ValidateFunc: validation.SingleIP(),
+							ValidateFunc: validation.IsIPv4Address,
 							Description:  "The IP address of the next hop",
 						},
 					},
