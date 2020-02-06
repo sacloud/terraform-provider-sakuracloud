@@ -187,6 +187,10 @@ func (b *Builder) Build(ctx context.Context, zone string) (*sacloud.MobileGatewa
 				}
 			}
 
+			if err := b.Client.MobileGateway.Config(ctx, zone, id); err != nil {
+				return err
+			}
+
 			if b.SetupOptions.BootAfterBuild {
 				return power.BootMobileGateway(ctx, b.Client.MobileGateway, zone, id)
 			}
@@ -422,6 +426,10 @@ func (b *Builder) Update(ctx context.Context, zone string, id types.ID) (*saclou
 				return nil, err
 			}
 		}
+	}
+
+	if err := b.Client.MobileGateway.Config(ctx, zone, id); err != nil {
+		return nil, err
 	}
 
 	if isNeedRestart {
