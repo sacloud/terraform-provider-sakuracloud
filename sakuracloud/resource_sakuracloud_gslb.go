@@ -116,7 +116,7 @@ func resourceSakuraCloudGSLB() *schema.Resource {
 							Type:         schema.TypeString,
 							Required:     true,
 							Description:  "The IP address of the server",
-							ValidateFunc: validation.SingleIP(),
+							ValidateFunc: validation.IsIPv4Address,
 						},
 						"enabled": {
 							Type:        schema.TypeBool,

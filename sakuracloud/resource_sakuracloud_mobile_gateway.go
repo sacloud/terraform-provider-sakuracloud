@@ -163,7 +163,7 @@ func resourceSakuraCloudMobileGateway() *schema.Resource {
 						"next_hop": {
 							Type:         schema.TypeString,
 							Required:     true,
-							ValidateFunc: validation.SingleIP(),
+							ValidateFunc: validation.IsIPv4Address,
 							Description:  "The IP address of next hop",
 						},
 					},

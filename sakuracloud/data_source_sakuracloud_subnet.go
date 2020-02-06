@@ -31,13 +31,11 @@ func dataSourceSakuraCloudSubnet() *schema.Resource {
 			"internet_id": {
 				Type:         schema.TypeString,
 				Required:     true,
-				ForceNew:     true,
 				ValidateFunc: validateSakuracloudIDType,
 				Description:  "The id of the switch+router resource that the Subnet belongs",
 			},
 			"index": {
 				Type:        schema.TypeInt,
-				ForceNew:    true,
 				Required:    true,
 				Description: "The index of the subnet in assigned to the Switch+Router",
 			},

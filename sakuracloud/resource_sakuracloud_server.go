@@ -104,7 +104,7 @@ func resourceSakuraCloudServer() *schema.Resource {
 							Type:         schema.TypeString,
 							Optional:     true,
 							Computed:     true,
-							ValidateFunc: validation.SingleIP(),
+							ValidateFunc: validation.IsIPv4Address,
 							Description:  "The IP address for only display. This value doesn't affect actual NIC settings",
 						},
 						"packet_filter_id": {
@@ -192,7 +192,7 @@ func resourceSakuraCloudServer() *schema.Resource {
 						"ip_address": {
 							Type:         schema.TypeString,
 							Optional:     true,
-							ValidateFunc: validation.SingleIP(),
+							ValidateFunc: validation.IsIPv4Address,
 							Description:  "The IP address to assign to the Server",
 						},
 						"gateway": {
