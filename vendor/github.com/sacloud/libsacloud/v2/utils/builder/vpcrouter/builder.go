@@ -222,6 +222,9 @@ func (b *Builder) Build(ctx context.Context, zone string) (*sacloud.VPCRouter, e
 			if err != nil {
 				return err
 			}
+			if err := b.Client.Config(ctx, zone, id); err != nil {
+				return err
+			}
 
 			if b.SetupOptions.BootAfterBuild {
 				return power.BootVPCRouter(ctx, b.Client, zone, id)
@@ -347,6 +350,10 @@ func (b *Builder) Update(ctx context.Context, zone string, id types.ID) (*saclou
 		SettingsHash: vpcRouter.SettingsHash,
 	})
 	if err != nil {
+		return nil, err
+	}
+
+	if err := b.Client.Config(ctx, zone, id); err != nil {
 		return nil, err
 	}
 

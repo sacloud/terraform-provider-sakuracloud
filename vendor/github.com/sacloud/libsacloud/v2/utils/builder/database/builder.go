@@ -104,6 +104,9 @@ func (b *Builder) Build(ctx context.Context, zone string) (*sacloud.Database, er
 		Read: func(ctx context.Context, zone string, id types.ID) (interface{}, error) {
 			return b.Client.Database.Read(ctx, zone, id)
 		},
+		ProvisionBeforeUp: func(ctx context.Context, zone string, id types.ID, _ interface{}) error {
+			return b.Client.Database.Config(ctx, zone, id)
+		},
 		IsWaitForCopy:       true,
 		IsWaitForUp:         true,
 		RetryCount:          b.SetupOptions.RetryCount,
@@ -164,6 +167,9 @@ func (b *Builder) Update(ctx context.Context, zone string, id types.ID) (*saclou
 		SettingsHash:       db.SettingsHash,
 	})
 	if err != nil {
+		return nil, err
+	}
+	if err := b.Client.Database.Config(ctx, zone, id); err != nil {
 		return nil, err
 	}
 	if isNeedRestart {

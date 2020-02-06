@@ -191,6 +191,9 @@ func resourceSakuraCloudLoadBalancerCreate(d *schema.ResourceData, meta interfac
 		Create: func(ctx context.Context, zone string) (accessor.ID, error) {
 			return lbOp.Create(ctx, zone, expandLoadBalancerCreateRequest(d))
 		},
+		ProvisionBeforeUp: func(ctx context.Context, zone string, id types.ID, _ interface{}) error {
+			return lbOp.Config(ctx, zone, id)
+		},
 		Read: func(ctx context.Context, zone string, id types.ID) (interface{}, error) {
 			return lbOp.Read(ctx, zone, id)
 		},
@@ -251,6 +254,9 @@ func resourceSakuraCloudLoadBalancerUpdate(d *schema.ResourceData, meta interfac
 	}
 
 	if _, err := lbOp.Update(ctx, zone, lb.ID, expandLoadBalancerUpdateRequest(d, lb)); err != nil {
+		return fmt.Errorf("updating SakuraCloud LoadBalancer[%s] is failed: %s", d.Id(), err)
+	}
+	if err := lbOp.Config(ctx, zone, lb.ID); err != nil {
 		return fmt.Errorf("updating SakuraCloud LoadBalancer[%s] is failed: %s", d.Id(), err)
 	}
 
