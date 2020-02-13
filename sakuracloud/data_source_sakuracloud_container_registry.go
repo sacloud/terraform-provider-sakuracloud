@@ -38,6 +38,11 @@ func dataSourceSakuraCloudContainerRegistry() *schema.Resource {
 					types.ContainerRegistryAccessLevelStrings,
 				),
 			},
+			"virtual_domain": {
+				Type:        schema.TypeString,
+				Computed:    true,
+				Description: "The alias for accessing the container registry",
+			},
 			"subdomain_label": {
 				Type:        schema.TypeString,
 				Computed:    true,
@@ -47,6 +52,27 @@ func dataSourceSakuraCloudContainerRegistry() *schema.Resource {
 				Type:        schema.TypeString,
 				Computed:    true,
 				Description: "The FQDN for accessing the container registry. FQDN is built from `subdomain_label` + `.sakuracr.jp`",
+			},
+			"user": {
+				Type:     schema.TypeList,
+				Computed: true,
+				Elem: &schema.Resource{
+					Schema: map[string]*schema.Schema{
+						"name": {
+							Type:        schema.TypeString,
+							Computed:    true,
+							Description: "The user name used to authenticate remote access",
+						},
+						"permission": {
+							Type:     schema.TypeString,
+							Computed: true,
+							Description: descf(
+								"The level of access that allow to the user. This will be one of [%s]",
+								types.ContainerRegistryPermissionStrings,
+							),
+						},
+					},
+				},
 			},
 			"icon_id":     schemaDataSourceIconID(resourceName),
 			"description": schemaDataSourceDescription(resourceName),
@@ -87,5 +113,5 @@ func dataSourceSakuraCloudContainerRegistryRead(d *schema.ResourceData, meta int
 	}
 
 	d.SetId(targets[0].ID.String())
-	return setContainerRegistryResourceData(ctx, d, client, targets[0])
+	return setContainerRegistryResourceData(ctx, d, client, targets[0], false)
 }

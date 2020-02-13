@@ -47,7 +47,7 @@ var RDBMSVersions = map[RDBMSType]*RDBMSVersion{
 	},
 	RDBMSTypesPostgreSQL: {
 		Name:     "postgres",
-		Version:  "11",
+		Version:  "12",
 		Revision: "",
 	},
 }

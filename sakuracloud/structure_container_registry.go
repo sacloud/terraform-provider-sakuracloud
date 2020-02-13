@@ -16,6 +16,7 @@ package sakuracloud
 
 import (
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
+	"github.com/sacloud/libsacloud/v2/sacloud"
 	"github.com/sacloud/libsacloud/v2/sacloud/types"
 	registryUtil "github.com/sacloud/libsacloud/v2/utils/builder/registry"
 )
@@ -27,6 +28,7 @@ func expandContainerRegistryBuilder(d *schema.ResourceData, client *APIClient, s
 		Tags:           expandTags(d),
 		IconID:         expandSakuraCloudID(d, "icon_id"),
 		AccessLevel:    types.EContainerRegistryAccessLevel(d.Get("access_level").(string)),
+		VirtualDomain:  stringOrDefault(d, "virtual_domain"),
 		SubDomainLabel: d.Get("subdomain_label").(string),
 		Users:          expandContainerRegistryUsers(d),
 		SettingsHash:   settingsHash,
@@ -40,9 +42,34 @@ func expandContainerRegistryUsers(d *schema.ResourceData) []*registryUtil.User {
 	for _, raw := range users {
 		d := mapToResourceData(raw.(map[string]interface{}))
 		results = append(results, &registryUtil.User{
-			UserName: stringOrDefault(d, "name"),
-			Password: stringOrDefault(d, "password"),
+			UserName:   stringOrDefault(d, "name"),
+			Password:   stringOrDefault(d, "password"),
+			Permission: types.EContainerRegistryPermission(stringOrDefault(d, "permission")),
 		})
+	}
+	return results
+}
+
+func flattenContainerRegistryUsers(d *schema.ResourceData, users []*sacloud.ContainerRegistryUser, includePassword bool) []interface{} {
+	inputs := expandContainerRegistryUsers(d)
+
+	var results []interface{}
+	for _, user := range users {
+		v := map[string]interface{}{
+			"name":       user.UserName,
+			"permission": user.Permission,
+		}
+		if includePassword {
+			password := ""
+			for _, i := range inputs {
+				if i.UserName == user.UserName {
+					password = i.Password
+					break
+				}
+			}
+			v["password"] = password
+		}
+		results = append(results, v)
 	}
 	return results
 }

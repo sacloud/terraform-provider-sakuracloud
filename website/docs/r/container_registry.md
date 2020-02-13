@@ -14,38 +14,42 @@ Manages a SakuraCloud Container Registry.
 
 ```hcl
 variable users {
-  type = list(object({
-    name     = string
-    password = string
-  }))
-  default = [
-    {
-      name     = "user1"
-      password = "password1"
-    },
-    {
-      name     = "user2"
-      password = "password2"
-    }
-  ]
-}
-
-resource "sakuracloud_container_registry" "foobar" {
-  name            = "foobar"
-  subdomain_label = "your-subdomain-label"
-  access_level    = "readwrite" # this must be one of ["readwrite"/"readonly"/"none"]
-
-  description = "description"
-  tags        = ["tag1", "tag2"]
-
-  dynamic user {
-    for_each = var.users
-    content {
-      name     = user.value.name
-      password = user.value.password
-    }
-  }
-}
+   type = list(object({
+     name       = string
+     password   = string
+     permission = string
+   }))
+   default = [
+     {
+       name       = "user1"
+       password   = "password1"
+       permission = "all"
+     },
+     {
+       name       = "user2"
+       password   = "password2"
+       permission = "readwrite"
+     }
+   ]
+ }
+ 
+ resource "sakuracloud_container_registry" "foobar" {
+   name            = "foobar"
+   subdomain_label = "your-subdomain-label"
+   access_level    = "readwrite" # this must be one of ["readwrite"/"readonly"/"none"]
+ 
+   description = "description"
+   tags        = ["tag1", "tag2"]
+ 
+   dynamic user {
+     for_each = var.users
+     content {
+       name       = user.value.name
+       password   = user.value.password
+       permission = user.value.permission
+     }
+   }
+ }
 ```
 ## Argument Reference
 
@@ -53,6 +57,7 @@ resource "sakuracloud_container_registry" "foobar" {
 * `access_level` - (Required) The level of access that allow to users. This must be one of [`readwrite`/`readonly`/`none`].
 * `subdomain_label` - (Required) The label at the lowest of the FQDN used when be accessed from users. The length of this value must be in the range [`1`-`64`]. Changing this forces a new resource to be created.
 * `user` - (Optional) One or more `user` blocks as defined below.
+* `virtual_domain` - (Optional) The alias for accessing the container registry.
 
 ---
 
@@ -60,6 +65,7 @@ A `user` block supports the following:
 
 * `name` - (Required) The user name used to authenticate remote access.
 * `password` - (Required) The password used to authenticate remote access.
+* `permission` - (Required) The level of access that allow to the user. This must be one of [`all`/`readwrite`/`readonly`].
 
 #### Common Arguments
 

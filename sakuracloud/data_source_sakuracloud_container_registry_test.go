@@ -37,6 +37,11 @@ func TestAccSakuraCloudDataSourceContainerRegistry_basic(t *testing.T) {
 					testCheckSakuraCloudDataSourceExists(resourceName),
 					resource.TestCheckResourceAttr(resourceName, "name", rand),
 					resource.TestCheckResourceAttr(resourceName, "description", "description"),
+					resource.TestCheckResourceAttr(resourceName, "user.#", "2"),
+					resource.TestCheckResourceAttr(resourceName, "user.0.name", "user1"),
+					resource.TestCheckResourceAttr(resourceName, "user.0.permission", "readwrite"),
+					resource.TestCheckResourceAttr(resourceName, "user.1.name", "user2"),
+					resource.TestCheckResourceAttr(resourceName, "user.1.permission", "readonly"),
 				),
 			},
 		},
@@ -53,12 +58,14 @@ resource "sakuracloud_container_registry" "foobar" {
   tags        = ["tag1", "tag2"]
 
   user {
-    name     = "user1"
-    password = "{{ .arg2 }}"
+    name       = "user1"
+    password   = "{{ .arg2 }}"
+    permission = "readwrite"
   }
   user {
     name     = "user2"
     password = "{{ .arg2 }}"
+    permission = "readonly"
   }
 }
 

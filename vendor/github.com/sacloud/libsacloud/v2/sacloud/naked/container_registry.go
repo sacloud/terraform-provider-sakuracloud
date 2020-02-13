@@ -62,8 +62,9 @@ type ContainerRegistryStatus struct {
 
 // ContainerRegistryUser コンテナレジストリのユーザ
 type ContainerRegistryUser struct {
-	UserName string `json:"username" yaml:"username"`
-	Password string `json:"password,omitempty" yaml:"password,omitempty"`
+	UserName   string                             `json:"username,omitempty" yaml:"username,omitempty"`
+	Password   string                             `json:"password,omitempty" yaml:"password,omitempty"`
+	Permission types.EContainerRegistryPermission `json:"permission" yaml:"permission"`
 }
 
 // ContainerRegistryUsers コンテナレジストリのユーザ

@@ -51,6 +51,14 @@ A `condition` block supports the following:
 * `name` - The name of the ContainerRegistry.
 * `subdomain_label` - The label at the lowest of the FQDN used when be accessed from users.
 * `tags` - Any tags assigned to the ContainerRegistry.
+* `user` - A list of `user` blocks as defined below.
+* `virtual_domain` - The alias for accessing the container registry.
 
 
+---
+
+A `user` block exports the following:
+
+* `name` - The user name used to authenticate remote access.
+* `permission` - The level of access that allow to the user. This will be one of [`all`/`readwrite`/`readonly`].
 

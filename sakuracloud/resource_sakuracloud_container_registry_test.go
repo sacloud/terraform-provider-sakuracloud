@@ -47,6 +47,7 @@ func TestAccSakuraCloudContainerRegistry_basic(t *testing.T) {
 					testCheckSakuraCloudContainerRegistryExists(resourceName, &reg),
 					resource.TestCheckResourceAttr(resourceName, "name", rand),
 					resource.TestCheckResourceAttr(resourceName, "subdomain_label", subDomainLabel),
+					resource.TestCheckResourceAttr(resourceName, "virtual_domain", subDomainLabel+".usacloud.jp"),
 					resource.TestCheckResourceAttr(resourceName, "fqdn", subDomainLabel+".sakuracr.jp"),
 					resource.TestCheckResourceAttr(resourceName, "access_level", "readwrite"),
 					resource.TestCheckResourceAttr(resourceName, "description", "description"),
@@ -55,7 +56,11 @@ func TestAccSakuraCloudContainerRegistry_basic(t *testing.T) {
 					resource.TestCheckResourceAttr(resourceName, "tags.1852302624", "tag2"),
 					resource.TestCheckResourceAttr(resourceName, "user.#", "2"),
 					resource.TestCheckResourceAttr(resourceName, "user.0.name", "user1"),
+					resource.TestCheckResourceAttr(resourceName, "user.0.password", password),
+					resource.TestCheckResourceAttr(resourceName, "user.0.permission", "readwrite"),
 					resource.TestCheckResourceAttr(resourceName, "user.1.name", "user2"),
+					resource.TestCheckResourceAttr(resourceName, "user.1.password", password),
+					resource.TestCheckResourceAttr(resourceName, "user.1.permission", "readonly"),
 					resource.TestCheckResourceAttrPair(
 						resourceName, "icon_id",
 						"sakuracloud_icon.foobar", "id",
@@ -68,6 +73,7 @@ func TestAccSakuraCloudContainerRegistry_basic(t *testing.T) {
 					testCheckSakuraCloudContainerRegistryExists(resourceName, &reg),
 					resource.TestCheckResourceAttr(resourceName, "name", rand+"-upd"),
 					resource.TestCheckResourceAttr(resourceName, "subdomain_label", subDomainLabel),
+					resource.TestCheckResourceAttr(resourceName, "virtual_domain", subDomainLabel+"-upd.usacloud.jp"),
 					resource.TestCheckResourceAttr(resourceName, "fqdn", subDomainLabel+".sakuracr.jp"),
 					resource.TestCheckResourceAttr(resourceName, "access_level", "readonly"),
 					resource.TestCheckResourceAttr(resourceName, "description", "description-upd"),
@@ -77,6 +83,8 @@ func TestAccSakuraCloudContainerRegistry_basic(t *testing.T) {
 					resource.TestCheckResourceAttr(resourceName, "icon_id", ""),
 					resource.TestCheckResourceAttr(resourceName, "user.#", "1"),
 					resource.TestCheckResourceAttr(resourceName, "user.0.name", "user1"),
+					resource.TestCheckResourceAttr(resourceName, "user.0.password", password),
+					resource.TestCheckResourceAttr(resourceName, "user.0.permission", "all"),
 				),
 			},
 		},
@@ -139,6 +147,7 @@ func testCheckSakuraCloudContainerRegistryDestroy(s *terraform.State) error {
 var testAccSakuraCloudContainerRegistry_basic = `
 resource "sakuracloud_container_registry" "foobar" {
   name            = "{{ .arg0 }}"
+  virtual_domain  = "{{ .arg1 }}.usacloud.jp"
   subdomain_label = "{{ .arg1 }}"
   access_level    = "readwrite"
 
@@ -147,12 +156,14 @@ resource "sakuracloud_container_registry" "foobar" {
   icon_id     = sakuracloud_icon.foobar.id
 
   user {
-    name     = "user1"
-    password = "{{ .arg2 }}"
+    name       = "user1"
+    password   = "{{ .arg2 }}"
+    permission = "readwrite"
   }
   user {
-    name     = "user2"
-    password = "{{ .arg2 }}"
+    name       = "user2"
+    password   = "{{ .arg2 }}"
+    permission = "readonly"
   }
 }
 
@@ -165,6 +176,7 @@ resource "sakuracloud_icon" "foobar" {
 var testAccSakuraCloudContainerRegistry_update = `
 resource "sakuracloud_container_registry" "foobar" {
   name            = "{{ .arg0 }}-upd"
+  virtual_domain  = "{{ .arg1 }}-upd.usacloud.jp"
   subdomain_label = "{{ .arg1 }}"
   access_level    = "readonly"
 
@@ -172,8 +184,9 @@ resource "sakuracloud_container_registry" "foobar" {
   tags        = ["tag1-upd", "tag2-upd"]
   
   user {
-    name     = "user1"
-    password = "{{ .arg2 }}"
+    name       = "user1"
+    password   = "{{ .arg2 }}"
+    permission = "all"
   }
 }
 `
