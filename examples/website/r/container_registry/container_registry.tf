@@ -1,16 +1,19 @@
 variable users {
   type = list(object({
-    name     = string
-    password = string
+    name       = string
+    password   = string
+    permission = string
   }))
   default = [
     {
-      name     = "user1"
-      password = "password1"
+      name       = "user1"
+      password   = "password1"
+      permission = "all"
     },
     {
-      name     = "user2"
-      password = "password2"
+      name       = "user2"
+      password   = "password2"
+      permission = "readwrite"
     }
   ]
 }
@@ -26,8 +29,9 @@ resource "sakuracloud_container_registry" "foobar" {
   dynamic user {
     for_each = var.users
     content {
-      name     = user.value.name
-      password = user.value.password
+      name       = user.value.name
+      password   = user.value.password
+      permission = user.value.permission
     }
   }
 }

@@ -50,6 +50,11 @@ func resourceSakuraCloudContainerRegistry() *schema.Resource {
 					types.ContainerRegistryAccessLevelStrings,
 				),
 			},
+			"virtual_domain": {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Description: "The alias for accessing the container registry",
+			},
 			"subdomain_label": {
 				Type:         schema.TypeString,
 				Required:     true,
@@ -83,6 +88,15 @@ func resourceSakuraCloudContainerRegistry() *schema.Resource {
 							Required:    true,
 							Sensitive:   true,
 							Description: "The password used to authenticate remote access",
+						},
+						"permission": {
+							Type:         schema.TypeString,
+							Required:     true,
+							ValidateFunc: validation.StringInSlice(types.ContainerRegistryPermissionStrings, false),
+							Description: descf(
+								"The level of access that allow to the user. This must be one of [%s]",
+								types.ContainerRegistryPermissionStrings,
+							),
 						},
 					},
 				},
@@ -129,7 +143,7 @@ func resourceSakuraCloudContainerRegistryRead(d *schema.ResourceData, meta inter
 		}
 		return fmt.Errorf("could not find SakuraCloud ContainerRegistry[%s]: %s", d.Id(), err)
 	}
-	return setContainerRegistryResourceData(ctx, d, client, reg)
+	return setContainerRegistryResourceData(ctx, d, client, reg, true)
 }
 
 func resourceSakuraCloudContainerRegistryUpdate(d *schema.ResourceData, meta interface{}) error {
@@ -180,12 +194,24 @@ func resourceSakuraCloudContainerRegistryDelete(d *schema.ResourceData, meta int
 	return nil
 }
 
-func setContainerRegistryResourceData(ctx context.Context, d *schema.ResourceData, client *APIClient, data *sacloud.ContainerRegistry) error {
+func setContainerRegistryResourceData(ctx context.Context, d *schema.ResourceData, client *APIClient, data *sacloud.ContainerRegistry, includePassword bool) error {
+	regOp := sacloud.NewContainerRegistryOp(client)
+
+	users, err := regOp.ListUsers(ctx, data.ID)
+	if err != nil {
+		return err
+	}
+
 	d.Set("name", data.Name)                         // nolint
 	d.Set("access_level", data.AccessLevel.String()) // nolint
+	d.Set("virtual_domain", data.VirtualDomain)      // nolint
 	d.Set("subdomain_label", data.SubDomainLabel)    // nolint
 	d.Set("fqdn", data.FQDN)                         // nolint
 	d.Set("icon_id", data.IconID.String())           // nolint
 	d.Set("description", data.Description)           // nolint
+
+	if err := d.Set("user", flattenContainerRegistryUsers(d, users.Users, includePassword)); err != nil {
+		return err
+	}
 	return d.Set("tags", flattenTags(data.Tags))
 }

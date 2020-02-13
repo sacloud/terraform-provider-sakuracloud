@@ -126,7 +126,8 @@ func (o *ContainerRegistryOp) AddUser(ctx context.Context, id types.ID, param *s
 		users = v.([]*sacloud.ContainerRegistryUser)
 	}
 	users = append(users, &sacloud.ContainerRegistryUser{
-		UserName: param.UserName,
+		UserName:   param.UserName,
+		Permission: param.Permission,
 	})
 
 	ds().Put(ResourceContainerRegistry+"Users", sacloud.APIDefaultZone, id, users)
@@ -144,6 +145,13 @@ func (o *ContainerRegistryOp) UpdateUser(ctx context.Context, id types.ID, usern
 	if v == nil {
 		return newErrorNotFound(ResourceContainerRegistry+"Users", id)
 	}
+	users := v.([]*sacloud.ContainerRegistryUser)
+	for _, u := range users {
+		if u.UserName == username {
+			u.Permission = param.Permission
+		}
+	}
+	ds().Put(ResourceContainerRegistry+"Users", sacloud.APIDefaultZone, id, users)
 	return nil
 }
 

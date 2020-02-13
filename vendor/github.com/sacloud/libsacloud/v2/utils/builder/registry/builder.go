@@ -28,6 +28,7 @@ type Builder struct {
 	Description    string
 	Tags           types.Tags
 	IconID         types.ID
+	VirtualDomain  string
 	AccessLevel    types.EContainerRegistryAccessLevel
 	SubDomainLabel string
 	Users          []*User
@@ -38,8 +39,9 @@ type Builder struct {
 
 // User ユーザー
 type User struct {
-	UserName string
-	Password string
+	UserName   string
+	Password   string
+	Permission types.EContainerRegistryPermission
 }
 
 // Validate 値の検証
@@ -63,6 +65,7 @@ func (b *Builder) Build(ctx context.Context) (*sacloud.ContainerRegistry, error)
 		IconID:         b.IconID,
 		AccessLevel:    b.AccessLevel,
 		SubDomainLabel: b.SubDomainLabel,
+		VirtualDomain:  b.VirtualDomain,
 	})
 	if err != nil {
 		return nil, err
@@ -71,8 +74,9 @@ func (b *Builder) Build(ctx context.Context) (*sacloud.ContainerRegistry, error)
 	// add users
 	for _, user := range b.Users {
 		u := &sacloud.ContainerRegistryUserCreateRequest{
-			UserName: user.UserName,
-			Password: user.Password,
+			UserName:   user.UserName,
+			Password:   user.Password,
+			Permission: user.Permission,
 		}
 		if err := b.Client.ContainerRegistry.AddUser(ctx, reg.ID, u); err != nil {
 			return nil, err
@@ -95,12 +99,13 @@ func (b *Builder) Update(ctx context.Context, id types.ID) (*sacloud.ContainerRe
 	}
 
 	_, err = b.Client.ContainerRegistry.Update(ctx, id, &sacloud.ContainerRegistryUpdateRequest{
-		Name:         b.Name,
-		Description:  b.Description,
-		Tags:         b.Tags,
-		IconID:       b.IconID,
-		AccessLevel:  b.AccessLevel,
-		SettingsHash: b.SettingsHash,
+		Name:          b.Name,
+		Description:   b.Description,
+		Tags:          b.Tags,
+		IconID:        b.IconID,
+		AccessLevel:   b.AccessLevel,
+		VirtualDomain: b.VirtualDomain,
+		SettingsHash:  b.SettingsHash,
 	})
 	if err != nil {
 		return nil, err
@@ -114,8 +119,9 @@ func (b *Builder) Update(ctx context.Context, id types.ID) (*sacloud.ContainerRe
 	// added
 	for _, user := range added {
 		u := &sacloud.ContainerRegistryUserCreateRequest{
-			UserName: user.UserName,
-			Password: user.Password,
+			UserName:   user.UserName,
+			Password:   user.Password,
+			Permission: user.Permission,
 		}
 		if err := b.Client.ContainerRegistry.AddUser(ctx, id, u); err != nil {
 			return nil, err
@@ -124,7 +130,8 @@ func (b *Builder) Update(ctx context.Context, id types.ID) (*sacloud.ContainerRe
 	// updated
 	for _, user := range updated {
 		u := &sacloud.ContainerRegistryUserUpdateRequest{
-			Password: user.Password,
+			Password:   user.Password,
+			Permission: user.Permission,
 		}
 		err := b.Client.ContainerRegistry.UpdateUser(ctx, id, user.UserName, u)
 		if err != nil {
