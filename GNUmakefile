@@ -129,7 +129,8 @@ fmt:
 .PHONY: docscheck
 docscheck:
 	tfproviderdocs check \
-		-require-resource-subcategory
+		-require-resource-subcategory \
+		-require-guide-subcategory
 
 .PHONY: set-license
 set-license:
