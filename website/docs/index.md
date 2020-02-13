@@ -16,7 +16,7 @@ The SakuraCloud Provider is used to interact with the many resources supported b
 provider "sakuracloud" {
   # We recommend pinning to the specific version of the SakuraCloud Provider you're using
   # since new versions are released frequently
-  version = "=2.0.1"
+  version = "=2.1.0"
 
   # More information on the authentication methods supported by
   # the SakuraCloud Provider can be found here:
