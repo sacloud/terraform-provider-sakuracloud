@@ -6,7 +6,7 @@ require (
 	github.com/hashicorp/go-hclog v0.10.0 // indirect
 	github.com/hashicorp/go-multierror v1.0.1-0.20190722213833-bdca7bb83f60
 	github.com/hashicorp/hcl v1.0.0 // indirect
-	github.com/hashicorp/terraform-plugin-sdk v1.6.0
+	github.com/hashicorp/terraform-plugin-sdk v1.7.0
 	github.com/mattn/go-isatty v0.0.12 // indirect
 	github.com/mitchellh/go-homedir v1.1.0
 	github.com/mitchellh/goamz v0.0.0-20150317174335-caaaea8b30ee
