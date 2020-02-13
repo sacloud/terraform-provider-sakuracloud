@@ -31,14 +31,14 @@ clean:
 
 .PHONY: tools
 tools:
-	GO111MODULE=off go get github.com/x-motemen/gobump/cmd/gobump
-	GO111MODULE=off go get golang.org/x/tools/cmd/goimports
-	GO111MODULE=off go get github.com/sacloud/addlicense
-	GO111MODULE=off go get github.com/tcnksm/ghr
-	GO111MODULE=on go install github.com/bflad/tfproviderdocs
-	GO111MODULE=on go install github.com/bflad/tfproviderlint/cmd/tfproviderlintx
-	GO111MODULE=on go install github.com/client9/misspell/cmd/misspell
-	GO111MODULE=on go install github.com/golangci/golangci-lint/cmd/golangci-lint
+	go get github.com/x-motemen/gobump/cmd/gobump
+	go get golang.org/x/tools/cmd/goimports
+	go get github.com/sacloud/addlicense
+	go get github.com/tcnksm/ghr
+	go install github.com/bflad/tfproviderdocs
+	go install github.com/bflad/tfproviderlint/cmd/tfproviderlintx
+	go install github.com/client9/misspell/cmd/misspell
+	go install github.com/golangci/golangci-lint/cmd/golangci-lint
 
 
 .PHONY: build-envs
