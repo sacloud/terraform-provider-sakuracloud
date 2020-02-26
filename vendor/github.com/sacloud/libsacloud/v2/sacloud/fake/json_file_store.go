@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+// +build freebsd openbsd netbsd dragonfly darwin windows
+
 package fake
 
 import (
@@ -19,7 +21,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
-	"log"
 	"os"
 	"reflect"
 	"sort"
@@ -27,8 +28,6 @@ import (
 	"sync"
 
 	"github.com/fatih/structs"
-
-	"github.com/fsnotify/fsnotify"
 
 	"github.com/sacloud/libsacloud/v2/sacloud"
 	"github.com/sacloud/libsacloud/v2/sacloud/types"
@@ -187,53 +186,6 @@ func (s *JSONFileStore) Init() error {
 	}
 	s.startWatcher()
 	return nil
-}
-
-func (s *JSONFileStore) startWatcher() {
-	ctx := s.Ctx
-	watcher, err := fsnotify.NewWatcher()
-	if err != nil {
-		panic(err)
-	}
-	log.Printf("file watch start: %q", s.Path)
-
-	go func() {
-		defer watcher.Close()
-		for {
-			select {
-			case event, ok := <-watcher.Events:
-				if !ok {
-					return
-				}
-				switch {
-				case event.Op&fsnotify.Write == fsnotify.Write,
-					event.Op&fsnotify.Create == fsnotify.Create,
-					event.Op&fsnotify.Rename == fsnotify.Rename:
-
-					if err := s.load(); err != nil {
-						log.Printf("reloading %q is failed: %s\n", s.Path, err)
-					}
-
-					if event.Op&fsnotify.Rename == fsnotify.Rename {
-						if err := watcher.Add(s.Path); err != nil {
-							panic(err)
-						}
-					}
-					log.Printf("reloaded: %q\n", s.Path)
-				}
-			case err, ok := <-watcher.Errors:
-				if !ok {
-					return
-				}
-				panic(err)
-			case <-ctx.Done():
-				return
-			}
-		}
-	}()
-	if err := watcher.Add(s.Path); err != nil {
-		panic(err)
-	}
 }
 
 // NeedInitData .

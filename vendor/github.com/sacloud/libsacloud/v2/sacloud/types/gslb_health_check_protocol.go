@@ -24,8 +24,6 @@ func (p EGSLBHealthCheckProtocol) String() string {
 
 // GSLBHealthCheckProtocols GSLB 監視プロトコル
 var GSLBHealthCheckProtocols = struct {
-	// Unknown 不明
-	Unknown EGSLBHealthCheckProtocol
 	// HTTP http
 	HTTP EGSLBHealthCheckProtocol
 	// HTTPS https
@@ -35,16 +33,13 @@ var GSLBHealthCheckProtocols = struct {
 	// Ping ping
 	Ping EGSLBHealthCheckProtocol
 }{
-	Unknown: EGSLBHealthCheckProtocol(""),
-	HTTP:    EGSLBHealthCheckProtocol("http"),
-	HTTPS:   EGSLBHealthCheckProtocol("https"),
-	TCP:     EGSLBHealthCheckProtocol("tcp"),
-	Ping:    EGSLBHealthCheckProtocol("ping"),
+	HTTP:  EGSLBHealthCheckProtocol("http"),
+	HTTPS: EGSLBHealthCheckProtocol("https"),
+	TCP:   EGSLBHealthCheckProtocol("tcp"),
+	Ping:  EGSLBHealthCheckProtocol("ping"),
 }
 
 // GSLBHealthCheckProtocolStrings 有効なGSLB監視プロトコルを示す文字列のリスト
-//
-// Unknown(空文字)は含まない
 var GSLBHealthCheckProtocolStrings = []string{
 	GSLBHealthCheckProtocols.HTTP.String(),
 	GSLBHealthCheckProtocols.HTTPS.String(),

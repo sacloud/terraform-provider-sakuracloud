@@ -19,8 +19,6 @@ type EDNSRecordType string
 
 // DNSRecordTypes DNSレコード種別
 var DNSRecordTypes = struct {
-	// Unknown 不明
-	Unknown EDNSRecordType
 	// A Aレコード
 	A EDNSRecordType
 	// AAAA AAAAレコード
@@ -42,17 +40,16 @@ var DNSRecordTypes = struct {
 	// PTR PTRレコード
 	PTR EDNSRecordType
 }{
-	Unknown: EDNSRecordType(""),
-	A:       EDNSRecordType("A"),
-	AAAA:    EDNSRecordType("AAAA"),
-	ALIAS:   EDNSRecordType("ALIAS"),
-	CNAME:   EDNSRecordType("CNAME"),
-	NS:      EDNSRecordType("NS"),
-	MX:      EDNSRecordType("MX"),
-	TXT:     EDNSRecordType("TXT"),
-	SRV:     EDNSRecordType("SRV"),
-	CAA:     EDNSRecordType("CAA"),
-	PTR:     EDNSRecordType("PTR"),
+	A:     EDNSRecordType("A"),
+	AAAA:  EDNSRecordType("AAAA"),
+	ALIAS: EDNSRecordType("ALIAS"),
+	CNAME: EDNSRecordType("CNAME"),
+	NS:    EDNSRecordType("NS"),
+	MX:    EDNSRecordType("MX"),
+	TXT:   EDNSRecordType("TXT"),
+	SRV:   EDNSRecordType("SRV"),
+	CAA:   EDNSRecordType("CAA"),
+	PTR:   EDNSRecordType("PTR"),
 }
 
 // String EDNSRecordTypeの文字列表現
@@ -61,8 +58,6 @@ func (t EDNSRecordType) String() string {
 }
 
 // DNSRecordTypeStrings 有効なDNSレコードタイプを示す文字列のリスト
-//
-// Unknown(空文字)は含まない
 var DNSRecordTypeStrings = []string{
 	DNSRecordTypes.A.String(),
 	DNSRecordTypes.AAAA.String(),

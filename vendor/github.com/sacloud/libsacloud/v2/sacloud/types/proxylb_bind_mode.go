@@ -19,8 +19,6 @@ type EProxyLBProxyMode string
 
 // ProxyLBProxyModes エンハンスドロードバランサでのプロキシ方式
 var ProxyLBProxyModes = struct {
-	// Unknown 不明
-	Unknown EProxyLBProxyMode
 	// HTTP .
 	HTTP EProxyLBProxyMode
 	// HTTPS .
@@ -28,10 +26,9 @@ var ProxyLBProxyModes = struct {
 	// TCP .
 	TCP EProxyLBProxyMode
 }{
-	Unknown: EProxyLBProxyMode(""),
-	HTTP:    EProxyLBProxyMode("http"),
-	HTTPS:   EProxyLBProxyMode("https"),
-	TCP:     EProxyLBProxyMode("tcp"),
+	HTTP:  EProxyLBProxyMode("http"),
+	HTTPS: EProxyLBProxyMode("https"),
+	TCP:   EProxyLBProxyMode("tcp"),
 }
 
 // String EProxyLBProxyModeの文字列表現

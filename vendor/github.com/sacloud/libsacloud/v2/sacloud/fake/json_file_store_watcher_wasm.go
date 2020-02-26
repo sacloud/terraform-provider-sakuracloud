@@ -12,7 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package libsacloud
+// +build wasm
 
-// Version バージョン
-const Version = "2.1.3"
+package fake
+
+import "log"
+
+func (s *JSONFileStore) startWatcher() {
+	log.Println("[WARN] fake json file store is not supported fsnotify on wasm")
+}

@@ -18,9 +18,21 @@ package types
 var LoadBalancerPlans = struct {
 	// Standard スタンダード
 	Standard ID
-	// Premium プレミアム
-	Premium ID
+	// HighSpec プレミアム
+	HighSpec ID
 }{
 	Standard: ID(1),
-	Premium:  ID(2),
+	HighSpec: ID(2),
+}
+
+// LoadBalancerPlanNameMap ロードバランサのIDとプラン名のマップ
+var LoadBalancerPlanNameMap = map[ID]string{
+	LoadBalancerPlans.Standard: "standard",
+	LoadBalancerPlans.HighSpec: "highspec",
+}
+
+// LoadBalancerPlanIDNameMap ロードバランサのプラン名とIDのマップ
+var LoadBalancerPlanIDNameMap = map[string]ID{
+	"standard": LoadBalancerPlans.Standard,
+	"highspec": LoadBalancerPlans.HighSpec,
 }

@@ -107,7 +107,7 @@ func expandLoadBalancerPlanID(d resourceValueGettable) types.ID {
 		return types.LoadBalancerPlans.Standard
 	}
 
-	return types.LoadBalancerPlans.Premium
+	return types.LoadBalancerPlans.HighSpec
 }
 
 func flattenLoadBalancerPlanID(lb *sacloud.LoadBalancer) string {
@@ -115,7 +115,7 @@ func flattenLoadBalancerPlanID(lb *sacloud.LoadBalancer) string {
 	switch lb.PlanID {
 	case types.LoadBalancerPlans.Standard:
 		plan = "standard"
-	case types.LoadBalancerPlans.Premium:
+	case types.LoadBalancerPlans.HighSpec:
 		plan = "highspec"
 	}
 	return plan

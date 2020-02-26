@@ -16,3 +16,23 @@ package types
 
 // VPCRouterFirewallProtocolStrings VPCルータでのファイアウォールプロトコルを表す文字列
 var VPCRouterFirewallProtocolStrings = []string{"tcp", "udp", "icmp", "ip"}
+
+// EVPCRouterFirewallProtocol VPCルータでのファイアウォールプロトコルを表す文字列
+type EVPCRouterFirewallProtocol string
+
+// VPCRouterFirewallProtocols ファイアアウォール プロトコル
+var VPCRouterFirewallProtocols = struct {
+	// TCP tcp
+	TCP EVPCRouterFirewallProtocol
+	// UDP udp
+	UDP EVPCRouterFirewallProtocol
+	// ICMP udp
+	ICMP EVPCRouterFirewallProtocol
+	// ICMP udp
+	IP EVPCRouterFirewallProtocol
+}{
+	TCP:  EVPCRouterFirewallProtocol("tcp"),
+	UDP:  EVPCRouterFirewallProtocol("udp"),
+	ICMP: EVPCRouterFirewallProtocol("icmp"),
+	IP:   EVPCRouterFirewallProtocol("ip"),
+}
