@@ -25,7 +25,6 @@ func (t EUpstreamNetworkType) String() string {
 var (
 	// UpstreamNetworkTypes 上流ネットワーク種別
 	UpstreamNetworkTypes = struct {
-		// Unknown 不明(invalid)
 		Unknown EUpstreamNetworkType
 		// Shared 共有セグメント
 		Shared EUpstreamNetworkType

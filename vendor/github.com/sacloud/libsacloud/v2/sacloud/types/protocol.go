@@ -42,8 +42,6 @@ func (p Protocol) String() string {
 }
 
 // PacketFilterProtocolStrings 有効なパケットフィルタプロトコルを示す文字列のリスト
-//
-// Unknown(空文字)は含まない
 var PacketFilterProtocolStrings = []string{
 	Protocols.HTTP.String(),
 	Protocols.HTTPS.String(),

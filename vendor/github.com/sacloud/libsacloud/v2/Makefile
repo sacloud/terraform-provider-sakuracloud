@@ -32,7 +32,6 @@ testacc:
 tools:
 	GO111MODULE=off go get golang.org/x/tools/cmd/goimports
 	GO111MODULE=off go get golang.org/x/tools/cmd/stringer
-	GO111MODULE=off go get github.com/motemen/gobump
 	GO111MODULE=off go get github.com/sacloud/addlicense
 	GO111MODULE=off go get -u github.com/client9/misspell/cmd/misspell
 	curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/v1.19.1/install.sh | sh -s -- -b $$(go env GOPATH)/bin v1.19.1
@@ -75,23 +74,6 @@ godoc:
 .PHONY: lint
 lint:
 	golangci-lint run ./...
-
-.PHONY: bump-patch bump-minor bump-major version
-bump-patch:
-	@gobump patch -w ; echo "next version is v`gobump show -r`"
-
-bump-minor:
-	@gobump minor -w ; echo "next version is v`gobump show -r`"
-
-bump-major:
-	@gobump major -w ; echo "next version is v`gobump show -r`"
-
-version:
-	@gobump show -r
-
-.PHONY: git tag
-git-tag:
-	git tag v`gobump show -r`
 
 .PHONY: set-license
 set-license:

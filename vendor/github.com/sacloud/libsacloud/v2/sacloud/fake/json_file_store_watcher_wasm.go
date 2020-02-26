@@ -12,26 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package types
+// +build wasm
 
-// EProxyLBRegion エンハンスドロードバランサ 設置先リージョン
-type EProxyLBRegion string
+package fake
 
-// String EProxyLBRegionの文字列表現
-func (r EProxyLBRegion) String() string {
-	return string(r)
+import "log"
+
+func (s *JSONFileStore) startWatcher() {
+	log.Println("[WARN] fake json file store is not supported fsnotify on wasm")
 }
-
-// ProxyLBRegions エンハンスドロードバランサ 設置先リージョン
-var ProxyLBRegions = struct {
-	// TK1 東京
-	TK1 EProxyLBRegion
-	// IS1 石狩
-	IS1 EProxyLBRegion
-}{
-	TK1: EProxyLBRegion("tk1"),
-	IS1: EProxyLBRegion("is1"),
-}
-
-// ProxyLBRegionStrings 設置先リージョンを表す文字列
-var ProxyLBRegionStrings = []string{"tk1", "is1"}

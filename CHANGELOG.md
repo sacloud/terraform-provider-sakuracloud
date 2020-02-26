@@ -1,6 +1,7 @@
 ## 2.1.1 (Unreleased)
 
-*
+* tfproviderlint v0.10.0 [GH-708] (@yamamoto-febc)
+* libsacloud v2.1.4 [GH-708] (@yamamoto-febc)
 
 ## 2.1.0 (2020-02-14)
 

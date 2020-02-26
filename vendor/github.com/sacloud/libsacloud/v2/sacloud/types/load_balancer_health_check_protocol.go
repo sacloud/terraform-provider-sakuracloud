@@ -24,8 +24,6 @@ func (p ELoadBalancerHealthCheckProtocol) String() string {
 
 // LoadBalancerHealthCheckProtocols ロードバランサ 監視プロトコル
 var LoadBalancerHealthCheckProtocols = struct {
-	// Unknown 不明
-	Unknown ELoadBalancerHealthCheckProtocol
 	// HTTP http
 	HTTP ELoadBalancerHealthCheckProtocol
 	// HTTPS https
@@ -35,16 +33,13 @@ var LoadBalancerHealthCheckProtocols = struct {
 	// Ping ping
 	Ping ELoadBalancerHealthCheckProtocol
 }{
-	Unknown: ELoadBalancerHealthCheckProtocol(""),
-	HTTP:    ELoadBalancerHealthCheckProtocol("http"),
-	HTTPS:   ELoadBalancerHealthCheckProtocol("https"),
-	TCP:     ELoadBalancerHealthCheckProtocol("tcp"),
-	Ping:    ELoadBalancerHealthCheckProtocol("ping"),
+	HTTP:  ELoadBalancerHealthCheckProtocol("http"),
+	HTTPS: ELoadBalancerHealthCheckProtocol("https"),
+	TCP:   ELoadBalancerHealthCheckProtocol("tcp"),
+	Ping:  ELoadBalancerHealthCheckProtocol("ping"),
 }
 
 // LoadBalancerHealthCheckProtocolStrings 有効なロードバランサ監視プロトコルを示す文字列のリスト
-//
-// Unknown(空文字)は含まない
 var LoadBalancerHealthCheckProtocolStrings = []string{
 	LoadBalancerHealthCheckProtocols.HTTP.String(),
 	LoadBalancerHealthCheckProtocols.HTTPS.String(),

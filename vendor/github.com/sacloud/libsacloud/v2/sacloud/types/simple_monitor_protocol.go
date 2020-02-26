@@ -24,8 +24,6 @@ func (p ESimpleMonitorProtocol) String() string {
 
 // SimpleMonitorProtocols シンプル監視 プロトコル
 var SimpleMonitorProtocols = struct {
-	// Unknown 不明
-	Unknown ESimpleMonitorProtocol
 	// HTTP http
 	HTTP ESimpleMonitorProtocol
 	// HTTPS https
@@ -47,7 +45,6 @@ var SimpleMonitorProtocols = struct {
 	// SSLCertificate sslcertificate
 	SSLCertificate ESimpleMonitorProtocol
 }{
-	Unknown:        ESimpleMonitorProtocol(""),
 	HTTP:           ESimpleMonitorProtocol("http"),
 	HTTPS:          ESimpleMonitorProtocol("https"),
 	Ping:           ESimpleMonitorProtocol("ping"),

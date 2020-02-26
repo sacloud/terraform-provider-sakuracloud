@@ -36,3 +36,9 @@ var NFSPlanIDMap = map[string]ID{
 	"hdd": NFSPlans.HDD,
 	"ssd": NFSPlans.SSD,
 }
+
+// NFSPlanNameMap NFSプランIDと名前のマップ
+var NFSPlanNameMap = map[ID]string{
+	NFSPlans.HDD: "hdd",
+	NFSPlans.SSD: "ssd",
+}

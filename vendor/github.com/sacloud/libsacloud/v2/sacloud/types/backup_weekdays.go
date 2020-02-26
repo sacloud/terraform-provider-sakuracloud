@@ -21,21 +21,21 @@ type EBackupSpanWeekday string
 
 // BackupSpanWeekdays バックアップ取得曜日
 var BackupSpanWeekdays = struct {
+	Sunday    EBackupSpanWeekday
 	Monday    EBackupSpanWeekday
 	Tuesday   EBackupSpanWeekday
 	Wednesday EBackupSpanWeekday
 	Thursday  EBackupSpanWeekday
 	Friday    EBackupSpanWeekday
 	Saturday  EBackupSpanWeekday
-	Sunday    EBackupSpanWeekday
 }{
+	Sunday:    EBackupSpanWeekday("sun"),
 	Monday:    EBackupSpanWeekday("mon"),
 	Tuesday:   EBackupSpanWeekday("tue"),
 	Wednesday: EBackupSpanWeekday("wed"),
 	Thursday:  EBackupSpanWeekday("thu"),
 	Friday:    EBackupSpanWeekday("fri"),
 	Saturday:  EBackupSpanWeekday("sat"),
-	Sunday:    EBackupSpanWeekday("sun"),
 }
 
 // String Stringer実装
