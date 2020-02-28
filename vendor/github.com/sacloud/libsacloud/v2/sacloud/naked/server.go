@@ -39,7 +39,7 @@ type Server struct {
 	Disks             []*Disk                `json:",omitempty" yaml:"disks,omitempty" structs:",omitempty"`
 	Interfaces        []*Interface           `json:",omitempty" yaml:"interfaces,omitempty" structs:",omitempty"`
 	PrivateHost       *PrivateHost           `json:",omitempty" yaml:"private_host,omitempty" structs:",omitempty"`
-	WaitDiskMigration bool                   `json:",omitempty" yaml:"wait_disk_migration,omitempty" structs:",omitempty"`
+	WaitDiskMigration bool                   `yaml:"wait_disk_migration"`
 	ConnectedSwitches []*ConnectedSwitch     `json:",omitempty" yaml:"connected_switches,omitempty" structs:",omitempty"`
 }
 

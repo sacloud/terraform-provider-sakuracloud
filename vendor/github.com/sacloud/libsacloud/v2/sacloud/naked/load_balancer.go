@@ -88,7 +88,7 @@ func (s LoadBalancerSetting) MarshalJSON() ([]byte, error) {
 type LoadBalancerDestinationServer struct {
 	IPAddress   string             `json:",omitempty" yaml:"ip_address,omitempty" structs:",omitempty"`
 	Port        types.StringNumber `json:",omitempty" yaml:"port,omitempty" structs:",omitempty"`
-	Enabled     types.StringFlag   `json:",omitempty" yaml:"enabled,omitempty" structs:",omitempty"`
+	Enabled     types.StringFlag   `yaml:"enabled"`
 	HealthCheck *HealthCheck       `json:",omitempty" yaml:"health_check,omitempty" structs:",omitempty"`
 }
 

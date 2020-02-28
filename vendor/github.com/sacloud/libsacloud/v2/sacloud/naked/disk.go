@@ -77,5 +77,5 @@ func (e *JobConfigError) String() string {
 
 // ResizePartitionRequest リサイズ時のオプション
 type ResizePartitionRequest struct {
-	Background bool `json:",omitempty" yaml:"background,omitempty" structs:",omitempty"`
+	Background bool `yaml:"background"`
 }
