@@ -31,14 +31,14 @@ clean:
 
 .PHONY: tools
 tools:
-	go get github.com/x-motemen/gobump/cmd/gobump
-	go get golang.org/x/tools/cmd/goimports
-	go get github.com/sacloud/addlicense
-	go get github.com/tcnksm/ghr
-	go install github.com/bflad/tfproviderdocs
-	go install github.com/bflad/tfproviderlint/cmd/tfproviderlintx
-	go install github.com/client9/misspell/cmd/misspell
-	go install github.com/golangci/golangci-lint/cmd/golangci-lint
+	GO111MODULE=off go get github.com/x-motemen/gobump/cmd/gobump
+	GO111MODULE=off go get golang.org/x/tools/cmd/goimports
+	GO111MODULE=off go get github.com/sacloud/addlicense
+	GO111MODULE=off go get github.com/tcnksm/ghr
+	GO111MODULE=off go get github.com/bflad/tfproviderdocs
+	GO111MODULE=off go get github.com/bflad/tfproviderlint/cmd/tfproviderlintx
+	GO111MODULE=off go get github.com/client9/misspell/cmd/misspell
+	GO111MODULE=off go get github.com/golangci/golangci-lint/cmd/golangci-lint
 
 
 .PHONY: build-envs
@@ -92,15 +92,15 @@ release: build-envs
 
 .PHONY: test
 test:
-	TF_ACC= SAKURACLOUD_APPEND_USER_AGENT="$(UNIT_TEST_UA)" go test -mod=vendor -v $(TESTARGS) -timeout=30s ./...
+	TF_ACC= SAKURACLOUD_APPEND_USER_AGENT="$(UNIT_TEST_UA)" go test -v $(TESTARGS) -timeout=30s ./...
 
 .PHONY: testacc
 testacc:
-	TF_ACC=1 SAKURACLOUD_APPEND_USER_AGENT="$(ACC_TEST_UA)" go test -mod=vendor -v $(TESTARGS) -timeout 240m ./...
+	TF_ACC=1 SAKURACLOUD_APPEND_USER_AGENT="$(ACC_TEST_UA)" go test -v $(TESTARGS) -timeout 240m ./...
 
 .PHONY: testfake
 testfake:
-	FAKE_MODE=1 TF_ACC=1 SAKURACLOUD_APPEND_USER_AGENT="$(ACC_TEST_UA)" go test -mod=vendor -v $(TESTARGS) -timeout 240m ./...
+	FAKE_MODE=1 TF_ACC=1 SAKURACLOUD_APPEND_USER_AGENT="$(ACC_TEST_UA)" go test -v $(TESTARGS) -timeout 240m ./...
 
 .PHONY: lint
 lint:
