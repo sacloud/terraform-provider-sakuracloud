@@ -1,6 +1,6 @@
 module github.com/sacloud/terraform-provider-sakuracloud
 
-go 1.13
+go 1.14
 
 require (
 	github.com/hashicorp/go-hclog v0.10.0 // indirect
