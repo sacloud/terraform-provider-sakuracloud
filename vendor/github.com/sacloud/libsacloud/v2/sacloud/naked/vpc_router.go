@@ -72,7 +72,7 @@ type VPCRouterSetting struct {
 
 // VPCRouterInternetConnection インターフェース
 type VPCRouterInternetConnection struct {
-	Enabled types.StringFlag `json:",omitempty" yaml:",omitempty" structs:",omitempty"`
+	Enabled types.StringFlag `yaml:"enabled"`
 }
 
 // VPCRouterInterface インターフェース
@@ -152,7 +152,7 @@ func (i *VPCRouterInterface) MarshalJSON() ([]byte, error) {
 // VPCRouterStaticNAT スタティックNAT
 type VPCRouterStaticNAT struct {
 	Config  []*VPCRouterStaticNATConfig `json:",omitempty" yaml:",omitempty" structs:",omitempty"`
-	Enabled types.StringFlag            `json:",omitempty" yaml:",omitempty" structs:",omitempty"`
+	Enabled types.StringFlag            `yaml:"enabled"`
 }
 
 // MarshalJSON Configが一つ以上ある場合にEnabledをtrueに設定する
@@ -178,7 +178,7 @@ type VPCRouterStaticNATConfig struct {
 // VPCRouterPortForwarding ポートフォワーディング設定
 type VPCRouterPortForwarding struct {
 	Config  []*VPCRouterPortForwardingConfig `json:",omitempty" yaml:",omitempty" structs:",omitempty"`
-	Enabled types.StringFlag                 `json:",omitempty" yaml:",omitempty" structs:",omitempty"`
+	Enabled types.StringFlag                 `yaml:"enabled"`
 }
 
 // MarshalJSON Configが一つ以上ある場合にEnabledをtrueに設定する
@@ -206,7 +206,7 @@ type VPCRouterPortForwardingConfig struct {
 // VPCRouterFirewall ファイアウォール
 type VPCRouterFirewall struct {
 	Config  VPCRouterFirewallConfigs `json:",omitempty" yaml:",omitempty" structs:",omitempty"`
-	Enabled types.StringFlag         `json:",omitempty" yaml:",omitempty" structs:",omitempty"`
+	Enabled types.StringFlag         `yaml:"enabled"`
 }
 
 // MarshalJSON 常にEnabledをtrueに設定する
@@ -292,14 +292,14 @@ type VPCRouterFirewallRule struct {
 	DestinationNetwork types.VPCFirewallNetwork `json:",omitempty" yaml:",omitempty" structs:",omitempty"`
 	DestinationPort    types.VPCFirewallPort    `json:",omitempty" yaml:",omitempty" structs:",omitempty"`
 	Action             types.Action             `json:",omitempty" yaml:",omitempty" structs:",omitempty"`
-	Logging            types.StringFlag         `json:",omitempty" yaml:",omitempty" structs:",omitempty"`
+	Logging            types.StringFlag         `yaml:"enabled"`
 	Description        string                   `yaml:"description"`
 }
 
 // VPCRouterDHCPServer DHCPサーバ
 type VPCRouterDHCPServer struct {
 	Config  []*VPCRouterDHCPServerConfig `json:",omitempty" yaml:",omitempty" structs:",omitempty"`
-	Enabled types.StringFlag             `json:",omitempty" yaml:",omitempty" structs:",omitempty"`
+	Enabled types.StringFlag             `yaml:"enabled"`
 }
 
 // MarshalJSON Configが一つ以上ある場合にEnabledをtrueに設定する
@@ -326,7 +326,7 @@ type VPCRouterDHCPServerConfig struct {
 // VPCRouterDHCPStaticMappings DHCPスタティックマッピング
 type VPCRouterDHCPStaticMappings struct {
 	Config  []*VPCRouterDHCPStaticMappingConfig `json:",omitempty" yaml:",omitempty" structs:",omitempty"`
-	Enabled types.StringFlag                    `json:",omitempty" yaml:",omitempty" structs:",omitempty"`
+	Enabled types.StringFlag                    `yaml:"enabled"`
 }
 
 // MarshalJSON Configが一つ以上ある場合にEnabledをtrueに設定する
@@ -351,7 +351,7 @@ type VPCRouterDHCPStaticMappingConfig struct {
 // VPCRouterPPTPServer PPTP
 type VPCRouterPPTPServer struct {
 	Config  *VPCRouterPPTPServerConfig `json:",omitempty" yaml:",omitempty" structs:",omitempty"`
-	Enabled types.StringFlag           `json:",omitempty" yaml:",omitempty" structs:",omitempty"`
+	Enabled types.StringFlag           `yaml:"enabled"`
 }
 
 // VPCRouterPPTPServerConfig PPTP
@@ -363,7 +363,7 @@ type VPCRouterPPTPServerConfig struct {
 // VPCRouterL2TPIPsecServer L2TP
 type VPCRouterL2TPIPsecServer struct {
 	Config  *VPCRouterL2TPIPsecServerConfig `json:",omitempty" yaml:",omitempty" structs:",omitempty"`
-	Enabled types.StringFlag                `json:",omitempty" yaml:",omitempty" structs:",omitempty"`
+	Enabled types.StringFlag                `yaml:"enabled"`
 }
 
 // VPCRouterL2TPIPsecServerConfig L2TP
@@ -376,7 +376,7 @@ type VPCRouterL2TPIPsecServerConfig struct {
 // VPCRouterRemoteAccessUsers リモートアクセスユーザー
 type VPCRouterRemoteAccessUsers struct {
 	Config  []*VPCRouterRemoteAccessUserConfig `json:",omitempty" yaml:",omitempty" structs:",omitempty"`
-	Enabled types.StringFlag                   `json:",omitempty" yaml:",omitempty" structs:",omitempty"`
+	Enabled types.StringFlag                   `yaml:"enabled"`
 }
 
 // MarshalJSON Configが一つ以上ある場合にEnabledをtrueに設定する
@@ -401,7 +401,7 @@ type VPCRouterRemoteAccessUserConfig struct {
 // VPCRouterSiteToSiteIPsecVPN サイト間VPN
 type VPCRouterSiteToSiteIPsecVPN struct {
 	Config  []*VPCRouterSiteToSiteIPsecVPNConfig `json:",omitempty" yaml:",omitempty" structs:",omitempty"`
-	Enabled types.StringFlag                     `json:",omitempty" yaml:",omitempty" structs:",omitempty"`
+	Enabled types.StringFlag                     `yaml:"enabled"`
 }
 
 // MarshalJSON Configが一つ以上ある場合にEnabledをtrueに設定する
@@ -429,7 +429,7 @@ type VPCRouterSiteToSiteIPsecVPNConfig struct {
 // VPCRouterStaticRoutes スタティックルート
 type VPCRouterStaticRoutes struct {
 	Config  []*VPCRouterStaticRouteConfig `json:",omitempty" yaml:",omitempty" structs:",omitempty"`
-	Enabled types.StringFlag              `json:",omitempty" yaml:",omitempty" structs:",omitempty"`
+	Enabled types.StringFlag              `yaml:"enabled"`
 }
 
 // MarshalJSON Configが一つ以上ある場合にEnabledをtrueに設定する

@@ -100,7 +100,7 @@ func (m *Map) Get(key string) (interface{}, error) {
 		k = strings.Replace(k, "[]", "", -1)
 
 		value := targetMap[k]
-		if value == nil {
+		if value == nil || reflect.ValueOf(value).IsZero() {
 			return nil, nil
 		}
 		if last {

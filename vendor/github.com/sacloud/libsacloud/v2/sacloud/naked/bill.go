@@ -26,7 +26,7 @@ type Bill struct {
 	Amount         int64      `json:",omitempty" yaml:"amount,omitempty" structs:",omitempty"`           // 金額
 	Date           *time.Time `json:",omitempty" yaml:"date,omitempty" structs:",omitempty"`             // 請求日
 	MemberID       string     `json:",omitempty" yaml:"member_id,omitempty" structs:",omitempty"`        // 会員ID
-	Paid           bool       `json:",omitempty" yaml:"paid,omitempty" structs:",omitempty"`             // 支払済フラグ
+	Paid           bool       `yaml:"paid"`                                                              // 支払済フラグ
 	PayLimit       *time.Time `json:",omitempty" yaml:"pay_limit,omitempty" structs:",omitempty"`        // 支払い期限
 	PaymentClassID types.ID   `json:",omitempty" yaml:"payment_class_id,omitempty" structs:",omitempty"` // 支払いクラスID
 }

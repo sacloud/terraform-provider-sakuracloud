@@ -33,8 +33,8 @@ type WebAccelSite struct {
 	Origin             string                    `json:",omitempty" yaml:"origin,omitempty" structs:",omitempty"`
 	HostHeader         string                    `json:",omitempty" yaml:"host_header,omitempty" structs:",omitempty"`
 	Status             types.EWebAccelStatus     `json:",omitempty" yaml:"status,omitempty" structs:",omitempty"`
-	HasCertificate     bool                      `json:",omitempty" yaml:"has_certificate,omitempty" structs:",omitempty"`
-	HasOldCertificate  bool                      `json:",omitempty" yaml:"has_old_certificate,omitempty" structs:",omitempty"`
+	HasCertificate     bool                      `yaml:"has_certificate"`
+	HasOldCertificate  bool                      `yaml:"has_old_certificate"`
 	GibSentInLastWeek  int64                     `json:",omitempty" yaml:"gib_sent_in_last_week,omitempty" structs:",omitempty"`
 	CertValidNotBefore int64                     `json:",omitempty" yaml:"cert_valid_not_before,omitempty" structs:",omitempty"`
 	CertValidNotAfter  int64                     `json:",omitempty" yaml:"cert_valid_not_after,omitempty" structs:",omitempty"`
