@@ -79,7 +79,7 @@ func (b *Builder) Build(ctx context.Context) (*sacloud.ContainerRegistry, error)
 			Permission: user.Permission,
 		}
 		if err := b.Client.ContainerRegistry.AddUser(ctx, reg.ID, u); err != nil {
-			return nil, err
+			return reg, err
 		}
 	}
 

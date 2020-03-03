@@ -23,6 +23,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/helper/validation"
 	"github.com/sacloud/libsacloud/v2/sacloud"
 	"github.com/sacloud/libsacloud/v2/sacloud/types"
+	"github.com/sacloud/libsacloud/v2/utils/cleanup"
 )
 
 func resourceSakuraCloudPrivateHost() *schema.Resource {
@@ -163,13 +164,10 @@ func resourceSakuraCloudPrivateHostDelete(d *schema.ResourceData, meta interface
 		return fmt.Errorf("could not read SakuraCloud PrivateHost[%s]: %s", d.Id(), err)
 	}
 
-	if err := waitForDeletionByPrivateHostID(ctx, client, zone, ph.ID); err != nil {
-		return fmt.Errorf("waiting deletion is failed: PrivateHost[%s] still used by Server: %s", ph.ID, err)
-	}
-
-	if err := phOp.Delete(ctx, zone, ph.ID); err != nil {
+	if err := cleanup.DeletePrivateHost(ctx, client, zone, ph.ID, client.checkReferencedOption()); err != nil {
 		return fmt.Errorf("deleting SakuraCloud PrivateHost[%s] is failed: %s", d.Id(), err)
 	}
+	d.SetId("")
 	return nil
 }
 

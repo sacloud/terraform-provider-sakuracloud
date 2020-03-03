@@ -72,27 +72,27 @@ func (b *Builder) Build(ctx context.Context) (*sacloud.SIM, error) {
 	}
 
 	if err := b.Client.SIM.SetNetworkOperator(ctx, sim.ID, b.Carrier); err != nil {
-		return nil, err
+		return sim, err
 	}
 
 	if b.Activate {
 		if err := b.Client.SIM.Activate(ctx, sim.ID); err != nil {
-			return nil, err
+			return sim, err
 		}
 	}
 
 	if b.IMEI != "" {
 		if err := b.Client.SIM.IMEILock(ctx, sim.ID, &sacloud.SIMIMEILockRequest{IMEI: b.IMEI}); err != nil {
-			return nil, err
+			return sim, err
 		}
 	}
 
 	// reload
-	sim, err = query.FindSIMByID(ctx, b.Client.SIM, sim.ID)
+	refreshed, err := query.FindSIMByID(ctx, b.Client.SIM, sim.ID)
 	if err != nil {
-		return nil, err
+		return sim, err
 	}
-	return sim, nil
+	return refreshed, nil
 }
 
 // Update SIMの更新

@@ -696,6 +696,9 @@ func build(ctx context.Context, client *APIClient, zone string, serverID types.I
 		disk, err = client.Disk.CreateWithConfig(ctx, zone, diskReq, editReq, false, distantFrom)
 	}
 	if err != nil {
+		if disk != nil {
+			return &BuildResult{DiskID: disk.ID}, err
+		}
 		return nil, err
 	}
 
@@ -704,6 +707,9 @@ func build(ctx context.Context, client *APIClient, zone string, serverID types.I
 	})
 	lastState, err := waiter.WaitForState(ctx)
 	if err != nil {
+		if lastState != nil {
+			return &BuildResult{DiskID: lastState.(*sacloud.Disk).ID}, err
+		}
 		return nil, err
 	}
 	disk = lastState.(*sacloud.Disk)

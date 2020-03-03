@@ -21,6 +21,7 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/sacloud/libsacloud/v2/sacloud"
+	"github.com/sacloud/libsacloud/v2/utils/cleanup"
 )
 
 func resourceSakuraCloudSwitch() *schema.Resource {
@@ -193,12 +194,8 @@ func resourceSakuraCloudSwitchDelete(d *schema.ResourceData, meta interface{}) e
 		}
 	}
 
-	if err := waitForDeletionBySwitchID(ctx, client, zone, sw.ID); err != nil {
-		return fmt.Errorf("waiting deletion is failed: Switch[%s] still used by others: %s", sw.ID, err)
-	}
-
-	if err := swOp.Delete(ctx, zone, sw.ID); err != nil {
-		return fmt.Errorf("deleting SakuraCloud Switch[%s] is failed: %s", sw.ID, err)
+	if err := cleanup.DeleteSwitch(ctx, client, zone, sw.ID, client.checkReferencedOption()); err != nil {
+		return fmt.Errorf("deleting SakuraCloud PacketFilter[%s] is failed: %s", d.Id(), err)
 	}
 	return nil
 }

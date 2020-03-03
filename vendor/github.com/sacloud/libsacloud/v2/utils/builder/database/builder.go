@@ -116,10 +116,13 @@ func (b *Builder) Build(ctx context.Context, zone string) (*sacloud.Database, er
 	}
 
 	result, err := builder.Setup(ctx, zone)
-	if err != nil {
-		return nil, err
+	var db *sacloud.Database
+	if result != nil {
+		db = result.(*sacloud.Database)
 	}
-	db := result.(*sacloud.Database)
+	if err != nil {
+		return db, err
+	}
 
 	// refresh
 	db, err = b.Client.Database.Read(ctx, zone, db.ID)

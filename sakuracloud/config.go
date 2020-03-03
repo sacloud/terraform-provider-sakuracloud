@@ -33,6 +33,7 @@ import (
 	"github.com/sacloud/libsacloud/v2/sacloud/profile"
 	"github.com/sacloud/libsacloud/v2/sacloud/trace"
 	"github.com/sacloud/libsacloud/v2/utils/builder"
+	"github.com/sacloud/libsacloud/v2/utils/query"
 	"github.com/sacloud/libsacloud/v2/utils/setup"
 )
 
@@ -80,6 +81,13 @@ type APIClient struct {
 	deletionWaiterTimeout           time.Duration
 	deletionWaiterPollingInterval   time.Duration
 	databaseWaitAfterCreateDuration time.Duration
+}
+
+func (c *APIClient) checkReferencedOption() query.CheckReferencedOption {
+	return query.CheckReferencedOption{
+		Tick:    c.deletionWaiterPollingInterval,
+		Timeout: c.deletionWaiterTimeout,
+	}
 }
 
 func (c *Config) loadFromProfile() error {

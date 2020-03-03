@@ -24,6 +24,7 @@ import (
 	"github.com/sacloud/libsacloud/v2/sacloud"
 	"github.com/sacloud/libsacloud/v2/sacloud/types"
 	"github.com/sacloud/libsacloud/v2/utils/cleanup"
+	"github.com/sacloud/libsacloud/v2/utils/query"
 )
 
 func resourceSakuraCloudInternet() *schema.Resource {
@@ -221,7 +222,7 @@ func resourceSakuraCloudInternetDelete(d *schema.ResourceData, meta interface{})
 		return fmt.Errorf("could not read SakuraCloud Internet[%s]: %s", d.Id(), err)
 	}
 
-	if err := waitForDeletionBySwitchID(ctx, client, zone, internet.Switch.ID); err != nil {
+	if err := query.WaitWhileSwitchIsReferenced(ctx, client, zone, internet.Switch.ID, client.checkReferencedOption()); err != nil {
 		return fmt.Errorf("waiting deletion is failed: Internet[%s] still used by others: %s", internet.ID, err)
 	}
 

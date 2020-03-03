@@ -27,6 +27,7 @@ import (
 	"github.com/sacloud/iso9660wrap"
 	"github.com/sacloud/libsacloud/v2/sacloud"
 	"github.com/sacloud/libsacloud/v2/sacloud/types"
+	"github.com/sacloud/libsacloud/v2/utils/cleanup"
 )
 
 func resourceSakuraCloudCDROM() *schema.Resource {
@@ -205,14 +206,9 @@ func resourceSakuraCloudCDROMDelete(d *schema.ResourceData, meta interface{}) er
 		return fmt.Errorf("could not read SakuraCloud CDROM[%s]: %s", d.Id(), err)
 	}
 
-	if err := waitForDeletionByCDROMID(ctx, client, zone, cdrom.ID); err != nil {
-		return fmt.Errorf("waiting deletion is failed: CDROM[%s] still used by Servers: %s", cdrom.ID, err)
+	if err := cleanup.DeleteCDROM(ctx, client, zone, cdrom.ID, client.checkReferencedOption()); err != nil {
+		return fmt.Errorf("deleting SakuraCloud CDROM[%s] is failed: %s", d.Id(), err)
 	}
-
-	if err := cdromOp.Delete(ctx, zone, cdrom.ID); err != nil {
-		return fmt.Errorf("deleting SakuraCloud CDROM[%s] is failed: %s", cdrom.ID, err)
-	}
-
 	d.SetId("")
 	return nil
 }
