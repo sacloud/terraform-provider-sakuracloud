@@ -67,7 +67,7 @@ func (b *Builder) Build(ctx context.Context) (*sacloud.LocalRouter, error) {
 		return nil, err
 	}
 
-	updLocalRouter, err := b.Client.LocalRouter.UpdateSettings(ctx, localRouter.ID, &sacloud.LocalRouterUpdateSettingsRequest{
+	lr, err := b.Client.LocalRouter.UpdateSettings(ctx, localRouter.ID, &sacloud.LocalRouterUpdateSettingsRequest{
 		Switch:       b.Switch,
 		Interface:    b.Interface,
 		StaticRoutes: b.StaticRoutes,
@@ -76,9 +76,10 @@ func (b *Builder) Build(ctx context.Context) (*sacloud.LocalRouter, error) {
 	if err != nil {
 		return localRouter, err
 	}
+	localRouter = lr
 
 	if len(b.Peers) > 0 {
-		updLocalRouter, err = b.Client.LocalRouter.UpdateSettings(ctx, localRouter.ID, &sacloud.LocalRouterUpdateSettingsRequest{
+		lr, err := b.Client.LocalRouter.UpdateSettings(ctx, localRouter.ID, &sacloud.LocalRouterUpdateSettingsRequest{
 			Switch:       localRouter.Switch,
 			Interface:    localRouter.Interface,
 			StaticRoutes: localRouter.StaticRoutes,
@@ -88,9 +89,10 @@ func (b *Builder) Build(ctx context.Context) (*sacloud.LocalRouter, error) {
 		if err != nil {
 			return localRouter, err
 		}
+		localRouter = lr
 	}
 
-	return updLocalRouter, nil
+	return localRouter, nil
 }
 
 // Update ローカルルータの更新
