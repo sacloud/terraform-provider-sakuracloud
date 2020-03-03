@@ -56,6 +56,7 @@ type Builder struct {
 // BuildResult サーバ構築結果
 type BuildResult struct {
 	ServerID               types.ID
+	DiskIDs                []types.ID
 	GeneratedSSHPrivateKey string
 }
 
@@ -130,8 +131,9 @@ func (b *Builder) Build(ctx context.Context, zone string) (*BuildResult, error) 
 	for _, diskReq := range b.DiskBuilders {
 		builtDisk, err := diskReq.Build(ctx, zone, server.ID)
 		if err != nil {
-			return nil, err
+			return result, err
 		}
+		result.DiskIDs = append(result.DiskIDs, builtDisk.DiskID)
 		if builtDisk.GeneratedSSHKey != nil {
 			result.GeneratedSSHPrivateKey = builtDisk.GeneratedSSHKey.PrivateKey
 		}
@@ -139,21 +141,21 @@ func (b *Builder) Build(ctx context.Context, zone string) (*BuildResult, error) 
 
 	// connect packet filter
 	if err := b.updateInterfaces(ctx, zone, server); err != nil {
-		return nil, err
+		return result, err
 	}
 
 	// insert CD-ROM
 	if !b.CDROMID.IsEmpty() {
 		req := &sacloud.InsertCDROMRequest{ID: b.CDROMID}
 		if err := b.Client.Server.InsertCDROM(ctx, zone, server.ID, req); err != nil {
-			return nil, err
+			return result, err
 		}
 	}
 
 	// bool
 	if b.BootAfterCreate {
 		if err := power.BootServer(ctx, b.Client.Server, zone, server.ID); err != nil {
-			return nil, err
+			return result, err
 		}
 	}
 
@@ -211,29 +213,29 @@ func (b *Builder) Update(ctx context.Context, zone string) (*BuildResult, error)
 
 	server, err := b.Client.Server.Read(ctx, zone, b.ServerID)
 	if err != nil {
-		return nil, err
+		return result, err
 	}
 
 	isNeedShutdown, err := b.IsNeedShutdown(ctx, zone)
 	if err != nil {
-		return nil, err
+		return result, err
 	}
 
 	// shutdown
 	if isNeedShutdown && server.InstanceStatus.IsUp() {
 		if err := power.ShutdownServer(ctx, b.Client.Server, zone, server.ID, b.ForceShutdown); err != nil {
-			return nil, err
+			return result, err
 		}
 	}
 
 	// reconcile disks
 	if err := b.reconcileDisks(ctx, zone, server, result); err != nil {
-		return nil, err
+		return result, err
 	}
 
 	// reconcile interface
 	if err := b.reconcileInterfaces(ctx, zone, server); err != nil {
-		return nil, err
+		return result, err
 	}
 
 	// plan
@@ -245,7 +247,7 @@ func (b *Builder) Update(ctx context.Context, zone string) (*BuildResult, error)
 			ServerPlanCommitment: b.Commitment,
 		})
 		if err != nil {
-			return nil, err
+			return result, err
 		}
 		server = updated
 	}
@@ -260,26 +262,27 @@ func (b *Builder) Update(ctx context.Context, zone string) (*BuildResult, error)
 		InterfaceDriver: b.InterfaceDriver,
 	})
 	if err != nil {
-		return nil, err
+		return result, err
 	}
 	server = updated
+	result.ServerID = server.ID
 
 	// insert CD-ROM
 	if !b.CDROMID.IsEmpty() && b.CDROMID != server.CDROMID {
 		if !server.CDROMID.IsEmpty() {
 			if err := b.Client.Server.EjectCDROM(ctx, zone, server.ID, &sacloud.EjectCDROMRequest{ID: server.CDROMID}); err != nil {
-				return nil, err
+				return result, err
 			}
 		}
 		if err := b.Client.Server.InsertCDROM(ctx, zone, server.ID, &sacloud.InsertCDROMRequest{ID: b.CDROMID}); err != nil {
-			return nil, err
+			return result, err
 		}
 	}
 
 	// bool
 	if isNeedShutdown && server.InstanceStatus.IsDown() {
 		if err := power.BootServer(ctx, b.Client.Server, zone, server.ID); err != nil {
-			return nil, err
+			return result, err
 		}
 	}
 
@@ -528,9 +531,11 @@ func (b *Builder) reconcileDisks(ctx context.Context, zone string, server *saclo
 		}
 		// reconnect all
 		for _, diskReq := range b.DiskBuilders {
+			result.DiskIDs = []types.ID{}
 			if err := b.Client.Disk.ConnectToServer(ctx, zone, diskReq.DiskID(), server.ID); err != nil {
 				return err
 			}
+			result.DiskIDs = append(result.DiskIDs, diskReq.DiskID())
 		}
 	}
 	return nil

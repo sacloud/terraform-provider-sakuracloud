@@ -213,17 +213,20 @@ func (b *Builder) Build(ctx context.Context, zone string) (*sacloud.MobileGatewa
 	}
 
 	result, err := builder.Setup(ctx, zone)
-	if err != nil {
-		return nil, err
+	var mgw *sacloud.MobileGateway
+	if result != nil {
+		mgw = result.(*sacloud.MobileGateway)
 	}
-	mgw := result.(*sacloud.MobileGateway)
+	if err != nil {
+		return mgw, err
+	}
 
 	// refresh
-	mgw, err = b.Client.MobileGateway.Read(ctx, zone, mgw.ID)
+	refreshed, err := b.Client.MobileGateway.Read(ctx, zone, mgw.ID)
 	if err != nil {
-		return nil, err
+		return mgw, err
 	}
-	return mgw, nil
+	return refreshed, nil
 }
 
 // Update モバイルゲートウェイの更新

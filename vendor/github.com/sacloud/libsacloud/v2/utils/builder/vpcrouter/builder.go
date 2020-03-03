@@ -248,17 +248,20 @@ func (b *Builder) Build(ctx context.Context, zone string) (*sacloud.VPCRouter, e
 	}
 
 	result, err := builder.Setup(ctx, zone)
-	if err != nil {
-		return nil, err
+	var vpcRouter *sacloud.VPCRouter
+	if result != nil {
+		vpcRouter = result.(*sacloud.VPCRouter)
 	}
-	vpcRouter := result.(*sacloud.VPCRouter)
+	if err != nil {
+		return vpcRouter, err
+	}
 
 	// refresh
-	vpcRouter, err = b.Client.Read(ctx, zone, vpcRouter.ID)
+	refreshed, err := b.Client.Read(ctx, zone, vpcRouter.ID)
 	if err != nil {
-		return nil, err
+		return vpcRouter, err
 	}
-	return vpcRouter, nil
+	return refreshed, nil
 }
 
 // Update VPCルータの更新(再起動を伴う場合あり)

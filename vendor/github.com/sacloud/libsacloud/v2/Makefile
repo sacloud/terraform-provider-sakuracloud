@@ -22,7 +22,7 @@ default: gen fmt set-license goimports lint test
 
 .PHONY: tests
 test:
-	TESTACC= go test ./... $(TESTARGS) -v -timeout=120m -parallel=8 ;
+	TESTACC= go test ./... $(TESTARGS) -v -timeout=120m -parallel=8 -race;
 
 .PHONY: testacc
 testacc:

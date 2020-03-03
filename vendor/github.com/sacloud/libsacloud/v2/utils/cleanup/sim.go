@@ -16,6 +16,7 @@ package cleanup
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/sacloud/libsacloud/v2/sacloud"
 	"github.com/sacloud/libsacloud/v2/sacloud/types"
@@ -34,4 +35,12 @@ func DeleteSIM(ctx context.Context, client sacloud.SIMAPI, id types.ID) error {
 		}
 	}
 	return client.Delete(ctx, id)
+}
+
+// DeleteSIMWithReferencedCheck 他リソースからの参照を確認した上でリソースの削除を行う
+func DeleteSIMWithReferencedCheck(ctx context.Context, caller sacloud.APICaller, zones []string, id types.ID, option query.CheckReferencedOption) error {
+	if err := query.WaitWhileSIMIsReferenced(ctx, caller, zones, id, option); err != nil {
+		return fmt.Errorf("SIM[%s] is still being used by other resources: %s", id, err)
+	}
+	return DeleteSIM(ctx, sacloud.NewSIMOp(caller), id)
 }

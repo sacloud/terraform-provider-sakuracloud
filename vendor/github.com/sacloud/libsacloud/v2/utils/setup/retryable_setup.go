@@ -118,7 +118,7 @@ func (r *RetryableSetup) Setup(ctx context.Context, zone string) (interface{}, e
 			// コピー待ち、Failedになった場合はリソース削除
 			state, err := r.waitForCopyWithCleanup(ctx, zone, id)
 			if err != nil {
-				return nil, err
+				return state, err
 			}
 			if state != nil {
 				created = state
@@ -129,12 +129,12 @@ func (r *RetryableSetup) Setup(ctx context.Context, zone string) (interface{}, e
 
 		// 起動前の設定など
 		if err := r.provisionBeforeUp(ctx, zone, id, created); err != nil {
-			return nil, err
+			return created, err
 		}
 
 		// 起動待ち
 		if err := r.waitForUp(ctx, zone, id, created); err != nil {
-			return nil, err
+			return created, err
 		}
 
 		if created != nil {

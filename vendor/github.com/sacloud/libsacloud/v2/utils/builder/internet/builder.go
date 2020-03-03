@@ -81,13 +81,13 @@ func (b *Builder) Build(ctx context.Context, zone string) (*sacloud.Internet, er
 		return b.Client.Internet.Read(ctx, zone, internet.ID)
 	}, b.NotFoundRetry)
 	if _, err := waiter.WaitForState(ctx); err != nil {
-		return nil, err
+		return internet, err
 	}
 
 	if b.EnableIPv6 {
 		_, err = b.Client.Internet.EnableIPv6(ctx, zone, internet.ID)
 		if err != nil {
-			return nil, err
+			return internet, err
 		}
 	}
 
