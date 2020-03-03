@@ -19,10 +19,9 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/sacloud/libsacloud/v2/utils/cleanup"
-
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/sacloud/libsacloud/v2/sacloud"
+	"github.com/sacloud/libsacloud/v2/utils/cleanup"
 )
 
 func resourceSakuraCloudSwitch() *schema.Resource {

@@ -21,14 +21,13 @@ import (
 	"os"
 	"time"
 
-	"github.com/sacloud/libsacloud/v2/utils/cleanup"
-
 	"github.com/hashicorp/terraform-plugin-sdk/helper/customdiff"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/mitchellh/go-homedir"
 	"github.com/sacloud/iso9660wrap"
 	"github.com/sacloud/libsacloud/v2/sacloud"
 	"github.com/sacloud/libsacloud/v2/sacloud/types"
+	"github.com/sacloud/libsacloud/v2/utils/cleanup"
 )
 
 func resourceSakuraCloudCDROM() *schema.Resource {

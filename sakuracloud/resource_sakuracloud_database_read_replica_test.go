@@ -19,10 +19,9 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/sacloud/libsacloud/v2/sacloud"
-
 	"github.com/hashicorp/terraform-plugin-sdk/helper/resource"
 	"github.com/hashicorp/terraform-plugin-sdk/terraform"
+	"github.com/sacloud/libsacloud/v2/sacloud"
 )
 
 func TestAccSakuraCloudDatabaseReplica_basic(t *testing.T) {
