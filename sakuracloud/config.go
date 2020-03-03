@@ -26,6 +26,8 @@ import (
 	"sync"
 	"time"
 
+	"github.com/sacloud/libsacloud/v2/utils/query"
+
 	"github.com/hashicorp/go-multierror"
 	"github.com/hashicorp/terraform-plugin-sdk/httpclient"
 	"github.com/sacloud/libsacloud/v2/sacloud"
@@ -80,6 +82,13 @@ type APIClient struct {
 	deletionWaiterTimeout           time.Duration
 	deletionWaiterPollingInterval   time.Duration
 	databaseWaitAfterCreateDuration time.Duration
+}
+
+func (c *APIClient) checkReferencedOption() query.CheckReferencedOption {
+	return query.CheckReferencedOption{
+		Tick:    c.deletionWaiterPollingInterval,
+		Timeout: c.deletionWaiterTimeout,
+	}
 }
 
 func (c *Config) loadFromProfile() error {

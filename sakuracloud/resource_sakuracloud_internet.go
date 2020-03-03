@@ -19,6 +19,8 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/sacloud/libsacloud/v2/utils/query"
+
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/validation"
 	"github.com/sacloud/libsacloud/v2/sacloud"
@@ -221,7 +223,7 @@ func resourceSakuraCloudInternetDelete(d *schema.ResourceData, meta interface{})
 		return fmt.Errorf("could not read SakuraCloud Internet[%s]: %s", d.Id(), err)
 	}
 
-	if err := waitForDeletionBySwitchID(ctx, client, zone, internet.Switch.ID); err != nil {
+	if err := query.WaitWhileSwitchIsReferenced(ctx, client, zone, internet.Switch.ID, client.checkReferencedOption()); err != nil {
 		return fmt.Errorf("waiting deletion is failed: Internet[%s] still used by others: %s", internet.ID, err)
 	}
 

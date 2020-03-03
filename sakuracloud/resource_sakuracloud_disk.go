@@ -19,6 +19,8 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/sacloud/libsacloud/v2/utils/cleanup"
+
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/validation"
 	"github.com/sacloud/libsacloud/v2/sacloud"
@@ -199,13 +201,10 @@ func resourceSakuraCloudDiskDelete(d *schema.ResourceData, meta interface{}) err
 		return fmt.Errorf("could not read SakuraCloud Disk[%s]: %s", d.Id(), err)
 	}
 
-	if err := waitForDeletionByDiskID(ctx, client, zone, disk.ID); err != nil {
-		return fmt.Errorf("waiting deletion is failed: Disk[%s] still used by Servers: %s", disk.ID, err)
-	}
-
-	if err := diskOp.Delete(ctx, zone, disk.ID); err != nil {
+	if err := cleanup.DeleteDisk(ctx, client, zone, disk.ID, client.checkReferencedOption()); err != nil {
 		return fmt.Errorf("deleting SakuraCloud Disk[%s] is failed: %s", d.Id(), err)
 	}
+	d.SetId("")
 	return nil
 }
 

@@ -197,14 +197,10 @@ func resourceSakuraCloudSIMDelete(d *schema.ResourceData, meta interface{}) erro
 		return fmt.Errorf("could not read SakuraCloud SIM[%s]: %s", d.Id(), err)
 	}
 
-	if err := waitForDeletionBySIMID(ctx, client, sim.ID); err != nil {
-		return fmt.Errorf("waiting deletion is failed: SIM[%s] still used by MobileGateway: %s", sim.ID, err)
+	if err := cleanup.DeleteSIMWithReferencedCheck(ctx, client, client.zones, sim.ID, client.checkReferencedOption()); err != nil {
+		return fmt.Errorf("deleting SakuraCloud SIM[%s] is failed: %s", d.Id(), err)
 	}
-
-	if err := cleanup.DeleteSIM(ctx, simOp, sim.ID); err != nil {
-		return fmt.Errorf("deleting SIM[%s] is failed: %s", sim.ID, err)
-	}
-
+	d.SetId("")
 	return nil
 }
 

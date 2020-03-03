@@ -19,6 +19,8 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/sacloud/libsacloud/v2/utils/cleanup"
+
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/sacloud/libsacloud/v2/sacloud"
 )
@@ -135,11 +137,7 @@ func resourceSakuraCloudBridgeDelete(d *schema.ResourceData, meta interface{}) e
 		return fmt.Errorf("could not read SakuraCloud Bridge[%s]: %s", d.Id(), err)
 	}
 
-	if err := waitForDeletionByBridgeID(ctx, client, bridge.ID); err != nil {
-		return fmt.Errorf("waiting deletion is failed: Bridge[%s] still used by Switches: %s", bridge.ID, err)
-	}
-
-	if err := bridgeOp.Delete(ctx, zone, bridge.ID); err != nil {
+	if err := cleanup.DeleteBridge(ctx, client, zone, client.zones, bridge.ID, client.checkReferencedOption()); err != nil {
 		return fmt.Errorf("deleting SakuraCloud Bridge[%s] is failed: %s", d.Id(), err)
 	}
 	d.SetId("")
