@@ -195,7 +195,7 @@ func resourceSakuraCloudSwitchDelete(d *schema.ResourceData, meta interface{}) e
 	}
 
 	if err := cleanup.DeleteSwitch(ctx, client, zone, sw.ID, client.checkReferencedOption()); err != nil {
-		return fmt.Errorf("deleting SakuraCloud PacketFilter[%s] is failed: %s", d.Id(), err)
+		return fmt.Errorf("deleting SakuraCloud Switch[%s] is failed: %s", d.Id(), err)
 	}
 	return nil
 }
