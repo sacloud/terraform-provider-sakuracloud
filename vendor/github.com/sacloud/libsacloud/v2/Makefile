@@ -16,11 +16,10 @@
 AUTHOR          ?="The Libsacloud Authors"
 COPYRIGHT_YEAR  ?="2016-2020"
 COPYRIGHT_FILES ?=$$(find . -name "*.go" -print | grep -v "/vendor/")
-export GO111MODULE=on
 
 default: gen fmt set-license goimports lint test
 
-.PHONY: tests
+.PHONY: test
 test:
 	TESTACC= go test ./... $(TESTARGS) -v -timeout=120m -parallel=8 -race;
 
@@ -34,7 +33,7 @@ tools:
 	GO111MODULE=off go get golang.org/x/tools/cmd/stringer
 	GO111MODULE=off go get github.com/sacloud/addlicense
 	GO111MODULE=off go get -u github.com/client9/misspell/cmd/misspell
-	curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/v1.19.1/install.sh | sh -s -- -b $$(go env GOPATH)/bin v1.19.1
+	curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/v1.23.8/install.sh | sh -s -- -b $$(go env GOPATH)/bin v1.23.8
 
 .PHONY: clean
 clean:
@@ -56,7 +55,7 @@ gen_fake_data: _gen_fake_data fmt goimports set-license
 
 .PHONY: _gen_fake_data
 _gen_fake_data:
-	go run -mod=vendor internal/tools/gen-api-fake-data/main.go
+	go run internal/tools/gen-api-fake-data/main.go
 
 .PHONY: goimports
 goimports: fmt

@@ -50,9 +50,9 @@ type SIMInfo struct {
 	IMSI                       []string         `json:"imsi,omitempty" yaml:"imsi,omitempty" structs:",omitempty"`
 	IP                         string           `json:"ip,omitempty" yaml:"ip,omitempty" structs:",omitempty"`
 	SessionStatus              string           `json:"session_status,omitempty" yaml:"session_status,omitempty" structs:",omitempty"`
-	IMEILock                   bool             `yaml:"imei_lock"`
-	Registered                 bool             `yaml:"registered"`
-	Activated                  bool             `yaml:"activated"`
+	IMEILock                   bool             `json:"imei_lock" yaml:"imei_lock"`
+	Registered                 bool             `json:"registered" yaml:"registered"`
+	Activated                  bool             `json:"activated" yaml:"activated"`
 	ResourceID                 string           `json:"resource_id,omitempty" yaml:"resource_id,omitempty" structs:",omitempty"`
 	RegisteredDate             time.Time        `json:"registered_date,omitempty" yaml:"registered_date,omitempty" structs:",omitempty"`
 	ActivatedDate              time.Time        `json:"activated_date,omitempty" yaml:"activated_date,omitempty" structs:",omitempty"`
@@ -108,7 +108,7 @@ type SIMLog struct {
 
 // SIMNetworkOperatorConfig SIM通信キャリア設定
 type SIMNetworkOperatorConfig struct {
-	Allow       bool   `yaml:"allow"`
+	Allow       bool   `json:"allow" yaml:"allow"`
 	CountryCode string `json:"country_code,omitempty" yaml:"country_code,omitempty" structs:",omitempty"`
 	Name        string `json:"name,omitempty" yaml:"name,omitempty" structs:",omitempty"`
 }
