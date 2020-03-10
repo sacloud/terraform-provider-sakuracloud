@@ -5,6 +5,7 @@
 * Go 1.14 [GH-712] (@yamamoto-febc)
 * Fix wrong error message [GH-718] (@yamamoto-febc)
 * libsacloud v2.1.8 to avoid marshal JSON error at SIM [GH-714] (@yamamoto-febc)
+* libsacloud v2.1.9 [GH-723] (@yamamoto-febc)
 
 ## 2.1.1 (2020-02-28)
 
