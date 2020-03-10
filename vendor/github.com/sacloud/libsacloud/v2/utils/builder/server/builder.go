@@ -174,7 +174,18 @@ func (b *Builder) IsNeedShutdown(ctx context.Context, zone string) (bool, error)
 		return false, err
 	}
 
-	if !reflect.DeepEqual(b.currentState(server), b.desiredState()) {
+	current := b.currentState(server)
+	desired := b.desiredState()
+
+	// シャットダウンが不要な項目には固定値を入れる
+	var nics []*nicState
+	nics = append(nics, current.nic)
+	nics = append(nics, current.additionalNICs...)
+	nics = append(nics, desired.nic)
+	nics = append(nics, desired.additionalNICs...)
+	b.fillDummyValueToState(nics...)
+
+	if !reflect.DeepEqual(current, desired) {
 		return true, nil
 	}
 
@@ -197,6 +208,15 @@ func (b *Builder) IsNeedShutdown(ctx context.Context, zone string) (bool, error)
 		}
 	}
 	return false, nil
+}
+
+func (b *Builder) fillDummyValueToState(state ...*nicState) {
+	for _, s := range state {
+		if s != nil {
+			s.packetFilterID = types.ID(0)
+			s.displayIP = ""
+		}
+	}
 }
 
 // Update サーバの更新
@@ -553,10 +573,12 @@ func (b *Builder) reconcileInterfaces(ctx context.Context, zone string, server *
 				desired = desiredState.additionalNICs[i-1]
 			}
 		}
-		if desired == nil && !nic.SwitchID.IsEmpty() {
+		if desired == nil {
 			// disconnect and delete
-			if err := b.Client.Interface.DisconnectFromSwitch(ctx, zone, nic.ID); err != nil {
-				return err
+			if !nic.SwitchID.IsEmpty() {
+				if err := b.Client.Interface.DisconnectFromSwitch(ctx, zone, nic.ID); err != nil {
+					return err
+				}
 			}
 			if err := b.Client.Interface.Delete(ctx, zone, nic.ID); err != nil {
 				return err
@@ -577,6 +599,9 @@ func (b *Builder) reconcileInterfaces(ctx context.Context, zone string, server *
 	desiredNICs = append(desiredNICs, desiredState.additionalNICs...)
 
 	for i, desired := range desiredNICs {
+		if desired == nil {
+			continue
+		}
 		var nic *sacloud.InterfaceView
 		if len(server.Interfaces) > i {
 			nic = server.Interfaces[i]
@@ -642,5 +667,6 @@ func (b *Builder) isPlanChanged(server *sacloud.Server) bool {
 	return b.CPU != server.CPU ||
 		b.MemoryGB != server.GetMemoryGB() ||
 		b.Commitment != server.ServerPlanCommitment ||
-		b.Generation != server.ServerPlanGeneration
+		(b.Generation != types.PlanGenerations.Default && b.Generation != server.ServerPlanGeneration)
+	//b.Generation != server.ServerPlanGeneration
 }
