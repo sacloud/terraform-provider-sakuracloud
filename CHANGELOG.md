@@ -1,4 +1,8 @@
-## 2.1.2 (Unreleased)
+## 2.1.3 (Unreleased)
+
+* 
+
+## 2.1.2 (2020-03-10)
 
 * Remove deletion waiter [GH-713] (@yamamoto-febc)
 * libsacloud v2.1.7 [GH-713] (@yamamoto-febc)
