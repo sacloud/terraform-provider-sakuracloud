@@ -1,4 +1,11 @@
-## 2.1.3 (Unreleased)
+## 2.2.0 (Unreleased)
+
+FEATURES
+
+* Supports transferred/shared archives [GH-727] (@yamamoto-febc)
+    * libsacloud v2.4.1
+
+IMPROVEMENTS
 
 * Set ID to state even if got error from builders [GH-726] (@yamamoto-febc)
 * libsacloud v2.3.0 - MariaDB 10.4 [GH-724]
