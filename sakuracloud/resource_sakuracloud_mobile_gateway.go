@@ -230,11 +230,13 @@ func resourceSakuraCloudMobileGatewayCreate(d *schema.ResourceData, meta interfa
 	}
 
 	mgw, err := builder.Build(ctx, zone)
+	if mgw != nil {
+		d.SetId(mgw.ID.String())
+	}
 	if err != nil {
 		return fmt.Errorf("creating SakuraCloud MobileGateway is failed: %s", err)
 	}
 
-	d.SetId(mgw.ID.String())
 	return resourceSakuraCloudMobileGatewayRead(d, meta)
 }
 

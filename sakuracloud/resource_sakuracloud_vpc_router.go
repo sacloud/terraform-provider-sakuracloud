@@ -503,10 +503,12 @@ func resourceSakuraCloudVPCRouterCreate(d *schema.ResourceData, meta interface{}
 	}
 
 	vpcRouter, err := builder.Build(ctx, zone)
+	if vpcRouter != nil {
+		d.SetId(vpcRouter.ID.String())
+	}
 	if err != nil {
 		return fmt.Errorf("creating SakuraCloud VPCRouter is failed: %s", err)
 	}
-	d.SetId(vpcRouter.ID.String())
 	return resourceSakuraCloudVPCRouterRead(d, meta)
 }
 

@@ -181,10 +181,13 @@ func resourceSakuraCloudLocalRouterCreate(d *schema.ResourceData, meta interface
 	}
 
 	localRouter, err := builder.Build(ctx)
+	if localRouter != nil {
+		d.SetId(localRouter.ID.String())
+	}
 	if err != nil {
 		return fmt.Errorf("creating SakuraCloud LocalRouter is failed: %s", err)
 	}
-	d.SetId(localRouter.ID.String())
+
 	return resourceSakuraCloudLocalRouterRead(d, meta)
 }
 
