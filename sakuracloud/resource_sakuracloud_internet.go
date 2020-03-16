@@ -143,11 +143,13 @@ func resourceSakuraCloudInternetCreate(d *schema.ResourceData, meta interface{})
 	builder := expandInternetBuilder(d, client)
 
 	internet, err := builder.Build(ctx, zone)
+	if internet != nil {
+		d.SetId(internet.ID.String())
+	}
 	if err != nil {
 		return fmt.Errorf("creating SakuraCloud Internet is failed: %s", err)
 	}
 
-	d.SetId(internet.ID.String())
 	return resourceSakuraCloudInternetRead(d, meta)
 }
 

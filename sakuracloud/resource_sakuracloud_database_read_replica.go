@@ -126,6 +126,9 @@ func resourceSakuraCloudDatabaseReadReplicaCreate(d *schema.ResourceData, meta i
 	}
 
 	db, err := builder.Build(ctx, zone)
+	if db != nil {
+		d.SetId(db.ID.String())
+	}
 	if err != nil {
 		return fmt.Errorf("creating SakuraCloud Database ReadReplica is failed: %s", err)
 	}
@@ -134,7 +137,6 @@ func resourceSakuraCloudDatabaseReadReplicaCreate(d *schema.ResourceData, meta i
 	// この挙動はテストなどで問題となる。このためここで少しsleepすることで対応する。
 	time.Sleep(client.databaseWaitAfterCreateDuration)
 
-	d.SetId(db.ID.String())
 	return setDatabaseReadReplicaResourceData(ctx, d, client, db)
 }
 

@@ -117,11 +117,13 @@ func resourceSakuraCloudContainerRegistryCreate(d *schema.ResourceData, meta int
 
 	builder := expandContainerRegistryBuilder(d, client, "")
 	reg, err := builder.Build(ctx)
+	if reg != nil {
+		d.SetId(reg.ID.String())
+	}
 	if err != nil {
 		return fmt.Errorf("creating SakuraCloud ContainerRegistry is failed: %s", err)
 	}
 
-	d.SetId(reg.ID.String())
 	return resourceSakuraCloudContainerRegistryRead(d, meta)
 }
 

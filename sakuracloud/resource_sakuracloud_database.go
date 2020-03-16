@@ -183,6 +183,9 @@ func resourceSakuraCloudDatabaseCreate(d *schema.ResourceData, meta interface{})
 
 	dbBuilder := expandDatabaseBuilder(d, client)
 	db, err := dbBuilder.Build(ctx, zone)
+	if db != nil {
+		d.SetId(db.ID.String())
+	}
 	if err != nil {
 		return fmt.Errorf("creating SakuraCloud Database is failed: %s", err)
 	}
@@ -191,7 +194,6 @@ func resourceSakuraCloudDatabaseCreate(d *schema.ResourceData, meta interface{})
 	// この挙動はテストなどで問題となる。このためここで少しsleepすることで対応する。
 	time.Sleep(client.databaseWaitAfterCreateDuration)
 
-	d.SetId(db.ID.String())
 	return resourceSakuraCloudDatabaseRead(d, meta)
 }
 
