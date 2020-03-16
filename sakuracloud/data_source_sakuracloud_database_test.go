@@ -64,11 +64,11 @@ resource "sakuracloud_database" "foobar" {
 
   network_interface {
     switch_id       = "${sakuracloud_switch.foobar.id}"
-    ip_address      = "192.168.11.101"
+    ip_address      = "192.168.101.101"
     netmask         = 24
-    gateway         = "192.168.11.1"
+    gateway         = "192.168.101.1"
     port            = 54321
-    source_ranges   = ["192.168.11.0/24", "192.168.12.0/24"]
+    source_ranges   = ["192.168.101.0/24", "192.168.102.0/24"]
   }
   backup {
     weekdays = ["mon", "tue"]

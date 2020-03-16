@@ -1,6 +1,6 @@
 ## 2.1.3 (Unreleased)
 
-* 
+* libsacloud v2.3.0 - MariaDB 10.4 [GH-724]
 
 ## 2.1.2 (2020-03-10)
 

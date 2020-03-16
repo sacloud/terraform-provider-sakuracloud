@@ -1176,6 +1176,259 @@ func (o *OpenFTPRequest) SetChangePassword(v bool) {
 }
 
 /*************************************************
+* ArchiveShareInfo
+*************************************************/
+
+// ArchiveShareInfo represents API parameter/response structure
+type ArchiveShareInfo struct {
+	SharedKey types.ArchiveShareKey
+}
+
+// Validate validates by field tags
+func (o *ArchiveShareInfo) Validate() error {
+	return validator.New().Struct(o)
+}
+
+// setDefaults implements sacloud.argumentDefaulter
+func (o *ArchiveShareInfo) setDefaults() interface{} {
+	return &struct {
+		SharedKey types.ArchiveShareKey
+	}{
+		SharedKey: o.GetSharedKey(),
+	}
+}
+
+// GetSharedKey returns value of SharedKey
+func (o *ArchiveShareInfo) GetSharedKey() types.ArchiveShareKey {
+	return o.SharedKey
+}
+
+// SetSharedKey sets value to SharedKey
+func (o *ArchiveShareInfo) SetSharedKey(v types.ArchiveShareKey) {
+	o.SharedKey = v
+}
+
+/*************************************************
+* ArchiveCreateRequestFromShared
+*************************************************/
+
+// ArchiveCreateRequestFromShared represents API parameter/response structure
+type ArchiveCreateRequestFromShared struct {
+	Name            string `validate:"required"`
+	Description     string `validate:"min=0,max=512"`
+	Tags            types.Tags
+	IconID          types.ID `mapconv:"Icon.ID"`
+	SourceSharedKey types.ArchiveShareKey
+}
+
+// Validate validates by field tags
+func (o *ArchiveCreateRequestFromShared) Validate() error {
+	return validator.New().Struct(o)
+}
+
+// setDefaults implements sacloud.argumentDefaulter
+func (o *ArchiveCreateRequestFromShared) setDefaults() interface{} {
+	return &struct {
+		Name            string `validate:"required"`
+		Description     string `validate:"min=0,max=512"`
+		Tags            types.Tags
+		IconID          types.ID `mapconv:"Icon.ID"`
+		SourceSharedKey types.ArchiveShareKey
+	}{
+		Name:            o.GetName(),
+		Description:     o.GetDescription(),
+		Tags:            o.GetTags(),
+		IconID:          o.GetIconID(),
+		SourceSharedKey: o.GetSourceSharedKey(),
+	}
+}
+
+// GetName returns value of Name
+func (o *ArchiveCreateRequestFromShared) GetName() string {
+	return o.Name
+}
+
+// SetName sets value to Name
+func (o *ArchiveCreateRequestFromShared) SetName(v string) {
+	o.Name = v
+}
+
+// GetDescription returns value of Description
+func (o *ArchiveCreateRequestFromShared) GetDescription() string {
+	return o.Description
+}
+
+// SetDescription sets value to Description
+func (o *ArchiveCreateRequestFromShared) SetDescription(v string) {
+	o.Description = v
+}
+
+// GetTags returns value of Tags
+func (o *ArchiveCreateRequestFromShared) GetTags() types.Tags {
+	return o.Tags
+}
+
+// SetTags sets value to Tags
+func (o *ArchiveCreateRequestFromShared) SetTags(v types.Tags) {
+	o.Tags = v
+}
+
+// HasTag 指定のタグが存在する場合trueを返す
+func (o *ArchiveCreateRequestFromShared) HasTag(tag string) bool {
+	return accessor.HasTag(o, tag)
+}
+
+// AppendTag 指定のタグを追加
+func (o *ArchiveCreateRequestFromShared) AppendTag(tag string) {
+	accessor.AppendTag(o, tag)
+}
+
+// RemoveTag 指定のタグを削除
+func (o *ArchiveCreateRequestFromShared) RemoveTag(tag string) {
+	accessor.RemoveTag(o, tag)
+}
+
+// ClearTags タグを全クリア
+func (o *ArchiveCreateRequestFromShared) ClearTags() {
+	accessor.ClearTags(o)
+}
+
+// GetIconID returns value of IconID
+func (o *ArchiveCreateRequestFromShared) GetIconID() types.ID {
+	return o.IconID
+}
+
+// SetIconID sets value to IconID
+func (o *ArchiveCreateRequestFromShared) SetIconID(v types.ID) {
+	o.IconID = v
+}
+
+// GetSourceSharedKey returns value of SourceSharedKey
+func (o *ArchiveCreateRequestFromShared) GetSourceSharedKey() types.ArchiveShareKey {
+	return o.SourceSharedKey
+}
+
+// SetSourceSharedKey sets value to SourceSharedKey
+func (o *ArchiveCreateRequestFromShared) SetSourceSharedKey(v types.ArchiveShareKey) {
+	o.SourceSharedKey = v
+}
+
+/*************************************************
+* ArchiveTransferRequest
+*************************************************/
+
+// ArchiveTransferRequest represents API parameter/response structure
+type ArchiveTransferRequest struct {
+	SizeMB      int
+	Name        string `validate:"required"`
+	Description string `validate:"min=0,max=512"`
+	Tags        types.Tags
+	IconID      types.ID `mapconv:"Icon.ID"`
+}
+
+// Validate validates by field tags
+func (o *ArchiveTransferRequest) Validate() error {
+	return validator.New().Struct(o)
+}
+
+// setDefaults implements sacloud.argumentDefaulter
+func (o *ArchiveTransferRequest) setDefaults() interface{} {
+	return &struct {
+		SizeMB      int
+		Name        string `validate:"required"`
+		Description string `validate:"min=0,max=512"`
+		Tags        types.Tags
+		IconID      types.ID `mapconv:"Icon.ID"`
+	}{
+		SizeMB:      o.GetSizeMB(),
+		Name:        o.GetName(),
+		Description: o.GetDescription(),
+		Tags:        o.GetTags(),
+		IconID:      o.GetIconID(),
+	}
+}
+
+// GetSizeMB returns value of SizeMB
+func (o *ArchiveTransferRequest) GetSizeMB() int {
+	return o.SizeMB
+}
+
+// SetSizeMB sets value to SizeMB
+func (o *ArchiveTransferRequest) SetSizeMB(v int) {
+	o.SizeMB = v
+}
+
+// GetSizeGB .
+func (o *ArchiveTransferRequest) GetSizeGB() int {
+	return accessor.GetSizeGB(o)
+}
+
+// SetSizeGB .
+func (o *ArchiveTransferRequest) SetSizeGB(size int) {
+	accessor.SetSizeGB(o, size)
+}
+
+// GetName returns value of Name
+func (o *ArchiveTransferRequest) GetName() string {
+	return o.Name
+}
+
+// SetName sets value to Name
+func (o *ArchiveTransferRequest) SetName(v string) {
+	o.Name = v
+}
+
+// GetDescription returns value of Description
+func (o *ArchiveTransferRequest) GetDescription() string {
+	return o.Description
+}
+
+// SetDescription sets value to Description
+func (o *ArchiveTransferRequest) SetDescription(v string) {
+	o.Description = v
+}
+
+// GetTags returns value of Tags
+func (o *ArchiveTransferRequest) GetTags() types.Tags {
+	return o.Tags
+}
+
+// SetTags sets value to Tags
+func (o *ArchiveTransferRequest) SetTags(v types.Tags) {
+	o.Tags = v
+}
+
+// HasTag 指定のタグが存在する場合trueを返す
+func (o *ArchiveTransferRequest) HasTag(tag string) bool {
+	return accessor.HasTag(o, tag)
+}
+
+// AppendTag 指定のタグを追加
+func (o *ArchiveTransferRequest) AppendTag(tag string) {
+	accessor.AppendTag(o, tag)
+}
+
+// RemoveTag 指定のタグを削除
+func (o *ArchiveTransferRequest) RemoveTag(tag string) {
+	accessor.RemoveTag(o, tag)
+}
+
+// ClearTags タグを全クリア
+func (o *ArchiveTransferRequest) ClearTags() {
+	accessor.ClearTags(o)
+}
+
+// GetIconID returns value of IconID
+func (o *ArchiveTransferRequest) GetIconID() types.ID {
+	return o.IconID
+}
+
+// SetIconID sets value to IconID
+func (o *ArchiveTransferRequest) SetIconID(v types.ID) {
+	o.IconID = v
+}
+
+/*************************************************
 * AuthStatus
 *************************************************/
 

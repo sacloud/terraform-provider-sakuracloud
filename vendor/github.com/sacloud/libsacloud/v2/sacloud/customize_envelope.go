@@ -223,3 +223,33 @@ func (s mobileGatewayFindRequestEnvelope) MarshalJSON() ([]byte, error) {
 	tmp.Filter[search.Key("Class")] = "mobilegateway"
 	return json.Marshal(tmp)
 }
+
+/*
+ * for Shared Archive
+ */
+
+func (s archiveShareRequestEnvelope) MarshalJSON() ([]byte, error) {
+	type alias archiveShareRequestEnvelope
+	tmp := alias(s)
+	tmp.Shared = true
+	return json.Marshal(tmp)
+}
+
+// UnmarshalJSON APIからの戻り値でレスポンスボディ直下にデータを持つことへの対応
+func (s *archiveShareResponseEnvelope) UnmarshalJSON(data []byte) error {
+	type alias archiveShareResponseEnvelope
+
+	var tmp alias
+	if err := json.Unmarshal(data, &tmp); err != nil {
+		return err
+	}
+
+	var nakedData naked.ArchiveShareInfo
+	if err := json.Unmarshal(data, &nakedData); err != nil {
+		return err
+	}
+	tmp.ArchiveShareInfo = &nakedData
+
+	*s = archiveShareResponseEnvelope(tmp)
+	return nil
+}
