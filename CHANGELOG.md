@@ -1,5 +1,6 @@
 ## 2.1.3 (Unreleased)
 
+* Set ID to state even if got error from builders [GH-726] (@yamamoto-febc)
 * libsacloud v2.3.0 - MariaDB 10.4 [GH-724]
 
 ## 2.1.2 (2020-03-10)
