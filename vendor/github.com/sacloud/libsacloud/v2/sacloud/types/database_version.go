@@ -42,8 +42,8 @@ type RDBMSVersion struct {
 var RDBMSVersions = map[RDBMSType]*RDBMSVersion{
 	RDBMSTypesMariaDB: {
 		Name:     "MariaDB",
-		Version:  "10.3",
-		Revision: "10.3.15",
+		Version:  "10.4",
+		Revision: "",
 	},
 	RDBMSTypesPostgreSQL: {
 		Name:     "postgres",

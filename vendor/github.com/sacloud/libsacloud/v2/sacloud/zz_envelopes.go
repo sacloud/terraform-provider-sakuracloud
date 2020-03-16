@@ -104,6 +104,45 @@ type archiveOpenFTPResponseEnvelope struct {
 	FTPServer *naked.OpeningFTPServer `json:",omitempty"`
 }
 
+// archiveShareRequestEnvelope is envelop of API request
+type archiveShareRequestEnvelope struct {
+	Shared bool `json:",omitempty"`
+}
+
+// archiveShareResponseEnvelope is envelop of API response
+type archiveShareResponseEnvelope struct {
+	IsOk    bool            `json:"is_ok,omitempty"` // is_ok項目
+	Success types.APIResult `json:",omitempty"`      // success項目
+
+	ArchiveShareInfo *naked.ArchiveShareInfo `json:",omitempty"`
+}
+
+// archiveCreateFromSharedRequestEnvelope is envelop of API request
+type archiveCreateFromSharedRequestEnvelope struct {
+	Archive *naked.Archive `json:",omitempty"`
+}
+
+// archiveCreateFromSharedResponseEnvelope is envelop of API response
+type archiveCreateFromSharedResponseEnvelope struct {
+	IsOk    bool            `json:"is_ok,omitempty"` // is_ok項目
+	Success types.APIResult `json:",omitempty"`      // success項目
+
+	Archive *naked.Archive `json:",omitempty"`
+}
+
+// archiveTransferRequestEnvelope is envelop of API request
+type archiveTransferRequestEnvelope struct {
+	Archive *naked.Archive `json:",omitempty"`
+}
+
+// archiveTransferResponseEnvelope is envelop of API response
+type archiveTransferResponseEnvelope struct {
+	IsOk    bool            `json:"is_ok,omitempty"` // is_ok項目
+	Success types.APIResult `json:",omitempty"`      // success項目
+
+	Archive *naked.Archive `json:",omitempty"`
+}
+
 // authStatusReadResponseEnvelope is envelop of API response
 type authStatusReadResponseEnvelope struct {
 	IsOk    bool            `json:"is_ok,omitempty"` // is_ok項目
