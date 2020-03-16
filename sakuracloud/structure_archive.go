@@ -15,33 +15,79 @@
 package sakuracloud
 
 import (
+	"io"
+	"os"
+
+	"github.com/hashicorp/terraform-plugin-sdk/helper/validation"
+
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
-	"github.com/sacloud/libsacloud/v2/pkg/size"
 	"github.com/sacloud/libsacloud/v2/sacloud"
+	"github.com/sacloud/libsacloud/v2/sacloud/types"
+	archiveUtil "github.com/sacloud/libsacloud/v2/utils/builder/archive"
 )
 
-func expandArchiveHash(d *schema.ResourceData) string {
-	// NOTE 本来はAPIにてmd5ハッシュを取得できるのが望ましい。現状ではここでファイルを読んで算出する。
+func expandArchiveBuilder(d *schema.ResourceData, zone string, client *APIClient) (archiveUtil.Builder, func(), error) {
+	var reader io.ReadCloser
 	source := d.Get("archive_file").(string)
+	if source != "" {
+		sourcePath, err := expandHomeDir(source)
+		if err != nil {
+			return nil, nil, err
+		}
+		f, err := os.Open(sourcePath)
+		if err != nil {
+			return nil, nil, err
+		}
+		reader = f
+	}
+
+	sourceArchiveZone := stringOrDefault(d, "source_archive_zone")
+	if sourceArchiveZone != "" {
+		if _, errs := validation.StringInSlice(client.zones, false)(sourceArchiveZone, "source_archive_zone"); len(errs) > 0 {
+			return nil, nil, errs[0]
+		}
+		if zone == sourceArchiveZone {
+			sourceArchiveZone = ""
+		}
+	}
+
+	director := &archiveUtil.Director{
+		Name:              d.Get("name").(string),
+		Description:       d.Get("description").(string),
+		Tags:              expandTags(d),
+		IconID:            expandSakuraCloudID(d, "icon_id"),
+		SizeGB:            intOrDefault(d, "size"),
+		SourceReader:      reader,
+		SourceDiskID:      expandSakuraCloudID(d, "source_disk_id"),
+		SourceArchiveID:   expandSakuraCloudID(d, "source_archive_id"),
+		SourceArchiveZone: sourceArchiveZone,
+		SourceSharedKey:   types.ArchiveShareKey(stringOrDefault(d, "source_shared_key")),
+		Client:            archiveUtil.NewAPIClient(client),
+	}
+	return director.Builder(), func() {
+		if reader != nil {
+			reader.Close() // nolint
+		}
+	}, nil
+}
+
+func expandArchiveHash(d *schema.ResourceData) string {
+	source := d.Get("archive_file").(string)
+	if source == "" {
+		return ""
+	}
+
 	path, err := expandHomeDir(source)
 	if err != nil {
 		return ""
 	}
+
+	// NOTE 本来はAPIにてmd5ハッシュを取得できるのが望ましい。現状ではここでファイルを読んで算出する。
 	hash, err := md5CheckSumFromFile(path)
 	if err != nil {
 		return ""
 	}
 	return hash
-}
-
-func expandArchiveCreateRequest(d *schema.ResourceData) *sacloud.ArchiveCreateBlankRequest {
-	return &sacloud.ArchiveCreateBlankRequest{
-		Name:        d.Get("name").(string),
-		Description: d.Get("description").(string),
-		SizeMB:      d.Get("size").(int) * size.GiB,
-		IconID:      expandSakuraCloudID(d, "icon_id"),
-		Tags:        expandTags(d),
-	}
 }
 
 func expandArchiveUpdateRequest(d *schema.ResourceData) *sacloud.ArchiveUpdateRequest {

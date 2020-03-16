@@ -142,3 +142,18 @@ func validateCarrier(d resourceValueGettable) error {
 
 	return nil
 }
+
+func validateSourceSharedKey(v interface{}, k string) ([]string, []error) {
+	var ws []string
+	var errors []error
+
+	value := v.(string)
+	if value == "" {
+		return ws, errors
+	}
+	key := types.ArchiveShareKey(value)
+	if !key.ValidFormat() {
+		errors = append(errors, fmt.Errorf("%q must be formatted in '<ZONE>:<ID>:<TOKEN>'", k))
+	}
+	return ws, errors
+}
