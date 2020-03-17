@@ -13,6 +13,7 @@ require (
 	github.com/leodido/go-urn v1.1.0 // indirect
 	github.com/mitchellh/go-homedir v1.1.0
 	github.com/mitchellh/mapstructure v1.1.2
+	github.com/sacloud/ftps v1.0.0
 	github.com/stretchr/testify v1.2.2
 	github.com/uber-go/atomic v1.4.0 // indirect
 	go.uber.org/atomic v1.4.0 // indirect

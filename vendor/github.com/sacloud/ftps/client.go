@@ -3,6 +3,7 @@ package ftps
 import (
 	"errors"
 	"fmt"
+	"io"
 	"os"
 	"path/filepath"
 	"strings"
@@ -38,6 +39,11 @@ func (c *Client) Upload(filePath string) error {
 
 // UploadFile file to Server
 func (c *Client) UploadFile(remoteFilepath string, file *os.File) error {
+	return c.UploadReader(remoteFilepath, file)
+}
+
+// UploadFile file to Server
+func (c *Client) UploadReader(remoteFilepath string, source io.Reader) error {
 	rawClient := &FTPS{}
 	rawClient.TLSConfig.InsecureSkipVerify = true
 
@@ -51,7 +57,7 @@ func (c *Client) UploadFile(remoteFilepath string, file *os.File) error {
 		return fmt.Errorf("Auth FTP failed: %#v", err)
 	}
 
-	err = rawClient.StoreFile(remoteFilepath, file)
+	err = rawClient.StoreReader(remoteFilepath, source)
 	if err != nil {
 		return fmt.Errorf("Storefile FTP failed: %#v", err)
 	}

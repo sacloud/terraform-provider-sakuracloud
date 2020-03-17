@@ -12,7 +12,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package libsacloud
+package archive
 
-// Version バージョン
-const Version = "2.4.1"
+import "github.com/sacloud/libsacloud/v2/sacloud"
+
+// APIClient builderが利用するAPIクライアント
+type APIClient struct {
+	Archive sacloud.ArchiveAPI
+	Zone    sacloud.ZoneAPI
+}
+
+// NewAPIClient builderが利用するAPIクライアントを返す
+func NewAPIClient(caller sacloud.APICaller) *APIClient {
+	return &APIClient{
+		Archive: sacloud.NewArchiveOp(caller),
+		Zone:    sacloud.NewZoneOp(caller),
+	}
+}

@@ -200,12 +200,12 @@ github.com/pmezard/go-difflib v1.0.0/go.mod h1:iKH77koFhYxTK1pcRnkKkqfTogsbg7gZN
 github.com/posener/complete v1.1.1/go.mod h1:em0nMJCgc9GFtwrmVmEMR/ZL6WyhyjMBndrE9hABlRI=
 github.com/posener/complete v1.2.1 h1:LrvDIY//XNo65Lq84G/akBuMGlawHvGBABv8f/ZN6DI=
 github.com/posener/complete v1.2.1/go.mod h1:6gapUrK/U1TAN7ciCoNRIdVC5sbdBTUh1DKN0g6uH7E=
-github.com/sacloud/ftps v0.0.0-20171205062625-42fc0f9886fe h1:JSZLn4B8X9V1ynSEht3QdNJ13Stey0hR6asicabuEqU=
-github.com/sacloud/ftps v0.0.0-20171205062625-42fc0f9886fe/go.mod h1:sdVeG85LaUt1f+0meZqSf6hSQYlwdgFLI8tJqLZ58VM=
+github.com/sacloud/ftps v1.0.0 h1:RFIOwGby8ZDqdSccA7Tm9kJdm9QVAxADvxmMINBGLZw=
+github.com/sacloud/ftps v1.0.0/go.mod h1:h4awhOi3PEyhKLj1FpXjoVV5yVkmRUU+d5L95EwX2JU=
 github.com/sacloud/iso9660wrap v0.0.0-20171031075302-eda21f77f6a8 h1:5piK7EELHKRxGqBjgVEHsdfsFwEzF/Kds/bMWLS6gCw=
 github.com/sacloud/iso9660wrap v0.0.0-20171031075302-eda21f77f6a8/go.mod h1:1jHHCa624cG5rODkWmourombJaNmkY9/SBHWhLJcg+w=
-github.com/sacloud/libsacloud/v2 v2.3.0 h1:ryRa9U87ZwhcCqWhqww8d1klPdg5J2iAfAV4VTGt0zM=
-github.com/sacloud/libsacloud/v2 v2.3.0/go.mod h1:BG2crADa3HJrADiZK2zK1/UxsVUtWSy6q7nd6YqleD4=
+github.com/sacloud/libsacloud/v2 v2.4.1 h1:E1b94d/lngTSbrTeNIyKsWs6AHQUPx0Lt3jJZWdDaQQ=
+github.com/sacloud/libsacloud/v2 v2.4.1/go.mod h1:83Mv5rKrD39QtKyarsFC2mVl9NKXWyGlL2XtnnqGKVk=
 github.com/sergi/go-diff v1.0.0 h1:Kpca3qRNrduNnOQeazBd0ysaKrUJiIuISHxogkT9RPQ=
 github.com/sergi/go-diff v1.0.0/go.mod h1:0CfEIISq7TuYL3j771MWULgwwjU+GofnZX9QAmXWZgo=
 github.com/spf13/afero v1.2.2 h1:5jhuqJyZCZf2JRofRvN/nIFgIWNzPa3/Vz8mYylgbWc=
