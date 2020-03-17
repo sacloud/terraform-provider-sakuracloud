@@ -100,6 +100,10 @@ var definitions = map[string]definition{
 		displayName: "Archive",
 		category:    CategoryStorage,
 	},
+	"sakuracloud_archive_share": {
+		displayName: "Archive",
+		category:    CategoryStorage,
+	},
 	"sakuracloud_auto_backup": {
 		displayName: "Auto Backup",
 		category:    CategoryAppliance,

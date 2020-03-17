@@ -164,6 +164,7 @@ func Provider() terraform.ResourceProvider {
 		ResourcesMap: map[string]*schema.Resource{
 			"sakuracloud_auto_backup":           resourceSakuraCloudAutoBackup(),
 			"sakuracloud_archive":               resourceSakuraCloudArchive(),
+			"sakuracloud_archive_share":         resourceSakuraCloudArchiveShare(),
 			"sakuracloud_bridge":                resourceSakuraCloudBridge(),
 			"sakuracloud_bucket_object":         resourceSakuraCloudBucketObject(),
 			"sakuracloud_cdrom":                 resourceSakuraCloudCDROM(),

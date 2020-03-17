@@ -18,15 +18,12 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"os"
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/resource"
 	"github.com/hashicorp/terraform-plugin-sdk/terraform"
 	"github.com/sacloud/libsacloud/v2/sacloud"
 )
-
-const envSourceSharedArchiveKey = "SAKURACLOUD_SOURCE_SHARED_ARCHIVE_KEY"
 
 func TestAccSakuraCloudArchive_basic(t *testing.T) {
 	skipIfFakeModeEnabled(t)
@@ -115,11 +112,9 @@ func TestAccSakuraCloudArchive_transfer(t *testing.T) {
 
 func TestAccSakuraCloudArchive_fromShared(t *testing.T) {
 	skipIfFakeModeEnabled(t)
-	skipIfEnvIsNotSet(t, envSourceSharedArchiveKey)
 
 	resourceName := "sakuracloud_archive.foobar"
 	rand := randomName()
-	sharedKey := os.Getenv(envSourceSharedArchiveKey)
 
 	var archive sacloud.Archive
 	resource.ParallelTest(t, resource.TestCase{
@@ -131,7 +126,7 @@ func TestAccSakuraCloudArchive_fromShared(t *testing.T) {
 		),
 		Steps: []resource.TestStep{
 			{
-				Config: buildConfigWithArgs(testAccSakuraCloudArchive_fromShared, rand, sharedKey),
+				Config: buildConfigWithArgs(testAccSakuraCloudArchive_fromShared, rand),
 				Check: resource.ComposeTestCheckFunc(
 					testCheckSakuraCloudArchiveExists(resourceName, &archive),
 					resource.TestCheckResourceAttr(resourceName, "name", rand),
@@ -139,7 +134,8 @@ func TestAccSakuraCloudArchive_fromShared(t *testing.T) {
 					resource.TestCheckResourceAttr(resourceName, "description", "description"),
 					resource.TestCheckResourceAttr(resourceName, "tags.4151227546", "tag1"),
 					resource.TestCheckResourceAttr(resourceName, "tags.1852302624", "tag2"),
-					resource.TestCheckResourceAttr(resourceName, "source_shared_key", sharedKey),
+					resource.TestCheckResourceAttrPair(resourceName, "source_shared_key",
+						"sakuracloud_archive_share.share", "share_key"),
 				),
 			},
 		},
@@ -287,11 +283,27 @@ resource "sakuracloud_archive" "foobar" {
 `
 
 var testAccSakuraCloudArchive_fromShared = `
+resource "sakuracloud_archive" "source" {
+  name         = "{{ .arg0 }}"
+  size         = 20
+  archive_file = "test/dummy.raw"
+
+  zone = "is1a"
+}
+
+resource "sakuracloud_archive_share" "share" {
+  archive_id = sakuracloud_archive.source.id
+
+  zone = "is1a"
+}
+
 resource "sakuracloud_archive" "foobar" {
   name        = "{{ .arg0 }}"
   description = "description"
   tags        = ["tag1", "tag2"]
 
-  source_shared_key = "{{ .arg1 }}"
+  source_shared_key = sakuracloud_archive_share.share.share_key
+
+  zone = "is1b"
 }
 `

@@ -2,6 +2,7 @@
 
 FEATURES
 
+* Add sakuracloud_archive_share resource [GH-728] (@yamamoto-febc)
 * Supports transferred/shared archives [GH-727] (@yamamoto-febc)
     * libsacloud v2.4.1
 
