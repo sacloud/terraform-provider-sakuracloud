@@ -10,12 +10,18 @@ resource "sakuracloud_server" "foobar" {
   }
 
   disk_edit_parameter {
-    hostname        = "hostname"
-    password        = "password"
+    hostname = "hostname"
+    password = "password"
     disable_pw_auth = true
 
     # ssh_key_ids     = ["<ID>", "<ID>"]
-    # note_ids        = ["<ID>", "<ID>"]
+    # note {
+    #  id         = "<ID>"
+    #  api_key_id = "<ID>"
+    #  variables = {
+    #    foo = "bar"
+    #  }
+    # }
   }
 }
 

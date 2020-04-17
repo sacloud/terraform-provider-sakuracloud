@@ -30,7 +30,13 @@ resource "sakuracloud_server" "foobar" {
     disable_pw_auth = true
 
     # ssh_key_ids     = ["<ID>", "<ID>"]
-    # note_ids        = ["<ID>", "<ID>"]
+    # note {
+    #  id         = "<ID>"
+    #  api_key_id = "<ID>"
+    #  variables = {
+    #    foo = "bar"
+    #  }
+    # }
   }
 }
 
@@ -91,9 +97,19 @@ A `disk_edit_parameter` block supports the following:
 * `hostname` - (Optional) The hostname of the Server. The length of this value must be in the range [`1`-`64`].
 * `ip_address` - (Optional) The IP address to assign to the Server.
 * `netmask` - (Optional) The bit length of the subnet to assign to the Server.
-* `note_ids` - (Optional) A list of the Note id.
+* `note` - (Optional) A list of the `note` block as defined below.
+* `note_ids` - (Optional/Deprecated) A list of the Note id.  
+Note: **The `note_ids` will be removed in a future version. Please use the `note` instead**
 * `password` - (Optional) The password of default user. The length of this value must be in the range [`8`-`64`].
 * `ssh_key_ids` - (Optional) A list of the SSHKey id.
+
+---
+
+A `note` block supports the following:
+
+* `id` - (Required) The id of the Note/StartupScript.
+* `api_key_id` - (Optional) The id of the API key to be injected into the Note/StartupScript when editing the disk.
+* `variables` - (Optional) The value of the variable that be injected into the Note/StartupScript when editing the disk.
 
 #### Common Arguments
 
