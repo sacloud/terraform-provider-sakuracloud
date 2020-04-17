@@ -56,8 +56,12 @@ func TestAccSakuraCloudServer_basic(t *testing.T) {
 					resource.TestCheckResourceAttr(resourceName, "disk_edit_parameter.0.ssh_key_ids.#", "2"),
 					resource.TestCheckResourceAttr(resourceName, "disk_edit_parameter.0.ssh_key_ids.0", "100000000000"),
 					resource.TestCheckResourceAttr(resourceName, "disk_edit_parameter.0.disable_pw_auth", "true"),
-					resource.TestCheckResourceAttr(resourceName, "disk_edit_parameter.0.note_ids.#", "2"),
-					resource.TestCheckResourceAttr(resourceName, "disk_edit_parameter.0.note_ids.0", "100000000000"),
+					resource.TestCheckResourceAttr(resourceName, "disk_edit_parameter.0.note.#", "1"),
+					resource.TestCheckResourceAttr(resourceName, "disk_edit_parameter.0.note.0.id", "100000000000"),
+					resource.TestCheckResourceAttr(resourceName, "disk_edit_parameter.0.note.0.api_key_id", "100000000001"),
+					resource.TestCheckResourceAttr(resourceName, "disk_edit_parameter.0.note.0.variables.%", "2"),
+					resource.TestCheckResourceAttr(resourceName, "disk_edit_parameter.0.note.0.variables.foo1", "bar1"),
+					resource.TestCheckResourceAttr(resourceName, "disk_edit_parameter.0.note.0.variables.foo2", "bar2"),
 					resource.TestCheckResourceAttr(resourceName, "network_interface.#", "1"),
 					resource.TestCheckResourceAttr(resourceName, "network_interface.0.upstream", "shared"),
 					resource.TestCheckResourceAttr(resourceName, "hostname", rand),
@@ -341,7 +345,14 @@ resource "sakuracloud_server" "foobar" {
     password        = "{{ .arg1 }}"
     ssh_key_ids     = ["100000000000", "200000000000"]
     disable_pw_auth = true
-    note_ids        = ["100000000000", "200000000000"]
+    note {
+      id         = "100000000000"
+      api_key_id = "100000000001"
+      variables  = {
+        foo1 = "bar1"
+        foo2 = "bar2"
+      }
+    }
   }
 }
 
