@@ -7317,7 +7317,7 @@ type DiskEditRequest struct {
 	EnableDHCP          bool                `json:",omitempty" mapconv:",omitempty"`
 	ChangePartitionUUID bool                `json:",omitempty" mapconv:",omitempty"`
 	HostName            string              `json:",omitempty" mapconv:",omitempty"`
-	Notes               []*DiskEditNote     `json:",omitempty" mapconv:",omitempty,recursive"`
+	Notes               []*DiskEditNote     `json:",omitempty" mapconv:"[]Notes,omitempty,recursive"`
 	UserIPAddress       string              `json:",omitempty" mapconv:",omitempty"`
 	UserSubnet          *DiskEditUserSubnet `json:",omitempty" mapconv:",omitempty"`
 }
@@ -7338,7 +7338,7 @@ func (o *DiskEditRequest) setDefaults() interface{} {
 		EnableDHCP          bool                `json:",omitempty" mapconv:",omitempty"`
 		ChangePartitionUUID bool                `json:",omitempty" mapconv:",omitempty"`
 		HostName            string              `json:",omitempty" mapconv:",omitempty"`
-		Notes               []*DiskEditNote     `json:",omitempty" mapconv:",omitempty,recursive"`
+		Notes               []*DiskEditNote     `json:",omitempty" mapconv:"[]Notes,omitempty,recursive"`
 		UserIPAddress       string              `json:",omitempty" mapconv:",omitempty"`
 		UserSubnet          *DiskEditUserSubnet `json:",omitempty" mapconv:",omitempty"`
 	}{
@@ -7519,6 +7519,7 @@ func (o *DiskEditSSHKey) SetPublicKey(v string) {
 // DiskEditNote represents API parameter/response structure
 type DiskEditNote struct {
 	ID        types.ID               `json:",omitempty" mapconv:",omitempty"`
+	APIKeyID  types.ID               `json:",omitempty" mapconv:"APIKey.ID,omitempty"`
 	Variables map[string]interface{} `json:",omitempty" mapconv:",omitempty"`
 }
 
@@ -7531,9 +7532,11 @@ func (o *DiskEditNote) Validate() error {
 func (o *DiskEditNote) setDefaults() interface{} {
 	return &struct {
 		ID        types.ID               `json:",omitempty" mapconv:",omitempty"`
+		APIKeyID  types.ID               `json:",omitempty" mapconv:"APIKey.ID,omitempty"`
 		Variables map[string]interface{} `json:",omitempty" mapconv:",omitempty"`
 	}{
 		ID:        o.GetID(),
+		APIKeyID:  o.GetAPIKeyID(),
 		Variables: o.GetVariables(),
 	}
 }
@@ -7546,6 +7549,16 @@ func (o *DiskEditNote) GetID() types.ID {
 // SetID sets value to ID
 func (o *DiskEditNote) SetID(v types.ID) {
 	o.ID = v
+}
+
+// GetAPIKeyID returns value of APIKeyID
+func (o *DiskEditNote) GetAPIKeyID() types.ID {
+	return o.APIKeyID
+}
+
+// SetAPIKeyID sets value to APIKeyID
+func (o *DiskEditNote) SetAPIKeyID(v types.ID) {
+	o.APIKeyID = v
 }
 
 // GetVariables returns value of Variables

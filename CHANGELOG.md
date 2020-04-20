@@ -1,6 +1,7 @@
-## 2.2.1 (Unreleased)
+## 2.3.0 (Unreleased)
 
-* 
+* Startup Script Parameters [GH-731] (@yamamoto-febc)
+    * libsacloud v2.5.1
 
 ## 2.2.0 (2020-03-17)
 

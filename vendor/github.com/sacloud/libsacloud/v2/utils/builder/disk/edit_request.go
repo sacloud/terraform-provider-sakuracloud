@@ -71,8 +71,8 @@ type UnixEditRequest struct {
 	GenerateSSHKeyDescription string
 
 	IsNotesEphemeral bool
-	Notes            []string
-	NoteIDs          []types.ID
+	NoteContents     []string
+	Notes            []*sacloud.DiskEditNote
 }
 
 // Validate 設定値の検証
@@ -82,8 +82,8 @@ func (u *UnixEditRequest) Validate(ctx context.Context, client *APIClient) error
 			return err
 		}
 	}
-	for _, id := range u.NoteIDs {
-		if _, err := client.Note.Read(ctx, id); err != nil {
+	for _, note := range u.Notes {
+		if _, err := client.Note.Read(ctx, note.ID); err != nil {
 			return err
 		}
 	}
@@ -144,7 +144,7 @@ func (u *UnixEditRequest) prepareDiskEditParameter(ctx context.Context, client *
 	var notes []*sacloud.DiskEditNote
 	var generatedNotes []*sacloud.Note
 
-	for _, note := range u.Notes {
+	for _, note := range u.NoteContents {
 		created, err := client.Note.Create(ctx, &sacloud.NoteCreateRequest{
 			Name:    fmt.Sprintf("note-%s", time.Now().Format(time.RFC3339)),
 			Class:   "shell",
@@ -158,9 +158,11 @@ func (u *UnixEditRequest) prepareDiskEditParameter(ctx context.Context, client *
 		})
 		generatedNotes = append(generatedNotes, created)
 	}
-	for _, id := range u.NoteIDs {
+	for _, note := range u.Notes {
 		notes = append(notes, &sacloud.DiskEditNote{
-			ID: id,
+			ID:        note.ID,
+			APIKeyID:  note.APIKeyID,
+			Variables: note.Variables,
 		})
 	}
 	editReq.Notes = notes

@@ -184,10 +184,42 @@ func resourceSakuraCloudServer() *schema.Resource {
 							Description: "The flag to change partition uuid",
 						},
 						"note_ids": {
-							Type:        schema.TypeList,
-							Optional:    true,
-							Elem:        &schema.Schema{Type: schema.TypeString},
-							Description: "A list of the Note id",
+							Type:          schema.TypeList,
+							Optional:      true,
+							Elem:          &schema.Schema{Type: schema.TypeString},
+							Deprecated:    "The note_ids field will be removed in a future version. Please use the note field instead",
+							Description:   "A list of the Note id",
+							ConflictsWith: []string{"disk_edit_parameter.0.note"},
+						},
+						"note": {
+							Type:     schema.TypeList,
+							Optional: true,
+							Elem: &schema.Resource{
+								Schema: map[string]*schema.Schema{
+									"id": {
+										Type:         schema.TypeString,
+										Required:     true,
+										ValidateFunc: validateSakuracloudIDType,
+										Description:  "The id of the note",
+									},
+									"api_key_id": {
+										Type:         schema.TypeString,
+										Optional:     true,
+										ValidateFunc: validateSakuracloudIDType,
+										Description:  "The id of the API key to be injected into note when editing the disk",
+									},
+									"variables": {
+										Type: schema.TypeMap,
+										Elem: &schema.Schema{
+											Type: schema.TypeString,
+										},
+										Optional:    true,
+										Description: "The value of the variable that be injected into note when editing the disk",
+									},
+								},
+							},
+							ConflictsWith: []string{"disk_edit_parameter.0.note_ids"},
+							Description:   "A list of the Note/StartupScript",
 						},
 						"ip_address": {
 							Type:         schema.TypeString,

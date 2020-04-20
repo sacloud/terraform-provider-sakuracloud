@@ -25,7 +25,7 @@ type DiskEdit struct {
 	EnableDHCP          bool              `json:",omitempty" yaml:",omitempty" structs:",omitempty"` // DHCPの有効化
 	ChangePartitionUUID bool              `json:",omitempty" yaml:",omitempty" structs:",omitempty"` // パーティションのUUID変更
 	HostName            string            `json:",omitempty" yaml:",omitempty" structs:",omitempty"` // ホスト名
-	Notes               []DiskEditNote    `json:",omitempty" yaml:",omitempty" structs:",omitempty"` // スタートアップスクリプト
+	Notes               []*DiskEditNote   `json:",omitempty" yaml:",omitempty" structs:",omitempty"` // スタートアップスクリプト
 	UserIPAddress       string            `json:",omitempty" yaml:",omitempty" structs:",omitempty"` // IPアドレス
 	UserSubnet          *UserSubnet       `json:",omitempty" yaml:",omitempty" structs:",omitempty"` // デフォルトルート/サブネットマスク長
 	Background          bool              `json:",omitempty" yaml:",omitempty" structs:",omitempty"` // バックグラウンド実行
@@ -40,5 +40,10 @@ type DiskEditSSHKey struct {
 // DiskEditNote ディスクの修正で指定するスタートアップスクリプト
 type DiskEditNote struct {
 	ID        types.ID               `json:",omitempty" yaml:",omitempty" structs:",omitempty"`
+	APIKey    *APIKey                `json:",omitempty" yaml:"api_key,omitempty" structs:",omitempty"`
 	Variables map[string]interface{} `json:",omitempty" yaml:",omitempty" structs:",omitempty"`
+}
+
+type APIKey struct {
+	ID types.ID `json:",omitempty" yaml:",omitempty" structs:",omitempty"`
 }

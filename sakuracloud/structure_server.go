@@ -70,13 +70,34 @@ func expandServerDisks(d *schema.ResourceData, client *APIClient) []diskBuilder.
 					NetworkMaskLen:      intOrDefault(v, "netmask"),
 					DefaultRoute:        stringOrDefault(v, "gateway"),
 					SSHKeyIDs:           expandSakuraCloudIDs(v, "ssh_key_ids"),
-					NoteIDs:             expandSakuraCloudIDs(v, "note_ids"),
+					Notes:               expandDiskEditNotes(v),
 				}
 			}
 		}
 		builders = append(builders, b)
 	}
 	return builders
+}
+
+func expandDiskEditNotes(d resourceValueGettable) []*sacloud.DiskEditNote {
+	var notes []*sacloud.DiskEditNote
+	if _, ok := d.GetOk("note_ids"); ok {
+		ids := expandSakuraCloudIDs(d, "note_ids")
+		for _, id := range ids {
+			notes = append(notes, &sacloud.DiskEditNote{ID: id})
+		}
+	}
+	if values, ok := d.GetOk("note"); ok { // nolint
+		for _, value := range values.([]interface{}) {
+			d = mapToResourceData(value.(map[string]interface{}))
+			notes = append(notes, &sacloud.DiskEditNote{
+				ID:        expandSakuraCloudID(d, "id"),
+				APIKeyID:  expandSakuraCloudID(d, "api_key_id"),
+				Variables: d.Get("variables").(map[string]interface{}),
+			})
+		}
+	}
+	return notes
 }
 
 func expandServerNIC(d resourceValueGettable) serverBuilder.NICSettingHolder {

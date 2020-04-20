@@ -653,17 +653,17 @@ type diskCreateResponseEnvelope struct {
 
 // diskConfigRequestEnvelope is envelop of API request
 type diskConfigRequestEnvelope struct {
-	Background          bool                `json:",omitempty" mapconv:",omitempty"`
-	Password            string              `json:",omitempty" mapconv:",omitempty"`
-	SSHKey              *DiskEditSSHKey     `json:",omitempty" mapconv:",omitempty,recursive"`
-	SSHKeys             []*DiskEditSSHKey   `json:",omitempty" mapconv:"[]SSHKeys,omitempty,recursive"`
-	DisablePWAuth       bool                `json:",omitempty" mapconv:",omitempty"`
-	EnableDHCP          bool                `json:",omitempty" mapconv:",omitempty"`
-	ChangePartitionUUID bool                `json:",omitempty" mapconv:",omitempty"`
-	HostName            string              `json:",omitempty" mapconv:",omitempty"`
-	Notes               []*DiskEditNote     `json:",omitempty" mapconv:",omitempty,recursive"`
-	UserIPAddress       string              `json:",omitempty" mapconv:",omitempty"`
-	UserSubnet          *DiskEditUserSubnet `json:",omitempty" mapconv:",omitempty"`
+	Background          bool                  `json:",omitempty" mapconv:",omitempty"`
+	Password            string                `json:",omitempty" mapconv:",omitempty"`
+	SSHKey              *DiskEditSSHKey       `json:",omitempty" mapconv:",omitempty,recursive"`
+	SSHKeys             []*DiskEditSSHKey     `json:",omitempty" mapconv:"[]SSHKeys,omitempty,recursive"`
+	DisablePWAuth       bool                  `json:",omitempty" mapconv:",omitempty"`
+	EnableDHCP          bool                  `json:",omitempty" mapconv:",omitempty"`
+	ChangePartitionUUID bool                  `json:",omitempty" mapconv:",omitempty"`
+	HostName            string                `json:",omitempty" mapconv:",omitempty"`
+	Notes               []*naked.DiskEditNote `json:",omitempty" mapconv:"[]Notes,omitempty,recursive"`
+	UserIPAddress       string                `json:",omitempty" mapconv:",omitempty"`
+	UserSubnet          *DiskEditUserSubnet   `json:",omitempty" mapconv:",omitempty"`
 }
 
 // diskCreateWithConfigRequestEnvelope is envelop of API request
