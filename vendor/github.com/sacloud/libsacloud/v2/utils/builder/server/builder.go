@@ -91,7 +91,19 @@ func (b *Builder) Validate(ctx context.Context, zone string) error {
 		return fmt.Errorf("invalid InterfaceDriver: %s", b.InterfaceDriver)
 	}
 
-	// Field values
+	// NICs
+	if b.NIC != nil {
+		if err := b.NIC.Validate(ctx, b.Client, zone); err != nil {
+			return fmt.Errorf("invalid NIC: %s", err)
+		}
+	}
+	for i, nic := range b.AdditionalNICs {
+		if err := nic.Validate(ctx, b.Client, zone); err != nil {
+			return fmt.Errorf("invalid AdditionalNICs[%d]: %s", i, err)
+		}
+	}
+
+	// server plan
 	_, err := query.FindServerPlan(ctx, b.Client.ServerPlan, zone, &query.FindServerPlanRequest{
 		CPU:        b.CPU,
 		MemoryGB:   b.MemoryGB,
