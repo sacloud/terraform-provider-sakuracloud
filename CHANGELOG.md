@@ -2,6 +2,7 @@
 
 * Startup Script Parameters [GH-731] (@yamamoto-febc)
     * libsacloud v2.5.1
+* libsacloud v2.5.2 - improve error messages [GH-733] (@yamamoto-febc)    
 
 ## 2.2.0 (2020-03-17)
 
