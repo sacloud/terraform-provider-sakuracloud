@@ -1,5 +1,9 @@
 ## 2.3.1 (Unreleased)
 
+MISC
+
+* Fix broken CI - install golangci-lint via install script [GH-735] (@yamamoto-febc)
+
 ## 2.3.0 (2020-04-20)
 
 * Startup Script Parameters [GH-731] (@yamamoto-febc)
