@@ -1,5 +1,9 @@
 ## 2.3.1 (Unreleased)
 
+FIXES
+
+* Modify how to determine whether to pass disk_edit_parameter to ServerBuilder [GH-737] (@yamamoto-febc)
+
 MISC
 
 * Fix broken CI - install golangci-lint via install script [GH-735] (@yamamoto-febc)

@@ -33,6 +33,11 @@ import (
 	"github.com/sacloud/libsacloud/v2/sacloud/types"
 )
 
+type resourceValueChangeHandler interface {
+	HasChanges(keys ...string) bool
+	GetChange(key string) (interface{}, interface{})
+}
+
 type resourceValueGettable interface {
 	Get(key string) interface{}
 	GetOk(key string) (interface{}, bool)

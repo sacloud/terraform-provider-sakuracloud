@@ -96,6 +96,51 @@ func TestAccSakuraCloudServer_basic(t *testing.T) {
 	})
 }
 
+func TestAccSakuraCloudServer_withoutShutdown(t *testing.T) {
+	resourceName := "sakuracloud_server.foobar"
+	rand := randomName()
+	password := randomPassword()
+
+	var created, updated, editParamChanged sacloud.Server
+	resource.ParallelTest(t, resource.TestCase{
+		PreCheck:     func() { testAccPreCheck(t) },
+		Providers:    testAccProviders,
+		CheckDestroy: testCheckSakuraCloudServerDestroy,
+		Steps: []resource.TestStep{
+			{
+				Config: buildConfigWithArgs(testAccSakuraCloudServer_withoutShutdownWhenUpdate, rand, password),
+				Check: resource.ComposeTestCheckFunc(
+					testCheckSakuraCloudServerExists(resourceName, &created),
+				),
+			},
+			{
+				Config: buildConfigWithArgs(testAccSakuraCloudServer_updateWithoutShutdownWhenUpdate, rand, password),
+				Check: resource.ComposeTestCheckFunc(
+					testCheckSakuraCloudServerExists(resourceName, &updated),
+					func(state *terraform.State) error {
+						if created.InstanceStatusChangedAt != updated.InstanceStatusChangedAt {
+							return errors.New("unexpected shutdown has happened")
+						}
+						return nil
+					},
+				),
+			},
+			{
+				Config: buildConfigWithArgs(testAccSakuraCloudServer_updateWithShutdownWhenUpdate, rand, password),
+				Check: resource.ComposeTestCheckFunc(
+					testCheckSakuraCloudServerExists(resourceName, &editParamChanged),
+					func(state *terraform.State) error {
+						if updated.InstanceStatusChangedAt == editParamChanged.InstanceStatusChangedAt {
+							return errors.New("expected shutdown has not happened")
+						}
+						return nil
+					},
+				),
+			},
+		},
+	})
+}
+
 func TestAccSakuraCloudServer_interfaces(t *testing.T) {
 	resourceName := "sakuracloud_server.foobar"
 	rand := randomName()
@@ -579,6 +624,113 @@ resource "sakuracloud_server" "foobar" {
     ip_address = "192.168.0.2"
     netmask    = 24
     gateway    = "192.168.0.1"
+  }
+}
+`
+
+const testAccSakuraCloudServer_withoutShutdownWhenUpdate = `
+resource "sakuracloud_switch" "sw" {
+  name = "{{ .arg0 }}"
+}
+
+data "sakuracloud_archive" "ubuntu" {
+  os_type = "ubuntu"
+}
+resource "sakuracloud_disk" "foobar" {
+  name              = "{{ .arg0 }}"
+  source_archive_id = data.sakuracloud_archive.ubuntu.id
+}
+
+resource "sakuracloud_server" "foobar" {
+  name        = "{{ .arg0 }}"
+  disks       = [sakuracloud_disk.foobar.id]
+  description = "description"
+  tags        = ["tag1", "tag2"]
+
+  network_interface {
+    upstream = "shared"
+  }
+
+  network_interface {
+    upstream        = sakuracloud_switch.sw.id
+    user_ip_address = "192.168.0.11"
+  }
+
+  disk_edit_parameter {
+    hostname        = "{{ .arg0 }}"
+    password        = "{{ .arg1 }}"
+  }
+}
+`
+
+const testAccSakuraCloudServer_updateWithoutShutdownWhenUpdate = `
+resource "sakuracloud_switch" "sw" {
+  name = "{{ .arg0 }}"
+}
+
+data "sakuracloud_archive" "ubuntu" {
+  os_type = "ubuntu"
+}
+
+resource "sakuracloud_disk" "foobar" {
+  name              = "{{ .arg0 }}-upd"
+  source_archive_id = data.sakuracloud_archive.ubuntu.id
+}
+
+resource "sakuracloud_server" "foobar" {
+  name             = "{{ .arg0 }}-upd"
+  disks            = [sakuracloud_disk.foobar.id]
+  description      = "description-upd"
+  tags             = ["tag1-upd", "tag2-upd"]
+
+  network_interface {
+    upstream = "shared"
+  }
+
+  network_interface {
+    upstream        = sakuracloud_switch.sw.id
+    user_ip_address = "192.168.0.12"
+  }
+
+  disk_edit_parameter {
+    hostname        = "{{ .arg0 }}"
+    password        = "{{ .arg1 }}"
+  }
+}
+`
+
+const testAccSakuraCloudServer_updateWithShutdownWhenUpdate = `
+resource "sakuracloud_switch" "sw" {
+  name = "{{ .arg0 }}"
+}
+
+data "sakuracloud_archive" "ubuntu" {
+  os_type = "ubuntu"
+}
+
+resource "sakuracloud_disk" "foobar" {
+  name              = "{{ .arg0 }}-upd"
+  source_archive_id = data.sakuracloud_archive.ubuntu.id
+}
+
+resource "sakuracloud_server" "foobar" {
+  name             = "{{ .arg0 }}-upd"
+  disks            = [sakuracloud_disk.foobar.id]
+  description      = "description-upd"
+  tags             = ["tag1-upd", "tag2-upd"]
+
+  network_interface {
+    upstream = "shared"
+  }
+
+  network_interface {
+    upstream        = sakuracloud_switch.sw.id
+    user_ip_address = "192.168.0.12"
+  }
+
+  disk_edit_parameter {
+    hostname        = "{{ .arg0 }}"
+    password        = "{{ .arg1 }}-upd"
   }
 }
 `

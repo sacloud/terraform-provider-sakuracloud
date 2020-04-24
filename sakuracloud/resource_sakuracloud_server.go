@@ -439,7 +439,3 @@ func setServerResourceData(ctx context.Context, d *schema.ResourceData, client *
 	d.Set("zone", zone) // nolint
 	return d.Set("tags", flattenTags(data.Tags))
 }
-
-func isServerDiskConfigChanged(d *schema.ResourceData) bool {
-	return d.HasChanges("disks", "network_interface", "disk_edit_parameter")
-}
