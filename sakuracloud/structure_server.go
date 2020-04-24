@@ -56,7 +56,8 @@ func expandServerDisks(d *schema.ResourceData, client *APIClient) []diskBuilder.
 			ID:     diskID,
 			Client: diskBuilder.NewBuildersAPIClient(client),
 		}
-		if i == 0 && isServerDiskConfigChanged(d) {
+		// set only when value was changed
+		if i == 0 && isDiskEditParameterChanged(d) {
 			if diskEdit, ok := d.GetOk("disk_edit_parameter"); ok {
 				v := mapToResourceData(diskEdit.([]interface{})[0].(map[string]interface{}))
 				log.Printf("[INFO] disk_edit_parameter is specified for Disk[%s]", diskID)
@@ -195,4 +196,38 @@ func flattenServerNetworkInfo(server *sacloud.Server) (ip, gateway string, nwMas
 		nwAddress = nic.SubnetNetworkAddress // null if connected switch(not router)
 	}
 	return
+}
+
+func isDiskEditParameterChanged(d resourceValueChangeHandler) bool {
+	if d.HasChanges("network_interface") && isUpstreamChanged(d.GetChange("network_interface")) {
+		return true
+	}
+	return d.HasChanges("disks", "disk_edit_parameter")
+}
+
+func isUpstreamChanged(old, new interface{}) bool {
+	oldIsNil := old == nil
+	newIsNil := new == nil
+
+	if oldIsNil && newIsNil {
+		return false
+	}
+	if oldIsNil != newIsNil {
+		return true
+	}
+
+	oldNICs := old.([]interface{})
+	newNICs := new.([]interface{})
+	if len(oldNICs) != len(newNICs) {
+		return true
+	}
+
+	for i := range oldNICs {
+		oldUpstream := mapToResourceData(oldNICs[i].(map[string]interface{})).Get("upstream").(string)
+		newUpstream := mapToResourceData(newNICs[i].(map[string]interface{})).Get("upstream").(string)
+		if oldUpstream != newUpstream {
+			return true
+		}
+	}
+	return false
 }
