@@ -1,6 +1,6 @@
-## 2.3.2 (Unreleased)
+## 2.3.2 (2020-05-15)
 
-*
+* This is an experimental release for testing publishing to the Terraform registry. Don't use this in a production environment.
 
 ## 2.3.1 (2020-04-24)
 
