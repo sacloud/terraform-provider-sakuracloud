@@ -2,6 +2,8 @@
 **/terraform-provider-sakuracloud*
 **/.usacloud
 
+dist/
+
 .terraform*
 terraform.tfstate*
 terraform.tfvars*

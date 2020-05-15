@@ -27,7 +27,7 @@ export GO111MODULE=on
 default: fmt goimports set-license lint tflint docscheck
 
 clean:
-	rm -Rf $(CURDIR)/bin/*
+	rm -f $(CURDIR)/terraform-provider-sakuracloud
 
 .PHONY: tools
 tools:
@@ -44,51 +44,19 @@ tools:
 .PHONY: build-envs
 build-envs:
 	$(eval CURRENT_VERSION ?= $(shell gobump show -r sakuracloud/))
-	$(eval BUILD_LDFLAGS := "-s -w \
-           -X github.com/sacloud/terraform-provider-sakuracloud/sakuracloud.Revision=`git rev-parse --short HEAD` \
-           -X github.com/sacloud/terraform-provider-sakuracloud/sakuracloud.Version=$(CURRENT_VERSION)")
+	$(eval BUILD_LDFLAGS := "-s -w -X github.com/sacloud/terraform-provider-sakuracloud/sakuracloud.Revision=`git rev-parse --short HEAD`")
 
 .PHONY: build
 build: build-envs
-	OS=$${OS:-"`go env GOOS`"} ARCH=$${ARCH:-"`go env GOARCH`"} BUILD_LDFLAGS=$(BUILD_LDFLAGS) CURRENT_VERSION=$(CURRENT_VERSION) sh -c "'$(CURDIR)/scripts/build.sh'"
-
-.PHONY: build-x
-build-x: build-envs build-darwin build-windows build-linux shasum
-
-.PHONY: build-darwin
-build-darwin: build-envs bin/terraform-provider-sakuracloud_$(CURRENT_VERSION)_darwin-386.zip bin/terraform-provider-sakuracloud_$(CURRENT_VERSION)_darwin-amd64.zip
-
-.PHONY: build-windows
-build-windows: build-envs bin/terraform-provider-sakuracloud_$(CURRENT_VERSION)_windows-386.zip bin/terraform-provider-sakuracloud_$(CURRENT_VERSION)_windows-amd64.zip
-
-.PHONY: build-linux
-build-linux: build-envs bin/terraform-provider-sakuracloud_$(CURRENT_VERSION)_linux-386.zip bin/terraform-provider-sakuracloud_$(CURRENT_VERSION)_linux-amd64.zip
-
-bin/terraform-provider-sakuracloud_$(CURRENT_VERSION)_darwin-386.zip: build-envs
-	OS="darwin"  ARCH="386"   ARCHIVE=1 BUILD_LDFLAGS=$(BUILD_LDFLAGS) CURRENT_VERSION=$(CURRENT_VERSION) sh -c "'$(CURDIR)/scripts/build.sh'"
-
-bin/terraform-provider-sakuracloud_$(CURRENT_VERSION)_darwin-amd64.zip: build-envs
-	OS="darwin"  ARCH="amd64" ARCHIVE=1 BUILD_LDFLAGS=$(BUILD_LDFLAGS) CURRENT_VERSION=$(CURRENT_VERSION) sh -c "'$(CURDIR)/scripts/build.sh'"
-
-bin/terraform-provider-sakuracloud_$(CURRENT_VERSION)_windows-386.zip: build-envs
-	OS="windows" ARCH="386"   ARCHIVE=1 BUILD_LDFLAGS=$(BUILD_LDFLAGS) CURRENT_VERSION=$(CURRENT_VERSION) sh -c "'$(CURDIR)/scripts/build.sh'"
-
-bin/terraform-provider-sakuracloud_$(CURRENT_VERSION)_windows-amd64.zip: build-envs
-	OS="windows" ARCH="amd64" ARCHIVE=1 BUILD_LDFLAGS=$(BUILD_LDFLAGS) CURRENT_VERSION=$(CURRENT_VERSION) sh -c "'$(CURDIR)/scripts/build.sh'"
-
-bin/terraform-provider-sakuracloud_$(CURRENT_VERSION)_linux-386.zip: build-envs
-	OS="linux"   ARCH="386"   ARCHIVE=1 BUILD_LDFLAGS=$(BUILD_LDFLAGS) CURRENT_VERSION=$(CURRENT_VERSION) sh -c "'$(CURDIR)/scripts/build.sh'"
-
-bin/terraform-provider-sakuracloud_$(CURRENT_VERSION)_linux-amd64.zip: build-envs
-	OS="linux"   ARCH="amd64" ARCHIVE=1 BUILD_LDFLAGS=$(BUILD_LDFLAGS) CURRENT_VERSION=$(CURRENT_VERSION) sh -c "'$(CURDIR)/scripts/build.sh'"
+	GOOS=$${OS:-"`go env GOOS`"} GOARCH=$${ARCH:-"`go env GOARCH`"} CGO_ENABLED=0 go build -ldflags=$(BUILD_LDFLAGS)
 
 .PHONY: shasum
 shasum:
 	(cd bin/; shasum -a 256 * > terraform-provider-sakuracloud_$(CURRENT_VERSION)_SHA256SUMS)
 
-.PHONY: release
-release: build-envs
-	ghr v${CURRENT_VERSION} bin/
+# .PHONY: release
+# release: build-envs
+# 	goreleaser release --rm-dist
 
 .PHONY: test
 test:
