@@ -1,3 +1,7 @@
+## 2.3.3 (Unreleased)
+
+- Support for publishing in the Terraform Registry [GH-744] (@yamamoto-febc)
+
 ## 2.3.2 (2020-05-15)
 
 * This is an experimental release for testing publishing to the Terraform registry. Don't use this in a production environment.
