@@ -43,17 +43,16 @@ archives:
 checksum:
   name_template: '{{ .ProjectName }}_{{ .Version }}_SHA256SUMS'
   algorithm: sha256
-#signs:
-#  - artifacts: checksum
-#    args:
-#      - "--local-user"
-#      - "3D86849D"
-#      - "--output"
-#      - "${signature}"
-#      - "--detach-sign"
-#      - "${artifact}"
-release:
-  # Visit your project's GitHub Releases page to publish this release.
-  draft: true
+signs:
+  - artifacts: checksum
+    args:
+      - "--local-user"
+      - "E37EC0B895A9AC27DC4919AB96CEB4B93D86849D"
+      - "--output"
+      - "${signature}"
+      - "--detach-sign"
+      - "${artifact}"
+# release:
+#   draft: true
 changelog:
   skip: true
