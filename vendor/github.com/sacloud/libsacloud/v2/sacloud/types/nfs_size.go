@@ -52,3 +52,14 @@ var NFSSSDSizes = struct {
 	Size2TB:   ENFSSize(1024 * 2),
 	Size4TB:   ENFSSize(1024 * 4),
 }
+
+// NFSIntSizes NFSで使用可能なサイズの一覧
+var NFSIntSizes = []int{
+	int(NFSHDDSizes.Size100GB),
+	int(NFSHDDSizes.Size500GB),
+	int(NFSHDDSizes.Size1TB),
+	int(NFSHDDSizes.Size2TB),
+	int(NFSHDDSizes.Size4TB),
+	int(NFSHDDSizes.Size8TB),
+	int(NFSHDDSizes.Size12TB),
+}

@@ -2012,7 +2012,7 @@ type proxyLBUpdateSettingsResponseEnvelope struct {
 
 // proxyLBChangePlanRequestEnvelope is envelop of API request
 type proxyLBChangePlanRequestEnvelope struct {
-	CommonServiceItem *naked.ProxyLB `json:",omitempty"`
+	CommonServiceItem *naked.ProxyLBPlanChange `json:",omitempty"`
 }
 
 // proxyLBChangePlanResponseEnvelope is envelop of API response

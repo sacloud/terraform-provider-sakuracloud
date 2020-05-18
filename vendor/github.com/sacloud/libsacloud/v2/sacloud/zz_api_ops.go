@@ -8366,7 +8366,7 @@ func (o *ProxyLBOp) ChangePlan(ctx context.Context, id types.ID, param *ProxyLBC
 		"param":      param,
 	}
 
-	url, err := buildURL("{{.rootURL}}/{{.zone}}/{{.pathSuffix}}/{{.pathName}}/{{.id}}", pathBuildParameter)
+	url, err := buildURL("{{.rootURL}}/{{.zone}}/{{.pathSuffix}}/{{.pathName}}/{{.id}}/plan", pathBuildParameter)
 	if err != nil {
 		return nil, err
 	}

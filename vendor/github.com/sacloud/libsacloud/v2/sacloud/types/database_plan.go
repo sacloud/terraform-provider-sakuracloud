@@ -42,6 +42,16 @@ func SlaveDatabasePlanID(masterPlanID ID) ID {
 	return ID(int64(masterPlanID) + 1)
 }
 
+// DatabasePlanIDs データベースプランのID
+var DatabasePlanIDs = []ID{
+	DatabasePlans.DB10GB,
+	DatabasePlans.DB30GB,
+	DatabasePlans.DB90GB,
+	DatabasePlans.DB240GB,
+	DatabasePlans.DB500GB,
+	DatabasePlans.DB1TB,
+}
+
 // DatabasePlanStrings データベースプランを示す文字列
 var DatabasePlanStrings = []string{"10g", "30g", "90g", "240g", "500g", "1t"}
 
