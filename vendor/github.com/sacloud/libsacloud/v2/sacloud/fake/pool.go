@@ -47,11 +47,11 @@ type valuePool struct {
 	mu                   sync.Mutex
 }
 
-func initValuePool(s Store) *valuePool {
-	var mu sync.Mutex
+var poolMu sync.Mutex
 
-	mu.Lock()
-	defer mu.Unlock()
+func initValuePool(s Store) *valuePool {
+	poolMu.Lock()
+	defer poolMu.Unlock()
 
 	v := s.Get(valuePoolResourceKey, sacloud.APIDefaultZone, valuePoolMagicID)
 	if v != nil {
@@ -99,9 +99,11 @@ func (p *valuePool) nextSharedIP() net.IP {
 	ip := p.CurrentSharedIP.To4()
 	ip[3]++
 	p.CurrentSharedIP = ip
-
 	p.store()
-	return ip
+
+	ret := net.IP{0x00, 0x00, 0x00, 0x00}
+	copy(ret, ip)
+	return ret
 }
 
 func (p *valuePool) nextMACAddress() net.HardwareAddr {
@@ -110,10 +112,12 @@ func (p *valuePool) nextMACAddress() net.HardwareAddr {
 
 	mac := []byte(p.CurrentMACAddress)
 	mac[5]++
-	p.CurrentMACAddress = net.HardwareAddr(mac)
-
+	p.CurrentMACAddress = mac
 	p.store()
-	return p.CurrentMACAddress
+
+	ret := net.HardwareAddr{0x00, 0x00, 0x00, 0x00, 0x00, 0x00}
+	copy(ret, mac)
+	return ret
 }
 
 func (p *valuePool) nextSubnet(maskLen int) *assignedSubnet {

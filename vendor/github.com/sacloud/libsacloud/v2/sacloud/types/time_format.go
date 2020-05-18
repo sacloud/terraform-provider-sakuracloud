@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package libsacloud
+package types
 
-// Version バージョン
-const Version = "2.5.4"
+// DatetimeLayout さくらのクラウドAPIで利用される日付型のレイアウト(RFC3339)
+var DatetimeLayout = "2006-01-02T15:04:05-07:00"

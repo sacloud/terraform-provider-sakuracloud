@@ -187,6 +187,8 @@ func (o *ProxyLBOp) ChangePlan(ctx context.Context, id types.ID, param *sacloud.
 	}
 
 	value.Plan = param.Plan
+	putProxyLB(sacloud.APIDefaultZone, value)
+
 	return value, err
 }
 

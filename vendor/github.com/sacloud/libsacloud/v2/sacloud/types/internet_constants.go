@@ -15,11 +15,7 @@
 package types
 
 // InternetBandWidths 設定可能な帯域幅の値リスト
-func InternetBandWidths() []int {
-	return []int{100, 250, 500, 1000, 1500, 2000, 2500, 3000, 5000}
-}
+var InternetBandWidths = []int{100, 250, 500, 1000, 1500, 2000, 2500, 3000, 5000}
 
 // InternetNetworkMaskLengths 設定可能なネットワークマスク長の値リスト
-func InternetNetworkMaskLengths() []int {
-	return []int{26, 27, 28}
-}
+var InternetNetworkMaskLengths = []int{26, 27, 28}

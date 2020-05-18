@@ -69,7 +69,7 @@ resource sakuracloud_server "foobar" {
 
 * `name` - (Required) The name of the ProxyLB. The length of this value must be in the range [`1`-`64`].
 * `vip_failover` - (Optional) The flag to enable VIP fail-over. Changing this forces a new resource to be created.
-* `plan` - (Optional) The plan name of the ProxyLB. This must be one of [`100`/`500`/`1000`/`5000`/`10000`/`50000`/`100000`]. Changing this forces a new resource to be created. Default:`100`.
+* `plan` - (Optional) The plan name of the ProxyLB. This must be one of [`100`/`500`/`1000`/`5000`/`10000`/`50000`/`100000`]. Default:`100`.
 * `region` - (Optional) The name of region that the proxy LB is in. This must be one of [`tk1`/`is1`]. Changing this forces a new resource to be created. Default:`is1`.
 * `timeout` - (Optional) The timeout duration in seconds. Default:`10`.
 

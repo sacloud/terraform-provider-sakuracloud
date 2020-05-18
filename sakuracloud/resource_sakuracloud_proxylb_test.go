@@ -39,7 +39,7 @@ func TestAccSakuraCloudProxyLB_basic(t *testing.T) {
 	rand := randomName()
 	ip := os.Getenv(envProxyLBRealServerIP0)
 
-	var proxylb sacloud.ProxyLB
+	var proxylb, proxylbUpd sacloud.ProxyLB
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:  func() { testAccPreCheck(t) },
 		Providers: testAccProviders,
@@ -93,12 +93,19 @@ func TestAccSakuraCloudProxyLB_basic(t *testing.T) {
 			{
 				Config: buildConfigWithArgs(testAccSakuraCloudProxyLB_update, rand),
 				Check: resource.ComposeTestCheckFunc(
-					testCheckSakuraCloudProxyLBExists(resourceName, &proxylb),
+					testCheckSakuraCloudProxyLBExists(resourceName, &proxylbUpd),
+					func(state *terraform.State) error {
+						if proxylb.ID == proxylbUpd.ID {
+							return fmt.Errorf("sakuracloud_proxylb: plan wasn't updated")
+						}
+						return nil
+					},
 					resource.TestCheckResourceAttr(resourceName, "name", rand+"-upd"),
 					resource.TestCheckResourceAttr(resourceName, "description", "description-upd"),
 					resource.TestCheckResourceAttr(resourceName, "tags.#", "2"),
 					resource.TestCheckResourceAttr(resourceName, "tags.2362157161", "tag1-upd"),
 					resource.TestCheckResourceAttr(resourceName, "tags.3412841145", "tag2-upd"),
+					resource.TestCheckResourceAttr(resourceName, "plan", "500"),
 					resource.TestCheckResourceAttr(resourceName, "sticky_session", "false"),
 					resource.TestCheckResourceAttr(resourceName, "health_check.0.protocol", "tcp"),
 					resource.TestCheckResourceAttr(resourceName, "health_check.0.delay_loop", "20"),
@@ -298,7 +305,7 @@ resource sakuracloud_server "foobar" {
 var testAccSakuraCloudProxyLB_update = `
 resource "sakuracloud_proxylb" "foobar" {
   name           = "{{ .arg0 }}-upd"
-  plan           = 100
+  plan           = 500
   vip_failover   = true
   sticky_session = false
   timeout        = 10
