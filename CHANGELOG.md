@@ -1,15 +1,19 @@
-## 2.3.3 (Unreleased)
+## 2.3.4 (Unreleased)
+
+*
+
+## 2.3.3 (2020-05-18)
 
 Note: Publishing in the Terraform Registry is supported this version and later.
 see http://registry.terraform.io/providers/sacloud/sakuracloud/
 
 FEATURES
 
-- Support for publishing in the Terraform Registry [GH-744] (@yamamoto-febc)
+* Support for publishing in the Terraform Registry [GH-744] (@yamamoto-febc)
 
 FIXES
 
-- Fixes plan changing of ProxyLB [GH-745] (@yamamoto-febc)
+* Fixes plan changing of ProxyLB [GH-745] (@yamamoto-febc)
 
 ## 2.3.2 (2020-05-15)
 
