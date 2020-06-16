@@ -1,4 +1,8 @@
-## 2.3.4 (Unreleased)
+## 2.3.5 (Unreleased)
+
+* 
+
+## 2.3.4 (2020-06-16)
 
 * ProxyLB: supports anycast [GH-747] (@yamamoto-febc)
 
