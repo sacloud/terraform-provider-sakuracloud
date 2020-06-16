@@ -36,6 +36,9 @@ func ConvertTo(source interface{}, dest interface{}) error {
 		}
 
 		tags := ParseMapConvTag(f.Tag("mapconv"))
+		if tags.Ignore {
+			continue
+		}
 		for _, key := range tags.SourceFields {
 			destKey := f.Name()
 			value := f.Value()
@@ -118,6 +121,9 @@ func ConvertFrom(source interface{}, dest interface{}) error {
 		}
 
 		tags := ParseMapConvTag(f.Tag("mapconv"))
+		if tags.Ignore {
+			continue
+		}
 		if tags.Squash {
 			return errors.New("ConvertFrom is not allowed squash")
 		}
@@ -182,6 +188,7 @@ func ConvertFrom(source interface{}, dest interface{}) error {
 
 // TagInfo mapconvタグの情報
 type TagInfo struct {
+	Ignore       bool
 	SourceFields []string
 	DefaultValue interface{}
 	OmitEmpty    bool
@@ -197,9 +204,13 @@ func ParseMapConvTag(tagBody string) TagInfo {
 
 	keys := strings.Split(key, "/")
 	var defaultValue interface{}
-	var omitEmpty, recursive, squash, isSlice bool
+	var ignore, omitEmpty, recursive, squash, isSlice bool
 
 	for _, k := range keys {
+		if k == "-" {
+			ignore = true
+			break
+		}
 		if strings.Contains(k, "[]") {
 			isSlice = true
 		}
@@ -225,6 +236,7 @@ func ParseMapConvTag(tagBody string) TagInfo {
 		}
 	}
 	return TagInfo{
+		Ignore:       ignore,
 		SourceFields: keys,
 		DefaultValue: defaultValue,
 		OmitEmpty:    omitEmpty,

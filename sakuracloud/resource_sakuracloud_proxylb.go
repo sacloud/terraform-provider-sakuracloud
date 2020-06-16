@@ -404,7 +404,8 @@ func resourceSakuraCloudProxyLBUpdate(d *schema.ResourceData, meta interface{}) 
 
 	if d.HasChange("plan") {
 		newPlan := types.EProxyLBPlan(d.Get("plan").(int))
-		upd, err := proxyLBOp.ChangePlan(ctx, proxyLB.ID, &sacloud.ProxyLBChangePlanRequest{Plan: newPlan})
+		serviceClass := types.ProxyLBServiceClass(newPlan, proxyLB.Region)
+		upd, err := proxyLBOp.ChangePlan(ctx, proxyLB.ID, &sacloud.ProxyLBChangePlanRequest{ServiceClass: serviceClass})
 		if err != nil {
 			return fmt.Errorf("changing ProxyLB[%s] plan is failed: %s", d.Id(), err)
 		}

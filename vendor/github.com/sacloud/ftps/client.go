@@ -84,6 +84,11 @@ func (c *Client) Download(filePath string) error {
 
 // DownloadFile file from server
 func (c *Client) DownloadFile(file *os.File) error {
+	return c.DownloadWriter(file)
+}
+
+// DownloadFile file from server
+func (c *Client) DownloadWriter(writer io.Writer) error {
 
 	rawClient := &FTPS{}
 	rawClient.TLSConfig.InsecureSkipVerify = true
@@ -115,7 +120,7 @@ func (c *Client) DownloadFile(file *os.File) error {
 	}
 
 	// download
-	err = rawClient.RetrieveFile(serverFilePath, file)
+	err = rawClient.RetrieveWriter(serverFilePath, writer)
 	if err != nil {
 		return fmt.Errorf("FTP download file is failed: %#v", err)
 	}

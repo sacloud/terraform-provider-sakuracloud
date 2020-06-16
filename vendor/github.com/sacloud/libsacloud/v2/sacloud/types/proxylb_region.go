@@ -28,10 +28,13 @@ var ProxyLBRegions = struct {
 	TK1 EProxyLBRegion
 	// IS1 石狩
 	IS1 EProxyLBRegion
+	// Anycast エニーキャスト
+	Anycast EProxyLBRegion
 }{
-	TK1: EProxyLBRegion("tk1"),
-	IS1: EProxyLBRegion("is1"),
+	TK1:     EProxyLBRegion("tk1"),
+	IS1:     EProxyLBRegion("is1"),
+	Anycast: EProxyLBRegion("anycast"),
 }
 
 // ProxyLBRegionStrings 設置先リージョンを表す文字列
-var ProxyLBRegionStrings = []string{"tk1", "is1"}
+var ProxyLBRegionStrings = []string{"tk1", "is1", "anycast"}

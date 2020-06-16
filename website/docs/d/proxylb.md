@@ -52,7 +52,7 @@ A `condition` block supports the following:
 * `name` - The name of the ProxyLB.
 * `plan` - The plan name of the ProxyLB. This will be one of [`100`/`500`/`1000`/`5000`/`10000`/`50000`/`100000`].
 * `proxy_networks` - A list of CIDR block used by the ProxyLB to access the server.
-* `region` - The name of region that the proxy LB is in. This will be one of [`tk1`/`is1`].
+* `region` - The name of region that the proxy LB is in. This will be one of [`tk1`/`is1`/`anycast`].
 * `rule` - A list of `rule` blocks as defined below.
 * `server` - A list of `server` blocks as defined below.
 * `sorry_server` - A list of `sorry_server` blocks as defined below.
