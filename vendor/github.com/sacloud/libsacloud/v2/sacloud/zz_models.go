@@ -19,10 +19,10 @@ package sacloud
 import (
 	"time"
 
+	"github.com/go-playground/validator/v10"
 	"github.com/sacloud/libsacloud/v2/sacloud/accessor"
 	"github.com/sacloud/libsacloud/v2/sacloud/search"
 	"github.com/sacloud/libsacloud/v2/sacloud/types"
-	"gopkg.in/go-playground/validator.v9"
 )
 
 /*************************************************
@@ -17682,7 +17682,7 @@ type ProxyLB struct {
 	IconID           types.ID `mapconv:"Icon.ID"`
 	CreatedAt        time.Time
 	ModifiedAt       time.Time
-	Plan             types.EProxyLBPlan    `mapconv:"ServiceClass"`
+	Plan             types.EProxyLBPlan
 	HealthCheck      *ProxyLBHealthCheck   `mapconv:"Settings.ProxyLB.HealthCheck,recursive"`
 	SorryServer      *ProxyLBSorryServer   `mapconv:"Settings.ProxyLB.SorryServer,recursive"`
 	BindPorts        []*ProxyLBBindPort    `mapconv:"Settings.ProxyLB.[]BindPorts,recursive"`
@@ -17715,7 +17715,7 @@ func (o *ProxyLB) setDefaults() interface{} {
 		IconID           types.ID `mapconv:"Icon.ID"`
 		CreatedAt        time.Time
 		ModifiedAt       time.Time
-		Plan             types.EProxyLBPlan    `mapconv:"ServiceClass"`
+		Plan             types.EProxyLBPlan
 		HealthCheck      *ProxyLBHealthCheck   `mapconv:"Settings.ProxyLB.HealthCheck,recursive"`
 		SorryServer      *ProxyLBSorryServer   `mapconv:"Settings.ProxyLB.SorryServer,recursive"`
 		BindPorts        []*ProxyLBBindPort    `mapconv:"Settings.ProxyLB.[]BindPorts,recursive"`
@@ -18541,7 +18541,7 @@ func (o *ProxyLBTimeout) SetInactiveSec(v int) {
 
 // ProxyLBCreateRequest represents API parameter/response structure
 type ProxyLBCreateRequest struct {
-	Plan           types.EProxyLBPlan    `mapconv:"ServiceClass"`
+	Plan           types.EProxyLBPlan
 	HealthCheck    *ProxyLBHealthCheck   `mapconv:"Settings.ProxyLB.HealthCheck,recursive"`
 	SorryServer    *ProxyLBSorryServer   `mapconv:"Settings.ProxyLB.SorryServer,recursive"`
 	BindPorts      []*ProxyLBBindPort    `mapconv:"Settings.ProxyLB.[]BindPorts,recursive"`
@@ -18566,7 +18566,7 @@ func (o *ProxyLBCreateRequest) Validate() error {
 // setDefaults implements sacloud.argumentDefaulter
 func (o *ProxyLBCreateRequest) setDefaults() interface{} {
 	return &struct {
-		Plan           types.EProxyLBPlan    `mapconv:"ServiceClass"`
+		Plan           types.EProxyLBPlan
 		HealthCheck    *ProxyLBHealthCheck   `mapconv:"Settings.ProxyLB.HealthCheck,recursive"`
 		SorryServer    *ProxyLBSorryServer   `mapconv:"Settings.ProxyLB.SorryServer,recursive"`
 		BindPorts      []*ProxyLBBindPort    `mapconv:"Settings.ProxyLB.[]BindPorts,recursive"`
@@ -19124,7 +19124,7 @@ func (o *ProxyLBUpdateSettingsRequest) SetSettingsHash(v string) {
 
 // ProxyLBChangePlanRequest represents API parameter/response structure
 type ProxyLBChangePlanRequest struct {
-	Plan types.EProxyLBPlan `mapconv:"ServiceClass"`
+	ServiceClass string
 }
 
 // Validate validates by field tags
@@ -19135,20 +19135,20 @@ func (o *ProxyLBChangePlanRequest) Validate() error {
 // setDefaults implements sacloud.argumentDefaulter
 func (o *ProxyLBChangePlanRequest) setDefaults() interface{} {
 	return &struct {
-		Plan types.EProxyLBPlan `mapconv:"ServiceClass"`
+		ServiceClass string
 	}{
-		Plan: o.GetPlan(),
+		ServiceClass: o.GetServiceClass(),
 	}
 }
 
-// GetPlan returns value of Plan
-func (o *ProxyLBChangePlanRequest) GetPlan() types.EProxyLBPlan {
-	return o.Plan
+// GetServiceClass returns value of ServiceClass
+func (o *ProxyLBChangePlanRequest) GetServiceClass() string {
+	return o.ServiceClass
 }
 
-// SetPlan sets value to Plan
-func (o *ProxyLBChangePlanRequest) SetPlan(v types.EProxyLBPlan) {
-	o.Plan = v
+// SetServiceClass sets value to ServiceClass
+func (o *ProxyLBChangePlanRequest) SetServiceClass(v string) {
+	o.ServiceClass = v
 }
 
 /*************************************************

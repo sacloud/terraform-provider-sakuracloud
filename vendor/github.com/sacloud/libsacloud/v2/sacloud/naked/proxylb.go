@@ -37,13 +37,39 @@ type ProxyLB struct {
 	SettingsHash string              `json:",omitempty" yaml:"settings_hash,omitempty" structs:",omitempty"`
 	Status       *ProxyLBStatus      `json:",omitempty" yaml:"status,omitempty" structs:",omitempty"`
 
-	// ServiceClass [HACK] プランはServiceClassとして文字列で表す必要がある。 詳細はtypes.EProxyLBPlanのコメント参照
-	ServiceClass types.EProxyLBPlan `json:",omitempty" yaml:"service_class,omitempty" structs:",omitempty"`
+	// ServiceClass [HACK] ServiceClassはプランとリージョンから決定するためjson.Marshalerで出力する。
+	// see https://github.com/sacloud/libsacloud/issues/577
+	ServiceClass string             `json:",omitempty" yaml:"service_class,omitempty" structs:",omitempty"`
+	Plan         types.EProxyLBPlan `json:"-"`
+}
+
+// MarshalJSON implements json.Marshaler
+func (p *ProxyLB) MarshalJSON() ([]byte, error) {
+	if p.Status != nil && p.Plan != types.EProxyLBPlan(0) {
+		p.ServiceClass = types.ProxyLBServiceClass(p.Plan, p.Status.Region)
+	}
+
+	type alias ProxyLB
+	tmp := alias(*p)
+	return json.Marshal(&tmp)
+}
+
+// UnmarshalJSON implements json.Unmarshaler
+func (p *ProxyLB) UnmarshalJSON(b []byte) error {
+	type alias ProxyLB
+	var tmp alias
+	if err := json.Unmarshal(b, &tmp); err != nil {
+		return err
+	}
+
+	tmp.Plan = types.ProxyLBPlanFromServiceClass(tmp.ServiceClass)
+	*p = ProxyLB(tmp)
+	return nil
 }
 
 // ProxyLBPlanChange エンハンスドロードバランサのプラン変更
 type ProxyLBPlanChange struct {
-	ServiceClass types.EProxyLBPlan `yaml:"service_class"`
+	ServiceClass string `yaml:"service_class"`
 }
 
 // ProxyLBSettingsUpdate エンハンスドロードバランサ
