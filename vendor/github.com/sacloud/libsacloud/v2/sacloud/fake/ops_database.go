@@ -278,8 +278,9 @@ func (o *DatabaseOp) Status(ctx context.Context, zone string, id types.ID) (*sac
 	}
 
 	return &sacloud.DatabaseStatus{
-		Status:  value.InstanceStatus,
-		IsFatal: true,
+		Status:        value.InstanceStatus,
+		IsFatal:       false,
+		MariaDBStatus: "running",
 		Version: &sacloud.DatabaseVersionInfo{
 			LastModified: value.ModifiedAt.String(),
 			CommitHash:   "foobar",

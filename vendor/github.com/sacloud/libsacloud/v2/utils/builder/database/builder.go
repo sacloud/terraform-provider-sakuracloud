@@ -105,6 +105,15 @@ func (b *Builder) Build(ctx context.Context, zone string) (*sacloud.Database, er
 			return b.Client.Database.Read(ctx, zone, id)
 		},
 		ProvisionBeforeUp: func(ctx context.Context, zone string, id types.ID, _ interface{}) error {
+			// [HACK] データベースアプライアンス場合のみ/appliance/:id/statusも考慮する
+			waiter := sacloud.WaiterForUp(func() (interface{}, error) {
+				return b.Client.Database.Status(ctx, zone, id)
+			})
+			waiter.SetPollingInterval(sacloud.DefaultDBStatusPollingInterval) // HACK 現状は決め打ち、ユースケースが出たら修正する
+			_, err := waiter.WaitForState(ctx)
+			if err != nil {
+				return err
+			}
 			return b.Client.Database.Config(ctx, zone, id)
 		},
 		IsWaitForCopy:       true,

@@ -30,6 +30,10 @@ type StateWaiter interface {
 	WaitForState(context.Context) (interface{}, error)
 	// AsyncWaitForState リソースが指定の状態になるまで待つ
 	AsyncWaitForState(context.Context) (compCh <-chan interface{}, progressCh <-chan interface{}, errorCh <-chan error)
+	// SetPollingTimeout ポーリングタイムアウトを指定
+	SetPollingTimeout(d time.Duration)
+	// SetPollingInterval ポーリングタイムアウトを指定
+	SetPollingInterval(d time.Duration)
 }
 
 var (
@@ -37,6 +41,9 @@ var (
 	DefaultStatePollingTimeout = 20 * time.Minute
 	// DefaultStatePollingInterval StatePollWaiterでのデフォルトポーリング間隔
 	DefaultStatePollingInterval = 5 * time.Second
+
+	// DefaultDBStatusPollingInterval データベースアプライアンスのステータス取得ポーリング間隔
+	DefaultDBStatusPollingInterval = 30 * time.Second
 )
 
 // StateReadFunc StatePollWaiterにより利用される、対象リソースの状態を取得するためのfunc
@@ -144,6 +151,16 @@ func (w *StatePollingWaiter) defaults() {
 	if w.PollingInterval == time.Duration(0) {
 		w.PollingInterval = DefaultStatePollingInterval
 	}
+}
+
+// SetPollingTimeout ポーリングタイムアウトを指定
+func (w *StatePollingWaiter) SetPollingTimeout(timeout time.Duration) {
+	w.Timeout = timeout
+}
+
+// SetPollingInterval ポーリングタイムアウトを指定
+func (w *StatePollingWaiter) SetPollingInterval(d time.Duration) {
+	w.PollingInterval = d
 }
 
 // WaitForState リソースが指定の状態になるまで待つ

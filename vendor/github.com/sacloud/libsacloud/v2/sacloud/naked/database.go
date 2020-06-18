@@ -127,14 +127,21 @@ type DatabaseStatus struct {
 
 // DatabaseStatusDBConf データベース設定
 type DatabaseStatusDBConf struct {
-	Version *DatabaseStatusVersion `json:"version,omitempty" yaml:"version,omitempty" structs:",omitempty"`
-	Log     []*DatabaseLog         `json:"log,omitempty" yaml:"log,omitempty" structs:",omitempty"`
-	Backup  *DatabaseBackupInfo    `json:"backup,omitempty" yaml:"backup,omitempty" structs:",omitempty"`
+	Version  *DatabaseStatusVersion    `json:"version,omitempty" yaml:"version,omitempty" structs:",omitempty"`
+	Log      []*DatabaseLog            `json:"log,omitempty" yaml:"log,omitempty" structs:",omitempty"`
+	Backup   *DatabaseBackupInfo       `json:"backup,omitempty" yaml:"backup,omitempty" structs:",omitempty"`
+	MariaDB  *DatabaseStatusMariaDB    `json:",omitempty" yaml:"maria_db,omitempty" structs:",omitempty"`
+	Postgres *DatabaseStatusPostgreSQL `json:"postgres,omitempty" yaml:"postgres,omitempty" structs:",omitempty"`
 
 	// 以下フィールドはサポートしない
 	// Replication
-	// MariaDB
-	// Postgress
+}
+
+type DatabaseStatusMariaDB struct {
+	Status string `json:"status,omitempty"`
+}
+type DatabaseStatusPostgreSQL struct {
+	Status string `json:"status,omitempty"`
 }
 
 // DatabaseStatusVersion データベース設定バージョン情報
@@ -148,9 +155,9 @@ type DatabaseStatusVersion struct {
 
 // DatabaseLog データベースログ
 type DatabaseLog struct {
-	Name string `json:"name,omitempty" yaml:"name,omitempty" structs:",omitempty"`
-	Data string `json:"data,omitempty" yaml:"data,omitempty" structs:",omitempty"`
-	Size int    `json:"size,omitempty" yaml:"size,omitempty" structs:",omitempty"`
+	Name string             `json:"name,omitempty" yaml:"name,omitempty" structs:",omitempty"`
+	Data string             `json:"data,omitempty" yaml:"data,omitempty" structs:",omitempty"`
+	Size types.StringNumber `json:"size,omitempty" yaml:"size,omitempty" structs:",omitempty"`
 }
 
 // IsSystemdLog systemcltのログか判定
