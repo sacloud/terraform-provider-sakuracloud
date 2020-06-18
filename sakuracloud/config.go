@@ -243,6 +243,7 @@ func (c *Config) NewClient() (*APIClient, error) {
 
 		// update default polling intervals: libsacloud/sacloud
 		sacloud.DefaultStatePollingInterval = defaultInterval
+		sacloud.DefaultDBStatusPollingInterval = defaultInterval
 		// update default polling intervals: libsacloud/utils/setup
 		setup.DefaultDeleteWaitInterval = defaultInterval
 		setup.DefaultProvisioningWaitInterval = defaultInterval

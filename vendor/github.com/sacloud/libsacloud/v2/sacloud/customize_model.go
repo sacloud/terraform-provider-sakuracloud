@@ -19,12 +19,12 @@ import "github.com/sacloud/libsacloud/v2/sacloud/types"
 // BandWidthAt 指定インデックスのNICの帯域幅を算出
 //
 // 不明な場合は-1を、制限なしの場合は0を、以外の場合はMbps単位で返す
-func (s *Server) BandWidthAt(index int) int {
-	if len(s.Interfaces) <= index {
+func (o *Server) BandWidthAt(index int) int {
+	if len(o.Interfaces) <= index {
 		return -1
 	}
 
-	nic := s.Interfaces[index]
+	nic := o.Interfaces[index]
 
 	switch nic.UpstreamType {
 	case types.UpstreamNetworkTypes.None:
@@ -38,12 +38,12 @@ func (s *Server) BandWidthAt(index int) int {
 		//
 
 		// 専有ホストの場合は制限なし
-		if !s.PrivateHostID.IsEmpty() {
+		if !o.PrivateHostID.IsEmpty() {
 			return 0
 		}
 
 		// メモリに応じた制限
-		memory := s.GetMemoryGB()
+		memory := o.GetMemoryGB()
 		switch {
 		case memory < 32:
 			return 1000
@@ -59,4 +59,21 @@ func (s *Server) BandWidthAt(index int) int {
 	default:
 		return -1
 	}
+}
+
+// GetInstanceStatus データベース(サービス)ステータスを返すためのアダプター実装
+// PostgreSQLまたはMariaDBのステータス(詳細は以下)をInstanceStatusにラップして返す
+//    ステータス: GET /appliance/:id/status -> Appliance.ResponseStatus.DBConf.{MariaDB | postgres}.status
+// 主にStateWaiterで利用する。
+func (o *DatabaseStatus) GetInstanceStatus() types.EServerInstanceStatus {
+	if o.MariaDBStatus == "running" || o.PostgresStatus == "running" {
+		return types.ServerInstanceStatuses.Up
+	}
+	return types.ServerInstanceStatuses.Unknown
+}
+
+// SetInstanceStatus データベース(サービス)ステータスを返すためのアダプター実装
+// accessor.InstanceStatusを満たすためのスタブ実装
+func (o *DatabaseStatus) SetInstanceStatus(types.EServerInstanceStatus) {
+	// noop
 }

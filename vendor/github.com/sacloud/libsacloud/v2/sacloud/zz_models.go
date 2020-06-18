@@ -6336,11 +6336,13 @@ func (o *MonitorDatabaseValue) SetDelayTimeSec(v float64) {
 
 // DatabaseStatus represents API parameter/response structure
 type DatabaseStatus struct {
-	Status  types.EServerInstanceStatus `mapconv:"SettingsResponse.Status"`
-	IsFatal bool                        `mapconv:"SettingsResponse.IsFatal"`
-	Version *DatabaseVersionInfo        `mapconv:"SettingsResponse.DBConf.Version,recursive"`
-	Logs    []*DatabaseLog              `mapconv:"SettingsResponse.DBConf.[]Log,recursive"`
-	Backups []*DatabaseBackupHistory    `mapconv:"SettingsResponse.DBConf.Backup.[]History,recursive"`
+	Status         types.EServerInstanceStatus `mapconv:"SettingsResponse.Status"`
+	MariaDBStatus  string                      `mapconv:"SettingsResponse.DBConf.MariaDB.Status"`
+	PostgresStatus string                      `mapconv:"SettingsResponse.DBConf.Postgres.Status"`
+	IsFatal        bool                        `mapconv:"SettingsResponse.IsFatal"`
+	Version        *DatabaseVersionInfo        `mapconv:"SettingsResponse.DBConf.Version,recursive"`
+	Logs           []*DatabaseLog              `mapconv:"SettingsResponse.DBConf.[]Log,recursive"`
+	Backups        []*DatabaseBackupHistory    `mapconv:"SettingsResponse.DBConf.Backup.[]History,recursive"`
 }
 
 // Validate validates by field tags
@@ -6351,17 +6353,21 @@ func (o *DatabaseStatus) Validate() error {
 // setDefaults implements sacloud.argumentDefaulter
 func (o *DatabaseStatus) setDefaults() interface{} {
 	return &struct {
-		Status  types.EServerInstanceStatus `mapconv:"SettingsResponse.Status"`
-		IsFatal bool                        `mapconv:"SettingsResponse.IsFatal"`
-		Version *DatabaseVersionInfo        `mapconv:"SettingsResponse.DBConf.Version,recursive"`
-		Logs    []*DatabaseLog              `mapconv:"SettingsResponse.DBConf.[]Log,recursive"`
-		Backups []*DatabaseBackupHistory    `mapconv:"SettingsResponse.DBConf.Backup.[]History,recursive"`
+		Status         types.EServerInstanceStatus `mapconv:"SettingsResponse.Status"`
+		MariaDBStatus  string                      `mapconv:"SettingsResponse.DBConf.MariaDB.Status"`
+		PostgresStatus string                      `mapconv:"SettingsResponse.DBConf.Postgres.Status"`
+		IsFatal        bool                        `mapconv:"SettingsResponse.IsFatal"`
+		Version        *DatabaseVersionInfo        `mapconv:"SettingsResponse.DBConf.Version,recursive"`
+		Logs           []*DatabaseLog              `mapconv:"SettingsResponse.DBConf.[]Log,recursive"`
+		Backups        []*DatabaseBackupHistory    `mapconv:"SettingsResponse.DBConf.Backup.[]History,recursive"`
 	}{
-		Status:  o.GetStatus(),
-		IsFatal: o.GetIsFatal(),
-		Version: o.GetVersion(),
-		Logs:    o.GetLogs(),
-		Backups: o.GetBackups(),
+		Status:         o.GetStatus(),
+		MariaDBStatus:  o.GetMariaDBStatus(),
+		PostgresStatus: o.GetPostgresStatus(),
+		IsFatal:        o.GetIsFatal(),
+		Version:        o.GetVersion(),
+		Logs:           o.GetLogs(),
+		Backups:        o.GetBackups(),
 	}
 }
 
@@ -6373,6 +6379,26 @@ func (o *DatabaseStatus) GetStatus() types.EServerInstanceStatus {
 // SetStatus sets value to Status
 func (o *DatabaseStatus) SetStatus(v types.EServerInstanceStatus) {
 	o.Status = v
+}
+
+// GetMariaDBStatus returns value of MariaDBStatus
+func (o *DatabaseStatus) GetMariaDBStatus() string {
+	return o.MariaDBStatus
+}
+
+// SetMariaDBStatus sets value to MariaDBStatus
+func (o *DatabaseStatus) SetMariaDBStatus(v string) {
+	o.MariaDBStatus = v
+}
+
+// GetPostgresStatus returns value of PostgresStatus
+func (o *DatabaseStatus) GetPostgresStatus() string {
+	return o.PostgresStatus
+}
+
+// SetPostgresStatus sets value to PostgresStatus
+func (o *DatabaseStatus) SetPostgresStatus(v string) {
+	o.PostgresStatus = v
 }
 
 // GetIsFatal returns value of IsFatal
@@ -6508,7 +6534,7 @@ func (o *DatabaseVersionInfo) SetExpire(v string) {
 type DatabaseLog struct {
 	Name string
 	Data string
-	Size int
+	Size types.StringNumber
 }
 
 // Validate validates by field tags
@@ -6521,7 +6547,7 @@ func (o *DatabaseLog) setDefaults() interface{} {
 	return &struct {
 		Name string
 		Data string
-		Size int
+		Size types.StringNumber
 	}{
 		Name: o.GetName(),
 		Data: o.GetData(),
@@ -6550,12 +6576,12 @@ func (o *DatabaseLog) SetData(v string) {
 }
 
 // GetSize returns value of Size
-func (o *DatabaseLog) GetSize() int {
+func (o *DatabaseLog) GetSize() types.StringNumber {
 	return o.Size
 }
 
 // SetSize sets value to Size
-func (o *DatabaseLog) SetSize(v int) {
+func (o *DatabaseLog) SetSize(v types.StringNumber) {
 	o.Size = v
 }
 
