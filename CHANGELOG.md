@@ -1,4 +1,8 @@
-## 2.3.5 (Unreleased)
+## 2.3.6 (Unreleased)
+
+* 
+
+## 2.3.5 (2020-06-19)
 
 * Update dependencies - libsacloud v2.6.1 [GH-748] (@yamamoto-febc)
 
