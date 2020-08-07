@@ -152,7 +152,8 @@ func (m *Map) Get(key string) (interface{}, error) {
 			}
 			return values, nil
 		default:
-			return nil, fmt.Errorf("key %q(part of %q) is not map[string]interface{} or []map[string]interface{}", k, key)
+			// 対象がオブジェクト(value)、かつフィールドが全て空(nil)の場合にここに到達する
+			return nil, nil
 		}
 	}
 
