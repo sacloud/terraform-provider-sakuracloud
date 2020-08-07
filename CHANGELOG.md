@@ -1,6 +1,7 @@
 ## 2.3.6 (Unreleased)
 
-* 
+* Fix time comparison method - use time#Equal() [GH-753] (@yamamoto-febc)
+* Use libsacloud v2.6.3  [GH-751] (@yamamoto-febc)
 
 ## 2.3.5 (2020-06-19)
 
