@@ -118,8 +118,12 @@ func TestAccSakuraCloudServer_withoutShutdown(t *testing.T) {
 				Check: resource.ComposeTestCheckFunc(
 					testCheckSakuraCloudServerExists(resourceName, &updated),
 					func(state *terraform.State) error {
-						if created.InstanceStatusChangedAt != updated.InstanceStatusChangedAt {
-							return errors.New("unexpected shutdown has happened")
+						if !created.InstanceStatusChangedAt.Equal(updated.InstanceStatusChangedAt) {
+							return fmt.Errorf(
+								"unexpected shutdown has happened: ChangeAt: before: %s after: %s",
+								created.InstanceStatusChangedAt.String(),
+								updated.InstanceStatusChangedAt.String(),
+							)
 						}
 						return nil
 					},
@@ -130,7 +134,7 @@ func TestAccSakuraCloudServer_withoutShutdown(t *testing.T) {
 				Check: resource.ComposeTestCheckFunc(
 					testCheckSakuraCloudServerExists(resourceName, &editParamChanged),
 					func(state *terraform.State) error {
-						if updated.InstanceStatusChangedAt == editParamChanged.InstanceStatusChangedAt {
+						if updated.InstanceStatusChangedAt.Equal(editParamChanged.InstanceStatusChangedAt) {
 							return errors.New("expected shutdown has not happened")
 						}
 						return nil
