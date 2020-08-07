@@ -20,13 +20,13 @@ import (
 	"fmt"
 	"reflect"
 
+	"github.com/sacloud/libsacloud/v2/helper/builder"
 	"github.com/sacloud/libsacloud/v2/pkg/size"
-	"github.com/sacloud/libsacloud/v2/utils/builder"
 
+	archiveUtil "github.com/sacloud/libsacloud/v2/helper/query"
 	"github.com/sacloud/libsacloud/v2/sacloud"
 	"github.com/sacloud/libsacloud/v2/sacloud/ostype"
 	"github.com/sacloud/libsacloud/v2/sacloud/types"
-	archiveUtil "github.com/sacloud/libsacloud/v2/utils/query"
 )
 
 // Builder ディスクの構築インターフェース

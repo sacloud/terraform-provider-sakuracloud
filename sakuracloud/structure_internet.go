@@ -16,7 +16,7 @@ package sakuracloud
 
 import (
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
-	internetBuilder "github.com/sacloud/libsacloud/v2/utils/builder/internet"
+	internetBuilder "github.com/sacloud/libsacloud/v2/helper/builder/internet"
 )
 
 func expandInternetBuilder(d *schema.ResourceData, client *APIClient) *internetBuilder.Builder {

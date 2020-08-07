@@ -18,12 +18,12 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/sacloud/libsacloud/v2/helper/builder"
+	"github.com/sacloud/libsacloud/v2/helper/power"
+	"github.com/sacloud/libsacloud/v2/helper/setup"
 	"github.com/sacloud/libsacloud/v2/sacloud"
 	"github.com/sacloud/libsacloud/v2/sacloud/accessor"
 	"github.com/sacloud/libsacloud/v2/sacloud/types"
-	"github.com/sacloud/libsacloud/v2/utils/builder"
-	"github.com/sacloud/libsacloud/v2/utils/power"
-	"github.com/sacloud/libsacloud/v2/utils/setup"
 )
 
 // Builder データベースの構築を行う

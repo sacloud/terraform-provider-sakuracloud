@@ -16,9 +16,9 @@ package sakuracloud
 
 import (
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
+	simBuilder "github.com/sacloud/libsacloud/v2/helper/builder/sim"
 	"github.com/sacloud/libsacloud/v2/sacloud"
 	"github.com/sacloud/libsacloud/v2/sacloud/types"
-	simBuilder "github.com/sacloud/libsacloud/v2/utils/builder/sim"
 )
 
 func expandSIMCarrier(d resourceValueGettable) []*sacloud.SIMNetworkOperatorConfig {

@@ -18,9 +18,9 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/sacloud/libsacloud/v2/helper/query"
 	"github.com/sacloud/libsacloud/v2/sacloud"
 	"github.com/sacloud/libsacloud/v2/sacloud/types"
-	"github.com/sacloud/libsacloud/v2/utils/query"
 )
 
 // TransferArchiveBuilder 共有アーカイブからアーカイブの作成を行う

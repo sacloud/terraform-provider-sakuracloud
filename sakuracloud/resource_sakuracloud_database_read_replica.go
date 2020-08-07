@@ -21,8 +21,8 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/validation"
+	"github.com/sacloud/libsacloud/v2/helper/power"
 	"github.com/sacloud/libsacloud/v2/sacloud"
-	"github.com/sacloud/libsacloud/v2/utils/power"
 )
 
 func resourceSakuraCloudDatabaseReadReplica() *schema.Resource {

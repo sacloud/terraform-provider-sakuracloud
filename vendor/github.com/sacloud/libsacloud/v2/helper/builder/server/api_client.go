@@ -17,9 +17,9 @@ package server
 import (
 	"context"
 
+	"github.com/sacloud/libsacloud/v2/helper/query"
 	"github.com/sacloud/libsacloud/v2/sacloud"
 	"github.com/sacloud/libsacloud/v2/sacloud/types"
-	"github.com/sacloud/libsacloud/v2/utils/query"
 )
 
 // APIClient builderが利用するAPIクライアント群

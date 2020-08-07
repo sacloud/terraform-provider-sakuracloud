@@ -12,7 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package libsacloud
+package validate
 
-// Version バージョン
-const Version = "2.6.3"
+import "github.com/go-playground/validator/v10"
+
+// Struct go-playground/validatorを利用してバリデーションを行う
+func Struct(s interface{}) error {
+	return validator.New().Struct(s)
+}

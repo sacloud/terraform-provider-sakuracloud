@@ -28,13 +28,13 @@ import (
 
 	"github.com/hashicorp/go-multierror"
 	"github.com/hashicorp/terraform-plugin-sdk/httpclient"
+	"github.com/sacloud/libsacloud/v2/helper/builder"
+	"github.com/sacloud/libsacloud/v2/helper/query"
+	"github.com/sacloud/libsacloud/v2/helper/setup"
 	"github.com/sacloud/libsacloud/v2/sacloud"
 	"github.com/sacloud/libsacloud/v2/sacloud/fake"
 	"github.com/sacloud/libsacloud/v2/sacloud/profile"
 	"github.com/sacloud/libsacloud/v2/sacloud/trace"
-	"github.com/sacloud/libsacloud/v2/utils/builder"
-	"github.com/sacloud/libsacloud/v2/utils/query"
-	"github.com/sacloud/libsacloud/v2/utils/setup"
 )
 
 const (

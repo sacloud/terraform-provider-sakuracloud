@@ -18,9 +18,9 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/sacloud/libsacloud/v2/helper/query"
 	"github.com/sacloud/libsacloud/v2/sacloud"
 	"github.com/sacloud/libsacloud/v2/sacloud/types"
-	"github.com/sacloud/libsacloud/v2/utils/query"
 )
 
 // DeleteCDROM 他のリソースから参照されていないかを確認した上で削除する

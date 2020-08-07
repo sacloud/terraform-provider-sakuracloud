@@ -19,10 +19,10 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/sacloud/libsacloud/v2/helper/builder"
+	"github.com/sacloud/libsacloud/v2/helper/builder/vpcrouter"
 	"github.com/sacloud/libsacloud/v2/sacloud"
 	"github.com/sacloud/libsacloud/v2/sacloud/types"
-	"github.com/sacloud/libsacloud/v2/utils/builder"
-	"github.com/sacloud/libsacloud/v2/utils/builder/vpcrouter"
 )
 
 func expandVPCRouterBuilder(d resourceValueGettable, client *APIClient) *vpcrouter.Builder {

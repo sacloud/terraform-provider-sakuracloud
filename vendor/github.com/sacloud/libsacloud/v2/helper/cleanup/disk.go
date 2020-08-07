@@ -18,15 +18,15 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/sacloud/libsacloud/v2/helper/query"
 	"github.com/sacloud/libsacloud/v2/sacloud"
 	"github.com/sacloud/libsacloud/v2/sacloud/types"
-	"github.com/sacloud/libsacloud/v2/utils/query"
 )
 
-// DeletePrivateHost 他のリソースから参照されていないかを確認した上で削除する
-func DeletePrivateHost(ctx context.Context, caller sacloud.APICaller, zone string, id types.ID, option query.CheckReferencedOption) error {
-	if err := query.WaitWhilePrivateHostIsReferenced(ctx, caller, zone, id, option); err != nil {
-		return fmt.Errorf("PrivateHost[%s] is still being used by other resources: %s", id, err)
+// DeleteDisk 他のリソースから参照されていないかを確認した上で削除する
+func DeleteDisk(ctx context.Context, caller sacloud.APICaller, zone string, id types.ID, option query.CheckReferencedOption) error {
+	if err := query.WaitWhileDiskIsReferenced(ctx, caller, zone, id, option); err != nil {
+		return fmt.Errorf("Disk[%s] is still being used by other resources: %s", id, err)
 	}
-	return sacloud.NewPrivateHostOp(caller).Delete(ctx, zone, id)
+	return sacloud.NewDiskOp(caller).Delete(ctx, zone, id)
 }

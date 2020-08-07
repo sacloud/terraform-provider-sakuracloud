@@ -16,9 +16,9 @@ package sakuracloud
 
 import (
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
+	registryUtil "github.com/sacloud/libsacloud/v2/helper/builder/registry"
 	"github.com/sacloud/libsacloud/v2/sacloud"
 	"github.com/sacloud/libsacloud/v2/sacloud/types"
-	registryUtil "github.com/sacloud/libsacloud/v2/utils/builder/registry"
 )
 
 func expandContainerRegistryBuilder(d *schema.ResourceData, client *APIClient, settingsHash string) *registryUtil.Builder {

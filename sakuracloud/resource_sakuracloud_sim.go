@@ -20,10 +20,10 @@ import (
 	"time"
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
+	"github.com/sacloud/libsacloud/v2/helper/cleanup"
+	"github.com/sacloud/libsacloud/v2/helper/query"
 	"github.com/sacloud/libsacloud/v2/sacloud"
 	"github.com/sacloud/libsacloud/v2/sacloud/types"
-	"github.com/sacloud/libsacloud/v2/utils/cleanup"
-	"github.com/sacloud/libsacloud/v2/utils/query"
 )
 
 func resourceSakuraCloudSIM() *schema.Resource {
