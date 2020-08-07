@@ -19,7 +19,7 @@ package sacloud
 import (
 	"time"
 
-	"github.com/go-playground/validator/v10"
+	"github.com/sacloud/libsacloud/v2/helper/validate"
 	"github.com/sacloud/libsacloud/v2/sacloud/accessor"
 	"github.com/sacloud/libsacloud/v2/sacloud/search"
 	"github.com/sacloud/libsacloud/v2/sacloud/types"
@@ -58,7 +58,7 @@ type Archive struct {
 
 // Validate validates by field tags
 func (o *Archive) Validate() error {
-	return validator.New().Struct(o)
+	return validate.Struct(o)
 }
 
 // setDefaults implements sacloud.argumentDefaulter
@@ -412,7 +412,7 @@ type BundleInfo struct {
 
 // Validate validates by field tags
 func (o *BundleInfo) Validate() error {
-	return validator.New().Struct(o)
+	return validate.Struct(o)
 }
 
 // setDefaults implements sacloud.argumentDefaulter
@@ -492,7 +492,7 @@ type Storage struct {
 
 // Validate validates by field tags
 func (o *Storage) Validate() error {
-	return validator.New().Struct(o)
+	return validate.Struct(o)
 }
 
 // setDefaults implements sacloud.argumentDefaulter
@@ -584,7 +584,7 @@ type SourceArchiveInfo struct {
 
 // Validate validates by field tags
 func (o *SourceArchiveInfo) Validate() error {
-	return validator.New().Struct(o)
+	return validate.Struct(o)
 }
 
 // setDefaults implements sacloud.argumentDefaulter
@@ -658,7 +658,7 @@ type FindCondition struct {
 
 // Validate validates by field tags
 func (o *FindCondition) Validate() error {
-	return validator.New().Struct(o)
+	return validate.Struct(o)
 }
 
 // setDefaults implements sacloud.argumentDefaulter
@@ -761,7 +761,7 @@ type ArchiveCreateRequest struct {
 
 // Validate validates by field tags
 func (o *ArchiveCreateRequest) Validate() error {
-	return validator.New().Struct(o)
+	return validate.Struct(o)
 }
 
 // setDefaults implements sacloud.argumentDefaulter
@@ -877,7 +877,7 @@ type FTPServer struct {
 
 // Validate validates by field tags
 func (o *FTPServer) Validate() error {
-	return validator.New().Struct(o)
+	return validate.Struct(o)
 }
 
 // setDefaults implements sacloud.argumentDefaulter
@@ -950,7 +950,7 @@ type ArchiveCreateBlankRequest struct {
 
 // Validate validates by field tags
 func (o *ArchiveCreateBlankRequest) Validate() error {
-	return validator.New().Struct(o)
+	return validate.Struct(o)
 }
 
 // setDefaults implements sacloud.argumentDefaulter
@@ -1064,7 +1064,7 @@ type ArchiveUpdateRequest struct {
 
 // Validate validates by field tags
 func (o *ArchiveUpdateRequest) Validate() error {
-	return validator.New().Struct(o)
+	return validate.Struct(o)
 }
 
 // setDefaults implements sacloud.argumentDefaulter
@@ -1153,7 +1153,7 @@ type OpenFTPRequest struct {
 
 // Validate validates by field tags
 func (o *OpenFTPRequest) Validate() error {
-	return validator.New().Struct(o)
+	return validate.Struct(o)
 }
 
 // setDefaults implements sacloud.argumentDefaulter
@@ -1186,7 +1186,7 @@ type ArchiveShareInfo struct {
 
 // Validate validates by field tags
 func (o *ArchiveShareInfo) Validate() error {
-	return validator.New().Struct(o)
+	return validate.Struct(o)
 }
 
 // setDefaults implements sacloud.argumentDefaulter
@@ -1223,7 +1223,7 @@ type ArchiveCreateRequestFromShared struct {
 
 // Validate validates by field tags
 func (o *ArchiveCreateRequestFromShared) Validate() error {
-	return validator.New().Struct(o)
+	return validate.Struct(o)
 }
 
 // setDefaults implements sacloud.argumentDefaulter
@@ -1328,7 +1328,7 @@ type ArchiveTransferRequest struct {
 
 // Validate validates by field tags
 func (o *ArchiveTransferRequest) Validate() error {
-	return validator.New().Struct(o)
+	return validate.Struct(o)
 }
 
 // setDefaults implements sacloud.argumentDefaulter
@@ -1450,7 +1450,7 @@ type AuthStatus struct {
 
 // Validate validates by field tags
 func (o *AuthStatus) Validate() error {
-	return validator.New().Struct(o)
+	return validate.Struct(o)
 }
 
 // setDefaults implements sacloud.argumentDefaulter
@@ -1629,7 +1629,7 @@ type AutoBackup struct {
 
 // Validate validates by field tags
 func (o *AutoBackup) Validate() error {
-	return validator.New().Struct(o)
+	return validate.Struct(o)
 }
 
 // setDefaults implements sacloud.argumentDefaulter
@@ -1876,7 +1876,7 @@ type AutoBackupCreateRequest struct {
 
 // Validate validates by field tags
 func (o *AutoBackupCreateRequest) Validate() error {
-	return validator.New().Struct(o)
+	return validate.Struct(o)
 }
 
 // setDefaults implements sacloud.argumentDefaulter
@@ -2011,7 +2011,7 @@ type AutoBackupUpdateRequest struct {
 
 // Validate validates by field tags
 func (o *AutoBackupUpdateRequest) Validate() error {
-	return validator.New().Struct(o)
+	return validate.Struct(o)
 }
 
 // setDefaults implements sacloud.argumentDefaulter
@@ -2140,7 +2140,7 @@ type AutoBackupUpdateSettingsRequest struct {
 
 // Validate validates by field tags
 func (o *AutoBackupUpdateSettingsRequest) Validate() error {
-	return validator.New().Struct(o)
+	return validate.Struct(o)
 }
 
 // setDefaults implements sacloud.argumentDefaulter
@@ -2205,7 +2205,7 @@ type Bill struct {
 
 // Validate validates by field tags
 func (o *Bill) Validate() error {
-	return validator.New().Struct(o)
+	return validate.Struct(o)
 }
 
 // setDefaults implements sacloud.argumentDefaulter
@@ -2336,7 +2336,7 @@ type BillDetail struct {
 
 // Validate validates by field tags
 func (o *BillDetail) Validate() error {
-	return validator.New().Struct(o)
+	return validate.Struct(o)
 }
 
 // setDefaults implements sacloud.argumentDefaulter
@@ -2466,7 +2466,7 @@ type BillDetailCSV struct {
 
 // Validate validates by field tags
 func (o *BillDetailCSV) Validate() error {
-	return validator.New().Struct(o)
+	return validate.Struct(o)
 }
 
 // setDefaults implements sacloud.argumentDefaulter
@@ -2565,7 +2565,7 @@ type Bridge struct {
 
 // Validate validates by field tags
 func (o *Bridge) Validate() error {
-	return validator.New().Struct(o)
+	return validate.Struct(o)
 }
 
 // setDefaults implements sacloud.argumentDefaulter
@@ -2693,7 +2693,7 @@ type Region struct {
 
 // Validate validates by field tags
 func (o *Region) Validate() error {
-	return validator.New().Struct(o)
+	return validate.Struct(o)
 }
 
 // setDefaults implements sacloud.argumentDefaulter
@@ -2785,7 +2785,7 @@ type BridgeInfo struct {
 
 // Validate validates by field tags
 func (o *BridgeInfo) Validate() error {
-	return validator.New().Struct(o)
+	return validate.Struct(o)
 }
 
 // setDefaults implements sacloud.argumentDefaulter
@@ -2878,7 +2878,7 @@ type BridgeSwitchInfo struct {
 
 // Validate validates by field tags
 func (o *BridgeSwitchInfo) Validate() error {
-	return validator.New().Struct(o)
+	return validate.Struct(o)
 }
 
 // setDefaults implements sacloud.argumentDefaulter
@@ -2980,7 +2980,7 @@ type BridgeCreateRequest struct {
 
 // Validate validates by field tags
 func (o *BridgeCreateRequest) Validate() error {
-	return validator.New().Struct(o)
+	return validate.Struct(o)
 }
 
 // setDefaults implements sacloud.argumentDefaulter
@@ -3026,7 +3026,7 @@ type BridgeUpdateRequest struct {
 
 // Validate validates by field tags
 func (o *BridgeUpdateRequest) Validate() error {
-	return validator.New().Struct(o)
+	return validate.Struct(o)
 }
 
 // setDefaults implements sacloud.argumentDefaulter
@@ -3082,7 +3082,7 @@ type CDROM struct {
 
 // Validate validates by field tags
 func (o *CDROM) Validate() error {
-	return validator.New().Struct(o)
+	return validate.Struct(o)
 }
 
 // setDefaults implements sacloud.argumentDefaulter
@@ -3301,7 +3301,7 @@ type CDROMCreateRequest struct {
 
 // Validate validates by field tags
 func (o *CDROMCreateRequest) Validate() error {
-	return validator.New().Struct(o)
+	return validate.Struct(o)
 }
 
 // setDefaults implements sacloud.argumentDefaulter
@@ -3415,7 +3415,7 @@ type CDROMUpdateRequest struct {
 
 // Validate validates by field tags
 func (o *CDROMUpdateRequest) Validate() error {
-	return validator.New().Struct(o)
+	return validate.Struct(o)
 }
 
 // setDefaults implements sacloud.argumentDefaulter
@@ -3516,7 +3516,7 @@ type ContainerRegistry struct {
 
 // Validate validates by field tags
 func (o *ContainerRegistry) Validate() error {
-	return validator.New().Struct(o)
+	return validate.Struct(o)
 }
 
 // setDefaults implements sacloud.argumentDefaulter
@@ -3739,7 +3739,7 @@ type ContainerRegistryCreateRequest struct {
 
 // Validate validates by field tags
 func (o *ContainerRegistryCreateRequest) Validate() error {
-	return validator.New().Struct(o)
+	return validate.Struct(o)
 }
 
 // setDefaults implements sacloud.argumentDefaulter
@@ -3872,7 +3872,7 @@ type ContainerRegistryUpdateRequest struct {
 
 // Validate validates by field tags
 func (o *ContainerRegistryUpdateRequest) Validate() error {
-	return validator.New().Struct(o)
+	return validate.Struct(o)
 }
 
 // setDefaults implements sacloud.argumentDefaulter
@@ -3999,7 +3999,7 @@ type ContainerRegistryUpdateSettingsRequest struct {
 
 // Validate validates by field tags
 func (o *ContainerRegistryUpdateSettingsRequest) Validate() error {
-	return validator.New().Struct(o)
+	return validate.Struct(o)
 }
 
 // setDefaults implements sacloud.argumentDefaulter
@@ -4056,7 +4056,7 @@ type ContainerRegistryUsers struct {
 
 // Validate validates by field tags
 func (o *ContainerRegistryUsers) Validate() error {
-	return validator.New().Struct(o)
+	return validate.Struct(o)
 }
 
 // setDefaults implements sacloud.argumentDefaulter
@@ -4090,7 +4090,7 @@ type ContainerRegistryUser struct {
 
 // Validate validates by field tags
 func (o *ContainerRegistryUser) Validate() error {
-	return validator.New().Struct(o)
+	return validate.Struct(o)
 }
 
 // setDefaults implements sacloud.argumentDefaulter
@@ -4137,7 +4137,7 @@ type ContainerRegistryUserCreateRequest struct {
 
 // Validate validates by field tags
 func (o *ContainerRegistryUserCreateRequest) Validate() error {
-	return validator.New().Struct(o)
+	return validate.Struct(o)
 }
 
 // setDefaults implements sacloud.argumentDefaulter
@@ -4195,7 +4195,7 @@ type ContainerRegistryUserUpdateRequest struct {
 
 // Validate validates by field tags
 func (o *ContainerRegistryUserUpdateRequest) Validate() error {
-	return validator.New().Struct(o)
+	return validate.Struct(o)
 }
 
 // setDefaults implements sacloud.argumentDefaulter
@@ -4246,7 +4246,7 @@ type Coupon struct {
 
 // Validate validates by field tags
 func (o *Coupon) Validate() error {
-	return validator.New().Struct(o)
+	return validate.Struct(o)
 }
 
 // setDefaults implements sacloud.argumentDefaulter
@@ -4395,7 +4395,7 @@ type Database struct {
 
 // Validate validates by field tags
 func (o *Database) Validate() error {
-	return validator.New().Struct(o)
+	return validate.Struct(o)
 }
 
 // setDefaults implements sacloud.argumentDefaulter
@@ -4762,7 +4762,7 @@ type DatabaseSettingCommon struct {
 
 // Validate validates by field tags
 func (o *DatabaseSettingCommon) Validate() error {
-	return validator.New().Struct(o)
+	return validate.Struct(o)
 }
 
 // setDefaults implements sacloud.argumentDefaulter
@@ -4869,7 +4869,7 @@ type DatabaseSettingBackup struct {
 
 // Validate validates by field tags
 func (o *DatabaseSettingBackup) Validate() error {
-	return validator.New().Struct(o)
+	return validate.Struct(o)
 }
 
 // setDefaults implements sacloud.argumentDefaulter
@@ -4931,7 +4931,7 @@ type DatabaseReplicationSetting struct {
 
 // Validate validates by field tags
 func (o *DatabaseReplicationSetting) Validate() error {
-	return validator.New().Struct(o)
+	return validate.Struct(o)
 }
 
 // setDefaults implements sacloud.argumentDefaulter
@@ -5028,7 +5028,7 @@ type DatabaseRemarkDBConfCommon struct {
 
 // Validate validates by field tags
 func (o *DatabaseRemarkDBConfCommon) Validate() error {
-	return validator.New().Struct(o)
+	return validate.Struct(o)
 }
 
 // setDefaults implements sacloud.argumentDefaulter
@@ -5126,7 +5126,7 @@ type InterfaceView struct {
 
 // Validate validates by field tags
 func (o *InterfaceView) Validate() error {
-	return validator.New().Struct(o)
+	return validate.Struct(o)
 }
 
 // setDefaults implements sacloud.argumentDefaulter
@@ -5396,7 +5396,7 @@ type DatabaseCreateRequest struct {
 
 // Validate validates by field tags
 func (o *DatabaseCreateRequest) Validate() error {
-	return validator.New().Struct(o)
+	return validate.Struct(o)
 }
 
 // setDefaults implements sacloud.argumentDefaulter
@@ -5614,7 +5614,7 @@ type DatabaseUpdateRequest struct {
 
 // Validate validates by field tags
 func (o *DatabaseUpdateRequest) Validate() error {
-	return validator.New().Struct(o)
+	return validate.Struct(o)
 }
 
 // setDefaults implements sacloud.argumentDefaulter
@@ -5754,7 +5754,7 @@ type DatabaseUpdateSettingsRequest struct {
 
 // Validate validates by field tags
 func (o *DatabaseUpdateSettingsRequest) Validate() error {
-	return validator.New().Struct(o)
+	return validate.Struct(o)
 }
 
 // setDefaults implements sacloud.argumentDefaulter
@@ -5823,7 +5823,7 @@ type ShutdownOption struct {
 
 // Validate validates by field tags
 func (o *ShutdownOption) Validate() error {
-	return validator.New().Struct(o)
+	return validate.Struct(o)
 }
 
 // setDefaults implements sacloud.argumentDefaulter
@@ -5856,7 +5856,7 @@ type CPUTimeActivity struct {
 
 // Validate validates by field tags
 func (o *CPUTimeActivity) Validate() error {
-	return validator.New().Struct(o)
+	return validate.Struct(o)
 }
 
 // setDefaults implements sacloud.argumentDefaulter
@@ -5890,7 +5890,7 @@ type MonitorCPUTimeValue struct {
 
 // Validate validates by field tags
 func (o *MonitorCPUTimeValue) Validate() error {
-	return validator.New().Struct(o)
+	return validate.Struct(o)
 }
 
 // setDefaults implements sacloud.argumentDefaulter
@@ -5936,7 +5936,7 @@ type MonitorCondition struct {
 
 // Validate validates by field tags
 func (o *MonitorCondition) Validate() error {
-	return validator.New().Struct(o)
+	return validate.Struct(o)
 }
 
 // setDefaults implements sacloud.argumentDefaulter
@@ -5987,7 +5987,7 @@ type DiskActivity struct {
 
 // Validate validates by field tags
 func (o *DiskActivity) Validate() error {
-	return validator.New().Struct(o)
+	return validate.Struct(o)
 }
 
 // setDefaults implements sacloud.argumentDefaulter
@@ -6022,7 +6022,7 @@ type MonitorDiskValue struct {
 
 // Validate validates by field tags
 func (o *MonitorDiskValue) Validate() error {
-	return validator.New().Struct(o)
+	return validate.Struct(o)
 }
 
 // setDefaults implements sacloud.argumentDefaulter
@@ -6079,7 +6079,7 @@ type InterfaceActivity struct {
 
 // Validate validates by field tags
 func (o *InterfaceActivity) Validate() error {
-	return validator.New().Struct(o)
+	return validate.Struct(o)
 }
 
 // setDefaults implements sacloud.argumentDefaulter
@@ -6114,7 +6114,7 @@ type MonitorInterfaceValue struct {
 
 // Validate validates by field tags
 func (o *MonitorInterfaceValue) Validate() error {
-	return validator.New().Struct(o)
+	return validate.Struct(o)
 }
 
 // setDefaults implements sacloud.argumentDefaulter
@@ -6171,7 +6171,7 @@ type DatabaseActivity struct {
 
 // Validate validates by field tags
 func (o *DatabaseActivity) Validate() error {
-	return validator.New().Struct(o)
+	return validate.Struct(o)
 }
 
 // setDefaults implements sacloud.argumentDefaulter
@@ -6212,7 +6212,7 @@ type MonitorDatabaseValue struct {
 
 // Validate validates by field tags
 func (o *MonitorDatabaseValue) Validate() error {
-	return validator.New().Struct(o)
+	return validate.Struct(o)
 }
 
 // setDefaults implements sacloud.argumentDefaulter
@@ -6347,7 +6347,7 @@ type DatabaseStatus struct {
 
 // Validate validates by field tags
 func (o *DatabaseStatus) Validate() error {
-	return validator.New().Struct(o)
+	return validate.Struct(o)
 }
 
 // setDefaults implements sacloud.argumentDefaulter
@@ -6456,7 +6456,7 @@ type DatabaseVersionInfo struct {
 
 // Validate validates by field tags
 func (o *DatabaseVersionInfo) Validate() error {
-	return validator.New().Struct(o)
+	return validate.Struct(o)
 }
 
 // setDefaults implements sacloud.argumentDefaulter
@@ -6539,7 +6539,7 @@ type DatabaseLog struct {
 
 // Validate validates by field tags
 func (o *DatabaseLog) Validate() error {
-	return validator.New().Struct(o)
+	return validate.Struct(o)
 }
 
 // setDefaults implements sacloud.argumentDefaulter
@@ -6599,7 +6599,7 @@ type DatabaseBackupHistory struct {
 
 // Validate validates by field tags
 func (o *DatabaseBackupHistory) Validate() error {
-	return validator.New().Struct(o)
+	return validate.Struct(o)
 }
 
 // setDefaults implements sacloud.argumentDefaulter
@@ -6691,7 +6691,7 @@ type Disk struct {
 
 // Validate validates by field tags
 func (o *Disk) Validate() error {
-	return validator.New().Struct(o)
+	return validate.Struct(o)
 }
 
 // setDefaults implements sacloud.argumentDefaulter
@@ -7056,7 +7056,7 @@ type JobStatus struct {
 
 // Validate validates by field tags
 func (o *JobStatus) Validate() error {
-	return validator.New().Struct(o)
+	return validate.Struct(o)
 }
 
 // setDefaults implements sacloud.argumentDefaulter
@@ -7103,7 +7103,7 @@ type JobConfigError struct {
 
 // Validate validates by field tags
 func (o *JobConfigError) Validate() error {
-	return validator.New().Struct(o)
+	return validate.Struct(o)
 }
 
 // setDefaults implements sacloud.argumentDefaulter
@@ -7169,7 +7169,7 @@ type DiskCreateRequest struct {
 
 // Validate validates by field tags
 func (o *DiskCreateRequest) Validate() error {
-	return validator.New().Struct(o)
+	return validate.Struct(o)
 }
 
 // setDefaults implements sacloud.argumentDefaulter
@@ -7350,7 +7350,7 @@ type DiskEditRequest struct {
 
 // Validate validates by field tags
 func (o *DiskEditRequest) Validate() error {
-	return validator.New().Struct(o)
+	return validate.Struct(o)
 }
 
 // setDefaults implements sacloud.argumentDefaulter
@@ -7504,7 +7504,7 @@ type DiskEditSSHKey struct {
 
 // Validate validates by field tags
 func (o *DiskEditSSHKey) Validate() error {
-	return validator.New().Struct(o)
+	return validate.Struct(o)
 }
 
 // setDefaults implements sacloud.argumentDefaulter
@@ -7551,7 +7551,7 @@ type DiskEditNote struct {
 
 // Validate validates by field tags
 func (o *DiskEditNote) Validate() error {
-	return validator.New().Struct(o)
+	return validate.Struct(o)
 }
 
 // setDefaults implements sacloud.argumentDefaulter
@@ -7609,7 +7609,7 @@ type DiskEditUserSubnet struct {
 
 // Validate validates by field tags
 func (o *DiskEditUserSubnet) Validate() error {
-	return validator.New().Struct(o)
+	return validate.Struct(o)
 }
 
 // setDefaults implements sacloud.argumentDefaulter
@@ -7654,7 +7654,7 @@ type DiskResizePartitionRequest struct {
 
 // Validate validates by field tags
 func (o *DiskResizePartitionRequest) Validate() error {
-	return validator.New().Struct(o)
+	return validate.Struct(o)
 }
 
 // setDefaults implements sacloud.argumentDefaulter
@@ -7689,7 +7689,7 @@ type DiskInstallRequest struct {
 
 // Validate validates by field tags
 func (o *DiskInstallRequest) Validate() error {
-	return validator.New().Struct(o)
+	return validate.Struct(o)
 }
 
 // setDefaults implements sacloud.argumentDefaulter
@@ -7760,7 +7760,7 @@ type DiskUpdateRequest struct {
 
 // Validate validates by field tags
 func (o *DiskUpdateRequest) Validate() error {
-	return validator.New().Struct(o)
+	return validate.Struct(o)
 }
 
 // setDefaults implements sacloud.argumentDefaulter
@@ -7865,7 +7865,7 @@ type DiskPlan struct {
 
 // Validate validates by field tags
 func (o *DiskPlan) Validate() error {
-	return validator.New().Struct(o)
+	return validate.Struct(o)
 }
 
 // setDefaults implements sacloud.argumentDefaulter
@@ -7969,7 +7969,7 @@ type DiskPlanSizeInfo struct {
 
 // Validate validates by field tags
 func (o *DiskPlanSizeInfo) Validate() error {
-	return validator.New().Struct(o)
+	return validate.Struct(o)
 }
 
 // setDefaults implements sacloud.argumentDefaulter
@@ -8059,7 +8059,7 @@ type DNS struct {
 
 // Validate validates by field tags
 func (o *DNS) Validate() error {
-	return validator.New().Struct(o)
+	return validate.Struct(o)
 }
 
 // setDefaults implements sacloud.argumentDefaulter
@@ -8267,7 +8267,7 @@ type DNSRecord struct {
 
 // Validate validates by field tags
 func (o *DNSRecord) Validate() error {
-	return validator.New().Struct(o)
+	return validate.Struct(o)
 }
 
 // setDefaults implements sacloud.argumentDefaulter
@@ -8340,7 +8340,7 @@ type DNSCreateRequest struct {
 
 // Validate validates by field tags
 func (o *DNSCreateRequest) Validate() error {
-	return validator.New().Struct(o)
+	return validate.Struct(o)
 }
 
 // setDefaults implements sacloud.argumentDefaulter
@@ -8447,7 +8447,7 @@ type DNSUpdateRequest struct {
 
 // Validate validates by field tags
 func (o *DNSUpdateRequest) Validate() error {
-	return validator.New().Struct(o)
+	return validate.Struct(o)
 }
 
 // setDefaults implements sacloud.argumentDefaulter
@@ -8549,7 +8549,7 @@ type DNSUpdateSettingsRequest struct {
 
 // Validate validates by field tags
 func (o *DNSUpdateSettingsRequest) Validate() error {
-	return validator.New().Struct(o)
+	return validate.Struct(o)
 }
 
 // setDefaults implements sacloud.argumentDefaulter
@@ -8608,7 +8608,7 @@ type GSLB struct {
 
 // Validate validates by field tags
 func (o *GSLB) Validate() error {
-	return validator.New().Struct(o)
+	return validate.Struct(o)
 }
 
 // setDefaults implements sacloud.argumentDefaulter
@@ -8856,7 +8856,7 @@ type GSLBHealthCheck struct {
 
 // Validate validates by field tags
 func (o *GSLBHealthCheck) Validate() error {
-	return validator.New().Struct(o)
+	return validate.Struct(o)
 }
 
 // setDefaults implements sacloud.argumentDefaulter
@@ -8939,7 +8939,7 @@ type GSLBServer struct {
 
 // Validate validates by field tags
 func (o *GSLBServer) Validate() error {
-	return validator.New().Struct(o)
+	return validate.Struct(o)
 }
 
 // setDefaults implements sacloud.argumentDefaulter
@@ -9004,7 +9004,7 @@ type GSLBCreateRequest struct {
 
 // Validate validates by field tags
 func (o *GSLBCreateRequest) Validate() error {
-	return validator.New().Struct(o)
+	return validate.Struct(o)
 }
 
 // setDefaults implements sacloud.argumentDefaulter
@@ -9167,7 +9167,7 @@ type GSLBUpdateRequest struct {
 
 // Validate validates by field tags
 func (o *GSLBUpdateRequest) Validate() error {
-	return validator.New().Struct(o)
+	return validate.Struct(o)
 }
 
 // setDefaults implements sacloud.argumentDefaulter
@@ -9336,7 +9336,7 @@ type GSLBUpdateSettingsRequest struct {
 
 // Validate validates by field tags
 func (o *GSLBUpdateSettingsRequest) Validate() error {
-	return validator.New().Struct(o)
+	return validate.Struct(o)
 }
 
 // setDefaults implements sacloud.argumentDefaulter
@@ -9439,7 +9439,7 @@ type Icon struct {
 
 // Validate validates by field tags
 func (o *Icon) Validate() error {
-	return validator.New().Struct(o)
+	return validate.Struct(o)
 }
 
 // setDefaults implements sacloud.argumentDefaulter
@@ -9598,7 +9598,7 @@ type IconCreateRequest struct {
 
 // Validate validates by field tags
 func (o *IconCreateRequest) Validate() error {
-	return validator.New().Struct(o)
+	return validate.Struct(o)
 }
 
 // setDefaults implements sacloud.argumentDefaulter
@@ -9676,7 +9676,7 @@ type IconUpdateRequest struct {
 
 // Validate validates by field tags
 func (o *IconUpdateRequest) Validate() error {
-	return validator.New().Struct(o)
+	return validate.Struct(o)
 }
 
 // setDefaults implements sacloud.argumentDefaulter
@@ -9750,7 +9750,7 @@ type Interface struct {
 
 // Validate validates by field tags
 func (o *Interface) Validate() error {
-	return validator.New().Struct(o)
+	return validate.Struct(o)
 }
 
 // setDefaults implements sacloud.argumentDefaulter
@@ -9911,7 +9911,7 @@ type InterfaceCreateRequest struct {
 
 // Validate validates by field tags
 func (o *InterfaceCreateRequest) Validate() error {
-	return validator.New().Struct(o)
+	return validate.Struct(o)
 }
 
 // setDefaults implements sacloud.argumentDefaulter
@@ -9944,7 +9944,7 @@ type InterfaceUpdateRequest struct {
 
 // Validate validates by field tags
 func (o *InterfaceUpdateRequest) Validate() error {
-	return validator.New().Struct(o)
+	return validate.Struct(o)
 }
 
 // setDefaults implements sacloud.argumentDefaulter
@@ -9985,7 +9985,7 @@ type Internet struct {
 
 // Validate validates by field tags
 func (o *Internet) Validate() error {
-	return validator.New().Struct(o)
+	return validate.Struct(o)
 }
 
 // setDefaults implements sacloud.argumentDefaulter
@@ -10160,7 +10160,7 @@ type SwitchInfo struct {
 
 // Validate validates by field tags
 func (o *SwitchInfo) Validate() error {
-	return validator.New().Struct(o)
+	return validate.Struct(o)
 }
 
 // setDefaults implements sacloud.argumentDefaulter
@@ -10310,7 +10310,7 @@ type InternetSubnet struct {
 
 // Validate validates by field tags
 func (o *InternetSubnet) Validate() error {
-	return validator.New().Struct(o)
+	return validate.Struct(o)
 }
 
 // setDefaults implements sacloud.argumentDefaulter
@@ -10425,7 +10425,7 @@ type IPv6NetInfo struct {
 
 // Validate validates by field tags
 func (o *IPv6NetInfo) Validate() error {
-	return validator.New().Struct(o)
+	return validate.Struct(o)
 }
 
 // setDefaults implements sacloud.argumentDefaulter
@@ -10507,7 +10507,7 @@ type InternetCreateRequest struct {
 
 // Validate validates by field tags
 func (o *InternetCreateRequest) Validate() error {
-	return validator.New().Struct(o)
+	return validate.Struct(o)
 }
 
 // setDefaults implements sacloud.argumentDefaulter
@@ -10623,7 +10623,7 @@ type InternetUpdateRequest struct {
 
 // Validate validates by field tags
 func (o *InternetUpdateRequest) Validate() error {
-	return validator.New().Struct(o)
+	return validate.Struct(o)
 }
 
 // setDefaults implements sacloud.argumentDefaulter
@@ -10712,7 +10712,7 @@ type InternetUpdateBandWidthRequest struct {
 
 // Validate validates by field tags
 func (o *InternetUpdateBandWidthRequest) Validate() error {
-	return validator.New().Struct(o)
+	return validate.Struct(o)
 }
 
 // setDefaults implements sacloud.argumentDefaulter
@@ -10751,7 +10751,7 @@ type InternetSubnetOperationResult struct {
 
 // Validate validates by field tags
 func (o *InternetSubnetOperationResult) Validate() error {
-	return validator.New().Struct(o)
+	return validate.Struct(o)
 }
 
 // setDefaults implements sacloud.argumentDefaulter
@@ -10877,7 +10877,7 @@ type InternetAddSubnetRequest struct {
 
 // Validate validates by field tags
 func (o *InternetAddSubnetRequest) Validate() error {
-	return validator.New().Struct(o)
+	return validate.Struct(o)
 }
 
 // setDefaults implements sacloud.argumentDefaulter
@@ -10922,7 +10922,7 @@ type InternetUpdateSubnetRequest struct {
 
 // Validate validates by field tags
 func (o *InternetUpdateSubnetRequest) Validate() error {
-	return validator.New().Struct(o)
+	return validate.Struct(o)
 }
 
 // setDefaults implements sacloud.argumentDefaulter
@@ -10955,7 +10955,7 @@ type RouterActivity struct {
 
 // Validate validates by field tags
 func (o *RouterActivity) Validate() error {
-	return validator.New().Struct(o)
+	return validate.Struct(o)
 }
 
 // setDefaults implements sacloud.argumentDefaulter
@@ -10990,7 +10990,7 @@ type MonitorRouterValue struct {
 
 // Validate validates by field tags
 func (o *MonitorRouterValue) Validate() error {
-	return validator.New().Struct(o)
+	return validate.Struct(o)
 }
 
 // setDefaults implements sacloud.argumentDefaulter
@@ -11050,7 +11050,7 @@ type InternetPlan struct {
 
 // Validate validates by field tags
 func (o *InternetPlan) Validate() error {
-	return validator.New().Struct(o)
+	return validate.Struct(o)
 }
 
 // setDefaults implements sacloud.argumentDefaulter
@@ -11142,7 +11142,7 @@ type IPAddress struct {
 
 // Validate validates by field tags
 func (o *IPAddress) Validate() error {
-	return validator.New().Struct(o)
+	return validate.Struct(o)
 }
 
 // setDefaults implements sacloud.argumentDefaulter
@@ -11220,7 +11220,7 @@ type IPv6Net struct {
 
 // Validate validates by field tags
 func (o *IPv6Net) Validate() error {
-	return validator.New().Struct(o)
+	return validate.Struct(o)
 }
 
 // setDefaults implements sacloud.argumentDefaulter
@@ -11385,7 +11385,7 @@ type IPv6Addr struct {
 
 // Validate validates by field tags
 func (o *IPv6Addr) Validate() error {
-	return validator.New().Struct(o)
+	return validate.Struct(o)
 }
 
 // setDefaults implements sacloud.argumentDefaulter
@@ -11467,7 +11467,7 @@ type IPv6AddrCreateRequest struct {
 
 // Validate validates by field tags
 func (o *IPv6AddrCreateRequest) Validate() error {
-	return validator.New().Struct(o)
+	return validate.Struct(o)
 }
 
 // setDefaults implements sacloud.argumentDefaulter
@@ -11512,7 +11512,7 @@ type IPv6AddrUpdateRequest struct {
 
 // Validate validates by field tags
 func (o *IPv6AddrUpdateRequest) Validate() error {
-	return validator.New().Struct(o)
+	return validate.Struct(o)
 }
 
 // setDefaults implements sacloud.argumentDefaulter
@@ -11550,7 +11550,7 @@ type License struct {
 
 // Validate validates by field tags
 func (o *License) Validate() error {
-	return validator.New().Struct(o)
+	return validate.Struct(o)
 }
 
 // setDefaults implements sacloud.argumentDefaulter
@@ -11664,7 +11664,7 @@ type LicenseCreateRequest struct {
 
 // Validate validates by field tags
 func (o *LicenseCreateRequest) Validate() error {
-	return validator.New().Struct(o)
+	return validate.Struct(o)
 }
 
 // setDefaults implements sacloud.argumentDefaulter
@@ -11709,7 +11709,7 @@ type LicenseUpdateRequest struct {
 
 // Validate validates by field tags
 func (o *LicenseUpdateRequest) Validate() error {
-	return validator.New().Struct(o)
+	return validate.Struct(o)
 }
 
 // setDefaults implements sacloud.argumentDefaulter
@@ -11746,7 +11746,7 @@ type LicenseInfo struct {
 
 // Validate validates by field tags
 func (o *LicenseInfo) Validate() error {
-	return validator.New().Struct(o)
+	return validate.Struct(o)
 }
 
 // setDefaults implements sacloud.argumentDefaulter
@@ -11869,7 +11869,7 @@ type LoadBalancer struct {
 
 // Validate validates by field tags
 func (o *LoadBalancer) Validate() error {
-	return validator.New().Struct(o)
+	return validate.Struct(o)
 }
 
 // setDefaults implements sacloud.argumentDefaulter
@@ -12211,7 +12211,7 @@ type LoadBalancerVirtualIPAddress struct {
 
 // Validate validates by field tags
 func (o *LoadBalancerVirtualIPAddress) Validate() error {
-	return validator.New().Struct(o)
+	return validate.Struct(o)
 }
 
 // setDefaults implements sacloud.argumentDefaulter
@@ -12310,7 +12310,7 @@ type LoadBalancerServer struct {
 
 // Validate validates by field tags
 func (o *LoadBalancerServer) Validate() error {
-	return validator.New().Struct(o)
+	return validate.Struct(o)
 }
 
 // setDefaults implements sacloud.argumentDefaulter
@@ -12381,7 +12381,7 @@ type LoadBalancerServerHealthCheck struct {
 
 // Validate validates by field tags
 func (o *LoadBalancerServerHealthCheck) Validate() error {
-	return validator.New().Struct(o)
+	return validate.Struct(o)
 }
 
 // setDefaults implements sacloud.argumentDefaulter
@@ -12448,7 +12448,7 @@ type LoadBalancerCreateRequest struct {
 
 // Validate validates by field tags
 func (o *LoadBalancerCreateRequest) Validate() error {
-	return validator.New().Struct(o)
+	return validate.Struct(o)
 }
 
 // setDefaults implements sacloud.argumentDefaulter
@@ -12628,7 +12628,7 @@ type LoadBalancerUpdateRequest struct {
 
 // Validate validates by field tags
 func (o *LoadBalancerUpdateRequest) Validate() error {
-	return validator.New().Struct(o)
+	return validate.Struct(o)
 }
 
 // setDefaults implements sacloud.argumentDefaulter
@@ -12742,7 +12742,7 @@ type LoadBalancerUpdateSettingsRequest struct {
 
 // Validate validates by field tags
 func (o *LoadBalancerUpdateSettingsRequest) Validate() error {
-	return validator.New().Struct(o)
+	return validate.Struct(o)
 }
 
 // setDefaults implements sacloud.argumentDefaulter
@@ -12790,7 +12790,7 @@ type LoadBalancerStatus struct {
 
 // Validate validates by field tags
 func (o *LoadBalancerStatus) Validate() error {
-	return validator.New().Struct(o)
+	return validate.Struct(o)
 }
 
 // setDefaults implements sacloud.argumentDefaulter
@@ -12863,7 +12863,7 @@ type LoadBalancerServerStatus struct {
 
 // Validate validates by field tags
 func (o *LoadBalancerServerStatus) Validate() error {
-	return validator.New().Struct(o)
+	return validate.Struct(o)
 }
 
 // setDefaults implements sacloud.argumentDefaulter
@@ -12957,7 +12957,7 @@ type LocalRouter struct {
 
 // Validate validates by field tags
 func (o *LocalRouter) Validate() error {
-	return validator.New().Struct(o)
+	return validate.Struct(o)
 }
 
 // setDefaults implements sacloud.argumentDefaulter
@@ -13188,7 +13188,7 @@ type LocalRouterSwitch struct {
 
 // Validate validates by field tags
 func (o *LocalRouterSwitch) Validate() error {
-	return validator.New().Struct(o)
+	return validate.Struct(o)
 }
 
 // setDefaults implements sacloud.argumentDefaulter
@@ -13248,7 +13248,7 @@ type LocalRouterInterface struct {
 
 // Validate validates by field tags
 func (o *LocalRouterInterface) Validate() error {
-	return validator.New().Struct(o)
+	return validate.Struct(o)
 }
 
 // setDefaults implements sacloud.argumentDefaulter
@@ -13320,7 +13320,7 @@ type LocalRouterPeer struct {
 
 // Validate validates by field tags
 func (o *LocalRouterPeer) Validate() error {
-	return validator.New().Struct(o)
+	return validate.Struct(o)
 }
 
 // setDefaults implements sacloud.argumentDefaulter
@@ -13390,7 +13390,7 @@ type LocalRouterStaticRoute struct {
 
 // Validate validates by field tags
 func (o *LocalRouterStaticRoute) Validate() error {
-	return validator.New().Struct(o)
+	return validate.Struct(o)
 }
 
 // setDefaults implements sacloud.argumentDefaulter
@@ -13438,7 +13438,7 @@ type LocalRouterCreateRequest struct {
 
 // Validate validates by field tags
 func (o *LocalRouterCreateRequest) Validate() error {
-	return validator.New().Struct(o)
+	return validate.Struct(o)
 }
 
 // setDefaults implements sacloud.argumentDefaulter
@@ -13537,7 +13537,7 @@ type LocalRouterUpdateRequest struct {
 
 // Validate validates by field tags
 func (o *LocalRouterUpdateRequest) Validate() error {
-	return validator.New().Struct(o)
+	return validate.Struct(o)
 }
 
 // setDefaults implements sacloud.argumentDefaulter
@@ -13690,7 +13690,7 @@ type LocalRouterUpdateSettingsRequest struct {
 
 // Validate validates by field tags
 func (o *LocalRouterUpdateSettingsRequest) Validate() error {
-	return validator.New().Struct(o)
+	return validate.Struct(o)
 }
 
 // setDefaults implements sacloud.argumentDefaulter
@@ -13771,7 +13771,7 @@ type LocalRouterHealth struct {
 
 // Validate validates by field tags
 func (o *LocalRouterHealth) Validate() error {
-	return validator.New().Struct(o)
+	return validate.Struct(o)
 }
 
 // setDefaults implements sacloud.argumentDefaulter
@@ -13806,7 +13806,7 @@ type LocalRouterHealthPeer struct {
 
 // Validate validates by field tags
 func (o *LocalRouterHealthPeer) Validate() error {
-	return validator.New().Struct(o)
+	return validate.Struct(o)
 }
 
 // setDefaults implements sacloud.argumentDefaulter
@@ -13863,7 +13863,7 @@ type LocalRouterActivity struct {
 
 // Validate validates by field tags
 func (o *LocalRouterActivity) Validate() error {
-	return validator.New().Struct(o)
+	return validate.Struct(o)
 }
 
 // setDefaults implements sacloud.argumentDefaulter
@@ -13898,7 +13898,7 @@ type MonitorLocalRouterValue struct {
 
 // Validate validates by field tags
 func (o *MonitorLocalRouterValue) Validate() error {
-	return validator.New().Struct(o)
+	return validate.Struct(o)
 }
 
 // setDefaults implements sacloud.argumentDefaulter
@@ -13970,7 +13970,7 @@ type MobileGateway struct {
 
 // Validate validates by field tags
 func (o *MobileGateway) Validate() error {
-	return validator.New().Struct(o)
+	return validate.Struct(o)
 }
 
 // setDefaults implements sacloud.argumentDefaulter
@@ -14241,7 +14241,7 @@ type MobileGatewayInterface struct {
 
 // Validate validates by field tags
 func (o *MobileGatewayInterface) Validate() error {
-	return validator.New().Struct(o)
+	return validate.Struct(o)
 }
 
 // setDefaults implements sacloud.argumentDefaulter
@@ -14513,7 +14513,7 @@ type MobileGatewaySetting struct {
 
 // Validate validates by field tags
 func (o *MobileGatewaySetting) Validate() error {
-	return validator.New().Struct(o)
+	return validate.Struct(o)
 }
 
 // setDefaults implements sacloud.argumentDefaulter
@@ -14584,7 +14584,7 @@ type MobileGatewayInterfaceSetting struct {
 
 // Validate validates by field tags
 func (o *MobileGatewayInterfaceSetting) Validate() error {
-	return validator.New().Struct(o)
+	return validate.Struct(o)
 }
 
 // setDefaults implements sacloud.argumentDefaulter
@@ -14642,7 +14642,7 @@ type MobileGatewayStaticRoute struct {
 
 // Validate validates by field tags
 func (o *MobileGatewayStaticRoute) Validate() error {
-	return validator.New().Struct(o)
+	return validate.Struct(o)
 }
 
 // setDefaults implements sacloud.argumentDefaulter
@@ -14691,7 +14691,7 @@ type MobileGatewayCreateRequest struct {
 
 // Validate validates by field tags
 func (o *MobileGatewayCreateRequest) Validate() error {
-	return validator.New().Struct(o)
+	return validate.Struct(o)
 }
 
 // setDefaults implements sacloud.argumentDefaulter
@@ -14712,7 +14712,7 @@ func (o *MobileGatewayCreateRequest) setDefaults() interface{} {
 		IconID:      o.GetIconID(),
 		Settings:    o.GetSettings(),
 		Class:       "mobilegateway",
-		PlanID:      types.ID(1),
+		PlanID:      types.ID(2),
 		SwitchID:    "shared",
 	}
 }
@@ -14800,7 +14800,7 @@ type MobileGatewaySettingCreate struct {
 
 // Validate validates by field tags
 func (o *MobileGatewaySettingCreate) Validate() error {
-	return validator.New().Struct(o)
+	return validate.Struct(o)
 }
 
 // setDefaults implements sacloud.argumentDefaulter
@@ -14862,7 +14862,7 @@ type MobileGatewayUpdateRequest struct {
 
 // Validate validates by field tags
 func (o *MobileGatewayUpdateRequest) Validate() error {
-	return validator.New().Struct(o)
+	return validate.Struct(o)
 }
 
 // setDefaults implements sacloud.argumentDefaulter
@@ -14976,7 +14976,7 @@ type MobileGatewayUpdateSettingsRequest struct {
 
 // Validate validates by field tags
 func (o *MobileGatewayUpdateSettingsRequest) Validate() error {
-	return validator.New().Struct(o)
+	return validate.Struct(o)
 }
 
 // setDefaults implements sacloud.argumentDefaulter
@@ -15022,7 +15022,7 @@ type MobileGatewayDNSSetting struct {
 
 // Validate validates by field tags
 func (o *MobileGatewayDNSSetting) Validate() error {
-	return validator.New().Struct(o)
+	return validate.Struct(o)
 }
 
 // setDefaults implements sacloud.argumentDefaulter
@@ -15069,7 +15069,7 @@ type MobileGatewaySIMRoute struct {
 
 // Validate validates by field tags
 func (o *MobileGatewaySIMRoute) Validate() error {
-	return validator.New().Struct(o)
+	return validate.Struct(o)
 }
 
 // setDefaults implements sacloud.argumentDefaulter
@@ -15127,7 +15127,7 @@ type MobileGatewaySIMRouteParam struct {
 
 // Validate validates by field tags
 func (o *MobileGatewaySIMRouteParam) Validate() error {
-	return validator.New().Struct(o)
+	return validate.Struct(o)
 }
 
 // setDefaults implements sacloud.argumentDefaulter
@@ -15185,7 +15185,7 @@ type MobileGatewaySIMInfo struct {
 
 // Validate validates by field tags
 func (o *MobileGatewaySIMInfo) Validate() error {
-	return validator.New().Struct(o)
+	return validate.Struct(o)
 }
 
 // setDefaults implements sacloud.argumentDefaulter
@@ -15375,7 +15375,7 @@ type SIMTrafficBytes struct {
 
 // Validate validates by field tags
 func (o *SIMTrafficBytes) Validate() error {
-	return validator.New().Struct(o)
+	return validate.Struct(o)
 }
 
 // setDefaults implements sacloud.argumentDefaulter
@@ -15420,7 +15420,7 @@ type MobileGatewayAddSIMRequest struct {
 
 // Validate validates by field tags
 func (o *MobileGatewayAddSIMRequest) Validate() error {
-	return validator.New().Struct(o)
+	return validate.Struct(o)
 }
 
 // setDefaults implements sacloud.argumentDefaulter
@@ -15457,7 +15457,7 @@ type MobileGatewaySIMLogs struct {
 
 // Validate validates by field tags
 func (o *MobileGatewaySIMLogs) Validate() error {
-	return validator.New().Struct(o)
+	return validate.Struct(o)
 }
 
 // setDefaults implements sacloud.argumentDefaulter
@@ -15543,7 +15543,7 @@ type MobileGatewayTrafficControl struct {
 
 // Validate validates by field tags
 func (o *MobileGatewayTrafficControl) Validate() error {
-	return validator.New().Struct(o)
+	return validate.Struct(o)
 }
 
 // setDefaults implements sacloud.argumentDefaulter
@@ -15638,7 +15638,7 @@ type MobileGatewayTrafficStatus struct {
 
 // Validate validates by field tags
 func (o *MobileGatewayTrafficStatus) Validate() error {
-	return validator.New().Struct(o)
+	return validate.Struct(o)
 }
 
 // setDefaults implements sacloud.argumentDefaulter
@@ -15715,7 +15715,7 @@ type NFS struct {
 
 // Validate validates by field tags
 func (o *NFS) Validate() error {
-	return validator.New().Struct(o)
+	return validate.Struct(o)
 }
 
 // setDefaults implements sacloud.argumentDefaulter
@@ -16036,7 +16036,7 @@ type NFSCreateRequest struct {
 
 // Validate validates by field tags
 func (o *NFSCreateRequest) Validate() error {
-	return validator.New().Struct(o)
+	return validate.Struct(o)
 }
 
 // setDefaults implements sacloud.argumentDefaulter
@@ -16190,7 +16190,7 @@ type NFSUpdateRequest struct {
 
 // Validate validates by field tags
 func (o *NFSUpdateRequest) Validate() error {
-	return validator.New().Struct(o)
+	return validate.Struct(o)
 }
 
 // setDefaults implements sacloud.argumentDefaulter
@@ -16279,7 +16279,7 @@ type FreeDiskSizeActivity struct {
 
 // Validate validates by field tags
 func (o *FreeDiskSizeActivity) Validate() error {
-	return validator.New().Struct(o)
+	return validate.Struct(o)
 }
 
 // setDefaults implements sacloud.argumentDefaulter
@@ -16313,7 +16313,7 @@ type MonitorFreeDiskSizeValue struct {
 
 // Validate validates by field tags
 func (o *MonitorFreeDiskSizeValue) Validate() error {
-	return validator.New().Struct(o)
+	return validate.Struct(o)
 }
 
 // setDefaults implements sacloud.argumentDefaulter
@@ -16368,7 +16368,7 @@ type Note struct {
 
 // Validate validates by field tags
 func (o *Note) Validate() error {
-	return validator.New().Struct(o)
+	return validate.Struct(o)
 }
 
 // setDefaults implements sacloud.argumentDefaulter
@@ -16565,7 +16565,7 @@ type NoteCreateRequest struct {
 
 // Validate validates by field tags
 func (o *NoteCreateRequest) Validate() error {
-	return validator.New().Struct(o)
+	return validate.Struct(o)
 }
 
 // setDefaults implements sacloud.argumentDefaulter
@@ -16670,7 +16670,7 @@ type NoteUpdateRequest struct {
 
 // Validate validates by field tags
 func (o *NoteUpdateRequest) Validate() error {
-	return validator.New().Struct(o)
+	return validate.Struct(o)
 }
 
 // setDefaults implements sacloud.argumentDefaulter
@@ -16777,7 +16777,7 @@ type PacketFilter struct {
 
 // Validate validates by field tags
 func (o *PacketFilter) Validate() error {
-	return validator.New().Struct(o)
+	return validate.Struct(o)
 }
 
 // setDefaults implements sacloud.argumentDefaulter
@@ -16907,7 +16907,7 @@ type PacketFilterExpression struct {
 
 // Validate validates by field tags
 func (o *PacketFilterExpression) Validate() error {
-	return validator.New().Struct(o)
+	return validate.Struct(o)
 }
 
 // setDefaults implements sacloud.argumentDefaulter
@@ -17002,7 +17002,7 @@ type PacketFilterCreateRequest struct {
 
 // Validate validates by field tags
 func (o *PacketFilterCreateRequest) Validate() error {
-	return validator.New().Struct(o)
+	return validate.Struct(o)
 }
 
 // setDefaults implements sacloud.argumentDefaulter
@@ -17061,7 +17061,7 @@ type PacketFilterUpdateRequest struct {
 
 // Validate validates by field tags
 func (o *PacketFilterUpdateRequest) Validate() error {
-	return validator.New().Struct(o)
+	return validate.Struct(o)
 }
 
 // setDefaults implements sacloud.argumentDefaulter
@@ -17131,7 +17131,7 @@ type PrivateHost struct {
 
 // Validate validates by field tags
 func (o *PrivateHost) Validate() error {
-	return validator.New().Struct(o)
+	return validate.Struct(o)
 }
 
 // setDefaults implements sacloud.argumentDefaulter
@@ -17384,7 +17384,7 @@ type PrivateHostCreateRequest struct {
 
 // Validate validates by field tags
 func (o *PrivateHostCreateRequest) Validate() error {
-	return validator.New().Struct(o)
+	return validate.Struct(o)
 }
 
 // setDefaults implements sacloud.argumentDefaulter
@@ -17488,7 +17488,7 @@ type PrivateHostUpdateRequest struct {
 
 // Validate validates by field tags
 func (o *PrivateHostUpdateRequest) Validate() error {
-	return validator.New().Struct(o)
+	return validate.Struct(o)
 }
 
 // setDefaults implements sacloud.argumentDefaulter
@@ -17582,7 +17582,7 @@ type PrivateHostPlan struct {
 
 // Validate validates by field tags
 func (o *PrivateHostPlan) Validate() error {
-	return validator.New().Struct(o)
+	return validate.Struct(o)
 }
 
 // setDefaults implements sacloud.argumentDefaulter
@@ -17727,7 +17727,7 @@ type ProxyLB struct {
 
 // Validate validates by field tags
 func (o *ProxyLB) Validate() error {
-	return validator.New().Struct(o)
+	return validate.Struct(o)
 }
 
 // setDefaults implements sacloud.argumentDefaulter
@@ -18067,7 +18067,7 @@ type ProxyLBHealthCheck struct {
 
 // Validate validates by field tags
 func (o *ProxyLBHealthCheck) Validate() error {
-	return validator.New().Struct(o)
+	return validate.Struct(o)
 }
 
 // setDefaults implements sacloud.argumentDefaulter
@@ -18137,7 +18137,7 @@ type ProxyLBSorryServer struct {
 
 // Validate validates by field tags
 func (o *ProxyLBSorryServer) Validate() error {
-	return validator.New().Struct(o)
+	return validate.Struct(o)
 }
 
 // setDefaults implements sacloud.argumentDefaulter
@@ -18186,7 +18186,7 @@ type ProxyLBBindPort struct {
 
 // Validate validates by field tags
 func (o *ProxyLBBindPort) Validate() error {
-	return validator.New().Struct(o)
+	return validate.Struct(o)
 }
 
 // setDefaults implements sacloud.argumentDefaulter
@@ -18268,7 +18268,7 @@ type ProxyLBResponseHeader struct {
 
 // Validate validates by field tags
 func (o *ProxyLBResponseHeader) Validate() error {
-	return validator.New().Struct(o)
+	return validate.Struct(o)
 }
 
 // setDefaults implements sacloud.argumentDefaulter
@@ -18316,7 +18316,7 @@ type ProxyLBServer struct {
 
 // Validate validates by field tags
 func (o *ProxyLBServer) Validate() error {
-	return validator.New().Struct(o)
+	return validate.Struct(o)
 }
 
 // setDefaults implements sacloud.argumentDefaulter
@@ -18387,7 +18387,7 @@ type ProxyLBRule struct {
 
 // Validate validates by field tags
 func (o *ProxyLBRule) Validate() error {
-	return validator.New().Struct(o)
+	return validate.Struct(o)
 }
 
 // setDefaults implements sacloud.argumentDefaulter
@@ -18445,7 +18445,7 @@ type ProxyLBACMESetting struct {
 
 // Validate validates by field tags
 func (o *ProxyLBACMESetting) Validate() error {
-	return validator.New().Struct(o)
+	return validate.Struct(o)
 }
 
 // setDefaults implements sacloud.argumentDefaulter
@@ -18491,7 +18491,7 @@ type ProxyLBStickySession struct {
 
 // Validate validates by field tags
 func (o *ProxyLBStickySession) Validate() error {
-	return validator.New().Struct(o)
+	return validate.Struct(o)
 }
 
 // setDefaults implements sacloud.argumentDefaulter
@@ -18536,7 +18536,7 @@ type ProxyLBTimeout struct {
 
 // Validate validates by field tags
 func (o *ProxyLBTimeout) Validate() error {
-	return validator.New().Struct(o)
+	return validate.Struct(o)
 }
 
 // setDefaults implements sacloud.argumentDefaulter
@@ -18586,7 +18586,7 @@ type ProxyLBCreateRequest struct {
 
 // Validate validates by field tags
 func (o *ProxyLBCreateRequest) Validate() error {
-	return validator.New().Struct(o)
+	return validate.Struct(o)
 }
 
 // setDefaults implements sacloud.argumentDefaulter
@@ -18821,7 +18821,7 @@ type ProxyLBUpdateRequest struct {
 
 // Validate validates by field tags
 func (o *ProxyLBUpdateRequest) Validate() error {
-	return validator.New().Struct(o)
+	return validate.Struct(o)
 }
 
 // setDefaults implements sacloud.argumentDefaulter
@@ -19026,7 +19026,7 @@ type ProxyLBUpdateSettingsRequest struct {
 
 // Validate validates by field tags
 func (o *ProxyLBUpdateSettingsRequest) Validate() error {
-	return validator.New().Struct(o)
+	return validate.Struct(o)
 }
 
 // setDefaults implements sacloud.argumentDefaulter
@@ -19155,7 +19155,7 @@ type ProxyLBChangePlanRequest struct {
 
 // Validate validates by field tags
 func (o *ProxyLBChangePlanRequest) Validate() error {
-	return validator.New().Struct(o)
+	return validate.Struct(o)
 }
 
 // setDefaults implements sacloud.argumentDefaulter
@@ -19189,7 +19189,7 @@ type ProxyLBCertificates struct {
 
 // Validate validates by field tags
 func (o *ProxyLBCertificates) Validate() error {
-	return validator.New().Struct(o)
+	return validate.Struct(o)
 }
 
 // setDefaults implements sacloud.argumentDefaulter
@@ -19238,7 +19238,7 @@ type ProxyLBPrimaryCert struct {
 
 // Validate validates by field tags
 func (o *ProxyLBPrimaryCert) Validate() error {
-	return validator.New().Struct(o)
+	return validate.Struct(o)
 }
 
 // setDefaults implements sacloud.argumentDefaulter
@@ -19323,7 +19323,7 @@ type ProxyLBAdditionalCert struct {
 
 // Validate validates by field tags
 func (o *ProxyLBAdditionalCert) Validate() error {
-	return validator.New().Struct(o)
+	return validate.Struct(o)
 }
 
 // setDefaults implements sacloud.argumentDefaulter
@@ -19405,7 +19405,7 @@ type ProxyLBSetCertificatesRequest struct {
 
 // Validate validates by field tags
 func (o *ProxyLBSetCertificatesRequest) Validate() error {
-	return validator.New().Struct(o)
+	return validate.Struct(o)
 }
 
 // setDefaults implements sacloud.argumentDefaulter
@@ -19453,7 +19453,7 @@ type ProxyLBHealth struct {
 
 // Validate validates by field tags
 func (o *ProxyLBHealth) Validate() error {
-	return validator.New().Struct(o)
+	return validate.Struct(o)
 }
 
 // setDefaults implements sacloud.argumentDefaulter
@@ -19522,7 +19522,7 @@ type ConnectionActivity struct {
 
 // Validate validates by field tags
 func (o *ConnectionActivity) Validate() error {
-	return validator.New().Struct(o)
+	return validate.Struct(o)
 }
 
 // setDefaults implements sacloud.argumentDefaulter
@@ -19557,7 +19557,7 @@ type MonitorConnectionValue struct {
 
 // Validate validates by field tags
 func (o *MonitorConnectionValue) Validate() error {
-	return validator.New().Struct(o)
+	return validate.Struct(o)
 }
 
 // setDefaults implements sacloud.argumentDefaulter
@@ -19643,7 +19643,7 @@ type Server struct {
 
 // Validate validates by field tags
 func (o *Server) Validate() error {
-	return validator.New().Struct(o)
+	return validate.Struct(o)
 }
 
 // setDefaults implements sacloud.argumentDefaulter
@@ -20081,7 +20081,7 @@ type ZoneInfo struct {
 
 // Validate validates by field tags
 func (o *ZoneInfo) Validate() error {
-	return validator.New().Struct(o)
+	return validate.Struct(o)
 }
 
 // setDefaults implements sacloud.argumentDefaulter
@@ -20207,7 +20207,7 @@ type VNCProxy struct {
 
 // Validate validates by field tags
 func (o *VNCProxy) Validate() error {
-	return validator.New().Struct(o)
+	return validate.Struct(o)
 }
 
 // setDefaults implements sacloud.argumentDefaulter
@@ -20253,7 +20253,7 @@ type FTPServerInfo struct {
 
 // Validate validates by field tags
 func (o *FTPServerInfo) Validate() error {
-	return validator.New().Struct(o)
+	return validate.Struct(o)
 }
 
 // setDefaults implements sacloud.argumentDefaulter
@@ -20306,7 +20306,7 @@ type ServerConnectedDisk struct {
 
 // Validate validates by field tags
 func (o *ServerConnectedDisk) Validate() error {
-	return validator.New().Struct(o)
+	return validate.Struct(o)
 }
 
 // setDefaults implements sacloud.argumentDefaulter
@@ -20476,7 +20476,7 @@ type ServerCreateRequest struct {
 
 // Validate validates by field tags
 func (o *ServerCreateRequest) Validate() error {
-	return validator.New().Struct(o)
+	return validate.Struct(o)
 }
 
 // setDefaults implements sacloud.argumentDefaulter
@@ -20673,7 +20673,7 @@ type ConnectedSwitch struct {
 
 // Validate validates by field tags
 func (o *ConnectedSwitch) Validate() error {
-	return validator.New().Struct(o)
+	return validate.Struct(o)
 }
 
 // setDefaults implements sacloud.argumentDefaulter
@@ -20743,7 +20743,7 @@ type ServerUpdateRequest struct {
 
 // Validate validates by field tags
 func (o *ServerUpdateRequest) Validate() error {
-	return validator.New().Struct(o)
+	return validate.Struct(o)
 }
 
 // setDefaults implements sacloud.argumentDefaulter
@@ -20859,7 +20859,7 @@ type ServerDeleteWithDisksRequest struct {
 
 // Validate validates by field tags
 func (o *ServerDeleteWithDisksRequest) Validate() error {
-	return validator.New().Struct(o)
+	return validate.Struct(o)
 }
 
 // setDefaults implements sacloud.argumentDefaulter
@@ -20895,7 +20895,7 @@ type ServerChangePlanRequest struct {
 
 // Validate validates by field tags
 func (o *ServerChangePlanRequest) Validate() error {
-	return validator.New().Struct(o)
+	return validate.Struct(o)
 }
 
 // setDefaults implements sacloud.argumentDefaulter
@@ -20977,7 +20977,7 @@ type InsertCDROMRequest struct {
 
 // Validate validates by field tags
 func (o *InsertCDROMRequest) Validate() error {
-	return validator.New().Struct(o)
+	return validate.Struct(o)
 }
 
 // setDefaults implements sacloud.argumentDefaulter
@@ -21030,7 +21030,7 @@ type EjectCDROMRequest struct {
 
 // Validate validates by field tags
 func (o *EjectCDROMRequest) Validate() error {
-	return validator.New().Struct(o)
+	return validate.Struct(o)
 }
 
 // setDefaults implements sacloud.argumentDefaulter
@@ -21084,7 +21084,7 @@ type SendKeyRequest struct {
 
 // Validate validates by field tags
 func (o *SendKeyRequest) Validate() error {
-	return validator.New().Struct(o)
+	return validate.Struct(o)
 }
 
 // setDefaults implements sacloud.argumentDefaulter
@@ -21134,7 +21134,7 @@ type VNCProxyInfo struct {
 
 // Validate validates by field tags
 func (o *VNCProxyInfo) Validate() error {
-	return validator.New().Struct(o)
+	return validate.Struct(o)
 }
 
 // setDefaults implements sacloud.argumentDefaulter
@@ -21233,7 +21233,7 @@ type ServerPlan struct {
 
 // Validate validates by field tags
 func (o *ServerPlan) Validate() error {
-	return validator.New().Struct(o)
+	return validate.Struct(o)
 }
 
 // setDefaults implements sacloud.argumentDefaulter
@@ -21373,7 +21373,7 @@ type ServiceClass struct {
 
 // Validate validates by field tags
 func (o *ServiceClass) Validate() error {
-	return validator.New().Struct(o)
+	return validate.Struct(o)
 }
 
 // setDefaults implements sacloud.argumentDefaulter
@@ -21481,32 +21481,53 @@ func (o *ServiceClass) SetPrice(v *Price) {
 
 // Price represents API parameter/response structure
 type Price struct {
-	Base    int
-	Daily   int
-	Hourly  int
-	Monthly int
-	Zone    string
+	Base          int
+	Daily         int
+	Hourly        int
+	Monthly       int
+	PerUse        int
+	Basic         int
+	Traffic       int
+	DocomoTraffic int
+	KddiTraffic   int
+	SbTraffic     int
+	SimSheet      int
+	Zone          string
 }
 
 // Validate validates by field tags
 func (o *Price) Validate() error {
-	return validator.New().Struct(o)
+	return validate.Struct(o)
 }
 
 // setDefaults implements sacloud.argumentDefaulter
 func (o *Price) setDefaults() interface{} {
 	return &struct {
-		Base    int
-		Daily   int
-		Hourly  int
-		Monthly int
-		Zone    string
+		Base          int
+		Daily         int
+		Hourly        int
+		Monthly       int
+		PerUse        int
+		Basic         int
+		Traffic       int
+		DocomoTraffic int
+		KddiTraffic   int
+		SbTraffic     int
+		SimSheet      int
+		Zone          string
 	}{
-		Base:    o.GetBase(),
-		Daily:   o.GetDaily(),
-		Hourly:  o.GetHourly(),
-		Monthly: o.GetMonthly(),
-		Zone:    o.GetZone(),
+		Base:          o.GetBase(),
+		Daily:         o.GetDaily(),
+		Hourly:        o.GetHourly(),
+		Monthly:       o.GetMonthly(),
+		PerUse:        o.GetPerUse(),
+		Basic:         o.GetBasic(),
+		Traffic:       o.GetTraffic(),
+		DocomoTraffic: o.GetDocomoTraffic(),
+		KddiTraffic:   o.GetKddiTraffic(),
+		SbTraffic:     o.GetSbTraffic(),
+		SimSheet:      o.GetSimSheet(),
+		Zone:          o.GetZone(),
 	}
 }
 
@@ -21550,6 +21571,76 @@ func (o *Price) SetMonthly(v int) {
 	o.Monthly = v
 }
 
+// GetPerUse returns value of PerUse
+func (o *Price) GetPerUse() int {
+	return o.PerUse
+}
+
+// SetPerUse sets value to PerUse
+func (o *Price) SetPerUse(v int) {
+	o.PerUse = v
+}
+
+// GetBasic returns value of Basic
+func (o *Price) GetBasic() int {
+	return o.Basic
+}
+
+// SetBasic sets value to Basic
+func (o *Price) SetBasic(v int) {
+	o.Basic = v
+}
+
+// GetTraffic returns value of Traffic
+func (o *Price) GetTraffic() int {
+	return o.Traffic
+}
+
+// SetTraffic sets value to Traffic
+func (o *Price) SetTraffic(v int) {
+	o.Traffic = v
+}
+
+// GetDocomoTraffic returns value of DocomoTraffic
+func (o *Price) GetDocomoTraffic() int {
+	return o.DocomoTraffic
+}
+
+// SetDocomoTraffic sets value to DocomoTraffic
+func (o *Price) SetDocomoTraffic(v int) {
+	o.DocomoTraffic = v
+}
+
+// GetKddiTraffic returns value of KddiTraffic
+func (o *Price) GetKddiTraffic() int {
+	return o.KddiTraffic
+}
+
+// SetKddiTraffic sets value to KddiTraffic
+func (o *Price) SetKddiTraffic(v int) {
+	o.KddiTraffic = v
+}
+
+// GetSbTraffic returns value of SbTraffic
+func (o *Price) GetSbTraffic() int {
+	return o.SbTraffic
+}
+
+// SetSbTraffic sets value to SbTraffic
+func (o *Price) SetSbTraffic(v int) {
+	o.SbTraffic = v
+}
+
+// GetSimSheet returns value of SimSheet
+func (o *Price) GetSimSheet() int {
+	return o.SimSheet
+}
+
+// SetSimSheet sets value to SimSheet
+func (o *Price) SetSimSheet(v int) {
+	o.SimSheet = v
+}
+
 // GetZone returns value of Zone
 func (o *Price) GetZone() string {
 	return o.Zone
@@ -21581,7 +21672,7 @@ type SIM struct {
 
 // Validate validates by field tags
 func (o *SIM) Validate() error {
-	return validator.New().Struct(o)
+	return validate.Struct(o)
 }
 
 // setDefaults implements sacloud.argumentDefaulter
@@ -21787,7 +21878,7 @@ type SIMInfo struct {
 
 // Validate validates by field tags
 func (o *SIMInfo) Validate() error {
-	return validator.New().Struct(o)
+	return validate.Struct(o)
 }
 
 // setDefaults implements sacloud.argumentDefaulter
@@ -21981,7 +22072,7 @@ type SIMCreateRequest struct {
 
 // Validate validates by field tags
 func (o *SIMCreateRequest) Validate() error {
-	return validator.New().Struct(o)
+	return validate.Struct(o)
 }
 
 // setDefaults implements sacloud.argumentDefaulter
@@ -22099,7 +22190,7 @@ type SIMUpdateRequest struct {
 
 // Validate validates by field tags
 func (o *SIMUpdateRequest) Validate() error {
-	return validator.New().Struct(o)
+	return validate.Struct(o)
 }
 
 // setDefaults implements sacloud.argumentDefaulter
@@ -22188,7 +22279,7 @@ type SIMAssignIPRequest struct {
 
 // Validate validates by field tags
 func (o *SIMAssignIPRequest) Validate() error {
-	return validator.New().Struct(o)
+	return validate.Struct(o)
 }
 
 // setDefaults implements sacloud.argumentDefaulter
@@ -22221,7 +22312,7 @@ type SIMIMEILockRequest struct {
 
 // Validate validates by field tags
 func (o *SIMIMEILockRequest) Validate() error {
-	return validator.New().Struct(o)
+	return validate.Struct(o)
 }
 
 // setDefaults implements sacloud.argumentDefaulter
@@ -22258,7 +22349,7 @@ type SIMLog struct {
 
 // Validate validates by field tags
 func (o *SIMLog) Validate() error {
-	return validator.New().Struct(o)
+	return validate.Struct(o)
 }
 
 // setDefaults implements sacloud.argumentDefaulter
@@ -22341,7 +22432,7 @@ type SIMNetworkOperatorConfig struct {
 
 // Validate validates by field tags
 func (o *SIMNetworkOperatorConfig) Validate() error {
-	return validator.New().Struct(o)
+	return validate.Struct(o)
 }
 
 // setDefaults implements sacloud.argumentDefaulter
@@ -22398,7 +22489,7 @@ type LinkActivity struct {
 
 // Validate validates by field tags
 func (o *LinkActivity) Validate() error {
-	return validator.New().Struct(o)
+	return validate.Struct(o)
 }
 
 // setDefaults implements sacloud.argumentDefaulter
@@ -22433,7 +22524,7 @@ type MonitorLinkValue struct {
 
 // Validate validates by field tags
 func (o *MonitorLinkValue) Validate() error {
-	return validator.New().Struct(o)
+	return validate.Struct(o)
 }
 
 // setDefaults implements sacloud.argumentDefaulter
@@ -22508,7 +22599,7 @@ type SimpleMonitor struct {
 
 // Validate validates by field tags
 func (o *SimpleMonitor) Validate() error {
-	return validator.New().Struct(o)
+	return validate.Struct(o)
 }
 
 // setDefaults implements sacloud.argumentDefaulter
@@ -22816,7 +22907,7 @@ type SimpleMonitorHealthCheck struct {
 
 // Validate validates by field tags
 func (o *SimpleMonitorHealthCheck) Validate() error {
-	return validator.New().Struct(o)
+	return validate.Struct(o)
 }
 
 // setDefaults implements sacloud.argumentDefaulter
@@ -23016,7 +23107,7 @@ type SimpleMonitorCreateRequest struct {
 
 // Validate validates by field tags
 func (o *SimpleMonitorCreateRequest) Validate() error {
-	return validator.New().Struct(o)
+	return validate.Struct(o)
 }
 
 // setDefaults implements sacloud.argumentDefaulter
@@ -23220,7 +23311,7 @@ type SimpleMonitorUpdateRequest struct {
 
 // Validate validates by field tags
 func (o *SimpleMonitorUpdateRequest) Validate() error {
-	return validator.New().Struct(o)
+	return validate.Struct(o)
 }
 
 // setDefaults implements sacloud.argumentDefaulter
@@ -23419,7 +23510,7 @@ type SimpleMonitorUpdateSettingsRequest struct {
 
 // Validate validates by field tags
 func (o *SimpleMonitorUpdateSettingsRequest) Validate() error {
-	return validator.New().Struct(o)
+	return validate.Struct(o)
 }
 
 // setDefaults implements sacloud.argumentDefaulter
@@ -23554,7 +23645,7 @@ type ResponseTimeSecActivity struct {
 
 // Validate validates by field tags
 func (o *ResponseTimeSecActivity) Validate() error {
-	return validator.New().Struct(o)
+	return validate.Struct(o)
 }
 
 // setDefaults implements sacloud.argumentDefaulter
@@ -23588,7 +23679,7 @@ type MonitorResponseTimeSecValue struct {
 
 // Validate validates by field tags
 func (o *MonitorResponseTimeSecValue) Validate() error {
-	return validator.New().Struct(o)
+	return validate.Struct(o)
 }
 
 // setDefaults implements sacloud.argumentDefaulter
@@ -23635,7 +23726,7 @@ type SimpleMonitorHealthStatus struct {
 
 // Validate validates by field tags
 func (o *SimpleMonitorHealthStatus) Validate() error {
-	return validator.New().Struct(o)
+	return validate.Struct(o)
 }
 
 // setDefaults implements sacloud.argumentDefaulter
@@ -23697,7 +23788,7 @@ type SSHKey struct {
 
 // Validate validates by field tags
 func (o *SSHKey) Validate() error {
-	return validator.New().Struct(o)
+	return validate.Struct(o)
 }
 
 // setDefaults implements sacloud.argumentDefaulter
@@ -23812,7 +23903,7 @@ type SSHKeyCreateRequest struct {
 
 // Validate validates by field tags
 func (o *SSHKeyCreateRequest) Validate() error {
-	return validator.New().Struct(o)
+	return validate.Struct(o)
 }
 
 // setDefaults implements sacloud.argumentDefaulter
@@ -23875,7 +23966,7 @@ type SSHKeyGenerated struct {
 
 // Validate validates by field tags
 func (o *SSHKeyGenerated) Validate() error {
-	return validator.New().Struct(o)
+	return validate.Struct(o)
 }
 
 // setDefaults implements sacloud.argumentDefaulter
@@ -24002,7 +24093,7 @@ type SSHKeyGenerateRequest struct {
 
 // Validate validates by field tags
 func (o *SSHKeyGenerateRequest) Validate() error {
-	return validator.New().Struct(o)
+	return validate.Struct(o)
 }
 
 // setDefaults implements sacloud.argumentDefaulter
@@ -24062,7 +24153,7 @@ type SSHKeyUpdateRequest struct {
 
 // Validate validates by field tags
 func (o *SSHKeyUpdateRequest) Validate() error {
-	return validator.New().Struct(o)
+	return validate.Struct(o)
 }
 
 // setDefaults implements sacloud.argumentDefaulter
@@ -24115,7 +24206,7 @@ type Subnet struct {
 
 // Validate validates by field tags
 func (o *Subnet) Validate() error {
-	return validator.New().Struct(o)
+	return validate.Struct(o)
 }
 
 // setDefaults implements sacloud.argumentDefaulter
@@ -24265,7 +24356,7 @@ type SubnetIPAddress struct {
 
 // Validate validates by field tags
 func (o *SubnetIPAddress) Validate() error {
-	return validator.New().Struct(o)
+	return validate.Struct(o)
 }
 
 // setDefaults implements sacloud.argumentDefaulter
@@ -24323,7 +24414,7 @@ type Switch struct {
 
 // Validate validates by field tags
 func (o *Switch) Validate() error {
-	return validator.New().Struct(o)
+	return validate.Struct(o)
 }
 
 // setDefaults implements sacloud.argumentDefaulter
@@ -24560,7 +24651,7 @@ type SwitchSubnet struct {
 
 // Validate validates by field tags
 func (o *SwitchSubnet) Validate() error {
-	return validator.New().Struct(o)
+	return validate.Struct(o)
 }
 
 // setDefaults implements sacloud.argumentDefaulter
@@ -24719,7 +24810,7 @@ type SwitchCreateRequest struct {
 
 // Validate validates by field tags
 func (o *SwitchCreateRequest) Validate() error {
-	return validator.New().Struct(o)
+	return validate.Struct(o)
 }
 
 // setDefaults implements sacloud.argumentDefaulter
@@ -24837,7 +24928,7 @@ type SwitchUpdateRequest struct {
 
 // Validate validates by field tags
 func (o *SwitchUpdateRequest) Validate() error {
-	return validator.New().Struct(o)
+	return validate.Struct(o)
 }
 
 // setDefaults implements sacloud.argumentDefaulter
@@ -24966,7 +25057,7 @@ type VPCRouter struct {
 
 // Validate validates by field tags
 func (o *VPCRouter) Validate() error {
-	return validator.New().Struct(o)
+	return validate.Struct(o)
 }
 
 // setDefaults implements sacloud.argumentDefaulter
@@ -25246,7 +25337,7 @@ type VPCRouterSetting struct {
 
 // Validate validates by field tags
 func (o *VPCRouterSetting) Validate() error {
-	return validator.New().Struct(o)
+	return validate.Struct(o)
 }
 
 // setDefaults implements sacloud.argumentDefaulter
@@ -25463,7 +25554,7 @@ type VPCRouterInterfaceSetting struct {
 
 // Validate validates by field tags
 func (o *VPCRouterInterfaceSetting) Validate() error {
-	return validator.New().Struct(o)
+	return validate.Struct(o)
 }
 
 // setDefaults implements sacloud.argumentDefaulter
@@ -25546,7 +25637,7 @@ type VPCRouterStaticNAT struct {
 
 // Validate validates by field tags
 func (o *VPCRouterStaticNAT) Validate() error {
-	return validator.New().Struct(o)
+	return validate.Struct(o)
 }
 
 // setDefaults implements sacloud.argumentDefaulter
@@ -25607,7 +25698,7 @@ type VPCRouterPortForwarding struct {
 
 // Validate validates by field tags
 func (o *VPCRouterPortForwarding) Validate() error {
-	return validator.New().Struct(o)
+	return validate.Struct(o)
 }
 
 // setDefaults implements sacloud.argumentDefaulter
@@ -25690,7 +25781,7 @@ type VPCRouterFirewall struct {
 
 // Validate validates by field tags
 func (o *VPCRouterFirewall) Validate() error {
-	return validator.New().Struct(o)
+	return validate.Struct(o)
 }
 
 // setDefaults implements sacloud.argumentDefaulter
@@ -25754,7 +25845,7 @@ type VPCRouterFirewallRule struct {
 
 // Validate validates by field tags
 func (o *VPCRouterFirewallRule) Validate() error {
-	return validator.New().Struct(o)
+	return validate.Struct(o)
 }
 
 // setDefaults implements sacloud.argumentDefaulter
@@ -25874,7 +25965,7 @@ type VPCRouterDHCPServer struct {
 
 // Validate validates by field tags
 func (o *VPCRouterDHCPServer) Validate() error {
-	return validator.New().Struct(o)
+	return validate.Struct(o)
 }
 
 // setDefaults implements sacloud.argumentDefaulter
@@ -25944,7 +26035,7 @@ type VPCRouterDHCPStaticMapping struct {
 
 // Validate validates by field tags
 func (o *VPCRouterDHCPStaticMapping) Validate() error {
-	return validator.New().Struct(o)
+	return validate.Struct(o)
 }
 
 // setDefaults implements sacloud.argumentDefaulter
@@ -25990,7 +26081,7 @@ type VPCRouterPPTPServer struct {
 
 // Validate validates by field tags
 func (o *VPCRouterPPTPServer) Validate() error {
-	return validator.New().Struct(o)
+	return validate.Struct(o)
 }
 
 // setDefaults implements sacloud.argumentDefaulter
@@ -26037,7 +26128,7 @@ type VPCRouterL2TPIPsecServer struct {
 
 // Validate validates by field tags
 func (o *VPCRouterL2TPIPsecServer) Validate() error {
-	return validator.New().Struct(o)
+	return validate.Struct(o)
 }
 
 // setDefaults implements sacloud.argumentDefaulter
@@ -26095,7 +26186,7 @@ type VPCRouterRemoteAccessUser struct {
 
 // Validate validates by field tags
 func (o *VPCRouterRemoteAccessUser) Validate() error {
-	return validator.New().Struct(o)
+	return validate.Struct(o)
 }
 
 // setDefaults implements sacloud.argumentDefaulter
@@ -26144,7 +26235,7 @@ type VPCRouterSiteToSiteIPsecVPN struct {
 
 // Validate validates by field tags
 func (o *VPCRouterSiteToSiteIPsecVPN) Validate() error {
-	return validator.New().Struct(o)
+	return validate.Struct(o)
 }
 
 // setDefaults implements sacloud.argumentDefaulter
@@ -26226,7 +26317,7 @@ type VPCRouterStaticRoute struct {
 
 // Validate validates by field tags
 func (o *VPCRouterStaticRoute) Validate() error {
-	return validator.New().Struct(o)
+	return validate.Struct(o)
 }
 
 // setDefaults implements sacloud.argumentDefaulter
@@ -26289,7 +26380,7 @@ type VPCRouterInterface struct {
 
 // Validate validates by field tags
 func (o *VPCRouterInterface) Validate() error {
-	return validator.New().Struct(o)
+	return validate.Struct(o)
 }
 
 // setDefaults implements sacloud.argumentDefaulter
@@ -26565,7 +26656,7 @@ type VPCRouterCreateRequest struct {
 
 // Validate validates by field tags
 func (o *VPCRouterCreateRequest) Validate() error {
-	return validator.New().Struct(o)
+	return validate.Struct(o)
 }
 
 // setDefaults implements sacloud.argumentDefaulter
@@ -26705,7 +26796,7 @@ type ApplianceConnectedSwitch struct {
 
 // Validate validates by field tags
 func (o *ApplianceConnectedSwitch) Validate() error {
-	return validator.New().Struct(o)
+	return validate.Struct(o)
 }
 
 // setDefaults implements sacloud.argumentDefaulter
@@ -26775,7 +26866,7 @@ type VPCRouterUpdateRequest struct {
 
 // Validate validates by field tags
 func (o *VPCRouterUpdateRequest) Validate() error {
-	return validator.New().Struct(o)
+	return validate.Struct(o)
 }
 
 // setDefaults implements sacloud.argumentDefaulter
@@ -26889,7 +26980,7 @@ type VPCRouterUpdateSettingsRequest struct {
 
 // Validate validates by field tags
 func (o *VPCRouterUpdateSettingsRequest) Validate() error {
-	return validator.New().Struct(o)
+	return validate.Struct(o)
 }
 
 // setDefaults implements sacloud.argumentDefaulter
@@ -26941,7 +27032,7 @@ type VPCRouterStatus struct {
 
 // Validate validates by field tags
 func (o *VPCRouterStatus) Validate() error {
-	return validator.New().Struct(o)
+	return validate.Struct(o)
 }
 
 // setDefaults implements sacloud.argumentDefaulter
@@ -27059,7 +27150,7 @@ type VPCRouterDHCPServerLease struct {
 
 // Validate validates by field tags
 func (o *VPCRouterDHCPServerLease) Validate() error {
-	return validator.New().Struct(o)
+	return validate.Struct(o)
 }
 
 // setDefaults implements sacloud.argumentDefaulter
@@ -27106,7 +27197,7 @@ type VPCRouterL2TPIPsecServerSession struct {
 
 // Validate validates by field tags
 func (o *VPCRouterL2TPIPsecServerSession) Validate() error {
-	return validator.New().Struct(o)
+	return validate.Struct(o)
 }
 
 // setDefaults implements sacloud.argumentDefaulter
@@ -27165,7 +27256,7 @@ type VPCRouterPPTPServerSession struct {
 
 // Validate validates by field tags
 func (o *VPCRouterPPTPServerSession) Validate() error {
-	return validator.New().Struct(o)
+	return validate.Struct(o)
 }
 
 // setDefaults implements sacloud.argumentDefaulter
@@ -27223,7 +27314,7 @@ type VPCRouterSiteToSiteIPsecVPNPeer struct {
 
 // Validate validates by field tags
 func (o *VPCRouterSiteToSiteIPsecVPNPeer) Validate() error {
-	return validator.New().Struct(o)
+	return validate.Struct(o)
 }
 
 // setDefaults implements sacloud.argumentDefaulter
@@ -27282,7 +27373,7 @@ type WebAccel struct {
 
 // Validate validates by field tags
 func (o *WebAccel) Validate() error {
-	return validator.New().Struct(o)
+	return validate.Struct(o)
 }
 
 // setDefaults implements sacloud.argumentDefaulter
@@ -27504,7 +27595,7 @@ type WebAccelCerts struct {
 
 // Validate validates by field tags
 func (o *WebAccelCerts) Validate() error {
-	return validator.New().Struct(o)
+	return validate.Struct(o)
 }
 
 // setDefaults implements sacloud.argumentDefaulter
@@ -27561,7 +27652,7 @@ type WebAccelCurrentCert struct {
 
 // Validate validates by field tags
 func (o *WebAccelCurrentCert) Validate() error {
-	return validator.New().Struct(o)
+	return validate.Struct(o)
 }
 
 // setDefaults implements sacloud.argumentDefaulter
@@ -27761,7 +27852,7 @@ type WebAccelCertIssuer struct {
 
 // Validate validates by field tags
 func (o *WebAccelCertIssuer) Validate() error {
-	return validator.New().Struct(o)
+	return validate.Struct(o)
 }
 
 // setDefaults implements sacloud.argumentDefaulter
@@ -27838,7 +27929,7 @@ type WebAccelCertSubject struct {
 
 // Validate validates by field tags
 func (o *WebAccelCertSubject) Validate() error {
-	return validator.New().Struct(o)
+	return validate.Struct(o)
 }
 
 // setDefaults implements sacloud.argumentDefaulter
@@ -27979,7 +28070,7 @@ type WebAccelOldCerts struct {
 
 // Validate validates by field tags
 func (o *WebAccelOldCerts) Validate() error {
-	return validator.New().Struct(o)
+	return validate.Struct(o)
 }
 
 // setDefaults implements sacloud.argumentDefaulter
@@ -28177,7 +28268,7 @@ type WebAccelCertRequest struct {
 
 // Validate validates by field tags
 func (o *WebAccelCertRequest) Validate() error {
-	return validator.New().Struct(o)
+	return validate.Struct(o)
 }
 
 // setDefaults implements sacloud.argumentDefaulter
@@ -28222,7 +28313,7 @@ type WebAccelDeleteAllCacheRequest struct {
 
 // Validate validates by field tags
 func (o *WebAccelDeleteAllCacheRequest) Validate() error {
-	return validator.New().Struct(o)
+	return validate.Struct(o)
 }
 
 // setDefaults implements sacloud.argumentDefaulter
@@ -28257,7 +28348,7 @@ type WebAccelDeleteCacheResult struct {
 
 // Validate validates by field tags
 func (o *WebAccelDeleteCacheResult) Validate() error {
-	return validator.New().Struct(o)
+	return validate.Struct(o)
 }
 
 // setDefaults implements sacloud.argumentDefaulter
@@ -28314,7 +28405,7 @@ type WebAccelDeleteCacheRequest struct {
 
 // Validate validates by field tags
 func (o *WebAccelDeleteCacheRequest) Validate() error {
-	return validator.New().Struct(o)
+	return validate.Struct(o)
 }
 
 // setDefaults implements sacloud.argumentDefaulter
@@ -28354,7 +28445,7 @@ type Zone struct {
 
 // Validate validates by field tags
 func (o *Zone) Validate() error {
-	return validator.New().Struct(o)
+	return validate.Struct(o)
 }
 
 // setDefaults implements sacloud.argumentDefaulter

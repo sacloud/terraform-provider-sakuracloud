@@ -21,9 +21,9 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/helper/validation"
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
+	archiveUtil "github.com/sacloud/libsacloud/v2/helper/builder/archive"
 	"github.com/sacloud/libsacloud/v2/sacloud"
 	"github.com/sacloud/libsacloud/v2/sacloud/types"
-	archiveUtil "github.com/sacloud/libsacloud/v2/utils/builder/archive"
 )
 
 func expandArchiveBuilder(d *schema.ResourceData, zone string, client *APIClient) (archiveUtil.Builder, func(), error) {

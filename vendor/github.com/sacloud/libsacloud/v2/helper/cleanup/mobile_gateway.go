@@ -17,9 +17,9 @@ package cleanup
 import (
 	"context"
 
+	"github.com/sacloud/libsacloud/v2/helper/power"
 	"github.com/sacloud/libsacloud/v2/sacloud"
 	"github.com/sacloud/libsacloud/v2/sacloud/types"
-	"github.com/sacloud/libsacloud/v2/utils/power"
 )
 
 // DeleteMobileGateway 削除

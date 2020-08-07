@@ -19,10 +19,10 @@ import (
 	"strings"
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
+	diskBuilder "github.com/sacloud/libsacloud/v2/helper/builder/disk"
+	serverBuilder "github.com/sacloud/libsacloud/v2/helper/builder/server"
 	"github.com/sacloud/libsacloud/v2/sacloud"
 	"github.com/sacloud/libsacloud/v2/sacloud/types"
-	diskBuilder "github.com/sacloud/libsacloud/v2/utils/builder/disk"
-	serverBuilder "github.com/sacloud/libsacloud/v2/utils/builder/server"
 )
 
 func expandServerBuilder(d *schema.ResourceData, client *APIClient) *serverBuilder.Builder {

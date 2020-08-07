@@ -16,8 +16,8 @@ package sakuracloud
 
 import (
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
+	"github.com/sacloud/libsacloud/v2/helper/builder/localrouter"
 	"github.com/sacloud/libsacloud/v2/sacloud"
-	"github.com/sacloud/libsacloud/v2/utils/builder/localrouter"
 )
 
 func expandLocalRouterBuilder(d *schema.ResourceData, client *APIClient) *localrouter.Builder {

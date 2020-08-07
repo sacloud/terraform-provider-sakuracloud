@@ -14,7 +14,11 @@
 
 package naked
 
-import "github.com/sacloud/libsacloud/v2/sacloud/types"
+import (
+	"encoding/json"
+
+	"github.com/sacloud/libsacloud/v2/sacloud/types"
+)
 
 // ServiceClass 料金
 type ServiceClass struct {
@@ -28,9 +32,31 @@ type ServiceClass struct {
 
 // Price 価格
 type Price struct {
-	Base    int    `yaml:"base"`    // 基本料金
-	Daily   int    `yaml:"daily"`   // 日単位料金
-	Hourly  int    `yaml:"hourly"`  // 時間単位料金
-	Monthly int    `yaml:"monthly"` // 分単位料金
-	Zone    string `yaml:"zone"`    // ゾーン
+	Base          int    `yaml:"base"`           // 基本料金
+	Daily         int    `yaml:"daily"`          // 日単位料金
+	Hourly        int    `yaml:"hourly"`         // 時間単位料金
+	Monthly       int    `yaml:"monthly"`        // 分単位料金
+	PerUse        int    `yaml:"per_use"`        // 自動バックアップ
+	Basic         int    `yaml:"basic"`          // AWS接続オプション: 基本料
+	Traffic       int    `yaml:"traffic"`        // AWS接続オプション: トラフィック課金
+	DocomoTraffic int    `yaml:"docomo_traffic"` // セキュアモバイルコネクト: Docomo
+	KddiTraffic   int    `yaml:"kddi_traffic"`   // セキュアモバイルコネクト: KDDI
+	SbTraffic     int    `yaml:"sb_traffic"`     // セキュアモバイルコネクト: SoftBank
+	SimSheet      int    `yaml:"sim_sheet"`      // SIM
+	Zone          string `yaml:"zone"`           // ゾーン
+}
+
+// UnmarshalJSON 配列/オブジェクトが混在することへの対応
+func (p *Price) UnmarshalJSON(b []byte) error {
+	if string(b) == "[]" {
+		return nil
+	}
+	type alias Price
+
+	var a alias
+	if err := json.Unmarshal(b, &a); err != nil {
+		return err
+	}
+	*p = Price(a)
+	return nil
 }

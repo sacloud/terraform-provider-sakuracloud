@@ -246,9 +246,25 @@ github.com/sacloud/ftps
 # github.com/sacloud/iso9660wrap v0.0.0-20171031075302-eda21f77f6a8
 ## explicit
 github.com/sacloud/iso9660wrap
-# github.com/sacloud/libsacloud/v2 v2.6.1
+# github.com/sacloud/libsacloud/v2 v2.6.3
 ## explicit
 github.com/sacloud/libsacloud/v2
+github.com/sacloud/libsacloud/v2/helper/builder
+github.com/sacloud/libsacloud/v2/helper/builder/archive
+github.com/sacloud/libsacloud/v2/helper/builder/database
+github.com/sacloud/libsacloud/v2/helper/builder/disk
+github.com/sacloud/libsacloud/v2/helper/builder/internet
+github.com/sacloud/libsacloud/v2/helper/builder/localrouter
+github.com/sacloud/libsacloud/v2/helper/builder/mobilegateway
+github.com/sacloud/libsacloud/v2/helper/builder/registry
+github.com/sacloud/libsacloud/v2/helper/builder/server
+github.com/sacloud/libsacloud/v2/helper/builder/sim
+github.com/sacloud/libsacloud/v2/helper/builder/vpcrouter
+github.com/sacloud/libsacloud/v2/helper/cleanup
+github.com/sacloud/libsacloud/v2/helper/power
+github.com/sacloud/libsacloud/v2/helper/query
+github.com/sacloud/libsacloud/v2/helper/setup
+github.com/sacloud/libsacloud/v2/helper/validate
 github.com/sacloud/libsacloud/v2/pkg/cidr
 github.com/sacloud/libsacloud/v2/pkg/mapconv
 github.com/sacloud/libsacloud/v2/pkg/mutexkv
@@ -263,21 +279,6 @@ github.com/sacloud/libsacloud/v2/sacloud/search
 github.com/sacloud/libsacloud/v2/sacloud/search/keys
 github.com/sacloud/libsacloud/v2/sacloud/trace
 github.com/sacloud/libsacloud/v2/sacloud/types
-github.com/sacloud/libsacloud/v2/utils/builder
-github.com/sacloud/libsacloud/v2/utils/builder/archive
-github.com/sacloud/libsacloud/v2/utils/builder/database
-github.com/sacloud/libsacloud/v2/utils/builder/disk
-github.com/sacloud/libsacloud/v2/utils/builder/internet
-github.com/sacloud/libsacloud/v2/utils/builder/localrouter
-github.com/sacloud/libsacloud/v2/utils/builder/mobilegateway
-github.com/sacloud/libsacloud/v2/utils/builder/registry
-github.com/sacloud/libsacloud/v2/utils/builder/server
-github.com/sacloud/libsacloud/v2/utils/builder/sim
-github.com/sacloud/libsacloud/v2/utils/builder/vpcrouter
-github.com/sacloud/libsacloud/v2/utils/cleanup
-github.com/sacloud/libsacloud/v2/utils/power
-github.com/sacloud/libsacloud/v2/utils/query
-github.com/sacloud/libsacloud/v2/utils/setup
 # github.com/spf13/afero v1.2.2
 github.com/spf13/afero
 github.com/spf13/afero/mem

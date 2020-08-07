@@ -21,11 +21,11 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/validation"
+	"github.com/sacloud/libsacloud/v2/helper/power"
+	"github.com/sacloud/libsacloud/v2/helper/setup"
 	"github.com/sacloud/libsacloud/v2/sacloud"
 	"github.com/sacloud/libsacloud/v2/sacloud/accessor"
 	"github.com/sacloud/libsacloud/v2/sacloud/types"
-	"github.com/sacloud/libsacloud/v2/utils/power"
-	"github.com/sacloud/libsacloud/v2/utils/setup"
 )
 
 func resourceSakuraCloudLoadBalancer() *schema.Resource {

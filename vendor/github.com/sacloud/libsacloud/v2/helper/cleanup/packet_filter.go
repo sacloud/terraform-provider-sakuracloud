@@ -18,15 +18,15 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/sacloud/libsacloud/v2/helper/query"
 	"github.com/sacloud/libsacloud/v2/sacloud"
 	"github.com/sacloud/libsacloud/v2/sacloud/types"
-	"github.com/sacloud/libsacloud/v2/utils/query"
 )
 
-// DeleteSwitch 他のリソースから参照されていないかを確認した上で削除する
-func DeleteSwitch(ctx context.Context, caller sacloud.APICaller, zone string, id types.ID, option query.CheckReferencedOption) error {
-	if err := query.WaitWhileSwitchIsReferenced(ctx, caller, zone, id, option); err != nil {
-		return fmt.Errorf("Switch[%s] is still being used by other resources: %s", id, err)
+// DeletePacketFilter 他のリソースから参照されていないかを確認した上で削除する
+func DeletePacketFilter(ctx context.Context, caller sacloud.APICaller, zone string, id types.ID, option query.CheckReferencedOption) error {
+	if err := query.WaitWhilePacketFilterIsReferenced(ctx, caller, zone, id, option); err != nil {
+		return fmt.Errorf("PacketFilter[%s] is still being used by other resources: %s", id, err)
 	}
-	return sacloud.NewSwitchOp(caller).Delete(ctx, zone, id)
+	return sacloud.NewPacketFilterOp(caller).Delete(ctx, zone, id)
 }
