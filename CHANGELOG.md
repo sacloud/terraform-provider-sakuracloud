@@ -1,5 +1,6 @@
 ## 2.3.6 (Unreleased)
 
+* Fix error handling at VPCRouter [GH-757] (@yamamoto-febc)
 * Use libsacloud v2.6.4 [GH-754] (@yamamoto-febc)
 * Fix time comparison method - use time#Equal() [GH-753] (@yamamoto-febc)
 * Use libsacloud v2.6.3  [GH-751] (@yamamoto-febc)
