@@ -557,9 +557,9 @@ func resourceSakuraCloudVPCRouterUpdate(d *schema.ResourceData, meta interface{}
 		return fmt.Errorf("validating parameter for SakuraCloud VPCRouter is failed: %s", err)
 	}
 
-	vpcRouter, err = builder.Update(ctx, zone, vpcRouter.ID)
+	_, err = builder.Update(ctx, zone, vpcRouter.ID)
 	if err != nil {
-		return fmt.Errorf("updating SakuraCloud VPCRouter[%s] is failed: %s", vpcRouter.ID, err)
+		return fmt.Errorf("updating SakuraCloud VPCRouter[%s] is failed: %s", d.Id(), err)
 	}
 	return resourceSakuraCloudVPCRouterRead(d, meta)
 }
