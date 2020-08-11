@@ -1,10 +1,15 @@
 ## 2.3.6 (Unreleased)
 
+FIXES
+
 * Fix error handling at VPCRouter [GH-757] (@yamamoto-febc)
 * Use libsacloud v2.6.4 [GH-754] (@yamamoto-febc)
 * Fix time comparison method - use time#Equal() [GH-753] (@yamamoto-febc)
 * Use libsacloud v2.6.3  [GH-751] (@yamamoto-febc)
 
+DOCS
+
+* docs: Terraform v0.13 [GH-758] (@yamamoto-febc)
 
 ## 2.3.5 (2020-06-19)
 
