@@ -12,12 +12,20 @@ The SakuraCloud Provider is used to interact with the many resources supported b
 ## Example Usage
 
 ```hcl
+terraform {
+  required_providers {
+    sakuracloud = {
+      source = "sacloud/sakuracloud"
+
+      # We recommend pinning to the specific version of the SakuraCloud Provider you're using
+      # since new versions are released frequently
+      version = "2.3.6"
+      #version = "~> 2"
+    }
+  }
+}
 # Configure the SakuraCloud Provider
 provider "sakuracloud" {
-  # We recommend pinning to the specific version of the SakuraCloud Provider you're using
-  # since new versions are released frequently
-  version = "=2.1.0"
-
   # More information on the authentication methods supported by
   # the SakuraCloud Provider can be found here:
   # https://docs.usacloud.jp/terraform/provider/

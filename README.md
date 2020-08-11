@@ -4,18 +4,28 @@
 [![Slack](https://slack.usacloud.jp/badge.svg)](https://slack.usacloud.jp/)
 
 - Terraform Website: https://terraform.io
-- Documentation: https://docs.usacloud.jp/terraform
+- Terraform Registry: https://registry.terraform.io/providers/sacloud/sakuracloud/latest
+- Documentation: https://registry.terraform.io/providers/sacloud/sakuracloud/latest/docs
+- Documentation(ja): https://docs.usacloud.jp/terraform
 - Slack Workspace for Users: https://slack.usacloud.jp
 
 ## Usage Example
 
 ```hcl
 # Configure the SakuraCloud Provider
-provider "sakuracloud" {
-  # We recommend pinning to the specific version of the SakuraCloud Provider you're using
-  # since new versions are released frequently
-  version = "=2.1.0"
+terraform {
+  required_providers {
+    sakuracloud = {
+      source = "sacloud/sakuracloud"
 
+      # We recommend pinning to the specific version of the SakuraCloud Provider you're using
+      # since new versions are released frequently
+      version = "2.3.6"
+      #version = "~> 2"
+    }
+  }
+}
+provider "sakuracloud" {
   # More information on the authentication methods supported by
   # the SakuraCloud Provider can be found here:
   # https://docs.usacloud.jp/terraform/provider/
