@@ -1,4 +1,8 @@
-## 2.3.6 (Unreleased)
+## 2.3.7 (Unreleased)
+
+* 
+
+## 2.3.6 (2020-08-11)
 
 FIXES
 
