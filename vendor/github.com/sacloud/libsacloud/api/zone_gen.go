@@ -210,7 +210,7 @@ func (api *ZoneAPI) SetSortByName(reverse bool) {
 // }
 
 // Read 読み取り
-func (api *ZoneAPI) Read(id int64) (*sacloud.Zone, error) {
+func (api *ZoneAPI) Read(id sacloud.ID) (*sacloud.Zone, error) {
 	return api.request(func(res *sacloud.Response) error {
 		return api.read(id, nil, res)
 	})

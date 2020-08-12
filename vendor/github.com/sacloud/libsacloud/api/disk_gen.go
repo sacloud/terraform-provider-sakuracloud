@@ -197,21 +197,21 @@ func (api *DiskAPI) New() *sacloud.Disk {
 //}
 
 // Read 読み取り
-func (api *DiskAPI) Read(id int64) (*sacloud.Disk, error) {
+func (api *DiskAPI) Read(id sacloud.ID) (*sacloud.Disk, error) {
 	return api.request(func(res *sacloud.Response) error {
 		return api.read(id, nil, res)
 	})
 }
 
 // Update 更新
-func (api *DiskAPI) Update(id int64, value *sacloud.Disk) (*sacloud.Disk, error) {
+func (api *DiskAPI) Update(id sacloud.ID, value *sacloud.Disk) (*sacloud.Disk, error) {
 	return api.request(func(res *sacloud.Response) error {
 		return api.update(id, api.createRequest(value), res)
 	})
 }
 
 // Delete 削除
-func (api *DiskAPI) Delete(id int64) (*sacloud.Disk, error) {
+func (api *DiskAPI) Delete(id sacloud.ID) (*sacloud.Disk, error) {
 	return api.request(func(res *sacloud.Response) error {
 		return api.delete(id, nil, res)
 	})

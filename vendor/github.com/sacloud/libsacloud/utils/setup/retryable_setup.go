@@ -43,7 +43,7 @@ const DefaultDeleteWaitInterval = 10 * time.Second
 type CreateFunc func() (sacloud.ResourceIDHolder, error)
 
 // AsyncWaitForCopyFunc リソース作成時のコピー待ち(非同期)関数
-type AsyncWaitForCopyFunc func(id int64) (
+type AsyncWaitForCopyFunc func(id sacloud.ID) (
 	chan interface{}, chan interface{}, chan error,
 )
 
@@ -51,15 +51,15 @@ type AsyncWaitForCopyFunc func(id int64) (
 //
 // リソース作成後に起動が行われないリソース(VPCルータなど)向け。
 // 必要であればこの中でリソース起動処理を行う。
-type ProvisionBeforeUpFunc func(id int64, target interface{}) error
+type ProvisionBeforeUpFunc func(id sacloud.ID, target interface{}) error
 
 // DeleteFunc リソース削除関数。
 //
 // リソース作成時のコピー待ちの間にリソースのAvailabilityがFailedになった場合に利用される。
-type DeleteFunc func(id int64) error
+type DeleteFunc func(id sacloud.ID) error
 
 // WaitForUpFunc リソース起動待ち関数
-type WaitForUpFunc func(id int64) error
+type WaitForUpFunc func(id sacloud.ID) error
 
 // RetryableSetup リソース作成時にコピー待ちや起動待ちが必要なリソースのビルダー。
 //
@@ -165,7 +165,7 @@ func (r *RetryableSetup) createResource() (sacloud.ResourceIDHolder, error) {
 	return r.Create()
 }
 
-func (r *RetryableSetup) waitForCopyWithCleanup(resourceID int64) (interface{}, error) {
+func (r *RetryableSetup) waitForCopyWithCleanup(resourceID sacloud.ID) (interface{}, error) {
 
 	//wait
 	compChan, progChan, errChan := r.AsyncWaitForCopy(resourceID)
@@ -211,7 +211,7 @@ loop:
 	return nil, nil
 }
 
-func (r *RetryableSetup) provisionBeforeUp(id int64, created interface{}) error {
+func (r *RetryableSetup) provisionBeforeUp(id sacloud.ID, created interface{}) error {
 	if r.ProvisionBeforeUp != nil && created != nil {
 		var err error
 		for i := 0; i < r.ProvisioningRetryCount; i++ {
@@ -225,7 +225,7 @@ func (r *RetryableSetup) provisionBeforeUp(id int64, created interface{}) error 
 	return nil
 }
 
-func (r *RetryableSetup) waitForUp(id int64, created interface{}) error {
+func (r *RetryableSetup) waitForUp(id sacloud.ID, created interface{}) error {
 	if r.WaitForUp != nil && created != nil {
 		if err := r.WaitForUp(id); err != nil {
 			return err

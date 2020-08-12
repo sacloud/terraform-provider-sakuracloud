@@ -212,21 +212,21 @@ func (api *SwitchAPI) Create(value *sacloud.Switch) (*sacloud.Switch, error) {
 }
 
 // Read 読み取り
-func (api *SwitchAPI) Read(id int64) (*sacloud.Switch, error) {
+func (api *SwitchAPI) Read(id sacloud.ID) (*sacloud.Switch, error) {
 	return api.request(func(res *sacloud.Response) error {
 		return api.read(id, nil, res)
 	})
 }
 
 // Update 更新
-func (api *SwitchAPI) Update(id int64, value *sacloud.Switch) (*sacloud.Switch, error) {
+func (api *SwitchAPI) Update(id sacloud.ID, value *sacloud.Switch) (*sacloud.Switch, error) {
 	return api.request(func(res *sacloud.Response) error {
 		return api.update(id, api.createRequest(value), res)
 	})
 }
 
 // Delete 削除
-func (api *SwitchAPI) Delete(id int64) (*sacloud.Switch, error) {
+func (api *SwitchAPI) Delete(id sacloud.ID) (*sacloud.Switch, error) {
 	return api.request(func(res *sacloud.Response) error {
 		return api.delete(id, nil, res)
 	})

@@ -200,7 +200,7 @@ func resourceSakuraCloudLoadBalancerCreate(d *schema.ResourceData, meta interfac
 	opts := &sacloud.CreateLoadBalancerValue{}
 
 	opts.Name = d.Get("name").(string)
-	opts.SwitchID = d.Get("switch_id").(string)
+	opts.SwitchID = sacloud.StringID(d.Get("switch_id").(string))
 	opts.VRID = d.Get("vrid").(int)
 	highAvailability := d.Get("high_availability").(bool)
 	ipAddress1 := d.Get("ipaddress1").(string)
@@ -267,14 +267,14 @@ func resourceSakuraCloudLoadBalancerCreate(d *schema.ResourceData, meta interfac
 		Create: func() (sacloud.ResourceIDHolder, error) {
 			return client.LoadBalancer.Create(createLb)
 		},
-		AsyncWaitForCopy: func(id int64) (chan interface{}, chan interface{}, chan error) {
+		AsyncWaitForCopy: func(id sacloud.ID) (chan interface{}, chan interface{}, chan error) {
 			return client.LoadBalancer.AsyncSleepWhileCopying(id, client.DefaultTimeoutDuration, 20)
 		},
-		Delete: func(id int64) error {
+		Delete: func(id sacloud.ID) error {
 			_, err := client.LoadBalancer.Delete(id)
 			return err
 		},
-		WaitForUp: func(id int64) error {
+		WaitForUp: func(id sacloud.ID) error {
 			return client.LoadBalancer.SleepUntilUp(id, client.DefaultTimeoutDuration)
 		},
 		RetryCount: 3,
@@ -394,7 +394,7 @@ func setLoadBalancerResourceData(d *schema.ResourceData, client *APIClient, data
 		d.Set("ipaddress2", "")
 	}
 
-	switch data.GetPlanID() {
+	switch data.GetPlanID().Int64() {
 	case int64(sacloud.LoadBalancerPlanStandard):
 		d.Set("plan", "standard")
 	case int64(sacloud.LoadBalancerPlanPremium):

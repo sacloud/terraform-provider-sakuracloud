@@ -19,17 +19,17 @@ type propPrivateHost struct {
 	PrivateHost *PrivateHost // 専有ホスト
 }
 
-// SetPrivateHostByID 指定のアイコンIDを設定
-func (p *propPrivateHost) SetPrivateHostByID(id int64) {
+// SetPrivateHostByID 指定の専有ホストIDを設定
+func (p *propPrivateHost) SetPrivateHostByID(id ID) {
 	p.PrivateHost = &PrivateHost{Resource: NewResource(id)}
 }
 
-// SetPrivateHost 指定のアイコンオブジェクトを設定
+// SetPrivateHost 指定の専有ホストオブジェクトを設定
 func (p *propPrivateHost) SetPrivateHost(icon *PrivateHost) {
 	p.PrivateHost = icon
 }
 
-// ClearPrivateHost アイコンをクリア(空IDを持つアイコンオブジェクトをセット)
+// ClearPrivateHost 専有ホストをクリア(空IDを持つ専有ホストオブジェクトをセット)
 func (p *propPrivateHost) ClearPrivateHost() {
 	p.PrivateHost = &PrivateHost{Resource: NewResource(EmptyID)}
 }

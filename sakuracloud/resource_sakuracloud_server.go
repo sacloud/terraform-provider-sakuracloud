@@ -1053,7 +1053,7 @@ func createServer(client *APIClient, server *sacloud.Server) (*sacloud.Server, e
 	return client.Server.Create(server)
 }
 
-func bootServer(client *APIClient, id int64) error {
+func bootServer(client *APIClient, id sacloud.ID) error {
 	var err error
 	// power API lock(for same resource)
 	lockKey := getServerPowerAPILockKey(id)
@@ -1083,7 +1083,7 @@ func bootServer(client *APIClient, id int64) error {
 	return err
 }
 
-func stopServer(client *APIClient, id int64, d *schema.ResourceData) error {
+func stopServer(client *APIClient, id sacloud.ID, d *schema.ResourceData) error {
 	var err error
 	// power API lock(for same resource)
 	lockKey := getServerPowerAPILockKey(id)
@@ -1116,11 +1116,11 @@ func stopServer(client *APIClient, id int64, d *schema.ResourceData) error {
 	return err
 }
 
-func getServerPowerAPILockKey(id int64) string {
+func getServerPowerAPILockKey(id sacloud.ID) string {
 	return fmt.Sprintf(serverPowerAPILockKey, id)
 }
 
-func getServerDeleteAPILockKey(id int64) string {
+func getServerDeleteAPILockKey(id sacloud.ID) string {
 	return fmt.Sprintf(serverDeleteAPILockKey, id)
 }
 

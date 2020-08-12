@@ -57,7 +57,7 @@ func (api *DiskAPI) SortByConnectionOrder(reverse bool) *DiskAPI {
 }
 
 // WithServerID サーバーID条件
-func (api *DiskAPI) WithServerID(id int64) *DiskAPI {
+func (api *DiskAPI) WithServerID(id sacloud.ID) *DiskAPI {
 	api.FilterBy("Server.ID", id)
 	return api
 }
@@ -76,7 +76,7 @@ func (api *DiskAPI) Create(value *sacloud.Disk) (*sacloud.Disk, error) {
 	rawBody.Disk = value
 	if len(value.DistantFrom) > 0 {
 		rawBody.DistantFrom = value.DistantFrom
-		value.DistantFrom = []int64{}
+		value.DistantFrom = []sacloud.ID{}
 	}
 
 	err := api.create(rawBody, res)
@@ -111,7 +111,7 @@ func (api *DiskAPI) CreateWithConfig(value *sacloud.Disk, config *sacloud.DiskEd
 
 	if len(value.DistantFrom) > 0 {
 		rawBody.DistantFrom = value.DistantFrom
-		value.DistantFrom = []int64{}
+		value.DistantFrom = []sacloud.ID{}
 	}
 
 	err := api.create(rawBody, res)
@@ -127,7 +127,7 @@ func (api *DiskAPI) NewCondig() *sacloud.DiskEditValue {
 }
 
 // Config ディスクの修正
-func (api *DiskAPI) Config(id int64, disk *sacloud.DiskEditValue) (bool, error) {
+func (api *DiskAPI) Config(id sacloud.ID, disk *sacloud.DiskEditValue) (bool, error) {
 	var (
 		method = "PUT"
 		uri    = fmt.Sprintf("%s/%d/config", api.getResourceURL(), id)
@@ -145,7 +145,7 @@ func (api *DiskAPI) Config(id int64, disk *sacloud.DiskEditValue) (bool, error) 
 
 }
 
-func (api *DiskAPI) install(id int64, body *sacloud.Disk) (bool, error) {
+func (api *DiskAPI) install(id sacloud.ID, body *sacloud.Disk) (bool, error) {
 	var (
 		method = "PUT"
 		uri    = fmt.Sprintf("%s/%d/install", api.getResourceURL(), id)
@@ -161,7 +161,7 @@ func (api *DiskAPI) install(id int64, body *sacloud.Disk) (bool, error) {
 	rawBody.Disk = body
 	if len(body.DistantFrom) > 0 {
 		rawBody.DistantFrom = body.DistantFrom
-		body.DistantFrom = []int64{}
+		body.DistantFrom = []sacloud.ID{}
 	}
 
 	err := api.baseAPI.request(method, uri, rawBody, res)
@@ -172,7 +172,7 @@ func (api *DiskAPI) install(id int64, body *sacloud.Disk) (bool, error) {
 }
 
 // ReinstallFromBlank ブランクディスクから再インストール
-func (api *DiskAPI) ReinstallFromBlank(id int64, sizeMB int) (bool, error) {
+func (api *DiskAPI) ReinstallFromBlank(id sacloud.ID, sizeMB int) (bool, error) {
 	var body = &sacloud.Disk{}
 	body.SetSizeMB(sizeMB)
 
@@ -180,7 +180,7 @@ func (api *DiskAPI) ReinstallFromBlank(id int64, sizeMB int) (bool, error) {
 }
 
 // ReinstallFromArchive アーカイブからの再インストール
-func (api *DiskAPI) ReinstallFromArchive(id int64, archiveID int64, distantFrom ...int64) (bool, error) {
+func (api *DiskAPI) ReinstallFromArchive(id sacloud.ID, archiveID sacloud.ID, distantFrom ...sacloud.ID) (bool, error) {
 	var body = &sacloud.Disk{}
 	body.SetSourceArchive(archiveID)
 	if len(distantFrom) > 0 {
@@ -190,7 +190,7 @@ func (api *DiskAPI) ReinstallFromArchive(id int64, archiveID int64, distantFrom 
 }
 
 // ReinstallFromDisk ディスクからの再インストール
-func (api *DiskAPI) ReinstallFromDisk(id int64, diskID int64, distantFrom ...int64) (bool, error) {
+func (api *DiskAPI) ReinstallFromDisk(id sacloud.ID, diskID sacloud.ID, distantFrom ...sacloud.ID) (bool, error) {
 	var body = &sacloud.Disk{}
 	body.SetSourceDisk(diskID)
 	if len(distantFrom) > 0 {
@@ -200,7 +200,7 @@ func (api *DiskAPI) ReinstallFromDisk(id int64, diskID int64, distantFrom ...int
 }
 
 // ToBlank ディスクを空にする
-func (api *DiskAPI) ToBlank(diskID int64) (bool, error) {
+func (api *DiskAPI) ToBlank(diskID sacloud.ID) (bool, error) {
 	var (
 		method = "PUT"
 		uri    = fmt.Sprintf("%s/%d/to/blank", api.getResourceURL(), diskID)
@@ -209,7 +209,7 @@ func (api *DiskAPI) ToBlank(diskID int64) (bool, error) {
 }
 
 // ResizePartition パーティションのリサイズ
-func (api *DiskAPI) ResizePartition(diskID int64) (bool, error) {
+func (api *DiskAPI) ResizePartition(diskID sacloud.ID) (bool, error) {
 	var (
 		method = "PUT"
 		uri    = fmt.Sprintf("%s/%d/resize-partition", api.getResourceURL(), diskID)
@@ -226,7 +226,7 @@ func (api *DiskAPI) ResizePartition(diskID int64) (bool, error) {
 }
 
 // ResizePartitionBackground パーティションのリサイズ(非同期)
-func (api *DiskAPI) ResizePartitionBackground(diskID int64) (bool, error) {
+func (api *DiskAPI) ResizePartitionBackground(diskID sacloud.ID) (bool, error) {
 	var (
 		method = "PUT"
 		uri    = fmt.Sprintf("%s/%d/resize-partition", api.getResourceURL(), diskID)
@@ -247,7 +247,7 @@ func (api *DiskAPI) ResizePartitionBackground(diskID int64) (bool, error) {
 }
 
 // DisconnectFromServer サーバーとの接続解除
-func (api *DiskAPI) DisconnectFromServer(diskID int64) (bool, error) {
+func (api *DiskAPI) DisconnectFromServer(diskID sacloud.ID) (bool, error) {
 	var (
 		method = "DELETE"
 		uri    = fmt.Sprintf("%s/%d/to/server", api.getResourceURL(), diskID)
@@ -256,7 +256,7 @@ func (api *DiskAPI) DisconnectFromServer(diskID int64) (bool, error) {
 }
 
 // ConnectToServer サーバーとの接続
-func (api *DiskAPI) ConnectToServer(diskID int64, serverID int64) (bool, error) {
+func (api *DiskAPI) ConnectToServer(diskID sacloud.ID, serverID sacloud.ID) (bool, error) {
 	var (
 		method = "PUT"
 		uri    = fmt.Sprintf("%s/%d/to/server/%d", api.getResourceURL(), diskID, serverID)
@@ -265,7 +265,7 @@ func (api *DiskAPI) ConnectToServer(diskID int64, serverID int64) (bool, error) 
 }
 
 // State ディスクの状態を取得し有効な状態か判定
-func (api *DiskAPI) State(diskID int64) (bool, error) {
+func (api *DiskAPI) State(diskID sacloud.ID) (bool, error) {
 	disk, err := api.Read(diskID)
 	if err != nil {
 		return false, err
@@ -274,7 +274,7 @@ func (api *DiskAPI) State(diskID int64) (bool, error) {
 }
 
 // SleepWhileCopying コピー終了まで待機
-func (api *DiskAPI) SleepWhileCopying(id int64, timeout time.Duration) error {
+func (api *DiskAPI) SleepWhileCopying(id sacloud.ID, timeout time.Duration) error {
 	handler := waitingForAvailableFunc(func() (hasAvailable, error) {
 		return api.Read(id)
 	}, 0)
@@ -282,7 +282,7 @@ func (api *DiskAPI) SleepWhileCopying(id int64, timeout time.Duration) error {
 }
 
 // AsyncSleepWhileCopying コピー終了まで待機(非同期)
-func (api *DiskAPI) AsyncSleepWhileCopying(id int64, timeout time.Duration) (chan (interface{}), chan (interface{}), chan (error)) {
+func (api *DiskAPI) AsyncSleepWhileCopying(id sacloud.ID, timeout time.Duration) (chan (interface{}), chan (interface{}), chan (error)) {
 	handler := waitingForAvailableFunc(func() (hasAvailable, error) {
 		return api.Read(id)
 	}, 0)
@@ -290,12 +290,12 @@ func (api *DiskAPI) AsyncSleepWhileCopying(id int64, timeout time.Duration) (cha
 }
 
 // Monitor アクティビティーモニター取得
-func (api *DiskAPI) Monitor(id int64, body *sacloud.ResourceMonitorRequest) (*sacloud.MonitorValues, error) {
+func (api *DiskAPI) Monitor(id sacloud.ID, body *sacloud.ResourceMonitorRequest) (*sacloud.MonitorValues, error) {
 	return api.baseAPI.monitor(id, body)
 }
 
 // CanEditDisk ディスクの修正が可能か判定
-func (api *DiskAPI) CanEditDisk(id int64) (bool, error) {
+func (api *DiskAPI) CanEditDisk(id sacloud.ID) (bool, error) {
 
 	disk, err := api.Read(id)
 	if err != nil {
@@ -351,9 +351,9 @@ func (api *DiskAPI) CanEditDisk(id int64) (bool, error) {
 }
 
 // GetPublicArchiveIDFromAncestors 祖先の中からパブリックアーカイブのIDを検索
-func (api *DiskAPI) GetPublicArchiveIDFromAncestors(id int64) (int64, bool) {
+func (api *DiskAPI) GetPublicArchiveIDFromAncestors(id sacloud.ID) (sacloud.ID, bool) {
 
-	emptyID := int64(0)
+	emptyID := sacloud.EmptyID
 
 	disk, err := api.Read(id)
 	if err != nil {

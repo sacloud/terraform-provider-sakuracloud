@@ -30,6 +30,6 @@ func (p *propServer) SetServer(server *Server) {
 }
 
 // SetServerID サーバーIDの設定
-func (p *propServer) SetServerID(id int64) {
+func (p *propServer) SetServerID(id ID) {
 	p.Server = &Server{Resource: &Resource{ID: id}}
 }

@@ -112,21 +112,21 @@ func (api *GSLBAPI) Create(value *sacloud.GSLB) (*sacloud.GSLB, error) {
 }
 
 // Read 読み取り
-func (api *GSLBAPI) Read(id int64) (*sacloud.GSLB, error) {
+func (api *GSLBAPI) Read(id sacloud.ID) (*sacloud.GSLB, error) {
 	return api.request(func(res *gslbResponse) error {
 		return api.read(id, nil, res)
 	})
 }
 
 // Update 更新
-func (api *GSLBAPI) Update(id int64, value *sacloud.GSLB) (*sacloud.GSLB, error) {
+func (api *GSLBAPI) Update(id sacloud.ID, value *sacloud.GSLB) (*sacloud.GSLB, error) {
 	return api.request(func(res *gslbResponse) error {
 		return api.update(id, api.createRequest(value), res)
 	})
 }
 
 // Delete 削除
-func (api *GSLBAPI) Delete(id int64) (*sacloud.GSLB, error) {
+func (api *GSLBAPI) Delete(id sacloud.ID) (*sacloud.GSLB, error) {
 	return api.request(func(res *gslbResponse) error {
 		return api.delete(id, nil, res)
 	})

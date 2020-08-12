@@ -36,6 +36,6 @@ func (l *License) SetLicenseInfo(license *ProductLicense) {
 }
 
 // SetLicenseInfoByID ライセンス情報 設定
-func (l *License) SetLicenseInfoByID(id int64) {
+func (l *License) SetLicenseInfoByID(id ID) {
 	l.LicenseInfo = &ProductLicense{Resource: NewResource(id)}
 }

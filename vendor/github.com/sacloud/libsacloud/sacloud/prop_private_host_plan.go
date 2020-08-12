@@ -30,7 +30,7 @@ func (p *propPrivateHostPlan) SetPrivateHostPlan(plan *ProductPrivateHost) {
 }
 
 // SetPrivateHostPlanByID 専有ホストプラン設定
-func (p *propPrivateHostPlan) SetPrivateHostPlanByID(planID int64) {
+func (p *propPrivateHostPlan) SetPrivateHostPlanByID(planID ID) {
 	if p.Plan == nil {
 		p.Plan = &ProductPrivateHost{}
 	}

@@ -212,21 +212,21 @@ func (api *LicenseAPI) Create(value *sacloud.License) (*sacloud.License, error) 
 }
 
 // Read 読み取り
-func (api *LicenseAPI) Read(id int64) (*sacloud.License, error) {
+func (api *LicenseAPI) Read(id sacloud.ID) (*sacloud.License, error) {
 	return api.request(func(res *sacloud.Response) error {
 		return api.read(id, nil, res)
 	})
 }
 
 // Update 更新
-func (api *LicenseAPI) Update(id int64, value *sacloud.License) (*sacloud.License, error) {
+func (api *LicenseAPI) Update(id sacloud.ID, value *sacloud.License) (*sacloud.License, error) {
 	return api.request(func(res *sacloud.Response) error {
 		return api.update(id, api.createRequest(value), res)
 	})
 }
 
 // Delete 削除
-func (api *LicenseAPI) Delete(id int64) (*sacloud.License, error) {
+func (api *LicenseAPI) Delete(id sacloud.ID) (*sacloud.License, error) {
 	return api.request(func(res *sacloud.Response) error {
 		return api.delete(id, nil, res)
 	})

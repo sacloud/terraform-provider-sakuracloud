@@ -103,7 +103,7 @@ func NewArchiveAPI(client *Client) *ArchiveAPI {
 }
 
 // OpenFTP FTP接続開始
-func (api *ArchiveAPI) OpenFTP(id int64) (*sacloud.FTPServer, error) {
+func (api *ArchiveAPI) OpenFTP(id sacloud.ID) (*sacloud.FTPServer, error) {
 	var (
 		method = "PUT"
 		uri    = fmt.Sprintf("%s/%d/ftp", api.getResourceURL(), id)
@@ -120,7 +120,7 @@ func (api *ArchiveAPI) OpenFTP(id int64) (*sacloud.FTPServer, error) {
 }
 
 // CloseFTP FTP接続終了
-func (api *ArchiveAPI) CloseFTP(id int64) (bool, error) {
+func (api *ArchiveAPI) CloseFTP(id sacloud.ID) (bool, error) {
 	var (
 		method = "DELETE"
 		uri    = fmt.Sprintf("%s/%d/ftp", api.getResourceURL(), id)
@@ -130,7 +130,7 @@ func (api *ArchiveAPI) CloseFTP(id int64) (bool, error) {
 }
 
 // SleepWhileCopying コピー終了まで待機
-func (api *ArchiveAPI) SleepWhileCopying(id int64, timeout time.Duration) error {
+func (api *ArchiveAPI) SleepWhileCopying(id sacloud.ID, timeout time.Duration) error {
 	handler := waitingForAvailableFunc(func() (hasAvailable, error) {
 		return api.Read(id)
 	}, 0)
@@ -138,7 +138,7 @@ func (api *ArchiveAPI) SleepWhileCopying(id int64, timeout time.Duration) error 
 }
 
 // AsyncSleepWhileCopying コピー終了まで待機(非同期)
-func (api *ArchiveAPI) AsyncSleepWhileCopying(id int64, timeout time.Duration) (chan (interface{}), chan (interface{}), chan (error)) {
+func (api *ArchiveAPI) AsyncSleepWhileCopying(id sacloud.ID, timeout time.Duration) (chan (interface{}), chan (interface{}), chan (error)) {
 	handler := waitingForAvailableFunc(func() (hasAvailable, error) {
 		return api.Read(id)
 	}, 0)
@@ -146,7 +146,7 @@ func (api *ArchiveAPI) AsyncSleepWhileCopying(id int64, timeout time.Duration) (
 }
 
 // CanEditDisk ディスクの修正が可能か判定
-func (api *ArchiveAPI) CanEditDisk(id int64) (bool, error) {
+func (api *ArchiveAPI) CanEditDisk(id sacloud.ID) (bool, error) {
 
 	archive, err := api.Read(id)
 	if err != nil {
@@ -199,9 +199,9 @@ func (api *ArchiveAPI) CanEditDisk(id int64) (bool, error) {
 }
 
 // GetPublicArchiveIDFromAncestors 祖先の中からパブリックアーカイブのIDを検索
-func (api *ArchiveAPI) GetPublicArchiveIDFromAncestors(id int64) (int64, bool) {
+func (api *ArchiveAPI) GetPublicArchiveIDFromAncestors(id sacloud.ID) (sacloud.ID, bool) {
 
-	emptyID := int64(0)
+	emptyID := sacloud.EmptyID
 
 	archive, err := api.Read(id)
 	if err != nil {

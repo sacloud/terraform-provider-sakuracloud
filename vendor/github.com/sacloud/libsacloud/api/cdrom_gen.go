@@ -219,21 +219,21 @@ func (api *CDROMAPI) New() *sacloud.CDROM {
 //}
 
 // Read 読み取り
-func (api *CDROMAPI) Read(id int64) (*sacloud.CDROM, error) {
+func (api *CDROMAPI) Read(id sacloud.ID) (*sacloud.CDROM, error) {
 	return api.request(func(res *sacloud.Response) error {
 		return api.read(id, nil, res)
 	})
 }
 
 // Update 更新
-func (api *CDROMAPI) Update(id int64, value *sacloud.CDROM) (*sacloud.CDROM, error) {
+func (api *CDROMAPI) Update(id sacloud.ID, value *sacloud.CDROM) (*sacloud.CDROM, error) {
 	return api.request(func(res *sacloud.Response) error {
 		return api.update(id, api.createRequest(value), res)
 	})
 }
 
 // Delete 削除
-func (api *CDROMAPI) Delete(id int64) (*sacloud.CDROM, error) {
+func (api *CDROMAPI) Delete(id sacloud.ID) (*sacloud.CDROM, error) {
 	return api.request(func(res *sacloud.Response) error {
 		return api.delete(id, nil, res)
 	})

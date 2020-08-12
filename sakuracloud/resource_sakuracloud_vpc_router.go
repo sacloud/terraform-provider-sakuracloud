@@ -312,14 +312,14 @@ func resourceSakuraCloudVPCRouterCreate(d *schema.ResourceData, meta interface{}
 		Create: func() (sacloud.ResourceIDHolder, error) {
 			return client.VPCRouter.Create(opts)
 		},
-		AsyncWaitForCopy: func(id int64) (chan interface{}, chan interface{}, chan error) {
+		AsyncWaitForCopy: func(id sacloud.ID) (chan interface{}, chan interface{}, chan error) {
 			return client.VPCRouter.AsyncSleepWhileCopying(id, client.DefaultTimeoutDuration, 20)
 		},
-		Delete: func(id int64) error {
+		Delete: func(id sacloud.ID) error {
 			_, err := client.VPCRouter.Delete(id)
 			return err
 		},
-		ProvisionBeforeUp: func(id int64, created interface{}) error {
+		ProvisionBeforeUp: func(id sacloud.ID, created interface{}) error {
 			vpcRouter := created.(*sacloud.VPCRouter)
 
 			if interfaces, ok := getListFromResource(d, "interface"); ok && len(interfaces) > 0 {
@@ -507,7 +507,7 @@ func resourceSakuraCloudVPCRouterCreate(d *schema.ResourceData, meta interface{}
 			}
 			return nil
 		},
-		WaitForUp: func(id int64) error {
+		WaitForUp: func(id sacloud.ID) error {
 			return client.VPCRouter.SleepUntilUp(id, client.DefaultTimeoutDuration)
 		},
 		RetryCount:             3,
@@ -1139,6 +1139,6 @@ func resourceSakuraCloudVPCRouterDelete(d *schema.ResourceData, meta interface{}
 	return nil
 }
 
-func getVPCRouterPowerAPILockKey(id int64) string {
+func getVPCRouterPowerAPILockKey(id sacloud.ID) string {
 	return fmt.Sprintf(vpcRouterPowerAPILockKey, id)
 }

@@ -17,13 +17,15 @@ package sakuracloud
 import (
 	"time"
 
+	"github.com/sacloud/libsacloud/sacloud"
+
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 )
 
 type shutdownHandler interface {
-	Stop(id int64) (bool, error)
-	Shutdown(id int64) (bool, error)
-	SleepUntilDown(id int64, timeout time.Duration) error
+	Stop(id sacloud.ID) (bool, error)
+	Shutdown(id sacloud.ID) (bool, error)
+	SleepUntilDown(id sacloud.ID, timeout time.Duration) error
 }
 
 var (
@@ -42,7 +44,7 @@ var (
 	defaultPowerManageTimeout = 60
 )
 
-func handleShutdown(handler shutdownHandler, id int64, d *schema.ResourceData, defaultTimeOut time.Duration) error {
+func handleShutdown(handler shutdownHandler, id sacloud.ID, d *schema.ResourceData, defaultTimeOut time.Duration) error {
 	timeout := defaultTimeOut
 	if v, ok := d.GetOk(powerManageTimeoutKey); ok {
 		s := v.(int)

@@ -113,21 +113,21 @@ func (api *DNSAPI) New(zoneName string) *sacloud.DNS {
 }
 
 // Read 読み取り
-func (api *DNSAPI) Read(id int64) (*sacloud.DNS, error) {
+func (api *DNSAPI) Read(id sacloud.ID) (*sacloud.DNS, error) {
 	return api.request(func(res *dnsResponse) error {
 		return api.read(id, nil, res)
 	})
 }
 
 // Update 更新
-func (api *DNSAPI) Update(id int64, value *sacloud.DNS) (*sacloud.DNS, error) {
+func (api *DNSAPI) Update(id sacloud.ID, value *sacloud.DNS) (*sacloud.DNS, error) {
 	return api.request(func(res *dnsResponse) error {
 		return api.update(id, api.createRequest(value), res)
 	})
 }
 
 // Delete 削除
-func (api *DNSAPI) Delete(id int64) (*sacloud.DNS, error) {
+func (api *DNSAPI) Delete(id sacloud.ID) (*sacloud.DNS, error) {
 	return api.request(func(res *dnsResponse) error {
 		return api.delete(id, nil, res)
 	})

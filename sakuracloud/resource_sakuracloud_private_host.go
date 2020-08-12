@@ -176,7 +176,7 @@ func resourceSakuraCloudPrivateHostDelete(d *schema.ResourceData, meta interface
 	if err != nil {
 		return fmt.Errorf("Error deleting SakuraCloud PrivateHost resource: finding server is failed: %s", err)
 	}
-	var needRestartServers []int64
+	var needRestartServers []sacloud.ID
 
 	for _, s := range res.Servers {
 		if s.PrivateHost != nil && s.PrivateHost.ID == id {

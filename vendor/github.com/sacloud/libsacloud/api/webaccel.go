@@ -66,7 +66,7 @@ func (api *WebAccelAPI) Read(id string) (*sacloud.WebAccelSite, error) {
 }
 
 // ReadCertificate 証明書 参照
-func (api *WebAccelAPI) ReadCertificate(id string) (*sacloud.WebAccelCertResponseBody, error) {
+func (api *WebAccelAPI) ReadCertificate(id sacloud.ID) (*sacloud.WebAccelCertResponseBody, error) {
 	uri := fmt.Sprintf("%s/site/%s/certificate", api.getResourceURL(), id)
 
 	data, err := api.client.newRequest("GET", uri, nil)
@@ -82,7 +82,7 @@ func (api *WebAccelAPI) ReadCertificate(id string) (*sacloud.WebAccelCertRespons
 }
 
 // CreateCertificate 証明書 更新
-func (api *WebAccelAPI) CreateCertificate(id string, request *sacloud.WebAccelCertRequest) (*sacloud.WebAccelCertResponse, error) {
+func (api *WebAccelAPI) CreateCertificate(id sacloud.ID, request *sacloud.WebAccelCertRequest) (*sacloud.WebAccelCertResponse, error) {
 	uri := fmt.Sprintf("%s/site/%s/certificate", api.getResourceURL(), id)
 
 	if request.CertificateChain != "" {
@@ -107,7 +107,7 @@ func (api *WebAccelAPI) CreateCertificate(id string, request *sacloud.WebAccelCe
 }
 
 // UpdateCertificate 証明書 更新
-func (api *WebAccelAPI) UpdateCertificate(id string, request *sacloud.WebAccelCertRequest) (*sacloud.WebAccelCertResponse, error) {
+func (api *WebAccelAPI) UpdateCertificate(id sacloud.ID, request *sacloud.WebAccelCertRequest) (*sacloud.WebAccelCertResponse, error) {
 	uri := fmt.Sprintf("%s/site/%s/certificate", api.getResourceURL(), id)
 
 	if request.CertificateChain != "" {

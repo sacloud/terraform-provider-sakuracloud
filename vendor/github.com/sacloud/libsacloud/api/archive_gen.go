@@ -215,21 +215,21 @@ func (api *ArchiveAPI) Create(value *sacloud.Archive) (*sacloud.Archive, error) 
 }
 
 // Read 読み取り
-func (api *ArchiveAPI) Read(id int64) (*sacloud.Archive, error) {
+func (api *ArchiveAPI) Read(id sacloud.ID) (*sacloud.Archive, error) {
 	return api.request(func(res *sacloud.Response) error {
 		return api.read(id, nil, res)
 	})
 }
 
 // Update 更新
-func (api *ArchiveAPI) Update(id int64, value *sacloud.Archive) (*sacloud.Archive, error) {
+func (api *ArchiveAPI) Update(id sacloud.ID, value *sacloud.Archive) (*sacloud.Archive, error) {
 	return api.request(func(res *sacloud.Response) error {
 		return api.update(id, api.createRequest(value), res)
 	})
 }
 
 // Delete 削除
-func (api *ArchiveAPI) Delete(id int64) (*sacloud.Archive, error) {
+func (api *ArchiveAPI) Delete(id sacloud.ID) (*sacloud.Archive, error) {
 	return api.request(func(res *sacloud.Response) error {
 		return api.delete(id, nil, res)
 	})

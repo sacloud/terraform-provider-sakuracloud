@@ -97,7 +97,7 @@ func (api *AutoBackupAPI) createRequest(value *sacloud.AutoBackup) *autoBackupRe
 }
 
 // New 新規作成用パラメーター作成
-func (api *AutoBackupAPI) New(name string, diskID int64) *sacloud.AutoBackup {
+func (api *AutoBackupAPI) New(name string, diskID sacloud.ID) *sacloud.AutoBackup {
 	return sacloud.CreateNewAutoBackup(name, diskID)
 }
 
@@ -109,21 +109,21 @@ func (api *AutoBackupAPI) Create(value *sacloud.AutoBackup) (*sacloud.AutoBackup
 }
 
 // Read 読み取り
-func (api *AutoBackupAPI) Read(id int64) (*sacloud.AutoBackup, error) {
+func (api *AutoBackupAPI) Read(id sacloud.ID) (*sacloud.AutoBackup, error) {
 	return api.request(func(res *autoBackupResponse) error {
 		return api.read(id, nil, res)
 	})
 }
 
 // Update 更新
-func (api *AutoBackupAPI) Update(id int64, value *sacloud.AutoBackup) (*sacloud.AutoBackup, error) {
+func (api *AutoBackupAPI) Update(id sacloud.ID, value *sacloud.AutoBackup) (*sacloud.AutoBackup, error) {
 	return api.request(func(res *autoBackupResponse) error {
 		return api.update(id, api.createRequest(value), res)
 	})
 }
 
 // Delete 削除
-func (api *AutoBackupAPI) Delete(id int64) (*sacloud.AutoBackup, error) {
+func (api *AutoBackupAPI) Delete(id sacloud.ID) (*sacloud.AutoBackup, error) {
 	return api.request(func(res *autoBackupResponse) error {
 		return api.delete(id, nil, res)
 	})

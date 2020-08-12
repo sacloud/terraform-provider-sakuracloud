@@ -86,7 +86,7 @@ func resourceSakuraCloudWebAccelCertificateCreate(d *schema.ResourceData, meta i
 
 	siteID := d.Get("site_id").(string)
 
-	res, err := client.WebAccel.CreateCertificate(siteID, &sacloud.WebAccelCertRequest{
+	res, err := client.WebAccel.CreateCertificate(toSakuraCloudID(siteID), &sacloud.WebAccelCertRequest{
 		CertificateChain: d.Get("certificate_chain").(string),
 		Key:              d.Get("private_key").(string),
 	})
@@ -94,7 +94,7 @@ func resourceSakuraCloudWebAccelCertificateCreate(d *schema.ResourceData, meta i
 		return err
 	}
 
-	d.SetId(res.Certificate.Current.SiteID)
+	d.SetId(res.Certificate.Current.SiteID.String())
 	return resourceSakuraCloudWebAccelCertificateRead(d, meta)
 }
 
@@ -102,7 +102,7 @@ func resourceSakuraCloudWebAccelCertificateRead(d *schema.ResourceData, meta int
 	client := meta.(*APIClient)
 	siteID := d.Id()
 
-	certs, err := client.WebAccel.ReadCertificate(siteID)
+	certs, err := client.WebAccel.ReadCertificate(toSakuraCloudID(siteID))
 	if err != nil {
 		if sacloudErr, ok := err.(api.Error); ok && sacloudErr.ResponseCode() == 404 {
 			d.SetId("")
@@ -124,14 +124,14 @@ func resourceSakuraCloudWebAccelCertificateUpdate(d *schema.ResourceData, meta i
 	siteID := d.Id()
 
 	if d.HasChanges("certificate_chain", "private_key") {
-		res, err := client.WebAccel.UpdateCertificate(siteID, &sacloud.WebAccelCertRequest{
+		res, err := client.WebAccel.UpdateCertificate(toSakuraCloudID(siteID), &sacloud.WebAccelCertRequest{
 			CertificateChain: d.Get("certificate_chain").(string),
 			Key:              d.Get("private_key").(string),
 		})
 		if err != nil {
 			return err
 		}
-		d.SetId(res.Certificate.Current.SiteID)
+		d.SetId(res.Certificate.Current.SiteID.String())
 	}
 
 	return resourceSakuraCloudWebAccelCertificateRead(d, meta)

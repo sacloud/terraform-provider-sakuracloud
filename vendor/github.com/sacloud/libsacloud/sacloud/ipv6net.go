@@ -26,7 +26,7 @@ type IPv6Net struct {
 	IPv6PrefixTail     string    `json:",omitempty"` // IPv6プレフィックス末尾
 	IPv6Table          *Resource `json:",omitempty"` // IPv6テーブル
 	NamedIPv6AddrCount int       `json:",omitempty"` // 名前付きIPv6アドレス数
-	ServiceID          int64     `json:",omitempty"` // サービスID
+	ServiceID          ID        `json:",omitempty"` // サービスID
 	Switch             *Switch   `json:",omitempty"` // 接続先スイッチ
 
 }

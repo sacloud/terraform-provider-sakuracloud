@@ -24,7 +24,7 @@ type Subnet struct {
 	IPAddresses    []*IPAddress `json:",omitempty"` // IPv4アドレス範囲
 	NetworkAddress string       `json:",omitempty"` // ネットワークアドレス
 	NetworkMaskLen int          `json:",omitempty"` // ネットワークマスク長
-	ServiceID      int64        `json:",omitempty"` // サービスID
+	ServiceID      ID           `json:",omitempty"` // サービスID
 	StaticRoute    string       `json:",omitempty"` // スタティックルート
 	NextHop        string       `json:",omitempty"` // ネクストホップ
 	Switch         *Switch      `json:",omitempty"` // スイッチ

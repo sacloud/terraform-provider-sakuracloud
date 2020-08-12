@@ -30,6 +30,6 @@ func (p *propSwitch) SetSwitch(sw *Switch) {
 }
 
 // SetSwitchID スイッチID 設定
-func (p *Interface) SetSwitchID(id int64) {
+func (p *Interface) SetSwitchID(id ID) {
 	p.Switch = &Switch{Resource: &Resource{ID: id}}
 }

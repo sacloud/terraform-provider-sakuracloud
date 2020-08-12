@@ -109,7 +109,7 @@ func resourceSakuraCloudNFSCreate(d *schema.ResourceData, meta interface{}) erro
 	opts := &sacloud.CreateNFSValue{}
 
 	opts.Name = d.Get("name").(string)
-	opts.SwitchID = d.Get("switch_id").(string)
+	opts.SwitchID = sacloud.StringID(d.Get("switch_id").(string))
 	ipAddress := d.Get("ipaddress").(string)
 	nwMaskLen := d.Get("nw_mask_len").(int)
 	defaultRoute := ""
@@ -145,14 +145,14 @@ func resourceSakuraCloudNFSCreate(d *schema.ResourceData, meta interface{}) erro
 		Create: func() (sacloud.ResourceIDHolder, error) {
 			return client.NFS.CreateWithPlan(opts, plan, size)
 		},
-		AsyncWaitForCopy: func(id int64) (chan interface{}, chan interface{}, chan error) {
+		AsyncWaitForCopy: func(id sacloud.ID) (chan interface{}, chan interface{}, chan error) {
 			return client.NFS.AsyncSleepWhileCopying(id, client.DefaultTimeoutDuration, 20)
 		},
-		Delete: func(id int64) error {
+		Delete: func(id sacloud.ID) error {
 			_, err := client.NFS.Delete(id)
 			return err
 		},
-		WaitForUp: func(id int64) error {
+		WaitForUp: func(id sacloud.ID) error {
 			return client.NFS.SleepUntilUp(id, client.DefaultTimeoutDuration)
 		},
 		RetryCount: 3,

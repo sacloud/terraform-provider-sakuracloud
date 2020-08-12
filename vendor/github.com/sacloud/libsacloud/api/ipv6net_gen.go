@@ -200,19 +200,19 @@ func (api *IPv6NetAPI) SetSortBy(key string, reverse bool) {
 //}
 
 // Read 読み取り
-func (api *IPv6NetAPI) Read(id int64) (*sacloud.IPv6Net, error) {
+func (api *IPv6NetAPI) Read(id sacloud.ID) (*sacloud.IPv6Net, error) {
 	return api.request(func(res *sacloud.Response) error {
 		return api.read(id, nil, res)
 	})
 }
 
-//func (api *IPv6NetAPI) Update(id int64, value *sacloud.IPv6Net) (*sacloud.IPv6Net, error) {
+//func (api *IPv6NetAPI) Update(id sacloud.ID, value *sacloud.IPv6Net) (*sacloud.IPv6Net, error) {
 //	return api.request(func(res *sacloud.Response) error {
 //		return api.update(id, api.createRequest(value), res)
 //	})
 //}
 //
-//func (api *IPv6NetAPI) Delete(id int64) (*sacloud.IPv6Net, error) {
+//func (api *IPv6NetAPI) Delete(id sacloud.ID) (*sacloud.IPv6Net, error) {
 //	return api.request(func(res *sacloud.Response) error {
 //		return api.delete(id, nil, res)
 //	})

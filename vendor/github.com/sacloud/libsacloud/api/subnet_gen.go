@@ -200,19 +200,19 @@ func (api *SubnetAPI) SetSortBy(key string, reverse bool) {
 //}
 
 // Read 読み取り
-func (api *SubnetAPI) Read(id int64) (*sacloud.Subnet, error) {
+func (api *SubnetAPI) Read(id sacloud.ID) (*sacloud.Subnet, error) {
 	return api.request(func(res *sacloud.Response) error {
 		return api.read(id, nil, res)
 	})
 }
 
-//func (api *SubnetAPI) Update(id int64, value *sacloud.Subnet) (*sacloud.Subnet, error) {
+//func (api *SubnetAPI) Update(id sacloud.ID, value *sacloud.Subnet) (*sacloud.Subnet, error) {
 //	return api.request(func(res *sacloud.Response) error {
 //		return api.update(id, api.createRequest(value), res)
 //	})
 //}
 //
-//func (api *SubnetAPI) Delete(id int64) (*sacloud.Subnet, error) {
+//func (api *SubnetAPI) Delete(id sacloud.ID) (*sacloud.Subnet, error) {
 //	return api.request(func(res *sacloud.Response) error {
 //		return api.delete(id, nil, res)
 //	})
