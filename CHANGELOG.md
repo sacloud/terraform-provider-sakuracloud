@@ -1,5 +1,6 @@
 ## 1.22.0 (Unreleased)
 
+* libsacloud v1.36.2 #760 (@yamamoto-febc)
 * Use SDK-style User-Agent #679 (@yamamoto-febc)
 * Improve release processes #678 (@yamamoto-febc)
 
