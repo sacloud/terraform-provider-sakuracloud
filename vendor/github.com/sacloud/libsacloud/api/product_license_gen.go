@@ -206,19 +206,19 @@ func (api *ProductLicenseAPI) SetSortByName(reverse bool) {
 // }
 
 // Read 読み取り
-func (api *ProductLicenseAPI) Read(id int64) (*sacloud.ProductLicense, error) {
+func (api *ProductLicenseAPI) Read(id sacloud.ID) (*sacloud.ProductLicense, error) {
 	return api.request(func(res *sacloud.Response) error {
 		return api.read(id, nil, res)
 	})
 }
 
-// func (api *ProductLicenseAPI) Update(id int64, value *sacloud.ProductLicense) (*sacloud.ProductLicense, error) {
+// func (api *ProductLicenseAPI) Update(id sacloud.ID, value *sacloud.ProductLicense) (*sacloud.ProductLicense, error) {
 // 	return api.request(func(res *sacloud.Response) error {
 // 		return api.update(id, api.createRequest(value), res)
 // 	})
 // }
 
-// func (api *ProductLicenseAPI) Delete(id int64) (*sacloud.ProductLicense, error) {
+// func (api *ProductLicenseAPI) Delete(id sacloud.ID) (*sacloud.ProductLicense, error) {
 // 	return api.request(func(res *sacloud.Response) error {
 // 		return api.delete(id, nil, res)
 // 	})

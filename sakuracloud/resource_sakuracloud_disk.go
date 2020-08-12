@@ -193,9 +193,9 @@ func resourceSakuraCloudDiskCreate(d *schema.ResourceData, meta interface{}) err
 		rawDistantFrom := d.Get("distant_from").([]interface{})
 		if rawDistantFrom != nil {
 			strDiskIDs := expandStringList(rawDistantFrom)
-			diskIDs := []int64{}
+			diskIDs := []sacloud.ID{}
 			for _, id := range strDiskIDs {
-				diskIDs = append(diskIDs, int64(forceAtoI(id)))
+				diskIDs = append(diskIDs, sacloud.ID(forceAtoI(id)))
 			}
 
 			opts.DistantFrom = diskIDs
@@ -206,14 +206,14 @@ func resourceSakuraCloudDiskCreate(d *schema.ResourceData, meta interface{}) err
 		Create: func() (sacloud.ResourceIDHolder, error) {
 			return client.Disk.Create(opts)
 		},
-		AsyncWaitForCopy: func(id int64) (chan interface{}, chan interface{}, chan error) {
+		AsyncWaitForCopy: func(id sacloud.ID) (chan interface{}, chan interface{}, chan error) {
 			return client.Disk.AsyncSleepWhileCopying(id, client.DefaultTimeoutDuration)
 		},
-		Delete: func(id int64) error {
+		Delete: func(id sacloud.ID) error {
 			_, err := client.Disk.Delete(id)
 			return err
 		},
-		ProvisionBeforeUp: func(id int64, _ interface{}) error {
+		ProvisionBeforeUp: func(id sacloud.ID, _ interface{}) error {
 			isNeedEditDisk := false
 
 			//edit disk

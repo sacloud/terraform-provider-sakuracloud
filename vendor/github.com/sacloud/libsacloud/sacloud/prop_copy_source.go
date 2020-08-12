@@ -22,8 +22,8 @@ type propCopySource struct {
 }
 
 // SetSourceArchive ソースアーカイブ設定
-func (p *propCopySource) SetSourceArchive(sourceID int64) {
-	if sourceID == EmptyID {
+func (p *propCopySource) SetSourceArchive(sourceID ID) {
+	if sourceID.IsEmpty() {
 		return
 	}
 	p.SourceArchive = &Archive{
@@ -33,8 +33,8 @@ func (p *propCopySource) SetSourceArchive(sourceID int64) {
 }
 
 // SetSourceDisk ソースディスク設定
-func (p *propCopySource) SetSourceDisk(sourceID int64) {
-	if sourceID == EmptyID {
+func (p *propCopySource) SetSourceDisk(sourceID ID) {
+	if sourceID.IsEmpty() {
 		return
 	}
 	p.SourceDisk = &Disk{
@@ -54,17 +54,17 @@ func (p *propCopySource) GetSourceDisk() *Disk {
 }
 
 // GetSourceArchiveID ソースアーカイブID取得
-func (p *propCopySource) GetSourceArchiveID() int64 {
+func (p *propCopySource) GetSourceArchiveID() ID {
 	if p.SourceArchive != nil {
-		return p.SourceArchive.GetID()
+		return p.SourceArchive.ID
 	}
 	return EmptyID
 }
 
 // GetSourceDiskID ソースディスクID取得
-func (p *propCopySource) GetSourceDiskID() int64 {
+func (p *propCopySource) GetSourceDiskID() ID {
 	if p.SourceDisk != nil {
-		return p.SourceDisk.GetID()
+		return p.SourceDisk.ID
 	}
 	return EmptyID
 }

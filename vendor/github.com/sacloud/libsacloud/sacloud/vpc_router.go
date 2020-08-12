@@ -124,7 +124,7 @@ func (v *VPCRouter) SetHighSpec4000MbpsPlan(switchID string, virtualIPAddress st
 
 func (v *VPCRouter) setPremiumServices(switchID string, virtualIPAddress string, ipAddress1 string, ipAddress2 string, vrid int, ipAliases []string) {
 	v.Remark.Switch = &ApplianceRemarkSwitch{
-		ID: switchID,
+		ID: StringID(switchID),
 	}
 	v.Remark.Servers = []interface{}{
 		map[string]string{"IPAddress": ipAddress1},

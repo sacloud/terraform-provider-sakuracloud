@@ -212,21 +212,21 @@ func (api *SSHKeyAPI) Create(value *sacloud.SSHKey) (*sacloud.SSHKey, error) {
 }
 
 // Read 読み取り
-func (api *SSHKeyAPI) Read(id int64) (*sacloud.SSHKey, error) {
+func (api *SSHKeyAPI) Read(id sacloud.ID) (*sacloud.SSHKey, error) {
 	return api.request(func(res *sacloud.Response) error {
 		return api.read(id, nil, res)
 	})
 }
 
 // Update 更新
-func (api *SSHKeyAPI) Update(id int64, value *sacloud.SSHKey) (*sacloud.SSHKey, error) {
+func (api *SSHKeyAPI) Update(id sacloud.ID, value *sacloud.SSHKey) (*sacloud.SSHKey, error) {
 	return api.request(func(res *sacloud.Response) error {
 		return api.update(id, api.createRequest(value), res)
 	})
 }
 
 // Delete 削除
-func (api *SSHKeyAPI) Delete(id int64) (*sacloud.SSHKey, error) {
+func (api *SSHKeyAPI) Delete(id sacloud.ID) (*sacloud.SSHKey, error) {
 	return api.request(func(res *sacloud.Response) error {
 		return api.delete(id, nil, res)
 	})

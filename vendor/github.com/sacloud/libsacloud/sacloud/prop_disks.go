@@ -25,12 +25,11 @@ func (p *propDisks) GetDisks() []Disk {
 }
 
 // GetDiskIDs ディスクID配列を返す
-func (p *propDisks) GetDiskIDs() []int64 {
+func (p *propDisks) GetDiskIDs() []ID {
 
-	ids := []int64{}
+	var ids []ID
 	for _, disk := range p.Disks {
 		ids = append(ids, disk.ID)
 	}
 	return ids
-
 }

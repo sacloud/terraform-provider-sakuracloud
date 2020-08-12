@@ -116,14 +116,14 @@ func (s *Server) UpstreamTypeAt(index int) EUpstreamNetworkType {
 // SwitchID 上流のスイッチのID
 //
 // NICがない、上流スイッチが見つからない、上流が共有セグメントの場合は-1を返す
-func (s *Server) SwitchID() int64 {
+func (s *Server) SwitchID() ID {
 	return s.SwitchIDAt(0)
 }
 
 // SwitchIDAt 上流ネットワークのスイッチのID
 //
 // NICがない、上流スイッチが見つからない、上流が共有セグメントの場合は-1を返す
-func (s *Server) SwitchIDAt(index int) int64 {
+func (s *Server) SwitchIDAt(index int) ID {
 	if len(s.Interfaces) <= index {
 		return -1
 	}

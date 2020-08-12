@@ -63,14 +63,14 @@ const (
 
 var (
 	// DiskPlanHDD HDDプラン
-	DiskPlanHDD = &Resource{ID: int64(DiskPlanHDDID)}
+	DiskPlanHDD = DiskPlanHDDID.ToResource()
 	// DiskPlanSSD SSDプラン
-	DiskPlanSSD = &Resource{ID: int64(DiskPlanSSDID)}
+	DiskPlanSSD = DiskPlanSSDID.ToResource()
 )
 
 // ToResource ディスクプランIDからリソースへの変換
 func (d DiskPlanID) ToResource() *Resource {
-	return &Resource{ID: int64(d)}
+	return &Resource{ID: ID(d)}
 }
 
 // CreateNewDisk ディスクの作成

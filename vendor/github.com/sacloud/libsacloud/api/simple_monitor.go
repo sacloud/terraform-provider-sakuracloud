@@ -112,21 +112,21 @@ func (api *SimpleMonitorAPI) Create(value *sacloud.SimpleMonitor) (*sacloud.Simp
 }
 
 // Read 読み取り
-func (api *SimpleMonitorAPI) Read(id int64) (*sacloud.SimpleMonitor, error) {
+func (api *SimpleMonitorAPI) Read(id sacloud.ID) (*sacloud.SimpleMonitor, error) {
 	return api.request(func(res *simpleMonitorResponse) error {
 		return api.read(id, nil, res)
 	})
 }
 
 // Update 更新
-func (api *SimpleMonitorAPI) Update(id int64, value *sacloud.SimpleMonitor) (*sacloud.SimpleMonitor, error) {
+func (api *SimpleMonitorAPI) Update(id sacloud.ID, value *sacloud.SimpleMonitor) (*sacloud.SimpleMonitor, error) {
 	return api.request(func(res *simpleMonitorResponse) error {
 		return api.update(id, api.createRequest(value), res)
 	})
 }
 
 // Delete 削除
-func (api *SimpleMonitorAPI) Delete(id int64) (*sacloud.SimpleMonitor, error) {
+func (api *SimpleMonitorAPI) Delete(id sacloud.ID) (*sacloud.SimpleMonitor, error) {
 	return api.request(func(res *simpleMonitorResponse) error {
 		return api.delete(id, nil, res)
 	})
@@ -135,7 +135,7 @@ func (api *SimpleMonitorAPI) Delete(id int64) (*sacloud.SimpleMonitor, error) {
 // Health ヘルスチェック
 //
 // まだチェックが行われていない場合nilを返す
-func (api *SimpleMonitorAPI) Health(id int64) (*sacloud.SimpleMonitorHealthCheckStatus, error) {
+func (api *SimpleMonitorAPI) Health(id sacloud.ID) (*sacloud.SimpleMonitorHealthCheckStatus, error) {
 	var (
 		method = "GET"
 		uri    = fmt.Sprintf("%s/%d/health", api.getResourceURL(), id)
@@ -152,7 +152,7 @@ func (api *SimpleMonitorAPI) Health(id int64) (*sacloud.SimpleMonitorHealthCheck
 }
 
 // MonitorResponseTimeSec アクティビティーモニター(レスポンスタイム)取得
-func (api *SimpleMonitorAPI) MonitorResponseTimeSec(id int64, body *sacloud.ResourceMonitorRequest) (*sacloud.MonitorValues, error) {
+func (api *SimpleMonitorAPI) MonitorResponseTimeSec(id sacloud.ID, body *sacloud.ResourceMonitorRequest) (*sacloud.MonitorValues, error) {
 	var (
 		method = "GET"
 		uri    = fmt.Sprintf("%s/%d/activity/responsetimesec/monitor", api.getResourceURL(), id)

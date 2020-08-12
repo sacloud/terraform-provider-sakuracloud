@@ -224,7 +224,7 @@ func resourceSakuraCloudCDROMUpdate(d *schema.ResourceData, meta interface{}) er
 				if _, err := client.GetServerAPI().EjectCDROM(s.ID, cdrom.ID); err != nil {
 					return fmt.Errorf("Couldn't eject CDROM from Server: %s", err)
 				}
-				serverIDs = append(serverIDs, s.ID)
+				serverIDs = append(serverIDs, s.ID.Int64())
 			}
 		}
 
@@ -251,7 +251,7 @@ func resourceSakuraCloudCDROMUpdate(d *schema.ResourceData, meta interface{}) er
 
 		// re-insert CDROM
 		for _, serverID := range serverIDs {
-			if _, err := client.GetServerAPI().InsertCDROM(serverID, cdrom.ID); err != nil {
+			if _, err := client.GetServerAPI().InsertCDROM(sacloud.ID(serverID), cdrom.ID); err != nil {
 				return fmt.Errorf("Couldn't insert CDROM from Server: %s", err)
 			}
 		}

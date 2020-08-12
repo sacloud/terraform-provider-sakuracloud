@@ -280,7 +280,7 @@ func resourceSakuraCloudInternetDelete(d *schema.ResourceData, meta interface{})
 		return fmt.Errorf("Couldn't find SakuraCloud Servers: %s", err)
 	}
 
-	isRunning := []int64{}
+	isRunning := []sacloud.ID{}
 	for _, s := range servers {
 		if s.Instance.IsUp() {
 			isRunning = append(isRunning, s.ID)

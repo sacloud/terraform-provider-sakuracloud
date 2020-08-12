@@ -20,7 +20,7 @@ type propPlanID struct {
 }
 
 // GetPlanID プランID 取得
-func (p *propPlanID) GetPlanID() int64 {
+func (p *propPlanID) GetPlanID() ID {
 	if p.Plan == nil {
 		return -1
 	}

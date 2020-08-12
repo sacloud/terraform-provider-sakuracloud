@@ -14,11 +14,6 @@
 
 package sacloud
 
-import (
-	"encoding/json"
-	"fmt"
-)
-
 // AutoBackup 自動バックアップ(CommonServiceItem)
 type AutoBackup struct {
 	*Resource        // ID
@@ -38,9 +33,9 @@ type AutoBackup struct {
 
 // AutoBackupSettings 自動バックアップ設定
 type AutoBackupSettings struct {
-	AccountID  json.Number           `json:"AccountId,omitempty"` // アカウントID
-	DiskID     string                `json:"DiskId,omitempty"`    // ディスクID
-	ZoneID     int64                 `json:"ZoneId,omitempty"`    // ゾーンID
+	AccountID  ID                    `json:"AccountId,omitempty"` // アカウントID
+	DiskID     ID                    `json:"DiskId,omitempty"`    // ディスクID
+	ZoneID     ID                    `json:"ZoneId,omitempty"`    // ゾーンID
 	ZoneName   string                `json:",omitempty"`          // ゾーン名称
 	Autobackup *AutoBackupRecordSets `json:",omitempty"`          // 自動バックアップ定義
 
@@ -48,10 +43,10 @@ type AutoBackupSettings struct {
 
 // AutoBackupStatus 自動バックアップステータス
 type AutoBackupStatus struct {
-	AccountID json.Number `json:"AccountId,omitempty"` // アカウントID
-	DiskID    string      `json:"DiskId,omitempty"`    // ディスクID
-	ZoneID    int64       `json:"ZoneId,omitempty"`    // ゾーンID
-	ZoneName  string      `json:",omitempty"`          // ゾーン名称
+	AccountID ID     `json:"AccountId,omitempty"` // アカウントID
+	DiskID    ID     `json:"DiskId,omitempty"`    // ディスクID
+	ZoneID    ID     `json:"ZoneId,omitempty"`    // ゾーンID
+	ZoneName  string `json:",omitempty"`          // ゾーン名称
 }
 
 // AutoBackupProvider 自動バックアッププロバイダ
@@ -60,12 +55,12 @@ type AutoBackupProvider struct {
 }
 
 // CreateNewAutoBackup 自動バックアップ 作成(CommonServiceItem)
-func CreateNewAutoBackup(backupName string, diskID int64) *AutoBackup {
+func CreateNewAutoBackup(backupName string, diskID ID) *AutoBackup {
 	return &AutoBackup{
 		Resource: &Resource{},
 		propName: propName{Name: backupName},
 		Status: &AutoBackupStatus{
-			DiskID: fmt.Sprintf("%d", diskID),
+			DiskID: diskID,
 		},
 		Provider: &AutoBackupProvider{
 			Class: "autobackup",

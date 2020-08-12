@@ -15,7 +15,6 @@
 package sacloud
 
 import (
-	"encoding/json"
 	"fmt"
 	"net"
 )
@@ -43,10 +42,7 @@ type Switch struct {
 	Bridge *struct { // 接続先ブリッジ(Info.Switches配下のIDデータ型HACK)
 		*Bridge // ブリッジ
 		Info    *struct {
-			Switches []struct { // 接続スイッチリスト
-				*Switch             // スイッチ
-				ID      json.Number `json:",omitempty"` // HACK
-			}
+			Switches []*Switch
 		}
 	} `json:",omitempty"`
 

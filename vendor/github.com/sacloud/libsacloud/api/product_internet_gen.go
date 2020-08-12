@@ -210,19 +210,19 @@ func (api *ProductInternetAPI) SortByName(reverse bool) *ProductInternetAPI {
 // }
 
 // Read 読み取り
-func (api *ProductInternetAPI) Read(id int64) (*sacloud.ProductInternet, error) {
+func (api *ProductInternetAPI) Read(id sacloud.ID) (*sacloud.ProductInternet, error) {
 	return api.request(func(res *sacloud.Response) error {
 		return api.read(id, nil, res)
 	})
 }
 
-// func (api *ProductInternetAPI) Update(id int64, value *sacloud.ProductInternet) (*sacloud.ProductInternet, error) {
+// func (api *ProductInternetAPI) Update(id sacloud.ID, value *sacloud.ProductInternet) (*sacloud.ProductInternet, error) {
 // 	return api.request(func(res *sacloud.Response) error {
 // 		return api.update(id, api.createRequest(value), res)
 // 	})
 // }
 
-// func (api *ProductInternetAPI) Delete(id int64) (*sacloud.ProductInternet, error) {
+// func (api *ProductInternetAPI) Delete(id sacloud.ID) (*sacloud.ProductInternet, error) {
 // 	return api.request(func(res *sacloud.Response) error {
 // 		return api.delete(id, nil, res)
 // 	})

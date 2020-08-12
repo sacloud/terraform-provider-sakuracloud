@@ -197,19 +197,19 @@ func (api *IPAddressAPI) SetSortBy(key string, reverse bool) {
 //	})
 //}
 
-//func (api *IPAddressAPI) Read(id int64) (*sacloud.IPAddress, error) {
+//func (api *IPAddressAPI) Read(id sacloud.ID) (*sacloud.IPAddress, error) {
 //	return api.request(func(res *sacloud.Response) error {
 //		return api.read(id, nil, res)
 //	})
 //}
 
-//func (api *IPAddressAPI) Update(id int64, value *sacloud.IPAddress) (*sacloud.IPAddress, error) {
+//func (api *IPAddressAPI) Update(id sacloud.ID, value *sacloud.IPAddress) (*sacloud.IPAddress, error) {
 //	return api.request(func(res *sacloud.Response) error {
 //		return api.update(id, api.createRequest(value), res)
 //	})
 //}
 //
-//func (api *IPAddressAPI) Delete(id int64) (*sacloud.IPAddress, error) {
+//func (api *IPAddressAPI) Delete(id sacloud.ID) (*sacloud.IPAddress, error) {
 //	return api.request(func(res *sacloud.Response) error {
 //		return api.delete(id, nil, res)
 //	})

@@ -179,7 +179,7 @@ func resourceSakuraCloudMobileGatewayCreate(d *schema.ResourceData, meta interfa
 	if rawSwitchID, ok := d.GetOk("switch_id"); ok {
 		strSwitchID := rawSwitchID.(string)
 		if strSwitchID != "" {
-			switchID = toSakuraCloudID(strSwitchID)
+			switchID = toSakuraCloudID(strSwitchID).Int64()
 			if rawIP, ok := d.GetOk("private_ipaddress"); ok {
 				ip = rawIP.(string)
 			}
@@ -233,7 +233,7 @@ func resourceSakuraCloudMobileGatewayCreate(d *schema.ResourceData, meta interfa
 
 	// connect to switch
 	if switchID > 0 {
-		_, err = client.MobileGateway.ConnectToSwitch(mgw.ID, switchID)
+		_, err = client.MobileGateway.ConnectToSwitch(mgw.ID, sacloud.ID(switchID))
 		if err != nil {
 			return fmt.Errorf("Failed to create SakuraCloud MobileGateway resource: %s", err)
 		}
@@ -353,7 +353,7 @@ func resourceSakuraCloudMobileGatewayUpdate(d *schema.ResourceData, meta interfa
 		return fmt.Errorf("Couldn't find SakuraCloud MobileGateway resource: %s", err)
 	}
 
-	var switchID int64
+	var switchID sacloud.ID
 	var ip string
 	var nwMaskLen int
 	if rawSwitchID, ok := d.GetOk("switch_id"); ok {

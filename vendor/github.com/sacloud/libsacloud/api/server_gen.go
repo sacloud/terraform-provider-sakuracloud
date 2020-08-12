@@ -212,21 +212,21 @@ func (api *ServerAPI) Create(value *sacloud.Server) (*sacloud.Server, error) {
 }
 
 // Read 読み取り
-func (api *ServerAPI) Read(id int64) (*sacloud.Server, error) {
+func (api *ServerAPI) Read(id sacloud.ID) (*sacloud.Server, error) {
 	return api.request(func(res *sacloud.Response) error {
 		return api.read(id, nil, res)
 	})
 }
 
 // Update 更新
-func (api *ServerAPI) Update(id int64, value *sacloud.Server) (*sacloud.Server, error) {
+func (api *ServerAPI) Update(id sacloud.ID, value *sacloud.Server) (*sacloud.Server, error) {
 	return api.request(func(res *sacloud.Response) error {
 		return api.update(id, api.createRequest(value), res)
 	})
 }
 
 // Delete 削除
-func (api *ServerAPI) Delete(id int64) (*sacloud.Server, error) {
+func (api *ServerAPI) Delete(id sacloud.ID) (*sacloud.Server, error) {
 	return api.request(func(res *sacloud.Response) error {
 		return api.delete(id, nil, res)
 	})

@@ -135,7 +135,7 @@ func resourceSakuraCloudDatabaseReadReplicaCreate(d *schema.ResourceData, meta i
 		Plan:              sacloud.DatabasePlan(masterDB.Plan.ID),
 		DefaultUser:       masterDB.Settings.DBConf.Common.DefaultUser,
 		UserPassword:      masterDB.Settings.DBConf.Common.UserPassword,
-		SwitchID:          switchID,
+		SwitchID:          sacloud.StringID(switchID),
 		IPAddress1:        d.Get("ipaddress1").(string),
 		MaskLen:           maskLen,
 		DefaultRoute:      defaultRoute,
@@ -156,14 +156,14 @@ func resourceSakuraCloudDatabaseReadReplicaCreate(d *schema.ResourceData, meta i
 		Create: func() (sacloud.ResourceIDHolder, error) {
 			return client.Database.Create(createDB)
 		},
-		AsyncWaitForCopy: func(id int64) (chan interface{}, chan interface{}, chan error) {
+		AsyncWaitForCopy: func(id sacloud.ID) (chan interface{}, chan interface{}, chan error) {
 			return client.Database.AsyncSleepWhileCopying(id, client.DefaultTimeoutDuration, 20)
 		},
-		Delete: func(id int64) error {
+		Delete: func(id sacloud.ID) error {
 			_, err := client.Database.Delete(id)
 			return err
 		},
-		WaitForUp: func(id int64) error {
+		WaitForUp: func(id sacloud.ID) error {
 			return client.Database.SleepUntilUp(id, client.DefaultTimeoutDuration)
 		},
 		RetryCount: 3,

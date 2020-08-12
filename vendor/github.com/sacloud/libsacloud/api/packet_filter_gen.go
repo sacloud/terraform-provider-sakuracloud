@@ -212,21 +212,21 @@ func (api *PacketFilterAPI) Create(value *sacloud.PacketFilter) (*sacloud.Packet
 }
 
 // Read 読み取り
-func (api *PacketFilterAPI) Read(id int64) (*sacloud.PacketFilter, error) {
+func (api *PacketFilterAPI) Read(id sacloud.ID) (*sacloud.PacketFilter, error) {
 	return api.request(func(res *sacloud.Response) error {
 		return api.read(id, nil, res)
 	})
 }
 
 // Update 更新
-func (api *PacketFilterAPI) Update(id int64, value *sacloud.PacketFilter) (*sacloud.PacketFilter, error) {
+func (api *PacketFilterAPI) Update(id sacloud.ID, value *sacloud.PacketFilter) (*sacloud.PacketFilter, error) {
 	return api.request(func(res *sacloud.Response) error {
 		return api.update(id, api.createRequest(value), res)
 	})
 }
 
 // Delete 削除
-func (api *PacketFilterAPI) Delete(id int64) (*sacloud.PacketFilter, error) {
+func (api *PacketFilterAPI) Delete(id sacloud.ID) (*sacloud.PacketFilter, error) {
 	return api.request(func(res *sacloud.Response) error {
 		return api.delete(id, nil, res)
 	})

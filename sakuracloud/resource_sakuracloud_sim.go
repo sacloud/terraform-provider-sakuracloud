@@ -107,7 +107,7 @@ func resourceSakuraCloudSIMCreate(d *schema.ResourceData, meta interface{}) erro
 		return err
 	}
 
-	var mgwID int64
+	var mgwID sacloud.ID
 	var ip string
 	if rawMgwID, ok := d.GetOk("mobile_gateway_id"); ok {
 		mgwID = toSakuraCloudID(rawMgwID.(string))
@@ -218,7 +218,7 @@ func resourceSakuraCloudSIMUpdate(d *schema.ResourceData, meta interface{}) erro
 		return err
 	}
 
-	var mgwID int64
+	var mgwID sacloud.ID
 	var ip string
 	if rawMgwID, ok := d.GetOk("mobile_gateway_id"); ok {
 		mgwID = toSakuraCloudID(rawMgwID.(string))

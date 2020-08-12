@@ -215,7 +215,7 @@ func (api *baseAPI) create(body interface{}, res interface{}) error {
 	return api.request(method, uri, body, res)
 }
 
-func (api *baseAPI) read(id int64, body interface{}, res interface{}) error {
+func (api *baseAPI) read(id sacloud.ID, body interface{}, res interface{}) error {
 	var (
 		method = "GET"
 		uri    = fmt.Sprintf("%s/%d", api.getResourceURL(), id)
@@ -224,7 +224,7 @@ func (api *baseAPI) read(id int64, body interface{}, res interface{}) error {
 	return api.request(method, uri, body, res)
 }
 
-func (api *baseAPI) update(id int64, body interface{}, res interface{}) error {
+func (api *baseAPI) update(id sacloud.ID, body interface{}, res interface{}) error {
 	var (
 		method = "PUT"
 		uri    = fmt.Sprintf("%s/%d", api.getResourceURL(), id)
@@ -232,7 +232,7 @@ func (api *baseAPI) update(id int64, body interface{}, res interface{}) error {
 	return api.request(method, uri, body, res)
 }
 
-func (api *baseAPI) delete(id int64, body interface{}, res interface{}) error {
+func (api *baseAPI) delete(id sacloud.ID, body interface{}, res interface{}) error {
 	var (
 		method = "DELETE"
 		uri    = fmt.Sprintf("%s/%d", api.getResourceURL(), id)
@@ -257,7 +257,7 @@ func (api *baseAPI) action(method string, uri string, body interface{}, res inte
 	return true, nil
 }
 
-func (api *baseAPI) monitor(id int64, body *sacloud.ResourceMonitorRequest) (*sacloud.MonitorValues, error) {
+func (api *baseAPI) monitor(id sacloud.ID, body *sacloud.ResourceMonitorRequest) (*sacloud.MonitorValues, error) {
 	var (
 		method = "GET"
 		uri    = fmt.Sprintf("%s/%d/monitor", api.getResourceURL(), id)
@@ -270,7 +270,7 @@ func (api *baseAPI) monitor(id int64, body *sacloud.ResourceMonitorRequest) (*sa
 	return res.Data, nil
 }
 
-func (api *baseAPI) applianceMonitorBy(id int64, target string, nicIndex int, body *sacloud.ResourceMonitorRequest) (*sacloud.MonitorValues, error) {
+func (api *baseAPI) applianceMonitorBy(id sacloud.ID, target string, nicIndex int, body *sacloud.ResourceMonitorRequest) (*sacloud.MonitorValues, error) {
 	var (
 		method = "GET"
 		uri    = fmt.Sprintf("%s/%d/%s/%d/monitor", api.getResourceURL(), id, target, nicIndex)

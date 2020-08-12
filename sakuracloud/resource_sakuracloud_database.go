@@ -191,7 +191,7 @@ func resourceSakuraCloudDatabaseCreate(d *schema.ResourceData, meta interface{})
 		opts.EnableBackup = true
 	}
 
-	opts.SwitchID = d.Get("switch_id").(string)
+	opts.SwitchID = sacloud.StringID(d.Get("switch_id").(string))
 	ipAddress1 := d.Get("ipaddress1").(string)
 	nwMaskLen := d.Get("nw_mask_len").(int)
 	defaultRoute := ""
@@ -239,14 +239,14 @@ func resourceSakuraCloudDatabaseCreate(d *schema.ResourceData, meta interface{})
 		Create: func() (sacloud.ResourceIDHolder, error) {
 			return client.Database.Create(createDB)
 		},
-		AsyncWaitForCopy: func(id int64) (chan interface{}, chan interface{}, chan error) {
+		AsyncWaitForCopy: func(id sacloud.ID) (chan interface{}, chan interface{}, chan error) {
 			return client.Database.AsyncSleepWhileCopying(id, client.DefaultTimeoutDuration, 20)
 		},
-		Delete: func(id int64) error {
+		Delete: func(id sacloud.ID) error {
 			_, err := client.Database.Delete(id)
 			return err
 		},
-		WaitForUp: func(id int64) error {
+		WaitForUp: func(id sacloud.ID) error {
 			return client.Database.SleepUntilUp(id, client.DefaultTimeoutDuration)
 		},
 		RetryCount: 3,
@@ -455,7 +455,7 @@ func setDatabaseResourceData(d *schema.ResourceData, client *APIClient, data *sa
 	d.Set("replica_password", data.Settings.DBConf.Common.ReplicaPassword)
 
 	//plan
-	switch data.Plan.ID {
+	switch data.Plan.ID.Int64() {
 	case int64(sacloud.DatabasePlan10G):
 		d.Set("plan", "10g")
 	case int64(sacloud.DatabasePlan30G):

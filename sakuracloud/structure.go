@@ -79,9 +79,9 @@ func getSacloudAPIClient(d resourceValueGetable, meta interface{}) *APIClient {
 	}
 }
 
-func toSakuraCloudID(id string) int64 {
+func toSakuraCloudID(id string) sacloud.ID {
 	v, _ := strconv.ParseInt(id, 10, 64)
-	return v
+	return sacloud.ID(v)
 }
 
 // Takes the result of flatmap.Expand for an array of strings

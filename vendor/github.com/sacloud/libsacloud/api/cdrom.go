@@ -52,7 +52,7 @@ func (api *CDROMAPI) Create(value *sacloud.CDROM) (*sacloud.CDROM, *sacloud.FTPS
 }
 
 // OpenFTP FTP接続開始
-func (api *CDROMAPI) OpenFTP(id int64, reset bool) (*sacloud.FTPServer, error) {
+func (api *CDROMAPI) OpenFTP(id sacloud.ID, reset bool) (*sacloud.FTPServer, error) {
 	var (
 		method = "PUT"
 		uri    = fmt.Sprintf("%s/%d/ftp", api.getResourceURL(), id)
@@ -69,7 +69,7 @@ func (api *CDROMAPI) OpenFTP(id int64, reset bool) (*sacloud.FTPServer, error) {
 }
 
 // CloseFTP FTP接続終了
-func (api *CDROMAPI) CloseFTP(id int64) (bool, error) {
+func (api *CDROMAPI) CloseFTP(id sacloud.ID) (bool, error) {
 	var (
 		method = "DELETE"
 		uri    = fmt.Sprintf("%s/%d/ftp", api.getResourceURL(), id)
@@ -79,7 +79,7 @@ func (api *CDROMAPI) CloseFTP(id int64) (bool, error) {
 }
 
 // SleepWhileCopying コピー終了まで待機
-func (api *CDROMAPI) SleepWhileCopying(id int64, timeout time.Duration) error {
+func (api *CDROMAPI) SleepWhileCopying(id sacloud.ID, timeout time.Duration) error {
 	handler := waitingForAvailableFunc(func() (hasAvailable, error) {
 		return api.Read(id)
 	}, 0)
@@ -87,7 +87,7 @@ func (api *CDROMAPI) SleepWhileCopying(id int64, timeout time.Duration) error {
 }
 
 // AsyncSleepWhileCopying コピー終了まで待機(非同期)
-func (api *CDROMAPI) AsyncSleepWhileCopying(id int64, timeout time.Duration) (chan (interface{}), chan (interface{}), chan (error)) {
+func (api *CDROMAPI) AsyncSleepWhileCopying(id sacloud.ID, timeout time.Duration) (chan (interface{}), chan (interface{}), chan (error)) {
 	handler := waitingForAvailableFunc(func() (hasAvailable, error) {
 		return api.Read(id)
 	}, 0)

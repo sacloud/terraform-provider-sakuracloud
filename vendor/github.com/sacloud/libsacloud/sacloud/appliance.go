@@ -54,8 +54,8 @@ type ApplianceRemarkBase struct {
 
 // ApplianceRemarkSwitch スイッチ
 type ApplianceRemarkSwitch struct {
-	ID        string `json:",omitempty"` // リソースID
-	propScope        // スコープ
+	ID        ID `json:",omitempty"` // リソースID
+	propScope    // スコープ
 }
 
 // ApplianceRemarkVRRP VRRP

@@ -25,7 +25,7 @@ func (p *propRegion) GetRegion() *Region {
 }
 
 // GetRegionID リージョンID 取得
-func (p *propRegion) GetRegionID() int64 {
+func (p *propRegion) GetRegionID() ID {
 	if p.Region == nil {
 		return -1
 	}

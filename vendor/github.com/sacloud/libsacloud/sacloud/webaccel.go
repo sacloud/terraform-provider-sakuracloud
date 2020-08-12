@@ -16,8 +16,6 @@ package sacloud
 
 import (
 	"encoding/json"
-	"fmt"
-	"strconv"
 	"strings"
 )
 
@@ -43,7 +41,7 @@ const (
 
 // WebAccelSite ウェブアクセラレータ サイト
 type WebAccelSite struct {
-	ID                 string              // ID
+	ID                 ID                  // ID
 	Name               string              `json:",omitempty"`
 	DomainType         EWebAccelDomainType `json:",omitempty"`
 	Domain             string              `json:",omitempty"`
@@ -61,20 +59,16 @@ type WebAccelSite struct {
 }
 
 // SetID ID 設定
-func (n *WebAccelSite) SetID(id int64) {
-	n.ID = fmt.Sprintf("%d", id)
+func (n *WebAccelSite) SetID(id ID) {
+	n.ID = id
 }
 
 // GetID ID 取得
-func (n *WebAccelSite) GetID() int64 {
+func (n *WebAccelSite) GetID() ID {
 	if n == nil {
 		return -1
 	}
-	i, err := strconv.ParseInt(n.ID, 10, 64)
-	if err != nil {
-		return -1
-	}
-	return i
+	return n.ID
 }
 
 // GetStrID 文字列でID取得
@@ -82,7 +76,7 @@ func (n *WebAccelSite) GetStrID() string {
 	if n == nil {
 		return ""
 	}
-	return n.ID
+	return n.ID.String()
 }
 
 // GetName 名称取得
@@ -103,8 +97,8 @@ func (n *WebAccelSite) SetName(name string) {
 
 // WebAccelCert ウェブアクセラレータ証明書
 type WebAccelCert struct {
-	ID               string `json:",omitempty"`
-	SiteID           string `json:",omitempty"`
+	ID               ID     `json:",omitempty"`
+	SiteID           ID     `json:",omitempty"`
 	CertificateChain string `json:",omitempty"`
 	Key              string `json:",omitempty"`
 	propCreatedAt    `json:",omitempty"`
@@ -135,20 +129,16 @@ type WebAccelCert struct {
 }
 
 // SetID ID 設定
-func (n *WebAccelCert) SetID(id int64) {
-	n.ID = fmt.Sprintf("%d", id)
+func (n *WebAccelCert) SetID(id ID) {
+	n.ID = id
 }
 
 // GetID ID 取得
-func (n *WebAccelCert) GetID() int64 {
+func (n *WebAccelCert) GetID() ID {
 	if n == nil {
 		return -1
 	}
-	i, err := strconv.ParseInt(n.ID, 10, 64)
-	if err != nil {
-		return -1
-	}
-	return i
+	return n.ID
 }
 
 // GetStrID 文字列でID取得
@@ -156,7 +146,7 @@ func (n *WebAccelCert) GetStrID() string {
 	if n == nil {
 		return ""
 	}
-	return n.ID
+	return n.ID.String()
 }
 
 // WebAccelCertRequest ウェブアクセラレータ証明書API リクエスト

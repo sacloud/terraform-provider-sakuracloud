@@ -15,58 +15,49 @@
 package sacloud
 
 import (
-	"fmt"
-	"strconv"
 	"time"
 )
 
 // Resource IDを持つ、さくらのクラウド上のリソース
 type Resource struct {
-	ID int64 // ID
+	ID ID // ID
 }
 
 // ResourceIDHolder ID保持インターフェース
 type ResourceIDHolder interface {
-	SetID(int64)
-	GetID() int64
+	SetID(id ID)
+	GetID() ID
 }
 
 // EmptyID 空ID
-const EmptyID int64 = 0
+const EmptyID = ID(0)
 
 // NewResource 新規リソース作成
-func NewResource(id int64) *Resource {
+func NewResource(id ID) *Resource {
 	return &Resource{ID: id}
 }
 
 // NewResourceByStringID ID文字列からリソース作成
 func NewResourceByStringID(id string) *Resource {
-	intID, err := strconv.ParseInt(id, 10, 64)
-	if err != nil {
-		panic(err)
-	}
-	return &Resource{ID: intID}
+	return &Resource{ID: StringID(id)}
 }
 
 // SetID ID 設定
-func (n *Resource) SetID(id int64) {
+func (n *Resource) SetID(id ID) {
 	n.ID = id
 }
 
 // GetID ID 取得
-func (n *Resource) GetID() int64 {
+func (n *Resource) GetID() ID {
 	if n == nil {
-		return -1
+		return EmptyID
 	}
 	return n.ID
 }
 
 // GetStrID 文字列でID取得
 func (n *Resource) GetStrID() string {
-	if n == nil {
-		return ""
-	}
-	return fmt.Sprintf("%d", n.ID)
+	return n.ID.String()
 }
 
 // EAvailability 有効状態
@@ -269,7 +260,7 @@ type Request struct {
 	Filter               map[string]interface{} `json:",omitempty"` // フィルタ
 	Exclude              []string               `json:",omitempty"` // 除外する項目
 	Include              []string               `json:",omitempty"` // 取得する項目
-	DistantFrom          []int64                `json:",omitempty"` // ストレージ隔離対象ディスク
+	DistantFrom          []ID                   `json:",omitempty"` // ストレージ隔離対象ディスク
 }
 
 // AddFilter フィルタの追加

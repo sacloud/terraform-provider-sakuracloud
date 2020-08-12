@@ -212,21 +212,21 @@ func (api *BridgeAPI) Create(value *sacloud.Bridge) (*sacloud.Bridge, error) {
 }
 
 // Read 読み取り
-func (api *BridgeAPI) Read(id int64) (*sacloud.Bridge, error) {
+func (api *BridgeAPI) Read(id sacloud.ID) (*sacloud.Bridge, error) {
 	return api.request(func(res *sacloud.Response) error {
 		return api.read(id, nil, res)
 	})
 }
 
 // Update 更新
-func (api *BridgeAPI) Update(id int64, value *sacloud.Bridge) (*sacloud.Bridge, error) {
+func (api *BridgeAPI) Update(id sacloud.ID, value *sacloud.Bridge) (*sacloud.Bridge, error) {
 	return api.request(func(res *sacloud.Response) error {
 		return api.update(id, api.createRequest(value), res)
 	})
 }
 
 // Delete 削除
-func (api *BridgeAPI) Delete(id int64) (*sacloud.Bridge, error) {
+func (api *BridgeAPI) Delete(id sacloud.ID) (*sacloud.Bridge, error) {
 	return api.request(func(res *sacloud.Response) error {
 		return api.delete(id, nil, res)
 	})
