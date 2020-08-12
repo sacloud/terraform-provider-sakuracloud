@@ -136,7 +136,7 @@ func dataSourceSakuraCloudServer() *schema.Resource {
 				Computed:     true,
 				ForceNew:     true,
 				Description:  "target SakuraCloud zone",
-				ValidateFunc: validateZone([]string{"is1a", "is1b", "tk1a", "tk1v"}),
+				ValidateFunc: validateZone([]string{"is1a", "is1b", "tk1a", "tk1b", "tk1v"}),
 			},
 			"macaddresses": {
 				Type:     schema.TypeList,

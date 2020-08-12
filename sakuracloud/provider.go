@@ -27,7 +27,7 @@ var (
 	defaultRetryInterval = 5
 )
 
-var allowZones = []string{"is1a", "is1b", "tk1a", "tk1v"}
+var allowZones = []string{"is1a", "is1b", "tk1a", "tk1b", "tk1v"}
 
 // Provider returns a terraform.ResourceProvider.
 func Provider() terraform.ResourceProvider {
@@ -49,7 +49,7 @@ func Provider() terraform.ResourceProvider {
 				Type:         schema.TypeString,
 				Optional:     true,
 				DefaultFunc:  schema.MultiEnvDefaultFunc([]string{"SAKURACLOUD_ZONE"}, nil),
-				Description:  "Target SakuraCloud Zone(is1a | is1b | tk1a | tk1v)",
+				Description:  "Target SakuraCloud Zone(is1a | is1b | tk1a | t1kb | tk1v)",
 				InputDefault: defaultZone,
 				ValidateFunc: validateZone(allowZones),
 			},

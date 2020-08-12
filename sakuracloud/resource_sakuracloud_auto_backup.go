@@ -77,7 +77,7 @@ func resourceSakuraCloudAutoBackup() *schema.Resource {
 				Computed:     true,
 				ForceNew:     true,
 				Description:  "target SakuraCloud zone",
-				ValidateFunc: validateZone([]string{"is1b", "tk1a", "is1a"}),
+				ValidateFunc: validateZone([]string{"is1b", "tk1a", "tk1b", "is1a"}),
 			},
 		},
 	}
