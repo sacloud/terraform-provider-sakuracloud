@@ -1,6 +1,8 @@
 ## 2.3.7 (Unreleased)
 
-* 
+IMPROVEMENTS
+
+* Skip acc tests for the object storage when env is not set [GH-762] (@yamamoto-febc)
 
 ## 2.3.6 (2020-08-11)
 
