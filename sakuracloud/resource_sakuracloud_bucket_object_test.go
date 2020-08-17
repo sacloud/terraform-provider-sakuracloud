@@ -29,6 +29,7 @@ import (
 
 func TestAccSakuraCloudBucketObject_basic(t *testing.T) {
 	skipIfFakeModeEnabled(t)
+	skipIfEnvIsNotSet(t, "SACLOUD_OJS_ACCESS_KEY_ID", "SACLOUD_OJS_SECRET_ACCESS_KEY")
 
 	resourceName := "sakuracloud_bucket_object.foobar"
 
