@@ -55,8 +55,6 @@ func testAccPreCheck(t *testing.T) {
 	requiredEnvs := []string{
 		"SAKURACLOUD_ACCESS_TOKEN",
 		"SAKURACLOUD_ACCESS_TOKEN_SECRET",
-		"SACLOUD_OJS_ACCESS_KEY_ID",
-		"SACLOUD_OJS_SECRET_ACCESS_KEY",
 	}
 
 	if isFakeModeEnabled() {
