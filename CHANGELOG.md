@@ -1,8 +1,13 @@
-## 1.22.0 (Unreleased)
+## 1.22.1 (Unreleased)
+
+*
+
+## 1.22.0 (2020-08-20)
 
 * libsacloud v1.36.2 #760 (@yamamoto-febc)
 * Use SDK-style User-Agent #679 (@yamamoto-febc)
 * Improve release processes #678 (@yamamoto-febc)
+* tk1b zone #765 (@yamamoto-febc)
 
 ## 1.21.3 (2020-01-28)
 
