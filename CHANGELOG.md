@@ -1,4 +1,8 @@
-## 2.3.7 (Unreleased)
+## 2.4.0 (Unreleased)
+
+FEATURES
+
+* tk1b zone (libsacloud v2.7.0) [GH-767] (@yamamoto-febc)
 
 IMPROVEMENTS
 
