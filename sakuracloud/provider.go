@@ -19,13 +19,14 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/validation"
 	"github.com/hashicorp/terraform-plugin-sdk/terraform"
+	"github.com/sacloud/libsacloud/v2/sacloud"
 	"github.com/sacloud/libsacloud/v2/sacloud/profile"
 )
 
 var (
 	defaultZone                = "is1b"
 	defaultRetryMax            = 10
-	defaultZones               = []string{"is1a", "is1b", "tk1a", "tk1v"}
+	defaultZones               = sacloud.SakuraCloudZones
 	defaultAPIRequestTimeout   = 300
 	defaultAPIRequestRateLimit = 10
 )
