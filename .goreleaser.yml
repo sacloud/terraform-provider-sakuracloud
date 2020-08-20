@@ -8,9 +8,9 @@ builds:
   - env:
       - CGO_ENABLED=0
     goos:
-      - freebsd
-      - openbsd
-      - solaris
+#      - freebsd
+#      - openbsd
+#      - solaris
       - windows
       - linux
       - darwin
@@ -52,7 +52,7 @@ signs:
       - "${signature}"
       - "--detach-sign"
       - "${artifact}"
-# release:
-#   draft: true
+release:
+  draft: true
 changelog:
   skip: true
