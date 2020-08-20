@@ -1,4 +1,8 @@
-## 2.4.0 (Unreleased)
+## 2.4.1 (Unreleased)
+
+*
+
+## 2.4.0 (2020-08-20)
 
 FEATURES
 
