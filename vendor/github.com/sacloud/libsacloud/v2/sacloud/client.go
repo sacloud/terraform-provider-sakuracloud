@@ -35,7 +35,7 @@ var (
 	SakuraCloudAPIRoot = "https://secure.sakura.ad.jp/cloud/zone"
 
 	// SakuraCloudZones 利用可能なゾーンのデフォルト値
-	SakuraCloudZones = []string{"is1a", "is1b", "tk1a", "tk1v"}
+	SakuraCloudZones = []string{"is1a", "is1b", "tk1a", "tk1b", "tk1v"}
 )
 
 var (
