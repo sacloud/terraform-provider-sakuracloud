@@ -59,6 +59,7 @@ type Config struct {
 	AccessTokenSecret   string
 	Zone                string
 	Zones               []string
+	DefaultZone         string
 	TraceMode           string
 	FakeMode            string
 	FakeStorePath       string
@@ -117,6 +118,9 @@ func (c *Config) loadFromProfile() error {
 	sort.Strings(pcv.Zones)
 	if reflect.DeepEqual(defaultZones, c.Zones) && !reflect.DeepEqual(c.Zones, pcv.Zones) && len(pcv.Zones) > 0 {
 		c.Zones = pcv.Zones
+	}
+	if c.DefaultZone != "" {
+		sacloud.APIDefaultZone = c.DefaultZone
 	}
 	if c.TraceMode == "" {
 		c.TraceMode = pcv.TraceMode
