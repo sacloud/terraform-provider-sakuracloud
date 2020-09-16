@@ -19,7 +19,7 @@ terraform {
 
       # We recommend pinning to the specific version of the SakuraCloud Provider you're using
       # since new versions are released frequently
-      version = "2.3.6"
+      version = "2.4.0"
       #version = "~> 2"
     }
   }
@@ -101,6 +101,7 @@ Example shared credentials file is follows:
 * `api_request_rate_limit` - (Optional) The maximum number of SakuraCloud API calls per second. It can also be sourced from the `SAKURACLOUD_RATE_LIMIT` environment variables, or via a shared credentials file if `profile` is specified. Default:`10`.
 * `api_request_timeout` - (Optional) The timeout seconds for each SakuraCloud API call. It can also be sourced from the `SAKURACLOUD_API_REQUEST_TIMEOUT` environment variables, or via a shared credentials file if `profile` is specified. Default:`300`.
 * `api_root_url` - (Optional) The root URL of SakuraCloud API. It can also be sourced from the `SAKURACLOUD_API_ROOT_URL` environment variables, or via a shared credentials file if `profile` is specified. Default:`https://secure.sakura.ad.jp/cloud/zone`.
+* `default_zone` - (Optional) The name of zone to use as default for global resources. It must be provided, but it can also be sourced from the `SAKURACLOUD_DEFAULT_ZONE` environment variables, or via a shared credentials file if `profile` is specified.
 * `fake_mode` - (Optional) The flag to enable fake of SakuraCloud API call. It is for debugging or developping the provider. It can also be sourced from the `FAKE_MODE` environment variables, or via a shared credentials file if `profile` is specified.
 * `fake_store_path` - (Optional) The file path used by SakuraCloud API fake driver for storing fake data. It is for debugging or developping the provider. It can also be sourced from the `FAKE_STORE_PATH` environment variables, or via a shared credentials file if `profile` is specified.
 * `profile` - (Optional) The profile name of your SakuraCloud account. Default:`default`.
