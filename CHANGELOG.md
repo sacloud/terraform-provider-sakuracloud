@@ -1,6 +1,8 @@
 ## 2.4.1 (Unreleased)
 
-*
+FEATURES
+
+* Add default_zone to provider config [GH-769] (@higebu)
 
 ## 2.4.0 (2020-08-20)
 
