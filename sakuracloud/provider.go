@@ -65,6 +65,12 @@ func Provider() terraform.ResourceProvider {
 				Elem:        &schema.Schema{Type: schema.TypeString},
 				Description: "A list of available SakuraCloud zone name. It can also be sourced via a shared credentials file if `profile` is specified. Default:[`is1a`, `is1b`, `tk1a`, `tk1v`]",
 			},
+			"default_zone": {
+				Type:        schema.TypeString,
+				Optional:    true,
+				DefaultFunc: schema.MultiEnvDefaultFunc([]string{"SAKURACLOUD_DEFAULT_ZONE"}, nil),
+				Description: "The name of zone to use as default for global resources. It must be provided, but it can also be sourced from the `SAKURACLOUD_DEFAULT_ZONE` environment variables, or via a shared credentials file if `profile` is specified",
+			},
 			"accept_language": {
 				Type:        schema.TypeString,
 				Optional:    true,
@@ -220,6 +226,7 @@ func providerConfigure(d *schema.ResourceData, terraformVersion string) (interfa
 		AccessTokenSecret:   d.Get("secret").(string),
 		Zone:                d.Get("zone").(string),
 		Zones:               expandStringList(d.Get("zones").([]interface{})),
+		DefaultZone:         d.Get("default_zone").(string),
 		TraceMode:           d.Get("trace").(string),
 		APIRootURL:          d.Get("api_root_url").(string),
 		RetryMax:            d.Get("retry_max").(int),
