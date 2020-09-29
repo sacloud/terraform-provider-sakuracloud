@@ -58,6 +58,9 @@ func SwitchFactoryFuncToFake() {
 	sacloud.SetClientFactoryFunc(ResourceDNS, func(caller sacloud.APICaller) interface{} {
 		return NewDNSOp()
 	})
+	sacloud.SetClientFactoryFunc(ResourceESME, func(caller sacloud.APICaller) interface{} {
+		return NewESMEOp()
+	})
 	sacloud.SetClientFactoryFunc(ResourceGSLB, func(caller sacloud.APICaller) interface{} {
 		return NewGSLBOp()
 	})
@@ -342,6 +345,22 @@ type DNSOp struct {
 func NewDNSOp() sacloud.DNSAPI {
 	return &DNSOp{
 		key: ResourceDNS,
+	}
+}
+
+/*************************************************
+* ESMEOp
+*************************************************/
+
+// ESMEOp is fake implementation of ESMEAPI interface
+type ESMEOp struct {
+	key string
+}
+
+// NewESMEOp creates new ESMEOp instance
+func NewESMEOp() sacloud.ESMEAPI {
+	return &ESMEOp{
+		key: ResourceESME,
 	}
 }
 

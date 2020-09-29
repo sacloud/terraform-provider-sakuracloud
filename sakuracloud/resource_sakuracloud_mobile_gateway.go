@@ -347,10 +347,10 @@ func setMobileGatewayResourceData(ctx context.Context, d *schema.ResourceData, c
 	if err := d.Set("private_network_interface", flattenMobileGatewayPrivateNetworks(data)); err != nil {
 		return err
 	}
-	d.Set("public_ip", flattenMobileGatewayPublicIPAddress(data))                             // nolint
-	d.Set("public_netmask", flattenMobileGatewayPublicNetmask(data))                          // nolint
-	d.Set("internet_connection", data.Settings.InternetConnectionEnabled.Bool())              // nolint
-	d.Set("inter_device_communication", data.Settings.InterDeviceCommunicationEnabled.Bool()) // nolint
+	d.Set("public_ip", flattenMobileGatewayPublicIPAddress(data))                    // nolint
+	d.Set("public_netmask", flattenMobileGatewayPublicNetmask(data))                 // nolint
+	d.Set("internet_connection", data.InternetConnectionEnabled.Bool())              // nolint
+	d.Set("inter_device_communication", data.InterDeviceCommunicationEnabled.Bool()) // nolint
 
 	if err := d.Set("traffic_control", flattenMobileGatewayTrafficConfigs(tc)); err != nil {
 		return err
@@ -358,7 +358,7 @@ func setMobileGatewayResourceData(ctx context.Context, d *schema.ResourceData, c
 	if err := d.Set("dns_servers", []string{resolver.DNS1, resolver.DNS2}); err != nil {
 		return err
 	}
-	if err := d.Set("static_route", flattenMobileGatewayStaticRoutes(data.Settings.StaticRoute)); err != nil {
+	if err := d.Set("static_route", flattenMobileGatewayStaticRoutes(data.StaticRoutes)); err != nil {
 		return err
 	}
 	d.Set("name", data.Name)               // nolint

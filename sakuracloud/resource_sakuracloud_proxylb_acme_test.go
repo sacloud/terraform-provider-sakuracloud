@@ -89,7 +89,7 @@ resource sakuracloud_proxylb_acme "foobar" {
 }
 
 data sakuracloud_archive "ubuntu" {
-  os_type = "ubuntu"
+  os_type = "ubuntu2004"
 }
 
 resource sakuracloud_disk "foobar" {

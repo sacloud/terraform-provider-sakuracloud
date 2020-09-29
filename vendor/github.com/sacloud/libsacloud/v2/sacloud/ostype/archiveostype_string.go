@@ -28,28 +28,28 @@ func _() {
 	_ = x[CentOS7-3]
 	_ = x[CentOS6-4]
 	_ = x[Ubuntu-5]
-	_ = x[Ubuntu1804-6]
-	_ = x[Ubuntu1604-7]
-	_ = x[Debian-8]
-	_ = x[Debian10-9]
-	_ = x[Debian9-10]
-	_ = x[CoreOS-11]
-	_ = x[RancherOS-12]
-	_ = x[K3OS-13]
-	_ = x[Kusanagi-14]
-	_ = x[FreeBSD-15]
-	_ = x[Windows2016-16]
-	_ = x[Windows2016RDS-17]
-	_ = x[Windows2016RDSOffice-18]
-	_ = x[Windows2016SQLServerWeb-19]
-	_ = x[Windows2016SQLServerStandard-20]
-	_ = x[Windows2016SQLServer2017Standard-21]
-	_ = x[Windows2016SQLServer2017Enterprise-22]
-	_ = x[Windows2016SQLServerStandardAll-23]
-	_ = x[Windows2016SQLServer2017StandardAll-24]
-	_ = x[Windows2019-25]
-	_ = x[Windows2019RDS-26]
-	_ = x[Windows2019RDSOffice2016-27]
+	_ = x[Ubuntu2004-6]
+	_ = x[Ubuntu1804-7]
+	_ = x[Ubuntu1604-8]
+	_ = x[Debian-9]
+	_ = x[Debian10-10]
+	_ = x[Debian9-11]
+	_ = x[CoreOS-12]
+	_ = x[RancherOS-13]
+	_ = x[K3OS-14]
+	_ = x[Kusanagi-15]
+	_ = x[FreeBSD-16]
+	_ = x[Windows2016-17]
+	_ = x[Windows2016RDS-18]
+	_ = x[Windows2016RDSOffice-19]
+	_ = x[Windows2016SQLServerWeb-20]
+	_ = x[Windows2016SQLServerStandard-21]
+	_ = x[Windows2016SQLServer2017Standard-22]
+	_ = x[Windows2016SQLServer2017Enterprise-23]
+	_ = x[Windows2016SQLServerStandardAll-24]
+	_ = x[Windows2016SQLServer2017StandardAll-25]
+	_ = x[Windows2019-26]
+	_ = x[Windows2019RDS-27]
 	_ = x[Windows2019RDSOffice2019-28]
 	_ = x[Windows2019SQLServer2017Web-29]
 	_ = x[Windows2019SQLServer2019Web-30]
@@ -61,9 +61,9 @@ func _() {
 	_ = x[Windows2019SQLServer2019StandardAll-36]
 }
 
-const _ArchiveOSType_name = "CustomCentOSCentOS8CentOS7CentOS6UbuntuUbuntu1804Ubuntu1604DebianDebian10Debian9CoreOSRancherOSK3OSKusanagiFreeBSDWindows2016Windows2016RDSWindows2016RDSOfficeWindows2016SQLServerWebWindows2016SQLServerStandardWindows2016SQLServer2017StandardWindows2016SQLServer2017EnterpriseWindows2016SQLServerStandardAllWindows2016SQLServer2017StandardAllWindows2019Windows2019RDSWindows2019RDSOffice2016Windows2019RDSOffice2019Windows2019SQLServer2017WebWindows2019SQLServer2019WebWindows2019SQLServer2017StandardWindows2019SQLServer2019StandardWindows2019SQLServer2017EnterpriseWindows2019SQLServer2019EnterpriseWindows2019SQLServer2017StandardAllWindows2019SQLServer2019StandardAll"
+const _ArchiveOSType_name = "CustomCentOSCentOS8CentOS7CentOS6UbuntuUbuntu2004Ubuntu1804Ubuntu1604DebianDebian10Debian9CoreOSRancherOSK3OSKusanagiFreeBSDWindows2016Windows2016RDSWindows2016RDSOfficeWindows2016SQLServerWebWindows2016SQLServerStandardWindows2016SQLServer2017StandardWindows2016SQLServer2017EnterpriseWindows2016SQLServerStandardAllWindows2016SQLServer2017StandardAllWindows2019Windows2019RDSWindows2019RDSOffice2019Windows2019SQLServer2017WebWindows2019SQLServer2019WebWindows2019SQLServer2017StandardWindows2019SQLServer2019StandardWindows2019SQLServer2017EnterpriseWindows2019SQLServer2019EnterpriseWindows2019SQLServer2017StandardAllWindows2019SQLServer2019StandardAll"
 
-var _ArchiveOSType_index = [...]uint16{0, 6, 12, 19, 26, 33, 39, 49, 59, 65, 73, 80, 86, 95, 99, 107, 114, 125, 139, 159, 182, 210, 242, 276, 307, 342, 353, 367, 391, 415, 442, 469, 501, 533, 567, 601, 636, 671}
+var _ArchiveOSType_index = [...]uint16{0, 6, 12, 19, 26, 33, 39, 49, 59, 69, 75, 83, 90, 96, 105, 109, 117, 124, 135, 149, 169, 192, 220, 252, 286, 317, 352, 363, 377, 401, 428, 455, 487, 519, 553, 587, 622, 657}
 
 func (i ArchiveOSType) String() string {
 	if i < 0 || i >= ArchiveOSType(len(_ArchiveOSType_index)-1) {

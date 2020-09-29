@@ -60,7 +60,7 @@ func (o *PacketFilterOp) Read(ctx context.Context, zone string, id types.ID) (*s
 }
 
 // Update is fake implementation
-func (o *PacketFilterOp) Update(ctx context.Context, zone string, id types.ID, param *sacloud.PacketFilterUpdateRequest) (*sacloud.PacketFilter, error) {
+func (o *PacketFilterOp) Update(ctx context.Context, zone string, id types.ID, param *sacloud.PacketFilterUpdateRequest, hash string) (*sacloud.PacketFilter, error) {
 	value, err := o.Read(ctx, zone, id)
 	if err != nil {
 		return nil, err

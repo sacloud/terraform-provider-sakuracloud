@@ -35,6 +35,8 @@ const (
 
 	// Ubuntu OS種別:Ubuntu
 	Ubuntu
+	// Ubuntu1804 OS種別:Ubuntu(Focal Fossa)
+	Ubuntu2004
 	// Ubuntu1804 OS種別:Ubuntu(Bionic)
 	Ubuntu1804
 	// Ubuntu1604 OS種別:Ubuntu(Xenial)
@@ -85,8 +87,6 @@ const (
 	// Windows2019RDS OS種別:Windows Server 2019 RDS
 	Windows2019RDS
 
-	// Windows2019RDSOffice2016 OS種別:Windows Server 2019 RDS + Office 2016
-	Windows2019RDSOffice2016
 	// Windows2019RDSOffice2019 OS種別:Windows Server 2019 RDS + Office 2019
 	Windows2019RDSOffice2019
 
@@ -118,6 +118,7 @@ var ArchiveOSTypes = []ArchiveOSType{
 	CentOS7,
 	CentOS6,
 	Ubuntu,
+	Ubuntu2004,
 	Ubuntu1804,
 	Ubuntu1604,
 	Debian,
@@ -139,7 +140,6 @@ var ArchiveOSTypes = []ArchiveOSType{
 	Windows2016SQLServer2017StandardAll,
 	Windows2019,
 	Windows2019RDS,
-	Windows2019RDSOffice2016,
 	Windows2019RDSOffice2019,
 	Windows2019SQLServer2017Web,
 	Windows2019SQLServer2019Web,
@@ -154,13 +154,13 @@ var ArchiveOSTypes = []ArchiveOSType{
 // OSTypeShortNames OSTypeとして利用できる文字列のリスト
 var OSTypeShortNames = []string{
 	"centos", "centos8", "centos7", "centos6",
-	"ubuntu", "ubuntu1804", "ubuntu1604",
+	"ubuntu", "ubuntu2004", "ubuntu1804", "ubuntu1604",
 	"debian", "debian10", "debian9",
 	"coreos", "rancheros", "k3os", "kusanagi", "freebsd",
 	"windows2016", "windows2016-rds", "windows2016-rds-office",
 	"windows2016-sql-web", "windows2016-sql-standard", "windows2016-sql-standard-all",
 	"windows2016-sql2017-standard", "windows2016-sql2017-enterprise", "windows2016-sql2017-standard-all",
-	"windows2019", "windows2019-rds", "windows2019-rds-office2016", "windows2019-rds-office2019",
+	"windows2019", "windows2019-rds", "windows2019-rds-office2019",
 	"windows2019-sql2017-web", "windows2019-sql2019-web",
 	"windows2019-sql2017-standard", "windows2019-sql2019-standard",
 	"windows2019-sql2017-enterprise", "windows2019-sql2019-enterprise",
@@ -174,7 +174,7 @@ func (o ArchiveOSType) IsWindows() bool {
 		Windows2016SQLServerWeb, Windows2016SQLServerStandard, Windows2016SQLServerStandardAll,
 		Windows2016SQLServer2017Standard, Windows2016SQLServer2017Enterprise, Windows2016SQLServer2017StandardAll,
 		Windows2019, Windows2019RDS,
-		Windows2019RDSOffice2016, Windows2019RDSOffice2019,
+		Windows2019RDSOffice2019,
 		Windows2019SQLServer2017Web, Windows2019SQLServer2019Web,
 		Windows2019SQLServer2017Standard, Windows2019SQLServer2019Standard,
 		Windows2019SQLServer2017Enterprise, Windows2019SQLServer2019Enterprise,
@@ -189,7 +189,7 @@ func (o ArchiveOSType) IsWindows() bool {
 func (o ArchiveOSType) IsSupportDiskEdit() bool {
 	switch o {
 	case CentOS, CentOS8, CentOS7, CentOS6,
-		Ubuntu, Ubuntu1804, Ubuntu1604,
+		Ubuntu, Ubuntu2004, Ubuntu1804, Ubuntu1604,
 		Debian, Debian10, Debian9,
 		CoreOS, RancherOS, K3OS, Kusanagi, FreeBSD:
 		return true
@@ -211,6 +211,8 @@ func StrToOSType(osType string) ArchiveOSType {
 		return CentOS6
 	case "ubuntu":
 		return Ubuntu
+	case "ubuntu2004":
+		return Ubuntu2004
 	case "ubuntu1804":
 		return Ubuntu1804
 	case "ubuntu1604":
@@ -253,8 +255,6 @@ func StrToOSType(osType string) ArchiveOSType {
 		return Windows2019
 	case "windows2019-rds":
 		return Windows2019RDS
-	case "windows2019-rds-office2016":
-		return Windows2019RDSOffice2016
 	case "windows2019-rds-office2019":
 		return Windows2019RDSOffice2019
 	case "windows2019-sql2017-web":

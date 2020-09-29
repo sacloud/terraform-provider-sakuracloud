@@ -358,6 +358,34 @@ func putDNS(zone string, value *sacloud.DNS) {
 	ds().Put(ResourceDNS, zone, 0, value)
 }
 
+func getESME(zone string) []*sacloud.ESME {
+	values := ds().List(ResourceESME, zone)
+	var ret []*sacloud.ESME
+	for _, v := range values {
+		if v, ok := v.(*sacloud.ESME); ok {
+			ret = append(ret, v)
+		}
+	}
+	return ret
+}
+
+func getESMEByID(zone string, id types.ID) *sacloud.ESME {
+	v := ds().Get(ResourceESME, zone, id)
+	if v, ok := v.(*sacloud.ESME); ok {
+		return v
+	}
+	return nil
+}
+
+func putESME(zone string, value *sacloud.ESME) {
+	var v interface{} = value
+	if id, ok := v.(accessor.ID); ok {
+		ds().Put(ResourceESME, zone, id.GetID(), value)
+		return
+	}
+	ds().Put(ResourceESME, zone, 0, value)
+}
+
 func getGSLB(zone string) []*sacloud.GSLB {
 	values := ds().List(ResourceGSLB, zone)
 	var ret []*sacloud.GSLB

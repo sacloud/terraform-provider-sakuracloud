@@ -150,7 +150,7 @@ func resourceSakuraCloudPacketFilterRulesUpdate(d *schema.ResourceData, meta int
 		return fmt.Errorf("could not read SakuraCloud PacketFilter[%s]: %s", pfID, err)
 	}
 
-	_, err = pfOp.Update(ctx, zone, pf.ID, expandPacketFilterRulesUpdateRequest(d, pf))
+	_, err = pfOp.Update(ctx, zone, pf.ID, expandPacketFilterRulesUpdateRequest(d, pf), pf.ExpressionHash)
 	if err != nil {
 		return fmt.Errorf("updating SakuraCloud PacketFilter[%s] is failed: %s", pfID, err)
 	}
@@ -181,7 +181,7 @@ func resourceSakuraCloudPacketFilterRulesDelete(d *schema.ResourceData, meta int
 		}
 		return fmt.Errorf("could not read SakuraCloud PacketFilter[%s]: %s", pfID, err)
 	}
-	_, err = pfOp.Update(ctx, zone, pf.ID, expandPacketFilterRulesDeleteRequest(d, pf))
+	_, err = pfOp.Update(ctx, zone, pf.ID, expandPacketFilterRulesDeleteRequest(d, pf), pf.ExpressionHash)
 	if err != nil {
 		return fmt.Errorf("updating SakuraCloud PacketFilter[%s] is failed: %s", pfID, err)
 	}

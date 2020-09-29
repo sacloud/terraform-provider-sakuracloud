@@ -37,11 +37,7 @@ tools:
 
 .PHONY: clean
 clean:
-	rm -f sacloud/zz_*.go; \
-	rm -f sacloud/fake/zz_*.go \
-	rm -f sacloud/naked/zz_*.go \
-	rm -f sacloud/stub/zz_*.go \
-	rm -f sacloud/trace/zz_*.go
+	find . -type f -name "zz_*.go" -delete
 
 .PHONY: gen
 gen: _gen fmt goimports set-license

@@ -14,6 +14,8 @@
 
 package types
 
+import "strings"
+
 const (
 	// PrivateHostClassDynamic 標準
 	PrivateHostClassDynamic = "dynamic"
@@ -23,3 +25,6 @@ const (
 
 // PrivateHostClasses PrivateHost.Classに指定できる有効な文字列
 var PrivateHostClasses = []string{PrivateHostClassDynamic, PrivateHostClassWindows}
+
+// PrivateHostClassString PrivateHost.Classに指定できる有効な文字列(スペース区切り)
+var PrivateHostClassString = strings.Join(PrivateHostClasses, " ")

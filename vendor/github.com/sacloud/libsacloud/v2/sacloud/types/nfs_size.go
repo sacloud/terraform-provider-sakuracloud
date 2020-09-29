@@ -14,8 +14,22 @@
 
 package types
 
+import "fmt"
+
 // ENFSSize NFSサイズ
 type ENFSSize int
+
+func (s ENFSSize) Int() int {
+	return int(s)
+}
+
+func (s ENFSSize) Int64() int64 {
+	return int64(s)
+}
+
+func (s ENFSSize) String() string {
+	return fmt.Sprintf("%d", s.Int())
+}
 
 // NFSHDDSizes NFSのHDDプランで指定可能なサイズ
 var NFSHDDSizes = struct {

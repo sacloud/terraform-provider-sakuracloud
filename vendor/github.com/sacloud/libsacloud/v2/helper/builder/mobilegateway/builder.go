@@ -102,14 +102,12 @@ func (b *Builder) Build(ctx context.Context, zone string) (*sacloud.MobileGatewa
 	builder := &setup.RetryableSetup{
 		Create: func(ctx context.Context, zone string) (accessor.ID, error) {
 			return b.Client.MobileGateway.Create(ctx, zone, &sacloud.MobileGatewayCreateRequest{
-				Name:        b.Name,
-				Description: b.Description,
-				Tags:        b.Tags,
-				IconID:      b.IconID,
-				Settings: &sacloud.MobileGatewaySettingCreate{
-					InternetConnectionEnabled:       types.StringFlag(b.InternetConnectionEnabled),
-					InterDeviceCommunicationEnabled: types.StringFlag(b.InterDeviceCommunicationEnabled),
-				},
+				Name:                            b.Name,
+				Description:                     b.Description,
+				Tags:                            b.Tags,
+				IconID:                          b.IconID,
+				InternetConnectionEnabled:       types.StringFlag(b.InternetConnectionEnabled),
+				InterDeviceCommunicationEnabled: types.StringFlag(b.InterDeviceCommunicationEnabled),
 			})
 		},
 		ProvisionBeforeUp: func(ctx context.Context, zone string, id types.ID, target interface{}) error {
@@ -127,12 +125,10 @@ func (b *Builder) Build(ctx context.Context, zone string) (*sacloud.MobileGatewa
 
 			// Interface設定
 			updated, err := b.Client.MobileGateway.UpdateSettings(ctx, zone, id, &sacloud.MobileGatewayUpdateSettingsRequest{
-				Settings: &sacloud.MobileGatewaySetting{
-					Interfaces:                      b.getInterfaceSettings(),
-					InternetConnectionEnabled:       types.StringFlag(b.InternetConnectionEnabled),
-					InterDeviceCommunicationEnabled: types.StringFlag(b.InterDeviceCommunicationEnabled),
-				},
-				SettingsHash: mgw.SettingsHash,
+				InterfaceSettings:               b.getInterfaceSettings(),
+				InternetConnectionEnabled:       types.StringFlag(b.InternetConnectionEnabled),
+				InterDeviceCommunicationEnabled: types.StringFlag(b.InterDeviceCommunicationEnabled),
+				SettingsHash:                    mgw.SettingsHash,
 			})
 			if err != nil {
 				return err
@@ -161,13 +157,11 @@ func (b *Builder) Build(ctx context.Context, zone string) (*sacloud.MobileGatewa
 			// static route
 			if len(b.StaticRoutes) > 0 {
 				_, err := b.Client.MobileGateway.UpdateSettings(ctx, zone, id, &sacloud.MobileGatewayUpdateSettingsRequest{
-					Settings: &sacloud.MobileGatewaySetting{
-						Interfaces:                      b.getInterfaceSettings(),
-						StaticRoute:                     b.StaticRoutes,
-						InternetConnectionEnabled:       types.StringFlag(b.InternetConnectionEnabled),
-						InterDeviceCommunicationEnabled: types.StringFlag(b.InterDeviceCommunicationEnabled),
-					},
-					SettingsHash: mgw.SettingsHash,
+					InterfaceSettings:               b.getInterfaceSettings(),
+					StaticRoutes:                    b.StaticRoutes,
+					InternetConnectionEnabled:       types.StringFlag(b.InternetConnectionEnabled),
+					InterDeviceCommunicationEnabled: types.StringFlag(b.InterDeviceCommunicationEnabled),
+					SettingsHash:                    mgw.SettingsHash,
 				})
 				if err != nil {
 					return err
@@ -275,11 +269,9 @@ func (b *Builder) Update(ctx context.Context, zone string, id types.ID) (*saclou
 			time.Sleep(b.SetupOptions.NICUpdateWaitDuration)
 
 			updated, err := b.Client.MobileGateway.UpdateSettings(ctx, zone, id, &sacloud.MobileGatewayUpdateSettingsRequest{
-				Settings: &sacloud.MobileGatewaySetting{
-					InternetConnectionEnabled:       types.StringFlag(b.InternetConnectionEnabled),
-					InterDeviceCommunicationEnabled: types.StringFlag(b.InterDeviceCommunicationEnabled),
-				},
-				SettingsHash: mgw.SettingsHash,
+				InternetConnectionEnabled:       types.StringFlag(b.InternetConnectionEnabled),
+				InterDeviceCommunicationEnabled: types.StringFlag(b.InterDeviceCommunicationEnabled),
+				SettingsHash:                    mgw.SettingsHash,
 			})
 			if err != nil {
 				return nil, err
@@ -304,12 +296,10 @@ func (b *Builder) Update(ctx context.Context, zone string, id types.ID) (*saclou
 
 			// Interface設定
 			updated, err := b.Client.MobileGateway.UpdateSettings(ctx, zone, id, &sacloud.MobileGatewayUpdateSettingsRequest{
-				Settings: &sacloud.MobileGatewaySetting{
-					Interfaces:                      b.getInterfaceSettings(),
-					InternetConnectionEnabled:       types.StringFlag(b.InternetConnectionEnabled),
-					InterDeviceCommunicationEnabled: types.StringFlag(b.InterDeviceCommunicationEnabled),
-				},
-				SettingsHash: mgw.SettingsHash,
+				InterfaceSettings:               b.getInterfaceSettings(),
+				InternetConnectionEnabled:       types.StringFlag(b.InternetConnectionEnabled),
+				InterDeviceCommunicationEnabled: types.StringFlag(b.InterDeviceCommunicationEnabled),
+				SettingsHash:                    mgw.SettingsHash,
 			})
 			if err != nil {
 				return nil, err
@@ -324,16 +314,14 @@ func (b *Builder) Update(ctx context.Context, zone string, id types.ID) (*saclou
 	}
 
 	mgw, err = b.Client.MobileGateway.Update(ctx, zone, id, &sacloud.MobileGatewayUpdateRequest{
-		Name:        b.Name,
-		Description: b.Description,
-		Tags:        b.Tags,
-		IconID:      b.IconID,
-		Settings: &sacloud.MobileGatewaySetting{
-			Interfaces:                      b.getInterfaceSettings(),
-			InternetConnectionEnabled:       types.StringFlag(b.InternetConnectionEnabled),
-			InterDeviceCommunicationEnabled: types.StringFlag(b.InterDeviceCommunicationEnabled),
-		},
-		SettingsHash: mgw.SettingsHash,
+		Name:                            b.Name,
+		Description:                     b.Description,
+		Tags:                            b.Tags,
+		IconID:                          b.IconID,
+		InterfaceSettings:               b.getInterfaceSettings(),
+		InternetConnectionEnabled:       types.StringFlag(b.InternetConnectionEnabled),
+		InterDeviceCommunicationEnabled: types.StringFlag(b.InterDeviceCommunicationEnabled),
+		SettingsHash:                    mgw.SettingsHash,
 	})
 	if err != nil {
 		return nil, err
@@ -384,13 +372,11 @@ func (b *Builder) Update(ctx context.Context, zone string, id types.ID) (*saclou
 	// static route(
 	if len(b.StaticRoutes) > 0 {
 		_, err := b.Client.MobileGateway.UpdateSettings(ctx, zone, id, &sacloud.MobileGatewayUpdateSettingsRequest{
-			Settings: &sacloud.MobileGatewaySetting{
-				Interfaces:                      b.getInterfaceSettings(),
-				StaticRoute:                     b.StaticRoutes,
-				InternetConnectionEnabled:       types.StringFlag(b.InternetConnectionEnabled),
-				InterDeviceCommunicationEnabled: types.StringFlag(b.InterDeviceCommunicationEnabled),
-			},
-			SettingsHash: mgw.SettingsHash,
+			InterfaceSettings:               b.getInterfaceSettings(),
+			StaticRoutes:                    b.StaticRoutes,
+			InternetConnectionEnabled:       types.StringFlag(b.InternetConnectionEnabled),
+			InterDeviceCommunicationEnabled: types.StringFlag(b.InterDeviceCommunicationEnabled),
+			SettingsHash:                    mgw.SettingsHash,
 		})
 		if err != nil {
 			return nil, err
@@ -504,7 +490,7 @@ func (b *Builder) currentPrivateInterfaceState(mgw *sacloud.MobileGateway) *Priv
 	if len(mgw.Interfaces) > 1 {
 		switchID := mgw.Interfaces[1].SwitchID
 		var setting *sacloud.MobileGatewayInterfaceSetting
-		for _, s := range mgw.Settings.Interfaces {
+		for _, s := range mgw.InterfaceSettings {
 			if s.Index == 1 {
 				setting = s
 			}

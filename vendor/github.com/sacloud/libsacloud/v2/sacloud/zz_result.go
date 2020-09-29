@@ -422,6 +422,13 @@ type diskMonitorResult struct {
 	DiskActivity *DiskActivity `json:",omitempty" mapconv:"Data,omitempty,recursive"`
 }
 
+// diskMonitorDiskResult represents the Result of API
+type diskMonitorDiskResult struct {
+	IsOk bool `json:",omitempty"` // is_ok
+
+	DiskActivity *DiskActivity `json:",omitempty" mapconv:"Data,omitempty,recursive"`
+}
+
 // DiskPlanFindResult represents the Result of API
 type DiskPlanFindResult struct {
 	Total int `json:",omitempty"` // Total count of target resources
@@ -473,6 +480,57 @@ type dNSUpdateSettingsResult struct {
 	IsOk bool `json:",omitempty"` // is_ok
 
 	DNS *DNS `json:",omitempty" mapconv:"CommonServiceItem,omitempty,recursive"`
+}
+
+// ESMEFindResult represents the Result of API
+type ESMEFindResult struct {
+	Total int `json:",omitempty"` // Total count of target resources
+	From  int `json:",omitempty"` // Current page number
+	Count int `json:",omitempty"` // Count of current page
+
+	ESME []*ESME `json:",omitempty" mapconv:"[]CommonServiceItems,omitempty,recursive"`
+}
+
+// eSMECreateResult represents the Result of API
+type eSMECreateResult struct {
+	IsOk bool `json:",omitempty"` // is_ok
+
+	ESME *ESME `json:",omitempty" mapconv:"CommonServiceItem,omitempty,recursive"`
+}
+
+// eSMEReadResult represents the Result of API
+type eSMEReadResult struct {
+	IsOk bool `json:",omitempty"` // is_ok
+
+	ESME *ESME `json:",omitempty" mapconv:"CommonServiceItem,omitempty,recursive"`
+}
+
+// eSMEUpdateResult represents the Result of API
+type eSMEUpdateResult struct {
+	IsOk bool `json:",omitempty"` // is_ok
+
+	ESME *ESME `json:",omitempty" mapconv:"CommonServiceItem,omitempty,recursive"`
+}
+
+// eSMESendMessageWithGeneratedOTPResult represents the Result of API
+type eSMESendMessageWithGeneratedOTPResult struct {
+	IsOk bool `json:",omitempty"` // is_ok
+
+	ESMESendMessageResult *ESMESendMessageResult `json:",omitempty" mapconv:"ESME,omitempty,recursive"`
+}
+
+// eSMESendMessageWithInputtedOTPResult represents the Result of API
+type eSMESendMessageWithInputtedOTPResult struct {
+	IsOk bool `json:",omitempty"` // is_ok
+
+	ESMESendMessageResult *ESMESendMessageResult `json:",omitempty" mapconv:"ESME,omitempty,recursive"`
+}
+
+// eSMELogsResult represents the Result of API
+type eSMELogsResult struct {
+	IsOk bool `json:",omitempty"` // is_ok
+
+	Logs []*ESMELogs `json:",omitempty" mapconv:"[]ESME.Logs,omitempty,recursive"`
 }
 
 // GSLBFindResult represents the Result of API
@@ -637,6 +695,13 @@ type internetMonitorResult struct {
 	RouterActivity *RouterActivity `json:",omitempty" mapconv:"Data,omitempty,recursive"`
 }
 
+// internetMonitorRouterResult represents the Result of API
+type internetMonitorRouterResult struct {
+	IsOk bool `json:",omitempty"` // is_ok
+
+	RouterActivity *RouterActivity `json:",omitempty" mapconv:"Data,omitempty,recursive"`
+}
+
 // internetEnableIPv6Result represents the Result of API
 type internetEnableIPv6Result struct {
 	IsOk bool `json:",omitempty"` // is_ok
@@ -685,6 +750,15 @@ type iPAddressUpdateHostNameResult struct {
 
 // IPv6NetListResult represents the Result of API
 type IPv6NetListResult struct {
+	Total int `json:",omitempty"` // Total count of target resources
+	From  int `json:",omitempty"` // Current page number
+	Count int `json:",omitempty"` // Count of current page
+
+	IPv6Nets []*IPv6Net `json:",omitempty" mapconv:"[]IPv6Nets,omitempty,recursive"`
+}
+
+// IPv6NetFindResult represents the Result of API
+type IPv6NetFindResult struct {
 	Total int `json:",omitempty"` // Total count of target resources
 	From  int `json:",omitempty"` // Current page number
 	Count int `json:",omitempty"` // Count of current page
@@ -927,14 +1001,14 @@ type mobileGatewayGetDNSResult struct {
 type mobileGatewayGetSIMRoutesResult struct {
 	IsOk bool `json:",omitempty"` // is_ok
 
-	SIMRoutes []*MobileGatewaySIMRoute `json:",omitempty" mapconv:"[]SIMRoutes,omitempty,recursive"`
+	SIMRoutes MobileGatewaySIMRoutes `json:",omitempty" mapconv:"[]SIMRoutes,omitempty,recursive"`
 }
 
 // mobileGatewayListSIMResult represents the Result of API
 type mobileGatewayListSIMResult struct {
 	IsOk bool `json:",omitempty"` // is_ok
 
-	SIM []*MobileGatewaySIMInfo `json:",omitempty" mapconv:"[]SIM,omitempty,recursive"`
+	SIM MobileGatewaySIMs `json:",omitempty" mapconv:"[]SIM,omitempty,recursive"`
 }
 
 // mobileGatewayLogsResult represents the Result of API
@@ -1249,6 +1323,13 @@ type serverGetVNCProxyResult struct {
 
 // serverMonitorResult represents the Result of API
 type serverMonitorResult struct {
+	IsOk bool `json:",omitempty"` // is_ok
+
+	CPUTimeActivity *CPUTimeActivity `json:",omitempty" mapconv:"Data,omitempty,recursive"`
+}
+
+// serverMonitorCPUResult represents the Result of API
+type serverMonitorCPUResult struct {
 	IsOk bool `json:",omitempty"` // is_ok
 
 	CPUTimeActivity *CPUTimeActivity `json:",omitempty" mapconv:"Data,omitempty,recursive"`

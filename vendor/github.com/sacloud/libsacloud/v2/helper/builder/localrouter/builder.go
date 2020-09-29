@@ -16,7 +16,6 @@ package localrouter
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/sacloud/libsacloud/v2/sacloud"
 	"github.com/sacloud/libsacloud/v2/sacloud/types"
@@ -34,20 +33,13 @@ type Builder struct {
 	Peers        []*sacloud.LocalRouterPeer
 	StaticRoutes []*sacloud.LocalRouterStaticRoute
 
+	SettingsHash string
+
 	Client *APIClient
 }
 
 // Validate 設定値の検証
-func (b *Builder) Validate(ctx context.Context) error {
-	requiredValues := map[string]bool{
-		"Switch":    b.Switch == nil,
-		"Interface": b.Interface == nil,
-	}
-	for key, empty := range requiredValues {
-		if empty {
-			return fmt.Errorf("%s is required", key)
-		}
-	}
+func (b *Builder) Validate(_ context.Context) error {
 	return nil
 }
 
@@ -71,7 +63,7 @@ func (b *Builder) Build(ctx context.Context) (*sacloud.LocalRouter, error) {
 		Switch:       b.Switch,
 		Interface:    b.Interface,
 		StaticRoutes: b.StaticRoutes,
-		SettingsHash: localRouter.SettingsHash,
+		SettingsHash: b.SettingsHash,
 	})
 	if err != nil {
 		return localRouter, err
@@ -102,17 +94,17 @@ func (b *Builder) Update(ctx context.Context, id types.ID) (*sacloud.LocalRouter
 	}
 
 	// check Internet is exists
-	localRouter, err := b.Client.LocalRouter.Read(ctx, id)
+	_, err := b.Client.LocalRouter.Read(ctx, id)
 	if err != nil {
 		return nil, err
 	}
 
-	localRouter, err = b.Client.LocalRouter.Update(ctx, id, &sacloud.LocalRouterUpdateRequest{
+	localRouter, err := b.Client.LocalRouter.Update(ctx, id, &sacloud.LocalRouterUpdateRequest{
 		Switch:       b.Switch,
 		Interface:    b.Interface,
 		Peers:        b.Peers,
 		StaticRoutes: b.StaticRoutes,
-		SettingsHash: localRouter.SettingsHash,
+		SettingsHash: b.SettingsHash,
 		Name:         b.Name,
 		Description:  b.Description,
 		Tags:         b.Tags,

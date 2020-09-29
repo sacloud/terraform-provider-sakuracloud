@@ -43,6 +43,8 @@ type Builder struct {
 	Tags               types.Tags
 	IconID             types.ID
 
+	SettingsHash string
+
 	SetupOptions *builder.RetryableSetupParameter
 	Client       *APIClient
 }
@@ -176,7 +178,7 @@ func (b *Builder) Update(ctx context.Context, zone string, id types.ID) (*saclou
 		CommonSetting:      b.CommonSetting,
 		BackupSetting:      b.BackupSetting,
 		ReplicationSetting: b.ReplicationSetting,
-		SettingsHash:       db.SettingsHash,
+		SettingsHash:       b.SettingsHash,
 	})
 	if err != nil {
 		return nil, err

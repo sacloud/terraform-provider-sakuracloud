@@ -103,13 +103,16 @@ func initBills(s Store, p *valuePool) {
 func initBillDetails(s Store, p *valuePool, billID types.ID) {
 	details := []*sacloud.BillDetail{
 		{
-			ID:             p.generateID(),
-			Amount:         108,
-			Description:    "description",
-			ServiceClassID: 999,
-			Usage:          100,
-			Zone:           "tk1a",
-			ContractEndAt:  time.Now(),
+			ID:               p.generateID(),
+			Amount:           108,
+			Description:      "description",
+			ServiceClassID:   999,
+			ServiceClassPath: "fake/cloud/dummy",
+			Usage:            100,
+			FormattedUsage:   "1d, 2h",
+			ServiceUsagePath: "fake/cloud/usetime",
+			Zone:             "tk1a",
+			ContractEndAt:    time.Now(),
 		},
 	}
 	s.Put(ResourceBill+"Details", sacloud.APIDefaultZone, billID, &details)
@@ -159,6 +162,7 @@ func initNotes(s Store, p *valuePool) {
 			{"size": 12288,"availability":"available","planId":107}
 		],
 		"SSD":[
+			{"size": 20,"availability":"available","planId":200},
 			{"size": 100,"availability":"available","planId":201},
 			{"size": 500,"availability":"available","planId":202},
 			{"size": 1024,"availability":"available","planId":203},

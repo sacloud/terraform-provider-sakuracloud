@@ -225,7 +225,7 @@ github.com/mitchellh/go-wordwrap
 ## explicit
 github.com/mitchellh/goamz/aws
 github.com/mitchellh/goamz/s3
-# github.com/mitchellh/mapstructure v1.1.2
+# github.com/mitchellh/mapstructure v1.3.2
 github.com/mitchellh/mapstructure
 # github.com/mitchellh/reflectwalk v1.0.1
 github.com/mitchellh/reflectwalk
@@ -246,7 +246,7 @@ github.com/sacloud/ftps
 # github.com/sacloud/iso9660wrap v0.0.0-20171031075302-eda21f77f6a8
 ## explicit
 github.com/sacloud/iso9660wrap
-# github.com/sacloud/libsacloud/v2 v2.7.0
+# github.com/sacloud/libsacloud/v2 v2.8.1
 ## explicit
 github.com/sacloud/libsacloud/v2
 github.com/sacloud/libsacloud/v2/helper/builder

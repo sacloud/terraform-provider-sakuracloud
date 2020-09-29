@@ -63,6 +63,9 @@ func AddClientFactoryHooks() {
 	sacloud.AddClientFacotyHookFunc("DNS", func(in interface{}) interface{} {
 		return NewDNSTracer(in.(sacloud.DNSAPI))
 	})
+	sacloud.AddClientFacotyHookFunc("ESME", func(in interface{}) interface{} {
+		return NewESMETracer(in.(sacloud.ESMEAPI))
+	})
 	sacloud.AddClientFacotyHookFunc("GSLB", func(in interface{}) interface{} {
 		return NewGSLBTracer(in.(sacloud.GSLBAPI))
 	})
@@ -2796,6 +2799,41 @@ func (t *DiskTracer) Monitor(ctx context.Context, zone string, id types.ID, cond
 	return resultDiskActivity, err
 }
 
+// MonitorDisk is API call with trace log
+func (t *DiskTracer) MonitorDisk(ctx context.Context, zone string, id types.ID, condition *sacloud.MonitorCondition) (*sacloud.DiskActivity, error) {
+	log.Println("[TRACE] DiskAPI.MonitorDisk start")
+	targetArguments := struct {
+		Argzone      string
+		Argid        types.ID                  `json:"id"`
+		Argcondition *sacloud.MonitorCondition `json:"condition"`
+	}{
+		Argzone:      zone,
+		Argid:        id,
+		Argcondition: condition,
+	}
+	if d, err := json.Marshal(targetArguments); err == nil {
+		log.Printf("[TRACE] \targs: %s\n", string(d))
+	}
+
+	defer func() {
+		log.Println("[TRACE] DiskAPI.MonitorDisk end")
+	}()
+
+	resultDiskActivity, err := t.Internal.MonitorDisk(ctx, zone, id, condition)
+	targetResults := struct {
+		DiskActivity *sacloud.DiskActivity
+		Error        error
+	}{
+		DiskActivity: resultDiskActivity,
+		Error:        err,
+	}
+	if d, err := json.Marshal(targetResults); err == nil {
+		log.Printf("[TRACE] \tresults: %s\n", string(d))
+	}
+
+	return resultDiskActivity, err
+}
+
 /*************************************************
 * DiskPlanTracer
 *************************************************/
@@ -3080,6 +3118,274 @@ func (t *DNSTracer) Delete(ctx context.Context, id types.ID) error {
 	}
 
 	return err
+}
+
+/*************************************************
+* ESMETracer
+*************************************************/
+
+// ESMETracer is for trace ESMEOp operations
+type ESMETracer struct {
+	Internal sacloud.ESMEAPI
+}
+
+// NewESMETracer creates new ESMETracer instance
+func NewESMETracer(in sacloud.ESMEAPI) sacloud.ESMEAPI {
+	return &ESMETracer{
+		Internal: in,
+	}
+}
+
+// Find is API call with trace log
+func (t *ESMETracer) Find(ctx context.Context, conditions *sacloud.FindCondition) (*sacloud.ESMEFindResult, error) {
+	log.Println("[TRACE] ESMEAPI.Find start")
+	targetArguments := struct {
+		Argconditions *sacloud.FindCondition `json:"conditions"`
+	}{
+		Argconditions: conditions,
+	}
+	if d, err := json.Marshal(targetArguments); err == nil {
+		log.Printf("[TRACE] \targs: %s\n", string(d))
+	}
+
+	defer func() {
+		log.Println("[TRACE] ESMEAPI.Find end")
+	}()
+
+	result, err := t.Internal.Find(ctx, conditions)
+	targetResults := struct {
+		Result *sacloud.ESMEFindResult
+		Error  error
+	}{
+		Result: result,
+		Error:  err,
+	}
+	if d, err := json.Marshal(targetResults); err == nil {
+		log.Printf("[TRACE] \tresults: %s\n", string(d))
+	}
+
+	return result, err
+}
+
+// Create is API call with trace log
+func (t *ESMETracer) Create(ctx context.Context, param *sacloud.ESMECreateRequest) (*sacloud.ESME, error) {
+	log.Println("[TRACE] ESMEAPI.Create start")
+	targetArguments := struct {
+		Argparam *sacloud.ESMECreateRequest `json:"param"`
+	}{
+		Argparam: param,
+	}
+	if d, err := json.Marshal(targetArguments); err == nil {
+		log.Printf("[TRACE] \targs: %s\n", string(d))
+	}
+
+	defer func() {
+		log.Println("[TRACE] ESMEAPI.Create end")
+	}()
+
+	resultESME, err := t.Internal.Create(ctx, param)
+	targetResults := struct {
+		ESME  *sacloud.ESME
+		Error error
+	}{
+		ESME:  resultESME,
+		Error: err,
+	}
+	if d, err := json.Marshal(targetResults); err == nil {
+		log.Printf("[TRACE] \tresults: %s\n", string(d))
+	}
+
+	return resultESME, err
+}
+
+// Read is API call with trace log
+func (t *ESMETracer) Read(ctx context.Context, id types.ID) (*sacloud.ESME, error) {
+	log.Println("[TRACE] ESMEAPI.Read start")
+	targetArguments := struct {
+		Argid types.ID `json:"id"`
+	}{
+		Argid: id,
+	}
+	if d, err := json.Marshal(targetArguments); err == nil {
+		log.Printf("[TRACE] \targs: %s\n", string(d))
+	}
+
+	defer func() {
+		log.Println("[TRACE] ESMEAPI.Read end")
+	}()
+
+	resultESME, err := t.Internal.Read(ctx, id)
+	targetResults := struct {
+		ESME  *sacloud.ESME
+		Error error
+	}{
+		ESME:  resultESME,
+		Error: err,
+	}
+	if d, err := json.Marshal(targetResults); err == nil {
+		log.Printf("[TRACE] \tresults: %s\n", string(d))
+	}
+
+	return resultESME, err
+}
+
+// Update is API call with trace log
+func (t *ESMETracer) Update(ctx context.Context, id types.ID, param *sacloud.ESMEUpdateRequest) (*sacloud.ESME, error) {
+	log.Println("[TRACE] ESMEAPI.Update start")
+	targetArguments := struct {
+		Argid    types.ID                   `json:"id"`
+		Argparam *sacloud.ESMEUpdateRequest `json:"param"`
+	}{
+		Argid:    id,
+		Argparam: param,
+	}
+	if d, err := json.Marshal(targetArguments); err == nil {
+		log.Printf("[TRACE] \targs: %s\n", string(d))
+	}
+
+	defer func() {
+		log.Println("[TRACE] ESMEAPI.Update end")
+	}()
+
+	resultESME, err := t.Internal.Update(ctx, id, param)
+	targetResults := struct {
+		ESME  *sacloud.ESME
+		Error error
+	}{
+		ESME:  resultESME,
+		Error: err,
+	}
+	if d, err := json.Marshal(targetResults); err == nil {
+		log.Printf("[TRACE] \tresults: %s\n", string(d))
+	}
+
+	return resultESME, err
+}
+
+// Delete is API call with trace log
+func (t *ESMETracer) Delete(ctx context.Context, id types.ID) error {
+	log.Println("[TRACE] ESMEAPI.Delete start")
+	targetArguments := struct {
+		Argid types.ID `json:"id"`
+	}{
+		Argid: id,
+	}
+	if d, err := json.Marshal(targetArguments); err == nil {
+		log.Printf("[TRACE] \targs: %s\n", string(d))
+	}
+
+	defer func() {
+		log.Println("[TRACE] ESMEAPI.Delete end")
+	}()
+
+	err := t.Internal.Delete(ctx, id)
+	targetResults := struct {
+		Error error
+	}{
+		Error: err,
+	}
+	if d, err := json.Marshal(targetResults); err == nil {
+		log.Printf("[TRACE] \tresults: %s\n", string(d))
+	}
+
+	return err
+}
+
+// SendMessageWithGeneratedOTP is API call with trace log
+func (t *ESMETracer) SendMessageWithGeneratedOTP(ctx context.Context, id types.ID, param *sacloud.ESMESendMessageWithGeneratedOTPRequest) (*sacloud.ESMESendMessageResult, error) {
+	log.Println("[TRACE] ESMEAPI.SendMessageWithGeneratedOTP start")
+	targetArguments := struct {
+		Argid    types.ID                                        `json:"id"`
+		Argparam *sacloud.ESMESendMessageWithGeneratedOTPRequest `json:"param"`
+	}{
+		Argid:    id,
+		Argparam: param,
+	}
+	if d, err := json.Marshal(targetArguments); err == nil {
+		log.Printf("[TRACE] \targs: %s\n", string(d))
+	}
+
+	defer func() {
+		log.Println("[TRACE] ESMEAPI.SendMessageWithGeneratedOTP end")
+	}()
+
+	resultESMESendMessageResult, err := t.Internal.SendMessageWithGeneratedOTP(ctx, id, param)
+	targetResults := struct {
+		ESMESendMessageResult *sacloud.ESMESendMessageResult
+		Error                 error
+	}{
+		ESMESendMessageResult: resultESMESendMessageResult,
+		Error:                 err,
+	}
+	if d, err := json.Marshal(targetResults); err == nil {
+		log.Printf("[TRACE] \tresults: %s\n", string(d))
+	}
+
+	return resultESMESendMessageResult, err
+}
+
+// SendMessageWithInputtedOTP is API call with trace log
+func (t *ESMETracer) SendMessageWithInputtedOTP(ctx context.Context, id types.ID, param *sacloud.ESMESendMessageWithInputtedOTPRequest) (*sacloud.ESMESendMessageResult, error) {
+	log.Println("[TRACE] ESMEAPI.SendMessageWithInputtedOTP start")
+	targetArguments := struct {
+		Argid    types.ID                                       `json:"id"`
+		Argparam *sacloud.ESMESendMessageWithInputtedOTPRequest `json:"param"`
+	}{
+		Argid:    id,
+		Argparam: param,
+	}
+	if d, err := json.Marshal(targetArguments); err == nil {
+		log.Printf("[TRACE] \targs: %s\n", string(d))
+	}
+
+	defer func() {
+		log.Println("[TRACE] ESMEAPI.SendMessageWithInputtedOTP end")
+	}()
+
+	resultESMESendMessageResult, err := t.Internal.SendMessageWithInputtedOTP(ctx, id, param)
+	targetResults := struct {
+		ESMESendMessageResult *sacloud.ESMESendMessageResult
+		Error                 error
+	}{
+		ESMESendMessageResult: resultESMESendMessageResult,
+		Error:                 err,
+	}
+	if d, err := json.Marshal(targetResults); err == nil {
+		log.Printf("[TRACE] \tresults: %s\n", string(d))
+	}
+
+	return resultESMESendMessageResult, err
+}
+
+// Logs is API call with trace log
+func (t *ESMETracer) Logs(ctx context.Context, id types.ID) ([]*sacloud.ESMELogs, error) {
+	log.Println("[TRACE] ESMEAPI.Logs start")
+	targetArguments := struct {
+		Argid types.ID `json:"id"`
+	}{
+		Argid: id,
+	}
+	if d, err := json.Marshal(targetArguments); err == nil {
+		log.Printf("[TRACE] \targs: %s\n", string(d))
+	}
+
+	defer func() {
+		log.Println("[TRACE] ESMEAPI.Logs end")
+	}()
+
+	resultLogs, err := t.Internal.Logs(ctx, id)
+	targetResults := struct {
+		Logs  []*sacloud.ESMELogs
+		Error error
+	}{
+		Logs:  resultLogs,
+		Error: err,
+	}
+	if d, err := json.Marshal(targetResults); err == nil {
+		log.Printf("[TRACE] \tresults: %s\n", string(d))
+	}
+
+	return resultLogs, err
 }
 
 /*************************************************
@@ -4188,6 +4494,41 @@ func (t *InternetTracer) Monitor(ctx context.Context, zone string, id types.ID, 
 	return resultRouterActivity, err
 }
 
+// MonitorRouter is API call with trace log
+func (t *InternetTracer) MonitorRouter(ctx context.Context, zone string, id types.ID, condition *sacloud.MonitorCondition) (*sacloud.RouterActivity, error) {
+	log.Println("[TRACE] InternetAPI.MonitorRouter start")
+	targetArguments := struct {
+		Argzone      string
+		Argid        types.ID                  `json:"id"`
+		Argcondition *sacloud.MonitorCondition `json:"condition"`
+	}{
+		Argzone:      zone,
+		Argid:        id,
+		Argcondition: condition,
+	}
+	if d, err := json.Marshal(targetArguments); err == nil {
+		log.Printf("[TRACE] \targs: %s\n", string(d))
+	}
+
+	defer func() {
+		log.Println("[TRACE] InternetAPI.MonitorRouter end")
+	}()
+
+	resultRouterActivity, err := t.Internal.MonitorRouter(ctx, zone, id, condition)
+	targetResults := struct {
+		RouterActivity *sacloud.RouterActivity
+		Error          error
+	}{
+		RouterActivity: resultRouterActivity,
+		Error:          err,
+	}
+	if d, err := json.Marshal(targetResults); err == nil {
+		log.Printf("[TRACE] \tresults: %s\n", string(d))
+	}
+
+	return resultRouterActivity, err
+}
+
 // EnableIPv6 is API call with trace log
 func (t *InternetTracer) EnableIPv6(ctx context.Context, zone string, id types.ID) (*sacloud.IPv6NetInfo, error) {
 	log.Println("[TRACE] InternetAPI.EnableIPv6 start")
@@ -4486,6 +4827,39 @@ func (t *IPv6NetTracer) List(ctx context.Context, zone string) (*sacloud.IPv6Net
 	result, err := t.Internal.List(ctx, zone)
 	targetResults := struct {
 		Result *sacloud.IPv6NetListResult
+		Error  error
+	}{
+		Result: result,
+		Error:  err,
+	}
+	if d, err := json.Marshal(targetResults); err == nil {
+		log.Printf("[TRACE] \tresults: %s\n", string(d))
+	}
+
+	return result, err
+}
+
+// Find is API call with trace log
+func (t *IPv6NetTracer) Find(ctx context.Context, zone string, conditions *sacloud.FindCondition) (*sacloud.IPv6NetFindResult, error) {
+	log.Println("[TRACE] IPv6NetAPI.Find start")
+	targetArguments := struct {
+		Argzone       string
+		Argconditions *sacloud.FindCondition `json:"conditions"`
+	}{
+		Argzone:       zone,
+		Argconditions: conditions,
+	}
+	if d, err := json.Marshal(targetArguments); err == nil {
+		log.Printf("[TRACE] \targs: %s\n", string(d))
+	}
+
+	defer func() {
+		log.Println("[TRACE] IPv6NetAPI.Find end")
+	}()
+
+	result, err := t.Internal.Find(ctx, zone, conditions)
+	targetResults := struct {
+		Result *sacloud.IPv6NetFindResult
 		Error  error
 	}{
 		Result: result,
@@ -6112,7 +6486,7 @@ func (t *MobileGatewayTracer) SetDNS(ctx context.Context, zone string, id types.
 }
 
 // GetSIMRoutes is API call with trace log
-func (t *MobileGatewayTracer) GetSIMRoutes(ctx context.Context, zone string, id types.ID) ([]*sacloud.MobileGatewaySIMRoute, error) {
+func (t *MobileGatewayTracer) GetSIMRoutes(ctx context.Context, zone string, id types.ID) (sacloud.MobileGatewaySIMRoutes, error) {
 	log.Println("[TRACE] MobileGatewayAPI.GetSIMRoutes start")
 	targetArguments := struct {
 		Argzone string
@@ -6131,7 +6505,7 @@ func (t *MobileGatewayTracer) GetSIMRoutes(ctx context.Context, zone string, id 
 
 	resultSIMRoutes, err := t.Internal.GetSIMRoutes(ctx, zone, id)
 	targetResults := struct {
-		SIMRoutes []*sacloud.MobileGatewaySIMRoute
+		SIMRoutes sacloud.MobileGatewaySIMRoutes
 		Error     error
 	}{
 		SIMRoutes: resultSIMRoutes,
@@ -6178,7 +6552,7 @@ func (t *MobileGatewayTracer) SetSIMRoutes(ctx context.Context, zone string, id 
 }
 
 // ListSIM is API call with trace log
-func (t *MobileGatewayTracer) ListSIM(ctx context.Context, zone string, id types.ID) ([]*sacloud.MobileGatewaySIMInfo, error) {
+func (t *MobileGatewayTracer) ListSIM(ctx context.Context, zone string, id types.ID) (sacloud.MobileGatewaySIMs, error) {
 	log.Println("[TRACE] MobileGatewayAPI.ListSIM start")
 	targetArguments := struct {
 		Argzone string
@@ -6197,7 +6571,7 @@ func (t *MobileGatewayTracer) ListSIM(ctx context.Context, zone string, id types
 
 	resultSIM, err := t.Internal.ListSIM(ctx, zone, id)
 	targetResults := struct {
-		SIM   []*sacloud.MobileGatewaySIMInfo
+		SIM   sacloud.MobileGatewaySIMs
 		Error error
 	}{
 		SIM:   resultSIM,
@@ -7109,16 +7483,18 @@ func (t *PacketFilterTracer) Read(ctx context.Context, zone string, id types.ID)
 }
 
 // Update is API call with trace log
-func (t *PacketFilterTracer) Update(ctx context.Context, zone string, id types.ID, param *sacloud.PacketFilterUpdateRequest) (*sacloud.PacketFilter, error) {
+func (t *PacketFilterTracer) Update(ctx context.Context, zone string, id types.ID, updateParam *sacloud.PacketFilterUpdateRequest, originalExpressionHash string) (*sacloud.PacketFilter, error) {
 	log.Println("[TRACE] PacketFilterAPI.Update start")
 	targetArguments := struct {
-		Argzone  string
-		Argid    types.ID                           `json:"id"`
-		Argparam *sacloud.PacketFilterUpdateRequest `json:"param"`
+		Argzone                   string
+		Argid                     types.ID                           `json:"id"`
+		ArgupdateParam            *sacloud.PacketFilterUpdateRequest `json:"updateParam"`
+		ArgoriginalExpressionHash string                             `json:"originalExpressionHash"`
 	}{
-		Argzone:  zone,
-		Argid:    id,
-		Argparam: param,
+		Argzone:                   zone,
+		Argid:                     id,
+		ArgupdateParam:            updateParam,
+		ArgoriginalExpressionHash: originalExpressionHash,
 	}
 	if d, err := json.Marshal(targetArguments); err == nil {
 		log.Printf("[TRACE] \targs: %s\n", string(d))
@@ -7128,7 +7504,7 @@ func (t *PacketFilterTracer) Update(ctx context.Context, zone string, id types.I
 		log.Println("[TRACE] PacketFilterAPI.Update end")
 	}()
 
-	resultPacketFilter, err := t.Internal.Update(ctx, zone, id, param)
+	resultPacketFilter, err := t.Internal.Update(ctx, zone, id, updateParam, originalExpressionHash)
 	targetResults := struct {
 		PacketFilter *sacloud.PacketFilter
 		Error        error
@@ -8435,6 +8811,41 @@ func (t *ServerTracer) Monitor(ctx context.Context, zone string, id types.ID, co
 	}()
 
 	resultCPUTimeActivity, err := t.Internal.Monitor(ctx, zone, id, condition)
+	targetResults := struct {
+		CPUTimeActivity *sacloud.CPUTimeActivity
+		Error           error
+	}{
+		CPUTimeActivity: resultCPUTimeActivity,
+		Error:           err,
+	}
+	if d, err := json.Marshal(targetResults); err == nil {
+		log.Printf("[TRACE] \tresults: %s\n", string(d))
+	}
+
+	return resultCPUTimeActivity, err
+}
+
+// MonitorCPU is API call with trace log
+func (t *ServerTracer) MonitorCPU(ctx context.Context, zone string, id types.ID, condition *sacloud.MonitorCondition) (*sacloud.CPUTimeActivity, error) {
+	log.Println("[TRACE] ServerAPI.MonitorCPU start")
+	targetArguments := struct {
+		Argzone      string
+		Argid        types.ID                  `json:"id"`
+		Argcondition *sacloud.MonitorCondition `json:"condition"`
+	}{
+		Argzone:      zone,
+		Argid:        id,
+		Argcondition: condition,
+	}
+	if d, err := json.Marshal(targetArguments); err == nil {
+		log.Printf("[TRACE] \targs: %s\n", string(d))
+	}
+
+	defer func() {
+		log.Println("[TRACE] ServerAPI.MonitorCPU end")
+	}()
+
+	resultCPUTimeActivity, err := t.Internal.MonitorCPU(ctx, zone, id, condition)
 	targetResults := struct {
 		CPUTimeActivity *sacloud.CPUTimeActivity
 		Error           error
