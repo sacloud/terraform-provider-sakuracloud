@@ -1,6 +1,9 @@
-## 2.4.2 (Unreleased)
+## 2.5.0 (Unreleased)
 
-*
+FEATURES
+
+* ESME [GH-772] (@yamamoto-febc)
+* libsacloud v2.8.1 [GH-771] (@yamamoto-febc)
 
 ## 2.4.1 (2020-09-17)
 
