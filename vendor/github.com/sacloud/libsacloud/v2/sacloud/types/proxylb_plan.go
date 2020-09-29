@@ -16,6 +16,7 @@ package types
 
 import (
 	"fmt"
+	"strings"
 )
 
 // EProxyLBPlan エンハンスドロードバランサのプラン
@@ -55,7 +56,7 @@ var ProxyLBPlans = struct {
 	CPS100000: EProxyLBPlan(100000),
 }
 
-// ProxyLBPlanValues プランを表すint値
+// ProxyLBPlanValues 有効なプランを表すint値
 var ProxyLBPlanValues = []int{
 	int(ProxyLBPlans.CPS100),
 	int(ProxyLBPlans.CPS500),
@@ -65,3 +66,14 @@ var ProxyLBPlanValues = []int{
 	int(ProxyLBPlans.CPS50000),
 	int(ProxyLBPlans.CPS100000),
 }
+
+// ProxyLBPlanString 有効なプランを表す文字列(スペース区切り)
+var ProxyLBPlanString = strings.Join([]string{
+	ProxyLBPlans.CPS100.String(),
+	ProxyLBPlans.CPS500.String(),
+	ProxyLBPlans.CPS1000.String(),
+	ProxyLBPlans.CPS5000.String(),
+	ProxyLBPlans.CPS10000.String(),
+	ProxyLBPlans.CPS50000.String(),
+	ProxyLBPlans.CPS100000.String(),
+}, " ")

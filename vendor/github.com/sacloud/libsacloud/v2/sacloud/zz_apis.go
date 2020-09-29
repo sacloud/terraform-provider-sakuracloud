@@ -175,6 +175,7 @@ type DiskAPI interface {
 	Update(ctx context.Context, zone string, id types.ID, param *DiskUpdateRequest) (*Disk, error)
 	Delete(ctx context.Context, zone string, id types.ID) error
 	Monitor(ctx context.Context, zone string, id types.ID, condition *MonitorCondition) (*DiskActivity, error)
+	MonitorDisk(ctx context.Context, zone string, id types.ID, condition *MonitorCondition) (*DiskActivity, error)
 }
 
 /*************************************************
@@ -199,6 +200,22 @@ type DNSAPI interface {
 	Update(ctx context.Context, id types.ID, param *DNSUpdateRequest) (*DNS, error)
 	UpdateSettings(ctx context.Context, id types.ID, param *DNSUpdateSettingsRequest) (*DNS, error)
 	Delete(ctx context.Context, id types.ID) error
+}
+
+/*************************************************
+* ESMEAPI
+*************************************************/
+
+// ESMEAPI is interface for operate ESME resource
+type ESMEAPI interface {
+	Find(ctx context.Context, conditions *FindCondition) (*ESMEFindResult, error)
+	Create(ctx context.Context, param *ESMECreateRequest) (*ESME, error)
+	Read(ctx context.Context, id types.ID) (*ESME, error)
+	Update(ctx context.Context, id types.ID, param *ESMEUpdateRequest) (*ESME, error)
+	Delete(ctx context.Context, id types.ID) error
+	SendMessageWithGeneratedOTP(ctx context.Context, id types.ID, param *ESMESendMessageWithGeneratedOTPRequest) (*ESMESendMessageResult, error)
+	SendMessageWithInputtedOTP(ctx context.Context, id types.ID, param *ESMESendMessageWithInputtedOTPRequest) (*ESMESendMessageResult, error)
+	Logs(ctx context.Context, id types.ID) ([]*ESMELogs, error)
 }
 
 /*************************************************
@@ -263,6 +280,7 @@ type InternetAPI interface {
 	UpdateSubnet(ctx context.Context, zone string, id types.ID, subnetID types.ID, param *InternetUpdateSubnetRequest) (*InternetSubnetOperationResult, error)
 	DeleteSubnet(ctx context.Context, zone string, id types.ID, subnetID types.ID) error
 	Monitor(ctx context.Context, zone string, id types.ID, condition *MonitorCondition) (*RouterActivity, error)
+	MonitorRouter(ctx context.Context, zone string, id types.ID, condition *MonitorCondition) (*RouterActivity, error)
 	EnableIPv6(ctx context.Context, zone string, id types.ID) (*IPv6NetInfo, error)
 	DisableIPv6(ctx context.Context, zone string, id types.ID, ipv6netID types.ID) error
 }
@@ -295,6 +313,7 @@ type IPAddressAPI interface {
 // IPv6NetAPI is interface for operate IPv6Net resource
 type IPv6NetAPI interface {
 	List(ctx context.Context, zone string) (*IPv6NetListResult, error)
+	Find(ctx context.Context, zone string, conditions *FindCondition) (*IPv6NetFindResult, error)
 	Read(ctx context.Context, zone string, id types.ID) (*IPv6Net, error)
 }
 
@@ -390,9 +409,9 @@ type MobileGatewayAPI interface {
 	DisconnectFromSwitch(ctx context.Context, zone string, id types.ID) error
 	GetDNS(ctx context.Context, zone string, id types.ID) (*MobileGatewayDNSSetting, error)
 	SetDNS(ctx context.Context, zone string, id types.ID, param *MobileGatewayDNSSetting) error
-	GetSIMRoutes(ctx context.Context, zone string, id types.ID) ([]*MobileGatewaySIMRoute, error)
+	GetSIMRoutes(ctx context.Context, zone string, id types.ID) (MobileGatewaySIMRoutes, error)
 	SetSIMRoutes(ctx context.Context, zone string, id types.ID, param []*MobileGatewaySIMRouteParam) error
-	ListSIM(ctx context.Context, zone string, id types.ID) ([]*MobileGatewaySIMInfo, error)
+	ListSIM(ctx context.Context, zone string, id types.ID) (MobileGatewaySIMs, error)
 	AddSIM(ctx context.Context, zone string, id types.ID, param *MobileGatewayAddSIMRequest) error
 	DeleteSIM(ctx context.Context, zone string, id types.ID, simID types.ID) error
 	Logs(ctx context.Context, zone string, id types.ID) ([]*MobileGatewaySIMLogs, error)
@@ -443,7 +462,7 @@ type PacketFilterAPI interface {
 	Find(ctx context.Context, zone string, conditions *FindCondition) (*PacketFilterFindResult, error)
 	Create(ctx context.Context, zone string, param *PacketFilterCreateRequest) (*PacketFilter, error)
 	Read(ctx context.Context, zone string, id types.ID) (*PacketFilter, error)
-	Update(ctx context.Context, zone string, id types.ID, param *PacketFilterUpdateRequest) (*PacketFilter, error)
+	Update(ctx context.Context, zone string, id types.ID, updateParam *PacketFilterUpdateRequest, originalExpressionHash string) (*PacketFilter, error)
 	Delete(ctx context.Context, zone string, id types.ID) error
 }
 
@@ -522,6 +541,7 @@ type ServerAPI interface {
 	SendKey(ctx context.Context, zone string, id types.ID, keyboardParam *SendKeyRequest) error
 	GetVNCProxy(ctx context.Context, zone string, id types.ID) (*VNCProxyInfo, error)
 	Monitor(ctx context.Context, zone string, id types.ID, condition *MonitorCondition) (*CPUTimeActivity, error)
+	MonitorCPU(ctx context.Context, zone string, id types.ID, condition *MonitorCondition) (*CPUTimeActivity, error)
 }
 
 /*************************************************

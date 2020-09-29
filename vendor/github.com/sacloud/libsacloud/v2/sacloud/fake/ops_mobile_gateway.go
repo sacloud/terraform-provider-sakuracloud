@@ -284,7 +284,7 @@ func (o *MobileGatewayOp) SetDNS(ctx context.Context, zone string, id types.ID, 
 }
 
 // GetSIMRoutes is fake implementation
-func (o *MobileGatewayOp) GetSIMRoutes(ctx context.Context, zone string, id types.ID) ([]*sacloud.MobileGatewaySIMRoute, error) {
+func (o *MobileGatewayOp) GetSIMRoutes(ctx context.Context, zone string, id types.ID) (sacloud.MobileGatewaySIMRoutes, error) {
 	_, err := o.Read(ctx, zone, id)
 	if err != nil {
 		return nil, err
@@ -327,7 +327,7 @@ func (o *MobileGatewayOp) SetSIMRoutes(ctx context.Context, zone string, id type
 }
 
 // ListSIM is fake implementation
-func (o *MobileGatewayOp) ListSIM(ctx context.Context, zone string, id types.ID) ([]*sacloud.MobileGatewaySIMInfo, error) {
+func (o *MobileGatewayOp) ListSIM(ctx context.Context, zone string, id types.ID) (sacloud.MobileGatewaySIMs, error) {
 	_, err := o.Read(ctx, zone, id)
 	if err != nil {
 		return nil, err

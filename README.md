@@ -36,7 +36,7 @@ provider "sakuracloud" {
 variable password {}
 
 data "sakuracloud_archive" "ubuntu" {
-  os_type = "ubuntu"
+  os_type = "ubuntu2004"
 }
 
 resource "sakuracloud_disk" "example" {

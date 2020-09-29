@@ -103,7 +103,7 @@ func flattenMobileGatewayPrivateNetworks(mgw *sacloud.MobileGateway) []interface
 	if len(mgw.Interfaces) > 1 && !mgw.Interfaces[1].SwitchID.IsEmpty() {
 		switchID := mgw.Interfaces[1].SwitchID
 		var setting *sacloud.MobileGatewayInterfaceSetting
-		for _, s := range mgw.Settings.Interfaces {
+		for _, s := range mgw.InterfaceSettings {
 			if s.Index == 1 {
 				setting = s
 			}

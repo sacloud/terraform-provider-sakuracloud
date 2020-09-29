@@ -356,6 +356,11 @@ func (o *InternetOp) Monitor(ctx context.Context, zone string, id types.ID, cond
 	return res, nil
 }
 
+// MonitorRouter is fake implementation
+func (o *InternetOp) MonitorRouter(ctx context.Context, zone string, id types.ID, condition *sacloud.MonitorCondition) (*sacloud.RouterActivity, error) {
+	return o.Monitor(ctx, zone, id, condition)
+}
+
 // EnableIPv6 is fake implementation
 func (o *InternetOp) EnableIPv6(ctx context.Context, zone string, id types.ID) (*sacloud.IPv6NetInfo, error) {
 	value, err := o.Read(ctx, zone, id)

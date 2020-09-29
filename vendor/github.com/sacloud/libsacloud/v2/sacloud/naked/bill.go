@@ -33,14 +33,17 @@ type Bill struct {
 
 // BillDetail 支払い明細情報
 type BillDetail struct {
-	ID             types.ID   `json:"ContractID,omitempty" yaml:"contract_id,omitempty" structs:",omitempty"` // 契約ID
-	Amount         int64      `json:",omitempty" yaml:"amount,omitempty" structs:",omitempty"`                // 金額
-	Description    string     `yaml:"description"`                                                            // 説明
-	Index          int        `json:",omitempty" yaml:"index,omitempty" structs:",omitempty"`                 // インデックス
-	ServiceClassID types.ID   `json:",omitempty" yaml:"service_class_id,omitempty" structs:",omitempty"`      // サービスクラスID
-	Usage          int64      `json:",omitempty" yaml:"usage,omitempty" structs:",omitempty"`                 // 秒数
-	Zone           string     `json:",omitempty" yaml:"zone,omitempty" structs:",omitempty"`                  // ゾーン
-	ContractEndAt  *time.Time `json:",omitempty" yaml:"contract_end_at,omitempty" structs:",omitempty"`       // 契約終了日時
+	ID               types.ID   `json:"ContractID,omitempty" yaml:"contract_id,omitempty" structs:",omitempty"` // 契約ID
+	Amount           int64      `json:",omitempty" yaml:"amount,omitempty" structs:",omitempty"`                // 金額
+	Description      string     `yaml:"description"`                                                            // 説明
+	Index            int        `json:",omitempty" yaml:"index,omitempty" structs:",omitempty"`                 // インデックス
+	ServiceClassID   types.ID   `json:",omitempty" yaml:"service_class_id,omitempty" structs:",omitempty"`      // サービスクラスID
+	ServiceClassPath string     `json:",omitempty" yaml:"service_class_path,omitempty" structs:",omitempty"`    // サービスクラスパス
+	Usage            int64      `json:",omitempty" yaml:"usage,omitempty" structs:",omitempty"`                 // 利用量(秒数など)
+	FormattedUsage   string     `json:",omitempty" yaml:"formatted_usage,omitempty" structs:",omitempty"`       // 利用量(フォーマット済)
+	ServiceUsagePath string     `json:",omitempty" yaml:"service_class_path,omitempty" structs:",omitempty"`    // サービス利用量の種類
+	Zone             string     `json:",omitempty" yaml:"zone,omitempty" structs:",omitempty"`                  // ゾーン
+	ContractEndAt    *time.Time `json:",omitempty" yaml:"contract_end_at,omitempty" structs:",omitempty"`       // 契約終了日時
 }
 
 // IsContractEnded 支払済か判定

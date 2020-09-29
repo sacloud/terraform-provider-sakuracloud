@@ -36,6 +36,9 @@ var ArchiveCriteria = map[ArchiveOSType]search.Filter{
 	Ubuntu: {
 		search.Key(keys.Tags): search.TagsAndEqual("current-stable", "distro-ubuntu"),
 	},
+	Ubuntu2004: {
+		search.Key(keys.Tags): search.TagsAndEqual("ubuntu-20.04-latest"),
+	},
 	Ubuntu1804: {
 		search.Key(keys.Tags): search.TagsAndEqual("ubuntu-18.04-latest"),
 	},
@@ -109,10 +112,6 @@ var ArchiveCriteria = map[ArchiveOSType]search.Filter{
 	Windows2019RDS: {
 		search.Key(keys.Tags): search.TagsAndEqual("os-windows", "distro-ver-2019", "windows-rds"),
 		search.Key(keys.Name): search.OrEqual("Windows Server 2019 for RDS"),
-	},
-	Windows2019RDSOffice2016: {
-		search.Key(keys.Tags): search.TagsAndEqual("os-windows", "distro-ver-2019", "windows-rds", "with-office"),
-		search.Key(keys.Name): search.OrEqual("Windows Server 2019 for RDS(MS Office付)"),
 	},
 	Windows2019RDSOffice2019: {
 		search.Key(keys.Tags): search.TagsAndEqual("os-windows", "distro-ver-2019", "windows-rds", "with-office"),

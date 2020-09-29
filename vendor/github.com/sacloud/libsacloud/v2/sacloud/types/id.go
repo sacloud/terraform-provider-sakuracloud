@@ -71,3 +71,44 @@ func StringID(id string) ID {
 	intID, _ := strconv.ParseInt(id, 10, 64)
 	return ID(intID)
 }
+
+// IDs IDのコレクション型
+type IDs []ID
+
+// StringSlice stringスライスを返す
+func (i IDs) StringSlice() []string {
+	var ret []string
+	for _, id := range i {
+		ret = append(ret, id.String())
+	}
+	return ret
+}
+
+// Int64Slice Int64スライスを返す
+func (i IDs) Int64Slice() []int64 {
+	var ret []int64
+	for _, id := range i {
+		ret = append(ret, id.Int64())
+	}
+	return ret
+}
+
+// IsEmptyAll すべてゼロ値な場合にtrueを返す
+func (i IDs) IsEmptyAll() bool {
+	for _, id := range i {
+		if !id.IsEmpty() {
+			return false
+		}
+	}
+	return true
+}
+
+// IsEmptyAny 1つでもゼロ値な場合にtrueを返す
+func (i IDs) IsEmptyAny() bool {
+	for _, id := range i {
+		if id.IsEmpty() {
+			return true
+		}
+	}
+	return false
+}

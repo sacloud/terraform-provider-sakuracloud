@@ -395,3 +395,8 @@ func (o *ServerOp) Monitor(ctx context.Context, zone string, id types.ID, condit
 
 	return res, nil
 }
+
+// MonitorCPU is fake implementation
+func (o *ServerOp) MonitorCPU(ctx context.Context, zone string, id types.ID, condition *sacloud.MonitorCondition) (*sacloud.CPUTimeActivity, error) {
+	return o.Monitor(ctx, zone, id, condition)
+}

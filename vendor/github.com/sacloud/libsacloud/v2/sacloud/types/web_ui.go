@@ -14,7 +14,10 @@
 
 package types
 
-import "encoding/json"
+import (
+	"encoding/json"
+	"fmt"
+)
 
 // WebUI データベースアプライアンスでのUI設定
 type WebUI string
@@ -31,6 +34,11 @@ func (w *WebUI) Bool() bool {
 		return false
 	}
 	return true
+}
+
+// ToWebUI bool値からWebUI型へ変換
+func ToWebUI(v bool) WebUI {
+	return WebUI(fmt.Sprintf("%t", v))
 }
 
 // MarshalJSON boolとstring両方に対応するための実装

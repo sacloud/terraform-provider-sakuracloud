@@ -355,3 +355,8 @@ func (o *DiskOp) Monitor(ctx context.Context, zone string, id types.ID, conditio
 
 	return res, nil
 }
+
+// MonitorDisk is fake implementation
+func (o *DiskOp) MonitorDisk(ctx context.Context, zone string, id types.ID, condition *sacloud.MonitorCondition) (*sacloud.DiskActivity, error) {
+	return o.Monitor(ctx, zone, id, condition)
+}

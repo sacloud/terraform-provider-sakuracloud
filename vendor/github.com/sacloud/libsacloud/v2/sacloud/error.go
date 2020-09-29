@@ -15,6 +15,7 @@
 package sacloud
 
 import (
+	"errors"
 	"fmt"
 	"net/http"
 	"net/url"
@@ -31,6 +32,26 @@ func IsNotFoundError(err error) bool {
 	}
 
 	return false
+}
+
+// IsNoResultsError 指定のerrorがNoResultErrorであるか判定
+func IsNoResultsError(err error) bool {
+	if err == nil {
+		return false
+	}
+
+	_, ok := err.(*NoResultsError)
+	return ok
+}
+
+// NoResultError APIが返した応答に処理すべきデータが含まれていない場合を示すエラー型
+type NoResultsError struct {
+	error
+}
+
+// NewNoResultsError NoResultErrorを返す
+func NewNoResultsError() *NoResultsError {
+	return &NoResultsError{error: errors.New("no results")}
 }
 
 // APIErrorResponse APIエラー型

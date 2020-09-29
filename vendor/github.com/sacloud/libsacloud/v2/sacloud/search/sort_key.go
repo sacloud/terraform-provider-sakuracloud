@@ -35,6 +35,22 @@ type SortKey struct {
 	Order SortOrder
 }
 
+// SortKeyAsc 昇順ソートキー
+func SortKeyAsc(key string) SortKey {
+	return SortKey{
+		Key:   key,
+		Order: SortAsc,
+	}
+}
+
+// SortKeyDesc 降順ソートキー
+func SortKeyDesc(key string) SortKey {
+	return SortKey{
+		Key:   key,
+		Order: SortDesc,
+	}
+}
+
 // MarshalJSON キーの文字列表現
 func (k SortKey) MarshalJSON() ([]byte, error) {
 	s := k.Key

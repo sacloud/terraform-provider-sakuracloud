@@ -38,6 +38,23 @@ func (o *IPv6NetOp) List(ctx context.Context, zone string) (*sacloud.IPv6NetList
 	}, nil
 }
 
+// List is fake implementation
+func (o *IPv6NetOp) Find(ctx context.Context, zone string, conditions *sacloud.FindCondition) (*sacloud.IPv6NetFindResult, error) {
+	results, _ := find(o.key, zone, nil)
+	var values []*sacloud.IPv6Net
+	for _, res := range results {
+		dest := &sacloud.IPv6Net{}
+		copySameNameField(res, dest)
+		values = append(values, dest)
+	}
+	return &sacloud.IPv6NetFindResult{
+		Total:    len(results),
+		Count:    len(results),
+		From:     0,
+		IPv6Nets: values,
+	}, nil
+}
+
 // Read is fake implementation
 func (o *IPv6NetOp) Read(ctx context.Context, zone string, id types.ID) (*sacloud.IPv6Net, error) {
 	value := getIPv6NetByID(zone, id)

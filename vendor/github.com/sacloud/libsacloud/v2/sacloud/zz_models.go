@@ -2325,13 +2325,16 @@ func (o *Bill) SetPaymentClassID(v types.ID) {
 
 // BillDetail represents API parameter/response structure
 type BillDetail struct {
-	ID             types.ID
-	Amount         int64
-	Description    string `validate:"min=0,max=512"`
-	ServiceClassID types.ID
-	Usage          int64
-	Zone           string
-	ContractEndAt  time.Time
+	ID               types.ID
+	Amount           int64
+	Description      string `validate:"min=0,max=512"`
+	ServiceClassID   types.ID
+	ServiceClassPath string
+	Usage            int64
+	FormattedUsage   string
+	ServiceUsagePath string
+	Zone             string
+	ContractEndAt    time.Time
 }
 
 // Validate validates by field tags
@@ -2342,21 +2345,27 @@ func (o *BillDetail) Validate() error {
 // setDefaults implements sacloud.argumentDefaulter
 func (o *BillDetail) setDefaults() interface{} {
 	return &struct {
-		ID             types.ID
-		Amount         int64
-		Description    string `validate:"min=0,max=512"`
-		ServiceClassID types.ID
-		Usage          int64
-		Zone           string
-		ContractEndAt  time.Time
+		ID               types.ID
+		Amount           int64
+		Description      string `validate:"min=0,max=512"`
+		ServiceClassID   types.ID
+		ServiceClassPath string
+		Usage            int64
+		FormattedUsage   string
+		ServiceUsagePath string
+		Zone             string
+		ContractEndAt    time.Time
 	}{
-		ID:             o.GetID(),
-		Amount:         o.GetAmount(),
-		Description:    o.GetDescription(),
-		ServiceClassID: o.GetServiceClassID(),
-		Usage:          o.GetUsage(),
-		Zone:           o.GetZone(),
-		ContractEndAt:  o.GetContractEndAt(),
+		ID:               o.GetID(),
+		Amount:           o.GetAmount(),
+		Description:      o.GetDescription(),
+		ServiceClassID:   o.GetServiceClassID(),
+		ServiceClassPath: o.GetServiceClassPath(),
+		Usage:            o.GetUsage(),
+		FormattedUsage:   o.GetFormattedUsage(),
+		ServiceUsagePath: o.GetServiceUsagePath(),
+		Zone:             o.GetZone(),
+		ContractEndAt:    o.GetContractEndAt(),
 	}
 }
 
@@ -2420,6 +2429,16 @@ func (o *BillDetail) SetServiceClassID(v types.ID) {
 	o.ServiceClassID = v
 }
 
+// GetServiceClassPath returns value of ServiceClassPath
+func (o *BillDetail) GetServiceClassPath() string {
+	return o.ServiceClassPath
+}
+
+// SetServiceClassPath sets value to ServiceClassPath
+func (o *BillDetail) SetServiceClassPath(v string) {
+	o.ServiceClassPath = v
+}
+
 // GetUsage returns value of Usage
 func (o *BillDetail) GetUsage() int64 {
 	return o.Usage
@@ -2428,6 +2447,26 @@ func (o *BillDetail) GetUsage() int64 {
 // SetUsage sets value to Usage
 func (o *BillDetail) SetUsage(v int64) {
 	o.Usage = v
+}
+
+// GetFormattedUsage returns value of FormattedUsage
+func (o *BillDetail) GetFormattedUsage() string {
+	return o.FormattedUsage
+}
+
+// SetFormattedUsage sets value to FormattedUsage
+func (o *BillDetail) SetFormattedUsage(v string) {
+	o.FormattedUsage = v
+}
+
+// GetServiceUsagePath returns value of ServiceUsagePath
+func (o *BillDetail) GetServiceUsagePath() string {
+	return o.ServiceUsagePath
+}
+
+// SetServiceUsagePath sets value to ServiceUsagePath
+func (o *BillDetail) SetServiceUsagePath(v string) {
+	o.ServiceUsagePath = v
 }
 
 // GetZone returns value of Zone
@@ -8051,10 +8090,10 @@ type DNS struct {
 	IconID         types.ID `mapconv:"Icon.ID"`
 	CreatedAt      time.Time
 	ModifiedAt     time.Time
-	Records        []*DNSRecord `mapconv:"Settings.DNS.[]ResourceRecordSets,recursive" validate:"min=0,max=1000"`
-	SettingsHash   string       `json:",omitempty" mapconv:",omitempty"`
-	DNSZone        string       `mapconv:"Status.Zone"`
-	DNSNameServers []string     `mapconv:"Status.NS"`
+	Records        DNSRecords `mapconv:"Settings.DNS.[]ResourceRecordSets,recursive" validate:"min=0,max=1000"`
+	SettingsHash   string     `json:",omitempty" mapconv:",omitempty"`
+	DNSZone        string     `mapconv:"Status.Zone"`
+	DNSNameServers []string   `mapconv:"Status.NS"`
 }
 
 // Validate validates by field tags
@@ -8073,10 +8112,10 @@ func (o *DNS) setDefaults() interface{} {
 		IconID         types.ID `mapconv:"Icon.ID"`
 		CreatedAt      time.Time
 		ModifiedAt     time.Time
-		Records        []*DNSRecord `mapconv:"Settings.DNS.[]ResourceRecordSets,recursive" validate:"min=0,max=1000"`
-		SettingsHash   string       `json:",omitempty" mapconv:",omitempty"`
-		DNSZone        string       `mapconv:"Status.Zone"`
-		DNSNameServers []string     `mapconv:"Status.NS"`
+		Records        DNSRecords `mapconv:"Settings.DNS.[]ResourceRecordSets,recursive" validate:"min=0,max=1000"`
+		SettingsHash   string     `json:",omitempty" mapconv:",omitempty"`
+		DNSZone        string     `mapconv:"Status.Zone"`
+		DNSNameServers []string   `mapconv:"Status.NS"`
 	}{
 		ID:             o.GetID(),
 		Name:           o.GetName(),
@@ -8214,12 +8253,12 @@ func (o *DNS) SetModifiedAt(v time.Time) {
 }
 
 // GetRecords returns value of Records
-func (o *DNS) GetRecords() []*DNSRecord {
+func (o *DNS) GetRecords() DNSRecords {
 	return o.Records
 }
 
 // SetRecords sets value to Records
-func (o *DNS) SetRecords(v []*DNSRecord) {
+func (o *DNS) SetRecords(v DNSRecords) {
 	o.Records = v
 }
 
@@ -8331,9 +8370,9 @@ func (o *DNSRecord) SetTTL(v int) {
 
 // DNSCreateRequest represents API parameter/response structure
 type DNSCreateRequest struct {
-	Name        string       `mapconv:"Name/Status.Zone" validate:"required"`
-	Records     []*DNSRecord `mapconv:"Settings.DNS.[]ResourceRecordSets,recursive" validate:"min=0,max=1000"`
-	Description string       `validate:"min=0,max=512"`
+	Name        string     `mapconv:"Name/Status.Zone" validate:"required"`
+	Records     DNSRecords `mapconv:"Settings.DNS.[]ResourceRecordSets,recursive" validate:"min=0,max=1000"`
+	Description string     `validate:"min=0,max=512"`
 	Tags        types.Tags
 	IconID      types.ID `mapconv:"Icon.ID"`
 }
@@ -8346,9 +8385,9 @@ func (o *DNSCreateRequest) Validate() error {
 // setDefaults implements sacloud.argumentDefaulter
 func (o *DNSCreateRequest) setDefaults() interface{} {
 	return &struct {
-		Name        string       `mapconv:"Name/Status.Zone" validate:"required"`
-		Records     []*DNSRecord `mapconv:"Settings.DNS.[]ResourceRecordSets,recursive" validate:"min=0,max=1000"`
-		Description string       `validate:"min=0,max=512"`
+		Name        string     `mapconv:"Name/Status.Zone" validate:"required"`
+		Records     DNSRecords `mapconv:"Settings.DNS.[]ResourceRecordSets,recursive" validate:"min=0,max=1000"`
+		Description string     `validate:"min=0,max=512"`
 		Tags        types.Tags
 		IconID      types.ID `mapconv:"Icon.ID"`
 		Class       string   `mapconv:"Provider.Class"`
@@ -8373,12 +8412,12 @@ func (o *DNSCreateRequest) SetName(v string) {
 }
 
 // GetRecords returns value of Records
-func (o *DNSCreateRequest) GetRecords() []*DNSRecord {
+func (o *DNSCreateRequest) GetRecords() DNSRecords {
 	return o.Records
 }
 
 // SetRecords sets value to Records
-func (o *DNSCreateRequest) SetRecords(v []*DNSRecord) {
+func (o *DNSCreateRequest) SetRecords(v DNSRecords) {
 	o.Records = v
 }
 
@@ -8440,9 +8479,9 @@ func (o *DNSCreateRequest) SetIconID(v types.ID) {
 type DNSUpdateRequest struct {
 	Description  string `validate:"min=0,max=512"`
 	Tags         types.Tags
-	IconID       types.ID     `mapconv:"Icon.ID"`
-	Records      []*DNSRecord `mapconv:"Settings.DNS.[]ResourceRecordSets,recursive" validate:"min=0,max=1000"`
-	SettingsHash string       `json:",omitempty" mapconv:",omitempty"`
+	IconID       types.ID   `mapconv:"Icon.ID"`
+	Records      DNSRecords `mapconv:"Settings.DNS.[]ResourceRecordSets,recursive" validate:"min=0,max=1000"`
+	SettingsHash string     `json:",omitempty" mapconv:",omitempty"`
 }
 
 // Validate validates by field tags
@@ -8455,9 +8494,9 @@ func (o *DNSUpdateRequest) setDefaults() interface{} {
 	return &struct {
 		Description  string `validate:"min=0,max=512"`
 		Tags         types.Tags
-		IconID       types.ID     `mapconv:"Icon.ID"`
-		Records      []*DNSRecord `mapconv:"Settings.DNS.[]ResourceRecordSets,recursive" validate:"min=0,max=1000"`
-		SettingsHash string       `json:",omitempty" mapconv:",omitempty"`
+		IconID       types.ID   `mapconv:"Icon.ID"`
+		Records      DNSRecords `mapconv:"Settings.DNS.[]ResourceRecordSets,recursive" validate:"min=0,max=1000"`
+		SettingsHash string     `json:",omitempty" mapconv:",omitempty"`
 	}{
 		Description:  o.GetDescription(),
 		Tags:         o.GetTags(),
@@ -8518,12 +8557,12 @@ func (o *DNSUpdateRequest) SetIconID(v types.ID) {
 }
 
 // GetRecords returns value of Records
-func (o *DNSUpdateRequest) GetRecords() []*DNSRecord {
+func (o *DNSUpdateRequest) GetRecords() DNSRecords {
 	return o.Records
 }
 
 // SetRecords sets value to Records
-func (o *DNSUpdateRequest) SetRecords(v []*DNSRecord) {
+func (o *DNSUpdateRequest) SetRecords(v DNSRecords) {
 	o.Records = v
 }
 
@@ -8543,8 +8582,8 @@ func (o *DNSUpdateRequest) SetSettingsHash(v string) {
 
 // DNSUpdateSettingsRequest represents API parameter/response structure
 type DNSUpdateSettingsRequest struct {
-	Records      []*DNSRecord `mapconv:"Settings.DNS.[]ResourceRecordSets,recursive" validate:"min=0,max=1000"`
-	SettingsHash string       `json:",omitempty" mapconv:",omitempty"`
+	Records      DNSRecords `mapconv:"Settings.DNS.[]ResourceRecordSets,recursive" validate:"min=0,max=1000"`
+	SettingsHash string     `json:",omitempty" mapconv:",omitempty"`
 }
 
 // Validate validates by field tags
@@ -8555,8 +8594,8 @@ func (o *DNSUpdateSettingsRequest) Validate() error {
 // setDefaults implements sacloud.argumentDefaulter
 func (o *DNSUpdateSettingsRequest) setDefaults() interface{} {
 	return &struct {
-		Records      []*DNSRecord `mapconv:"Settings.DNS.[]ResourceRecordSets,recursive" validate:"min=0,max=1000"`
-		SettingsHash string       `json:",omitempty" mapconv:",omitempty"`
+		Records      DNSRecords `mapconv:"Settings.DNS.[]ResourceRecordSets,recursive" validate:"min=0,max=1000"`
+		SettingsHash string     `json:",omitempty" mapconv:",omitempty"`
 	}{
 		Records:      o.GetRecords(),
 		SettingsHash: o.GetSettingsHash(),
@@ -8564,12 +8603,12 @@ func (o *DNSUpdateSettingsRequest) setDefaults() interface{} {
 }
 
 // GetRecords returns value of Records
-func (o *DNSUpdateSettingsRequest) GetRecords() []*DNSRecord {
+func (o *DNSUpdateSettingsRequest) GetRecords() DNSRecords {
 	return o.Records
 }
 
 // SetRecords sets value to Records
-func (o *DNSUpdateSettingsRequest) SetRecords(v []*DNSRecord) {
+func (o *DNSUpdateSettingsRequest) SetRecords(v DNSRecords) {
 	o.Records = v
 }
 
@@ -8581,6 +8620,635 @@ func (o *DNSUpdateSettingsRequest) GetSettingsHash() string {
 // SetSettingsHash sets value to SettingsHash
 func (o *DNSUpdateSettingsRequest) SetSettingsHash(v string) {
 	o.SettingsHash = v
+}
+
+/*************************************************
+* ESME
+*************************************************/
+
+// ESME represents API parameter/response structure
+type ESME struct {
+	ID           types.ID
+	Name         string `validate:"required"`
+	Description  string `validate:"min=0,max=512"`
+	Tags         types.Tags
+	Availability types.EAvailability
+	IconID       types.ID `mapconv:"Icon.ID"`
+	CreatedAt    time.Time
+	ModifiedAt   time.Time
+}
+
+// Validate validates by field tags
+func (o *ESME) Validate() error {
+	return validate.Struct(o)
+}
+
+// setDefaults implements sacloud.argumentDefaulter
+func (o *ESME) setDefaults() interface{} {
+	return &struct {
+		ID           types.ID
+		Name         string `validate:"required"`
+		Description  string `validate:"min=0,max=512"`
+		Tags         types.Tags
+		Availability types.EAvailability
+		IconID       types.ID `mapconv:"Icon.ID"`
+		CreatedAt    time.Time
+		ModifiedAt   time.Time
+	}{
+		ID:           o.GetID(),
+		Name:         o.GetName(),
+		Description:  o.GetDescription(),
+		Tags:         o.GetTags(),
+		Availability: o.GetAvailability(),
+		IconID:       o.GetIconID(),
+		CreatedAt:    o.GetCreatedAt(),
+		ModifiedAt:   o.GetModifiedAt(),
+	}
+}
+
+// GetID returns value of ID
+func (o *ESME) GetID() types.ID {
+	return o.ID
+}
+
+// SetID sets value to ID
+func (o *ESME) SetID(v types.ID) {
+	o.ID = v
+}
+
+// SetStringID .
+func (o *ESME) SetStringID(id string) {
+	accessor.SetStringID(o, id)
+}
+
+// GetStringID .
+func (o *ESME) GetStringID() string {
+	return accessor.GetStringID(o)
+}
+
+// SetInt64ID .
+func (o *ESME) SetInt64ID(id int64) {
+	accessor.SetInt64ID(o, id)
+}
+
+// GetInt64ID .
+func (o *ESME) GetInt64ID() int64 {
+	return accessor.GetInt64ID(o)
+}
+
+// GetName returns value of Name
+func (o *ESME) GetName() string {
+	return o.Name
+}
+
+// SetName sets value to Name
+func (o *ESME) SetName(v string) {
+	o.Name = v
+}
+
+// GetDescription returns value of Description
+func (o *ESME) GetDescription() string {
+	return o.Description
+}
+
+// SetDescription sets value to Description
+func (o *ESME) SetDescription(v string) {
+	o.Description = v
+}
+
+// GetTags returns value of Tags
+func (o *ESME) GetTags() types.Tags {
+	return o.Tags
+}
+
+// SetTags sets value to Tags
+func (o *ESME) SetTags(v types.Tags) {
+	o.Tags = v
+}
+
+// HasTag 指定のタグが存在する場合trueを返す
+func (o *ESME) HasTag(tag string) bool {
+	return accessor.HasTag(o, tag)
+}
+
+// AppendTag 指定のタグを追加
+func (o *ESME) AppendTag(tag string) {
+	accessor.AppendTag(o, tag)
+}
+
+// RemoveTag 指定のタグを削除
+func (o *ESME) RemoveTag(tag string) {
+	accessor.RemoveTag(o, tag)
+}
+
+// ClearTags タグを全クリア
+func (o *ESME) ClearTags() {
+	accessor.ClearTags(o)
+}
+
+// GetAvailability returns value of Availability
+func (o *ESME) GetAvailability() types.EAvailability {
+	return o.Availability
+}
+
+// SetAvailability sets value to Availability
+func (o *ESME) SetAvailability(v types.EAvailability) {
+	o.Availability = v
+}
+
+// GetIconID returns value of IconID
+func (o *ESME) GetIconID() types.ID {
+	return o.IconID
+}
+
+// SetIconID sets value to IconID
+func (o *ESME) SetIconID(v types.ID) {
+	o.IconID = v
+}
+
+// GetCreatedAt returns value of CreatedAt
+func (o *ESME) GetCreatedAt() time.Time {
+	return o.CreatedAt
+}
+
+// SetCreatedAt sets value to CreatedAt
+func (o *ESME) SetCreatedAt(v time.Time) {
+	o.CreatedAt = v
+}
+
+// GetModifiedAt returns value of ModifiedAt
+func (o *ESME) GetModifiedAt() time.Time {
+	return o.ModifiedAt
+}
+
+// SetModifiedAt sets value to ModifiedAt
+func (o *ESME) SetModifiedAt(v time.Time) {
+	o.ModifiedAt = v
+}
+
+/*************************************************
+* ESMECreateRequest
+*************************************************/
+
+// ESMECreateRequest represents API parameter/response structure
+type ESMECreateRequest struct {
+	Name        string `validate:"required"`
+	Description string `validate:"min=0,max=512"`
+	Tags        types.Tags
+	IconID      types.ID `mapconv:"Icon.ID"`
+}
+
+// Validate validates by field tags
+func (o *ESMECreateRequest) Validate() error {
+	return validate.Struct(o)
+}
+
+// setDefaults implements sacloud.argumentDefaulter
+func (o *ESMECreateRequest) setDefaults() interface{} {
+	return &struct {
+		Name        string `validate:"required"`
+		Description string `validate:"min=0,max=512"`
+		Tags        types.Tags
+		IconID      types.ID `mapconv:"Icon.ID"`
+		Class       string   `mapconv:"Provider.Class"`
+	}{
+		Name:        o.GetName(),
+		Description: o.GetDescription(),
+		Tags:        o.GetTags(),
+		IconID:      o.GetIconID(),
+		Class:       "esme",
+	}
+}
+
+// GetName returns value of Name
+func (o *ESMECreateRequest) GetName() string {
+	return o.Name
+}
+
+// SetName sets value to Name
+func (o *ESMECreateRequest) SetName(v string) {
+	o.Name = v
+}
+
+// GetDescription returns value of Description
+func (o *ESMECreateRequest) GetDescription() string {
+	return o.Description
+}
+
+// SetDescription sets value to Description
+func (o *ESMECreateRequest) SetDescription(v string) {
+	o.Description = v
+}
+
+// GetTags returns value of Tags
+func (o *ESMECreateRequest) GetTags() types.Tags {
+	return o.Tags
+}
+
+// SetTags sets value to Tags
+func (o *ESMECreateRequest) SetTags(v types.Tags) {
+	o.Tags = v
+}
+
+// HasTag 指定のタグが存在する場合trueを返す
+func (o *ESMECreateRequest) HasTag(tag string) bool {
+	return accessor.HasTag(o, tag)
+}
+
+// AppendTag 指定のタグを追加
+func (o *ESMECreateRequest) AppendTag(tag string) {
+	accessor.AppendTag(o, tag)
+}
+
+// RemoveTag 指定のタグを削除
+func (o *ESMECreateRequest) RemoveTag(tag string) {
+	accessor.RemoveTag(o, tag)
+}
+
+// ClearTags タグを全クリア
+func (o *ESMECreateRequest) ClearTags() {
+	accessor.ClearTags(o)
+}
+
+// GetIconID returns value of IconID
+func (o *ESMECreateRequest) GetIconID() types.ID {
+	return o.IconID
+}
+
+// SetIconID sets value to IconID
+func (o *ESMECreateRequest) SetIconID(v types.ID) {
+	o.IconID = v
+}
+
+/*************************************************
+* ESMEUpdateRequest
+*************************************************/
+
+// ESMEUpdateRequest represents API parameter/response structure
+type ESMEUpdateRequest struct {
+	Name        string `validate:"required"`
+	Description string `validate:"min=0,max=512"`
+	Tags        types.Tags
+	IconID      types.ID `mapconv:"Icon.ID"`
+}
+
+// Validate validates by field tags
+func (o *ESMEUpdateRequest) Validate() error {
+	return validate.Struct(o)
+}
+
+// setDefaults implements sacloud.argumentDefaulter
+func (o *ESMEUpdateRequest) setDefaults() interface{} {
+	return &struct {
+		Name        string `validate:"required"`
+		Description string `validate:"min=0,max=512"`
+		Tags        types.Tags
+		IconID      types.ID `mapconv:"Icon.ID"`
+	}{
+		Name:        o.GetName(),
+		Description: o.GetDescription(),
+		Tags:        o.GetTags(),
+		IconID:      o.GetIconID(),
+	}
+}
+
+// GetName returns value of Name
+func (o *ESMEUpdateRequest) GetName() string {
+	return o.Name
+}
+
+// SetName sets value to Name
+func (o *ESMEUpdateRequest) SetName(v string) {
+	o.Name = v
+}
+
+// GetDescription returns value of Description
+func (o *ESMEUpdateRequest) GetDescription() string {
+	return o.Description
+}
+
+// SetDescription sets value to Description
+func (o *ESMEUpdateRequest) SetDescription(v string) {
+	o.Description = v
+}
+
+// GetTags returns value of Tags
+func (o *ESMEUpdateRequest) GetTags() types.Tags {
+	return o.Tags
+}
+
+// SetTags sets value to Tags
+func (o *ESMEUpdateRequest) SetTags(v types.Tags) {
+	o.Tags = v
+}
+
+// HasTag 指定のタグが存在する場合trueを返す
+func (o *ESMEUpdateRequest) HasTag(tag string) bool {
+	return accessor.HasTag(o, tag)
+}
+
+// AppendTag 指定のタグを追加
+func (o *ESMEUpdateRequest) AppendTag(tag string) {
+	accessor.AppendTag(o, tag)
+}
+
+// RemoveTag 指定のタグを削除
+func (o *ESMEUpdateRequest) RemoveTag(tag string) {
+	accessor.RemoveTag(o, tag)
+}
+
+// ClearTags タグを全クリア
+func (o *ESMEUpdateRequest) ClearTags() {
+	accessor.ClearTags(o)
+}
+
+// GetIconID returns value of IconID
+func (o *ESMEUpdateRequest) GetIconID() types.ID {
+	return o.IconID
+}
+
+// SetIconID sets value to IconID
+func (o *ESMEUpdateRequest) SetIconID(v types.ID) {
+	o.IconID = v
+}
+
+/*************************************************
+* ESMESendMessageResult
+*************************************************/
+
+// ESMESendMessageResult represents API parameter/response structure
+type ESMESendMessageResult struct {
+	MessageID string
+	Status    string
+	OTP       string
+}
+
+// Validate validates by field tags
+func (o *ESMESendMessageResult) Validate() error {
+	return validate.Struct(o)
+}
+
+// setDefaults implements sacloud.argumentDefaulter
+func (o *ESMESendMessageResult) setDefaults() interface{} {
+	return &struct {
+		MessageID string
+		Status    string
+		OTP       string
+	}{
+		MessageID: o.GetMessageID(),
+		Status:    o.GetStatus(),
+		OTP:       o.GetOTP(),
+	}
+}
+
+// GetMessageID returns value of MessageID
+func (o *ESMESendMessageResult) GetMessageID() string {
+	return o.MessageID
+}
+
+// SetMessageID sets value to MessageID
+func (o *ESMESendMessageResult) SetMessageID(v string) {
+	o.MessageID = v
+}
+
+// GetStatus returns value of Status
+func (o *ESMESendMessageResult) GetStatus() string {
+	return o.Status
+}
+
+// SetStatus sets value to Status
+func (o *ESMESendMessageResult) SetStatus(v string) {
+	o.Status = v
+}
+
+// GetOTP returns value of OTP
+func (o *ESMESendMessageResult) GetOTP() string {
+	return o.OTP
+}
+
+// SetOTP sets value to OTP
+func (o *ESMESendMessageResult) SetOTP(v string) {
+	o.OTP = v
+}
+
+/*************************************************
+* ESMESendMessageWithGeneratedOTPRequest
+*************************************************/
+
+// ESMESendMessageWithGeneratedOTPRequest represents API parameter/response structure
+type ESMESendMessageWithGeneratedOTPRequest struct {
+	Destination string
+	Sender      string
+}
+
+// Validate validates by field tags
+func (o *ESMESendMessageWithGeneratedOTPRequest) Validate() error {
+	return validate.Struct(o)
+}
+
+// setDefaults implements sacloud.argumentDefaulter
+func (o *ESMESendMessageWithGeneratedOTPRequest) setDefaults() interface{} {
+	return &struct {
+		Destination  string
+		Sender       string
+		OTPOperation types.EOTPOperation
+	}{
+		Destination:  o.GetDestination(),
+		Sender:       o.GetSender(),
+		OTPOperation: "generate",
+	}
+}
+
+// GetDestination returns value of Destination
+func (o *ESMESendMessageWithGeneratedOTPRequest) GetDestination() string {
+	return o.Destination
+}
+
+// SetDestination sets value to Destination
+func (o *ESMESendMessageWithGeneratedOTPRequest) SetDestination(v string) {
+	o.Destination = v
+}
+
+// GetSender returns value of Sender
+func (o *ESMESendMessageWithGeneratedOTPRequest) GetSender() string {
+	return o.Sender
+}
+
+// SetSender sets value to Sender
+func (o *ESMESendMessageWithGeneratedOTPRequest) SetSender(v string) {
+	o.Sender = v
+}
+
+/*************************************************
+* ESMESendMessageWithInputtedOTPRequest
+*************************************************/
+
+// ESMESendMessageWithInputtedOTPRequest represents API parameter/response structure
+type ESMESendMessageWithInputtedOTPRequest struct {
+	Destination string
+	Sender      string
+	OTP         string
+}
+
+// Validate validates by field tags
+func (o *ESMESendMessageWithInputtedOTPRequest) Validate() error {
+	return validate.Struct(o)
+}
+
+// setDefaults implements sacloud.argumentDefaulter
+func (o *ESMESendMessageWithInputtedOTPRequest) setDefaults() interface{} {
+	return &struct {
+		Destination  string
+		Sender       string
+		OTP          string
+		OTPOperation types.EOTPOperation
+	}{
+		Destination:  o.GetDestination(),
+		Sender:       o.GetSender(),
+		OTP:          o.GetOTP(),
+		OTPOperation: "input",
+	}
+}
+
+// GetDestination returns value of Destination
+func (o *ESMESendMessageWithInputtedOTPRequest) GetDestination() string {
+	return o.Destination
+}
+
+// SetDestination sets value to Destination
+func (o *ESMESendMessageWithInputtedOTPRequest) SetDestination(v string) {
+	o.Destination = v
+}
+
+// GetSender returns value of Sender
+func (o *ESMESendMessageWithInputtedOTPRequest) GetSender() string {
+	return o.Sender
+}
+
+// SetSender sets value to Sender
+func (o *ESMESendMessageWithInputtedOTPRequest) SetSender(v string) {
+	o.Sender = v
+}
+
+// GetOTP returns value of OTP
+func (o *ESMESendMessageWithInputtedOTPRequest) GetOTP() string {
+	return o.OTP
+}
+
+// SetOTP sets value to OTP
+func (o *ESMESendMessageWithInputtedOTPRequest) SetOTP(v string) {
+	o.OTP = v
+}
+
+/*************************************************
+* ESMELogs
+*************************************************/
+
+// ESMELogs represents API parameter/response structure
+type ESMELogs struct {
+	MessageID   string
+	Status      string
+	OTP         string
+	Destination string
+	SentAt      time.Time
+	DoneAt      time.Time
+	RetryCount  int
+}
+
+// Validate validates by field tags
+func (o *ESMELogs) Validate() error {
+	return validate.Struct(o)
+}
+
+// setDefaults implements sacloud.argumentDefaulter
+func (o *ESMELogs) setDefaults() interface{} {
+	return &struct {
+		MessageID   string
+		Status      string
+		OTP         string
+		Destination string
+		SentAt      time.Time
+		DoneAt      time.Time
+		RetryCount  int
+	}{
+		MessageID:   o.GetMessageID(),
+		Status:      o.GetStatus(),
+		OTP:         o.GetOTP(),
+		Destination: o.GetDestination(),
+		SentAt:      o.GetSentAt(),
+		DoneAt:      o.GetDoneAt(),
+		RetryCount:  o.GetRetryCount(),
+	}
+}
+
+// GetMessageID returns value of MessageID
+func (o *ESMELogs) GetMessageID() string {
+	return o.MessageID
+}
+
+// SetMessageID sets value to MessageID
+func (o *ESMELogs) SetMessageID(v string) {
+	o.MessageID = v
+}
+
+// GetStatus returns value of Status
+func (o *ESMELogs) GetStatus() string {
+	return o.Status
+}
+
+// SetStatus sets value to Status
+func (o *ESMELogs) SetStatus(v string) {
+	o.Status = v
+}
+
+// GetOTP returns value of OTP
+func (o *ESMELogs) GetOTP() string {
+	return o.OTP
+}
+
+// SetOTP sets value to OTP
+func (o *ESMELogs) SetOTP(v string) {
+	o.OTP = v
+}
+
+// GetDestination returns value of Destination
+func (o *ESMELogs) GetDestination() string {
+	return o.Destination
+}
+
+// SetDestination sets value to Destination
+func (o *ESMELogs) SetDestination(v string) {
+	o.Destination = v
+}
+
+// GetSentAt returns value of SentAt
+func (o *ESMELogs) GetSentAt() time.Time {
+	return o.SentAt
+}
+
+// SetSentAt sets value to SentAt
+func (o *ESMELogs) SetSentAt(v time.Time) {
+	o.SentAt = v
+}
+
+// GetDoneAt returns value of DoneAt
+func (o *ESMELogs) GetDoneAt() time.Time {
+	return o.DoneAt
+}
+
+// SetDoneAt sets value to DoneAt
+func (o *ESMELogs) SetDoneAt(v time.Time) {
+	o.DoneAt = v
+}
+
+// GetRetryCount returns value of RetryCount
+func (o *ESMELogs) GetRetryCount() int {
+	return o.RetryCount
+}
+
+// SetRetryCount sets value to RetryCount
+func (o *ESMELogs) SetRetryCount(v int) {
+	o.RetryCount = v
 }
 
 /*************************************************
@@ -8603,7 +9271,7 @@ type GSLB struct {
 	Weighted           types.StringFlag `mapconv:"Settings.GSLB.Weighted"`
 	HealthCheck        *GSLBHealthCheck `mapconv:"Settings.GSLB.HealthCheck,recursive"`
 	SorryServer        string           `mapconv:"Settings.GSLB.SorryServer"`
-	DestinationServers []*GSLBServer    `mapconv:"Settings.GSLB.[]Servers,recursive" validate:"min=0,max=12"`
+	DestinationServers GSLBServers      `mapconv:"Settings.GSLB.[]Servers,recursive" validate:"min=0,max=12"`
 }
 
 // Validate validates by field tags
@@ -8628,7 +9296,7 @@ func (o *GSLB) setDefaults() interface{} {
 		Weighted           types.StringFlag `mapconv:"Settings.GSLB.Weighted"`
 		HealthCheck        *GSLBHealthCheck `mapconv:"Settings.GSLB.HealthCheck,recursive"`
 		SorryServer        string           `mapconv:"Settings.GSLB.SorryServer"`
-		DestinationServers []*GSLBServer    `mapconv:"Settings.GSLB.[]Servers,recursive" validate:"min=0,max=12"`
+		DestinationServers GSLBServers      `mapconv:"Settings.GSLB.[]Servers,recursive" validate:"min=0,max=12"`
 	}{
 		ID:                 o.GetID(),
 		Name:               o.GetName(),
@@ -8832,12 +9500,12 @@ func (o *GSLB) SetSorryServer(v string) {
 }
 
 // GetDestinationServers returns value of DestinationServers
-func (o *GSLB) GetDestinationServers() []*GSLBServer {
+func (o *GSLB) GetDestinationServers() GSLBServers {
 	return o.DestinationServers
 }
 
 // SetDestinationServers sets value to DestinationServers
-func (o *GSLB) SetDestinationServers(v []*GSLBServer) {
+func (o *GSLB) SetDestinationServers(v GSLBServers) {
 	o.DestinationServers = v
 }
 
@@ -8995,7 +9663,7 @@ type GSLBCreateRequest struct {
 	DelayLoop          int              `mapconv:"Settings.GSLB.DelayLoop" validate:"min=10,max=60"`
 	Weighted           types.StringFlag `mapconv:"Settings.GSLB.Weighted"`
 	SorryServer        string           `mapconv:"Settings.GSLB.SorryServer"`
-	DestinationServers []*GSLBServer    `mapconv:"Settings.GSLB.[]Servers,recursive" validate:"min=0,max=12"`
+	DestinationServers GSLBServers      `mapconv:"Settings.GSLB.[]Servers,recursive" validate:"min=0,max=12"`
 	Name               string           `validate:"required"`
 	Description        string           `validate:"min=0,max=512"`
 	Tags               types.Tags
@@ -9014,7 +9682,7 @@ func (o *GSLBCreateRequest) setDefaults() interface{} {
 		DelayLoop          int              `mapconv:"Settings.GSLB.DelayLoop" validate:"min=10,max=60"`
 		Weighted           types.StringFlag `mapconv:"Settings.GSLB.Weighted"`
 		SorryServer        string           `mapconv:"Settings.GSLB.SorryServer"`
-		DestinationServers []*GSLBServer    `mapconv:"Settings.GSLB.[]Servers,recursive" validate:"min=0,max=12"`
+		DestinationServers GSLBServers      `mapconv:"Settings.GSLB.[]Servers,recursive" validate:"min=0,max=12"`
 		Name               string           `validate:"required"`
 		Description        string           `validate:"min=0,max=512"`
 		Tags               types.Tags
@@ -9078,12 +9746,12 @@ func (o *GSLBCreateRequest) SetSorryServer(v string) {
 }
 
 // GetDestinationServers returns value of DestinationServers
-func (o *GSLBCreateRequest) GetDestinationServers() []*GSLBServer {
+func (o *GSLBCreateRequest) GetDestinationServers() GSLBServers {
 	return o.DestinationServers
 }
 
 // SetDestinationServers sets value to DestinationServers
-func (o *GSLBCreateRequest) SetDestinationServers(v []*GSLBServer) {
+func (o *GSLBCreateRequest) SetDestinationServers(v GSLBServers) {
 	o.DestinationServers = v
 }
 
@@ -9161,7 +9829,7 @@ type GSLBUpdateRequest struct {
 	DelayLoop          int              `mapconv:"Settings.GSLB.DelayLoop" validate:"min=10,max=60"`
 	Weighted           types.StringFlag `mapconv:"Settings.GSLB.Weighted"`
 	SorryServer        string           `mapconv:"Settings.GSLB.SorryServer"`
-	DestinationServers []*GSLBServer    `mapconv:"Settings.GSLB.[]Servers,recursive" validate:"min=0,max=12"`
+	DestinationServers GSLBServers      `mapconv:"Settings.GSLB.[]Servers,recursive" validate:"min=0,max=12"`
 	SettingsHash       string           `json:",omitempty" mapconv:",omitempty"`
 }
 
@@ -9181,7 +9849,7 @@ func (o *GSLBUpdateRequest) setDefaults() interface{} {
 		DelayLoop          int              `mapconv:"Settings.GSLB.DelayLoop" validate:"min=10,max=60"`
 		Weighted           types.StringFlag `mapconv:"Settings.GSLB.Weighted"`
 		SorryServer        string           `mapconv:"Settings.GSLB.SorryServer"`
-		DestinationServers []*GSLBServer    `mapconv:"Settings.GSLB.[]Servers,recursive" validate:"min=0,max=12"`
+		DestinationServers GSLBServers      `mapconv:"Settings.GSLB.[]Servers,recursive" validate:"min=0,max=12"`
 		SettingsHash       string           `json:",omitempty" mapconv:",omitempty"`
 	}{
 		Name:               o.GetName(),
@@ -9301,12 +9969,12 @@ func (o *GSLBUpdateRequest) SetSorryServer(v string) {
 }
 
 // GetDestinationServers returns value of DestinationServers
-func (o *GSLBUpdateRequest) GetDestinationServers() []*GSLBServer {
+func (o *GSLBUpdateRequest) GetDestinationServers() GSLBServers {
 	return o.DestinationServers
 }
 
 // SetDestinationServers sets value to DestinationServers
-func (o *GSLBUpdateRequest) SetDestinationServers(v []*GSLBServer) {
+func (o *GSLBUpdateRequest) SetDestinationServers(v GSLBServers) {
 	o.DestinationServers = v
 }
 
@@ -9330,7 +9998,7 @@ type GSLBUpdateSettingsRequest struct {
 	DelayLoop          int              `mapconv:"Settings.GSLB.DelayLoop" validate:"min=10,max=60"`
 	Weighted           types.StringFlag `mapconv:"Settings.GSLB.Weighted"`
 	SorryServer        string           `mapconv:"Settings.GSLB.SorryServer"`
-	DestinationServers []*GSLBServer    `mapconv:"Settings.GSLB.[]Servers,recursive" validate:"min=0,max=12"`
+	DestinationServers GSLBServers      `mapconv:"Settings.GSLB.[]Servers,recursive" validate:"min=0,max=12"`
 	SettingsHash       string           `json:",omitempty" mapconv:",omitempty"`
 }
 
@@ -9346,7 +10014,7 @@ func (o *GSLBUpdateSettingsRequest) setDefaults() interface{} {
 		DelayLoop          int              `mapconv:"Settings.GSLB.DelayLoop" validate:"min=10,max=60"`
 		Weighted           types.StringFlag `mapconv:"Settings.GSLB.Weighted"`
 		SorryServer        string           `mapconv:"Settings.GSLB.SorryServer"`
-		DestinationServers []*GSLBServer    `mapconv:"Settings.GSLB.[]Servers,recursive" validate:"min=0,max=12"`
+		DestinationServers GSLBServers      `mapconv:"Settings.GSLB.[]Servers,recursive" validate:"min=0,max=12"`
 		SettingsHash       string           `json:",omitempty" mapconv:",omitempty"`
 	}{
 		HealthCheck:        o.GetHealthCheck(),
@@ -9402,12 +10070,12 @@ func (o *GSLBUpdateSettingsRequest) SetSorryServer(v string) {
 }
 
 // GetDestinationServers returns value of DestinationServers
-func (o *GSLBUpdateSettingsRequest) GetDestinationServers() []*GSLBServer {
+func (o *GSLBUpdateSettingsRequest) GetDestinationServers() GSLBServers {
 	return o.DestinationServers
 }
 
 // SetDestinationServers sets value to DestinationServers
-func (o *GSLBUpdateSettingsRequest) SetDestinationServers(v []*GSLBServer) {
+func (o *GSLBUpdateSettingsRequest) SetDestinationServers(v GSLBServers) {
 	o.DestinationServers = v
 }
 
@@ -11851,20 +12519,20 @@ type LoadBalancer struct {
 	IconID                  types.ID `mapconv:"Icon.ID"`
 	CreatedAt               time.Time
 	ModifiedAt              time.Time
-	InstanceHostName        string                          `mapconv:"Instance.Host.Name"`
-	InstanceHostInfoURL     string                          `mapconv:"Instance.Host.InfoURL"`
-	InstanceStatus          types.EServerInstanceStatus     `mapconv:"Instance.Status"`
-	InstanceStatusChangedAt time.Time                       `mapconv:"Instance.StatusChangedAt"`
-	PlanID                  types.ID                        `mapconv:"Remark.Plan.ID/Plan.ID"`
-	SwitchID                types.ID                        `mapconv:"Remark.Switch.ID"`
-	DefaultRoute            string                          `mapconv:"Remark.Network.DefaultRoute" validate:"ipv4"`
-	NetworkMaskLen          int                             `mapconv:"Remark.Network.NetworkMaskLen" validate:"min=1,max=32"`
-	IPAddresses             []string                        `mapconv:"Remark.[]Servers.IPAddress"`
-	ZoneID                  types.ID                        `mapconv:"Remark.Zone.ID"`
-	VRID                    int                             `mapconv:"Remark.VRRP.VRID"`
-	VirtualIPAddresses      []*LoadBalancerVirtualIPAddress `mapconv:"Settings.[]LoadBalancer,recursive" validate:"min=0,max=10"`
-	SettingsHash            string                          `json:",omitempty" mapconv:",omitempty"`
-	Interfaces              []*InterfaceView                `json:",omitempty" mapconv:"[]Interfaces,recursive,omitempty"`
+	InstanceHostName        string                         `mapconv:"Instance.Host.Name"`
+	InstanceHostInfoURL     string                         `mapconv:"Instance.Host.InfoURL"`
+	InstanceStatus          types.EServerInstanceStatus    `mapconv:"Instance.Status"`
+	InstanceStatusChangedAt time.Time                      `mapconv:"Instance.StatusChangedAt"`
+	PlanID                  types.ID                       `mapconv:"Remark.Plan.ID/Plan.ID"`
+	SwitchID                types.ID                       `mapconv:"Remark.Switch.ID"`
+	DefaultRoute            string                         `mapconv:"Remark.Network.DefaultRoute" validate:"ipv4"`
+	NetworkMaskLen          int                            `mapconv:"Remark.Network.NetworkMaskLen" validate:"min=1,max=32"`
+	IPAddresses             []string                       `mapconv:"Remark.[]Servers.IPAddress"`
+	ZoneID                  types.ID                       `mapconv:"Remark.Zone.ID"`
+	VRID                    int                            `mapconv:"Remark.VRRP.VRID"`
+	VirtualIPAddresses      LoadBalancerVirtualIPAddresses `mapconv:"Settings.[]LoadBalancer,recursive" validate:"min=0,max=10"`
+	SettingsHash            string                         `json:",omitempty" mapconv:",omitempty"`
+	Interfaces              []*InterfaceView               `json:",omitempty" mapconv:"[]Interfaces,recursive,omitempty"`
 }
 
 // Validate validates by field tags
@@ -11884,20 +12552,20 @@ func (o *LoadBalancer) setDefaults() interface{} {
 		IconID                  types.ID `mapconv:"Icon.ID"`
 		CreatedAt               time.Time
 		ModifiedAt              time.Time
-		InstanceHostName        string                          `mapconv:"Instance.Host.Name"`
-		InstanceHostInfoURL     string                          `mapconv:"Instance.Host.InfoURL"`
-		InstanceStatus          types.EServerInstanceStatus     `mapconv:"Instance.Status"`
-		InstanceStatusChangedAt time.Time                       `mapconv:"Instance.StatusChangedAt"`
-		PlanID                  types.ID                        `mapconv:"Remark.Plan.ID/Plan.ID"`
-		SwitchID                types.ID                        `mapconv:"Remark.Switch.ID"`
-		DefaultRoute            string                          `mapconv:"Remark.Network.DefaultRoute" validate:"ipv4"`
-		NetworkMaskLen          int                             `mapconv:"Remark.Network.NetworkMaskLen" validate:"min=1,max=32"`
-		IPAddresses             []string                        `mapconv:"Remark.[]Servers.IPAddress"`
-		ZoneID                  types.ID                        `mapconv:"Remark.Zone.ID"`
-		VRID                    int                             `mapconv:"Remark.VRRP.VRID"`
-		VirtualIPAddresses      []*LoadBalancerVirtualIPAddress `mapconv:"Settings.[]LoadBalancer,recursive" validate:"min=0,max=10"`
-		SettingsHash            string                          `json:",omitempty" mapconv:",omitempty"`
-		Interfaces              []*InterfaceView                `json:",omitempty" mapconv:"[]Interfaces,recursive,omitempty"`
+		InstanceHostName        string                         `mapconv:"Instance.Host.Name"`
+		InstanceHostInfoURL     string                         `mapconv:"Instance.Host.InfoURL"`
+		InstanceStatus          types.EServerInstanceStatus    `mapconv:"Instance.Status"`
+		InstanceStatusChangedAt time.Time                      `mapconv:"Instance.StatusChangedAt"`
+		PlanID                  types.ID                       `mapconv:"Remark.Plan.ID/Plan.ID"`
+		SwitchID                types.ID                       `mapconv:"Remark.Switch.ID"`
+		DefaultRoute            string                         `mapconv:"Remark.Network.DefaultRoute" validate:"ipv4"`
+		NetworkMaskLen          int                            `mapconv:"Remark.Network.NetworkMaskLen" validate:"min=1,max=32"`
+		IPAddresses             []string                       `mapconv:"Remark.[]Servers.IPAddress"`
+		ZoneID                  types.ID                       `mapconv:"Remark.Zone.ID"`
+		VRID                    int                            `mapconv:"Remark.VRRP.VRID"`
+		VirtualIPAddresses      LoadBalancerVirtualIPAddresses `mapconv:"Settings.[]LoadBalancer,recursive" validate:"min=0,max=10"`
+		SettingsHash            string                         `json:",omitempty" mapconv:",omitempty"`
+		Interfaces              []*InterfaceView               `json:",omitempty" mapconv:"[]Interfaces,recursive,omitempty"`
 	}{
 		ID:                      o.GetID(),
 		Name:                    o.GetName(),
@@ -12166,12 +12834,12 @@ func (o *LoadBalancer) SetVRID(v int) {
 }
 
 // GetVirtualIPAddresses returns value of VirtualIPAddresses
-func (o *LoadBalancer) GetVirtualIPAddresses() []*LoadBalancerVirtualIPAddress {
+func (o *LoadBalancer) GetVirtualIPAddresses() LoadBalancerVirtualIPAddresses {
 	return o.VirtualIPAddresses
 }
 
 // SetVirtualIPAddresses sets value to VirtualIPAddresses
-func (o *LoadBalancer) SetVirtualIPAddresses(v []*LoadBalancerVirtualIPAddress) {
+func (o *LoadBalancer) SetVirtualIPAddresses(v LoadBalancerVirtualIPAddresses) {
 	o.VirtualIPAddresses = v
 }
 
@@ -12201,12 +12869,12 @@ func (o *LoadBalancer) SetInterfaces(v []*InterfaceView) {
 
 // LoadBalancerVirtualIPAddress represents API parameter/response structure
 type LoadBalancerVirtualIPAddress struct {
-	VirtualIPAddress string `validate:"ipv4"`
-	Port             types.StringNumber
-	DelayLoop        types.StringNumber    `mapconv:",default=10" validate:"min=0,max=10000"`
-	SorryServer      string                `validate:"ipv4"`
-	Description      string                `validate:"min=0,max=512"`
-	Servers          []*LoadBalancerServer `mapconv:",recursive" validate:"min=0,max=40"`
+	VirtualIPAddress string             `validate:"ipv4"`
+	Port             types.StringNumber `validate:"min=1,max=65535"`
+	DelayLoop        types.StringNumber `mapconv:",default=10" validate:"min=0,max=10000"`
+	SorryServer      string             `validate:"omitempty,ipv4"`
+	Description      string             `validate:"min=0,max=512"`
+	Servers          LoadBalancerServers
 }
 
 // Validate validates by field tags
@@ -12217,12 +12885,12 @@ func (o *LoadBalancerVirtualIPAddress) Validate() error {
 // setDefaults implements sacloud.argumentDefaulter
 func (o *LoadBalancerVirtualIPAddress) setDefaults() interface{} {
 	return &struct {
-		VirtualIPAddress string `validate:"ipv4"`
-		Port             types.StringNumber
-		DelayLoop        types.StringNumber    `mapconv:",default=10" validate:"min=0,max=10000"`
-		SorryServer      string                `validate:"ipv4"`
-		Description      string                `validate:"min=0,max=512"`
-		Servers          []*LoadBalancerServer `mapconv:",recursive" validate:"min=0,max=40"`
+		VirtualIPAddress string             `validate:"ipv4"`
+		Port             types.StringNumber `validate:"min=1,max=65535"`
+		DelayLoop        types.StringNumber `mapconv:",default=10" validate:"min=0,max=10000"`
+		SorryServer      string             `validate:"omitempty,ipv4"`
+		Description      string             `validate:"min=0,max=512"`
+		Servers          LoadBalancerServers
 	}{
 		VirtualIPAddress: o.GetVirtualIPAddress(),
 		Port:             o.GetPort(),
@@ -12287,12 +12955,12 @@ func (o *LoadBalancerVirtualIPAddress) SetDescription(v string) {
 }
 
 // GetServers returns value of Servers
-func (o *LoadBalancerVirtualIPAddress) GetServers() []*LoadBalancerServer {
+func (o *LoadBalancerVirtualIPAddress) GetServers() LoadBalancerServers {
 	return o.Servers
 }
 
 // SetServers sets value to Servers
-func (o *LoadBalancerVirtualIPAddress) SetServers(v []*LoadBalancerServer) {
+func (o *LoadBalancerVirtualIPAddress) SetServers(v LoadBalancerServers) {
 	o.Servers = v
 }
 
@@ -12442,8 +13110,8 @@ type LoadBalancerCreateRequest struct {
 	Name               string   `validate:"required"`
 	Description        string   `validate:"min=0,max=512"`
 	Tags               types.Tags
-	IconID             types.ID                        `mapconv:"Icon.ID"`
-	VirtualIPAddresses []*LoadBalancerVirtualIPAddress `mapconv:"Settings.[]LoadBalancer,recursive" validate:"min=0,max=10"`
+	IconID             types.ID                       `mapconv:"Icon.ID"`
+	VirtualIPAddresses LoadBalancerVirtualIPAddresses `mapconv:"Settings.[]LoadBalancer,recursive" validate:"min=0,max=10"`
 }
 
 // Validate validates by field tags
@@ -12463,8 +13131,8 @@ func (o *LoadBalancerCreateRequest) setDefaults() interface{} {
 		Name               string   `validate:"required"`
 		Description        string   `validate:"min=0,max=512"`
 		Tags               types.Tags
-		IconID             types.ID                        `mapconv:"Icon.ID"`
-		VirtualIPAddresses []*LoadBalancerVirtualIPAddress `mapconv:"Settings.[]LoadBalancer,recursive" validate:"min=0,max=10"`
+		IconID             types.ID                       `mapconv:"Icon.ID"`
+		VirtualIPAddresses LoadBalancerVirtualIPAddresses `mapconv:"Settings.[]LoadBalancer,recursive" validate:"min=0,max=10"`
 		Class              string
 	}{
 		SwitchID:           o.GetSwitchID(),
@@ -12603,12 +13271,12 @@ func (o *LoadBalancerCreateRequest) SetIconID(v types.ID) {
 }
 
 // GetVirtualIPAddresses returns value of VirtualIPAddresses
-func (o *LoadBalancerCreateRequest) GetVirtualIPAddresses() []*LoadBalancerVirtualIPAddress {
+func (o *LoadBalancerCreateRequest) GetVirtualIPAddresses() LoadBalancerVirtualIPAddresses {
 	return o.VirtualIPAddresses
 }
 
 // SetVirtualIPAddresses sets value to VirtualIPAddresses
-func (o *LoadBalancerCreateRequest) SetVirtualIPAddresses(v []*LoadBalancerVirtualIPAddress) {
+func (o *LoadBalancerCreateRequest) SetVirtualIPAddresses(v LoadBalancerVirtualIPAddresses) {
 	o.VirtualIPAddresses = v
 }
 
@@ -12621,9 +13289,9 @@ type LoadBalancerUpdateRequest struct {
 	Name               string `validate:"required"`
 	Description        string `validate:"min=0,max=512"`
 	Tags               types.Tags
-	IconID             types.ID                        `mapconv:"Icon.ID"`
-	VirtualIPAddresses []*LoadBalancerVirtualIPAddress `mapconv:"Settings.[]LoadBalancer,recursive" validate:"min=0,max=10"`
-	SettingsHash       string                          `json:",omitempty" mapconv:",omitempty"`
+	IconID             types.ID                       `mapconv:"Icon.ID"`
+	VirtualIPAddresses LoadBalancerVirtualIPAddresses `mapconv:"Settings.[]LoadBalancer,recursive" validate:"min=0,max=10"`
+	SettingsHash       string                         `json:",omitempty" mapconv:",omitempty"`
 }
 
 // Validate validates by field tags
@@ -12637,9 +13305,9 @@ func (o *LoadBalancerUpdateRequest) setDefaults() interface{} {
 		Name               string `validate:"required"`
 		Description        string `validate:"min=0,max=512"`
 		Tags               types.Tags
-		IconID             types.ID                        `mapconv:"Icon.ID"`
-		VirtualIPAddresses []*LoadBalancerVirtualIPAddress `mapconv:"Settings.[]LoadBalancer,recursive" validate:"min=0,max=10"`
-		SettingsHash       string                          `json:",omitempty" mapconv:",omitempty"`
+		IconID             types.ID                       `mapconv:"Icon.ID"`
+		VirtualIPAddresses LoadBalancerVirtualIPAddresses `mapconv:"Settings.[]LoadBalancer,recursive" validate:"min=0,max=10"`
+		SettingsHash       string                         `json:",omitempty" mapconv:",omitempty"`
 	}{
 		Name:               o.GetName(),
 		Description:        o.GetDescription(),
@@ -12711,12 +13379,12 @@ func (o *LoadBalancerUpdateRequest) SetIconID(v types.ID) {
 }
 
 // GetVirtualIPAddresses returns value of VirtualIPAddresses
-func (o *LoadBalancerUpdateRequest) GetVirtualIPAddresses() []*LoadBalancerVirtualIPAddress {
+func (o *LoadBalancerUpdateRequest) GetVirtualIPAddresses() LoadBalancerVirtualIPAddresses {
 	return o.VirtualIPAddresses
 }
 
 // SetVirtualIPAddresses sets value to VirtualIPAddresses
-func (o *LoadBalancerUpdateRequest) SetVirtualIPAddresses(v []*LoadBalancerVirtualIPAddress) {
+func (o *LoadBalancerUpdateRequest) SetVirtualIPAddresses(v LoadBalancerVirtualIPAddresses) {
 	o.VirtualIPAddresses = v
 }
 
@@ -12736,8 +13404,8 @@ func (o *LoadBalancerUpdateRequest) SetSettingsHash(v string) {
 
 // LoadBalancerUpdateSettingsRequest represents API parameter/response structure
 type LoadBalancerUpdateSettingsRequest struct {
-	VirtualIPAddresses []*LoadBalancerVirtualIPAddress `mapconv:"Settings.[]LoadBalancer,recursive" validate:"min=0,max=10"`
-	SettingsHash       string                          `json:",omitempty" mapconv:",omitempty"`
+	VirtualIPAddresses LoadBalancerVirtualIPAddresses `mapconv:"Settings.[]LoadBalancer,recursive" validate:"min=0,max=10"`
+	SettingsHash       string                         `json:",omitempty" mapconv:",omitempty"`
 }
 
 // Validate validates by field tags
@@ -12748,8 +13416,8 @@ func (o *LoadBalancerUpdateSettingsRequest) Validate() error {
 // setDefaults implements sacloud.argumentDefaulter
 func (o *LoadBalancerUpdateSettingsRequest) setDefaults() interface{} {
 	return &struct {
-		VirtualIPAddresses []*LoadBalancerVirtualIPAddress `mapconv:"Settings.[]LoadBalancer,recursive" validate:"min=0,max=10"`
-		SettingsHash       string                          `json:",omitempty" mapconv:",omitempty"`
+		VirtualIPAddresses LoadBalancerVirtualIPAddresses `mapconv:"Settings.[]LoadBalancer,recursive" validate:"min=0,max=10"`
+		SettingsHash       string                         `json:",omitempty" mapconv:",omitempty"`
 	}{
 		VirtualIPAddresses: o.GetVirtualIPAddresses(),
 		SettingsHash:       o.GetSettingsHash(),
@@ -12757,12 +13425,12 @@ func (o *LoadBalancerUpdateSettingsRequest) setDefaults() interface{} {
 }
 
 // GetVirtualIPAddresses returns value of VirtualIPAddresses
-func (o *LoadBalancerUpdateSettingsRequest) GetVirtualIPAddresses() []*LoadBalancerVirtualIPAddress {
+func (o *LoadBalancerUpdateSettingsRequest) GetVirtualIPAddresses() LoadBalancerVirtualIPAddresses {
 	return o.VirtualIPAddresses
 }
 
 // SetVirtualIPAddresses sets value to VirtualIPAddresses
-func (o *LoadBalancerUpdateSettingsRequest) SetVirtualIPAddresses(v []*LoadBalancerVirtualIPAddress) {
+func (o *LoadBalancerUpdateSettingsRequest) SetVirtualIPAddresses(v LoadBalancerVirtualIPAddresses) {
 	o.VirtualIPAddresses = v
 }
 
@@ -13950,22 +14618,25 @@ func (o *MonitorLocalRouterValue) SetSendBytesPerSec(v float64) {
 
 // MobileGateway represents API parameter/response structure
 type MobileGateway struct {
-	ID                      types.ID
-	Name                    string `validate:"required"`
-	Description             string `validate:"min=0,max=512"`
-	Tags                    types.Tags
-	Availability            types.EAvailability
-	Class                   string
-	IconID                  types.ID `mapconv:"Icon.ID"`
-	CreatedAt               time.Time
-	InstanceHostName        string                      `mapconv:"Instance.Host.Name"`
-	InstanceHostInfoURL     string                      `mapconv:"Instance.Host.InfoURL"`
-	InstanceStatus          types.EServerInstanceStatus `mapconv:"Instance.Status"`
-	InstanceStatusChangedAt time.Time                   `mapconv:"Instance.StatusChangedAt"`
-	Interfaces              []*MobileGatewayInterface   `json:",omitempty" mapconv:"[]Interfaces,recursive,omitempty"`
-	ZoneID                  types.ID                    `mapconv:"Remark.Zone.ID"`
-	Settings                *MobileGatewaySetting       `mapconv:",omitempty,recursive"`
-	SettingsHash            string                      `json:",omitempty" mapconv:",omitempty"`
+	ID                              types.ID
+	Name                            string `validate:"required"`
+	Description                     string `validate:"min=0,max=512"`
+	Tags                            types.Tags
+	Availability                    types.EAvailability
+	Class                           string
+	IconID                          types.ID `mapconv:"Icon.ID"`
+	CreatedAt                       time.Time
+	InstanceHostName                string                           `mapconv:"Instance.Host.Name"`
+	InstanceHostInfoURL             string                           `mapconv:"Instance.Host.InfoURL"`
+	InstanceStatus                  types.EServerInstanceStatus      `mapconv:"Instance.Status"`
+	InstanceStatusChangedAt         time.Time                        `mapconv:"Instance.StatusChangedAt"`
+	Interfaces                      []*MobileGatewayInterface        `json:",omitempty" mapconv:"[]Interfaces,recursive,omitempty"`
+	ZoneID                          types.ID                         `mapconv:"Remark.Zone.ID"`
+	InterfaceSettings               []*MobileGatewayInterfaceSetting `mapconv:"Settings.MobileGateway.[]Interfaces,recursive"`
+	StaticRoutes                    []*MobileGatewayStaticRoute      `mapconv:"Settings.MobileGateway.[]StaticRoutes,recursive"`
+	InternetConnectionEnabled       types.StringFlag                 `mapconv:"Settings.MobileGateway.InternetConnection.Enabled"`
+	InterDeviceCommunicationEnabled types.StringFlag                 `mapconv:"Settings.MobileGateway.InterDeviceCommunication.Enabled"`
+	SettingsHash                    string                           `json:",omitempty" mapconv:",omitempty"`
 }
 
 // Validate validates by field tags
@@ -13976,39 +14647,45 @@ func (o *MobileGateway) Validate() error {
 // setDefaults implements sacloud.argumentDefaulter
 func (o *MobileGateway) setDefaults() interface{} {
 	return &struct {
-		ID                      types.ID
-		Name                    string `validate:"required"`
-		Description             string `validate:"min=0,max=512"`
-		Tags                    types.Tags
-		Availability            types.EAvailability
-		Class                   string
-		IconID                  types.ID `mapconv:"Icon.ID"`
-		CreatedAt               time.Time
-		InstanceHostName        string                      `mapconv:"Instance.Host.Name"`
-		InstanceHostInfoURL     string                      `mapconv:"Instance.Host.InfoURL"`
-		InstanceStatus          types.EServerInstanceStatus `mapconv:"Instance.Status"`
-		InstanceStatusChangedAt time.Time                   `mapconv:"Instance.StatusChangedAt"`
-		Interfaces              []*MobileGatewayInterface   `json:",omitempty" mapconv:"[]Interfaces,recursive,omitempty"`
-		ZoneID                  types.ID                    `mapconv:"Remark.Zone.ID"`
-		Settings                *MobileGatewaySetting       `mapconv:",omitempty,recursive"`
-		SettingsHash            string                      `json:",omitempty" mapconv:",omitempty"`
+		ID                              types.ID
+		Name                            string `validate:"required"`
+		Description                     string `validate:"min=0,max=512"`
+		Tags                            types.Tags
+		Availability                    types.EAvailability
+		Class                           string
+		IconID                          types.ID `mapconv:"Icon.ID"`
+		CreatedAt                       time.Time
+		InstanceHostName                string                           `mapconv:"Instance.Host.Name"`
+		InstanceHostInfoURL             string                           `mapconv:"Instance.Host.InfoURL"`
+		InstanceStatus                  types.EServerInstanceStatus      `mapconv:"Instance.Status"`
+		InstanceStatusChangedAt         time.Time                        `mapconv:"Instance.StatusChangedAt"`
+		Interfaces                      []*MobileGatewayInterface        `json:",omitempty" mapconv:"[]Interfaces,recursive,omitempty"`
+		ZoneID                          types.ID                         `mapconv:"Remark.Zone.ID"`
+		InterfaceSettings               []*MobileGatewayInterfaceSetting `mapconv:"Settings.MobileGateway.[]Interfaces,recursive"`
+		StaticRoutes                    []*MobileGatewayStaticRoute      `mapconv:"Settings.MobileGateway.[]StaticRoutes,recursive"`
+		InternetConnectionEnabled       types.StringFlag                 `mapconv:"Settings.MobileGateway.InternetConnection.Enabled"`
+		InterDeviceCommunicationEnabled types.StringFlag                 `mapconv:"Settings.MobileGateway.InterDeviceCommunication.Enabled"`
+		SettingsHash                    string                           `json:",omitempty" mapconv:",omitempty"`
 	}{
-		ID:                      o.GetID(),
-		Name:                    o.GetName(),
-		Description:             o.GetDescription(),
-		Tags:                    o.GetTags(),
-		Availability:            o.GetAvailability(),
-		Class:                   o.GetClass(),
-		IconID:                  o.GetIconID(),
-		CreatedAt:               o.GetCreatedAt(),
-		InstanceHostName:        o.GetInstanceHostName(),
-		InstanceHostInfoURL:     o.GetInstanceHostInfoURL(),
-		InstanceStatus:          o.GetInstanceStatus(),
-		InstanceStatusChangedAt: o.GetInstanceStatusChangedAt(),
-		Interfaces:              o.GetInterfaces(),
-		ZoneID:                  o.GetZoneID(),
-		Settings:                o.GetSettings(),
-		SettingsHash:            o.GetSettingsHash(),
+		ID:                              o.GetID(),
+		Name:                            o.GetName(),
+		Description:                     o.GetDescription(),
+		Tags:                            o.GetTags(),
+		Availability:                    o.GetAvailability(),
+		Class:                           o.GetClass(),
+		IconID:                          o.GetIconID(),
+		CreatedAt:                       o.GetCreatedAt(),
+		InstanceHostName:                o.GetInstanceHostName(),
+		InstanceHostInfoURL:             o.GetInstanceHostInfoURL(),
+		InstanceStatus:                  o.GetInstanceStatus(),
+		InstanceStatusChangedAt:         o.GetInstanceStatusChangedAt(),
+		Interfaces:                      o.GetInterfaces(),
+		ZoneID:                          o.GetZoneID(),
+		InterfaceSettings:               o.GetInterfaceSettings(),
+		StaticRoutes:                    o.GetStaticRoutes(),
+		InternetConnectionEnabled:       o.GetInternetConnectionEnabled(),
+		InterDeviceCommunicationEnabled: o.GetInterDeviceCommunicationEnabled(),
+		SettingsHash:                    o.GetSettingsHash(),
 	}
 }
 
@@ -14192,14 +14869,44 @@ func (o *MobileGateway) SetZoneID(v types.ID) {
 	o.ZoneID = v
 }
 
-// GetSettings returns value of Settings
-func (o *MobileGateway) GetSettings() *MobileGatewaySetting {
-	return o.Settings
+// GetInterfaceSettings returns value of InterfaceSettings
+func (o *MobileGateway) GetInterfaceSettings() []*MobileGatewayInterfaceSetting {
+	return o.InterfaceSettings
 }
 
-// SetSettings sets value to Settings
-func (o *MobileGateway) SetSettings(v *MobileGatewaySetting) {
-	o.Settings = v
+// SetInterfaceSettings sets value to InterfaceSettings
+func (o *MobileGateway) SetInterfaceSettings(v []*MobileGatewayInterfaceSetting) {
+	o.InterfaceSettings = v
+}
+
+// GetStaticRoutes returns value of StaticRoutes
+func (o *MobileGateway) GetStaticRoutes() []*MobileGatewayStaticRoute {
+	return o.StaticRoutes
+}
+
+// SetStaticRoutes sets value to StaticRoutes
+func (o *MobileGateway) SetStaticRoutes(v []*MobileGatewayStaticRoute) {
+	o.StaticRoutes = v
+}
+
+// GetInternetConnectionEnabled returns value of InternetConnectionEnabled
+func (o *MobileGateway) GetInternetConnectionEnabled() types.StringFlag {
+	return o.InternetConnectionEnabled
+}
+
+// SetInternetConnectionEnabled sets value to InternetConnectionEnabled
+func (o *MobileGateway) SetInternetConnectionEnabled(v types.StringFlag) {
+	o.InternetConnectionEnabled = v
+}
+
+// GetInterDeviceCommunicationEnabled returns value of InterDeviceCommunicationEnabled
+func (o *MobileGateway) GetInterDeviceCommunicationEnabled() types.StringFlag {
+	return o.InterDeviceCommunicationEnabled
+}
+
+// SetInterDeviceCommunicationEnabled sets value to InterDeviceCommunicationEnabled
+func (o *MobileGateway) SetInterDeviceCommunicationEnabled(v types.StringFlag) {
+	o.InterDeviceCommunicationEnabled = v
 }
 
 // GetSettingsHash returns value of SettingsHash
@@ -14500,78 +15207,6 @@ func (o *MobileGatewayInterface) SetIndex(v int) {
 }
 
 /*************************************************
-* MobileGatewaySetting
-*************************************************/
-
-// MobileGatewaySetting represents API parameter/response structure
-type MobileGatewaySetting struct {
-	Interfaces                      []*MobileGatewayInterfaceSetting `mapconv:"MobileGateway.[]Interfaces,recursive"`
-	StaticRoute                     []*MobileGatewayStaticRoute      `mapconv:"MobileGateway.[]StaticRoutes,recursive"`
-	InternetConnectionEnabled       types.StringFlag                 `mapconv:"MobileGateway.InternetConnection.Enabled"`
-	InterDeviceCommunicationEnabled types.StringFlag                 `mapconv:"MobileGateway.InterDeviceCommunication.Enabled"`
-}
-
-// Validate validates by field tags
-func (o *MobileGatewaySetting) Validate() error {
-	return validate.Struct(o)
-}
-
-// setDefaults implements sacloud.argumentDefaulter
-func (o *MobileGatewaySetting) setDefaults() interface{} {
-	return &struct {
-		Interfaces                      []*MobileGatewayInterfaceSetting `mapconv:"MobileGateway.[]Interfaces,recursive"`
-		StaticRoute                     []*MobileGatewayStaticRoute      `mapconv:"MobileGateway.[]StaticRoutes,recursive"`
-		InternetConnectionEnabled       types.StringFlag                 `mapconv:"MobileGateway.InternetConnection.Enabled"`
-		InterDeviceCommunicationEnabled types.StringFlag                 `mapconv:"MobileGateway.InterDeviceCommunication.Enabled"`
-	}{
-		Interfaces:                      o.GetInterfaces(),
-		StaticRoute:                     o.GetStaticRoute(),
-		InternetConnectionEnabled:       o.GetInternetConnectionEnabled(),
-		InterDeviceCommunicationEnabled: o.GetInterDeviceCommunicationEnabled(),
-	}
-}
-
-// GetInterfaces returns value of Interfaces
-func (o *MobileGatewaySetting) GetInterfaces() []*MobileGatewayInterfaceSetting {
-	return o.Interfaces
-}
-
-// SetInterfaces sets value to Interfaces
-func (o *MobileGatewaySetting) SetInterfaces(v []*MobileGatewayInterfaceSetting) {
-	o.Interfaces = v
-}
-
-// GetStaticRoute returns value of StaticRoute
-func (o *MobileGatewaySetting) GetStaticRoute() []*MobileGatewayStaticRoute {
-	return o.StaticRoute
-}
-
-// SetStaticRoute sets value to StaticRoute
-func (o *MobileGatewaySetting) SetStaticRoute(v []*MobileGatewayStaticRoute) {
-	o.StaticRoute = v
-}
-
-// GetInternetConnectionEnabled returns value of InternetConnectionEnabled
-func (o *MobileGatewaySetting) GetInternetConnectionEnabled() types.StringFlag {
-	return o.InternetConnectionEnabled
-}
-
-// SetInternetConnectionEnabled sets value to InternetConnectionEnabled
-func (o *MobileGatewaySetting) SetInternetConnectionEnabled(v types.StringFlag) {
-	o.InternetConnectionEnabled = v
-}
-
-// GetInterDeviceCommunicationEnabled returns value of InterDeviceCommunicationEnabled
-func (o *MobileGatewaySetting) GetInterDeviceCommunicationEnabled() types.StringFlag {
-	return o.InterDeviceCommunicationEnabled
-}
-
-// SetInterDeviceCommunicationEnabled sets value to InterDeviceCommunicationEnabled
-func (o *MobileGatewaySetting) SetInterDeviceCommunicationEnabled(v types.StringFlag) {
-	o.InterDeviceCommunicationEnabled = v
-}
-
-/*************************************************
 * MobileGatewayInterfaceSetting
 *************************************************/
 
@@ -14682,11 +15317,13 @@ func (o *MobileGatewayStaticRoute) SetNextHop(v string) {
 
 // MobileGatewayCreateRequest represents API parameter/response structure
 type MobileGatewayCreateRequest struct {
-	Name        string `validate:"required"`
-	Description string `validate:"min=0,max=512"`
-	Tags        types.Tags
-	IconID      types.ID                    `mapconv:"Icon.ID"`
-	Settings    *MobileGatewaySettingCreate `json:",omitempty" mapconv:",omitempty,recursive"`
+	Name                            string `validate:"required"`
+	Description                     string `validate:"min=0,max=512"`
+	Tags                            types.Tags
+	IconID                          types.ID                    `mapconv:"Icon.ID"`
+	StaticRoutes                    []*MobileGatewayStaticRoute `json:",omitempty" mapconv:"Settings.MobileGateway.[]StaticRoutes,omitempty,recursive"`
+	InternetConnectionEnabled       types.StringFlag            `mapconv:"Settings.MobileGateway.InternetConnection.Enabled"`
+	InterDeviceCommunicationEnabled types.StringFlag            `mapconv:"Settings.MobileGateway.InterDeviceCommunication.Enabled"`
 }
 
 // Validate validates by field tags
@@ -14697,23 +15334,27 @@ func (o *MobileGatewayCreateRequest) Validate() error {
 // setDefaults implements sacloud.argumentDefaulter
 func (o *MobileGatewayCreateRequest) setDefaults() interface{} {
 	return &struct {
-		Name        string `validate:"required"`
-		Description string `validate:"min=0,max=512"`
-		Tags        types.Tags
-		IconID      types.ID                    `mapconv:"Icon.ID"`
-		Settings    *MobileGatewaySettingCreate `json:",omitempty" mapconv:",omitempty,recursive"`
-		Class       string
-		PlanID      types.ID `mapconv:"Remark.Plan.ID/Plan.ID"`
-		SwitchID    string   `mapconv:"Remark.Switch.Scope"`
+		Name                            string `validate:"required"`
+		Description                     string `validate:"min=0,max=512"`
+		Tags                            types.Tags
+		IconID                          types.ID                    `mapconv:"Icon.ID"`
+		StaticRoutes                    []*MobileGatewayStaticRoute `json:",omitempty" mapconv:"Settings.MobileGateway.[]StaticRoutes,omitempty,recursive"`
+		InternetConnectionEnabled       types.StringFlag            `mapconv:"Settings.MobileGateway.InternetConnection.Enabled"`
+		InterDeviceCommunicationEnabled types.StringFlag            `mapconv:"Settings.MobileGateway.InterDeviceCommunication.Enabled"`
+		Class                           string
+		PlanID                          types.ID `mapconv:"Remark.Plan.ID/Plan.ID"`
+		SwitchID                        string   `mapconv:"Remark.Switch.Scope"`
 	}{
-		Name:        o.GetName(),
-		Description: o.GetDescription(),
-		Tags:        o.GetTags(),
-		IconID:      o.GetIconID(),
-		Settings:    o.GetSettings(),
-		Class:       "mobilegateway",
-		PlanID:      types.ID(2),
-		SwitchID:    "shared",
+		Name:                            o.GetName(),
+		Description:                     o.GetDescription(),
+		Tags:                            o.GetTags(),
+		IconID:                          o.GetIconID(),
+		StaticRoutes:                    o.GetStaticRoutes(),
+		InternetConnectionEnabled:       o.GetInternetConnectionEnabled(),
+		InterDeviceCommunicationEnabled: o.GetInterDeviceCommunicationEnabled(),
+		Class:                           "mobilegateway",
+		PlanID:                          types.ID(2),
+		SwitchID:                        "shared",
 	}
 }
 
@@ -14777,72 +15418,33 @@ func (o *MobileGatewayCreateRequest) SetIconID(v types.ID) {
 	o.IconID = v
 }
 
-// GetSettings returns value of Settings
-func (o *MobileGatewayCreateRequest) GetSettings() *MobileGatewaySettingCreate {
-	return o.Settings
+// GetStaticRoutes returns value of StaticRoutes
+func (o *MobileGatewayCreateRequest) GetStaticRoutes() []*MobileGatewayStaticRoute {
+	return o.StaticRoutes
 }
 
-// SetSettings sets value to Settings
-func (o *MobileGatewayCreateRequest) SetSettings(v *MobileGatewaySettingCreate) {
-	o.Settings = v
-}
-
-/*************************************************
-* MobileGatewaySettingCreate
-*************************************************/
-
-// MobileGatewaySettingCreate represents API parameter/response structure
-type MobileGatewaySettingCreate struct {
-	StaticRoute                     []*MobileGatewayStaticRoute `json:",omitempty" mapconv:"MobileGateway.[]StaticRoutes,omitempty,recursive"`
-	InternetConnectionEnabled       types.StringFlag            `mapconv:"MobileGateway.InternetConnection.Enabled"`
-	InterDeviceCommunicationEnabled types.StringFlag            `mapconv:"MobileGateway.InterDeviceCommunication.Enabled"`
-}
-
-// Validate validates by field tags
-func (o *MobileGatewaySettingCreate) Validate() error {
-	return validate.Struct(o)
-}
-
-// setDefaults implements sacloud.argumentDefaulter
-func (o *MobileGatewaySettingCreate) setDefaults() interface{} {
-	return &struct {
-		StaticRoute                     []*MobileGatewayStaticRoute `json:",omitempty" mapconv:"MobileGateway.[]StaticRoutes,omitempty,recursive"`
-		InternetConnectionEnabled       types.StringFlag            `mapconv:"MobileGateway.InternetConnection.Enabled"`
-		InterDeviceCommunicationEnabled types.StringFlag            `mapconv:"MobileGateway.InterDeviceCommunication.Enabled"`
-	}{
-		StaticRoute:                     o.GetStaticRoute(),
-		InternetConnectionEnabled:       o.GetInternetConnectionEnabled(),
-		InterDeviceCommunicationEnabled: o.GetInterDeviceCommunicationEnabled(),
-	}
-}
-
-// GetStaticRoute returns value of StaticRoute
-func (o *MobileGatewaySettingCreate) GetStaticRoute() []*MobileGatewayStaticRoute {
-	return o.StaticRoute
-}
-
-// SetStaticRoute sets value to StaticRoute
-func (o *MobileGatewaySettingCreate) SetStaticRoute(v []*MobileGatewayStaticRoute) {
-	o.StaticRoute = v
+// SetStaticRoutes sets value to StaticRoutes
+func (o *MobileGatewayCreateRequest) SetStaticRoutes(v []*MobileGatewayStaticRoute) {
+	o.StaticRoutes = v
 }
 
 // GetInternetConnectionEnabled returns value of InternetConnectionEnabled
-func (o *MobileGatewaySettingCreate) GetInternetConnectionEnabled() types.StringFlag {
+func (o *MobileGatewayCreateRequest) GetInternetConnectionEnabled() types.StringFlag {
 	return o.InternetConnectionEnabled
 }
 
 // SetInternetConnectionEnabled sets value to InternetConnectionEnabled
-func (o *MobileGatewaySettingCreate) SetInternetConnectionEnabled(v types.StringFlag) {
+func (o *MobileGatewayCreateRequest) SetInternetConnectionEnabled(v types.StringFlag) {
 	o.InternetConnectionEnabled = v
 }
 
 // GetInterDeviceCommunicationEnabled returns value of InterDeviceCommunicationEnabled
-func (o *MobileGatewaySettingCreate) GetInterDeviceCommunicationEnabled() types.StringFlag {
+func (o *MobileGatewayCreateRequest) GetInterDeviceCommunicationEnabled() types.StringFlag {
 	return o.InterDeviceCommunicationEnabled
 }
 
 // SetInterDeviceCommunicationEnabled sets value to InterDeviceCommunicationEnabled
-func (o *MobileGatewaySettingCreate) SetInterDeviceCommunicationEnabled(v types.StringFlag) {
+func (o *MobileGatewayCreateRequest) SetInterDeviceCommunicationEnabled(v types.StringFlag) {
 	o.InterDeviceCommunicationEnabled = v
 }
 
@@ -14852,12 +15454,15 @@ func (o *MobileGatewaySettingCreate) SetInterDeviceCommunicationEnabled(v types.
 
 // MobileGatewayUpdateRequest represents API parameter/response structure
 type MobileGatewayUpdateRequest struct {
-	Name         string `validate:"required"`
-	Description  string `validate:"min=0,max=512"`
-	Tags         types.Tags
-	IconID       types.ID              `mapconv:"Icon.ID"`
-	Settings     *MobileGatewaySetting `json:",omitempty" mapconv:",omitempty,recursive"`
-	SettingsHash string                `json:",omitempty" mapconv:",omitempty"`
+	Name                            string `validate:"required"`
+	Description                     string `validate:"min=0,max=512"`
+	Tags                            types.Tags
+	IconID                          types.ID                         `mapconv:"Icon.ID"`
+	InterfaceSettings               []*MobileGatewayInterfaceSetting `mapconv:"Settings.MobileGateway.[]Interfaces,recursive"`
+	StaticRoutes                    []*MobileGatewayStaticRoute      `mapconv:"Settings.MobileGateway.[]StaticRoutes,recursive"`
+	InternetConnectionEnabled       types.StringFlag                 `mapconv:"Settings.MobileGateway.InternetConnection.Enabled"`
+	InterDeviceCommunicationEnabled types.StringFlag                 `mapconv:"Settings.MobileGateway.InterDeviceCommunication.Enabled"`
+	SettingsHash                    string                           `json:",omitempty" mapconv:",omitempty"`
 }
 
 // Validate validates by field tags
@@ -14868,19 +15473,25 @@ func (o *MobileGatewayUpdateRequest) Validate() error {
 // setDefaults implements sacloud.argumentDefaulter
 func (o *MobileGatewayUpdateRequest) setDefaults() interface{} {
 	return &struct {
-		Name         string `validate:"required"`
-		Description  string `validate:"min=0,max=512"`
-		Tags         types.Tags
-		IconID       types.ID              `mapconv:"Icon.ID"`
-		Settings     *MobileGatewaySetting `json:",omitempty" mapconv:",omitempty,recursive"`
-		SettingsHash string                `json:",omitempty" mapconv:",omitempty"`
+		Name                            string `validate:"required"`
+		Description                     string `validate:"min=0,max=512"`
+		Tags                            types.Tags
+		IconID                          types.ID                         `mapconv:"Icon.ID"`
+		InterfaceSettings               []*MobileGatewayInterfaceSetting `mapconv:"Settings.MobileGateway.[]Interfaces,recursive"`
+		StaticRoutes                    []*MobileGatewayStaticRoute      `mapconv:"Settings.MobileGateway.[]StaticRoutes,recursive"`
+		InternetConnectionEnabled       types.StringFlag                 `mapconv:"Settings.MobileGateway.InternetConnection.Enabled"`
+		InterDeviceCommunicationEnabled types.StringFlag                 `mapconv:"Settings.MobileGateway.InterDeviceCommunication.Enabled"`
+		SettingsHash                    string                           `json:",omitempty" mapconv:",omitempty"`
 	}{
-		Name:         o.GetName(),
-		Description:  o.GetDescription(),
-		Tags:         o.GetTags(),
-		IconID:       o.GetIconID(),
-		Settings:     o.GetSettings(),
-		SettingsHash: o.GetSettingsHash(),
+		Name:                            o.GetName(),
+		Description:                     o.GetDescription(),
+		Tags:                            o.GetTags(),
+		IconID:                          o.GetIconID(),
+		InterfaceSettings:               o.GetInterfaceSettings(),
+		StaticRoutes:                    o.GetStaticRoutes(),
+		InternetConnectionEnabled:       o.GetInternetConnectionEnabled(),
+		InterDeviceCommunicationEnabled: o.GetInterDeviceCommunicationEnabled(),
+		SettingsHash:                    o.GetSettingsHash(),
 	}
 }
 
@@ -14944,14 +15555,44 @@ func (o *MobileGatewayUpdateRequest) SetIconID(v types.ID) {
 	o.IconID = v
 }
 
-// GetSettings returns value of Settings
-func (o *MobileGatewayUpdateRequest) GetSettings() *MobileGatewaySetting {
-	return o.Settings
+// GetInterfaceSettings returns value of InterfaceSettings
+func (o *MobileGatewayUpdateRequest) GetInterfaceSettings() []*MobileGatewayInterfaceSetting {
+	return o.InterfaceSettings
 }
 
-// SetSettings sets value to Settings
-func (o *MobileGatewayUpdateRequest) SetSettings(v *MobileGatewaySetting) {
-	o.Settings = v
+// SetInterfaceSettings sets value to InterfaceSettings
+func (o *MobileGatewayUpdateRequest) SetInterfaceSettings(v []*MobileGatewayInterfaceSetting) {
+	o.InterfaceSettings = v
+}
+
+// GetStaticRoutes returns value of StaticRoutes
+func (o *MobileGatewayUpdateRequest) GetStaticRoutes() []*MobileGatewayStaticRoute {
+	return o.StaticRoutes
+}
+
+// SetStaticRoutes sets value to StaticRoutes
+func (o *MobileGatewayUpdateRequest) SetStaticRoutes(v []*MobileGatewayStaticRoute) {
+	o.StaticRoutes = v
+}
+
+// GetInternetConnectionEnabled returns value of InternetConnectionEnabled
+func (o *MobileGatewayUpdateRequest) GetInternetConnectionEnabled() types.StringFlag {
+	return o.InternetConnectionEnabled
+}
+
+// SetInternetConnectionEnabled sets value to InternetConnectionEnabled
+func (o *MobileGatewayUpdateRequest) SetInternetConnectionEnabled(v types.StringFlag) {
+	o.InternetConnectionEnabled = v
+}
+
+// GetInterDeviceCommunicationEnabled returns value of InterDeviceCommunicationEnabled
+func (o *MobileGatewayUpdateRequest) GetInterDeviceCommunicationEnabled() types.StringFlag {
+	return o.InterDeviceCommunicationEnabled
+}
+
+// SetInterDeviceCommunicationEnabled sets value to InterDeviceCommunicationEnabled
+func (o *MobileGatewayUpdateRequest) SetInterDeviceCommunicationEnabled(v types.StringFlag) {
+	o.InterDeviceCommunicationEnabled = v
 }
 
 // GetSettingsHash returns value of SettingsHash
@@ -14970,8 +15611,11 @@ func (o *MobileGatewayUpdateRequest) SetSettingsHash(v string) {
 
 // MobileGatewayUpdateSettingsRequest represents API parameter/response structure
 type MobileGatewayUpdateSettingsRequest struct {
-	Settings     *MobileGatewaySetting `json:",omitempty" mapconv:",omitempty,recursive"`
-	SettingsHash string                `json:",omitempty" mapconv:",omitempty"`
+	InterfaceSettings               []*MobileGatewayInterfaceSetting `mapconv:"Settings.MobileGateway.[]Interfaces,recursive"`
+	StaticRoutes                    []*MobileGatewayStaticRoute      `mapconv:"Settings.MobileGateway.[]StaticRoutes,recursive"`
+	InternetConnectionEnabled       types.StringFlag                 `mapconv:"Settings.MobileGateway.InternetConnection.Enabled"`
+	InterDeviceCommunicationEnabled types.StringFlag                 `mapconv:"Settings.MobileGateway.InterDeviceCommunication.Enabled"`
+	SettingsHash                    string                           `json:",omitempty" mapconv:",omitempty"`
 }
 
 // Validate validates by field tags
@@ -14982,22 +15626,58 @@ func (o *MobileGatewayUpdateSettingsRequest) Validate() error {
 // setDefaults implements sacloud.argumentDefaulter
 func (o *MobileGatewayUpdateSettingsRequest) setDefaults() interface{} {
 	return &struct {
-		Settings     *MobileGatewaySetting `json:",omitempty" mapconv:",omitempty,recursive"`
-		SettingsHash string                `json:",omitempty" mapconv:",omitempty"`
+		InterfaceSettings               []*MobileGatewayInterfaceSetting `mapconv:"Settings.MobileGateway.[]Interfaces,recursive"`
+		StaticRoutes                    []*MobileGatewayStaticRoute      `mapconv:"Settings.MobileGateway.[]StaticRoutes,recursive"`
+		InternetConnectionEnabled       types.StringFlag                 `mapconv:"Settings.MobileGateway.InternetConnection.Enabled"`
+		InterDeviceCommunicationEnabled types.StringFlag                 `mapconv:"Settings.MobileGateway.InterDeviceCommunication.Enabled"`
+		SettingsHash                    string                           `json:",omitempty" mapconv:",omitempty"`
 	}{
-		Settings:     o.GetSettings(),
-		SettingsHash: o.GetSettingsHash(),
+		InterfaceSettings:               o.GetInterfaceSettings(),
+		StaticRoutes:                    o.GetStaticRoutes(),
+		InternetConnectionEnabled:       o.GetInternetConnectionEnabled(),
+		InterDeviceCommunicationEnabled: o.GetInterDeviceCommunicationEnabled(),
+		SettingsHash:                    o.GetSettingsHash(),
 	}
 }
 
-// GetSettings returns value of Settings
-func (o *MobileGatewayUpdateSettingsRequest) GetSettings() *MobileGatewaySetting {
-	return o.Settings
+// GetInterfaceSettings returns value of InterfaceSettings
+func (o *MobileGatewayUpdateSettingsRequest) GetInterfaceSettings() []*MobileGatewayInterfaceSetting {
+	return o.InterfaceSettings
 }
 
-// SetSettings sets value to Settings
-func (o *MobileGatewayUpdateSettingsRequest) SetSettings(v *MobileGatewaySetting) {
-	o.Settings = v
+// SetInterfaceSettings sets value to InterfaceSettings
+func (o *MobileGatewayUpdateSettingsRequest) SetInterfaceSettings(v []*MobileGatewayInterfaceSetting) {
+	o.InterfaceSettings = v
+}
+
+// GetStaticRoutes returns value of StaticRoutes
+func (o *MobileGatewayUpdateSettingsRequest) GetStaticRoutes() []*MobileGatewayStaticRoute {
+	return o.StaticRoutes
+}
+
+// SetStaticRoutes sets value to StaticRoutes
+func (o *MobileGatewayUpdateSettingsRequest) SetStaticRoutes(v []*MobileGatewayStaticRoute) {
+	o.StaticRoutes = v
+}
+
+// GetInternetConnectionEnabled returns value of InternetConnectionEnabled
+func (o *MobileGatewayUpdateSettingsRequest) GetInternetConnectionEnabled() types.StringFlag {
+	return o.InternetConnectionEnabled
+}
+
+// SetInternetConnectionEnabled sets value to InternetConnectionEnabled
+func (o *MobileGatewayUpdateSettingsRequest) SetInternetConnectionEnabled(v types.StringFlag) {
+	o.InternetConnectionEnabled = v
+}
+
+// GetInterDeviceCommunicationEnabled returns value of InterDeviceCommunicationEnabled
+func (o *MobileGatewayUpdateSettingsRequest) GetInterDeviceCommunicationEnabled() types.StringFlag {
+	return o.InterDeviceCommunicationEnabled
+}
+
+// SetInterDeviceCommunicationEnabled sets value to InterDeviceCommunicationEnabled
+func (o *MobileGatewayUpdateSettingsRequest) SetInterDeviceCommunicationEnabled(v types.StringFlag) {
+	o.InterDeviceCommunicationEnabled = v
 }
 
 // GetSettingsHash returns value of SettingsHash

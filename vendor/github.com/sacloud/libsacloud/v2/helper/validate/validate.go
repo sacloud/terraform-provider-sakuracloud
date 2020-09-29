@@ -14,9 +14,31 @@
 
 package validate
 
-import "github.com/go-playground/validator/v10"
+import (
+	"github.com/go-playground/validator/v10"
+	"github.com/sacloud/libsacloud/v2/sacloud/types"
+)
+
+var v *validator.Validate
 
 // Struct go-playground/validatorを利用してバリデーションを行う
 func Struct(s interface{}) error {
-	return validator.New().Struct(s)
+	return v.Struct(s)
+}
+
+func init() {
+	v = validator.New()
+	if err := v.RegisterValidation("dns_record_type", validateDNSRecord); err != nil {
+		panic(err)
+	}
+}
+
+func validateDNSRecord(fl validator.FieldLevel) bool {
+	t := fl.Field().String()
+	for _, ts := range types.DNSRecordTypeStrings {
+		if t == ts {
+			return true
+		}
+	}
+	return false
 }

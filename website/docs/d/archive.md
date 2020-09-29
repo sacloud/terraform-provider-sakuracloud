@@ -22,7 +22,7 @@ data "sakuracloud_archive" "foobar" {
 * `filter` - (Optional) One or more values used for filtering, as defined below.
 * `os_type` - (Optional) The criteria used to filter SakuraCloud archives. This must be one of following:  
   - **CentOS**: [`centos`/`centos8`/`centos7`/`centos6`]  
-  - **Ubuntu**: [`ubuntu`/`ubuntu1804`/`ubuntu1604`]  
+  - **Ubuntu**: [`ubuntu`/`ubuntu2004`/`ubuntu1804`/`ubuntu1604`]  
   - **Debian**: [`debian`/`debian10`/`debian9`]
   - **CoreOS/ContainerLinux**: `coreos`  
   - **RancherOS**: `rancheros`  
@@ -43,15 +43,15 @@ A `filter` block supports the following:
 
 * `condition` - (Optional) One or more name/values pairs used for filtering. There are several valid keys, for a full reference, check out finding section in the [SakuraCloud API reference](https://developer.sakura.ad.jp/cloud/api/1.1/).
 * `id` - (Optional) The resource id on SakuraCloud used for filtering.
-* `names` - (Optional) The resource names on SakuraCloud used for filtering. If multiple values ​​are specified, they combined as AND condition.
-* `tags` - (Optional) The resource tags on SakuraCloud used for filtering. If multiple values ​​are specified, they combined as AND condition.
+* `names` - (Optional) The resource names on SakuraCloud used for filtering. If multiple values are specified, they combined as AND condition.
+* `tags` - (Optional) The resource tags on SakuraCloud used for filtering. If multiple values are specified, they combined as AND condition.
 
 ---
 
 A `condition` block supports the following:
 
 * `name` - (Required) The name of the target field. This value is case-sensitive.
-* `values` - (Required) The values of the condition. If multiple values ​​are specified, they combined as AND condition.
+* `values` - (Required) The values of the condition. If multiple values are specified, they combined as AND condition.
 
 
 ## Attribute Reference

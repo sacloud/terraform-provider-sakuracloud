@@ -12,7 +12,22 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package libsacloud
+package types
 
-// Version バージョン
-const Version = "2.8.1"
+type EOTPOperation string
+
+func (o EOTPOperation) String() string {
+	return string(o)
+}
+
+var (
+	OTPOperations = struct {
+		Unknown  EOTPOperation
+		Input    EOTPOperation
+		Generate EOTPOperation
+	}{
+		Unknown:  EOTPOperation(""),
+		Input:    EOTPOperation("input"),
+		Generate: EOTPOperation("generate"),
+	}
+)

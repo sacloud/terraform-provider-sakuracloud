@@ -26,8 +26,8 @@ import (
 	"time"
 
 	"github.com/hashicorp/go-retryablehttp"
-
 	"github.com/sacloud/libsacloud/v2"
+	"github.com/sacloud/libsacloud/v2/sacloud/types"
 )
 
 var (
@@ -35,7 +35,7 @@ var (
 	SakuraCloudAPIRoot = "https://secure.sakura.ad.jp/cloud/zone"
 
 	// SakuraCloudZones 利用可能なゾーンのデフォルト値
-	SakuraCloudZones = []string{"is1a", "is1b", "tk1a", "tk1b", "tk1v"}
+	SakuraCloudZones = types.ZoneNames
 )
 
 var (
@@ -62,7 +62,7 @@ const (
 	APIAccessSecretEnvKey = "SAKURACLOUD_ACCESS_TOKEN_SECRET"
 )
 
-// APICaller API呼び出し時に利用するトランスポートのインターフェース
+// APICaller API呼び出し時に利用するトランスポートのインターフェース sacloud.Clientなどで実装される
 type APICaller interface {
 	Do(ctx context.Context, method, uri string, body interface{}) ([]byte, error)
 }

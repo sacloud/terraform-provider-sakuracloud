@@ -199,7 +199,7 @@ func TestAccImportSakuraCloudDisk_basic(t *testing.T) {
 
 var testAccSakuraCloudDisk_basic = `
 data "sakuracloud_archive" "ubuntu" {
-  os_type = "ubuntu"
+  os_type = "ubuntu2004"
 }
 resource "sakuracloud_disk" "foobar" {
   name              = "{{ .arg0 }}"
@@ -221,7 +221,7 @@ resource "sakuracloud_icon" "foobar" {
 
 var testAccSakuraCloudDisk_upadte = `
 data "sakuracloud_archive" "ubuntu" {
-  os_type = "ubuntu"
+  os_type = "ubuntu2004"
 }
 resource "sakuracloud_disk" "foobar" {
   name              = "{{ .arg0 }}-upd"

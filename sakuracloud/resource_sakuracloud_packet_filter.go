@@ -156,7 +156,7 @@ func resourceSakuraCloudPacketFilterUpdate(d *schema.ResourceData, meta interfac
 		return fmt.Errorf("could not read SakuraCloud PacketFilter[%s]: %s", d.Id(), err)
 	}
 
-	_, err = pfOp.Update(ctx, zone, pf.ID, expandPacketFilterUpdateRequest(d, pf))
+	_, err = pfOp.Update(ctx, zone, pf.ID, expandPacketFilterUpdateRequest(d, pf), pf.ExpressionHash)
 	if err != nil {
 		return fmt.Errorf("updating SakuraCloud PacketFilter[%s] is failed: %s", d.Id(), err)
 	}
