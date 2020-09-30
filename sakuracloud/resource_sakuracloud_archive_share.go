@@ -138,7 +138,7 @@ func resourceSakuraCloudArchiveShareDelete(d *schema.ResourceData, meta interfac
 	}
 
 	if err := archiveOp.CloseFTP(ctx, zone, archive.ID); err != nil {
-		return fmt.Errorf("deleting SakuraCloud Archive Share[%s] is failed: %s", archive.ID, err)
+		return fmt.Errorf("deleting SakuraCloud Archive Share[%s] is failed: %s", d.Id(), err)
 	}
 
 	d.SetId("")

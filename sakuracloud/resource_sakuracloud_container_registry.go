@@ -164,7 +164,7 @@ func resourceSakuraCloudContainerRegistryUpdate(d *schema.ResourceData, meta int
 
 	builder := expandContainerRegistryBuilder(d, client, reg.SettingsHash)
 	if _, err := builder.Update(ctx, reg.ID); err != nil {
-		return fmt.Errorf("updating SakuraCloud ContainerRegistry[%s] is failed: %s", reg.ID, err)
+		return fmt.Errorf("updating SakuraCloud ContainerRegistry[%s] is failed: %s", d.Id(), err)
 	}
 
 	return resourceSakuraCloudContainerRegistryRead(d, meta)
@@ -189,7 +189,7 @@ func resourceSakuraCloudContainerRegistryDelete(d *schema.ResourceData, meta int
 	}
 
 	if err := regOp.Delete(ctx, reg.ID); err != nil {
-		return fmt.Errorf("deleting SakuraCloud ContainerRegistry[%s] is failed: %s", reg.ID, err)
+		return fmt.Errorf("deleting SakuraCloud ContainerRegistry[%s] is failed: %s", d.Id(), err)
 	}
 
 	d.SetId("")

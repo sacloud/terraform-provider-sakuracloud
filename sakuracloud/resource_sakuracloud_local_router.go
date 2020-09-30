@@ -235,9 +235,8 @@ func resourceSakuraCloudLocalRouterUpdate(d *schema.ResourceData, meta interface
 		return fmt.Errorf("validating parameter for SakuraCloud LocalRouter is failed: %s", err)
 	}
 
-	localRouter, err = builder.Update(ctx, localRouter.ID)
-	if err != nil {
-		return fmt.Errorf("updating SakuraCloud LocalRouter[%s] is failed: %s", localRouter.ID, err)
+	if _, err = builder.Update(ctx, localRouter.ID); err != nil {
+		return fmt.Errorf("updating SakuraCloud LocalRouter[%s] is failed: %s", d.Id(), err)
 	}
 	return resourceSakuraCloudLocalRouterRead(d, meta)
 }
@@ -265,7 +264,7 @@ func resourceSakuraCloudLocalRouterDelete(d *schema.ResourceData, meta interface
 	}
 
 	if err := lrOp.Delete(ctx, localRouter.ID); err != nil {
-		return fmt.Errorf("deleting SakuraCloud LocalRouter[%s] is failed: %s", localRouter.ID, err)
+		return fmt.Errorf("deleting SakuraCloud LocalRouter[%s] is failed: %s", d.Id(), err)
 	}
 	return nil
 }

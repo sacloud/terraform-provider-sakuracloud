@@ -115,7 +115,7 @@ func resourceSakuraCloudSSHKeyUpdate(d *schema.ResourceData, meta interface{}) e
 
 	_, err = sshKeyOp.Update(ctx, key.ID, expandSSHKeyUpdateRequest(d))
 	if err != nil {
-		return fmt.Errorf("updating SSHKey[%s] is failed: %s", key.ID, err)
+		return fmt.Errorf("updating SSHKey[%s] is failed: %s", d.Id(), err)
 	}
 	return resourceSakuraCloudSSHKeyRead(d, meta)
 }
@@ -140,7 +140,7 @@ func resourceSakuraCloudSSHKeyDelete(d *schema.ResourceData, meta interface{}) e
 	}
 
 	if err := sshKeyOp.Delete(ctx, key.ID); err != nil {
-		return fmt.Errorf("deleting SSHKey[%s] is failed: %s", key.ID, err)
+		return fmt.Errorf("deleting SSHKey[%s] is failed: %s", d.Id(), err)
 	}
 	return nil
 }
