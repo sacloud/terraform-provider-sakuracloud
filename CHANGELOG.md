@@ -5,6 +5,14 @@ FEATURES
 * ESME [GH-772] (@yamamoto-febc)
 * libsacloud v2.8.1 [GH-771] (@yamamoto-febc)
 
+IMPROVEMENTS
+
+* Use d.Id() for building error message [GH-774] (@yamamoto-febc)
+
+MISC
+
+* Remove Dockerfile [GH-773] (@yamamoto-febc)
+
 ## 2.4.1 (2020-09-17)
 
 FEATURES
