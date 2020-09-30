@@ -183,7 +183,7 @@ func resourceSakuraCloudDatabaseReadReplicaUpdate(d *schema.ResourceData, meta i
 
 	db, err = builder.Update(ctx, zone, db.ID)
 	if err != nil {
-		return fmt.Errorf("updating SakuraCloud Database ReadReplica[%s] is failed: %s", db.ID, err)
+		return fmt.Errorf("updating SakuraCloud Database ReadReplica[%s] is failed: %s", d.Id(), err)
 	}
 
 	return setDatabaseReadReplicaResourceData(ctx, d, client, db)
@@ -217,7 +217,7 @@ func resourceSakuraCloudDatabaseReadReplicaDelete(d *schema.ResourceData, meta i
 
 	// delete
 	if err = dbOp.Delete(ctx, zone, data.ID); err != nil {
-		return fmt.Errorf("deleting SakuraCloud Database[%s] is failed: %s", data.ID, err)
+		return fmt.Errorf("deleting SakuraCloud Database[%s] is failed: %s", d.Id(), err)
 	}
 
 	d.SetId("")

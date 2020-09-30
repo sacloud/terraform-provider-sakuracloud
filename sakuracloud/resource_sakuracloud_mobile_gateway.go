@@ -282,9 +282,8 @@ func resourceSakuraCloudMobileGatewayUpdate(d *schema.ResourceData, meta interfa
 		return fmt.Errorf("validating SakuraCloud MobileGateway is failed: %s", err)
 	}
 
-	mgw, err = builder.Update(ctx, zone, mgw.ID)
-	if err != nil {
-		return fmt.Errorf("updating SakuraCloud MobileGateway[%s] is failed: %s", mgw.ID, err)
+	if _, err = builder.Update(ctx, zone, mgw.ID); err != nil {
+		return fmt.Errorf("updating SakuraCloud MobileGateway[%s] is failed: %s", d.Id(), err)
 	}
 
 	return resourceSakuraCloudMobileGatewayRead(d, meta)
@@ -311,7 +310,7 @@ func resourceSakuraCloudMobileGatewayDelete(d *schema.ResourceData, meta interfa
 	}
 
 	if err := cleanup.DeleteMobileGateway(ctx, mgwOp, simOp, zone, mgw.ID); err != nil {
-		return fmt.Errorf("deleting SakuraCloud MobileGateway[%s] is failed: %s", mgw.ID, err)
+		return fmt.Errorf("deleting SakuraCloud MobileGateway[%s] is failed: %s", d.Id(), err)
 	}
 	return nil
 }

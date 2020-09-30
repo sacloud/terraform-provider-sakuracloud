@@ -107,12 +107,12 @@ func resourceSakuraCloudBridgeUpdate(d *schema.ResourceData, meta interface{}) e
 		return fmt.Errorf("could not read SakuraCloud Bridge[%s]: %s", d.Id(), err)
 	}
 
-	bridge, err = bridgeOp.Update(ctx, zone, bridge.ID, &sacloud.BridgeUpdateRequest{
+	_, err = bridgeOp.Update(ctx, zone, bridge.ID, &sacloud.BridgeUpdateRequest{
 		Name:        d.Get("name").(string),
 		Description: d.Get("description").(string),
 	})
 	if err != nil {
-		return fmt.Errorf("updating SakuraCloud Bridge[%s] is failed: %s", bridge.ID, err)
+		return fmt.Errorf("updating SakuraCloud Bridge[%s] is failed: %s", d.Id(), err)
 	}
 	return resourceSakuraCloudBridgeRead(d, meta)
 }

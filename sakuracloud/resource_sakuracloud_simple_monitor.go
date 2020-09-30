@@ -253,9 +253,8 @@ func resourceSakuraCloudSimpleMonitorUpdate(d *schema.ResourceData, meta interfa
 		return fmt.Errorf("could not read SimpleMonitor[%s]: %s", d.Id(), err)
 	}
 
-	simpleMonitor, err = smOp.Update(ctx, simpleMonitor.ID, expandSimpleMonitorUpdateRequest(d))
-	if err != nil {
-		return fmt.Errorf("updating SimpleMonitor[%s] is failed: %s", simpleMonitor.ID, err)
+	if _, err = smOp.Update(ctx, simpleMonitor.ID, expandSimpleMonitorUpdateRequest(d)); err != nil {
+		return fmt.Errorf("updating SimpleMonitor[%s] is failed: %s", d.Id(), err)
 	}
 
 	return resourceSakuraCloudSimpleMonitorRead(d, meta)
@@ -281,7 +280,7 @@ func resourceSakuraCloudSimpleMonitorDelete(d *schema.ResourceData, meta interfa
 	}
 
 	if err := smOp.Delete(ctx, simpleMonitor.ID); err != nil {
-		return fmt.Errorf("deleting SimpleMonitor[%s] is failed: %s", simpleMonitor.ID, err)
+		return fmt.Errorf("deleting SimpleMonitor[%s] is failed: %s", d.Id(), err)
 	}
 	return nil
 }

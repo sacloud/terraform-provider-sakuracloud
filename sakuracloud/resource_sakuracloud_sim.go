@@ -166,12 +166,12 @@ func resourceSakuraCloudSIMUpdate(d *schema.ResourceData, meta interface{}) erro
 
 	builder := expandSIMBuilder(d, client)
 	if err := builder.Validate(ctx); err != nil {
-		return fmt.Errorf("validating SakuraCloud SIM[%s] is failed: %s", sim.ID, err)
+		return fmt.Errorf("validating SakuraCloud SIM[%s] is failed: %s", d.Id(), err)
 	}
 
 	_, err = builder.Update(ctx, sim.ID)
 	if err != nil {
-		return fmt.Errorf("updating SakuraCloud SIM[%s] is failed: %s", sim.ID, err)
+		return fmt.Errorf("updating SakuraCloud SIM[%s] is failed: %s", d.Id(), err)
 	}
 
 	return resourceSakuraCloudSIMRead(d, meta)

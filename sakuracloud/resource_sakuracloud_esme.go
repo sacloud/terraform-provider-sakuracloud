@@ -117,9 +117,8 @@ func resourceSakuraCloudESMEUpdate(d *schema.ResourceData, meta interface{}) err
 		return err
 	}
 
-	esme, err = esmeOp.Update(ctx, esme.ID, expandESMEUpdateRequest(d, esme))
-	if err != nil {
-		return fmt.Errorf("updating SakuraCloud ESME[%s] is failed: %s", esme.ID, err)
+	if _, err = esmeOp.Update(ctx, esme.ID, expandESMEUpdateRequest(d, esme)); err != nil {
+		return fmt.Errorf("updating SakuraCloud ESME[%s] is failed: %s", d.Id(), err)
 	}
 
 	return resourceSakuraCloudESMERead(d, meta)
@@ -145,7 +144,7 @@ func resourceSakuraCloudESMEDelete(d *schema.ResourceData, meta interface{}) err
 	}
 
 	if err := esmeOp.Delete(ctx, esme.ID); err != nil {
-		return fmt.Errorf("deleting SakuraCloud ESME[%s] is failed: %s", esme.ID, err)
+		return fmt.Errorf("deleting SakuraCloud ESME[%s] is failed: %s", d.Id(), err)
 	}
 
 	d.SetId("")

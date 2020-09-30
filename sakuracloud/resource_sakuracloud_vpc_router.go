@@ -588,12 +588,12 @@ func resourceSakuraCloudVPCRouterDelete(d *schema.ResourceData, meta interface{}
 
 	if vpcRouter.InstanceStatus.IsUp() {
 		if err := power.ShutdownVPCRouter(ctx, vrOp, zone, vpcRouter.ID, true); err != nil {
-			return fmt.Errorf("stopping VPCRouter[%s] is failed: %s", vpcRouter.ID, err)
+			return fmt.Errorf("stopping VPCRouter[%s] is failed: %s", d.Id(), err)
 		}
 	}
 
 	if err := vrOp.Delete(ctx, zone, vpcRouter.ID); err != nil {
-		return fmt.Errorf("deleting SakuraCloud VPCRouter[%s] is failed: %s", vpcRouter.ID, err)
+		return fmt.Errorf("deleting SakuraCloud VPCRouter[%s] is failed: %s", d.Id(), err)
 	}
 	return nil
 }

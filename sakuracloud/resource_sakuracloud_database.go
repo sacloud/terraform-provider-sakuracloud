@@ -235,7 +235,7 @@ func resourceSakuraCloudDatabaseUpdate(d *schema.ResourceData, meta interface{})
 
 	dbBuilder := expandDatabaseBuilder(d, client)
 	if _, err := dbBuilder.Update(ctx, zone, db.ID); err != nil {
-		return fmt.Errorf("updating SakuraCloud Database[%s] is failed: %s", db.ID, err)
+		return fmt.Errorf("updating SakuraCloud Database[%s] is failed: %s", d.Id(), err)
 	}
 
 	return resourceSakuraCloudDatabaseRead(d, meta)
@@ -268,7 +268,7 @@ func resourceSakuraCloudDatabaseDelete(d *schema.ResourceData, meta interface{})
 
 	// delete
 	if err = dbOp.Delete(ctx, zone, data.ID); err != nil {
-		return fmt.Errorf("deleting SakuraCloud Database[%s] is failed: %s", data.ID, err)
+		return fmt.Errorf("deleting SakuraCloud Database[%s] is failed: %s", d.Id(), err)
 	}
 
 	d.SetId("")

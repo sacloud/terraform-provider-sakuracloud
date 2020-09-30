@@ -139,9 +139,8 @@ func resourceSakuraCloudAutoBackupUpdate(d *schema.ResourceData, meta interface{
 		return err
 	}
 
-	autoBackup, err = autoBackupOp.Update(ctx, zone, autoBackup.ID, expandAutoBackupUpdateRequest(d, autoBackup))
-	if err != nil {
-		return fmt.Errorf("updating SakuraCloud AutoBackup[%s] is failed: %s", autoBackup.ID, err)
+	if _, err = autoBackupOp.Update(ctx, zone, autoBackup.ID, expandAutoBackupUpdateRequest(d, autoBackup)); err != nil {
+		return fmt.Errorf("updating SakuraCloud AutoBackup[%s] is failed: %s", d.Id(), err)
 	}
 
 	return resourceSakuraCloudAutoBackupRead(d, meta)
@@ -167,7 +166,7 @@ func resourceSakuraCloudAutoBackupDelete(d *schema.ResourceData, meta interface{
 	}
 
 	if err := autoBackupOp.Delete(ctx, zone, autoBackup.ID); err != nil {
-		return fmt.Errorf("deleting SakuraCloud AutoBackup[%s] is failed: %s", autoBackup.ID, err)
+		return fmt.Errorf("deleting SakuraCloud AutoBackup[%s] is failed: %s", d.Id(), err)
 	}
 
 	d.SetId("")
