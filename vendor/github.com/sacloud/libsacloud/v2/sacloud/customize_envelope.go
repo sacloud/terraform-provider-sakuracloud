@@ -114,6 +114,16 @@ func (s containerRegistryFindRequestEnvelope) MarshalJSON() ([]byte, error) {
 	return json.Marshal(tmp)
 }
 
+func (s eSMEFindRequestEnvelope) MarshalJSON() ([]byte, error) {
+	type alias eSMEFindRequestEnvelope
+	tmp := alias(s)
+	if tmp.Filter == nil {
+		tmp.Filter = search.Filter{}
+	}
+	tmp.Filter[search.Key("Provider.Class")] = "esme"
+	return json.Marshal(tmp)
+}
+
 func (s dNSFindRequestEnvelope) MarshalJSON() ([]byte, error) {
 	type alias dNSFindRequestEnvelope
 	tmp := alias(s)
