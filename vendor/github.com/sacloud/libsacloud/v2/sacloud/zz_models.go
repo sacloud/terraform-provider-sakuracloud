@@ -12869,12 +12869,12 @@ func (o *LoadBalancer) SetInterfaces(v []*InterfaceView) {
 
 // LoadBalancerVirtualIPAddress represents API parameter/response structure
 type LoadBalancerVirtualIPAddress struct {
-	VirtualIPAddress string             `validate:"ipv4"`
-	Port             types.StringNumber `validate:"min=1,max=65535"`
-	DelayLoop        types.StringNumber `mapconv:",default=10" validate:"min=0,max=10000"`
-	SorryServer      string             `validate:"omitempty,ipv4"`
-	Description      string             `validate:"min=0,max=512"`
-	Servers          LoadBalancerServers
+	VirtualIPAddress string              `validate:"ipv4"`
+	Port             types.StringNumber  `validate:"min=1,max=65535"`
+	DelayLoop        types.StringNumber  `mapconv:",default=10" validate:"min=0,max=10000"`
+	SorryServer      string              `validate:"omitempty,ipv4"`
+	Description      string              `validate:"min=0,max=512"`
+	Servers          LoadBalancerServers `mapconv:"[]Servers,recursive" validate:"min=0,max=40"`
 }
 
 // Validate validates by field tags
@@ -12885,12 +12885,12 @@ func (o *LoadBalancerVirtualIPAddress) Validate() error {
 // setDefaults implements sacloud.argumentDefaulter
 func (o *LoadBalancerVirtualIPAddress) setDefaults() interface{} {
 	return &struct {
-		VirtualIPAddress string             `validate:"ipv4"`
-		Port             types.StringNumber `validate:"min=1,max=65535"`
-		DelayLoop        types.StringNumber `mapconv:",default=10" validate:"min=0,max=10000"`
-		SorryServer      string             `validate:"omitempty,ipv4"`
-		Description      string             `validate:"min=0,max=512"`
-		Servers          LoadBalancerServers
+		VirtualIPAddress string              `validate:"ipv4"`
+		Port             types.StringNumber  `validate:"min=1,max=65535"`
+		DelayLoop        types.StringNumber  `mapconv:",default=10" validate:"min=0,max=10000"`
+		SorryServer      string              `validate:"omitempty,ipv4"`
+		Description      string              `validate:"min=0,max=512"`
+		Servers          LoadBalancerServers `mapconv:"[]Servers,recursive" validate:"min=0,max=40"`
 	}{
 		VirtualIPAddress: o.GetVirtualIPAddress(),
 		Port:             o.GetPort(),
