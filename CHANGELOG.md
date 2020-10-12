@@ -1,4 +1,8 @@
-## 2.5.0 (Unreleased)
+## 2.5.1 (Unreleased)
+
+*
+
+## 2.5.0 (2020-09-30)
 
 FEATURES
 
