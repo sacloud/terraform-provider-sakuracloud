@@ -1,4 +1,8 @@
-## 2.5.1 (Unreleased)
+## 2.5.2 (Unreleased)
+
+*
+
+## 2.5.1 (2020-10-21)
 
 * libsacloud v2.8.4 [GH-779] (@yamamoto-febc)
 * Use d.Id() for building error message [GH-774] (@yamamoto-febc)
