@@ -70,13 +70,50 @@ type DatabaseSettingCommon struct {
 	//
 	// [HACK] Create時はbool型、Read/Update時は文字列(FQDN or IP)となる。
 	// また、無効にするにはJSONで要素自体を指定しないことで行う。
-	WebUI           interface{} `yaml:"web_ui"`
-	ServicePort     int         `json:",omitempty" yaml:"service_port,omitempty" structs:",omitempty"`
-	SourceNetwork   []string    `yaml:"source_network"`
-	DefaultUser     string      `json:",omitempty" yaml:"default_user,omitempty" structs:",omitempty"`
-	UserPassword    string      `json:",omitempty" yaml:"user_password,omitempty" structs:",omitempty"`
-	ReplicaUser     string      `json:",omitempty" yaml:"replica_user,omitempty" structs:",omitempty"`
-	ReplicaPassword string      `json:",omitempty" yaml:"replica_password,omitempty" structs:",omitempty"`
+	WebUI           interface{}                   `yaml:"web_ui"`
+	ServicePort     int                           `json:",omitempty" yaml:"service_port,omitempty" structs:",omitempty"`
+	SourceNetwork   DatabaseSettingSourceNetworks `yaml:"source_network"`
+	DefaultUser     string                        `json:",omitempty" yaml:"default_user,omitempty" structs:",omitempty"`
+	UserPassword    string                        `json:",omitempty" yaml:"user_password,omitempty" structs:",omitempty"`
+	ReplicaUser     string                        `json:",omitempty" yaml:"replica_user,omitempty" structs:",omitempty"`
+	ReplicaPassword string                        `json:",omitempty" yaml:"replica_password,omitempty" structs:",omitempty"`
+}
+
+// DatabaseSettingSourceNetworks データベースへのアクセスを許可するCIDRリスト
+//
+// Note: すべての接続先を許可する場合は"0.0.0.0/0"を指定する。
+// この処理はMarshalJSON時にDatabaseSettingSourceNetwork側で行われるため、
+// APIクライアント側は許可したいCIDRブロックのリストを指定する。
+// libsacloudではすべての接続を拒否する設定はサポートしない。
+type DatabaseSettingSourceNetworks []string
+
+// MarshalJSON すべての接続先を許可する場合は"0.0.0.0/0"を指定するための対応
+func (d DatabaseSettingSourceNetworks) MarshalJSON() ([]byte, error) {
+	type alias DatabaseSettingSourceNetworks
+	dest := alias(d)
+
+	if dest == nil || len(dest) == 0 {
+		dest = append(dest, "0.0.0.0/0")
+	}
+
+	return json.Marshal(dest)
+}
+
+func (d *DatabaseSettingSourceNetworks) UnmarshalJSON(b []byte) error {
+	if string(b) == `""` || string(b) == "" {
+		return nil
+	}
+	type alias DatabaseSettingSourceNetworks
+
+	var a alias
+	if err := json.Unmarshal(b, &a); err != nil {
+		return err
+	}
+	if len(a) == 1 && a[0] == "0.0.0.0/0" {
+		return nil
+	}
+	*d = DatabaseSettingSourceNetworks(a)
+	return nil
 }
 
 // DatabaseSettingBackup データベース設定 バックアップ設定

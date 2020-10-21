@@ -64,8 +64,8 @@ type SIMInfo struct {
 
 // SIMTrafficBytes 当月通信量
 type SIMTrafficBytes struct {
-	UplinkBytes   uint64 `json:"uplink_bytes,omitempty" yaml:"uplink_bytes,omitempty" structs:",omitempty"`
-	DownlinkBytes uint64 `json:"downlink_bytes,omitempty" yaml:"downlink_bytes,omitempty" structs:",omitempty"`
+	UplinkBytes   types.StringNumber `json:"uplink_bytes,omitempty" yaml:"uplink_bytes,omitempty" structs:",omitempty"`
+	DownlinkBytes types.StringNumber `json:"downlink_bytes,omitempty" yaml:"downlink_bytes,omitempty" structs:",omitempty"`
 }
 
 // SIMProvider SIMプロバイダー
