@@ -1,6 +1,6 @@
 ## 2.5.2 (Unreleased)
 
-*
+*　libsacloud v2.8.5 [GH-781] (@yamamoto-febc)
 
 ## 2.5.1 (2020-10-21)
 
