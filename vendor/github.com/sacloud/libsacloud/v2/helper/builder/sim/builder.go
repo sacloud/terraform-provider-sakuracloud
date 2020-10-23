@@ -131,12 +131,14 @@ func (b *Builder) Update(ctx context.Context, id types.ID) (*sacloud.SIM, error)
 		}
 	}
 
-	if b.IMEI == "" || sim.Info.IMEILock {
+	// Unlock -> ロックされている、かつIMEIが空か前と変わっている場合
+	if sim.Info.IMEILock && (b.IMEI == "" || b.IMEI != sim.Info.ConnectedIMEI) {
 		if err := b.Client.SIM.IMEIUnlock(ctx, sim.ID); err != nil {
 			return nil, err
 		}
 	}
-	if b.IMEI != "" {
+	// Lock -> IMEIが変わっている場合は上でアンロックされた状態になっているはず
+	if b.IMEI != "" && b.IMEI != sim.Info.ConnectedIMEI {
 		if err := b.Client.SIM.IMEILock(ctx, sim.ID, &sacloud.SIMIMEILockRequest{IMEI: b.IMEI}); err != nil {
 			return nil, err
 		}
