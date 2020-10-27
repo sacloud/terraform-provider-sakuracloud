@@ -15849,6 +15849,7 @@ func (o *MobileGatewaySIMRouteParam) SetPrefix(v string) {
 type MobileGatewaySIMInfo struct {
 	ICCID                      string
 	IMSI                       []string
+	IMEI                       string
 	IP                         string
 	SessionStatus              string
 	IMEILock                   bool
@@ -15873,6 +15874,7 @@ func (o *MobileGatewaySIMInfo) setDefaults() interface{} {
 	return &struct {
 		ICCID                      string
 		IMSI                       []string
+		IMEI                       string
 		IP                         string
 		SessionStatus              string
 		IMEILock                   bool
@@ -15888,6 +15890,7 @@ func (o *MobileGatewaySIMInfo) setDefaults() interface{} {
 	}{
 		ICCID:                      o.GetICCID(),
 		IMSI:                       o.GetIMSI(),
+		IMEI:                       o.GetIMEI(),
 		IP:                         o.GetIP(),
 		SessionStatus:              o.GetSessionStatus(),
 		IMEILock:                   o.GetIMEILock(),
@@ -15921,6 +15924,16 @@ func (o *MobileGatewaySIMInfo) GetIMSI() []string {
 // SetIMSI sets value to IMSI
 func (o *MobileGatewaySIMInfo) SetIMSI(v []string) {
 	o.IMSI = v
+}
+
+// GetIMEI returns value of IMEI
+func (o *MobileGatewaySIMInfo) GetIMEI() string {
+	return o.IMEI
+}
+
+// SetIMEI sets value to IMEI
+func (o *MobileGatewaySIMInfo) SetIMEI(v string) {
+	o.IMEI = v
 }
 
 // GetIP returns value of IP
@@ -22542,6 +22555,7 @@ func (o *SIM) SetModifiedAt(v time.Time) {
 type SIMInfo struct {
 	ICCID                      string
 	IMSI                       []string
+	IMEI                       string
 	IP                         string
 	SessionStatus              string
 	IMEILock                   bool
@@ -22566,6 +22580,7 @@ func (o *SIMInfo) setDefaults() interface{} {
 	return &struct {
 		ICCID                      string
 		IMSI                       []string
+		IMEI                       string
 		IP                         string
 		SessionStatus              string
 		IMEILock                   bool
@@ -22581,6 +22596,7 @@ func (o *SIMInfo) setDefaults() interface{} {
 	}{
 		ICCID:                      o.GetICCID(),
 		IMSI:                       o.GetIMSI(),
+		IMEI:                       o.GetIMEI(),
 		IP:                         o.GetIP(),
 		SessionStatus:              o.GetSessionStatus(),
 		IMEILock:                   o.GetIMEILock(),
@@ -22614,6 +22630,16 @@ func (o *SIMInfo) GetIMSI() []string {
 // SetIMSI sets value to IMSI
 func (o *SIMInfo) SetIMSI(v []string) {
 	o.IMSI = v
+}
+
+// GetIMEI returns value of IMEI
+func (o *SIMInfo) GetIMEI() string {
+	return o.IMEI
+}
+
+// SetIMEI sets value to IMEI
+func (o *SIMInfo) SetIMEI(v string) {
+	o.IMEI = v
 }
 
 // GetIP returns value of IP
