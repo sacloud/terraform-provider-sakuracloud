@@ -48,6 +48,7 @@ type SIMStatus struct {
 type SIMInfo struct {
 	ICCID                      string           `json:"iccid,omitempty" yaml:"iccid,omitempty" structs:",omitempty"`
 	IMSI                       []string         `json:"imsi,omitempty" yaml:"imsi,omitempty" structs:",omitempty"`
+	IMEI                       string           `json:"imei,omitempty" yaml:"imei,omitempty" structs:",omitempty"`
 	IP                         string           `json:"ip,omitempty" yaml:"ip,omitempty" structs:",omitempty"`
 	SessionStatus              string           `json:"session_status,omitempty" yaml:"session_status,omitempty" structs:",omitempty"`
 	IMEILock                   bool             `json:"imei_lock" yaml:"imei_lock"`
