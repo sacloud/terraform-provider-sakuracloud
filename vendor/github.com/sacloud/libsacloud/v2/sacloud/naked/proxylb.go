@@ -191,6 +191,16 @@ type ProxyLBCertificates struct {
 	AdditionalCerts ProxyLBAdditionalCerts `yaml:"additional_certs"`
 }
 
+// MarshalJSON nullの場合に空配列を出力するための実装
+func (s ProxyLBCertificates) MarshalJSON() ([]byte, error) {
+	if s.AdditionalCerts == nil {
+		s.AdditionalCerts = make([]*ProxyLBCertificate, 0)
+	}
+	type alias ProxyLBCertificates
+	tmp := alias(s)
+	return json.Marshal(&tmp)
+}
+
 // UnmarshalJSON UnmarshalJSON(AdditionalCertsが空の場合に空文字を返す問題への対応)
 func (p *ProxyLBAdditionalCerts) UnmarshalJSON(data []byte) error {
 	targetData := strings.Replace(strings.Replace(string(data), " ", "", -1), "\n", "", -1)
