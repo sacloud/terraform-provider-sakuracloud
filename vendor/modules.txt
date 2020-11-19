@@ -246,7 +246,7 @@ github.com/sacloud/ftps
 # github.com/sacloud/iso9660wrap v0.0.0-20171031075302-eda21f77f6a8
 ## explicit
 github.com/sacloud/iso9660wrap
-# github.com/sacloud/libsacloud/v2 v2.8.6
+# github.com/sacloud/libsacloud/v2 v2.8.10
 ## explicit
 github.com/sacloud/libsacloud/v2
 github.com/sacloud/libsacloud/v2/helper/builder

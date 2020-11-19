@@ -32,6 +32,12 @@ const (
 	DirectoryNameEnvOld = "USACLOUD_PROFILE_DIR"
 	// DefaultProfileName デフォルトのプロファイル名
 	DefaultProfileName = "default"
+
+	// EnableAPITraceWord TraceModeに設定する、APIトレースを有効化するためのキーワード
+	EnableAPITraceWord = "api"
+
+	// EnableHTTPTraceWord TraceModeに設定する、HTTPトレースを有効化するためのキーワード
+	EnableHTTPTraceWord = "http"
 )
 
 var (
@@ -149,12 +155,45 @@ type ConfigValue struct {
 	// APIRootURL APIのルートURL
 	APIRootURL string `json:",omitempty"`
 
+	// DefaultZone グローバルリソースAPIを呼ぶ際に指定するゾーン
+	DefaultZone string `json:",omitempty"`
+
 	// TraceMode トレースモード
 	TraceMode string `json:",omitempty"`
 	// FakeMode フェイクモード有効化
 	FakeMode bool `json:",omitempty"`
 	// FakeStorePath フェイクモードでのファイルストアパス
 	FakeStorePath string `json:",omitempty"`
+}
+
+func (o *ConfigValue) traceModeValue() string {
+	return strings.ToLower(strings.TrimSpace(o.TraceMode))
+}
+
+func (o *ConfigValue) EnableHTTPTrace() bool {
+	traceMode := o.traceModeValue()
+	if traceMode == "" {
+		return false
+	}
+
+	// TraceModeが"api"の場合はfalseにする(TraceMode=1などの場合はAPI/HTTP両方が有効になる)
+	if traceMode == EnableAPITraceWord {
+		return false
+	}
+	return true
+}
+
+func (o *ConfigValue) EnableAPITrace() bool {
+	traceMode := o.traceModeValue()
+	if traceMode == "" {
+		return false
+	}
+
+	// TraceModeが"http"の場合はfalseにする(TraceMode=1などの場合はAPI/HTTP両方が有効になる)
+	if traceMode == EnableHTTPTraceWord {
+		return false
+	}
+	return true
 }
 
 // Save プロファイルコンフィグを保存

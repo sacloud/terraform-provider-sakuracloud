@@ -20092,7 +20092,7 @@ func (o *ProxyLBAdditionalCert) SetCertificateCommonName(v string) {
 
 // ProxyLBSetCertificatesRequest represents API parameter/response structure
 type ProxyLBSetCertificatesRequest struct {
-	PrimaryCerts    *ProxyLBPrimaryCert
+	PrimaryCerts    *ProxyLBPrimaryCert      `mapconv:"PrimaryCert"`
 	AdditionalCerts []*ProxyLBAdditionalCert `mapconv:"[]AdditionalCerts, recursive"`
 }
 
@@ -20104,7 +20104,7 @@ func (o *ProxyLBSetCertificatesRequest) Validate() error {
 // setDefaults implements sacloud.argumentDefaulter
 func (o *ProxyLBSetCertificatesRequest) setDefaults() interface{} {
 	return &struct {
-		PrimaryCerts    *ProxyLBPrimaryCert
+		PrimaryCerts    *ProxyLBPrimaryCert      `mapconv:"PrimaryCert"`
 		AdditionalCerts []*ProxyLBAdditionalCert `mapconv:"[]AdditionalCerts, recursive"`
 	}{
 		PrimaryCerts:    o.GetPrimaryCerts(),
