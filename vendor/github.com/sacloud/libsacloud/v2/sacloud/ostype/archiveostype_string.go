@@ -24,9 +24,9 @@ func _() {
 	var x [1]struct{}
 	_ = x[Custom-0]
 	_ = x[CentOS-1]
-	_ = x[CentOS8-2]
-	_ = x[CentOS7-3]
-	_ = x[CentOS6-4]
+	_ = x[CentOS8Stream-2]
+	_ = x[CentOS8-3]
+	_ = x[CentOS7-4]
 	_ = x[Ubuntu-5]
 	_ = x[Ubuntu2004-6]
 	_ = x[Ubuntu1804-7]
@@ -61,9 +61,9 @@ func _() {
 	_ = x[Windows2019SQLServer2019StandardAll-36]
 }
 
-const _ArchiveOSType_name = "CustomCentOSCentOS8CentOS7CentOS6UbuntuUbuntu2004Ubuntu1804Ubuntu1604DebianDebian10Debian9CoreOSRancherOSK3OSKusanagiFreeBSDWindows2016Windows2016RDSWindows2016RDSOfficeWindows2016SQLServerWebWindows2016SQLServerStandardWindows2016SQLServer2017StandardWindows2016SQLServer2017EnterpriseWindows2016SQLServerStandardAllWindows2016SQLServer2017StandardAllWindows2019Windows2019RDSWindows2019RDSOffice2019Windows2019SQLServer2017WebWindows2019SQLServer2019WebWindows2019SQLServer2017StandardWindows2019SQLServer2019StandardWindows2019SQLServer2017EnterpriseWindows2019SQLServer2019EnterpriseWindows2019SQLServer2017StandardAllWindows2019SQLServer2019StandardAll"
+const _ArchiveOSType_name = "CustomCentOSCentOS8StreamCentOS8CentOS7UbuntuUbuntu2004Ubuntu1804Ubuntu1604DebianDebian10Debian9CoreOSRancherOSK3OSKusanagiFreeBSDWindows2016Windows2016RDSWindows2016RDSOfficeWindows2016SQLServerWebWindows2016SQLServerStandardWindows2016SQLServer2017StandardWindows2016SQLServer2017EnterpriseWindows2016SQLServerStandardAllWindows2016SQLServer2017StandardAllWindows2019Windows2019RDSWindows2019RDSOffice2019Windows2019SQLServer2017WebWindows2019SQLServer2019WebWindows2019SQLServer2017StandardWindows2019SQLServer2019StandardWindows2019SQLServer2017EnterpriseWindows2019SQLServer2019EnterpriseWindows2019SQLServer2017StandardAllWindows2019SQLServer2019StandardAll"
 
-var _ArchiveOSType_index = [...]uint16{0, 6, 12, 19, 26, 33, 39, 49, 59, 69, 75, 83, 90, 96, 105, 109, 117, 124, 135, 149, 169, 192, 220, 252, 286, 317, 352, 363, 377, 401, 428, 455, 487, 519, 553, 587, 622, 657}
+var _ArchiveOSType_index = [...]uint16{0, 6, 12, 25, 32, 39, 45, 55, 65, 75, 81, 89, 96, 102, 111, 115, 123, 130, 141, 155, 175, 198, 226, 258, 292, 323, 358, 369, 383, 407, 434, 461, 493, 525, 559, 593, 628, 663}
 
 func (i ArchiveOSType) String() string {
 	if i < 0 || i >= ArchiveOSType(len(_ArchiveOSType_index)-1) {

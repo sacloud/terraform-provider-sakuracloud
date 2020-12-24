@@ -19,6 +19,8 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/sacloud/libsacloud/v2/helper/defaults"
+
 	"github.com/sacloud/libsacloud/v2/helper/builder"
 	"github.com/sacloud/libsacloud/v2/helper/builder/vpcrouter"
 	"github.com/sacloud/libsacloud/v2/sacloud"
@@ -37,7 +39,7 @@ func expandVPCRouterBuilder(d resourceValueGettable, client *APIClient) *vpcrout
 		RouterSetting:         expandVPCRouterSettings(d),
 		SetupOptions: &builder.RetryableSetupParameter{
 			BootAfterBuild:        true,
-			NICUpdateWaitDuration: builder.DefaultNICUpdateWaitDuration,
+			NICUpdateWaitDuration: defaults.DefaultNICUpdateWaitDuration,
 		},
 		Client: sacloud.NewVPCRouterOp(client),
 	}
@@ -60,8 +62,7 @@ func expandVPCRouterNICSetting(d resourceValueGettable) vpcrouter.NICSettingHold
 		nic := expandVPCRouterPublicNetworkInterface(d)
 		return &vpcrouter.PremiumNICSetting{
 			SwitchID:         nic.switchID,
-			IPAddress1:       nic.ipAddresses[0],
-			IPAddress2:       nic.ipAddresses[1],
+			IPAddresses:      nic.ipAddresses,
 			VirtualIPAddress: nic.vip,
 			IPAliases:        nic.ipAliases,
 		}
@@ -125,8 +126,7 @@ func expandVPCRouterAdditionalNICSettings(d resourceValueGettable) []vpcrouter.A
 			nicSetting = &vpcrouter.AdditionalPremiumNICSetting{
 				SwitchID:         expandSakuraCloudID(d, "switch_id"),
 				NetworkMaskLen:   d.Get("netmask").(int),
-				IPAddress1:       ipAddresses[0],
-				IPAddress2:       ipAddresses[1],
+				IPAddresses:      ipAddresses,
 				VirtualIPAddress: d.Get("vip").(string),
 				Index:            d.Get("index").(int),
 			}

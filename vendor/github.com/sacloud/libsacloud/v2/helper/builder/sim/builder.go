@@ -44,9 +44,6 @@ func (b *Builder) Validate(ctx context.Context) error {
 	if b.ICCID == "" {
 		return fmt.Errorf("iccid is required")
 	}
-	if b.PassCode == "" {
-		return fmt.Errorf("iccid is required")
-	}
 	if len(b.Carrier) == 0 {
 		return fmt.Errorf("carrier is required")
 	}

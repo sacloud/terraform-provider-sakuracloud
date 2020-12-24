@@ -20,6 +20,8 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/sacloud/libsacloud/v2/helper/defaults"
+
 	"github.com/sacloud/libsacloud/v2/sacloud"
 	"github.com/sacloud/libsacloud/v2/sacloud/accessor"
 	"github.com/sacloud/libsacloud/v2/sacloud/types"
@@ -27,25 +29,6 @@ import (
 
 // MaxRetryCountExceededError リトライ最大数超過エラー
 type MaxRetryCountExceededError error
-
-var (
-	// DefaultMaxRetryCount デフォルトリトライ最大数
-	DefaultMaxRetryCount = 3
-	// DefaultProvisioningRetryCount リソースごとのプロビジョニングAPI呼び出しのリトライ最大数
-	DefaultProvisioningRetryCount = 10
-
-	// DefaultProvisioningWaitInterval リソースごとのプロビジョニングAPI呼び出しのリトライ間隔
-	DefaultProvisioningWaitInterval = 5 * time.Second
-
-	// DefaultDeleteRetryCount リソースごとの削除API呼び出しのリトライ最大数
-	DefaultDeleteRetryCount = 10
-
-	// DefaultDeleteWaitInterval リソースごとの削除API呼び出しのリトライ間隔
-	DefaultDeleteWaitInterval = 10 * time.Second
-
-	// DefaultPollingInterval ポーリング処理の間隔
-	DefaultPollingInterval = 5 * time.Second
-)
 
 // CreateFunc リソース作成関数
 type CreateFunc func(ctx context.Context, zone string) (accessor.ID, error)
@@ -150,22 +133,22 @@ func (r *RetryableSetup) Setup(ctx context.Context, zone string) (interface{}, e
 
 func (r *RetryableSetup) init() {
 	if r.RetryCount <= 0 {
-		r.RetryCount = DefaultMaxRetryCount
+		r.RetryCount = defaults.DefaultMaxRetryCount
 	}
 	if r.DeleteRetryCount <= 0 {
-		r.DeleteRetryCount = DefaultDeleteRetryCount
+		r.DeleteRetryCount = defaults.DefaultDeleteRetryCount
 	}
 	if r.DeleteRetryInterval <= 0 {
-		r.DeleteRetryInterval = DefaultDeleteWaitInterval
+		r.DeleteRetryInterval = defaults.DefaultDeleteWaitInterval
 	}
 	if r.ProvisioningRetryCount <= 0 {
-		r.ProvisioningRetryCount = DefaultProvisioningRetryCount
+		r.ProvisioningRetryCount = defaults.DefaultProvisioningRetryCount
 	}
 	if r.ProvisioningRetryInterval <= 0 {
-		r.ProvisioningRetryInterval = DefaultProvisioningWaitInterval
+		r.ProvisioningRetryInterval = defaults.DefaultProvisioningWaitInterval
 	}
 	if r.PollingInterval <= 0 {
-		r.PollingInterval = DefaultPollingInterval
+		r.PollingInterval = defaults.DefaultPollingInterval
 	}
 }
 

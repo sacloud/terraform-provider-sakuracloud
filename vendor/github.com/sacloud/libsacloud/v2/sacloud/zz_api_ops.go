@@ -7476,7 +7476,7 @@ func (o *MobileGatewayOp) MonitorInterface(ctx context.Context, zone string, id 
 		"condition":  condition,
 	}
 
-	url, err := buildURL("{{.rootURL}}/{{.zone}}/{{.pathSuffix}}/{{.pathName}}/{{.id}}/interface/{{if eq .index 0}}{{.index}}{{end}}/monitor", pathBuildParameter)
+	url, err := buildURL("{{.rootURL}}/{{.zone}}/{{.pathSuffix}}/{{.pathName}}/{{.id}}/interface{{if ne .index 0}}/{{.index}}{{end}}/monitor", pathBuildParameter)
 	if err != nil {
 		return nil, err
 	}
@@ -11724,7 +11724,7 @@ func (o *VPCRouterOp) MonitorInterface(ctx context.Context, zone string, id type
 		"condition":  condition,
 	}
 
-	url, err := buildURL("{{.rootURL}}/{{.zone}}/{{.pathSuffix}}/{{.pathName}}/{{.id}}/interface/{{if eq .index 0}}{{.index}}{{end}}/monitor", pathBuildParameter)
+	url, err := buildURL("{{.rootURL}}/{{.zone}}/{{.pathSuffix}}/{{.pathName}}/{{.id}}/interface{{if ne .index 0}}/{{.index}}{{end}}/monitor", pathBuildParameter)
 	if err != nil {
 		return nil, err
 	}

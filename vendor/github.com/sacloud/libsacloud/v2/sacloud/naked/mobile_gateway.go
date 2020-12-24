@@ -62,8 +62,11 @@ func (i *MobileGatewayInterfaces) UnmarshalJSON(b []byte) error {
 	}
 
 	var dest []*Interface
-	for _, v := range a {
+	for i, v := range a {
 		if v != nil {
+			if v.Index == 0 {
+				v.Index = i
+			}
 			dest = append(dest, v)
 		}
 	}

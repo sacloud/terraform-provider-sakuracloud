@@ -1184,8 +1184,8 @@ type internetUpdateBandWidthResponseEnvelope struct {
 
 // internetAddSubnetRequestEnvelope is envelop of API request
 type internetAddSubnetRequestEnvelope struct {
-	NetworkMaskLen int    `validate:"min=24,max=28"`
-	NextHop        string `validate:"ipv4"`
+	NetworkMaskLen int    `json:",omitempty"`
+	NextHop        string `json:",omitempty"`
 }
 
 // internetAddSubnetResponseEnvelope is envelop of API response
@@ -1198,7 +1198,7 @@ type internetAddSubnetResponseEnvelope struct {
 
 // internetUpdateSubnetRequestEnvelope is envelop of API request
 type internetUpdateSubnetRequestEnvelope struct {
-	NextHop string `validate:"ipv4"`
+	NextHop string `json:",omitempty"`
 }
 
 // internetUpdateSubnetResponseEnvelope is envelop of API response

@@ -143,6 +143,7 @@ func (o *ServerOp) Create(ctx context.Context, zone string, param *sacloud.Serve
 		}
 	}
 
+	result.Availability = types.Availabilities.Available
 	putServer(zone, result)
 	return result, nil
 }

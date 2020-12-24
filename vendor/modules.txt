@@ -246,9 +246,10 @@ github.com/sacloud/ftps
 # github.com/sacloud/iso9660wrap v0.0.0-20171031075302-eda21f77f6a8
 ## explicit
 github.com/sacloud/iso9660wrap
-# github.com/sacloud/libsacloud/v2 v2.8.10
+# github.com/sacloud/libsacloud/v2 v2.9.4
 ## explicit
 github.com/sacloud/libsacloud/v2
+github.com/sacloud/libsacloud/v2/helper/api
 github.com/sacloud/libsacloud/v2/helper/builder
 github.com/sacloud/libsacloud/v2/helper/builder/archive
 github.com/sacloud/libsacloud/v2/helper/builder/database
@@ -261,6 +262,7 @@ github.com/sacloud/libsacloud/v2/helper/builder/server
 github.com/sacloud/libsacloud/v2/helper/builder/sim
 github.com/sacloud/libsacloud/v2/helper/builder/vpcrouter
 github.com/sacloud/libsacloud/v2/helper/cleanup
+github.com/sacloud/libsacloud/v2/helper/defaults
 github.com/sacloud/libsacloud/v2/helper/power
 github.com/sacloud/libsacloud/v2/helper/query
 github.com/sacloud/libsacloud/v2/helper/setup
@@ -269,6 +271,7 @@ github.com/sacloud/libsacloud/v2/pkg/cidr
 github.com/sacloud/libsacloud/v2/pkg/mapconv
 github.com/sacloud/libsacloud/v2/pkg/mutexkv
 github.com/sacloud/libsacloud/v2/pkg/size
+github.com/sacloud/libsacloud/v2/pkg/util
 github.com/sacloud/libsacloud/v2/sacloud
 github.com/sacloud/libsacloud/v2/sacloud/accessor
 github.com/sacloud/libsacloud/v2/sacloud/fake

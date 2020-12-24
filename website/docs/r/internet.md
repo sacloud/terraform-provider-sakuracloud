@@ -28,7 +28,7 @@ resource "sakuracloud_internet" "foobar" {
 ## Argument Reference
 
 * `name` - (Required) The name of the Switch+Router. The length of this value must be in the range [`1`-`64`].
-* `band_width` - (Optional) The bandwidth of the network connected to the Internet in Mbps. `100`/`250`/`500`/`1000`/`1500`/`2000`/`2500`/`3000`/`5000`. Default:`100`.
+* `band_width` - (Optional) The bandwidth of the network connected to the Internet in Mbps. `100`/`250`/`500`/`1000`/`1500`/`2000`/`2500`/`3000`/`3500`/`4000`/`4500`/`5000`. Default:`100`.  
 * `netmask` - (Optional) The bit length of the subnet assigned to the Switch+Router. `26`/`27`/`28`. Changing this forces a new resource to be created. Default:`28`.
 * `enable_ipv6` - (Optional) The flag to enable IPv6.
 

@@ -288,7 +288,10 @@ func resourceSakuraCloudServerCreate(d *schema.ResourceData, meta interface{}) e
 	ctx, cancel := operationContext(d, schema.TimeoutCreate)
 	defer cancel()
 
-	builder := expandServerBuilder(d, client)
+	builder, err := expandServerBuilder(ctx, zone, d, client)
+	if err != nil {
+		return err
+	}
 
 	if err := builder.Validate(ctx, zone); err != nil {
 		return fmt.Errorf("validating SakuraCloud Server is failed: %s", err)
@@ -343,7 +346,10 @@ func resourceSakuraCloudServerUpdate(d *schema.ResourceData, meta interface{}) e
 		return fmt.Errorf("could not read SakuraCloud Server[%s]: %s", d.Id(), err)
 	}
 
-	builder := expandServerBuilder(d, client)
+	builder, err := expandServerBuilder(ctx, zone, d, client)
+	if err != nil {
+		return err
+	}
 
 	if err := builder.Validate(ctx, zone); err != nil {
 		return fmt.Errorf("validating SakuraCloud Server[%s] is failed: %s", server.ID, err)

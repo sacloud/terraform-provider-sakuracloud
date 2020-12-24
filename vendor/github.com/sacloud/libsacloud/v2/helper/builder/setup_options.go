@@ -14,17 +14,16 @@
 
 package builder
 
-import "time"
+import (
+	"time"
 
-var (
-	// DefaultNICUpdateWaitDuration NIC切断/削除後の待ち時間デフォルト値
-	DefaultNICUpdateWaitDuration = 5 * time.Second
+	"github.com/sacloud/libsacloud/v2/helper/defaults"
 )
 
 // DefaultSetupOptions RetryableSetupのデフォルトオプション
 func DefaultSetupOptions() *RetryableSetupParameter {
 	return &RetryableSetupParameter{
-		NICUpdateWaitDuration: DefaultNICUpdateWaitDuration,
+		NICUpdateWaitDuration: defaults.DefaultNICUpdateWaitDuration,
 	}
 }
 

@@ -33,6 +33,7 @@ type TransferArchiveBuilder struct {
 	SourceArchiveID   types.ID
 	SourceArchiveZone string
 
+	NoWait bool
 	Client *APIClient
 }
 
@@ -77,6 +78,9 @@ func (b *TransferArchiveBuilder) Build(ctx context.Context, zone string) (*saclo
 		})
 	if err != nil {
 		return nil, err
+	}
+	if b.NoWait {
+		return archive, nil
 	}
 
 	lastState, err := sacloud.WaiterForReady(func() (interface{}, error) {

@@ -49,6 +49,9 @@ type Director struct {
 	// for shared archive builder
 	SourceSharedKey types.ArchiveShareKey
 
+	// trueの場合アーカイブ作成完了まで待たずにreturnする。SourceReaderを指定する場合(BlankArchiveBuilder)にNoWaitをtrueにするとエラーとする
+	NoWait bool
+
 	Client *APIClient
 }
 
@@ -68,6 +71,7 @@ func (d *Director) Builder() Builder {
 			IconID:       d.IconID,
 			SizeGB:       d.SizeGB,
 			SourceReader: d.SourceReader,
+			NoWait:       d.NoWait,
 			Client:       d.Client,
 		}
 	}
@@ -78,6 +82,7 @@ func (d *Director) Builder() Builder {
 			Tags:            d.Tags,
 			IconID:          d.IconID,
 			SourceSharedKey: d.SourceSharedKey,
+			NoWait:          d.NoWait,
 			Client:          d.Client,
 		}
 	}
@@ -90,6 +95,7 @@ func (d *Director) Builder() Builder {
 			IconID:            d.IconID,
 			SourceArchiveID:   d.SourceArchiveID,
 			SourceArchiveZone: d.SourceArchiveZone,
+			NoWait:            d.NoWait,
 			Client:            d.Client,
 		}
 	}
@@ -101,6 +107,7 @@ func (d *Director) Builder() Builder {
 		IconID:          d.IconID,
 		SourceDiskID:    d.SourceDiskID,
 		SourceArchiveID: d.SourceArchiveID,
+		NoWait:          d.NoWait,
 		Client:          d.Client,
 	}
 }

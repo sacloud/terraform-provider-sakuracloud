@@ -16,6 +16,7 @@ package internet
 
 import (
 	"context"
+	"errors"
 	"fmt"
 
 	"github.com/sacloud/libsacloud/v2/sacloud"
@@ -37,6 +38,8 @@ type Builder struct {
 
 	NotFoundRetry int
 
+	NoWait bool
+
 	Client *APIClient
 }
 
@@ -50,6 +53,10 @@ func (b *Builder) Validate(ctx context.Context, zone string) error {
 		if empty {
 			return fmt.Errorf("%s is required", key)
 		}
+	}
+
+	if b.NoWait && b.EnableIPv6 {
+		return errors.New("NoWait=true is not supported when EnableIPv6=true")
 	}
 	return nil
 }
@@ -74,6 +81,10 @@ func (b *Builder) Build(ctx context.Context, zone string) (*sacloud.Internet, er
 	})
 	if err != nil {
 		return nil, err
+	}
+
+	if b.NoWait {
+		return internet, nil
 	}
 
 	// [HACK] ルータ作成直後は GET /internet/:id が404を返すことへの対応

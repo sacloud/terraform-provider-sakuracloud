@@ -18,6 +18,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/sacloud/libsacloud/v2/helper/builder"
 	mobileGatewayBuilder "github.com/sacloud/libsacloud/v2/helper/builder/mobilegateway"
+	"github.com/sacloud/libsacloud/v2/helper/defaults"
 	"github.com/sacloud/libsacloud/v2/sacloud"
 )
 
@@ -37,7 +38,7 @@ func expandMobileGatewayBuilder(d *schema.ResourceData, client *APIClient) *mobi
 		TrafficConfig:                   expandMobileGatewayTrafficConfig(d),
 		SetupOptions: &builder.RetryableSetupParameter{
 			BootAfterBuild:        true,
-			NICUpdateWaitDuration: builder.DefaultNICUpdateWaitDuration,
+			NICUpdateWaitDuration: defaults.DefaultNICUpdateWaitDuration,
 		},
 		Client: mobileGatewayBuilder.NewAPIClient(client),
 	}
