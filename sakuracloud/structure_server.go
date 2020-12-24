@@ -15,6 +15,7 @@
 package sakuracloud
 
 import (
+	"context"
 	"log"
 	"strings"
 
@@ -25,7 +26,11 @@ import (
 	"github.com/sacloud/libsacloud/v2/sacloud/types"
 )
 
-func expandServerBuilder(d *schema.ResourceData, client *APIClient) *serverBuilder.Builder {
+func expandServerBuilder(ctx context.Context, zone string, d *schema.ResourceData, client *APIClient) (*serverBuilder.Builder, error) {
+	diskBuilders, err := expandServerDisks(ctx, zone, d, client)
+	if err != nil {
+		return nil, err
+	}
 	return &serverBuilder.Builder{
 		ServerID:        sakuraCloudID(d.Id()),
 		Name:            d.Get("name").(string),
@@ -41,20 +46,30 @@ func expandServerBuilder(d *schema.ResourceData, client *APIClient) *serverBuild
 		PrivateHostID:   expandSakuraCloudID(d, "private_host_id"),
 		NIC:             expandServerNIC(d),
 		AdditionalNICs:  expandServerAdditionalNICs(d),
-		DiskBuilders:    expandServerDisks(d, client),
+		DiskBuilders:    diskBuilders,
 		Client:          serverBuilder.NewBuildersAPIClient(client),
 		ForceShutdown:   d.Get("force_shutdown").(bool),
 		BootAfterCreate: true,
-	}
+	}, nil
 }
 
-func expandServerDisks(d *schema.ResourceData, client *APIClient) []diskBuilder.Builder {
+func expandServerDisks(ctx context.Context, zone string, d *schema.ResourceData, client *APIClient) ([]diskBuilder.Builder, error) {
 	var builders []diskBuilder.Builder
 	diskIDs := expandSakuraCloudIDs(d, "disks")
+	diskOp := sacloud.NewDiskOp(client)
 	for i, diskID := range diskIDs {
+		disk, err := diskOp.Read(ctx, zone, diskID)
+		if err != nil {
+			return nil, err
+		}
 		b := &diskBuilder.ConnectedDiskBuilder{
-			ID:     diskID,
-			Client: diskBuilder.NewBuildersAPIClient(client),
+			ID:          diskID,
+			Name:        disk.Name,
+			Description: disk.Description,
+			Tags:        disk.Tags,
+			IconID:      disk.IconID,
+			Connection:  disk.Connection,
+			Client:      diskBuilder.NewBuildersAPIClient(client),
 		}
 		// set only when value was changed
 		if i == 0 && isDiskEditParameterChanged(d) {
@@ -77,7 +92,7 @@ func expandServerDisks(d *schema.ResourceData, client *APIClient) []diskBuilder.
 		}
 		builders = append(builders, b)
 	}
-	return builders
+	return builders, nil
 }
 
 func expandDiskEditNotes(d resourceValueGettable) []*sacloud.DiskEditNote {

@@ -28,9 +28,8 @@ import (
 
 	"github.com/hashicorp/go-multierror"
 	"github.com/hashicorp/terraform-plugin-sdk/httpclient"
-	"github.com/sacloud/libsacloud/v2/helper/builder"
+	"github.com/sacloud/libsacloud/v2/helper/defaults"
 	"github.com/sacloud/libsacloud/v2/helper/query"
-	"github.com/sacloud/libsacloud/v2/helper/setup"
 	"github.com/sacloud/libsacloud/v2/sacloud"
 	"github.com/sacloud/libsacloud/v2/sacloud/fake"
 	"github.com/sacloud/libsacloud/v2/sacloud/profile"
@@ -248,12 +247,10 @@ func (c *Config) NewClient() (*APIClient, error) {
 		// update default polling intervals: libsacloud/sacloud
 		sacloud.DefaultStatePollingInterval = defaultInterval
 		sacloud.DefaultDBStatusPollingInterval = defaultInterval
-		// update default polling intervals: libsacloud/utils/setup
-		setup.DefaultDeleteWaitInterval = defaultInterval
-		setup.DefaultProvisioningWaitInterval = defaultInterval
-		setup.DefaultPollingInterval = defaultInterval
-		// update default polling intervals: libsacloud/utils/builder
-		builder.DefaultNICUpdateWaitDuration = defaultInterval
+		defaults.DefaultDeleteWaitInterval = defaultInterval
+		defaults.DefaultProvisioningWaitInterval = defaultInterval
+		defaults.DefaultPollingInterval = defaultInterval
+		defaults.DefaultNICUpdateWaitDuration = defaultInterval
 	}
 
 	zones := c.Zones
