@@ -31,6 +31,7 @@ type FromSharedArchiveBuilder struct {
 	IconID          types.ID
 	SourceSharedKey types.ArchiveShareKey
 
+	NoWait bool
 	Client *APIClient
 }
 
@@ -72,6 +73,10 @@ func (b *FromSharedArchiveBuilder) Build(ctx context.Context, zone string) (*sac
 		})
 	if err != nil {
 		return nil, err
+	}
+
+	if b.NoWait {
+		return archive, nil
 	}
 
 	lastState, err := sacloud.WaiterForReady(func() (interface{}, error) {

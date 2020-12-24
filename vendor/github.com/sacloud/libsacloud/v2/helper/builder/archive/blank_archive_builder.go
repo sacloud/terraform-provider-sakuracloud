@@ -16,6 +16,7 @@ package archive
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"io"
 
@@ -34,11 +35,16 @@ type BlankArchiveBuilder struct {
 	SizeGB       int
 	SourceReader io.Reader
 
+	NoWait bool
+
 	Client *APIClient
 }
 
 // Validate 設定値の検証
 func (b *BlankArchiveBuilder) Validate(ctx context.Context, zone string) error {
+	if b.NoWait {
+		return errors.New("NoWait=true is not supported when uploading files and creating archives")
+	}
 	requiredValues := map[string]bool{
 		"Name":         b.Name == "",
 		"SizeGB":       b.SizeGB == 0,

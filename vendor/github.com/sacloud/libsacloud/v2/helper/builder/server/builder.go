@@ -49,8 +49,94 @@ type Builder struct {
 
 	Client *APIClient
 
+	NoWait bool
+
 	ServerID      types.ID
 	ForceShutdown bool
+}
+
+func BuilderFromResource(ctx context.Context, caller sacloud.APICaller, zone string, id types.ID) (*Builder, error) {
+	serverOp := sacloud.NewServerOp(caller)
+	current, err := serverOp.Read(ctx, zone, id)
+	if err != nil {
+		return nil, err
+	}
+
+	var nic NICSettingHolder
+	if len(current.Interfaces) > 0 {
+		iface := current.Interfaces[0]
+		switch {
+		case iface.SwitchID.IsEmpty():
+			nic = &DisconnectedNICSetting{}
+		case iface.SwitchScope == types.Scopes.Shared:
+			nic = &SharedNICSetting{PacketFilterID: iface.PacketFilterID}
+		default:
+			nic = &ConnectedNICSetting{
+				SwitchID:         iface.SwitchID,
+				DisplayIPAddress: iface.UserIPAddress,
+				PacketFilterID:   iface.PacketFilterID,
+			}
+		}
+	}
+
+	var additionalNICs []AdditionalNICSettingHolder
+	if len(current.Interfaces) > 1 {
+		for i, iface := range current.Interfaces {
+			if i == 0 {
+				continue
+			}
+			switch {
+			case iface.SwitchID.IsEmpty():
+				additionalNICs = append(additionalNICs, &DisconnectedNICSetting{})
+			default:
+				additionalNICs = append(additionalNICs, &ConnectedNICSetting{
+					SwitchID:         iface.SwitchID,
+					DisplayIPAddress: iface.UserIPAddress,
+					PacketFilterID:   iface.PacketFilterID,
+				})
+			}
+		}
+	}
+
+	diskOp := sacloud.NewDiskOp(caller)
+	var diskBuilders []disk.Builder
+	for _, d := range current.Disks {
+		currentDisk, err := diskOp.Read(ctx, zone, d.ID)
+		if err != nil {
+			return nil, err
+		}
+		diskBuilders = append(diskBuilders, &disk.ConnectedDiskBuilder{
+			ID:            currentDisk.ID,
+			EditParameter: nil,
+			Name:          currentDisk.Name,
+			Description:   currentDisk.Description,
+			Tags:          currentDisk.Tags,
+			IconID:        currentDisk.IconID,
+			Connection:    currentDisk.Connection,
+			NoWait:        false,
+			Client:        disk.NewBuildersAPIClient(caller),
+		})
+	}
+
+	return &Builder{
+		Name:            current.Name,
+		CPU:             current.CPU,
+		MemoryGB:        current.MemoryMB * size.GiB,
+		Commitment:      current.ServerPlanCommitment,
+		Generation:      current.ServerPlanGeneration,
+		InterfaceDriver: current.InterfaceDriver,
+		Description:     current.Description,
+		IconID:          current.IconID,
+		Tags:            current.Tags,
+		BootAfterCreate: false,
+		CDROMID:         current.CDROMID,
+		PrivateHostID:   current.PrivateHostID,
+		NIC:             nic,
+		AdditionalNICs:  additionalNICs,
+		DiskBuilders:    diskBuilders,
+		Client:          NewBuildersAPIClient(caller),
+		ServerID:        current.ID,
+	}, nil
 }
 
 // BuildResult サーバ構築結果
@@ -118,6 +204,13 @@ func (b *Builder) Validate(ctx context.Context, zone string) error {
 		if err := diskBuilder.Validate(ctx, zone); err != nil {
 			return err
 		}
+		if b.NoWait && !diskBuilder.NoWaitFlag() {
+			return errors.New("NoWait=true is not supported if the disks contain NoWait=false")
+		}
+	}
+
+	if b.NoWait && b.BootAfterCreate {
+		return errors.New("NoWait=true is not supported with BootAfterCreate=true")
 	}
 
 	return nil
@@ -165,7 +258,7 @@ func (b *Builder) Build(ctx context.Context, zone string) (*BuildResult, error) 
 	}
 
 	// bool
-	if b.BootAfterCreate {
+	if !b.NoWait && b.BootAfterCreate {
 		if err := power.BootServer(ctx, b.Client.Server, zone, server.ID); err != nil {
 			return result, err
 		}
@@ -255,6 +348,9 @@ func (b *Builder) Update(ctx context.Context, zone string) (*BuildResult, error)
 
 	// shutdown
 	if isNeedShutdown && server.InstanceStatus.IsUp() {
+		if b.NoWait {
+			return nil, errors.New("NoWait option is not available due to the need to shut down")
+		}
 		if err := power.ShutdownServer(ctx, b.Client.Server, zone, server.ID, b.ForceShutdown); err != nil {
 			return result, err
 		}

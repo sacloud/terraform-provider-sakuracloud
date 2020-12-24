@@ -60,8 +60,12 @@ var RDBMSTypeStrings = []string{
 
 // RDBMSTypeFromString 文字列からRDBMSTypeを取得
 func RDBMSTypeFromString(s string) RDBMSType {
-	if s == strings.ToLower(RDBMSTypesMariaDB.String()) {
+	switch {
+	case s == strings.ToLower(RDBMSTypesMariaDB.String()):
 		return RDBMSTypesMariaDB
+	case strings.ToLower(s) == "postgresql":
+		return RDBMSTypesPostgreSQL
+	default:
+		return RDBMSType(s)
 	}
-	return RDBMSType(s)
 }

@@ -24,14 +24,14 @@ var ArchiveCriteria = map[ArchiveOSType]search.Filter{
 	CentOS: {
 		search.Key(keys.Tags): search.TagsAndEqual("current-stable", "distro-centos"),
 	},
+	CentOS8Stream: {
+		search.Key(keys.Tags): search.TagsAndEqual("distro-ver-8-stream", "distro-centos"),
+	},
 	CentOS8: {
 		search.Key(keys.Tags): search.TagsAndEqual("centos-8-latest"),
 	},
 	CentOS7: {
 		search.Key(keys.Tags): search.TagsAndEqual("centos-7-latest"),
-	},
-	CentOS6: {
-		search.Key(keys.Tags): search.TagsAndEqual("centos-6-latest"),
 	},
 	Ubuntu: {
 		search.Key(keys.Tags): search.TagsAndEqual("current-stable", "distro-ubuntu"),

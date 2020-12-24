@@ -81,6 +81,9 @@ func escapeFilterString(s string) string {
 	//HACK さくらのクラウド側でqueryStringでの+エスケープに対応していないため、
 	// %20にエスケープされるurl.Pathを利用する。
 	// http://qiita.com/shibukawa/items/c0730092371c0e243f62
-	u := &url.URL{Path: s}
-	return u.String()
+	//
+	// UPDATE: https://github.com/sacloud/libsacloud/issues/657#issuecomment-733467472
+	// (&url.URL{Path:s}).String()だと、MADAddressが"./00:00:5E:00:53:00"のようになってしまう。
+	// このためurl.PathEscapeを利用する。
+	return url.PathEscape(s)
 }

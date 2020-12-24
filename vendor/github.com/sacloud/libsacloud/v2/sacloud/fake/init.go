@@ -224,10 +224,25 @@ func initZones(s Store, p *valuePool) {
 			},
 		},
 		{
+			ID:           21002,
+			Name:         "tk1b",
+			Description:  "東京第2ゾーン",
+			DisplayOrder: 2,
+			Region: &sacloud.Region{
+				ID:          210,
+				Name:        "東京",
+				Description: "東京",
+				NameServers: []string{
+					"210.188.224.10",
+					"210.188.224.11",
+				},
+			},
+		},
+		{
 			ID:           31001,
 			Name:         "is1a",
 			Description:  "石狩第1ゾーン",
-			DisplayOrder: 2,
+			DisplayOrder: 3,
 			Region: &sacloud.Region{
 				ID:          310,
 				Name:        "石狩",
@@ -242,7 +257,7 @@ func initZones(s Store, p *valuePool) {
 			ID:           31002,
 			Name:         "is1b",
 			Description:  "石狩第2ゾーン",
-			DisplayOrder: 3,
+			DisplayOrder: 4,
 			Region: &sacloud.Region{
 				ID:          310,
 				Name:        "石狩",
@@ -257,7 +272,7 @@ func initZones(s Store, p *valuePool) {
 			ID:           29001,
 			Name:         "tk1v",
 			Description:  "Sandbox",
-			DisplayOrder: 4,
+			DisplayOrder: 5,
 			IsDummy:      true,
 			Region: &sacloud.Region{
 				ID:          210,

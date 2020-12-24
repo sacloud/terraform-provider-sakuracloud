@@ -16,6 +16,7 @@ package mobilegateway
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"reflect"
 	"time"
@@ -43,6 +44,9 @@ type Builder struct {
 	SIMs                            []*SIMSetting
 	TrafficConfig                   *sacloud.MobileGatewayTrafficControl
 
+	SettingsHash string
+	NoWait       bool
+
 	SetupOptions *builder.RetryableSetupParameter
 	Client       *APIClient
 }
@@ -64,6 +68,78 @@ type SIMSetting struct {
 type SIMRouteSetting struct {
 	SIMID  types.ID
 	Prefix string
+}
+
+// BuilderFromResource 既存のMobileGatewayからBuilderを組み立てて返す
+func BuilderFromResource(ctx context.Context, caller sacloud.APICaller, zone string, id types.ID) (*Builder, error) {
+	mgwOp := sacloud.NewMobileGatewayOp(caller)
+	current, err := mgwOp.Read(ctx, zone, id)
+	if err != nil {
+		return nil, err
+	}
+
+	var privateInterface *PrivateInterfaceSetting
+	for i, nic := range current.InterfaceSettings {
+		if nic.Index == 1 {
+			privateInterface = &PrivateInterfaceSetting{
+				SwitchID:       current.Interfaces[i].SwitchID,
+				IPAddress:      nic.IPAddress[0],
+				NetworkMaskLen: nic.NetworkMaskLen,
+			}
+		}
+	}
+
+	simRoutes, err := mgwOp.GetSIMRoutes(ctx, zone, id)
+	if err != nil {
+		return nil, err
+	}
+	var simRouteSettings []*SIMRouteSetting
+	for _, r := range simRoutes {
+		simRouteSettings = append(simRouteSettings, &SIMRouteSetting{
+			SIMID:  types.StringID(r.ResourceID),
+			Prefix: r.Prefix,
+		})
+	}
+
+	dns, err := mgwOp.GetDNS(ctx, zone, id)
+	if err != nil {
+		return nil, err
+	}
+
+	sims, err := mgwOp.ListSIM(ctx, zone, id)
+	if err != nil {
+		return nil, err
+	}
+	var simSettings []*SIMSetting
+	for _, s := range sims {
+		simSettings = append(simSettings, &SIMSetting{
+			SIMID:     types.StringID(s.ResourceID),
+			IPAddress: s.IP,
+		})
+	}
+
+	trafficConfig, err := mgwOp.GetTrafficConfig(ctx, zone, id)
+	if err != nil {
+		return nil, err
+	}
+
+	return &Builder{
+		Name:                            current.Name,
+		Description:                     current.Description,
+		Tags:                            current.Tags,
+		IconID:                          current.IconID,
+		PrivateInterface:                privateInterface,
+		StaticRoutes:                    current.StaticRoutes,
+		SIMRoutes:                       simRouteSettings,
+		InternetConnectionEnabled:       current.InternetConnectionEnabled.Bool(),
+		InterDeviceCommunicationEnabled: current.InterDeviceCommunicationEnabled.Bool(),
+		DNS:                             dns,
+		SIMs:                            simSettings,
+		TrafficConfig:                   trafficConfig,
+		SettingsHash:                    current.SettingsHash,
+		NoWait:                          false,
+		Client:                          NewAPIClient(caller),
+	}, nil
 }
 
 func (b *Builder) init() {
@@ -88,6 +164,12 @@ func (b *Builder) Validate(ctx context.Context, zone string) error {
 	if len(b.SIMRoutes) > 0 && len(b.SIMs) == 0 {
 		return fmt.Errorf("sim settings are required when specified sim routes")
 	}
+
+	if b.NoWait {
+		if b.PrivateInterface != nil || len(b.StaticRoutes) > 0 || len(b.SIMRoutes) > 0 || b.DNS != nil || len(b.SIMs) > 0 || b.TrafficConfig != nil {
+			return errors.New("NoWait=true is not supported with PrivateInterface/StaticRoutes/SIMRoutes/DNS/SIMs/TrafficConfig")
+		}
+	}
 	return nil
 }
 
@@ -111,6 +193,9 @@ func (b *Builder) Build(ctx context.Context, zone string) (*sacloud.MobileGatewa
 			})
 		},
 		ProvisionBeforeUp: func(ctx context.Context, zone string, id types.ID, target interface{}) error {
+			if b.NoWait {
+				return nil
+			}
 			mgw := target.(*sacloud.MobileGateway)
 
 			// スイッチの接続
@@ -202,8 +287,8 @@ func (b *Builder) Build(ctx context.Context, zone string) (*sacloud.MobileGatewa
 		Read: func(ctx context.Context, zone string, id types.ID) (interface{}, error) {
 			return b.Client.MobileGateway.Read(ctx, zone, id)
 		},
-		IsWaitForCopy:             true,
-		IsWaitForUp:               b.SetupOptions.BootAfterBuild,
+		IsWaitForCopy:             !b.NoWait,
+		IsWaitForUp:               !b.NoWait && b.SetupOptions.BootAfterBuild,
 		RetryCount:                b.SetupOptions.RetryCount,
 		ProvisioningRetryCount:    1,
 		ProvisioningRetryInterval: b.SetupOptions.ProvisioningRetryInterval,
@@ -244,6 +329,7 @@ func (b *Builder) Update(ctx context.Context, zone string, id types.ID) (*saclou
 	if err != nil {
 		return nil, err
 	}
+	mgw.SettingsHash = b.SettingsHash // 更新ルートが複数あるためここに設定しておく
 
 	isNeedShutdown, err := b.collectUpdateInfo(mgw)
 	if err != nil {
@@ -252,6 +338,9 @@ func (b *Builder) Update(ctx context.Context, zone string, id types.ID) (*saclou
 
 	isNeedRestart := false
 	if mgw.InstanceStatus.IsUp() && isNeedShutdown {
+		if b.NoWait {
+			return nil, errors.New("NoWait option is not available due to the need to shut down")
+		}
 		isNeedRestart = true
 		if err := power.ShutdownMobileGateway(ctx, b.Client.MobileGateway, zone, id, false); err != nil {
 			return nil, err
@@ -261,38 +350,42 @@ func (b *Builder) Update(ctx context.Context, zone string, id types.ID) (*saclou
 	// NICの切断/変更
 	if b.isPrivateInterfaceChanged(mgw) {
 		if len(mgw.Interfaces) > 1 && !mgw.Interfaces[1].SwitchID.IsEmpty() {
-			// 切断
-			if err := b.Client.MobileGateway.DisconnectFromSwitch(ctx, zone, id); err != nil {
-				return nil, err
-			}
-			// [HACK] スイッチ接続直後だとエラーになることがあるため数秒待つ
-			time.Sleep(b.SetupOptions.NICUpdateWaitDuration)
+			if b.PrivateInterface != nil && mgw.Interfaces[1].SwitchID != b.PrivateInterface.SwitchID {
+				// 切断
+				if err := b.Client.MobileGateway.DisconnectFromSwitch(ctx, zone, id); err != nil {
+					return nil, err
+				}
+				// [HACK] スイッチ接続直後だとエラーになることがあるため数秒待つ
+				time.Sleep(b.SetupOptions.NICUpdateWaitDuration)
 
-			updated, err := b.Client.MobileGateway.UpdateSettings(ctx, zone, id, &sacloud.MobileGatewayUpdateSettingsRequest{
-				InternetConnectionEnabled:       types.StringFlag(b.InternetConnectionEnabled),
-				InterDeviceCommunicationEnabled: types.StringFlag(b.InterDeviceCommunicationEnabled),
-				SettingsHash:                    mgw.SettingsHash,
-			})
-			if err != nil {
-				return nil, err
+				updated, err := b.Client.MobileGateway.UpdateSettings(ctx, zone, id, &sacloud.MobileGatewayUpdateSettingsRequest{
+					InternetConnectionEnabled:       types.StringFlag(b.InternetConnectionEnabled),
+					InterDeviceCommunicationEnabled: types.StringFlag(b.InterDeviceCommunicationEnabled),
+					SettingsHash:                    mgw.SettingsHash,
+				})
+				if err != nil {
+					return nil, err
+				}
+				// [HACK] インターフェースの設定をConfigで反映させておかないとエラーになることへの対応
+				// see: https://github.com/sacloud/libsacloud/issues/589
+				if err := b.Client.MobileGateway.Config(ctx, zone, id); err != nil {
+					return nil, err
+				}
+				mgw = updated
 			}
-			// [HACK] インターフェースの設定をConfigで反映させておかないとエラーになることへの対応
-			// see: https://github.com/sacloud/libsacloud/issues/589
-			if err := b.Client.MobileGateway.Config(ctx, zone, id); err != nil {
-				return nil, err
-			}
-			mgw = updated
 		}
 
 		// 接続
 		if b.PrivateInterface != nil {
-			// スイッチの接続
-			if err := b.Client.MobileGateway.ConnectToSwitch(ctx, zone, id, b.PrivateInterface.SwitchID); err != nil {
-				return nil, err
-			}
+			if len(mgw.Interfaces) == 1 {
+				// スイッチの接続
+				if err := b.Client.MobileGateway.ConnectToSwitch(ctx, zone, id, b.PrivateInterface.SwitchID); err != nil {
+					return nil, err
+				}
 
-			// [HACK] スイッチ接続直後だとエラーになることがあるため数秒待つ
-			time.Sleep(b.SetupOptions.NICUpdateWaitDuration)
+				// [HACK] スイッチ接続直後だとエラーになることがあるため数秒待つ
+				time.Sleep(b.SetupOptions.NICUpdateWaitDuration)
+			}
 
 			// Interface設定
 			updated, err := b.Client.MobileGateway.UpdateSettings(ctx, zone, id, &sacloud.MobileGatewayUpdateSettingsRequest{

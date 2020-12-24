@@ -37,7 +37,9 @@ type Director struct {
 	SourceArchiveID types.ID
 
 	EditParameter *EditRequest
-	Client        *APIClient
+
+	NoWait bool
+	Client *APIClient
 }
 
 // Builder パラメータに応じて適切なDiskBuilderを返す
@@ -48,7 +50,13 @@ func (d *Director) Builder() Builder {
 		case !d.DiskID.IsEmpty():
 			return &ConnectedDiskBuilder{
 				ID:            d.DiskID,
+				Name:          d.Name,
+				Description:   d.Description,
+				Tags:          d.Tags,
+				IconID:        d.IconID,
+				Connection:    d.Connection,
 				EditParameter: d.EditParameter.ToUnixDiskEditRequest(),
+				NoWait:        d.NoWait,
 				Client:        d.Client,
 			}
 		case !d.SourceDiskID.IsEmpty(), !d.SourceArchiveID.IsEmpty():
@@ -64,6 +72,7 @@ func (d *Director) Builder() Builder {
 				Tags:            d.Tags,
 				IconID:          d.IconID,
 				EditParameter:   d.EditParameter.ToUnixDiskEditRequest(),
+				NoWait:          d.NoWait,
 				Client:          d.Client,
 			}
 		default:
@@ -76,6 +85,7 @@ func (d *Director) Builder() Builder {
 				Description: d.Description,
 				Tags:        d.Tags,
 				IconID:      d.IconID,
+				NoWait:      d.NoWait,
 				Client:      d.Client,
 			}
 		}
@@ -91,6 +101,7 @@ func (d *Director) Builder() Builder {
 			Tags:          d.Tags,
 			IconID:        d.IconID,
 			EditParameter: d.EditParameter.ToUnixDiskEditRequest(),
+			NoWait:        d.NoWait,
 			Client:        d.Client,
 		}
 	case d.OSType.IsWindows():
@@ -105,6 +116,7 @@ func (d *Director) Builder() Builder {
 			Tags:          d.Tags,
 			IconID:        d.IconID,
 			EditParameter: d.EditParameter.ToWindowsDiskEditRequest(),
+			NoWait:        d.NoWait,
 			Client:        d.Client,
 		}
 	default:
@@ -119,6 +131,7 @@ func (d *Director) Builder() Builder {
 			Description: d.Description,
 			Tags:        d.Tags,
 			IconID:      d.IconID,
+			NoWait:      d.NoWait,
 			Client:      d.Client,
 		}
 	}

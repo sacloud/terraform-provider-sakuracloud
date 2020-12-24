@@ -102,6 +102,15 @@ func baseDir() (string, error) {
 	return homeDir, nil
 }
 
+// ConfigDir プロファイルを格納するディレクトリのフルパス
+func ConfigDir() (string, error) {
+	baseDir, err := baseDir()
+	if err != nil {
+		return "", fmt.Errorf("getting profile base dir is failed: %s", err)
+	}
+	return filepath.Clean(filepath.Join(baseDir, configDirName)), nil
+}
+
 // ConfigFilePath 指定のプロファイル名のコンフィグファイルパスを取得
 func ConfigFilePath(profileName string) (string, error) {
 	if err := ValidateName(profileName); err != nil {
@@ -133,19 +142,19 @@ type ConfigValue struct {
 	// UserAgent ユーザーエージェント
 	UserAgent string `json:",omitempty"`
 	// AcceptLanguage リクエスト時のAccept-Languageヘッダ
-	AcceptLanguage string `json:",omitempty"`
+	AcceptLanguage string
 
 	// RetryMax 423/503時のリトライ回数
-	RetryMax int `json:",omitempty"`
+	RetryMax int
 	// RetryMin 423/503時のリトライ間隔(最小) 単位:秒
-	RetryWaitMin int `json:",omitempty"`
+	RetryWaitMin int
 	// RetryMax 423/503時のリトライ間隔(最大) 単位:秒
-	RetryWaitMax int `json:",omitempty"`
+	RetryWaitMax int
 
 	// StatePollingTimeout StatePollWaiterでのタイムアウト 単位:秒
-	StatePollingTimeout int `json:",omitempty"`
+	StatePollingTimeout int
 	// StatePollingInterval StatePollWaiterでのポーリング間隔 単位:秒
-	StatePollingInterval int `json:",omitempty"`
+	StatePollingInterval int
 
 	// HTTPRequestTimeout APIリクエスト時のHTTPタイムアウト 単位:秒
 	HTTPRequestTimeout int
@@ -153,17 +162,17 @@ type ConfigValue struct {
 	HTTPRequestRateLimit int
 
 	// APIRootURL APIのルートURL
-	APIRootURL string `json:",omitempty"`
+	APIRootURL string
 
 	// DefaultZone グローバルリソースAPIを呼ぶ際に指定するゾーン
-	DefaultZone string `json:",omitempty"`
+	DefaultZone string
 
 	// TraceMode トレースモード
-	TraceMode string `json:",omitempty"`
+	TraceMode string
 	// FakeMode フェイクモード有効化
-	FakeMode bool `json:",omitempty"`
+	FakeMode bool
 	// FakeStorePath フェイクモードでのファイルストアパス
-	FakeStorePath string `json:",omitempty"`
+	FakeStorePath string
 }
 
 func (o *ConfigValue) traceModeValue() string {
@@ -216,9 +225,36 @@ func Save(profileName string, val interface{}) error {
 		}
 	}
 
-	rawBody, err := json.MarshalIndent(val, "", "\t")
+	rawBody, err := json.MarshalIndent(val, "", "  ")
 	if err != nil {
 		return fmt.Errorf("marshalling config to JSON is failed: %s", err)
+	}
+
+	// merge new value if current config exists
+	if _, err := os.Stat(path); err == nil {
+		currentData, err := ioutil.ReadFile(path)
+		if err != nil {
+			return fmt.Errorf("reading current config %q failed: %s", path, err)
+		}
+		var currentDataMap map[string]interface{}
+		if err := json.Unmarshal(currentData, &currentDataMap); err != nil {
+			return fmt.Errorf("unmarshaling current config %q failed: %s", path, err)
+		}
+
+		var newDataMap map[string]interface{}
+		if err := json.Unmarshal(rawBody, &newDataMap); err != nil {
+			return fmt.Errorf("unmarshaling new config %q failed: %s", path, err)
+		}
+
+		// merge
+		for k, v := range newDataMap {
+			currentDataMap[k] = v
+		}
+
+		rawBody, err = json.MarshalIndent(currentDataMap, "", "  ")
+		if err != nil {
+			return fmt.Errorf("marshalling new config to JSON failed: %s", err)
+		}
 	}
 
 	err = ioutil.WriteFile(path, rawBody, 0600)

@@ -36,6 +36,7 @@ type Builder interface {
 	Update(ctx context.Context, zone string) (*UpdateResult, error)
 	DiskID() types.ID
 	UpdateLevel(ctx context.Context, zone string, disk *sacloud.Disk) builder.UpdateLevel
+	NoWaitFlag() bool
 }
 
 // BuildResult ディスク構築結果
@@ -65,6 +66,7 @@ type FromUnixBuilder struct {
 	EditParameter *UnixEditRequest
 
 	Client *APIClient
+	NoWait bool
 
 	ID types.ID
 
@@ -177,6 +179,10 @@ func (d *FromUnixBuilder) createDiskParameter(ctx context.Context, client *APICl
 	return createReq, editReq, nil
 }
 
+func (d *FromUnixBuilder) NoWaitFlag() bool {
+	return d.NoWait
+}
+
 // FromFixedArchiveBuilder ディスクの修正をサポートしないパブリックアーカイブからディスクを作成するリクエスト
 type FromFixedArchiveBuilder struct {
 	OSType ostype.ArchiveOSType
@@ -191,6 +197,7 @@ type FromFixedArchiveBuilder struct {
 	IconID      types.ID
 
 	Client *APIClient
+	NoWait bool
 
 	ID types.ID
 
@@ -267,6 +274,10 @@ func (d *FromFixedArchiveBuilder) createDiskParameter(ctx context.Context, clien
 	return createReq, nil, nil
 }
 
+func (d *FromFixedArchiveBuilder) NoWaitFlag() bool {
+	return d.NoWait
+}
+
 // FromWindowsBuilder Windows系パブリックアーカイブからディスクを作成するリクエスト
 type FromWindowsBuilder struct {
 	OSType ostype.ArchiveOSType
@@ -283,6 +294,7 @@ type FromWindowsBuilder struct {
 	EditParameter *WindowsEditRequest
 
 	Client *APIClient
+	NoWait bool
 
 	ID types.ID
 }
@@ -359,6 +371,10 @@ func (d *FromWindowsBuilder) createDiskParameter(ctx context.Context, client *AP
 	return createReq, editReq, nil
 }
 
+func (d *FromWindowsBuilder) NoWaitFlag() bool {
+	return d.NoWait
+}
+
 // FromDiskOrArchiveBuilder ディスクorアーカイブからディスクを作成するリクエスト
 //
 // ディスクの修正が可能かは実行時にさくらのクラウドAPI側にて判定される
@@ -379,7 +395,8 @@ type FromDiskOrArchiveBuilder struct {
 
 	Client *APIClient
 
-	ID types.ID
+	ID     types.ID
+	NoWait bool
 
 	generatedSSHKey *sacloud.SSHKeyGenerated
 	generatedNotes  []*sacloud.Note
@@ -404,6 +421,7 @@ func (d *FromDiskOrArchiveBuilder) Validate(ctx context.Context, zone string) er
 			return err
 		}
 	}
+
 	return nil
 }
 
@@ -492,6 +510,10 @@ func (d *FromDiskOrArchiveBuilder) createDiskParameter(ctx context.Context, clie
 	return createReq, editReq, nil
 }
 
+func (d *FromDiskOrArchiveBuilder) NoWaitFlag() bool {
+	return d.NoWait
+}
+
 // BlankBuilder ブランクディスクを作成する場合のリクエスト
 type BlankBuilder struct {
 	Name        string
@@ -504,8 +526,8 @@ type BlankBuilder struct {
 	IconID      types.ID
 
 	Client *APIClient
-
-	ID types.ID
+	NoWait bool
+	ID     types.ID
 }
 
 // Validate 設定値の検証
@@ -565,11 +587,22 @@ func (d *BlankBuilder) createDiskParameter(ctx context.Context, client *APIClien
 	return createReq, nil, nil
 }
 
+func (d *BlankBuilder) NoWaitFlag() bool {
+	return d.NoWait
+}
+
 // ConnectedDiskBuilder 既存ディスクを接続する場合のリクエスト
 type ConnectedDiskBuilder struct {
 	ID            types.ID
 	EditParameter *UnixEditRequest
 
+	Name        string
+	Description string
+	Tags        types.Tags
+	IconID      types.ID
+	Connection  types.EDiskConnection
+
+	NoWait bool
 	Client *APIClient
 }
 
@@ -582,6 +615,7 @@ func (d *ConnectedDiskBuilder) Validate(ctx context.Context, zone string) error 
 	if _, err := d.Client.Disk.Read(ctx, zone, d.ID); err != nil {
 		return err
 	}
+
 	return nil
 }
 
@@ -617,7 +651,7 @@ func (d *ConnectedDiskBuilder) Build(ctx context.Context, zone string, serverID 
 
 // Update ディスクの更新
 func (d *ConnectedDiskBuilder) Update(ctx context.Context, zone string) (*UpdateResult, error) {
-	disk, err := d.Client.Disk.Read(ctx, zone, d.ID)
+	disk, err := d.Client.Disk.Update(ctx, zone, d.ID, d.updateDiskParameter())
 	if err != nil {
 		return nil, err
 	}
@@ -652,7 +686,13 @@ func (d *ConnectedDiskBuilder) UpdateLevel(ctx context.Context, zone string, dis
 }
 
 func (d *ConnectedDiskBuilder) updateDiskParameter() *sacloud.DiskUpdateRequest {
-	return nil
+	return &sacloud.DiskUpdateRequest{
+		Name:        d.Name,
+		Description: d.Description,
+		Tags:        d.Tags,
+		IconID:      d.IconID,
+		Connection:  d.Connection,
+	}
 }
 
 func (d *ConnectedDiskBuilder) createDiskParameter(
@@ -665,6 +705,10 @@ func (d *ConnectedDiskBuilder) createDiskParameter(
 	return nil, nil, nil
 }
 
+func (d *ConnectedDiskBuilder) NoWaitFlag() bool {
+	return d.NoWait
+}
+
 type diskBuilder interface {
 	createDiskParameter(
 		ctx context.Context,
@@ -674,6 +718,7 @@ type diskBuilder interface {
 	) (*sacloud.DiskCreateRequest, *sacloud.DiskEditRequest, error)
 	updateDiskParameter() *sacloud.DiskUpdateRequest
 	DiskID() types.ID
+	NoWaitFlag() bool
 }
 
 func build(ctx context.Context, client *APIClient, zone string, serverID types.ID, distantFrom []types.ID, builder diskBuilder) (*BuildResult, error) {
@@ -700,6 +745,10 @@ func build(ctx context.Context, client *APIClient, zone string, serverID types.I
 			return &BuildResult{DiskID: disk.ID}, err
 		}
 		return nil, err
+	}
+
+	if builder.NoWaitFlag() {
+		return &BuildResult{DiskID: disk.ID}, nil
 	}
 
 	waiter := sacloud.WaiterForReady(func() (interface{}, error) {
@@ -748,6 +797,10 @@ func update(ctx context.Context, client *APIClient, zone string, builder diskBui
 		if err := client.Disk.Config(ctx, zone, disk.ID, editReq); err != nil {
 			return nil, err
 		}
+	}
+
+	if builder.NoWaitFlag() {
+		return &UpdateResult{Disk: disk}, nil
 	}
 
 	waiter := sacloud.WaiterForReady(func() (interface{}, error) {

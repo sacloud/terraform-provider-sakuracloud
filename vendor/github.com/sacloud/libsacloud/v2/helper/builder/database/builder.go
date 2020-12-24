@@ -16,6 +16,7 @@ package database
 
 import (
 	"context"
+	"errors"
 	"fmt"
 
 	"github.com/sacloud/libsacloud/v2/helper/builder"
@@ -44,6 +45,8 @@ type Builder struct {
 	IconID             types.ID
 
 	SettingsHash string
+
+	NoWait bool
 
 	SetupOptions *builder.RetryableSetupParameter
 	Client       *APIClient
@@ -107,6 +110,10 @@ func (b *Builder) Build(ctx context.Context, zone string) (*sacloud.Database, er
 			return b.Client.Database.Read(ctx, zone, id)
 		},
 		ProvisionBeforeUp: func(ctx context.Context, zone string, id types.ID, _ interface{}) error {
+			if b.NoWait {
+				return nil
+			}
+
 			// [HACK] データベースアプライアンス場合のみ/appliance/:id/statusも考慮する
 			waiter := sacloud.WaiterForUp(func() (interface{}, error) {
 				return b.Client.Database.Status(ctx, zone, id)
@@ -118,8 +125,8 @@ func (b *Builder) Build(ctx context.Context, zone string) (*sacloud.Database, er
 			}
 			return b.Client.Database.Config(ctx, zone, id)
 		},
-		IsWaitForCopy:       true,
-		IsWaitForUp:         true,
+		IsWaitForCopy:       !b.NoWait,
+		IsWaitForUp:         !b.NoWait,
 		RetryCount:          b.SetupOptions.RetryCount,
 		DeleteRetryCount:    b.SetupOptions.DeleteRetryCount,
 		DeleteRetryInterval: b.SetupOptions.DeleteRetryInterval,
@@ -164,6 +171,10 @@ func (b *Builder) Update(ctx context.Context, zone string, id types.ID) (*saclou
 
 	isNeedRestart := false
 	if db.InstanceStatus.IsUp() && isNeedShutdown {
+		if b.NoWait {
+			return nil, errors.New("NoWait option is not available due to the need to shut down")
+		}
+
 		isNeedRestart = true
 		if err := power.ShutdownDatabase(ctx, b.Client.Database, zone, id, false); err != nil {
 			return nil, err

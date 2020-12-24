@@ -59,32 +59,42 @@ func (b *Builder) Build(ctx context.Context) (*sacloud.LocalRouter, error) {
 		return nil, err
 	}
 
-	lr, err := b.Client.LocalRouter.UpdateSettings(ctx, localRouter.ID, &sacloud.LocalRouterUpdateSettingsRequest{
-		Switch:       b.Switch,
-		Interface:    b.Interface,
-		StaticRoutes: b.StaticRoutes,
-		SettingsHash: b.SettingsHash,
-	})
-	if err != nil {
-		return localRouter, err
-	}
-	localRouter = lr
-
-	if len(b.Peers) > 0 {
+	if b.hasNetworkSettings() {
 		lr, err := b.Client.LocalRouter.UpdateSettings(ctx, localRouter.ID, &sacloud.LocalRouterUpdateSettingsRequest{
-			Switch:       localRouter.Switch,
-			Interface:    localRouter.Interface,
-			StaticRoutes: localRouter.StaticRoutes,
-			Peers:        b.Peers,
-			SettingsHash: localRouter.SettingsHash,
+			Switch:       b.Switch,
+			Interface:    b.Interface,
+			StaticRoutes: b.StaticRoutes,
+			SettingsHash: b.SettingsHash,
 		})
 		if err != nil {
 			return localRouter, err
 		}
 		localRouter = lr
+
+		if len(b.Peers) > 0 {
+			lr, err := b.Client.LocalRouter.UpdateSettings(ctx, localRouter.ID, &sacloud.LocalRouterUpdateSettingsRequest{
+				Switch:       localRouter.Switch,
+				Interface:    localRouter.Interface,
+				StaticRoutes: localRouter.StaticRoutes,
+				Peers:        b.Peers,
+				SettingsHash: localRouter.SettingsHash,
+			})
+			if err != nil {
+				return localRouter, err
+			}
+			localRouter = lr
+		}
 	}
 
 	return localRouter, nil
+}
+
+func (b *Builder) hasNetworkSettings() bool {
+	return b.Interface != nil && b.Switch != nil &&
+		b.Interface.NetworkMaskLen > 0 &&
+		b.Interface.VirtualIPAddress != "" &&
+		len(b.Interface.IPAddress) > 0 &&
+		b.Switch.Code != ""
 }
 
 // Update ローカルルータの更新

@@ -26,7 +26,7 @@ import (
 	"sync"
 
 	"github.com/fatih/structs"
-
+	"github.com/mitchellh/go-homedir"
 	"github.com/sacloud/libsacloud/v2/sacloud"
 	"github.com/sacloud/libsacloud/v2/sacloud/types"
 )
@@ -169,6 +169,14 @@ func (s *JSONFileStore) Init() error {
 	if s.Path == "" {
 		s.Path = defaultJSONFilePath
 	}
+
+	// expand filepath
+	path, err := homedir.Expand(s.Path)
+	if err != nil {
+		return err
+	}
+	s.Path = path
+
 	if stat, err := os.Stat(s.Path); err == nil {
 		if stat.IsDir() {
 			return fmt.Errorf("path %q is directory", s.Path)

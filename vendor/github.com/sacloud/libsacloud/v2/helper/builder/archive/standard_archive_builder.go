@@ -31,6 +31,7 @@ type StandardArchiveBuilder struct {
 	SourceDiskID    types.ID
 	SourceArchiveID types.ID
 
+	NoWait bool
 	Client *APIClient
 }
 
@@ -65,6 +66,10 @@ func (b *StandardArchiveBuilder) Build(ctx context.Context, zone string) (*saclo
 		})
 	if err != nil {
 		return nil, err
+	}
+
+	if b.NoWait {
+		return archive, nil
 	}
 
 	lastState, err := sacloud.WaiterForReady(func() (interface{}, error) {

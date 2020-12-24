@@ -24,14 +24,20 @@ import (
 //
 // Appliance.Remarkを表現する
 type ApplianceRemark struct {
-	Zone            *ApplianceRemarkZone    `json:",omitempty" yaml:"zone,omitempty" structs:",omitempty"`
-	Switch          *ApplianceRemarkSwitch  `json:",omitempty" yaml:"switch,omitempty" structs:",omitempty"`
-	VRRP            *ApplianceVRRP          `json:",omitempty" yaml:"vrrp,omitempty" structs:",omitempty"`
-	Network         *ApplianceRemarkNetwork `json:",omitempty" yaml:"network,omitempty" structs:",omitempty"`
-	Servers         ApplianceRemarkServers  `yaml:"servers"`
-	Plan            *AppliancePlan          `json:",omitempty" yaml:"plan,omitempty" structs:",omitempty"`
-	DBConf          *ApplianceRemarkDBConf  `json:",omitempty" yaml:"db_conf,omitempty" structs:",omitempty"` // for database
-	SourceAppliance *ApplianceSource        `json:",omitempty" yaml:"db_conf,omitempty" structs:",omitempty"` // for database
+	Zone            *ApplianceRemarkZone          `json:",omitempty" yaml:"zone,omitempty" structs:",omitempty"`
+	Switch          *ApplianceRemarkSwitch        `json:",omitempty" yaml:"switch,omitempty" structs:",omitempty"`
+	VRRP            *ApplianceVRRP                `json:",omitempty" yaml:"vrrp,omitempty" structs:",omitempty"`
+	Network         *ApplianceRemarkNetwork       `json:",omitempty" yaml:"network,omitempty" structs:",omitempty"`
+	Servers         ApplianceRemarkServers        `yaml:"servers"`
+	Plan            *AppliancePlan                `json:",omitempty" yaml:"plan,omitempty" structs:",omitempty"`
+	DBConf          *ApplianceRemarkDBConf        `json:",omitempty" yaml:"db_conf,omitempty" structs:",omitempty"`        // for database
+	SourceAppliance *ApplianceSource              `json:",omitempty" yaml:"db_conf,omitempty" structs:",omitempty"`        // for database
+	MobileGateway   *ApplianceRemarkMobileGateway `json:",omitempty" yaml:"mobile_gateway,omitempty" structs:",omitempty"` // for mobile gateway
+}
+
+// ApplianceRemarkMobileGateway モバイルゲートウェイのグローバルIP
+type ApplianceRemarkMobileGateway struct {
+	GlobalAddress string
 }
 
 // ApplianceSource クローン元アプライアンス データベースのクローン時に利用

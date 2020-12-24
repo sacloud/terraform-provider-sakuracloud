@@ -41,6 +41,7 @@ type Builder struct {
 
 	SetupOptions *builder.RetryableSetupParameter
 	Client       sacloud.VPCRouterAPI
+	NoWait       bool
 }
 
 // RouterSetting VPCルータの設定
@@ -94,6 +95,15 @@ func (b *Builder) getInterfaceSettings() []*sacloud.VPCRouterInterfaceSetting {
 func (b *Builder) Validate(ctx context.Context, zone string) error {
 	if err := b.validateCommon(ctx, zone); err != nil {
 		return err
+	}
+
+	if b.NoWait {
+		if len(b.AdditionalNICSettings) > 0 || b.RouterSetting != nil {
+			return errors.New("NoWait=true is not supported with AdditionalNICSettings and RouterSetting")
+		}
+		if b.SetupOptions != nil && b.SetupOptions.BootAfterBuild {
+			return errors.New("NoWait=true is not supported with SetupOptions.BootAfterBuild")
+		}
 	}
 
 	switch b.PlanID {
@@ -184,6 +194,9 @@ func (b *Builder) Build(ctx context.Context, zone string) (*sacloud.VPCRouter, e
 			})
 		},
 		ProvisionBeforeUp: func(ctx context.Context, zone string, id types.ID, target interface{}) error {
+			if b.NoWait {
+				return nil
+			}
 			vpcRouter := target.(*sacloud.VPCRouter)
 
 			// スイッチの接続
@@ -237,8 +250,8 @@ func (b *Builder) Build(ctx context.Context, zone string) (*sacloud.VPCRouter, e
 		Read: func(ctx context.Context, zone string, id types.ID) (interface{}, error) {
 			return b.Client.Read(ctx, zone, id)
 		},
-		IsWaitForCopy:             true,
-		IsWaitForUp:               b.SetupOptions.BootAfterBuild,
+		IsWaitForCopy:             !b.NoWait,
+		IsWaitForUp:               !b.NoWait && b.SetupOptions.BootAfterBuild,
 		RetryCount:                b.SetupOptions.RetryCount,
 		ProvisioningRetryCount:    1,
 		ProvisioningRetryInterval: b.SetupOptions.ProvisioningRetryInterval,
@@ -287,6 +300,10 @@ func (b *Builder) Update(ctx context.Context, zone string, id types.ID) (*saclou
 
 	isNeedRestart := false
 	if vpcRouter.InstanceStatus.IsUp() && isNeedShutdown {
+		if b.NoWait {
+			return nil, errors.New("NoWait option is not available due to the need to shut down")
+		}
+
 		isNeedRestart = true
 		if err := power.ShutdownVPCRouter(ctx, b.Client, zone, id, false); err != nil {
 			return nil, err

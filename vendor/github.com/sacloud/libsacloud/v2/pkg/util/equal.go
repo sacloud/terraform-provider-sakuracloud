@@ -12,7 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package libsacloud
+package util
 
-// Version バージョン
-const Version = "2.9.4"
+import "reflect"
+
+func DeepEqual(x, y interface{}) bool {
+	return reflect.DeepEqual(x, y)
+}
