@@ -1,6 +1,7 @@
-## 2.5.5 (Unreleased)
+## 2.6.0 (Unreleased)
 
-*
+* WebAccelerator [GH-791] (@yamamoto-febc)
+* libsacloud v2.9 [GH-790] (@yamamoto-febc)
 
 ## 2.5.4 (2020-11-19)
 
