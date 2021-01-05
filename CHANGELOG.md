@@ -1,5 +1,6 @@
 ## 2.6.0 (Unreleased)
 
+* Update copyright [GH-792] (@yamamoto-febc)
 * WebAccelerator [GH-791] (@yamamoto-febc)
 * libsacloud v2.9 [GH-790] (@yamamoto-febc)
 
