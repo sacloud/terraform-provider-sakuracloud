@@ -1,4 +1,4 @@
-## 2.6.0 (Unreleased)
+## 2.6.0 (2021-01-05)
 
 * Update copyright [GH-792] (@yamamoto-febc)
 * WebAccelerator [GH-791] (@yamamoto-febc)
