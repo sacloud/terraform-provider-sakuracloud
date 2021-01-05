@@ -167,6 +167,7 @@ func Provider() terraform.ResourceProvider {
 			"sakuracloud_subnet":             dataSourceSakuraCloudSubnet(),
 			"sakuracloud_switch":             dataSourceSakuraCloudSwitch(),
 			"sakuracloud_vpc_router":         dataSourceSakuraCloudVPCRouter(),
+			"sakuracloud_webaccel":           dataSourceSakuraCloudWebAccel(),
 			"sakuracloud_zone":               dataSourceSakuraCloudZone(),
 		},
 		ResourcesMap: map[string]*schema.Resource{
@@ -205,6 +206,7 @@ func Provider() terraform.ResourceProvider {
 			"sakuracloud_subnet":                resourceSakuraCloudSubnet(),
 			"sakuracloud_switch":                resourceSakuraCloudSwitch(),
 			"sakuracloud_vpc_router":            resourceSakuraCloudVPCRouter(),
+			"sakuracloud_webaccel_certificate":  resourceSakuraCloudWebAccelCertificate(),
 		},
 	}
 
