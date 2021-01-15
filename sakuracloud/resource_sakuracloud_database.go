@@ -161,6 +161,14 @@ func resourceSakuraCloudDatabase() *schema.Resource {
 					},
 				},
 			},
+			"parameters": {
+				Type: schema.TypeMap,
+				Elem: &schema.Schema{
+					Type: schema.TypeString,
+				},
+				Optional:    true,
+				Description: "The map for setting RDMBS-specific parameters. Valid keys can be found with the `usacloud database list-parameters` command",
+			},
 			"icon_id":     schemaResourceIconID(resourceName),
 			"description": schemaResourceDescription(resourceName),
 			"tags":        schemaResourceTags(resourceName),
@@ -215,7 +223,7 @@ func resourceSakuraCloudDatabaseRead(d *schema.ResourceData, meta interface{}) e
 		}
 		return fmt.Errorf("could not find SakuraCloud Database[%s]: %s", d.Id(), err)
 	}
-	return setDatabaseResourceData(ctx, d, client, data)
+	return setDatabaseResourceData(ctx, d, client, data, zone)
 }
 
 func resourceSakuraCloudDatabaseUpdate(d *schema.ResourceData, meta interface{}) error {
@@ -275,7 +283,7 @@ func resourceSakuraCloudDatabaseDelete(d *schema.ResourceData, meta interface{})
 	return nil
 }
 
-func setDatabaseResourceData(ctx context.Context, d *schema.ResourceData, client *APIClient, data *sacloud.Database) error {
+func setDatabaseResourceData(ctx context.Context, d *schema.ResourceData, client *APIClient, data *sacloud.Database, zone string) error {
 	if data.Availability.IsFailed() {
 		d.SetId("")
 		return fmt.Errorf("got unexpected state: Database[%d].Availability is failed", data.ID)
@@ -302,5 +310,41 @@ func setDatabaseResourceData(ctx context.Context, d *schema.ResourceData, client
 	d.Set("icon_id", data.IconID.String()) // nolint
 	d.Set("description", data.Description) // nolint
 	d.Set("zone", getZone(d, client))      // nolint
+
+	parameters, err := sacloud.NewDatabaseOp(client).GetParameter(ctx, zone, data.ID)
+	if err != nil {
+		return err
+	}
+	parameterSettings := convertDatabaseParametersToStringKeyValues(parameters)
+	if err := d.Set("parameters", parameterSettings); err != nil {
+		return err
+	}
+
 	return nil
+}
+
+func convertDatabaseParametersToStringKeyValues(parameter *sacloud.DatabaseParameter) map[string]interface{} {
+	stringMap := make(map[string]interface{})
+	// convert to string
+	for k, v := range parameter.Settings {
+		switch v := v.(type) {
+		case fmt.Stringer:
+			stringMap[k] = v.String()
+		case string:
+			stringMap[k] = v
+		default:
+			stringMap[k] = fmt.Sprintf("%v", v)
+		}
+	}
+
+	dest := make(map[string]interface{})
+	for k, v := range stringMap {
+		for _, meta := range parameter.MetaInfo {
+			if k == meta.Name {
+				dest[meta.Label] = v
+			}
+		}
+	}
+
+	return dest
 }

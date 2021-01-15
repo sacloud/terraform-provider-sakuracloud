@@ -61,13 +61,13 @@ func expandDatabaseBuilder(d *schema.ResourceData, client *APIClient) *databaseB
 			ReplicaUser:     replicaUser,
 			ReplicaPassword: replicaPassword,
 		},
-		Name:        d.Get("name").(string),
-		Description: d.Get("description").(string),
-		Tags:        expandTags(d),
-		IconID:      expandSakuraCloudID(d, "icon_id"),
-		Client:      databaseBuilder.NewAPIClient(client),
-		// 後で設定する
+		Name:               d.Get("name").(string),
+		Description:        d.Get("description").(string),
+		Tags:               expandTags(d),
+		IconID:             expandSakuraCloudID(d, "icon_id"),
+		Client:             databaseBuilder.NewAPIClient(client),
 		BackupSetting:      expandDatabaseBackupSetting(d),
+		Parameters:         d.Get("parameters").(map[string]interface{}),
 		ReplicationSetting: &sacloud.DatabaseReplicationSetting{},
 	}
 
