@@ -105,7 +105,7 @@ func dataSourceSakuraCloudDatabase() *schema.Resource {
 					Type: schema.TypeString,
 				},
 				Computed:    true,
-				Description: "The map for setting RDMBS-specific parameters. Valid keys can be found with the `usacloud database list-parameters` command",
+				Description: "The map for setting RDBMS-specific parameters. Valid keys can be found with the `usacloud database list-parameters` command",
 			},
 			"icon_id":     schemaDataSourceIconID(resourceName),
 			"description": schemaDataSourceDescription(resourceName),

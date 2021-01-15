@@ -40,6 +40,10 @@ resource "sakuracloud_database" "foobar" {
     weekdays = ["mon", "tue"]
   }
 
+  parameters = {
+    max_connections = 100
+  }
+
   name        = "foobar"
   description = "description"
   tags        = ["tag1", "tag2"]
@@ -55,6 +59,7 @@ resource "sakuracloud_switch" "foobar" {
 * `name` - (Required) The name of the Database. The length of this value must be in the range [`1`-`64`].
 * `database_type` - (Optional) The type of the database. This must be one of [`mariadb`/`postgres`]. Changing this forces a new resource to be created. Default:`postgres`.
 * `plan` - (Optional) The plan name of the Database. This must be one of [`10g`/`30g`/`90g`/`240g`/`500g`/`1t`]. Changing this forces a new resource to be created. Default:`10g`.
+* `password` - (Required) The password of default user on the database.
 
 #### User
 
@@ -87,6 +92,9 @@ A `backup` block supports the following:
 * `time` - (Optional) The time to take backup. This must be formatted with `HH:mm`.
 * `weekdays` - (Optional) A list of weekdays to backed up. The values in the list must be in [`sun`/`mon`/`tue`/`wed`/`thu`/`fri`/`sat`].
 
+#### RDBMS Parameters
+
+* `parameters` - (Optional) The map for setting RDBMS-specific parameters. Valid keys can be found with the `usacloud database list-parameters` command.
 
 #### Replication
 
