@@ -1,4 +1,4 @@
-// Copyright 2016-2020 The Libsacloud Authors
+// Copyright 2016-2021 The Libsacloud Authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -17,11 +17,21 @@
 package fake
 
 import (
+	"sync"
+
 	"github.com/sacloud/libsacloud/v2/sacloud"
 )
 
+var switchOnce sync.Once
+
 // SwitchFactoryFuncToFake switches sacloud.xxxAPI's factory methods to use fake client
 func SwitchFactoryFuncToFake() {
+	switchOnce.Do(func() {
+		switchFactoryFuncToFake()
+	})
+}
+
+func switchFactoryFuncToFake() {
 	sacloud.SetClientFactoryFunc(ResourceArchive, func(caller sacloud.APICaller) interface{} {
 		return NewArchiveOp()
 	})

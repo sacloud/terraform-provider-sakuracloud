@@ -1,4 +1,4 @@
-// Copyright 2016-2020 The Libsacloud Authors
+// Copyright 2016-2021 The Libsacloud Authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -197,22 +197,6 @@ func (o *DiskOp) CreateWithConfig(ctx context.Context, zone string, createParam 
 	return result, nil
 }
 
-// ToBlank is fake implementation
-func (o *DiskOp) ToBlank(ctx context.Context, zone string, id types.ID) error {
-	value, err := o.Read(ctx, zone, id)
-	if err != nil {
-		return err
-	}
-
-	value.SourceArchiveID = types.ID(0)
-	value.SourceArchiveAvailability = types.Availabilities.Unknown
-	value.SourceDiskID = types.ID(0)
-	value.SourceDiskAvailability = types.Availabilities.Unknown
-
-	putDisk(zone, value)
-	return nil
-}
-
 // ResizePartition is fake implementation
 func (o *DiskOp) ResizePartition(ctx context.Context, zone string, id types.ID, param *sacloud.DiskResizePartitionRequest) error {
 	_, err := o.Read(ctx, zone, id)
@@ -291,18 +275,6 @@ func (o *DiskOp) DisconnectFromServer(ctx context.Context, zone string, id types
 	putDisk(zone, value)
 
 	return nil
-}
-
-// Install is fake implementation
-func (o *DiskOp) Install(ctx context.Context, zone string, id types.ID, installParam *sacloud.DiskInstallRequest, distantFrom []types.ID) (*sacloud.Disk, error) {
-	value, err := o.Read(ctx, zone, id)
-	if err != nil {
-		return nil, err
-	}
-
-	fill(value, fillDiskPlan)
-	putDisk(zone, value)
-	return value, nil
 }
 
 // Read is fake implementation

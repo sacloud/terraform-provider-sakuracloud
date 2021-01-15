@@ -1,4 +1,4 @@
-// Copyright 2016-2020 The Libsacloud Authors
+// Copyright 2016-2021 The Libsacloud Authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -2706,6 +2706,73 @@ func (o *DatabaseOp) Status(ctx context.Context, zone string, id types.ID) (*Dat
 	return results.DatabaseStatus, nil
 }
 
+// GetParameter is API call
+func (o *DatabaseOp) GetParameter(ctx context.Context, zone string, id types.ID) (*DatabaseParameter, error) {
+	// build request URL
+	pathBuildParameter := map[string]interface{}{
+		"rootURL":    SakuraCloudAPIRoot,
+		"pathSuffix": o.PathSuffix,
+		"pathName":   o.PathName,
+		"zone":       zone,
+		"id":         id,
+	}
+
+	url, err := buildURL("{{.rootURL}}/{{.zone}}/{{.pathSuffix}}/{{.pathName}}/{{.id}}/database/parameter", pathBuildParameter)
+	if err != nil {
+		return nil, err
+	}
+	// build request body
+	var body interface{}
+
+	// do request
+	data, err := o.Client.Do(ctx, "GET", url, body)
+	if err != nil {
+		return nil, err
+	}
+
+	// build results
+	results, err := o.transformGetParameterResults(data)
+	if err != nil {
+		return nil, err
+	}
+	return results.DatabaseParameter, nil
+}
+
+// SetParameter is API call
+func (o *DatabaseOp) SetParameter(ctx context.Context, zone string, id types.ID, param map[string]interface{}) error {
+	// build request URL
+	pathBuildParameter := map[string]interface{}{
+		"rootURL":    SakuraCloudAPIRoot,
+		"pathSuffix": o.PathSuffix,
+		"pathName":   o.PathName,
+		"zone":       zone,
+		"id":         id,
+		"param":      param,
+	}
+
+	url, err := buildURL("{{.rootURL}}/{{.zone}}/{{.pathSuffix}}/{{.pathName}}/{{.id}}/database/parameter", pathBuildParameter)
+	if err != nil {
+		return err
+	}
+	// build request body
+	var body interface{}
+	v, err := o.transformSetParameterArgs(id, param)
+	if err != nil {
+		return err
+	}
+	body = v
+
+	// do request
+	_, err = o.Client.Do(ctx, "PUT", url, body)
+	if err != nil {
+		return err
+	}
+
+	// build results
+
+	return nil
+}
+
 /*************************************************
 * DiskOp
 *************************************************/
@@ -2875,35 +2942,6 @@ func (o *DiskOp) CreateWithConfig(ctx context.Context, zone string, createParam 
 	return results.Disk, nil
 }
 
-// ToBlank is API call
-func (o *DiskOp) ToBlank(ctx context.Context, zone string, id types.ID) error {
-	// build request URL
-	pathBuildParameter := map[string]interface{}{
-		"rootURL":    SakuraCloudAPIRoot,
-		"pathSuffix": o.PathSuffix,
-		"pathName":   o.PathName,
-		"zone":       zone,
-		"id":         id,
-	}
-
-	url, err := buildURL("{{.rootURL}}/{{.zone}}/{{.pathSuffix}}/{{.pathName}}/{{.id}}/to/blank", pathBuildParameter)
-	if err != nil {
-		return err
-	}
-	// build request body
-	var body interface{}
-
-	// do request
-	_, err = o.Client.Do(ctx, "PUT", url, body)
-	if err != nil {
-		return err
-	}
-
-	// build results
-
-	return nil
-}
-
 // ResizePartition is API call
 func (o *DiskOp) ResizePartition(ctx context.Context, zone string, id types.ID, param *DiskResizePartitionRequest) error {
 	// build request URL
@@ -2996,45 +3034,6 @@ func (o *DiskOp) DisconnectFromServer(ctx context.Context, zone string, id types
 	// build results
 
 	return nil
-}
-
-// Install is API call
-func (o *DiskOp) Install(ctx context.Context, zone string, id types.ID, installParam *DiskInstallRequest, distantFrom []types.ID) (*Disk, error) {
-	// build request URL
-	pathBuildParameter := map[string]interface{}{
-		"rootURL":      SakuraCloudAPIRoot,
-		"pathSuffix":   o.PathSuffix,
-		"pathName":     o.PathName,
-		"zone":         zone,
-		"id":           id,
-		"installParam": installParam,
-		"distantFrom":  distantFrom,
-	}
-
-	url, err := buildURL("{{.rootURL}}/{{.zone}}/{{.pathSuffix}}/{{.pathName}}/{{.id}}/install", pathBuildParameter)
-	if err != nil {
-		return nil, err
-	}
-	// build request body
-	var body interface{}
-	v, err := o.transformInstallArgs(id, installParam, distantFrom)
-	if err != nil {
-		return nil, err
-	}
-	body = v
-
-	// do request
-	data, err := o.Client.Do(ctx, "PUT", url, body)
-	if err != nil {
-		return nil, err
-	}
-
-	// build results
-	results, err := o.transformInstallResults(data)
-	if err != nil {
-		return nil, err
-	}
-	return results.Disk, nil
 }
 
 // Read is API call

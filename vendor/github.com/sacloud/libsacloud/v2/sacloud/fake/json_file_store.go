@@ -1,4 +1,4 @@
-// Copyright 2016-2020 The Libsacloud Authors
+// Copyright 2016-2021 The Libsacloud Authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -303,6 +303,7 @@ var jsonResourceTypeMap = map[string]func() interface{}{
 	valuePoolResourceKey:         func() interface{} { return &valuePool{} },
 	"BillDetails":                func() interface{} { return &[]*sacloud.BillDetail{} },
 	"ContainerRegistryUsers":     func() interface{} { return &[]*sacloud.ContainerRegistryUser{} },
+	"DatabaseParameter":          func() interface{} { return map[string]interface{}{} },
 	"ESMELogs":                   func() interface{} { return &[]*sacloud.ESMELogs{} },
 	"LocalRouterStatus":          func() interface{} { return &sacloud.LocalRouterHealth{} },
 	"MobileGatewayDNS":           func() interface{} { return &sacloud.MobileGatewayDNSSetting{} },
