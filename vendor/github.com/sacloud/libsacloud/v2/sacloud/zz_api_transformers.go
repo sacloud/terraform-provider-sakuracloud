@@ -1,4 +1,4 @@
-// Copyright 2016-2020 The Libsacloud Authors
+// Copyright 2016-2021 The Libsacloud Authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -1555,6 +1555,49 @@ func (o *DatabaseOp) transformStatusResults(data []byte) (*databaseStatusResult,
 	return results, nil
 }
 
+func (o *DatabaseOp) transformGetParameterResults(data []byte) (*databaseGetParameterResult, error) {
+	nakedResponse := &databaseGetParameterResponseEnvelope{}
+	if err := json.Unmarshal(data, nakedResponse); err != nil {
+		return nil, err
+	}
+
+	results := &databaseGetParameterResult{}
+	if err := mapconv.ConvertFrom(nakedResponse, results); err != nil {
+		return nil, err
+	}
+	return results, nil
+}
+
+func (o *DatabaseOp) transformSetParameterArgs(id types.ID, param map[string]interface{}) (*databaseSetParameterRequestEnvelope, error) {
+	if id == types.ID(int64(0)) {
+		id = types.ID(int64(0))
+	}
+	var arg0 interface{} = id
+	if v, ok := arg0.(argumentDefaulter); ok {
+		arg0 = v.setDefaults()
+	}
+	if param == nil {
+		param = map[string]interface{}{}
+	}
+	var arg1 interface{} = param
+	if v, ok := arg1.(argumentDefaulter); ok {
+		arg1 = v.setDefaults()
+	}
+	args := &struct {
+		Arg0 interface{}
+		Arg1 interface{} `mapconv:"Parameter.Attr"`
+	}{
+		Arg0: arg0,
+		Arg1: arg1,
+	}
+
+	v := &databaseSetParameterRequestEnvelope{}
+	if err := mapconv.ConvertTo(args, v); err != nil {
+		return nil, err
+	}
+	return v, nil
+}
+
 func (o *DiskOp) transformFindArgs(conditions *FindCondition) (*diskFindRequestEnvelope, error) {
 	if conditions == nil {
 		conditions = &FindCondition{}
@@ -1751,58 +1794,6 @@ func (o *DiskOp) transformResizePartitionArgs(id types.ID, param *DiskResizePart
 		return nil, err
 	}
 	return v, nil
-}
-
-func (o *DiskOp) transformInstallArgs(id types.ID, installParam *DiskInstallRequest, distantFrom []types.ID) (*diskInstallRequestEnvelope, error) {
-	if id == types.ID(int64(0)) {
-		id = types.ID(int64(0))
-	}
-	var arg0 interface{} = id
-	if v, ok := arg0.(argumentDefaulter); ok {
-		arg0 = v.setDefaults()
-	}
-	if installParam == nil {
-		installParam = &DiskInstallRequest{}
-	}
-	var arg1 interface{} = installParam
-	if v, ok := arg1.(argumentDefaulter); ok {
-		arg1 = v.setDefaults()
-	}
-	if distantFrom == nil {
-		distantFrom = []types.ID{}
-	}
-	var arg2 interface{} = distantFrom
-	if v, ok := arg2.(argumentDefaulter); ok {
-		arg2 = v.setDefaults()
-	}
-	args := &struct {
-		Arg0 interface{}
-		Arg1 interface{} `mapconv:"Disk,recursive"`
-		Arg2 interface{} `mapconv:"DistantFrom"`
-	}{
-		Arg0: arg0,
-		Arg1: arg1,
-		Arg2: arg2,
-	}
-
-	v := &diskInstallRequestEnvelope{}
-	if err := mapconv.ConvertTo(args, v); err != nil {
-		return nil, err
-	}
-	return v, nil
-}
-
-func (o *DiskOp) transformInstallResults(data []byte) (*diskInstallResult, error) {
-	nakedResponse := &diskInstallResponseEnvelope{}
-	if err := json.Unmarshal(data, nakedResponse); err != nil {
-		return nil, err
-	}
-
-	results := &diskInstallResult{}
-	if err := mapconv.ConvertFrom(nakedResponse, results); err != nil {
-		return nil, err
-	}
-	return results, nil
 }
 
 func (o *DiskOp) transformReadResults(data []byte) (*diskReadResult, error) {

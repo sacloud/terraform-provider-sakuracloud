@@ -1,4 +1,4 @@
-// Copyright 2016-2020 The Libsacloud Authors
+// Copyright 2016-2021 The Libsacloud Authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -371,6 +371,13 @@ type databaseStatusResult struct {
 	DatabaseStatus *DatabaseStatus `json:",omitempty" mapconv:"Appliance,omitempty,recursive"`
 }
 
+// databaseGetParameterResult represents the Result of API
+type databaseGetParameterResult struct {
+	IsOk bool `json:",omitempty"` // is_ok
+
+	DatabaseParameter *DatabaseParameter `json:",omitempty" mapconv:"Database,omitempty,recursive"`
+}
+
 // DiskFindResult represents the Result of API
 type DiskFindResult struct {
 	Total int `json:",omitempty"` // Total count of target resources
@@ -389,13 +396,6 @@ type diskCreateResult struct {
 
 // diskCreateWithConfigResult represents the Result of API
 type diskCreateWithConfigResult struct {
-	IsOk bool `json:",omitempty"` // is_ok
-
-	Disk *Disk `json:",omitempty" mapconv:"Disk,omitempty,recursive"`
-}
-
-// diskInstallResult represents the Result of API
-type diskInstallResult struct {
 	IsOk bool `json:",omitempty"` // is_ok
 
 	Disk *Disk `json:",omitempty" mapconv:"Disk,omitempty,recursive"`

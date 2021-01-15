@@ -1,4 +1,4 @@
-// Copyright 2016-2020 The Libsacloud Authors
+// Copyright 2016-2021 The Libsacloud Authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -154,6 +154,8 @@ type DatabaseAPI interface {
 	MonitorInterface(ctx context.Context, zone string, id types.ID, condition *MonitorCondition) (*InterfaceActivity, error)
 	MonitorDatabase(ctx context.Context, zone string, id types.ID, condition *MonitorCondition) (*DatabaseActivity, error)
 	Status(ctx context.Context, zone string, id types.ID) (*DatabaseStatus, error)
+	GetParameter(ctx context.Context, zone string, id types.ID) (*DatabaseParameter, error)
+	SetParameter(ctx context.Context, zone string, id types.ID, param map[string]interface{}) error
 }
 
 /*************************************************
@@ -166,11 +168,9 @@ type DiskAPI interface {
 	Create(ctx context.Context, zone string, createParam *DiskCreateRequest, distantFrom []types.ID) (*Disk, error)
 	Config(ctx context.Context, zone string, id types.ID, edit *DiskEditRequest) error
 	CreateWithConfig(ctx context.Context, zone string, createParam *DiskCreateRequest, editParam *DiskEditRequest, bootAtAvailable bool, distantFrom []types.ID) (*Disk, error)
-	ToBlank(ctx context.Context, zone string, id types.ID) error
 	ResizePartition(ctx context.Context, zone string, id types.ID, param *DiskResizePartitionRequest) error
 	ConnectToServer(ctx context.Context, zone string, id types.ID, serverID types.ID) error
 	DisconnectFromServer(ctx context.Context, zone string, id types.ID) error
-	Install(ctx context.Context, zone string, id types.ID, installParam *DiskInstallRequest, distantFrom []types.ID) (*Disk, error)
 	Read(ctx context.Context, zone string, id types.ID) (*Disk, error)
 	Update(ctx context.Context, zone string, id types.ID, param *DiskUpdateRequest) (*Disk, error)
 	Delete(ctx context.Context, zone string, id types.ID) error

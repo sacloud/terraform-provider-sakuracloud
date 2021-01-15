@@ -1,4 +1,4 @@
-// Copyright 2016-2020 The Libsacloud Authors
+// Copyright 2016-2021 The Libsacloud Authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -43,6 +43,12 @@ type Builder struct {
 	Description        string
 	Tags               types.Tags
 	IconID             types.ID
+
+	// Parameters RDBMS固有のパラメータ設定
+	//
+	// キーにはsacloud.DatabaseParameterMetaのLabelを指定する
+	//   - 例: effective_cache_size: 10
+	Parameters map[string]interface{}
 
 	SettingsHash string
 
@@ -123,6 +129,11 @@ func (b *Builder) Build(ctx context.Context, zone string) (*sacloud.Database, er
 			if err != nil {
 				return err
 			}
+
+			if err := b.reconcileDatabaseParameters(ctx, zone, id); err != nil {
+				return err
+			}
+
 			return b.Client.Database.Config(ctx, zone, id)
 		},
 		IsWaitForCopy:       !b.NoWait,
@@ -194,6 +205,9 @@ func (b *Builder) Update(ctx context.Context, zone string, id types.ID) (*saclou
 	if err != nil {
 		return nil, err
 	}
+	if err := b.reconcileDatabaseParameters(ctx, zone, id); err != nil {
+		return nil, err
+	}
 	if err := b.Client.Database.Config(ctx, zone, id); err != nil {
 		return nil, err
 	}
@@ -214,4 +228,38 @@ func (b *Builder) Update(ctx context.Context, zone string, id types.ID) (*saclou
 func (b *Builder) collectUpdateInfo(db *sacloud.Database) (isNeedShutdown bool, err error) {
 	isNeedShutdown = b.CommonSetting.ReplicaPassword != db.CommonSetting.ReplicaPassword
 	return
+}
+
+func (b *Builder) reconcileDatabaseParameters(ctx context.Context, zone string, id types.ID) error {
+	parameters, err := b.Client.Database.GetParameter(ctx, zone, id)
+	if err != nil {
+		return err
+	}
+
+	newParameters := make(map[string]interface{})
+	// 既存のパラメータは一旦nullに
+	for k := range parameters.Settings {
+		newParameters[k] = nil
+	}
+
+	for k, v := range b.Parameters {
+		found := false
+		for _, meta := range parameters.MetaInfo {
+			if k == meta.Label {
+				newParameters[meta.Name] = v
+				found = true
+				break
+			}
+		}
+		// kvのキーがラベルではなかったらそのままnmへ
+		if !found {
+			newParameters[k] = v
+		}
+	}
+	if len(newParameters) > 0 {
+		// DatabaseAPI.Configはあとで呼ぶ
+		return b.Client.Database.SetParameter(ctx, zone, id, newParameters)
+	}
+
+	return nil
 }

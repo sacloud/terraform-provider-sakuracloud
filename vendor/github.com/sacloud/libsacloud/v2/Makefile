@@ -1,5 +1,5 @@
 #
-# Copyright 2016-2020 The Libsacloud Authors
+# Copyright 2016-2021 The Libsacloud Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
 # limitations under the License.
 #
 AUTHOR          ?="The Libsacloud Authors"
-COPYRIGHT_YEAR  ?="2016-2020"
+COPYRIGHT_YEAR  ?="2016-2021"
 COPYRIGHT_FILES ?=$$(find . -name "*.go" -print | grep -v "/vendor/")
 
 default: gen fmt set-license goimports lint test

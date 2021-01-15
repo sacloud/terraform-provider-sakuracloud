@@ -1,4 +1,4 @@
-// Copyright 2016-2020 The Libsacloud Authors
+// Copyright 2016-2021 The Libsacloud Authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -286,4 +286,57 @@ func (h *DatabaseBackupHistory) UnmarshalJSON(data []byte) error {
 	}
 
 	return nil
+}
+
+// DatabaseParameter RDBMSごとに固有のパラメータ設定
+type DatabaseParameter struct {
+	Parameter *DatabaseParameterSetting `json:",omitempty" yaml:",omitempty" structs:",omitempty"`
+	Remark    *DatabaseParameterRemark  `json:",omitempty" yaml:",omitempty" structs:",omitempty"`
+}
+
+type DatabaseParameterSetting struct {
+	NoteID types.ID                     `json:",omitempty" yaml:"note_id,omitempty" structs:",omitempty"`
+	Attr   DatabaseParameterSettingAttr `json:",omitempty" yaml:"attr,omitempty" structs:",omitempty"`
+}
+
+type DatabaseParameterSettingAttr map[string]interface{}
+
+// UnmarshalJSON 配列/オブジェクトが混在することへの対応
+func (d *DatabaseParameterSettingAttr) UnmarshalJSON(b []byte) error {
+	if string(b) == "[]" {
+		return nil
+	}
+	type alias map[string]interface{}
+
+	var a alias
+	if err := json.Unmarshal(b, &a); err != nil {
+		return err
+	}
+	*d = DatabaseParameterSettingAttr(a)
+	return nil
+}
+
+type DatabaseParameterRemark struct {
+	Settings []interface{}                // どのような値が入るのか不明
+	Form     []*DatabaseParameterFormMeta `json:",omitempty" yaml:"form,omitempty" structs:",omitempty"`
+}
+
+type DatabaseParameterFormMeta struct {
+	Type    string                            `json:"type" yaml:"yaml"`
+	Name    string                            `json:"name" yaml:"name"`
+	Label   string                            `json:"label" yaml:"label"`
+	Options *DatabaseParameterFormMetaOptions `json:"options" yaml:"options"`
+	Items   [][]interface{}                   `json:"items,omitempty" yaml:"items,omitempty" structs:",omitempty"` // 例: [["value1", "text1"],[ "value2", "text2"]] ※ valueは数値となる可能性がある
+}
+
+type DatabaseParameterFormMetaOptions struct {
+	Validator string  `json:"validator" yaml:"validator"`
+	Example   string  `json:"ex" yaml:"ex"`
+	Min       float64 `json:"min" yaml:"min"`
+	Max       float64 `json:"max" yaml:"max"`
+	MaxLen    int     `json:"maxlen" yaml:"maxlen"`
+	Text      string  `json:"text" yaml:"text"`
+	Reboot    string  `json:"reboot" yaml:"reboot"`
+	Type      string  `json:"type" yaml:"type"`
+	Integer   bool    `json:"integer" yaml:"integer"` // postgres用のパラメータにだけ存在する模様
 }
