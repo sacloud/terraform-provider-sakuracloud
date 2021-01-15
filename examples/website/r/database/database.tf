@@ -25,6 +25,10 @@ resource "sakuracloud_database" "foobar" {
     weekdays = ["mon", "tue"]
   }
 
+  parameters = {
+    max_connections = 100
+  }
+
   name        = "foobar"
   description = "description"
   tags        = ["tag1", "tag2"]

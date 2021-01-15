@@ -99,6 +99,14 @@ func dataSourceSakuraCloudDatabase() *schema.Resource {
 					},
 				},
 			},
+			"parameters": {
+				Type: schema.TypeMap,
+				Elem: &schema.Schema{
+					Type: schema.TypeString,
+				},
+				Computed:    true,
+				Description: "The map for setting RDBMS-specific parameters. Valid keys can be found with the `usacloud database list-parameters` command",
+			},
 			"icon_id":     schemaDataSourceIconID(resourceName),
 			"description": schemaDataSourceDescription(resourceName),
 			"tags":        schemaDataSourceTags(resourceName),
@@ -132,5 +140,5 @@ func dataSourceSakuraCloudDatabaseRead(d *schema.ResourceData, meta interface{})
 
 	targets := res.Databases
 	d.SetId(targets[0].ID.String())
-	return setDatabaseResourceData(ctx, d, client, targets[0])
+	return setDatabaseResourceData(ctx, d, client, targets[0], zone)
 }

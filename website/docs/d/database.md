@@ -22,7 +22,8 @@ data "sakuracloud_database" "foobar" {
 ## Argument Reference
 
 * `filter` - (Optional) One or more values used for filtering, as defined below.
-* `zone` - The name of zone that the Database is in (e.g. `is1a`, `tk1a`).
+* `zone` - (Optional) The name of zone that the Database is in (e.g. `is1a`, `tk1a`). Changing this forces a new resource to be created.
+
 
 ---
 
@@ -50,6 +51,7 @@ A `condition` block supports the following:
 * `icon_id` - The icon id attached to the Database.
 * `name` - The name of the Database.
 * `network_interface` - A list of `network_interface` blocks as defined below.
+* `parameters` - The map for setting RDBMS-specific parameters. Valid keys can be found with the `usacloud database list-parameters` command.
 * `password` - The password of default user on the database.
 * `plan` - The plan name of the Database. This will be one of [`10g`/`30g`/`90g`/`240g`/`500g`/`1t`].
 * `port` - The number of the listening port.

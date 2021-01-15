@@ -68,6 +68,9 @@ func TestAccSakuraCloudDatabase_basic(t *testing.T) {
 					resource.TestCheckResourceAttr(resourceName, "backup.0.weekdays.#", "2"),
 					resource.TestCheckResourceAttr(resourceName, "backup.0.weekdays.4146182742", "mon"),
 					resource.TestCheckResourceAttr(resourceName, "backup.0.weekdays.3274244602", "tue"),
+					resource.TestCheckResourceAttr(resourceName, "parameters.%", "2"),
+					resource.TestCheckResourceAttr(resourceName, "parameters.max_connections", "100"),
+					resource.TestCheckResourceAttr(resourceName, "parameters.event_scheduler", "ON"),
 					resource.TestCheckResourceAttrPair(
 						resourceName, "icon_id",
 						"sakuracloud_icon.foobar", "id",
@@ -99,6 +102,8 @@ func TestAccSakuraCloudDatabase_basic(t *testing.T) {
 					resource.TestCheckResourceAttr(resourceName, "backup.0.weekdays.#", "2"),
 					resource.TestCheckResourceAttr(resourceName, "backup.0.weekdays.1370803959", "sun"),
 					resource.TestCheckResourceAttr(resourceName, "backup.0.weekdays.2188959960", "sat"),
+					resource.TestCheckResourceAttr(resourceName, "parameters.%", "1"),
+					resource.TestCheckResourceAttr(resourceName, "parameters.max_connections", "200"),
 					resource.TestCheckResourceAttr(resourceName, "icon_id", ""),
 				),
 			},
@@ -262,6 +267,11 @@ resource "sakuracloud_database" "foobar" {
     weekdays = ["mon", "tue"]
   }
 
+  parameters = {
+    max_connections = 100
+    event_scheduler = "ON"
+  }
+
   name        = "{{ .arg0 }}"
   description = "description"
   tags        = ["tag1", "tag2"]
@@ -298,6 +308,11 @@ resource "sakuracloud_database" "foobar" {
     time     = "00:30"
     weekdays = ["sun", "sat"]
   }
+
+  parameters = {
+    max_connections = 200
+  }
+
 
   name        = "{{ .arg0 }}-upd"
   description = "description-upd"
