@@ -33,11 +33,17 @@ type ApplianceRemark struct {
 	DBConf          *ApplianceRemarkDBConf        `json:",omitempty" yaml:"db_conf,omitempty" structs:",omitempty"`        // for database
 	SourceAppliance *ApplianceSource              `json:",omitempty" yaml:"db_conf,omitempty" structs:",omitempty"`        // for database
 	MobileGateway   *ApplianceRemarkMobileGateway `json:",omitempty" yaml:"mobile_gateway,omitempty" structs:",omitempty"` // for mobile gateway
+	Router          *ApplianceRemarkRouter        `json:",omitempty" yaml:"router,omitempty" structs:",omitempty"`         // for vpc router
 }
 
 // ApplianceRemarkMobileGateway モバイルゲートウェイのグローバルIP
 type ApplianceRemarkMobileGateway struct {
 	GlobalAddress string
+}
+
+// ApplianceRemarkRouter VPCルータのバージョンなど
+type ApplianceRemarkRouter struct {
+	VPCRouterVersion int `json:",omitempty" yaml:"vpc_router_version,omitempty" structs:",omitempty"`
 }
 
 // ApplianceSource クローン元アプライアンス データベースのクローン時に利用

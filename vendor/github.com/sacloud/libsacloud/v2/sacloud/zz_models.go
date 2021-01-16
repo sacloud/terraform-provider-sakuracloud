@@ -25891,6 +25891,7 @@ type VPCRouter struct {
 	IconID                  types.ID `mapconv:"Icon.ID"`
 	CreatedAt               time.Time
 	PlanID                  types.ID                    `mapconv:"Remark.Plan.ID/Plan.ID"`
+	Version                 int                         `mapconv:"Remark.Router.VPCRouterVersion"`
 	Settings                *VPCRouterSetting           `mapconv:",omitempty,recursive"`
 	SettingsHash            string                      `json:",omitempty" mapconv:",omitempty"`
 	InstanceHostName        string                      `mapconv:"Instance.Host.Name"`
@@ -25918,6 +25919,7 @@ func (o *VPCRouter) setDefaults() interface{} {
 		IconID                  types.ID `mapconv:"Icon.ID"`
 		CreatedAt               time.Time
 		PlanID                  types.ID                    `mapconv:"Remark.Plan.ID/Plan.ID"`
+		Version                 int                         `mapconv:"Remark.Router.VPCRouterVersion"`
 		Settings                *VPCRouterSetting           `mapconv:",omitempty,recursive"`
 		SettingsHash            string                      `json:",omitempty" mapconv:",omitempty"`
 		InstanceHostName        string                      `mapconv:"Instance.Host.Name"`
@@ -25936,6 +25938,7 @@ func (o *VPCRouter) setDefaults() interface{} {
 		IconID:                  o.GetIconID(),
 		CreatedAt:               o.GetCreatedAt(),
 		PlanID:                  o.GetPlanID(),
+		Version:                 o.GetVersion(),
 		Settings:                o.GetSettings(),
 		SettingsHash:            o.GetSettingsHash(),
 		InstanceHostName:        o.GetInstanceHostName(),
@@ -26075,6 +26078,19 @@ func (o *VPCRouter) GetPlanID() types.ID {
 // SetPlanID sets value to PlanID
 func (o *VPCRouter) SetPlanID(v types.ID) {
 	o.PlanID = v
+}
+
+// GetVersion returns value of Version
+func (o *VPCRouter) GetVersion() int {
+	if o.Version == 0 {
+		return 2
+	}
+	return o.Version
+}
+
+// SetVersion sets value to Version
+func (o *VPCRouter) SetVersion(v int) {
+	o.Version = v
 }
 
 // GetSettings returns value of Settings
@@ -27497,6 +27513,7 @@ type VPCRouterCreateRequest struct {
 	PlanID      types.ID                  `mapconv:"Plan.ID"`
 	Switch      *ApplianceConnectedSwitch `json:",omitempty" mapconv:"Remark.Switch,recursive"`
 	IPAddresses []string                  `mapconv:"Remark.[]Servers.IPAddress"`
+	Version     int                       `mapconv:"Remark.Router.VPCRouterVersion"`
 	Settings    *VPCRouterSetting         `mapconv:",omitempty,recursive"`
 }
 
@@ -27515,6 +27532,7 @@ func (o *VPCRouterCreateRequest) setDefaults() interface{} {
 		PlanID      types.ID                  `mapconv:"Plan.ID"`
 		Switch      *ApplianceConnectedSwitch `json:",omitempty" mapconv:"Remark.Switch,recursive"`
 		IPAddresses []string                  `mapconv:"Remark.[]Servers.IPAddress"`
+		Version     int                       `mapconv:"Remark.Router.VPCRouterVersion"`
 		Settings    *VPCRouterSetting         `mapconv:",omitempty,recursive"`
 		Class       string
 	}{
@@ -27525,6 +27543,7 @@ func (o *VPCRouterCreateRequest) setDefaults() interface{} {
 		PlanID:      o.GetPlanID(),
 		Switch:      o.GetSwitch(),
 		IPAddresses: o.GetIPAddresses(),
+		Version:     o.GetVersion(),
 		Settings:    o.GetSettings(),
 		Class:       "vpcrouter",
 	}
@@ -27618,6 +27637,19 @@ func (o *VPCRouterCreateRequest) GetIPAddresses() []string {
 // SetIPAddresses sets value to IPAddresses
 func (o *VPCRouterCreateRequest) SetIPAddresses(v []string) {
 	o.IPAddresses = v
+}
+
+// GetVersion returns value of Version
+func (o *VPCRouterCreateRequest) GetVersion() int {
+	if o.Version == 0 {
+		return 2
+	}
+	return o.Version
+}
+
+// SetVersion sets value to Version
+func (o *VPCRouterCreateRequest) SetVersion(v int) {
+	o.Version = v
 }
 
 // GetSettings returns value of Settings

@@ -35,6 +35,7 @@ type Builder struct {
 	Tags                  types.Tags
 	IconID                types.ID
 	PlanID                types.ID
+	Version               int
 	NICSetting            NICSettingHolder
 	AdditionalNICSettings []AdditionalNICSettingHolder
 	RouterSetting         *RouterSetting
@@ -185,6 +186,7 @@ func (b *Builder) Build(ctx context.Context, zone string) (*sacloud.VPCRouter, e
 				PlanID:      b.PlanID,
 				Switch:      b.NICSetting.getConnectedSwitch(),
 				IPAddresses: b.NICSetting.getIPAddresses(),
+				Version:     b.Version,
 				Settings: &sacloud.VPCRouterSetting{
 					VRID:                      b.RouterSetting.VRID,
 					InternetConnectionEnabled: b.RouterSetting.InternetConnectionEnabled,

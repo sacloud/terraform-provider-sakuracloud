@@ -51,6 +51,9 @@ func (o *VPCRouterOp) Create(ctx context.Context, zone string, param *sacloud.VP
 	result.Availability = types.Availabilities.Migrating
 	result.ZoneID = zoneIDs[zone]
 	result.SettingsHash = ""
+	if result.Version == 0 {
+		result.Version = 2
+	}
 
 	ifOp := NewInterfaceOp()
 	swOp := NewSwitchOp()
