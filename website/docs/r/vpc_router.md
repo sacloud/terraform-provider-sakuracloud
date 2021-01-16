@@ -142,6 +142,7 @@ resource sakuracloud_switch "foobar" {
 * `name` - (Required) The name of the VPCRouter. The length of this value must be in the range [`1`-`64`].
 * `internet_connection` - (Optional) The flag to enable connecting to the Internet from the VPC Router. Default:`true`.
 * `plan` - (Optional) The plan name of the VPCRouter. This must be one of [`standard`/`premium`/`highspec`/`highspec4000`]. Changing this forces a new resource to be created. Default:`standard`.
+* `version` - (Optional) The version of the VPC Router. Changing this forces a new resource to be created. Default:`2`.
 * `syslog_host` - (Optional) The ip address of the syslog host to which the VPC Router sends logs.
 
 #### Network
