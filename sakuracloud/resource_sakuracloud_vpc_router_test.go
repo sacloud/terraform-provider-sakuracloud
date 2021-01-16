@@ -48,6 +48,7 @@ func TestAccSakuraCloudVPCRouter_basic(t *testing.T) {
 					resource.TestCheckResourceAttr(resourceName, "tags.4151227546", "tag1"),
 					resource.TestCheckResourceAttr(resourceName, "tags.1852302624", "tag2"),
 					resource.TestCheckResourceAttr(resourceName, "plan", "standard"),
+					resource.TestCheckResourceAttr(resourceName, "version", "2"),
 					resource.TestCheckResourceAttr(resourceName, "internet_connection", "true"),
 					resource.TestCheckNoResourceAttr(resourceName, "public_network_interface"),
 					resource.TestCheckResourceAttrSet(resourceName, "public_ip"),
@@ -99,6 +100,7 @@ func TestAccSakuraCloudVPCRouter_Full(t *testing.T) {
 				Check: resource.ComposeTestCheckFunc(
 					testCheckSakuraCloudVPCRouterExists(resourceName, &vpcRouter),
 					resource.TestCheckResourceAttr(resourceName, "name", rand),
+					resource.TestCheckResourceAttr(resourceName, "version", "1"),
 					resource.TestCheckResourceAttrSet(resourceName, "public_ip"),
 					resource.TestCheckResourceAttrSet(resourceName, "public_netmask"),
 					resource.TestCheckResourceAttr(resourceName, "private_network_interface.#", "1"),
@@ -281,6 +283,7 @@ resource "sakuracloud_vpc_router" "foobar" {
   description = "description"
   tags        = ["tag1" , "tag2"]
   plan        = "premium"
+  version     = 1
 
   internet_connection = true
 

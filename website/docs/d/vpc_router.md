@@ -65,6 +65,8 @@ A `condition` block supports the following:
 * `syslog_host` - The ip address of the syslog host to which the VPC Router sends logs.
 * `tags` - Any tags assigned to the VPCRouter.
 * `user` - A list of `user` blocks as defined below.
+* `version` - The version of the VPC Router.
+
 
 ---
 
