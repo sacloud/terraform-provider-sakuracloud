@@ -1,4 +1,4 @@
-## 2.7.0 (Unreleased)
+## 2.7.0 (2021-01-16)
 
 * VPCRouter version [GH-795] (@yamamoto-febc)
 * Added support for parameters blocks in sakuracloud_database [GH-794] (@yamamoto-febc)
