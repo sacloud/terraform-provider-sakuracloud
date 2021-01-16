@@ -31,6 +31,11 @@ func dataSourceSakuraCloudVPCRouter() *schema.Resource {
 			filterAttrName: filterSchema(&filterSchemaOption{}),
 			"name":         schemaDataSourceSwitchID(resourceName),
 			"plan":         schemaDataSourcePlan(resourceName, types.VPCRouterPlanStrings),
+			"version": {
+				Type:        schema.TypeInt,
+				Computed:    true,
+				Description: "The version of the VPC Router",
+			},
 			"public_network_interface": {
 				Type:        schema.TypeList,
 				Computed:    true,

@@ -46,6 +46,13 @@ func resourceSakuraCloudVPCRouter() *schema.Resource {
 		Schema: map[string]*schema.Schema{
 			"name": schemaResourceName(resourceName),
 			"plan": schemaResourcePlan(resourceName, "standard", types.VPCRouterPlanStrings),
+			"version": {
+				Type:        schema.TypeInt,
+				Optional:    true,
+				Description: "The version of the VPC Router",
+				Default:     2,
+				ForceNew:    true,
+			},
 			"public_network_interface": {
 				Type:     schema.TypeList,
 				Optional: true, // only required when `plan` is not `standard`

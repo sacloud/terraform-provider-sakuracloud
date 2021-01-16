@@ -34,6 +34,7 @@ func expandVPCRouterBuilder(d resourceValueGettable, client *APIClient) *vpcrout
 		Tags:                  expandTags(d),
 		IconID:                expandSakuraCloudID(d, "icon_id"),
 		PlanID:                expandVPCRouterPlanID(d),
+		Version:               d.Get("version").(int),
 		NICSetting:            expandVPCRouterNICSetting(d),
 		AdditionalNICSettings: expandVPCRouterAdditionalNICSettings(d),
 		RouterSetting:         expandVPCRouterSettings(d),
