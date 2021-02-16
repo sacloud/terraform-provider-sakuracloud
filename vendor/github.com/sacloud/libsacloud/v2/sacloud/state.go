@@ -128,6 +128,9 @@ type StatePollingWaiter struct {
 	Timeout time.Duration // タイムアウト
 	// PollingInterval ポーリング間隔
 	PollingInterval time.Duration
+
+	// RaiseErrorWithUnknownState State(AvailabilityとInstanceStatus)が予期しない値だった場合にエラーとするか
+	RaiseErrorWithUnknownState bool
 }
 
 func (w *StatePollingWaiter) validateFields() {
@@ -287,7 +290,11 @@ func (w *StatePollingWaiter) handleAvailability(state accessor.Availability) (bo
 	case w.isInAvailability(v, w.PendingAvailability):
 		return false, nil
 	default:
-		return false, fmt.Errorf("got unexpected value of Availability: got %q", v)
+		var err error
+		if w.RaiseErrorWithUnknownState {
+			err = fmt.Errorf("got unexpected value of Availability: got %q", v)
+		}
+		return false, err
 	}
 }
 
@@ -302,7 +309,11 @@ func (w *StatePollingWaiter) handleInstanceState(state accessor.InstanceStatus) 
 	case w.isInInstanceStatus(v, w.PendingInstanceStatus):
 		return false, nil
 	default:
-		return false, fmt.Errorf("got unexpected value of InstanceState: got %q", v)
+		var err error
+		if w.RaiseErrorWithUnknownState {
+			err = fmt.Errorf("got unexpected value of InstanceState: got %q", v)
+		}
+		return false, err
 	}
 }
 
