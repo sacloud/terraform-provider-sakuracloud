@@ -1,3 +1,7 @@
+## 2.7.1 (2021-02-17)
+
+* libsacloud v2.13 [GH-796] (@yamamoto-febc)
+
 ## 2.7.0 (2021-01-16)
 
 * VPCRouter version [GH-795] (@yamamoto-febc)
