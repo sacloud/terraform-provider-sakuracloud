@@ -1,3 +1,10 @@
+## 2.8.0(Unreleased)
+
+FEATURES
+
+  * libsacloud v2.14.0 [GH-799] (@yamamoto-febc)
+
+
 ## 2.7.1 (2021-02-17)
 
 * libsacloud v2.13 [GH-796] (@yamamoto-febc)
