@@ -38,7 +38,7 @@ tools:
 	GO111MODULE=off go get github.com/bflad/tfproviderdocs
 	GO111MODULE=off go get github.com/bflad/tfproviderlint/cmd/tfproviderlintx
 	GO111MODULE=off go get github.com/client9/misspell/cmd/misspell
-	curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $$(go env GOPATH)/bin v1.24.0
+	curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/v1.37.0/install.sh | sh -s -- -b $$(go env GOPATH)/bin v1.37.0
 
 
 .PHONY: build-envs
