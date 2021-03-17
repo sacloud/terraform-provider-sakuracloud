@@ -1,6 +1,6 @@
 module github.com/sacloud/libsacloud/v2
 
-go 1.12
+go 1.16
 
 require (
 	github.com/fatih/structs v1.1.0
@@ -20,7 +20,6 @@ require (
 	go.opentelemetry.io/otel/exporters/stdout v0.15.0
 	go.opentelemetry.io/otel/exporters/trace/jaeger v0.15.0
 	go.opentelemetry.io/otel/sdk v0.15.0
-	go.uber.org/atomic v1.4.0 // indirect
 	go.uber.org/ratelimit v0.0.0-20180316092928-c15da0234277
 	golang.org/x/crypto v0.0.0-20200622213623-75b288015ac9
 )
