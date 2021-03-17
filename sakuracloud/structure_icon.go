@@ -17,7 +17,7 @@ package sakuracloud
 import (
 	"encoding/base64"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"os"
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
@@ -37,7 +37,7 @@ func expandIconBody(d resourceValueGettable) (string, error) {
 		if err != nil {
 			return "", fmt.Errorf("opening SakuraCloud Icon source(%s) is failed: %s", source, err)
 		}
-		data, err := ioutil.ReadAll(file)
+		data, err := io.ReadAll(file)
 		if err != nil {
 			return "", fmt.Errorf("reading SakuraCloud Icon source file is failed: %s", err)
 		}

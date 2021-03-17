@@ -17,7 +17,6 @@ package tfdocgen
 import (
 	"bytes"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"text/template"
@@ -169,7 +168,7 @@ func (p *Provider) writeERBFile(destDir string, params []*TemplateParameter) err
 	}
 
 	// write to file
-	if err := ioutil.WriteFile(dest, buf.Bytes(), 0644); err != nil {
+	if err := os.WriteFile(dest, buf.Bytes(), 0644); err != nil {
 		return err
 	}
 	fmt.Println(dest)
@@ -218,7 +217,7 @@ func (p *Provider) execTemplate(tmpl, dest string, param *TemplateParameter) err
 	}
 
 	// write to file
-	if err := ioutil.WriteFile(dest, buf.Bytes(), 0644); err != nil {
+	if err := os.WriteFile(dest, buf.Bytes(), 0644); err != nil {
 		return err
 	}
 	fmt.Println(dest)
@@ -231,7 +230,7 @@ func (p *Provider) loadTemplate(templateDir, templatePath string) (string, error
 		return defaultTemplate, nil
 	}
 
-	data, err := ioutil.ReadFile(tmplPath)
+	data, err := os.ReadFile(tmplPath)
 	if err != nil {
 		return "", err
 	}
@@ -245,7 +244,7 @@ func (p *Provider) loadExample(exampleDir, examplePath string) (string, error) {
 		return "", nil
 	}
 
-	data, err := ioutil.ReadFile(exPath)
+	data, err := os.ReadFile(exPath)
 	if err != nil {
 		return "", err
 	}
