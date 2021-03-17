@@ -18,7 +18,6 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"reflect"
 	"sort"
@@ -331,14 +330,14 @@ func (s *JSONFileStore) store() error {
 	if err != nil {
 		return err
 	}
-	return ioutil.WriteFile(s.Path, data, 0600)
+	return os.WriteFile(s.Path, data, 0600)
 }
 
 func (s *JSONFileStore) load() error {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
-	data, err := ioutil.ReadFile(s.Path)
+	data, err := os.ReadFile(s.Path)
 	if err != nil {
 		return err
 	}

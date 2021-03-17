@@ -20,7 +20,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"net/http"
 	"os"
 	"time"
@@ -197,7 +196,7 @@ func (c *Client) Do(ctx context.Context, method, uri string, body interface{}) (
 	}
 	defer resp.Body.Close() // nolint - ignore error
 
-	data, err := ioutil.ReadAll(resp.Body)
+	data, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return nil, err
 	}

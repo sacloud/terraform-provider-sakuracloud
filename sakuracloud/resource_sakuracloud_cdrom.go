@@ -17,7 +17,6 @@ package sakuracloud
 import (
 	"context"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"time"
 
@@ -314,7 +313,7 @@ func prepareContentFile(d *schema.ResourceData) (string, bool, error) {
 		}
 
 		// create iso9660 format file
-		tmpFile, err := ioutil.TempFile("", "tf-sakuracloud-cdrom")
+		tmpFile, err := os.CreateTemp("", "tf-sakuracloud-cdrom")
 		if err != nil {
 			return "", isTemporal, fmt.Errorf("error creating temp-file : %s", err)
 		}

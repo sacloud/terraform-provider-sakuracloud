@@ -17,7 +17,6 @@ package profile
 import (
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"strings"
@@ -232,7 +231,7 @@ func Save(profileName string, val interface{}) error {
 
 	// merge new value if current config exists
 	if _, err := os.Stat(path); err == nil {
-		currentData, err := ioutil.ReadFile(path)
+		currentData, err := os.ReadFile(path)
 		if err != nil {
 			return fmt.Errorf("reading current config %q failed: %s", path, err)
 		}
@@ -257,7 +256,7 @@ func Save(profileName string, val interface{}) error {
 		}
 	}
 
-	err = ioutil.WriteFile(path, rawBody, 0600)
+	err = os.WriteFile(path, rawBody, 0600)
 	if err != nil {
 		return fmt.Errorf("writing config to %q is failed: %s", path, err)
 	}
@@ -280,7 +279,7 @@ func Load(profileName string, configValue interface{}) error {
 	// file exists?
 	if _, err := os.Stat(filePath); err == nil {
 		// read file
-		buf, err := ioutil.ReadFile(filePath)
+		buf, err := os.ReadFile(filePath)
 		if err != nil {
 			return fmt.Errorf("loading config from %q is failed: %s", filePath, err)
 		}
@@ -319,7 +318,7 @@ func Remove(profileName string) error {
 	}
 
 	// remove dir if dir is empty
-	info, err := ioutil.ReadDir(dir)
+	info, err := os.ReadDir(dir)
 	if err != nil {
 		return fmt.Errorf("removing config file is failed: reading %q is failed: %s", dir, err)
 	}
@@ -352,7 +351,7 @@ func CurrentName() (string, error) {
 
 	profNameFile := filepath.Join(baseDir, configDirName, currentFileName)
 	if _, err := os.Stat(profNameFile); err == nil {
-		data, err := ioutil.ReadFile(profNameFile)
+		data, err := os.ReadFile(profNameFile)
 		if err != nil {
 			return "", fmt.Errorf("reading current profile is failed: %s", err)
 		}
@@ -409,7 +408,7 @@ func SetCurrentName(profileName string) error {
 	}
 
 	profNameFile := filepath.Join(baseDir, configDirName, currentFileName)
-	if err := ioutil.WriteFile(profNameFile, []byte(profileName), 0600); err != nil {
+	if err := os.WriteFile(profNameFile, []byte(profileName), 0600); err != nil {
 		return fmt.Errorf("writing profile to %q is failed: %s", profNameFile, err)
 	}
 
@@ -429,7 +428,7 @@ func List() ([]string, error) {
 	if _, err := os.Stat(configDirPath); err != nil {
 		return res, nil
 	}
-	entries, err := ioutil.ReadDir(filepath.Join(baseDir, configDirName))
+	entries, err := os.ReadDir(filepath.Join(baseDir, configDirName))
 	if err != nil {
 		return []string{}, fmt.Errorf("listing profiles is failed: %s", err)
 	}
