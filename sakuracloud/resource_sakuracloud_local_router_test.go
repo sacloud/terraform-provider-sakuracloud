@@ -47,8 +47,8 @@ func TestAccSakuraCloudLocalRouter_basic(t *testing.T) {
 					resource.TestCheckResourceAttr(resourceName, "name", rand),
 					resource.TestCheckResourceAttr(resourceName, "description", "description"),
 					resource.TestCheckResourceAttr(resourceName, "tags.#", "2"),
-					resource.TestCheckResourceAttr(resourceName, "tags.4151227546", "tag1"),
-					resource.TestCheckResourceAttr(resourceName, "tags.1852302624", "tag2"),
+					resource.TestCheckResourceAttr(resourceName, "tags.0", "tag1"),
+					resource.TestCheckResourceAttr(resourceName, "tags.1", "tag2"),
 					resource.TestCheckResourceAttrPair(
 						resourceName, "switch.0.code",
 						"sakuracloud_switch.foobar", "id"),
@@ -78,8 +78,8 @@ func TestAccSakuraCloudLocalRouter_basic(t *testing.T) {
 					resource.TestCheckResourceAttr(resourceName, "name", rand+"-upd"),
 					resource.TestCheckResourceAttr(resourceName, "description", "description-upd"),
 					resource.TestCheckResourceAttr(resourceName, "tags.#", "2"),
-					resource.TestCheckResourceAttr(resourceName, "tags.2362157161", "tag1-upd"),
-					resource.TestCheckResourceAttr(resourceName, "tags.3412841145", "tag2-upd"),
+					resource.TestCheckResourceAttr(resourceName, "tags.0", "tag1-upd"),
+					resource.TestCheckResourceAttr(resourceName, "tags.1", "tag2-upd"),
 					resource.TestCheckResourceAttrPair(
 						resourceName, "switch.0.code",
 						"sakuracloud_switch.foobar", "id"),
@@ -165,8 +165,8 @@ func TestAccImportSakuraCloudLocalRouter_basic(t *testing.T) {
 		expects := map[string]string{
 			"name":                               rand,
 			"description":                        "description",
-			"tags.4151227546":                    "tag1",
-			"tags.1852302624":                    "tag2",
+			"tags.0":                             "tag1",
+			"tags.1":                             "tag2",
 			"switch.0.category":                  "cloud",
 			"switch.0.zone_id":                   os.Getenv("SAKURACLOUD_ZONE"),
 			"network_interface.0.vip":            "192.168.11.1",

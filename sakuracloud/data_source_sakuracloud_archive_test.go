@@ -33,12 +33,12 @@ func TestAccSakuraCloudDataSourceArchive_basic(t *testing.T) {
 					resource.TestCheckResourceAttr(resourceName, "name", "Ubuntu Server 16.04.6 LTS 64bit"),
 					resource.TestCheckResourceAttr(resourceName, "size", "20"),
 					resource.TestCheckResourceAttr(resourceName, "tags.#", "6"),
-					resource.TestCheckResourceAttr(resourceName, "tags.1695116635", "@size-extendable"),
-					resource.TestCheckResourceAttr(resourceName, "tags.2816018188", "arch-64bit"),
-					resource.TestCheckResourceAttr(resourceName, "tags.1490716481", "distro-ubuntu"),
-					resource.TestCheckResourceAttr(resourceName, "tags.4143804920", "distro-ver-16.04.5"),
-					resource.TestCheckResourceAttr(resourceName, "tags.1583874418", "os-linux"),
-					resource.TestCheckResourceAttr(resourceName, "tags.1550871325", "ubuntu-16.04-latest"),
+					resource.TestCheckResourceAttr(resourceName, "tags.0", "@size-extendable"),
+					resource.TestCheckResourceAttr(resourceName, "tags.1", "arch-64bit"),
+					resource.TestCheckResourceAttr(resourceName, "tags.2", "distro-ubuntu"),
+					resource.TestCheckResourceAttr(resourceName, "tags.3", "distro-ver-16.04.5"),
+					resource.TestCheckResourceAttr(resourceName, "tags.4", "os-linux"),
+					resource.TestCheckResourceAttr(resourceName, "tags.5", "ubuntu-16.04-latest"),
 				),
 			},
 		},
@@ -77,40 +77,6 @@ func TestAccSakuraCloudDataSourceArchive_withTag(t *testing.T) {
 	})
 }
 
-func TestAccSakuraCloudDataSourceArchive_notExists(t *testing.T) {
-	name := "data.sakuracloud_archive.foobar"
-	resource.ParallelTest(t, resource.TestCase{
-		PreCheck:  func() { testAccPreCheck(t) },
-		Providers: testAccProviders,
-		Steps: []resource.TestStep{
-			{
-				Config: testAccCheckSakuraCloudDataSourceArchive_notExists,
-				Check: resource.ComposeTestCheckFunc(
-					testCheckSakuraCloudDataSourceNotExists(name),
-				),
-				Destroy: true,
-			},
-		},
-	})
-}
-
-func TestAccSakuraCloudDataSourceArchive_tagNotExists(t *testing.T) {
-	name := "data.sakuracloud_archive.foobar"
-	resource.ParallelTest(t, resource.TestCase{
-		PreCheck:  func() { testAccPreCheck(t) },
-		Providers: testAccProviders,
-		Steps: []resource.TestStep{
-			{
-				Config: testAccCheckSakuraCloudDataSourceArchive_tagNotExists,
-				Check: resource.ComposeTestCheckFunc(
-					testCheckSakuraCloudDataSourceNotExists(name),
-				),
-				Destroy: true,
-			},
-		},
-	})
-}
-
 var testAccSakuraCloudDataSourceArchive_basic = `
 data "sakuracloud_archive" "foobar" {
   filter {
@@ -122,20 +88,6 @@ var testAccCheckSakuraCloudDataSourceArchive_withTag = `
 data "sakuracloud_archive" "foobar" {
   filter {
     tags = ["distro-ubuntu","os-linux"]
-  }
-}`
-
-var testAccCheckSakuraCloudDataSourceArchive_tagNotExists = `
-data "sakuracloud_archive" "foobar" {
-  filter {
-    tags = ["distro-ubuntu-xxxxxxxxxxx","os-linux-xxxxxxxx"]
-  }
-}`
-
-var testAccCheckSakuraCloudDataSourceArchive_notExists = `
-data "sakuracloud_archive" "foobar" {
-  filter {
-    names = ["xxxxxxxxxxxxxxxxxx"]
   }
 }`
 

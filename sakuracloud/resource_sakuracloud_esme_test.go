@@ -45,8 +45,8 @@ func TestAccSakuraCloudESME_basic(t *testing.T) {
 					resource.TestCheckResourceAttr(resourceName, "name", rand),
 					resource.TestCheckResourceAttr(resourceName, "description", "description"),
 					resource.TestCheckResourceAttr(resourceName, "tags.#", "2"),
-					resource.TestCheckResourceAttr(resourceName, "tags.4151227546", "tag1"),
-					resource.TestCheckResourceAttr(resourceName, "tags.1852302624", "tag2"),
+					resource.TestCheckResourceAttr(resourceName, "tags.0", "tag1"),
+					resource.TestCheckResourceAttr(resourceName, "tags.1", "tag2"),
 					resource.TestCheckResourceAttrPair(
 						resourceName, "icon_id",
 						"sakuracloud_icon.foobar", "id",
@@ -62,8 +62,8 @@ func TestAccSakuraCloudESME_basic(t *testing.T) {
 					resource.TestCheckResourceAttr(resourceName, "name", rand+"-upd"),
 					resource.TestCheckResourceAttr(resourceName, "description", "description-upd"),
 					resource.TestCheckResourceAttr(resourceName, "tags.#", "2"),
-					resource.TestCheckResourceAttr(resourceName, "tags.2362157161", "tag1-upd"),
-					resource.TestCheckResourceAttr(resourceName, "tags.3412841145", "tag2-upd"),
+					resource.TestCheckResourceAttr(resourceName, "tags.0", "tag1-upd"),
+					resource.TestCheckResourceAttr(resourceName, "tags.1", "tag2-upd"),
 					resource.TestCheckResourceAttr(resourceName, "icon_id", ""),
 					resource.TestCheckResourceAttrSet(resourceName, "send_message_with_generated_otp_api_url"),
 					resource.TestCheckResourceAttrSet(resourceName, "send_message_with_inputted_otp_api_url"),
@@ -134,10 +134,10 @@ func TestAccImportSakuraCloudESME_basic(t *testing.T) {
 			return fmt.Errorf("expected 1 state: %#v", s)
 		}
 		expects := map[string]string{
-			"name":            rand,
-			"description":     "description",
-			"tags.4151227546": "tag1",
-			"tags.1852302624": "tag2",
+			"name":        rand,
+			"description": "description",
+			"tags.0":      "tag1",
+			"tags.1":      "tag2",
 		}
 
 		if err := compareStateMulti(s[0], expects); err != nil {
