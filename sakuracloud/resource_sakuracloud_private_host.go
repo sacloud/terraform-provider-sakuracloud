@@ -48,11 +48,11 @@ func resourceSakuraCloudPrivateHost() *schema.Resource {
 		Schema: map[string]*schema.Schema{
 			"name": schemaResourceName(resourceName),
 			"class": {
-				Type:         schema.TypeString,
-				Optional:     true,
-				Default:      types.PrivateHostClassDynamic,
-				ValidateFunc: validation.StringInSlice(classes, false),
-				Description:  descf("The class of the %s. This will be one of [%s]", resourceName, classes),
+				Type:             schema.TypeString,
+				Optional:         true,
+				Default:          types.PrivateHostClassDynamic,
+				ValidateDiagFunc: validation.ToDiagFunc(validation.StringInSlice(classes, false)),
+				Description:      descf("The class of the %s. This will be one of [%s]", resourceName, classes),
 			},
 			"icon_id":     schemaResourceIconID(resourceName),
 			"description": schemaResourceDescription(resourceName),

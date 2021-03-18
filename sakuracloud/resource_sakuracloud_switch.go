@@ -20,6 +20,7 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
 	"github.com/sacloud/libsacloud/v2/helper/cleanup"
 	"github.com/sacloud/libsacloud/v2/sacloud"
 )
@@ -47,10 +48,10 @@ func resourceSakuraCloudSwitch() *schema.Resource {
 			"description": schemaResourceDescription(resourceName),
 			"tags":        schemaResourceTags(resourceName),
 			"bridge_id": {
-				Type:         schema.TypeString,
-				Optional:     true,
-				ValidateFunc: validateSakuracloudIDType,
-				Description:  descf("The bridge id attached to the %s", resourceName),
+				Type:             schema.TypeString,
+				Optional:         true,
+				ValidateDiagFunc: validation.ToDiagFunc(validateSakuracloudIDType),
+				Description:      descf("The bridge id attached to the %s", resourceName),
 			},
 			"server_ids": {
 				Type:        schema.TypeList,

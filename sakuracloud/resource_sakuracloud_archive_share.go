@@ -20,6 +20,7 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
 	"github.com/sacloud/libsacloud/v2/sacloud"
 )
 
@@ -39,11 +40,11 @@ func resourceSakuraCloudArchiveShare() *schema.Resource {
 
 		Schema: map[string]*schema.Schema{
 			"archive_id": {
-				Type:         schema.TypeString,
-				ForceNew:     true,
-				Required:     true,
-				ValidateFunc: validateSakuracloudIDType,
-				Description:  "The id of the archive",
+				Type:             schema.TypeString,
+				ForceNew:         true,
+				Required:         true,
+				ValidateDiagFunc: validation.ToDiagFunc(validateSakuracloudIDType),
+				Description:      "The id of the archive",
 			},
 			"share_key": {
 				Type:        schema.TypeString,

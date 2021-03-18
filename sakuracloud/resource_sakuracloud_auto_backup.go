@@ -45,11 +45,11 @@ func resourceSakuraCloudAutoBackup() *schema.Resource {
 		Schema: map[string]*schema.Schema{
 			"name": schemaResourceName(resourceName),
 			"disk_id": {
-				Type:         schema.TypeString,
-				Required:     true,
-				ForceNew:     true,
-				ValidateFunc: validateSakuracloudIDType,
-				Description:  "The disk id to backed up",
+				Type:             schema.TypeString,
+				Required:         true,
+				ForceNew:         true,
+				ValidateDiagFunc: validation.ToDiagFunc(validateSakuracloudIDType),
+				Description:      "The disk id to backed up",
 			},
 			"weekdays": {
 				Type:     schema.TypeSet,
@@ -62,11 +62,11 @@ func resourceSakuraCloudAutoBackup() *schema.Resource {
 				),
 			},
 			"max_backup_num": {
-				Type:         schema.TypeInt,
-				Optional:     true,
-				Default:      1,
-				ValidateFunc: validation.IntBetween(1, 10),
-				Description:  descf("The number backup files to keep. %s", descRange(1, 10)),
+				Type:             schema.TypeInt,
+				Optional:         true,
+				Default:          1,
+				ValidateDiagFunc: validation.ToDiagFunc(validation.IntBetween(1, 10)),
+				Description:      descf("The number backup files to keep. %s", descRange(1, 10)),
 			},
 			"icon_id":     schemaResourceIconID(resourceName),
 			"description": schemaResourceDescription(resourceName),

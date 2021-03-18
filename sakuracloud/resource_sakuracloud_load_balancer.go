@@ -73,10 +73,10 @@ func resourceSakuraCloudLoadBalancer() *schema.Resource {
 							Description: descf("A list of IP address to assign to the %s. ", resourceName),
 						},
 						"netmask": {
-							Type:         schema.TypeInt,
-							ForceNew:     true,
-							Required:     true,
-							ValidateFunc: validation.IntBetween(8, 29),
+							Type:             schema.TypeInt,
+							ForceNew:         true,
+							Required:         true,
+							ValidateDiagFunc: validation.ToDiagFunc(validation.IntBetween(8, 29)),
 							Description: descf(
 								"The bit length of the subnet assigned to the %s. %s", resourceName,
 								descRange(8, 29),
@@ -107,19 +107,19 @@ func resourceSakuraCloudLoadBalancer() *schema.Resource {
 							Description: "The virtual IP address",
 						},
 						"port": {
-							Type:         schema.TypeInt,
-							Required:     true,
-							ValidateFunc: validation.IntBetween(1, 65535),
+							Type:             schema.TypeInt,
+							Required:         true,
+							ValidateDiagFunc: validation.ToDiagFunc(validation.IntBetween(1, 65535)),
 							Description: descf(
 								"The target port number for load-balancing. %s",
 								descRange(1, 65535),
 							),
 						},
 						"delay_loop": {
-							Type:         schema.TypeInt,
-							Optional:     true,
-							ValidateFunc: validation.IntBetween(10, 2147483647),
-							Default:      10,
+							Type:             schema.TypeInt,
+							Optional:         true,
+							ValidateDiagFunc: validation.ToDiagFunc(validation.IntBetween(10, 2147483647)),
+							Default:          10,
 							Description: descf(
 								"The interval in seconds between checks. %s",
 								descRange(10, 2147483647),
@@ -143,9 +143,9 @@ func resourceSakuraCloudLoadBalancer() *schema.Resource {
 										Description: "The IP address of the destination server",
 									},
 									"protocol": {
-										Type:         schema.TypeString,
-										Required:     true,
-										ValidateFunc: validation.StringInSlice(types.LoadBalancerHealthCheckProtocolStrings, false),
+										Type:             schema.TypeString,
+										Required:         true,
+										ValidateDiagFunc: validation.ToDiagFunc(validation.StringInSlice(types.LoadBalancerHealthCheckProtocolStrings, false)),
 										Description: descf(
 											"The protocol used for health checks. This must be one of [%s]",
 											types.LoadBalancerHealthCheckProtocolStrings,

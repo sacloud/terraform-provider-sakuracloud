@@ -51,10 +51,10 @@ func resourceSakuraCloudSimpleMonitor() *schema.Resource {
 				Description: "The monitoring target of the simple monitor. This must be IP address or FQDN",
 			},
 			"delay_loop": {
-				Type:         schema.TypeInt,
-				Optional:     true,
-				ValidateFunc: validation.IntBetween(60, 3600),
-				Default:      60,
+				Type:             schema.TypeInt,
+				Optional:         true,
+				ValidateDiagFunc: validation.ToDiagFunc(validation.IntBetween(60, 3600)),
+				Default:          60,
 				Description: descf(
 					"The interval in seconds between checks. %s",
 					descRange(60, 3600),
@@ -68,9 +68,9 @@ func resourceSakuraCloudSimpleMonitor() *schema.Resource {
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
 						"protocol": {
-							Type:         schema.TypeString,
-							Required:     true,
-							ValidateFunc: validation.StringInSlice(types.SimpleMonitorProtocolStrings, false),
+							Type:             schema.TypeString,
+							Required:         true,
+							ValidateDiagFunc: validation.ToDiagFunc(validation.StringInSlice(types.SimpleMonitorProtocolStrings, false)),
 							Description: descf(
 								"The protocol used for health checks. This must be one of [%s]",
 								types.SimpleMonitorProtocolStrings,
@@ -128,9 +128,9 @@ func resourceSakuraCloudSimpleMonitor() *schema.Resource {
 							Description: "The SNMP community string used when checking by SNMP",
 						},
 						"snmp_version": {
-							Type:         schema.TypeString,
-							ValidateFunc: validation.StringInSlice([]string{"1", "2c"}, false),
-							Optional:     true,
+							Type:             schema.TypeString,
+							ValidateDiagFunc: validation.ToDiagFunc(validation.StringInSlice([]string{"1", "2c"}, false)),
+							Optional:         true,
 							Description: descf(
 								"The SNMP version used when checking by SNMP. This must be one of %s",
 								[]string{"1", "2c"},
@@ -142,10 +142,10 @@ func resourceSakuraCloudSimpleMonitor() *schema.Resource {
 							Description: "The SNMP OID used when checking by SNMP",
 						},
 						"remaining_days": {
-							Type:         schema.TypeInt,
-							Optional:     true,
-							ValidateFunc: validation.IntBetween(1, 9999),
-							Default:      30,
+							Type:             schema.TypeInt,
+							Optional:         true,
+							ValidateDiagFunc: validation.ToDiagFunc(validation.IntBetween(1, 9999)),
+							Default:          30,
 							Description: descf(
 								"The number of remaining days until certificate expiration used when checking SSL certificates. %s",
 								descRange(1, 9999),
@@ -181,11 +181,11 @@ func resourceSakuraCloudSimpleMonitor() *schema.Resource {
 				Description: "The webhook URL for sending notification by slack/discord",
 			},
 			"notify_interval": {
-				Type:         schema.TypeInt,
-				Optional:     true,
-				Default:      2,
-				ValidateFunc: validation.IntBetween(1, 72),
-				Description:  descf("The interval in hours between notification. %s", descRange(1, 72)),
+				Type:             schema.TypeInt,
+				Optional:         true,
+				Default:          2,
+				ValidateDiagFunc: validation.ToDiagFunc(validation.IntBetween(1, 72)),
+				Description:      descf("The interval in hours between notification. %s", descRange(1, 72)),
 			},
 			"enabled": {
 				Type:        schema.TypeBool,

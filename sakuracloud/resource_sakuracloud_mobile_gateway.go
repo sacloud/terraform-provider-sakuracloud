@@ -54,10 +54,10 @@ func resourceSakuraCloudMobileGateway() *schema.Resource {
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
 						"switch_id": {
-							Type:         schema.TypeString,
-							ValidateFunc: validateSakuracloudIDType,
-							Required:     true,
-							Description:  descf("The id of the switch to which the %s connects", resourceName),
+							Type:             schema.TypeString,
+							ValidateDiagFunc: validation.ToDiagFunc(validateSakuracloudIDType),
+							Required:         true,
+							Description:      descf("The id of the switch to which the %s connects", resourceName),
 						},
 						"ip_address": {
 							Type:             schema.TypeString,
@@ -66,9 +66,9 @@ func resourceSakuraCloudMobileGateway() *schema.Resource {
 							Description:      descf("The IP address to assign to the %s", resourceName),
 						},
 						"netmask": {
-							Type:         schema.TypeInt,
-							Required:     true,
-							ValidateFunc: validation.IntBetween(8, 29),
+							Type:             schema.TypeInt,
+							Required:         true,
+							ValidateDiagFunc: validation.ToDiagFunc(validation.IntBetween(8, 29)),
 							Description: descf(
 								"The bit length of the subnet to assign to the %s. %s",
 								resourceName,
@@ -115,16 +115,16 @@ func resourceSakuraCloudMobileGateway() *schema.Resource {
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
 						"quota": {
-							Type:         schema.TypeInt,
-							Required:     true,
-							ValidateFunc: validation.IntBetween(1, math.MaxInt32),
-							Description:  "The threshold of monthly traffic usage to enable to the traffic shaping",
+							Type:             schema.TypeInt,
+							Required:         true,
+							ValidateDiagFunc: validation.ToDiagFunc(validation.IntBetween(1, math.MaxInt32)),
+							Description:      "The threshold of monthly traffic usage to enable to the traffic shaping",
 						},
 						"band_width_limit": {
-							Type:         schema.TypeInt,
-							Optional:     true,
-							ValidateFunc: validation.IntBetween(1, math.MaxInt32),
-							Description:  "The bandwidth allowed when the traffic shaping is enabled",
+							Type:             schema.TypeInt,
+							Optional:         true,
+							ValidateDiagFunc: validation.ToDiagFunc(validation.IntBetween(1, math.MaxInt32)),
+							Description:      "The bandwidth allowed when the traffic shaping is enabled",
 						},
 						"enable_email": {
 							Type:        schema.TypeBool,
@@ -137,10 +137,10 @@ func resourceSakuraCloudMobileGateway() *schema.Resource {
 							Description: "The flag to enable slack notification when the traffic shaping is enabled",
 						},
 						"slack_webhook": {
-							Type:         schema.TypeString,
-							Optional:     true,
-							ValidateFunc: validation.StringMatch(regexp.MustCompile(`^https://hooks.slack.com/services/\w+/\w+/\w+$`), ""),
-							Description:  "The webhook URL used when sends notification. It will only used when `enable_slack` is set `true`",
+							Type:             schema.TypeString,
+							Optional:         true,
+							ValidateDiagFunc: validation.ToDiagFunc(validation.StringMatch(regexp.MustCompile(`^https://hooks.slack.com/services/\w+/\w+/\w+$`), "")),
+							Description:      "The webhook URL used when sends notification. It will only used when `enable_slack` is set `true`",
 						},
 						"auto_traffic_shaping": {
 							Type:        schema.TypeBool,
@@ -161,10 +161,10 @@ func resourceSakuraCloudMobileGateway() *schema.Resource {
 							Description: "The destination network prefix used by static routing. This must be specified by CIDR block formatted string",
 						},
 						"next_hop": {
-							Type:         schema.TypeString,
-							Required:     true,
-							ValidateFunc: validation.IsIPv4Address,
-							Description:  "The IP address of next hop",
+							Type:             schema.TypeString,
+							Required:         true,
+							ValidateDiagFunc: validation.ToDiagFunc(validation.IsIPv4Address),
+							Description:      "The IP address of next hop",
 						},
 					},
 				},
@@ -175,10 +175,10 @@ func resourceSakuraCloudMobileGateway() *schema.Resource {
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
 						"sim_id": {
-							Type:         schema.TypeString,
-							ValidateFunc: validateSakuracloudIDType,
-							Required:     true,
-							Description:  descf("The id of the Switch connected to the %s", resourceName),
+							Type:             schema.TypeString,
+							ValidateDiagFunc: validation.ToDiagFunc(validateSakuracloudIDType),
+							Required:         true,
+							Description:      descf("The id of the Switch connected to the %s", resourceName),
 						},
 						"ip_address": {
 							Type:             schema.TypeString,
@@ -195,10 +195,10 @@ func resourceSakuraCloudMobileGateway() *schema.Resource {
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
 						"sim_id": {
-							Type:         schema.TypeString,
-							ValidateFunc: validateSakuracloudIDType,
-							Required:     true,
-							Description:  "The id of the routing destination SIM",
+							Type:             schema.TypeString,
+							ValidateDiagFunc: validation.ToDiagFunc(validateSakuracloudIDType),
+							Required:         true,
+							Description:      "The id of the routing destination SIM",
 						},
 						"prefix": {
 							Type:        schema.TypeString,

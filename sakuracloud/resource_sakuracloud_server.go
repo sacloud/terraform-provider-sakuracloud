@@ -60,10 +60,10 @@ func resourceSakuraCloudServer() *schema.Resource {
 				Description: "The size of memory in GiB",
 			},
 			"commitment": {
-				Type:         schema.TypeString,
-				Optional:     true,
-				Default:      types.Commitments.Standard.String(),
-				ValidateFunc: validation.StringInSlice(types.CommitmentStrings, false),
+				Type:             schema.TypeString,
+				Optional:         true,
+				Default:          types.Commitments.Standard.String(),
+				ValidateDiagFunc: validation.ToDiagFunc(validation.StringInSlice(types.CommitmentStrings, false)),
 				Description: descf(
 					"The policy of how to allocate virtual CPUs to the server. This must be one of [%s]",
 					types.CommitmentStrings,
@@ -76,10 +76,10 @@ func resourceSakuraCloudServer() *schema.Resource {
 				Description: "A list of disk id connected to the server",
 			},
 			"interface_driver": {
-				Type:         schema.TypeString,
-				Optional:     true,
-				Default:      types.InterfaceDrivers.VirtIO.String(),
-				ValidateFunc: validation.StringInSlice(types.InterfaceDriverStrings, false),
+				Type:             schema.TypeString,
+				Optional:         true,
+				Default:          types.InterfaceDrivers.VirtIO.String(),
+				ValidateDiagFunc: validation.ToDiagFunc(validation.StringInSlice(types.InterfaceDriverStrings, false)),
 				Description: descf(
 					"The driver name of network interface. This must be one of [%s]",
 					types.InterfaceDriverStrings,
@@ -92,26 +92,26 @@ func resourceSakuraCloudServer() *schema.Resource {
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
 						"upstream": {
-							Type:         schema.TypeString,
-							Required:     true,
-							ValidateFunc: validateSakuraCloudServerNIC,
+							Type:             schema.TypeString,
+							Required:         true,
+							ValidateDiagFunc: validation.ToDiagFunc(validateSakuraCloudServerNIC),
 							Description: descf(
 								"The upstream type or upstream switch id. This must be one of [%s]",
 								[]string{"shared", "disconnect", "<switch id>"},
 							),
 						},
 						"user_ip_address": {
-							Type:         schema.TypeString,
-							Optional:     true,
-							Computed:     true,
-							ValidateFunc: validation.IsIPv4Address,
-							Description:  "The IP address for only display. This value doesn't affect actual NIC settings",
+							Type:             schema.TypeString,
+							Optional:         true,
+							Computed:         true,
+							ValidateDiagFunc: validation.ToDiagFunc(validation.IsIPv4Address),
+							Description:      "The IP address for only display. This value doesn't affect actual NIC settings",
 						},
 						"packet_filter_id": {
-							Type:         schema.TypeString,
-							Optional:     true,
-							ValidateFunc: validateSakuracloudIDType,
-							Description:  "The id of the packet filter to attach to the network interface",
+							Type:             schema.TypeString,
+							Optional:         true,
+							ValidateDiagFunc: validation.ToDiagFunc(validateSakuracloudIDType),
+							Description:      "The id of the packet filter to attach to the network interface",
 						},
 						"mac_address": {
 							Type:        schema.TypeString,
@@ -122,16 +122,16 @@ func resourceSakuraCloudServer() *schema.Resource {
 				},
 			},
 			"cdrom_id": {
-				Type:         schema.TypeString,
-				Optional:     true,
-				ValidateFunc: validateSakuracloudIDType,
-				Description:  "The id of the CD-ROM to attach to the Server",
+				Type:             schema.TypeString,
+				Optional:         true,
+				ValidateDiagFunc: validation.ToDiagFunc(validateSakuracloudIDType),
+				Description:      "The id of the CD-ROM to attach to the Server",
 			},
 			"private_host_id": {
-				Type:         schema.TypeString,
-				Optional:     true,
-				ValidateFunc: validateSakuracloudIDType,
-				Description:  "The id of the PrivateHost which the Server is assigned",
+				Type:             schema.TypeString,
+				Optional:         true,
+				ValidateDiagFunc: validation.ToDiagFunc(validateSakuracloudIDType),
+				Description:      "The id of the PrivateHost which the Server is assigned",
 			},
 			"private_host_name": {
 				Type:        schema.TypeString,
@@ -150,17 +150,17 @@ func resourceSakuraCloudServer() *schema.Resource {
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
 						"hostname": {
-							Type:         schema.TypeString,
-							Optional:     true,
-							ValidateFunc: validation.StringLenBetween(1, 64),
-							Description:  descf("The hostname of the %s. %s", resourceName, descLength(1, 64)),
+							Type:             schema.TypeString,
+							Optional:         true,
+							ValidateDiagFunc: validation.ToDiagFunc(validation.StringLenBetween(1, 64)),
+							Description:      descf("The hostname of the %s. %s", resourceName, descLength(1, 64)),
 						},
 						"password": {
-							Type:         schema.TypeString,
-							Optional:     true,
-							ValidateFunc: validation.StringLenBetween(8, 64),
-							Sensitive:    true,
-							Description:  descf("The password of default user. %s", descLength(8, 64)),
+							Type:             schema.TypeString,
+							Optional:         true,
+							ValidateDiagFunc: validation.ToDiagFunc(validation.StringLenBetween(8, 64)),
+							Sensitive:        true,
+							Description:      descf("The password of default user. %s", descLength(8, 64)),
 						},
 						"ssh_key_ids": {
 							Type:        schema.TypeList,
@@ -203,16 +203,16 @@ func resourceSakuraCloudServer() *schema.Resource {
 							Elem: &schema.Resource{
 								Schema: map[string]*schema.Schema{
 									"id": {
-										Type:         schema.TypeString,
-										Required:     true,
-										ValidateFunc: validateSakuracloudIDType,
-										Description:  "The id of the note",
+										Type:             schema.TypeString,
+										Required:         true,
+										ValidateDiagFunc: validation.ToDiagFunc(validateSakuracloudIDType),
+										Description:      "The id of the note",
 									},
 									"api_key_id": {
-										Type:         schema.TypeString,
-										Optional:     true,
-										ValidateFunc: validateSakuracloudIDType,
-										Description:  "The id of the API key to be injected into note when editing the disk",
+										Type:             schema.TypeString,
+										Optional:         true,
+										ValidateDiagFunc: validation.ToDiagFunc(validateSakuracloudIDType),
+										Description:      "The id of the API key to be injected into note when editing the disk",
 									},
 									"variables": {
 										Type: schema.TypeMap,
@@ -228,10 +228,10 @@ func resourceSakuraCloudServer() *schema.Resource {
 							Description:   "A list of the Note/StartupScript",
 						},
 						"ip_address": {
-							Type:         schema.TypeString,
-							Optional:     true,
-							ValidateFunc: validation.IsIPv4Address,
-							Description:  "The IP address to assign to the Server",
+							Type:             schema.TypeString,
+							Optional:         true,
+							ValidateDiagFunc: validation.ToDiagFunc(validation.IsIPv4Address),
+							Description:      "The IP address to assign to the Server",
 						},
 						"gateway": {
 							Type:        schema.TypeString,

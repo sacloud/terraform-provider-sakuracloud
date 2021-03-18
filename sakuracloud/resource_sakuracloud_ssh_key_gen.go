@@ -39,24 +39,24 @@ func resourceSakuraCloudSSHKeyGen() *schema.Resource {
 
 		Schema: map[string]*schema.Schema{
 			"name": {
-				Type:         schema.TypeString,
-				Required:     true,
-				ForceNew:     true,
-				ValidateFunc: validation.StringLenBetween(1, 64),
-				Description:  descf("The name of the %s. %s", resourceName, descLength(1, 64)),
+				Type:             schema.TypeString,
+				Required:         true,
+				ForceNew:         true,
+				ValidateDiagFunc: validation.ToDiagFunc(validation.StringLenBetween(1, 64)),
+				Description:      descf("The name of the %s. %s", resourceName, descLength(1, 64)),
 			},
 			"description": {
-				Type:         schema.TypeString,
-				Optional:     true,
-				ForceNew:     true,
-				ValidateFunc: validation.StringLenBetween(1, 512),
-				Description:  descf("The description of the %s. %s", resourceName, descLength(1, 512)),
+				Type:             schema.TypeString,
+				Optional:         true,
+				ForceNew:         true,
+				ValidateDiagFunc: validation.ToDiagFunc(validation.StringLenBetween(1, 512)),
+				Description:      descf("The description of the %s. %s", resourceName, descLength(1, 512)),
 			},
 			"pass_phrase": {
-				Type:         schema.TypeString,
-				Optional:     true,
-				ForceNew:     true,
-				ValidateFunc: validation.StringLenBetween(8, 64),
+				Type:             schema.TypeString,
+				Optional:         true,
+				ForceNew:         true,
+				ValidateDiagFunc: validation.ToDiagFunc(validation.StringLenBetween(8, 64)),
 				Description: descf(
 					"The pass phrase of the private key. %s",
 					descLength(8, 64),

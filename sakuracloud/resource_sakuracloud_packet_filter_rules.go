@@ -42,11 +42,11 @@ func resourceSakuraCloudPacketFilterRules() *schema.Resource {
 
 		Schema: map[string]*schema.Schema{
 			"packet_filter_id": {
-				Type:         schema.TypeString,
-				Required:     true,
-				ForceNew:     true,
-				ValidateFunc: validateSakuracloudIDType,
-				Description:  "The id of the packet filter that set expressions to",
+				Type:             schema.TypeString,
+				Required:         true,
+				ForceNew:         true,
+				ValidateDiagFunc: validation.ToDiagFunc(validateSakuracloudIDType),
+				Description:      "The id of the packet filter that set expressions to",
 			},
 			"expression": {
 				Type:     schema.TypeList,
@@ -56,10 +56,10 @@ func resourceSakuraCloudPacketFilterRules() *schema.Resource {
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
 						"protocol": {
-							Type:         schema.TypeString,
-							Required:     true,
-							ValidateFunc: validation.StringInSlice(types.PacketFilterProtocolStrings, false),
-							ForceNew:     true,
+							Type:             schema.TypeString,
+							Required:         true,
+							ValidateDiagFunc: validation.ToDiagFunc(validation.StringInSlice(types.PacketFilterProtocolStrings, false)),
+							ForceNew:         true,
 							Description: descf(
 								"The protocol used for filtering. This must be one of [%s]",
 								types.PacketFilterProtocolStrings,

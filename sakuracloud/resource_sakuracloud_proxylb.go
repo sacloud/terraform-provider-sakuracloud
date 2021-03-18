@@ -64,11 +64,11 @@ func resourceSakuraCloudProxyLB() *schema.Resource {
 				Description: "The timeout duration in seconds",
 			},
 			"region": {
-				Type:         schema.TypeString,
-				Optional:     true,
-				Default:      types.ProxyLBRegions.IS1.String(),
-				ValidateFunc: validation.StringInSlice(types.ProxyLBRegionStrings, false),
-				ForceNew:     true,
+				Type:             schema.TypeString,
+				Optional:         true,
+				Default:          types.ProxyLBRegions.IS1.String(),
+				ValidateDiagFunc: validation.ToDiagFunc(validation.StringInSlice(types.ProxyLBRegionStrings, false)),
+				ForceNew:         true,
 				Description: descf(
 					"The name of region that the proxy LB is in. This must be one of [%s]",
 					types.ProxyLBRegionStrings,
@@ -82,9 +82,9 @@ func resourceSakuraCloudProxyLB() *schema.Resource {
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
 						"proxy_mode": {
-							Type:         schema.TypeString,
-							Required:     true,
-							ValidateFunc: validation.StringInSlice(types.ProxyLBProxyModeStrings, false),
+							Type:             schema.TypeString,
+							Required:         true,
+							ValidateDiagFunc: validation.ToDiagFunc(validation.StringInSlice(types.ProxyLBProxyModeStrings, false)),
 							Description: descf(
 								"The proxy mode. This must be one of [%s]",
 								types.ProxyLBProxyModeStrings,
@@ -135,19 +135,19 @@ func resourceSakuraCloudProxyLB() *schema.Resource {
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
 						"protocol": {
-							Type:         schema.TypeString,
-							Required:     true,
-							ValidateFunc: validation.StringInSlice(types.ProxyLBProtocolStrings, false),
+							Type:             schema.TypeString,
+							Required:         true,
+							ValidateDiagFunc: validation.ToDiagFunc(validation.StringInSlice(types.ProxyLBProtocolStrings, false)),
 							Description: descf(
 								"The protocol used for health checks. This must be one of [%s]",
 								types.ProxyLBProtocolStrings,
 							),
 						},
 						"delay_loop": {
-							Type:         schema.TypeInt,
-							Optional:     true,
-							ValidateFunc: validation.IntBetween(10, 60),
-							Default:      10,
+							Type:             schema.TypeInt,
+							Optional:         true,
+							ValidateDiagFunc: validation.ToDiagFunc(validation.IntBetween(10, 60)),
+							Default:          10,
 							Description: descf(
 								"The interval in seconds between checks. %s",
 								descRange(10, 60),
@@ -254,15 +254,15 @@ func resourceSakuraCloudProxyLB() *schema.Resource {
 							Description: "The IP address of the destination server",
 						},
 						"port": {
-							Type:         schema.TypeInt,
-							Required:     true,
-							ValidateFunc: validation.IntBetween(1, 65535),
-							Description:  descf("The port number of the destination server. %s", descRange(1, 65535)),
+							Type:             schema.TypeInt,
+							Required:         true,
+							ValidateDiagFunc: validation.ToDiagFunc(validation.IntBetween(1, 65535)),
+							Description:      descf("The port number of the destination server. %s", descRange(1, 65535)),
 						},
 						"group": {
-							Type:         schema.TypeString,
-							Optional:     true,
-							ValidateFunc: validation.StringLenBetween(1, 10),
+							Type:             schema.TypeString,
+							Optional:         true,
+							ValidateDiagFunc: validation.ToDiagFunc(validation.StringLenBetween(1, 10)),
 							Description: descf(
 								"The name of load balancing group. This is used when using rule-based load balancing. %s",
 								descLength(1, 10),
@@ -293,9 +293,9 @@ func resourceSakuraCloudProxyLB() *schema.Resource {
 							Description: "The request path that is used as condition of rule-based balancing",
 						},
 						"group": {
-							Type:         schema.TypeString,
-							Optional:     true,
-							ValidateFunc: validation.StringLenBetween(1, 10),
+							Type:             schema.TypeString,
+							Optional:         true,
+							ValidateDiagFunc: validation.ToDiagFunc(validation.StringLenBetween(1, 10)),
 							Description: descf(
 								"The name of load balancing group. When proxyLB received request which matched to `host` and `path`, proxyLB forwards the request to servers that having same group name. %s",
 								descLength(1, 10),

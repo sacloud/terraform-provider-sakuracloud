@@ -20,6 +20,7 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
 	"github.com/sacloud/libsacloud/v2/sacloud"
 	"github.com/sacloud/libsacloud/v2/sacloud/search"
 	"github.com/sacloud/libsacloud/v2/sacloud/types"
@@ -31,10 +32,10 @@ func dataSourceSakuraCloudServerVNCInfo() *schema.Resource {
 
 		Schema: map[string]*schema.Schema{
 			"server_id": {
-				Type:         schema.TypeString,
-				Required:     true,
-				ValidateFunc: validateSakuracloudIDType,
-				Description:  "The id of the Server",
+				Type:             schema.TypeString,
+				Required:         true,
+				ValidateDiagFunc: validation.ToDiagFunc(validateSakuracloudIDType),
+				Description:      "The id of the Server",
 			},
 			"host": {
 				Type:        schema.TypeString,

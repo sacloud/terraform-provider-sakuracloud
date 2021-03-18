@@ -42,9 +42,9 @@ func resourceSakuraCloudContainerRegistry() *schema.Resource {
 		Schema: map[string]*schema.Schema{
 			"name": schemaResourceName(resourceName),
 			"access_level": {
-				Type:         schema.TypeString,
-				Required:     true,
-				ValidateFunc: validation.StringInSlice(types.ContainerRegistryAccessLevelStrings, false),
+				Type:             schema.TypeString,
+				Required:         true,
+				ValidateDiagFunc: validation.ToDiagFunc(validation.StringInSlice(types.ContainerRegistryAccessLevelStrings, false)),
 				Description: descf(
 					"The level of access that allow to users. This must be one of [%s]",
 					types.ContainerRegistryAccessLevelStrings,
@@ -56,10 +56,10 @@ func resourceSakuraCloudContainerRegistry() *schema.Resource {
 				Description: "The alias for accessing the container registry",
 			},
 			"subdomain_label": {
-				Type:         schema.TypeString,
-				Required:     true,
-				ForceNew:     true,
-				ValidateFunc: validation.StringLenBetween(1, 64),
+				Type:             schema.TypeString,
+				Required:         true,
+				ForceNew:         true,
+				ValidateDiagFunc: validation.ToDiagFunc(validation.StringLenBetween(1, 64)),
 				Description: descf(
 					"The label at the lowest of the FQDN used when be accessed from users. %s",
 					descLength(1, 64),
@@ -90,9 +90,9 @@ func resourceSakuraCloudContainerRegistry() *schema.Resource {
 							Description: "The password used to authenticate remote access",
 						},
 						"permission": {
-							Type:         schema.TypeString,
-							Required:     true,
-							ValidateFunc: validation.StringInSlice(types.ContainerRegistryPermissionStrings, false),
+							Type:             schema.TypeString,
+							Required:         true,
+							ValidateDiagFunc: validation.ToDiagFunc(validation.StringInSlice(types.ContainerRegistryPermissionStrings, false)),
 							Description: descf(
 								"The level of access that allow to the user. This must be one of [%s]",
 								types.ContainerRegistryPermissionStrings,

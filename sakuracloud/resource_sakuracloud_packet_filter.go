@@ -55,9 +55,9 @@ func resourceSakuraCloudPacketFilter() *schema.Resource {
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
 						"protocol": {
-							Type:         schema.TypeString,
-							Required:     true,
-							ValidateFunc: validation.StringInSlice(types.PacketFilterProtocolStrings, false),
+							Type:             schema.TypeString,
+							Required:         true,
+							ValidateDiagFunc: validation.ToDiagFunc(validation.StringInSlice(types.PacketFilterProtocolStrings, false)),
 							Description: descf(
 								"The protocol used for filtering. This must be one of [%s]",
 								types.PacketFilterProtocolStrings,

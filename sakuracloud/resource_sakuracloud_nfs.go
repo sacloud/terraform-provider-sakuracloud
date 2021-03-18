@@ -65,10 +65,10 @@ func resourceSakuraCloudNFS() *schema.Resource {
 							Description: descf("The IP address to assign to the %s", resourceName),
 						},
 						"netmask": {
-							Type:         schema.TypeInt,
-							ForceNew:     true,
-							Required:     true,
-							ValidateFunc: validation.IntBetween(8, 29),
+							Type:             schema.TypeInt,
+							ForceNew:         true,
+							Required:         true,
+							ValidateDiagFunc: validation.ToDiagFunc(validation.IntBetween(8, 29)),
 							Description: descf(
 								"The bit length of the subnet to assign to the %s. %s",
 								resourceName,

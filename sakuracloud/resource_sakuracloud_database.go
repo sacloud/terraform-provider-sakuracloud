@@ -47,11 +47,11 @@ func resourceSakuraCloudDatabase() *schema.Resource {
 		Schema: map[string]*schema.Schema{
 			"name": schemaResourceName(resourceName),
 			"database_type": {
-				Type:         schema.TypeString,
-				Optional:     true,
-				ForceNew:     true,
-				ValidateFunc: validation.StringInSlice(types.RDBMSTypeStrings, false),
-				Default:      "postgres",
+				Type:             schema.TypeString,
+				Optional:         true,
+				ForceNew:         true,
+				ValidateDiagFunc: validation.ToDiagFunc(validation.StringInSlice(types.RDBMSTypeStrings, false)),
+				Default:          "postgres",
 				Description: descf(
 					"The type of the database. This must be one of [%s]",
 					types.RDBMSTypeStrings,
@@ -59,11 +59,11 @@ func resourceSakuraCloudDatabase() *schema.Resource {
 			},
 			"plan": schemaResourcePlan(resourceName, "10g", types.DatabasePlanStrings),
 			"username": {
-				Type:         schema.TypeString,
-				ForceNew:     true,
-				Required:     true,
-				ValidateFunc: validation.StringLenBetween(3, 20),
-				Description:  descf("The name of default user on the database. %s", descLength(3, 20)),
+				Type:             schema.TypeString,
+				ForceNew:         true,
+				Required:         true,
+				ValidateDiagFunc: validation.ToDiagFunc(validation.StringLenBetween(3, 20)),
+				Description:      descf("The name of default user on the database. %s", descLength(3, 20)),
 			},
 			"password": {
 				Type:        schema.TypeString,
@@ -98,10 +98,10 @@ func resourceSakuraCloudDatabase() *schema.Resource {
 							Description: descf("The IP address to assign to the %s", resourceName),
 						},
 						"netmask": {
-							Type:         schema.TypeInt,
-							ForceNew:     true,
-							Required:     true,
-							ValidateFunc: validation.IntBetween(8, 29),
+							Type:             schema.TypeInt,
+							ForceNew:         true,
+							Required:         true,
+							ValidateDiagFunc: validation.ToDiagFunc(validation.IntBetween(8, 29)),
 							Description: descf(
 								"The bit length of the subnet to assign to the %s. %s",
 								resourceName,
@@ -115,10 +115,10 @@ func resourceSakuraCloudDatabase() *schema.Resource {
 							Description: descf("The IP address of the gateway used by %s", resourceName),
 						},
 						"port": {
-							Type:         schema.TypeInt,
-							Optional:     true,
-							Default:      5432,
-							ValidateFunc: validation.IntBetween(1024, 65535),
+							Type:             schema.TypeInt,
+							Optional:         true,
+							Default:          5432,
+							ValidateDiagFunc: validation.ToDiagFunc(validation.IntBetween(1024, 65535)),
 							Description: descf(
 								"The number of the listening port. %s",
 								descRange(1024, 65535),

@@ -34,10 +34,10 @@ func dataSourceSakuraCloudArchive() *schema.Resource {
 		Schema: map[string]*schema.Schema{
 			filterAttrName: filterSchema(&filterSchemaOption{}),
 			"os_type": {
-				Type:          schema.TypeString,
-				Optional:      true,
-				ValidateFunc:  validation.StringInSlice(ostype.OSTypeShortNames, false),
-				ConflictsWith: []string{"filter"},
+				Type:             schema.TypeString,
+				Optional:         true,
+				ValidateDiagFunc: validation.ToDiagFunc(validation.StringInSlice(ostype.OSTypeShortNames, false)),
+				ConflictsWith:    []string{"filter"},
 				Description: descf(
 					"The criteria used to filter SakuraCloud archives. This must be one of following:  \n%s",
 					ostype.OSTypeShortNames,

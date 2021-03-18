@@ -44,11 +44,11 @@ func resourceSakuraCloudDatabaseReadReplica() *schema.Resource {
 
 		Schema: map[string]*schema.Schema{
 			"master_id": {
-				Type:         schema.TypeString,
-				Required:     true,
-				ForceNew:     true,
-				ValidateFunc: validateSakuracloudIDType,
-				Description:  "The id of the replication master database",
+				Type:             schema.TypeString,
+				Required:         true,
+				ForceNew:         true,
+				ValidateDiagFunc: validation.ToDiagFunc(validateSakuracloudIDType),
+				Description:      "The id of the replication master database",
 			},
 			"name": schemaResourceName(resourceName),
 			"network_interface": {
@@ -59,12 +59,12 @@ func resourceSakuraCloudDatabaseReadReplica() *schema.Resource {
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
 						"switch_id": {
-							Type:         schema.TypeString,
-							ForceNew:     true,
-							Optional:     true,
-							Computed:     true,
-							ValidateFunc: validateSakuracloudIDType,
-							Description:  descf("The id of the switch to which the %s connects. If `switch_id` isn't specified, it will be set to the same value of the master database", resourceName),
+							Type:             schema.TypeString,
+							ForceNew:         true,
+							Optional:         true,
+							Computed:         true,
+							ValidateDiagFunc: validation.ToDiagFunc(validateSakuracloudIDType),
+							Description:      descf("The id of the switch to which the %s connects. If `switch_id` isn't specified, it will be set to the same value of the master database", resourceName),
 						},
 						"ip_address": {
 							Type:        schema.TypeString,
@@ -73,11 +73,11 @@ func resourceSakuraCloudDatabaseReadReplica() *schema.Resource {
 							Description: descf("The IP address to assign to the %s", resourceName),
 						},
 						"netmask": {
-							Type:         schema.TypeInt,
-							ForceNew:     true,
-							Optional:     true,
-							Computed:     true,
-							ValidateFunc: validation.IntBetween(8, 29),
+							Type:             schema.TypeInt,
+							ForceNew:         true,
+							Optional:         true,
+							Computed:         true,
+							ValidateDiagFunc: validation.ToDiagFunc(validation.IntBetween(8, 29)),
 							Description: descf(
 								"The bit length of the subnet to assign to the %s. %s. If `netmask` isn't specified, it will be set to the same value of the master database",
 								resourceName,

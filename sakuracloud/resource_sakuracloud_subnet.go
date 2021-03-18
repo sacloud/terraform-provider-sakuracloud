@@ -43,18 +43,18 @@ func resourceSakuraCloudSubnet() *schema.Resource {
 
 		Schema: map[string]*schema.Schema{
 			"internet_id": {
-				Type:         schema.TypeString,
-				ForceNew:     true,
-				Required:     true,
-				ValidateFunc: validateSakuracloudIDType,
-				Description:  "The id of the switch+router resource that the subnet belongs",
+				Type:             schema.TypeString,
+				ForceNew:         true,
+				Required:         true,
+				ValidateDiagFunc: validation.ToDiagFunc(validateSakuracloudIDType),
+				Description:      "The id of the switch+router resource that the subnet belongs",
 			},
 			"netmask": {
-				Type:         schema.TypeInt,
-				ForceNew:     true,
-				Optional:     true,
-				ValidateFunc: validation.IntInSlice([]int{28, 27, 26}),
-				Default:      28,
+				Type:             schema.TypeInt,
+				ForceNew:         true,
+				Optional:         true,
+				ValidateDiagFunc: validation.ToDiagFunc(validation.IntInSlice([]int{28, 27, 26})),
+				Default:          28,
 				Description: descf(
 					"The bit length of the subnet to assign to the %s. %s", resourceName,
 					descRange(26, 28),

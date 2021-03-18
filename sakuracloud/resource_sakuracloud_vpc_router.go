@@ -61,11 +61,11 @@ func resourceSakuraCloudVPCRouter() *schema.Resource {
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
 						"switch_id": {
-							Type:         schema.TypeString,
-							ForceNew:     true,
-							Optional:     true,
-							ValidateFunc: validateSakuracloudIDType,
-							Description:  "The id of the switch to connect. This is only required when when `plan` is not `standard`",
+							Type:             schema.TypeString,
+							ForceNew:         true,
+							Optional:         true,
+							ValidateDiagFunc: validation.ToDiagFunc(validateSakuracloudIDType),
+							Description:      "The id of the switch to connect. This is only required when when `plan` is not `standard`",
 						},
 						"vip": {
 							Type:        schema.TypeString,
@@ -117,16 +117,16 @@ func resourceSakuraCloudVPCRouter() *schema.Resource {
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
 						"index": {
-							Type:         schema.TypeInt,
-							Required:     true,
-							ValidateFunc: validation.IntBetween(1, 7),
-							Description:  descf("The index of the network interface. %s", descRange(1, 7)),
+							Type:             schema.TypeInt,
+							Required:         true,
+							ValidateDiagFunc: validation.ToDiagFunc(validation.IntBetween(1, 7)),
+							Description:      descf("The index of the network interface. %s", descRange(1, 7)),
 						},
 						"switch_id": {
-							Type:         schema.TypeString,
-							Required:     true,
-							ValidateFunc: validateSakuracloudIDType,
-							Description:  "The id of the connected switch",
+							Type:             schema.TypeString,
+							Required:         true,
+							ValidateDiagFunc: validation.ToDiagFunc(validateSakuracloudIDType),
+							Description:      "The id of the connected switch",
 						},
 						"vip": {
 							Type:        schema.TypeString,
@@ -142,10 +142,10 @@ func resourceSakuraCloudVPCRouter() *schema.Resource {
 							Description: "A list of ip address to assign to the network interface. This is required only one value when `plan` is `standard`, two values otherwise",
 						},
 						"netmask": {
-							Type:         schema.TypeInt,
-							Required:     true,
-							ValidateFunc: validation.IntBetween(16, 28),
-							Description:  "The bit length of the subnet to assign to the network interface",
+							Type:             schema.TypeInt,
+							Required:         true,
+							ValidateDiagFunc: validation.ToDiagFunc(validation.IntBetween(16, 28)),
+							Description:      "The bit length of the subnet to assign to the network interface",
 						},
 					},
 				},
@@ -156,9 +156,9 @@ func resourceSakuraCloudVPCRouter() *schema.Resource {
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
 						"interface_index": {
-							Type:         schema.TypeInt,
-							Required:     true,
-							ValidateFunc: validation.IntBetween(1, 7),
+							Type:             schema.TypeInt,
+							Required:         true,
+							ValidateDiagFunc: validation.ToDiagFunc(validation.IntBetween(1, 7)),
 							Description: descf(
 								"The index of the network interface on which to enable the DHCP service. %s",
 								descRange(1, 7),
@@ -209,18 +209,18 @@ func resourceSakuraCloudVPCRouter() *schema.Resource {
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
 						"interface_index": {
-							Type:         schema.TypeInt,
-							Optional:     true,
-							ValidateFunc: validation.IntBetween(0, 7),
+							Type:             schema.TypeInt,
+							Optional:         true,
+							ValidateDiagFunc: validation.ToDiagFunc(validation.IntBetween(0, 7)),
 							Description: descf(
 								"The index of the network interface on which to enable filtering. %s",
 								descRange(0, 7),
 							),
 						},
 						"direction": {
-							Type:         schema.TypeString,
-							Required:     true,
-							ValidateFunc: validation.StringInSlice([]string{"send", "receive"}, false),
+							Type:             schema.TypeString,
+							Required:         true,
+							ValidateDiagFunc: validation.ToDiagFunc(validation.StringInSlice([]string{"send", "receive"}, false)),
 							Description: descf(
 								"The direction to apply the firewall. This must be one of [%s]",
 								[]string{"send", "receive"},
@@ -232,9 +232,9 @@ func resourceSakuraCloudVPCRouter() *schema.Resource {
 							Elem: &schema.Resource{
 								Schema: map[string]*schema.Schema{
 									"protocol": {
-										Type:         schema.TypeString,
-										Required:     true,
-										ValidateFunc: validation.StringInSlice(types.VPCRouterFirewallProtocolStrings, false),
+										Type:             schema.TypeString,
+										Required:         true,
+										ValidateDiagFunc: validation.ToDiagFunc(validation.StringInSlice(types.VPCRouterFirewallProtocolStrings, false)),
 										Description: descf(
 											"The protocol used for filtering. This must be one of [%s]",
 											types.VPCRouterFirewallProtocolStrings,
@@ -271,10 +271,10 @@ func resourceSakuraCloudVPCRouter() *schema.Resource {
 										Description: "The flag to enable packet logging when matching the expression",
 									},
 									"description": {
-										Type:         schema.TypeString,
-										Optional:     true,
-										ValidateFunc: validation.StringLenBetween(0, 512),
-										Description:  descf("The description of the expression. %s", descLength(0, 512)),
+										Type:             schema.TypeString,
+										Optional:         true,
+										ValidateDiagFunc: validation.ToDiagFunc(validation.StringLenBetween(0, 512)),
+										Description:      descf("The description of the expression. %s", descLength(0, 512)),
 									},
 								},
 							},
@@ -289,11 +289,11 @@ func resourceSakuraCloudVPCRouter() *schema.Resource {
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
 						"pre_shared_secret": {
-							Type:         schema.TypeString,
-							Required:     true,
-							Sensitive:    true,
-							ValidateFunc: validation.StringLenBetween(0, 40),
-							Description:  "The pre shared secret for L2TP/IPsec",
+							Type:             schema.TypeString,
+							Required:         true,
+							Sensitive:        true,
+							ValidateDiagFunc: validation.ToDiagFunc(validation.StringLenBetween(0, 40)),
+							Description:      "The pre shared secret for L2TP/IPsec",
 						},
 						"range_start": {
 							Type:             schema.TypeString,
@@ -316,19 +316,19 @@ func resourceSakuraCloudVPCRouter() *schema.Resource {
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
 						"protocol": {
-							Type:         schema.TypeString,
-							Required:     true,
-							ValidateFunc: validation.StringInSlice([]string{"tcp", "udp"}, false),
+							Type:             schema.TypeString,
+							Required:         true,
+							ValidateDiagFunc: validation.ToDiagFunc(validation.StringInSlice([]string{"tcp", "udp"}, false)),
 							Description: descf(
 								"The protocol used for port forwarding. This must be one of [%s]",
 								[]string{"tcp", "udp"},
 							),
 						},
 						"public_port": {
-							Type:         schema.TypeInt,
-							Required:     true,
-							ValidateFunc: validation.IntBetween(1, 65535),
-							Description:  "The source port number of the port forwarding. This must be a port number on a public network",
+							Type:             schema.TypeInt,
+							Required:         true,
+							ValidateDiagFunc: validation.ToDiagFunc(validation.IntBetween(1, 65535)),
+							Description:      "The source port number of the port forwarding. This must be a port number on a public network",
 						},
 						"private_ip": {
 							Type:             schema.TypeString,
@@ -337,16 +337,16 @@ func resourceSakuraCloudVPCRouter() *schema.Resource {
 							Description:      "The destination ip address of the port forwarding",
 						},
 						"private_port": {
-							Type:         schema.TypeInt,
-							Required:     true,
-							ValidateFunc: validation.IntBetween(1, 65535),
-							Description:  "The destination port number of the port forwarding. This will be a port number on a private network",
+							Type:             schema.TypeInt,
+							Required:         true,
+							ValidateDiagFunc: validation.ToDiagFunc(validation.IntBetween(1, 65535)),
+							Description:      "The destination port number of the port forwarding. This will be a port number on a private network",
 						},
 						"description": {
-							Type:         schema.TypeString,
-							Optional:     true,
-							ValidateFunc: validation.StringLenBetween(0, 512),
-							Description:  descf("The description of the port forwarding. %s", descLength(0, 512)),
+							Type:             schema.TypeString,
+							Optional:         true,
+							ValidateDiagFunc: validation.ToDiagFunc(validation.StringLenBetween(0, 512)),
+							Description:      descf("The description of the port forwarding. %s", descLength(0, 512)),
 						},
 					},
 				},
@@ -388,11 +388,11 @@ func resourceSakuraCloudVPCRouter() *schema.Resource {
 							Description: "The id of the opposing appliance connected to the VPC Router. This is typically set same as value of `peer`",
 						},
 						"pre_shared_secret": {
-							Type:         schema.TypeString,
-							Required:     true,
-							Sensitive:    true,
-							ValidateFunc: validation.StringLenBetween(0, 40),
-							Description:  descf("The pre shared secret for the VPN. %s", descLength(0, 40)),
+							Type:             schema.TypeString,
+							Required:         true,
+							Sensitive:        true,
+							ValidateDiagFunc: validation.ToDiagFunc(validation.StringLenBetween(0, 40)),
+							Description:      descf("The pre shared secret for the VPN. %s", descLength(0, 40)),
 						},
 						"routes": {
 							Type:        schema.TypeSet,
@@ -429,10 +429,10 @@ func resourceSakuraCloudVPCRouter() *schema.Resource {
 							Description:      "The private IP address used for the static NAT",
 						},
 						"description": {
-							Type:         schema.TypeString,
-							Optional:     true,
-							ValidateFunc: validation.StringLenBetween(0, 512),
-							Description:  descf("The description of the static nat. %s", descLength(0, 512)),
+							Type:             schema.TypeString,
+							Optional:         true,
+							ValidateDiagFunc: validation.ToDiagFunc(validation.StringLenBetween(0, 512)),
+							Description:      descf("The description of the static nat. %s", descLength(0, 512)),
 						},
 					},
 				},
@@ -463,17 +463,17 @@ func resourceSakuraCloudVPCRouter() *schema.Resource {
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
 						"name": {
-							Type:         schema.TypeString,
-							Required:     true,
-							ValidateFunc: validation.StringLenBetween(1, 20),
-							Description:  "The user name used to authenticate remote access",
+							Type:             schema.TypeString,
+							Required:         true,
+							ValidateDiagFunc: validation.ToDiagFunc(validation.StringLenBetween(1, 20)),
+							Description:      "The user name used to authenticate remote access",
 						},
 						"password": {
-							Type:         schema.TypeString,
-							Required:     true,
-							Sensitive:    true,
-							ValidateFunc: validation.StringLenBetween(1, 20),
-							Description:  "The password used to authenticate remote access",
+							Type:             schema.TypeString,
+							Required:         true,
+							Sensitive:        true,
+							ValidateDiagFunc: validation.ToDiagFunc(validation.StringLenBetween(1, 20)),
+							Description:      "The password used to authenticate remote access",
 						},
 					},
 				},

@@ -86,11 +86,11 @@ func Provider() *schema.Provider {
 				Description: "The root URL of SakuraCloud API. It can also be sourced from the `SAKURACLOUD_API_ROOT_URL` environment variables, or via a shared credentials file if `profile` is specified. Default:`https://secure.sakura.ad.jp/cloud/zone`",
 			},
 			"retry_max": {
-				Type:         schema.TypeInt,
-				Optional:     true,
-				DefaultFunc:  schema.MultiEnvDefaultFunc([]string{"SAKURACLOUD_RETRY_MAX"}, defaultRetryMax),
-				ValidateFunc: validation.IntBetween(0, 100),
-				Description:  "The maximum number of API call retries used when SakuraCloud API returns status code `423` or `503`. It can also be sourced from the `SAKURACLOUD_RETRY_MAX` environment variables, or via a shared credentials file if `profile` is specified. Default:`100`",
+				Type:             schema.TypeInt,
+				Optional:         true,
+				DefaultFunc:      schema.MultiEnvDefaultFunc([]string{"SAKURACLOUD_RETRY_MAX"}, defaultRetryMax),
+				ValidateDiagFunc: validation.ToDiagFunc(validation.IntBetween(0, 100)),
+				Description:      "The maximum number of API call retries used when SakuraCloud API returns status code `423` or `503`. It can also be sourced from the `SAKURACLOUD_RETRY_MAX` environment variables, or via a shared credentials file if `profile` is specified. Default:`100`",
 			},
 			"retry_wait_max": {
 				Type:        schema.TypeInt,
@@ -114,10 +114,10 @@ func Provider() *schema.Provider {
 				),
 			},
 			"api_request_rate_limit": {
-				Type:         schema.TypeInt,
-				Optional:     true,
-				DefaultFunc:  schema.MultiEnvDefaultFunc([]string{"SAKURACLOUD_RATE_LIMIT"}, defaultAPIRequestRateLimit),
-				ValidateFunc: validation.IntBetween(1, 10),
+				Type:             schema.TypeInt,
+				Optional:         true,
+				DefaultFunc:      schema.MultiEnvDefaultFunc([]string{"SAKURACLOUD_RATE_LIMIT"}, defaultAPIRequestRateLimit),
+				ValidateDiagFunc: validation.ToDiagFunc(validation.IntBetween(1, 10)),
 				Description: descf(
 					"The maximum number of SakuraCloud API calls per second. It can also be sourced from the `SAKURACLOUD_RATE_LIMIT` environment variables, or via a shared credentials file if `profile` is specified. Default:`%d`",
 					defaultAPIRequestRateLimit,

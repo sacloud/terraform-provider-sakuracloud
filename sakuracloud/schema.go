@@ -29,10 +29,10 @@ func schemaDataSourceName(resourceName string) *schema.Schema {
 
 func schemaResourceName(resourceName string) *schema.Schema {
 	return &schema.Schema{
-		Type:         schema.TypeString,
-		Required:     true,
-		ValidateFunc: validation.StringLenBetween(1, 64),
-		Description:  descf("The name of the %s. %s", resourceName, descLength(1, 64)),
+		Type:             schema.TypeString,
+		Required:         true,
+		ValidateDiagFunc: validation.ToDiagFunc(validation.StringLenBetween(1, 64)),
+		Description:      descf("The name of the %s. %s", resourceName, descLength(1, 64)),
 	}
 }
 
@@ -55,7 +55,7 @@ func schemaResourceSize(resourceName string, defaultValue int, validSizes ...int
 		s.Default = defaultValue
 	}
 	if len(validSizes) > 0 {
-		s.ValidateFunc = validation.IntInSlice(validSizes)
+		s.ValidateDiagFunc = validation.ToDiagFunc(validation.IntInSlice(validSizes))
 		s.Description = descf("%s. This must be one of [%s]", s.Description, validSizes)
 	}
 	return s
@@ -79,10 +79,10 @@ func schemaDataSourceIconID(resourceName string) *schema.Schema {
 
 func schemaResourceIconID(resourceName string) *schema.Schema {
 	return &schema.Schema{
-		Type:         schema.TypeString,
-		Optional:     true,
-		ValidateFunc: validateSakuracloudIDType,
-		Description:  descf("The icon id to attach to the %s", resourceName),
+		Type:             schema.TypeString,
+		Optional:         true,
+		ValidateDiagFunc: validation.ToDiagFunc(validateSakuracloudIDType),
+		Description:      descf("The icon id to attach to the %s", resourceName),
 	}
 }
 
@@ -96,10 +96,10 @@ func schemaDataSourceDescription(resourceName string) *schema.Schema {
 
 func schemaResourceDescription(resourceName string) *schema.Schema {
 	return &schema.Schema{
-		Type:         schema.TypeString,
-		Optional:     true,
-		ValidateFunc: validation.StringLenBetween(1, 512),
-		Description:  descf("The description of the %s. %s", resourceName, descLength(1, 512)),
+		Type:             schema.TypeString,
+		Optional:         true,
+		ValidateDiagFunc: validation.ToDiagFunc(validation.StringLenBetween(1, 512)),
+		Description:      descf("The description of the %s. %s", resourceName, descLength(1, 512)),
 	}
 }
 
@@ -161,11 +161,11 @@ func schemaDataSourceSwitchID(resourceName string) *schema.Schema {
 
 func schemaResourceSwitchID(resourceName string) *schema.Schema {
 	return &schema.Schema{
-		Type:         schema.TypeString,
-		ForceNew:     true,
-		Required:     true,
-		ValidateFunc: validateSakuracloudIDType,
-		Description:  descf("The id of the switch to which the %s connects", resourceName),
+		Type:             schema.TypeString,
+		ForceNew:         true,
+		Required:         true,
+		ValidateDiagFunc: validation.ToDiagFunc(validateSakuracloudIDType),
+		Description:      descf("The id of the switch to which the %s connects", resourceName),
 	}
 }
 
@@ -212,11 +212,11 @@ func schemaDataSourcePlan(resourceName string, plans []string) *schema.Schema {
 
 func schemaResourcePlan(resourceName string, defaultValue string, plans []string) *schema.Schema {
 	s := &schema.Schema{
-		Type:         schema.TypeString,
-		Optional:     true,
-		ForceNew:     true,
-		Description:  descResourcePlan(resourceName, plans),
-		ValidateFunc: validation.StringInSlice(plans, false),
+		Type:             schema.TypeString,
+		Optional:         true,
+		ForceNew:         true,
+		Description:      descResourcePlan(resourceName, plans),
+		ValidateDiagFunc: validation.ToDiagFunc(validation.StringInSlice(plans, false)),
 	}
 	if defaultValue != "" {
 		s.Default = defaultValue
@@ -234,11 +234,11 @@ func schemaDataSourceIntPlan(resourceName string, plans []int) *schema.Schema {
 
 func schemaResourceIntPlan(resourceName string, defaultValue int, plans []int) *schema.Schema {
 	s := &schema.Schema{
-		Type:         schema.TypeInt,
-		Optional:     true,
-		ForceNew:     true,
-		Description:  descResourcePlan(resourceName, plans),
-		ValidateFunc: validation.IntInSlice(plans),
+		Type:             schema.TypeInt,
+		Optional:         true,
+		ForceNew:         true,
+		Description:      descResourcePlan(resourceName, plans),
+		ValidateDiagFunc: validation.ToDiagFunc(validation.IntInSlice(plans)),
 	}
 	if defaultValue > 0 {
 		s.Default = defaultValue

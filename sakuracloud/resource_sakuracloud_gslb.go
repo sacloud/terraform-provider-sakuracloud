@@ -58,20 +58,20 @@ func resourceSakuraCloudGSLB() *schema.Resource {
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
 						"protocol": {
-							Type:         schema.TypeString,
-							Required:     true,
-							ValidateFunc: validation.StringInSlice(types.GSLBHealthCheckProtocolStrings, false),
+							Type:             schema.TypeString,
+							Required:         true,
+							ValidateDiagFunc: validation.ToDiagFunc(validation.StringInSlice(types.GSLBHealthCheckProtocolStrings, false)),
 							Description: descf(
 								"The protocol used for health checks. This must be one of [%s]",
 								types.GSLBHealthCheckProtocolStrings,
 							),
 						},
 						"delay_loop": {
-							Type:         schema.TypeInt,
-							Optional:     true,
-							ValidateFunc: validation.IntBetween(10, 60),
-							Default:      10,
-							Description:  descf("The interval in seconds between checks. %s", descRange(10, 60)),
+							Type:             schema.TypeInt,
+							Optional:         true,
+							ValidateDiagFunc: validation.ToDiagFunc(validation.IntBetween(10, 60)),
+							Default:          10,
+							Description:      descf("The interval in seconds between checks. %s", descRange(10, 60)),
 						},
 						"host_header": {
 							Type:        schema.TypeString,
@@ -113,10 +113,10 @@ func resourceSakuraCloudGSLB() *schema.Resource {
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
 						"ip_address": {
-							Type:         schema.TypeString,
-							Required:     true,
-							Description:  "The IP address of the server",
-							ValidateFunc: validation.IsIPv4Address,
+							Type:             schema.TypeString,
+							Required:         true,
+							Description:      "The IP address of the server",
+							ValidateDiagFunc: validation.ToDiagFunc(validation.IsIPv4Address),
 						},
 						"enabled": {
 							Type:        schema.TypeBool,
@@ -125,10 +125,10 @@ func resourceSakuraCloudGSLB() *schema.Resource {
 							Description: "The flag to enable as destination of load balancing",
 						},
 						"weight": {
-							Type:         schema.TypeInt,
-							Optional:     true,
-							ValidateFunc: validation.IntBetween(1, 10000),
-							Default:      1,
+							Type:             schema.TypeInt,
+							Optional:         true,
+							ValidateDiagFunc: validation.ToDiagFunc(validation.IntBetween(1, 10000)),
+							Default:          1,
 							Description: descf(
 								"The weight used when weighted load balancing is enabled. %s",
 								descRange(1, 10000),

@@ -20,6 +20,7 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
 	"github.com/sacloud/libsacloud/v2/sacloud"
 )
 
@@ -39,11 +40,11 @@ func resourceSakuraCloudProxyLBACME() *schema.Resource {
 
 		Schema: map[string]*schema.Schema{
 			"proxylb_id": {
-				Type:         schema.TypeString,
-				Required:     true,
-				ForceNew:     true,
-				ValidateFunc: validateSakuracloudIDType,
-				Description:  "The id of the ProxyLB that set ACME settings to",
+				Type:             schema.TypeString,
+				Required:         true,
+				ForceNew:         true,
+				ValidateDiagFunc: validation.ToDiagFunc(validateSakuracloudIDType),
+				Description:      "The id of the ProxyLB that set ACME settings to",
 			},
 			"accept_tos": {
 				Type:        schema.TypeBool,

@@ -78,10 +78,10 @@ func resourceSakuraCloudLocalRouter() *schema.Resource {
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
 						"vip": {
-							Type:         schema.TypeString,
-							Required:     true,
-							ValidateFunc: validation.IsIPv4Address,
-							Description:  "The virtual IP address",
+							Type:             schema.TypeString,
+							Required:         true,
+							ValidateDiagFunc: validation.ToDiagFunc(validation.IsIPv4Address),
+							Description:      "The virtual IP address",
 						},
 						"ip_addresses": {
 							Type:        schema.TypeList,
@@ -92,9 +92,9 @@ func resourceSakuraCloudLocalRouter() *schema.Resource {
 							Description: descf("A list of IP address to assign to the %s. ", resourceName),
 						},
 						"netmask": {
-							Type:         schema.TypeInt,
-							Required:     true,
-							ValidateFunc: validation.IntBetween(8, 29),
+							Type:             schema.TypeInt,
+							Required:         true,
+							ValidateDiagFunc: validation.ToDiagFunc(validation.IntBetween(8, 29)),
 							Description: descf(
 								"The bit length of the subnet assigned to the %s. %s", resourceName,
 								descRange(8, 29),
@@ -114,10 +114,10 @@ func resourceSakuraCloudLocalRouter() *schema.Resource {
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
 						"peer_id": {
-							Type:         schema.TypeString,
-							Required:     true,
-							ValidateFunc: validateSakuracloudIDType,
-							Description:  "The ID of the peer LocalRouter",
+							Type:             schema.TypeString,
+							Required:         true,
+							ValidateDiagFunc: validation.ToDiagFunc(validateSakuracloudIDType),
+							Description:      "The ID of the peer LocalRouter",
 						},
 						"secret_key": {
 							Type:        schema.TypeString,
@@ -146,10 +146,10 @@ func resourceSakuraCloudLocalRouter() *schema.Resource {
 							Description: "The CIDR block of destination",
 						},
 						"next_hop": {
-							Type:         schema.TypeString,
-							Required:     true,
-							ValidateFunc: validation.IsIPv4Address,
-							Description:  "The IP address of the next hop",
+							Type:             schema.TypeString,
+							Required:         true,
+							ValidateDiagFunc: validation.ToDiagFunc(validation.IsIPv4Address),
+							Description:      "The IP address of the next hop",
 						},
 					},
 				},
