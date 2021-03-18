@@ -2,6 +2,7 @@
 
 FEATURES
 
+  * libsacloud v2.14.1 - added internet plans [GH-806] (@yamamoto-febc)
   * sakuracloud_server: ssh_keys [GH-805] (@yamamoto-febc)
   * sakuracloud_sim: Sentitive:true [GH-802] (@yamamoto-febc)
   * darwin/arm64 [GH-800] (@yamamoto-febc)
