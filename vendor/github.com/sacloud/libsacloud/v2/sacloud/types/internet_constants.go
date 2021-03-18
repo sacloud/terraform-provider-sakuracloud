@@ -15,7 +15,10 @@
 package types
 
 // InternetBandWidths 設定可能な帯域幅の値リスト
-var InternetBandWidths = []int{100, 250, 500, 1000, 1500, 2000, 2500, 3000, 3500, 4000, 4500, 5000}
+var InternetBandWidths = []int{
+	100, 250, 500, 1000, 1500, 2000, 2500, 3000, 3500, 4000, 4500, 5000,
+	5500, 6000, 6500, 7000, 7500, 8000, 8500, 9000, 9500, 10000,
+}
 
 // InternetNetworkMaskLengths 設定可能なネットワークマスク長の値リスト
 var InternetNetworkMaskLengths = []int{26, 27, 28}
