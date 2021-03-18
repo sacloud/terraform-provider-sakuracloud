@@ -39,7 +39,7 @@ func resourceSakuraCloudCDROM() *schema.Resource {
 		Importer: &schema.ResourceImporter{
 			State: schema.ImportStatePassthrough,
 		},
-		CustomizeDiff: customdiff.ComputedIf("hash", func(d *schema.ResourceDiff, meta interface{}) bool {
+		CustomizeDiff: customdiff.ComputedIf("hash", func(ctx context.Context, d *schema.ResourceDiff, meta interface{}) bool {
 			return d.HasChange("iso_image_file") || d.HasChange("content")
 		}),
 

@@ -15,6 +15,7 @@
 package sakuracloud
 
 import (
+	"context"
 	"fmt"
 	"time"
 
@@ -33,7 +34,7 @@ func resourceSakuraCloudArchive() *schema.Resource {
 		Read:   resourceSakuraCloudArchiveRead,
 		Update: resourceSakuraCloudArchiveUpdate,
 		Delete: resourceSakuraCloudArchiveDelete,
-		CustomizeDiff: customdiff.ComputedIf("hash", func(d *schema.ResourceDiff, meta interface{}) bool {
+		CustomizeDiff: customdiff.ComputedIf("hash", func(ctx context.Context, d *schema.ResourceDiff, meta interface{}) bool {
 			return d.HasChange("archive_file")
 		}),
 		Importer: &schema.ResourceImporter{
