@@ -270,7 +270,6 @@ func setLocalRouterResourceData(ctx context.Context, d *schema.ResourceData, cli
 	d.Set("name", data.Name)               // nolint
 	d.Set("icon_id", data.IconID.String()) // nolint
 	d.Set("description", data.Description) // nolint
-	d.Set("zone", getZone(d, client))      // nolint
 	if err := d.Set("secret_keys", data.SecretKeys); err != nil {
 		return diag.FromErr(err)
 	}

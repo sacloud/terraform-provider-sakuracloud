@@ -61,7 +61,13 @@ func dataSourceSakuraCloudCDROMRead(ctx context.Context, d *schema.ResourceData,
 	}
 
 	targets := res.CDROMs
+	target := targets[0]
 
-	d.SetId(targets[0].ID.String())
-	return setCDROMResourceData(ctx, d, client, targets[0])
+	d.SetId(target.ID.String())
+	d.Set("name", target.Name)               // nolint
+	d.Set("size", target.GetSizeGB())        // nolint
+	d.Set("icon_id", target.IconID.String()) // nolint
+	d.Set("description", target.Description) // nolint
+	d.Set("zone", getZone(d, client))        // nolint
+	return diag.FromErr(d.Set("tags", flattenTags(target.Tags)))
 }
