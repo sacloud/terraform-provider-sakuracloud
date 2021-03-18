@@ -33,8 +33,8 @@ func TestAccSakuraCloudDisk_basic(t *testing.T) {
 
 	var disk sacloud.Disk
 	resource.ParallelTest(t, resource.TestCase{
-		PreCheck:  func() { testAccPreCheck(t) },
-		Providers: testAccProviders,
+		PreCheck:          func() { testAccPreCheck(t) },
+		ProviderFactories: testAccProviderFactories,
 		CheckDestroy: resource.ComposeTestCheckFunc(
 			testCheckSakuraCloudDiskDestroy,
 			testCheckSakuraCloudIconDestroy,
@@ -174,8 +174,8 @@ func TestAccImportSakuraCloudDisk_basic(t *testing.T) {
 	resourceName := "sakuracloud_disk.foobar"
 
 	resource.ParallelTest(t, resource.TestCase{
-		PreCheck:  func() { testAccPreCheck(t) },
-		Providers: testAccProviders,
+		PreCheck:          func() { testAccPreCheck(t) },
+		ProviderFactories: testAccProviderFactories,
 		CheckDestroy: resource.ComposeTestCheckFunc(
 			testCheckSakuraCloudDiskDestroy,
 			testCheckSakuraCloudIconDestroy,

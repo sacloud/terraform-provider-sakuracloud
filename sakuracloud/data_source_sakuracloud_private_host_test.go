@@ -26,8 +26,8 @@ func TestAccSakuraCloudDataSourcePrivateHost_basic(t *testing.T) {
 	resourceName := "data.sakuracloud_private_host.foobar"
 	rand := randomName()
 	resource.ParallelTest(t, resource.TestCase{
-		PreCheck:  func() { testAccPreCheck(t) },
-		Providers: testAccProviders,
+		PreCheck:          func() { testAccPreCheck(t) },
+		ProviderFactories: testAccProviderFactories,
 		Steps: []resource.TestStep{
 			{
 				Config: buildConfigWithArgs(testAccSakuraCloudDataSourcePrivateHost_basic, rand),

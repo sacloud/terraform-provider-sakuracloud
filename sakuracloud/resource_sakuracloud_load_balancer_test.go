@@ -32,8 +32,8 @@ func TestAccSakuraCloudLoadBalancer_basic(t *testing.T) {
 
 	var loadBalancer sacloud.LoadBalancer
 	resource.ParallelTest(t, resource.TestCase{
-		PreCheck:  func() { testAccPreCheck(t) },
-		Providers: testAccProviders,
+		PreCheck:          func() { testAccPreCheck(t) },
+		ProviderFactories: testAccProviderFactories,
 		CheckDestroy: resource.ComposeTestCheckFunc(
 			testCheckSakuraCloudIconDestroy,
 			testCheckSakuraCloudLoadBalancerDestroy,
@@ -115,8 +115,8 @@ func TestAccSakuraCloudLoadBalancer_withRouter(t *testing.T) {
 
 	var loadBalancer sacloud.LoadBalancer
 	resource.ParallelTest(t, resource.TestCase{
-		PreCheck:  func() { testAccPreCheck(t) },
-		Providers: testAccProviders,
+		PreCheck:          func() { testAccPreCheck(t) },
+		ProviderFactories: testAccProviderFactories,
 		CheckDestroy: resource.ComposeTestCheckFunc(
 			testCheckSakuraCloudInternetDestroy,
 			testCheckSakuraCloudLoadBalancerDestroy,
@@ -218,9 +218,9 @@ func TestAccImportSakuraCloudLoadBalancer_basic(t *testing.T) {
 	resourceName := "sakuracloud_load_balancer.foobar"
 
 	resource.ParallelTest(t, resource.TestCase{
-		PreCheck:     func() { testAccPreCheck(t) },
-		Providers:    testAccProviders,
-		CheckDestroy: testCheckSakuraCloudLoadBalancerDestroy,
+		PreCheck:          func() { testAccPreCheck(t) },
+		ProviderFactories: testAccProviderFactories,
+		CheckDestroy:      testCheckSakuraCloudLoadBalancerDestroy,
 		Steps: []resource.TestStep{
 			{
 				Config: buildConfigWithArgs(testAccSakuraCloudLoadBalancer_basic, rand),

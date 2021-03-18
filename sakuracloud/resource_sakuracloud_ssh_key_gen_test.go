@@ -31,9 +31,9 @@ func TestAccSakuraCloudSSHKeyGen_basic(t *testing.T) {
 
 	var sshKey sacloud.SSHKey
 	resource.ParallelTest(t, resource.TestCase{
-		PreCheck:     func() { testAccPreCheck(t) },
-		Providers:    testAccProviders,
-		CheckDestroy: testCheckSakuraCloudSSHKeyGenDestroy,
+		PreCheck:          func() { testAccPreCheck(t) },
+		ProviderFactories: testAccProviderFactories,
+		CheckDestroy:      testCheckSakuraCloudSSHKeyGenDestroy,
 		Steps: []resource.TestStep{
 			{
 				Config: buildConfigWithArgs(testAccSakuraCloudSSHKeyGen_basic, rand),

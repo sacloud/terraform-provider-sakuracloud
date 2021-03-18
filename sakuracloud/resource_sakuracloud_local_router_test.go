@@ -32,8 +32,8 @@ func TestAccSakuraCloudLocalRouter_basic(t *testing.T) {
 
 	var localRouter sacloud.LocalRouter
 	resource.ParallelTest(t, resource.TestCase{
-		PreCheck:  func() { testAccPreCheck(t) },
-		Providers: testAccProviders,
+		PreCheck:          func() { testAccPreCheck(t) },
+		ProviderFactories: testAccProviderFactories,
 		CheckDestroy: resource.ComposeTestCheckFunc(
 			testCheckSakuraCloudIconDestroy,
 			testCheckSakuraCloudLocalRouterDestroy,
@@ -187,9 +187,9 @@ func TestAccImportSakuraCloudLocalRouter_basic(t *testing.T) {
 	resourceName := "sakuracloud_local_router.foobar"
 
 	resource.ParallelTest(t, resource.TestCase{
-		PreCheck:     func() { testAccPreCheck(t) },
-		Providers:    testAccProviders,
-		CheckDestroy: testCheckSakuraCloudLocalRouterDestroy,
+		PreCheck:          func() { testAccPreCheck(t) },
+		ProviderFactories: testAccProviderFactories,
+		CheckDestroy:      testCheckSakuraCloudLocalRouterDestroy,
 		Steps: []resource.TestStep{
 			{
 				Config: buildConfigWithArgs(testAccSakuraCloudLocalRouter_basic, rand),
@@ -280,8 +280,8 @@ func TestAccSakuraCloudLocalRouter_peering(t *testing.T) {
 	rand := randomName()
 
 	resource.ParallelTest(t, resource.TestCase{
-		PreCheck:  func() { testAccPreCheck(t) },
-		Providers: testAccProviders,
+		PreCheck:          func() { testAccPreCheck(t) },
+		ProviderFactories: testAccProviderFactories,
 		CheckDestroy: resource.ComposeTestCheckFunc(
 			testCheckSakuraCloudIconDestroy,
 			testCheckSakuraCloudLocalRouterDestroy,

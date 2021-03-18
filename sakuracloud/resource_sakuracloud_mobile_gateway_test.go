@@ -31,8 +31,8 @@ func TestAccSakuraCloudMobileGateway_basic(t *testing.T) {
 
 	var mgw sacloud.MobileGateway
 	resource.Test(t, resource.TestCase{
-		PreCheck:  func() { testAccPreCheck(t) },
-		Providers: testAccProviders,
+		PreCheck:          func() { testAccPreCheck(t) },
+		ProviderFactories: testAccProviderFactories,
 		CheckDestroy: resource.ComposeTestCheckFunc(
 			testCheckSakuraCloudIconDestroy,
 			testCheckSakuraCloudMobileGatewayDestroy,
@@ -195,8 +195,8 @@ func TestAccImportSakuraCloudMobileGateway_basic(t *testing.T) {
 	resourceName := "sakuracloud_mobile_gateway.foobar"
 
 	resource.Test(t, resource.TestCase{
-		PreCheck:  func() { testAccPreCheck(t) },
-		Providers: testAccProviders,
+		PreCheck:          func() { testAccPreCheck(t) },
+		ProviderFactories: testAccProviderFactories,
 		CheckDestroy: resource.ComposeTestCheckFunc(
 			testCheckSakuraCloudMobileGatewayDestroy,
 			testCheckSakuraCloudSwitchDestroy,

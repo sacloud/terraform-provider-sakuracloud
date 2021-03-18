@@ -31,9 +31,9 @@ func TestAccSakuraCloudSimpleMonitor_basic(t *testing.T) {
 
 	var monitor sacloud.SimpleMonitor
 	resource.ParallelTest(t, resource.TestCase{
-		PreCheck:     func() { testAccPreCheck(t) },
-		Providers:    testAccProviders,
-		CheckDestroy: testCheckSakuraCloudSimpleMonitorDestroy,
+		PreCheck:          func() { testAccPreCheck(t) },
+		ProviderFactories: testAccProviderFactories,
+		CheckDestroy:      testCheckSakuraCloudSimpleMonitorDestroy,
 		Steps: []resource.TestStep{
 			{
 				Config: buildConfigWithArgs(testAccSakuraCloudSimpleMonitor_basic, zone, testAccSlackWebhook),
@@ -82,9 +82,9 @@ func TestAccSakuraCloudSimpleMonitor_certMonitor(t *testing.T) {
 
 	var monitor sacloud.SimpleMonitor
 	resource.ParallelTest(t, resource.TestCase{
-		PreCheck:     func() { testAccPreCheck(t) },
-		Providers:    testAccProviders,
-		CheckDestroy: testCheckSakuraCloudSimpleMonitorDestroy,
+		PreCheck:          func() { testAccPreCheck(t) },
+		ProviderFactories: testAccProviderFactories,
+		CheckDestroy:      testCheckSakuraCloudSimpleMonitorDestroy,
 		Steps: []resource.TestStep{
 			{
 				Config: buildConfigWithArgs(testAccSakuraCloudSimpleMonitor_certMonitor, zone, testAccSlackWebhook),

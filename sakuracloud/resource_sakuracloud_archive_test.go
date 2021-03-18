@@ -33,8 +33,8 @@ func TestAccSakuraCloudArchive_basic(t *testing.T) {
 
 	var archive sacloud.Archive
 	resource.ParallelTest(t, resource.TestCase{
-		PreCheck:  func() { testAccPreCheck(t) },
-		Providers: testAccProviders,
+		PreCheck:          func() { testAccPreCheck(t) },
+		ProviderFactories: testAccProviderFactories,
 		CheckDestroy: resource.ComposeTestCheckFunc(
 			testCheckSakuraCloudArchiveDestroy,
 			testCheckSakuraCloudIconDestroy,
@@ -80,8 +80,8 @@ func TestAccSakuraCloudArchive_transfer(t *testing.T) {
 
 	var archive sacloud.Archive
 	resource.ParallelTest(t, resource.TestCase{
-		PreCheck:  func() { testAccPreCheck(t) },
-		Providers: testAccProviders,
+		PreCheck:          func() { testAccPreCheck(t) },
+		ProviderFactories: testAccProviderFactories,
 		CheckDestroy: resource.ComposeTestCheckFunc(
 			testCheckSakuraCloudArchiveDestroy,
 			testCheckSakuraCloudIconDestroy,
@@ -118,8 +118,8 @@ func TestAccSakuraCloudArchive_fromShared(t *testing.T) {
 
 	var archive sacloud.Archive
 	resource.ParallelTest(t, resource.TestCase{
-		PreCheck:  func() { testAccPreCheck(t) },
-		Providers: testAccProviders,
+		PreCheck:          func() { testAccPreCheck(t) },
+		ProviderFactories: testAccProviderFactories,
 		CheckDestroy: resource.ComposeTestCheckFunc(
 			testCheckSakuraCloudArchiveDestroy,
 			testCheckSakuraCloudIconDestroy,
@@ -212,9 +212,9 @@ func TestAccImportSakuraCloudArchive_basic(t *testing.T) {
 
 	resourceName := "sakuracloud_archive.foobar"
 	resource.Test(t, resource.TestCase{
-		PreCheck:     func() { testAccPreCheck(t) },
-		Providers:    testAccProviders,
-		CheckDestroy: testCheckSakuraCloudArchiveDestroy,
+		PreCheck:          func() { testAccPreCheck(t) },
+		ProviderFactories: testAccProviderFactories,
+		CheckDestroy:      testCheckSakuraCloudArchiveDestroy,
 		Steps: []resource.TestStep{
 			{
 				Config: buildConfigWithArgs(testAccSakuraCloudArchive_basic, rand),

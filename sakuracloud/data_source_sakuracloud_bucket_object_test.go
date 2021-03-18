@@ -43,8 +43,8 @@ func TestAccSakuraCloudBucketObjectDataSource_Basic(t *testing.T) {
 	httpsCacheURL := fmt.Sprintf("https://%s.c.sakurastorage.jp/%s", bucket, key)
 
 	resource.ParallelTest(t, resource.TestCase{
-		PreCheck:  func() { testAccPreCheck(t) },
-		Providers: testAccProviders,
+		PreCheck:          func() { testAccPreCheck(t) },
+		ProviderFactories: testAccProviderFactories,
 		Steps: []resource.TestStep{
 			{
 				Config: buildConfigWithArgs(testAccSakuraCloudDataSourceBucketObject, bucket, key),

@@ -32,8 +32,8 @@ func TestAccSakuraCloudDNSRecord_basic(t *testing.T) {
 	zone := fmt.Sprintf("%s.com", randomName())
 
 	resource.ParallelTest(t, resource.TestCase{
-		PreCheck:  func() { testAccPreCheck(t) },
-		Providers: testAccProviders,
+		PreCheck:          func() { testAccPreCheck(t) },
+		ProviderFactories: testAccProviderFactories,
 		CheckDestroy: resource.ComposeTestCheckFunc(
 			testCheckSakuraCloudDNSDestroy,
 			testCheckSakuraCloudDNSRecordDestroy,
@@ -70,8 +70,8 @@ func TestAccSakuraCloudDNSRecord_withCount(t *testing.T) {
 	zone := fmt.Sprintf("%s.com", randomName())
 
 	resource.ParallelTest(t, resource.TestCase{
-		PreCheck:  func() { testAccPreCheck(t) },
-		Providers: testAccProviders,
+		PreCheck:          func() { testAccPreCheck(t) },
+		ProviderFactories: testAccProviderFactories,
 		CheckDestroy: resource.ComposeTestCheckFunc(
 			testCheckSakuraCloudDNSDestroy,
 			testCheckSakuraCloudDNSRecordDestroy,

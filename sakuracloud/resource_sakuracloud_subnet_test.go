@@ -31,8 +31,8 @@ func TestAccSakuraCloudSubnet_basic(t *testing.T) {
 
 	var subnet sacloud.Subnet
 	resource.Test(t, resource.TestCase{
-		PreCheck:  func() { testAccPreCheck(t) },
-		Providers: testAccProviders,
+		PreCheck:          func() { testAccPreCheck(t) },
+		ProviderFactories: testAccProviderFactories,
 		CheckDestroy: resource.ComposeTestCheckFunc(
 			testCheckSakuraCloudInternetDestroy,
 			testCheckSakuraCloudSubnetDestroy,

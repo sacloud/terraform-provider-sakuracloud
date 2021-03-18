@@ -41,8 +41,8 @@ func TestAccSakuraCloudProxyLB_basic(t *testing.T) {
 
 	var proxylb, proxylbUpd sacloud.ProxyLB
 	resource.ParallelTest(t, resource.TestCase{
-		PreCheck:  func() { testAccPreCheck(t) },
-		Providers: testAccProviders,
+		PreCheck:          func() { testAccPreCheck(t) },
+		ProviderFactories: testAccProviderFactories,
 		CheckDestroy: resource.ComposeTestCheckFunc(
 			testCheckSakuraCloudIconDestroy,
 			testCheckSakuraCloudProxyLBDestroy,
@@ -223,9 +223,9 @@ func TestAccImportSakuraCloudProxyLB_basic(t *testing.T) {
 	resourceName := "sakuracloud_proxylb.foobar"
 
 	resource.ParallelTest(t, resource.TestCase{
-		PreCheck:     func() { testAccPreCheck(t) },
-		Providers:    testAccProviders,
-		CheckDestroy: testCheckSakuraCloudProxyLBDestroy,
+		PreCheck:          func() { testAccPreCheck(t) },
+		ProviderFactories: testAccProviderFactories,
+		CheckDestroy:      testCheckSakuraCloudProxyLBDestroy,
 		Steps: []resource.TestStep{
 			{
 				Config: buildConfigWithArgs(testAccSakuraCloudProxyLB_import, rand, ip0, ip1),

@@ -26,8 +26,8 @@ func TestAccSakuraCloudDataSourceDatabase_basic(t *testing.T) {
 	password := randomPassword()
 
 	resource.ParallelTest(t, resource.TestCase{
-		PreCheck:  func() { testAccPreCheck(t) },
-		Providers: testAccProviders,
+		PreCheck:          func() { testAccPreCheck(t) },
+		ProviderFactories: testAccProviderFactories,
 		Steps: []resource.TestStep{
 			{
 				Config: buildConfigWithArgs(testAccSakuraCloudDataSourceDatabase_basic, rand, password),

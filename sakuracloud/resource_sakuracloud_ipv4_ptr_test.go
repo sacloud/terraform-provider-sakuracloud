@@ -47,9 +47,9 @@ func TestAccSakuraCloudIPv4Ptr_basic(t *testing.T) {
 	rand := randomName()
 
 	resource.ParallelTest(t, resource.TestCase{
-		PreCheck:     func() { testAccPreCheck(t) },
-		Providers:    testAccProviders,
-		CheckDestroy: testCheckSakuraCloudIPv4PtrDestroy,
+		PreCheck:          func() { testAccPreCheck(t) },
+		ProviderFactories: testAccProviderFactories,
+		CheckDestroy:      testCheckSakuraCloudIPv4PtrDestroy,
 		Steps: []resource.TestStep{
 			{
 				Config: buildConfigWithArgs(testAccCheckSakuraCloudIPv4PtrConfig_basic, rand, testDomain),

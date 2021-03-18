@@ -30,8 +30,8 @@ func TestAccSakuraCloudDatabaseReplica_basic(t *testing.T) {
 	password := randomPassword()
 
 	resource.ParallelTest(t, resource.TestCase{
-		PreCheck:  func() { testAccPreCheck(t) },
-		Providers: testAccProviders,
+		PreCheck:          func() { testAccPreCheck(t) },
+		ProviderFactories: testAccProviderFactories,
 		CheckDestroy: resource.ComposeTestCheckFunc(
 			testCheckSakuraCloudDatabaseDestroy,
 			testCheckSakuraCloudDatabaseReadReplicaDestroy,
@@ -101,8 +101,8 @@ func TestAccImportSakuraCloudDatabaseReadReplica_basic(t *testing.T) {
 	resourceName := "sakuracloud_database_read_replica.foobar"
 
 	resource.ParallelTest(t, resource.TestCase{
-		PreCheck:  func() { testAccPreCheck(t) },
-		Providers: testAccProviders,
+		PreCheck:          func() { testAccPreCheck(t) },
+		ProviderFactories: testAccProviderFactories,
 		CheckDestroy: resource.ComposeTestCheckFunc(
 			testCheckSakuraCloudDatabaseDestroy,
 			testCheckSakuraCloudDatabaseReadReplicaDestroy,

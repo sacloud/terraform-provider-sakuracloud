@@ -34,8 +34,8 @@ func TestAccSakuraCloudContainerRegistry_basic(t *testing.T) {
 
 	var reg sacloud.ContainerRegistry
 	resource.ParallelTest(t, resource.TestCase{
-		PreCheck:  func() { testAccPreCheck(t) },
-		Providers: testAccProviders,
+		PreCheck:          func() { testAccPreCheck(t) },
+		ProviderFactories: testAccProviderFactories,
 		CheckDestroy: resource.ComposeTestCheckFunc(
 			testCheckSakuraCloudContainerRegistryDestroy,
 			testCheckSakuraCloudIconDestroy,

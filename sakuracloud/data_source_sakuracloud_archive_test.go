@@ -23,8 +23,8 @@ import (
 func TestAccSakuraCloudDataSourceArchive_basic(t *testing.T) {
 	resourceName := "data.sakuracloud_archive.foobar"
 	resource.ParallelTest(t, resource.TestCase{
-		PreCheck:  func() { testAccPreCheck(t) },
-		Providers: testAccProviders,
+		PreCheck:          func() { testAccPreCheck(t) },
+		ProviderFactories: testAccProviderFactories,
 		Steps: []resource.TestStep{
 			{
 				Config: testAccSakuraCloudDataSourceArchive_basic,
@@ -48,8 +48,8 @@ func TestAccSakuraCloudDataSourceArchive_basic(t *testing.T) {
 func TestAccSakuraCloudDataSourceArchive_osType(t *testing.T) {
 	resourceName := "data.sakuracloud_archive.foobar"
 	resource.ParallelTest(t, resource.TestCase{
-		PreCheck:  func() { testAccPreCheck(t) },
-		Providers: testAccProviders,
+		PreCheck:          func() { testAccPreCheck(t) },
+		ProviderFactories: testAccProviderFactories,
 		Steps: []resource.TestStep{
 			{
 				Config: testAccCheckSakuraCloudDataSourceArchive_osType,
@@ -64,8 +64,8 @@ func TestAccSakuraCloudDataSourceArchive_osType(t *testing.T) {
 func TestAccSakuraCloudDataSourceArchive_withTag(t *testing.T) {
 	resourceName := "data.sakuracloud_archive.foobar"
 	resource.ParallelTest(t, resource.TestCase{
-		PreCheck:  func() { testAccPreCheck(t) },
-		Providers: testAccProviders,
+		PreCheck:          func() { testAccPreCheck(t) },
+		ProviderFactories: testAccProviderFactories,
 		Steps: []resource.TestStep{
 			{
 				Config: testAccCheckSakuraCloudDataSourceArchive_withTag,

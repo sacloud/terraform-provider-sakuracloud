@@ -23,8 +23,8 @@ import (
 func TestAccSakuraCloudDataSourceCDROM_basic(t *testing.T) {
 	resourceName := "data.sakuracloud_cdrom.foobar"
 	resource.ParallelTest(t, resource.TestCase{
-		PreCheck:  func() { testAccPreCheck(t) },
-		Providers: testAccProviders,
+		PreCheck:          func() { testAccPreCheck(t) },
+		ProviderFactories: testAccProviderFactories,
 		Steps: []resource.TestStep{
 			{
 				Config: testAccSakuraCloudDataSourceCDROM_basic,

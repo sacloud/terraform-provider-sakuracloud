@@ -47,9 +47,9 @@ func TestAccSakuraCloudBucketObject_basic(t *testing.T) {
 	httpsCacheURL := fmt.Sprintf("https://%s.c.sakurastorage.jp/%s", bucket, key)
 
 	resource.ParallelTest(t, resource.TestCase{
-		PreCheck:     func() { testAccPreCheck(t) },
-		Providers:    testAccProviders,
-		CheckDestroy: testCheckSakuraCloudBucketObjectDestroy,
+		PreCheck:          func() { testAccPreCheck(t) },
+		ProviderFactories: testAccProviderFactories,
+		CheckDestroy:      testCheckSakuraCloudBucketObjectDestroy,
 		Steps: []resource.TestStep{
 			{
 				Config: buildConfigWithArgs(testAccSakuraCloudBucketObject_basic, bucket, key),

@@ -31,8 +31,8 @@ func TestAccSakuraCloudInternet_basic(t *testing.T) {
 
 	var internet sacloud.Internet
 	resource.ParallelTest(t, resource.TestCase{
-		PreCheck:  func() { testAccPreCheck(t) },
-		Providers: testAccProviders,
+		PreCheck:          func() { testAccPreCheck(t) },
+		ProviderFactories: testAccProviderFactories,
 		CheckDestroy: resource.ComposeTestCheckFunc(
 			testCheckSakuraCloudDiskDestroy,
 			testCheckSakuraCloudInternetDestroy,
@@ -167,8 +167,8 @@ func TestAccImportSakuraCloudInternet_basic(t *testing.T) {
 	resourceName := "sakuracloud_internet.foobar"
 
 	resource.Test(t, resource.TestCase{
-		PreCheck:  func() { testAccPreCheck(t) },
-		Providers: testAccProviders,
+		PreCheck:          func() { testAccPreCheck(t) },
+		ProviderFactories: testAccProviderFactories,
 		CheckDestroy: resource.ComposeTestCheckFunc(
 			testCheckSakuraCloudInternetDestroy,
 			testCheckSakuraCloudIconDestroy,

@@ -33,8 +33,8 @@ func TestAccSakuraCloudDatabase_basic(t *testing.T) {
 
 	var database sacloud.Database
 	resource.ParallelTest(t, resource.TestCase{
-		PreCheck:  func() { testAccPreCheck(t) },
-		Providers: testAccProviders,
+		PreCheck:          func() { testAccPreCheck(t) },
+		ProviderFactories: testAccProviderFactories,
 		CheckDestroy: resource.ComposeTestCheckFunc(
 			testCheckSakuraCloudDatabaseDestroy,
 			testCheckSakuraCloudIconDestroy,
@@ -218,8 +218,8 @@ func TestAccImportSakuraCloudDatabase_basic(t *testing.T) {
 	resourceName := "sakuracloud_database.foobar"
 
 	resource.ParallelTest(t, resource.TestCase{
-		PreCheck:  func() { testAccPreCheck(t) },
-		Providers: testAccProviders,
+		PreCheck:          func() { testAccPreCheck(t) },
+		ProviderFactories: testAccProviderFactories,
 		CheckDestroy: resource.ComposeTestCheckFunc(
 			testCheckSakuraCloudDatabaseDestroy,
 			testCheckSakuraCloudIconDestroy,

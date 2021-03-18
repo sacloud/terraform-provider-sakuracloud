@@ -23,8 +23,8 @@ import (
 func TestAccSakuraCloudDataSourceZone_basic(t *testing.T) {
 	resourceName := "data.sakuracloud_zone.foobar"
 	resource.ParallelTest(t, resource.TestCase{
-		PreCheck:  func() { testAccPreCheck(t) },
-		Providers: testAccProviders,
+		PreCheck:          func() { testAccPreCheck(t) },
+		ProviderFactories: testAccProviderFactories,
 		Steps: []resource.TestStep{
 			{
 				Config: testAccSakuraCloudDataSourceZone_basic,

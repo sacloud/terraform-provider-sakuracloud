@@ -31,8 +31,8 @@ func TestAccSakuraCloudDNS_basic(t *testing.T) {
 
 	var dns sacloud.DNS
 	resource.ParallelTest(t, resource.TestCase{
-		PreCheck:  func() { testAccPreCheck(t) },
-		Providers: testAccProviders,
+		PreCheck:          func() { testAccPreCheck(t) },
+		ProviderFactories: testAccProviderFactories,
 		CheckDestroy: resource.ComposeTestCheckFunc(
 			testCheckSakuraCloudDNSDestroy,
 			testCheckSakuraCloudIconDestroy,
@@ -159,8 +159,8 @@ func TestAccImportSakuraCloudDNS_basic(t *testing.T) {
 	resourceName := "sakuracloud_dns.foobar"
 
 	resource.ParallelTest(t, resource.TestCase{
-		PreCheck:  func() { testAccPreCheck(t) },
-		Providers: testAccProviders,
+		PreCheck:          func() { testAccPreCheck(t) },
+		ProviderFactories: testAccProviderFactories,
 		CheckDestroy: resource.ComposeTestCheckFunc(
 			testCheckSakuraCloudDNSDestroy,
 			testCheckSakuraCloudIconDestroy,

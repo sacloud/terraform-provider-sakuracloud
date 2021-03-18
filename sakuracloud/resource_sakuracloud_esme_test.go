@@ -31,8 +31,8 @@ func TestAccSakuraCloudESME_basic(t *testing.T) {
 
 	var esme sacloud.ESME
 	resource.ParallelTest(t, resource.TestCase{
-		PreCheck:  func() { testAccPreCheck(t) },
-		Providers: testAccProviders,
+		PreCheck:          func() { testAccPreCheck(t) },
+		ProviderFactories: testAccProviderFactories,
 		CheckDestroy: resource.ComposeTestCheckFunc(
 			testCheckSakuraCloudESMEDestroy,
 			testCheckSakuraCloudIconDestroy,
@@ -149,8 +149,8 @@ func TestAccImportSakuraCloudESME_basic(t *testing.T) {
 	resourceName := "sakuracloud_esme.foobar"
 
 	resource.ParallelTest(t, resource.TestCase{
-		PreCheck:  func() { testAccPreCheck(t) },
-		Providers: testAccProviders,
+		PreCheck:          func() { testAccPreCheck(t) },
+		ProviderFactories: testAccProviderFactories,
 		CheckDestroy: resource.ComposeTestCheckFunc(
 			testCheckSakuraCloudESMEDestroy,
 			testCheckSakuraCloudIconDestroy,

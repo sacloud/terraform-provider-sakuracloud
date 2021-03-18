@@ -26,8 +26,8 @@ func TestAccSakuraCloudDataSourceSimpleMonitor_basic(t *testing.T) {
 	target := fmt.Sprintf("%s.com", randomName())
 
 	resource.ParallelTest(t, resource.TestCase{
-		PreCheck:  func() { testAccPreCheck(t) },
-		Providers: testAccProviders,
+		PreCheck:          func() { testAccPreCheck(t) },
+		ProviderFactories: testAccProviderFactories,
 		Steps: []resource.TestStep{
 			{
 				Config: buildConfigWithArgs(testAccSakuraCloudDataSourceSimpleMonitor_basic, target, testAccSlackWebhook),

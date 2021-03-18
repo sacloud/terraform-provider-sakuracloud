@@ -33,8 +33,8 @@ func TestAccSakuraCloudPrivateHost_basic(t *testing.T) {
 
 	var privateHost sacloud.PrivateHost
 	resource.ParallelTest(t, resource.TestCase{
-		PreCheck:  func() { testAccPreCheck(t) },
-		Providers: testAccProviders,
+		PreCheck:          func() { testAccPreCheck(t) },
+		ProviderFactories: testAccProviderFactories,
 		CheckDestroy: resource.ComposeTestCheckFunc(
 			testCheckSakuraCloudPrivateHostDestroy,
 			testCheckSakuraCloudIconDestroy,
@@ -85,8 +85,8 @@ func TestAccSakuraCloudPrivateHost_windows(t *testing.T) {
 
 	var privateHost sacloud.PrivateHost
 	resource.ParallelTest(t, resource.TestCase{
-		PreCheck:  func() { testAccPreCheck(t) },
-		Providers: testAccProviders,
+		PreCheck:          func() { testAccPreCheck(t) },
+		ProviderFactories: testAccProviderFactories,
 		CheckDestroy: resource.ComposeTestCheckFunc(
 			testCheckSakuraCloudPrivateHostDestroy,
 			testCheckSakuraCloudIconDestroy,
@@ -118,8 +118,8 @@ func TestAccSakuraCloudPrivateHost_destroyWithRunningServer(t *testing.T) {
 
 	var privateHost sacloud.PrivateHost
 	resource.ParallelTest(t, resource.TestCase{
-		PreCheck:  func() { testAccPreCheck(t) },
-		Providers: testAccProviders,
+		PreCheck:          func() { testAccPreCheck(t) },
+		ProviderFactories: testAccProviderFactories,
 		CheckDestroy: resource.ComposeTestCheckFunc(
 			testCheckSakuraCloudPrivateHostDestroy,
 			testCheckSakuraCloudServerDestroy,

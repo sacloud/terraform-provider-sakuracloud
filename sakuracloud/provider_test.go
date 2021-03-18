@@ -22,7 +22,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 )
 
-var testAccProviders map[string]*schema.Provider
+var testAccProviderFactories map[string]func() (*schema.Provider, error)
 var testAccProvider *schema.Provider
 var (
 	testDefaultTargetZone   = "is1b"
@@ -35,8 +35,8 @@ func init() {
 		os.Setenv("SAKURACLOUD_ZONE", v)
 	}
 	testAccProvider = Provider()
-	testAccProviders = map[string]*schema.Provider{
-		"sakuracloud": testAccProvider,
+	testAccProviderFactories = map[string]func() (*schema.Provider, error){
+		"sakuracloud": func() (*schema.Provider, error) { return testAccProvider, nil },
 	}
 }
 

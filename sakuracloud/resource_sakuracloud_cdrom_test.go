@@ -34,8 +34,8 @@ func TestAccSakuraCloudCDROM_basic(t *testing.T) {
 
 	var cdrom sacloud.CDROM
 	resource.ParallelTest(t, resource.TestCase{
-		PreCheck:  func() { testAccPreCheck(t) },
-		Providers: testAccProviders,
+		PreCheck:          func() { testAccPreCheck(t) },
+		ProviderFactories: testAccProviderFactories,
 		CheckDestroy: resource.ComposeTestCheckFunc(
 			testCheckSakuraCloudCDROMDestroy,
 			testCheckSakuraCloudIconDestroy,
@@ -80,9 +80,9 @@ func TestAccSakuraCloudCDROM_textContent(t *testing.T) {
 	rand := randomName()
 
 	resource.ParallelTest(t, resource.TestCase{
-		PreCheck:     func() { testAccPreCheck(t) },
-		Providers:    testAccProviders,
-		CheckDestroy: testCheckSakuraCloudCDROMDestroy,
+		PreCheck:          func() { testAccPreCheck(t) },
+		ProviderFactories: testAccProviderFactories,
+		CheckDestroy:      testCheckSakuraCloudCDROMDestroy,
 		Steps: []resource.TestStep{
 			{
 				Config: buildConfigWithArgs(testAccSakuraCloudCDROM_textContent, rand),
@@ -181,8 +181,8 @@ func TestAccImportSakuraCloudCDROM_basic(t *testing.T) {
 	resourceName := "sakuracloud_cdrom.foobar"
 
 	resource.ParallelTest(t, resource.TestCase{
-		PreCheck:  func() { testAccPreCheck(t) },
-		Providers: testAccProviders,
+		PreCheck:          func() { testAccPreCheck(t) },
+		ProviderFactories: testAccProviderFactories,
 		CheckDestroy: resource.ComposeTestCheckFunc(
 			testCheckSakuraCloudCDROMDestroy,
 			testCheckSakuraCloudIconDestroy,

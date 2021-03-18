@@ -28,8 +28,8 @@ func TestAccSakuraCloudDataSourceESME_basic(t *testing.T) {
 	password := randomPassword()
 
 	resource.ParallelTest(t, resource.TestCase{
-		PreCheck:  func() { testAccPreCheck(t) },
-		Providers: testAccProviders,
+		PreCheck:          func() { testAccPreCheck(t) },
+		ProviderFactories: testAccProviderFactories,
 		Steps: []resource.TestStep{
 			{
 				Config: buildConfigWithArgs(testAccSakuraCloudDataSourceESME_basic, rand, prefix, password),

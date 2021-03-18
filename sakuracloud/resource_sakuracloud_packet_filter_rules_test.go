@@ -27,9 +27,9 @@ func TestAccSakuraCloudPacketFilterRules_basic(t *testing.T) {
 
 	var filter sacloud.PacketFilter
 	resource.ParallelTest(t, resource.TestCase{
-		PreCheck:     func() { testAccPreCheck(t) },
-		Providers:    testAccProviders,
-		CheckDestroy: testCheckSakuraCloudPacketFilterDestroy,
+		PreCheck:          func() { testAccPreCheck(t) },
+		ProviderFactories: testAccProviderFactories,
+		CheckDestroy:      testCheckSakuraCloudPacketFilterDestroy,
 		Steps: []resource.TestStep{
 			{
 				Config: buildConfigWithArgs(testAccSakuraCloudPacketFilterRules_basic, rand),

@@ -25,8 +25,8 @@ func TestAccSakuraCloudDataSourceSwitch_basic(t *testing.T) {
 	rand := randomName()
 
 	resource.ParallelTest(t, resource.TestCase{
-		PreCheck:  func() { testAccPreCheck(t) },
-		Providers: testAccProviders,
+		PreCheck:          func() { testAccPreCheck(t) },
+		ProviderFactories: testAccProviderFactories,
 		Steps: []resource.TestStep{
 			{
 				Config: buildConfigWithArgs(testAccSakuraCloudDataSourceSwitch_basic, rand),

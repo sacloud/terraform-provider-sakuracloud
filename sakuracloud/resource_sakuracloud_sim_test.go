@@ -44,9 +44,9 @@ func TestAccSakuraCloudSIM_basic(t *testing.T) {
 
 	var sim sacloud.SIM
 	resource.Test(t, resource.TestCase{
-		PreCheck:     func() { testAccPreCheck(t) },
-		Providers:    testAccProviders,
-		CheckDestroy: testCheckSakuraCloudSIMDestroy,
+		PreCheck:          func() { testAccPreCheck(t) },
+		ProviderFactories: testAccProviderFactories,
+		CheckDestroy:      testCheckSakuraCloudSIMDestroy,
 		Steps: []resource.TestStep{
 			{
 				Config: buildConfigWithArgs(testAccSakuraCloudSIM_basic, rand, iccid, passcode, imei),
@@ -98,8 +98,8 @@ func TestAccSakuraCloudSIM_withMobileGateway(t *testing.T) {
 	rand := randomName()
 
 	resource.Test(t, resource.TestCase{
-		PreCheck:  func() { testAccPreCheck(t) },
-		Providers: testAccProviders,
+		PreCheck:          func() { testAccPreCheck(t) },
+		ProviderFactories: testAccProviderFactories,
 		CheckDestroy: resource.ComposeTestCheckFunc(
 			testCheckSakuraCloudSIMDestroy,
 			testCheckSakuraCloudMobileGatewayDestroy,
