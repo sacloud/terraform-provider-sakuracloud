@@ -29,7 +29,8 @@ resource "sakuracloud_server" "foobar" {
     password        = "password"
     disable_pw_auth = true
 
-    # ssh_key_ids     = ["<ID>", "<ID>"]
+    # ssh_keys    = ["ssh-rsa xxxxx"]
+    # ssh_key_ids = ["<ID>", "<ID>"]
     # note {
     #  id         = "<ID>"
     #  api_key_id = "<ID>"
@@ -102,6 +103,7 @@ A `disk_edit_parameter` block supports the following:
 Note: **The `note_ids` will be removed in a future version. Please use the `note` instead**
 * `password` - (Optional) The password of default user. The length of this value must be in the range [`8`-`64`].
 * `ssh_key_ids` - (Optional) A list of the SSHKey id.
+* `ssh_keys` - (Optional) A list of the SSHKey text.
 
 ---
 
