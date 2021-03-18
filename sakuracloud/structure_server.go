@@ -85,6 +85,7 @@ func expandServerDisks(ctx context.Context, zone string, d *schema.ResourceData,
 					IPAddress:           stringOrDefault(v, "ip_address"),
 					NetworkMaskLen:      intOrDefault(v, "netmask"),
 					DefaultRoute:        stringOrDefault(v, "gateway"),
+					SSHKeys:             stringListOrDefault(v, "ssh_keys"),
 					SSHKeyIDs:           expandSakuraCloudIDs(v, "ssh_key_ids"),
 					Notes:               expandDiskEditNotes(v),
 				}

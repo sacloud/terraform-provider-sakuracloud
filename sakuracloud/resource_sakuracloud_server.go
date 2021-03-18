@@ -168,6 +168,12 @@ func resourceSakuraCloudServer() *schema.Resource {
 							Elem:        &schema.Schema{Type: schema.TypeString},
 							Description: "A list of the SSHKey id",
 						},
+						"ssh_keys": {
+							Type:        schema.TypeList,
+							Optional:    true,
+							Elem:        &schema.Schema{Type: schema.TypeString},
+							Description: "A list of the SSHKey text",
+						},
 						"disable_pw_auth": {
 							Type:        schema.TypeBool,
 							Optional:    true,
