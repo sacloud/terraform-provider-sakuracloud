@@ -18,7 +18,7 @@ import (
 	"context"
 	"errors"
 
-	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/sacloud/libsacloud/v2/sacloud"
 	"github.com/sacloud/libsacloud/v2/sacloud/search"
 	"github.com/sacloud/libsacloud/v2/sacloud/types"

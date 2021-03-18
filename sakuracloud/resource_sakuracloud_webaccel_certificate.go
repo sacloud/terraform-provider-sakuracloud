@@ -20,7 +20,7 @@ import (
 
 	"github.com/sacloud/libsacloud/v2/sacloud/types"
 
-	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/sacloud/libsacloud/v2/sacloud"
 )
 

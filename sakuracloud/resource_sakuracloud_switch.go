@@ -19,7 +19,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/sacloud/libsacloud/v2/helper/cleanup"
 	"github.com/sacloud/libsacloud/v2/sacloud"
 )

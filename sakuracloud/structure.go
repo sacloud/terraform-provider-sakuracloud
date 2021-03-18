@@ -25,8 +25,8 @@ import (
 	"os"
 	"strconv"
 
-	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
-	"github.com/hashicorp/terraform-plugin-sdk/helper/validation"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
 	"github.com/mitchellh/go-homedir"
 	"github.com/sacloud/libsacloud/v2/sacloud/search"
 	"github.com/sacloud/libsacloud/v2/sacloud/search/keys"

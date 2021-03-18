@@ -15,7 +15,7 @@
 package sakuracloud
 
 import (
-	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/sacloud/libsacloud/v2/helper/builder"
 	mobileGatewayBuilder "github.com/sacloud/libsacloud/v2/helper/builder/mobilegateway"
 	"github.com/sacloud/libsacloud/v2/helper/defaults"

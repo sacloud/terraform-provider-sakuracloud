@@ -20,10 +20,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/hashicorp/terraform-plugin-sdk/helper/validation"
-
-	"github.com/hashicorp/terraform-plugin-sdk/helper/hashcode"
-	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/sacloud/libsacloud/v2/sacloud"
 	"github.com/sacloud/libsacloud/v2/sacloud/types"
 )
@@ -221,5 +219,5 @@ func dnsRecordIDHash(dns_id string, r *sacloud.DNSRecord) string {
 	buf.WriteString(fmt.Sprintf("%d-", r.TTL))
 	buf.WriteString(fmt.Sprintf("%s-", r.Name))
 
-	return fmt.Sprintf("dnsrecord-%d", hashcode.String(buf.String()))
+	return fmt.Sprintf("dnsrecord-%d", schema.HashString(buf.String()))
 }
