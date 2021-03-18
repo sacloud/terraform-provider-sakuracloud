@@ -16,10 +16,10 @@ package sakuracloud
 
 import (
 	"context"
-	"fmt"
 	"log"
 	"time"
 
+	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
 	"github.com/sacloud/libsacloud/v2/helper/power"
@@ -31,12 +31,12 @@ import (
 func resourceSakuraCloudServer() *schema.Resource {
 	resourceName := "Server"
 	return &schema.Resource{
-		Create: resourceSakuraCloudServerCreate,
-		Update: resourceSakuraCloudServerUpdate,
-		Read:   resourceSakuraCloudServerRead,
-		Delete: resourceSakuraCloudServerDelete,
+		CreateContext: resourceSakuraCloudServerCreate,
+		UpdateContext: resourceSakuraCloudServerUpdate,
+		ReadContext:   resourceSakuraCloudServerRead,
+		DeleteContext: resourceSakuraCloudServerDelete,
 		Importer: &schema.ResourceImporter{
-			State: schema.ImportStatePassthrough,
+			StateContext: schema.ImportStatePassthroughContext,
 		},
 
 		Timeouts: &schema.ResourceTimeout{
@@ -286,61 +286,54 @@ func resourceSakuraCloudServer() *schema.Resource {
 	}
 }
 
-func resourceSakuraCloudServerCreate(d *schema.ResourceData, meta interface{}) error {
+func resourceSakuraCloudServerCreate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client, zone, err := sakuraCloudClient(d, meta)
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
-	ctx, cancel := operationContext(d, schema.TimeoutCreate)
-	defer cancel()
 
 	builder, err := expandServerBuilder(ctx, zone, d, client)
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
 
 	if err := builder.Validate(ctx, zone); err != nil {
-		return fmt.Errorf("validating SakuraCloud Server is failed: %s", err)
+		return diag.Errorf("validating SakuraCloud Server is failed: %s", err)
 	}
 
 	result, err := builder.Build(ctx, zone)
 	if err != nil {
-		return fmt.Errorf("creating SakuraCloud Server is failed: %s", err)
+		return diag.Errorf("creating SakuraCloud Server is failed: %s", err)
 	}
 
 	d.SetId(result.ServerID.String())
-	return resourceSakuraCloudServerRead(d, meta)
+	return resourceSakuraCloudServerRead(ctx, d, meta)
 }
 
-func resourceSakuraCloudServerRead(d *schema.ResourceData, meta interface{}) error {
+func resourceSakuraCloudServerRead(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client, zone, err := sakuraCloudClient(d, meta)
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
-	ctx, cancel := operationContext(d, schema.TimeoutRead)
-	defer cancel()
 
 	serverOp := sacloud.NewServerOp(client)
-
 	server, err := serverOp.Read(ctx, zone, sakuraCloudID(d.Id()))
 	if err != nil {
 		if sacloud.IsNotFoundError(err) {
 			d.SetId("")
 			return nil
 		}
-		return fmt.Errorf("could not read SakuraCloud Server[%s]: %s", d.Id(), err)
+		return diag.Errorf("could not read SakuraCloud Server[%s]: %s", d.Id(), err)
 	}
 
 	return setServerResourceData(ctx, d, client, server)
 }
 
-func resourceSakuraCloudServerUpdate(d *schema.ResourceData, meta interface{}) error {
+func resourceSakuraCloudServerUpdate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client, zone, err := sakuraCloudClient(d, meta)
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
-	ctx, cancel := operationContext(d, schema.TimeoutUpdate)
-	defer cancel()
 
 	serverOp := sacloud.NewServerOp(client)
 
@@ -349,34 +342,32 @@ func resourceSakuraCloudServerUpdate(d *schema.ResourceData, meta interface{}) e
 
 	server, err := serverOp.Read(ctx, zone, sakuraCloudID(d.Id()))
 	if err != nil {
-		return fmt.Errorf("could not read SakuraCloud Server[%s]: %s", d.Id(), err)
+		return diag.Errorf("could not read SakuraCloud Server[%s]: %s", d.Id(), err)
 	}
 
 	builder, err := expandServerBuilder(ctx, zone, d, client)
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
 
 	if err := builder.Validate(ctx, zone); err != nil {
-		return fmt.Errorf("validating SakuraCloud Server[%s] is failed: %s", server.ID, err)
+		return diag.Errorf("validating SakuraCloud Server[%s] is failed: %s", server.ID, err)
 	}
 
 	result, err := builder.Update(ctx, zone)
 	if err != nil {
-		return fmt.Errorf("updating SakuraCloud Server[%s] is failed: %s", server.ID, err)
+		return diag.Errorf("updating SakuraCloud Server[%s] is failed: %s", server.ID, err)
 	}
 
 	d.SetId(result.ServerID.String())
-	return resourceSakuraCloudServerRead(d, meta)
+	return resourceSakuraCloudServerRead(ctx, d, meta)
 }
 
-func resourceSakuraCloudServerDelete(d *schema.ResourceData, meta interface{}) error {
+func resourceSakuraCloudServerDelete(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client, zone, err := sakuraCloudClient(d, meta)
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
-	ctx, cancel := operationContext(d, schema.TimeoutDelete)
-	defer cancel()
 
 	serverOp := sacloud.NewServerOp(client)
 
@@ -389,22 +380,22 @@ func resourceSakuraCloudServerDelete(d *schema.ResourceData, meta interface{}) e
 			d.SetId("")
 			return nil
 		}
-		return fmt.Errorf("could not read SakuraCloud Server[%s]: %s", d.Id(), err)
+		return diag.Errorf("could not read SakuraCloud Server[%s]: %s", d.Id(), err)
 	}
 
 	if server.InstanceStatus.IsUp() {
 		if err := power.ShutdownServer(ctx, serverOp, zone, server.ID, d.Get("force_shutdown").(bool)); err != nil {
-			return fmt.Errorf("stopping SakuraCloud Server[%s] is failed: %s", server.ID, err)
+			return diag.Errorf("stopping SakuraCloud Server[%s] is failed: %s", server.ID, err)
 		}
 	}
 
 	if err := serverOp.Delete(ctx, zone, server.ID); err != nil {
-		return fmt.Errorf("deleting SakuraCloud Server[%s] is failed: %s", server.ID, err)
+		return diag.Errorf("deleting SakuraCloud Server[%s] is failed: %s", server.ID, err)
 	}
 	return nil
 }
 
-func setServerResourceData(ctx context.Context, d *schema.ResourceData, client *APIClient, data *sacloud.Server) error {
+func setServerResourceData(ctx context.Context, d *schema.ResourceData, client *APIClient, data *sacloud.Server) diag.Diagnostics {
 	zone := getZone(d, client)
 
 	ip, gateway, nwMaskLen, nwAddress := flattenServerNetworkInfo(data)
@@ -429,14 +420,14 @@ func setServerResourceData(ctx context.Context, d *schema.ResourceData, client *
 	d.Set("memory", data.GetMemoryGB())                     // nolint
 	d.Set("commitment", data.ServerPlanCommitment.String()) // nolint
 	if err := d.Set("disks", flattenServerConnectedDiskIDs(data)); err != nil {
-		return err
+		return diag.FromErr(err)
 	}
 	d.Set("cdrom_id", data.CDROMID.String())                 // nolint
 	d.Set("interface_driver", data.InterfaceDriver.String()) // nolint
 	d.Set("private_host_id", data.PrivateHostID.String())    // nolint
 	d.Set("private_host_name", data.PrivateHostName)         // nolint
 	if err := d.Set("network_interface", flattenServerNICs(data)); err != nil {
-		return err
+		return diag.FromErr(err)
 	}
 	d.Set("icon_id", data.IconID.String()) // nolint
 	d.Set("description", data.Description) // nolint
@@ -446,8 +437,8 @@ func setServerResourceData(ctx context.Context, d *schema.ResourceData, client *
 	d.Set("netmask", nwMaskLen)            // nolint
 	d.Set("hostname", data.HostName)       // nolint
 	if err := d.Set("dns_servers", data.Zone.Region.NameServers); err != nil {
-		return err
+		return diag.FromErr(err)
 	}
 	d.Set("zone", zone) // nolint
-	return d.Set("tags", flattenTags(data.Tags))
+	return diag.FromErr(d.Set("tags", flattenTags(data.Tags)))
 }

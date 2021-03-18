@@ -16,11 +16,11 @@ package sakuracloud
 
 import (
 	"context"
-	"fmt"
 	"math"
 	"regexp"
 	"time"
 
+	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
 	"github.com/sacloud/libsacloud/v2/helper/cleanup"
@@ -31,12 +31,12 @@ func resourceSakuraCloudMobileGateway() *schema.Resource {
 	resourceName := "MobileGateway"
 
 	return &schema.Resource{
-		Create: resourceSakuraCloudMobileGatewayCreate,
-		Read:   resourceSakuraCloudMobileGatewayRead,
-		Update: resourceSakuraCloudMobileGatewayUpdate,
-		Delete: resourceSakuraCloudMobileGatewayDelete,
+		CreateContext: resourceSakuraCloudMobileGatewayCreate,
+		ReadContext:   resourceSakuraCloudMobileGatewayRead,
+		UpdateContext: resourceSakuraCloudMobileGatewayUpdate,
+		DeleteContext: resourceSakuraCloudMobileGatewayDelete,
 		Importer: &schema.ResourceImporter{
-			State: schema.ImportStatePassthrough,
+			StateContext: schema.ImportStatePassthroughContext,
 		},
 
 		Timeouts: &schema.ResourceTimeout{
@@ -60,10 +60,10 @@ func resourceSakuraCloudMobileGateway() *schema.Resource {
 							Description:  descf("The id of the switch to which the %s connects", resourceName),
 						},
 						"ip_address": {
-							Type:         schema.TypeString,
-							ValidateFunc: validateIPv4Address(),
-							Required:     true,
-							Description:  descf("The IP address to assign to the %s", resourceName),
+							Type:             schema.TypeString,
+							ValidateDiagFunc: validateIPv4Address(),
+							Required:         true,
+							Description:      descf("The IP address to assign to the %s", resourceName),
 						},
 						"netmask": {
 							Type:         schema.TypeInt,
@@ -181,10 +181,10 @@ func resourceSakuraCloudMobileGateway() *schema.Resource {
 							Description:  descf("The id of the Switch connected to the %s", resourceName),
 						},
 						"ip_address": {
-							Type:         schema.TypeString,
-							ValidateFunc: validateIPv4Address(),
-							Required:     true,
-							Description:  "The IP address to assign to the SIM",
+							Type:             schema.TypeString,
+							ValidateDiagFunc: validateIPv4Address(),
+							Required:         true,
+							Description:      "The IP address to assign to the SIM",
 						},
 					},
 				},
@@ -216,17 +216,15 @@ func resourceSakuraCloudMobileGateway() *schema.Resource {
 	}
 }
 
-func resourceSakuraCloudMobileGatewayCreate(d *schema.ResourceData, meta interface{}) error {
+func resourceSakuraCloudMobileGatewayCreate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client, zone, err := sakuraCloudClient(d, meta)
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
-	ctx, cancel := operationContext(d, schema.TimeoutCreate)
-	defer cancel()
 
 	builder := expandMobileGatewayBuilder(d, client)
 	if err := builder.Validate(ctx, zone); err != nil {
-		return fmt.Errorf("validating SakuraCloud MobileGateway is failed: %s", err)
+		return diag.Errorf("validating SakuraCloud MobileGateway is failed: %s", err)
 	}
 
 	mgw, err := builder.Build(ctx, zone)
@@ -234,19 +232,17 @@ func resourceSakuraCloudMobileGatewayCreate(d *schema.ResourceData, meta interfa
 		d.SetId(mgw.ID.String())
 	}
 	if err != nil {
-		return fmt.Errorf("creating SakuraCloud MobileGateway is failed: %s", err)
+		return diag.Errorf("creating SakuraCloud MobileGateway is failed: %s", err)
 	}
 
-	return resourceSakuraCloudMobileGatewayRead(d, meta)
+	return resourceSakuraCloudMobileGatewayRead(ctx, d, meta)
 }
 
-func resourceSakuraCloudMobileGatewayRead(d *schema.ResourceData, meta interface{}) error {
+func resourceSakuraCloudMobileGatewayRead(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client, zone, err := sakuraCloudClient(d, meta)
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
-	ctx, cancel := operationContext(d, schema.TimeoutRead)
-	defer cancel()
 
 	mgwOp := sacloud.NewMobileGatewayOp(client)
 
@@ -256,46 +252,42 @@ func resourceSakuraCloudMobileGatewayRead(d *schema.ResourceData, meta interface
 			d.SetId("")
 			return nil
 		}
-		return fmt.Errorf("could not read SakuraCloud MobileGateway[%s]: %s", d.Id(), err)
+		return diag.Errorf("could not read SakuraCloud MobileGateway[%s]: %s", d.Id(), err)
 	}
 
 	return setMobileGatewayResourceData(ctx, d, client, mgw)
 }
 
-func resourceSakuraCloudMobileGatewayUpdate(d *schema.ResourceData, meta interface{}) error {
+func resourceSakuraCloudMobileGatewayUpdate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client, zone, err := sakuraCloudClient(d, meta)
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
-	ctx, cancel := operationContext(d, schema.TimeoutUpdate)
-	defer cancel()
 
 	mgwOp := sacloud.NewMobileGatewayOp(client)
 
 	mgw, err := mgwOp.Read(ctx, zone, sakuraCloudID(d.Id()))
 	if err != nil {
-		return fmt.Errorf("could not read SakuraCloud MobileGateway[%s]: %s", d.Id(), err)
+		return diag.Errorf("could not read SakuraCloud MobileGateway[%s]: %s", d.Id(), err)
 	}
 
 	builder := expandMobileGatewayBuilder(d, client)
 	if err := builder.Validate(ctx, zone); err != nil {
-		return fmt.Errorf("validating SakuraCloud MobileGateway is failed: %s", err)
+		return diag.Errorf("validating SakuraCloud MobileGateway is failed: %s", err)
 	}
 
 	if _, err = builder.Update(ctx, zone, mgw.ID); err != nil {
-		return fmt.Errorf("updating SakuraCloud MobileGateway[%s] is failed: %s", d.Id(), err)
+		return diag.Errorf("updating SakuraCloud MobileGateway[%s] is failed: %s", d.Id(), err)
 	}
 
-	return resourceSakuraCloudMobileGatewayRead(d, meta)
+	return resourceSakuraCloudMobileGatewayRead(ctx, d, meta)
 }
 
-func resourceSakuraCloudMobileGatewayDelete(d *schema.ResourceData, meta interface{}) error {
+func resourceSakuraCloudMobileGatewayDelete(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client, zone, err := sakuraCloudClient(d, meta)
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
-	ctx, cancel := operationContext(d, schema.TimeoutDelete)
-	defer cancel()
 
 	mgwOp := sacloud.NewMobileGatewayOp(client)
 	simOp := sacloud.NewSIMOp(client)
@@ -306,45 +298,45 @@ func resourceSakuraCloudMobileGatewayDelete(d *schema.ResourceData, meta interfa
 			d.SetId("")
 			return nil
 		}
-		return fmt.Errorf("could not read SakuraCloud MobileGateway: %s", err)
+		return diag.Errorf("could not read SakuraCloud MobileGateway: %s", err)
 	}
 
 	if err := cleanup.DeleteMobileGateway(ctx, mgwOp, simOp, zone, mgw.ID); err != nil {
-		return fmt.Errorf("deleting SakuraCloud MobileGateway[%s] is failed: %s", d.Id(), err)
+		return diag.Errorf("deleting SakuraCloud MobileGateway[%s] is failed: %s", d.Id(), err)
 	}
 	return nil
 }
 
-func setMobileGatewayResourceData(ctx context.Context, d *schema.ResourceData, client *APIClient, data *sacloud.MobileGateway) error {
+func setMobileGatewayResourceData(ctx context.Context, d *schema.ResourceData, client *APIClient, data *sacloud.MobileGateway) diag.Diagnostics {
 	zone := getZone(d, client)
 	mgwOp := sacloud.NewMobileGatewayOp(client)
 
 	if data.Availability.IsFailed() {
 		d.SetId("")
-		return fmt.Errorf("got unexpected state: MobileGateway[%d].Availability is failed", data.ID)
+		return diag.Errorf("got unexpected state: MobileGateway[%d].Availability is failed", data.ID)
 	}
 
 	// fetch configs
 	tc, err := mgwOp.GetTrafficConfig(ctx, zone, data.ID)
 	if err != nil && !sacloud.IsNotFoundError(err) {
-		return fmt.Errorf("reading TrafficConfig is failed: %s", err)
+		return diag.Errorf("reading TrafficConfig is failed: %s", err)
 	}
 	resolver, err := mgwOp.GetDNS(ctx, zone, data.ID)
 	if err != nil {
-		return fmt.Errorf("reading ResolverConfig is failed: %s", err)
+		return diag.Errorf("reading ResolverConfig is failed: %s", err)
 	}
 	sims, err := mgwOp.ListSIM(ctx, zone, data.ID)
 	if err != nil && !sacloud.IsNotFoundError(err) {
-		return fmt.Errorf("reading SIMs is failed: %s", err)
+		return diag.Errorf("reading SIMs is failed: %s", err)
 	}
 	simRoutes, err := mgwOp.GetSIMRoutes(ctx, zone, data.ID)
 	if err != nil {
-		return fmt.Errorf("reading SIM Routes is failed: %s", err)
+		return diag.Errorf("reading SIM Routes is failed: %s", err)
 	}
 
 	// set data
 	if err := d.Set("private_network_interface", flattenMobileGatewayPrivateNetworks(data)); err != nil {
-		return err
+		return diag.FromErr(err)
 	}
 	d.Set("public_ip", flattenMobileGatewayPublicIPAddress(data))                    // nolint
 	d.Set("public_netmask", flattenMobileGatewayPublicNetmask(data))                 // nolint
@@ -352,25 +344,25 @@ func setMobileGatewayResourceData(ctx context.Context, d *schema.ResourceData, c
 	d.Set("inter_device_communication", data.InterDeviceCommunicationEnabled.Bool()) // nolint
 
 	if err := d.Set("traffic_control", flattenMobileGatewayTrafficConfigs(tc)); err != nil {
-		return err
+		return diag.FromErr(err)
 	}
 	if err := d.Set("dns_servers", []string{resolver.DNS1, resolver.DNS2}); err != nil {
-		return err
+		return diag.FromErr(err)
 	}
 	if err := d.Set("static_route", flattenMobileGatewayStaticRoutes(data.StaticRoutes)); err != nil {
-		return err
+		return diag.FromErr(err)
 	}
 	d.Set("name", data.Name)               // nolint
 	d.Set("icon_id", data.IconID.String()) // nolint
 	d.Set("description", data.Description) // nolint
 	if err := d.Set("tags", flattenTags(data.Tags)); err != nil {
-		return err
+		return diag.FromErr(err)
 	}
 	if err := d.Set("sim", flattenMobileGatewaySIMs(sims)); err != nil {
-		return err
+		return diag.FromErr(err)
 	}
 	if err := d.Set("sim_route", flattenMobileGatewaySIMRoutes(simRoutes)); err != nil {
-		return err
+		return diag.FromErr(err)
 	}
 	d.Set("zone", zone) // nolint
 

@@ -15,9 +15,11 @@
 package sakuracloud
 
 import (
+	"context"
 	"fmt"
 	"time"
 
+	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/sacloud/libsacloud/v2/sacloud"
 )
@@ -25,12 +27,12 @@ import (
 func resourceSakuraCloudESME() *schema.Resource {
 	resourceName := "ESME"
 	return &schema.Resource{
-		Create: resourceSakuraCloudESMECreate,
-		Read:   resourceSakuraCloudESMERead,
-		Update: resourceSakuraCloudESMEUpdate,
-		Delete: resourceSakuraCloudESMEDelete,
+		CreateContext: resourceSakuraCloudESMECreate,
+		ReadContext:   resourceSakuraCloudESMERead,
+		UpdateContext: resourceSakuraCloudESMEUpdate,
+		DeleteContext: resourceSakuraCloudESMEDelete,
 		Importer: &schema.ResourceImporter{
-			State: schema.ImportStatePassthrough,
+			StateContext: schema.ImportStatePassthroughContext,
 		},
 
 		Timeouts: &schema.ResourceTimeout{
@@ -58,100 +60,89 @@ func resourceSakuraCloudESME() *schema.Resource {
 	}
 }
 
-func resourceSakuraCloudESMECreate(d *schema.ResourceData, meta interface{}) error {
+func resourceSakuraCloudESMECreate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client, _, err := sakuraCloudClient(d, meta)
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
-	ctx, cancel := operationContext(d, schema.TimeoutCreate)
-	defer cancel()
 
 	esmeOp := sacloud.NewESMEOp(client)
 
 	esme, err := esmeOp.Create(ctx, expandESMECreateRequest(d))
 	if err != nil {
-		return fmt.Errorf("creating SakuraCloud ESME is failed: %s", err)
+		return diag.Errorf("creating SakuraCloud ESME is failed: %s", err)
 	}
 
 	d.SetId(esme.ID.String())
-	return resourceSakuraCloudESMERead(d, meta)
+	return resourceSakuraCloudESMERead(ctx, d, meta)
 }
 
-func resourceSakuraCloudESMERead(d *schema.ResourceData, meta interface{}) error {
+func resourceSakuraCloudESMERead(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client, _, err := sakuraCloudClient(d, meta)
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
-	ctx, cancel := operationContext(d, schema.TimeoutRead)
-	defer cancel()
 
 	esmeOp := sacloud.NewESMEOp(client)
-
 	esme, err := esmeOp.Read(ctx, sakuraCloudID(d.Id()))
 	if err != nil {
 		if sacloud.IsNotFoundError(err) {
 			d.SetId("")
 			return nil
 		}
-		return fmt.Errorf("could not find SakuraCloud ESME[%s]: %s", d.Id(), err)
+		return diag.Errorf("could not find SakuraCloud ESME[%s]: %s", d.Id(), err)
 	}
 	return setESMEResourceData(d, client, esme)
 }
 
-func resourceSakuraCloudESMEUpdate(d *schema.ResourceData, meta interface{}) error {
+func resourceSakuraCloudESMEUpdate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client, _, err := sakuraCloudClient(d, meta)
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
-	ctx, cancel := operationContext(d, schema.TimeoutUpdate)
-	defer cancel()
 
 	esmeOp := sacloud.NewESMEOp(client)
-
 	esme, err := esmeOp.Read(ctx, sakuraCloudID(d.Id()))
 	if err != nil {
-		return fmt.Errorf("could not read SakuraCloud ESME[%s]: %s", d.Id(), err)
+		return diag.Errorf("could not read SakuraCloud ESME[%s]: %s", d.Id(), err)
 	}
 
 	if err := validateBackupWeekdays(d, "weekdays"); err != nil {
-		return err
+		return diag.FromErr(err)
 	}
 
 	if _, err = esmeOp.Update(ctx, esme.ID, expandESMEUpdateRequest(d, esme)); err != nil {
-		return fmt.Errorf("updating SakuraCloud ESME[%s] is failed: %s", d.Id(), err)
+		return diag.Errorf("updating SakuraCloud ESME[%s] is failed: %s", d.Id(), err)
 	}
 
-	return resourceSakuraCloudESMERead(d, meta)
+	return resourceSakuraCloudESMERead(ctx, d, meta)
 }
 
-func resourceSakuraCloudESMEDelete(d *schema.ResourceData, meta interface{}) error {
+func resourceSakuraCloudESMEDelete(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client, _, err := sakuraCloudClient(d, meta)
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
-	ctx, cancel := operationContext(d, schema.TimeoutDelete)
-	defer cancel()
 
 	esmeOp := sacloud.NewESMEOp(client)
-
 	esme, err := esmeOp.Read(ctx, sakuraCloudID(d.Id()))
 	if err != nil {
 		if sacloud.IsNotFoundError(err) {
 			d.SetId("")
 			return nil
 		}
-		return fmt.Errorf("could not read SakuraCloud ESME[%s]: %s", d.Id(), err)
+		return diag.Errorf("could not read SakuraCloud ESME[%s]: %s", d.Id(), err)
 	}
 
 	if err := esmeOp.Delete(ctx, esme.ID); err != nil {
-		return fmt.Errorf("deleting SakuraCloud ESME[%s] is failed: %s", d.Id(), err)
+		return diag.Errorf("deleting SakuraCloud ESME[%s] is failed: %s", d.Id(), err)
 	}
 
 	d.SetId("")
 	return nil
 }
 
-func setESMEResourceData(d *schema.ResourceData, _ *APIClient, data *sacloud.ESME) error {
+func setESMEResourceData(d *schema.ResourceData, _ *APIClient, data *sacloud.ESME) diag.Diagnostics {
 	d.Set("name", data.Name)                         // nolint
 	d.Set("icon_id", data.IconID.String())           // nolint
 	d.Set("description", data.Description)           // nolint
@@ -171,5 +162,5 @@ func setESMEResourceData(d *schema.ResourceData, _ *APIClient, data *sacloud.ESM
 			d.Id(),
 		),
 	)
-	return d.Set("tags", flattenTags(data.Tags))
+	return diag.FromErr(d.Set("tags", flattenTags(data.Tags)))
 }

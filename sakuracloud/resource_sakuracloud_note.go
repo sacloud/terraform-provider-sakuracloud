@@ -16,9 +16,9 @@ package sakuracloud
 
 import (
 	"context"
-	"fmt"
 	"time"
 
+	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
 	"github.com/sacloud/libsacloud/v2/sacloud"
@@ -28,12 +28,12 @@ import (
 func resourceSakuraCloudNote() *schema.Resource {
 	resourceName := "Note"
 	return &schema.Resource{
-		Create: resourceSakuraCloudNoteCreate,
-		Read:   resourceSakuraCloudNoteRead,
-		Update: resourceSakuraCloudNoteUpdate,
-		Delete: resourceSakuraCloudNoteDelete,
+		CreateContext: resourceSakuraCloudNoteCreate,
+		ReadContext:   resourceSakuraCloudNoteRead,
+		UpdateContext: resourceSakuraCloudNoteUpdate,
+		DeleteContext: resourceSakuraCloudNoteDelete,
 		Importer: &schema.ResourceImporter{
-			State: schema.ImportStatePassthrough,
+			StateContext: schema.ImportStatePassthroughContext,
 		},
 
 		Timeouts: &schema.ResourceTimeout{
@@ -70,100 +70,88 @@ func resourceSakuraCloudNote() *schema.Resource {
 	}
 }
 
-func resourceSakuraCloudNoteCreate(d *schema.ResourceData, meta interface{}) error {
+func resourceSakuraCloudNoteCreate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client, _, err := sakuraCloudClient(d, meta)
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
-	ctx, cancel := operationContext(d, schema.TimeoutCreate)
-	defer cancel()
 
 	noteOp := sacloud.NewNoteOp(client)
-
 	note, err := noteOp.Create(ctx, expandNoteCreateRequest(d))
 	if err != nil {
-		return fmt.Errorf("creating SakuraCloud Note is failed: %s", err)
+		return diag.Errorf("creating SakuraCloud Note is failed: %s", err)
 	}
 
 	d.SetId(note.ID.String())
-	return resourceSakuraCloudNoteRead(d, meta)
+	return resourceSakuraCloudNoteRead(ctx, d, meta)
 }
 
-func resourceSakuraCloudNoteRead(d *schema.ResourceData, meta interface{}) error {
+func resourceSakuraCloudNoteRead(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client, _, err := sakuraCloudClient(d, meta)
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
-	ctx, cancel := operationContext(d, schema.TimeoutRead)
-	defer cancel()
 
 	noteOp := sacloud.NewNoteOp(client)
-
 	note, err := noteOp.Read(ctx, sakuraCloudID(d.Id()))
 	if err != nil {
 		if sacloud.IsNotFoundError(err) {
 			d.SetId("")
 			return nil
 		}
-		return fmt.Errorf("could not read SakuraCloud Note[%s]: %s", d.Id(), err)
+		return diag.Errorf("could not read SakuraCloud Note[%s]: %s", d.Id(), err)
 	}
 
 	return setNoteResourceData(ctx, d, client, note)
 }
 
-func resourceSakuraCloudNoteUpdate(d *schema.ResourceData, meta interface{}) error {
+func resourceSakuraCloudNoteUpdate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client, _, err := sakuraCloudClient(d, meta)
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
-	ctx, cancel := operationContext(d, schema.TimeoutUpdate)
-	defer cancel()
 
 	noteOp := sacloud.NewNoteOp(client)
-
 	note, err := noteOp.Read(ctx, sakuraCloudID(d.Id()))
 	if err != nil {
-		return fmt.Errorf("could not read SakuraCloud Note[%s]: %s", d.Id(), err)
+		return diag.Errorf("could not read SakuraCloud Note[%s]: %s", d.Id(), err)
 	}
 
 	_, err = noteOp.Update(ctx, note.ID, expandNoteUpdateRequest(d))
 	if err != nil {
-		return fmt.Errorf("updating SakuraCloud Note[%s] is failed: %s", d.Id(), err)
+		return diag.Errorf("updating SakuraCloud Note[%s] is failed: %s", d.Id(), err)
 	}
 
-	return resourceSakuraCloudNoteRead(d, meta)
+	return resourceSakuraCloudNoteRead(ctx, d, meta)
 }
 
-func resourceSakuraCloudNoteDelete(d *schema.ResourceData, meta interface{}) error {
+func resourceSakuraCloudNoteDelete(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client, _, err := sakuraCloudClient(d, meta)
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
-	ctx, cancel := operationContext(d, schema.TimeoutDelete)
-	defer cancel()
 
 	noteOp := sacloud.NewNoteOp(client)
-
 	note, err := noteOp.Read(ctx, sakuraCloudID(d.Id()))
 	if err != nil {
 		if sacloud.IsNotFoundError(err) {
 			d.SetId("")
 			return nil
 		}
-		return fmt.Errorf("could not read SakuraCloud Note[%s]: %s", d.Id(), err)
+		return diag.Errorf("could not read SakuraCloud Note[%s]: %s", d.Id(), err)
 	}
 
 	if err := noteOp.Delete(ctx, note.ID); err != nil {
-		return fmt.Errorf("deleting SakuraCloud Note[%s] is failed: %s", d.Id(), err)
+		return diag.Errorf("deleting SakuraCloud Note[%s] is failed: %s", d.Id(), err)
 	}
 	return nil
 }
 
-func setNoteResourceData(ctx context.Context, d *schema.ResourceData, client *APIClient, data *sacloud.Note) error {
+func setNoteResourceData(ctx context.Context, d *schema.ResourceData, client *APIClient, data *sacloud.Note) diag.Diagnostics {
 	d.Set("name", data.Name)               // nolint
 	d.Set("content", data.Content)         // nolint
 	d.Set("class", data.Class)             // nolint
 	d.Set("icon_id", data.IconID.String()) // nolint
 	d.Set("description", data.Description) // nolint
-	return d.Set("tags", flattenTags(data.Tags))
+	return diag.FromErr(d.Set("tags", flattenTags(data.Tags)))
 }

@@ -15,8 +15,9 @@
 package sakuracloud
 
 import (
-	"fmt"
+	"context"
 
+	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
 	"github.com/sacloud/libsacloud/v2/helper/query"
@@ -28,7 +29,7 @@ func dataSourceSakuraCloudArchive() *schema.Resource {
 	resourceName := "Archive"
 
 	return &schema.Resource{
-		Read: dataSourceSakuraCloudArchiveRead,
+		ReadContext: dataSourceSakuraCloudArchiveRead,
 
 		Schema: map[string]*schema.Schema{
 			filterAttrName: filterSchema(&filterSchemaOption{}),
@@ -52,13 +53,11 @@ func dataSourceSakuraCloudArchive() *schema.Resource {
 	}
 }
 
-func dataSourceSakuraCloudArchiveRead(d *schema.ResourceData, meta interface{}) error {
+func dataSourceSakuraCloudArchiveRead(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client, zone, err := sakuraCloudClient(d, meta)
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
-	ctx, cancel := operationContext(d, schema.TimeoutRead)
-	defer cancel()
 
 	searcher := sacloud.NewArchiveOp(client)
 
@@ -68,7 +67,7 @@ func dataSourceSakuraCloudArchiveRead(d *schema.ResourceData, meta interface{}) 
 		if strOSType != "" {
 			res, err := query.FindArchiveByOSType(ctx, searcher, zone, ostype.StrToOSType(strOSType))
 			if err != nil {
-				return err
+				return diag.FromErr(err)
 			}
 			data = res
 		}
@@ -80,7 +79,7 @@ func dataSourceSakuraCloudArchiveRead(d *schema.ResourceData, meta interface{}) 
 
 		res, err := searcher.Find(ctx, zone, findCondition)
 		if err != nil {
-			return fmt.Errorf("could not find SakuraCloud Archive resource: %s", err)
+			return diag.Errorf("could not find SakuraCloud Archive resource: %s", err)
 		}
 		if res == nil || res.Count == 0 {
 			return filterNoResultErr()
@@ -100,7 +99,7 @@ func dataSourceSakuraCloudArchiveRead(d *schema.ResourceData, meta interface{}) 
 		d.Set("icon_id", data.IconID.String()) // nolint
 		d.Set("description", data.Description) // nolint
 		if err := d.Set("tags", flattenTags(data.Tags)); err != nil {
-			return err
+			return diag.FromErr(err)
 		}
 		d.Set("zone", getZone(d, client)) // nolint
 	}

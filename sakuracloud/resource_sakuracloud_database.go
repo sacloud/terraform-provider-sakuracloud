@@ -19,6 +19,7 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
 	"github.com/sacloud/libsacloud/v2/helper/power"
@@ -29,12 +30,12 @@ import (
 func resourceSakuraCloudDatabase() *schema.Resource {
 	resourceName := "Database"
 	return &schema.Resource{
-		Create: resourceSakuraCloudDatabaseCreate,
-		Read:   resourceSakuraCloudDatabaseRead,
-		Update: resourceSakuraCloudDatabaseUpdate,
-		Delete: resourceSakuraCloudDatabaseDelete,
+		CreateContext: resourceSakuraCloudDatabaseCreate,
+		ReadContext:   resourceSakuraCloudDatabaseRead,
+		UpdateContext: resourceSakuraCloudDatabaseUpdate,
+		DeleteContext: resourceSakuraCloudDatabaseDelete,
 		Importer: &schema.ResourceImporter{
-			State: schema.ImportStatePassthrough,
+			StateContext: schema.ImportStatePassthroughContext,
 		},
 
 		Timeouts: &schema.ResourceTimeout{
@@ -153,10 +154,10 @@ func resourceSakuraCloudDatabase() *schema.Resource {
 							),
 						},
 						"time": {
-							Type:         schema.TypeString,
-							Optional:     true,
-							ValidateFunc: validateBackupTime(),
-							Description:  "The time to take backup. This must be formatted with `HH:mm`",
+							Type:             schema.TypeString,
+							Optional:         true,
+							ValidateDiagFunc: validateBackupTime(),
+							Description:      "The time to take backup. This must be formatted with `HH:mm`",
 						},
 					},
 				},
@@ -177,16 +178,14 @@ func resourceSakuraCloudDatabase() *schema.Resource {
 	}
 }
 
-func resourceSakuraCloudDatabaseCreate(d *schema.ResourceData, meta interface{}) error {
+func resourceSakuraCloudDatabaseCreate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client, zone, err := sakuraCloudClient(d, meta)
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
-	ctx, cancel := operationContext(d, schema.TimeoutCreate)
-	defer cancel()
 
 	if err := validateDatabaseParameters(d); err != nil {
-		return err
+		return diag.FromErr(err)
 	}
 
 	dbBuilder := expandDatabaseBuilder(d, client)
@@ -195,23 +194,21 @@ func resourceSakuraCloudDatabaseCreate(d *schema.ResourceData, meta interface{})
 		d.SetId(db.ID.String())
 	}
 	if err != nil {
-		return fmt.Errorf("creating SakuraCloud Database is failed: %s", err)
+		return diag.Errorf("creating SakuraCloud Database is failed: %s", err)
 	}
 
 	// HACK データベースアプライアンスの電源投入後すぐに他の操作(Updateなど)を行うと202(Accepted)が返ってくるものの無視される。
 	// この挙動はテストなどで問題となる。このためここで少しsleepすることで対応する。
 	time.Sleep(client.databaseWaitAfterCreateDuration)
 
-	return resourceSakuraCloudDatabaseRead(d, meta)
+	return resourceSakuraCloudDatabaseRead(ctx, d, meta)
 }
 
-func resourceSakuraCloudDatabaseRead(d *schema.ResourceData, meta interface{}) error {
+func resourceSakuraCloudDatabaseRead(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client, zone, err := sakuraCloudClient(d, meta)
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
-	ctx, cancel := operationContext(d, schema.TimeoutRead)
-	defer cancel()
 
 	dbOp := sacloud.NewDatabaseOp(client)
 
@@ -221,41 +218,37 @@ func resourceSakuraCloudDatabaseRead(d *schema.ResourceData, meta interface{}) e
 			d.SetId("")
 			return nil
 		}
-		return fmt.Errorf("could not find SakuraCloud Database[%s]: %s", d.Id(), err)
+		return diag.Errorf("could not find SakuraCloud Database[%s]: %s", d.Id(), err)
 	}
 	return setDatabaseResourceData(ctx, d, client, data, zone)
 }
 
-func resourceSakuraCloudDatabaseUpdate(d *schema.ResourceData, meta interface{}) error {
+func resourceSakuraCloudDatabaseUpdate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client, zone, err := sakuraCloudClient(d, meta)
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
-	ctx, cancel := operationContext(d, schema.TimeoutUpdate)
-	defer cancel()
 
 	dbOp := sacloud.NewDatabaseOp(client)
 
 	db, err := dbOp.Read(ctx, zone, sakuraCloudID(d.Id()))
 	if err != nil {
-		return fmt.Errorf("could not read SakuraCloud Database[%s]: %s", d.Id(), err)
+		return diag.Errorf("could not read SakuraCloud Database[%s]: %s", d.Id(), err)
 	}
 
 	dbBuilder := expandDatabaseBuilder(d, client)
 	if _, err := dbBuilder.Update(ctx, zone, db.ID); err != nil {
-		return fmt.Errorf("updating SakuraCloud Database[%s] is failed: %s", d.Id(), err)
+		return diag.Errorf("updating SakuraCloud Database[%s] is failed: %s", d.Id(), err)
 	}
 
-	return resourceSakuraCloudDatabaseRead(d, meta)
+	return resourceSakuraCloudDatabaseRead(ctx, d, meta)
 }
 
-func resourceSakuraCloudDatabaseDelete(d *schema.ResourceData, meta interface{}) error {
+func resourceSakuraCloudDatabaseDelete(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client, zone, err := sakuraCloudClient(d, meta)
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
-	ctx, cancel := operationContext(d, schema.TimeoutDelete)
-	defer cancel()
 
 	dbOp := sacloud.NewDatabaseOp(client)
 
@@ -265,28 +258,28 @@ func resourceSakuraCloudDatabaseDelete(d *schema.ResourceData, meta interface{})
 			d.SetId("")
 			return nil
 		}
-		return fmt.Errorf("could not read SakuraCloud Database[%s]: %s", d.Id(), err)
+		return diag.Errorf("could not read SakuraCloud Database[%s]: %s", d.Id(), err)
 	}
 
 	if data.InstanceStatus.IsUp() {
 		if err := power.ShutdownDatabase(ctx, dbOp, zone, data.ID, true); err != nil {
-			return err
+			return diag.FromErr(err)
 		}
 	}
 
 	// delete
 	if err = dbOp.Delete(ctx, zone, data.ID); err != nil {
-		return fmt.Errorf("deleting SakuraCloud Database[%s] is failed: %s", d.Id(), err)
+		return diag.Errorf("deleting SakuraCloud Database[%s] is failed: %s", d.Id(), err)
 	}
 
 	d.SetId("")
 	return nil
 }
 
-func setDatabaseResourceData(ctx context.Context, d *schema.ResourceData, client *APIClient, data *sacloud.Database, zone string) error {
+func setDatabaseResourceData(ctx context.Context, d *schema.ResourceData, client *APIClient, data *sacloud.Database, zone string) diag.Diagnostics {
 	if data.Availability.IsFailed() {
 		d.SetId("")
-		return fmt.Errorf("got unexpected state: Database[%d].Availability is failed", data.ID)
+		return diag.Errorf("got unexpected state: Database[%d].Availability is failed", data.ID)
 	}
 
 	d.Set("database_type", flattenDatabaseType(data)) // nolint
@@ -295,17 +288,17 @@ func setDatabaseResourceData(ctx context.Context, d *schema.ResourceData, client
 		d.Set("replica_password", data.CommonSetting.ReplicaPassword) // nolint
 	}
 	if err := d.Set("backup", flattenDatabaseBackupSetting(data)); err != nil {
-		return err
+		return diag.FromErr(err)
 	}
 	if err := d.Set("tags", flattenDatabaseTags(data)); err != nil {
-		return err
+		return diag.FromErr(err)
 	}
 	d.Set("name", data.Name)                              // nolint
 	d.Set("username", data.CommonSetting.DefaultUser)     // nolint
 	d.Set("password", data.CommonSetting.UserPassword)    // nolint
 	d.Set("plan", types.DatabasePlanNameMap[data.PlanID]) // nolint
 	if err := d.Set("network_interface", flattenDatabaseNetworkInterface(data)); err != nil {
-		return err
+		return diag.FromErr(err)
 	}
 	d.Set("icon_id", data.IconID.String()) // nolint
 	d.Set("description", data.Description) // nolint
@@ -313,11 +306,11 @@ func setDatabaseResourceData(ctx context.Context, d *schema.ResourceData, client
 
 	parameters, err := sacloud.NewDatabaseOp(client).GetParameter(ctx, zone, data.ID)
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
 	parameterSettings := convertDatabaseParametersToStringKeyValues(parameters)
 	if err := d.Set("parameters", parameterSettings); err != nil {
-		return err
+		return diag.FromErr(err)
 	}
 
 	return nil

@@ -16,9 +16,9 @@ package sakuracloud
 
 import (
 	"context"
-	"fmt"
 	"time"
 
+	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
 	"github.com/sacloud/libsacloud/v2/sacloud"
@@ -28,12 +28,12 @@ import (
 func resourceSakuraCloudDNS() *schema.Resource {
 	resourceName := "DNS"
 	return &schema.Resource{
-		Create: resourceSakuraCloudDNSCreate,
-		Read:   resourceSakuraCloudDNSRead,
-		Update: resourceSakuraCloudDNSUpdate,
-		Delete: resourceSakuraCloudDNSDelete,
+		CreateContext: resourceSakuraCloudDNSCreate,
+		ReadContext:   resourceSakuraCloudDNSRead,
+		UpdateContext: resourceSakuraCloudDNSUpdate,
+		DeleteContext: resourceSakuraCloudDNSDelete,
 		Importer: &schema.ResourceImporter{
-			State: schema.ImportStatePassthrough,
+			StateContext: schema.ImportStatePassthroughContext,
 		},
 
 		Timeouts: &schema.ResourceTimeout{
@@ -111,46 +111,37 @@ func resourceSakuraCloudDNS() *schema.Resource {
 	}
 }
 
-func resourceSakuraCloudDNSCreate(d *schema.ResourceData, meta interface{}) error {
+func resourceSakuraCloudDNSCreate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*APIClient)
-	ctx, cancel := operationContext(d, schema.TimeoutCreate)
-	defer cancel()
 
 	dnsOp := sacloud.NewDNSOp(client)
-
 	dns, err := dnsOp.Create(ctx, expandDNSCreateRequest(d))
 	if err != nil {
-		return fmt.Errorf("creating SakuraCloud DNS is failed: %s", err)
+		return diag.Errorf("creating SakuraCloud DNS is failed: %s", err)
 	}
 
 	d.SetId(dns.ID.String())
-	return resourceSakuraCloudDNSRead(d, meta)
+	return resourceSakuraCloudDNSRead(ctx, d, meta)
 }
 
-func resourceSakuraCloudDNSRead(d *schema.ResourceData, meta interface{}) error {
+func resourceSakuraCloudDNSRead(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*APIClient)
-	ctx, cancel := operationContext(d, schema.TimeoutRead)
-	defer cancel()
 
 	dnsOp := sacloud.NewDNSOp(client)
-
 	dns, err := dnsOp.Read(ctx, sakuraCloudID(d.Id()))
 	if err != nil {
 		if sacloud.IsNotFoundError(err) {
 			d.SetId("")
 			return nil
 		}
-		return fmt.Errorf("could not read SakuraCloud DNS[%s]: %s", d.Id(), err)
+		return diag.Errorf("could not read SakuraCloud DNS[%s]: %s", d.Id(), err)
 	}
 
 	return setDNSResourceData(ctx, d, client, dns)
 }
 
-func resourceSakuraCloudDNSUpdate(d *schema.ResourceData, meta interface{}) error {
+func resourceSakuraCloudDNSUpdate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*APIClient)
-	ctx, cancel := operationContext(d, schema.TimeoutUpdate)
-	defer cancel()
-
 	dnsOp := sacloud.NewDNSOp(client)
 
 	sakuraMutexKV.Lock(d.Id())
@@ -158,20 +149,17 @@ func resourceSakuraCloudDNSUpdate(d *schema.ResourceData, meta interface{}) erro
 
 	dns, err := dnsOp.Read(ctx, sakuraCloudID(d.Id()))
 	if err != nil {
-		return fmt.Errorf("could not read SakuraCloud DNS[%s]: %s", d.Id(), err)
+		return diag.Errorf("could not read SakuraCloud DNS[%s]: %s", d.Id(), err)
 	}
 
 	if _, err := dnsOp.Update(ctx, dns.ID, expandDNSUpdateRequest(d, dns)); err != nil {
-		return fmt.Errorf("updating SakuraCloud DNS[%s] is failed: %s", d.Id(), err)
+		return diag.Errorf("updating SakuraCloud DNS[%s] is failed: %s", d.Id(), err)
 	}
-	return resourceSakuraCloudDNSRead(d, meta)
+	return resourceSakuraCloudDNSRead(ctx, d, meta)
 }
 
-func resourceSakuraCloudDNSDelete(d *schema.ResourceData, meta interface{}) error {
+func resourceSakuraCloudDNSDelete(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*APIClient)
-	ctx, cancel := operationContext(d, schema.TimeoutDelete)
-	defer cancel()
-
 	dnsOp := sacloud.NewDNSOp(client)
 
 	sakuraMutexKV.Lock(d.Id())
@@ -183,24 +171,24 @@ func resourceSakuraCloudDNSDelete(d *schema.ResourceData, meta interface{}) erro
 			d.SetId("")
 			return nil
 		}
-		return fmt.Errorf("could not read SakuraCloud DNS[%s]: %s", d.Id(), err)
+		return diag.Errorf("could not read SakuraCloud DNS[%s]: %s", d.Id(), err)
 	}
 
 	if err := dnsOp.Delete(ctx, dns.ID); err != nil {
-		return fmt.Errorf("deleting SakuraCloud DNS[%s] is failed: %s", d.Id(), err)
+		return diag.Errorf("deleting SakuraCloud DNS[%s] is failed: %s", d.Id(), err)
 	}
 	return nil
 }
 
-func setDNSResourceData(ctx context.Context, d *schema.ResourceData, client *APIClient, data *sacloud.DNS) error {
+func setDNSResourceData(ctx context.Context, d *schema.ResourceData, client *APIClient, data *sacloud.DNS) diag.Diagnostics {
 	d.Set("zone", data.Name)               // nolint
 	d.Set("icon_id", data.IconID.String()) // nolint
 	d.Set("description", data.Description) // nolint
 	if err := d.Set("dns_servers", data.DNSNameServers); err != nil {
-		return err
+		return diag.FromErr(err)
 	}
 	if err := d.Set("record", flattenDNSRecords(data)); err != nil {
-		return err
+		return diag.FromErr(err)
 	}
-	return d.Set("tags", flattenTags(data.Tags))
+	return diag.FromErr(d.Set("tags", flattenTags(data.Tags)))
 }

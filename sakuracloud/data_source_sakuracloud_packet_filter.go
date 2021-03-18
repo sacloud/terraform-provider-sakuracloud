@@ -15,8 +15,9 @@
 package sakuracloud
 
 import (
-	"fmt"
+	"context"
 
+	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/sacloud/libsacloud/v2/sacloud"
 	"github.com/sacloud/libsacloud/v2/sacloud/types"
@@ -25,7 +26,7 @@ import (
 func dataSourceSakuraCloudPacketFilter() *schema.Resource {
 	resourceName := "PacketFilter"
 	return &schema.Resource{
-		Read: dataSourceSakuraCloudPacketFilterRead,
+		ReadContext: dataSourceSakuraCloudPacketFilterRead,
 
 		Schema: map[string]*schema.Schema{
 			filterAttrName: filterSchema(&filterSchemaOption{excludeTags: true}),
@@ -73,13 +74,11 @@ func dataSourceSakuraCloudPacketFilter() *schema.Resource {
 	}
 }
 
-func dataSourceSakuraCloudPacketFilterRead(d *schema.ResourceData, meta interface{}) error {
+func dataSourceSakuraCloudPacketFilterRead(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client, zone, err := sakuraCloudClient(d, meta)
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
-	ctx, cancel := operationContext(d, schema.TimeoutRead)
-	defer cancel()
 
 	searcher := sacloud.NewPacketFilterOp(client)
 
@@ -90,7 +89,7 @@ func dataSourceSakuraCloudPacketFilterRead(d *schema.ResourceData, meta interfac
 
 	res, err := searcher.Find(ctx, zone, findCondition)
 	if err != nil {
-		return fmt.Errorf("could not find SakuraCloud PacketFilter resource: %s", err)
+		return diag.Errorf("could not find SakuraCloud PacketFilter resource: %s", err)
 	}
 	if res == nil || res.Count == 0 || len(res.PacketFilters) == 0 {
 		return filterNoResultErr()

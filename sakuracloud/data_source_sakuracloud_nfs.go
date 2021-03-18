@@ -15,8 +15,9 @@
 package sakuracloud
 
 import (
-	"fmt"
+	"context"
 
+	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/sacloud/libsacloud/v2/sacloud"
 	"github.com/sacloud/libsacloud/v2/sacloud/types"
@@ -25,7 +26,7 @@ import (
 func dataSourceSakuraCloudNFS() *schema.Resource {
 	resourceName := "NFS"
 	return &schema.Resource{
-		Read: dataSourceSakuraCloudNFSRead,
+		ReadContext: dataSourceSakuraCloudNFSRead,
 
 		Schema: map[string]*schema.Schema{
 			filterAttrName: filterSchema(&filterSchemaOption{}),
@@ -52,13 +53,11 @@ func dataSourceSakuraCloudNFS() *schema.Resource {
 	}
 }
 
-func dataSourceSakuraCloudNFSRead(d *schema.ResourceData, meta interface{}) error {
+func dataSourceSakuraCloudNFSRead(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client, zone, err := sakuraCloudClient(d, meta)
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
-	ctx, cancel := operationContext(d, schema.TimeoutRead)
-	defer cancel()
 
 	searcher := sacloud.NewNFSOp(client)
 
@@ -69,7 +68,7 @@ func dataSourceSakuraCloudNFSRead(d *schema.ResourceData, meta interface{}) erro
 
 	res, err := searcher.Find(ctx, zone, findCondition)
 	if err != nil {
-		return fmt.Errorf("could not find SakuraCloud NFS resource: %s", err)
+		return diag.Errorf("could not find SakuraCloud NFS resource: %s", err)
 	}
 	if res == nil || res.Count == 0 || len(res.NFS) == 0 {
 		return filterNoResultErr()

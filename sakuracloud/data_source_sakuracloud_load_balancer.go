@@ -15,8 +15,9 @@
 package sakuracloud
 
 import (
-	"fmt"
+	"context"
 
+	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/sacloud/libsacloud/v2/sacloud"
 	"github.com/sacloud/libsacloud/v2/sacloud/types"
@@ -25,7 +26,7 @@ import (
 func dataSourceSakuraCloudLoadBalancer() *schema.Resource {
 	resourceName := "LoadBalancer"
 	return &schema.Resource{
-		Read: dataSourceSakuraCloudLoadBalancerRead,
+		ReadContext: dataSourceSakuraCloudLoadBalancerRead,
 
 		Schema: map[string]*schema.Schema{
 			filterAttrName: filterSchema(&filterSchemaOption{}),
@@ -121,13 +122,11 @@ func dataSourceSakuraCloudLoadBalancer() *schema.Resource {
 	}
 }
 
-func dataSourceSakuraCloudLoadBalancerRead(d *schema.ResourceData, meta interface{}) error {
+func dataSourceSakuraCloudLoadBalancerRead(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client, zone, err := sakuraCloudClient(d, meta)
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
-	ctx, cancel := operationContext(d, schema.TimeoutRead)
-	defer cancel()
 
 	searcher := sacloud.NewLoadBalancerOp(client)
 
@@ -138,7 +137,7 @@ func dataSourceSakuraCloudLoadBalancerRead(d *schema.ResourceData, meta interfac
 
 	res, err := searcher.Find(ctx, zone, findCondition)
 	if err != nil {
-		return fmt.Errorf("could not find SakuraCloud LoadBalancer resource: %s", err)
+		return diag.Errorf("could not find SakuraCloud LoadBalancer resource: %s", err)
 	}
 	if res == nil || res.Count == 0 || len(res.LoadBalancers) == 0 {
 		return filterNoResultErr()

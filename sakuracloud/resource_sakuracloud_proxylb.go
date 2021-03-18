@@ -16,9 +16,9 @@ package sakuracloud
 
 import (
 	"context"
-	"fmt"
 	"time"
 
+	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
 	"github.com/sacloud/libsacloud/v2/sacloud"
@@ -29,12 +29,12 @@ func resourceSakuraCloudProxyLB() *schema.Resource {
 	resourceName := "ProxyLB"
 
 	return &schema.Resource{
-		Create: resourceSakuraCloudProxyLBCreate,
-		Read:   resourceSakuraCloudProxyLBRead,
-		Update: resourceSakuraCloudProxyLBUpdate,
-		Delete: resourceSakuraCloudProxyLBDelete,
+		CreateContext: resourceSakuraCloudProxyLBCreate,
+		ReadContext:   resourceSakuraCloudProxyLBRead,
+		UpdateContext: resourceSakuraCloudProxyLBUpdate,
+		DeleteContext: resourceSakuraCloudProxyLBDelete,
 		Importer: &schema.ResourceImporter{
-			State: schema.ImportStatePassthrough,
+			StateContext: schema.ImportStatePassthroughContext,
 		},
 
 		Timeouts: &schema.ResourceTimeout{
@@ -327,19 +327,16 @@ func resourceSakuraCloudProxyLB() *schema.Resource {
 	}
 }
 
-func resourceSakuraCloudProxyLBCreate(d *schema.ResourceData, meta interface{}) error {
+func resourceSakuraCloudProxyLBCreate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client, _, err := sakuraCloudClient(d, meta)
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
-	ctx, cancel := operationContext(d, schema.TimeoutCreate)
-	defer cancel()
 
 	proxyLBOp := sacloud.NewProxyLBOp(client)
-
 	proxyLB, err := proxyLBOp.Create(ctx, expandProxyLBCreateRequest(d))
 	if err != nil {
-		return fmt.Errorf("creating SakuraCloud ProxyLB is failed: %s", err)
+		return diag.Errorf("creating SakuraCloud ProxyLB is failed: %s", err)
 	}
 
 	certs := expandProxyLBCerts(d)
@@ -349,43 +346,38 @@ func resourceSakuraCloudProxyLBCreate(d *schema.ResourceData, meta interface{}) 
 			AdditionalCerts: certs.AdditionalCerts,
 		})
 		if err != nil {
-			return fmt.Errorf("setting Certificates to ProxyLB[%s] is failed: %s", proxyLB.ID, err)
+			return diag.Errorf("setting Certificates to ProxyLB[%s] is failed: %s", proxyLB.ID, err)
 		}
 	}
 
 	d.SetId(proxyLB.ID.String())
-	return resourceSakuraCloudProxyLBRead(d, meta)
+	return resourceSakuraCloudProxyLBRead(ctx, d, meta)
 }
 
-func resourceSakuraCloudProxyLBRead(d *schema.ResourceData, meta interface{}) error {
+func resourceSakuraCloudProxyLBRead(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client, _, err := sakuraCloudClient(d, meta)
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
-	ctx, cancel := operationContext(d, schema.TimeoutRead)
-	defer cancel()
 
 	proxyLBOp := sacloud.NewProxyLBOp(client)
-
 	proxyLB, err := proxyLBOp.Read(ctx, sakuraCloudID(d.Id()))
 	if err != nil {
 		if sacloud.IsNotFoundError(err) {
 			d.SetId("")
 			return nil
 		}
-		return fmt.Errorf("could not read SakuraCloud ProxyLB[%s]: %s", d.Id(), err)
+		return diag.Errorf("could not read SakuraCloud ProxyLB[%s]: %s", d.Id(), err)
 	}
 
 	return setProxyLBResourceData(ctx, d, client, proxyLB)
 }
 
-func resourceSakuraCloudProxyLBUpdate(d *schema.ResourceData, meta interface{}) error {
+func resourceSakuraCloudProxyLBUpdate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client, _, err := sakuraCloudClient(d, meta)
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
-	ctx, cancel := operationContext(d, schema.TimeoutUpdate)
-	defer cancel()
 
 	proxyLBOp := sacloud.NewProxyLBOp(client)
 
@@ -394,12 +386,12 @@ func resourceSakuraCloudProxyLBUpdate(d *schema.ResourceData, meta interface{}) 
 
 	proxyLB, err := proxyLBOp.Read(ctx, sakuraCloudID(d.Id()))
 	if err != nil {
-		return fmt.Errorf("could not read SakuraCloud ProxyLB[%s]: %s", d.Id(), err)
+		return diag.Errorf("could not read SakuraCloud ProxyLB[%s]: %s", d.Id(), err)
 	}
 
 	proxyLB, err = proxyLBOp.Update(ctx, proxyLB.ID, expandProxyLBUpdateRequest(d))
 	if err != nil {
-		return fmt.Errorf("updating SakuraCloud ProxyLB[%s] is failed: %s", d.Id(), err)
+		return diag.Errorf("updating SakuraCloud ProxyLB[%s] is failed: %s", d.Id(), err)
 	}
 
 	if d.HasChange("plan") {
@@ -407,7 +399,7 @@ func resourceSakuraCloudProxyLBUpdate(d *schema.ResourceData, meta interface{}) 
 		serviceClass := types.ProxyLBServiceClass(newPlan, proxyLB.Region)
 		upd, err := proxyLBOp.ChangePlan(ctx, proxyLB.ID, &sacloud.ProxyLBChangePlanRequest{ServiceClass: serviceClass})
 		if err != nil {
-			return fmt.Errorf("changing ProxyLB[%s] plan is failed: %s", d.Id(), err)
+			return diag.Errorf("changing ProxyLB[%s] plan is failed: %s", d.Id(), err)
 		}
 
 		// update ID
@@ -419,27 +411,25 @@ func resourceSakuraCloudProxyLBUpdate(d *schema.ResourceData, meta interface{}) 
 		certs := expandProxyLBCerts(d)
 		if certs == nil {
 			if err := proxyLBOp.DeleteCertificates(ctx, proxyLB.ID); err != nil {
-				return fmt.Errorf("deleting Certificates of ProxyLB[%s] is failed: %s", d.Id(), err)
+				return diag.Errorf("deleting Certificates of ProxyLB[%s] is failed: %s", d.Id(), err)
 			}
 		} else {
 			if _, err := proxyLBOp.SetCertificates(ctx, proxyLB.ID, &sacloud.ProxyLBSetCertificatesRequest{
 				PrimaryCerts:    certs.PrimaryCert,
 				AdditionalCerts: certs.AdditionalCerts,
 			}); err != nil {
-				return fmt.Errorf("setting Certificates to ProxyLB[%s] is failed: %s", d.Id(), err)
+				return diag.Errorf("setting Certificates to ProxyLB[%s] is failed: %s", d.Id(), err)
 			}
 		}
 	}
-	return resourceSakuraCloudProxyLBRead(d, meta)
+	return resourceSakuraCloudProxyLBRead(ctx, d, meta)
 }
 
-func resourceSakuraCloudProxyLBDelete(d *schema.ResourceData, meta interface{}) error {
+func resourceSakuraCloudProxyLBDelete(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client, _, err := sakuraCloudClient(d, meta)
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
-	ctx, cancel := operationContext(d, schema.TimeoutDelete)
-	defer cancel()
 
 	proxyLBOp := sacloud.NewProxyLBOp(client)
 
@@ -452,27 +442,27 @@ func resourceSakuraCloudProxyLBDelete(d *schema.ResourceData, meta interface{}) 
 			d.SetId("")
 			return nil
 		}
-		return fmt.Errorf("could not read SakuraCloud ProxyLB[%s]: %s", d.Id(), err)
+		return diag.Errorf("could not read SakuraCloud ProxyLB[%s]: %s", d.Id(), err)
 	}
 
 	if err := proxyLBOp.Delete(ctx, proxyLB.ID); err != nil {
-		return fmt.Errorf("deleting ProxyLB[%s] is failed: %s", d.Id(), err)
+		return diag.Errorf("deleting ProxyLB[%s] is failed: %s", d.Id(), err)
 	}
 	return nil
 }
 
-func setProxyLBResourceData(ctx context.Context, d *schema.ResourceData, client *APIClient, data *sacloud.ProxyLB) error {
+func setProxyLBResourceData(ctx context.Context, d *schema.ResourceData, client *APIClient, data *sacloud.ProxyLB) diag.Diagnostics {
 	// certificates
 	proxyLBOp := sacloud.NewProxyLBOp(client)
 
 	certs, err := proxyLBOp.GetCertificates(ctx, data.ID)
 	if err != nil {
 		// even if certificate is deleted, it will not result in an error
-		return err
+		return diag.FromErr(err)
 	}
 	health, err := proxyLBOp.HealthStatus(ctx, data.ID)
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
 
 	d.Set("name", data.Name)                                   // nolint
@@ -484,27 +474,27 @@ func setProxyLBResourceData(ctx context.Context, d *schema.ResourceData, client 
 	d.Set("fqdn", data.FQDN)                                   // nolint
 	d.Set("vip", health.CurrentVIP)                            // nolint
 	if err := d.Set("proxy_networks", data.ProxyNetworks); err != nil {
-		return err
+		return diag.FromErr(err)
 	}
 	d.Set("icon_id", data.IconID.String()) // nolint
 	d.Set("description", data.Description) // nolint
 	if err := d.Set("bind_port", flattenProxyLBBindPorts(data)); err != nil {
-		return err
+		return diag.FromErr(err)
 	}
 	if err := d.Set("health_check", flattenProxyLBHealthCheck(data)); err != nil {
-		return err
+		return diag.FromErr(err)
 	}
 	if err := d.Set("sorry_server", flattenProxyLBSorryServer(data)); err != nil {
-		return err
+		return diag.FromErr(err)
 	}
 	if err := d.Set("server", flattenProxyLBServers(data)); err != nil {
-		return err
+		return diag.FromErr(err)
 	}
 	if err := d.Set("rule", flattenProxyLBRules(data)); err != nil {
-		return err
+		return diag.FromErr(err)
 	}
 	if err := d.Set("certificate", flattenProxyLBCerts(certs)); err != nil {
-		return err
+		return diag.FromErr(err)
 	}
-	return d.Set("tags", flattenTags(data.Tags))
+	return diag.FromErr(d.Set("tags", flattenTags(data.Tags)))
 }

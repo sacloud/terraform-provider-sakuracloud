@@ -15,7 +15,10 @@
 package sakuracloud
 
 import (
+	"context"
+
 	"github.com/hashicorp/terraform-plugin-sdk/helper/mutexkv"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
 	"github.com/sacloud/libsacloud/v2/sacloud"
@@ -209,7 +212,7 @@ func Provider() *schema.Provider {
 		},
 	}
 
-	provider.ConfigureFunc = func(d *schema.ResourceData) (interface{}, error) {
+	provider.ConfigureContextFunc = func(ctx context.Context, d *schema.ResourceData) (interface{}, diag.Diagnostics) {
 		terraformVersion := provider.TerraformVersion
 		if terraformVersion == "" {
 			// Terraform 0.12 introduced this field to the protocol
@@ -222,7 +225,7 @@ func Provider() *schema.Provider {
 	return provider
 }
 
-func providerConfigure(d *schema.ResourceData, terraformVersion string) (interface{}, error) {
+func providerConfigure(d *schema.ResourceData, terraformVersion string) (interface{}, diag.Diagnostics) {
 	config := Config{
 		Profile:             d.Get("profile").(string),
 		AccessToken:         d.Get("token").(string),
@@ -242,7 +245,8 @@ func providerConfigure(d *schema.ResourceData, terraformVersion string) (interfa
 		terraformVersion:    terraformVersion,
 	}
 
-	return config.NewClient()
+	client, err := config.NewClient()
+	return client, diag.FromErr(err)
 }
 
 var sakuraMutexKV = mutexkv.NewMutexKV()

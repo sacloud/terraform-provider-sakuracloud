@@ -17,9 +17,9 @@ package sakuracloud
 import (
 	"context"
 	"errors"
-	"fmt"
 	"time"
 
+	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
 	"github.com/sacloud/libsacloud/v2/helper/power"
@@ -32,12 +32,12 @@ import (
 func resourceSakuraCloudNFS() *schema.Resource {
 	resourceName := "NFS"
 	return &schema.Resource{
-		Create: resourceSakuraCloudNFSCreate,
-		Read:   resourceSakuraCloudNFSRead,
-		Update: resourceSakuraCloudNFSUpdate,
-		Delete: resourceSakuraCloudNFSDelete,
+		CreateContext: resourceSakuraCloudNFSCreate,
+		ReadContext:   resourceSakuraCloudNFSRead,
+		UpdateContext: resourceSakuraCloudNFSUpdate,
+		DeleteContext: resourceSakuraCloudNFSDelete,
 		Importer: &schema.ResourceImporter{
-			State: schema.ImportStatePassthrough,
+			StateContext: schema.ImportStatePassthroughContext,
 		},
 
 		Timeouts: &schema.ResourceTimeout{
@@ -92,19 +92,16 @@ func resourceSakuraCloudNFS() *schema.Resource {
 	}
 }
 
-func resourceSakuraCloudNFSCreate(d *schema.ResourceData, meta interface{}) error {
+func resourceSakuraCloudNFSCreate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client, zone, err := sakuraCloudClient(d, meta)
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
-	ctx, cancel := operationContext(d, schema.TimeoutCreate)
-	defer cancel()
 
 	nfsOp := sacloud.NewNFSOp(client)
-
 	planID, err := expandNFSDiskPlanID(ctx, client, d)
 	if err != nil {
-		return fmt.Errorf("finding NFS plans is failed: %s", err)
+		return diag.Errorf("finding NFS plans is failed: %s", err)
 	}
 
 	builder := &setup.RetryableSetup{
@@ -124,111 +121,102 @@ func resourceSakuraCloudNFSCreate(d *schema.ResourceData, meta interface{}) erro
 
 	res, err := builder.Setup(ctx, zone)
 	if err != nil {
-		return fmt.Errorf("creating SakuraCloud NFS is failed: %s", err)
+		return diag.Errorf("creating SakuraCloud NFS is failed: %s", err)
 	}
 
 	nfs, ok := res.(*sacloud.NFS)
 	if !ok {
-		return errors.New("creating SakuraCloud NFS is failed: created resource is not *sacloud.NFS")
+		return diag.FromErr(errors.New("creating SakuraCloud NFS is failed: created resource is not *sacloud.NFS"))
 	}
 
 	d.SetId(nfs.ID.String())
-	return resourceSakuraCloudNFSRead(d, meta)
+	return resourceSakuraCloudNFSRead(ctx, d, meta)
 }
 
-func resourceSakuraCloudNFSRead(d *schema.ResourceData, meta interface{}) error {
+func resourceSakuraCloudNFSRead(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client, zone, err := sakuraCloudClient(d, meta)
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
-	ctx, cancel := operationContext(d, schema.TimeoutRead)
-	defer cancel()
 
 	nfsOp := sacloud.NewNFSOp(client)
-
 	nfs, err := nfsOp.Read(ctx, zone, sakuraCloudID(d.Id()))
 	if err != nil {
 		if sacloud.IsNotFoundError(err) {
 			d.SetId("")
 			return nil
 		}
-		return fmt.Errorf("could not read SakuraCloud NFS[%s]: %s", d.Id(), err)
+		return diag.Errorf("could not read SakuraCloud NFS[%s]: %s", d.Id(), err)
 	}
 
 	return setNFSResourceData(ctx, d, client, nfs)
 }
 
-func resourceSakuraCloudNFSUpdate(d *schema.ResourceData, meta interface{}) error {
+func resourceSakuraCloudNFSUpdate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client, zone, err := sakuraCloudClient(d, meta)
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
-	ctx, cancel := operationContext(d, schema.TimeoutUpdate)
-	defer cancel()
 
 	nfsOp := sacloud.NewNFSOp(client)
-
 	nfs, err := nfsOp.Read(ctx, zone, sakuraCloudID(d.Id()))
 	if err != nil {
-		return fmt.Errorf("could not read SakuraCloud NFS[%s]: %s", d.Id(), err)
+		return diag.Errorf("could not read SakuraCloud NFS[%s]: %s", d.Id(), err)
 	}
 
 	_, err = nfsOp.Update(ctx, zone, nfs.ID, expandNFSUpdateRequest(d))
 	if err != nil {
-		return fmt.Errorf("updating SakuraCloud NFS[%s] is failed: %s", d.Id(), err)
+		return diag.Errorf("updating SakuraCloud NFS[%s] is failed: %s", d.Id(), err)
 	}
 
-	return resourceSakuraCloudNFSRead(d, meta)
+	return resourceSakuraCloudNFSRead(ctx, d, meta)
 }
 
-func resourceSakuraCloudNFSDelete(d *schema.ResourceData, meta interface{}) error {
+func resourceSakuraCloudNFSDelete(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client, zone, err := sakuraCloudClient(d, meta)
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
-	ctx, cancel := operationContext(d, schema.TimeoutDelete)
-	defer cancel()
 
 	nfsOp := sacloud.NewNFSOp(client)
-
 	nfs, err := nfsOp.Read(ctx, zone, sakuraCloudID(d.Id()))
 	if err != nil {
 		if sacloud.IsNotFoundError(err) {
 			d.SetId("")
 			return nil
 		}
-		return fmt.Errorf("could not read SakuraCloud NFS[%s]: %s", d.Id(), err)
+		return diag.Errorf("could not read SakuraCloud NFS[%s]: %s", d.Id(), err)
 	}
 
 	if err := power.ShutdownNFS(ctx, nfsOp, zone, nfs.ID, true); err != nil {
-		return err
+		return diag.FromErr(err)
 	}
 
 	if err := nfsOp.Delete(ctx, zone, nfs.ID); err != nil {
-		return fmt.Errorf("deleting SakuraCloud NFS[%s] is failed: %s", d.Id(), err)
+		return diag.Errorf("deleting SakuraCloud NFS[%s] is failed: %s", d.Id(), err)
 	}
 
 	return nil
 }
 
-func setNFSResourceData(ctx context.Context, d *schema.ResourceData, client *APIClient, data *sacloud.NFS) error {
+func setNFSResourceData(ctx context.Context, d *schema.ResourceData, client *APIClient, data *sacloud.NFS) diag.Diagnostics {
 	if data.Availability.IsFailed() {
 		d.SetId("")
-		return fmt.Errorf("got unexpected state: NFS[%d].Availability is failed", data.ID)
+		return diag.Errorf("got unexpected state: NFS[%d].Availability is failed", data.ID)
 	}
 
 	plan, size, err := flattenNFSDiskPlan(ctx, client, data.PlanID)
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
 	d.Set("plan", plan) // nolint
 	d.Set("size", size) // nolint
 	if err := d.Set("network_interface", flattenNFSNetworkInterface(data)); err != nil {
-		return err
+		return diag.FromErr(err)
 	}
 	d.Set("name", data.Name)               // nolint
 	d.Set("icon_id", data.IconID.String()) // nolint
 	d.Set("description", data.Description) // nolint
 	d.Set("zone", getZone(d, client))      // nolint
-	return d.Set("tags", flattenTags(data.Tags))
+	return diag.FromErr(d.Set("tags", flattenTags(data.Tags)))
 }

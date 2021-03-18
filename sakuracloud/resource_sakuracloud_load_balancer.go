@@ -16,9 +16,9 @@ package sakuracloud
 
 import (
 	"context"
-	"fmt"
 	"time"
 
+	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
 	"github.com/sacloud/libsacloud/v2/helper/power"
@@ -32,12 +32,12 @@ func resourceSakuraCloudLoadBalancer() *schema.Resource {
 	resourceName := "LoadBalancer"
 
 	return &schema.Resource{
-		Create: resourceSakuraCloudLoadBalancerCreate,
-		Read:   resourceSakuraCloudLoadBalancerRead,
-		Update: resourceSakuraCloudLoadBalancerUpdate,
-		Delete: resourceSakuraCloudLoadBalancerDelete,
+		CreateContext: resourceSakuraCloudLoadBalancerCreate,
+		ReadContext:   resourceSakuraCloudLoadBalancerRead,
+		UpdateContext: resourceSakuraCloudLoadBalancerUpdate,
+		DeleteContext: resourceSakuraCloudLoadBalancerDelete,
 		Importer: &schema.ResourceImporter{
-			State: schema.ImportStatePassthrough,
+			StateContext: schema.ImportStatePassthroughContext,
 		},
 
 		Timeouts: &schema.ResourceTimeout{
@@ -177,13 +177,11 @@ func resourceSakuraCloudLoadBalancer() *schema.Resource {
 	}
 }
 
-func resourceSakuraCloudLoadBalancerCreate(d *schema.ResourceData, meta interface{}) error {
+func resourceSakuraCloudLoadBalancerCreate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client, zone, err := sakuraCloudClient(d, meta)
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
-	ctx, cancel := operationContext(d, schema.TimeoutCreate)
-	defer cancel()
 
 	lbOp := sacloud.NewLoadBalancerOp(client)
 
@@ -206,24 +204,22 @@ func resourceSakuraCloudLoadBalancerCreate(d *schema.ResourceData, meta interfac
 	}
 	res, err := builder.Setup(ctx, zone)
 	if err != nil {
-		return fmt.Errorf("creating SakuraCloud LoadBalancer is failed: %s", err)
+		return diag.Errorf("creating SakuraCloud LoadBalancer is failed: %s", err)
 	}
 
 	lb, ok := res.(*sacloud.LoadBalancer)
 	if !ok {
-		return fmt.Errorf("creating SakuraCloud LoadBalancer is failed: created resource is not *sacloud.LoadBalancer")
+		return diag.Errorf("creating SakuraCloud LoadBalancer is failed: created resource is not *sacloud.LoadBalancer")
 	}
 	d.SetId(lb.ID.String())
-	return resourceSakuraCloudLoadBalancerRead(d, meta)
+	return resourceSakuraCloudLoadBalancerRead(ctx, d, meta)
 }
 
-func resourceSakuraCloudLoadBalancerRead(d *schema.ResourceData, meta interface{}) error {
+func resourceSakuraCloudLoadBalancerRead(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client, zone, err := sakuraCloudClient(d, meta)
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
-	ctx, cancel := operationContext(d, schema.TimeoutRead)
-	defer cancel()
 
 	lbOp := sacloud.NewLoadBalancerOp(client)
 
@@ -233,43 +229,39 @@ func resourceSakuraCloudLoadBalancerRead(d *schema.ResourceData, meta interface{
 			d.SetId("")
 			return nil
 		}
-		return fmt.Errorf("could not read SakuraCloud LoadBalancer[%s]: %s", d.Id(), err)
+		return diag.Errorf("could not read SakuraCloud LoadBalancer[%s]: %s", d.Id(), err)
 	}
 	return setLoadBalancerResourceData(ctx, d, client, lb)
 }
 
-func resourceSakuraCloudLoadBalancerUpdate(d *schema.ResourceData, meta interface{}) error {
+func resourceSakuraCloudLoadBalancerUpdate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client, zone, err := sakuraCloudClient(d, meta)
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
-	ctx, cancel := operationContext(d, schema.TimeoutUpdate)
-	defer cancel()
 
 	lbOp := sacloud.NewLoadBalancerOp(client)
 
 	lb, err := lbOp.Read(ctx, zone, sakuraCloudID(d.Id()))
 	if err != nil {
-		return fmt.Errorf("could not read SakuraCloud LoadBalancer[%s]: %s", d.Id(), err)
+		return diag.Errorf("could not read SakuraCloud LoadBalancer[%s]: %s", d.Id(), err)
 	}
 
 	if _, err := lbOp.Update(ctx, zone, lb.ID, expandLoadBalancerUpdateRequest(d, lb)); err != nil {
-		return fmt.Errorf("updating SakuraCloud LoadBalancer[%s] is failed: %s", d.Id(), err)
+		return diag.Errorf("updating SakuraCloud LoadBalancer[%s] is failed: %s", d.Id(), err)
 	}
 	if err := lbOp.Config(ctx, zone, lb.ID); err != nil {
-		return fmt.Errorf("updating SakuraCloud LoadBalancer[%s] is failed: %s", d.Id(), err)
+		return diag.Errorf("updating SakuraCloud LoadBalancer[%s] is failed: %s", d.Id(), err)
 	}
 
-	return resourceSakuraCloudLoadBalancerRead(d, meta)
+	return resourceSakuraCloudLoadBalancerRead(ctx, d, meta)
 }
 
-func resourceSakuraCloudLoadBalancerDelete(d *schema.ResourceData, meta interface{}) error {
+func resourceSakuraCloudLoadBalancerDelete(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client, zone, err := sakuraCloudClient(d, meta)
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
-	ctx, cancel := operationContext(d, schema.TimeoutDelete)
-	defer cancel()
 
 	lbOp := sacloud.NewLoadBalancerOp(client)
 
@@ -279,28 +271,28 @@ func resourceSakuraCloudLoadBalancerDelete(d *schema.ResourceData, meta interfac
 			d.SetId("")
 			return nil
 		}
-		return fmt.Errorf("could not read SakuraCloud LoadBalancer[%s]: %s", d.Id(), err)
+		return diag.Errorf("could not read SakuraCloud LoadBalancer[%s]: %s", d.Id(), err)
 	}
 
 	if err := power.ShutdownLoadBalancer(ctx, lbOp, zone, lb.ID, true); err != nil {
-		return err
+		return diag.FromErr(err)
 	}
 
 	if err := lbOp.Delete(ctx, zone, lb.ID); err != nil {
-		return fmt.Errorf("deleting SakuraCloud LoadBalancer[%s] is failed: %s", d.Id(), err)
+		return diag.Errorf("deleting SakuraCloud LoadBalancer[%s] is failed: %s", d.Id(), err)
 	}
 
 	return nil
 }
 
-func setLoadBalancerResourceData(ctx context.Context, d *schema.ResourceData, client *APIClient, data *sacloud.LoadBalancer) error {
+func setLoadBalancerResourceData(ctx context.Context, d *schema.ResourceData, client *APIClient, data *sacloud.LoadBalancer) diag.Diagnostics {
 	if data.Availability.IsFailed() {
 		d.SetId("")
-		return fmt.Errorf("got unexpected state: LoadBalancer[%d].Availability is failed", data.ID)
+		return diag.Errorf("got unexpected state: LoadBalancer[%d].Availability is failed", data.ID)
 	}
 
 	if err := d.Set("network_interface", flattenLoadBalancerNetworkInterface(data)); err != nil {
-		return err
+		return diag.FromErr(err)
 	}
 	d.Set("plan", flattenLoadBalancerPlanID(data)) // nolint
 	d.Set("name", data.Name)                       // nolint
@@ -308,8 +300,8 @@ func setLoadBalancerResourceData(ctx context.Context, d *schema.ResourceData, cl
 	d.Set("description", data.Description)         // nolint
 	d.Set("zone", getZone(d, client))              // nolint
 	if err := d.Set("vip", flattenLoadBalancerVIPs(data)); err != nil {
-		return err
+		return diag.FromErr(err)
 	}
 
-	return d.Set("tags", flattenTags(data.Tags))
+	return diag.FromErr(d.Set("tags", flattenTags(data.Tags)))
 }

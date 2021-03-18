@@ -16,7 +16,6 @@ package sakuracloud
 
 import (
 	"bytes"
-	"context"
 	"crypto/md5"
 	"encoding/base64"
 	"encoding/hex"
@@ -156,10 +155,6 @@ func getZone(d resourceValueGettable, client *APIClient) string {
 		}
 	}
 	return client.defaultZone
-}
-
-func operationContext(d *schema.ResourceData, opKey string) (context.Context, context.CancelFunc) {
-	return context.WithTimeout(context.Background(), d.Timeout(opKey))
 }
 
 func sakuraCloudID(id string) types.ID {

@@ -15,8 +15,9 @@
 package sakuracloud
 
 import (
-	"fmt"
+	"context"
 
+	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/sacloud/libsacloud/v2/sacloud"
 )
@@ -24,7 +25,7 @@ import (
 func dataSourceSakuraCloudIcon() *schema.Resource {
 	resourceName := "Icon"
 	return &schema.Resource{
-		Read: dataSourceSakuraCloudIconRead,
+		ReadContext: dataSourceSakuraCloudIconRead,
 
 		Schema: map[string]*schema.Schema{
 			filterAttrName: filterSchema(&filterSchemaOption{}),
@@ -39,13 +40,11 @@ func dataSourceSakuraCloudIcon() *schema.Resource {
 	}
 }
 
-func dataSourceSakuraCloudIconRead(d *schema.ResourceData, meta interface{}) error {
+func dataSourceSakuraCloudIconRead(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client, _, err := sakuraCloudClient(d, meta)
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
-	ctx, cancel := operationContext(d, schema.TimeoutRead)
-	defer cancel()
 
 	searcher := sacloud.NewIconOp(client)
 
@@ -56,7 +55,7 @@ func dataSourceSakuraCloudIconRead(d *schema.ResourceData, meta interface{}) err
 
 	res, err := searcher.Find(ctx, findCondition)
 	if err != nil {
-		return fmt.Errorf("could not find SakuraCloud Icon resource: %s", err)
+		return diag.Errorf("could not find SakuraCloud Icon resource: %s", err)
 	}
 	if res == nil || res.Count == 0 || len(res.Icons) == 0 {
 		return filterNoResultErr()

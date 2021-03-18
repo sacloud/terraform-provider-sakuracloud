@@ -15,25 +15,25 @@
 package sakuracloud
 
 import (
-	"fmt"
+	"context"
 	"time"
 
-	"github.com/sacloud/libsacloud/v2/sacloud/types"
-
+	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
 	"github.com/sacloud/libsacloud/v2/sacloud"
+	"github.com/sacloud/libsacloud/v2/sacloud/types"
 )
 
 func resourceSakuraCloudAutoBackup() *schema.Resource {
 	resourceName := "AutoBackup"
 	return &schema.Resource{
-		Create: resourceSakuraCloudAutoBackupCreate,
-		Read:   resourceSakuraCloudAutoBackupRead,
-		Update: resourceSakuraCloudAutoBackupUpdate,
-		Delete: resourceSakuraCloudAutoBackupDelete,
+		CreateContext: resourceSakuraCloudAutoBackupCreate,
+		ReadContext:   resourceSakuraCloudAutoBackupRead,
+		UpdateContext: resourceSakuraCloudAutoBackupUpdate,
+		DeleteContext: resourceSakuraCloudAutoBackupDelete,
 		Importer: &schema.ResourceImporter{
-			State: schema.ImportStatePassthrough,
+			StateContext: schema.ImportStatePassthroughContext,
 		},
 
 		Timeouts: &schema.ResourceTimeout{
@@ -76,104 +76,94 @@ func resourceSakuraCloudAutoBackup() *schema.Resource {
 	}
 }
 
-func resourceSakuraCloudAutoBackupCreate(d *schema.ResourceData, meta interface{}) error {
+func resourceSakuraCloudAutoBackupCreate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client, zone, err := sakuraCloudClient(d, meta)
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
-	ctx, cancel := operationContext(d, schema.TimeoutCreate)
-	defer cancel()
 
 	autoBackupOp := sacloud.NewAutoBackupOp(client)
 
 	if err := validateBackupWeekdays(d, "weekdays"); err != nil {
-		return err
+		return diag.FromErr(err)
 	}
 
 	autoBackup, err := autoBackupOp.Create(ctx, zone, expandAutoBackupCreateRequest(d))
 	if err != nil {
-		return fmt.Errorf("creating SakuraCloud AutoBackup is failed: %s", err)
+		return diag.Errorf("creating SakuraCloud AutoBackup is failed: %s", err)
 	}
 
 	d.SetId(autoBackup.ID.String())
-	return resourceSakuraCloudAutoBackupRead(d, meta)
+	return resourceSakuraCloudAutoBackupRead(ctx, d, meta)
 }
 
-func resourceSakuraCloudAutoBackupRead(d *schema.ResourceData, meta interface{}) error {
+func resourceSakuraCloudAutoBackupRead(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client, zone, err := sakuraCloudClient(d, meta)
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
-	ctx, cancel := operationContext(d, schema.TimeoutRead)
-	defer cancel()
 
 	autoBackupOp := sacloud.NewAutoBackupOp(client)
-
 	autoBackup, err := autoBackupOp.Read(ctx, zone, sakuraCloudID(d.Id()))
 	if err != nil {
 		if sacloud.IsNotFoundError(err) {
 			d.SetId("")
 			return nil
 		}
-		return fmt.Errorf("could not find SakuraCloud AutoBackup[%s]: %s", d.Id(), err)
+		return diag.Errorf("could not find SakuraCloud AutoBackup[%s]: %s", d.Id(), err)
 	}
 	return setAutoBackupResourceData(d, client, autoBackup)
 }
 
-func resourceSakuraCloudAutoBackupUpdate(d *schema.ResourceData, meta interface{}) error {
+func resourceSakuraCloudAutoBackupUpdate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client, zone, err := sakuraCloudClient(d, meta)
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
-	ctx, cancel := operationContext(d, schema.TimeoutUpdate)
-	defer cancel()
 
 	autoBackupOp := sacloud.NewAutoBackupOp(client)
 
 	autoBackup, err := autoBackupOp.Read(ctx, zone, sakuraCloudID(d.Id()))
 	if err != nil {
-		return fmt.Errorf("could not read SakuraCloud AutoBackup[%s]: %s", d.Id(), err)
+		return diag.Errorf("could not read SakuraCloud AutoBackup[%s]: %s", d.Id(), err)
 	}
 
 	if err := validateBackupWeekdays(d, "weekdays"); err != nil {
-		return err
+		return diag.FromErr(err)
 	}
 
 	if _, err = autoBackupOp.Update(ctx, zone, autoBackup.ID, expandAutoBackupUpdateRequest(d, autoBackup)); err != nil {
-		return fmt.Errorf("updating SakuraCloud AutoBackup[%s] is failed: %s", d.Id(), err)
+		return diag.Errorf("updating SakuraCloud AutoBackup[%s] is failed: %s", d.Id(), err)
 	}
 
-	return resourceSakuraCloudAutoBackupRead(d, meta)
+	return resourceSakuraCloudAutoBackupRead(ctx, d, meta)
 }
 
-func resourceSakuraCloudAutoBackupDelete(d *schema.ResourceData, meta interface{}) error {
+func resourceSakuraCloudAutoBackupDelete(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client, zone, err := sakuraCloudClient(d, meta)
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
-	ctx, cancel := operationContext(d, schema.TimeoutDelete)
-	defer cancel()
 
 	autoBackupOp := sacloud.NewAutoBackupOp(client)
-
 	autoBackup, err := autoBackupOp.Read(ctx, zone, sakuraCloudID(d.Id()))
 	if err != nil {
 		if sacloud.IsNotFoundError(err) {
 			d.SetId("")
 			return nil
 		}
-		return fmt.Errorf("could not read SakuraCloud AutoBackup[%s]: %s", d.Id(), err)
+		return diag.Errorf("could not read SakuraCloud AutoBackup[%s]: %s", d.Id(), err)
 	}
 
 	if err := autoBackupOp.Delete(ctx, zone, autoBackup.ID); err != nil {
-		return fmt.Errorf("deleting SakuraCloud AutoBackup[%s] is failed: %s", d.Id(), err)
+		return diag.Errorf("deleting SakuraCloud AutoBackup[%s] is failed: %s", d.Id(), err)
 	}
 
 	d.SetId("")
 	return nil
 }
 
-func setAutoBackupResourceData(d *schema.ResourceData, client *APIClient, data *sacloud.AutoBackup) error {
+func setAutoBackupResourceData(d *schema.ResourceData, client *APIClient, data *sacloud.AutoBackup) diag.Diagnostics {
 	d.Set("name", data.Name)                              // nolint
 	d.Set("disk_id", data.DiskID.String())                // nolint
 	d.Set("max_backup_num", data.MaximumNumberOfArchives) // nolint
@@ -181,7 +171,7 @@ func setAutoBackupResourceData(d *schema.ResourceData, client *APIClient, data *
 	d.Set("description", data.Description)                // nolint
 	d.Set("zone", getZone(d, client))                     // nolint
 	if err := d.Set("weekdays", flattenBackupWeekdays(data.BackupSpanWeekdays)); err != nil {
-		return err
+		return diag.FromErr(err)
 	}
-	return d.Set("tags", flattenTags(data.Tags))
+	return diag.FromErr(d.Set("tags", flattenTags(data.Tags)))
 }

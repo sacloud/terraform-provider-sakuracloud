@@ -15,8 +15,9 @@
 package sakuracloud
 
 import (
-	"fmt"
+	"context"
 
+	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/sacloud/libsacloud/v2/sacloud"
 	"github.com/sacloud/libsacloud/v2/sacloud/types"
@@ -25,7 +26,7 @@ import (
 func dataSourceSakuraCloudVPCRouter() *schema.Resource {
 	resourceName := "VPCRouter"
 	return &schema.Resource{
-		Read: dataSourceSakuraCloudVPCRouterRead,
+		ReadContext: dataSourceSakuraCloudVPCRouterRead,
 
 		Schema: map[string]*schema.Schema{
 			filterAttrName: filterSchema(&filterSchemaOption{}),
@@ -416,13 +417,11 @@ func dataSourceSakuraCloudVPCRouter() *schema.Resource {
 	}
 }
 
-func dataSourceSakuraCloudVPCRouterRead(d *schema.ResourceData, meta interface{}) error {
+func dataSourceSakuraCloudVPCRouterRead(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client, zone, err := sakuraCloudClient(d, meta)
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
-	ctx, cancel := operationContext(d, schema.TimeoutRead)
-	defer cancel()
 
 	searcher := sacloud.NewVPCRouterOp(client)
 
@@ -433,7 +432,7 @@ func dataSourceSakuraCloudVPCRouterRead(d *schema.ResourceData, meta interface{}
 
 	res, err := searcher.Find(ctx, zone, findCondition)
 	if err != nil {
-		return fmt.Errorf("could not find SakuraCloud VPCRouter resource: %s", err)
+		return diag.Errorf("could not find SakuraCloud VPCRouter resource: %s", err)
 	}
 	if res == nil || res.Count == 0 || len(res.VPCRouters) == 0 {
 		return filterNoResultErr()

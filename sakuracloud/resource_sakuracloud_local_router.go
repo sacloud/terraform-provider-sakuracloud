@@ -16,9 +16,9 @@ package sakuracloud
 
 import (
 	"context"
-	"fmt"
 	"time"
 
+	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
 	"github.com/sacloud/libsacloud/v2/sacloud"
@@ -28,12 +28,12 @@ func resourceSakuraCloudLocalRouter() *schema.Resource {
 	resourceName := "LocalRouter"
 
 	return &schema.Resource{
-		Create: resourceSakuraCloudLocalRouterCreate,
-		Read:   resourceSakuraCloudLocalRouterRead,
-		Update: resourceSakuraCloudLocalRouterUpdate,
-		Delete: resourceSakuraCloudLocalRouterDelete,
+		CreateContext: resourceSakuraCloudLocalRouterCreate,
+		ReadContext:   resourceSakuraCloudLocalRouterRead,
+		UpdateContext: resourceSakuraCloudLocalRouterUpdate,
+		DeleteContext: resourceSakuraCloudLocalRouterDelete,
 		Importer: &schema.ResourceImporter{
-			State: schema.ImportStatePassthrough,
+			StateContext: schema.ImportStatePassthroughContext,
 		},
 
 		Timeouts: &schema.ResourceTimeout{
@@ -167,17 +167,15 @@ func resourceSakuraCloudLocalRouter() *schema.Resource {
 	}
 }
 
-func resourceSakuraCloudLocalRouterCreate(d *schema.ResourceData, meta interface{}) error {
+func resourceSakuraCloudLocalRouterCreate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client, _, err := sakuraCloudClient(d, meta)
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
-	ctx, cancel := operationContext(d, schema.TimeoutCreate)
-	defer cancel()
 
 	builder := expandLocalRouterBuilder(d, client)
 	if err := builder.Validate(ctx); err != nil {
-		return fmt.Errorf("validating parameter for SakuraCloud LocalRouter is failed: %s", err)
+		return diag.Errorf("validating parameter for SakuraCloud LocalRouter is failed: %s", err)
 	}
 
 	localRouter, err := builder.Build(ctx)
@@ -185,19 +183,17 @@ func resourceSakuraCloudLocalRouterCreate(d *schema.ResourceData, meta interface
 		d.SetId(localRouter.ID.String())
 	}
 	if err != nil {
-		return fmt.Errorf("creating SakuraCloud LocalRouter is failed: %s", err)
+		return diag.Errorf("creating SakuraCloud LocalRouter is failed: %s", err)
 	}
 
-	return resourceSakuraCloudLocalRouterRead(d, meta)
+	return resourceSakuraCloudLocalRouterRead(ctx, d, meta)
 }
 
-func resourceSakuraCloudLocalRouterRead(d *schema.ResourceData, meta interface{}) error {
+func resourceSakuraCloudLocalRouterRead(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client, _, err := sakuraCloudClient(d, meta)
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
-	ctx, cancel := operationContext(d, schema.TimeoutRead)
-	defer cancel()
 
 	lrOp := sacloud.NewLocalRouterOp(client)
 	localRouter, err := lrOp.Read(ctx, sakuraCloudID(d.Id()))
@@ -206,19 +202,17 @@ func resourceSakuraCloudLocalRouterRead(d *schema.ResourceData, meta interface{}
 			d.SetId("")
 			return nil
 		}
-		return fmt.Errorf("could not read SakuraCloud LocalRouter[%s]: %s", d.Id(), err)
+		return diag.Errorf("could not read SakuraCloud LocalRouter[%s]: %s", d.Id(), err)
 	}
 
 	return setLocalRouterResourceData(ctx, d, client, localRouter)
 }
 
-func resourceSakuraCloudLocalRouterUpdate(d *schema.ResourceData, meta interface{}) error {
+func resourceSakuraCloudLocalRouterUpdate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client, _, err := sakuraCloudClient(d, meta)
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
-	ctx, cancel := operationContext(d, schema.TimeoutUpdate)
-	defer cancel()
 
 	lrOp := sacloud.NewLocalRouterOp(client)
 
@@ -227,27 +221,25 @@ func resourceSakuraCloudLocalRouterUpdate(d *schema.ResourceData, meta interface
 
 	localRouter, err := lrOp.Read(ctx, sakuraCloudID(d.Id()))
 	if err != nil {
-		return fmt.Errorf("could not read SakuraCloud LocalRouter[%s]: %s", d.Id(), err)
+		return diag.Errorf("could not read SakuraCloud LocalRouter[%s]: %s", d.Id(), err)
 	}
 
 	builder := expandLocalRouterBuilder(d, client)
 	if err := builder.Validate(ctx); err != nil {
-		return fmt.Errorf("validating parameter for SakuraCloud LocalRouter is failed: %s", err)
+		return diag.Errorf("validating parameter for SakuraCloud LocalRouter is failed: %s", err)
 	}
 
 	if _, err = builder.Update(ctx, localRouter.ID); err != nil {
-		return fmt.Errorf("updating SakuraCloud LocalRouter[%s] is failed: %s", d.Id(), err)
+		return diag.Errorf("updating SakuraCloud LocalRouter[%s] is failed: %s", d.Id(), err)
 	}
-	return resourceSakuraCloudLocalRouterRead(d, meta)
+	return resourceSakuraCloudLocalRouterRead(ctx, d, meta)
 }
 
-func resourceSakuraCloudLocalRouterDelete(d *schema.ResourceData, meta interface{}) error {
+func resourceSakuraCloudLocalRouterDelete(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client, _, err := sakuraCloudClient(d, meta)
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
-	ctx, cancel := operationContext(d, schema.TimeoutDelete)
-	defer cancel()
 
 	lrOp := sacloud.NewLocalRouterOp(client)
 
@@ -260,19 +252,19 @@ func resourceSakuraCloudLocalRouterDelete(d *schema.ResourceData, meta interface
 			d.SetId("")
 			return nil
 		}
-		return fmt.Errorf("could not read SakuraCloud LocalRouter[%s]: %s", d.Id(), err)
+		return diag.Errorf("could not read SakuraCloud LocalRouter[%s]: %s", d.Id(), err)
 	}
 
 	if err := lrOp.Delete(ctx, localRouter.ID); err != nil {
-		return fmt.Errorf("deleting SakuraCloud LocalRouter[%s] is failed: %s", d.Id(), err)
+		return diag.Errorf("deleting SakuraCloud LocalRouter[%s] is failed: %s", d.Id(), err)
 	}
 	return nil
 }
 
-func setLocalRouterResourceData(ctx context.Context, d *schema.ResourceData, client *APIClient, data *sacloud.LocalRouter) error {
+func setLocalRouterResourceData(ctx context.Context, d *schema.ResourceData, client *APIClient, data *sacloud.LocalRouter) diag.Diagnostics {
 	if data.Availability.IsFailed() {
 		d.SetId("")
-		return fmt.Errorf("got unexpected state: LocalRouter[%d].Availability is failed", data.ID)
+		return diag.Errorf("got unexpected state: LocalRouter[%d].Availability is failed", data.ID)
 	}
 
 	d.Set("name", data.Name)               // nolint
@@ -280,19 +272,19 @@ func setLocalRouterResourceData(ctx context.Context, d *schema.ResourceData, cli
 	d.Set("description", data.Description) // nolint
 	d.Set("zone", getZone(d, client))      // nolint
 	if err := d.Set("secret_keys", data.SecretKeys); err != nil {
-		return err
+		return diag.FromErr(err)
 	}
 	if err := d.Set("switch", flattenLocalRouterSwitch(data)); err != nil {
-		return err
+		return diag.FromErr(err)
 	}
 	if err := d.Set("network_interface", flattenLocalRouterNetworkInterface(data)); err != nil {
-		return err
+		return diag.FromErr(err)
 	}
 	if err := d.Set("peer", flattenLocalRouterPeers(data)); err != nil {
-		return err
+		return diag.FromErr(err)
 	}
 	if err := d.Set("static_route", flattenLocalRouterStaticRoutes(data)); err != nil {
-		return err
+		return diag.FromErr(err)
 	}
-	return d.Set("tags", flattenTags(data.Tags))
+	return diag.FromErr(d.Set("tags", flattenTags(data.Tags)))
 }

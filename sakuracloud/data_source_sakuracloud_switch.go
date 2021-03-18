@@ -15,8 +15,9 @@
 package sakuracloud
 
 import (
-	"fmt"
+	"context"
 
+	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/sacloud/libsacloud/v2/sacloud"
 )
@@ -24,7 +25,7 @@ import (
 func dataSourceSakuraCloudSwitch() *schema.Resource {
 	resourceName := "Switch"
 	return &schema.Resource{
-		Read: dataSourceSakuraCloudSwitchRead,
+		ReadContext: dataSourceSakuraCloudSwitchRead,
 
 		Schema: map[string]*schema.Schema{
 			filterAttrName: filterSchema(&filterSchemaOption{}),
@@ -44,13 +45,11 @@ func dataSourceSakuraCloudSwitch() *schema.Resource {
 	}
 }
 
-func dataSourceSakuraCloudSwitchRead(d *schema.ResourceData, meta interface{}) error {
+func dataSourceSakuraCloudSwitchRead(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client, zone, err := sakuraCloudClient(d, meta)
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
-	ctx, cancel := operationContext(d, schema.TimeoutRead)
-	defer cancel()
 
 	searcher := sacloud.NewSwitchOp(client)
 
@@ -61,7 +60,7 @@ func dataSourceSakuraCloudSwitchRead(d *schema.ResourceData, meta interface{}) e
 
 	res, err := searcher.Find(ctx, zone, findCondition)
 	if err != nil {
-		return fmt.Errorf("could not find SakuraCloud Switch resource: %s", err)
+		return diag.Errorf("could not find SakuraCloud Switch resource: %s", err)
 	}
 	if res == nil || res.Count == 0 || len(res.Switches) == 0 {
 		return filterNoResultErr()

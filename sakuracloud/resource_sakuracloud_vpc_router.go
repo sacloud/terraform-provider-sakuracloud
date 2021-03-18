@@ -16,9 +16,9 @@ package sakuracloud
 
 import (
 	"context"
-	"fmt"
 	"time"
 
+	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
 	"github.com/sacloud/libsacloud/v2/helper/power"
@@ -29,12 +29,12 @@ import (
 func resourceSakuraCloudVPCRouter() *schema.Resource {
 	resourceName := "VPCRouter"
 	return &schema.Resource{
-		Create: resourceSakuraCloudVPCRouterCreate,
-		Read:   resourceSakuraCloudVPCRouterRead,
-		Update: resourceSakuraCloudVPCRouterUpdate,
-		Delete: resourceSakuraCloudVPCRouterDelete,
+		CreateContext: resourceSakuraCloudVPCRouterCreate,
+		ReadContext:   resourceSakuraCloudVPCRouterRead,
+		UpdateContext: resourceSakuraCloudVPCRouterUpdate,
+		DeleteContext: resourceSakuraCloudVPCRouterDelete,
 		Importer: &schema.ResourceImporter{
-			State: schema.ImportStatePassthrough,
+			StateContext: schema.ImportStatePassthroughContext,
 		},
 
 		Timeouts: &schema.ResourceTimeout{
@@ -165,16 +165,16 @@ func resourceSakuraCloudVPCRouter() *schema.Resource {
 							),
 						},
 						"range_start": {
-							Type:         schema.TypeString,
-							Required:     true,
-							ValidateFunc: validateIPv4Address(),
-							Description:  "The start value of IP address range to assign to DHCP client",
+							Type:             schema.TypeString,
+							Required:         true,
+							ValidateDiagFunc: validateIPv4Address(),
+							Description:      "The start value of IP address range to assign to DHCP client",
 						},
 						"range_stop": {
-							Type:         schema.TypeString,
-							Required:     true,
-							ValidateFunc: validateIPv4Address(),
-							Description:  "The end value of IP address range to assign to DHCP client",
+							Type:             schema.TypeString,
+							Required:         true,
+							ValidateDiagFunc: validateIPv4Address(),
+							Description:      "The end value of IP address range to assign to DHCP client",
 						},
 						"dns_servers": {
 							Type:        schema.TypeList,
@@ -296,16 +296,16 @@ func resourceSakuraCloudVPCRouter() *schema.Resource {
 							Description:  "The pre shared secret for L2TP/IPsec",
 						},
 						"range_start": {
-							Type:         schema.TypeString,
-							Required:     true,
-							ValidateFunc: validateIPv4Address(),
-							Description:  "The start value of IP address range to assign to L2TP/IPsec client",
+							Type:             schema.TypeString,
+							Required:         true,
+							ValidateDiagFunc: validateIPv4Address(),
+							Description:      "The start value of IP address range to assign to L2TP/IPsec client",
 						},
 						"range_stop": {
-							Type:         schema.TypeString,
-							Required:     true,
-							ValidateFunc: validateIPv4Address(),
-							Description:  "The end value of IP address range to assign to L2TP/IPsec client",
+							Type:             schema.TypeString,
+							Required:         true,
+							ValidateDiagFunc: validateIPv4Address(),
+							Description:      "The end value of IP address range to assign to L2TP/IPsec client",
 						},
 					},
 				},
@@ -331,10 +331,10 @@ func resourceSakuraCloudVPCRouter() *schema.Resource {
 							Description:  "The source port number of the port forwarding. This must be a port number on a public network",
 						},
 						"private_ip": {
-							Type:         schema.TypeString,
-							Required:     true,
-							ValidateFunc: validateIPv4Address(),
-							Description:  "The destination ip address of the port forwarding",
+							Type:             schema.TypeString,
+							Required:         true,
+							ValidateDiagFunc: validateIPv4Address(),
+							Description:      "The destination ip address of the port forwarding",
 						},
 						"private_port": {
 							Type:         schema.TypeInt,
@@ -358,16 +358,16 @@ func resourceSakuraCloudVPCRouter() *schema.Resource {
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
 						"range_start": {
-							Type:         schema.TypeString,
-							Required:     true,
-							ValidateFunc: validateIPv4Address(),
-							Description:  "The start value of IP address range to assign to PPTP client",
+							Type:             schema.TypeString,
+							Required:         true,
+							ValidateDiagFunc: validateIPv4Address(),
+							Description:      "The start value of IP address range to assign to PPTP client",
 						},
 						"range_stop": {
-							Type:         schema.TypeString,
-							Required:     true,
-							ValidateFunc: validateIPv4Address(),
-							Description:  "The end value of IP address range to assign to PPTP client",
+							Type:             schema.TypeString,
+							Required:         true,
+							ValidateDiagFunc: validateIPv4Address(),
+							Description:      "The end value of IP address range to assign to PPTP client",
 						},
 					},
 				},
@@ -417,16 +417,16 @@ func resourceSakuraCloudVPCRouter() *schema.Resource {
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
 						"public_ip": {
-							Type:         schema.TypeString,
-							Required:     true,
-							ValidateFunc: validateIPv4Address(),
-							Description:  "The public IP address used for the static NAT",
+							Type:             schema.TypeString,
+							Required:         true,
+							ValidateDiagFunc: validateIPv4Address(),
+							Description:      "The public IP address used for the static NAT",
 						},
 						"private_ip": {
-							Type:         schema.TypeString,
-							Required:     true,
-							ValidateFunc: validateIPv4Address(),
-							Description:  "The private IP address used for the static NAT",
+							Type:             schema.TypeString,
+							Required:         true,
+							ValidateDiagFunc: validateIPv4Address(),
+							Description:      "The private IP address used for the static NAT",
 						},
 						"description": {
 							Type:         schema.TypeString,
@@ -448,10 +448,10 @@ func resourceSakuraCloudVPCRouter() *schema.Resource {
 							Description: "The CIDR block of destination",
 						},
 						"next_hop": {
-							Type:         schema.TypeString,
-							Required:     true,
-							ValidateFunc: validateIPv4Address(),
-							Description:  "The IP address of the next hop",
+							Type:             schema.TypeString,
+							Required:         true,
+							ValidateDiagFunc: validateIPv4Address(),
+							Description:      "The IP address of the next hop",
 						},
 					},
 				},
@@ -496,17 +496,15 @@ func resourceSakuraCloudVPCRouter() *schema.Resource {
 	}
 }
 
-func resourceSakuraCloudVPCRouterCreate(d *schema.ResourceData, meta interface{}) error {
+func resourceSakuraCloudVPCRouterCreate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client, zone, err := sakuraCloudClient(d, meta)
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
-	ctx, cancel := operationContext(d, schema.TimeoutCreate)
-	defer cancel()
 
 	builder := expandVPCRouterBuilder(d, client)
 	if err := builder.Validate(ctx, zone); err != nil {
-		return fmt.Errorf("validating parameter for SakuraCloud VPCRouter is failed: %s", err)
+		return diag.Errorf("validating parameter for SakuraCloud VPCRouter is failed: %s", err)
 	}
 
 	vpcRouter, err := builder.Build(ctx, zone)
@@ -514,18 +512,16 @@ func resourceSakuraCloudVPCRouterCreate(d *schema.ResourceData, meta interface{}
 		d.SetId(vpcRouter.ID.String())
 	}
 	if err != nil {
-		return fmt.Errorf("creating SakuraCloud VPCRouter is failed: %s", err)
+		return diag.Errorf("creating SakuraCloud VPCRouter is failed: %s", err)
 	}
-	return resourceSakuraCloudVPCRouterRead(d, meta)
+	return resourceSakuraCloudVPCRouterRead(ctx, d, meta)
 }
 
-func resourceSakuraCloudVPCRouterRead(d *schema.ResourceData, meta interface{}) error {
+func resourceSakuraCloudVPCRouterRead(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client, zone, err := sakuraCloudClient(d, meta)
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
-	ctx, cancel := operationContext(d, schema.TimeoutRead)
-	defer cancel()
 
 	vrOp := sacloud.NewVPCRouterOp(client)
 
@@ -535,19 +531,17 @@ func resourceSakuraCloudVPCRouterRead(d *schema.ResourceData, meta interface{}) 
 			d.SetId("")
 			return nil
 		}
-		return fmt.Errorf("could not read SakuraCloud VPCRouter[%s]: %s", d.Id(), err)
+		return diag.Errorf("could not read SakuraCloud VPCRouter[%s]: %s", d.Id(), err)
 	}
 
 	return setVPCRouterResourceData(ctx, d, client, vpcRouter)
 }
 
-func resourceSakuraCloudVPCRouterUpdate(d *schema.ResourceData, meta interface{}) error {
+func resourceSakuraCloudVPCRouterUpdate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client, zone, err := sakuraCloudClient(d, meta)
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
-	ctx, cancel := operationContext(d, schema.TimeoutUpdate)
-	defer cancel()
 
 	vrOp := sacloud.NewVPCRouterOp(client)
 
@@ -556,28 +550,26 @@ func resourceSakuraCloudVPCRouterUpdate(d *schema.ResourceData, meta interface{}
 
 	vpcRouter, err := vrOp.Read(ctx, zone, sakuraCloudID(d.Id()))
 	if err != nil {
-		return fmt.Errorf("could not read SakuraCloud VPCRouter[%s]: %s", d.Id(), err)
+		return diag.Errorf("could not read SakuraCloud VPCRouter[%s]: %s", d.Id(), err)
 	}
 
 	builder := expandVPCRouterBuilder(d, client)
 	if err := builder.Validate(ctx, zone); err != nil {
-		return fmt.Errorf("validating parameter for SakuraCloud VPCRouter is failed: %s", err)
+		return diag.Errorf("validating parameter for SakuraCloud VPCRouter is failed: %s", err)
 	}
 
 	_, err = builder.Update(ctx, zone, vpcRouter.ID)
 	if err != nil {
-		return fmt.Errorf("updating SakuraCloud VPCRouter[%s] is failed: %s", d.Id(), err)
+		return diag.Errorf("updating SakuraCloud VPCRouter[%s] is failed: %s", d.Id(), err)
 	}
-	return resourceSakuraCloudVPCRouterRead(d, meta)
+	return resourceSakuraCloudVPCRouterRead(ctx, d, meta)
 }
 
-func resourceSakuraCloudVPCRouterDelete(d *schema.ResourceData, meta interface{}) error {
+func resourceSakuraCloudVPCRouterDelete(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client, zone, err := sakuraCloudClient(d, meta)
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
-	ctx, cancel := operationContext(d, schema.TimeoutDelete)
-	defer cancel()
 
 	vrOp := sacloud.NewVPCRouterOp(client)
 
@@ -590,74 +582,74 @@ func resourceSakuraCloudVPCRouterDelete(d *schema.ResourceData, meta interface{}
 			d.SetId("")
 			return nil
 		}
-		return fmt.Errorf("could not read SakuraCloud VPCRouter[%s]: %s", d.Id(), err)
+		return diag.Errorf("could not read SakuraCloud VPCRouter[%s]: %s", d.Id(), err)
 	}
 
 	if vpcRouter.InstanceStatus.IsUp() {
 		if err := power.ShutdownVPCRouter(ctx, vrOp, zone, vpcRouter.ID, true); err != nil {
-			return fmt.Errorf("stopping VPCRouter[%s] is failed: %s", d.Id(), err)
+			return diag.Errorf("stopping VPCRouter[%s] is failed: %s", d.Id(), err)
 		}
 	}
 
 	if err := vrOp.Delete(ctx, zone, vpcRouter.ID); err != nil {
-		return fmt.Errorf("deleting SakuraCloud VPCRouter[%s] is failed: %s", d.Id(), err)
+		return diag.Errorf("deleting SakuraCloud VPCRouter[%s] is failed: %s", d.Id(), err)
 	}
 	return nil
 }
 
-func setVPCRouterResourceData(_ context.Context, d *schema.ResourceData, client *APIClient, data *sacloud.VPCRouter) error {
+func setVPCRouterResourceData(_ context.Context, d *schema.ResourceData, client *APIClient, data *sacloud.VPCRouter) diag.Diagnostics {
 	if data.Availability.IsFailed() {
 		d.SetId("")
-		return fmt.Errorf("got unexpected state: VPCRouter[%d].Availability is failed", data.ID)
+		return diag.Errorf("got unexpected state: VPCRouter[%d].Availability is failed", data.ID)
 	}
 
 	d.Set("name", data.Name)               // nolint
 	d.Set("icon_id", data.IconID.String()) // nolint
 	d.Set("description", data.Description) // nolint
 	if err := d.Set("tags", flattenTags(data.Tags)); err != nil {
-		return err
+		return diag.FromErr(err)
 	}
 	d.Set("plan", flattenVPCRouterPlan(data))                           // nolint
 	d.Set("public_ip", flattenVPCRouterGlobalAddress(data))             // nolint
 	d.Set("public_netmask", flattenVPCRouterGlobalNetworkMaskLen(data)) // nolint
 	if err := d.Set("public_network_interface", flattenVPCRouterPublicNetworkInterface(data)); err != nil {
-		return err
+		return diag.FromErr(err)
 	}
 
 	d.Set("syslog_host", data.Settings.SyslogHost)                               // nolint
 	d.Set("internet_connection", data.Settings.InternetConnectionEnabled.Bool()) // nolint
 	if err := d.Set("private_network_interface", flattenVPCRouterInterfaces(data)); err != nil {
-		return err
+		return diag.FromErr(err)
 	}
 	if err := d.Set("dhcp_server", flattenVPCRouterDHCPServers(data)); err != nil {
-		return err
+		return diag.FromErr(err)
 	}
 	if err := d.Set("dhcp_static_mapping", flattenVPCRouterDHCPStaticMappings(data)); err != nil {
-		return err
+		return diag.FromErr(err)
 	}
 	if err := d.Set("firewall", flattenVPCRouterFirewalls(data)); err != nil {
-		return err
+		return diag.FromErr(err)
 	}
 	if err := d.Set("l2tp", flattenVPCRouterL2TP(data)); err != nil {
-		return err
+		return diag.FromErr(err)
 	}
 	if err := d.Set("pptp", flattenVPCRouterPPTP(data)); err != nil {
-		return err
+		return diag.FromErr(err)
 	}
 	if err := d.Set("port_forwarding", flattenVPCRouterPortForwardings(data)); err != nil {
-		return err
+		return diag.FromErr(err)
 	}
 	if err := d.Set("site_to_site_vpn", flattenVPCRouterSiteToSite(data)); err != nil {
-		return err
+		return diag.FromErr(err)
 	}
 	if err := d.Set("static_nat", flattenVPCRouterStaticNAT(data)); err != nil {
-		return err
+		return diag.FromErr(err)
 	}
 	if err := d.Set("static_route", flattenVPCRouterStaticRoutes(data)); err != nil {
-		return err
+		return diag.FromErr(err)
 	}
 	if err := d.Set("user", flattenVPCRouterUsers(data)); err != nil {
-		return err
+		return diag.FromErr(err)
 	}
 	d.Set("zone", getZone(d, client)) // nolint
 	return nil

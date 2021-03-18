@@ -16,9 +16,9 @@ package sakuracloud
 
 import (
 	"context"
-	"fmt"
 	"time"
 
+	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
 	"github.com/sacloud/libsacloud/v2/sacloud"
@@ -28,11 +28,11 @@ import (
 func resourceSakuraCloudPacketFilterRules() *schema.Resource {
 	resourceName := "PacketFilter Rule"
 	return &schema.Resource{
-		Create: resourceSakuraCloudPacketFilterRulesUpdate,
-		Read:   resourceSakuraCloudPacketFilterRulesRead,
-		Delete: resourceSakuraCloudPacketFilterRulesDelete,
+		CreateContext: resourceSakuraCloudPacketFilterRulesUpdate,
+		ReadContext:   resourceSakuraCloudPacketFilterRulesRead,
+		DeleteContext: resourceSakuraCloudPacketFilterRulesDelete,
 		Importer: &schema.ResourceImporter{
-			State: schema.ImportStatePassthrough,
+			StateContext: schema.ImportStatePassthroughContext,
 		},
 
 		Timeouts: &schema.ResourceTimeout{
@@ -107,16 +107,13 @@ func resourceSakuraCloudPacketFilterRules() *schema.Resource {
 	}
 }
 
-func resourceSakuraCloudPacketFilterRulesRead(d *schema.ResourceData, meta interface{}) error {
+func resourceSakuraCloudPacketFilterRulesRead(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client, zone, err := sakuraCloudClient(d, meta)
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
-	ctx, cancel := operationContext(d, schema.TimeoutRead)
-	defer cancel()
 
 	pfOp := sacloud.NewPacketFilterOp(client)
-
 	pfID := d.Get("packet_filter_id").(string)
 
 	pf, err := pfOp.Read(ctx, zone, sakuraCloudID(pfID))
@@ -125,51 +122,47 @@ func resourceSakuraCloudPacketFilterRulesRead(d *schema.ResourceData, meta inter
 			d.SetId("")
 			return nil
 		}
-		return fmt.Errorf("could not read SakuraCloud PacketFilter[%s]: %s", pfID, err)
+		return diag.Errorf("could not read SakuraCloud PacketFilter[%s]: %s", pfID, err)
 	}
 
 	return setPacketFilterRulesResourceData(ctx, d, client, pf)
 }
 
-func resourceSakuraCloudPacketFilterRulesUpdate(d *schema.ResourceData, meta interface{}) error {
+func resourceSakuraCloudPacketFilterRulesUpdate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client, zone, err := sakuraCloudClient(d, meta)
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
-	ctx, cancel := operationContext(d, schema.TimeoutCreate)
-	defer cancel()
 
 	pfOp := sacloud.NewPacketFilterOp(client)
-
 	pfID := d.Get("packet_filter_id").(string)
+
 	sakuraMutexKV.Lock(pfID)
 	defer sakuraMutexKV.Unlock(pfID)
 
 	pf, err := pfOp.Read(ctx, zone, sakuraCloudID(pfID))
 	if err != nil {
-		return fmt.Errorf("could not read SakuraCloud PacketFilter[%s]: %s", pfID, err)
+		return diag.Errorf("could not read SakuraCloud PacketFilter[%s]: %s", pfID, err)
 	}
 
 	_, err = pfOp.Update(ctx, zone, pf.ID, expandPacketFilterRulesUpdateRequest(d, pf), pf.ExpressionHash)
 	if err != nil {
-		return fmt.Errorf("updating SakuraCloud PacketFilter[%s] is failed: %s", pfID, err)
+		return diag.Errorf("updating SakuraCloud PacketFilter[%s] is failed: %s", pfID, err)
 	}
 
 	d.SetId(pfID)
-	return resourceSakuraCloudPacketFilterRulesRead(d, meta)
+	return resourceSakuraCloudPacketFilterRulesRead(ctx, d, meta)
 }
 
-func resourceSakuraCloudPacketFilterRulesDelete(d *schema.ResourceData, meta interface{}) error {
+func resourceSakuraCloudPacketFilterRulesDelete(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client, zone, err := sakuraCloudClient(d, meta)
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
-	ctx, cancel := operationContext(d, schema.TimeoutDelete)
-	defer cancel()
 
 	pfOp := sacloud.NewPacketFilterOp(client)
-
 	pfID := d.Get("packet_filter_id").(string)
+
 	sakuraMutexKV.Lock(pfID)
 	defer sakuraMutexKV.Unlock(pfID)
 
@@ -179,16 +172,16 @@ func resourceSakuraCloudPacketFilterRulesDelete(d *schema.ResourceData, meta int
 			d.SetId("")
 			return nil
 		}
-		return fmt.Errorf("could not read SakuraCloud PacketFilter[%s]: %s", pfID, err)
+		return diag.Errorf("could not read SakuraCloud PacketFilter[%s]: %s", pfID, err)
 	}
 	_, err = pfOp.Update(ctx, zone, pf.ID, expandPacketFilterRulesDeleteRequest(d, pf), pf.ExpressionHash)
 	if err != nil {
-		return fmt.Errorf("updating SakuraCloud PacketFilter[%s] is failed: %s", pfID, err)
+		return diag.Errorf("updating SakuraCloud PacketFilter[%s] is failed: %s", pfID, err)
 	}
 	return nil
 }
 
-func setPacketFilterRulesResourceData(ctx context.Context, d *schema.ResourceData, client *APIClient, data *sacloud.PacketFilter) error {
+func setPacketFilterRulesResourceData(ctx context.Context, d *schema.ResourceData, client *APIClient, data *sacloud.PacketFilter) diag.Diagnostics {
 	d.Set("zone", getZone(d, client)) // nolint
-	return d.Set("expression", flattenPacketFilterExpressions(data))
+	return diag.FromErr(d.Set("expression", flattenPacketFilterExpressions(data)))
 }

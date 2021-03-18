@@ -16,9 +16,9 @@ package sakuracloud
 
 import (
 	"context"
-	"fmt"
 	"time"
 
+	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
 	"github.com/sacloud/libsacloud/v2/helper/power"
@@ -28,12 +28,12 @@ import (
 func resourceSakuraCloudDatabaseReadReplica() *schema.Resource {
 	resourceName := "read-replica database"
 	return &schema.Resource{
-		Create: resourceSakuraCloudDatabaseReadReplicaCreate,
-		Read:   resourceSakuraCloudDatabaseReadReplicaRead,
-		Update: resourceSakuraCloudDatabaseReadReplicaUpdate,
-		Delete: resourceSakuraCloudDatabaseReadReplicaDelete,
+		CreateContext: resourceSakuraCloudDatabaseReadReplicaCreate,
+		ReadContext:   resourceSakuraCloudDatabaseReadReplicaRead,
+		UpdateContext: resourceSakuraCloudDatabaseReadReplicaUpdate,
+		DeleteContext: resourceSakuraCloudDatabaseReadReplicaDelete,
 		Importer: &schema.ResourceImporter{
-			State: schema.ImportStatePassthrough,
+			StateContext: schema.ImportStatePassthroughContext,
 		},
 
 		Timeouts: &schema.ResourceTimeout{
@@ -111,13 +111,11 @@ func resourceSakuraCloudDatabaseReadReplica() *schema.Resource {
 	}
 }
 
-func resourceSakuraCloudDatabaseReadReplicaCreate(d *schema.ResourceData, meta interface{}) error {
+func resourceSakuraCloudDatabaseReadReplicaCreate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client, zone, err := sakuraCloudClient(d, meta)
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
-	ctx, cancel := operationContext(d, schema.TimeoutCreate)
-	defer cancel()
 
 	// validate master instance
 	builder, err := expandDatabaseReadReplicaBuilder(ctx, d, client, zone)
@@ -130,7 +128,7 @@ func resourceSakuraCloudDatabaseReadReplicaCreate(d *schema.ResourceData, meta i
 		d.SetId(db.ID.String())
 	}
 	if err != nil {
-		return fmt.Errorf("creating SakuraCloud Database ReadReplica is failed: %s", err)
+		return diag.Errorf("creating SakuraCloud Database ReadReplica is failed: %s", err)
 	}
 
 	// HACK データベースアプライアンスの電源投入後すぐに他の操作(Updateなど)を行うと202(Accepted)が返ってくるものの無視される。
@@ -140,13 +138,11 @@ func resourceSakuraCloudDatabaseReadReplicaCreate(d *schema.ResourceData, meta i
 	return setDatabaseReadReplicaResourceData(ctx, d, client, db)
 }
 
-func resourceSakuraCloudDatabaseReadReplicaRead(d *schema.ResourceData, meta interface{}) error {
+func resourceSakuraCloudDatabaseReadReplicaRead(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client, zone, err := sakuraCloudClient(d, meta)
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
-	ctx, cancel := operationContext(d, schema.TimeoutRead)
-	defer cancel()
 
 	dbOp := sacloud.NewDatabaseOp(client)
 
@@ -156,24 +152,22 @@ func resourceSakuraCloudDatabaseReadReplicaRead(d *schema.ResourceData, meta int
 			d.SetId("")
 			return nil
 		}
-		return fmt.Errorf("could not find SakuraCloud Database ReadReplica[%s] : %s", d.Id(), err)
+		return diag.Errorf("could not find SakuraCloud Database ReadReplica[%s] : %s", d.Id(), err)
 	}
 	return setDatabaseReadReplicaResourceData(ctx, d, client, data)
 }
 
-func resourceSakuraCloudDatabaseReadReplicaUpdate(d *schema.ResourceData, meta interface{}) error {
+func resourceSakuraCloudDatabaseReadReplicaUpdate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client, zone, err := sakuraCloudClient(d, meta)
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
-	ctx, cancel := operationContext(d, schema.TimeoutUpdate)
-	defer cancel()
 
 	dbOp := sacloud.NewDatabaseOp(client)
 
 	db, err := dbOp.Read(ctx, zone, sakuraCloudID(d.Id()))
 	if err != nil {
-		return fmt.Errorf("could not read SakuraCloud Database[%s]: %s", d.Id(), err)
+		return diag.Errorf("could not read SakuraCloud Database[%s]: %s", d.Id(), err)
 	}
 
 	builder, err := expandDatabaseReadReplicaBuilder(ctx, d, client, zone)
@@ -183,19 +177,17 @@ func resourceSakuraCloudDatabaseReadReplicaUpdate(d *schema.ResourceData, meta i
 
 	db, err = builder.Update(ctx, zone, db.ID)
 	if err != nil {
-		return fmt.Errorf("updating SakuraCloud Database ReadReplica[%s] is failed: %s", d.Id(), err)
+		return diag.Errorf("updating SakuraCloud Database ReadReplica[%s] is failed: %s", d.Id(), err)
 	}
 
 	return setDatabaseReadReplicaResourceData(ctx, d, client, db)
 }
 
-func resourceSakuraCloudDatabaseReadReplicaDelete(d *schema.ResourceData, meta interface{}) error {
+func resourceSakuraCloudDatabaseReadReplicaDelete(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client, zone, err := sakuraCloudClient(d, meta)
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
-	ctx, cancel := operationContext(d, schema.TimeoutDelete)
-	defer cancel()
 
 	dbOp := sacloud.NewDatabaseOp(client)
 
@@ -205,39 +197,39 @@ func resourceSakuraCloudDatabaseReadReplicaDelete(d *schema.ResourceData, meta i
 			d.SetId("")
 			return nil
 		}
-		return fmt.Errorf("could not read SakuraCloud Database[%s]: %s", d.Id(), err)
+		return diag.Errorf("could not read SakuraCloud Database[%s]: %s", d.Id(), err)
 	}
 
 	// shutdown(force) if running
 	if data.InstanceStatus.IsUp() {
 		if err := power.ShutdownDatabase(ctx, dbOp, zone, data.ID, true); err != nil {
-			return err
+			return diag.FromErr(err)
 		}
 	}
 
 	// delete
 	if err = dbOp.Delete(ctx, zone, data.ID); err != nil {
-		return fmt.Errorf("deleting SakuraCloud Database[%s] is failed: %s", d.Id(), err)
+		return diag.Errorf("deleting SakuraCloud Database[%s] is failed: %s", d.Id(), err)
 	}
 
 	d.SetId("")
 	return nil
 }
 
-func setDatabaseReadReplicaResourceData(ctx context.Context, d *schema.ResourceData, client *APIClient, data *sacloud.Database) error {
+func setDatabaseReadReplicaResourceData(ctx context.Context, d *schema.ResourceData, client *APIClient, data *sacloud.Database) diag.Diagnostics {
 	if data.Availability.IsFailed() {
 		d.SetId("")
-		return fmt.Errorf("got unexpected state: Database[%d].Availability is failed", data.ID)
+		return diag.Errorf("got unexpected state: Database[%d].Availability is failed", data.ID)
 	}
 
 	if err := d.Set("tags", flattenDatabaseTags(data)); err != nil {
-		return err
+		return diag.FromErr(err)
 	}
 
 	d.Set("master_id", data.ReplicationSetting.ApplianceID.String()) // nolint
 	d.Set("name", data.Name)                                         // nolint
 	if err := d.Set("network_interface", flattenDatabaseReadReplicaNetworkInterface(data)); err != nil {
-		return err
+		return diag.FromErr(err)
 	}
 	d.Set("icon_id", data.IconID.String()) // nolint
 	d.Set("description", data.Description) // nolint

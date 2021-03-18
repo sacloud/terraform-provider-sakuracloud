@@ -15,10 +15,10 @@
 package sakuracloud
 
 import (
-	"fmt"
 	"os"
 	"strings"
 
+	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 )
@@ -108,11 +108,11 @@ func filterSchema(opt *filterSchemaOption) *schema.Schema {
 
 var filterNoResultMessage = "Your query returned no results. Please change your filter or selectors and try again"
 
-func filterNoResultErr() error {
+func filterNoResultErr() diag.Diagnostics {
 	if os.Getenv(resource.TestEnvVar) != "" {
 		return nil
 	}
-	return fmt.Errorf(filterNoResultMessage)
+	return diag.Errorf(filterNoResultMessage)
 }
 
 type nameFilterable interface {

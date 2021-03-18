@@ -15,15 +15,17 @@
 package sakuracloud
 
 import (
+	"context"
 	"fmt"
 
+	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/sacloud/libsacloud/v2/sacloud"
 )
 
 func dataSourceSakuraCloudWebAccel() *schema.Resource {
 	return &schema.Resource{
-		Read: dataSourceSakuraCloudWebAccelRead,
+		ReadContext: dataSourceSakuraCloudWebAccelRead,
 
 		Schema: map[string]*schema.Schema{
 			// input/condition
@@ -80,25 +82,22 @@ func dataSourceSakuraCloudWebAccel() *schema.Resource {
 	}
 }
 
-func dataSourceSakuraCloudWebAccelRead(d *schema.ResourceData, meta interface{}) error {
+func dataSourceSakuraCloudWebAccelRead(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	name := d.Get("name").(string)
 	domain := d.Get("domain").(string)
 	if name == "" && domain == "" {
-		return fmt.Errorf("name or domain required")
+		return diag.Errorf("name or domain required")
 	}
-
-	ctx, cancel := operationContext(d, schema.TimeoutRead)
-	defer cancel()
 
 	caller, _, err := sakuraCloudClient(d, meta)
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
 	webAccelOp := sacloud.NewWebAccelOp(caller)
 
 	res, err := webAccelOp.List(ctx)
 	if err != nil {
-		return fmt.Errorf("could not find SakuraCloud WebAccelerator resource: %s", err)
+		return diag.Errorf("could not find SakuraCloud WebAccelerator resource: %s", err)
 	}
 	if res == nil || len(res.WebAccels) == 0 {
 		return filterNoResultErr()

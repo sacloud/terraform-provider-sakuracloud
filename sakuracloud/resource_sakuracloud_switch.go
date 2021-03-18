@@ -16,9 +16,9 @@ package sakuracloud
 
 import (
 	"context"
-	"fmt"
 	"time"
 
+	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/sacloud/libsacloud/v2/helper/cleanup"
 	"github.com/sacloud/libsacloud/v2/sacloud"
@@ -27,12 +27,12 @@ import (
 func resourceSakuraCloudSwitch() *schema.Resource {
 	resourceName := "Switch"
 	return &schema.Resource{
-		Create: resourceSakuraCloudSwitchCreate,
-		Read:   resourceSakuraCloudSwitchRead,
-		Update: resourceSakuraCloudSwitchUpdate,
-		Delete: resourceSakuraCloudSwitchDelete,
+		CreateContext: resourceSakuraCloudSwitchCreate,
+		ReadContext:   resourceSakuraCloudSwitchRead,
+		UpdateContext: resourceSakuraCloudSwitchUpdate,
+		DeleteContext: resourceSakuraCloudSwitchDelete,
 		Importer: &schema.ResourceImporter{
-			State: schema.ImportStatePassthrough,
+			StateContext: schema.ImportStatePassthroughContext,
 		},
 
 		Timeouts: &schema.ResourceTimeout{
@@ -63,16 +63,13 @@ func resourceSakuraCloudSwitch() *schema.Resource {
 	}
 }
 
-func resourceSakuraCloudSwitchCreate(d *schema.ResourceData, meta interface{}) error {
+func resourceSakuraCloudSwitchCreate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client, zone, err := sakuraCloudClient(d, meta)
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
-	ctx, cancel := operationContext(d, schema.TimeoutCreate)
-	defer cancel()
 
 	swOp := sacloud.NewSwitchOp(client)
-
 	req := &sacloud.SwitchCreateRequest{
 		Name:        d.Get("name").(string),
 		Description: d.Get("description").(string),
@@ -82,49 +79,44 @@ func resourceSakuraCloudSwitchCreate(d *schema.ResourceData, meta interface{}) e
 
 	sw, err := swOp.Create(ctx, zone, req)
 	if err != nil {
-		return fmt.Errorf("creating SakuraCloud Switch is failed: %s", err)
+		return diag.Errorf("creating SakuraCloud Switch is failed: %s", err)
 	}
 
 	if bridgeID, ok := d.GetOk("bridge_id"); ok {
 		brID := bridgeID.(string)
 		if brID != "" {
 			if err := swOp.ConnectToBridge(ctx, zone, sw.ID, sakuraCloudID(brID)); err != nil {
-				return fmt.Errorf("connecting Switch[%s] to Bridge[%s] is failed: %s", sw.ID, brID, err)
+				return diag.Errorf("connecting Switch[%s] to Bridge[%s] is failed: %s", sw.ID, brID, err)
 			}
 		}
 	}
 	d.SetId(sw.ID.String())
-	return resourceSakuraCloudSwitchRead(d, meta)
+	return resourceSakuraCloudSwitchRead(ctx, d, meta)
 }
 
-func resourceSakuraCloudSwitchRead(d *schema.ResourceData, meta interface{}) error {
+func resourceSakuraCloudSwitchRead(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client, zone, err := sakuraCloudClient(d, meta)
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
-	ctx, cancel := operationContext(d, schema.TimeoutRead)
-	defer cancel()
 
 	swOp := sacloud.NewSwitchOp(client)
-
 	sw, err := swOp.Read(ctx, zone, sakuraCloudID(d.Id()))
 	if err != nil {
 		if sacloud.IsNotFoundError(err) {
 			d.SetId("")
 			return nil
 		}
-		return fmt.Errorf("could not read SakuraCloud Switch[%s] : %s", d.Id(), err)
+		return diag.Errorf("could not read SakuraCloud Switch[%s] : %s", d.Id(), err)
 	}
 	return setSwitchResourceData(ctx, d, client, sw)
 }
 
-func resourceSakuraCloudSwitchUpdate(d *schema.ResourceData, meta interface{}) error {
+func resourceSakuraCloudSwitchUpdate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client, zone, err := sakuraCloudClient(d, meta)
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
-	ctx, cancel := operationContext(d, schema.TimeoutUpdate)
-	defer cancel()
 
 	swOp := sacloud.NewSwitchOp(client)
 
@@ -133,7 +125,7 @@ func resourceSakuraCloudSwitchUpdate(d *schema.ResourceData, meta interface{}) e
 
 	sw, err := swOp.Read(ctx, zone, sakuraCloudID(d.Id()))
 	if err != nil {
-		return fmt.Errorf("could not read SakuraCloud Switch[%s] : %s", d.Id(), err)
+		return diag.Errorf("could not read SakuraCloud Switch[%s] : %s", d.Id(), err)
 	}
 
 	req := &sacloud.SwitchUpdateRequest{
@@ -145,7 +137,7 @@ func resourceSakuraCloudSwitchUpdate(d *schema.ResourceData, meta interface{}) e
 
 	sw, err = swOp.Update(ctx, zone, sw.ID, req)
 	if err != nil {
-		return fmt.Errorf("updating SakuraCloud Switch[%s] is failed : %s", d.Id(), err)
+		return diag.Errorf("updating SakuraCloud Switch[%s] is failed : %s", d.Id(), err)
 	}
 
 	if d.HasChange("bridge_id") {
@@ -153,26 +145,24 @@ func resourceSakuraCloudSwitchUpdate(d *schema.ResourceData, meta interface{}) e
 			brID := bridgeID.(string)
 			if brID == "" && !sw.BridgeID.IsEmpty() {
 				if err := swOp.DisconnectFromBridge(ctx, zone, sw.ID); err != nil {
-					return fmt.Errorf("disconnecting from Bridge[%s] is failed: %s", sw.BridgeID, err)
+					return diag.Errorf("disconnecting from Bridge[%s] is failed: %s", sw.BridgeID, err)
 				}
 			} else {
 				if err := swOp.ConnectToBridge(ctx, zone, sw.ID, sakuraCloudID(brID)); err != nil {
-					return fmt.Errorf("connecting to Bridge[%s] is failed: %s", brID, err)
+					return diag.Errorf("connecting to Bridge[%s] is failed: %s", brID, err)
 				}
 			}
 		}
 	}
 
-	return resourceSakuraCloudSwitchRead(d, meta)
+	return resourceSakuraCloudSwitchRead(ctx, d, meta)
 }
 
-func resourceSakuraCloudSwitchDelete(d *schema.ResourceData, meta interface{}) error {
+func resourceSakuraCloudSwitchDelete(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client, zone, err := sakuraCloudClient(d, meta)
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
-	ctx, cancel := operationContext(d, schema.TimeoutDelete)
-	defer cancel()
 
 	swOp := sacloud.NewSwitchOp(client)
 
@@ -185,29 +175,29 @@ func resourceSakuraCloudSwitchDelete(d *schema.ResourceData, meta interface{}) e
 			d.SetId("")
 			return nil
 		}
-		return fmt.Errorf("could not read SakuraCloud Switch[%s]: %s", d.Id(), err)
+		return diag.Errorf("could not read SakuraCloud Switch[%s]: %s", d.Id(), err)
 	}
 
 	if !sw.BridgeID.IsEmpty() {
 		if err := swOp.DisconnectFromBridge(ctx, zone, sw.ID); err != nil {
-			return fmt.Errorf("disconnecting Switch[%s] from Bridge[%s] is failed: %s", sw.ID, sw.BridgeID, err)
+			return diag.Errorf("disconnecting Switch[%s] from Bridge[%s] is failed: %s", sw.ID, sw.BridgeID, err)
 		}
 	}
 
 	if err := cleanup.DeleteSwitch(ctx, client, zone, sw.ID, client.checkReferencedOption()); err != nil {
-		return fmt.Errorf("deleting SakuraCloud Switch[%s] is failed: %s", d.Id(), err)
+		return diag.Errorf("deleting SakuraCloud Switch[%s] is failed: %s", d.Id(), err)
 	}
 	return nil
 }
 
-func setSwitchResourceData(ctx context.Context, d *schema.ResourceData, client *APIClient, data *sacloud.Switch) error {
+func setSwitchResourceData(ctx context.Context, d *schema.ResourceData, client *APIClient, data *sacloud.Switch) diag.Diagnostics {
 	zone := getZone(d, client)
 	var serverIDs []string
 	if data.ServerCount > 0 {
 		swOp := sacloud.NewSwitchOp(client)
 		searched, err := swOp.GetServers(ctx, zone, data.ID)
 		if err != nil {
-			return fmt.Errorf("could not find SakuraCloud Servers: switch[%s]", err)
+			return diag.Errorf("could not find SakuraCloud Servers: switch[%s]", err)
 		}
 		for _, s := range searched.Servers {
 			serverIDs = append(serverIDs, s.ID.String())
@@ -220,7 +210,7 @@ func setSwitchResourceData(ctx context.Context, d *schema.ResourceData, client *
 	d.Set("bridge_id", data.BridgeID.String()) // nolint
 	d.Set("zone", zone)                        // nolint
 	if err := d.Set("server_ids", serverIDs); err != nil {
-		return err
+		return diag.FromErr(err)
 	}
-	return d.Set("tags", flattenTags(data.Tags))
+	return diag.FromErr(d.Set("tags", flattenTags(data.Tags)))
 }

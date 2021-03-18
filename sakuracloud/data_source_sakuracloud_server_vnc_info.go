@@ -15,9 +15,10 @@
 package sakuracloud
 
 import (
+	"context"
 	"errors"
-	"fmt"
 
+	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/sacloud/libsacloud/v2/sacloud"
 	"github.com/sacloud/libsacloud/v2/sacloud/search"
@@ -26,7 +27,7 @@ import (
 
 func dataSourceSakuraCloudServerVNCInfo() *schema.Resource {
 	return &schema.Resource{
-		Read: dataSourceSakuraCloudServerVNCInfoRead,
+		ReadContext: dataSourceSakuraCloudServerVNCInfoRead,
 
 		Schema: map[string]*schema.Schema{
 			"server_id": {
@@ -56,22 +57,20 @@ func dataSourceSakuraCloudServerVNCInfo() *schema.Resource {
 	}
 }
 
-func dataSourceSakuraCloudServerVNCInfoRead(d *schema.ResourceData, meta interface{}) error {
+func dataSourceSakuraCloudServerVNCInfoRead(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client, zone, err := sakuraCloudClient(d, meta)
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
-	ctx, cancel := operationContext(d, schema.TimeoutRead)
-	defer cancel()
 
 	// validate account
 	authOp := sacloud.NewAuthStatusOp(client)
 	auth, err := authOp.Read(ctx)
 	if err != nil {
-		return fmt.Errorf("could not read Authentication Status: %s", err)
+		return diag.Errorf("could not read Authentication Status: %s", err)
 	}
 	if auth.Permission == types.Permissions.View {
-		return errors.New("current API key is only permitted to view")
+		return diag.FromErr(errors.New("current API key is only permitted to view"))
 	}
 
 	// validate zone
@@ -82,11 +81,11 @@ func dataSourceSakuraCloudServerVNCInfoRead(d *schema.ResourceData, meta interfa
 		},
 	})
 	if err != nil || searched.Count == 0 {
-		return fmt.Errorf("could not find SakuraCkoud Zone[%s]: %s", zone, err)
+		return diag.Errorf("could not find SakuraCkoud Zone[%s]: %s", zone, err)
 	}
 	zoneInfo := searched.Zones[0]
 	if zoneInfo.IsDummy {
-		return fmt.Errorf("reading VNC information is failed: VNC information is not support on zone[%s]", zone)
+		return diag.Errorf("reading VNC information is failed: VNC information is not support on zone[%s]", zone)
 	}
 
 	serverOp := sacloud.NewServerOp(client)
@@ -94,7 +93,7 @@ func dataSourceSakuraCloudServerVNCInfoRead(d *schema.ResourceData, meta interfa
 
 	data, err := serverOp.GetVNCProxy(ctx, zone, serverID)
 	if err != nil {
-		return fmt.Errorf("could not get VNC information: %s", err)
+		return diag.Errorf("could not get VNC information: %s", err)
 	}
 
 	d.SetId(serverID.String())

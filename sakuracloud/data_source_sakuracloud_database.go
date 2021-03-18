@@ -15,8 +15,9 @@
 package sakuracloud
 
 import (
-	"fmt"
+	"context"
 
+	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/sacloud/libsacloud/v2/sacloud"
 	"github.com/sacloud/libsacloud/v2/sacloud/types"
@@ -26,7 +27,7 @@ func dataSourceSakuraCloudDatabase() *schema.Resource {
 	resourceName := "Database"
 
 	return &schema.Resource{
-		Read: dataSourceSakuraCloudDatabaseRead,
+		ReadContext: dataSourceSakuraCloudDatabaseRead,
 
 		Schema: map[string]*schema.Schema{
 			filterAttrName: filterSchema(&filterSchemaOption{}),
@@ -115,13 +116,11 @@ func dataSourceSakuraCloudDatabase() *schema.Resource {
 	}
 }
 
-func dataSourceSakuraCloudDatabaseRead(d *schema.ResourceData, meta interface{}) error {
+func dataSourceSakuraCloudDatabaseRead(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client, zone, err := sakuraCloudClient(d, meta)
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
-	ctx, cancel := operationContext(d, schema.TimeoutRead)
-	defer cancel()
 
 	searcher := sacloud.NewDatabaseOp(client)
 
@@ -132,7 +131,7 @@ func dataSourceSakuraCloudDatabaseRead(d *schema.ResourceData, meta interface{})
 
 	res, err := searcher.Find(ctx, zone, findCondition)
 	if err != nil {
-		return fmt.Errorf("could not find SakuraCloud Database resource: %s", err)
+		return diag.Errorf("could not find SakuraCloud Database resource: %s", err)
 	}
 	if res == nil || res.Count == 0 || len(res.Databases) == 0 {
 		return filterNoResultErr()

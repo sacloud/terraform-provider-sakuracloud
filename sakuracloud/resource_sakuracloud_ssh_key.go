@@ -16,9 +16,9 @@ package sakuracloud
 
 import (
 	"context"
-	"fmt"
 	"time"
 
+	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/sacloud/libsacloud/v2/sacloud"
 )
@@ -26,12 +26,12 @@ import (
 func resourceSakuraCloudSSHKey() *schema.Resource {
 	resourceName := "SSHKey"
 	return &schema.Resource{
-		Create: resourceSakuraCloudSSHKeyCreate,
-		Read:   resourceSakuraCloudSSHKeyRead,
-		Update: resourceSakuraCloudSSHKeyUpdate,
-		Delete: resourceSakuraCloudSSHKeyDelete,
+		CreateContext: resourceSakuraCloudSSHKeyCreate,
+		ReadContext:   resourceSakuraCloudSSHKeyRead,
+		UpdateContext: resourceSakuraCloudSSHKeyUpdate,
+		DeleteContext: resourceSakuraCloudSSHKeyDelete,
 		Importer: &schema.ResourceImporter{
-			State: schema.ImportStatePassthrough,
+			StateContext: schema.ImportStatePassthroughContext,
 		},
 
 		Timeouts: &schema.ResourceTimeout{
@@ -58,94 +58,83 @@ func resourceSakuraCloudSSHKey() *schema.Resource {
 	}
 }
 
-func resourceSakuraCloudSSHKeyCreate(d *schema.ResourceData, meta interface{}) error {
+func resourceSakuraCloudSSHKeyCreate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client, _, err := sakuraCloudClient(d, meta)
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
-	ctx, cancel := operationContext(d, schema.TimeoutCreate)
-	defer cancel()
 
 	sshKeyOp := sacloud.NewSSHKeyOp(client)
 
 	key, err := sshKeyOp.Create(ctx, expandSSHKeyCreateRequest(d))
 	if err != nil {
-		return fmt.Errorf("creating SSHKey is failed: %s", err)
+		return diag.Errorf("creating SSHKey is failed: %s", err)
 	}
 
 	d.SetId(key.ID.String())
-	return resourceSakuraCloudSSHKeyRead(d, meta)
+	return resourceSakuraCloudSSHKeyRead(ctx, d, meta)
 }
 
-func resourceSakuraCloudSSHKeyRead(d *schema.ResourceData, meta interface{}) error {
+func resourceSakuraCloudSSHKeyRead(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client, _, err := sakuraCloudClient(d, meta)
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
-	ctx, cancel := operationContext(d, schema.TimeoutRead)
-	defer cancel()
 
 	sshKeyOp := sacloud.NewSSHKeyOp(client)
-
 	key, err := sshKeyOp.Read(ctx, sakuraCloudID(d.Id()))
 	if err != nil {
 		if sacloud.IsNotFoundError(err) {
 			d.SetId("")
 			return nil
 		}
-		return fmt.Errorf("could not read SSHKey[%s]: %s", d.Id(), err)
+		return diag.Errorf("could not read SSHKey[%s]: %s", d.Id(), err)
 	}
 	return setSSHKeyResourceData(ctx, d, client, key)
 }
 
-func resourceSakuraCloudSSHKeyUpdate(d *schema.ResourceData, meta interface{}) error {
+func resourceSakuraCloudSSHKeyUpdate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client, _, err := sakuraCloudClient(d, meta)
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
-	ctx, cancel := operationContext(d, schema.TimeoutUpdate)
-	defer cancel()
 
 	sshKeyOp := sacloud.NewSSHKeyOp(client)
-
 	key, err := sshKeyOp.Read(ctx, sakuraCloudID(d.Id()))
 	if err != nil {
-		return fmt.Errorf("could not read SSHKey[%s]: %s", d.Id(), err)
+		return diag.Errorf("could not read SSHKey[%s]: %s", d.Id(), err)
 	}
 
 	_, err = sshKeyOp.Update(ctx, key.ID, expandSSHKeyUpdateRequest(d))
 	if err != nil {
-		return fmt.Errorf("updating SSHKey[%s] is failed: %s", d.Id(), err)
+		return diag.Errorf("updating SSHKey[%s] is failed: %s", d.Id(), err)
 	}
-	return resourceSakuraCloudSSHKeyRead(d, meta)
+	return resourceSakuraCloudSSHKeyRead(ctx, d, meta)
 }
 
-func resourceSakuraCloudSSHKeyDelete(d *schema.ResourceData, meta interface{}) error {
+func resourceSakuraCloudSSHKeyDelete(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client, _, err := sakuraCloudClient(d, meta)
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
-	ctx, cancel := operationContext(d, schema.TimeoutDelete)
-	defer cancel()
 
 	sshKeyOp := sacloud.NewSSHKeyOp(client)
-
 	key, err := sshKeyOp.Read(ctx, sakuraCloudID(d.Id()))
 	if err != nil {
 		if sacloud.IsNotFoundError(err) {
 			d.SetId("")
 			return nil
 		}
-		return fmt.Errorf("could not read SSHKey[%s]: %s", d.Id(), err)
+		return diag.Errorf("could not read SSHKey[%s]: %s", d.Id(), err)
 	}
 
 	if err := sshKeyOp.Delete(ctx, key.ID); err != nil {
-		return fmt.Errorf("deleting SSHKey[%s] is failed: %s", d.Id(), err)
+		return diag.Errorf("deleting SSHKey[%s] is failed: %s", d.Id(), err)
 	}
 	return nil
 }
 
-func setSSHKeyResourceData(_ context.Context, d *schema.ResourceData, _ *APIClient, data *sacloud.SSHKey) error {
+func setSSHKeyResourceData(_ context.Context, d *schema.ResourceData, _ *APIClient, data *sacloud.SSHKey) diag.Diagnostics {
 	d.Set("name", data.Name)               // nolint
 	d.Set("public_key", data.PublicKey)    // nolint
 	d.Set("fingerprint", data.Fingerprint) // nolint

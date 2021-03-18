@@ -16,9 +16,9 @@ package sakuracloud
 
 import (
 	"context"
-	"fmt"
 	"time"
 
+	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
 	"github.com/sacloud/libsacloud/v2/sacloud"
@@ -28,10 +28,10 @@ import (
 func resourceSakuraCloudContainerRegistry() *schema.Resource {
 	resourceName := "Container Registry"
 	return &schema.Resource{
-		Create: resourceSakuraCloudContainerRegistryCreate,
-		Read:   resourceSakuraCloudContainerRegistryRead,
-		Update: resourceSakuraCloudContainerRegistryUpdate,
-		Delete: resourceSakuraCloudContainerRegistryDelete,
+		CreateContext: resourceSakuraCloudContainerRegistryCreate,
+		ReadContext:   resourceSakuraCloudContainerRegistryRead,
+		UpdateContext: resourceSakuraCloudContainerRegistryUpdate,
+		DeleteContext: resourceSakuraCloudContainerRegistryDelete,
 
 		Timeouts: &schema.ResourceTimeout{
 			Create: schema.DefaultTimeout(5 * time.Minute),
@@ -107,13 +107,11 @@ func resourceSakuraCloudContainerRegistry() *schema.Resource {
 	}
 }
 
-func resourceSakuraCloudContainerRegistryCreate(d *schema.ResourceData, meta interface{}) error {
+func resourceSakuraCloudContainerRegistryCreate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client, _, err := sakuraCloudClient(d, meta)
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
-	ctx, cancel := operationContext(d, schema.TimeoutCreate)
-	defer cancel()
 
 	builder := expandContainerRegistryBuilder(d, client, "")
 	reg, err := builder.Build(ctx)
@@ -121,62 +119,55 @@ func resourceSakuraCloudContainerRegistryCreate(d *schema.ResourceData, meta int
 		d.SetId(reg.ID.String())
 	}
 	if err != nil {
-		return fmt.Errorf("creating SakuraCloud ContainerRegistry is failed: %s", err)
+		return diag.Errorf("creating SakuraCloud ContainerRegistry is failed: %s", err)
 	}
 
-	return resourceSakuraCloudContainerRegistryRead(d, meta)
+	return resourceSakuraCloudContainerRegistryRead(ctx, d, meta)
 }
 
-func resourceSakuraCloudContainerRegistryRead(d *schema.ResourceData, meta interface{}) error {
+func resourceSakuraCloudContainerRegistryRead(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client, _, err := sakuraCloudClient(d, meta)
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
-	ctx, cancel := operationContext(d, schema.TimeoutRead)
-	defer cancel()
 
 	regOp := sacloud.NewContainerRegistryOp(client)
-
 	reg, err := regOp.Read(ctx, sakuraCloudID(d.Id()))
 	if err != nil {
 		if sacloud.IsNotFoundError(err) {
 			d.SetId("")
 			return nil
 		}
-		return fmt.Errorf("could not find SakuraCloud ContainerRegistry[%s]: %s", d.Id(), err)
+		return diag.Errorf("could not find SakuraCloud ContainerRegistry[%s]: %s", d.Id(), err)
 	}
 	return setContainerRegistryResourceData(ctx, d, client, reg, true)
 }
 
-func resourceSakuraCloudContainerRegistryUpdate(d *schema.ResourceData, meta interface{}) error {
+func resourceSakuraCloudContainerRegistryUpdate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client, _, err := sakuraCloudClient(d, meta)
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
-	ctx, cancel := operationContext(d, schema.TimeoutUpdate)
-	defer cancel()
 
 	regOp := sacloud.NewContainerRegistryOp(client)
 	reg, err := regOp.Read(ctx, sakuraCloudID(d.Id()))
 	if err != nil {
-		return fmt.Errorf("could not read SakuraCloud ContainerRegistry[%s]: %s", d.Id(), err)
+		return diag.Errorf("could not read SakuraCloud ContainerRegistry[%s]: %s", d.Id(), err)
 	}
 
 	builder := expandContainerRegistryBuilder(d, client, reg.SettingsHash)
 	if _, err := builder.Update(ctx, reg.ID); err != nil {
-		return fmt.Errorf("updating SakuraCloud ContainerRegistry[%s] is failed: %s", d.Id(), err)
+		return diag.Errorf("updating SakuraCloud ContainerRegistry[%s] is failed: %s", d.Id(), err)
 	}
 
-	return resourceSakuraCloudContainerRegistryRead(d, meta)
+	return resourceSakuraCloudContainerRegistryRead(ctx, d, meta)
 }
 
-func resourceSakuraCloudContainerRegistryDelete(d *schema.ResourceData, meta interface{}) error {
+func resourceSakuraCloudContainerRegistryDelete(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client, _, err := sakuraCloudClient(d, meta)
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
-	ctx, cancel := operationContext(d, schema.TimeoutDelete)
-	defer cancel()
 
 	regOp := sacloud.NewContainerRegistryOp(client)
 	reg, err := regOp.Read(ctx, sakuraCloudID(d.Id()))
@@ -185,23 +176,23 @@ func resourceSakuraCloudContainerRegistryDelete(d *schema.ResourceData, meta int
 			d.SetId("")
 			return nil
 		}
-		return fmt.Errorf("could not read SakuraCloud ContainerRegistry[%s]: %s", d.Id(), err)
+		return diag.Errorf("could not read SakuraCloud ContainerRegistry[%s]: %s", d.Id(), err)
 	}
 
 	if err := regOp.Delete(ctx, reg.ID); err != nil {
-		return fmt.Errorf("deleting SakuraCloud ContainerRegistry[%s] is failed: %s", d.Id(), err)
+		return diag.Errorf("deleting SakuraCloud ContainerRegistry[%s] is failed: %s", d.Id(), err)
 	}
 
 	d.SetId("")
 	return nil
 }
 
-func setContainerRegistryResourceData(ctx context.Context, d *schema.ResourceData, client *APIClient, data *sacloud.ContainerRegistry, includePassword bool) error {
+func setContainerRegistryResourceData(ctx context.Context, d *schema.ResourceData, client *APIClient, data *sacloud.ContainerRegistry, includePassword bool) diag.Diagnostics {
 	regOp := sacloud.NewContainerRegistryOp(client)
 
 	users, err := regOp.ListUsers(ctx, data.ID)
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
 
 	d.Set("name", data.Name)                         // nolint
@@ -213,7 +204,7 @@ func setContainerRegistryResourceData(ctx context.Context, d *schema.ResourceDat
 	d.Set("description", data.Description)           // nolint
 
 	if err := d.Set("user", flattenContainerRegistryUsers(d, users.Users, includePassword)); err != nil {
-		return err
+		return diag.FromErr(err)
 	}
-	return d.Set("tags", flattenTags(data.Tags))
+	return diag.FromErr(d.Set("tags", flattenTags(data.Tags)))
 }
