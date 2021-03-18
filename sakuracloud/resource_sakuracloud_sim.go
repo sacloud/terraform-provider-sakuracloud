@@ -56,6 +56,7 @@ func resourceSakuraCloudSIM() *schema.Resource {
 				Type:        schema.TypeString,
 				Required:    true,
 				ForceNew:    true,
+				Sensitive:   true,
 				Description: "The passcord to authenticate the SIM",
 			},
 			"imei": {
