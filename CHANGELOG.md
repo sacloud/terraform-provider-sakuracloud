@@ -2,6 +2,7 @@
 
 FEATURES
 
+  * sakuracloud_server: ssh_keys [GH-805] (@yamamoto-febc)
   * sakuracloud_sim: Sentitive:true [GH-802] (@yamamoto-febc)
   * darwin/arm64 [GH-800] (@yamamoto-febc)
   * libsacloud v2.14.0 [GH-799] (@yamamoto-febc)
