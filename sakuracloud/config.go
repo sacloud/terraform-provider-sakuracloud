@@ -26,7 +26,6 @@ import (
 	"time"
 
 	"github.com/hashicorp/go-multierror"
-	"github.com/hashicorp/terraform-plugin-sdk/httpclient"
 	"github.com/sacloud/libsacloud/v2/helper/api"
 	"github.com/sacloud/libsacloud/v2/helper/query"
 	"github.com/sacloud/libsacloud/v2/sacloud"
@@ -166,7 +165,7 @@ func (c *Config) NewClient() (*APIClient, error) {
 		return nil, err
 	}
 
-	tfUserAgent := httpclient.TerraformUserAgent(c.terraformVersion)
+	tfUserAgent := terraformUserAgent(c.terraformVersion)
 	providerUserAgent := fmt.Sprintf("%s/v%s", "terraform-provider-sakuracloud", Version)
 	ua := fmt.Sprintf("%s %s", tfUserAgent, providerUserAgent)
 	if add := os.Getenv(uaEnvVar); add != "" {

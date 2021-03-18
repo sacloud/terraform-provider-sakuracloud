@@ -4,7 +4,6 @@ go 1.16
 
 require (
 	github.com/hashicorp/go-multierror v1.0.1-0.20190722213833-bdca7bb83f60
-	github.com/hashicorp/terraform-plugin-sdk v1.16.0
 	github.com/hashicorp/terraform-plugin-sdk/v2 v2.4.4
 	github.com/mattn/go-isatty v0.0.12 // indirect
 	github.com/mitchellh/go-homedir v1.1.0
