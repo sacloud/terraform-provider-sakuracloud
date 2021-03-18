@@ -23,17 +23,14 @@ import (
 	"reflect"
 	"sort"
 	"strings"
-	"sync"
 	"time"
 
 	"github.com/hashicorp/go-multierror"
 	"github.com/hashicorp/terraform-plugin-sdk/httpclient"
-	"github.com/sacloud/libsacloud/v2/helper/defaults"
+	"github.com/sacloud/libsacloud/v2/helper/api"
 	"github.com/sacloud/libsacloud/v2/helper/query"
 	"github.com/sacloud/libsacloud/v2/sacloud"
-	"github.com/sacloud/libsacloud/v2/sacloud/fake"
 	"github.com/sacloud/libsacloud/v2/sacloud/profile"
-	"github.com/sacloud/libsacloud/v2/sacloud/trace"
 )
 
 const (
@@ -44,8 +41,6 @@ const (
 const uaEnvVar = "SAKURACLOUD_APPEND_USER_AGENT"
 
 var (
-	fakeModeOnce                    sync.Once
-	v2ClientOnce                    sync.Once
 	deletionWaiterTimeout           = 30 * time.Minute
 	deletionWaiterPollingInterval   = 5 * time.Second
 	databaseWaitAfterCreateDuration = 1 * time.Minute
@@ -76,7 +71,7 @@ type Config struct {
 // APIClient for SakuraCloud API
 type APIClient struct {
 	sacloud.APICaller
-	defaultZone                     string
+	defaultZone                     string // 各リソースでzone未指定の場合に利用するゾーン。sacloud.APIDefaultZoneとは別物。
 	zones                           []string
 	deletionWaiterTimeout           time.Duration
 	deletionWaiterPollingInterval   time.Duration
@@ -117,9 +112,6 @@ func (c *Config) loadFromProfile() error {
 	sort.Strings(pcv.Zones)
 	if reflect.DeepEqual(defaultZones, c.Zones) && !reflect.DeepEqual(c.Zones, pcv.Zones) && len(pcv.Zones) > 0 {
 		c.Zones = pcv.Zones
-	}
-	if c.DefaultZone != "" {
-		sacloud.APIDefaultZone = c.DefaultZone
 	}
 	if c.TraceMode == "" {
 		c.TraceMode = pcv.TraceMode
@@ -182,35 +174,11 @@ func (c *Config) NewClient() (*APIClient, error) {
 		log.Printf("[DEBUG] Using modified User-Agent: %s", ua)
 	}
 
-	httpClient := http.DefaultClient
-	httpClient.Timeout = time.Duration(c.APIRequestTimeout) * time.Second
-	httpClient.Transport = &sacloud.RateLimitRoundTripper{RateLimitPerSec: c.APIRequestRateLimit}
-
-	retryWaitMax := sacloud.APIDefaultRetryWaitMax
-	retryWaitMin := sacloud.APIDefaultRetryWaitMin
-	if c.RetryWaitMax > 0 {
-		retryWaitMax = time.Duration(c.RetryWaitMax) * time.Second
-	}
-	if c.RetryWaitMin > 0 {
-		retryWaitMin = time.Duration(c.RetryWaitMin) * time.Second
-	}
-
-	caller := &sacloud.Client{
-		AccessToken:       c.AccessToken,
-		AccessTokenSecret: c.AccessTokenSecret,
-		UserAgent:         ua,
-		AcceptLanguage:    c.AcceptLanguage,
-		RetryMax:          c.RetryMax,
-		RetryWaitMax:      retryWaitMax,
-		RetryWaitMin:      retryWaitMin,
-		HTTPClient:        httpClient,
-	}
-	sacloud.DefaultStatePollingTimeout = 72 * time.Hour
-
+	enableAPITrace := false
+	enableHTTPTrace := false
 	if c.TraceMode != "" {
-		enableAPITrace := true
-		enableHTTPTrace := true
-
+		enableAPITrace = true
+		enableHTTPTrace = true
 		mode := strings.ToLower(c.TraceMode)
 		switch mode {
 		case traceAPI:
@@ -218,50 +186,39 @@ func (c *Config) NewClient() (*APIClient, error) {
 		case traceHTTP:
 			enableAPITrace = false
 		}
-
-		if enableAPITrace {
-			v2ClientOnce.Do(func() {
-				trace.AddClientFactoryHooks()
-			})
-		}
-		if enableHTTPTrace {
-			caller.HTTPClient.Transport = &sacloud.TracingRoundTripper{
-				Transport: caller.HTTPClient.Transport,
-			}
-		}
 	}
 
-	if c.FakeMode != "" {
-		if c.FakeStorePath != "" {
-			fake.DataStore = fake.NewJSONFileStore(c.FakeStorePath)
-		}
-		fakeModeOnce.Do(func() {
-			fake.SwitchFactoryFuncToFake()
-		})
-
-		deletionWaiterTimeout = 10 * time.Second
-		defaultInterval := 10 * time.Millisecond
-		deletionWaiterPollingInterval = defaultInterval
-		databaseWaitAfterCreateDuration = defaultInterval
-
-		// update default polling intervals: libsacloud/sacloud
-		sacloud.DefaultStatePollingInterval = defaultInterval
-		sacloud.DefaultDBStatusPollingInterval = defaultInterval
-		defaults.DefaultDeleteWaitInterval = defaultInterval
-		defaults.DefaultProvisioningWaitInterval = defaultInterval
-		defaults.DefaultPollingInterval = defaultInterval
-		defaults.DefaultNICUpdateWaitDuration = defaultInterval
-	}
+	caller := api.NewCaller(&api.CallerOptions{
+		AccessToken:          c.AccessToken,
+		AccessTokenSecret:    c.AccessTokenSecret,
+		APIRootURL:           c.APIRootURL,
+		DefaultZone:          c.DefaultZone,
+		AcceptLanguage:       c.AcceptLanguage,
+		HTTPClient:           http.DefaultClient,
+		HTTPRequestTimeout:   c.APIRequestTimeout,
+		HTTPRequestRateLimit: c.APIRequestRateLimit,
+		RetryMax:             c.RetryMax,
+		RetryWaitMax:         c.RetryWaitMax,
+		RetryWaitMin:         c.RetryWaitMin,
+		UserAgent:            ua,
+		TraceAPI:             enableAPITrace,
+		TraceHTTP:            enableHTTPTrace,
+		OpenTelemetry:        false,
+		OpenTelemetryOptions: nil,
+		FakeMode:             c.FakeMode != "",
+		FakeStorePath:        c.FakeStorePath,
+	})
 
 	zones := c.Zones
 	if len(zones) == 0 {
 		zones = defaultZones
 	}
-	if c.APIRootURL != "" {
-		if strings.HasSuffix(c.APIRootURL, "/") {
-			c.APIRootURL = strings.TrimRight(c.APIRootURL, "/")
-		}
-		sacloud.SakuraCloudAPIRoot = c.APIRootURL
+
+	// fakeモード有効時は待ち時間を短くしておく
+	if c.FakeMode != "" {
+		deletionWaiterTimeout = 300 * time.Millisecond // 短すぎるとタイムアウトするため余裕を持たせておく
+		deletionWaiterPollingInterval = time.Millisecond
+		databaseWaitAfterCreateDuration = time.Millisecond
 	}
 
 	return &APIClient{
