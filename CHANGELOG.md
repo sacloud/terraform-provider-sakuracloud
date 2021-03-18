@@ -2,6 +2,7 @@
 
 FEATURES
 
+  * darwin/arm64 [GH-800] (@yamamoto-febc)
   * libsacloud v2.14.0 [GH-799] (@yamamoto-febc)
 
 
