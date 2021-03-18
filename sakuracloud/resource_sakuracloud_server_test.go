@@ -53,6 +53,8 @@ func TestAccSakuraCloudServer_basic(t *testing.T) {
 					resource.TestCheckResourceAttr(resourceName, "tags.1852302624", "tag2"),
 					resource.TestCheckResourceAttr(resourceName, "disk_edit_parameter.0.hostname", rand),
 					resource.TestCheckResourceAttr(resourceName, "disk_edit_parameter.0.password", password),
+					resource.TestCheckResourceAttr(resourceName, "disk_edit_parameter.0.ssh_keys.#", "1"),
+					resource.TestCheckResourceAttr(resourceName, "disk_edit_parameter.0.ssh_keys.0", "ssh-rsa xxxxx"),
 					resource.TestCheckResourceAttr(resourceName, "disk_edit_parameter.0.ssh_key_ids.#", "2"),
 					resource.TestCheckResourceAttr(resourceName, "disk_edit_parameter.0.ssh_key_ids.0", "100000000000"),
 					resource.TestCheckResourceAttr(resourceName, "disk_edit_parameter.0.disable_pw_auth", "true"),
@@ -392,6 +394,7 @@ resource "sakuracloud_server" "foobar" {
   disk_edit_parameter {
     hostname        = "{{ .arg0 }}"
     password        = "{{ .arg1 }}"
+    ssh_keys        = ["ssh-rsa xxxxx"]
     ssh_key_ids     = ["100000000000", "200000000000"]
     disable_pw_auth = true
     note {

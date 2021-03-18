@@ -14,7 +14,8 @@ resource "sakuracloud_server" "foobar" {
     password = "password"
     disable_pw_auth = true
 
-    # ssh_key_ids     = ["<ID>", "<ID>"]
+    # ssh_keys    = ["ssh-rsa xxxxx"]
+    # ssh_key_ids = ["<ID>", "<ID>"]
     # note {
     #  id         = "<ID>"
     #  api_key_id = "<ID>"
