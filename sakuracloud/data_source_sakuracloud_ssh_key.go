@@ -15,16 +15,17 @@
 package sakuracloud
 
 import (
-	"fmt"
+	"context"
 
-	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/sacloud/libsacloud/v2/sacloud"
 )
 
 func dataSourceSakuraCloudSSHKey() *schema.Resource {
 	resourceName := "SSHKey"
 	return &schema.Resource{
-		Read: dataSourceSakuraCloudSSHKeyRead,
+		ReadContext: dataSourceSakuraCloudSSHKeyRead,
 
 		Schema: map[string]*schema.Schema{
 			filterAttrName: filterSchema(&filterSchemaOption{excludeTags: true}),
@@ -44,13 +45,11 @@ func dataSourceSakuraCloudSSHKey() *schema.Resource {
 	}
 }
 
-func dataSourceSakuraCloudSSHKeyRead(d *schema.ResourceData, meta interface{}) error {
+func dataSourceSakuraCloudSSHKeyRead(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client, _, err := sakuraCloudClient(d, meta)
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
-	ctx, cancel := operationContext(d, schema.TimeoutRead)
-	defer cancel()
 
 	searcher := sacloud.NewSSHKeyOp(client)
 
@@ -61,7 +60,7 @@ func dataSourceSakuraCloudSSHKeyRead(d *schema.ResourceData, meta interface{}) e
 
 	res, err := searcher.Find(ctx, findCondition)
 	if err != nil {
-		return fmt.Errorf("could not find SakuraCloud SSHKey resource: %s", err)
+		return diag.Errorf("could not find SakuraCloud SSHKey resource: %s", err)
 	}
 	if res == nil || res.Count == 0 || len(res.SSHKeys) == 0 {
 		return filterNoResultErr()

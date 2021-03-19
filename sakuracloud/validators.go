@@ -21,8 +21,8 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
-	"github.com/hashicorp/terraform-plugin-sdk/helper/validation"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
 	"github.com/sacloud/libsacloud/v2/sacloud/types"
 )
 
@@ -81,7 +81,7 @@ func validateBackupWeekdays(d resourceValueGettable, k string) error {
 	return nil
 }
 
-func validateBackupTime() schema.SchemaValidateFunc {
+func validateBackupTime() schema.SchemaValidateDiagFunc {
 	var timeStrings []string
 	minutes := []int{0, 15, 30, 45}
 
@@ -92,11 +92,11 @@ func validateBackupTime() schema.SchemaValidateFunc {
 		}
 	}
 
-	return validation.StringInSlice(timeStrings, false)
+	return validation.ToDiagFunc(validation.StringInSlice(timeStrings, false))
 }
 
-func validateIPv4Address() schema.SchemaValidateFunc {
-	return func(v interface{}, k string) (ws []string, errors []error) {
+func validateIPv4Address() schema.SchemaValidateDiagFunc {
+	return validation.ToDiagFunc(func(v interface{}, k string) (ws []string, errors []error) {
 		// if target is nil , return OK(Use required attr if necessary)
 		if v == nil {
 			return
@@ -113,7 +113,7 @@ func validateIPv4Address() schema.SchemaValidateFunc {
 			}
 		}
 		return
-	}
+	})
 }
 
 func validateDatabaseParameters(d *schema.ResourceData) error {

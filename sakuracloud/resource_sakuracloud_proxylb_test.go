@@ -22,8 +22,8 @@ import (
 	"regexp"
 	"testing"
 
-	"github.com/hashicorp/terraform-plugin-sdk/helper/resource"
-	"github.com/hashicorp/terraform-plugin-sdk/terraform"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
 	"github.com/sacloud/libsacloud/v2/sacloud"
 )
 
@@ -41,8 +41,8 @@ func TestAccSakuraCloudProxyLB_basic(t *testing.T) {
 
 	var proxylb, proxylbUpd sacloud.ProxyLB
 	resource.ParallelTest(t, resource.TestCase{
-		PreCheck:  func() { testAccPreCheck(t) },
-		Providers: testAccProviders,
+		PreCheck:          func() { testAccPreCheck(t) },
+		ProviderFactories: testAccProviderFactories,
 		CheckDestroy: resource.ComposeTestCheckFunc(
 			testCheckSakuraCloudIconDestroy,
 			testCheckSakuraCloudProxyLBDestroy,
@@ -56,8 +56,8 @@ func TestAccSakuraCloudProxyLB_basic(t *testing.T) {
 					resource.TestCheckResourceAttr(resourceName, "name", rand),
 					resource.TestCheckResourceAttr(resourceName, "description", "description"),
 					resource.TestCheckResourceAttr(resourceName, "tags.#", "2"),
-					resource.TestCheckResourceAttr(resourceName, "tags.4151227546", "tag1"),
-					resource.TestCheckResourceAttr(resourceName, "tags.1852302624", "tag2"),
+					resource.TestCheckResourceAttr(resourceName, "tags.0", "tag1"),
+					resource.TestCheckResourceAttr(resourceName, "tags.1", "tag2"),
 					resource.TestCheckResourceAttr(resourceName, "plan", "100"),
 					resource.TestMatchResourceAttr(resourceName, "fqdn", regexp.MustCompile(`.+\.sakura\.ne\.jp$`)),
 					resource.TestCheckResourceAttr(resourceName, "vip_failover", "true"),
@@ -103,8 +103,8 @@ func TestAccSakuraCloudProxyLB_basic(t *testing.T) {
 					resource.TestCheckResourceAttr(resourceName, "name", rand+"-upd"),
 					resource.TestCheckResourceAttr(resourceName, "description", "description-upd"),
 					resource.TestCheckResourceAttr(resourceName, "tags.#", "2"),
-					resource.TestCheckResourceAttr(resourceName, "tags.2362157161", "tag1-upd"),
-					resource.TestCheckResourceAttr(resourceName, "tags.3412841145", "tag2-upd"),
+					resource.TestCheckResourceAttr(resourceName, "tags.0", "tag1-upd"),
+					resource.TestCheckResourceAttr(resourceName, "tags.1", "tag2-upd"),
 					resource.TestCheckResourceAttr(resourceName, "plan", "500"),
 					resource.TestCheckResourceAttr(resourceName, "sticky_session", "false"),
 					resource.TestCheckResourceAttr(resourceName, "health_check.0.protocol", "tcp"),
@@ -201,8 +201,8 @@ func TestAccImportSakuraCloudProxyLB_basic(t *testing.T) {
 			"health_check.0.protocol":   "tcp",
 			"health_check.0.delay_loop": "20",
 			"description":               "description",
-			"tags.4151227546":           "tag1",
-			"tags.1852302624":           "tag2",
+			"tags.0":                    "tag1",
+			"tags.1":                    "tag2",
 			"bind_port.0.proxy_mode":    "https",
 			"bind_port.0.port":          "443",
 			"server.#":                  "2",
@@ -223,9 +223,9 @@ func TestAccImportSakuraCloudProxyLB_basic(t *testing.T) {
 	resourceName := "sakuracloud_proxylb.foobar"
 
 	resource.ParallelTest(t, resource.TestCase{
-		PreCheck:     func() { testAccPreCheck(t) },
-		Providers:    testAccProviders,
-		CheckDestroy: testCheckSakuraCloudProxyLBDestroy,
+		PreCheck:          func() { testAccPreCheck(t) },
+		ProviderFactories: testAccProviderFactories,
+		CheckDestroy:      testCheckSakuraCloudProxyLBDestroy,
 		Steps: []resource.TestStep{
 			{
 				Config: buildConfigWithArgs(testAccSakuraCloudProxyLB_import, rand, ip0, ip1),

@@ -16,20 +16,21 @@ package sakuracloud
 
 import (
 	"context"
-	"fmt"
 	"time"
 
-	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
 	"github.com/sacloud/libsacloud/v2/sacloud"
 )
 
 func resourceSakuraCloudProxyLBACME() *schema.Resource {
 	return &schema.Resource{
-		Create: resourceSakuraCloudProxyLBACMECreate,
-		Read:   resourceSakuraCloudProxyLBACMERead,
-		Delete: resourceSakuraCloudProxyLBACMEDelete,
+		CreateContext: resourceSakuraCloudProxyLBACMECreate,
+		ReadContext:   resourceSakuraCloudProxyLBACMERead,
+		DeleteContext: resourceSakuraCloudProxyLBACMEDelete,
 		Importer: &schema.ResourceImporter{
-			State: schema.ImportStatePassthrough,
+			StateContext: schema.ImportStatePassthroughContext,
 		},
 
 		Timeouts: &schema.ResourceTimeout{
@@ -39,11 +40,11 @@ func resourceSakuraCloudProxyLBACME() *schema.Resource {
 
 		Schema: map[string]*schema.Schema{
 			"proxylb_id": {
-				Type:         schema.TypeString,
-				Required:     true,
-				ForceNew:     true,
-				ValidateFunc: validateSakuracloudIDType,
-				Description:  "The id of the ProxyLB that set ACME settings to",
+				Type:             schema.TypeString,
+				Required:         true,
+				ForceNew:         true,
+				ValidateDiagFunc: validation.ToDiagFunc(validateSakuracloudIDType),
+				Description:      "The id of the ProxyLB that set ACME settings to",
 			},
 			"accept_tos": {
 				Type:        schema.TypeBool,
@@ -113,16 +114,13 @@ func resourceSakuraCloudProxyLBACME() *schema.Resource {
 	}
 }
 
-func resourceSakuraCloudProxyLBACMECreate(d *schema.ResourceData, meta interface{}) error {
+func resourceSakuraCloudProxyLBACMECreate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client, _, err := sakuraCloudClient(d, meta)
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
-	ctx, cancel := operationContext(d, schema.TimeoutCreate)
-	defer cancel()
 
 	proxyLBOp := sacloud.NewProxyLBOp(client)
-
 	proxyLBID := d.Get("proxylb_id").(string)
 
 	sakuraMutexKV.Lock(proxyLBID)
@@ -130,7 +128,7 @@ func resourceSakuraCloudProxyLBACMECreate(d *schema.ResourceData, meta interface
 
 	proxyLB, err := proxyLBOp.Read(ctx, sakuraCloudID(proxyLBID))
 	if err != nil {
-		return fmt.Errorf("could not read SakuraCloud ProxyLB[%s]: %s", proxyLBID, err)
+		return diag.Errorf("could not read SakuraCloud ProxyLB[%s]: %s", proxyLBID, err)
 	}
 
 	// clear
@@ -163,26 +161,23 @@ func resourceSakuraCloudProxyLBACMECreate(d *schema.ResourceData, meta interface
 		SettingsHash:  proxyLB.SettingsHash,
 	})
 	if err != nil {
-		return fmt.Errorf("setting ProxyLB[%s] ACME is failed: %s", proxyLBID, err)
+		return diag.Errorf("setting ProxyLB[%s] ACME is failed: %s", proxyLBID, err)
 	}
 	if err := proxyLBOp.RenewLetsEncryptCert(ctx, proxyLB.ID); err != nil {
-		return fmt.Errorf("renewing ACME Certificates at ProxyLB[%s] is failed: %s", proxyLBID, err)
+		return diag.Errorf("renewing ACME Certificates at ProxyLB[%s] is failed: %s", proxyLBID, err)
 	}
 
 	d.SetId(proxyLBID)
-	return resourceSakuraCloudProxyLBACMERead(d, meta)
+	return resourceSakuraCloudProxyLBACMERead(ctx, d, meta)
 }
 
-func resourceSakuraCloudProxyLBACMERead(d *schema.ResourceData, meta interface{}) error {
+func resourceSakuraCloudProxyLBACMERead(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client, _, err := sakuraCloudClient(d, meta)
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
-	ctx, cancel := operationContext(d, schema.TimeoutRead)
-	defer cancel()
 
 	proxyLBOp := sacloud.NewProxyLBOp(client)
-
 	proxyLBID := d.Get("proxylb_id").(string)
 
 	proxyLB, err := proxyLBOp.Read(ctx, sakuraCloudID(proxyLBID))
@@ -191,22 +186,19 @@ func resourceSakuraCloudProxyLBACMERead(d *schema.ResourceData, meta interface{}
 			d.SetId("")
 			return nil
 		}
-		return fmt.Errorf("could not read SakuraCloud ProxyLB[%s] : %s", proxyLBID, err)
+		return diag.Errorf("could not read SakuraCloud ProxyLB[%s] : %s", proxyLBID, err)
 	}
 
 	return setProxyLBACMEResourceData(ctx, d, client, proxyLB)
 }
 
-func resourceSakuraCloudProxyLBACMEDelete(d *schema.ResourceData, meta interface{}) error {
+func resourceSakuraCloudProxyLBACMEDelete(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client, _, err := sakuraCloudClient(d, meta)
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
-	ctx, cancel := operationContext(d, schema.TimeoutDelete)
-	defer cancel()
 
 	proxyLBOp := sacloud.NewProxyLBOp(client)
-
 	proxyLBID := d.Get("proxylb_id").(string)
 
 	sakuraMutexKV.Lock(proxyLBID)
@@ -214,7 +206,7 @@ func resourceSakuraCloudProxyLBACMEDelete(d *schema.ResourceData, meta interface
 
 	proxyLB, err := proxyLBOp.Read(ctx, sakuraCloudID(proxyLBID))
 	if err != nil {
-		return fmt.Errorf("could not read SakuraCloud ProxyLB[%s]: %s", proxyLBID, err)
+		return diag.Errorf("could not read SakuraCloud ProxyLB[%s]: %s", proxyLBID, err)
 	}
 
 	// clear
@@ -231,14 +223,14 @@ func resourceSakuraCloudProxyLBACMEDelete(d *schema.ResourceData, meta interface
 		SettingsHash:  proxyLB.SettingsHash,
 	})
 	if err != nil {
-		return fmt.Errorf("clearing ACME Setting of ProxyLB[%s] is failed: %s", proxyLBID, err)
+		return diag.Errorf("clearing ACME Setting of ProxyLB[%s] is failed: %s", proxyLBID, err)
 	}
 
 	d.SetId("")
 	return nil
 }
 
-func setProxyLBACMEResourceData(ctx context.Context, d *schema.ResourceData, client *APIClient, data *sacloud.ProxyLB) error {
+func setProxyLBACMEResourceData(ctx context.Context, d *schema.ResourceData, client *APIClient, data *sacloud.ProxyLB) diag.Diagnostics {
 	proxyLBOp := sacloud.NewProxyLBOp(client)
 
 	// certificates
@@ -248,7 +240,7 @@ func setProxyLBACMEResourceData(ctx context.Context, d *schema.ResourceData, cli
 		cert, err = proxyLBOp.GetCertificates(ctx, data.ID)
 		if err != nil {
 			// even if certificate is deleted, it will not result in an error
-			return err
+			return diag.FromErr(err)
 		}
 		if cert.PrimaryCert != nil && cert.PrimaryCert.ServerCertificate != "" {
 			break
@@ -275,7 +267,7 @@ func setProxyLBACMEResourceData(ctx context.Context, d *schema.ResourceData, cli
 	}
 
 	if err := d.Set("certificate", []interface{}{proxylbCert}); err != nil {
-		return err
+		return diag.FromErr(err)
 	}
 	return nil
 }

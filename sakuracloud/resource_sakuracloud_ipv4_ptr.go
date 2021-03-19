@@ -15,22 +15,23 @@
 package sakuracloud
 
 import (
-	"fmt"
+	"context"
 	"time"
 
-	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
-	"github.com/hashicorp/terraform-plugin-sdk/helper/validation"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
 	"github.com/sacloud/libsacloud/v2/sacloud"
 )
 
 func resourceSakuraCloudIPv4Ptr() *schema.Resource {
 	return &schema.Resource{
-		Create: resourceSakuraCloudIPv4PtrUpdate,
-		Read:   resourceSakuraCloudIPv4PtrRead,
-		Update: resourceSakuraCloudIPv4PtrUpdate,
-		Delete: resourceSakuraCloudIPv4PtrDelete,
+		CreateContext: resourceSakuraCloudIPv4PtrUpdate,
+		ReadContext:   resourceSakuraCloudIPv4PtrRead,
+		UpdateContext: resourceSakuraCloudIPv4PtrUpdate,
+		DeleteContext: resourceSakuraCloudIPv4PtrDelete,
 		Importer: &schema.ResourceImporter{
-			State: schema.ImportStatePassthrough,
+			StateContext: schema.ImportStatePassthroughContext,
 		},
 
 		Timeouts: &schema.ResourceTimeout{
@@ -41,10 +42,10 @@ func resourceSakuraCloudIPv4Ptr() *schema.Resource {
 
 		Schema: map[string]*schema.Schema{
 			"ip_address": {
-				Type:         schema.TypeString,
-				Required:     true,
-				ValidateFunc: validateIPv4Address(),
-				Description:  "The IP address to which the PTR record is set",
+				Type:             schema.TypeString,
+				Required:         true,
+				ValidateDiagFunc: validateIPv4Address(),
+				Description:      "The IP address to which the PTR record is set",
 			},
 			"hostname": {
 				Type:        schema.TypeString,
@@ -52,37 +53,31 @@ func resourceSakuraCloudIPv4Ptr() *schema.Resource {
 				Description: "The value of the PTR record. This must be FQDN",
 			},
 			"retry_max": {
-				Type:         schema.TypeInt,
-				Optional:     true,
-				Default:      30,
-				ValidateFunc: validation.IntBetween(1, 100),
-				Description:  "The maximum number of API call retries used when SakuraCloud API returns any errors",
+				Type:             schema.TypeInt,
+				Optional:         true,
+				Default:          30,
+				ValidateDiagFunc: validation.ToDiagFunc(validation.IntBetween(1, 100)),
+				Description:      "The maximum number of API call retries used when SakuraCloud API returns any errors",
 			},
 			"retry_interval": {
-				Type:         schema.TypeInt,
-				Optional:     true,
-				Default:      10,
-				ValidateFunc: validation.IntBetween(1, 600),
-				Description:  "The wait interval(in seconds) for retrying API call used when SakuraCloud API returns any errors",
+				Type:             schema.TypeInt,
+				Optional:         true,
+				Default:          10,
+				ValidateDiagFunc: validation.ToDiagFunc(validation.IntBetween(1, 600)),
+				Description:      "The wait interval(in seconds) for retrying API call used when SakuraCloud API returns any errors",
 			},
 			"zone": schemaResourceZone("IPv4 PTR"),
 		},
 	}
 }
 
-func resourceSakuraCloudIPv4PtrUpdate(d *schema.ResourceData, meta interface{}) error {
+func resourceSakuraCloudIPv4PtrUpdate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	var err error
 
 	client, zone, err := sakuraCloudClient(d, meta)
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
-	op := schema.TimeoutUpdate
-	if d.IsNewResource() {
-		op = schema.TimeoutCreate
-	}
-	ctx, cancel := operationContext(d, op)
-	defer cancel()
 
 	ipAddrOp := sacloud.NewIPAddressOp(client)
 
@@ -97,7 +92,7 @@ func resourceSakuraCloudIPv4PtrUpdate(d *schema.ResourceData, meta interface{}) 
 	_, err = ipAddrOp.Read(ctx, zone, ip)
 	if err != nil {
 		// includes 404 error
-		return fmt.Errorf("could not find SakuraCloud IPv4Ptr[%s]: %s", ip, err)
+		return diag.Errorf("could not find SakuraCloud IPv4Ptr[%s]: %s", ip, err)
 	}
 
 	i := 0
@@ -114,20 +109,18 @@ func resourceSakuraCloudIPv4PtrUpdate(d *schema.ResourceData, meta interface{}) 
 	}
 
 	if !success {
-		return fmt.Errorf("could not update SakuraCloud IPv4Ptr[IP:%s Host:%s]: %s", ip, hostName, err)
+		return diag.Errorf("could not update SakuraCloud IPv4Ptr[IP:%s Host:%s]: %s", ip, hostName, err)
 	}
 
 	d.SetId(ip)
-	return resourceSakuraCloudIPv4PtrRead(d, meta)
+	return resourceSakuraCloudIPv4PtrRead(ctx, d, meta)
 }
 
-func resourceSakuraCloudIPv4PtrRead(d *schema.ResourceData, meta interface{}) error {
+func resourceSakuraCloudIPv4PtrRead(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client, zone, err := sakuraCloudClient(d, meta)
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
-	ctx, cancel := operationContext(d, schema.TimeoutRead)
-	defer cancel()
 
 	ipAddrOp := sacloud.NewIPAddressOp(client)
 	ip := d.Id()
@@ -138,20 +131,18 @@ func resourceSakuraCloudIPv4PtrRead(d *schema.ResourceData, meta interface{}) er
 			d.SetId("")
 			return nil
 		}
-		return fmt.Errorf("could not read SakuraCloud IPv4Ptr[%s]: %s", ip, err)
+		return diag.Errorf("could not read SakuraCloud IPv4Ptr[%s]: %s", ip, err)
 	}
 	return setIPv4PtrResourceData(d, client, ptr)
 }
 
-func resourceSakuraCloudIPv4PtrDelete(d *schema.ResourceData, meta interface{}) error {
+func resourceSakuraCloudIPv4PtrDelete(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	var err error
 
 	client, zone, err := sakuraCloudClient(d, meta)
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
-	ctx, cancel := operationContext(d, schema.TimeoutDelete)
-	defer cancel()
 
 	ipAddrOp := sacloud.NewIPAddressOp(client)
 	ip := d.Id()
@@ -164,12 +155,12 @@ func resourceSakuraCloudIPv4PtrDelete(d *schema.ResourceData, meta interface{}) 
 
 	_, err = ipAddrOp.UpdateHostName(ctx, zone, ip, "")
 	if err != nil {
-		return fmt.Errorf("could not update SakuraCloud IPv4Ptr[%s]: %s", ip, err)
+		return diag.Errorf("could not update SakuraCloud IPv4Ptr[%s]: %s", ip, err)
 	}
 	return nil
 }
 
-func setIPv4PtrResourceData(d *schema.ResourceData, client *APIClient, data *sacloud.IPAddress) error {
+func setIPv4PtrResourceData(d *schema.ResourceData, client *APIClient, data *sacloud.IPAddress) diag.Diagnostics {
 	d.Set("ip_address", data.IPAddress) // nolint
 	d.Set("hostname", data.HostName)    // nolint
 	d.Set("zone", getZone(d, client))   // nolint

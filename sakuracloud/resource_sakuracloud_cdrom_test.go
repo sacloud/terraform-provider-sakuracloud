@@ -21,8 +21,8 @@ import (
 	"os"
 	"testing"
 
-	"github.com/hashicorp/terraform-plugin-sdk/helper/resource"
-	"github.com/hashicorp/terraform-plugin-sdk/terraform"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
 	"github.com/sacloud/libsacloud/v2/sacloud"
 )
 
@@ -34,8 +34,8 @@ func TestAccSakuraCloudCDROM_basic(t *testing.T) {
 
 	var cdrom sacloud.CDROM
 	resource.ParallelTest(t, resource.TestCase{
-		PreCheck:  func() { testAccPreCheck(t) },
-		Providers: testAccProviders,
+		PreCheck:          func() { testAccPreCheck(t) },
+		ProviderFactories: testAccProviderFactories,
 		CheckDestroy: resource.ComposeTestCheckFunc(
 			testCheckSakuraCloudCDROMDestroy,
 			testCheckSakuraCloudIconDestroy,
@@ -53,8 +53,8 @@ func TestAccSakuraCloudCDROM_basic(t *testing.T) {
 					),
 					resource.TestCheckResourceAttr(resourceName, "iso_image_file", "test/dummy.iso"),
 					resource.TestCheckResourceAttr(resourceName, "description", "description"),
-					resource.TestCheckResourceAttr(resourceName, "tags.4151227546", "tag1"),
-					resource.TestCheckResourceAttr(resourceName, "tags.1852302624", "tag2"),
+					resource.TestCheckResourceAttr(resourceName, "tags.0", "tag1"),
+					resource.TestCheckResourceAttr(resourceName, "tags.1", "tag2"),
 				),
 			},
 			{
@@ -65,8 +65,8 @@ func TestAccSakuraCloudCDROM_basic(t *testing.T) {
 					resource.TestCheckResourceAttr(resourceName, "icon_id", ""),
 					resource.TestCheckResourceAttr(resourceName, "iso_image_file", "test/dummy-upd.iso"),
 					resource.TestCheckResourceAttr(resourceName, "description", "description-upd"),
-					resource.TestCheckResourceAttr(resourceName, "tags.2362157161", "tag1-upd"),
-					resource.TestCheckResourceAttr(resourceName, "tags.3412841145", "tag2-upd"),
+					resource.TestCheckResourceAttr(resourceName, "tags.0", "tag1-upd"),
+					resource.TestCheckResourceAttr(resourceName, "tags.1", "tag2-upd"),
 				),
 			},
 		},
@@ -80,9 +80,9 @@ func TestAccSakuraCloudCDROM_textContent(t *testing.T) {
 	rand := randomName()
 
 	resource.ParallelTest(t, resource.TestCase{
-		PreCheck:     func() { testAccPreCheck(t) },
-		Providers:    testAccProviders,
-		CheckDestroy: testCheckSakuraCloudCDROMDestroy,
+		PreCheck:          func() { testAccPreCheck(t) },
+		ProviderFactories: testAccProviderFactories,
+		CheckDestroy:      testCheckSakuraCloudCDROMDestroy,
 		Steps: []resource.TestStep{
 			{
 				Config: buildConfigWithArgs(testAccSakuraCloudCDROM_textContent, rand),
@@ -164,12 +164,12 @@ func TestAccImportSakuraCloudCDROM_basic(t *testing.T) {
 			return fmt.Errorf("expected 1 state: %#v", s)
 		}
 		expects := map[string]string{
-			"name":            rand,
-			"size":            "5",
-			"description":     "description",
-			"tags.4151227546": "tag1",
-			"tags.1852302624": "tag2",
-			"zone":            os.Getenv("SAKURACLOUD_ZONE"),
+			"name":        rand,
+			"size":        "5",
+			"description": "description",
+			"tags.0":      "tag1",
+			"tags.1":      "tag2",
+			"zone":        os.Getenv("SAKURACLOUD_ZONE"),
 		}
 
 		if err := compareStateMulti(s[0], expects); err != nil {
@@ -181,8 +181,8 @@ func TestAccImportSakuraCloudCDROM_basic(t *testing.T) {
 	resourceName := "sakuracloud_cdrom.foobar"
 
 	resource.ParallelTest(t, resource.TestCase{
-		PreCheck:  func() { testAccPreCheck(t) },
-		Providers: testAccProviders,
+		PreCheck:          func() { testAccPreCheck(t) },
+		ProviderFactories: testAccProviderFactories,
 		CheckDestroy: resource.ComposeTestCheckFunc(
 			testCheckSakuraCloudCDROMDestroy,
 			testCheckSakuraCloudIconDestroy,

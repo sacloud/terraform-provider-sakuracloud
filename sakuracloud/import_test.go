@@ -17,7 +17,7 @@ package sakuracloud
 import (
 	"fmt"
 
-	"github.com/hashicorp/terraform-plugin-sdk/terraform"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
 )
 
 func compareState(s *terraform.InstanceState, key, value string) error {

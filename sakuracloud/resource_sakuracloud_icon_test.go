@@ -20,8 +20,8 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/hashicorp/terraform-plugin-sdk/helper/resource"
-	"github.com/hashicorp/terraform-plugin-sdk/terraform"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
 	"github.com/sacloud/libsacloud/v2/sacloud"
 )
 
@@ -31,9 +31,9 @@ func TestAccSakuraCloudIcon_basic(t *testing.T) {
 
 	var icon sacloud.Icon
 	resource.ParallelTest(t, resource.TestCase{
-		PreCheck:     func() { testAccPreCheck(t) },
-		Providers:    testAccProviders,
-		CheckDestroy: testCheckSakuraCloudIconDestroy,
+		PreCheck:          func() { testAccPreCheck(t) },
+		ProviderFactories: testAccProviderFactories,
+		CheckDestroy:      testCheckSakuraCloudIconDestroy,
 		Steps: []resource.TestStep{
 			{
 				Config: buildConfigWithArgs(testAccSakuraCloudIcon_basic, name),
@@ -41,8 +41,8 @@ func TestAccSakuraCloudIcon_basic(t *testing.T) {
 					testCheckSakuraCloudIconExists(resourceName, &icon),
 					resource.TestCheckResourceAttr(resourceName, "name", name),
 					resource.TestCheckResourceAttr(resourceName, "tags.#", "2"),
-					resource.TestCheckResourceAttr(resourceName, "tags.4151227546", "tag1"),
-					resource.TestCheckResourceAttr(resourceName, "tags.1852302624", "tag2"),
+					resource.TestCheckResourceAttr(resourceName, "tags.0", "tag1"),
+					resource.TestCheckResourceAttr(resourceName, "tags.1", "tag2"),
 				),
 			},
 			{
@@ -51,8 +51,8 @@ func TestAccSakuraCloudIcon_basic(t *testing.T) {
 					testCheckSakuraCloudIconExists(resourceName, &icon),
 					resource.TestCheckResourceAttr(resourceName, "name", name+"-upd"),
 					resource.TestCheckResourceAttr(resourceName, "tags.#", "2"),
-					resource.TestCheckResourceAttr(resourceName, "tags.2362157161", "tag1-upd"),
-					resource.TestCheckResourceAttr(resourceName, "tags.3412841145", "tag2-upd"),
+					resource.TestCheckResourceAttr(resourceName, "tags.0", "tag1-upd"),
+					resource.TestCheckResourceAttr(resourceName, "tags.1", "tag2-upd"),
 				),
 			},
 		},
@@ -65,8 +65,8 @@ func TestAccSakuraCloudIcon_withSwitch(t *testing.T) {
 
 	var icon sacloud.Icon
 	resource.ParallelTest(t, resource.TestCase{
-		PreCheck:  func() { testAccPreCheck(t) },
-		Providers: testAccProviders,
+		PreCheck:          func() { testAccPreCheck(t) },
+		ProviderFactories: testAccProviderFactories,
 		CheckDestroy: resource.ComposeTestCheckFunc(
 			testCheckSakuraCloudIconDestroy,
 			testCheckSakuraCloudSwitchDestroy,

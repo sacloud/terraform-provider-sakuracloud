@@ -15,9 +15,11 @@
 package sakuracloud
 
 import (
-	"fmt"
+	"context"
 
-	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
 	"github.com/sacloud/libsacloud/v2/sacloud"
 )
 
@@ -25,14 +27,14 @@ func dataSourceSakuraCloudSubnet() *schema.Resource {
 	resourceName := "Subnet"
 
 	return &schema.Resource{
-		Read: dataSourceSakuraCloudSubnetRead,
+		ReadContext: dataSourceSakuraCloudSubnetRead,
 
 		Schema: map[string]*schema.Schema{
 			"internet_id": {
-				Type:         schema.TypeString,
-				Required:     true,
-				ValidateFunc: validateSakuracloudIDType,
-				Description:  "The id of the switch+router resource that the Subnet belongs",
+				Type:             schema.TypeString,
+				Required:         true,
+				ValidateDiagFunc: validation.ToDiagFunc(validateSakuracloudIDType),
+				Description:      "The id of the switch+router resource that the Subnet belongs",
 			},
 			"index": {
 				Type:        schema.TypeInt,
@@ -73,13 +75,11 @@ func dataSourceSakuraCloudSubnet() *schema.Resource {
 	}
 }
 
-func dataSourceSakuraCloudSubnetRead(d *schema.ResourceData, meta interface{}) error {
+func dataSourceSakuraCloudSubnetRead(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client, zone, err := sakuraCloudClient(d, meta)
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
-	ctx, cancel := operationContext(d, schema.TimeoutRead)
-	defer cancel()
 
 	internetOp := sacloud.NewInternetOp(client)
 	subnetOp := sacloud.NewSubnetOp(client)
@@ -89,16 +89,16 @@ func dataSourceSakuraCloudSubnetRead(d *schema.ResourceData, meta interface{}) e
 
 	res, err := internetOp.Read(ctx, zone, internetID)
 	if err != nil {
-		return fmt.Errorf("could not find SakuraCloud Internet[%d]: %s", internetID, err)
+		return diag.Errorf("could not find SakuraCloud Internet[%d]: %s", internetID, err)
 	}
 	if subnetIndex >= len(res.Switch.Subnets) {
-		return fmt.Errorf("could not find SakuraCloud Subnet: invalid subneet index: %d", subnetIndex)
+		return diag.Errorf("could not find SakuraCloud Subnet: invalid subneet index: %d", subnetIndex)
 	}
 
 	subnetID := res.Switch.Subnets[subnetIndex].ID
 	subnet, err := subnetOp.Read(ctx, zone, subnetID)
 	if err != nil {
-		return fmt.Errorf("could not find SakuraCloud Subnet[%d]: %s", subnetID, err)
+		return diag.Errorf("could not find SakuraCloud Subnet[%d]: %s", subnetID, err)
 	}
 
 	d.SetId(subnetID.String())

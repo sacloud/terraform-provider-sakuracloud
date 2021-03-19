@@ -19,8 +19,9 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
-	"github.com/hashicorp/terraform-plugin-sdk/helper/validation"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
 	"github.com/sacloud/libsacloud/v2/helper/cleanup"
 	"github.com/sacloud/libsacloud/v2/helper/query"
 	"github.com/sacloud/libsacloud/v2/sacloud"
@@ -30,12 +31,12 @@ import (
 func resourceSakuraCloudInternet() *schema.Resource {
 	resourceName := "Switch+Router"
 	return &schema.Resource{
-		Create: resourceSakuraCloudInternetCreate,
-		Read:   resourceSakuraCloudInternetRead,
-		Update: resourceSakuraCloudInternetUpdate,
-		Delete: resourceSakuraCloudInternetDelete,
+		CreateContext: resourceSakuraCloudInternetCreate,
+		ReadContext:   resourceSakuraCloudInternetRead,
+		UpdateContext: resourceSakuraCloudInternetUpdate,
+		DeleteContext: resourceSakuraCloudInternetDelete,
 		Importer: &schema.ResourceImporter{
-			State: schema.ImportStatePassthrough,
+			StateContext: schema.ImportStatePassthroughContext,
 		},
 
 		Timeouts: &schema.ResourceTimeout{
@@ -51,21 +52,21 @@ func resourceSakuraCloudInternet() *schema.Resource {
 			"tags":        schemaResourceTags(resourceName),
 			"zone":        schemaResourceZone(resourceName),
 			"netmask": {
-				Type:         schema.TypeInt,
-				ForceNew:     true,
-				Optional:     true,
-				ValidateFunc: validation.IntInSlice(types.InternetNetworkMaskLengths),
-				Default:      28,
+				Type:             schema.TypeInt,
+				ForceNew:         true,
+				Optional:         true,
+				ValidateDiagFunc: validation.ToDiagFunc(validation.IntInSlice(types.InternetNetworkMaskLengths)),
+				Default:          28,
 				Description: descf(
 					"The bit length of the subnet assigned to the %s. %s", resourceName,
 					types.InternetNetworkMaskLengths,
 				),
 			},
 			"band_width": {
-				Type:         schema.TypeInt,
-				Optional:     true,
-				ValidateFunc: validation.IntInSlice(types.InternetBandWidths),
-				Default:      100,
+				Type:             schema.TypeInt,
+				Optional:         true,
+				ValidateDiagFunc: validation.ToDiagFunc(validation.IntInSlice(types.InternetBandWidths)),
+				Default:          100,
 				Description: descf(
 					"The bandwidth of the network connected to the Internet in Mbps. %s",
 					types.InternetBandWidths,
@@ -132,13 +133,11 @@ func resourceSakuraCloudInternet() *schema.Resource {
 	}
 }
 
-func resourceSakuraCloudInternetCreate(d *schema.ResourceData, meta interface{}) error {
+func resourceSakuraCloudInternetCreate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client, zone, err := sakuraCloudClient(d, meta)
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
-	ctx, cancel := operationContext(d, schema.TimeoutCreate)
-	defer cancel()
 
 	builder := expandInternetBuilder(d, client)
 
@@ -147,19 +146,17 @@ func resourceSakuraCloudInternetCreate(d *schema.ResourceData, meta interface{})
 		d.SetId(internet.ID.String())
 	}
 	if err != nil {
-		return fmt.Errorf("creating SakuraCloud Internet is failed: %s", err)
+		return diag.Errorf("creating SakuraCloud Internet is failed: %s", err)
 	}
 
-	return resourceSakuraCloudInternetRead(d, meta)
+	return resourceSakuraCloudInternetRead(ctx, d, meta)
 }
 
-func resourceSakuraCloudInternetRead(d *schema.ResourceData, meta interface{}) error {
+func resourceSakuraCloudInternetRead(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client, zone, err := sakuraCloudClient(d, meta)
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
-	ctx, cancel := operationContext(d, schema.TimeoutRead)
-	defer cancel()
 
 	internetOp := sacloud.NewInternetOp(client)
 
@@ -169,18 +166,16 @@ func resourceSakuraCloudInternetRead(d *schema.ResourceData, meta interface{}) e
 			d.SetId("")
 			return nil
 		}
-		return fmt.Errorf("could not read SakuraCloud Internet[%s]: %s", d.Id(), err)
+		return diag.Errorf("could not read SakuraCloud Internet[%s]: %s", d.Id(), err)
 	}
 	return setInternetResourceData(ctx, d, client, internet)
 }
 
-func resourceSakuraCloudInternetUpdate(d *schema.ResourceData, meta interface{}) error {
+func resourceSakuraCloudInternetUpdate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client, zone, err := sakuraCloudClient(d, meta)
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
-	ctx, cancel := operationContext(d, schema.TimeoutUpdate)
-	defer cancel()
 
 	internetOp := sacloud.NewInternetOp(client)
 
@@ -189,26 +184,24 @@ func resourceSakuraCloudInternetUpdate(d *schema.ResourceData, meta interface{})
 
 	internet, err := internetOp.Read(ctx, zone, sakuraCloudID(d.Id()))
 	if err != nil {
-		return fmt.Errorf("could not read SakuraCloud Internet[%s]: %s", d.Id(), err)
+		return diag.Errorf("could not read SakuraCloud Internet[%s]: %s", d.Id(), err)
 	}
 
 	builder := expandInternetBuilder(d, client)
 	internet, err = builder.Update(ctx, zone, internet.ID)
 	if err != nil {
-		return fmt.Errorf("updating SakuraCloud Internet[%s] is failed: %s", d.Id(), err)
+		return diag.Errorf("updating SakuraCloud Internet[%s] is failed: %s", d.Id(), err)
 	}
 
 	d.SetId(internet.ID.String()) // 帯域変更後はIDが変更になるため
-	return resourceSakuraCloudInternetRead(d, meta)
+	return resourceSakuraCloudInternetRead(ctx, d, meta)
 }
 
-func resourceSakuraCloudInternetDelete(d *schema.ResourceData, meta interface{}) error {
+func resourceSakuraCloudInternetDelete(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client, zone, err := sakuraCloudClient(d, meta)
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
-	ctx, cancel := operationContext(d, schema.TimeoutDelete)
-	defer cancel()
 
 	internetOp := sacloud.NewInternetOp(client)
 
@@ -221,33 +214,33 @@ func resourceSakuraCloudInternetDelete(d *schema.ResourceData, meta interface{})
 			d.SetId("")
 			return nil
 		}
-		return fmt.Errorf("could not read SakuraCloud Internet[%s]: %s", d.Id(), err)
+		return diag.Errorf("could not read SakuraCloud Internet[%s]: %s", d.Id(), err)
 	}
 
 	if err := query.WaitWhileSwitchIsReferenced(ctx, client, zone, internet.Switch.ID, client.checkReferencedOption()); err != nil {
-		return fmt.Errorf("waiting deletion is failed: Internet[%s] still used by others: %s", internet.ID, err)
+		return diag.Errorf("waiting deletion is failed: Internet[%s] still used by others: %s", internet.ID, err)
 	}
 
 	if err := cleanup.DeleteInternet(ctx, internetOp, zone, internet.ID); err != nil {
-		return fmt.Errorf("deleting SakuraCloud Internet[%s] is failed: %s", d.Id(), err)
+		return diag.Errorf("deleting SakuraCloud Internet[%s] is failed: %s", d.Id(), err)
 	}
 	return nil
 }
 
-func setInternetResourceData(ctx context.Context, d *schema.ResourceData, client *APIClient, data *sacloud.Internet) error {
+func setInternetResourceData(ctx context.Context, d *schema.ResourceData, client *APIClient, data *sacloud.Internet) diag.Diagnostics {
 	swOp := sacloud.NewSwitchOp(client)
 	zone := getZone(d, client)
 
 	sw, err := swOp.Read(ctx, zone, data.Switch.ID)
 	if err != nil {
-		return fmt.Errorf("could not read SakuraCloud Switch[%s]: %s", data.Switch.ID, err)
+		return diag.Errorf("could not read SakuraCloud Switch[%s]: %s", data.Switch.ID, err)
 	}
 
 	var serverIDs []string
 	if sw.ServerCount > 0 {
 		servers, err := swOp.GetServers(ctx, zone, sw.ID)
 		if err != nil {
-			return fmt.Errorf("could not find SakuraCloud Servers: %s", err)
+			return diag.Errorf("could not find SakuraCloud Servers: %s", err)
 		}
 		for _, s := range servers.Servers {
 			serverIDs = append(serverIDs, s.ID.String())
@@ -280,10 +273,10 @@ func setInternetResourceData(ctx context.Context, d *schema.ResourceData, client
 	d.Set("ipv6_network_address", ipv6NetworkAddress)           // nolint
 	d.Set("zone", zone)                                         // nolint
 	if err := d.Set("ip_addresses", sw.Subnets[0].GetAssignedIPAddresses()); err != nil {
-		return err
+		return diag.FromErr(err)
 	}
 	if err := d.Set("server_ids", serverIDs); err != nil {
-		return err
+		return diag.FromErr(err)
 	}
-	return d.Set("tags", flattenTags(data.Tags))
+	return diag.FromErr(d.Set("tags", flattenTags(data.Tags)))
 }

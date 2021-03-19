@@ -20,8 +20,8 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/hashicorp/terraform-plugin-sdk/helper/resource"
-	"github.com/hashicorp/terraform-plugin-sdk/terraform"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
 	"github.com/sacloud/libsacloud/v2/sacloud"
 )
 
@@ -31,8 +31,8 @@ func TestAccSakuraCloudNFS_basic(t *testing.T) {
 
 	var nfs sacloud.NFS
 	resource.ParallelTest(t, resource.TestCase{
-		PreCheck:  func() { testAccPreCheck(t) },
-		Providers: testAccProviders,
+		PreCheck:          func() { testAccPreCheck(t) },
+		ProviderFactories: testAccProviderFactories,
 		CheckDestroy: resource.ComposeTestCheckFunc(
 			testCheckSakuraCloudIconDestroy,
 			testCheckSakuraCloudNFSDestroy,
@@ -48,8 +48,8 @@ func TestAccSakuraCloudNFS_basic(t *testing.T) {
 					resource.TestCheckResourceAttr(resourceName, "plan", "ssd"),
 					resource.TestCheckResourceAttr(resourceName, "size", "500"),
 					resource.TestCheckResourceAttr(resourceName, "tags.#", "2"),
-					resource.TestCheckResourceAttr(resourceName, "tags.4151227546", "tag1"),
-					resource.TestCheckResourceAttr(resourceName, "tags.1852302624", "tag2"),
+					resource.TestCheckResourceAttr(resourceName, "tags.0", "tag1"),
+					resource.TestCheckResourceAttr(resourceName, "tags.1", "tag2"),
 					resource.TestCheckResourceAttr(resourceName, "network_interface.0.ip_address", "192.168.11.101"),
 					resource.TestCheckResourceAttr(resourceName, "network_interface.0.netmask", "24"),
 					resource.TestCheckResourceAttr(resourceName, "network_interface.0.gateway", "192.168.11.1"),
@@ -68,8 +68,8 @@ func TestAccSakuraCloudNFS_basic(t *testing.T) {
 					resource.TestCheckResourceAttr(resourceName, "plan", "ssd"),
 					resource.TestCheckResourceAttr(resourceName, "size", "500"),
 					resource.TestCheckResourceAttr(resourceName, "tags.#", "2"),
-					resource.TestCheckResourceAttr(resourceName, "tags.2362157161", "tag1-upd"),
-					resource.TestCheckResourceAttr(resourceName, "tags.3412841145", "tag2-upd"),
+					resource.TestCheckResourceAttr(resourceName, "tags.0", "tag1-upd"),
+					resource.TestCheckResourceAttr(resourceName, "tags.1", "tag2-upd"),
 					resource.TestCheckResourceAttr(resourceName, "network_interface.0.ip_address", "192.168.11.101"),
 					resource.TestCheckResourceAttr(resourceName, "network_interface.0.netmask", "24"),
 					resource.TestCheckResourceAttr(resourceName, "network_interface.0.gateway", "192.168.11.1"),

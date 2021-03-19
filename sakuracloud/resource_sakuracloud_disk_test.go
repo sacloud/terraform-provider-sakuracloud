@@ -21,8 +21,8 @@ import (
 	"os"
 	"testing"
 
-	"github.com/hashicorp/terraform-plugin-sdk/helper/resource"
-	"github.com/hashicorp/terraform-plugin-sdk/terraform"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
 	"github.com/sacloud/libsacloud/v2/sacloud"
 	"github.com/sacloud/libsacloud/v2/sacloud/types"
 )
@@ -33,8 +33,8 @@ func TestAccSakuraCloudDisk_basic(t *testing.T) {
 
 	var disk sacloud.Disk
 	resource.ParallelTest(t, resource.TestCase{
-		PreCheck:  func() { testAccPreCheck(t) },
-		Providers: testAccProviders,
+		PreCheck:          func() { testAccPreCheck(t) },
+		ProviderFactories: testAccProviderFactories,
 		CheckDestroy: resource.ComposeTestCheckFunc(
 			testCheckSakuraCloudDiskDestroy,
 			testCheckSakuraCloudIconDestroy,
@@ -51,8 +51,8 @@ func TestAccSakuraCloudDisk_basic(t *testing.T) {
 					resource.TestCheckResourceAttr(resourceName, "connector", "virtio"),
 					resource.TestCheckResourceAttr(resourceName, "size", "20"),
 					resource.TestCheckResourceAttr(resourceName, "tags.#", "2"),
-					resource.TestCheckResourceAttr(resourceName, "tags.4151227546", "tag1"),
-					resource.TestCheckResourceAttr(resourceName, "tags.1852302624", "tag2"),
+					resource.TestCheckResourceAttr(resourceName, "tags.0", "tag1"),
+					resource.TestCheckResourceAttr(resourceName, "tags.1", "tag2"),
 					resource.TestCheckResourceAttrPair(
 						resourceName, "icon_id",
 						"sakuracloud_icon.foobar", "id",
@@ -70,8 +70,8 @@ func TestAccSakuraCloudDisk_basic(t *testing.T) {
 					resource.TestCheckResourceAttr(resourceName, "connector", "virtio"),
 					resource.TestCheckResourceAttr(resourceName, "size", "20"),
 					resource.TestCheckResourceAttr(resourceName, "tags.#", "2"),
-					resource.TestCheckResourceAttr(resourceName, "tags.2362157161", "tag1-upd"),
-					resource.TestCheckResourceAttr(resourceName, "tags.3412841145", "tag2-upd"),
+					resource.TestCheckResourceAttr(resourceName, "tags.0", "tag1-upd"),
+					resource.TestCheckResourceAttr(resourceName, "tags.1", "tag2-upd"),
 					resource.TestCheckResourceAttr(resourceName, "icon_id", ""),
 				),
 			},
@@ -153,16 +153,16 @@ func TestAccImportSakuraCloudDisk_basic(t *testing.T) {
 			return fmt.Errorf("expected 1 state: %#v", s)
 		}
 		expects := map[string]string{
-			"name":            rand,
-			"plan":            "ssd",
-			"connector":       "virtio",
-			"size":            "20",
-			"source_disk_id":  "",
-			"server_id":       "",
-			"description":     "description",
-			"tags.4151227546": "tag1",
-			"tags.1852302624": "tag2",
-			"zone":            os.Getenv("SAKURACLOUD_ZONE"),
+			"name":           rand,
+			"plan":           "ssd",
+			"connector":      "virtio",
+			"size":           "20",
+			"source_disk_id": "",
+			"server_id":      "",
+			"description":    "description",
+			"tags.0":         "tag1",
+			"tags.1":         "tag2",
+			"zone":           os.Getenv("SAKURACLOUD_ZONE"),
 		}
 
 		if err := compareStateMulti(s[0], expects); err != nil {
@@ -174,8 +174,8 @@ func TestAccImportSakuraCloudDisk_basic(t *testing.T) {
 	resourceName := "sakuracloud_disk.foobar"
 
 	resource.ParallelTest(t, resource.TestCase{
-		PreCheck:  func() { testAccPreCheck(t) },
-		Providers: testAccProviders,
+		PreCheck:          func() { testAccPreCheck(t) },
+		ProviderFactories: testAccProviderFactories,
 		CheckDestroy: resource.ComposeTestCheckFunc(
 			testCheckSakuraCloudDiskDestroy,
 			testCheckSakuraCloudIconDestroy,

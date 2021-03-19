@@ -15,21 +15,21 @@
 package sakuracloud
 
 import (
-	"fmt"
+	"context"
 	"time"
 
-	"github.com/sacloud/libsacloud/v2/sacloud/types"
-
-	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/sacloud/libsacloud/v2/sacloud"
+	"github.com/sacloud/libsacloud/v2/sacloud/types"
 )
 
 func resourceSakuraCloudWebAccelCertificate() *schema.Resource {
 	return &schema.Resource{
-		Create: resourceSakuraCloudWebAccelCertificateCreate,
-		Read:   resourceSakuraCloudWebAccelCertificateRead,
-		Update: resourceSakuraCloudWebAccelCertificateUpdate,
-		Delete: resourceSakuraCloudWebAccelCertificateDelete,
+		CreateContext: resourceSakuraCloudWebAccelCertificateCreate,
+		ReadContext:   resourceSakuraCloudWebAccelCertificateRead,
+		UpdateContext: resourceSakuraCloudWebAccelCertificateUpdate,
+		DeleteContext: resourceSakuraCloudWebAccelCertificateDelete,
 		Schema: map[string]*schema.Schema{
 			"site_id": {
 				Type:     schema.TypeString,
@@ -78,13 +78,11 @@ func resourceSakuraCloudWebAccelCertificate() *schema.Resource {
 	}
 }
 
-func resourceSakuraCloudWebAccelCertificateCreate(d *schema.ResourceData, meta interface{}) error {
+func resourceSakuraCloudWebAccelCertificateCreate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	caller, _, err := sakuraCloudClient(d, meta)
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
-	ctx, cancel := operationContext(d, schema.TimeoutCreate)
-	defer cancel()
 
 	siteID := d.Get("site_id").(string)
 
@@ -93,20 +91,18 @@ func resourceSakuraCloudWebAccelCertificateCreate(d *schema.ResourceData, meta i
 		Key:              d.Get("private_key").(string),
 	})
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
 
 	d.SetId(res.Current.SiteID.String())
-	return resourceSakuraCloudWebAccelCertificateRead(d, meta)
+	return resourceSakuraCloudWebAccelCertificateRead(ctx, d, meta)
 }
 
-func resourceSakuraCloudWebAccelCertificateRead(d *schema.ResourceData, meta interface{}) error {
+func resourceSakuraCloudWebAccelCertificateRead(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	caller, _, err := sakuraCloudClient(d, meta)
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
-	ctx, cancel := operationContext(d, schema.TimeoutRead)
-	defer cancel()
 
 	siteID := d.Id()
 
@@ -116,7 +112,7 @@ func resourceSakuraCloudWebAccelCertificateRead(d *schema.ResourceData, meta int
 			d.SetId("")
 			return nil
 		}
-		return fmt.Errorf("could not read SakuraCloud WebAccelCert[%s]: %s", d.Id(), err)
+		return diag.Errorf("could not read SakuraCloud WebAccelCert[%s]: %s", d.Id(), err)
 	}
 
 	if certs.Current == nil {
@@ -127,13 +123,11 @@ func resourceSakuraCloudWebAccelCertificateRead(d *schema.ResourceData, meta int
 	return setWebAccelCertificateResourceData(d, caller, certs.Current)
 }
 
-func resourceSakuraCloudWebAccelCertificateUpdate(d *schema.ResourceData, meta interface{}) error {
+func resourceSakuraCloudWebAccelCertificateUpdate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	caller, _, err := sakuraCloudClient(d, meta)
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
-	ctx, cancel := operationContext(d, schema.TimeoutUpdate)
-	defer cancel()
 	siteID := d.Id()
 
 	if d.HasChanges("certificate_chain", "private_key") {
@@ -142,32 +136,30 @@ func resourceSakuraCloudWebAccelCertificateUpdate(d *schema.ResourceData, meta i
 			Key:              d.Get("private_key").(string),
 		})
 		if err != nil {
-			return err
+			return diag.FromErr(err)
 		}
 		d.SetId(res.Current.SiteID.String())
 	}
 
-	return resourceSakuraCloudWebAccelCertificateRead(d, meta)
+	return resourceSakuraCloudWebAccelCertificateRead(ctx, d, meta)
 }
 
-func resourceSakuraCloudWebAccelCertificateDelete(d *schema.ResourceData, meta interface{}) error {
+func resourceSakuraCloudWebAccelCertificateDelete(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	caller, _, err := sakuraCloudClient(d, meta)
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
-	ctx, cancel := operationContext(d, schema.TimeoutDelete)
-	defer cancel()
 	siteID := d.Get("site_id").(string)
 
 	if err := sacloud.NewWebAccelOp(caller).DeleteCertificate(ctx, types.StringID(siteID)); err != nil {
-		return fmt.Errorf("deleting SakuraCloud WebAccelCert[%s] is failed: %s", d.Id(), err)
+		return diag.Errorf("deleting SakuraCloud WebAccelCert[%s] is failed: %s", d.Id(), err)
 	}
 
 	d.SetId("")
 	return nil
 }
 
-func setWebAccelCertificateResourceData(d *schema.ResourceData, client *APIClient, data *sacloud.WebAccelCurrentCert) error {
+func setWebAccelCertificateResourceData(d *schema.ResourceData, client *APIClient, data *sacloud.WebAccelCurrentCert) diag.Diagnostics {
 	notBefore := time.Unix(data.NotBefore/1000, 0).Format(time.RFC3339)
 	notAfter := time.Unix(data.NotAfter/1000, 0).Format(time.RFC3339)
 
@@ -178,7 +170,7 @@ func setWebAccelCertificateResourceData(d *schema.ResourceData, client *APIClien
 	d.Set("issuer_common_name", data.Issuer.CommonName)   // nolint
 	d.Set("subject_common_name", data.Subject.CommonName) // nolint
 	if err := d.Set("dns_names", data.DNSNames); err != nil {
-		return err
+		return diag.FromErr(err)
 	}
 	d.Set("sha256_fingerprint", data.SHA256Fingerprint) // nolint
 	return nil

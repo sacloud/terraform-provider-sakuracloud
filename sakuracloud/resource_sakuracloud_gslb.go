@@ -16,11 +16,11 @@ package sakuracloud
 
 import (
 	"context"
-	"fmt"
 	"time"
 
-	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
-	"github.com/hashicorp/terraform-plugin-sdk/helper/validation"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
 	"github.com/sacloud/libsacloud/v2/sacloud"
 	"github.com/sacloud/libsacloud/v2/sacloud/types"
 )
@@ -29,12 +29,12 @@ func resourceSakuraCloudGSLB() *schema.Resource {
 	resourceName := "GSLB"
 
 	return &schema.Resource{
-		Create: resourceSakuraCloudGSLBCreate,
-		Read:   resourceSakuraCloudGSLBRead,
-		Update: resourceSakuraCloudGSLBUpdate,
-		Delete: resourceSakuraCloudGSLBDelete,
+		CreateContext: resourceSakuraCloudGSLBCreate,
+		ReadContext:   resourceSakuraCloudGSLBRead,
+		UpdateContext: resourceSakuraCloudGSLBUpdate,
+		DeleteContext: resourceSakuraCloudGSLBDelete,
 		Importer: &schema.ResourceImporter{
-			State: schema.ImportStatePassthrough,
+			StateContext: schema.ImportStatePassthroughContext,
 		},
 
 		Timeouts: &schema.ResourceTimeout{
@@ -58,20 +58,20 @@ func resourceSakuraCloudGSLB() *schema.Resource {
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
 						"protocol": {
-							Type:         schema.TypeString,
-							Required:     true,
-							ValidateFunc: validation.StringInSlice(types.GSLBHealthCheckProtocolStrings, false),
+							Type:             schema.TypeString,
+							Required:         true,
+							ValidateDiagFunc: validation.ToDiagFunc(validation.StringInSlice(types.GSLBHealthCheckProtocolStrings, false)),
 							Description: descf(
 								"The protocol used for health checks. This must be one of [%s]",
 								types.GSLBHealthCheckProtocolStrings,
 							),
 						},
 						"delay_loop": {
-							Type:         schema.TypeInt,
-							Optional:     true,
-							ValidateFunc: validation.IntBetween(10, 60),
-							Default:      10,
-							Description:  descf("The interval in seconds between checks. %s", descRange(10, 60)),
+							Type:             schema.TypeInt,
+							Optional:         true,
+							ValidateDiagFunc: validation.ToDiagFunc(validation.IntBetween(10, 60)),
+							Default:          10,
+							Description:      descf("The interval in seconds between checks. %s", descRange(10, 60)),
 						},
 						"host_header": {
 							Type:        schema.TypeString,
@@ -113,10 +113,10 @@ func resourceSakuraCloudGSLB() *schema.Resource {
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
 						"ip_address": {
-							Type:         schema.TypeString,
-							Required:     true,
-							Description:  "The IP address of the server",
-							ValidateFunc: validation.IsIPv4Address,
+							Type:             schema.TypeString,
+							Required:         true,
+							Description:      "The IP address of the server",
+							ValidateDiagFunc: validation.ToDiagFunc(validation.IsIPv4Address),
 						},
 						"enabled": {
 							Type:        schema.TypeBool,
@@ -125,10 +125,10 @@ func resourceSakuraCloudGSLB() *schema.Resource {
 							Description: "The flag to enable as destination of load balancing",
 						},
 						"weight": {
-							Type:         schema.TypeInt,
-							Optional:     true,
-							ValidateFunc: validation.IntBetween(1, 10000),
-							Default:      1,
+							Type:             schema.TypeInt,
+							Optional:         true,
+							ValidateDiagFunc: validation.ToDiagFunc(validation.IntBetween(1, 10000)),
+							Default:          1,
 							Description: descf(
 								"The weight used when weighted load balancing is enabled. %s",
 								descRange(1, 10000),
@@ -144,96 +144,84 @@ func resourceSakuraCloudGSLB() *schema.Resource {
 	}
 }
 
-func resourceSakuraCloudGSLBCreate(d *schema.ResourceData, meta interface{}) error {
+func resourceSakuraCloudGSLBCreate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client, _, err := sakuraCloudClient(d, meta)
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
-	ctx, cancel := operationContext(d, schema.TimeoutCreate)
-	defer cancel()
 
 	gslbOp := sacloud.NewGSLBOp(client)
-
 	gslb, err := gslbOp.Create(ctx, expandGSLBCreateRequest(d))
 	if err != nil {
-		return fmt.Errorf("creating SakuraCloud GSLB is failed: %s", err)
+		return diag.Errorf("creating SakuraCloud GSLB is failed: %s", err)
 	}
 
 	d.SetId(gslb.ID.String())
-	return resourceSakuraCloudGSLBRead(d, meta)
+	return resourceSakuraCloudGSLBRead(ctx, d, meta)
 }
 
-func resourceSakuraCloudGSLBRead(d *schema.ResourceData, meta interface{}) error {
+func resourceSakuraCloudGSLBRead(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client, _, err := sakuraCloudClient(d, meta)
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
-	ctx, cancel := operationContext(d, schema.TimeoutRead)
-	defer cancel()
 
 	gslbOp := sacloud.NewGSLBOp(client)
-
 	gslb, err := gslbOp.Read(ctx, sakuraCloudID(d.Id()))
 	if err != nil {
 		if sacloud.IsNotFoundError(err) {
 			d.SetId("")
 			return nil
 		}
-		return fmt.Errorf("could not read SakuraCloud GSLB[%s]: %s", d.Id(), err)
+		return diag.Errorf("could not read SakuraCloud GSLB[%s]: %s", d.Id(), err)
 	}
 
 	return setGSLBResourceData(ctx, d, client, gslb)
 }
 
-func resourceSakuraCloudGSLBUpdate(d *schema.ResourceData, meta interface{}) error {
+func resourceSakuraCloudGSLBUpdate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client, _, err := sakuraCloudClient(d, meta)
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
-	ctx, cancel := operationContext(d, schema.TimeoutUpdate)
-	defer cancel()
 
 	gslbOp := sacloud.NewGSLBOp(client)
-
 	gslb, err := gslbOp.Read(ctx, sakuraCloudID(d.Id()))
 	if err != nil {
-		return fmt.Errorf("could not read SakuraCloud GSLB[%s]: %s", d.Id(), err)
+		return diag.Errorf("could not read SakuraCloud GSLB[%s]: %s", d.Id(), err)
 	}
 
 	_, err = gslbOp.Update(ctx, sakuraCloudID(d.Id()), expandGSLBUpdateRequest(d, gslb))
 	if err != nil {
-		return fmt.Errorf("updating SakuraCloud GSLB[%s] is failed: %s", d.Id(), err)
+		return diag.Errorf("updating SakuraCloud GSLB[%s] is failed: %s", d.Id(), err)
 	}
 
-	return resourceSakuraCloudGSLBRead(d, meta)
+	return resourceSakuraCloudGSLBRead(ctx, d, meta)
 }
 
-func resourceSakuraCloudGSLBDelete(d *schema.ResourceData, meta interface{}) error {
+func resourceSakuraCloudGSLBDelete(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client, _, err := sakuraCloudClient(d, meta)
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
-	ctx, cancel := operationContext(d, schema.TimeoutDelete)
-	defer cancel()
 
 	gslbOp := sacloud.NewGSLBOp(client)
-
 	gslb, err := gslbOp.Read(ctx, sakuraCloudID(d.Id()))
 	if err != nil {
 		if sacloud.IsNotFoundError(err) {
 			d.SetId("")
 			return nil
 		}
-		return fmt.Errorf("could not read SakuraCloud GSLB[%s]: %s", d.Id(), err)
+		return diag.Errorf("could not read SakuraCloud GSLB[%s]: %s", d.Id(), err)
 	}
 	if err := gslbOp.Delete(ctx, gslb.ID); err != nil {
-		return fmt.Errorf("deleting SakuraCloud GSLB[%s] is failed: %s", d.Id(), err)
+		return diag.Errorf("deleting SakuraCloud GSLB[%s] is failed: %s", d.Id(), err)
 	}
 
 	return nil
 }
 
-func setGSLBResourceData(ctx context.Context, d *schema.ResourceData, client *APIClient, data *sacloud.GSLB) error {
+func setGSLBResourceData(ctx context.Context, d *schema.ResourceData, client *APIClient, data *sacloud.GSLB) diag.Diagnostics {
 	d.Set("name", data.Name)                // nolint
 	d.Set("fqdn", data.FQDN)                // nolint
 	d.Set("sorry_server", data.SorryServer) // nolint
@@ -241,10 +229,10 @@ func setGSLBResourceData(ctx context.Context, d *schema.ResourceData, client *AP
 	d.Set("description", data.Description)  // nolint
 	d.Set("weighted", data.Weighted.Bool()) // nolint
 	if err := d.Set("health_check", flattenGSLBHealthCheck(data)); err != nil {
-		return err
+		return diag.FromErr(err)
 	}
 	if err := d.Set("server", flattenGSLBServers(data)); err != nil {
-		return err
+		return diag.FromErr(err)
 	}
-	return d.Set("tags", flattenTags(data.Tags))
+	return diag.FromErr(d.Set("tags", flattenTags(data.Tags)))
 }

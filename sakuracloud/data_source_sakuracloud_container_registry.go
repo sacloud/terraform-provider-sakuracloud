@@ -15,9 +15,10 @@
 package sakuracloud
 
 import (
-	"fmt"
+	"context"
 
-	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/sacloud/libsacloud/v2/sacloud"
 	"github.com/sacloud/libsacloud/v2/sacloud/types"
 )
@@ -25,7 +26,7 @@ import (
 func dataSourceSakuraCloudContainerRegistry() *schema.Resource {
 	resourceName := "ContainerRegistry"
 	return &schema.Resource{
-		Read: dataSourceSakuraCloudContainerRegistryRead,
+		ReadContext: dataSourceSakuraCloudContainerRegistryRead,
 
 		Schema: map[string]*schema.Schema{
 			filterAttrName: filterSchema(&filterSchemaOption{}),
@@ -81,16 +82,14 @@ func dataSourceSakuraCloudContainerRegistry() *schema.Resource {
 	}
 }
 
-func dataSourceSakuraCloudContainerRegistryRead(d *schema.ResourceData, meta interface{}) error {
+func dataSourceSakuraCloudContainerRegistryRead(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client, _, err := sakuraCloudClient(d, meta)
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
-	ctx, cancel := operationContext(d, schema.TimeoutRead)
-	defer cancel()
 
 	searcher := sacloud.NewContainerRegistryOp(client)
 
@@ -101,7 +100,7 @@ func dataSourceSakuraCloudContainerRegistryRead(d *schema.ResourceData, meta int
 
 	res, err := searcher.Find(ctx, findCondition)
 	if err != nil {
-		return fmt.Errorf("could not find SakuraCloud ContainerRegistry: %s", err)
+		return diag.Errorf("could not find SakuraCloud ContainerRegistry: %s", err)
 	}
 	if res == nil || res.Count == 0 {
 		return filterNoResultErr()

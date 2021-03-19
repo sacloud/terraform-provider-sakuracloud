@@ -16,10 +16,10 @@ package sakuracloud
 
 import (
 	"context"
-	"fmt"
 	"time"
 
-	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/sacloud/libsacloud/v2/helper/cleanup"
 	"github.com/sacloud/libsacloud/v2/helper/query"
 	"github.com/sacloud/libsacloud/v2/sacloud"
@@ -30,12 +30,12 @@ func resourceSakuraCloudSIM() *schema.Resource {
 	resourceName := "SIM"
 
 	return &schema.Resource{
-		Create: resourceSakuraCloudSIMCreate,
-		Read:   resourceSakuraCloudSIMRead,
-		Update: resourceSakuraCloudSIMUpdate,
-		Delete: resourceSakuraCloudSIMDelete,
+		CreateContext: resourceSakuraCloudSIMCreate,
+		ReadContext:   resourceSakuraCloudSIMRead,
+		UpdateContext: resourceSakuraCloudSIMUpdate,
+		DeleteContext: resourceSakuraCloudSIMDelete,
 		Importer: &schema.ResourceImporter{
-			State: schema.ImportStatePassthrough,
+			StateContext: schema.ImportStatePassthroughContext,
 		},
 
 		Timeouts: &schema.ResourceTimeout{
@@ -99,39 +99,35 @@ func resourceSakuraCloudSIM() *schema.Resource {
 	}
 }
 
-func resourceSakuraCloudSIMCreate(d *schema.ResourceData, meta interface{}) error {
+func resourceSakuraCloudSIMCreate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client, _, err := sakuraCloudClient(d, meta)
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
-	ctx, cancel := operationContext(d, schema.TimeoutCreate)
-	defer cancel()
 
 	if err := validateCarrier(d); err != nil {
-		return err
+		return diag.FromErr(err)
 	}
 
 	builder := expandSIMBuilder(d, client)
 	if err := builder.Validate(ctx); err != nil {
-		return fmt.Errorf("validating SakuraCloud SIM is failed: %s", err)
+		return diag.Errorf("validating SakuraCloud SIM is failed: %s", err)
 	}
 
 	sim, err := builder.Build(ctx)
 	if err != nil {
-		return fmt.Errorf("creating SakuraCloud SIM is failed: %s", err)
+		return diag.Errorf("creating SakuraCloud SIM is failed: %s", err)
 	}
 
 	d.SetId(sim.ID.String())
-	return resourceSakuraCloudSIMRead(d, meta)
+	return resourceSakuraCloudSIMRead(ctx, d, meta)
 }
 
-func resourceSakuraCloudSIMRead(d *schema.ResourceData, meta interface{}) error {
+func resourceSakuraCloudSIMRead(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client, _, err := sakuraCloudClient(d, meta)
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
-	ctx, cancel := operationContext(d, schema.TimeoutRead)
-	defer cancel()
 
 	simOp := sacloud.NewSIMOp(client)
 
@@ -141,50 +137,46 @@ func resourceSakuraCloudSIMRead(d *schema.ResourceData, meta interface{}) error 
 			d.SetId("")
 			return nil
 		}
-		return fmt.Errorf("could not read SakuraCloud SIM[%s]: %s", d.Id(), err)
+		return diag.Errorf("could not read SakuraCloud SIM[%s]: %s", d.Id(), err)
 	}
 	return setSIMResourceData(ctx, d, client, sim)
 }
 
-func resourceSakuraCloudSIMUpdate(d *schema.ResourceData, meta interface{}) error {
+func resourceSakuraCloudSIMUpdate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client, _, err := sakuraCloudClient(d, meta)
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
-	ctx, cancel := operationContext(d, schema.TimeoutUpdate)
-	defer cancel()
 
 	simOp := sacloud.NewSIMOp(client)
 
 	if err := validateCarrier(d); err != nil {
-		return err
+		return diag.FromErr(err)
 	}
 
 	sim, err := query.FindSIMByID(ctx, simOp, types.StringID(d.Id()))
 	if err != nil {
-		return fmt.Errorf("could not read SakuraCloud SIM[%s]: %s", d.Id(), err)
+		return diag.Errorf("could not read SakuraCloud SIM[%s]: %s", d.Id(), err)
 	}
 
 	builder := expandSIMBuilder(d, client)
 	if err := builder.Validate(ctx); err != nil {
-		return fmt.Errorf("validating SakuraCloud SIM[%s] is failed: %s", d.Id(), err)
+		return diag.Errorf("validating SakuraCloud SIM[%s] is failed: %s", d.Id(), err)
 	}
 
 	_, err = builder.Update(ctx, sim.ID)
 	if err != nil {
-		return fmt.Errorf("updating SakuraCloud SIM[%s] is failed: %s", d.Id(), err)
+		return diag.Errorf("updating SakuraCloud SIM[%s] is failed: %s", d.Id(), err)
 	}
 
-	return resourceSakuraCloudSIMRead(d, meta)
+	return resourceSakuraCloudSIMRead(ctx, d, meta)
 }
 
-func resourceSakuraCloudSIMDelete(d *schema.ResourceData, meta interface{}) error {
+func resourceSakuraCloudSIMDelete(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client, _, err := sakuraCloudClient(d, meta)
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
-	ctx, cancel := operationContext(d, schema.TimeoutDelete)
-	defer cancel()
 
 	simOp := sacloud.NewSIMOp(client)
 
@@ -195,22 +187,22 @@ func resourceSakuraCloudSIMDelete(d *schema.ResourceData, meta interface{}) erro
 			d.SetId("")
 			return nil
 		}
-		return fmt.Errorf("could not read SakuraCloud SIM[%s]: %s", d.Id(), err)
+		return diag.Errorf("could not read SakuraCloud SIM[%s]: %s", d.Id(), err)
 	}
 
 	if err := cleanup.DeleteSIMWithReferencedCheck(ctx, client, client.zones, sim.ID, client.checkReferencedOption()); err != nil {
-		return fmt.Errorf("deleting SakuraCloud SIM[%s] is failed: %s", d.Id(), err)
+		return diag.Errorf("deleting SakuraCloud SIM[%s] is failed: %s", d.Id(), err)
 	}
 	d.SetId("")
 	return nil
 }
 
-func setSIMResourceData(ctx context.Context, d *schema.ResourceData, client *APIClient, data *sacloud.SIM) error {
+func setSIMResourceData(ctx context.Context, d *schema.ResourceData, client *APIClient, data *sacloud.SIM) diag.Diagnostics {
 	simOp := sacloud.NewSIMOp(client)
 
 	carrierInfo, err := simOp.GetNetworkOperator(ctx, data.ID)
 	if err != nil {
-		return fmt.Errorf("reading SIM[%s] NetworkOperator is failed: %s", data.ID, err)
+		return diag.Errorf("reading SIM[%s] NetworkOperator is failed: %s", data.ID, err)
 	}
 
 	d.Set("name", data.Name)               // nolint
@@ -222,8 +214,8 @@ func setSIMResourceData(ctx context.Context, d *schema.ResourceData, client *API
 		d.Set("mobile_gateway_id", data.Info.SIMGroupID) // nolint
 	}
 	if err := d.Set("carrier", flattenSIMCarrier(carrierInfo)); err != nil {
-		return err
+		return diag.FromErr(err)
 	}
 
-	return d.Set("tags", flattenTags(data.Tags))
+	return diag.FromErr(d.Set("tags", flattenTags(data.Tags)))
 }

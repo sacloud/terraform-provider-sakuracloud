@@ -18,7 +18,7 @@ import (
 	"os"
 	"testing"
 
-	"github.com/hashicorp/terraform-plugin-sdk/helper/resource"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
 )
 
 func TestAccSakuraCloudDataSourceProxyLB_basic(t *testing.T) {
@@ -30,8 +30,8 @@ func TestAccSakuraCloudDataSourceProxyLB_basic(t *testing.T) {
 	ip1 := os.Getenv(envProxyLBRealServerIP1)
 
 	resource.ParallelTest(t, resource.TestCase{
-		PreCheck:  func() { testAccPreCheck(t) },
-		Providers: testAccProviders,
+		PreCheck:          func() { testAccPreCheck(t) },
+		ProviderFactories: testAccProviderFactories,
 		Steps: []resource.TestStep{
 			{
 				Config: buildConfigWithArgs(testAccSakuraCloudDataSourceProxyLB_basic, rand, ip0, ip1),
@@ -41,9 +41,9 @@ func TestAccSakuraCloudDataSourceProxyLB_basic(t *testing.T) {
 					resource.TestCheckResourceAttr(resourceName, "plan", "100"),
 					resource.TestCheckResourceAttr(resourceName, "description", "description"),
 					resource.TestCheckResourceAttr(resourceName, "tags.#", "3"),
-					resource.TestCheckResourceAttr(resourceName, "tags.4151227546", "tag1"),
-					resource.TestCheckResourceAttr(resourceName, "tags.1852302624", "tag2"),
-					resource.TestCheckResourceAttr(resourceName, "tags.425776566", "tag3"),
+					resource.TestCheckResourceAttr(resourceName, "tags.0", "tag1"),
+					resource.TestCheckResourceAttr(resourceName, "tags.1", "tag2"),
+					resource.TestCheckResourceAttr(resourceName, "tags.2", "tag3"),
 					resource.TestCheckResourceAttr(resourceName, "health_check.0.protocol", "tcp"),
 					resource.TestCheckResourceAttr(resourceName, "health_check.0.delay_loop", "20"),
 					resource.TestCheckResourceAttr(resourceName, "bind_port.0.proxy_mode", "http"),

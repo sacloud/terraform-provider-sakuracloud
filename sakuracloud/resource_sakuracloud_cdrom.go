@@ -20,8 +20,9 @@ import (
 	"os"
 	"time"
 
-	"github.com/hashicorp/terraform-plugin-sdk/helper/customdiff"
-	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/customdiff"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/mitchellh/go-homedir"
 	"github.com/sacloud/iso9660wrap"
 	"github.com/sacloud/libsacloud/v2/helper/cleanup"
@@ -32,14 +33,14 @@ import (
 func resourceSakuraCloudCDROM() *schema.Resource {
 	resourceName := "CD-ROM"
 	return &schema.Resource{
-		Create: resourceSakuraCloudCDROMCreate,
-		Read:   resourceSakuraCloudCDROMRead,
-		Update: resourceSakuraCloudCDROMUpdate,
-		Delete: resourceSakuraCloudCDROMDelete,
+		CreateContext: resourceSakuraCloudCDROMCreate,
+		ReadContext:   resourceSakuraCloudCDROMRead,
+		UpdateContext: resourceSakuraCloudCDROMUpdate,
+		DeleteContext: resourceSakuraCloudCDROMDelete,
 		Importer: &schema.ResourceImporter{
-			State: schema.ImportStatePassthrough,
+			StateContext: schema.ImportStatePassthroughContext,
 		},
-		CustomizeDiff: customdiff.ComputedIf("hash", func(d *schema.ResourceDiff, meta interface{}) bool {
+		CustomizeDiff: customdiff.ComputedIf("hash", func(ctx context.Context, d *schema.ResourceDiff, meta interface{}) bool {
 			return d.HasChange("iso_image_file") || d.HasChange("content")
 		}),
 
@@ -98,19 +99,17 @@ const (
 	cdromDefaultISOLabel = "config"
 )
 
-func resourceSakuraCloudCDROMCreate(d *schema.ResourceData, meta interface{}) error {
+func resourceSakuraCloudCDROMCreate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client, zone, err := sakuraCloudClient(d, meta)
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
-	ctx, cancel := operationContext(d, schema.TimeoutCreate)
-	defer cancel()
 
 	cdromOp := sacloud.NewCDROMOp(client)
 
 	cdrom, ftpServer, err := cdromOp.Create(ctx, zone, expandCDROMCreateRequest(d))
 	if err != nil {
-		return fmt.Errorf("creating SakuraCloud CDROM is failed: %s", err)
+		return diag.Errorf("creating SakuraCloud CDROM is failed: %s", err)
 	}
 
 	// upload
@@ -122,20 +121,18 @@ func resourceSakuraCloudCDROMCreate(d *schema.ResourceData, meta interface{}) er
 		ftpServer: ftpServer,
 	}, d)
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
 
 	d.SetId(cdrom.ID.String())
-	return resourceSakuraCloudCDROMRead(d, meta)
+	return resourceSakuraCloudCDROMRead(ctx, d, meta)
 }
 
-func resourceSakuraCloudCDROMRead(d *schema.ResourceData, meta interface{}) error {
+func resourceSakuraCloudCDROMRead(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client, zone, err := sakuraCloudClient(d, meta)
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
-	ctx, cancel := operationContext(d, schema.TimeoutRead)
-	defer cancel()
 
 	cdromOp := sacloud.NewCDROMOp(client)
 
@@ -145,29 +142,27 @@ func resourceSakuraCloudCDROMRead(d *schema.ResourceData, meta interface{}) erro
 			d.SetId("")
 			return nil
 		}
-		return fmt.Errorf("could not read SakuraCloud CDROM[%s]: %s", d.Id(), err)
+		return diag.Errorf("could not read SakuraCloud CDROM[%s]: %s", d.Id(), err)
 	}
 	return setCDROMResourceData(ctx, d, client, cdrom)
 }
 
-func resourceSakuraCloudCDROMUpdate(d *schema.ResourceData, meta interface{}) error {
+func resourceSakuraCloudCDROMUpdate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client, zone, err := sakuraCloudClient(d, meta)
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
-	ctx, cancel := operationContext(d, schema.TimeoutUpdate)
-	defer cancel()
 
 	cdromOp := sacloud.NewCDROMOp(client)
 
 	cdrom, err := cdromOp.Read(ctx, zone, sakuraCloudID(d.Id()))
 	if err != nil {
-		return fmt.Errorf("could not read SakuraCloud CDROM[%s]: %s", d.Id(), err)
+		return diag.Errorf("could not read SakuraCloud CDROM[%s]: %s", d.Id(), err)
 	}
 
 	cdrom, err = cdromOp.Update(ctx, zone, cdrom.ID, expandCDROMUpdateRequest(d))
 	if err != nil {
-		return fmt.Errorf("updating SakuraCloud CDROM[%s] is failed: %s", d.Id(), err)
+		return diag.Errorf("updating SakuraCloud CDROM[%s] is failed: %s", d.Id(), err)
 	}
 
 	if isCDROMContentChanged(d) {
@@ -179,20 +174,18 @@ func resourceSakuraCloudCDROMUpdate(d *schema.ResourceData, meta interface{}) er
 			ftpServer: nil,
 		}, d)
 		if err != nil {
-			return err
+			return diag.FromErr(err)
 		}
 	}
 
-	return resourceSakuraCloudCDROMRead(d, meta)
+	return resourceSakuraCloudCDROMRead(ctx, d, meta)
 }
 
-func resourceSakuraCloudCDROMDelete(d *schema.ResourceData, meta interface{}) error {
+func resourceSakuraCloudCDROMDelete(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client, zone, err := sakuraCloudClient(d, meta)
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
-	ctx, cancel := operationContext(d, schema.TimeoutDelete)
-	defer cancel()
 
 	cdromOp := sacloud.NewCDROMOp(client)
 
@@ -202,24 +195,24 @@ func resourceSakuraCloudCDROMDelete(d *schema.ResourceData, meta interface{}) er
 			d.SetId("")
 			return nil
 		}
-		return fmt.Errorf("could not read SakuraCloud CDROM[%s]: %s", d.Id(), err)
+		return diag.Errorf("could not read SakuraCloud CDROM[%s]: %s", d.Id(), err)
 	}
 
 	if err := cleanup.DeleteCDROM(ctx, client, zone, cdrom.ID, client.checkReferencedOption()); err != nil {
-		return fmt.Errorf("deleting SakuraCloud CDROM[%s] is failed: %s", d.Id(), err)
+		return diag.Errorf("deleting SakuraCloud CDROM[%s] is failed: %s", d.Id(), err)
 	}
 	d.SetId("")
 	return nil
 }
 
-func setCDROMResourceData(ctx context.Context, d *schema.ResourceData, client *APIClient, data *sacloud.CDROM) error {
+func setCDROMResourceData(ctx context.Context, d *schema.ResourceData, client *APIClient, data *sacloud.CDROM) diag.Diagnostics {
 	d.Set("hash", expandCDROMContentHash(d)) // nolint
 	d.Set("name", data.Name)                 // nolint
 	d.Set("size", data.GetSizeGB())          // nolint
 	d.Set("icon_id", data.IconID.String())   // nolint
 	d.Set("description", data.Description)   // nolint
 	d.Set("zone", getZone(d, client))        // nolint
-	return d.Set("tags", flattenTags(data.Tags))
+	return diag.FromErr(d.Set("tags", flattenTags(data.Tags)))
 }
 
 type uploadCDROMContext struct {

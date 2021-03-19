@@ -20,8 +20,8 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/hashicorp/terraform-plugin-sdk/helper/resource"
-	"github.com/hashicorp/terraform-plugin-sdk/terraform"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
 	"github.com/sacloud/libsacloud/v2/sacloud"
 )
 
@@ -31,8 +31,8 @@ func TestAccSakuraCloudMobileGateway_basic(t *testing.T) {
 
 	var mgw sacloud.MobileGateway
 	resource.Test(t, resource.TestCase{
-		PreCheck:  func() { testAccPreCheck(t) },
-		Providers: testAccProviders,
+		PreCheck:          func() { testAccPreCheck(t) },
+		ProviderFactories: testAccProviderFactories,
 		CheckDestroy: resource.ComposeTestCheckFunc(
 			testCheckSakuraCloudIconDestroy,
 			testCheckSakuraCloudMobileGatewayDestroy,
@@ -47,8 +47,8 @@ func TestAccSakuraCloudMobileGateway_basic(t *testing.T) {
 					resource.TestCheckResourceAttr(resourceName, "description", "description"),
 					resource.TestCheckResourceAttr(resourceName, "internet_connection", "true"),
 					resource.TestCheckResourceAttr(resourceName, "tags.#", "2"),
-					resource.TestCheckResourceAttr(resourceName, "tags.4151227546", "tag1"),
-					resource.TestCheckResourceAttr(resourceName, "tags.1852302624", "tag2"),
+					resource.TestCheckResourceAttr(resourceName, "tags.0", "tag1"),
+					resource.TestCheckResourceAttr(resourceName, "tags.1", "tag2"),
 					resource.TestCheckResourceAttrPair(
 						resourceName, "private_network_interface.0.switch_id",
 						"sakuracloud_switch.foobar", "id",
@@ -83,8 +83,8 @@ func TestAccSakuraCloudMobileGateway_basic(t *testing.T) {
 					resource.TestCheckResourceAttr(resourceName, "description", "description-upd"),
 					resource.TestCheckResourceAttr(resourceName, "internet_connection", "false"),
 					resource.TestCheckResourceAttr(resourceName, "tags.#", "2"),
-					resource.TestCheckResourceAttr(resourceName, "tags.2362157161", "tag1-upd"),
-					resource.TestCheckResourceAttr(resourceName, "tags.3412841145", "tag2-upd"),
+					resource.TestCheckResourceAttr(resourceName, "tags.0", "tag1-upd"),
+					resource.TestCheckResourceAttr(resourceName, "tags.1", "tag2-upd"),
 					resource.TestCheckResourceAttr(resourceName, "icon_id", ""),
 					resource.TestCheckResourceAttr(resourceName, "traffic_control.#", "0"),
 					resource.TestCheckResourceAttrPair(
@@ -170,8 +170,8 @@ func TestAccImportSakuraCloudMobileGateway_basic(t *testing.T) {
 			"description":                            "description",
 			"internet_connection":                    "true",
 			"inter_device_communication":             "false",
-			"tags.4151227546":                        "tag1",
-			"tags.1852302624":                        "tag2",
+			"tags.0":                                 "tag1",
+			"tags.1":                                 "tag2",
 			"traffic_control.0.quota":                "256",
 			"traffic_control.0.band_width_limit":     "64",
 			"traffic_control.0.enable_email":         "true",
@@ -195,8 +195,8 @@ func TestAccImportSakuraCloudMobileGateway_basic(t *testing.T) {
 	resourceName := "sakuracloud_mobile_gateway.foobar"
 
 	resource.Test(t, resource.TestCase{
-		PreCheck:  func() { testAccPreCheck(t) },
-		Providers: testAccProviders,
+		PreCheck:          func() { testAccPreCheck(t) },
+		ProviderFactories: testAccProviderFactories,
 		CheckDestroy: resource.ComposeTestCheckFunc(
 			testCheckSakuraCloudMobileGatewayDestroy,
 			testCheckSakuraCloudSwitchDestroy,

@@ -19,8 +19,8 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/hashicorp/terraform-plugin-sdk/helper/resource"
-	"github.com/hashicorp/terraform-plugin-sdk/terraform"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
 	"github.com/sacloud/libsacloud/v2/sacloud"
 )
 
@@ -30,8 +30,8 @@ func TestAccSakuraCloudDatabaseReplica_basic(t *testing.T) {
 	password := randomPassword()
 
 	resource.ParallelTest(t, resource.TestCase{
-		PreCheck:  func() { testAccPreCheck(t) },
-		Providers: testAccProviders,
+		PreCheck:          func() { testAccPreCheck(t) },
+		ProviderFactories: testAccProviderFactories,
 		CheckDestroy: resource.ComposeTestCheckFunc(
 			testCheckSakuraCloudDatabaseDestroy,
 			testCheckSakuraCloudDatabaseReadReplicaDestroy,
@@ -45,8 +45,8 @@ func TestAccSakuraCloudDatabaseReplica_basic(t *testing.T) {
 					resource.TestCheckResourceAttr(resourceName, "name", rand),
 					resource.TestCheckResourceAttr(resourceName, "description", "description"),
 					resource.TestCheckResourceAttr(resourceName, "tags.#", "2"),
-					resource.TestCheckResourceAttr(resourceName, "tags.4151227546", "tag1"),
-					resource.TestCheckResourceAttr(resourceName, "tags.1852302624", "tag2"),
+					resource.TestCheckResourceAttr(resourceName, "tags.0", "tag1"),
+					resource.TestCheckResourceAttr(resourceName, "tags.1", "tag2"),
 					resource.TestCheckResourceAttr(resourceName, "network_interface.0.ip_address", "192.168.151.111"),
 					resource.TestCheckResourceAttr(resourceName, "network_interface.0.netmask", "24"),
 					resource.TestCheckResourceAttr(resourceName, "network_interface.0.gateway", "192.168.151.1"),
@@ -62,8 +62,8 @@ func TestAccSakuraCloudDatabaseReplica_basic(t *testing.T) {
 					resource.TestCheckResourceAttr(resourceName, "name", rand+"-upd"),
 					resource.TestCheckResourceAttr(resourceName, "description", "description-upd"),
 					resource.TestCheckResourceAttr(resourceName, "tags.#", "2"),
-					resource.TestCheckResourceAttr(resourceName, "tags.2362157161", "tag1-upd"),
-					resource.TestCheckResourceAttr(resourceName, "tags.3412841145", "tag2-upd"),
+					resource.TestCheckResourceAttr(resourceName, "tags.0", "tag1-upd"),
+					resource.TestCheckResourceAttr(resourceName, "tags.1", "tag2-upd"),
 					resource.TestCheckResourceAttr(resourceName, "network_interface.0.ip_address", "192.168.151.111"),
 					resource.TestCheckResourceAttr(resourceName, "network_interface.0.netmask", "24"),
 					resource.TestCheckResourceAttr(resourceName, "network_interface.0.gateway", "192.168.151.1"),
@@ -88,8 +88,8 @@ func TestAccImportSakuraCloudDatabaseReadReplica_basic(t *testing.T) {
 			"network_interface.0.ip_address": "192.168.152.111",
 			"network_interface.0.netmask":    "24",
 			"network_interface.0.gateway":    "192.168.152.1",
-			"tags.4151227546":                "tag1",
-			"tags.1852302624":                "tag2",
+			"tags.0":                         "tag1",
+			"tags.1":                         "tag2",
 		}
 
 		if err := compareStateMulti(s[0], expects); err != nil {
@@ -101,8 +101,8 @@ func TestAccImportSakuraCloudDatabaseReadReplica_basic(t *testing.T) {
 	resourceName := "sakuracloud_database_read_replica.foobar"
 
 	resource.ParallelTest(t, resource.TestCase{
-		PreCheck:  func() { testAccPreCheck(t) },
-		Providers: testAccProviders,
+		PreCheck:          func() { testAccPreCheck(t) },
+		ProviderFactories: testAccProviderFactories,
 		CheckDestroy: resource.ComposeTestCheckFunc(
 			testCheckSakuraCloudDatabaseDestroy,
 			testCheckSakuraCloudDatabaseReadReplicaDestroy,

@@ -20,8 +20,8 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/hashicorp/terraform-plugin-sdk/helper/resource"
-	"github.com/hashicorp/terraform-plugin-sdk/terraform"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
 	"github.com/sacloud/libsacloud/v2/sacloud"
 )
 
@@ -31,8 +31,8 @@ func TestAccSakuraCloudVPCRouter_basic(t *testing.T) {
 
 	var vpcRouter sacloud.VPCRouter
 	resource.ParallelTest(t, resource.TestCase{
-		PreCheck:  func() { testAccPreCheck(t) },
-		Providers: testAccProviders,
+		PreCheck:          func() { testAccPreCheck(t) },
+		ProviderFactories: testAccProviderFactories,
 		CheckDestroy: resource.ComposeTestCheckFunc(
 			testCheckSakuraCloudIconDestroy,
 			testCheckSakuraCloudVPCRouterDestroy,
@@ -45,8 +45,8 @@ func TestAccSakuraCloudVPCRouter_basic(t *testing.T) {
 					resource.TestCheckResourceAttr(resourceName, "name", rand),
 					resource.TestCheckResourceAttr(resourceName, "description", "description"),
 					resource.TestCheckResourceAttr(resourceName, "tags.#", "2"),
-					resource.TestCheckResourceAttr(resourceName, "tags.4151227546", "tag1"),
-					resource.TestCheckResourceAttr(resourceName, "tags.1852302624", "tag2"),
+					resource.TestCheckResourceAttr(resourceName, "tags.0", "tag1"),
+					resource.TestCheckResourceAttr(resourceName, "tags.1", "tag2"),
 					resource.TestCheckResourceAttr(resourceName, "plan", "standard"),
 					resource.TestCheckResourceAttr(resourceName, "version", "2"),
 					resource.TestCheckResourceAttr(resourceName, "internet_connection", "true"),
@@ -66,8 +66,8 @@ func TestAccSakuraCloudVPCRouter_basic(t *testing.T) {
 					resource.TestCheckResourceAttr(resourceName, "name", rand+"-upd"),
 					resource.TestCheckResourceAttr(resourceName, "description", "description-upd"),
 					resource.TestCheckResourceAttr(resourceName, "tags.#", "2"),
-					resource.TestCheckResourceAttr(resourceName, "tags.2362157161", "tag1-upd"),
-					resource.TestCheckResourceAttr(resourceName, "tags.3412841145", "tag2-upd"),
+					resource.TestCheckResourceAttr(resourceName, "tags.0", "tag1-upd"),
+					resource.TestCheckResourceAttr(resourceName, "tags.1", "tag2-upd"),
 					resource.TestCheckResourceAttr(resourceName, "plan", "standard"),
 					resource.TestCheckResourceAttr(resourceName, "internet_connection", "false"),
 					resource.TestCheckNoResourceAttr(resourceName, "public_network_interface"),
@@ -87,8 +87,8 @@ func TestAccSakuraCloudVPCRouter_Full(t *testing.T) {
 
 	var vpcRouter sacloud.VPCRouter
 	resource.ParallelTest(t, resource.TestCase{
-		PreCheck:  func() { testAccPreCheck(t) },
-		Providers: testAccProviders,
+		PreCheck:          func() { testAccPreCheck(t) },
+		ProviderFactories: testAccProviderFactories,
 		CheckDestroy: resource.ComposeTestCheckFunc(
 			testCheckSakuraCloudInternetDestroy,
 			testCheckSakuraCloudSwitchDestroy,
@@ -153,9 +153,9 @@ func TestAccSakuraCloudVPCRouter_Full(t *testing.T) {
 					resource.TestCheckResourceAttr(resourceName, "site_to_site_vpn.0.remote_id", "8.8.8.8"),
 					resource.TestCheckResourceAttr(resourceName, "site_to_site_vpn.0.pre_shared_secret", "example"),
 					resource.TestCheckResourceAttr(resourceName, "site_to_site_vpn.0.routes.#", "1"),
-					resource.TestCheckResourceAttr(resourceName, "site_to_site_vpn.0.routes.3423270202", "10.0.0.0/8"),
+					resource.TestCheckResourceAttr(resourceName, "site_to_site_vpn.0.routes.0", "10.0.0.0/8"),
 					resource.TestCheckResourceAttr(resourceName, "site_to_site_vpn.0.local_prefix.#", "1"),
-					resource.TestCheckResourceAttr(resourceName, "site_to_site_vpn.0.local_prefix.1172524555", "192.168.21.0/24"),
+					resource.TestCheckResourceAttr(resourceName, "site_to_site_vpn.0.local_prefix.0", "192.168.21.0/24"),
 					resource.TestCheckResourceAttr(resourceName, "static_nat.#", "1"),
 					resource.TestCheckResourceAttrPair(
 						resourceName, "static_nat.0.public_ip",

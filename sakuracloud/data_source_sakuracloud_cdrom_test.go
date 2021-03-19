@@ -17,14 +17,14 @@ package sakuracloud
 import (
 	"testing"
 
-	"github.com/hashicorp/terraform-plugin-sdk/helper/resource"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
 )
 
 func TestAccSakuraCloudDataSourceCDROM_basic(t *testing.T) {
 	resourceName := "data.sakuracloud_cdrom.foobar"
 	resource.ParallelTest(t, resource.TestCase{
-		PreCheck:  func() { testAccPreCheck(t) },
-		Providers: testAccProviders,
+		PreCheck:          func() { testAccPreCheck(t) },
+		ProviderFactories: testAccProviderFactories,
 		Steps: []resource.TestStep{
 			{
 				Config: testAccSakuraCloudDataSourceCDROM_basic,
@@ -33,11 +33,11 @@ func TestAccSakuraCloudDataSourceCDROM_basic(t *testing.T) {
 					resource.TestCheckResourceAttr(resourceName, "name", "Parted Magic 2013_08_01"),
 					resource.TestCheckResourceAttr(resourceName, "size", "5"),
 					resource.TestCheckResourceAttr(resourceName, "tags.#", "5"),
-					resource.TestCheckResourceAttr(resourceName, "tags.2816018188", "arch-64bit"),
-					resource.TestCheckResourceAttr(resourceName, "tags.1883356667", "current-stable"),
-					resource.TestCheckResourceAttr(resourceName, "tags.3295801924", "distro-parted_magic"),
-					resource.TestCheckResourceAttr(resourceName, "tags.2388413417", "distro-ver-2013.08.01"),
-					resource.TestCheckResourceAttr(resourceName, "tags.1583874418", "os-linux"),
+					resource.TestCheckResourceAttr(resourceName, "tags.0", "arch-64bit"),
+					resource.TestCheckResourceAttr(resourceName, "tags.1", "current-stable"),
+					resource.TestCheckResourceAttr(resourceName, "tags.2", "distro-parted_magic"),
+					resource.TestCheckResourceAttr(resourceName, "tags.3", "distro-ver-2013.08.01"),
+					resource.TestCheckResourceAttr(resourceName, "tags.4", "os-linux"),
 				),
 			},
 		},

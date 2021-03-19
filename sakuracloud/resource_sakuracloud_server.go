@@ -16,12 +16,12 @@ package sakuracloud
 
 import (
 	"context"
-	"fmt"
 	"log"
 	"time"
 
-	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
-	"github.com/hashicorp/terraform-plugin-sdk/helper/validation"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
 	"github.com/sacloud/libsacloud/v2/helper/power"
 	"github.com/sacloud/libsacloud/v2/helper/query"
 	"github.com/sacloud/libsacloud/v2/sacloud"
@@ -31,12 +31,12 @@ import (
 func resourceSakuraCloudServer() *schema.Resource {
 	resourceName := "Server"
 	return &schema.Resource{
-		Create: resourceSakuraCloudServerCreate,
-		Update: resourceSakuraCloudServerUpdate,
-		Read:   resourceSakuraCloudServerRead,
-		Delete: resourceSakuraCloudServerDelete,
+		CreateContext: resourceSakuraCloudServerCreate,
+		UpdateContext: resourceSakuraCloudServerUpdate,
+		ReadContext:   resourceSakuraCloudServerRead,
+		DeleteContext: resourceSakuraCloudServerDelete,
 		Importer: &schema.ResourceImporter{
-			State: schema.ImportStatePassthrough,
+			StateContext: schema.ImportStatePassthroughContext,
 		},
 
 		Timeouts: &schema.ResourceTimeout{
@@ -60,10 +60,10 @@ func resourceSakuraCloudServer() *schema.Resource {
 				Description: "The size of memory in GiB",
 			},
 			"commitment": {
-				Type:         schema.TypeString,
-				Optional:     true,
-				Default:      types.Commitments.Standard.String(),
-				ValidateFunc: validation.StringInSlice(types.CommitmentStrings, false),
+				Type:             schema.TypeString,
+				Optional:         true,
+				Default:          types.Commitments.Standard.String(),
+				ValidateDiagFunc: validation.ToDiagFunc(validation.StringInSlice(types.CommitmentStrings, false)),
 				Description: descf(
 					"The policy of how to allocate virtual CPUs to the server. This must be one of [%s]",
 					types.CommitmentStrings,
@@ -76,10 +76,10 @@ func resourceSakuraCloudServer() *schema.Resource {
 				Description: "A list of disk id connected to the server",
 			},
 			"interface_driver": {
-				Type:         schema.TypeString,
-				Optional:     true,
-				Default:      types.InterfaceDrivers.VirtIO.String(),
-				ValidateFunc: validation.StringInSlice(types.InterfaceDriverStrings, false),
+				Type:             schema.TypeString,
+				Optional:         true,
+				Default:          types.InterfaceDrivers.VirtIO.String(),
+				ValidateDiagFunc: validation.ToDiagFunc(validation.StringInSlice(types.InterfaceDriverStrings, false)),
 				Description: descf(
 					"The driver name of network interface. This must be one of [%s]",
 					types.InterfaceDriverStrings,
@@ -92,26 +92,26 @@ func resourceSakuraCloudServer() *schema.Resource {
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
 						"upstream": {
-							Type:         schema.TypeString,
-							Required:     true,
-							ValidateFunc: validateSakuraCloudServerNIC,
+							Type:             schema.TypeString,
+							Required:         true,
+							ValidateDiagFunc: validation.ToDiagFunc(validateSakuraCloudServerNIC),
 							Description: descf(
 								"The upstream type or upstream switch id. This must be one of [%s]",
 								[]string{"shared", "disconnect", "<switch id>"},
 							),
 						},
 						"user_ip_address": {
-							Type:         schema.TypeString,
-							Optional:     true,
-							Computed:     true,
-							ValidateFunc: validation.IsIPv4Address,
-							Description:  "The IP address for only display. This value doesn't affect actual NIC settings",
+							Type:             schema.TypeString,
+							Optional:         true,
+							Computed:         true,
+							ValidateDiagFunc: validation.ToDiagFunc(validation.IsIPv4Address),
+							Description:      "The IP address for only display. This value doesn't affect actual NIC settings",
 						},
 						"packet_filter_id": {
-							Type:         schema.TypeString,
-							Optional:     true,
-							ValidateFunc: validateSakuracloudIDType,
-							Description:  "The id of the packet filter to attach to the network interface",
+							Type:             schema.TypeString,
+							Optional:         true,
+							ValidateDiagFunc: validation.ToDiagFunc(validateSakuracloudIDType),
+							Description:      "The id of the packet filter to attach to the network interface",
 						},
 						"mac_address": {
 							Type:        schema.TypeString,
@@ -122,16 +122,16 @@ func resourceSakuraCloudServer() *schema.Resource {
 				},
 			},
 			"cdrom_id": {
-				Type:         schema.TypeString,
-				Optional:     true,
-				ValidateFunc: validateSakuracloudIDType,
-				Description:  "The id of the CD-ROM to attach to the Server",
+				Type:             schema.TypeString,
+				Optional:         true,
+				ValidateDiagFunc: validation.ToDiagFunc(validateSakuracloudIDType),
+				Description:      "The id of the CD-ROM to attach to the Server",
 			},
 			"private_host_id": {
-				Type:         schema.TypeString,
-				Optional:     true,
-				ValidateFunc: validateSakuracloudIDType,
-				Description:  "The id of the PrivateHost which the Server is assigned",
+				Type:             schema.TypeString,
+				Optional:         true,
+				ValidateDiagFunc: validation.ToDiagFunc(validateSakuracloudIDType),
+				Description:      "The id of the PrivateHost which the Server is assigned",
 			},
 			"private_host_name": {
 				Type:        schema.TypeString,
@@ -150,17 +150,17 @@ func resourceSakuraCloudServer() *schema.Resource {
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
 						"hostname": {
-							Type:         schema.TypeString,
-							Optional:     true,
-							ValidateFunc: validation.StringLenBetween(1, 64),
-							Description:  descf("The hostname of the %s. %s", resourceName, descLength(1, 64)),
+							Type:             schema.TypeString,
+							Optional:         true,
+							ValidateDiagFunc: validation.ToDiagFunc(validation.StringLenBetween(1, 64)),
+							Description:      descf("The hostname of the %s. %s", resourceName, descLength(1, 64)),
 						},
 						"password": {
-							Type:         schema.TypeString,
-							Optional:     true,
-							ValidateFunc: validation.StringLenBetween(8, 64),
-							Sensitive:    true,
-							Description:  descf("The password of default user. %s", descLength(8, 64)),
+							Type:             schema.TypeString,
+							Optional:         true,
+							ValidateDiagFunc: validation.ToDiagFunc(validation.StringLenBetween(8, 64)),
+							Sensitive:        true,
+							Description:      descf("The password of default user. %s", descLength(8, 64)),
 						},
 						"ssh_key_ids": {
 							Type:        schema.TypeList,
@@ -203,16 +203,16 @@ func resourceSakuraCloudServer() *schema.Resource {
 							Elem: &schema.Resource{
 								Schema: map[string]*schema.Schema{
 									"id": {
-										Type:         schema.TypeString,
-										Required:     true,
-										ValidateFunc: validateSakuracloudIDType,
-										Description:  "The id of the note",
+										Type:             schema.TypeString,
+										Required:         true,
+										ValidateDiagFunc: validation.ToDiagFunc(validateSakuracloudIDType),
+										Description:      "The id of the note",
 									},
 									"api_key_id": {
-										Type:         schema.TypeString,
-										Optional:     true,
-										ValidateFunc: validateSakuracloudIDType,
-										Description:  "The id of the API key to be injected into note when editing the disk",
+										Type:             schema.TypeString,
+										Optional:         true,
+										ValidateDiagFunc: validation.ToDiagFunc(validateSakuracloudIDType),
+										Description:      "The id of the API key to be injected into note when editing the disk",
 									},
 									"variables": {
 										Type: schema.TypeMap,
@@ -228,10 +228,10 @@ func resourceSakuraCloudServer() *schema.Resource {
 							Description:   "A list of the Note/StartupScript",
 						},
 						"ip_address": {
-							Type:         schema.TypeString,
-							Optional:     true,
-							ValidateFunc: validation.IsIPv4Address,
-							Description:  "The IP address to assign to the Server",
+							Type:             schema.TypeString,
+							Optional:         true,
+							ValidateDiagFunc: validation.ToDiagFunc(validation.IsIPv4Address),
+							Description:      "The IP address to assign to the Server",
 						},
 						"gateway": {
 							Type:        schema.TypeString,
@@ -286,61 +286,54 @@ func resourceSakuraCloudServer() *schema.Resource {
 	}
 }
 
-func resourceSakuraCloudServerCreate(d *schema.ResourceData, meta interface{}) error {
+func resourceSakuraCloudServerCreate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client, zone, err := sakuraCloudClient(d, meta)
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
-	ctx, cancel := operationContext(d, schema.TimeoutCreate)
-	defer cancel()
 
 	builder, err := expandServerBuilder(ctx, zone, d, client)
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
 
 	if err := builder.Validate(ctx, zone); err != nil {
-		return fmt.Errorf("validating SakuraCloud Server is failed: %s", err)
+		return diag.Errorf("validating SakuraCloud Server is failed: %s", err)
 	}
 
 	result, err := builder.Build(ctx, zone)
 	if err != nil {
-		return fmt.Errorf("creating SakuraCloud Server is failed: %s", err)
+		return diag.Errorf("creating SakuraCloud Server is failed: %s", err)
 	}
 
 	d.SetId(result.ServerID.String())
-	return resourceSakuraCloudServerRead(d, meta)
+	return resourceSakuraCloudServerRead(ctx, d, meta)
 }
 
-func resourceSakuraCloudServerRead(d *schema.ResourceData, meta interface{}) error {
+func resourceSakuraCloudServerRead(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client, zone, err := sakuraCloudClient(d, meta)
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
-	ctx, cancel := operationContext(d, schema.TimeoutRead)
-	defer cancel()
 
 	serverOp := sacloud.NewServerOp(client)
-
 	server, err := serverOp.Read(ctx, zone, sakuraCloudID(d.Id()))
 	if err != nil {
 		if sacloud.IsNotFoundError(err) {
 			d.SetId("")
 			return nil
 		}
-		return fmt.Errorf("could not read SakuraCloud Server[%s]: %s", d.Id(), err)
+		return diag.Errorf("could not read SakuraCloud Server[%s]: %s", d.Id(), err)
 	}
 
 	return setServerResourceData(ctx, d, client, server)
 }
 
-func resourceSakuraCloudServerUpdate(d *schema.ResourceData, meta interface{}) error {
+func resourceSakuraCloudServerUpdate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client, zone, err := sakuraCloudClient(d, meta)
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
-	ctx, cancel := operationContext(d, schema.TimeoutUpdate)
-	defer cancel()
 
 	serverOp := sacloud.NewServerOp(client)
 
@@ -349,34 +342,32 @@ func resourceSakuraCloudServerUpdate(d *schema.ResourceData, meta interface{}) e
 
 	server, err := serverOp.Read(ctx, zone, sakuraCloudID(d.Id()))
 	if err != nil {
-		return fmt.Errorf("could not read SakuraCloud Server[%s]: %s", d.Id(), err)
+		return diag.Errorf("could not read SakuraCloud Server[%s]: %s", d.Id(), err)
 	}
 
 	builder, err := expandServerBuilder(ctx, zone, d, client)
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
 
 	if err := builder.Validate(ctx, zone); err != nil {
-		return fmt.Errorf("validating SakuraCloud Server[%s] is failed: %s", server.ID, err)
+		return diag.Errorf("validating SakuraCloud Server[%s] is failed: %s", server.ID, err)
 	}
 
 	result, err := builder.Update(ctx, zone)
 	if err != nil {
-		return fmt.Errorf("updating SakuraCloud Server[%s] is failed: %s", server.ID, err)
+		return diag.Errorf("updating SakuraCloud Server[%s] is failed: %s", server.ID, err)
 	}
 
 	d.SetId(result.ServerID.String())
-	return resourceSakuraCloudServerRead(d, meta)
+	return resourceSakuraCloudServerRead(ctx, d, meta)
 }
 
-func resourceSakuraCloudServerDelete(d *schema.ResourceData, meta interface{}) error {
+func resourceSakuraCloudServerDelete(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client, zone, err := sakuraCloudClient(d, meta)
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
-	ctx, cancel := operationContext(d, schema.TimeoutDelete)
-	defer cancel()
 
 	serverOp := sacloud.NewServerOp(client)
 
@@ -389,22 +380,22 @@ func resourceSakuraCloudServerDelete(d *schema.ResourceData, meta interface{}) e
 			d.SetId("")
 			return nil
 		}
-		return fmt.Errorf("could not read SakuraCloud Server[%s]: %s", d.Id(), err)
+		return diag.Errorf("could not read SakuraCloud Server[%s]: %s", d.Id(), err)
 	}
 
 	if server.InstanceStatus.IsUp() {
 		if err := power.ShutdownServer(ctx, serverOp, zone, server.ID, d.Get("force_shutdown").(bool)); err != nil {
-			return fmt.Errorf("stopping SakuraCloud Server[%s] is failed: %s", server.ID, err)
+			return diag.Errorf("stopping SakuraCloud Server[%s] is failed: %s", server.ID, err)
 		}
 	}
 
 	if err := serverOp.Delete(ctx, zone, server.ID); err != nil {
-		return fmt.Errorf("deleting SakuraCloud Server[%s] is failed: %s", server.ID, err)
+		return diag.Errorf("deleting SakuraCloud Server[%s] is failed: %s", server.ID, err)
 	}
 	return nil
 }
 
-func setServerResourceData(ctx context.Context, d *schema.ResourceData, client *APIClient, data *sacloud.Server) error {
+func setServerResourceData(ctx context.Context, d *schema.ResourceData, client *APIClient, data *sacloud.Server) diag.Diagnostics {
 	zone := getZone(d, client)
 
 	ip, gateway, nwMaskLen, nwAddress := flattenServerNetworkInfo(data)
@@ -429,14 +420,14 @@ func setServerResourceData(ctx context.Context, d *schema.ResourceData, client *
 	d.Set("memory", data.GetMemoryGB())                     // nolint
 	d.Set("commitment", data.ServerPlanCommitment.String()) // nolint
 	if err := d.Set("disks", flattenServerConnectedDiskIDs(data)); err != nil {
-		return err
+		return diag.FromErr(err)
 	}
 	d.Set("cdrom_id", data.CDROMID.String())                 // nolint
 	d.Set("interface_driver", data.InterfaceDriver.String()) // nolint
 	d.Set("private_host_id", data.PrivateHostID.String())    // nolint
 	d.Set("private_host_name", data.PrivateHostName)         // nolint
 	if err := d.Set("network_interface", flattenServerNICs(data)); err != nil {
-		return err
+		return diag.FromErr(err)
 	}
 	d.Set("icon_id", data.IconID.String()) // nolint
 	d.Set("description", data.Description) // nolint
@@ -446,8 +437,8 @@ func setServerResourceData(ctx context.Context, d *schema.ResourceData, client *
 	d.Set("netmask", nwMaskLen)            // nolint
 	d.Set("hostname", data.HostName)       // nolint
 	if err := d.Set("dns_servers", data.Zone.Region.NameServers); err != nil {
-		return err
+		return diag.FromErr(err)
 	}
 	d.Set("zone", zone) // nolint
-	return d.Set("tags", flattenTags(data.Tags))
+	return diag.FromErr(d.Set("tags", flattenTags(data.Tags)))
 }

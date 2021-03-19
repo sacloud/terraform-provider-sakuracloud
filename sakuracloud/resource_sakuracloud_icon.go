@@ -16,20 +16,20 @@ package sakuracloud
 
 import (
 	"context"
-	"fmt"
 	"time"
 
-	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/sacloud/libsacloud/v2/sacloud"
 )
 
 func resourceSakuraCloudIcon() *schema.Resource {
 	resourceName := "Icon"
 	return &schema.Resource{
-		Create: resourceSakuraCloudIconCreate,
-		Read:   resourceSakuraCloudIconRead,
-		Update: resourceSakuraCloudIconUpdate,
-		Delete: resourceSakuraCloudIconDelete,
+		CreateContext: resourceSakuraCloudIconCreate,
+		ReadContext:   resourceSakuraCloudIconRead,
+		UpdateContext: resourceSakuraCloudIconUpdate,
+		DeleteContext: resourceSakuraCloudIconDelete,
 
 		Timeouts: &schema.ResourceTimeout{
 			Create: schema.DefaultTimeout(5 * time.Minute),
@@ -69,100 +69,89 @@ func resourceSakuraCloudIcon() *schema.Resource {
 	}
 }
 
-func resourceSakuraCloudIconCreate(d *schema.ResourceData, meta interface{}) error {
+func resourceSakuraCloudIconCreate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client, _, err := sakuraCloudClient(d, meta)
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
-	ctx, cancel := operationContext(d, schema.TimeoutCreate)
-	defer cancel()
 
 	iconOp := sacloud.NewIconOp(client)
 
 	req, err := expandIconCreateRequest(d)
 	if err != nil {
-		return fmt.Errorf("creating SakuraCloud Icon is failed: %s", err)
+		return diag.Errorf("creating SakuraCloud Icon is failed: %s", err)
 	}
 	icon, err := iconOp.Create(ctx, req)
 	if err != nil {
-		return fmt.Errorf("creating SakuraCloud Icon is failed: %s", err)
+		return diag.Errorf("creating SakuraCloud Icon is failed: %s", err)
 	}
 
 	d.SetId(icon.ID.String())
-	return resourceSakuraCloudIconRead(d, meta)
+	return resourceSakuraCloudIconRead(ctx, d, meta)
 }
 
-func resourceSakuraCloudIconRead(d *schema.ResourceData, meta interface{}) error {
+func resourceSakuraCloudIconRead(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client, _, err := sakuraCloudClient(d, meta)
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
-	ctx, cancel := operationContext(d, schema.TimeoutRead)
-	defer cancel()
 
 	iconOp := sacloud.NewIconOp(client)
-
 	icon, err := iconOp.Read(ctx, sakuraCloudID(d.Id()))
 	if err != nil {
 		if sacloud.IsNotFoundError(err) {
 			d.SetId("")
 			return nil
 		}
-		return fmt.Errorf("could not read SakuraCloud Icon[%s]: %s", d.Id(), err)
+		return diag.Errorf("could not read SakuraCloud Icon[%s]: %s", d.Id(), err)
 	}
 
 	return setIconResourceData(ctx, d, client, icon)
 }
 
-func resourceSakuraCloudIconUpdate(d *schema.ResourceData, meta interface{}) error {
+func resourceSakuraCloudIconUpdate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client, _, err := sakuraCloudClient(d, meta)
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
-	ctx, cancel := operationContext(d, schema.TimeoutUpdate)
-	defer cancel()
 
 	iconOp := sacloud.NewIconOp(client)
-
 	_, err = iconOp.Read(ctx, sakuraCloudID(d.Id()))
 	if err != nil {
-		return fmt.Errorf("could not read SakuraCloud Icon[%s]: %s", d.Id(), err)
+		return diag.Errorf("could not read SakuraCloud Icon[%s]: %s", d.Id(), err)
 	}
 
 	_, err = iconOp.Update(ctx, sakuraCloudID(d.Id()), expandIconUpdateRequest(d))
 	if err != nil {
-		return fmt.Errorf("updating SakuraCloud Icon[%s] is failed: %s", d.Id(), err)
+		return diag.Errorf("updating SakuraCloud Icon[%s] is failed: %s", d.Id(), err)
 	}
-	return resourceSakuraCloudIconRead(d, meta)
+	return resourceSakuraCloudIconRead(ctx, d, meta)
 }
 
-func resourceSakuraCloudIconDelete(d *schema.ResourceData, meta interface{}) error {
+func resourceSakuraCloudIconDelete(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client, _, err := sakuraCloudClient(d, meta)
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
-	ctx, cancel := operationContext(d, schema.TimeoutDelete)
-	defer cancel()
 
 	iconOp := sacloud.NewIconOp(client)
-
 	icon, err := iconOp.Read(ctx, sakuraCloudID(d.Id()))
 	if err != nil {
 		if sacloud.IsNotFoundError(err) {
 			d.SetId("")
 			return nil
 		}
-		return fmt.Errorf("could not read SakuraCloud Icon[%s]: %s", d.Id(), err)
+		return diag.Errorf("could not read SakuraCloud Icon[%s]: %s", d.Id(), err)
 	}
 
 	if err := iconOp.Delete(ctx, icon.ID); err != nil {
-		return fmt.Errorf("deleting SakuraCloud Icon[%s] is failed: %s", d.Id(), err)
+		return diag.Errorf("deleting SakuraCloud Icon[%s] is failed: %s", d.Id(), err)
 	}
 	return nil
 }
 
-func setIconResourceData(ctx context.Context, d *schema.ResourceData, client *APIClient, data *sacloud.Icon) error {
+func setIconResourceData(ctx context.Context, d *schema.ResourceData, client *APIClient, data *sacloud.Icon) diag.Diagnostics {
 	d.Set("name", data.Name) // nolint
 	d.Set("url", data.URL)   // nolint
-	return d.Set("tags", flattenTags(data.Tags))
+	return diag.FromErr(d.Set("tags", flattenTags(data.Tags)))
 }

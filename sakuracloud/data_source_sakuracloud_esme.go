@@ -15,16 +15,17 @@
 package sakuracloud
 
 import (
-	"fmt"
+	"context"
 
-	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/sacloud/libsacloud/v2/sacloud"
 )
 
 func dataSourceSakuraCloudESME() *schema.Resource {
 	resourceName := "ESME"
 	return &schema.Resource{
-		Read: dataSourceSakuraCloudESMERead,
+		ReadContext: dataSourceSakuraCloudESMERead,
 
 		Schema: map[string]*schema.Schema{
 			filterAttrName: filterSchema(&filterSchemaOption{}),
@@ -46,13 +47,11 @@ func dataSourceSakuraCloudESME() *schema.Resource {
 	}
 }
 
-func dataSourceSakuraCloudESMERead(d *schema.ResourceData, meta interface{}) error {
+func dataSourceSakuraCloudESMERead(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client, _, err := sakuraCloudClient(d, meta)
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
-	ctx, cancel := operationContext(d, schema.TimeoutRead)
-	defer cancel()
 
 	searcher := sacloud.NewESMEOp(client)
 
@@ -63,7 +62,7 @@ func dataSourceSakuraCloudESMERead(d *schema.ResourceData, meta interface{}) err
 
 	res, err := searcher.Find(ctx, findCondition)
 	if err != nil {
-		return fmt.Errorf("could not find SakuraCloud ESME: %s", err)
+		return diag.Errorf("could not find SakuraCloud ESME: %s", err)
 	}
 	if res == nil || res.Count == 0 {
 		return filterNoResultErr()

@@ -15,9 +15,10 @@
 package sakuracloud
 
 import (
-	"fmt"
+	"context"
 
-	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/sacloud/libsacloud/v2/sacloud"
 	"github.com/sacloud/libsacloud/v2/sacloud/types"
 )
@@ -26,7 +27,7 @@ func dataSourceSakuraCloudNote() *schema.Resource {
 	resourceName := "Note"
 
 	return &schema.Resource{
-		Read: dataSourceSakuraCloudNoteRead,
+		ReadContext: dataSourceSakuraCloudNoteRead,
 
 		Schema: map[string]*schema.Schema{
 			filterAttrName: filterSchema(&filterSchemaOption{}),
@@ -44,13 +45,11 @@ func dataSourceSakuraCloudNote() *schema.Resource {
 	}
 }
 
-func dataSourceSakuraCloudNoteRead(d *schema.ResourceData, meta interface{}) error {
+func dataSourceSakuraCloudNoteRead(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client, _, err := sakuraCloudClient(d, meta)
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
-	ctx, cancel := operationContext(d, schema.TimeoutRead)
-	defer cancel()
 
 	searcher := sacloud.NewNoteOp(client)
 
@@ -61,7 +60,7 @@ func dataSourceSakuraCloudNoteRead(d *schema.ResourceData, meta interface{}) err
 
 	res, err := searcher.Find(ctx, findCondition)
 	if err != nil {
-		return fmt.Errorf("could not find SakuraCloud Note resource: %s", err)
+		return diag.Errorf("could not find SakuraCloud Note resource: %s", err)
 	}
 	if res == nil || res.Count == 0 || len(res.Notes) == 0 {
 		return filterNoResultErr()

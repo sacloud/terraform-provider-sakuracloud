@@ -16,7 +16,6 @@ package sakuracloud
 
 import (
 	"bytes"
-	"context"
 	"crypto/md5"
 	"encoding/base64"
 	"encoding/hex"
@@ -25,8 +24,8 @@ import (
 	"os"
 	"strconv"
 
-	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
-	"github.com/hashicorp/terraform-plugin-sdk/helper/validation"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
 	"github.com/mitchellh/go-homedir"
 	"github.com/sacloud/libsacloud/v2/sacloud/search"
 	"github.com/sacloud/libsacloud/v2/sacloud/search/keys"
@@ -156,10 +155,6 @@ func getZone(d resourceValueGettable, client *APIClient) string {
 		}
 	}
 	return client.defaultZone
-}
-
-func operationContext(d *schema.ResourceData, opKey string) (context.Context, context.CancelFunc) {
-	return context.WithTimeout(context.Background(), d.Timeout(opKey))
 }
 
 func sakuraCloudID(id string) types.ID {

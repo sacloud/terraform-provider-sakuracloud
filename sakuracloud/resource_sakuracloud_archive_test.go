@@ -20,8 +20,8 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/hashicorp/terraform-plugin-sdk/helper/resource"
-	"github.com/hashicorp/terraform-plugin-sdk/terraform"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
 	"github.com/sacloud/libsacloud/v2/sacloud"
 )
 
@@ -33,8 +33,8 @@ func TestAccSakuraCloudArchive_basic(t *testing.T) {
 
 	var archive sacloud.Archive
 	resource.ParallelTest(t, resource.TestCase{
-		PreCheck:  func() { testAccPreCheck(t) },
-		Providers: testAccProviders,
+		PreCheck:          func() { testAccPreCheck(t) },
+		ProviderFactories: testAccProviderFactories,
 		CheckDestroy: resource.ComposeTestCheckFunc(
 			testCheckSakuraCloudArchiveDestroy,
 			testCheckSakuraCloudIconDestroy,
@@ -49,8 +49,8 @@ func TestAccSakuraCloudArchive_basic(t *testing.T) {
 					resource.TestCheckResourceAttr(resourceName, "icon_id", ""),
 					resource.TestCheckResourceAttr(resourceName, "archive_file", "test/dummy.raw"),
 					resource.TestCheckResourceAttr(resourceName, "description", "description"),
-					resource.TestCheckResourceAttr(resourceName, "tags.4151227546", "tag1"),
-					resource.TestCheckResourceAttr(resourceName, "tags.1852302624", "tag2"),
+					resource.TestCheckResourceAttr(resourceName, "tags.0", "tag1"),
+					resource.TestCheckResourceAttr(resourceName, "tags.1", "tag2"),
 				),
 			},
 			{
@@ -64,8 +64,8 @@ func TestAccSakuraCloudArchive_basic(t *testing.T) {
 					),
 					resource.TestCheckResourceAttr(resourceName, "archive_file", "test/dummy-upd.raw"),
 					resource.TestCheckResourceAttr(resourceName, "description", "description-upd"),
-					resource.TestCheckResourceAttr(resourceName, "tags.2362157161", "tag1-upd"),
-					resource.TestCheckResourceAttr(resourceName, "tags.3412841145", "tag2-upd"),
+					resource.TestCheckResourceAttr(resourceName, "tags.0", "tag1-upd"),
+					resource.TestCheckResourceAttr(resourceName, "tags.1", "tag2-upd"),
 				),
 			},
 		},
@@ -80,8 +80,8 @@ func TestAccSakuraCloudArchive_transfer(t *testing.T) {
 
 	var archive sacloud.Archive
 	resource.ParallelTest(t, resource.TestCase{
-		PreCheck:  func() { testAccPreCheck(t) },
-		Providers: testAccProviders,
+		PreCheck:          func() { testAccPreCheck(t) },
+		ProviderFactories: testAccProviderFactories,
 		CheckDestroy: resource.ComposeTestCheckFunc(
 			testCheckSakuraCloudArchiveDestroy,
 			testCheckSakuraCloudIconDestroy,
@@ -94,8 +94,8 @@ func TestAccSakuraCloudArchive_transfer(t *testing.T) {
 					resource.TestCheckResourceAttr(resourceName, "name", rand),
 					resource.TestCheckResourceAttr(resourceName, "icon_id", ""),
 					resource.TestCheckResourceAttr(resourceName, "description", "description"),
-					resource.TestCheckResourceAttr(resourceName, "tags.4151227546", "tag1"),
-					resource.TestCheckResourceAttr(resourceName, "tags.1852302624", "tag2"),
+					resource.TestCheckResourceAttr(resourceName, "tags.0", "tag1"),
+					resource.TestCheckResourceAttr(resourceName, "tags.1", "tag2"),
 					resource.TestCheckResourceAttrPair(
 						resourceName, "source_archive_id",
 						"sakuracloud_archive.source", "id",
@@ -118,8 +118,8 @@ func TestAccSakuraCloudArchive_fromShared(t *testing.T) {
 
 	var archive sacloud.Archive
 	resource.ParallelTest(t, resource.TestCase{
-		PreCheck:  func() { testAccPreCheck(t) },
-		Providers: testAccProviders,
+		PreCheck:          func() { testAccPreCheck(t) },
+		ProviderFactories: testAccProviderFactories,
 		CheckDestroy: resource.ComposeTestCheckFunc(
 			testCheckSakuraCloudArchiveDestroy,
 			testCheckSakuraCloudIconDestroy,
@@ -132,8 +132,8 @@ func TestAccSakuraCloudArchive_fromShared(t *testing.T) {
 					resource.TestCheckResourceAttr(resourceName, "name", rand),
 					resource.TestCheckResourceAttr(resourceName, "icon_id", ""),
 					resource.TestCheckResourceAttr(resourceName, "description", "description"),
-					resource.TestCheckResourceAttr(resourceName, "tags.4151227546", "tag1"),
-					resource.TestCheckResourceAttr(resourceName, "tags.1852302624", "tag2"),
+					resource.TestCheckResourceAttr(resourceName, "tags.0", "tag1"),
+					resource.TestCheckResourceAttr(resourceName, "tags.1", "tag2"),
 					resource.TestCheckResourceAttrPair(resourceName, "source_shared_key",
 						"sakuracloud_archive_share.share", "share_key"),
 				),
@@ -198,13 +198,13 @@ func TestAccImportSakuraCloudArchive_basic(t *testing.T) {
 		}
 
 		expects := map[string]string{
-			"name":            rand,
-			"size":            "20",
-			"icon_id":         "",
-			"archive_file":    "",
-			"description":     "description",
-			"tags.4151227546": "tag1",
-			"tags.1852302624": "tag2",
+			"name":         rand,
+			"size":         "20",
+			"icon_id":      "",
+			"archive_file": "",
+			"description":  "description",
+			"tags.0":       "tag1",
+			"tags.1":       "tag2",
 		}
 
 		return compareStateMulti(s[0], expects)
@@ -212,9 +212,9 @@ func TestAccImportSakuraCloudArchive_basic(t *testing.T) {
 
 	resourceName := "sakuracloud_archive.foobar"
 	resource.Test(t, resource.TestCase{
-		PreCheck:     func() { testAccPreCheck(t) },
-		Providers:    testAccProviders,
-		CheckDestroy: testCheckSakuraCloudArchiveDestroy,
+		PreCheck:          func() { testAccPreCheck(t) },
+		ProviderFactories: testAccProviderFactories,
+		CheckDestroy:      testCheckSakuraCloudArchiveDestroy,
 		Steps: []resource.TestStep{
 			{
 				Config: buildConfigWithArgs(testAccSakuraCloudArchive_basic, rand),

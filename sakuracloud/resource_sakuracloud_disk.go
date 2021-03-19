@@ -16,11 +16,11 @@ package sakuracloud
 
 import (
 	"context"
-	"fmt"
 	"time"
 
-	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
-	"github.com/hashicorp/terraform-plugin-sdk/helper/validation"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
 	"github.com/sacloud/libsacloud/v2/helper/cleanup"
 	"github.com/sacloud/libsacloud/v2/helper/setup"
 	"github.com/sacloud/libsacloud/v2/sacloud"
@@ -31,12 +31,12 @@ import (
 func resourceSakuraCloudDisk() *schema.Resource {
 	resourceName := "disk"
 	return &schema.Resource{
-		Create: resourceSakuraCloudDiskCreate,
-		Read:   resourceSakuraCloudDiskRead,
-		Update: resourceSakuraCloudDiskUpdate,
-		Delete: resourceSakuraCloudDiskDelete,
+		CreateContext: resourceSakuraCloudDiskCreate,
+		ReadContext:   resourceSakuraCloudDiskRead,
+		UpdateContext: resourceSakuraCloudDiskUpdate,
+		DeleteContext: resourceSakuraCloudDiskDelete,
 		Importer: &schema.ResourceImporter{
-			State: schema.ImportStatePassthrough,
+			StateContext: schema.ImportStatePassthroughContext,
 		},
 
 		Timeouts: &schema.ResourceTimeout{
@@ -49,33 +49,33 @@ func resourceSakuraCloudDisk() *schema.Resource {
 			"name": schemaResourceName(resourceName),
 			"plan": schemaResourcePlan(resourceName, types.DiskPlanNameMap[types.DiskPlans.SSD], types.DiskPlanStrings),
 			"connector": {
-				Type:         schema.TypeString,
-				Optional:     true,
-				ForceNew:     true,
-				Default:      types.DiskConnections.VirtIO,
-				ValidateFunc: validation.StringInSlice(types.DiskConnectionStrings, false),
+				Type:             schema.TypeString,
+				Optional:         true,
+				ForceNew:         true,
+				Default:          types.DiskConnections.VirtIO,
+				ValidateDiagFunc: validation.ToDiagFunc(validation.StringInSlice(types.DiskConnectionStrings, false)),
 				Description: descf(
 					"The name of the disk connector. This must be one of [%s]",
 					types.DiskConnectionStrings,
 				),
 			},
 			"source_archive_id": {
-				Type:          schema.TypeString,
-				ForceNew:      true,
-				Optional:      true,
-				ConflictsWith: []string{"source_disk_id"},
-				ValidateFunc:  validateSakuracloudIDType,
+				Type:             schema.TypeString,
+				ForceNew:         true,
+				Optional:         true,
+				ConflictsWith:    []string{"source_disk_id"},
+				ValidateDiagFunc: validation.ToDiagFunc(validateSakuracloudIDType),
 				Description: descf(
 					"The id of the source archive. %s",
 					descConflicts("source_disk_id"),
 				),
 			},
 			"source_disk_id": {
-				Type:          schema.TypeString,
-				ForceNew:      true,
-				Optional:      true,
-				ConflictsWith: []string{"source_archive_id"},
-				ValidateFunc:  validateSakuracloudIDType,
+				Type:             schema.TypeString,
+				ForceNew:         true,
+				Optional:         true,
+				ConflictsWith:    []string{"source_archive_id"},
+				ValidateDiagFunc: validation.ToDiagFunc(validateSakuracloudIDType),
 				Description: descf(
 					"The id of the source disk. %s",
 					descConflicts("source_archive_id"),
@@ -98,16 +98,13 @@ func resourceSakuraCloudDisk() *schema.Resource {
 	}
 }
 
-func resourceSakuraCloudDiskCreate(d *schema.ResourceData, meta interface{}) error {
+func resourceSakuraCloudDiskCreate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client, zone, err := sakuraCloudClient(d, meta)
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
-	ctx, cancel := operationContext(d, schema.TimeoutCreate)
-	defer cancel()
 
 	diskOp := sacloud.NewDiskOp(client)
-
 	diskBuilder := &setup.RetryableSetup{
 		IsWaitForCopy: true,
 		Create: func(ctx context.Context, zone string) (accessor.ID, error) {
@@ -124,90 +121,81 @@ func resourceSakuraCloudDiskCreate(d *schema.ResourceData, meta interface{}) err
 
 	res, err := diskBuilder.Setup(ctx, zone)
 	if err != nil {
-		return fmt.Errorf("creating SakuraCloud Disk is failed: %s", err)
+		return diag.Errorf("creating SakuraCloud Disk is failed: %s", err)
 	}
 
 	disk, ok := res.(*sacloud.Disk)
 	if !ok {
-		return fmt.Errorf("creating SakuraCloud Disk is failed: created resource is not a *sacloud.Disk")
+		return diag.Errorf("creating SakuraCloud Disk is failed: created resource is not a *sacloud.Disk")
 	}
 
 	d.SetId(disk.ID.String())
-	return resourceSakuraCloudDiskRead(d, meta)
+	return resourceSakuraCloudDiskRead(ctx, d, meta)
 }
 
-func resourceSakuraCloudDiskRead(d *schema.ResourceData, meta interface{}) error {
+func resourceSakuraCloudDiskRead(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client, zone, err := sakuraCloudClient(d, meta)
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
-	ctx, cancel := operationContext(d, schema.TimeoutRead)
-	defer cancel()
 
 	diskOp := sacloud.NewDiskOp(client)
-
 	disk, err := diskOp.Read(ctx, zone, sakuraCloudID(d.Id()))
 	if err != nil {
 		if sacloud.IsNotFoundError(err) {
 			d.SetId("")
 			return nil
 		}
-		return fmt.Errorf("could not read SakuraCloud Disk[%s]: %s", d.Id(), err)
+		return diag.Errorf("could not read SakuraCloud Disk[%s]: %s", d.Id(), err)
 	}
 
 	return setDiskResourceData(ctx, d, client, disk)
 }
 
-func resourceSakuraCloudDiskUpdate(d *schema.ResourceData, meta interface{}) error {
+func resourceSakuraCloudDiskUpdate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client, zone, err := sakuraCloudClient(d, meta)
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
-	ctx, cancel := operationContext(d, schema.TimeoutUpdate)
-	defer cancel()
 
 	diskOp := sacloud.NewDiskOp(client)
-
 	disk, err := diskOp.Read(ctx, zone, sakuraCloudID(d.Id()))
 	if err != nil {
-		return fmt.Errorf("could not read SakuraCloud Disk[%s]: %s", d.Id(), err)
+		return diag.Errorf("could not read SakuraCloud Disk[%s]: %s", d.Id(), err)
 	}
 
 	_, err = diskOp.Update(ctx, zone, disk.ID, expandDiskUpdateRequest(d))
 	if err != nil {
-		return fmt.Errorf("updating SakuraCloud Disk[%s] is failed: %s", d.Id(), err)
+		return diag.Errorf("updating SakuraCloud Disk[%s] is failed: %s", d.Id(), err)
 	}
 
-	return resourceSakuraCloudDiskRead(d, meta)
+	return resourceSakuraCloudDiskRead(ctx, d, meta)
 }
 
-func resourceSakuraCloudDiskDelete(d *schema.ResourceData, meta interface{}) error {
+func resourceSakuraCloudDiskDelete(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client, zone, err := sakuraCloudClient(d, meta)
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
-	ctx, cancel := operationContext(d, schema.TimeoutDelete)
-	defer cancel()
 
 	diskOp := sacloud.NewDiskOp(client)
-
 	disk, err := diskOp.Read(ctx, zone, sakuraCloudID(d.Id()))
 	if err != nil {
 		if sacloud.IsNotFoundError(err) {
 			d.SetId("")
 			return nil
 		}
-		return fmt.Errorf("could not read SakuraCloud Disk[%s]: %s", d.Id(), err)
+		return diag.Errorf("could not read SakuraCloud Disk[%s]: %s", d.Id(), err)
 	}
 
 	if err := cleanup.DeleteDisk(ctx, client, zone, disk.ID, client.checkReferencedOption()); err != nil {
-		return fmt.Errorf("deleting SakuraCloud Disk[%s] is failed: %s", d.Id(), err)
+		return diag.Errorf("deleting SakuraCloud Disk[%s] is failed: %s", d.Id(), err)
 	}
 	d.SetId("")
 	return nil
 }
 
-func setDiskResourceData(ctx context.Context, d *schema.ResourceData, client *APIClient, data *sacloud.Disk) error {
+func setDiskResourceData(ctx context.Context, d *schema.ResourceData, client *APIClient, data *sacloud.Disk) diag.Diagnostics {
 	d.Set("name", data.Name)                                  // nolint
 	d.Set("plan", flattenDiskPlan(data))                      // nolint
 	d.Set("source_disk_id", data.SourceDiskID.String())       // nolint
@@ -218,5 +206,5 @@ func setDiskResourceData(ctx context.Context, d *schema.ResourceData, client *AP
 	d.Set("description", data.Description)                    // nolint
 	d.Set("server_id", data.ServerID.String())                // nolint
 	d.Set("zone", getZone(d, client))                         // nolint
-	return d.Set("tags", flattenTags(data.Tags))
+	return diag.FromErr(d.Set("tags", flattenTags(data.Tags)))
 }

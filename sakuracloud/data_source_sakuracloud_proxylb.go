@@ -15,9 +15,10 @@
 package sakuracloud
 
 import (
-	"fmt"
+	"context"
 
-	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/sacloud/libsacloud/v2/sacloud"
 	"github.com/sacloud/libsacloud/v2/sacloud/types"
 )
@@ -25,7 +26,7 @@ import (
 func dataSourceSakuraCloudProxyLB() *schema.Resource {
 	resourceName := "ProxyLB"
 	return &schema.Resource{
-		Read: dataSourceSakuraCloudProxyLBRead,
+		ReadContext: dataSourceSakuraCloudProxyLBRead,
 
 		Schema: map[string]*schema.Schema{
 			filterAttrName: filterSchema(&filterSchemaOption{}),
@@ -277,13 +278,11 @@ func dataSourceSakuraCloudProxyLB() *schema.Resource {
 	}
 }
 
-func dataSourceSakuraCloudProxyLBRead(d *schema.ResourceData, meta interface{}) error {
+func dataSourceSakuraCloudProxyLBRead(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client, _, err := sakuraCloudClient(d, meta)
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
-	ctx, cancel := operationContext(d, schema.TimeoutRead)
-	defer cancel()
 
 	searcher := sacloud.NewProxyLBOp(client)
 
@@ -294,7 +293,7 @@ func dataSourceSakuraCloudProxyLBRead(d *schema.ResourceData, meta interface{}) 
 
 	res, err := searcher.Find(ctx, findCondition)
 	if err != nil {
-		return fmt.Errorf("could not find SakuraCloud ProxyLB resource: %s", err)
+		return diag.Errorf("could not find SakuraCloud ProxyLB resource: %s", err)
 	}
 	if res == nil || res.Count == 0 || len(res.ProxyLBs) == 0 {
 		return filterNoResultErr()

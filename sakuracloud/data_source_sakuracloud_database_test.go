@@ -17,7 +17,7 @@ package sakuracloud
 import (
 	"testing"
 
-	"github.com/hashicorp/terraform-plugin-sdk/helper/resource"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
 )
 
 func TestAccSakuraCloudDataSourceDatabase_basic(t *testing.T) {
@@ -26,8 +26,8 @@ func TestAccSakuraCloudDataSourceDatabase_basic(t *testing.T) {
 	password := randomPassword()
 
 	resource.ParallelTest(t, resource.TestCase{
-		PreCheck:  func() { testAccPreCheck(t) },
-		Providers: testAccProviders,
+		PreCheck:          func() { testAccPreCheck(t) },
+		ProviderFactories: testAccProviderFactories,
 		Steps: []resource.TestStep{
 			{
 				Config: buildConfigWithArgs(testAccSakuraCloudDataSourceDatabase_basic, rand, password),
@@ -37,12 +37,12 @@ func TestAccSakuraCloudDataSourceDatabase_basic(t *testing.T) {
 					resource.TestCheckResourceAttr(resourceName, "plan", "10g"),
 					resource.TestCheckResourceAttr(resourceName, "description", "description"),
 					resource.TestCheckResourceAttr(resourceName, "tags.#", "3"),
-					resource.TestCheckResourceAttr(resourceName, "tags.4151227546", "tag1"),
-					resource.TestCheckResourceAttr(resourceName, "tags.1852302624", "tag2"),
-					resource.TestCheckResourceAttr(resourceName, "tags.425776566", "tag3"),
+					resource.TestCheckResourceAttr(resourceName, "tags.0", "tag1"),
+					resource.TestCheckResourceAttr(resourceName, "tags.1", "tag2"),
+					resource.TestCheckResourceAttr(resourceName, "tags.2", "tag3"),
 					resource.TestCheckResourceAttr(resourceName, "backup.0.weekdays.#", "2"),
-					resource.TestCheckResourceAttr(resourceName, "backup.0.weekdays.4146182742", "mon"),
-					resource.TestCheckResourceAttr(resourceName, "backup.0.weekdays.3274244602", "tue"),
+					resource.TestCheckResourceAttr(resourceName, "backup.0.weekdays.0", "mon"),
+					resource.TestCheckResourceAttr(resourceName, "backup.0.weekdays.1", "tue"),
 				),
 			},
 		},

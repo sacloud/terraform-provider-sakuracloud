@@ -15,12 +15,13 @@
 package sakuracloud
 
 import (
-	"fmt"
+	"context"
 	"time"
 
-	"github.com/hashicorp/terraform-plugin-sdk/helper/customdiff"
-	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
-	"github.com/hashicorp/terraform-plugin-sdk/helper/validation"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/customdiff"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
 	"github.com/sacloud/libsacloud/v2/sacloud"
 	"github.com/sacloud/libsacloud/v2/sacloud/types"
 )
@@ -29,15 +30,15 @@ func resourceSakuraCloudArchive() *schema.Resource {
 	resourceName := "archive"
 
 	return &schema.Resource{
-		Create: resourceSakuraCloudArchiveCreate,
-		Read:   resourceSakuraCloudArchiveRead,
-		Update: resourceSakuraCloudArchiveUpdate,
-		Delete: resourceSakuraCloudArchiveDelete,
-		CustomizeDiff: customdiff.ComputedIf("hash", func(d *schema.ResourceDiff, meta interface{}) bool {
+		CreateContext: resourceSakuraCloudArchiveCreate,
+		ReadContext:   resourceSakuraCloudArchiveRead,
+		UpdateContext: resourceSakuraCloudArchiveUpdate,
+		DeleteContext: resourceSakuraCloudArchiveDelete,
+		CustomizeDiff: customdiff.ComputedIf("hash", func(ctx context.Context, d *schema.ResourceDiff, meta interface{}) bool {
 			return d.HasChange("archive_file")
 		}),
 		Importer: &schema.ResourceImporter{
-			State: schema.ImportStatePassthrough,
+			StateContext: schema.ImportStatePassthroughContext,
 		},
 
 		Timeouts: &schema.ResourceTimeout{
@@ -49,13 +50,13 @@ func resourceSakuraCloudArchive() *schema.Resource {
 		Schema: map[string]*schema.Schema{
 			"name": schemaResourceName(resourceName),
 			"size": {
-				Type:          schema.TypeInt,
-				Optional:      true,
-				ForceNew:      true,
-				Default:       20,
-				ValidateFunc:  validation.IntInSlice(types.ArchiveSizes),
-				Description:   descf("The size of %s in GiB. This must be one of [%s]", resourceName, types.ArchiveSizes),
-				ConflictsWith: []string{"source_disk_id", "source_archive_id", "source_shared_key", "source_archive_zone"},
+				Type:             schema.TypeInt,
+				Optional:         true,
+				ForceNew:         true,
+				Default:          20,
+				ValidateDiagFunc: validation.ToDiagFunc(validation.IntInSlice(types.ArchiveSizes)),
+				Description:      descf("The size of %s in GiB. This must be one of [%s]", resourceName, types.ArchiveSizes),
+				ConflictsWith:    []string{"source_disk_id", "source_archive_id", "source_shared_key", "source_archive_zone"},
 			},
 			"archive_file": {
 				Type:        schema.TypeString,
@@ -71,11 +72,11 @@ func resourceSakuraCloudArchive() *schema.Resource {
 				Description: "The md5 checksum calculated from the base64 encoded file body",
 			},
 			"source_archive_id": {
-				Type:          schema.TypeString,
-				ForceNew:      true,
-				Optional:      true,
-				ConflictsWith: []string{"source_disk_id", "size", "source_shared_key"},
-				ValidateFunc:  validateSakuracloudIDType,
+				Type:             schema.TypeString,
+				ForceNew:         true,
+				Optional:         true,
+				ConflictsWith:    []string{"source_disk_id", "size", "source_shared_key"},
+				ValidateDiagFunc: validation.ToDiagFunc(validateSakuracloudIDType),
 				Description: descf(
 					"The id of the source archive. %s",
 					descConflicts("source_disk_id"),
@@ -89,24 +90,24 @@ func resourceSakuraCloudArchive() *schema.Resource {
 				Description:   "The share key of source shared archive",
 			},
 			"source_disk_id": {
-				Type:          schema.TypeString,
-				ForceNew:      true,
-				Optional:      true,
-				ConflictsWith: []string{"source_archive_id", "size", "source_shared_key", "source_archive_zone"},
-				ValidateFunc:  validateSakuracloudIDType,
+				Type:             schema.TypeString,
+				ForceNew:         true,
+				Optional:         true,
+				ConflictsWith:    []string{"source_archive_id", "size", "source_shared_key", "source_archive_zone"},
+				ValidateDiagFunc: validation.ToDiagFunc(validateSakuracloudIDType),
 				Description: descf(
 					"The id of the source disk. %s",
 					descConflicts("source_archive_id"),
 				),
 			},
 			"source_shared_key": {
-				Type:          schema.TypeString,
-				ForceNew:      true,
-				Optional:      true,
-				Sensitive:     true,
-				ConflictsWith: []string{"source_archive_id", "source_disk_id", "size", "source_archive_zone"},
-				ValidateFunc:  validateSourceSharedKey,
-				Description:   "The share key of source shared archive",
+				Type:             schema.TypeString,
+				ForceNew:         true,
+				Optional:         true,
+				Sensitive:        true,
+				ConflictsWith:    []string{"source_archive_id", "source_disk_id", "size", "source_archive_zone"},
+				ValidateDiagFunc: validation.ToDiagFunc(validateSourceSharedKey),
+				Description:      "The share key of source shared archive",
 			},
 			"icon_id":     schemaResourceIconID(resourceName),
 			"description": schemaResourceDescription(resourceName),
@@ -116,17 +117,15 @@ func resourceSakuraCloudArchive() *schema.Resource {
 	}
 }
 
-func resourceSakuraCloudArchiveCreate(d *schema.ResourceData, meta interface{}) error {
+func resourceSakuraCloudArchiveCreate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client, zone, err := sakuraCloudClient(d, meta)
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
-	ctx, cancel := operationContext(d, schema.TimeoutCreate)
-	defer cancel()
 
 	builder, cleanup, err := expandArchiveBuilder(d, zone, client)
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
 	if cleanup != nil {
 		defer cleanup()
@@ -137,19 +136,17 @@ func resourceSakuraCloudArchiveCreate(d *schema.ResourceData, meta interface{}) 
 		d.SetId(archive.ID.String())
 	}
 	if err != nil {
-		return fmt.Errorf("creating SakuraCloud Archive is failed: %s", err)
+		return diag.Errorf("creating SakuraCloud Archive is failed: %s", err)
 	}
 
-	return resourceSakuraCloudArchiveRead(d, meta)
+	return resourceSakuraCloudArchiveRead(ctx, d, meta)
 }
 
-func resourceSakuraCloudArchiveRead(d *schema.ResourceData, meta interface{}) error {
+func resourceSakuraCloudArchiveRead(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client, zone, err := sakuraCloudClient(d, meta)
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
-	ctx, cancel := operationContext(d, schema.TimeoutRead)
-	defer cancel()
 
 	archiveOp := sacloud.NewArchiveOp(client)
 
@@ -159,40 +156,36 @@ func resourceSakuraCloudArchiveRead(d *schema.ResourceData, meta interface{}) er
 			d.SetId("")
 			return nil
 		}
-		return fmt.Errorf("could not read SakuraCloud Archive[%s]: %s", d.Id(), err)
+		return diag.Errorf("could not read SakuraCloud Archive[%s]: %s", d.Id(), err)
 	}
 	return setArchiveResourceData(d, client, archive)
 }
 
-func resourceSakuraCloudArchiveUpdate(d *schema.ResourceData, meta interface{}) error {
+func resourceSakuraCloudArchiveUpdate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client, zone, err := sakuraCloudClient(d, meta)
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
-	ctx, cancel := operationContext(d, schema.TimeoutUpdate)
-	defer cancel()
 
 	archiveOp := sacloud.NewArchiveOp(client)
 
 	archive, err := archiveOp.Read(ctx, zone, sakuraCloudID(d.Id()))
 	if err != nil {
-		return fmt.Errorf("could not read SakuraCloud Archive[%s]: %s", d.Id(), err)
+		return diag.Errorf("could not read SakuraCloud Archive[%s]: %s", d.Id(), err)
 	}
 
 	if _, err = archiveOp.Update(ctx, zone, archive.ID, expandArchiveUpdateRequest(d)); err != nil {
-		return fmt.Errorf("updating SakuraCloud Archive[%s] is failed: %s", d.Id(), err)
+		return diag.Errorf("updating SakuraCloud Archive[%s] is failed: %s", d.Id(), err)
 	}
 
-	return resourceSakuraCloudArchiveRead(d, meta)
+	return resourceSakuraCloudArchiveRead(ctx, d, meta)
 }
 
-func resourceSakuraCloudArchiveDelete(d *schema.ResourceData, meta interface{}) error {
+func resourceSakuraCloudArchiveDelete(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client, zone, err := sakuraCloudClient(d, meta)
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
-	ctx, cancel := operationContext(d, schema.TimeoutDelete)
-	defer cancel()
 
 	archiveOp := sacloud.NewArchiveOp(client)
 
@@ -202,18 +195,18 @@ func resourceSakuraCloudArchiveDelete(d *schema.ResourceData, meta interface{}) 
 			d.SetId("")
 			return nil
 		}
-		return fmt.Errorf("could not read SakuraCloud Archive[%s]: %s", d.Id(), err)
+		return diag.Errorf("could not read SakuraCloud Archive[%s]: %s", d.Id(), err)
 	}
 
 	if err := archiveOp.Delete(ctx, zone, archive.ID); err != nil {
-		return fmt.Errorf("deleting SakuraCloud Archive[%s] is failed: %s", d.Id(), err)
+		return diag.Errorf("deleting SakuraCloud Archive[%s] is failed: %s", d.Id(), err)
 	}
 
 	d.SetId("")
 	return nil
 }
 
-func setArchiveResourceData(d *schema.ResourceData, client *APIClient, data *sacloud.Archive) error {
+func setArchiveResourceData(d *schema.ResourceData, client *APIClient, data *sacloud.Archive) diag.Diagnostics {
 	d.Set("hash", expandArchiveHash(d))                             // nolint
 	d.Set("icon_id", data.IconID.String())                          // nolint
 	d.Set("name", data.Name)                                        // nolint
@@ -223,5 +216,5 @@ func setArchiveResourceData(d *schema.ResourceData, client *APIClient, data *sac
 	d.Set("source_archive_id", d.Get("source_archive_id").(string)) // nolint
 	d.Set("source_disk_id", d.Get("source_disk_id").(string))       // nolint
 	d.Set("source_shared_key", d.Get("source_shared_key").(string)) // nolint
-	return d.Set("tags", flattenTags(data.Tags))
+	return diag.FromErr(d.Set("tags", flattenTags(data.Tags)))
 }

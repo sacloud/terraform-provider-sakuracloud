@@ -16,14 +16,14 @@ package sakuracloud
 
 import (
 	"bytes"
+	"context"
 	"fmt"
 	"strings"
 	"time"
 
-	"github.com/hashicorp/terraform-plugin-sdk/helper/validation"
-
-	"github.com/hashicorp/terraform-plugin-sdk/helper/hashcode"
-	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
 	"github.com/sacloud/libsacloud/v2/sacloud"
 	"github.com/sacloud/libsacloud/v2/sacloud/types"
 )
@@ -32,9 +32,9 @@ const defaultTTL = 3600
 
 func resourceSakuraCloudDNSRecord() *schema.Resource {
 	return &schema.Resource{
-		Create: resourceSakuraCloudDNSRecordCreate,
-		Read:   resourceSakuraCloudDNSRecordRead,
-		Delete: resourceSakuraCloudDNSRecordDelete,
+		CreateContext: resourceSakuraCloudDNSRecordCreate,
+		ReadContext:   resourceSakuraCloudDNSRecordRead,
+		DeleteContext: resourceSakuraCloudDNSRecordDelete,
 
 		Timeouts: &schema.ResourceTimeout{
 			Create: schema.DefaultTimeout(5 * time.Minute),
@@ -43,11 +43,11 @@ func resourceSakuraCloudDNSRecord() *schema.Resource {
 
 		Schema: map[string]*schema.Schema{
 			"dns_id": {
-				Type:         schema.TypeString,
-				Required:     true,
-				ForceNew:     true,
-				ValidateFunc: validateSakuracloudIDType,
-				Description:  "The id of the DNS resource",
+				Type:             schema.TypeString,
+				Required:         true,
+				ForceNew:         true,
+				ValidateDiagFunc: validation.ToDiagFunc(validateSakuracloudIDType),
+				Description:      "The id of the DNS resource",
 			},
 			"name": {
 				Type:        schema.TypeString,
@@ -56,10 +56,10 @@ func resourceSakuraCloudDNSRecord() *schema.Resource {
 				Description: "The name of the DNS Record resource",
 			},
 			"type": {
-				Type:         schema.TypeString,
-				Required:     true,
-				ValidateFunc: validation.StringInSlice(types.DNSRecordTypeStrings, false),
-				ForceNew:     true,
+				Type:             schema.TypeString,
+				Required:         true,
+				ValidateDiagFunc: validation.ToDiagFunc(validation.StringInSlice(types.DNSRecordTypeStrings, false)),
+				ForceNew:         true,
 				Description: descf(
 					"The type of DNS Record. This must be one of [%s]",
 					types.DNSRecordTypeStrings,
@@ -79,34 +79,32 @@ func resourceSakuraCloudDNSRecord() *schema.Resource {
 				Description: "The number of the TTL",
 			},
 			"priority": {
-				Type:         schema.TypeInt,
-				Optional:     true,
-				ValidateFunc: validation.IntBetween(0, 65535),
-				ForceNew:     true,
-				Description:  descf("The priority of target DNS Record. %s", descRange(0, 65535)),
+				Type:             schema.TypeInt,
+				Optional:         true,
+				ValidateDiagFunc: validation.ToDiagFunc(validation.IntBetween(0, 65535)),
+				ForceNew:         true,
+				Description:      descf("The priority of target DNS Record. %s", descRange(0, 65535)),
 			},
 			"weight": {
-				Type:         schema.TypeInt,
-				Optional:     true,
-				ValidateFunc: validation.IntBetween(0, 65535),
-				ForceNew:     true,
-				Description:  descf("The weight of target DNS Record. %s", descRange(0, 65535)),
+				Type:             schema.TypeInt,
+				Optional:         true,
+				ValidateDiagFunc: validation.ToDiagFunc(validation.IntBetween(0, 65535)),
+				ForceNew:         true,
+				Description:      descf("The weight of target DNS Record. %s", descRange(0, 65535)),
 			},
 			"port": {
-				Type:         schema.TypeInt,
-				Optional:     true,
-				ValidateFunc: validation.IntBetween(1, 65535),
-				ForceNew:     true,
-				Description:  descf("The number of port. %s", descRange(1, 65535)),
+				Type:             schema.TypeInt,
+				Optional:         true,
+				ValidateDiagFunc: validation.ToDiagFunc(validation.IntBetween(1, 65535)),
+				ForceNew:         true,
+				Description:      descf("The number of port. %s", descRange(1, 65535)),
 			},
 		},
 	}
 }
 
-func resourceSakuraCloudDNSRecordCreate(d *schema.ResourceData, meta interface{}) error {
+func resourceSakuraCloudDNSRecordCreate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*APIClient)
-	ctx, cancel := operationContext(d, schema.TimeoutCreate)
-	defer cancel()
 
 	dnsOp := sacloud.NewDNSOp(client)
 	dnsID := d.Get("dns_id").(string)
@@ -116,23 +114,21 @@ func resourceSakuraCloudDNSRecordCreate(d *schema.ResourceData, meta interface{}
 
 	dns, err := dnsOp.Read(ctx, sakuraCloudID(dnsID))
 	if err != nil {
-		return fmt.Errorf("could not read SakuraCloud DNS[%s]: %s", dnsID, err)
+		return diag.Errorf("could not read SakuraCloud DNS[%s]: %s", dnsID, err)
 	}
 
 	record, req := expandDNSRecordCreateRequest(d, dns)
 	_, err = dnsOp.UpdateSettings(ctx, sakuraCloudID(dnsID), req)
 	if err != nil {
-		return fmt.Errorf("creating SakuraCloud DNSRecord is failed: %s", err)
+		return diag.Errorf("creating SakuraCloud DNSRecord is failed: %s", err)
 	}
 
 	d.SetId(dnsRecordIDHash(dnsID, record))
-	return resourceSakuraCloudDNSRecordRead(d, meta)
+	return resourceSakuraCloudDNSRecordRead(ctx, d, meta)
 }
 
-func resourceSakuraCloudDNSRecordRead(d *schema.ResourceData, meta interface{}) error {
+func resourceSakuraCloudDNSRecordRead(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*APIClient)
-	ctx, cancel := operationContext(d, schema.TimeoutRead)
-	defer cancel()
 
 	dnsOp := sacloud.NewDNSOp(client)
 	dnsID := d.Get("dns_id").(string)
@@ -143,7 +139,7 @@ func resourceSakuraCloudDNSRecordRead(d *schema.ResourceData, meta interface{}) 
 			d.SetId("")
 			return nil
 		}
-		return fmt.Errorf("could not read SakuraCloud DNS[%s]: %s", d.Id(), err)
+		return diag.Errorf("could not read SakuraCloud DNS[%s]: %s", d.Id(), err)
 	}
 
 	record := expandDNSRecord(d)
@@ -173,10 +169,8 @@ func resourceSakuraCloudDNSRecordRead(d *schema.ResourceData, meta interface{}) 
 	return nil
 }
 
-func resourceSakuraCloudDNSRecordDelete(d *schema.ResourceData, meta interface{}) error {
+func resourceSakuraCloudDNSRecordDelete(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*APIClient)
-	ctx, cancel := operationContext(d, schema.TimeoutDelete)
-	defer cancel()
 
 	dnsOp := sacloud.NewDNSOp(client)
 	dnsID := d.Get("dns_id").(string)
@@ -190,12 +184,12 @@ func resourceSakuraCloudDNSRecordDelete(d *schema.ResourceData, meta interface{}
 			d.SetId("")
 			return nil
 		}
-		return fmt.Errorf("could not read SakuraCloud DNS[%s]: %s", dnsID, err)
+		return diag.Errorf("could not read SakuraCloud DNS[%s]: %s", dnsID, err)
 	}
 
 	_, err = dnsOp.UpdateSettings(ctx, sakuraCloudID(dnsID), expandDNSRecordDeleteRequest(d, dns))
 	if err != nil {
-		return fmt.Errorf("deleting SakuraCloud DNSRecord[%s] is failed: %s", dnsID, err)
+		return diag.Errorf("deleting SakuraCloud DNSRecord[%s] is failed: %s", dnsID, err)
 	}
 
 	return nil
@@ -221,5 +215,5 @@ func dnsRecordIDHash(dns_id string, r *sacloud.DNSRecord) string {
 	buf.WriteString(fmt.Sprintf("%d-", r.TTL))
 	buf.WriteString(fmt.Sprintf("%s-", r.Name))
 
-	return fmt.Sprintf("dnsrecord-%d", hashcode.String(buf.String()))
+	return fmt.Sprintf("dnsrecord-%d", schema.HashString(buf.String()))
 }

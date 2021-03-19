@@ -15,10 +15,12 @@
 package sakuracloud
 
 import (
-	"fmt"
+	"context"
 	"time"
 
-	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
 	"github.com/sacloud/libsacloud/v2/sacloud"
 )
 
@@ -26,9 +28,9 @@ func resourceSakuraCloudArchiveShare() *schema.Resource {
 	resourceName := "ArchiveShare"
 
 	return &schema.Resource{
-		Create: resourceSakuraCloudArchiveShareCreate,
-		Read:   resourceSakuraCloudArchiveShareRead,
-		Delete: resourceSakuraCloudArchiveShareDelete,
+		CreateContext: resourceSakuraCloudArchiveShareCreate,
+		ReadContext:   resourceSakuraCloudArchiveShareRead,
+		DeleteContext: resourceSakuraCloudArchiveShareDelete,
 
 		Timeouts: &schema.ResourceTimeout{
 			Create: schema.DefaultTimeout(5 * time.Minute),
@@ -38,11 +40,11 @@ func resourceSakuraCloudArchiveShare() *schema.Resource {
 
 		Schema: map[string]*schema.Schema{
 			"archive_id": {
-				Type:         schema.TypeString,
-				ForceNew:     true,
-				Required:     true,
-				ValidateFunc: validateSakuracloudIDType,
-				Description:  "The id of the archive",
+				Type:             schema.TypeString,
+				ForceNew:         true,
+				Required:         true,
+				ValidateDiagFunc: validation.ToDiagFunc(validateSakuracloudIDType),
+				Description:      "The id of the archive",
 			},
 			"share_key": {
 				Type:        schema.TypeString,
@@ -55,26 +57,24 @@ func resourceSakuraCloudArchiveShare() *schema.Resource {
 	}
 }
 
-func resourceSakuraCloudArchiveShareCreate(d *schema.ResourceData, meta interface{}) error {
+func resourceSakuraCloudArchiveShareCreate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client, zone, err := sakuraCloudClient(d, meta)
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
-	ctx, cancel := operationContext(d, schema.TimeoutCreate)
-	defer cancel()
 
 	archiveOp := sacloud.NewArchiveOp(client)
 	archiveID := expandSakuraCloudID(d, "archive_id")
 
 	archive, err := archiveOp.Read(ctx, zone, archiveID)
 	if err != nil {
-		return fmt.Errorf("sharing SakuraCloud Archive is failed: %s", err)
+		return diag.Errorf("sharing SakuraCloud Archive is failed: %s", err)
 	}
 
 	// share
 	shareInfo, err := archiveOp.Share(ctx, zone, archiveID)
 	if err != nil {
-		return fmt.Errorf("sharing SakuraCloud Archive is failed: %s", err)
+		return diag.Errorf("sharing SakuraCloud Archive is failed: %s", err)
 	}
 
 	d.SetId(archive.ID.String())
@@ -83,13 +83,11 @@ func resourceSakuraCloudArchiveShareCreate(d *schema.ResourceData, meta interfac
 	return nil
 }
 
-func resourceSakuraCloudArchiveShareRead(d *schema.ResourceData, meta interface{}) error {
+func resourceSakuraCloudArchiveShareRead(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client, zone, err := sakuraCloudClient(d, meta)
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
-	ctx, cancel := operationContext(d, schema.TimeoutRead)
-	defer cancel()
 
 	archiveOp := sacloud.NewArchiveOp(client)
 
@@ -99,7 +97,7 @@ func resourceSakuraCloudArchiveShareRead(d *schema.ResourceData, meta interface{
 			d.SetId("")
 			return nil
 		}
-		return fmt.Errorf("could not read SakuraCloud Archive[%s]: %s", d.Id(), err)
+		return diag.Errorf("could not read SakuraCloud Archive[%s]: %s", d.Id(), err)
 	}
 
 	if !archive.Availability.IsUploading() {
@@ -113,13 +111,11 @@ func resourceSakuraCloudArchiveShareRead(d *schema.ResourceData, meta interface{
 	return nil
 }
 
-func resourceSakuraCloudArchiveShareDelete(d *schema.ResourceData, meta interface{}) error {
+func resourceSakuraCloudArchiveShareDelete(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client, zone, err := sakuraCloudClient(d, meta)
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
-	ctx, cancel := operationContext(d, schema.TimeoutDelete)
-	defer cancel()
 
 	archiveOp := sacloud.NewArchiveOp(client)
 
@@ -129,7 +125,7 @@ func resourceSakuraCloudArchiveShareDelete(d *schema.ResourceData, meta interfac
 			d.SetId("")
 			return nil
 		}
-		return fmt.Errorf("could not read SakuraCloud Archive[%s]: %s", d.Id(), err)
+		return diag.Errorf("could not read SakuraCloud Archive[%s]: %s", d.Id(), err)
 	}
 
 	if !archive.Availability.IsUploading() {
@@ -138,7 +134,7 @@ func resourceSakuraCloudArchiveShareDelete(d *schema.ResourceData, meta interfac
 	}
 
 	if err := archiveOp.CloseFTP(ctx, zone, archive.ID); err != nil {
-		return fmt.Errorf("deleting SakuraCloud Archive Share[%s] is failed: %s", d.Id(), err)
+		return diag.Errorf("deleting SakuraCloud Archive Share[%s] is failed: %s", d.Id(), err)
 	}
 
 	d.SetId("")

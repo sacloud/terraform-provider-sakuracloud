@@ -18,7 +18,7 @@ import (
 	"os"
 	"testing"
 
-	"github.com/hashicorp/terraform-plugin-sdk/helper/resource"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
 	"github.com/sacloud/libsacloud/v2/sacloud"
 )
 
@@ -37,8 +37,8 @@ func TestAccSakuraCloudProxyLBACME_basic(t *testing.T) {
 
 	var proxylb sacloud.ProxyLB
 	resource.ParallelTest(t, resource.TestCase{
-		PreCheck:  func() { testAccPreCheck(t) },
-		Providers: testAccProviders,
+		PreCheck:          func() { testAccPreCheck(t) },
+		ProviderFactories: testAccProviderFactories,
 		CheckDestroy: resource.ComposeTestCheckFunc(
 			testCheckSakuraCloudDiskDestroy,
 			testCheckSakuraCloudDNSRecordDestroy,

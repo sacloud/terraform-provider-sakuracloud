@@ -16,10 +16,10 @@ package sakuracloud
 
 import (
 	"context"
-	"fmt"
 	"time"
 
-	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/sacloud/libsacloud/v2/helper/cleanup"
 	"github.com/sacloud/libsacloud/v2/sacloud"
 )
@@ -27,12 +27,12 @@ import (
 func resourceSakuraCloudBridge() *schema.Resource {
 	resourceName := "Bridge"
 	return &schema.Resource{
-		Create: resourceSakuraCloudBridgeCreate,
-		Read:   resourceSakuraCloudBridgeRead,
-		Update: resourceSakuraCloudBridgeUpdate,
-		Delete: resourceSakuraCloudBridgeDelete,
+		CreateContext: resourceSakuraCloudBridgeCreate,
+		ReadContext:   resourceSakuraCloudBridgeRead,
+		UpdateContext: resourceSakuraCloudBridgeUpdate,
+		DeleteContext: resourceSakuraCloudBridgeDelete,
 		Importer: &schema.ResourceImporter{
-			State: schema.ImportStatePassthrough,
+			StateContext: schema.ImportStatePassthroughContext,
 		},
 
 		Timeouts: &schema.ResourceTimeout{
@@ -49,35 +49,30 @@ func resourceSakuraCloudBridge() *schema.Resource {
 	}
 }
 
-func resourceSakuraCloudBridgeCreate(d *schema.ResourceData, meta interface{}) error {
+func resourceSakuraCloudBridgeCreate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client, zone, err := sakuraCloudClient(d, meta)
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
-	ctx, cancel := operationContext(d, schema.TimeoutCreate)
-	defer cancel()
 
 	bridgeOp := sacloud.NewBridgeOp(client)
-
 	bridge, err := bridgeOp.Create(ctx, zone, &sacloud.BridgeCreateRequest{
 		Name:        d.Get("name").(string),
 		Description: d.Get("description").(string),
 	})
 	if err != nil {
-		return fmt.Errorf("creating SakuraCloud Bridge is failed: %s", err)
+		return diag.Errorf("creating SakuraCloud Bridge is failed: %s", err)
 	}
 
 	d.SetId(bridge.ID.String())
-	return resourceSakuraCloudBridgeRead(d, meta)
+	return resourceSakuraCloudBridgeRead(ctx, d, meta)
 }
 
-func resourceSakuraCloudBridgeRead(d *schema.ResourceData, meta interface{}) error {
+func resourceSakuraCloudBridgeRead(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client, zone, err := sakuraCloudClient(d, meta)
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
-	ctx, cancel := operationContext(d, schema.TimeoutRead)
-	defer cancel()
 
 	bridgeOp := sacloud.NewBridgeOp(client)
 
@@ -87,24 +82,22 @@ func resourceSakuraCloudBridgeRead(d *schema.ResourceData, meta interface{}) err
 			d.SetId("")
 			return nil
 		}
-		return fmt.Errorf("could not read SakuraCloud Bridge[%s]: %s", d.Id(), err)
+		return diag.Errorf("could not read SakuraCloud Bridge[%s]: %s", d.Id(), err)
 	}
 	return setBridgeResourceData(ctx, d, client, bridge)
 }
 
-func resourceSakuraCloudBridgeUpdate(d *schema.ResourceData, meta interface{}) error {
+func resourceSakuraCloudBridgeUpdate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client, zone, err := sakuraCloudClient(d, meta)
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
-	ctx, cancel := operationContext(d, schema.TimeoutUpdate)
-	defer cancel()
 
 	bridgeOp := sacloud.NewBridgeOp(client)
 
 	bridge, err := bridgeOp.Read(ctx, zone, sakuraCloudID(d.Id()))
 	if err != nil {
-		return fmt.Errorf("could not read SakuraCloud Bridge[%s]: %s", d.Id(), err)
+		return diag.Errorf("could not read SakuraCloud Bridge[%s]: %s", d.Id(), err)
 	}
 
 	_, err = bridgeOp.Update(ctx, zone, bridge.ID, &sacloud.BridgeUpdateRequest{
@@ -112,18 +105,16 @@ func resourceSakuraCloudBridgeUpdate(d *schema.ResourceData, meta interface{}) e
 		Description: d.Get("description").(string),
 	})
 	if err != nil {
-		return fmt.Errorf("updating SakuraCloud Bridge[%s] is failed: %s", d.Id(), err)
+		return diag.Errorf("updating SakuraCloud Bridge[%s] is failed: %s", d.Id(), err)
 	}
-	return resourceSakuraCloudBridgeRead(d, meta)
+	return resourceSakuraCloudBridgeRead(ctx, d, meta)
 }
 
-func resourceSakuraCloudBridgeDelete(d *schema.ResourceData, meta interface{}) error {
+func resourceSakuraCloudBridgeDelete(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client, zone, err := sakuraCloudClient(d, meta)
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
-	ctx, cancel := operationContext(d, schema.TimeoutDelete)
-	defer cancel()
 
 	bridgeOp := sacloud.NewBridgeOp(client)
 
@@ -133,17 +124,17 @@ func resourceSakuraCloudBridgeDelete(d *schema.ResourceData, meta interface{}) e
 			d.SetId("")
 			return nil
 		}
-		return fmt.Errorf("could not read SakuraCloud Bridge[%s]: %s", d.Id(), err)
+		return diag.Errorf("could not read SakuraCloud Bridge[%s]: %s", d.Id(), err)
 	}
 
 	if err := cleanup.DeleteBridge(ctx, client, zone, client.zones, bridge.ID, client.checkReferencedOption()); err != nil {
-		return fmt.Errorf("deleting SakuraCloud Bridge[%s] is failed: %s", d.Id(), err)
+		return diag.Errorf("deleting SakuraCloud Bridge[%s] is failed: %s", d.Id(), err)
 	}
 	d.SetId("")
 	return nil
 }
 
-func setBridgeResourceData(ctx context.Context, d *schema.ResourceData, client *APIClient, data *sacloud.Bridge) error {
+func setBridgeResourceData(ctx context.Context, d *schema.ResourceData, client *APIClient, data *sacloud.Bridge) diag.Diagnostics {
 	d.Set("name", data.Name)               // nolint
 	d.Set("description", data.Description) // nolint
 	d.Set("zone", getZone(d, client))      // nolint

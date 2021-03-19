@@ -15,10 +15,12 @@
 package sakuracloud
 
 import (
-	"github.com/hashicorp/terraform-plugin-sdk/helper/mutexkv"
-	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
-	"github.com/hashicorp/terraform-plugin-sdk/helper/validation"
-	"github.com/hashicorp/terraform-plugin-sdk/terraform"
+	"context"
+
+	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
+	"github.com/sacloud/libsacloud/v2/pkg/mutexkv"
 	"github.com/sacloud/libsacloud/v2/sacloud"
 	"github.com/sacloud/libsacloud/v2/sacloud/profile"
 )
@@ -32,7 +34,7 @@ var (
 )
 
 // Provider returns a terraform.ResourceProvider.
-func Provider() terraform.ResourceProvider {
+func Provider() *schema.Provider {
 	provider := &schema.Provider{
 		Schema: map[string]*schema.Schema{
 			"profile": {
@@ -84,11 +86,11 @@ func Provider() terraform.ResourceProvider {
 				Description: "The root URL of SakuraCloud API. It can also be sourced from the `SAKURACLOUD_API_ROOT_URL` environment variables, or via a shared credentials file if `profile` is specified. Default:`https://secure.sakura.ad.jp/cloud/zone`",
 			},
 			"retry_max": {
-				Type:         schema.TypeInt,
-				Optional:     true,
-				DefaultFunc:  schema.MultiEnvDefaultFunc([]string{"SAKURACLOUD_RETRY_MAX"}, defaultRetryMax),
-				ValidateFunc: validation.IntBetween(0, 100),
-				Description:  "The maximum number of API call retries used when SakuraCloud API returns status code `423` or `503`. It can also be sourced from the `SAKURACLOUD_RETRY_MAX` environment variables, or via a shared credentials file if `profile` is specified. Default:`100`",
+				Type:             schema.TypeInt,
+				Optional:         true,
+				DefaultFunc:      schema.MultiEnvDefaultFunc([]string{"SAKURACLOUD_RETRY_MAX"}, defaultRetryMax),
+				ValidateDiagFunc: validation.ToDiagFunc(validation.IntBetween(0, 100)),
+				Description:      "The maximum number of API call retries used when SakuraCloud API returns status code `423` or `503`. It can also be sourced from the `SAKURACLOUD_RETRY_MAX` environment variables, or via a shared credentials file if `profile` is specified. Default:`100`",
 			},
 			"retry_wait_max": {
 				Type:        schema.TypeInt,
@@ -112,10 +114,10 @@ func Provider() terraform.ResourceProvider {
 				),
 			},
 			"api_request_rate_limit": {
-				Type:         schema.TypeInt,
-				Optional:     true,
-				DefaultFunc:  schema.MultiEnvDefaultFunc([]string{"SAKURACLOUD_RATE_LIMIT"}, defaultAPIRequestRateLimit),
-				ValidateFunc: validation.IntBetween(1, 10),
+				Type:             schema.TypeInt,
+				Optional:         true,
+				DefaultFunc:      schema.MultiEnvDefaultFunc([]string{"SAKURACLOUD_RATE_LIMIT"}, defaultAPIRequestRateLimit),
+				ValidateDiagFunc: validation.ToDiagFunc(validation.IntBetween(1, 10)),
 				Description: descf(
 					"The maximum number of SakuraCloud API calls per second. It can also be sourced from the `SAKURACLOUD_RATE_LIMIT` environment variables, or via a shared credentials file if `profile` is specified. Default:`%d`",
 					defaultAPIRequestRateLimit,
@@ -210,7 +212,7 @@ func Provider() terraform.ResourceProvider {
 		},
 	}
 
-	provider.ConfigureFunc = func(d *schema.ResourceData) (interface{}, error) {
+	provider.ConfigureContextFunc = func(ctx context.Context, d *schema.ResourceData) (interface{}, diag.Diagnostics) {
 		terraformVersion := provider.TerraformVersion
 		if terraformVersion == "" {
 			// Terraform 0.12 introduced this field to the protocol
@@ -223,7 +225,7 @@ func Provider() terraform.ResourceProvider {
 	return provider
 }
 
-func providerConfigure(d *schema.ResourceData, terraformVersion string) (interface{}, error) {
+func providerConfigure(d *schema.ResourceData, terraformVersion string) (interface{}, diag.Diagnostics) {
 	config := Config{
 		Profile:             d.Get("profile").(string),
 		AccessToken:         d.Get("token").(string),
@@ -243,7 +245,8 @@ func providerConfigure(d *schema.ResourceData, terraformVersion string) (interfa
 		terraformVersion:    terraformVersion,
 	}
 
-	return config.NewClient()
+	client, err := config.NewClient()
+	return client, diag.FromErr(err)
 }
 
 var sakuraMutexKV = mutexkv.NewMutexKV()

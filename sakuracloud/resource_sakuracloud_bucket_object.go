@@ -16,6 +16,7 @@ package sakuracloud
 
 import (
 	"bytes"
+	"context"
 	"fmt"
 	"io"
 	"mime"
@@ -23,7 +24,8 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	homedir "github.com/mitchellh/go-homedir"
 	"github.com/mitchellh/goamz/aws"
 	"github.com/mitchellh/goamz/s3"
@@ -34,10 +36,10 @@ const objectStorageCachedHost = "c.sakurastorage.jp"
 
 func resourceSakuraCloudBucketObject() *schema.Resource {
 	return &schema.Resource{
-		Create: resourceSakuraCloudBucketObjectPut,
-		Read:   resourceSakuraCloudBucketObjectRead,
-		Update: resourceSakuraCloudBucketObjectPut,
-		Delete: resourceSakuraCloudBucketObjectDelete,
+		CreateContext: resourceSakuraCloudBucketObjectPut,
+		ReadContext:   resourceSakuraCloudBucketObjectRead,
+		UpdateContext: resourceSakuraCloudBucketObjectPut,
+		DeleteContext: resourceSakuraCloudBucketObjectDelete,
 
 		Schema: map[string]*schema.Schema{
 			"access_key": {
@@ -139,10 +141,10 @@ func resourceSakuraCloudBucketObject() *schema.Resource {
 	}
 }
 
-func resourceSakuraCloudBucketObjectPut(d *schema.ResourceData, meta interface{}) error {
+func resourceSakuraCloudBucketObjectPut(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client, err := getS3Client(d)
 	if err != nil {
-		return fmt.Errorf("SakuraCloud BucketObject Put is failed: %s", err)
+		return diag.Errorf("SakuraCloud BucketObject Put is failed: %s", err)
 	}
 
 	strBucket := d.Get("bucket").(string)
@@ -157,15 +159,15 @@ func resourceSakuraCloudBucketObjectPut(d *schema.ResourceData, meta interface{}
 		source := v.(string)
 		path, err := homedir.Expand(source)
 		if err != nil {
-			return fmt.Errorf("Error expanding homedir in source (%s): %s", source, err)
+			return diag.Errorf("Error expanding homedir in source (%s): %s", source, err)
 		}
 		file, err := os.Open(path)
 		if err != nil {
-			return fmt.Errorf("Error opening S3 bucket object source (%s): %s", source, err)
+			return diag.Errorf("Error opening S3 bucket object source (%s): %s", source, err)
 		}
 		fi, err := file.Stat()
 		if err != nil {
-			return err
+			return diag.FromErr(err)
 		}
 
 		body = file
@@ -184,23 +186,23 @@ func resourceSakuraCloudBucketObjectPut(d *schema.ResourceData, meta interface{}
 			contentType = "text/plain"
 		}
 	} else {
-		return fmt.Errorf("Must specify \"source\" or \"content\" field")
+		return diag.Errorf(`Must specify "source" or "content" field`)
 	}
 
 	// put file
 	err = bucket.PutReader(key, body, size, contentType, s3.PublicRead)
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
 
 	d.SetId(key)
-	return resourceSakuraCloudBucketObjectRead(d, meta)
+	return resourceSakuraCloudBucketObjectRead(ctx, d, meta)
 }
 
-func resourceSakuraCloudBucketObjectRead(d *schema.ResourceData, meta interface{}) error {
+func resourceSakuraCloudBucketObjectRead(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client, err := getS3Client(d)
 	if err != nil {
-		return fmt.Errorf("SakuraCloud BucketObject Read is failed: %s", err)
+		return diag.Errorf("SakuraCloud BucketObject Read is failed: %s", err)
 	}
 
 	strBucket := d.Get("bucket").(string)
@@ -209,7 +211,7 @@ func resourceSakuraCloudBucketObjectRead(d *schema.ResourceData, meta interface{
 	// get key-info
 	keyInfo, err := bucket.GetKey(d.Id())
 	if err != nil {
-		return fmt.Errorf("SakuraCloud BucketObject Read is failed: %s", err)
+		return diag.Errorf("SakuraCloud BucketObject Read is failed: %s", err)
 	}
 	d.Set("last_modified", keyInfo.LastModified) // nolint
 	d.Set("size", keyInfo.Size)                  // nolint
@@ -219,7 +221,7 @@ func resourceSakuraCloudBucketObjectRead(d *schema.ResourceData, meta interface{
 	// get head
 	head, err := bucket.Head(d.Id())
 	if err != nil {
-		return fmt.Errorf("SakuraCloud BucketObject Read is failed: %s", err)
+		return diag.Errorf("SakuraCloud BucketObject Read is failed: %s", err)
 	}
 	contentType := head.Header.Get("Content-Type")
 	d.Set("content_type", contentType) // nolint
@@ -239,16 +241,16 @@ func resourceSakuraCloudBucketObjectRead(d *schema.ResourceData, meta interface{
 	return nil
 }
 
-func resourceSakuraCloudBucketObjectDelete(d *schema.ResourceData, meta interface{}) error {
+func resourceSakuraCloudBucketObjectDelete(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client, err := getS3Client(d)
 	if err != nil {
-		return fmt.Errorf("SakuraCloud BucketObject Delete is failed: %s", err)
+		return diag.Errorf("SakuraCloud BucketObject Delete is failed: %s", err)
 	}
 
 	strBucket := d.Get("bucket").(string)
 	bucket := client.Bucket(strBucket)
 
-	return bucket.Del(d.Id())
+	return diag.FromErr(bucket.Del(d.Id()))
 }
 
 func getS3Client(d *schema.ResourceData) (*s3.S3, error) {

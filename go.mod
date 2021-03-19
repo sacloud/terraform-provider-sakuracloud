@@ -3,10 +3,8 @@ module github.com/sacloud/terraform-provider-sakuracloud
 go 1.16
 
 require (
-	github.com/hashicorp/go-hclog v0.10.0 // indirect
 	github.com/hashicorp/go-multierror v1.0.1-0.20190722213833-bdca7bb83f60
-	github.com/hashicorp/hcl v1.0.0 // indirect
-	github.com/hashicorp/terraform-plugin-sdk v1.7.0
+	github.com/hashicorp/terraform-plugin-sdk/v2 v2.4.4
 	github.com/mattn/go-isatty v0.0.12 // indirect
 	github.com/mitchellh/go-homedir v1.1.0
 	github.com/mitchellh/goamz v0.0.0-20150317174335-caaaea8b30ee
@@ -16,5 +14,4 @@ require (
 	github.com/sacloud/libsacloud/v2 v2.14.1
 	github.com/stretchr/testify v1.6.1
 	github.com/vaughan0/go-ini v0.0.0-20130923145212-a98ad7ee00ec // indirect
-	gopkg.in/check.v1 v1.0.0-20190902080502-41f04d3bba15 // indirect
 )

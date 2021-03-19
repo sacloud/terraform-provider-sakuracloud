@@ -15,17 +15,19 @@
 package sakuracloud
 
 import (
+	"context"
 	"fmt"
 	"log"
 	"regexp"
 	"strings"
 
-	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 )
 
 func dataSourceSakuraCloudBucketObject() *schema.Resource {
 	return &schema.Resource{
-		Read: dataSourceSakuraCloudBucketObjectRead,
+		ReadContext: dataSourceSakuraCloudBucketObjectRead,
 
 		Schema: map[string]*schema.Schema{
 			"bucket": {
@@ -110,10 +112,10 @@ func dataSourceSakuraCloudBucketObject() *schema.Resource {
 	}
 }
 
-func dataSourceSakuraCloudBucketObjectRead(d *schema.ResourceData, meta interface{}) error {
+func dataSourceSakuraCloudBucketObjectRead(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client, err := getS3Client(d)
 	if err != nil {
-		return fmt.Errorf("reading SakuraCloud BucketObject is failed: %s", err)
+		return diag.Errorf("reading SakuraCloud BucketObject is failed: %s", err)
 	}
 
 	key := d.Get("key").(string)
@@ -123,7 +125,7 @@ func dataSourceSakuraCloudBucketObjectRead(d *schema.ResourceData, meta interfac
 	// get key-info
 	keyInfo, err := bucket.GetKey(key)
 	if err != nil {
-		return fmt.Errorf("reading SakuraCloud BucketObject is failed: %s", err)
+		return diag.Errorf("reading SakuraCloud BucketObject is failed: %s", err)
 	}
 	d.Set("last_modified", keyInfo.LastModified) // nolint
 	d.Set("size", keyInfo.Size)                  // nolint
@@ -133,7 +135,7 @@ func dataSourceSakuraCloudBucketObjectRead(d *schema.ResourceData, meta interfac
 	// get head
 	head, err := bucket.Head(key)
 	if err != nil {
-		return fmt.Errorf("reading SakuraCloud BucketObject is failed: %s", err)
+		return diag.Errorf("reading SakuraCloud BucketObject is failed: %s", err)
 	}
 	contentType := head.Header.Get("Content-Type")
 	d.Set("content_type", contentType) // nolint
@@ -141,7 +143,7 @@ func dataSourceSakuraCloudBucketObjectRead(d *schema.ResourceData, meta interfac
 	if isContentTypeAllowed(&contentType) {
 		data, err := bucket.Get(key)
 		if err != nil {
-			return fmt.Errorf("reading SakuraCloud BucketObject is failed: %s", err)
+			return diag.Errorf("reading SakuraCloud BucketObject is failed: %s", err)
 		}
 		d.Set("body", string(data)) // nolint
 	} else {

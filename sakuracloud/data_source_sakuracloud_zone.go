@@ -15,15 +15,16 @@
 package sakuracloud
 
 import (
-	"fmt"
+	"context"
 
-	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/sacloud/libsacloud/v2/sacloud"
 )
 
 func dataSourceSakuraCloudZone() *schema.Resource {
 	return &schema.Resource{
-		Read: dataSourceSakuraCloudZoneRead,
+		ReadContext: dataSourceSakuraCloudZoneRead,
 
 		Schema: map[string]*schema.Schema{
 			"name": {
@@ -58,13 +59,11 @@ func dataSourceSakuraCloudZone() *schema.Resource {
 	}
 }
 
-func dataSourceSakuraCloudZoneRead(d *schema.ResourceData, meta interface{}) error {
+func dataSourceSakuraCloudZoneRead(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client, zoneSlug, err := sakuraCloudClient(d, meta)
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
-	ctx, cancel := operationContext(d, schema.TimeoutRead)
-	defer cancel()
 
 	zoneOp := sacloud.NewZoneOp(client)
 
@@ -74,7 +73,7 @@ func dataSourceSakuraCloudZoneRead(d *schema.ResourceData, meta interface{}) err
 
 	res, err := zoneOp.Find(ctx, &sacloud.FindCondition{})
 	if err != nil {
-		return fmt.Errorf("could not find SakuraCloud Zone resource: %s", err)
+		return diag.Errorf("could not find SakuraCloud Zone resource: %s", err)
 	}
 	if res == nil || len(res.Zones) == 0 {
 		return filterNoResultErr()
@@ -97,5 +96,5 @@ func dataSourceSakuraCloudZoneRead(d *schema.ResourceData, meta interface{}) err
 	d.Set("description", data.Description)      // nolint
 	d.Set("region_id", data.Region.ID.String()) // nolint
 	d.Set("region_name", data.Region.Name)      // nolint
-	return d.Set("dns_servers", data.Region.NameServers)
+	return diag.FromErr(d.Set("dns_servers", data.Region.NameServers))
 }

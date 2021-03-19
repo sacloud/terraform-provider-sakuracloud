@@ -15,9 +15,10 @@
 package sakuracloud
 
 import (
-	"fmt"
+	"context"
 
-	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/sacloud/libsacloud/v2/sacloud"
 	"github.com/sacloud/libsacloud/v2/sacloud/types"
 )
@@ -25,7 +26,7 @@ import (
 func dataSourceSakuraCloudDNS() *schema.Resource {
 	resourceName := "DNS"
 	return &schema.Resource{
-		Read: dataSourceSakuraCloudDNSRead,
+		ReadContext: dataSourceSakuraCloudDNSRead,
 
 		Schema: map[string]*schema.Schema{
 			filterAttrName: filterSchema(&filterSchemaOption{}),
@@ -89,10 +90,8 @@ func dataSourceSakuraCloudDNS() *schema.Resource {
 	}
 }
 
-func dataSourceSakuraCloudDNSRead(d *schema.ResourceData, meta interface{}) error {
+func dataSourceSakuraCloudDNSRead(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*APIClient)
-	ctx, cancel := operationContext(d, schema.TimeoutRead)
-	defer cancel()
 
 	searcher := sacloud.NewDNSOp(client)
 
@@ -103,7 +102,7 @@ func dataSourceSakuraCloudDNSRead(d *schema.ResourceData, meta interface{}) erro
 
 	res, err := searcher.Find(ctx, findCondition)
 	if err != nil {
-		return fmt.Errorf("could not find SakuraCloud Disk resource: %s", err)
+		return diag.Errorf("could not find SakuraCloud Disk resource: %s", err)
 	}
 	if res == nil || res.Count == 0 || len(res.DNS) == 0 {
 		return filterNoResultErr()
