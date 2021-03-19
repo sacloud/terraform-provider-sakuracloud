@@ -1,6 +1,10 @@
 ## 2.8.0(Unreleased)
 
-FEATURES
+ENHANCEMENTS:
+
+  * **Terraform Plugin SDK v2** [GH-807] (@yamamoto-febc)
+
+FEATURES:
 
   * libsacloud v2.14.1 - added internet plans [GH-806] (@yamamoto-febc)
   * sakuracloud_server: ssh_keys [GH-805] (@yamamoto-febc)
