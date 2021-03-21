@@ -139,7 +139,7 @@ func resourceSakuraCloudMobileGateway() *schema.Resource {
 						"slack_webhook": {
 							Type:             schema.TypeString,
 							Optional:         true,
-							ValidateDiagFunc: validation.ToDiagFunc(validation.StringMatch(regexp.MustCompile(`^https://hooks.slack.com/services/\w+/\w+/\w+$`), "")),
+							ValidateDiagFunc: validation.ToDiagFunc(validation.StringMatch(regexp.MustCompile(`^https://hooks.slack.com/services/\w+/\w+/\w+$`), "slack_webhook")),
 							Description:      "The webhook URL used when sends notification. It will only used when `enable_slack` is set `true`",
 						},
 						"auto_traffic_shaping": {
