@@ -82,7 +82,7 @@ func randomName() string {
 }
 
 func randomPassword() string {
-	return acctest.RandStringFromCharSet(20, acctest.CharSetAlphaNum)
+	return acctest.RandString(20)
 }
 
 func buildConfigWithArgs(config string, args ...string) string {
