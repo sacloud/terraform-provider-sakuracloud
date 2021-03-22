@@ -6,12 +6,14 @@ ENHANCEMENTS:
 
 FEATURES:
 
-  * libsacloud v2.14.1 - added internet plans [GH-806] (@yamamoto-febc)
   * sakuracloud_server: ssh_keys [GH-805] (@yamamoto-febc)
   * sakuracloud_sim: Sentitive:true [GH-802] (@yamamoto-febc)
-  * darwin/arm64 [GH-800] (@yamamoto-febc)
-  * libsacloud v2.14.0 [GH-799] (@yamamoto-febc)
 
+IMPROVEMENTS:
+
+  * Added some rules for tfproviderlint [GH-809] (@yamamoto-febc)
+  * upgrade dependencies - libsacloud to v2.14.1 - added internet plans [GH-806],[GH-799] (@yamamoto-febc)
+  * darwin/arm64 [GH-800] (@yamamoto-febc)
 
 ## 2.7.1 (2021-02-17)
 
