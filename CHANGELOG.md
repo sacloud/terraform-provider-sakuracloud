@@ -1,3 +1,9 @@
+## 2.8.1(Unreleased)
+
+DOCS:
+
+  * Fix packet_filter examples [GH-811] (@tokibi) 
+
 ## 2.8.0(2021-03-22)
 
 ENHANCEMENTS:
