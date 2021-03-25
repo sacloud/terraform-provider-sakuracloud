@@ -2289,8 +2289,8 @@ type serverDeleteWithDisksRequestEnvelope struct {
 type serverChangePlanRequestEnvelope struct {
 	CPU                  int                   `json:",omitempty"`
 	MemoryMB             int                   `json:",omitempty"`
-	ServerPlanGeneration types.EPlanGeneration `json:",omitempty"`
-	ServerPlanCommitment types.ECommitment     `json:",omitempty" mapconv:"ServerPlan.Commitment"`
+	ServerPlanGeneration types.EPlanGeneration `json:"Generation,omitempty"`
+	ServerPlanCommitment types.ECommitment     `json:"Commitment,omitempty"`
 }
 
 // serverChangePlanResponseEnvelope is envelop of API response

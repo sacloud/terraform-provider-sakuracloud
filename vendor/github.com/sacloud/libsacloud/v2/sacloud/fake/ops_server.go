@@ -228,7 +228,10 @@ func (o *ServerOp) ChangePlan(ctx context.Context, zone string, id types.ID, pla
 		return nil, newErrorConflict(o.key, id, fmt.Sprintf("Server[%d] is running", value.ID))
 	}
 
-	copySameNameField(plan, value)
+	value.CPU = plan.CPU
+	value.MemoryMB = plan.MemoryMB
+	value.ServerPlanCommitment = plan.ServerPlanCommitment
+	value.ServerPlanGeneration = plan.ServerPlanGeneration
 	value.ServerPlanID = types.StringID(fmt.Sprintf("%03d%03d%03d", value.ServerPlanGeneration, value.GetMemoryGB(), value.CPU))
 	value.ServerPlanName = fmt.Sprintf("世代:%03d メモリ:%03d CPU:%03d", value.ServerPlanGeneration, value.GetMemoryGB(), value.CPU)
 
