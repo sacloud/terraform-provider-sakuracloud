@@ -1,5 +1,9 @@
 ## 2.8.1(Unreleased)
 
+FIXES:
+
+  * Fixed parameter handling for server plan change operation [GH-812] (@yamamoto-febc)
+
 DOCS:
 
   * Fix packet_filter examples [GH-811] (@tokibi) 
