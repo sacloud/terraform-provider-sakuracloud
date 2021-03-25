@@ -98,6 +98,63 @@ func TestAccSakuraCloudServer_basic(t *testing.T) {
 	})
 }
 
+func TestAccSakuraCloudServer_planChange(t *testing.T) {
+	resourceName := "sakuracloud_server.foobar"
+	rand := randomName()
+	password := randomPassword()
+
+	var step1, step2, step3 sacloud.Server
+	resource.ParallelTest(t, resource.TestCase{
+		PreCheck:          func() { testAccPreCheck(t) },
+		ProviderFactories: testAccProviderFactories,
+		CheckDestroy:      testCheckSakuraCloudServerDestroy,
+		Steps: []resource.TestStep{
+			{
+				Config: buildConfigWithArgs(testAccSakuraCloudServer_standardPlan, rand, password),
+				Check: resource.ComposeTestCheckFunc(
+					testCheckSakuraCloudServerExists(resourceName, &step1),
+					resource.TestCheckResourceAttr(resourceName, "name", rand),
+					resource.TestCheckResourceAttr(resourceName, "core", "2"),
+					resource.TestCheckResourceAttr(resourceName, "memory", "4"),
+					resource.TestCheckResourceAttr(resourceName, "commitment", "standard"),
+				),
+			},
+			{
+				Config: buildConfigWithArgs(testAccSakuraCloudServer_dedicatedCPUPlan, rand, password),
+				Check: resource.ComposeTestCheckFunc(
+					testCheckSakuraCloudServerExists(resourceName, &step2),
+					func(state *terraform.State) error {
+						if step1.ID == step2.ID {
+							return fmt.Errorf("server id was not changed: before.ID: %s after.ID:%s", step1.ID, step2.ID)
+						}
+						return nil
+					},
+					resource.TestCheckResourceAttr(resourceName, "name", rand),
+					resource.TestCheckResourceAttr(resourceName, "core", "2"),
+					resource.TestCheckResourceAttr(resourceName, "memory", "4"),
+					resource.TestCheckResourceAttr(resourceName, "commitment", "dedicatedcpu"),
+				),
+			},
+			{
+				Config: buildConfigWithArgs(testAccSakuraCloudServer_standardPlan, rand, password),
+				Check: resource.ComposeTestCheckFunc(
+					testCheckSakuraCloudServerExists(resourceName, &step3),
+					func(state *terraform.State) error {
+						if step2.ID == step3.ID {
+							return fmt.Errorf("server id was not changed: before.ID: %s after.ID:%s", step2.ID, step3.ID)
+						}
+						return nil
+					},
+					resource.TestCheckResourceAttr(resourceName, "name", rand),
+					resource.TestCheckResourceAttr(resourceName, "core", "2"),
+					resource.TestCheckResourceAttr(resourceName, "memory", "4"),
+					resource.TestCheckResourceAttr(resourceName, "commitment", "standard"),
+				),
+			},
+		},
+	})
+}
+
 func TestAccSakuraCloudServer_withoutShutdown(t *testing.T) {
 	resourceName := "sakuracloud_server.foobar"
 	rand := randomName()
@@ -738,6 +795,58 @@ resource "sakuracloud_server" "foobar" {
   disk_edit_parameter {
     hostname        = "{{ .arg0 }}"
     password        = "{{ .arg1 }}-upd"
+  }
+}
+`
+
+const testAccSakuraCloudServer_standardPlan = `
+data "sakuracloud_archive" "ubuntu" {
+  os_type = "ubuntu2004"
+}
+resource "sakuracloud_disk" "foobar" {
+  name              = "{{ .arg0 }}"
+  source_archive_id = data.sakuracloud_archive.ubuntu.id
+}
+
+resource "sakuracloud_server" "foobar" {
+  name        = "{{ .arg0 }}"
+  disks       = [sakuracloud_disk.foobar.id]
+  network_interface {
+    upstream = "shared"
+  }
+  core   = 2
+  memory = 4
+  commitment = "standard"
+
+  disk_edit_parameter {
+    hostname        = "{{ .arg0 }}"
+    password        = "{{ .arg1 }}"
+  }
+}
+`
+
+const testAccSakuraCloudServer_dedicatedCPUPlan = `
+data "sakuracloud_archive" "ubuntu" {
+  os_type = "ubuntu2004"
+}
+resource "sakuracloud_disk" "foobar" {
+  name              = "{{ .arg0 }}"
+  source_archive_id = data.sakuracloud_archive.ubuntu.id
+}
+
+resource "sakuracloud_server" "foobar" {
+  name        = "{{ .arg0 }}"
+  disks       = [sakuracloud_disk.foobar.id]
+  network_interface {
+    upstream = "shared"
+  }
+  core   = 2
+  memory = 4
+  commitment = "dedicatedcpu"
+
+  disk_edit_parameter {
+    hostname        = "{{ .arg0 }}"
+    password        = "{{ .arg1 }}"
   }
 }
 `

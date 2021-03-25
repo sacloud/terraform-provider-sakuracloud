@@ -9166,6 +9166,7 @@ func (o *ESMESendMessageResult) SetOTP(v string) {
 type ESMESendMessageWithGeneratedOTPRequest struct {
 	Destination string
 	Sender      string
+	DomainName  string
 }
 
 // Validate validates by field tags
@@ -9178,10 +9179,12 @@ func (o *ESMESendMessageWithGeneratedOTPRequest) setDefaults() interface{} {
 	return &struct {
 		Destination  string
 		Sender       string
+		DomainName   string
 		OTPOperation types.EOTPOperation
 	}{
 		Destination:  o.GetDestination(),
 		Sender:       o.GetSender(),
+		DomainName:   o.GetDomainName(),
 		OTPOperation: "generate",
 	}
 }
@@ -9206,6 +9209,16 @@ func (o *ESMESendMessageWithGeneratedOTPRequest) SetSender(v string) {
 	o.Sender = v
 }
 
+// GetDomainName returns value of DomainName
+func (o *ESMESendMessageWithGeneratedOTPRequest) GetDomainName() string {
+	return o.DomainName
+}
+
+// SetDomainName sets value to DomainName
+func (o *ESMESendMessageWithGeneratedOTPRequest) SetDomainName(v string) {
+	o.DomainName = v
+}
+
 /*************************************************
 * ESMESendMessageWithInputtedOTPRequest
 *************************************************/
@@ -9214,6 +9227,7 @@ func (o *ESMESendMessageWithGeneratedOTPRequest) SetSender(v string) {
 type ESMESendMessageWithInputtedOTPRequest struct {
 	Destination string
 	Sender      string
+	DomainName  string
 	OTP         string
 }
 
@@ -9227,11 +9241,13 @@ func (o *ESMESendMessageWithInputtedOTPRequest) setDefaults() interface{} {
 	return &struct {
 		Destination  string
 		Sender       string
+		DomainName   string
 		OTP          string
 		OTPOperation types.EOTPOperation
 	}{
 		Destination:  o.GetDestination(),
 		Sender:       o.GetSender(),
+		DomainName:   o.GetDomainName(),
 		OTP:          o.GetOTP(),
 		OTPOperation: "input",
 	}
@@ -9255,6 +9271,16 @@ func (o *ESMESendMessageWithInputtedOTPRequest) GetSender() string {
 // SetSender sets value to Sender
 func (o *ESMESendMessageWithInputtedOTPRequest) SetSender(v string) {
 	o.Sender = v
+}
+
+// GetDomainName returns value of DomainName
+func (o *ESMESendMessageWithInputtedOTPRequest) GetDomainName() string {
+	return o.DomainName
+}
+
+// SetDomainName sets value to DomainName
+func (o *ESMESendMessageWithInputtedOTPRequest) SetDomainName(v string) {
+	o.DomainName = v
 }
 
 // GetOTP returns value of OTP
@@ -21722,8 +21748,8 @@ func (o *ServerDeleteWithDisksRequest) SetIDs(v []types.ID) {
 type ServerChangePlanRequest struct {
 	CPU                  int
 	MemoryMB             int
-	ServerPlanGeneration types.EPlanGeneration
-	ServerPlanCommitment types.ECommitment `json:",omitempty" mapconv:"ServerPlan.Commitment"`
+	ServerPlanGeneration types.EPlanGeneration `json:"Generation,omitempty"`
+	ServerPlanCommitment types.ECommitment     `json:"Commitment,omitempty"`
 }
 
 // Validate validates by field tags
@@ -21736,8 +21762,8 @@ func (o *ServerChangePlanRequest) setDefaults() interface{} {
 	return &struct {
 		CPU                  int
 		MemoryMB             int
-		ServerPlanGeneration types.EPlanGeneration
-		ServerPlanCommitment types.ECommitment `json:",omitempty" mapconv:"ServerPlan.Commitment"`
+		ServerPlanGeneration types.EPlanGeneration `json:"Generation,omitempty"`
+		ServerPlanCommitment types.ECommitment     `json:"Commitment,omitempty"`
 	}{
 		CPU:                  o.GetCPU(),
 		MemoryMB:             o.GetMemoryMB(),

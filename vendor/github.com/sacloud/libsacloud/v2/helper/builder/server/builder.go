@@ -441,6 +441,7 @@ type serverState struct {
 	interfaceDriver types.EInterfaceDriver
 	memoryGB        int
 	cpu             int
+	commitment      types.ECommitment
 	nic             *nicState   // hash
 	additionalNICs  []*nicState // hash
 	diskCount       int
@@ -461,6 +462,7 @@ func (b *Builder) desiredState() *serverState {
 		interfaceDriver: b.InterfaceDriver,
 		memoryGB:        b.MemoryGB,
 		cpu:             b.CPU,
+		commitment:      b.Commitment,
 		nic:             nic,
 		additionalNICs:  additionalNICs,
 		diskCount:       len(b.DiskBuilders),
@@ -513,6 +515,7 @@ func (b *Builder) currentState(server *sacloud.Server) *serverState {
 		interfaceDriver: server.InterfaceDriver,
 		memoryGB:        server.GetMemoryGB(),
 		cpu:             server.CPU,
+		commitment:      server.ServerPlanCommitment,
 		nic:             nic,
 		additionalNICs:  additionalNICs,
 		diskCount:       len(server.Disks),
