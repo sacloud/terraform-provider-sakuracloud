@@ -151,6 +151,11 @@ func resourceSakuraCloudSimpleMonitor() *schema.Resource {
 								descRange(1, 9999),
 							),
 						},
+						"http2": {
+							Type:        schema.TypeBool,
+							Optional:    true,
+							Description: "The flag to enable HTTP/2 when checking by HTTPS",
+						},
 					},
 				},
 			},
