@@ -1,3 +1,9 @@
+## 2.8.2(Unreleased)
+
+FEATURES:
+
+  * simple_monitor: http2 [GH-813] (@yamamoto-febc)
+
 ## 2.8.1(2021-03-26)
 
 FIXES:
