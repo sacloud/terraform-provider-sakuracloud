@@ -9580,6 +9580,35 @@ func (o *ServerOp) SendKey(ctx context.Context, zone string, id types.ID, keyboa
 	return nil
 }
 
+// SendNMI is API call
+func (o *ServerOp) SendNMI(ctx context.Context, zone string, id types.ID) error {
+	// build request URL
+	pathBuildParameter := map[string]interface{}{
+		"rootURL":    SakuraCloudAPIRoot,
+		"pathSuffix": o.PathSuffix,
+		"pathName":   o.PathName,
+		"zone":       zone,
+		"id":         id,
+	}
+
+	url, err := buildURL("{{.rootURL}}/{{.zone}}/{{.pathSuffix}}/{{.pathName}}/{{.id}}/qemu/nmi", pathBuildParameter)
+	if err != nil {
+		return err
+	}
+	// build request body
+	var body interface{}
+
+	// do request
+	_, err = o.Client.Do(ctx, "PUT", url, body)
+	if err != nil {
+		return err
+	}
+
+	// build results
+
+	return nil
+}
+
 // GetVNCProxy is API call
 func (o *ServerOp) GetVNCProxy(ctx context.Context, zone string, id types.ID) (*VNCProxyInfo, error) {
 	// build request URL

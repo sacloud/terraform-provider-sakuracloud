@@ -355,6 +355,15 @@ func (o *ServerOp) SendKey(ctx context.Context, zone string, id types.ID, keyboa
 	return nil
 }
 
+// SendNMI is fake implementation
+func (o *ServerOp) SendNMI(ctx context.Context, zone string, id types.ID) error {
+	_, err := o.Read(ctx, zone, id)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
 // GetVNCProxy is fake implementation
 func (o *ServerOp) GetVNCProxy(ctx context.Context, zone string, id types.ID) (*sacloud.VNCProxyInfo, error) {
 	_, err := o.Read(ctx, zone, id)

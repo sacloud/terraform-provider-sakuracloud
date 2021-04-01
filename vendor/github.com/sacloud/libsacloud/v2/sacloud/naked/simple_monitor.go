@@ -74,6 +74,7 @@ type SimpleMonitorHealthCheck struct {
 	SNMPVersion       string                       `json:",omitempty" yaml:"snmp_version,omitempty" structs:",omitempty"`        // SNMP監視 SNMPバージョン
 	OID               string                       `json:",omitempty" yaml:"oid,omitempty" structs:",omitempty"`                 // SNMP監視 OID
 	RemainingDays     int                          `json:",omitempty" yaml:"remaining_days,omitempty" structs:",omitempty"`      // SSL証明書 有効残日数
+	HTTP2             types.StringFlag             `yaml:"http2"`                                                                // HTTPS監視の場合にHTTP/2を利用するか
 }
 
 // SimpleMonitorNotifyEmail Eメールでの通知設定
