@@ -9,6 +9,7 @@ resource "sakuracloud_simple_monitor" "foobar" {
     status      = "200"
     host_header = "example.com"
     sni         = true
+    http2       = true
     # username    = "username"
     # password    = "password"
   }
