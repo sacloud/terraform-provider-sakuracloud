@@ -7146,6 +7146,31 @@ func (t *ServerTracer) SendKey(ctx context.Context, zone string, id types.ID, ke
 	return err
 }
 
+// SendNMI is API call with trace log
+func (t *ServerTracer) SendNMI(ctx context.Context, zone string, id types.ID) error {
+	var span trace.Span
+	options := append(t.config.SpanStartOptions, trace.WithAttributes(
+		label.String("libsacloud.api.arguments.zone", zone),
+		label.Any("libsacloud.api.arguments.id", id),
+	))
+	ctx, span = t.config.Tracer.Start(ctx, "ServerAPI.SendNMI", options...)
+	defer func() {
+		span.End()
+	}()
+
+	// for http trace
+	ctx = httptrace.WithClientTrace(ctx, otelhttptrace.NewClientTrace(ctx))
+	err := t.Internal.SendNMI(ctx, zone, id)
+
+	if err != nil {
+		span.SetStatus(codes.Error, err.Error())
+	} else {
+		span.SetStatus(codes.Ok, "")
+
+	}
+	return err
+}
+
 // GetVNCProxy is API call with trace log
 func (t *ServerTracer) GetVNCProxy(ctx context.Context, zone string, id types.ID) (*sacloud.VNCProxyInfo, error) {
 	var span trace.Span

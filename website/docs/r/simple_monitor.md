@@ -24,6 +24,7 @@ resource "sakuracloud_simple_monitor" "foobar" {
     status      = "200"
     host_header = "example.com"
     sni         = true
+    http2       = true
     # username    = "username"
     # password    = "password"
   }
@@ -64,6 +65,7 @@ A `health_check` block supports the following:
 * `username` - (Optional) The user name for basic auth used when checking by HTTP/HTTPS.
 * `path` - (Optional) The path used when checking by HTTP/HTTPS.
 * `sni` - (Optional) The flag to enable SNI when checking by HTTP/HTTPS.
+* `http2` - (Optional) The flag to enable HTTP/2 when checking by HTTPS.
 * `status` - (Optional) The response-code to expect when checking by HTTP/HTTPS.
 
 ##### Certificate

@@ -539,6 +539,7 @@ type ServerAPI interface {
 	Shutdown(ctx context.Context, zone string, id types.ID, shutdownOption *ShutdownOption) error
 	Reset(ctx context.Context, zone string, id types.ID) error
 	SendKey(ctx context.Context, zone string, id types.ID, keyboardParam *SendKeyRequest) error
+	SendNMI(ctx context.Context, zone string, id types.ID) error
 	GetVNCProxy(ctx context.Context, zone string, id types.ID) (*VNCProxyInfo, error)
 	Monitor(ctx context.Context, zone string, id types.ID, condition *MonitorCondition) (*CPUTimeActivity, error)
 	MonitorCPU(ctx context.Context, zone string, id types.ID, condition *MonitorCondition) (*CPUTimeActivity, error)

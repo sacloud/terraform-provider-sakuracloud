@@ -118,6 +118,11 @@ func dataSourceSakuraCloudSimpleMonitor() *schema.Resource {
 							Computed:    true,
 							Description: "The number of remaining days until certificate expiration used when checking SSL certificates",
 						},
+						"http2": {
+							Type:        schema.TypeBool,
+							Computed:    true,
+							Description: "The flag to enable HTTP/2 when checking by HTTPS",
+						},
 					},
 				},
 			},

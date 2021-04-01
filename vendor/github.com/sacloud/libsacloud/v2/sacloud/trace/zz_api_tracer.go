@@ -8764,6 +8764,37 @@ func (t *ServerTracer) SendKey(ctx context.Context, zone string, id types.ID, ke
 	return err
 }
 
+// SendNMI is API call with trace log
+func (t *ServerTracer) SendNMI(ctx context.Context, zone string, id types.ID) error {
+	log.Println("[TRACE] ServerAPI.SendNMI start")
+	targetArguments := struct {
+		Argzone string
+		Argid   types.ID `json:"id"`
+	}{
+		Argzone: zone,
+		Argid:   id,
+	}
+	if d, err := json.Marshal(targetArguments); err == nil {
+		log.Printf("[TRACE] \targs: %s\n", string(d))
+	}
+
+	defer func() {
+		log.Println("[TRACE] ServerAPI.SendNMI end")
+	}()
+
+	err := t.Internal.SendNMI(ctx, zone, id)
+	targetResults := struct {
+		Error error
+	}{
+		Error: err,
+	}
+	if d, err := json.Marshal(targetResults); err == nil {
+		log.Printf("[TRACE] \tresults: %s\n", string(d))
+	}
+
+	return err
+}
+
 // GetVNCProxy is API call with trace log
 func (t *ServerTracer) GetVNCProxy(ctx context.Context, zone string, id types.ID) (*sacloud.VNCProxyInfo, error) {
 	log.Println("[TRACE] ServerAPI.GetVNCProxy start")
