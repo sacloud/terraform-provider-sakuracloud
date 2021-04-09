@@ -1,3 +1,10 @@
+## 2.8.3(Unreleased)
+
+FEATURES:
+
+  * simple_monitor: contains_string & proxylb: gzip [GH-814] (@yamamoto-febc)
+  * libsacloud v2.17 [GH-814] (@yamamoto-febc)
+
 ## 2.8.2(2021-04-01)
 
 FEATURES:
