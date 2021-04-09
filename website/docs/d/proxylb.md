@@ -47,6 +47,7 @@ A `condition` block supports the following:
 * `certificate` - A list of `certificate` blocks as defined below.
 * `description` - The description of the ProxyLB.
 * `fqdn` - The FQDN for accessing to the ProxyLB. This is typically used as value of CNAME record.
+* `gzip` - The flag to enable gzip compression.
 * `health_check` - A list of `health_check` blocks as defined below.
 * `icon_id` - The icon id attached to the ProxyLB.
 * `name` - The name of the ProxyLB.
