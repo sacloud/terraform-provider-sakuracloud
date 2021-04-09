@@ -43,10 +43,12 @@ func TestAccSakuraCloudSimpleMonitor_basic(t *testing.T) {
 					resource.TestCheckResourceAttr(resourceName, "delay_loop", "60"),
 					resource.TestCheckResourceAttr(resourceName, "health_check.0.protocol", "https"),
 					resource.TestCheckResourceAttr(resourceName, "health_check.0.port", "8443"),
+					resource.TestCheckResourceAttr(resourceName, "health_check.0.contains_string", "ok"),
 					resource.TestCheckResourceAttr(resourceName, "health_check.0.sni", "true"),
 					resource.TestCheckResourceAttr(resourceName, "health_check.0.username", "foo"),
 					resource.TestCheckResourceAttr(resourceName, "health_check.0.password", "bar"),
 					resource.TestCheckResourceAttr(resourceName, "health_check.0.http2", "true"),
+					resource.TestCheckResourceAttr(resourceName, "health_check.0.contains_string", "ok"),
 					resource.TestCheckResourceAttr(resourceName, "target", zone),
 					resource.TestCheckResourceAttr(resourceName, "notify_email_enabled", "true"),
 					resource.TestCheckResourceAttr(resourceName, "notify_email_html", "true"),
@@ -67,6 +69,7 @@ func TestAccSakuraCloudSimpleMonitor_basic(t *testing.T) {
 					resource.TestCheckResourceAttr(resourceName, "health_check.0.port", "80"),
 					resource.TestCheckResourceAttr(resourceName, "health_check.0.host_header", "usacloud.jp"),
 					resource.TestCheckResourceAttr(resourceName, "health_check.0.http2", "false"),
+					resource.TestCheckResourceAttr(resourceName, "health_check.0.contains_string", ""),
 					resource.TestCheckResourceAttr(resourceName, "target", zone),
 					resource.TestCheckResourceAttr(resourceName, "notify_email_enabled", "false"),
 					resource.TestCheckResourceAttr(resourceName, "notify_email_html", "false"),
@@ -182,15 +185,16 @@ resource "sakuracloud_simple_monitor" "foobar" {
   target     = "{{ .arg0 }}"
   delay_loop = 60
   health_check {
-    protocol    = "https"
-    port        = 8443
-    path        = "/"
-    status      = "200"
-    host_header = "usacloud.jp"
-    sni         = true
-    username    = "foo"
-    password    = "bar"
-    http2       = true
+    protocol        = "https"
+    port            = 8443
+    path            = "/"
+    status          = "200"
+    contains_string = "ok"
+    host_header     = "usacloud.jp"
+    sni             = true
+    username        = "foo"
+    password        = "bar"
+    http2           = true
   }
   description          = "description"
   tags                 = ["tag1", "tag2"]

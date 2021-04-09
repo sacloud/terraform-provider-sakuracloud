@@ -73,6 +73,7 @@ func flattenSimpleMonitorHealthCheck(simpleMonitor *sacloud.SimpleMonitor) []int
 	case types.SimpleMonitorProtocols.HTTP:
 		healthCheck["path"] = hc.Path
 		healthCheck["status"] = hc.Status.Int()
+		healthCheck["contains_string"] = hc.ContainsString
 		healthCheck["host_header"] = hc.Host
 		healthCheck["port"] = hc.Port.Int()
 		healthCheck["username"] = hc.BasicAuthUsername
@@ -80,6 +81,7 @@ func flattenSimpleMonitorHealthCheck(simpleMonitor *sacloud.SimpleMonitor) []int
 	case types.SimpleMonitorProtocols.HTTPS:
 		healthCheck["path"] = hc.Path
 		healthCheck["status"] = hc.Status.Int()
+		healthCheck["contains_string"] = hc.ContainsString
 		healthCheck["host_header"] = hc.Host
 		healthCheck["port"] = hc.Port.Int()
 		healthCheck["sni"] = hc.SNI.Bool()
@@ -123,6 +125,7 @@ func expandSimpleMonitorHealthCheck(d resourceValueGettable) *sacloud.SimpleMoni
 			Port:              types.StringNumber(port),
 			Path:              forceString(conf["path"]),
 			Status:            types.StringNumber(conf["status"].(int)),
+			ContainsString:    forceString(conf["contains_string"]),
 			Host:              forceString(conf["host_header"]),
 			BasicAuthUsername: forceString(conf["username"]),
 			BasicAuthPassword: forceString(conf["password"]),
@@ -136,6 +139,7 @@ func expandSimpleMonitorHealthCheck(d resourceValueGettable) *sacloud.SimpleMoni
 			Port:              types.StringNumber(port),
 			Path:              forceString(conf["path"]),
 			Status:            types.StringNumber(conf["status"].(int)),
+			ContainsString:    forceString(conf["contains_string"]),
 			SNI:               types.StringFlag(forceBool(conf["sni"])),
 			Host:              forceString(conf["host_header"]),
 			BasicAuthUsername: forceString(conf["username"]),
