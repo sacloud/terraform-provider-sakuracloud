@@ -63,6 +63,7 @@ A `condition` block supports the following:
 A `health_check` block exports the following:
 
 * `community` - The SNMP community string used when checking by SNMP.
+* `contains_string` - The string that should be included in the response body when checking for HTTP/HTTPS.
 * `excepcted_data` - The expected value used when checking by DNS.
 * `host_header` - The value of host header send when checking by HTTP/HTTPS.
 * `http2` - The flag to enable HTTP/2 when checking by HTTPS.

@@ -18575,6 +18575,7 @@ type ProxyLB struct {
 	Rules            []*ProxyLBRule        `mapconv:"Settings.ProxyLB.[]Rules,recursive"`
 	LetsEncrypt      *ProxyLBACMESetting   `mapconv:"Settings.ProxyLB.LetsEncrypt,recursive"`
 	StickySession    *ProxyLBStickySession `mapconv:"Settings.ProxyLB.StickySession,recursive"`
+	Gzip             *ProxyLBGzip          `mapconv:"Settings.ProxyLB.Gzip,recursive"`
 	Timeout          *ProxyLBTimeout       `json:",omitempty" mapconv:"Settings.ProxyLB.Timeout,recursive,omitempty"`
 	SettingsHash     string                `json:",omitempty" mapconv:",omitempty"`
 	UseVIPFailover   bool                  `mapconv:"Status.UseVIPFailover"`
@@ -18608,6 +18609,7 @@ func (o *ProxyLB) setDefaults() interface{} {
 		Rules            []*ProxyLBRule        `mapconv:"Settings.ProxyLB.[]Rules,recursive"`
 		LetsEncrypt      *ProxyLBACMESetting   `mapconv:"Settings.ProxyLB.LetsEncrypt,recursive"`
 		StickySession    *ProxyLBStickySession `mapconv:"Settings.ProxyLB.StickySession,recursive"`
+		Gzip             *ProxyLBGzip          `mapconv:"Settings.ProxyLB.Gzip,recursive"`
 		Timeout          *ProxyLBTimeout       `json:",omitempty" mapconv:"Settings.ProxyLB.Timeout,recursive,omitempty"`
 		SettingsHash     string                `json:",omitempty" mapconv:",omitempty"`
 		UseVIPFailover   bool                  `mapconv:"Status.UseVIPFailover"`
@@ -18632,6 +18634,7 @@ func (o *ProxyLB) setDefaults() interface{} {
 		Rules:            o.GetRules(),
 		LetsEncrypt:      o.GetLetsEncrypt(),
 		StickySession:    o.GetStickySession(),
+		Gzip:             o.GetGzip(),
 		Timeout:          o.GetTimeout(),
 		SettingsHash:     o.GetSettingsHash(),
 		UseVIPFailover:   o.GetUseVIPFailover(),
@@ -18840,6 +18843,16 @@ func (o *ProxyLB) GetStickySession() *ProxyLBStickySession {
 // SetStickySession sets value to StickySession
 func (o *ProxyLB) SetStickySession(v *ProxyLBStickySession) {
 	o.StickySession = v
+}
+
+// GetGzip returns value of Gzip
+func (o *ProxyLB) GetGzip() *ProxyLBGzip {
+	return o.Gzip
+}
+
+// SetGzip sets value to Gzip
+func (o *ProxyLB) SetGzip(v *ProxyLBGzip) {
+	o.Gzip = v
 }
 
 // GetTimeout returns value of Timeout
@@ -19385,6 +19398,39 @@ func (o *ProxyLBStickySession) SetEnabled(v bool) {
 }
 
 /*************************************************
+* ProxyLBGzip
+*************************************************/
+
+// ProxyLBGzip represents API parameter/response structure
+type ProxyLBGzip struct {
+	Enabled bool
+}
+
+// Validate validates by field tags
+func (o *ProxyLBGzip) Validate() error {
+	return validate.Struct(o)
+}
+
+// setDefaults implements sacloud.argumentDefaulter
+func (o *ProxyLBGzip) setDefaults() interface{} {
+	return &struct {
+		Enabled bool
+	}{
+		Enabled: o.GetEnabled(),
+	}
+}
+
+// GetEnabled returns value of Enabled
+func (o *ProxyLBGzip) GetEnabled() bool {
+	return o.Enabled
+}
+
+// SetEnabled sets value to Enabled
+func (o *ProxyLBGzip) SetEnabled(v bool) {
+	o.Enabled = v
+}
+
+/*************************************************
 * ProxyLBTimeout
 *************************************************/
 
@@ -19435,6 +19481,7 @@ type ProxyLBCreateRequest struct {
 	LetsEncrypt    *ProxyLBACMESetting   `mapconv:"Settings.ProxyLB.LetsEncrypt,recursive"`
 	StickySession  *ProxyLBStickySession `mapconv:"Settings.ProxyLB.StickySession,recursive"`
 	Timeout        *ProxyLBTimeout       `json:",omitempty" mapconv:"Settings.ProxyLB.Timeout,recursive,omitempty"`
+	Gzip           *ProxyLBGzip          `mapconv:"Settings.ProxyLB.Gzip,recursive"`
 	UseVIPFailover bool                  `mapconv:"Status.UseVIPFailover"`
 	Region         types.EProxyLBRegion  `mapconv:"Status.Region"`
 	Name           string
@@ -19460,6 +19507,7 @@ func (o *ProxyLBCreateRequest) setDefaults() interface{} {
 		LetsEncrypt    *ProxyLBACMESetting   `mapconv:"Settings.ProxyLB.LetsEncrypt,recursive"`
 		StickySession  *ProxyLBStickySession `mapconv:"Settings.ProxyLB.StickySession,recursive"`
 		Timeout        *ProxyLBTimeout       `json:",omitempty" mapconv:"Settings.ProxyLB.Timeout,recursive,omitempty"`
+		Gzip           *ProxyLBGzip          `mapconv:"Settings.ProxyLB.Gzip,recursive"`
 		UseVIPFailover bool                  `mapconv:"Status.UseVIPFailover"`
 		Region         types.EProxyLBRegion  `mapconv:"Status.Region"`
 		Name           string
@@ -19477,6 +19525,7 @@ func (o *ProxyLBCreateRequest) setDefaults() interface{} {
 		LetsEncrypt:    o.GetLetsEncrypt(),
 		StickySession:  o.GetStickySession(),
 		Timeout:        o.GetTimeout(),
+		Gzip:           o.GetGzip(),
 		UseVIPFailover: o.GetUseVIPFailover(),
 		Region:         o.GetRegion(),
 		Name:           o.GetName(),
@@ -19577,6 +19626,16 @@ func (o *ProxyLBCreateRequest) SetTimeout(v *ProxyLBTimeout) {
 	o.Timeout = v
 }
 
+// GetGzip returns value of Gzip
+func (o *ProxyLBCreateRequest) GetGzip() *ProxyLBGzip {
+	return o.Gzip
+}
+
+// SetGzip sets value to Gzip
+func (o *ProxyLBCreateRequest) SetGzip(v *ProxyLBGzip) {
+	o.Gzip = v
+}
+
 // GetUseVIPFailover returns value of UseVIPFailover
 func (o *ProxyLBCreateRequest) GetUseVIPFailover() bool {
 	return o.UseVIPFailover
@@ -19671,6 +19730,7 @@ type ProxyLBUpdateRequest struct {
 	LetsEncrypt   *ProxyLBACMESetting   `mapconv:"Settings.ProxyLB.LetsEncrypt,recursive"`
 	StickySession *ProxyLBStickySession `mapconv:"Settings.ProxyLB.StickySession,recursive"`
 	Timeout       *ProxyLBTimeout       `json:",omitempty" mapconv:"Settings.ProxyLB.Timeout,recursive,omitempty"`
+	Gzip          *ProxyLBGzip          `mapconv:"Settings.ProxyLB.Gzip,recursive"`
 	SettingsHash  string                `json:",omitempty" mapconv:",omitempty"`
 	Name          string
 	Description   string
@@ -19694,6 +19754,7 @@ func (o *ProxyLBUpdateRequest) setDefaults() interface{} {
 		LetsEncrypt   *ProxyLBACMESetting   `mapconv:"Settings.ProxyLB.LetsEncrypt,recursive"`
 		StickySession *ProxyLBStickySession `mapconv:"Settings.ProxyLB.StickySession,recursive"`
 		Timeout       *ProxyLBTimeout       `json:",omitempty" mapconv:"Settings.ProxyLB.Timeout,recursive,omitempty"`
+		Gzip          *ProxyLBGzip          `mapconv:"Settings.ProxyLB.Gzip,recursive"`
 		SettingsHash  string                `json:",omitempty" mapconv:",omitempty"`
 		Name          string
 		Description   string
@@ -19708,6 +19769,7 @@ func (o *ProxyLBUpdateRequest) setDefaults() interface{} {
 		LetsEncrypt:   o.GetLetsEncrypt(),
 		StickySession: o.GetStickySession(),
 		Timeout:       o.GetTimeout(),
+		Gzip:          o.GetGzip(),
 		SettingsHash:  o.GetSettingsHash(),
 		Name:          o.GetName(),
 		Description:   o.GetDescription(),
@@ -19796,6 +19858,16 @@ func (o *ProxyLBUpdateRequest) SetTimeout(v *ProxyLBTimeout) {
 	o.Timeout = v
 }
 
+// GetGzip returns value of Gzip
+func (o *ProxyLBUpdateRequest) GetGzip() *ProxyLBGzip {
+	return o.Gzip
+}
+
+// SetGzip sets value to Gzip
+func (o *ProxyLBUpdateRequest) SetGzip(v *ProxyLBGzip) {
+	o.Gzip = v
+}
+
 // GetSettingsHash returns value of SettingsHash
 func (o *ProxyLBUpdateRequest) GetSettingsHash() string {
 	return o.SettingsHash
@@ -19880,6 +19952,7 @@ type ProxyLBUpdateSettingsRequest struct {
 	LetsEncrypt   *ProxyLBACMESetting   `mapconv:"Settings.ProxyLB.LetsEncrypt,recursive"`
 	StickySession *ProxyLBStickySession `mapconv:"Settings.ProxyLB.StickySession,recursive"`
 	Timeout       *ProxyLBTimeout       `json:",omitempty" mapconv:"Settings.ProxyLB.Timeout,recursive,omitempty"`
+	Gzip          *ProxyLBGzip          `mapconv:"Settings.ProxyLB.Gzip,recursive"`
 	SettingsHash  string                `json:",omitempty" mapconv:",omitempty"`
 }
 
@@ -19899,6 +19972,7 @@ func (o *ProxyLBUpdateSettingsRequest) setDefaults() interface{} {
 		LetsEncrypt   *ProxyLBACMESetting   `mapconv:"Settings.ProxyLB.LetsEncrypt,recursive"`
 		StickySession *ProxyLBStickySession `mapconv:"Settings.ProxyLB.StickySession,recursive"`
 		Timeout       *ProxyLBTimeout       `json:",omitempty" mapconv:"Settings.ProxyLB.Timeout,recursive,omitempty"`
+		Gzip          *ProxyLBGzip          `mapconv:"Settings.ProxyLB.Gzip,recursive"`
 		SettingsHash  string                `json:",omitempty" mapconv:",omitempty"`
 	}{
 		HealthCheck:   o.GetHealthCheck(),
@@ -19909,6 +19983,7 @@ func (o *ProxyLBUpdateSettingsRequest) setDefaults() interface{} {
 		LetsEncrypt:   o.GetLetsEncrypt(),
 		StickySession: o.GetStickySession(),
 		Timeout:       o.GetTimeout(),
+		Gzip:          o.GetGzip(),
 		SettingsHash:  o.GetSettingsHash(),
 	}
 }
@@ -19991,6 +20066,16 @@ func (o *ProxyLBUpdateSettingsRequest) GetTimeout() *ProxyLBTimeout {
 // SetTimeout sets value to Timeout
 func (o *ProxyLBUpdateSettingsRequest) SetTimeout(v *ProxyLBTimeout) {
 	o.Timeout = v
+}
+
+// GetGzip returns value of Gzip
+func (o *ProxyLBUpdateSettingsRequest) GetGzip() *ProxyLBGzip {
+	return o.Gzip
+}
+
+// SetGzip sets value to Gzip
+func (o *ProxyLBUpdateSettingsRequest) SetGzip(v *ProxyLBGzip) {
+	o.Gzip = v
 }
 
 // GetSettingsHash returns value of SettingsHash
@@ -23769,6 +23854,7 @@ type SimpleMonitorHealthCheck struct {
 	Host              string
 	BasicAuthUsername string
 	BasicAuthPassword string
+	ContainsString    string
 	QName             string
 	ExpectedData      string
 	Community         string
@@ -23794,6 +23880,7 @@ func (o *SimpleMonitorHealthCheck) setDefaults() interface{} {
 		Host              string
 		BasicAuthUsername string
 		BasicAuthPassword string
+		ContainsString    string
 		QName             string
 		ExpectedData      string
 		Community         string
@@ -23810,6 +23897,7 @@ func (o *SimpleMonitorHealthCheck) setDefaults() interface{} {
 		Host:              o.GetHost(),
 		BasicAuthUsername: o.GetBasicAuthUsername(),
 		BasicAuthPassword: o.GetBasicAuthPassword(),
+		ContainsString:    o.GetContainsString(),
 		QName:             o.GetQName(),
 		ExpectedData:      o.GetExpectedData(),
 		Community:         o.GetCommunity(),
@@ -23898,6 +23986,16 @@ func (o *SimpleMonitorHealthCheck) GetBasicAuthPassword() string {
 // SetBasicAuthPassword sets value to BasicAuthPassword
 func (o *SimpleMonitorHealthCheck) SetBasicAuthPassword(v string) {
 	o.BasicAuthPassword = v
+}
+
+// GetContainsString returns value of ContainsString
+func (o *SimpleMonitorHealthCheck) GetContainsString() string {
+	return o.ContainsString
+}
+
+// SetContainsString sets value to ContainsString
+func (o *SimpleMonitorHealthCheck) SetContainsString(v string) {
+	o.ContainsString = v
 }
 
 // GetQName returns value of QName

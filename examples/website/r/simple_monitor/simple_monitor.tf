@@ -3,13 +3,14 @@ resource "sakuracloud_simple_monitor" "foobar" {
 
   delay_loop = 60
   health_check {
-    protocol    = "https"
-    port        = 443
-    path        = "/"
-    status      = "200"
-    host_header = "example.com"
-    sni         = true
-    http2       = true
+    protocol        = "https"
+    port            = 443
+    path            = "/"
+    contains_string = "ok"
+    status          = "200"
+    host_header     = "example.com"
+    sni             = true
+    http2           = true
     # username    = "username"
     # password    = "password"
   }

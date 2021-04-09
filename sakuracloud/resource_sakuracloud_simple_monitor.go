@@ -91,6 +91,11 @@ func resourceSakuraCloudSimpleMonitor() *schema.Resource {
 							Optional:    true,
 							Description: "The response-code to expect when checking by HTTP/HTTPS",
 						},
+						"contains_string": {
+							Type:        schema.TypeString,
+							Optional:    true,
+							Description: "The string that should be included in the response body when checking for HTTP/HTTPS",
+						},
 						"sni": {
 							Type:        schema.TypeBool,
 							Optional:    true,

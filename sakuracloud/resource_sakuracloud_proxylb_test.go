@@ -62,6 +62,7 @@ func TestAccSakuraCloudProxyLB_basic(t *testing.T) {
 					resource.TestMatchResourceAttr(resourceName, "fqdn", regexp.MustCompile(`.+\.sakura\.ne\.jp$`)),
 					resource.TestCheckResourceAttr(resourceName, "vip_failover", "true"),
 					resource.TestCheckResourceAttr(resourceName, "sticky_session", "true"),
+					resource.TestCheckResourceAttr(resourceName, "gzip", "true"),
 					resource.TestCheckResourceAttr(resourceName, "health_check.0.protocol", "http"),
 					resource.TestCheckResourceAttr(resourceName, "health_check.0.delay_loop", "10"),
 					resource.TestCheckResourceAttr(resourceName, "health_check.0.host_header", "usacloud.jp"),
@@ -107,6 +108,7 @@ func TestAccSakuraCloudProxyLB_basic(t *testing.T) {
 					resource.TestCheckResourceAttr(resourceName, "tags.1", "tag2-upd"),
 					resource.TestCheckResourceAttr(resourceName, "plan", "500"),
 					resource.TestCheckResourceAttr(resourceName, "sticky_session", "false"),
+					resource.TestCheckResourceAttr(resourceName, "gzip", "false"),
 					resource.TestCheckResourceAttr(resourceName, "health_check.0.protocol", "tcp"),
 					resource.TestCheckResourceAttr(resourceName, "health_check.0.delay_loop", "20"),
 					resource.TestCheckResourceAttr(resourceName, "health_check.0.host_header", ""),
@@ -246,6 +248,7 @@ resource "sakuracloud_proxylb" "foobar" {
   plan           = 100
   vip_failover   = true
   sticky_session = true
+  gzip           = true
   timeout        = 10
   region         = "is1"
 

@@ -68,8 +68,9 @@ type SimpleMonitorHealthCheck struct {
 	Host              string                       `json:",omitempty" yaml:"host,omitempty" structs:",omitempty"`                // 対象ホスト(IP or FQDN)
 	BasicAuthUsername string                       `json:",omitempty" yaml:"basic_auth_username,omitempty" structs:",omitempty"` // HTTP/HTTPS監視の場合のBASIC認証 ユーザー名
 	BasicAuthPassword string                       `json:",omitempty" yaml:"basic_auth_password,omitempty" structs:",omitempty"` // HTTP/HTTPS監視の場合のBASIC認証 パスワード
+	ContainsString    string                       `json:",omitempty" yaml:"contains_string,omitempty" structs:",omitempty"`     // HTTP/HTTPS監視の場合にBODY中に含まれるべき文字列
 	QName             string                       `json:",omitempty" yaml:"qname,omitempty" structs:",omitempty"`               // DNS監視の場合の問い合わせFQDN
-	ExpectedData      string                       `json:",omitempty" yaml:"expected_data,omitempty" structs:",omitempty"`       // 期待値
+	ExpectedData      string                       `json:",omitempty" yaml:"expected_data,omitempty" structs:",omitempty"`       // DNS/SNMP監視の場合の期待値
 	Community         string                       `json:",omitempty" yaml:"community,omitempty" structs:",omitempty"`           // SNMP監視の場合のコミュニティ名
 	SNMPVersion       string                       `json:",omitempty" yaml:"snmp_version,omitempty" structs:",omitempty"`        // SNMP監視 SNMPバージョン
 	OID               string                       `json:",omitempty" yaml:"oid,omitempty" structs:",omitempty"`                 // SNMP監視 OID

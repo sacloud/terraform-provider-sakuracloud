@@ -3,6 +3,7 @@ resource "sakuracloud_proxylb" "foobar" {
   plan           = 100
   vip_failover   = true
   sticky_session = true
+  gzip           = true
   timeout        = 10
   region         = "is1"
 

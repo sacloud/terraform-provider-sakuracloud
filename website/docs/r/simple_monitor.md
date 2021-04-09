@@ -18,13 +18,14 @@ resource "sakuracloud_simple_monitor" "foobar" {
 
   delay_loop = 60
   health_check {
-    protocol    = "https"
-    port        = 443
-    path        = "/"
-    status      = "200"
-    host_header = "example.com"
-    sni         = true
-    http2       = true
+    protocol        = "https"
+    port            = 443
+    path            = "/"
+    contains_string = "ok"
+    status          = "200"
+    host_header     = "example.com"
+    sni             = true
+    http2           = true
     # username    = "username"
     # password    = "password"
   }
@@ -67,6 +68,7 @@ A `health_check` block supports the following:
 * `sni` - (Optional) The flag to enable SNI when checking by HTTP/HTTPS.
 * `http2` - (Optional) The flag to enable HTTP/2 when checking by HTTPS.
 * `status` - (Optional) The response-code to expect when checking by HTTP/HTTPS.
+* `contains_string` - (Optional) The string that should be included in the response body when checking for HTTP/HTTPS.
 
 ##### Certificate
 

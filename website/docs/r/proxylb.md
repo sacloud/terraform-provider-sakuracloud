@@ -18,6 +18,7 @@ resource "sakuracloud_proxylb" "foobar" {
   plan           = 100
   vip_failover   = true
   sticky_session = true
+  gzip           = true
   timeout        = 10
   region         = "is1"
 
@@ -102,7 +103,7 @@ A `additional_certificate` block supports the following:
 * `server` - (Optional) One or more `server` blocks as defined below.
 * `sorry_server` - (Optional) A `sorry_server` block as defined below.
 * `sticky_session` - (Optional) The flag to enable sticky session.
-
+* `gzip` - (Optional) The flag to enable gzip compression.
 ---
 
 A `bind_port` block supports the following:
