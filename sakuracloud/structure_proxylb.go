@@ -29,6 +29,7 @@ func expandProxyLBCreateRequest(d *schema.ResourceData) *sacloud.ProxyLBCreateRe
 		Servers:        expandProxyLBServers(d),
 		Rules:          expandProxyLBRules(d),
 		StickySession:  expandProxyLBStickySession(d),
+		Gzip:           expandProxyLBGzip(d),
 		Timeout:        expandProxyLBTimeout(d),
 		UseVIPFailover: d.Get("vip_failover").(bool),
 		Region:         types.EProxyLBRegion(d.Get("region").(string)),
@@ -47,6 +48,7 @@ func expandProxyLBUpdateRequest(d *schema.ResourceData) *sacloud.ProxyLBUpdateRe
 		Servers:       expandProxyLBServers(d),
 		Rules:         expandProxyLBRules(d),
 		StickySession: expandProxyLBStickySession(d),
+		Gzip:          expandProxyLBGzip(d),
 		Timeout:       expandProxyLBTimeout(d),
 		Name:          d.Get("name").(string),
 		Description:   d.Get("description").(string),
@@ -161,6 +163,13 @@ func flattenProxyLBStickySession(proxyLB *sacloud.ProxyLB) bool {
 	return false
 }
 
+func flattenProxyLBGzip(proxyLB *sacloud.ProxyLB) bool {
+	if proxyLB.Gzip != nil {
+		return proxyLB.Gzip.Enabled
+	}
+	return false
+}
+
 func flattenProxyLBTimeout(proxyLB *sacloud.ProxyLB) int {
 	if proxyLB.Timeout != nil {
 		return proxyLB.Timeout.InactiveSec
@@ -174,6 +183,16 @@ func expandProxyLBStickySession(d resourceValueGettable) *sacloud.ProxyLBStickyS
 		return &sacloud.ProxyLBStickySession{
 			Enabled: true,
 			Method:  "cookie",
+		}
+	}
+	return nil
+}
+
+func expandProxyLBGzip(d resourceValueGettable) *sacloud.ProxyLBGzip {
+	gzip := d.Get("gzip").(bool)
+	if gzip {
+		return &sacloud.ProxyLBGzip{
+			Enabled: true,
 		}
 	}
 	return nil

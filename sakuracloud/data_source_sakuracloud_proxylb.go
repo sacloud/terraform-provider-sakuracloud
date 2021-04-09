@@ -42,6 +42,11 @@ func dataSourceSakuraCloudProxyLB() *schema.Resource {
 				Computed:    true,
 				Description: "The flag to enable sticky session",
 			},
+			"gzip": {
+				Type:        schema.TypeBool,
+				Computed:    true,
+				Description: "The flag to enable gzip compression",
+			},
 			"timeout": {
 				Type:        schema.TypeInt,
 				Computed:    true,
