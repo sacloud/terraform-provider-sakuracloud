@@ -93,6 +93,7 @@ type ProxyLBSetting struct {
 	LetsEncrypt   *ProxyLBACMESetting  `json:",omitempty" yaml:"lets_encrypt,omitempty" structs:",omitempty"` // Let's encryptでの証明書取得設定
 	StickySession ProxyLBStickySession `yaml:"sticky_session"`                                                // StickySession
 	Timeout       ProxyLBTimeout       `json:",omitempty" yaml:"timeout,omitempty" structs:",omitempty"`      // タイムアウト
+	Gzip          ProxyLBGzip          `yaml:"gzip"`                                                          // Gzip
 }
 
 // MarshalJSON nullの場合に空配列を出力するための実装
@@ -158,14 +159,19 @@ type ProxyLBRule struct {
 
 // ProxyLBACMESetting Let's Encryptでの証明書取得設定
 type ProxyLBACMESetting struct {
-	Enabled    bool
+	Enabled    bool   `yaml:"enabled"`
 	CommonName string `json:",omitempty" yaml:",omitempty" structs:",omitempty"`
 }
 
 // ProxyLBStickySession セッション維持(Sticky session)設定
 type ProxyLBStickySession struct {
-	Enabled bool
+	Enabled bool   `yaml:"enabled"`
 	Method  string `json:",omitempty" yaml:"method,omitempty" structs:",omitempty"`
+}
+
+// ProxyLBGzip Gzip圧縮設定
+type ProxyLBGzip struct {
+	Enabled bool `yaml:"enabled"`
 }
 
 // ProxyLBTimeout 実サーバの通信タイムアウト
