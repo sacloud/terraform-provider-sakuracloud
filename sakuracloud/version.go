@@ -18,7 +18,7 @@ import "fmt"
 
 var (
 	// Version app version
-	Version = "2.8.2"
+	Version = "2.8.3"
 	// Revision git commit short commithash
 	Revision = "xxxxxx" // set on build
 )
