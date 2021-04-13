@@ -187,16 +187,10 @@ github.com/mitchellh/go-homedir
 github.com/mitchellh/go-testing-interface
 # github.com/mitchellh/go-wordwrap v1.0.0
 github.com/mitchellh/go-wordwrap
-# github.com/mitchellh/goamz v0.0.0-20150317174335-caaaea8b30ee
-## explicit
-github.com/mitchellh/goamz/aws
-github.com/mitchellh/goamz/s3
 # github.com/mitchellh/mapstructure v1.3.2
 github.com/mitchellh/mapstructure
 # github.com/mitchellh/reflectwalk v1.0.1
 github.com/mitchellh/reflectwalk
-# github.com/motain/gocheck v0.0.0-20131023154940-9beb271d26e6
-## explicit
 # github.com/oklog/run v1.0.0
 github.com/oklog/run
 # github.com/pmezard/go-difflib v1.0.0
@@ -252,9 +246,6 @@ github.com/ulikunitz/xz
 github.com/ulikunitz/xz/internal/hash
 github.com/ulikunitz/xz/internal/xlog
 github.com/ulikunitz/xz/lzma
-# github.com/vaughan0/go-ini v0.0.0-20130923145212-a98ad7ee00ec
-## explicit
-github.com/vaughan0/go-ini
 # github.com/vmihailenco/msgpack v4.0.4+incompatible
 github.com/vmihailenco/msgpack
 github.com/vmihailenco/msgpack/codes

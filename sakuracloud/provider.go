@@ -145,7 +145,6 @@ func Provider() *schema.Provider {
 		DataSourcesMap: map[string]*schema.Resource{
 			"sakuracloud_archive":            dataSourceSakuraCloudArchive(),
 			"sakuracloud_bridge":             dataSourceSakuraCloudBridge(),
-			"sakuracloud_bucket_object":      dataSourceSakuraCloudBucketObject(),
 			"sakuracloud_cdrom":              dataSourceSakuraCloudCDROM(),
 			"sakuracloud_container_registry": dataSourceSakuraCloudContainerRegistry(),
 			"sakuracloud_database":           dataSourceSakuraCloudDatabase(),
@@ -177,7 +176,6 @@ func Provider() *schema.Provider {
 			"sakuracloud_archive":               resourceSakuraCloudArchive(),
 			"sakuracloud_archive_share":         resourceSakuraCloudArchiveShare(),
 			"sakuracloud_bridge":                resourceSakuraCloudBridge(),
-			"sakuracloud_bucket_object":         resourceSakuraCloudBucketObject(),
 			"sakuracloud_cdrom":                 resourceSakuraCloudCDROM(),
 			"sakuracloud_container_registry":    resourceSakuraCloudContainerRegistry(),
 			"sakuracloud_database":              resourceSakuraCloudDatabase(),
