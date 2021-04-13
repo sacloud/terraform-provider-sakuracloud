@@ -128,3 +128,17 @@ resource "aws_s3_bucket_object" "object" {
     - バージョニング
     - CORS
     
+### 自前実装する場合(with aws-sdk-go)
+
+[github.com/aws/aws-sdk-go](https://github.com/aws/aws-sdk-go)を用いて実装する。  
+このプロバイダーとは必要な設定項目類が大きく異なるため、別のプロバイダーとした方が良いかもしれない。  
+(例: terraform-provider-s3cloud)
+
+#### メリット/デメリット
+
+- 新オブジェクトストレージのフル機能を利用可能
+- AWSプロバイダーとのコード重複が多く、アップストリームへの追随などでメンテナンスが煩雑になりうる
+
+## 実装方針
+
+!TODO! 検討
