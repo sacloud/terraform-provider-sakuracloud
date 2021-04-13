@@ -57,6 +57,74 @@
 - awsなどの他のプロバイダーにまかせ自前実装しない
 - aws sdkなどを用いて自前実装
 
-## TODO
+#### AWSプロバイダーを利用する場合
 
-- [ ] 実装方針案ごとに実現可能性の検討
+以下のように利用する。
+
+```tf
+terraform {
+  required_providers {
+    aws = {
+      source  = "hashicorp/aws"
+      version = "~> 3.0"
+    }
+  }
+}
+
+provider "aws" {
+  alias      = "sacloud"
+  region     = var.s3_region
+  access_key = var.s3_access_key
+  secret_key = var.s3_secret_key
+  endpoints {
+    s3 = var.s3_endpoint
+  }
+
+  skip_credentials_validation = true
+  skip_region_validation      = true
+  skip_requesting_account_id  = true
+  skip_metadata_api_check     = true
+}
+
+#================================================
+
+variable "s3_access_key" {}
+variable "s3_secret_key" {}
+
+variable "s3_region" {
+  default = "jp-north-1"
+}
+
+variable "s3_endpoint" {
+  default = "https://s3.isk01.sakurastorage.jp"
+}
+
+#================================================
+
+# 作成済みのバケットを参照
+data "aws_s3_bucket" "example" {
+  provider = aws.sacloud
+
+  bucket   = "aws-provider-test"
+}
+
+# オブジェクトの作成
+resource "aws_s3_bucket_object" "object" {
+  provider = aws.sacloud
+
+  bucket = data.aws_s3_bucket.example.id
+  key    = "example.txt"
+  source = "example.txt"
+  etag   = filemd5("example.txt")
+  acl    = "public-read"
+}
+```
+
+#### メリット/デメリット
+
+- AWSプロバイダーをそのまま利用可能なためメンテナンスコストが下げられる
+- API経由でバケット作成が行えないため、バケットに対する操作が行えない
+    - ACL
+    - バージョニング
+    - CORS
+    
