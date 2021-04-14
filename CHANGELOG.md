@@ -1,3 +1,7 @@
+## 2.8.4(Unreleased)
+
+* Remove bucket_object resources [GH-818] (@yamamoto-febc)
+
 ## 2.8.3(2021-04-12)
 
 FEATURES:
