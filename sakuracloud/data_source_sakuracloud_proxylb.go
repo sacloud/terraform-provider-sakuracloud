@@ -183,6 +183,16 @@ func dataSourceSakuraCloudProxyLB() *schema.Resource {
 							Computed:    true,
 							Description: "The private key for a server",
 						},
+						"common_name": {
+							Type:        schema.TypeString,
+							Computed:    true,
+							Description: "The common name of the certificate",
+						},
+						"subject_alt_names": {
+							Type:        schema.TypeString,
+							Computed:    true,
+							Description: "The subject alternative names of the certificate",
+						},
 						"additional_certificate": {
 							Type:     schema.TypeList,
 							Computed: true,

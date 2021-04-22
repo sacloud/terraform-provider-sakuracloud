@@ -141,6 +141,8 @@ func flattenProxyLBCerts(certs *sacloud.ProxyLBCertificates) []interface{} {
 		proxylbCert["server_cert"] = certs.PrimaryCert.ServerCertificate
 		proxylbCert["intermediate_cert"] = certs.PrimaryCert.IntermediateCertificate
 		proxylbCert["private_key"] = certs.PrimaryCert.PrivateKey
+		proxylbCert["common_name"] = certs.PrimaryCert.CertificateCommonName
+		proxylbCert["subject_alt_names"] = certs.PrimaryCert.CertificateAltNames
 	}
 	if len(certs.AdditionalCerts) > 0 {
 		var additionalCerts []interface{}

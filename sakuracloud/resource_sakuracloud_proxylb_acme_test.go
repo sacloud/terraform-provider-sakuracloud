@@ -15,6 +15,7 @@
 package sakuracloud
 
 import (
+	"fmt"
 	"os"
 	"testing"
 
@@ -36,6 +37,7 @@ func TestAccSakuraCloudProxyLBACME_basic(t *testing.T) {
 	proxyLBDomain = os.Getenv(envProxyLBACMEDomain)
 
 	var proxylb sacloud.ProxyLB
+	resourceName := "sakuracloud_proxylb_acme.foobar"
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:          func() { testAccPreCheck(t) },
 		ProviderFactories: testAccProviderFactories,
@@ -50,6 +52,12 @@ func TestAccSakuraCloudProxyLBACME_basic(t *testing.T) {
 				Config: buildConfigWithArgs(testAccSakuraCloudProxyLBACME_basic, rand, proxyLBDomain),
 				Check: resource.ComposeTestCheckFunc(
 					testCheckSakuraCloudProxyLBExists("sakuracloud_proxylb.foobar", &proxylb),
+					resource.TestCheckResourceAttr(resourceName, "certificate.#", "1"),
+					resource.TestCheckResourceAttr(resourceName, "certificate.0.common_name", "acme-acctest."+proxyLBDomain),
+					resource.TestCheckResourceAttr(resourceName,
+						"certificate.0.subject_alt_names",
+						fmt.Sprintf("acme-acctest.%s, acme-acctest2.%s, acme-acctest3.%s,", proxyLBDomain, proxyLBDomain, proxyLBDomain),
+					),
 				),
 			},
 		},
@@ -82,10 +90,11 @@ resource "sakuracloud_proxylb" "foobar" {
 }
 
 resource sakuracloud_proxylb_acme "foobar" {
-  proxylb_id       = sakuracloud_proxylb.foobar.id
-  accept_tos       = true
-  common_name      = "acme-acctest.{{ .arg1 }}"
-  update_delay_sec = 120
+  proxylb_id        = sakuracloud_proxylb.foobar.id
+  accept_tos        = true
+  common_name       = "acme-acctest.{{ .arg1 }}"
+  subject_alt_names = ["acme-acctest2.{{ .arg1 }}", "acme-acctest3.{{ .arg1 }}"]
+  update_delay_sec  = 120
 }
 
 data sakuracloud_archive "ubuntu" {
@@ -114,6 +123,20 @@ data sakuracloud_dns "zone" {
 resource "sakuracloud_dns_record" "record" {
   dns_id = data.sakuracloud_dns.zone.id
   name   = "acme-acctest"
+  type   = "CNAME"
+  value  = "${sakuracloud_proxylb.foobar.fqdn}."
+  ttl    = 10
+}
+resource "sakuracloud_dns_record" "record2" {
+  dns_id = data.sakuracloud_dns.zone.id
+  name   = "acme-acctest2"
+  type   = "CNAME"
+  value  = "${sakuracloud_proxylb.foobar.fqdn}."
+  ttl    = 10
+}
+resource "sakuracloud_dns_record" "record3" {
+  dns_id = data.sakuracloud_dns.zone.id
+  name   = "acme-acctest3"
   type   = "CNAME"
   value  = "${sakuracloud_proxylb.foobar.fqdn}."
   ttl    = 10
