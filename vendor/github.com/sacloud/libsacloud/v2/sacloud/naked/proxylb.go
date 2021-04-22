@@ -159,8 +159,46 @@ type ProxyLBRule struct {
 
 // ProxyLBACMESetting Let's Encryptでの証明書取得設定
 type ProxyLBACMESetting struct {
-	Enabled    bool   `yaml:"enabled"`
-	CommonName string `json:",omitempty" yaml:",omitempty" structs:",omitempty"`
+	Enabled         bool     `yaml:"enabled"`
+	CommonName      string   `json:",omitempty" yaml:",omitempty" structs:",omitempty"`
+	SubjectAltNames []string `json:",omitempty" yaml:",omitempty" structs:",omitempty"`
+}
+
+// MarshalJSON SubjectAltNamesをスライスから文字列にする
+func (p ProxyLBACMESetting) MarshalJSON() ([]byte, error) {
+	type tmpSetting struct {
+		Enabled         bool   `yaml:"enabled"`
+		CommonName      string `json:",omitempty" yaml:",omitempty" structs:",omitempty"`
+		SubjectAltNames string `json:",omitempty" yaml:",omitempty" structs:",omitempty"`
+	}
+	tmp := tmpSetting{
+		Enabled:         p.Enabled,
+		CommonName:      p.CommonName,
+		SubjectAltNames: strings.Join(p.SubjectAltNames, ","), // Note: カンマ区切りで統一
+	}
+	return json.Marshal(&tmp)
+}
+
+// UnmarshalJSON SubjectAltNamesを文字列からスライスにする
+func (p *ProxyLBACMESetting) UnmarshalJSON(data []byte) error {
+	type tmpSetting struct {
+		Enabled         bool   `yaml:"enabled"`
+		CommonName      string `json:",omitempty" yaml:",omitempty" structs:",omitempty"`
+		SubjectAltNames string `json:",omitempty" yaml:",omitempty" structs:",omitempty"`
+	}
+	var setting *tmpSetting
+	if err := json.Unmarshal(data, &setting); err != nil {
+		return err
+	}
+
+	*p = ProxyLBACMESetting{
+		Enabled:    setting.Enabled,
+		CommonName: setting.CommonName,
+		SubjectAltNames: strings.FieldsFunc(setting.SubjectAltNames, func(r rune) bool {
+			return r == ' ' || r == ',' || r == '\n'
+		}),
+	}
+	return nil
 }
 
 // ProxyLBStickySession セッション維持(Sticky session)設定
@@ -230,6 +268,7 @@ type ProxyLBCertificate struct {
 	PrivateKey              string     `yaml:"private_key"`                                                              // 秘密鍵
 	CertificateEndDate      *time.Time `json:",omitempty" yaml:"certificate_end_date,omitempty" structs:",omitempty"`    // 有効期限
 	CertificateCommonName   string     `json:",omitempty" yaml:"certificate_common_name,omitempty" structs:",omitempty"` // CommonName
+	CertificateAltNames     string     `json:",omitempty" yaml:"certificate_alt_names,omitempty" structs:",omitempty"`   // SAN
 }
 
 // UnmarshalJSON UnmarshalJSON(CertificateEndDateのtime.TimeへのUnmarshal対応)
@@ -243,6 +282,7 @@ func (p *ProxyLBCertificate) UnmarshalJSON(data []byte) error {
 	p.IntermediateCertificate = tmp["IntermediateCertificate"].(string)
 	p.PrivateKey = tmp["PrivateKey"].(string)
 	p.CertificateCommonName = tmp["CertificateCommonName"].(string)
+	p.CertificateAltNames = tmp["CertificateAltNames"].(string)
 	endDate := tmp["CertificateEndDate"].(string)
 	if endDate != "" {
 		date, err := time.Parse("Jan _2 15:04:05 2006 MST", endDate)

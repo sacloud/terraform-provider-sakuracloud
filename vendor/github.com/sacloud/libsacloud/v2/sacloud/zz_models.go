@@ -19311,8 +19311,9 @@ func (o *ProxyLBRule) SetServerGroup(v string) {
 
 // ProxyLBACMESetting represents API parameter/response structure
 type ProxyLBACMESetting struct {
-	CommonName string
-	Enabled    bool
+	CommonName      string
+	Enabled         bool
+	SubjectAltNames []string
 }
 
 // Validate validates by field tags
@@ -19323,11 +19324,13 @@ func (o *ProxyLBACMESetting) Validate() error {
 // setDefaults implements sacloud.argumentDefaulter
 func (o *ProxyLBACMESetting) setDefaults() interface{} {
 	return &struct {
-		CommonName string
-		Enabled    bool
+		CommonName      string
+		Enabled         bool
+		SubjectAltNames []string
 	}{
-		CommonName: o.GetCommonName(),
-		Enabled:    o.GetEnabled(),
+		CommonName:      o.GetCommonName(),
+		Enabled:         o.GetEnabled(),
+		SubjectAltNames: o.GetSubjectAltNames(),
 	}
 }
 
@@ -19349,6 +19352,16 @@ func (o *ProxyLBACMESetting) GetEnabled() bool {
 // SetEnabled sets value to Enabled
 func (o *ProxyLBACMESetting) SetEnabled(v bool) {
 	o.Enabled = v
+}
+
+// GetSubjectAltNames returns value of SubjectAltNames
+func (o *ProxyLBACMESetting) GetSubjectAltNames() []string {
+	return o.SubjectAltNames
+}
+
+// SetSubjectAltNames sets value to SubjectAltNames
+func (o *ProxyLBACMESetting) SetSubjectAltNames(v []string) {
+	o.SubjectAltNames = v
 }
 
 /*************************************************
@@ -20178,6 +20191,7 @@ type ProxyLBPrimaryCert struct {
 	PrivateKey              string
 	CertificateEndDate      time.Time
 	CertificateCommonName   string
+	CertificateAltNames     string
 }
 
 // Validate validates by field tags
@@ -20193,12 +20207,14 @@ func (o *ProxyLBPrimaryCert) setDefaults() interface{} {
 		PrivateKey              string
 		CertificateEndDate      time.Time
 		CertificateCommonName   string
+		CertificateAltNames     string
 	}{
 		ServerCertificate:       o.GetServerCertificate(),
 		IntermediateCertificate: o.GetIntermediateCertificate(),
 		PrivateKey:              o.GetPrivateKey(),
 		CertificateEndDate:      o.GetCertificateEndDate(),
 		CertificateCommonName:   o.GetCertificateCommonName(),
+		CertificateAltNames:     o.GetCertificateAltNames(),
 	}
 }
 
@@ -20252,6 +20268,16 @@ func (o *ProxyLBPrimaryCert) SetCertificateCommonName(v string) {
 	o.CertificateCommonName = v
 }
 
+// GetCertificateAltNames returns value of CertificateAltNames
+func (o *ProxyLBPrimaryCert) GetCertificateAltNames() string {
+	return o.CertificateAltNames
+}
+
+// SetCertificateAltNames sets value to CertificateAltNames
+func (o *ProxyLBPrimaryCert) SetCertificateAltNames(v string) {
+	o.CertificateAltNames = v
+}
+
 /*************************************************
 * ProxyLBAdditionalCert
 *************************************************/
@@ -20263,6 +20289,7 @@ type ProxyLBAdditionalCert struct {
 	PrivateKey              string
 	CertificateEndDate      time.Time
 	CertificateCommonName   string
+	CertificateAltNames     string
 }
 
 // Validate validates by field tags
@@ -20278,12 +20305,14 @@ func (o *ProxyLBAdditionalCert) setDefaults() interface{} {
 		PrivateKey              string
 		CertificateEndDate      time.Time
 		CertificateCommonName   string
+		CertificateAltNames     string
 	}{
 		ServerCertificate:       o.GetServerCertificate(),
 		IntermediateCertificate: o.GetIntermediateCertificate(),
 		PrivateKey:              o.GetPrivateKey(),
 		CertificateEndDate:      o.GetCertificateEndDate(),
 		CertificateCommonName:   o.GetCertificateCommonName(),
+		CertificateAltNames:     o.GetCertificateAltNames(),
 	}
 }
 
@@ -20335,6 +20364,16 @@ func (o *ProxyLBAdditionalCert) GetCertificateCommonName() string {
 // SetCertificateCommonName sets value to CertificateCommonName
 func (o *ProxyLBAdditionalCert) SetCertificateCommonName(v string) {
 	o.CertificateCommonName = v
+}
+
+// GetCertificateAltNames returns value of CertificateAltNames
+func (o *ProxyLBAdditionalCert) GetCertificateAltNames() string {
+	return o.CertificateAltNames
+}
+
+// SetCertificateAltNames sets value to CertificateAltNames
+func (o *ProxyLBAdditionalCert) SetCertificateAltNames(v string) {
+	o.CertificateAltNames = v
 }
 
 /*************************************************
