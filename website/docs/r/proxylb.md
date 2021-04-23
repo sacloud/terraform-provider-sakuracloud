@@ -176,3 +176,11 @@ The `timeouts` block allows you to specify [timeouts](https://www.terraform.io/d
 * `proxy_networks` - A list of CIDR block used by the ProxyLB to access the server.
 * `vip` - The virtual IP address assigned to the ProxyLB.
 
+---
+
+A `certificate` block exports the following:
+
+* `common_name` - The common name of the certificate.
+* `subject_alt_names` - The subject alternative names of the certificate.
+
+
