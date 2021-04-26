@@ -35,9 +35,9 @@ tools:
 	GO111MODULE=off go get golang.org/x/tools/cmd/goimports
 	GO111MODULE=off go get github.com/sacloud/addlicense
 	GO111MODULE=off go get github.com/tcnksm/ghr
-	GO111MODULE=off go get github.com/bflad/tfproviderdocs
 	GO111MODULE=off go get github.com/bflad/tfproviderlint/cmd/tfproviderlintx
 	GO111MODULE=off go get github.com/client9/misspell/cmd/misspell
+	go get github.com/bflad/tfproviderdocs@v0.9.1
 	curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/v1.37.0/install.sh | sh -s -- -b $$(go env GOPATH)/bin v1.37.0
 
 

@@ -3,7 +3,7 @@ layout: "sakuracloud"
 page_title: "Guide: Object Storage"
 subcategory: "Guides"
 description: |-
-How to Manage Object Storage in SAKURA Cloud with Terraform.
+  How to Manage Object Storage in SAKURA Cloud with Terraform.
 ---
 
 # Object Storage
