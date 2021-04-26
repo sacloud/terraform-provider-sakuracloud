@@ -210,6 +210,18 @@ func flattenTags(tags types.Tags) *schema.Set {
 	return stringListToSet(tags)
 }
 
+func expandSubjectAltNames(d resourceValueGettable) []string {
+	var names []string
+	rawNames := d.Get("subject_alt_names").(*schema.Set).List()
+	for _, v := range rawNames {
+		v := v.(string)
+		if v != "" {
+			names = append(names, v)
+		}
+	}
+	return names
+}
+
 func expandBackupWeekdays(d resourceValueGettable, key string) []types.EBackupSpanWeekday {
 	var vs []types.EBackupSpanWeekday
 

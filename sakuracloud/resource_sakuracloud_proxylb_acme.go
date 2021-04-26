@@ -58,6 +58,14 @@ func resourceSakuraCloudProxyLBACME() *schema.Resource {
 				ForceNew:    true,
 				Description: "The FQDN used by ACME. This must set resolvable value",
 			},
+			"subject_alt_names": {
+				Type:        schema.TypeSet,
+				ForceNew:    true,
+				Optional:    true,
+				Elem:        &schema.Schema{Type: schema.TypeString},
+				Set:         schema.HashString,
+				Description: "The Subject alternative names used by ACME",
+			},
 			"update_delay_sec": {
 				Type:        schema.TypeInt,
 				Optional:    true,
@@ -83,6 +91,16 @@ func resourceSakuraCloudProxyLBACME() *schema.Resource {
 							Type:        schema.TypeString,
 							Computed:    true,
 							Description: "The private key for a server",
+						},
+						"common_name": {
+							Type:        schema.TypeString,
+							Computed:    true,
+							Description: "The common name of the certificate",
+						},
+						"subject_alt_names": {
+							Type:        schema.TypeString,
+							Computed:    true,
+							Description: "The subject alternative names of the certificate",
 						},
 						"additional_certificate": {
 							Type:     schema.TypeList,
@@ -138,10 +156,12 @@ func resourceSakuraCloudProxyLBACMECreate(ctx context.Context, d *schema.Resourc
 
 	tos := d.Get("accept_tos").(bool)
 	commonName := d.Get("common_name").(string)
+	altNames := expandSubjectAltNames(d)
 	if tos {
 		le = &sacloud.ProxyLBACMESetting{
-			Enabled:    true,
-			CommonName: commonName,
+			Enabled:         true,
+			CommonName:      commonName,
+			SubjectAltNames: altNames,
 		}
 	}
 
@@ -253,6 +273,8 @@ func setProxyLBACMEResourceData(ctx context.Context, d *schema.ResourceData, cli
 		proxylbCert["server_cert"] = cert.PrimaryCert.ServerCertificate
 		proxylbCert["intermediate_cert"] = cert.PrimaryCert.IntermediateCertificate
 		proxylbCert["private_key"] = cert.PrimaryCert.PrivateKey
+		proxylbCert["common_name"] = cert.PrimaryCert.CertificateCommonName
+		proxylbCert["subject_alt_names"] = cert.PrimaryCert.CertificateAltNames
 	}
 	if len(cert.AdditionalCerts) > 0 {
 		var certs []interface{}

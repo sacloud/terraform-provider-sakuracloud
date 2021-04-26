@@ -17,6 +17,7 @@ resource sakuracloud_proxylb_acme "foobar" {
   proxylb_id       = sakuracloud_proxylb.foobar.id
   accept_tos       = true
   common_name      = "www.example.com"
+  subject_alt_names = ["www1.example.com"]
   update_delay_sec = 120
 }
 
@@ -32,6 +33,7 @@ data "sakuracloud_proxylb" "foobar" {
 * `accept_tos` - (Required) The flag to accept the current Let's Encrypt terms of service(see: https://letsencrypt.org/repository/). This must be set `true` explicitly. Changing this forces a new resource to be created.
 * `common_name` - (Required) The FQDN used by ACME. This must set resolvable value. Changing this forces a new resource to be created.
 * `proxylb_id` - (Required) The id of the ProxyLB that set ACME settings to. Changing this forces a new resource to be created.
+* `subject_alt_names` - (Optional) The Subject alternative names used by ACME. Changing this forces a new resource to be created.
 * `update_delay_sec` - (Optional) The wait time in seconds. This typically used for waiting for a DNS propagation. Changing this forces a new resource to be created.
 
 ### Timeouts
@@ -51,9 +53,11 @@ The `timeouts` block allows you to specify [timeouts](https://www.terraform.io/d
 A `certificate` block exports the following:
 
 * `additional_certificate` - A list of `additional_certificate` blocks as defined below.
+* `common_name` - The common name of the certificate.
 * `intermediate_cert` - The intermediate certificate for a server.
 * `private_key` - The private key for a server.
 * `server_cert` - The certificate for a server.
+* `subject_alt_names` - The subject alternative names of the certificate.
 
 ---
 

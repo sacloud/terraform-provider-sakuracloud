@@ -85,9 +85,12 @@ A `response_header` block exports the following:
 
 A `certificate` block exports the following:
 
+* `additional_certificate` - A list of `additional_certificate` blocks as defined below.
+* `common_name` - The common name of the certificate.
 * `intermediate_cert` - The intermediate certificate for a server.
 * `private_key` - The private key for a server.
 * `server_cert` - The certificate for a server.
+* `subject_alt_names` - The subject alternative names of the certificate.
 
 ---
 
