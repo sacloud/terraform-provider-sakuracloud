@@ -232,6 +232,10 @@ resource "sakuracloud_private_host" "foobar" {
 
 var testAccSakuraCloudPrivateHost_destroy = `
 resource "sakuracloud_server" "foobar" {
+  lifecycle {
+    create_before_destroy = true
+  }
+
   name            = "{{ .arg0 }}"
   private_host_id = sakuracloud_private_host.foobar.id
   network_interface {
@@ -247,6 +251,10 @@ resource "sakuracloud_private_host" "foobar" {
 
 var testAccSakuraCloudPrivateHost_destroyed = `
 resource "sakuracloud_server" "foobar" {
+  lifecycle {
+    create_before_destroy = true
+  }
+
   name = "{{ .arg0 }}"
 
   network_interface {

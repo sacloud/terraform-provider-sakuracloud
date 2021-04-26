@@ -497,6 +497,10 @@ resource "sakuracloud_server" "foobar" {
 
 const testAccSakuraCloudServer_interfaces = `
 resource "sakuracloud_server" "foobar" {
+  lifecycle {
+    create_before_destroy = true
+  }
+
   name = "{{ .arg0 }}"
 
   network_interface {
@@ -509,6 +513,10 @@ resource "sakuracloud_server" "foobar" {
 
 const testAccSakuraCloudServer_interfacesAdded = `
 resource "sakuracloud_server" "foobar" {
+  lifecycle {
+    create_before_destroy = true
+  }
+
   name = "{{ .arg0 }}"
 
   network_interface {
@@ -527,6 +535,10 @@ resource "sakuracloud_switch" "foobar0" {
 `
 const testAccSakuraCloudServer_interfacesUpdated = `
 resource "sakuracloud_server" "foobar" {
+  lifecycle {
+    create_before_destroy = true
+  }
+
   name = "{{ .arg0 }}"
 
   network_interface {
@@ -558,6 +570,10 @@ resource "sakuracloud_switch" "foobar2" {
 
 const testAccSakuraCloudServer_interfacesDisconnect = `
 resource "sakuracloud_server" "foobar" {
+  lifecycle {
+    create_before_destroy = true
+  }
+
   name = "{{ .arg0 }}"
 
   network_interface {
@@ -587,6 +603,10 @@ resource "sakuracloud_packet_filter" "foobar" {
 }
 
 resource "sakuracloud_server" "foobar" {
+  lifecycle {
+    create_before_destroy = true
+  }
+
   name = "{{ .arg0 }}"
   network_interface {
     upstream         = "shared"
@@ -619,6 +639,10 @@ resource "sakuracloud_packet_filter" "foobar" {
 }
 
 resource "sakuracloud_server" "foobar" {
+  lifecycle {
+    create_before_destroy = true
+  }
+
   name = "{{ .arg0 }}-upd"
 
   network_interface {
