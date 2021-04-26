@@ -2,6 +2,7 @@
 
 * Remove bucket_object resources [GH-818] (@yamamoto-febc)
 * sakuracloud_proxylb_acme: subject_alt_names [GH-819] (@yamamoto-febc)
+* Fixes CI problems [GH-821] (@yamamoto-febc)
 
 ## 2.8.3(2021-04-12)
 
