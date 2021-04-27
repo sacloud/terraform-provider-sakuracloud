@@ -56,7 +56,7 @@ func TestAccSakuraCloudProxyLBACME_basic(t *testing.T) {
 					resource.TestCheckResourceAttr(resourceName, "certificate.0.common_name", "acme-acctest."+proxyLBDomain),
 					resource.TestCheckResourceAttr(resourceName,
 						"certificate.0.subject_alt_names",
-						fmt.Sprintf("acme-acctest.%s, acme-acctest2.%s, acme-acctest3.%s,", proxyLBDomain, proxyLBDomain, proxyLBDomain),
+						fmt.Sprintf("acme-acctest.%s, acme-acctest2.%s, acme-acctest3.%s", proxyLBDomain, proxyLBDomain, proxyLBDomain),
 					),
 				),
 			},
