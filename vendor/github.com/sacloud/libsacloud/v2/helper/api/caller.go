@@ -133,17 +133,7 @@ func newCaller(opts *CallerOptions) sacloud.APICaller {
 		// note: exact once
 		fake.SwitchFactoryFuncToFake()
 
-		defaultInterval := 10 * time.Millisecond
-
-		// update default polling intervals: libsacloud/sacloud
-		sacloud.DefaultStatePollingInterval = defaultInterval
-		sacloud.DefaultDBStatusPollingInterval = defaultInterval
-		// update default polling intervals: libsacloud/utils/setup
-		defaults.DefaultDeleteWaitInterval = defaultInterval
-		defaults.DefaultProvisioningWaitInterval = defaultInterval
-		defaults.DefaultPollingInterval = defaultInterval
-		// update default polling intervals: libsacloud/utils/builder
-		defaults.DefaultNICUpdateWaitDuration = defaultInterval
+		SetupFakeDefaults()
 	}
 
 	if opts.DefaultZone != "" {
@@ -157,4 +147,23 @@ func newCaller(opts *CallerOptions) sacloud.APICaller {
 		sacloud.SakuraCloudAPIRoot = opts.APIRootURL
 	}
 	return caller
+}
+
+func SetupFakeDefaults() {
+	defaultInterval := 10 * time.Millisecond
+
+	// update default polling intervals: libsacloud/sacloud
+	sacloud.DefaultStatePollingInterval = defaultInterval
+	sacloud.DefaultDBStatusPollingInterval = defaultInterval
+	// update default polling intervals: libsacloud/helper/setup
+	defaults.DefaultDeleteWaitInterval = defaultInterval
+	defaults.DefaultProvisioningWaitInterval = defaultInterval
+	defaults.DefaultPollingInterval = defaultInterval
+	// update default polling intervals: libsacloud/helper/builder
+	defaults.DefaultNICUpdateWaitDuration = defaultInterval
+	// update default timeouts and span: libsacloud/helper/power
+	defaults.DefaultPowerHelperBootRetrySpan = defaultInterval
+	defaults.DefaultPowerHelperShutdownRetrySpan = defaultInterval
+	defaults.DefaultPowerHelperInitialRequestRetrySpan = defaultInterval
+	defaults.DefaultPowerHelperInitialRequestTimeout = defaultInterval * 100
 }
