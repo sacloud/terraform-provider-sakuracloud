@@ -44,7 +44,20 @@ func IsNoResultsError(err error) bool {
 	return ok
 }
 
-// NoResultError APIが返した応答に処理すべきデータが含まれていない場合を示すエラー型
+// IsStillCreatingError 指定のerrorがAPI呼び出し時の409エラー、かつエラーコードがstill_creatingであるか判定
+func IsStillCreatingError(err error) bool {
+	if err == nil {
+		return false
+	}
+
+	if apiError, ok := err.(APIError); ok {
+		return apiError.ResponseCode() == http.StatusConflict && apiError.Code() == "still_creating"
+	}
+
+	return false
+}
+
+// NoResultsError APIが返した応答に処理すべきデータが含まれていない場合を示すエラー型
 type NoResultsError struct {
 	error
 }

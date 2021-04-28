@@ -17,27 +17,27 @@ package power
 import (
 	"context"
 	"errors"
+	"fmt"
 	"net/http"
+	"sync"
 	"time"
+
+	"github.com/sacloud/libsacloud/v2/helper/defaults"
 
 	"github.com/sacloud/libsacloud/v2/sacloud"
 	"github.com/sacloud/libsacloud/v2/sacloud/accessor"
 	"github.com/sacloud/libsacloud/v2/sacloud/types"
 )
 
-const (
-	// DefaultBootRetrySpan BootRetrySpanのデフォルト値
-	DefaultBootRetrySpan = 20 * time.Second
-	// DefaultShutdownRetrySpan ShutdownRetrySpanのデフォルト値
-	DefaultShutdownRetrySpan = 20 * time.Second
-)
-
 var (
 	// BootRetrySpan 起動APIをコールしてからリトライするまでの待機時間
-	BootRetrySpan = DefaultBootRetrySpan
-
+	BootRetrySpan time.Duration
 	// ShutdownRetrySpan シャットダウンAPIをコールしてからリトライするまでの待機時間
-	ShutdownRetrySpan = DefaultShutdownRetrySpan
+	ShutdownRetrySpan time.Duration
+	// InitialRequestTimeout 初回のBoot/Shutdownリクエストが受け入れられるまでのタイムアウト時間
+	InitialRequestTimeout time.Duration
+	// InitialRequestRetrySpan 初回のBoot/Shutdownリクエストをリトライする場合のリトライ間隔
+	InitialRequestRetrySpan time.Duration
 )
 
 /************************************************
@@ -190,8 +190,31 @@ type handler interface {
 	read() (interface{}, error)
 }
 
+var mu sync.Mutex
+
+func initDefaults() {
+	mu.Lock()
+	defer mu.Unlock()
+
+	if BootRetrySpan == 0 {
+		BootRetrySpan = defaults.DefaultPowerHelperBootRetrySpan
+	}
+	if ShutdownRetrySpan == 0 {
+		ShutdownRetrySpan = defaults.DefaultPowerHelperShutdownRetrySpan
+	}
+	if InitialRequestTimeout == 0 {
+		InitialRequestTimeout = defaults.DefaultPowerHelperInitialRequestTimeout
+	}
+	if InitialRequestRetrySpan == 0 {
+		InitialRequestRetrySpan = defaults.DefaultPowerHelperInitialRequestRetrySpan
+	}
+}
+
 func boot(ctx context.Context, h handler) error {
-	if err := h.boot(); err != nil {
+	initDefaults()
+
+	// 初回リクエスト、409+still_creatingの場合は一定期間リトライする
+	if err := powerRequestWithRetry(ctx, h.boot); err != nil {
 		return err
 	}
 
@@ -220,6 +243,7 @@ func boot(ctx context.Context, h handler) error {
 			if state != nil && state.(accessor.InstanceStatus).GetInstanceStatus().IsDown() {
 				if err := h.boot(); err != nil {
 					if err, ok := err.(sacloud.APIError); ok {
+						// 初回リクエスト以降で409を受け取った場合はAPI側で受け入れ済とみなしこれ以上リトライしない
 						if err.ResponseCode() == http.StatusConflict {
 							inProcess = true
 							continue
@@ -235,7 +259,10 @@ func boot(ctx context.Context, h handler) error {
 }
 
 func shutdown(ctx context.Context, h handler, force bool) error {
-	if err := h.shutdown(force); err != nil {
+	initDefaults()
+
+	// 初回リクエスト、409+still_creatingの場合は一定期間リトライする
+	if err := powerRequestWithRetry(ctx, func() error { return h.shutdown(force) }); err != nil {
 		return err
 	}
 
@@ -262,6 +289,7 @@ func shutdown(ctx context.Context, h handler, force bool) error {
 			if state != nil && state.(accessor.InstanceStatus).GetInstanceStatus().IsUp() {
 				if err := h.shutdown(force); err != nil {
 					if err, ok := err.(sacloud.APIError); ok {
+						// 初回リクエスト以降で409を受け取った場合はAPI側で受け入れ済とみなしこれ以上リトライしない
 						if err.ResponseCode() == http.StatusConflict {
 							inProcess = true
 							continue
@@ -272,6 +300,34 @@ func shutdown(ctx context.Context, h handler, force bool) error {
 			}
 		case err := <-errCh:
 			return err
+		}
+	}
+}
+
+func powerRequestWithRetry(ctx context.Context, fn func() error) error {
+	ctx, cancel := context.WithTimeout(ctx, InitialRequestTimeout)
+	defer cancel()
+
+	retryTimer := time.NewTicker(InitialRequestRetrySpan)
+	defer retryTimer.Stop()
+
+	for {
+		select {
+		case <-ctx.Done():
+			err := ctx.Err()
+			if err != nil {
+				return fmt.Errorf("powerRequestWithRetry: timed out: %s", err)
+			}
+			return nil
+		case <-retryTimer.C:
+			err := fn()
+			if err != nil {
+				if sacloud.IsStillCreatingError(err) {
+					continue
+				}
+				return err
+			}
+			return nil
 		}
 	}
 }

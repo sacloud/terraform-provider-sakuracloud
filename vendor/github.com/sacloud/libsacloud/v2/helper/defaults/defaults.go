@@ -34,6 +34,15 @@ var (
 
 	// DefaultPollingInterval ポーリング処理の間隔
 	DefaultPollingInterval = 5 * time.Second
+
+	// DefaultPowerHelperBootRetrySpan helper/powerでの起動リクエストリトライ間隔
+	DefaultPowerHelperBootRetrySpan = 20 * time.Second
+	// DefaultPowerHelperShutdownRetrySpan helper/powerでのシャットダウンリクエストリトライ間隔
+	DefaultPowerHelperShutdownRetrySpan = 20 * time.Second
+	// DefaultPowerHelperInitialRequestTimeout helper/powerでの初回電源リクエスト成功までのタイムアウト
+	DefaultPowerHelperInitialRequestTimeout = 30 * time.Minute
+	// DefaultPowerHelperInitialRequestRetrySpan helper/powerでの初回リクエスト409+still_creating時のリトライ間隔
+	DefaultPowerHelperInitialRequestRetrySpan = 20 * time.Second
 )
 
 // for builder package
