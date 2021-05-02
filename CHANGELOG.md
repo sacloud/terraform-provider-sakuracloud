@@ -1,9 +1,10 @@
-## 2.8.4(Unreleased)
+## 2.8.4(2021-05-02)
 
 * Remove bucket_object resources [GH-818] (@yamamoto-febc)
 * sakuracloud_proxylb_acme: subject_alt_names [GH-819] (@yamamoto-febc)
 * Fixes CI problems [GH-821 , GH-823] (@yamamoto-febc)
-* libsacloud v2.18.1 [GH-825](@yamamoto-febc)
+  - github.com/hashicorp/terraform-plugin-sdk v2.6.1
+* libsacloud v2.18.1 [GH-825] (@yamamoto-febc)
 
 ## 2.8.3(2021-04-12)
 
