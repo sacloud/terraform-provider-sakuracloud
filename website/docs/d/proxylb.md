@@ -51,7 +51,7 @@ A `condition` block supports the following:
 * `health_check` - A list of `health_check` blocks as defined below.
 * `icon_id` - The icon id attached to the ProxyLB.
 * `name` - The name of the ProxyLB.
-* `plan` - The plan name of the ProxyLB. This will be one of [`100`/`500`/`1000`/`5000`/`10000`/`50000`/`100000`].
+* `plan` - The plan name of the ProxyLB. This will be one of [`100`/`500`/`1000`/`5000`/`10000`/`50000`/`100000`/`400000`].
 * `proxy_networks` - A list of CIDR block used by the ProxyLB to access the server.
 * `region` - The name of region that the proxy LB is in. This will be one of [`tk1`/`is1`/`anycast`].
 * `rule` - A list of `rule` blocks as defined below.
@@ -114,9 +114,15 @@ A `health_check` block exports the following:
 
 A `rule` block exports the following:
 
+* `action` - The type of action to be performed when requests matches the rule. This will be one of [`forward`/`redirect`/`fixed`].
+* `fixed_content_type` - Content-Type header value for fixed response sent when requests matches the rule. This will be one of [`text/plain`/`text/html`/`application/javascript`/`application/json`].
+* `fixed_message_body` - Content body for fixed response sent when requests matches the rule.
+* `fixed_status_code` - HTTP status code for fixed response sent when requests matches the rule. This will be one of [`200`/`403`/`503`].
 * `group` - The name of load balancing group. When proxyLB received request which matched to `host` and `path`, proxyLB forwards the request to servers that having same group name.
 * `host` - The value of HTTP host header that is used as condition of rule-based balancing.
 * `path` - The request path that is used as condition of rule-based balancing.
+* `redirect_location` - The URL to redirect to when the request matches the rule. see https://manual.sakura.ad.jp/cloud/appliance/enhanced-lb/#enhanced-lb-rule for details.
+* `redirect_status_code` - HTTP status code for redirects sent when requests matches the rule. This will be one of [`301`/`302`].
 
 ---
 

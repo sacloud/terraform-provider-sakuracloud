@@ -267,6 +267,48 @@ func dataSourceSakuraCloudProxyLB() *schema.Resource {
 							Computed:    true,
 							Description: "The name of load balancing group. When proxyLB received request which matched to `host` and `path`, proxyLB forwards the request to servers that having same group name",
 						},
+						"action": {
+							Type:     schema.TypeString,
+							Computed: true,
+							Description: descf(
+								"The type of action to be performed when requests matches the rule. This will be one of [%s]",
+								types.ProxyLBRuleActionStrings(),
+							),
+						},
+						"redirect_location": {
+							Type:        schema.TypeString,
+							Computed:    true,
+							Description: "The URL to redirect to when the request matches the rule. see https://manual.sakura.ad.jp/cloud/appliance/enhanced-lb/#enhanced-lb-rule for details",
+						},
+						"redirect_status_code": {
+							Type:     schema.TypeString,
+							Computed: true,
+							Description: descf(
+								"HTTP status code for redirects sent when requests matches the rule. This will be one of [%s]",
+								types.ProxyLBRedirectStatusCodeStrings(),
+							),
+						},
+						"fixed_status_code": {
+							Type:     schema.TypeString,
+							Computed: true,
+							Description: descf(
+								"HTTP status code for fixed response sent when requests matches the rule. This will be one of [%s]",
+								types.ProxyLBFixedStatusCodeStrings(),
+							),
+						},
+						"fixed_content_type": {
+							Type:     schema.TypeString,
+							Computed: true,
+							Description: descf(
+								"Content-Type header value for fixed response sent when requests matches the rule. This will be one of [%s]",
+								types.ProxyLBFixedContentTypeStrings(),
+							),
+						},
+						"fixed_message_body": {
+							Type:        schema.TypeString,
+							Computed:    true,
+							Description: "Content body for fixed response sent when requests matches the rule",
+						},
 					},
 				},
 			},

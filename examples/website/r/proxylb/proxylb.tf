@@ -33,10 +33,29 @@ resource "sakuracloud_proxylb" "foobar" {
     port       = 80
     group      = "group1"
   }
+
   rule {
-    host  = "www.example.com"
-    path  = "/"
-    group = "group1"
+    action = "forward"
+    host   = "www.example.com"
+    path   = "/"
+    group  = "group1"
+  }
+  rule {
+    action               = "redirect"
+    host                 = "www2.example.com"
+    path                 = "/"
+    group                = "group1"
+    redirect_location    = "https://redirect.example.com"
+    redirect_status_code = "301"
+  }
+  rule {
+    action               = "fixed"
+    host                 = "www3.example.com"
+    path                 = "/"
+    group                = "group1"
+    fixed_status_code    = "200"
+    fixed_content_type   = "text/plain"
+    fixed_message_body   = "body"
   }
 
   description = "description"

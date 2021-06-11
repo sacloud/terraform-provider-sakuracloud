@@ -80,6 +80,12 @@ func TestAccSakuraCloudProxyLB_basic(t *testing.T) {
 					resource.TestCheckResourceAttr(resourceName, "rule.0.host", "usacloud.jp"),
 					resource.TestCheckResourceAttr(resourceName, "rule.0.path", "/path"),
 					resource.TestCheckResourceAttr(resourceName, "rule.0.group", "group1"),
+					resource.TestCheckResourceAttr(resourceName, "rule.0.action", "fixed"),
+					resource.TestCheckResourceAttr(resourceName, "rule.0.fixed_status_code", "200"),
+					resource.TestCheckResourceAttr(resourceName, "rule.0.fixed_content_type", "text/plain"),
+					resource.TestCheckResourceAttr(resourceName, "rule.0.fixed_message_body", "example"),
+					resource.TestCheckResourceAttr(resourceName, "rule.0.redirect_status_code", ""),
+					resource.TestCheckResourceAttr(resourceName, "rule.0.redirect_location", ""),
 					resource.TestCheckResourceAttrSet(resourceName, "vip"),
 					resource.TestCheckResourceAttrPair(
 						resourceName, "server.0.ip_address",
@@ -123,6 +129,12 @@ func TestAccSakuraCloudProxyLB_basic(t *testing.T) {
 					resource.TestCheckResourceAttr(resourceName, "rule.0.host", "upd.usacloud.jp"),
 					resource.TestCheckResourceAttr(resourceName, "rule.0.path", "/path-upd"),
 					resource.TestCheckResourceAttr(resourceName, "rule.0.group", "group2"),
+					resource.TestCheckResourceAttr(resourceName, "rule.0.action", "redirect"),
+					resource.TestCheckResourceAttr(resourceName, "rule.0.fixed_status_code", ""),
+					resource.TestCheckResourceAttr(resourceName, "rule.0.fixed_content_type", ""),
+					resource.TestCheckResourceAttr(resourceName, "rule.0.fixed_message_body", ""),
+					resource.TestCheckResourceAttr(resourceName, "rule.0.redirect_status_code", "301"),
+					resource.TestCheckResourceAttr(resourceName, "rule.0.redirect_location", "https://redirect.usacloud.jp"),
 					resource.TestCheckResourceAttrSet(resourceName, "vip"),
 					resource.TestCheckResourceAttrPair(
 						resourceName, "server.0.ip_address",
@@ -214,6 +226,11 @@ func TestAccImportSakuraCloudProxyLB_basic(t *testing.T) {
 			"server.1.ip_address":       ip1,
 			"server.1.port":             "80",
 			"server.1.enabled":          "true",
+			"server.1.group":            "group1",
+			"rule.0.action":             "forward",
+			"rule.0.host":               "www.usacloud.jp",
+			"rule.0.path":               "/",
+			"rule.0.group":              "group1",
 		}
 
 		if err := compareStateMulti(s[0], expects); err != nil {
@@ -279,9 +296,13 @@ resource "sakuracloud_proxylb" "foobar" {
     group      = "group1"
   }
   rule {
-    host  = "usacloud.jp"
-    path  = "/path"
-    group = "group1"
+    host               = "usacloud.jp"
+    path               = "/path"
+    group              = "group1"
+    action             = "fixed"
+    fixed_status_code  = "200"
+    fixed_content_type = "text/plain"
+    fixed_message_body = "example"
   }
 
   description = "description"
@@ -331,9 +352,12 @@ resource "sakuracloud_proxylb" "foobar" {
   }
 
   rule {
-    host  = "upd.usacloud.jp"
-    path  = "/path-upd"
-    group = "group2"
+    host                 = "upd.usacloud.jp"
+    path                 = "/path-upd"
+    group                = "group2"
+    action               = "redirect"
+    redirect_status_code = "301"
+    redirect_location    = "https://redirect.usacloud.jp"
   }
 
   description = "description-upd"
@@ -373,6 +397,12 @@ resource "sakuracloud_proxylb" "foobar" {
   server {
     ip_address = "{{ .arg2 }}"
     port       = 80
+    group      = "group1"
+  }
+  rule {
+    host                 = "www.usacloud.jp"
+    path                 = "/"
+    group                = "group1"
   }
 
   description = "description"

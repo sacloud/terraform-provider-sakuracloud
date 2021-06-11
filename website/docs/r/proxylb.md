@@ -48,10 +48,29 @@ resource "sakuracloud_proxylb" "foobar" {
     port       = 80
     group      = "group1"
   }
+
   rule {
-    host  = "www.example.com"
-    path  = "/"
-    group = "group1"
+    action = "forward"
+    host   = "www.example.com"
+    path   = "/"
+    group  = "group1"
+  }
+  rule {
+    action               = "redirect"
+    host                 = "www2.example.com"
+    path                 = "/"
+    group                = "group1"
+    redirect_location    = "https://redirect.example.com"
+    redirect_status_code = "301"
+  }
+  rule {
+    action               = "fixed"
+    host                 = "www3.example.com"
+    path                 = "/"
+    group                = "group1"
+    fixed_status_code    = "200"
+    fixed_content_type   = "text/plain"
+    fixed_message_body   = "body"
   }
 
   description = "description"
@@ -135,9 +154,15 @@ A `health_check` block supports the following:
 
 A `rule` block supports the following:
 
+* `action` - (Optional) The type of action to be performed when requests matches the rule. This must be one of [`forward`/`redirect`/`fixed`] Default: `forward`.
+* `fixed_content_type` - (Optional) Content-Type header value for fixed response sent when requests matches the rule. This must be one of [`text/plain`/`text/html`/`application/javascript`/`application/json`].
+* `fixed_message_body` - (Optional) Content body for fixed response sent when requests matches the rule.
+* `fixed_status_code` - (Optional) HTTP status code for fixed response sent when requests matches the rule. This must be one of [`200`/`403`/`503`].
 * `group` - (Optional) The name of load balancing group. When proxyLB received request which matched to `host` and `path`, proxyLB forwards the request to servers that having same group name. The length of this value must be in the range [`1`-`10`].
 * `host` - (Optional) The value of HTTP host header that is used as condition of rule-based balancing.
 * `path` - (Optional) The request path that is used as condition of rule-based balancing.
+* `redirect_location` - (Optional) The URL to redirect to when the request matches the rule. see https://manual.sakura.ad.jp/cloud/appliance/enhanced-lb/#enhanced-lb-rule for details.
+* `redirect_status_code` - (Optional) HTTP status code for redirects sent when requests matches the rule. This must be one of [`301`/`302`].
 
 ---
 
