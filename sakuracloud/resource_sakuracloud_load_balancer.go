@@ -98,7 +98,7 @@ func resourceSakuraCloudLoadBalancer() *schema.Resource {
 			"vip": {
 				Type:     schema.TypeList,
 				Optional: true,
-				MaxItems: 10,
+				MaxItems: 20,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
 						"vip": {
