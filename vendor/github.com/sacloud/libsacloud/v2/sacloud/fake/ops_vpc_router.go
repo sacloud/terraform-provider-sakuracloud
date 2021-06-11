@@ -318,10 +318,17 @@ func (o *VPCRouterOp) MonitorInterface(ctx context.Context, zone string, id type
 
 // Status is fake implementation
 func (o *VPCRouterOp) Status(ctx context.Context, zone string, id types.ID) (*sacloud.VPCRouterStatus, error) {
-	_, err := o.Read(ctx, zone, id)
+	v, err := o.Read(ctx, zone, id)
 	if err != nil {
 		return nil, err
 	}
 
+	if v.InstanceStatus.IsUp() && v.Settings.WireGuardEnabled.Bool() {
+		return &sacloud.VPCRouterStatus{
+			WireGuard: &sacloud.WireGuardStatus{
+				PublicKey: "fake-public-key",
+			},
+		}, nil
+	}
 	return &sacloud.VPCRouterStatus{}, nil
 }
