@@ -230,7 +230,6 @@ func expandVPCRouterSettings(d resourceValueGettable) *vpcrouter.RouterSetting {
 		PPTPServer:                expandVPCRouterPPTP(d),
 		L2TPIPsecServer:           expandVPCRouterL2TP(d),
 		RemoteAccessUsers:         expandVPCRouterUserList(d),
-		WireGuard:                 expandVPCRouterWireGuard(d),
 		SiteToSiteIPsecVPN:        expandVPCRouterSiteToSiteList(d),
 		StaticRoute:               expandVPCRouterStaticRouteList(d),
 		SyslogHost:                d.Get("syslog_host").(string),
@@ -505,53 +504,6 @@ func flattenVPCRouterL2TP(vpcRouter *sacloud.VPCRouter) []interface{} {
 		})
 	}
 	return l2tp
-}
-
-func expandVPCRouterWireGuard(d resourceValueGettable) *sacloud.VPCRouterWireGuard {
-	if values, ok := getListFromResource(d, "wire_guard"); ok && len(values) > 0 {
-		raw := values[0]
-		d := mapToResourceData(raw.(map[string]interface{}))
-
-		var peers []*sacloud.VPCRouterWireGuardPeer
-		if peerValues, ok := getListFromResource(d, "peer"); ok && len(peerValues) > 0 {
-			for _, v := range peerValues {
-				d := mapToResourceData(v.(map[string]interface{}))
-				peers = append(peers, &sacloud.VPCRouterWireGuardPeer{
-					Name:      stringOrDefault(d, "name"),
-					IPAddress: stringOrDefault(d, "ip_address"),
-					PublicKey: stringOrDefault(d, "public_key"),
-				})
-			}
-		}
-
-		return &sacloud.VPCRouterWireGuard{
-			IPAddress: stringOrDefault(d, "ip_address"),
-			Peer:      peers,
-		}
-	}
-	return nil
-}
-
-func flattenVPCRouterWireGuard(vpcRouter *sacloud.VPCRouter, publicKey string) []interface{} {
-	var wireGuard []interface{}
-	if vpcRouter.Settings.WireGuardEnabled.Bool() {
-		s := vpcRouter.Settings.WireGuard
-		var peers []interface{}
-		for _, peer := range s.Peer {
-			peers = append(peers, map[string]interface{}{
-				"name":       peer.Name,
-				"ip_address": peer.IPAddress,
-				"public_key": peer.PublicKey,
-			})
-		}
-
-		wireGuard = append(wireGuard, map[string]interface{}{
-			"ip_address": s.IPAddress,
-			"public_key": publicKey,
-			"peer":       peers,
-		})
-	}
-	return wireGuard
 }
 
 func expandVPCRouterPortForwardingList(d resourceValueGettable) []*sacloud.VPCRouterPortForwarding {
