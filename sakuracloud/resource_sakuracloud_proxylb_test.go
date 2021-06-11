@@ -226,6 +226,11 @@ func TestAccImportSakuraCloudProxyLB_basic(t *testing.T) {
 			"server.1.ip_address":       ip1,
 			"server.1.port":             "80",
 			"server.1.enabled":          "true",
+			"server.1.group":            "group1",
+			"rule.0.action":             "forward",
+			"rule.0.host":               "www.usacloud.jp",
+			"rule.0.path":               "/",
+			"rule.0.group":              "group1",
 		}
 
 		if err := compareStateMulti(s[0], expects); err != nil {
@@ -392,6 +397,12 @@ resource "sakuracloud_proxylb" "foobar" {
   server {
     ip_address = "{{ .arg2 }}"
     port       = 80
+    group      = "group1"
+  }
+  rule {
+    host                 = "www.usacloud.jp"
+    path                 = "/"
+    group                = "group1"
   }
 
   description = "description"

@@ -318,7 +318,8 @@ func resourceSakuraCloudProxyLB() *schema.Resource {
 						},
 						"action": {
 							Type:             schema.TypeString,
-							Required:         true,
+							Optional:         true,
+							Default:          types.ProxyLBRuleActions.Forward,
 							ValidateDiagFunc: validation.ToDiagFunc(validation.StringInSlice(types.ProxyLBRuleActionStrings(), false)),
 							Description: descf(
 								"The type of action to be performed when requests matches the rule. This must be one of [%s]",

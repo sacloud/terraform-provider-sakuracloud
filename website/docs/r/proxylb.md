@@ -154,7 +154,7 @@ A `health_check` block supports the following:
 
 A `rule` block supports the following:
 
-* `action` - (Required) The type of action to be performed when requests matches the rule. This must be one of [`forward`/`redirect`/`fixed`].
+* `action` - (Optional) The type of action to be performed when requests matches the rule. This must be one of [`forward`/`redirect`/`fixed`] Default: `forward`.
 * `fixed_content_type` - (Optional) Content-Type header value for fixed response sent when requests matches the rule. This must be one of [`text/plain`/`text/html`/`application/javascript`/`application/json`].
 * `fixed_message_body` - (Optional) Content body for fixed response sent when requests matches the rule.
 * `fixed_status_code` - (Optional) HTTP status code for fixed response sent when requests matches the rule. This must be one of [`200`/`403`/`503`].
