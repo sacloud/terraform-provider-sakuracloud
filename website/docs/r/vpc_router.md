@@ -103,6 +103,15 @@ resource "sakuracloud_vpc_router" "premium" {
     range_stop  = "192.168.11.40"
   }
 
+  wire_guard {
+    ip_address = "192.168.31.1/24"
+    peer {
+      name       = "example"
+      ip_address = "192.168.31.11"
+      public_key = "<your-public-key>"
+    }
+  }
+
   site_to_site_vpn {
     peer              = "10.0.0.1"
     remote_id         = "10.0.0.1"
@@ -275,6 +284,7 @@ A `static_nat` block supports the following:
 
 * `l2tp` - (Optional) A `l2tp` block as defined below.
 * `pptp` - (Optional) A `pptp` block as defined below.
+* `wire_guard` - (Optional) A `wire_guard` block as defined below.
 * `user` - (Optional) One or more `user` blocks as defined below.
 
 ---
@@ -300,6 +310,22 @@ A `user` block supports the following:
 * `password` - (Required) The password used to authenticate remote access.
 
 ---
+
+A `wire_guard` block supports the following:
+
+* `ip_address` - (Required) The IP address for WireGuard server. This must be formatted with xxx.xxx.xxx.xxx/nn.
+* `peer` - (Optional) One or more `peer` blocks as defined below.
+
+---
+
+A `peer` block supports the following:
+
+* `ip_address` - (Required) The IP address for peer.
+* `name` - (Required) the of the peer.
+* `public_key` - (Required) the public key of the WireGuard client.
+
+---
+
 
 #### Common Arguments
 
