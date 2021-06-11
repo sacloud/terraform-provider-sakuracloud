@@ -372,6 +372,48 @@ func resourceSakuraCloudVPCRouter() *schema.Resource {
 					},
 				},
 			},
+			"wire_guard": {
+				Type:     schema.TypeList,
+				Optional: true,
+				MaxItems: 1,
+				Elem: &schema.Resource{
+					Schema: map[string]*schema.Schema{
+						"ip_address": {
+							Type:        schema.TypeString,
+							Required:    true,
+							Description: "The IP address for WireGuard server. This must be formatted with xxx.xxx.xxx.xxx/nn",
+						},
+						"public_key": {
+							Type:        schema.TypeString,
+							Computed:    true,
+							Description: "the public key of the WireGuard server",
+						},
+						"peer": {
+							Type:     schema.TypeList,
+							Optional: true,
+							Elem: &schema.Resource{
+								Schema: map[string]*schema.Schema{
+									"name": {
+										Type:        schema.TypeString,
+										Required:    true,
+										Description: "the of the peer",
+									},
+									"ip_address": {
+										Type:        schema.TypeString,
+										Required:    true,
+										Description: "The IP address for peer",
+									},
+									"public_key": {
+										Type:        schema.TypeString,
+										Required:    true,
+										Description: "the public key of the WireGuard client",
+									},
+								},
+							},
+						},
+					},
+				},
+			},
 			"site_to_site_vpn": {
 				Type:     schema.TypeList,
 				Optional: true,
@@ -514,6 +556,10 @@ func resourceSakuraCloudVPCRouterCreate(ctx context.Context, d *schema.ResourceD
 	if err != nil {
 		return diag.Errorf("creating SakuraCloud VPCRouter is failed: %s", err)
 	}
+
+	// Note: 起動してからしばらくは/:id/Statusが空となるため、数秒待つようにする。
+	time.Sleep(client.vpcRouterWaitAfterCreateDuration)
+
 	return resourceSakuraCloudVPCRouterRead(ctx, d, meta)
 }
 
@@ -534,7 +580,7 @@ func resourceSakuraCloudVPCRouterRead(ctx context.Context, d *schema.ResourceDat
 		return diag.Errorf("could not read SakuraCloud VPCRouter[%s]: %s", d.Id(), err)
 	}
 
-	return setVPCRouterResourceData(ctx, d, client, vpcRouter)
+	return setVPCRouterResourceData(ctx, d, zone, client, vpcRouter)
 }
 
 func resourceSakuraCloudVPCRouterUpdate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
@@ -562,6 +608,10 @@ func resourceSakuraCloudVPCRouterUpdate(ctx context.Context, d *schema.ResourceD
 	if err != nil {
 		return diag.Errorf("updating SakuraCloud VPCRouter[%s] is failed: %s", d.Id(), err)
 	}
+
+	// Note: 起動してからしばらくは/:id/Statusが空となるため、数秒待つようにする。
+	time.Sleep(client.vpcRouterWaitAfterCreateDuration)
+
 	return resourceSakuraCloudVPCRouterRead(ctx, d, meta)
 }
 
@@ -597,7 +647,7 @@ func resourceSakuraCloudVPCRouterDelete(ctx context.Context, d *schema.ResourceD
 	return nil
 }
 
-func setVPCRouterResourceData(_ context.Context, d *schema.ResourceData, client *APIClient, data *sacloud.VPCRouter) diag.Diagnostics {
+func setVPCRouterResourceData(ctx context.Context, d *schema.ResourceData, zone string, client *APIClient, data *sacloud.VPCRouter) diag.Diagnostics {
 	if data.Availability.IsFailed() {
 		d.SetId("")
 		return diag.Errorf("got unexpected state: VPCRouter[%d].Availability is failed", data.ID)
@@ -634,6 +684,18 @@ func setVPCRouterResourceData(_ context.Context, d *schema.ResourceData, client 
 		return diag.FromErr(err)
 	}
 	if err := d.Set("pptp", flattenVPCRouterPPTP(data)); err != nil {
+		return diag.FromErr(err)
+	}
+	// get public key from /:id/Status API
+	status, err := sacloud.NewVPCRouterOp(client).Status(ctx, zone, data.ID)
+	if err != nil {
+		return diag.FromErr(err)
+	}
+	wireGuardPublicKey := ""
+	if status != nil && status.WireGuard != nil {
+		wireGuardPublicKey = status.WireGuard.PublicKey
+	}
+	if err := d.Set("wire_guard", flattenVPCRouterWireGuard(data, wireGuardPublicKey)); err != nil {
 		return diag.FromErr(err)
 	}
 	if err := d.Set("port_forwarding", flattenVPCRouterPortForwardings(data)); err != nil {

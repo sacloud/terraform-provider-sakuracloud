@@ -40,9 +40,10 @@ const (
 const uaEnvVar = "SAKURACLOUD_APPEND_USER_AGENT"
 
 var (
-	deletionWaiterTimeout           = 30 * time.Minute
-	deletionWaiterPollingInterval   = 5 * time.Second
-	databaseWaitAfterCreateDuration = 1 * time.Minute
+	deletionWaiterTimeout            = 30 * time.Minute
+	deletionWaiterPollingInterval    = 5 * time.Second
+	databaseWaitAfterCreateDuration  = 1 * time.Minute
+	vpcRouterWaitAfterCreateDuration = 1 * time.Minute
 )
 
 // Config type of SakuraCloud Config
@@ -70,11 +71,12 @@ type Config struct {
 // APIClient for SakuraCloud API
 type APIClient struct {
 	sacloud.APICaller
-	defaultZone                     string // 各リソースでzone未指定の場合に利用するゾーン。sacloud.APIDefaultZoneとは別物。
-	zones                           []string
-	deletionWaiterTimeout           time.Duration
-	deletionWaiterPollingInterval   time.Duration
-	databaseWaitAfterCreateDuration time.Duration
+	defaultZone                      string // 各リソースでzone未指定の場合に利用するゾーン。sacloud.APIDefaultZoneとは別物。
+	zones                            []string
+	deletionWaiterTimeout            time.Duration
+	deletionWaiterPollingInterval    time.Duration
+	databaseWaitAfterCreateDuration  time.Duration
+	vpcRouterWaitAfterCreateDuration time.Duration
 }
 
 func (c *APIClient) checkReferencedOption() query.CheckReferencedOption {
@@ -218,14 +220,16 @@ func (c *Config) NewClient() (*APIClient, error) {
 		deletionWaiterTimeout = 300 * time.Millisecond // 短すぎるとタイムアウトするため余裕を持たせておく
 		deletionWaiterPollingInterval = time.Millisecond
 		databaseWaitAfterCreateDuration = time.Millisecond
+		vpcRouterWaitAfterCreateDuration = time.Millisecond
 	}
 
 	return &APIClient{
-		APICaller:                       caller,
-		defaultZone:                     c.Zone,
-		zones:                           zones,
-		deletionWaiterTimeout:           deletionWaiterTimeout,
-		deletionWaiterPollingInterval:   deletionWaiterPollingInterval,
-		databaseWaitAfterCreateDuration: databaseWaitAfterCreateDuration,
+		APICaller:                        caller,
+		defaultZone:                      c.Zone,
+		zones:                            zones,
+		deletionWaiterTimeout:            deletionWaiterTimeout,
+		deletionWaiterPollingInterval:    deletionWaiterPollingInterval,
+		databaseWaitAfterCreateDuration:  databaseWaitAfterCreateDuration,
+		vpcRouterWaitAfterCreateDuration: vpcRouterWaitAfterCreateDuration,
 	}, nil
 }
