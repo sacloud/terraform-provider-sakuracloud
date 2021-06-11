@@ -21,9 +21,10 @@ data "sakuracloud_archive" "foobar" {
 
 * `filter` - (Optional) One or more values used for filtering, as defined below.
 * `os_type` - (Optional) The criteria used to filter SakuraCloud archives. This must be one of following:  
-  - **CentOS**: [`centos`/`centos8`/`centos8stream`/`centos7`/`centos6`]  
-  - **Ubuntu**: [`ubuntu`/`ubuntu2004`/`ubuntu1804`/`ubuntu1604`]  
-  - **Debian**: [`debian`/`debian10`/`debian9`]  
+  - **CentOS**: [`centos`/`centos8`/`centos8stream`/`centos7`]  
+  - **Alt RHEL/CentOS**: [`almalinux`/`rockylinux`]
+  - **Ubuntu**: [`ubuntu`/`ubuntu2004`/`ubuntu1804`]
+  - **Debian**: [`debian`/`debian10`/]  
   - **CoreOS/ContainerLinux**: `coreos`  
   - **RancherOS**: `rancheros`  
   - **k3OS**: `k3os`  
