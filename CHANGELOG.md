@@ -1,3 +1,10 @@
+## 2.9.0 (Unreleased)
+
+- VPCRouter: WireGuard server [GH-834] (@yamamoto-febc)
+- ELB: extending rule-based-balancing [GH-831] (@yamamoto-febc)
+- libsacloud v2.19.1 [GH-834] (@yamamoto-febc)
+- libsacloud v2.19.0 [GH-829] (@yamamoto-febc)
+
 ## 2.8.4(2021-05-02)
 
 * Remove bucket_object resources [GH-818] (@yamamoto-febc)
