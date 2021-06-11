@@ -124,9 +124,15 @@ func flattenProxyLBRules(proxyLB *sacloud.ProxyLB) []interface{} {
 	var results []interface{}
 	for _, rule := range proxyLB.Rules {
 		results = append(results, map[string]interface{}{
-			"host":  rule.Host,
-			"path":  rule.Path,
-			"group": rule.ServerGroup,
+			"host":                 rule.Host,
+			"path":                 rule.Path,
+			"group":                rule.ServerGroup,
+			"action":               rule.Action.String(),
+			"redirect_location":    rule.RedirectLocation,
+			"redirect_status_code": rule.RedirectStatusCode.String(),
+			"fixed_status_code":    rule.FixedStatusCode.String(),
+			"fixed_content_type":   rule.FixedContentType.String(),
+			"fixed_message_body":   rule.FixedMessageBody,
 		})
 	}
 	return results
@@ -286,9 +292,15 @@ func expandProxyLBRules(d resourceValueGettable) []*sacloud.ProxyLBRule {
 		for _, rule := range rules {
 			v := mapToResourceData(rule.(map[string]interface{}))
 			results = append(results, &sacloud.ProxyLBRule{
-				Host:        v.Get("host").(string),
-				Path:        v.Get("path").(string),
-				ServerGroup: v.Get("group").(string),
+				Host:               v.Get("host").(string),
+				Path:               v.Get("path").(string),
+				ServerGroup:        v.Get("group").(string),
+				Action:             types.EProxyLBRuleAction(v.Get("action").(string)),
+				RedirectLocation:   v.Get("redirect_location").(string),
+				RedirectStatusCode: types.EProxyLBRedirectStatusCode(forceAtoI(v.Get("redirect_status_code").(string))),
+				FixedStatusCode:    types.EProxyLBFixedStatusCode(forceAtoI(v.Get("fixed_status_code").(string))),
+				FixedContentType:   types.EProxyLBFixedContentType(v.Get("fixed_content_type").(string)),
+				FixedMessageBody:   v.Get("fixed_message_body").(string),
 			})
 		}
 	}

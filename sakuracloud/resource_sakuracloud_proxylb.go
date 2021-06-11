@@ -316,6 +316,52 @@ func resourceSakuraCloudProxyLB() *schema.Resource {
 								descLength(1, 10),
 							),
 						},
+						"action": {
+							Type:             schema.TypeString,
+							Required:         true,
+							ValidateDiagFunc: validation.ToDiagFunc(validation.StringInSlice(types.ProxyLBRuleActionStrings(), false)),
+							Description: descf(
+								"The type of action to be performed when requests matches the rule. This must be one of [%s]",
+								types.ProxyLBRuleActionStrings(),
+							),
+						},
+						"redirect_location": {
+							Type:        schema.TypeString,
+							Optional:    true,
+							Description: "The URL to redirect to when the request matches the rule. see https://manual.sakura.ad.jp/cloud/appliance/enhanced-lb/#enhanced-lb-rule for details",
+						},
+						"redirect_status_code": {
+							Type:             schema.TypeString,
+							Optional:         true,
+							ValidateDiagFunc: validation.ToDiagFunc(validation.StringInSlice(types.ProxyLBRedirectStatusCodeStrings(), false)),
+							Description: descf(
+								"HTTP status code for redirects sent when requests matches the rule. This must be one of [%s]",
+								types.ProxyLBRedirectStatusCodeStrings(),
+							),
+						},
+						"fixed_status_code": {
+							Type:             schema.TypeString,
+							Optional:         true,
+							ValidateDiagFunc: validation.ToDiagFunc(validation.StringInSlice(types.ProxyLBFixedStatusCodeStrings(), false)),
+							Description: descf(
+								"HTTP status code for fixed response sent when requests matches the rule. This must be one of [%s]",
+								types.ProxyLBFixedStatusCodeStrings(),
+							),
+						},
+						"fixed_content_type": {
+							Type:             schema.TypeString,
+							Optional:         true,
+							ValidateDiagFunc: validation.ToDiagFunc(validation.StringInSlice(types.ProxyLBFixedContentTypeStrings(), false)),
+							Description: descf(
+								"Content-Type header value for fixed response sent when requests matches the rule. This must be one of [%s]",
+								types.ProxyLBFixedContentTypeStrings(),
+							),
+						},
+						"fixed_message_body": {
+							Type:        schema.TypeString,
+							Optional:    true,
+							Description: "Content body for fixed response sent when requests matches the rule",
+						},
 					},
 				},
 			},
