@@ -46,14 +46,16 @@ var ProxyLBPlans = struct {
 	CPS10000  EProxyLBPlan
 	CPS50000  EProxyLBPlan
 	CPS100000 EProxyLBPlan
+	CPS400000 EProxyLBPlan
 }{
 	CPS100:    EProxyLBPlan(100),
 	CPS500:    EProxyLBPlan(500),
-	CPS1000:   EProxyLBPlan(1000),
-	CPS5000:   EProxyLBPlan(5000),
-	CPS10000:  EProxyLBPlan(10000),
-	CPS50000:  EProxyLBPlan(50000),
-	CPS100000: EProxyLBPlan(100000),
+	CPS1000:   EProxyLBPlan(1_000),
+	CPS5000:   EProxyLBPlan(5_000),
+	CPS10000:  EProxyLBPlan(10_000),
+	CPS50000:  EProxyLBPlan(50_000),
+	CPS100000: EProxyLBPlan(100_000),
+	CPS400000: EProxyLBPlan(400_000),
 }
 
 // ProxyLBPlanValues 有効なプランを表すint値
@@ -65,6 +67,7 @@ var ProxyLBPlanValues = []int{
 	int(ProxyLBPlans.CPS10000),
 	int(ProxyLBPlans.CPS50000),
 	int(ProxyLBPlans.CPS100000),
+	int(ProxyLBPlans.CPS400000),
 }
 
 // ProxyLBPlanString 有効なプランを表す文字列(スペース区切り)
@@ -76,4 +79,5 @@ var ProxyLBPlanString = strings.Join([]string{
 	ProxyLBPlans.CPS10000.String(),
 	ProxyLBPlans.CPS50000.String(),
 	ProxyLBPlans.CPS100000.String(),
+	ProxyLBPlans.CPS400000.String(),
 }, " ")

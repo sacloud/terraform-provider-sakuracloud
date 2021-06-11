@@ -33,21 +33,22 @@ const (
 	// CentOS7 OS種別:CentOS7
 	CentOS7
 
+	// AlmaLinux OS種別: Alma Linux
+	AlmaLinux
+	// RockyLinux OS種別: Rocky Linux
+	RockyLinux
+
 	// Ubuntu OS種別:Ubuntu
 	Ubuntu
-	// Ubuntu1804 OS種別:Ubuntu(Focal Fossa)
+	// Ubuntu2004 OS種別:Ubuntu(Focal Fossa)
 	Ubuntu2004
 	// Ubuntu1804 OS種別:Ubuntu(Bionic)
 	Ubuntu1804
-	// Ubuntu1604 OS種別:Ubuntu(Xenial)
-	Ubuntu1604
 
 	// Debian OS種別:Debian
 	Debian
 	// Debian10 OS種別:Debian10
 	Debian10
-	// Debian9 OS種別:Debian9
-	Debian9
 
 	// CoreOS OS種別:CoreOS
 	CoreOS
@@ -117,13 +118,13 @@ var ArchiveOSTypes = []ArchiveOSType{
 	CentOS8Stream,
 	CentOS8,
 	CentOS7,
+	AlmaLinux,
+	RockyLinux,
 	Ubuntu,
 	Ubuntu2004,
 	Ubuntu1804,
-	Ubuntu1604,
 	Debian,
 	Debian10,
-	Debian9,
 	CoreOS,
 	RancherOS,
 	K3OS,
@@ -154,8 +155,9 @@ var ArchiveOSTypes = []ArchiveOSType{
 // OSTypeShortNames OSTypeとして利用できる文字列のリスト
 var OSTypeShortNames = []string{
 	"centos", "centos8stream", "centos8", "centos7",
+	"almalinux", "rockylinux",
 	"ubuntu", "ubuntu2004", "ubuntu1804", "ubuntu1604",
-	"debian", "debian10", "debian9",
+	"debian", "debian10",
 	"coreos", "rancheros", "k3os", "kusanagi", "freebsd",
 	"windows2016", "windows2016-rds", "windows2016-rds-office",
 	"windows2016-sql-web", "windows2016-sql-standard", "windows2016-sql-standard-all",
@@ -189,8 +191,9 @@ func (o ArchiveOSType) IsWindows() bool {
 func (o ArchiveOSType) IsSupportDiskEdit() bool {
 	switch o {
 	case CentOS, CentOS8Stream, CentOS8, CentOS7,
-		Ubuntu, Ubuntu2004, Ubuntu1804, Ubuntu1604,
-		Debian, Debian10, Debian9,
+		AlmaLinux, RockyLinux,
+		Ubuntu, Ubuntu2004, Ubuntu1804,
+		Debian, Debian10,
 		CoreOS, RancherOS, K3OS, Kusanagi, FreeBSD:
 		return true
 	default:
@@ -209,20 +212,20 @@ func StrToOSType(osType string) ArchiveOSType {
 		return CentOS8
 	case "centos7":
 		return CentOS7
+	case "almalinux":
+		return AlmaLinux
+	case "rockylinux":
+		return RockyLinux
 	case "ubuntu":
 		return Ubuntu
 	case "ubuntu2004":
 		return Ubuntu2004
 	case "ubuntu1804":
 		return Ubuntu1804
-	case "ubuntu1604":
-		return Ubuntu1604
 	case "debian":
 		return Debian
 	case "debian10":
 		return Debian10
-	case "debian9":
-		return Debian9
 	case "coreos":
 		return CoreOS
 	case "rancheros":

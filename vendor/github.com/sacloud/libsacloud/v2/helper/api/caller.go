@@ -166,4 +166,8 @@ func SetupFakeDefaults() {
 	defaults.DefaultPowerHelperShutdownRetrySpan = defaultInterval
 	defaults.DefaultPowerHelperInitialRequestRetrySpan = defaultInterval
 	defaults.DefaultPowerHelperInitialRequestTimeout = defaultInterval * 100
+
+	fake.PowerOnDuration = time.Millisecond
+	fake.PowerOffDuration = time.Millisecond
+	fake.DiskCopyDuration = time.Millisecond
 }

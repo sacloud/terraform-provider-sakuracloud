@@ -64,6 +64,7 @@ type VPCRouterSetting struct {
 	DHCPStaticMapping  *VPCRouterDHCPStaticMappings `json:",omitempty" yaml:",omitempty" structs:",omitempty"`
 	PPTPServer         *VPCRouterPPTPServer         `json:",omitempty" yaml:",omitempty" structs:",omitempty"`
 	L2TPIPsecServer    *VPCRouterL2TPIPsecServer    `json:",omitempty" yaml:",omitempty" structs:",omitempty"`
+	WireGuard          *VPCRouterWireGuard          `json:",omitempty" yaml:",omitempty" structs:",omitempty"`
 	RemoteAccessUsers  *VPCRouterRemoteAccessUsers  `json:",omitempty" yaml:",omitempty" structs:",omitempty"`
 	SiteToSiteIPsecVPN *VPCRouterSiteToSiteIPsecVPN `json:",omitempty" yaml:",omitempty" structs:",omitempty"`
 	StaticRoutes       *VPCRouterStaticRoutes       `json:",omitempty" yaml:",omitempty" structs:",omitempty"`
@@ -373,6 +374,31 @@ type VPCRouterL2TPIPsecServerConfig struct {
 	PreSharedSecret string `json:",omitempty" yaml:",omitempty" structs:",omitempty"`
 }
 
+// VPCRouterWireGuard WireGuardサーバ
+type VPCRouterWireGuard struct {
+	Config  *VPCRouterWireGuardConfig `json:",omitempty" yaml:",omitempty" structs:",omitempty"`
+	Enabled types.StringFlag          `yaml:"enabled"`
+}
+
+// VPCRouterWireGuardConfig WireGuardサーバコンフィグ
+type VPCRouterWireGuardConfig struct {
+	IPAddress string                    `json:",omitempty" yaml:",omitempty" structs:",omitempty"` // xxx.xxx.xxx.xxx/nn
+	Peers     []*VPCRouterWireGuardPeer `yaml:"peers"`
+}
+
+// VPCRouterWireGuardPeer ピアの設定
+type VPCRouterWireGuardPeer struct {
+	Name      string `json:",omitempty" yaml:",omitempty" structs:",omitempty"`
+	IPAddress string `json:",omitempty" yaml:",omitempty" structs:",omitempty"`
+	PublicKey string `json:",omitempty" yaml:",omitempty" structs:",omitempty"`
+}
+
+// VPCRouterRemoteAccessUserConfig リモートアクセスユーザー
+type VPCRouterRemoteAccessUserConfig struct {
+	UserName string `json:",omitempty" yaml:",omitempty" structs:",omitempty"`
+	Password string `json:",omitempty" yaml:",omitempty" structs:",omitempty"`
+}
+
 // VPCRouterRemoteAccessUsers リモートアクセスユーザー
 type VPCRouterRemoteAccessUsers struct {
 	Config  []*VPCRouterRemoteAccessUserConfig `json:",omitempty" yaml:",omitempty" structs:",omitempty"`
@@ -390,12 +416,6 @@ func (f *VPCRouterRemoteAccessUsers) MarshalJSON() ([]byte, error) {
 	type alias VPCRouterRemoteAccessUsers
 	a := alias(*f)
 	return json.Marshal(&a)
-}
-
-// VPCRouterRemoteAccessUserConfig リモートアクセスユーザー
-type VPCRouterRemoteAccessUserConfig struct {
-	UserName string `json:",omitempty" yaml:",omitempty" structs:",omitempty"`
-	Password string `json:",omitempty" yaml:",omitempty" structs:",omitempty"`
 }
 
 // VPCRouterSiteToSiteIPsecVPN サイト間VPN
@@ -470,6 +490,9 @@ type VPCRouterStatus struct {
 		User      string
 		IPAddress string
 		TimeSec   int
+	} `json:",omitempty" yaml:",omitempty" structs:",omitempty"`
+	WireGuard *struct {
+		PublicKey string `json:",omitempty" yaml:",omitempty" structs:",omitempty"`
 	} `json:",omitempty" yaml:",omitempty" structs:",omitempty"`
 	SiteToSiteIPsecVPNPeers []struct {
 		Status string

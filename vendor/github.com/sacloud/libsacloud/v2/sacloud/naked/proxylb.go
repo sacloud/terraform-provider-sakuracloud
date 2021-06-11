@@ -152,9 +152,15 @@ type ProxyLBServer struct {
 
 // ProxyLBRule ProxyLBの振り分けルール
 type ProxyLBRule struct {
-	Host        string `json:",omitempty" yaml:"host,omitempty" structs:",omitempty"` // ホストヘッダのパターン(ワイルドカードとして?と*が利用可能)
-	Path        string `json:",omitempty" yaml:"path,omitempty" structs:",omitempty"` // パス
-	ServerGroup string `yaml:"server_group"`
+	Host               string                         `json:",omitempty" yaml:"host,omitempty" structs:",omitempty"` // ホストヘッダのパターン(ワイルドカードとして?と*が利用可能)
+	Path               string                         `json:",omitempty" yaml:"path,omitempty" structs:",omitempty"` // パス
+	ServerGroup        string                         `json:",omitempty" yaml:"server_group,omitempty" structs:",omitempty"`
+	Action             types.EProxyLBRuleAction       `json:",omitempty" yaml:"action,omitempty" structs:",omitempty"` // forward(実サーバへ転送) | redirect | fixed(固定レスポンス)
+	RedirectLocation   string                         `json:",omitempty" yaml:"redirect_location,omitempty" structs:",omitempty"`
+	RedirectStatusCode string                         `json:",omitempty" yaml:"redirect_status_code,omitempty" structs:",omitempty"` // 301 | 302
+	FixedStatusCode    string                         `json:",omitempty" yaml:"fixed_status_code,omitempty" structs:",omitempty"`
+	FixedContentType   types.EProxyLBFixedContentType `json:",omitempty" yaml:"fixed_content_type,omitempty" structs:",omitempty"`
+	FixedMessageBody   string                         `json:",omitempty" yaml:"fixed_message_body,omitempty" structs:",omitempty"`
 }
 
 // ProxyLBACMESetting Let's Encryptでの証明書取得設定

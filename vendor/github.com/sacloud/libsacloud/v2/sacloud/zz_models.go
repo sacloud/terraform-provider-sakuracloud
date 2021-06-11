@@ -19252,9 +19252,15 @@ func (o *ProxyLBServer) SetEnabled(v bool) {
 
 // ProxyLBRule represents API parameter/response structure
 type ProxyLBRule struct {
-	Host        string
-	Path        string
-	ServerGroup string
+	Host               string
+	Path               string
+	ServerGroup        string                           `json:",omitempty" mapconv:",omitempty"`
+	Action             types.EProxyLBRuleAction         `json:",omitempty" mapconv:",omitempty"`
+	RedirectLocation   string                           `json:",omitempty" mapconv:",omitempty"`
+	RedirectStatusCode types.EProxyLBRedirectStatusCode `json:",omitempty" mapconv:",omitempty"`
+	FixedStatusCode    types.EProxyLBFixedStatusCode    `json:",omitempty" mapconv:",omitempty"`
+	FixedContentType   types.EProxyLBFixedContentType   `json:",omitempty" mapconv:",omitempty"`
+	FixedMessageBody   string                           `json:",omitempty" mapconv:",omitempty"`
 }
 
 // Validate validates by field tags
@@ -19265,13 +19271,25 @@ func (o *ProxyLBRule) Validate() error {
 // setDefaults implements sacloud.argumentDefaulter
 func (o *ProxyLBRule) setDefaults() interface{} {
 	return &struct {
-		Host        string
-		Path        string
-		ServerGroup string
+		Host               string
+		Path               string
+		ServerGroup        string                           `json:",omitempty" mapconv:",omitempty"`
+		Action             types.EProxyLBRuleAction         `json:",omitempty" mapconv:",omitempty"`
+		RedirectLocation   string                           `json:",omitempty" mapconv:",omitempty"`
+		RedirectStatusCode types.EProxyLBRedirectStatusCode `json:",omitempty" mapconv:",omitempty"`
+		FixedStatusCode    types.EProxyLBFixedStatusCode    `json:",omitempty" mapconv:",omitempty"`
+		FixedContentType   types.EProxyLBFixedContentType   `json:",omitempty" mapconv:",omitempty"`
+		FixedMessageBody   string                           `json:",omitempty" mapconv:",omitempty"`
 	}{
-		Host:        o.GetHost(),
-		Path:        o.GetPath(),
-		ServerGroup: o.GetServerGroup(),
+		Host:               o.GetHost(),
+		Path:               o.GetPath(),
+		ServerGroup:        o.GetServerGroup(),
+		Action:             o.GetAction(),
+		RedirectLocation:   o.GetRedirectLocation(),
+		RedirectStatusCode: o.GetRedirectStatusCode(),
+		FixedStatusCode:    o.GetFixedStatusCode(),
+		FixedContentType:   o.GetFixedContentType(),
+		FixedMessageBody:   o.GetFixedMessageBody(),
 	}
 }
 
@@ -19305,6 +19323,66 @@ func (o *ProxyLBRule) SetServerGroup(v string) {
 	o.ServerGroup = v
 }
 
+// GetAction returns value of Action
+func (o *ProxyLBRule) GetAction() types.EProxyLBRuleAction {
+	return o.Action
+}
+
+// SetAction sets value to Action
+func (o *ProxyLBRule) SetAction(v types.EProxyLBRuleAction) {
+	o.Action = v
+}
+
+// GetRedirectLocation returns value of RedirectLocation
+func (o *ProxyLBRule) GetRedirectLocation() string {
+	return o.RedirectLocation
+}
+
+// SetRedirectLocation sets value to RedirectLocation
+func (o *ProxyLBRule) SetRedirectLocation(v string) {
+	o.RedirectLocation = v
+}
+
+// GetRedirectStatusCode returns value of RedirectStatusCode
+func (o *ProxyLBRule) GetRedirectStatusCode() types.EProxyLBRedirectStatusCode {
+	return o.RedirectStatusCode
+}
+
+// SetRedirectStatusCode sets value to RedirectStatusCode
+func (o *ProxyLBRule) SetRedirectStatusCode(v types.EProxyLBRedirectStatusCode) {
+	o.RedirectStatusCode = v
+}
+
+// GetFixedStatusCode returns value of FixedStatusCode
+func (o *ProxyLBRule) GetFixedStatusCode() types.EProxyLBFixedStatusCode {
+	return o.FixedStatusCode
+}
+
+// SetFixedStatusCode sets value to FixedStatusCode
+func (o *ProxyLBRule) SetFixedStatusCode(v types.EProxyLBFixedStatusCode) {
+	o.FixedStatusCode = v
+}
+
+// GetFixedContentType returns value of FixedContentType
+func (o *ProxyLBRule) GetFixedContentType() types.EProxyLBFixedContentType {
+	return o.FixedContentType
+}
+
+// SetFixedContentType sets value to FixedContentType
+func (o *ProxyLBRule) SetFixedContentType(v types.EProxyLBFixedContentType) {
+	o.FixedContentType = v
+}
+
+// GetFixedMessageBody returns value of FixedMessageBody
+func (o *ProxyLBRule) GetFixedMessageBody() string {
+	return o.FixedMessageBody
+}
+
+// SetFixedMessageBody sets value to FixedMessageBody
+func (o *ProxyLBRule) SetFixedMessageBody(v string) {
+	o.FixedMessageBody = v
+}
+
 /*************************************************
 * ProxyLBACMESetting
 *************************************************/
@@ -19313,7 +19391,7 @@ func (o *ProxyLBRule) SetServerGroup(v string) {
 type ProxyLBACMESetting struct {
 	CommonName      string
 	Enabled         bool
-	SubjectAltNames []string
+	SubjectAltNames []string `json:",omitempty" mapconv:",omitempty"`
 }
 
 // Validate validates by field tags
@@ -19326,7 +19404,7 @@ func (o *ProxyLBACMESetting) setDefaults() interface{} {
 	return &struct {
 		CommonName      string
 		Enabled         bool
-		SubjectAltNames []string
+		SubjectAltNames []string `json:",omitempty" mapconv:",omitempty"`
 	}{
 		CommonName:      o.GetCommonName(),
 		Enabled:         o.GetEnabled(),
@@ -26367,6 +26445,8 @@ type VPCRouterSetting struct {
 	PPTPServerEnabled         types.StringFlag               `mapconv:"Router.PPTPServer.Enabled,omitempty"`
 	L2TPIPsecServer           *VPCRouterL2TPIPsecServer      `mapconv:"Router.L2TPIPsecServer.Config,omitempty,recursive"`
 	L2TPIPsecServerEnabled    types.StringFlag               `mapconv:"Router.L2TPIPsecServer.Enabled,omitempty"`
+	WireGuard                 *VPCRouterWireGuard            `mapconv:"Router.WireGuard.Config,omitempty,recursive"`
+	WireGuardEnabled          types.StringFlag               `mapconv:"Router.WireGuard.Enabled,omitempty"`
 	RemoteAccessUsers         []*VPCRouterRemoteAccessUser   `mapconv:"Router.RemoteAccessUsers.[]Config,omitempty,recursive"`
 	SiteToSiteIPsecVPN        []*VPCRouterSiteToSiteIPsecVPN `mapconv:"Router.SiteToSiteIPsecVPN.[]Config,omitempty,recursive"`
 	StaticRoute               []*VPCRouterStaticRoute        `mapconv:"Router.StaticRoutes.[]Config,omitempty,recursive"`
@@ -26393,6 +26473,8 @@ func (o *VPCRouterSetting) setDefaults() interface{} {
 		PPTPServerEnabled         types.StringFlag               `mapconv:"Router.PPTPServer.Enabled,omitempty"`
 		L2TPIPsecServer           *VPCRouterL2TPIPsecServer      `mapconv:"Router.L2TPIPsecServer.Config,omitempty,recursive"`
 		L2TPIPsecServerEnabled    types.StringFlag               `mapconv:"Router.L2TPIPsecServer.Enabled,omitempty"`
+		WireGuard                 *VPCRouterWireGuard            `mapconv:"Router.WireGuard.Config,omitempty,recursive"`
+		WireGuardEnabled          types.StringFlag               `mapconv:"Router.WireGuard.Enabled,omitempty"`
 		RemoteAccessUsers         []*VPCRouterRemoteAccessUser   `mapconv:"Router.RemoteAccessUsers.[]Config,omitempty,recursive"`
 		SiteToSiteIPsecVPN        []*VPCRouterSiteToSiteIPsecVPN `mapconv:"Router.SiteToSiteIPsecVPN.[]Config,omitempty,recursive"`
 		StaticRoute               []*VPCRouterStaticRoute        `mapconv:"Router.StaticRoutes.[]Config,omitempty,recursive"`
@@ -26410,6 +26492,8 @@ func (o *VPCRouterSetting) setDefaults() interface{} {
 		PPTPServerEnabled:         o.GetPPTPServerEnabled(),
 		L2TPIPsecServer:           o.GetL2TPIPsecServer(),
 		L2TPIPsecServerEnabled:    o.GetL2TPIPsecServerEnabled(),
+		WireGuard:                 o.GetWireGuard(),
+		WireGuardEnabled:          o.GetWireGuardEnabled(),
 		RemoteAccessUsers:         o.GetRemoteAccessUsers(),
 		SiteToSiteIPsecVPN:        o.GetSiteToSiteIPsecVPN(),
 		StaticRoute:               o.GetStaticRoute(),
@@ -26535,6 +26619,26 @@ func (o *VPCRouterSetting) GetL2TPIPsecServerEnabled() types.StringFlag {
 // SetL2TPIPsecServerEnabled sets value to L2TPIPsecServerEnabled
 func (o *VPCRouterSetting) SetL2TPIPsecServerEnabled(v types.StringFlag) {
 	o.L2TPIPsecServerEnabled = v
+}
+
+// GetWireGuard returns value of WireGuard
+func (o *VPCRouterSetting) GetWireGuard() *VPCRouterWireGuard {
+	return o.WireGuard
+}
+
+// SetWireGuard sets value to WireGuard
+func (o *VPCRouterSetting) SetWireGuard(v *VPCRouterWireGuard) {
+	o.WireGuard = v
+}
+
+// GetWireGuardEnabled returns value of WireGuardEnabled
+func (o *VPCRouterSetting) GetWireGuardEnabled() types.StringFlag {
+	return o.WireGuardEnabled
+}
+
+// SetWireGuardEnabled sets value to WireGuardEnabled
+func (o *VPCRouterSetting) SetWireGuardEnabled(v types.StringFlag) {
+	o.WireGuardEnabled = v
 }
 
 // GetRemoteAccessUsers returns value of RemoteAccessUsers
@@ -27210,6 +27314,111 @@ func (o *VPCRouterL2TPIPsecServer) GetPreSharedSecret() string {
 // SetPreSharedSecret sets value to PreSharedSecret
 func (o *VPCRouterL2TPIPsecServer) SetPreSharedSecret(v string) {
 	o.PreSharedSecret = v
+}
+
+/*************************************************
+* VPCRouterWireGuard
+*************************************************/
+
+// VPCRouterWireGuard represents API parameter/response structure
+type VPCRouterWireGuard struct {
+	IPAddress string
+	Peer      []*VPCRouterWireGuardPeer `mapconv:"[]Peer,omitempty,recursive"`
+}
+
+// Validate validates by field tags
+func (o *VPCRouterWireGuard) Validate() error {
+	return validate.Struct(o)
+}
+
+// setDefaults implements sacloud.argumentDefaulter
+func (o *VPCRouterWireGuard) setDefaults() interface{} {
+	return &struct {
+		IPAddress string
+		Peer      []*VPCRouterWireGuardPeer `mapconv:"[]Peer,omitempty,recursive"`
+	}{
+		IPAddress: o.GetIPAddress(),
+		Peer:      o.GetPeer(),
+	}
+}
+
+// GetIPAddress returns value of IPAddress
+func (o *VPCRouterWireGuard) GetIPAddress() string {
+	return o.IPAddress
+}
+
+// SetIPAddress sets value to IPAddress
+func (o *VPCRouterWireGuard) SetIPAddress(v string) {
+	o.IPAddress = v
+}
+
+// GetPeer returns value of Peer
+func (o *VPCRouterWireGuard) GetPeer() []*VPCRouterWireGuardPeer {
+	return o.Peer
+}
+
+// SetPeer sets value to Peer
+func (o *VPCRouterWireGuard) SetPeer(v []*VPCRouterWireGuardPeer) {
+	o.Peer = v
+}
+
+/*************************************************
+* VPCRouterWireGuardPeer
+*************************************************/
+
+// VPCRouterWireGuardPeer represents API parameter/response structure
+type VPCRouterWireGuardPeer struct {
+	Name      string
+	IPAddress string
+	PublicKey string
+}
+
+// Validate validates by field tags
+func (o *VPCRouterWireGuardPeer) Validate() error {
+	return validate.Struct(o)
+}
+
+// setDefaults implements sacloud.argumentDefaulter
+func (o *VPCRouterWireGuardPeer) setDefaults() interface{} {
+	return &struct {
+		Name      string
+		IPAddress string
+		PublicKey string
+	}{
+		Name:      o.GetName(),
+		IPAddress: o.GetIPAddress(),
+		PublicKey: o.GetPublicKey(),
+	}
+}
+
+// GetName returns value of Name
+func (o *VPCRouterWireGuardPeer) GetName() string {
+	return o.Name
+}
+
+// SetName sets value to Name
+func (o *VPCRouterWireGuardPeer) SetName(v string) {
+	o.Name = v
+}
+
+// GetIPAddress returns value of IPAddress
+func (o *VPCRouterWireGuardPeer) GetIPAddress() string {
+	return o.IPAddress
+}
+
+// SetIPAddress sets value to IPAddress
+func (o *VPCRouterWireGuardPeer) SetIPAddress(v string) {
+	o.IPAddress = v
+}
+
+// GetPublicKey returns value of PublicKey
+func (o *VPCRouterWireGuardPeer) GetPublicKey() string {
+	return o.PublicKey
+}
+
+// SetPublicKey sets value to PublicKey
+func (o *VPCRouterWireGuardPeer) SetPublicKey(v string) {
+	o.PublicKey = v
 }
 
 /*************************************************
@@ -28078,6 +28287,7 @@ type VPCRouterStatus struct {
 	FirewallSendLogs        []string
 	VPNLogs                 []string
 	SessionCount            int
+	WireGuard               *WireGuardStatus
 	DHCPServerLeases        []*VPCRouterDHCPServerLease        `mapconv:"[]DHCPServerLeases,recursive"`
 	L2TPIPsecServerSessions []*VPCRouterL2TPIPsecServerSession `mapconv:"[]L2TPIPsecServerSessions,recursive"`
 	PPTPServerSessions      []*VPCRouterPPTPServerSession      `mapconv:"[]PPTPServerSessions,recursive"`
@@ -28096,6 +28306,7 @@ func (o *VPCRouterStatus) setDefaults() interface{} {
 		FirewallSendLogs        []string
 		VPNLogs                 []string
 		SessionCount            int
+		WireGuard               *WireGuardStatus
 		DHCPServerLeases        []*VPCRouterDHCPServerLease        `mapconv:"[]DHCPServerLeases,recursive"`
 		L2TPIPsecServerSessions []*VPCRouterL2TPIPsecServerSession `mapconv:"[]L2TPIPsecServerSessions,recursive"`
 		PPTPServerSessions      []*VPCRouterPPTPServerSession      `mapconv:"[]PPTPServerSessions,recursive"`
@@ -28105,6 +28316,7 @@ func (o *VPCRouterStatus) setDefaults() interface{} {
 		FirewallSendLogs:        o.GetFirewallSendLogs(),
 		VPNLogs:                 o.GetVPNLogs(),
 		SessionCount:            o.GetSessionCount(),
+		WireGuard:               o.GetWireGuard(),
 		DHCPServerLeases:        o.GetDHCPServerLeases(),
 		L2TPIPsecServerSessions: o.GetL2TPIPsecServerSessions(),
 		PPTPServerSessions:      o.GetPPTPServerSessions(),
@@ -28152,6 +28364,16 @@ func (o *VPCRouterStatus) SetSessionCount(v int) {
 	o.SessionCount = v
 }
 
+// GetWireGuard returns value of WireGuard
+func (o *VPCRouterStatus) GetWireGuard() *WireGuardStatus {
+	return o.WireGuard
+}
+
+// SetWireGuard sets value to WireGuard
+func (o *VPCRouterStatus) SetWireGuard(v *WireGuardStatus) {
+	o.WireGuard = v
+}
+
 // GetDHCPServerLeases returns value of DHCPServerLeases
 func (o *VPCRouterStatus) GetDHCPServerLeases() []*VPCRouterDHCPServerLease {
 	return o.DHCPServerLeases
@@ -28190,6 +28412,39 @@ func (o *VPCRouterStatus) GetSiteToSiteIPsecVPNPeers() []*VPCRouterSiteToSiteIPs
 // SetSiteToSiteIPsecVPNPeers sets value to SiteToSiteIPsecVPNPeers
 func (o *VPCRouterStatus) SetSiteToSiteIPsecVPNPeers(v []*VPCRouterSiteToSiteIPsecVPNPeer) {
 	o.SiteToSiteIPsecVPNPeers = v
+}
+
+/*************************************************
+* WireGuardStatus
+*************************************************/
+
+// WireGuardStatus represents API parameter/response structure
+type WireGuardStatus struct {
+	PublicKey string
+}
+
+// Validate validates by field tags
+func (o *WireGuardStatus) Validate() error {
+	return validate.Struct(o)
+}
+
+// setDefaults implements sacloud.argumentDefaulter
+func (o *WireGuardStatus) setDefaults() interface{} {
+	return &struct {
+		PublicKey string
+	}{
+		PublicKey: o.GetPublicKey(),
+	}
+}
+
+// GetPublicKey returns value of PublicKey
+func (o *WireGuardStatus) GetPublicKey() string {
+	return o.PublicKey
+}
+
+// SetPublicKey sets value to PublicKey
+func (o *WireGuardStatus) SetPublicKey(v string) {
+	o.PublicKey = v
 }
 
 /*************************************************

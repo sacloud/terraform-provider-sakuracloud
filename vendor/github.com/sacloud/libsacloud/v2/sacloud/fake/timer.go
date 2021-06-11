@@ -137,7 +137,7 @@ func startPowerOn(resourceKey, zone string, readFunc func() (interface{}, error)
 
 func startPowerOff(resourceKey, zone string, readFunc func() (interface{}, error)) {
 	counter := 0
-	ticker := time.NewTicker(PowerOnDuration)
+	ticker := time.NewTicker(PowerOffDuration)
 	go func() {
 		defer ticker.Stop()
 		for {

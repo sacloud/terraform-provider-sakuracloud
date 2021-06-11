@@ -56,6 +56,7 @@ type RouterSetting struct {
 	DHCPStaticMapping         []*sacloud.VPCRouterDHCPStaticMapping
 	PPTPServer                *sacloud.VPCRouterPPTPServer
 	L2TPIPsecServer           *sacloud.VPCRouterL2TPIPsecServer
+	WireGuard                 *sacloud.VPCRouterWireGuard
 	RemoteAccessUsers         []*sacloud.VPCRouterRemoteAccessUser
 	SiteToSiteIPsecVPN        []*sacloud.VPCRouterSiteToSiteIPsecVPN
 	StaticRoute               []*sacloud.VPCRouterStaticRoute
@@ -227,6 +228,8 @@ func (b *Builder) Build(ctx context.Context, zone string) (*sacloud.VPCRouter, e
 					PPTPServerEnabled:         b.RouterSetting.PPTPServer != nil,
 					L2TPIPsecServer:           b.RouterSetting.L2TPIPsecServer,
 					L2TPIPsecServerEnabled:    b.RouterSetting.L2TPIPsecServer != nil,
+					WireGuard:                 b.RouterSetting.WireGuard,
+					WireGuardEnabled:          b.RouterSetting.WireGuard != nil,
 					RemoteAccessUsers:         b.RouterSetting.RemoteAccessUsers,
 					SiteToSiteIPsecVPN:        b.RouterSetting.SiteToSiteIPsecVPN,
 					StaticRoute:               b.RouterSetting.StaticRoute,
@@ -364,6 +367,8 @@ func (b *Builder) Update(ctx context.Context, zone string, id types.ID) (*saclou
 			PPTPServerEnabled:         b.RouterSetting.PPTPServer != nil,
 			L2TPIPsecServer:           b.RouterSetting.L2TPIPsecServer,
 			L2TPIPsecServerEnabled:    b.RouterSetting.L2TPIPsecServer != nil,
+			WireGuard:                 b.RouterSetting.WireGuard,
+			WireGuardEnabled:          b.RouterSetting.WireGuard != nil,
 			RemoteAccessUsers:         b.RouterSetting.RemoteAccessUsers,
 			SiteToSiteIPsecVPN:        b.RouterSetting.SiteToSiteIPsecVPN,
 			StaticRoute:               b.RouterSetting.StaticRoute,
