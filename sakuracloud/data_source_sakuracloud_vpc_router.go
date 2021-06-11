@@ -317,47 +317,6 @@ func dataSourceSakuraCloudVPCRouter() *schema.Resource {
 					},
 				},
 			},
-			"wire_guard": {
-				Type:     schema.TypeList,
-				Computed: true,
-				Elem: &schema.Resource{
-					Schema: map[string]*schema.Schema{
-						"ip_address": {
-							Type:        schema.TypeString,
-							Computed:    true,
-							Description: "The IP address for WireGuard server",
-						},
-						"public_key": {
-							Type:        schema.TypeString,
-							Computed:    true,
-							Description: "the public key of the WireGuard server",
-						},
-						"peer": {
-							Type:     schema.TypeList,
-							Computed: true,
-							Elem: &schema.Resource{
-								Schema: map[string]*schema.Schema{
-									"name": {
-										Type:        schema.TypeString,
-										Computed:    true,
-										Description: "the of the peer",
-									},
-									"ip_address": {
-										Type:        schema.TypeString,
-										Computed:    true,
-										Description: "The IP address for peer",
-									},
-									"public_key": {
-										Type:        schema.TypeString,
-										Computed:    true,
-										Description: "the public key of the WireGuard client",
-									},
-								},
-							},
-						},
-					},
-				},
-			},
 			"site_to_site_vpn": {
 				Type:     schema.TypeList,
 				Computed: true,
@@ -481,5 +440,5 @@ func dataSourceSakuraCloudVPCRouterRead(ctx context.Context, d *schema.ResourceD
 
 	targets := res.VPCRouters
 	d.SetId(targets[0].ID.String())
-	return setVPCRouterResourceData(ctx, d, zone, client, targets[0])
+	return setVPCRouterResourceData(ctx, d, client, targets[0])
 }
