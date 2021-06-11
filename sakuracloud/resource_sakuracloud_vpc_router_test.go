@@ -148,6 +148,16 @@ func TestAccSakuraCloudVPCRouter_Full(t *testing.T) {
 					resource.TestCheckResourceAttr(resourceName, "pptp.#", "1"),
 					resource.TestCheckResourceAttr(resourceName, "pptp.0.range_start", "192.168.11.31"),
 					resource.TestCheckResourceAttr(resourceName, "pptp.0.range_stop", "192.168.11.40"),
+					resource.TestCheckResourceAttr(resourceName, "wire_guard.0.ip_address", "192.168.31.1/24"),
+					func() resource.TestCheckFunc {
+						if !isFakeModeEnabled() {
+							return resource.TestCheckResourceAttrSet(resourceName, "wire_guard.0.public_key") // NOTE: libsacloudのFakeドライバーが常に空を返すため, acctestでないと確認できない
+						}
+						return func(_ *terraform.State) error { return nil }
+					}(),
+					resource.TestCheckResourceAttr(resourceName, "wire_guard.0.peer.0.name", "example"),
+					resource.TestCheckResourceAttr(resourceName, "wire_guard.0.peer.0.ip_address", "192.168.31.11"),
+					resource.TestCheckResourceAttr(resourceName, "wire_guard.0.peer.0.public_key", "fqxOlS2X0Jtg4P9zVf8D3BAUtJmrp+z2mjzUmgxxxxx="),
 					resource.TestCheckResourceAttr(resourceName, "site_to_site_vpn.#", "1"),
 					resource.TestCheckResourceAttr(resourceName, "site_to_site_vpn.0.peer", "8.8.8.8"),
 					resource.TestCheckResourceAttr(resourceName, "site_to_site_vpn.0.remote_id", "8.8.8.8"),
@@ -360,6 +370,15 @@ resource "sakuracloud_vpc_router" "foobar" {
   pptp {
     range_start = "192.168.11.31"
     range_stop  = "192.168.11.40"
+  }
+
+  wire_guard {
+    ip_address = "192.168.31.1/24"
+    peer {
+      name       = "example"
+      ip_address = "192.168.31.11"
+      public_key = "fqxOlS2X0Jtg4P9zVf8D3BAUtJmrp+z2mjzUmgxxxxx="
+    }
   }
 
   site_to_site_vpn {
