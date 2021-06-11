@@ -156,7 +156,7 @@ var ArchiveOSTypes = []ArchiveOSType{
 var OSTypeShortNames = []string{
 	"centos", "centos8stream", "centos8", "centos7",
 	"almalinux", "rockylinux",
-	"ubuntu", "ubuntu2004", "ubuntu1804", "ubuntu1604",
+	"ubuntu", "ubuntu2004", "ubuntu1804",
 	"debian", "debian10",
 	"coreos", "rancheros", "k3os", "kusanagi", "freebsd",
 	"windows2016", "windows2016-rds", "windows2016-rds-office",

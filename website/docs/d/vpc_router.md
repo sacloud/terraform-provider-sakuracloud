@@ -66,6 +66,7 @@ A `condition` block supports the following:
 * `tags` - Any tags assigned to the VPCRouter.
 * `user` - A list of `user` blocks as defined below.
 * `version` - The version of the VPC Router.
+* `wire_guard` - A list of `wire_guard` blocks as defined below.
 
 
 ---
@@ -181,5 +182,21 @@ A `user` block exports the following:
 
 * `name` - The user name used to authenticate remote access.
 * `password` - The password used to authenticate remote access.
+
+---
+
+A `wire_guard` block exports the following:
+
+* `ip_address` - The IP address for WireGuard server.
+* `peer` - A list of `peer` blocks as defined below.
+* `public_key` - the public key of the WireGuard server.
+
+---
+
+A `peer` block exports the following:
+
+* `ip_address` - The IP address for peer.
+* `name` - the name of the peer.
+* `public_key` - the public key of the WireGuard client.
 
 

@@ -27323,7 +27323,7 @@ func (o *VPCRouterL2TPIPsecServer) SetPreSharedSecret(v string) {
 // VPCRouterWireGuard represents API parameter/response structure
 type VPCRouterWireGuard struct {
 	IPAddress string
-	Peer      []*VPCRouterWireGuardPeer `mapconv:"[]Peer,omitempty,recursive"`
+	Peers     []*VPCRouterWireGuardPeer `mapconv:"[]Peers,omitempty,recursive"`
 }
 
 // Validate validates by field tags
@@ -27335,10 +27335,10 @@ func (o *VPCRouterWireGuard) Validate() error {
 func (o *VPCRouterWireGuard) setDefaults() interface{} {
 	return &struct {
 		IPAddress string
-		Peer      []*VPCRouterWireGuardPeer `mapconv:"[]Peer,omitempty,recursive"`
+		Peers     []*VPCRouterWireGuardPeer `mapconv:"[]Peers,omitempty,recursive"`
 	}{
 		IPAddress: o.GetIPAddress(),
-		Peer:      o.GetPeer(),
+		Peers:     o.GetPeers(),
 	}
 }
 
@@ -27352,14 +27352,14 @@ func (o *VPCRouterWireGuard) SetIPAddress(v string) {
 	o.IPAddress = v
 }
 
-// GetPeer returns value of Peer
-func (o *VPCRouterWireGuard) GetPeer() []*VPCRouterWireGuardPeer {
-	return o.Peer
+// GetPeers returns value of Peers
+func (o *VPCRouterWireGuard) GetPeers() []*VPCRouterWireGuardPeer {
+	return o.Peers
 }
 
-// SetPeer sets value to Peer
-func (o *VPCRouterWireGuard) SetPeer(v []*VPCRouterWireGuardPeer) {
-	o.Peer = v
+// SetPeers sets value to Peers
+func (o *VPCRouterWireGuard) SetPeers(v []*VPCRouterWireGuardPeer) {
+	o.Peers = v
 }
 
 /*************************************************

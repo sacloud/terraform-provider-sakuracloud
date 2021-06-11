@@ -88,6 +88,15 @@ resource "sakuracloud_vpc_router" "premium" {
     range_stop  = "192.168.11.40"
   }
 
+  wire_guard {
+    ip_address = "192.168.31.1/24"
+    peer {
+      name       = "example"
+      ip_address = "192.168.31.11"
+      public_key = "<your-public-key>"
+    }
+  }
+
   site_to_site_vpn {
     peer              = "10.0.0.1"
     remote_id         = "10.0.0.1"
