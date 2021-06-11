@@ -1,5 +1,6 @@
 ## 2.9.0 (Unreleased)
 
+- LoadBalancer: Increased VIP limit to 20 [GH-835] (@yamamoto-febc)
 - VPCRouter: WireGuard server [GH-834] (@yamamoto-febc)
 - ELB: extending rule-based-balancing [GH-831] (@yamamoto-febc)
 - libsacloud v2.19.1 [GH-834] (@yamamoto-febc)
