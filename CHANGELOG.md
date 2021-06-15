@@ -1,4 +1,4 @@
-## 2.9.0 (Unreleased)
+## 2.9.0 (2021-06-15)
 
 - LoadBalancer: Increased VIP limit to 20 [GH-835] (@yamamoto-febc)
 - VPCRouter: WireGuard server [GH-834] (@yamamoto-febc)
