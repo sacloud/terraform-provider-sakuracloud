@@ -178,6 +178,7 @@ func resourceSakuraCloudProxyLBACMECreate(ctx context.Context, d *schema.Resourc
 		LetsEncrypt:   le,
 		StickySession: proxyLB.StickySession,
 		Timeout:       proxyLB.Timeout,
+		Gzip:          proxyLB.Gzip,
 		SettingsHash:  proxyLB.SettingsHash,
 	})
 	if err != nil {
@@ -240,6 +241,7 @@ func resourceSakuraCloudProxyLBACMEDelete(ctx context.Context, d *schema.Resourc
 		},
 		StickySession: proxyLB.StickySession,
 		Timeout:       proxyLB.Timeout,
+		Gzip:          proxyLB.Gzip,
 		SettingsHash:  proxyLB.SettingsHash,
 	})
 	if err != nil {
