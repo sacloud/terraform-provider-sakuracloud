@@ -1,3 +1,7 @@
+## 2.9.2 (Unreleased)
+
+- Fix zone name attribute of DNS [GH-838] (@chibiegg) 
+
 ## 2.9.1 (2021-06-21)
 
 - fixed gzip misconfiguration [GH-837] (@yamamoto-febc)
