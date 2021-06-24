@@ -1,4 +1,4 @@
-## 2.9.2 (Unreleased)
+## 2.9.2 (2021-06-24)
 
 - Fix zone name attribute of DNS [GH-838] (@chibiegg) 
 
