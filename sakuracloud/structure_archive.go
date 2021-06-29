@@ -50,13 +50,19 @@ func expandArchiveBuilder(d *schema.ResourceData, zone string, client *APIClient
 			sourceArchiveZone = ""
 		}
 	}
+	sizeGB := intOrDefault(d, "size")
+	if sizeGB == 0 {
+		sizeGB = 20
+	}
 
+	// Note: APIとしてはディスクやアーカイブをソースとした場合Sizeの指定はできないが、
+	//       archiveUtil.Director側でAPIに渡すパラメータを制御しているためここでは常に渡して問題ない
 	director := &archiveUtil.Director{
 		Name:              d.Get("name").(string),
 		Description:       d.Get("description").(string),
 		Tags:              expandTags(d),
 		IconID:            expandSakuraCloudID(d, "icon_id"),
-		SizeGB:            intOrDefault(d, "size"),
+		SizeGB:            sizeGB,
 		SourceReader:      reader,
 		SourceDiskID:      expandSakuraCloudID(d, "source_disk_id"),
 		SourceArchiveID:   expandSakuraCloudID(d, "source_archive_id"),

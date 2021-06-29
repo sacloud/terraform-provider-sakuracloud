@@ -20,31 +20,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
 )
 
-func TestAccSakuraCloudDataSourceArchive_basic(t *testing.T) {
-	resourceName := "data.sakuracloud_archive.foobar"
-	resource.ParallelTest(t, resource.TestCase{
-		PreCheck:          func() { testAccPreCheck(t) },
-		ProviderFactories: testAccProviderFactories,
-		Steps: []resource.TestStep{
-			{
-				Config: testAccSakuraCloudDataSourceArchive_basic,
-				Check: resource.ComposeTestCheckFunc(
-					testCheckSakuraCloudDataSourceExists(resourceName),
-					resource.TestCheckResourceAttr(resourceName, "name", "Ubuntu Server 16.04.6 LTS 64bit"),
-					resource.TestCheckResourceAttr(resourceName, "size", "20"),
-					resource.TestCheckResourceAttr(resourceName, "tags.#", "6"),
-					resource.TestCheckResourceAttr(resourceName, "tags.0", "@size-extendable"),
-					resource.TestCheckResourceAttr(resourceName, "tags.1", "arch-64bit"),
-					resource.TestCheckResourceAttr(resourceName, "tags.2", "distro-ubuntu"),
-					resource.TestCheckResourceAttr(resourceName, "tags.3", "distro-ver-16.04.5"),
-					resource.TestCheckResourceAttr(resourceName, "tags.4", "os-linux"),
-					resource.TestCheckResourceAttr(resourceName, "tags.5", "ubuntu-16.04-latest"),
-				),
-			},
-		},
-	})
-}
-
 func TestAccSakuraCloudDataSourceArchive_osType(t *testing.T) {
 	resourceName := "data.sakuracloud_archive.foobar"
 	resource.ParallelTest(t, resource.TestCase{
@@ -76,13 +51,6 @@ func TestAccSakuraCloudDataSourceArchive_withTag(t *testing.T) {
 		},
 	})
 }
-
-var testAccSakuraCloudDataSourceArchive_basic = `
-data "sakuracloud_archive" "foobar" {
-  filter {
-    names = ["Ubuntu Server 16"]
-  }
-}`
 
 var testAccCheckSakuraCloudDataSourceArchive_withTag = `
 data "sakuracloud_archive" "foobar" {
