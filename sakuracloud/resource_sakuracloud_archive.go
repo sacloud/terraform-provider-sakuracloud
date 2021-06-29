@@ -53,7 +53,7 @@ func resourceSakuraCloudArchive() *schema.Resource {
 				Type:             schema.TypeInt,
 				Optional:         true,
 				ForceNew:         true,
-				Default:          20,
+				Computed:         true,
 				ValidateDiagFunc: validation.ToDiagFunc(validation.IntInSlice(types.ArchiveSizes)),
 				Description:      descf("The size of %s in GiB. This must be one of [%s]", resourceName, types.ArchiveSizes),
 				ConflictsWith:    []string{"source_disk_id", "source_archive_id", "source_shared_key", "source_archive_zone"},
