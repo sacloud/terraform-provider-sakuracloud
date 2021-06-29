@@ -1,6 +1,13 @@
 ## 2.9.3 (Unreleased)
 
+IMPROVEMENTS
+
 - Terraform Plugin SDK v2.7.0 [GH-840] (@yamamoto-febc)
+
+FIXES
+
+- Moved default size setting from the schema definition section [GH-843] (@yamamoto-febc)
+
 
 ## 2.9.2 (2021-06-24)
 
