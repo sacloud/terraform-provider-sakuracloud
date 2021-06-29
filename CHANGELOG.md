@@ -1,4 +1,4 @@
-## 2.9.3 (Unreleased)
+## 2.9.3 (2021-06-29)
 
 IMPROVEMENTS
 
