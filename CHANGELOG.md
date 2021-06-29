@@ -3,6 +3,7 @@
 IMPROVEMENTS
 
 - Terraform Plugin SDK v2.7.0 [GH-840] (@yamamoto-febc)
+- Rename flag from -debuggable to -debug [GH-844] (@yamamoto-febc)
 
 FIXES
 
