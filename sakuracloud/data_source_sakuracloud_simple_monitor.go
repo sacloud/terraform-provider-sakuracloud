@@ -40,6 +40,11 @@ func dataSourceSakuraCloudSimpleMonitor() *schema.Resource {
 				Computed:    true,
 				Description: "The interval in seconds between checks",
 			},
+			"timeout": {
+				Type:        schema.TypeInt,
+				Computed:    true,
+				Description: "The timeout in seconds for monitoring",
+			},
 			"health_check": {
 				Type:     schema.TypeList,
 				Computed: true,

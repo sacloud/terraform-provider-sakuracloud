@@ -60,6 +60,16 @@ func resourceSakuraCloudSimpleMonitor() *schema.Resource {
 					descRange(60, 3600),
 				),
 			},
+			"timeout": {
+				Type:             schema.TypeInt,
+				Optional:         true,
+				Computed:         true,
+				ValidateDiagFunc: validation.ToDiagFunc(validation.IntBetween(10, 30)),
+				Description: descf(
+					"The timeout in seconds for monitoring. %s",
+					descRange(10, 30),
+				),
+			},
 			"health_check": {
 				Type:     schema.TypeList,
 				Required: true,
@@ -290,6 +300,7 @@ func resourceSakuraCloudSimpleMonitorDelete(ctx context.Context, d *schema.Resou
 func setSimpleMonitorResourceData(ctx context.Context, d *schema.ResourceData, client *APIClient, data *sacloud.SimpleMonitor) diag.Diagnostics {
 	d.Set("target", data.Target)                                       // nolint
 	d.Set("delay_loop", data.DelayLoop)                                // nolint
+	d.Set("timeout", data.Timeout)                                     // nolint
 	d.Set("icon_id", data.IconID.String())                             // nolint
 	d.Set("description", data.Description)                             // nolint
 	d.Set("enabled", data.Enabled.Bool())                              // nolint

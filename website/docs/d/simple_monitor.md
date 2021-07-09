@@ -56,7 +56,7 @@ A `condition` block supports the following:
 * `notify_slack_webhook` - The webhook URL for sending notification by slack/discord.
 * `tags` - Any tags assigned to the SimpleMonitor.
 * `target` - The monitoring target of the simple monitor. This will be IP address or FQDN.
-
+* `timeout` - The timeout in seconds for monitoring.
 
 ---
 
