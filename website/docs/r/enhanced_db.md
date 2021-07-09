@@ -47,7 +47,7 @@ The `timeouts` block allows you to specify [timeouts](https://www.terraform.io/d
 
 * `id` - The id of the sakuracloud_enhanced_db.
 * `database_type` - The type of database.
-* `host_name` - The name of database host. This will be built from `database_name` + `tidb-is1.db.sakurausercontent.com`.
+* `hostname` - The name of database host. This will be built from `database_name` + `tidb-is1.db.sakurausercontent.com`.
 * `max_connections` - The value of max connections setting.
 * `region` - The region name.
 

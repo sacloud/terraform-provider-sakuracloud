@@ -55,7 +55,7 @@ func TestAccSakuraCloudEnhancedDB_basic(t *testing.T) {
 					resource.TestCheckResourceAttr(resourceName, "database_type", "tidb"),
 					resource.TestCheckResourceAttr(resourceName, "region", "is1"),
 					resource.TestCheckResourceAttr(resourceName, "max_connections", "50"),
-					resource.TestCheckResourceAttr(resourceName, "host_name", databaseName+".tidb-is1.db.sakurausercontent.com"),
+					resource.TestCheckResourceAttr(resourceName, "hostname", databaseName+".tidb-is1.db.sakurausercontent.com"),
 
 					resource.TestCheckResourceAttrPair(
 						resourceName, "icon_id",

@@ -45,7 +45,7 @@ func dataSourceSakuraCloudEnhancedDB() *schema.Resource {
 				Computed:    true,
 				Description: "The type of database",
 			},
-			"host_name": {
+			"hostname": {
 				Type:        schema.TypeString,
 				Computed:    true,
 				Description: "The name of database host. This will be built from `database_name` + `tidb-is1.db.sakurausercontent.com`",

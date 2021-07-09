@@ -47,7 +47,7 @@ A `condition` block supports the following:
 * `database_name` - The name of database.
 * `database_type` - The type of database.
 * `description` - The description of the EnhancedDB.
-* `host_name` - The name of database host. This will be built from `database_name` + `tidb-is1.db.sakurausercontent.com`.
+* `hostname` - The name of database host. This will be built from `database_name` + `tidb-is1.db.sakurausercontent.com`.
 * `icon_id` - The icon id attached to the EnhancedDB.
 * `max_connections` - The value of max connections setting.
 * `name` - The name of the EnhancedDB.

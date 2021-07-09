@@ -61,7 +61,7 @@ func resourceSakuraCloudEnhancedDB() *schema.Resource {
 				Computed:    true,
 				Description: "The type of database",
 			},
-			"host_name": {
+			"hostname": {
 				Type:        schema.TypeString,
 				Computed:    true,
 				Description: "The name of database host. This will be built from `database_name` + `tidb-is1.db.sakurausercontent.com`",
@@ -168,7 +168,7 @@ func setEnhancedDBResourceData(ctx context.Context, d *schema.ResourceData, clie
 	d.Set("database_type", data.DatabaseType)     // nolint
 	d.Set("database_name", data.DatabaseName)     // nolint
 	d.Set("region", data.Region)                  // nolint
-	d.Set("host_name", data.HostName)             // nolint
+	d.Set("hostname", data.HostName)              // nolint
 	d.Set("max_connections", data.MaxConnections) // nolint
 
 	return diag.FromErr(d.Set("tags", flattenTags(data.Tags)))
