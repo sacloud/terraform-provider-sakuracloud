@@ -1,3 +1,16 @@
+## 2.10.0 (Unreleased)
+
+FEATURES
+
+- Enhanced Database [GH-847] by @yamamoto-febc
+- SimpleMonitor: timeout [GH-850] by @yamamoto-febc
+- ELB: supports syslog block and ssl_policy field [GH-849] by @yamamoto-febc
+
+MISC
+
+- libsacloud v2.20.0 [GH-851] by @yamamoto-febc
+- Update dev env [GH-848] by @yamamoto-febc
+
 ## 2.9.3 (2021-06-29)
 
 IMPROVEMENTS
