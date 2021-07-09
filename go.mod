@@ -9,6 +9,6 @@ require (
 	github.com/mitchellh/go-homedir v1.1.0
 	github.com/sacloud/ftps v1.1.0
 	github.com/sacloud/iso9660wrap v0.0.0-20171031075302-eda21f77f6a8
-	github.com/sacloud/libsacloud/v2 v2.19.1
+	github.com/sacloud/libsacloud/v2 v2.19.2-0.20210708085023-8ace2030abf8
 	github.com/stretchr/testify v1.7.0
 )

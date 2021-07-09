@@ -19,6 +19,11 @@ resource "sakuracloud_proxylb" "foobar" {
     port       = 80
   }
 
+  syslog {
+    server = "192.0.2.1"
+    port   = 514
+  }
+
   bind_port {
     proxy_mode = "http"
     port       = 80

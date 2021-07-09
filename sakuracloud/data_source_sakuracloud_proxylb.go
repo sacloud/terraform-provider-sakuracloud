@@ -60,6 +60,24 @@ func dataSourceSakuraCloudProxyLB() *schema.Resource {
 					types.ProxyLBRegionStrings,
 				),
 			},
+			"syslog": {
+				Type:     schema.TypeList,
+				Computed: true,
+				Elem: &schema.Resource{
+					Schema: map[string]*schema.Schema{
+						"server": {
+							Type:        schema.TypeString,
+							Computed:    true,
+							Description: "The address of syslog server",
+						},
+						"port": {
+							Type:        schema.TypeInt,
+							Computed:    true,
+							Description: "The number of syslog port",
+						},
+					},
+				},
+			},
 			"bind_port": {
 				Type:     schema.TypeList,
 				Computed: true,
@@ -87,6 +105,11 @@ func dataSourceSakuraCloudProxyLB() *schema.Resource {
 							Type:        schema.TypeBool,
 							Computed:    true,
 							Description: "The flag to enable HTTP/2. This flag is used only when `proxy_mode` is `https`",
+						},
+						"ssl_policy": {
+							Type:        schema.TypeString,
+							Computed:    true,
+							Description: "The ssl policy",
 						},
 						"response_header": {
 							Type:     schema.TypeList,

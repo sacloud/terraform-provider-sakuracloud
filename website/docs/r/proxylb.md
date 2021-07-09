@@ -34,6 +34,11 @@ resource "sakuracloud_proxylb" "foobar" {
     port       = 80
   }
 
+  syslog {
+    server = "192.0.2.1"
+    port   = 514
+  }
+  
   bind_port {
     proxy_mode = "http"
     port       = 80
@@ -123,6 +128,8 @@ A `additional_certificate` block supports the following:
 * `sorry_server` - (Optional) A `sorry_server` block as defined below.
 * `sticky_session` - (Optional) The flag to enable sticky session.
 * `gzip` - (Optional) The flag to enable gzip compression.
+* `syslog` - (Optional) A `syslog` block as defined below.
+
 ---
 
 A `bind_port` block supports the following:
@@ -132,6 +139,7 @@ A `bind_port` block supports the following:
 * `redirect_to_https` - (Optional) The flag to enable redirection from http to https. This flag is used only when `proxy_mode` is `http`.
 * `response_header` - (Optional) One or more `response_header` blocks as defined below.
 * `support_http2` - (Optional) The flag to enable HTTP/2. This flag is used only when `proxy_mode` is `https`.
+* `ssl_policy` - (Optional) The ssl policy. This must be one of [`TLS-1-2-2019-04`/`TLS-1-2-2021-06`/`TLS-1-3-2021-06`].
 
 ---
 
@@ -179,6 +187,13 @@ A `sorry_server` block supports the following:
 
 * `ip_address` - (Required) The IP address of the SorryServer. This will be used when all servers are down.
 * `port` - (Optional) The port number of the SorryServer. This will be used when all servers are down.
+
+---
+
+A `syslog` block supports the following:
+
+* `port` - (Optional) The number of syslog port.
+* `server` - (Optional) The address of syslog server.
 
 #### Common Arguments
 
