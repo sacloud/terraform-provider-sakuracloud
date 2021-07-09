@@ -69,8 +69,11 @@ func TestAccSakuraCloudProxyLB_basic(t *testing.T) {
 					resource.TestCheckResourceAttr(resourceName, "health_check.0.path", "/"),
 					resource.TestCheckResourceAttr(resourceName, "sorry_server.0.ip_address", ip),
 					resource.TestCheckResourceAttr(resourceName, "sorry_server.0.port", "80"),
+					resource.TestCheckResourceAttr(resourceName, "syslog.0.server", "133.242.0.1"),
+					resource.TestCheckResourceAttr(resourceName, "syslog.0.port", "514"),
 					resource.TestCheckResourceAttr(resourceName, "bind_port.0.proxy_mode", "http"),
 					resource.TestCheckResourceAttr(resourceName, "bind_port.0.port", "80"),
+					resource.TestCheckResourceAttr(resourceName, "bind_port.0.ssl_policy", ""),
 					resource.TestCheckResourceAttr(resourceName, "bind_port.0.response_header.#", "1"),
 					resource.TestCheckResourceAttr(resourceName, "bind_port.0.response_header.0.header", "Cache-Control"),
 					resource.TestCheckResourceAttr(resourceName, "bind_port.0.response_header.0.value", "public, max-age=10"),
@@ -120,8 +123,11 @@ func TestAccSakuraCloudProxyLB_basic(t *testing.T) {
 					resource.TestCheckResourceAttr(resourceName, "health_check.0.host_header", ""),
 					resource.TestCheckResourceAttr(resourceName, "health_check.0.path", ""),
 					resource.TestCheckNoResourceAttr(resourceName, "sorry_server.0.ip_address.#"),
+					resource.TestCheckResourceAttr(resourceName, "syslog.0.server", ""),
+					resource.TestCheckResourceAttr(resourceName, "syslog.0.port", "514"),
 					resource.TestCheckResourceAttr(resourceName, "bind_port.0.proxy_mode", "https"),
 					resource.TestCheckResourceAttr(resourceName, "bind_port.0.port", "443"),
+					resource.TestCheckResourceAttr(resourceName, "bind_port.0.ssl_policy", "TLS-1-3-2021-06"),
 					resource.TestCheckResourceAttr(resourceName, "bind_port.0.response_header.#", "0"),
 					resource.TestCheckResourceAttr(resourceName, "server.0.port", "443"),
 					resource.TestCheckResourceAttr(resourceName, "server.0.enabled", "true"),
@@ -281,6 +287,11 @@ resource "sakuracloud_proxylb" "foobar" {
     port       = 80
   }
 
+  syslog {
+    server = "133.242.0.1"
+    port   = 514
+  }
+
   bind_port {
     proxy_mode = "http"
     port       = 80
@@ -343,6 +354,7 @@ resource "sakuracloud_proxylb" "foobar" {
   bind_port {
     proxy_mode = "https"
     port       = 443
+    ssl_policy = "TLS-1-3-2021-06"
   }
 
   server {

@@ -179,6 +179,7 @@ func resourceSakuraCloudProxyLBACMECreate(ctx context.Context, d *schema.Resourc
 		StickySession: proxyLB.StickySession,
 		Timeout:       proxyLB.Timeout,
 		Gzip:          proxyLB.Gzip,
+		Syslog:        proxyLB.Syslog,
 		SettingsHash:  proxyLB.SettingsHash,
 	})
 	if err != nil {
@@ -242,6 +243,7 @@ func resourceSakuraCloudProxyLBACMEDelete(ctx context.Context, d *schema.Resourc
 		StickySession: proxyLB.StickySession,
 		Timeout:       proxyLB.Timeout,
 		Gzip:          proxyLB.Gzip,
+		Syslog:        proxyLB.Syslog,
 		SettingsHash:  proxyLB.SettingsHash,
 	})
 	if err != nil {

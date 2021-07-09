@@ -30,6 +30,7 @@ func expandProxyLBCreateRequest(d *schema.ResourceData) *sacloud.ProxyLBCreateRe
 		Rules:          expandProxyLBRules(d),
 		StickySession:  expandProxyLBStickySession(d),
 		Gzip:           expandProxyLBGzip(d),
+		Syslog:         expandProxyLBSyslog(d),
 		Timeout:        expandProxyLBTimeout(d),
 		UseVIPFailover: d.Get("vip_failover").(bool),
 		Region:         types.EProxyLBRegion(d.Get("region").(string)),
@@ -49,12 +50,26 @@ func expandProxyLBUpdateRequest(d *schema.ResourceData) *sacloud.ProxyLBUpdateRe
 		Rules:         expandProxyLBRules(d),
 		StickySession: expandProxyLBStickySession(d),
 		Gzip:          expandProxyLBGzip(d),
+		Syslog:        expandProxyLBSyslog(d),
 		Timeout:       expandProxyLBTimeout(d),
 		Name:          d.Get("name").(string),
 		Description:   d.Get("description").(string),
 		Tags:          expandTags(d),
 		IconID:        expandSakuraCloudID(d, "icon_id"),
 	}
+}
+
+func flattenProxyLBSyslog(proxyLB *sacloud.ProxyLB) []interface{} {
+	syslog := proxyLB.Syslog
+	if syslog != nil {
+		return []interface{}{
+			map[string]interface{}{
+				"server": syslog.Server,
+				"port":   syslog.Port,
+			},
+		}
+	}
+	return nil
 }
 
 func flattenProxyLBBindPorts(proxyLB *sacloud.ProxyLB) []interface{} {
@@ -73,6 +88,7 @@ func flattenProxyLBBindPorts(proxyLB *sacloud.ProxyLB) []interface{} {
 			"port":              bindPort.Port,
 			"redirect_to_https": bindPort.RedirectToHTTPS,
 			"support_http2":     bindPort.SupportHTTP2,
+			"ssl_policy":        bindPort.SSLPolicy,
 			"response_header":   headers,
 		})
 	}
@@ -206,6 +222,17 @@ func expandProxyLBGzip(d resourceValueGettable) *sacloud.ProxyLBGzip {
 	return nil
 }
 
+func expandProxyLBSyslog(d resourceValueGettable) *sacloud.ProxyLBSyslog {
+	if syslog, ok := getListFromResource(d, "syslog"); ok && len(syslog) == 1 {
+		values := mapToResourceData(syslog[0].(map[string]interface{}))
+		return &sacloud.ProxyLBSyslog{
+			Server: values.Get("server").(string),
+			Port:   values.Get("port").(int),
+		}
+	}
+	return &sacloud.ProxyLBSyslog{Port: 514}
+}
+
 func expandProxyLBBindPorts(d resourceValueGettable) []*sacloud.ProxyLBBindPort {
 	var results []*sacloud.ProxyLBBindPort
 	if bindPorts, ok := getListFromResource(d, "bind_port"); ok {
@@ -230,6 +257,7 @@ func expandProxyLBBindPorts(d resourceValueGettable) []*sacloud.ProxyLBBindPort 
 				Port:              values.Get("port").(int),
 				RedirectToHTTPS:   values.Get("redirect_to_https").(bool),
 				SupportHTTP2:      values.Get("support_http2").(bool),
+				SSLPolicy:         values.Get("ssl_policy").(string),
 				AddResponseHeader: headers,
 			})
 		}

@@ -79,6 +79,29 @@ func resourceSakuraCloudProxyLB() *schema.Resource {
 					types.ProxyLBRegionStrings,
 				),
 			},
+			"syslog": {
+				Type:     schema.TypeList,
+				Optional: true,
+				Computed: true,
+				MaxItems: 1,
+				MinItems: 1,
+				Elem: &schema.Resource{
+					Schema: map[string]*schema.Schema{
+						"server": {
+							Type:             schema.TypeString,
+							Optional:         true,
+							ValidateDiagFunc: validation.ToDiagFunc(validation.IsIPv4Address),
+							Description:      "The address of syslog server",
+						},
+						"port": {
+							Type:        schema.TypeInt,
+							Optional:    true,
+							Computed:    true,
+							Description: "The number of syslog port",
+						},
+					},
+				},
+			},
 			"bind_port": {
 				Type:     schema.TypeList,
 				Required: true,
@@ -109,6 +132,15 @@ func resourceSakuraCloudProxyLB() *schema.Resource {
 							Type:        schema.TypeBool,
 							Optional:    true,
 							Description: "The flag to enable HTTP/2. This flag is used only when `proxy_mode` is `https`",
+						},
+						"ssl_policy": {
+							Type:             schema.TypeString,
+							Optional:         true,
+							ValidateDiagFunc: validation.ToDiagFunc(validation.StringInSlice(types.ProxyLBSSLPolicies, false)),
+							Description: descf(
+								"The ssl policy. This must be one of [%s]",
+								types.ProxyLBSSLPolicies,
+							),
 						},
 						"response_header": {
 							Type:     schema.TypeList,
@@ -541,6 +573,9 @@ func setProxyLBResourceData(ctx context.Context, d *schema.ResourceData, client 
 	}
 	d.Set("icon_id", data.IconID.String()) // nolint
 	d.Set("description", data.Description) // nolint
+	if err := d.Set("syslog", flattenProxyLBSyslog(data)); err != nil {
+		return diag.FromErr(err)
+	}
 	if err := d.Set("bind_port", flattenProxyLBBindPorts(data)); err != nil {
 		return diag.FromErr(err)
 	}

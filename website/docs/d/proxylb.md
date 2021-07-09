@@ -58,6 +58,7 @@ A `condition` block supports the following:
 * `server` - A list of `server` blocks as defined below.
 * `sorry_server` - A list of `sorry_server` blocks as defined below.
 * `sticky_session` - The flag to enable sticky session.
+* `syslog` - A list of `syslog` blocks as defined below.
 * `tags` - Any tags assigned to the ProxyLB.
 * `timeout` - The timeout duration in seconds.
 * `vip` - The virtual IP address assigned to the ProxyLB.
@@ -140,4 +141,9 @@ A `sorry_server` block exports the following:
 * `ip_address` - The IP address of the SorryServer. This will be used when all servers are down.
 * `port` - The port number of the SorryServer. This will be used when all servers are down.
 
+---
 
+A `syslog` block exports the following:
+
+* `port` - The number of syslog port.
+* `server` - The address of syslog server.
