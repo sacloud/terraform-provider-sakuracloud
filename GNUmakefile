@@ -17,7 +17,7 @@ WEBSITE_REPO  = github.com/hashicorp/terraform-website
 
 AUTHOR          ?="terraform-provider-sakuracloud authors"
 COPYRIGHT_YEAR  ?="2016-2021"
-COPYRIGHT_FILES ?=$$(find . \( -name "*.dockerfile" -or -name "*.go" -or -name "*.sh" -or -name "*.pl" -or -name "*.bash" \) -print | grep -v "/vendor/")
+COPYRIGHT_FILES ?=$$(find . \( -name "*.dockerfile" -or -name "*.go" -or -name "*.sh" -or -name "*.pl" -or -name "*.bash" \) -print)
 
 UNIT_TEST_UA ?= (Unit Test)
 ACC_TEST_UA ?= (Acceptance Test)
@@ -31,12 +31,12 @@ clean:
 
 .PHONY: tools
 tools:
-	GO111MODULE=off go get golang.org/x/tools/cmd/goimports
-	(cd tools; go install github.com/sacloud/addlicense)
-	(cd tools; go install github.com/bflad/tfproviderlint/cmd/tfproviderlintx)
-	(cd tools; go install github.com/client9/misspell/cmd/misspell)
-	(cd tools; go install github.com/bflad/tfproviderdocs)
-	curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/v1.37.0/install.sh | sh -s -- -b $$(go env GOPATH)/bin v1.37.0
+	go install golang.org/x/tools/cmd/goimports@v0.1.0
+	go install github.com/sacloud/addlicense@master
+	go install github.com/bflad/tfproviderlint/cmd/tfproviderlintx@v0.27.0
+	go install github.com/client9/misspell/cmd/misspell@v0.3.4
+	go install github.com/bflad/tfproviderdocs@v0.9.1
+	curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/v1.41.1/install.sh | sh -s -- -b $$(go env GOPATH)/bin v1.41.1
 
 
 .PHONY: build-envs
@@ -91,7 +91,7 @@ goimports:
 
 .PHONY: fmt
 fmt:
-	find . -name '*.go' | grep -v vendor | xargs gofmt -s -w
+	find . -name '*.go' | xargs gofmt -s -w
 
 .PHONY: docscheck
 docscheck:
