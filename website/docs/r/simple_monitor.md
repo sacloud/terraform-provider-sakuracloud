@@ -17,6 +17,8 @@ resource "sakuracloud_simple_monitor" "foobar" {
   target = "www.example.com"
 
   delay_loop = 60
+  timeout    = 10
+  
   health_check {
     protocol        = "https"
     port            = 443
@@ -45,6 +47,7 @@ resource "sakuracloud_simple_monitor" "foobar" {
 * `target` - (Required) The monitoring target of the simple monitor. This must be IP address or FQDN. Changing this forces a new resource to be created.
 * `health_check` - (Required) A `health_check` block as defined below.
 * `delay_loop` - (Optional) The interval in seconds between checks. This must be in the range [`60`-`3600`]. Default:`60`.
+* `timeout` - (Optional) The timeout in seconds for monitoring. This must be in the range [`10`-`30`].  
 * `enabled` - (Optional) The flag to enable monitoring by the simple monitor. Default:`true`.
 
 ---

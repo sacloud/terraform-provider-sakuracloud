@@ -2,6 +2,8 @@ resource "sakuracloud_simple_monitor" "foobar" {
   target = "www.example.com"
 
   delay_loop = 60
+  timeout    = 10
+
   health_check {
     protocol        = "https"
     port            = 443

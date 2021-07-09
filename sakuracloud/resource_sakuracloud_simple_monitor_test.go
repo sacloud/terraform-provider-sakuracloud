@@ -41,6 +41,7 @@ func TestAccSakuraCloudSimpleMonitor_basic(t *testing.T) {
 					testCheckSakuraCloudSimpleMonitorExists(resourceName, &monitor),
 					testCheckSakuraCloudSimpleMonitorAttributes(&monitor),
 					resource.TestCheckResourceAttr(resourceName, "delay_loop", "60"),
+					resource.TestCheckResourceAttr(resourceName, "timeout", "20"),
 					resource.TestCheckResourceAttr(resourceName, "health_check.0.protocol", "https"),
 					resource.TestCheckResourceAttr(resourceName, "health_check.0.port", "8443"),
 					resource.TestCheckResourceAttr(resourceName, "health_check.0.contains_string", "ok"),
@@ -65,6 +66,7 @@ func TestAccSakuraCloudSimpleMonitor_basic(t *testing.T) {
 				Check: resource.ComposeTestCheckFunc(
 					testCheckSakuraCloudSimpleMonitorExists(resourceName, &monitor),
 					testCheckSakuraCloudSimpleMonitorAttributesUpdated(&monitor),
+					resource.TestCheckResourceAttr(resourceName, "timeout", "30"),
 					resource.TestCheckResourceAttr(resourceName, "health_check.0.protocol", "http"),
 					resource.TestCheckResourceAttr(resourceName, "health_check.0.port", "80"),
 					resource.TestCheckResourceAttr(resourceName, "health_check.0.host_header", "usacloud.jp"),
@@ -184,6 +186,7 @@ var testAccSakuraCloudSimpleMonitor_basic = `
 resource "sakuracloud_simple_monitor" "foobar" {
   target     = "{{ .arg0 }}"
   delay_loop = 60
+  timeout    = 20
   health_check {
     protocol        = "https"
     port            = 8443
@@ -214,6 +217,7 @@ var testAccSakuraCloudSimpleMonitor_update = `
 resource "sakuracloud_simple_monitor" "foobar" {
   target     = "{{ .arg0 }}"
   delay_loop = 120
+  timeout    = 30
   health_check {
     protocol    = "http"
     port        = 80
