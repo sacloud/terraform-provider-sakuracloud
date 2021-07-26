@@ -1,3 +1,8 @@
+## 2.10.2 (Unreleased)
+
+FIXES
+  - libsacloud v2.21.1 [GH-854] (@yamamoto-febc)
+
 ## 2.10.1 (2021-07-19)
 
 FIXES
