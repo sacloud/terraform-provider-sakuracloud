@@ -23,10 +23,12 @@ import (
 	"io"
 	"os"
 	"strconv"
+	"strings"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
 	"github.com/mitchellh/go-homedir"
+	"github.com/sacloud/libsacloud/v2/helper/plans"
 	"github.com/sacloud/libsacloud/v2/sacloud/search"
 	"github.com/sacloud/libsacloud/v2/sacloud/search/keys"
 	"github.com/sacloud/libsacloud/v2/sacloud/types"
@@ -207,7 +209,13 @@ func expandTags(d resourceValueGettable) types.Tags {
 }
 
 func flattenTags(tags types.Tags) *schema.Set {
-	return stringListToSet(tags)
+	filtered := types.Tags{}
+	for _, t := range tags {
+		if !strings.HasPrefix(t, plans.PreviousIDTagName) {
+			filtered = append(filtered, t)
+		}
+	}
+	return stringListToSet(filtered)
 }
 
 func expandSubjectAltNames(d resourceValueGettable) []string {

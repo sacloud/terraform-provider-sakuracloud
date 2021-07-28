@@ -158,16 +158,15 @@ func resourceSakuraCloudInternetRead(ctx context.Context, d *schema.ResourceData
 		return diag.FromErr(err)
 	}
 
-	internetOp := sacloud.NewInternetOp(client)
-
-	internet, err := internetOp.Read(ctx, zone, sakuraCloudID(d.Id()))
+	internet, err := query.ReadRouter(ctx, client, zone, sakuraCloudID(d.Id()))
 	if err != nil {
-		if sacloud.IsNotFoundError(err) {
+		if sacloud.IsNoResultsError(err) {
 			d.SetId("")
 			return nil
 		}
 		return diag.Errorf("could not read SakuraCloud Internet[%s]: %s", d.Id(), err)
 	}
+	d.SetId(internet.ID.String())
 	return setInternetResourceData(ctx, d, client, internet)
 }
 

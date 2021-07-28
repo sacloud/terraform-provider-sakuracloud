@@ -21,6 +21,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
+	"github.com/sacloud/libsacloud/v2/helper/query"
 	"github.com/sacloud/libsacloud/v2/sacloud"
 	"github.com/sacloud/libsacloud/v2/sacloud/types"
 )
@@ -454,15 +455,15 @@ func resourceSakuraCloudProxyLBRead(ctx context.Context, d *schema.ResourceData,
 		return diag.FromErr(err)
 	}
 
-	proxyLBOp := sacloud.NewProxyLBOp(client)
-	proxyLB, err := proxyLBOp.Read(ctx, sakuraCloudID(d.Id()))
+	proxyLB, err := query.ReadProxyLB(ctx, client, sakuraCloudID(d.Id()))
 	if err != nil {
-		if sacloud.IsNotFoundError(err) {
+		if sacloud.IsNoResultsError(err) {
 			d.SetId("")
 			return nil
 		}
 		return diag.Errorf("could not read SakuraCloud ProxyLB[%s]: %s", d.Id(), err)
 	}
+	d.SetId(proxyLB.ID.String())
 
 	return setProxyLBResourceData(ctx, d, client, proxyLB)
 }
