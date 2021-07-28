@@ -1,3 +1,8 @@
+## 2.11.0 (Unreleased)
+
+FEATURES:
+  - Support @previous-id tags for server/internet/proxylb [GH-855] (@yamamoto-febc)
+
 ## 2.10.2 (2021-07-26)
 
 FIXES
