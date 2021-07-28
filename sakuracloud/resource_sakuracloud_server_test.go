@@ -22,6 +22,8 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
+	"github.com/sacloud/libsacloud/v2/helper/plans"
+	"github.com/sacloud/libsacloud/v2/helper/power"
 	"github.com/sacloud/libsacloud/v2/sacloud"
 	"github.com/sacloud/libsacloud/v2/sacloud/types"
 )
@@ -149,6 +151,65 @@ func TestAccSakuraCloudServer_planChange(t *testing.T) {
 					resource.TestCheckResourceAttr(resourceName, "core", "2"),
 					resource.TestCheckResourceAttr(resourceName, "memory", "4"),
 					resource.TestCheckResourceAttr(resourceName, "commitment", "standard"),
+				),
+			},
+		},
+	})
+}
+
+func TestAccSakuraCloudServer_planChangeByOutsideOfTerraform(t *testing.T) {
+	resourceName := "sakuracloud_server.foobar"
+	rand := randomName()
+	password := randomPassword()
+
+	var step1, step2, step3 sacloud.Server
+	resource.ParallelTest(t, resource.TestCase{
+		PreCheck:          func() { testAccPreCheck(t) },
+		ProviderFactories: testAccProviderFactories,
+		CheckDestroy:      testCheckSakuraCloudServerDestroy,
+		Steps: []resource.TestStep{
+			{
+				Config:             buildConfigWithArgs(testAccSakuraCloudServer_standardPlan, rand, password),
+				ExpectNonEmptyPlan: true, // Terraform外での変更を擬似的にStepの中で行うためtrueにしておく
+				Check: resource.ComposeTestCheckFunc(
+					testCheckSakuraCloudServerExists(resourceName, &step1),
+					resource.TestCheckResourceAttr(resourceName, "name", rand),
+					resource.TestCheckResourceAttr(resourceName, "core", "2"),
+					resource.TestCheckResourceAttr(resourceName, "memory", "4"),
+					resource.TestCheckResourceAttr(resourceName, "commitment", "standard"),
+					func(*terraform.State) error {
+						client := testAccProvider.Meta().(*APIClient)
+						ctx := context.Background()
+						// shutdown
+						if err := power.ShutdownServer(ctx, sacloud.NewServerOp(client), step1.Zone.Name, step1.ID, true); err != nil {
+							return err
+						}
+
+						updated, err := plans.ChangeServerPlan(
+							context.Background(), client, step1.Zone.Name, step1.ID,
+							1, 1, types.Commitments.Standard, types.PlanGenerations.Default)
+						if err != nil {
+							return err
+						}
+						step2 = *updated
+						return nil
+					},
+				),
+			},
+			{
+				Config: buildConfigWithArgs(testAccSakuraCloudServer_standardPlan, rand, password),
+				Check: resource.ComposeTestCheckFunc(
+					testCheckSakuraCloudServerExists(resourceName, &step3),
+					resource.TestCheckResourceAttr(resourceName, "name", rand),
+					resource.TestCheckResourceAttr(resourceName, "core", "2"),
+					resource.TestCheckResourceAttr(resourceName, "memory", "4"),
+					resource.TestCheckResourceAttr(resourceName, "commitment", "standard"),
+					func(*terraform.State) error {
+						if step1.ID == step2.ID || step1.ID == step3.ID || step2.ID == step3.ID {
+							return fmt.Errorf("server plan changed, but id is not updated")
+						}
+						return nil
+					},
 				),
 			},
 		},

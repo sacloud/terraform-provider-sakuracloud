@@ -316,15 +316,15 @@ func resourceSakuraCloudServerRead(ctx context.Context, d *schema.ResourceData, 
 		return diag.FromErr(err)
 	}
 
-	serverOp := sacloud.NewServerOp(client)
-	server, err := serverOp.Read(ctx, zone, sakuraCloudID(d.Id()))
+	server, err := query.ReadServer(ctx, client, zone, sakuraCloudID(d.Id()))
 	if err != nil {
-		if sacloud.IsNotFoundError(err) {
+		if sacloud.IsNoResultsError(err) {
 			d.SetId("")
 			return nil
 		}
 		return diag.Errorf("could not read SakuraCloud Server[%s]: %s", d.Id(), err)
 	}
+	d.SetId(server.ID.String())
 
 	return setServerResourceData(ctx, d, client, server)
 }
