@@ -50,7 +50,15 @@ func expandServerBuilder(ctx context.Context, zone string, d *schema.ResourceDat
 		Client:          serverBuilder.NewBuildersAPIClient(client),
 		ForceShutdown:   d.Get("force_shutdown").(bool),
 		BootAfterCreate: true,
+		UserData:        expandServerUserData(ctx, d),
 	}, nil
+}
+
+func expandServerUserData(_ context.Context, d *schema.ResourceData) string {
+	if d.HasChanges("user_data") {
+		return d.Get("user_data").(string)
+	}
+	return ""
 }
 
 func expandServerDisks(ctx context.Context, zone string, d *schema.ResourceData, client *APIClient) ([]diskBuilder.Builder, error) {

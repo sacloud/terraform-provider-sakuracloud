@@ -142,11 +142,17 @@ func resourceSakuraCloudServer() *schema.Resource {
 			"description": schemaResourceDescription(resourceName),
 			"tags":        schemaResourceTags(resourceName),
 			"zone":        schemaResourceZone(resourceName),
+			"user_data": {
+				Type:          schema.TypeString,
+				Optional:      true,
+				ConflictsWith: []string{"disk_edit_parameter"},
+			},
 			"disk_edit_parameter": {
-				Type:     schema.TypeList,
-				Optional: true,
-				MaxItems: 1,
-				MinItems: 1,
+				Type:          schema.TypeList,
+				Optional:      true,
+				MaxItems:      1,
+				MinItems:      1,
+				ConflictsWith: []string{"user_data"},
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
 						"hostname": {
