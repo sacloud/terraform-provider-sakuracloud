@@ -18,6 +18,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"os"
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
@@ -399,6 +400,63 @@ func TestAccSakuraCloudServer_switch(t *testing.T) {
 					resource.TestCheckResourceAttr(resourceName, "ip_address", "192.168.0.2"),
 					resource.TestCheckResourceAttr(resourceName, "netmask", "24"),
 					resource.TestCheckResourceAttr(resourceName, "gateway", "192.168.0.1"),
+				),
+			},
+		},
+	})
+}
+
+const envCloudInitDiskID = "SAKURACLOUD_CLOUD_INIT_DISK"
+
+func TestAccSakuraCloudServer_cloudInit(t *testing.T) {
+	skipIfEnvIsNotSet(t, envCloudInitDiskID)
+
+	resourceName := "sakuracloud_server.foobar"
+	rand := randomName()
+	password := randomPassword()
+	diskID := os.Getenv(envCloudInitDiskID)
+
+	var created, updated, userDataChanged sacloud.Server
+	resource.ParallelTest(t, resource.TestCase{
+		PreCheck:          func() { testAccPreCheck(t) },
+		ProviderFactories: testAccProviderFactories,
+		CheckDestroy:      testCheckSakuraCloudServerDestroy,
+		Steps: []resource.TestStep{
+			{
+				Config: buildConfigWithArgs(testAccSakuraCloudServer_cloudInit, rand, password, diskID),
+				Check: resource.ComposeTestCheckFunc(
+					testCheckSakuraCloudServerExists(resourceName, &created),
+					resource.TestCheckResourceAttr(resourceName, "name", rand),
+				),
+			},
+			{
+				Config: buildConfigWithArgs(testAccSakuraCloudServer_cloudInitUpdated, rand, password, diskID),
+				Check: resource.ComposeTestCheckFunc(
+					testCheckSakuraCloudServerExists(resourceName, &updated),
+					resource.TestCheckResourceAttr(resourceName, "name", rand+"_upd"),
+					func(state *terraform.State) error {
+						if !created.InstanceStatusChangedAt.Equal(updated.InstanceStatusChangedAt) {
+							return fmt.Errorf(
+								"unexpected shutdown has happened: ChangeAt: before: %s after: %s",
+								created.InstanceStatusChangedAt.String(),
+								updated.InstanceStatusChangedAt.String(),
+							)
+						}
+						return nil
+					},
+				),
+			},
+			{
+				Config: buildConfigWithArgs(testAccSakuraCloudServer_cloudInitUserDataUpdated, rand, password, diskID),
+				Check: resource.ComposeTestCheckFunc(
+					testCheckSakuraCloudServerExists(resourceName, &userDataChanged),
+					resource.TestCheckResourceAttr(resourceName, "name", rand),
+					func(state *terraform.State) error {
+						if updated.InstanceStatusChangedAt.Equal(userDataChanged.InstanceStatusChangedAt) {
+							return errors.New("expected shutdown has not happened")
+						}
+						return nil
+					},
 				),
 			},
 		},
@@ -933,5 +991,77 @@ resource "sakuracloud_server" "foobar" {
     hostname        = "{{ .arg0 }}"
     password        = "{{ .arg1 }}"
   }
+}
+`
+
+const testAccSakuraCloudServer_cloudInit = `
+resource "sakuracloud_server" "foobar" {
+  name        = "{{ .arg0 }}"
+  disks       = [{{ .arg2 }}]
+  network_interface {
+    upstream = "shared"
+  }
+  core   = 2
+  memory = 4
+
+  user_data = join("\n", [
+    "#cloud-config",
+    yamlencode({
+      hostname: "{{ .arg0 }}",
+      password: "{{ .arg1 }}",
+      chpasswd: {
+        expire: false,
+      }
+      ssh_pwauth: false,
+    }),
+  ])
+}
+`
+
+const testAccSakuraCloudServer_cloudInitUpdated = `
+resource "sakuracloud_server" "foobar" {
+  name        = "{{ .arg0 }}_upd"
+  disks       = [{{ .arg2 }}]
+  network_interface {
+    upstream = "shared"
+  }
+  core   = 2
+  memory = 4
+
+  user_data = join("\n", [
+    "#cloud-config",
+    yamlencode({
+      hostname: "{{ .arg0 }}",
+      password: "{{ .arg1 }}",
+      chpasswd: {
+        expire: false,
+      }
+      ssh_pwauth: false,
+    }),
+  ])
+}
+`
+
+const testAccSakuraCloudServer_cloudInitUserDataUpdated = `
+resource "sakuracloud_server" "foobar" {
+  name        = "{{ .arg0 }}"
+  disks       = [{{ .arg2 }}]
+  network_interface {
+    upstream = "shared"
+  }
+  core   = 2
+  memory = 4
+
+  user_data = join("\n", [
+    "#cloud-config",
+    yamlencode({
+      hostname: "{{ .arg0 }}-upd",
+      password: "{{ .arg1 }}",
+      chpasswd: {
+        expire: false,
+      }
+      ssh_pwauth: false,
+    }),
+  ])
 }
 `
