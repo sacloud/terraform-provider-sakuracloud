@@ -1,4 +1,4 @@
-## 2.12.0 (Unreleased)
+## 2.12.0 (2021-08-19)
 
 FEATURES:
   - cloud-init [GH-856] (@yamamoto-febc)
