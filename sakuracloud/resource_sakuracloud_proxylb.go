@@ -63,6 +63,11 @@ func resourceSakuraCloudProxyLB() *schema.Resource {
 				Optional:    true,
 				Description: "The flag to enable gzip compression",
 			},
+			"proxy_protocol": {
+				Type:        schema.TypeBool,
+				Optional:    true,
+				Description: "The flag to enable proxy protocol v2",
+			},
 			"timeout": {
 				Type:        schema.TypeInt,
 				Default:     10,
@@ -565,6 +570,7 @@ func setProxyLBResourceData(ctx context.Context, d *schema.ResourceData, client 
 	d.Set("vip_failover", data.UseVIPFailover)                 // nolint
 	d.Set("sticky_session", flattenProxyLBStickySession(data)) // nolint
 	d.Set("gzip", flattenProxyLBGzip(data))                    // nolint
+	d.Set("proxy_protocol", flattenProxyLBProxyProtocol(data)) // nolint
 	d.Set("timeout", flattenProxyLBTimeout(data))              // nolint
 	d.Set("region", data.Region.String())                      // nolint
 	d.Set("fqdn", data.FQDN)                                   // nolint

@@ -30,6 +30,7 @@ func expandProxyLBCreateRequest(d *schema.ResourceData) *sacloud.ProxyLBCreateRe
 		Rules:          expandProxyLBRules(d),
 		StickySession:  expandProxyLBStickySession(d),
 		Gzip:           expandProxyLBGzip(d),
+		ProxyProtocol:  expandProxyLBProxyProtocol(d),
 		Syslog:         expandProxyLBSyslog(d),
 		Timeout:        expandProxyLBTimeout(d),
 		UseVIPFailover: d.Get("vip_failover").(bool),
@@ -50,6 +51,7 @@ func expandProxyLBUpdateRequest(d *schema.ResourceData) *sacloud.ProxyLBUpdateRe
 		Rules:         expandProxyLBRules(d),
 		StickySession: expandProxyLBStickySession(d),
 		Gzip:          expandProxyLBGzip(d),
+		ProxyProtocol: expandProxyLBProxyProtocol(d),
 		Syslog:        expandProxyLBSyslog(d),
 		Timeout:       expandProxyLBTimeout(d),
 		Name:          d.Get("name").(string),
@@ -194,6 +196,13 @@ func flattenProxyLBGzip(proxyLB *sacloud.ProxyLB) bool {
 	return false
 }
 
+func flattenProxyLBProxyProtocol(proxyLB *sacloud.ProxyLB) bool {
+	if proxyLB.ProxyProtocol != nil {
+		return proxyLB.ProxyProtocol.Enabled
+	}
+	return false
+}
+
 func flattenProxyLBTimeout(proxyLB *sacloud.ProxyLB) int {
 	if proxyLB.Timeout != nil {
 		return proxyLB.Timeout.InactiveSec
@@ -216,6 +225,16 @@ func expandProxyLBGzip(d resourceValueGettable) *sacloud.ProxyLBGzip {
 	gzip := d.Get("gzip").(bool)
 	if gzip {
 		return &sacloud.ProxyLBGzip{
+			Enabled: true,
+		}
+	}
+	return nil
+}
+
+func expandProxyLBProxyProtocol(d resourceValueGettable) *sacloud.ProxyLBProxyProtocol {
+	v := d.Get("proxy_protocol").(bool)
+	if v {
+		return &sacloud.ProxyLBProxyProtocol{
 			Enabled: true,
 		}
 	}
