@@ -24,6 +24,23 @@ resource "sakuracloud_server" "foobar" {
     #  }
     # }
   }
+
+  # If you use cloud-init instead of disk_edit_parameter
+
+  # user_data = join("\n", [
+  #   "#cloud-config",
+  #   yamlencode({
+  #     hostname: "hostname",
+  #     password: "password",
+  #     chpasswd: {
+  #       expire: false,
+  #     }
+  #     ssh_pwauth: false,
+  #     ssh_authorized_keys: [
+  #       file("~/.ssh/id_rsa.pub"),
+  #     ],
+  #   }),
+  # ])
 }
 
 data "sakuracloud_packet_filter" "foobar" {

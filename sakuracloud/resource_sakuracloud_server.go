@@ -146,6 +146,7 @@ func resourceSakuraCloudServer() *schema.Resource {
 				Type:          schema.TypeString,
 				Optional:      true,
 				ConflictsWith: []string{"disk_edit_parameter"},
+				Description:   descf("A string representing the user data used by cloud-init. %s", descConflicts("disk_edit_parameter")),
 			},
 			"disk_edit_parameter": {
 				Type:          schema.TypeList,

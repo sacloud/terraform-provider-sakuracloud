@@ -39,6 +39,23 @@ resource "sakuracloud_server" "foobar" {
     #  }
     # }
   }
+
+  # If you use cloud-init instead of disk_edit_parameter
+  
+  # user_data = join("\n", [
+  #   "#cloud-config",
+  #   yamlencode({
+  #     hostname: "hostname",
+  #     password: "password",
+  #     chpasswd: {
+  #       expire: false,
+  #     }
+  #     ssh_pwauth: false,
+  #     ssh_authorized_keys: [
+  #       file("~/.ssh/id_rsa.pub"),
+  #     ],
+  #   }),
+  # ])
 }
 
 data "sakuracloud_packet_filter" "foobar" {
@@ -84,7 +101,8 @@ A `network_interface` block supports the following:
 
 #### Disks
 
-* `disk_edit_parameter` - (Optional) A `disk_edit_parameter` block as defined below.
+* `disk_edit_parameter` - (Optional) A `disk_edit_parameter` block as defined below. This parameter conflicts with [`user_data`].
+* `user_data` - (Optional) A string representing the user data used by cloud-init. This parameter conflicts with [`disk_edit_parameter`].
 * `disks` - (Optional) A list of disk id connected to the server.
 
 ---
