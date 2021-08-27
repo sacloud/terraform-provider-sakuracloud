@@ -47,6 +47,11 @@ func dataSourceSakuraCloudProxyLB() *schema.Resource {
 				Computed:    true,
 				Description: "The flag to enable gzip compression",
 			},
+			"proxy_protocol": {
+				Type:        schema.TypeBool,
+				Computed:    true,
+				Description: "The flag to enable proxy protocol v2",
+			},
 			"timeout": {
 				Type:        schema.TypeInt,
 				Computed:    true,
