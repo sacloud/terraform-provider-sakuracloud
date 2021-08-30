@@ -3,6 +3,9 @@
 FEATURES:
   - ELB: Proxy Protocol v2 [GH-857] (@yamamoto-febc)
 
+MISC:
+  - Update docs: user_data [GH-858] (@yamamoto-febc)
+
 ## 2.12.0 (2021-08-19)
 
 FEATURES:
