@@ -24,7 +24,7 @@ data "sakuracloud_archive" "foobar" {
   - **CentOS**: [`centos`/`centos8`/`centos8stream`/`centos7`]  
   - **Alt RHEL/CentOS**: [`almalinux`/`rockylinux`]
   - **Ubuntu**: [`ubuntu`/`ubuntu2004`/`ubuntu1804`]
-  - **Debian**: [`debian`/`debian10`/]  
+  - **Debian**: [`debian`/`debian10`/`debian11`]  
   - **CoreOS/ContainerLinux**: `coreos`  
   - **RancherOS**: `rancheros`  
   - **k3OS**: `k3os`  
