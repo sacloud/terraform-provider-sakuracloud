@@ -2,6 +2,7 @@
 
 FEATURES:
   - ELB: Proxy Protocol v2 [GH-857] (@yamamoto-febc)
+  - libsacloud v2.25.1 - debian11 [GH-860] (@yamamoto-febc)
 
 MISC:
   - Update docs: user_data [GH-858] (@yamamoto-febc)
