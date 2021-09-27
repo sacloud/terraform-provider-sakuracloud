@@ -178,6 +178,7 @@ func Provider() *schema.Provider {
 			"sakuracloud_archive_share":         resourceSakuraCloudArchiveShare(),
 			"sakuracloud_bridge":                resourceSakuraCloudBridge(),
 			"sakuracloud_cdrom":                 resourceSakuraCloudCDROM(),
+			"sakuracloud_certificate_authority": resourceSakuraCloudCertificateAuthority(),
 			"sakuracloud_container_registry":    resourceSakuraCloudContainerRegistry(),
 			"sakuracloud_database":              resourceSakuraCloudDatabase(),
 			"sakuracloud_database_read_replica": resourceSakuraCloudDatabaseReadReplica(),
