@@ -28,8 +28,9 @@ resource "sakuracloud_simple_monitor" "foobar" {
     host_header     = "example.com"
     sni             = true
     http2           = true
-    # username    = "username"
-    # password    = "password"
+    # username        = "username"
+    # password        = "password"
+    # ftps            = "explicit"
   }
 
   description = "description"
@@ -54,7 +55,7 @@ resource "sakuracloud_simple_monitor" "foobar" {
 
 A `health_check` block supports the following:
 
-* `protocol` - (Required) The protocol used for health checks. This must be one of [`http`/`https`/`ping`/`tcp`/`dns`/`ssh`/`smtp`/`pop3`/`snmp`/`sslcertificate`].
+* `protocol` - (Required) The protocol used for health checks. This must be one of [`http`/`https`/`ping`/`tcp`/`dns`/`ssh`/`smtp`/`pop3`/`snmp`/`sslcertificate`/`ftp`].
 * `port` - (Optional) The target port number.
 
 ##### DNS
@@ -82,6 +83,10 @@ A `health_check` block supports the following:
 * `community` - (Optional) The SNMP community string used when checking by SNMP.
 * `oid` - (Optional) The SNMP OID used when checking by SNMP.
 * `snmp_version` - (Optional) The SNMP version used when checking by SNMP. This must be one of `1`/`2c`.
+
+##### FTP
+
+* `ftps` - (Optional) The methods of invoking security for monitoring with FTPS. This must be one of [``/`implicit`/`explicit`].
 
 #### Notification
 

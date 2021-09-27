@@ -15,6 +15,7 @@ resource "sakuracloud_simple_monitor" "foobar" {
     http2           = true
     # username    = "username"
     # password    = "password"
+    # ftps        = "explicit"
   }
 
   description = "description"

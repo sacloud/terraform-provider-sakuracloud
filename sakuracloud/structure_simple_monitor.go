@@ -100,6 +100,8 @@ func flattenSimpleMonitorHealthCheck(simpleMonitor *sacloud.SimpleMonitor) []int
 	case types.SimpleMonitorProtocols.DNS:
 		healthCheck["qname"] = hc.QName
 		healthCheck["expected_data"] = hc.ExpectedData
+	case types.SimpleMonitorProtocols.FTP:
+		healthCheck["ftps"] = hc.FTPS.String()
 	case types.SimpleMonitorProtocols.SSLCertificate:
 	}
 	days := hc.RemainingDays
@@ -204,6 +206,19 @@ func expandSimpleMonitorHealthCheck(d resourceValueGettable) *sacloud.SimpleMoni
 		return &sacloud.SimpleMonitorHealthCheck{
 			Protocol:      types.SimpleMonitorProtocols.SSLCertificate,
 			RemainingDays: days,
+		}
+	case "ftp":
+		if port == 0 {
+			port = 21
+		}
+		ftps := ""
+		if v, ok := conf["ftps"]; ok {
+			ftps = v.(string)
+		}
+		return &sacloud.SimpleMonitorHealthCheck{
+			Protocol: types.SimpleMonitorProtocols.FTP,
+			Port:     types.StringNumber(port),
+			FTPS:     types.ESimpleMonitorFTPS(ftps),
 		}
 	}
 	return nil

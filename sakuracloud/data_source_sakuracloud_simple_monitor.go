@@ -133,6 +133,14 @@ func dataSourceSakuraCloudSimpleMonitor() *schema.Resource {
 							Computed:    true,
 							Description: "The flag to enable HTTP/2 when checking by HTTPS",
 						},
+						"ftps": {
+							Type:     schema.TypeString,
+							Computed: true,
+							Description: descf(
+								"The methods of invoking security for monitoring with FTPS. This will be one of [%s]",
+								types.SimpleMonitorFTPSStrings,
+							),
+						},
 					},
 				},
 			},
