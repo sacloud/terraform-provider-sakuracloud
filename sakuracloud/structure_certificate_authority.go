@@ -209,3 +209,57 @@ func flattenCertificateAuthorityServersFromBuilder(d resourceValueGettable, buil
 	}
 	return results
 }
+
+func flattenCertificateAuthorityClientsForData(clients []*sacloud.CertificateAuthorityClient) []interface{} {
+	var results []interface{}
+	for _, client := range clients {
+		result := map[string]interface{}{
+			"id":             client.ID,
+			"subject_string": client.Subject,
+			"hold":           client.IssueState == "hold",
+			"url":            client.URL,
+			"certificate":    "",
+			"serial_number":  "",
+			"not_before":     "",
+			"not_after":      "",
+			"issue_state":    client.IssueState,
+		}
+		if client.CertificateData != nil {
+			result["certificate"] = client.CertificateData.CertificatePEM
+			result["serial_number"] = client.CertificateData.SerialNumber
+			result["not_before"] = client.CertificateData.NotBefore.Format(time.RFC3339)
+			result["not_after"] = client.CertificateData.NotAfter.Format(time.RFC3339)
+		}
+
+		results = append(results, result)
+	}
+
+	return results
+}
+
+func flattenCertificateAuthorityServersForData(servers []*sacloud.CertificateAuthorityServer) []interface{} {
+	var results []interface{}
+	for _, server := range servers {
+		result := map[string]interface{}{
+			"id":                        server.ID,
+			"subject_string":            server.Subject,
+			"hold":                      server.IssueState == "hold",
+			"subject_alternative_names": server.SANs,
+			"certificate":               "",
+			"serial_number":             "",
+			"not_before":                "",
+			"not_after":                 "",
+			"issue_state":               server.IssueState,
+		}
+		if server.CertificateData != nil {
+			result["certificate"] = server.CertificateData.CertificatePEM
+			result["serial_number"] = server.CertificateData.SerialNumber
+			result["not_before"] = server.CertificateData.NotBefore.Format(time.RFC3339)
+			result["not_after"] = server.CertificateData.NotAfter.Format(time.RFC3339)
+		}
+
+		results = append(results, result)
+	}
+
+	return results
+}
