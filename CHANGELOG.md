@@ -1,7 +1,8 @@
 ## 2.13.0 (Unreleased)
 
-FEATURES:
+FEATURES
 
+  - Managed PKI [GH-862] (@yamamoto-febc)
   - ELB: Proxy Protocol v2 [GH-857] (@yamamoto-febc)
   - libsacloud v2.25.1 - debian11 [GH-860] (@yamamoto-febc)
   - simple_monitor: ftp/ftps [GH-861] (@yamamoto-febc)
