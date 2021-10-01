@@ -120,6 +120,10 @@ var definitions = map[string]definition{
 		displayName: "CD-ROM",
 		category:    CategoryStorage,
 	},
+	"sakuracloud_certificate_authority": {
+		displayName: "Certificate Authority",
+		category:    CategoryLab,
+	},
 	"sakuracloud_container_registry": {
 		displayName: "Container Registry",
 		category:    CategoryLab,
