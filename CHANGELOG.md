@@ -8,6 +8,7 @@ FEATURES
   - simple_monitor: ftp/ftps [GH-861] (@yamamoto-febc)
 
 MISC:
+  - libsacloud v2.26.0 [GH-864] (@yamamoto-febc)
   - Update docs: user_data [GH-858] (@yamamoto-febc)
 
 ## 2.12.0 (2021-08-19)
