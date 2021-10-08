@@ -85,6 +85,7 @@ resource "sakuracloud_disk" "foobar" {
 * `commitment` - (Optional) The policy of how to allocate virtual CPUs to the server. This must be one of [`standard`/`dedicatedcpu`]. Default:`standard`.
 * `core` - (Optional) The number of virtual CPUs. Default:`1`.
 * `memory` - (Optional) The size of memory in GiB. Default:`1`.
+* `gpu` - (Optional) The number of GPUs.
 * `network_interface` - (Optional) One or more `network_interface` blocks as defined below.
 * `interface_driver` - (Optional) The driver name of network interface. This must be one of [`virtio`/`e1000`]. Default:`virtio`.
 * `private_host_id` - (Optional) The id of the PrivateHost which the Server is assigned.

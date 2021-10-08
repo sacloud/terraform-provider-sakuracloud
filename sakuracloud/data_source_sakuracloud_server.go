@@ -42,6 +42,11 @@ func dataSourceSakuraCloudServer() *schema.Resource {
 				Computed:    true,
 				Description: "The size of memory in GiB",
 			},
+			"gpu": {
+				Type:        schema.TypeInt,
+				Computed:    true,
+				Description: "The number of GPUs",
+			},
 			"commitment": {
 				Type:     schema.TypeString,
 				Computed: true,

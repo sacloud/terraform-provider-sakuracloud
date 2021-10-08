@@ -59,6 +59,11 @@ func resourceSakuraCloudServer() *schema.Resource {
 				Default:     1,
 				Description: "The size of memory in GiB",
 			},
+			"gpu": {
+				Type:        schema.TypeInt,
+				Optional:    true,
+				Description: "The number of GPUs",
+			},
 			"commitment": {
 				Type:             schema.TypeString,
 				Optional:         true,
@@ -425,6 +430,7 @@ func setServerResourceData(ctx context.Context, d *schema.ResourceData, client *
 	d.Set("name", data.Name)                                // nolint
 	d.Set("core", data.CPU)                                 // nolint
 	d.Set("memory", data.GetMemoryGB())                     // nolint
+	d.Set("gpu", data.GPU)                                  // nolint
 	d.Set("commitment", data.ServerPlanCommitment.String()) // nolint
 	if err := d.Set("disks", flattenServerConnectedDiskIDs(data)); err != nil {
 		return diag.FromErr(err)
