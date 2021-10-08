@@ -1,3 +1,9 @@
+## 2.14.0 (Unreleased)
+
+FEATURES
+
+  - GPU plan [GH-865] (@yamamoto-febc)
+
 ## 2.13.0 (2021-10-05)
 
 FEATURES
