@@ -406,6 +406,29 @@ func TestAccSakuraCloudServer_switch(t *testing.T) {
 	})
 }
 
+func TestAccSakuraCloudServer_withGPU(t *testing.T) {
+	resourceName := "sakuracloud_server.foobar"
+	rand := randomName()
+
+	var server sacloud.Server
+	resource.ParallelTest(t, resource.TestCase{
+		PreCheck:          func() { testAccPreCheck(t) },
+		ProviderFactories: testAccProviderFactories,
+		CheckDestroy:      testCheckSakuraCloudServerDestroy,
+		Steps: []resource.TestStep{
+			{
+				Config: buildConfigWithArgs(testAccSakuraCloudServer_withGPU, rand),
+				Check: resource.ComposeTestCheckFunc(
+					testCheckSakuraCloudServerExists(resourceName, &server),
+					resource.TestCheckResourceAttr(resourceName, "core", "4"),
+					resource.TestCheckResourceAttr(resourceName, "memory", "56"),
+					resource.TestCheckResourceAttr(resourceName, "gpu", "1"),
+				),
+			},
+		},
+	})
+}
+
 const envCloudInitDiskID = "SAKURACLOUD_CLOUD_INIT_DISK"
 
 func TestAccSakuraCloudServer_cloudInit(t *testing.T) {
@@ -1063,5 +1086,18 @@ resource "sakuracloud_server" "foobar" {
       ssh_pwauth: false,
     }),
   ])
+}
+`
+
+const testAccSakuraCloudServer_withGPU = `
+resource "sakuracloud_server" "foobar" {
+  zone = "is1a"
+
+  name   = "{{ .arg0 }}"
+  core   = 4
+  memory = 56
+  gpu    = 1
+
+  force_shutdown = true
 }
 `
