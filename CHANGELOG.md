@@ -1,3 +1,9 @@
+## 2.14.1 (Unreleased)
+
+FEATURES
+
+  - libsacloud v2.27 - miracle linux [GH-866] (@yamamoto-febc)
+
 ## 2.14.0 (2021-10-08)
 
 FEATURES
