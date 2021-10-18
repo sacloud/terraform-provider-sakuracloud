@@ -27,6 +27,10 @@ import (
 )
 
 func TestAccSakuraCloudLocalRouter_basic(t *testing.T) {
+	if !isFakeModeEnabled() {
+		t.Skip("This test only run if FAKE_MODE environment variable is set")
+	}
+
 	resourceName := "sakuracloud_local_router.foobar"
 	rand := randomName()
 
@@ -156,6 +160,10 @@ func testCheckSakuraCloudLocalRouterDestroy(s *terraform.State) error {
 }
 
 func TestAccImportSakuraCloudLocalRouter_basic(t *testing.T) {
+	if !isFakeModeEnabled() {
+		t.Skip("This test only run if FAKE_MODE environment variable is set")
+	}
+
 	rand := randomName()
 
 	checkFn := func(s []*terraform.InstanceState) error {
@@ -275,6 +283,10 @@ resource "sakuracloud_local_router" "foobar" {
 `
 
 func TestAccSakuraCloudLocalRouter_peering(t *testing.T) {
+	if !isFakeModeEnabled() {
+		t.Skip("This test only run if FAKE_MODE environment variable is set")
+	}
+
 	resourceName1 := "sakuracloud_local_router.foobar1"
 	resourceName2 := "sakuracloud_local_router.foobar2"
 	rand := randomName()

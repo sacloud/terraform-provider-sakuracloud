@@ -21,6 +21,10 @@ import (
 )
 
 func TestAccSakuraCloudDataSourceLocalRouter_basic(t *testing.T) {
+	if !isFakeModeEnabled() {
+		t.Skip("This test only run if FAKE_MODE environment variable is set")
+	}
+
 	resourceName := "data.sakuracloud_local_router.foobar"
 	rand := randomName()
 
