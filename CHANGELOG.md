@@ -1,3 +1,9 @@
+## 2.14.2 (Unreleased)
+
+MISC:
+
+  * Skip local router tests in acceptance test [GH-867] (@yamamoto-febc)
+
 ## 2.14.1 (2021-10-14)
 
 FEATURES
