@@ -1,5 +1,9 @@
 ## 2.14.2 (Unreleased)
 
+FIXES:
+
+  * libsacloud v2.27.1 [GH-870] (@yamamoto-febc)
+
 MISC:
 
   * Skip local router tests in acceptance test [GH-867] (@yamamoto-febc)
