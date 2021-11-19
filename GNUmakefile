@@ -31,12 +31,12 @@ clean:
 
 .PHONY: tools
 tools:
-	go install golang.org/x/tools/cmd/goimports@v0.1.0
-	go install github.com/sacloud/addlicense@master
-	go install github.com/bflad/tfproviderlint/cmd/tfproviderlintx@v0.27.0
+	go install golang.org/x/tools/cmd/goimports@latest
+	go install github.com/sacloud/addlicense@latest
+	go install github.com/bflad/tfproviderlint/cmd/tfproviderlintx@v0.27.1
 	go install github.com/client9/misspell/cmd/misspell@v0.3.4
 	go install github.com/bflad/tfproviderdocs@v0.9.1
-	curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/v1.41.1/install.sh | sh -s -- -b $$(go env GOPATH)/bin v1.41.1
+	curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/v1.43.0/install.sh | sh -s -- -b $$(go env GOPATH)/bin v1.43.0
 
 
 .PHONY: build-envs
