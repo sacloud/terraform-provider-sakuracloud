@@ -1,3 +1,7 @@
+## 2.xx.x (Unreleased)
+
+- Update dependencies- github.com/sacloud/libsacloud/v2 v2.28.0 [GH-871] (@yamamoto-febc)
+
 ## 2.14.2 (2021-10-25)
 
 FIXES:
