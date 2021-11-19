@@ -225,7 +225,6 @@ github.com/hashicorp/terraform-plugin-sdk/v2 v2.7.0/go.mod h1:grseeRo9g3yNkYW09i
 github.com/hashicorp/yamux v0.0.0-20180604194846-3520598351bb/go.mod h1:+NfK9FKeTrX5uv1uIXGdwYDTeHna2qgaIlx54MXqjAM=
 github.com/hashicorp/yamux v0.0.0-20181012175058-2f1d1f20f75d h1:kJCB4vdITiW1eC1vq2e6IsrXKrZit1bv/TDYFGMp4BQ=
 github.com/hashicorp/yamux v0.0.0-20181012175058-2f1d1f20f75d/go.mod h1:+NfK9FKeTrX5uv1uIXGdwYDTeHna2qgaIlx54MXqjAM=
-github.com/huandu/xstrings v1.2.0/go.mod h1:DvyZB1rfVYsBIigL8HwpZgxHwXozlTgGqn63UyNX5k4=
 github.com/huandu/xstrings v1.3.2/go.mod h1:y5/lhBue+AyNmUVz9RLU9xbLR0o4KIIExikq4ovT0aE=
 github.com/ianlancetaylor/demangle v0.0.0-20181102032728-5e5cf60278f6/go.mod h1:aSSvb/t6k1mPoxDqO4vJh6VOCGPwU4O0C2/Eqndh1Sc=
 github.com/imdario/mergo v0.3.11/go.mod h1:jmQim1M+e3UYxmgPu/WyfjB3N3VflVyUjjjwH0dnCYA=
@@ -363,15 +362,12 @@ go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.27.0/go.mod h1:
 go.opentelemetry.io/otel v1.2.0 h1:YOQDvxO1FayUcT9MIhJhgMyNO1WqoduiyvQHzGN0kUQ=
 go.opentelemetry.io/otel v1.2.0/go.mod h1:aT17Fk0Z1Nor9e0uisf98LrntPGMnk4frBO9+dkf69I=
 go.opentelemetry.io/otel/exporters/jaeger v1.2.0 h1:C/5Egj3MJBXRJi22cSl07suqPqtZLnLFmH//OxETUEc=
-go.opentelemetry.io/otel/exporters/jaeger v1.2.0/go.mod h1:KJLFbEMKTNPIfOxcg/WikIozEoKcPgJRz3Ce1vLlM8E=
 go.opentelemetry.io/otel/exporters/stdout/stdouttrace v1.2.0 h1:OiYdrCq1Ctwnovp6EofSPwlp5aGy4LgKNbkg7PtEUw8=
-go.opentelemetry.io/otel/exporters/stdout/stdouttrace v1.2.0/go.mod h1:DUFCmFkXr0VtAHl5Zq2JRx24G6ze5CAq8YfdD36RdX8=
 go.opentelemetry.io/otel/internal/metric v0.25.0 h1:w/7RXe16WdPylaIXDgcYM6t/q0K5lXgSdZOEbIEyliE=
 go.opentelemetry.io/otel/internal/metric v0.25.0/go.mod h1:Nhuw26QSX7d6n4duoqAFi5KOQR4AuzyMcl5eXOgwxtc=
 go.opentelemetry.io/otel/metric v0.25.0 h1:7cXOnCADUsR3+EOqxPaSKwhEuNu0gz/56dRN1hpIdKw=
 go.opentelemetry.io/otel/metric v0.25.0/go.mod h1:E884FSpQfnJOMMUaq+05IWlJ4rjZpk2s/F1Ju+TEEm8=
 go.opentelemetry.io/otel/sdk v1.2.0 h1:wKN260u4DesJYhyjxDa7LRFkuhH7ncEVKU37LWcyNIo=
-go.opentelemetry.io/otel/sdk v1.2.0/go.mod h1:jNN8QtpvbsKhgaC6V5lHiejMoKD+V8uadoSafgHPx1U=
 go.opentelemetry.io/otel/trace v1.2.0 h1:Ys3iqbqZhcf28hHzrm5WAquMkDHNZTUkw7KHbuNjej0=
 go.opentelemetry.io/otel/trace v1.2.0/go.mod h1:N5FLswTubnxKxOJHM7XZC074qpeEdLy3CgAVsdMucK0=
 go.uber.org/atomic v1.7.0 h1:ADUqmZGgLDDfbSL9ZmPxKTybcoEYHgpYfELNoN+7hsw=
@@ -503,7 +499,6 @@ golang.org/x/sys v0.0.0-20200905004654-be1d3432aa8f/go.mod h1:h1NjWce9XRLGQEsW7w
 golang.org/x/sys v0.0.0-20201119102817-f84b799fce68/go.mod h1:h1NjWce9XRLGQEsW7wpKNCjG9DtNlClVuFLEZdDNbEs=
 golang.org/x/sys v0.0.0-20210320140829-1e4c9ba3b0c4/go.mod h1:h1NjWce9XRLGQEsW7wpKNCjG9DtNlClVuFLEZdDNbEs=
 golang.org/x/sys v0.0.0-20210324051608-47abb6519492/go.mod h1:h1NjWce9XRLGQEsW7wpKNCjG9DtNlClVuFLEZdDNbEs=
-golang.org/x/sys v0.0.0-20210423185535-09eb48e85fd7/go.mod h1:h1NjWce9XRLGQEsW7wpKNCjG9DtNlClVuFLEZdDNbEs=
 golang.org/x/sys v0.0.0-20210502180810-71e4cd670f79/go.mod h1:h1NjWce9XRLGQEsW7wpKNCjG9DtNlClVuFLEZdDNbEs=
 golang.org/x/sys v0.0.0-20210615035016-665e8c7367d1/go.mod h1:oPkhp1MJrh7nUepCBck5+mAzfO9JrbApNNgaTdGDITg=
 golang.org/x/sys v0.0.0-20210630005230-0f9fa26af87c/go.mod h1:oPkhp1MJrh7nUepCBck5+mAzfO9JrbApNNgaTdGDITg=
