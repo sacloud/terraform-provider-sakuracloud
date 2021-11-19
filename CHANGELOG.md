@@ -1,4 +1,4 @@
-## 2.xx.x (Unreleased)
+## 2.15.0 (Unreleased)
 
 - Go 1.17 [GH-872] (@yamamoto-febc)
 - Update dependencies- github.com/sacloud/libsacloud/v2 v2.28.0 [GH-871] (@yamamoto-febc)
