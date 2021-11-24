@@ -1,5 +1,6 @@
 ## 2.15.0 (Unreleased)
 
+- Update dependencies - terraform-plugin-sdk/v2 v2.9.0 [GH-875] (@yamamoto-febc)
 - Update dependencies - terraform-plugin-sdk/v2 v2.8.0 [GH-873] (@yamamoto-febc) 
 - Go 1.17 [GH-872] (@yamamoto-febc)
 - Update dependencies- github.com/sacloud/libsacloud/v2 v2.28.0 [GH-871] (@yamamoto-febc)
