@@ -309,12 +309,12 @@ github.com/rogpeppe/go-internal v1.8.0 h1:FCbCCtXNOY3UtUuHUYaghJg4y7Fd14rXifAYUA
 github.com/rogpeppe/go-internal v1.8.0/go.mod h1:WmiCO8CzOY8rg0OYDC4/i/2WRWAB6poM+XZ2dLUbcbE=
 github.com/sacloud/ftps v1.1.0 h1:cYv+b6qhrIT8msfx64XXRJzbv5S+Dqwb/rXa5Y641XA=
 github.com/sacloud/ftps v1.1.0/go.mod h1:h4awhOi3PEyhKLj1FpXjoVV5yVkmRUU+d5L95EwX2JU=
-github.com/sacloud/go-http v0.0.3 h1:D0RDrPZnsvZ0coNWQYEVJfy/ar5/Pb3vMuV8pUxSC3E=
-github.com/sacloud/go-http v0.0.3/go.mod h1:OoIrSShwQSYT9p0AdnJ6hZ3rlhLf8tDvg5DjIu5YjxI=
+github.com/sacloud/go-http v0.0.4 h1:+vgx/uCctcGiHMe8jE+qirMKd3+d73MNZXK7nrUo0po=
+github.com/sacloud/go-http v0.0.4/go.mod h1:aYTXNuAnPmD6Ar3ktDaR1gPxJCPv2CqpppcYciy1hmo=
 github.com/sacloud/iso9660wrap v0.0.0-20171031075302-eda21f77f6a8 h1:5piK7EELHKRxGqBjgVEHsdfsFwEzF/Kds/bMWLS6gCw=
 github.com/sacloud/iso9660wrap v0.0.0-20171031075302-eda21f77f6a8/go.mod h1:1jHHCa624cG5rODkWmourombJaNmkY9/SBHWhLJcg+w=
-github.com/sacloud/libsacloud/v2 v2.28.0 h1:ZO8LXwowJEhsqvg1zRTGhRaAAchiociMaaT5sSe0m8Y=
-github.com/sacloud/libsacloud/v2 v2.28.0/go.mod h1:+gmUEPNiXdV6espjRCs/j0xu2IvXFx276g6Xefd6k5I=
+github.com/sacloud/libsacloud/v2 v2.28.1-0.20211206013343-22cec9b427cb h1:fV/nNaRuyAM8jLqcJNXVGbh0RX43OfcoZnoPK48MsgA=
+github.com/sacloud/libsacloud/v2 v2.28.1-0.20211206013343-22cec9b427cb/go.mod h1:QDsX+iHidP+o/AfOHvl44oeQew3cdfgoswqP2dQy2tk=
 github.com/sebdah/goldie v1.0.0/go.mod h1:jXP4hmWywNEwZzhMuv2ccnqTSFpuq8iyQhtQdkkZBH4=
 github.com/sergi/go-diff v1.0.0/go.mod h1:0CfEIISq7TuYL3j771MWULgwwjU+GofnZX9QAmXWZgo=
 github.com/sergi/go-diff v1.1.0/go.mod h1:STckp+ISIX8hZLjrqAeVduY0gWCT9IjLuqbuNXdaHfM=
