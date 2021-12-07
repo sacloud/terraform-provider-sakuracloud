@@ -180,6 +180,11 @@ func resourceSakuraCloudSimpleMonitor() *schema.Resource {
 								types.SimpleMonitorFTPSStrings,
 							),
 						},
+						"verify_sni": {
+							Type:        schema.TypeBool,
+							Optional:    true,
+							Description: "The flag to enable hostname verification for SNI",
+						},
 					},
 				},
 			},
