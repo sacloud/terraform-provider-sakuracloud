@@ -1,5 +1,6 @@
 ## 2.15.0 (Unreleased)
 
+- simple_monitor: verify_sni [GH-877] (@yamamoto-febc)
 - Upgrade dependencies - libsacloud [GH-876] (@yamamoto-febc)
 - Update dependencies - terraform-plugin-sdk/v2 v2.9.0 [GH-875] (@yamamoto-febc)
 - Update dependencies - terraform-plugin-sdk/v2 v2.8.0 [GH-873] (@yamamoto-febc) 
