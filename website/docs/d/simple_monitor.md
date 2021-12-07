@@ -79,5 +79,5 @@ A `health_check` block exports the following:
 * `snmp_version` - The SNMP version used when checking by SNMP.
 * `status` - The response-code to expect when checking by HTTP/HTTPS.
 * `username` - The user name for basic auth used when checking by HTTP/HTTPS.
-
+* `verify_sni` - The flag to enable hostname verification for SNI.
 

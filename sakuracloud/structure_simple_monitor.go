@@ -90,6 +90,7 @@ func flattenSimpleMonitorHealthCheck(simpleMonitor *sacloud.SimpleMonitor) []int
 		healthCheck["username"] = hc.BasicAuthUsername
 		healthCheck["password"] = hc.BasicAuthPassword
 		healthCheck["http2"] = hc.HTTP2
+		healthCheck["verify_sni"] = hc.VerifySNI
 	case types.SimpleMonitorProtocols.TCP, types.SimpleMonitorProtocols.SSH, types.SimpleMonitorProtocols.SMTP, types.SimpleMonitorProtocols.POP3:
 		healthCheck["port"] = hc.Port.Int()
 	case types.SimpleMonitorProtocols.SNMP:
@@ -149,6 +150,7 @@ func expandSimpleMonitorHealthCheck(d resourceValueGettable) *sacloud.SimpleMoni
 			BasicAuthUsername: forceString(conf["username"]),
 			BasicAuthPassword: forceString(conf["password"]),
 			HTTP2:             types.StringFlag(forceBool(conf["http2"])),
+			VerifySNI:         types.StringFlag(forceBool(conf["verify_sni"])),
 		}
 
 	case "dns":
