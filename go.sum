@@ -313,8 +313,8 @@ github.com/sacloud/go-http v0.0.4 h1:+vgx/uCctcGiHMe8jE+qirMKd3+d73MNZXK7nrUo0po
 github.com/sacloud/go-http v0.0.4/go.mod h1:aYTXNuAnPmD6Ar3ktDaR1gPxJCPv2CqpppcYciy1hmo=
 github.com/sacloud/iso9660wrap v0.0.0-20171031075302-eda21f77f6a8 h1:5piK7EELHKRxGqBjgVEHsdfsFwEzF/Kds/bMWLS6gCw=
 github.com/sacloud/iso9660wrap v0.0.0-20171031075302-eda21f77f6a8/go.mod h1:1jHHCa624cG5rODkWmourombJaNmkY9/SBHWhLJcg+w=
-github.com/sacloud/libsacloud/v2 v2.29.0 h1:/Bnz6dgwd4mefiHGc+cE6fQ6XTRsBrlov33Iyec5Mtc=
-github.com/sacloud/libsacloud/v2 v2.29.0/go.mod h1:QDsX+iHidP+o/AfOHvl44oeQew3cdfgoswqP2dQy2tk=
+github.com/sacloud/libsacloud/v2 v2.30.0 h1:3/kaGR0iVth7Pd4xXNFUDP6ZatRRpruPIW/S4/Z7E+Y=
+github.com/sacloud/libsacloud/v2 v2.30.0/go.mod h1:QDsX+iHidP+o/AfOHvl44oeQew3cdfgoswqP2dQy2tk=
 github.com/sebdah/goldie v1.0.0/go.mod h1:jXP4hmWywNEwZzhMuv2ccnqTSFpuq8iyQhtQdkkZBH4=
 github.com/sergi/go-diff v1.0.0/go.mod h1:0CfEIISq7TuYL3j771MWULgwwjU+GofnZX9QAmXWZgo=
 github.com/sergi/go-diff v1.1.0/go.mod h1:STckp+ISIX8hZLjrqAeVduY0gWCT9IjLuqbuNXdaHfM=
