@@ -1,3 +1,7 @@
+## 2.16.0 (Unreleased)
+
+- libsacloud v2.30.0 - PostgreSQL 13 [GH-878] (@yamamoto-febc)
+
 ## 2.15.0 (2021-12-08)
 
 FEATURES:
