@@ -1,5 +1,12 @@
 ## 2.16.0 (Unreleased)
 
+FEATURES:
+
+- simple_monitor: retry [GH-880] (@yamamoto-febc)
+
+IMPROVEMENTS:
+
+- libsacloud v2.31 [GH-879] (@yamamoto-febc)
 - libsacloud v2.30.0 - PostgreSQL 13 [GH-878] (@yamamoto-febc)
 
 ## 2.15.0 (2021-12-08)
