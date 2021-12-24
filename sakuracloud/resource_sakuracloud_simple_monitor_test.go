@@ -67,6 +67,8 @@ func TestAccSakuraCloudSimpleMonitor_basic(t *testing.T) {
 				Check: resource.ComposeTestCheckFunc(
 					testCheckSakuraCloudSimpleMonitorExists(resourceName, &monitor),
 					testCheckSakuraCloudSimpleMonitorAttributesUpdated(&monitor),
+					resource.TestCheckResourceAttr(resourceName, "max_check_attempts", "5"),
+					resource.TestCheckResourceAttr(resourceName, "retry_interval", "20"),
 					resource.TestCheckResourceAttr(resourceName, "timeout", "30"),
 					resource.TestCheckResourceAttr(resourceName, "health_check.0.protocol", "http"),
 					resource.TestCheckResourceAttr(resourceName, "health_check.0.port", "80"),
@@ -218,8 +220,12 @@ resource "sakuracloud_icon" "foobar" {
 var testAccSakuraCloudSimpleMonitor_update = `
 resource "sakuracloud_simple_monitor" "foobar" {
   target     = "{{ .arg0 }}"
-  delay_loop = 120
   timeout    = 30
+  delay_loop = 120
+
+  max_check_attempts = 5
+  retry_interval     = 20
+
   health_check {
     protocol    = "http"
     port        = 80

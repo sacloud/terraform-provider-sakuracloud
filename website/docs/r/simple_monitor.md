@@ -18,6 +18,9 @@ resource "sakuracloud_simple_monitor" "foobar" {
 
   delay_loop = 60
   timeout    = 10
+
+  max_check_attempts = 3
+  retry_interval     = 10
   
   health_check {
     protocol        = "https"
@@ -48,6 +51,8 @@ resource "sakuracloud_simple_monitor" "foobar" {
 * `target` - (Required) The monitoring target of the simple monitor. This must be IP address or FQDN. Changing this forces a new resource to be created.
 * `health_check` - (Required) A `health_check` block as defined below.
 * `delay_loop` - (Optional) The interval in seconds between checks. This must be in the range [`60`-`3600`]. Default:`60`.
+* `max_check_attempts` - (Optional) The number of retry. This must be in the range [`1`-`10`].
+* `retry_interval` - (Optional) The interval in seconds between retries. This must be in the range [`10`-`3600`].
 * `timeout` - (Optional) The timeout in seconds for monitoring. This must be in the range [`10`-`30`].  
 * `enabled` - (Optional) The flag to enable monitoring by the simple monitor. Default:`true`.
 

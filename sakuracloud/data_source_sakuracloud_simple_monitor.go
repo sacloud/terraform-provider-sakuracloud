@@ -40,6 +40,20 @@ func dataSourceSakuraCloudSimpleMonitor() *schema.Resource {
 				Computed:    true,
 				Description: "The interval in seconds between checks",
 			},
+			"max_check_attempts": {
+				Type:     schema.TypeInt,
+				Computed: true,
+				Description: descf(
+					"The number of retry",
+				),
+			},
+			"retry_interval": {
+				Type:     schema.TypeInt,
+				Computed: true,
+				Description: descf(
+					"The interval in seconds between retries",
+				),
+			},
 			"timeout": {
 				Type:        schema.TypeInt,
 				Computed:    true,
