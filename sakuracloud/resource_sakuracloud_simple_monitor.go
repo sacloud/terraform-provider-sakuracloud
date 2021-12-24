@@ -60,6 +60,26 @@ func resourceSakuraCloudSimpleMonitor() *schema.Resource {
 					descRange(60, 3600),
 				),
 			},
+			"max_check_attempts": {
+				Type:             schema.TypeInt,
+				Optional:         true,
+				Computed:         true,
+				ValidateDiagFunc: validation.ToDiagFunc(validation.IntBetween(1, 10)),
+				Description: descf(
+					"The number of retry. %s",
+					descRange(1, 10),
+				),
+			},
+			"retry_interval": {
+				Type:             schema.TypeInt,
+				Optional:         true,
+				Computed:         true,
+				ValidateDiagFunc: validation.ToDiagFunc(validation.IntBetween(10, 3600)),
+				Description: descf(
+					"The interval in seconds between retries. %s",
+					descRange(10, 3600),
+				),
+			},
 			"timeout": {
 				Type:             schema.TypeInt,
 				Optional:         true,
@@ -314,6 +334,8 @@ func resourceSakuraCloudSimpleMonitorDelete(ctx context.Context, d *schema.Resou
 func setSimpleMonitorResourceData(ctx context.Context, d *schema.ResourceData, client *APIClient, data *sacloud.SimpleMonitor) diag.Diagnostics {
 	d.Set("target", data.Target)                                       // nolint
 	d.Set("delay_loop", data.DelayLoop)                                // nolint
+	d.Set("max_check_attempts", data.MaxCheckAttempts)                 // nolint
+	d.Set("retry_interval", data.RetryInterval)                        // nolint
 	d.Set("timeout", data.Timeout)                                     // nolint
 	d.Set("icon_id", data.IconID.String())                             // nolint
 	d.Set("description", data.Description)                             // nolint

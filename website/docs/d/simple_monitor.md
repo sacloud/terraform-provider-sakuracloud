@@ -49,11 +49,13 @@ A `condition` block supports the following:
 * `enabled` - The flag to enable monitoring by the simple monitor.
 * `health_check` - A list of `health_check` blocks as defined below.
 * `icon_id` - The icon id attached to the SimpleMonitor.
+* `max_check_attempts` - The number of retry.
 * `notify_email_enabled` - The flag to enable notification by email.
 * `notify_email_html` - The flag to enable HTML format instead of text format.
 * `notify_interval` - The interval in hours between notification.
 * `notify_slack_enabled` - The flag to enable notification by slack/discord.
 * `notify_slack_webhook` - The webhook URL for sending notification by slack/discord.
+* `retry_interval` - The interval in seconds between retries.
 * `tags` - Any tags assigned to the SimpleMonitor.
 * `target` - The monitoring target of the simple monitor. This will be IP address or FQDN.
 * `timeout` - The timeout in seconds for monitoring.
