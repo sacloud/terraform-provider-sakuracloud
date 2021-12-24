@@ -47,6 +47,7 @@ A `condition` block supports the following:
 * `description` - The description of the VPCRouter.
 * `dhcp_server` - A list of `dhcp_server` blocks as defined below.
 * `dhcp_static_mapping` - A list of `dhcp_static_mapping` blocks as defined below.
+* `dns_forwarding` - A list of `dns_forwarding` blocks as defined below.
 * `firewall` - A list of `firewall` blocks as defined below.
 * `icon_id` - The icon id attached to the VPCRouter.
 * `internet_connection` - The flag to enable connecting to the Internet from the VPC Router.
@@ -84,6 +85,13 @@ A `dhcp_static_mapping` block exports the following:
 
 * `ip_address` - The static IP address to assign to DHCP client.
 * `mac_address` - The source MAC address of static mapping.
+
+---
+
+A `dns_forwarding` block exports the following:
+
+* `dns_servers` - A list of IP address of DNS server to forward to.
+* `interface_index` - The index of the network interface on which to enable the DNS forwarding service.
 
 ---
 

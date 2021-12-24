@@ -57,6 +57,11 @@ resource "sakuracloud_vpc_router" "premium" {
     mac_address = "aa:bb:cc:aa:bb:cc"
   }
 
+  dns_forwarding {
+    interface_index = 1
+    dns_servers = ["133.242.0.3", "133.242.0.4"]
+  }
+
   firewall {
     interface_index = 1
 
@@ -241,6 +246,7 @@ A `site_to_site_vpn` block supports the following:
 
 * `dhcp_server` - (Optional) One or more `dhcp_server` blocks as defined below.
 * `dhcp_static_mapping` - (Optional) One or more `dhcp_static_mapping` blocks as defined below.
+* `dns_forwarding` - (Optional) A `dns_forwarding` block as defined below.
 * `port_forwarding` - (Optional) One or more `port_forwarding` blocks as defined below.
 * `static_nat` - (Optional) One or more `static_nat` blocks as defined below.
 
@@ -259,6 +265,13 @@ A `dhcp_static_mapping` block supports the following:
 
 * `ip_address` - (Required) The static IP address to assign to DHCP client.
 * `mac_address` - (Required) The source MAC address of static mapping.
+* 
+---
+
+A `dns_forwarding` block supports the following:
+
+* `dns_servers` - (Optional) A list of IP address of DNS server to forward to.
+* `interface_index` - (Required) The index of the network interface on which to enable the DNS forwarding service. This must be in the range [`1`-`7`].
 
 ---
 

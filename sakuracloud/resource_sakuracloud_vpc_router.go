@@ -203,6 +203,30 @@ func resourceSakuraCloudVPCRouter() *schema.Resource {
 					},
 				},
 			},
+			"dns_forwarding": {
+				Type:     schema.TypeList,
+				Optional: true,
+				MaxItems: 1,
+				Elem: &schema.Resource{
+					Schema: map[string]*schema.Schema{
+						"interface_index": {
+							Type:             schema.TypeInt,
+							Required:         true,
+							ValidateDiagFunc: validation.ToDiagFunc(validation.IntBetween(1, 7)),
+							Description: descf(
+								"The index of the network interface on which to enable the DNS forwarding service. %s",
+								descRange(1, 7),
+							),
+						},
+						"dns_servers": {
+							Type:        schema.TypeList,
+							Optional:    true,
+							Elem:        &schema.Schema{Type: schema.TypeString},
+							Description: "A list of IP address of DNS server to forward to",
+						},
+					},
+				},
+			},
 			"firewall": {
 				Type:     schema.TypeList,
 				Optional: true,
@@ -675,6 +699,9 @@ func setVPCRouterResourceData(ctx context.Context, d *schema.ResourceData, zone 
 		return diag.FromErr(err)
 	}
 	if err := d.Set("dhcp_static_mapping", flattenVPCRouterDHCPStaticMappings(data)); err != nil {
+		return diag.FromErr(err)
+	}
+	if err := d.Set("dns_forwarding", flattenVPCRouterDNSForwarding(data)); err != nil {
 		return diag.FromErr(err)
 	}
 	if err := d.Set("firewall", flattenVPCRouterFirewalls(data)); err != nil {

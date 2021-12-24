@@ -174,6 +174,25 @@ func dataSourceSakuraCloudVPCRouter() *schema.Resource {
 					},
 				},
 			},
+			"dns_forwarding": {
+				Type:     schema.TypeList,
+				Computed: true,
+				Elem: &schema.Resource{
+					Schema: map[string]*schema.Schema{
+						"interface_index": {
+							Type:        schema.TypeInt,
+							Computed:    true,
+							Description: "The index of the network interface on which to enable the DNS forwarding service",
+						},
+						"dns_servers": {
+							Type:        schema.TypeList,
+							Computed:    true,
+							Elem:        &schema.Schema{Type: schema.TypeString},
+							Description: "A list of IP address of DNS server to forward to",
+						},
+					},
+				},
+			},
 			"firewall": {
 				Type:     schema.TypeList,
 				Computed: true,

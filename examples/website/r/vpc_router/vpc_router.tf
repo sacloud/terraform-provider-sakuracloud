@@ -42,6 +42,11 @@ resource "sakuracloud_vpc_router" "premium" {
     mac_address = "aa:bb:cc:aa:bb:cc"
   }
 
+  dns_forwarding {
+    interface_index = 1
+    dns_servers = ["133.242.0.3", "133.242.0.4"]
+  }
+
   firewall {
     interface_index = 1
 
