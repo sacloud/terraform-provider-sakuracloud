@@ -227,6 +227,7 @@ func expandVPCRouterSettings(d resourceValueGettable) *vpcrouter.RouterSetting {
 		Firewall:                  expandVPCRouterFirewallList(d),
 		DHCPServer:                expandVPCRouterDHCPServerList(d),
 		DHCPStaticMapping:         expandVPCRouterDHCPStaticMappingList(d),
+		DNSForwarding:             expandVPCRouterDNSForwarding(d),
 		PPTPServer:                expandVPCRouterPPTP(d),
 		L2TPIPsecServer:           expandVPCRouterL2TP(d),
 		RemoteAccessUsers:         expandVPCRouterUserList(d),
@@ -340,6 +341,31 @@ func flattenVPCRouterDHCPStaticMappings(vpcRouter *sacloud.VPCRouter) []interfac
 		})
 	}
 	return staticMappings
+}
+
+func expandVPCRouterDNSForwarding(d resourceValueGettable) *sacloud.VPCRouterDNSForwarding {
+	if values, ok := getListFromResource(d, "dns_forwarding"); ok && len(values) > 0 {
+		raw := values[0]
+		d := mapToResourceData(raw.(map[string]interface{}))
+		return &sacloud.VPCRouterDNSForwarding{
+			Interface:  fmt.Sprintf("eth%d", d.Get("interface_index").(int)),
+			DNSServers: expandStringList(d.Get("dns_servers").([]interface{})),
+		}
+	}
+	return nil
+}
+
+func flattenVPCRouterDNSForwarding(vpcRouter *sacloud.VPCRouter) []interface{} {
+	v := vpcRouter.Settings.DNSForwarding
+	if v != nil {
+		return []interface{}{
+			map[string]interface{}{
+				"interface_index": vpcRouterInterfaceNameToIndex(v.Interface),
+				"dns_servers":     v.DNSServers,
+			},
+		}
+	}
+	return nil
 }
 
 func expandVPCRouterFirewallList(d resourceValueGettable) []*sacloud.VPCRouterFirewall {

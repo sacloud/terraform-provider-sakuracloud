@@ -119,6 +119,11 @@ func TestAccSakuraCloudVPCRouter_Full(t *testing.T) {
 					resource.TestCheckResourceAttr(resourceName, "dhcp_static_mapping.#", "1"),
 					resource.TestCheckResourceAttr(resourceName, "dhcp_static_mapping.0.ip_address", "192.168.11.10"),
 					resource.TestCheckResourceAttr(resourceName, "dhcp_static_mapping.0.mac_address", "aa:bb:cc:aa:bb:cc"),
+					resource.TestCheckResourceAttr(resourceName, "dns_forwarding.#", "1"),
+					resource.TestCheckResourceAttr(resourceName, "dns_forwarding.0.interface_index", "1"),
+					resource.TestCheckResourceAttr(resourceName, "dns_forwarding.0.dns_servers.#", "2"),
+					resource.TestCheckResourceAttr(resourceName, "dns_forwarding.0.dns_servers.0", "133.242.0.3"),
+					resource.TestCheckResourceAttr(resourceName, "dns_forwarding.0.dns_servers.1", "133.242.0.4"),
 					resource.TestCheckResourceAttr(resourceName, "firewall.#", "1"),
 					resource.TestCheckResourceAttr(resourceName, "firewall.0.interface_index", "1"),
 					resource.TestCheckResourceAttr(resourceName, "firewall.0.direction", "send"),
@@ -320,6 +325,12 @@ resource "sakuracloud_vpc_router" "foobar" {
     ip_address  = "192.168.11.10"
     mac_address = "aa:bb:cc:aa:bb:cc"
   }
+
+  dns_forwarding {
+    interface_index = 1
+    dns_servers = ["133.242.0.3", "133.242.0.4"]
+  }
+
 
   firewall {
     interface_index = 1
