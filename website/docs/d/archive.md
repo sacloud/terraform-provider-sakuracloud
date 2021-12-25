@@ -14,7 +14,7 @@ Get information about an existing Archive.
 
 ```hcl
 data "sakuracloud_archive" "foobar" {
-  os_type = "centos8"
+  os_type = "centos"
 }
 ```
 ## Argument Reference
