@@ -2,6 +2,7 @@
 
 FEATURES:
 
+- vpc_router: dns_forwarding [GH-881] (@yamamoto-febc)
 - simple_monitor: retry [GH-880] (@yamamoto-febc)
 
 IMPROVEMENTS:
