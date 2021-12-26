@@ -21,23 +21,25 @@ import (
 )
 
 func TestAccSakuraCloudDataSourceCDROM_basic(t *testing.T) {
+	skipIfFakeModeEnabled(t)
+
 	resourceName := "data.sakuracloud_cdrom.foobar"
+	rand := randomName()
+
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:          func() { testAccPreCheck(t) },
 		ProviderFactories: testAccProviderFactories,
 		Steps: []resource.TestStep{
 			{
-				Config: testAccSakuraCloudDataSourceCDROM_basic,
+				Config: buildConfigWithArgs(testAccSakuraCloudDataSourceCDROM_basic, rand),
 				Check: resource.ComposeTestCheckFunc(
 					testCheckSakuraCloudDataSourceExists(resourceName),
-					resource.TestCheckResourceAttr(resourceName, "name", "Parted Magic 2013_08_01"),
+					resource.TestCheckResourceAttr(resourceName, "name", rand),
+					resource.TestCheckResourceAttr(resourceName, "description", "description"),
 					resource.TestCheckResourceAttr(resourceName, "size", "5"),
-					resource.TestCheckResourceAttr(resourceName, "tags.#", "5"),
-					resource.TestCheckResourceAttr(resourceName, "tags.0", "arch-64bit"),
-					resource.TestCheckResourceAttr(resourceName, "tags.1", "current-stable"),
-					resource.TestCheckResourceAttr(resourceName, "tags.2", "distro-parted_magic"),
-					resource.TestCheckResourceAttr(resourceName, "tags.3", "distro-ver-2013.08.01"),
-					resource.TestCheckResourceAttr(resourceName, "tags.4", "os-linux"),
+					resource.TestCheckResourceAttr(resourceName, "tags.#", "2"),
+					resource.TestCheckResourceAttr(resourceName, "tags.0", "tag1"),
+					resource.TestCheckResourceAttr(resourceName, "tags.1", "tag2"),
 				),
 			},
 		},
@@ -45,11 +47,19 @@ func TestAccSakuraCloudDataSourceCDROM_basic(t *testing.T) {
 }
 
 var testAccSakuraCloudDataSourceCDROM_basic = `
+resource "sakuracloud_cdrom" "foobar" {
+  name           = "{{ .arg0 }}"
+  size           = 5
+  iso_image_file = "test/dummy.iso"
+  description    = "description"
+  tags           = ["tag1", "tag2"]
+}
+
 data "sakuracloud_cdrom" "foobar" {
   filter {
     condition {
 	  name    = "Name"
-	  values = ["Parted Magic 2013_08_01"]
+	  values = [sakuracloud_cdrom.foobar.name]
     }
   }
 }`
