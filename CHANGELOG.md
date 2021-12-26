@@ -7,8 +7,12 @@ FEATURES:
 
 IMPROVEMENTS:
 
+- fix broken test - TestAccSakuraCloudDataSourceCDROM_basic [GH-883] (@yamamoto-febc)
+- Remove centos8 from examples [GH-882] (@yamamoto-febc)
 - libsacloud v2.31 [GH-879] (@yamamoto-febc)
 - libsacloud v2.30.0 - PostgreSQL 13 [GH-878] (@yamamoto-febc)
+
+Note: `data.sakuracloud_archive#os_type`:  `centos8` has been removed. 
 
 ## 2.15.0 (2021-12-08)
 
