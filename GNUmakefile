@@ -1,4 +1,4 @@
-# Copyright 2016-2021 terraform-provider-sakuracloud authors
+# Copyright 2016-2022 terraform-provider-sakuracloud authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -16,7 +16,7 @@ PKG_NAME     ?= sakuracloud
 WEBSITE_REPO  = github.com/hashicorp/terraform-website
 
 AUTHOR          ?="terraform-provider-sakuracloud authors"
-COPYRIGHT_YEAR  ?="2016-2021"
+COPYRIGHT_YEAR  ?="2016-2022"
 COPYRIGHT_FILES ?=$$(find . \( -name "*.dockerfile" -or -name "*.go" -or -name "*.sh" -or -name "*.pl" -or -name "*.bash" \) -print)
 
 UNIT_TEST_UA ?= (Unit Test)
