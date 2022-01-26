@@ -3,6 +3,7 @@
 ## 2.16.1 (Unreleased)
 
 MISC:
+  - Upgrade dependencies - github.com/hashicorp/terraform-plugin-sdk v2.10.1 [GH-887] (@yamamoto-febc)
   - libsacloud v2.32.1 - Removed some os-types: freebsd and coreos [GH-886] (@yamamoto-febc)
 
 ## 2.16.0 (2021-12-27)
