@@ -1,6 +1,6 @@
 # CHANGELOG
 
-## 2.16.1 (Unreleased)
+## 2.16.1 (2022-01-27)
 
 MISC:
   - Upgrade dependencies - github.com/hashicorp/terraform-plugin-sdk v2.10.1 [GH-887] (@yamamoto-febc)
