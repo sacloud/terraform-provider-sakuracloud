@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## 2.16.2 (Unreleased)
+
+FEATURES:
+
+  - sakuracloud_dns: upgrade MaxItems to 2000 [GH-889] (@yamamoto-febc)
+
 ## 2.16.1 (2022-01-27)
 
 MISC:
