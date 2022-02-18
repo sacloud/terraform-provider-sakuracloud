@@ -59,7 +59,7 @@ func resourceSakuraCloudDNS() *schema.Resource {
 				Type:     schema.TypeList,
 				Optional: true,
 				Computed: true,
-				MaxItems: 1000,
+				MaxItems: 2000,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
 						"name": schemaResourceName("DNS Record"),
