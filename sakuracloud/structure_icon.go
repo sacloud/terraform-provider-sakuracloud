@@ -22,7 +22,7 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/mitchellh/go-homedir"
-	"github.com/sacloud/libsacloud/v2/sacloud"
+	"github.com/sacloud/iaas-api-go"
 )
 
 func expandIconBody(d resourceValueGettable) (string, error) {
@@ -50,20 +50,20 @@ func expandIconBody(d resourceValueGettable) (string, error) {
 	return body, nil
 }
 
-func expandIconCreateRequest(d *schema.ResourceData) (*sacloud.IconCreateRequest, error) {
+func expandIconCreateRequest(d *schema.ResourceData) (*iaas.IconCreateRequest, error) {
 	body, err := expandIconBody(d)
 	if err != nil {
 		return nil, fmt.Errorf("creating SakuraCloud Icon is failed: %s", err)
 	}
-	return &sacloud.IconCreateRequest{
+	return &iaas.IconCreateRequest{
 		Name:  d.Get("name").(string),
 		Tags:  expandTags(d),
 		Image: body,
 	}, nil
 }
 
-func expandIconUpdateRequest(d *schema.ResourceData) *sacloud.IconUpdateRequest {
-	return &sacloud.IconUpdateRequest{
+func expandIconUpdateRequest(d *schema.ResourceData) *iaas.IconUpdateRequest {
+	return &iaas.IconUpdateRequest{
 		Name: d.Get("name").(string),
 		Tags: expandTags(d),
 	}

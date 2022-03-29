@@ -21,8 +21,8 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
-	"github.com/sacloud/libsacloud/v2/sacloud"
-	"github.com/sacloud/libsacloud/v2/sacloud/types"
+	"github.com/sacloud/iaas-api-go"
+	"github.com/sacloud/iaas-api-go/types"
 )
 
 func resourceSakuraCloudAutoBackup() *schema.Resource {
@@ -82,7 +82,7 @@ func resourceSakuraCloudAutoBackupCreate(ctx context.Context, d *schema.Resource
 		return diag.FromErr(err)
 	}
 
-	autoBackupOp := sacloud.NewAutoBackupOp(client)
+	autoBackupOp := iaas.NewAutoBackupOp(client)
 
 	if err := validateBackupWeekdays(d, "weekdays"); err != nil {
 		return diag.FromErr(err)
@@ -103,10 +103,10 @@ func resourceSakuraCloudAutoBackupRead(ctx context.Context, d *schema.ResourceDa
 		return diag.FromErr(err)
 	}
 
-	autoBackupOp := sacloud.NewAutoBackupOp(client)
+	autoBackupOp := iaas.NewAutoBackupOp(client)
 	autoBackup, err := autoBackupOp.Read(ctx, zone, sakuraCloudID(d.Id()))
 	if err != nil {
-		if sacloud.IsNotFoundError(err) {
+		if iaas.IsNotFoundError(err) {
 			d.SetId("")
 			return nil
 		}
@@ -121,7 +121,7 @@ func resourceSakuraCloudAutoBackupUpdate(ctx context.Context, d *schema.Resource
 		return diag.FromErr(err)
 	}
 
-	autoBackupOp := sacloud.NewAutoBackupOp(client)
+	autoBackupOp := iaas.NewAutoBackupOp(client)
 
 	autoBackup, err := autoBackupOp.Read(ctx, zone, sakuraCloudID(d.Id()))
 	if err != nil {
@@ -145,10 +145,10 @@ func resourceSakuraCloudAutoBackupDelete(ctx context.Context, d *schema.Resource
 		return diag.FromErr(err)
 	}
 
-	autoBackupOp := sacloud.NewAutoBackupOp(client)
+	autoBackupOp := iaas.NewAutoBackupOp(client)
 	autoBackup, err := autoBackupOp.Read(ctx, zone, sakuraCloudID(d.Id()))
 	if err != nil {
-		if sacloud.IsNotFoundError(err) {
+		if iaas.IsNotFoundError(err) {
 			d.SetId("")
 			return nil
 		}
@@ -163,7 +163,7 @@ func resourceSakuraCloudAutoBackupDelete(ctx context.Context, d *schema.Resource
 	return nil
 }
 
-func setAutoBackupResourceData(d *schema.ResourceData, client *APIClient, data *sacloud.AutoBackup) diag.Diagnostics {
+func setAutoBackupResourceData(d *schema.ResourceData, client *APIClient, data *iaas.AutoBackup) diag.Diagnostics {
 	d.Set("name", data.Name)                              // nolint
 	d.Set("disk_id", data.DiskID.String())                // nolint
 	d.Set("max_backup_num", data.MaximumNumberOfArchives) // nolint

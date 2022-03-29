@@ -21,7 +21,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
-	"github.com/sacloud/libsacloud/v2/sacloud"
+	"github.com/sacloud/iaas-api-go"
 )
 
 func resourceSakuraCloudProxyLBACME() *schema.Resource {
@@ -138,7 +138,7 @@ func resourceSakuraCloudProxyLBACMECreate(ctx context.Context, d *schema.Resourc
 		return diag.FromErr(err)
 	}
 
-	proxyLBOp := sacloud.NewProxyLBOp(client)
+	proxyLBOp := iaas.NewProxyLBOp(client)
 	proxyLBID := d.Get("proxylb_id").(string)
 
 	sakuraMutexKV.Lock(proxyLBID)
@@ -150,7 +150,7 @@ func resourceSakuraCloudProxyLBACMECreate(ctx context.Context, d *schema.Resourc
 	}
 
 	// clear
-	le := &sacloud.ProxyLBACMESetting{
+	le := &iaas.ProxyLBACMESetting{
 		Enabled: false,
 	}
 
@@ -158,7 +158,7 @@ func resourceSakuraCloudProxyLBACMECreate(ctx context.Context, d *schema.Resourc
 	commonName := d.Get("common_name").(string)
 	altNames := expandSubjectAltNames(d)
 	if tos {
-		le = &sacloud.ProxyLBACMESetting{
+		le = &iaas.ProxyLBACMESetting{
 			Enabled:         true,
 			CommonName:      commonName,
 			SubjectAltNames: altNames,
@@ -170,7 +170,7 @@ func resourceSakuraCloudProxyLBACMECreate(ctx context.Context, d *schema.Resourc
 		time.Sleep(time.Duration(updateDelaySec) * time.Second)
 	}
 
-	proxyLB, err = proxyLBOp.UpdateSettings(ctx, proxyLB.ID, &sacloud.ProxyLBUpdateSettingsRequest{
+	proxyLB, err = proxyLBOp.UpdateSettings(ctx, proxyLB.ID, &iaas.ProxyLBUpdateSettingsRequest{
 		HealthCheck:   proxyLB.HealthCheck,
 		SorryServer:   proxyLB.SorryServer,
 		BindPorts:     proxyLB.BindPorts,
@@ -200,12 +200,12 @@ func resourceSakuraCloudProxyLBACMERead(ctx context.Context, d *schema.ResourceD
 		return diag.FromErr(err)
 	}
 
-	proxyLBOp := sacloud.NewProxyLBOp(client)
+	proxyLBOp := iaas.NewProxyLBOp(client)
 	proxyLBID := d.Get("proxylb_id").(string)
 
 	proxyLB, err := proxyLBOp.Read(ctx, sakuraCloudID(proxyLBID))
 	if err != nil {
-		if sacloud.IsNotFoundError(err) {
+		if iaas.IsNotFoundError(err) {
 			d.SetId("")
 			return nil
 		}
@@ -221,7 +221,7 @@ func resourceSakuraCloudProxyLBACMEDelete(ctx context.Context, d *schema.Resourc
 		return diag.FromErr(err)
 	}
 
-	proxyLBOp := sacloud.NewProxyLBOp(client)
+	proxyLBOp := iaas.NewProxyLBOp(client)
 	proxyLBID := d.Get("proxylb_id").(string)
 
 	sakuraMutexKV.Lock(proxyLBID)
@@ -233,12 +233,12 @@ func resourceSakuraCloudProxyLBACMEDelete(ctx context.Context, d *schema.Resourc
 	}
 
 	// clear
-	_, err = proxyLBOp.UpdateSettings(ctx, proxyLB.ID, &sacloud.ProxyLBUpdateSettingsRequest{
+	_, err = proxyLBOp.UpdateSettings(ctx, proxyLB.ID, &iaas.ProxyLBUpdateSettingsRequest{
 		HealthCheck: proxyLB.HealthCheck,
 		SorryServer: proxyLB.SorryServer,
 		BindPorts:   proxyLB.BindPorts,
 		Servers:     proxyLB.Servers,
-		LetsEncrypt: &sacloud.ProxyLBACMESetting{
+		LetsEncrypt: &iaas.ProxyLBACMESetting{
 			Enabled: false,
 		},
 		StickySession: proxyLB.StickySession,
@@ -256,11 +256,11 @@ func resourceSakuraCloudProxyLBACMEDelete(ctx context.Context, d *schema.Resourc
 	return nil
 }
 
-func setProxyLBACMEResourceData(ctx context.Context, d *schema.ResourceData, client *APIClient, data *sacloud.ProxyLB) diag.Diagnostics {
-	proxyLBOp := sacloud.NewProxyLBOp(client)
+func setProxyLBACMEResourceData(ctx context.Context, d *schema.ResourceData, client *APIClient, data *iaas.ProxyLB) diag.Diagnostics {
+	proxyLBOp := iaas.NewProxyLBOp(client)
 
 	// certificates
-	var cert *sacloud.ProxyLBCertificates
+	var cert *iaas.ProxyLBCertificates
 	var err error
 	for i := 0; i < 5; i++ { // 作成直後はcertが空になるため数回リトライする
 		cert, err = proxyLBOp.GetCertificates(ctx, data.ID)

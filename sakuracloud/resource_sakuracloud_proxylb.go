@@ -21,9 +21,9 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
-	"github.com/sacloud/libsacloud/v2/helper/query"
-	"github.com/sacloud/libsacloud/v2/sacloud"
-	"github.com/sacloud/libsacloud/v2/sacloud/types"
+	"github.com/sacloud/iaas-api-go"
+	"github.com/sacloud/iaas-api-go/helper/query"
+	"github.com/sacloud/iaas-api-go/types"
 )
 
 func resourceSakuraCloudProxyLB() *schema.Resource {
@@ -433,7 +433,7 @@ func resourceSakuraCloudProxyLBCreate(ctx context.Context, d *schema.ResourceDat
 		return diag.FromErr(err)
 	}
 
-	proxyLBOp := sacloud.NewProxyLBOp(client)
+	proxyLBOp := iaas.NewProxyLBOp(client)
 	proxyLB, err := proxyLBOp.Create(ctx, expandProxyLBCreateRequest(d))
 	if err != nil {
 		return diag.Errorf("creating SakuraCloud ProxyLB is failed: %s", err)
@@ -441,7 +441,7 @@ func resourceSakuraCloudProxyLBCreate(ctx context.Context, d *schema.ResourceDat
 
 	certs := expandProxyLBCerts(d)
 	if certs != nil {
-		_, err := proxyLBOp.SetCertificates(ctx, proxyLB.ID, &sacloud.ProxyLBSetCertificatesRequest{
+		_, err := proxyLBOp.SetCertificates(ctx, proxyLB.ID, &iaas.ProxyLBSetCertificatesRequest{
 			PrimaryCerts:    certs.PrimaryCert,
 			AdditionalCerts: certs.AdditionalCerts,
 		})
@@ -462,7 +462,7 @@ func resourceSakuraCloudProxyLBRead(ctx context.Context, d *schema.ResourceData,
 
 	proxyLB, err := query.ReadProxyLB(ctx, client, sakuraCloudID(d.Id()))
 	if err != nil {
-		if sacloud.IsNoResultsError(err) {
+		if iaas.IsNoResultsError(err) {
 			d.SetId("")
 			return nil
 		}
@@ -479,7 +479,7 @@ func resourceSakuraCloudProxyLBUpdate(ctx context.Context, d *schema.ResourceDat
 		return diag.FromErr(err)
 	}
 
-	proxyLBOp := sacloud.NewProxyLBOp(client)
+	proxyLBOp := iaas.NewProxyLBOp(client)
 
 	sakuraMutexKV.Lock(d.Id())
 	defer sakuraMutexKV.Unlock(d.Id())
@@ -497,7 +497,7 @@ func resourceSakuraCloudProxyLBUpdate(ctx context.Context, d *schema.ResourceDat
 	if d.HasChange("plan") {
 		newPlan := types.EProxyLBPlan(d.Get("plan").(int))
 		serviceClass := types.ProxyLBServiceClass(newPlan, proxyLB.Region)
-		upd, err := proxyLBOp.ChangePlan(ctx, proxyLB.ID, &sacloud.ProxyLBChangePlanRequest{ServiceClass: serviceClass})
+		upd, err := proxyLBOp.ChangePlan(ctx, proxyLB.ID, &iaas.ProxyLBChangePlanRequest{ServiceClass: serviceClass})
 		if err != nil {
 			return diag.Errorf("changing ProxyLB[%s] plan is failed: %s", d.Id(), err)
 		}
@@ -514,7 +514,7 @@ func resourceSakuraCloudProxyLBUpdate(ctx context.Context, d *schema.ResourceDat
 				return diag.Errorf("deleting Certificates of ProxyLB[%s] is failed: %s", d.Id(), err)
 			}
 		} else {
-			if _, err := proxyLBOp.SetCertificates(ctx, proxyLB.ID, &sacloud.ProxyLBSetCertificatesRequest{
+			if _, err := proxyLBOp.SetCertificates(ctx, proxyLB.ID, &iaas.ProxyLBSetCertificatesRequest{
 				PrimaryCerts:    certs.PrimaryCert,
 				AdditionalCerts: certs.AdditionalCerts,
 			}); err != nil {
@@ -531,14 +531,14 @@ func resourceSakuraCloudProxyLBDelete(ctx context.Context, d *schema.ResourceDat
 		return diag.FromErr(err)
 	}
 
-	proxyLBOp := sacloud.NewProxyLBOp(client)
+	proxyLBOp := iaas.NewProxyLBOp(client)
 
 	sakuraMutexKV.Lock(d.Id())
 	defer sakuraMutexKV.Unlock(d.Id())
 
 	proxyLB, err := proxyLBOp.Read(ctx, sakuraCloudID(d.Id()))
 	if err != nil {
-		if sacloud.IsNotFoundError(err) {
+		if iaas.IsNotFoundError(err) {
 			d.SetId("")
 			return nil
 		}
@@ -551,9 +551,9 @@ func resourceSakuraCloudProxyLBDelete(ctx context.Context, d *schema.ResourceDat
 	return nil
 }
 
-func setProxyLBResourceData(ctx context.Context, d *schema.ResourceData, client *APIClient, data *sacloud.ProxyLB) diag.Diagnostics {
+func setProxyLBResourceData(ctx context.Context, d *schema.ResourceData, client *APIClient, data *iaas.ProxyLB) diag.Diagnostics {
 	// certificates
-	proxyLBOp := sacloud.NewProxyLBOp(client)
+	proxyLBOp := iaas.NewProxyLBOp(client)
 
 	certs, err := proxyLBOp.GetCertificates(ctx, data.ID)
 	if err != nil {

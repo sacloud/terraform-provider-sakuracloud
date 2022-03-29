@@ -19,12 +19,12 @@ import (
 	"strings"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
-	"github.com/sacloud/libsacloud/v2/sacloud"
-	"github.com/sacloud/libsacloud/v2/sacloud/types"
+	"github.com/sacloud/iaas-api-go"
+	"github.com/sacloud/iaas-api-go/types"
 )
 
-func expandDNSCreateRequest(d *schema.ResourceData) *sacloud.DNSCreateRequest {
-	return &sacloud.DNSCreateRequest{
+func expandDNSCreateRequest(d *schema.ResourceData) *iaas.DNSCreateRequest {
+	return &iaas.DNSCreateRequest{
 		Name:        d.Get("zone").(string),
 		Description: d.Get("description").(string),
 		Tags:        expandTags(d),
@@ -33,12 +33,12 @@ func expandDNSCreateRequest(d *schema.ResourceData) *sacloud.DNSCreateRequest {
 	}
 }
 
-func expandDNSUpdateRequest(d *schema.ResourceData, dns *sacloud.DNS) *sacloud.DNSUpdateRequest {
+func expandDNSUpdateRequest(d *schema.ResourceData, dns *iaas.DNS) *iaas.DNSUpdateRequest {
 	records := dns.Records
 	if d.HasChange("record") {
 		records = expandDNSRecords(d, "record")
 	}
-	return &sacloud.DNSUpdateRequest{
+	return &iaas.DNSUpdateRequest{
 		Description: d.Get("description").(string),
 		Tags:        expandTags(d),
 		IconID:      expandSakuraCloudID(d, "icon_id"),
@@ -46,7 +46,7 @@ func expandDNSUpdateRequest(d *schema.ResourceData, dns *sacloud.DNS) *sacloud.D
 	}
 }
 
-func flattenDNSRecords(dns *sacloud.DNS) []interface{} {
+func flattenDNSRecords(dns *iaas.DNS) []interface{} {
 	var records []interface{}
 	for _, record := range dns.Records {
 		records = append(records, flattenDNSRecord(record))
@@ -55,7 +55,7 @@ func flattenDNSRecords(dns *sacloud.DNS) []interface{} {
 	return records
 }
 
-func flattenDNSRecord(record *sacloud.DNSRecord) map[string]interface{} {
+func flattenDNSRecord(record *iaas.DNSRecord) map[string]interface{} {
 	var r = map[string]interface{}{
 		"name":  record.Name,
 		"type":  record.Type,
@@ -84,15 +84,15 @@ func flattenDNSRecord(record *sacloud.DNSRecord) map[string]interface{} {
 	return r
 }
 
-func expandDNSRecords(d resourceValueGettable, key string) []*sacloud.DNSRecord {
-	var records []*sacloud.DNSRecord
+func expandDNSRecords(d resourceValueGettable, key string) []*iaas.DNSRecord {
+	var records []*iaas.DNSRecord
 	for _, rawRecord := range d.Get(key).([]interface{}) {
 		records = append(records, expandDNSRecord(&resourceMapValue{rawRecord.(map[string]interface{})}))
 	}
 	return records
 }
 
-func expandDNSRecord(d resourceValueGettable) *sacloud.DNSRecord {
+func expandDNSRecord(d resourceValueGettable) *iaas.DNSRecord {
 	t, _ := d.GetOk("type")
 	recordType := t.(string)
 	name := d.Get("name")
@@ -109,7 +109,7 @@ func expandDNSRecord(d resourceValueGettable) *sacloud.DNSRecord {
 		if rdata != "" && !strings.HasSuffix(rdata, ".") {
 			rdata = rdata + "."
 		}
-		return &sacloud.DNSRecord{
+		return &iaas.DNSRecord{
 			Name:  name.(string),
 			Type:  types.EDNSRecordType(recordType),
 			RData: fmt.Sprintf("%d %s", pr, rdata),
@@ -132,14 +132,14 @@ func expandDNSRecord(d resourceValueGettable) *sacloud.DNSRecord {
 		if rdata != "" && !strings.HasSuffix(rdata, ".") {
 			rdata = rdata + "."
 		}
-		return &sacloud.DNSRecord{
+		return &iaas.DNSRecord{
 			Name:  name.(string),
 			Type:  types.EDNSRecordType(recordType),
 			RData: fmt.Sprintf("%d %d %d %s", pr, weight, port, rdata),
 			TTL:   ttl.(int),
 		}
 	default:
-		return &sacloud.DNSRecord{
+		return &iaas.DNSRecord{
 			Name:  name.(string),
 			Type:  types.EDNSRecordType(recordType),
 			RData: value.(string),
@@ -148,19 +148,19 @@ func expandDNSRecord(d resourceValueGettable) *sacloud.DNSRecord {
 	}
 }
 
-func expandDNSRecordCreateRequest(d *schema.ResourceData, dns *sacloud.DNS) (*sacloud.DNSRecord, *sacloud.DNSUpdateSettingsRequest) {
+func expandDNSRecordCreateRequest(d *schema.ResourceData, dns *iaas.DNS) (*iaas.DNSRecord, *iaas.DNSUpdateSettingsRequest) {
 	record := expandDNSRecord(d)
 	records := append(dns.Records, record)
 
-	return record, &sacloud.DNSUpdateSettingsRequest{
+	return record, &iaas.DNSUpdateSettingsRequest{
 		Records:      records,
 		SettingsHash: dns.SettingsHash,
 	}
 }
 
-func expandDNSRecordDeleteRequest(d *schema.ResourceData, dns *sacloud.DNS) *sacloud.DNSUpdateSettingsRequest {
+func expandDNSRecordDeleteRequest(d *schema.ResourceData, dns *iaas.DNS) *iaas.DNSUpdateSettingsRequest {
 	record := expandDNSRecord(d)
-	var records []*sacloud.DNSRecord
+	var records []*iaas.DNSRecord
 
 	for _, r := range dns.Records {
 		if !isSameDNSRecord(r, record) {
@@ -168,7 +168,7 @@ func expandDNSRecordDeleteRequest(d *schema.ResourceData, dns *sacloud.DNS) *sac
 		}
 	}
 
-	return &sacloud.DNSUpdateSettingsRequest{
+	return &iaas.DNSUpdateSettingsRequest{
 		Records:      records,
 		SettingsHash: dns.SettingsHash,
 	}

@@ -22,14 +22,14 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
-	"github.com/sacloud/libsacloud/v2/sacloud"
+	"github.com/sacloud/iaas-api-go"
 )
 
 func TestAccSakuraCloudSimpleMonitor_basic(t *testing.T) {
 	resourceName := "sakuracloud_simple_monitor.foobar"
 	zone := randomName() + ".com"
 
-	var monitor sacloud.SimpleMonitor
+	var monitor iaas.SimpleMonitor
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:          func() { testAccPreCheck(t) },
 		ProviderFactories: testAccProviderFactories,
@@ -90,7 +90,7 @@ func TestAccSakuraCloudSimpleMonitor_certMonitor(t *testing.T) {
 	resourceName := "sakuracloud_simple_monitor.foobar"
 	zone := randomName() + ".com"
 
-	var monitor sacloud.SimpleMonitor
+	var monitor iaas.SimpleMonitor
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:          func() { testAccPreCheck(t) },
 		ProviderFactories: testAccProviderFactories,
@@ -118,7 +118,7 @@ func TestAccSakuraCloudSimpleMonitor_certMonitor(t *testing.T) {
 	})
 }
 
-func testCheckSakuraCloudSimpleMonitorExists(n string, monitor *sacloud.SimpleMonitor) resource.TestCheckFunc {
+func testCheckSakuraCloudSimpleMonitorExists(n string, monitor *iaas.SimpleMonitor) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
 		rs, ok := s.RootModule().Resources[n]
 
@@ -131,7 +131,7 @@ func testCheckSakuraCloudSimpleMonitorExists(n string, monitor *sacloud.SimpleMo
 		}
 
 		client := testAccProvider.Meta().(*APIClient)
-		smOp := sacloud.NewSimpleMonitorOp(client)
+		smOp := iaas.NewSimpleMonitorOp(client)
 
 		foundSimpleMonitor, err := smOp.Read(context.Background(), sakuraCloudID(rs.Primary.ID))
 		if err != nil {
@@ -147,7 +147,7 @@ func testCheckSakuraCloudSimpleMonitorExists(n string, monitor *sacloud.SimpleMo
 	}
 }
 
-func testCheckSakuraCloudSimpleMonitorAttributes(monitor *sacloud.SimpleMonitor) resource.TestCheckFunc {
+func testCheckSakuraCloudSimpleMonitorAttributes(monitor *iaas.SimpleMonitor) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
 		if monitor.DelayLoop != 60 {
 			return fmt.Errorf("bad delay_loop: expected:60 got:%d", monitor.DelayLoop)
@@ -156,7 +156,7 @@ func testCheckSakuraCloudSimpleMonitorAttributes(monitor *sacloud.SimpleMonitor)
 	}
 }
 
-func testCheckSakuraCloudSimpleMonitorAttributesUpdated(monitor *sacloud.SimpleMonitor) resource.TestCheckFunc {
+func testCheckSakuraCloudSimpleMonitorAttributesUpdated(monitor *iaas.SimpleMonitor) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
 		if monitor.DelayLoop != 120 {
 			return fmt.Errorf("bad delay_loop: expected:120 got:%d", monitor.DelayLoop)
@@ -167,7 +167,7 @@ func testCheckSakuraCloudSimpleMonitorAttributesUpdated(monitor *sacloud.SimpleM
 
 func testCheckSakuraCloudSimpleMonitorDestroy(s *terraform.State) error {
 	client := testAccProvider.Meta().(*APIClient)
-	smOp := sacloud.NewSimpleMonitorOp(client)
+	smOp := iaas.NewSimpleMonitorOp(client)
 
 	for _, rs := range s.RootModule().Resources {
 		if rs.Type != "sakuracloud_simple_monitor" {

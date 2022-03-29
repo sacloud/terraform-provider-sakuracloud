@@ -21,8 +21,8 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
-	"github.com/sacloud/libsacloud/v2/sacloud"
-	"github.com/sacloud/libsacloud/v2/sacloud/types"
+	"github.com/sacloud/iaas-api-go"
+	"github.com/sacloud/iaas-api-go/types"
 )
 
 func resourceSakuraCloudNote() *schema.Resource {
@@ -76,7 +76,7 @@ func resourceSakuraCloudNoteCreate(ctx context.Context, d *schema.ResourceData, 
 		return diag.FromErr(err)
 	}
 
-	noteOp := sacloud.NewNoteOp(client)
+	noteOp := iaas.NewNoteOp(client)
 	note, err := noteOp.Create(ctx, expandNoteCreateRequest(d))
 	if err != nil {
 		return diag.Errorf("creating SakuraCloud Note is failed: %s", err)
@@ -92,10 +92,10 @@ func resourceSakuraCloudNoteRead(ctx context.Context, d *schema.ResourceData, me
 		return diag.FromErr(err)
 	}
 
-	noteOp := sacloud.NewNoteOp(client)
+	noteOp := iaas.NewNoteOp(client)
 	note, err := noteOp.Read(ctx, sakuraCloudID(d.Id()))
 	if err != nil {
-		if sacloud.IsNotFoundError(err) {
+		if iaas.IsNotFoundError(err) {
 			d.SetId("")
 			return nil
 		}
@@ -111,7 +111,7 @@ func resourceSakuraCloudNoteUpdate(ctx context.Context, d *schema.ResourceData, 
 		return diag.FromErr(err)
 	}
 
-	noteOp := sacloud.NewNoteOp(client)
+	noteOp := iaas.NewNoteOp(client)
 	note, err := noteOp.Read(ctx, sakuraCloudID(d.Id()))
 	if err != nil {
 		return diag.Errorf("could not read SakuraCloud Note[%s]: %s", d.Id(), err)
@@ -131,10 +131,10 @@ func resourceSakuraCloudNoteDelete(ctx context.Context, d *schema.ResourceData, 
 		return diag.FromErr(err)
 	}
 
-	noteOp := sacloud.NewNoteOp(client)
+	noteOp := iaas.NewNoteOp(client)
 	note, err := noteOp.Read(ctx, sakuraCloudID(d.Id()))
 	if err != nil {
-		if sacloud.IsNotFoundError(err) {
+		if iaas.IsNotFoundError(err) {
 			d.SetId("")
 			return nil
 		}
@@ -147,7 +147,7 @@ func resourceSakuraCloudNoteDelete(ctx context.Context, d *schema.ResourceData, 
 	return nil
 }
 
-func setNoteResourceData(ctx context.Context, d *schema.ResourceData, client *APIClient, data *sacloud.Note) diag.Diagnostics {
+func setNoteResourceData(ctx context.Context, d *schema.ResourceData, client *APIClient, data *iaas.Note) diag.Diagnostics {
 	d.Set("name", data.Name)               // nolint
 	d.Set("content", data.Content)         // nolint
 	d.Set("class", data.Class)             // nolint

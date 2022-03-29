@@ -21,7 +21,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
-	"github.com/sacloud/libsacloud/v2/sacloud"
+	"github.com/sacloud/iaas-api-go"
 )
 
 func resourceSakuraCloudIPv4Ptr() *schema.Resource {
@@ -79,7 +79,7 @@ func resourceSakuraCloudIPv4PtrUpdate(ctx context.Context, d *schema.ResourceDat
 		return diag.FromErr(err)
 	}
 
-	ipAddrOp := sacloud.NewIPAddressOp(client)
+	ipAddrOp := iaas.NewIPAddressOp(client)
 
 	ip := d.Get("ip_address").(string)
 	hostName := d.Get("hostname").(string)
@@ -122,12 +122,12 @@ func resourceSakuraCloudIPv4PtrRead(ctx context.Context, d *schema.ResourceData,
 		return diag.FromErr(err)
 	}
 
-	ipAddrOp := sacloud.NewIPAddressOp(client)
+	ipAddrOp := iaas.NewIPAddressOp(client)
 	ip := d.Id()
 
 	ptr, err := ipAddrOp.Read(ctx, zone, ip)
 	if err != nil {
-		if sacloud.IsNotFoundError(err) {
+		if iaas.IsNotFoundError(err) {
 			d.SetId("")
 			return nil
 		}
@@ -144,7 +144,7 @@ func resourceSakuraCloudIPv4PtrDelete(ctx context.Context, d *schema.ResourceDat
 		return diag.FromErr(err)
 	}
 
-	ipAddrOp := sacloud.NewIPAddressOp(client)
+	ipAddrOp := iaas.NewIPAddressOp(client)
 	ip := d.Id()
 
 	_, err = ipAddrOp.Read(ctx, zone, ip)
@@ -160,7 +160,7 @@ func resourceSakuraCloudIPv4PtrDelete(ctx context.Context, d *schema.ResourceDat
 	return nil
 }
 
-func setIPv4PtrResourceData(d *schema.ResourceData, client *APIClient, data *sacloud.IPAddress) diag.Diagnostics {
+func setIPv4PtrResourceData(d *schema.ResourceData, client *APIClient, data *iaas.IPAddress) diag.Diagnostics {
 	d.Set("ip_address", data.IPAddress) // nolint
 	d.Set("hostname", data.HostName)    // nolint
 	d.Set("zone", getZone(d, client))   // nolint

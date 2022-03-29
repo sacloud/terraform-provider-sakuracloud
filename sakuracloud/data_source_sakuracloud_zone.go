@@ -19,7 +19,7 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
-	"github.com/sacloud/libsacloud/v2/sacloud"
+	"github.com/sacloud/iaas-api-go"
 )
 
 func dataSourceSakuraCloudZone() *schema.Resource {
@@ -65,20 +65,20 @@ func dataSourceSakuraCloudZoneRead(ctx context.Context, d *schema.ResourceData, 
 		return diag.FromErr(err)
 	}
 
-	zoneOp := sacloud.NewZoneOp(client)
+	zoneOp := iaas.NewZoneOp(client)
 
 	if v, ok := d.GetOk("name"); ok {
 		zoneSlug = v.(string)
 	}
 
-	res, err := zoneOp.Find(ctx, &sacloud.FindCondition{})
+	res, err := zoneOp.Find(ctx, &iaas.FindCondition{})
 	if err != nil {
 		return diag.Errorf("could not find SakuraCloud Zone resource: %s", err)
 	}
 	if res == nil || len(res.Zones) == 0 {
 		return filterNoResultErr()
 	}
-	var data *sacloud.Zone
+	var data *iaas.Zone
 
 	for _, z := range res.Zones {
 		if z.Name == zoneSlug {

@@ -23,7 +23,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/acctest"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
-	"github.com/sacloud/libsacloud/v2/sacloud"
+	"github.com/sacloud/iaas-api-go"
 )
 
 func TestAccSakuraCloudEnhancedDB_basic(t *testing.T) {
@@ -32,7 +32,7 @@ func TestAccSakuraCloudEnhancedDB_basic(t *testing.T) {
 	databaseName := acctest.RandStringFromCharSet(10, acctest.CharSetAlpha)
 	password := randomPassword()
 
-	var reg sacloud.EnhancedDB
+	var reg iaas.EnhancedDB
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:          func() { testAccPreCheck(t) },
 		ProviderFactories: testAccProviderFactories,
@@ -84,7 +84,7 @@ func TestAccSakuraCloudEnhancedDB_basic(t *testing.T) {
 	})
 }
 
-func testCheckSakuraCloudEnhancedDBExists(n string, auto_backup *sacloud.EnhancedDB) resource.TestCheckFunc {
+func testCheckSakuraCloudEnhancedDBExists(n string, auto_backup *iaas.EnhancedDB) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
 		rs, ok := s.RootModule().Resources[n]
 
@@ -97,7 +97,7 @@ func testCheckSakuraCloudEnhancedDBExists(n string, auto_backup *sacloud.Enhance
 		}
 
 		client := testAccProvider.Meta().(*APIClient)
-		regOp := sacloud.NewEnhancedDBOp(client)
+		regOp := iaas.NewEnhancedDBOp(client)
 
 		foundEnhancedDB, err := regOp.Read(context.Background(), sakuraCloudID(rs.Primary.ID))
 
@@ -126,7 +126,7 @@ func testCheckSakuraCloudEnhancedDBDestroy(s *terraform.State) error {
 			continue
 		}
 
-		regOp := sacloud.NewEnhancedDBOp(client)
+		regOp := iaas.NewEnhancedDBOp(client)
 		_, err := regOp.Read(context.Background(), sakuraCloudID(rs.Primary.ID))
 
 		if err == nil {

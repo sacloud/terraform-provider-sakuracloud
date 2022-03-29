@@ -20,8 +20,8 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
-	"github.com/sacloud/libsacloud/v2/sacloud"
-	"github.com/sacloud/libsacloud/v2/sacloud/types"
+	"github.com/sacloud/iaas-api-go"
+	"github.com/sacloud/iaas-api-go/types"
 )
 
 func resourceSakuraCloudWebAccelCertificate() *schema.Resource {
@@ -86,7 +86,7 @@ func resourceSakuraCloudWebAccelCertificateCreate(ctx context.Context, d *schema
 
 	siteID := d.Get("site_id").(string)
 
-	res, err := sacloud.NewWebAccelOp(caller).CreateCertificate(ctx, types.StringID(siteID), &sacloud.WebAccelCertRequest{
+	res, err := iaas.NewWebAccelOp(caller).CreateCertificate(ctx, types.StringID(siteID), &iaas.WebAccelCertRequest{
 		CertificateChain: d.Get("certificate_chain").(string),
 		Key:              d.Get("private_key").(string),
 	})
@@ -106,9 +106,9 @@ func resourceSakuraCloudWebAccelCertificateRead(ctx context.Context, d *schema.R
 
 	siteID := d.Id()
 
-	certs, err := sacloud.NewWebAccelOp(caller).ReadCertificate(ctx, types.StringID(siteID))
+	certs, err := iaas.NewWebAccelOp(caller).ReadCertificate(ctx, types.StringID(siteID))
 	if err != nil {
-		if sacloud.IsNotFoundError(err) {
+		if iaas.IsNotFoundError(err) {
 			d.SetId("")
 			return nil
 		}
@@ -131,7 +131,7 @@ func resourceSakuraCloudWebAccelCertificateUpdate(ctx context.Context, d *schema
 	siteID := d.Id()
 
 	if d.HasChanges("certificate_chain", "private_key") {
-		res, err := sacloud.NewWebAccelOp(caller).UpdateCertificate(ctx, types.StringID(siteID), &sacloud.WebAccelCertRequest{
+		res, err := iaas.NewWebAccelOp(caller).UpdateCertificate(ctx, types.StringID(siteID), &iaas.WebAccelCertRequest{
 			CertificateChain: d.Get("certificate_chain").(string),
 			Key:              d.Get("private_key").(string),
 		})
@@ -151,7 +151,7 @@ func resourceSakuraCloudWebAccelCertificateDelete(ctx context.Context, d *schema
 	}
 	siteID := d.Get("site_id").(string)
 
-	if err := sacloud.NewWebAccelOp(caller).DeleteCertificate(ctx, types.StringID(siteID)); err != nil {
+	if err := iaas.NewWebAccelOp(caller).DeleteCertificate(ctx, types.StringID(siteID)); err != nil {
 		return diag.Errorf("deleting SakuraCloud WebAccelCert[%s] is failed: %s", d.Id(), err)
 	}
 
@@ -159,7 +159,7 @@ func resourceSakuraCloudWebAccelCertificateDelete(ctx context.Context, d *schema
 	return nil
 }
 
-func setWebAccelCertificateResourceData(d *schema.ResourceData, client *APIClient, data *sacloud.WebAccelCurrentCert) diag.Diagnostics {
+func setWebAccelCertificateResourceData(d *schema.ResourceData, client *APIClient, data *iaas.WebAccelCurrentCert) diag.Diagnostics {
 	notBefore := time.Unix(data.NotBefore/1000, 0).Format(time.RFC3339)
 	notAfter := time.Unix(data.NotAfter/1000, 0).Format(time.RFC3339)
 

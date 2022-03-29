@@ -23,7 +23,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/acctest"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
-	"github.com/sacloud/libsacloud/v2/sacloud"
+	"github.com/sacloud/iaas-api-go"
 )
 
 func TestAccSakuraCloudContainerRegistry_basic(t *testing.T) {
@@ -32,7 +32,7 @@ func TestAccSakuraCloudContainerRegistry_basic(t *testing.T) {
 	subDomainLabel := acctest.RandStringFromCharSet(60, acctest.CharSetAlpha)
 	password := randomPassword()
 
-	var reg sacloud.ContainerRegistry
+	var reg iaas.ContainerRegistry
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:          func() { testAccPreCheck(t) },
 		ProviderFactories: testAccProviderFactories,
@@ -91,7 +91,7 @@ func TestAccSakuraCloudContainerRegistry_basic(t *testing.T) {
 	})
 }
 
-func testCheckSakuraCloudContainerRegistryExists(n string, auto_backup *sacloud.ContainerRegistry) resource.TestCheckFunc {
+func testCheckSakuraCloudContainerRegistryExists(n string, auto_backup *iaas.ContainerRegistry) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
 		rs, ok := s.RootModule().Resources[n]
 
@@ -104,7 +104,7 @@ func testCheckSakuraCloudContainerRegistryExists(n string, auto_backup *sacloud.
 		}
 
 		client := testAccProvider.Meta().(*APIClient)
-		regOp := sacloud.NewContainerRegistryOp(client)
+		regOp := iaas.NewContainerRegistryOp(client)
 
 		foundContainerRegistry, err := regOp.Read(context.Background(), sakuraCloudID(rs.Primary.ID))
 
@@ -133,7 +133,7 @@ func testCheckSakuraCloudContainerRegistryDestroy(s *terraform.State) error {
 			continue
 		}
 
-		regOp := sacloud.NewContainerRegistryOp(client)
+		regOp := iaas.NewContainerRegistryOp(client)
 		_, err := regOp.Read(context.Background(), sakuraCloudID(rs.Primary.ID))
 
 		if err == nil {

@@ -21,7 +21,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
-	"github.com/sacloud/libsacloud/v2/sacloud"
+	"github.com/sacloud/iaas-api-go"
 )
 
 func resourceSakuraCloudArchiveShare() *schema.Resource {
@@ -63,7 +63,7 @@ func resourceSakuraCloudArchiveShareCreate(ctx context.Context, d *schema.Resour
 		return diag.FromErr(err)
 	}
 
-	archiveOp := sacloud.NewArchiveOp(client)
+	archiveOp := iaas.NewArchiveOp(client)
 	archiveID := expandSakuraCloudID(d, "archive_id")
 
 	archive, err := archiveOp.Read(ctx, zone, archiveID)
@@ -89,11 +89,11 @@ func resourceSakuraCloudArchiveShareRead(ctx context.Context, d *schema.Resource
 		return diag.FromErr(err)
 	}
 
-	archiveOp := sacloud.NewArchiveOp(client)
+	archiveOp := iaas.NewArchiveOp(client)
 
 	archive, err := archiveOp.Read(ctx, zone, sakuraCloudID(d.Id()))
 	if err != nil {
-		if sacloud.IsNotFoundError(err) {
+		if iaas.IsNotFoundError(err) {
 			d.SetId("")
 			return nil
 		}
@@ -117,11 +117,11 @@ func resourceSakuraCloudArchiveShareDelete(ctx context.Context, d *schema.Resour
 		return diag.FromErr(err)
 	}
 
-	archiveOp := sacloud.NewArchiveOp(client)
+	archiveOp := iaas.NewArchiveOp(client)
 
 	archive, err := archiveOp.Read(ctx, zone, sakuraCloudID(d.Id()))
 	if err != nil {
-		if sacloud.IsNotFoundError(err) {
+		if iaas.IsNotFoundError(err) {
 			d.SetId("")
 			return nil
 		}

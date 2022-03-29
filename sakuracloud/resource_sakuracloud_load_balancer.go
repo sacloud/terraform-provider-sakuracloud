@@ -21,11 +21,11 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
-	"github.com/sacloud/libsacloud/v2/helper/power"
-	"github.com/sacloud/libsacloud/v2/helper/setup"
-	"github.com/sacloud/libsacloud/v2/sacloud"
-	"github.com/sacloud/libsacloud/v2/sacloud/accessor"
-	"github.com/sacloud/libsacloud/v2/sacloud/types"
+	"github.com/sacloud/iaas-api-go"
+	"github.com/sacloud/iaas-api-go/accessor"
+	"github.com/sacloud/iaas-api-go/helper/power"
+	"github.com/sacloud/iaas-api-go/types"
+	"github.com/sacloud/iaas-service-go/setup"
 )
 
 func resourceSakuraCloudLoadBalancer() *schema.Resource {
@@ -183,7 +183,7 @@ func resourceSakuraCloudLoadBalancerCreate(ctx context.Context, d *schema.Resour
 		return diag.FromErr(err)
 	}
 
-	lbOp := sacloud.NewLoadBalancerOp(client)
+	lbOp := iaas.NewLoadBalancerOp(client)
 
 	builder := &setup.RetryableSetup{
 		Create: func(ctx context.Context, zone string) (accessor.ID, error) {
@@ -198,18 +198,20 @@ func resourceSakuraCloudLoadBalancerCreate(ctx context.Context, d *schema.Resour
 		Delete: func(ctx context.Context, zone string, id types.ID) error {
 			return lbOp.Delete(ctx, zone, id)
 		},
-		RetryCount:    3,
 		IsWaitForUp:   true,
 		IsWaitForCopy: true,
+		Options: &setup.Options{
+			RetryCount: 3,
+		},
 	}
 	res, err := builder.Setup(ctx, zone)
 	if err != nil {
 		return diag.Errorf("creating SakuraCloud LoadBalancer is failed: %s", err)
 	}
 
-	lb, ok := res.(*sacloud.LoadBalancer)
+	lb, ok := res.(*iaas.LoadBalancer)
 	if !ok {
-		return diag.Errorf("creating SakuraCloud LoadBalancer is failed: created resource is not *sacloud.LoadBalancer")
+		return diag.Errorf("creating SakuraCloud LoadBalancer is failed: created resource is not *iaas.LoadBalancer")
 	}
 	d.SetId(lb.ID.String())
 	return resourceSakuraCloudLoadBalancerRead(ctx, d, meta)
@@ -221,11 +223,11 @@ func resourceSakuraCloudLoadBalancerRead(ctx context.Context, d *schema.Resource
 		return diag.FromErr(err)
 	}
 
-	lbOp := sacloud.NewLoadBalancerOp(client)
+	lbOp := iaas.NewLoadBalancerOp(client)
 
 	lb, err := lbOp.Read(ctx, zone, sakuraCloudID(d.Id()))
 	if err != nil {
-		if sacloud.IsNotFoundError(err) {
+		if iaas.IsNotFoundError(err) {
 			d.SetId("")
 			return nil
 		}
@@ -240,7 +242,7 @@ func resourceSakuraCloudLoadBalancerUpdate(ctx context.Context, d *schema.Resour
 		return diag.FromErr(err)
 	}
 
-	lbOp := sacloud.NewLoadBalancerOp(client)
+	lbOp := iaas.NewLoadBalancerOp(client)
 
 	lb, err := lbOp.Read(ctx, zone, sakuraCloudID(d.Id()))
 	if err != nil {
@@ -263,11 +265,11 @@ func resourceSakuraCloudLoadBalancerDelete(ctx context.Context, d *schema.Resour
 		return diag.FromErr(err)
 	}
 
-	lbOp := sacloud.NewLoadBalancerOp(client)
+	lbOp := iaas.NewLoadBalancerOp(client)
 
 	lb, err := lbOp.Read(ctx, zone, sakuraCloudID(d.Id()))
 	if err != nil {
-		if sacloud.IsNotFoundError(err) {
+		if iaas.IsNotFoundError(err) {
 			d.SetId("")
 			return nil
 		}
@@ -285,7 +287,7 @@ func resourceSakuraCloudLoadBalancerDelete(ctx context.Context, d *schema.Resour
 	return nil
 }
 
-func setLoadBalancerResourceData(ctx context.Context, d *schema.ResourceData, client *APIClient, data *sacloud.LoadBalancer) diag.Diagnostics {
+func setLoadBalancerResourceData(ctx context.Context, d *schema.ResourceData, client *APIClient, data *iaas.LoadBalancer) diag.Diagnostics {
 	if data.Availability.IsFailed() {
 		d.SetId("")
 		return diag.Errorf("got unexpected state: LoadBalancer[%d].Availability is failed", data.ID)

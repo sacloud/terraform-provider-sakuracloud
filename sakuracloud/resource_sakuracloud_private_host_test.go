@@ -22,7 +22,7 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
-	"github.com/sacloud/libsacloud/v2/sacloud"
+	"github.com/sacloud/iaas-api-go"
 )
 
 func TestAccSakuraCloudPrivateHost_basic(t *testing.T) {
@@ -31,7 +31,7 @@ func TestAccSakuraCloudPrivateHost_basic(t *testing.T) {
 	resourceName := "sakuracloud_private_host.foobar"
 	rand := randomName()
 
-	var privateHost sacloud.PrivateHost
+	var privateHost iaas.PrivateHost
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:          func() { testAccPreCheck(t) },
 		ProviderFactories: testAccProviderFactories,
@@ -83,7 +83,7 @@ func TestAccSakuraCloudPrivateHost_windows(t *testing.T) {
 	resourceName := "sakuracloud_private_host.foobar"
 	rand := randomName()
 
-	var privateHost sacloud.PrivateHost
+	var privateHost iaas.PrivateHost
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:          func() { testAccPreCheck(t) },
 		ProviderFactories: testAccProviderFactories,
@@ -116,7 +116,7 @@ func TestAccSakuraCloudPrivateHost_destroyWithRunningServer(t *testing.T) {
 	resourceName := "sakuracloud_private_host.foobar"
 	rand := randomName()
 
-	var privateHost sacloud.PrivateHost
+	var privateHost iaas.PrivateHost
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:          func() { testAccPreCheck(t) },
 		ProviderFactories: testAccProviderFactories,
@@ -142,7 +142,7 @@ func TestAccSakuraCloudPrivateHost_destroyWithRunningServer(t *testing.T) {
 	})
 }
 
-func testCheckSakuraCloudPrivateHostExists(n string, privateHost *sacloud.PrivateHost) resource.TestCheckFunc {
+func testCheckSakuraCloudPrivateHostExists(n string, privateHost *iaas.PrivateHost) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
 		rs, ok := s.RootModule().Resources[n]
 
@@ -156,7 +156,7 @@ func testCheckSakuraCloudPrivateHostExists(n string, privateHost *sacloud.Privat
 
 		client := testAccProvider.Meta().(*APIClient)
 		zone := rs.Primary.Attributes["zone"]
-		phOp := sacloud.NewPrivateHostOp(client)
+		phOp := iaas.NewPrivateHostOp(client)
 
 		foundPrivateHost, err := phOp.Read(context.Background(), zone, sakuraCloudID(rs.Primary.ID))
 		if err != nil {
@@ -174,7 +174,7 @@ func testCheckSakuraCloudPrivateHostExists(n string, privateHost *sacloud.Privat
 
 func testCheckSakuraCloudPrivateHostDestroy(s *terraform.State) error {
 	client := testAccProvider.Meta().(*APIClient)
-	phOp := sacloud.NewPrivateHostOp(client)
+	phOp := iaas.NewPrivateHostOp(client)
 
 	for _, rs := range s.RootModule().Resources {
 		if rs.Type != "sakuracloud_private_host" {

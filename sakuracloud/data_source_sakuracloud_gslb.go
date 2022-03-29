@@ -19,8 +19,8 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
-	"github.com/sacloud/libsacloud/v2/sacloud"
-	"github.com/sacloud/libsacloud/v2/sacloud/types"
+	"github.com/sacloud/iaas-api-go"
+	"github.com/sacloud/iaas-api-go/types"
 )
 
 func dataSourceSakuraCloudGSLB() *schema.Resource {
@@ -123,9 +123,9 @@ func dataSourceSakuraCloudGSLBRead(ctx context.Context, d *schema.ResourceData, 
 		return diag.FromErr(err)
 	}
 
-	searcher := sacloud.NewGSLBOp(client)
+	searcher := iaas.NewGSLBOp(client)
 
-	findCondition := &sacloud.FindCondition{}
+	findCondition := &iaas.FindCondition{}
 	if rawFilter, ok := d.GetOk(filterAttrName); ok {
 		findCondition.Filter = expandSearchFilter(rawFilter)
 	}

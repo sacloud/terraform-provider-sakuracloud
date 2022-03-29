@@ -23,10 +23,10 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
-	"github.com/sacloud/libsacloud/v2/helper/plans"
-	"github.com/sacloud/libsacloud/v2/helper/power"
-	"github.com/sacloud/libsacloud/v2/sacloud"
-	"github.com/sacloud/libsacloud/v2/sacloud/types"
+	"github.com/sacloud/iaas-api-go"
+	"github.com/sacloud/iaas-api-go/helper/plans"
+	"github.com/sacloud/iaas-api-go/helper/power"
+	"github.com/sacloud/iaas-api-go/types"
 )
 
 func TestAccSakuraCloudServer_basic(t *testing.T) {
@@ -34,7 +34,7 @@ func TestAccSakuraCloudServer_basic(t *testing.T) {
 	rand := randomName()
 	password := randomPassword()
 
-	var server sacloud.Server
+	var server iaas.Server
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:          func() { testAccPreCheck(t) },
 		ProviderFactories: testAccProviderFactories,
@@ -106,7 +106,7 @@ func TestAccSakuraCloudServer_planChange(t *testing.T) {
 	rand := randomName()
 	password := randomPassword()
 
-	var step1, step2, step3 sacloud.Server
+	var step1, step2, step3 iaas.Server
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:          func() { testAccPreCheck(t) },
 		ProviderFactories: testAccProviderFactories,
@@ -163,7 +163,7 @@ func TestAccSakuraCloudServer_planChangeByOutsideOfTerraform(t *testing.T) {
 	rand := randomName()
 	password := randomPassword()
 
-	var step1, step2, step3 sacloud.Server
+	var step1, step2, step3 iaas.Server
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:          func() { testAccPreCheck(t) },
 		ProviderFactories: testAccProviderFactories,
@@ -182,7 +182,7 @@ func TestAccSakuraCloudServer_planChangeByOutsideOfTerraform(t *testing.T) {
 						client := testAccProvider.Meta().(*APIClient)
 						ctx := context.Background()
 						// shutdown
-						if err := power.ShutdownServer(ctx, sacloud.NewServerOp(client), step1.Zone.Name, step1.ID, true); err != nil {
+						if err := power.ShutdownServer(ctx, iaas.NewServerOp(client), step1.Zone.Name, step1.ID, true); err != nil {
 							return err
 						}
 
@@ -222,7 +222,7 @@ func TestAccSakuraCloudServer_withoutShutdown(t *testing.T) {
 	rand := randomName()
 	password := randomPassword()
 
-	var created, updated, editParamChanged sacloud.Server
+	var created, updated, editParamChanged iaas.Server
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:          func() { testAccPreCheck(t) },
 		ProviderFactories: testAccProviderFactories,
@@ -270,7 +270,7 @@ func TestAccSakuraCloudServer_interfaces(t *testing.T) {
 	resourceName := "sakuracloud_server.foobar"
 	rand := randomName()
 
-	var server sacloud.Server
+	var server iaas.Server
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:          func() { testAccPreCheck(t) },
 		ProviderFactories: testAccProviderFactories,
@@ -364,7 +364,7 @@ func TestAccSakuraCloudServer_withBlankDisk(t *testing.T) {
 	resourceName := "sakuracloud_server.foobar"
 	rand := randomName()
 
-	var server sacloud.Server
+	var server iaas.Server
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:          func() { testAccPreCheck(t) },
 		ProviderFactories: testAccProviderFactories,
@@ -385,7 +385,7 @@ func TestAccSakuraCloudServer_switch(t *testing.T) {
 	resourceName := "sakuracloud_server.foobar"
 	rand := randomName()
 
-	var server sacloud.Server
+	var server iaas.Server
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:          func() { testAccPreCheck(t) },
 		ProviderFactories: testAccProviderFactories,
@@ -410,7 +410,7 @@ func TestAccSakuraCloudServer_withGPU(t *testing.T) {
 	resourceName := "sakuracloud_server.foobar"
 	rand := randomName()
 
-	var server sacloud.Server
+	var server iaas.Server
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:          func() { testAccPreCheck(t) },
 		ProviderFactories: testAccProviderFactories,
@@ -439,7 +439,7 @@ func TestAccSakuraCloudServer_cloudInit(t *testing.T) {
 	password := randomPassword()
 	diskID := os.Getenv(envCloudInitDiskID)
 
-	var created, updated, userDataChanged sacloud.Server
+	var created, updated, userDataChanged iaas.Server
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:          func() { testAccPreCheck(t) },
 		ProviderFactories: testAccProviderFactories,
@@ -486,7 +486,7 @@ func TestAccSakuraCloudServer_cloudInit(t *testing.T) {
 	})
 }
 
-func testCheckSakuraCloudServerExists(n string, server *sacloud.Server) resource.TestCheckFunc {
+func testCheckSakuraCloudServerExists(n string, server *iaas.Server) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
 		rs, ok := s.RootModule().Resources[n]
 
@@ -499,7 +499,7 @@ func testCheckSakuraCloudServerExists(n string, server *sacloud.Server) resource
 		}
 
 		client := testAccProvider.Meta().(*APIClient)
-		serverOp := sacloud.NewServerOp(client)
+		serverOp := iaas.NewServerOp(client)
 		zone := rs.Primary.Attributes["zone"]
 
 		foundServer, err := serverOp.Read(context.Background(), zone, sakuraCloudID(rs.Primary.ID))
@@ -516,7 +516,7 @@ func testCheckSakuraCloudServerExists(n string, server *sacloud.Server) resource
 	}
 }
 
-func testCheckSakuraCloudServerAttributes(server *sacloud.Server) resource.TestCheckFunc {
+func testCheckSakuraCloudServerAttributes(server *iaas.Server) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
 		if !server.InstanceStatus.IsUp() {
 			return fmt.Errorf("unexpected server status: status=%v", server.InstanceStatus)
@@ -534,7 +534,7 @@ func testCheckSakuraCloudServerAttributes(server *sacloud.Server) resource.TestC
 	}
 }
 
-func testCheckSakuraCloudServerSharedInterface(server *sacloud.Server) resource.TestCheckFunc {
+func testCheckSakuraCloudServerSharedInterface(server *iaas.Server) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
 		if !server.InstanceStatus.IsUp() {
 			return fmt.Errorf("unexpected server status: status=%v", server.InstanceStatus)
@@ -550,7 +550,7 @@ func testCheckSakuraCloudServerSharedInterface(server *sacloud.Server) resource.
 
 func testCheckSakuraCloudServerDestroy(s *terraform.State) error {
 	client := testAccProvider.Meta().(*APIClient)
-	serverOp := sacloud.NewServerOp(client)
+	serverOp := iaas.NewServerOp(client)
 
 	for _, rs := range s.RootModule().Resources {
 		if rs.Type != "sakuracloud_server" {

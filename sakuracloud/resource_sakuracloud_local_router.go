@@ -21,7 +21,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
-	"github.com/sacloud/libsacloud/v2/sacloud"
+	"github.com/sacloud/iaas-api-go"
 )
 
 func resourceSakuraCloudLocalRouter() *schema.Resource {
@@ -195,10 +195,10 @@ func resourceSakuraCloudLocalRouterRead(ctx context.Context, d *schema.ResourceD
 		return diag.FromErr(err)
 	}
 
-	lrOp := sacloud.NewLocalRouterOp(client)
+	lrOp := iaas.NewLocalRouterOp(client)
 	localRouter, err := lrOp.Read(ctx, sakuraCloudID(d.Id()))
 	if err != nil {
-		if sacloud.IsNotFoundError(err) {
+		if iaas.IsNotFoundError(err) {
 			d.SetId("")
 			return nil
 		}
@@ -214,7 +214,7 @@ func resourceSakuraCloudLocalRouterUpdate(ctx context.Context, d *schema.Resourc
 		return diag.FromErr(err)
 	}
 
-	lrOp := sacloud.NewLocalRouterOp(client)
+	lrOp := iaas.NewLocalRouterOp(client)
 
 	sakuraMutexKV.Lock(d.Id())
 	defer sakuraMutexKV.Unlock(d.Id())
@@ -241,14 +241,14 @@ func resourceSakuraCloudLocalRouterDelete(ctx context.Context, d *schema.Resourc
 		return diag.FromErr(err)
 	}
 
-	lrOp := sacloud.NewLocalRouterOp(client)
+	lrOp := iaas.NewLocalRouterOp(client)
 
 	sakuraMutexKV.Lock(d.Id())
 	defer sakuraMutexKV.Unlock(d.Id())
 
 	localRouter, err := lrOp.Read(ctx, sakuraCloudID(d.Id()))
 	if err != nil {
-		if sacloud.IsNotFoundError(err) {
+		if iaas.IsNotFoundError(err) {
 			d.SetId("")
 			return nil
 		}
@@ -261,7 +261,7 @@ func resourceSakuraCloudLocalRouterDelete(ctx context.Context, d *schema.Resourc
 	return nil
 }
 
-func setLocalRouterResourceData(ctx context.Context, d *schema.ResourceData, client *APIClient, data *sacloud.LocalRouter) diag.Diagnostics {
+func setLocalRouterResourceData(ctx context.Context, d *schema.ResourceData, client *APIClient, data *iaas.LocalRouter) diag.Diagnostics {
 	if data.Availability.IsFailed() {
 		d.SetId("")
 		return diag.Errorf("got unexpected state: LocalRouter[%d].Availability is failed", data.ID)

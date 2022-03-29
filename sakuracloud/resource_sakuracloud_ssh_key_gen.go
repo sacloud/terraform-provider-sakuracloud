@@ -21,7 +21,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
-	"github.com/sacloud/libsacloud/v2/sacloud"
+	"github.com/sacloud/iaas-api-go"
 )
 
 func resourceSakuraCloudSSHKeyGen() *schema.Resource {
@@ -87,7 +87,7 @@ func resourceSakuraCloudSSHKeyGenCreate(ctx context.Context, d *schema.ResourceD
 		return diag.FromErr(err)
 	}
 
-	sshKeyOp := sacloud.NewSSHKeyOp(client)
+	sshKeyOp := iaas.NewSSHKeyOp(client)
 
 	key, err := sshKeyOp.Generate(ctx, expandSSHKeyGenerateRequest(d))
 	if err != nil {
@@ -106,10 +106,10 @@ func resourceSakuraCloudSSHKeyGenRead(ctx context.Context, d *schema.ResourceDat
 		return diag.FromErr(err)
 	}
 
-	sshKeyOp := sacloud.NewSSHKeyOp(client)
+	sshKeyOp := iaas.NewSSHKeyOp(client)
 	key, err := sshKeyOp.Read(ctx, sakuraCloudID(d.Id()))
 	if err != nil {
-		if sacloud.IsNotFoundError(err) {
+		if iaas.IsNotFoundError(err) {
 			d.SetId("")
 			return nil
 		}
@@ -125,10 +125,10 @@ func resourceSakuraCloudSSHKeyGenDelete(ctx context.Context, d *schema.ResourceD
 		return diag.FromErr(err)
 	}
 
-	sshKeyOp := sacloud.NewSSHKeyOp(client)
+	sshKeyOp := iaas.NewSSHKeyOp(client)
 	key, err := sshKeyOp.Read(ctx, sakuraCloudID(d.Id()))
 	if err != nil {
-		if sacloud.IsNotFoundError(err) {
+		if iaas.IsNotFoundError(err) {
 			d.SetId("")
 			return nil
 		}

@@ -21,7 +21,7 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
-	"github.com/sacloud/libsacloud/v2/sacloud"
+	"github.com/sacloud/iaas-api-go"
 )
 
 func resourceSakuraCloudESME() *schema.Resource {
@@ -66,7 +66,7 @@ func resourceSakuraCloudESMECreate(ctx context.Context, d *schema.ResourceData, 
 		return diag.FromErr(err)
 	}
 
-	esmeOp := sacloud.NewESMEOp(client)
+	esmeOp := iaas.NewESMEOp(client)
 
 	esme, err := esmeOp.Create(ctx, expandESMECreateRequest(d))
 	if err != nil {
@@ -83,10 +83,10 @@ func resourceSakuraCloudESMERead(ctx context.Context, d *schema.ResourceData, me
 		return diag.FromErr(err)
 	}
 
-	esmeOp := sacloud.NewESMEOp(client)
+	esmeOp := iaas.NewESMEOp(client)
 	esme, err := esmeOp.Read(ctx, sakuraCloudID(d.Id()))
 	if err != nil {
-		if sacloud.IsNotFoundError(err) {
+		if iaas.IsNotFoundError(err) {
 			d.SetId("")
 			return nil
 		}
@@ -101,7 +101,7 @@ func resourceSakuraCloudESMEUpdate(ctx context.Context, d *schema.ResourceData, 
 		return diag.FromErr(err)
 	}
 
-	esmeOp := sacloud.NewESMEOp(client)
+	esmeOp := iaas.NewESMEOp(client)
 	esme, err := esmeOp.Read(ctx, sakuraCloudID(d.Id()))
 	if err != nil {
 		return diag.Errorf("could not read SakuraCloud ESME[%s]: %s", d.Id(), err)
@@ -124,10 +124,10 @@ func resourceSakuraCloudESMEDelete(ctx context.Context, d *schema.ResourceData, 
 		return diag.FromErr(err)
 	}
 
-	esmeOp := sacloud.NewESMEOp(client)
+	esmeOp := iaas.NewESMEOp(client)
 	esme, err := esmeOp.Read(ctx, sakuraCloudID(d.Id()))
 	if err != nil {
-		if sacloud.IsNotFoundError(err) {
+		if iaas.IsNotFoundError(err) {
 			d.SetId("")
 			return nil
 		}
@@ -142,23 +142,23 @@ func resourceSakuraCloudESMEDelete(ctx context.Context, d *schema.ResourceData, 
 	return nil
 }
 
-func setESMEResourceData(d *schema.ResourceData, _ *APIClient, data *sacloud.ESME) diag.Diagnostics {
+func setESMEResourceData(d *schema.ResourceData, _ *APIClient, data *iaas.ESME) diag.Diagnostics {
 	d.Set("name", data.Name)                         // nolint
 	d.Set("icon_id", data.IconID.String())           // nolint
 	d.Set("description", data.Description)           // nolint
 	d.Set("send_message_with_generated_otp_api_url", // nolint
 		fmt.Sprintf(
 			"%s/%s/api/cloud/1.1/commonserviceitem/%s/esme/2fa/otp",
-			sacloud.SakuraCloudAPIRoot,
-			sacloud.APIDefaultZone,
+			iaas.SakuraCloudAPIRoot,
+			iaas.APIDefaultZone,
 			d.Id(),
 		),
 	)
 	d.Set("send_message_with_inputted_otp_api_url", // nolint
 		fmt.Sprintf(
 			"%s/%s/api/cloud/1.1/commonserviceitem/%s/esme/2fa",
-			sacloud.SakuraCloudAPIRoot,
-			sacloud.APIDefaultZone,
+			iaas.SakuraCloudAPIRoot,
+			iaas.APIDefaultZone,
 			d.Id(),
 		),
 	)

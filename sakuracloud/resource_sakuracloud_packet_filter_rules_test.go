@@ -18,14 +18,14 @@ import (
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
-	"github.com/sacloud/libsacloud/v2/sacloud"
+	"github.com/sacloud/iaas-api-go"
 )
 
 func TestAccSakuraCloudPacketFilterRules_basic(t *testing.T) {
 	resourceName := "sakuracloud_packet_filter_rules.rules"
 	rand := randomName()
 
-	var filter sacloud.PacketFilter
+	var filter iaas.PacketFilter
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:          func() { testAccPreCheck(t) },
 		ProviderFactories: testAccProviderFactories,

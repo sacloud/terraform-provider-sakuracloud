@@ -20,8 +20,8 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
-	"github.com/sacloud/libsacloud/v2/helper/cleanup"
-	"github.com/sacloud/libsacloud/v2/sacloud"
+	"github.com/sacloud/iaas-api-go"
+	"github.com/sacloud/iaas-api-go/helper/cleanup"
 )
 
 func resourceSakuraCloudBridge() *schema.Resource {
@@ -55,8 +55,8 @@ func resourceSakuraCloudBridgeCreate(ctx context.Context, d *schema.ResourceData
 		return diag.FromErr(err)
 	}
 
-	bridgeOp := sacloud.NewBridgeOp(client)
-	bridge, err := bridgeOp.Create(ctx, zone, &sacloud.BridgeCreateRequest{
+	bridgeOp := iaas.NewBridgeOp(client)
+	bridge, err := bridgeOp.Create(ctx, zone, &iaas.BridgeCreateRequest{
 		Name:        d.Get("name").(string),
 		Description: d.Get("description").(string),
 	})
@@ -74,11 +74,11 @@ func resourceSakuraCloudBridgeRead(ctx context.Context, d *schema.ResourceData, 
 		return diag.FromErr(err)
 	}
 
-	bridgeOp := sacloud.NewBridgeOp(client)
+	bridgeOp := iaas.NewBridgeOp(client)
 
 	bridge, err := bridgeOp.Read(ctx, zone, sakuraCloudID(d.Id()))
 	if err != nil {
-		if sacloud.IsNotFoundError(err) {
+		if iaas.IsNotFoundError(err) {
 			d.SetId("")
 			return nil
 		}
@@ -93,14 +93,14 @@ func resourceSakuraCloudBridgeUpdate(ctx context.Context, d *schema.ResourceData
 		return diag.FromErr(err)
 	}
 
-	bridgeOp := sacloud.NewBridgeOp(client)
+	bridgeOp := iaas.NewBridgeOp(client)
 
 	bridge, err := bridgeOp.Read(ctx, zone, sakuraCloudID(d.Id()))
 	if err != nil {
 		return diag.Errorf("could not read SakuraCloud Bridge[%s]: %s", d.Id(), err)
 	}
 
-	_, err = bridgeOp.Update(ctx, zone, bridge.ID, &sacloud.BridgeUpdateRequest{
+	_, err = bridgeOp.Update(ctx, zone, bridge.ID, &iaas.BridgeUpdateRequest{
 		Name:        d.Get("name").(string),
 		Description: d.Get("description").(string),
 	})
@@ -116,11 +116,11 @@ func resourceSakuraCloudBridgeDelete(ctx context.Context, d *schema.ResourceData
 		return diag.FromErr(err)
 	}
 
-	bridgeOp := sacloud.NewBridgeOp(client)
+	bridgeOp := iaas.NewBridgeOp(client)
 
 	bridge, err := bridgeOp.Read(ctx, zone, sakuraCloudID(d.Id()))
 	if err != nil {
-		if sacloud.IsNotFoundError(err) {
+		if iaas.IsNotFoundError(err) {
 			d.SetId("")
 			return nil
 		}
@@ -134,7 +134,7 @@ func resourceSakuraCloudBridgeDelete(ctx context.Context, d *schema.ResourceData
 	return nil
 }
 
-func setBridgeResourceData(ctx context.Context, d *schema.ResourceData, client *APIClient, data *sacloud.Bridge) diag.Diagnostics {
+func setBridgeResourceData(ctx context.Context, d *schema.ResourceData, client *APIClient, data *iaas.Bridge) diag.Diagnostics {
 	d.Set("name", data.Name)               // nolint
 	d.Set("description", data.Description) // nolint
 	d.Set("zone", getZone(d, client))      // nolint

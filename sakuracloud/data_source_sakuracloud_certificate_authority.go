@@ -21,8 +21,9 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
-	caService "github.com/sacloud/libsacloud/v2/helper/service/certificateauthority"
-	"github.com/sacloud/libsacloud/v2/sacloud"
+	"github.com/sacloud/iaas-api-go"
+	caService "github.com/sacloud/iaas-service-go/certificateauthority"
+	caBuilder "github.com/sacloud/iaas-service-go/certificateauthority/builder"
 )
 
 func dataSourceSakuraCloudCertificateAuthority() *schema.Resource {
@@ -192,9 +193,9 @@ func dataSourceSakuraCloudCertificateAuthorityRead(ctx context.Context, d *schem
 		return diag.FromErr(err)
 	}
 
-	searcher := sacloud.NewCertificateAuthorityOp(client)
+	searcher := iaas.NewCertificateAuthorityOp(client)
 
-	findCondition := &sacloud.FindCondition{}
+	findCondition := &iaas.FindCondition{}
 	if rawFilter, ok := d.GetOk(filterAttrName); ok {
 		findCondition.Filter = expandSearchFilter(rawFilter)
 	}
@@ -221,7 +222,7 @@ func dataSourceSakuraCloudCertificateAuthorityRead(ctx context.Context, d *schem
 	return setCertificateAuthorityDataSourceData(ctx, d, client, target)
 }
 
-func setCertificateAuthorityDataSourceData(ctx context.Context, d *schema.ResourceData, client *APIClient, data *caService.CertificateAuthority) diag.Diagnostics {
+func setCertificateAuthorityDataSourceData(ctx context.Context, d *schema.ResourceData, client *APIClient, data *caBuilder.CertificateAuthority) diag.Diagnostics {
 	d.Set("name", data.Name)               // nolint
 	d.Set("icon_id", data.IconID.String()) // nolint
 	d.Set("description", data.Description) // nolint

@@ -19,16 +19,16 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/sacloud/libsacloud/v2/helper/defaults"
-
-	"github.com/sacloud/libsacloud/v2/helper/builder"
-	"github.com/sacloud/libsacloud/v2/helper/builder/vpcrouter"
-	"github.com/sacloud/libsacloud/v2/sacloud"
-	"github.com/sacloud/libsacloud/v2/sacloud/types"
+	"github.com/sacloud/iaas-api-go"
+	"github.com/sacloud/iaas-api-go/defaults"
+	"github.com/sacloud/iaas-api-go/types"
+	"github.com/sacloud/iaas-service-go/setup"
+	"github.com/sacloud/iaas-service-go/vpcrouter/builder"
 )
 
-func expandVPCRouterBuilder(d resourceValueGettable, client *APIClient) *vpcrouter.Builder {
-	return &vpcrouter.Builder{
+func expandVPCRouterBuilder(d resourceValueGettable, client *APIClient, zone string) *builder.Builder {
+	return &builder.Builder{
+		Zone:                  zone,
 		Name:                  d.Get("name").(string),
 		Description:           d.Get("description").(string),
 		Tags:                  expandTags(d),
@@ -38,11 +38,11 @@ func expandVPCRouterBuilder(d resourceValueGettable, client *APIClient) *vpcrout
 		NICSetting:            expandVPCRouterNICSetting(d),
 		AdditionalNICSettings: expandVPCRouterAdditionalNICSettings(d),
 		RouterSetting:         expandVPCRouterSettings(d),
-		SetupOptions: &builder.RetryableSetupParameter{
+		SetupOptions: &setup.Options{
 			BootAfterBuild:        true,
 			NICUpdateWaitDuration: defaults.DefaultNICUpdateWaitDuration,
 		},
-		Client: sacloud.NewVPCRouterOp(client),
+		Client: iaas.NewVPCRouterOp(client),
 	}
 }
 
@@ -50,18 +50,18 @@ func expandVPCRouterPlanID(d resourceValueGettable) types.ID {
 	return types.VPCRouterPlanIDMap[d.Get("plan").(string)]
 }
 
-func flattenVPCRouterPlan(vpcRouter *sacloud.VPCRouter) string {
+func flattenVPCRouterPlan(vpcRouter *iaas.VPCRouter) string {
 	return types.VPCRouterPlanNameMap[vpcRouter.PlanID]
 }
 
-func expandVPCRouterNICSetting(d resourceValueGettable) vpcrouter.NICSettingHolder {
+func expandVPCRouterNICSetting(d resourceValueGettable) builder.NICSettingHolder {
 	planID := expandVPCRouterPlanID(d)
 	switch planID {
 	case types.VPCRouterPlans.Standard:
-		return &vpcrouter.StandardNICSetting{}
+		return &builder.StandardNICSetting{}
 	default:
 		nic := expandVPCRouterPublicNetworkInterface(d)
-		return &vpcrouter.PremiumNICSetting{
+		return &builder.PremiumNICSetting{
 			SwitchID:         nic.switchID,
 			IPAddresses:      nic.ipAddresses,
 			VirtualIPAddress: nic.vip,
@@ -91,7 +91,7 @@ func expandVPCRouterPublicNetworkInterface(d resourceValueGettable) *vpcRouterPu
 		vrid:        intOrDefault(d, "vrid"),
 	}
 }
-func flattenVPCRouterPublicNetworkInterface(vpcRouter *sacloud.VPCRouter) []interface{} {
+func flattenVPCRouterPublicNetworkInterface(vpcRouter *iaas.VPCRouter) []interface{} {
 	if vpcRouter.PlanID == types.VPCRouterPlans.Standard {
 		return nil
 	}
@@ -106,25 +106,25 @@ func flattenVPCRouterPublicNetworkInterface(vpcRouter *sacloud.VPCRouter) []inte
 	}
 }
 
-func expandVPCRouterAdditionalNICSettings(d resourceValueGettable) []vpcrouter.AdditionalNICSettingHolder {
-	var results []vpcrouter.AdditionalNICSettingHolder
+func expandVPCRouterAdditionalNICSettings(d resourceValueGettable) []builder.AdditionalNICSettingHolder {
+	var results []builder.AdditionalNICSettingHolder
 	planID := expandVPCRouterPlanID(d)
 	interfaces := d.Get("private_network_interface").([]interface{})
 	for _, iface := range interfaces {
 		d = mapToResourceData(iface.(map[string]interface{}))
-		var nicSetting vpcrouter.AdditionalNICSettingHolder
+		var nicSetting builder.AdditionalNICSettingHolder
 		ipAddresses := expandStringList(d.Get("ip_addresses").([]interface{}))
 
 		switch planID {
 		case types.VPCRouterPlans.Standard:
-			nicSetting = &vpcrouter.AdditionalStandardNICSetting{
+			nicSetting = &builder.AdditionalStandardNICSetting{
 				SwitchID:       expandSakuraCloudID(d, "switch_id"),
 				IPAddress:      ipAddresses[0],
 				NetworkMaskLen: d.Get("netmask").(int),
 				Index:          d.Get("index").(int),
 			}
 		default:
-			nicSetting = &vpcrouter.AdditionalPremiumNICSetting{
+			nicSetting = &builder.AdditionalPremiumNICSetting{
 				SwitchID:         expandSakuraCloudID(d, "switch_id"),
 				NetworkMaskLen:   d.Get("netmask").(int),
 				IPAddresses:      ipAddresses,
@@ -137,7 +137,7 @@ func expandVPCRouterAdditionalNICSettings(d resourceValueGettable) []vpcrouter.A
 	return results
 }
 
-func flattenVPCRouterInterfaces(vpcRouter *sacloud.VPCRouter) []interface{} {
+func flattenVPCRouterInterfaces(vpcRouter *iaas.VPCRouter) []interface{} {
 	var interfaces []interface{}
 	if len(vpcRouter.Interfaces) > 0 {
 		for _, iface := range vpcRouter.Settings.Interfaces {
@@ -145,7 +145,7 @@ func flattenVPCRouterInterfaces(vpcRouter *sacloud.VPCRouter) []interface{} {
 				continue
 			}
 			// find nic from data.Interfaces
-			var nic *sacloud.VPCRouterInterface
+			var nic *iaas.VPCRouterInterface
 			for _, n := range vpcRouter.Interfaces {
 				if iface.Index == n.Index {
 					nic = n
@@ -167,59 +167,59 @@ func flattenVPCRouterInterfaces(vpcRouter *sacloud.VPCRouter) []interface{} {
 	return interfaces
 }
 
-func flattenVPCRouterGlobalAddress(vpcRouter *sacloud.VPCRouter) string {
+func flattenVPCRouterGlobalAddress(vpcRouter *iaas.VPCRouter) string {
 	if vpcRouter.PlanID == types.VPCRouterPlans.Standard {
 		return vpcRouter.Interfaces[0].IPAddress
 	}
 	return vpcRouter.Settings.Interfaces[0].VirtualIPAddress
 }
 
-func flattenVPCRouterGlobalNetworkMaskLen(vpcRouter *sacloud.VPCRouter) int {
+func flattenVPCRouterGlobalNetworkMaskLen(vpcRouter *iaas.VPCRouter) int {
 	return vpcRouter.Interfaces[0].SubnetNetworkMaskLen
 }
 
-func flattenVPCRouterSwitchID(vpcRouter *sacloud.VPCRouter) string {
+func flattenVPCRouterSwitchID(vpcRouter *iaas.VPCRouter) string {
 	if vpcRouter.PlanID != types.VPCRouterPlans.Standard {
 		return vpcRouter.Interfaces[0].SwitchID.String()
 	}
 	return ""
 }
 
-func flattenVPCRouterVIP(vpcRouter *sacloud.VPCRouter) string {
+func flattenVPCRouterVIP(vpcRouter *iaas.VPCRouter) string {
 	if vpcRouter.PlanID != types.VPCRouterPlans.Standard {
 		return vpcRouter.Settings.Interfaces[0].VirtualIPAddress
 	}
 	return ""
 }
 
-func flattenVPCRouterIPAddresses(vpcRouter *sacloud.VPCRouter) []string {
+func flattenVPCRouterIPAddresses(vpcRouter *iaas.VPCRouter) []string {
 	if vpcRouter.PlanID != types.VPCRouterPlans.Standard {
 		return vpcRouter.Settings.Interfaces[0].IPAddress
 	}
 	return []string{}
 }
 
-func flattenVPCRouterIPAliases(vpcRouter *sacloud.VPCRouter) []string {
+func flattenVPCRouterIPAliases(vpcRouter *iaas.VPCRouter) []string {
 	if vpcRouter.PlanID != types.VPCRouterPlans.Standard {
 		return vpcRouter.Settings.Interfaces[0].IPAliases
 	}
 	return []string{}
 }
 
-func flattenVPCRouterVRID(vpcRouter *sacloud.VPCRouter) int {
+func flattenVPCRouterVRID(vpcRouter *iaas.VPCRouter) int {
 	if vpcRouter.PlanID != types.VPCRouterPlans.Standard {
 		return vpcRouter.Settings.VRID
 	}
 	return 0
 }
 
-func expandVPCRouterSettings(d resourceValueGettable) *vpcrouter.RouterSetting {
+func expandVPCRouterSettings(d resourceValueGettable) *builder.RouterSetting {
 	nic := expandVPCRouterPublicNetworkInterface(d)
 	vrid := 0
 	if nic != nil {
 		vrid = nic.vrid
 	}
-	return &vpcrouter.RouterSetting{
+	return &builder.RouterSetting{
 		VRID:                      vrid,
 		InternetConnectionEnabled: types.StringFlag(d.Get("internet_connection").(bool)),
 		StaticNAT:                 expandVPCRouterStaticNATList(d),
@@ -238,9 +238,9 @@ func expandVPCRouterSettings(d resourceValueGettable) *vpcrouter.RouterSetting {
 	}
 }
 
-func expandVPCRouterStaticNATList(d resourceValueGettable) []*sacloud.VPCRouterStaticNAT {
+func expandVPCRouterStaticNATList(d resourceValueGettable) []*iaas.VPCRouterStaticNAT {
 	if values, ok := getListFromResource(d, "static_nat"); ok && len(values) > 0 {
-		var results []*sacloud.VPCRouterStaticNAT
+		var results []*iaas.VPCRouterStaticNAT
 		for _, raw := range values {
 			v := mapToResourceData(raw.(map[string]interface{}))
 			results = append(results, expandVPCRouterStaticNAT(v))
@@ -250,15 +250,15 @@ func expandVPCRouterStaticNATList(d resourceValueGettable) []*sacloud.VPCRouterS
 	return nil
 }
 
-func expandVPCRouterStaticNAT(d resourceValueGettable) *sacloud.VPCRouterStaticNAT {
-	return &sacloud.VPCRouterStaticNAT{
+func expandVPCRouterStaticNAT(d resourceValueGettable) *iaas.VPCRouterStaticNAT {
+	return &iaas.VPCRouterStaticNAT{
 		GlobalAddress:  d.Get("public_ip").(string),
 		PrivateAddress: d.Get("private_ip").(string),
 		Description:    d.Get("description").(string),
 	}
 }
 
-func flattenVPCRouterStaticNAT(vpcRouter *sacloud.VPCRouter) []interface{} {
+func flattenVPCRouterStaticNAT(vpcRouter *iaas.VPCRouter) []interface{} {
 	var staticNATs []interface{}
 	for _, s := range vpcRouter.Settings.StaticNAT {
 		staticNATs = append(staticNATs, map[string]interface{}{
@@ -270,9 +270,9 @@ func flattenVPCRouterStaticNAT(vpcRouter *sacloud.VPCRouter) []interface{} {
 	return staticNATs
 }
 
-func expandVPCRouterDHCPServerList(d resourceValueGettable) []*sacloud.VPCRouterDHCPServer {
+func expandVPCRouterDHCPServerList(d resourceValueGettable) []*iaas.VPCRouterDHCPServer {
 	if values, ok := getListFromResource(d, "dhcp_server"); ok && len(values) > 0 {
-		var results []*sacloud.VPCRouterDHCPServer
+		var results []*iaas.VPCRouterDHCPServer
 		for _, raw := range values {
 			v := mapToResourceData(raw.(map[string]interface{}))
 			results = append(results, expandVPCRouterDHCPServer(v))
@@ -282,8 +282,8 @@ func expandVPCRouterDHCPServerList(d resourceValueGettable) []*sacloud.VPCRouter
 	return nil
 }
 
-func expandVPCRouterDHCPServer(d resourceValueGettable) *sacloud.VPCRouterDHCPServer {
-	return &sacloud.VPCRouterDHCPServer{
+func expandVPCRouterDHCPServer(d resourceValueGettable) *iaas.VPCRouterDHCPServer {
+	return &iaas.VPCRouterDHCPServer{
 		Interface:  fmt.Sprintf("eth%d", d.Get("interface_index").(int)),
 		RangeStart: d.Get("range_start").(string),
 		RangeStop:  d.Get("range_stop").(string),
@@ -291,7 +291,7 @@ func expandVPCRouterDHCPServer(d resourceValueGettable) *sacloud.VPCRouterDHCPSe
 	}
 }
 
-func flattenVPCRouterDHCPServers(vpcRouter *sacloud.VPCRouter) []interface{} {
+func flattenVPCRouterDHCPServers(vpcRouter *iaas.VPCRouter) []interface{} {
 	var dhcpServers []interface{}
 	for _, d := range vpcRouter.Settings.DHCPServer {
 		dhcpServers = append(dhcpServers, map[string]interface{}{
@@ -313,9 +313,9 @@ func vpcRouterInterfaceNameToIndex(ifName string) int {
 	return index
 }
 
-func expandVPCRouterDHCPStaticMappingList(d resourceValueGettable) []*sacloud.VPCRouterDHCPStaticMapping {
+func expandVPCRouterDHCPStaticMappingList(d resourceValueGettable) []*iaas.VPCRouterDHCPStaticMapping {
 	if values, ok := getListFromResource(d, "dhcp_static_mapping"); ok && len(values) > 0 {
-		var results []*sacloud.VPCRouterDHCPStaticMapping
+		var results []*iaas.VPCRouterDHCPStaticMapping
 		for _, raw := range values {
 			v := mapToResourceData(raw.(map[string]interface{}))
 			results = append(results, expandVPCRouterDHCPStaticMapping(v))
@@ -325,14 +325,14 @@ func expandVPCRouterDHCPStaticMappingList(d resourceValueGettable) []*sacloud.VP
 	return nil
 }
 
-func expandVPCRouterDHCPStaticMapping(d resourceValueGettable) *sacloud.VPCRouterDHCPStaticMapping {
-	return &sacloud.VPCRouterDHCPStaticMapping{
+func expandVPCRouterDHCPStaticMapping(d resourceValueGettable) *iaas.VPCRouterDHCPStaticMapping {
+	return &iaas.VPCRouterDHCPStaticMapping{
 		IPAddress:  d.Get("ip_address").(string),
 		MACAddress: d.Get("mac_address").(string),
 	}
 }
 
-func flattenVPCRouterDHCPStaticMappings(vpcRouter *sacloud.VPCRouter) []interface{} {
+func flattenVPCRouterDHCPStaticMappings(vpcRouter *iaas.VPCRouter) []interface{} {
 	var staticMappings []interface{}
 	for _, d := range vpcRouter.Settings.DHCPStaticMapping {
 		staticMappings = append(staticMappings, map[string]interface{}{
@@ -343,11 +343,11 @@ func flattenVPCRouterDHCPStaticMappings(vpcRouter *sacloud.VPCRouter) []interfac
 	return staticMappings
 }
 
-func expandVPCRouterDNSForwarding(d resourceValueGettable) *sacloud.VPCRouterDNSForwarding {
+func expandVPCRouterDNSForwarding(d resourceValueGettable) *iaas.VPCRouterDNSForwarding {
 	if values, ok := getListFromResource(d, "dns_forwarding"); ok && len(values) > 0 {
 		raw := values[0]
 		d := mapToResourceData(raw.(map[string]interface{}))
-		return &sacloud.VPCRouterDNSForwarding{
+		return &iaas.VPCRouterDNSForwarding{
 			Interface:  fmt.Sprintf("eth%d", d.Get("interface_index").(int)),
 			DNSServers: expandStringList(d.Get("dns_servers").([]interface{})),
 		}
@@ -355,7 +355,7 @@ func expandVPCRouterDNSForwarding(d resourceValueGettable) *sacloud.VPCRouterDNS
 	return nil
 }
 
-func flattenVPCRouterDNSForwarding(vpcRouter *sacloud.VPCRouter) []interface{} {
+func flattenVPCRouterDNSForwarding(vpcRouter *iaas.VPCRouter) []interface{} {
 	v := vpcRouter.Settings.DNSForwarding
 	if v != nil {
 		return []interface{}{
@@ -368,9 +368,9 @@ func flattenVPCRouterDNSForwarding(vpcRouter *sacloud.VPCRouter) []interface{} {
 	return nil
 }
 
-func expandVPCRouterFirewallList(d resourceValueGettable) []*sacloud.VPCRouterFirewall {
+func expandVPCRouterFirewallList(d resourceValueGettable) []*iaas.VPCRouterFirewall {
 	if values, ok := getListFromResource(d, "firewall"); ok && len(values) > 0 {
-		var results []*sacloud.VPCRouterFirewall
+		var results []*iaas.VPCRouterFirewall
 		for _, raw := range values {
 			v := mapToResourceData(raw.(map[string]interface{}))
 			results = append(results, expandVPCRouterFirewall(v))
@@ -379,9 +379,9 @@ func expandVPCRouterFirewallList(d resourceValueGettable) []*sacloud.VPCRouterFi
 		// インデックスごとにSend/Receiveをまとめる
 		// results: {Index: 0, Send: []Rules{...}, Receive: nil} , {Index: 0, Send: nil, Receive: []Rules{...}}
 		// merged: {Index: 0, Send: []Rules{...}, Receive: []Rules{...}}
-		var merged []*sacloud.VPCRouterFirewall
+		var merged []*iaas.VPCRouterFirewall
 		for i := 0; i < 8; i++ {
-			firewall := &sacloud.VPCRouterFirewall{
+			firewall := &iaas.VPCRouterFirewall{
 				Index: i,
 			}
 			for _, f := range results {
@@ -401,10 +401,10 @@ func expandVPCRouterFirewallList(d resourceValueGettable) []*sacloud.VPCRouterFi
 	return nil
 }
 
-func expandVPCRouterFirewall(d resourceValueGettable) *sacloud.VPCRouterFirewall {
+func expandVPCRouterFirewall(d resourceValueGettable) *iaas.VPCRouterFirewall {
 	index := intOrDefault(d, "interface_index")
 	direction := stringOrDefault(d, "direction")
-	f := &sacloud.VPCRouterFirewall{
+	f := &iaas.VPCRouterFirewall{
 		Index: index,
 	}
 	if direction == "send" {
@@ -416,9 +416,9 @@ func expandVPCRouterFirewall(d resourceValueGettable) *sacloud.VPCRouterFirewall
 	return f
 }
 
-func expandVPCRouterFirewallRuleList(d resourceValueGettable) []*sacloud.VPCRouterFirewallRule {
+func expandVPCRouterFirewallRuleList(d resourceValueGettable) []*iaas.VPCRouterFirewallRule {
 	if values, ok := getListFromResource(d, "expression"); ok && len(values) > 0 {
-		var results []*sacloud.VPCRouterFirewallRule
+		var results []*iaas.VPCRouterFirewallRule
 		for _, raw := range values {
 			v := mapToResourceData(raw.(map[string]interface{}))
 			results = append(results, expandVPCRouterFirewallRule(v))
@@ -428,14 +428,14 @@ func expandVPCRouterFirewallRuleList(d resourceValueGettable) []*sacloud.VPCRout
 	return nil
 }
 
-func expandVPCRouterFirewallRule(d resourceValueGettable) *sacloud.VPCRouterFirewallRule {
+func expandVPCRouterFirewallRule(d resourceValueGettable) *iaas.VPCRouterFirewallRule {
 	allow := boolOrDefault(d, "allow")
 	action := types.Actions.Allow
 	if !allow {
 		action = types.Actions.Deny
 	}
 
-	return &sacloud.VPCRouterFirewallRule{
+	return &iaas.VPCRouterFirewallRule{
 		Protocol:           types.Protocol(stringOrDefault(d, "protocol")),
 		SourceNetwork:      types.VPCFirewallNetwork(stringOrDefault(d, "source_network")),
 		SourcePort:         types.VPCFirewallPort(stringOrDefault(d, "source_port")),
@@ -447,10 +447,10 @@ func expandVPCRouterFirewallRule(d resourceValueGettable) *sacloud.VPCRouterFire
 	}
 }
 
-func flattenVPCRouterFirewalls(vpcRouter *sacloud.VPCRouter) []interface{} {
+func flattenVPCRouterFirewalls(vpcRouter *iaas.VPCRouter) []interface{} {
 	var firewallRules []interface{}
 	for i, configs := range vpcRouter.Settings.Firewall {
-		directionRules := map[string][]*sacloud.VPCRouterFirewallRule{
+		directionRules := map[string][]*iaas.VPCRouterFirewallRule{
 			"send":    configs.Send,
 			"receive": configs.Receive,
 		}
@@ -483,11 +483,11 @@ func flattenVPCRouterFirewalls(vpcRouter *sacloud.VPCRouter) []interface{} {
 	return firewallRules
 }
 
-func expandVPCRouterPPTP(d resourceValueGettable) *sacloud.VPCRouterPPTPServer {
+func expandVPCRouterPPTP(d resourceValueGettable) *iaas.VPCRouterPPTPServer {
 	if values, ok := getListFromResource(d, "pptp"); ok && len(values) > 0 {
 		raw := values[0]
 		d := mapToResourceData(raw.(map[string]interface{}))
-		return &sacloud.VPCRouterPPTPServer{
+		return &iaas.VPCRouterPPTPServer{
 			RangeStart: stringOrDefault(d, "range_start"),
 			RangeStop:  stringOrDefault(d, "range_stop"),
 		}
@@ -495,7 +495,7 @@ func expandVPCRouterPPTP(d resourceValueGettable) *sacloud.VPCRouterPPTPServer {
 	return nil
 }
 
-func flattenVPCRouterPPTP(vpcRouter *sacloud.VPCRouter) []interface{} {
+func flattenVPCRouterPPTP(vpcRouter *iaas.VPCRouter) []interface{} {
 	var pptp []interface{}
 	if vpcRouter.Settings.PPTPServerEnabled.Bool() {
 		c := vpcRouter.Settings.PPTPServer
@@ -507,11 +507,11 @@ func flattenVPCRouterPPTP(vpcRouter *sacloud.VPCRouter) []interface{} {
 	return pptp
 }
 
-func expandVPCRouterL2TP(d resourceValueGettable) *sacloud.VPCRouterL2TPIPsecServer {
+func expandVPCRouterL2TP(d resourceValueGettable) *iaas.VPCRouterL2TPIPsecServer {
 	if values, ok := getListFromResource(d, "l2tp"); ok && len(values) > 0 {
 		raw := values[0]
 		d := mapToResourceData(raw.(map[string]interface{}))
-		return &sacloud.VPCRouterL2TPIPsecServer{
+		return &iaas.VPCRouterL2TPIPsecServer{
 			RangeStart:      stringOrDefault(d, "range_start"),
 			RangeStop:       stringOrDefault(d, "range_stop"),
 			PreSharedSecret: stringOrDefault(d, "pre_shared_secret"),
@@ -520,7 +520,7 @@ func expandVPCRouterL2TP(d resourceValueGettable) *sacloud.VPCRouterL2TPIPsecSer
 	return nil
 }
 
-func flattenVPCRouterL2TP(vpcRouter *sacloud.VPCRouter) []interface{} {
+func flattenVPCRouterL2TP(vpcRouter *iaas.VPCRouter) []interface{} {
 	var l2tp []interface{}
 	if vpcRouter.Settings.L2TPIPsecServerEnabled.Bool() {
 		s := vpcRouter.Settings.L2TPIPsecServer
@@ -533,16 +533,16 @@ func flattenVPCRouterL2TP(vpcRouter *sacloud.VPCRouter) []interface{} {
 	return l2tp
 }
 
-func expandVPCRouterWireGuard(d resourceValueGettable) *sacloud.VPCRouterWireGuard {
+func expandVPCRouterWireGuard(d resourceValueGettable) *iaas.VPCRouterWireGuard {
 	if values, ok := getListFromResource(d, "wire_guard"); ok && len(values) > 0 {
 		raw := values[0]
 		d := mapToResourceData(raw.(map[string]interface{}))
 
-		var peers []*sacloud.VPCRouterWireGuardPeer
+		var peers []*iaas.VPCRouterWireGuardPeer
 		if peerValues, ok := getListFromResource(d, "peer"); ok && len(peerValues) > 0 {
 			for _, v := range peerValues {
 				d := mapToResourceData(v.(map[string]interface{}))
-				peers = append(peers, &sacloud.VPCRouterWireGuardPeer{
+				peers = append(peers, &iaas.VPCRouterWireGuardPeer{
 					Name:      stringOrDefault(d, "name"),
 					IPAddress: stringOrDefault(d, "ip_address"),
 					PublicKey: stringOrDefault(d, "public_key"),
@@ -550,7 +550,7 @@ func expandVPCRouterWireGuard(d resourceValueGettable) *sacloud.VPCRouterWireGua
 			}
 		}
 
-		return &sacloud.VPCRouterWireGuard{
+		return &iaas.VPCRouterWireGuard{
 			IPAddress: stringOrDefault(d, "ip_address"),
 			Peers:     peers,
 		}
@@ -558,7 +558,7 @@ func expandVPCRouterWireGuard(d resourceValueGettable) *sacloud.VPCRouterWireGua
 	return nil
 }
 
-func flattenVPCRouterWireGuard(vpcRouter *sacloud.VPCRouter, publicKey string) []interface{} {
+func flattenVPCRouterWireGuard(vpcRouter *iaas.VPCRouter, publicKey string) []interface{} {
 	var wireGuard []interface{}
 	if vpcRouter.Settings.WireGuardEnabled.Bool() {
 		s := vpcRouter.Settings.WireGuard
@@ -580,9 +580,9 @@ func flattenVPCRouterWireGuard(vpcRouter *sacloud.VPCRouter, publicKey string) [
 	return wireGuard
 }
 
-func expandVPCRouterPortForwardingList(d resourceValueGettable) []*sacloud.VPCRouterPortForwarding {
+func expandVPCRouterPortForwardingList(d resourceValueGettable) []*iaas.VPCRouterPortForwarding {
 	if values, ok := getListFromResource(d, "port_forwarding"); ok && len(values) > 0 {
-		var results []*sacloud.VPCRouterPortForwarding
+		var results []*iaas.VPCRouterPortForwarding
 		for _, raw := range values {
 			v := mapToResourceData(raw.(map[string]interface{}))
 			results = append(results, expandVPCRouterPortForwarding(v))
@@ -592,8 +592,8 @@ func expandVPCRouterPortForwardingList(d resourceValueGettable) []*sacloud.VPCRo
 	return nil
 }
 
-func expandVPCRouterPortForwarding(d resourceValueGettable) *sacloud.VPCRouterPortForwarding {
-	return &sacloud.VPCRouterPortForwarding{
+func expandVPCRouterPortForwarding(d resourceValueGettable) *iaas.VPCRouterPortForwarding {
+	return &iaas.VPCRouterPortForwarding{
 		Protocol:       types.EVPCRouterPortForwardingProtocol(d.Get("protocol").(string)),
 		GlobalPort:     types.StringNumber(intOrDefault(d, "public_port")),
 		PrivateAddress: stringOrDefault(d, "private_ip"),
@@ -602,7 +602,7 @@ func expandVPCRouterPortForwarding(d resourceValueGettable) *sacloud.VPCRouterPo
 	}
 }
 
-func flattenVPCRouterPortForwardings(vpcRouter *sacloud.VPCRouter) []interface{} {
+func flattenVPCRouterPortForwardings(vpcRouter *iaas.VPCRouter) []interface{} {
 	var portForwardings []interface{}
 	for _, p := range vpcRouter.Settings.PortForwarding {
 		globalPort := p.GlobalPort.Int()
@@ -618,9 +618,9 @@ func flattenVPCRouterPortForwardings(vpcRouter *sacloud.VPCRouter) []interface{}
 	return portForwardings
 }
 
-func expandVPCRouterSiteToSiteList(d resourceValueGettable) []*sacloud.VPCRouterSiteToSiteIPsecVPN {
+func expandVPCRouterSiteToSiteList(d resourceValueGettable) []*iaas.VPCRouterSiteToSiteIPsecVPN {
 	if values, ok := getListFromResource(d, "site_to_site_vpn"); ok && len(values) > 0 {
-		var results []*sacloud.VPCRouterSiteToSiteIPsecVPN
+		var results []*iaas.VPCRouterSiteToSiteIPsecVPN
 		for _, raw := range values {
 			v := mapToResourceData(raw.(map[string]interface{}))
 			results = append(results, expandVPCRouterSiteToSite(v))
@@ -630,8 +630,8 @@ func expandVPCRouterSiteToSiteList(d resourceValueGettable) []*sacloud.VPCRouter
 	return nil
 }
 
-func expandVPCRouterSiteToSite(d resourceValueGettable) *sacloud.VPCRouterSiteToSiteIPsecVPN {
-	return &sacloud.VPCRouterSiteToSiteIPsecVPN{
+func expandVPCRouterSiteToSite(d resourceValueGettable) *iaas.VPCRouterSiteToSiteIPsecVPN {
+	return &iaas.VPCRouterSiteToSiteIPsecVPN{
 		Peer:            stringOrDefault(d, "peer"),
 		RemoteID:        stringOrDefault(d, "remote_id"),
 		PreSharedSecret: stringOrDefault(d, "pre_shared_secret"),
@@ -640,7 +640,7 @@ func expandVPCRouterSiteToSite(d resourceValueGettable) *sacloud.VPCRouterSiteTo
 	}
 }
 
-func flattenVPCRouterSiteToSite(vpcRouter *sacloud.VPCRouter) []interface{} {
+func flattenVPCRouterSiteToSite(vpcRouter *iaas.VPCRouter) []interface{} {
 	var s2sSettings []interface{}
 	for _, s := range vpcRouter.Settings.SiteToSiteIPsecVPN {
 		s2sSettings = append(s2sSettings, map[string]interface{}{
@@ -654,9 +654,9 @@ func flattenVPCRouterSiteToSite(vpcRouter *sacloud.VPCRouter) []interface{} {
 	return s2sSettings
 }
 
-func expandVPCRouterStaticRouteList(d resourceValueGettable) []*sacloud.VPCRouterStaticRoute {
+func expandVPCRouterStaticRouteList(d resourceValueGettable) []*iaas.VPCRouterStaticRoute {
 	if values, ok := getListFromResource(d, "static_route"); ok && len(values) > 0 {
-		var results []*sacloud.VPCRouterStaticRoute
+		var results []*iaas.VPCRouterStaticRoute
 		for _, raw := range values {
 			v := mapToResourceData(raw.(map[string]interface{}))
 			results = append(results, expandVPCRouterStaticRoute(v))
@@ -666,14 +666,14 @@ func expandVPCRouterStaticRouteList(d resourceValueGettable) []*sacloud.VPCRoute
 	return nil
 }
 
-func expandVPCRouterStaticRoute(d resourceValueGettable) *sacloud.VPCRouterStaticRoute {
-	return &sacloud.VPCRouterStaticRoute{
+func expandVPCRouterStaticRoute(d resourceValueGettable) *iaas.VPCRouterStaticRoute {
+	return &iaas.VPCRouterStaticRoute{
 		Prefix:  stringOrDefault(d, "prefix"),
 		NextHop: stringOrDefault(d, "next_hop"),
 	}
 }
 
-func flattenVPCRouterStaticRoutes(vpcRouter *sacloud.VPCRouter) []interface{} {
+func flattenVPCRouterStaticRoutes(vpcRouter *iaas.VPCRouter) []interface{} {
 	var staticRoutes []interface{}
 	for _, s := range vpcRouter.Settings.StaticRoute {
 		staticRoutes = append(staticRoutes, map[string]interface{}{
@@ -684,9 +684,9 @@ func flattenVPCRouterStaticRoutes(vpcRouter *sacloud.VPCRouter) []interface{} {
 	return staticRoutes
 }
 
-func expandVPCRouterUserList(d resourceValueGettable) []*sacloud.VPCRouterRemoteAccessUser {
+func expandVPCRouterUserList(d resourceValueGettable) []*iaas.VPCRouterRemoteAccessUser {
 	if values, ok := getListFromResource(d, "user"); ok && len(values) > 0 {
-		var results []*sacloud.VPCRouterRemoteAccessUser
+		var results []*iaas.VPCRouterRemoteAccessUser
 		for _, raw := range values {
 			v := mapToResourceData(raw.(map[string]interface{}))
 			results = append(results, expandVPCRouterUser(v))
@@ -696,14 +696,14 @@ func expandVPCRouterUserList(d resourceValueGettable) []*sacloud.VPCRouterRemote
 	return nil
 }
 
-func expandVPCRouterUser(d resourceValueGettable) *sacloud.VPCRouterRemoteAccessUser {
-	return &sacloud.VPCRouterRemoteAccessUser{
+func expandVPCRouterUser(d resourceValueGettable) *iaas.VPCRouterRemoteAccessUser {
+	return &iaas.VPCRouterRemoteAccessUser{
 		UserName: stringOrDefault(d, "name"),
 		Password: stringOrDefault(d, "password"),
 	}
 }
 
-func flattenVPCRouterUsers(vpcRouter *sacloud.VPCRouter) []interface{} {
+func flattenVPCRouterUsers(vpcRouter *iaas.VPCRouter) []interface{} {
 	var users []interface{}
 	for _, u := range vpcRouter.Settings.RemoteAccessUsers {
 		users = append(users, map[string]interface{}{

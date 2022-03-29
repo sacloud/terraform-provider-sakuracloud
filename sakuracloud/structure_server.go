@@ -20,10 +20,10 @@ import (
 	"strings"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
-	diskBuilder "github.com/sacloud/libsacloud/v2/helper/builder/disk"
-	serverBuilder "github.com/sacloud/libsacloud/v2/helper/builder/server"
-	"github.com/sacloud/libsacloud/v2/sacloud"
-	"github.com/sacloud/libsacloud/v2/sacloud/types"
+	"github.com/sacloud/iaas-api-go"
+	"github.com/sacloud/iaas-api-go/types"
+	diskBuilder "github.com/sacloud/iaas-service-go/disk/builder"
+	serverBuilder "github.com/sacloud/iaas-service-go/server/builder"
 )
 
 func expandServerBuilder(ctx context.Context, zone string, d *schema.ResourceData, client *APIClient) (*serverBuilder.Builder, error) {
@@ -65,7 +65,7 @@ func expandServerUserData(_ context.Context, d *schema.ResourceData) string {
 func expandServerDisks(ctx context.Context, zone string, d *schema.ResourceData, client *APIClient) ([]diskBuilder.Builder, error) {
 	var builders []diskBuilder.Builder
 	diskIDs := expandSakuraCloudIDs(d, "disks")
-	diskOp := sacloud.NewDiskOp(client)
+	diskOp := iaas.NewDiskOp(client)
 	for i, diskID := range diskIDs {
 		disk, err := diskOp.Read(ctx, zone, diskID)
 		if err != nil {
@@ -105,18 +105,18 @@ func expandServerDisks(ctx context.Context, zone string, d *schema.ResourceData,
 	return builders, nil
 }
 
-func expandDiskEditNotes(d resourceValueGettable) []*sacloud.DiskEditNote {
-	var notes []*sacloud.DiskEditNote
+func expandDiskEditNotes(d resourceValueGettable) []*iaas.DiskEditNote {
+	var notes []*iaas.DiskEditNote
 	if _, ok := d.GetOk("note_ids"); ok {
 		ids := expandSakuraCloudIDs(d, "note_ids")
 		for _, id := range ids {
-			notes = append(notes, &sacloud.DiskEditNote{ID: id})
+			notes = append(notes, &iaas.DiskEditNote{ID: id})
 		}
 	}
 	if values, ok := d.GetOk("note"); ok { // nolint
 		for _, value := range values.([]interface{}) {
 			d = mapToResourceData(value.(map[string]interface{}))
-			notes = append(notes, &sacloud.DiskEditNote{
+			notes = append(notes, &iaas.DiskEditNote{
 				ID:        expandSakuraCloudID(d, "id"),
 				APIKeyID:  expandSakuraCloudID(d, "api_key_id"),
 				Variables: d.Get("variables").(map[string]interface{}),
@@ -178,7 +178,7 @@ func expandServerAdditionalNICs(d resourceValueGettable) []serverBuilder.Additio
 	return results
 }
 
-func flattenServerNICs(server *sacloud.Server) []interface{} {
+func flattenServerNICs(server *iaas.Server) []interface{} {
 	var results []interface{}
 	for _, nic := range server.Interfaces {
 		var upstream string
@@ -200,7 +200,7 @@ func flattenServerNICs(server *sacloud.Server) []interface{} {
 	return results
 }
 
-func flattenServerConnectedDiskIDs(server *sacloud.Server) []string {
+func flattenServerConnectedDiskIDs(server *iaas.Server) []string {
 	var ids []string
 	for _, disk := range server.Disks {
 		ids = append(ids, disk.ID.String())
@@ -208,7 +208,7 @@ func flattenServerConnectedDiskIDs(server *sacloud.Server) []string {
 	return ids
 }
 
-func flattenServerNetworkInfo(server *sacloud.Server) (ip, gateway string, nwMaskLen int, nwAddress string) {
+func flattenServerNetworkInfo(server *iaas.Server) (ip, gateway string, nwMaskLen int, nwAddress string) {
 	if len(server.Interfaces) > 0 && !server.Interfaces[0].SwitchID.IsEmpty() {
 		nic := server.Interfaces[0]
 		if nic.SwitchScope == types.Scopes.Shared {

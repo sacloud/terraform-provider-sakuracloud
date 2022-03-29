@@ -20,9 +20,9 @@ import (
 	"strings"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
-	databaseBuilder "github.com/sacloud/libsacloud/v2/helper/builder/database"
-	"github.com/sacloud/libsacloud/v2/sacloud"
-	"github.com/sacloud/libsacloud/v2/sacloud/types"
+	"github.com/sacloud/iaas-api-go"
+	"github.com/sacloud/iaas-api-go/types"
+	databaseBuilder "github.com/sacloud/iaas-service-go/database/builder"
 )
 
 func expandDatabaseBuilder(d *schema.ResourceData, client *APIClient) *databaseBuilder.Builder {
@@ -46,14 +46,14 @@ func expandDatabaseBuilder(d *schema.ResourceData, client *APIClient) *databaseB
 		IPAddresses:    []string{nic.ipAddress},
 		NetworkMaskLen: nic.netmask,
 		DefaultRoute:   nic.gateway,
-		Conf: &sacloud.DatabaseRemarkDBConfCommon{
+		Conf: &iaas.DatabaseRemarkDBConfCommon{
 			DatabaseName:     dbVersion.Name,
 			DatabaseVersion:  dbVersion.Version,
 			DatabaseRevision: dbVersion.Revision,
 			DefaultUser:      d.Get("username").(string),
 			UserPassword:     d.Get("password").(string),
 		},
-		CommonSetting: &sacloud.DatabaseSettingCommon{
+		CommonSetting: &iaas.DatabaseSettingCommon{
 			ServicePort:     nic.port,
 			SourceNetwork:   nic.sourceRanges,
 			DefaultUser:     d.Get("username").(string),
@@ -68,11 +68,11 @@ func expandDatabaseBuilder(d *schema.ResourceData, client *APIClient) *databaseB
 		Client:             databaseBuilder.NewAPIClient(client),
 		BackupSetting:      expandDatabaseBackupSetting(d),
 		Parameters:         d.Get("parameters").(map[string]interface{}),
-		ReplicationSetting: &sacloud.DatabaseReplicationSetting{},
+		ReplicationSetting: &iaas.DatabaseReplicationSetting{},
 	}
 
 	if replicaUser != "" && replicaPassword != "" {
-		req.ReplicationSetting = &sacloud.DatabaseReplicationSetting{
+		req.ReplicationSetting = &iaas.DatabaseReplicationSetting{
 			Model:    types.DatabaseReplicationModels.MasterSlave,
 			User:     replicaUser,
 			Password: replicaPassword,
@@ -82,7 +82,7 @@ func expandDatabaseBuilder(d *schema.ResourceData, client *APIClient) *databaseB
 }
 
 func expandDatabaseReadReplicaBuilder(ctx context.Context, d *schema.ResourceData, client *APIClient, zone string) (*databaseBuilder.Builder, error) {
-	dbOp := sacloud.NewDatabaseOp(client)
+	dbOp := iaas.NewDatabaseOp(client)
 
 	// validate master instance
 	masterID := d.Get("master_id").(string)
@@ -109,6 +109,7 @@ func expandDatabaseReadReplicaBuilder(ctx context.Context, d *schema.ResourceDat
 	}
 
 	return &databaseBuilder.Builder{
+		Zone:           zone,
 		Name:           d.Get("name").(string),
 		Description:    d.Get("description").(string),
 		Tags:           expandTags(d),
@@ -118,16 +119,16 @@ func expandDatabaseReadReplicaBuilder(ctx context.Context, d *schema.ResourceDat
 		IPAddresses:    []string{nic.ipAddress},
 		NetworkMaskLen: maskLen,
 		DefaultRoute:   defaultRoute,
-		Conf: &sacloud.DatabaseRemarkDBConfCommon{
+		Conf: &iaas.DatabaseRemarkDBConfCommon{
 			DatabaseName:     masterDB.Conf.DatabaseName,
 			DatabaseVersion:  masterDB.Conf.DatabaseVersion,
 			DatabaseRevision: masterDB.Conf.DatabaseRevision,
 		},
-		CommonSetting: &sacloud.DatabaseSettingCommon{
+		CommonSetting: &iaas.DatabaseSettingCommon{
 			ServicePort:   masterDB.CommonSetting.ServicePort,
 			SourceNetwork: nic.sourceRanges,
 		},
-		ReplicationSetting: &sacloud.DatabaseReplicationSetting{
+		ReplicationSetting: &iaas.DatabaseReplicationSetting{
 			Model:       types.DatabaseReplicationModels.AsyncReplica,
 			IPAddress:   masterDB.IPAddresses[0],
 			Port:        masterDB.CommonSetting.ServicePort,
@@ -139,7 +140,7 @@ func expandDatabaseReadReplicaBuilder(ctx context.Context, d *schema.ResourceDat
 	}, nil
 }
 
-func flattenDatabaseType(db *sacloud.Database) string {
+func flattenDatabaseType(db *iaas.Database) string {
 	var databaseType string
 	switch db.Conf.DatabaseName {
 	case types.RDBMSVersions[types.RDBMSTypesPostgreSQL].Name:
@@ -150,7 +151,7 @@ func flattenDatabaseType(db *sacloud.Database) string {
 	return databaseType
 }
 
-func flattenDatabaseTags(db *sacloud.Database) *schema.Set {
+func flattenDatabaseTags(db *iaas.Database) *schema.Set {
 	var tags types.Tags
 	for _, t := range db.Tags {
 		if !(strings.HasPrefix(t, "@MariaDB-") || strings.HasPrefix(t, "@postgres-")) {
@@ -160,13 +161,13 @@ func flattenDatabaseTags(db *sacloud.Database) *schema.Set {
 	return flattenTags(tags)
 }
 
-func expandDatabaseBackupSetting(d resourceValueGettable) *sacloud.DatabaseSettingBackup {
+func expandDatabaseBackupSetting(d resourceValueGettable) *iaas.DatabaseSettingBackup {
 	d = mapFromFirstElement(d, "backup")
 	if d != nil {
 		backupTime := d.Get("time").(string)
 		backupWeekdays := expandBackupWeekdays(d, "weekdays")
 		if backupTime != "" && len(backupWeekdays) > 0 {
-			return &sacloud.DatabaseSettingBackup{
+			return &iaas.DatabaseSettingBackup{
 				Time:      backupTime,
 				DayOfWeek: backupWeekdays,
 			}
@@ -175,7 +176,7 @@ func expandDatabaseBackupSetting(d resourceValueGettable) *sacloud.DatabaseSetti
 	return nil
 }
 
-func flattenDatabaseBackupSetting(db *sacloud.Database) []interface{} {
+func flattenDatabaseBackupSetting(db *iaas.Database) []interface{} {
 	if db.BackupSetting != nil {
 		setting := map[string]interface{}{
 			"time":     db.BackupSetting.Time,
@@ -210,7 +211,7 @@ func expandDatabaseNetworkInterface(d resourceValueGettable) *databaseNetworkInt
 	}
 }
 
-func flattenDatabaseNetworkInterface(db *sacloud.Database) []interface{} {
+func flattenDatabaseNetworkInterface(db *iaas.Database) []interface{} {
 	return []interface{}{
 		map[string]interface{}{
 			"switch_id":     db.SwitchID.String(),
@@ -223,7 +224,7 @@ func flattenDatabaseNetworkInterface(db *sacloud.Database) []interface{} {
 	}
 }
 
-func flattenDatabaseReadReplicaNetworkInterface(db *sacloud.Database) []interface{} {
+func flattenDatabaseReadReplicaNetworkInterface(db *iaas.Database) []interface{} {
 	return []interface{}{
 		map[string]interface{}{
 			"switch_id":     db.SwitchID.String(),

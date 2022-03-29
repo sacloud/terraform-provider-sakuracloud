@@ -16,13 +16,13 @@ package sakuracloud
 
 import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
-	registryUtil "github.com/sacloud/libsacloud/v2/helper/builder/registry"
-	"github.com/sacloud/libsacloud/v2/sacloud"
-	"github.com/sacloud/libsacloud/v2/sacloud/types"
+	"github.com/sacloud/iaas-api-go"
+	"github.com/sacloud/iaas-api-go/types"
+	registryBuilder "github.com/sacloud/iaas-service-go/containerregistry/builder"
 )
 
-func expandContainerRegistryBuilder(d *schema.ResourceData, client *APIClient, settingsHash string) *registryUtil.Builder {
-	return &registryUtil.Builder{
+func expandContainerRegistryBuilder(d *schema.ResourceData, client *APIClient, settingsHash string) *registryBuilder.Builder {
+	return &registryBuilder.Builder{
 		Name:           d.Get("name").(string),
 		Description:    d.Get("description").(string),
 		Tags:           expandTags(d),
@@ -32,16 +32,16 @@ func expandContainerRegistryBuilder(d *schema.ResourceData, client *APIClient, s
 		SubDomainLabel: d.Get("subdomain_label").(string),
 		Users:          expandContainerRegistryUsers(d),
 		SettingsHash:   settingsHash,
-		Client:         registryUtil.NewAPIClient(client),
+		Client:         iaas.NewContainerRegistryOp(client),
 	}
 }
 
-func expandContainerRegistryUsers(d *schema.ResourceData) []*registryUtil.User {
-	var results []*registryUtil.User
+func expandContainerRegistryUsers(d *schema.ResourceData) []*registryBuilder.User {
+	var results []*registryBuilder.User
 	users := d.Get("user").([]interface{})
 	for _, raw := range users {
 		d := mapToResourceData(raw.(map[string]interface{}))
-		results = append(results, &registryUtil.User{
+		results = append(results, &registryBuilder.User{
 			UserName:   stringOrDefault(d, "name"),
 			Password:   stringOrDefault(d, "password"),
 			Permission: types.EContainerRegistryPermission(stringOrDefault(d, "permission")),
@@ -50,7 +50,7 @@ func expandContainerRegistryUsers(d *schema.ResourceData) []*registryUtil.User {
 	return results
 }
 
-func flattenContainerRegistryUsers(d *schema.ResourceData, users []*sacloud.ContainerRegistryUser, includePassword bool) []interface{} {
+func flattenContainerRegistryUsers(d *schema.ResourceData, users []*iaas.ContainerRegistryUser, includePassword bool) []interface{} {
 	inputs := expandContainerRegistryUsers(d)
 
 	var results []interface{}

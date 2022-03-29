@@ -18,14 +18,14 @@ import (
 	"time"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
-	caService "github.com/sacloud/libsacloud/v2/helper/service/certificateauthority"
-	"github.com/sacloud/libsacloud/v2/sacloud"
-	"github.com/sacloud/libsacloud/v2/sacloud/types"
+	"github.com/sacloud/iaas-api-go"
+	"github.com/sacloud/iaas-api-go/types"
+	caBuilder "github.com/sacloud/iaas-service-go/certificateauthority/builder"
 )
 
-func expandCertificateAuthorityBuilder(d *schema.ResourceData, client *APIClient) *caService.Builder {
+func expandCertificateAuthorityBuilder(d *schema.ResourceData, client *APIClient) *caBuilder.Builder {
 	subject := mapToResourceData(d.Get("subject").([]interface{})[0].(map[string]interface{}))
-	return &caService.Builder{
+	return &caBuilder.Builder{
 		ID:          types.StringID(d.Id()),
 		Name:        d.Get("name").(string),
 		Description: d.Get("description").(string),
@@ -45,11 +45,11 @@ func expandCertificateAuthorityBuilder(d *schema.ResourceData, client *APIClient
 		Clients: expandCertificateAuthorityClients(d),
 		Servers: expandCertificateAuthorityServers(d),
 
-		Client: sacloud.NewCertificateAuthorityOp(client),
+		Client: iaas.NewCertificateAuthorityOp(client),
 	}
 }
 
-func flattenCertificateAuthoritySubject(ca *caService.CertificateAuthority) []interface{} {
+func flattenCertificateAuthoritySubject(ca *caBuilder.CertificateAuthority) []interface{} {
 	return []interface{}{
 		map[string]interface{}{
 			"common_name":        ca.CommonName,
@@ -60,8 +60,8 @@ func flattenCertificateAuthoritySubject(ca *caService.CertificateAuthority) []in
 	}
 }
 
-func expandCertificateAuthorityClients(d resourceValueGettable) []*caService.ClientCert {
-	var results []*caService.ClientCert
+func expandCertificateAuthorityClients(d resourceValueGettable) []*caBuilder.ClientCert {
+	var results []*caBuilder.ClientCert
 	rawClients := d.Get("client").([]interface{})
 	for _, rc := range rawClients {
 		d := mapToResourceData(rc.(map[string]interface{}))
@@ -78,7 +78,7 @@ func expandCertificateAuthorityClients(d resourceValueGettable) []*caService.Cli
 			method = types.CertificateAuthorityIssuanceMethods.PublicKey
 		}
 
-		results = append(results, &caService.ClientCert{
+		results = append(results, &caBuilder.ClientCert{
 			ID:                        d.Get("id").(string),
 			Country:                   subject.Get("country").(string),
 			Organization:              subject.Get("organization").(string),
@@ -96,7 +96,7 @@ func expandCertificateAuthorityClients(d resourceValueGettable) []*caService.Cli
 	return results
 }
 
-func flattenCertificateAuthorityClients(d resourceValueGettable, clients []*sacloud.CertificateAuthorityClient) []interface{} {
+func flattenCertificateAuthorityClients(d resourceValueGettable, clients []*iaas.CertificateAuthorityClient) []interface{} {
 	rawClients := d.Get("client").([]interface{})
 
 	var results []interface{}
@@ -114,7 +114,7 @@ func flattenCertificateAuthorityClients(d resourceValueGettable, clients []*sacl
 	return results
 }
 
-func flattenCertificateAuthorityClient(client *sacloud.CertificateAuthorityClient, input map[string]interface{}) interface{} {
+func flattenCertificateAuthorityClient(client *iaas.CertificateAuthorityClient, input map[string]interface{}) interface{} {
 	input["id"] = client.ID
 	input["url"] = client.URL
 	input["hold"] = client.IssueState == "hold"
@@ -135,13 +135,13 @@ func flattenCertificateAuthorityClient(client *sacloud.CertificateAuthorityClien
 	return input
 }
 
-func expandCertificateAuthorityServers(d resourceValueGettable) []*caService.ServerCert {
-	var results []*caService.ServerCert
+func expandCertificateAuthorityServers(d resourceValueGettable) []*caBuilder.ServerCert {
+	var results []*caBuilder.ServerCert
 	rawServers := d.Get("server").([]interface{})
 	for _, rs := range rawServers {
 		d := mapToResourceData(rs.(map[string]interface{}))
 		subject := mapToResourceData(d.Get("subject").([]interface{})[0].(map[string]interface{}))
-		results = append(results, &caService.ServerCert{
+		results = append(results, &caBuilder.ServerCert{
 			ID:                        d.Get("id").(string),
 			Country:                   subject.Get("country").(string),
 			Organization:              subject.Get("organization").(string),
@@ -158,7 +158,7 @@ func expandCertificateAuthorityServers(d resourceValueGettable) []*caService.Ser
 	return results
 }
 
-func flattenCertificateAuthorityServers(d resourceValueGettable, servers []*sacloud.CertificateAuthorityServer) []interface{} {
+func flattenCertificateAuthorityServers(d resourceValueGettable, servers []*iaas.CertificateAuthorityServer) []interface{} {
 	rawServers := d.Get("server").([]interface{})
 
 	var results []interface{}
@@ -176,7 +176,7 @@ func flattenCertificateAuthorityServers(d resourceValueGettable, servers []*sacl
 	return results
 }
 
-func flattenCertificateAuthorityServer(server *sacloud.CertificateAuthorityServer, input map[string]interface{}) interface{} {
+func flattenCertificateAuthorityServer(server *iaas.CertificateAuthorityServer, input map[string]interface{}) interface{} {
 	input["id"] = server.ID
 	input["subject_alternative_names"] = server.SANs
 	input["hold"] = server.IssueState == "hold"
@@ -188,7 +188,7 @@ func flattenCertificateAuthorityServer(server *sacloud.CertificateAuthorityServe
 	return input
 }
 
-func flattenCertificateAuthorityClientsFromBuilder(d resourceValueGettable, builder *caService.Builder) []interface{} {
+func flattenCertificateAuthorityClientsFromBuilder(d resourceValueGettable, builder *caBuilder.Builder) []interface{} {
 	var results []interface{}
 	rawClients := d.Get("client").([]interface{})
 	for i, rc := range rawClients {
@@ -199,7 +199,7 @@ func flattenCertificateAuthorityClientsFromBuilder(d resourceValueGettable, buil
 	return results
 }
 
-func flattenCertificateAuthorityServersFromBuilder(d resourceValueGettable, builder *caService.Builder) []interface{} {
+func flattenCertificateAuthorityServersFromBuilder(d resourceValueGettable, builder *caBuilder.Builder) []interface{} {
 	var results []interface{}
 	rawClients := d.Get("server").([]interface{})
 	for i, rc := range rawClients {
@@ -210,7 +210,7 @@ func flattenCertificateAuthorityServersFromBuilder(d resourceValueGettable, buil
 	return results
 }
 
-func flattenCertificateAuthorityClientsForData(clients []*sacloud.CertificateAuthorityClient) []interface{} {
+func flattenCertificateAuthorityClientsForData(clients []*iaas.CertificateAuthorityClient) []interface{} {
 	var results []interface{}
 	for _, client := range clients {
 		result := map[string]interface{}{
@@ -237,7 +237,7 @@ func flattenCertificateAuthorityClientsForData(clients []*sacloud.CertificateAut
 	return results
 }
 
-func flattenCertificateAuthorityServersForData(servers []*sacloud.CertificateAuthorityServer) []interface{} {
+func flattenCertificateAuthorityServersForData(servers []*iaas.CertificateAuthorityServer) []interface{} {
 	var results []interface{}
 	for _, server := range servers {
 		result := map[string]interface{}{

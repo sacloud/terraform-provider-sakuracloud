@@ -16,11 +16,11 @@ package sakuracloud
 
 import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
-	"github.com/sacloud/libsacloud/v2/sacloud"
+	"github.com/sacloud/iaas-api-go"
 )
 
-func expandAutoBackupCreateRequest(d *schema.ResourceData) *sacloud.AutoBackupCreateRequest {
-	return &sacloud.AutoBackupCreateRequest{
+func expandAutoBackupCreateRequest(d *schema.ResourceData) *iaas.AutoBackupCreateRequest {
+	return &iaas.AutoBackupCreateRequest{
 		Name:                    d.Get("name").(string),
 		Description:             d.Get("description").(string),
 		Tags:                    expandTags(d),
@@ -31,8 +31,8 @@ func expandAutoBackupCreateRequest(d *schema.ResourceData) *sacloud.AutoBackupCr
 	}
 }
 
-func expandAutoBackupUpdateRequest(d *schema.ResourceData, autoBackup *sacloud.AutoBackup) *sacloud.AutoBackupUpdateRequest {
-	return &sacloud.AutoBackupUpdateRequest{
+func expandAutoBackupUpdateRequest(d *schema.ResourceData, autoBackup *iaas.AutoBackup) *iaas.AutoBackupUpdateRequest {
+	return &iaas.AutoBackupUpdateRequest{
 		Name:                    d.Get("name").(string),
 		Description:             d.Get("description").(string),
 		Tags:                    expandTags(d),

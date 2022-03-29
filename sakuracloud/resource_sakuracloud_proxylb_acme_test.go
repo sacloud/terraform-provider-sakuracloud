@@ -20,7 +20,7 @@ import (
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
-	"github.com/sacloud/libsacloud/v2/sacloud"
+	"github.com/sacloud/iaas-api-go"
 )
 
 const (
@@ -36,7 +36,7 @@ func TestAccSakuraCloudProxyLBACME_basic(t *testing.T) {
 	rand := randomName()
 	proxyLBDomain = os.Getenv(envProxyLBACMEDomain)
 
-	var proxylb sacloud.ProxyLB
+	var proxylb iaas.ProxyLB
 	resourceName := "sakuracloud_proxylb_acme.foobar"
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:          func() { testAccPreCheck(t) },

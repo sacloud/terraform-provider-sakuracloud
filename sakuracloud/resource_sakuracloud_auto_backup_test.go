@@ -23,14 +23,14 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
-	"github.com/sacloud/libsacloud/v2/sacloud"
+	"github.com/sacloud/iaas-api-go"
 )
 
 func TestAccSakuraCloudAutoBackup_basic(t *testing.T) {
 	resourceName := "sakuracloud_auto_backup.foobar"
 	rand := randomName()
 
-	var autoBackup sacloud.AutoBackup
+	var autoBackup iaas.AutoBackup
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:          func() { testAccPreCheck(t) },
 		ProviderFactories: testAccProviderFactories,
@@ -79,7 +79,7 @@ func TestAccSakuraCloudAutoBackup_basic(t *testing.T) {
 	})
 }
 
-func testCheckSakuraCloudAutoBackupExists(n string, auto_backup *sacloud.AutoBackup) resource.TestCheckFunc {
+func testCheckSakuraCloudAutoBackupExists(n string, auto_backup *iaas.AutoBackup) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
 		rs, ok := s.RootModule().Resources[n]
 
@@ -92,7 +92,7 @@ func testCheckSakuraCloudAutoBackupExists(n string, auto_backup *sacloud.AutoBac
 		}
 
 		client := testAccProvider.Meta().(*APIClient)
-		autoBackupOp := sacloud.NewAutoBackupOp(client)
+		autoBackupOp := iaas.NewAutoBackupOp(client)
 		zone := rs.Primary.Attributes["zone"]
 
 		foundAutoBackup, err := autoBackupOp.Read(context.Background(), zone, sakuraCloudID(rs.Primary.ID))
@@ -122,7 +122,7 @@ func testCheckSakuraCloudAutoBackupDestroy(s *terraform.State) error {
 			continue
 		}
 
-		autoBackupOp := sacloud.NewAutoBackupOp(client)
+		autoBackupOp := iaas.NewAutoBackupOp(client)
 		zone := rs.Primary.Attributes["zone"]
 		_, err := autoBackupOp.Read(context.Background(), zone, sakuraCloudID(rs.Primary.ID))
 

@@ -23,14 +23,14 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
-	"github.com/sacloud/libsacloud/v2/sacloud"
+	"github.com/sacloud/iaas-api-go"
 )
 
 func TestAccSakuraCloudLoadBalancer_basic(t *testing.T) {
 	resourceName := "sakuracloud_load_balancer.foobar"
 	rand := randomName()
 
-	var loadBalancer sacloud.LoadBalancer
+	var loadBalancer iaas.LoadBalancer
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:          func() { testAccPreCheck(t) },
 		ProviderFactories: testAccProviderFactories,
@@ -113,7 +113,7 @@ func TestAccSakuraCloudLoadBalancer_withRouter(t *testing.T) {
 	resourceName := "sakuracloud_load_balancer.foobar"
 	name := randomName()
 
-	var loadBalancer sacloud.LoadBalancer
+	var loadBalancer iaas.LoadBalancer
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:          func() { testAccPreCheck(t) },
 		ProviderFactories: testAccProviderFactories,
@@ -137,7 +137,7 @@ func TestAccSakuraCloudLoadBalancer_withRouter(t *testing.T) {
 	})
 }
 
-func testCheckSakuraCloudLoadBalancerExists(n string, loadBalancer *sacloud.LoadBalancer) resource.TestCheckFunc {
+func testCheckSakuraCloudLoadBalancerExists(n string, loadBalancer *iaas.LoadBalancer) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
 		rs, ok := s.RootModule().Resources[n]
 
@@ -151,7 +151,7 @@ func testCheckSakuraCloudLoadBalancerExists(n string, loadBalancer *sacloud.Load
 
 		client := testAccProvider.Meta().(*APIClient)
 		zone := rs.Primary.Attributes["zone"]
-		lbOp := sacloud.NewLoadBalancerOp(client)
+		lbOp := iaas.NewLoadBalancerOp(client)
 
 		foundLoadBalancer, err := lbOp.Read(context.Background(), zone, sakuraCloudID(rs.Primary.ID))
 		if err != nil {
@@ -169,7 +169,7 @@ func testCheckSakuraCloudLoadBalancerExists(n string, loadBalancer *sacloud.Load
 
 func testCheckSakuraCloudLoadBalancerDestroy(s *terraform.State) error {
 	client := testAccProvider.Meta().(*APIClient)
-	lbOp := sacloud.NewLoadBalancerOp(client)
+	lbOp := iaas.NewLoadBalancerOp(client)
 
 	for _, rs := range s.RootModule().Resources {
 		if rs.Type != "sakuracloud_load_balancer" {

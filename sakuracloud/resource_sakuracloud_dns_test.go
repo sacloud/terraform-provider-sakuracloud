@@ -22,14 +22,14 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
-	"github.com/sacloud/libsacloud/v2/sacloud"
+	"github.com/sacloud/iaas-api-go"
 )
 
 func TestAccSakuraCloudDNS_basic(t *testing.T) {
 	resourceName := "sakuracloud_dns.foobar"
 	zone := fmt.Sprintf("%s.com", randomName())
 
-	var dns sacloud.DNS
+	var dns iaas.DNS
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:          func() { testAccPreCheck(t) },
 		ProviderFactories: testAccProviderFactories,
@@ -78,7 +78,7 @@ func TestAccSakuraCloudDNS_basic(t *testing.T) {
 	})
 }
 
-func testCheckSakuraCloudDNSExists(n string, dns *sacloud.DNS) resource.TestCheckFunc {
+func testCheckSakuraCloudDNSExists(n string, dns *iaas.DNS) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
 		rs, ok := s.RootModule().Resources[n]
 
@@ -91,7 +91,7 @@ func testCheckSakuraCloudDNSExists(n string, dns *sacloud.DNS) resource.TestChec
 		}
 
 		client := testAccProvider.Meta().(*APIClient)
-		dnsOp := sacloud.NewDNSOp(client)
+		dnsOp := iaas.NewDNSOp(client)
 		ctx := context.Background()
 
 		foundDNS, err := dnsOp.Read(ctx, sakuraCloudID(rs.Primary.ID))
@@ -111,7 +111,7 @@ func testCheckSakuraCloudDNSExists(n string, dns *sacloud.DNS) resource.TestChec
 
 func testCheckSakuraCloudDNSDestroy(s *terraform.State) error {
 	client := testAccProvider.Meta().(*APIClient)
-	dnsOp := sacloud.NewDNSOp(client)
+	dnsOp := iaas.NewDNSOp(client)
 
 	for _, rs := range s.RootModule().Resources {
 		if rs.Type != "sakuracloud_dns" {

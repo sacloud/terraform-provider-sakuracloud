@@ -19,9 +19,9 @@ import (
 	"fmt"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
-	"github.com/sacloud/libsacloud/v2/helper/query"
-	"github.com/sacloud/libsacloud/v2/sacloud"
-	"github.com/sacloud/libsacloud/v2/sacloud/types"
+	"github.com/sacloud/iaas-api-go"
+	"github.com/sacloud/iaas-api-go/helper/query"
+	"github.com/sacloud/iaas-api-go/types"
 )
 
 func expandNFSDiskPlanID(ctx context.Context, client *APIClient, d resourceValueGettable) (types.ID, error) {
@@ -33,11 +33,11 @@ func expandNFSDiskPlanID(ctx context.Context, client *APIClient, d resourceValue
 	}
 	size := d.Get("size").(int)
 
-	return query.FindNFSPlanID(ctx, sacloud.NewNoteOp(client), planID, types.ENFSSize(size))
+	return query.FindNFSPlanID(ctx, iaas.NewNoteOp(client), planID, types.ENFSSize(size))
 }
 
 func flattenNFSDiskPlan(ctx context.Context, client *APIClient, planID types.ID) (string, int, error) {
-	planInfo, err := query.GetNFSPlanInfo(ctx, sacloud.NewNoteOp(client), planID)
+	planInfo, err := query.GetNFSPlanInfo(ctx, iaas.NewNoteOp(client), planID)
 	if err != nil {
 		return "", 0, err
 	}
@@ -54,9 +54,9 @@ func flattenNFSDiskPlan(ctx context.Context, client *APIClient, planID types.ID)
 	return planName, size, nil
 }
 
-func expandNFSCreateRequest(d *schema.ResourceData, planID types.ID) *sacloud.NFSCreateRequest {
+func expandNFSCreateRequest(d *schema.ResourceData, planID types.ID) *iaas.NFSCreateRequest {
 	nic := expandNFSNetworkInterface(d)
-	return &sacloud.NFSCreateRequest{
+	return &iaas.NFSCreateRequest{
 		SwitchID:       nic.switchID,
 		PlanID:         planID,
 		IPAddresses:    []string{nic.ipAddress},
@@ -69,8 +69,8 @@ func expandNFSCreateRequest(d *schema.ResourceData, planID types.ID) *sacloud.NF
 	}
 }
 
-func expandNFSUpdateRequest(d *schema.ResourceData) *sacloud.NFSUpdateRequest {
-	return &sacloud.NFSUpdateRequest{
+func expandNFSUpdateRequest(d *schema.ResourceData) *iaas.NFSUpdateRequest {
+	return &iaas.NFSUpdateRequest{
 		Name:        d.Get("name").(string),
 		Description: d.Get("description").(string),
 		Tags:        expandTags(d),
@@ -98,7 +98,7 @@ func expandNFSNetworkInterface(d resourceValueGettable) *nfsNetworkInterface {
 	}
 }
 
-func flattenNFSNetworkInterface(nfs *sacloud.NFS) []interface{} {
+func flattenNFSNetworkInterface(nfs *iaas.NFS) []interface{} {
 	return []interface{}{
 		map[string]interface{}{
 			"switch_id":  nfs.SwitchID.String(),

@@ -22,8 +22,8 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
-	"github.com/sacloud/libsacloud/v2/sacloud"
-	"github.com/sacloud/libsacloud/v2/sacloud/types"
+	"github.com/sacloud/iaas-api-go"
+	"github.com/sacloud/iaas-api-go/types"
 )
 
 func TestAccSakuraCloudDatabase_basic(t *testing.T) {
@@ -31,7 +31,7 @@ func TestAccSakuraCloudDatabase_basic(t *testing.T) {
 	rand := randomName()
 	password := randomPassword()
 
-	var database sacloud.Database
+	var database iaas.Database
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:          func() { testAccPreCheck(t) },
 		ProviderFactories: testAccProviderFactories,
@@ -111,7 +111,7 @@ func TestAccSakuraCloudDatabase_basic(t *testing.T) {
 	})
 }
 
-func testCheckSakuraCloudDatabaseExists(n string, database *sacloud.Database) resource.TestCheckFunc {
+func testCheckSakuraCloudDatabaseExists(n string, database *iaas.Database) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
 		rs, ok := s.RootModule().Resources[n]
 
@@ -124,7 +124,7 @@ func testCheckSakuraCloudDatabaseExists(n string, database *sacloud.Database) re
 		}
 
 		client := testAccProvider.Meta().(*APIClient)
-		dbOp := sacloud.NewDatabaseOp(client)
+		dbOp := iaas.NewDatabaseOp(client)
 		zone := rs.Primary.Attributes["zone"]
 
 		foundDatabase, err := dbOp.Read(context.Background(), zone, sakuraCloudID(rs.Primary.ID))
@@ -142,7 +142,7 @@ func testCheckSakuraCloudDatabaseExists(n string, database *sacloud.Database) re
 	}
 }
 
-func testCheckSakuraCloudDatabaseIsMaster(isMaster bool, database *sacloud.Database) resource.TestCheckFunc {
+func testCheckSakuraCloudDatabaseIsMaster(isMaster bool, database *iaas.Database) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
 		if database == nil {
 			return errors.New("database is nil")
@@ -168,7 +168,7 @@ func testCheckSakuraCloudDatabaseDestroy(s *terraform.State) error {
 			continue
 		}
 
-		dbOp := sacloud.NewDatabaseOp(client)
+		dbOp := iaas.NewDatabaseOp(client)
 		zone := rs.Primary.Attributes["zone"]
 		_, err := dbOp.Read(context.Background(), zone, sakuraCloudID(rs.Primary.ID))
 

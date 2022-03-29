@@ -18,12 +18,11 @@ import (
 	"io"
 	"os"
 
-	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
-
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
-	archiveUtil "github.com/sacloud/libsacloud/v2/helper/builder/archive"
-	"github.com/sacloud/libsacloud/v2/sacloud"
-	"github.com/sacloud/libsacloud/v2/sacloud/types"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
+	"github.com/sacloud/iaas-api-go"
+	"github.com/sacloud/iaas-api-go/types"
+	archiveUtil "github.com/sacloud/iaas-service-go/archive/builder"
 )
 
 func expandArchiveBuilder(d *schema.ResourceData, zone string, client *APIClient) (archiveUtil.Builder, func(), error) {
@@ -96,8 +95,8 @@ func expandArchiveHash(d *schema.ResourceData) string {
 	return hash
 }
 
-func expandArchiveUpdateRequest(d *schema.ResourceData) *sacloud.ArchiveUpdateRequest {
-	return &sacloud.ArchiveUpdateRequest{
+func expandArchiveUpdateRequest(d *schema.ResourceData) *iaas.ArchiveUpdateRequest {
+	return &iaas.ArchiveUpdateRequest{
 		Name:        d.Get("name").(string),
 		Description: d.Get("description").(string),
 		Tags:        expandTags(d),

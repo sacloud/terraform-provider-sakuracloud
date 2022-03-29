@@ -23,7 +23,7 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
-	"github.com/sacloud/libsacloud/v2/sacloud"
+	"github.com/sacloud/iaas-api-go"
 )
 
 const (
@@ -37,7 +37,7 @@ var (
 func TestAccSakuraCloudIPv4Ptr_basic(t *testing.T) {
 	skipIfFakeModeEnabled(t)
 
-	var ip sacloud.IPAddress
+	var ip iaas.IPAddress
 	if domain, ok := os.LookupEnv(envTestDomain); ok {
 		testDomain = domain
 	} else {
@@ -71,7 +71,7 @@ func TestAccSakuraCloudIPv4Ptr_basic(t *testing.T) {
 	})
 }
 
-func testCheckSakuraCloudIPv4PtrExists(n string, ip *sacloud.IPAddress) resource.TestCheckFunc {
+func testCheckSakuraCloudIPv4PtrExists(n string, ip *iaas.IPAddress) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
 		rs, ok := s.RootModule().Resources[n]
 		if !ok {
@@ -84,7 +84,7 @@ func testCheckSakuraCloudIPv4PtrExists(n string, ip *sacloud.IPAddress) resource
 
 		client := testAccProvider.Meta().(*APIClient)
 		zone := rs.Primary.Attributes["zone"]
-		ipAddrOp := sacloud.NewIPAddressOp(client)
+		ipAddrOp := iaas.NewIPAddressOp(client)
 
 		foundIPv4Ptr, err := ipAddrOp.Read(context.Background(), zone, rs.Primary.ID)
 		if err != nil {
@@ -105,7 +105,7 @@ func testCheckSakuraCloudIPv4PtrExists(n string, ip *sacloud.IPAddress) resource
 
 func testCheckSakuraCloudIPv4PtrDestroy(s *terraform.State) error {
 	client := testAccProvider.Meta().(*APIClient)
-	ipAddrOp := sacloud.NewIPAddressOp(client)
+	ipAddrOp := iaas.NewIPAddressOp(client)
 
 	for _, rs := range s.RootModule().Resources {
 		if rs.Type != "sakuracloud_ipv4_ptr" {

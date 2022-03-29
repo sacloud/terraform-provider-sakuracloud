@@ -16,12 +16,12 @@ package sakuracloud
 
 import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
-	"github.com/sacloud/libsacloud/v2/pkg/size"
-	"github.com/sacloud/libsacloud/v2/sacloud"
-	"github.com/sacloud/libsacloud/v2/sacloud/types"
+	"github.com/sacloud/iaas-api-go"
+	"github.com/sacloud/iaas-api-go/types"
+	"github.com/sacloud/packages-go/size"
 )
 
-func flattenDiskPlan(data *sacloud.Disk) string {
+func flattenDiskPlan(data *iaas.Disk) string {
 	plan, ok := types.DiskPlanNameMap[data.DiskPlanID]
 	if !ok {
 		return ""
@@ -33,8 +33,8 @@ func expandDiskPlan(d *schema.ResourceData) types.ID {
 	return types.DiskPlanIDMap[d.Get("plan").(string)]
 }
 
-func expandDiskCreateRequest(d *schema.ResourceData) *sacloud.DiskCreateRequest {
-	return &sacloud.DiskCreateRequest{
+func expandDiskCreateRequest(d *schema.ResourceData) *iaas.DiskCreateRequest {
+	return &iaas.DiskCreateRequest{
 		DiskPlanID:      expandDiskPlan(d),
 		Connection:      types.EDiskConnection(d.Get("connector").(string)),
 		SourceDiskID:    expandSakuraCloudID(d, "source_disk_id"),
@@ -47,8 +47,8 @@ func expandDiskCreateRequest(d *schema.ResourceData) *sacloud.DiskCreateRequest 
 	}
 }
 
-func expandDiskUpdateRequest(d *schema.ResourceData) *sacloud.DiskUpdateRequest {
-	return &sacloud.DiskUpdateRequest{
+func expandDiskUpdateRequest(d *schema.ResourceData) *iaas.DiskUpdateRequest {
+	return &iaas.DiskUpdateRequest{
 		Connection:  types.EDiskConnection(d.Get("connector").(string)),
 		Name:        d.Get("name").(string),
 		Description: d.Get("description").(string),

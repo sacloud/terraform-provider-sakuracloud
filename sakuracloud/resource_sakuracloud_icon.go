@@ -20,7 +20,7 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
-	"github.com/sacloud/libsacloud/v2/sacloud"
+	"github.com/sacloud/iaas-api-go"
 )
 
 func resourceSakuraCloudIcon() *schema.Resource {
@@ -75,7 +75,7 @@ func resourceSakuraCloudIconCreate(ctx context.Context, d *schema.ResourceData, 
 		return diag.FromErr(err)
 	}
 
-	iconOp := sacloud.NewIconOp(client)
+	iconOp := iaas.NewIconOp(client)
 
 	req, err := expandIconCreateRequest(d)
 	if err != nil {
@@ -96,10 +96,10 @@ func resourceSakuraCloudIconRead(ctx context.Context, d *schema.ResourceData, me
 		return diag.FromErr(err)
 	}
 
-	iconOp := sacloud.NewIconOp(client)
+	iconOp := iaas.NewIconOp(client)
 	icon, err := iconOp.Read(ctx, sakuraCloudID(d.Id()))
 	if err != nil {
-		if sacloud.IsNotFoundError(err) {
+		if iaas.IsNotFoundError(err) {
 			d.SetId("")
 			return nil
 		}
@@ -115,7 +115,7 @@ func resourceSakuraCloudIconUpdate(ctx context.Context, d *schema.ResourceData, 
 		return diag.FromErr(err)
 	}
 
-	iconOp := sacloud.NewIconOp(client)
+	iconOp := iaas.NewIconOp(client)
 	_, err = iconOp.Read(ctx, sakuraCloudID(d.Id()))
 	if err != nil {
 		return diag.Errorf("could not read SakuraCloud Icon[%s]: %s", d.Id(), err)
@@ -134,10 +134,10 @@ func resourceSakuraCloudIconDelete(ctx context.Context, d *schema.ResourceData, 
 		return diag.FromErr(err)
 	}
 
-	iconOp := sacloud.NewIconOp(client)
+	iconOp := iaas.NewIconOp(client)
 	icon, err := iconOp.Read(ctx, sakuraCloudID(d.Id()))
 	if err != nil {
-		if sacloud.IsNotFoundError(err) {
+		if iaas.IsNotFoundError(err) {
 			d.SetId("")
 			return nil
 		}
@@ -150,7 +150,7 @@ func resourceSakuraCloudIconDelete(ctx context.Context, d *schema.ResourceData, 
 	return nil
 }
 
-func setIconResourceData(ctx context.Context, d *schema.ResourceData, client *APIClient, data *sacloud.Icon) diag.Diagnostics {
+func setIconResourceData(ctx context.Context, d *schema.ResourceData, client *APIClient, data *iaas.Icon) diag.Diagnostics {
 	d.Set("name", data.Name) // nolint
 	d.Set("url", data.URL)   // nolint
 	return diag.FromErr(d.Set("tags", flattenTags(data.Tags)))

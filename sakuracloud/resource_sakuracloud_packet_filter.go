@@ -21,9 +21,9 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
-	"github.com/sacloud/libsacloud/v2/helper/cleanup"
-	"github.com/sacloud/libsacloud/v2/sacloud"
-	"github.com/sacloud/libsacloud/v2/sacloud/types"
+	"github.com/sacloud/iaas-api-go"
+	"github.com/sacloud/iaas-api-go/helper/cleanup"
+	"github.com/sacloud/iaas-api-go/types"
 )
 
 func resourceSakuraCloudPacketFilter() *schema.Resource {
@@ -106,7 +106,7 @@ func resourceSakuraCloudPacketFilterCreate(ctx context.Context, d *schema.Resour
 		return diag.FromErr(err)
 	}
 
-	pfOp := sacloud.NewPacketFilterOp(client)
+	pfOp := iaas.NewPacketFilterOp(client)
 
 	pf, err := pfOp.Create(ctx, zone, expandPacketFilterCreateRequest(d))
 	if err != nil {
@@ -123,10 +123,10 @@ func resourceSakuraCloudPacketFilterRead(ctx context.Context, d *schema.Resource
 		return diag.FromErr(err)
 	}
 
-	pfOp := sacloud.NewPacketFilterOp(client)
+	pfOp := iaas.NewPacketFilterOp(client)
 	pf, err := pfOp.Read(ctx, zone, sakuraCloudID(d.Id()))
 	if err != nil {
-		if sacloud.IsNotFoundError(err) {
+		if iaas.IsNotFoundError(err) {
 			d.SetId("")
 			return nil
 		}
@@ -142,7 +142,7 @@ func resourceSakuraCloudPacketFilterUpdate(ctx context.Context, d *schema.Resour
 		return diag.FromErr(err)
 	}
 
-	pfOp := sacloud.NewPacketFilterOp(client)
+	pfOp := iaas.NewPacketFilterOp(client)
 	pf, err := pfOp.Read(ctx, zone, sakuraCloudID(d.Id()))
 	if err != nil {
 		return diag.Errorf("could not read SakuraCloud PacketFilter[%s]: %s", d.Id(), err)
@@ -162,10 +162,10 @@ func resourceSakuraCloudPacketFilterDelete(ctx context.Context, d *schema.Resour
 		return diag.FromErr(err)
 	}
 
-	pfOp := sacloud.NewPacketFilterOp(client)
+	pfOp := iaas.NewPacketFilterOp(client)
 	pf, err := pfOp.Read(ctx, zone, sakuraCloudID(d.Id()))
 	if err != nil {
-		if sacloud.IsNotFoundError(err) {
+		if iaas.IsNotFoundError(err) {
 			d.SetId("")
 			return nil
 		}
@@ -179,7 +179,7 @@ func resourceSakuraCloudPacketFilterDelete(ctx context.Context, d *schema.Resour
 	return nil
 }
 
-func setPacketFilterResourceData(ctx context.Context, d *schema.ResourceData, client *APIClient, data *sacloud.PacketFilter) diag.Diagnostics {
+func setPacketFilterResourceData(ctx context.Context, d *schema.ResourceData, client *APIClient, data *iaas.PacketFilter) diag.Diagnostics {
 	d.Set("name", data.Name)               // nolint
 	d.Set("description", data.Description) // nolint
 	d.Set("zone", getZone(d, client))      // nolint

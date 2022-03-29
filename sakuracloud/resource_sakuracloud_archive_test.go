@@ -22,7 +22,7 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
-	"github.com/sacloud/libsacloud/v2/sacloud"
+	"github.com/sacloud/iaas-api-go"
 )
 
 func TestAccSakuraCloudArchive_basic(t *testing.T) {
@@ -31,7 +31,7 @@ func TestAccSakuraCloudArchive_basic(t *testing.T) {
 	resourceName := "sakuracloud_archive.foobar"
 	rand := randomName()
 
-	var archive sacloud.Archive
+	var archive iaas.Archive
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:          func() { testAccPreCheck(t) },
 		ProviderFactories: testAccProviderFactories,
@@ -102,7 +102,7 @@ func TestAccSakuraCloudArchive_transfer(t *testing.T) {
 	resourceName := "sakuracloud_archive.foobar"
 	rand := randomName()
 
-	var archive sacloud.Archive
+	var archive iaas.Archive
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:          func() { testAccPreCheck(t) },
 		ProviderFactories: testAccProviderFactories,
@@ -140,7 +140,7 @@ func TestAccSakuraCloudArchive_fromShared(t *testing.T) {
 	resourceName := "sakuracloud_archive.foobar"
 	rand := randomName()
 
-	var archive sacloud.Archive
+	var archive iaas.Archive
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:          func() { testAccPreCheck(t) },
 		ProviderFactories: testAccProviderFactories,
@@ -166,7 +166,7 @@ func TestAccSakuraCloudArchive_fromShared(t *testing.T) {
 	})
 }
 
-func testCheckSakuraCloudArchiveExists(n string, archive *sacloud.Archive) resource.TestCheckFunc {
+func testCheckSakuraCloudArchiveExists(n string, archive *iaas.Archive) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
 		rs, ok := s.RootModule().Resources[n]
 
@@ -178,7 +178,7 @@ func testCheckSakuraCloudArchiveExists(n string, archive *sacloud.Archive) resou
 			return errors.New("no Archive ID is set")
 		}
 		client := testAccProvider.Meta().(*APIClient)
-		archiveOp := sacloud.NewArchiveOp(client)
+		archiveOp := iaas.NewArchiveOp(client)
 		zone := rs.Primary.Attributes["zone"]
 		foundArchive, err := archiveOp.Read(context.Background(), zone, sakuraCloudID(rs.Primary.ID))
 		if err != nil {
@@ -191,7 +191,7 @@ func testCheckSakuraCloudArchiveExists(n string, archive *sacloud.Archive) resou
 
 func testCheckSakuraCloudArchiveDestroy(s *terraform.State) error {
 	client := testAccProvider.Meta().(*APIClient)
-	archiveOp := sacloud.NewArchiveOp(client)
+	archiveOp := iaas.NewArchiveOp(client)
 
 	for _, rs := range s.RootModule().Resources {
 		if rs.Type != "sakuracloud_archive" {

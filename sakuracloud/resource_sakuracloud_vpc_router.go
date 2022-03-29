@@ -21,9 +21,9 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
-	"github.com/sacloud/libsacloud/v2/helper/power"
-	"github.com/sacloud/libsacloud/v2/sacloud"
-	"github.com/sacloud/libsacloud/v2/sacloud/types"
+	"github.com/sacloud/iaas-api-go"
+	"github.com/sacloud/iaas-api-go/helper/power"
+	"github.com/sacloud/iaas-api-go/types"
 )
 
 func resourceSakuraCloudVPCRouter() *schema.Resource {
@@ -568,12 +568,12 @@ func resourceSakuraCloudVPCRouterCreate(ctx context.Context, d *schema.ResourceD
 		return diag.FromErr(err)
 	}
 
-	builder := expandVPCRouterBuilder(d, client)
+	builder := expandVPCRouterBuilder(d, client, zone)
 	if err := builder.Validate(ctx, zone); err != nil {
 		return diag.Errorf("validating parameter for SakuraCloud VPCRouter is failed: %s", err)
 	}
 
-	vpcRouter, err := builder.Build(ctx, zone)
+	vpcRouter, err := builder.Build(ctx)
 	if vpcRouter != nil {
 		d.SetId(vpcRouter.ID.String())
 	}
@@ -593,11 +593,11 @@ func resourceSakuraCloudVPCRouterRead(ctx context.Context, d *schema.ResourceDat
 		return diag.FromErr(err)
 	}
 
-	vrOp := sacloud.NewVPCRouterOp(client)
+	vrOp := iaas.NewVPCRouterOp(client)
 
 	vpcRouter, err := vrOp.Read(ctx, zone, sakuraCloudID(d.Id()))
 	if err != nil {
-		if sacloud.IsNotFoundError(err) {
+		if iaas.IsNotFoundError(err) {
 			d.SetId("")
 			return nil
 		}
@@ -613,7 +613,7 @@ func resourceSakuraCloudVPCRouterUpdate(ctx context.Context, d *schema.ResourceD
 		return diag.FromErr(err)
 	}
 
-	vrOp := sacloud.NewVPCRouterOp(client)
+	vrOp := iaas.NewVPCRouterOp(client)
 
 	sakuraMutexKV.Lock(d.Id())
 	defer sakuraMutexKV.Unlock(d.Id())
@@ -623,12 +623,13 @@ func resourceSakuraCloudVPCRouterUpdate(ctx context.Context, d *schema.ResourceD
 		return diag.Errorf("could not read SakuraCloud VPCRouter[%s]: %s", d.Id(), err)
 	}
 
-	builder := expandVPCRouterBuilder(d, client)
+	builder := expandVPCRouterBuilder(d, client, zone)
 	if err := builder.Validate(ctx, zone); err != nil {
 		return diag.Errorf("validating parameter for SakuraCloud VPCRouter is failed: %s", err)
 	}
+	builder.ID = vpcRouter.ID
 
-	_, err = builder.Update(ctx, zone, vpcRouter.ID)
+	_, err = builder.Build(ctx)
 	if err != nil {
 		return diag.Errorf("updating SakuraCloud VPCRouter[%s] is failed: %s", d.Id(), err)
 	}
@@ -645,14 +646,14 @@ func resourceSakuraCloudVPCRouterDelete(ctx context.Context, d *schema.ResourceD
 		return diag.FromErr(err)
 	}
 
-	vrOp := sacloud.NewVPCRouterOp(client)
+	vrOp := iaas.NewVPCRouterOp(client)
 
 	sakuraMutexKV.Lock(d.Id())
 	defer sakuraMutexKV.Unlock(d.Id())
 
 	vpcRouter, err := vrOp.Read(ctx, zone, sakuraCloudID(d.Id()))
 	if err != nil {
-		if sacloud.IsNotFoundError(err) {
+		if iaas.IsNotFoundError(err) {
 			d.SetId("")
 			return nil
 		}
@@ -671,7 +672,7 @@ func resourceSakuraCloudVPCRouterDelete(ctx context.Context, d *schema.ResourceD
 	return nil
 }
 
-func setVPCRouterResourceData(ctx context.Context, d *schema.ResourceData, zone string, client *APIClient, data *sacloud.VPCRouter) diag.Diagnostics {
+func setVPCRouterResourceData(ctx context.Context, d *schema.ResourceData, zone string, client *APIClient, data *iaas.VPCRouter) diag.Diagnostics {
 	if data.Availability.IsFailed() {
 		d.SetId("")
 		return diag.Errorf("got unexpected state: VPCRouter[%d].Availability is failed", data.ID)
@@ -714,7 +715,7 @@ func setVPCRouterResourceData(ctx context.Context, d *schema.ResourceData, zone 
 		return diag.FromErr(err)
 	}
 	// get public key from /:id/Status API
-	status, err := sacloud.NewVPCRouterOp(client).Status(ctx, zone, data.ID)
+	status, err := iaas.NewVPCRouterOp(client).Status(ctx, zone, data.ID)
 	if err != nil {
 		return diag.FromErr(err)
 	}

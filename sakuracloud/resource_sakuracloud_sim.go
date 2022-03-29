@@ -20,10 +20,10 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
-	"github.com/sacloud/libsacloud/v2/helper/cleanup"
-	"github.com/sacloud/libsacloud/v2/helper/query"
-	"github.com/sacloud/libsacloud/v2/sacloud"
-	"github.com/sacloud/libsacloud/v2/sacloud/types"
+	"github.com/sacloud/iaas-api-go"
+	"github.com/sacloud/iaas-api-go/helper/cleanup"
+	"github.com/sacloud/iaas-api-go/helper/query"
+	"github.com/sacloud/iaas-api-go/types"
 )
 
 func resourceSakuraCloudSIM() *schema.Resource {
@@ -129,11 +129,11 @@ func resourceSakuraCloudSIMRead(ctx context.Context, d *schema.ResourceData, met
 		return diag.FromErr(err)
 	}
 
-	simOp := sacloud.NewSIMOp(client)
+	simOp := iaas.NewSIMOp(client)
 
 	sim, err := query.FindSIMByID(ctx, simOp, sakuraCloudID(d.Id()))
 	if err != nil {
-		if sacloud.IsNotFoundError(err) {
+		if iaas.IsNotFoundError(err) {
 			d.SetId("")
 			return nil
 		}
@@ -148,7 +148,7 @@ func resourceSakuraCloudSIMUpdate(ctx context.Context, d *schema.ResourceData, m
 		return diag.FromErr(err)
 	}
 
-	simOp := sacloud.NewSIMOp(client)
+	simOp := iaas.NewSIMOp(client)
 
 	if err := validateCarrier(d); err != nil {
 		return diag.FromErr(err)
@@ -178,12 +178,12 @@ func resourceSakuraCloudSIMDelete(ctx context.Context, d *schema.ResourceData, m
 		return diag.FromErr(err)
 	}
 
-	simOp := sacloud.NewSIMOp(client)
+	simOp := iaas.NewSIMOp(client)
 
 	// read sim info
 	sim, err := query.FindSIMByID(ctx, simOp, sakuraCloudID(d.Id()))
 	if err != nil {
-		if sacloud.IsNotFoundError(err) {
+		if iaas.IsNotFoundError(err) {
 			d.SetId("")
 			return nil
 		}
@@ -197,8 +197,8 @@ func resourceSakuraCloudSIMDelete(ctx context.Context, d *schema.ResourceData, m
 	return nil
 }
 
-func setSIMResourceData(ctx context.Context, d *schema.ResourceData, client *APIClient, data *sacloud.SIM) diag.Diagnostics {
-	simOp := sacloud.NewSIMOp(client)
+func setSIMResourceData(ctx context.Context, d *schema.ResourceData, client *APIClient, data *iaas.SIM) diag.Diagnostics {
+	simOp := iaas.NewSIMOp(client)
 
 	carrierInfo, err := simOp.GetNetworkOperator(ctx, data.ID)
 	if err != nil {

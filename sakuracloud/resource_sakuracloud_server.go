@@ -22,10 +22,10 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
-	"github.com/sacloud/libsacloud/v2/helper/power"
-	"github.com/sacloud/libsacloud/v2/helper/query"
-	"github.com/sacloud/libsacloud/v2/sacloud"
-	"github.com/sacloud/libsacloud/v2/sacloud/types"
+	"github.com/sacloud/iaas-api-go"
+	"github.com/sacloud/iaas-api-go/helper/power"
+	"github.com/sacloud/iaas-api-go/helper/query"
+	"github.com/sacloud/iaas-api-go/types"
 )
 
 func resourceSakuraCloudServer() *schema.Resource {
@@ -330,7 +330,7 @@ func resourceSakuraCloudServerRead(ctx context.Context, d *schema.ResourceData, 
 
 	server, err := query.ReadServer(ctx, client, zone, sakuraCloudID(d.Id()))
 	if err != nil {
-		if sacloud.IsNoResultsError(err) {
+		if iaas.IsNoResultsError(err) {
 			d.SetId("")
 			return nil
 		}
@@ -347,7 +347,7 @@ func resourceSakuraCloudServerUpdate(ctx context.Context, d *schema.ResourceData
 		return diag.FromErr(err)
 	}
 
-	serverOp := sacloud.NewServerOp(client)
+	serverOp := iaas.NewServerOp(client)
 
 	sakuraMutexKV.Lock(d.Id())
 	defer sakuraMutexKV.Unlock(d.Id())
@@ -381,14 +381,14 @@ func resourceSakuraCloudServerDelete(ctx context.Context, d *schema.ResourceData
 		return diag.FromErr(err)
 	}
 
-	serverOp := sacloud.NewServerOp(client)
+	serverOp := iaas.NewServerOp(client)
 
 	sakuraMutexKV.Lock(d.Id())
 	defer sakuraMutexKV.Unlock(d.Id())
 
 	server, err := serverOp.Read(ctx, zone, sakuraCloudID(d.Id()))
 	if err != nil {
-		if sacloud.IsNotFoundError(err) {
+		if iaas.IsNotFoundError(err) {
 			d.SetId("")
 			return nil
 		}
@@ -407,7 +407,7 @@ func resourceSakuraCloudServerDelete(ctx context.Context, d *schema.ResourceData
 	return nil
 }
 
-func setServerResourceData(ctx context.Context, d *schema.ResourceData, client *APIClient, data *sacloud.Server) diag.Diagnostics {
+func setServerResourceData(ctx context.Context, d *schema.ResourceData, client *APIClient, data *iaas.Server) diag.Diagnostics {
 	zone := getZone(d, client)
 
 	ip, gateway, nwMaskLen, nwAddress := flattenServerNetworkInfo(data)

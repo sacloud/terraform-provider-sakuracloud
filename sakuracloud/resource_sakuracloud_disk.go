@@ -21,11 +21,11 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
-	"github.com/sacloud/libsacloud/v2/helper/cleanup"
-	"github.com/sacloud/libsacloud/v2/helper/setup"
-	"github.com/sacloud/libsacloud/v2/sacloud"
-	"github.com/sacloud/libsacloud/v2/sacloud/accessor"
-	"github.com/sacloud/libsacloud/v2/sacloud/types"
+	"github.com/sacloud/iaas-api-go"
+	"github.com/sacloud/iaas-api-go/accessor"
+	"github.com/sacloud/iaas-api-go/helper/cleanup"
+	"github.com/sacloud/iaas-api-go/types"
+	"github.com/sacloud/iaas-service-go/setup"
 )
 
 func resourceSakuraCloudDisk() *schema.Resource {
@@ -104,7 +104,7 @@ func resourceSakuraCloudDiskCreate(ctx context.Context, d *schema.ResourceData, 
 		return diag.FromErr(err)
 	}
 
-	diskOp := sacloud.NewDiskOp(client)
+	diskOp := iaas.NewDiskOp(client)
 	diskBuilder := &setup.RetryableSetup{
 		IsWaitForCopy: true,
 		Create: func(ctx context.Context, zone string) (accessor.ID, error) {
@@ -116,7 +116,9 @@ func resourceSakuraCloudDiskCreate(ctx context.Context, d *schema.ResourceData, 
 		Delete: func(ctx context.Context, zone string, id types.ID) error {
 			return diskOp.Delete(ctx, zone, id)
 		},
-		RetryCount: 3,
+		Options: &setup.Options{
+			RetryCount: 3,
+		},
 	}
 
 	res, err := diskBuilder.Setup(ctx, zone)
@@ -124,9 +126,9 @@ func resourceSakuraCloudDiskCreate(ctx context.Context, d *schema.ResourceData, 
 		return diag.Errorf("creating SakuraCloud Disk is failed: %s", err)
 	}
 
-	disk, ok := res.(*sacloud.Disk)
+	disk, ok := res.(*iaas.Disk)
 	if !ok {
-		return diag.Errorf("creating SakuraCloud Disk is failed: created resource is not a *sacloud.Disk")
+		return diag.Errorf("creating SakuraCloud Disk is failed: created resource is not a *iaas.Disk")
 	}
 
 	d.SetId(disk.ID.String())
@@ -139,10 +141,10 @@ func resourceSakuraCloudDiskRead(ctx context.Context, d *schema.ResourceData, me
 		return diag.FromErr(err)
 	}
 
-	diskOp := sacloud.NewDiskOp(client)
+	diskOp := iaas.NewDiskOp(client)
 	disk, err := diskOp.Read(ctx, zone, sakuraCloudID(d.Id()))
 	if err != nil {
-		if sacloud.IsNotFoundError(err) {
+		if iaas.IsNotFoundError(err) {
 			d.SetId("")
 			return nil
 		}
@@ -158,7 +160,7 @@ func resourceSakuraCloudDiskUpdate(ctx context.Context, d *schema.ResourceData, 
 		return diag.FromErr(err)
 	}
 
-	diskOp := sacloud.NewDiskOp(client)
+	diskOp := iaas.NewDiskOp(client)
 	disk, err := diskOp.Read(ctx, zone, sakuraCloudID(d.Id()))
 	if err != nil {
 		return diag.Errorf("could not read SakuraCloud Disk[%s]: %s", d.Id(), err)
@@ -178,10 +180,10 @@ func resourceSakuraCloudDiskDelete(ctx context.Context, d *schema.ResourceData, 
 		return diag.FromErr(err)
 	}
 
-	diskOp := sacloud.NewDiskOp(client)
+	diskOp := iaas.NewDiskOp(client)
 	disk, err := diskOp.Read(ctx, zone, sakuraCloudID(d.Id()))
 	if err != nil {
-		if sacloud.IsNotFoundError(err) {
+		if iaas.IsNotFoundError(err) {
 			d.SetId("")
 			return nil
 		}
@@ -195,7 +197,7 @@ func resourceSakuraCloudDiskDelete(ctx context.Context, d *schema.ResourceData, 
 	return nil
 }
 
-func setDiskResourceData(ctx context.Context, d *schema.ResourceData, client *APIClient, data *sacloud.Disk) diag.Diagnostics {
+func setDiskResourceData(ctx context.Context, d *schema.ResourceData, client *APIClient, data *iaas.Disk) diag.Diagnostics {
 	d.Set("name", data.Name)                                  // nolint
 	d.Set("plan", flattenDiskPlan(data))                      // nolint
 	d.Set("source_disk_id", data.SourceDiskID.String())       // nolint

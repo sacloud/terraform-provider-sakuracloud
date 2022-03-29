@@ -22,14 +22,14 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
-	"github.com/sacloud/libsacloud/v2/sacloud"
+	"github.com/sacloud/iaas-api-go"
 )
 
 func TestAccSakuraCloudESME_basic(t *testing.T) {
 	resourceName := "sakuracloud_esme.foobar"
 	rand := randomName()
 
-	var esme sacloud.ESME
+	var esme iaas.ESME
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:          func() { testAccPreCheck(t) },
 		ProviderFactories: testAccProviderFactories,
@@ -73,7 +73,7 @@ func TestAccSakuraCloudESME_basic(t *testing.T) {
 	})
 }
 
-func testCheckSakuraCloudESMEExists(n string, esme *sacloud.ESME) resource.TestCheckFunc {
+func testCheckSakuraCloudESMEExists(n string, esme *iaas.ESME) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
 		rs, ok := s.RootModule().Resources[n]
 
@@ -86,7 +86,7 @@ func testCheckSakuraCloudESMEExists(n string, esme *sacloud.ESME) resource.TestC
 		}
 
 		client := testAccProvider.Meta().(*APIClient)
-		esmeOp := sacloud.NewESMEOp(client)
+		esmeOp := iaas.NewESMEOp(client)
 
 		foundESME, err := esmeOp.Read(context.Background(), sakuraCloudID(rs.Primary.ID))
 
@@ -115,7 +115,7 @@ func testCheckSakuraCloudESMEDestroy(s *terraform.State) error {
 			continue
 		}
 
-		esmeOp := sacloud.NewESMEOp(client)
+		esmeOp := iaas.NewESMEOp(client)
 		_, err := esmeOp.Read(context.Background(), sakuraCloudID(rs.Primary.ID))
 
 		if err == nil {

@@ -16,13 +16,13 @@ package sakuracloud
 
 import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
-	"github.com/sacloud/libsacloud/v2/helper/service/enhanceddb"
-	"github.com/sacloud/libsacloud/v2/sacloud"
-	"github.com/sacloud/libsacloud/v2/sacloud/types"
+	"github.com/sacloud/iaas-api-go"
+	"github.com/sacloud/iaas-api-go/types"
+	"github.com/sacloud/iaas-service-go/enhanceddb/builder"
 )
 
-func expandEnhancedDBBuilder(d *schema.ResourceData, client *APIClient, settingsHash string) *enhanceddb.Builder {
-	return &enhanceddb.Builder{
+func expandEnhancedDBBuilder(d *schema.ResourceData, client *APIClient, settingsHash string) *builder.Builder {
+	return &builder.Builder{
 		ID:           types.StringID(d.Id()),
 		Name:         d.Get("name").(string),
 		Description:  d.Get("description").(string),
@@ -31,6 +31,6 @@ func expandEnhancedDBBuilder(d *schema.ResourceData, client *APIClient, settings
 		DatabaseName: d.Get("database_name").(string),
 		Password:     d.Get("password").(string),
 		SettingsHash: settingsHash,
-		Client:       sacloud.NewEnhancedDBOp(client),
+		Client:       iaas.NewEnhancedDBOp(client),
 	}
 }

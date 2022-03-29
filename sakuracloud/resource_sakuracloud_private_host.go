@@ -21,9 +21,9 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
-	"github.com/sacloud/libsacloud/v2/helper/cleanup"
-	"github.com/sacloud/libsacloud/v2/sacloud"
-	"github.com/sacloud/libsacloud/v2/sacloud/types"
+	"github.com/sacloud/iaas-api-go"
+	"github.com/sacloud/iaas-api-go/helper/cleanup"
+	"github.com/sacloud/iaas-api-go/types"
 )
 
 func resourceSakuraCloudPrivateHost() *schema.Resource {
@@ -83,7 +83,7 @@ func resourceSakuraCloudPrivateHostCreate(ctx context.Context, d *schema.Resourc
 		return diag.FromErr(err)
 	}
 
-	phOp := sacloud.NewPrivateHostOp(client)
+	phOp := iaas.NewPrivateHostOp(client)
 	planID, err := expandPrivateHostPlanID(ctx, d, client, zone)
 	if err != nil {
 		return diag.Errorf("creating SakuraCloud PrivateHost is failed: %s", err)
@@ -104,11 +104,11 @@ func resourceSakuraCloudPrivateHostRead(ctx context.Context, d *schema.ResourceD
 		return diag.FromErr(err)
 	}
 
-	phOp := sacloud.NewPrivateHostOp(client)
+	phOp := iaas.NewPrivateHostOp(client)
 
 	ph, err := phOp.Read(ctx, zone, sakuraCloudID(d.Id()))
 	if err != nil {
-		if sacloud.IsNotFoundError(err) {
+		if iaas.IsNotFoundError(err) {
 			d.SetId("")
 			return nil
 		}
@@ -123,7 +123,7 @@ func resourceSakuraCloudPrivateHostUpdate(ctx context.Context, d *schema.Resourc
 		return diag.FromErr(err)
 	}
 
-	phOp := sacloud.NewPrivateHostOp(client)
+	phOp := iaas.NewPrivateHostOp(client)
 	ph, err := phOp.Read(ctx, zone, sakuraCloudID(d.Id()))
 	if err != nil {
 		return diag.Errorf("could not read SakuraCloud PrivateHost[%s]: %s", d.Id(), err)
@@ -143,11 +143,11 @@ func resourceSakuraCloudPrivateHostDelete(ctx context.Context, d *schema.Resourc
 		return diag.FromErr(err)
 	}
 
-	phOp := sacloud.NewPrivateHostOp(client)
+	phOp := iaas.NewPrivateHostOp(client)
 
 	ph, err := phOp.Read(ctx, zone, sakuraCloudID(d.Id()))
 	if err != nil {
-		if sacloud.IsNotFoundError(err) {
+		if iaas.IsNotFoundError(err) {
 			d.SetId("")
 			return nil
 		}
@@ -161,7 +161,7 @@ func resourceSakuraCloudPrivateHostDelete(ctx context.Context, d *schema.Resourc
 	return nil
 }
 
-func setPrivateHostResourceData(ctx context.Context, d *schema.ResourceData, client *APIClient, data *sacloud.PrivateHost) diag.Diagnostics {
+func setPrivateHostResourceData(ctx context.Context, d *schema.ResourceData, client *APIClient, data *iaas.PrivateHost) diag.Diagnostics {
 	d.Set("name", data.Name)                             // nolint
 	d.Set("class", data.PlanClass)                       // nolint
 	d.Set("icon_id", data.IconID.String())               // nolint

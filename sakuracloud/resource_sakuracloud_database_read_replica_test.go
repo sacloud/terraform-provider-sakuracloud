@@ -21,7 +21,7 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
-	"github.com/sacloud/libsacloud/v2/sacloud"
+	"github.com/sacloud/iaas-api-go"
 )
 
 func TestAccSakuraCloudDatabaseReplica_basic(t *testing.T) {
@@ -134,7 +134,7 @@ func testCheckSakuraCloudDatabaseReadReplicaDestroy(s *terraform.State) error {
 			continue
 		}
 
-		dbOp := sacloud.NewDatabaseOp(client)
+		dbOp := iaas.NewDatabaseOp(client)
 		zone := rs.Primary.Attributes["zone"]
 		_, err := dbOp.Read(context.Background(), zone, sakuraCloudID(rs.Primary.ID))
 

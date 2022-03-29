@@ -20,7 +20,7 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
-	"github.com/sacloud/libsacloud/v2/sacloud"
+	"github.com/sacloud/iaas-api-go"
 )
 
 func dataSourceSakuraCloudWebAccel() *schema.Resource {
@@ -93,7 +93,7 @@ func dataSourceSakuraCloudWebAccelRead(ctx context.Context, d *schema.ResourceDa
 	if err != nil {
 		return diag.FromErr(err)
 	}
-	webAccelOp := sacloud.NewWebAccelOp(caller)
+	webAccelOp := iaas.NewWebAccelOp(caller)
 
 	res, err := webAccelOp.List(ctx)
 	if err != nil {
@@ -102,7 +102,7 @@ func dataSourceSakuraCloudWebAccelRead(ctx context.Context, d *schema.ResourceDa
 	if res == nil || len(res.WebAccels) == 0 {
 		return filterNoResultErr()
 	}
-	var data *sacloud.WebAccel
+	var data *iaas.WebAccel
 
 	for _, s := range res.WebAccels {
 		if s.Name == name || s.Domain == domain {
