@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## 2.17.0 (Unreleased) 
+
+IMPROVEMENTS:
+
+  - libsacloudからiaas-service-goへの切り替え [GH-891] (@yamamoto-febc)
+
 ## 2.16.2 (2022-02-18)
 
 FEATURES:
