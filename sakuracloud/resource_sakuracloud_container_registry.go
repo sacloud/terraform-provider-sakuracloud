@@ -21,8 +21,8 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
-	"github.com/sacloud/libsacloud/v2/sacloud"
-	"github.com/sacloud/libsacloud/v2/sacloud/types"
+	"github.com/sacloud/iaas-api-go"
+	"github.com/sacloud/iaas-api-go/types"
 )
 
 func resourceSakuraCloudContainerRegistry() *schema.Resource {
@@ -131,10 +131,10 @@ func resourceSakuraCloudContainerRegistryRead(ctx context.Context, d *schema.Res
 		return diag.FromErr(err)
 	}
 
-	regOp := sacloud.NewContainerRegistryOp(client)
+	regOp := iaas.NewContainerRegistryOp(client)
 	reg, err := regOp.Read(ctx, sakuraCloudID(d.Id()))
 	if err != nil {
-		if sacloud.IsNotFoundError(err) {
+		if iaas.IsNotFoundError(err) {
 			d.SetId("")
 			return nil
 		}
@@ -149,14 +149,15 @@ func resourceSakuraCloudContainerRegistryUpdate(ctx context.Context, d *schema.R
 		return diag.FromErr(err)
 	}
 
-	regOp := sacloud.NewContainerRegistryOp(client)
+	regOp := iaas.NewContainerRegistryOp(client)
 	reg, err := regOp.Read(ctx, sakuraCloudID(d.Id()))
 	if err != nil {
 		return diag.Errorf("could not read SakuraCloud ContainerRegistry[%s]: %s", d.Id(), err)
 	}
 
 	builder := expandContainerRegistryBuilder(d, client, reg.SettingsHash)
-	if _, err := builder.Update(ctx, reg.ID); err != nil {
+	builder.ID = reg.ID
+	if _, err := builder.Build(ctx); err != nil {
 		return diag.Errorf("updating SakuraCloud ContainerRegistry[%s] is failed: %s", d.Id(), err)
 	}
 
@@ -169,10 +170,10 @@ func resourceSakuraCloudContainerRegistryDelete(ctx context.Context, d *schema.R
 		return diag.FromErr(err)
 	}
 
-	regOp := sacloud.NewContainerRegistryOp(client)
+	regOp := iaas.NewContainerRegistryOp(client)
 	reg, err := regOp.Read(ctx, sakuraCloudID(d.Id()))
 	if err != nil {
-		if sacloud.IsNotFoundError(err) {
+		if iaas.IsNotFoundError(err) {
 			d.SetId("")
 			return nil
 		}
@@ -187,8 +188,8 @@ func resourceSakuraCloudContainerRegistryDelete(ctx context.Context, d *schema.R
 	return nil
 }
 
-func setContainerRegistryResourceData(ctx context.Context, d *schema.ResourceData, client *APIClient, data *sacloud.ContainerRegistry, includePassword bool) diag.Diagnostics {
-	regOp := sacloud.NewContainerRegistryOp(client)
+func setContainerRegistryResourceData(ctx context.Context, d *schema.ResourceData, client *APIClient, data *iaas.ContainerRegistry, includePassword bool) diag.Diagnostics {
+	regOp := iaas.NewContainerRegistryOp(client)
 
 	users, err := regOp.ListUsers(ctx, data.ID)
 	if err != nil {

@@ -21,8 +21,8 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
-	"github.com/sacloud/libsacloud/v2/helper/power"
-	"github.com/sacloud/libsacloud/v2/sacloud"
+	"github.com/sacloud/iaas-api-go"
+	"github.com/sacloud/iaas-api-go/helper/power"
 )
 
 func resourceSakuraCloudDatabaseReadReplica() *schema.Resource {
@@ -123,7 +123,7 @@ func resourceSakuraCloudDatabaseReadReplicaCreate(ctx context.Context, d *schema
 		return nil
 	}
 
-	db, err := builder.Build(ctx, zone)
+	db, err := builder.Build(ctx)
 	if db != nil {
 		d.SetId(db.ID.String())
 	}
@@ -144,11 +144,11 @@ func resourceSakuraCloudDatabaseReadReplicaRead(ctx context.Context, d *schema.R
 		return diag.FromErr(err)
 	}
 
-	dbOp := sacloud.NewDatabaseOp(client)
+	dbOp := iaas.NewDatabaseOp(client)
 
 	data, err := dbOp.Read(ctx, zone, sakuraCloudID(d.Id()))
 	if err != nil {
-		if sacloud.IsNotFoundError(err) {
+		if iaas.IsNotFoundError(err) {
 			d.SetId("")
 			return nil
 		}
@@ -163,7 +163,7 @@ func resourceSakuraCloudDatabaseReadReplicaUpdate(ctx context.Context, d *schema
 		return diag.FromErr(err)
 	}
 
-	dbOp := sacloud.NewDatabaseOp(client)
+	dbOp := iaas.NewDatabaseOp(client)
 
 	db, err := dbOp.Read(ctx, zone, sakuraCloudID(d.Id()))
 	if err != nil {
@@ -174,8 +174,9 @@ func resourceSakuraCloudDatabaseReadReplicaUpdate(ctx context.Context, d *schema
 	if err != nil {
 		return nil
 	}
+	builder.ID = db.ID
 
-	db, err = builder.Update(ctx, zone, db.ID)
+	db, err = builder.Build(ctx)
 	if err != nil {
 		return diag.Errorf("updating SakuraCloud Database ReadReplica[%s] is failed: %s", d.Id(), err)
 	}
@@ -189,11 +190,11 @@ func resourceSakuraCloudDatabaseReadReplicaDelete(ctx context.Context, d *schema
 		return diag.FromErr(err)
 	}
 
-	dbOp := sacloud.NewDatabaseOp(client)
+	dbOp := iaas.NewDatabaseOp(client)
 
 	data, err := dbOp.Read(ctx, zone, sakuraCloudID(d.Id()))
 	if err != nil {
-		if sacloud.IsNotFoundError(err) {
+		if iaas.IsNotFoundError(err) {
 			d.SetId("")
 			return nil
 		}
@@ -216,7 +217,7 @@ func resourceSakuraCloudDatabaseReadReplicaDelete(ctx context.Context, d *schema
 	return nil
 }
 
-func setDatabaseReadReplicaResourceData(ctx context.Context, d *schema.ResourceData, client *APIClient, data *sacloud.Database) diag.Diagnostics {
+func setDatabaseReadReplicaResourceData(ctx context.Context, d *schema.ResourceData, client *APIClient, data *iaas.Database) diag.Diagnostics {
 	if data.Availability.IsFailed() {
 		d.SetId("")
 		return diag.Errorf("got unexpected state: Database[%d].Availability is failed", data.ID)

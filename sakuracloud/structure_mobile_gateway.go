@@ -16,14 +16,16 @@ package sakuracloud
 
 import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
-	"github.com/sacloud/libsacloud/v2/helper/builder"
-	mobileGatewayBuilder "github.com/sacloud/libsacloud/v2/helper/builder/mobilegateway"
-	"github.com/sacloud/libsacloud/v2/helper/defaults"
-	"github.com/sacloud/libsacloud/v2/sacloud"
+	"github.com/sacloud/iaas-api-go"
+	"github.com/sacloud/iaas-api-go/defaults"
+	mobileGatewayBuilder "github.com/sacloud/iaas-service-go/mobilegateway/builder"
+	"github.com/sacloud/iaas-service-go/setup"
 )
 
-func expandMobileGatewayBuilder(d *schema.ResourceData, client *APIClient) *mobileGatewayBuilder.Builder {
+func expandMobileGatewayBuilder(d *schema.ResourceData, client *APIClient, zone string) *mobileGatewayBuilder.Builder {
 	return &mobileGatewayBuilder.Builder{
+		Zone: zone,
+
 		Name:                            d.Get("name").(string),
 		Description:                     d.Get("description").(string),
 		Tags:                            expandTags(d),
@@ -36,7 +38,7 @@ func expandMobileGatewayBuilder(d *schema.ResourceData, client *APIClient) *mobi
 		DNS:                             expandMobileGatewayDNSSetting(d),
 		SIMs:                            expandMobileGatewaySIMs(d),
 		TrafficConfig:                   expandMobileGatewayTrafficConfig(d),
-		SetupOptions: &builder.RetryableSetupParameter{
+		SetupOptions: &setup.Options{
 			BootAfterBuild:        true,
 			NICUpdateWaitDuration: defaults.DefaultNICUpdateWaitDuration,
 		},
@@ -62,7 +64,7 @@ func expandMobileGatewaySIM(d resourceValueGettable) *mobileGatewayBuilder.SIMSe
 	}
 }
 
-func flattenMobileGatewaySIMs(sims []*sacloud.MobileGatewaySIMInfo) []interface{} {
+func flattenMobileGatewaySIMs(sims []*iaas.MobileGatewaySIMInfo) []interface{} {
 	var results []interface{}
 	for _, sim := range sims {
 		results = append(results, flattenMobileGatewaySIM(sim))
@@ -70,17 +72,17 @@ func flattenMobileGatewaySIMs(sims []*sacloud.MobileGatewaySIMInfo) []interface{
 	return results
 }
 
-func flattenMobileGatewaySIM(sim *sacloud.MobileGatewaySIMInfo) interface{} {
+func flattenMobileGatewaySIM(sim *iaas.MobileGatewaySIMInfo) interface{} {
 	return map[string]interface{}{
 		"sim_id":     sim.ResourceID,
 		"ip_address": sim.IP,
 	}
 }
 
-func expandMobileGatewayDNSSetting(d resourceValueGettable) *sacloud.MobileGatewayDNSSetting {
+func expandMobileGatewayDNSSetting(d resourceValueGettable) *iaas.MobileGatewayDNSSetting {
 	servers := d.Get("dns_servers").([]interface{})
 	if len(servers) == 2 && servers[0].(string) != "" && servers[1].(string) != "" {
-		return &sacloud.MobileGatewayDNSSetting{
+		return &iaas.MobileGatewayDNSSetting{
 			DNS1: servers[0].(string),
 			DNS2: servers[1].(string),
 		}
@@ -100,10 +102,10 @@ func expandMobileGatewayPrivateNetworks(d resourceValueGettable) *mobileGatewayB
 	return nil
 }
 
-func flattenMobileGatewayPrivateNetworks(mgw *sacloud.MobileGateway) []interface{} {
+func flattenMobileGatewayPrivateNetworks(mgw *iaas.MobileGateway) []interface{} {
 	if len(mgw.Interfaces) > 1 && !mgw.Interfaces[1].SwitchID.IsEmpty() {
 		switchID := mgw.Interfaces[1].SwitchID
-		var setting *sacloud.MobileGatewayInterfaceSetting
+		var setting *iaas.MobileGatewayInterfaceSetting
 		for _, s := range mgw.InterfaceSettings {
 			if s.Index == 1 {
 				setting = s
@@ -122,14 +124,14 @@ func flattenMobileGatewayPrivateNetworks(mgw *sacloud.MobileGateway) []interface
 	return nil
 }
 
-func flattenMobileGatewayPublicNetmask(mgw *sacloud.MobileGateway) int {
+func flattenMobileGatewayPublicNetmask(mgw *iaas.MobileGateway) int {
 	if len(mgw.Interfaces) > 0 {
 		return mgw.Interfaces[0].SubnetNetworkMaskLen
 	}
 	return 0
 }
 
-func flattenMobileGatewayPublicIPAddress(mgw *sacloud.MobileGateway) string {
+func flattenMobileGatewayPublicIPAddress(mgw *iaas.MobileGateway) string {
 	if len(mgw.Interfaces) > 0 {
 		return mgw.Interfaces[0].IPAddress
 	}
@@ -155,7 +157,7 @@ func expandMobileGatewaySIMRoute(d resourceValueGettable) *mobileGatewayBuilder.
 	return simRoute
 }
 
-func flattenMobileGatewaySIMRoutes(routes []*sacloud.MobileGatewaySIMRoute) []interface{} {
+func flattenMobileGatewaySIMRoutes(routes []*iaas.MobileGatewaySIMRoute) []interface{} {
 	var results []interface{}
 	for _, route := range routes {
 		results = append(results, flattenMobileGatewaySIMRoute(route))
@@ -163,20 +165,20 @@ func flattenMobileGatewaySIMRoutes(routes []*sacloud.MobileGatewaySIMRoute) []in
 	return results
 }
 
-func flattenMobileGatewaySIMRoute(route *sacloud.MobileGatewaySIMRoute) interface{} {
+func flattenMobileGatewaySIMRoute(route *iaas.MobileGatewaySIMRoute) interface{} {
 	return map[string]interface{}{
 		"sim_id": route.ResourceID,
 		"prefix": route.Prefix,
 	}
 }
 
-func expandMobileGatewayTrafficConfig(d resourceValueGettable) *sacloud.MobileGatewayTrafficControl {
+func expandMobileGatewayTrafficConfig(d resourceValueGettable) *iaas.MobileGatewayTrafficControl {
 	values := d.Get("traffic_control").([]interface{})
 	if len(values) == 0 {
 		return nil
 	}
 	v := &resourceMapValue{value: values[0].(map[string]interface{})}
-	return &sacloud.MobileGatewayTrafficControl{
+	return &iaas.MobileGatewayTrafficControl{
 		TrafficQuotaInMB:       v.Get("quota").(int),
 		BandWidthLimitInKbps:   v.Get("band_width_limit").(int),
 		EmailNotifyEnabled:     v.Get("enable_email").(bool),
@@ -186,7 +188,7 @@ func expandMobileGatewayTrafficConfig(d resourceValueGettable) *sacloud.MobileGa
 	}
 }
 
-func flattenMobileGatewayTrafficConfig(tc *sacloud.MobileGatewayTrafficControl) interface{} {
+func flattenMobileGatewayTrafficConfig(tc *iaas.MobileGatewayTrafficControl) interface{} {
 	return map[string]interface{}{
 		"quota":                tc.TrafficQuotaInMB,
 		"band_width_limit":     tc.BandWidthLimitInKbps,
@@ -197,15 +199,15 @@ func flattenMobileGatewayTrafficConfig(tc *sacloud.MobileGatewayTrafficControl) 
 	}
 }
 
-func flattenMobileGatewayTrafficConfigs(tc *sacloud.MobileGatewayTrafficControl) []interface{} {
+func flattenMobileGatewayTrafficConfigs(tc *iaas.MobileGatewayTrafficControl) []interface{} {
 	if tc == nil {
 		return nil
 	}
 	return []interface{}{flattenMobileGatewayTrafficConfig(tc)}
 }
 
-func expandMobileGatewayStaticRoutes(d resourceValueGettable) []*sacloud.MobileGatewayStaticRoute {
-	var routes []*sacloud.MobileGatewayStaticRoute
+func expandMobileGatewayStaticRoutes(d resourceValueGettable) []*iaas.MobileGatewayStaticRoute {
+	var routes []*iaas.MobileGatewayStaticRoute
 	if staticRoutes, ok := d.Get("static_route").([]interface{}); ok && len(staticRoutes) > 0 {
 		for _, v := range staticRoutes {
 			route := expandMobileGatewayStaticRoute(&resourceMapValue{v.(map[string]interface{})})
@@ -215,14 +217,14 @@ func expandMobileGatewayStaticRoutes(d resourceValueGettable) []*sacloud.MobileG
 	return routes
 }
 
-func expandMobileGatewayStaticRoute(d resourceValueGettable) *sacloud.MobileGatewayStaticRoute {
-	return &sacloud.MobileGatewayStaticRoute{
+func expandMobileGatewayStaticRoute(d resourceValueGettable) *iaas.MobileGatewayStaticRoute {
+	return &iaas.MobileGatewayStaticRoute{
 		Prefix:  d.Get("prefix").(string),
 		NextHop: d.Get("next_hop").(string),
 	}
 }
 
-func flattenMobileGatewayStaticRoutes(routes []*sacloud.MobileGatewayStaticRoute) []interface{} {
+func flattenMobileGatewayStaticRoutes(routes []*iaas.MobileGatewayStaticRoute) []interface{} {
 	var results []interface{}
 	for _, r := range routes {
 		results = append(results, map[string]interface{}{

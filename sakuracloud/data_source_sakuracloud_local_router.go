@@ -19,7 +19,7 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
-	"github.com/sacloud/libsacloud/v2/sacloud"
+	"github.com/sacloud/iaas-api-go"
 )
 
 func dataSourceSakuraCloudLocalRouter() *schema.Resource {
@@ -138,9 +138,9 @@ func dataSourceSakuraCloudLocalRouterRead(ctx context.Context, d *schema.Resourc
 		return diag.FromErr(err)
 	}
 
-	searcher := sacloud.NewLocalRouterOp(client)
+	searcher := iaas.NewLocalRouterOp(client)
 
-	findCondition := &sacloud.FindCondition{}
+	findCondition := &iaas.FindCondition{}
 	if rawFilter, ok := d.GetOk(filterAttrName); ok {
 		findCondition.Filter = expandSearchFilter(rawFilter)
 	}

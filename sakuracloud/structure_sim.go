@@ -16,17 +16,17 @@ package sakuracloud
 
 import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
-	simBuilder "github.com/sacloud/libsacloud/v2/helper/builder/sim"
-	"github.com/sacloud/libsacloud/v2/sacloud"
-	"github.com/sacloud/libsacloud/v2/sacloud/types"
+	"github.com/sacloud/iaas-api-go"
+	"github.com/sacloud/iaas-api-go/types"
+	simBuilder "github.com/sacloud/iaas-service-go/sim/builder"
 )
 
-func expandSIMCarrier(d resourceValueGettable) []*sacloud.SIMNetworkOperatorConfig {
+func expandSIMCarrier(d resourceValueGettable) []*iaas.SIMNetworkOperatorConfig {
 	// carriers
-	var carriers []*sacloud.SIMNetworkOperatorConfig
+	var carriers []*iaas.SIMNetworkOperatorConfig
 	rawCarriers := d.Get("carrier").(*schema.Set).List()
 	for _, carrier := range rawCarriers {
-		carriers = append(carriers, &sacloud.SIMNetworkOperatorConfig{
+		carriers = append(carriers, &iaas.SIMNetworkOperatorConfig{
 			Allow: true,
 			Name:  types.SIMOperatorShortNameMap[carrier.(string)].String(),
 		})
@@ -34,7 +34,7 @@ func expandSIMCarrier(d resourceValueGettable) []*sacloud.SIMNetworkOperatorConf
 	return carriers
 }
 
-func flattenSIMCarrier(carrierInfo []*sacloud.SIMNetworkOperatorConfig) *schema.Set {
+func flattenSIMCarrier(carrierInfo []*iaas.SIMNetworkOperatorConfig) *schema.Set {
 	set := &schema.Set{F: schema.HashString}
 	for _, c := range carrierInfo {
 		if !c.Allow {

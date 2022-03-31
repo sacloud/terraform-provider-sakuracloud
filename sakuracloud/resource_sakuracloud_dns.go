@@ -21,8 +21,8 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
-	"github.com/sacloud/libsacloud/v2/sacloud"
-	"github.com/sacloud/libsacloud/v2/sacloud/types"
+	"github.com/sacloud/iaas-api-go"
+	"github.com/sacloud/iaas-api-go/types"
 )
 
 func resourceSakuraCloudDNS() *schema.Resource {
@@ -114,7 +114,7 @@ func resourceSakuraCloudDNS() *schema.Resource {
 func resourceSakuraCloudDNSCreate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*APIClient)
 
-	dnsOp := sacloud.NewDNSOp(client)
+	dnsOp := iaas.NewDNSOp(client)
 	dns, err := dnsOp.Create(ctx, expandDNSCreateRequest(d))
 	if err != nil {
 		return diag.Errorf("creating SakuraCloud DNS is failed: %s", err)
@@ -127,10 +127,10 @@ func resourceSakuraCloudDNSCreate(ctx context.Context, d *schema.ResourceData, m
 func resourceSakuraCloudDNSRead(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*APIClient)
 
-	dnsOp := sacloud.NewDNSOp(client)
+	dnsOp := iaas.NewDNSOp(client)
 	dns, err := dnsOp.Read(ctx, sakuraCloudID(d.Id()))
 	if err != nil {
-		if sacloud.IsNotFoundError(err) {
+		if iaas.IsNotFoundError(err) {
 			d.SetId("")
 			return nil
 		}
@@ -142,7 +142,7 @@ func resourceSakuraCloudDNSRead(ctx context.Context, d *schema.ResourceData, met
 
 func resourceSakuraCloudDNSUpdate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*APIClient)
-	dnsOp := sacloud.NewDNSOp(client)
+	dnsOp := iaas.NewDNSOp(client)
 
 	sakuraMutexKV.Lock(d.Id())
 	defer sakuraMutexKV.Unlock(d.Id())
@@ -160,14 +160,14 @@ func resourceSakuraCloudDNSUpdate(ctx context.Context, d *schema.ResourceData, m
 
 func resourceSakuraCloudDNSDelete(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*APIClient)
-	dnsOp := sacloud.NewDNSOp(client)
+	dnsOp := iaas.NewDNSOp(client)
 
 	sakuraMutexKV.Lock(d.Id())
 	defer sakuraMutexKV.Unlock(d.Id())
 
 	dns, err := dnsOp.Read(ctx, sakuraCloudID(d.Id()))
 	if err != nil {
-		if sacloud.IsNotFoundError(err) {
+		if iaas.IsNotFoundError(err) {
 			d.SetId("")
 			return nil
 		}
@@ -180,7 +180,7 @@ func resourceSakuraCloudDNSDelete(ctx context.Context, d *schema.ResourceData, m
 	return nil
 }
 
-func setDNSResourceData(ctx context.Context, d *schema.ResourceData, client *APIClient, data *sacloud.DNS) diag.Diagnostics {
+func setDNSResourceData(ctx context.Context, d *schema.ResourceData, client *APIClient, data *iaas.DNS) diag.Diagnostics {
 	d.Set("zone", data.DNSZone)            // nolint
 	d.Set("icon_id", data.IconID.String()) // nolint
 	d.Set("description", data.Description) // nolint

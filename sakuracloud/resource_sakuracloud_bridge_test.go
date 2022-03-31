@@ -23,14 +23,14 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
-	"github.com/sacloud/libsacloud/v2/sacloud"
+	"github.com/sacloud/iaas-api-go"
 )
 
 func TestAccSakuraCloudBridge_basic(t *testing.T) {
 	resourceName := "sakuracloud_bridge.foobar"
 	rand := randomName()
 
-	var bridge sacloud.Bridge
+	var bridge iaas.Bridge
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:          func() { testAccPreCheck(t) },
 		ProviderFactories: testAccProviderFactories,
@@ -59,7 +59,7 @@ func TestAccSakuraCloudBridge_basic(t *testing.T) {
 	})
 }
 
-func testCheckSakuraCloudBridgeExists(n string, bridge *sacloud.Bridge) resource.TestCheckFunc {
+func testCheckSakuraCloudBridgeExists(n string, bridge *iaas.Bridge) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
 		rs, ok := s.RootModule().Resources[n]
 
@@ -72,7 +72,7 @@ func testCheckSakuraCloudBridgeExists(n string, bridge *sacloud.Bridge) resource
 		}
 
 		client := testAccProvider.Meta().(*APIClient)
-		bridgeOp := sacloud.NewBridgeOp(client)
+		bridgeOp := iaas.NewBridgeOp(client)
 		zone := rs.Primary.Attributes["zone"]
 		foundBridge, err := bridgeOp.Read(context.Background(), zone, sakuraCloudID(rs.Primary.ID))
 
@@ -101,7 +101,7 @@ func testCheckSakuraCloudBridgeDestroy(s *terraform.State) error {
 			continue
 		}
 
-		bridgeOp := sacloud.NewBridgeOp(client)
+		bridgeOp := iaas.NewBridgeOp(client)
 		zone := rs.Primary.Attributes["zone"]
 		_, err := bridgeOp.Read(context.Background(), zone, sakuraCloudID(rs.Primary.ID))
 

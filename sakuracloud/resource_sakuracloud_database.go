@@ -22,9 +22,9 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
-	"github.com/sacloud/libsacloud/v2/helper/power"
-	"github.com/sacloud/libsacloud/v2/sacloud"
-	"github.com/sacloud/libsacloud/v2/sacloud/types"
+	"github.com/sacloud/iaas-api-go"
+	"github.com/sacloud/iaas-api-go/helper/power"
+	"github.com/sacloud/iaas-api-go/types"
 )
 
 func resourceSakuraCloudDatabase() *schema.Resource {
@@ -189,7 +189,9 @@ func resourceSakuraCloudDatabaseCreate(ctx context.Context, d *schema.ResourceDa
 	}
 
 	dbBuilder := expandDatabaseBuilder(d, client)
-	db, err := dbBuilder.Build(ctx, zone)
+	dbBuilder.Zone = zone
+
+	db, err := dbBuilder.Build(ctx)
 	if db != nil {
 		d.SetId(db.ID.String())
 	}
@@ -210,11 +212,11 @@ func resourceSakuraCloudDatabaseRead(ctx context.Context, d *schema.ResourceData
 		return diag.FromErr(err)
 	}
 
-	dbOp := sacloud.NewDatabaseOp(client)
+	dbOp := iaas.NewDatabaseOp(client)
 
 	data, err := dbOp.Read(ctx, zone, sakuraCloudID(d.Id()))
 	if err != nil {
-		if sacloud.IsNotFoundError(err) {
+		if iaas.IsNotFoundError(err) {
 			d.SetId("")
 			return nil
 		}
@@ -229,7 +231,7 @@ func resourceSakuraCloudDatabaseUpdate(ctx context.Context, d *schema.ResourceDa
 		return diag.FromErr(err)
 	}
 
-	dbOp := sacloud.NewDatabaseOp(client)
+	dbOp := iaas.NewDatabaseOp(client)
 
 	db, err := dbOp.Read(ctx, zone, sakuraCloudID(d.Id()))
 	if err != nil {
@@ -237,7 +239,10 @@ func resourceSakuraCloudDatabaseUpdate(ctx context.Context, d *schema.ResourceDa
 	}
 
 	dbBuilder := expandDatabaseBuilder(d, client)
-	if _, err := dbBuilder.Update(ctx, zone, db.ID); err != nil {
+	dbBuilder.Zone = zone
+	dbBuilder.ID = db.ID
+
+	if _, err := dbBuilder.Build(ctx); err != nil {
 		return diag.Errorf("updating SakuraCloud Database[%s] is failed: %s", d.Id(), err)
 	}
 
@@ -250,11 +255,11 @@ func resourceSakuraCloudDatabaseDelete(ctx context.Context, d *schema.ResourceDa
 		return diag.FromErr(err)
 	}
 
-	dbOp := sacloud.NewDatabaseOp(client)
+	dbOp := iaas.NewDatabaseOp(client)
 
 	data, err := dbOp.Read(ctx, zone, sakuraCloudID(d.Id()))
 	if err != nil {
-		if sacloud.IsNotFoundError(err) {
+		if iaas.IsNotFoundError(err) {
 			d.SetId("")
 			return nil
 		}
@@ -276,7 +281,7 @@ func resourceSakuraCloudDatabaseDelete(ctx context.Context, d *schema.ResourceDa
 	return nil
 }
 
-func setDatabaseResourceData(ctx context.Context, d *schema.ResourceData, client *APIClient, data *sacloud.Database, zone string) diag.Diagnostics {
+func setDatabaseResourceData(ctx context.Context, d *schema.ResourceData, client *APIClient, data *iaas.Database, zone string) diag.Diagnostics {
 	if data.Availability.IsFailed() {
 		d.SetId("")
 		return diag.Errorf("got unexpected state: Database[%d].Availability is failed", data.ID)
@@ -304,7 +309,7 @@ func setDatabaseResourceData(ctx context.Context, d *schema.ResourceData, client
 	d.Set("description", data.Description) // nolint
 	d.Set("zone", getZone(d, client))      // nolint
 
-	parameters, err := sacloud.NewDatabaseOp(client).GetParameter(ctx, zone, data.ID)
+	parameters, err := iaas.NewDatabaseOp(client).GetParameter(ctx, zone, data.ID)
 	if err != nil {
 		return diag.FromErr(err)
 	}
@@ -316,7 +321,7 @@ func setDatabaseResourceData(ctx context.Context, d *schema.ResourceData, client
 	return nil
 }
 
-func convertDatabaseParametersToStringKeyValues(parameter *sacloud.DatabaseParameter) map[string]interface{} {
+func convertDatabaseParametersToStringKeyValues(parameter *iaas.DatabaseParameter) map[string]interface{} {
 	stringMap := make(map[string]interface{})
 	// convert to string
 	for k, v := range parameter.Settings {

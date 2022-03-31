@@ -19,7 +19,7 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
-	"github.com/sacloud/libsacloud/v2/sacloud"
+	"github.com/sacloud/iaas-api-go"
 )
 
 func dataSourceSakuraCloudInternet() *schema.Resource {
@@ -99,9 +99,9 @@ func dataSourceSakuraCloudInternetRead(ctx context.Context, d *schema.ResourceDa
 		return diag.FromErr(err)
 	}
 
-	searcher := sacloud.NewInternetOp(client)
+	searcher := iaas.NewInternetOp(client)
 
-	findCondition := &sacloud.FindCondition{}
+	findCondition := &iaas.FindCondition{}
 	if rawFilter, ok := d.GetOk(filterAttrName); ok {
 		findCondition.Filter = expandSearchFilter(rawFilter)
 	}

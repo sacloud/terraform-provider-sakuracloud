@@ -21,7 +21,7 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
-	"github.com/sacloud/libsacloud/v2/sacloud"
+	"github.com/sacloud/iaas-api-go"
 )
 
 func TestAccSakuraCloudArchiveShare_basic(t *testing.T) {
@@ -51,7 +51,7 @@ func TestAccSakuraCloudArchiveShare_basic(t *testing.T) {
 
 func testCheckSakuraCloudArchiveShareDestroy(s *terraform.State) error {
 	client := testAccProvider.Meta().(*APIClient)
-	archiveOp := sacloud.NewArchiveOp(client)
+	archiveOp := iaas.NewArchiveOp(client)
 
 	for _, rs := range s.RootModule().Resources {
 		if rs.Type != "sakuracloud_archive" {

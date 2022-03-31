@@ -23,7 +23,7 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
-	"github.com/sacloud/libsacloud/v2/sacloud"
+	"github.com/sacloud/iaas-api-go"
 )
 
 const (
@@ -42,7 +42,7 @@ func TestAccSakuraCloudSIM_basic(t *testing.T) {
 	imei := os.Getenv(envIMEI)
 	rand := randomName()
 
-	var sim sacloud.SIM
+	var sim iaas.SIM
 	resource.Test(t, resource.TestCase{
 		PreCheck:          func() { testAccPreCheck(t) },
 		ProviderFactories: testAccProviderFactories,
@@ -166,7 +166,7 @@ func TestAccSakuraCloudSIM_withMobileGateway(t *testing.T) {
 	})
 }
 
-func testCheckSakuraCloudSIMExists(n string, sim *sacloud.SIM) resource.TestCheckFunc {
+func testCheckSakuraCloudSIMExists(n string, sim *iaas.SIM) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
 		rs, ok := s.RootModule().Resources[n]
 
@@ -179,7 +179,7 @@ func testCheckSakuraCloudSIMExists(n string, sim *sacloud.SIM) resource.TestChec
 		}
 
 		client := testAccProvider.Meta().(*APIClient)
-		simOp := sacloud.NewSIMOp(client)
+		simOp := iaas.NewSIMOp(client)
 
 		foundSIM, err := simOp.Read(context.Background(), sakuraCloudID(rs.Primary.ID))
 		if err != nil {
@@ -196,7 +196,7 @@ func testCheckSakuraCloudSIMExists(n string, sim *sacloud.SIM) resource.TestChec
 
 func testCheckSakuraCloudSIMDestroy(s *terraform.State) error {
 	client := testAccProvider.Meta().(*APIClient)
-	simOp := sacloud.NewSIMOp(client)
+	simOp := iaas.NewSIMOp(client)
 
 	for _, rs := range s.RootModule().Resources {
 		if rs.Type != "sakuracloud_sim" {

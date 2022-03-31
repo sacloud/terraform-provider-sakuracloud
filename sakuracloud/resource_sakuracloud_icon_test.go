@@ -22,14 +22,14 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
-	"github.com/sacloud/libsacloud/v2/sacloud"
+	"github.com/sacloud/iaas-api-go"
 )
 
 func TestAccSakuraCloudIcon_basic(t *testing.T) {
 	resourceName := "sakuracloud_icon.foobar"
 	name := randomName()
 
-	var icon sacloud.Icon
+	var icon iaas.Icon
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:          func() { testAccPreCheck(t) },
 		ProviderFactories: testAccProviderFactories,
@@ -63,7 +63,7 @@ func TestAccSakuraCloudIcon_withSwitch(t *testing.T) {
 	resourceName := "sakuracloud_icon.foobar"
 	name := randomName()
 
-	var icon sacloud.Icon
+	var icon iaas.Icon
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:          func() { testAccPreCheck(t) },
 		ProviderFactories: testAccProviderFactories,
@@ -93,7 +93,7 @@ func TestAccSakuraCloudIcon_withSwitch(t *testing.T) {
 	})
 }
 
-func testCheckSakuraCloudIconExists(n string, icon *sacloud.Icon) resource.TestCheckFunc {
+func testCheckSakuraCloudIconExists(n string, icon *iaas.Icon) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
 		rs, ok := s.RootModule().Resources[n]
 
@@ -106,7 +106,7 @@ func testCheckSakuraCloudIconExists(n string, icon *sacloud.Icon) resource.TestC
 		}
 
 		client := testAccProvider.Meta().(*APIClient)
-		iconOp := sacloud.NewIconOp(client)
+		iconOp := iaas.NewIconOp(client)
 
 		foundIcon, err := iconOp.Read(context.Background(), sakuraCloudID(rs.Primary.ID))
 		if err != nil {
@@ -124,7 +124,7 @@ func testCheckSakuraCloudIconExists(n string, icon *sacloud.Icon) resource.TestC
 
 func testCheckSakuraCloudIconDestroy(s *terraform.State) error {
 	client := testAccProvider.Meta().(*APIClient)
-	iconOp := sacloud.NewIconOp(client)
+	iconOp := iaas.NewIconOp(client)
 
 	for _, rs := range s.RootModule().Resources {
 		if rs.Type != "sakuracloud_icon" {

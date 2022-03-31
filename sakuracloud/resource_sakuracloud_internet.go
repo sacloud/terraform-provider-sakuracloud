@@ -22,10 +22,10 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
-	"github.com/sacloud/libsacloud/v2/helper/cleanup"
-	"github.com/sacloud/libsacloud/v2/helper/query"
-	"github.com/sacloud/libsacloud/v2/sacloud"
-	"github.com/sacloud/libsacloud/v2/sacloud/types"
+	"github.com/sacloud/iaas-api-go"
+	"github.com/sacloud/iaas-api-go/helper/cleanup"
+	"github.com/sacloud/iaas-api-go/helper/query"
+	"github.com/sacloud/iaas-api-go/types"
 )
 
 func resourceSakuraCloudInternet() *schema.Resource {
@@ -160,7 +160,7 @@ func resourceSakuraCloudInternetRead(ctx context.Context, d *schema.ResourceData
 
 	internet, err := query.ReadRouter(ctx, client, zone, sakuraCloudID(d.Id()))
 	if err != nil {
-		if sacloud.IsNoResultsError(err) {
+		if iaas.IsNoResultsError(err) {
 			d.SetId("")
 			return nil
 		}
@@ -176,7 +176,7 @@ func resourceSakuraCloudInternetUpdate(ctx context.Context, d *schema.ResourceDa
 		return diag.FromErr(err)
 	}
 
-	internetOp := sacloud.NewInternetOp(client)
+	internetOp := iaas.NewInternetOp(client)
 
 	sakuraMutexKV.Lock(d.Id())
 	defer sakuraMutexKV.Unlock(d.Id())
@@ -202,14 +202,14 @@ func resourceSakuraCloudInternetDelete(ctx context.Context, d *schema.ResourceDa
 		return diag.FromErr(err)
 	}
 
-	internetOp := sacloud.NewInternetOp(client)
+	internetOp := iaas.NewInternetOp(client)
 
 	sakuraMutexKV.Lock(d.Id())
 	defer sakuraMutexKV.Unlock(d.Id())
 
 	internet, err := internetOp.Read(ctx, zone, sakuraCloudID(d.Id()))
 	if err != nil {
-		if sacloud.IsNotFoundError(err) {
+		if iaas.IsNotFoundError(err) {
 			d.SetId("")
 			return nil
 		}
@@ -226,8 +226,8 @@ func resourceSakuraCloudInternetDelete(ctx context.Context, d *schema.ResourceDa
 	return nil
 }
 
-func setInternetResourceData(ctx context.Context, d *schema.ResourceData, client *APIClient, data *sacloud.Internet) diag.Diagnostics {
-	swOp := sacloud.NewSwitchOp(client)
+func setInternetResourceData(ctx context.Context, d *schema.ResourceData, client *APIClient, data *iaas.Internet) diag.Diagnostics {
+	swOp := iaas.NewSwitchOp(client)
 	zone := getZone(d, client)
 
 	sw, err := swOp.Read(ctx, zone, data.Switch.ID)

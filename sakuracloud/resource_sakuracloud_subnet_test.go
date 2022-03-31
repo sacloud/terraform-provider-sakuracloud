@@ -22,14 +22,14 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
-	"github.com/sacloud/libsacloud/v2/sacloud"
+	"github.com/sacloud/iaas-api-go"
 )
 
 func TestAccSakuraCloudSubnet_basic(t *testing.T) {
 	resourceName := "sakuracloud_subnet.foobar"
 	rand := randomName()
 
-	var subnet sacloud.Subnet
+	var subnet iaas.Subnet
 	resource.Test(t, resource.TestCase{
 		PreCheck:          func() { testAccPreCheck(t) },
 		ProviderFactories: testAccProviderFactories,
@@ -56,7 +56,7 @@ func TestAccSakuraCloudSubnet_basic(t *testing.T) {
 	})
 }
 
-func testCheckSakuraCloudSubnetExists(n string, subnet *sacloud.Subnet) resource.TestCheckFunc {
+func testCheckSakuraCloudSubnetExists(n string, subnet *iaas.Subnet) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
 		rs, ok := s.RootModule().Resources[n]
 		if !ok {
@@ -68,7 +68,7 @@ func testCheckSakuraCloudSubnetExists(n string, subnet *sacloud.Subnet) resource
 		}
 
 		client := testAccProvider.Meta().(*APIClient)
-		subnetOp := sacloud.NewSubnetOp(client)
+		subnetOp := iaas.NewSubnetOp(client)
 		zone := rs.Primary.Attributes["zone"]
 
 		foundSubnet, err := subnetOp.Read(context.Background(), zone, sakuraCloudID(rs.Primary.ID))
@@ -87,7 +87,7 @@ func testCheckSakuraCloudSubnetExists(n string, subnet *sacloud.Subnet) resource
 
 func testCheckSakuraCloudSubnetDestroy(s *terraform.State) error {
 	client := testAccProvider.Meta().(*APIClient)
-	subnetOp := sacloud.NewSubnetOp(client)
+	subnetOp := iaas.NewSubnetOp(client)
 
 	for _, rs := range s.RootModule().Resources {
 		if rs.Type != "sakuracloud_subnet" {

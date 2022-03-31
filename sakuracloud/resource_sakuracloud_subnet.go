@@ -21,7 +21,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
-	"github.com/sacloud/libsacloud/v2/sacloud"
+	"github.com/sacloud/iaas-api-go"
 )
 
 func resourceSakuraCloudSubnet() *schema.Resource {
@@ -102,7 +102,7 @@ func resourceSakuraCloudSubnetCreate(ctx context.Context, d *schema.ResourceData
 		return diag.FromErr(err)
 	}
 
-	internetOp := sacloud.NewInternetOp(client)
+	internetOp := iaas.NewInternetOp(client)
 	internetID := d.Get("internet_id").(string)
 
 	sakuraMutexKV.Lock(internetID)
@@ -113,7 +113,7 @@ func resourceSakuraCloudSubnetCreate(ctx context.Context, d *schema.ResourceData
 		return diag.Errorf("could not read SakuraCloud Internet[%s]: %s", internetID, err)
 	}
 
-	subnet, err := internetOp.AddSubnet(ctx, zone, internet.ID, &sacloud.InternetAddSubnetRequest{
+	subnet, err := internetOp.AddSubnet(ctx, zone, internet.ID, &iaas.InternetAddSubnetRequest{
 		NetworkMaskLen: d.Get("netmask").(int),
 		NextHop:        d.Get("next_hop").(string),
 	})
@@ -131,10 +131,10 @@ func resourceSakuraCloudSubnetRead(ctx context.Context, d *schema.ResourceData, 
 		return diag.FromErr(err)
 	}
 
-	subnetOp := sacloud.NewSubnetOp(client)
+	subnetOp := iaas.NewSubnetOp(client)
 	subnet, err := subnetOp.Read(ctx, zone, sakuraCloudID(d.Id()))
 	if err != nil {
-		if sacloud.IsNotFoundError(err) {
+		if iaas.IsNotFoundError(err) {
 			d.SetId("")
 			return nil
 		}
@@ -149,8 +149,8 @@ func resourceSakuraCloudSubnetUpdate(ctx context.Context, d *schema.ResourceData
 		return diag.FromErr(err)
 	}
 
-	subnetOp := sacloud.NewSubnetOp(client)
-	internetOp := sacloud.NewInternetOp(client)
+	subnetOp := iaas.NewSubnetOp(client)
+	internetOp := iaas.NewInternetOp(client)
 
 	internetID := d.Get("internet_id").(string)
 
@@ -162,7 +162,7 @@ func resourceSakuraCloudSubnetUpdate(ctx context.Context, d *schema.ResourceData
 		return diag.Errorf("could not read Subnet[%s]: %s", d.Id(), err)
 	}
 
-	_, err = internetOp.UpdateSubnet(ctx, zone, sakuraCloudID(internetID), subnet.ID, &sacloud.InternetUpdateSubnetRequest{
+	_, err = internetOp.UpdateSubnet(ctx, zone, sakuraCloudID(internetID), subnet.ID, &iaas.InternetUpdateSubnetRequest{
 		NextHop: d.Get("next_hop").(string),
 	})
 	if err != nil {
@@ -177,8 +177,8 @@ func resourceSakuraCloudSubnetDelete(ctx context.Context, d *schema.ResourceData
 		return diag.FromErr(err)
 	}
 
-	subnetOp := sacloud.NewSubnetOp(client)
-	internetOp := sacloud.NewInternetOp(client)
+	subnetOp := iaas.NewSubnetOp(client)
+	internetOp := iaas.NewInternetOp(client)
 
 	internetID := d.Get("internet_id").(string)
 
@@ -187,7 +187,7 @@ func resourceSakuraCloudSubnetDelete(ctx context.Context, d *schema.ResourceData
 
 	subnet, err := subnetOp.Read(ctx, zone, sakuraCloudID(d.Id()))
 	if err != nil {
-		if sacloud.IsNotFoundError(err) {
+		if iaas.IsNotFoundError(err) {
 			d.SetId("")
 			return nil
 		}
@@ -200,7 +200,7 @@ func resourceSakuraCloudSubnetDelete(ctx context.Context, d *schema.ResourceData
 	return nil
 }
 
-func setSubnetResourceData(_ context.Context, d *schema.ResourceData, client *APIClient, data *sacloud.Subnet) diag.Diagnostics {
+func setSubnetResourceData(_ context.Context, d *schema.ResourceData, client *APIClient, data *iaas.Subnet) diag.Diagnostics {
 	if data.SwitchID.IsEmpty() {
 		return diag.Errorf("error reading SakuraCloud Subnet[%s]: %s", data.ID, "switch is nil")
 	}

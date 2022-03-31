@@ -21,9 +21,9 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
-	"github.com/sacloud/libsacloud/v2/sacloud"
-	"github.com/sacloud/libsacloud/v2/sacloud/search"
-	"github.com/sacloud/libsacloud/v2/sacloud/types"
+	"github.com/sacloud/iaas-api-go"
+	"github.com/sacloud/iaas-api-go/search"
+	"github.com/sacloud/iaas-api-go/types"
 )
 
 func dataSourceSakuraCloudServerVNCInfo() *schema.Resource {
@@ -65,7 +65,7 @@ func dataSourceSakuraCloudServerVNCInfoRead(ctx context.Context, d *schema.Resou
 	}
 
 	// validate account
-	authOp := sacloud.NewAuthStatusOp(client)
+	authOp := iaas.NewAuthStatusOp(client)
 	auth, err := authOp.Read(ctx)
 	if err != nil {
 		return diag.Errorf("could not read Authentication Status: %s", err)
@@ -75,8 +75,8 @@ func dataSourceSakuraCloudServerVNCInfoRead(ctx context.Context, d *schema.Resou
 	}
 
 	// validate zone
-	zoneOp := sacloud.NewZoneOp(client)
-	searched, err := zoneOp.Find(ctx, &sacloud.FindCondition{
+	zoneOp := iaas.NewZoneOp(client)
+	searched, err := zoneOp.Find(ctx, &iaas.FindCondition{
 		Filter: search.Filter{
 			search.Key("Name"): search.ExactMatch(zone),
 		},
@@ -89,7 +89,7 @@ func dataSourceSakuraCloudServerVNCInfoRead(ctx context.Context, d *schema.Resou
 		return diag.Errorf("reading VNC information is failed: VNC information is not support on zone[%s]", zone)
 	}
 
-	serverOp := sacloud.NewServerOp(client)
+	serverOp := iaas.NewServerOp(client)
 	serverID := expandSakuraCloudID(d, "server_id")
 
 	data, err := serverOp.GetVNCProxy(ctx, zone, serverID)

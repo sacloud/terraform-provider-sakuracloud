@@ -20,15 +20,15 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
-	"github.com/sacloud/libsacloud/v2/pkg/mutexkv"
-	"github.com/sacloud/libsacloud/v2/sacloud"
-	"github.com/sacloud/libsacloud/v2/sacloud/profile"
+	"github.com/sacloud/api-client-go/profile"
+	"github.com/sacloud/iaas-api-go"
+	"github.com/sacloud/packages-go/mutexkv"
 )
 
 var (
 	defaultZone                = "is1b"
 	defaultRetryMax            = 10
-	defaultZones               = sacloud.SakuraCloudZones
+	defaultZones               = iaas.SakuraCloudZones
 	defaultAPIRequestTimeout   = 300
 	defaultAPIRequestRateLimit = 10
 )

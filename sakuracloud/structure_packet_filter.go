@@ -16,46 +16,46 @@ package sakuracloud
 
 import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
-	"github.com/sacloud/libsacloud/v2/sacloud"
-	"github.com/sacloud/libsacloud/v2/sacloud/types"
+	"github.com/sacloud/iaas-api-go"
+	"github.com/sacloud/iaas-api-go/types"
 )
 
-func expandPacketFilterCreateRequest(d *schema.ResourceData) *sacloud.PacketFilterCreateRequest {
-	return &sacloud.PacketFilterCreateRequest{
+func expandPacketFilterCreateRequest(d *schema.ResourceData) *iaas.PacketFilterCreateRequest {
+	return &iaas.PacketFilterCreateRequest{
 		Name:        d.Get("name").(string),
 		Description: d.Get("description").(string),
 		Expression:  expandPacketFilterExpressions(d),
 	}
 }
 
-func expandPacketFilterUpdateRequest(d *schema.ResourceData, pf *sacloud.PacketFilter) *sacloud.PacketFilterUpdateRequest {
+func expandPacketFilterUpdateRequest(d *schema.ResourceData, pf *iaas.PacketFilter) *iaas.PacketFilterUpdateRequest {
 	expressions := pf.Expression
 	if d.HasChange("expression") {
 		expressions = expandPacketFilterExpressions(d)
 	}
 
-	return &sacloud.PacketFilterUpdateRequest{
+	return &iaas.PacketFilterUpdateRequest{
 		Name:        d.Get("name").(string),
 		Description: d.Get("description").(string),
 		Expression:  expressions,
 	}
 }
 
-func expandPacketFilterExpressions(d resourceValueGettable) []*sacloud.PacketFilterExpression {
-	var expressions []*sacloud.PacketFilterExpression
+func expandPacketFilterExpressions(d resourceValueGettable) []*iaas.PacketFilterExpression {
+	var expressions []*iaas.PacketFilterExpression
 	for _, e := range d.Get("expression").([]interface{}) {
 		expressions = append(expressions, expandPacketFilterExpression(&resourceMapValue{value: e.(map[string]interface{})}))
 	}
 	return expressions
 }
 
-func expandPacketFilterExpression(d resourceValueGettable) *sacloud.PacketFilterExpression {
+func expandPacketFilterExpression(d resourceValueGettable) *iaas.PacketFilterExpression {
 	action := "deny"
 	if d.Get("allow").(bool) {
 		action = "allow"
 	}
 
-	exp := &sacloud.PacketFilterExpression{
+	exp := &iaas.PacketFilterExpression{
 		Protocol:      types.Protocol(d.Get("protocol").(string)),
 		SourceNetwork: types.PacketFilterNetwork(d.Get("source_network").(string)),
 		Action:        types.Action(action),
@@ -71,7 +71,7 @@ func expandPacketFilterExpression(d resourceValueGettable) *sacloud.PacketFilter
 	return exp
 }
 
-func flattenPacketFilterExpressions(pf *sacloud.PacketFilter) []interface{} {
+func flattenPacketFilterExpressions(pf *iaas.PacketFilter) []interface{} {
 	var expressions []interface{}
 	if len(pf.Expression) > 0 {
 		for _, exp := range pf.Expression {
@@ -81,7 +81,7 @@ func flattenPacketFilterExpressions(pf *sacloud.PacketFilter) []interface{} {
 	return expressions
 }
 
-func flattenPacketFilterExpression(exp *sacloud.PacketFilterExpression) interface{} {
+func flattenPacketFilterExpression(exp *iaas.PacketFilterExpression) interface{} {
 	expression := map[string]interface{}{
 		"protocol":    exp.Protocol,
 		"allow":       exp.Action.IsAllow(),
@@ -99,18 +99,18 @@ func flattenPacketFilterExpression(exp *sacloud.PacketFilterExpression) interfac
 	return expression
 }
 
-func expandPacketFilterRulesUpdateRequest(d *schema.ResourceData, pf *sacloud.PacketFilter) *sacloud.PacketFilterUpdateRequest {
-	return &sacloud.PacketFilterUpdateRequest{
+func expandPacketFilterRulesUpdateRequest(d *schema.ResourceData, pf *iaas.PacketFilter) *iaas.PacketFilterUpdateRequest {
+	return &iaas.PacketFilterUpdateRequest{
 		Name:        pf.Name,
 		Description: pf.Description,
 		Expression:  expandPacketFilterExpressions(d),
 	}
 }
 
-func expandPacketFilterRulesDeleteRequest(_ *schema.ResourceData, pf *sacloud.PacketFilter) *sacloud.PacketFilterUpdateRequest {
-	return &sacloud.PacketFilterUpdateRequest{
+func expandPacketFilterRulesDeleteRequest(_ *schema.ResourceData, pf *iaas.PacketFilter) *iaas.PacketFilterUpdateRequest {
+	return &iaas.PacketFilterUpdateRequest{
 		Name:        pf.Name,
 		Description: pf.Description,
-		Expression:  []*sacloud.PacketFilterExpression{},
+		Expression:  []*iaas.PacketFilterExpression{},
 	}
 }

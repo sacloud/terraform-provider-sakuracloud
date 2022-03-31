@@ -28,10 +28,10 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
 	"github.com/mitchellh/go-homedir"
-	"github.com/sacloud/libsacloud/v2/helper/plans"
-	"github.com/sacloud/libsacloud/v2/sacloud/search"
-	"github.com/sacloud/libsacloud/v2/sacloud/search/keys"
-	"github.com/sacloud/libsacloud/v2/sacloud/types"
+	"github.com/sacloud/iaas-api-go/helper/plans"
+	"github.com/sacloud/iaas-api-go/search"
+	"github.com/sacloud/iaas-api-go/search/keys"
+	"github.com/sacloud/iaas-api-go/types"
 )
 
 type resourceValueChangeHandler interface {

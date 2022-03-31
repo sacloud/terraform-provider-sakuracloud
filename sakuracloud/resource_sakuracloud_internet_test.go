@@ -22,14 +22,14 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
-	"github.com/sacloud/libsacloud/v2/sacloud"
+	"github.com/sacloud/iaas-api-go"
 )
 
 func TestAccSakuraCloudInternet_basic(t *testing.T) {
 	resourceName := "sakuracloud_internet.foobar"
 	rand := randomName()
 
-	var internet sacloud.Internet
+	var internet iaas.Internet
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:          func() { testAccPreCheck(t) },
 		ProviderFactories: testAccProviderFactories,
@@ -81,7 +81,7 @@ func TestAccSakuraCloudInternet_basic(t *testing.T) {
 	})
 }
 
-func testCheckSakuraCloudInternetExists(n string, internet *sacloud.Internet) resource.TestCheckFunc {
+func testCheckSakuraCloudInternetExists(n string, internet *iaas.Internet) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
 		rs, ok := s.RootModule().Resources[n]
 
@@ -94,7 +94,7 @@ func testCheckSakuraCloudInternetExists(n string, internet *sacloud.Internet) re
 		}
 
 		client := testAccProvider.Meta().(*APIClient)
-		internetOp := sacloud.NewInternetOp(client)
+		internetOp := iaas.NewInternetOp(client)
 		zone := rs.Primary.Attributes["zone"]
 
 		foundInternet, err := internetOp.Read(context.Background(), zone, sakuraCloudID(rs.Primary.ID))
@@ -113,7 +113,7 @@ func testCheckSakuraCloudInternetExists(n string, internet *sacloud.Internet) re
 
 func testCheckSakuraCloudInternetDestroy(s *terraform.State) error {
 	client := testAccProvider.Meta().(*APIClient)
-	internetOp := sacloud.NewInternetOp(client)
+	internetOp := iaas.NewInternetOp(client)
 
 	for _, rs := range s.RootModule().Resources {
 		if rs.Type != "sakuracloud_internet" {

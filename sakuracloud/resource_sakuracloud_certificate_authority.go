@@ -22,8 +22,9 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
-	caService "github.com/sacloud/libsacloud/v2/helper/service/certificateauthority"
-	"github.com/sacloud/libsacloud/v2/sacloud"
+	"github.com/sacloud/iaas-api-go"
+	caService "github.com/sacloud/iaas-service-go/certificateauthority"
+	caBuilder "github.com/sacloud/iaas-service-go/certificateauthority/builder"
 )
 
 func resourceSakuraCloudCertificateAuthority() *schema.Resource {
@@ -352,7 +353,7 @@ func resourceSakuraCloudCertificateAuthorityRead(ctx context.Context, d *schema.
 	caSvc := caService.New(client)
 	ca, err := caSvc.ReadWithContext(ctx, &caService.ReadRequest{ID: sakuraCloudID(d.Id())})
 	if err != nil {
-		if sacloud.IsNotFoundError(err) {
+		if iaas.IsNotFoundError(err) {
 			d.SetId("")
 			return nil
 		}
@@ -370,7 +371,7 @@ func resourceSakuraCloudCertificateAuthorityUpdate(ctx context.Context, d *schem
 	caSvc := caService.New(client)
 	_, err = caSvc.ReadWithContext(ctx, &caService.ReadRequest{ID: sakuraCloudID(d.Id())})
 	if err != nil {
-		if sacloud.IsNotFoundError(err) {
+		if iaas.IsNotFoundError(err) {
 			d.SetId("")
 			return nil
 		}
@@ -399,10 +400,10 @@ func resourceSakuraCloudCertificateAuthorityDelete(ctx context.Context, d *schem
 		return diag.FromErr(err)
 	}
 
-	caOp := sacloud.NewCertificateAuthorityOp(client)
+	caOp := iaas.NewCertificateAuthorityOp(client)
 	ca, err := caOp.Read(ctx, sakuraCloudID(d.Id()))
 	if err != nil {
-		if sacloud.IsNotFoundError(err) {
+		if iaas.IsNotFoundError(err) {
 			d.SetId("")
 			return nil
 		}
@@ -448,7 +449,7 @@ func resourceSakuraCloudCertificateAuthorityDelete(ctx context.Context, d *schem
 	return nil
 }
 
-func setCertificateAuthorityResourceData(ctx context.Context, d *schema.ResourceData, client *APIClient, data *caService.CertificateAuthority) diag.Diagnostics {
+func setCertificateAuthorityResourceData(ctx context.Context, d *schema.ResourceData, client *APIClient, data *caBuilder.CertificateAuthority) diag.Diagnostics {
 	d.Set("name", data.Name)               // nolint
 	d.Set("icon_id", data.IconID.String()) // nolint
 	d.Set("description", data.Description) // nolint

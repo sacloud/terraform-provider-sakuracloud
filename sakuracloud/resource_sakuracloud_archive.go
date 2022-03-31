@@ -22,8 +22,8 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/customdiff"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
-	"github.com/sacloud/libsacloud/v2/sacloud"
-	"github.com/sacloud/libsacloud/v2/sacloud/types"
+	"github.com/sacloud/iaas-api-go"
+	"github.com/sacloud/iaas-api-go/types"
 )
 
 func resourceSakuraCloudArchive() *schema.Resource {
@@ -148,11 +148,11 @@ func resourceSakuraCloudArchiveRead(ctx context.Context, d *schema.ResourceData,
 		return diag.FromErr(err)
 	}
 
-	archiveOp := sacloud.NewArchiveOp(client)
+	archiveOp := iaas.NewArchiveOp(client)
 
 	archive, err := archiveOp.Read(ctx, zone, sakuraCloudID(d.Id()))
 	if err != nil {
-		if sacloud.IsNotFoundError(err) {
+		if iaas.IsNotFoundError(err) {
 			d.SetId("")
 			return nil
 		}
@@ -167,7 +167,7 @@ func resourceSakuraCloudArchiveUpdate(ctx context.Context, d *schema.ResourceDat
 		return diag.FromErr(err)
 	}
 
-	archiveOp := sacloud.NewArchiveOp(client)
+	archiveOp := iaas.NewArchiveOp(client)
 
 	archive, err := archiveOp.Read(ctx, zone, sakuraCloudID(d.Id()))
 	if err != nil {
@@ -187,11 +187,11 @@ func resourceSakuraCloudArchiveDelete(ctx context.Context, d *schema.ResourceDat
 		return diag.FromErr(err)
 	}
 
-	archiveOp := sacloud.NewArchiveOp(client)
+	archiveOp := iaas.NewArchiveOp(client)
 
 	archive, err := archiveOp.Read(ctx, zone, sakuraCloudID(d.Id()))
 	if err != nil {
-		if sacloud.IsNotFoundError(err) {
+		if iaas.IsNotFoundError(err) {
 			d.SetId("")
 			return nil
 		}
@@ -206,7 +206,7 @@ func resourceSakuraCloudArchiveDelete(ctx context.Context, d *schema.ResourceDat
 	return nil
 }
 
-func setArchiveResourceData(d *schema.ResourceData, client *APIClient, data *sacloud.Archive) diag.Diagnostics {
+func setArchiveResourceData(d *schema.ResourceData, client *APIClient, data *iaas.Archive) diag.Diagnostics {
 	d.Set("hash", expandArchiveHash(d))                             // nolint
 	d.Set("icon_id", data.IconID.String())                          // nolint
 	d.Set("name", data.Name)                                        // nolint

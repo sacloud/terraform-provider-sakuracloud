@@ -16,11 +16,11 @@ package sakuracloud
 
 import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
-	"github.com/sacloud/libsacloud/v2/sacloud"
-	"github.com/sacloud/libsacloud/v2/sacloud/types"
+	"github.com/sacloud/iaas-api-go"
+	"github.com/sacloud/iaas-api-go/types"
 )
 
-func expandGSLBHealthCheckConf(d resourceValueGettable) *sacloud.GSLBHealthCheck {
+func expandGSLBHealthCheckConf(d resourceValueGettable) *iaas.GSLBHealthCheck {
 	healthCheckConf := d.Get("health_check").([]interface{})
 	if len(healthCheckConf) == 0 {
 		return nil
@@ -30,19 +30,19 @@ func expandGSLBHealthCheckConf(d resourceValueGettable) *sacloud.GSLBHealthCheck
 	protocol := conf["protocol"].(string)
 	switch protocol {
 	case "http", "https":
-		return &sacloud.GSLBHealthCheck{
+		return &iaas.GSLBHealthCheck{
 			Protocol:     types.EGSLBHealthCheckProtocol(protocol),
 			HostHeader:   conf["host_header"].(string),
 			Path:         conf["path"].(string),
 			ResponseCode: types.StringNumber(forceAtoI(conf["status"].(string))),
 		}
 	case "tcp":
-		return &sacloud.GSLBHealthCheck{
+		return &iaas.GSLBHealthCheck{
 			Protocol: types.EGSLBHealthCheckProtocol(protocol),
 			Port:     types.StringNumber(conf["port"].(int)),
 		}
 	case "ping":
-		return &sacloud.GSLBHealthCheck{
+		return &iaas.GSLBHealthCheck{
 			Protocol: types.EGSLBHealthCheckProtocol(protocol),
 		}
 	}
@@ -59,8 +59,8 @@ func expandGSLBDelayLoop(d resourceValueGettable) int {
 	return conf["delay_loop"].(int)
 }
 
-func expandGSLBServers(d resourceValueGettable) []*sacloud.GSLBServer {
-	var servers []*sacloud.GSLBServer
+func expandGSLBServers(d resourceValueGettable) []*iaas.GSLBServer {
+	var servers []*iaas.GSLBServer
 	for _, s := range d.Get("server").([]interface{}) {
 		v := s.(map[string]interface{})
 		server := expandGSLBServer(&resourceMapValue{value: v})
@@ -69,7 +69,7 @@ func expandGSLBServers(d resourceValueGettable) []*sacloud.GSLBServer {
 	return servers
 }
 
-func flattenGSLBHealthCheck(data *sacloud.GSLB) []interface{} {
+func flattenGSLBHealthCheck(data *iaas.GSLB) []interface{} {
 	//health_check
 	healthCheck := map[string]interface{}{}
 	switch data.HealthCheck.Protocol {
@@ -86,7 +86,7 @@ func flattenGSLBHealthCheck(data *sacloud.GSLB) []interface{} {
 	return []interface{}{healthCheck}
 }
 
-func flattenGSLBServers(data *sacloud.GSLB) []interface{} {
+func flattenGSLBServers(data *iaas.GSLB) []interface{} {
 	var servers []interface{}
 	for _, server := range data.DestinationServers {
 		servers = append(servers, flattenGSLBServer(server))
@@ -94,7 +94,7 @@ func flattenGSLBServers(data *sacloud.GSLB) []interface{} {
 	return servers
 }
 
-func flattenGSLBServer(s *sacloud.GSLBServer) interface{} {
+func flattenGSLBServer(s *iaas.GSLBServer) interface{} {
 	v := map[string]interface{}{}
 	v["ip_address"] = s.IPAddress
 	v["enabled"] = s.Enabled.Bool()
@@ -102,16 +102,16 @@ func flattenGSLBServer(s *sacloud.GSLBServer) interface{} {
 	return v
 }
 
-func expandGSLBServer(d resourceValueGettable) *sacloud.GSLBServer {
-	return &sacloud.GSLBServer{
+func expandGSLBServer(d resourceValueGettable) *iaas.GSLBServer {
+	return &iaas.GSLBServer{
 		IPAddress: d.Get("ip_address").(string),
 		Enabled:   types.StringFlag(d.Get("enabled").(bool)),
 		Weight:    types.StringNumber(d.Get("weight").(int)),
 	}
 }
 
-func expandGSLBCreateRequest(d *schema.ResourceData) *sacloud.GSLBCreateRequest {
-	return &sacloud.GSLBCreateRequest{
+func expandGSLBCreateRequest(d *schema.ResourceData) *iaas.GSLBCreateRequest {
+	return &iaas.GSLBCreateRequest{
 		HealthCheck:        expandGSLBHealthCheckConf(d),
 		DelayLoop:          expandGSLBDelayLoop(d),
 		Weighted:           types.StringFlag(d.Get("weighted").(bool)),
@@ -124,8 +124,8 @@ func expandGSLBCreateRequest(d *schema.ResourceData) *sacloud.GSLBCreateRequest 
 	}
 }
 
-func expandGSLBUpdateRequest(d *schema.ResourceData, gslb *sacloud.GSLB) *sacloud.GSLBUpdateRequest {
-	return &sacloud.GSLBUpdateRequest{
+func expandGSLBUpdateRequest(d *schema.ResourceData, gslb *iaas.GSLB) *iaas.GSLBUpdateRequest {
+	return &iaas.GSLBUpdateRequest{
 		Name:               d.Get("name").(string),
 		Description:        d.Get("description").(string),
 		Tags:               expandTags(d),

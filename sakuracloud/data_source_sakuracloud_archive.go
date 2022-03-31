@@ -20,9 +20,9 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
-	"github.com/sacloud/libsacloud/v2/helper/query"
-	"github.com/sacloud/libsacloud/v2/sacloud"
-	"github.com/sacloud/libsacloud/v2/sacloud/ostype"
+	"github.com/sacloud/iaas-api-go"
+	"github.com/sacloud/iaas-api-go/helper/query"
+	"github.com/sacloud/iaas-api-go/ostype"
 )
 
 func dataSourceSakuraCloudArchive() *schema.Resource {
@@ -59,9 +59,9 @@ func dataSourceSakuraCloudArchiveRead(ctx context.Context, d *schema.ResourceDat
 		return diag.FromErr(err)
 	}
 
-	searcher := sacloud.NewArchiveOp(client)
+	searcher := iaas.NewArchiveOp(client)
 
-	var data *sacloud.Archive
+	var data *iaas.Archive
 	if osType, ok := d.GetOk("os_type"); ok {
 		strOSType := osType.(string)
 		if strOSType != "" {
@@ -72,7 +72,7 @@ func dataSourceSakuraCloudArchiveRead(ctx context.Context, d *schema.ResourceDat
 			data = res
 		}
 	} else {
-		findCondition := &sacloud.FindCondition{}
+		findCondition := &iaas.FindCondition{}
 		if rawFilter, ok := d.GetOk(filterAttrName); ok {
 			findCondition.Filter = expandSearchFilter(rawFilter)
 		}

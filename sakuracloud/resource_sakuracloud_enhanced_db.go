@@ -20,7 +20,7 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
-	"github.com/sacloud/libsacloud/v2/sacloud"
+	"github.com/sacloud/iaas-api-go"
 )
 
 func resourceSakuraCloudEnhancedDB() *schema.Resource {
@@ -104,10 +104,10 @@ func resourceSakuraCloudEnhancedDBRead(ctx context.Context, d *schema.ResourceDa
 		return diag.FromErr(err)
 	}
 
-	regOp := sacloud.NewEnhancedDBOp(client)
+	regOp := iaas.NewEnhancedDBOp(client)
 	reg, err := regOp.Read(ctx, sakuraCloudID(d.Id()))
 	if err != nil {
-		if sacloud.IsNotFoundError(err) {
+		if iaas.IsNotFoundError(err) {
 			d.SetId("")
 			return nil
 		}
@@ -122,7 +122,7 @@ func resourceSakuraCloudEnhancedDBUpdate(ctx context.Context, d *schema.Resource
 		return diag.FromErr(err)
 	}
 
-	regOp := sacloud.NewEnhancedDBOp(client)
+	regOp := iaas.NewEnhancedDBOp(client)
 	reg, err := regOp.Read(ctx, sakuraCloudID(d.Id()))
 	if err != nil {
 		return diag.Errorf("could not read SakuraCloud EnhancedDB[%s]: %s", d.Id(), err)
@@ -142,10 +142,10 @@ func resourceSakuraCloudEnhancedDBDelete(ctx context.Context, d *schema.Resource
 		return diag.FromErr(err)
 	}
 
-	regOp := sacloud.NewEnhancedDBOp(client)
+	regOp := iaas.NewEnhancedDBOp(client)
 	reg, err := regOp.Read(ctx, sakuraCloudID(d.Id()))
 	if err != nil {
-		if sacloud.IsNotFoundError(err) {
+		if iaas.IsNotFoundError(err) {
 			d.SetId("")
 			return nil
 		}
@@ -160,7 +160,7 @@ func resourceSakuraCloudEnhancedDBDelete(ctx context.Context, d *schema.Resource
 	return nil
 }
 
-func setEnhancedDBResourceData(ctx context.Context, d *schema.ResourceData, client *APIClient, data *sacloud.EnhancedDB, includePassword bool) diag.Diagnostics {
+func setEnhancedDBResourceData(ctx context.Context, d *schema.ResourceData, client *APIClient, data *iaas.EnhancedDB, includePassword bool) diag.Diagnostics {
 	d.Set("name", data.Name)               // nolint
 	d.Set("icon_id", data.IconID.String()) // nolint
 	d.Set("description", data.Description) // nolint

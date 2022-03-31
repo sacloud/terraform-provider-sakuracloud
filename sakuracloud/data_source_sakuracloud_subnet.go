@@ -20,7 +20,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
-	"github.com/sacloud/libsacloud/v2/sacloud"
+	"github.com/sacloud/iaas-api-go"
 )
 
 func dataSourceSakuraCloudSubnet() *schema.Resource {
@@ -81,8 +81,8 @@ func dataSourceSakuraCloudSubnetRead(ctx context.Context, d *schema.ResourceData
 		return diag.FromErr(err)
 	}
 
-	internetOp := sacloud.NewInternetOp(client)
-	subnetOp := sacloud.NewSubnetOp(client)
+	internetOp := iaas.NewInternetOp(client)
+	subnetOp := iaas.NewSubnetOp(client)
 
 	internetID := expandSakuraCloudID(d, "internet_id")
 	subnetIndex := d.Get("index").(int)

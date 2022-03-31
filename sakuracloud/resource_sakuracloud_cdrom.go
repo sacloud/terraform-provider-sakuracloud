@@ -24,10 +24,10 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/customdiff"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/mitchellh/go-homedir"
+	"github.com/sacloud/iaas-api-go"
+	"github.com/sacloud/iaas-api-go/helper/cleanup"
+	"github.com/sacloud/iaas-api-go/types"
 	"github.com/sacloud/iso9660wrap"
-	"github.com/sacloud/libsacloud/v2/helper/cleanup"
-	"github.com/sacloud/libsacloud/v2/sacloud"
-	"github.com/sacloud/libsacloud/v2/sacloud/types"
 )
 
 func resourceSakuraCloudCDROM() *schema.Resource {
@@ -105,7 +105,7 @@ func resourceSakuraCloudCDROMCreate(ctx context.Context, d *schema.ResourceData,
 		return diag.FromErr(err)
 	}
 
-	cdromOp := sacloud.NewCDROMOp(client)
+	cdromOp := iaas.NewCDROMOp(client)
 
 	cdrom, ftpServer, err := cdromOp.Create(ctx, zone, expandCDROMCreateRequest(d))
 	if err != nil {
@@ -134,11 +134,11 @@ func resourceSakuraCloudCDROMRead(ctx context.Context, d *schema.ResourceData, m
 		return diag.FromErr(err)
 	}
 
-	cdromOp := sacloud.NewCDROMOp(client)
+	cdromOp := iaas.NewCDROMOp(client)
 
 	cdrom, err := cdromOp.Read(ctx, zone, sakuraCloudID(d.Id()))
 	if err != nil {
-		if sacloud.IsNotFoundError(err) {
+		if iaas.IsNotFoundError(err) {
 			d.SetId("")
 			return nil
 		}
@@ -153,7 +153,7 @@ func resourceSakuraCloudCDROMUpdate(ctx context.Context, d *schema.ResourceData,
 		return diag.FromErr(err)
 	}
 
-	cdromOp := sacloud.NewCDROMOp(client)
+	cdromOp := iaas.NewCDROMOp(client)
 
 	cdrom, err := cdromOp.Read(ctx, zone, sakuraCloudID(d.Id()))
 	if err != nil {
@@ -187,11 +187,11 @@ func resourceSakuraCloudCDROMDelete(ctx context.Context, d *schema.ResourceData,
 		return diag.FromErr(err)
 	}
 
-	cdromOp := sacloud.NewCDROMOp(client)
+	cdromOp := iaas.NewCDROMOp(client)
 
 	cdrom, err := cdromOp.Read(ctx, zone, sakuraCloudID(d.Id()))
 	if err != nil {
-		if sacloud.IsNotFoundError(err) {
+		if iaas.IsNotFoundError(err) {
 			d.SetId("")
 			return nil
 		}
@@ -205,7 +205,7 @@ func resourceSakuraCloudCDROMDelete(ctx context.Context, d *schema.ResourceData,
 	return nil
 }
 
-func setCDROMResourceData(ctx context.Context, d *schema.ResourceData, client *APIClient, data *sacloud.CDROM) diag.Diagnostics {
+func setCDROMResourceData(ctx context.Context, d *schema.ResourceData, client *APIClient, data *iaas.CDROM) diag.Diagnostics {
 	d.Set("hash", expandCDROMContentHash(d)) // nolint
 	d.Set("name", data.Name)                 // nolint
 	d.Set("size", data.GetSizeGB())          // nolint
@@ -220,11 +220,11 @@ type uploadCDROMContext struct {
 	zone      string
 	id        types.ID
 	client    *APIClient
-	ftpServer *sacloud.FTPServer
+	ftpServer *iaas.FTPServer
 }
 
 func uploadCDROMFile(ctx *uploadCDROMContext, d *schema.ResourceData) error {
-	cdromOp := sacloud.NewCDROMOp(ctx.client)
+	cdromOp := iaas.NewCDROMOp(ctx.client)
 
 	filePath, isTemporal, err := prepareContentFile(d)
 	if isTemporal {
@@ -242,7 +242,7 @@ func uploadCDROMFile(ctx *uploadCDROMContext, d *schema.ResourceData) error {
 
 	ftpServer := ctx.ftpServer
 	if ftpServer == nil {
-		fs, err := cdromOp.OpenFTP(ctx, ctx.zone, ctx.id, &sacloud.OpenFTPRequest{ChangePassword: false})
+		fs, err := cdromOp.OpenFTP(ctx, ctx.zone, ctx.id, &iaas.OpenFTPRequest{ChangePassword: false})
 		if err != nil {
 			return fmt.Errorf("opening FTPS connection to CDROM[%s] is failed: %s", ctx.id, err)
 		}
@@ -333,16 +333,16 @@ func writeISOFile(path string, content []byte, label string) error {
 }
 
 func ejectCDROMFromAllServers(ctx context.Context, d *schema.ResourceData, client *APIClient, cdromID types.ID) ([]types.ID, error) {
-	serverOp := sacloud.NewServerOp(client)
+	serverOp := iaas.NewServerOp(client)
 	zone := getZone(d, client)
-	searched, err := serverOp.Find(ctx, zone, &sacloud.FindCondition{})
+	searched, err := serverOp.Find(ctx, zone, &iaas.FindCondition{})
 	if err != nil {
 		return nil, err
 	}
 	var ejectedIDs []types.ID
 	for _, server := range searched.Servers {
 		if server.CDROMID == cdromID {
-			if err := serverOp.EjectCDROM(ctx, zone, server.ID, &sacloud.EjectCDROMRequest{ID: cdromID}); err != nil {
+			if err := serverOp.EjectCDROM(ctx, zone, server.ID, &iaas.EjectCDROMRequest{ID: cdromID}); err != nil {
 				return nil, err
 			}
 			ejectedIDs = append(ejectedIDs, server.ID)
@@ -352,11 +352,11 @@ func ejectCDROMFromAllServers(ctx context.Context, d *schema.ResourceData, clien
 }
 
 func insertCDROMToAllServers(ctx context.Context, d *schema.ResourceData, client *APIClient, cdromID types.ID, serverIDs []types.ID) error {
-	serverOp := sacloud.NewServerOp(client)
+	serverOp := iaas.NewServerOp(client)
 	zone := getZone(d, client)
 
 	for _, id := range serverIDs {
-		if err := serverOp.InsertCDROM(ctx, zone, id, &sacloud.InsertCDROMRequest{ID: cdromID}); err != nil {
+		if err := serverOp.InsertCDROM(ctx, zone, id, &iaas.InsertCDROMRequest{ID: cdromID}); err != nil {
 			return err
 		}
 	}

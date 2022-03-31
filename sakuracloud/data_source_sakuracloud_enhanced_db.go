@@ -19,7 +19,7 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
-	"github.com/sacloud/libsacloud/v2/sacloud"
+	"github.com/sacloud/iaas-api-go"
 )
 
 func dataSourceSakuraCloudEnhancedDB() *schema.Resource {
@@ -71,9 +71,9 @@ func dataSourceSakuraCloudEnhancedDBRead(ctx context.Context, d *schema.Resource
 		return diag.FromErr(err)
 	}
 
-	searcher := sacloud.NewEnhancedDBOp(client)
+	searcher := iaas.NewEnhancedDBOp(client)
 
-	findCondition := &sacloud.FindCondition{}
+	findCondition := &iaas.FindCondition{}
 	if rawFilter, ok := d.GetOk(filterAttrName); ok {
 		findCondition.Filter = expandSearchFilter(rawFilter)
 	}

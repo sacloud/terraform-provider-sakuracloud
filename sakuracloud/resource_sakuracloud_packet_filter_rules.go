@@ -21,8 +21,8 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
-	"github.com/sacloud/libsacloud/v2/sacloud"
-	"github.com/sacloud/libsacloud/v2/sacloud/types"
+	"github.com/sacloud/iaas-api-go"
+	"github.com/sacloud/iaas-api-go/types"
 )
 
 func resourceSakuraCloudPacketFilterRules() *schema.Resource {
@@ -113,12 +113,12 @@ func resourceSakuraCloudPacketFilterRulesRead(ctx context.Context, d *schema.Res
 		return diag.FromErr(err)
 	}
 
-	pfOp := sacloud.NewPacketFilterOp(client)
+	pfOp := iaas.NewPacketFilterOp(client)
 	pfID := d.Get("packet_filter_id").(string)
 
 	pf, err := pfOp.Read(ctx, zone, sakuraCloudID(pfID))
 	if err != nil {
-		if sacloud.IsNotFoundError(err) {
+		if iaas.IsNotFoundError(err) {
 			d.SetId("")
 			return nil
 		}
@@ -134,7 +134,7 @@ func resourceSakuraCloudPacketFilterRulesUpdate(ctx context.Context, d *schema.R
 		return diag.FromErr(err)
 	}
 
-	pfOp := sacloud.NewPacketFilterOp(client)
+	pfOp := iaas.NewPacketFilterOp(client)
 	pfID := d.Get("packet_filter_id").(string)
 
 	sakuraMutexKV.Lock(pfID)
@@ -160,7 +160,7 @@ func resourceSakuraCloudPacketFilterRulesDelete(ctx context.Context, d *schema.R
 		return diag.FromErr(err)
 	}
 
-	pfOp := sacloud.NewPacketFilterOp(client)
+	pfOp := iaas.NewPacketFilterOp(client)
 	pfID := d.Get("packet_filter_id").(string)
 
 	sakuraMutexKV.Lock(pfID)
@@ -168,7 +168,7 @@ func resourceSakuraCloudPacketFilterRulesDelete(ctx context.Context, d *schema.R
 
 	pf, err := pfOp.Read(ctx, zone, sakuraCloudID(pfID))
 	if err != nil {
-		if sacloud.IsNotFoundError(err) {
+		if iaas.IsNotFoundError(err) {
 			d.SetId("")
 			return nil
 		}
@@ -181,7 +181,7 @@ func resourceSakuraCloudPacketFilterRulesDelete(ctx context.Context, d *schema.R
 	return nil
 }
 
-func setPacketFilterRulesResourceData(ctx context.Context, d *schema.ResourceData, client *APIClient, data *sacloud.PacketFilter) diag.Diagnostics {
+func setPacketFilterRulesResourceData(ctx context.Context, d *schema.ResourceData, client *APIClient, data *iaas.PacketFilter) diag.Diagnostics {
 	d.Set("zone", getZone(d, client)) // nolint
 	return diag.FromErr(d.Set("expression", flattenPacketFilterExpressions(data)))
 }

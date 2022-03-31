@@ -22,11 +22,11 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
-	"github.com/sacloud/libsacloud/v2/helper/power"
-	"github.com/sacloud/libsacloud/v2/helper/setup"
-	"github.com/sacloud/libsacloud/v2/sacloud"
-	"github.com/sacloud/libsacloud/v2/sacloud/accessor"
-	"github.com/sacloud/libsacloud/v2/sacloud/types"
+	"github.com/sacloud/iaas-api-go"
+	"github.com/sacloud/iaas-api-go/accessor"
+	"github.com/sacloud/iaas-api-go/helper/power"
+	"github.com/sacloud/iaas-api-go/types"
+	"github.com/sacloud/iaas-service-go/setup"
 )
 
 func resourceSakuraCloudNFS() *schema.Resource {
@@ -98,7 +98,7 @@ func resourceSakuraCloudNFSCreate(ctx context.Context, d *schema.ResourceData, m
 		return diag.FromErr(err)
 	}
 
-	nfsOp := sacloud.NewNFSOp(client)
+	nfsOp := iaas.NewNFSOp(client)
 	planID, err := expandNFSDiskPlanID(ctx, client, d)
 	if err != nil {
 		return diag.Errorf("finding NFS plans is failed: %s", err)
@@ -114,9 +114,11 @@ func resourceSakuraCloudNFSCreate(ctx context.Context, d *schema.ResourceData, m
 		Read: func(ctx context.Context, zone string, id types.ID) (interface{}, error) {
 			return nfsOp.Read(ctx, zone, id)
 		},
-		RetryCount:    3,
 		IsWaitForCopy: true,
 		IsWaitForUp:   true,
+		Options: &setup.Options{
+			RetryCount: 3,
+		},
 	}
 
 	res, err := builder.Setup(ctx, zone)
@@ -124,9 +126,9 @@ func resourceSakuraCloudNFSCreate(ctx context.Context, d *schema.ResourceData, m
 		return diag.Errorf("creating SakuraCloud NFS is failed: %s", err)
 	}
 
-	nfs, ok := res.(*sacloud.NFS)
+	nfs, ok := res.(*iaas.NFS)
 	if !ok {
-		return diag.FromErr(errors.New("creating SakuraCloud NFS is failed: created resource is not *sacloud.NFS"))
+		return diag.FromErr(errors.New("creating SakuraCloud NFS is failed: created resource is not *iaas.NFS"))
 	}
 
 	d.SetId(nfs.ID.String())
@@ -139,10 +141,10 @@ func resourceSakuraCloudNFSRead(ctx context.Context, d *schema.ResourceData, met
 		return diag.FromErr(err)
 	}
 
-	nfsOp := sacloud.NewNFSOp(client)
+	nfsOp := iaas.NewNFSOp(client)
 	nfs, err := nfsOp.Read(ctx, zone, sakuraCloudID(d.Id()))
 	if err != nil {
-		if sacloud.IsNotFoundError(err) {
+		if iaas.IsNotFoundError(err) {
 			d.SetId("")
 			return nil
 		}
@@ -158,7 +160,7 @@ func resourceSakuraCloudNFSUpdate(ctx context.Context, d *schema.ResourceData, m
 		return diag.FromErr(err)
 	}
 
-	nfsOp := sacloud.NewNFSOp(client)
+	nfsOp := iaas.NewNFSOp(client)
 	nfs, err := nfsOp.Read(ctx, zone, sakuraCloudID(d.Id()))
 	if err != nil {
 		return diag.Errorf("could not read SakuraCloud NFS[%s]: %s", d.Id(), err)
@@ -178,10 +180,10 @@ func resourceSakuraCloudNFSDelete(ctx context.Context, d *schema.ResourceData, m
 		return diag.FromErr(err)
 	}
 
-	nfsOp := sacloud.NewNFSOp(client)
+	nfsOp := iaas.NewNFSOp(client)
 	nfs, err := nfsOp.Read(ctx, zone, sakuraCloudID(d.Id()))
 	if err != nil {
-		if sacloud.IsNotFoundError(err) {
+		if iaas.IsNotFoundError(err) {
 			d.SetId("")
 			return nil
 		}
@@ -199,7 +201,7 @@ func resourceSakuraCloudNFSDelete(ctx context.Context, d *schema.ResourceData, m
 	return nil
 }
 
-func setNFSResourceData(ctx context.Context, d *schema.ResourceData, client *APIClient, data *sacloud.NFS) diag.Diagnostics {
+func setNFSResourceData(ctx context.Context, d *schema.ResourceData, client *APIClient, data *iaas.NFS) diag.Diagnostics {
 	if data.Availability.IsFailed() {
 		d.SetId("")
 		return diag.Errorf("got unexpected state: NFS[%d].Availability is failed", data.ID)

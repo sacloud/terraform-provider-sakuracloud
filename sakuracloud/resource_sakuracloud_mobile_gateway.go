@@ -23,8 +23,8 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
-	"github.com/sacloud/libsacloud/v2/helper/cleanup"
-	"github.com/sacloud/libsacloud/v2/sacloud"
+	"github.com/sacloud/iaas-api-go"
+	"github.com/sacloud/iaas-api-go/helper/cleanup"
 )
 
 func resourceSakuraCloudMobileGateway() *schema.Resource {
@@ -222,12 +222,12 @@ func resourceSakuraCloudMobileGatewayCreate(ctx context.Context, d *schema.Resou
 		return diag.FromErr(err)
 	}
 
-	builder := expandMobileGatewayBuilder(d, client)
+	builder := expandMobileGatewayBuilder(d, client, zone)
 	if err := builder.Validate(ctx, zone); err != nil {
 		return diag.Errorf("validating SakuraCloud MobileGateway is failed: %s", err)
 	}
 
-	mgw, err := builder.Build(ctx, zone)
+	mgw, err := builder.Build(ctx)
 	if mgw != nil {
 		d.SetId(mgw.ID.String())
 	}
@@ -244,11 +244,11 @@ func resourceSakuraCloudMobileGatewayRead(ctx context.Context, d *schema.Resourc
 		return diag.FromErr(err)
 	}
 
-	mgwOp := sacloud.NewMobileGatewayOp(client)
+	mgwOp := iaas.NewMobileGatewayOp(client)
 
 	mgw, err := mgwOp.Read(ctx, zone, sakuraCloudID(d.Id()))
 	if err != nil {
-		if sacloud.IsNotFoundError(err) {
+		if iaas.IsNotFoundError(err) {
 			d.SetId("")
 			return nil
 		}
@@ -264,19 +264,20 @@ func resourceSakuraCloudMobileGatewayUpdate(ctx context.Context, d *schema.Resou
 		return diag.FromErr(err)
 	}
 
-	mgwOp := sacloud.NewMobileGatewayOp(client)
+	mgwOp := iaas.NewMobileGatewayOp(client)
 
 	mgw, err := mgwOp.Read(ctx, zone, sakuraCloudID(d.Id()))
 	if err != nil {
 		return diag.Errorf("could not read SakuraCloud MobileGateway[%s]: %s", d.Id(), err)
 	}
 
-	builder := expandMobileGatewayBuilder(d, client)
+	builder := expandMobileGatewayBuilder(d, client, zone)
 	if err := builder.Validate(ctx, zone); err != nil {
 		return diag.Errorf("validating SakuraCloud MobileGateway is failed: %s", err)
 	}
+	builder.ID = mgw.ID
 
-	if _, err = builder.Update(ctx, zone, mgw.ID); err != nil {
+	if _, err = builder.Build(ctx); err != nil {
 		return diag.Errorf("updating SakuraCloud MobileGateway[%s] is failed: %s", d.Id(), err)
 	}
 
@@ -289,12 +290,12 @@ func resourceSakuraCloudMobileGatewayDelete(ctx context.Context, d *schema.Resou
 		return diag.FromErr(err)
 	}
 
-	mgwOp := sacloud.NewMobileGatewayOp(client)
-	simOp := sacloud.NewSIMOp(client)
+	mgwOp := iaas.NewMobileGatewayOp(client)
+	simOp := iaas.NewSIMOp(client)
 
 	mgw, err := mgwOp.Read(ctx, zone, sakuraCloudID(d.Id()))
 	if err != nil {
-		if sacloud.IsNotFoundError(err) {
+		if iaas.IsNotFoundError(err) {
 			d.SetId("")
 			return nil
 		}
@@ -307,9 +308,9 @@ func resourceSakuraCloudMobileGatewayDelete(ctx context.Context, d *schema.Resou
 	return nil
 }
 
-func setMobileGatewayResourceData(ctx context.Context, d *schema.ResourceData, client *APIClient, data *sacloud.MobileGateway) diag.Diagnostics {
+func setMobileGatewayResourceData(ctx context.Context, d *schema.ResourceData, client *APIClient, data *iaas.MobileGateway) diag.Diagnostics {
 	zone := getZone(d, client)
-	mgwOp := sacloud.NewMobileGatewayOp(client)
+	mgwOp := iaas.NewMobileGatewayOp(client)
 
 	if data.Availability.IsFailed() {
 		d.SetId("")
@@ -318,7 +319,7 @@ func setMobileGatewayResourceData(ctx context.Context, d *schema.ResourceData, c
 
 	// fetch configs
 	tc, err := mgwOp.GetTrafficConfig(ctx, zone, data.ID)
-	if err != nil && !sacloud.IsNotFoundError(err) {
+	if err != nil && !iaas.IsNotFoundError(err) {
 		return diag.Errorf("reading TrafficConfig is failed: %s", err)
 	}
 	resolver, err := mgwOp.GetDNS(ctx, zone, data.ID)
@@ -326,7 +327,7 @@ func setMobileGatewayResourceData(ctx context.Context, d *schema.ResourceData, c
 		return diag.Errorf("reading ResolverConfig is failed: %s", err)
 	}
 	sims, err := mgwOp.ListSIM(ctx, zone, data.ID)
-	if err != nil && !sacloud.IsNotFoundError(err) {
+	if err != nil && !iaas.IsNotFoundError(err) {
 		return diag.Errorf("reading SIMs is failed: %s", err)
 	}
 	simRoutes, err := mgwOp.GetSIMRoutes(ctx, zone, data.ID)

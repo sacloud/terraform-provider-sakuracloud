@@ -22,14 +22,14 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
-	"github.com/sacloud/libsacloud/v2/sacloud"
+	"github.com/sacloud/iaas-api-go"
 )
 
 func TestAccSakuraCloudVPCRouter_basic(t *testing.T) {
 	resourceName := "sakuracloud_vpc_router.foobar"
 	rand := randomName()
 
-	var vpcRouter sacloud.VPCRouter
+	var vpcRouter iaas.VPCRouter
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:          func() { testAccPreCheck(t) },
 		ProviderFactories: testAccProviderFactories,
@@ -85,7 +85,7 @@ func TestAccSakuraCloudVPCRouter_Full(t *testing.T) {
 	resourceName := "sakuracloud_vpc_router.foobar"
 	rand := randomName()
 
-	var vpcRouter sacloud.VPCRouter
+	var vpcRouter iaas.VPCRouter
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:          func() { testAccPreCheck(t) },
 		ProviderFactories: testAccProviderFactories,
@@ -204,7 +204,7 @@ func TestAccSakuraCloudVPCRouter_Full(t *testing.T) {
 	})
 }
 
-func testCheckSakuraCloudVPCRouterExists(n string, vpcRouter *sacloud.VPCRouter) resource.TestCheckFunc {
+func testCheckSakuraCloudVPCRouterExists(n string, vpcRouter *iaas.VPCRouter) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
 		rs, ok := s.RootModule().Resources[n]
 		if !ok {
@@ -216,7 +216,7 @@ func testCheckSakuraCloudVPCRouterExists(n string, vpcRouter *sacloud.VPCRouter)
 		}
 
 		client := testAccProvider.Meta().(*APIClient)
-		vrOp := sacloud.NewVPCRouterOp(client)
+		vrOp := iaas.NewVPCRouterOp(client)
 		zone := rs.Primary.Attributes["zone"]
 
 		foundVPCRouter, err := vrOp.Read(context.Background(), zone, sakuraCloudID(rs.Primary.ID))
@@ -236,7 +236,7 @@ func testCheckSakuraCloudVPCRouterExists(n string, vpcRouter *sacloud.VPCRouter)
 
 func testCheckSakuraCloudVPCRouterDestroy(s *terraform.State) error {
 	client := testAccProvider.Meta().(*APIClient)
-	vrOp := sacloud.NewVPCRouterOp(client)
+	vrOp := iaas.NewVPCRouterOp(client)
 	for _, rs := range s.RootModule().Resources {
 		if rs.Type != "sakuracloud_vpc_router" {
 			continue

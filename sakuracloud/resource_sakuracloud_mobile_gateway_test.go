@@ -22,14 +22,14 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
-	"github.com/sacloud/libsacloud/v2/sacloud"
+	"github.com/sacloud/iaas-api-go"
 )
 
 func TestAccSakuraCloudMobileGateway_basic(t *testing.T) {
 	resourceName := "sakuracloud_mobile_gateway.foobar"
 	name := randomName()
 
-	var mgw sacloud.MobileGateway
+	var mgw iaas.MobileGateway
 	resource.Test(t, resource.TestCase{
 		PreCheck:          func() { testAccPreCheck(t) },
 		ProviderFactories: testAccProviderFactories,
@@ -101,7 +101,7 @@ func TestAccSakuraCloudMobileGateway_basic(t *testing.T) {
 	})
 }
 
-func testCheckSakuraCloudMobileGatewayExists(n string, mgs *sacloud.MobileGateway) resource.TestCheckFunc {
+func testCheckSakuraCloudMobileGatewayExists(n string, mgs *iaas.MobileGateway) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
 		rs, ok := s.RootModule().Resources[n]
 
@@ -115,7 +115,7 @@ func testCheckSakuraCloudMobileGatewayExists(n string, mgs *sacloud.MobileGatewa
 
 		client := testAccProvider.Meta().(*APIClient)
 		zone := rs.Primary.Attributes["zone"]
-		mgwOp := sacloud.NewMobileGatewayOp(client)
+		mgwOp := iaas.NewMobileGatewayOp(client)
 
 		foundMobileGateway, err := mgwOp.Read(context.Background(), zone, sakuraCloudID(rs.Primary.ID))
 
@@ -135,7 +135,7 @@ func testCheckSakuraCloudMobileGatewayExists(n string, mgs *sacloud.MobileGatewa
 
 func testCheckSakuraCloudMobileGatewayDestroy(s *terraform.State) error {
 	client := testAccProvider.Meta().(*APIClient)
-	mgwOp := sacloud.NewMobileGatewayOp(client)
+	mgwOp := iaas.NewMobileGatewayOp(client)
 
 	for _, rs := range s.RootModule().Resources {
 		if rs.Type != "sakuracloud_mobile_gateway" {

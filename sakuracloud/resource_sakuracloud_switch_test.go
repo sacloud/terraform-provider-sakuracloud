@@ -22,14 +22,14 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
-	"github.com/sacloud/libsacloud/v2/sacloud"
+	"github.com/sacloud/iaas-api-go"
 )
 
 func TestAccSakuraCloudSwitch_basic(t *testing.T) {
 	resourceName := "sakuracloud_switch.foobar"
 	rand := randomName()
 
-	var sw sacloud.Switch
+	var sw iaas.Switch
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:          func() { testAccPreCheck(t) },
 		ProviderFactories: testAccProviderFactories,
@@ -77,7 +77,7 @@ func TestAccSakuraCloudSwitch_basic(t *testing.T) {
 	})
 }
 
-func testCheckSakuraCloudSwitchExists(n string, sw *sacloud.Switch) resource.TestCheckFunc {
+func testCheckSakuraCloudSwitchExists(n string, sw *iaas.Switch) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
 		rs, ok := s.RootModule().Resources[n]
 		if !ok {
@@ -89,7 +89,7 @@ func testCheckSakuraCloudSwitchExists(n string, sw *sacloud.Switch) resource.Tes
 		}
 
 		client := testAccProvider.Meta().(*APIClient)
-		swOp := sacloud.NewSwitchOp(client)
+		swOp := iaas.NewSwitchOp(client)
 		zone := rs.Primary.Attributes["zone"]
 
 		foundSwitch, err := swOp.Read(context.Background(), zone, sakuraCloudID(rs.Primary.ID))
@@ -109,7 +109,7 @@ func testCheckSakuraCloudSwitchExists(n string, sw *sacloud.Switch) resource.Tes
 
 func testCheckSakuraCloudSwitchDestroy(s *terraform.State) error {
 	client := testAccProvider.Meta().(*APIClient)
-	swOp := sacloud.NewSwitchOp(client)
+	swOp := iaas.NewSwitchOp(client)
 
 	for _, rs := range s.RootModule().Resources {
 		if rs.Type != "sakuracloud_switch" {

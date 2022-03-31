@@ -22,14 +22,14 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
-	"github.com/sacloud/libsacloud/v2/sacloud"
+	"github.com/sacloud/iaas-api-go"
 )
 
 func TestAccSakuraCloudPacketFilter_basic(t *testing.T) {
 	resourceName := "sakuracloud_packet_filter.foobar"
 	rand := randomName()
 
-	var filter sacloud.PacketFilter
+	var filter iaas.PacketFilter
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:          func() { testAccPreCheck(t) },
 		ProviderFactories: testAccProviderFactories,
@@ -68,7 +68,7 @@ func TestAccSakuraCloudPacketFilter_basic(t *testing.T) {
 	})
 }
 
-func testCheckSakuraCloudPacketFilterExists(n string, filter *sacloud.PacketFilter) resource.TestCheckFunc {
+func testCheckSakuraCloudPacketFilterExists(n string, filter *iaas.PacketFilter) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
 		rs, ok := s.RootModule().Resources[n]
 
@@ -82,7 +82,7 @@ func testCheckSakuraCloudPacketFilterExists(n string, filter *sacloud.PacketFilt
 
 		client := testAccProvider.Meta().(*APIClient)
 		zone := rs.Primary.Attributes["zone"]
-		pfOp := sacloud.NewPacketFilterOp(client)
+		pfOp := iaas.NewPacketFilterOp(client)
 
 		foundPacketFilter, err := pfOp.Read(context.Background(), zone, sakuraCloudID(rs.Primary.ID))
 		if err != nil {
@@ -100,7 +100,7 @@ func testCheckSakuraCloudPacketFilterExists(n string, filter *sacloud.PacketFilt
 
 func testCheckSakuraCloudPacketFilterDestroy(s *terraform.State) error {
 	client := testAccProvider.Meta().(*APIClient)
-	pfOp := sacloud.NewPacketFilterOp(client)
+	pfOp := iaas.NewPacketFilterOp(client)
 
 	for _, rs := range s.RootModule().Resources {
 		if rs.Type != "sakuracloud_packet_filter" {

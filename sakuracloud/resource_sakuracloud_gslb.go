@@ -21,8 +21,8 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
-	"github.com/sacloud/libsacloud/v2/sacloud"
-	"github.com/sacloud/libsacloud/v2/sacloud/types"
+	"github.com/sacloud/iaas-api-go"
+	"github.com/sacloud/iaas-api-go/types"
 )
 
 func resourceSakuraCloudGSLB() *schema.Resource {
@@ -150,7 +150,7 @@ func resourceSakuraCloudGSLBCreate(ctx context.Context, d *schema.ResourceData, 
 		return diag.FromErr(err)
 	}
 
-	gslbOp := sacloud.NewGSLBOp(client)
+	gslbOp := iaas.NewGSLBOp(client)
 	gslb, err := gslbOp.Create(ctx, expandGSLBCreateRequest(d))
 	if err != nil {
 		return diag.Errorf("creating SakuraCloud GSLB is failed: %s", err)
@@ -166,10 +166,10 @@ func resourceSakuraCloudGSLBRead(ctx context.Context, d *schema.ResourceData, me
 		return diag.FromErr(err)
 	}
 
-	gslbOp := sacloud.NewGSLBOp(client)
+	gslbOp := iaas.NewGSLBOp(client)
 	gslb, err := gslbOp.Read(ctx, sakuraCloudID(d.Id()))
 	if err != nil {
-		if sacloud.IsNotFoundError(err) {
+		if iaas.IsNotFoundError(err) {
 			d.SetId("")
 			return nil
 		}
@@ -185,7 +185,7 @@ func resourceSakuraCloudGSLBUpdate(ctx context.Context, d *schema.ResourceData, 
 		return diag.FromErr(err)
 	}
 
-	gslbOp := sacloud.NewGSLBOp(client)
+	gslbOp := iaas.NewGSLBOp(client)
 	gslb, err := gslbOp.Read(ctx, sakuraCloudID(d.Id()))
 	if err != nil {
 		return diag.Errorf("could not read SakuraCloud GSLB[%s]: %s", d.Id(), err)
@@ -205,10 +205,10 @@ func resourceSakuraCloudGSLBDelete(ctx context.Context, d *schema.ResourceData, 
 		return diag.FromErr(err)
 	}
 
-	gslbOp := sacloud.NewGSLBOp(client)
+	gslbOp := iaas.NewGSLBOp(client)
 	gslb, err := gslbOp.Read(ctx, sakuraCloudID(d.Id()))
 	if err != nil {
-		if sacloud.IsNotFoundError(err) {
+		if iaas.IsNotFoundError(err) {
 			d.SetId("")
 			return nil
 		}
@@ -221,7 +221,7 @@ func resourceSakuraCloudGSLBDelete(ctx context.Context, d *schema.ResourceData, 
 	return nil
 }
 
-func setGSLBResourceData(ctx context.Context, d *schema.ResourceData, client *APIClient, data *sacloud.GSLB) diag.Diagnostics {
+func setGSLBResourceData(ctx context.Context, d *schema.ResourceData, client *APIClient, data *iaas.GSLB) diag.Diagnostics {
 	d.Set("name", data.Name)                // nolint
 	d.Set("fqdn", data.FQDN)                // nolint
 	d.Set("sorry_server", data.SorryServer) // nolint

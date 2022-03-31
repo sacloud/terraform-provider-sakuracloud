@@ -16,12 +16,12 @@ package sakuracloud
 
 import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
-	"github.com/sacloud/libsacloud/v2/sacloud"
-	"github.com/sacloud/libsacloud/v2/sacloud/types"
+	"github.com/sacloud/iaas-api-go"
+	"github.com/sacloud/iaas-api-go/types"
 )
 
-func expandLoadBalancerVIPs(d resourceValueGettable) []*sacloud.LoadBalancerVirtualIPAddress {
-	var vips []*sacloud.LoadBalancerVirtualIPAddress
+func expandLoadBalancerVIPs(d resourceValueGettable) []*iaas.LoadBalancerVirtualIPAddress {
+	var vips []*iaas.LoadBalancerVirtualIPAddress
 	vipsConf := d.Get("vip").([]interface{})
 	for _, vip := range vipsConf {
 		v := &resourceMapValue{vip.(map[string]interface{})}
@@ -30,9 +30,9 @@ func expandLoadBalancerVIPs(d resourceValueGettable) []*sacloud.LoadBalancerVirt
 	return vips
 }
 
-func expandLoadBalancerVIP(d resourceValueGettable) *sacloud.LoadBalancerVirtualIPAddress {
+func expandLoadBalancerVIP(d resourceValueGettable) *iaas.LoadBalancerVirtualIPAddress {
 	servers := expandLoadBalancerServers(d, d.Get("port").(int))
-	return &sacloud.LoadBalancerVirtualIPAddress{
+	return &iaas.LoadBalancerVirtualIPAddress{
 		VirtualIPAddress: d.Get("vip").(string),
 		Port:             types.StringNumber(d.Get("port").(int)),
 		DelayLoop:        types.StringNumber(d.Get("delay_loop").(int)),
@@ -42,7 +42,7 @@ func expandLoadBalancerVIP(d resourceValueGettable) *sacloud.LoadBalancerVirtual
 	}
 }
 
-func flattenLoadBalancerVIPs(lb *sacloud.LoadBalancer) []interface{} {
+func flattenLoadBalancerVIPs(lb *iaas.LoadBalancer) []interface{} {
 	var vips []interface{}
 	for _, v := range lb.VirtualIPAddresses {
 		vips = append(vips, flattenLoadBalancerVIP(v))
@@ -50,7 +50,7 @@ func flattenLoadBalancerVIPs(lb *sacloud.LoadBalancer) []interface{} {
 	return vips
 }
 
-func flattenLoadBalancerVIP(vip *sacloud.LoadBalancerVirtualIPAddress) interface{} {
+func flattenLoadBalancerVIP(vip *iaas.LoadBalancerVirtualIPAddress) interface{} {
 	return map[string]interface{}{
 		"vip":          vip.VirtualIPAddress,
 		"port":         vip.Port.Int(),
@@ -60,8 +60,8 @@ func flattenLoadBalancerVIP(vip *sacloud.LoadBalancerVirtualIPAddress) interface
 	}
 }
 
-func expandLoadBalancerServers(d resourceValueGettable, vipPort int) []*sacloud.LoadBalancerServer {
-	var servers []*sacloud.LoadBalancerServer
+func expandLoadBalancerServers(d resourceValueGettable, vipPort int) []*iaas.LoadBalancerServer {
+	var servers []*iaas.LoadBalancerServer
 	for _, v := range d.Get("server").([]interface{}) {
 		data := &resourceMapValue{v.(map[string]interface{})}
 		server := expandLoadBalancerServer(data, vipPort)
@@ -70,12 +70,12 @@ func expandLoadBalancerServers(d resourceValueGettable, vipPort int) []*sacloud.
 	return servers
 }
 
-func expandLoadBalancerServer(d resourceValueGettable, vipPort int) *sacloud.LoadBalancerServer {
-	return &sacloud.LoadBalancerServer{
+func expandLoadBalancerServer(d resourceValueGettable, vipPort int) *iaas.LoadBalancerServer {
+	return &iaas.LoadBalancerServer{
 		IPAddress: d.Get("ip_address").(string),
 		Port:      types.StringNumber(vipPort),
 		Enabled:   expandStringFlag(d, "enabled"),
-		HealthCheck: &sacloud.LoadBalancerServerHealthCheck{
+		HealthCheck: &iaas.LoadBalancerServerHealthCheck{
 			Protocol:     types.ELoadBalancerHealthCheckProtocol(d.Get("protocol").(string)),
 			Path:         d.Get("path").(string),
 			ResponseCode: expandStringNumber(d, "status"),
@@ -83,7 +83,7 @@ func expandLoadBalancerServer(d resourceValueGettable, vipPort int) *sacloud.Loa
 	}
 }
 
-func flattenLoadBalancerServers(servers []*sacloud.LoadBalancerServer) []interface{} {
+func flattenLoadBalancerServers(servers []*iaas.LoadBalancerServer) []interface{} {
 	var results []interface{}
 	for _, s := range servers {
 		results = append(results, flattenLoadBalancerServer(s))
@@ -91,7 +91,7 @@ func flattenLoadBalancerServers(servers []*sacloud.LoadBalancerServer) []interfa
 	return results
 }
 
-func flattenLoadBalancerServer(server *sacloud.LoadBalancerServer) interface{} {
+func flattenLoadBalancerServer(server *iaas.LoadBalancerServer) interface{} {
 	return map[string]interface{}{
 		"ip_address": server.IPAddress,
 		"protocol":   server.HealthCheck.Protocol,
@@ -110,7 +110,7 @@ func expandLoadBalancerPlanID(d resourceValueGettable) types.ID {
 	return types.LoadBalancerPlans.HighSpec
 }
 
-func flattenLoadBalancerPlanID(lb *sacloud.LoadBalancer) string {
+func flattenLoadBalancerPlanID(lb *iaas.LoadBalancer) string {
 	var plan string
 	switch lb.PlanID {
 	case types.LoadBalancerPlans.Standard:
@@ -146,7 +146,7 @@ func expandLoadBalancerNetworkInterface(d resourceValueGettable) *loadBalancerNe
 	}
 }
 
-func flattenLoadBalancerNetworkInterface(lb *sacloud.LoadBalancer) []interface{} {
+func flattenLoadBalancerNetworkInterface(lb *iaas.LoadBalancer) []interface{} {
 	return []interface{}{
 		map[string]interface{}{
 			"switch_id":    lb.SwitchID.String(),
@@ -158,9 +158,9 @@ func flattenLoadBalancerNetworkInterface(lb *sacloud.LoadBalancer) []interface{}
 	}
 }
 
-func expandLoadBalancerCreateRequest(d *schema.ResourceData) *sacloud.LoadBalancerCreateRequest {
+func expandLoadBalancerCreateRequest(d *schema.ResourceData) *iaas.LoadBalancerCreateRequest {
 	nic := expandLoadBalancerNetworkInterface(d)
-	return &sacloud.LoadBalancerCreateRequest{
+	return &iaas.LoadBalancerCreateRequest{
 		SwitchID:           nic.switchID,
 		PlanID:             expandLoadBalancerPlanID(d),
 		VRID:               nic.vrid,
@@ -174,8 +174,8 @@ func expandLoadBalancerCreateRequest(d *schema.ResourceData) *sacloud.LoadBalanc
 		VirtualIPAddresses: expandLoadBalancerVIPs(d),
 	}
 }
-func expandLoadBalancerUpdateRequest(d *schema.ResourceData, lb *sacloud.LoadBalancer) *sacloud.LoadBalancerUpdateRequest {
-	return &sacloud.LoadBalancerUpdateRequest{
+func expandLoadBalancerUpdateRequest(d *schema.ResourceData, lb *iaas.LoadBalancer) *iaas.LoadBalancerUpdateRequest {
+	return &iaas.LoadBalancerUpdateRequest{
 		Name:               d.Get("name").(string),
 		Description:        d.Get("description").(string),
 		Tags:               expandTags(d),

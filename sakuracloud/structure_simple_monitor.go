@@ -16,12 +16,12 @@ package sakuracloud
 
 import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
-	"github.com/sacloud/libsacloud/v2/sacloud"
-	"github.com/sacloud/libsacloud/v2/sacloud/types"
+	"github.com/sacloud/iaas-api-go"
+	"github.com/sacloud/iaas-api-go/types"
 )
 
-func expandSimpleMonitorCreateRequest(d *schema.ResourceData) *sacloud.SimpleMonitorCreateRequest {
-	return &sacloud.SimpleMonitorCreateRequest{
+func expandSimpleMonitorCreateRequest(d *schema.ResourceData) *iaas.SimpleMonitorCreateRequest {
+	return &iaas.SimpleMonitorCreateRequest{
 		Target:             d.Get("target").(string),
 		Enabled:            types.StringFlag(d.Get("enabled").(bool)),
 		HealthCheck:        expandSimpleMonitorHealthCheck(d),
@@ -40,8 +40,8 @@ func expandSimpleMonitorCreateRequest(d *schema.ResourceData) *sacloud.SimpleMon
 	}
 }
 
-func expandSimpleMonitorUpdateRequest(d *schema.ResourceData) *sacloud.SimpleMonitorUpdateRequest {
-	return &sacloud.SimpleMonitorUpdateRequest{
+func expandSimpleMonitorUpdateRequest(d *schema.ResourceData) *iaas.SimpleMonitorUpdateRequest {
+	return &iaas.SimpleMonitorUpdateRequest{
 		Enabled:            types.StringFlag(d.Get("enabled").(bool)),
 		HealthCheck:        expandSimpleMonitorHealthCheck(d),
 		DelayLoop:          d.Get("delay_loop").(int),
@@ -63,7 +63,7 @@ func expandSimpleMonitorNotifyInterval(d *schema.ResourceData) int {
 	return d.Get("notify_interval").(int) * 60 * 60 // hours => seconds
 }
 
-func flattenSimpleMonitorNotifyInterval(simpleMonitor *sacloud.SimpleMonitor) int {
+func flattenSimpleMonitorNotifyInterval(simpleMonitor *iaas.SimpleMonitor) int {
 	interval := simpleMonitor.NotifyInterval
 	if interval == 0 {
 		return 0
@@ -72,7 +72,7 @@ func flattenSimpleMonitorNotifyInterval(simpleMonitor *sacloud.SimpleMonitor) in
 	return interval / 60 / 60
 }
 
-func flattenSimpleMonitorHealthCheck(simpleMonitor *sacloud.SimpleMonitor) []interface{} {
+func flattenSimpleMonitorHealthCheck(simpleMonitor *iaas.SimpleMonitor) []interface{} {
 	healthCheck := map[string]interface{}{}
 	hc := simpleMonitor.HealthCheck
 	switch hc.Protocol {
@@ -118,7 +118,7 @@ func flattenSimpleMonitorHealthCheck(simpleMonitor *sacloud.SimpleMonitor) []int
 	return []interface{}{healthCheck}
 }
 
-func expandSimpleMonitorHealthCheck(d resourceValueGettable) *sacloud.SimpleMonitorHealthCheck {
+func expandSimpleMonitorHealthCheck(d resourceValueGettable) *iaas.SimpleMonitorHealthCheck {
 	healthCheckConf := d.Get("health_check").([]interface{})
 	conf := healthCheckConf[0].(map[string]interface{})
 	protocol := conf["protocol"].(string)
@@ -129,7 +129,7 @@ func expandSimpleMonitorHealthCheck(d resourceValueGettable) *sacloud.SimpleMoni
 		if port == 0 {
 			port = 80
 		}
-		return &sacloud.SimpleMonitorHealthCheck{
+		return &iaas.SimpleMonitorHealthCheck{
 			Protocol:          types.SimpleMonitorProtocols.HTTP,
 			Port:              types.StringNumber(port),
 			Path:              forceString(conf["path"]),
@@ -143,7 +143,7 @@ func expandSimpleMonitorHealthCheck(d resourceValueGettable) *sacloud.SimpleMoni
 		if port == 0 {
 			port = 443
 		}
-		return &sacloud.SimpleMonitorHealthCheck{
+		return &iaas.SimpleMonitorHealthCheck{
 			Protocol:          types.SimpleMonitorProtocols.HTTPS,
 			Port:              types.StringNumber(port),
 			Path:              forceString(conf["path"]),
@@ -158,13 +158,13 @@ func expandSimpleMonitorHealthCheck(d resourceValueGettable) *sacloud.SimpleMoni
 		}
 
 	case "dns":
-		return &sacloud.SimpleMonitorHealthCheck{
+		return &iaas.SimpleMonitorHealthCheck{
 			Protocol:     types.SimpleMonitorProtocols.DNS,
 			QName:        forceString(conf["qname"]),
 			ExpectedData: forceString(conf["expected_data"]),
 		}
 	case "snmp":
-		return &sacloud.SimpleMonitorHealthCheck{
+		return &iaas.SimpleMonitorHealthCheck{
 			Protocol:     types.SimpleMonitorProtocols.SNMP,
 			Community:    forceString(conf["community"]),
 			SNMPVersion:  forceString(conf["snmp_version"]),
@@ -172,7 +172,7 @@ func expandSimpleMonitorHealthCheck(d resourceValueGettable) *sacloud.SimpleMoni
 			ExpectedData: forceString(conf["expected_data"]),
 		}
 	case "tcp":
-		return &sacloud.SimpleMonitorHealthCheck{
+		return &iaas.SimpleMonitorHealthCheck{
 			Protocol: types.SimpleMonitorProtocols.TCP,
 			Port:     types.StringNumber(port),
 		}
@@ -180,7 +180,7 @@ func expandSimpleMonitorHealthCheck(d resourceValueGettable) *sacloud.SimpleMoni
 		if port == 0 {
 			port = 22
 		}
-		return &sacloud.SimpleMonitorHealthCheck{
+		return &iaas.SimpleMonitorHealthCheck{
 			Protocol: types.SimpleMonitorProtocols.SSH,
 			Port:     types.StringNumber(port),
 		}
@@ -188,7 +188,7 @@ func expandSimpleMonitorHealthCheck(d resourceValueGettable) *sacloud.SimpleMoni
 		if port == 0 {
 			port = 25
 		}
-		return &sacloud.SimpleMonitorHealthCheck{
+		return &iaas.SimpleMonitorHealthCheck{
 			Protocol: types.SimpleMonitorProtocols.SMTP,
 			Port:     types.StringNumber(port),
 		}
@@ -196,12 +196,12 @@ func expandSimpleMonitorHealthCheck(d resourceValueGettable) *sacloud.SimpleMoni
 		if port == 0 {
 			port = 110
 		}
-		return &sacloud.SimpleMonitorHealthCheck{
+		return &iaas.SimpleMonitorHealthCheck{
 			Protocol: types.SimpleMonitorProtocols.POP3,
 			Port:     types.StringNumber(port),
 		}
 	case "ping":
-		return &sacloud.SimpleMonitorHealthCheck{
+		return &iaas.SimpleMonitorHealthCheck{
 			Protocol: types.SimpleMonitorProtocols.Ping,
 		}
 	case "sslcertificate":
@@ -209,7 +209,7 @@ func expandSimpleMonitorHealthCheck(d resourceValueGettable) *sacloud.SimpleMoni
 		if v, ok := conf["remaining_days"]; ok {
 			days = v.(int)
 		}
-		return &sacloud.SimpleMonitorHealthCheck{
+		return &iaas.SimpleMonitorHealthCheck{
 			Protocol:      types.SimpleMonitorProtocols.SSLCertificate,
 			RemainingDays: days,
 		}
@@ -221,7 +221,7 @@ func expandSimpleMonitorHealthCheck(d resourceValueGettable) *sacloud.SimpleMoni
 		if v, ok := conf["ftps"]; ok {
 			ftps = v.(string)
 		}
-		return &sacloud.SimpleMonitorHealthCheck{
+		return &iaas.SimpleMonitorHealthCheck{
 			Protocol: types.SimpleMonitorProtocols.FTP,
 			Port:     types.StringNumber(port),
 			FTPS:     types.ESimpleMonitorFTPS(ftps),

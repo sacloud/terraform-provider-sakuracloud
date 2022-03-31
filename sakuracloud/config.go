@@ -26,10 +26,11 @@ import (
 	"time"
 
 	"github.com/hashicorp/go-multierror"
-	"github.com/sacloud/libsacloud/v2/helper/api"
-	"github.com/sacloud/libsacloud/v2/helper/query"
-	"github.com/sacloud/libsacloud/v2/sacloud"
-	"github.com/sacloud/libsacloud/v2/sacloud/profile"
+	client "github.com/sacloud/api-client-go"
+	"github.com/sacloud/api-client-go/profile"
+	"github.com/sacloud/iaas-api-go"
+	"github.com/sacloud/iaas-api-go/helper/api"
+	"github.com/sacloud/iaas-api-go/helper/query"
 )
 
 const (
@@ -70,8 +71,8 @@ type Config struct {
 
 // APIClient for SakuraCloud API
 type APIClient struct {
-	sacloud.APICaller
-	defaultZone                      string // 各リソースでzone未指定の場合に利用するゾーン。sacloud.APIDefaultZoneとは別物。
+	iaas.APICaller
+	defaultZone                      string // 各リソースでzone未指定の場合に利用するゾーン。iaas.APIDefaultZoneとは別物。
 	zones                            []string
 	deletionWaiterTimeout            time.Duration
 	deletionWaiterPollingInterval    time.Duration
@@ -189,25 +190,25 @@ func (c *Config) NewClient() (*APIClient, error) {
 		}
 	}
 
-	caller := api.NewCaller(&api.CallerOptions{
-		AccessToken:          c.AccessToken,
-		AccessTokenSecret:    c.AccessTokenSecret,
-		APIRootURL:           c.APIRootURL,
-		DefaultZone:          c.DefaultZone,
-		AcceptLanguage:       c.AcceptLanguage,
-		HTTPClient:           http.DefaultClient,
-		HTTPRequestTimeout:   c.APIRequestTimeout,
-		HTTPRequestRateLimit: c.APIRequestRateLimit,
-		RetryMax:             c.RetryMax,
-		RetryWaitMax:         c.RetryWaitMax,
-		RetryWaitMin:         c.RetryWaitMin,
-		UserAgent:            ua,
-		TraceAPI:             enableAPITrace,
-		TraceHTTP:            enableHTTPTrace,
-		OpenTelemetry:        false,
-		OpenTelemetryOptions: nil,
-		FakeMode:             c.FakeMode != "",
-		FakeStorePath:        c.FakeStorePath,
+	caller := api.NewCallerWithOptions(&api.CallerOptions{
+		Options: &client.Options{
+			AccessToken:          c.AccessToken,
+			AccessTokenSecret:    c.AccessTokenSecret,
+			AcceptLanguage:       c.AcceptLanguage,
+			HttpClient:           http.DefaultClient,
+			HttpRequestTimeout:   c.APIRequestTimeout,
+			HttpRequestRateLimit: c.APIRequestRateLimit,
+			RetryMax:             c.RetryMax,
+			RetryWaitMax:         c.RetryWaitMax,
+			RetryWaitMin:         c.RetryWaitMin,
+			UserAgent:            ua,
+			Trace:                enableHTTPTrace,
+		},
+		APIRootURL:    c.APIRootURL,
+		DefaultZone:   c.DefaultZone,
+		TraceAPI:      enableAPITrace,
+		FakeMode:      c.FakeMode != "",
+		FakeStorePath: c.FakeStorePath,
 	})
 
 	zones := c.Zones

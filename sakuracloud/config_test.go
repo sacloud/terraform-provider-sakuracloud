@@ -22,35 +22,8 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/sacloud/libsacloud/v2/sacloud"
-	"github.com/sacloud/libsacloud/v2/sacloud/profile"
+	"github.com/sacloud/api-client-go/profile"
 )
-
-func TestConfig_NewClient_useDefaultHTTPClient(t *testing.T) {
-	config := &Config{
-		AccessToken:       "dummy",
-		AccessTokenSecret: "dummy",
-	}
-
-	c1, err := config.NewClient()
-	if err != nil {
-		t.Fatal(err)
-	}
-	c2, err := config.NewClient()
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	if c1 == c2 {
-		t.Errorf("Config.NewClient() should return fresh instance: instance1: %p instance2: %p", c1, c2)
-	}
-
-	hc1 := c1.APICaller.(*sacloud.Client).HTTPClient
-	hc2 := c2.APICaller.(*sacloud.Client).HTTPClient
-	if hc1 != hc2 {
-		t.Errorf("APIClient.HTTPClient should use same instance: instance1: %p instance2: %p", hc1, hc2)
-	}
-}
 
 func initTestProfileDir() func() {
 	wd, err := os.Getwd()

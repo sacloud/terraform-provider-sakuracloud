@@ -21,8 +21,8 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
-	"github.com/sacloud/libsacloud/v2/sacloud"
-	"github.com/sacloud/libsacloud/v2/sacloud/types"
+	"github.com/sacloud/iaas-api-go"
+	"github.com/sacloud/iaas-api-go/types"
 )
 
 func TestAccSakuraCloudDNSRecord_basic(t *testing.T) {
@@ -94,7 +94,7 @@ func TestAccSakuraCloudDNSRecord_withCount(t *testing.T) {
 
 func testCheckSakuraCloudDNSRecordDestroy(s *terraform.State) error {
 	client := testAccProvider.Meta().(*APIClient)
-	dnsOp := sacloud.NewDNSOp(client)
+	dnsOp := iaas.NewDNSOp(client)
 
 	for _, rs := range s.RootModule().Resources {
 		if rs.Type != "sakuracloud_dns_record" {
@@ -107,11 +107,11 @@ func testCheckSakuraCloudDNSRecordDestroy(s *terraform.State) error {
 		dnsID := rs.Primary.Attributes["dns_id"]
 		if dnsID != "" {
 			dns, err := dnsOp.Read(context.Background(), sakuraCloudID(dnsID))
-			if err != nil && !sacloud.IsNotFoundError(err) {
+			if err != nil && !iaas.IsNotFoundError(err) {
 				return fmt.Errorf("resource still exists: DNS: %s", rs.Primary.ID)
 			}
 			if dns != nil {
-				record := &sacloud.DNSRecord{
+				record := &iaas.DNSRecord{
 					Name:  rs.Primary.Attributes["name"],
 					Type:  types.EDNSRecordType(rs.Primary.Attributes["type"]),
 					RData: rs.Primary.Attributes["value"],

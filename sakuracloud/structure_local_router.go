@@ -16,8 +16,8 @@ package sakuracloud
 
 import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
-	"github.com/sacloud/libsacloud/v2/helper/builder/localrouter"
-	"github.com/sacloud/libsacloud/v2/sacloud"
+	"github.com/sacloud/iaas-api-go"
+	localrouter "github.com/sacloud/iaas-service-go/localrouter/builder"
 )
 
 func expandLocalRouterBuilder(d *schema.ResourceData, client *APIClient) *localrouter.Builder {
@@ -34,10 +34,10 @@ func expandLocalRouterBuilder(d *schema.ResourceData, client *APIClient) *localr
 	}
 }
 
-func expandLocalRouterSwitch(d resourceValueGettable) *sacloud.LocalRouterSwitch {
+func expandLocalRouterSwitch(d resourceValueGettable) *iaas.LocalRouterSwitch {
 	if values, ok := getListFromResource(d, "switch"); ok && len(values) > 0 {
 		d = mapToResourceData(values[0].(map[string]interface{}))
-		return &sacloud.LocalRouterSwitch{
+		return &iaas.LocalRouterSwitch{
 			Code:     stringOrDefault(d, "code"),
 			Category: stringOrDefault(d, "category"),
 			ZoneID:   stringOrDefault(d, "zone_id"),
@@ -46,7 +46,7 @@ func expandLocalRouterSwitch(d resourceValueGettable) *sacloud.LocalRouterSwitch
 	return nil
 }
 
-func flattenLocalRouterSwitch(data *sacloud.LocalRouter) []interface{} {
+func flattenLocalRouterSwitch(data *iaas.LocalRouter) []interface{} {
 	if data.Switch != nil {
 		return []interface{}{
 			map[string]interface{}{
@@ -59,10 +59,10 @@ func flattenLocalRouterSwitch(data *sacloud.LocalRouter) []interface{} {
 	return nil
 }
 
-func expandLocalRouterNetworkInterface(d resourceValueGettable) *sacloud.LocalRouterInterface {
+func expandLocalRouterNetworkInterface(d resourceValueGettable) *iaas.LocalRouterInterface {
 	if values, ok := getListFromResource(d, "network_interface"); ok && len(values) > 0 {
 		d = mapToResourceData(values[0].(map[string]interface{}))
-		return &sacloud.LocalRouterInterface{
+		return &iaas.LocalRouterInterface{
 			VirtualIPAddress: stringOrDefault(d, "vip"),
 			IPAddress:        expandStringList(d.Get("ip_addresses").([]interface{})),
 			NetworkMaskLen:   intOrDefault(d, "netmask"),
@@ -72,7 +72,7 @@ func expandLocalRouterNetworkInterface(d resourceValueGettable) *sacloud.LocalRo
 	return nil
 }
 
-func flattenLocalRouterNetworkInterface(data *sacloud.LocalRouter) []interface{} {
+func flattenLocalRouterNetworkInterface(data *iaas.LocalRouter) []interface{} {
 	if data.Interface != nil {
 		return []interface{}{
 			map[string]interface{}{
@@ -86,12 +86,12 @@ func flattenLocalRouterNetworkInterface(data *sacloud.LocalRouter) []interface{}
 	return nil
 }
 
-func expandLocalRouterPeers(d resourceValueGettable) []*sacloud.LocalRouterPeer {
-	var results []*sacloud.LocalRouterPeer
+func expandLocalRouterPeers(d resourceValueGettable) []*iaas.LocalRouterPeer {
+	var results []*iaas.LocalRouterPeer
 	if values, ok := getListFromResource(d, "peer"); ok && len(values) > 0 {
 		for _, raw := range values {
 			d = mapToResourceData(raw.(map[string]interface{}))
-			results = append(results, &sacloud.LocalRouterPeer{
+			results = append(results, &iaas.LocalRouterPeer{
 				ID:          expandSakuraCloudID(d, "peer_id"),
 				SecretKey:   stringOrDefault(d, "secret_key"),
 				Enabled:     boolOrDefault(d, "enabled"),
@@ -102,7 +102,7 @@ func expandLocalRouterPeers(d resourceValueGettable) []*sacloud.LocalRouterPeer 
 	return results
 }
 
-func flattenLocalRouterPeers(data *sacloud.LocalRouter) []interface{} {
+func flattenLocalRouterPeers(data *iaas.LocalRouter) []interface{} {
 	var results []interface{}
 	for _, peer := range data.Peers {
 		results = append(results, flattenLocalRouterPeer(peer))
@@ -110,7 +110,7 @@ func flattenLocalRouterPeers(data *sacloud.LocalRouter) []interface{} {
 	return results
 }
 
-func flattenLocalRouterPeer(data *sacloud.LocalRouterPeer) interface{} {
+func flattenLocalRouterPeer(data *iaas.LocalRouterPeer) interface{} {
 	return map[string]interface{}{
 		"peer_id":     data.ID.String(),
 		"secret_key":  data.SecretKey,
@@ -119,12 +119,12 @@ func flattenLocalRouterPeer(data *sacloud.LocalRouterPeer) interface{} {
 	}
 }
 
-func expandLocalStaticRoutes(d resourceValueGettable) []*sacloud.LocalRouterStaticRoute {
-	var results []*sacloud.LocalRouterStaticRoute
+func expandLocalStaticRoutes(d resourceValueGettable) []*iaas.LocalRouterStaticRoute {
+	var results []*iaas.LocalRouterStaticRoute
 	if values, ok := getListFromResource(d, "static_route"); ok && len(values) > 0 {
 		for _, raw := range values {
 			d = mapToResourceData(raw.(map[string]interface{}))
-			results = append(results, &sacloud.LocalRouterStaticRoute{
+			results = append(results, &iaas.LocalRouterStaticRoute{
 				Prefix:  stringOrDefault(d, "prefix"),
 				NextHop: stringOrDefault(d, "next_hop"),
 			})
@@ -133,7 +133,7 @@ func expandLocalStaticRoutes(d resourceValueGettable) []*sacloud.LocalRouterStat
 	return results
 }
 
-func flattenLocalRouterStaticRoutes(data *sacloud.LocalRouter) []interface{} {
+func flattenLocalRouterStaticRoutes(data *iaas.LocalRouter) []interface{} {
 	var results []interface{}
 	for _, route := range data.StaticRoutes {
 		results = append(results, flattenLocalRouterStaticRoute(route))
@@ -141,7 +141,7 @@ func flattenLocalRouterStaticRoutes(data *sacloud.LocalRouter) []interface{} {
 	return results
 }
 
-func flattenLocalRouterStaticRoute(data *sacloud.LocalRouterStaticRoute) interface{} {
+func flattenLocalRouterStaticRoute(data *iaas.LocalRouterStaticRoute) interface{} {
 	return map[string]interface{}{
 		"prefix":   data.Prefix,
 		"next_hop": data.NextHop,

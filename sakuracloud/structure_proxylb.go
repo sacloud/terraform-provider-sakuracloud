@@ -16,12 +16,12 @@ package sakuracloud
 
 import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
-	"github.com/sacloud/libsacloud/v2/sacloud"
-	"github.com/sacloud/libsacloud/v2/sacloud/types"
+	"github.com/sacloud/iaas-api-go"
+	"github.com/sacloud/iaas-api-go/types"
 )
 
-func expandProxyLBCreateRequest(d *schema.ResourceData) *sacloud.ProxyLBCreateRequest {
-	return &sacloud.ProxyLBCreateRequest{
+func expandProxyLBCreateRequest(d *schema.ResourceData) *iaas.ProxyLBCreateRequest {
+	return &iaas.ProxyLBCreateRequest{
 		Plan:           types.EProxyLBPlan(d.Get("plan").(int)),
 		HealthCheck:    expandProxyLBHealthCheck(d),
 		SorryServer:    expandProxyLBSorryServer(d),
@@ -42,8 +42,8 @@ func expandProxyLBCreateRequest(d *schema.ResourceData) *sacloud.ProxyLBCreateRe
 	}
 }
 
-func expandProxyLBUpdateRequest(d *schema.ResourceData) *sacloud.ProxyLBUpdateRequest {
-	return &sacloud.ProxyLBUpdateRequest{
+func expandProxyLBUpdateRequest(d *schema.ResourceData) *iaas.ProxyLBUpdateRequest {
+	return &iaas.ProxyLBUpdateRequest{
 		HealthCheck:   expandProxyLBHealthCheck(d),
 		SorryServer:   expandProxyLBSorryServer(d),
 		BindPorts:     expandProxyLBBindPorts(d),
@@ -61,7 +61,7 @@ func expandProxyLBUpdateRequest(d *schema.ResourceData) *sacloud.ProxyLBUpdateRe
 	}
 }
 
-func flattenProxyLBSyslog(proxyLB *sacloud.ProxyLB) []interface{} {
+func flattenProxyLBSyslog(proxyLB *iaas.ProxyLB) []interface{} {
 	syslog := proxyLB.Syslog
 	if syslog != nil {
 		return []interface{}{
@@ -74,7 +74,7 @@ func flattenProxyLBSyslog(proxyLB *sacloud.ProxyLB) []interface{} {
 	return nil
 }
 
-func flattenProxyLBBindPorts(proxyLB *sacloud.ProxyLB) []interface{} {
+func flattenProxyLBBindPorts(proxyLB *iaas.ProxyLB) []interface{} {
 	var bindPorts []interface{}
 	for _, bindPort := range proxyLB.BindPorts {
 		var headers []interface{}
@@ -97,7 +97,7 @@ func flattenProxyLBBindPorts(proxyLB *sacloud.ProxyLB) []interface{} {
 	return bindPorts
 }
 
-func flattenProxyLBHealthCheck(proxyLB *sacloud.ProxyLB) []interface{} {
+func flattenProxyLBHealthCheck(proxyLB *iaas.ProxyLB) []interface{} {
 	var results []interface{}
 	if proxyLB.HealthCheck != nil {
 		results = []interface{}{
@@ -112,7 +112,7 @@ func flattenProxyLBHealthCheck(proxyLB *sacloud.ProxyLB) []interface{} {
 	return results
 }
 
-func flattenProxyLBSorryServer(proxyLB *sacloud.ProxyLB) []interface{} {
+func flattenProxyLBSorryServer(proxyLB *iaas.ProxyLB) []interface{} {
 	var results []interface{}
 	if proxyLB.SorryServer != nil && proxyLB.SorryServer.IPAddress != "" {
 		results = []interface{}{
@@ -125,7 +125,7 @@ func flattenProxyLBSorryServer(proxyLB *sacloud.ProxyLB) []interface{} {
 	return results
 }
 
-func flattenProxyLBServers(proxyLB *sacloud.ProxyLB) []interface{} {
+func flattenProxyLBServers(proxyLB *iaas.ProxyLB) []interface{} {
 	var results []interface{}
 	for _, server := range proxyLB.Servers {
 		results = append(results, map[string]interface{}{
@@ -138,7 +138,7 @@ func flattenProxyLBServers(proxyLB *sacloud.ProxyLB) []interface{} {
 	return results
 }
 
-func flattenProxyLBRules(proxyLB *sacloud.ProxyLB) []interface{} {
+func flattenProxyLBRules(proxyLB *iaas.ProxyLB) []interface{} {
 	var results []interface{}
 	for _, rule := range proxyLB.Rules {
 		results = append(results, map[string]interface{}{
@@ -156,7 +156,7 @@ func flattenProxyLBRules(proxyLB *sacloud.ProxyLB) []interface{} {
 	return results
 }
 
-func flattenProxyLBCerts(certs *sacloud.ProxyLBCertificates) []interface{} {
+func flattenProxyLBCerts(certs *iaas.ProxyLBCertificates) []interface{} {
 	if certs == nil {
 		return nil
 	}
@@ -182,38 +182,38 @@ func flattenProxyLBCerts(certs *sacloud.ProxyLBCertificates) []interface{} {
 	return []interface{}{proxylbCert}
 }
 
-func flattenProxyLBStickySession(proxyLB *sacloud.ProxyLB) bool {
+func flattenProxyLBStickySession(proxyLB *iaas.ProxyLB) bool {
 	if proxyLB.StickySession != nil {
 		return proxyLB.StickySession.Enabled
 	}
 	return false
 }
 
-func flattenProxyLBGzip(proxyLB *sacloud.ProxyLB) bool {
+func flattenProxyLBGzip(proxyLB *iaas.ProxyLB) bool {
 	if proxyLB.Gzip != nil {
 		return proxyLB.Gzip.Enabled
 	}
 	return false
 }
 
-func flattenProxyLBProxyProtocol(proxyLB *sacloud.ProxyLB) bool {
+func flattenProxyLBProxyProtocol(proxyLB *iaas.ProxyLB) bool {
 	if proxyLB.ProxyProtocol != nil {
 		return proxyLB.ProxyProtocol.Enabled
 	}
 	return false
 }
 
-func flattenProxyLBTimeout(proxyLB *sacloud.ProxyLB) int {
+func flattenProxyLBTimeout(proxyLB *iaas.ProxyLB) int {
 	if proxyLB.Timeout != nil {
 		return proxyLB.Timeout.InactiveSec
 	}
 	return 0
 }
 
-func expandProxyLBStickySession(d resourceValueGettable) *sacloud.ProxyLBStickySession {
+func expandProxyLBStickySession(d resourceValueGettable) *iaas.ProxyLBStickySession {
 	stickySession := d.Get("sticky_session").(bool)
 	if stickySession {
-		return &sacloud.ProxyLBStickySession{
+		return &iaas.ProxyLBStickySession{
 			Enabled: true,
 			Method:  "cookie",
 		}
@@ -221,57 +221,57 @@ func expandProxyLBStickySession(d resourceValueGettable) *sacloud.ProxyLBStickyS
 	return nil
 }
 
-func expandProxyLBGzip(d resourceValueGettable) *sacloud.ProxyLBGzip {
+func expandProxyLBGzip(d resourceValueGettable) *iaas.ProxyLBGzip {
 	gzip := d.Get("gzip").(bool)
 	if gzip {
-		return &sacloud.ProxyLBGzip{
+		return &iaas.ProxyLBGzip{
 			Enabled: true,
 		}
 	}
 	return nil
 }
 
-func expandProxyLBProxyProtocol(d resourceValueGettable) *sacloud.ProxyLBProxyProtocol {
+func expandProxyLBProxyProtocol(d resourceValueGettable) *iaas.ProxyLBProxyProtocol {
 	v := d.Get("proxy_protocol").(bool)
 	if v {
-		return &sacloud.ProxyLBProxyProtocol{
+		return &iaas.ProxyLBProxyProtocol{
 			Enabled: true,
 		}
 	}
 	return nil
 }
 
-func expandProxyLBSyslog(d resourceValueGettable) *sacloud.ProxyLBSyslog {
+func expandProxyLBSyslog(d resourceValueGettable) *iaas.ProxyLBSyslog {
 	if syslog, ok := getListFromResource(d, "syslog"); ok && len(syslog) == 1 {
 		values := mapToResourceData(syslog[0].(map[string]interface{}))
-		return &sacloud.ProxyLBSyslog{
+		return &iaas.ProxyLBSyslog{
 			Server: values.Get("server").(string),
 			Port:   values.Get("port").(int),
 		}
 	}
-	return &sacloud.ProxyLBSyslog{Port: 514}
+	return &iaas.ProxyLBSyslog{Port: 514}
 }
 
-func expandProxyLBBindPorts(d resourceValueGettable) []*sacloud.ProxyLBBindPort {
-	var results []*sacloud.ProxyLBBindPort
+func expandProxyLBBindPorts(d resourceValueGettable) []*iaas.ProxyLBBindPort {
+	var results []*iaas.ProxyLBBindPort
 	if bindPorts, ok := getListFromResource(d, "bind_port"); ok {
 		for _, bindPort := range bindPorts {
 			values := mapToResourceData(bindPort.(map[string]interface{}))
-			var headers []*sacloud.ProxyLBResponseHeader
+			var headers []*iaas.ProxyLBResponseHeader
 			if rawHeaders, ok := values.GetOk("response_header"); ok {
 				for _, rawHeader := range rawHeaders.([]interface{}) {
 					if rawHeader == nil {
 						continue
 					}
 					v := rawHeader.(map[string]interface{})
-					headers = append(headers, &sacloud.ProxyLBResponseHeader{
+					headers = append(headers, &iaas.ProxyLBResponseHeader{
 						Header: v["header"].(string),
 						Value:  v["value"].(string),
 					})
 				}
 			}
 
-			results = append(results, &sacloud.ProxyLBBindPort{
+			results = append(results, &iaas.ProxyLBBindPort{
 				ProxyMode:         types.EProxyLBProxyMode(values.Get("proxy_mode").(string)),
 				Port:              values.Get("port").(int),
 				RedirectToHTTPS:   values.Get("redirect_to_https").(bool),
@@ -284,20 +284,20 @@ func expandProxyLBBindPorts(d resourceValueGettable) []*sacloud.ProxyLBBindPort 
 	return results
 }
 
-func expandProxyLBHealthCheck(d resourceValueGettable) *sacloud.ProxyLBHealthCheck {
+func expandProxyLBHealthCheck(d resourceValueGettable) *iaas.ProxyLBHealthCheck {
 	if healthChecks, ok := getListFromResource(d, "health_check"); ok {
 		v := mapToResourceData(healthChecks[0].(map[string]interface{}))
 		protocol := v.Get("protocol").(string)
 		switch protocol {
 		case "http":
-			return &sacloud.ProxyLBHealthCheck{
+			return &iaas.ProxyLBHealthCheck{
 				Protocol:  types.ProxyLBProtocols.HTTP,
 				Path:      v.Get("path").(string),
 				Host:      v.Get("host_header").(string),
 				DelayLoop: v.Get("delay_loop").(int),
 			}
 		case "tcp":
-			return &sacloud.ProxyLBHealthCheck{
+			return &iaas.ProxyLBHealthCheck{
 				Protocol:  types.ProxyLBProtocols.TCP,
 				DelayLoop: v.Get("delay_loop").(int),
 			}
@@ -306,10 +306,10 @@ func expandProxyLBHealthCheck(d resourceValueGettable) *sacloud.ProxyLBHealthChe
 	return nil
 }
 
-func expandProxyLBSorryServer(d resourceValueGettable) *sacloud.ProxyLBSorryServer {
+func expandProxyLBSorryServer(d resourceValueGettable) *iaas.ProxyLBSorryServer {
 	if sorryServers, ok := getListFromResource(d, "sorry_server"); ok && len(sorryServers) > 0 {
 		v := mapToResourceData(sorryServers[0].(map[string]interface{}))
-		return &sacloud.ProxyLBSorryServer{
+		return &iaas.ProxyLBSorryServer{
 			IPAddress: v.Get("ip_address").(string),
 			Port:      v.Get("port").(int),
 		}
@@ -317,12 +317,12 @@ func expandProxyLBSorryServer(d resourceValueGettable) *sacloud.ProxyLBSorryServ
 	return nil
 }
 
-func expandProxyLBServers(d resourceValueGettable) []*sacloud.ProxyLBServer {
-	var results []*sacloud.ProxyLBServer
+func expandProxyLBServers(d resourceValueGettable) []*iaas.ProxyLBServer {
+	var results []*iaas.ProxyLBServer
 	if servers, ok := getListFromResource(d, "server"); ok && len(servers) > 0 {
 		for _, server := range servers {
 			v := mapToResourceData(server.(map[string]interface{}))
-			results = append(results, &sacloud.ProxyLBServer{
+			results = append(results, &iaas.ProxyLBServer{
 				IPAddress:   v.Get("ip_address").(string),
 				Port:        v.Get("port").(int),
 				Enabled:     v.Get("enabled").(bool),
@@ -333,12 +333,12 @@ func expandProxyLBServers(d resourceValueGettable) []*sacloud.ProxyLBServer {
 	return results
 }
 
-func expandProxyLBRules(d resourceValueGettable) []*sacloud.ProxyLBRule {
-	var results []*sacloud.ProxyLBRule
+func expandProxyLBRules(d resourceValueGettable) []*iaas.ProxyLBRule {
+	var results []*iaas.ProxyLBRule
 	if rules, ok := getListFromResource(d, "rule"); ok && len(rules) > 0 {
 		for _, rule := range rules {
 			v := mapToResourceData(rule.(map[string]interface{}))
-			results = append(results, &sacloud.ProxyLBRule{
+			results = append(results, &iaas.ProxyLBRule{
 				Host:               v.Get("host").(string),
 				Path:               v.Get("path").(string),
 				ServerGroup:        v.Get("group").(string),
@@ -354,16 +354,16 @@ func expandProxyLBRules(d resourceValueGettable) []*sacloud.ProxyLBRule {
 	return results
 }
 
-func expandProxyLBTimeout(d resourceValueGettable) *sacloud.ProxyLBTimeout {
-	return &sacloud.ProxyLBTimeout{InactiveSec: d.Get("timeout").(int)}
+func expandProxyLBTimeout(d resourceValueGettable) *iaas.ProxyLBTimeout {
+	return &iaas.ProxyLBTimeout{InactiveSec: d.Get("timeout").(int)}
 }
 
-func expandProxyLBCerts(d resourceValueGettable) *sacloud.ProxyLBCertificates {
+func expandProxyLBCerts(d resourceValueGettable) *iaas.ProxyLBCertificates {
 	// set cert
 	if certs, ok := getListFromResource(d, "certificate"); ok && len(certs) > 0 {
 		values := mapToResourceData(certs[0].(map[string]interface{}))
-		cert := &sacloud.ProxyLBCertificates{
-			PrimaryCert: &sacloud.ProxyLBPrimaryCert{
+		cert := &iaas.ProxyLBCertificates{
+			PrimaryCert: &iaas.ProxyLBPrimaryCert{
 				ServerCertificate:       values.Get("server_cert").(string),
 				IntermediateCertificate: values.Get("intermediate_cert").(string),
 				PrivateKey:              values.Get("private_key").(string),
@@ -373,7 +373,7 @@ func expandProxyLBCerts(d resourceValueGettable) *sacloud.ProxyLBCertificates {
 		if rawAdditionalCerts, ok := getListFromResource(values, "additional_certificate"); ok && len(rawAdditionalCerts) > 0 {
 			for _, rawCert := range rawAdditionalCerts {
 				values := mapToResourceData(rawCert.(map[string]interface{}))
-				cert.AdditionalCerts = append(cert.AdditionalCerts, &sacloud.ProxyLBAdditionalCert{
+				cert.AdditionalCerts = append(cert.AdditionalCerts, &iaas.ProxyLBAdditionalCert{
 					ServerCertificate:       values.Get("server_cert").(string),
 					IntermediateCertificate: values.Get("intermediate_cert").(string),
 					PrivateKey:              values.Get("private_key").(string),

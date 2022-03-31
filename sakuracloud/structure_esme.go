@@ -16,11 +16,11 @@ package sakuracloud
 
 import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
-	"github.com/sacloud/libsacloud/v2/sacloud"
+	"github.com/sacloud/iaas-api-go"
 )
 
-func expandESMECreateRequest(d *schema.ResourceData) *sacloud.ESMECreateRequest {
-	return &sacloud.ESMECreateRequest{
+func expandESMECreateRequest(d *schema.ResourceData) *iaas.ESMECreateRequest {
+	return &iaas.ESMECreateRequest{
 		Name:        d.Get("name").(string),
 		Description: d.Get("description").(string),
 		Tags:        expandTags(d),
@@ -28,8 +28,8 @@ func expandESMECreateRequest(d *schema.ResourceData) *sacloud.ESMECreateRequest 
 	}
 }
 
-func expandESMEUpdateRequest(d *schema.ResourceData, autoBackup *sacloud.ESME) *sacloud.ESMEUpdateRequest {
-	return &sacloud.ESMEUpdateRequest{
+func expandESMEUpdateRequest(d *schema.ResourceData, autoBackup *iaas.ESME) *iaas.ESMEUpdateRequest {
+	return &iaas.ESMEUpdateRequest{
 		Name:        d.Get("name").(string),
 		Description: d.Get("description").(string),
 		Tags:        expandTags(d),

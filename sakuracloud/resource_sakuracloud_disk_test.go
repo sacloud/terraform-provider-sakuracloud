@@ -23,15 +23,15 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
-	"github.com/sacloud/libsacloud/v2/sacloud"
-	"github.com/sacloud/libsacloud/v2/sacloud/types"
+	"github.com/sacloud/iaas-api-go"
+	"github.com/sacloud/iaas-api-go/types"
 )
 
 func TestAccSakuraCloudDisk_basic(t *testing.T) {
 	resourceName := "sakuracloud_disk.foobar"
 	rand := randomName()
 
-	var disk sacloud.Disk
+	var disk iaas.Disk
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:          func() { testAccPreCheck(t) },
 		ProviderFactories: testAccProviderFactories,
@@ -79,7 +79,7 @@ func TestAccSakuraCloudDisk_basic(t *testing.T) {
 	})
 }
 
-func testCheckSakuraCloudDiskExists(n string, disk *sacloud.Disk) resource.TestCheckFunc {
+func testCheckSakuraCloudDiskExists(n string, disk *iaas.Disk) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
 		rs, ok := s.RootModule().Resources[n]
 
@@ -92,7 +92,7 @@ func testCheckSakuraCloudDiskExists(n string, disk *sacloud.Disk) resource.TestC
 		}
 
 		client := testAccProvider.Meta().(*APIClient)
-		diskOp := sacloud.NewDiskOp(client)
+		diskOp := iaas.NewDiskOp(client)
 		ctx := context.Background()
 		zone := rs.Primary.Attributes["zone"]
 
@@ -110,7 +110,7 @@ func testCheckSakuraCloudDiskExists(n string, disk *sacloud.Disk) resource.TestC
 	}
 }
 
-func testCheckSakuraCloudDiskAttributes(disk *sacloud.Disk) resource.TestCheckFunc {
+func testCheckSakuraCloudDiskAttributes(disk *iaas.Disk) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
 		if disk.Connection != types.DiskConnections.VirtIO {
 			return fmt.Errorf("got bad disk connector: %v", disk.Connection)
@@ -125,7 +125,7 @@ func testCheckSakuraCloudDiskAttributes(disk *sacloud.Disk) resource.TestCheckFu
 
 func testCheckSakuraCloudDiskDestroy(s *terraform.State) error {
 	client := testAccProvider.Meta().(*APIClient)
-	diskOp := sacloud.NewDiskOp(client)
+	diskOp := iaas.NewDiskOp(client)
 
 	for _, rs := range s.RootModule().Resources {
 		if rs.Type != "sakuracloud_disk" {

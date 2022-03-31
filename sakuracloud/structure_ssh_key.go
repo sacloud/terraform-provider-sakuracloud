@@ -16,26 +16,26 @@ package sakuracloud
 
 import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
-	"github.com/sacloud/libsacloud/v2/sacloud"
+	"github.com/sacloud/iaas-api-go"
 )
 
-func expandSSHKeyCreateRequest(d *schema.ResourceData) *sacloud.SSHKeyCreateRequest {
-	return &sacloud.SSHKeyCreateRequest{
+func expandSSHKeyCreateRequest(d *schema.ResourceData) *iaas.SSHKeyCreateRequest {
+	return &iaas.SSHKeyCreateRequest{
 		Name:        d.Get("name").(string),
 		Description: d.Get("description").(string),
 		PublicKey:   d.Get("public_key").(string),
 	}
 }
 
-func expandSSHKeyUpdateRequest(d *schema.ResourceData) *sacloud.SSHKeyUpdateRequest {
-	return &sacloud.SSHKeyUpdateRequest{
+func expandSSHKeyUpdateRequest(d *schema.ResourceData) *iaas.SSHKeyUpdateRequest {
+	return &iaas.SSHKeyUpdateRequest{
 		Name:        d.Get("name").(string),
 		Description: d.Get("description").(string),
 	}
 }
 
-func expandSSHKeyGenerateRequest(d *schema.ResourceData) *sacloud.SSHKeyGenerateRequest {
-	return &sacloud.SSHKeyGenerateRequest{
+func expandSSHKeyGenerateRequest(d *schema.ResourceData) *iaas.SSHKeyGenerateRequest {
+	return &iaas.SSHKeyGenerateRequest{
 		Name:        d.Get("name").(string),
 		Description: d.Get("description").(string),
 		PassPhrase:  d.Get("pass_phrase").(string),

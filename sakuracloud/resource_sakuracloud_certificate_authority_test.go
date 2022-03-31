@@ -23,7 +23,7 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
-	"github.com/sacloud/libsacloud/v2/sacloud"
+	"github.com/sacloud/iaas-api-go"
 )
 
 func TestAccSakuraCloudCertificateAuthority_basic(t *testing.T) {
@@ -32,7 +32,7 @@ func TestAccSakuraCloudCertificateAuthority_basic(t *testing.T) {
 	resourceName := "sakuracloud_certificate_authority.foobar"
 	rand := randomName()
 
-	var reg sacloud.CertificateAuthority
+	var reg iaas.CertificateAuthority
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:          func() { testAccPreCheck(t) },
 		ProviderFactories: testAccProviderFactories,
@@ -138,7 +138,7 @@ func TestAccSakuraCloudCertificateAuthority_basic(t *testing.T) {
 	})
 }
 
-func testCheckSakuraCloudCertificateAuthorityExists(n string, auto_backup *sacloud.CertificateAuthority) resource.TestCheckFunc {
+func testCheckSakuraCloudCertificateAuthorityExists(n string, auto_backup *iaas.CertificateAuthority) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
 		rs, ok := s.RootModule().Resources[n]
 
@@ -151,7 +151,7 @@ func testCheckSakuraCloudCertificateAuthorityExists(n string, auto_backup *saclo
 		}
 
 		client := testAccProvider.Meta().(*APIClient)
-		regOp := sacloud.NewCertificateAuthorityOp(client)
+		regOp := iaas.NewCertificateAuthorityOp(client)
 
 		foundCertificateAuthority, err := regOp.Read(context.Background(), sakuraCloudID(rs.Primary.ID))
 
@@ -180,7 +180,7 @@ func testCheckSakuraCloudCertificateAuthorityDestroy(s *terraform.State) error {
 			continue
 		}
 
-		regOp := sacloud.NewCertificateAuthorityOp(client)
+		regOp := iaas.NewCertificateAuthorityOp(client)
 		_, err := regOp.Read(context.Background(), sakuraCloudID(rs.Primary.ID))
 
 		if err == nil {

@@ -24,8 +24,8 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
-	"github.com/sacloud/libsacloud/v2/sacloud"
-	"github.com/sacloud/libsacloud/v2/sacloud/types"
+	"github.com/sacloud/iaas-api-go"
+	"github.com/sacloud/iaas-api-go/types"
 )
 
 const defaultTTL = 3600
@@ -106,7 +106,7 @@ func resourceSakuraCloudDNSRecord() *schema.Resource {
 func resourceSakuraCloudDNSRecordCreate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*APIClient)
 
-	dnsOp := sacloud.NewDNSOp(client)
+	dnsOp := iaas.NewDNSOp(client)
 	dnsID := d.Get("dns_id").(string)
 
 	sakuraMutexKV.Lock(dnsID)
@@ -130,12 +130,12 @@ func resourceSakuraCloudDNSRecordCreate(ctx context.Context, d *schema.ResourceD
 func resourceSakuraCloudDNSRecordRead(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*APIClient)
 
-	dnsOp := sacloud.NewDNSOp(client)
+	dnsOp := iaas.NewDNSOp(client)
 	dnsID := d.Get("dns_id").(string)
 
 	dns, err := dnsOp.Read(ctx, sakuraCloudID(dnsID))
 	if err != nil {
-		if sacloud.IsNotFoundError(err) {
+		if iaas.IsNotFoundError(err) {
 			d.SetId("")
 			return nil
 		}
@@ -172,7 +172,7 @@ func resourceSakuraCloudDNSRecordRead(ctx context.Context, d *schema.ResourceDat
 func resourceSakuraCloudDNSRecordDelete(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*APIClient)
 
-	dnsOp := sacloud.NewDNSOp(client)
+	dnsOp := iaas.NewDNSOp(client)
 	dnsID := d.Get("dns_id").(string)
 
 	sakuraMutexKV.Lock(dnsID)
@@ -180,7 +180,7 @@ func resourceSakuraCloudDNSRecordDelete(ctx context.Context, d *schema.ResourceD
 
 	dns, err := dnsOp.Read(ctx, sakuraCloudID(dnsID))
 	if err != nil {
-		if sacloud.IsNotFoundError(err) {
+		if iaas.IsNotFoundError(err) {
 			d.SetId("")
 			return nil
 		}
@@ -195,7 +195,7 @@ func resourceSakuraCloudDNSRecordDelete(ctx context.Context, d *schema.ResourceD
 	return nil
 }
 
-func findRecordMatch(records []*sacloud.DNSRecord, record *sacloud.DNSRecord) *sacloud.DNSRecord {
+func findRecordMatch(records []*iaas.DNSRecord, record *iaas.DNSRecord) *iaas.DNSRecord {
 	for _, r := range records {
 		if isSameDNSRecord(r, record) {
 			return record
@@ -203,11 +203,11 @@ func findRecordMatch(records []*sacloud.DNSRecord, record *sacloud.DNSRecord) *s
 	}
 	return nil
 }
-func isSameDNSRecord(r1, r2 *sacloud.DNSRecord) bool {
+func isSameDNSRecord(r1, r2 *iaas.DNSRecord) bool {
 	return r1.Name == r2.Name && r1.RData == r2.RData && r1.TTL == r2.TTL && r1.Type == r2.Type
 }
 
-func dnsRecordIDHash(dns_id string, r *sacloud.DNSRecord) string {
+func dnsRecordIDHash(dns_id string, r *iaas.DNSRecord) string {
 	var buf bytes.Buffer
 	buf.WriteString(fmt.Sprintf("%s-", dns_id))
 	buf.WriteString(fmt.Sprintf("%s-", r.Type))

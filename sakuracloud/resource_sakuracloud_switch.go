@@ -21,8 +21,8 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
-	"github.com/sacloud/libsacloud/v2/helper/cleanup"
-	"github.com/sacloud/libsacloud/v2/sacloud"
+	"github.com/sacloud/iaas-api-go"
+	"github.com/sacloud/iaas-api-go/helper/cleanup"
 )
 
 func resourceSakuraCloudSwitch() *schema.Resource {
@@ -70,8 +70,8 @@ func resourceSakuraCloudSwitchCreate(ctx context.Context, d *schema.ResourceData
 		return diag.FromErr(err)
 	}
 
-	swOp := sacloud.NewSwitchOp(client)
-	req := &sacloud.SwitchCreateRequest{
+	swOp := iaas.NewSwitchOp(client)
+	req := &iaas.SwitchCreateRequest{
 		Name:        d.Get("name").(string),
 		Description: d.Get("description").(string),
 		Tags:        expandTags(d),
@@ -101,10 +101,10 @@ func resourceSakuraCloudSwitchRead(ctx context.Context, d *schema.ResourceData, 
 		return diag.FromErr(err)
 	}
 
-	swOp := sacloud.NewSwitchOp(client)
+	swOp := iaas.NewSwitchOp(client)
 	sw, err := swOp.Read(ctx, zone, sakuraCloudID(d.Id()))
 	if err != nil {
-		if sacloud.IsNotFoundError(err) {
+		if iaas.IsNotFoundError(err) {
 			d.SetId("")
 			return nil
 		}
@@ -119,7 +119,7 @@ func resourceSakuraCloudSwitchUpdate(ctx context.Context, d *schema.ResourceData
 		return diag.FromErr(err)
 	}
 
-	swOp := sacloud.NewSwitchOp(client)
+	swOp := iaas.NewSwitchOp(client)
 
 	sakuraMutexKV.Lock(d.Id())
 	defer sakuraMutexKV.Unlock(d.Id())
@@ -129,7 +129,7 @@ func resourceSakuraCloudSwitchUpdate(ctx context.Context, d *schema.ResourceData
 		return diag.Errorf("could not read SakuraCloud Switch[%s] : %s", d.Id(), err)
 	}
 
-	req := &sacloud.SwitchUpdateRequest{
+	req := &iaas.SwitchUpdateRequest{
 		Name:        d.Get("name").(string),
 		Description: d.Get("description").(string),
 		Tags:        expandTags(d),
@@ -165,14 +165,14 @@ func resourceSakuraCloudSwitchDelete(ctx context.Context, d *schema.ResourceData
 		return diag.FromErr(err)
 	}
 
-	swOp := sacloud.NewSwitchOp(client)
+	swOp := iaas.NewSwitchOp(client)
 
 	sakuraMutexKV.Lock(d.Id())
 	defer sakuraMutexKV.Unlock(d.Id())
 
 	sw, err := swOp.Read(ctx, zone, sakuraCloudID(d.Id()))
 	if err != nil {
-		if sacloud.IsNotFoundError(err) {
+		if iaas.IsNotFoundError(err) {
 			d.SetId("")
 			return nil
 		}
@@ -191,11 +191,11 @@ func resourceSakuraCloudSwitchDelete(ctx context.Context, d *schema.ResourceData
 	return nil
 }
 
-func setSwitchResourceData(ctx context.Context, d *schema.ResourceData, client *APIClient, data *sacloud.Switch) diag.Diagnostics {
+func setSwitchResourceData(ctx context.Context, d *schema.ResourceData, client *APIClient, data *iaas.Switch) diag.Diagnostics {
 	zone := getZone(d, client)
 	var serverIDs []string
 	if data.ServerCount > 0 {
-		swOp := sacloud.NewSwitchOp(client)
+		swOp := iaas.NewSwitchOp(client)
 		searched, err := swOp.GetServers(ctx, zone, data.ID)
 		if err != nil {
 			return diag.Errorf("could not find SakuraCloud Servers: switch[%s]", err)

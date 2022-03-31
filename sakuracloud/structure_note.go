@@ -16,11 +16,11 @@ package sakuracloud
 
 import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
-	"github.com/sacloud/libsacloud/v2/sacloud"
+	"github.com/sacloud/iaas-api-go"
 )
 
-func expandNoteCreateRequest(d *schema.ResourceData) *sacloud.NoteCreateRequest {
-	return &sacloud.NoteCreateRequest{
+func expandNoteCreateRequest(d *schema.ResourceData) *iaas.NoteCreateRequest {
+	return &iaas.NoteCreateRequest{
 		Name:    d.Get("name").(string),
 		Tags:    expandTags(d),
 		IconID:  expandSakuraCloudID(d, "icon_id"),
@@ -29,8 +29,8 @@ func expandNoteCreateRequest(d *schema.ResourceData) *sacloud.NoteCreateRequest 
 	}
 }
 
-func expandNoteUpdateRequest(d *schema.ResourceData) *sacloud.NoteUpdateRequest {
-	return &sacloud.NoteUpdateRequest{
+func expandNoteUpdateRequest(d *schema.ResourceData) *iaas.NoteUpdateRequest {
+	return &iaas.NoteUpdateRequest{
 		Name:    d.Get("name").(string),
 		Tags:    expandTags(d),
 		IconID:  expandSakuraCloudID(d, "icon_id"),

@@ -21,8 +21,8 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
-	"github.com/sacloud/libsacloud/v2/sacloud"
-	"github.com/sacloud/libsacloud/v2/sacloud/types"
+	"github.com/sacloud/iaas-api-go"
+	"github.com/sacloud/iaas-api-go/types"
 )
 
 func resourceSakuraCloudSimpleMonitor() *schema.Resource {
@@ -257,7 +257,7 @@ func resourceSakuraCloudSimpleMonitorCreate(ctx context.Context, d *schema.Resou
 		return diag.FromErr(err)
 	}
 
-	smOp := sacloud.NewSimpleMonitorOp(client)
+	smOp := iaas.NewSimpleMonitorOp(client)
 
 	simpleMonitor, err := smOp.Create(ctx, expandSimpleMonitorCreateRequest(d))
 	if err != nil {
@@ -274,11 +274,11 @@ func resourceSakuraCloudSimpleMonitorRead(ctx context.Context, d *schema.Resourc
 		return diag.FromErr(err)
 	}
 
-	smOp := sacloud.NewSimpleMonitorOp(client)
+	smOp := iaas.NewSimpleMonitorOp(client)
 
 	simpleMonitor, err := smOp.Read(ctx, sakuraCloudID(d.Id()))
 	if err != nil {
-		if sacloud.IsNotFoundError(err) {
+		if iaas.IsNotFoundError(err) {
 			d.SetId("")
 			return nil
 		}
@@ -294,7 +294,7 @@ func resourceSakuraCloudSimpleMonitorUpdate(ctx context.Context, d *schema.Resou
 		return diag.FromErr(err)
 	}
 
-	smOp := sacloud.NewSimpleMonitorOp(client)
+	smOp := iaas.NewSimpleMonitorOp(client)
 
 	simpleMonitor, err := smOp.Read(ctx, sakuraCloudID(d.Id()))
 	if err != nil {
@@ -314,11 +314,11 @@ func resourceSakuraCloudSimpleMonitorDelete(ctx context.Context, d *schema.Resou
 		return diag.FromErr(err)
 	}
 
-	smOp := sacloud.NewSimpleMonitorOp(client)
+	smOp := iaas.NewSimpleMonitorOp(client)
 
 	simpleMonitor, err := smOp.Read(ctx, sakuraCloudID(d.Id()))
 	if err != nil {
-		if sacloud.IsNotFoundError(err) {
+		if iaas.IsNotFoundError(err) {
 			d.SetId("")
 			return nil
 		}
@@ -331,7 +331,7 @@ func resourceSakuraCloudSimpleMonitorDelete(ctx context.Context, d *schema.Resou
 	return nil
 }
 
-func setSimpleMonitorResourceData(ctx context.Context, d *schema.ResourceData, client *APIClient, data *sacloud.SimpleMonitor) diag.Diagnostics {
+func setSimpleMonitorResourceData(ctx context.Context, d *schema.ResourceData, client *APIClient, data *iaas.SimpleMonitor) diag.Diagnostics {
 	d.Set("target", data.Target)                                       // nolint
 	d.Set("delay_loop", data.DelayLoop)                                // nolint
 	d.Set("max_check_attempts", data.MaxCheckAttempts)                 // nolint

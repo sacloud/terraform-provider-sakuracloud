@@ -22,14 +22,14 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
-	"github.com/sacloud/libsacloud/v2/sacloud"
+	"github.com/sacloud/iaas-api-go"
 )
 
 func TestAccSakuraCloudSSHKeyGen_basic(t *testing.T) {
 	resourceName := "sakuracloud_ssh_key_gen.foobar"
 	rand := randomName()
 
-	var sshKey sacloud.SSHKey
+	var sshKey iaas.SSHKey
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:          func() { testAccPreCheck(t) },
 		ProviderFactories: testAccProviderFactories,
@@ -59,7 +59,7 @@ func TestAccSakuraCloudSSHKeyGen_basic(t *testing.T) {
 	})
 }
 
-func testCheckSakuraCloudSSHKeyGenExists(n string, sshKey *sacloud.SSHKey) resource.TestCheckFunc {
+func testCheckSakuraCloudSSHKeyGenExists(n string, sshKey *iaas.SSHKey) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
 		rs, ok := s.RootModule().Resources[n]
 
@@ -72,7 +72,7 @@ func testCheckSakuraCloudSSHKeyGenExists(n string, sshKey *sacloud.SSHKey) resou
 		}
 
 		client := testAccProvider.Meta().(*APIClient)
-		keyOp := sacloud.NewSSHKeyOp(client)
+		keyOp := iaas.NewSSHKeyOp(client)
 
 		foundSSHKey, err := keyOp.Read(context.Background(), sakuraCloudID(rs.Primary.ID))
 		if err != nil {
@@ -90,7 +90,7 @@ func testCheckSakuraCloudSSHKeyGenExists(n string, sshKey *sacloud.SSHKey) resou
 
 func testCheckSakuraCloudSSHKeyGenDestroy(s *terraform.State) error {
 	client := testAccProvider.Meta().(*APIClient)
-	keyOp := sacloud.NewSSHKeyOp(client)
+	keyOp := iaas.NewSSHKeyOp(client)
 
 	for _, rs := range s.RootModule().Resources {
 		if rs.Type != "sakuracloud_ssh_key_gen" {

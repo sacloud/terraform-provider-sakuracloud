@@ -20,7 +20,7 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
-	"github.com/sacloud/libsacloud/v2/sacloud"
+	"github.com/sacloud/iaas-api-go"
 )
 
 func resourceSakuraCloudSSHKey() *schema.Resource {
@@ -64,7 +64,7 @@ func resourceSakuraCloudSSHKeyCreate(ctx context.Context, d *schema.ResourceData
 		return diag.FromErr(err)
 	}
 
-	sshKeyOp := sacloud.NewSSHKeyOp(client)
+	sshKeyOp := iaas.NewSSHKeyOp(client)
 
 	key, err := sshKeyOp.Create(ctx, expandSSHKeyCreateRequest(d))
 	if err != nil {
@@ -81,10 +81,10 @@ func resourceSakuraCloudSSHKeyRead(ctx context.Context, d *schema.ResourceData, 
 		return diag.FromErr(err)
 	}
 
-	sshKeyOp := sacloud.NewSSHKeyOp(client)
+	sshKeyOp := iaas.NewSSHKeyOp(client)
 	key, err := sshKeyOp.Read(ctx, sakuraCloudID(d.Id()))
 	if err != nil {
-		if sacloud.IsNotFoundError(err) {
+		if iaas.IsNotFoundError(err) {
 			d.SetId("")
 			return nil
 		}
@@ -99,7 +99,7 @@ func resourceSakuraCloudSSHKeyUpdate(ctx context.Context, d *schema.ResourceData
 		return diag.FromErr(err)
 	}
 
-	sshKeyOp := sacloud.NewSSHKeyOp(client)
+	sshKeyOp := iaas.NewSSHKeyOp(client)
 	key, err := sshKeyOp.Read(ctx, sakuraCloudID(d.Id()))
 	if err != nil {
 		return diag.Errorf("could not read SSHKey[%s]: %s", d.Id(), err)
@@ -118,10 +118,10 @@ func resourceSakuraCloudSSHKeyDelete(ctx context.Context, d *schema.ResourceData
 		return diag.FromErr(err)
 	}
 
-	sshKeyOp := sacloud.NewSSHKeyOp(client)
+	sshKeyOp := iaas.NewSSHKeyOp(client)
 	key, err := sshKeyOp.Read(ctx, sakuraCloudID(d.Id()))
 	if err != nil {
-		if sacloud.IsNotFoundError(err) {
+		if iaas.IsNotFoundError(err) {
 			d.SetId("")
 			return nil
 		}
@@ -134,7 +134,7 @@ func resourceSakuraCloudSSHKeyDelete(ctx context.Context, d *schema.ResourceData
 	return nil
 }
 
-func setSSHKeyResourceData(_ context.Context, d *schema.ResourceData, _ *APIClient, data *sacloud.SSHKey) diag.Diagnostics {
+func setSSHKeyResourceData(_ context.Context, d *schema.ResourceData, _ *APIClient, data *iaas.SSHKey) diag.Diagnostics {
 	d.Set("name", data.Name)               // nolint
 	d.Set("public_key", data.PublicKey)    // nolint
 	d.Set("fingerprint", data.Fingerprint) // nolint

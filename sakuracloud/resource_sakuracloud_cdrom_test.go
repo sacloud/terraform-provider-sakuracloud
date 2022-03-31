@@ -23,7 +23,7 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
-	"github.com/sacloud/libsacloud/v2/sacloud"
+	"github.com/sacloud/iaas-api-go"
 )
 
 func TestAccSakuraCloudCDROM_basic(t *testing.T) {
@@ -32,7 +32,7 @@ func TestAccSakuraCloudCDROM_basic(t *testing.T) {
 	resourceName := "sakuracloud_cdrom.foobar"
 	rand := randomName()
 
-	var cdrom sacloud.CDROM
+	var cdrom iaas.CDROM
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:          func() { testAccPreCheck(t) },
 		ProviderFactories: testAccProviderFactories,
@@ -100,7 +100,7 @@ func TestAccSakuraCloudCDROM_textContent(t *testing.T) {
 	})
 }
 
-func testCheckSakuraCloudCDROMExists(n string, cdrom *sacloud.CDROM) resource.TestCheckFunc {
+func testCheckSakuraCloudCDROMExists(n string, cdrom *iaas.CDROM) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
 		rs, ok := s.RootModule().Resources[n]
 
@@ -113,7 +113,7 @@ func testCheckSakuraCloudCDROMExists(n string, cdrom *sacloud.CDROM) resource.Te
 		}
 
 		client := testAccProvider.Meta().(*APIClient)
-		cdromOp := sacloud.NewCDROMOp(client)
+		cdromOp := iaas.NewCDROMOp(client)
 		zone := rs.Primary.Attributes["zone"]
 		foundCDROM, err := cdromOp.Read(context.Background(), zone, sakuraCloudID(rs.Primary.ID))
 
@@ -142,7 +142,7 @@ func testCheckSakuraCloudCDROMDestroy(s *terraform.State) error {
 			continue
 		}
 
-		cdromOp := sacloud.NewCDROMOp(client)
+		cdromOp := iaas.NewCDROMOp(client)
 		zone := rs.Primary.Attributes["zone"]
 		_, err := cdromOp.Read(context.Background(), zone, sakuraCloudID(rs.Primary.ID))
 

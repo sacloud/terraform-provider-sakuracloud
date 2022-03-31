@@ -24,7 +24,7 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
-	"github.com/sacloud/libsacloud/v2/sacloud"
+	"github.com/sacloud/iaas-api-go"
 )
 
 const (
@@ -39,7 +39,7 @@ func TestAccSakuraCloudProxyLB_basic(t *testing.T) {
 	rand := randomName()
 	ip := os.Getenv(envProxyLBRealServerIP0)
 
-	var proxylb, proxylbUpd sacloud.ProxyLB
+	var proxylb, proxylbUpd iaas.ProxyLB
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:          func() { testAccPreCheck(t) },
 		ProviderFactories: testAccProviderFactories,
@@ -154,7 +154,7 @@ func TestAccSakuraCloudProxyLB_basic(t *testing.T) {
 	})
 }
 
-func testCheckSakuraCloudProxyLBExists(n string, proxylb *sacloud.ProxyLB) resource.TestCheckFunc {
+func testCheckSakuraCloudProxyLBExists(n string, proxylb *iaas.ProxyLB) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
 		rs, ok := s.RootModule().Resources[n]
 
@@ -167,7 +167,7 @@ func testCheckSakuraCloudProxyLBExists(n string, proxylb *sacloud.ProxyLB) resou
 		}
 
 		client := testAccProvider.Meta().(*APIClient)
-		proxyLBOp := sacloud.NewProxyLBOp(client)
+		proxyLBOp := iaas.NewProxyLBOp(client)
 
 		foundProxyLB, err := proxyLBOp.Read(context.Background(), sakuraCloudID(rs.Primary.ID))
 		if err != nil {
@@ -184,7 +184,7 @@ func testCheckSakuraCloudProxyLBExists(n string, proxylb *sacloud.ProxyLB) resou
 
 func testCheckSakuraCloudProxyLBDestroy(s *terraform.State) error {
 	client := testAccProvider.Meta().(*APIClient)
-	proxyLBOp := sacloud.NewProxyLBOp(client)
+	proxyLBOp := iaas.NewProxyLBOp(client)
 
 	for _, rs := range s.RootModule().Resources {
 		if rs.Type != "sakuracloud_proxylb" {

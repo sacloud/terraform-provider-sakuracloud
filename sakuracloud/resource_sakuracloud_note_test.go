@@ -22,14 +22,14 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
-	"github.com/sacloud/libsacloud/v2/sacloud"
+	"github.com/sacloud/iaas-api-go"
 )
 
 func TestAccSakuraCloudNote_basic(t *testing.T) {
 	resourceName := "sakuracloud_note.foobar"
 	rand := randomName()
 
-	var note sacloud.Note
+	var note iaas.Note
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:          func() { testAccPreCheck(t) },
 		ProviderFactories: testAccProviderFactories,
@@ -66,7 +66,7 @@ func TestAccSakuraCloudNote_withYAML(t *testing.T) {
 	resourceName := "sakuracloud_note.foobar"
 	name := randomName()
 
-	var note sacloud.Note
+	var note iaas.Note
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:          func() { testAccPreCheck(t) },
 		ProviderFactories: testAccProviderFactories,
@@ -85,7 +85,7 @@ func TestAccSakuraCloudNote_withYAML(t *testing.T) {
 	})
 }
 
-func testCheckSakuraCloudNoteExists(n string, note *sacloud.Note) resource.TestCheckFunc {
+func testCheckSakuraCloudNoteExists(n string, note *iaas.Note) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
 		rs, ok := s.RootModule().Resources[n]
 
@@ -98,7 +98,7 @@ func testCheckSakuraCloudNoteExists(n string, note *sacloud.Note) resource.TestC
 		}
 
 		client := testAccProvider.Meta().(*APIClient)
-		noteOp := sacloud.NewNoteOp(client)
+		noteOp := iaas.NewNoteOp(client)
 
 		foundNote, err := noteOp.Read(context.Background(), sakuraCloudID(rs.Primary.ID))
 		if err != nil {
@@ -116,7 +116,7 @@ func testCheckSakuraCloudNoteExists(n string, note *sacloud.Note) resource.TestC
 
 func testCheckSakuraCloudNoteDestroy(s *terraform.State) error {
 	client := testAccProvider.Meta().(*APIClient)
-	noteOp := sacloud.NewNoteOp(client)
+	noteOp := iaas.NewNoteOp(client)
 
 	for _, rs := range s.RootModule().Resources {
 		if rs.Type != "sakuracloud_note" {

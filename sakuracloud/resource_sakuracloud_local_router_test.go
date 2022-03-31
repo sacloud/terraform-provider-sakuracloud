@@ -23,7 +23,7 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
-	"github.com/sacloud/libsacloud/v2/sacloud"
+	"github.com/sacloud/iaas-api-go"
 )
 
 func TestAccSakuraCloudLocalRouter_basic(t *testing.T) {
@@ -34,7 +34,7 @@ func TestAccSakuraCloudLocalRouter_basic(t *testing.T) {
 	resourceName := "sakuracloud_local_router.foobar"
 	rand := randomName()
 
-	var localRouter sacloud.LocalRouter
+	var localRouter iaas.LocalRouter
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:          func() { testAccPreCheck(t) },
 		ProviderFactories: testAccProviderFactories,
@@ -109,7 +109,7 @@ func TestAccSakuraCloudLocalRouter_basic(t *testing.T) {
 	})
 }
 
-func testCheckSakuraCloudLocalRouterExists(n string, loadBalancer *sacloud.LocalRouter) resource.TestCheckFunc {
+func testCheckSakuraCloudLocalRouterExists(n string, loadBalancer *iaas.LocalRouter) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
 		rs, ok := s.RootModule().Resources[n]
 
@@ -122,7 +122,7 @@ func testCheckSakuraCloudLocalRouterExists(n string, loadBalancer *sacloud.Local
 		}
 
 		client := testAccProvider.Meta().(*APIClient)
-		lrOp := sacloud.NewLocalRouterOp(client)
+		lrOp := iaas.NewLocalRouterOp(client)
 
 		foundLocalRouter, err := lrOp.Read(context.Background(), sakuraCloudID(rs.Primary.ID))
 		if err != nil {
@@ -140,7 +140,7 @@ func testCheckSakuraCloudLocalRouterExists(n string, loadBalancer *sacloud.Local
 
 func testCheckSakuraCloudLocalRouterDestroy(s *terraform.State) error {
 	client := testAccProvider.Meta().(*APIClient)
-	lrOp := sacloud.NewLocalRouterOp(client)
+	lrOp := iaas.NewLocalRouterOp(client)
 
 	for _, rs := range s.RootModule().Resources {
 		if rs.Type != "sakuracloud_local_router" {

@@ -19,7 +19,7 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
-	"github.com/sacloud/libsacloud/v2/sacloud"
+	"github.com/sacloud/iaas-api-go"
 )
 
 func dataSourceSakuraCloudSSHKey() *schema.Resource {
@@ -51,9 +51,9 @@ func dataSourceSakuraCloudSSHKeyRead(ctx context.Context, d *schema.ResourceData
 		return diag.FromErr(err)
 	}
 
-	searcher := sacloud.NewSSHKeyOp(client)
+	searcher := iaas.NewSSHKeyOp(client)
 
-	findCondition := &sacloud.FindCondition{}
+	findCondition := &iaas.FindCondition{}
 	if rawFilter, ok := d.GetOk(filterAttrName); ok {
 		findCondition.Filter = expandSearchFilter(rawFilter)
 	}

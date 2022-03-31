@@ -22,14 +22,14 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
-	"github.com/sacloud/libsacloud/v2/sacloud"
+	"github.com/sacloud/iaas-api-go"
 )
 
 func TestAccSakuraCloudGSLB_basic(t *testing.T) {
 	resourceName := "sakuracloud_gslb.foobar"
 	rand := randomName()
 
-	var gslb sacloud.GSLB
+	var gslb iaas.GSLB
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:          func() { testAccPreCheck(t) },
 		ProviderFactories: testAccProviderFactories,
@@ -105,7 +105,7 @@ func TestAccSakuraCloudGSLB_basic(t *testing.T) {
 	})
 }
 
-func testCheckSakuraCloudGSLBExists(n string, gslb *sacloud.GSLB) resource.TestCheckFunc {
+func testCheckSakuraCloudGSLBExists(n string, gslb *iaas.GSLB) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
 		rs, ok := s.RootModule().Resources[n]
 
@@ -118,7 +118,7 @@ func testCheckSakuraCloudGSLBExists(n string, gslb *sacloud.GSLB) resource.TestC
 		}
 
 		client := testAccProvider.Meta().(*APIClient)
-		gslbOp := sacloud.NewGSLBOp(client)
+		gslbOp := iaas.NewGSLBOp(client)
 		ctx := context.Background()
 
 		foundGSLB, err := gslbOp.Read(ctx, sakuraCloudID(rs.Primary.ID))
@@ -136,7 +136,7 @@ func testCheckSakuraCloudGSLBExists(n string, gslb *sacloud.GSLB) resource.TestC
 
 func testCheckSakuraCloudGSLBDestroy(s *terraform.State) error {
 	client := testAccProvider.Meta().(*APIClient)
-	gslbOp := sacloud.NewGSLBOp(client)
+	gslbOp := iaas.NewGSLBOp(client)
 	ctx := context.Background()
 
 	for _, rs := range s.RootModule().Resources {

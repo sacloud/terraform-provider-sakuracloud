@@ -19,14 +19,14 @@ import (
 	"errors"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
-	"github.com/sacloud/libsacloud/v2/sacloud"
-	"github.com/sacloud/libsacloud/v2/sacloud/search"
-	"github.com/sacloud/libsacloud/v2/sacloud/types"
+	"github.com/sacloud/iaas-api-go"
+	"github.com/sacloud/iaas-api-go/search"
+	"github.com/sacloud/iaas-api-go/types"
 )
 
 func expandPrivateHostPlanID(ctx context.Context, d resourceValueGettable, client *APIClient, zone string) (types.ID, error) {
-	op := sacloud.NewPrivateHostPlanOp(client)
-	searched, err := op.Find(ctx, zone, &sacloud.FindCondition{
+	op := iaas.NewPrivateHostPlanOp(client)
+	searched, err := op.Find(ctx, zone, &iaas.FindCondition{
 		Filter: search.Filter{
 			search.Key("Class"): search.ExactMatch(d.Get("class").(string)),
 		},
@@ -40,8 +40,8 @@ func expandPrivateHostPlanID(ctx context.Context, d resourceValueGettable, clien
 	return searched.PrivateHostPlans[0].ID, nil
 }
 
-func expandPrivateHostCreateRequest(d *schema.ResourceData, planID types.ID) *sacloud.PrivateHostCreateRequest {
-	return &sacloud.PrivateHostCreateRequest{
+func expandPrivateHostCreateRequest(d *schema.ResourceData, planID types.ID) *iaas.PrivateHostCreateRequest {
+	return &iaas.PrivateHostCreateRequest{
 		Name:        d.Get("name").(string),
 		Description: d.Get("description").(string),
 		Tags:        expandTags(d),
@@ -50,8 +50,8 @@ func expandPrivateHostCreateRequest(d *schema.ResourceData, planID types.ID) *sa
 	}
 }
 
-func expandPrivateHostUpdateRequest(d *schema.ResourceData) *sacloud.PrivateHostUpdateRequest {
-	return &sacloud.PrivateHostUpdateRequest{
+func expandPrivateHostUpdateRequest(d *schema.ResourceData) *iaas.PrivateHostUpdateRequest {
+	return &iaas.PrivateHostUpdateRequest{
 		Name:        d.Get("name").(string),
 		Description: d.Get("description").(string),
 		Tags:        expandTags(d),

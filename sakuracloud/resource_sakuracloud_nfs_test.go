@@ -22,14 +22,14 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
-	"github.com/sacloud/libsacloud/v2/sacloud"
+	"github.com/sacloud/iaas-api-go"
 )
 
 func TestAccSakuraCloudNFS_basic(t *testing.T) {
 	resourceName := "sakuracloud_nfs.foobar"
 	rand := randomName()
 
-	var nfs sacloud.NFS
+	var nfs iaas.NFS
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:          func() { testAccPreCheck(t) },
 		ProviderFactories: testAccProviderFactories,
@@ -80,7 +80,7 @@ func TestAccSakuraCloudNFS_basic(t *testing.T) {
 	})
 }
 
-func testCheckSakuraCloudNFSExists(n string, nfs *sacloud.NFS) resource.TestCheckFunc {
+func testCheckSakuraCloudNFSExists(n string, nfs *iaas.NFS) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
 		rs, ok := s.RootModule().Resources[n]
 
@@ -94,7 +94,7 @@ func testCheckSakuraCloudNFSExists(n string, nfs *sacloud.NFS) resource.TestChec
 
 		client := testAccProvider.Meta().(*APIClient)
 		zone := rs.Primary.Attributes["zone"]
-		nfsOp := sacloud.NewNFSOp(client)
+		nfsOp := iaas.NewNFSOp(client)
 
 		foundNFS, err := nfsOp.Read(context.Background(), zone, sakuraCloudID(rs.Primary.ID))
 		if err != nil {
@@ -112,7 +112,7 @@ func testCheckSakuraCloudNFSExists(n string, nfs *sacloud.NFS) resource.TestChec
 
 func testCheckSakuraCloudNFSDestroy(s *terraform.State) error {
 	client := testAccProvider.Meta().(*APIClient)
-	nfsOp := sacloud.NewNFSOp(client)
+	nfsOp := iaas.NewNFSOp(client)
 
 	for _, rs := range s.RootModule().Resources {
 		if rs.Type != "sakuracloud_nfs" {

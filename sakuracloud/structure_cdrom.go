@@ -16,8 +16,8 @@ package sakuracloud
 
 import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
-	"github.com/sacloud/libsacloud/v2/pkg/size"
-	"github.com/sacloud/libsacloud/v2/sacloud"
+	"github.com/sacloud/iaas-api-go"
+	"github.com/sacloud/packages-go/size"
 )
 
 func expandCDROMContentHash(d *schema.ResourceData) string {
@@ -38,8 +38,8 @@ func expandCDROMContentHash(d *schema.ResourceData) string {
 	return ""
 }
 
-func expandCDROMCreateRequest(d *schema.ResourceData) *sacloud.CDROMCreateRequest {
-	return &sacloud.CDROMCreateRequest{
+func expandCDROMCreateRequest(d *schema.ResourceData) *iaas.CDROMCreateRequest {
+	return &iaas.CDROMCreateRequest{
 		Name:        d.Get("name").(string),
 		Description: d.Get("description").(string),
 		SizeMB:      d.Get("size").(int) * size.GiB,
@@ -48,8 +48,8 @@ func expandCDROMCreateRequest(d *schema.ResourceData) *sacloud.CDROMCreateReques
 	}
 }
 
-func expandCDROMUpdateRequest(d *schema.ResourceData) *sacloud.CDROMUpdateRequest {
-	return &sacloud.CDROMUpdateRequest{
+func expandCDROMUpdateRequest(d *schema.ResourceData) *iaas.CDROMUpdateRequest {
+	return &iaas.CDROMUpdateRequest{
 		Name:        d.Get("name").(string),
 		Description: d.Get("description").(string),
 		Tags:        expandTags(d),
