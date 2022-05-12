@@ -4,6 +4,7 @@
 
 IMPROVEMENTS:
 
+  - github.com/hashicorp/hc-install v0.3.2 [GH-892] (@yamamoto-febc)
   - libsacloudからiaas-service-goへの切り替え [GH-891] (@yamamoto-febc)
 
 ## 2.16.2 (2022-02-18)
