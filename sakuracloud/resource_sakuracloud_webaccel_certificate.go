@@ -21,7 +21,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/sacloud/iaas-api-go"
-	"github.com/sacloud/iaas-api-go/types"
+	"github.com/sacloud/webaccel-api-go"
 )
 
 func resourceSakuraCloudWebAccelCertificate() *schema.Resource {
@@ -79,14 +79,14 @@ func resourceSakuraCloudWebAccelCertificate() *schema.Resource {
 }
 
 func resourceSakuraCloudWebAccelCertificateCreate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
-	caller, _, err := sakuraCloudClient(d, meta)
+	client, _, err := sakuraCloudClient(d, meta)
 	if err != nil {
 		return diag.FromErr(err)
 	}
 
 	siteID := d.Get("site_id").(string)
 
-	res, err := iaas.NewWebAccelOp(caller).CreateCertificate(ctx, types.StringID(siteID), &iaas.WebAccelCertRequest{
+	res, err := webaccel.NewOp(client.webaccelClient).CreateCertificate(ctx, siteID, &webaccel.CreateOrUpdateCertificateRequest{
 		CertificateChain: d.Get("certificate_chain").(string),
 		Key:              d.Get("private_key").(string),
 	})
@@ -94,19 +94,19 @@ func resourceSakuraCloudWebAccelCertificateCreate(ctx context.Context, d *schema
 		return diag.FromErr(err)
 	}
 
-	d.SetId(res.Current.SiteID.String())
+	d.SetId(res.Current.SiteID)
 	return resourceSakuraCloudWebAccelCertificateRead(ctx, d, meta)
 }
 
 func resourceSakuraCloudWebAccelCertificateRead(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
-	caller, _, err := sakuraCloudClient(d, meta)
+	client, _, err := sakuraCloudClient(d, meta)
 	if err != nil {
 		return diag.FromErr(err)
 	}
 
 	siteID := d.Id()
 
-	certs, err := iaas.NewWebAccelOp(caller).ReadCertificate(ctx, types.StringID(siteID))
+	certs, err := webaccel.NewOp(client.webaccelClient).ReadCertificate(ctx, siteID)
 	if err != nil {
 		if iaas.IsNotFoundError(err) {
 			d.SetId("")
@@ -120,38 +120,38 @@ func resourceSakuraCloudWebAccelCertificateRead(ctx context.Context, d *schema.R
 		return nil
 	}
 
-	return setWebAccelCertificateResourceData(d, caller, certs.Current)
+	return setWebAccelCertificateResourceData(d, client, certs.Current)
 }
 
 func resourceSakuraCloudWebAccelCertificateUpdate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
-	caller, _, err := sakuraCloudClient(d, meta)
+	client, _, err := sakuraCloudClient(d, meta)
 	if err != nil {
 		return diag.FromErr(err)
 	}
 	siteID := d.Id()
 
 	if d.HasChanges("certificate_chain", "private_key") {
-		res, err := iaas.NewWebAccelOp(caller).UpdateCertificate(ctx, types.StringID(siteID), &iaas.WebAccelCertRequest{
+		res, err := webaccel.NewOp(client.webaccelClient).UpdateCertificate(ctx, siteID, &webaccel.CreateOrUpdateCertificateRequest{
 			CertificateChain: d.Get("certificate_chain").(string),
 			Key:              d.Get("private_key").(string),
 		})
 		if err != nil {
 			return diag.FromErr(err)
 		}
-		d.SetId(res.Current.SiteID.String())
+		d.SetId(res.Current.SiteID)
 	}
 
 	return resourceSakuraCloudWebAccelCertificateRead(ctx, d, meta)
 }
 
 func resourceSakuraCloudWebAccelCertificateDelete(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
-	caller, _, err := sakuraCloudClient(d, meta)
+	client, _, err := sakuraCloudClient(d, meta)
 	if err != nil {
 		return diag.FromErr(err)
 	}
 	siteID := d.Get("site_id").(string)
 
-	if err := iaas.NewWebAccelOp(caller).DeleteCertificate(ctx, types.StringID(siteID)); err != nil {
+	if err := webaccel.NewOp(client.webaccelClient).DeleteCertificate(ctx, siteID); err != nil {
 		return diag.Errorf("deleting SakuraCloud WebAccelCert[%s] is failed: %s", d.Id(), err)
 	}
 
@@ -159,7 +159,7 @@ func resourceSakuraCloudWebAccelCertificateDelete(ctx context.Context, d *schema
 	return nil
 }
 
-func setWebAccelCertificateResourceData(d *schema.ResourceData, client *APIClient, data *iaas.WebAccelCurrentCert) diag.Diagnostics {
+func setWebAccelCertificateResourceData(d *schema.ResourceData, client *APIClient, data *webaccel.CurrentCertificate) diag.Diagnostics {
 	notBefore := time.Unix(data.NotBefore/1000, 0).Format(time.RFC3339)
 	notAfter := time.Unix(data.NotAfter/1000, 0).Format(time.RFC3339)
 
