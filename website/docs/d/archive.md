@@ -28,12 +28,6 @@ data "sakuracloud_archive" "foobar" {
   - **RancherOS**: `rancheros`  
   - **k3OS**: `k3os`  
   - **Kusanagi**: `kusanagi`  
-  - **Windows2016**: [`windows2016`/`windows2016-rds`/`windows2016-rds-office`]  
-  - **Windows2016+SQLServer**:  [`windows2016-sql-web`/`windows2016-sql-standard`/`windows2016-sql-standard-all`]  
-  - **Windows2016+SQLServer2017**: [`windows2016-sql2017-standard`/`windows2016-sql2017-enterprise`/`windows2016-sql2017-standard-all`]  
-  - **Windows2019**: [`windows2019`/`windows2019-rds`/`windows2019-rds-office2016`/`windows2019-rds-office2019`]  
-  - **Windows2019+SQLServer2017**: [`windows2019-sql2017-web`/`windows2019-sql2017-standard`/`windows2019-sql2017-enterprise`/`windows2019-sql2017-standard-all`]  
-  - **Windows2019+SQLServer2019**: [`windows2019-sql2019-web`/`windows2019-sql2019-standard`/`windows2019-sql2019-enterprise`/`windows2019-sql2019-standard-all`]  
 * `zone` - (Optional) The name of zone that the Archive is in (e.g. `is1a`, `tk1a`).
 
 ---

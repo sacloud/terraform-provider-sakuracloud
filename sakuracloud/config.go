@@ -31,6 +31,7 @@ import (
 	"github.com/sacloud/iaas-api-go"
 	"github.com/sacloud/iaas-api-go/helper/api"
 	"github.com/sacloud/iaas-api-go/helper/query"
+	"github.com/sacloud/webaccel-api-go"
 )
 
 const (
@@ -78,6 +79,8 @@ type APIClient struct {
 	deletionWaiterPollingInterval    time.Duration
 	databaseWaitAfterCreateDuration  time.Duration
 	vpcRouterWaitAfterCreateDuration time.Duration
+
+	webaccelClient *webaccel.Client
 }
 
 func (c *APIClient) checkReferencedOption() query.CheckReferencedOption {
@@ -189,21 +192,21 @@ func (c *Config) NewClient() (*APIClient, error) {
 			enableAPITrace = false
 		}
 	}
-
+	callerOptions := &client.Options{
+		AccessToken:          c.AccessToken,
+		AccessTokenSecret:    c.AccessTokenSecret,
+		AcceptLanguage:       c.AcceptLanguage,
+		HttpClient:           http.DefaultClient,
+		HttpRequestTimeout:   c.APIRequestTimeout,
+		HttpRequestRateLimit: c.APIRequestRateLimit,
+		RetryMax:             c.RetryMax,
+		RetryWaitMax:         c.RetryWaitMax,
+		RetryWaitMin:         c.RetryWaitMin,
+		UserAgent:            ua,
+		Trace:                enableHTTPTrace,
+	}
 	caller := api.NewCallerWithOptions(&api.CallerOptions{
-		Options: &client.Options{
-			AccessToken:          c.AccessToken,
-			AccessTokenSecret:    c.AccessTokenSecret,
-			AcceptLanguage:       c.AcceptLanguage,
-			HttpClient:           http.DefaultClient,
-			HttpRequestTimeout:   c.APIRequestTimeout,
-			HttpRequestRateLimit: c.APIRequestRateLimit,
-			RetryMax:             c.RetryMax,
-			RetryWaitMax:         c.RetryWaitMax,
-			RetryWaitMin:         c.RetryWaitMin,
-			UserAgent:            ua,
-			Trace:                enableHTTPTrace,
-		},
+		Options:       callerOptions,
 		APIRootURL:    c.APIRootURL,
 		DefaultZone:   c.DefaultZone,
 		TraceAPI:      enableAPITrace,
@@ -232,5 +235,6 @@ func (c *Config) NewClient() (*APIClient, error) {
 		deletionWaiterPollingInterval:    deletionWaiterPollingInterval,
 		databaseWaitAfterCreateDuration:  databaseWaitAfterCreateDuration,
 		vpcRouterWaitAfterCreateDuration: vpcRouterWaitAfterCreateDuration,
+		webaccelClient:                   &webaccel.Client{Options: callerOptions},
 	}, nil
 }
