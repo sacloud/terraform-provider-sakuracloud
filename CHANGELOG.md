@@ -4,6 +4,7 @@
 
 IMPROVEMENTS:
 
+  - iaas-api-go v1.1.1 [GH-894] (@yamamoto-febc)
   - github.com/hashicorp/hc-install v0.3.2 [GH-892] (@yamamoto-febc)
   - libsacloudからiaas-service-goへの切り替え [GH-891] (@yamamoto-febc)
 
