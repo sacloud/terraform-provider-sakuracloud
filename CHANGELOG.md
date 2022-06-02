@@ -2,6 +2,10 @@
 
 ## 2.17.0 (Unreleased) 
 
+FEATURES:
+
+  - AutoScale [GH-895] (@yamamoto-febc)
+
 IMPROVEMENTS:
 
   - iaas-api-go v1.1.1 [GH-894] (@yamamoto-febc)
