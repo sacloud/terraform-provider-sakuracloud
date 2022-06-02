@@ -21,8 +21,11 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/goccy/go-yaml"
+
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
+	autoScaler "github.com/sacloud/autoscaler/core"
 	"github.com/sacloud/iaas-api-go/types"
 )
 
@@ -154,6 +157,19 @@ func validateSourceSharedKey(v interface{}, k string) ([]string, []error) {
 	key := types.ArchiveShareKey(value)
 	if !key.ValidFormat() {
 		errors = append(errors, fmt.Errorf("%q must be formatted in '<ZONE>:<ID>:<TOKEN>'", k))
+	}
+	return ws, errors
+}
+
+func validateAutoScaleConfig(v interface{}, k string) ([]string, []error) {
+	var ws []string
+	var errors []error
+
+	value := v.(string)
+	config := autoScaler.Config{}
+	err := yaml.UnmarshalWithOptions([]byte(value), &config, yaml.Strict())
+	if err != nil {
+		errors = append(errors, fmt.Errorf(yaml.FormatError(err, false, true)))
 	}
 	return ws, errors
 }
