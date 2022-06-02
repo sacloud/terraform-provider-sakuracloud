@@ -20,7 +20,7 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
-	"github.com/sacloud/iaas-api-go"
+	"github.com/sacloud/webaccel-api-go"
 )
 
 func dataSourceSakuraCloudWebAccel() *schema.Resource {
@@ -89,22 +89,22 @@ func dataSourceSakuraCloudWebAccelRead(ctx context.Context, d *schema.ResourceDa
 		return diag.Errorf("name or domain required")
 	}
 
-	caller, _, err := sakuraCloudClient(d, meta)
+	client, _, err := sakuraCloudClient(d, meta)
 	if err != nil {
 		return diag.FromErr(err)
 	}
-	webAccelOp := iaas.NewWebAccelOp(caller)
+	webAccelOp := webaccel.NewOp(client.webaccelClient)
 
 	res, err := webAccelOp.List(ctx)
 	if err != nil {
 		return diag.Errorf("could not find SakuraCloud WebAccelerator resource: %s", err)
 	}
-	if res == nil || len(res.WebAccels) == 0 {
+	if res == nil || len(res.Sites) == 0 {
 		return filterNoResultErr()
 	}
-	var data *iaas.WebAccel
+	var data *webaccel.Site
 
-	for _, s := range res.WebAccels {
+	for _, s := range res.Sites {
 		if s.Name == name || s.Domain == domain {
 			data = s
 			break
@@ -114,16 +114,16 @@ func dataSourceSakuraCloudWebAccelRead(ctx context.Context, d *schema.ResourceDa
 		return filterNoResultErr()
 	}
 
-	d.SetId(data.ID.String())
+	d.SetId(data.ID)
 	d.Set("name", data.Name)
 	d.Set("domain", data.Domain)
 	d.Set("site_id", data.ID)
 	d.Set("origin", data.Origin)
 	d.Set("subdomain", data.Subdomain)
-	d.Set("domain_type", string(data.DomainType))
+	d.Set("domain_type", data.DomainType)
 	d.Set("has_certificate", data.HasCertificate)
 	d.Set("host_header", data.HostHeader)
-	d.Set("status", string(data.Status))
+	d.Set("status", data.Status)
 
 	d.Set("cname_record_value", data.Subdomain+".")
 	d.Set("txt_record_value", fmt.Sprintf("webaccel=%s", data.Subdomain))
