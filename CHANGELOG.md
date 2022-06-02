@@ -5,6 +5,7 @@
 FEATURES:
 
   - AutoScale [GH-895] (@yamamoto-febc)
+  - iaas-api-go/v1.1.2 [GH-896] (@yamamoto-febc)
 
 IMPROVEMENTS:
 
