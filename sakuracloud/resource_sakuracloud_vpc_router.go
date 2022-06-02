@@ -144,7 +144,7 @@ func resourceSakuraCloudVPCRouter() *schema.Resource {
 						"netmask": {
 							Type:             schema.TypeInt,
 							Required:         true,
-							ValidateDiagFunc: validation.ToDiagFunc(validation.IntBetween(16, 28)),
+							ValidateDiagFunc: validation.ToDiagFunc(validation.IntBetween(16, 29)),
 							Description:      "The bit length of the subnet to assign to the network interface",
 						},
 					},
