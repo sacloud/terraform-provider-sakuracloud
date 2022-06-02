@@ -133,17 +133,18 @@ func Provider() *schema.Provider {
 				Type:        schema.TypeString,
 				Optional:    true,
 				DefaultFunc: schema.EnvDefaultFunc("FAKE_MODE", ""),
-				Description: "The flag to enable fake of SakuraCloud API call. It is for debugging or developping the provider. It can also be sourced from the `FAKE_MODE` environment variables, or via a shared credentials file if `profile` is specified",
+				Description: "The flag to enable fake of SakuraCloud API call. It is for debugging or developing the provider. It can also be sourced from the `FAKE_MODE` environment variables, or via a shared credentials file if `profile` is specified",
 			},
 			"fake_store_path": {
 				Type:        schema.TypeString,
 				Optional:    true,
 				DefaultFunc: schema.EnvDefaultFunc("FAKE_STORE_PATH", ""),
-				Description: "The file path used by SakuraCloud API fake driver for storing fake data. It is for debugging or developping the provider. It can also be sourced from the `FAKE_STORE_PATH` environment variables, or via a shared credentials file if `profile` is specified",
+				Description: "The file path used by SakuraCloud API fake driver for storing fake data. It is for debugging or developing the provider. It can also be sourced from the `FAKE_STORE_PATH` environment variables, or via a shared credentials file if `profile` is specified",
 			},
 		},
 		DataSourcesMap: map[string]*schema.Resource{
 			"sakuracloud_archive":               dataSourceSakuraCloudArchive(),
+			"sakuracloud_auto_scale":            dataSourceSakuraCloudAutoScale(),
 			"sakuracloud_bridge":                dataSourceSakuraCloudBridge(),
 			"sakuracloud_cdrom":                 dataSourceSakuraCloudCDROM(),
 			"sakuracloud_certificate_authority": dataSourceSakuraCloudCertificateAuthority(),
@@ -175,6 +176,7 @@ func Provider() *schema.Provider {
 		},
 		ResourcesMap: map[string]*schema.Resource{
 			"sakuracloud_auto_backup":           resourceSakuraCloudAutoBackup(),
+			"sakuracloud_auto_scale":            resourceSakuraCloudAutoScale(),
 			"sakuracloud_archive":               resourceSakuraCloudArchive(),
 			"sakuracloud_archive_share":         resourceSakuraCloudArchiveShare(),
 			"sakuracloud_bridge":                resourceSakuraCloudBridge(),
