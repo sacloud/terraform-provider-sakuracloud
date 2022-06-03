@@ -50,7 +50,7 @@ resource "sakuracloud_server" "foobar" {
 ```
 ## Argument Reference
 
-* `api_key_id` - (Required) The disk id to backed up. Changing this forces a new resource to be created.
+* `api_key_id` - (Required) The id of the API key.. Changing this forces a new resource to be created.
 * `config` - (Required) The configuration file for sacloud/autoscaler.
 * `cpu_threshold_scaling` - (Required) A `cpu_threshold_scaling` block as defined below.
 * `description` - (Optional) The description of the AutoScale. The length of this value must be in the range [`1`-`512`].
@@ -63,9 +63,9 @@ resource "sakuracloud_server" "foobar" {
 
 A `cpu_threshold_scaling` block supports the following:
 
-* `server_prefix` - (Required) Threshold for average CPU utilization to scale up/out.
-* `up` - (Required) Threshold for average CPU utilization to scale down/in.
-* `down` - (Required) Server name prefix to be monitored.
+* `server_prefix` - (Required) Server name prefix to be monitored. 
+* `up` - (Required) Threshold for average CPU utilization to scale up/out. 
+* `down` - (Required) Threshold for average CPU utilization to scale down/in.
 
 
 ### Timeouts

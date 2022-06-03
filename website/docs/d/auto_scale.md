@@ -43,7 +43,7 @@ A `condition` block supports the following:
 ## Attribute Reference
 
 * `id` - The id of the sakuracloud_auto_scale.
-* `api_key_id` - The disk id to backed up.
+* `api_key_id` - The id of the API key.
 * `config` - The configuration file for sacloud/autoscaler.
 * `cpu_threshold_scaling` - A list of `cpu_threshold_scaling` blocks as defined below.
 * `description` - The description of the AutoScale.
@@ -56,6 +56,6 @@ A `condition` block supports the following:
 
 A `cpu_threshold_scaling` block exports the following:
 
-* `down` - Server name prefix to be monitored.
-* `server_prefix` - Threshold for average CPU utilization to scale up/out.
-* `up` - Threshold for average CPU utilization to scale down/in.
+* `server_prefix` - Server name prefix to be monitored.
+* `up` - Threshold for average CPU utilization to scale up/out.
+* `down` - Threshold for average CPU utilization to scale down/in.

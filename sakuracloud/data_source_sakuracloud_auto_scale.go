@@ -47,7 +47,7 @@ func dataSourceSakuraCloudAutoScale() *schema.Resource {
 			"api_key_id": {
 				Type:        schema.TypeString,
 				Computed:    true,
-				Description: "The disk id to backed up",
+				Description: "The id of the API key",
 			},
 			"cpu_threshold_scaling": {
 				Type:     schema.TypeList,

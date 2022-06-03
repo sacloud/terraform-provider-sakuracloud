@@ -59,7 +59,7 @@ func resourceSakuraCloudAutoScale() *schema.Resource {
 				Type:             schema.TypeString,
 				Required:         true,
 				ValidateDiagFunc: validation.ToDiagFunc(validateSakuracloudIDType),
-				Description:      "The disk id to backed up",
+				Description:      "The id of the API key",
 				ForceNew:         true,
 			},
 			"cpu_threshold_scaling": {
