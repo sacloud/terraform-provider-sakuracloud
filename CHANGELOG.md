@@ -1,6 +1,6 @@
 # CHANGELOG
 
-## 2.17.0 (Unreleased) 
+## 2.17.0 (2022-06-03) 
 
 FEATURES:
 
