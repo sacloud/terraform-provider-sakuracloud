@@ -14,6 +14,10 @@ IMPROVEMENTS:
   - github.com/hashicorp/hc-install v0.3.2 [GH-892] (@yamamoto-febc)
   - switch to iaas-service-go [GH-891] (@yamamoto-febc)
 
+MISC:
+
+  - docs: misc updates [GH-898] (@yamamoto-febc)
+
 ## 2.16.2 (2022-02-18)
 
 FEATURES:
