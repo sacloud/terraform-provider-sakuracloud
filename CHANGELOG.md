@@ -2,6 +2,9 @@
 
 ## 2.17.1 (Unreleased)
 
+FIXES: 
+  - sakuracloud_proxylb_acmeでruleが反映されない問題を修正 [GH-901] (@yamamoto-febc)
+
 DOCS:
    - yamlencodeからjsonencodeへ変更 [GH-900] (@yamamoto-febc)
 
