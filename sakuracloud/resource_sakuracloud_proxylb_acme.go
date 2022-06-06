@@ -175,6 +175,7 @@ func resourceSakuraCloudProxyLBACMECreate(ctx context.Context, d *schema.Resourc
 		SorryServer:   proxyLB.SorryServer,
 		BindPorts:     proxyLB.BindPorts,
 		Servers:       proxyLB.Servers,
+		Rules:         proxyLB.Rules,
 		LetsEncrypt:   le,
 		StickySession: proxyLB.StickySession,
 		Timeout:       proxyLB.Timeout,
@@ -238,6 +239,7 @@ func resourceSakuraCloudProxyLBACMEDelete(ctx context.Context, d *schema.Resourc
 		SorryServer: proxyLB.SorryServer,
 		BindPorts:   proxyLB.BindPorts,
 		Servers:     proxyLB.Servers,
+		Rules:       proxyLB.Rules,
 		LetsEncrypt: &iaas.ProxyLBACMESetting{
 			Enabled: false,
 		},
