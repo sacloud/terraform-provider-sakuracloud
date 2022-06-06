@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## 2.17.1 (Unreleased)
+
+DOCS:
+   - yamlencodeからjsonencodeへ変更 [GH-900] (@yamamoto-febc)
+
 ## 2.17.0 (2022-06-03) 
 
 FEATURES:
