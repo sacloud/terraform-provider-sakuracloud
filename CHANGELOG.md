@@ -1,6 +1,6 @@
 # CHANGELOG
 
-## 2.17.1 (Unreleased)
+## 2.17.1 (2022-06-06)
 
 FIXES: 
   - sakuracloud_proxylb_acmeでruleが反映されない問題を修正 [GH-901] (@yamamoto-febc)
