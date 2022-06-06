@@ -54,6 +54,7 @@ func TestAccSakuraCloudProxyLBACME_basic(t *testing.T) {
 					testCheckSakuraCloudProxyLBExists("sakuracloud_proxylb.foobar", &proxylb),
 					resource.TestCheckResourceAttr("sakuracloud_proxylb.foobar", "gzip", "true"),
 					resource.TestCheckResourceAttr("sakuracloud_proxylb.foobar", "proxy_protocol", "true"),
+					resource.TestCheckResourceAttr("sakuracloud_proxylb.foobar", "rule.#", "1"),
 					resource.TestCheckResourceAttr(resourceName, "certificate.#", "1"),
 					resource.TestCheckResourceAttr(resourceName, "certificate.0.common_name", "acme-acctest."+proxyLBDomain),
 					resource.TestCheckResourceAttr(resourceName,
@@ -91,6 +92,12 @@ resource "sakuracloud_proxylb" "foobar" {
   server {
     ip_address = sakuracloud_server.foobar.ip_address
     port       = 80
+    group      = "group1"
+  }
+  rule {
+    host  = "www.usacloud.com"
+    path  = "/"
+    group = "group1"
   }
 }
 
