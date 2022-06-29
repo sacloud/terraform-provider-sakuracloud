@@ -4,6 +4,7 @@
 
 DEVELOPMENTS:
   - sacloud/go-template@v0.0.2 [GH-902] (@yamamoto-febc)
+  - go: bump github.com/stretchr/testify from 1.7.1 to 1.7.5 [GH-903] (@dependabot)
 
 ## 2.17.1 (2022-06-06)
 
