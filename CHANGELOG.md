@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## 2.xx.x (Unreleased)
+
+DEVELOPMENTS:
+  - sacloud/go-template@v0.0.2 [GH-902] (@yamamoto-febc)
+
 ## 2.17.1 (2022-06-06)
 
 FIXES: 
