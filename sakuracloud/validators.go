@@ -22,7 +22,6 @@ import (
 	"strings"
 
 	"github.com/goccy/go-yaml"
-
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
 	autoScaler "github.com/sacloud/autoscaler/core"

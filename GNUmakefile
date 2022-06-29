@@ -11,66 +11,36 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+#====================
+AUTHOR          ?= The sacloud/terraform-provider-sakuracloud Authors
+COPYRIGHT_YEAR  ?= 2016-2022
+
+BIN            ?= terraform-provider-sakuracloud
+BUILD_LDFLAGS   ?= "-s -w -X github.com/sacloud/terraform-provider-sakuracloud/sakuracloud.Revision=`git rev-parse --short HEAD`"
+
+include includes/go/common.mk
+include includes/go/single.mk
+#====================
+export GOPROXY=https://proxy.golang.org
+
+default: fmt set-license go-licenses-check goimports lint docscheck testfake
 
 PKG_NAME     ?= sakuracloud
 WEBSITE_REPO  = github.com/hashicorp/terraform-website
-
-AUTHOR          ?="terraform-provider-sakuracloud authors"
-COPYRIGHT_YEAR  ?="2016-2022"
-COPYRIGHT_FILES ?=$$(find . \( -name "*.dockerfile" -or -name "*.go" -or -name "*.sh" -or -name "*.pl" -or -name "*.bash" \) -print)
 
 UNIT_TEST_UA ?= (Unit Test)
 ACC_TEST_UA ?= (Acceptance Test)
 
 export GO111MODULE=on
 
-default: fmt goimports set-license lint tflint docscheck
-
-clean:
-	rm -f $(CURDIR)/terraform-provider-sakuracloud
-
 .PHONY: tools
-tools:
-	go install golang.org/x/tools/cmd/goimports@latest
-	go install github.com/sacloud/addlicense@latest
-	go install github.com/bflad/tfproviderlint/cmd/tfproviderlintx@v0.27.1
-	go install github.com/client9/misspell/cmd/misspell@v0.3.4
+tools: dev-tools
+	go install github.com/bflad/tfproviderlint/cmd/tfproviderlintx@v0.28.1
 	go install github.com/bflad/tfproviderdocs@v0.9.1
-	curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/v1.43.0/install.sh | sh -s -- -b $$(go env GOPATH)/bin v1.43.0
-
-
-.PHONY: build-envs
-build-envs:
-	$(eval CURRENT_VERSION ?= $(shell gobump show -r sakuracloud/))
-	$(eval BUILD_LDFLAGS := "-s -w -X github.com/sacloud/terraform-provider-sakuracloud/sakuracloud.Revision=`git rev-parse --short HEAD`")
-
-.PHONY: build
-build: build-envs
-	GOOS=$${OS:-"`go env GOOS`"} GOARCH=$${ARCH:-"`go env GOARCH`"} CGO_ENABLED=0 go build -ldflags=$(BUILD_LDFLAGS)
-
-.PHONY: shasum
-shasum:
-	(cd bin/; shasum -a 256 * > terraform-provider-sakuracloud_$(CURRENT_VERSION)_SHA256SUMS)
-
-# .PHONY: release
-# release: build-envs
-# 	goreleaser release --rm-dist
-
-.PHONY: test
-test:
-	TF_ACC= SAKURACLOUD_APPEND_USER_AGENT="$(UNIT_TEST_UA)" go test -v $(TESTARGS) -timeout=30s ./...
-
-.PHONY: testacc
-testacc:
-	TF_ACC=1 SAKURACLOUD_APPEND_USER_AGENT="$(ACC_TEST_UA)" go test -v $(TESTARGS) -timeout 240m ./...
 
 .PHONY: testfake
 testfake:
 	FAKE_MODE=1 TF_ACC=1 SAKURACLOUD_APPEND_USER_AGENT="$(ACC_TEST_UA)" go test -v $(TESTARGS) -timeout 240m ./...
-
-.PHONY: lint
-lint:
-	golangci-lint run ./...
 
 .PHONY: tflint
 tflint:
@@ -85,23 +55,11 @@ tflint:
         -XR001 -XR004 \
         ./$(PKG_NAME)
 
-.PHONY: goimports
-goimports:
-	goimports -l -w $(PKG_NAME)/
-
-.PHONY: fmt
-fmt:
-	find . -name '*.go' | xargs gofmt -s -w
-
 .PHONY: docscheck
 docscheck:
 	tfproviderdocs check \
 		-require-resource-subcategory \
 		-require-guide-subcategory
-
-.PHONY: set-license
-set-license:
-	addlicense -c $(AUTHOR) -y $(COPYRIGHT_YEAR) $(COPYRIGHT_FILES)
 
 .PHONY: website
 website:
