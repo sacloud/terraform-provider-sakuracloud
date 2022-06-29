@@ -3,12 +3,49 @@ on: [push, pull_request]
 env:
   GOPROXY: https://proxy.golang.org
 jobs:
-  lint:
-    name: lint
+  lint-text:
+    name: lint-text
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
+
+      - name: Unshallow
+        run: git fetch --prune --unshallow
+
+      - name: lint a document with textlint
+        uses: sacloud/textlint-action@v0.0.1
+        # with:
+        #   working-directory: .
+  lint-go:
+    name: lint-go
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Unshallow
+        run: git fetch --prune --unshallow
+
+      - name: Set up Go
+        uses: actions/setup-go@v3
+        with:
+          go-version: 1.18
+
+      - name: Setup tools
+        run: | 
+          make tools
+
+      - name: make lint-go
+        run:  |
+          make lint-go
+
+  licenses-check:
+    name: licenses-check
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
 
       - name: Unshallow
         run: git fetch --prune --unshallow
@@ -16,54 +53,35 @@ jobs:
       - name: Set up Go
         uses: actions/setup-go@v2
         with:
-          go-version: 1.17
+          go-version: 1.18
 
       - name: Setup tools
         run: make tools
 
-      - name: make lint
-        run: make lint
-  tflint:
-    name: tflint
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v2
-
-      - name: Unshallow
-        run: git fetch --prune --unshallow
-
-      - name: Set up Go
-        uses: actions/setup-go@v2
-        with:
-          go-version: 1.17
-
-      - name: Setup tools
-        run: make tools
-
-      - name: make tflint
-        run: make tflint
+      - name: make go-licenses-check
+        run: make go-licenses-check
   test:
     name: test
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [macos-latest, windows-latest, ubuntu-18.04]
+        os: [macos-latest, windows-latest, ubuntu-22.04, ubuntu-20.04]
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: Unshallow
         run: git fetch --prune --unshallow
 
       - name: Set up Go
-        uses: actions/setup-go@v2
+        uses: actions/setup-go@v3
         with:
-          go-version: 1.17
+          go-version: 1.18
 
       - name: Setup tools
-        run: make tools
+        run: | 
+          make tools
 
-      - name: make testfake
-        run: make testfake
-
+      - name: make test
+        run: |
+          make test
