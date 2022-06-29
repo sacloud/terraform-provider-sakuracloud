@@ -20,6 +20,8 @@ import (
 	"strings"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
+	"golang.org/x/text/cases"
+	"golang.org/x/text/language"
 )
 
 type Attribute struct {
@@ -128,7 +130,7 @@ func NewSchema(sc map[string]*schema.Schema, parents ...string) *Schema {
 			}
 			if elemIsResource(s) && arg.Description == "" {
 				if s.MaxItems == 1 {
-					article := strings.Title(indefiniteArticle(name))
+					article := cases.Title(language.English).String(indefiniteArticle(name))
 					arg.Description = fmt.Sprintf("%s `%s` block as defined below", article, name)
 				} else {
 					arg.Description = fmt.Sprintf("One or more `%s` blocks as defined below", name)

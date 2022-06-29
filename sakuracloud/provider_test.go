@@ -15,7 +15,6 @@
 package sakuracloud
 
 import (
-	"fmt"
 	"os"
 	"testing"
 
@@ -61,7 +60,7 @@ func testAccPreCheck(t *testing.T) {
 	} else {
 		for _, env := range requiredEnvs {
 			if v := os.Getenv(env); v == "" {
-				t.Fatal(fmt.Sprintf("%s must be set for acceptance tests", env))
+				t.Fatalf("%s must be set for acceptance tests", env)
 			}
 		}
 	}

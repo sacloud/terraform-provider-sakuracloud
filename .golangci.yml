@@ -1,6 +1,5 @@
 run:
   deadline: 10m10s
-  modules-download-mode: readonly
 
 issues:
   max-per-linter: 0
