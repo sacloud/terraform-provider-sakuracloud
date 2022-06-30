@@ -15,9 +15,7 @@
 package main
 
 import (
-	"context"
 	"flag"
-	"log"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/plugin"
 	"github.com/sacloud/terraform-provider-sakuracloud/sakuracloud"
@@ -29,16 +27,13 @@ func main() {
 	flag.BoolVar(&debugMode, "debug", false, "set to true to run the provider with support for debuggers like delve")
 	flag.Parse()
 
-	if debugMode {
-		err := plugin.Debug(context.Background(), "registry.terraform.io/sacloud/sakuracloud",
-			&plugin.ServeOpts{
-				ProviderFunc: sakuracloud.Provider,
-			})
-		if err != nil {
-			log.Println(err.Error())
-		}
-	} else {
-		plugin.Serve(&plugin.ServeOpts{
-			ProviderFunc: sakuracloud.Provider})
+	opts := &plugin.ServeOpts{
+		ProviderFunc: sakuracloud.Provider,
 	}
+
+	if debugMode {
+		opts.ProviderAddr = "registry.terraform.io/sacloud/sakuracloud"
+		opts.Debug = true
+	}
+	plugin.Serve(opts)
 }
