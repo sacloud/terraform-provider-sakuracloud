@@ -109,7 +109,7 @@ func filterSchema(opt *filterSchemaOption) *schema.Schema {
 var filterNoResultMessage = "Your query returned no results. Please change your filter or selectors and try again"
 
 func filterNoResultErr() diag.Diagnostics {
-	if os.Getenv(resource.TestEnvVar) != "" {
+	if os.Getenv(resource.EnvTfAcc) != "" {
 		return nil
 	}
 	return diag.Errorf(filterNoResultMessage)
