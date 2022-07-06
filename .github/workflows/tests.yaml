@@ -14,7 +14,7 @@ jobs:
         run: git fetch --prune --unshallow
 
       - name: lint a document with textlint
-        uses: sacloud/textlint-action@v0.0.1
+        uses: sacloud/textlint-action@v0.0.3
         # with:
         #   working-directory: .
   lint-go:
