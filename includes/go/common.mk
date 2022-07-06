@@ -27,12 +27,12 @@ TEXTLINT_ACTION_VERSION ?= v0.0.3
 .PHONY: test
 test:
 	@echo "running 'go test'..."
-	TESTACC= $(GO) test ./... $(TESTARGS) -v -timeout=120m -parallel=8 -race;
+	TF_ACC= SAKURACLOUD_APPEND_USER_AGENT="$(UNIT_TEST_UA)" go test -v $(TESTARGS) -timeout=30s ./...
 
 .PHONY: testacc
 testacc:
 	@echo "running 'go test' with TESTACC=1..."
-	TESTACC=1 $(GO) test ./... $(TESTARGS) --tags=acctest -v -timeout=120m -parallel=8 ;
+	TF_ACC=1 SAKURACLOUD_APPEND_USER_AGENT="$(ACC_TEST_UA)" go test -v $(TESTARGS) -timeout 240m ./...
 
 .PHONY: dev-tools
 dev-tools:
