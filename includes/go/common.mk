@@ -20,7 +20,7 @@ COPYRIGHT_FILES         ?= $$(find . -name "*.go" -print | grep -v "/vendor/")
 GO                      ?= go
 DEFAULT_GOALS           ?= fmt set-license go-licenses-check goimports lint test
 GOLANG_CI_LINT_VERSION  ?= v1.46.2
-TEXTLINT_ACTION_VERSION ?= v0.0.1
+TEXTLINT_ACTION_VERSION ?= v0.0.3
 
 .DEFAULT_GOAL = default
 
@@ -41,6 +41,7 @@ dev-tools:
 	$(GO) install github.com/sacloud/addlicense@latest
 	$(GO) install github.com/client9/misspell/cmd/misspell@latest
 	$(GO) install github.com/google/go-licenses@v1.0.0
+	$(GO) install github.com/rhysd/actionlint/cmd/actionlint@latest
 	curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $$(go env GOPATH)/bin $(GOLANG_CI_LINT_VERSION)
 
 .PHONY: goimports
@@ -57,8 +58,8 @@ fmt:
 godoc:
 	godoc -http=localhost:6060
 
-.PHONY: lint lint-go
-lint: lint-go lint-text
+.PHONY: lint
+lint: lint-go lint-text lint-action
 
 .PHONY: lint-go
 lint-go:
@@ -69,7 +70,12 @@ lint-go:
 textlint: lint-text
 lint-text:
 	@echo "running textlint..."
-	@docker run -it --rm -v $$PWD:/work -w /work ghcr.io/sacloud/textlint-action:$(TEXTLINT_ACTION_VERSION) .
+	@docker run -t --rm -v $$PWD:/work -w /work ghcr.io/sacloud/textlint-action:$(TEXTLINT_ACTION_VERSION) .
+
+.PHONY: lint-action
+lint-action:
+	@echo "running rhysd/actionlint..."
+	@actionlint
 
 .PHONY: set-license
 set-license:
