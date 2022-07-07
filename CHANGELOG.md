@@ -6,6 +6,7 @@ DEVELOPMENTS:
   - iaas-api-go@v1.2 [GH-917] (@yamamoto-febc)
   - sacloud/go-template@v0.0.5 [GH-913 , GH-916] (@yamamoto-febc)
   - sacloud/go-template@v0.0.2 [GH-902] (@yamamoto-febc)
+  - go: bump github.com/hashicorp/terraform-plugin-sdk/v2 from 2.17.0 to 2.18.0 [GH-910] (@dependabot)
   - go: bump github.com/stretchr/testify from 1.7.1 to 1.7.5 [GH-903] (@dependabot)
   - go: bump github.com/sacloud/iaas-service-go from 1.1.2 to 1.1.3 [GH-905] (@dependabot)
   - go: bump github.com/sacloud/api-client-go from 0.1.0 to 0.2.0 [GH-906] (@dependabot)
