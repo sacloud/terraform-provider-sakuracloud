@@ -10,12 +10,12 @@ require (
 	github.com/sacloud/api-client-go v0.2.0
 	github.com/sacloud/autoscaler v0.7.1-0.20220630000602-0055057da3cb
 	github.com/sacloud/ftps v1.1.0
-	github.com/sacloud/iaas-api-go v1.1.2
+	github.com/sacloud/iaas-api-go v1.2.1
 	github.com/sacloud/iaas-service-go v1.1.3
 	github.com/sacloud/iso9660wrap v0.0.0-20171031075302-eda21f77f6a8
 	github.com/sacloud/packages-go v0.0.3
 	github.com/sacloud/webaccel-api-go v1.1.2
-	github.com/stretchr/testify v1.7.5
+	github.com/stretchr/testify v1.8.0
 	golang.org/x/text v0.3.7
 )
 
@@ -30,7 +30,7 @@ require (
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/fatih/color v1.10.0 // indirect
 	github.com/fatih/structs v1.1.0 // indirect
-	github.com/fsnotify/fsnotify v1.5.1 // indirect
+	github.com/fsnotify/fsnotify v1.5.4 // indirect
 	github.com/go-kit/log v0.2.0 // indirect
 	github.com/go-logfmt/logfmt v0.5.1 // indirect
 	github.com/go-playground/locales v0.14.0 // indirect
