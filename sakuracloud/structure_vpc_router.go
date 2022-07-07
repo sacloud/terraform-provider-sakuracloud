@@ -618,20 +618,22 @@ func flattenVPCRouterPortForwardings(vpcRouter *iaas.VPCRouter) []interface{} {
 	return portForwardings
 }
 
-func expandVPCRouterSiteToSiteList(d resourceValueGettable) []*iaas.VPCRouterSiteToSiteIPsecVPN {
+func expandVPCRouterSiteToSiteList(d resourceValueGettable) *iaas.VPCRouterSiteToSiteIPsecVPN {
 	if values, ok := getListFromResource(d, "site_to_site_vpn"); ok && len(values) > 0 {
-		var results []*iaas.VPCRouterSiteToSiteIPsecVPN
+		var results []*iaas.VPCRouterSiteToSiteIPsecVPNConfig
 		for _, raw := range values {
 			v := mapToResourceData(raw.(map[string]interface{}))
 			results = append(results, expandVPCRouterSiteToSite(v))
 		}
-		return results
+		return &iaas.VPCRouterSiteToSiteIPsecVPN{
+			Config: results,
+		}
 	}
 	return nil
 }
 
-func expandVPCRouterSiteToSite(d resourceValueGettable) *iaas.VPCRouterSiteToSiteIPsecVPN {
-	return &iaas.VPCRouterSiteToSiteIPsecVPN{
+func expandVPCRouterSiteToSite(d resourceValueGettable) *iaas.VPCRouterSiteToSiteIPsecVPNConfig {
+	return &iaas.VPCRouterSiteToSiteIPsecVPNConfig{
 		Peer:            stringOrDefault(d, "peer"),
 		RemoteID:        stringOrDefault(d, "remote_id"),
 		PreSharedSecret: stringOrDefault(d, "pre_shared_secret"),
@@ -642,14 +644,16 @@ func expandVPCRouterSiteToSite(d resourceValueGettable) *iaas.VPCRouterSiteToSit
 
 func flattenVPCRouterSiteToSite(vpcRouter *iaas.VPCRouter) []interface{} {
 	var s2sSettings []interface{}
-	for _, s := range vpcRouter.Settings.SiteToSiteIPsecVPN {
-		s2sSettings = append(s2sSettings, map[string]interface{}{
-			"local_prefix":      stringListToSet(s.LocalPrefix),
-			"peer":              s.Peer,
-			"pre_shared_secret": s.PreSharedSecret,
-			"remote_id":         s.RemoteID,
-			"routes":            stringListToSet(s.Routes),
-		})
+	if vpcRouter.Settings.SiteToSiteIPsecVPN != nil {
+		for _, s := range vpcRouter.Settings.SiteToSiteIPsecVPN.Config {
+			s2sSettings = append(s2sSettings, map[string]interface{}{
+				"local_prefix":      stringListToSet(s.LocalPrefix),
+				"peer":              s.Peer,
+				"pre_shared_secret": s.PreSharedSecret,
+				"remote_id":         s.RemoteID,
+				"routes":            stringListToSet(s.Routes),
+			})
+		}
 	}
 	return s2sSettings
 }
