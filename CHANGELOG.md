@@ -3,7 +3,7 @@
 ## 2.xx.x (Unreleased)
 
 DEVELOPMENTS:
-  - sacloud/go-template@v0.0.5 [GH-913] (@yamamoto-febc)
+  - sacloud/go-template@v0.0.5 [GH-913 , GH-916] (@yamamoto-febc)
   - sacloud/go-template@v0.0.2 [GH-902] (@yamamoto-febc)
   - go: bump github.com/stretchr/testify from 1.7.1 to 1.7.5 [GH-903] (@dependabot)
   - go: bump github.com/sacloud/iaas-service-go from 1.1.2 to 1.1.3 [GH-905] (@dependabot)
