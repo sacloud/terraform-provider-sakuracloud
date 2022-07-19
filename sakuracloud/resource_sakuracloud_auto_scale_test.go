@@ -224,7 +224,7 @@ resource "sakuracloud_auto_scale" "foobar" {
     resources: [{
       type: "Server",
       selector: {
-        names: ["{{ .arg0 }}"],
+        names: [sakuracloud_server.foobar.name],
         zones: ["is1a"],
       },
       shutdown_force: true,
@@ -273,7 +273,7 @@ resource "sakuracloud_auto_scale" "foobar" {
     resources: [{
       type: "Server",
       selector: {
-        names: ["{{ .arg0 }}"],
+        names: [sakuracloud_server.foobar.name],
         zones: ["is1a"],
       },
       shutdown_force: true,
