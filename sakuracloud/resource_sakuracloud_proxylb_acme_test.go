@@ -19,6 +19,7 @@ import (
 	"os"
 	"testing"
 
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/acctest"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
 	"github.com/sacloud/iaas-api-go"
 )
@@ -34,6 +35,8 @@ func TestAccSakuraCloudProxyLBACME_basic(t *testing.T) {
 	skipIfEnvIsNotSet(t, envProxyLBACMEDomain)
 
 	rand := randomName()
+	subDomain := "acme-acctest1" + acctest.RandStringFromCharSet(5, acctest.CharSetAlpha)
+
 	proxyLBDomain = os.Getenv(envProxyLBACMEDomain)
 
 	var proxylb iaas.ProxyLB
@@ -49,17 +52,17 @@ func TestAccSakuraCloudProxyLBACME_basic(t *testing.T) {
 		),
 		Steps: []resource.TestStep{
 			{
-				Config: buildConfigWithArgs(testAccSakuraCloudProxyLBACME_basic, rand, proxyLBDomain),
+				Config: buildConfigWithArgs(testAccSakuraCloudProxyLBACME_basic, rand, proxyLBDomain, subDomain),
 				Check: resource.ComposeTestCheckFunc(
 					testCheckSakuraCloudProxyLBExists("sakuracloud_proxylb.foobar", &proxylb),
 					resource.TestCheckResourceAttr("sakuracloud_proxylb.foobar", "gzip", "true"),
 					resource.TestCheckResourceAttr("sakuracloud_proxylb.foobar", "proxy_protocol", "true"),
 					resource.TestCheckResourceAttr("sakuracloud_proxylb.foobar", "rule.#", "1"),
 					resource.TestCheckResourceAttr(resourceName, "certificate.#", "1"),
-					resource.TestCheckResourceAttr(resourceName, "certificate.0.common_name", "acme-acctest."+proxyLBDomain),
+					resource.TestCheckResourceAttr(resourceName, "certificate.0.common_name", subDomain+"."+proxyLBDomain),
 					resource.TestCheckResourceAttr(resourceName,
 						"certificate.0.subject_alt_names",
-						fmt.Sprintf("acme-acctest.%s, acme-acctest2.%s, acme-acctest3.%s", proxyLBDomain, proxyLBDomain, proxyLBDomain),
+						fmt.Sprintf("%s.%s, acme-acctest2.%s, acme-acctest3.%s", subDomain, proxyLBDomain, proxyLBDomain, proxyLBDomain),
 					),
 				),
 			},
@@ -104,7 +107,7 @@ resource "sakuracloud_proxylb" "foobar" {
 resource sakuracloud_proxylb_acme "foobar" {
   proxylb_id        = sakuracloud_proxylb.foobar.id
   accept_tos        = true
-  common_name       = "acme-acctest.{{ .arg1 }}"
+  common_name       = "{{ .arg2 }}.{{ .arg1 }}"
   subject_alt_names = ["acme-acctest2.{{ .arg1 }}", "acme-acctest3.{{ .arg1 }}"]
 
   update_delay_sec             = 120
@@ -136,7 +139,7 @@ data sakuracloud_dns "zone" {
 
 resource "sakuracloud_dns_record" "record" {
   dns_id = data.sakuracloud_dns.zone.id
-  name   = "acme-acctest"
+  name   = "{{ .arg2 }}"
   type   = "CNAME"
   value  = "${sakuracloud_proxylb.foobar.fqdn}."
   ttl    = 10
