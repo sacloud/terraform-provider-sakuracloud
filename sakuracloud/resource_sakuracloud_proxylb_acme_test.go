@@ -106,7 +106,9 @@ resource sakuracloud_proxylb_acme "foobar" {
   accept_tos        = true
   common_name       = "acme-acctest.{{ .arg1 }}"
   subject_alt_names = ["acme-acctest2.{{ .arg1 }}", "acme-acctest3.{{ .arg1 }}"]
-  update_delay_sec  = 120
+
+  update_delay_sec             = 120
+  get_certificates_timeout_sec = 300
 }
 
 data sakuracloud_archive "ubuntu" {
