@@ -7,6 +7,7 @@ FEATURES:
 
 IMPROVEMENTS:
   - オートスケーラーのテスト改善 [GH-927] (@yamamoto-febc)
+  - Let's Encryptのレートリミットエラー回避対応 [GH-928] (@yamamoto-febc)
 
 DEVELOPMENTS:
   - iaas-api-go@v1.2 [GH-917] (@yamamoto-febc)
