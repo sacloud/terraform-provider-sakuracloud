@@ -18,7 +18,9 @@ resource sakuracloud_proxylb_acme "foobar" {
   accept_tos       = true
   common_name      = "www.example.com"
   subject_alt_names = ["www1.example.com"]
-  update_delay_sec = 120
+  
+  update_delay_sec             = 120 
+  get_certificates_timeout_sec = 120 
 }
 
 data "sakuracloud_proxylb" "foobar" {
@@ -35,6 +37,7 @@ data "sakuracloud_proxylb" "foobar" {
 * `proxylb_id` - (Required) The id of the ProxyLB that set ACME settings to. Changing this forces a new resource to be created.
 * `subject_alt_names` - (Optional) The Subject alternative names used by ACME. Changing this forces a new resource to be created.
 * `update_delay_sec` - (Optional) The wait time in seconds. This typically used for waiting for a DNS propagation. Changing this forces a new resource to be created.
+* `get_certificates_timeout_sec` - (Optional) The timeout in seconds for the certificate acquisition to complete.
 
 ### Timeouts
 
