@@ -22,6 +22,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
 	"github.com/sacloud/iaas-api-go"
+	"github.com/sacloud/iaas-api-go/types"
 )
 
 func resourceSakuraCloudProxyLBACME() *schema.Resource {
@@ -71,6 +72,13 @@ func resourceSakuraCloudProxyLBACME() *schema.Resource {
 				Optional:    true,
 				ForceNew:    true,
 				Description: "The wait time in seconds. This typically used for waiting for a DNS propagation",
+			},
+			"get_certificates_timeout_sec": {
+				Type:        schema.TypeInt,
+				Optional:    true,
+				ForceNew:    true,
+				Default:     120,
+				Description: "The timeout in seconds for the certificate acquisition to complete",
 			},
 			"certificate": {
 				Type:     schema.TypeList,
@@ -191,6 +199,10 @@ func resourceSakuraCloudProxyLBACMECreate(ctx context.Context, d *schema.Resourc
 		return diag.Errorf("renewing ACME Certificates at ProxyLB[%s] is failed: %s", proxyLBID, err)
 	}
 
+	if diag := waitForProxyLBCertAcquision(ctx, d, meta); diag != nil {
+		return diag
+	}
+
 	d.SetId(proxyLBID)
 	return resourceSakuraCloudProxyLBACMERead(ctx, d, meta)
 }
@@ -262,18 +274,10 @@ func setProxyLBACMEResourceData(ctx context.Context, d *schema.ResourceData, cli
 	proxyLBOp := iaas.NewProxyLBOp(client)
 
 	// certificates
-	var cert *iaas.ProxyLBCertificates
-	var err error
-	for i := 0; i < 5; i++ { // 作成直後はcertが空になるため数回リトライする
-		cert, err = proxyLBOp.GetCertificates(ctx, data.ID)
-		if err != nil {
-			// even if certificate is deleted, it will not result in an error
-			return diag.FromErr(err)
-		}
-		if cert.PrimaryCert != nil && cert.PrimaryCert.ServerCertificate != "" {
-			break
-		}
-		time.Sleep(10 * time.Second)
+	cert, err := proxyLBOp.GetCertificates(ctx, data.ID)
+	if err != nil {
+		// even if certificate is deleted, it will not result in an error
+		return diag.FromErr(err)
 	}
 
 	proxylbCert := make(map[string]interface{})
@@ -300,4 +304,35 @@ func setProxyLBACMEResourceData(ctx context.Context, d *schema.ResourceData, cli
 		return diag.FromErr(err)
 	}
 	return nil
+}
+
+func waitForProxyLBCertAcquision(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
+	client, _, err := sakuraCloudClient(d, meta)
+	if err != nil {
+		return diag.FromErr(err)
+	}
+
+	proxyLBOp := iaas.NewProxyLBOp(client)
+	proxyLBID := d.Get("proxylb_id").(string)
+
+	getCertTimeout := d.Get("get_certificates_timeout_sec").(int)
+	waitCtx, cancel := context.WithTimeout(ctx, time.Duration(getCertTimeout)*time.Second)
+	defer cancel()
+
+	for {
+		select {
+		case <-waitCtx.Done():
+			return diag.Errorf("Waiting for certificate acquisition failed: %s", waitCtx.Err())
+		default:
+			cert, err := proxyLBOp.GetCertificates(ctx, types.StringID(proxyLBID))
+			if err != nil {
+				// even if certificate is deleted, it will not result in an error
+				return diag.FromErr(err)
+			}
+			if cert.PrimaryCert != nil && cert.PrimaryCert.ServerCertificate != "" {
+				return nil
+			}
+			time.Sleep(5 * time.Second)
+		}
+	}
 }
