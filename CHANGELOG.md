@@ -2,8 +2,11 @@
 
 ## 2.xx.x (Unreleased)
 
-FEATURE:
+FEATURES:
   - エンハンスドロードバランサでの証明書取得待ち処理の改善 [GH-925] (@yamamoto-febc)
+
+IMPROVEMENTS:
+  - オートスケーラーのテスト改善 [GH-927] (@yamamoto-febc)
 
 DEVELOPMENTS:
   - iaas-api-go@v1.2 [GH-917] (@yamamoto-febc)
