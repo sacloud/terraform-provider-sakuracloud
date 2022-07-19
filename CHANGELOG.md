@@ -2,6 +2,9 @@
 
 ## 2.xx.x (Unreleased)
 
+FEATURE:
+  - エンハンスドロードバランサでの証明書取得待ち処理の改善 [GH-925] (@yamamoto-febc)
+
 DEVELOPMENTS:
   - iaas-api-go@v1.2 [GH-917] (@yamamoto-febc)
   - sacloud/go-template@v0.0.5 [GH-913 , GH-916] (@yamamoto-febc)
