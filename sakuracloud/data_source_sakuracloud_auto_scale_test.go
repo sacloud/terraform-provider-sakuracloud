@@ -76,7 +76,7 @@ resource "sakuracloud_auto_scale" "foobar" {
     resources: [{
       type: "Server",
       selector: {
-        names: ["{{ .arg0 }}"],
+        names: [sakuracloud_server.foobar.name],
         zones: ["is1a"],
       },
       shutdown_force: true,
@@ -85,7 +85,7 @@ resource "sakuracloud_auto_scale" "foobar" {
   api_key_id = "{{ .arg1 }}"
 
   cpu_threshold_scaling {
-    server_prefix = "{{ .arg0 }}"
+    server_prefix = sakuracloud_server.foobar.name
 
     up   = 80
     down = 20
