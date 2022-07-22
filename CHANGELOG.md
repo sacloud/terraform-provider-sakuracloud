@@ -6,6 +6,7 @@ FEATURES:
   - エンハンスドロードバランサでの証明書取得待ち処理の改善 [GH-925] (@yamamoto-febc)
 
 IMPROVEMENTS:
+  - オートスケーラーのテスト改善 [GH-930] (@yamamoto-febc)
   - オートスケーラーのテスト改善 [GH-927] (@yamamoto-febc)
   - Let's Encryptのレートリミットエラー回避対応 [GH-928] (@yamamoto-febc)
 
