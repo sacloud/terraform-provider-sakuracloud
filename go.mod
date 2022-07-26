@@ -13,7 +13,7 @@ require (
 	github.com/sacloud/iaas-api-go v1.2.1
 	github.com/sacloud/iaas-service-go v1.2.0
 	github.com/sacloud/iso9660wrap v0.0.0-20171031075302-eda21f77f6a8
-	github.com/sacloud/packages-go v0.0.3
+	github.com/sacloud/packages-go v0.0.4
 	github.com/sacloud/webaccel-api-go v1.1.2
 	github.com/stretchr/testify v1.8.0
 	golang.org/x/text v0.3.7
@@ -35,7 +35,7 @@ require (
 	github.com/go-logfmt/logfmt v0.5.1 // indirect
 	github.com/go-playground/locales v0.14.0 // indirect
 	github.com/go-playground/universal-translator v0.18.0 // indirect
-	github.com/go-playground/validator/v10 v10.10.1 // indirect
+	github.com/go-playground/validator/v10 v10.11.0 // indirect
 	github.com/golang/protobuf v1.5.2 // indirect
 	github.com/google/go-cmp v0.5.8 // indirect
 	github.com/hashicorp/errwrap v1.0.0 // indirect

@@ -131,8 +131,8 @@ github.com/go-playground/universal-translator v0.17.0/go.mod h1:UkSxE5sNxxRwHyU+
 github.com/go-playground/universal-translator v0.18.0 h1:82dyy6p4OuJq4/CByFNOn/jYrnRPArHwAcmLoJZxyho=
 github.com/go-playground/universal-translator v0.18.0/go.mod h1:UvRDBj+xPUEGrFYl+lu/H90nyDXpg0fqeB/AQUGNTVA=
 github.com/go-playground/validator/v10 v10.4.1/go.mod h1:nlOn6nFhuKACm19sB/8EGNn9GlaMV7XkbRSipzJ0Ii4=
-github.com/go-playground/validator/v10 v10.10.1 h1:uA0+amWMiglNZKZ9FJRKUAe9U3RX91eVn1JYXMWt7ig=
-github.com/go-playground/validator/v10 v10.10.1/go.mod h1:i+3WkQ1FvaUjjxh1kSvIA4dMGDBiPU55YFDl0WbKdWU=
+github.com/go-playground/validator/v10 v10.11.0 h1:0W+xRM511GY47Yy3bZUbJVitCNg2BOGlCyvTqsp/xIw=
+github.com/go-playground/validator/v10 v10.11.0/go.mod h1:i+3WkQ1FvaUjjxh1kSvIA4dMGDBiPU55YFDl0WbKdWU=
 github.com/go-stack/stack v1.8.0/go.mod h1:v0f6uXyyMGvRgIKkXu+yp6POWl0qKG85gN/melR3HDY=
 github.com/go-test/deep v1.0.3 h1:ZrJSEWsXzPOxaZnFteGEfooLba+ju3FYIbOrS+rQd68=
 github.com/goccy/go-yaml v1.9.5 h1:Eh/+3uk9kLxG4koCX6lRMAPS1OaMSAi+FJcya0INdB0=
@@ -363,8 +363,8 @@ github.com/sacloud/iaas-service-go v1.2.0 h1:cfVAG1IPVV0gRyZ+onPq9qOhsBV8AEAM1A3
 github.com/sacloud/iaas-service-go v1.2.0/go.mod h1:mi88b6BqTtYqVjSitdVg5qSiyINdhuKdShY+3MFWIwQ=
 github.com/sacloud/iso9660wrap v0.0.0-20171031075302-eda21f77f6a8 h1:5piK7EELHKRxGqBjgVEHsdfsFwEzF/Kds/bMWLS6gCw=
 github.com/sacloud/iso9660wrap v0.0.0-20171031075302-eda21f77f6a8/go.mod h1:1jHHCa624cG5rODkWmourombJaNmkY9/SBHWhLJcg+w=
-github.com/sacloud/packages-go v0.0.3 h1:MtUVkZyAwvr3drjjTj4PKssRrm3hRGWPdEj+skIHbUA=
-github.com/sacloud/packages-go v0.0.3/go.mod h1:Eny1qnbKr9n/5yfXDiwOC+0YMiBhK1HBYGjjmxes+CI=
+github.com/sacloud/packages-go v0.0.4 h1:WrmHr7ERmZNes9ZTgRCFBpakZEBeUixWcDvk9J02gK4=
+github.com/sacloud/packages-go v0.0.4/go.mod h1:XWMBSNHT9YKY3lCh6yJsx1o1RRQQGpuhNqJA6bSHdD4=
 github.com/sacloud/webaccel-api-go v1.1.2 h1:xDZqGSpa0g9mhTgZ+Xaod9HKaHX7opqX1JPEEEyEd7o=
 github.com/sacloud/webaccel-api-go v1.1.2/go.mod h1:GThzM8mxWVw4acwRQFDJOIIlBl2+l2Ciav8vD697zeQ=
 github.com/sebdah/goldie v1.0.0/go.mod h1:jXP4hmWywNEwZzhMuv2ccnqTSFpuq8iyQhtQdkkZBH4=
