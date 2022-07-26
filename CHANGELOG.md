@@ -11,6 +11,7 @@ IMPROVEMENTS:
   - Let's Encryptのレートリミットエラー回避対応 [GH-928] (@yamamoto-febc)
 
 DEVELOPMENTS:
+  - go: bump github.com/hashicorp/terraform-plugin-sdk/v2 from 2.18.0 to 2.19.0 [GH-923] (@dependabot)
   - iaas-api-go@v1.2 [GH-917] (@yamamoto-febc)
   - sacloud/go-template@v0.0.5 [GH-913 , GH-916] (@yamamoto-febc)
   - sacloud/go-template@v0.0.2 [GH-902] (@yamamoto-febc)
