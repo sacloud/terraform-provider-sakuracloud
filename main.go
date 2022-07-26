@@ -15,25 +15,45 @@
 package main
 
 import (
+	"context"
 	"flag"
+	"log"
 
-	"github.com/hashicorp/terraform-plugin-sdk/v2/plugin"
+	"github.com/hashicorp/terraform-plugin-go/tfprotov5/tf5server"
+	"github.com/hashicorp/terraform-plugin-mux/tf5muxserver"
 	"github.com/sacloud/terraform-provider-sakuracloud/sakuracloud"
 )
 
 func main() {
-	var debugMode bool
-
-	flag.BoolVar(&debugMode, "debug", false, "set to true to run the provider with support for debuggers like delve")
+	debugFlag := flag.Bool("debug", false, "Start provider in debug mode.")
 	flag.Parse()
 
-	opts := &plugin.ServeOpts{
-		ProviderFunc: sakuracloud.Provider,
+	serverFactory, err := sakuracloud.ProtoV5ProviderServerFactory(context.Background())
+	if err != nil {
+		log.Fatal(err)
 	}
 
-	if debugMode {
-		opts.ProviderAddr = "registry.terraform.io/sacloud/sakuracloud"
-		opts.Debug = true
+	muxServer, err := tf5muxserver.NewMuxServer(context.Background(), serverFactory)
+	if err != nil {
+		log.Fatal(err)
 	}
-	plugin.Serve(opts)
+
+	var serveOpts []tf5server.ServeOpt
+	if *debugFlag {
+		serveOpts = append(serveOpts, tf5server.WithManagedDebug())
+	}
+
+	logFlags := log.Flags()
+	logFlags = logFlags &^ (log.Ldate | log.Ltime)
+	log.SetFlags(logFlags)
+
+	err = tf5server.Serve(
+		"registry.terraform.io/sacloud/sakuracloud",
+		muxServer.ProviderServer,
+		serveOpts...,
+	)
+
+	if err != nil {
+		log.Fatal(err)
+	}
 }
