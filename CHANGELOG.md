@@ -1,6 +1,6 @@
 # CHANGELOG
 
-## 2.xx.x (Unreleased)
+## 2.18.x (Unreleased)
 
 FEATURES:
   - エンハンスドロードバランサでの証明書取得待ち処理の改善 [GH-925] (@yamamoto-febc)
@@ -22,6 +22,9 @@ DEVELOPMENTS:
   - go: bump github.com/sacloud/api-client-go from 0.1.0 to 0.2.0 [GH-906] (@dependabot)
   - go: bump github.com/goccy/go-yaml from 1.8.9 to 1.9.5 [GH-907] (@dependabot)
   - go: bump github.com/hashicorp/terraform-plugin-sdk/v2 from 2.10.1 to 2.17.0 [GH-904] (@dependabot)
+
+DOCS:
+  - docs: Terraform Plugin Frameworkへの対応方針 [GH-931] (@yamamoto-febc)
 
 ## 2.17.1 (2022-06-06)
 
