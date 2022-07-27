@@ -1,13 +1,13 @@
 # Terraform Provider for SakuraCloud
 
 ![Test Status](https://github.com/sacloud/terraform-provider-sakuracloud/workflows/Tests/badge.svg)
-[![Slack](https://img.shields.io/badge/Slack-Sacloud%20Workspace-brightgreen)](https://join.slack.com/t/sacloud/shared_invite/zt-ohsdpv2t-_Bi1_F0jDAAmWjoMQCmAxg)
+[![Discord](https://img.shields.io/badge/Discord-SAKURA%20Users-blue)](https://discord.gg/yUEDN8hbMf)
 
 - Terraform Website: https://terraform.io
 - Terraform Registry: https://registry.terraform.io/providers/sacloud/sakuracloud/latest
 - Documentation: https://registry.terraform.io/providers/sacloud/sakuracloud/latest/docs
 - Documentation(ja): https://docs.usacloud.jp/terraform
-- Slack Workspace for Users: https://slack.usacloud.jp
+- Discord: https://discord.gg/yUEDN8hbMf
 
 ## Usage Example
 
