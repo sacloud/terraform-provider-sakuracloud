@@ -7,7 +7,7 @@ require (
 	github.com/hashicorp/go-multierror v1.1.1
 	github.com/hashicorp/terraform-plugin-go v0.13.0
 	github.com/hashicorp/terraform-plugin-mux v0.7.0
-	github.com/hashicorp/terraform-plugin-sdk/v2 v2.19.0
+	github.com/hashicorp/terraform-plugin-sdk/v2 v2.20.0
 	github.com/mitchellh/go-homedir v1.1.0
 	github.com/sacloud/api-client-go v0.2.0
 	github.com/sacloud/autoscaler v0.7.1-0.20220630000602-0055057da3cb
