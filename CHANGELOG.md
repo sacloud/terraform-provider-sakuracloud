@@ -11,6 +11,7 @@ IMPROVEMENTS:
   - Let's Encryptのレートリミットエラー回避対応 [GH-928] (@yamamoto-febc)
 
 DEVELOPMENTS:
+  - crazy-max/ghaction-import-gpg@v5でのパラメータ名変更対応 [GH-935] (@yamamoto-febc)
   - terraform-plugin-mux対応 [GH-932] (@yamamoto-febc)
   - go: bump github.com/sacloud/packages-go from 0.0.3 to 0.0.4 [GH-922] (@dependabot)
   - go: bump github.com/hashicorp/terraform-plugin-sdk/v2 from 2.18.0 to 2.19.0 [GH-923] (@dependabot)
