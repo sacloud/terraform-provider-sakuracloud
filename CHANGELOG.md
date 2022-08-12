@@ -9,6 +9,7 @@ IMPROVEMENTS:
   - オートスケーラーのテスト改善 [GH-930] (@yamamoto-febc)
   - オートスケーラーのテスト改善 [GH-927] (@yamamoto-febc)
   - Let's Encryptのレートリミットエラー回避対応 [GH-928] (@yamamoto-febc)
+  - VPCルータ作成直後に値が参照できない問題を修正 [GH-939] (@yamamoto-febc)
 
 DEVELOPMENTS:
   - go: bump github.com/sacloud/webaccel-api-go from 1.1.2 to 1.1.3 [GH-936] (@dependabot)
