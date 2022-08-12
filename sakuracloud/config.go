@@ -45,7 +45,7 @@ var (
 	deletionWaiterTimeout            = 30 * time.Minute
 	deletionWaiterPollingInterval    = 5 * time.Second
 	databaseWaitAfterCreateDuration  = 1 * time.Minute
-	vpcRouterWaitAfterCreateDuration = 1 * time.Minute
+	vpcRouterWaitAfterCreateDuration = 2 * time.Minute
 )
 
 // Config type of SakuraCloud Config
