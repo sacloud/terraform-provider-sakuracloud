@@ -12,6 +12,7 @@ IMPROVEMENTS:
   - VPCルータ作成直後に値が参照できない問題を修正 [GH-939] (@yamamoto-febc)
 
 DEVELOPMENTS:
+  - go: bump github.com/hashicorp/terraform-plugin-sdk/v2 from 2.20.0 to 2.21.0 [GH-940] (@dependabot)
   - go: bump github.com/sacloud/webaccel-api-go from 1.1.2 to 1.1.3 [GH-936] (@dependabot)
   - crazy-max/ghaction-import-gpg@v5でのパラメータ名変更対応 [GH-935] (@yamamoto-febc)
   - terraform-plugin-mux対応 [GH-932] (@yamamoto-febc)
