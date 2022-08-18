@@ -318,6 +318,8 @@ func expandSearchFilter(rawFilters interface{}) search.Filter {
 
 			keyName := mv["name"].(string)
 			values := mv["values"].([]interface{})
+			operator := mv["operator"].(string)
+
 			var conditions []string
 			for _, value := range values {
 				v := value.(string)
@@ -326,7 +328,15 @@ func expandSearchFilter(rawFilters interface{}) search.Filter {
 				}
 			}
 			if len(conditions) > 0 {
-				ret[search.Key(keyName)] = search.AndEqual(conditions...)
+				if operator == filteringOperatorExactMatchOr {
+					var vs []interface{}
+					for _, p := range conditions {
+						vs = append(vs, p)
+					}
+					ret[search.Key(keyName)] = search.OrEqual(vs...)
+				} else {
+					ret[search.Key(keyName)] = search.AndEqual(conditions...)
+				}
 			}
 		}
 	}

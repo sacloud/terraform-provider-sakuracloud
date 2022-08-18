@@ -21,6 +21,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
 )
 
 const filterAttrName = "filter"
@@ -36,6 +37,15 @@ var (
 		"filter.0.condition",
 	}
 	filterConfigKeysWithTags = append(filterConfigKeys, "filter.0.tags")
+	filteringOperators       = []string{
+		filteringOperatorPartialMatchAnd,
+		filteringOperatorExactMatchOr,
+	}
+)
+
+const (
+	filteringOperatorPartialMatchAnd = "partial_match_and"
+	filteringOperatorExactMatchOr    = "exact_match_or"
 )
 
 func filterSchema(opt *filterSchemaOption) *schema.Schema {
@@ -85,6 +95,16 @@ func filterSchema(opt *filterSchemaOption) *schema.Schema {
 						Required:    true,
 						Elem:        &schema.Schema{Type: schema.TypeString},
 						Description: "The values of the condition. If multiple values ​​are specified, they combined as AND condition",
+					},
+					"operator": {
+						Type:             schema.TypeString,
+						Optional:         true,
+						ValidateDiagFunc: validation.ToDiagFunc(validation.StringInSlice(filteringOperators, false)),
+						Default:          filteringOperatorPartialMatchAnd,
+						Description: descf(
+							"The filtering operator. This must be one of following:  \n%s",
+							filteringOperators,
+						),
 					},
 				},
 			},

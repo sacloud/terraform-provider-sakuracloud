@@ -39,6 +39,7 @@ A `condition` block supports the following:
 
 * `name` - (Required) The name of the target field. This value is case-sensitive.
 * `values` - (Required) The values of the condition. If multiple values are specified, they combined as AND condition.
+* `operator` - (Optional) The filtering operator. This must be one of following: `partial_match_and`/`exact_match_or`. Default: `partial_match_and`
 
 
 ## Attribute Reference
