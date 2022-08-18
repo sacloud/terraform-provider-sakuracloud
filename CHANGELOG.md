@@ -3,6 +3,7 @@
 ## 2.18.x (Unreleased)
 
 FEATURES:
+  - sakuracloud_vpc_router: サイト間VPNパラメータ [GH-943] (@yamamoto-febc)
   - 各データソースのfilter.conditionで完全一致/部分一致のどちらで検索するか指定可能にする [GH-942] (@yamamoto-febc)
   - エンハンスドロードバランサでの証明書取得待ち処理の改善 [GH-925] (@yamamoto-febc)
 
