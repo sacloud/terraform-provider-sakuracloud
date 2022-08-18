@@ -477,6 +477,89 @@ func resourceSakuraCloudVPCRouter() *schema.Resource {
 					},
 				},
 			},
+			"site_to_site_vpn_parameter": {
+				Type:     schema.TypeList,
+				Optional: true,
+				Computed: true,
+				MaxItems: 1,
+				Elem: &schema.Resource{
+					Schema: map[string]*schema.Schema{
+						"ike": {
+							Type:     schema.TypeList,
+							Optional: true,
+							MaxItems: 1,
+							Computed: true,
+							Elem: &schema.Resource{
+								Schema: map[string]*schema.Schema{
+									"lifetime": {
+										Type:        schema.TypeInt,
+										Optional:    true,
+										Computed:    true,
+										Description: "Lifetime of IKE SA. Default: 28800",
+									},
+									"dpd": {
+										Type:     schema.TypeList,
+										Optional: true,
+										MaxItems: 1,
+										Elem: &schema.Resource{
+											Schema: map[string]*schema.Schema{
+												"interval": {
+													Type:        schema.TypeInt,
+													Optional:    true,
+													Computed:    true,
+													Description: "Default: 15",
+												},
+												"timeout": {
+													Type:        schema.TypeInt,
+													Optional:    true,
+													Computed:    true,
+													Description: "Default: 30",
+												},
+											},
+										},
+									},
+								},
+							},
+						},
+						"esp": {
+							Type:     schema.TypeList,
+							Optional: true,
+							MaxItems: 1,
+							Computed: true,
+							Elem: &schema.Resource{
+								Schema: map[string]*schema.Schema{
+									"lifetime": {
+										Type:        schema.TypeInt,
+										Optional:    true,
+										Computed:    true,
+										Description: "Default: 1800",
+									},
+								},
+							},
+						},
+						"encryption_algo": {
+							Type:             schema.TypeString,
+							Optional:         true,
+							Computed:         true,
+							ValidateDiagFunc: validation.ToDiagFunc(validation.StringInSlice(types.VPCRouterSiteToSiteVPNEncryptionAlgos, false)),
+							Description: descf(
+								"This must be one of [%s]",
+								types.VPCRouterSiteToSiteVPNEncryptionAlgos,
+							),
+						},
+						"hash_algo": {
+							Type:             schema.TypeString,
+							Optional:         true,
+							Computed:         true,
+							ValidateDiagFunc: validation.ToDiagFunc(validation.StringInSlice(types.VPCRouterSiteToSiteVPNHashAlgos, false)),
+							Description: descf(
+								"This must be one of [%s]",
+								types.VPCRouterSiteToSiteVPNHashAlgos,
+							),
+						},
+					},
+				},
+			},
 			"static_nat": {
 				Type:     schema.TypeList,
 				Optional: true,
@@ -729,7 +812,10 @@ func setVPCRouterResourceData(ctx context.Context, d *schema.ResourceData, zone 
 	if err := d.Set("port_forwarding", flattenVPCRouterPortForwardings(data)); err != nil {
 		return diag.FromErr(err)
 	}
-	if err := d.Set("site_to_site_vpn", flattenVPCRouterSiteToSite(data)); err != nil {
+	if err := d.Set("site_to_site_vpn", flattenVPCRouterSiteToSiteConfig(data)); err != nil {
+		return diag.FromErr(err)
+	}
+	if err := d.Set("site_to_site_vpn_parameter", flattenVPCRouterSiteToSiteParameter(data)); err != nil {
 		return diag.FromErr(err)
 	}
 	if err := d.Set("static_nat", flattenVPCRouterStaticNAT(data)); err != nil {
