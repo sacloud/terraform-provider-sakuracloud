@@ -232,7 +232,7 @@ func expandVPCRouterSettings(d resourceValueGettable) *builder.RouterSetting {
 		L2TPIPsecServer:           expandVPCRouterL2TP(d),
 		RemoteAccessUsers:         expandVPCRouterUserList(d),
 		WireGuard:                 expandVPCRouterWireGuard(d),
-		SiteToSiteIPsecVPN:        expandVPCRouterSiteToSiteList(d),
+		SiteToSiteIPsecVPN:        expandVPCRouterSiteToSite(d),
 		StaticRoute:               expandVPCRouterStaticRouteList(d),
 		SyslogHost:                d.Get("syslog_host").(string),
 	}
@@ -618,21 +618,28 @@ func flattenVPCRouterPortForwardings(vpcRouter *iaas.VPCRouter) []interface{} {
 	return portForwardings
 }
 
-func expandVPCRouterSiteToSiteList(d resourceValueGettable) *iaas.VPCRouterSiteToSiteIPsecVPN {
+func expandVPCRouterSiteToSite(d resourceValueGettable) *iaas.VPCRouterSiteToSiteIPsecVPN {
+	siteToSiteVPN := &iaas.VPCRouterSiteToSiteIPsecVPN{}
 	if values, ok := getListFromResource(d, "site_to_site_vpn"); ok && len(values) > 0 {
-		var results []*iaas.VPCRouterSiteToSiteIPsecVPNConfig
 		for _, raw := range values {
 			v := mapToResourceData(raw.(map[string]interface{}))
-			results = append(results, expandVPCRouterSiteToSite(v))
-		}
-		return &iaas.VPCRouterSiteToSiteIPsecVPN{
-			Config: results,
+			siteToSiteVPN.Config = append(siteToSiteVPN.Config, expandVPCRouterSiteToSiteConfig(v))
 		}
 	}
-	return nil
+	if values, ok := getListFromResource(d, "site_to_site_vpn_parameter"); ok && len(values) > 0 {
+		raw := values[0]
+		d := mapToResourceData(raw.(map[string]interface{}))
+
+		siteToSiteVPN.IKE = expandVPCRouterSiteToSiteParameterIKE(d)
+		siteToSiteVPN.ESP = expandVPCRouterSiteToSiteParameterESP(d)
+		siteToSiteVPN.EncryptionAlgo = stringOrDefault(d, "encryption_algo")
+		siteToSiteVPN.HashAlgo = stringOrDefault(d, "hash_algo")
+	}
+
+	return siteToSiteVPN
 }
 
-func expandVPCRouterSiteToSite(d resourceValueGettable) *iaas.VPCRouterSiteToSiteIPsecVPNConfig {
+func expandVPCRouterSiteToSiteConfig(d resourceValueGettable) *iaas.VPCRouterSiteToSiteIPsecVPNConfig {
 	return &iaas.VPCRouterSiteToSiteIPsecVPNConfig{
 		Peer:            stringOrDefault(d, "peer"),
 		RemoteID:        stringOrDefault(d, "remote_id"),
@@ -642,7 +649,42 @@ func expandVPCRouterSiteToSite(d resourceValueGettable) *iaas.VPCRouterSiteToSit
 	}
 }
 
-func flattenVPCRouterSiteToSite(vpcRouter *iaas.VPCRouter) []interface{} {
+func expandVPCRouterSiteToSiteParameterIKE(d resourceValueGettable) *iaas.VPCRouterSiteToSiteIPsecVPNIKE {
+	if values, ok := getListFromResource(d, "ike"); ok && len(values) > 0 {
+		raw := values[0]
+		d := mapToResourceData(raw.(map[string]interface{}))
+		return &iaas.VPCRouterSiteToSiteIPsecVPNIKE{
+			Lifetime: intOrDefault(d, "lifetime"),
+			DPD:      expandVPCRouterSiteToSiteParameterIKEDPD(d),
+		}
+	}
+	return nil
+}
+
+func expandVPCRouterSiteToSiteParameterIKEDPD(d resourceValueGettable) *iaas.VPCRouterSiteToSiteIPsecVPNIKEDPD {
+	if values, ok := getListFromResource(d, "dpd"); ok && len(values) > 0 {
+		raw := values[0]
+		d := mapToResourceData(raw.(map[string]interface{}))
+		return &iaas.VPCRouterSiteToSiteIPsecVPNIKEDPD{
+			Interval: intOrDefault(d, "interval"),
+			Timeout:  intOrDefault(d, "timeout"),
+		}
+	}
+	return nil
+}
+
+func expandVPCRouterSiteToSiteParameterESP(d resourceValueGettable) *iaas.VPCRouterSiteToSiteIPsecVPNESP {
+	if values, ok := getListFromResource(d, "esp"); ok && len(values) > 0 {
+		raw := values[0]
+		d := mapToResourceData(raw.(map[string]interface{}))
+		return &iaas.VPCRouterSiteToSiteIPsecVPNESP{
+			Lifetime: intOrDefault(d, "lifetime"),
+		}
+	}
+	return nil
+}
+
+func flattenVPCRouterSiteToSiteConfig(vpcRouter *iaas.VPCRouter) []interface{} {
 	var s2sSettings []interface{}
 	if vpcRouter.Settings.SiteToSiteIPsecVPN != nil {
 		for _, s := range vpcRouter.Settings.SiteToSiteIPsecVPN.Config {
@@ -656,6 +698,35 @@ func flattenVPCRouterSiteToSite(vpcRouter *iaas.VPCRouter) []interface{} {
 		}
 	}
 	return s2sSettings
+}
+
+func flattenVPCRouterSiteToSiteParameter(vpcRouter *iaas.VPCRouter) []interface{} {
+	var s2sParameters []interface{}
+	if vpcRouter.Settings.SiteToSiteIPsecVPN != nil {
+		v := map[string]interface{}{
+			"encryption_algo": vpcRouter.Settings.SiteToSiteIPsecVPN.EncryptionAlgo,
+			"hash_algo":       vpcRouter.Settings.SiteToSiteIPsecVPN.HashAlgo,
+		}
+		if vpcRouter.Settings.SiteToSiteIPsecVPN.IKE != nil {
+			ike := map[string]interface{}{
+				"lifetime": vpcRouter.Settings.SiteToSiteIPsecVPN.IKE.Lifetime,
+			}
+			if vpcRouter.Settings.SiteToSiteIPsecVPN.IKE.DPD != nil {
+				ike["dpd"] = []interface{}{map[string]interface{}{
+					"interval": vpcRouter.Settings.SiteToSiteIPsecVPN.IKE.DPD.Interval,
+					"timeout":  vpcRouter.Settings.SiteToSiteIPsecVPN.IKE.DPD.Timeout,
+				}}
+			}
+			v["ike"] = []interface{}{ike}
+		}
+		if vpcRouter.Settings.SiteToSiteIPsecVPN.ESP != nil {
+			v["esp"] = []interface{}{map[string]interface{}{
+				"lifetime": vpcRouter.Settings.SiteToSiteIPsecVPN.ESP.Lifetime,
+			}}
+		}
+		s2sParameters = append(s2sParameters, v)
+	}
+	return s2sParameters
 }
 
 func expandVPCRouterStaticRouteList(d resourceValueGettable) []*iaas.VPCRouterStaticRoute {

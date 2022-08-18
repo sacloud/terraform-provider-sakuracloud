@@ -415,6 +415,62 @@ func dataSourceSakuraCloudVPCRouter() *schema.Resource {
 					},
 				},
 			},
+			"site_to_site_vpn_parameter": {
+				Type:     schema.TypeList,
+				Computed: true,
+				Elem: &schema.Resource{
+					Schema: map[string]*schema.Schema{
+						"ike": {
+							Type:     schema.TypeList,
+							Computed: true,
+							Elem: &schema.Resource{
+								Schema: map[string]*schema.Schema{
+									"lifetime": {
+										Type:     schema.TypeInt,
+										Computed: true,
+									},
+									"dpd": {
+										Type:     schema.TypeList,
+										Computed: true,
+										Elem: &schema.Resource{
+											Schema: map[string]*schema.Schema{
+												"interval": {
+													Type:     schema.TypeInt,
+													Computed: true,
+												},
+												"timeout": {
+													Type:     schema.TypeInt,
+													Computed: true,
+												},
+											},
+										},
+									},
+								},
+							},
+						},
+						"esp": {
+							Type:     schema.TypeList,
+							Computed: true,
+							Elem: &schema.Resource{
+								Schema: map[string]*schema.Schema{
+									"lifetime": {
+										Type:     schema.TypeInt,
+										Computed: true,
+									},
+								},
+							},
+						},
+						"encryption_algo": {
+							Type:     schema.TypeString,
+							Computed: true,
+						},
+						"hash_algo": {
+							Type:     schema.TypeString,
+							Computed: true,
+						},
+					},
+				},
+			},
 			"static_nat": {
 				Type:        schema.TypeList,
 				Computed:    true,

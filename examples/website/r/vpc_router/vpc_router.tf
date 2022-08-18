@@ -110,6 +110,21 @@ resource "sakuracloud_vpc_router" "premium" {
     local_prefix      = ["192.168.21.0/24"]
   }
 
+  site_to_site_vpn_parameter {
+    ike {
+      lifetime = 28800
+      dpd {
+        interval = 15
+        timeout  = 30
+      }
+    }
+    esp {
+      lifetime = 1800
+    }
+    encryption_algo = "aes256"
+    hash_algo       = "sha256"
+  }
+
   static_nat {
     public_ip   = sakuracloud_internet.foobar.ip_addresses[3]
     private_ip  = "192.168.11.12"

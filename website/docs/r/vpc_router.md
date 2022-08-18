@@ -125,6 +125,21 @@ resource "sakuracloud_vpc_router" "premium" {
     local_prefix      = ["192.168.21.0/24"]
   }
 
+  site_to_site_vpn_parameter {
+    ike {
+      lifetime = 28800
+      dpd {
+        interval = 15
+        timeout  = 30
+      }
+    }
+    esp {
+      lifetime = 1800
+    }
+    encryption_algo = "aes256"
+    hash_algo       = "sha256"
+  }
+
   static_nat {
     public_ip   = sakuracloud_internet.foobar.ip_addresses[3]
     private_ip  = "192.168.11.12"
@@ -229,7 +244,7 @@ A `expression` block supports the following:
 #### Site to Site VPN
 
 * `site_to_site_vpn` - (Optional) One or more `site_to_site_vpn` blocks as defined below.
-
+* `site_to_site_vpn_parameter` - (Optional) A `site_to_site_vpn_parameter` block as defined below.
 ---
 
 A `site_to_site_vpn` block supports the following:
@@ -241,6 +256,33 @@ A `site_to_site_vpn` block supports the following:
 * `routes` - (Required) A list of CIDR block of VPN connected networks.
 
 ---
+
+A `site_to_site_vpn_parameter` block supports the following:
+
+* `encryption_algo` - (Optional) This must be one of [`aes128`/`aes256`].
+* `esp` - (Optional) A `esp` block as defined below.
+* `hash_algo` - (Optional) This must be one of [`sha1`/`sha256`].
+* `ike` - (Optional) An `ike` block as defined below.
+
+---
+
+A `esp` block supports the following:
+
+* `lifetime` - (Optional) Default: `1800`.
+
+---
+
+A `ike` block supports the following:
+
+* `dpd` - (Optional) A `dpd` block as defined below.
+* `lifetime` - (Optional) Default: `28800`.
+
+---
+
+A `dpd` block supports the following:
+
+* `interval` - (Optional) Default: `15`.
+* `timeout` - (Optional) Default: `30`.
 
 #### DHCP/NAT/Forwarding
 

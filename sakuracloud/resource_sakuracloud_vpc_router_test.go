@@ -166,6 +166,13 @@ func TestAccSakuraCloudVPCRouter_Full(t *testing.T) {
 					resource.TestCheckResourceAttr(resourceName, "site_to_site_vpn.0.routes.0", "10.0.0.0/8"),
 					resource.TestCheckResourceAttr(resourceName, "site_to_site_vpn.0.local_prefix.#", "1"),
 					resource.TestCheckResourceAttr(resourceName, "site_to_site_vpn.0.local_prefix.0", "192.168.21.0/24"),
+					resource.TestCheckResourceAttr(resourceName, "site_to_site_vpn_parameter.#", "1"),
+					resource.TestCheckResourceAttr(resourceName, "site_to_site_vpn_parameter.0.ike.0.lifetime", "28801"),
+					resource.TestCheckResourceAttr(resourceName, "site_to_site_vpn_parameter.0.ike.0.dpd.0.interval", "16"),
+					resource.TestCheckResourceAttr(resourceName, "site_to_site_vpn_parameter.0.ike.0.dpd.0.timeout", "31"),
+					resource.TestCheckResourceAttr(resourceName, "site_to_site_vpn_parameter.0.esp.0.lifetime", "1801"),
+					resource.TestCheckResourceAttr(resourceName, "site_to_site_vpn_parameter.0.encryption_algo", "aes256"),
+					resource.TestCheckResourceAttr(resourceName, "site_to_site_vpn_parameter.0.hash_algo", "sha256"),
 					resource.TestCheckResourceAttr(resourceName, "static_nat.#", "1"),
 					resource.TestCheckResourceAttrPair(
 						resourceName, "static_nat.0.public_ip",
@@ -393,6 +400,21 @@ resource "sakuracloud_vpc_router" "foobar" {
     pre_shared_secret = "example"
     routes            = ["10.0.0.0/8"]
     local_prefix      = ["192.168.21.0/24"]
+  }
+
+  site_to_site_vpn_parameter {
+    ike {
+      lifetime = 28801
+      dpd {
+        interval = 16
+        timeout  = 31
+      }
+    }
+    esp {
+      lifetime = 1801
+    }
+    encryption_algo = "aes256"
+    hash_algo       = "sha256"
   }
 
   static_nat {

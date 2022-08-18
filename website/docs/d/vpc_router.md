@@ -62,6 +62,7 @@ A `condition` block supports the following:
 * `public_netmask` - The bit length of the subnet to assign to the public network interface.
 * `public_network_interface` - A list of additional network interface setting. This doesn't include primary network interface setting.
 * `site_to_site_vpn` - A list of `site_to_site_vpn` blocks as defined below.
+* `site_to_site_vpn_parameter` - A list of `site_to_site_vpn_parameter` blocks as defined below.
 * `static_nat` - A list of `static_nat` blocks as defined below. This represents a `1:1 NAT`, doing static mapping to both send/receive to/from the Internet. This is only used when `plan` is not `standard`.
 * `static_route` - A list of `static_route` blocks as defined below.
 * `syslog_host` - The ip address of the syslog host to which the VPC Router sends logs.
@@ -169,6 +170,35 @@ A `site_to_site_vpn` block exports the following:
 * `pre_shared_secret` - The pre shared secret for the VPN.
 * `remote_id` - The id of the opposing appliance connected to the VPC Router. This is typically set same as value of `peer`.
 * `routes` - A list of CIDR block of VPN connected networks.
+
+---
+
+A `site_to_site_vpn_parameter` block exports the following:
+
+* `encryption_algo` - .
+* `esp` - A list of `esp` blocks as defined below.
+* `hash_algo` - .
+* `ike` - A list of `ike` blocks as defined below.
+
+---
+
+A `esp` block exports the following:
+
+* `lifetime` - .
+
+---
+
+A `ike` block exports the following:
+
+* `dpd` - A list of `dpd` blocks as defined below.
+* `lifetime` - .
+
+---
+
+A `dpd` block exports the following:
+
+* `interval` - .
+* `timeout` - .
 
 ---
 
