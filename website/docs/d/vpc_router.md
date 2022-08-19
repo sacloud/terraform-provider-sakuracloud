@@ -61,6 +61,7 @@ A `condition` block supports the following:
 * `public_ip` - The public ip address of the VPC Router.
 * `public_netmask` - The bit length of the subnet to assign to the public network interface.
 * `public_network_interface` - A list of additional network interface setting. This doesn't include primary network interface setting.
+* `scheduled_maintenance` - A list of `scheduled_maintenance` blocks as defined below.
 * `site_to_site_vpn` - A list of `site_to_site_vpn` blocks as defined below.
 * `site_to_site_vpn_parameter` - A list of `site_to_site_vpn_parameter` blocks as defined below.
 * `static_nat` - A list of `static_nat` blocks as defined below. This represents a `1:1 NAT`, doing static mapping to both send/receive to/from the Internet. This is only used when `plan` is not `standard`.
@@ -160,6 +161,13 @@ A `public_network_interface` block exports the following:
 * `switch_id` - The id of the switch connected from the VPCRouter.
 * `vip` - The virtual IP address of the VPC Router. This is only used when `plan` is not `standard`.
 * `vrid` - The Virtual Router Identifier. This is only used when `plan` is not `standard`.
+
+---
+
+A `scheduled_maintenance` block exports the following:
+
+* `day_of_week` - The value must be in [`sun`/`mon`/`tue`/`wed`/`thu`/`fri`/`sat`].
+* `hour` - The time to start maintenance.
 
 ---
 

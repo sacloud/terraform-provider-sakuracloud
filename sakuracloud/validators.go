@@ -70,14 +70,14 @@ func validateBackupWeekdays(d resourceValueGettable, k string) error {
 
 	for _, v := range weekdays {
 		var found bool
-		for _, t := range types.BackupWeekdayStrings {
+		for _, t := range types.DaysOfTheWeekStrings {
 			if v.String() == t {
 				found = true
 				break
 			}
 		}
 		if !found {
-			return fmt.Errorf("%q must be one of [%s]", k, strings.Join(types.BackupWeekdayStrings, "/"))
+			return fmt.Errorf("%q must be one of [%s]", k, strings.Join(types.DaysOfTheWeekStrings, "/"))
 		}
 	}
 	return nil

@@ -140,6 +140,11 @@ resource "sakuracloud_vpc_router" "premium" {
     name     = "username"
     password = "password"
   }
+
+  scheduled_maintenance {
+    day_of_week = "tue"
+    hour        = 1
+  }
 }
 
 resource "sakuracloud_internet" "foobar" {

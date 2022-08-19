@@ -605,6 +605,32 @@ func resourceSakuraCloudVPCRouter() *schema.Resource {
 					},
 				},
 			},
+			"scheduled_maintenance": {
+				Type:     schema.TypeList,
+				Optional: true,
+				Computed: true,
+				MaxItems: 1,
+				Elem: &schema.Resource{
+					Schema: map[string]*schema.Schema{
+						"day_of_week": {
+							Type:     schema.TypeString,
+							Optional: true,
+							Default:  types.DaysOfTheWeek.Monday.String(),
+							Description: descf(
+								"The value must be in [%s]",
+								types.DaysOfTheWeekStrings,
+							),
+						},
+						"hour": {
+							Type:             schema.TypeInt,
+							Optional:         true,
+							Default:          3,
+							ValidateDiagFunc: validation.ToDiagFunc(validation.IntBetween(0, 23)),
+							Description:      "The time to start maintenance",
+						},
+					},
+				},
+			},
 			"user": {
 				Type:     schema.TypeList,
 				Optional: true,
@@ -825,6 +851,9 @@ func setVPCRouterResourceData(ctx context.Context, d *schema.ResourceData, zone 
 		return diag.FromErr(err)
 	}
 	if err := d.Set("user", flattenVPCRouterUsers(data)); err != nil {
+		return diag.FromErr(err)
+	}
+	if err := d.Set("scheduled_maintenance", flattenVPCRouterScheduledMaintenance(data)); err != nil {
 		return diag.FromErr(err)
 	}
 	d.Set("zone", getZone(d, client)) // nolint
