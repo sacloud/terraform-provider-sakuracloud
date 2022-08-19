@@ -3,13 +3,14 @@
 ## 2.18.x (Unreleased)
 
 FEATURES:
+  - sakuracloud_vpc_router: スケジュールメンテナンス機能 [GH-948] (@yamamoto-febc)
   - sakuracloud_vpc_router: サイト間VPNパラメータ [GH-943] (@yamamoto-febc)
   - 各データソースのfilter.conditionで完全一致/部分一致のどちらで検索するか指定可能にする [GH-942] (@yamamoto-febc)
-  - エンハンスドロードバランサでの証明書取得待ち処理の改善 [GH-925] (@yamamoto-febc)
 
 IMPROVEMENTS:
   - オートスケーラーのテスト改善 [GH-930] (@yamamoto-febc)
   - オートスケーラーのテスト改善 [GH-927] (@yamamoto-febc)
+  - エンハンスドロードバランサでの証明書取得待ち処理の改善 [GH-925] (@yamamoto-febc)
   - Let's Encryptのレートリミットエラー回避対応 [GH-928] (@yamamoto-febc)
   - VPCルータ作成直後に値が参照できない問題を修正 [GH-939] (@yamamoto-febc)
 
