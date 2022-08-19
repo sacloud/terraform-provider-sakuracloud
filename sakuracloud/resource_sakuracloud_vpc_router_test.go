@@ -185,6 +185,9 @@ func TestAccSakuraCloudVPCRouter_Full(t *testing.T) {
 					resource.TestCheckResourceAttr(resourceName, "user.#", "1"),
 					resource.TestCheckResourceAttr(resourceName, "user.0.name", "username"),
 					resource.TestCheckResourceAttr(resourceName, "user.0.password", "password"),
+					resource.TestCheckResourceAttr(resourceName, "scheduled_maintenance.#", "1"),
+					resource.TestCheckResourceAttr(resourceName, "scheduled_maintenance.0.day_of_week", "tue"),
+					resource.TestCheckResourceAttr(resourceName, "scheduled_maintenance.0.hour", "1"),
 				),
 			},
 			{
@@ -431,6 +434,11 @@ resource "sakuracloud_vpc_router" "foobar" {
   user {
     name     = "username"
     password = "password"
+  }
+
+  scheduled_maintenance {
+    day_of_week = "tue"
+    hour        = 1
   }
 }
 `

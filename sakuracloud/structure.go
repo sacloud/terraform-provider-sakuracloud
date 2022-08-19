@@ -230,18 +230,18 @@ func expandSubjectAltNames(d resourceValueGettable) []string {
 	return names
 }
 
-func expandBackupWeekdays(d resourceValueGettable, key string) []types.EBackupSpanWeekday {
-	var vs []types.EBackupSpanWeekday
+func expandBackupWeekdays(d resourceValueGettable, key string) []types.EDayOfTheWeek {
+	var vs []types.EDayOfTheWeek
 
 	for _, w := range d.Get(key).(*schema.Set).List() {
 		v := w.(string)
-		vs = append(vs, types.EBackupSpanWeekday(v))
+		vs = append(vs, types.EDayOfTheWeek(v))
 	}
-	types.SortBackupSpanWeekdays(vs)
+	types.SortDayOfTheWeekList(vs)
 	return vs
 }
 
-func flattenBackupWeekdays(weekdays []types.EBackupSpanWeekday) *schema.Set {
+func flattenBackupWeekdays(weekdays []types.EDayOfTheWeek) *schema.Set {
 	set := &schema.Set{F: schema.HashString}
 	for _, w := range weekdays {
 		set.Add(w.String())

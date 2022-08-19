@@ -235,6 +235,7 @@ func expandVPCRouterSettings(d resourceValueGettable) *builder.RouterSetting {
 		SiteToSiteIPsecVPN:        expandVPCRouterSiteToSite(d),
 		StaticRoute:               expandVPCRouterStaticRouteList(d),
 		SyslogHost:                d.Get("syslog_host").(string),
+		ScheduledMaintenance:      expandVPCRouterScheduledMaintenance(d),
 	}
 }
 
@@ -787,4 +788,30 @@ func flattenVPCRouterUsers(vpcRouter *iaas.VPCRouter) []interface{} {
 		})
 	}
 	return users
+}
+
+func expandVPCRouterScheduledMaintenance(d resourceValueGettable) *iaas.VPCRouterScheduledMaintenance {
+	if values, ok := getListFromResource(d, "scheduled_maintenance"); ok && len(values) > 0 {
+		raw := values[0]
+		d := mapToResourceData(raw.(map[string]interface{}))
+
+		dayOfWeek := stringOrDefault(d, "day_of_week")
+		hour := intOrDefault(d, "hour")
+
+		return &iaas.VPCRouterScheduledMaintenance{
+			DayOfWeek: types.DayOfTheWeekFromString(dayOfWeek).Int(),
+			Hour:      hour,
+		}
+	}
+	return nil
+}
+func flattenVPCRouterScheduledMaintenance(vpcRouter *iaas.VPCRouter) []interface{} {
+	var values []interface{}
+	if vpcRouter.Settings != nil && vpcRouter.Settings.ScheduledMaintenance != nil {
+		values = append(values, map[string]interface{}{
+			"day_of_week": types.DayOfTheWeekFromInt(vpcRouter.Settings.ScheduledMaintenance.DayOfWeek).String(),
+			"hour":        vpcRouter.Settings.ScheduledMaintenance.Hour,
+		})
+	}
+	return values
 }

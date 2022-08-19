@@ -509,6 +509,27 @@ func dataSourceSakuraCloudVPCRouter() *schema.Resource {
 					},
 				},
 			},
+			"scheduled_maintenance": {
+				Type:     schema.TypeList,
+				Computed: true,
+				Elem: &schema.Resource{
+					Schema: map[string]*schema.Schema{
+						"day_of_week": {
+							Type:     schema.TypeString,
+							Computed: true,
+							Description: descf(
+								"The value must be in [%s]",
+								types.DaysOfTheWeekStrings,
+							),
+						},
+						"hour": {
+							Type:        schema.TypeInt,
+							Computed:    true,
+							Description: "The time to start maintenance",
+						},
+					},
+				},
+			},
 			"user": {
 				Type:     schema.TypeList,
 				Computed: true,

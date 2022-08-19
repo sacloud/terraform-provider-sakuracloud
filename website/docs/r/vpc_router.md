@@ -155,6 +155,11 @@ resource "sakuracloud_vpc_router" "premium" {
     name     = "username"
     password = "password"
   }
+
+  scheduled_maintenance {
+    day_of_week = "tue"
+    hour        = 1
+  }
 }
 
 resource "sakuracloud_internet" "foobar" {
@@ -378,6 +383,19 @@ A `peer` block supports the following:
 * `ip_address` - (Required) The IP address for peer.
 * `name` - (Required) the of the peer.
 * `public_key` - (Required) the public key of the WireGuard client.
+
+---
+
+#### Maintenance
+
+* `scheduled_maintenance` - (Optional) An `scheduled_maintenance` block as defined below.
+
+---
+
+A `scheduled_maintenance` block supports the following:
+
+* `day_of_week` - (Optional) The value must be in [`sun`/`mon`/`tue`/`wed`/`thu`/`fri`/`sat`].
+* `hour` - (Optional) The time to start maintenance.
 
 ---
 

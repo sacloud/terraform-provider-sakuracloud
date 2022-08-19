@@ -89,7 +89,7 @@ func dataSourceSakuraCloudDatabase() *schema.Resource {
 							Set:      schema.HashString,
 							Description: descf(
 								"The list of name of weekday that doing backup. This will be in [%s]",
-								types.BackupWeekdayStrings,
+								types.DaysOfTheWeekStrings,
 							),
 						},
 						"time": {
