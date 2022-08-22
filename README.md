@@ -20,7 +20,7 @@ terraform {
 
       # We recommend pinning to the specific version of the SakuraCloud Provider you're using
       # since new versions are released frequently
-      version = "2.17.1"
+      version = "2.18.0"
       #version = "~> 2"
     }
   }

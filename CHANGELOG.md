@@ -1,13 +1,18 @@
 # CHANGELOG
 
-## 2.18.x (Unreleased)
+## 2.18.0 (2022-08-22)
+
+このバージョンからterraform-plugin-muxによるiTerraform Plugin SDK/Framework両方への対応が行われています(GH-932)。  
+現時点ではFrameworkを利用するリソースはありませんが、今後追加されるリソースはFrameworkを用いて実装されます。
 
 FEATURES:
+
   - sakuracloud_vpc_router: スケジュールメンテナンス機能 [GH-948] (@yamamoto-febc)
   - sakuracloud_vpc_router: サイト間VPNパラメータ [GH-943] (@yamamoto-febc)
   - 各データソースのfilter.conditionで完全一致/部分一致のどちらで検索するか指定可能にする [GH-942] (@yamamoto-febc)
 
 IMPROVEMENTS:
+
   - オートスケーラーのテスト改善 [GH-930] (@yamamoto-febc)
   - オートスケーラーのテスト改善 [GH-927] (@yamamoto-febc)
   - エンハンスドロードバランサでの証明書取得待ち処理の改善 [GH-925] (@yamamoto-febc)
@@ -15,6 +20,7 @@ IMPROVEMENTS:
   - VPCルータ作成直後に値が参照できない問題を修正 [GH-939] (@yamamoto-febc)
 
 DEVELOPMENTS:
+
   - iaas-service-go@v1.3.1 [GH-946] (@yamamoto-febc)
   - go: bump github.com/hashicorp/terraform-plugin-sdk/v2 from 2.20.0 to 2.21.0 [GH-940] (@dependabot)
   - go: bump github.com/sacloud/webaccel-api-go from 1.1.2 to 1.1.3 [GH-936] (@dependabot)
