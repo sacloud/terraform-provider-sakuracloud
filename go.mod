@@ -12,8 +12,8 @@ require (
 	github.com/sacloud/api-client-go v0.2.1
 	github.com/sacloud/autoscaler v0.7.1-0.20220630000602-0055057da3cb
 	github.com/sacloud/ftps v1.1.0
-	github.com/sacloud/iaas-api-go v1.3.0
-	github.com/sacloud/iaas-service-go v1.3.0
+	github.com/sacloud/iaas-api-go v1.3.1
+	github.com/sacloud/iaas-service-go v1.3.1
 	github.com/sacloud/iso9660wrap v0.0.0-20171031075302-eda21f77f6a8
 	github.com/sacloud/packages-go v0.0.5
 	github.com/sacloud/webaccel-api-go v1.1.3
