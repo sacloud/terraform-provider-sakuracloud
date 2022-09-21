@@ -1,8 +1,16 @@
 # CHANGELOG
 
+## 2.18.1 (Unreleased)
+
+このバージョンからCHANGELOGの形式を変更します。
+
+IMPROVEMENTS:
+
+- go: bump github.com/hashicorp/terraform-plugin-sdk/v2 from 2.21.0 to 2.23.0 #951
+
 ## 2.18.0 (2022-08-22)
 
-このバージョンからterraform-plugin-muxによるiTerraform Plugin SDK/Framework両方への対応が行われています(GH-932)。  
+このバージョンからterraform-plugin-muxによるTerraform Plugin SDK/Framework両方への対応が行われています(GH-932)。  
 現時点ではFrameworkを利用するリソースはありませんが、今後追加されるリソースはFrameworkを用いて実装されます。
 
 FEATURES:
