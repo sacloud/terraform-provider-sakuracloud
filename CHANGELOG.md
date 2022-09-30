@@ -2,7 +2,12 @@
 
 ## 2.18.1 (Unreleased)
 
-このバージョンからCHANGELOGの形式を変更します。
+Note: 
+- sakuracloud_archiveのos_typeで指定できる値が変更されています。指定できる値の詳細はsakuracloud_archiveのドキュメントを参照ください。
+- このバージョンからCHANGELOGの形式を変更します
+
+FEATURES:
+- iaas-api-go v1.4.0 - OSType更新 #955
 
 IMPROVEMENTS:
 
