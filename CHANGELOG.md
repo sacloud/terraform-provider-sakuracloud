@@ -1,6 +1,6 @@
 # CHANGELOG
 
-## 2.18.1 (Unreleased)
+## 2.19.0 (2022-09-30)
 
 Note: 
 - sakuracloud_archiveのos_typeで指定できる値が変更されています。指定できる値の詳細はsakuracloud_archiveのドキュメントを参照ください。
