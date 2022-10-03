@@ -16,7 +16,7 @@ jobs:
       - name: Set up Go
         uses: actions/setup-go@v3
         with:
-          go-version: 1.18
+          go-version: 1.19
 
       - name: Setup tools
         run: |
@@ -38,7 +38,7 @@ jobs:
       - name: Set up Go
         uses: actions/setup-go@v3
         with:
-          go-version: 1.18
+          go-version: 1.19
 
       - name: Setup tools
         run: | 
@@ -46,6 +46,8 @@ jobs:
 
       - name: make lint-go
         run:  |
+          # Explicitly set GOROOT to avoid golangci-lint/issues/3107
+          export GOROOT=$(go env GOROOT)
           make lint-go
 
   licenses-check:
@@ -61,7 +63,7 @@ jobs:
       - name: Set up Go
         uses: actions/setup-go@v3
         with:
-          go-version: 1.18
+          go-version: 1.19
 
       - name: Setup tools
         run: make tools
@@ -84,7 +86,7 @@ jobs:
       - name: Set up Go
         uses: actions/setup-go@v3
         with:
-          go-version: 1.18
+          go-version: 1.19
 
       - name: Setup tools
         run: | 

@@ -1,6 +1,6 @@
 module github.com/sacloud/terraform-provider-sakuracloud
 
-go 1.18
+go 1.19
 
 require (
 	github.com/goccy/go-yaml v1.9.5
