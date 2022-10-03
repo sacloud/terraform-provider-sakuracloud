@@ -41,6 +41,16 @@ resource "sakuracloud_disk" "foobar" {
 * `size` - (Optional) The size of disk in GiB. Changing this forces a new resource to be created. Default:`20`.
 * `distant_from` - (Optional) A list of disk id. The disk will be located to different storage from these disks. Changing this forces a new resource to be created.
 
+The values that can be specified for `size` can be found with the following command.
+
+```bash
+# for SSD Plan
+usacloud disk-plan read 4 --zone is1a -o json | jq '.[].Size|.[]|select(.Availability == "available")|.SizeMB / 1024'
+
+# for HDD Plan
+usacloud disk-plan read 2 --zone is1a -o json | jq '.[].Size|.[]|select(.Availability == "available")|.SizeMB / 1024'
+```
+
 #### Disk Source
 
 * `source_archive_id` - (Optional) The id of the source archive. This conflicts with [`source_disk_id`]. Changing this forces a new resource to be created.
