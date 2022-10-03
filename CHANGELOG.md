@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## 2.19.1 (Unreleased)
+
+IMPROVEMENTS:
+  - go 1.19 #957
+
 ## 2.19.0 (2022-09-30)
 
 Note: 
