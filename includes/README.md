@@ -17,7 +17,7 @@ git remote add makefile https://github.com/sacloud/makefile.git
 #### 追加(初回のみ)
 
 ```bash
-git subtree add --prefix=includes --squash makefile v0.0.6
+git subtree add --prefix=includes --squash makefile v0.0.7
 ```
 
 利用する側のプロジェクトではMakefileを以下のように記述します。
@@ -41,7 +41,7 @@ tools: dev-tools # toolsゴールはsacloudプロダクト向け日次CIを行�
 #### 更新
 
 ```bash
-git subtree pull --prefix=includes --squash makefile v0.0.6
+git subtree pull --prefix=includes --squash makefile v0.0.7
 ```
 
 ## License
