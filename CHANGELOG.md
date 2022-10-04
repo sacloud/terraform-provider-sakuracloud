@@ -4,6 +4,7 @@
 
 IMPROVEMENTS:
   - go 1.19 #957
+  - sacloud/makefile v0.0.7 #958
 
 ## 2.19.0 (2022-09-30)
 
