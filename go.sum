@@ -368,8 +368,8 @@ github.com/sacloud/iso9660wrap v0.0.0-20171031075302-eda21f77f6a8 h1:5piK7EELHKR
 github.com/sacloud/iso9660wrap v0.0.0-20171031075302-eda21f77f6a8/go.mod h1:1jHHCa624cG5rODkWmourombJaNmkY9/SBHWhLJcg+w=
 github.com/sacloud/packages-go v0.0.6 h1:2aFjvqsxhK7+gy+g7LBX0Brfcf4aTYAEszL9B4rUhvY=
 github.com/sacloud/packages-go v0.0.6/go.mod h1:+THah+bxMCWSkaCTgJ0E0pEjxqpxmiASbNjaImkYzMo=
-github.com/sacloud/webaccel-api-go v1.1.3 h1:JKsjVL8U9QbzsEjMxqUzr+H7ni3vKVPhpdJeLkUy0ZQ=
-github.com/sacloud/webaccel-api-go v1.1.3/go.mod h1:GAmsQquhje9diSc/gAfVGYbavlD4S3KJCljOAxzAajU=
+github.com/sacloud/webaccel-api-go v1.1.4 h1:/9q4p31kEGCz6E02Csmik5fNCPB3OewGwGtwZmaGW+8=
+github.com/sacloud/webaccel-api-go v1.1.4/go.mod h1:1E0zu1Ad1N4E5upRknxauh5OOfKCZWQUEQ4Nj7Ek1ls=
 github.com/sebdah/goldie v1.0.0/go.mod h1:jXP4hmWywNEwZzhMuv2ccnqTSFpuq8iyQhtQdkkZBH4=
 github.com/sergi/go-diff v1.1.0/go.mod h1:STckp+ISIX8hZLjrqAeVduY0gWCT9IjLuqbuNXdaHfM=
 github.com/sergi/go-diff v1.2.0 h1:XU+rvMAioB0UC3q1MFrIQy4Vo5/4VsRDQQXHsEya6xQ=
