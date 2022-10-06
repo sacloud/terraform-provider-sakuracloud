@@ -1,8 +1,9 @@
 # CHANGELOG
 
-## 2.19.1 (Unreleased)
+## 2.19.1 (2022-10-06)
 
 IMPROVEMENTS:
+
   - go 1.19 #957
   - sacloud/makefile v0.0.7 #958
 
