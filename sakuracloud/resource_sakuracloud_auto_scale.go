@@ -91,7 +91,6 @@ func resourceSakuraCloudAutoScale() *schema.Resource {
 			"description": schemaResourceDescription(resourceName),
 			"tags":        schemaResourceTags(resourceName),
 		},
-		DeprecationMessage: "sakuracloud_auto_scale is an experimental resource. Please note that you will need to update the tfstate manually if the resource schema is changed.",
 	}
 }
 
