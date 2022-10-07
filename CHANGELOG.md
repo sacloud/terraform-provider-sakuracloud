@@ -4,6 +4,7 @@
 
 FEATURES:
   - sacloud/autoscaler v0.11.1 #964
+  - sakuracloud_auto_scale: GA #965
 
 
 ## 2.19.1 (2022-10-06)
