@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## 2.20.0 (Unreleased)
+
+FEATURES:
+  - sacloud/autoscaler v0.11.1 #964
+
+
 ## 2.19.1 (2022-10-06)
 
 IMPROVEMENTS:
