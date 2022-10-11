@@ -1,8 +1,9 @@
 # CHANGELOG
 
-## 2.20.0 (Unreleased)
+## 2.19.2 (2022-10-11)
 
 FEATURES:
+
   - sacloud/autoscaler v0.11.1 #964
   - sakuracloud_auto_scale: GA #965
 
