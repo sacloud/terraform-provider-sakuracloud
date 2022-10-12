@@ -1,6 +1,6 @@
 # CHANGELOG
 
-## 2.19.3 (Unreleased)
+## 2.19.3 (2022-10-12)
 
 FIXES:
 
