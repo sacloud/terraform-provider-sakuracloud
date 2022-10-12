@@ -109,13 +109,13 @@ func (c *Config) loadFromProfile() error {
 	if c.AccessTokenSecret == "" {
 		c.AccessTokenSecret = pcv.AccessTokenSecret
 	}
-	if c.Zone == defaultZone && pcv.Zone != "" {
+	if (c.Zone == "" || c.Zone == defaultZone) && pcv.Zone != "" {
 		c.Zone = pcv.Zone
 	}
 
 	sort.Strings(c.Zones)
-	sort.Strings(pcv.Zones)
-	if reflect.DeepEqual(defaultZones, c.Zones) && !reflect.DeepEqual(c.Zones, pcv.Zones) && len(pcv.Zones) > 0 {
+	sort.Strings(defaultZones)
+	if (len(c.Zones) == 0 || reflect.DeepEqual(defaultZones, c.Zones)) && len(pcv.Zones) > 0 {
 		c.Zones = pcv.Zones
 	}
 	if c.TraceMode == "" {
@@ -133,7 +133,7 @@ func (c *Config) loadFromProfile() error {
 	if c.APIRootURL == "" {
 		c.APIRootURL = pcv.APIRootURL
 	}
-	if c.RetryMax == defaultRetryMax && pcv.RetryMax > 0 {
+	if (c.RetryMax == 0 || c.RetryMax == defaultRetryMax) && pcv.RetryMax > 0 {
 		c.RetryMax = pcv.RetryMax
 	}
 	if c.RetryWaitMax == 0 {
@@ -142,10 +142,10 @@ func (c *Config) loadFromProfile() error {
 	if c.RetryWaitMin == 0 {
 		c.RetryWaitMin = pcv.RetryWaitMin
 	}
-	if c.APIRequestTimeout == defaultAPIRequestTimeout && pcv.HTTPRequestTimeout > 0 {
+	if (c.APIRequestTimeout == 0 || c.APIRequestTimeout == defaultAPIRequestTimeout) && pcv.HTTPRequestTimeout > 0 {
 		c.APIRequestTimeout = pcv.HTTPRequestTimeout
 	}
-	if c.APIRequestRateLimit == defaultAPIRequestRateLimit && pcv.HTTPRequestRateLimit > 0 {
+	if (c.APIRequestRateLimit == 0 || c.APIRequestRateLimit == defaultAPIRequestRateLimit) && pcv.HTTPRequestRateLimit > 0 {
 		c.APIRequestRateLimit = pcv.HTTPRequestRateLimit
 	}
 	return nil
