@@ -23,6 +23,7 @@ import (
 	"testing"
 
 	"github.com/sacloud/api-client-go/profile"
+	"github.com/stretchr/testify/require"
 )
 
 func initTestProfileDir() func() {
@@ -231,6 +232,32 @@ func TestConfig_NewClient_loadFromProfile(t *testing.T) {
 				APIRequestRateLimit: testProfile.HTTPRequestRateLimit,
 			},
 		},
+		{
+			scenario: "only Profile name specified with normal profile",
+			in: &Config{
+				Profile: "test",
+			},
+			profiles: map[string]*profile.ConfigValue{
+				"test": testProfile,
+			},
+			expect: &Config{
+				Profile:             "test",
+				AccessToken:         testProfile.AccessToken,
+				AccessTokenSecret:   testProfile.AccessTokenSecret,
+				Zone:                testProfile.Zone,
+				Zones:               testProfile.Zones,
+				TraceMode:           testProfile.TraceMode,
+				FakeMode:            "",
+				FakeStorePath:       testProfile.FakeStorePath,
+				AcceptLanguage:      testProfile.AcceptLanguage,
+				APIRootURL:          testProfile.APIRootURL,
+				RetryMax:            testProfile.RetryMax,
+				RetryWaitMin:        testProfile.RetryWaitMin,
+				RetryWaitMax:        testProfile.RetryWaitMax,
+				APIRequestTimeout:   testProfile.HTTPRequestTimeout,
+				APIRequestRateLimit: testProfile.HTTPRequestRateLimit,
+			},
+		},
 	}
 
 	for _, tt := range cases {
@@ -246,9 +273,7 @@ func TestConfig_NewClient_loadFromProfile(t *testing.T) {
 			if !reflect.DeepEqual(tt.err, err) {
 				t.Errorf("got unexpected error: expected: %s got: %s", tt.err, err)
 			}
-			if !reflect.DeepEqual(tt.expect, tt.in) {
-				t.Errorf("got unexpected state: expected: %+v got: %+v", tt.expect, tt.in)
-			}
+			require.EqualValues(t, tt.expect, tt.in)
 		})
 	}
 }
