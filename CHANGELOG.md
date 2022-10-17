@@ -1,5 +1,11 @@
 # CHANGELOG
 
+# 2.19.4 (Unreleased)
+
+IMPROVEMENTS:
+
+- go: bump github.com/sacloud/iaas-api-go from 1.4.1 to 1.5.1 #970
+
 ## 2.19.3 (2022-10-12)
 
 FIXES:
