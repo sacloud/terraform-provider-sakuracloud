@@ -22,6 +22,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
 	"github.com/sacloud/api-client-go/profile"
 	"github.com/sacloud/iaas-api-go"
+	"github.com/sacloud/packages-go/envvar"
 	"github.com/sacloud/packages-go/mutexkv"
 )
 
@@ -230,12 +231,16 @@ func Provider() *schema.Provider {
 }
 
 func providerConfigure(d *schema.ResourceData, terraformVersion string) (interface{}, diag.Diagnostics) {
+	zones := expandStringList(d.Get("zones").([]interface{}))
+	if len(zones) == 0 {
+		zones = envvar.StringSliceFromEnv("SAKURACLOUD_ZONES", nil)
+	}
 	config := Config{
 		Profile:             d.Get("profile").(string),
 		AccessToken:         d.Get("token").(string),
 		AccessTokenSecret:   d.Get("secret").(string),
 		Zone:                d.Get("zone").(string),
-		Zones:               expandStringList(d.Get("zones").([]interface{})),
+		Zones:               zones,
 		DefaultZone:         d.Get("default_zone").(string),
 		TraceMode:           d.Get("trace").(string),
 		APIRootURL:          d.Get("api_root_url").(string),
