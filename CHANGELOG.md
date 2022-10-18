@@ -4,6 +4,7 @@
 
 IMPROVEMENTS:
 
+- SAKURACLOUD_ZONES環境変数をサポート #974
 - go: bump github.com/sacloud/iaas-api-go from 1.4.1 to 1.5.1 #970
 - go: bump github.com/hashicorp/terraform-plugin-sdk/v2 from 2.23.0 to 2.24.0 #969
 - go: bump golang.org/x/text from 0.3.8 to 0.4.0 #973
