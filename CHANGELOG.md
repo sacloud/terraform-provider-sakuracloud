@@ -1,6 +1,6 @@
 # CHANGELOG
 
-# 2.19.4 (Unreleased)
+# 2.19.4 (2022-10-19)
 
 IMPROVEMENTS:
 
