@@ -26,14 +26,8 @@ import (
 )
 
 func expandDatabaseBuilder(d *schema.ResourceData, client *APIClient) *databaseBuilder.Builder {
-	var dbVersion *types.RDBMSVersion
 	dbType := d.Get("database_type").(string)
-	switch dbType {
-	case "postgres":
-		dbVersion = types.RDBMSVersions[types.RDBMSTypesPostgreSQL]
-	case "mariadb":
-		dbVersion = types.RDBMSVersions[types.RDBMSTypesMariaDB]
-	}
+	dbName := types.RDBMSTypeFromString(dbType)
 
 	nic := expandDatabaseNetworkInterface(d)
 
@@ -47,11 +41,10 @@ func expandDatabaseBuilder(d *schema.ResourceData, client *APIClient) *databaseB
 		NetworkMaskLen: nic.netmask,
 		DefaultRoute:   nic.gateway,
 		Conf: &iaas.DatabaseRemarkDBConfCommon{
-			DatabaseName:     dbVersion.Name,
-			DatabaseVersion:  dbVersion.Version,
-			DatabaseRevision: dbVersion.Revision,
-			DefaultUser:      d.Get("username").(string),
-			UserPassword:     d.Get("password").(string),
+			DatabaseName:    dbName.String(),
+			DatabaseVersion: d.Get("database_version").(string),
+			DefaultUser:     d.Get("username").(string),
+			UserPassword:    d.Get("password").(string),
 		},
 		CommonSetting: &iaas.DatabaseSettingCommon{
 			ServicePort:     nic.port,
@@ -141,14 +134,7 @@ func expandDatabaseReadReplicaBuilder(ctx context.Context, d *schema.ResourceDat
 }
 
 func flattenDatabaseType(db *iaas.Database) string {
-	var databaseType string
-	switch db.Conf.DatabaseName {
-	case types.RDBMSVersions[types.RDBMSTypesPostgreSQL].Name:
-		databaseType = "postgres"
-	case types.RDBMSVersions[types.RDBMSTypesMariaDB].Name:
-		databaseType = "mariadb"
-	}
-	return databaseType
+	return strings.ToLower(db.Conf.DatabaseName)
 }
 
 func flattenDatabaseTags(db *iaas.Database) *schema.Set {

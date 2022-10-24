@@ -47,6 +47,7 @@ func TestAccSakuraCloudDatabase_basic(t *testing.T) {
 					testCheckSakuraCloudDatabaseExists(resourceName, &database),
 					testCheckSakuraCloudDatabaseIsMaster(true, &database),
 					resource.TestCheckResourceAttr(resourceName, "database_type", "mariadb"),
+					resource.TestCheckResourceAttrSet(resourceName, "database_version"),
 					resource.TestCheckResourceAttr(resourceName, "name", rand),
 					resource.TestCheckResourceAttr(resourceName, "plan", "30g"),
 					resource.TestCheckResourceAttr(resourceName, "description", "description"),
@@ -83,6 +84,7 @@ func TestAccSakuraCloudDatabase_basic(t *testing.T) {
 					testCheckSakuraCloudDatabaseExists(resourceName, &database),
 					testCheckSakuraCloudDatabaseIsMaster(false, &database),
 					resource.TestCheckResourceAttr(resourceName, "database_type", "mariadb"),
+					resource.TestCheckResourceAttrSet(resourceName, "database_version"),
 					resource.TestCheckResourceAttr(resourceName, "name", rand+"-upd"),
 					resource.TestCheckResourceAttr(resourceName, "plan", "30g"),
 					resource.TestCheckResourceAttr(resourceName, "description", "description-upd"),
@@ -212,7 +214,8 @@ func TestAccImportSakuraCloudDatabase_basic(t *testing.T) {
 		if err := compareStateMulti(s[0], expects); err != nil {
 			return err
 		}
-		return stateNotEmptyMulti(s[0], "icon_id", "network_interface.0.switch_id")
+		// Note: database_versionのデフォルト値はcomputedなため比較時は無視する
+		return stateNotEmptyMulti(s[0], "database_version", "icon_id", "network_interface.0.switch_id")
 	}
 
 	resourceName := "sakuracloud_database.foobar"

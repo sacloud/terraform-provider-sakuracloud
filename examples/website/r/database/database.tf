@@ -3,8 +3,9 @@ variable password {}
 variable replica_password {}
 
 resource "sakuracloud_database" "foobar" {
-  database_type = "mariadb"
-  plan          = "30g"
+  database_type    = "mariadb"
+  # database_version = "13" // optional
+  plan             = "30g"
 
   username = var.username
   password = var.password
