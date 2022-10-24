@@ -1,6 +1,12 @@
 # CHANGELOG
 
-# 2.19.4 (2022-10-19)
+## 2.20.0 (Unreleased)
+
+FEATURES:
+
+- sakuracloud_database: RDBMSのバージョン指定機能 #975
+
+## 2.19.4 (2022-10-19)
 
 IMPROVEMENTS:
 
