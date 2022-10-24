@@ -40,6 +40,11 @@ func dataSourceSakuraCloudDatabase() *schema.Resource {
 					types.RDBMSTypeStrings,
 				),
 			},
+			"database_version": {
+				Type:        schema.TypeString,
+				Computed:    true,
+				Description: "The version of the database",
+			},
 			"plan": schemaDataSourcePlan(resourceName, types.DatabasePlanStrings),
 			"username": {
 				Type:        schema.TypeString,

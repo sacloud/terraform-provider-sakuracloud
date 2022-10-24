@@ -57,6 +57,13 @@ func resourceSakuraCloudDatabase() *schema.Resource {
 					types.RDBMSTypeStrings,
 				),
 			},
+			"database_version": {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Computed:    true,
+				ForceNew:    true,
+				Description: "The version of the database",
+			},
 			"plan": schemaResourcePlan(resourceName, "10g", types.DatabasePlanStrings),
 			"username": {
 				Type:             schema.TypeString,
@@ -287,7 +294,8 @@ func setDatabaseResourceData(ctx context.Context, d *schema.ResourceData, client
 		return diag.Errorf("got unexpected state: Database[%d].Availability is failed", data.ID)
 	}
 
-	d.Set("database_type", flattenDatabaseType(data)) // nolint
+	d.Set("database_type", flattenDatabaseType(data))    // nolint
+	d.Set("database_version", data.Conf.DatabaseVersion) // nolint
 	if data.ReplicationSetting != nil {
 		d.Set("replica_user", data.CommonSetting.ReplicaUser)         // nolint
 		d.Set("replica_password", data.CommonSetting.ReplicaPassword) // nolint
