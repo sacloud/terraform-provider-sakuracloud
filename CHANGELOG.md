@@ -6,6 +6,10 @@ FEATURES:
 
 - sakuracloud_database: RDBMSのバージョン指定機能 #975
 
+IMPROVEMENTS:
+
+- go: bump github.com/sacloud/iaas-service-go from 1.3.2 to 1.4.0 #977
+
 ## 2.19.4 (2022-10-19)
 
 IMPROVEMENTS:
