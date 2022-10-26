@@ -1,6 +1,6 @@
 # CHANGELOG
 
-## 2.20.0 (Unreleased)
+## 2.20.0 (2020-10-26)
 
 FEATURES:
 

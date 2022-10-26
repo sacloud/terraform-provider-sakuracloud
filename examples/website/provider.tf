@@ -2,7 +2,7 @@
 provider "sakuracloud" {
   # We recommend pinning to the specific version of the SakuraCloud Provider you're using
   # since new versions are released frequently
-  version = "2.19.4"
+  version = "2.20.0"
 
   # More information on the authentication methods supported by
   # the SakuraCloud Provider can be found here:
