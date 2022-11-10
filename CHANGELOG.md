@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## 2.20.1 (Unreleased)
+
+IMPROVEMENTS:
+
+- go: bump github.com/goccy/go-yaml from 1.9.5 to 1.9.6 #978
+
 ## 2.20.0 (2020-10-26)
 
 FEATURES:
