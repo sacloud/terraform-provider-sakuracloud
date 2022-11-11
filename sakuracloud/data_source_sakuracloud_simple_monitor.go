@@ -21,6 +21,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/sacloud/iaas-api-go"
 	"github.com/sacloud/iaas-api-go/types"
+	"github.com/sacloud/terraform-provider-sakuracloud/internal/desc"
 )
 
 func dataSourceSakuraCloudSimpleMonitor() *schema.Resource {
@@ -43,14 +44,14 @@ func dataSourceSakuraCloudSimpleMonitor() *schema.Resource {
 			"max_check_attempts": {
 				Type:     schema.TypeInt,
 				Computed: true,
-				Description: descf(
+				Description: desc.Sprintf(
 					"The number of retry",
 				),
 			},
 			"retry_interval": {
 				Type:     schema.TypeInt,
 				Computed: true,
-				Description: descf(
+				Description: desc.Sprintf(
 					"The interval in seconds between retries",
 				),
 			},
@@ -67,7 +68,7 @@ func dataSourceSakuraCloudSimpleMonitor() *schema.Resource {
 						"protocol": {
 							Type:     schema.TypeString,
 							Computed: true,
-							Description: descf(
+							Description: desc.Sprintf(
 								"The protocol used for health checks. This will be one of [%s]",
 								types.SimpleMonitorProtocolStrings,
 							),
@@ -150,7 +151,7 @@ func dataSourceSakuraCloudSimpleMonitor() *schema.Resource {
 						"ftps": {
 							Type:     schema.TypeString,
 							Computed: true,
-							Description: descf(
+							Description: desc.Sprintf(
 								"The methods of invoking security for monitoring with FTPS. This will be one of [%s]",
 								types.SimpleMonitorFTPSStrings,
 							),

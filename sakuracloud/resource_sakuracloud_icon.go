@@ -21,6 +21,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/sacloud/iaas-api-go"
+	"github.com/sacloud/terraform-provider-sakuracloud/internal/desc"
 )
 
 func resourceSakuraCloudIcon() *schema.Resource {
@@ -44,9 +45,9 @@ func resourceSakuraCloudIcon() *schema.Resource {
 				Optional:      true,
 				ConflictsWith: []string{"base64content"},
 				ForceNew:      true,
-				Description: descf(
+				Description: desc.Sprintf(
 					"The file path to upload to as the Icon. %s",
-					descConflicts("base64content"),
+					desc.Conflicts("base64content"),
 				),
 			},
 			"base64content": {
@@ -54,9 +55,9 @@ func resourceSakuraCloudIcon() *schema.Resource {
 				Optional:      true,
 				ConflictsWith: []string{"source"},
 				ForceNew:      true,
-				Description: descf(
+				Description: desc.Sprintf(
 					"The base64 encoded content to upload to as the Icon. %s",
-					descConflicts("source"),
+					desc.Conflicts("source"),
 				),
 			},
 			"tags": schemaResourceTags(resourceName),

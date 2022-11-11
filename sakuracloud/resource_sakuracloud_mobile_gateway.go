@@ -25,6 +25,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
 	"github.com/sacloud/iaas-api-go"
 	"github.com/sacloud/iaas-api-go/helper/cleanup"
+	"github.com/sacloud/terraform-provider-sakuracloud/internal/desc"
 )
 
 func resourceSakuraCloudMobileGateway() *schema.Resource {
@@ -57,22 +58,22 @@ func resourceSakuraCloudMobileGateway() *schema.Resource {
 							Type:             schema.TypeString,
 							ValidateDiagFunc: validation.ToDiagFunc(validateSakuracloudIDType),
 							Required:         true,
-							Description:      descf("The id of the switch to which the %s connects", resourceName),
+							Description:      desc.Sprintf("The id of the switch to which the %s connects", resourceName),
 						},
 						"ip_address": {
 							Type:             schema.TypeString,
 							ValidateDiagFunc: validateIPv4Address(),
 							Required:         true,
-							Description:      descf("The IP address to assign to the %s", resourceName),
+							Description:      desc.Sprintf("The IP address to assign to the %s", resourceName),
 						},
 						"netmask": {
 							Type:             schema.TypeInt,
 							Required:         true,
 							ValidateDiagFunc: validation.ToDiagFunc(validation.IntBetween(8, 29)),
-							Description: descf(
+							Description: desc.Sprintf(
 								"The bit length of the subnet to assign to the %s. %s",
 								resourceName,
-								descRange(8, 29),
+								desc.Range(8, 29),
 							),
 						},
 					},
@@ -81,12 +82,12 @@ func resourceSakuraCloudMobileGateway() *schema.Resource {
 			"public_ip": {
 				Type:        schema.TypeString,
 				Computed:    true,
-				Description: descf("The public IP address assigned to the %s", resourceName),
+				Description: desc.Sprintf("The public IP address assigned to the %s", resourceName),
 			},
 			"public_netmask": {
 				Type:        schema.TypeInt,
 				Computed:    true,
-				Description: descf("The bit length of the subnet assigned to the %s", resourceName),
+				Description: desc.Sprintf("The bit length of the subnet assigned to the %s", resourceName),
 			},
 			"internet_connection": {
 				Type:        schema.TypeBool,
@@ -178,7 +179,7 @@ func resourceSakuraCloudMobileGateway() *schema.Resource {
 							Type:             schema.TypeString,
 							ValidateDiagFunc: validation.ToDiagFunc(validateSakuracloudIDType),
 							Required:         true,
-							Description:      descf("The id of the Switch connected to the %s", resourceName),
+							Description:      desc.Sprintf("The id of the Switch connected to the %s", resourceName),
 						},
 						"ip_address": {
 							Type:             schema.TypeString,

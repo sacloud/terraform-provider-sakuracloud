@@ -24,6 +24,7 @@ import (
 	"github.com/sacloud/iaas-api-go/helper/cleanup"
 	"github.com/sacloud/iaas-api-go/helper/query"
 	"github.com/sacloud/iaas-api-go/types"
+	"github.com/sacloud/terraform-provider-sakuracloud/internal/desc"
 )
 
 func resourceSakuraCloudSIM() *schema.Resource {
@@ -71,7 +72,7 @@ func resourceSakuraCloudSIM() *schema.Resource {
 				Set:      schema.HashString,
 				MinItems: 1,
 				MaxItems: 3,
-				Description: descf(
+				Description: desc.Sprintf(
 					"A list of a communication company. Each element must be one of %s",
 					types.SIMOperatorShortNames(),
 				),

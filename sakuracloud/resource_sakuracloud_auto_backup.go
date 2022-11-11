@@ -23,6 +23,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
 	"github.com/sacloud/iaas-api-go"
 	"github.com/sacloud/iaas-api-go/types"
+	"github.com/sacloud/terraform-provider-sakuracloud/internal/desc"
 )
 
 func resourceSakuraCloudAutoBackup() *schema.Resource {
@@ -56,7 +57,7 @@ func resourceSakuraCloudAutoBackup() *schema.Resource {
 				Required: true,
 				Elem:     &schema.Schema{Type: schema.TypeString},
 				Set:      schema.HashString,
-				Description: descf(
+				Description: desc.Sprintf(
 					"A list of weekdays to backed up. The values in the list must be in [%s]",
 					types.DaysOfTheWeekStrings,
 				),
@@ -66,7 +67,7 @@ func resourceSakuraCloudAutoBackup() *schema.Resource {
 				Optional:         true,
 				Default:          1,
 				ValidateDiagFunc: validation.ToDiagFunc(validation.IntBetween(1, 10)),
-				Description:      descf("The number backup files to keep. %s", descRange(1, 10)),
+				Description:      desc.Sprintf("The number backup files to keep. %s", desc.Range(1, 10)),
 			},
 			"icon_id":     schemaResourceIconID(resourceName),
 			"description": schemaResourceDescription(resourceName),

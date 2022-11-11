@@ -21,6 +21,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/sacloud/iaas-api-go"
 	"github.com/sacloud/iaas-api-go/types"
+	"github.com/sacloud/terraform-provider-sakuracloud/internal/desc"
 )
 
 func dataSourceSakuraCloudContainerRegistry() *schema.Resource {
@@ -34,7 +35,7 @@ func dataSourceSakuraCloudContainerRegistry() *schema.Resource {
 			"access_level": {
 				Type:     schema.TypeString,
 				Computed: true,
-				Description: descf(
+				Description: desc.Sprintf(
 					"The level of access that allow to users. This will be one of [%s]",
 					types.ContainerRegistryAccessLevelStrings,
 				),
@@ -67,7 +68,7 @@ func dataSourceSakuraCloudContainerRegistry() *schema.Resource {
 						"permission": {
 							Type:     schema.TypeString,
 							Computed: true,
-							Description: descf(
+							Description: desc.Sprintf(
 								"The level of access that allow to the user. This will be one of [%s]",
 								types.ContainerRegistryPermissionStrings,
 							),

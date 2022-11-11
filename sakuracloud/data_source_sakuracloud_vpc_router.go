@@ -21,6 +21,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/sacloud/iaas-api-go"
 	"github.com/sacloud/iaas-api-go/types"
+	"github.com/sacloud/terraform-provider-sakuracloud/internal/desc"
 )
 
 func dataSourceSakuraCloudVPCRouter() *schema.Resource {
@@ -206,7 +207,7 @@ func dataSourceSakuraCloudVPCRouter() *schema.Resource {
 						"direction": {
 							Type:     schema.TypeString,
 							Computed: true,
-							Description: descf(
+							Description: desc.Sprintf(
 								"The direction to apply the firewall. This will be one of [%s]",
 								[]string{"send", "receive"},
 							),
@@ -219,7 +220,7 @@ func dataSourceSakuraCloudVPCRouter() *schema.Resource {
 									"protocol": {
 										Type:     schema.TypeString,
 										Computed: true,
-										Description: descf(
+										Description: desc.Sprintf(
 											"The protocol used for filtering. This will be one of [%s]",
 											types.VPCRouterFirewallProtocolStrings,
 										),
@@ -294,7 +295,7 @@ func dataSourceSakuraCloudVPCRouter() *schema.Resource {
 						"protocol": {
 							Type:     schema.TypeString,
 							Computed: true,
-							Description: descf(
+							Description: desc.Sprintf(
 								"The protocol used for port forwarding. This will be one of [%s]",
 								[]string{"tcp", "udp"},
 							),
@@ -517,7 +518,7 @@ func dataSourceSakuraCloudVPCRouter() *schema.Resource {
 						"day_of_week": {
 							Type:     schema.TypeString,
 							Computed: true,
-							Description: descf(
+							Description: desc.Sprintf(
 								"The value must be in [%s]",
 								types.DaysOfTheWeekStrings,
 							),

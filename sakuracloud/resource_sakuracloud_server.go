@@ -26,6 +26,7 @@ import (
 	"github.com/sacloud/iaas-api-go/helper/power"
 	"github.com/sacloud/iaas-api-go/helper/query"
 	"github.com/sacloud/iaas-api-go/types"
+	"github.com/sacloud/terraform-provider-sakuracloud/internal/desc"
 )
 
 func resourceSakuraCloudServer() *schema.Resource {
@@ -69,7 +70,7 @@ func resourceSakuraCloudServer() *schema.Resource {
 				Optional:         true,
 				Default:          types.Commitments.Standard.String(),
 				ValidateDiagFunc: validation.ToDiagFunc(validation.StringInSlice(types.CommitmentStrings, false)),
-				Description: descf(
+				Description: desc.Sprintf(
 					"The policy of how to allocate virtual CPUs to the server. This must be one of [%s]",
 					types.CommitmentStrings,
 				),
@@ -85,7 +86,7 @@ func resourceSakuraCloudServer() *schema.Resource {
 				Optional:         true,
 				Default:          types.InterfaceDrivers.VirtIO.String(),
 				ValidateDiagFunc: validation.ToDiagFunc(validation.StringInSlice(types.InterfaceDriverStrings, false)),
-				Description: descf(
+				Description: desc.Sprintf(
 					"The driver name of network interface. This must be one of [%s]",
 					types.InterfaceDriverStrings,
 				),
@@ -100,7 +101,7 @@ func resourceSakuraCloudServer() *schema.Resource {
 							Type:             schema.TypeString,
 							Required:         true,
 							ValidateDiagFunc: validation.ToDiagFunc(validateSakuraCloudServerNIC),
-							Description: descf(
+							Description: desc.Sprintf(
 								"The upstream type or upstream switch id. This must be one of [%s]",
 								[]string{"shared", "disconnect", "<switch id>"},
 							),
@@ -151,7 +152,7 @@ func resourceSakuraCloudServer() *schema.Resource {
 				Type:          schema.TypeString,
 				Optional:      true,
 				ConflictsWith: []string{"disk_edit_parameter"},
-				Description:   descf("A string representing the user data used by cloud-init. %s", descConflicts("disk_edit_parameter")),
+				Description:   desc.Sprintf("A string representing the user data used by cloud-init. %s", desc.Conflicts("disk_edit_parameter")),
 			},
 			"disk_edit_parameter": {
 				Type:          schema.TypeList,
@@ -165,14 +166,14 @@ func resourceSakuraCloudServer() *schema.Resource {
 							Type:             schema.TypeString,
 							Optional:         true,
 							ValidateDiagFunc: validation.ToDiagFunc(validation.StringLenBetween(1, 64)),
-							Description:      descf("The hostname of the %s. %s", resourceName, descLength(1, 64)),
+							Description:      desc.Sprintf("The hostname of the %s. %s", resourceName, desc.Length(1, 64)),
 						},
 						"password": {
 							Type:             schema.TypeString,
 							Optional:         true,
 							ValidateDiagFunc: validation.ToDiagFunc(validation.StringLenBetween(8, 64)),
 							Sensitive:        true,
-							Description:      descf("The password of default user. %s", descLength(8, 64)),
+							Description:      desc.Sprintf("The password of default user. %s", desc.Length(8, 64)),
 						},
 						"ssh_key_ids": {
 							Type:        schema.TypeList,
@@ -261,12 +262,12 @@ func resourceSakuraCloudServer() *schema.Resource {
 			"ip_address": {
 				Type:        schema.TypeString,
 				Computed:    true,
-				Description: descf("The IP address assigned to the %s", resourceName),
+				Description: desc.Sprintf("The IP address assigned to the %s", resourceName),
 			},
 			"gateway": {
 				Type:        schema.TypeString,
 				Computed:    true,
-				Description: descf("The IP address of the gateway used by %s", resourceName),
+				Description: desc.Sprintf("The IP address of the gateway used by %s", resourceName),
 			},
 			"network_address": {
 				Type:        schema.TypeString,
@@ -276,7 +277,7 @@ func resourceSakuraCloudServer() *schema.Resource {
 			"netmask": {
 				Type:        schema.TypeInt,
 				Computed:    true,
-				Description: descf("The bit length of the subnet assigned to the %s", resourceName),
+				Description: desc.Sprintf("The bit length of the subnet assigned to the %s", resourceName),
 			},
 			"dns_servers": {
 				Type:        schema.TypeList,

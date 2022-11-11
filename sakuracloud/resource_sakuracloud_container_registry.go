@@ -23,6 +23,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
 	"github.com/sacloud/iaas-api-go"
 	"github.com/sacloud/iaas-api-go/types"
+	"github.com/sacloud/terraform-provider-sakuracloud/internal/desc"
 )
 
 func resourceSakuraCloudContainerRegistry() *schema.Resource {
@@ -45,7 +46,7 @@ func resourceSakuraCloudContainerRegistry() *schema.Resource {
 				Type:             schema.TypeString,
 				Required:         true,
 				ValidateDiagFunc: validation.ToDiagFunc(validation.StringInSlice(types.ContainerRegistryAccessLevelStrings, false)),
-				Description: descf(
+				Description: desc.Sprintf(
 					"The level of access that allow to users. This must be one of [%s]",
 					types.ContainerRegistryAccessLevelStrings,
 				),
@@ -60,9 +61,9 @@ func resourceSakuraCloudContainerRegistry() *schema.Resource {
 				Required:         true,
 				ForceNew:         true,
 				ValidateDiagFunc: validation.ToDiagFunc(validation.StringLenBetween(1, 64)),
-				Description: descf(
+				Description: desc.Sprintf(
 					"The label at the lowest of the FQDN used when be accessed from users. %s",
-					descLength(1, 64),
+					desc.Length(1, 64),
 				),
 			},
 			"fqdn": {
@@ -93,7 +94,7 @@ func resourceSakuraCloudContainerRegistry() *schema.Resource {
 							Type:             schema.TypeString,
 							Required:         true,
 							ValidateDiagFunc: validation.ToDiagFunc(validation.StringInSlice(types.ContainerRegistryPermissionStrings, false)),
-							Description: descf(
+							Description: desc.Sprintf(
 								"The level of access that allow to the user. This must be one of [%s]",
 								types.ContainerRegistryPermissionStrings,
 							),

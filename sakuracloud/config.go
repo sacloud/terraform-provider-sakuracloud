@@ -31,6 +31,8 @@ import (
 	"github.com/sacloud/iaas-api-go"
 	"github.com/sacloud/iaas-api-go/helper/api"
 	"github.com/sacloud/iaas-api-go/helper/query"
+	"github.com/sacloud/terraform-provider-sakuracloud/internal/defaults"
+	"github.com/sacloud/terraform-provider-sakuracloud/version"
 	"github.com/sacloud/webaccel-api-go"
 )
 
@@ -109,10 +111,11 @@ func (c *Config) loadFromProfile() error {
 	if c.AccessTokenSecret == "" {
 		c.AccessTokenSecret = pcv.AccessTokenSecret
 	}
-	if (c.Zone == "" || c.Zone == defaultZone) && pcv.Zone != "" {
+	if (c.Zone == "" || c.Zone == defaults.Zone) && pcv.Zone != "" {
 		c.Zone = pcv.Zone
 	}
 
+	defaultZones := iaas.SakuraCloudZones
 	sort.Strings(c.Zones)
 	sort.Strings(defaultZones)
 	if (len(c.Zones) == 0 || reflect.DeepEqual(defaultZones, c.Zones)) && len(pcv.Zones) > 0 {
@@ -133,7 +136,7 @@ func (c *Config) loadFromProfile() error {
 	if c.APIRootURL == "" {
 		c.APIRootURL = pcv.APIRootURL
 	}
-	if (c.RetryMax == 0 || c.RetryMax == defaultRetryMax) && pcv.RetryMax > 0 {
+	if (c.RetryMax == 0 || c.RetryMax == defaults.RetryMax) && pcv.RetryMax > 0 {
 		c.RetryMax = pcv.RetryMax
 	}
 	if c.RetryWaitMax == 0 {
@@ -142,10 +145,10 @@ func (c *Config) loadFromProfile() error {
 	if c.RetryWaitMin == 0 {
 		c.RetryWaitMin = pcv.RetryWaitMin
 	}
-	if (c.APIRequestTimeout == 0 || c.APIRequestTimeout == defaultAPIRequestTimeout) && pcv.HTTPRequestTimeout > 0 {
+	if (c.APIRequestTimeout == 0 || c.APIRequestTimeout == defaults.APIRequestTimeout) && pcv.HTTPRequestTimeout > 0 {
 		c.APIRequestTimeout = pcv.HTTPRequestTimeout
 	}
-	if (c.APIRequestRateLimit == 0 || c.APIRequestRateLimit == defaultAPIRequestRateLimit) && pcv.HTTPRequestRateLimit > 0 {
+	if (c.APIRequestRateLimit == 0 || c.APIRequestRateLimit == defaults.APIRequestRateLimit) && pcv.HTTPRequestRateLimit > 0 {
 		c.APIRequestRateLimit = pcv.HTTPRequestRateLimit
 	}
 	return nil
@@ -172,7 +175,7 @@ func (c *Config) NewClient() (*APIClient, error) {
 	}
 
 	tfUserAgent := terraformUserAgent(c.terraformVersion)
-	providerUserAgent := fmt.Sprintf("%s/v%s", "terraform-provider-sakuracloud", Version)
+	providerUserAgent := fmt.Sprintf("%s/v%s", "terraform-provider-sakuracloud", version.Version)
 	ua := fmt.Sprintf("%s %s", tfUserAgent, providerUserAgent)
 	if add := os.Getenv(uaEnvVar); add != "" {
 		ua += " " + add
@@ -216,7 +219,7 @@ func (c *Config) NewClient() (*APIClient, error) {
 
 	zones := c.Zones
 	if len(zones) == 0 {
-		zones = defaultZones
+		zones = iaas.SakuraCloudZones
 	}
 
 	// fakeモード有効時は待ち時間を短くしておく

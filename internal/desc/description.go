@@ -12,14 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package sakuracloud
+package desc
 
 import (
 	"fmt"
 	"strings"
 )
 
-func quoteAndJoin(a []string, quote, sep string) string {
+func QuoteAndJoin(a []string, quote, sep string) string {
 	if quote == "" {
 		quote = `"`
 	}
@@ -30,7 +30,7 @@ func quoteAndJoin(a []string, quote, sep string) string {
 	return strings.Join(ret, sep)
 }
 
-func quoteAndJoinInt(a []int, quote, sep string) string {
+func QuoteAndJoinInt(a []int, quote, sep string) string {
 	if quote == "" {
 		quote = `"`
 	}
@@ -41,15 +41,15 @@ func quoteAndJoinInt(a []int, quote, sep string) string {
 	return strings.Join(ret, sep)
 }
 
-func descf(format string, a ...interface{}) string {
+func Sprintf(format string, a ...interface{}) string {
 	args := make([]interface{}, len(a))
 	for i, a := range a {
 		var v interface{}
 		switch a := a.(type) {
 		case []string:
-			v = quoteAndJoin(a, "`", "/")
+			v = QuoteAndJoin(a, "`", "/")
 		case []int:
-			v = quoteAndJoinInt(a, "`", "/")
+			v = QuoteAndJoinInt(a, "`", "/")
 		default:
 			v = a
 		}
@@ -58,27 +58,27 @@ func descf(format string, a ...interface{}) string {
 	return fmt.Sprintf(format, args...)
 }
 
-func descRange(min, max int) string {
+func Range(min, max int) string {
 	return fmt.Sprintf("This must be in the range [`%d`-`%d`]", min, max)
 }
 
-func descLength(min, max int) string {
+func Length(min, max int) string {
 	return fmt.Sprintf("The length of this value must be in the range [`%d`-`%d`]", min, max)
 }
 
-func descConflicts(names ...string) string {
-	return descf("This conflicts with [%s]", names)
+func Conflicts(names ...string) string {
+	return Sprintf("This conflicts with [%s]", names)
 }
 
-func descResourcePlan(resourceName string, plans interface{}) string {
-	return descf(
+func ResourcePlan(resourceName string, plans interface{}) string {
+	return Sprintf(
 		"The plan name of the %s. This must be one of [%s]",
 		resourceName, plans,
 	)
 }
 
-func descDataSourcePlan(resourceName string, plans interface{}) string {
-	return descf(
+func DataSourcePlan(resourceName string, plans interface{}) string {
+	return Sprintf(
 		"The plan name of the %s. This will be one of [%s]",
 		resourceName, plans,
 	)

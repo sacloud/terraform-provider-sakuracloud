@@ -26,6 +26,7 @@ import (
 	"github.com/sacloud/iaas-api-go/helper/power"
 	"github.com/sacloud/iaas-api-go/types"
 	"github.com/sacloud/iaas-service-go/setup"
+	"github.com/sacloud/terraform-provider-sakuracloud/internal/desc"
 )
 
 func resourceSakuraCloudLoadBalancer() *schema.Resource {
@@ -70,23 +71,23 @@ func resourceSakuraCloudLoadBalancer() *schema.Resource {
 							MinItems:    1,
 							MaxItems:    2,
 							Elem:        &schema.Schema{Type: schema.TypeString},
-							Description: descf("A list of IP address to assign to the %s. ", resourceName),
+							Description: desc.Sprintf("A list of IP address to assign to the %s. ", resourceName),
 						},
 						"netmask": {
 							Type:             schema.TypeInt,
 							ForceNew:         true,
 							Required:         true,
 							ValidateDiagFunc: validation.ToDiagFunc(validation.IntBetween(8, 29)),
-							Description: descf(
+							Description: desc.Sprintf(
 								"The bit length of the subnet assigned to the %s. %s", resourceName,
-								descRange(8, 29),
+								desc.Range(8, 29),
 							),
 						},
 						"gateway": {
 							Type:        schema.TypeString,
 							ForceNew:    true,
 							Optional:    true,
-							Description: descf("The IP address of the gateway used by %s", resourceName),
+							Description: desc.Sprintf("The IP address of the gateway used by %s", resourceName),
 						},
 					},
 				},
@@ -110,9 +111,9 @@ func resourceSakuraCloudLoadBalancer() *schema.Resource {
 							Type:             schema.TypeInt,
 							Required:         true,
 							ValidateDiagFunc: validation.ToDiagFunc(validation.IntBetween(1, 65535)),
-							Description: descf(
+							Description: desc.Sprintf(
 								"The target port number for load-balancing. %s",
-								descRange(1, 65535),
+								desc.Range(1, 65535),
 							),
 						},
 						"delay_loop": {
@@ -120,9 +121,9 @@ func resourceSakuraCloudLoadBalancer() *schema.Resource {
 							Optional:         true,
 							ValidateDiagFunc: validation.ToDiagFunc(validation.IntBetween(10, 2147483647)),
 							Default:          10,
-							Description: descf(
+							Description: desc.Sprintf(
 								"The interval in seconds between checks. %s",
-								descRange(10, 2147483647),
+								desc.Range(10, 2147483647),
 							),
 						},
 						"sorry_server": {
@@ -146,7 +147,7 @@ func resourceSakuraCloudLoadBalancer() *schema.Resource {
 										Type:             schema.TypeString,
 										Required:         true,
 										ValidateDiagFunc: validation.ToDiagFunc(validation.StringInSlice(types.LoadBalancerHealthCheckProtocolStrings, false)),
-										Description: descf(
+										Description: desc.Sprintf(
 											"The protocol used for health checks. This must be one of [%s]",
 											types.LoadBalancerHealthCheckProtocolStrings,
 										),

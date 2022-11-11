@@ -23,6 +23,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
 	"github.com/sacloud/iaas-api-go"
 	"github.com/sacloud/iaas-api-go/types"
+	"github.com/sacloud/terraform-provider-sakuracloud/internal/desc"
 )
 
 func resourceSakuraCloudSimpleMonitor() *schema.Resource {
@@ -55,9 +56,9 @@ func resourceSakuraCloudSimpleMonitor() *schema.Resource {
 				Optional:         true,
 				ValidateDiagFunc: validation.ToDiagFunc(validation.IntBetween(60, 3600)),
 				Default:          60,
-				Description: descf(
+				Description: desc.Sprintf(
 					"The interval in seconds between checks. %s",
-					descRange(60, 3600),
+					desc.Range(60, 3600),
 				),
 			},
 			"max_check_attempts": {
@@ -65,9 +66,9 @@ func resourceSakuraCloudSimpleMonitor() *schema.Resource {
 				Optional:         true,
 				Computed:         true,
 				ValidateDiagFunc: validation.ToDiagFunc(validation.IntBetween(1, 10)),
-				Description: descf(
+				Description: desc.Sprintf(
 					"The number of retry. %s",
-					descRange(1, 10),
+					desc.Range(1, 10),
 				),
 			},
 			"retry_interval": {
@@ -75,9 +76,9 @@ func resourceSakuraCloudSimpleMonitor() *schema.Resource {
 				Optional:         true,
 				Computed:         true,
 				ValidateDiagFunc: validation.ToDiagFunc(validation.IntBetween(10, 3600)),
-				Description: descf(
+				Description: desc.Sprintf(
 					"The interval in seconds between retries. %s",
-					descRange(10, 3600),
+					desc.Range(10, 3600),
 				),
 			},
 			"timeout": {
@@ -85,9 +86,9 @@ func resourceSakuraCloudSimpleMonitor() *schema.Resource {
 				Optional:         true,
 				Computed:         true,
 				ValidateDiagFunc: validation.ToDiagFunc(validation.IntBetween(10, 30)),
-				Description: descf(
+				Description: desc.Sprintf(
 					"The timeout in seconds for monitoring. %s",
-					descRange(10, 30),
+					desc.Range(10, 30),
 				),
 			},
 			"health_check": {
@@ -101,7 +102,7 @@ func resourceSakuraCloudSimpleMonitor() *schema.Resource {
 							Type:             schema.TypeString,
 							Required:         true,
 							ValidateDiagFunc: validation.ToDiagFunc(validation.StringInSlice(types.SimpleMonitorProtocolStrings, false)),
-							Description: descf(
+							Description: desc.Sprintf(
 								"The protocol used for health checks. This must be one of [%s]",
 								types.SimpleMonitorProtocolStrings,
 							),
@@ -166,7 +167,7 @@ func resourceSakuraCloudSimpleMonitor() *schema.Resource {
 							Type:             schema.TypeString,
 							ValidateDiagFunc: validation.ToDiagFunc(validation.StringInSlice([]string{"1", "2c"}, false)),
 							Optional:         true,
-							Description: descf(
+							Description: desc.Sprintf(
 								"The SNMP version used when checking by SNMP. This must be one of %s",
 								[]string{"1", "2c"},
 							),
@@ -181,9 +182,9 @@ func resourceSakuraCloudSimpleMonitor() *schema.Resource {
 							Optional:         true,
 							ValidateDiagFunc: validation.ToDiagFunc(validation.IntBetween(1, 9999)),
 							Default:          30,
-							Description: descf(
+							Description: desc.Sprintf(
 								"The number of remaining days until certificate expiration used when checking SSL certificates. %s",
-								descRange(1, 9999),
+								desc.Range(1, 9999),
 							),
 						},
 						"http2": {
@@ -195,7 +196,7 @@ func resourceSakuraCloudSimpleMonitor() *schema.Resource {
 							Type:             schema.TypeString,
 							Optional:         true,
 							ValidateDiagFunc: validation.ToDiagFunc(validation.StringInSlice(types.SimpleMonitorFTPSStrings, false)),
-							Description: descf(
+							Description: desc.Sprintf(
 								"The methods of invoking security for monitoring with FTPS. This must be one of [%s]",
 								types.SimpleMonitorFTPSStrings,
 							),
@@ -239,7 +240,7 @@ func resourceSakuraCloudSimpleMonitor() *schema.Resource {
 				Optional:         true,
 				Default:          2,
 				ValidateDiagFunc: validation.ToDiagFunc(validation.IntBetween(1, 72)),
-				Description:      descf("The interval in hours between notification. %s", descRange(1, 72)),
+				Description:      desc.Sprintf("The interval in hours between notification. %s", desc.Range(1, 72)),
 			},
 			"enabled": {
 				Type:        schema.TypeBool,

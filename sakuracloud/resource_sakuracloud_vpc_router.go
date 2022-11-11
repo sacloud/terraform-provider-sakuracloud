@@ -24,6 +24,7 @@ import (
 	"github.com/sacloud/iaas-api-go"
 	"github.com/sacloud/iaas-api-go/helper/power"
 	"github.com/sacloud/iaas-api-go/types"
+	"github.com/sacloud/terraform-provider-sakuracloud/internal/desc"
 )
 
 func resourceSakuraCloudVPCRouter() *schema.Resource {
@@ -120,7 +121,7 @@ func resourceSakuraCloudVPCRouter() *schema.Resource {
 							Type:             schema.TypeInt,
 							Required:         true,
 							ValidateDiagFunc: validation.ToDiagFunc(validation.IntBetween(1, 7)),
-							Description:      descf("The index of the network interface. %s", descRange(1, 7)),
+							Description:      desc.Sprintf("The index of the network interface. %s", desc.Range(1, 7)),
 						},
 						"switch_id": {
 							Type:             schema.TypeString,
@@ -159,9 +160,9 @@ func resourceSakuraCloudVPCRouter() *schema.Resource {
 							Type:             schema.TypeInt,
 							Required:         true,
 							ValidateDiagFunc: validation.ToDiagFunc(validation.IntBetween(1, 7)),
-							Description: descf(
+							Description: desc.Sprintf(
 								"The index of the network interface on which to enable the DHCP service. %s",
-								descRange(1, 7),
+								desc.Range(1, 7),
 							),
 						},
 						"range_start": {
@@ -213,9 +214,9 @@ func resourceSakuraCloudVPCRouter() *schema.Resource {
 							Type:             schema.TypeInt,
 							Required:         true,
 							ValidateDiagFunc: validation.ToDiagFunc(validation.IntBetween(1, 7)),
-							Description: descf(
+							Description: desc.Sprintf(
 								"The index of the network interface on which to enable the DNS forwarding service. %s",
-								descRange(1, 7),
+								desc.Range(1, 7),
 							),
 						},
 						"dns_servers": {
@@ -236,16 +237,16 @@ func resourceSakuraCloudVPCRouter() *schema.Resource {
 							Type:             schema.TypeInt,
 							Optional:         true,
 							ValidateDiagFunc: validation.ToDiagFunc(validation.IntBetween(0, 7)),
-							Description: descf(
+							Description: desc.Sprintf(
 								"The index of the network interface on which to enable filtering. %s",
-								descRange(0, 7),
+								desc.Range(0, 7),
 							),
 						},
 						"direction": {
 							Type:             schema.TypeString,
 							Required:         true,
 							ValidateDiagFunc: validation.ToDiagFunc(validation.StringInSlice([]string{"send", "receive"}, false)),
-							Description: descf(
+							Description: desc.Sprintf(
 								"The direction to apply the firewall. This must be one of [%s]",
 								[]string{"send", "receive"},
 							),
@@ -259,7 +260,7 @@ func resourceSakuraCloudVPCRouter() *schema.Resource {
 										Type:             schema.TypeString,
 										Required:         true,
 										ValidateDiagFunc: validation.ToDiagFunc(validation.StringInSlice(types.VPCRouterFirewallProtocolStrings, false)),
-										Description: descf(
+										Description: desc.Sprintf(
 											"The protocol used for filtering. This must be one of [%s]",
 											types.VPCRouterFirewallProtocolStrings,
 										),
@@ -298,7 +299,7 @@ func resourceSakuraCloudVPCRouter() *schema.Resource {
 										Type:             schema.TypeString,
 										Optional:         true,
 										ValidateDiagFunc: validation.ToDiagFunc(validation.StringLenBetween(0, 512)),
-										Description:      descf("The description of the expression. %s", descLength(0, 512)),
+										Description:      desc.Sprintf("The description of the expression. %s", desc.Length(0, 512)),
 									},
 								},
 							},
@@ -343,7 +344,7 @@ func resourceSakuraCloudVPCRouter() *schema.Resource {
 							Type:             schema.TypeString,
 							Required:         true,
 							ValidateDiagFunc: validation.ToDiagFunc(validation.StringInSlice([]string{"tcp", "udp"}, false)),
-							Description: descf(
+							Description: desc.Sprintf(
 								"The protocol used for port forwarding. This must be one of [%s]",
 								[]string{"tcp", "udp"},
 							),
@@ -370,7 +371,7 @@ func resourceSakuraCloudVPCRouter() *schema.Resource {
 							Type:             schema.TypeString,
 							Optional:         true,
 							ValidateDiagFunc: validation.ToDiagFunc(validation.StringLenBetween(0, 512)),
-							Description:      descf("The description of the port forwarding. %s", descLength(0, 512)),
+							Description:      desc.Sprintf("The description of the port forwarding. %s", desc.Length(0, 512)),
 						},
 					},
 				},
@@ -458,7 +459,7 @@ func resourceSakuraCloudVPCRouter() *schema.Resource {
 							Required:         true,
 							Sensitive:        true,
 							ValidateDiagFunc: validation.ToDiagFunc(validation.StringLenBetween(0, 40)),
-							Description:      descf("The pre shared secret for the VPN. %s", descLength(0, 40)),
+							Description:      desc.Sprintf("The pre shared secret for the VPN. %s", desc.Length(0, 40)),
 						},
 						"routes": {
 							Type:        schema.TypeSet,
@@ -542,7 +543,7 @@ func resourceSakuraCloudVPCRouter() *schema.Resource {
 							Optional:         true,
 							Computed:         true,
 							ValidateDiagFunc: validation.ToDiagFunc(validation.StringInSlice(types.VPCRouterSiteToSiteVPNEncryptionAlgos, false)),
-							Description: descf(
+							Description: desc.Sprintf(
 								"This must be one of [%s]",
 								types.VPCRouterSiteToSiteVPNEncryptionAlgos,
 							),
@@ -552,7 +553,7 @@ func resourceSakuraCloudVPCRouter() *schema.Resource {
 							Optional:         true,
 							Computed:         true,
 							ValidateDiagFunc: validation.ToDiagFunc(validation.StringInSlice(types.VPCRouterSiteToSiteVPNHashAlgos, false)),
-							Description: descf(
+							Description: desc.Sprintf(
 								"This must be one of [%s]",
 								types.VPCRouterSiteToSiteVPNHashAlgos,
 							),
@@ -581,7 +582,7 @@ func resourceSakuraCloudVPCRouter() *schema.Resource {
 							Type:             schema.TypeString,
 							Optional:         true,
 							ValidateDiagFunc: validation.ToDiagFunc(validation.StringLenBetween(0, 512)),
-							Description:      descf("The description of the static nat. %s", descLength(0, 512)),
+							Description:      desc.Sprintf("The description of the static nat. %s", desc.Length(0, 512)),
 						},
 					},
 				},
@@ -616,7 +617,7 @@ func resourceSakuraCloudVPCRouter() *schema.Resource {
 							Type:     schema.TypeString,
 							Optional: true,
 							Default:  types.DaysOfTheWeek.Monday.String(),
-							Description: descf(
+							Description: desc.Sprintf(
 								"The value must be in [%s]",
 								types.DaysOfTheWeekStrings,
 							),

@@ -23,6 +23,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
 	"github.com/sacloud/iaas-api-go"
 	"github.com/sacloud/iaas-api-go/helper/power"
+	"github.com/sacloud/terraform-provider-sakuracloud/internal/desc"
 )
 
 func resourceSakuraCloudDatabaseReadReplica() *schema.Resource {
@@ -64,13 +65,13 @@ func resourceSakuraCloudDatabaseReadReplica() *schema.Resource {
 							Optional:         true,
 							Computed:         true,
 							ValidateDiagFunc: validation.ToDiagFunc(validateSakuracloudIDType),
-							Description:      descf("The id of the switch to which the %s connects. If `switch_id` isn't specified, it will be set to the same value of the master database", resourceName),
+							Description:      desc.Sprintf("The id of the switch to which the %s connects. If `switch_id` isn't specified, it will be set to the same value of the master database", resourceName),
 						},
 						"ip_address": {
 							Type:        schema.TypeString,
 							ForceNew:    true,
 							Required:    true,
-							Description: descf("The IP address to assign to the %s", resourceName),
+							Description: desc.Sprintf("The IP address to assign to the %s", resourceName),
 						},
 						"netmask": {
 							Type:             schema.TypeInt,
@@ -78,10 +79,10 @@ func resourceSakuraCloudDatabaseReadReplica() *schema.Resource {
 							Optional:         true,
 							Computed:         true,
 							ValidateDiagFunc: validation.ToDiagFunc(validation.IntBetween(8, 29)),
-							Description: descf(
+							Description: desc.Sprintf(
 								"The bit length of the subnet to assign to the %s. %s. If `netmask` isn't specified, it will be set to the same value of the master database",
 								resourceName,
-								descRange(8, 29),
+								desc.Range(8, 29),
 							),
 						},
 						"gateway": {
@@ -89,13 +90,13 @@ func resourceSakuraCloudDatabaseReadReplica() *schema.Resource {
 							ForceNew:    true,
 							Optional:    true,
 							Computed:    true,
-							Description: descf("The IP address of the gateway used by %s. If `gateway` isn't specified, it will be set to the same value of the master database", resourceName),
+							Description: desc.Sprintf("The IP address of the gateway used by %s. If `gateway` isn't specified, it will be set to the same value of the master database", resourceName),
 						},
 						"source_ranges": {
 							Type:     schema.TypeList,
 							Optional: true,
 							Elem:     &schema.Schema{Type: schema.TypeString},
-							Description: descf(
+							Description: desc.Sprintf(
 								"The range of source IP addresses that allow to access to the %s via network",
 								resourceName,
 							),

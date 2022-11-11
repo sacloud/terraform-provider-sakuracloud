@@ -24,6 +24,7 @@ import (
 	"github.com/sacloud/iaas-api-go"
 	"github.com/sacloud/iaas-api-go/helper/query"
 	"github.com/sacloud/iaas-api-go/types"
+	"github.com/sacloud/terraform-provider-sakuracloud/internal/desc"
 )
 
 func resourceSakuraCloudProxyLB() *schema.Resource {
@@ -80,7 +81,7 @@ func resourceSakuraCloudProxyLB() *schema.Resource {
 				Default:          types.ProxyLBRegions.IS1.String(),
 				ValidateDiagFunc: validation.ToDiagFunc(validation.StringInSlice(types.ProxyLBRegionStrings, false)),
 				ForceNew:         true,
-				Description: descf(
+				Description: desc.Sprintf(
 					"The name of region that the proxy LB is in. This must be one of [%s]",
 					types.ProxyLBRegionStrings,
 				),
@@ -119,7 +120,7 @@ func resourceSakuraCloudProxyLB() *schema.Resource {
 							Type:             schema.TypeString,
 							Required:         true,
 							ValidateDiagFunc: validation.ToDiagFunc(validation.StringInSlice(types.ProxyLBProxyModeStrings, false)),
-							Description: descf(
+							Description: desc.Sprintf(
 								"The proxy mode. This must be one of [%s]",
 								types.ProxyLBProxyModeStrings,
 							),
@@ -143,7 +144,7 @@ func resourceSakuraCloudProxyLB() *schema.Resource {
 							Type:             schema.TypeString,
 							Optional:         true,
 							ValidateDiagFunc: validation.ToDiagFunc(validation.StringInSlice(types.ProxyLBSSLPolicies, false)),
-							Description: descf(
+							Description: desc.Sprintf(
 								"The ssl policy. This must be one of [%s]",
 								types.ProxyLBSSLPolicies,
 							),
@@ -157,12 +158,12 @@ func resourceSakuraCloudProxyLB() *schema.Resource {
 									"header": {
 										Type:        schema.TypeString,
 										Required:    true,
-										Description: descf("The field name of HTTP header added to response by the %s", resourceName),
+										Description: desc.Sprintf("The field name of HTTP header added to response by the %s", resourceName),
 									},
 									"value": {
 										Type:        schema.TypeString,
 										Required:    true,
-										Description: descf("The field value of HTTP header added to response by the %s", resourceName),
+										Description: desc.Sprintf("The field value of HTTP header added to response by the %s", resourceName),
 									},
 								},
 							},
@@ -181,7 +182,7 @@ func resourceSakuraCloudProxyLB() *schema.Resource {
 							Type:             schema.TypeString,
 							Required:         true,
 							ValidateDiagFunc: validation.ToDiagFunc(validation.StringInSlice(types.ProxyLBProtocolStrings, false)),
-							Description: descf(
+							Description: desc.Sprintf(
 								"The protocol used for health checks. This must be one of [%s]",
 								types.ProxyLBProtocolStrings,
 							),
@@ -191,9 +192,9 @@ func resourceSakuraCloudProxyLB() *schema.Resource {
 							Optional:         true,
 							ValidateDiagFunc: validation.ToDiagFunc(validation.IntBetween(10, 60)),
 							Default:          10,
-							Description: descf(
+							Description: desc.Sprintf(
 								"The interval in seconds between checks. %s",
-								descRange(10, 60),
+								desc.Range(10, 60),
 							),
 						},
 						"host_header": {
@@ -310,15 +311,15 @@ func resourceSakuraCloudProxyLB() *schema.Resource {
 							Type:             schema.TypeInt,
 							Required:         true,
 							ValidateDiagFunc: validation.ToDiagFunc(validation.IntBetween(1, 65535)),
-							Description:      descf("The port number of the destination server. %s", descRange(1, 65535)),
+							Description:      desc.Sprintf("The port number of the destination server. %s", desc.Range(1, 65535)),
 						},
 						"group": {
 							Type:             schema.TypeString,
 							Optional:         true,
 							ValidateDiagFunc: validation.ToDiagFunc(validation.StringLenBetween(1, 10)),
-							Description: descf(
+							Description: desc.Sprintf(
 								"The name of load balancing group. This is used when using rule-based load balancing. %s",
-								descLength(1, 10),
+								desc.Length(1, 10),
 							),
 						},
 						"enabled": {
@@ -349,9 +350,9 @@ func resourceSakuraCloudProxyLB() *schema.Resource {
 							Type:             schema.TypeString,
 							Optional:         true,
 							ValidateDiagFunc: validation.ToDiagFunc(validation.StringLenBetween(1, 10)),
-							Description: descf(
+							Description: desc.Sprintf(
 								"The name of load balancing group. When proxyLB received request which matched to `host` and `path`, proxyLB forwards the request to servers that having same group name. %s",
-								descLength(1, 10),
+								desc.Length(1, 10),
 							),
 						},
 						"action": {
@@ -359,7 +360,7 @@ func resourceSakuraCloudProxyLB() *schema.Resource {
 							Optional:         true,
 							Default:          types.ProxyLBRuleActions.Forward,
 							ValidateDiagFunc: validation.ToDiagFunc(validation.StringInSlice(types.ProxyLBRuleActionStrings(), false)),
-							Description: descf(
+							Description: desc.Sprintf(
 								"The type of action to be performed when requests matches the rule. This must be one of [%s]",
 								types.ProxyLBRuleActionStrings(),
 							),
@@ -373,7 +374,7 @@ func resourceSakuraCloudProxyLB() *schema.Resource {
 							Type:             schema.TypeString,
 							Optional:         true,
 							ValidateDiagFunc: validation.ToDiagFunc(validation.StringInSlice(types.ProxyLBRedirectStatusCodeStrings(), false)),
-							Description: descf(
+							Description: desc.Sprintf(
 								"HTTP status code for redirects sent when requests matches the rule. This must be one of [%s]",
 								types.ProxyLBRedirectStatusCodeStrings(),
 							),
@@ -382,7 +383,7 @@ func resourceSakuraCloudProxyLB() *schema.Resource {
 							Type:             schema.TypeString,
 							Optional:         true,
 							ValidateDiagFunc: validation.ToDiagFunc(validation.StringInSlice(types.ProxyLBFixedStatusCodeStrings(), false)),
-							Description: descf(
+							Description: desc.Sprintf(
 								"HTTP status code for fixed response sent when requests matches the rule. This must be one of [%s]",
 								types.ProxyLBFixedStatusCodeStrings(),
 							),
@@ -391,7 +392,7 @@ func resourceSakuraCloudProxyLB() *schema.Resource {
 							Type:             schema.TypeString,
 							Optional:         true,
 							ValidateDiagFunc: validation.ToDiagFunc(validation.StringInSlice(types.ProxyLBFixedContentTypeStrings(), false)),
-							Description: descf(
+							Description: desc.Sprintf(
 								"Content-Type header value for fixed response sent when requests matches the rule. This must be one of [%s]",
 								types.ProxyLBFixedContentTypeStrings(),
 							),
@@ -410,18 +411,18 @@ func resourceSakuraCloudProxyLB() *schema.Resource {
 			"fqdn": {
 				Type:        schema.TypeString,
 				Computed:    true,
-				Description: descf("The FQDN for accessing to the %s. This is typically used as value of CNAME record", resourceName),
+				Description: desc.Sprintf("The FQDN for accessing to the %s. This is typically used as value of CNAME record", resourceName),
 			},
 			"vip": {
 				Type:        schema.TypeString,
 				Computed:    true,
-				Description: descf("The virtual IP address assigned to the %s", resourceName),
+				Description: desc.Sprintf("The virtual IP address assigned to the %s", resourceName),
 			},
 			"proxy_networks": {
 				Type:        schema.TypeList,
 				Elem:        &schema.Schema{Type: schema.TypeString},
 				Computed:    true,
-				Description: descf("A list of CIDR block used by the %s to access the server", resourceName),
+				Description: desc.Sprintf("A list of CIDR block used by the %s to access the server", resourceName),
 			},
 		},
 	}

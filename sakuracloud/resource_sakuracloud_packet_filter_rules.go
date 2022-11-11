@@ -23,6 +23,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
 	"github.com/sacloud/iaas-api-go"
 	"github.com/sacloud/iaas-api-go/types"
+	"github.com/sacloud/terraform-provider-sakuracloud/internal/desc"
 )
 
 func resourceSakuraCloudPacketFilterRules() *schema.Resource {
@@ -60,7 +61,7 @@ func resourceSakuraCloudPacketFilterRules() *schema.Resource {
 							Required:         true,
 							ValidateDiagFunc: validation.ToDiagFunc(validation.StringInSlice(types.PacketFilterProtocolStrings, false)),
 							ForceNew:         true,
-							Description: descf(
+							Description: desc.Sprintf(
 								"The protocol used for filtering. This must be one of [%s]",
 								types.PacketFilterProtocolStrings,
 							),

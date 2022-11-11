@@ -20,6 +20,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/sacloud/iaas-api-go"
+	"github.com/sacloud/terraform-provider-sakuracloud/internal/desc"
 )
 
 func dataSourceSakuraCloudInternet() *schema.Resource {
@@ -44,29 +45,29 @@ func dataSourceSakuraCloudInternet() *schema.Resource {
 				Type:        schema.TypeList,
 				Computed:    true,
 				Elem:        &schema.Schema{Type: schema.TypeString},
-				Description: descf("A list of the ID of Servers connected to the %s", resourceName),
+				Description: desc.Sprintf("A list of the ID of Servers connected to the %s", resourceName),
 			},
 			"network_address": {
 				Type:        schema.TypeString,
 				Computed:    true,
-				Description: descf("The IPv4 network address assigned to the %s", resourceName),
+				Description: desc.Sprintf("The IPv4 network address assigned to the %s", resourceName),
 			},
 			"gateway": schemaDataSourceGateway(resourceName),
 			"min_ip_address": {
 				Type:        schema.TypeString,
 				Computed:    true,
-				Description: descf("Minimum IP address in assigned global addresses to the %s", resourceName),
+				Description: desc.Sprintf("Minimum IP address in assigned global addresses to the %s", resourceName),
 			},
 			"max_ip_address": {
 				Type:        schema.TypeString,
 				Computed:    true,
-				Description: descf("Maximum IP address in assigned global addresses to the %s", resourceName),
+				Description: desc.Sprintf("Maximum IP address in assigned global addresses to the %s", resourceName),
 			},
 			"ip_addresses": {
 				Type:        schema.TypeList,
 				Computed:    true,
 				Elem:        &schema.Schema{Type: schema.TypeString},
-				Description: descf("A list of assigned global address to the %s", resourceName),
+				Description: desc.Sprintf("A list of assigned global address to the %s", resourceName),
 			},
 			"enable_ipv6": {
 				Type:        schema.TypeBool,
@@ -76,7 +77,7 @@ func dataSourceSakuraCloudInternet() *schema.Resource {
 			"ipv6_prefix": {
 				Type:        schema.TypeString,
 				Computed:    true,
-				Description: descf("The network prefix of assigned IPv6 addresses to the %s", resourceName),
+				Description: desc.Sprintf("The network prefix of assigned IPv6 addresses to the %s", resourceName),
 			},
 			"ipv6_prefix_len": {
 				Type:        schema.TypeInt,
@@ -86,7 +87,7 @@ func dataSourceSakuraCloudInternet() *schema.Resource {
 			"ipv6_network_address": {
 				Type:        schema.TypeString,
 				Computed:    true,
-				Description: descf("The IPv6 network address assigned to the %s", resourceName),
+				Description: desc.Sprintf("The IPv6 network address assigned to the %s", resourceName),
 			},
 			"zone": schemaDataSourceZone(resourceName),
 		},

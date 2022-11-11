@@ -27,6 +27,7 @@ import (
 	"github.com/sacloud/iaas-api-go/helper/power"
 	"github.com/sacloud/iaas-api-go/types"
 	"github.com/sacloud/iaas-service-go/setup"
+	"github.com/sacloud/terraform-provider-sakuracloud/internal/desc"
 )
 
 func resourceSakuraCloudNFS() *schema.Resource {
@@ -62,24 +63,24 @@ func resourceSakuraCloudNFS() *schema.Resource {
 							Type:        schema.TypeString,
 							ForceNew:    true,
 							Required:    true,
-							Description: descf("The IP address to assign to the %s", resourceName),
+							Description: desc.Sprintf("The IP address to assign to the %s", resourceName),
 						},
 						"netmask": {
 							Type:             schema.TypeInt,
 							ForceNew:         true,
 							Required:         true,
 							ValidateDiagFunc: validation.ToDiagFunc(validation.IntBetween(8, 29)),
-							Description: descf(
+							Description: desc.Sprintf(
 								"The bit length of the subnet to assign to the %s. %s",
 								resourceName,
-								descRange(8, 29),
+								desc.Range(8, 29),
 							),
 						},
 						"gateway": {
 							Type:        schema.TypeString,
 							ForceNew:    true,
 							Optional:    true,
-							Description: descf("The IP address of the gateway used by %s", resourceName),
+							Description: desc.Sprintf("The IP address of the gateway used by %s", resourceName),
 						},
 					},
 				},

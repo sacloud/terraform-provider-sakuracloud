@@ -23,6 +23,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
 	"github.com/sacloud/iaas-api-go"
 	"github.com/sacloud/iaas-api-go/types"
+	"github.com/sacloud/terraform-provider-sakuracloud/internal/desc"
 )
 
 func resourceSakuraCloudNote() *schema.Resource {
@@ -47,7 +48,7 @@ func resourceSakuraCloudNote() *schema.Resource {
 			"content": {
 				Type:     schema.TypeString,
 				Required: true,
-				Description: descf(
+				Description: desc.Sprintf(
 					"The content of the %s. This must be specified as a shell script or as a cloud-config",
 					resourceName,
 				),
@@ -57,14 +58,14 @@ func resourceSakuraCloudNote() *schema.Resource {
 				Optional:         true,
 				Default:          "shell",
 				ValidateDiagFunc: validation.ToDiagFunc(validation.StringInSlice(types.NoteClassStrings, false)),
-				Description:      descf("The class of the %s. This must be one of %s", resourceName, types.NoteClassStrings),
+				Description:      desc.Sprintf("The class of the %s. This must be one of %s", resourceName, types.NoteClassStrings),
 			},
 			"icon_id": schemaResourceIconID(resourceName),
 			"tags":    schemaResourceTags(resourceName),
 			"description": {
 				Type:        schema.TypeString,
 				Computed:    true,
-				Description: descf("The description of the %s. This will be computed from special tags within body of `content`", resourceName),
+				Description: desc.Sprintf("The description of the %s. This will be computed from special tags within body of `content`", resourceName),
 			},
 		},
 	}
