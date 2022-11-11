@@ -37,17 +37,20 @@ https://github.com/hashicorp/terraform-provider-aws/pull/25606
 
 - terraform-plugin-muxを用いてSDK/Framework両方に対応する
 - 新しいリソース/データソースの実装時には基本的にFrameworkを用いる
+- 実験的に一部の小さいリソース/データソースをFrameworkへマイグレーションする
 
 ## やること/やらないこと
 
 ### やること
 
 - terraform-plugin-muxの導入
+- 一部の小さなリソース/データソースをFrameworkへマイグレーション
 
 ### やらないこと
 
-- 既存リソースのFrameworkへのマイグレーション
+- 既存リソース全てをFrameworkへマイグレーション
 
 ## 改訂履歴
 
 - 2022/7/26: 初版作成
+- 2022/11/11: 一部リソースのみFrameworkへマイグレーションする方針に変更
