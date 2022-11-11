@@ -22,6 +22,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
 	"github.com/sacloud/iaas-api-go"
+	"github.com/sacloud/terraform-provider-sakuracloud/internal/desc"
 )
 
 func resourceSakuraCloudAutoScale() *schema.Resource {
@@ -47,7 +48,7 @@ func resourceSakuraCloudAutoScale() *schema.Resource {
 				Type:        schema.TypeList,
 				Required:    true,
 				Elem:        &schema.Schema{Type: schema.TypeString},
-				Description: descf("List of zone names where monitored resources are located"),
+				Description: desc.Sprintf("List of zone names where monitored resources are located"),
 			},
 			"config": {
 				Type:             schema.TypeString,

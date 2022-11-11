@@ -24,6 +24,7 @@ import (
 	"github.com/sacloud/iaas-api-go"
 	"github.com/sacloud/iaas-api-go/helper/cleanup"
 	"github.com/sacloud/iaas-api-go/types"
+	"github.com/sacloud/terraform-provider-sakuracloud/internal/desc"
 )
 
 func resourceSakuraCloudPrivateHost() *schema.Resource {
@@ -52,7 +53,7 @@ func resourceSakuraCloudPrivateHost() *schema.Resource {
 				Optional:         true,
 				Default:          types.PrivateHostClassDynamic,
 				ValidateDiagFunc: validation.ToDiagFunc(validation.StringInSlice(classes, false)),
-				Description:      descf("The class of the %s. This will be one of [%s]", resourceName, classes),
+				Description:      desc.Sprintf("The class of the %s. This will be one of [%s]", resourceName, classes),
 			},
 			"icon_id":     schemaResourceIconID(resourceName),
 			"description": schemaResourceDescription(resourceName),

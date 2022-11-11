@@ -21,6 +21,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/sacloud/iaas-api-go"
 	"github.com/sacloud/iaas-api-go/types"
+	"github.com/sacloud/terraform-provider-sakuracloud/internal/desc"
 )
 
 func dataSourceSakuraCloudServer() *schema.Resource {
@@ -50,7 +51,7 @@ func dataSourceSakuraCloudServer() *schema.Resource {
 			"commitment": {
 				Type:     schema.TypeString,
 				Computed: true,
-				Description: descf(
+				Description: desc.Sprintf(
 					"The policy of how to allocate virtual CPUs to the server. This will be one of [%s]",
 					types.CommitmentStrings,
 				),
@@ -64,7 +65,7 @@ func dataSourceSakuraCloudServer() *schema.Resource {
 			"interface_driver": {
 				Type:     schema.TypeString,
 				Computed: true,
-				Description: descf(
+				Description: desc.Sprintf(
 					"The driver name of network interface. This will be one of [%s]",
 					types.InterfaceDriverStrings,
 				),
@@ -77,7 +78,7 @@ func dataSourceSakuraCloudServer() *schema.Resource {
 						"upstream": {
 							Type:     schema.TypeString,
 							Computed: true,
-							Description: descf(
+							Description: desc.Sprintf(
 								"The upstream type or upstream switch id. This will be one of [%s]",
 								[]string{"shared", "disconnect", "<switch id>"},
 							),

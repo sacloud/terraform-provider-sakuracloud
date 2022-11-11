@@ -26,6 +26,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
 	"github.com/sacloud/iaas-api-go"
 	"github.com/sacloud/iaas-api-go/types"
+	"github.com/sacloud/terraform-provider-sakuracloud/internal/desc"
 )
 
 const defaultTTL = 3600
@@ -60,7 +61,7 @@ func resourceSakuraCloudDNSRecord() *schema.Resource {
 				Required:         true,
 				ValidateDiagFunc: validation.ToDiagFunc(validation.StringInSlice(types.DNSRecordTypeStrings, false)),
 				ForceNew:         true,
-				Description: descf(
+				Description: desc.Sprintf(
 					"The type of DNS Record. This must be one of [%s]",
 					types.DNSRecordTypeStrings,
 				),
@@ -83,21 +84,21 @@ func resourceSakuraCloudDNSRecord() *schema.Resource {
 				Optional:         true,
 				ValidateDiagFunc: validation.ToDiagFunc(validation.IntBetween(0, 65535)),
 				ForceNew:         true,
-				Description:      descf("The priority of target DNS Record. %s", descRange(0, 65535)),
+				Description:      desc.Sprintf("The priority of target DNS Record. %s", desc.Range(0, 65535)),
 			},
 			"weight": {
 				Type:             schema.TypeInt,
 				Optional:         true,
 				ValidateDiagFunc: validation.ToDiagFunc(validation.IntBetween(0, 65535)),
 				ForceNew:         true,
-				Description:      descf("The weight of target DNS Record. %s", descRange(0, 65535)),
+				Description:      desc.Sprintf("The weight of target DNS Record. %s", desc.Range(0, 65535)),
 			},
 			"port": {
 				Type:             schema.TypeInt,
 				Optional:         true,
 				ValidateDiagFunc: validation.ToDiagFunc(validation.IntBetween(1, 65535)),
 				ForceNew:         true,
-				Description:      descf("The number of port. %s", descRange(1, 65535)),
+				Description:      desc.Sprintf("The number of port. %s", desc.Range(1, 65535)),
 			},
 		},
 	}

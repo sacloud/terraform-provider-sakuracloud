@@ -22,6 +22,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
+	"github.com/sacloud/terraform-provider-sakuracloud/internal/desc"
 )
 
 const filterAttrName = "filter"
@@ -101,7 +102,7 @@ func filterSchema(opt *filterSchemaOption) *schema.Schema {
 						Optional:         true,
 						ValidateDiagFunc: validation.ToDiagFunc(validation.StringInSlice(filteringOperators, false)),
 						Default:          filteringOperatorPartialMatchAnd,
-						Description: descf(
+						Description: desc.Sprintf(
 							"The filtering operator. This must be one of following:  \n%s",
 							filteringOperators,
 						),

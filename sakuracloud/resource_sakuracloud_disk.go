@@ -26,6 +26,7 @@ import (
 	"github.com/sacloud/iaas-api-go/helper/cleanup"
 	"github.com/sacloud/iaas-api-go/types"
 	"github.com/sacloud/iaas-service-go/setup"
+	"github.com/sacloud/terraform-provider-sakuracloud/internal/desc"
 )
 
 func resourceSakuraCloudDisk() *schema.Resource {
@@ -54,7 +55,7 @@ func resourceSakuraCloudDisk() *schema.Resource {
 				ForceNew:         true,
 				Default:          types.DiskConnections.VirtIO,
 				ValidateDiagFunc: validation.ToDiagFunc(validation.StringInSlice(types.DiskConnectionStrings, false)),
-				Description: descf(
+				Description: desc.Sprintf(
 					"The name of the disk connector. This must be one of [%s]",
 					types.DiskConnectionStrings,
 				),
@@ -65,9 +66,9 @@ func resourceSakuraCloudDisk() *schema.Resource {
 				Optional:         true,
 				ConflictsWith:    []string{"source_disk_id"},
 				ValidateDiagFunc: validation.ToDiagFunc(validateSakuracloudIDType),
-				Description: descf(
+				Description: desc.Sprintf(
 					"The id of the source archive. %s",
-					descConflicts("source_disk_id"),
+					desc.Conflicts("source_disk_id"),
 				),
 			},
 			"source_disk_id": {
@@ -76,9 +77,9 @@ func resourceSakuraCloudDisk() *schema.Resource {
 				Optional:         true,
 				ConflictsWith:    []string{"source_archive_id"},
 				ValidateDiagFunc: validation.ToDiagFunc(validateSakuracloudIDType),
-				Description: descf(
+				Description: desc.Sprintf(
 					"The id of the source disk. %s",
-					descConflicts("source_archive_id"),
+					desc.Conflicts("source_archive_id"),
 				),
 			},
 			"size": schemaResourceSize(resourceName, 20),

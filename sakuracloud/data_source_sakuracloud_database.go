@@ -21,6 +21,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/sacloud/iaas-api-go"
 	"github.com/sacloud/iaas-api-go/types"
+	"github.com/sacloud/terraform-provider-sakuracloud/internal/desc"
 )
 
 func dataSourceSakuraCloudDatabase() *schema.Resource {
@@ -35,7 +36,7 @@ func dataSourceSakuraCloudDatabase() *schema.Resource {
 			"database_type": {
 				Type:     schema.TypeString,
 				Computed: true,
-				Description: descf(
+				Description: desc.Sprintf(
 					"The type of the database. This will be one of [%s]",
 					types.RDBMSTypeStrings,
 				),
@@ -92,7 +93,7 @@ func dataSourceSakuraCloudDatabase() *schema.Resource {
 							Computed: true,
 							Elem:     &schema.Schema{Type: schema.TypeString},
 							Set:      schema.HashString,
-							Description: descf(
+							Description: desc.Sprintf(
 								"The list of name of weekday that doing backup. This will be in [%s]",
 								types.DaysOfTheWeekStrings,
 							),

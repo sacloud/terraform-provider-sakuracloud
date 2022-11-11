@@ -8,7 +8,6 @@ issues:
 linters:
   disable-all: true
   enable:
-    - deadcode
     - errcheck
     - gofmt
     - goimports
@@ -19,11 +18,9 @@ linters:
     - nakedret
     - misspell
     - staticcheck
-    - structcheck
     - typecheck
     - unused
     - unconvert
-    - varcheck
     - vet
     - vetshadow
     - whitespace

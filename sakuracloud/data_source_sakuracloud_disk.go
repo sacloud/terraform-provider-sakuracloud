@@ -21,6 +21,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/sacloud/iaas-api-go"
 	"github.com/sacloud/iaas-api-go/types"
+	"github.com/sacloud/terraform-provider-sakuracloud/internal/desc"
 )
 
 func dataSourceSakuraCloudDisk() *schema.Resource {
@@ -36,7 +37,7 @@ func dataSourceSakuraCloudDisk() *schema.Resource {
 			"connector": {
 				Type:     schema.TypeString,
 				Computed: true,
-				Description: descf(
+				Description: desc.Sprintf(
 					"The name of the disk connector. This will be one of [%s]",
 					types.DiskConnectionStrings,
 				),

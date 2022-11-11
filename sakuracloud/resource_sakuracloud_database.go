@@ -25,6 +25,7 @@ import (
 	"github.com/sacloud/iaas-api-go"
 	"github.com/sacloud/iaas-api-go/helper/power"
 	"github.com/sacloud/iaas-api-go/types"
+	"github.com/sacloud/terraform-provider-sakuracloud/internal/desc"
 )
 
 func resourceSakuraCloudDatabase() *schema.Resource {
@@ -52,7 +53,7 @@ func resourceSakuraCloudDatabase() *schema.Resource {
 				ForceNew:         true,
 				ValidateDiagFunc: validation.ToDiagFunc(validation.StringInSlice(types.RDBMSTypeStrings, false)),
 				Default:          "postgres",
-				Description: descf(
+				Description: desc.Sprintf(
 					"The type of the database. This must be one of [%s]",
 					types.RDBMSTypeStrings,
 				),
@@ -70,7 +71,7 @@ func resourceSakuraCloudDatabase() *schema.Resource {
 				ForceNew:         true,
 				Required:         true,
 				ValidateDiagFunc: validation.ToDiagFunc(validation.StringLenBetween(3, 20)),
-				Description:      descf("The name of default user on the database. %s", descLength(3, 20)),
+				Description:      desc.Sprintf("The name of default user on the database. %s", desc.Length(3, 20)),
 			},
 			"password": {
 				Type:        schema.TypeString,
@@ -102,40 +103,40 @@ func resourceSakuraCloudDatabase() *schema.Resource {
 							Type:        schema.TypeString,
 							ForceNew:    true,
 							Required:    true,
-							Description: descf("The IP address to assign to the %s", resourceName),
+							Description: desc.Sprintf("The IP address to assign to the %s", resourceName),
 						},
 						"netmask": {
 							Type:             schema.TypeInt,
 							ForceNew:         true,
 							Required:         true,
 							ValidateDiagFunc: validation.ToDiagFunc(validation.IntBetween(8, 29)),
-							Description: descf(
+							Description: desc.Sprintf(
 								"The bit length of the subnet to assign to the %s. %s",
 								resourceName,
-								descRange(8, 29),
+								desc.Range(8, 29),
 							),
 						},
 						"gateway": {
 							Type:        schema.TypeString,
 							ForceNew:    true,
 							Required:    true,
-							Description: descf("The IP address of the gateway used by %s", resourceName),
+							Description: desc.Sprintf("The IP address of the gateway used by %s", resourceName),
 						},
 						"port": {
 							Type:             schema.TypeInt,
 							Optional:         true,
 							Default:          5432,
 							ValidateDiagFunc: validation.ToDiagFunc(validation.IntBetween(1024, 65535)),
-							Description: descf(
+							Description: desc.Sprintf(
 								"The number of the listening port. %s",
-								descRange(1024, 65535),
+								desc.Range(1024, 65535),
 							),
 						},
 						"source_ranges": {
 							Type:     schema.TypeList,
 							Optional: true,
 							Elem:     &schema.Schema{Type: schema.TypeString},
-							Description: descf(
+							Description: desc.Sprintf(
 								"The range of source IP addresses that allow to access to the %s via network",
 								resourceName,
 							),
@@ -155,7 +156,7 @@ func resourceSakuraCloudDatabase() *schema.Resource {
 							Optional: true,
 							Elem:     &schema.Schema{Type: schema.TypeString},
 							Set:      schema.HashString,
-							Description: descf(
+							Description: desc.Sprintf(
 								"A list of weekdays to backed up. The values in the list must be in [%s]",
 								types.DaysOfTheWeekStrings,
 							),

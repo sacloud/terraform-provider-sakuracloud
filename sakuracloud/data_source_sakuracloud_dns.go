@@ -21,6 +21,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/sacloud/iaas-api-go"
 	"github.com/sacloud/iaas-api-go/types"
+	"github.com/sacloud/terraform-provider-sakuracloud/internal/desc"
 )
 
 func dataSourceSakuraCloudDNS() *schema.Resource {
@@ -53,7 +54,7 @@ func dataSourceSakuraCloudDNS() *schema.Resource {
 						"type": {
 							Type:     schema.TypeString,
 							Computed: true,
-							Description: descf(
+							Description: desc.Sprintf(
 								"The type of DNS Record. This will be one of [%s]",
 								types.DNSRecordTypeStrings,
 							),

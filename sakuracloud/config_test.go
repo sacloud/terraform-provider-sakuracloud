@@ -23,6 +23,8 @@ import (
 	"testing"
 
 	"github.com/sacloud/api-client-go/profile"
+	"github.com/sacloud/iaas-api-go"
+	"github.com/sacloud/terraform-provider-sakuracloud/internal/defaults"
 	"github.com/stretchr/testify/require"
 )
 
@@ -100,31 +102,31 @@ func TestConfig_NewClient_loadFromProfile(t *testing.T) {
 			scenario: "ProfileName is not specified and Profile is not exists",
 			in: &Config{
 				Profile:             "",
-				Zone:                defaultZone,
-				Zones:               defaultZones,
-				RetryMax:            defaultRetryMax,
-				APIRequestTimeout:   defaultAPIRequestTimeout,
-				APIRequestRateLimit: defaultAPIRequestRateLimit,
+				Zone:                defaults.Zone,
+				Zones:               iaas.SakuraCloudZones,
+				RetryMax:            defaults.RetryMax,
+				APIRequestTimeout:   defaults.APIRequestTimeout,
+				APIRequestRateLimit: defaults.APIRequestRateLimit,
 			},
 			profiles: map[string]*profile.ConfigValue{},
 			expect: &Config{
 				Profile:             "default",
-				Zone:                defaultZone,
-				Zones:               defaultZones,
-				RetryMax:            defaultRetryMax,
-				APIRequestTimeout:   defaultAPIRequestTimeout,
-				APIRequestRateLimit: defaultAPIRequestRateLimit,
+				Zone:                defaults.Zone,
+				Zones:               iaas.SakuraCloudZones,
+				RetryMax:            defaults.RetryMax,
+				APIRequestTimeout:   defaults.APIRequestTimeout,
+				APIRequestRateLimit: defaults.APIRequestRateLimit,
 			},
 		},
 		{
 			scenario: "ProfileName is not specified and Profile is exists",
 			in: &Config{
 				Profile:             "",
-				Zone:                defaultZone,
-				Zones:               defaultZones,
-				RetryMax:            defaultRetryMax,
-				APIRequestTimeout:   defaultAPIRequestTimeout,
-				APIRequestRateLimit: defaultAPIRequestRateLimit,
+				Zone:                defaults.Zone,
+				Zones:               iaas.SakuraCloudZones,
+				RetryMax:            defaults.RetryMax,
+				APIRequestTimeout:   defaults.APIRequestTimeout,
+				APIRequestRateLimit: defaults.APIRequestRateLimit,
 			},
 			profiles: map[string]*profile.ConfigValue{
 				"default": defaultProfile,
@@ -204,11 +206,11 @@ func TestConfig_NewClient_loadFromProfile(t *testing.T) {
 			scenario: "Profile name specified with normal profile",
 			in: &Config{
 				Profile:             "test",
-				Zone:                defaultZone,
-				Zones:               defaultZones,
-				RetryMax:            defaultRetryMax,
-				APIRequestTimeout:   defaultAPIRequestTimeout,
-				APIRequestRateLimit: defaultAPIRequestRateLimit,
+				Zone:                defaults.Zone,
+				Zones:               iaas.SakuraCloudZones,
+				RetryMax:            defaults.RetryMax,
+				APIRequestTimeout:   defaults.APIRequestTimeout,
+				APIRequestRateLimit: defaults.APIRequestRateLimit,
 			},
 			profiles: map[string]*profile.ConfigValue{
 				"default": defaultProfile,

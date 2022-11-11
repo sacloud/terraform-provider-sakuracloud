@@ -22,6 +22,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
 	"github.com/sacloud/iaas-api-go"
+	"github.com/sacloud/terraform-provider-sakuracloud/internal/desc"
 )
 
 func resourceSakuraCloudSubnet() *schema.Resource {
@@ -55,9 +56,9 @@ func resourceSakuraCloudSubnet() *schema.Resource {
 				Optional:         true,
 				ValidateDiagFunc: validation.ToDiagFunc(validation.IntInSlice([]int{28, 27, 26})),
 				Default:          28,
-				Description: descf(
+				Description: desc.Sprintf(
 					"The bit length of the subnet to assign to the %s. %s", resourceName,
-					descRange(26, 28),
+					desc.Range(26, 28),
 				),
 			},
 			"next_hop": {
@@ -69,7 +70,7 @@ func resourceSakuraCloudSubnet() *schema.Resource {
 			"switch_id": {
 				Type:        schema.TypeString,
 				Computed:    true,
-				Description: descf("The id of the switch connected from the %s", resourceName),
+				Description: desc.Sprintf("The id of the switch connected from the %s", resourceName),
 			},
 			"network_address": {
 				Type:        schema.TypeString,

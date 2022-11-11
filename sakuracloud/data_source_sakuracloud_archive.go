@@ -23,6 +23,7 @@ import (
 	"github.com/sacloud/iaas-api-go"
 	"github.com/sacloud/iaas-api-go/helper/query"
 	"github.com/sacloud/iaas-api-go/ostype"
+	"github.com/sacloud/terraform-provider-sakuracloud/internal/desc"
 )
 
 func dataSourceSakuraCloudArchive() *schema.Resource {
@@ -38,7 +39,7 @@ func dataSourceSakuraCloudArchive() *schema.Resource {
 				Optional:         true,
 				ValidateDiagFunc: validation.ToDiagFunc(validation.StringInSlice(ostype.OSTypeShortNames, false)),
 				ConflictsWith:    []string{"filter"},
-				Description: descf(
+				Description: desc.Sprintf(
 					"The criteria used to filter SakuraCloud archives. This must be one of following:  \n%s",
 					ostype.OSTypeShortNames,
 				),

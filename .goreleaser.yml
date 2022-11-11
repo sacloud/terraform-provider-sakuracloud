@@ -7,6 +7,9 @@ before:
 builds:
   - env:
       - CGO_ENABLED=0
+    ldflags:
+      - -s -w
+      - -X github.com/sacloud/terraform-provider-sakuracloud/version.Revision={{.ShortCommit}}
     goos:
       - freebsd
       - openbsd

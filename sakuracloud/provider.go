@@ -21,17 +21,10 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
 	"github.com/sacloud/api-client-go/profile"
-	"github.com/sacloud/iaas-api-go"
 	"github.com/sacloud/packages-go/envvar"
 	"github.com/sacloud/packages-go/mutexkv"
-)
-
-var (
-	defaultZone                = "is1b"
-	defaultRetryMax            = 10
-	defaultZones               = iaas.SakuraCloudZones
-	defaultAPIRequestTimeout   = 300
-	defaultAPIRequestRateLimit = 10
+	"github.com/sacloud/terraform-provider-sakuracloud/internal/defaults"
+	"github.com/sacloud/terraform-provider-sakuracloud/internal/desc"
 )
 
 // Provider returns a terraform.ResourceProvider.
@@ -59,7 +52,7 @@ func Provider() *schema.Provider {
 			"zone": {
 				Type:        schema.TypeString,
 				Optional:    true,
-				DefaultFunc: schema.MultiEnvDefaultFunc([]string{"SAKURACLOUD_ZONE"}, defaultZone),
+				DefaultFunc: schema.MultiEnvDefaultFunc([]string{"SAKURACLOUD_ZONE"}, defaults.Zone),
 				Description: "The name of zone to use as default. It must be provided, but it can also be sourced from the `SAKURACLOUD_ZONE` environment variables, or via a shared credentials file if `profile` is specified",
 			},
 			"zones": {
@@ -89,7 +82,7 @@ func Provider() *schema.Provider {
 			"retry_max": {
 				Type:             schema.TypeInt,
 				Optional:         true,
-				DefaultFunc:      schema.MultiEnvDefaultFunc([]string{"SAKURACLOUD_RETRY_MAX"}, defaultRetryMax),
+				DefaultFunc:      schema.MultiEnvDefaultFunc([]string{"SAKURACLOUD_RETRY_MAX"}, defaults.RetryMax),
 				ValidateDiagFunc: validation.ToDiagFunc(validation.IntBetween(0, 100)),
 				Description:      "The maximum number of API call retries used when SakuraCloud API returns status code `423` or `503`. It can also be sourced from the `SAKURACLOUD_RETRY_MAX` environment variables, or via a shared credentials file if `profile` is specified. Default:`100`",
 			},
@@ -108,20 +101,20 @@ func Provider() *schema.Provider {
 			"api_request_timeout": {
 				Type:        schema.TypeInt,
 				Optional:    true,
-				DefaultFunc: schema.MultiEnvDefaultFunc([]string{"SAKURACLOUD_API_REQUEST_TIMEOUT"}, defaultAPIRequestTimeout),
-				Description: descf(
+				DefaultFunc: schema.MultiEnvDefaultFunc([]string{"SAKURACLOUD_API_REQUEST_TIMEOUT"}, defaults.APIRequestTimeout),
+				Description: desc.Sprintf(
 					"The timeout seconds for each SakuraCloud API call. It can also be sourced from the `SAKURACLOUD_API_REQUEST_TIMEOUT` environment variables, or via a shared credentials file if `profile` is specified. Default:`%d`",
-					defaultAPIRequestTimeout,
+					defaults.APIRequestTimeout,
 				),
 			},
 			"api_request_rate_limit": {
 				Type:             schema.TypeInt,
 				Optional:         true,
-				DefaultFunc:      schema.MultiEnvDefaultFunc([]string{"SAKURACLOUD_RATE_LIMIT"}, defaultAPIRequestRateLimit),
+				DefaultFunc:      schema.MultiEnvDefaultFunc([]string{"SAKURACLOUD_RATE_LIMIT"}, defaults.APIRequestRateLimit),
 				ValidateDiagFunc: validation.ToDiagFunc(validation.IntBetween(1, 10)),
-				Description: descf(
+				Description: desc.Sprintf(
 					"The maximum number of SakuraCloud API calls per second. It can also be sourced from the `SAKURACLOUD_RATE_LIMIT` environment variables, or via a shared credentials file if `profile` is specified. Default:`%d`",
-					defaultAPIRequestRateLimit,
+					defaults.APIRequestRateLimit,
 				),
 			},
 			"trace": {

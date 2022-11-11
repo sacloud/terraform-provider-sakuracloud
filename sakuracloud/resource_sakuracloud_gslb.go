@@ -23,6 +23,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
 	"github.com/sacloud/iaas-api-go"
 	"github.com/sacloud/iaas-api-go/types"
+	"github.com/sacloud/terraform-provider-sakuracloud/internal/desc"
 )
 
 func resourceSakuraCloudGSLB() *schema.Resource {
@@ -61,7 +62,7 @@ func resourceSakuraCloudGSLB() *schema.Resource {
 							Type:             schema.TypeString,
 							Required:         true,
 							ValidateDiagFunc: validation.ToDiagFunc(validation.StringInSlice(types.GSLBHealthCheckProtocolStrings, false)),
-							Description: descf(
+							Description: desc.Sprintf(
 								"The protocol used for health checks. This must be one of [%s]",
 								types.GSLBHealthCheckProtocolStrings,
 							),
@@ -71,7 +72,7 @@ func resourceSakuraCloudGSLB() *schema.Resource {
 							Optional:         true,
 							ValidateDiagFunc: validation.ToDiagFunc(validation.IntBetween(10, 60)),
 							Default:          10,
-							Description:      descf("The interval in seconds between checks. %s", descRange(10, 60)),
+							Description:      desc.Sprintf("The interval in seconds between checks. %s", desc.Range(10, 60)),
 						},
 						"host_header": {
 							Type:        schema.TypeString,
@@ -129,9 +130,9 @@ func resourceSakuraCloudGSLB() *schema.Resource {
 							Optional:         true,
 							ValidateDiagFunc: validation.ToDiagFunc(validation.IntBetween(1, 10000)),
 							Default:          1,
-							Description: descf(
+							Description: desc.Sprintf(
 								"The weight used when weighted load balancing is enabled. %s",
-								descRange(1, 10000),
+								desc.Range(1, 10000),
 							),
 						},
 					},

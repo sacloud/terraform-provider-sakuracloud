@@ -22,6 +22,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
 	"github.com/sacloud/iaas-api-go"
+	"github.com/sacloud/terraform-provider-sakuracloud/internal/desc"
 )
 
 func resourceSakuraCloudLocalRouter() *schema.Resource {
@@ -89,15 +90,15 @@ func resourceSakuraCloudLocalRouter() *schema.Resource {
 							MinItems:    2,
 							MaxItems:    2,
 							Elem:        &schema.Schema{Type: schema.TypeString},
-							Description: descf("A list of IP address to assign to the %s. ", resourceName),
+							Description: desc.Sprintf("A list of IP address to assign to the %s. ", resourceName),
 						},
 						"netmask": {
 							Type:             schema.TypeInt,
 							Required:         true,
 							ValidateDiagFunc: validation.ToDiagFunc(validation.IntBetween(8, 29)),
-							Description: descf(
+							Description: desc.Sprintf(
 								"The bit length of the subnet assigned to the %s. %s", resourceName,
-								descRange(8, 29),
+								desc.Range(8, 29),
 							),
 						},
 						"vrid": {

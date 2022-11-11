@@ -21,6 +21,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/sacloud/iaas-api-go"
 	"github.com/sacloud/iaas-api-go/types"
+	"github.com/sacloud/terraform-provider-sakuracloud/internal/desc"
 )
 
 func dataSourceSakuraCloudGSLB() *schema.Resource {
@@ -44,7 +45,7 @@ func dataSourceSakuraCloudGSLB() *schema.Resource {
 						"protocol": {
 							Type:     schema.TypeString,
 							Computed: true,
-							Description: descf(
+							Description: desc.Sprintf(
 								"The protocol used for health checks. This will be one of [%s]",
 								types.GSLBHealthCheckProtocolStrings,
 							),

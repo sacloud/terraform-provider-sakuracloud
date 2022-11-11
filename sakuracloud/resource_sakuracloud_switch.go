@@ -23,6 +23,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
 	"github.com/sacloud/iaas-api-go"
 	"github.com/sacloud/iaas-api-go/helper/cleanup"
+	"github.com/sacloud/terraform-provider-sakuracloud/internal/desc"
 )
 
 func resourceSakuraCloudSwitch() *schema.Resource {
@@ -51,7 +52,7 @@ func resourceSakuraCloudSwitch() *schema.Resource {
 				Type:             schema.TypeString,
 				Optional:         true,
 				ValidateDiagFunc: validation.ToDiagFunc(validateSakuracloudIDType),
-				Description:      descf("The bridge id attached to the %s", resourceName),
+				Description:      desc.Sprintf("The bridge id attached to the %s", resourceName),
 			},
 			"server_ids": {
 				Type:        schema.TypeList,

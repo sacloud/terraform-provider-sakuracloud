@@ -24,6 +24,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
 	"github.com/sacloud/iaas-api-go"
 	"github.com/sacloud/iaas-api-go/types"
+	"github.com/sacloud/terraform-provider-sakuracloud/internal/desc"
 )
 
 func resourceSakuraCloudArchive() *schema.Resource {
@@ -55,7 +56,7 @@ func resourceSakuraCloudArchive() *schema.Resource {
 				ForceNew:         true,
 				Computed:         true,
 				ValidateDiagFunc: validation.ToDiagFunc(validation.IntInSlice(types.ArchiveSizes)),
-				Description:      descf("The size of %s in GiB. This must be one of [%s]", resourceName, types.ArchiveSizes),
+				Description:      desc.Sprintf("The size of %s in GiB. This must be one of [%s]", resourceName, types.ArchiveSizes),
 				ConflictsWith:    []string{"source_disk_id", "source_archive_id", "source_shared_key", "source_archive_zone"},
 			},
 			"archive_file": {
@@ -77,9 +78,9 @@ func resourceSakuraCloudArchive() *schema.Resource {
 				Optional:         true,
 				ConflictsWith:    []string{"source_disk_id", "size", "source_shared_key"},
 				ValidateDiagFunc: validation.ToDiagFunc(validateSakuracloudIDType),
-				Description: descf(
+				Description: desc.Sprintf(
 					"The id of the source archive. %s",
-					descConflicts("source_disk_id"),
+					desc.Conflicts("source_disk_id"),
 				),
 			},
 			"source_archive_zone": {
@@ -95,9 +96,9 @@ func resourceSakuraCloudArchive() *schema.Resource {
 				Optional:         true,
 				ConflictsWith:    []string{"source_archive_id", "size", "source_shared_key", "source_archive_zone"},
 				ValidateDiagFunc: validation.ToDiagFunc(validateSakuracloudIDType),
-				Description: descf(
+				Description: desc.Sprintf(
 					"The id of the source disk. %s",
-					descConflicts("source_archive_id"),
+					desc.Conflicts("source_archive_id"),
 				),
 			},
 			"source_shared_key": {

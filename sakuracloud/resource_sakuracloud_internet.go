@@ -26,6 +26,7 @@ import (
 	"github.com/sacloud/iaas-api-go/helper/cleanup"
 	"github.com/sacloud/iaas-api-go/helper/query"
 	"github.com/sacloud/iaas-api-go/types"
+	"github.com/sacloud/terraform-provider-sakuracloud/internal/desc"
 )
 
 func resourceSakuraCloudInternet() *schema.Resource {
@@ -57,7 +58,7 @@ func resourceSakuraCloudInternet() *schema.Resource {
 				Optional:         true,
 				ValidateDiagFunc: validation.ToDiagFunc(validation.IntInSlice(types.InternetNetworkMaskLengths)),
 				Default:          28,
-				Description: descf(
+				Description: desc.Sprintf(
 					"The bit length of the subnet assigned to the %s. %s", resourceName,
 					types.InternetNetworkMaskLengths,
 				),
@@ -67,7 +68,7 @@ func resourceSakuraCloudInternet() *schema.Resource {
 				Optional:         true,
 				ValidateDiagFunc: validation.ToDiagFunc(validation.IntInSlice(types.InternetBandWidths)),
 				Default:          100,
-				Description: descf(
+				Description: desc.Sprintf(
 					"The bandwidth of the network connected to the Internet in Mbps. %s",
 					types.InternetBandWidths,
 				),
@@ -80,44 +81,44 @@ func resourceSakuraCloudInternet() *schema.Resource {
 			"switch_id": {
 				Type:        schema.TypeString,
 				Computed:    true,
-				Description: descf("The id of the switch"),
+				Description: desc.Sprintf("The id of the switch"),
 			},
 			"server_ids": {
 				Type:        schema.TypeList,
 				Computed:    true,
 				Elem:        &schema.Schema{Type: schema.TypeString},
-				Description: descf("A list of the ID of Servers connected to the %s", resourceName),
+				Description: desc.Sprintf("A list of the ID of Servers connected to the %s", resourceName),
 			},
 			"network_address": {
 				Type:        schema.TypeString,
 				Computed:    true,
-				Description: descf("The IPv4 network address assigned to the %s", resourceName),
+				Description: desc.Sprintf("The IPv4 network address assigned to the %s", resourceName),
 			},
 			"gateway": {
 				Type:        schema.TypeString,
 				Computed:    true,
-				Description: descf("The IP address of the gateway used by the %s", resourceName),
+				Description: desc.Sprintf("The IP address of the gateway used by the %s", resourceName),
 			},
 			"min_ip_address": {
 				Type:        schema.TypeString,
 				Computed:    true,
-				Description: descf("Minimum IP address in assigned global addresses to the %s", resourceName),
+				Description: desc.Sprintf("Minimum IP address in assigned global addresses to the %s", resourceName),
 			},
 			"max_ip_address": {
 				Type:        schema.TypeString,
 				Computed:    true,
-				Description: descf("Maximum IP address in assigned global addresses to the %s", resourceName),
+				Description: desc.Sprintf("Maximum IP address in assigned global addresses to the %s", resourceName),
 			},
 			"ip_addresses": {
 				Type:        schema.TypeList,
 				Computed:    true,
 				Elem:        &schema.Schema{Type: schema.TypeString},
-				Description: descf("A list of assigned global address to the %s", resourceName),
+				Description: desc.Sprintf("A list of assigned global address to the %s", resourceName),
 			},
 			"ipv6_prefix": {
 				Type:        schema.TypeString,
 				Computed:    true,
-				Description: descf("The network prefix of assigned IPv6 addresses to the %s", resourceName),
+				Description: desc.Sprintf("The network prefix of assigned IPv6 addresses to the %s", resourceName),
 			},
 			"ipv6_prefix_len": {
 				Type:        schema.TypeInt,
@@ -127,7 +128,7 @@ func resourceSakuraCloudInternet() *schema.Resource {
 			"ipv6_network_address": {
 				Type:        schema.TypeString,
 				Computed:    true,
-				Description: descf("The IPv6 network address assigned to the %s", resourceName),
+				Description: desc.Sprintf("The IPv6 network address assigned to the %s", resourceName),
 			},
 		},
 	}

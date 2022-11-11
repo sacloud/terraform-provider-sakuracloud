@@ -28,6 +28,8 @@ import (
 	"github.com/sacloud/iaas-api-go/helper/cleanup"
 	"github.com/sacloud/iaas-api-go/types"
 	"github.com/sacloud/iso9660wrap"
+	"github.com/sacloud/terraform-provider-sakuracloud/internal/desc"
+	"github.com/sacloud/terraform-provider-sakuracloud/internal/ftps"
 )
 
 func resourceSakuraCloudCDROM() *schema.Resource {
@@ -57,18 +59,18 @@ func resourceSakuraCloudCDROM() *schema.Resource {
 				Type:          schema.TypeString,
 				Optional:      true,
 				ConflictsWith: []string{"content"},
-				Description: descf(
+				Description: desc.Sprintf(
 					"The file path to upload to as the CD-ROM. %s",
-					descConflicts("content"),
+					desc.Conflicts("content"),
 				),
 			},
 			"content": {
 				Type:          schema.TypeString,
 				Optional:      true,
 				ConflictsWith: []string{"iso_image_file"},
-				Description: descf(
+				Description: desc.Sprintf(
 					"The content to upload to as the CD-ROM. %s",
-					descConflicts("iso_image_file"),
+					desc.Conflicts("iso_image_file"),
 				),
 			},
 			"content_file_name": {
@@ -76,9 +78,9 @@ func resourceSakuraCloudCDROM() *schema.Resource {
 				Optional:      true,
 				Default:       cdromDefaultISOLabel,
 				ConflictsWith: []string{"iso_image_file"},
-				Description: descf(
+				Description: desc.Sprintf(
 					"The name of content file to upload to as the CD-ROM. This is only used when `content` is specified. %s",
-					descConflicts("iso_image_file"),
+					desc.Conflicts("iso_image_file"),
 				),
 			},
 			"hash": {
@@ -250,7 +252,7 @@ func uploadCDROMFile(ctx *uploadCDROMContext, d *schema.ResourceData) error {
 	}
 
 	// upload
-	if err := uploadFileViaFTPS(ctx, ftpServer.User, ftpServer.Password, ftpServer.HostName, filePath); err != nil {
+	if err := ftps.UploadFile(ctx, ftpServer.User, ftpServer.Password, ftpServer.HostName, filePath); err != nil {
 		return fmt.Errorf("upload CD-ROM contents is failed: %s", err)
 	}
 

@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package sakuracloud
+package ftps
 
 import (
 	"context"
@@ -23,7 +23,7 @@ import (
 	"github.com/sacloud/ftps"
 )
 
-func uploadFileViaFTPS(ctx context.Context, user, pass, host, file string) error {
+func UploadFile(ctx context.Context, user, pass, host, file string) error {
 	f, err := os.Open(file)
 	if err != nil {
 		return fmt.Errorf("opening file[%s] failed: %s", file, err)
