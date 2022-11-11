@@ -4,7 +4,12 @@
 
 IMPROVEMENTS:
 
+- SDK/Frameworkで共通利用するfunc類をinternal配下に切り出し #981
 - go: bump github.com/goccy/go-yaml from 1.9.5 to 1.9.6 #978
+
+DOCS:
+
+- docs: Terraform Plugin Frameworkの扱いの方針変更 #980
 
 ## 2.20.0 (2020-10-26)
 
