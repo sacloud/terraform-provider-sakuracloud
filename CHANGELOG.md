@@ -6,6 +6,7 @@ IMPROVEMENTS:
 
 - SDK/Frameworkで共通利用するfunc類をinternal配下に切り出し #981
 - go: bump github.com/goccy/go-yaml from 1.9.5 to 1.9.6 #978
+- go: bump github.com/hashicorp/terraform-plugin-sdk/v2 from 2.24.0 to 2.24.1 #982
 
 DOCS:
 
