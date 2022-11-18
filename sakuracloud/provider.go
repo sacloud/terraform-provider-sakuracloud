@@ -166,7 +166,6 @@ func Provider() *schema.Provider {
 			"sakuracloud_switch":                dataSourceSakuraCloudSwitch(),
 			"sakuracloud_vpc_router":            dataSourceSakuraCloudVPCRouter(),
 			"sakuracloud_webaccel":              dataSourceSakuraCloudWebAccel(),
-			"sakuracloud_zone":                  dataSourceSakuraCloudZone(),
 		},
 		ResourcesMap: map[string]*schema.Resource{
 			"sakuracloud_auto_backup":           resourceSakuraCloudAutoBackup(),

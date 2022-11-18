@@ -5,11 +5,13 @@ go 1.19
 require (
 	github.com/goccy/go-yaml v1.9.6
 	github.com/hashicorp/go-multierror v1.1.1
+	github.com/hashicorp/terraform-plugin-framework v0.15.0
+	github.com/hashicorp/terraform-plugin-framework-validators v0.5.0
 	github.com/hashicorp/terraform-plugin-go v0.14.1
 	github.com/hashicorp/terraform-plugin-mux v0.7.0
 	github.com/hashicorp/terraform-plugin-sdk/v2 v2.24.1
 	github.com/mitchellh/go-homedir v1.1.0
-	github.com/sacloud/api-client-go v0.2.3
+	github.com/sacloud/api-client-go v0.2.4
 	github.com/sacloud/autoscaler v0.11.1
 	github.com/sacloud/ftps v1.1.0
 	github.com/sacloud/iaas-api-go v1.6.0
@@ -77,14 +79,14 @@ require (
 	github.com/shivamMg/ppds v0.0.1 // indirect
 	github.com/vmihailenco/msgpack v4.0.4+incompatible // indirect
 	github.com/vmihailenco/msgpack/v4 v4.3.12 // indirect
-	github.com/vmihailenco/tagparser v0.1.1 // indirect
+	github.com/vmihailenco/tagparser v0.1.2 // indirect
 	github.com/zclconf/go-cty v1.12.1 // indirect
 	go.uber.org/ratelimit v0.2.0 // indirect
 	golang.org/x/crypto v0.0.0-20220517005047-85d78b3ac167 // indirect
-	golang.org/x/net v0.0.0-20220225172249-27dd8689420f // indirect
+	golang.org/x/net v0.0.0-20220708220712-1185a9018129 // indirect
 	golang.org/x/sys v0.0.0-20220908164124-27713097b956 // indirect
 	golang.org/x/xerrors v0.0.0-20200804184101-5ec99f83aff1 // indirect
-	google.golang.org/appengine v1.6.6 // indirect
+	google.golang.org/appengine v1.6.7 // indirect
 	google.golang.org/genproto v0.0.0-20200904004341-0bd0a958aa1d // indirect
 	google.golang.org/grpc v1.50.1 // indirect
 	google.golang.org/protobuf v1.28.1 // indirect
