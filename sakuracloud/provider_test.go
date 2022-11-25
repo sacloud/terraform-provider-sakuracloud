@@ -20,6 +20,7 @@ import (
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-go/tfprotov5"
+	"github.com/hashicorp/terraform-plugin-mux/tf5muxserver"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 )
 
@@ -43,11 +44,7 @@ func init() {
 	}
 	ProtoV5ProviderFactories = map[string]func() (tfprotov5.ProviderServer, error){
 		"sakuracloud": func() (tfprotov5.ProviderServer, error) {
-			providerServerFactory, err := ProtoV5ProviderServerFactory(context.Background())
-			if err != nil {
-				return nil, err
-			}
-			return providerServerFactory(), nil
+			return tf5muxserver.NewMuxServer(context.Background(), Provider().GRPCProvider)
 		},
 	}
 }
