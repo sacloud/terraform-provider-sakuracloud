@@ -2,11 +2,18 @@
 
 ## 2.20.1 (Unreleased)
 
+FIXES
+
+- iaas-api-go v1.6.1 #989
+
 IMPROVEMENTS:
 
 - SDK/Frameworkで共通利用するfunc類をinternal配下に切り出し #981
 - go: bump github.com/goccy/go-yaml from 1.9.5 to 1.9.6 #978
 - go: bump github.com/hashicorp/terraform-plugin-sdk/v2 from 2.24.0 to 2.24.1 #982
+- go: bump github.com/sacloud/autoscaler from 0.11.1 to 0.11.2 #984
+- go: bump github.com/hashicorp/terraform-plugin-go from 0.14.1 to 0.14.2 #987
+
 
 DOCS:
 
