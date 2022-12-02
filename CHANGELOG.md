@@ -2,6 +2,10 @@
 
 ## 2.20.1 (Unreleased)
 
+FEATURES
+
+- iaas-api-go v1.6.2(MIRACLE LINUX9対応) #991
+
 FIXES
 
 - iaas-api-go v1.6.1 #989
