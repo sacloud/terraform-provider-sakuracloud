@@ -14,7 +14,7 @@ Get information about an existing Archive.
 
 ```hcl
 data "sakuracloud_archive" "foobar" {
-  os_type = "centos"
+  os_type = "ubuntu"
 }
 ```
 ## Argument Reference
@@ -24,7 +24,7 @@ data "sakuracloud_archive" "foobar" {
   - **CentOS**: [`centos`/`centos7`]  
   - **AlmaLinux**: [`almalinux`/`almalinux8`/`almalinux9`]
   - **RockyLinux**: [`rockylinux`/`rockylinux8`/`rockylinux9`]
-  - **MIRACLE LINUX**[`miracle`/`miraclelinux`/`miracle8`/`miraclelinux8`]
+  - **MIRACLE LINUX**[`miracle`/`miraclelinux`/`miracle8`/`miraclelinux8`/`miracle9`/`miraclelinux9`]
   - **Ubuntu**: [`ubuntu`/`ubuntu2204`/`ubuntu2004`/`ubuntu1804`]
   - **Debian**: [`debian`/`debian10`/`debian11`]  
   - **Kusanagi**: `kusanagi`  
