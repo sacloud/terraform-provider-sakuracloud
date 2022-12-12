@@ -355,8 +355,8 @@ github.com/sacloud/iaas-service-go v1.4.0 h1:BXVklHm1TyIGJxcVTzH4CWtYyOo2l4HZqav
 github.com/sacloud/iaas-service-go v1.4.0/go.mod h1:5ww4Mii2QgyOJbeRVlQ2fK1X+3C//G/I9BKSK6U0Vn0=
 github.com/sacloud/iso9660wrap v0.0.0-20171031075302-eda21f77f6a8 h1:5piK7EELHKRxGqBjgVEHsdfsFwEzF/Kds/bMWLS6gCw=
 github.com/sacloud/iso9660wrap v0.0.0-20171031075302-eda21f77f6a8/go.mod h1:1jHHCa624cG5rODkWmourombJaNmkY9/SBHWhLJcg+w=
-github.com/sacloud/packages-go v0.0.6 h1:2aFjvqsxhK7+gy+g7LBX0Brfcf4aTYAEszL9B4rUhvY=
-github.com/sacloud/packages-go v0.0.6/go.mod h1:+THah+bxMCWSkaCTgJ0E0pEjxqpxmiASbNjaImkYzMo=
+github.com/sacloud/packages-go v0.0.7 h1:Py6nksUuyoRBaHtPfpA9sTIxSKnQfce/xm7XkiCLZmQ=
+github.com/sacloud/packages-go v0.0.7/go.mod h1:NlADopH0g9pLGDHJLi1geDgQpZBN9w4Rl1ucvmiDwAI=
 github.com/sacloud/webaccel-api-go v1.1.4 h1:/9q4p31kEGCz6E02Csmik5fNCPB3OewGwGtwZmaGW+8=
 github.com/sacloud/webaccel-api-go v1.1.4/go.mod h1:1E0zu1Ad1N4E5upRknxauh5OOfKCZWQUEQ4Nj7Ek1ls=
 github.com/sebdah/goldie v1.0.0/go.mod h1:jXP4hmWywNEwZzhMuv2ccnqTSFpuq8iyQhtQdkkZBH4=
