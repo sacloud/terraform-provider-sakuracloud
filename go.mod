@@ -10,7 +10,7 @@ require (
 	github.com/hashicorp/terraform-plugin-sdk/v2 v2.24.1
 	github.com/mitchellh/go-homedir v1.1.0
 	github.com/sacloud/api-client-go v0.2.4
-	github.com/sacloud/autoscaler v0.11.2
+	github.com/sacloud/autoscaler v0.12.0
 	github.com/sacloud/ftps v1.1.0
 	github.com/sacloud/iaas-api-go v1.6.2
 	github.com/sacloud/iaas-service-go v1.4.0
@@ -27,7 +27,7 @@ require (
 	github.com/apparentlymart/go-cidr v1.1.0 // indirect
 	github.com/apparentlymart/go-textseg/v13 v13.0.0 // indirect
 	github.com/beorn7/perks v1.0.1 // indirect
-	github.com/c-robinson/iplib v1.0.3 // indirect
+	github.com/c-robinson/iplib v1.0.4 // indirect
 	github.com/cespare/xxhash/v2 v2.1.2 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/fatih/color v1.13.0 // indirect
