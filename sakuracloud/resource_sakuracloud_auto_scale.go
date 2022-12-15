@@ -63,9 +63,48 @@ func resourceSakuraCloudAutoScale() *schema.Resource {
 				Description:      "The id of the API key",
 				ForceNew:         true,
 			},
+			"trigger_type": {
+				Type:             schema.TypeString,
+				Optional:         true,
+				Computed:         true,
+				ValidateDiagFunc: validation.ToDiagFunc(validation.StringInSlice([]string{"cpu", "router"}, false)),
+				Description: desc.Sprintf(
+					"This must be one of [%s]",
+					[]string{"cpu", "router"},
+				),
+			},
+			"router_threshold_scaling": {
+				Type:     schema.TypeList,
+				Optional: true,
+				MinItems: 1,
+				MaxItems: 1,
+				Elem: &schema.Resource{
+					Schema: map[string]*schema.Schema{
+						"router_prefix": {
+							Type:        schema.TypeString,
+							Required:    true,
+							Description: "Router name prefix to be monitored",
+						},
+						"direction": {
+							Type:             schema.TypeString,
+							Required:         true,
+							ValidateDiagFunc: validation.ToDiagFunc(validation.StringInSlice([]string{"in", "out"}, false)),
+							Description: desc.Sprintf(
+								"This must be one of [%s]",
+								[]string{"in", "out"},
+							),
+						},
+						"mbps": {
+							Type:        schema.TypeInt,
+							Required:    true,
+							Description: "Mbps",
+						},
+					},
+				},
+			},
 			"cpu_threshold_scaling": {
 				Type:     schema.TypeList,
-				Required: true,
+				Optional: true,
 				MinItems: 1,
 				MaxItems: 1,
 				Elem: &schema.Resource{
@@ -178,9 +217,13 @@ func setAutoScaleResourceData(d *schema.ResourceData, client *APIClient, data *i
 	if err := d.Set("zones", data.Zones); err != nil {
 		return diag.FromErr(err)
 	}
-	d.Set("config", data.Config)       // nolint
-	d.Set("api_key_id", data.APIKeyID) // nolint
+	d.Set("config", data.Config)            // nolint
+	d.Set("api_key_id", data.APIKeyID)      // nolint
+	d.Set("trigger_type", data.TriggerType) // nolint
 	if err := d.Set("cpu_threshold_scaling", flattenAutoScaleCPUThresholdScaling(data.CPUThresholdScaling)); err != nil {
+		return diag.FromErr(err)
+	}
+	if err := d.Set("router_threshold_scaling", flattenAutoScaleRouterThresholdScaling(data.RouterThresholdScaling)); err != nil {
 		return diag.FromErr(err)
 	}
 

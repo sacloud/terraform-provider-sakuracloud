@@ -708,7 +708,7 @@ func flattenVPCRouterSiteToSiteParameter(vpcRouter *iaas.VPCRouter) []interface{
 		v := map[string]interface{}{
 			"encryption_algo": vpcRouter.Settings.SiteToSiteIPsecVPN.EncryptionAlgo,
 			"hash_algo":       vpcRouter.Settings.SiteToSiteIPsecVPN.HashAlgo,
-			"dh_group":       vpcRouter.Settings.SiteToSiteIPsecVPN.DHGroup,
+			"dh_group":        vpcRouter.Settings.SiteToSiteIPsecVPN.DHGroup,
 		}
 		if vpcRouter.Settings.SiteToSiteIPsecVPN.IKE != nil {
 			ike := map[string]interface{}{

@@ -50,6 +50,40 @@ func dataSourceSakuraCloudAutoScale() *schema.Resource {
 				Computed:    true,
 				Description: "The id of the API key",
 			},
+			"trigger_type": {
+				Type:     schema.TypeString,
+				Computed: true,
+				Description: desc.Sprintf(
+					"This must be one of [%s]",
+					[]string{"cpu", "router"},
+				),
+			},
+			"router_threshold_scaling": {
+				Type:     schema.TypeList,
+				Computed: true,
+				Elem: &schema.Resource{
+					Schema: map[string]*schema.Schema{
+						"router_prefix": {
+							Type:        schema.TypeString,
+							Computed:    true,
+							Description: "Router name prefix to be monitored",
+						},
+						"direction": {
+							Type:     schema.TypeString,
+							Computed: true,
+							Description: desc.Sprintf(
+								"This must be one of [%s]",
+								[]string{"in", "out"},
+							),
+						},
+						"mbps": {
+							Type:        schema.TypeInt,
+							Computed:    true,
+							Description: "Mbps",
+						},
+					},
+				},
+			},
 			"cpu_threshold_scaling": {
 				Type:     schema.TypeList,
 				Computed: true,
