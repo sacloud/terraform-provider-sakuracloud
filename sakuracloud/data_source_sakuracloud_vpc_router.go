@@ -469,6 +469,10 @@ func dataSourceSakuraCloudVPCRouter() *schema.Resource {
 							Type:     schema.TypeString,
 							Computed: true,
 						},
+						"dh_group": {
+							Type:     schema.TypeString,
+							Computed: true,
+						},
 					},
 				},
 			},

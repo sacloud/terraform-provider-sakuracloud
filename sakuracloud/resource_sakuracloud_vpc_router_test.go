@@ -173,6 +173,7 @@ func TestAccSakuraCloudVPCRouter_Full(t *testing.T) {
 					resource.TestCheckResourceAttr(resourceName, "site_to_site_vpn_parameter.0.esp.0.lifetime", "1801"),
 					resource.TestCheckResourceAttr(resourceName, "site_to_site_vpn_parameter.0.encryption_algo", "aes256"),
 					resource.TestCheckResourceAttr(resourceName, "site_to_site_vpn_parameter.0.hash_algo", "sha256"),
+					resource.TestCheckResourceAttr(resourceName, "site_to_site_vpn_parameter.0.dh_group", "modp2048"),
 					resource.TestCheckResourceAttr(resourceName, "static_nat.#", "1"),
 					resource.TestCheckResourceAttrPair(
 						resourceName, "static_nat.0.public_ip",
@@ -418,6 +419,7 @@ resource "sakuracloud_vpc_router" "foobar" {
     }
     encryption_algo = "aes256"
     hash_algo       = "sha256"
+    dh_group        = "modp2048"
   }
 
   static_nat {
