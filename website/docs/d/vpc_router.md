@@ -183,6 +183,7 @@ A `site_to_site_vpn` block exports the following:
 
 A `site_to_site_vpn_parameter` block exports the following:
 
+* `dh_group` - .
 * `encryption_algo` - .
 * `esp` - A list of `esp` blocks as defined below.
 * `hash_algo` - .

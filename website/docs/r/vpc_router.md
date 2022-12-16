@@ -264,6 +264,7 @@ A `site_to_site_vpn` block supports the following:
 
 A `site_to_site_vpn_parameter` block supports the following:
 
+* `dh_group` - (Optional) This must be one of [`modp1024`/`modp2048`/`modp3072`/`modp4096`].
 * `encryption_algo` - (Optional) This must be one of [`aes128`/`aes256`].
 * `esp` - (Optional) A `esp` block as defined below.
 * `hash_algo` - (Optional) This must be one of [`sha1`/`sha256`].
@@ -421,5 +422,12 @@ The `timeouts` block allows you to specify [timeouts](https://www.terraform.io/d
 * `id` - The id of the VPC Router.
 * `public_ip` - The public ip address of the VPC Router.
 * `public_netmask` - The bit length of the subnet to assign to the public network interface.
+
+
+---
+
+A `wire_guard` block exports the following:
+
+* `public_key` - the public key of the WireGuard server.
 
 

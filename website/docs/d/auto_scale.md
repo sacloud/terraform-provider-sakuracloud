@@ -49,7 +49,9 @@ A `condition` block supports the following:
 * `description` - The description of the AutoScale.
 * `icon_id` - The icon id attached to the AutoScale.
 * `name` - The name of the AutoScale.
+* `router_threshold_scaling` - A list of `router_threshold_scaling` blocks as defined below.
 * `tags` - Any tags assigned to the AutoScale.
+* `trigger_type` - This must be one of [`cpu`/`router`].
 * `zones` - List of zone names where monitored resources are located.
 
 ---
@@ -58,4 +60,13 @@ A `cpu_threshold_scaling` block exports the following:
 
 * `server_prefix` - Server name prefix to be monitored.
 * `up` - Threshold for average CPU utilization to scale up/out.
-* `down` - Threshold for average CPU utilization to scale down/in.
+
+---
+
+A `router_threshold_scaling` block exports the following:
+
+* `direction` - This must be one of [`in`/`out`].
+* `mbps` - Mbps.
+* `router_prefix` - Router name prefix to be monitored.
+
+
