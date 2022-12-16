@@ -99,6 +99,45 @@ func TestAccSakuraCloudAutoScale_basic(t *testing.T) {
 	})
 }
 
+func TestAccSakuraCloudAutoScale_withRouter(t *testing.T) {
+	resourceName := "sakuracloud_auto_scale.foobar"
+	rand := randomName()
+	if !isFakeModeEnabled() {
+		skipIfEnvIsNotSet(t, "SAKURACLOUD_API_KEY_ID")
+	}
+	apiKeyId := os.Getenv("SAKURACLOUD_API_KEY_ID")
+	if apiKeyId == "" {
+		apiKeyId = "111111111111" // dummy
+	}
+
+	var autoScale iaas.AutoScale
+	resource.ParallelTest(t, resource.TestCase{
+		PreCheck:          func() { testAccPreCheck(t) },
+		ProviderFactories: testAccProviderFactories,
+		CheckDestroy: resource.ComposeTestCheckFunc(
+			testCheckSakuraCloudAutoScaleDestroy,
+			testCheckSakuraCloudInternetDestroy,
+		),
+		Steps: []resource.TestStep{
+			{
+				Config: buildConfigWithArgs(testAccSakuraCloudAutoScale_withRouter, rand, apiKeyId),
+				Check: resource.ComposeTestCheckFunc(
+					testCheckSakuraCloudAutoScaleExists(resourceName, &autoScale),
+					resource.TestCheckResourceAttr(resourceName, "name", rand),
+					resource.TestCheckResourceAttr(resourceName, "cpu_threshold_scaling.#", "0"),
+					resource.TestCheckResourceAttr(resourceName, "router_threshold_scaling.#", "1"),
+					resource.TestCheckResourceAttr(resourceName, "router_threshold_scaling.0.router_prefix", rand),
+					resource.TestCheckResourceAttr(resourceName, "router_threshold_scaling.0.direction", "in"),
+					resource.TestCheckResourceAttr(resourceName, "router_threshold_scaling.0.mbps", "20"),
+
+					resource.TestCheckResourceAttr(resourceName, "config", buildConfigWithArgs(testAccSakuraCloudAutoScale_encodedConfigWithRouter, rand)),
+					resource.TestCheckResourceAttrSet(resourceName, "api_key_id"),
+				),
+			},
+		},
+	})
+}
+
 func testCheckSakuraCloudAutoScaleExists(n string, auto_scale *iaas.AutoScale) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
 		rs, ok := s.RootModule().Resources[n]
@@ -304,4 +343,43 @@ var testAccSakuraCloudAutoScale_encodedConfig_update = `"autoscaler":
     - "is1a"
   "shutdown_force": true
   "type": "Server"
+`
+
+var testAccSakuraCloudAutoScale_withRouter = `
+resource "sakuracloud_internet" "foobar" {
+  name = "{{ .arg0 }}"
+  zone = "is1a"
+}
+
+resource "sakuracloud_auto_scale" "foobar" {
+  name           = "{{ .arg0 }}"
+
+  zones  = ["is1a"]
+  config = yamlencode({
+    resources: [{
+      type: "Router",
+      selector: {
+        names: [sakuracloud_internet.foobar.name],
+        zones: ["is1a"],
+      },
+    }],
+  })
+  api_key_id = "{{ .arg1 }}"
+
+  trigger_type = "router"
+  router_threshold_scaling {
+    router_prefix = "{{ .arg0 }}"
+    direction     = "in"
+    mbps          = 20
+  }
+}
+`
+
+var testAccSakuraCloudAutoScale_encodedConfigWithRouter = `"resources":
+- "selector":
+    "names":
+    - "{{ .arg0 }}"
+    "zones":
+    - "is1a"
+  "type": "Router"
 `

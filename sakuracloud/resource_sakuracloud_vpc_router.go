@@ -558,6 +558,16 @@ func resourceSakuraCloudVPCRouter() *schema.Resource {
 								types.VPCRouterSiteToSiteVPNHashAlgos,
 							),
 						},
+						"dh_group": {
+							Type:             schema.TypeString,
+							Optional:         true,
+							Computed:         true,
+							ValidateDiagFunc: validation.ToDiagFunc(validation.StringInSlice(types.VPCRouterSiteToSiteVPNDHGroups, false)),
+							Description: desc.Sprintf(
+								"This must be one of [%s]",
+								types.VPCRouterSiteToSiteVPNDHGroups,
+							),
+						},
 					},
 				},
 			},

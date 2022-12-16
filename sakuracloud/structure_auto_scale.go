@@ -26,10 +26,12 @@ func expandAutoScaleCreateRequest(d *schema.ResourceData) *iaas.AutoScaleCreateR
 		Tags:        expandTags(d),
 		IconID:      expandSakuraCloudID(d, "icon_id"),
 
-		Zones:               expandStringList(d.Get("zones").([]interface{})),
-		Config:              d.Get("config").(string),
-		CPUThresholdScaling: expandAutoScaleCPUThresholdScaling(d),
-		APIKeyID:            d.Get("api_key_id").(string),
+		Zones:                  expandStringList(d.Get("zones").([]interface{})),
+		Config:                 d.Get("config").(string),
+		TriggerType:            d.Get("trigger_type").(string),
+		CPUThresholdScaling:    expandAutoScaleCPUThresholdScaling(d),
+		RouterThresholdScaling: expandAutoScaleRouterThresholdScaling(d),
+		APIKeyID:               d.Get("api_key_id").(string),
 	}
 }
 
@@ -40,10 +42,12 @@ func expandAutoScaleUpdateRequest(d *schema.ResourceData, autoBackup *iaas.AutoS
 		Tags:        expandTags(d),
 		IconID:      expandSakuraCloudID(d, "icon_id"),
 
-		Zones:               expandStringList(d.Get("zones").([]interface{})),
-		Config:              d.Get("config").(string),
-		CPUThresholdScaling: expandAutoScaleCPUThresholdScaling(d),
-		SettingsHash:        autoBackup.SettingsHash,
+		Zones:                  expandStringList(d.Get("zones").([]interface{})),
+		Config:                 d.Get("config").(string),
+		TriggerType:            d.Get("trigger_type").(string),
+		CPUThresholdScaling:    expandAutoScaleCPUThresholdScaling(d),
+		RouterThresholdScaling: expandAutoScaleRouterThresholdScaling(d),
+		SettingsHash:           autoBackup.SettingsHash,
 	}
 }
 
@@ -59,12 +63,40 @@ func expandAutoScaleCPUThresholdScaling(d resourceValueGettable) *iaas.AutoScale
 	return nil
 }
 
-func flattenAutoScaleCPUThresholdScaling(v *iaas.AutoScaleCPUThresholdScaling) []interface{} {
-	return []interface{}{
-		map[string]interface{}{
-			"server_prefix": v.ServerPrefix,
-			"up":            v.Up,
-			"down":          v.Down,
-		},
+func expandAutoScaleRouterThresholdScaling(d resourceValueGettable) *iaas.AutoScaleRouterThresholdScaling {
+	if routerThresholds, ok := getListFromResource(d, "router_threshold_scaling"); ok {
+		v := mapToResourceData(routerThresholds[0].(map[string]interface{}))
+		return &iaas.AutoScaleRouterThresholdScaling{
+			RouterPrefix: v.Get("router_prefix").(string),
+			Direction:    v.Get("direction").(string),
+			Mbps:         v.Get("mbps").(int),
+		}
 	}
+	return nil
+}
+
+func flattenAutoScaleCPUThresholdScaling(v *iaas.AutoScaleCPUThresholdScaling) []interface{} {
+	if v != nil {
+		return []interface{}{
+			map[string]interface{}{
+				"server_prefix": v.ServerPrefix,
+				"up":            v.Up,
+				"down":          v.Down,
+			},
+		}
+	}
+	return []interface{}{}
+}
+
+func flattenAutoScaleRouterThresholdScaling(v *iaas.AutoScaleRouterThresholdScaling) []interface{} {
+	if v != nil {
+		return []interface{}{
+			map[string]interface{}{
+				"router_prefix": v.RouterPrefix,
+				"direction":     v.Direction,
+				"mbps":          v.Mbps,
+			},
+		}
+	}
+	return []interface{}{}
 }

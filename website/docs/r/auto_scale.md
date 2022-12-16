@@ -20,9 +20,12 @@ locals {
 }
 
 resource "sakuracloud_auto_scale" "foobar" {
-  name  = "example"
+  name = "example"
+
+  # 監視対象が存在するゾーン
   zones = [local.zone]
 
+  # 設定ファイル
   config = jsonencode({
     resources : [{
       type : "Server",
@@ -33,12 +36,19 @@ resource "sakuracloud_auto_scale" "foobar" {
     }],
   })
 
+  # APIキーのID
   api_key_id = local.api_key_id
 
+  # しきい値
   cpu_threshold_scaling {
+    # 監視対象のサーバ名のプリフィックス
     server_prefix = local.server_name_prefix
-    up            = 80
-    down          = 20
+
+    # 性能アップするCPU使用率
+    up = 80
+
+    # 性能ダウンするCPU使用率
+    down = 20
   }
 }
 
@@ -56,7 +66,9 @@ resource "sakuracloud_server" "foobar" {
 * `description` - (Optional) The description of the AutoScale. The length of this value must be in the range [`1`-`512`].
 * `icon_id` - (Optional) The icon id to attach to the AutoScale.
 * `name` - (Required) The name of the AutoScale. The length of this value must be in the range [`1`-`64`].
+* `router_threshold_scaling` - (Optional) A `router_threshold_scaling` block as defined below.
 * `tags` - (Optional) Any tags to assign to the AutoScale.
+* `trigger_type` - (Optional) This must be one of [`cpu`/`router`].
 * `zones` - (Required) List of zone names where monitored resources are located.
 
 ---
@@ -66,6 +78,15 @@ A `cpu_threshold_scaling` block supports the following:
 * `server_prefix` - (Required) Server name prefix to be monitored. 
 * `up` - (Required) Threshold for average CPU utilization to scale up/out. 
 * `down` - (Required) Threshold for average CPU utilization to scale down/in.
+
+---
+
+A `router_threshold_scaling` block supports the following:
+
+* `router_prefix` - (Required) Router name prefix to be monitored.
+* `direction` - (Required) This must be one of [`in`/`out`].
+* `mbps` - (Required) Mbps.
+
 
 
 ### Timeouts
