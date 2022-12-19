@@ -10,12 +10,12 @@ FEATURES
 
 IMPROVEMENTS:
 
+- iaas-api-go v1.7.1 #1003
 - go: bump github.com/goccy/go-yaml from 1.9.6 to 1.9.7 #991
 - go: bump golang.org/x/text from 0.4.0 to 0.5.0 #993
 - go: bump github.com/sacloud/packages-go from 0.0.6 to 0.0.7 #996
 - ci: bump goreleaser/goreleaser-action from 3 to 4 #997
-- 
-
+ 
 
 ## 2.20.1 (2022-12-05)
 
