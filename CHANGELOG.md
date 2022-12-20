@@ -1,6 +1,6 @@
 # CHANGELOG
 
-## 2.21.0 (Unreleased)
+## 2.21.0 (2022-12-20)
 
 FEATURES
 
