@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## 2.21.1 (Unreleased)
+
+MISC:
+
+- e2e: is1a -> is1b #1006
+
 ## 2.21.0 (2022-12-20)
 
 FEATURES
