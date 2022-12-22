@@ -30,7 +30,7 @@ func TestAccSakuraCloudDataSourceZone_basic(t *testing.T) {
 				Config: testAccSakuraCloudDataSourceZone_basic,
 				Check: resource.ComposeTestCheckFunc(
 					testCheckSakuraCloudDataSourceExists(resourceName),
-					resource.TestCheckResourceAttr(resourceName, "name", "is1a"),
+					resource.TestCheckResourceAttr(resourceName, "name", "is1b"),
 					resource.TestCheckResourceAttr(resourceName, "zone_id", "31001"),
 					resource.TestCheckResourceAttr(resourceName, "description", "石狩第1ゾーン"),
 					resource.TestCheckResourceAttr(resourceName, "region_id", "310"),
@@ -45,5 +45,5 @@ func TestAccSakuraCloudDataSourceZone_basic(t *testing.T) {
 
 var testAccSakuraCloudDataSourceZone_basic = `
 data "sakuracloud_zone" "foobar" { 
-  name = "is1a"
+  name = "is1b"
 }`
