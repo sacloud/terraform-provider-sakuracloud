@@ -46,7 +46,7 @@ func TestAccSakuraCloudDataSourceAutoScale_basic(t *testing.T) {
 					resource.TestCheckResourceAttr(resourceName, "tags.1", "tag2"),
 
 					resource.TestCheckResourceAttr(resourceName, "zones.#", "1"),
-					resource.TestCheckResourceAttr(resourceName, "zones.0", "is1a"),
+					resource.TestCheckResourceAttr(resourceName, "zones.0", "is1b"),
 					resource.TestCheckResourceAttr(resourceName, "cpu_threshold_scaling.#", "1"),
 					resource.TestCheckResourceAttr(resourceName, "cpu_threshold_scaling.0.server_prefix", rand),
 					resource.TestCheckResourceAttr(resourceName, "cpu_threshold_scaling.0.up", "80"),
@@ -63,7 +63,7 @@ var testAccSakuraCloudDataSourceAutoScale_basic = `
 resource "sakuracloud_server" "foobar" {
   name = "{{ .arg0 }}"
   force_shutdown = true
-  zone = "is1a"
+  zone = "is1b"
 }
 
 resource "sakuracloud_auto_scale" "foobar" {
@@ -71,13 +71,13 @@ resource "sakuracloud_auto_scale" "foobar" {
   description    = "description"
   tags           = ["tag1", "tag2"]
 
-  zones  = ["is1a"]
+  zones  = ["is1b"]
   config = yamlencode({
     resources: [{
       type: "Server",
       selector: {
         names: [sakuracloud_server.foobar.name],
-        zones: ["is1a"],
+        zones: ["is1b"],
       },
       shutdown_force: true,
     }],

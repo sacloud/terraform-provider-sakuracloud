@@ -61,7 +61,7 @@ func TestAccSakuraCloudAutoScale_basic(t *testing.T) {
 						"sakuracloud_icon.foobar", "id",
 					),
 					resource.TestCheckResourceAttr(resourceName, "zones.#", "1"),
-					resource.TestCheckResourceAttr(resourceName, "zones.0", "is1a"),
+					resource.TestCheckResourceAttr(resourceName, "zones.0", "is1b"),
 
 					resource.TestCheckResourceAttr(resourceName, "cpu_threshold_scaling.#", "1"),
 					resource.TestCheckResourceAttr(resourceName, "cpu_threshold_scaling.0.server_prefix", rand),
@@ -84,7 +84,7 @@ func TestAccSakuraCloudAutoScale_basic(t *testing.T) {
 					resource.TestCheckResourceAttr(resourceName, "icon_id", ""),
 
 					resource.TestCheckResourceAttr(resourceName, "zones.#", "1"),
-					resource.TestCheckResourceAttr(resourceName, "zones.0", "is1a"),
+					resource.TestCheckResourceAttr(resourceName, "zones.0", "is1b"),
 
 					resource.TestCheckResourceAttr(resourceName, "cpu_threshold_scaling.#", "1"),
 					resource.TestCheckResourceAttr(resourceName, "cpu_threshold_scaling.0.server_prefix", rand),
@@ -207,7 +207,7 @@ func TestAccImportSakuraCloudAutoScale_basic(t *testing.T) {
 			"description":                           "description",
 			"tags.0":                                "tag1",
 			"tags.1":                                "tag2",
-			"zones.0":                               "is1a",
+			"zones.0":                               "is1b",
 			"api_key_id":                            apiKeyId,
 			"cpu_threshold_scaling.0.server_prefix": rand,
 			"cpu_threshold_scaling.0.up":            "80",
@@ -249,7 +249,7 @@ var testAccSakuraCloudAutoScale_basic = `
 resource "sakuracloud_server" "foobar" {
   name = "{{ .arg0 }}"
   force_shutdown = true
-  zone = "is1a"
+  zone = "is1b"
 }
 
 resource "sakuracloud_auto_scale" "foobar" {
@@ -258,13 +258,13 @@ resource "sakuracloud_auto_scale" "foobar" {
   tags           = ["tag1", "tag2"]
   icon_id        = sakuracloud_icon.foobar.id
 
-  zones  = ["is1a"]
+  zones  = ["is1b"]
   config = yamlencode({
     resources: [{
       type: "Server",
       selector: {
         names: [sakuracloud_server.foobar.name],
-        zones: ["is1a"],
+        zones: ["is1b"],
       },
       shutdown_force: true,
     }],
@@ -290,7 +290,7 @@ var testAccSakuraCloudAutoScale_encodedConfig = `"resources":
     "names":
     - "{{ .arg0 }}"
     "zones":
-    - "is1a"
+    - "is1b"
   "shutdown_force": true
   "type": "Server"
 `
@@ -299,7 +299,7 @@ var testAccSakuraCloudAutoScale_update = `
 resource "sakuracloud_server" "foobar" {
   name = "{{ .arg0 }}"
   force_shutdown = true
-  zone = "is1a"
+  zone = "is1b"
 }
 
 resource "sakuracloud_auto_scale" "foobar" {
@@ -307,13 +307,13 @@ resource "sakuracloud_auto_scale" "foobar" {
   description    = "description-upd"
   tags           = ["tag1-upd", "tag2-upd"]
 
-  zones  = ["is1a"]
+  zones  = ["is1b"]
   config = yamlencode({
     resources: [{
       type: "Server",
       selector: {
         names: [sakuracloud_server.foobar.name],
-        zones: ["is1a"],
+        zones: ["is1b"],
       },
       shutdown_force: true,
     }],
@@ -340,7 +340,7 @@ var testAccSakuraCloudAutoScale_encodedConfig_update = `"autoscaler":
     "names":
     - "{{ .arg0 }}"
     "zones":
-    - "is1a"
+    - "is1b"
   "shutdown_force": true
   "type": "Server"
 `
@@ -348,19 +348,19 @@ var testAccSakuraCloudAutoScale_encodedConfig_update = `"autoscaler":
 var testAccSakuraCloudAutoScale_withRouter = `
 resource "sakuracloud_internet" "foobar" {
   name = "{{ .arg0 }}"
-  zone = "is1a"
+  zone = "is1b"
 }
 
 resource "sakuracloud_auto_scale" "foobar" {
   name           = "{{ .arg0 }}"
 
-  zones  = ["is1a"]
+  zones  = ["is1b"]
   config = yamlencode({
     resources: [{
       type: "Router",
       selector: {
         names: [sakuracloud_internet.foobar.name],
-        zones: ["is1a"],
+        zones: ["is1b"],
       },
     }],
   })
@@ -380,6 +380,6 @@ var testAccSakuraCloudAutoScale_encodedConfigWithRouter = `"resources":
     "names":
     - "{{ .arg0 }}"
     "zones":
-    - "is1a"
+    - "is1b"
   "type": "Router"
 `
