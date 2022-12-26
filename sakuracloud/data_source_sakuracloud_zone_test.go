@@ -31,8 +31,8 @@ func TestAccSakuraCloudDataSourceZone_basic(t *testing.T) {
 				Check: resource.ComposeTestCheckFunc(
 					testCheckSakuraCloudDataSourceExists(resourceName),
 					resource.TestCheckResourceAttr(resourceName, "name", "is1b"),
-					resource.TestCheckResourceAttr(resourceName, "zone_id", "31001"),
-					resource.TestCheckResourceAttr(resourceName, "description", "石狩第1ゾーン"),
+					resource.TestCheckResourceAttr(resourceName, "zone_id", "31002"),
+					resource.TestCheckResourceAttr(resourceName, "description", "石狩第2ゾーン"),
 					resource.TestCheckResourceAttr(resourceName, "region_id", "310"),
 					resource.TestCheckResourceAttr(resourceName, "region_name", "石狩"),
 					resource.TestCheckResourceAttr(resourceName, "dns_servers.0", "133.242.0.3"),
