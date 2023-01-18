@@ -83,6 +83,7 @@ func TestAccSakuraCloudProxyLB_basic(t *testing.T) {
 					resource.TestCheckResourceAttr(resourceName, "server.0.group", "group1"),
 					resource.TestCheckResourceAttr(resourceName, "rule.0.host", "usacloud.jp"),
 					resource.TestCheckResourceAttr(resourceName, "rule.0.path", "/path"),
+					resource.TestCheckResourceAttr(resourceName, "rule.0.source_ips", "192.0.2.1,192.0.2.2"),
 					resource.TestCheckResourceAttr(resourceName, "rule.0.group", "group1"),
 					resource.TestCheckResourceAttr(resourceName, "rule.0.action", "fixed"),
 					resource.TestCheckResourceAttr(resourceName, "rule.0.fixed_status_code", "200"),
@@ -136,6 +137,7 @@ func TestAccSakuraCloudProxyLB_basic(t *testing.T) {
 					resource.TestCheckResourceAttr(resourceName, "server.0.group", "group2"),
 					resource.TestCheckResourceAttr(resourceName, "rule.0.host", "upd.usacloud.jp"),
 					resource.TestCheckResourceAttr(resourceName, "rule.0.path", "/path-upd"),
+					resource.TestCheckResourceAttr(resourceName, "rule.0.source_ips", "192.0.2.11,192.0.2.12"),
 					resource.TestCheckResourceAttr(resourceName, "rule.0.group", "group2"),
 					resource.TestCheckResourceAttr(resourceName, "rule.0.action", "redirect"),
 					resource.TestCheckResourceAttr(resourceName, "rule.0.fixed_status_code", ""),
@@ -237,6 +239,7 @@ func TestAccImportSakuraCloudProxyLB_basic(t *testing.T) {
 			"server.1.group":            "group1",
 			"rule.0.action":             "forward",
 			"rule.0.host":               "www.usacloud.jp",
+			"rule.0.source_ips":         "192.0.2.1,192.0.2.2",
 			"rule.0.path":               "/",
 			"rule.0.group":              "group1",
 		}
@@ -312,6 +315,7 @@ resource "sakuracloud_proxylb" "foobar" {
   rule {
     host               = "usacloud.jp"
     path               = "/path"
+    source_ips         = "192.0.2.1,192.0.2.2"
     group              = "group1"
     action             = "fixed"
     fixed_status_code  = "200"
@@ -369,6 +373,7 @@ resource "sakuracloud_proxylb" "foobar" {
   rule {
     host                 = "upd.usacloud.jp"
     path                 = "/path-upd"
+    source_ips           = "192.0.2.11,192.0.2.12"
     group                = "group2"
     action               = "redirect"
     redirect_status_code = "301"
@@ -417,6 +422,7 @@ resource "sakuracloud_proxylb" "foobar" {
   rule {
     host                 = "www.usacloud.jp"
     path                 = "/"
+    source_ips           = "192.0.2.1,192.0.2.2"
     group                = "group1"
   }
 

@@ -41,10 +41,11 @@ resource "sakuracloud_proxylb" "foobar" {
   }
 
   rule {
-    action = "forward"
-    host   = "www.example.com"
-    path   = "/"
-    group  = "group1"
+    action     = "forward"
+    host       = "www.example.com"
+    source_ips = "192.2.0.1,192.12.0.2"
+    path       = "/"
+    group      = "group1"
   }
   rule {
     action               = "redirect"

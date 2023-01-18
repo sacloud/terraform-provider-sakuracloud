@@ -144,6 +144,7 @@ func flattenProxyLBRules(proxyLB *iaas.ProxyLB) []interface{} {
 		results = append(results, map[string]interface{}{
 			"host":                 rule.Host,
 			"path":                 rule.Path,
+			"source_ips":           rule.SourceIPs,
 			"group":                rule.ServerGroup,
 			"action":               rule.Action.String(),
 			"redirect_location":    rule.RedirectLocation,
@@ -341,6 +342,7 @@ func expandProxyLBRules(d resourceValueGettable) []*iaas.ProxyLBRule {
 			results = append(results, &iaas.ProxyLBRule{
 				Host:               v.Get("host").(string),
 				Path:               v.Get("path").(string),
+				SourceIPs:          v.Get("source_ips").(string),
 				ServerGroup:        v.Get("group").(string),
 				Action:             types.EProxyLBRuleAction(v.Get("action").(string)),
 				RedirectLocation:   v.Get("redirect_location").(string),
