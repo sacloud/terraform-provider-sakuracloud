@@ -8,7 +8,15 @@ FEATURES:
 
 MISC:
 
-- e2e: is1a -> is1b #1006
+- e2e: is1a -> is1b #1006 , #1007
+- copyright: 2023 #1009
+
+IMPROVEMENTS:
+
+- go: bump github.com/goccy/go-yaml from 1.9.7 to 1.9.8 #1004
+- go: bump github.com/hashicorp/terraform-plugin-mux from 0.7.0 to 0.8.0 #1005
+- go: bump golang.org/x/text from 0.5.0 to 0.6.0 #1008
+- go: bump github.com/hashicorp/terraform-plugin-go from 0.14.2 to 0.14.3  #1010
 
 ## 2.21.0 (2022-12-20)
 
