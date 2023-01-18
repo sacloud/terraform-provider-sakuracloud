@@ -49,12 +49,12 @@ A `condition` block supports the following:
 * `description` - The description of the ProxyLB.
 * `fqdn` - The FQDN for accessing to the ProxyLB. This is typically used as value of CNAME record.
 * `gzip` - The flag to enable gzip compression.
-* `proxy_protocol` - The flag to enable proxy protocol v2.
 * `health_check` - A list of `health_check` blocks as defined below.
 * `icon_id` - The icon id attached to the ProxyLB.
 * `name` - The name of the ProxyLB.
 * `plan` - The plan name of the ProxyLB. This will be one of [`100`/`500`/`1000`/`5000`/`10000`/`50000`/`100000`/`400000`].
 * `proxy_networks` - A list of CIDR block used by the ProxyLB to access the server.
+* `proxy_protocol` - The flag to enable proxy protocol v2.
 * `region` - The name of region that the proxy LB is in. This will be one of [`tk1`/`is1`/`anycast`].
 * `rule` - A list of `rule` blocks as defined below.
 * `server` - A list of `server` blocks as defined below.
@@ -75,6 +75,7 @@ A `bind_port` block exports the following:
 * `proxy_mode` - The proxy mode. This will be one of [`http`/`https`/`tcp`].
 * `redirect_to_https` - The flag to enable redirection from http to https. This flag is used only when `proxy_mode` is `http`.
 * `response_header` - A list of `response_header` blocks as defined below.
+* `ssl_policy` - The ssl policy.
 * `support_http2` - The flag to enable HTTP/2. This flag is used only when `proxy_mode` is `https`.
 
 ---
@@ -126,6 +127,7 @@ A `rule` block exports the following:
 * `path` - The request path that is used as condition of rule-based balancing.
 * `redirect_location` - The URL to redirect to when the request matches the rule. see https://manual.sakura.ad.jp/cloud/appliance/enhanced-lb/#enhanced-lb-rule for details.
 * `redirect_status_code` - HTTP status code for redirects sent when requests matches the rule. This will be one of [`301`/`302`].
+* `source_ips` - IP address or CIDR block to which the rule will be applied.
 
 ---
 

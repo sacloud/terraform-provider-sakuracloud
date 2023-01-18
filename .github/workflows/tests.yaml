@@ -47,7 +47,8 @@ jobs:
       - name: make lint-go
         run:  |
           # Explicitly set GOROOT to avoid golangci-lint/issues/3107
-          export GOROOT=$(go env GOROOT)
+          GOROOT=$(go env GOROOT)
+          export GOROOT
           make lint-go
 
   licenses-check:

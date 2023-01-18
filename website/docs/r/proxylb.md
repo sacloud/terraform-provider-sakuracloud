@@ -56,10 +56,11 @@ resource "sakuracloud_proxylb" "foobar" {
   }
 
   rule {
-    action = "forward"
-    host   = "www.example.com"
-    path   = "/"
-    group  = "group1"
+    action     = "forward"
+    host       = "www.example.com"
+    source_ips = "192.2.0.1,192.12.0.2"
+    path       = "/"
+    group      = "group1"
   }
   rule {
     action               = "redirect"
@@ -173,6 +174,7 @@ A `rule` block supports the following:
 * `path` - (Optional) The request path that is used as condition of rule-based balancing.
 * `redirect_location` - (Optional) The URL to redirect to when the request matches the rule. see https://manual.sakura.ad.jp/cloud/appliance/enhanced-lb/#enhanced-lb-rule for details.
 * `redirect_status_code` - (Optional) HTTP status code for redirects sent when requests matches the rule. This must be one of [`301`/`302`].
+* `source_ips` - (Optional) IP address or CIDR block to which the rule will be applied. Multiple values can be specified by separating them with a space or comma.
 
 ---
 

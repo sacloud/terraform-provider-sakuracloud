@@ -346,6 +346,11 @@ func resourceSakuraCloudProxyLB() *schema.Resource {
 							Optional:    true,
 							Description: "The request path that is used as condition of rule-based balancing",
 						},
+						"source_ips": {
+							Type:        schema.TypeString,
+							Optional:    true,
+							Description: "IP address or CIDR block to which the rule will be applied. Multiple values can be specified by separating them with a space or comma",
+						},
 						"group": {
 							Type:             schema.TypeString,
 							Optional:         true,
