@@ -1,6 +1,10 @@
 # CHANGELOG
 
-## 2.21.1 (Unreleased)
+## 2.22.0 (Unreleased)
+
+FEATURES:
+
+- ELB: source_ips #1011
 
 MISC:
 
