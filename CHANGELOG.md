@@ -6,6 +6,11 @@ FIXES:
 
 - fix: sakuracloud_simple_monitor: verify_sniの反映誤りを修正 #1019
 
+MISC:
+
+- go: bump github.com/sacloud/iaas-api-go from 1.8.0 to 1.8.1
+- go: bump github.com/sacloud/iaas-api-go from 1.8.1 to 1.8.3
+
 
 ## 2.22.0 (2023-01-19)
 
