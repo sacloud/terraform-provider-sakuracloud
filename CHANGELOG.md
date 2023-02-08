@@ -1,5 +1,12 @@
 # CHANGELOG
 
+## 2.22.1 (Unreleased)
+
+FIXES:
+
+- fix: sakuracloud_simple_monitor: verify_sniの反映誤りを修正 #1019
+
+
 ## 2.22.0 (2023-01-19)
 
 FEATURES:
