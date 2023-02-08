@@ -1,6 +1,6 @@
 # CHANGELOG
 
-## 2.22.1 (Unreleased)
+## 2.22.1 (2023-02-08)
 
 FIXES:
 
