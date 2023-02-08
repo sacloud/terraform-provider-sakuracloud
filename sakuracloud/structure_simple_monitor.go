@@ -94,7 +94,6 @@ func flattenSimpleMonitorHealthCheck(simpleMonitor *iaas.SimpleMonitor) []interf
 		healthCheck["username"] = hc.BasicAuthUsername
 		healthCheck["password"] = hc.BasicAuthPassword
 		healthCheck["http2"] = hc.HTTP2
-		healthCheck["verify_sni"] = hc.VerifySNI
 	case types.SimpleMonitorProtocols.TCP, types.SimpleMonitorProtocols.SSH, types.SimpleMonitorProtocols.SMTP, types.SimpleMonitorProtocols.POP3:
 		healthCheck["port"] = hc.Port.Int()
 	case types.SimpleMonitorProtocols.SNMP:
@@ -108,6 +107,7 @@ func flattenSimpleMonitorHealthCheck(simpleMonitor *iaas.SimpleMonitor) []interf
 	case types.SimpleMonitorProtocols.FTP:
 		healthCheck["ftps"] = hc.FTPS.String()
 	case types.SimpleMonitorProtocols.SSLCertificate:
+		healthCheck["verify_sni"] = hc.VerifySNI
 	}
 	days := hc.RemainingDays
 	if days == 0 {
@@ -154,7 +154,6 @@ func expandSimpleMonitorHealthCheck(d resourceValueGettable) *iaas.SimpleMonitor
 			BasicAuthUsername: forceString(conf["username"]),
 			BasicAuthPassword: forceString(conf["password"]),
 			HTTP2:             types.StringFlag(forceBool(conf["http2"])),
-			VerifySNI:         types.StringFlag(forceBool(conf["verify_sni"])),
 		}
 
 	case "dns":
@@ -212,6 +211,7 @@ func expandSimpleMonitorHealthCheck(d resourceValueGettable) *iaas.SimpleMonitor
 		return &iaas.SimpleMonitorHealthCheck{
 			Protocol:      types.SimpleMonitorProtocols.SSLCertificate,
 			RemainingDays: days,
+			VerifySNI:         types.StringFlag(forceBool(conf["verify_sni"])),
 		}
 	case "ftp":
 		if port == 0 {
