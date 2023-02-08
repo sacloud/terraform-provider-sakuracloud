@@ -75,13 +75,13 @@ A `health_check` block supports the following:
 * `username` - (Optional) The user name for basic auth used when checking by HTTP/HTTPS.
 * `path` - (Optional) The path used when checking by HTTP/HTTPS.
 * `sni` - (Optional) The flag to enable SNI when checking by HTTP/HTTPS.
-* `verify_sni` - (Optional) The flag to enable hostname verification for SNI.
 * `http2` - (Optional) The flag to enable HTTP/2 when checking by HTTPS.
 * `status` - (Optional) The response-code to expect when checking by HTTP/HTTPS.
 * `contains_string` - (Optional) The string that should be included in the response body when checking for HTTP/HTTPS.
 
 ##### Certificate
 
+* `verify_sni` - (Optional) The flag to enable hostname verification for SNI.
 * `remaining_days` - (Optional) The number of remaining days until certificate expiration used when checking SSL certificates. This must be in the range [`1`-`9999`].
 
 ##### SNMP 

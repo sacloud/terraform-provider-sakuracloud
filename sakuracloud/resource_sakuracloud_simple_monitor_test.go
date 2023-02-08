@@ -46,7 +46,6 @@ func TestAccSakuraCloudSimpleMonitor_basic(t *testing.T) {
 					resource.TestCheckResourceAttr(resourceName, "health_check.0.port", "8443"),
 					resource.TestCheckResourceAttr(resourceName, "health_check.0.contains_string", "ok"),
 					resource.TestCheckResourceAttr(resourceName, "health_check.0.sni", "true"),
-					resource.TestCheckResourceAttr(resourceName, "health_check.0.verify_sni", "true"),
 					resource.TestCheckResourceAttr(resourceName, "health_check.0.username", "foo"),
 					resource.TestCheckResourceAttr(resourceName, "health_check.0.password", "bar"),
 					resource.TestCheckResourceAttr(resourceName, "health_check.0.http2", "true"),
@@ -103,6 +102,7 @@ func TestAccSakuraCloudSimpleMonitor_certMonitor(t *testing.T) {
 					testCheckSakuraCloudSimpleMonitorAttributes(&monitor),
 					resource.TestCheckResourceAttr(resourceName, "health_check.0.protocol", "sslcertificate"),
 					resource.TestCheckResourceAttr(resourceName, "health_check.0.remaining_days", "30"),
+					resource.TestCheckResourceAttr(resourceName, "health_check.0.verify_sni", "true"),
 					resource.TestCheckResourceAttr(resourceName, "target", zone),
 					resource.TestCheckResourceAttr(resourceName, "notify_email_enabled", "true"),
 					resource.TestCheckResourceAttr(resourceName, "notify_email_html", "true"),
@@ -201,7 +201,6 @@ resource "sakuracloud_simple_monitor" "foobar" {
     username        = "foo"
     password        = "bar"
     http2           = true
-    verify_sni      = true
   }
   description          = "description"
   tags                 = ["tag1", "tag2"]
@@ -246,6 +245,7 @@ resource "sakuracloud_simple_monitor" "foobar" {
   health_check {
     protocol       = "sslcertificate"
     remaining_days = 30
+    verify_sni     = true
   }
   description          = "description"
   tags                 = ["tag1", "tag2"]
