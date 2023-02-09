@@ -18,7 +18,7 @@ require (
 	github.com/sacloud/packages-go v0.0.7
 	github.com/sacloud/webaccel-api-go v1.1.4
 	github.com/stretchr/testify v1.8.1
-	golang.org/x/text v0.6.0
+	golang.org/x/text v0.7.0
 )
 
 require (
