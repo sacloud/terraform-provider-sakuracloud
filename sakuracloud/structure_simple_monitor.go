@@ -211,7 +211,7 @@ func expandSimpleMonitorHealthCheck(d resourceValueGettable) *iaas.SimpleMonitor
 		return &iaas.SimpleMonitorHealthCheck{
 			Protocol:      types.SimpleMonitorProtocols.SSLCertificate,
 			RemainingDays: days,
-			VerifySNI:         types.StringFlag(forceBool(conf["verify_sni"])),
+			VerifySNI:     types.StringFlag(forceBool(conf["verify_sni"])),
 		}
 	case "ftp":
 		if port == 0 {
