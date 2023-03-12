@@ -28,6 +28,7 @@ import (
 
 func TestAccSakuraCloudCertificateAuthority_basic(t *testing.T) {
 	skipIfFakeModeEnabled(t)
+	skipIfEnvIsNotSet(t, "SAKURACLOUD_ENABLE_MANAGED_PKI")
 
 	resourceName := "sakuracloud_certificate_authority.foobar"
 	rand := randomName()
