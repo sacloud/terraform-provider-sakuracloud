@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## 2.22.2 (Unreleased)
+
+MISC:
+- go 1.20 #1037
+
 ## 2.22.1 (2023-02-08)
 
 FIXES:
