@@ -3,7 +3,9 @@
 ## 2.22.2 (Unreleased)
 
 MISC:
+
 - go 1.20 #1037
+- go: bump github.com/stretchr/testify from 1.8.1 to 1.8.2 #1034
 
 ## 2.22.1 (2023-02-08)
 
