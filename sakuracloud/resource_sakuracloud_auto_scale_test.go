@@ -318,7 +318,10 @@ resource "sakuracloud_auto_scale" "foobar" {
       shutdown_force: true,
     }],
     autoscaler: {
-      cooldown: 300,
+      cooldown: {
+        down: 500,
+        up: 300,
+      }
     },
   })
 
@@ -334,7 +337,9 @@ resource "sakuracloud_auto_scale" "foobar" {
 `
 
 var testAccSakuraCloudAutoScale_encodedConfig_update = `"autoscaler":
-  "cooldown": 300
+  "cooldown":
+    "down": 500
+    "up": 300
 "resources":
 - "selector":
     "names":
