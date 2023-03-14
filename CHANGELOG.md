@@ -6,6 +6,7 @@ MISC:
 
 - go 1.20 #1037
 - go: bump github.com/stretchr/testify from 1.8.1 to 1.8.2 #1034
+- go: bump github.com/sacloud/iaas-service-go from 1.6.0 to 1.6.1 #1033
 
 ## 2.22.1 (2023-02-08)
 
