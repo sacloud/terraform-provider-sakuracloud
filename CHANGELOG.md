@@ -1,6 +1,6 @@
 # CHANGELOG
 
-## 2.22.2 (Unreleased)
+## 2.22.2 (2022-03-17)
 
 FEATURES:
 
