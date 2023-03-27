@@ -63,6 +63,8 @@ func TestAccSakuraCloudProxyLB_basic(t *testing.T) {
 					resource.TestCheckResourceAttr(resourceName, "vip_failover", "true"),
 					resource.TestCheckResourceAttr(resourceName, "sticky_session", "true"),
 					resource.TestCheckResourceAttr(resourceName, "gzip", "true"),
+					resource.TestCheckResourceAttr(resourceName, "backend_http_keep_alive", "aggressive"),
+					resource.TestCheckResourceAttr(resourceName, "backend_http_keep_alive", "aggressive"),
 					resource.TestCheckResourceAttr(resourceName, "proxy_protocol", "true"),
 					resource.TestCheckResourceAttr(resourceName, "health_check.0.protocol", "http"),
 					resource.TestCheckResourceAttr(resourceName, "health_check.0.delay_loop", "10"),
@@ -120,6 +122,7 @@ func TestAccSakuraCloudProxyLB_basic(t *testing.T) {
 					resource.TestCheckResourceAttr(resourceName, "plan", "500"),
 					resource.TestCheckResourceAttr(resourceName, "sticky_session", "false"),
 					resource.TestCheckResourceAttr(resourceName, "gzip", "false"),
+					resource.TestCheckResourceAttr(resourceName, "backend_http_keep_alive", "safe"),
 					resource.TestCheckResourceAttr(resourceName, "proxy_protocol", "false"),
 					resource.TestCheckResourceAttr(resourceName, "health_check.0.protocol", "tcp"),
 					resource.TestCheckResourceAttr(resourceName, "health_check.0.delay_loop", "20"),
@@ -280,6 +283,8 @@ resource "sakuracloud_proxylb" "foobar" {
   proxy_protocol = true
   timeout        = 10
   region         = "is1"
+
+  backend_http_keep_alive = "aggressive"
 
   health_check {
     protocol    = "http"

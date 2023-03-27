@@ -64,6 +64,16 @@ func resourceSakuraCloudProxyLB() *schema.Resource {
 				Optional:    true,
 				Description: "The flag to enable gzip compression",
 			},
+			"backend_http_keep_alive": {
+				Type:             schema.TypeString,
+				Default:          types.ProxyLBBackendHttpKeepAlive.Safe.String(),
+				Optional:         true,
+				ValidateDiagFunc: validation.ToDiagFunc(validation.StringInSlice(types.ProxyLBBackendHttpKeepAliveStrings, false)),
+				Description: desc.Sprintf(
+					"Mode of http keep-alive with backend. This must be one of [%s]",
+					types.ProxyLBBackendHttpKeepAliveStrings,
+				),
+			},
 			"proxy_protocol": {
 				Type:        schema.TypeBool,
 				Optional:    true,
@@ -571,16 +581,17 @@ func setProxyLBResourceData(ctx context.Context, d *schema.ResourceData, client 
 		return diag.FromErr(err)
 	}
 
-	d.Set("name", data.Name)                                   // nolint
-	d.Set("plan", data.Plan.Int())                             // nolint
-	d.Set("vip_failover", data.UseVIPFailover)                 // nolint
-	d.Set("sticky_session", flattenProxyLBStickySession(data)) // nolint
-	d.Set("gzip", flattenProxyLBGzip(data))                    // nolint
-	d.Set("proxy_protocol", flattenProxyLBProxyProtocol(data)) // nolint
-	d.Set("timeout", flattenProxyLBTimeout(data))              // nolint
-	d.Set("region", data.Region.String())                      // nolint
-	d.Set("fqdn", data.FQDN)                                   // nolint
-	d.Set("vip", health.CurrentVIP)                            // nolint
+	d.Set("name", data.Name)                                                   // nolint
+	d.Set("plan", data.Plan.Int())                                             // nolint
+	d.Set("vip_failover", data.UseVIPFailover)                                 // nolint
+	d.Set("sticky_session", flattenProxyLBStickySession(data))                 // nolint
+	d.Set("gzip", flattenProxyLBGzip(data))                                    // nolint
+	d.Set("backend_http_keep_alive", flattenProxyLBBackendHttpKeepAlive(data)) // nolint
+	d.Set("proxy_protocol", flattenProxyLBProxyProtocol(data))                 // nolint
+	d.Set("timeout", flattenProxyLBTimeout(data))                              // nolint
+	d.Set("region", data.Region.String())                                      // nolint
+	d.Set("fqdn", data.FQDN)                                                   // nolint
+	d.Set("vip", health.CurrentVIP)                                            // nolint
 	if err := d.Set("proxy_networks", data.ProxyNetworks); err != nil {
 		return diag.FromErr(err)
 	}

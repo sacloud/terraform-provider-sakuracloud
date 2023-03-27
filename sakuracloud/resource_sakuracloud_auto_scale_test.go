@@ -138,6 +138,52 @@ func TestAccSakuraCloudAutoScale_withRouter(t *testing.T) {
 	})
 }
 
+func TestAccSakuraCloudAutoScale_withScheduleTrigger(t *testing.T) {
+	resourceName := "sakuracloud_auto_scale.foobar"
+	rand := randomName()
+	if !isFakeModeEnabled() {
+		skipIfEnvIsNotSet(t, "SAKURACLOUD_API_KEY_ID")
+	}
+	apiKeyId := os.Getenv("SAKURACLOUD_API_KEY_ID")
+	if apiKeyId == "" {
+		apiKeyId = "111111111111" // dummy
+	}
+
+	var autoScale iaas.AutoScale
+	resource.ParallelTest(t, resource.TestCase{
+		PreCheck:          func() { testAccPreCheck(t) },
+		ProviderFactories: testAccProviderFactories,
+		CheckDestroy: resource.ComposeTestCheckFunc(
+			testCheckSakuraCloudAutoScaleDestroy,
+			testCheckSakuraCloudInternetDestroy,
+		),
+		Steps: []resource.TestStep{
+			{
+				Config: buildConfigWithArgs(testAccSakuraCloudAutoScale_withScheduleTrigger, rand, apiKeyId),
+				Check: resource.ComposeTestCheckFunc(
+					testCheckSakuraCloudAutoScaleExists(resourceName, &autoScale),
+					resource.TestCheckResourceAttr(resourceName, "name", rand),
+					resource.TestCheckResourceAttr(resourceName, "cpu_threshold_scaling.#", "0"),
+					resource.TestCheckResourceAttr(resourceName, "router_threshold_scaling.#", "0"),
+					resource.TestCheckResourceAttr(resourceName, "schedule_scaling.#", "2"),
+					resource.TestCheckResourceAttr(resourceName, "schedule_scaling.0.action", "up"),
+					resource.TestCheckResourceAttr(resourceName, "schedule_scaling.0.hour", "10"),
+					resource.TestCheckResourceAttr(resourceName, "schedule_scaling.0.minute", "15"),
+					resource.TestCheckResourceAttr(resourceName, "schedule_scaling.0.days_of_week.#", "2"),
+					resource.TestCheckResourceAttr(resourceName, "schedule_scaling.0.days_of_week.0", "mon"),
+					resource.TestCheckResourceAttr(resourceName, "schedule_scaling.0.days_of_week.1", "tue"),
+					resource.TestCheckResourceAttr(resourceName, "schedule_scaling.1.hour", "11"),
+					resource.TestCheckResourceAttr(resourceName, "schedule_scaling.1.minute", "30"),
+					resource.TestCheckResourceAttr(resourceName, "schedule_scaling.1.days_of_week.#", "2"),
+					resource.TestCheckResourceAttr(resourceName, "schedule_scaling.1.days_of_week.0", "sat"),
+					resource.TestCheckResourceAttr(resourceName, "schedule_scaling.1.days_of_week.1", "sun"),
+					resource.TestCheckResourceAttrSet(resourceName, "api_key_id"),
+				),
+			},
+		},
+	})
+}
+
 func testCheckSakuraCloudAutoScaleExists(n string, auto_scale *iaas.AutoScale) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
 		rs, ok := s.RootModule().Resources[n]
@@ -387,4 +433,43 @@ var testAccSakuraCloudAutoScale_encodedConfigWithRouter = `"resources":
     "zones":
     - "is1b"
   "type": "Router"
+`
+
+var testAccSakuraCloudAutoScale_withScheduleTrigger = `
+resource "sakuracloud_server" "foobar" {
+  name = "{{ .arg0 }}"
+  force_shutdown = true
+  zone = "is1b"
+}
+
+resource "sakuracloud_auto_scale" "foobar" {
+  name           = "{{ .arg0 }}"
+
+  zones  = ["is1b"]
+  config = yamlencode({
+    resources: [{
+      type: "Server",
+      selector: {
+        names: [sakuracloud_server.foobar.name],
+        zones: ["is1b"],
+      },
+      shutdown_force: true,
+    }],
+  })
+  api_key_id = "{{ .arg1 }}"
+
+  trigger_type = "schedule"
+  schedule_scaling {
+    action = "up"
+    hour   = 10
+    minute = 15
+    days_of_week = ["mon", "tue"]
+  }
+  schedule_scaling {
+    action = "down"
+    hour   = 11
+    minute = 30 
+    days_of_week = ["sat", "sun"]
+  }
+}
 `

@@ -20,6 +20,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/sacloud/iaas-api-go"
+	"github.com/sacloud/iaas-api-go/types"
 	"github.com/sacloud/terraform-provider-sakuracloud/internal/desc"
 )
 
@@ -50,12 +51,17 @@ func dataSourceSakuraCloudAutoScale() *schema.Resource {
 				Computed:    true,
 				Description: "The id of the API key",
 			},
+			"disabled": {
+				Type:        schema.TypeBool,
+				Computed:    true,
+				Description: "The flag to stop trigger",
+			},
 			"trigger_type": {
 				Type:     schema.TypeString,
 				Computed: true,
 				Description: desc.Sprintf(
 					"This must be one of [%s]",
-					[]string{"cpu", "router"},
+					[]string{"cpu", "router", "scheudle"},
 				),
 			},
 			"router_threshold_scaling": {
@@ -103,6 +109,45 @@ func dataSourceSakuraCloudAutoScale() *schema.Resource {
 							Type:        schema.TypeInt,
 							Computed:    true,
 							Description: "Threshold for average CPU utilization to scale down/in",
+						},
+					},
+				},
+			},
+			"schedule_scaling": {
+				Type:     schema.TypeList,
+				Computed: true,
+				Elem: &schema.Resource{
+					Schema: map[string]*schema.Schema{
+						"action": {
+							Type:     schema.TypeString,
+							Computed: true,
+							Description: desc.Sprintf(
+								"This must be one of [%s]",
+								[]string{"up", "down"},
+							),
+						},
+						"hour": {
+							Type:        schema.TypeInt,
+							Computed:    true,
+							Description: "Hour to be triggered",
+						},
+						"minute": {
+							Type:     schema.TypeInt,
+							Computed: true,
+							Description: desc.Sprintf(
+								"Minute to be triggered. This must be one of [%s]",
+								[]string{"0", "15", "30", "45"},
+							),
+						},
+						"days_of_week": {
+							Type:     schema.TypeSet,
+							Computed: true,
+							Elem:     &schema.Schema{Type: schema.TypeString},
+							Set:      schema.HashString,
+							Description: desc.Sprintf(
+								"A list of weekdays to backed up. The values in the list must be in [%s]",
+								types.DaysOfTheWeekStrings,
+							),
 						},
 					},
 				},

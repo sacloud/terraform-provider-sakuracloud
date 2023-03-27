@@ -47,17 +47,20 @@ A `condition` block supports the following:
 * `config` - The configuration file for sacloud/autoscaler.
 * `cpu_threshold_scaling` - A list of `cpu_threshold_scaling` blocks as defined below.
 * `description` - The description of the AutoScale.
+* `disabled` - The flag to stop trigger.
 * `icon_id` - The icon id attached to the AutoScale.
 * `name` - The name of the AutoScale.
 * `router_threshold_scaling` - A list of `router_threshold_scaling` blocks as defined below.
+* `schedule_scaling` - A list of `schedule_scaling` blocks as defined below.
 * `tags` - Any tags assigned to the AutoScale.
-* `trigger_type` - This must be one of [`cpu`/`router`].
+* `trigger_type` - This must be one of [`cpu`/`router`/`scheudle`].
 * `zones` - List of zone names where monitored resources are located.
 
 ---
 
 A `cpu_threshold_scaling` block exports the following:
 
+* `down` - Threshold for average CPU utilization to scale down/in.
 * `server_prefix` - Server name prefix to be monitored.
 * `up` - Threshold for average CPU utilization to scale up/out.
 
@@ -68,5 +71,14 @@ A `router_threshold_scaling` block exports the following:
 * `direction` - This must be one of [`in`/`out`].
 * `mbps` - Mbps.
 * `router_prefix` - Router name prefix to be monitored.
+
+---
+
+A `schedule_scaling` block exports the following:
+
+* `action` - This must be one of [`up`/`down`].
+* `days_of_week` - A list of weekdays to backed up. The values in the list must be in [`sun`/`mon`/`tue`/`wed`/`thu`/`fri`/`sat`].
+* `hour` - Hour to be triggered.
+* `minute` - Minute to be triggered. This must be one of [`0`/`15`/`30`/`45`].
 
 
