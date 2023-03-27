@@ -22,6 +22,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
 	"github.com/sacloud/iaas-api-go"
+	"github.com/sacloud/iaas-api-go/types"
 	"github.com/sacloud/terraform-provider-sakuracloud/internal/desc"
 )
 
@@ -63,14 +64,19 @@ func resourceSakuraCloudAutoScale() *schema.Resource {
 				Description:      "The id of the API key",
 				ForceNew:         true,
 			},
+			"disabled": {
+				Type:        schema.TypeBool,
+				Optional:    true,
+				Description: "The flag to stop trigger",
+			},
 			"trigger_type": {
 				Type:             schema.TypeString,
 				Optional:         true,
 				Computed:         true,
-				ValidateDiagFunc: validation.ToDiagFunc(validation.StringInSlice([]string{"cpu", "router"}, false)),
+				ValidateDiagFunc: validation.ToDiagFunc(validation.StringInSlice([]string{"cpu", "router", "schedule"}, false)),
 				Description: desc.Sprintf(
 					"This must be one of [%s]",
-					[]string{"cpu", "router"},
+					[]string{"cpu", "router", "schedule"},
 				),
 			},
 			"router_threshold_scaling": {
@@ -123,6 +129,51 @@ func resourceSakuraCloudAutoScale() *schema.Resource {
 							Type:        schema.TypeInt,
 							Required:    true,
 							Description: "Threshold for average CPU utilization to scale down/in",
+						},
+					},
+				},
+			},
+			"schedule_scaling": {
+				Type:     schema.TypeList,
+				Optional: true,
+				MinItems: 1,
+				MaxItems: 2,
+				Elem: &schema.Resource{
+					Schema: map[string]*schema.Schema{
+						"action": {
+							Type:             schema.TypeString,
+							Required:         true,
+							ValidateDiagFunc: validation.ToDiagFunc(validation.StringInSlice([]string{"up", "down"}, false)),
+							Description: desc.Sprintf(
+								"This must be one of [%s]",
+								[]string{"up", "down"},
+							),
+						},
+						"hour": {
+							Type:             schema.TypeInt,
+							Required:         true,
+							ValidateDiagFunc: validation.ToDiagFunc(validation.IntBetween(0, 23)),
+							Description:      "Hour to be triggered",
+						},
+						"minute": {
+							Type:             schema.TypeInt,
+							Required:         true,
+							ValidateDiagFunc: validation.ToDiagFunc(validation.IntInSlice([]int{0, 15, 30, 45})),
+							Description: desc.Sprintf(
+								"Minute to be triggered. This must be one of [%s]",
+								[]string{"0", "15", "30", "45"},
+							),
+						},
+						"days_of_week": {
+							Type:     schema.TypeSet,
+							Optional: true,
+							Elem:     &schema.Schema{Type: schema.TypeString},
+							Set:      schema.HashString,
+							MaxItems: 7,
+							Description: desc.Sprintf(
+								"A list of weekdays to backed up. The values in the list must be in [%s]",
+								types.DaysOfTheWeekStrings,
+							),
 						},
 					},
 				},

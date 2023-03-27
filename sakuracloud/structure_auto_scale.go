@@ -17,6 +17,7 @@ package sakuracloud
 import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/sacloud/iaas-api-go"
+	"github.com/sacloud/iaas-api-go/types"
 )
 
 func expandAutoScaleCreateRequest(d *schema.ResourceData) *iaas.AutoScaleCreateRequest {
@@ -28,9 +29,11 @@ func expandAutoScaleCreateRequest(d *schema.ResourceData) *iaas.AutoScaleCreateR
 
 		Zones:                  expandStringList(d.Get("zones").([]interface{})),
 		Config:                 d.Get("config").(string),
-		TriggerType:            d.Get("trigger_type").(string),
+		Disabled:               d.Get("disabled").(bool),
+		TriggerType:            types.EAutoScaleTriggerType(d.Get("trigger_type").(string)),
 		CPUThresholdScaling:    expandAutoScaleCPUThresholdScaling(d),
 		RouterThresholdScaling: expandAutoScaleRouterThresholdScaling(d),
+		ScheduleScaling:        expandAutoScaleScheduleScaling(d),
 		APIKeyID:               d.Get("api_key_id").(string),
 	}
 }
@@ -44,9 +47,11 @@ func expandAutoScaleUpdateRequest(d *schema.ResourceData, autoBackup *iaas.AutoS
 
 		Zones:                  expandStringList(d.Get("zones").([]interface{})),
 		Config:                 d.Get("config").(string),
-		TriggerType:            d.Get("trigger_type").(string),
+		Disabled:               d.Get("disabled").(bool),
+		TriggerType:            types.EAutoScaleTriggerType(d.Get("trigger_type").(string)),
 		CPUThresholdScaling:    expandAutoScaleCPUThresholdScaling(d),
 		RouterThresholdScaling: expandAutoScaleRouterThresholdScaling(d),
+		ScheduleScaling:        expandAutoScaleScheduleScaling(d),
 		SettingsHash:           autoBackup.SettingsHash,
 	}
 }
@@ -73,6 +78,34 @@ func expandAutoScaleRouterThresholdScaling(d resourceValueGettable) *iaas.AutoSc
 		}
 	}
 	return nil
+}
+
+func expandAutoScaleScheduleScaling(d resourceValueGettable) []*iaas.AutoScaleScheduleScaling {
+	if rawScheduleScalings, ok := getListFromResource(d, "schedule_scaling"); ok {
+		var scheduleScaling []*iaas.AutoScaleScheduleScaling
+		for _, ss := range rawScheduleScalings {
+			v := mapToResourceData(ss.(map[string]interface{}))
+			scheduleScaling = append(scheduleScaling, &iaas.AutoScaleScheduleScaling{
+				Action:    types.EAutoScaleAction(v.Get("action").(string)),
+				Hour:      v.Get("hour").(int),
+				Minute:    v.Get("minute").(int),
+				DayOfWeek: expandAutoScaleDaysOfWeek(v),
+			})
+		}
+		return scheduleScaling
+	}
+	return nil
+}
+
+func expandAutoScaleDaysOfWeek(d resourceValueGettable) []types.EDayOfTheWeek {
+	var vs []types.EDayOfTheWeek
+
+	for _, w := range d.Get("days_of_week").(*schema.Set).List() {
+		v := w.(string)
+		vs = append(vs, types.EDayOfTheWeek(v))
+	}
+	types.SortDayOfTheWeekList(vs)
+	return vs
 }
 
 func flattenAutoScaleCPUThresholdScaling(v *iaas.AutoScaleCPUThresholdScaling) []interface{} {

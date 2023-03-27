@@ -48,6 +48,11 @@ func dataSourceSakuraCloudProxyLB() *schema.Resource {
 				Computed:    true,
 				Description: "The flag to enable gzip compression",
 			},
+			"backend_http_keep_alive": {
+				Type:        schema.TypeString,
+				Computed:    true,
+				Description: "Mode of http keep-alive with backend",
+			},
 			"proxy_protocol": {
 				Type:        schema.TypeBool,
 				Computed:    true,

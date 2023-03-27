@@ -44,6 +44,7 @@ A `condition` block supports the following:
 ## Attribute Reference
 
 * `id` - The id of the ProxyLB.
+* `backend_http_keep_alive` - Mode of http keep-alive with backend.
 * `bind_port` - A list of `bind_port` blocks as defined below.
 * `certificate` - A list of `certificate` blocks as defined below.
 * `description` - The description of the ProxyLB.

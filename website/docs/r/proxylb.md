@@ -130,6 +130,7 @@ A `additional_certificate` block supports the following:
 * `sorry_server` - (Optional) A `sorry_server` block as defined below.
 * `sticky_session` - (Optional) The flag to enable sticky session.
 * `gzip` - (Optional) The flag to enable gzip compression.
+* `backend_http_keep_alive` - (Optional) Mode of http keep-alive with backend. This must be one of [`safe`/`aggressive`]. Default:`safe`.
 * `proxy_protocol` - (Optional) The flag to enable proxy protocol v2.
 * `syslog` - (Optional) A `syslog` block as defined below.
 

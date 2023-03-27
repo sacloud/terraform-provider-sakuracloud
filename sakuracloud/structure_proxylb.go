@@ -22,42 +22,44 @@ import (
 
 func expandProxyLBCreateRequest(d *schema.ResourceData) *iaas.ProxyLBCreateRequest {
 	return &iaas.ProxyLBCreateRequest{
-		Plan:           types.EProxyLBPlan(d.Get("plan").(int)),
-		HealthCheck:    expandProxyLBHealthCheck(d),
-		SorryServer:    expandProxyLBSorryServer(d),
-		BindPorts:      expandProxyLBBindPorts(d),
-		Servers:        expandProxyLBServers(d),
-		Rules:          expandProxyLBRules(d),
-		StickySession:  expandProxyLBStickySession(d),
-		Gzip:           expandProxyLBGzip(d),
-		ProxyProtocol:  expandProxyLBProxyProtocol(d),
-		Syslog:         expandProxyLBSyslog(d),
-		Timeout:        expandProxyLBTimeout(d),
-		UseVIPFailover: d.Get("vip_failover").(bool),
-		Region:         types.EProxyLBRegion(d.Get("region").(string)),
-		Name:           d.Get("name").(string),
-		Description:    d.Get("description").(string),
-		Tags:           expandTags(d),
-		IconID:         expandSakuraCloudID(d, "icon_id"),
+		Plan:                 types.EProxyLBPlan(d.Get("plan").(int)),
+		HealthCheck:          expandProxyLBHealthCheck(d),
+		SorryServer:          expandProxyLBSorryServer(d),
+		BindPorts:            expandProxyLBBindPorts(d),
+		Servers:              expandProxyLBServers(d),
+		Rules:                expandProxyLBRules(d),
+		StickySession:        expandProxyLBStickySession(d),
+		Gzip:                 expandProxyLBGzip(d),
+		BackendHttpKeepAlive: expandProxyLBBackendHttpKeepAlive(d),
+		ProxyProtocol:        expandProxyLBProxyProtocol(d),
+		Syslog:               expandProxyLBSyslog(d),
+		Timeout:              expandProxyLBTimeout(d),
+		UseVIPFailover:       d.Get("vip_failover").(bool),
+		Region:               types.EProxyLBRegion(d.Get("region").(string)),
+		Name:                 d.Get("name").(string),
+		Description:          d.Get("description").(string),
+		Tags:                 expandTags(d),
+		IconID:               expandSakuraCloudID(d, "icon_id"),
 	}
 }
 
 func expandProxyLBUpdateRequest(d *schema.ResourceData) *iaas.ProxyLBUpdateRequest {
 	return &iaas.ProxyLBUpdateRequest{
-		HealthCheck:   expandProxyLBHealthCheck(d),
-		SorryServer:   expandProxyLBSorryServer(d),
-		BindPorts:     expandProxyLBBindPorts(d),
-		Servers:       expandProxyLBServers(d),
-		Rules:         expandProxyLBRules(d),
-		StickySession: expandProxyLBStickySession(d),
-		Gzip:          expandProxyLBGzip(d),
-		ProxyProtocol: expandProxyLBProxyProtocol(d),
-		Syslog:        expandProxyLBSyslog(d),
-		Timeout:       expandProxyLBTimeout(d),
-		Name:          d.Get("name").(string),
-		Description:   d.Get("description").(string),
-		Tags:          expandTags(d),
-		IconID:        expandSakuraCloudID(d, "icon_id"),
+		HealthCheck:          expandProxyLBHealthCheck(d),
+		SorryServer:          expandProxyLBSorryServer(d),
+		BindPorts:            expandProxyLBBindPorts(d),
+		Servers:              expandProxyLBServers(d),
+		Rules:                expandProxyLBRules(d),
+		StickySession:        expandProxyLBStickySession(d),
+		Gzip:                 expandProxyLBGzip(d),
+		BackendHttpKeepAlive: expandProxyLBBackendHttpKeepAlive(d),
+		ProxyProtocol:        expandProxyLBProxyProtocol(d),
+		Syslog:               expandProxyLBSyslog(d),
+		Timeout:              expandProxyLBTimeout(d),
+		Name:                 d.Get("name").(string),
+		Description:          d.Get("description").(string),
+		Tags:                 expandTags(d),
+		IconID:               expandSakuraCloudID(d, "icon_id"),
 	}
 }
 
@@ -197,6 +199,13 @@ func flattenProxyLBGzip(proxyLB *iaas.ProxyLB) bool {
 	return false
 }
 
+func flattenProxyLBBackendHttpKeepAlive(proxyLB *iaas.ProxyLB) string {
+	if proxyLB.BackendHttpKeepAlive != nil {
+		return proxyLB.BackendHttpKeepAlive.Mode.String()
+	}
+	return ""
+}
+
 func flattenProxyLBProxyProtocol(proxyLB *iaas.ProxyLB) bool {
 	if proxyLB.ProxyProtocol != nil {
 		return proxyLB.ProxyProtocol.Enabled
@@ -227,6 +236,16 @@ func expandProxyLBGzip(d resourceValueGettable) *iaas.ProxyLBGzip {
 	if gzip {
 		return &iaas.ProxyLBGzip{
 			Enabled: true,
+		}
+	}
+	return nil
+}
+
+func expandProxyLBBackendHttpKeepAlive(d resourceValueGettable) *iaas.ProxyLBBackendHttpKeepAlive {
+	s := d.Get("backend_http_keep_alive").(string)
+	if s != "" {
+		return &iaas.ProxyLBBackendHttpKeepAlive{
+			Mode: types.EProxyLBBackendHttpKeepAlive(s),
 		}
 	}
 	return nil
