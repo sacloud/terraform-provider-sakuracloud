@@ -66,7 +66,6 @@ func resourceSakuraCloudProxyLB() *schema.Resource {
 			},
 			"backend_http_keep_alive": {
 				Type:             schema.TypeString,
-				Default:          types.ProxyLBBackendHttpKeepAlive.Safe.String(),
 				Optional:         true,
 				ValidateDiagFunc: validation.ToDiagFunc(validation.StringInSlice(types.ProxyLBBackendHttpKeepAliveStrings, false)),
 				Description: desc.Sprintf(
