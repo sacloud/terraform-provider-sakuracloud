@@ -243,12 +243,13 @@ func expandProxyLBGzip(d resourceValueGettable) *iaas.ProxyLBGzip {
 
 func expandProxyLBBackendHttpKeepAlive(d resourceValueGettable) *iaas.ProxyLBBackendHttpKeepAlive {
 	s := d.Get("backend_http_keep_alive").(string)
-	if s != "" {
-		return &iaas.ProxyLBBackendHttpKeepAlive{
-			Mode: types.EProxyLBBackendHttpKeepAlive(s),
-		}
+	if s == "" {
+		s = types.ProxyLBBackendHttpKeepAlive.Safe.String()
 	}
-	return nil
+
+	return &iaas.ProxyLBBackendHttpKeepAlive{
+		Mode: types.EProxyLBBackendHttpKeepAlive(s),
+	}
 }
 
 func expandProxyLBProxyProtocol(d resourceValueGettable) *iaas.ProxyLBProxyProtocol {
