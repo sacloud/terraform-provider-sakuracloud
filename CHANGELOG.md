@@ -1,6 +1,19 @@
 # CHANGELOG
 
-## 2.22.2 (2022-03-17)
+## 2.23.0 (2022-03-30)
+
+- sacloud/autoscaler v0.15.1 #1053
+- fix: http_backend_keep_aliveのスキーマ修正 - Computed:true #1052
+- go: bump github.com/goccy/go-yaml from 1.10.0 to 1.10.1 #1051
+- fix: http_backend_keep_aliveのスキーマ修正 - デフォルト値の除去 #1050
+- iaas-api-go v1.9.1 #1049
+- go: bump github.com/hashicorp/terraform-plugin-go from 0.14.3 to 0.15.0 #1048 
+- go: bump github.com/sacloud/webaccel-api-go from 1.1.4 to 1.1.5 #1047
+- iaas-api-go v1.9 #1046
+- go: bump github.com/hashicorp/terraform-plugin-sdk/v2 #1041
+- ci: bump actions/setup-go from 3 to 4 #1039
+
+## 2.23.0 (2022-03-17)
 
 FEATURES:
 
