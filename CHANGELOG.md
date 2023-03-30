@@ -13,7 +13,7 @@
 - go: bump github.com/hashicorp/terraform-plugin-sdk/v2 #1041
 - ci: bump actions/setup-go from 3 to 4 #1039
 
-## 2.23.0 (2022-03-17)
+## 2.22.2 (2022-03-17)
 
 FEATURES:
 
