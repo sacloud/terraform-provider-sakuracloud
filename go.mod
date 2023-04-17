@@ -12,13 +12,13 @@ require (
 	github.com/sacloud/api-client-go v0.2.7
 	github.com/sacloud/autoscaler v0.15.1
 	github.com/sacloud/ftps v1.1.0
-	github.com/sacloud/iaas-api-go v1.9.1
+	github.com/sacloud/iaas-api-go v1.10.0
 	github.com/sacloud/iaas-service-go v1.7.0
 	github.com/sacloud/iso9660wrap v0.0.0-20171031075302-eda21f77f6a8
 	github.com/sacloud/packages-go v0.0.8
 	github.com/sacloud/webaccel-api-go v1.1.5
 	github.com/stretchr/testify v1.8.2
-	golang.org/x/text v0.8.0
+	golang.org/x/text v0.9.0
 )
 
 require (
@@ -79,10 +79,10 @@ require (
 	github.com/vmihailenco/tagparser/v2 v2.0.0 // indirect
 	github.com/zclconf/go-cty v1.13.1 // indirect
 	go.uber.org/ratelimit v0.2.0 // indirect
-	golang.org/x/crypto v0.7.0 // indirect
+	golang.org/x/crypto v0.8.0 // indirect
 	golang.org/x/mod v0.8.0 // indirect
-	golang.org/x/net v0.8.0 // indirect
-	golang.org/x/sys v0.6.0 // indirect
+	golang.org/x/net v0.9.0 // indirect
+	golang.org/x/sys v0.7.0 // indirect
 	golang.org/x/xerrors v0.0.0-20200804184101-5ec99f83aff1 // indirect
 	google.golang.org/appengine v1.6.7 // indirect
 	google.golang.org/genproto v0.0.0-20230110181048-76db0878b65f // indirect
