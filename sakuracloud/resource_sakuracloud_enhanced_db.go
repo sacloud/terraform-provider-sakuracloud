@@ -21,6 +21,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/sacloud/iaas-api-go"
+	"github.com/sacloud/iaas-service-go/enhanceddb/builder"
 )
 
 func resourceSakuraCloudEnhancedDB() *schema.Resource {
@@ -104,8 +105,8 @@ func resourceSakuraCloudEnhancedDBRead(ctx context.Context, d *schema.ResourceDa
 		return diag.FromErr(err)
 	}
 
-	regOp := iaas.NewEnhancedDBOp(client)
-	reg, err := regOp.Read(ctx, sakuraCloudID(d.Id()))
+	edbOp := iaas.NewEnhancedDBOp(client)
+	edb, err := builder.Read(ctx, edbOp, sakuraCloudID(d.Id()))
 	if err != nil {
 		if iaas.IsNotFoundError(err) {
 			d.SetId("")
@@ -113,7 +114,7 @@ func resourceSakuraCloudEnhancedDBRead(ctx context.Context, d *schema.ResourceDa
 		}
 		return diag.Errorf("could not find SakuraCloud EnhancedDB[%s]: %s", d.Id(), err)
 	}
-	return setEnhancedDBResourceData(ctx, d, client, reg, true)
+	return setEnhancedDBResourceData(ctx, d, client, edb, true)
 }
 
 func resourceSakuraCloudEnhancedDBUpdate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
@@ -160,16 +161,16 @@ func resourceSakuraCloudEnhancedDBDelete(ctx context.Context, d *schema.Resource
 	return nil
 }
 
-func setEnhancedDBResourceData(ctx context.Context, d *schema.ResourceData, client *APIClient, data *iaas.EnhancedDB, includePassword bool) diag.Diagnostics {
+func setEnhancedDBResourceData(ctx context.Context, d *schema.ResourceData, client *APIClient, data *builder.EnhancedDB, includePassword bool) diag.Diagnostics {
 	d.Set("name", data.Name)               // nolint
 	d.Set("icon_id", data.IconID.String()) // nolint
 	d.Set("description", data.Description) // nolint
 
-	d.Set("database_type", data.DatabaseType)     // nolint
-	d.Set("database_name", data.DatabaseName)     // nolint
-	d.Set("region", data.Region)                  // nolint
-	d.Set("hostname", data.HostName)              // nolint
-	d.Set("max_connections", data.MaxConnections) // nolint
+	d.Set("database_type", data.DatabaseType)            // nolint
+	d.Set("database_name", data.DatabaseName)            // nolint
+	d.Set("region", data.Region)                         // nolint
+	d.Set("hostname", data.HostName)                     // nolint
+	d.Set("max_connections", data.Config.MaxConnections) // nolint
 
 	return diag.FromErr(d.Set("tags", flattenTags(data.Tags)))
 }
