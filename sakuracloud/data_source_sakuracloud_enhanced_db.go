@@ -20,6 +20,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/sacloud/iaas-api-go"
+	"github.com/sacloud/iaas-service-go/enhanceddb/builder"
 )
 
 func dataSourceSakuraCloudEnhancedDB() *schema.Resource {
@@ -71,14 +72,14 @@ func dataSourceSakuraCloudEnhancedDBRead(ctx context.Context, d *schema.Resource
 		return diag.FromErr(err)
 	}
 
-	searcher := iaas.NewEnhancedDBOp(client)
+	edbOp := iaas.NewEnhancedDBOp(client)
 
 	findCondition := &iaas.FindCondition{}
 	if rawFilter, ok := d.GetOk(filterAttrName); ok {
 		findCondition.Filter = expandSearchFilter(rawFilter)
 	}
 
-	res, err := searcher.Find(ctx, findCondition)
+	res, err := edbOp.Find(ctx, findCondition)
 	if err != nil {
 		return diag.Errorf("could not find SakuraCloud EnhancedDB: %s", err)
 	}
@@ -92,5 +93,10 @@ func dataSourceSakuraCloudEnhancedDBRead(ctx context.Context, d *schema.Resource
 	}
 
 	d.SetId(targets[0].ID.String())
-	return setEnhancedDBResourceData(ctx, d, client, targets[0], false)
+
+	edb, err := builder.Read(ctx, edbOp, targets[0].ID)
+	if err != nil {
+		return diag.Errorf("could not read EnhancedDB: %s", err)
+	}
+	return setEnhancedDBResourceData(ctx, d, client, edb, false)
 }
