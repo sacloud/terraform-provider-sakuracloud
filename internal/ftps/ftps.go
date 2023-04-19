@@ -20,7 +20,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/sacloud/ftps"
+	"github.com/sacloud/iaas-service-go/ftps"
 )
 
 func UploadFile(ctx context.Context, user, pass, host, file string) error {
