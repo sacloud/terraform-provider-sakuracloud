@@ -1,6 +1,13 @@
 # CHANGELOG
 
-## 2.23.0 (2022-03-30)
+## 2.23.1 (2023/04/20)
+
+- go: bump github.com/goccy/go-yaml from 1.10.1 to 1.11.0 #1056
+- update dependencies #1060
+- sacloud/iaas-service-go@v1.8.1 #1061
+- sacloud/iaas-service-go@v1.8.2 #1062
+
+## 2.23.0 (2023-03-30)
 
 - sacloud/autoscaler v0.15.1 #1053
 - fix: http_backend_keep_aliveのスキーマ修正 - Computed:true #1052
@@ -13,7 +20,7 @@
 - go: bump github.com/hashicorp/terraform-plugin-sdk/v2 #1041
 - ci: bump actions/setup-go from 3 to 4 #1039
 
-## 2.22.2 (2022-03-17)
+## 2.22.2 (2023-03-17)
 
 FEATURES:
 
