@@ -18,6 +18,7 @@ import (
 	"errors"
 	"fmt"
 	"net"
+	"regexp"
 	"strconv"
 	"strings"
 
@@ -171,4 +172,40 @@ func validateAutoScaleConfig(v interface{}, k string) ([]string, []error) {
 		errors = append(errors, fmt.Errorf(yaml.FormatError(err, false, true)))
 	}
 	return ws, errors
+}
+
+func validateHostName() schema.SchemaValidateDiagFunc {
+	return validation.ToDiagFunc(func(v interface{}, k string) ([]string, []error) {
+		// if target is nil , return OK(Use required attr if necessary)
+		if v == nil {
+			return []string{}, []error{}
+		}
+
+		if value, ok := v.(string); ok {
+			if value == "" {
+				return []string{}, []error{}
+			}
+
+			validateFormatFunc := func(_ interface{}, _ string) (warnings []string, errors []error) {
+				if !isValidHostName(value) {
+					errors = append(errors, fmt.Errorf("invalid hostname: %s", value))
+				}
+				return warnings, errors
+			}
+
+			return validation.All(
+				validation.StringLenBetween(1, 64),
+				validateFormatFunc,
+			)(v, k)
+		}
+		return []string{}, []error{}
+	})
+}
+
+func isValidHostName(hostname string) bool {
+	if hostname == "" {
+		return true
+	}
+	// RFC952,RFC1123
+	return regexp.MustCompile(`^(?i)([a-z0-9]+(-[a-z0-9]+)*)(\.[a-z0-9]+(-[a-z0-9]+)*)*$`).MatchString(hostname)
 }
