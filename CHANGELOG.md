@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 2.23.2 (Unreleased)
+
+- validate disk_edit_parameter.hostname #1064
+
 ## 2.23.1 (2023/04/20)
 
 - go: bump github.com/goccy/go-yaml from 1.10.1 to 1.11.0 #1056
