@@ -19,6 +19,7 @@ import (
 	"errors"
 	"fmt"
 	"os"
+	"regexp"
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
@@ -96,6 +97,22 @@ func TestAccSakuraCloudServer_basic(t *testing.T) {
 					resource.TestCheckResourceAttrSet(resourceName, "network_address"),
 					resource.TestCheckResourceAttr(resourceName, "icon_id", ""),
 				),
+			},
+		},
+	})
+}
+
+func TestAccSakuraCloudServer_validateHostName(t *testing.T) {
+	rand := randomName()
+
+	resource.ParallelTest(t, resource.TestCase{
+		PreCheck:          func() { testAccPreCheck(t) },
+		ProviderFactories: testAccProviderFactories,
+		CheckDestroy:      testCheckSakuraCloudServerDestroy,
+		Steps: []resource.TestStep{
+			{
+				Config:      buildConfigWithArgs(testAccSakuraCloudServer_validateHostName, rand),
+				ExpectError: regexp.MustCompile("invalid hostname: invalid_host_name"),
 			},
 		},
 	})
@@ -633,6 +650,25 @@ resource "sakuracloud_server" "foobar" {
   interface_driver = "e1000"
   network_interface {
     upstream = "shared"
+  }
+}
+`
+
+const testAccSakuraCloudServer_validateHostName = `
+data "sakuracloud_archive" "ubuntu" {
+  os_type = "ubuntu2004"
+}
+resource "sakuracloud_disk" "foobar" {
+  name              = "{{ .arg0 }}"
+  source_archive_id = data.sakuracloud_archive.ubuntu.id
+}
+
+resource "sakuracloud_server" "foobar" {
+  name        = "{{ .arg0 }}"
+  disks       = [sakuracloud_disk.foobar.id]
+
+  disk_edit_parameter {
+    hostname        = "invalid_host_name"
   }
 }
 `

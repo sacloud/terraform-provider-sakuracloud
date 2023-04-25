@@ -165,7 +165,7 @@ func resourceSakuraCloudServer() *schema.Resource {
 						"hostname": {
 							Type:             schema.TypeString,
 							Optional:         true,
-							ValidateDiagFunc: validation.ToDiagFunc(validation.StringLenBetween(1, 64)),
+							ValidateDiagFunc: validateHostName(),
 							Description:      desc.Sprintf("The hostname of the %s. %s", resourceName, desc.Length(1, 64)),
 						},
 						"password": {
