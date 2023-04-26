@@ -1,6 +1,6 @@
 # CHANGELOG
 
-## 2.23.2 (Unreleased)
+## 2.23.2 (2023/04/26)
 
 - validate disk_edit_parameter.hostname #1064
 
