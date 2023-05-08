@@ -6,12 +6,11 @@ require (
 	github.com/goccy/go-yaml v1.11.0
 	github.com/hashicorp/go-multierror v1.1.1
 	github.com/hashicorp/terraform-plugin-go v0.15.0
-	github.com/hashicorp/terraform-plugin-mux v0.9.0
+	github.com/hashicorp/terraform-plugin-mux v0.10.0
 	github.com/hashicorp/terraform-plugin-sdk/v2 v2.26.1
 	github.com/mitchellh/go-homedir v1.1.0
 	github.com/sacloud/api-client-go v0.2.7
 	github.com/sacloud/autoscaler v0.15.1
-	github.com/sacloud/ftps v1.2.0
 	github.com/sacloud/iaas-api-go v1.10.0
 	github.com/sacloud/iaas-service-go v1.8.2
 	github.com/sacloud/iso9660wrap v0.0.0-20171031075302-eda21f77f6a8
@@ -72,6 +71,7 @@ require (
 	github.com/prometheus/client_model v0.3.0 // indirect
 	github.com/prometheus/common v0.42.0 // indirect
 	github.com/prometheus/procfs v0.8.0 // indirect
+	github.com/sacloud/ftps v1.2.0 // indirect
 	github.com/sacloud/go-http v0.1.5 // indirect
 	github.com/shivamMg/ppds v0.0.1 // indirect
 	github.com/vmihailenco/msgpack v4.0.4+incompatible // indirect
