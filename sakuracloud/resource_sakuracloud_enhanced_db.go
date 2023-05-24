@@ -20,8 +20,11 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
 	"github.com/sacloud/iaas-api-go"
+	"github.com/sacloud/iaas-api-go/types"
 	"github.com/sacloud/iaas-service-go/enhanceddb/builder"
+	"github.com/sacloud/terraform-provider-sakuracloud/internal/desc"
 )
 
 func resourceSakuraCloudEnhancedDB() *schema.Resource {
@@ -46,21 +49,37 @@ func resourceSakuraCloudEnhancedDB() *schema.Resource {
 				ForceNew:    true,
 				Description: "The name of database",
 			},
+			"database_type": {
+				Type:             schema.TypeString,
+				Required:         true,
+				ForceNew:         true,
+				ValidateDiagFunc: validation.ToDiagFunc(validation.StringInSlice(types.EnhancedDBTypeStrings, false)),
+				Description: desc.Sprintf(
+					"The type of database. This must be one of [%s]",
+					types.EnhancedDBTypeStrings,
+				),
+			},
+			"region": {
+				Type:             schema.TypeString,
+				Required:         true,
+				ForceNew:         true,
+				ValidateDiagFunc: validation.ToDiagFunc(validation.StringInSlice(types.EnhancedDBRegionStrings, false)),
+				Description: desc.Sprintf(
+					"The name of region that the database is in. This must be one of [%s]",
+					types.EnhancedDBRegionStrings,
+				),
+			},
 			"password": {
 				Type:        schema.TypeString,
 				Required:    true,
 				Sensitive:   true,
 				Description: "The password of database",
 			},
-			"region": {
-				Type:        schema.TypeString,
-				Computed:    true,
-				Description: "The region name",
-			},
-			"database_type": {
-				Type:        schema.TypeString,
-				Computed:    true,
-				Description: "The type of database",
+			"allowed_networks": {
+				Type:        schema.TypeList,
+				Elem:        &schema.Schema{Type: schema.TypeString},
+				Optional:    true,
+				Description: desc.Sprintf("A list of CIDR blocks allowed to connect"),
 			},
 			"hostname": {
 				Type:        schema.TypeString,
@@ -171,6 +190,10 @@ func setEnhancedDBResourceData(ctx context.Context, d *schema.ResourceData, clie
 	d.Set("region", data.Region)                         // nolint
 	d.Set("hostname", data.HostName)                     // nolint
 	d.Set("max_connections", data.Config.MaxConnections) // nolint
+
+	if err := d.Set("allowed_networks", data.Config.AllowedNetworks); err != nil {
+		return diag.FromErr(err)
+	}
 
 	return diag.FromErr(d.Set("tags", flattenTags(data.Tags)))
 }

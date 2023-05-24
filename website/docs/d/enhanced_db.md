@@ -45,6 +45,7 @@ A `condition` block supports the following:
 ## Attribute Reference
 
 * `id` - The id of the sakuracloud_enhanced_db.
+* `allowed_networks` - A list of CIDR blocks allowed to connect.
 * `database_name` - The name of database.
 * `database_type` - The type of database.
 * `description` - The description of the EnhancedDB.

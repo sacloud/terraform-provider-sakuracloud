@@ -38,10 +38,10 @@ func TestAccSakuraCloudDataSourceEnhancedDB_basic(t *testing.T) {
 					resource.TestCheckResourceAttr(resourceName, "name", rand),
 					resource.TestCheckResourceAttr(resourceName, "description", "description"),
 					resource.TestCheckResourceAttr(resourceName, "database_name", databaseName),
-					resource.TestCheckResourceAttr(resourceName, "database_type", "tidb"),
-					resource.TestCheckResourceAttr(resourceName, "region", "is1"),
+					resource.TestCheckResourceAttr(resourceName, "database_type", "mariadb"),
+					resource.TestCheckResourceAttr(resourceName, "region", "tk1"),
 					resource.TestCheckResourceAttr(resourceName, "max_connections", "50"),
-					resource.TestCheckResourceAttr(resourceName, "hostname", databaseName+".tidb-is1.db.sakurausercontent.com"),
+					resource.TestCheckResourceAttr(resourceName, "hostname", databaseName+".mariadb-tk1.db.sakurausercontent.com"),
 				),
 			},
 		},
@@ -52,6 +52,8 @@ var testAccSakuraCloudDataSourceEnhancedDB_basic = `
 resource "sakuracloud_enhanced_db" "foobar" {
   name            = "{{ .arg0 }}"
   database_name   = "{{ .arg1 }}"
+  database_type   = "mariadb"
+  region          = "tk1"
   password        = "{{ .arg2 }}"
 
   description = "description"

@@ -21,6 +21,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/sacloud/iaas-api-go"
 	"github.com/sacloud/iaas-service-go/enhanceddb/builder"
+	"github.com/sacloud/terraform-provider-sakuracloud/internal/desc"
 )
 
 func dataSourceSakuraCloudEnhancedDB() *schema.Resource {
@@ -50,6 +51,12 @@ func dataSourceSakuraCloudEnhancedDB() *schema.Resource {
 				Type:        schema.TypeString,
 				Computed:    true,
 				Description: "The name of database host. This will be built from `database_name` + `tidb-is1.db.sakurausercontent.com`",
+			},
+			"allowed_networks": {
+				Type:        schema.TypeList,
+				Elem:        &schema.Schema{Type: schema.TypeString},
+				Computed:    true,
+				Description: desc.Sprintf("A list of CIDR blocks allowed to connect"),
 			},
 			"max_connections": {
 				Type:        schema.TypeInt,
