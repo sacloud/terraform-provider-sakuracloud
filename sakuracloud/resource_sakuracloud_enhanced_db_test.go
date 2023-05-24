@@ -27,6 +27,10 @@ import (
 )
 
 func TestAccSakuraCloudEnhancedDB_basic(t *testing.T) {
+	if isFakeModeEnabled() {
+		t.Skip()
+	}
+
 	resourceName := "sakuracloud_enhanced_db.foobar"
 	rand := randomName()
 	databaseName := acctest.RandStringFromCharSet(10, acctest.CharSetAlpha)
@@ -52,6 +56,8 @@ func TestAccSakuraCloudEnhancedDB_basic(t *testing.T) {
 					resource.TestCheckResourceAttr(resourceName, "tags.1", "tag2"),
 					resource.TestCheckResourceAttr(resourceName, "database_name", databaseName),
 					resource.TestCheckResourceAttr(resourceName, "password", password),
+					resource.TestCheckResourceAttr(resourceName, "allowed_networks.#", "1"),
+					resource.TestCheckResourceAttr(resourceName, "allowed_networks.0", "192.0.2.1/32"),
 					resource.TestCheckResourceAttr(resourceName, "database_type", "tidb"),
 					resource.TestCheckResourceAttr(resourceName, "region", "is1"),
 					resource.TestCheckResourceAttr(resourceName, "max_connections", "50"),
@@ -70,6 +76,7 @@ func TestAccSakuraCloudEnhancedDB_basic(t *testing.T) {
 					resource.TestCheckResourceAttr(resourceName, "name", rand+"-upd"),
 					resource.TestCheckResourceAttr(resourceName, "database_name", databaseName),
 					resource.TestCheckResourceAttr(resourceName, "password", password),
+					resource.TestCheckResourceAttr(resourceName, "allowed_networks.#", "0"),
 					resource.TestCheckResourceAttr(resourceName, "database_type", "tidb"),
 					resource.TestCheckResourceAttr(resourceName, "region", "is1"),
 					resource.TestCheckResourceAttr(resourceName, "max_connections", "50"),
@@ -139,9 +146,12 @@ func testCheckSakuraCloudEnhancedDBDestroy(s *terraform.State) error {
 
 var testAccSakuraCloudEnhancedDB_basic = `
 resource "sakuracloud_enhanced_db" "foobar" {
-  name            = "{{ .arg0 }}"
-  database_name   = "{{ .arg1 }}"
-  password        = "{{ .arg2 }}"
+  name           = "{{ .arg0 }}"
+  database_name  = "{{ .arg1 }}"
+  database_type  = "tidb"
+  region         = "is1"
+  password       = "{{ .arg2 }}"
+  allowed_networks = ["192.0.2.1/32"]
 
   description = "description"
   tags        = ["tag1", "tag2"]
@@ -156,9 +166,11 @@ resource "sakuracloud_icon" "foobar" {
 
 var testAccSakuraCloudEnhancedDB_update = `
 resource "sakuracloud_enhanced_db" "foobar" {
-  name            = "{{ .arg0 }}-upd"
-  database_name   = "{{ .arg1 }}"
-  password        = "{{ .arg2 }}"
+  name          = "{{ .arg0 }}-upd"
+  database_name = "{{ .arg1 }}"
+  database_type = "tidb"
+  region        = "is1"
+  password      = "{{ .arg2 }}"
 
   description = "description-upd"
   tags        = ["tag1-upd", "tag2-upd"]
