@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## 2.24.0 (Unreleased)
+
+- エンハンスドDBでのタイプ/リージョン/接続元ネットワーク指定 #1070
+- sacloud/autoscaler@v0.15.3 #1071
+
 ## 2.23.2 (2023/04/26)
 
 - validate disk_edit_parameter.hostname #1064
