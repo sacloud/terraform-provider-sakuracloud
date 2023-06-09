@@ -11,8 +11,8 @@ require (
 	github.com/mitchellh/go-homedir v1.1.0
 	github.com/sacloud/api-client-go v0.2.8
 	github.com/sacloud/autoscaler v0.15.3
-	github.com/sacloud/iaas-api-go v1.11.0
-	github.com/sacloud/iaas-service-go v1.9.0
+	github.com/sacloud/iaas-api-go v1.11.1
+	github.com/sacloud/iaas-service-go v1.9.1
 	github.com/sacloud/iso9660wrap v0.0.0-20171031075302-eda21f77f6a8
 	github.com/sacloud/packages-go v0.0.9
 	github.com/sacloud/webaccel-api-go v1.1.5
