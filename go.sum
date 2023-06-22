@@ -154,8 +154,8 @@ github.com/prometheus/procfs v0.9.0/go.mod h1:+pB4zwohETzFnmlpe6yd2lSc+0/46IYZRB
 github.com/rogpeppe/go-internal v1.10.0 h1:TMyTOH3F/DB16zRVcYyreMH6GnZZrwQVAoYjRBZyWFQ=
 github.com/sacloud/api-client-go v0.2.8 h1:tIY6PZNBX900K66TqEPa4d6UIbedUczfCBnPJkzi8kw=
 github.com/sacloud/api-client-go v0.2.8/go.mod h1:0CV/kWNYlS1hCNdnk6Wx7Wdg8DPFCnv0zOIzdXjeAeY=
-github.com/sacloud/autoscaler v0.15.3 h1:oAHu/R37jputJtMJvH0QPpJvlckHFdIkAhn1/T2XGTg=
-github.com/sacloud/autoscaler v0.15.3/go.mod h1:VZtTWFByZ/q8rHX5jmE5F/BfmJ4uA9+oK0zjevT4H6M=
+github.com/sacloud/autoscaler v0.15.4 h1:eS3R85k1cpf1W9jXnOjAbWzAWLHuLGJFuq5m8NFoF5A=
+github.com/sacloud/autoscaler v0.15.4/go.mod h1:VZtTWFByZ/q8rHX5jmE5F/BfmJ4uA9+oK0zjevT4H6M=
 github.com/sacloud/ftps v1.2.0 h1:7UlSWd7cnm1J+sANz7IiBV9ffVcS+4g6ZV5UHVVbvaw=
 github.com/sacloud/ftps v1.2.0/go.mod h1:h4awhOi3PEyhKLj1FpXjoVV5yVkmRUU+d5L95EwX2JU=
 github.com/sacloud/go-http v0.1.6 h1:lJGXDt9xrxJiDszRPaN9NIP8MVj10YKMzmnyzdSfI8w=
