@@ -44,7 +44,17 @@ func resourceSakuraCloudSwitch() *schema.Resource {
 		},
 
 		Schema: map[string]*schema.Schema{
-			"name":        schemaResourceName(resourceName),
+			"name": schemaResourceName(resourceName),
+			"network_mask_len": {
+				Type:         schema.TypeInt,
+				Optional:     true,
+				ValidateFunc: validation.IntBetween(8, 29),
+			},
+			"default_route": {
+				Type:             schema.TypeString,
+				Optional:         true,
+				ValidateDiagFunc: validateIPv4Address(),
+			},
 			"icon_id":     schemaResourceIconID(resourceName),
 			"description": schemaResourceDescription(resourceName),
 			"tags":        schemaResourceTags(resourceName),
@@ -73,10 +83,12 @@ func resourceSakuraCloudSwitchCreate(ctx context.Context, d *schema.ResourceData
 
 	swOp := iaas.NewSwitchOp(client)
 	req := &iaas.SwitchCreateRequest{
-		Name:        d.Get("name").(string),
-		Description: d.Get("description").(string),
-		Tags:        expandTags(d),
-		IconID:      expandSakuraCloudID(d, "icon_id"),
+		Name:           d.Get("name").(string),
+		NetworkMaskLen: d.Get("network_mask_len").(int),
+		DefaultRoute:   d.Get("default_route").(string),
+		Description:    d.Get("description").(string),
+		Tags:           expandTags(d),
+		IconID:         expandSakuraCloudID(d, "icon_id"),
 	}
 
 	sw, err := swOp.Create(ctx, zone, req)
@@ -131,10 +143,12 @@ func resourceSakuraCloudSwitchUpdate(ctx context.Context, d *schema.ResourceData
 	}
 
 	req := &iaas.SwitchUpdateRequest{
-		Name:        d.Get("name").(string),
-		Description: d.Get("description").(string),
-		Tags:        expandTags(d),
-		IconID:      expandSakuraCloudID(d, "icon_id"),
+		Name:           d.Get("name").(string),
+		NetworkMaskLen: d.Get("network_mask_len").(int),
+		DefaultRoute:   d.Get("default_route").(string),
+		Description:    d.Get("description").(string),
+		Tags:           expandTags(d),
+		IconID:         expandSakuraCloudID(d, "icon_id"),
 	}
 
 	sw, err = swOp.Update(ctx, zone, sw.ID, req)
@@ -206,11 +220,13 @@ func setSwitchResourceData(ctx context.Context, d *schema.ResourceData, client *
 		}
 	}
 
-	d.Set("name", data.Name)                   // nolint
-	d.Set("icon_id", data.IconID.String())     // nolint
-	d.Set("description", data.Description)     // nolint
-	d.Set("bridge_id", data.BridgeID.String()) // nolint
-	d.Set("zone", zone)                        // nolint
+	d.Set("name", data.Name)                       // nolint
+	d.Set("network_mask_len", data.NetworkMaskLen) // nolint
+	d.Set("default_route", data.DefaultRoute)      // nolint
+	d.Set("icon_id", data.IconID.String())         // nolint
+	d.Set("description", data.Description)         // nolint
+	d.Set("bridge_id", data.BridgeID.String())     // nolint
+	d.Set("zone", zone)                            // nolint
 	if err := d.Set("server_ids", serverIDs); err != nil {
 		return diag.FromErr(err)
 	}

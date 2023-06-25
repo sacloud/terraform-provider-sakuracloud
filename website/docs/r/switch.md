@@ -27,6 +27,8 @@ resource "sakuracloud_switch" "foobar" {
 
 #### Common Arguments
 
+* `network_mask_len` - (Optional) The network mask length of the Switch. This value must be in the range [`8`-`29`].
+* `default_route` - (Optional)  The ip address of the next-hop at the subnet.
 * `description` - (Optional) The description of the Switch. The length of this value must be in the range [`1`-`512`].
 * `icon_id` - (Optional) The icon id to attach to the Switch.
 * `tags` - (Optional) Any tags to assign to the Switch.

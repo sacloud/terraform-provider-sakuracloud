@@ -44,6 +44,8 @@ func TestAccSakuraCloudSwitch_basic(t *testing.T) {
 				Check: resource.ComposeTestCheckFunc(
 					testCheckSakuraCloudSwitchExists(resourceName, &sw),
 					resource.TestCheckResourceAttr(resourceName, "name", rand),
+					resource.TestCheckResourceAttr(resourceName, "network_mask_len", "29"),
+					resource.TestCheckResourceAttr(resourceName, "default_route", "10.0.0.1"),
 					resource.TestCheckResourceAttr(resourceName, "description", "description"),
 					resource.TestCheckResourceAttr(resourceName, "tags.#", "2"),
 					resource.TestCheckResourceAttr(resourceName, "tags.0", "tag1"),
@@ -59,6 +61,8 @@ func TestAccSakuraCloudSwitch_basic(t *testing.T) {
 				Check: resource.ComposeTestCheckFunc(
 					testCheckSakuraCloudSwitchExists(resourceName, &sw),
 					resource.TestCheckResourceAttr(resourceName, "name", rand+"-upd"),
+					resource.TestCheckResourceAttr(resourceName, "network_mask_len", "24"),
+					resource.TestCheckResourceAttr(resourceName, "default_route", "192.168.0.1"),
 					resource.TestCheckResourceAttr(resourceName, "description", "description-upd"),
 					resource.TestCheckResourceAttr(resourceName, "tags.#", "2"),
 					resource.TestCheckResourceAttr(resourceName, "tags.0", "tag1-upd"),
@@ -131,10 +135,12 @@ func testCheckSakuraCloudSwitchDestroy(s *terraform.State) error {
 
 var testAccSakuraCloudSwitch_basic = `
 resource "sakuracloud_switch" "foobar" {
-  name        = "{{ .arg0 }}"
-  description = "description"
-  tags        = ["tag1", "tag2"]
-  icon_id     = sakuracloud_icon.foobar.id
+  name             = "{{ .arg0 }}"
+  network_mask_len = 29
+  default_route    = "10.0.0.1"
+  description      = "description"
+  tags             = ["tag1", "tag2"]
+  icon_id          = sakuracloud_icon.foobar.id
 }
 
 resource "sakuracloud_icon" "foobar" {
@@ -145,7 +151,9 @@ resource "sakuracloud_icon" "foobar" {
 
 var testAccSakuraCloudSwitch_update = `
 resource "sakuracloud_server" "foobar" {
-  name        = "{{ .arg0 }}"
+  name             = "{{ .arg0 }}"
+  network_mask_len = 24
+  default_route    = "192.168.0.1"
   network_interface {
     upstream = "shared"
   }
