@@ -5,8 +5,8 @@ go 1.20
 require (
 	github.com/goccy/go-yaml v1.11.0
 	github.com/hashicorp/go-multierror v1.1.1
-	github.com/hashicorp/terraform-plugin-go v0.16.0
-	github.com/hashicorp/terraform-plugin-mux v0.10.0
+	github.com/hashicorp/terraform-plugin-go v0.17.0
+	github.com/hashicorp/terraform-plugin-mux v0.11.1
 	github.com/hashicorp/terraform-plugin-sdk/v2 v2.26.1
 	github.com/mitchellh/go-homedir v1.1.0
 	github.com/sacloud/api-client-go v0.2.8
@@ -89,7 +89,7 @@ require (
 	golang.org/x/xerrors v0.0.0-20200804184101-5ec99f83aff1 // indirect
 	google.golang.org/appengine v1.6.7 // indirect
 	google.golang.org/genproto v0.0.0-20230410155749-daa745c078e1 // indirect
-	google.golang.org/grpc v1.56.0 // indirect
-	google.golang.org/protobuf v1.30.0 // indirect
+	google.golang.org/grpc v1.56.1 // indirect
+	google.golang.org/protobuf v1.31.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
