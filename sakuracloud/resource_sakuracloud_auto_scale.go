@@ -166,7 +166,7 @@ func resourceSakuraCloudAutoScale() *schema.Resource {
 						},
 						"days_of_week": {
 							Type:     schema.TypeSet,
-							Optional: true,
+							Required: true,
 							Elem:     &schema.Schema{Type: schema.TypeString},
 							Set:      schema.HashString,
 							MaxItems: 7,
