@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 2.25.0 (Unreleased)
+
+- オートスケールのdays_of_weekをrequiredに変更 #1085
+
 ## 2.24.1 (2023/06/09)
 
 - iaas-api-go v1.11.1 - モバイルゲートウェイの電源APIの修正 #1073
