@@ -91,7 +91,7 @@ A `router_threshold_scaling` block supports the following:
 A `schedule_scaling` block supports the following:
 
 * `action` - (Required) This must be one of [`up`/`down`].
-* `days_of_week` - (Optional) A list of weekdays to backed up. The values in the list must be in [`sun`/`mon`/`tue`/`wed`/`thu`/`fri`/`sat`].
+* `days_of_week` - (Required) A list of weekdays to backed up. The values in the list must be in [`sun`/`mon`/`tue`/`wed`/`thu`/`fri`/`sat`].
 * `hour` - (Required) Hour to be triggered.
 * `minute` - (Required) Minute to be triggered. This must be one of [`0`/`15`/`30`/`45`].
 
