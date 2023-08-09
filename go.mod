@@ -10,9 +10,9 @@ require (
 	github.com/hashicorp/terraform-plugin-sdk/v2 v2.26.1
 	github.com/mitchellh/go-homedir v1.1.0
 	github.com/sacloud/api-client-go v0.2.8
-	github.com/sacloud/autoscaler v0.15.3
-	github.com/sacloud/iaas-api-go v1.11.1
-	github.com/sacloud/iaas-service-go v1.9.1
+	github.com/sacloud/autoscaler v0.15.5-0.20230809005149-0039f2f2e112
+	github.com/sacloud/iaas-api-go v1.11.2-0.20230808040020-104bc72d03c1
+	github.com/sacloud/iaas-service-go v1.9.2-0.20230808054001-efad52d748d4
 	github.com/sacloud/iso9660wrap v0.0.0-20171031075302-eda21f77f6a8
 	github.com/sacloud/packages-go v0.0.9
 	github.com/sacloud/webaccel-api-go v1.1.5
@@ -38,7 +38,7 @@ require (
 	github.com/go-logfmt/logfmt v0.5.1 // indirect
 	github.com/go-playground/locales v0.14.1 // indirect
 	github.com/go-playground/universal-translator v0.18.1 // indirect
-	github.com/go-playground/validator/v10 v10.14.0 // indirect
+	github.com/go-playground/validator/v10 v10.14.1 // indirect
 	github.com/golang/protobuf v1.5.3 // indirect
 	github.com/google/go-cmp v0.5.9 // indirect
 	github.com/hashicorp/errwrap v1.1.0 // indirect
@@ -70,10 +70,10 @@ require (
 	github.com/mitchellh/reflectwalk v1.0.2 // indirect
 	github.com/oklog/run v1.0.0 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
-	github.com/prometheus/client_golang v1.15.1 // indirect
+	github.com/prometheus/client_golang v1.16.0 // indirect
 	github.com/prometheus/client_model v0.4.0 // indirect
 	github.com/prometheus/common v0.44.0 // indirect
-	github.com/prometheus/procfs v0.9.0 // indirect
+	github.com/prometheus/procfs v0.10.1 // indirect
 	github.com/sacloud/ftps v1.2.0 // indirect
 	github.com/sacloud/go-http v0.1.6 // indirect
 	github.com/shivamMg/ppds v0.0.1 // indirect

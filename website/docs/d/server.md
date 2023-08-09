@@ -48,6 +48,7 @@ A `condition` block supports the following:
 * `cdrom_id` - The id of the CD-ROM attached to the server.
 * `commitment` - The policy of how to allocate virtual CPUs to the server. This will be one of [`standard`/`dedicatedcpu`].
 * `core` - The number of virtual CPUs.
+* `cpu_model` - The model of CPU.
 * `description` - The description of the Server.
 * `disks` - A list of disk id connected to the server.
 * `dns_servers` - A list of IP address of DNS server in the zone.

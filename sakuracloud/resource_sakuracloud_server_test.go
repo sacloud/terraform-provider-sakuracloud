@@ -205,7 +205,14 @@ func TestAccSakuraCloudServer_planChangeByOutsideOfTerraform(t *testing.T) {
 
 						updated, err := plans.ChangeServerPlan(
 							context.Background(), client, step1.Zone.Name, step1.ID,
-							1, 1, types.Commitments.Standard, types.PlanGenerations.Default)
+							&iaas.ServerChangePlanRequest{
+								CPU:                  1,
+								MemoryMB:             1,
+								GPU:                  0,
+								ServerPlanCPUModel:   "",
+								ServerPlanGeneration: types.PlanGenerations.Default,
+								ServerPlanCommitment: types.Commitments.Standard,
+							})
 						if err != nil {
 							return err
 						}
@@ -440,6 +447,30 @@ func TestAccSakuraCloudServer_withGPU(t *testing.T) {
 					resource.TestCheckResourceAttr(resourceName, "core", "4"),
 					resource.TestCheckResourceAttr(resourceName, "memory", "56"),
 					resource.TestCheckResourceAttr(resourceName, "gpu", "1"),
+				),
+			},
+		},
+	})
+}
+
+func TestAccSakuraCloudServer_withAMDPlan(t *testing.T) {
+	resourceName := "sakuracloud_server.foobar"
+	rand := randomName()
+
+	var server iaas.Server
+	resource.ParallelTest(t, resource.TestCase{
+		PreCheck:          func() { testAccPreCheck(t) },
+		ProviderFactories: testAccProviderFactories,
+		CheckDestroy:      testCheckSakuraCloudServerDestroy,
+		Steps: []resource.TestStep{
+			{
+				Config: buildConfigWithArgs(testAccSakuraCloudServer_withAMDPlan, rand),
+				Check: resource.ComposeTestCheckFunc(
+					testCheckSakuraCloudServerExists(resourceName, &server),
+					resource.TestCheckResourceAttr(resourceName, "core", "32"),
+					resource.TestCheckResourceAttr(resourceName, "memory", "120"),
+					resource.TestCheckResourceAttr(resourceName, "cpu_model", "amd_epyc_7713p"),
+					resource.TestCheckResourceAttr(resourceName, "commitment", "dedicatedcpu"),
 				),
 			},
 		},
@@ -1133,6 +1164,20 @@ resource "sakuracloud_server" "foobar" {
   core   = 4
   memory = 56
   gpu    = 1
+
+  force_shutdown = true
+}
+`
+
+const testAccSakuraCloudServer_withAMDPlan = `
+resource "sakuracloud_server" "foobar" {
+  zone = "is1b"
+
+  name       = "{{ .arg0 }}"
+  core       = 32
+  memory     = 120
+  cpu_model  = "amd_epyc_7713p"
+  commitment = "dedicatedcpu"
 
   force_shutdown = true
 }

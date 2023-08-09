@@ -48,6 +48,13 @@ func dataSourceSakuraCloudServer() *schema.Resource {
 				Computed:    true,
 				Description: "The number of GPUs",
 			},
+			"cpu_model": {
+				Type:     schema.TypeString,
+				Computed: true,
+				Description: desc.Sprintf(
+					"The model of cpu",
+				),
+			},
 			"commitment": {
 				Type:     schema.TypeString,
 				Computed: true,
