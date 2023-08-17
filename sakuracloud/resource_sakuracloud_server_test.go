@@ -454,6 +454,8 @@ func TestAccSakuraCloudServer_withGPU(t *testing.T) {
 }
 
 func TestAccSakuraCloudServer_withAMDPlan(t *testing.T) {
+	skipIfEnvIsNotSet(t, "SAKURACLOUD_ENABLE_AMD_PLAN")
+
 	resourceName := "sakuracloud_server.foobar"
 	rand := randomName()
 
