@@ -28,6 +28,7 @@ import (
 	"github.com/sacloud/iaas-api-go/helper/plans"
 	"github.com/sacloud/iaas-api-go/helper/power"
 	"github.com/sacloud/iaas-api-go/types"
+	"github.com/sacloud/packages-go/size"
 )
 
 func TestAccSakuraCloudServer_basic(t *testing.T) {
@@ -207,7 +208,7 @@ func TestAccSakuraCloudServer_planChangeByOutsideOfTerraform(t *testing.T) {
 							context.Background(), client, step1.Zone.Name, step1.ID,
 							&iaas.ServerChangePlanRequest{
 								CPU:                  1,
-								MemoryMB:             1,
+								MemoryMB:             1 * size.GiB,
 								GPU:                  0,
 								ServerPlanCPUModel:   "",
 								ServerPlanGeneration: types.PlanGenerations.Default,
