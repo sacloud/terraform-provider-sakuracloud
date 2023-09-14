@@ -21,6 +21,10 @@ import (
 )
 
 func TestAccSakuraCloudDataSourceLoadBalancer_basic(t *testing.T) {
+	if !isFakeModeEnabled() {
+		skipIfEnvIsNotSet(t, "SAKURACLOUD_ENABLE_LOAD_BALANCER_TEST")
+	}
+
 	resourceName := "data.sakuracloud_load_balancer.foobar"
 	rand := randomName()
 

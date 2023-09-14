@@ -27,6 +27,10 @@ import (
 )
 
 func TestAccSakuraCloudLoadBalancer_basic(t *testing.T) {
+	if !isFakeModeEnabled() {
+		skipIfEnvIsNotSet(t, "SAKURACLOUD_ENABLE_LOAD_BALANCER_TEST")
+	}
+
 	resourceName := "sakuracloud_load_balancer.foobar"
 	rand := randomName()
 
@@ -110,6 +114,10 @@ func TestAccSakuraCloudLoadBalancer_basic(t *testing.T) {
 }
 
 func TestAccSakuraCloudLoadBalancer_withRouter(t *testing.T) {
+	if !isFakeModeEnabled() {
+		skipIfEnvIsNotSet(t, "SAKURACLOUD_ENABLE_LOAD_BALANCER_TEST")
+	}
+
 	resourceName := "sakuracloud_load_balancer.foobar"
 	name := randomName()
 
@@ -190,6 +198,10 @@ func testCheckSakuraCloudLoadBalancerDestroy(s *terraform.State) error {
 }
 
 func TestAccImportSakuraCloudLoadBalancer_basic(t *testing.T) {
+	if !isFakeModeEnabled() {
+		skipIfEnvIsNotSet(t, "SAKURACLOUD_ENABLE_LOAD_BALANCER_TEST")
+	}
+
 	rand := randomName()
 
 	checkFn := func(s []*terraform.InstanceState) error {
