@@ -370,7 +370,7 @@ func expandProxyLBRules(d resourceValueGettable) []*iaas.ProxyLBRule {
 				RequestHeaderName:            v.Get("request_header_name").(string),
 				RequestHeaderValue:           v.Get("request_header_value").(string),
 				RequestHeaderValueIgnoreCase: v.Get("request_header_value_ignore_case").(bool),
-				RequestHeaderValueNotMatch:   v.get("request_header_value_not_match").(bool),
+				RequestHeaderValueNotMatch:   v.Get("request_header_value_not_match").(bool),
 				ServerGroup:                  v.Get("group").(string),
 				Action:                       types.EProxyLBRuleAction(v.Get("action").(string)),
 				RedirectLocation:             v.Get("redirect_location").(string),
