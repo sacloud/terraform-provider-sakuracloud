@@ -94,10 +94,10 @@ func TestAccSakuraCloudProxyLB_basic(t *testing.T) {
 					resource.TestCheckResourceAttr(resourceName, "rule.0.redirect_status_code", ""),
 					resource.TestCheckResourceAttr(resourceName, "rule.0.redirect_location", ""),
 
-					resource.TestCheckResourceAttr(resourceName, "rule.0.request_header_name", ""),
-					resource.TestCheckResourceAttr(resourceName, "rule.0.request_header_value", ""),
-					resource.TestCheckResourceAttr(resourceName, "rule.0.request_header_value_ignore_case", "false"),
-					resource.TestCheckResourceAttr(resourceName, "rule.0.request_header_value_not_match", "false"),
+					resource.TestCheckResourceAttr(resourceName, "rule.0.request_header_name", "foo"),
+					resource.TestCheckResourceAttr(resourceName, "rule.0.request_header_value", "1"),
+					resource.TestCheckResourceAttr(resourceName, "rule.0.request_header_value_ignore_case", "true"),
+					resource.TestCheckResourceAttr(resourceName, "rule.0.request_header_value_not_match", "true"),
 
 					resource.TestCheckResourceAttrSet(resourceName, "vip"),
 					resource.TestCheckResourceAttrPair(
@@ -332,6 +332,10 @@ resource "sakuracloud_proxylb" "foobar" {
     fixed_status_code  = "200"
     fixed_content_type = "text/plain"
     fixed_message_body = "example"
+	request_header_name = "foo"
+	request_header_value = "1"
+	request_header_value_ignore_case = "true"
+	request_header_value_not_match = "true"
   }
 
   description = "description"

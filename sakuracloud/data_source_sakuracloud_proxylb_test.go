@@ -62,12 +62,12 @@ func TestAccSakuraCloudDataSourceProxyLB_basic(t *testing.T) {
 					resource.TestCheckResourceAttr(resourceName, "rule.1.host", ""),
 					resource.TestCheckResourceAttr(resourceName, "rule.1.path", "/path2"),
 					resource.TestCheckResourceAttr(resourceName, "rule.1.group", "group2"),
-					resource.TestCheckResourceAttr(resourceName, "rule.0.request_header_name", ""),
-					resource.TestCheckResourceAttr(resourceName, "rule.0.request_header_value", ""),
-					resource.TestCheckResourceAttr(resourceName, "rule.0.request_header_value_ignore_case", "false"),
-					resource.TestCheckResourceAttr(resourceName, "rule.0.request_header_value_not_match", "false"),
-					resource.TestCheckResourceAttr(resourceName, "rule.1.request_header_name", ""),
-					resource.TestCheckResourceAttr(resourceName, "rule.1.request_header_value", ""),
+					resource.TestCheckResourceAttr(resourceName, "rule.0.request_header_name", "foo"),
+					resource.TestCheckResourceAttr(resourceName, "rule.0.request_header_value", "1"),
+					resource.TestCheckResourceAttr(resourceName, "rule.0.request_header_value_ignore_case", "true"),
+					resource.TestCheckResourceAttr(resourceName, "rule.0.request_header_value_not_match", "true"),
+					resource.TestCheckResourceAttr(resourceName, "rule.1.request_header_name", "bar"),
+					resource.TestCheckResourceAttr(resourceName, "rule.1.request_header_value", "2"),
 					resource.TestCheckResourceAttr(resourceName, "rule.1.request_header_value_ignore_case", "false"),
 					resource.TestCheckResourceAttr(resourceName, "rule.1.request_header_value_not_match", "false"),
 				),
@@ -106,10 +106,18 @@ resource "sakuracloud_proxylb" "foobar" {
   rule {
     path  = "/path1"
     group = "group1"
+	request_header_name = "foo"
+	request_header_value = "1"
+	request_header_value_ignore_case = "true"
+	request_header_value_not_match = "true"
   }
   rule {
     path  = "/path2"
     group = "group2"
+	request_header_name = "bar"
+	request_header_value = "2"
+	request_header_value_ignore_case = "false"
+	request_header_value_not_match = "false"
   }
 }
 
