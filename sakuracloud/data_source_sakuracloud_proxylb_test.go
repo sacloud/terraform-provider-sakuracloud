@@ -106,18 +106,18 @@ resource "sakuracloud_proxylb" "foobar" {
   rule {
     path  = "/path1"
     group = "group1"
-	request_header_name = "foo"
-	request_header_value = "1"
-	request_header_value_ignore_case = "true"
-	request_header_value_not_match = "true"
+    request_header_name = "foo"
+    request_header_value = "1"
+    request_header_value_ignore_case = "true"
+    request_header_value_not_match = "true"
   }
   rule {
     path  = "/path2"
     group = "group2"
-	request_header_name = "bar"
-	request_header_value = "2"
-	request_header_value_ignore_case = "false"
-	request_header_value_not_match = "false"
+    request_header_name = "bar"
+    request_header_value = "2"
+    request_header_value_ignore_case = "false"
+    request_header_value_not_match = "false"
   }
 }
 
