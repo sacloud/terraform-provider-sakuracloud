@@ -301,6 +301,26 @@ func dataSourceSakuraCloudProxyLB() *schema.Resource {
 							Computed:    true,
 							Description: "IP address or CIDR block to which the rule will be applied",
 						},
+						"request_header_name": {
+							Type:        schema.TypeString,
+							Optional:    true,
+							Description: "The header name that the client will send when making a request",
+						},
+						"request_header_value": {
+							Type:        schema.TypeString,
+							Optional:    true,
+							Description: "The condition for the value of the request header specified by the request header name",
+						},
+						"request_header_value_ignore_case": {
+							Type:        schema.TypeBool,
+							Optional:    true,
+							Description: "Boolean value representing whether the request header value ignores case",
+						},
+						"request_header_value_not_match": {
+							Type:        schema.TypeBool,
+							Optional:    true,
+							Description: "Boolean value representing whether to apply the rules when the request header value conditions are met or when the conditions do not match",
+						},
 						"group": {
 							Type:        schema.TypeString,
 							Computed:    true,

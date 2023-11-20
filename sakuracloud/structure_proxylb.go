@@ -144,16 +144,20 @@ func flattenProxyLBRules(proxyLB *iaas.ProxyLB) []interface{} {
 	var results []interface{}
 	for _, rule := range proxyLB.Rules {
 		results = append(results, map[string]interface{}{
-			"host":                 rule.Host,
-			"path":                 rule.Path,
-			"source_ips":           rule.SourceIPs,
-			"group":                rule.ServerGroup,
-			"action":               rule.Action.String(),
-			"redirect_location":    rule.RedirectLocation,
-			"redirect_status_code": rule.RedirectStatusCode.String(),
-			"fixed_status_code":    rule.FixedStatusCode.String(),
-			"fixed_content_type":   rule.FixedContentType.String(),
-			"fixed_message_body":   rule.FixedMessageBody,
+			"host":                             rule.Host,
+			"path":                             rule.Path,
+			"source_ips":                       rule.SourceIPs,
+			"request_header_name":              rule.RequestHeaderName,
+			"request_header_value":             rule.RequestHeaderValue,
+			"request_header_value_ignore_case": rule.RequestHeaderValueIgnoreCase,
+			"request_header_value_not_match":   rule.RequestHeaderValueNotMatch,
+			"group":                            rule.ServerGroup,
+			"action":                           rule.Action.String(),
+			"redirect_location":                rule.RedirectLocation,
+			"redirect_status_code":             rule.RedirectStatusCode.String(),
+			"fixed_status_code":                rule.FixedStatusCode.String(),
+			"fixed_content_type":               rule.FixedContentType.String(),
+			"fixed_message_body":               rule.FixedMessageBody,
 		})
 	}
 	return results
@@ -360,16 +364,20 @@ func expandProxyLBRules(d resourceValueGettable) []*iaas.ProxyLBRule {
 		for _, rule := range rules {
 			v := mapToResourceData(rule.(map[string]interface{}))
 			results = append(results, &iaas.ProxyLBRule{
-				Host:               v.Get("host").(string),
-				Path:               v.Get("path").(string),
-				SourceIPs:          v.Get("source_ips").(string),
-				ServerGroup:        v.Get("group").(string),
-				Action:             types.EProxyLBRuleAction(v.Get("action").(string)),
-				RedirectLocation:   v.Get("redirect_location").(string),
-				RedirectStatusCode: types.EProxyLBRedirectStatusCode(forceAtoI(v.Get("redirect_status_code").(string))),
-				FixedStatusCode:    types.EProxyLBFixedStatusCode(forceAtoI(v.Get("fixed_status_code").(string))),
-				FixedContentType:   types.EProxyLBFixedContentType(v.Get("fixed_content_type").(string)),
-				FixedMessageBody:   v.Get("fixed_message_body").(string),
+				Host:                         v.Get("host").(string),
+				Path:                         v.Get("path").(string),
+				SourceIPs:                    v.Get("source_ips").(string),
+				RequestHeaderName:            v.Get("request_header_name").(string),
+				RequestHeaderValue:           v.Get("request_header_value").(string),
+				RequestHeaderValueIgnoreCase: v.Get("request_header_value_ignore_case").(bool),
+				RequestHeaderValueNotMatch:   v.Get("request_header_value_not_match").(bool),
+				ServerGroup:                  v.Get("group").(string),
+				Action:                       types.EProxyLBRuleAction(v.Get("action").(string)),
+				RedirectLocation:             v.Get("redirect_location").(string),
+				RedirectStatusCode:           types.EProxyLBRedirectStatusCode(forceAtoI(v.Get("redirect_status_code").(string))),
+				FixedStatusCode:              types.EProxyLBFixedStatusCode(forceAtoI(v.Get("fixed_status_code").(string))),
+				FixedContentType:             types.EProxyLBFixedContentType(v.Get("fixed_content_type").(string)),
+				FixedMessageBody:             v.Get("fixed_message_body").(string),
 			})
 		}
 	}
