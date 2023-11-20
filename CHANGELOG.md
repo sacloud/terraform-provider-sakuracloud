@@ -1,8 +1,15 @@
 # CHANGELOG
 
-## 2.25.0 (Unreleased)
+## 2.25.0 (2023/11/20)
 
 - ELBリクエストヘッダによる振り分けルール対応  #1110 
+- go: bump github.com/hashicorp/terraform-plugin-go from 0.16.0 to 0.19.0 #1105 by dependabot bot was closed 4 days ago
+- ロードバランサの受け入れテストをデフォルトでスキップ #1099 
+- go 1.21 #1094 
+- Fix: サーバプラン変更テスト時のパラメータ指定誤りを修正 #1093
+- AMDプランのテストを環境変数指定時のみに限定 #1092
+- AMDプラン #1090
+- go: bump golang.org/x/text from 0.10.0 to 0.12.0 #1089
 - オートスケールのdays_of_weekをrequiredに変更 #1085
 
 ## 2.24.1 (2023/06/09)
