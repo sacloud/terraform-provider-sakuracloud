@@ -176,6 +176,10 @@ A `rule` block supports the following:
 * `redirect_location` - (Optional) The URL to redirect to when the request matches the rule. see https://manual.sakura.ad.jp/cloud/appliance/enhanced-lb/#enhanced-lb-rule for details.
 * `redirect_status_code` - (Optional) HTTP status code for redirects sent when requests matches the rule. This must be one of [`301`/`302`].
 * `source_ips` - (Optional) IP address or CIDR block to which the rule will be applied. Multiple values can be specified by separating them with a space or comma.
+* `request_header_name` - (Optional) The header name that the client will send when making a request.
+* `request_header_value` - (Optional) The condition for the value of the request header specified by the request header name.
+* `request_header_value_ignore_case` - (Optional) Boolean value representing whether the request header value ignores case.
+* `request_header_value_not_match` - (Optional) Boolean value representing whether to apply the rules when the request header value conditions are met or when the conditions do not match.
 
 ---
 
