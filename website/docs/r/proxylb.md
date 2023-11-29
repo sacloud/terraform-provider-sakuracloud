@@ -78,6 +78,11 @@ resource "sakuracloud_proxylb" "foobar" {
     fixed_status_code    = "200"
     fixed_content_type   = "text/plain"
     fixed_message_body   = "body"
+
+    request_header_name               = "example"
+    request_header_value              = "0"
+    request_header_value_ignore_case  = "true"
+    request_header_value_not_match    = "true"
   }
 
   description = "description"
