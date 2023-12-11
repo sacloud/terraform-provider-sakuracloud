@@ -90,8 +90,8 @@ github.com/hashicorp/go-multierror v1.1.1 h1:H5DkEtf6CXdFp0N0Em5UCwQpXMWke8IA0+l
 github.com/hashicorp/go-multierror v1.1.1/go.mod h1:iw975J/qwKPdAO1clOe2L8331t/9/fmwbPZ6JB6eMoM=
 github.com/hashicorp/go-plugin v1.5.2 h1:aWv8eimFqWlsEiMrYZdPYl+FdHaBJSN4AWwGWfT1G2Y=
 github.com/hashicorp/go-plugin v1.5.2/go.mod h1:w1sAEES3g3PuV/RzUrgow20W2uErMly84hhD3um1WL4=
-github.com/hashicorp/go-retryablehttp v0.7.4 h1:ZQgVdpTdAL7WpMIwLzCfbalOcSUdkDZnpUv3/+BxzFA=
-github.com/hashicorp/go-retryablehttp v0.7.4/go.mod h1:Jy/gPYAdjqffZ/yFGCFV2doI5wjtH1ewM9u8iYVjtX8=
+github.com/hashicorp/go-retryablehttp v0.7.5 h1:bJj+Pj19UZMIweq/iie+1u5YCdGrnxCT9yvm0e+Nd5M=
+github.com/hashicorp/go-retryablehttp v0.7.5/go.mod h1:Jy/gPYAdjqffZ/yFGCFV2doI5wjtH1ewM9u8iYVjtX8=
 github.com/hashicorp/go-uuid v1.0.0/go.mod h1:6SBZvOh/SIDV7/2o3Jml5SYk/TvGqwFJ/bN7x4byOro=
 github.com/hashicorp/go-uuid v1.0.3 h1:2gKiV6YVmrJ1i2CKKa9obLvRieoRGviZFL26PcT/Co8=
 github.com/hashicorp/go-uuid v1.0.3/go.mod h1:6SBZvOh/SIDV7/2o3Jml5SYk/TvGqwFJ/bN7x4byOro=
@@ -174,8 +174,8 @@ github.com/prometheus/procfs v0.10.1 h1:kYK1Va/YMlutzCGazswoHKo//tZVlFpKYh+Pymzi
 github.com/prometheus/procfs v0.10.1/go.mod h1:nwNm2aOCAYw8uTR/9bWRREkZFxAUcWzPHWJq+XBB/FM=
 github.com/rogpeppe/go-internal v1.10.0 h1:TMyTOH3F/DB16zRVcYyreMH6GnZZrwQVAoYjRBZyWFQ=
 github.com/rogpeppe/go-internal v1.10.0/go.mod h1:UQnix2H7Ngw/k4C5ijL5+65zddjncjaFoBhdsK/akog=
-github.com/sacloud/api-client-go v0.2.9 h1:oNZ6usbBre8SeqBp5gpLOKg0ScpvHEwyJOU92Y/47M8=
-github.com/sacloud/api-client-go v0.2.9/go.mod h1:PivzNlDl/8L5pTycvD/KzSAo9hKRl3qlqmVunSqjgJY=
+github.com/sacloud/api-client-go v0.2.10 h1:+rv3jDohD+pkdYwOTBiB+jZsM0xK3AxadXRzhp3q66c=
+github.com/sacloud/api-client-go v0.2.10/go.mod h1:Jj3CTy2+O4bcMedVDXlbHuqqche85HEPuVXoQFhLaRc=
 github.com/sacloud/autoscaler v0.15.5-0.20230809005149-0039f2f2e112 h1:5RVR888m4lYzwCPkDf9UpcZF1WjXAaqHXxN++A82ZSs=
 github.com/sacloud/autoscaler v0.15.5-0.20230809005149-0039f2f2e112/go.mod h1:Lo1S33UkLADij9p+QUjLDYGCo9+GxJHyexrkfDGAFdI=
 github.com/sacloud/ftps v1.2.0 h1:7UlSWd7cnm1J+sANz7IiBV9ffVcS+4g6ZV5UHVVbvaw=
