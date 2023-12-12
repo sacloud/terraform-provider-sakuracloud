@@ -1,5 +1,12 @@
 # CHANGELOG
 
+## 2.25.1 (Unreleased)
+
+- github.com/sacloud/autoscaler v0.15.5 #1121
+- go: bump github.com/sacloud/iaas-service-go from 1.9.2-0.20230808054001-efad52d748d4 to 1.9.2 #1119
+- go: bump github.com/sacloud/webaccel-api-go from 1.1.5 to 1.1.6 #1118
+- ci: bump actions/setup-go from 4 to 5 #1115
+
 ## 2.25.0 (2023/11/20)
 
 - ELBリクエストヘッダによる振り分けルール対応  #1110 
