@@ -24,6 +24,7 @@ import (
 	"github.com/sacloud/iaas-api-go"
 	"github.com/sacloud/iaas-api-go/accessor"
 	"github.com/sacloud/iaas-api-go/helper/cleanup"
+	"github.com/sacloud/iaas-api-go/helper/power"
 	"github.com/sacloud/iaas-api-go/types"
 	"github.com/sacloud/iaas-service-go/setup"
 	"github.com/sacloud/terraform-provider-sakuracloud/internal/desc"
@@ -189,6 +190,25 @@ func resourceSakuraCloudDiskDelete(ctx context.Context, d *schema.ResourceData, 
 			return nil
 		}
 		return diag.Errorf("could not read SakuraCloud Disk[%s]: %s", d.Id(), err)
+	}
+
+	serverID := disk.GetServerID()
+	if serverID != 0 {
+		serverOp := iaas.NewServerOp(client)
+		server, err := serverOp.Read(ctx, zone, serverID)
+		if err != nil {
+			return diag.Errorf("could not read SakuraCloud Server[%s]: %s", d.Id(), err)
+		}
+
+		if server.InstanceStatus.IsUp() {
+			if err := power.ShutdownServer(ctx, serverOp, zone, server.ID, true); err != nil {
+				return diag.Errorf("stopping SakuraCloud Server[%s] is failed: %s", server.ID, err)
+			}
+		}
+
+		if err := diskOp.DisconnectFromServer(ctx, zone, sakuraCloudID(d.Id())); err != nil {
+			return diag.Errorf("disconnect from server[%s] is failed: %s", d.Id(), err)
+		}
 	}
 
 	if err := cleanup.DeleteDisk(ctx, client, zone, disk.ID, client.checkReferencedOption()); err != nil {
