@@ -2,10 +2,14 @@
 
 ## 2.25.1 (Unreleased)
 
+- Update CHANGELOG #1122, 1123
 - github.com/sacloud/autoscaler v0.15.5 #1121
 - go: bump github.com/sacloud/iaas-service-go from 1.9.2-0.20230808054001-efad52d748d4 to 1.9.2 #1119
 - go: bump github.com/sacloud/webaccel-api-go from 1.1.5 to 1.1.6 #1118
 - ci: bump actions/setup-go from 4 to 5 #1115
+- ドキュメント更新：ELBリクエストヘッダによる振り分けルール #1114 
+- Improve CI #1113
+- go: bump github.com/hashicorp/terraform-plugin-sdk/v2 from 2.27.0 to 2.30.0 #1112
 
 ## 2.25.0 (2023/11/20)
 
