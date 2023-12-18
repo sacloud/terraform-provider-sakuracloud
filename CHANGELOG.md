@@ -1,6 +1,6 @@
 # CHANGELOG
 
-## 2.25.1 (Unreleased)
+## 2.25.1 (2023/12/18)
 
 - Update CHANGELOG #1122, 1123
 - github.com/sacloud/autoscaler v0.15.5 #1121
