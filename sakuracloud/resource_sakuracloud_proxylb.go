@@ -47,7 +47,13 @@ func resourceSakuraCloudProxyLB() *schema.Resource {
 
 		Schema: map[string]*schema.Schema{
 			"name": schemaResourceName(resourceName),
-			"plan": schemaResourceIntPlan(resourceName, types.ProxyLBPlans.CPS100.Int(), types.ProxyLBPlanValues),
+			"plan": {
+				Type:             schema.TypeInt,
+				Optional:         true,
+				Default:          types.ProxyLBPlans.CPS100.Int(),
+				Description:      desc.ResourcePlan(resourceName, types.ProxyLBPlanValues),
+				ValidateDiagFunc: validation.ToDiagFunc(validation.IntInSlice(types.ProxyLBPlanValues)),
+			},
 			"vip_failover": {
 				Type:        schema.TypeBool,
 				Optional:    true,
