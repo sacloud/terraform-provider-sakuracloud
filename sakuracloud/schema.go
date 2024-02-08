@@ -233,20 +233,6 @@ func schemaDataSourceIntPlan(resourceName string, plans []int) *schema.Schema {
 	}
 }
 
-func schemaResourceIntPlan(resourceName string, defaultValue int, plans []int) *schema.Schema {
-	s := &schema.Schema{
-		Type:             schema.TypeInt,
-		Optional:         true,
-		ForceNew:         true,
-		Description:      desc.ResourcePlan(resourceName, plans),
-		ValidateDiagFunc: validation.ToDiagFunc(validation.IntInSlice(plans)),
-	}
-	if defaultValue > 0 {
-		s.Default = defaultValue
-	}
-	return s
-}
-
 func schemaDataSourceClass(resourceName string, classes []string) *schema.Schema {
 	return &schema.Schema{
 		Type:     schema.TypeString,
