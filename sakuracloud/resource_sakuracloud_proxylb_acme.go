@@ -98,6 +98,7 @@ func resourceSakuraCloudProxyLBACME() *schema.Resource {
 						"private_key": {
 							Type:        schema.TypeString,
 							Computed:    true,
+							Sensitive:   true,
 							Description: "The private key for a server",
 						},
 						"common_name": {
@@ -128,6 +129,7 @@ func resourceSakuraCloudProxyLBACME() *schema.Resource {
 									"private_key": {
 										Type:        schema.TypeString,
 										Computed:    true,
+										Sensitive:   true,
 										Description: "The private key for a server",
 									},
 								},
