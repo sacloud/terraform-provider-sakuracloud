@@ -65,7 +65,7 @@ func expandProxyLBUpdateRequest(d *schema.ResourceData) *iaas.ProxyLBUpdateReque
 
 func flattenProxyLBSyslog(proxyLB *iaas.ProxyLB) []interface{} {
 	syslog := proxyLB.Syslog
-	if syslog != nil {
+	if syslog != nil && syslog.Port > 0 && syslog.Server != "" {
 		return []interface{}{
 			map[string]interface{}{
 				"server": syslog.Server,
