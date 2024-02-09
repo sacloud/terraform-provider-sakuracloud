@@ -66,6 +66,7 @@ func resourceSakuraCloudSSHKeyGen() *schema.Resource {
 			"private_key": {
 				Type:        schema.TypeString,
 				Computed:    true,
+				Sensitive:   true,
 				Description: "The body of the private key",
 			},
 			"public_key": {

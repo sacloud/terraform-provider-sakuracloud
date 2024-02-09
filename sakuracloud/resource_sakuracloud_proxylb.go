@@ -273,6 +273,7 @@ func resourceSakuraCloudProxyLB() *schema.Resource {
 							Type:        schema.TypeString,
 							Optional:    true,
 							Computed:    true,
+							Sensitive:   true,
 							Description: "The private key for a server",
 						},
 						"common_name": {
@@ -304,6 +305,7 @@ func resourceSakuraCloudProxyLB() *schema.Resource {
 									"private_key": {
 										Type:        schema.TypeString,
 										Required:    true,
+										Sensitive:   true,
 										Description: "The private key for a server",
 									},
 								},
