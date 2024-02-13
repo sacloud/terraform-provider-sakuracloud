@@ -73,7 +73,7 @@ func resourceSakuraCloudProxyLB() *schema.Resource {
 			"backend_http_keep_alive": {
 				Type:             schema.TypeString,
 				Optional:         true,
-				Computed:         true,
+				Default:          types.ProxyLBBackendHttpKeepAlive.Safe.String(),
 				ValidateDiagFunc: validation.ToDiagFunc(validation.StringInSlice(types.ProxyLBBackendHttpKeepAliveStrings, false)),
 				Description: desc.Sprintf(
 					"Mode of http keep-alive with backend. This must be one of [%s]",
@@ -105,7 +105,6 @@ func resourceSakuraCloudProxyLB() *schema.Resource {
 			"syslog": {
 				Type:     schema.TypeList,
 				Optional: true,
-				Computed: true,
 				MaxItems: 1,
 				MinItems: 1,
 				Elem: &schema.Resource{
