@@ -1,5 +1,12 @@
 # CHANGELOG
 
+## 2.25.2 (2024/2/14)
+
+- Fix: sakuracloud_proxylb: backend_http_keep_aliveとsyslogのデフォルト値/空の場合の挙動を修正 #1144
+- private_key: sensitive=true #1142
+- sakuracloud_proxylb: プラン変更で再作成される問題を修正 #1141
+- sakuracloud_proxylb_acme: BackendHttpKeepAliveの設定が引き継がれない問題を修正 #1135
+
 ## 2.25.1 (2023/12/18)
 
 - Update CHANGELOG #1122, 1123
