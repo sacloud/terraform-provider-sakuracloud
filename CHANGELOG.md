@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 2.25.3 (2024/2/26)
+
+- パッケージのダウングレード #1146
+
 ## 2.25.2 (2024/2/14)
 
 - Fix: sakuracloud_proxylb: backend_http_keep_aliveとsyslogのデフォルト値/空の場合の挙動を修正 #1144
