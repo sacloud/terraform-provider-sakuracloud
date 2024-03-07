@@ -1,5 +1,5 @@
 #
-# Copyright 2022 The sacloud/makefile Authors
+# Copyright 2022-2023 The sacloud/makefile Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -15,11 +15,11 @@
 #
 
 AUTHOR                  ?= The sacloud/makefile Authors
-COPYRIGHT_YEAR          ?= 2022
+COPYRIGHT_YEAR          ?= 2023
 COPYRIGHT_FILES         ?= $$(find . -name "*.go" -print | grep -v "/vendor/")
 GO                      ?= go
 DEFAULT_GOALS           ?= fmt set-license go-licenses-check goimports lint test
-GOLANG_CI_LINT_VERSION  ?= v1.49.0
+GOLANG_CI_LINT_VERSION  ?= v1.56.2
 TEXTLINT_ACTION_VERSION ?= v0.0.3
 
 .DEFAULT_GOAL = default
