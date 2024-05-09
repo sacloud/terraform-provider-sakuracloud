@@ -44,6 +44,8 @@ func expandDiskCreateRequest(d *schema.ResourceData) *iaas.DiskCreateRequest {
 		Description:     d.Get("description").(string),
 		Tags:            expandTags(d),
 		IconID:          expandSakuraCloudID(d, "icon_id"),
+		// EncryptionAlgorithm: d.Get("encryption_algorithm"),
+		EncryptionAlgorithm: types.EDiskEncryptionAlgorithm(d.Get("encryption_algorithm").(string)),
 	}
 }
 

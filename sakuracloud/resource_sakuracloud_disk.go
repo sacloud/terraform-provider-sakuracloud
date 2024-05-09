@@ -95,6 +95,13 @@ func resourceSakuraCloudDisk() *schema.Resource {
 			"description": schemaResourceDescription(resourceName),
 			"tags":        schemaResourceTags(resourceName),
 			"zone":        schemaResourceZone(resourceName),
+			"encryption_algorithm": {
+				Type:     schema.TypeString,
+				ForceNew: true,
+				Optional: true,
+				// Elem:        &schema.Schema{Type: schema.TypeString},
+				Description: "The disk encryption algorithm",
+			},
 		},
 	}
 }
