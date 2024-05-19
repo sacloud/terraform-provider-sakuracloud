@@ -46,7 +46,8 @@ func dataSourceSakuraCloudDisk() *schema.Resource {
 				Type:     schema.TypeString,
 				Computed: true,
 				Description: desc.Sprintf(
-					"The disk encryption algorithm",
+					"The disk encryption algorithm. This must be one of [%s]",
+					types.DiskEncryptionAlgorithmStrings,
 				),
 			},
 			"source_archive_id": {
