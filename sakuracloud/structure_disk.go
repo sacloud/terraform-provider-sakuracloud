@@ -35,15 +35,16 @@ func expandDiskPlan(d *schema.ResourceData) types.ID {
 
 func expandDiskCreateRequest(d *schema.ResourceData) *iaas.DiskCreateRequest {
 	return &iaas.DiskCreateRequest{
-		DiskPlanID:      expandDiskPlan(d),
-		Connection:      types.EDiskConnection(d.Get("connector").(string)),
-		SourceDiskID:    expandSakuraCloudID(d, "source_disk_id"),
-		SourceArchiveID: expandSakuraCloudID(d, "source_archive_id"),
-		SizeMB:          d.Get("size").(int) * size.GiB,
-		Name:            d.Get("name").(string),
-		Description:     d.Get("description").(string),
-		Tags:            expandTags(d),
-		IconID:          expandSakuraCloudID(d, "icon_id"),
+		DiskPlanID:          expandDiskPlan(d),
+		Connection:          types.EDiskConnection(d.Get("connector").(string)),
+		SourceDiskID:        expandSakuraCloudID(d, "source_disk_id"),
+		SourceArchiveID:     expandSakuraCloudID(d, "source_archive_id"),
+		SizeMB:              d.Get("size").(int) * size.GiB,
+		Name:                d.Get("name").(string),
+		Description:         d.Get("description").(string),
+		Tags:                expandTags(d),
+		IconID:              expandSakuraCloudID(d, "icon_id"),
+		EncryptionAlgorithm: types.EDiskEncryptionAlgorithm(d.Get("encryption_algorithm").(string)),
 	}
 }
 

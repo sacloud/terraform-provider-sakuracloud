@@ -57,6 +57,7 @@ func TestAccSakuraCloudDisk_basic(t *testing.T) {
 						resourceName, "icon_id",
 						"sakuracloud_icon.foobar", "id",
 					),
+					resource.TestCheckResourceAttr(resourceName, "encryption_algorithm", "aes256xts"),
 				),
 			},
 			{
@@ -73,6 +74,7 @@ func TestAccSakuraCloudDisk_basic(t *testing.T) {
 					resource.TestCheckResourceAttr(resourceName, "tags.0", "tag1-upd"),
 					resource.TestCheckResourceAttr(resourceName, "tags.1", "tag2-upd"),
 					resource.TestCheckResourceAttr(resourceName, "icon_id", ""),
+					resource.TestCheckResourceAttr(resourceName, "encryption_algorithm", "aes256xts"),
 				),
 			},
 		},
@@ -153,16 +155,17 @@ func TestAccImportSakuraCloudDisk_basic(t *testing.T) {
 			return fmt.Errorf("expected 1 state: %#v", s)
 		}
 		expects := map[string]string{
-			"name":           rand,
-			"plan":           "ssd",
-			"connector":      "virtio",
-			"size":           "20",
-			"source_disk_id": "",
-			"server_id":      "",
-			"description":    "description",
-			"tags.0":         "tag1",
-			"tags.1":         "tag2",
-			"zone":           os.Getenv("SAKURACLOUD_ZONE"),
+			"name":                 rand,
+			"plan":                 "ssd",
+			"connector":            "virtio",
+			"size":                 "20",
+			"source_disk_id":       "",
+			"server_id":            "",
+			"description":          "description",
+			"tags.0":               "tag1",
+			"tags.1":               "tag2",
+			"zone":                 os.Getenv("SAKURACLOUD_ZONE"),
+			"encryption_algorithm": "aes256xts",
 		}
 
 		if err := compareStateMulti(s[0], expects); err != nil {
@@ -211,6 +214,7 @@ resource "sakuracloud_disk" "foobar" {
   description       = "description"
   tags              = ["tag1", "tag2"]
   icon_id           = sakuracloud_icon.foobar.id
+  encryption_algorithm = "aes256xts"
 }
 
 resource "sakuracloud_icon" "foobar" {
@@ -232,4 +236,5 @@ resource "sakuracloud_disk" "foobar" {
   source_archive_id = data.sakuracloud_archive.ubuntu.id
   description       = "description-upd"
   tags              = ["tag1-upd", "tag2-upd"]
+  encryption_algorithm = "aes256xts"
 }`
