@@ -24,6 +24,7 @@ resource "sakuracloud_disk" "foobar" {
   size              = 20
   source_archive_id = data.sakuracloud_archive.ubuntu.id
   #distant_from      = ["111111111111"]
+  encryption_algorithm = "aes256_xts"
 
   description = "description"
   tags        = ["tag1", "tag2"]
@@ -40,6 +41,7 @@ resource "sakuracloud_disk" "foobar" {
 * `plan` - (Optional) The plan name of the disk. This must be one of [`ssd`/`hdd`]. Changing this forces a new resource to be created. Default:`ssd`.
 * `size` - (Optional) The size of disk in GiB. Changing this forces a new resource to be created. Default:`20`.
 * `distant_from` - (Optional) A list of disk id. The disk will be located to different storage from these disks. Changing this forces a new resource to be created.
+* `encryption_algorithm` - (Optional) The disk encryption algorithm. This must be one of [`none`/`aes256_xts`]. Changing this forces a new resource to be created. Default:`none`.
 
 The values that can be specified for `size` can be found with the following command.
 
