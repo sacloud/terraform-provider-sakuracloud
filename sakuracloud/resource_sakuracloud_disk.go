@@ -219,5 +219,6 @@ func setDiskResourceData(ctx context.Context, d *schema.ResourceData, client *AP
 	d.Set("description", data.Description)                    // nolint
 	d.Set("server_id", data.ServerID.String())                // nolint
 	d.Set("zone", getZone(d, client))                         // nolint
+	d.Set("encryption_algorithm", data.EncryptionAlgorithm.String())
 	return diag.FromErr(d.Set("tags", flattenTags(data.Tags)))
 }
