@@ -99,6 +99,7 @@ func resourceSakuraCloudDisk() *schema.Resource {
 				Type:             schema.TypeString,
 				ForceNew:         true,
 				Optional:         true,
+				Default:          types.DiskEncryptionAlgorithms.None,
 				ValidateDiagFunc: validation.ToDiagFunc(validation.StringInSlice(types.DiskEncryptionAlgorithmStrings, false)),
 				Description: desc.Sprintf(
 					"The disk encryption algorithm. This must be one of [%s]",
