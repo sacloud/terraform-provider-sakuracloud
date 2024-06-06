@@ -54,7 +54,7 @@ func resourceSakuraCloudCDROM() *schema.Resource {
 
 		Schema: map[string]*schema.Schema{
 			"name": schemaResourceName(resourceName),
-			"size": schemaResourceSize(resourceName, 5, []int{5, 10}...),
+			"size": schemaResourceSize(resourceName, 5, []int{5, 10, 20}...),
 			"iso_image_file": {
 				Type:          schema.TypeString,
 				Optional:      true,
