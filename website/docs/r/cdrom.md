@@ -29,7 +29,7 @@ resource "sakuracloud_cdrom" "foobar" {
 * `content_file_name` - (Optional) The name of content file to upload to as the CD-ROM. This is only used when `content` is specified. This conflicts with [`iso_image_file`]. Default:`config`.
 * `iso_image_file` - (Optional) The file path to upload to as the CD-ROM. This conflicts with [`content`].
 * `hash` - (Optional) The md5 checksum calculated from the base64 encoded file body.
-* `size` - (Optional) The size of CD-ROM in GiB. This must be one of [`5`/`10`]. Changing this forces a new resource to be created. Default:`5`.
+* `size` - (Optional) The size of CD-ROM in GiB. This must be one of [`5`/`10`/`20`]. Changing this forces a new resource to be created. Default:`5`.
 
 #### Common Arguments
 
