@@ -1,5 +1,15 @@
 # CHANGELOG
 
+## 2.25.4 (2024/6/10)
+
+- sakuracloud_cdrom: 20GB対応 #1169
+- ウェブアクセラレータ ACL機能 #1166
+- sakuracloud_disk: encryption_algorithmにデフォルト値を指定 #1167
+- ディスクのインポート修正 #1165
+- ディスク暗号化機能の対応 #1161
+- update dependencies - sacloud/makefile v0.0.8 #1150
+
+
 ## 2.25.3 (2024/2/26)
 
 - パッケージのダウングレード #1146

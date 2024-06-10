@@ -6,7 +6,7 @@
 #    }
 #    sakuracloud = {
 #      source  = "sacloud/sakuracloud"
-#      version = "2.25.3"
+#      version = "2.25.4"
 #    }
 #  }
 #}
