@@ -115,7 +115,7 @@ func resourceSakuraCloudPacketFilterRulesRead(ctx context.Context, d *schema.Res
 	}
 
 	pfOp := iaas.NewPacketFilterOp(client)
-	pfID := d.Get("packet_filter_id").(string)
+	pfID := d.Id()
 
 	pf, err := pfOp.Read(ctx, zone, sakuraCloudID(pfID))
 	if err != nil {
