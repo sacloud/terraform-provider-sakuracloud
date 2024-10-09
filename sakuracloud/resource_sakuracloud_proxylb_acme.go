@@ -217,7 +217,12 @@ func resourceSakuraCloudProxyLBACMERead(ctx context.Context, d *schema.ResourceD
 	}
 
 	proxyLBOp := iaas.NewProxyLBOp(client)
-	proxyLBID := d.Get("proxylb_id").(string)
+	var proxyLBID string
+	if id, ok := d.GetOk("proxylb_id"); ok {
+		proxyLBID = id.(string)
+	} else {
+		proxyLBID = d.Id()
+	}
 
 	proxyLB, err := proxyLBOp.Read(ctx, sakuraCloudID(proxyLBID))
 	if err != nil {
