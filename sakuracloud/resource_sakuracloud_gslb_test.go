@@ -30,7 +30,7 @@ func TestAccSakuraCloudGSLB_basic(t *testing.T) {
 	rand := randomName()
 
 	var gslb iaas.GSLB
-	resource.ParallelTest(t, resource.TestCase{
+	resource.Test(t, resource.TestCase{
 		PreCheck:          func() { testAccPreCheck(t) },
 		ProviderFactories: testAccProviderFactories,
 		CheckDestroy: resource.ComposeTestCheckFunc(
@@ -184,7 +184,7 @@ func TestAccImportSakuraCloudGSLB_basic(t *testing.T) {
 
 	resourceName := "sakuracloud_gslb.foobar"
 
-	resource.ParallelTest(t, resource.TestCase{
+	resource.Test(t, resource.TestCase{
 		PreCheck:          func() { testAccPreCheck(t) },
 		ProviderFactories: testAccProviderFactories,
 		CheckDestroy: resource.ComposeTestCheckFunc(

@@ -32,7 +32,7 @@ func TestAccSakuraCloudSSHKey_basic(t *testing.T) {
 	rand := randomName()
 
 	var sshKey iaas.SSHKey
-	resource.ParallelTest(t, resource.TestCase{
+	resource.Test(t, resource.TestCase{
 		PreCheck:          func() { testAccPreCheck(t) },
 		ProviderFactories: testAccProviderFactories,
 		CheckDestroy:      testCheckSakuraCloudSSHKeyDestroy,

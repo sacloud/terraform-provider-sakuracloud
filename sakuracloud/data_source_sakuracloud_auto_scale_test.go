@@ -32,7 +32,7 @@ func TestAccSakuraCloudDataSourceAutoScale_basic(t *testing.T) {
 		apiKeyId = "111111111111" // dummy
 	}
 
-	resource.ParallelTest(t, resource.TestCase{
+	resource.Test(t, resource.TestCase{
 		PreCheck:          func() { testAccPreCheck(t) },
 		ProviderFactories: testAccProviderFactories,
 		Steps: []resource.TestStep{

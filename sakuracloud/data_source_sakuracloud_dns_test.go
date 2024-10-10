@@ -25,7 +25,7 @@ func TestAccSakuraCloudDataSourceDNS_basic(t *testing.T) {
 	resourceName := "data.sakuracloud_dns.foobar"
 	zone := fmt.Sprintf("%s.com", randomName())
 
-	resource.ParallelTest(t, resource.TestCase{
+	resource.Test(t, resource.TestCase{
 		PreCheck:          func() { testAccPreCheck(t) },
 		ProviderFactories: testAccProviderFactories,
 		Steps: []resource.TestStep{

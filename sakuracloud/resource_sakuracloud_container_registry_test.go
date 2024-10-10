@@ -33,7 +33,7 @@ func TestAccSakuraCloudContainerRegistry_basic(t *testing.T) {
 	password := randomPassword()
 
 	var reg iaas.ContainerRegistry
-	resource.ParallelTest(t, resource.TestCase{
+	resource.Test(t, resource.TestCase{
 		PreCheck:          func() { testAccPreCheck(t) },
 		ProviderFactories: testAccProviderFactories,
 		CheckDestroy: resource.ComposeTestCheckFunc(
