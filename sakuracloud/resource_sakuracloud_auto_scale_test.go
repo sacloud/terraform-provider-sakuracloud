@@ -38,7 +38,7 @@ func TestAccSakuraCloudAutoScale_basic(t *testing.T) {
 	}
 
 	var autoScale iaas.AutoScale
-	resource.ParallelTest(t, resource.TestCase{
+	resource.Test(t, resource.TestCase{
 		PreCheck:          func() { testAccPreCheck(t) },
 		ProviderFactories: testAccProviderFactories,
 		CheckDestroy: resource.ComposeTestCheckFunc(
@@ -111,7 +111,7 @@ func TestAccSakuraCloudAutoScale_withRouter(t *testing.T) {
 	}
 
 	var autoScale iaas.AutoScale
-	resource.ParallelTest(t, resource.TestCase{
+	resource.Test(t, resource.TestCase{
 		PreCheck:          func() { testAccPreCheck(t) },
 		ProviderFactories: testAccProviderFactories,
 		CheckDestroy: resource.ComposeTestCheckFunc(
@@ -150,7 +150,7 @@ func TestAccSakuraCloudAutoScale_withScheduleTrigger(t *testing.T) {
 	}
 
 	var autoScale iaas.AutoScale
-	resource.ParallelTest(t, resource.TestCase{
+	resource.Test(t, resource.TestCase{
 		PreCheck:          func() { testAccPreCheck(t) },
 		ProviderFactories: testAccProviderFactories,
 		CheckDestroy: resource.ComposeTestCheckFunc(
@@ -269,7 +269,7 @@ func TestAccImportSakuraCloudAutoScale_basic(t *testing.T) {
 
 	resourceName := "sakuracloud_auto_scale.foobar"
 
-	resource.ParallelTest(t, resource.TestCase{
+	resource.Test(t, resource.TestCase{
 		PreCheck:          func() { testAccPreCheck(t) },
 		ProviderFactories: testAccProviderFactories,
 		CheckDestroy: resource.ComposeTestCheckFunc(

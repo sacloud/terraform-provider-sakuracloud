@@ -30,7 +30,7 @@ func TestAccSakuraCloudVPCRouter_basic(t *testing.T) {
 	rand := randomName()
 
 	var vpcRouter iaas.VPCRouter
-	resource.ParallelTest(t, resource.TestCase{
+	resource.Test(t, resource.TestCase{
 		PreCheck:          func() { testAccPreCheck(t) },
 		ProviderFactories: testAccProviderFactories,
 		CheckDestroy: resource.ComposeTestCheckFunc(
@@ -86,7 +86,7 @@ func TestAccSakuraCloudVPCRouter_Full(t *testing.T) {
 	rand := randomName()
 
 	var vpcRouter iaas.VPCRouter
-	resource.ParallelTest(t, resource.TestCase{
+	resource.Test(t, resource.TestCase{
 		PreCheck:          func() { testAccPreCheck(t) },
 		ProviderFactories: testAccProviderFactories,
 		CheckDestroy: resource.ComposeTestCheckFunc(

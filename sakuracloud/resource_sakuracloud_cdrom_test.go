@@ -33,7 +33,7 @@ func TestAccSakuraCloudCDROM_basic(t *testing.T) {
 	rand := randomName()
 
 	var cdrom iaas.CDROM
-	resource.ParallelTest(t, resource.TestCase{
+	resource.Test(t, resource.TestCase{
 		PreCheck:          func() { testAccPreCheck(t) },
 		ProviderFactories: testAccProviderFactories,
 		CheckDestroy: resource.ComposeTestCheckFunc(
@@ -79,7 +79,7 @@ func TestAccSakuraCloudCDROM_textContent(t *testing.T) {
 	resourceName := "sakuracloud_cdrom.foobar"
 	rand := randomName()
 
-	resource.ParallelTest(t, resource.TestCase{
+	resource.Test(t, resource.TestCase{
 		PreCheck:          func() { testAccPreCheck(t) },
 		ProviderFactories: testAccProviderFactories,
 		CheckDestroy:      testCheckSakuraCloudCDROMDestroy,
@@ -180,7 +180,7 @@ func TestAccImportSakuraCloudCDROM_basic(t *testing.T) {
 
 	resourceName := "sakuracloud_cdrom.foobar"
 
-	resource.ParallelTest(t, resource.TestCase{
+	resource.Test(t, resource.TestCase{
 		PreCheck:          func() { testAccPreCheck(t) },
 		ProviderFactories: testAccProviderFactories,
 		CheckDestroy: resource.ComposeTestCheckFunc(

@@ -40,7 +40,7 @@ func TestAccSakuraCloudProxyLB_basic(t *testing.T) {
 	ip := os.Getenv(envProxyLBRealServerIP0)
 
 	var proxylb, proxylbUpd iaas.ProxyLB
-	resource.ParallelTest(t, resource.TestCase{
+	resource.Test(t, resource.TestCase{
 		PreCheck:          func() { testAccPreCheck(t) },
 		ProviderFactories: testAccProviderFactories,
 		CheckDestroy: resource.ComposeTestCheckFunc(
@@ -259,7 +259,7 @@ func TestAccImportSakuraCloudProxyLB_basic(t *testing.T) {
 
 	resourceName := "sakuracloud_proxylb.foobar"
 
-	resource.ParallelTest(t, resource.TestCase{
+	resource.Test(t, resource.TestCase{
 		PreCheck:          func() { testAccPreCheck(t) },
 		ProviderFactories: testAccProviderFactories,
 		CheckDestroy:      testCheckSakuraCloudProxyLBDestroy,

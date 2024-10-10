@@ -31,7 +31,7 @@ func TestAccSakuraCloudBridge_basic(t *testing.T) {
 	rand := randomName()
 
 	var bridge iaas.Bridge
-	resource.ParallelTest(t, resource.TestCase{
+	resource.Test(t, resource.TestCase{
 		PreCheck:          func() { testAccPreCheck(t) },
 		ProviderFactories: testAccProviderFactories,
 		CheckDestroy: resource.ComposeTestCheckFunc(
@@ -130,7 +130,7 @@ func TestAccImportSakuraCloudBridge_basic(t *testing.T) {
 
 	resourceName := "sakuracloud_bridge.foobar"
 
-	resource.ParallelTest(t, resource.TestCase{
+	resource.Test(t, resource.TestCase{
 		PreCheck:          func() { testAccPreCheck(t) },
 		ProviderFactories: testAccProviderFactories,
 		CheckDestroy: resource.ComposeTestCheckFunc(

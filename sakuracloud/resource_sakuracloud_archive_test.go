@@ -32,7 +32,7 @@ func TestAccSakuraCloudArchive_basic(t *testing.T) {
 	rand := randomName()
 
 	var archive iaas.Archive
-	resource.ParallelTest(t, resource.TestCase{
+	resource.Test(t, resource.TestCase{
 		PreCheck:          func() { testAccPreCheck(t) },
 		ProviderFactories: testAccProviderFactories,
 		CheckDestroy: resource.ComposeTestCheckFunc(
@@ -78,7 +78,7 @@ func TestAccSakuraCloudArchive_defaultSize(t *testing.T) {
 	resourceName := "sakuracloud_archive.foobar"
 	rand := randomName()
 
-	resource.ParallelTest(t, resource.TestCase{
+	resource.Test(t, resource.TestCase{
 		PreCheck:          func() { testAccPreCheck(t) },
 		ProviderFactories: testAccProviderFactories,
 		CheckDestroy: resource.ComposeTestCheckFunc(
@@ -103,7 +103,7 @@ func TestAccSakuraCloudArchive_transfer(t *testing.T) {
 	rand := randomName()
 
 	var archive iaas.Archive
-	resource.ParallelTest(t, resource.TestCase{
+	resource.Test(t, resource.TestCase{
 		PreCheck:          func() { testAccPreCheck(t) },
 		ProviderFactories: testAccProviderFactories,
 		CheckDestroy: resource.ComposeTestCheckFunc(
@@ -141,7 +141,7 @@ func TestAccSakuraCloudArchive_fromShared(t *testing.T) {
 	rand := randomName()
 
 	var archive iaas.Archive
-	resource.ParallelTest(t, resource.TestCase{
+	resource.Test(t, resource.TestCase{
 		PreCheck:          func() { testAccPreCheck(t) },
 		ProviderFactories: testAccProviderFactories,
 		CheckDestroy: resource.ComposeTestCheckFunc(

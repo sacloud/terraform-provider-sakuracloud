@@ -32,7 +32,7 @@ func TestAccSakuraCloudDatabase_basic(t *testing.T) {
 	password := randomPassword()
 
 	var database iaas.Database
-	resource.ParallelTest(t, resource.TestCase{
+	resource.Test(t, resource.TestCase{
 		PreCheck:          func() { testAccPreCheck(t) },
 		ProviderFactories: testAccProviderFactories,
 		CheckDestroy: resource.ComposeTestCheckFunc(
@@ -220,7 +220,7 @@ func TestAccImportSakuraCloudDatabase_basic(t *testing.T) {
 
 	resourceName := "sakuracloud_database.foobar"
 
-	resource.ParallelTest(t, resource.TestCase{
+	resource.Test(t, resource.TestCase{
 		PreCheck:          func() { testAccPreCheck(t) },
 		ProviderFactories: testAccProviderFactories,
 		CheckDestroy: resource.ComposeTestCheckFunc(

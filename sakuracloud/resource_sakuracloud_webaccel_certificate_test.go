@@ -54,7 +54,7 @@ func TestAccResourceSakuraCloudWebAccelCertificate_basic(t *testing.T) {
 
 	regexpNotEmpty := regexp.MustCompile(".+")
 
-	resource.ParallelTest(t, resource.TestCase{
+	resource.Test(t, resource.TestCase{
 		PreCheck:          func() { testAccPreCheck(t) },
 		ProviderFactories: testAccProviderFactories,
 		CheckDestroy: func(*terraform.State) error {

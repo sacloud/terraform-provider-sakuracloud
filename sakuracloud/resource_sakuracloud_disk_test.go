@@ -32,7 +32,7 @@ func TestAccSakuraCloudDisk_basic(t *testing.T) {
 	rand := randomName()
 
 	var disk iaas.Disk
-	resource.ParallelTest(t, resource.TestCase{
+	resource.Test(t, resource.TestCase{
 		PreCheck:          func() { testAccPreCheck(t) },
 		ProviderFactories: testAccProviderFactories,
 		CheckDestroy: resource.ComposeTestCheckFunc(
@@ -176,7 +176,7 @@ func TestAccImportSakuraCloudDisk_basic(t *testing.T) {
 
 	resourceName := "sakuracloud_disk.foobar"
 
-	resource.ParallelTest(t, resource.TestCase{
+	resource.Test(t, resource.TestCase{
 		PreCheck:          func() { testAccPreCheck(t) },
 		ProviderFactories: testAccProviderFactories,
 		CheckDestroy: resource.ComposeTestCheckFunc(
