@@ -63,7 +63,7 @@ A `health_check` block exports the following:
 * `delay_loop` - The interval in seconds between checks.
 * `host_header` - The value of host header send when checking by HTTP/HTTPS.
 * `path` - The path used when checking by HTTP/HTTPS.
-* `port` - The port number used when checking by TCP.
+* `port` - The port number used when checking by TCP/HTTP/HTTPS.
 * `protocol` - The protocol used for health checks. This will be one of [`http`/`https`/`tcp`/`ping`].
 * `status` - The response-code to expect when checking by HTTP/HTTPS.
 
