@@ -51,6 +51,7 @@ func TestAccSakuraCloudGSLB_basic(t *testing.T) {
 					resource.TestCheckResourceAttr(resourceName, "health_check.0.protocol", "http"),
 					resource.TestCheckResourceAttr(resourceName, "health_check.0.delay_loop", "10"),
 					resource.TestCheckResourceAttr(resourceName, "health_check.0.host_header", "usacloud.jp"),
+					resource.TestCheckResourceAttr(resourceName, "health_check.0.port", "80"),
 					resource.TestCheckResourceAttr(resourceName, "server.0.ip_address", "1.1.1.1"),
 					resource.TestCheckResourceAttr(resourceName, "server.0.weight", "1"),
 					resource.TestCheckResourceAttr(resourceName, "server.0.enabled", "true"),
@@ -74,6 +75,7 @@ func TestAccSakuraCloudGSLB_basic(t *testing.T) {
 					resource.TestCheckResourceAttr(resourceName, "tags.1", "tag2-upd"),
 					resource.TestCheckResourceAttr(resourceName, "sorry_server", "8.8.4.4"),
 					resource.TestCheckResourceAttr(resourceName, "health_check.0.protocol", "https"),
+					resource.TestCheckResourceAttr(resourceName, "health_check.0.port", "443"),
 					resource.TestCheckResourceAttr(resourceName, "health_check.0.delay_loop", "20"),
 					resource.TestCheckResourceAttr(resourceName, "health_check.0.host_header", "usacloud.jp-upd"),
 					resource.TestCheckResourceAttr(resourceName, "server.0.ip_address", "2.2.2.2"),
@@ -96,6 +98,7 @@ func TestAccSakuraCloudGSLB_basic(t *testing.T) {
 					resource.TestCheckResourceAttr(resourceName, "tags.1", "tag2-upd"),
 					resource.TestCheckResourceAttr(resourceName, "sorry_server", "8.8.4.4"),
 					resource.TestCheckResourceAttr(resourceName, "health_check.0.protocol", "https"),
+					resource.TestCheckResourceAttr(resourceName, "health_check.0.port", "443"),
 					resource.TestCheckResourceAttr(resourceName, "health_check.0.delay_loop", "20"),
 					resource.TestCheckResourceAttr(resourceName, "health_check.0.host_header", "usacloud.jp-upd"),
 					resource.TestCheckResourceAttr(resourceName, "server.#", "0"),
@@ -167,6 +170,7 @@ func TestAccImportSakuraCloudGSLB_basic(t *testing.T) {
 			"health_check.0.protocol":    "http",
 			"health_check.0.delay_loop":  "10",
 			"health_check.0.host_header": "usacloud.jp",
+			"health_check.0.port":        "80",
 			"health_check.0.path":        "/",
 			"health_check.0.status":      "200",
 			"weighted":                   "false",
@@ -212,6 +216,7 @@ resource "sakuracloud_gslb" "foobar" {
     protocol    = "http"
     delay_loop  = 10
     host_header = "usacloud.jp"
+    port        = "80"
     path        = "/"
     status      = "200"
   }
@@ -244,6 +249,7 @@ resource "sakuracloud_gslb" "foobar" {
     protocol    = "https"
     delay_loop  = 20
     host_header = "usacloud.jp-upd"
+    port        = "443"
     path        = "/"
     status      = "200"
   }
@@ -269,6 +275,7 @@ resource "sakuracloud_gslb" "foobar" {
     protocol    = "https"
     delay_loop  = 20
     host_header = "usacloud.jp-upd"
+    port        = "443"
     path        = "/"
     status      = "200"
   }

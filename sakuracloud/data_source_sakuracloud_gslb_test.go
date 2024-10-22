@@ -37,6 +37,7 @@ func TestAccSakuraCloudDataSourceGSLB_basic(t *testing.T) {
 					resource.TestCheckResourceAttr(resourceName, "health_check.0.protocol", "http"),
 					resource.TestCheckResourceAttr(resourceName, "health_check.0.delay_loop", "10"),
 					resource.TestCheckResourceAttr(resourceName, "health_check.0.host_header", "usacloud.jp"),
+					resource.TestCheckResourceAttr(resourceName, "health_check.0.port", "80"),
 					resource.TestCheckResourceAttr(resourceName, "health_check.0.path", "/"),
 					resource.TestCheckResourceAttr(resourceName, "health_check.0.status", "200"),
 					resource.TestCheckResourceAttr(resourceName, "sorry_server", "8.8.8.8"),
@@ -57,6 +58,7 @@ resource "sakuracloud_gslb" "foobar" {
     protocol    = "http"
     delay_loop  = 10
     host_header = "usacloud.jp"
+    port        = "80"
     path        = "/"
     status      = "200"
   }
