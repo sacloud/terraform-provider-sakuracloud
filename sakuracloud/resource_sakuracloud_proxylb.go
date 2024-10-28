@@ -447,6 +447,31 @@ func resourceSakuraCloudProxyLB() *schema.Resource {
 					},
 				},
 			},
+			"letsencrypt": {
+				Type:     schema.TypeList,
+				Computed: true,
+				Elem: &schema.Resource{
+					Schema: map[string]*schema.Schema{
+						"enabled": {
+							Type:        schema.TypeBool,
+							Computed:    true,
+							Description: "The flag to accept the current Let's Encrypt terms of service(see: https://letsencrypt.org/repository/). This must be set `true` explicitly",
+						},
+						"common_name": {
+							Type:        schema.TypeString,
+							Computed:    true,
+							Description: "The common name of the certificate",
+						},
+						"subject_alt_names": {
+							Type:        schema.TypeSet,
+							Elem:        &schema.Schema{Type: schema.TypeString},
+							Set:         schema.HashString,
+							Computed:    true,
+							Description: "The subject alternative names of the certificate",
+						},
+					},
+				},
+			},
 			"icon_id":     schemaResourceIconID(resourceName),
 			"description": schemaResourceDescription(resourceName),
 			"tags":        schemaResourceTags(resourceName),
@@ -603,6 +628,7 @@ func setProxyLBResourceData(ctx context.Context, d *schema.ResourceData, client 
 		// even if certificate is deleted, it will not result in an error
 		return diag.FromErr(err)
 	}
+
 	health, err := proxyLBOp.HealthStatus(ctx, data.ID)
 	if err != nil {
 		return diag.FromErr(err)
@@ -640,6 +666,9 @@ func setProxyLBResourceData(ctx context.Context, d *schema.ResourceData, client 
 		return diag.FromErr(err)
 	}
 	if err := d.Set("rule", flattenProxyLBRules(data)); err != nil {
+		return diag.FromErr(err)
+	}
+	if err := d.Set("letsencrypt", flattenProxyLBACMESetting(data)); err != nil {
 		return diag.FromErr(err)
 	}
 	if err := d.Set("certificate", flattenProxyLBCerts(certs)); err != nil {
