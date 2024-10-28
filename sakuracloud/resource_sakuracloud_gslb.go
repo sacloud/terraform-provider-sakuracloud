@@ -92,7 +92,7 @@ func resourceSakuraCloudGSLB() *schema.Resource {
 						"port": {
 							Type:        schema.TypeInt,
 							Optional:    true,
-							Description: "The port number used when checking by TCP",
+							Description: "The port number used when checking by TCP/HTTP/HTTPS",
 						},
 					},
 				},
