@@ -6,7 +6,7 @@
 #    }
 #    sakuracloud = {
 #      source  = "sacloud/sakuracloud"
-#      version = "2.25.4"
+#      version = "2.25.5"
 #    }
 #  }
 #}
@@ -130,4 +130,3 @@ resource "sakuracloud_certificate_authority" "foobar" {
     csr                   = tls_cert_request.server_csr.cert_request_pem
   }
 }
-
