@@ -298,7 +298,7 @@ func resourceSakuraCloudVPCRouter() *schema.Resource {
 									"description": {
 										Type:             schema.TypeString,
 										Optional:         true,
-										ValidateDiagFunc: validation.ToDiagFunc(isValidLengthBetween(0, 512)),
+										ValidateDiagFunc: isValidLengthBetween(0, 512),
 										Description:      desc.Sprintf("The description of the expression. %s", desc.Length(0, 512)),
 									},
 								},
@@ -370,7 +370,7 @@ func resourceSakuraCloudVPCRouter() *schema.Resource {
 						"description": {
 							Type:             schema.TypeString,
 							Optional:         true,
-							ValidateDiagFunc: validation.ToDiagFunc(isValidLengthBetween(0, 512)),
+							ValidateDiagFunc: isValidLengthBetween(0, 512),
 							Description:      desc.Sprintf("The description of the port forwarding. %s", desc.Length(0, 512)),
 						},
 					},
@@ -591,7 +591,7 @@ func resourceSakuraCloudVPCRouter() *schema.Resource {
 						"description": {
 							Type:             schema.TypeString,
 							Optional:         true,
-							ValidateDiagFunc: validation.ToDiagFunc(isValidLengthBetween(0, 512)),
+							ValidateDiagFunc: isValidLengthBetween(0, 512),
 							Description:      desc.Sprintf("The description of the static nat. %s", desc.Length(0, 512)),
 						},
 					},

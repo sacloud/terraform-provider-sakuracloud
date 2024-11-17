@@ -193,8 +193,17 @@ func validateHostName() schema.SchemaValidateDiagFunc {
 				return warnings, errors
 			}
 
+			validateLengthFunc := func(v interface{}, k string) ([]string, []error) {
+				if value, ok := v.(string); ok {
+					if len(value) < 1 || len(value) > 64 {
+						return nil, []error{fmt.Errorf("hostname must be between 1 and 64 characters")}
+					}
+				}
+				return nil, nil
+			}
+
 			return validation.All(
-				isValidLengthBetween(1, 64),
+				validateLengthFunc,
 				validateFormatFunc,
 			)(v, k)
 		}
@@ -210,8 +219,8 @@ func isValidHostName(hostname string) bool {
 	return regexp.MustCompile(`^(?i)([a-z0-9]+(-[a-z0-9]+)*)(\.[a-z0-9]+(-[a-z0-9]+)*)*$`).MatchString(hostname)
 }
 
-func isValidLengthBetween(minVal, maxVal int) schema.SchemaValidateFunc {
-	return func(i interface{}, k string) (warnings []string, errors []error) {
+func isValidLengthBetween(minVal, maxVal int) schema.SchemaValidateDiagFunc {
+	return validation.ToDiagFunc(func(i interface{}, k string) (warnings []string, errors []error) {
 		v, ok := i.(string)
 
 		if !ok {
@@ -224,5 +233,5 @@ func isValidLengthBetween(minVal, maxVal int) schema.SchemaValidateFunc {
 		}
 
 		return warnings, errors
-	}
+	})
 }

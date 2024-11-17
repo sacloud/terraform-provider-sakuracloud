@@ -17,6 +17,7 @@ package sakuracloud
 import (
 	"testing"
 
+	"github.com/hashicorp/go-cty/cty"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -126,12 +127,12 @@ func Test_isValidLengthBetween(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			_, errors := validateFunc(tt.input, "test_field")
+			diagnostics := validateFunc(tt.input, cty.Path{cty.GetAttrStep{Name: "test_field"}})
 
 			if tt.want {
-				assert.NotEmpty(t, errors, "Expected validation errors but got none")
+				assert.NotEmpty(t, diagnostics, "Expected validation errors but got none")
 			} else {
-				assert.Empty(t, errors, "Expected no validation errors but got some")
+				assert.Empty(t, diagnostics, "Expected no validation errors but got some")
 			}
 		})
 	}
