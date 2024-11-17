@@ -79,8 +79,8 @@ func Test_isValidHostName(t *testing.T) {
 	}
 }
 
-func Test_isValidNameLengthBetween(t *testing.T) {
-	validateFunc := isValidNameLengthBetween(3, 64)
+func Test_isValidLengthBetween(t *testing.T) {
+	validateFunc := isValidLengthBetween(3, 64)
 
 	tests := []struct {
 		name  string
