@@ -43,7 +43,7 @@ func resourceSakuraCloudSSHKeyGen() *schema.Resource {
 				Type:             schema.TypeString,
 				Required:         true,
 				ForceNew:         true,
-				ValidateDiagFunc: validation.ToDiagFunc(validation.StringLenBetween(1, 64)),
+				ValidateDiagFunc: validation.ToDiagFunc(isValidNameLengthBetween(1, 64)),
 				Description:      desc.Sprintf("The name of the %s. %s", resourceName, desc.Length(1, 64)),
 			},
 			"description": {

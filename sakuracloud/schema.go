@@ -32,7 +32,7 @@ func schemaResourceName(resourceName string) *schema.Schema {
 	return &schema.Schema{
 		Type:             schema.TypeString,
 		Required:         true,
-		ValidateDiagFunc: validation.ToDiagFunc(validation.StringLenBetween(1, 64)),
+		ValidateDiagFunc: validation.ToDiagFunc(isValidNameLengthBetween(1, 64)),
 		Description:      desc.Sprintf("The name of the %s. %s", resourceName, desc.Length(1, 64)),
 	}
 }
