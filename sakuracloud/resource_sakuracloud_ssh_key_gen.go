@@ -20,7 +20,6 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
-	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
 	"github.com/sacloud/iaas-api-go"
 	"github.com/sacloud/terraform-provider-sakuracloud/internal/desc"
 )
@@ -57,7 +56,7 @@ func resourceSakuraCloudSSHKeyGen() *schema.Resource {
 				Type:             schema.TypeString,
 				Optional:         true,
 				ForceNew:         true,
-				ValidateDiagFunc: validation.ToDiagFunc(validation.StringLenBetween(8, 64)),
+				ValidateDiagFunc: isValidLengthBetween(8, 64),
 				Description: desc.Sprintf(
 					"The pass phrase of the private key. %s",
 					desc.Length(8, 64),

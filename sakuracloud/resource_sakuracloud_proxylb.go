@@ -333,7 +333,7 @@ func resourceSakuraCloudProxyLB() *schema.Resource {
 						"group": {
 							Type:             schema.TypeString,
 							Optional:         true,
-							ValidateDiagFunc: validation.ToDiagFunc(validation.StringLenBetween(1, 10)),
+							ValidateDiagFunc: isValidLengthBetween(1, 10),
 							Description: desc.Sprintf(
 								"The name of load balancing group. This is used when using rule-based load balancing. %s",
 								desc.Length(1, 10),
@@ -391,7 +391,7 @@ func resourceSakuraCloudProxyLB() *schema.Resource {
 						"group": {
 							Type:             schema.TypeString,
 							Optional:         true,
-							ValidateDiagFunc: validation.ToDiagFunc(validation.StringLenBetween(1, 10)),
+							ValidateDiagFunc: isValidLengthBetween(1, 10),
 							Description: desc.Sprintf(
 								"The name of load balancing group. When proxyLB received request which matched to `host` and `path`, proxyLB forwards the request to servers that having same group name. %s",
 								desc.Length(1, 10),

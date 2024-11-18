@@ -317,7 +317,7 @@ func resourceSakuraCloudVPCRouter() *schema.Resource {
 							Type:             schema.TypeString,
 							Required:         true,
 							Sensitive:        true,
-							ValidateDiagFunc: validation.ToDiagFunc(validation.StringLenBetween(0, 40)),
+							ValidateDiagFunc: isValidLengthBetween(0, 40),
 							Description:      "The pre shared secret for L2TP/IPsec",
 						},
 						"range_start": {
@@ -458,7 +458,7 @@ func resourceSakuraCloudVPCRouter() *schema.Resource {
 							Type:             schema.TypeString,
 							Required:         true,
 							Sensitive:        true,
-							ValidateDiagFunc: validation.ToDiagFunc(validation.StringLenBetween(0, 40)),
+							ValidateDiagFunc: isValidLengthBetween(0, 40),
 							Description:      desc.Sprintf("The pre shared secret for the VPN. %s", desc.Length(0, 40)),
 						},
 						"routes": {
@@ -651,14 +651,14 @@ func resourceSakuraCloudVPCRouter() *schema.Resource {
 						"name": {
 							Type:             schema.TypeString,
 							Required:         true,
-							ValidateDiagFunc: validation.ToDiagFunc(validation.StringLenBetween(1, 20)),
+							ValidateDiagFunc: isValidLengthBetween(1, 20),
 							Description:      "The user name used to authenticate remote access",
 						},
 						"password": {
 							Type:             schema.TypeString,
 							Required:         true,
 							Sensitive:        true,
-							ValidateDiagFunc: validation.ToDiagFunc(validation.StringLenBetween(1, 20)),
+							ValidateDiagFunc: isValidLengthBetween(1, 20),
 							Description:      "The password used to authenticate remote access",
 						},
 					},
