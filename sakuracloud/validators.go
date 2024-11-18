@@ -23,6 +23,7 @@ import (
 	"strings"
 
 	"github.com/goccy/go-yaml"
+	"github.com/hashicorp/go-cty/cty"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
 	autoScaler "github.com/sacloud/autoscaler/core"
@@ -193,13 +194,15 @@ func validateHostName() schema.SchemaValidateDiagFunc {
 				return warnings, errors
 			}
 
-			validateLengthFunc := func(v interface{}, k string) ([]string, []error) {
-				if value, ok := v.(string); ok {
-					if len(value) < 1 || len(value) > 64 {
-						return nil, []error{fmt.Errorf("hostname must be between 1 and 64 characters")}
-					}
+			validateLengthFunc := func(_ interface{}, _ string) (warnings []string, errors []error) {
+				lengthValidator := isValidLengthBetween(1, 64)
+
+				diagnostics := lengthValidator(value, cty.Path{cty.GetAttrStep{Name: "hostname"}})
+
+				if len(diagnostics) > 0 {
+					errors = append(errors, fmt.Errorf("hostname must be between 1 and 64 characters"))
 				}
-				return nil, nil
+				return warnings, errors
 			}
 
 			return validation.All(
