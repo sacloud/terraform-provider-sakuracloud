@@ -60,7 +60,7 @@ func resourceSakuraCloudContainerRegistry() *schema.Resource {
 				Type:             schema.TypeString,
 				Required:         true,
 				ForceNew:         true,
-				ValidateDiagFunc: validation.ToDiagFunc(validation.StringLenBetween(1, 64)),
+				ValidateDiagFunc: isValidLengthBetween(1, 64),
 				Description: desc.Sprintf(
 					"The label at the lowest of the FQDN used when be accessed from users. %s",
 					desc.Length(1, 64),
