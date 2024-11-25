@@ -112,7 +112,7 @@ func (c *Config) loadFromProfile() error {
 	if c.AccessTokenSecret == "" {
 		c.AccessTokenSecret = pcv.AccessTokenSecret
 	}
-	if c.ExplicitZone == false && (c.Zone == "" || c.Zone == defaults.Zone) && pcv.Zone != "" {
+	if !c.ExplicitZone && (c.Zone == "" || c.Zone == defaults.Zone) && pcv.Zone != "" {
 		c.Zone = pcv.Zone
 	}
 
