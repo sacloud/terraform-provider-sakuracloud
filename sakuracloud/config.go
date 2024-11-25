@@ -58,6 +58,7 @@ type Config struct {
 	Zone                string
 	Zones               []string
 	DefaultZone         string
+	ExplicitZone        bool
 	TraceMode           string
 	FakeMode            string
 	FakeStorePath       string
@@ -111,7 +112,7 @@ func (c *Config) loadFromProfile() error {
 	if c.AccessTokenSecret == "" {
 		c.AccessTokenSecret = pcv.AccessTokenSecret
 	}
-	if (c.Zone == "" || c.Zone == defaults.Zone) && pcv.Zone != "" {
+	if c.ExplicitZone == false && (c.Zone == "" || c.Zone == defaults.Zone) && pcv.Zone != "" {
 		c.Zone = pcv.Zone
 	}
 
