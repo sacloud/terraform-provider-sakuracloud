@@ -32,7 +32,7 @@ func TestAccSakuraCloudPrivateHost_basic(t *testing.T) {
 	rand := randomName()
 
 	var privateHost iaas.PrivateHost
-	resource.ParallelTest(t, resource.TestCase{
+	resource.Test(t, resource.TestCase{
 		PreCheck:          func() { testAccPreCheck(t) },
 		ProviderFactories: testAccProviderFactories,
 		CheckDestroy: resource.ComposeTestCheckFunc(
@@ -84,7 +84,7 @@ func TestAccSakuraCloudPrivateHost_windows(t *testing.T) {
 	rand := randomName()
 
 	var privateHost iaas.PrivateHost
-	resource.ParallelTest(t, resource.TestCase{
+	resource.Test(t, resource.TestCase{
 		PreCheck:          func() { testAccPreCheck(t) },
 		ProviderFactories: testAccProviderFactories,
 		CheckDestroy: resource.ComposeTestCheckFunc(
@@ -117,7 +117,7 @@ func TestAccSakuraCloudPrivateHost_destroyWithRunningServer(t *testing.T) {
 	rand := randomName()
 
 	var privateHost iaas.PrivateHost
-	resource.ParallelTest(t, resource.TestCase{
+	resource.Test(t, resource.TestCase{
 		PreCheck:          func() { testAccPreCheck(t) },
 		ProviderFactories: testAccProviderFactories,
 		CheckDestroy: resource.ComposeTestCheckFunc(

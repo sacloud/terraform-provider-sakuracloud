@@ -15,38 +15,58 @@
 package sakuracloud
 
 import (
+	"fmt"
+	"os"
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
 )
 
-func TestAccSakuraCloudDataSourceBridge_basic(t *testing.T) {
-	resourceName := "data.sakuracloud_bridge.foobar"
-	rand := randomName()
+func TestAccResourceSakuraCloudWebAccelACL_basic(t *testing.T) {
+	envKeys := []string{
+		envWebAccelSiteName,
+	}
+	for _, k := range envKeys {
+		if os.Getenv(k) == "" {
+			t.Skipf("ENV %q is requilred. skip", k)
+			return
+		}
+	}
+
+	siteName := os.Getenv(envWebAccelSiteName)
 
 	resource.Test(t, resource.TestCase{
 		PreCheck:          func() { testAccPreCheck(t) },
 		ProviderFactories: testAccProviderFactories,
+		CheckDestroy: func(*terraform.State) error {
+			return nil
+		},
 		Steps: []resource.TestStep{
 			{
-				Config: buildConfigWithArgs(testAccSakuraCloudDataSourceBridge_basic, rand),
+				Config: testAccCheckSakuraCloudWebAccelACLConfig(siteName),
 				Check: resource.ComposeTestCheckFunc(
-					testCheckSakuraCloudDataSourceExists(resourceName),
-					resource.TestCheckResourceAttr(resourceName, "name", rand),
-					resource.TestCheckResourceAttr(resourceName, "description", "description"),
+					resource.TestCheckResourceAttr("sakuracloud_webaccel_acl.foobar", "acl", "deny 192.0.2.5/25\ndeny 198.51.100.0\nallow all"),
 				),
 			},
 		},
 	})
 }
 
-var testAccSakuraCloudDataSourceBridge_basic = `
-resource "sakuracloud_bridge" "foobar" {
-  name        = "{{ .arg0 }}"
-  description = "description"
+func testAccCheckSakuraCloudWebAccelACLConfig(siteName string) string {
+	tmpl := `
+data sakuracloud_webaccel "site" {
+  name = "%s"
 }
-data "sakuracloud_bridge" "foobar" {
-  filter {
-    names = [sakuracloud_bridge.foobar.name]
-  }
-}`
+resource sakuracloud_webaccel_acl "foobar" {
+  site_id = data.sakuracloud_webaccel.site.id
+
+  acl = join("\n", [
+    "deny 192.0.2.5/25",
+    "deny 198.51.100.0",
+    "allow all",
+  ])
+}
+`
+	return fmt.Sprintf(tmpl, siteName)
+}

@@ -41,7 +41,7 @@ func TestAccSakuraCloudProxyLBACME_basic(t *testing.T) {
 
 	var proxylb iaas.ProxyLB
 	resourceName := "sakuracloud_proxylb_acme.foobar"
-	resource.ParallelTest(t, resource.TestCase{
+	resource.Test(t, resource.TestCase{
 		PreCheck:          func() { testAccPreCheck(t) },
 		ProviderFactories: testAccProviderFactories,
 		CheckDestroy: resource.ComposeTestCheckFunc(
@@ -57,6 +57,7 @@ func TestAccSakuraCloudProxyLBACME_basic(t *testing.T) {
 					testCheckSakuraCloudProxyLBExists("sakuracloud_proxylb.foobar", &proxylb),
 					resource.TestCheckResourceAttr("sakuracloud_proxylb.foobar", "gzip", "true"),
 					resource.TestCheckResourceAttr("sakuracloud_proxylb.foobar", "proxy_protocol", "true"),
+					resource.TestCheckResourceAttr("sakuracloud_proxylb.foobar", "backend_http_keep_alive", "aggressive"),
 					resource.TestCheckResourceAttr("sakuracloud_proxylb.foobar", "rule.#", "1"),
 					resource.TestCheckResourceAttr(resourceName, "certificate.#", "1"),
 					resource.TestCheckResourceAttr(resourceName, "certificate.0.common_name", subDomain+"."+proxyLBDomain),
@@ -77,6 +78,8 @@ resource "sakuracloud_proxylb" "foobar" {
   vip_failover   = true
   gzip           = true
   proxy_protocol = true
+
+  backend_http_keep_alive = "aggressive"
 
   health_check {
     protocol    = "http"

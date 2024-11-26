@@ -98,6 +98,7 @@ func resourceSakuraCloudProxyLBACME() *schema.Resource {
 						"private_key": {
 							Type:        schema.TypeString,
 							Computed:    true,
+							Sensitive:   true,
 							Description: "The private key for a server",
 						},
 						"common_name": {
@@ -128,6 +129,7 @@ func resourceSakuraCloudProxyLBACME() *schema.Resource {
 									"private_key": {
 										Type:        schema.TypeString,
 										Computed:    true,
+										Sensitive:   true,
 										Description: "The private key for a server",
 									},
 								},
@@ -179,18 +181,19 @@ func resourceSakuraCloudProxyLBACMECreate(ctx context.Context, d *schema.Resourc
 	}
 
 	proxyLB, err = proxyLBOp.UpdateSettings(ctx, proxyLB.ID, &iaas.ProxyLBUpdateSettingsRequest{
-		HealthCheck:   proxyLB.HealthCheck,
-		SorryServer:   proxyLB.SorryServer,
-		BindPorts:     proxyLB.BindPorts,
-		Servers:       proxyLB.Servers,
-		Rules:         proxyLB.Rules,
-		LetsEncrypt:   le,
-		StickySession: proxyLB.StickySession,
-		Timeout:       proxyLB.Timeout,
-		Gzip:          proxyLB.Gzip,
-		ProxyProtocol: proxyLB.ProxyProtocol,
-		Syslog:        proxyLB.Syslog,
-		SettingsHash:  proxyLB.SettingsHash,
+		HealthCheck:          proxyLB.HealthCheck,
+		SorryServer:          proxyLB.SorryServer,
+		BindPorts:            proxyLB.BindPorts,
+		Servers:              proxyLB.Servers,
+		Rules:                proxyLB.Rules,
+		LetsEncrypt:          le,
+		StickySession:        proxyLB.StickySession,
+		Timeout:              proxyLB.Timeout,
+		Gzip:                 proxyLB.Gzip,
+		BackendHttpKeepAlive: proxyLB.BackendHttpKeepAlive,
+		ProxyProtocol:        proxyLB.ProxyProtocol,
+		Syslog:               proxyLB.Syslog,
+		SettingsHash:         proxyLB.SettingsHash,
 	})
 	if err != nil {
 		return diag.Errorf("setting ProxyLB[%s] ACME is failed: %s", proxyLBID, err)
@@ -199,7 +202,7 @@ func resourceSakuraCloudProxyLBACMECreate(ctx context.Context, d *schema.Resourc
 		return diag.Errorf("renewing ACME Certificates at ProxyLB[%s] is failed: %s", proxyLBID, err)
 	}
 
-	if diag := waitForProxyLBCertAcquision(ctx, d, meta); diag != nil {
+	if diag := waitForProxyLBCertAcquisition(ctx, d, meta); diag != nil {
 		return diag
 	}
 
@@ -214,7 +217,7 @@ func resourceSakuraCloudProxyLBACMERead(ctx context.Context, d *schema.ResourceD
 	}
 
 	proxyLBOp := iaas.NewProxyLBOp(client)
-	proxyLBID := d.Get("proxylb_id").(string)
+	proxyLBID := d.Id()
 
 	proxyLB, err := proxyLBOp.Read(ctx, sakuraCloudID(proxyLBID))
 	if err != nil {
@@ -255,12 +258,13 @@ func resourceSakuraCloudProxyLBACMEDelete(ctx context.Context, d *schema.Resourc
 		LetsEncrypt: &iaas.ProxyLBACMESetting{
 			Enabled: false,
 		},
-		StickySession: proxyLB.StickySession,
-		Timeout:       proxyLB.Timeout,
-		Gzip:          proxyLB.Gzip,
-		ProxyProtocol: proxyLB.ProxyProtocol,
-		Syslog:        proxyLB.Syslog,
-		SettingsHash:  proxyLB.SettingsHash,
+		StickySession:        proxyLB.StickySession,
+		Timeout:              proxyLB.Timeout,
+		Gzip:                 proxyLB.Gzip,
+		BackendHttpKeepAlive: proxyLB.BackendHttpKeepAlive,
+		ProxyProtocol:        proxyLB.ProxyProtocol,
+		Syslog:               proxyLB.Syslog,
+		SettingsHash:         proxyLB.SettingsHash,
 	})
 	if err != nil {
 		return diag.Errorf("clearing ACME Setting of ProxyLB[%s] is failed: %s", proxyLBID, err)
@@ -306,7 +310,7 @@ func setProxyLBACMEResourceData(ctx context.Context, d *schema.ResourceData, cli
 	return nil
 }
 
-func waitForProxyLBCertAcquision(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
+func waitForProxyLBCertAcquisition(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client, _, err := sakuraCloudClient(d, meta)
 	if err != nil {
 		return diag.FromErr(err)

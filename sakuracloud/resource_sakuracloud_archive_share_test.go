@@ -30,7 +30,7 @@ func TestAccSakuraCloudArchiveShare_basic(t *testing.T) {
 	resourceName := "sakuracloud_archive_share.foobar"
 	rand := randomName()
 
-	resource.ParallelTest(t, resource.TestCase{
+	resource.Test(t, resource.TestCase{
 		PreCheck:          func() { testAccPreCheck(t) },
 		ProviderFactories: testAccProviderFactories,
 		CheckDestroy: resource.ComposeTestCheckFunc(

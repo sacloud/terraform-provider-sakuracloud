@@ -30,7 +30,7 @@ func TestAccSakuraCloudSimpleMonitor_basic(t *testing.T) {
 	zone := randomName() + ".com"
 
 	var monitor iaas.SimpleMonitor
-	resource.ParallelTest(t, resource.TestCase{
+	resource.Test(t, resource.TestCase{
 		PreCheck:          func() { testAccPreCheck(t) },
 		ProviderFactories: testAccProviderFactories,
 		CheckDestroy:      testCheckSakuraCloudSimpleMonitorDestroy,
@@ -90,7 +90,7 @@ func TestAccSakuraCloudSimpleMonitor_certMonitor(t *testing.T) {
 	zone := randomName() + ".com"
 
 	var monitor iaas.SimpleMonitor
-	resource.ParallelTest(t, resource.TestCase{
+	resource.Test(t, resource.TestCase{
 		PreCheck:          func() { testAccPreCheck(t) },
 		ProviderFactories: testAccProviderFactories,
 		CheckDestroy:      testCheckSakuraCloudSimpleMonitorDestroy,

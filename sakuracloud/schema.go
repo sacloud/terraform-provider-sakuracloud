@@ -32,7 +32,7 @@ func schemaResourceName(resourceName string) *schema.Schema {
 	return &schema.Schema{
 		Type:             schema.TypeString,
 		Required:         true,
-		ValidateDiagFunc: validation.ToDiagFunc(validation.StringLenBetween(1, 64)),
+		ValidateDiagFunc: isValidLengthBetween(1, 64),
 		Description:      desc.Sprintf("The name of the %s. %s", resourceName, desc.Length(1, 64)),
 	}
 }
@@ -99,7 +99,7 @@ func schemaResourceDescription(resourceName string) *schema.Schema {
 	return &schema.Schema{
 		Type:             schema.TypeString,
 		Optional:         true,
-		ValidateDiagFunc: validation.ToDiagFunc(validation.StringLenBetween(1, 512)),
+		ValidateDiagFunc: isValidLengthBetween(1, 512),
 		Description:      desc.Sprintf("The description of the %s. %s", resourceName, desc.Length(1, 512)),
 	}
 }
@@ -231,20 +231,6 @@ func schemaDataSourceIntPlan(resourceName string, plans []int) *schema.Schema {
 		Computed:    true,
 		Description: desc.DataSourcePlan(resourceName, plans),
 	}
-}
-
-func schemaResourceIntPlan(resourceName string, defaultValue int, plans []int) *schema.Schema {
-	s := &schema.Schema{
-		Type:             schema.TypeInt,
-		Optional:         true,
-		ForceNew:         true,
-		Description:      desc.ResourcePlan(resourceName, plans),
-		ValidateDiagFunc: validation.ToDiagFunc(validation.IntInSlice(plans)),
-	}
-	if defaultValue > 0 {
-		s.Default = defaultValue
-	}
-	return s
 }
 
 func schemaDataSourceClass(resourceName string, classes []string) *schema.Schema {

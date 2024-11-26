@@ -215,6 +215,7 @@ func dataSourceSakuraCloudProxyLB() *schema.Resource {
 						"private_key": {
 							Type:        schema.TypeString,
 							Computed:    true,
+							Sensitive:   true,
 							Description: "The private key for a server",
 						},
 						"common_name": {
@@ -245,6 +246,7 @@ func dataSourceSakuraCloudProxyLB() *schema.Resource {
 									"private_key": {
 										Type:        schema.TypeString,
 										Computed:    true,
+										Sensitive:   true,
 										Description: "The private key for a server",
 									},
 								},
@@ -367,6 +369,31 @@ func dataSourceSakuraCloudProxyLB() *schema.Resource {
 							Type:        schema.TypeString,
 							Computed:    true,
 							Description: "Content body for fixed response sent when requests matches the rule",
+						},
+					},
+				},
+			},
+			"letsencrypt": {
+				Type:     schema.TypeList,
+				Computed: true,
+				Elem: &schema.Resource{
+					Schema: map[string]*schema.Schema{
+						"enabled": {
+							Type:        schema.TypeBool,
+							Computed:    true,
+							Description: "The flag to accept the current Let's Encrypt terms of service(see: https://letsencrypt.org/repository/). This must be set `true` explicitly",
+						},
+						"common_name": {
+							Type:        schema.TypeString,
+							Computed:    true,
+							Description: "The common name of the certificate",
+						},
+						"subject_alt_names": {
+							Type:        schema.TypeSet,
+							Elem:        &schema.Schema{Type: schema.TypeString},
+							Set:         schema.HashString,
+							Computed:    true,
+							Description: "The subject alternative names of the certificate",
 						},
 					},
 				},

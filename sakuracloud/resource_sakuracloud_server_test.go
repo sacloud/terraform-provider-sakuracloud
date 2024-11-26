@@ -37,7 +37,7 @@ func TestAccSakuraCloudServer_basic(t *testing.T) {
 	password := randomPassword()
 
 	var server iaas.Server
-	resource.ParallelTest(t, resource.TestCase{
+	resource.Test(t, resource.TestCase{
 		PreCheck:          func() { testAccPreCheck(t) },
 		ProviderFactories: testAccProviderFactories,
 		CheckDestroy:      testCheckSakuraCloudServerDestroy,
@@ -106,7 +106,7 @@ func TestAccSakuraCloudServer_basic(t *testing.T) {
 func TestAccSakuraCloudServer_validateHostName(t *testing.T) {
 	rand := randomName()
 
-	resource.ParallelTest(t, resource.TestCase{
+	resource.Test(t, resource.TestCase{
 		PreCheck:          func() { testAccPreCheck(t) },
 		ProviderFactories: testAccProviderFactories,
 		CheckDestroy:      testCheckSakuraCloudServerDestroy,
@@ -125,7 +125,7 @@ func TestAccSakuraCloudServer_planChange(t *testing.T) {
 	password := randomPassword()
 
 	var step1, step2, step3 iaas.Server
-	resource.ParallelTest(t, resource.TestCase{
+	resource.Test(t, resource.TestCase{
 		PreCheck:          func() { testAccPreCheck(t) },
 		ProviderFactories: testAccProviderFactories,
 		CheckDestroy:      testCheckSakuraCloudServerDestroy,
@@ -182,7 +182,7 @@ func TestAccSakuraCloudServer_planChangeByOutsideOfTerraform(t *testing.T) {
 	password := randomPassword()
 
 	var step1, step2, step3 iaas.Server
-	resource.ParallelTest(t, resource.TestCase{
+	resource.Test(t, resource.TestCase{
 		PreCheck:          func() { testAccPreCheck(t) },
 		ProviderFactories: testAccProviderFactories,
 		CheckDestroy:      testCheckSakuraCloudServerDestroy,
@@ -248,7 +248,7 @@ func TestAccSakuraCloudServer_withoutShutdown(t *testing.T) {
 	password := randomPassword()
 
 	var created, updated, editParamChanged iaas.Server
-	resource.ParallelTest(t, resource.TestCase{
+	resource.Test(t, resource.TestCase{
 		PreCheck:          func() { testAccPreCheck(t) },
 		ProviderFactories: testAccProviderFactories,
 		CheckDestroy:      testCheckSakuraCloudServerDestroy,
@@ -296,7 +296,7 @@ func TestAccSakuraCloudServer_interfaces(t *testing.T) {
 	rand := randomName()
 
 	var server iaas.Server
-	resource.ParallelTest(t, resource.TestCase{
+	resource.Test(t, resource.TestCase{
 		PreCheck:          func() { testAccPreCheck(t) },
 		ProviderFactories: testAccProviderFactories,
 		CheckDestroy:      testCheckSakuraCloudServerDestroy,
@@ -345,7 +345,7 @@ func TestAccSakuraCloudServer_packetFilter(t *testing.T) {
 	resourceName := "sakuracloud_server.foobar"
 	rand := randomName()
 
-	resource.ParallelTest(t, resource.TestCase{
+	resource.Test(t, resource.TestCase{
 		PreCheck:          func() { testAccPreCheck(t) },
 		ProviderFactories: testAccProviderFactories,
 		CheckDestroy:      testCheckSakuraCloudServerDestroy,
@@ -390,7 +390,7 @@ func TestAccSakuraCloudServer_withBlankDisk(t *testing.T) {
 	rand := randomName()
 
 	var server iaas.Server
-	resource.ParallelTest(t, resource.TestCase{
+	resource.Test(t, resource.TestCase{
 		PreCheck:          func() { testAccPreCheck(t) },
 		ProviderFactories: testAccProviderFactories,
 		CheckDestroy:      testCheckSakuraCloudServerDestroy,
@@ -411,7 +411,7 @@ func TestAccSakuraCloudServer_switch(t *testing.T) {
 	rand := randomName()
 
 	var server iaas.Server
-	resource.ParallelTest(t, resource.TestCase{
+	resource.Test(t, resource.TestCase{
 		PreCheck:          func() { testAccPreCheck(t) },
 		ProviderFactories: testAccProviderFactories,
 		CheckDestroy:      testCheckSakuraCloudServerDestroy,
@@ -436,7 +436,7 @@ func TestAccSakuraCloudServer_withGPU(t *testing.T) {
 	rand := randomName()
 
 	var server iaas.Server
-	resource.ParallelTest(t, resource.TestCase{
+	resource.Test(t, resource.TestCase{
 		PreCheck:          func() { testAccPreCheck(t) },
 		ProviderFactories: testAccProviderFactories,
 		CheckDestroy:      testCheckSakuraCloudServerDestroy,
@@ -461,7 +461,7 @@ func TestAccSakuraCloudServer_withAMDPlan(t *testing.T) {
 	rand := randomName()
 
 	var server iaas.Server
-	resource.ParallelTest(t, resource.TestCase{
+	resource.Test(t, resource.TestCase{
 		PreCheck:          func() { testAccPreCheck(t) },
 		ProviderFactories: testAccProviderFactories,
 		CheckDestroy:      testCheckSakuraCloudServerDestroy,
@@ -491,7 +491,7 @@ func TestAccSakuraCloudServer_cloudInit(t *testing.T) {
 	diskID := os.Getenv(envCloudInitDiskID)
 
 	var created, updated, userDataChanged iaas.Server
-	resource.ParallelTest(t, resource.TestCase{
+	resource.Test(t, resource.TestCase{
 		PreCheck:          func() { testAccPreCheck(t) },
 		ProviderFactories: testAccProviderFactories,
 		CheckDestroy:      testCheckSakuraCloudServerDestroy,

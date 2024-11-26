@@ -33,7 +33,7 @@ func TestAccSakuraCloudCDROM_basic(t *testing.T) {
 	rand := randomName()
 
 	var cdrom iaas.CDROM
-	resource.ParallelTest(t, resource.TestCase{
+	resource.Test(t, resource.TestCase{
 		PreCheck:          func() { testAccPreCheck(t) },
 		ProviderFactories: testAccProviderFactories,
 		CheckDestroy: resource.ComposeTestCheckFunc(
@@ -46,7 +46,7 @@ func TestAccSakuraCloudCDROM_basic(t *testing.T) {
 				Check: resource.ComposeTestCheckFunc(
 					testCheckSakuraCloudCDROMExists(resourceName, &cdrom),
 					resource.TestCheckResourceAttr(resourceName, "name", rand),
-					resource.TestCheckResourceAttr(resourceName, "size", "5"),
+					resource.TestCheckResourceAttr(resourceName, "size", "20"),
 					resource.TestCheckResourceAttrPair(
 						resourceName, "icon_id",
 						"sakuracloud_icon.foobar", "id",
@@ -61,7 +61,7 @@ func TestAccSakuraCloudCDROM_basic(t *testing.T) {
 				Config: buildConfigWithArgs(testAccSakuraCloudCDROM_update, rand),
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttr(resourceName, "name", rand+"-upd"),
-					resource.TestCheckResourceAttr(resourceName, "size", "5"),
+					resource.TestCheckResourceAttr(resourceName, "size", "20"),
 					resource.TestCheckResourceAttr(resourceName, "icon_id", ""),
 					resource.TestCheckResourceAttr(resourceName, "iso_image_file", "test/dummy-upd.iso"),
 					resource.TestCheckResourceAttr(resourceName, "description", "description-upd"),
@@ -79,7 +79,7 @@ func TestAccSakuraCloudCDROM_textContent(t *testing.T) {
 	resourceName := "sakuracloud_cdrom.foobar"
 	rand := randomName()
 
-	resource.ParallelTest(t, resource.TestCase{
+	resource.Test(t, resource.TestCase{
 		PreCheck:          func() { testAccPreCheck(t) },
 		ProviderFactories: testAccProviderFactories,
 		CheckDestroy:      testCheckSakuraCloudCDROMDestroy,
@@ -165,7 +165,7 @@ func TestAccImportSakuraCloudCDROM_basic(t *testing.T) {
 		}
 		expects := map[string]string{
 			"name":        rand,
-			"size":        "5",
+			"size":        "20",
 			"description": "description",
 			"tags.0":      "tag1",
 			"tags.1":      "tag2",
@@ -180,7 +180,7 @@ func TestAccImportSakuraCloudCDROM_basic(t *testing.T) {
 
 	resourceName := "sakuracloud_cdrom.foobar"
 
-	resource.ParallelTest(t, resource.TestCase{
+	resource.Test(t, resource.TestCase{
 		PreCheck:          func() { testAccPreCheck(t) },
 		ProviderFactories: testAccProviderFactories,
 		CheckDestroy: resource.ComposeTestCheckFunc(
@@ -210,7 +210,7 @@ func TestAccImportSakuraCloudCDROM_basic(t *testing.T) {
 var testAccSakuraCloudCDROM_basic = `
 resource "sakuracloud_cdrom" "foobar" {
   name           = "{{ .arg0 }}"
-  size           = 5
+  size           = 20
   iso_image_file = "test/dummy.iso"
   description    = "description"
   tags           = ["tag1", "tag2"]
@@ -226,7 +226,7 @@ resource "sakuracloud_icon" "foobar" {
 var testAccSakuraCloudCDROM_update = `
 resource "sakuracloud_cdrom" "foobar" {
   name           = "{{ .arg0 }}-upd"
-  size           = 5
+  size           = 20
   iso_image_file = "test/dummy-upd.iso"
   description    = "description-upd"
   tags           = ["tag1-upd", "tag2-upd"]

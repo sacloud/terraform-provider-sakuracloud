@@ -41,7 +41,7 @@ func TestAccSakuraCloudDataSourceWebAccel_ByName(t *testing.T) {
 
 	regexpNotEmpty := regexp.MustCompile(".+")
 
-	resource.ParallelTest(t, resource.TestCase{
+	resource.Test(t, resource.TestCase{
 		PreCheck:          func() { testAccPreCheck(t) },
 		ProviderFactories: testAccProviderFactories,
 		Steps: []resource.TestStep{
@@ -76,7 +76,7 @@ func TestAccSakuraCloudDataSourceWebAccel_ByDomain(t *testing.T) {
 
 	regexpNotEmpty := regexp.MustCompile(".+")
 
-	resource.ParallelTest(t, resource.TestCase{
+	resource.Test(t, resource.TestCase{
 		PreCheck:          func() { testAccPreCheck(t) },
 		ProviderFactories: testAccProviderFactories,
 		Steps: []resource.TestStep{

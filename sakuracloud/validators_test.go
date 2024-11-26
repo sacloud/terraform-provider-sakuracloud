@@ -17,6 +17,7 @@ package sakuracloud
 import (
 	"testing"
 
+	"github.com/hashicorp/go-cty/cty"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -75,6 +76,64 @@ func Test_isValidHostName(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			assert.Equalf(t, tt.want, isValidHostName(tt.hostname), "isValidHostName(%v)", tt.hostname)
+		})
+	}
+}
+
+func Test_isValidLengthBetween(t *testing.T) {
+	validateFunc := isValidLengthBetween(3, 64)
+
+	tests := []struct {
+		name  string
+		input interface{}
+		want  bool
+	}{
+		{
+			name:  "Valid string length within range",
+			input: "こんにちはこんにちはこんにちはこんにちはこんにちはこんにちはこんにちはこんにちはこんにちはこんにちはこんにちはこんにちは",
+			want:  false,
+		},
+		{
+			name:  "String too short",
+			input: "こん",
+			want:  true,
+		},
+		{
+			name:  "String too long",
+			input: "こんにちはこんにちはこんにちはこんにちはこんにちはこんにちはこんにちはこんにちはこんにちはこんにちはこんにちはこんにちはこんにちはこんにちは",
+			want:  true,
+		},
+		{
+			name:  "Empty string",
+			input: "",
+			want:  true,
+		},
+		{
+			name:  "Exact minimum length",
+			input: "こんに",
+			want:  false,
+		},
+		{
+			name:  "Exact maximum length",
+			input: "こんにちはこんにちはこんにちはこんにちはこんにちはこんにちはこんにちはこんにちはこんにちはこんにちはこんにちはこんにちはこんにち",
+			want:  false,
+		},
+		{
+			name:  "Non-string input",
+			input: 12345,
+			want:  true,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			diagnostics := validateFunc(tt.input, cty.Path{cty.GetAttrStep{Name: "test_field"}})
+
+			if tt.want {
+				assert.NotEmpty(t, diagnostics, "Expected validation errors but got none")
+			} else {
+				assert.Empty(t, diagnostics, "Expected no validation errors but got some")
+			}
 		})
 	}
 }

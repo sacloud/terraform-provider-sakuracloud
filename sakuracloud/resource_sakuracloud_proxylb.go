@@ -47,7 +47,13 @@ func resourceSakuraCloudProxyLB() *schema.Resource {
 
 		Schema: map[string]*schema.Schema{
 			"name": schemaResourceName(resourceName),
-			"plan": schemaResourceIntPlan(resourceName, types.ProxyLBPlans.CPS100.Int(), types.ProxyLBPlanValues),
+			"plan": {
+				Type:             schema.TypeInt,
+				Optional:         true,
+				Default:          types.ProxyLBPlans.CPS100.Int(),
+				Description:      desc.ResourcePlan(resourceName, types.ProxyLBPlanValues),
+				ValidateDiagFunc: validation.ToDiagFunc(validation.IntInSlice(types.ProxyLBPlanValues)),
+			},
 			"vip_failover": {
 				Type:        schema.TypeBool,
 				Optional:    true,
@@ -67,7 +73,7 @@ func resourceSakuraCloudProxyLB() *schema.Resource {
 			"backend_http_keep_alive": {
 				Type:             schema.TypeString,
 				Optional:         true,
-				Computed:         true,
+				Default:          types.ProxyLBBackendHttpKeepAlive.Safe.String(),
 				ValidateDiagFunc: validation.ToDiagFunc(validation.StringInSlice(types.ProxyLBBackendHttpKeepAliveStrings, false)),
 				Description: desc.Sprintf(
 					"Mode of http keep-alive with backend. This must be one of [%s]",
@@ -99,7 +105,6 @@ func resourceSakuraCloudProxyLB() *schema.Resource {
 			"syslog": {
 				Type:     schema.TypeList,
 				Optional: true,
-				Computed: true,
 				MaxItems: 1,
 				MinItems: 1,
 				Elem: &schema.Resource{
@@ -267,6 +272,7 @@ func resourceSakuraCloudProxyLB() *schema.Resource {
 							Type:        schema.TypeString,
 							Optional:    true,
 							Computed:    true,
+							Sensitive:   true,
 							Description: "The private key for a server",
 						},
 						"common_name": {
@@ -298,6 +304,7 @@ func resourceSakuraCloudProxyLB() *schema.Resource {
 									"private_key": {
 										Type:        schema.TypeString,
 										Required:    true,
+										Sensitive:   true,
 										Description: "The private key for a server",
 									},
 								},
@@ -326,7 +333,7 @@ func resourceSakuraCloudProxyLB() *schema.Resource {
 						"group": {
 							Type:             schema.TypeString,
 							Optional:         true,
-							ValidateDiagFunc: validation.ToDiagFunc(validation.StringLenBetween(1, 10)),
+							ValidateDiagFunc: isValidLengthBetween(1, 10),
 							Description: desc.Sprintf(
 								"The name of load balancing group. This is used when using rule-based load balancing. %s",
 								desc.Length(1, 10),
@@ -384,7 +391,7 @@ func resourceSakuraCloudProxyLB() *schema.Resource {
 						"group": {
 							Type:             schema.TypeString,
 							Optional:         true,
-							ValidateDiagFunc: validation.ToDiagFunc(validation.StringLenBetween(1, 10)),
+							ValidateDiagFunc: isValidLengthBetween(1, 10),
 							Description: desc.Sprintf(
 								"The name of load balancing group. When proxyLB received request which matched to `host` and `path`, proxyLB forwards the request to servers that having same group name. %s",
 								desc.Length(1, 10),
@@ -436,6 +443,31 @@ func resourceSakuraCloudProxyLB() *schema.Resource {
 							Type:        schema.TypeString,
 							Optional:    true,
 							Description: "Content body for fixed response sent when requests matches the rule",
+						},
+					},
+				},
+			},
+			"letsencrypt": {
+				Type:     schema.TypeList,
+				Computed: true,
+				Elem: &schema.Resource{
+					Schema: map[string]*schema.Schema{
+						"enabled": {
+							Type:        schema.TypeBool,
+							Computed:    true,
+							Description: "The flag to accept the current Let's Encrypt terms of service(see: https://letsencrypt.org/repository/). This must be set `true` explicitly",
+						},
+						"common_name": {
+							Type:        schema.TypeString,
+							Computed:    true,
+							Description: "The common name of the certificate",
+						},
+						"subject_alt_names": {
+							Type:        schema.TypeSet,
+							Elem:        &schema.Schema{Type: schema.TypeString},
+							Set:         schema.HashString,
+							Computed:    true,
+							Description: "The subject alternative names of the certificate",
 						},
 					},
 				},
@@ -596,6 +628,7 @@ func setProxyLBResourceData(ctx context.Context, d *schema.ResourceData, client 
 		// even if certificate is deleted, it will not result in an error
 		return diag.FromErr(err)
 	}
+
 	health, err := proxyLBOp.HealthStatus(ctx, data.ID)
 	if err != nil {
 		return diag.FromErr(err)
@@ -633,6 +666,9 @@ func setProxyLBResourceData(ctx context.Context, d *schema.ResourceData, client 
 		return diag.FromErr(err)
 	}
 	if err := d.Set("rule", flattenProxyLBRules(data)); err != nil {
+		return diag.FromErr(err)
+	}
+	if err := d.Set("letsencrypt", flattenProxyLBACMESetting(data)); err != nil {
 		return diag.FromErr(err)
 	}
 	if err := d.Set("certificate", flattenProxyLBCerts(certs)); err != nil {

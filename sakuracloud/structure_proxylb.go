@@ -28,6 +28,7 @@ func expandProxyLBCreateRequest(d *schema.ResourceData) *iaas.ProxyLBCreateReque
 		BindPorts:            expandProxyLBBindPorts(d),
 		Servers:              expandProxyLBServers(d),
 		Rules:                expandProxyLBRules(d),
+		LetsEncrypt:          expandProxyLBACMESetting(d),
 		StickySession:        expandProxyLBStickySession(d),
 		Gzip:                 expandProxyLBGzip(d),
 		BackendHttpKeepAlive: expandProxyLBBackendHttpKeepAlive(d),
@@ -50,6 +51,7 @@ func expandProxyLBUpdateRequest(d *schema.ResourceData) *iaas.ProxyLBUpdateReque
 		BindPorts:            expandProxyLBBindPorts(d),
 		Servers:              expandProxyLBServers(d),
 		Rules:                expandProxyLBRules(d),
+		LetsEncrypt:          expandProxyLBACMESetting(d),
 		StickySession:        expandProxyLBStickySession(d),
 		Gzip:                 expandProxyLBGzip(d),
 		BackendHttpKeepAlive: expandProxyLBBackendHttpKeepAlive(d),
@@ -65,7 +67,7 @@ func expandProxyLBUpdateRequest(d *schema.ResourceData) *iaas.ProxyLBUpdateReque
 
 func flattenProxyLBSyslog(proxyLB *iaas.ProxyLB) []interface{} {
 	syslog := proxyLB.Syslog
-	if syslog != nil {
+	if syslog != nil && syslog.Port > 0 && syslog.Server != "" {
 		return []interface{}{
 			map[string]interface{}{
 				"server": syslog.Server,
@@ -412,6 +414,32 @@ func expandProxyLBCerts(d resourceValueGettable) *iaas.ProxyLBCertificates {
 		}
 
 		return cert
+	}
+	return nil
+}
+
+func flattenProxyLBACMESetting(proxyLB *iaas.ProxyLB) []interface{} {
+	var results []interface{}
+	if proxyLB.LetsEncrypt != nil {
+		results = []interface{}{
+			map[string]interface{}{
+				"enabled":           proxyLB.LetsEncrypt.Enabled,
+				"common_name":       proxyLB.LetsEncrypt.CommonName,
+				"subject_alt_names": proxyLB.LetsEncrypt.SubjectAltNames,
+			},
+		}
+	}
+	return results
+}
+
+func expandProxyLBACMESetting(d resourceValueGettable) *iaas.ProxyLBACMESetting {
+	if acmeSettings, ok := getListFromResource(d, "letsencrypt"); ok && len(acmeSettings) > 0 {
+		values := mapToResourceData(acmeSettings[0].(map[string]interface{}))
+		return &iaas.ProxyLBACMESetting{
+			CommonName:      values.Get("common_name").(string),
+			Enabled:         values.Get("enabled").(bool),
+			SubjectAltNames: expandSubjectAltNames(values),
+		}
 	}
 	return nil
 }

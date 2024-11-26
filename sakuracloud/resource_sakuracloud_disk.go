@@ -96,6 +96,17 @@ func resourceSakuraCloudDisk() *schema.Resource {
 			"description": schemaResourceDescription(resourceName),
 			"tags":        schemaResourceTags(resourceName),
 			"zone":        schemaResourceZone(resourceName),
+			"encryption_algorithm": {
+				Type:             schema.TypeString,
+				ForceNew:         true,
+				Optional:         true,
+				Default:          types.DiskEncryptionAlgorithms.None,
+				ValidateDiagFunc: validation.ToDiagFunc(validation.StringInSlice(types.DiskEncryptionAlgorithmStrings, false)),
+				Description: desc.Sprintf(
+					"The disk encryption algorithm. This must be one of [%s]",
+					types.DiskEncryptionAlgorithmStrings,
+				),
+			},
 		},
 	}
 }
@@ -229,5 +240,6 @@ func setDiskResourceData(ctx context.Context, d *schema.ResourceData, client *AP
 	d.Set("description", data.Description)                    // nolint
 	d.Set("server_id", data.ServerID.String())                // nolint
 	d.Set("zone", getZone(d, client))                         // nolint
+	d.Set("encryption_algorithm", data.EncryptionAlgorithm.String())
 	return diag.FromErr(d.Set("tags", flattenTags(data.Tags)))
 }

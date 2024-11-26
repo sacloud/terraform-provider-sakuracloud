@@ -1,11 +1,44 @@
 # CHANGELOG
 
-## 2.25.1 (Unreleased)
+## 2.25.5 (2024/10/29)
 
+- sakuracloud_proxylb_acmeのimport時のバグを修正 #1174
+- sakuracloud_packet_filter_rulesのimportができないバグを修正 #1175
+- ParallelTest() -> Test() #1176
+- GSLBのヘルスチェックでプロトコルがHTTP/HTTPSの場合にポートの指定ができない不具合修正 #1180
+- ELBのACME証明書自動更新が無効になる不具合修正 #1178
+
+## 2.25.4 (2024/6/10)
+
+- sakuracloud_cdrom: 20GB対応 #1169
+- ウェブアクセラレータ ACL機能 #1166
+- sakuracloud_disk: encryption_algorithmにデフォルト値を指定 #1167
+- ディスクのインポート修正 #1165
+- ディスク暗号化機能の対応 #1161
+- update dependencies - sacloud/makefile v0.0.8 #1150
+
+
+## 2.25.3 (2024/2/26)
+
+- パッケージのダウングレード #1146
+
+## 2.25.2 (2024/2/14)
+
+- Fix: sakuracloud_proxylb: backend_http_keep_aliveとsyslogのデフォルト値/空の場合の挙動を修正 #1144
+- private_key: sensitive=true #1142
+- sakuracloud_proxylb: プラン変更で再作成される問題を修正 #1141
+- sakuracloud_proxylb_acme: BackendHttpKeepAliveの設定が引き継がれない問題を修正 #1135
+
+## 2.25.1 (2023/12/18)
+
+- Update CHANGELOG #1122, 1123
 - github.com/sacloud/autoscaler v0.15.5 #1121
 - go: bump github.com/sacloud/iaas-service-go from 1.9.2-0.20230808054001-efad52d748d4 to 1.9.2 #1119
 - go: bump github.com/sacloud/webaccel-api-go from 1.1.5 to 1.1.6 #1118
 - ci: bump actions/setup-go from 4 to 5 #1115
+- ドキュメント更新：ELBリクエストヘッダによる振り分けルール #1114 
+- Improve CI #1113
+- go: bump github.com/hashicorp/terraform-plugin-sdk/v2 from 2.27.0 to 2.30.0 #1112
 
 ## 2.25.0 (2023/11/20)
 
