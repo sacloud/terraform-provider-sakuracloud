@@ -137,6 +137,7 @@ func Provider() *schema.Provider {
 			},
 		},
 		DataSourcesMap: map[string]*schema.Resource{
+			"sakuracloud_apprun_application":    dataSourceSakuraCloudApprunApplication(),
 			"sakuracloud_archive":               dataSourceSakuraCloudArchive(),
 			"sakuracloud_auto_scale":            dataSourceSakuraCloudAutoScale(),
 			"sakuracloud_bridge":                dataSourceSakuraCloudBridge(),
@@ -169,6 +170,7 @@ func Provider() *schema.Provider {
 			"sakuracloud_zone":                  dataSourceSakuraCloudZone(),
 		},
 		ResourcesMap: map[string]*schema.Resource{
+			"sakuracloud_apprun_application":    resourceSakuraCloudApprunApplication(),
 			"sakuracloud_auto_backup":           resourceSakuraCloudAutoBackup(),
 			"sakuracloud_auto_scale":            resourceSakuraCloudAutoScale(),
 			"sakuracloud_archive":               resourceSakuraCloudArchive(),
