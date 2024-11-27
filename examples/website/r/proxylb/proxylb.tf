@@ -2,11 +2,11 @@ resource "sakuracloud_proxylb" "foobar" {
   name           = "foobar"
   plan           = 100
   vip_failover   = true
-  sticky_session = true
   gzip           = true
-  proxy_protocol = true
   timeout        = 10
   region         = "is1"
+#  sticky_session = true
+#  proxy_protocol = true
 
   health_check {
     protocol    = "http"
