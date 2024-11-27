@@ -82,6 +82,8 @@ func TestAccSakuraCloudDisk_basic(t *testing.T) {
 }
 
 func TestAccSakuraCloudDisk_with_Server(t *testing.T) {
+	skipIfFakeModeEnabled(t) // FakeModeだとip_address指定が動かないためスキップする
+
 	diskResourceName := "sakuracloud_disk.foobar"
 	serverResourceName := "sakuracloud_server.foobar"
 	rand := randomName()
