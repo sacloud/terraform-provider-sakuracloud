@@ -10,3 +10,5 @@ terraform.tfvars*
 
 website-current
 website-scaffold
+
+.vscode/
