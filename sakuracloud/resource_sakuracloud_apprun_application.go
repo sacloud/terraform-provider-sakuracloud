@@ -2,6 +2,7 @@ package sakuracloud
 
 import (
 	"context"
+	"net/http"
 	"time"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
@@ -185,6 +186,8 @@ func resourceSakuraCloudApprunApplication() *schema.Resource {
 }
 
 func resourceSakuraCloudApprunApplicationCreate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
+	createUserIfNotExist(ctx, d, meta)
+
 	client, _, err := sakuraCloudClient(d, meta)
 	if err != nil {
 		return diag.FromErr(err)
@@ -209,6 +212,8 @@ func resourceSakuraCloudApprunApplicationCreate(ctx context.Context, d *schema.R
 }
 
 func resourceSakuraCloudApprunApplicationRead(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
+	createUserIfNotExist(ctx, d, meta)
+
 	client, _, err := sakuraCloudClient(d, meta)
 	if err != nil {
 		return diag.FromErr(err)
@@ -233,6 +238,8 @@ func resourceSakuraCloudApprunApplicationRead(ctx context.Context, d *schema.Res
 
 // NOTE: all_traffic_availableについては未対応
 func resourceSakuraCloudApprunApplicationUpdate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
+	createUserIfNotExist(ctx, d, meta)
+
 	client, _, err := sakuraCloudClient(d, meta)
 	if err != nil {
 		return diag.FromErr(err)
@@ -271,6 +278,8 @@ func resourceSakuraCloudApprunApplicationUpdate(ctx context.Context, d *schema.R
 }
 
 func resourceSakuraCloudApprunApplicationDelete(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
+	createUserIfNotExist(ctx, d, meta)
+
 	client, _, err := sakuraCloudClient(d, meta)
 	if err != nil {
 		return diag.FromErr(err)
@@ -329,4 +338,29 @@ func validateApprunApplicationMaxMemory() *schema.SchemaValidateDiagFunc {
 			(string)(v1.PostApplicationBodyComponentMaxMemoryN2Gi),
 		}, false))
 	return &f
+}
+
+// NOTE: AppRunは初回利用時に一度のみユーザーの作成を必要とする。
+// SakuraCloud Providerでは明示的にユーザーの作成を行わず、CURD操作の開始時に暗黙的にユーザーの存在確認と作成を行う。
+// ref. https://manual.sakura.ad.jp/sakura-apprun-api/spec.html#tag/%E3%83%A6%E3%83%BC%E3%82%B6%E3%83%BC
+func createUserIfNotExist(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
+	client, _, err := sakuraCloudClient(d, meta)
+	if err != nil {
+		return diag.FromErr(err)
+	}
+
+	userOp := apprun.NewUserOp(client.apprunClient)
+	res, err := userOp.Read(ctx)
+	if err != nil {
+		return diag.FromErr(err)
+	}
+
+	if res.StatusCode == http.StatusNotFound {
+		_, err := userOp.Create(ctx)
+		if err != nil {
+			return diag.FromErr(err)
+		}
+	}
+
+	return nil
 }
