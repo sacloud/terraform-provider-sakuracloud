@@ -1,6 +1,8 @@
 package sakuracloud
 
 import (
+	"fmt"
+
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	v1 "github.com/sacloud/apprun-api-go/apis/v1"
 )
@@ -157,6 +159,40 @@ func expandApprunApplicationComponents(d *schema.ResourceData) *[]v1.PostApplica
 	return &components
 }
 
+func expandApprunApplicationTraffics(d *schema.ResourceData, versions *[]v1.Version) (*[]v1.Traffic, error) {
+	// resourceにtraffics listが存在しない場合
+	if len(d.Get("traffics").([]interface{})) == 0 {
+		defaultIsLatestVersion := true
+		defaultPercent := 100
+
+		return &[]v1.Traffic{
+			{
+				IsLatestVersion: &defaultIsLatestVersion,
+				Percent:         &defaultPercent,
+			},
+		}, nil
+	}
+
+	var traffics []v1.Traffic
+	for _, traffic := range d.Get("traffics").([]interface{}) {
+		t := traffic.(map[string]interface{})
+
+		percent := t["percent"].(int)
+		version_index := t["version_index"].(int)
+		if len(*versions) <= version_index {
+			return nil, fmt.Errorf("index out of range, version_index: %d", version_index)
+		}
+
+		version := (*versions)[version_index]
+		traffics = append(traffics, v1.Traffic{
+			Percent:     &percent,
+			VersionName: version.Name,
+		})
+	}
+
+	return &traffics, nil
+}
+
 func flattenApprunApplicationComponents(d *schema.ResourceData, application *v1.Application) []interface{} {
 	var results []interface{}
 
@@ -224,5 +260,23 @@ func flattenApprunApplicationProbeHttpGetHeaders(component *v1.HandlerApplicatio
 			"value": h.Value,
 		})
 	}
+	return results
+}
+
+func flattenApprunApplicationTraffics(traffics *[]v1.Traffic, versions *[]v1.Version) []interface{} {
+	var results []interface{}
+
+	for _, traffic := range *traffics {
+		for i, version := range *versions {
+			if *traffic.VersionName == *version.Name {
+				results = append(results, map[string]interface{}{
+					"version_index": i,
+					"percent":       traffic.Percent,
+				})
+				continue
+			}
+		}
+	}
+
 	return results
 }

@@ -181,6 +181,25 @@ func resourceSakuraCloudApprunApplication() *schema.Resource {
 					},
 				},
 			},
+			"traffics": {
+				Type:        schema.TypeList,
+				Optional:    true,
+				Description: "The application traffic",
+				Elem: &schema.Resource{
+					Schema: map[string]*schema.Schema{
+						"version_index": {
+							Type:        schema.TypeInt,
+							Required:    true,
+							Description: "The application version index",
+						},
+						"percent": {
+							Type:        schema.TypeInt,
+							Required:    true,
+							Description: "The percentage of traffic dispersion",
+						},
+					},
+				},
+			},
 		},
 	}
 }
@@ -233,7 +252,18 @@ func resourceSakuraCloudApprunApplicationRead(ctx context.Context, d *schema.Res
 	}
 	d.SetId(*application.Id)
 
-	return setApprunApplicationResourceData(d, application)
+	versions, err := getVersions(ctx, d, meta)
+	if err != nil {
+		return diag.FromErr(err)
+	}
+
+	trafficOp := apprun.NewTrafficOp(client.apprunClient)
+	traffics, err := trafficOp.List(ctx, d.Id())
+	if err != nil {
+		return diag.Errorf("could not read SakuraCloud Apprun Application Traffics[%s]: %s", d.Id(), err)
+	}
+
+	return setApprunApplicationResourceData(d, application, traffics.Data, versions)
 }
 
 // NOTE: all_traffic_availableについては未対応
@@ -245,6 +275,7 @@ func resourceSakuraCloudApprunApplicationUpdate(ctx context.Context, d *schema.R
 		return diag.FromErr(err)
 	}
 
+	// Applicationの状態を変更
 	appOp := apprun.NewApplicationOp(client.apprunClient)
 
 	sakuraMutexKV.Lock(d.Id())
@@ -269,6 +300,23 @@ func resourceSakuraCloudApprunApplicationUpdate(ctx context.Context, d *schema.R
 		Components:     expandApprunApplicationComponentsForUpdate(d),
 	}
 	result, err := appOp.Update(ctx, *application.Id, &params)
+	if err != nil {
+		return diag.FromErr(err)
+	}
+
+	// 内部的にVersions/Traffics APIを利用してトラフィック分散の状態も変更する
+	versions, err := getVersions(ctx, d, meta)
+	if err != nil {
+		return diag.FromErr(err)
+	}
+
+	trafficOp := apprun.NewTrafficOp(client.apprunClient)
+	traffics, err := expandApprunApplicationTraffics(d, versions)
+	if err != nil {
+		return diag.FromErr(err)
+	}
+
+	_, err = trafficOp.Update(ctx, d.Id(), traffics)
 	if err != nil {
 		return diag.FromErr(err)
 	}
@@ -301,13 +349,14 @@ func resourceSakuraCloudApprunApplicationDelete(ctx context.Context, d *schema.R
 	return nil
 }
 
-func setApprunApplicationResourceData(d *schema.ResourceData, data *v1.Application) diag.Diagnostics {
-	d.Set("name", data.Name)
-	d.Set("timeout_seconds", data.TimeoutSeconds)
-	d.Set("port", data.Port)
-	d.Set("min_scale", data.MinScale)
-	d.Set("max_scale", data.MaxScale)
-	d.Set("components", flattenApprunApplicationComponents(d, data))
+func setApprunApplicationResourceData(d *schema.ResourceData, application *v1.Application, traffics *[]v1.Traffic, versions *[]v1.Version) diag.Diagnostics {
+	d.Set("name", application.Name)
+	d.Set("timeout_seconds", application.TimeoutSeconds)
+	d.Set("port", application.Port)
+	d.Set("min_scale", application.MinScale)
+	d.Set("max_scale", application.MaxScale)
+	d.Set("components", flattenApprunApplicationComponents(d, application))
+	d.Set("traffics", flattenApprunApplicationTraffics(traffics, versions))
 
 	return nil
 }
@@ -338,6 +387,37 @@ func validateApprunApplicationMaxMemory() *schema.SchemaValidateDiagFunc {
 			(string)(v1.PostApplicationBodyComponentMaxMemoryN2Gi),
 		}, false))
 	return &f
+}
+
+func getVersions(ctx context.Context, d *schema.ResourceData, meta interface{}) (*[]v1.Version, error) {
+	var versions []v1.Version
+
+	client, _, err := sakuraCloudClient(d, meta)
+	if err != nil {
+		return nil, err
+	}
+
+	versionOp := apprun.NewVersionOp(client.apprunClient)
+
+	pageNum := 1
+	pageSize := 100
+	for {
+		vs, err := versionOp.List(ctx, d.Id(), &v1.ListApplicationVersionsParams{
+			PageNum:  &pageNum,
+			PageSize: &pageSize,
+		})
+		if err != nil {
+			return nil, err
+		}
+		if len(*vs.Data) == 0 {
+			break
+		}
+
+		versions = append(versions, *vs.Data...)
+		pageNum++
+	}
+
+	return &versions, nil
 }
 
 // NOTE: AppRunは初回利用時に一度のみユーザーの作成を必要とする。
