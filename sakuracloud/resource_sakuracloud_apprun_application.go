@@ -19,6 +19,9 @@ func resourceSakuraCloudApprunApplication() *schema.Resource {
 		UpdateContext: resourceSakuraCloudApprunApplicationUpdate,
 		ReadContext:   resourceSakuraCloudApprunApplicationRead,
 		DeleteContext: resourceSakuraCloudApprunApplicationDelete,
+		Importer: &schema.ResourceImporter{
+			StateContext: schema.ImportStatePassthroughContext,
+		},
 
 		Timeouts: &schema.ResourceTimeout{
 			Create: schema.DefaultTimeout(5 * time.Minute),
