@@ -236,6 +236,7 @@ func providerConfigure(d *schema.ResourceData, terraformVersion string) (interfa
 		Zone:                d.Get("zone").(string),
 		Zones:               zones,
 		DefaultZone:         d.Get("default_zone").(string),
+		ExplicitZone:        func() bool { _, ok := d.GetOk("zone"); return ok }(),
 		TraceMode:           d.Get("trace").(string),
 		APIRootURL:          d.Get("api_root_url").(string),
 		RetryMax:            d.Get("retry_max").(int),
