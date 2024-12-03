@@ -44,7 +44,7 @@ func expandApprunApplicationComponentsForUpdate(d *schema.ResourceData) *[]v1.Pa
 
 		// CreateProbe
 		var probe v1.PatchApplicationBodyComponentProbe
-		if p, ok := c["probe"].([]interface{}); ok {
+		if p, ok := c["probe"].([]interface{}); ok && len(p) > 0 {
 			if hg, ok := p[0].(map[string]interface{})["http_get"].([]interface{}); ok {
 				probe.HttpGet = &v1.PatchApplicationBodyComponentProbeHttpGet{
 					Path: hg[0].(map[string]interface{})["path"].(string),
@@ -120,7 +120,7 @@ func expandApprunApplicationComponents(d *schema.ResourceData) *[]v1.PostApplica
 
 		// CreateProbe
 		var probe v1.PostApplicationBodyComponentProbe
-		if p, ok := c["probe"].([]interface{}); ok {
+		if p, ok := c["probe"].([]interface{}); ok && len(p) > 0 {
 			if hg, ok := p[0].(map[string]interface{})["http_get"].([]interface{}); ok {
 				probe.HttpGet = &v1.PostApplicationBodyComponentProbeHttpGet{
 					Path: hg[0].(map[string]interface{})["path"].(string),
@@ -225,18 +225,8 @@ func flattenApprunApplicationComponents(d *schema.ResourceData, application *v1.
 					},
 				},
 			},
-			"env": flattenApprunApplicationEnvs(&c),
-			"probe": []map[string]interface{}{
-				{
-					"http_get": []map[string]interface{}{
-						{
-							"path":    c.Probe.HttpGet.Path,
-							"port":    c.Probe.HttpGet.Port,
-							"headers": flattenApprunApplicationProbeHttpGetHeaders(&c),
-						},
-					},
-				},
-			},
+			"env":   flattenApprunApplicationEnvs(&c),
+			"probe": flattenApprunApplicationProbe(&c),
 		})
 	}
 	return results
@@ -253,13 +243,34 @@ func flattenApprunApplicationEnvs(component *v1.HandlerApplicationComponent) []m
 	return results
 }
 
+func flattenApprunApplicationProbe(component *v1.HandlerApplicationComponent) []map[string]interface{} {
+	var results []map[string]interface{}
+	if component.Probe != nil && component.Probe.HttpGet != nil {
+		results = []map[string]interface{}{
+			{
+				"http_get": []map[string]interface{}{
+					{
+						"path":    component.Probe.HttpGet.Path,
+						"port":    component.Probe.HttpGet.Port,
+						"headers": flattenApprunApplicationProbeHttpGetHeaders(component),
+					},
+				},
+			},
+		}
+	}
+
+	return results
+}
+
 func flattenApprunApplicationProbeHttpGetHeaders(component *v1.HandlerApplicationComponent) []map[string]interface{} {
 	var results []map[string]interface{}
-	for _, h := range *component.Probe.HttpGet.Headers {
-		results = append(results, map[string]interface{}{
-			"name":  h.Name,
-			"value": h.Value,
-		})
+	if component.Probe != nil && component.Probe.HttpGet != nil && component.Probe.HttpGet.Headers != nil {
+		for _, h := range *component.Probe.HttpGet.Headers {
+			results = append(results, map[string]interface{}{
+				"name":  h.Name,
+				"value": h.Value,
+			})
+		}
 	}
 	return results
 }
