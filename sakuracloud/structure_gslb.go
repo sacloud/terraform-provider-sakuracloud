@@ -33,7 +33,7 @@ func expandGSLBHealthCheckConf(d resourceValueGettable) *iaas.GSLBHealthCheck {
 		return &iaas.GSLBHealthCheck{
 			Protocol:     types.EGSLBHealthCheckProtocol(protocol),
 			HostHeader:   conf["host_header"].(string),
-			Port:     types.StringNumber(conf["port"].(int)),
+			Port:         types.StringNumber(conf["port"].(int)),
 			Path:         conf["path"].(string),
 			ResponseCode: types.StringNumber(forceAtoI(conf["status"].(string))),
 		}
