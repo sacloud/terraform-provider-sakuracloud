@@ -72,6 +72,8 @@ func dataSourceSakuraCloudApprunApplication() *schema.Resource {
 									"container_registry": {
 										Type:     schema.TypeList,
 										Computed: true,
+										Optional: true,
+										MaxItems: 1,
 										Elem: &schema.Resource{
 											Schema: map[string]*schema.Schema{
 												"image": {
@@ -82,11 +84,13 @@ func dataSourceSakuraCloudApprunApplication() *schema.Resource {
 												"server": {
 													Type:        schema.TypeString,
 													Computed:    true,
+													Optional:    true,
 													Description: "The container registry server name",
 												},
 												"username": {
 													Type:        schema.TypeString,
 													Computed:    true,
+													Optional:    true,
 													Description: "The container registry credentials",
 												},
 											},
@@ -98,17 +102,21 @@ func dataSourceSakuraCloudApprunApplication() *schema.Resource {
 						"env": {
 							Type:        schema.TypeList,
 							Computed:    true,
+							Optional:    true,
 							Description: "The environment variables passed to components",
 							Elem: &schema.Resource{
 								Schema: map[string]*schema.Schema{
 									"key": {
 										Type:        schema.TypeString,
 										Computed:    true,
+										Optional:    true,
 										Description: "The environment variable name",
 									},
 									"value": {
 										Type:        schema.TypeString,
 										Computed:    true,
+										Optional:    true,
+										Sensitive:   true,
 										Description: "environment variable value",
 									},
 								},
@@ -116,6 +124,7 @@ func dataSourceSakuraCloudApprunApplication() *schema.Resource {
 						},
 						"probe": {
 							Type:        schema.TypeList,
+							Optional:    true,
 							Computed:    true,
 							Description: "The component probe settings",
 							Elem: &schema.Resource{
@@ -136,15 +145,18 @@ func dataSourceSakuraCloudApprunApplication() *schema.Resource {
 												"headers": {
 													Type:     schema.TypeList,
 													Computed: true,
+													Optional: true,
 													Elem: &schema.Resource{
 														Schema: map[string]*schema.Schema{
 															"name": {
 																Type:     schema.TypeString,
 																Computed: true,
+																Optional: true,
 															},
 															"value": {
 																Type:     schema.TypeString,
 																Computed: true,
+																Optional: true,
 															},
 														},
 													},
