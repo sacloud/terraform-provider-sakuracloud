@@ -378,7 +378,7 @@ func resourceSakuraCloudApprunApplicationDelete(ctx context.Context, d *schema.R
 	}
 
 	if err := appOp.Delete(ctx, *application.Id); err != nil {
-		return diag.Errorf("deleting SakuraCloud Apprun Application[%s] is failed: %s", string(*application.Id), err)
+		return diag.Errorf("deleting SakuraCloud Apprun Application[%s] is failed: %s", *application.Id, err)
 	}
 	return nil
 }
