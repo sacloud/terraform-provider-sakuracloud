@@ -223,7 +223,7 @@ func dataSourceSakuraCloudApprunApplicationRead(ctx context.Context, d *schema.R
 	d.Set("port", *data.Port)
 	d.Set("min_scale", *data.MinScale)
 	d.Set("max_scale", *data.MaxScale)
-	d.Set("components", flattenApprunApplicationComponents(d, data))
+	d.Set("components", flattenApprunApplicationComponents(d, data, false))
 	d.Set("status", *data.Status)
 	d.Set("public_url", *data.PublicUrl)
 

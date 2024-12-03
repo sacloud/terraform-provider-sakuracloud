@@ -194,22 +194,11 @@ func expandApprunApplicationTraffics(d *schema.ResourceData, versions *[]v1.Vers
 	return &traffics, nil
 }
 
-func flattenApprunApplicationComponents(d *schema.ResourceData, application *v1.Application) []interface{} {
+func flattenApprunApplicationComponents(d *schema.ResourceData, application *v1.Application, includePassword bool) []interface{} {
 	var results []interface{}
 
 	for _, c := range *application.Components {
-		// NOTE:
-		// v1.Applicationはcontainer_registryのpasswordが含まれないため、そのままだとtfstateに空文字列がセットされてしまう。
-		// この場合resourceにpasswordの定義があると、resourceを変更していなくてもterraform planでdiffが出てしまう。
-		// この対策として、passwordのみschema.ResourceDataからデータを参照してセットするようにする。
-		var password string
-		for _, exComponent := range *expandApprunApplicationComponents(d) {
-			if exComponent.Name == c.Name && exComponent.DeploySource.ContainerRegistry != nil && exComponent.DeploySource.ContainerRegistry.Password != nil {
-				password = *exComponent.DeploySource.ContainerRegistry.Password
-			}
-		}
-
-		results = append(results, map[string]interface{}{
+		result := map[string]interface{}{
 			"name":       c.Name,
 			"max_cpu":    c.MaxCpu,
 			"max_memory": c.MaxMemory,
@@ -220,14 +209,32 @@ func flattenApprunApplicationComponents(d *schema.ResourceData, application *v1.
 							"image":    c.DeploySource.ContainerRegistry.Image,
 							"server":   *c.DeploySource.ContainerRegistry.Server,
 							"username": *c.DeploySource.ContainerRegistry.Username,
-							"password": password,
 						},
 					},
 				},
 			},
 			"env":   flattenApprunApplicationEnvs(&c),
 			"probe": flattenApprunApplicationProbe(&c),
-		})
+		}
+
+		if includePassword {
+			// NOTE:
+			// v1.Applicationはcontainer_registryのpasswordが含まれないため、そのままだとtfstateに空文字列がセットされてしまう。
+			// この場合resourceにpasswordの定義があると、resourceを変更していなくてもterraform planでdiffが出てしまう。
+			// この対策として、passwordのみschema.ResourceDataからデータを参照してセットするようにする。
+			var password string
+			for _, exComponent := range *expandApprunApplicationComponents(d) {
+				if exComponent.Name == c.Name && exComponent.DeploySource.ContainerRegistry != nil && exComponent.DeploySource.ContainerRegistry.Password != nil {
+					password = *exComponent.DeploySource.ContainerRegistry.Password
+				}
+			}
+
+			deploySource := result["deploy_source"].([]map[string]interface{})
+			containerRegistry := deploySource[0]["container_registry"].([]map[string]interface{})
+			containerRegistry[0]["password"] = password
+		}
+
+		results = append(results, result)
 	}
 	return results
 }

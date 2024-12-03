@@ -375,7 +375,7 @@ func setApprunApplicationResourceData(d *schema.ResourceData, application *v1.Ap
 	d.Set("port", application.Port)
 	d.Set("min_scale", application.MinScale)
 	d.Set("max_scale", application.MaxScale)
-	d.Set("components", flattenApprunApplicationComponents(d, application))
+	d.Set("components", flattenApprunApplicationComponents(d, application, true))
 	d.Set("traffics", flattenApprunApplicationTraffics(traffics, versions))
 
 	return nil
