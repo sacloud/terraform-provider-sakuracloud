@@ -2,6 +2,7 @@ package sakuracloud
 
 import (
 	"fmt"
+	"sort"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	v1 "github.com/sacloud/apprun-api-go/apis/v1"
@@ -243,10 +244,10 @@ func flattenApprunApplicationComponents(d *schema.ResourceData, application *v1.
 
 func flattenApprunApplicationEnvs(component *v1.HandlerApplicationComponent) []map[string]interface{} {
 	var results []map[string]interface{}
-	for _, e := range *component.Env {
+	for _, e := range sortEnv(*component.Env) {
 		results = append(results, map[string]interface{}{
-			"key":   e.Key,
-			"value": e.Value,
+			"key":   *e.Key,
+			"value": *e.Value,
 		})
 	}
 	return results
@@ -279,4 +280,14 @@ func flattenApprunApplicationTraffics(traffics *[]v1.Traffic, versions *[]v1.Ver
 	}
 
 	return results
+}
+
+// NOTE: AppRunの /applications/{id} (GET) APIにおいて、envのリストの順番がタイミングによって変化するため、ソートしてから利用する。
+func sortEnv(envList []v1.HandlerApplicationComponentEnv) []v1.HandlerApplicationComponentEnv {
+	sort.Slice(envList, func(i, j int) bool {
+		keyI := *(envList)[i].Key
+		keyJ := *(envList)[j].Key
+		return keyI < keyJ
+	})
+	return envList
 }
