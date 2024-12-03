@@ -229,6 +229,23 @@ func resourceSakuraCloudApprunApplicationCreate(ctx context.Context, d *schema.R
 		return diag.FromErr(err)
 	}
 
+	// 内部的にVersions/Traffics APIを利用してトラフィック分散の状態も変更する
+	versions, err := getVersions(ctx, d, meta, *result.Id)
+	if err != nil {
+		return diag.FromErr(err)
+	}
+
+	trafficOp := apprun.NewTrafficOp(client.apprunClient)
+	traffics, err := expandApprunApplicationTraffics(d, versions)
+	if err != nil {
+		return diag.FromErr(err)
+	}
+
+	_, err = trafficOp.Update(ctx, *result.Id, traffics)
+	if err != nil {
+		return diag.FromErr(err)
+	}
+
 	d.SetId(*result.Id)
 	return resourceSakuraCloudApprunApplicationRead(ctx, d, meta)
 }
@@ -255,7 +272,7 @@ func resourceSakuraCloudApprunApplicationRead(ctx context.Context, d *schema.Res
 	}
 	d.SetId(*application.Id)
 
-	versions, err := getVersions(ctx, d, meta)
+	versions, err := getVersions(ctx, d, meta, d.Id())
 	if err != nil {
 		return diag.FromErr(err)
 	}
@@ -308,7 +325,7 @@ func resourceSakuraCloudApprunApplicationUpdate(ctx context.Context, d *schema.R
 	}
 
 	// 内部的にVersions/Traffics APIを利用してトラフィック分散の状態も変更する
-	versions, err := getVersions(ctx, d, meta)
+	versions, err := getVersions(ctx, d, meta, d.Id())
 	if err != nil {
 		return diag.FromErr(err)
 	}
@@ -392,7 +409,7 @@ func validateApprunApplicationMaxMemory() *schema.SchemaValidateDiagFunc {
 	return &f
 }
 
-func getVersions(ctx context.Context, d *schema.ResourceData, meta interface{}) (*[]v1.Version, error) {
+func getVersions(ctx context.Context, d *schema.ResourceData, meta interface{}, applicationId string) (*[]v1.Version, error) {
 	var versions []v1.Version
 
 	client, _, err := sakuraCloudClient(d, meta)
@@ -405,7 +422,7 @@ func getVersions(ctx context.Context, d *schema.ResourceData, meta interface{}) 
 	pageNum := 1
 	pageSize := 100
 	for {
-		vs, err := versionOp.List(ctx, d.Id(), &v1.ListApplicationVersionsParams{
+		vs, err := versionOp.List(ctx, applicationId, &v1.ListApplicationVersionsParams{
 			PageNum:  &pageNum,
 			PageSize: &pageSize,
 		})
