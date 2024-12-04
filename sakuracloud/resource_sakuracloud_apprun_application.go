@@ -83,13 +83,13 @@ func resourceSakuraCloudApprunApplication() *schema.Resource {
 						"max_cpu": {
 							Type:             schema.TypeString,
 							Required:         true,
-							ValidateDiagFunc: *validateApprunApplicationMaxCPU(),
+							ValidateDiagFunc: validateApprunApplicationMaxCPU(),
 							Description:      "The maximum number of CPUs for a component",
 						},
 						"max_memory": {
 							Type:             schema.TypeString,
 							Required:         true,
-							ValidateDiagFunc: *validateApprunApplicationMaxMemory(),
+							ValidateDiagFunc: validateApprunApplicationMaxMemory(),
 							Description:      "The maximum memory of component",
 						},
 						"deploy_source": {
@@ -395,8 +395,8 @@ func setApprunApplicationResourceData(d *schema.ResourceData, application *v1.Ap
 	return nil
 }
 
-func validateApprunApplicationMaxCPU() *schema.SchemaValidateDiagFunc {
-	f := validation.ToDiagFunc(
+func validateApprunApplicationMaxCPU() schema.SchemaValidateDiagFunc {
+	return validation.ToDiagFunc(
 		validation.StringInSlice([]string{
 			(string)(v1.PostApplicationBodyComponentMaxCpuN01),
 			(string)(v1.PostApplicationBodyComponentMaxCpuN02),
@@ -409,18 +409,16 @@ func validateApprunApplicationMaxCPU() *schema.SchemaValidateDiagFunc {
 			(string)(v1.PostApplicationBodyComponentMaxCpuN09),
 			(string)(v1.PostApplicationBodyComponentMaxCpuN1),
 		}, false))
-	return &f
 }
 
-func validateApprunApplicationMaxMemory() *schema.SchemaValidateDiagFunc {
-	f := validation.ToDiagFunc(
+func validateApprunApplicationMaxMemory() schema.SchemaValidateDiagFunc {
+	return validation.ToDiagFunc(
 		validation.StringInSlice([]string{
 			(string)(v1.PostApplicationBodyComponentMaxMemoryN256Mi),
 			(string)(v1.PostApplicationBodyComponentMaxMemoryN512Mi),
 			(string)(v1.PostApplicationBodyComponentMaxMemoryN1Gi),
 			(string)(v1.PostApplicationBodyComponentMaxMemoryN2Gi),
 		}, false))
-	return &f
 }
 
 func getVersions(ctx context.Context, d *schema.ResourceData, meta interface{}, applicationId string) (*[]v1.Version, error) {
