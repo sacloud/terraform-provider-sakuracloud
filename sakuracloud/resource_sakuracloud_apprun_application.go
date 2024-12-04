@@ -309,8 +309,6 @@ func resourceSakuraCloudApprunApplicationRead(ctx context.Context, d *schema.Res
 
 // NOTE: all_traffic_availableについては未対応
 func resourceSakuraCloudApprunApplicationUpdate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
-	createUserIfNotExist(ctx, d, meta)
-
 	client, _, err := sakuraCloudClient(d, meta)
 	if err != nil {
 		return diag.FromErr(err)
@@ -367,8 +365,6 @@ func resourceSakuraCloudApprunApplicationUpdate(ctx context.Context, d *schema.R
 }
 
 func resourceSakuraCloudApprunApplicationDelete(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
-	createUserIfNotExist(ctx, d, meta)
-
 	client, _, err := sakuraCloudClient(d, meta)
 	if err != nil {
 		return diag.FromErr(err)
