@@ -25,6 +25,7 @@ import (
 
 	"github.com/sacloud/apprun-api-go"
 	v1 "github.com/sacloud/apprun-api-go/apis/v1"
+	"github.com/sacloud/terraform-provider-sakuracloud/internal/desc"
 )
 
 func resourceSakuraCloudApprunApplication() *schema.Resource {
@@ -84,13 +85,19 @@ func resourceSakuraCloudApprunApplication() *schema.Resource {
 							Type:             schema.TypeString,
 							Required:         true,
 							ValidateDiagFunc: validateApprunApplicationMaxCPU(),
-							Description:      "The maximum number of CPUs for a component",
+							Description: desc.Sprintf(
+								"The maximum number of CPUs for a component. The values in the list must be in [%s]",
+								apprun.ApplicationMaxCPUs,
+							),
 						},
 						"max_memory": {
 							Type:             schema.TypeString,
 							Required:         true,
 							ValidateDiagFunc: validateApprunApplicationMaxMemory(),
-							Description:      "The maximum memory of component",
+							Description: desc.Sprintf(
+								"The maximum memory of component. The values in the list must be in [%s]",
+								apprun.ApplicationMaxMemories,
+							),
 						},
 						"deploy_source": {
 							Type:        schema.TypeList,
@@ -396,29 +403,11 @@ func setApprunApplicationResourceData(d *schema.ResourceData, application *v1.Ap
 }
 
 func validateApprunApplicationMaxCPU() schema.SchemaValidateDiagFunc {
-	return validation.ToDiagFunc(
-		validation.StringInSlice([]string{
-			(string)(v1.PostApplicationBodyComponentMaxCpuN01),
-			(string)(v1.PostApplicationBodyComponentMaxCpuN02),
-			(string)(v1.PostApplicationBodyComponentMaxCpuN03),
-			(string)(v1.PostApplicationBodyComponentMaxCpuN04),
-			(string)(v1.PostApplicationBodyComponentMaxCpuN05),
-			(string)(v1.PostApplicationBodyComponentMaxCpuN06),
-			(string)(v1.PostApplicationBodyComponentMaxCpuN07),
-			(string)(v1.PostApplicationBodyComponentMaxCpuN08),
-			(string)(v1.PostApplicationBodyComponentMaxCpuN09),
-			(string)(v1.PostApplicationBodyComponentMaxCpuN1),
-		}, false))
+	return validation.ToDiagFunc(validation.StringInSlice(apprun.ApplicationMaxCPUs, false))
 }
 
 func validateApprunApplicationMaxMemory() schema.SchemaValidateDiagFunc {
-	return validation.ToDiagFunc(
-		validation.StringInSlice([]string{
-			(string)(v1.PostApplicationBodyComponentMaxMemoryN256Mi),
-			(string)(v1.PostApplicationBodyComponentMaxMemoryN512Mi),
-			(string)(v1.PostApplicationBodyComponentMaxMemoryN1Gi),
-			(string)(v1.PostApplicationBodyComponentMaxMemoryN2Gi),
-		}, false))
+	return validation.ToDiagFunc(validation.StringInSlice(apprun.ApplicationMaxMemories, false))
 }
 
 func getVersions(ctx context.Context, d *schema.ResourceData, meta interface{}, applicationId string) (*[]v1.Version, error) {
