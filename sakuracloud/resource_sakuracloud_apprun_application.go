@@ -316,10 +316,6 @@ func resourceSakuraCloudApprunApplicationUpdate(ctx context.Context, d *schema.R
 
 	// Applicationの状態を変更
 	appOp := apprun.NewApplicationOp(client.apprunClient)
-
-	sakuraMutexKV.Lock(d.Id())
-	defer sakuraMutexKV.Unlock(d.Id())
-
 	application, err := appOp.Read(ctx, d.Id())
 	if err != nil {
 		return diag.Errorf("could not read SakuraCloud Apprun Application[%s]: %s", d.Id(), err)
@@ -371,10 +367,6 @@ func resourceSakuraCloudApprunApplicationDelete(ctx context.Context, d *schema.R
 	}
 
 	appOp := apprun.NewApplicationOp(client.apprunClient)
-
-	sakuraMutexKV.Lock(d.Id())
-	defer sakuraMutexKV.Unlock(d.Id())
-
 	application, err := appOp.Read(ctx, d.Id())
 	if err != nil {
 		return diag.Errorf("could not read SakuraCloud Apprun Application[%s]: %s", d.Id(), err)
