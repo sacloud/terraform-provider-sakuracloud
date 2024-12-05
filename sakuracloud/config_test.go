@@ -99,7 +99,7 @@ func TestConfig_NewClient_loadFromProfile(t *testing.T) {
 		err      error
 	}{
 		{
-			scenario: "ProfileName is not specified and Profile is not exists",
+			scenario: "ProfileName is not specified and Profile does not exist",
 			in: &Config{
 				Profile:             "",
 				Zone:                defaults.Zone,
@@ -119,7 +119,7 @@ func TestConfig_NewClient_loadFromProfile(t *testing.T) {
 			},
 		},
 		{
-			scenario: "ProfileName is not specified and Profile is exists",
+			scenario: "ProfileName is not specified but Profile does exist",
 			in: &Config{
 				Profile:             "",
 				Zone:                defaults.Zone,
@@ -150,7 +150,7 @@ func TestConfig_NewClient_loadFromProfile(t *testing.T) {
 			},
 		},
 		{
-			scenario: "ProfileName is not specified with some values and Profile is exists",
+			scenario: "Config has some values although Profile Name is not specified while Profile does exist",
 			in: &Config{
 				Profile:             "",
 				AccessToken:         "from config",
@@ -190,7 +190,7 @@ func TestConfig_NewClient_loadFromProfile(t *testing.T) {
 			},
 		},
 		{
-			scenario: "Profile name specified but not exists",
+			scenario: "Profile Name is specified although Profile does not exist",
 			in: &Config{
 				Profile: "test",
 			},
@@ -203,7 +203,35 @@ func TestConfig_NewClient_loadFromProfile(t *testing.T) {
 			err: errors.New(`loading profile "test" is failed: profile "test" is not exists`),
 		},
 		{
-			scenario: "Profile name specified with normal profile",
+			scenario: "Profile Name is specified with a regular Profile with only zone being set explicitly",
+			in: &Config{
+				Profile: "test",
+				Zone:    defaults.Zone,
+			},
+			profiles: map[string]*profile.ConfigValue{
+				"default": defaultProfile,
+				"test":    testProfile,
+			},
+			expect: &Config{
+				Profile:             "test",
+				AccessToken:         testProfile.AccessToken,
+				AccessTokenSecret:   testProfile.AccessTokenSecret,
+				Zone:                testProfile.Zone,
+				Zones:               testProfile.Zones,
+				TraceMode:           testProfile.TraceMode,
+				FakeMode:            "",
+				FakeStorePath:       testProfile.FakeStorePath,
+				AcceptLanguage:      testProfile.AcceptLanguage,
+				APIRootURL:          testProfile.APIRootURL,
+				RetryMax:            testProfile.RetryMax,
+				RetryWaitMin:        testProfile.RetryWaitMin,
+				RetryWaitMax:        testProfile.RetryWaitMax,
+				APIRequestTimeout:   testProfile.HTTPRequestTimeout,
+				APIRequestRateLimit: testProfile.HTTPRequestRateLimit,
+			},
+		},
+		{
+			scenario: "Profile Name is specified with a regular Profile with other values being default",
 			in: &Config{
 				Profile:             "test",
 				Zone:                defaults.Zone,
@@ -235,7 +263,39 @@ func TestConfig_NewClient_loadFromProfile(t *testing.T) {
 			},
 		},
 		{
-			scenario: "only Profile name specified with normal profile",
+			scenario: "Profile Name is specified with a regular Profile with other values being default",
+			in: &Config{
+				Profile:             "test",
+				Zone:                defaults.Zone,
+				Zones:               iaas.SakuraCloudZones,
+				RetryMax:            defaults.RetryMax,
+				APIRequestTimeout:   defaults.APIRequestTimeout,
+				APIRequestRateLimit: defaults.APIRequestRateLimit,
+			},
+			profiles: map[string]*profile.ConfigValue{
+				"default": defaultProfile,
+				"test":    testProfile,
+			},
+			expect: &Config{
+				Profile:             "test",
+				AccessToken:         testProfile.AccessToken,
+				AccessTokenSecret:   testProfile.AccessTokenSecret,
+				Zone:                testProfile.Zone,
+				Zones:               testProfile.Zones,
+				TraceMode:           testProfile.TraceMode,
+				FakeMode:            "",
+				FakeStorePath:       testProfile.FakeStorePath,
+				AcceptLanguage:      testProfile.AcceptLanguage,
+				APIRootURL:          testProfile.APIRootURL,
+				RetryMax:            testProfile.RetryMax,
+				RetryWaitMin:        testProfile.RetryWaitMin,
+				RetryWaitMax:        testProfile.RetryWaitMax,
+				APIRequestTimeout:   testProfile.HTTPRequestTimeout,
+				APIRequestRateLimit: testProfile.HTTPRequestRateLimit,
+			},
+		},
+		{
+			scenario: "Profile Name is specified with a regular Profile with no other values being set",
 			in: &Config{
 				Profile: "test",
 			},
