@@ -99,7 +99,7 @@ func TestConfig_NewClient_loadFromProfile(t *testing.T) {
 		err      error
 	}{
 		{
-			scenario: "ProfileName is not specified and Profile does not exist",
+			scenario: "Profile Name is not specified and Profile does not exist",
 			in: &Config{
 				Profile:             "",
 				Zone:                defaults.Zone,
@@ -119,7 +119,7 @@ func TestConfig_NewClient_loadFromProfile(t *testing.T) {
 			},
 		},
 		{
-			scenario: "ProfileName is not specified but Profile does exist",
+			scenario: "Profile Name is not specified but Profile does exist",
 			in: &Config{
 				Profile:             "",
 				Zone:                defaults.Zone,
