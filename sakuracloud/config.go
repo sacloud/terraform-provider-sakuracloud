@@ -93,6 +93,8 @@ func (c *APIClient) checkReferencedOption() query.CheckReferencedOption {
 	}
 }
 
+// providers.goでは環境変数とtfファイルを考慮した値を設定してくれててProfileは見てないので、こちらで明示的にProfileの値を設定する必要がある
+// 優先度は 環境変数 (providers.go) < プロファイル (ここ) < tfファイル (providers.go)
 func (c *Config) loadFromProfile() error {
 	if c.Profile == "" {
 		c.Profile = profile.DefaultProfileName

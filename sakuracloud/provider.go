@@ -224,6 +224,7 @@ func Provider() *schema.Provider {
 	return provider
 }
 
+// 環境変数とtfファイルを考慮してTerraformが裏で値を設定してくれてる
 func providerConfigure(d *schema.ResourceData, terraformVersion string) (interface{}, diag.Diagnostics) {
 	zones := expandStringList(d.Get("zones").([]interface{}))
 	if len(zones) == 0 {
