@@ -245,6 +245,93 @@ func TestAccSakuraCloudApprunApplication_withTraffic(t *testing.T) {
 	})
 }
 
+func TestAccImportSakuraCloudApprunApplication_basic(t *testing.T) {
+	rand := randomName()
+	checkFn := func(s []*terraform.InstanceState) error {
+		if len(s) != 1 {
+			return fmt.Errorf("expected 1 state: %#v", s)
+		}
+		expects := map[string]string{
+			"name":                    rand,
+			"timeout_seconds":         "90",
+			"port":                    "80",
+			"min_scale":               "0",
+			"max_scale":               "1",
+			"components.0.name":       "compo1",
+			"components.0.max_cpu":    "0.1",
+			"components.0.max_memory": "256Mi",
+			"components.0.deploy_source.0.container_registry.0.image": "apprun-test.sakuracr.jp/test1:latest",
+		}
+
+		return compareStateMulti(s[0], expects)
+	}
+
+	resourceName := "sakuracloud_apprun_application.foobar"
+
+	resource.Test(t, resource.TestCase{
+		PreCheck:          func() { testAccPreCheck(t) },
+		ProviderFactories: testAccProviderFactories,
+		CheckDestroy:      testCheckSakuraCloudApprunApplicationDestroy,
+		Steps: []resource.TestStep{
+			{
+				Config: buildConfigWithArgs(testAccSakuraCloudApprunApplication_basic, rand),
+			},
+			{
+				ResourceName:      resourceName,
+				ImportState:       true,
+				ImportStateCheck:  checkFn,
+				ImportStateVerify: true,
+			},
+		},
+	})
+}
+
+func TestAccImportSakuraCloudApprunApplication_withCRUser(t *testing.T) {
+	rand := randomName()
+	checkFn := func(s []*terraform.InstanceState) error {
+		if len(s) != 1 {
+			return fmt.Errorf("expected 1 state: %#v", s)
+		}
+		expects := map[string]string{
+			"name":                    rand,
+			"timeout_seconds":         "90",
+			"port":                    "80",
+			"min_scale":               "0",
+			"max_scale":               "1",
+			"components.0.name":       "compo1",
+			"components.0.max_cpu":    "0.1",
+			"components.0.max_memory": "256Mi",
+			"components.0.deploy_source.0.container_registry.0.image":    "apprun-test.sakuracr.jp/test1:latest",
+			"components.0.deploy_source.0.container_registry.0.username": "user",
+			"components.0.deploy_source.0.container_registry.0.password": "",
+		}
+
+		return compareStateMulti(s[0], expects)
+	}
+
+	resourceName := "sakuracloud_apprun_application.foobar"
+
+	resource.Test(t, resource.TestCase{
+		PreCheck:          func() { testAccPreCheck(t) },
+		ProviderFactories: testAccProviderFactories,
+		CheckDestroy:      testCheckSakuraCloudApprunApplicationDestroy,
+		Steps: []resource.TestStep{
+			{
+				Config: buildConfigWithArgs(testAccSakuraCloudApprunApplication_withCRUser, rand),
+			},
+			{
+				ResourceName:      resourceName,
+				ImportState:       true,
+				ImportStateCheck:  checkFn,
+				ImportStateVerify: true,
+				ImportStateVerifyIgnore: []string{
+					"components.0.deploy_source.0.container_registry.0.password",
+				},
+			},
+		},
+	})
+}
+
 func testCheckSakuraCloudApprunApplicationExists(n string, application *v1.Application) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
 		rs, ok := s.RootModule().Resources[n]
