@@ -16,7 +16,6 @@ package sakuracloud
 
 import (
 	"fmt"
-	"sort"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	v1 "github.com/sacloud/apprun-api-go/apis/v1"
@@ -45,7 +44,7 @@ func expandApprunApplicationComponentsForUpdate(d *schema.ResourceData) *[]v1.Pa
 
 		// Create Env
 		var env []v1.PatchApplicationBodyComponentEnv
-		for _, e := range c["env"].([]interface{}) {
+		for _, e := range c["env"].(*schema.Set).List() {
 			key := e.(map[string]interface{})["key"].(string)
 			value := e.(map[string]interface{})["value"].(string)
 
@@ -121,7 +120,7 @@ func expandApprunApplicationComponents(d *schema.ResourceData) *[]v1.PostApplica
 
 		// Create Env
 		var env []v1.PostApplicationBodyComponentEnv
-		for _, e := range c["env"].([]interface{}) {
+		for _, e := range c["env"].(*schema.Set).List() {
 			key := e.(map[string]interface{})["key"].(string)
 			value := e.(map[string]interface{})["value"].(string)
 
@@ -253,15 +252,25 @@ func flattenApprunApplicationComponents(d *schema.ResourceData, application *v1.
 	return results
 }
 
-func flattenApprunApplicationEnvs(component *v1.HandlerApplicationComponent) []map[string]interface{} {
-	var results []map[string]interface{}
-	for _, e := range sortEnv(*component.Env) {
-		results = append(results, map[string]interface{}{
+func flattenApprunApplicationEnvs(component *v1.HandlerApplicationComponent) *schema.Set {
+	set := &schema.Set{
+		F: schema.HashResource(&schema.Resource{
+			Schema: map[string]*schema.Schema{
+				"key": {
+					Type: schema.TypeString,
+				},
+			},
+		}),
+	}
+
+	for _, e := range *component.Env {
+		set.Add(map[string]interface{}{
 			"key":   *e.Key,
 			"value": *e.Value,
 		})
 	}
-	return results
+
+	return set
 }
 
 func flattenApprunApplicationProbe(component *v1.HandlerApplicationComponent) []map[string]interface{} {
@@ -312,14 +321,4 @@ func flattenApprunApplicationTraffics(traffics *[]v1.Traffic, versions *[]v1.Ver
 	}
 
 	return results
-}
-
-// NOTE: AppRunの /applications/{id} (GET) APIにおいて、envのリストの順番がタイミングによって変化するため、ソートしてから利用する。
-func sortEnv(envList []v1.HandlerApplicationComponentEnv) []v1.HandlerApplicationComponentEnv {
-	sort.Slice(envList, func(i, j int) bool {
-		keyI := *(envList)[i].Key
-		keyJ := *(envList)[j].Key
-		return keyI < keyJ
-	})
-	return envList
 }

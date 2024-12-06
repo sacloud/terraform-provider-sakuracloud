@@ -129,6 +129,7 @@ func TestAccSakuraCloudApprunApplication_withEnv(t *testing.T) {
 					resource.TestCheckResourceAttr(resourceName, "components.0.max_cpu", "0.1"),
 					resource.TestCheckResourceAttr(resourceName, "components.0.max_memory", "256Mi"),
 					resource.TestCheckResourceAttr(resourceName, "components.0.deploy_source.0.container_registry.0.image", "apprun-test.sakuracr.jp/test1:latest"),
+					resource.TestCheckResourceAttr(resourceName, "components.0.env.#", "2"),
 					resource.TestCheckResourceAttr(resourceName, "components.0.env.0.key", "key"),
 					resource.TestCheckResourceAttr(resourceName, "components.0.env.0.value", "value"),
 					resource.TestCheckResourceAttr(resourceName, "components.0.env.1.key", "key2"),
@@ -479,6 +480,10 @@ resource "sakuracloud_apprun_application" "foobar" {
     env {
       key   = "key"
       value = "value"
+    }
+    env {
+      key   = "key2"
+      value = "value2"
     }
     env {
       key   = "key2"
