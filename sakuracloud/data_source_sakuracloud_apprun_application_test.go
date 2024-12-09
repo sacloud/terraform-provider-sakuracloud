@@ -21,6 +21,8 @@ import (
 )
 
 func TestAccSakuraCloudDataSourceApprunApplication_basic(t *testing.T) {
+	skipIfFakeModeEnabled(t)
+
 	resourceName := "data.sakuracloud_apprun_application.foobar"
 	rand := randomName()
 
@@ -48,6 +50,8 @@ func TestAccSakuraCloudDataSourceApprunApplication_basic(t *testing.T) {
 }
 
 func TestAccSakuraCloudDataSourceApprunApplication_withCRUser(t *testing.T) {
+	skipIfFakeModeEnabled(t)
+
 	resourceName := "data.sakuracloud_apprun_application.foobar"
 	rand := randomName()
 
@@ -77,6 +81,8 @@ func TestAccSakuraCloudDataSourceApprunApplication_withCRUser(t *testing.T) {
 }
 
 func TestAccSakuraCloudDataSourceApprunApplication_withProbe(t *testing.T) {
+	skipIfFakeModeEnabled(t)
+
 	resourceName := "sakuracloud_apprun_application.foobar"
 	rand := randomName()
 
@@ -110,6 +116,8 @@ func TestAccSakuraCloudDataSourceApprunApplication_withProbe(t *testing.T) {
 }
 
 func TestAccSakuraCloudDataSourceApprunApplication_withTraffic(t *testing.T) {
+	skipIfFakeModeEnabled(t)
+
 	resourceName := "sakuracloud_apprun_application.foobar"
 	rand := randomName()
 
