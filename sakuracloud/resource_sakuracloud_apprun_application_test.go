@@ -27,6 +27,8 @@ import (
 )
 
 func TestAccSakuraCloudApprunApplication_basic(t *testing.T) {
+	skipIfFakeModeEnabled(t)
+
 	resourceName := "sakuracloud_apprun_application.foobar"
 	rand := randomName()
 
@@ -73,6 +75,8 @@ func TestAccSakuraCloudApprunApplication_basic(t *testing.T) {
 }
 
 func TestAccSakuraCloudApprunApplication_withCRUser(t *testing.T) {
+	skipIfFakeModeEnabled(t)
+
 	resourceName := "sakuracloud_apprun_application.foobar"
 	rand := randomName()
 
@@ -106,6 +110,8 @@ func TestAccSakuraCloudApprunApplication_withCRUser(t *testing.T) {
 }
 
 func TestAccSakuraCloudApprunApplication_withEnv(t *testing.T) {
+	skipIfFakeModeEnabled(t)
+
 	resourceName := "sakuracloud_apprun_application.foobar"
 	rand := randomName()
 
@@ -141,6 +147,8 @@ func TestAccSakuraCloudApprunApplication_withEnv(t *testing.T) {
 }
 
 func TestAccSakuraCloudApprunApplication_withProbe(t *testing.T) {
+	skipIfFakeModeEnabled(t)
+
 	resourceName := "sakuracloud_apprun_application.foobar"
 	rand := randomName()
 
@@ -195,6 +203,8 @@ func TestAccSakuraCloudApprunApplication_withProbe(t *testing.T) {
 }
 
 func TestAccSakuraCloudApprunApplication_withTraffic(t *testing.T) {
+	skipIfFakeModeEnabled(t)
+
 	resourceName := "sakuracloud_apprun_application.foobar"
 	rand := randomName()
 
@@ -247,6 +257,8 @@ func TestAccSakuraCloudApprunApplication_withTraffic(t *testing.T) {
 }
 
 func TestAccImportSakuraCloudApprunApplication_basic(t *testing.T) {
+	skipIfFakeModeEnabled(t)
+
 	rand := randomName()
 	checkFn := func(s []*terraform.InstanceState) error {
 		if len(s) != 1 {
@@ -288,6 +300,8 @@ func TestAccImportSakuraCloudApprunApplication_basic(t *testing.T) {
 }
 
 func TestAccImportSakuraCloudApprunApplication_withCRUser(t *testing.T) {
+	skipIfFakeModeEnabled(t)
+
 	rand := randomName()
 	checkFn := func(s []*terraform.InstanceState) error {
 		if len(s) != 1 {
