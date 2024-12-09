@@ -140,7 +140,7 @@ func resourceSakuraCloudApprunApplication() *schema.Resource {
 							},
 						},
 						"env": {
-							Type:        schema.TypeList,
+							Type:        schema.TypeSet,
 							Optional:    true,
 							Description: "The environment variables passed to components",
 							Elem: &schema.Resource{
@@ -158,6 +158,13 @@ func resourceSakuraCloudApprunApplication() *schema.Resource {
 									},
 								},
 							},
+							Set: schema.HashResource(&schema.Resource{
+								Schema: map[string]*schema.Schema{
+									"key": {
+										Type: schema.TypeString,
+									},
+								},
+							}),
 						},
 						"probe": {
 							Type:        schema.TypeList,
