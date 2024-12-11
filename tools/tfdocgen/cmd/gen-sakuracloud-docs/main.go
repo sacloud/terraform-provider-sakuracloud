@@ -77,6 +77,7 @@ const (
 	CategoryObjectStorage = "ObjectStorage"
 	CategoryLab           = "Lab"
 	CategoryMisc          = "Misc"
+	CategoryAppRun        = "AppRun"
 )
 
 var categories = []string{
@@ -90,11 +91,16 @@ var categories = []string{
 	CategoryLab,
 	CategoryMisc,
 	CategoryObjectStorage,
+	CategoryAppRun,
 }
 
 var definitions = map[string]definition{
 	"sakuracloud": {
 		displayName: "SakuraCloud",
+	},
+	"sakuracloud_apprun_application": {
+		displayName: "AppRun Application",
+		category:    CategoryAppRun,
 	},
 	"sakuracloud_archive": {
 		displayName: "Archive",
