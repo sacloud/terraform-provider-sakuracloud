@@ -156,12 +156,14 @@ func dataSourceSakuraCloudApprunApplication() *schema.Resource {
 										Elem: &schema.Resource{
 											Schema: map[string]*schema.Schema{
 												"path": {
-													Type:     schema.TypeString,
-													Computed: true,
+													Type:        schema.TypeString,
+													Computed:    true,
+													Description: "The path to access HTTP server to check probes",
 												},
 												"port": {
-													Type:     schema.TypeInt,
-													Computed: true,
+													Type:        schema.TypeInt,
+													Computed:    true,
+													Description: "The port number for accessing HTTP server and checking probes",
 												},
 												"headers": {
 													Type:     schema.TypeList,
@@ -170,14 +172,16 @@ func dataSourceSakuraCloudApprunApplication() *schema.Resource {
 													Elem: &schema.Resource{
 														Schema: map[string]*schema.Schema{
 															"name": {
-																Type:     schema.TypeString,
-																Computed: true,
-																Optional: true,
+																Type:        schema.TypeString,
+																Computed:    true,
+																Optional:    true,
+																Description: "The header field name",
 															},
 															"value": {
-																Type:     schema.TypeString,
-																Computed: true,
-																Optional: true,
+																Type:        schema.TypeString,
+																Computed:    true,
+																Optional:    true,
+																Description: "The header field value",
 															},
 														},
 													},
@@ -192,12 +196,14 @@ func dataSourceSakuraCloudApprunApplication() *schema.Resource {
 				},
 			},
 			"status": {
-				Type:     schema.TypeString,
-				Computed: true,
+				Type:        schema.TypeString,
+				Computed:    true,
+				Description: "The application status",
 			},
 			"public_url": {
-				Type:     schema.TypeString,
-				Computed: true,
+				Type:        schema.TypeString,
+				Computed:    true,
+				Description: "The public URL",
 			},
 		},
 	}
