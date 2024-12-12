@@ -22,6 +22,7 @@ import (
 	"regexp"
 	"testing"
 
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/acctest"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
 	"github.com/sacloud/iaas-api-go"
@@ -38,9 +39,11 @@ func TestAccSakuraCloudProxyLB_basic(t *testing.T) {
 	resourceName := "sakuracloud_proxylb.foobar"
 	rand := randomName()
 	ip := os.Getenv(envProxyLBRealServerIP0)
+	subDomain := "acme-acctest1" + acctest.RandStringFromCharSet(5, acctest.CharSetAlpha)
+	proxyLBDomain = os.Getenv(envProxyLBACMEDomain)
 
 	var proxylb, proxylbUpd iaas.ProxyLB
-	resource.ParallelTest(t, resource.TestCase{
+	resource.Test(t, resource.TestCase{
 		PreCheck:          func() { testAccPreCheck(t) },
 		ProviderFactories: testAccProviderFactories,
 		CheckDestroy: resource.ComposeTestCheckFunc(
@@ -98,6 +101,13 @@ func TestAccSakuraCloudProxyLB_basic(t *testing.T) {
 					resource.TestCheckResourceAttr(resourceName, "rule.0.request_header_value_ignore_case", "true"),
 					resource.TestCheckResourceAttr(resourceName, "rule.0.request_header_value_not_match", "true"),
 
+					resource.TestCheckResourceAttr(resourceName, "certificate.#", "1"),
+					resource.TestCheckResourceAttr(resourceName, "certificate.0.common_name", subDomain+"."+proxyLBDomain),
+					resource.TestCheckResourceAttr(resourceName,
+						"certificate.0.subject_alt_names",
+						fmt.Sprintf("%s.%s, acme-acctest2.%s, acme-acctest3.%s", subDomain, proxyLBDomain, proxyLBDomain, proxyLBDomain),
+					),
+
 					resource.TestCheckResourceAttrSet(resourceName, "vip"),
 					resource.TestCheckResourceAttrPair(
 						resourceName, "server.0.ip_address",
@@ -152,6 +162,12 @@ func TestAccSakuraCloudProxyLB_basic(t *testing.T) {
 					resource.TestCheckResourceAttr(resourceName, "rule.0.fixed_message_body", ""),
 					resource.TestCheckResourceAttr(resourceName, "rule.0.redirect_status_code", "301"),
 					resource.TestCheckResourceAttr(resourceName, "rule.0.redirect_location", "https://redirect.usacloud.jp"),
+					resource.TestCheckResourceAttr(resourceName, "certificate.#", "1"),
+					resource.TestCheckResourceAttr(resourceName, "certificate.0.common_name", subDomain+"."+proxyLBDomain),
+					resource.TestCheckResourceAttr(resourceName,
+						"certificate.0.subject_alt_names",
+						fmt.Sprintf("%s.%s, acme-acctest2.%s, acme-acctest3.%s", subDomain, proxyLBDomain, proxyLBDomain, proxyLBDomain),
+					),
 					resource.TestCheckResourceAttrSet(resourceName, "vip"),
 					resource.TestCheckResourceAttrPair(
 						resourceName, "server.0.ip_address",
@@ -259,7 +275,7 @@ func TestAccImportSakuraCloudProxyLB_basic(t *testing.T) {
 
 	resourceName := "sakuracloud_proxylb.foobar"
 
-	resource.ParallelTest(t, resource.TestCase{
+	resource.Test(t, resource.TestCase{
 		PreCheck:          func() { testAccPreCheck(t) },
 		ProviderFactories: testAccProviderFactories,
 		CheckDestroy:      testCheckSakuraCloudProxyLBDestroy,
@@ -354,6 +370,16 @@ resource sakuracloud_server "foobar" {
   }
 
   force_shutdown = true
+}
+
+resource sakuracloud_proxylb_acme "foobar" {
+  proxylb_id        = sakuracloud_proxylb.foobar.id
+  accept_tos        = true
+  common_name       = "{{ .arg2 }}.{{ .arg1 }}"
+  subject_alt_names = ["acme-acctest2.{{ .arg1 }}", "acme-acctest3.{{ .arg1 }}"]
+
+  update_delay_sec             = 120
+  get_certificates_timeout_sec = 300
 }
 `
 

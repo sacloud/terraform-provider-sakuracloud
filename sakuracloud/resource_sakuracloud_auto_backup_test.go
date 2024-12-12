@@ -31,7 +31,7 @@ func TestAccSakuraCloudAutoBackup_basic(t *testing.T) {
 	rand := randomName()
 
 	var autoBackup iaas.AutoBackup
-	resource.ParallelTest(t, resource.TestCase{
+	resource.Test(t, resource.TestCase{
 		PreCheck:          func() { testAccPreCheck(t) },
 		ProviderFactories: testAccProviderFactories,
 		CheckDestroy: resource.ComposeTestCheckFunc(
@@ -160,7 +160,7 @@ func TestAccImportSakuraCloudAutoBackup_basic(t *testing.T) {
 
 	resourceName := "sakuracloud_auto_backup.foobar"
 
-	resource.ParallelTest(t, resource.TestCase{
+	resource.Test(t, resource.TestCase{
 		PreCheck:          func() { testAccPreCheck(t) },
 		ProviderFactories: testAccProviderFactories,
 		CheckDestroy: resource.ComposeTestCheckFunc(

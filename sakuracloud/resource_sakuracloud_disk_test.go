@@ -32,7 +32,7 @@ func TestAccSakuraCloudDisk_basic(t *testing.T) {
 	rand := randomName()
 
 	var disk iaas.Disk
-	resource.ParallelTest(t, resource.TestCase{
+	resource.Test(t, resource.TestCase{
 		PreCheck:          func() { testAccPreCheck(t) },
 		ProviderFactories: testAccProviderFactories,
 		CheckDestroy: resource.ComposeTestCheckFunc(
@@ -75,6 +75,79 @@ func TestAccSakuraCloudDisk_basic(t *testing.T) {
 					resource.TestCheckResourceAttr(resourceName, "tags.1", "tag2-upd"),
 					resource.TestCheckResourceAttr(resourceName, "icon_id", ""),
 					resource.TestCheckResourceAttr(resourceName, "encryption_algorithm", "aes256_xts"),
+				),
+			},
+		},
+	})
+}
+
+func TestAccSakuraCloudDisk_with_Server(t *testing.T) {
+	skipIfFakeModeEnabled(t) // FakeModeだとip_address指定が動かないためスキップする
+
+	diskResourceName := "sakuracloud_disk.foobar"
+	serverResourceName := "sakuracloud_server.foobar"
+	rand := randomName()
+
+	var disk iaas.Disk
+	var server iaas.Server
+	resource.ParallelTest(t, resource.TestCase{
+		PreCheck:          func() { testAccPreCheck(t) },
+		ProviderFactories: testAccProviderFactories,
+		CheckDestroy: resource.ComposeTestCheckFunc(
+			testCheckSakuraCloudDiskDestroy,
+			testCheckSakuraCloudServerDestroy,
+		),
+		Steps: []resource.TestStep{
+			{
+				Config: buildConfigWithArgs(testAccSakuraCloudDisk_with_Server, rand),
+				Check: resource.ComposeTestCheckFunc(
+					testCheckSakuraCloudDiskExists(diskResourceName, &disk),
+					testCheckSakuraCloudDiskAttributes(&disk),
+					resource.TestCheckResourceAttr(diskResourceName, "name", rand),
+					resource.TestCheckResourceAttr(diskResourceName, "description", "description"),
+					resource.TestCheckResourceAttr(diskResourceName, "plan", "ssd"),
+					resource.TestCheckResourceAttr(diskResourceName, "connector", "virtio"),
+					resource.TestCheckResourceAttr(diskResourceName, "size", "20"),
+					resource.TestCheckResourceAttr(diskResourceName, "tags.#", "2"),
+					resource.TestCheckResourceAttr(diskResourceName, "tags.0", "tag1"),
+					resource.TestCheckResourceAttr(diskResourceName, "tags.1", "tag2"),
+					testCheckSakuraCloudServerExists(serverResourceName, &server),
+					testCheckSakuraCloudServerAttributes(&server),
+					resource.TestCheckResourceAttr(serverResourceName, "name", rand),
+					resource.TestCheckResourceAttr(serverResourceName, "core", "1"),
+					resource.TestCheckResourceAttr(serverResourceName, "memory", "2"),
+					resource.TestCheckResourceAttr(serverResourceName, "disks.#", "1"),
+					resource.TestCheckResourceAttr(serverResourceName, "interface_driver", "virtio"),
+					resource.TestCheckResourceAttr(serverResourceName, "network_interface.#", "1"),
+					resource.TestCheckResourceAttr(serverResourceName, "network_interface.0.upstream", "shared"),
+					resource.TestCheckResourceAttrSet(serverResourceName, "network_interface.0.mac_address"),
+					resource.TestCheckResourceAttrSet(serverResourceName, "ip_address"),
+				),
+			},
+			{
+				Config: buildConfigWithArgs(testAccSakuraCloudDisk_with_Server_update, rand),
+				Check: resource.ComposeTestCheckFunc(
+					testCheckSakuraCloudDiskExists(diskResourceName, &disk),
+					testCheckSakuraCloudDiskAttributes(&disk),
+					resource.TestCheckResourceAttr(diskResourceName, "name", rand+"-upd"),
+					resource.TestCheckResourceAttr(diskResourceName, "description", "description-upd"),
+					resource.TestCheckResourceAttr(diskResourceName, "plan", "ssd"),
+					resource.TestCheckResourceAttr(diskResourceName, "connector", "virtio"),
+					resource.TestCheckResourceAttr(diskResourceName, "size", "40"),
+					resource.TestCheckResourceAttr(diskResourceName, "tags.#", "2"),
+					resource.TestCheckResourceAttr(diskResourceName, "tags.0", "tag1-upd"),
+					resource.TestCheckResourceAttr(diskResourceName, "tags.1", "tag2-upd"),
+					testCheckSakuraCloudServerExists(serverResourceName, &server),
+					// testCheckSakuraCloudServerAttributes(&server),
+					resource.TestCheckResourceAttr(serverResourceName, "name", rand+"-upd"),
+					resource.TestCheckResourceAttr(serverResourceName, "core", "2"),
+					resource.TestCheckResourceAttr(serverResourceName, "memory", "4"),
+					resource.TestCheckResourceAttr(serverResourceName, "disks.#", "1"),
+					resource.TestCheckResourceAttr(serverResourceName, "interface_driver", "virtio"),
+					resource.TestCheckResourceAttr(serverResourceName, "network_interface.#", "1"),
+					resource.TestCheckResourceAttr(serverResourceName, "network_interface.0.upstream", "shared"),
+					resource.TestCheckResourceAttrSet(serverResourceName, "network_interface.0.mac_address"),
+					resource.TestCheckResourceAttrSet(serverResourceName, "ip_address"),
 				),
 			},
 		},
@@ -176,7 +249,7 @@ func TestAccImportSakuraCloudDisk_basic(t *testing.T) {
 
 	resourceName := "sakuracloud_disk.foobar"
 
-	resource.ParallelTest(t, resource.TestCase{
+	resource.Test(t, resource.TestCase{
 		PreCheck:          func() { testAccPreCheck(t) },
 		ProviderFactories: testAccProviderFactories,
 		CheckDestroy: resource.ComposeTestCheckFunc(
@@ -238,3 +311,57 @@ resource "sakuracloud_disk" "foobar" {
   tags              = ["tag1-upd", "tag2-upd"]
   encryption_algorithm = "aes256_xts"
 }`
+
+var testAccSakuraCloudDisk_with_Server = `
+data "sakuracloud_archive" "ubuntu" {
+  os_type = "ubuntu2004"
+}
+
+resource "sakuracloud_disk" "foobar" {
+  name              = "{{ .arg0 }}"
+  plan              = "ssd"
+  connector         = "virtio"
+  size              = 20
+  distant_from      = ["111111111111"]
+  source_archive_id = data.sakuracloud_archive.ubuntu.id
+  description       = "description"
+  tags              = ["tag1", "tag2"]
+}
+
+resource sakuracloud_server "foobar" {
+  name  = "{{ .arg0 }}"
+  disks = [sakuracloud_disk.foobar.id]
+  network_interface {
+    upstream = "shared"
+  }
+  core = 1
+  memory = 2
+}
+`
+
+var testAccSakuraCloudDisk_with_Server_update = `
+data "sakuracloud_archive" "ubuntu" {
+  os_type = "ubuntu2004"
+}
+
+resource "sakuracloud_disk" "foobar" {
+  name              = "{{ .arg0 }}-upd"
+  plan              = "ssd"
+  connector         = "virtio"
+  size              = 40
+  distant_from      = ["111111111111"]
+  source_archive_id = data.sakuracloud_archive.ubuntu.id
+  description       = "description-upd"
+  tags              = ["tag1-upd", "tag2-upd"]
+}
+
+resource sakuracloud_server "foobar" {
+  name  = "{{ .arg0 }}-upd"
+  disks = [sakuracloud_disk.foobar.id]
+  network_interface {
+    upstream = "shared"
+  }
+  core  = 2
+  memory = 4
+}
+`

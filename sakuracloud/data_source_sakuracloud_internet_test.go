@@ -24,7 +24,7 @@ func TestAccSakuraCloudDataSourceInternet_basic(t *testing.T) {
 	resourceName := "data.sakuracloud_internet.foobar"
 	rand := randomName()
 
-	resource.ParallelTest(t, resource.TestCase{
+	resource.Test(t, resource.TestCase{
 		PreCheck:          func() { testAccPreCheck(t) },
 		ProviderFactories: testAccProviderFactories,
 		Steps: []resource.TestStep{

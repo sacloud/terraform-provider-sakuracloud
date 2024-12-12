@@ -29,7 +29,7 @@ func TestAccSakuraCloudDataSourceProxyLB_basic(t *testing.T) {
 	ip0 := os.Getenv(envProxyLBRealServerIP0)
 	ip1 := os.Getenv(envProxyLBRealServerIP1)
 
-	resource.ParallelTest(t, resource.TestCase{
+	resource.Test(t, resource.TestCase{
 		PreCheck:          func() { testAccPreCheck(t) },
 		ProviderFactories: testAccProviderFactories,
 		Steps: []resource.TestStep{

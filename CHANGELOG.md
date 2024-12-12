@@ -1,5 +1,13 @@
 # CHANGELOG
 
+## 2.25.5 (2024/10/29)
+
+- sakuracloud_proxylb_acmeのimport時のバグを修正 #1174
+- sakuracloud_packet_filter_rulesのimportができないバグを修正 #1175
+- ParallelTest() -> Test() #1176
+- GSLBのヘルスチェックでプロトコルがHTTP/HTTPSの場合にポートの指定ができない不具合修正 #1180
+- ELBのACME証明書自動更新が無効になる不具合修正 #1178
+
 ## 2.25.4 (2024/6/10)
 
 - sakuracloud_cdrom: 20GB対応 #1169

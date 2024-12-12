@@ -20,6 +20,7 @@ resource "sakuracloud_gslb" "foobar" {
     protocol    = "http"
     delay_loop  = 10
     host_header = "example.com"
+    port        = "80"
     path        = "/"
     status      = "200"
   }
@@ -58,7 +59,7 @@ A `health_check` block supports the following:
 * `delay_loop` - (Optional) The interval in seconds between checks. This must be in the range [`10`-`60`].
 * `host_header` - (Optional) The value of host header send when checking by HTTP/HTTPS.
 * `path` - (Optional) The path used when checking by HTTP/HTTPS.
-* `port` - (Optional) The port number used when checking by TCP.
+* `port` - (Optional) The port number used when checking by TCP/HTTP/HTTPS.
 * `status` - (Optional) The response-code to expect when checking by HTTP/HTTPS.
 
 ---

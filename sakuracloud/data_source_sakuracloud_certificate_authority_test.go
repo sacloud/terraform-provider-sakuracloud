@@ -30,7 +30,7 @@ func TestAccSakuraCloudDataSourceCertificateAuthority_basic(t *testing.T) {
 	prefix := acctest.RandStringFromCharSet(60, acctest.CharSetAlpha)
 	password := randomPassword()
 
-	resource.ParallelTest(t, resource.TestCase{
+	resource.Test(t, resource.TestCase{
 		PreCheck:          func() { testAccPreCheck(t) },
 		ProviderFactories: testAccProviderFactories,
 		Steps: []resource.TestStep{

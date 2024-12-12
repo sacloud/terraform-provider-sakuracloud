@@ -30,7 +30,7 @@ func TestAccSakuraCloudSwitch_basic(t *testing.T) {
 	rand := randomName()
 
 	var sw iaas.Switch
-	resource.ParallelTest(t, resource.TestCase{
+	resource.Test(t, resource.TestCase{
 		PreCheck:          func() { testAccPreCheck(t) },
 		ProviderFactories: testAccProviderFactories,
 		CheckDestroy: resource.ComposeTestCheckFunc(

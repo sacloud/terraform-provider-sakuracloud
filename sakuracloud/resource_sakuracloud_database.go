@@ -70,7 +70,7 @@ func resourceSakuraCloudDatabase() *schema.Resource {
 				Type:             schema.TypeString,
 				ForceNew:         true,
 				Required:         true,
-				ValidateDiagFunc: validation.ToDiagFunc(validation.StringLenBetween(3, 20)),
+				ValidateDiagFunc: isValidLengthBetween(3, 20),
 				Description:      desc.Sprintf("The name of default user on the database. %s", desc.Length(3, 20)),
 			},
 			"password": {

@@ -41,7 +41,7 @@ func TestAccSakuraCloudProxyLBACME_basic(t *testing.T) {
 
 	var proxylb iaas.ProxyLB
 	resourceName := "sakuracloud_proxylb_acme.foobar"
-	resource.ParallelTest(t, resource.TestCase{
+	resource.Test(t, resource.TestCase{
 		PreCheck:          func() { testAccPreCheck(t) },
 		ProviderFactories: testAccProviderFactories,
 		CheckDestroy: resource.ComposeTestCheckFunc(

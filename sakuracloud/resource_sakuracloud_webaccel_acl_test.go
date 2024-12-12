@@ -36,7 +36,7 @@ func TestAccResourceSakuraCloudWebAccelACL_basic(t *testing.T) {
 
 	siteName := os.Getenv(envWebAccelSiteName)
 
-	resource.ParallelTest(t, resource.TestCase{
+	resource.Test(t, resource.TestCase{
 		PreCheck:          func() { testAccPreCheck(t) },
 		ProviderFactories: testAccProviderFactories,
 		CheckDestroy: func(*terraform.State) error {

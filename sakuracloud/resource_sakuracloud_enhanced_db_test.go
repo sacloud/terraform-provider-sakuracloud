@@ -37,7 +37,7 @@ func TestAccSakuraCloudEnhancedDB_basic(t *testing.T) {
 	password := randomPassword()
 
 	var reg iaas.EnhancedDB
-	resource.ParallelTest(t, resource.TestCase{
+	resource.Test(t, resource.TestCase{
 		PreCheck:          func() { testAccPreCheck(t) },
 		ProviderFactories: testAccProviderFactories,
 		CheckDestroy: resource.ComposeTestCheckFunc(

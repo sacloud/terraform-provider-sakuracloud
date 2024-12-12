@@ -28,6 +28,7 @@ import (
 	"github.com/hashicorp/go-multierror"
 	client "github.com/sacloud/api-client-go"
 	"github.com/sacloud/api-client-go/profile"
+	"github.com/sacloud/apprun-api-go"
 	"github.com/sacloud/iaas-api-go"
 	"github.com/sacloud/iaas-api-go/helper/api"
 	"github.com/sacloud/iaas-api-go/helper/query"
@@ -84,6 +85,7 @@ type APIClient struct {
 	vpcRouterWaitAfterCreateDuration time.Duration
 
 	webaccelClient *webaccel.Client
+	apprunClient   *apprun.Client
 }
 
 func (c *APIClient) checkReferencedOption() query.CheckReferencedOption {
@@ -242,5 +244,6 @@ func (c *Config) NewClient() (*APIClient, error) {
 		databaseWaitAfterCreateDuration:  databaseWaitAfterCreateDuration,
 		vpcRouterWaitAfterCreateDuration: vpcRouterWaitAfterCreateDuration,
 		webaccelClient:                   &webaccel.Client{Options: callerOptions},
+		apprunClient:                     &apprun.Client{Options: callerOptions},
 	}, nil
 }

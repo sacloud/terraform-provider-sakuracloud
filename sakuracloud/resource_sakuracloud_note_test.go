@@ -30,7 +30,7 @@ func TestAccSakuraCloudNote_basic(t *testing.T) {
 	rand := randomName()
 
 	var note iaas.Note
-	resource.ParallelTest(t, resource.TestCase{
+	resource.Test(t, resource.TestCase{
 		PreCheck:          func() { testAccPreCheck(t) },
 		ProviderFactories: testAccProviderFactories,
 		CheckDestroy:      testCheckSakuraCloudNoteDestroy,
@@ -67,7 +67,7 @@ func TestAccSakuraCloudNote_withYAML(t *testing.T) {
 	name := randomName()
 
 	var note iaas.Note
-	resource.ParallelTest(t, resource.TestCase{
+	resource.Test(t, resource.TestCase{
 		PreCheck:          func() { testAccPreCheck(t) },
 		ProviderFactories: testAccProviderFactories,
 		CheckDestroy:      testCheckSakuraCloudNoteDestroy,

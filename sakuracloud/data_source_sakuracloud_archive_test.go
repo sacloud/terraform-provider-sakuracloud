@@ -22,7 +22,7 @@ import (
 
 func TestAccSakuraCloudDataSourceArchive_osType(t *testing.T) {
 	resourceName := "data.sakuracloud_archive.foobar"
-	resource.ParallelTest(t, resource.TestCase{
+	resource.Test(t, resource.TestCase{
 		PreCheck:          func() { testAccPreCheck(t) },
 		ProviderFactories: testAccProviderFactories,
 		Steps: []resource.TestStep{
@@ -38,7 +38,7 @@ func TestAccSakuraCloudDataSourceArchive_osType(t *testing.T) {
 
 func TestAccSakuraCloudDataSourceArchive_withTag(t *testing.T) {
 	resourceName := "data.sakuracloud_archive.foobar"
-	resource.ParallelTest(t, resource.TestCase{
+	resource.Test(t, resource.TestCase{
 		PreCheck:          func() { testAccPreCheck(t) },
 		ProviderFactories: testAccProviderFactories,
 		Steps: []resource.TestStep{

@@ -30,7 +30,7 @@ func TestAccSakuraCloudIcon_basic(t *testing.T) {
 	name := randomName()
 
 	var icon iaas.Icon
-	resource.ParallelTest(t, resource.TestCase{
+	resource.Test(t, resource.TestCase{
 		PreCheck:          func() { testAccPreCheck(t) },
 		ProviderFactories: testAccProviderFactories,
 		CheckDestroy:      testCheckSakuraCloudIconDestroy,
@@ -64,7 +64,7 @@ func TestAccSakuraCloudIcon_withSwitch(t *testing.T) {
 	name := randomName()
 
 	var icon iaas.Icon
-	resource.ParallelTest(t, resource.TestCase{
+	resource.Test(t, resource.TestCase{
 		PreCheck:          func() { testAccPreCheck(t) },
 		ProviderFactories: testAccProviderFactories,
 		CheckDestroy: resource.ComposeTestCheckFunc(

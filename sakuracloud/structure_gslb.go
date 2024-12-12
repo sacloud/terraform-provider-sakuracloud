@@ -33,6 +33,7 @@ func expandGSLBHealthCheckConf(d resourceValueGettable) *iaas.GSLBHealthCheck {
 		return &iaas.GSLBHealthCheck{
 			Protocol:     types.EGSLBHealthCheckProtocol(protocol),
 			HostHeader:   conf["host_header"].(string),
+			Port:         types.StringNumber(conf["port"].(int)),
 			Path:         conf["path"].(string),
 			ResponseCode: types.StringNumber(forceAtoI(conf["status"].(string))),
 		}
@@ -75,6 +76,7 @@ func flattenGSLBHealthCheck(data *iaas.GSLB) []interface{} {
 	switch data.HealthCheck.Protocol {
 	case types.GSLBHealthCheckProtocols.HTTP, types.GSLBHealthCheckProtocols.HTTPS:
 		healthCheck["host_header"] = data.HealthCheck.HostHeader
+		healthCheck["port"] = data.HealthCheck.Port
 		healthCheck["path"] = data.HealthCheck.Path
 		healthCheck["status"] = data.HealthCheck.ResponseCode.String()
 	case types.GSLBHealthCheckProtocols.TCP:
