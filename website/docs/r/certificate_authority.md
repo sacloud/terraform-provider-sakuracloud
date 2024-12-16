@@ -21,7 +21,7 @@ Manages a SakuraCloud sakuracloud_certificate_authority.
 #    }
 #    sakuracloud = {
 #      source  = "sacloud/sakuracloud"
-#      version = "2.25.5"
+#      version = "2.26.0"
 #    }
 #  }
 #}
@@ -234,5 +234,3 @@ A `server` block exports the following:
 * `not_after` - The date on which the certificate validity period ends, in RFC3339 format.
 * `not_before` - The date on which the certificate validity period begins, in RFC3339 format.
 * `serial_number` - The body of the CA's certificate in PEM format.
-
-

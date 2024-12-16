@@ -1,5 +1,18 @@
 # CHANGELOG
 
+## 2.26.0 (2024/12/16)
+
+- AppRun対応のドキュメント作成 #1206
+- AppRunのenvをTypeSetに変更 #1203
+- Daily Integration Testにおいて、AppRunはFakeModeの場合はテストをスキップする #1202
+- AppRun対応 #1200
+- GoReleaser v2 #1195
+- go: bump github.com/hashicorp/go-retryablehttp from 0.7.5 to 0.7.7 #1194
+- fix: 一部のテストケースをAcceptance Testでのみ実行するように修正 #1191
+- docs: exampleでのデフォルト値をより汎用的な用途向けに修正 #1189
+- go: bump github.com/stretchr/testify from 1.9.0 to 1.10.0 #1186
+- リソース名長エラーを修正 #1181
+
 ## 2.25.5 (2024/10/29)
 
 - sakuracloud_proxylb_acmeのimport時のバグを修正 #1174
