@@ -20,7 +20,7 @@ terraform {
 
       # We recommend pinning to the specific version of the SakuraCloud Provider you're using
       # since new versions are released frequently
-      version = "2.25.5"
+      version = "2.26.0"
       #version = "~> 2"
     }
   }
@@ -78,5 +78,5 @@ resource "sakuracloud_server" "example" {
 ## License
 
  `terraform-proivder-sakuracloud` Copyright (C) 2016-2023 terraform-provider-sakuraclou authors.
- 
+
   This project is published under [Apache 2.0 License](LICENSE).

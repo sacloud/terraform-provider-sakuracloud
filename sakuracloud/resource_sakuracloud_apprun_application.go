@@ -180,12 +180,14 @@ func resourceSakuraCloudApprunApplication() *schema.Resource {
 										Elem: &schema.Resource{
 											Schema: map[string]*schema.Schema{
 												"path": {
-													Type:     schema.TypeString,
-													Required: true,
+													Type:        schema.TypeString,
+													Required:    true,
+													Description: "The path to access HTTP server to check probes",
 												},
 												"port": {
-													Type:     schema.TypeInt,
-													Required: true,
+													Type:        schema.TypeInt,
+													Required:    true,
+													Description: "The port number for accessing HTTP server and checking probes",
 												},
 												"headers": {
 													Type:     schema.TypeList,
@@ -193,12 +195,14 @@ func resourceSakuraCloudApprunApplication() *schema.Resource {
 													Elem: &schema.Resource{
 														Schema: map[string]*schema.Schema{
 															"name": {
-																Type:     schema.TypeString,
-																Optional: true,
+																Type:        schema.TypeString,
+																Optional:    true,
+																Description: "The header field name",
 															},
 															"value": {
-																Type:     schema.TypeString,
-																Optional: true,
+																Type:        schema.TypeString,
+																Optional:    true,
+																Description: "The header field value",
 															},
 														},
 													},

@@ -1,5 +1,22 @@
 # CHANGELOG
 
+## 2.26.0 (2024/12/16)
+
+- AppRun対応のドキュメント作成 #1206
+- AppRunのenvをTypeSetに変更 #1203
+- Daily Integration Testにおいて、AppRunはFakeModeの場合はテストをスキップする #1202
+- AppRun対応 #1200
+- go: bump golang.org/x/net from 0.18.0 to 0.23.0 #1156
+- go: bump github.com/hashicorp/go-retryablehttp from 0.7.5 to 0.7.7 #1194
+- go: bump github.com/stretchr/testify from 1.9.0 to 1.10.0 #1186
+- GoReleaser v2 #1195
+- ci: bump goreleaser/goreleaser-action from 5 to 6 #1168
+- go: bump google.golang.org/protobuf from 1.31.0 to 1.33.0 #1154
+- fix: 一部のテストケースをAcceptance Testでのみ実行するように修正 #1191
+- docs: exampleでのデフォルト値をより汎用的な用途向けに修正 #1189
+- Fix error when updating server-connected disk #1128
+- リソース名長エラーを修正 #1181
+
 ## 2.25.5 (2024/10/29)
 
 - sakuracloud_proxylb_acmeのimport時のバグを修正 #1174
@@ -36,16 +53,16 @@
 - go: bump github.com/sacloud/iaas-service-go from 1.9.2-0.20230808054001-efad52d748d4 to 1.9.2 #1119
 - go: bump github.com/sacloud/webaccel-api-go from 1.1.5 to 1.1.6 #1118
 - ci: bump actions/setup-go from 4 to 5 #1115
-- ドキュメント更新：ELBリクエストヘッダによる振り分けルール #1114 
+- ドキュメント更新：ELBリクエストヘッダによる振り分けルール #1114
 - Improve CI #1113
 - go: bump github.com/hashicorp/terraform-plugin-sdk/v2 from 2.27.0 to 2.30.0 #1112
 
 ## 2.25.0 (2023/11/20)
 
-- ELBリクエストヘッダによる振り分けルール対応  #1110 
+- ELBリクエストヘッダによる振り分けルール対応  #1110
 - go: bump github.com/hashicorp/terraform-plugin-go from 0.16.0 to 0.19.0 #1105 by dependabot bot was closed 4 days ago
-- ロードバランサの受け入れテストをデフォルトでスキップ #1099 
-- go 1.21 #1094 
+- ロードバランサの受け入れテストをデフォルトでスキップ #1099
+- go 1.21 #1094
 - Fix: サーバプラン変更テスト時のパラメータ指定誤りを修正 #1093
 - AMDプランのテストを環境変数指定時のみに限定 #1092
 - AMDプラン #1090
@@ -79,7 +96,7 @@
 - go: bump github.com/goccy/go-yaml from 1.10.0 to 1.10.1 #1051
 - fix: http_backend_keep_aliveのスキーマ修正 - デフォルト値の除去 #1050
 - iaas-api-go v1.9.1 #1049
-- go: bump github.com/hashicorp/terraform-plugin-go from 0.14.3 to 0.15.0 #1048 
+- go: bump github.com/hashicorp/terraform-plugin-go from 0.14.3 to 0.15.0 #1048
 - go: bump github.com/sacloud/webaccel-api-go from 1.1.4 to 1.1.5 #1047
 - iaas-api-go v1.9 #1046
 - go: bump github.com/hashicorp/terraform-plugin-sdk/v2 #1041
@@ -144,7 +161,7 @@ IMPROVEMENTS:
 - go: bump golang.org/x/text from 0.4.0 to 0.5.0 #993
 - go: bump github.com/sacloud/packages-go from 0.0.6 to 0.0.7 #996
 - ci: bump goreleaser/goreleaser-action from 3 to 4 #997
- 
+
 
 ## 2.20.1 (2022-12-05)
 
@@ -211,7 +228,7 @@ IMPROVEMENTS:
 
 ## 2.19.0 (2022-09-30)
 
-Note: 
+Note:
 - sakuracloud_archiveのos_typeで指定できる値が変更されています。指定できる値の詳細はsakuracloud_archiveのドキュメントを参照ください。
 - このバージョンからCHANGELOGの形式を変更します
 
@@ -224,7 +241,7 @@ IMPROVEMENTS:
 
 ## 2.18.0 (2022-08-22)
 
-このバージョンからterraform-plugin-muxによるTerraform Plugin SDK/Framework両方への対応が行われています(GH-932)。  
+このバージョンからterraform-plugin-muxによるTerraform Plugin SDK/Framework両方への対応が行われています(GH-932)。
 現時点ではFrameworkを利用するリソースはありませんが、今後追加されるリソースはFrameworkを用いて実装されます。
 
 FEATURES:
@@ -265,13 +282,13 @@ DOCS:
 
 ## 2.17.1 (2022-06-06)
 
-FIXES: 
+FIXES:
   - sakuracloud_proxylb_acmeでruleが反映されない問題を修正 [GH-901] (@yamamoto-febc)
 
 DOCS:
    - yamlencodeからjsonencodeへ変更 [GH-900] (@yamamoto-febc)
 
-## 2.17.0 (2022-06-03) 
+## 2.17.0 (2022-06-03)
 
 FEATURES:
 
@@ -315,7 +332,7 @@ IMPROVEMENTS:
 - libsacloud v2.31 [GH-879] (@yamamoto-febc)
 - libsacloud v2.30.0 - PostgreSQL 13 [GH-878] (@yamamoto-febc)
 
-Note: `data.sakuracloud_archive#os_type`:  `centos8` has been removed. 
+Note: `data.sakuracloud_archive#os_type`:  `centos8` has been removed.
 
 ## 2.15.0 (2021-12-08)
 
@@ -327,7 +344,7 @@ IMPROVEMENTS:
 
 - Upgrade dependencies - libsacloud [GH-876] (@yamamoto-febc)
 - Update dependencies - terraform-plugin-sdk/v2 v2.9.0 [GH-875] (@yamamoto-febc)
-- Update dependencies - terraform-plugin-sdk/v2 v2.8.0 [GH-873] (@yamamoto-febc) 
+- Update dependencies - terraform-plugin-sdk/v2 v2.8.0 [GH-873] (@yamamoto-febc)
 - Go 1.17 [GH-872] (@yamamoto-febc)
 - Update dependencies- github.com/sacloud/libsacloud/v2 v2.28.0 [GH-871] (@yamamoto-febc)
 
@@ -415,7 +432,7 @@ FIXES
 
 ## 2.9.2 (2021-06-24)
 
-- Fix zone name attribute of DNS [GH-838] (@chibiegg) 
+- Fix zone name attribute of DNS [GH-838] (@chibiegg)
 
 ## 2.9.1 (2021-06-21)
 
@@ -458,7 +475,7 @@ FIXES:
 
 DOCS:
 
-  * Fix packet_filter examples [GH-811] (@tokibi) 
+  * Fix packet_filter examples [GH-811] (@tokibi)
 
 ## 2.8.0(2021-03-22)
 
@@ -593,7 +610,7 @@ MISC
 
 * Startup Script Parameters [GH-731] (@yamamoto-febc)
     * libsacloud v2.5.1
-* libsacloud v2.5.2 - improve error messages [GH-733] (@yamamoto-febc)    
+* libsacloud v2.5.2 - improve error messages [GH-733] (@yamamoto-febc)
 
 ## 2.2.0 (2020-03-17)
 
@@ -653,4 +670,3 @@ IMPROVEMENTS
 NOTES:
 
 * Initial release of v2.0
-

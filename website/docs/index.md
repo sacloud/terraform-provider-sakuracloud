@@ -19,7 +19,7 @@ terraform {
 
       # We recommend pinning to the specific version of the SakuraCloud Provider you're using
       # since new versions are released frequently
-      version = "2.25.5"
+      version = "2.26.0"
       #version = "~> 2"
     }
   }
@@ -63,8 +63,8 @@ provider "sakuracloud" {
 ### Environment variables
 
 You can provide your credentials via the `SAKURACLOUD_ACCESS_TOKEN` and
-`SAKURACLOUD_ACCESS_TOKEN_SECRET`, environment variables, representing your 
-Access Token and your Access Secret, respectively. 
+`SAKURACLOUD_ACCESS_TOKEN_SECRET`, environment variables, representing your
+Access Token and your Access Secret, respectively.
 
 ```hcl
 provider "sakuracloud" {}
@@ -113,5 +113,3 @@ Example shared credentials file is follows:
 * `trace` - (Optional) The flag to enable output trace log. It can also be sourced from the `SAKURACLOUD_TRACE` environment variables, or via a shared credentials file if `profile` is specified.
 * `zone` - (Optional) The name of zone to use as default. It must be provided, but it can also be sourced from the `SAKURACLOUD_ZONE` environment variables, or via a shared credentials file if `profile` is specified.
 * `zones` - (Optional) A list of available SakuraCloud zone name. It can also be sourced via a shared credentials file if `profile` is specified. Default:[`is1a`, `is1b`, `tk1a`, `tk1v`].
-
-
