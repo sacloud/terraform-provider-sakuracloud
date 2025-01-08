@@ -1,4 +1,4 @@
-// Copyright 2016-2023 The sacloud/terraform-provider-sakuracloud Authors
+// Copyright 2016-2025 The sacloud/terraform-provider-sakuracloud Authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -22,7 +22,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
-
 	"github.com/sacloud/apprun-api-go"
 	v1 "github.com/sacloud/apprun-api-go/apis/v1"
 	"github.com/sacloud/terraform-provider-sakuracloud/internal/desc"
