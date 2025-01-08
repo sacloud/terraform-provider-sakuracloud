@@ -234,6 +234,16 @@ func resourceSakuraCloudApprunApplication() *schema.Resource {
 					},
 				},
 			},
+			"status": {
+				Type:        schema.TypeString,
+				Computed:    true,
+				Description: "The application status",
+			},
+			"public_url": {
+				Type:        schema.TypeString,
+				Computed:    true,
+				Description: "The public URL",
+			},
 		},
 	}
 }
@@ -396,6 +406,8 @@ func setApprunApplicationResourceData(d *schema.ResourceData, application *v1.Ap
 	d.Set("max_scale", application.MaxScale)
 	d.Set("components", flattenApprunApplicationComponents(d, application, true))
 	d.Set("traffics", flattenApprunApplicationTraffics(traffics, versions))
+	d.Set("status", *application.Status)
+	d.Set("public_url", *application.PublicUrl)
 
 	return nil
 }

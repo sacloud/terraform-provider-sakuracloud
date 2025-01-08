@@ -18,6 +18,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"regexp"
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
@@ -52,6 +53,8 @@ func TestAccSakuraCloudApprunApplication_basic(t *testing.T) {
 					resource.TestCheckResourceAttr(resourceName, "components.0.max_cpu", "0.1"),
 					resource.TestCheckResourceAttr(resourceName, "components.0.max_memory", "256Mi"),
 					resource.TestCheckResourceAttr(resourceName, "components.0.deploy_source.0.container_registry.0.image", "apprun-test.sakuracr.jp/test1:latest"),
+					resource.TestMatchResourceAttr(resourceName, "status", regexp.MustCompile(".+")),
+					resource.TestMatchResourceAttr(resourceName, "public_url", regexp.MustCompile(".+")),
 				),
 			},
 			{
@@ -294,6 +297,10 @@ func TestAccImportSakuraCloudApprunApplication_basic(t *testing.T) {
 				ImportState:       true,
 				ImportStateCheck:  checkFn,
 				ImportStateVerify: true,
+				ImportStateVerifyIgnore: []string{
+					"status",
+					"public_url",
+				},
 			},
 		},
 	})
@@ -341,6 +348,8 @@ func TestAccImportSakuraCloudApprunApplication_withCRUser(t *testing.T) {
 				ImportStateVerify: true,
 				ImportStateVerifyIgnore: []string{
 					"components.0.deploy_source.0.container_registry.0.password",
+					"status",
+					"public_url",
 				},
 			},
 		},
