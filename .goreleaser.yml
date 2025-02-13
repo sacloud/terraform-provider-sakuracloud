@@ -60,4 +60,4 @@ signs:
 # release:
 #   draft: true
 changelog:
-  disable: true
+  disable: false
