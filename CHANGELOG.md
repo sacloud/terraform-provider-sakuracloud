@@ -1,5 +1,12 @@
 # CHANGELOG
 
+## 2.26.1 (2025/02/13)
+
+- ContainerRegistry:beta #1225
+- enable CHANGELOG: #1226
+- sakuracloud_apprun_application: added status and public_url #1212
+- go: bump golang.org/x/crypto from 0.23.0 to 0.31.0 #1205
+
 ## 2.26.0 (2024/12/16)
 
 - AppRun対応のドキュメント作成 #1206
