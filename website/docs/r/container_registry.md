@@ -1,7 +1,7 @@
 ---
 layout: "sakuracloud"
 page_title: "SakuraCloud: sakuracloud_container_registry"
-subcategory: "Lab"
+subcategory: "Global"
 description: |-
   Manages a SakuraCloud Container Registry.
 ---
