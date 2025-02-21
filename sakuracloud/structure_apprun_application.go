@@ -259,6 +259,9 @@ func flattenApprunApplicationEnvs(component *v1.HandlerApplicationComponent) *sc
 				"key": {
 					Type: schema.TypeString,
 				},
+				"value": {
+					Type: schema.TypeString,
+				},
 			},
 		}),
 	}
