@@ -79,6 +79,7 @@ func resourceSakuraCloudApprunApplication() *schema.Resource {
 							Type:        schema.TypeString,
 							Required:    true,
 							Description: "The component name",
+							ForceNew:    true,
 						},
 						"max_cpu": {
 							Type:             schema.TypeString,
@@ -341,13 +342,11 @@ func resourceSakuraCloudApprunApplicationUpdate(ctx context.Context, d *schema.R
 		return diag.Errorf("could not read SakuraCloud Apprun Application[%s]: %s", d.Id(), err)
 	}
 
-	patchedName := d.Get("name").(string)
 	patchedTimeoutSeconds := d.Get("timeout_seconds").(int)
 	patchedPort := d.Get("port").(int)
 	patchedMinScale := d.Get("min_scale").(int)
 	patchedMaxScale := d.Get("max_scale").(int)
 	params := v1.PatchApplicationBody{
-		Name:           &patchedName,
 		TimeoutSeconds: &patchedTimeoutSeconds,
 		Port:           &patchedPort,
 		MinScale:       &patchedMinScale,
