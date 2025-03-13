@@ -1,6 +1,7 @@
 module github.com/sacloud/terraform-provider-sakuracloud
 
 go 1.21
+toolchain go1.23.7
 
 require (
 	github.com/goccy/go-yaml v1.11.3
@@ -19,7 +20,7 @@ require (
 	github.com/sacloud/packages-go v0.0.10
 	github.com/sacloud/webaccel-api-go v1.2.0
 	github.com/stretchr/testify v1.10.0
-	golang.org/x/text v0.21.0
+	golang.org/x/text v0.22.0
 )
 
 require (
@@ -114,10 +115,10 @@ require (
 	go.opentelemetry.io/proto/otlp v1.0.0 // indirect
 	go.uber.org/ratelimit v0.3.1 // indirect
 	golang.org/x/arch v0.8.0 // indirect
-	golang.org/x/crypto v0.31.0 // indirect
+	golang.org/x/crypto v0.35.0 // indirect
 	golang.org/x/mod v0.17.0 // indirect
-	golang.org/x/net v0.33.0 // indirect
-	golang.org/x/sys v0.28.0 // indirect
+	golang.org/x/net v0.36.0 // indirect
+	golang.org/x/sys v0.30.0 // indirect
 	golang.org/x/xerrors v0.0.0-20220411194840-2f41105eb62f // indirect
 	google.golang.org/appengine v1.6.8 // indirect
 	google.golang.org/genproto/googleapis/api v0.0.0-20240123012728-ef4313101c80 // indirect
