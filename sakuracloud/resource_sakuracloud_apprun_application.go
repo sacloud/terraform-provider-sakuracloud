@@ -16,6 +16,7 @@ package sakuracloud
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 	"time"
 
@@ -246,6 +247,7 @@ func resourceSakuraCloudApprunApplication() *schema.Resource {
 				Description: "The public URL",
 			},
 		},
+		CustomizeDiff: resourceSakuraCloudApprunApplicationDiff,
 	}
 }
 
@@ -393,6 +395,13 @@ func resourceSakuraCloudApprunApplicationDelete(ctx context.Context, d *schema.R
 
 	if err := appOp.Delete(ctx, *application.Id); err != nil {
 		return diag.Errorf("deleting SakuraCloud Apprun Application[%s] is failed: %s", *application.Id, err)
+	}
+	return nil
+}
+
+func resourceSakuraCloudApprunApplicationDiff(_ context.Context, d *schema.ResourceDiff, _ interface{}) error {
+	if len(d.Id()) != 0 && d.HasChange("name") {
+		return fmt.Errorf(`invalid diff found in SakuraCloud Apprun Application[%s]: “name” is immutable and cannot be updated`, d.Id())
 	}
 	return nil
 }

@@ -259,6 +259,59 @@ func TestAccSakuraCloudApprunApplication_withTraffic(t *testing.T) {
 	})
 }
 
+func TestAccSakuraCloudApprunApplication_diffInName(t *testing.T) {
+	skipIfFakeModeEnabled(t)
+
+	resourceName := "sakuracloud_apprun_application.foobar"
+	rand := randomName()
+
+	var application v1.Application
+	resource.Test(t, resource.TestCase{
+		PreCheck:          func() { testAccPreCheck(t) },
+		ProviderFactories: testAccProviderFactories,
+		CheckDestroy:      testCheckSakuraCloudApprunApplicationDestroy,
+		Steps: []resource.TestStep{
+			{
+				Config: buildConfigWithArgs(testAccSakuraCloudApprunApplication_basic, rand),
+				Check: resource.ComposeTestCheckFunc(
+					testCheckSakuraCloudApprunApplicationExists(resourceName, &application),
+					testCheckSakuraCloudApprunApplicationAttributes(&application),
+					resource.TestCheckResourceAttr(resourceName, "name", rand),
+					resource.TestCheckResourceAttr(resourceName, "timeout_seconds", "90"),
+					resource.TestCheckResourceAttr(resourceName, "port", "80"),
+					resource.TestCheckResourceAttr(resourceName, "min_scale", "0"),
+					resource.TestCheckResourceAttr(resourceName, "max_scale", "1"),
+					resource.TestCheckResourceAttr(resourceName, "components.0.name", "compo1"),
+					resource.TestCheckResourceAttr(resourceName, "components.0.max_cpu", "0.1"),
+					resource.TestCheckResourceAttr(resourceName, "components.0.max_memory", "256Mi"),
+					resource.TestCheckResourceAttr(resourceName, "components.0.deploy_source.0.container_registry.0.image", "apprun-test.sakuracr.jp/test1:latest"),
+					resource.TestMatchResourceAttr(resourceName, "status", regexp.MustCompile(".+")),
+					resource.TestMatchResourceAttr(resourceName, "public_url", regexp.MustCompile(".+")),
+				),
+			},
+			{
+				Config: buildConfigWithArgs(testAccSakuraCloudApprunApplication_update, fmt.Sprintf("%s2", rand)),
+				Check: resource.ComposeTestCheckFunc(
+					testCheckSakuraCloudApprunApplicationExists(resourceName, &application),
+					testCheckSakuraCloudApprunApplicationAttributes(&application),
+					resource.TestCheckResourceAttr(resourceName, "name", rand),
+					resource.TestCheckResourceAttr(resourceName, "timeout_seconds", "90"),
+					resource.TestCheckResourceAttr(resourceName, "port", "80"),
+					resource.TestCheckResourceAttr(resourceName, "min_scale", "0"),
+					resource.TestCheckResourceAttr(resourceName, "max_scale", "1"),
+					resource.TestCheckResourceAttr(resourceName, "components.0.name", "compo1"),
+					resource.TestCheckResourceAttr(resourceName, "components.0.max_cpu", "0.1"),
+					resource.TestCheckResourceAttr(resourceName, "components.0.max_memory", "256Mi"),
+					resource.TestCheckResourceAttr(resourceName, "components.0.deploy_source.0.container_registry.0.image", "apprun-test.sakuracr.jp/test1:latest"),
+					resource.TestMatchResourceAttr(resourceName, "status", regexp.MustCompile(".+")),
+					resource.TestMatchResourceAttr(resourceName, "public_url", regexp.MustCompile(".+")),
+				),
+				ExpectError: regexp.MustCompile(`invalid diff found in SakuraCloud Apprun Application\[(.*)\]: “name” is immutable and cannot be updated`),
+			},
+		},
+	})
+}
+
 func TestAccImportSakuraCloudApprunApplication_basic(t *testing.T) {
 	skipIfFakeModeEnabled(t)
 
