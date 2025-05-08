@@ -624,7 +624,7 @@ func testCheckSakuraCloudServerDestroy(s *terraform.State) error {
 
 const testAccSakuraCloudServer_basic = `
 data "sakuracloud_archive" "ubuntu" {
-  os_type = "ubuntu2004"
+  os_type = "ubuntu"
 }
 resource "sakuracloud_disk" "foobar" {
   name              = "{{ .arg0 }}"
@@ -666,7 +666,7 @@ resource "sakuracloud_icon" "foobar" {
 
 const testAccSakuraCloudServer_update = `
 data "sakuracloud_archive" "ubuntu" {
-  os_type = "ubuntu2004"
+  os_type = "ubuntu"
 }
 
 resource "sakuracloud_disk" "foobar" {
@@ -690,7 +690,7 @@ resource "sakuracloud_server" "foobar" {
 
 const testAccSakuraCloudServer_validateHostName = `
 data "sakuracloud_archive" "ubuntu" {
-  os_type = "ubuntu2004"
+  os_type = "ubuntu"
 }
 resource "sakuracloud_disk" "foobar" {
   name              = "{{ .arg0 }}"
@@ -892,7 +892,7 @@ resource "sakuracloud_disk" "foobar" {
 
 const testAccSakuraCloudServer_switch = `
 data "sakuracloud_archive" "ubuntu" {
-  os_type = "ubuntu2004"
+  os_type = "ubuntu"
 }
 
 resource "sakuracloud_disk" "foobar" {
@@ -934,7 +934,7 @@ resource "sakuracloud_switch" "sw" {
 }
 
 data "sakuracloud_archive" "ubuntu" {
-  os_type = "ubuntu2004"
+  os_type = "ubuntu"
 }
 resource "sakuracloud_disk" "foobar" {
   name              = "{{ .arg0 }}"
@@ -969,7 +969,7 @@ resource "sakuracloud_switch" "sw" {
 }
 
 data "sakuracloud_archive" "ubuntu" {
-  os_type = "ubuntu2004"
+  os_type = "ubuntu"
 }
 
 resource "sakuracloud_disk" "foobar" {
@@ -1005,7 +1005,7 @@ resource "sakuracloud_switch" "sw" {
 }
 
 data "sakuracloud_archive" "ubuntu" {
-  os_type = "ubuntu2004"
+  os_type = "ubuntu"
 }
 
 resource "sakuracloud_disk" "foobar" {
@@ -1037,7 +1037,7 @@ resource "sakuracloud_server" "foobar" {
 
 const testAccSakuraCloudServer_standardPlan = `
 data "sakuracloud_archive" "ubuntu" {
-  os_type = "ubuntu2004"
+  os_type = "ubuntu"
 }
 resource "sakuracloud_disk" "foobar" {
   name              = "{{ .arg0 }}"
@@ -1063,7 +1063,7 @@ resource "sakuracloud_server" "foobar" {
 
 const testAccSakuraCloudServer_dedicatedCPUPlan = `
 data "sakuracloud_archive" "ubuntu" {
-  os_type = "ubuntu2004"
+  os_type = "ubuntu"
 }
 resource "sakuracloud_disk" "foobar" {
   name              = "{{ .arg0 }}"
