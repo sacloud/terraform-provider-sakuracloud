@@ -126,3 +126,5 @@ require (
 	google.golang.org/protobuf v1.34.1 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
+
+replace github.com/sacloud/webaccel-api-go => github.com/g1eng/webaccel-api-go v0.0.0-20250509033841-95ac8fb16924

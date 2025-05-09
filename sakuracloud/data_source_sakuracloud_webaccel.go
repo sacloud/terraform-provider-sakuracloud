@@ -50,13 +50,54 @@ func dataSourceSakuraCloudWebAccel() *schema.Resource {
 				Type:     schema.TypeString,
 				Computed: true,
 			},
+			"origin_parameters": {
+				Type:     schema.TypeSet,
+				Computed: true,
+				Elem: &schema.Resource{
+					Schema: map[string]*schema.Schema{
+						//FIXME: フィールド毎に関数で生成。代入時にも使う
+						"type": {
+							Type:     schema.TypeString,
+							Required: true,
+						},
+						"host": {
+							Type:     schema.TypeString,
+							Optional: true,
+						},
+						"protocol": {
+							Type:     schema.TypeString,
+							Optional: true,
+						},
+						"host_header": {
+							Type:     schema.TypeString,
+							Optional: true,
+						},
+						"s3_endpoint": {
+							Type:     schema.TypeString,
+							Optional: true,
+						},
+						"s3_region": {
+							Type:     schema.TypeString,
+							Optional: true,
+						},
+						"bucket_name": {
+							Type:     schema.TypeString,
+							Optional: true,
+						},
+						"doc_index": {
+							Type:     schema.TypeBool,
+							Optional: true,
+						},
+					},
+				},
+			},
 			"subdomain": {
 				Type:     schema.TypeString,
 				Computed: true,
 			},
 			"domain_type": {
 				Type:     schema.TypeString,
-				Computed: true,
+				Optional: true,
 			},
 			"has_certificate": {
 				Type:     schema.TypeBool,
@@ -64,7 +105,7 @@ func dataSourceSakuraCloudWebAccel() *schema.Resource {
 			},
 			"host_header": {
 				Type:     schema.TypeString,
-				Computed: true,
+				Optional: true,
 			},
 			"status": {
 				Type:     schema.TypeString,
@@ -75,6 +116,35 @@ func dataSourceSakuraCloudWebAccel() *schema.Resource {
 				Computed: true,
 			},
 			"txt_record_value": {
+				Type:     schema.TypeString,
+				Computed: true,
+			},
+			"default_cache_ttl": {
+				Type:     schema.TypeInt,
+				Optional: true,
+			},
+			"vary_support": {
+				Type:     schema.TypeBool,
+				Optional: true,
+			},
+			"cors_rules": {
+				Type:     schema.TypeList,
+				Optional: true,
+				Elem: &schema.Resource{
+					Schema: map[string]*schema.Schema{
+						"allow_all_origin": {
+							Type:     schema.TypeBool,
+							Computed: true,
+						},
+						"allowed_origins": {
+							Type:     schema.TypeList,
+							Computed: true,
+							Elem:     &schema.Schema{Type: schema.TypeString},
+						},
+					},
+				},
+			},
+			"normalize_ae": {
 				Type:     schema.TypeString,
 				Computed: true,
 			},
@@ -124,6 +194,44 @@ func dataSourceSakuraCloudWebAccelRead(ctx context.Context, d *schema.ResourceDa
 	d.Set("has_certificate", data.HasCertificate)
 	d.Set("host_header", data.HostHeader)
 	d.Set("status", data.Status)
+
+	originParams := make(map[string]interface{})
+	switch data.OriginType {
+	case webaccel.OriginTypesWebServer:
+		originParams["type"] = "web"
+		originParams["host"] = data.Origin
+		if data.OriginProtocol == webaccel.OriginProtocolsHttp {
+			originParams["protocol"] = "http"
+		} else if data.OriginProtocol == webaccel.OriginProtocolsHttps {
+			originParams["protocol"] = "https"
+		} else {
+			panic("invalid origin protocol: " + data.OriginProtocol)
+		}
+		if data.HostHeader != "" {
+			originParams["host_header"] = data.HostHeader
+		}
+	case webaccel.OriginTypesObjectStorage:
+		originParams["type"] = "object_storage"
+		if data.S3Endpoint == "" || data.S3Region == "" || data.BucketName == "" {
+			panic("origin parameters are not fully provided: [s3_endpoint, s3_region, bucket_name]")
+		}
+		originParams["s3_endpoint"] = data.S3Endpoint
+		originParams["s3_region"] = data.S3Region
+		originParams["bucket_name"] = data.BucketName
+	default:
+		panic(fmt.Sprintf("unknown origin type: %s", data.OriginType))
+	}
+	d.Set("origin_parameters", []interface{}{originParams})
+	if data.NormalizeAE != "" {
+		d.Set("normalize_ae", data.NormalizeAE)
+	}
+
+	switch data.OriginType {
+	case webaccel.OriginTypesWebServer:
+	case webaccel.OriginTypesObjectStorage:
+	default:
+		return diag.Errorf("unknown origin type: %s", data.OriginType)
+	}
 
 	d.Set("cname_record_value", data.Subdomain+".")
 	d.Set("txt_record_value", fmt.Sprintf("webaccel=%s", data.Subdomain))

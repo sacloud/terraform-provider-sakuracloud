@@ -28,6 +28,7 @@ import (
 const (
 	envWebAccelSiteName   = "SAKURACLOUD_WEBACCEL_SITE_NAME"
 	envWebAccelDomainName = "SAKURACLOUD_WEBACCEL_DOMAIN_NAME"
+	envWebAccelOrigin     = "SAKURACLOUD_WEBACCEL_ORIGIN"
 )
 
 func TestAccSakuraCloudDataSourceWebAccel_ByName(t *testing.T) {
@@ -52,6 +53,7 @@ func TestAccSakuraCloudDataSourceWebAccel_ByName(t *testing.T) {
 					resource.TestCheckResourceAttr("data.sakuracloud_webaccel.foobar", "name", siteName),
 					resource.TestMatchResourceAttr("data.sakuracloud_webaccel.foobar", "domain", regexpNotEmpty),
 					resource.TestMatchResourceAttr("data.sakuracloud_webaccel.foobar", "origin", regexpNotEmpty),
+					resource.TestMatchResourceAttr("data.sakuracloud_webaccel.foobar", "origin_parameters.0.type", regexpNotEmpty),
 					resource.TestMatchResourceAttr("data.sakuracloud_webaccel.foobar", "subdomain", regexpNotEmpty),
 					resource.TestMatchResourceAttr("data.sakuracloud_webaccel.foobar", "domain_type", regexpNotEmpty),
 					//resource.TestMatchResourceAttr("data.sakuracloud_webaccel.foobar", "has_certificate", regexpNotEmpty),
@@ -87,6 +89,7 @@ func TestAccSakuraCloudDataSourceWebAccel_ByDomain(t *testing.T) {
 					resource.TestCheckResourceAttr("data.sakuracloud_webaccel.foobar", "domain", domainName),
 					resource.TestMatchResourceAttr("data.sakuracloud_webaccel.foobar", "name", regexpNotEmpty),
 					resource.TestMatchResourceAttr("data.sakuracloud_webaccel.foobar", "origin", regexpNotEmpty),
+					resource.TestMatchResourceAttr("data.sakuracloud_webaccel.foobar", "origin_parameters.0.type", regexpNotEmpty),
 					resource.TestMatchResourceAttr("data.sakuracloud_webaccel.foobar", "subdomain", regexpNotEmpty),
 					resource.TestMatchResourceAttr("data.sakuracloud_webaccel.foobar", "domain_type", regexpNotEmpty),
 					//resource.TestMatchResourceAttr("data.sakuracloud_webaccel.foobar", "has_certificate", regexpNotEmpty),
