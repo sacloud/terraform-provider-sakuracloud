@@ -17,6 +17,8 @@ package sakuracloud
 import (
 	"fmt"
 	"os"
+	"regexp"
+	"strings"
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
@@ -65,18 +67,19 @@ func TestAccResourceSakuraCloudWebAccel_InvalidConfigurations(t *testing.T) {
 	}
 	origin := os.Getenv(envWebAccelOrigin)
 	for name, tc := range testAccCheckSakuraCloudWebAccelInvalidConfigs(origin) {
+		t.Logf("test for invalid configuration: %s", name)
 		resource.Test(t, resource.TestCase{
 			ProviderFactories: testAccProviderFactories,
+			CheckDestroy: func(*terraform.State) error {
+				return nil
+			},
 			Steps: []resource.TestStep{
 				{
 					Config: tc,
+					ExpectError: func() *regexp.Regexp {
+						return regexp.MustCompile(".")
+					}(),
 				},
-			},
-			ErrorCheck: func(err error) error {
-				if err == nil {
-					return fmt.Errorf("config %s should result error. real: nil", name)
-				}
-				return nil
 			},
 		})
 	}
@@ -111,9 +114,11 @@ resource sakuracloud_webaccel "foobar" {
   request_protocol = "https-redirect"
   origin_parameters {
     type = "bucket"
-    s3_endpoint = "%s"
-    s3_region = "%s"
+    endpoint = "%s"
+    region = "%s"
     bucket_name = "%s"
+    access_key_id = "%s"
+    secret_access_key = "%s"
   }
   vary_support = true
   default_cache_ttl = 3600
@@ -224,9 +229,8 @@ resource sakuracloud_webaccel "foobar" {
   origin_parameters {
     type = "bucket"
     region = "jp-sample-1"
-    s3_access_key_id = "sample"
-    s3_secret_access_key = "sample"
-    
+    access_key_id = "sample"
+    secret_access_key = "sample"
   }
   vary_support = true
   default_cache_ttl = 3600
@@ -268,36 +272,21 @@ resource sakuracloud_webaccel "foobar" {
 }
 `
 
-	confValid := `
-resource sakuracloud_webaccel "foobar" {
-  name = "dummy"
-  domain_type = "subdomain"
-  request_protocol = "https-redirect"
-  origin_parameters {
-    type = "web"
-    host = "%s"
-    host_header = "dummy.example.com"
-    protocol = "https"
-  }
-  vary_support = true
-  normalize_ae = "INVALID"
-}
-`
-
 	tt := map[string]string{
-		"invalid-request-protocol":          confInvalidRequestProtocol,
-		"invalid-domain-type":               confInvalidDomainType,
-		"no-origin-params":                  confWithoutOriginParameters,
-		"invalid-origin-type":               confInvalidOriginType,
-		"lacking-web-origin-params":         confLackingWebOriginParameters,
-		"mismatched-origin-type-and-params": confMismatchedOriginParameters,
-		"lacking-bucket-origin-params":      confLackingBucketOriginParameters,
-		"invalid-compression":               confInvalidNormalizeAE,
-		"too-big-default-cache-ttl":         confTooBigDefaultCacheTTL,
-		"valid":                             confValid,
+		"invalid-request-protocol":                 confInvalidRequestProtocol,
+		"invalid-domain-type":                      confInvalidDomainType,
+		"no-origin-params":                         confWithoutOriginParameters,
+		"invalid-origin-type":                      confInvalidOriginType,
+		"lacking-web-origin-params":                confLackingWebOriginParameters,
+		"mismatched-bucket-origin-type-and-params": confMismatchedOriginParameters,
+		"lacking-bucket-origin-params":             confLackingBucketOriginParameters,
+		"invalid-compression":                      confInvalidNormalizeAE,
+		"too-big-default-cache-ttl":                confTooBigDefaultCacheTTL,
 	}
-	for k := range tt {
-		tt[k] = fmt.Sprintf(tt[k], origin)
+	for k, v := range tt {
+		if strings.Contains(v, "%s") {
+			tt[k] = fmt.Sprintf(tt[k], origin)
+		}
 	}
 
 	return tt
