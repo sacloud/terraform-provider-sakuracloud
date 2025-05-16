@@ -130,6 +130,9 @@ func resourceSakuraCloudWebAccelCreate(ctx context.Context, d *schema.ResourceDa
 	}
 	if v, ok := d.GetOk("default_cache_ttl"); ok {
 		ttl := v.(int)
+		if ttl < -1 || ttl > 6048000 {
+			return diag.Errorf("Default cache TTL must be between -1 and 604800 seconds")
+		}
 		req.DefaultCacheTTL = &ttl
 	}
 	if v, ok := d.GetOk("normalize_ae"); ok {
@@ -142,6 +145,8 @@ func resourceSakuraCloudWebAccelCreate(ctx context.Context, d *schema.ResourceDa
 			fallthrough
 		case "br+gz":
 			req.NormalizeAE = webaccel.NormalizeAEBzGz
+		default:
+			return diag.Errorf("invalid normalize_ae parameter: '%s'", v)
 		}
 	}
 
