@@ -26,9 +26,14 @@ import (
 )
 
 const (
-	envWebAccelSiteName   = "SAKURACLOUD_WEBACCEL_SITE_NAME"
-	envWebAccelDomainName = "SAKURACLOUD_WEBACCEL_DOMAIN_NAME"
-	envWebAccelOrigin     = "SAKURACLOUD_WEBACCEL_ORIGIN"
+	envWebAccelSiteName             = "SAKURACLOUD_WEBACCEL_SITE_NAME"
+	envWebAccelDomainName           = "SAKURACLOUD_WEBACCEL_DOMAIN_NAME"
+	envWebAccelOrigin               = "SAKURACLOUD_WEBACCEL_ORIGIN"
+	envObjectStorageEndpoint        = "SAKURASTORAGE_ENDPOINT"
+	envObjectStorageRegion          = "SAKURASTORAGE_REGION"
+	envObjectStorageBucketName      = "SAKURASTORAGE_BUCKET_NAME"
+	envObjectStorageAccessKeyId     = "SAKURASTORAGE_ACCESS_KEY"
+	envObjectStorageSecretAccessKey = "SAKURASTORAGE_ACCESS_SECRET"
 )
 
 func TestAccSakuraCloudDataSourceWebAccel_ByName(t *testing.T) {

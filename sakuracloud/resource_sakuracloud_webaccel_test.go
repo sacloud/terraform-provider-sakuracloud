@@ -54,6 +54,95 @@ func TestAccResourceSakuraCloudWebAccel_WebOrigin(t *testing.T) {
 					resource.TestCheckResourceAttr("sakuracloud_webaccel.foobar", "origin_parameters.0.type", "web"),
 					resource.TestCheckResourceAttr("sakuracloud_webaccel.foobar", "origin_parameters.0.host", origin),
 					resource.TestCheckResourceAttr("sakuracloud_webaccel.foobar", "vary_support", "true"),
+					resource.TestCheckResourceAttr("sakuracloud_webaccel.foobar", "normalize_ae", "brotli"),
+				),
+			},
+		},
+	})
+}
+
+func TestAccResourceSakuraCloudWebAccel_BucketOrigin(t *testing.T) {
+	envKeys := []string{
+		envWebAccelOrigin,
+		envObjectStorageEndpoint,
+		envObjectStorageRegion,
+		envObjectStorageBucketName,
+		envObjectStorageAccessKeyId,
+		envObjectStorageSecretAccessKey,
+	}
+	for _, k := range envKeys {
+		if os.Getenv(k) == "" {
+			t.Skipf("ENV %q is requilred. skip", k)
+			return
+		}
+	}
+
+	siteName := "your-site-name"
+	//domainName := os.Getenv(envWebAccelDomainName)
+	endpoint := os.Getenv(envObjectStorageEndpoint)
+	region := os.Getenv(envObjectStorageRegion)
+	bucketName := os.Getenv(envObjectStorageBucketName)
+	accessKey := os.Getenv(envObjectStorageAccessKeyId)
+	secretKey := os.Getenv(envObjectStorageSecretAccessKey)
+
+	resource.Test(t, resource.TestCase{
+		PreCheck:          func() { testAccPreCheck(t) },
+		ProviderFactories: testAccProviderFactories,
+		CheckDestroy: func(*terraform.State) error {
+			return nil
+		},
+		Steps: []resource.TestStep{
+			{
+				Config: testAccCheckSakuraCloudWebAccelBucketOriginConfig(siteName, endpoint, region, bucketName, accessKey, secretKey),
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr("sakuracloud_webaccel.foobar", "name", siteName),
+					resource.TestCheckResourceAttr("sakuracloud_webaccel.foobar", "origin_parameters.0.type", "bucket"),
+					resource.TestCheckResourceAttr("sakuracloud_webaccel.foobar", "origin_parameters.0.endpoint", bucketName),
+					resource.TestCheckResourceAttr("sakuracloud_webaccel.foobar", "origin_parameters.0.region", region),
+					resource.TestCheckResourceAttr("sakuracloud_webaccel.foobar", "origin_parameters.0.bucket_name", bucketName),
+					resource.TestCheckResourceAttr("sakuracloud_webaccel.foobar", "origin_parameters.0.access_key_id", accessKey),
+					resource.TestCheckResourceAttr("sakuracloud_webaccel.foobar", "origin_parameters.0.secret_access_key", secretKey),
+				),
+			},
+		},
+	})
+}
+
+func TestAccResourceSakuraCloudWebAccel_Logging(t *testing.T) {
+	envKeys := []string{
+		envWebAccelOrigin,
+		envObjectStorageBucketName,
+		envObjectStorageAccessKeyId,
+		envObjectStorageSecretAccessKey,
+	}
+	for _, k := range envKeys {
+		if os.Getenv(k) == "" {
+			t.Skipf("ENV %q is requilred. skip", k)
+			return
+		}
+	}
+
+	siteName := "your-site-name"
+	//domainName := os.Getenv(envWebAccelDomainName)
+	origin := os.Getenv(envWebAccelOrigin)
+	bucketName := os.Getenv(envObjectStorageBucketName)
+	accessKey := os.Getenv(envObjectStorageAccessKeyId)
+	secretKey := os.Getenv(envObjectStorageSecretAccessKey)
+
+	resource.Test(t, resource.TestCase{
+		PreCheck:          func() { testAccPreCheck(t) },
+		ProviderFactories: testAccProviderFactories,
+		CheckDestroy: func(*terraform.State) error {
+			return nil
+		},
+		Steps: []resource.TestStep{
+			{
+				Config: testAccCheckSakuraCloudWebAccelWebOriginLoggingConfig(siteName, origin, bucketName, accessKey, secretKey),
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr("sakuracloud_webaccel.foobar", "name", siteName),
+					resource.TestCheckResourceAttr("sakuracloud_webaccel.foobar", "origin_parameters.0.type", "web"),
+					resource.TestCheckResourceAttr("sakuracloud_webaccel.foobar", "origin_parameters.0.host", origin),
+					resource.TestCheckResourceAttr("sakuracloud_webaccel.foobar", "vary_support", "true"),
 				),
 			},
 		},
@@ -77,6 +166,9 @@ func TestAccResourceSakuraCloudWebAccel_InvalidConfigurations(t *testing.T) {
 				{
 					Config: tc,
 					ExpectError: func() *regexp.Regexp {
+						if name == "valid" {
+							return nil
+						}
 						return regexp.MustCompile(".")
 					}(),
 				},
@@ -98,6 +190,7 @@ resource sakuracloud_webaccel "foobar" {
     host_header = "%s"
     protocol = "https"
   }
+  cors_rules = "all"
   vary_support = true
   default_cache_ttl = 3600
   normalize_ae = "brotli"
@@ -120,7 +213,6 @@ resource sakuracloud_webaccel "foobar" {
     access_key_id = "%s"
     secret_access_key = "%s"
   }
-  vary_support = true
   default_cache_ttl = 3600
   normalize_ae = "brotli"
 }
@@ -128,7 +220,51 @@ resource sakuracloud_webaccel "foobar" {
 	return fmt.Sprintf(tmpl, siteName, endpoint, region, bucketName, accessKey, accessSecret)
 }
 
+func testAccCheckSakuraCloudWebAccelWebOriginLoggingConfig(siteName string, origin string, bucketName string, accessKey string, secretKey string) string {
+	tmpl := `
+resource sakuracloud_webaccel "foobar" {
+  name = "%s"
+  domain_type = "subdomain"
+  request_protocol = "https-redirect"
+  origin_parameters {
+    type = "web"
+    host = "%s"
+    host_header = "%s"
+    protocol = "https"
+  }
+  logging {
+    bucket_name = "%s"
+    access_key_id = "%s"
+    secret_access_key = "%s"
+  }
+  vary_support = true
+  default_cache_ttl = 3600
+  normalize_ae = "brotli"
+}
+`
+	return fmt.Sprintf(tmpl, siteName, origin, origin, bucketName, accessKey, secretKey)
+}
+
 func testAccCheckSakuraCloudWebAccelInvalidConfigs(origin string) map[string]string {
+
+	confUnknownArgument := `
+resource sakuracloud_webaccel "foobar" {
+  invalid = true
+  name = "dummy"
+  domain_type = "subdomain"
+  request_protocol = "https-redirect"
+  origin_parameters {
+    type = "web"
+    host = "%s"
+    host_header = "dummy.example.com"
+    protocol = "https"
+  }
+  vary_support = true
+  default_cache_ttl = 3600
+  normalize_ae = "brotli"
+}
+`
+
 	confInvalidDomainType := `
 resource sakuracloud_webaccel "foobar" {
   name = "dummy"
@@ -255,7 +391,8 @@ resource sakuracloud_webaccel "foobar" {
 }
 `
 
-	confTooBigDefaultCacheTTL := `
+	//config without the S3 secret access key for logging
+	confMissingLoggingParameters := `
 resource sakuracloud_webaccel "foobar" {
   name = "dummy"
   domain_type = "subdomain"
@@ -266,13 +403,61 @@ resource sakuracloud_webaccel "foobar" {
     host_header = "dummy.example.com"
     protocol = "https"
   }
+  logging {
+    bucket_name = "example-bucket"
+    access_key_id = "sample"
+  }
   vary_support = true
-  default_cache_ttl = 7000000
-  normalize_ae = "INVALID"
+}
+`
+
+	//cors_rule should be specified with `all` or an array of hosts
+	confInvalidCorsConfiguration := `
+resource sakuracloud_webaccel "foobar" {
+  name = "dummy"
+  domain_type = "subdomain"
+  request_protocol = "https-redirect"
+  origin_parameters {
+    type = "web"
+    host = "%s"
+    host_header = "dummy.example.com"
+    protocol = "https"
+  }
+  cors_rules = "https://app.example.com"
+  vary_support = true
+  default_cache_ttl = 3600
+  normalize_ae = "brotli"
+}
+`
+
+	valid := `
+resource sakuracloud_webaccel "foobar" {
+  name = "dummy"
+  domain_type = "subdomain"
+  request_protocol = "https-redirect"
+  origin_parameters {
+    type = "web"
+    host = "%s"
+    host_header = "dummy.example.com"
+    protocol = "https"
+  }
+  logging {
+    bucket_name = "example-bucket"
+    access_key_id = "sample"
+    access_key_secret = "sample"
+  }
+  cors_rules = [
+    "https://www2.example.com",
+    "https://app.example.com"
+  ]
+  vary_support = true
+  default_cache_ttl = 3600
+  normalize_ae = "brotli"
 }
 `
 
 	tt := map[string]string{
+		"unknown-argument":                         confUnknownArgument,
 		"invalid-request-protocol":                 confInvalidRequestProtocol,
 		"invalid-domain-type":                      confInvalidDomainType,
 		"no-origin-params":                         confWithoutOriginParameters,
@@ -281,7 +466,9 @@ resource sakuracloud_webaccel "foobar" {
 		"mismatched-bucket-origin-type-and-params": confMismatchedOriginParameters,
 		"lacking-bucket-origin-params":             confLackingBucketOriginParameters,
 		"invalid-compression":                      confInvalidNormalizeAE,
-		"too-big-default-cache-ttl":                confTooBigDefaultCacheTTL,
+		"missing-logging-bucket-secret":            confMissingLoggingParameters,
+		"invalid-cors-configuration":               confInvalidCorsConfiguration,
+		"valid":                                    valid,
 	}
 	for k, v := range tt {
 		if strings.Contains(v, "%s") {
