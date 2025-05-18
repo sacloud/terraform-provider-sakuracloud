@@ -103,6 +103,9 @@ func TestAccSakuraCloudResourceWebAccel_WebOriginWithCORS(t *testing.T) {
 func TestAccSakuraCloudResourceWebAccel_WebOriginUpdate(t *testing.T) {
 	envKeys := []string{
 		envWebAccelOrigin,
+		envObjectStorageBucketName,
+		envObjectStorageAccessKeyId,
+		envObjectStorageSecretAccessKey,
 	}
 	for _, k := range envKeys {
 		if os.Getenv(k) == "" {
@@ -114,6 +117,9 @@ func TestAccSakuraCloudResourceWebAccel_WebOriginUpdate(t *testing.T) {
 	siteName := "your-site-name"
 	//domainName := os.Getenv(envWebAccelDomainName)
 	origin := os.Getenv(envWebAccelOrigin)
+	bucketName := os.Getenv(envObjectStorageBucketName)
+	accessKey := os.Getenv(envObjectStorageAccessKeyId)
+	secretKey := os.Getenv(envObjectStorageSecretAccessKey)
 
 	resource.Test(t, resource.TestCase{
 		PreCheck:          func() { testAccPreCheck(t) },
@@ -141,6 +147,16 @@ func TestAccSakuraCloudResourceWebAccel_WebOriginUpdate(t *testing.T) {
 					resource.TestCheckResourceAttr("sakuracloud_webaccel.foobar", "cors_rules.0.allow_all", "false"),
 					resource.TestCheckResourceAttr("sakuracloud_webaccel.foobar", "cors_rules.0.allowed_origins.0", "https://apps.example.com"),
 					resource.TestCheckResourceAttr("sakuracloud_webaccel.foobar", "normalize_ae", "gzip"),
+				),
+			},
+			{
+				Config: testAccCheckSakuraCloudWebAccelWebOriginLoggingConfig(siteName, origin, bucketName, accessKey, secretKey),
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr("sakuracloud_webaccel.foobar", "name", siteName),
+					resource.TestCheckResourceAttr("sakuracloud_webaccel.foobar", "origin_parameters.0.type", "web"),
+					resource.TestCheckResourceAttr("sakuracloud_webaccel.foobar", "origin_parameters.0.host", origin),
+					resource.TestCheckResourceAttr("sakuracloud_webaccel.foobar", "logging.0.bucket_name", bucketName),
+					resource.TestCheckResourceAttr("sakuracloud_webaccel.foobar", "vary_support", "true"),
 				),
 			},
 		},

@@ -100,9 +100,13 @@ func resourceSakuraCloudWebAccelCreate(ctx context.Context, d *schema.ResourceDa
 			return diag.FromErr(err)
 		}
 		reqUpd.CORSRules = &[]*webaccel.CORSRule{corsRule}
+	} else {
+		reqUpd.CORSRules = &[]*webaccel.CORSRule{}
 	}
 	if hasOnetimeUrlSecret {
 		reqUpd.OnetimeURLSecrets = expandWebAccelOnetimeUrlSecrets(d)
+	} else {
+		reqUpd.OnetimeURLSecrets = &[]string{}
 	}
 
 	//onetime url secret
@@ -156,6 +160,8 @@ func resourceSakuraCloudWebAccelUpdate(ctx context.Context, d *schema.ResourceDa
 	if err != nil {
 		return diag.FromErr(err)
 	}
+	newOp := webaccel.NewOp(client.webaccelClient)
+
 	siteID := d.Id()
 	siteUpdatingArguments := []string{
 		"name",
@@ -167,7 +173,6 @@ func resourceSakuraCloudWebAccelUpdate(ctx context.Context, d *schema.ResourceDa
 		"default_cache_ttl",
 		"normalize_ae",
 	}
-
 	if d.HasChanges(siteUpdatingArguments...) {
 		reqUpd := new(webaccel.UpdateSiteRequest)
 		if name, ok := d.GetOk("name"); ok {
@@ -218,14 +223,27 @@ func resourceSakuraCloudWebAccelUpdate(ctx context.Context, d *schema.ResourceDa
 				return diag.FromErr(err)
 			}
 			reqUpd.CORSRules = &[]*webaccel.CORSRule{corsRule}
+		} else {
+			reqUpd.CORSRules = &[]*webaccel.CORSRule{}
 		}
 
 		//do request
-		_, err = webaccel.NewOp(client.webaccelClient).Update(ctx, siteID, reqUpd)
+		_, err = newOp.Update(ctx, siteID, reqUpd)
 		if err != nil {
 			return diag.FromErr(err)
 		}
 
+	}
+
+	if d.HasChange("logging") {
+		loggingUpd, err := expandLoggingParameters(d)
+		if err != nil {
+			return diag.FromErr(err)
+		}
+		_, err = newOp.ApplyLogUploadConfig(ctx, siteID, loggingUpd)
+		if err != nil {
+			return diag.FromErr(err)
+		}
 	}
 	return resourceSakuraCloudWebAccelRead(ctx, d, meta)
 }
@@ -274,10 +292,13 @@ func setWebAccelResourceSiteData(d *schema.ResourceData, client *APIClient, data
 	//cors parameters
 	if data.CORSRules != nil {
 		if len(data.CORSRules) == 1 {
-			if len(data.CORSRules[0].AllowedOrigins) != 0 && data.CORSRules[0].AllowsAnyOrigin {
+			if data.CORSRules[0].AllowsAnyOrigin == true && len(data.CORSRules[0].AllowedOrigins) != 0 {
 				return diag.Errorf("allow_all and allowed_origins should not be specified together")
+			} else if data.CORSRules[0].AllowsAnyOrigin == false && len(data.CORSRules[0].AllowedOrigins) == 0 {
+				d.Set("cors_rules", nil)
+			} else {
+				d.Set("cors_rules", flattenWebAccelCorsRules(data.CORSRules[0]))
 			}
-			d.Set("cors_rules", flattenWebAccelCorsRules(data.CORSRules[0]))
 		} else if len(data.CORSRules) > 1 {
 			return diag.Errorf("too many CORS rules")
 		}
