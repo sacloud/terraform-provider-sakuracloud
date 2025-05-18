@@ -55,7 +55,6 @@ func dataSourceSakuraCloudWebAccel() *schema.Resource {
 				Computed: true,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
-						//FIXME: フィールド毎に関数で生成。代入時にも使う
 						"type": {
 							Type:     schema.TypeString,
 							Required: true,
@@ -97,7 +96,7 @@ func dataSourceSakuraCloudWebAccel() *schema.Resource {
 			},
 			"domain_type": {
 				Type:     schema.TypeString,
-				Optional: true,
+				Computed: true,
 			},
 			"has_certificate": {
 				Type:     schema.TypeBool,
@@ -105,7 +104,7 @@ func dataSourceSakuraCloudWebAccel() *schema.Resource {
 			},
 			"host_header": {
 				Type:     schema.TypeString,
-				Optional: true,
+				Computed: true,
 			},
 			"status": {
 				Type:     schema.TypeString,

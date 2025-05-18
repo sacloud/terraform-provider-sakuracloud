@@ -31,16 +31,10 @@ func resourceSakuraCloudWebAccelCreate(ctx context.Context, d *schema.ResourceDa
 		Name:       d.Get("name").(string),
 		DomainType: d.Get("domain_type").(string),
 	}
-	if v, ok := d.GetOk("request_protocol"); ok {
-		switch v.(string) {
-		case "http+https":
-			req.RequestProtocol = webaccel.RequestProtocolsHttpAndHttps
-		case "https":
-			req.RequestProtocol = webaccel.RequestProtocolsHttpsOnly
-		case "https-redirect":
-			req.RequestProtocol = webaccel.RequestProtocolsRedirectToHttps
-		default:
-			return diag.Errorf("invalid request protocol: %s", v)
+	if _, ok := d.GetOk("request_protocol"); ok {
+		req.RequestProtocol, err = expandWebAccelRequestProtocol(d)
+		if err != nil {
+			return diag.FromErr(err)
 		}
 	}
 
@@ -62,29 +56,17 @@ func resourceSakuraCloudWebAccelCreate(ctx context.Context, d *schema.ResourceDa
 	req.SecretAccessKey = originParams.SecretAccessKey
 
 	// miscellaneous  params
-	if v, ok := d.GetOk("vary_support"); ok {
-		if v.(bool) {
-			req.VarySupport = webaccel.VarySupportEnabled
-		} else {
-			req.VarySupport = webaccel.VarySupportDisabled
-		}
+	if _, ok := d.GetOk("vary_support"); ok {
+		req.VarySupport = expandWebAccelVarySupportParameter(d)
 	}
 	if v, ok := d.GetOk("default_cache_ttl"); ok {
 		ttl := v.(int)
 		req.DefaultCacheTTL = &ttl
 	}
-	if v, ok := d.GetOk("normalize_ae"); ok {
-		switch v.(string) {
-		case "gzip":
-			fallthrough
-		case "gz":
-			req.NormalizeAE = webaccel.NormalizeAEGz
-		case "brotli":
-			fallthrough
-		case "br+gz":
-			req.NormalizeAE = webaccel.NormalizeAEBrGz
-		default:
-			return diag.Errorf("invalid normalize_ae parameter: '%s'", v)
+	if _, ok := d.GetOk("normalize_ae"); ok {
+		req.NormalizeAE, err = expandWebAccelNormalizeAEParameter(d)
+		if err != nil {
+			return diag.FromErr(err)
 		}
 	}
 
@@ -120,12 +102,7 @@ func resourceSakuraCloudWebAccelCreate(ctx context.Context, d *schema.ResourceDa
 		reqUpd.CORSRules = &[]*webaccel.CORSRule{corsRule}
 	}
 	if hasOnetimeUrlSecret {
-		secrets := d.Get("onetime_url_secrets").([]interface{})
-		var assignedParam []string
-		for _, secret := range secrets {
-			assignedParam = append(assignedParam, secret.(string))
-		}
-		reqUpd.OnetimeURLSecrets = &assignedParam
+		reqUpd.OnetimeURLSecrets = expandWebAccelOnetimeUrlSecrets(d)
 	}
 
 	//onetime url secret
@@ -175,21 +152,82 @@ func resourceSakuraCloudWebAccelRead(ctx context.Context, d *schema.ResourceData
 }
 
 func resourceSakuraCloudWebAccelUpdate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
-	return diag.Errorf("WIP!")
-	//client, _, err := sakuraCloudClient(d, meta)
-	//if err != nil {
-	//	return diag.FromErr(err)
-	//}
-	//siteID := d.Id()
-	//
-	//req := webaccel.UpdateSiteRequest{}
-	//if d.HasChanges("request_protocol", "origin_parameters", "cors_rules", "onetime_url_secrets", "vary_support", "default_cache_ttl", "normalize_ae") {
-	//}
-	//_, err = webaccel.NewOp(client.webaccelClient).Update(ctx, siteID, &req)
-	//if err != nil {
-	//	return diag.FromErr(err)
-	//}
-	//return resourceSakuraCloudWebAccelRead(ctx, d, meta)
+	client, _, err := sakuraCloudClient(d, meta)
+	if err != nil {
+		return diag.FromErr(err)
+	}
+	siteID := d.Id()
+	siteUpdatingArguments := []string{
+		"name",
+		"request_protocol",
+		"origin_parameters",
+		"cors_rules",
+		"onetime_url_secrets",
+		"vary_support",
+		"default_cache_ttl",
+		"normalize_ae",
+	}
+
+	if d.HasChanges(siteUpdatingArguments...) {
+		reqUpd := new(webaccel.UpdateSiteRequest)
+		if name, ok := d.GetOk("name"); ok {
+			reqUpd.Name = name.(string)
+		}
+		if _, ok := d.GetOk("request_protocol"); ok {
+			reqUpd.RequestProtocol, err = expandWebAccelRequestProtocol(d)
+			if err != nil {
+				return diag.FromErr(err)
+			}
+		}
+		if _, ok := d.GetOk("onetime_url_secrets"); ok {
+			reqUpd.OnetimeURLSecrets = expandWebAccelOnetimeUrlSecrets(d)
+		}
+		if _, ok := d.GetOk("vary_support"); ok {
+			reqUpd.VarySupport = expandWebAccelVarySupportParameter(d)
+		}
+		if defaultCacheTTL, ok := d.GetOk("default_cache_ttl"); ok {
+			ttl := defaultCacheTTL.(int)
+			reqUpd.DefaultCacheTTL = &ttl
+		}
+		if _, ok := d.GetOk("normalize_ae"); ok {
+			reqUpd.NormalizeAE, err = expandWebAccelNormalizeAEParameter(d)
+			if err != nil {
+				return diag.FromErr(err)
+			}
+		}
+
+		//origin params
+		originParameters, err := expandWebAccelOriginParameters(d)
+		if err != nil {
+			return diag.FromErr(err)
+		}
+		reqUpd.OriginType = originParameters.OriginType
+		reqUpd.Origin = originParameters.Origin
+		reqUpd.OriginProtocol = originParameters.OriginProtocol
+		reqUpd.HostHeader = originParameters.HostHeader
+		reqUpd.S3Endpoint = originParameters.S3Endpoint
+		reqUpd.S3Region = originParameters.S3Region
+		reqUpd.BucketName = originParameters.BucketName
+		reqUpd.AccessKeyID = originParameters.AccessKeyID
+		reqUpd.SecretAccessKey = originParameters.SecretAccessKey
+
+		//cors
+		if _, hasCorsRule := d.GetOk("cors_rules"); hasCorsRule {
+			corsRule, err := expandWebAccelCORSParameters(d)
+			if err != nil {
+				return diag.FromErr(err)
+			}
+			reqUpd.CORSRules = &[]*webaccel.CORSRule{corsRule}
+		}
+
+		//do request
+		_, err = webaccel.NewOp(client.webaccelClient).Update(ctx, siteID, reqUpd)
+		if err != nil {
+			return diag.FromErr(err)
+		}
+
+	}
+	return resourceSakuraCloudWebAccelRead(ctx, d, meta)
 }
 
 func resourceSakuraCloudWebAccelDelete(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {

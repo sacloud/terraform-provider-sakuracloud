@@ -26,7 +26,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
 )
 
-func TestAccResourceSakuraCloudWebAccel_WebOrigin(t *testing.T) {
+func TestAccSakuraCloudResourceWebAccel_WebOrigin(t *testing.T) {
 	envKeys := []string{
 		envWebAccelOrigin,
 	}
@@ -62,7 +62,7 @@ func TestAccResourceSakuraCloudWebAccel_WebOrigin(t *testing.T) {
 	})
 }
 
-func TestAccResourceSakuraCloudWebAccel_WebOriginWithCORS(t *testing.T) {
+func TestAccSakuraCloudResourceWebAccel_WebOriginWithCORS(t *testing.T) {
 	envKeys := []string{
 		envWebAccelOrigin,
 	}
@@ -100,7 +100,7 @@ func TestAccResourceSakuraCloudWebAccel_WebOriginWithCORS(t *testing.T) {
 	})
 }
 
-func TestAccResourceSakuraCloudWebAccel_WebOriginUpdate(t *testing.T) {
+func TestAccSakuraCloudResourceWebAccel_WebOriginUpdate(t *testing.T) {
 	envKeys := []string{
 		envWebAccelOrigin,
 	}
@@ -147,7 +147,7 @@ func TestAccResourceSakuraCloudWebAccel_WebOriginUpdate(t *testing.T) {
 	})
 }
 
-func TestAccResourceSakuraCloudWebAccel_BucketOrigin(t *testing.T) {
+func TestAccSakuraCloudResourceWebAccel_BucketOrigin(t *testing.T) {
 	envKeys := []string{
 		envWebAccelOrigin,
 		envObjectStorageEndpoint,
@@ -195,7 +195,7 @@ func TestAccResourceSakuraCloudWebAccel_BucketOrigin(t *testing.T) {
 	})
 }
 
-func TestAccResourceSakuraCloudWebAccel_Logging(t *testing.T) {
+func TestAccSakuraCloudResourceWebAccel_Logging(t *testing.T) {
 	envKeys := []string{
 		envWebAccelOrigin,
 		envObjectStorageBucketName,
@@ -237,7 +237,7 @@ func TestAccResourceSakuraCloudWebAccel_Logging(t *testing.T) {
 	})
 }
 
-func TestAccResourceSakuraCloudWebAccel_InvalidConfigurations(t *testing.T) {
+func TestAccSakuraCloudResourceWebAccel_InvalidConfigurations(t *testing.T) {
 	if os.Getenv(envWebAccelOrigin) == "" {
 		t.Skipf("ENV %q is requilred. skip", envWebAccelOrigin)
 		return
@@ -564,12 +564,6 @@ resource sakuracloud_webaccel "foobar" {
 	//   host = "%s"
 	//   host_header = "dummy.example.com"
 	//   protocol = "https"
-	// }
-	// logging {
-	//   enabled = false
-	//   bucket_name = "example-bucket"
-	//   access_key_id = "sample"
-	//   secret_access_key = "sample"
 	// }
 	// cors_rules {
 	//   allowed_origins = [

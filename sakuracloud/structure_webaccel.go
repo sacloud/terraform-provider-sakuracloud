@@ -298,6 +298,20 @@ func expandWebAccelOriginParameters(d resourceValueGettable) (*webaccel.UpdateSi
 	return req, nil
 }
 
+func expandWebAccelRequestProtocol(d resourceValueGettable) (string, error) {
+	v := d.Get("request_protocol")
+	switch v.(string) {
+	case "http+https":
+		return webaccel.RequestProtocolsHttpAndHttps, nil
+	case "https":
+		return webaccel.RequestProtocolsHttpsOnly, nil
+	case "https-redirect":
+		return webaccel.RequestProtocolsRedirectToHttps, nil
+	default:
+		return "", fmt.Errorf("invalid request protocol: %s", v)
+	}
+}
+
 func expandWebAccelCORSParameters(d resourceValueGettable) (*webaccel.CORSRule, error) {
 	rule := &webaccel.CORSRule{}
 	var (
@@ -367,4 +381,37 @@ func expandLoggingParameters(d resourceValueGettable) (*webaccel.LogUploadConfig
 	req.Region = DefaultObjectStorageRegion
 	req.Status = "enabled"
 	return req, nil
+}
+
+func expandWebAccelOnetimeUrlSecrets(d resourceValueGettable) *[]string {
+	value := d.Get("onetime_url_secrets").([]interface{})
+	var secrets []string
+	for _, secret := range value {
+		secrets = append(secrets, secret.(string))
+	}
+	return &secrets
+}
+
+func expandWebAccelVarySupportParameter(d resourceValueGettable) string {
+	v := d.Get("vary_support")
+	if v.(bool) {
+		return webaccel.VarySupportEnabled
+	} else {
+		return webaccel.VarySupportDisabled
+	}
+}
+
+func expandWebAccelNormalizeAEParameter(d resourceValueGettable) (string, error) {
+	v := d.Get("normalize_ae").(string)
+	switch v {
+	case "gzip":
+		fallthrough
+	case "gz":
+		return webaccel.NormalizeAEGz, nil
+	case "brotli":
+		fallthrough
+	case "br+gz":
+		return webaccel.NormalizeAEBrGz, nil
+	}
+	return "", fmt.Errorf("invalid normalize_ae parameter: '%s'", v)
 }
