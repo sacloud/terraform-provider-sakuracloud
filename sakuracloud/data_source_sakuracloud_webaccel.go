@@ -72,11 +72,11 @@ func dataSourceSakuraCloudWebAccel() *schema.Resource {
 							Type:     schema.TypeString,
 							Optional: true,
 						},
-						"s3_endpoint": {
+						"endpoint": {
 							Type:     schema.TypeString,
 							Optional: true,
 						},
-						"s3_region": {
+						"region": {
 							Type:     schema.TypeString,
 							Optional: true,
 						},
@@ -128,11 +128,11 @@ func dataSourceSakuraCloudWebAccel() *schema.Resource {
 				Optional: true,
 			},
 			"cors_rules": {
-				Type:     schema.TypeList,
+				Type:     schema.TypeSet,
 				Optional: true,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
-						"allow_all_origin": {
+						"allow_all": {
 							Type:     schema.TypeBool,
 							Computed: true,
 						},
@@ -213,10 +213,10 @@ func dataSourceSakuraCloudWebAccelRead(ctx context.Context, d *schema.ResourceDa
 	case webaccel.OriginTypesObjectStorage:
 		originParams["type"] = "object_storage"
 		if data.S3Endpoint == "" || data.S3Region == "" || data.BucketName == "" {
-			panic("origin parameters are not fully provided: [s3_endpoint, s3_region, bucket_name]")
+			panic("origin parameters are not fully provided: [endpoint, region, bucket_name]")
 		}
-		originParams["s3_endpoint"] = data.S3Endpoint
-		originParams["s3_region"] = data.S3Region
+		originParams["endpoint"] = data.S3Endpoint
+		originParams["region"] = data.S3Region
 		originParams["bucket_name"] = data.BucketName
 	default:
 		panic(fmt.Sprintf("unknown origin type: %s", data.OriginType))

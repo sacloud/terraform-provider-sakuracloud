@@ -48,13 +48,97 @@ func TestAccResourceSakuraCloudWebAccel_WebOrigin(t *testing.T) {
 		},
 		Steps: []resource.TestStep{
 			{
-				Config: testAccCheckSakuraCloudWebAccelWebOriginConfig(siteName, origin),
+				Config: testAccCheckSakuraCloudWebAccelWebOriginConfigBasic(siteName, origin),
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttr("sakuracloud_webaccel.foobar", "name", siteName),
 					resource.TestCheckResourceAttr("sakuracloud_webaccel.foobar", "origin_parameters.0.type", "web"),
 					resource.TestCheckResourceAttr("sakuracloud_webaccel.foobar", "origin_parameters.0.host", origin),
 					resource.TestCheckResourceAttr("sakuracloud_webaccel.foobar", "vary_support", "true"),
 					resource.TestCheckResourceAttr("sakuracloud_webaccel.foobar", "normalize_ae", "brotli"),
+				),
+			},
+		},
+	})
+}
+
+func TestAccResourceSakuraCloudWebAccel_WebOriginWithCORS(t *testing.T) {
+	envKeys := []string{
+		envWebAccelOrigin,
+	}
+	for _, k := range envKeys {
+		if os.Getenv(k) == "" {
+			t.Skipf("ENV %q is requilred. skip", k)
+			return
+		}
+	}
+
+	siteName := "your-site-name"
+	//domainName := os.Getenv(envWebAccelDomainName)
+	origin := os.Getenv(envWebAccelOrigin)
+
+	resource.Test(t, resource.TestCase{
+		PreCheck:          func() { testAccPreCheck(t) },
+		ProviderFactories: testAccProviderFactories,
+		CheckDestroy: func(*terraform.State) error {
+			return nil
+		},
+		Steps: []resource.TestStep{
+			{
+				Config: testAccCheckSakuraCloudWebAccelWebOriginConfigWithCors(siteName, origin),
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr("sakuracloud_webaccel.foobar", "name", siteName),
+					resource.TestCheckResourceAttr("sakuracloud_webaccel.foobar", "origin_parameters.0.type", "web"),
+					resource.TestCheckResourceAttr("sakuracloud_webaccel.foobar", "origin_parameters.0.host", origin),
+					resource.TestCheckResourceAttr("sakuracloud_webaccel.foobar", "cors_rules.0.allow_all", "false"),
+					resource.TestCheckResourceAttr("sakuracloud_webaccel.foobar", "cors_rules.0.allowed_origins.0", "https://apps.example.com"),
+					resource.TestCheckResourceAttr("sakuracloud_webaccel.foobar", "normalize_ae", "gzip"),
+				),
+			},
+		},
+	})
+}
+
+func TestAccResourceSakuraCloudWebAccel_WebOriginUpdate(t *testing.T) {
+	envKeys := []string{
+		envWebAccelOrigin,
+	}
+	for _, k := range envKeys {
+		if os.Getenv(k) == "" {
+			t.Skipf("ENV %q is requilred. skip", k)
+			return
+		}
+	}
+
+	siteName := "your-site-name"
+	//domainName := os.Getenv(envWebAccelDomainName)
+	origin := os.Getenv(envWebAccelOrigin)
+
+	resource.Test(t, resource.TestCase{
+		PreCheck:          func() { testAccPreCheck(t) },
+		ProviderFactories: testAccProviderFactories,
+		CheckDestroy: func(*terraform.State) error {
+			return nil
+		},
+		Steps: []resource.TestStep{
+			{
+				Config: testAccCheckSakuraCloudWebAccelWebOriginConfigBasic(siteName, origin),
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr("sakuracloud_webaccel.foobar", "name", siteName),
+					resource.TestCheckResourceAttr("sakuracloud_webaccel.foobar", "origin_parameters.0.type", "web"),
+					resource.TestCheckResourceAttr("sakuracloud_webaccel.foobar", "origin_parameters.0.host", origin),
+					resource.TestCheckResourceAttr("sakuracloud_webaccel.foobar", "vary_support", "true"),
+					resource.TestCheckResourceAttr("sakuracloud_webaccel.foobar", "normalize_ae", "brotli"),
+				),
+			},
+			{
+				Config: testAccCheckSakuraCloudWebAccelWebOriginConfigWithCors(siteName, origin),
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr("sakuracloud_webaccel.foobar", "name", siteName),
+					resource.TestCheckResourceAttr("sakuracloud_webaccel.foobar", "origin_parameters.0.type", "web"),
+					resource.TestCheckResourceAttr("sakuracloud_webaccel.foobar", "origin_parameters.0.host", origin),
+					resource.TestCheckResourceAttr("sakuracloud_webaccel.foobar", "cors_rules.0.allow_all", "false"),
+					resource.TestCheckResourceAttr("sakuracloud_webaccel.foobar", "cors_rules.0.allowed_origins.0", "https://apps.example.com"),
+					resource.TestCheckResourceAttr("sakuracloud_webaccel.foobar", "normalize_ae", "gzip"),
 				),
 			},
 		},
@@ -178,7 +262,7 @@ func TestAccResourceSakuraCloudWebAccel_InvalidConfigurations(t *testing.T) {
 
 }
 
-func testAccCheckSakuraCloudWebAccelWebOriginConfig(siteName string, origin string) string {
+func testAccCheckSakuraCloudWebAccelWebOriginConfigBasic(siteName string, origin string) string {
 	tmpl := `
 resource sakuracloud_webaccel "foobar" {
   name = "%s"
@@ -190,10 +274,36 @@ resource sakuracloud_webaccel "foobar" {
     host_header = "%s"
     protocol = "https"
   }
-  cors_rules = "all"
   vary_support = true
   default_cache_ttl = 3600
   normalize_ae = "brotli"
+}
+`
+	return fmt.Sprintf(tmpl, siteName, origin, origin)
+}
+
+func testAccCheckSakuraCloudWebAccelWebOriginConfigWithCors(siteName string, origin string) string {
+	tmpl := `
+resource sakuracloud_webaccel "foobar" {
+  name = "%s"
+  domain_type = "subdomain"
+  request_protocol = "https-redirect"
+  origin_parameters {
+    type = "web"
+    host = "%s"
+    host_header = "%s"
+    protocol = "https"
+  }
+  cors_rules {
+    allow_all = false
+    allowed_origins = [
+       "https://apps.example.com",
+       "https://platform.example.com"
+    ]
+  }
+  vary_support = true
+  default_cache_ttl = 3600
+  normalize_ae = "gzip"
 }
 `
 	return fmt.Sprintf(tmpl, siteName, origin, origin)
@@ -411,7 +521,7 @@ resource sakuracloud_webaccel "foobar" {
 }
 `
 
-	//cors_rule should be specified with `all` or an array of hosts
+	//allow_all and allowed_origins should not be specified together
 	confInvalidCorsConfiguration := `
 resource sakuracloud_webaccel "foobar" {
   name = "dummy"
@@ -423,7 +533,13 @@ resource sakuracloud_webaccel "foobar" {
     host_header = "dummy.example.com"
     protocol = "https"
   }
-  cors_rules = "https://app.example.com"
+  cors_rules {
+    allow_all = true
+    allowed_origins = [
+      "https://www2.example.com",
+      "https://app.example.com"
+    ]
+  }
   vary_support = true
   default_cache_ttl = 3600
   normalize_ae = "brotli"
@@ -446,10 +562,12 @@ resource sakuracloud_webaccel "foobar" {
     access_key_id = "sample"
     access_key_secret = "sample"
   }
-  cors_rules = [
-    "https://www2.example.com",
-    "https://app.example.com"
-  ]
+  cors_rules {
+    allowed_origins = [
+      "https://www2.example.com",
+      "https://app.example.com"
+    ]
+  }
   vary_support = true
   default_cache_ttl = 3600
   normalize_ae = "brotli"
