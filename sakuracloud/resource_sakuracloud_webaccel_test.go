@@ -16,7 +16,6 @@ package sakuracloud
 
 import (
 	"fmt"
-	"log"
 	"os"
 	"regexp"
 	"strings"
@@ -100,9 +99,11 @@ func TestAccSakuraCloudResourceWebAccel_WebOriginWithCORS(t *testing.T) {
 	})
 }
 
-func TestAccSakuraCloudResourceWebAccel_WebOriginUpdate(t *testing.T) {
+func TestAccSakuraCloudResourceWebAccel_Update(t *testing.T) {
 	envKeys := []string{
 		envWebAccelOrigin,
+		envObjectStorageEndpoint,
+		envObjectStorageRegion,
 		envObjectStorageBucketName,
 		envObjectStorageAccessKeyId,
 		envObjectStorageSecretAccessKey,
@@ -117,6 +118,8 @@ func TestAccSakuraCloudResourceWebAccel_WebOriginUpdate(t *testing.T) {
 	siteName := "your-site-name"
 	//domainName := os.Getenv(envWebAccelDomainName)
 	origin := os.Getenv(envWebAccelOrigin)
+	endpoint, _ := strings.CutPrefix(os.Getenv(envObjectStorageEndpoint), "https://")
+	region := os.Getenv(envObjectStorageRegion)
 	bucketName := os.Getenv(envObjectStorageBucketName)
 	accessKey := os.Getenv(envObjectStorageAccessKeyId)
 	secretKey := os.Getenv(envObjectStorageSecretAccessKey)
@@ -159,6 +162,18 @@ func TestAccSakuraCloudResourceWebAccel_WebOriginUpdate(t *testing.T) {
 					resource.TestCheckResourceAttr("sakuracloud_webaccel.foobar", "vary_support", "true"),
 				),
 			},
+			{
+				Config: testAccCheckSakuraCloudWebAccelBucketOriginConfig(siteName, endpoint, region, bucketName, accessKey, secretKey),
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr("sakuracloud_webaccel.foobar", "name", siteName),
+					resource.TestCheckResourceAttr("sakuracloud_webaccel.foobar", "origin_parameters.0.type", "bucket"),
+					resource.TestCheckResourceAttr("sakuracloud_webaccel.foobar", "origin_parameters.0.endpoint", endpoint),
+					resource.TestCheckResourceAttr("sakuracloud_webaccel.foobar", "origin_parameters.0.region", region),
+					resource.TestCheckResourceAttr("sakuracloud_webaccel.foobar", "origin_parameters.0.bucket_name", bucketName),
+					resource.TestCheckResourceAttr("sakuracloud_webaccel.foobar", "origin_parameters.0.access_key_id", accessKey),
+					resource.TestCheckResourceAttr("sakuracloud_webaccel.foobar", "origin_parameters.0.secret_access_key", secretKey),
+				),
+			},
 		},
 	})
 }
@@ -182,7 +197,6 @@ func TestAccSakuraCloudResourceWebAccel_BucketOrigin(t *testing.T) {
 	siteName := "your-site-name"
 	//domainName := os.Getenv(envWebAccelDomainName)
 	endpoint, _ := strings.CutPrefix(os.Getenv(envObjectStorageEndpoint), "https://")
-	log.Println("endpoint", endpoint)
 	region := os.Getenv(envObjectStorageRegion)
 	bucketName := os.Getenv(envObjectStorageBucketName)
 	accessKey := os.Getenv(envObjectStorageAccessKeyId)

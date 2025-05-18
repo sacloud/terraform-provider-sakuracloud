@@ -236,14 +236,22 @@ func resourceSakuraCloudWebAccelUpdate(ctx context.Context, d *schema.ResourceDa
 	}
 
 	if d.HasChange("logging") {
-		loggingUpd, err := expandLoggingParameters(d)
-		if err != nil {
-			return diag.FromErr(err)
+		if _, ok := d.GetOk("logging"); ok {
+			loggingUpd, err := expandLoggingParameters(d)
+			if err != nil {
+				return diag.FromErr(err)
+			}
+			_, err = newOp.ApplyLogUploadConfig(ctx, siteID, loggingUpd)
+			if err != nil {
+				return diag.FromErr(err)
+			}
+		} else {
+			err = newOp.DeleteLogUploadConfig(ctx, siteID)
+			if err != nil {
+				return diag.FromErr(err)
+			}
 		}
-		_, err = newOp.ApplyLogUploadConfig(ctx, siteID, loggingUpd)
-		if err != nil {
-			return diag.FromErr(err)
-		}
+
 	}
 	return resourceSakuraCloudWebAccelRead(ctx, d, meta)
 }
