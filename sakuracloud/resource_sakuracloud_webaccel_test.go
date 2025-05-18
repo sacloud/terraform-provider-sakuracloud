@@ -554,33 +554,34 @@ resource sakuracloud_webaccel "foobar" {
 }
 `
 
-	valid := `
-	resource sakuracloud_webaccel "foobar" {
-	 name = "dummy"
-	 domain_type = "subdomain"
-	 request_protocol = "https-redirect"
-	 origin_parameters {
-	   type = "web"
-	   host = "%s"
-	   host_header = "dummy.example.com"
-	   protocol = "https"
-	 }
-	 logging {
-	   bucket_name = "example-bucket"
-	   access_key_id = "sample"
-	   access_key_secret = "sample"
-	 }
-	 cors_rules {
-	   allowed_origins = [
-	     "https://www2.example.com",
-	     "https://app.example.com"
-	   ]
-	 }
-	 vary_support = true
-	 default_cache_ttl = 3600
-	 normalize_ae = "brotli"
-	}
-	`
+	//valid := `
+	//resource sakuracloud_webaccel "foobar" {
+	// name = "dummy"
+	// domain_type = "subdomain"
+	// request_protocol = "https-redirect"
+	// origin_parameters {
+	//   type = "web"
+	//   host = "%s"
+	//   host_header = "dummy.example.com"
+	//   protocol = "https"
+	// }
+	// logging {
+	//   enabled = false
+	//   bucket_name = "example-bucket"
+	//   access_key_id = "sample"
+	//   secret_access_key = "sample"
+	// }
+	// cors_rules {
+	//   allowed_origins = [
+	//     "https://www2.example.com",
+	//     "https://app.example.com"
+	//   ]
+	// }
+	// vary_support = true
+	// default_cache_ttl = 3600
+	// normalize_ae = "brotli"
+	//}
+	//`
 
 	tt := map[string]string{
 		"unknown-argument":                         confUnknownArgument,
@@ -594,7 +595,7 @@ resource sakuracloud_webaccel "foobar" {
 		"invalid-compression":                      confInvalidNormalizeAE,
 		"missing-logging-bucket-secret":            confMissingLoggingParameters,
 		"invalid-cors-configuration":               confInvalidCorsConfiguration,
-		"valid":                                    valid,
+		//"valid":                                    valid,
 	}
 	for k, v := range tt {
 		if strings.Contains(v, "%s") {

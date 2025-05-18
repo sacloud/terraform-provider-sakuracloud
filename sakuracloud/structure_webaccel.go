@@ -2,6 +2,7 @@ package sakuracloud
 
 import (
 	"fmt"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
 	"github.com/sacloud/webaccel-api-go"
@@ -193,6 +194,64 @@ func resourceSakuraCloudWebAccel() *schema.Resource {
 			},
 		},
 	}
+}
+
+func flattenWebAccelOriginParameters(d resourceValueGettable, site *webaccel.Site) []interface{} {
+	originParams := make(map[string]interface{})
+	switch site.OriginType {
+	case webaccel.OriginTypesWebServer:
+		originParams["type"] = "web"
+		originParams["host"] = site.Origin
+		if site.OriginProtocol == webaccel.OriginProtocolsHttp {
+			originParams["protocol"] = "http"
+		} else if site.OriginProtocol == webaccel.OriginProtocolsHttps {
+			originParams["protocol"] = "https"
+		} else {
+			panic("invalid origin protocol: " + site.OriginProtocol)
+		}
+		if site.HostHeader != "" {
+			originParams["host_header"] = site.HostHeader
+		}
+	case webaccel.OriginTypesObjectStorage:
+		originParams["type"] = "bucket"
+		if site.S3Endpoint == "" || site.S3Region == "" || site.BucketName == "" {
+			diag.Errorf("origin parameters are not fully provided: [endpoint, region, bucket_name]")
+		}
+		originParams["endpoint"] = site.S3Endpoint
+		originParams["region"] = site.S3Region
+		originParams["bucket_name"] = site.BucketName
+
+		// NOTE: access key/secret cannot be fetched from remote
+		presetOriginParams := mapFromSet(d, "origin_parameters")
+		originParams["access_key_id"] = presetOriginParams.Get("access_key_id").(string)
+		originParams["secret_access_key"] = presetOriginParams.Get("secret_access_key").(string)
+	default:
+		diag.Errorf("unknown origin type: %s", site.OriginType)
+	}
+	return []interface{}{originParams}
+}
+
+func flattenWebAccelCorsRules(data *webaccel.CORSRule) []interface{} {
+	corsRuleParams := make(map[string]interface{})
+	if data.AllowsAnyOrigin {
+		corsRuleParams["allow_all"] = true
+	} else if len(data.AllowedOrigins) > 0 {
+		corsRuleParams["allowed_origins"] = data.AllowedOrigins
+	}
+	return []interface{}{corsRuleParams}
+}
+
+func flattenWebAccelLogUploadConfigData(data *webaccel.LogUploadConfig) []interface{} {
+	loggingParams := make(map[string]interface{})
+	if data.Status == "enabled" {
+		loggingParams["enabled"] = true
+	} else {
+		loggingParams["enabled"] = false
+	}
+	loggingParams["bucket_name"] = data.Bucket
+	loggingParams["access_key_id"] = data.AccessKeyID
+	loggingParams["secret_access_key"] = data.SecretAccessKey
+	return []interface{}{loggingParams}
 }
 
 func expandWebAccelOriginParameters(d resourceValueGettable) (*webaccel.UpdateSiteRequest, error) {

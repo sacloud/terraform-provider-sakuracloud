@@ -166,7 +166,8 @@ func resourceSakuraCloudWebAccelRead(ctx context.Context, d *schema.ResourceData
 		return diag.Errorf("could not read SakuraCloud WebAccel [%s]: %s", d.Id(), err)
 	}
 	logUploadConfig, err := op.ReadLogUploadConfig(ctx, siteID)
-	// for avoiding panic on blank configuration
+
+	// for avoiding unconditional error/panic on blank configuration
 	if logUploadConfig != nil && logUploadConfig.Bucket == "" {
 		logUploadConfig = nil
 	}
@@ -227,58 +228,20 @@ func setWebAccelResourceSiteData(d *schema.ResourceData, client *APIClient, data
 	}
 
 	//origin parameters
-	originParams := make(map[string]interface{})
-	switch data.OriginType {
-	case webaccel.OriginTypesWebServer:
-		originParams["type"] = "web"
-		originParams["host"] = data.Origin
-		if data.OriginProtocol == webaccel.OriginProtocolsHttp {
-			originParams["protocol"] = "http"
-		} else if data.OriginProtocol == webaccel.OriginProtocolsHttps {
-			originParams["protocol"] = "https"
-		} else {
-			panic("invalid origin protocol: " + data.OriginProtocol)
-		}
-		if data.HostHeader != "" {
-			originParams["host_header"] = data.HostHeader
-		}
-	case webaccel.OriginTypesObjectStorage:
-		originParams["type"] = "bucket"
-		if data.S3Endpoint == "" || data.S3Region == "" || data.BucketName == "" {
-			diag.Errorf("origin parameters are not fully provided: [endpoint, region, bucket_name]")
-		}
-		originParams["endpoint"] = data.S3Endpoint
-		originParams["region"] = data.S3Region
-		originParams["bucket_name"] = data.BucketName
-
-		// NOTE: access key/secret cannot be fetched from remote
-		presetOriginParams := mapFromSet(d, "origin_parameters")
-		originParams["access_key_id"] = presetOriginParams.Get("access_key_id").(string)
-		originParams["secret_access_key"] = presetOriginParams.Get("secret_access_key").(string)
-	default:
-		diag.Errorf("unknown origin type: %s", data.OriginType)
-	}
-	err := d.Set("origin_parameters", []interface{}{originParams})
+	err := d.Set("origin_parameters", flattenWebAccelOriginParameters(d, data))
 	if err != nil {
 		return diag.FromErr(err)
 	}
 
 	//cors parameters
 	if data.CORSRules != nil {
-		corsRuleParams := make(map[string]interface{})
-		if len(data.CORSRules) == 1 && data.CORSRules[0].AllowsAnyOrigin {
-			if len(data.CORSRules[0].AllowedOrigins) != 0 {
+		if len(data.CORSRules) == 1 {
+			if len(data.CORSRules[0].AllowedOrigins) != 0 && data.CORSRules[0].AllowsAnyOrigin {
 				return diag.Errorf("allow_all and allowed_origins should not be specified together")
 			}
-			corsRuleParams["allow_all"] = true
-			d.Set("cors_rules", []interface{}{corsRuleParams})
-		} else if len(data.CORSRules) == 1 && len(data.CORSRules[0].AllowedOrigins) > 0 {
-			var allowedOrigins []string
-			for _, rule := range data.CORSRules {
-				allowedOrigins = append(allowedOrigins, rule.AllowedOrigins...)
-			}
-			corsRuleParams["allowed_origins"] = allowedOrigins
-			d.Set("cors_rules", []interface{}{corsRuleParams})
+			d.Set("cors_rules", flattenWebAccelCorsRules(data.CORSRules[0]))
+		} else if len(data.CORSRules) > 1 {
+			return diag.Errorf("too many CORS rules")
 		}
 	}
 
@@ -295,16 +258,7 @@ func setWebAccelResourceSiteData(d *schema.ResourceData, client *APIClient, data
 }
 
 func setWebAccelResourceLogUploadConfigData(d *schema.ResourceData, client *APIClient, data *webaccel.LogUploadConfig) diag.Diagnostics {
-	loggingParams := make(map[string]interface{})
-	if data.Status == "enabled" {
-		loggingParams["enabled"] = true
-	} else {
-		loggingParams["enabled"] = false
-	}
-	loggingParams["bucket_name"] = data.Bucket
-	loggingParams["access_key_id"] = data.AccessKeyID
-	loggingParams["secret_access_key"] = data.SecretAccessKey
-	err := d.Set("logging", []interface{}{loggingParams})
+	err := d.Set("logging", flattenWebAccelLogUploadConfigData(data))
 	if err != nil {
 		return diag.FromErr(err)
 	}
