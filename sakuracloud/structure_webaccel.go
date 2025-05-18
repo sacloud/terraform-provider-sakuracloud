@@ -1,7 +1,10 @@
 package sakuracloud
 
 import (
+	"fmt"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
+	"github.com/sacloud/webaccel-api-go"
 )
 
 func resourceSakuraCloudWebAccel() *schema.Resource {
@@ -14,13 +17,12 @@ func resourceSakuraCloudWebAccel() *schema.Resource {
 			StateContext: schema.ImportStatePassthroughContext,
 		},
 		Schema: map[string]*schema.Schema{
-			//FIXME: フィールド毎に関数で生成。代入時にも使う
 			"name": schemaResourceName("web accelerator"),
 			"domain_type": {
-				Type:     schema.TypeString,
-				Required: true,
-				// FIXME: add validator
-				Description: "domain type of the site: one of `subdomain` or `own_domain`",
+				Type:         schema.TypeString,
+				Required:     true,
+				ValidateFunc: validation.StringInSlice([]string{"subdomain", "own_domain"}, false),
+				Description:  "domain type of the site: one of `subdomain` or `own_domain`",
 			},
 			"subdomain": {
 				Type:        schema.TypeString,
@@ -34,10 +36,10 @@ func resourceSakuraCloudWebAccel() *schema.Resource {
 				Description: "domain name of the site: required for domain_type = `own_domain`",
 			},
 			"request_protocol": {
-				Type:     schema.TypeString,
-				Required: true,
-				// FIXME: add validator
-				Description: "request protocol of the site: one of `http+https`, `https` or `https-redirect",
+				Type:         schema.TypeString,
+				Required:     true,
+				ValidateFunc: validation.StringInSlice([]string{"http+https", "https", "https-redirect"}, false),
+				Description:  "request protocol of the site: one of `http+https`, `https` or `https-redirect",
 			},
 			"origin_parameters": {
 				Type:        schema.TypeSet,
@@ -58,10 +60,10 @@ func resourceSakuraCloudWebAccel() *schema.Resource {
 							Description: "origin host: required for origin.type = `web`",
 						},
 						"protocol": {
-							Type:     schema.TypeString,
-							Optional: true,
-							// FIXME: add validator
-							Description: "request protocol for the origin host: required for origin.type = `web`",
+							Type:         schema.TypeString,
+							Optional:     true,
+							ValidateFunc: validation.StringInSlice([]string{"http", "https"}, false),
+							Description:  "request protocol for the origin host: required for origin.type = `web`",
 						},
 						"host_header": {
 							Type:        schema.TypeString,
@@ -71,8 +73,9 @@ func resourceSakuraCloudWebAccel() *schema.Resource {
 						"endpoint": {
 							Type:     schema.TypeString,
 							Optional: true,
-							// FIXME: add validator
-							Description: "S3 endpoint: required for origin.type = `bucket`",
+							//without protocol scheme
+							ValidateDiagFunc: validateHostName(),
+							Description:      "S3 endpoint: required for origin.type = `bucket`",
 						},
 						"region": {
 							Type:        schema.TypeString,
@@ -85,13 +88,17 @@ func resourceSakuraCloudWebAccel() *schema.Resource {
 							Description: "S3 bucket name: required for origin.type = `bucket`",
 						},
 						"access_key_id": {
-							Type:        schema.TypeString,
-							Optional:    true,
+							Type:     schema.TypeString,
+							Optional: true,
+							//FIXME: uncomment this
+							//Sensitive:   true,
 							Description: "S3 access key ID: required for origin.type = `bucket`",
 						},
 						"secret_access_key": {
-							Type:        schema.TypeString,
-							Optional:    true,
+							Type:     schema.TypeString,
+							Optional: true,
+							//FIXME: uncomment this
+							//Sensitive:   true,
 							Description: "S3 secret access key: required for origin.type = `bucket`",
 						},
 						"doc_index": {
@@ -135,13 +142,17 @@ func resourceSakuraCloudWebAccel() *schema.Resource {
 							Description: "logging bucket name",
 						},
 						"access_key_id": {
-							Type:        schema.TypeString,
-							Required:    true,
+							Type:     schema.TypeString,
+							Required: true,
+							//FIXME: uncomment this
+							//Sensitive:   true,
 							Description: "S3 access key ID",
 						},
 						"secret_access_key": {
-							Type:        schema.TypeString,
-							Required:    true,
+							Type:     schema.TypeString,
+							Required: true,
+							//FIXME: uncomment this
+							//Sensitive:   true,
 							Description: "S3 secret access key",
 						},
 					},
@@ -158,17 +169,103 @@ func resourceSakuraCloudWebAccel() *schema.Resource {
 				Optional:    true,
 			},
 			"default_cache_ttl": {
-				Type:        schema.TypeInt,
-				Description: "the default cache TTL of the site",
-				// FIXME: add validator
-				Optional: true,
+				Type:         schema.TypeInt,
+				Description:  "the default cache TTL of the site",
+				ValidateFunc: validation.IntBetween(-1, 604800),
+				Optional:     true,
 			},
 			"normalize_ae": {
-				Type:        schema.TypeString,
-				Description: "accept-encoding normalization: one of `gzip` (gz) or `brotli` (br+gz)",
-				// FIXME: add validator
-				Optional: true,
+				Type:         schema.TypeString,
+				Description:  "accept-encoding normalization: one of `gzip` (gz) or `brotli` (br+gz)",
+				ValidateFunc: validation.StringInSlice([]string{"gzip", "gz", "brotli", "br+gz"}, false),
+				Optional:     true,
 			},
 		},
 	}
+}
+
+func expandWebAccelOriginParameters(d resourceValueGettable) (*webaccel.UpdateSiteRequest, error) {
+	var (
+		originType string
+		req        = new(webaccel.UpdateSiteRequest)
+	)
+	d = mapFromSet(d, "origin_parameters")
+	originType = d.Get("type").(string)
+	switch originType {
+	case "web":
+		req.OriginType = webaccel.OriginTypesWebServer
+		req.Origin = d.Get("host").(string)
+		switch d.Get("protocol").(string) {
+		case "http":
+			req.OriginProtocol = webaccel.OriginProtocolsHttp
+		case "https":
+			req.OriginProtocol = webaccel.OriginProtocolsHttps
+		default:
+			return nil, fmt.Errorf("unknown origin protocol")
+		}
+		if v, ok := d.GetOk("host_header"); ok {
+			req.HostHeader = v.(string)
+		}
+	case "bucket":
+		req.OriginType = webaccel.OriginTypesObjectStorage
+		req.S3Endpoint = d.Get("endpoint").(string)
+		req.S3Region = d.Get("region").(string)
+		req.BucketName = d.Get("bucket_name").(string)
+		req.AccessKeyID = d.Get("access_key_id").(string)
+		req.SecretAccessKey = d.Get("secret_access_key").(string)
+		if v, ok := d.GetOk("doc_index"); ok {
+			if v.(bool) {
+				req.DocIndex = webaccel.DocIndexEnabled
+			} else {
+				req.DocIndex = webaccel.DocIndexDisabled
+			}
+		} else {
+			req.DocIndex = webaccel.DocIndexDisabled
+		}
+	default:
+		return nil, fmt.Errorf("unknown origin type")
+	}
+	return req, nil
+}
+
+func expandWebAccelCORSParameters(d resourceValueGettable) (*webaccel.CORSRule, error) {
+	rule := &webaccel.CORSRule{}
+	var (
+		corsRule     = &webaccel.CORSRule{}
+		corsAllowAll = false
+	)
+
+	corsRuleParams := mapFromSet(d, "cors_rules")
+	//allow_all (true/false)
+	if v, ok := corsRuleParams.GetOk("allow_all"); ok {
+		if b, ok := v.(bool); ok && b {
+			corsAllowAll = b
+			rule.AllowsAnyOrigin = b
+		}
+	}
+	//allowed_origin
+	if origins, ok := corsRuleParams.GetOk("allowed_origins"); ok {
+		if o, ok := origins.([]interface{}); ok {
+			// allow_all=true is not permitted with allowed_origins
+			if corsAllowAll {
+				if len(o) != 0 {
+					return nil, fmt.Errorf("allow_all and allowed_origins are mutually exclusive")
+				}
+			} else {
+				for _, v := range o {
+					if origin, ok := v.(string); ok {
+						corsRule.AllowedOrigins = append(corsRule.AllowedOrigins, origin)
+					}
+				}
+			}
+		}
+	}
+	if !corsAllowAll && len(corsRule.AllowedOrigins) == 0 {
+		return nil, fmt.Errorf("both of allow_all and allowed_origins are missing")
+	}
+	return corsRule, nil
+}
+
+func expandLoggingParameters(d resourceValueGettable) (*webaccel.LogUploadConfig, error) {
+	return nil, fmt.Errorf("WIP")
 }

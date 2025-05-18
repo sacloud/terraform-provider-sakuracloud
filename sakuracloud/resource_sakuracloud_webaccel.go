@@ -44,85 +44,22 @@ func resourceSakuraCloudWebAccelCreate(ctx context.Context, d *schema.ResourceDa
 		}
 	}
 
-	var (
-		originType     string
-		originParams   map[string]interface{}
-		corsRuleParams map[string]interface{}
-		//loggingParams  map[string]interface{}
-	)
-
-	// origin parameters
-
-	if param, ok := d.GetOk("origin_parameters"); ok {
-		v := param.(*schema.Set).List()
-		if len(v) == 0 {
-			return diag.Errorf("invalid origin parameters")
-		} else if len(v) > 1 {
-			return diag.Errorf("invalid origin parameters: too many values")
-		}
-		originParams = v[0].(map[string]interface{})
-		originType = originParams["type"].(string)
-	} else {
-		return diag.Errorf("origin parameters is required")
+	if _, ok := d.GetOk("origin_parameters"); !ok {
+		panic("provider bug: no origin parameters found")
 	}
-	switch originType {
-	case "web":
-		if param, ok := originParams["host"]; ok {
-			req.Origin = param.(string)
-		} else {
-			return diag.Errorf("no origin specified")
-		}
-		if v, ok := originParams["protocol"]; ok {
-			switch v.(string) {
-			case "http":
-				req.OriginProtocol = webaccel.OriginProtocolsHttp
-			case "https":
-				req.OriginProtocol = webaccel.OriginProtocolsHttps
-			default:
-				return diag.Errorf("invalid origin protocol: '%s'", v)
-			}
-		}
-		if v, ok := originParams["host_header"]; ok {
-			req.HostHeader = v.(string)
-		}
-	case "object_storage":
-		if v, ok := originParams["endpoint"]; ok {
-			req.S3Endpoint = v.(string)
-		} else {
-			return diag.Errorf("origin parameters is empty: endpoint")
-		}
-		if v, ok := originParams["region"]; ok {
-			req.S3Region = v.(string)
-		} else {
-			return diag.Errorf("origin parameters is empty: region")
-		}
-		if v, ok := originParams["bucket_name"]; ok {
-			req.BucketName = v.(string)
-		} else {
-			return diag.Errorf("origin parameters is empty: bucket_name")
-		}
-		if v, ok := originParams["doc_index"]; ok {
-			if v.(bool) {
-				req.DocIndex = webaccel.DocIndexEnabled
-			} else {
-				req.DocIndex = webaccel.DocIndexDisabled
-			}
-		} else {
-			req.DocIndex = webaccel.DocIndexDisabled
-		}
-		if v, ok := originParams["access_key_id"]; ok {
-			req.AccessKeyID = v.(string)
-		} else {
-			return diag.Errorf("origin parameters is empty: access_key_id")
-		}
-		if v, ok := originParams["secret_access_key"]; ok {
-			req.SecretAccessKey = v.(string)
-		} else {
-			return diag.Errorf("origin parameters is empty: secret_access_key")
-		}
-	default:
-		return diag.Errorf("unknown origin type: %s", originType)
+	originParams, err := expandWebAccelOriginParameters(d)
+	if err != nil {
+		return diag.FromErr(err)
 	}
+	req.OriginType = originParams.OriginType
+	req.Origin = originParams.Origin
+	req.OriginProtocol = originParams.OriginProtocol
+	req.HostHeader = originParams.HostHeader
+	req.S3Endpoint = originParams.S3Endpoint
+	req.S3Region = originParams.S3Region
+	req.BucketName = originParams.BucketName
+	req.AccessKeyID = originParams.AccessKeyID
+	req.SecretAccessKey = originParams.SecretAccessKey
 
 	// miscellaneous  params
 	if v, ok := d.GetOk("vary_support"); ok {
@@ -145,7 +82,7 @@ func resourceSakuraCloudWebAccelCreate(ctx context.Context, d *schema.ResourceDa
 		case "brotli":
 			fallthrough
 		case "br+gz":
-			req.NormalizeAE = webaccel.NormalizeAEBzGz
+			req.NormalizeAE = webaccel.NormalizeAEBrGz
 		default:
 			return diag.Errorf("invalid normalize_ae parameter: '%s'", v)
 		}
@@ -164,54 +101,44 @@ func resourceSakuraCloudWebAccelCreate(ctx context.Context, d *schema.ResourceDa
 
 	// cors
 	var (
-		hasUpdatingParams bool
-		corsRule          = &webaccel.CORSRule{}
-		corsAllowAll      = false
+		hasSiteUpdatingArguments bool
+		corsRule                 *webaccel.CORSRule
+		reqUpd                   = new(webaccel.UpdateSiteRequest)
 	)
 
-	if param, ok := d.GetOk("cors_rules"); ok {
-		hasUpdatingParams = true
-		v := param.(*schema.Set).List()
-		if len(v) == 0 {
-			return diag.Errorf("invalid cors parameters")
-		} else if len(v) > 1 {
-			return diag.Errorf("invalid cors parameters: too many values")
-		}
-		corsRuleParams = v[0].(map[string]interface{})
+	_, hasCorsRule := d.GetOk("cors_rules")
+	_, hasOnetimeUrlSecret := d.GetOk("onetime_url_secret")
+	_, hasLoggingConfig := d.GetOk("logging")
+	hasSiteUpdatingArguments = hasCorsRule || hasOnetimeUrlSecret
 
-		//allow_all (true/false)
-		if v, ok := corsRuleParams["allow_all"]; ok {
-			if b, ok := v.(bool); ok && b {
-				corsAllowAll = b
-				corsRuleParams["allow_all"] = b
-				corsRule.AllowsAnyOrigin = b
-			}
+	//cors
+	if hasCorsRule {
+		corsRule, err = expandWebAccelCORSParameters(d)
+		if err != nil {
+			return diag.FromErr(err)
 		}
-		//allowed_origin
-		if origins, ok := corsRuleParams["allowed_origins"]; ok {
-			if o, ok := origins.([]interface{}); ok {
-				// allow_all=true is not permitted with allowed_origins
-				if corsAllowAll {
-					if len(o) != 0 {
-						return diag.Errorf("allow_all and allowed_origins are mutually exclusive")
-					}
-				} else {
-					for _, v := range o {
-						if origin, ok := v.(string); ok {
-							corsRule.AllowedOrigins = append(corsRule.AllowedOrigins, origin)
-						}
-					}
-				}
-			}
-		}
-		if !corsAllowAll && len(corsRule.AllowedOrigins) == 0 {
-			return diag.Errorf("both of allow_all and allowed_origins are missing")
+		reqUpd.CORSRules = &[]*webaccel.CORSRule{corsRule}
+	}
+	if hasOnetimeUrlSecret {
+		sec := d.Get("onetime_url_secret").([]string)
+		reqUpd.OnetimeURLSecrets = &sec
+	}
+
+	//onetime url secret
+	if hasSiteUpdatingArguments {
+		_, err = newOp.Update(ctx, res.ID, &webaccel.UpdateSiteRequest{CORSRules: &[]*webaccel.CORSRule{corsRule}})
+		if err != nil {
+			return diag.FromErr(err)
 		}
 	}
-	//fmt.Fprintf(os.Stderr, "allow_all: %v, allowed_origins: %v\n", corsRule.AllowsAnyOrigin, corsRule.AllowedOrigins)
 
-	if hasUpdatingParams {
-		_, err = newOp.Update(ctx, res.ID, &webaccel.UpdateSiteRequest{CORSRules: &[]*webaccel.CORSRule{corsRule}})
+	//logging
+	if hasLoggingConfig {
+		cfg, err := expandLoggingParameters(d)
+		if err != nil {
+			return diag.FromErr(err)
+		}
+		_, err = newOp.ApplyLogUploadConfig(ctx, res.ID, cfg)
 		if err != nil {
 			return diag.FromErr(err)
 		}
@@ -298,13 +225,18 @@ func setWebAccelResourceData(d *schema.ResourceData, client *APIClient, data *we
 			originParams["host_header"] = data.HostHeader
 		}
 	case webaccel.OriginTypesObjectStorage:
-		originParams["type"] = "object_storage"
+		originParams["type"] = "bucket"
 		if data.S3Endpoint == "" || data.S3Region == "" || data.BucketName == "" {
 			diag.Errorf("origin parameters are not fully provided: [endpoint, region, bucket_name]")
 		}
 		originParams["endpoint"] = data.S3Endpoint
 		originParams["region"] = data.S3Region
 		originParams["bucket_name"] = data.BucketName
+
+		// NOTE: access key/secret cannot be fetched from remote
+		presetOriginParams := mapFromSet(d, "origin_parameters")
+		originParams["access_key_id"] = presetOriginParams.Get("access_key_id").(string)
+		originParams["secret_access_key"] = presetOriginParams.Get("secret_access_key").(string)
 	default:
 		diag.Errorf("unknown origin type: %s", data.OriginType)
 	}
@@ -333,7 +265,7 @@ func setWebAccelResourceData(d *schema.ResourceData, client *APIClient, data *we
 	}
 
 	if data.NormalizeAE != "" {
-		if data.NormalizeAE == webaccel.NormalizeAEBzGz {
+		if data.NormalizeAE == webaccel.NormalizeAEBrGz {
 			d.Set("normalize_ae", "brotli")
 		} else if data.NormalizeAE == webaccel.NormalizeAEGz {
 			d.Set("normalize_ae", "gzip")

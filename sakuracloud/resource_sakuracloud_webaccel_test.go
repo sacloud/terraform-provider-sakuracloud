@@ -16,6 +16,7 @@ package sakuracloud
 
 import (
 	"fmt"
+	"log"
 	"os"
 	"regexp"
 	"strings"
@@ -163,7 +164,8 @@ func TestAccResourceSakuraCloudWebAccel_BucketOrigin(t *testing.T) {
 
 	siteName := "your-site-name"
 	//domainName := os.Getenv(envWebAccelDomainName)
-	endpoint := os.Getenv(envObjectStorageEndpoint)
+	endpoint, _ := strings.CutPrefix(os.Getenv(envObjectStorageEndpoint), "https://")
+	log.Println("endpoint", endpoint)
 	region := os.Getenv(envObjectStorageRegion)
 	bucketName := os.Getenv(envObjectStorageBucketName)
 	accessKey := os.Getenv(envObjectStorageAccessKeyId)
@@ -181,7 +183,7 @@ func TestAccResourceSakuraCloudWebAccel_BucketOrigin(t *testing.T) {
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttr("sakuracloud_webaccel.foobar", "name", siteName),
 					resource.TestCheckResourceAttr("sakuracloud_webaccel.foobar", "origin_parameters.0.type", "bucket"),
-					resource.TestCheckResourceAttr("sakuracloud_webaccel.foobar", "origin_parameters.0.endpoint", bucketName),
+					resource.TestCheckResourceAttr("sakuracloud_webaccel.foobar", "origin_parameters.0.endpoint", endpoint),
 					resource.TestCheckResourceAttr("sakuracloud_webaccel.foobar", "origin_parameters.0.region", region),
 					resource.TestCheckResourceAttr("sakuracloud_webaccel.foobar", "origin_parameters.0.bucket_name", bucketName),
 					resource.TestCheckResourceAttr("sakuracloud_webaccel.foobar", "origin_parameters.0.access_key_id", accessKey),
@@ -226,6 +228,7 @@ func TestAccResourceSakuraCloudWebAccel_Logging(t *testing.T) {
 					resource.TestCheckResourceAttr("sakuracloud_webaccel.foobar", "name", siteName),
 					resource.TestCheckResourceAttr("sakuracloud_webaccel.foobar", "origin_parameters.0.type", "web"),
 					resource.TestCheckResourceAttr("sakuracloud_webaccel.foobar", "origin_parameters.0.host", origin),
+					resource.TestCheckResourceAttr("sakuracloud_webaccel.foobar", "logging.0.bucket_name", bucketName),
 					resource.TestCheckResourceAttr("sakuracloud_webaccel.foobar", "vary_support", "true"),
 				),
 			},
@@ -547,32 +550,32 @@ resource sakuracloud_webaccel "foobar" {
 `
 
 	valid := `
-resource sakuracloud_webaccel "foobar" {
-  name = "dummy"
-  domain_type = "subdomain"
-  request_protocol = "https-redirect"
-  origin_parameters {
-    type = "web"
-    host = "%s"
-    host_header = "dummy.example.com"
-    protocol = "https"
-  }
-  logging {
-    bucket_name = "example-bucket"
-    access_key_id = "sample"
-    access_key_secret = "sample"
-  }
-  cors_rules {
-    allowed_origins = [
-      "https://www2.example.com",
-      "https://app.example.com"
-    ]
-  }
-  vary_support = true
-  default_cache_ttl = 3600
-  normalize_ae = "brotli"
-}
-`
+	resource sakuracloud_webaccel "foobar" {
+	 name = "dummy"
+	 domain_type = "subdomain"
+	 request_protocol = "https-redirect"
+	 origin_parameters {
+	   type = "web"
+	   host = "%s"
+	   host_header = "dummy.example.com"
+	   protocol = "https"
+	 }
+	 logging {
+	   bucket_name = "example-bucket"
+	   access_key_id = "sample"
+	   access_key_secret = "sample"
+	 }
+	 cors_rules {
+	   allowed_origins = [
+	     "https://www2.example.com",
+	     "https://app.example.com"
+	   ]
+	 }
+	 vary_support = true
+	 default_cache_ttl = 3600
+	 normalize_ae = "brotli"
+	}
+	`
 
 	tt := map[string]string{
 		"unknown-argument":                         confUnknownArgument,
