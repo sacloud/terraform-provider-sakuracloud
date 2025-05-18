@@ -7,6 +7,11 @@ import (
 	"github.com/sacloud/webaccel-api-go"
 )
 
+const (
+	DefaultObjectStorageEndpoint = "https://s3.isk01.sakurastorage.jp"
+	DefaultObjectStorageRegion   = "jp-north-1"
+)
+
 func resourceSakuraCloudWebAccel() *schema.Resource {
 	return &schema.Resource{
 		CreateContext: resourceSakuraCloudWebAccelCreate,
@@ -136,6 +141,11 @@ func resourceSakuraCloudWebAccel() *schema.Resource {
 				Description: "logging configuration of the site",
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
+						"enabled": {
+							Type:        schema.TypeBool,
+							Required:    true,
+							Description: "whether the site logging is enabled or not",
+						},
 						"bucket_name": {
 							Type:        schema.TypeString,
 							Required:    true,
@@ -268,5 +278,34 @@ func expandWebAccelCORSParameters(d resourceValueGettable) (*webaccel.CORSRule, 
 }
 
 func expandLoggingParameters(d resourceValueGettable) (*webaccel.LogUploadConfig, error) {
-	return nil, fmt.Errorf("WIP")
+	req := new(webaccel.LogUploadConfig)
+	loggingParams := mapFromSet(d, "logging")
+	if v, ok := loggingParams.GetOk("enabled"); ok {
+		if v.(bool) {
+			req.Status = "enabled"
+		} else {
+			req.Status = "disabled"
+		}
+	} else {
+		return nil, fmt.Errorf("logging status `enabled` is required")
+	}
+	if v, ok := loggingParams.GetOk("bucket_name"); ok {
+		req.Bucket = v.(string)
+	} else {
+		return nil, fmt.Errorf("bucket name is required")
+	}
+	if v, ok := loggingParams.GetOk("access_key_id"); ok {
+		req.AccessKeyID = v.(string)
+	} else {
+		return nil, fmt.Errorf("access_key_id is required")
+	}
+	if v, ok := loggingParams.GetOk("secret_access_key"); ok {
+		req.SecretAccessKey = v.(string)
+	} else {
+		return nil, fmt.Errorf("secret_access_key is required")
+	}
+	req.Endpoint = DefaultObjectStorageEndpoint
+	req.Region = DefaultObjectStorageRegion
+	req.Status = "enabled"
+	return req, nil
 }

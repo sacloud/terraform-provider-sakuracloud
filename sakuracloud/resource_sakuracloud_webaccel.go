@@ -160,12 +160,17 @@ func resourceSakuraCloudWebAccelRead(ctx context.Context, d *schema.ResourceData
 
 	siteID := d.Id()
 
-	site, err := webaccel.NewOp(client.webaccelClient).Read(ctx, siteID)
+	op := webaccel.NewOp(client.webaccelClient)
+	site, err := op.Read(ctx, siteID)
 	if err != nil {
 		return diag.Errorf("could not read SakuraCloud WebAccel [%s]: %s", d.Id(), err)
 	}
-
-	return setWebAccelResourceData(d, client, site)
+	logUploadConfig, err := op.ReadLogUploadConfig(ctx, siteID)
+	// for avoiding panic on blank configuration
+	if logUploadConfig != nil && logUploadConfig.Bucket == "" {
+		logUploadConfig = nil
+	}
+	return setWebAccelResourceData(d, client, site, logUploadConfig)
 }
 
 func resourceSakuraCloudWebAccelUpdate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
@@ -200,7 +205,16 @@ func resourceSakuraCloudWebAccelDelete(ctx context.Context, d *schema.ResourceDa
 	return nil
 }
 
-func setWebAccelResourceData(d *schema.ResourceData, client *APIClient, data *webaccel.Site) diag.Diagnostics {
+func setWebAccelResourceData(d *schema.ResourceData, client *APIClient, data *webaccel.Site, logUploadConfig *webaccel.LogUploadConfig) diag.Diagnostics {
+	if logUploadConfig != nil {
+		diagnostic := setWebAccelResourceLogUploadConfigData(d, client, logUploadConfig)
+		if diagnostic != nil {
+			return diagnostic
+		}
+	}
+	return setWebAccelResourceSiteData(d, client, data)
+}
+func setWebAccelResourceSiteData(d *schema.ResourceData, client *APIClient, data *webaccel.Site) diag.Diagnostics {
 
 	d.Set("name", data.Name)              //nolint
 	d.Set("domain_type", data.DomainType) //nolint
@@ -276,6 +290,23 @@ func setWebAccelResourceData(d *schema.ResourceData, client *APIClient, data *we
 		} else {
 			return diag.Errorf("invalid normalize_ae: %s", data.NormalizeAE)
 		}
+	}
+	return nil
+}
+
+func setWebAccelResourceLogUploadConfigData(d *schema.ResourceData, client *APIClient, data *webaccel.LogUploadConfig) diag.Diagnostics {
+	loggingParams := make(map[string]interface{})
+	if data.Status == "enabled" {
+		loggingParams["enabled"] = true
+	} else {
+		loggingParams["enabled"] = false
+	}
+	loggingParams["bucket_name"] = data.Bucket
+	loggingParams["access_key_id"] = data.AccessKeyID
+	loggingParams["secret_access_key"] = data.SecretAccessKey
+	err := d.Set("logging", []interface{}{loggingParams})
+	if err != nil {
+		return diag.FromErr(err)
 	}
 	return nil
 }

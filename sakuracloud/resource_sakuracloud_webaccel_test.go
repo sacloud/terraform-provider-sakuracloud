@@ -350,6 +350,7 @@ resource sakuracloud_webaccel "foobar" {
     protocol = "https"
   }
   logging {
+    enabled = true
     bucket_name = "%s"
     access_key_id = "%s"
     secret_access_key = "%s"
