@@ -158,10 +158,11 @@ func resourceSakuraCloudWebAccel() *schema.Resource {
 					},
 				},
 			},
-			"onetime_url_secret": {
-				Type:        schema.TypeString,
-				Description: "The site-wide onetime url secret",
+			"onetime_url_secrets": {
+				Description: "The site-wide onetime url secrets",
 				Optional:    true,
+				Type:        schema.TypeList,
+				Elem:        &schema.Schema{Type: schema.TypeString},
 			},
 			"vary_support": {
 				Type:        schema.TypeBool,

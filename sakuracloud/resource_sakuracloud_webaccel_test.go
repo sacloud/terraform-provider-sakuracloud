@@ -92,6 +92,7 @@ func TestAccResourceSakuraCloudWebAccel_WebOriginWithCORS(t *testing.T) {
 					resource.TestCheckResourceAttr("sakuracloud_webaccel.foobar", "origin_parameters.0.host", origin),
 					resource.TestCheckResourceAttr("sakuracloud_webaccel.foobar", "cors_rules.0.allow_all", "false"),
 					resource.TestCheckResourceAttr("sakuracloud_webaccel.foobar", "cors_rules.0.allowed_origins.0", "https://apps.example.com"),
+					resource.TestCheckResourceAttr("sakuracloud_webaccel.foobar", "onetime_url_secrets.0", "sample-secret"),
 					resource.TestCheckResourceAttr("sakuracloud_webaccel.foobar", "normalize_ae", "gzip"),
 				),
 			},
@@ -304,6 +305,9 @@ resource sakuracloud_webaccel "foobar" {
        "https://platform.example.com"
     ]
   }
+  onetime_url_secrets = [
+    "sample-secret"
+  ]
   vary_support = true
   default_cache_ttl = 3600
   normalize_ae = "gzip"

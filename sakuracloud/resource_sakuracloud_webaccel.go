@@ -107,7 +107,7 @@ func resourceSakuraCloudWebAccelCreate(ctx context.Context, d *schema.ResourceDa
 	)
 
 	_, hasCorsRule := d.GetOk("cors_rules")
-	_, hasOnetimeUrlSecret := d.GetOk("onetime_url_secret")
+	_, hasOnetimeUrlSecret := d.GetOk("onetime_url_secrets")
 	_, hasLoggingConfig := d.GetOk("logging")
 	hasSiteUpdatingArguments = hasCorsRule || hasOnetimeUrlSecret
 
@@ -120,8 +120,12 @@ func resourceSakuraCloudWebAccelCreate(ctx context.Context, d *schema.ResourceDa
 		reqUpd.CORSRules = &[]*webaccel.CORSRule{corsRule}
 	}
 	if hasOnetimeUrlSecret {
-		sec := d.Get("onetime_url_secret").([]string)
-		reqUpd.OnetimeURLSecrets = &sec
+		secrets := d.Get("onetime_url_secrets").([]interface{})
+		var assignedParam []string
+		for _, secret := range secrets {
+			assignedParam = append(assignedParam, secret.(string))
+		}
+		reqUpd.OnetimeURLSecrets = &assignedParam
 	}
 
 	//onetime url secret
@@ -173,7 +177,7 @@ func resourceSakuraCloudWebAccelUpdate(ctx context.Context, d *schema.ResourceDa
 	//siteID := d.Id()
 	//
 	//req := webaccel.UpdateSiteRequest{}
-	//if d.HasChanges("request_protocol", "origin_parameters", "cors_rules", "onetime_url_secret", "vary_support", "default_cache_ttl", "normalize_ae") {
+	//if d.HasChanges("request_protocol", "origin_parameters", "cors_rules", "onetime_url_secrets", "vary_support", "default_cache_ttl", "normalize_ae") {
 	//}
 	//_, err = webaccel.NewOp(client.webaccelClient).Update(ctx, siteID, &req)
 	//if err != nil {
