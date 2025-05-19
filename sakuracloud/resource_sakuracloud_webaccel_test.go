@@ -26,6 +26,8 @@ import (
 )
 
 func TestAccSakuraCloudResourceWebAccel_WebOrigin(t *testing.T) {
+	skipIfFakeModeEnabled(t)
+
 	envKeys := []string{
 		envWebAccelOrigin,
 	}
@@ -65,6 +67,8 @@ func TestAccSakuraCloudResourceWebAccel_WebOrigin(t *testing.T) {
 }
 
 func TestAccSakuraCloudResourceWebAccel_WebOriginWithCORS(t *testing.T) {
+	skipIfFakeModeEnabled(t)
+
 	envKeys := []string{
 		envWebAccelOrigin,
 	}
@@ -103,6 +107,8 @@ func TestAccSakuraCloudResourceWebAccel_WebOriginWithCORS(t *testing.T) {
 }
 
 func TestAccSakuraCloudResourceWebAccel_Update(t *testing.T) {
+	skipIfFakeModeEnabled(t)
+
 	envKeys := []string{
 		envWebAccelOrigin,
 		envObjectStorageEndpoint,
@@ -182,6 +188,8 @@ func TestAccSakuraCloudResourceWebAccel_Update(t *testing.T) {
 }
 
 func TestAccSakuraCloudResourceWebAccel_BucketOrigin(t *testing.T) {
+	skipIfFakeModeEnabled(t)
+
 	envKeys := []string{
 		envWebAccelOrigin,
 		envObjectStorageEndpoint,
@@ -229,6 +237,8 @@ func TestAccSakuraCloudResourceWebAccel_BucketOrigin(t *testing.T) {
 }
 
 func TestAccSakuraCloudResourceWebAccel_Logging(t *testing.T) {
+	skipIfFakeModeEnabled(t)
+
 	envKeys := []string{
 		envWebAccelOrigin,
 		envObjectStorageBucketName,
