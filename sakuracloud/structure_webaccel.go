@@ -6,6 +6,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
 	"github.com/sacloud/webaccel-api-go"
+	"os"
 )
 
 const (
@@ -102,17 +103,15 @@ func resourceSakuraCloudWebAccel() *schema.Resource {
 							Description: "S3 bucket name: required for origin.type = `bucket`",
 						},
 						"access_key_id": {
-							Type:     schema.TypeString,
-							Optional: true,
-							//FIXME: uncomment this
-							//Sensitive:   true,
+							Type:        schema.TypeString,
+							Optional:    true,
+							Sensitive:   true,
 							Description: "S3 access key ID: required for origin.type = `bucket`",
 						},
 						"secret_access_key": {
-							Type:     schema.TypeString,
-							Optional: true,
-							//FIXME: uncomment this
-							//Sensitive:   true,
+							Type:        schema.TypeString,
+							Optional:    true,
+							Sensitive:   true,
 							Description: "S3 secret access key: required for origin.type = `bucket`",
 						},
 						"doc_index": {
@@ -245,6 +244,9 @@ func flattenWebAccelCorsRules(data *webaccel.CORSRule) []interface{} {
 		corsRuleParams["allow_all"] = true
 	} else if len(data.AllowedOrigins) > 0 {
 		corsRuleParams["allowed_origins"] = data.AllowedOrigins
+	} else {
+		fmt.Fprintf(os.Stderr, "debug: ALLOW_ALL=false")
+		corsRuleParams["allow_all"] = false
 	}
 	return []interface{}{corsRuleParams}
 }
