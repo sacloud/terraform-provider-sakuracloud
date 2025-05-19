@@ -541,8 +541,7 @@ resource sakuracloud_webaccel "foobar" {
   normalize_ae = "INVALID"
 }
 `
-
-	//config without the S3 secret access key for logging
+	// config without the S3 secret access key for logging
 	confMissingLoggingParameters := `
 resource sakuracloud_webaccel "foobar" {
   name = "dummy"
@@ -550,18 +549,15 @@ resource sakuracloud_webaccel "foobar" {
   request_protocol = "https-redirect"
   origin_parameters {
     type = "web"
-    host = "%s"
-    host_header = "dummy.example.com"
+    host = "docs.usacloud.jp"
     protocol = "https"
   }
   logging {
     bucket_name = "example-bucket"
     access_key_id = "sample"
   }
-  vary_support = true
 }
 `
-
 	//allow_all and allowed_origins should not be specified together
 	confInvalidCorsConfiguration := `
 resource sakuracloud_webaccel "foobar" {

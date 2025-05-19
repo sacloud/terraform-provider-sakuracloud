@@ -65,7 +65,7 @@ func resourceSakuraCloudWebAccelActivationCreate(ctx context.Context, d *schema.
 	}
 
 	//for avoiding status update confliction
-	if statusString == "disabled" && site.Status == "disabled" {
+	if statusString == site.Status {
 		return resourceSakuraCloudWebAccelActivationRead(ctx, d, meta)
 	}
 

@@ -126,6 +126,10 @@ func resourceSakuraCloudWebAccelCreate(ctx context.Context, d *schema.ResourceDa
 		}
 		_, err = newOp.ApplyLogUploadConfig(ctx, res.ID, cfg)
 		if err != nil {
+			_, err2 := newOp.Delete(ctx, res.ID)
+			if err2 != nil {
+				return diag.FromErr(fmt.Errorf("%w: %s", err, err2.Error()))
+			}
 			return diag.FromErr(err)
 		}
 	}
