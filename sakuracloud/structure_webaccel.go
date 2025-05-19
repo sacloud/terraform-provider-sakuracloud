@@ -35,6 +35,14 @@ func resourceSakuraCloudWebAccel() *schema.Resource {
 				Computed:    true,
 				Description: "subdomain of the site",
 			},
+			"cname_record_value": {
+				Type:     schema.TypeString,
+				Computed: true,
+			},
+			"txt_record_value": {
+				Type:     schema.TypeString,
+				Computed: true,
+			},
 			"domain": {
 				Type:     schema.TypeString,
 				Optional: true,

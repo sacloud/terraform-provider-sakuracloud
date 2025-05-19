@@ -16,6 +16,7 @@ package sakuracloud
 
 import (
 	"context"
+	"fmt"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/sacloud/webaccel-api-go"
@@ -281,9 +282,11 @@ func setWebAccelResourceData(d *schema.ResourceData, client *APIClient, data *we
 }
 func setWebAccelResourceSiteData(d *schema.ResourceData, client *APIClient, data *webaccel.Site) diag.Diagnostics {
 
-	d.Set("name", data.Name)              //nolint
-	d.Set("domain_type", data.DomainType) //nolint
-	d.Set("subdomain", data.Subdomain)    //nolint
+	d.Set("name", data.Name)                                              //nolint
+	d.Set("domain_type", data.DomainType)                                 //nolint
+	d.Set("subdomain", data.Subdomain)                                    //nolint
+	d.Set("cname_record_value", data.Subdomain+".")                       //nolint
+	d.Set("txt_record_value", fmt.Sprintf("webaccel=%s", data.Subdomain)) //nolint
 
 	if data.DefaultCacheTTL != 0 {
 		d.Set("default_cache_ttl", data.DefaultCacheTTL)
