@@ -6,7 +6,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
 	"github.com/sacloud/webaccel-api-go"
-	"os"
 )
 
 const (
@@ -45,9 +44,8 @@ func resourceSakuraCloudWebAccel() *schema.Resource {
 				Computed: true,
 			},
 			"domain": {
-				Type:     schema.TypeString,
-				Optional: true,
-				// FIXME: add validator
+				Type:        schema.TypeString,
+				Optional:    true,
 				Description: "domain name of the site: required for domain_type = `own_domain`",
 			},
 			"request_protocol": {
@@ -69,9 +67,8 @@ func resourceSakuraCloudWebAccel() *schema.Resource {
 							Description: "origin type of the site: one of `web` or `bucket`",
 						},
 						"host": {
-							Type:     schema.TypeString,
-							Optional: true,
-							// FIXME: add validator
+							Type:        schema.TypeString,
+							Optional:    true,
 							Description: "origin host: required for origin.type = `web`",
 						},
 						"protocol": {
@@ -134,9 +131,8 @@ func resourceSakuraCloudWebAccel() *schema.Resource {
 							Optional:    true,
 						},
 						"allowed_origins": {
-							Type: schema.TypeList,
-							Elem: &schema.Schema{Type: schema.TypeString},
-							// FIXME: add validator
+							Type:        schema.TypeList,
+							Elem:        &schema.Schema{Type: schema.TypeString},
 							Description: "list of allowed origins for CORS",
 							Optional:    true,
 						},
@@ -160,17 +156,15 @@ func resourceSakuraCloudWebAccel() *schema.Resource {
 							Description: "logging bucket name",
 						},
 						"access_key_id": {
-							Type:     schema.TypeString,
-							Required: true,
-							//FIXME: uncomment this
-							//Sensitive:   true,
+							Type:        schema.TypeString,
+							Required:    true,
+							Sensitive:   true,
 							Description: "S3 access key ID",
 						},
 						"secret_access_key": {
-							Type:     schema.TypeString,
-							Required: true,
-							//FIXME: uncomment this
-							//Sensitive:   true,
+							Type:        schema.TypeString,
+							Required:    true,
+							Sensitive:   true,
 							Description: "S3 secret access key",
 						},
 					},
@@ -245,7 +239,6 @@ func flattenWebAccelCorsRules(data *webaccel.CORSRule) []interface{} {
 	} else if len(data.AllowedOrigins) > 0 {
 		corsRuleParams["allowed_origins"] = data.AllowedOrigins
 	} else {
-		fmt.Fprintf(os.Stderr, "debug: ALLOW_ALL=false")
 		corsRuleParams["allow_all"] = false
 	}
 	return []interface{}{corsRuleParams}

@@ -23,7 +23,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
 )
 
-func TestAccResourceSakuraCloudWebAccelActivation_basic(t *testing.T) {
+func TestAccResourceSakuraCloudWebAccelActivation_Basic(t *testing.T) {
 	envKeys := []string{
 		envWebAccelSiteName,
 	}
@@ -44,7 +44,7 @@ func TestAccResourceSakuraCloudWebAccelActivation_basic(t *testing.T) {
 		},
 		Steps: []resource.TestStep{
 			{
-				Config: testAccCheckSakuraCloudWebAccelActivationConfig(siteName),
+				Config: testAccCheckSakuraCloudWebAccelActivationConfig(siteName, true),
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttr("sakuracloud_webaccel_activation.foobar", "enabled", "true"),
 				),
@@ -53,15 +53,61 @@ func TestAccResourceSakuraCloudWebAccelActivation_basic(t *testing.T) {
 	})
 }
 
-func testAccCheckSakuraCloudWebAccelActivationConfig(siteName string) string {
+func TestAccResourceSakuraCloudWebAccelActivation_Update(t *testing.T) {
+	envKeys := []string{
+		envWebAccelSiteName,
+	}
+	for _, k := range envKeys {
+		if os.Getenv(k) == "" {
+			t.Skipf("ENV %q is requilred. skip", k)
+			return
+		}
+	}
+
+	siteName := os.Getenv(envWebAccelSiteName)
+
+	resource.Test(t, resource.TestCase{
+		PreCheck:          func() { testAccPreCheck(t) },
+		ProviderFactories: testAccProviderFactories,
+		CheckDestroy: func(*terraform.State) error {
+			return nil
+		},
+		Steps: []resource.TestStep{
+			{
+				Config: testAccCheckSakuraCloudWebAccelActivationConfig(siteName, true),
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr("sakuracloud_webaccel_activation.foobar", "enabled", "true"),
+				),
+			},
+			{
+				Config: testAccCheckSakuraCloudWebAccelActivationConfig(siteName, false),
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr("sakuracloud_webaccel_activation.foobar", "enabled", "false"),
+				),
+			},
+			{
+				Config: testAccCheckSakuraCloudWebAccelActivationConfig(siteName, true),
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr("sakuracloud_webaccel_activation.foobar", "enabled", "true"),
+				),
+			},
+		},
+	})
+}
+
+func testAccCheckSakuraCloudWebAccelActivationConfig(siteName string, statusEnabled bool) string {
+	statusValue := "false"
+	if statusEnabled {
+		statusValue = "true"
+	}
 	tmpl := `
 data sakuracloud_webaccel "site" {
   name = "%s"
 }
 resource sakuracloud_webaccel_activation "foobar" {
   site_id = data.sakuracloud_webaccel.site.id
-  enabled = true
+  enabled = %s
 }
 `
-	return fmt.Sprintf(tmpl, siteName)
+	return fmt.Sprintf(tmpl, siteName, statusValue)
 }
