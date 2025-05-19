@@ -118,6 +118,37 @@ func dataSourceSakuraCloudWebAccel() *schema.Resource {
 				Type:     schema.TypeString,
 				Computed: true,
 			},
+			"logging": {
+				Type:        schema.TypeSet,
+				Computed:    true,
+				Description: "logging configuration of the site",
+				Elem: &schema.Resource{
+					Schema: map[string]*schema.Schema{
+						"enabled": {
+							Type:        schema.TypeBool,
+							Computed:    true,
+							Description: "whether the site logging is enabled or not",
+						},
+						"bucket_name": {
+							Type:        schema.TypeString,
+							Computed:    true,
+							Description: "logging bucket name",
+						},
+						"access_key_id": {
+							Type:        schema.TypeString,
+							Computed:    true,
+							Sensitive:   true,
+							Description: "S3 access key ID",
+						},
+						"secret_access_key": {
+							Type:        schema.TypeString,
+							Required:    true,
+							Sensitive:   true,
+							Description: "S3 secret access key",
+						},
+					},
+				},
+			},
 			"default_cache_ttl": {
 				Type:     schema.TypeInt,
 				Optional: true,
@@ -152,6 +183,15 @@ func dataSourceSakuraCloudWebAccel() *schema.Resource {
 }
 
 func dataSourceSakuraCloudWebAccelRead(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
+	err := dataSourceSakuraCloudWebAccelSiteRead(ctx, d, meta)
+	if err != nil {
+		return err
+	}
+	err = dataSourceSakuraCloudWebAccelLogUploadConfigRead(ctx, d, meta)
+	return err
+}
+
+func dataSourceSakuraCloudWebAccelSiteRead(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	name := d.Get("name").(string)
 	domain := d.Get("domain").(string)
 	if name == "" && domain == "" {
@@ -225,6 +265,22 @@ func dataSourceSakuraCloudWebAccelRead(ctx context.Context, d *schema.ResourceDa
 		d.Set("normalize_ae", data.NormalizeAE)
 	}
 
+	if data.CORSRules != nil {
+		if len(data.CORSRules) == 1 {
+			if data.CORSRules[0].AllowsAnyOrigin == true && len(data.CORSRules[0].AllowedOrigins) != 0 {
+				return diag.Errorf("invalid condition: allow_all and allowed_origins are specified together")
+			} else if data.CORSRules[0].AllowsAnyOrigin == false && len(data.CORSRules[0].AllowedOrigins) == 0 {
+				d.Set("cors_rules", flattenWebAccelCorsRules(data.CORSRules[0]))
+			}
+		} else if len(data.CORSRules) > 1 {
+			return diag.Errorf("invalid condition: too many CORS rules")
+		}
+	} else {
+		//CORS is implicitly disabled by default
+		rule := &webaccel.CORSRule{AllowsAnyOrigin: false}
+		d.Set("cors_rules", flattenWebAccelCorsRules(rule))
+	}
+
 	switch data.OriginType {
 	case webaccel.OriginTypesWebServer:
 	case webaccel.OriginTypesObjectStorage:
@@ -234,5 +290,28 @@ func dataSourceSakuraCloudWebAccelRead(ctx context.Context, d *schema.ResourceDa
 
 	d.Set("cname_record_value", data.Subdomain+".")
 	d.Set("txt_record_value", fmt.Sprintf("webaccel=%s", data.Subdomain))
+	d.Set("vary_support", data.VarySupport == webaccel.VarySupportEnabled)
+	if data.NormalizeAE == webaccel.NormalizeAEBrGz {
+		d.Set("normalize_ae", "brotli")
+	} else {
+		// gzip is chosen by default
+		d.Set("normalize_ae", "gzip")
+	}
+	return nil
+}
+
+// FIXME: test the function
+func dataSourceSakuraCloudWebAccelLogUploadConfigRead(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
+	siteId := d.Id()
+	client, _, err := sakuraCloudClient(d, meta)
+	if err != nil {
+		return diag.FromErr(err)
+	}
+	webAccelOp := webaccel.NewOp(client.webaccelClient)
+	logCfg, err := webAccelOp.ReadLogUploadConfig(ctx, siteId)
+	if err != nil {
+		return diag.FromErr(err)
+	}
+	d.Set("logging", flattenWebAccelLogUploadConfigData(logCfg))
 	return nil
 }
