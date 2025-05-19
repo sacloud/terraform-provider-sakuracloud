@@ -50,6 +50,46 @@ func dataSourceSakuraCloudWebAccel() *schema.Resource {
 				Type:     schema.TypeString,
 				Computed: true,
 			},
+			"origin_parameters": {
+				Type:     schema.TypeSet,
+				Computed: true,
+				Elem: &schema.Resource{
+					Schema: map[string]*schema.Schema{
+						"type": {
+							Type:     schema.TypeString,
+							Required: true,
+						},
+						"host": {
+							Type:     schema.TypeString,
+							Optional: true,
+						},
+						"protocol": {
+							Type:     schema.TypeString,
+							Optional: true,
+						},
+						"host_header": {
+							Type:     schema.TypeString,
+							Optional: true,
+						},
+						"endpoint": {
+							Type:     schema.TypeString,
+							Optional: true,
+						},
+						"region": {
+							Type:     schema.TypeString,
+							Optional: true,
+						},
+						"bucket_name": {
+							Type:     schema.TypeString,
+							Optional: true,
+						},
+						"doc_index": {
+							Type:     schema.TypeBool,
+							Optional: true,
+						},
+					},
+				},
+			},
 			"subdomain": {
 				Type:     schema.TypeString,
 				Computed: true,
@@ -78,11 +118,80 @@ func dataSourceSakuraCloudWebAccel() *schema.Resource {
 				Type:     schema.TypeString,
 				Computed: true,
 			},
+			"logging": {
+				Type:        schema.TypeSet,
+				Computed:    true,
+				Description: "logging configuration of the site",
+				Elem: &schema.Resource{
+					Schema: map[string]*schema.Schema{
+						"enabled": {
+							Type:        schema.TypeBool,
+							Computed:    true,
+							Description: "whether the site logging is enabled or not",
+						},
+						"bucket_name": {
+							Type:        schema.TypeString,
+							Computed:    true,
+							Description: "logging bucket name",
+						},
+						"access_key_id": {
+							Type:        schema.TypeString,
+							Computed:    true,
+							Sensitive:   true,
+							Description: "S3 access key ID",
+						},
+						"secret_access_key": {
+							Type:        schema.TypeString,
+							Required:    true,
+							Sensitive:   true,
+							Description: "S3 secret access key",
+						},
+					},
+				},
+			},
+			"default_cache_ttl": {
+				Type:     schema.TypeInt,
+				Optional: true,
+			},
+			"vary_support": {
+				Type:     schema.TypeBool,
+				Optional: true,
+			},
+			"cors_rules": {
+				Type:     schema.TypeSet,
+				Optional: true,
+				Elem: &schema.Resource{
+					Schema: map[string]*schema.Schema{
+						"allow_all": {
+							Type:     schema.TypeBool,
+							Computed: true,
+						},
+						"allowed_origins": {
+							Type:     schema.TypeList,
+							Computed: true,
+							Elem:     &schema.Schema{Type: schema.TypeString},
+						},
+					},
+				},
+			},
+			"normalize_ae": {
+				Type:     schema.TypeString,
+				Computed: true,
+			},
 		},
 	}
 }
 
 func dataSourceSakuraCloudWebAccelRead(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
+	err := dataSourceSakuraCloudWebAccelSiteRead(ctx, d, meta)
+	if err != nil {
+		return err
+	}
+	err = dataSourceSakuraCloudWebAccelLogUploadConfigRead(ctx, d, meta)
+	return err
+}
+
+func dataSourceSakuraCloudWebAccelSiteRead(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	name := d.Get("name").(string)
 	domain := d.Get("domain").(string)
 	if name == "" && domain == "" {
@@ -125,7 +234,84 @@ func dataSourceSakuraCloudWebAccelRead(ctx context.Context, d *schema.ResourceDa
 	d.Set("host_header", data.HostHeader)
 	d.Set("status", data.Status)
 
+	originParams := make(map[string]interface{})
+	switch data.OriginType {
+	case webaccel.OriginTypesWebServer:
+		originParams["type"] = "web"
+		originParams["host"] = data.Origin
+		if data.OriginProtocol == webaccel.OriginProtocolsHttp {
+			originParams["protocol"] = "http"
+		} else if data.OriginProtocol == webaccel.OriginProtocolsHttps {
+			originParams["protocol"] = "https"
+		} else {
+			panic("invalid origin protocol: " + data.OriginProtocol)
+		}
+		if data.HostHeader != "" {
+			originParams["host_header"] = data.HostHeader
+		}
+	case webaccel.OriginTypesObjectStorage:
+		originParams["type"] = "object_storage"
+		if data.S3Endpoint == "" || data.S3Region == "" || data.BucketName == "" {
+			panic("origin parameters are not fully provided: [endpoint, region, bucket_name]")
+		}
+		originParams["endpoint"] = data.S3Endpoint
+		originParams["region"] = data.S3Region
+		originParams["bucket_name"] = data.BucketName
+	default:
+		panic(fmt.Sprintf("unknown origin type: %s", data.OriginType))
+	}
+	d.Set("origin_parameters", []interface{}{originParams})
+	if data.NormalizeAE != "" {
+		d.Set("normalize_ae", data.NormalizeAE)
+	}
+
+	if data.CORSRules != nil {
+		if len(data.CORSRules) == 1 {
+			if data.CORSRules[0].AllowsAnyOrigin == true && len(data.CORSRules[0].AllowedOrigins) != 0 {
+				return diag.Errorf("invalid condition: allow_all and allowed_origins are specified together")
+			} else if data.CORSRules[0].AllowsAnyOrigin == false && len(data.CORSRules[0].AllowedOrigins) == 0 {
+				d.Set("cors_rules", flattenWebAccelCorsRules(data.CORSRules[0]))
+			}
+		} else if len(data.CORSRules) > 1 {
+			return diag.Errorf("invalid condition: too many CORS rules")
+		}
+	} else {
+		//CORS is implicitly disabled by default
+		rule := &webaccel.CORSRule{AllowsAnyOrigin: false}
+		d.Set("cors_rules", flattenWebAccelCorsRules(rule))
+	}
+
+	switch data.OriginType {
+	case webaccel.OriginTypesWebServer:
+	case webaccel.OriginTypesObjectStorage:
+	default:
+		return diag.Errorf("unknown origin type: %s", data.OriginType)
+	}
+
 	d.Set("cname_record_value", data.Subdomain+".")
 	d.Set("txt_record_value", fmt.Sprintf("webaccel=%s", data.Subdomain))
+	d.Set("vary_support", data.VarySupport == webaccel.VarySupportEnabled)
+	if data.NormalizeAE == webaccel.NormalizeAEBrGz {
+		d.Set("normalize_ae", "brotli")
+	} else {
+		// gzip is chosen by default
+		d.Set("normalize_ae", "gzip")
+	}
+	return nil
+}
+
+// FIXME: test the function
+func dataSourceSakuraCloudWebAccelLogUploadConfigRead(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
+	siteId := d.Id()
+	client, _, err := sakuraCloudClient(d, meta)
+	if err != nil {
+		return diag.FromErr(err)
+	}
+	webAccelOp := webaccel.NewOp(client.webaccelClient)
+	logCfg, err := webAccelOp.ReadLogUploadConfig(ctx, siteId)
+	if err != nil {
+		return diag.FromErr(err)
+	}
+	d.Set("logging", flattenWebAccelLogUploadConfigData(logCfg))
 	return nil
 }

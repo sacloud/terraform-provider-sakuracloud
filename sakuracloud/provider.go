@@ -208,6 +208,8 @@ func Provider() *schema.Provider {
 			"sakuracloud_subnet":                resourceSakuraCloudSubnet(),
 			"sakuracloud_switch":                resourceSakuraCloudSwitch(),
 			"sakuracloud_vpc_router":            resourceSakuraCloudVPCRouter(),
+			"sakuracloud_webaccel":              resourceSakuraCloudWebAccel(),
+			"sakuracloud_webaccel_activation":   resourceSakuraCloudWebAccelActivation(),
 			"sakuracloud_webaccel_acl":          resourceSakuraCloudWebAccelACL(),
 			"sakuracloud_webaccel_certificate":  resourceSakuraCloudWebAccelCertificate(),
 		},

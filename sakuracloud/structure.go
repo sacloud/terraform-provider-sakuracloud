@@ -139,6 +139,13 @@ func mapFromFirstElement(d resourceValueGettable, key string) resourceValueGetta
 	return nil
 }
 
+func mapFromSet(d resourceValueGettable, key string) resourceValueGettable {
+	if v, ok := d.GetOk(key); ok {
+		return mapToResourceData(v.(*schema.Set).List()[0].(map[string]interface{}))
+	}
+	return nil
+}
+
 func sakuraCloudClient(d resourceValueGettable, meta interface{}) (*APIClient, string, error) {
 	client := meta.(*APIClient)
 	zone := getZone(d, client)
