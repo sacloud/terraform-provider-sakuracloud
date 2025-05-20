@@ -1,5 +1,15 @@
 # CHANGELOG
 
+## 2.27.0 (Unreleased)
+
+- go: bump golang.org/x/net from 0.33.0 to 0.38.0 (#1242)
+- iaas-api-go v1.15.0 (#1245)
+- Update GitHub Actions matrix to use Ubuntu 24.04 (#1244)
+- sakuracloud_apprun_application: set ForceNew: true for name (#1235)
+- go: bump golang.org/x/net from 0.25.0 to 0.33.0 (#1230)
+- go: bump github.com/sacloud/autoscaler from 0.15.5 to 0.16.1 (#1197)
+- update: iaas-api-go v1.14.0 (#1229)
+
 ## 2.26.1 (2025/02/13)
 
 - ContainerRegistry:beta #1225
