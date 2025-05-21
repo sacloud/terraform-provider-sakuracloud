@@ -120,10 +120,7 @@ func resourceSakuraCloudWebAccelCreate(ctx context.Context, d *schema.ResourceDa
 
 	//logging
 	if hasLoggingConfig {
-		cfg, err := expandLoggingParameters(d)
-		if err != nil {
-			return diag.FromErr(err)
-		}
+		cfg := expandLoggingParameters(d)
 		_, err = newOp.ApplyLogUploadConfig(ctx, res.ID, cfg)
 		if err != nil {
 			_, err2 := newOp.Delete(ctx, res.ID)
@@ -242,11 +239,8 @@ func resourceSakuraCloudWebAccelUpdate(ctx context.Context, d *schema.ResourceDa
 
 	if d.HasChange("logging") {
 		if _, ok := d.GetOk("logging"); ok {
-			loggingUpd, err := expandLoggingParameters(d)
-			if err != nil {
-				return diag.FromErr(err)
-			}
-			_, err = newOp.ApplyLogUploadConfig(ctx, siteID, loggingUpd)
+			cfg := expandLoggingParameters(d)
+			_, err = newOp.ApplyLogUploadConfig(ctx, siteID, cfg)
 			if err != nil {
 				return diag.FromErr(err)
 			}
@@ -291,6 +285,7 @@ func setWebAccelResourceSiteData(d *schema.ResourceData, client *APIClient, data
 	d.Set("subdomain", data.Subdomain)                                    //nolint
 	d.Set("cname_record_value", data.Subdomain+".")                       //nolint
 	d.Set("txt_record_value", fmt.Sprintf("webaccel=%s", data.Subdomain)) //nolint
+	d.Set("request_protocol", mapWebAccelRequestProtocol(data))           //nolint
 
 	if data.DefaultCacheTTL != 0 {
 		d.Set("default_cache_ttl", data.DefaultCacheTTL)

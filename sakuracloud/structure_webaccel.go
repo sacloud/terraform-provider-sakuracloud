@@ -353,37 +353,22 @@ func expandWebAccelCORSParameters(d resourceValueGettable) (*webaccel.CORSRule, 
 	return corsRule, nil
 }
 
-func expandLoggingParameters(d resourceValueGettable) (*webaccel.LogUploadConfig, error) {
+func expandLoggingParameters(d resourceValueGettable) *webaccel.LogUploadConfig {
 	req := new(webaccel.LogUploadConfig)
 	loggingParams := mapFromSet(d, "logging")
-	if v, ok := loggingParams.GetOk("enabled"); ok {
-		if v.(bool) {
-			req.Status = "enabled"
-		} else {
-			req.Status = "disabled"
-		}
+	if loggingParams.Get("enabled").(bool) {
+		req.Status = "enabled"
 	} else {
-		return nil, fmt.Errorf("logging status `enabled` is required")
+		req.Status = "disabled"
 	}
-	if v, ok := loggingParams.GetOk("bucket_name"); ok {
-		req.Bucket = v.(string)
-	} else {
-		return nil, fmt.Errorf("bucket name is required")
-	}
-	if v, ok := loggingParams.GetOk("access_key_id"); ok {
-		req.AccessKeyID = v.(string)
-	} else {
-		return nil, fmt.Errorf("access_key_id is required")
-	}
-	if v, ok := loggingParams.GetOk("secret_access_key"); ok {
-		req.SecretAccessKey = v.(string)
-	} else {
-		return nil, fmt.Errorf("secret_access_key is required")
-	}
+	req.Bucket = loggingParams.Get("bucket_name").(string)
+	req.AccessKeyID = loggingParams.Get("access_key_id").(string)
+	req.SecretAccessKey = loggingParams.Get("secret_access_key").(string)
+
 	req.Endpoint = DefaultObjectStorageEndpoint
 	req.Region = DefaultObjectStorageRegion
 	req.Status = "enabled"
-	return req, nil
+	return req
 }
 
 func expandWebAccelOnetimeUrlSecrets(d resourceValueGettable) *[]string {
@@ -417,4 +402,17 @@ func expandWebAccelNormalizeAEParameter(d resourceValueGettable) (string, error)
 		return webaccel.NormalizeAEBrGz, nil
 	}
 	return "", fmt.Errorf("invalid normalize_ae parameter: '%s'", v)
+}
+
+func mapWebAccelRequestProtocol(site *webaccel.Site) string {
+	switch site.RequestProtocol {
+	case webaccel.RequestProtocolsHttpAndHttps:
+		return "http+https"
+	case webaccel.RequestProtocolsHttpsOnly:
+		return "https"
+	case webaccel.RequestProtocolsRedirectToHttps:
+		return "https-redirect"
+	default:
+		panic("invalid condition")
+	}
 }

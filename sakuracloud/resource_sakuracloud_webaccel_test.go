@@ -54,6 +54,7 @@ func TestAccSakuraCloudResourceWebAccel_WebOrigin(t *testing.T) {
 				Config: testAccCheckSakuraCloudWebAccelWebOriginConfigBasic(siteName, origin),
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttr("sakuracloud_webaccel.foobar", "name", siteName),
+					resource.TestCheckResourceAttr("sakuracloud_webaccel.foobar", "request_protocol", "https-redirect"),
 					resource.TestCheckResourceAttr("sakuracloud_webaccel.foobar", "origin_parameters.0.type", "web"),
 					resource.TestCheckResourceAttr("sakuracloud_webaccel.foobar", "origin_parameters.0.host", origin),
 					resource.TestCheckResourceAttr("sakuracloud_webaccel.foobar", "vary_support", "true"),
@@ -146,6 +147,7 @@ func TestAccSakuraCloudResourceWebAccel_Update(t *testing.T) {
 					resource.TestCheckResourceAttr("sakuracloud_webaccel.foobar", "name", siteName),
 					resource.TestCheckResourceAttr("sakuracloud_webaccel.foobar", "origin_parameters.0.type", "web"),
 					resource.TestCheckResourceAttr("sakuracloud_webaccel.foobar", "origin_parameters.0.host", origin),
+					resource.TestCheckResourceAttr("sakuracloud_webaccel.foobar", "request_protocol", "https-redirect"),
 					resource.TestCheckResourceAttr("sakuracloud_webaccel.foobar", "vary_support", "true"),
 					resource.TestCheckResourceAttr("sakuracloud_webaccel.foobar", "normalize_ae", "brotli"),
 				),
@@ -156,6 +158,7 @@ func TestAccSakuraCloudResourceWebAccel_Update(t *testing.T) {
 					resource.TestCheckResourceAttr("sakuracloud_webaccel.foobar", "name", siteName),
 					resource.TestCheckResourceAttr("sakuracloud_webaccel.foobar", "origin_parameters.0.type", "web"),
 					resource.TestCheckResourceAttr("sakuracloud_webaccel.foobar", "origin_parameters.0.host", origin),
+					resource.TestCheckResourceAttr("sakuracloud_webaccel.foobar", "request_protocol", "http+https"),
 					resource.TestCheckResourceAttr("sakuracloud_webaccel.foobar", "cors_rules.0.allow_all", "false"),
 					resource.TestCheckResourceAttr("sakuracloud_webaccel.foobar", "cors_rules.0.allowed_origins.0", "https://apps.example.com"),
 					resource.TestCheckResourceAttr("sakuracloud_webaccel.foobar", "normalize_ae", "gzip"),
@@ -334,7 +337,7 @@ func testAccCheckSakuraCloudWebAccelWebOriginConfigWithCors(siteName string, ori
 resource sakuracloud_webaccel "foobar" {
   name = "%s"
   domain_type = "subdomain"
-  request_protocol = "https-redirect"
+  request_protocol = "http+https"
   origin_parameters {
     type = "web"
     host = "%s"

@@ -50,6 +50,10 @@ func dataSourceSakuraCloudWebAccel() *schema.Resource {
 				Type:     schema.TypeString,
 				Computed: true,
 			},
+			"request_protocol": {
+				Type:     schema.TypeString,
+				Computed: true,
+			},
 			"origin_parameters": {
 				Type:     schema.TypeSet,
 				Computed: true,
@@ -230,6 +234,7 @@ func dataSourceSakuraCloudWebAccelSiteRead(ctx context.Context, d *schema.Resour
 	d.Set("origin", data.Origin)
 	d.Set("subdomain", data.Subdomain)
 	d.Set("domain_type", data.DomainType)
+	d.Set("request_protocol", mapWebAccelRequestProtocol(data))
 	d.Set("has_certificate", data.HasCertificate)
 	d.Set("host_header", data.HostHeader)
 	d.Set("status", data.Status)

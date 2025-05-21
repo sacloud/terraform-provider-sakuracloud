@@ -58,6 +58,7 @@ func TestAccSakuraCloudDataSourceWebAccel_ByName(t *testing.T) {
 					resource.TestCheckResourceAttr("data.sakuracloud_webaccel.foobar", "name", siteName),
 					resource.TestMatchResourceAttr("data.sakuracloud_webaccel.foobar", "domain", regexpNotEmpty),
 					resource.TestMatchResourceAttr("data.sakuracloud_webaccel.foobar", "origin", regexpNotEmpty),
+					resource.TestMatchResourceAttr("data.sakuracloud_webaccel.foobar", "request_protocol", regexpNotEmpty),
 					resource.TestMatchResourceAttr("data.sakuracloud_webaccel.foobar", "origin_parameters.0.type", regexpNotEmpty),
 					resource.TestMatchResourceAttr("data.sakuracloud_webaccel.foobar", "cors_rules.0.allow_all", regexpNotEmpty),
 					//resource.TestMatchResourceAttr("data.sakuracloud_webaccel.foobar", "logging.0.enabled", regexpNotEmpty),
