@@ -28,33 +28,24 @@ func resourceSakuraCloudWebAccelCreate(ctx context.Context, d *schema.ResourceDa
 		return diag.FromErr(err)
 	}
 
-	req := webaccel.CreateSiteRequest{
-		Name:       d.Get("name").(string),
-		DomainType: d.Get("domain_type").(string),
+	req := new(webaccel.CreateSiteRequest)
+	if _, ok := d.GetOk("origin_parameters"); !ok {
+		panic("provider bug: no origin parameters found")
 	}
+
+	req, err = expandWebAccelOriginParamsForCreation(d)
+	if err != nil {
+		return diag.FromErr(err)
+	}
+	req.Name = d.Get("name").(string)
+	req.DomainType = d.Get("domain_type").(string)
+
 	if _, ok := d.GetOk("request_protocol"); ok {
 		req.RequestProtocol, err = expandWebAccelRequestProtocol(d)
 		if err != nil {
 			return diag.FromErr(err)
 		}
 	}
-
-	if _, ok := d.GetOk("origin_parameters"); !ok {
-		panic("provider bug: no origin parameters found")
-	}
-	originParams, err := expandWebAccelOriginParameters(d)
-	if err != nil {
-		return diag.FromErr(err)
-	}
-	req.OriginType = originParams.OriginType
-	req.Origin = originParams.Origin
-	req.OriginProtocol = originParams.OriginProtocol
-	req.HostHeader = originParams.HostHeader
-	req.S3Endpoint = originParams.S3Endpoint
-	req.S3Region = originParams.S3Region
-	req.BucketName = originParams.BucketName
-	req.AccessKeyID = originParams.AccessKeyID
-	req.SecretAccessKey = originParams.SecretAccessKey
 
 	// miscellaneous  params
 	if _, ok := d.GetOk("vary_support"); ok {
@@ -73,7 +64,7 @@ func resourceSakuraCloudWebAccelCreate(ctx context.Context, d *schema.ResourceDa
 
 	newOp := webaccel.NewOp(client.webaccelClient)
 
-	res, err := newOp.Create(ctx, &req)
+	res, err := newOp.Create(ctx, req)
 	if err != nil {
 		return diag.FromErr(err)
 	}
@@ -177,6 +168,13 @@ func resourceSakuraCloudWebAccelUpdate(ctx context.Context, d *schema.ResourceDa
 	}
 	if d.HasChanges(siteUpdatingArguments...) {
 		reqUpd := new(webaccel.UpdateSiteRequest)
+
+		//map origin params into the request
+		reqUpd, err := expandWebAccelOriginParametersForUpdate(d)
+		if err != nil {
+			return diag.FromErr(err)
+		}
+
 		if name, ok := d.GetOk("name"); ok {
 			reqUpd.Name = name.(string)
 		}
@@ -202,21 +200,6 @@ func resourceSakuraCloudWebAccelUpdate(ctx context.Context, d *schema.ResourceDa
 				return diag.FromErr(err)
 			}
 		}
-
-		//origin params
-		originParameters, err := expandWebAccelOriginParameters(d)
-		if err != nil {
-			return diag.FromErr(err)
-		}
-		reqUpd.OriginType = originParameters.OriginType
-		reqUpd.Origin = originParameters.Origin
-		reqUpd.OriginProtocol = originParameters.OriginProtocol
-		reqUpd.HostHeader = originParameters.HostHeader
-		reqUpd.S3Endpoint = originParameters.S3Endpoint
-		reqUpd.S3Region = originParameters.S3Region
-		reqUpd.BucketName = originParameters.BucketName
-		reqUpd.AccessKeyID = originParameters.AccessKeyID
-		reqUpd.SecretAccessKey = originParameters.SecretAccessKey
 
 		//cors
 		if _, hasCorsRule := d.GetOk("cors_rules"); hasCorsRule {

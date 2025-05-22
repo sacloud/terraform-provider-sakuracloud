@@ -208,6 +208,7 @@ func flattenWebAccelOriginParameters(d resourceValueGettable, site *webaccel.Sit
 		} else if site.OriginProtocol == webaccel.OriginProtocolsHttps {
 			originParams["protocol"] = "https"
 		} else {
+			// エンドポイントもしくはproviderのバグはキャッチしない
 			panic("invalid origin protocol: " + site.OriginProtocol)
 		}
 		if site.HostHeader != "" {
@@ -257,7 +258,29 @@ func flattenWebAccelLogUploadConfigData(data *webaccel.LogUploadConfig) []interf
 	return []interface{}{loggingParams}
 }
 
-func expandWebAccelOriginParameters(d resourceValueGettable) (*webaccel.UpdateSiteRequest, error) {
+// 事前条件: d.IsSet("origin_parameters") == true
+func expandWebAccelOriginParamsForCreation(d resourceValueGettable) (*webaccel.CreateSiteRequest, error) {
+	var req = new(webaccel.CreateSiteRequest)
+	// NOTE: UpdateSiteRequest は CreateSiteRequest と互換なフィールドを実装している
+	originParams, err := expandWebAccelOriginParametersForUpdate(d)
+	if err != nil {
+		return nil, err
+	}
+	req.OriginType = originParams.OriginType
+	req.Origin = originParams.Origin
+	req.OriginProtocol = originParams.OriginProtocol
+	req.HostHeader = originParams.HostHeader
+	req.S3Endpoint = originParams.S3Endpoint
+	req.S3Region = originParams.S3Region
+	req.BucketName = originParams.BucketName
+	req.AccessKeyID = originParams.AccessKeyID
+	req.SecretAccessKey = originParams.SecretAccessKey
+
+	return req, nil
+}
+
+// 事前条件: d.IsSet("origin_parameters") == true
+func expandWebAccelOriginParametersForUpdate(d resourceValueGettable) (*webaccel.UpdateSiteRequest, error) {
 	var (
 		originType string
 		req        = new(webaccel.UpdateSiteRequest)
@@ -301,6 +324,7 @@ func expandWebAccelOriginParameters(d resourceValueGettable) (*webaccel.UpdateSi
 	return req, nil
 }
 
+// 事前条件: d.IsSet("request_protocol") == true
 func expandWebAccelRequestProtocol(d resourceValueGettable) (string, error) {
 	v := d.Get("request_protocol")
 	switch v.(string) {
@@ -315,6 +339,7 @@ func expandWebAccelRequestProtocol(d resourceValueGettable) (string, error) {
 	}
 }
 
+// 事前条件: d.IsSet("cors_rules") == true
 func expandWebAccelCORSParameters(d resourceValueGettable) (*webaccel.CORSRule, error) {
 	rule := &webaccel.CORSRule{}
 	var (
@@ -353,6 +378,7 @@ func expandWebAccelCORSParameters(d resourceValueGettable) (*webaccel.CORSRule, 
 	return corsRule, nil
 }
 
+// 事前条件: d.IsSet("logging") == true および全ての内部パラメタが設定されていること
 func expandLoggingParameters(d resourceValueGettable) *webaccel.LogUploadConfig {
 	req := new(webaccel.LogUploadConfig)
 	loggingParams := mapFromSet(d, "logging")
@@ -371,6 +397,7 @@ func expandLoggingParameters(d resourceValueGettable) *webaccel.LogUploadConfig 
 	return req
 }
 
+// 事前条件: d.IsSet("onetime_url_secrets") == true
 func expandWebAccelOnetimeUrlSecrets(d resourceValueGettable) *[]string {
 	value := d.Get("onetime_url_secrets").([]interface{})
 	var secrets []string
@@ -380,6 +407,7 @@ func expandWebAccelOnetimeUrlSecrets(d resourceValueGettable) *[]string {
 	return &secrets
 }
 
+// 事前条件: d.IsSet("vary_support") == true
 func expandWebAccelVarySupportParameter(d resourceValueGettable) string {
 	v := d.Get("vary_support")
 	if v.(bool) {
@@ -389,6 +417,7 @@ func expandWebAccelVarySupportParameter(d resourceValueGettable) string {
 	}
 }
 
+// 事前条件: d.IsSet("normalize_ae") == true
 func expandWebAccelNormalizeAEParameter(d resourceValueGettable) (string, error) {
 	v := d.Get("normalize_ae").(string)
 	switch v {
@@ -404,6 +433,7 @@ func expandWebAccelNormalizeAEParameter(d resourceValueGettable) (string, error)
 	return "", fmt.Errorf("invalid normalize_ae parameter: '%s'", v)
 }
 
+// mapWebAccelRequestProtocol: Read系処理以外で利用する場合、panic部分の書き換えが必要
 func mapWebAccelRequestProtocol(site *webaccel.Site) string {
 	switch site.RequestProtocol {
 	case webaccel.RequestProtocolsHttpAndHttps:
@@ -413,6 +443,7 @@ func mapWebAccelRequestProtocol(site *webaccel.Site) string {
 	case webaccel.RequestProtocolsRedirectToHttps:
 		return "https-redirect"
 	default:
+		// エンドポイントもしくはproviderのバグはキャッチしない
 		panic("invalid condition")
 	}
 }

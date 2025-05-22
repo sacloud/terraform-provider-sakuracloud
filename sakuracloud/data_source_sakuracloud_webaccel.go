@@ -61,35 +61,35 @@ func dataSourceSakuraCloudWebAccel() *schema.Resource {
 					Schema: map[string]*schema.Schema{
 						"type": {
 							Type:     schema.TypeString,
-							Required: true,
+							Computed: true,
 						},
 						"host": {
 							Type:     schema.TypeString,
-							Optional: true,
+							Computed: true,
 						},
 						"protocol": {
 							Type:     schema.TypeString,
-							Optional: true,
+							Computed: true,
 						},
 						"host_header": {
 							Type:     schema.TypeString,
-							Optional: true,
+							Computed: true,
 						},
 						"endpoint": {
 							Type:     schema.TypeString,
-							Optional: true,
+							Computed: true,
 						},
 						"region": {
 							Type:     schema.TypeString,
-							Optional: true,
+							Computed: true,
 						},
 						"bucket_name": {
 							Type:     schema.TypeString,
-							Optional: true,
+							Computed: true,
 						},
 						"doc_index": {
 							Type:     schema.TypeBool,
-							Optional: true,
+							Computed: true,
 						},
 					},
 				},
@@ -238,34 +238,7 @@ func dataSourceSakuraCloudWebAccelSiteRead(ctx context.Context, d *schema.Resour
 	d.Set("has_certificate", data.HasCertificate)
 	d.Set("host_header", data.HostHeader)
 	d.Set("status", data.Status)
-
-	originParams := make(map[string]interface{})
-	switch data.OriginType {
-	case webaccel.OriginTypesWebServer:
-		originParams["type"] = "web"
-		originParams["host"] = data.Origin
-		if data.OriginProtocol == webaccel.OriginProtocolsHttp {
-			originParams["protocol"] = "http"
-		} else if data.OriginProtocol == webaccel.OriginProtocolsHttps {
-			originParams["protocol"] = "https"
-		} else {
-			panic("invalid origin protocol: " + data.OriginProtocol)
-		}
-		if data.HostHeader != "" {
-			originParams["host_header"] = data.HostHeader
-		}
-	case webaccel.OriginTypesObjectStorage:
-		originParams["type"] = "object_storage"
-		if data.S3Endpoint == "" || data.S3Region == "" || data.BucketName == "" {
-			panic("origin parameters are not fully provided: [endpoint, region, bucket_name]")
-		}
-		originParams["endpoint"] = data.S3Endpoint
-		originParams["region"] = data.S3Region
-		originParams["bucket_name"] = data.BucketName
-	default:
-		panic(fmt.Sprintf("unknown origin type: %s", data.OriginType))
-	}
-	d.Set("origin_parameters", []interface{}{originParams})
+	d.Set("origin_parameters", flattenWebAccelOriginParameters(d, data))
 	if data.NormalizeAE != "" {
 		d.Set("normalize_ae", data.NormalizeAE)
 	}
