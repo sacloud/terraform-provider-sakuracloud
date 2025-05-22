@@ -239,42 +239,11 @@ func dataSourceSakuraCloudWebAccelSiteRead(ctx context.Context, d *schema.Resour
 	d.Set("host_header", data.HostHeader)
 	d.Set("status", data.Status)
 	d.Set("origin_parameters", flattenWebAccelOriginParameters(d, data))
-	if data.NormalizeAE != "" {
-		d.Set("normalize_ae", data.NormalizeAE)
-	}
-
-	if data.CORSRules != nil {
-		if len(data.CORSRules) == 1 {
-			if data.CORSRules[0].AllowsAnyOrigin == true && len(data.CORSRules[0].AllowedOrigins) != 0 {
-				return diag.Errorf("invalid condition: allow_all and allowed_origins are specified together")
-			} else if data.CORSRules[0].AllowsAnyOrigin == false && len(data.CORSRules[0].AllowedOrigins) == 0 {
-				d.Set("cors_rules", flattenWebAccelCorsRules(data.CORSRules[0]))
-			}
-		} else if len(data.CORSRules) > 1 {
-			return diag.Errorf("invalid condition: too many CORS rules")
-		}
-	} else {
-		//CORS is implicitly disabled by default
-		rule := &webaccel.CORSRule{AllowsAnyOrigin: false}
-		d.Set("cors_rules", flattenWebAccelCorsRules(rule))
-	}
-
-	switch data.OriginType {
-	case webaccel.OriginTypesWebServer:
-	case webaccel.OriginTypesObjectStorage:
-	default:
-		return diag.Errorf("unknown origin type: %s", data.OriginType)
-	}
-
+	d.Set("cors_rules", flattenWebAccelCorsRules(data.CORSRules))
 	d.Set("cname_record_value", data.Subdomain+".")
 	d.Set("txt_record_value", fmt.Sprintf("webaccel=%s", data.Subdomain))
 	d.Set("vary_support", data.VarySupport == webaccel.VarySupportEnabled)
-	if data.NormalizeAE == webaccel.NormalizeAEBrGz {
-		d.Set("normalize_ae", "brotli")
-	} else {
-		// gzip is chosen by default
-		d.Set("normalize_ae", "gzip")
-	}
+	d.Set("normalize_ae", mapWebAccelNormalizeAE(data))
 	return nil
 }
 

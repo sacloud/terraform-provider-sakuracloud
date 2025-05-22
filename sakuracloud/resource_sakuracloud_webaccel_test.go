@@ -57,7 +57,6 @@ func TestAccSakuraCloudResourceWebAccel_WebOrigin(t *testing.T) {
 					resource.TestCheckResourceAttr("sakuracloud_webaccel.foobar", "request_protocol", "https-redirect"),
 					resource.TestCheckResourceAttr("sakuracloud_webaccel.foobar", "origin_parameters.0.type", "web"),
 					resource.TestCheckResourceAttr("sakuracloud_webaccel.foobar", "origin_parameters.0.host", origin),
-					resource.TestCheckResourceAttr("sakuracloud_webaccel.foobar", "vary_support", "true"),
 					resource.TestMatchResourceAttr("sakuracloud_webaccel.foobar", "cname_record_value", regexpNotEmpty),
 					resource.TestMatchResourceAttr("sakuracloud_webaccel.foobar", "txt_record_value", regexpNotEmpty),
 					resource.TestCheckResourceAttr("sakuracloud_webaccel.foobar", "normalize_ae", "brotli"),

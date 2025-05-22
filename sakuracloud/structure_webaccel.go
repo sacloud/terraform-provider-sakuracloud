@@ -233,16 +233,35 @@ func flattenWebAccelOriginParameters(d resourceValueGettable, site *webaccel.Sit
 	return []interface{}{originParams}
 }
 
-func flattenWebAccelCorsRules(data *webaccel.CORSRule) []interface{} {
-	corsRuleParams := make(map[string]interface{})
-	if data.AllowsAnyOrigin {
-		corsRuleParams["allow_all"] = true
-	} else if len(data.AllowedOrigins) > 0 {
-		corsRuleParams["allowed_origins"] = data.AllowedOrigins
-	} else {
-		corsRuleParams["allow_all"] = false
+func flattenWebAccelCorsRules(data []*webaccel.CORSRule) []interface{} {
+	switch len(data) {
+	case 0:
+		return nil
+	case 1:
+		rule := data[0]
+		if rule.AllowsAnyOrigin == true && len(rule.AllowedOrigins) != 0 {
+			// エンドポイントもしくはproviderのバグはキャッチしない
+			panic("invalid state: allow_all and allowed_origins should not be specified together")
+		}
+		// NOTE: resourceのRead系処理では `cors_rules` を指定しない場合には値を代入しない。
+		// これにより、レスポンス内のデフォルト値を無視することができ、差分が発生することを防ぐ。
+		if rule.AllowsAnyOrigin == false && len(rule.AllowedOrigins) == 0 {
+			return nil
+		}
+		corsRuleParams := make(map[string]interface{})
+		if rule.AllowsAnyOrigin {
+			corsRuleParams["allow_all"] = true
+		} else if len(rule.AllowedOrigins) > 0 {
+			corsRuleParams["allowed_origins"] = rule.AllowedOrigins
+		} else {
+			corsRuleParams["allow_all"] = false
+		}
+		return []interface{}{corsRuleParams}
+	default:
+		// ウェブアクセラレーターAPIの現仕様では、CORSRules配列の最大長は`1`。
+		// この長さを超える配列が与えられた場合、バグとみなす。
+		panic("invalid state: too many CORS rules")
 	}
-	return []interface{}{corsRuleParams}
 }
 
 func flattenWebAccelLogUploadConfigData(data *webaccel.LogUploadConfig) []interface{} {
@@ -258,7 +277,7 @@ func flattenWebAccelLogUploadConfigData(data *webaccel.LogUploadConfig) []interf
 	return []interface{}{loggingParams}
 }
 
-// 事前条件: d.IsSet("origin_parameters") == true
+// 事前条件: `origin_parameters` が設定されていること
 func expandWebAccelOriginParamsForCreation(d resourceValueGettable) (*webaccel.CreateSiteRequest, error) {
 	var req = new(webaccel.CreateSiteRequest)
 	// NOTE: UpdateSiteRequest は CreateSiteRequest と互換なフィールドを実装している
@@ -279,7 +298,7 @@ func expandWebAccelOriginParamsForCreation(d resourceValueGettable) (*webaccel.C
 	return req, nil
 }
 
-// 事前条件: d.IsSet("origin_parameters") == true
+// 事前条件: `origin_parameters` が設定されていること
 func expandWebAccelOriginParametersForUpdate(d resourceValueGettable) (*webaccel.UpdateSiteRequest, error) {
 	var (
 		originType string
@@ -324,7 +343,7 @@ func expandWebAccelOriginParametersForUpdate(d resourceValueGettable) (*webaccel
 	return req, nil
 }
 
-// 事前条件: d.IsSet("request_protocol") == true
+// 事前条件: `request_protocol` が設定されていること
 func expandWebAccelRequestProtocol(d resourceValueGettable) (string, error) {
 	v := d.Get("request_protocol")
 	switch v.(string) {
@@ -339,7 +358,7 @@ func expandWebAccelRequestProtocol(d resourceValueGettable) (string, error) {
 	}
 }
 
-// 事前条件: d.IsSet("cors_rules") == true
+// 事前条件: `cors_rules` が設定されていること
 func expandWebAccelCORSParameters(d resourceValueGettable) (*webaccel.CORSRule, error) {
 	rule := &webaccel.CORSRule{}
 	var (
@@ -378,7 +397,7 @@ func expandWebAccelCORSParameters(d resourceValueGettable) (*webaccel.CORSRule, 
 	return corsRule, nil
 }
 
-// 事前条件: d.IsSet("logging") == true および全ての内部パラメタが設定されていること
+// 事前条件: `logging` が設定されていること
 func expandLoggingParameters(d resourceValueGettable) *webaccel.LogUploadConfig {
 	req := new(webaccel.LogUploadConfig)
 	loggingParams := mapFromSet(d, "logging")
@@ -397,7 +416,7 @@ func expandLoggingParameters(d resourceValueGettable) *webaccel.LogUploadConfig 
 	return req
 }
 
-// 事前条件: d.IsSet("onetime_url_secrets") == true
+// 事前条件: `onetime_url_secrets` が設定されていること
 func expandWebAccelOnetimeUrlSecrets(d resourceValueGettable) *[]string {
 	value := d.Get("onetime_url_secrets").([]interface{})
 	var secrets []string
@@ -407,7 +426,7 @@ func expandWebAccelOnetimeUrlSecrets(d resourceValueGettable) *[]string {
 	return &secrets
 }
 
-// 事前条件: d.IsSet("vary_support") == true
+// 事前条件: `vary_support` が設定されていること
 func expandWebAccelVarySupportParameter(d resourceValueGettable) string {
 	v := d.Get("vary_support")
 	if v.(bool) {
@@ -417,7 +436,7 @@ func expandWebAccelVarySupportParameter(d resourceValueGettable) string {
 	}
 }
 
-// 事前条件: d.IsSet("normalize_ae") == true
+// 事前条件: `normalize_ae` が設定されていること
 func expandWebAccelNormalizeAEParameter(d resourceValueGettable) (string, error) {
 	v := d.Get("normalize_ae").(string)
 	switch v {
@@ -433,7 +452,7 @@ func expandWebAccelNormalizeAEParameter(d resourceValueGettable) (string, error)
 	return "", fmt.Errorf("invalid normalize_ae parameter: '%s'", v)
 }
 
-// mapWebAccelRequestProtocol: Read系処理以外で利用する場合、panic部分の書き換えが必要
+// mapWebAccelRequestProtocol: setter/Read系処理以外で利用する場合、panic部分の書き換えが必要
 func mapWebAccelRequestProtocol(site *webaccel.Site) string {
 	switch site.RequestProtocol {
 	case webaccel.RequestProtocolsHttpAndHttps:
@@ -446,4 +465,21 @@ func mapWebAccelRequestProtocol(site *webaccel.Site) string {
 		// エンドポイントもしくはproviderのバグはキャッチしない
 		panic("invalid condition")
 	}
+}
+
+// mapWebAccelNormalizeAE: Read系処理以外で利用する場合、panic部分の書き換えが必要
+func mapWebAccelNormalizeAE(site *webaccel.Site) interface{} {
+	if site.NormalizeAE != "" {
+		if site.NormalizeAE == webaccel.NormalizeAEBrGz {
+			return "brotli"
+		} else if site.NormalizeAE == webaccel.NormalizeAEGz {
+			return "gzip"
+		}
+		// エンドポイントもしくはproviderのバグはキャッチしない
+		panic("invalid condition: normalize_ae: " + site.NormalizeAE)
+	}
+	//NOTE: APIが返却するデフォルト値は""。
+	// このフィールドでで "gzip" と "" が持つ効果は同一であるため、
+	// "gzip" として正規化する
+	return "gzip"
 }

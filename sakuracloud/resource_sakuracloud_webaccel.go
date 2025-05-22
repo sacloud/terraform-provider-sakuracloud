@@ -259,9 +259,9 @@ func setWebAccelResourceData(d *schema.ResourceData, client *APIClient, data *we
 			return diagnostic
 		}
 	}
-	return setWebAccelResourceSiteData(d, client, data)
+	return setWebAccelSiteResourceData(d, client, data)
 }
-func setWebAccelResourceSiteData(d *schema.ResourceData, client *APIClient, data *webaccel.Site) diag.Diagnostics {
+func setWebAccelSiteResourceData(d *schema.ResourceData, client *APIClient, data *webaccel.Site) diag.Diagnostics {
 
 	d.Set("name", data.Name)                                              //nolint
 	d.Set("domain_type", data.DomainType)                                 //nolint
@@ -269,43 +269,16 @@ func setWebAccelResourceSiteData(d *schema.ResourceData, client *APIClient, data
 	d.Set("cname_record_value", data.Subdomain+".")                       //nolint
 	d.Set("txt_record_value", fmt.Sprintf("webaccel=%s", data.Subdomain)) //nolint
 	d.Set("request_protocol", mapWebAccelRequestProtocol(data))           //nolint
-
-	if data.DefaultCacheTTL != 0 {
-		d.Set("default_cache_ttl", data.DefaultCacheTTL)
-	} else {
-		d.Set("default_cache_ttl", -1) // by default, no cache TTL specified on edge
+	d.Set("default_cache_ttl", data.DefaultCacheTTL)
+	d.Set("origin_parameters", flattenWebAccelOriginParameters(d, data))
+	d.Set("cors_rules", flattenWebAccelCorsRules(data.CORSRules))
+	if _, ok := d.GetOk("vary_support"); ok {
+		d.Set("vary_support", data.VarySupport == webaccel.VarySupportEnabled)
+	}
+	if _, ok := d.GetOk("normalize_ae"); ok {
+		d.Set("normalize_ae", mapWebAccelNormalizeAE(data))
 	}
 
-	//origin parameters
-	err := d.Set("origin_parameters", flattenWebAccelOriginParameters(d, data))
-	if err != nil {
-		return diag.FromErr(err)
-	}
-
-	//cors parameters
-	if data.CORSRules != nil {
-		if len(data.CORSRules) == 1 {
-			if data.CORSRules[0].AllowsAnyOrigin == true && len(data.CORSRules[0].AllowedOrigins) != 0 {
-				return diag.Errorf("allow_all and allowed_origins should not be specified together")
-			} else if data.CORSRules[0].AllowsAnyOrigin == false && len(data.CORSRules[0].AllowedOrigins) == 0 {
-				d.Set("cors_rules", nil)
-			} else {
-				d.Set("cors_rules", flattenWebAccelCorsRules(data.CORSRules[0]))
-			}
-		} else if len(data.CORSRules) > 1 {
-			return diag.Errorf("too many CORS rules")
-		}
-	}
-
-	if data.NormalizeAE != "" {
-		if data.NormalizeAE == webaccel.NormalizeAEBrGz {
-			d.Set("normalize_ae", "brotli")
-		} else if data.NormalizeAE == webaccel.NormalizeAEGz {
-			d.Set("normalize_ae", "gzip")
-		} else {
-			return diag.Errorf("invalid normalize_ae: %s", data.NormalizeAE)
-		}
-	}
 	return nil
 }
 
