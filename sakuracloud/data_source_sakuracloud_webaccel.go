@@ -46,6 +46,7 @@ func dataSourceSakuraCloudWebAccel() *schema.Resource {
 				Type:     schema.TypeString,
 				Computed: true,
 			},
+			//TODO: `origin_parameters.origin`フィールドと等価であるため、将来的に廃止を検討する。
 			"origin": {
 				Type:     schema.TypeString,
 				Computed: true,
@@ -63,7 +64,7 @@ func dataSourceSakuraCloudWebAccel() *schema.Resource {
 							Type:     schema.TypeString,
 							Computed: true,
 						},
-						"host": {
+						"origin": {
 							Type:     schema.TypeString,
 							Computed: true,
 						},
@@ -75,19 +76,19 @@ func dataSourceSakuraCloudWebAccel() *schema.Resource {
 							Type:     schema.TypeString,
 							Computed: true,
 						},
-						"endpoint": {
+						"s3_endpoint": {
 							Type:     schema.TypeString,
 							Computed: true,
 						},
-						"region": {
+						"s3_region": {
 							Type:     schema.TypeString,
 							Computed: true,
 						},
-						"bucket_name": {
+						"s3_bucket_name": {
 							Type:     schema.TypeString,
 							Computed: true,
 						},
-						"doc_index": {
+						"s3_doc_index": {
 							Type:     schema.TypeBool,
 							Computed: true,
 						},
@@ -231,7 +232,10 @@ func dataSourceSakuraCloudWebAccelSiteRead(ctx context.Context, d *schema.Resour
 	d.Set("name", data.Name)
 	d.Set("domain", data.Domain)
 	d.Set("site_id", data.ID)
+
+	//TODO: `origin_parameters.origin`フィールドと等価であるため、将来的に廃止を検討する。
 	d.Set("origin", data.Origin)
+
 	d.Set("subdomain", data.Subdomain)
 	d.Set("domain_type", data.DomainType)
 	d.Set("request_protocol", mapWebAccelRequestProtocol(data))

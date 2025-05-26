@@ -56,10 +56,10 @@ func TestAccSakuraCloudResourceWebAccel_WebOrigin(t *testing.T) {
 					resource.TestCheckResourceAttr("sakuracloud_webaccel.foobar", "name", siteName),
 					resource.TestCheckResourceAttr("sakuracloud_webaccel.foobar", "request_protocol", "https-redirect"),
 					resource.TestCheckResourceAttr("sakuracloud_webaccel.foobar", "origin_parameters.0.type", "web"),
-					resource.TestCheckResourceAttr("sakuracloud_webaccel.foobar", "origin_parameters.0.host", origin),
+					resource.TestCheckResourceAttr("sakuracloud_webaccel.foobar", "origin_parameters.0.origin", origin),
 					resource.TestMatchResourceAttr("sakuracloud_webaccel.foobar", "cname_record_value", regexpNotEmpty),
 					resource.TestMatchResourceAttr("sakuracloud_webaccel.foobar", "txt_record_value", regexpNotEmpty),
-					resource.TestCheckResourceAttr("sakuracloud_webaccel.foobar", "normalize_ae", "brotli"),
+					resource.TestCheckResourceAttr("sakuracloud_webaccel.foobar", "normalize_ae", "br+gzip"),
 				),
 			},
 		},
@@ -95,7 +95,7 @@ func TestAccSakuraCloudResourceWebAccel_WebOriginWithCORS(t *testing.T) {
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttr("sakuracloud_webaccel.foobar", "name", siteName),
 					resource.TestCheckResourceAttr("sakuracloud_webaccel.foobar", "origin_parameters.0.type", "web"),
-					resource.TestCheckResourceAttr("sakuracloud_webaccel.foobar", "origin_parameters.0.host", origin),
+					resource.TestCheckResourceAttr("sakuracloud_webaccel.foobar", "origin_parameters.0.origin", origin),
 					resource.TestCheckResourceAttr("sakuracloud_webaccel.foobar", "cors_rules.0.allow_all", "false"),
 					resource.TestCheckResourceAttr("sakuracloud_webaccel.foobar", "cors_rules.0.allowed_origins.0", "https://apps.example.com"),
 					resource.TestCheckResourceAttr("sakuracloud_webaccel.foobar", "onetime_url_secrets.0", "sample-secret"),
@@ -145,10 +145,10 @@ func TestAccSakuraCloudResourceWebAccel_Update(t *testing.T) {
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttr("sakuracloud_webaccel.foobar", "name", siteName),
 					resource.TestCheckResourceAttr("sakuracloud_webaccel.foobar", "origin_parameters.0.type", "web"),
-					resource.TestCheckResourceAttr("sakuracloud_webaccel.foobar", "origin_parameters.0.host", origin),
+					resource.TestCheckResourceAttr("sakuracloud_webaccel.foobar", "origin_parameters.0.origin", origin),
 					resource.TestCheckResourceAttr("sakuracloud_webaccel.foobar", "request_protocol", "https-redirect"),
 					resource.TestCheckResourceAttr("sakuracloud_webaccel.foobar", "vary_support", "true"),
-					resource.TestCheckResourceAttr("sakuracloud_webaccel.foobar", "normalize_ae", "brotli"),
+					resource.TestCheckResourceAttr("sakuracloud_webaccel.foobar", "normalize_ae", "br+gzip"),
 				),
 			},
 			{
@@ -156,7 +156,7 @@ func TestAccSakuraCloudResourceWebAccel_Update(t *testing.T) {
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttr("sakuracloud_webaccel.foobar", "name", siteName),
 					resource.TestCheckResourceAttr("sakuracloud_webaccel.foobar", "origin_parameters.0.type", "web"),
-					resource.TestCheckResourceAttr("sakuracloud_webaccel.foobar", "origin_parameters.0.host", origin),
+					resource.TestCheckResourceAttr("sakuracloud_webaccel.foobar", "origin_parameters.0.origin", origin),
 					resource.TestCheckResourceAttr("sakuracloud_webaccel.foobar", "request_protocol", "http+https"),
 					resource.TestCheckResourceAttr("sakuracloud_webaccel.foobar", "cors_rules.0.allow_all", "false"),
 					resource.TestCheckResourceAttr("sakuracloud_webaccel.foobar", "cors_rules.0.allowed_origins.0", "https://apps.example.com"),
@@ -168,7 +168,7 @@ func TestAccSakuraCloudResourceWebAccel_Update(t *testing.T) {
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttr("sakuracloud_webaccel.foobar", "name", siteName),
 					resource.TestCheckResourceAttr("sakuracloud_webaccel.foobar", "origin_parameters.0.type", "web"),
-					resource.TestCheckResourceAttr("sakuracloud_webaccel.foobar", "origin_parameters.0.host", origin),
+					resource.TestCheckResourceAttr("sakuracloud_webaccel.foobar", "origin_parameters.0.origin", origin),
 					resource.TestCheckResourceAttr("sakuracloud_webaccel.foobar", "logging.0.bucket_name", bucketName),
 					resource.TestCheckResourceAttr("sakuracloud_webaccel.foobar", "vary_support", "true"),
 				),
@@ -273,7 +273,7 @@ func TestAccSakuraCloudResourceWebAccel_Logging(t *testing.T) {
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttr("sakuracloud_webaccel.foobar", "name", siteName),
 					resource.TestCheckResourceAttr("sakuracloud_webaccel.foobar", "origin_parameters.0.type", "web"),
-					resource.TestCheckResourceAttr("sakuracloud_webaccel.foobar", "origin_parameters.0.host", origin),
+					resource.TestCheckResourceAttr("sakuracloud_webaccel.foobar", "origin_parameters.0.origin", origin),
 					resource.TestCheckResourceAttr("sakuracloud_webaccel.foobar", "logging.0.bucket_name", bucketName),
 					resource.TestCheckResourceAttr("sakuracloud_webaccel.foobar", "vary_support", "true"),
 				),
@@ -319,13 +319,13 @@ resource sakuracloud_webaccel "foobar" {
   request_protocol = "https-redirect"
   origin_parameters {
     type = "web"
-    host = "%s"
+    origin = "%s"
     host_header = "%s"
     protocol = "https"
   }
   vary_support = true
   default_cache_ttl = 3600
-  normalize_ae = "brotli"
+  normalize_ae = "br+gzip"
 }
 `
 	return fmt.Sprintf(tmpl, siteName, origin, origin)
@@ -339,7 +339,7 @@ resource sakuracloud_webaccel "foobar" {
   request_protocol = "http+https"
   origin_parameters {
     type = "web"
-    host = "%s"
+    origin = "%s"
     host_header = "%s"
     protocol = "https"
   }
@@ -376,7 +376,7 @@ resource sakuracloud_webaccel "foobar" {
     secret_access_key = "%s"
   }
   default_cache_ttl = 3600
-  normalize_ae = "brotli"
+  normalize_ae = "br+gzip"
 }
 `
 	return fmt.Sprintf(tmpl, siteName, endpoint, region, bucketName, accessKey, accessSecret)
@@ -390,7 +390,7 @@ resource sakuracloud_webaccel "foobar" {
   request_protocol = "https-redirect"
   origin_parameters {
     type = "web"
-    host = "%s"
+    origin = "%s"
     host_header = "%s"
     protocol = "https"
   }
@@ -402,7 +402,7 @@ resource sakuracloud_webaccel "foobar" {
   }
   vary_support = true
   default_cache_ttl = 3600
-  normalize_ae = "brotli"
+  normalize_ae = "br+gzip"
 }
 `
 	return fmt.Sprintf(tmpl, siteName, origin, origin, bucketName, accessKey, secretKey)
@@ -418,13 +418,13 @@ resource sakuracloud_webaccel "foobar" {
   request_protocol = "https-redirect"
   origin_parameters {
     type = "web"
-    host = "%s"
+    origin = "%s"
     host_header = "dummy.example.com"
     protocol = "https"
   }
   vary_support = true
   default_cache_ttl = 3600
-  normalize_ae = "brotli"
+  normalize_ae = "br+gzip"
 }
 `
 
@@ -435,13 +435,13 @@ resource sakuracloud_webaccel "foobar" {
   request_protocol = "https-redirect"
   origin_parameters {
     type = "web"
-    host = "%s"
+    origin = "%s"
     host_header = "dummy.example.com"
     protocol = "https"
   }
   vary_support = true
   default_cache_ttl = 3600
-  normalize_ae = "brotli"
+  normalize_ae = "br+gzip"
 }
 `
 
@@ -452,13 +452,13 @@ resource sakuracloud_webaccel "foobar" {
   request_protocol = "http"
   origin_parameters {
     type = "web"
-    host = "%s"
+    origin = "%s"
     host_header = "dummy.example.com"
     protocol = "https"
   }
   vary_support = true
   default_cache_ttl = 3600
-  normalize_ae = "brotli"
+  normalize_ae = "br+gzip"
 }
 `
 	confWithoutOriginParameters := `
@@ -468,7 +468,7 @@ resource sakuracloud_webaccel "foobar" {
   request_protocol = "https-redirect"
   vary_support = true
   default_cache_ttl = 3600
-  normalize_ae = "brotli"
+  normalize_ae = "br+gzip"
 }
 `
 
@@ -479,13 +479,13 @@ resource sakuracloud_webaccel "foobar" {
   request_protocol = "https-redirect"
   origin_parameters {
     type = "INVALID"
-    host = "%s"
+    origin = "%s"
     host_header = "dummy.example.com"
     protocol = "https"
   }
   vary_support = true
   default_cache_ttl = 3600
-  normalize_ae = "brotli"
+  normalize_ae = "br+gzip"
 }
 `
 
@@ -500,7 +500,7 @@ resource sakuracloud_webaccel "foobar" {
   }
   vary_support = true
   default_cache_ttl = 3600
-  normalize_ae = "brotli"
+  normalize_ae = "br+gzip"
 }
 `
 
@@ -515,7 +515,7 @@ resource sakuracloud_webaccel "foobar" {
   }
   vary_support = true
   default_cache_ttl = 3600
-  normalize_ae = "brotli"
+  normalize_ae = "br+gzip"
 }
 `
 
@@ -533,7 +533,7 @@ resource sakuracloud_webaccel "foobar" {
   }
   vary_support = true
   default_cache_ttl = 3600
-  normalize_ae = "brotli"
+  normalize_ae = "br+gzip"
 }
 `
 
@@ -544,7 +544,7 @@ resource sakuracloud_webaccel "foobar" {
   request_protocol = "https-redirect"
   origin_parameters {
     type = "web"
-    host = "%s"
+    origin = "%s"
     host_header = "dummy.example.com"
     protocol = "https"
   }
@@ -561,7 +561,7 @@ resource sakuracloud_webaccel "foobar" {
   request_protocol = "https-redirect"
   origin_parameters {
     type = "web"
-    host = "docs.usacloud.jp"
+    origin = "docs.usacloud.jp"
     protocol = "https"
   }
   logging {
@@ -578,7 +578,7 @@ resource sakuracloud_webaccel "foobar" {
   request_protocol = "https-redirect"
   origin_parameters {
     type = "web"
-    host = "%s"
+    origin = "%s"
     host_header = "dummy.example.com"
     protocol = "https"
   }
@@ -591,32 +591,31 @@ resource sakuracloud_webaccel "foobar" {
   }
   vary_support = true
   default_cache_ttl = 3600
-  normalize_ae = "brotli"
+  normalize_ae = "br+gzip"
 }
 `
 
-	//valid := `
-	//resource sakuracloud_webaccel "foobar" {
-	// name = "dummy"
-	// domain_type = "subdomain"
-	// request_protocol = "https-redirect"
-	// origin_parameters {
-	//   type = "web"
-	//   host = "%s"
-	//   host_header = "dummy.example.com"
-	//   protocol = "https"
-	// }
-	// cors_rules {
-	//   allowed_origins = [
-	//     "https://www2.example.com",
-	//     "https://app.example.com"
-	//   ]
-	// }
-	// vary_support = true
-	// default_cache_ttl = 3600
-	// normalize_ae = "brotli"
-	//}
-	//`
+	valid := `
+	resource sakuracloud_webaccel "foobar" {
+	name = "dummy"
+	domain_type = "subdomain"
+	request_protocol = "https-redirect"
+	origin_parameters {
+	  type = "web"
+	  origin = "%s"
+	  protocol = "https"
+	}
+	cors_rules {
+	  allowed_origins = [
+	    "https://www2.example.com",
+	    "https://app.example.com"
+	  ]
+	}
+	vary_support = true
+	default_cache_ttl = 3600
+	normalize_ae = "br+gzip"
+	}
+	`
 
 	tt := map[string]string{
 		"unknown-argument":                         confUnknownArgument,
@@ -630,7 +629,7 @@ resource sakuracloud_webaccel "foobar" {
 		"invalid-compression":                      confInvalidNormalizeAE,
 		"missing-logging-bucket-secret":            confMissingLoggingParameters,
 		"invalid-cors-configuration":               confInvalidCorsConfiguration,
-		//"valid":                                    valid,
+		"valid":                                    valid,
 	}
 	for k, v := range tt {
 		if strings.Contains(v, "%s") {

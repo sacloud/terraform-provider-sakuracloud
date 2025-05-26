@@ -66,10 +66,10 @@ func resourceSakuraCloudWebAccel() *schema.Resource {
 							Required:    true,
 							Description: "origin type of the site: one of `web` or `bucket`",
 						},
-						"host": {
+						"origin": {
 							Type:        schema.TypeString,
 							Optional:    true,
-							Description: "origin host: required for origin.type = `web`",
+							Description: "origin hostname or IP address: required for origin.type = `web`",
 						},
 						"protocol": {
 							Type:         schema.TypeString,
@@ -189,8 +189,8 @@ func resourceSakuraCloudWebAccel() *schema.Resource {
 			},
 			"normalize_ae": {
 				Type:         schema.TypeString,
-				Description:  "accept-encoding normalization: one of `gzip` (gz) or `brotli` (br+gz)",
-				ValidateFunc: validation.StringInSlice([]string{"gzip", "gz", "brotli", "br+gz"}, false),
+				Description:  "accept-encoding normalization: one of `gzip` or br+gzip",
+				ValidateFunc: validation.StringInSlice([]string{"gzip", "br+gzip"}, false),
 				Optional:     true,
 			},
 		},
@@ -202,7 +202,7 @@ func flattenWebAccelOriginParameters(d resourceValueGettable, site *webaccel.Sit
 	switch site.OriginType {
 	case webaccel.OriginTypesWebServer:
 		originParams["type"] = "web"
-		originParams["host"] = site.Origin
+		originParams["origin"] = site.Origin
 		if site.OriginProtocol == webaccel.OriginProtocolsHttp {
 			originParams["protocol"] = "http"
 		} else if site.OriginProtocol == webaccel.OriginProtocolsHttps {
@@ -309,7 +309,7 @@ func expandWebAccelOriginParametersForUpdate(d resourceValueGettable) (*webaccel
 	switch originType {
 	case "web":
 		req.OriginType = webaccel.OriginTypesWebServer
-		req.Origin = d.Get("host").(string)
+		req.Origin = d.Get("origin").(string)
 		switch d.Get("protocol").(string) {
 		case "http":
 			req.OriginProtocol = webaccel.OriginProtocolsHttp
@@ -441,12 +441,8 @@ func expandWebAccelNormalizeAEParameter(d resourceValueGettable) (string, error)
 	v := d.Get("normalize_ae").(string)
 	switch v {
 	case "gzip":
-		fallthrough
-	case "gz":
 		return webaccel.NormalizeAEGz, nil
-	case "brotli":
-		fallthrough
-	case "br+gz":
+	case "br+gzip":
 		return webaccel.NormalizeAEBrGz, nil
 	}
 	return "", fmt.Errorf("invalid normalize_ae parameter: '%s'", v)
@@ -471,7 +467,7 @@ func mapWebAccelRequestProtocol(site *webaccel.Site) string {
 func mapWebAccelNormalizeAE(site *webaccel.Site) interface{} {
 	if site.NormalizeAE != "" {
 		if site.NormalizeAE == webaccel.NormalizeAEBrGz {
-			return "brotli"
+			return "br+gzip"
 		} else if site.NormalizeAE == webaccel.NormalizeAEGz {
 			return "gzip"
 		}

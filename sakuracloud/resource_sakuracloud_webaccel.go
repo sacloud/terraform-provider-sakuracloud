@@ -262,13 +262,12 @@ func setWebAccelResourceData(d *schema.ResourceData, client *APIClient, data *we
 	return setWebAccelSiteResourceData(d, client, data)
 }
 func setWebAccelSiteResourceData(d *schema.ResourceData, client *APIClient, data *webaccel.Site) diag.Diagnostics {
-
-	d.Set("name", data.Name)                                              //nolint
-	d.Set("domain_type", data.DomainType)                                 //nolint
-	d.Set("subdomain", data.Subdomain)                                    //nolint
-	d.Set("cname_record_value", data.Subdomain+".")                       //nolint
-	d.Set("txt_record_value", fmt.Sprintf("webaccel=%s", data.Subdomain)) //nolint
-	d.Set("request_protocol", mapWebAccelRequestProtocol(data))           //nolint
+	d.Set("name", data.Name)
+	d.Set("domain_type", data.DomainType)
+	d.Set("subdomain", data.Subdomain)
+	d.Set("cname_record_value", data.Subdomain+".")
+	d.Set("txt_record_value", fmt.Sprintf("webaccel=%s", data.Subdomain))
+	d.Set("request_protocol", mapWebAccelRequestProtocol(data))
 	d.Set("default_cache_ttl", data.DefaultCacheTTL)
 	d.Set("origin_parameters", flattenWebAccelOriginParameters(d, data))
 	d.Set("cors_rules", flattenWebAccelCorsRules(data.CORSRules))
