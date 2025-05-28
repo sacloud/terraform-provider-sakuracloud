@@ -284,3 +284,173 @@ func TestMapWebAccelNormalizeAE(t *testing.T) {
 		})
 	}
 }
+
+func TestFlattenWebAccelCorsRules(t *testing.T) {
+	tt := []struct {
+		Name        string
+		Given       []*webaccel.CORSRule
+		Want        []interface{}
+		ExpectError bool
+	}{
+		{
+			"No CORS rules (implicitly disabled)",
+			nil,
+			nil,
+			false,
+		},
+		{
+			"explicitly disabled rule",
+			[]*webaccel.CORSRule{
+				{
+					AllowsAnyOrigin: false,
+				},
+			},
+			nil,
+			false,
+		},
+		{
+			"allow-all rule",
+			[]*webaccel.CORSRule{
+				{
+					AllowsAnyOrigin: true,
+				},
+			},
+			[]interface{}{
+				map[string]interface{}{
+					"allow_all": true,
+				},
+			},
+			false,
+		},
+		{
+			"allow for origin rule",
+			[]*webaccel.CORSRule{
+				{
+					AllowedOrigins: []string{"origin1", "origin2"},
+				},
+			},
+			[]interface{}{
+				map[string]interface{}{
+					"allowed_origins": []string{"origin1", "origin2"},
+				},
+			},
+			false,
+		},
+		{
+			"unsupported rule length",
+			[]*webaccel.CORSRule{
+				{
+					AllowedOrigins: []string{"origin1", "origin2"},
+				},
+				{
+					AllowedOrigins: []string{"origin3", "origin4"},
+				},
+			},
+			nil,
+			true,
+		},
+	}
+	for _, tc := range tt {
+		t.Run(tc.Name, func(t *testing.T) {
+			res, err := flattenWebAccelCorsRules(tc.Given)
+			if tc.ExpectError {
+				if err == nil {
+					t.Fatalf("expected error, got none")
+				}
+			} else if err != nil {
+				t.Fatalf("unexpected error: %s", err)
+			} else if !reflect.DeepEqual(res, tc.Want) {
+				t.Fatalf("FAILED %s: got: %v\nwant: %v", tc.Name, res, tc.Want)
+			}
+		})
+	}
+}
+
+func TestExpandWebAccelCORSParameters(t *testing.T) {
+	hasher := func(_ interface{}) int {
+		return rand.Int()
+	}
+	makeSetFromMap := func(m map[string]interface{}) *schema.Set {
+		return schema.NewSet(hasher, []interface{}{m})
+	}
+	tt := []struct {
+		Name        string
+		Given       resourceValueGettable
+		Want        *webaccel.CORSRule
+		ExpectError bool
+	}{
+		{
+			"no cors_rules field should give error",
+			&resourceMapValue{
+				value: map[string]interface{}{
+					"no_cors_rule_field": makeSetFromMap(nil),
+				},
+			},
+			nil,
+			true,
+		}, {
+			"allow_all rule",
+			&resourceMapValue{
+				map[string]interface{}{
+					"cors_rules": makeSetFromMap(map[string]interface{}{
+						"allow_all": true,
+					}),
+				},
+			},
+			&webaccel.CORSRule{AllowsAnyOrigin: true},
+			false,
+		}, {
+			"allow for origins",
+			&resourceMapValue{
+				map[string]interface{}{
+					"cors_rules": makeSetFromMap(map[string]interface{}{
+						"allowed_origins": []interface{}{"origin1", "origin2"},
+					}),
+				},
+			},
+			&webaccel.CORSRule{
+				AllowsAnyOrigin: false,
+				AllowedOrigins:  []string{"origin1", "origin2"},
+			},
+			false,
+		}, {
+			"allow_all=true and allowed_origins together should give error",
+			&resourceMapValue{
+				map[string]interface{}{
+					"cors_rules": makeSetFromMap(map[string]interface{}{
+						"allow_all":       true,
+						"allowed_origins": []interface{}{"origin1", "origin2"},
+					}),
+				},
+			},
+			nil,
+			true,
+		}, {
+			"allow_all=false and allowed_origins together also should give error",
+			&resourceMapValue{
+				map[string]interface{}{
+					"cors_rules": map[string]interface{}{
+						"allow_all":       true,
+						"allowed_origins": []interface{}{"origin1", "origin2"},
+					},
+				},
+			},
+			nil,
+			true,
+		},
+	}
+	for _, tc := range tt {
+		t.Run(tc.Name, func(t *testing.T) {
+			res, err := expandWebAccelCORSParameters(tc.Given)
+			if tc.ExpectError {
+				if err == nil {
+					t.Fatalf("expected error, got none")
+				}
+			} else if err != nil {
+				t.Fatalf("unexpected error: %s", err)
+			} else if !reflect.DeepEqual(res, tc.Want) {
+				t.Fatalf("FAILED %s: got: %v\nwant: %v", tc.Name, res, tc.Want)
+			}
+		})
+	}
+}

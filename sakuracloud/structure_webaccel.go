@@ -73,7 +73,7 @@ func flattenWebAccelCorsRules(data []*webaccel.CORSRule) ([]interface{}, error) 
 		}
 		corsRuleParams := make(map[string]interface{})
 		if rule.AllowsAnyOrigin {
-			corsRuleParams["allow_all"] = true
+			corsRuleParams["allow_all"] = rule.AllowsAnyOrigin
 		} else if len(rule.AllowedOrigins) > 0 {
 			corsRuleParams["allowed_origins"] = rule.AllowedOrigins
 		} else {
@@ -81,9 +81,9 @@ func flattenWebAccelCorsRules(data []*webaccel.CORSRule) ([]interface{}, error) 
 		}
 		return []interface{}{corsRuleParams}, nil
 	default:
-		// ウェブアクセラレーターAPIの現仕様では、CORSRules配列の最大長は`1`。
-		// この長さを超える配列が与えられた場合、バグとみなす。
-		panic("invalid state: too many CORS rules")
+		// NOTE: ウェブアクセラレーターAPIの現仕様では、CORSRules配列の最大長は`1`。
+		// 仕様が変更された場合、サポートを追加する。
+		return nil, fmt.Errorf("duplicated CORS rule is unsupported: %d", len(data))
 	}
 }
 
@@ -186,7 +186,6 @@ func expandWebAccelRequestProtocol(d resourceValueGettable) (string, error) {
 
 // 事前条件: `cors_rules` が設定されていること
 func expandWebAccelCORSParameters(d resourceValueGettable) (*webaccel.CORSRule, error) {
-	rule := &webaccel.CORSRule{}
 	var (
 		corsRule     = &webaccel.CORSRule{}
 		corsAllowAll = false
@@ -200,7 +199,7 @@ func expandWebAccelCORSParameters(d resourceValueGettable) (*webaccel.CORSRule, 
 	if v, ok := corsRuleParams.GetOk("allow_all"); ok {
 		if b, ok := v.(bool); ok && b {
 			corsAllowAll = b
-			rule.AllowsAnyOrigin = b
+			corsRule.AllowsAnyOrigin = b
 		}
 	}
 	//allowed_origin
