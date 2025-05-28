@@ -296,20 +296,17 @@ func resourceSakuraCloudWebAccelCreate(ctx context.Context, d *schema.ResourceDa
 
 	//logging
 	if hasLoggingConfig {
-		cleanUpSiteForAnError := func(e error) diag.Diagnostics {
-			_, deleteErr := newOp.Delete(ctx, res.ID)
-			if deleteErr != nil {
-				return diag.FromErr(fmt.Errorf("%w: %s", e, deleteErr.Error()))
-			}
+		cleanUpSiteWithError := func(e error) diag.Diagnostics {
+			d.SetId("")
 			return diag.FromErr(e)
 		}
 		cfg, err := expandLoggingParameters(d)
 		if err != nil {
-			return cleanUpSiteForAnError(err)
+			return cleanUpSiteWithError(err)
 		}
 		_, err = newOp.ApplyLogUploadConfig(ctx, res.ID, cfg)
 		if err != nil {
-			return cleanUpSiteForAnError(err)
+			return cleanUpSiteWithError(err)
 		}
 	}
 
@@ -328,9 +325,13 @@ func resourceSakuraCloudWebAccelRead(ctx context.Context, d *schema.ResourceData
 	op := webaccel.NewOp(client.webaccelClient)
 	site, err := op.Read(ctx, siteID)
 	if err != nil {
-		return diag.Errorf("could not read SakuraCloud WebAccel [%s]: %s", d.Id(), err)
+		d.SetId("")
+		return diag.Errorf("could not read SakuraCloud WebAccel [%s]: %s", siteID, err)
 	}
 	logUploadConfig, err := op.ReadLogUploadConfig(ctx, siteID)
+	if err != nil {
+		return diag.Errorf("unconditional error: failed to parse logging parameter for webaccel site [%s]: %s", siteID, err)
+	}
 
 	// for avoiding unconditional error/panic on blank configuration
 	if logUploadConfig != nil && logUploadConfig.Bucket == "" {
