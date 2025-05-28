@@ -296,14 +296,20 @@ func resourceSakuraCloudWebAccelCreate(ctx context.Context, d *schema.ResourceDa
 
 	//logging
 	if hasLoggingConfig {
-		cfg := expandLoggingParameters(d)
+		cleanUpSiteForAnError := func(e error) diag.Diagnostics {
+			_, deleteErr := newOp.Delete(ctx, res.ID)
+			if deleteErr != nil {
+				return diag.FromErr(fmt.Errorf("%w: %s", e, deleteErr.Error()))
+			}
+			return diag.FromErr(e)
+		}
+		cfg, err := expandLoggingParameters(d)
+		if err != nil {
+			return cleanUpSiteForAnError(err)
+		}
 		_, err = newOp.ApplyLogUploadConfig(ctx, res.ID, cfg)
 		if err != nil {
-			_, err2 := newOp.Delete(ctx, res.ID)
-			if err2 != nil {
-				return diag.FromErr(fmt.Errorf("%w: %s", err, err2.Error()))
-			}
-			return diag.FromErr(err)
+			return cleanUpSiteForAnError(err)
 		}
 	}
 
@@ -407,7 +413,10 @@ func resourceSakuraCloudWebAccelUpdate(ctx context.Context, d *schema.ResourceDa
 
 	if d.HasChange("logging") {
 		if _, ok := d.GetOk("logging"); ok {
-			cfg := expandLoggingParameters(d)
+			cfg, err := expandLoggingParameters(d)
+			if err != nil {
+				return diag.FromErr(err)
+			}
 			_, err = newOp.ApplyLogUploadConfig(ctx, siteID, cfg)
 			if err != nil {
 				return diag.FromErr(err)
@@ -452,15 +461,31 @@ func setWebAccelSiteResourceData(d *schema.ResourceData, client *APIClient, data
 	d.Set("subdomain", data.Subdomain)
 	d.Set("cname_record_value", data.Subdomain+".")
 	d.Set("txt_record_value", fmt.Sprintf("webaccel=%s", data.Subdomain))
-	d.Set("request_protocol", mapWebAccelRequestProtocol(data))
+	rp, err := mapWebAccelRequestProtocol(data)
+	if err != nil {
+		return diag.FromErr(err)
+	}
+	d.Set("request_protocol", rp)
 	d.Set("default_cache_ttl", data.DefaultCacheTTL)
-	d.Set("origin_parameters", flattenWebAccelOriginParameters(d, data))
-	d.Set("cors_rules", flattenWebAccelCorsRules(data.CORSRules))
+	originParams, err := flattenWebAccelOriginParameters(d, data)
+	if err != nil {
+		return diag.FromErr(err)
+	}
+	d.Set("origin_parameters", originParams)
+	cors, err := flattenWebAccelCorsRules(data.CORSRules)
+	if err != nil {
+		return diag.FromErr(err)
+	}
+	d.Set("cors_rules", cors)
 	if _, ok := d.GetOk("vary_support"); ok {
 		d.Set("vary_support", data.VarySupport == webaccel.VarySupportEnabled)
 	}
 	if _, ok := d.GetOk("normalize_ae"); ok {
-		d.Set("normalize_ae", mapWebAccelNormalizeAE(data))
+		if ae, err := mapWebAccelNormalizeAE(data); err != nil {
+			return diag.FromErr(err)
+		} else {
+			d.Set("normalize_ae", ae)
+		}
 	}
 
 	return nil

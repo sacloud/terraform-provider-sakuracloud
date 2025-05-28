@@ -238,16 +238,32 @@ func dataSourceSakuraCloudWebAccelSiteRead(ctx context.Context, d *schema.Resour
 
 	d.Set("subdomain", data.Subdomain)
 	d.Set("domain_type", data.DomainType)
-	d.Set("request_protocol", mapWebAccelRequestProtocol(data))
+	rp, err := mapWebAccelRequestProtocol(data)
+	if err != nil {
+		return diag.FromErr(err)
+	}
+	d.Set("request_protocol", rp)
 	d.Set("has_certificate", data.HasCertificate)
 	d.Set("host_header", data.HostHeader)
 	d.Set("status", data.Status)
-	d.Set("origin_parameters", flattenWebAccelOriginParameters(d, data))
-	d.Set("cors_rules", flattenWebAccelCorsRules(data.CORSRules))
+	originParams, err := flattenWebAccelOriginParameters(d, data)
+	if err != nil {
+		return diag.FromErr(err)
+	}
+	d.Set("origin_parameters", originParams)
+	cors, err := flattenWebAccelCorsRules(data.CORSRules)
+	if err != nil {
+		return diag.FromErr(err)
+	}
+	d.Set("cors_rules", cors)
 	d.Set("cname_record_value", data.Subdomain+".")
 	d.Set("txt_record_value", fmt.Sprintf("webaccel=%s", data.Subdomain))
 	d.Set("vary_support", data.VarySupport == webaccel.VarySupportEnabled)
-	d.Set("normalize_ae", mapWebAccelNormalizeAE(data))
+	ae, err := mapWebAccelNormalizeAE(data)
+	if err != nil {
+		return diag.FromErr(err)
+	}
+	d.Set("normalize_ae", ae)
 	return nil
 }
 

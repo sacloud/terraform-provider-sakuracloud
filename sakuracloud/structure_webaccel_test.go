@@ -1,0 +1,286 @@
+package sakuracloud
+
+import (
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
+	"github.com/sacloud/webaccel-api-go"
+	"math/rand"
+	"reflect"
+	"testing"
+)
+
+func TestFlattenWebAccelOriginParameters(t *testing.T) {
+	validBucketOriginParamSet := schema.NewSet(func(_ interface{}) int {
+		return rand.Int()
+	}, []interface{}{
+		map[string]interface{}{
+			"access_key_id":     "DUMMY-KEY",
+			"secret_access_key": "DUMMY-SECRET",
+		},
+	})
+	invalidBucketOriginParamSet := schema.NewSet(func(_ interface{}) int {
+		return rand.Int()
+	}, []interface{}{
+		map[string]interface{}{
+			"access_key_id":             "DUMMY-KEY",
+			"NO_SUCH_secret_access_key": "the secret_access_key field is not exist",
+		},
+	})
+
+	invalidOriginType := webaccel.OriginTypesObjectStorage + "-WITH-INVALID-SUFFIX"
+	invalidOriginProtocol := webaccel.OriginProtocolsHttps + "-WITH-INVALID-SUFFIX"
+
+	tt := []struct {
+		Name              string
+		InputResourceData resourceValueGettable
+		InputSiteData     *webaccel.Site
+		ExpectedOutput    []interface{}
+		ExpectError       bool
+	}{
+		{
+			"valid-web-origin",
+			&resourceMapValue{
+				value: map[string]interface{}{
+					"field": "IS-NOT-REQUIRED-FOR-WEB-ORIGIN",
+				},
+			},
+			&webaccel.Site{
+				Name:           "hoge",
+				Origin:         "docs.usacloud.jp",
+				OriginType:     webaccel.OriginTypesWebServer,
+				OriginProtocol: webaccel.OriginProtocolsHttps,
+				HostHeader:     "docs.usacloud.jp",
+			},
+			[]interface{}{
+				map[string]interface{}{
+					"type":        "web",
+					"origin":      "docs.usacloud.jp",
+					"protocol":    "https",
+					"host_header": "docs.usacloud.jp",
+				},
+			},
+			false,
+		},
+		{
+			"valid-bucket-origin",
+			&resourceMapValue{
+				value: map[string]interface{}{
+					"origin_parameters": validBucketOriginParamSet,
+				},
+			},
+			&webaccel.Site{
+				Name:       "hoge",
+				OriginType: webaccel.OriginTypesObjectStorage,
+				S3Endpoint: "s3.isk01.sakurastorage.jp",
+				S3Region:   "jp-north-1",
+				BucketName: "hoge",
+			},
+			[]interface{}{
+				map[string]interface{}{
+					"type":              "bucket",
+					"endpoint":          "s3.isk01.sakurastorage.jp",
+					"region":            "jp-north-1",
+					"bucket_name":       "hoge",
+					"access_key_id":     "DUMMY-KEY",
+					"secret_access_key": "DUMMY-SECRET",
+				},
+			},
+			false,
+		},
+		{
+			"invalid-origin-type",
+			&resourceMapValue{
+				value: map[string]interface{}{
+					"dummy": "garbage",
+				},
+			},
+			&webaccel.Site{
+				Name:           "hoge",
+				Origin:         "docs.usacloud.jp",
+				OriginType:     invalidOriginType,
+				OriginProtocol: webaccel.OriginProtocolsHttps,
+				HostHeader:     "docs.usacloud.jp",
+			},
+			nil,
+			true,
+		},
+		{
+			"invalid-origin-protocol",
+			&resourceMapValue{
+				value: map[string]interface{}{
+					"dummy": "garbage",
+				},
+			},
+			&webaccel.Site{
+				Name:           "hoge",
+				Origin:         "docs.usacloud.jp",
+				OriginType:     webaccel.OriginTypesWebServer,
+				OriginProtocol: invalidOriginProtocol,
+				HostHeader:     "docs.usacloud.jp",
+			},
+			nil,
+			true,
+		},
+		{
+			"lacking-field-for-bucket-origin",
+			&resourceMapValue{
+				value: map[string]interface{}{
+					"origin_parameters": invalidBucketOriginParamSet,
+				},
+			},
+			&webaccel.Site{
+				Name:       "hoge",
+				OriginType: webaccel.OriginTypesObjectStorage,
+				S3Endpoint: "s3.isk01.sakurastorage.jp",
+				S3Region:   "jp-north-1",
+			},
+			[]interface{}{
+				map[string]interface{}{
+					"type":          "bucket",
+					"endpoint":      "s3.isk01.sakurastorage.jp",
+					"region":        "jp-north-1",
+					"access_key_id": "DUMMY-KEY",
+				},
+			},
+			true,
+		},
+		{
+			"blank-field-for-bucket-origin",
+			&resourceMapValue{
+				value: map[string]interface{}{},
+			},
+			&webaccel.Site{
+				Name:       "hoge",
+				OriginType: webaccel.OriginTypesObjectStorage,
+				S3Endpoint: "s3.isk01.sakurastorage.jp",
+				S3Region:   "jp-north-1",
+				BucketName: "hoge",
+			},
+			[]interface{}{
+				map[string]interface{}{
+					"type":          "bucket",
+					"endpoint":      "s3.isk01.sakurastorage.jp",
+					"bucket_name":   "hoge",
+					"region":        "jp-north-1",
+					"access_key_id": "DUMMY-KEY",
+				},
+			},
+			true,
+		},
+	}
+	for _, tc := range tt {
+		t.Run(tc.Name, func(t *testing.T) {
+			res, err := flattenWebAccelOriginParameters(tc.InputResourceData, tc.InputSiteData)
+			if tc.ExpectError {
+				if err == nil {
+					t.Fatalf("expected error, got none")
+				}
+			} else if err != nil {
+				t.Fatalf("unexpected error: %s", err)
+			} else if !reflect.DeepEqual(res, tc.ExpectedOutput) {
+				t.Fatalf("FAILED %s: got: %v\nwant: %v", tc.Name, res, tc.ExpectedOutput)
+			}
+		})
+	}
+}
+
+func TestMapWebAccelRequestProtocol(t *testing.T) {
+	tt := []struct {
+		Name        string
+		Given       *webaccel.Site
+		Want        string
+		ExpectError bool
+	}{
+		{
+			"valid http+https",
+			&webaccel.Site{
+				RequestProtocol: webaccel.RequestProtocolsHttpAndHttps,
+			},
+			"http+https",
+			false,
+		},
+		{
+			"valid https",
+			&webaccel.Site{
+				RequestProtocol: webaccel.RequestProtocolsHttpsOnly,
+			},
+			"https",
+			false,
+		},
+		{
+			"valid https-redirect",
+			&webaccel.Site{
+				RequestProtocol: webaccel.RequestProtocolsRedirectToHttps,
+			},
+			"https-redirect",
+			false,
+		},
+		{
+			"invalid request protocol",
+			&webaccel.Site{
+				RequestProtocol: "NO-SUCH-RP",
+			},
+			"",
+			true,
+		},
+	}
+
+	for _, tc := range tt {
+		t.Run(tc.Name, func(t *testing.T) {
+			res, err := mapWebAccelRequestProtocol(tc.Given)
+			if tc.ExpectError {
+				if err == nil {
+					t.Fatalf("expected error, got none")
+				}
+			} else if res != tc.Want {
+				t.Fatalf("FAILED %s: got: %v\nwant: %v", tc.Name, res, tc.Want)
+			}
+		})
+	}
+}
+
+func TestMapWebAccelNormalizeAE(t *testing.T) {
+	tt := []struct {
+		Name        string
+		Given       *webaccel.Site
+		Want        string
+		ExpectError bool
+	}{
+		{
+			"valid gzip",
+			&webaccel.Site{
+				NormalizeAE: webaccel.NormalizeAEGz,
+			},
+			"gzip",
+			false,
+		},
+		{
+			"valid brotli",
+			&webaccel.Site{
+				NormalizeAE: webaccel.NormalizeAEBrGz,
+			},
+			"br+gzip",
+			false,
+		},
+		{
+			"invalid encoding",
+			&webaccel.Site{
+				NormalizeAE: "3-NO-SUCH-NORMALIZE-AE-PARAM",
+			},
+			"",
+			true,
+		},
+	}
+
+	for _, tc := range tt {
+		t.Run(tc.Name, func(t *testing.T) {
+			res, err := mapWebAccelNormalizeAE(tc.Given)
+			if tc.ExpectError {
+				if err == nil {
+					t.Fatalf("expected error, got none")
+				}
+			} else if res != tc.Want {
+				t.Fatalf("FAILED %s: got: %v\nwant: %v", tc.Name, res, tc.Want)
+			}
+		})
+	}
+}

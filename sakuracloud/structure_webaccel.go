@@ -11,7 +11,7 @@ const (
 	DefaultObjectStorageRegion   = "jp-north-1"
 )
 
-func flattenWebAccelOriginParameters(d resourceValueGettable, site *webaccel.Site) []interface{} {
+func flattenWebAccelOriginParameters(d resourceValueGettable, site *webaccel.Site) ([]interface{}, error) {
 	originParams := make(map[string]interface{})
 	switch site.OriginType {
 	case webaccel.OriginTypesWebServer:
@@ -22,8 +22,7 @@ func flattenWebAccelOriginParameters(d resourceValueGettable, site *webaccel.Sit
 		} else if site.OriginProtocol == webaccel.OriginProtocolsHttps {
 			originParams["protocol"] = "https"
 		} else {
-			// エンドポイントもしくはproviderのバグはキャッチしない
-			panic("invalid origin protocol: " + site.OriginProtocol)
+			return nil, fmt.Errorf("invalid origin protocol: %s", site.OriginProtocol)
 		}
 		if site.HostHeader != "" {
 			originParams["host_header"] = site.HostHeader
@@ -38,29 +37,39 @@ func flattenWebAccelOriginParameters(d resourceValueGettable, site *webaccel.Sit
 		originParams["bucket_name"] = site.BucketName
 
 		// NOTE: access key/secret cannot be fetched from remote
-		presetOriginParams := mapFromSet(d, "origin_parameters")
-		originParams["access_key_id"] = presetOriginParams.Get("access_key_id").(string)
-		originParams["secret_access_key"] = presetOriginParams.Get("secret_access_key").(string)
+		presetOriginParams, err := mapFromSet(d, "origin_parameters")
+		if err != nil {
+			return nil, err
+		}
+		if v, ok := presetOriginParams.GetOk("access_key_id"); !ok {
+			return nil, fmt.Errorf("origin parameters are not fully provided: [access_key_id]")
+		} else if originParams["access_key_id"], ok = v.(string); !ok {
+			return nil, fmt.Errorf("the origin parameter should be string: [access_key_id]")
+		}
+		if v, ok := presetOriginParams.GetOk("secret_access_key"); !ok {
+			return nil, fmt.Errorf("origin parameters are not fully provided: [secret_access_key]")
+		} else if originParams["secret_access_key"], ok = v.(string); !ok {
+			return nil, fmt.Errorf("the origin parameter should be string: [secret_access_key]")
+		}
 	default:
-		diag.Errorf("unknown origin type: %s", site.OriginType)
+		return nil, fmt.Errorf("unknown origin type: %s", site.OriginType)
 	}
-	return []interface{}{originParams}
+	return []interface{}{originParams}, nil
 }
 
-func flattenWebAccelCorsRules(data []*webaccel.CORSRule) []interface{} {
+func flattenWebAccelCorsRules(data []*webaccel.CORSRule) ([]interface{}, error) {
 	switch len(data) {
 	case 0:
-		return nil
+		return nil, nil
 	case 1:
 		rule := data[0]
 		if rule.AllowsAnyOrigin == true && len(rule.AllowedOrigins) != 0 {
-			// エンドポイントもしくはproviderのバグはキャッチしない
-			panic("invalid state: allow_all and allowed_origins should not be specified together")
+			return nil, fmt.Errorf("allow_all and allowed_origins should not be specified together")
 		}
 		// NOTE: resourceのRead系処理では `cors_rules` を指定しない場合には値を代入しない。
 		// これにより、レスポンス内のデフォルト値を無視することができ、差分が発生することを防ぐ。
 		if rule.AllowsAnyOrigin == false && len(rule.AllowedOrigins) == 0 {
-			return nil
+			return nil, nil
 		}
 		corsRuleParams := make(map[string]interface{})
 		if rule.AllowsAnyOrigin {
@@ -70,7 +79,7 @@ func flattenWebAccelCorsRules(data []*webaccel.CORSRule) []interface{} {
 		} else {
 			corsRuleParams["allow_all"] = false
 		}
-		return []interface{}{corsRuleParams}
+		return []interface{}{corsRuleParams}, nil
 	default:
 		// ウェブアクセラレーターAPIの現仕様では、CORSRules配列の最大長は`1`。
 		// この長さを超える配列が与えられた場合、バグとみなす。
@@ -118,7 +127,10 @@ func expandWebAccelOriginParametersForUpdate(d resourceValueGettable) (*webaccel
 		originType string
 		req        = new(webaccel.UpdateSiteRequest)
 	)
-	d = mapFromSet(d, "origin_parameters")
+	d, err := mapFromSet(d, "origin_parameters")
+	if err != nil {
+		return nil, err
+	}
 	originType = d.Get("type").(string)
 	switch originType {
 	case "web":
@@ -180,7 +192,10 @@ func expandWebAccelCORSParameters(d resourceValueGettable) (*webaccel.CORSRule, 
 		corsAllowAll = false
 	)
 
-	corsRuleParams := mapFromSet(d, "cors_rules")
+	corsRuleParams, err := mapFromSet(d, "cors_rules")
+	if err != nil {
+		return nil, err
+	}
 	//allow_all (true/false)
 	if v, ok := corsRuleParams.GetOk("allow_all"); ok {
 		if b, ok := v.(bool); ok && b {
@@ -212,9 +227,12 @@ func expandWebAccelCORSParameters(d resourceValueGettable) (*webaccel.CORSRule, 
 }
 
 // 事前条件: `logging` が設定されていること
-func expandLoggingParameters(d resourceValueGettable) *webaccel.LogUploadConfig {
+func expandLoggingParameters(d resourceValueGettable) (*webaccel.LogUploadConfig, error) {
 	req := new(webaccel.LogUploadConfig)
-	loggingParams := mapFromSet(d, "logging")
+	loggingParams, err := mapFromSet(d, "logging")
+	if err != nil {
+		return nil, err
+	}
 	if loggingParams.Get("enabled").(bool) {
 		req.Status = "enabled"
 	} else {
@@ -227,7 +245,7 @@ func expandLoggingParameters(d resourceValueGettable) *webaccel.LogUploadConfig 
 	req.Endpoint = DefaultObjectStorageEndpoint
 	req.Region = DefaultObjectStorageRegion
 	req.Status = "enabled"
-	return req
+	return req, nil
 }
 
 // 事前条件: `onetime_url_secrets` が設定されていること
@@ -262,34 +280,30 @@ func expandWebAccelNormalizeAEParameter(d resourceValueGettable) (string, error)
 	return "", fmt.Errorf("invalid normalize_ae parameter: '%s'", v)
 }
 
-// mapWebAccelRequestProtocol: setter/Read系処理以外で利用する場合、panic部分の書き換えが必要
-func mapWebAccelRequestProtocol(site *webaccel.Site) string {
+func mapWebAccelRequestProtocol(site *webaccel.Site) (string, error) {
 	switch site.RequestProtocol {
 	case webaccel.RequestProtocolsHttpAndHttps:
-		return "http+https"
+		return "http+https", nil
 	case webaccel.RequestProtocolsHttpsOnly:
-		return "https"
+		return "https", nil
 	case webaccel.RequestProtocolsRedirectToHttps:
-		return "https-redirect"
+		return "https-redirect", nil
 	default:
-		// エンドポイントもしくはproviderのバグはキャッチしない
-		panic("invalid condition")
+		return "", fmt.Errorf("invalid request protocol: %s", site.RequestProtocol)
 	}
 }
 
-// mapWebAccelNormalizeAE: Read系処理以外で利用する場合、panic部分の書き換えが必要
-func mapWebAccelNormalizeAE(site *webaccel.Site) interface{} {
+func mapWebAccelNormalizeAE(site *webaccel.Site) (string, error) {
 	if site.NormalizeAE != "" {
 		if site.NormalizeAE == webaccel.NormalizeAEBrGz {
-			return "br+gzip"
+			return "br+gzip", nil
 		} else if site.NormalizeAE == webaccel.NormalizeAEGz {
-			return "gzip"
+			return "gzip", nil
 		}
-		// エンドポイントもしくはproviderのバグはキャッチしない
-		panic("invalid condition: normalize_ae: " + site.NormalizeAE)
+		return "", fmt.Errorf("invalid normalize_ae parameter: '%s'", site.NormalizeAE)
 	}
 	//NOTE: APIが返却するデフォルト値は""。
 	// このフィールドでで "gzip" と "" が持つ効果は同一であるため、
 	// "gzip" として正規化する
-	return "gzip"
+	return "gzip", nil
 }
