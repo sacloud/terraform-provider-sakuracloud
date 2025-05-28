@@ -467,7 +467,9 @@ func setWebAccelSiteResourceData(d *schema.ResourceData, client *APIClient, data
 		return diag.FromErr(err)
 	}
 	d.Set("request_protocol", rp)
-	d.Set("default_cache_ttl", data.DefaultCacheTTL)
+	if _, ok := d.GetOk("default_cache_ttl"); ok {
+		d.Set("default_cache_ttl", data.DefaultCacheTTL)
+	}
 	originParams, err := flattenWebAccelOriginParameters(d, data)
 	if err != nil {
 		return diag.FromErr(err)
