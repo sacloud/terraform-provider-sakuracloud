@@ -92,36 +92,36 @@ func resourceSakuraCloudWebAccel() *schema.Resource {
 							Optional:    true,
 							Description: "host header to the origin : optional for origin.type = `web`",
 						},
-						"endpoint": {
+						"s3_endpoint": {
 							Type:     schema.TypeString,
 							Optional: true,
 							//without protocol scheme
 							ValidateDiagFunc: validateHostName(),
 							Description:      "S3 endpoint: required for origin.type = `bucket`",
 						},
-						"region": {
+						"s3_region": {
 							Type:        schema.TypeString,
 							Optional:    true,
 							Description: "S3 region: required for origin.type = `bucket`",
 						},
-						"bucket_name": {
+						"s3_bucket_name": {
 							Type:        schema.TypeString,
 							Optional:    true,
 							Description: "S3 bucket name: required for origin.type = `bucket`",
 						},
-						"access_key_id": {
+						"s3_access_key_id": {
 							Type:        schema.TypeString,
 							Optional:    true,
 							Sensitive:   true,
 							Description: "S3 access key ID: required for origin.type = `bucket`",
 						},
-						"secret_access_key": {
+						"s3_secret_access_key": {
 							Type:        schema.TypeString,
 							Optional:    true,
 							Sensitive:   true,
 							Description: "S3 secret access key: required for origin.type = `bucket`",
 						},
-						"doc_index": {
+						"s3_doc_index": {
 							Type:        schema.TypeBool,
 							Optional:    true,
 							Description: "whether the document indexing for the bucket is enabled or not: optional for origin.type = `bucket`",
@@ -160,18 +160,18 @@ func resourceSakuraCloudWebAccel() *schema.Resource {
 							Required:    true,
 							Description: "whether the site logging is enabled or not",
 						},
-						"bucket_name": {
+						"s3_bucket_name": {
 							Type:        schema.TypeString,
 							Required:    true,
 							Description: "logging bucket name",
 						},
-						"access_key_id": {
+						"s3_access_key_id": {
 							Type:        schema.TypeString,
 							Required:    true,
 							Sensitive:   true,
 							Description: "S3 access key ID",
 						},
-						"secret_access_key": {
+						"s3_secret_access_key": {
 							Type:        schema.TypeString,
 							Required:    true,
 							Sensitive:   true,

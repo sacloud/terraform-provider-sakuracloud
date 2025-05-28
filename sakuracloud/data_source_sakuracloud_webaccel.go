@@ -134,18 +134,18 @@ func dataSourceSakuraCloudWebAccel() *schema.Resource {
 							Computed:    true,
 							Description: "whether the site logging is enabled or not",
 						},
-						"bucket_name": {
+						"s3_bucket_name": {
 							Type:        schema.TypeString,
 							Computed:    true,
 							Description: "logging bucket name",
 						},
-						"access_key_id": {
+						"s3_access_key_id": {
 							Type:        schema.TypeString,
 							Computed:    true,
 							Sensitive:   true,
 							Description: "S3 access key ID",
 						},
-						"secret_access_key": {
+						"s3_secret_access_key": {
 							Type:        schema.TypeString,
 							Required:    true,
 							Sensitive:   true,

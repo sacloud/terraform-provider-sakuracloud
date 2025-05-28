@@ -169,7 +169,7 @@ func TestAccSakuraCloudResourceWebAccel_Update(t *testing.T) {
 					resource.TestCheckResourceAttr("sakuracloud_webaccel.foobar", "name", siteName),
 					resource.TestCheckResourceAttr("sakuracloud_webaccel.foobar", "origin_parameters.0.type", "web"),
 					resource.TestCheckResourceAttr("sakuracloud_webaccel.foobar", "origin_parameters.0.origin", origin),
-					resource.TestCheckResourceAttr("sakuracloud_webaccel.foobar", "logging.0.bucket_name", bucketName),
+					resource.TestCheckResourceAttr("sakuracloud_webaccel.foobar", "logging.0.s3_bucket_name", bucketName),
 					resource.TestCheckResourceAttr("sakuracloud_webaccel.foobar", "vary_support", "true"),
 				),
 			},
@@ -178,11 +178,11 @@ func TestAccSakuraCloudResourceWebAccel_Update(t *testing.T) {
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttr("sakuracloud_webaccel.foobar", "name", siteName),
 					resource.TestCheckResourceAttr("sakuracloud_webaccel.foobar", "origin_parameters.0.type", "bucket"),
-					resource.TestCheckResourceAttr("sakuracloud_webaccel.foobar", "origin_parameters.0.endpoint", endpoint),
-					resource.TestCheckResourceAttr("sakuracloud_webaccel.foobar", "origin_parameters.0.region", region),
-					resource.TestCheckResourceAttr("sakuracloud_webaccel.foobar", "origin_parameters.0.bucket_name", bucketName),
-					resource.TestCheckResourceAttr("sakuracloud_webaccel.foobar", "origin_parameters.0.access_key_id", accessKey),
-					resource.TestCheckResourceAttr("sakuracloud_webaccel.foobar", "origin_parameters.0.secret_access_key", secretKey),
+					resource.TestCheckResourceAttr("sakuracloud_webaccel.foobar", "origin_parameters.0.s3_endpoint", endpoint),
+					resource.TestCheckResourceAttr("sakuracloud_webaccel.foobar", "origin_parameters.0.s3_region", region),
+					resource.TestCheckResourceAttr("sakuracloud_webaccel.foobar", "origin_parameters.0.s3_bucket_name", bucketName),
+					resource.TestCheckResourceAttr("sakuracloud_webaccel.foobar", "origin_parameters.0.s3_access_key_id", accessKey),
+					resource.TestCheckResourceAttr("sakuracloud_webaccel.foobar", "origin_parameters.0.s3_secret_access_key", secretKey),
 				),
 			},
 		},
@@ -227,11 +227,11 @@ func TestAccSakuraCloudResourceWebAccel_BucketOrigin(t *testing.T) {
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttr("sakuracloud_webaccel.foobar", "name", siteName),
 					resource.TestCheckResourceAttr("sakuracloud_webaccel.foobar", "origin_parameters.0.type", "bucket"),
-					resource.TestCheckResourceAttr("sakuracloud_webaccel.foobar", "origin_parameters.0.endpoint", endpoint),
-					resource.TestCheckResourceAttr("sakuracloud_webaccel.foobar", "origin_parameters.0.region", region),
-					resource.TestCheckResourceAttr("sakuracloud_webaccel.foobar", "origin_parameters.0.bucket_name", bucketName),
-					resource.TestCheckResourceAttr("sakuracloud_webaccel.foobar", "origin_parameters.0.access_key_id", accessKey),
-					resource.TestCheckResourceAttr("sakuracloud_webaccel.foobar", "origin_parameters.0.secret_access_key", secretKey),
+					resource.TestCheckResourceAttr("sakuracloud_webaccel.foobar", "origin_parameters.0.s3_endpoint", endpoint),
+					resource.TestCheckResourceAttr("sakuracloud_webaccel.foobar", "origin_parameters.0.s3_region", region),
+					resource.TestCheckResourceAttr("sakuracloud_webaccel.foobar", "origin_parameters.0.s3_bucket_name", bucketName),
+					resource.TestCheckResourceAttr("sakuracloud_webaccel.foobar", "origin_parameters.0.s3_access_key_id", accessKey),
+					resource.TestCheckResourceAttr("sakuracloud_webaccel.foobar", "origin_parameters.0.s3_secret_access_key", secretKey),
 				),
 			},
 		},
@@ -274,7 +274,7 @@ func TestAccSakuraCloudResourceWebAccel_Logging(t *testing.T) {
 					resource.TestCheckResourceAttr("sakuracloud_webaccel.foobar", "name", siteName),
 					resource.TestCheckResourceAttr("sakuracloud_webaccel.foobar", "origin_parameters.0.type", "web"),
 					resource.TestCheckResourceAttr("sakuracloud_webaccel.foobar", "origin_parameters.0.origin", origin),
-					resource.TestCheckResourceAttr("sakuracloud_webaccel.foobar", "logging.0.bucket_name", bucketName),
+					resource.TestCheckResourceAttr("sakuracloud_webaccel.foobar", "logging.0.s3_bucket_name", bucketName),
 					resource.TestCheckResourceAttr("sakuracloud_webaccel.foobar", "vary_support", "true"),
 				),
 			},
@@ -361,7 +361,7 @@ resource sakuracloud_webaccel "foobar" {
 	return fmt.Sprintf(tmpl, siteName, origin, origin)
 }
 
-func testAccCheckSakuraCloudWebAccelBucketOriginConfig(siteName string, endpoint string, region string, bucketName string, accessKey string, accessSecret string) string {
+func testAccCheckSakuraCloudWebAccelBucketOriginConfig(siteName string, s3_endpoint string, region string, bucketName string, accessKey string, accessSecret string) string {
 	tmpl := `
 resource sakuracloud_webaccel "foobar" {
   name = "%s"
@@ -369,17 +369,17 @@ resource sakuracloud_webaccel "foobar" {
   request_protocol = "https-redirect"
   origin_parameters {
     type = "bucket"
-    endpoint = "%s"
-    region = "%s"
-    bucket_name = "%s"
-    access_key_id = "%s"
-    secret_access_key = "%s"
+    s3_endpoint = "%s"
+    s3_region = "%s"
+    s3_bucket_name = "%s"
+    s3_access_key_id = "%s"
+    s3_secret_access_key = "%s"
   }
   default_cache_ttl = 3600
   normalize_ae = "br+gzip"
 }
 `
-	return fmt.Sprintf(tmpl, siteName, endpoint, region, bucketName, accessKey, accessSecret)
+	return fmt.Sprintf(tmpl, siteName, s3_endpoint, region, bucketName, accessKey, accessSecret)
 }
 
 func testAccCheckSakuraCloudWebAccelWebOriginLoggingConfig(siteName string, origin string, bucketName string, accessKey string, secretKey string) string {
@@ -396,9 +396,9 @@ resource sakuracloud_webaccel "foobar" {
   }
   logging {
     enabled = true
-    bucket_name = "%s"
-    access_key_id = "%s"
-    secret_access_key = "%s"
+    s3_bucket_name = "%s"
+    s3_access_key_id = "%s"
+    s3_secret_access_key = "%s"
   }
   vary_support = true
   default_cache_ttl = 3600
@@ -519,7 +519,7 @@ resource sakuracloud_webaccel "foobar" {
 }
 `
 
-	//config without the S3 endpoint parameter
+	//config without the S3 s3_endpoint parameter
 	confLackingBucketOriginParameters := `
 resource sakuracloud_webaccel "foobar" {
   name = "dummy"
@@ -527,9 +527,9 @@ resource sakuracloud_webaccel "foobar" {
   request_protocol = "https-redirect"
   origin_parameters {
     type = "bucket"
-    region = "jp-sample-1"
-    access_key_id = "sample"
-    secret_access_key = "sample"
+    s3_region = "jp-sample-1"
+    s3_access_key_id = "sample"
+    s3_secret_access_key = "sample"
   }
   vary_support = true
   default_cache_ttl = 3600
@@ -565,8 +565,8 @@ resource sakuracloud_webaccel "foobar" {
     protocol = "https"
   }
   logging {
-    bucket_name = "example-bucket"
-    access_key_id = "sample"
+    s3_bucket_name = "example-bucket"
+    s3_access_key_id = "sample"
   }
 }
 `

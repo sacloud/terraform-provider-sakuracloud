@@ -30,26 +30,26 @@ func flattenWebAccelOriginParameters(d resourceValueGettable, site *webaccel.Sit
 	case webaccel.OriginTypesObjectStorage:
 		originParams["type"] = "bucket"
 		if site.S3Endpoint == "" || site.S3Region == "" || site.BucketName == "" {
-			diag.Errorf("origin parameters are not fully provided: [endpoint, region, bucket_name]")
+			diag.Errorf("origin parameters are not fully provided: [s3_endpoint, s3_region, s3_bucket_name]")
 		}
-		originParams["endpoint"] = site.S3Endpoint
-		originParams["region"] = site.S3Region
-		originParams["bucket_name"] = site.BucketName
+		originParams["s3_endpoint"] = site.S3Endpoint
+		originParams["s3_region"] = site.S3Region
+		originParams["s3_bucket_name"] = site.BucketName
 
 		// NOTE: access key/secret cannot be fetched from remote
 		presetOriginParams, err := mapFromSet(d, "origin_parameters")
 		if err != nil {
 			return nil, err
 		}
-		if v, ok := presetOriginParams.GetOk("access_key_id"); !ok {
-			return nil, fmt.Errorf("origin parameters are not fully provided: [access_key_id]")
-		} else if originParams["access_key_id"], ok = v.(string); !ok {
-			return nil, fmt.Errorf("the origin parameter should be string: [access_key_id]")
+		if v, ok := presetOriginParams.GetOk("s3_access_key_id"); !ok {
+			return nil, fmt.Errorf("origin parameters are not fully provided: [s3_access_key_id]")
+		} else if originParams["s3_access_key_id"], ok = v.(string); !ok {
+			return nil, fmt.Errorf("the origin parameter should be string: [s3_access_key_id]")
 		}
-		if v, ok := presetOriginParams.GetOk("secret_access_key"); !ok {
-			return nil, fmt.Errorf("origin parameters are not fully provided: [secret_access_key]")
-		} else if originParams["secret_access_key"], ok = v.(string); !ok {
-			return nil, fmt.Errorf("the origin parameter should be string: [secret_access_key]")
+		if v, ok := presetOriginParams.GetOk("s3_secret_access_key"); !ok {
+			return nil, fmt.Errorf("origin parameters are not fully provided: [s3_secret_access_key]")
+		} else if originParams["s3_secret_access_key"], ok = v.(string); !ok {
+			return nil, fmt.Errorf("the origin parameter should be string: [s3_secret_access_key]")
 		}
 	default:
 		return nil, fmt.Errorf("unknown origin type: %s", site.OriginType)
@@ -94,9 +94,9 @@ func flattenWebAccelLogUploadConfigData(data *webaccel.LogUploadConfig) []interf
 	} else {
 		loggingParams["enabled"] = false
 	}
-	loggingParams["bucket_name"] = data.Bucket
-	loggingParams["access_key_id"] = data.AccessKeyID
-	loggingParams["secret_access_key"] = data.SecretAccessKey
+	loggingParams["s3_bucket_name"] = data.Bucket
+	loggingParams["s3_access_key_id"] = data.AccessKeyID
+	loggingParams["s3_secret_access_key"] = data.SecretAccessKey
 	return []interface{}{loggingParams}
 }
 
@@ -149,12 +149,12 @@ func expandWebAccelOriginParametersForUpdate(d resourceValueGettable) (*webaccel
 		}
 	case "bucket":
 		req.OriginType = webaccel.OriginTypesObjectStorage
-		req.S3Endpoint = d.Get("endpoint").(string)
-		req.S3Region = d.Get("region").(string)
-		req.BucketName = d.Get("bucket_name").(string)
-		req.AccessKeyID = d.Get("access_key_id").(string)
-		req.SecretAccessKey = d.Get("secret_access_key").(string)
-		if v, ok := d.GetOk("doc_index"); ok {
+		req.S3Endpoint = d.Get("s3_endpoint").(string)
+		req.S3Region = d.Get("s3_region").(string)
+		req.BucketName = d.Get("s3_bucket_name").(string)
+		req.AccessKeyID = d.Get("s3_access_key_id").(string)
+		req.SecretAccessKey = d.Get("s3_secret_access_key").(string)
+		if v, ok := d.GetOk("s3_doc_index"); ok {
 			if v.(bool) {
 				req.DocIndex = webaccel.DocIndexEnabled
 			} else {
@@ -237,9 +237,9 @@ func expandLoggingParameters(d resourceValueGettable) (*webaccel.LogUploadConfig
 	} else {
 		req.Status = "disabled"
 	}
-	req.Bucket = loggingParams.Get("bucket_name").(string)
-	req.AccessKeyID = loggingParams.Get("access_key_id").(string)
-	req.SecretAccessKey = loggingParams.Get("secret_access_key").(string)
+	req.Bucket = loggingParams.Get("s3_bucket_name").(string)
+	req.AccessKeyID = loggingParams.Get("s3_access_key_id").(string)
+	req.SecretAccessKey = loggingParams.Get("s3_secret_access_key").(string)
 
 	req.Endpoint = DefaultObjectStorageEndpoint
 	req.Region = DefaultObjectStorageRegion

@@ -9,8 +9,8 @@ import (
 
 func TestMapFromSet(t *testing.T) {
 	blockData := map[string]interface{}{
-		"access_key_id":     "DUMMY-KEY",
-		"secret_access_key": "DUMMY-SECRET",
+		"s3_access_key_id":     "DUMMY-KEY",
+		"s3_secret_access_key": "DUMMY-SECRET",
 	}
 	hasher := func(_ interface{}) int {
 		return rand.Int()

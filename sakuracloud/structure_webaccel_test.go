@@ -13,15 +13,15 @@ func TestFlattenWebAccelOriginParameters(t *testing.T) {
 		return rand.Int()
 	}, []interface{}{
 		map[string]interface{}{
-			"access_key_id":     "DUMMY-KEY",
-			"secret_access_key": "DUMMY-SECRET",
+			"s3_access_key_id":     "DUMMY-KEY",
+			"s3_secret_access_key": "DUMMY-SECRET",
 		},
 	})
 	invalidBucketOriginParamSet := schema.NewSet(func(_ interface{}) int {
 		return rand.Int()
 	}, []interface{}{
 		map[string]interface{}{
-			"access_key_id":             "DUMMY-KEY",
+			"s3_access_key_id":          "DUMMY-KEY",
 			"NO_SUCH_secret_access_key": "the secret_access_key field is not exist",
 		},
 	})
@@ -76,12 +76,12 @@ func TestFlattenWebAccelOriginParameters(t *testing.T) {
 			},
 			[]interface{}{
 				map[string]interface{}{
-					"type":              "bucket",
-					"endpoint":          "s3.isk01.sakurastorage.jp",
-					"region":            "jp-north-1",
-					"bucket_name":       "hoge",
-					"access_key_id":     "DUMMY-KEY",
-					"secret_access_key": "DUMMY-SECRET",
+					"type":                 "bucket",
+					"s3_endpoint":          "s3.isk01.sakurastorage.jp",
+					"s3_region":            "jp-north-1",
+					"s3_bucket_name":       "hoge",
+					"s3_access_key_id":     "DUMMY-KEY",
+					"s3_secret_access_key": "DUMMY-SECRET",
 				},
 			},
 			false,
@@ -135,10 +135,10 @@ func TestFlattenWebAccelOriginParameters(t *testing.T) {
 			},
 			[]interface{}{
 				map[string]interface{}{
-					"type":          "bucket",
-					"endpoint":      "s3.isk01.sakurastorage.jp",
-					"region":        "jp-north-1",
-					"access_key_id": "DUMMY-KEY",
+					"type":             "bucket",
+					"s3_endpoint":      "s3.isk01.sakurastorage.jp",
+					"s3_region":        "jp-north-1",
+					"s3_access_key_id": "DUMMY-KEY",
 				},
 			},
 			true,
@@ -157,11 +157,11 @@ func TestFlattenWebAccelOriginParameters(t *testing.T) {
 			},
 			[]interface{}{
 				map[string]interface{}{
-					"type":          "bucket",
-					"endpoint":      "s3.isk01.sakurastorage.jp",
-					"bucket_name":   "hoge",
-					"region":        "jp-north-1",
-					"access_key_id": "DUMMY-KEY",
+					"type":             "bucket",
+					"s3_endpoint":      "s3.isk01.sakurastorage.jp",
+					"s3_bucket_name":   "hoge",
+					"s3_region":        "jp-north-1",
+					"s3_access_key_id": "DUMMY-KEY",
 				},
 			},
 			true,
