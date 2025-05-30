@@ -184,6 +184,7 @@ func resourceSakuraCloudWebAccel() *schema.Resource {
 				Description: "The site-wide onetime url secrets",
 				Optional:    true,
 				Type:        schema.TypeList,
+				Sensitive:   true,
 				Elem:        &schema.Schema{Type: schema.TypeString},
 			},
 			"vary_support": {

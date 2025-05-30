@@ -147,7 +147,7 @@ func dataSourceSakuraCloudWebAccel() *schema.Resource {
 						},
 						"s3_secret_access_key": {
 							Type:        schema.TypeString,
-							Required:    true,
+							Computed:    true,
 							Sensitive:   true,
 							Description: "S3 secret access key",
 						},
@@ -156,11 +156,11 @@ func dataSourceSakuraCloudWebAccel() *schema.Resource {
 			},
 			"default_cache_ttl": {
 				Type:     schema.TypeInt,
-				Optional: true,
+				Computed: true,
 			},
 			"vary_support": {
 				Type:     schema.TypeBool,
-				Optional: true,
+				Computed: true,
 			},
 			"cors_rules": {
 				Type:     schema.TypeSet,
@@ -192,8 +192,7 @@ func dataSourceSakuraCloudWebAccelRead(ctx context.Context, d *schema.ResourceDa
 	if err != nil {
 		return err
 	}
-	err = dataSourceSakuraCloudWebAccelLogUploadConfigRead(ctx, d, meta)
-	return err
+	return dataSourceSakuraCloudWebAccelLogUploadConfigRead(ctx, d, meta)
 }
 
 func dataSourceSakuraCloudWebAccelSiteRead(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
@@ -267,7 +266,7 @@ func dataSourceSakuraCloudWebAccelSiteRead(ctx context.Context, d *schema.Resour
 	return nil
 }
 
-// FIXME: test the function
+// TODO: plan to enhance acceptance tests for the function
 func dataSourceSakuraCloudWebAccelLogUploadConfigRead(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	siteId := d.Id()
 	client, _, err := sakuraCloudClient(d, meta)
@@ -276,6 +275,8 @@ func dataSourceSakuraCloudWebAccelLogUploadConfigRead(ctx context.Context, d *sc
 	}
 	webAccelOp := webaccel.NewOp(client.webaccelClient)
 	logCfg, err := webAccelOp.ReadLogUploadConfig(ctx, siteId)
+	logCfg.AccessKeyID = ""
+	logCfg.SecretAccessKey = ""
 	if err != nil {
 		return diag.FromErr(err)
 	}
