@@ -4,24 +4,21 @@ resource "sakuracloud_webaccel" "foobar" {
   request_protocol = "https-redirect"
   origin_parameters {
     type     = "web"
-    host     = "docs.usacloud.jp"
+    origin   = "docs.usacloud.jp"
     protocol = "https"
   }
-  logging {
-    bucket_name       = "example-bucket"
-    access_key_id     = "xxxxxxxxxxxxxxx"
-    secret_access_key = "xxxxxxxxxxxxxxxxxxxxxxx"
-    enabled           = true
-  }
+  onetime_url_secrets = [
+    "abc-0x123456"
+  ]
   vary_support      = true
   default_cache_ttl = 3600
-  normalize_ae      = "gz"
+  normalize_ae      = "gzip"
 }
 
 
 resource "sakuracloud_webaccel_acl" "foobar_acl" {
   acl = join("\n", [
-    "allow 114.156.138.154/32",
+    "allow 192.0.1.1/32",
     "allow 192.0.2.5/25",
     "deny all",
   ])
