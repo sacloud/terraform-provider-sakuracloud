@@ -66,6 +66,42 @@ func TestAccSakuraCloudResourceWebAccel_WebOrigin(t *testing.T) {
 	})
 }
 
+func TestAccSakuraCloudResourceWebAccel_WebOriginWithOneTimeUrlSecrets(t *testing.T) {
+	skipIfFakeModeEnabled(t)
+
+	envKeys := []string{
+		envWebAccelOrigin,
+	}
+	for _, k := range envKeys {
+		if os.Getenv(k) == "" {
+			t.Skipf("ENV %q is requilred. skip", k)
+			return
+		}
+	}
+
+	siteName := "your-site-name"
+	origin := os.Getenv(envWebAccelOrigin)
+
+	resource.Test(t, resource.TestCase{
+		PreCheck:          func() { testAccPreCheck(t) },
+		ProviderFactories: testAccProviderFactories,
+		CheckDestroy: func(*terraform.State) error {
+			return nil
+		},
+		Steps: []resource.TestStep{
+			{
+				Config: testAccCheckSakuraCloudWebAccelWebOriginConfigWithOneTimeUrlSecrets(siteName, origin),
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr("sakuracloud_webaccel.foobar", "name", siteName),
+					resource.TestCheckResourceAttr("sakuracloud_webaccel.foobar", "origin_parameters.0.type", "web"),
+					resource.TestCheckResourceAttr("sakuracloud_webaccel.foobar", "origin_parameters.0.origin", origin),
+					resource.TestCheckResourceAttr("sakuracloud_webaccel.foobar", "onetime_url_secrets.0", "sample-secret"),
+				),
+			},
+		},
+	})
+}
+
 func TestAccSakuraCloudResourceWebAccel_WebOriginWithCORS(t *testing.T) {
 	skipIfFakeModeEnabled(t)
 
@@ -326,6 +362,29 @@ resource sakuracloud_webaccel "foobar" {
   vary_support = true
   default_cache_ttl = 3600
   normalize_ae = "br+gzip"
+}
+`
+	return fmt.Sprintf(tmpl, siteName, origin, origin)
+}
+
+func testAccCheckSakuraCloudWebAccelWebOriginConfigWithOneTimeUrlSecrets(siteName string, origin string) string {
+	tmpl := `
+resource sakuracloud_webaccel "foobar" {
+  name = "%s"
+  domain_type = "subdomain"
+  request_protocol = "http+https"
+  origin_parameters {
+    type = "web"
+    origin = "%s"
+    host_header = "%s"
+    protocol = "https"
+  }
+  onetime_url_secrets = [
+    "sample-secret"
+  ]
+  vary_support = true
+  default_cache_ttl = 3600
+  normalize_ae = "gzip"
 }
 `
 	return fmt.Sprintf(tmpl, siteName, origin, origin)

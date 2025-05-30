@@ -281,15 +281,15 @@ func resourceSakuraCloudWebAccelCreate(ctx context.Context, d *schema.ResourceDa
 	} else {
 		reqUpd.CORSRules = &[]*webaccel.CORSRule{}
 	}
+	//onetime url secret
 	if hasOnetimeUrlSecret {
 		reqUpd.OnetimeURLSecrets = expandWebAccelOnetimeUrlSecrets(d)
 	} else {
 		reqUpd.OnetimeURLSecrets = &[]string{}
 	}
 
-	//onetime url secret
 	if hasSiteUpdatingArguments {
-		_, err = newOp.Update(ctx, res.ID, &webaccel.UpdateSiteRequest{CORSRules: &[]*webaccel.CORSRule{corsRule}})
+		_, err = newOp.Update(ctx, res.ID, reqUpd)
 		if err != nil {
 			return diag.FromErr(err)
 		}
