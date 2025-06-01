@@ -174,7 +174,7 @@ func dataSourceSakuraCloudWebAccel() *schema.Resource {
 			},
 			"cors_rules": {
 				Type:     schema.TypeSet,
-				Optional: true,
+				Computed: true,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
 						"allow_all": {
