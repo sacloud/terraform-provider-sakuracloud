@@ -268,6 +268,7 @@ func TestAccSakuraCloudResourceWebAccel_BucketOrigin(t *testing.T) {
 					resource.TestCheckResourceAttr("sakuracloud_webaccel.foobar", "origin_parameters.0.s3_bucket_name", bucketName),
 					resource.TestCheckResourceAttr("sakuracloud_webaccel.foobar", "origin_parameters.0.s3_access_key_id", accessKey),
 					resource.TestCheckResourceAttr("sakuracloud_webaccel.foobar", "origin_parameters.0.s3_secret_access_key", secretKey),
+					resource.TestCheckResourceAttr("sakuracloud_webaccel.foobar", "origin_parameters.0.s3_doc_index", "true"),
 				),
 			},
 		},
@@ -420,7 +421,7 @@ resource sakuracloud_webaccel "foobar" {
 	return fmt.Sprintf(tmpl, siteName, origin, origin)
 }
 
-func testAccCheckSakuraCloudWebAccelBucketOriginConfig(siteName string, s3_endpoint string, region string, bucketName string, accessKey string, accessSecret string) string {
+func testAccCheckSakuraCloudWebAccelBucketOriginConfig(siteName string, s3Endpoint string, region string, bucketName string, accessKey string, accessSecret string) string {
 	tmpl := `
 resource sakuracloud_webaccel "foobar" {
   name = "%s"
@@ -433,12 +434,13 @@ resource sakuracloud_webaccel "foobar" {
     s3_bucket_name = "%s"
     s3_access_key_id = "%s"
     s3_secret_access_key = "%s"
+    s3_doc_index = true
   }
   default_cache_ttl = 3600
   normalize_ae = "br+gzip"
 }
 `
-	return fmt.Sprintf(tmpl, siteName, s3_endpoint, region, bucketName, accessKey, accessSecret)
+	return fmt.Sprintf(tmpl, siteName, s3Endpoint, region, bucketName, accessKey, accessSecret)
 }
 
 func testAccCheckSakuraCloudWebAccelWebOriginLoggingConfig(siteName string, origin string, bucketName string, accessKey string, secretKey string) string {

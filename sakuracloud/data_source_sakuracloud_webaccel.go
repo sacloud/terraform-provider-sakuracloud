@@ -88,6 +88,16 @@ func dataSourceSakuraCloudWebAccel() *schema.Resource {
 							Type:     schema.TypeString,
 							Computed: true,
 						},
+						//NOTE: blank value
+						"s3_access_key_id": {
+							Type:     schema.TypeString,
+							Computed: true,
+						},
+						//NOTE: blank value
+						"s3_secret_access_key": {
+							Type:     schema.TypeString,
+							Computed: true,
+						},
 						"s3_doc_index": {
 							Type:     schema.TypeBool,
 							Computed: true,
@@ -243,6 +253,8 @@ func dataSourceSakuraCloudWebAccelSiteRead(ctx context.Context, d *schema.Resour
 	}
 	d.Set("request_protocol", rp)
 	d.Set("has_certificate", data.HasCertificate)
+
+	//TODO: `origin_parameters.host_header`フィールドと等価であるため、将来的に廃止を検討する。
 	d.Set("host_header", data.HostHeader)
 	d.Set("status", data.Status)
 	originParams, err := flattenWebAccelOriginParameters(d, data)

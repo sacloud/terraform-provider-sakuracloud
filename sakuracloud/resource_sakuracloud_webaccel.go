@@ -67,7 +67,6 @@ func resourceSakuraCloudWebAccel() *schema.Resource {
 			"origin_parameters": {
 				Type:        schema.TypeSet,
 				Required:    true,
-				Computed:    false,
 				Description: "origin parameters of the site",
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{

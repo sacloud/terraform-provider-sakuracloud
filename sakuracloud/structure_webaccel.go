@@ -51,6 +51,9 @@ func flattenWebAccelOriginParameters(d resourceValueGettable, site *webaccel.Sit
 		} else if originParams["s3_secret_access_key"], ok = v.(string); !ok {
 			return nil, fmt.Errorf("the origin parameter should be string: [s3_secret_access_key]")
 		}
+		if v, ok := presetOriginParams.GetOk("s3_doc_index"); ok && v.(bool) {
+			originParams["s3_doc_index"] = true
+		}
 	default:
 		return nil, fmt.Errorf("unknown origin type: %s", site.OriginType)
 	}
@@ -117,6 +120,7 @@ func expandWebAccelOriginParamsForCreation(d resourceValueGettable) (*webaccel.C
 	req.BucketName = originParams.BucketName
 	req.AccessKeyID = originParams.AccessKeyID
 	req.SecretAccessKey = originParams.SecretAccessKey
+	req.DocIndex = originParams.DocIndex
 
 	return req, nil
 }
