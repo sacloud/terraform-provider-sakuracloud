@@ -215,6 +215,8 @@ func resourceSakuraCloudWebAccelCreate(ctx context.Context, d *schema.ResourceDa
 
 	req := new(webaccel.CreateSiteRequest)
 	if _, ok := d.GetOk("origin_parameters"); !ok {
+		// NOTE: `origin_parameters`は必須フィールドです。
+		// この行が実行された場合、スキーマ定義が不正に変更されたか、schema.ResourceDataの誤った処理が混入している可能性があります。
 		panic("provider bug: no origin parameters found")
 	}
 
@@ -394,7 +396,7 @@ func resourceSakuraCloudWebAccelUpdate(ctx context.Context, d *schema.ResourceDa
 		}
 
 		//cors
-		if _, hasCorsRule := d.GetOk("cors_rules"); hasCorsRule {
+		if _, ok := d.GetOk("cors_rules"); ok {
 			corsRule, err := expandWebAccelCORSParameters(d)
 			if err != nil {
 				return diag.FromErr(err)

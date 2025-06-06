@@ -66,12 +66,12 @@ func flattenWebAccelCorsRules(data []*webaccel.CORSRule) ([]interface{}, error) 
 		return nil, nil
 	case 1:
 		rule := data[0]
-		if rule.AllowsAnyOrigin == true && len(rule.AllowedOrigins) != 0 {
+		if rule.AllowsAnyOrigin && len(rule.AllowedOrigins) != 0 {
 			return nil, fmt.Errorf("allow_all and allowed_origins should not be specified together")
 		}
 		// NOTE: resourceのRead系処理では `cors_rules` を指定しない場合には値を代入しない。
 		// これにより、レスポンス内のデフォルト値を無視することができ、差分が発生することを防ぐ。
-		if rule.AllowsAnyOrigin == false && len(rule.AllowedOrigins) == 0 {
+		if !rule.AllowsAnyOrigin && len(rule.AllowedOrigins) == 0 {
 			return nil, nil
 		}
 		corsRuleParams := make(map[string]interface{})
@@ -306,7 +306,7 @@ func mapWebAccelNormalizeAE(site *webaccel.Site) (string, error) {
 		return "", fmt.Errorf("invalid normalize_ae parameter: '%s'", site.NormalizeAE)
 	}
 	//NOTE: APIが返却するデフォルト値は""。
-	// このフィールドでで "gzip" と "" が持つ効果は同一であるため、
+	// このフィールドで "gzip" と "" が持つ効果は同一であるため、
 	// "gzip" として正規化する
 	return "gzip", nil
 }
