@@ -21,12 +21,11 @@ data "sakuracloud_archive" "foobar" {
 
 * `filter` - (Optional) One or more values used for filtering, as defined below.
 * `os_type` - (Optional) The criteria used to filter SakuraCloud archives. This must be one of following:  
-  - **CentOS**: [`centos`/`centos7`]  
   - **AlmaLinux**: [`almalinux`/`almalinux8`/`almalinux9`]
   - **RockyLinux**: [`rockylinux`/`rockylinux8`/`rockylinux9`]
   - **MIRACLE LINUX**[`miracle`/`miraclelinux`/`miracle8`/`miraclelinux8`/`miracle9`/`miraclelinux9`]
-  - **Ubuntu**: [`ubuntu`/`ubuntu2204`/`ubuntu2004`/`ubuntu1804`]
-  - **Debian**: [`debian`/`debian10`/`debian11`]  
+  - **Ubuntu**: [`ubuntu`/`ubuntu2404`/`ubuntu2204`]
+  - **Debian**: [`debian`/`debian12`/`debian11`]
   - **Kusanagi**: `kusanagi`  
 * `zone` - (Optional) The name of zone that the Archive is in (e.g. `is1a`, `tk1a`).
 

@@ -164,15 +164,15 @@ func validateSourceSharedKey(v interface{}, k string) ([]string, []error) {
 
 func validateAutoScaleConfig(v interface{}, k string) ([]string, []error) {
 	var ws []string
-	var errors []error
+	var errs []error
 
 	value := v.(string)
 	config := autoScaler.Config{}
 	err := yaml.UnmarshalWithOptions([]byte(value), &config, yaml.Strict())
 	if err != nil {
-		errors = append(errors, fmt.Errorf(yaml.FormatError(err, false, true)))
+		errs = append(errs, errors.New(yaml.FormatError(err, false, true)))
 	}
-	return ws, errors
+	return ws, errs
 }
 
 func validateHostName() schema.SchemaValidateDiagFunc {

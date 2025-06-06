@@ -14,7 +14,7 @@ Manages a SakuraCloud Disk.
 
 ```hcl
 data "sakuracloud_archive" "ubuntu" {
-  os_type = "ubuntu2004"
+  os_type = "ubuntu"
 }
 
 resource "sakuracloud_disk" "foobar" {
