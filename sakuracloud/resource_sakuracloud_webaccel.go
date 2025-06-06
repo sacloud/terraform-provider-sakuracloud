@@ -361,8 +361,6 @@ func resourceSakuraCloudWebAccelUpdate(ctx context.Context, d *schema.ResourceDa
 		"normalize_ae",
 	}
 	if d.HasChanges(siteUpdatingArguments...) {
-		reqUpd := new(webaccel.UpdateSiteRequest)
-
 		//map origin params into the request
 		reqUpd, err := expandWebAccelOriginParametersForUpdate(d)
 		if err != nil {
