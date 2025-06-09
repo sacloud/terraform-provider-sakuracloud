@@ -163,13 +163,13 @@ func resourceSakuraCloudPrivateHostDelete(ctx context.Context, d *schema.Resourc
 }
 
 func setPrivateHostResourceData(ctx context.Context, d *schema.ResourceData, client *APIClient, data *iaas.PrivateHost) diag.Diagnostics {
-	d.Set("name", data.Name)                             // nolint
-	d.Set("class", data.PlanClass)                       // nolint
-	d.Set("icon_id", data.IconID.String())               // nolint
-	d.Set("description", data.Description)               // nolint
-	d.Set("hostname", data.GetHostName())                // nolint
-	d.Set("assigned_core", data.GetAssignedCPU())        // nolint
-	d.Set("assigned_memory", data.GetAssignedMemoryGB()) // nolint
-	d.Set("zone", getZone(d, client))                    // nolint
+	d.Set("name", data.Name)                             //nolint
+	d.Set("class", data.PlanClass)                       //nolint
+	d.Set("icon_id", data.IconID.String())               //nolint
+	d.Set("description", data.Description)               //nolint
+	d.Set("hostname", data.GetHostName())                //nolint
+	d.Set("assigned_core", data.GetAssignedCPU())        //nolint
+	d.Set("assigned_memory", data.GetAssignedMemoryGB()) //nolint
+	d.Set("zone", getZone(d, client))                    //nolint
 	return diag.FromErr(d.Set("tags", flattenTags(data.Tags)))
 }

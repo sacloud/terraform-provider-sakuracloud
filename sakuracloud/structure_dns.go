@@ -107,7 +107,7 @@ func expandDNSRecord(d resourceValueGettable) *iaas.DNSRecord {
 		}
 		rdata := value.(string)
 		if rdata != "" && !strings.HasSuffix(rdata, ".") {
-			rdata = rdata + "."
+			rdata += "."
 		}
 		return &iaas.DNSRecord{
 			Name:  name.(string),
@@ -130,7 +130,7 @@ func expandDNSRecord(d resourceValueGettable) *iaas.DNSRecord {
 		}
 		rdata := value.(string)
 		if rdata != "" && !strings.HasSuffix(rdata, ".") {
-			rdata = rdata + "."
+			rdata += "."
 		}
 		return &iaas.DNSRecord{
 			Name:  name.(string),
@@ -150,7 +150,7 @@ func expandDNSRecord(d resourceValueGettable) *iaas.DNSRecord {
 
 func expandDNSRecordCreateRequest(d *schema.ResourceData, dns *iaas.DNS) (*iaas.DNSRecord, *iaas.DNSUpdateSettingsRequest) {
 	record := expandDNSRecord(d)
-	records := append(dns.Records, record)
+	records := append(dns.Records, record) //nolint:gocritic
 
 	return record, &iaas.DNSUpdateSettingsRequest{
 		Records:      records,

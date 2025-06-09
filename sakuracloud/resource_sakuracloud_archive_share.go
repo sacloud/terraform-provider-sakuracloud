@@ -78,8 +78,8 @@ func resourceSakuraCloudArchiveShareCreate(ctx context.Context, d *schema.Resour
 	}
 
 	d.SetId(archive.ID.String())
-	d.Set("share_key", shareInfo.SharedKey)
-	d.Set("zone", zone)
+	d.Set("share_key", shareInfo.SharedKey) //nolint:errcheck,gosec
+	d.Set("zone", zone)                     //nolint:errcheck,gosec
 	return nil
 }
 
@@ -106,8 +106,8 @@ func resourceSakuraCloudArchiveShareRead(ctx context.Context, d *schema.Resource
 	}
 
 	d.SetId(archive.ID.String())
-	d.Set("share_key", d.Get("share_key").(string))
-	d.Set("zone", zone)
+	d.Set("share_key", d.Get("share_key").(string)) //nolint:errcheck,gosec
+	d.Set("zone", zone)                             //nolint:errcheck,gosec
 	return nil
 }
 

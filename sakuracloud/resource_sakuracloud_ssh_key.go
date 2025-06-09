@@ -135,9 +135,9 @@ func resourceSakuraCloudSSHKeyDelete(ctx context.Context, d *schema.ResourceData
 }
 
 func setSSHKeyResourceData(_ context.Context, d *schema.ResourceData, _ *APIClient, data *iaas.SSHKey) diag.Diagnostics {
-	d.Set("name", data.Name)               // nolint
-	d.Set("public_key", data.PublicKey)    // nolint
-	d.Set("fingerprint", data.Fingerprint) // nolint
-	d.Set("description", data.Description) // nolint
+	d.Set("name", data.Name)               //nolint
+	d.Set("public_key", data.PublicKey)    //nolint
+	d.Set("fingerprint", data.Fingerprint) //nolint
+	d.Set("description", data.Description) //nolint
 	return nil
 }

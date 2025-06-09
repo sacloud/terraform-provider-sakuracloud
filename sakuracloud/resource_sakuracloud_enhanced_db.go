@@ -181,15 +181,15 @@ func resourceSakuraCloudEnhancedDBDelete(ctx context.Context, d *schema.Resource
 }
 
 func setEnhancedDBResourceData(ctx context.Context, d *schema.ResourceData, client *APIClient, data *builder.EnhancedDB, includePassword bool) diag.Diagnostics {
-	d.Set("name", data.Name)               // nolint
-	d.Set("icon_id", data.IconID.String()) // nolint
-	d.Set("description", data.Description) // nolint
+	d.Set("name", data.Name)               //nolint
+	d.Set("icon_id", data.IconID.String()) //nolint
+	d.Set("description", data.Description) //nolint
 
-	d.Set("database_type", data.DatabaseType)            // nolint
-	d.Set("database_name", data.DatabaseName)            // nolint
-	d.Set("region", data.Region)                         // nolint
-	d.Set("hostname", data.HostName)                     // nolint
-	d.Set("max_connections", data.Config.MaxConnections) // nolint
+	d.Set("database_type", data.DatabaseType)            //nolint
+	d.Set("database_name", data.DatabaseName)            //nolint
+	d.Set("region", data.Region)                         //nolint
+	d.Set("hostname", data.HostName)                     //nolint
+	d.Set("max_connections", data.Config.MaxConnections) //nolint
 
 	if err := d.Set("allowed_networks", data.Config.AllowedNetworks); err != nil {
 		return diag.FromErr(err)

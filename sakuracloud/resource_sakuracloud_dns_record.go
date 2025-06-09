@@ -149,23 +149,23 @@ func resourceSakuraCloudDNSRecordRead(ctx context.Context, d *schema.ResourceDat
 		return nil
 	}
 
-	d.Set("name", record.Name)          // nolint
-	d.Set("type", record.Type.String()) // nolint
-	d.Set("value", record.RData)        // nolint
-	d.Set("ttl", record.TTL)            // nolint
+	d.Set("name", record.Name)          //nolint
+	d.Set("type", record.Type.String()) //nolint
+	d.Set("value", record.RData)        //nolint
+	d.Set("ttl", record.TTL)            //nolint
 
 	switch record.Type {
 	case "MX":
 		// ex. record.RData = "10 example.com."
 		values := strings.SplitN(record.RData, " ", 2)
-		d.Set("value", values[1])               // nolint
-		d.Set("priority", forceAtoI(values[0])) // nolint
+		d.Set("value", values[1])               //nolint
+		d.Set("priority", forceAtoI(values[0])) //nolint
 	case "SRV":
 		values := strings.SplitN(record.RData, " ", 4)
-		d.Set("value", values[3])               // nolint
-		d.Set("priority", forceAtoI(values[0])) // nolint
-		d.Set("weight", forceAtoI(values[1]))   // nolint
-		d.Set("port", forceAtoI(values[2]))     // nolint
+		d.Set("value", values[3])               //nolint
+		d.Set("priority", forceAtoI(values[0])) //nolint
+		d.Set("weight", forceAtoI(values[1]))   //nolint
+		d.Set("port", forceAtoI(values[2]))     //nolint
 	}
 	return nil
 }

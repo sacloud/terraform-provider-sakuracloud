@@ -306,7 +306,7 @@ func flattenVPCRouterDHCPServers(vpcRouter *iaas.VPCRouter) []interface{} {
 }
 
 func vpcRouterInterfaceNameToIndex(ifName string) int {
-	strIndex := strings.Replace(ifName, "eth", "", -1)
+	strIndex := strings.ReplaceAll(ifName, "eth", "")
 	index, err := strconv.Atoi(strIndex)
 	if err != nil {
 		return -1

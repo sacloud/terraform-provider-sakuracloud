@@ -98,10 +98,10 @@ func dataSourceSakuraCloudServerVNCInfoRead(ctx context.Context, d *schema.Resou
 	}
 
 	d.SetId(serverID.String())
-	d.Set("server_id", serverID.String()) // nolint
-	d.Set("host", data.IOServerHost)      // nolint
-	d.Set("port", data.Port.Int())        // nolint
-	d.Set("password", data.Password)      // nolint
-	d.Set("zone", zone)                   // nolint
+	d.Set("server_id", serverID.String()) //nolint
+	d.Set("host", data.IOServerHost)      //nolint
+	d.Set("port", data.Port.Int())        //nolint
+	d.Set("password", data.Password)      //nolint
+	d.Set("zone", zone)                   //nolint
 	return nil
 }

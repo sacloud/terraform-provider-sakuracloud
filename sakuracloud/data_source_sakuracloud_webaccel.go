@@ -238,43 +238,43 @@ func dataSourceSakuraCloudWebAccelSiteRead(ctx context.Context, d *schema.Resour
 	}
 
 	d.SetId(data.ID)
-	d.Set("name", data.Name)
-	d.Set("domain", data.Domain)
-	d.Set("site_id", data.ID)
+	d.Set("name", data.Name)     //nolint:errcheck,gosec
+	d.Set("domain", data.Domain) //nolint:errcheck,gosec
+	d.Set("site_id", data.ID)    //nolint:errcheck,gosec
 
 	//TODO: `origin_parameters.origin`フィールドと等価であるため、将来的に廃止を検討する。
-	d.Set("origin", data.Origin)
+	d.Set("origin", data.Origin) //nolint:errcheck,gosec
 
-	d.Set("subdomain", data.Subdomain)
-	d.Set("domain_type", data.DomainType)
+	d.Set("subdomain", data.Subdomain)    //nolint:errcheck,gosec
+	d.Set("domain_type", data.DomainType) //nolint:errcheck,gosec
 	rp, err := mapWebAccelRequestProtocol(data)
 	if err != nil {
 		return diag.FromErr(err)
 	}
-	d.Set("request_protocol", rp)
-	d.Set("has_certificate", data.HasCertificate)
+	d.Set("request_protocol", rp)                 //nolint:errcheck,gosec
+	d.Set("has_certificate", data.HasCertificate) //nolint:errcheck,gosec
 
 	//TODO: `origin_parameters.host_header`フィールドと等価であるため、将来的に廃止を検討する。
-	d.Set("host_header", data.HostHeader)
-	d.Set("status", data.Status)
+	d.Set("host_header", data.HostHeader) //nolint:errcheck,gosec
+	d.Set("status", data.Status)          //nolint:errcheck,gosec
 	originParams, err := flattenWebAccelOriginParameters(d, data)
 	if err != nil {
 		return diag.FromErr(err)
 	}
-	d.Set("origin_parameters", originParams)
+	d.Set("origin_parameters", originParams) //nolint:errcheck,gosec
 	cors, err := flattenWebAccelCorsRules(data.CORSRules)
 	if err != nil {
 		return diag.FromErr(err)
 	}
-	d.Set("cors_rules", cors)
-	d.Set("cname_record_value", data.Subdomain+".")
-	d.Set("txt_record_value", fmt.Sprintf("webaccel=%s", data.Subdomain))
-	d.Set("vary_support", data.VarySupport == webaccel.VarySupportEnabled)
+	d.Set("cors_rules", cors)                                              //nolint:errcheck,gosec
+	d.Set("cname_record_value", data.Subdomain+".")                        //nolint:errcheck,gosec
+	d.Set("txt_record_value", fmt.Sprintf("webaccel=%s", data.Subdomain))  //nolint:errcheck,gosec
+	d.Set("vary_support", data.VarySupport == webaccel.VarySupportEnabled) //nolint:errcheck,gosec
 	ae, err := mapWebAccelNormalizeAE(data)
 	if err != nil {
 		return diag.FromErr(err)
 	}
-	d.Set("normalize_ae", ae)
+	d.Set("normalize_ae", ae) //nolint:errcheck,gosec
 	return nil
 }
 
@@ -292,6 +292,6 @@ func dataSourceSakuraCloudWebAccelLogUploadConfigRead(ctx context.Context, d *sc
 	if err != nil {
 		return diag.FromErr(err)
 	}
-	d.Set("logging", flattenWebAccelLogUploadConfigData(logCfg))
+	d.Set("logging", flattenWebAccelLogUploadConfigData(logCfg)) //nolint:errcheck,gosec
 	return nil
 }

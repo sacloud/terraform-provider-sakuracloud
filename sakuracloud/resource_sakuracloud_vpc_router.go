@@ -798,21 +798,21 @@ func setVPCRouterResourceData(ctx context.Context, d *schema.ResourceData, zone 
 		return diag.Errorf("got unexpected state: VPCRouter[%d].Availability is failed", data.ID)
 	}
 
-	d.Set("name", data.Name)               // nolint
-	d.Set("icon_id", data.IconID.String()) // nolint
-	d.Set("description", data.Description) // nolint
+	d.Set("name", data.Name)               //nolint
+	d.Set("icon_id", data.IconID.String()) //nolint
+	d.Set("description", data.Description) //nolint
 	if err := d.Set("tags", flattenTags(data.Tags)); err != nil {
 		return diag.FromErr(err)
 	}
-	d.Set("plan", flattenVPCRouterPlan(data))                           // nolint
-	d.Set("public_ip", flattenVPCRouterGlobalAddress(data))             // nolint
-	d.Set("public_netmask", flattenVPCRouterGlobalNetworkMaskLen(data)) // nolint
+	d.Set("plan", flattenVPCRouterPlan(data))                           //nolint
+	d.Set("public_ip", flattenVPCRouterGlobalAddress(data))             //nolint
+	d.Set("public_netmask", flattenVPCRouterGlobalNetworkMaskLen(data)) //nolint
 	if err := d.Set("public_network_interface", flattenVPCRouterPublicNetworkInterface(data)); err != nil {
 		return diag.FromErr(err)
 	}
 
-	d.Set("syslog_host", data.Settings.SyslogHost)                               // nolint
-	d.Set("internet_connection", data.Settings.InternetConnectionEnabled.Bool()) // nolint
+	d.Set("syslog_host", data.Settings.SyslogHost)                               //nolint
+	d.Set("internet_connection", data.Settings.InternetConnectionEnabled.Bool()) //nolint
 	if err := d.Set("private_network_interface", flattenVPCRouterInterfaces(data)); err != nil {
 		return diag.FromErr(err)
 	}
@@ -867,6 +867,6 @@ func setVPCRouterResourceData(ctx context.Context, d *schema.ResourceData, zone 
 	if err := d.Set("scheduled_maintenance", flattenVPCRouterScheduledMaintenance(data)); err != nil {
 		return diag.FromErr(err)
 	}
-	d.Set("zone", getZone(d, client)) // nolint
+	d.Set("zone", getZone(d, client)) //nolint
 	return nil
 }

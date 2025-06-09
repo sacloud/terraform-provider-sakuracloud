@@ -16,6 +16,7 @@ package sakuracloud
 
 import (
 	"context"
+
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/sacloud/webaccel-api-go"
@@ -64,7 +65,7 @@ func resourceSakuraCloudWebAccelActivationCreate(ctx context.Context, d *schema.
 		return diag.FromErr(err)
 	}
 
-	//for avoiding status update confliction
+	// for avoiding status update confliction
 	if statusString == site.Status {
 		return resourceSakuraCloudWebAccelActivationRead(ctx, d, meta)
 	}
@@ -134,6 +135,6 @@ func resourceSakuraCloudWebAccelActivationDelete(ctx context.Context, d *schema.
 
 func setWebAccelActivationResourceData(d *schema.ResourceData, client *APIClient, data *webaccel.Site) diag.Diagnostics {
 	d.SetId(data.ID)
-	d.Set("enabled", data.Status == "enabled") // nolint
+	d.Set("enabled", data.Status == "enabled") //nolint
 	return nil
 }

@@ -183,6 +183,6 @@ func resourceSakuraCloudPacketFilterRulesDelete(ctx context.Context, d *schema.R
 }
 
 func setPacketFilterRulesResourceData(ctx context.Context, d *schema.ResourceData, client *APIClient, data *iaas.PacketFilter) diag.Diagnostics {
-	d.Set("zone", getZone(d, client)) // nolint
+	d.Set("zone", getZone(d, client)) //nolint
 	return diag.FromErr(d.Set("expression", flattenPacketFilterExpressions(data)))
 }
