@@ -139,6 +139,21 @@ func mapFromFirstElement(d resourceValueGettable, key string) resourceValueGetta
 	return nil
 }
 
+func mapFromSet(d resourceValueGettable, key string) (resourceValueGettable, error) {
+	if v, ok := d.GetOk(key); ok {
+		set, ok := v.(*schema.Set)
+		if !ok {
+			return nil, fmt.Errorf("expected set, found %T", v)
+		}
+		if len(set.List()) == 0 {
+			//NOTE: 空のSetを許容しない
+			panic("invalid state: empty list")
+		}
+		return mapToResourceData(set.List()[0].(map[string]interface{})), nil
+	}
+	return nil, fmt.Errorf("no such field %q", key)
+}
+
 func sakuraCloudClient(d resourceValueGettable, meta interface{}) (*APIClient, string, error) {
 	client := meta.(*APIClient)
 	zone := getZone(d, client)
