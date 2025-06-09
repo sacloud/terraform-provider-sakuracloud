@@ -6,7 +6,7 @@ toolchain go1.24.1
 
 require (
 	github.com/goccy/go-yaml v1.11.3
-	github.com/hashicorp/go-cty v1.4.1-0.20200414143053-d3edf31b6320
+	github.com/hashicorp/go-cty v1.5.0
 	github.com/hashicorp/go-multierror v1.1.1
 	github.com/hashicorp/terraform-plugin-go v0.16.0
 	github.com/hashicorp/terraform-plugin-mux v0.10.0
