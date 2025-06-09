@@ -1,7 +1,8 @@
 # CHANGELOG
 
-## 2.27.0 (Unreleased)
+## 2.27.0 (2025/06/09)
 
+- resource_webaccel および resource_webaccel_activation を実装 (#1250)
 - go: bump golang.org/x/net from 0.33.0 to 0.38.0 (#1242)
 - iaas-api-go v1.15.0 (#1245)
 - Update GitHub Actions matrix to use Ubuntu 24.04 (#1244)
