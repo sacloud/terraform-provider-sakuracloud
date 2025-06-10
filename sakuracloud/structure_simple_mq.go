@@ -49,10 +49,10 @@ func expandSimpleMQUpdateRequest(d *schema.ResourceData, before *queue.CommonSer
 	}
 
 	if vts, ok := d.GetOk("visibility_timeout_seconds"); ok {
-		req.CommonServiceItem.Settings.VisibilityTimeoutSeconds = vts.(int)
+		req.CommonServiceItem.Settings.VisibilityTimeoutSeconds = queue.VisibilityTimeoutSeconds(vts.(int))
 	}
 	if es, ok := d.GetOk("expire_seconds"); ok {
-		req.CommonServiceItem.Settings.ExpireSeconds = es.(int)
+		req.CommonServiceItem.Settings.ExpireSeconds = queue.ExpireSeconds(es.(int))
 	}
 	if desc, ok := d.GetOk("description"); ok {
 		req.CommonServiceItem.Description = queue.NewOptString(desc.(string))

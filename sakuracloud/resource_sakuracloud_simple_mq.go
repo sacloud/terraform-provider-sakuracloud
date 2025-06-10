@@ -16,19 +16,15 @@ package sakuracloud
 
 import (
 	"context"
-	"regexp"
 	"strconv"
 	"time"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
-	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
 	"github.com/sacloud/simplemq-api-go"
 	"github.com/sacloud/simplemq-api-go/apis/v1/queue"
 	"github.com/sacloud/terraform-provider-sakuracloud/internal/desc"
 )
-
-var queueNameRegex = regexp.MustCompile("^[0-9a-zA-Z]+(-[0-9a-zA-Z]+)*$")
 
 func resourceSakuraCloudSimpleMQ() *schema.Resource {
 	resourceName := "SimpleMQ"
@@ -50,25 +46,31 @@ func resourceSakuraCloudSimpleMQ() *schema.Resource {
 
 		Schema: map[string]*schema.Schema{
 			"name": {
-				Type:             schema.TypeString,
-				Required:         true,
-				ForceNew:         true,
-				ValidateDiagFunc: validation.ToDiagFunc(validation.StringMatch(queueNameRegex, "name")),
-				Description:      desc.Sprintf("The name of the %s. %s", resourceName, queueNameRegex),
+				Type:     schema.TypeString,
+				Required: true,
+				ForceNew: true,
+				ValidateDiagFunc: validateWithCustomFunc(func(v string) error {
+					return queue.QueueName(v).Validate()
+				}),
+				Description: desc.Sprintf("The name of the %s.", resourceName),
 			},
 			"visibility_timeout_seconds": {
-				Type:             schema.TypeInt,
-				Optional:         true,
-				Default:          30,
-				ValidateDiagFunc: validation.ToDiagFunc(validation.IntBetween(5, 900)),
-				Description:      "The duration in seconds that a message is invisible to others after being read from a queue. Default is 30 seconds.",
+				Type:     schema.TypeInt,
+				Optional: true,
+				Default:  30,
+				ValidateDiagFunc: validateWithCustomFunc(func(v int) error {
+					return queue.VisibilityTimeoutSeconds(v).Validate()
+				}),
+				Description: "The duration in seconds that a message is invisible to others after being read from a queue. Default is 30 seconds.",
 			},
 			"expire_seconds": {
-				Type:             schema.TypeInt,
-				Optional:         true,
-				Default:          345600,
-				ValidateDiagFunc: validation.ToDiagFunc(validation.IntBetween(60, 1209600)),
-				Description:      "The duration in seconds that a message is stored in a queue. Default is 345600 seconds (4 days).",
+				Type:     schema.TypeInt,
+				Optional: true,
+				Default:  345600,
+				ValidateDiagFunc: validateWithCustomFunc(func(v int) error {
+					return queue.ExpireSeconds(v).Validate()
+				}),
+				Description: "The duration in seconds that a message is stored in a queue. Default is 345600 seconds (4 days).",
 			},
 			"description": schemaResourceDescription(resourceName),
 			"tags":        schemaResourceTags(resourceName),
