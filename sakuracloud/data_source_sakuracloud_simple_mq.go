@@ -18,7 +18,6 @@ import (
 	"context"
 	"fmt"
 	"slices"
-	"strconv"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
@@ -86,21 +85,7 @@ func dataSourceSakuraCloudSimpleMQRead(ctx context.Context, d *schema.ResourceDa
 		return diag.FromErr(err)
 	}
 
-	d.SetId(simplemq.GetQueueID(data))
-	d.Set("name", simplemq.GetQueueName(data))
-	d.Set("description", data.Description.Value.String)
-	d.Set("tags", data.Tags)
-	d.Set("visibility_timeout_seconds", data.Settings.VisibilityTimeoutSeconds)
-	d.Set("expire_seconds", data.Settings.ExpireSeconds)
-	if iconID, ok := data.Icon.Value.Icon1.ID.Get(); !ok {
-		id, ok := iconID.GetString()
-		if !ok {
-			id = strconv.Itoa(iconID.Int)
-		}
-		d.Set("icon_id", id)
-	}
-
-	return nil
+	return setSimpleMQResourceData(d, data)
 }
 
 func filterSimpleMQByNameOrTags(qs []queue.CommonServiceItem, name string, tags []any) (*queue.CommonServiceItem, error) {

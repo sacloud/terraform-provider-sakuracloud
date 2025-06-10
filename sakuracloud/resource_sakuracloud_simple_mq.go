@@ -150,6 +150,7 @@ func resourceSakuraCloudSimpleMQDelete(ctx context.Context, d *schema.ResourceDa
 }
 
 func setSimpleMQResourceData(d *schema.ResourceData, data *queue.CommonServiceItem) diag.Diagnostics {
+	d.SetId(simplemq.GetQueueID(data))
 	d.Set("name", simplemq.GetQueueName(data))
 	d.Set("visibility_timeout_seconds", data.Settings.VisibilityTimeoutSeconds)
 	d.Set("expire_seconds", data.Settings.ExpireSeconds)
