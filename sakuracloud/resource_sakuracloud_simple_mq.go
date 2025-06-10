@@ -104,6 +104,7 @@ func resourceSakuraCloudSimpleMQRead(ctx context.Context, d *schema.ResourceData
 
 	mq, err := queueOp.Get(ctx, d.Id())
 	if err != nil {
+		d.SetId("")
 		return diag.Errorf("could not read SimpleMQ[%s]: %s", d.Id(), err)
 	}
 
@@ -138,6 +139,7 @@ func resourceSakuraCloudSimpleMQDelete(ctx context.Context, d *schema.ResourceDa
 
 	mq, err := queueOp.Get(ctx, d.Id())
 	if err != nil {
+		d.SetId("")
 		return diag.Errorf("could not read SimpleMQ[%s]: %s", d.Id(), err)
 	}
 
