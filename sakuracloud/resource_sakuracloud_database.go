@@ -91,6 +91,18 @@ func resourceSakuraCloudDatabase() *schema.Resource {
 				Sensitive:   true,
 				Description: "The password of user that processing a replication",
 			},
+			"webui": {
+				Type:        schema.TypeBool,
+				Optional:    true,
+				Description: "Whether the Web UI is enabled or not",
+				Default:     false,
+			},
+			"transparent_encryption": {
+				Type:        schema.TypeBool,
+				Optional:    true,
+				Description: desc.Sprintf("Whether the transparent encryption is enabled or not"),
+				Default:     false,
+			},
 			"network_interface": {
 				Type:     schema.TypeList,
 				Required: true,
@@ -100,10 +112,25 @@ func resourceSakuraCloudDatabase() *schema.Resource {
 					Schema: map[string]*schema.Schema{
 						"switch_id": schemaResourceSwitchID(resourceName),
 						"ip_address": {
-							Type:        schema.TypeString,
-							ForceNew:    true,
-							Required:    true,
-							Description: desc.Sprintf("The IP address to assign to the %s", resourceName),
+							Type:             schema.TypeString,
+							ForceNew:         true,
+							Required:         true,
+							ValidateDiagFunc: validateIPv4Address(),
+							Description:      desc.Sprintf("The IP address to assign to the %s", resourceName),
+						},
+						"vip": {
+							Type:             schema.TypeString,
+							ForceNew:         true,
+							Optional:         true,
+							ValidateDiagFunc: validateIPv4Address(),
+							Description:      desc.Sprintf("The virtual IP address on the database clustering"),
+						},
+						"secondary_ip_address": {
+							Type:             schema.TypeString,
+							ForceNew:         true,
+							Optional:         true,
+							ValidateDiagFunc: validateIPv4Address(),
+							Description:      desc.Sprintf("The IP address for the secondary database on clustering"),
 						},
 						"netmask": {
 							Type:             schema.TypeInt,
@@ -197,6 +224,10 @@ func resourceSakuraCloudDatabaseCreate(ctx context.Context, d *schema.ResourceDa
 	}
 
 	dbBuilder := expandDatabaseBuilder(d, client)
+	// Note: 不正な値が含まれる場合にnil
+	if dbBuilder == nil {
+		return diag.Errorf("creating SakuraCloud Database is failed: inconsistent arguments for database clustering")
+	}
 	dbBuilder.Zone = zone
 
 	db, err := dbBuilder.Build(ctx)
@@ -247,6 +278,10 @@ func resourceSakuraCloudDatabaseUpdate(ctx context.Context, d *schema.ResourceDa
 	}
 
 	dbBuilder := expandDatabaseBuilder(d, client)
+	// Note: 不正な値が含まれる場合にnil
+	if dbBuilder == nil {
+		return diag.Errorf("creating SakuraCloud Database is failed: inconsistent arguments for database clustering")
+	}
 	dbBuilder.Zone = zone
 	dbBuilder.ID = db.ID
 

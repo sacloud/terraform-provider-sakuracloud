@@ -12,7 +12,7 @@ require (
 	github.com/hashicorp/terraform-plugin-mux v0.10.0
 	github.com/hashicorp/terraform-plugin-sdk/v2 v2.27.0
 	github.com/mitchellh/go-homedir v1.1.0
-	github.com/sacloud/api-client-go v0.2.10
+	github.com/sacloud/api-client-go v0.3.0
 	github.com/sacloud/apprun-api-go v0.3.0
 	github.com/sacloud/autoscaler v0.16.1
 	github.com/sacloud/iaas-api-go v1.15.0
@@ -21,7 +21,7 @@ require (
 	github.com/sacloud/packages-go v0.0.11
 	github.com/sacloud/webaccel-api-go v1.3.0
 	github.com/stretchr/testify v1.10.0
-	golang.org/x/text v0.25.0
+	golang.org/x/text v0.26.0
 )
 
 require (
@@ -116,8 +116,8 @@ require (
 	go.opentelemetry.io/proto/otlp v1.0.0 // indirect
 	go.uber.org/ratelimit v0.3.1 // indirect
 	golang.org/x/arch v0.8.0 // indirect
-	golang.org/x/crypto v0.38.0 // indirect
-	golang.org/x/mod v0.17.0 // indirect
+	golang.org/x/crypto v0.39.0 // indirect
+	golang.org/x/mod v0.25.0 // indirect
 	golang.org/x/net v0.38.0 // indirect
 	golang.org/x/sys v0.33.0 // indirect
 	golang.org/x/xerrors v0.0.0-20220411194840-2f41105eb62f // indirect
@@ -128,3 +128,5 @@ require (
 	google.golang.org/protobuf v1.34.1 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
+
+replace github.com/sacloud/iaas-service-go => github.com/g1eng/iaas-service-go v0.0.0-20250614133212-de85e3e90bab
