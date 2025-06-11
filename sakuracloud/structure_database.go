@@ -30,6 +30,10 @@ func expandDatabaseBuilder(d *schema.ResourceData, client *APIClient) *databaseB
 	dbName := types.RDBMSTypeFromString(dbType)
 
 	nic := expandDatabaseNetworkInterface(d)
+	// Note: 不正な値が含まれる場合にnilが返却される
+	if nic == nil {
+		return nil
+	}
 
 	replicaUser := d.Get("replica_user").(string)
 	replicaPassword := d.Get("replica_password").(string)
@@ -37,7 +41,7 @@ func expandDatabaseBuilder(d *schema.ResourceData, client *APIClient) *databaseB
 	req := &databaseBuilder.Builder{
 		PlanID:         types.DatabasePlanIDMap[d.Get("plan").(string)],
 		SwitchID:       nic.switchID,
-		IPAddresses:    []string{nic.ipAddress},
+		IPAddresses:    nic.ipAddresses,
 		NetworkMaskLen: nic.netmask,
 		DefaultRoute:   nic.gateway,
 		Conf: &iaas.DatabaseRemarkDBConfCommon{
@@ -47,6 +51,7 @@ func expandDatabaseBuilder(d *schema.ResourceData, client *APIClient) *databaseB
 			UserPassword:    d.Get("password").(string),
 		},
 		CommonSetting: &iaas.DatabaseSettingCommon{
+			WebUI:           expandWebUiSetting(d),
 			ServicePort:     nic.port,
 			SourceNetwork:   nic.sourceRanges,
 			DefaultUser:     d.Get("username").(string),
@@ -62,6 +67,7 @@ func expandDatabaseBuilder(d *schema.ResourceData, client *APIClient) *databaseB
 		BackupSetting:      expandDatabaseBackupSetting(d),
 		Parameters:         d.Get("parameters").(map[string]interface{}),
 		ReplicationSetting: &iaas.DatabaseReplicationSetting{},
+		VirtualIPAddress:   nic.virtualIpAddress,
 	}
 
 	if replicaUser != "" && replicaPassword != "" {
@@ -72,6 +78,15 @@ func expandDatabaseBuilder(d *schema.ResourceData, client *APIClient) *databaseB
 		}
 	}
 	return req
+}
+
+func expandWebUiSetting(d resourceValueGettable) types.WebUI {
+	if isEnabled, ok := d.GetOk("webui"); ok {
+		return types.ToWebUI(isEnabled.(bool))
+	}
+	//Note: types.WebUI は "" もしくは "false" で無効状態を表現する
+	// デフォルトで無効であり、ここでは"false"として正規化する
+	return "false"
 }
 
 func expandDatabaseReadReplicaBuilder(ctx context.Context, d *schema.ResourceData, client *APIClient, zone string) (*databaseBuilder.Builder, error) {
@@ -109,7 +124,7 @@ func expandDatabaseReadReplicaBuilder(ctx context.Context, d *schema.ResourceDat
 		IconID:         expandSakuraCloudID(d, "icon_id"),
 		PlanID:         types.ID(masterDB.PlanID.Int64() + 1),
 		SwitchID:       sakuraCloudID(switchID),
-		IPAddresses:    []string{nic.ipAddress},
+		IPAddresses:    nic.ipAddresses,
 		NetworkMaskLen: maskLen,
 		DefaultRoute:   defaultRoute,
 		Conf: &iaas.DatabaseRemarkDBConfCommon{
@@ -174,12 +189,13 @@ func flattenDatabaseBackupSetting(db *iaas.Database) []interface{} {
 }
 
 type databaseNetworkInterface struct {
-	switchID     types.ID
-	ipAddress    string
-	netmask      int
-	gateway      string
-	port         int
-	sourceRanges []string
+	switchID         types.ID
+	ipAddresses      []string //Note: 要素を2つ以上持つ場合、冗長化オプションを有効化するものと見なす。
+	virtualIpAddress string   //Note: 冗長化オプションを有効化する場合に必須。
+	netmask          int
+	gateway          string
+	port             int
+	sourceRanges     []string
 }
 
 func expandDatabaseNetworkInterface(d resourceValueGettable) *databaseNetworkInterface {
@@ -187,14 +203,28 @@ func expandDatabaseNetworkInterface(d resourceValueGettable) *databaseNetworkInt
 	if d == nil {
 		return nil
 	}
-	return &databaseNetworkInterface{
+
+	res := &databaseNetworkInterface{
 		switchID:     expandSakuraCloudID(d, "switch_id"),
-		ipAddress:    stringOrDefault(d, "ip_address"),
+		ipAddresses:  []string{stringOrDefault(d, "ip_address")},
 		netmask:      intOrDefault(d, "netmask"),
 		gateway:      stringOrDefault(d, "gateway"),
 		port:         intOrDefault(d, "port"),
 		sourceRanges: stringListOrDefault(d, "source_ranges"),
 	}
+
+	// 冗長化設定
+	vip, hasVip := d.GetOk("vip")
+	secondaryIpAddress, hasSecondaryIpAddress := d.GetOk("secondary_ip_address")
+	if hasVip && hasSecondaryIpAddress {
+		res.virtualIpAddress = vip.(string)
+		res.ipAddresses = append(res.ipAddresses, secondaryIpAddress.(string))
+	} else if hasVip || hasSecondaryIpAddress {
+		// Note: 冗長化設定時にはVIPとセカンダリDBのIPアドレスの双方が必須。
+		// nil を返却して設定値が不正であることを通知する。
+		return nil
+	}
+	return res
 }
 
 func flattenDatabaseNetworkInterface(db *iaas.Database) []interface{} {
