@@ -106,7 +106,8 @@ func resourceSakuraCloudSimpleMQRead(ctx context.Context, d *schema.ResourceData
 
 	mq, err := queueOp.Get(ctx, d.Id())
 	if err != nil {
-		d.SetId("")
+		// TODO: simplemq-api-goで404 NotFoundかどうかのエラー判定ができるようになったら、404の時のみ`d.SetId("")`を呼ぶようにする
+		// ref: https://github.com/sacloud/terraform-provider-sakuracloud/pull/1256#discussion_r2141220479
 		return diag.Errorf("could not read SimpleMQ[%s]: %s", d.Id(), err)
 	}
 
@@ -141,7 +142,8 @@ func resourceSakuraCloudSimpleMQDelete(ctx context.Context, d *schema.ResourceDa
 
 	mq, err := queueOp.Get(ctx, d.Id())
 	if err != nil {
-		d.SetId("")
+		// TODO: simplemq-api-goで404 NotFoundかどうかのエラー判定ができるようになったら、404の時のみ`d.SetId("")`を呼ぶようにする
+		// ref: https://github.com/sacloud/terraform-provider-sakuracloud/pull/1256#discussion_r2141220479
 		return diag.Errorf("could not read SimpleMQ[%s]: %s", d.Id(), err)
 	}
 
