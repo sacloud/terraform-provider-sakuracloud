@@ -10,7 +10,7 @@ description: |-
 
 Manages a SakuraCloud SimpleMQ.
 
-!> **Warning:** Queue's API key cannot be created with Terraform. To get one, head over to [SakuraCloud Console](https://secure.sakura.ad.jp/cloud/) or use [API](https://manual.sakura.ad.jp/api/cloud/simplemq/sacloud/#operation/rotateAPIKey).
+!> **Warning:** Queue's API key cannot be created with Terraform. To get one, head over to [Control Panel](https://secure.sakura.ad.jp/cloud/) or use [API](https://manual.sakura.ad.jp/api/cloud/simplemq/sacloud/#operation/rotateAPIKey).
 
 ## Example Usage
 
