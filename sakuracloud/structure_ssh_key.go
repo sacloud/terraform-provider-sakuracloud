@@ -33,11 +33,3 @@ func expandSSHKeyUpdateRequest(d *schema.ResourceData) *iaas.SSHKeyUpdateRequest
 		Description: d.Get("description").(string),
 	}
 }
-
-func expandSSHKeyGenerateRequest(d *schema.ResourceData) *iaas.SSHKeyGenerateRequest {
-	return &iaas.SSHKeyGenerateRequest{
-		Name:        d.Get("name").(string),
-		Description: d.Get("description").(string),
-		PassPhrase:  d.Get("pass_phrase").(string),
-	}
-}
