@@ -263,14 +263,14 @@ func resourceSakuraCloudAutoScaleDelete(ctx context.Context, d *schema.ResourceD
 }
 
 func setAutoScaleResourceData(d *schema.ResourceData, client *APIClient, data *iaas.AutoScale) diag.Diagnostics {
-	d.Set("name", data.Name) // nolint
+	d.Set("name", data.Name) //nolint
 
 	if err := d.Set("zones", data.Zones); err != nil {
 		return diag.FromErr(err)
 	}
-	d.Set("config", data.Config)            // nolint
-	d.Set("api_key_id", data.APIKeyID)      // nolint
-	d.Set("trigger_type", data.TriggerType) // nolint
+	d.Set("config", data.Config)            //nolint
+	d.Set("api_key_id", data.APIKeyID)      //nolint
+	d.Set("trigger_type", data.TriggerType) //nolint
 	if err := d.Set("cpu_threshold_scaling", flattenAutoScaleCPUThresholdScaling(data.CPUThresholdScaling)); err != nil {
 		return diag.FromErr(err)
 	}
@@ -278,7 +278,7 @@ func setAutoScaleResourceData(d *schema.ResourceData, client *APIClient, data *i
 		return diag.FromErr(err)
 	}
 
-	d.Set("icon_id", data.IconID.String()) // nolint
-	d.Set("description", data.Description) // nolint
+	d.Set("icon_id", data.IconID.String()) //nolint
+	d.Set("description", data.Description) //nolint
 	return diag.FromErr(d.Set("tags", flattenTags(data.Tags)))
 }

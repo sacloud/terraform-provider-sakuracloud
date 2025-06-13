@@ -212,14 +212,14 @@ func setNFSResourceData(ctx context.Context, d *schema.ResourceData, client *API
 	if err != nil {
 		return diag.FromErr(err)
 	}
-	d.Set("plan", plan) // nolint
-	d.Set("size", size) // nolint
+	d.Set("plan", plan) //nolint
+	d.Set("size", size) //nolint
 	if err := d.Set("network_interface", flattenNFSNetworkInterface(data)); err != nil {
 		return diag.FromErr(err)
 	}
-	d.Set("name", data.Name)               // nolint
-	d.Set("icon_id", data.IconID.String()) // nolint
-	d.Set("description", data.Description) // nolint
-	d.Set("zone", getZone(d, client))      // nolint
+	d.Set("name", data.Name)               //nolint
+	d.Set("icon_id", data.IconID.String()) //nolint
+	d.Set("description", data.Description) //nolint
+	d.Set("zone", getZone(d, client))      //nolint
 	return diag.FromErr(d.Set("tags", flattenTags(data.Tags)))
 }

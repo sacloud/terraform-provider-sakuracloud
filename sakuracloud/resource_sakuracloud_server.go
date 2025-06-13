@@ -436,32 +436,32 @@ func setServerResourceData(ctx context.Context, d *schema.ResourceData, client *
 		d.SetConnInfo(connInfo)
 	}
 
-	d.Set("name", data.Name)                                // nolint
-	d.Set("core", data.CPU)                                 // nolint
-	d.Set("memory", data.GetMemoryGB())                     // nolint
-	d.Set("gpu", data.GPU)                                  // nolint
-	d.Set("cpu_model", data.ServerPlanCPUModel)             // nolint
-	d.Set("commitment", data.ServerPlanCommitment.String()) // nolint
+	d.Set("name", data.Name)                                //nolint
+	d.Set("core", data.CPU)                                 //nolint
+	d.Set("memory", data.GetMemoryGB())                     //nolint
+	d.Set("gpu", data.GPU)                                  //nolint
+	d.Set("cpu_model", data.ServerPlanCPUModel)             //nolint
+	d.Set("commitment", data.ServerPlanCommitment.String()) //nolint
 	if err := d.Set("disks", flattenServerConnectedDiskIDs(data)); err != nil {
 		return diag.FromErr(err)
 	}
-	d.Set("cdrom_id", data.CDROMID.String())                 // nolint
-	d.Set("interface_driver", data.InterfaceDriver.String()) // nolint
-	d.Set("private_host_id", data.PrivateHostID.String())    // nolint
-	d.Set("private_host_name", data.PrivateHostName)         // nolint
+	d.Set("cdrom_id", data.CDROMID.String())                 //nolint
+	d.Set("interface_driver", data.InterfaceDriver.String()) //nolint
+	d.Set("private_host_id", data.PrivateHostID.String())    //nolint
+	d.Set("private_host_name", data.PrivateHostName)         //nolint
 	if err := d.Set("network_interface", flattenServerNICs(data)); err != nil {
 		return diag.FromErr(err)
 	}
-	d.Set("icon_id", data.IconID.String()) // nolint
-	d.Set("description", data.Description) // nolint
-	d.Set("ip_address", ip)                // nolint
-	d.Set("gateway", gateway)              // nolint
-	d.Set("network_address", nwAddress)    // nolint
-	d.Set("netmask", nwMaskLen)            // nolint
-	d.Set("hostname", data.HostName)       // nolint
+	d.Set("icon_id", data.IconID.String()) //nolint
+	d.Set("description", data.Description) //nolint
+	d.Set("ip_address", ip)                //nolint
+	d.Set("gateway", gateway)              //nolint
+	d.Set("network_address", nwAddress)    //nolint
+	d.Set("netmask", nwMaskLen)            //nolint
+	d.Set("hostname", data.HostName)       //nolint
 	if err := d.Set("dns_servers", data.Zone.Region.NameServers); err != nil {
 		return diag.FromErr(err)
 	}
-	d.Set("zone", zone) // nolint
+	d.Set("zone", zone) //nolint
 	return diag.FromErr(d.Set("tags", flattenTags(data.Tags)))
 }

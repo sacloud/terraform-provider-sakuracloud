@@ -206,11 +206,11 @@ func setSwitchResourceData(ctx context.Context, d *schema.ResourceData, client *
 		}
 	}
 
-	d.Set("name", data.Name)                   // nolint
-	d.Set("icon_id", data.IconID.String())     // nolint
-	d.Set("description", data.Description)     // nolint
-	d.Set("bridge_id", data.BridgeID.String()) // nolint
-	d.Set("zone", zone)                        // nolint
+	d.Set("name", data.Name)                   //nolint
+	d.Set("icon_id", data.IconID.String())     //nolint
+	d.Set("description", data.Description)     //nolint
+	d.Set("bridge_id", data.BridgeID.String()) //nolint
+	d.Set("zone", zone)                        //nolint
 	if err := d.Set("server_ids", serverIDs); err != nil {
 		return diag.FromErr(err)
 	}

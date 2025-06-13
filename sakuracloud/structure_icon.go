@@ -19,6 +19,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"path/filepath"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/mitchellh/go-homedir"
@@ -33,7 +34,7 @@ func expandIconBody(d resourceValueGettable) (string, error) {
 		if err != nil {
 			return "", fmt.Errorf("expanding homedir in source (%s) is failed: %s", source, err)
 		}
-		file, err := os.Open(path)
+		file, err := os.Open(filepath.Clean(path))
 		if err != nil {
 			return "", fmt.Errorf("opening SakuraCloud Icon source(%s) is failed: %s", source, err)
 		}

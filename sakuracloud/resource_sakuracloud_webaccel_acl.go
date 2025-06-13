@@ -115,7 +115,7 @@ func resourceSakuraCloudWebAccelACLDelete(ctx context.Context, d *schema.Resourc
 }
 
 func setWebAccelACLResourceData(d *schema.ResourceData, client *APIClient, data *webaccel.ACLResult) diag.Diagnostics {
-	d.Set("site_id", d.Id()) // nolint
-	d.Set("acl", data.ACL)   // nolint
+	d.Set("site_id", d.Id()) //nolint
+	d.Set("acl", data.ACL)   //nolint
 	return nil
 }

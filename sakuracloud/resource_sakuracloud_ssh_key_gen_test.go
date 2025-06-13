@@ -116,6 +116,7 @@ resource "sakuracloud_ssh_key_gen" "foobar" {
   description = "description"
 }`
 
+//nolint:gosec
 var testAccSakuraCloudSSHKeyGen_passPhrase = `
 resource "sakuracloud_ssh_key_gen" "foobar" {
   name        = "{{ .arg0 }}"

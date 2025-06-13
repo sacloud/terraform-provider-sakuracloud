@@ -39,7 +39,7 @@ func TestAccSakuraCloudResourceWebAccel_WebOrigin(t *testing.T) {
 	}
 
 	siteName := "your-site-name"
-	//domainName := os.Getenv(envWebAccelDomainName)
+	// domainName := os.Getenv(envWebAccelDomainName)
 	origin := os.Getenv(envWebAccelOrigin)
 	regexpNotEmpty := regexp.MustCompile(".+")
 
@@ -116,7 +116,7 @@ func TestAccSakuraCloudResourceWebAccel_WebOriginWithCORS(t *testing.T) {
 	}
 
 	siteName := "your-site-name"
-	//domainName := os.Getenv(envWebAccelDomainName)
+	// domainName := os.Getenv(envWebAccelDomainName)
 	origin := os.Getenv(envWebAccelOrigin)
 
 	resource.Test(t, resource.TestCase{
@@ -161,7 +161,7 @@ func TestAccSakuraCloudResourceWebAccel_Update(t *testing.T) {
 	}
 
 	siteName := "your-site-name"
-	//domainName := os.Getenv(envWebAccelDomainName)
+	// domainName := os.Getenv(envWebAccelDomainName)
 	origin := os.Getenv(envWebAccelOrigin)
 	endpoint, _ := strings.CutPrefix(os.Getenv(envObjectStorageEndpoint), "https://")
 	region := os.Getenv(envObjectStorageRegion)
@@ -244,7 +244,7 @@ func TestAccSakuraCloudResourceWebAccel_BucketOrigin(t *testing.T) {
 	}
 
 	siteName := "your-site-name"
-	//domainName := os.Getenv(envWebAccelDomainName)
+	// domainName := os.Getenv(envWebAccelDomainName)
 	endpoint, _ := strings.CutPrefix(os.Getenv(envObjectStorageEndpoint), "https://")
 	region := os.Getenv(envObjectStorageRegion)
 	bucketName := os.Getenv(envObjectStorageBucketName)
@@ -292,7 +292,7 @@ func TestAccSakuraCloudResourceWebAccel_Logging(t *testing.T) {
 	}
 
 	siteName := "your-site-name"
-	//domainName := os.Getenv(envWebAccelDomainName)
+	// domainName := os.Getenv(envWebAccelDomainName)
 	origin := os.Getenv(envWebAccelOrigin)
 	bucketName := os.Getenv(envObjectStorageBucketName)
 	accessKey := os.Getenv(envObjectStorageAccessKeyId)
@@ -345,7 +345,6 @@ func TestAccSakuraCloudResourceWebAccel_InvalidConfigurations(t *testing.T) {
 			},
 		})
 	}
-
 }
 
 func testAccCheckSakuraCloudWebAccelWebOriginConfigBasic(siteName string, origin string) string {
@@ -470,7 +469,6 @@ resource sakuracloud_webaccel "foobar" {
 }
 
 func testAccCheckSakuraCloudWebAccelInvalidConfigs(origin string) map[string]string {
-
 	confUnknownArgument := `
 resource sakuracloud_webaccel "foobar" {
   invalid = true
@@ -580,7 +578,7 @@ resource sakuracloud_webaccel "foobar" {
 }
 `
 
-	//config without the S3 s3_endpoint parameter
+	// config without the S3 s3_endpoint parameter
 	confLackingBucketOriginParameters := `
 resource sakuracloud_webaccel "foobar" {
   name = "dummy"
@@ -631,7 +629,7 @@ resource sakuracloud_webaccel "foobar" {
   }
 }
 `
-	//allow_all and allowed_origins should not be specified together
+	// allow_all and allowed_origins should not be specified together
 	confInvalidCorsConfiguration := `
 resource sakuracloud_webaccel "foobar" {
   name = "dummy"

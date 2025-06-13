@@ -135,8 +135,8 @@ func resourceSakuraCloudBridgeDelete(ctx context.Context, d *schema.ResourceData
 }
 
 func setBridgeResourceData(ctx context.Context, d *schema.ResourceData, client *APIClient, data *iaas.Bridge) diag.Diagnostics {
-	d.Set("name", data.Name)               // nolint
-	d.Set("description", data.Description) // nolint
-	d.Set("zone", getZone(d, client))      // nolint
+	d.Set("name", data.Name)               //nolint
+	d.Set("description", data.Description) //nolint
+	d.Set("zone", getZone(d, client))      //nolint
 	return nil
 }

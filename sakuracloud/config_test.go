@@ -33,14 +33,14 @@ func initTestProfileDir() func() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	os.Setenv("SAKURACLOUD_PROFILE_DIR", wd) // nolint
+	os.Setenv("SAKURACLOUD_PROFILE_DIR", wd) //nolint
 	profileDir := filepath.Join(wd, ".usacloud")
 	if _, err := os.Stat(profileDir); err == nil {
-		os.RemoveAll(profileDir) // nolint
+		os.RemoveAll(profileDir) //nolint
 	}
 
 	return func() {
-		os.RemoveAll(profileDir) // nolint
+		os.RemoveAll(profileDir) //nolint
 	}
 }
 

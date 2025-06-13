@@ -44,7 +44,7 @@ func main() {
 	}
 
 	logFlags := log.Flags()
-	logFlags = logFlags &^ (log.Ldate | log.Ltime)
+	logFlags &^= (log.Ldate | log.Ltime)
 	log.SetFlags(logFlags)
 
 	err = tf5server.Serve(

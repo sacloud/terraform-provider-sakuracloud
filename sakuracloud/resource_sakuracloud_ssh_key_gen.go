@@ -144,13 +144,13 @@ func resourceSakuraCloudSSHKeyGenDelete(ctx context.Context, d *schema.ResourceD
 
 func setSSHKeyGenResourceData(d *schema.ResourceData, _ *APIClient, data interface{}) diag.Diagnostics {
 	if key, ok := data.(sshKeyType); ok {
-		d.Set("name", key.GetName())               // nolint
-		d.Set("public_key", key.GetPublicKey())    // nolint
-		d.Set("fingerprint", key.GetFingerprint()) // nolint
-		d.Set("description", key.GetDescription()) // nolint
+		d.Set("name", key.GetName())               //nolint
+		d.Set("public_key", key.GetPublicKey())    //nolint
+		d.Set("fingerprint", key.GetFingerprint()) //nolint
+		d.Set("description", key.GetDescription()) //nolint
 
 		if pKey, ok := data.(sshKeyGenType); ok {
-			d.Set("private_key", pKey.GetPrivateKey()) // nolint
+			d.Set("private_key", pKey.GetPrivateKey()) //nolint
 		}
 	}
 	return nil

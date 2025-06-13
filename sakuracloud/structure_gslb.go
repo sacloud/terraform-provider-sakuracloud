@@ -71,7 +71,7 @@ func expandGSLBServers(d resourceValueGettable) []*iaas.GSLBServer {
 }
 
 func flattenGSLBHealthCheck(data *iaas.GSLB) []interface{} {
-	//health_check
+	// health_check
 	healthCheck := map[string]interface{}{}
 	switch data.HealthCheck.Protocol {
 	case types.GSLBHealthCheckProtocols.HTTP, types.GSLBHealthCheckProtocols.HTTPS:

@@ -1,16 +1,17 @@
 package sakuracloud
 
 import (
-	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
-	"github.com/sacloud/webaccel-api-go"
 	"math/rand"
 	"reflect"
 	"testing"
+
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
+	"github.com/sacloud/webaccel-api-go"
 )
 
 func TestFlattenWebAccelOriginParameters(t *testing.T) {
 	validBucketOriginParamSet := schema.NewSet(func(_ interface{}) int {
-		return rand.Int()
+		return rand.Int() // #nosec G404 -- only testing purpose
 	}, []interface{}{
 		map[string]interface{}{
 			"s3_access_key_id":     "DUMMY-KEY",
@@ -18,7 +19,7 @@ func TestFlattenWebAccelOriginParameters(t *testing.T) {
 		},
 	})
 	invalidBucketOriginParamSet := schema.NewSet(func(_ interface{}) int {
-		return rand.Int()
+		return rand.Int() // #nosec G404 -- only testing purpose
 	}, []interface{}{
 		map[string]interface{}{
 			"s3_access_key_id":          "DUMMY-KEY",
@@ -170,7 +171,7 @@ func TestFlattenWebAccelOriginParameters(t *testing.T) {
 	for _, tc := range tt {
 		t.Run(tc.Name, func(t *testing.T) {
 			res, err := flattenWebAccelOriginParameters(tc.InputResourceData, tc.InputSiteData)
-			if tc.ExpectError {
+			if tc.ExpectError { //nolint:gocritic
 				if err == nil {
 					t.Fatalf("expected error, got none")
 				}
@@ -353,7 +354,7 @@ func TestFlattenWebAccelCorsRules(t *testing.T) {
 	for _, tc := range tt {
 		t.Run(tc.Name, func(t *testing.T) {
 			res, err := flattenWebAccelCorsRules(tc.Given)
-			if tc.ExpectError {
+			if tc.ExpectError { //nolint:gocritic
 				if err == nil {
 					t.Fatalf("expected error, got none")
 				}
@@ -368,7 +369,7 @@ func TestFlattenWebAccelCorsRules(t *testing.T) {
 
 func TestExpandWebAccelCORSParameters(t *testing.T) {
 	hasher := func(_ interface{}) int {
-		return rand.Int()
+		return rand.Int() // #nosec G404 -- only testing purpose
 	}
 	makeSetFromMap := func(m map[string]interface{}) *schema.Set {
 		return schema.NewSet(hasher, []interface{}{m})
@@ -442,7 +443,7 @@ func TestExpandWebAccelCORSParameters(t *testing.T) {
 	for _, tc := range tt {
 		t.Run(tc.Name, func(t *testing.T) {
 			res, err := expandWebAccelCORSParameters(tc.Given)
-			if tc.ExpectError {
+			if tc.ExpectError { //nolint:gocritic
 				if err == nil {
 					t.Fatalf("expected error, got none")
 				}

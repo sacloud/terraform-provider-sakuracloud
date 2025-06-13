@@ -165,12 +165,12 @@ func resourceSakuraCloudAutoBackupDelete(ctx context.Context, d *schema.Resource
 }
 
 func setAutoBackupResourceData(d *schema.ResourceData, client *APIClient, data *iaas.AutoBackup) diag.Diagnostics {
-	d.Set("name", data.Name)                              // nolint
-	d.Set("disk_id", data.DiskID.String())                // nolint
-	d.Set("max_backup_num", data.MaximumNumberOfArchives) // nolint
-	d.Set("icon_id", data.IconID.String())                // nolint
-	d.Set("description", data.Description)                // nolint
-	d.Set("zone", getZone(d, client))                     // nolint
+	d.Set("name", data.Name)                              //nolint
+	d.Set("disk_id", data.DiskID.String())                //nolint
+	d.Set("max_backup_num", data.MaximumNumberOfArchives) //nolint
+	d.Set("icon_id", data.IconID.String())                //nolint
+	d.Set("description", data.Description)                //nolint
+	d.Set("zone", getZone(d, client))                     //nolint
 	if err := d.Set("weekdays", flattenBackupWeekdays(data.BackupSpanWeekdays)); err != nil {
 		return diag.FromErr(err)
 	}

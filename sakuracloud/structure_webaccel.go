@@ -2,6 +2,7 @@ package sakuracloud
 
 import (
 	"fmt"
+
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/sacloud/webaccel-api-go"
 )
@@ -17,11 +18,12 @@ func flattenWebAccelOriginParameters(d resourceValueGettable, site *webaccel.Sit
 	case webaccel.OriginTypesWebServer:
 		originParams["type"] = "web"
 		originParams["origin"] = site.Origin
-		if site.OriginProtocol == webaccel.OriginProtocolsHttp {
+		switch site.OriginProtocol {
+		case webaccel.OriginProtocolsHttp:
 			originParams["protocol"] = "http"
-		} else if site.OriginProtocol == webaccel.OriginProtocolsHttps {
+		case webaccel.OriginProtocolsHttps:
 			originParams["protocol"] = "https"
-		} else {
+		default:
 			return nil, fmt.Errorf("invalid origin protocol: %s", site.OriginProtocol)
 		}
 		if site.HostHeader != "" {
@@ -75,11 +77,12 @@ func flattenWebAccelCorsRules(data []*webaccel.CORSRule) ([]interface{}, error) 
 			return nil, nil
 		}
 		corsRuleParams := make(map[string]interface{})
-		if rule.AllowsAnyOrigin {
+		switch {
+		case rule.AllowsAnyOrigin:
 			corsRuleParams["allow_all"] = rule.AllowsAnyOrigin
-		} else if len(rule.AllowedOrigins) > 0 {
+		case len(rule.AllowedOrigins) > 0:
 			corsRuleParams["allowed_origins"] = rule.AllowedOrigins
-		} else {
+		default:
 			corsRuleParams["allow_all"] = false
 		}
 		return []interface{}{corsRuleParams}, nil
@@ -199,14 +202,14 @@ func expandWebAccelCORSParameters(d resourceValueGettable) (*webaccel.CORSRule, 
 	if err != nil {
 		return nil, err
 	}
-	//allow_all (true/false)
+	// allow_all (true/false)
 	if v, ok := corsRuleParams.GetOk("allow_all"); ok {
 		if b, ok := v.(bool); ok && b {
 			corsAllowAll = b
 			corsRule.AllowsAnyOrigin = b
 		}
 	}
-	//allowed_origin
+	// allowed_origin
 	if origins, ok := corsRuleParams.GetOk("allowed_origins"); ok {
 		if o, ok := origins.([]interface{}); ok {
 			// allow_all=true is not permitted with allowed_origins
