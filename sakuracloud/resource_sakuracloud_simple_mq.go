@@ -155,20 +155,20 @@ func resourceSakuraCloudSimpleMQDelete(ctx context.Context, d *schema.ResourceDa
 
 func setSimpleMQResourceData(d *schema.ResourceData, data *queue.CommonServiceItem) diag.Diagnostics {
 	d.SetId(simplemq.GetQueueID(data))
-	d.Set("name", simplemq.GetQueueName(data))
-	d.Set("visibility_timeout_seconds", data.Settings.VisibilityTimeoutSeconds)
-	d.Set("expire_seconds", data.Settings.ExpireSeconds)
+	d.Set("name", simplemq.GetQueueName(data))                                  //nolint:errcheck,gosec
+	d.Set("visibility_timeout_seconds", data.Settings.VisibilityTimeoutSeconds) //nolint:errcheck,gosec
+	d.Set("expire_seconds", data.Settings.ExpireSeconds)                        //nolint:errcheck,gosec
 	if desc, ok := data.Description.Value.GetString(); ok {
-		d.Set("description", desc)
+		d.Set("description", desc) //nolint:errcheck,gosec
 	}
 	if iconID, ok := data.Icon.Value.Icon1.ID.Get(); ok {
 		id, ok := iconID.GetString()
 		if !ok {
 			id = strconv.Itoa(iconID.Int)
 		}
-		d.Set("icon_id", id)
+		d.Set("icon_id", id) //nolint:errcheck,gosec
 	} else {
-		d.Set("icon_id", nil)
+		d.Set("icon_id", nil) //nolint:errcheck,gosec
 	}
 	return diag.FromErr(d.Set("tags", flattenTags(data.Tags)))
 }
