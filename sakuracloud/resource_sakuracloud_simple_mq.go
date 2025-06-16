@@ -88,7 +88,7 @@ func resourceSakuraCloudSimpleMQCreate(ctx context.Context, d *schema.ResourceDa
 
 	mq, err := queueOp.Create(ctx, expandSimpleMQCreateRequest(d))
 	if err != nil {
-		return diag.Errorf("create SimpleMQ failed: %s", err)
+		return diag.Errorf("create SimpleMQ queue failed: %s", err)
 	}
 
 	d.SetId(simplemq.GetQueueID(mq))
@@ -108,7 +108,7 @@ func resourceSakuraCloudSimpleMQRead(ctx context.Context, d *schema.ResourceData
 	if err != nil {
 		// TODO: simplemq-api-goで404 NotFoundかどうかのエラー判定ができるようになったら、404の時のみ`d.SetId("")`を呼ぶようにする
 		// ref: https://github.com/sacloud/terraform-provider-sakuracloud/pull/1256#discussion_r2141220479
-		return diag.Errorf("could not read SimpleMQ[%s]: %s", d.Id(), err)
+		return diag.Errorf("could not read SimpleMQ[%s] queue: %s", d.Id(), err)
 	}
 
 	return setSimpleMQResourceData(d, mq)
@@ -123,11 +123,11 @@ func resourceSakuraCloudSimpleMQUpdate(ctx context.Context, d *schema.ResourceDa
 
 	mq, err := queueOp.Get(ctx, d.Id())
 	if err != nil {
-		return diag.Errorf("could not read SimpleMQ[%s]: %s", d.Id(), err)
+		return diag.Errorf("could not read SimpleMQ[%s] queue: %s", d.Id(), err)
 	}
 
 	if _, err = queueOp.Config(ctx, simplemq.GetQueueID(mq), expandSimpleMQUpdateRequest(d, mq)); err != nil {
-		return diag.Errorf("update SimpleMQ[%s] failed: %s", d.Id(), err)
+		return diag.Errorf("update SimpleMQ[%s] queue config failed: %s", d.Id(), err)
 	}
 
 	return resourceSakuraCloudSimpleMQRead(ctx, d, meta)
@@ -144,11 +144,11 @@ func resourceSakuraCloudSimpleMQDelete(ctx context.Context, d *schema.ResourceDa
 	if err != nil {
 		// TODO: simplemq-api-goで404 NotFoundかどうかのエラー判定ができるようになったら、404の時のみ`d.SetId("")`を呼ぶようにする
 		// ref: https://github.com/sacloud/terraform-provider-sakuracloud/pull/1256#discussion_r2141220479
-		return diag.Errorf("could not read SimpleMQ[%s]: %s", d.Id(), err)
+		return diag.Errorf("could not read SimpleMQ[%s] queue: %s", d.Id(), err)
 	}
 
 	if err := queueOp.Delete(ctx, simplemq.GetQueueID(mq)); err != nil {
-		return diag.Errorf("delete SimpleMQ[%s] failed: %s", d.Id(), err)
+		return diag.Errorf("delete SimpleMQ[%s] queue failed: %s", d.Id(), err)
 	}
 	return nil
 }
