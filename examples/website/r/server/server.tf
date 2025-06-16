@@ -54,6 +54,6 @@ data "sakuracloud_archive" "ubuntu" {
 }
 
 resource "sakuracloud_disk" "foobar" {
-  name              = "{{ .arg0 }}"
+  name              = "foobar"
   source_archive_id = data.sakuracloud_archive.ubuntu.id
 }
