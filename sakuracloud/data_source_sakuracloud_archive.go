@@ -95,14 +95,14 @@ func dataSourceSakuraCloudArchiveRead(ctx context.Context, d *schema.ResourceDat
 
 	if data != nil {
 		d.SetId(data.ID.String())
-		d.Set("name", data.Name)               // nolint
-		d.Set("size", data.GetSizeGB())        // nolint
-		d.Set("icon_id", data.IconID.String()) // nolint
-		d.Set("description", data.Description) // nolint
+		d.Set("name", data.Name)               //nolint
+		d.Set("size", data.GetSizeGB())        //nolint
+		d.Set("icon_id", data.IconID.String()) //nolint
+		d.Set("description", data.Description) //nolint
 		if err := d.Set("tags", flattenTags(data.Tags)); err != nil {
 			return diag.FromErr(err)
 		}
-		d.Set("zone", getZone(d, client)) // nolint
+		d.Set("zone", getZone(d, client)) //nolint
 	}
 	return nil
 }

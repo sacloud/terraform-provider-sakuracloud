@@ -143,10 +143,10 @@ func resourceSakuraCloudESMEDelete(ctx context.Context, d *schema.ResourceData, 
 }
 
 func setESMEResourceData(d *schema.ResourceData, _ *APIClient, data *iaas.ESME) diag.Diagnostics {
-	d.Set("name", data.Name)                         // nolint
-	d.Set("icon_id", data.IconID.String())           // nolint
-	d.Set("description", data.Description)           // nolint
-	d.Set("send_message_with_generated_otp_api_url", // nolint
+	d.Set("name", data.Name)                         //nolint
+	d.Set("icon_id", data.IconID.String())           //nolint
+	d.Set("description", data.Description)           //nolint
+	d.Set("send_message_with_generated_otp_api_url", //nolint
 		fmt.Sprintf(
 			"%s/%s/api/cloud/1.1/commonserviceitem/%s/esme/2fa/otp",
 			iaas.SakuraCloudAPIRoot,
@@ -154,7 +154,7 @@ func setESMEResourceData(d *schema.ResourceData, _ *APIClient, data *iaas.ESME) 
 			d.Id(),
 		),
 	)
-	d.Set("send_message_with_inputted_otp_api_url", // nolint
+	d.Set("send_message_with_inputted_otp_api_url", //nolint
 		fmt.Sprintf(
 			"%s/%s/api/cloud/1.1/commonserviceitem/%s/esme/2fa",
 			iaas.SakuraCloudAPIRoot,

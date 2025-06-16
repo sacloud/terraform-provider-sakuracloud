@@ -182,9 +182,9 @@ func resourceSakuraCloudDNSDelete(ctx context.Context, d *schema.ResourceData, m
 }
 
 func setDNSResourceData(ctx context.Context, d *schema.ResourceData, client *APIClient, data *iaas.DNS) diag.Diagnostics {
-	d.Set("zone", data.DNSZone)            // nolint
-	d.Set("icon_id", data.IconID.String()) // nolint
-	d.Set("description", data.Description) // nolint
+	d.Set("zone", data.DNSZone)            //nolint
+	d.Set("icon_id", data.IconID.String()) //nolint
+	d.Set("description", data.Description) //nolint
 	if err := d.Set("dns_servers", data.DNSNameServers); err != nil {
 		return diag.FromErr(err)
 	}

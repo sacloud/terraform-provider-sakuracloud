@@ -228,13 +228,13 @@ func setDatabaseReadReplicaResourceData(ctx context.Context, d *schema.ResourceD
 		return diag.FromErr(err)
 	}
 
-	d.Set("master_id", data.ReplicationSetting.ApplianceID.String()) // nolint
-	d.Set("name", data.Name)                                         // nolint
+	d.Set("master_id", data.ReplicationSetting.ApplianceID.String()) //nolint
+	d.Set("name", data.Name)                                         //nolint
 	if err := d.Set("network_interface", flattenDatabaseReadReplicaNetworkInterface(data)); err != nil {
 		return diag.FromErr(err)
 	}
-	d.Set("icon_id", data.IconID.String()) // nolint
-	d.Set("description", data.Description) // nolint
-	d.Set("zone", getZone(d, client))      // nolint
+	d.Set("icon_id", data.IconID.String()) //nolint
+	d.Set("description", data.Description) //nolint
+	d.Set("zone", getZone(d, client))      //nolint
 	return nil
 }

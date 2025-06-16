@@ -1,10 +1,11 @@
 package sakuracloud
 
 import (
-	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"math/rand"
 	"reflect"
 	"testing"
+
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 )
 
 func TestMapFromSet(t *testing.T) {
@@ -13,7 +14,7 @@ func TestMapFromSet(t *testing.T) {
 		"s3_secret_access_key": "DUMMY-SECRET",
 	}
 	hasher := func(_ interface{}) int {
-		return rand.Int()
+		return rand.Int() // #nosec G404 -- only testing purpose
 	}
 	fixtureSetWithBlock := schema.NewSet(hasher, []interface{}{
 		blockData,
@@ -63,13 +64,14 @@ func TestMapFromSet(t *testing.T) {
 	for _, tc := range tt {
 		t.Run(tc.FieldName, func(t *testing.T) {
 			res, err := mapFromSet(tc.Given, tc.FieldName)
-			if tc.ExpectError {
+			switch {
+			case tc.ExpectError:
 				if err == nil {
 					t.Errorf("expected error but got nil")
 				}
-			} else if err != nil {
+			case err != nil:
 				t.Errorf("expected no error but got %s", err)
-			} else if !reflect.DeepEqual(*(res.(*resourceMapValue)), tc.FieldValue) {
+			case !reflect.DeepEqual(*(res.(*resourceMapValue)), tc.FieldValue):
 				t.Fatalf("got: %#v, want: %#v", *(res.(*resourceMapValue)), tc.FieldValue)
 			}
 		})

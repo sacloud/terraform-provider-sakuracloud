@@ -17,6 +17,7 @@ package sakuracloud
 import (
 	"io"
 	"os"
+	"path/filepath"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
@@ -33,7 +34,7 @@ func expandArchiveBuilder(d *schema.ResourceData, zone string, client *APIClient
 		if err != nil {
 			return nil, nil, err
 		}
-		f, err := os.Open(sourcePath)
+		f, err := os.Open(filepath.Clean(sourcePath))
 		if err != nil {
 			return nil, nil, err
 		}
@@ -71,7 +72,7 @@ func expandArchiveBuilder(d *schema.ResourceData, zone string, client *APIClient
 	}
 	return director.Builder(), func() {
 		if reader != nil {
-			reader.Close() // nolint
+			reader.Close() //nolint
 		}
 	}, nil
 }

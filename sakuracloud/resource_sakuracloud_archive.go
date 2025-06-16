@@ -208,14 +208,14 @@ func resourceSakuraCloudArchiveDelete(ctx context.Context, d *schema.ResourceDat
 }
 
 func setArchiveResourceData(d *schema.ResourceData, client *APIClient, data *iaas.Archive) diag.Diagnostics {
-	d.Set("hash", expandArchiveHash(d))                             // nolint
-	d.Set("icon_id", data.IconID.String())                          // nolint
-	d.Set("name", data.Name)                                        // nolint
-	d.Set("size", data.GetSizeGB())                                 // nolint
-	d.Set("description", data.Description)                          // nolint
-	d.Set("zone", getZone(d, client))                               // nolint
-	d.Set("source_archive_id", d.Get("source_archive_id").(string)) // nolint
-	d.Set("source_disk_id", d.Get("source_disk_id").(string))       // nolint
-	d.Set("source_shared_key", d.Get("source_shared_key").(string)) // nolint
+	d.Set("hash", expandArchiveHash(d))                             //nolint
+	d.Set("icon_id", data.IconID.String())                          //nolint
+	d.Set("name", data.Name)                                        //nolint
+	d.Set("size", data.GetSizeGB())                                 //nolint
+	d.Set("description", data.Description)                          //nolint
+	d.Set("zone", getZone(d, client))                               //nolint
+	d.Set("source_archive_id", d.Get("source_archive_id").(string)) //nolint
+	d.Set("source_disk_id", d.Get("source_disk_id").(string))       //nolint
+	d.Set("source_shared_key", d.Get("source_shared_key").(string)) //nolint
 	return diag.FromErr(d.Set("tags", flattenTags(data.Tags)))
 }

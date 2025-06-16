@@ -1,30 +1,56 @@
+version: "2"
 run:
-  deadline: 10m10s
+  timeout: 10m10s
 
 issues:
-  max-per-linter: 0
+  max-issues-per-linter: 0
   max-same-issues: 0
 
 linters:
-  disable-all: true
+  default: none
   enable:
     - errcheck
-    - gofmt
-    - goimports
-    - gosimple
+    - gocritic
+    - goprintffuncname
+    - gosec
     - govet
     - ineffassign
-#    - interfacer
-    - nakedret
     - misspell
-    - staticcheck
-    - typecheck
-    - unused
+    - nakedret
+    - nolintlint
     - unconvert
-    - vet
-    - vetshadow
+    - unused
     - whitespace
+  settings:
+    errcheck:
+      ignore: github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema:ForceNew|Set,fmt:.*,io:Close
 
-linters-settings:
-  errcheck:
-    ignore: github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema:ForceNew|Set,fmt:.*,io:Close
+formatters:
+  enable:
+    - gofmt
+    - goimports
+
+  # don't enable:
+  #  - asciicheck
+  #  - depguard
+  #  - dogsled
+  #  - dupl
+  #  - funlen
+  #  - gochecknoinits
+  #  - gochecknoglobals
+  #  - gocognit
+  #  - goconst
+  #  - gocyclo
+  #  - gomnd
+  #  - godot
+  #  - godox
+  #  - goerr113
+  #  - lll
+  #  - prealloc
+  #  - revive
+  #  - stylecheck
+  #  - staticcheck
+  #  - structcheck
+  #  - testpackage
+  #  - unparam
+  #  - wsl

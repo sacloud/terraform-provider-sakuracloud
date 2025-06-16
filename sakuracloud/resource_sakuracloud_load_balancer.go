@@ -297,11 +297,11 @@ func setLoadBalancerResourceData(ctx context.Context, d *schema.ResourceData, cl
 	if err := d.Set("network_interface", flattenLoadBalancerNetworkInterface(data)); err != nil {
 		return diag.FromErr(err)
 	}
-	d.Set("plan", flattenLoadBalancerPlanID(data)) // nolint
-	d.Set("name", data.Name)                       // nolint
-	d.Set("icon_id", data.IconID.String())         // nolint
-	d.Set("description", data.Description)         // nolint
-	d.Set("zone", getZone(d, client))              // nolint
+	d.Set("plan", flattenLoadBalancerPlanID(data)) //nolint
+	d.Set("name", data.Name)                       //nolint
+	d.Set("icon_id", data.IconID.String())         //nolint
+	d.Set("description", data.Description)         //nolint
+	d.Set("zone", getZone(d, client))              //nolint
 	if err := d.Set("vip", flattenLoadBalancerVIPs(data)); err != nil {
 		return diag.FromErr(err)
 	}

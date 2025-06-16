@@ -333,19 +333,19 @@ func resourceSakuraCloudSimpleMonitorDelete(ctx context.Context, d *schema.Resou
 }
 
 func setSimpleMonitorResourceData(ctx context.Context, d *schema.ResourceData, client *APIClient, data *iaas.SimpleMonitor) diag.Diagnostics {
-	d.Set("target", data.Target)                                       // nolint
-	d.Set("delay_loop", data.DelayLoop)                                // nolint
-	d.Set("max_check_attempts", data.MaxCheckAttempts)                 // nolint
-	d.Set("retry_interval", data.RetryInterval)                        // nolint
-	d.Set("timeout", data.Timeout)                                     // nolint
-	d.Set("icon_id", data.IconID.String())                             // nolint
-	d.Set("description", data.Description)                             // nolint
-	d.Set("enabled", data.Enabled.Bool())                              // nolint
-	d.Set("notify_email_enabled", data.NotifyEmailEnabled.Bool())      // nolint
-	d.Set("notify_email_html", data.NotifyEmailHTML.Bool())            // nolint
-	d.Set("notify_slack_enabled", data.NotifySlackEnabled.Bool())      // nolint
-	d.Set("notify_slack_webhook", data.SlackWebhooksURL)               // nolint
-	d.Set("notify_interval", flattenSimpleMonitorNotifyInterval(data)) // nolint
+	d.Set("target", data.Target)                                       //nolint
+	d.Set("delay_loop", data.DelayLoop)                                //nolint
+	d.Set("max_check_attempts", data.MaxCheckAttempts)                 //nolint
+	d.Set("retry_interval", data.RetryInterval)                        //nolint
+	d.Set("timeout", data.Timeout)                                     //nolint
+	d.Set("icon_id", data.IconID.String())                             //nolint
+	d.Set("description", data.Description)                             //nolint
+	d.Set("enabled", data.Enabled.Bool())                              //nolint
+	d.Set("notify_email_enabled", data.NotifyEmailEnabled.Bool())      //nolint
+	d.Set("notify_email_html", data.NotifyEmailHTML.Bool())            //nolint
+	d.Set("notify_slack_enabled", data.NotifySlackEnabled.Bool())      //nolint
+	d.Set("notify_slack_webhook", data.SlackWebhooksURL)               //nolint
+	d.Set("notify_interval", flattenSimpleMonitorNotifyInterval(data)) //nolint
 	if err := d.Set("health_check", flattenSimpleMonitorHealthCheck(data)); err != nil {
 		return diag.FromErr(err)
 	}

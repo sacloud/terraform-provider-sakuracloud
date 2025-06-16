@@ -208,12 +208,12 @@ func resourceSakuraCloudCDROMDelete(ctx context.Context, d *schema.ResourceData,
 }
 
 func setCDROMResourceData(ctx context.Context, d *schema.ResourceData, client *APIClient, data *iaas.CDROM) diag.Diagnostics {
-	d.Set("hash", expandCDROMContentHash(d)) // nolint
-	d.Set("name", data.Name)                 // nolint
-	d.Set("size", data.GetSizeGB())          // nolint
-	d.Set("icon_id", data.IconID.String())   // nolint
-	d.Set("description", data.Description)   // nolint
-	d.Set("zone", getZone(d, client))        // nolint
+	d.Set("hash", expandCDROMContentHash(d)) //nolint:errcheck,gosec
+	d.Set("name", data.Name)                 //nolint:errcheck,gosec
+	d.Set("size", data.GetSizeGB())          //nolint:errcheck,gosec
+	d.Set("icon_id", data.IconID.String())   //nolint:errcheck,gosec
+	d.Set("description", data.Description)   //nolint:errcheck,gosec
+	d.Set("zone", getZone(d, client))        //nolint:errcheck,gosec
 	return diag.FromErr(d.Set("tags", flattenTags(data.Tags)))
 }
 
@@ -230,7 +230,7 @@ func uploadCDROMFile(ctx *uploadCDROMContext, d *schema.ResourceData) error {
 
 	filePath, isTemporal, err := prepareContentFile(d)
 	if isTemporal {
-		defer os.Remove(filePath)
+		defer os.Remove(filePath) //nolint:errcheck
 	}
 	if err != nil {
 		return err
@@ -312,7 +312,7 @@ func prepareContentFile(d *schema.ResourceData) (string, bool, error) {
 		if err != nil {
 			return "", isTemporal, fmt.Errorf("error creating temp-file : %s", err)
 		}
-		defer tmpFile.Close() // nolint
+		defer tmpFile.Close() //nolint
 		filePath = tmpFile.Name()
 		err = writeISOFile(filePath, []byte(content), label)
 		if err != nil {
@@ -325,11 +325,11 @@ func prepareContentFile(d *schema.ResourceData) (string, bool, error) {
 }
 
 func writeISOFile(path string, content []byte, label string) error {
-	outfh, err := os.OpenFile(path, os.O_CREATE|os.O_WRONLY, 0644)
+	outfh, err := os.OpenFile(path, os.O_CREATE|os.O_WRONLY, 0644) //nolint:gosec
 	if err != nil {
 		return err
 	}
-	defer outfh.Close() // nolint
+	defer outfh.Close() //nolint
 
 	return iso9660wrap.WriteBuffer(outfh, content, label)
 }

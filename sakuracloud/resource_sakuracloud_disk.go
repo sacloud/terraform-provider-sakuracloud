@@ -230,16 +230,16 @@ func resourceSakuraCloudDiskDelete(ctx context.Context, d *schema.ResourceData, 
 }
 
 func setDiskResourceData(ctx context.Context, d *schema.ResourceData, client *APIClient, data *iaas.Disk) diag.Diagnostics {
-	d.Set("name", data.Name)                                  // nolint
-	d.Set("plan", flattenDiskPlan(data))                      // nolint
-	d.Set("source_disk_id", data.SourceDiskID.String())       // nolint
-	d.Set("source_archive_id", data.SourceArchiveID.String()) // nolint
-	d.Set("connector", data.Connection.String())              // nolint
-	d.Set("size", data.GetSizeGB())                           // nolint
-	d.Set("icon_id", data.IconID.String())                    // nolint
-	d.Set("description", data.Description)                    // nolint
-	d.Set("server_id", data.ServerID.String())                // nolint
-	d.Set("zone", getZone(d, client))                         // nolint
-	d.Set("encryption_algorithm", data.EncryptionAlgorithm.String())
+	d.Set("name", data.Name)                                         //nolint:errcheck,gosec
+	d.Set("plan", flattenDiskPlan(data))                             //nolint:errcheck,gosec
+	d.Set("source_disk_id", data.SourceDiskID.String())              //nolint:errcheck,gosec
+	d.Set("source_archive_id", data.SourceArchiveID.String())        //nolint:errcheck,gosec
+	d.Set("connector", data.Connection.String())                     //nolint:errcheck,gosec
+	d.Set("size", data.GetSizeGB())                                  //nolint:errcheck,gosec
+	d.Set("icon_id", data.IconID.String())                           //nolint:errcheck,gosec
+	d.Set("description", data.Description)                           //nolint:errcheck,gosec
+	d.Set("server_id", data.ServerID.String())                       //nolint:errcheck,gosec
+	d.Set("zone", getZone(d, client))                                //nolint:errcheck,gosec
+	d.Set("encryption_algorithm", data.EncryptionAlgorithm.String()) //nolint:errcheck,gosec
 	return diag.FromErr(d.Set("tags", flattenTags(data.Tags)))
 }

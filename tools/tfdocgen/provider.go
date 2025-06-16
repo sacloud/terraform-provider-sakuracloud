@@ -163,7 +163,7 @@ func (p *Provider) writeERBFile(destDir string, params []*TemplateParameter) err
 	}
 
 	// write to file
-	if err := os.WriteFile(dest, buf.Bytes(), 0644); err != nil {
+	if err := os.WriteFile(dest, buf.Bytes(), 0644); err != nil { //nolint:gosec
 		return err
 	}
 	fmt.Println(dest)
@@ -212,7 +212,7 @@ func (p *Provider) execTemplate(tmpl, dest string, param *TemplateParameter) err
 	}
 
 	// write to file
-	if err := os.WriteFile(dest, buf.Bytes(), 0644); err != nil {
+	if err := os.WriteFile(dest, buf.Bytes(), 0644); err != nil { //nolint:gosec
 		return err
 	}
 	fmt.Println(dest)
@@ -225,7 +225,7 @@ func (p *Provider) loadTemplate(templateDir, templatePath string) (string, error
 		return defaultTemplate, nil
 	}
 
-	data, err := os.ReadFile(tmplPath)
+	data, err := os.ReadFile(filepath.Clean(tmplPath))
 	if err != nil {
 		return "", err
 	}
@@ -239,7 +239,7 @@ func (p *Provider) loadExample(exampleDir, examplePath string) (string, error) {
 		return "", nil
 	}
 
-	data, err := os.ReadFile(exPath)
+	data, err := os.ReadFile(filepath.Clean(exPath))
 	if err != nil {
 		return "", err
 	}
@@ -250,7 +250,7 @@ func (p *Provider) prepareDestDir(destPath string) error {
 	dir := filepath.Dir(destPath)
 	_, err := os.Stat(dir)
 	if err != nil {
-		if err := os.MkdirAll(dir, 0755); err != nil {
+		if err := os.MkdirAll(dir, 0755); err != nil { //nolint:gosec
 			return err
 		}
 	}

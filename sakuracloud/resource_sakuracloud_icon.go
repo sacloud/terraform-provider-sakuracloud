@@ -152,7 +152,7 @@ func resourceSakuraCloudIconDelete(ctx context.Context, d *schema.ResourceData, 
 }
 
 func setIconResourceData(ctx context.Context, d *schema.ResourceData, client *APIClient, data *iaas.Icon) diag.Diagnostics {
-	d.Set("name", data.Name) // nolint
-	d.Set("url", data.URL)   // nolint
+	d.Set("name", data.Name) //nolint
+	d.Set("url", data.URL)   //nolint
 	return diag.FromErr(d.Set("tags", flattenTags(data.Tags)))
 }

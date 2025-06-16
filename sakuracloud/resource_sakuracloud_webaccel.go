@@ -17,6 +17,7 @@ package sakuracloud
 import (
 	"context"
 	"fmt"
+
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
@@ -94,7 +95,7 @@ func resourceSakuraCloudWebAccel() *schema.Resource {
 						"s3_endpoint": {
 							Type:     schema.TypeString,
 							Optional: true,
-							//without protocol scheme
+							// without protocol scheme
 							ValidateDiagFunc: validateHostName(),
 							Description:      "S3 endpoint: required for origin.type = `bucket`",
 						},
@@ -272,7 +273,7 @@ func resourceSakuraCloudWebAccelCreate(ctx context.Context, d *schema.ResourceDa
 	_, hasLoggingConfig := d.GetOk("logging")
 	hasSiteUpdatingArguments = hasCorsRule || hasOnetimeUrlSecret
 
-	//cors
+	// cors
 	if hasCorsRule {
 		corsRule, err = expandWebAccelCORSParameters(d)
 		if err != nil {
@@ -282,7 +283,7 @@ func resourceSakuraCloudWebAccelCreate(ctx context.Context, d *schema.ResourceDa
 	} else {
 		reqUpd.CORSRules = &[]*webaccel.CORSRule{}
 	}
-	//onetime url secret
+	// onetime url secret
 	if hasOnetimeUrlSecret {
 		reqUpd.OnetimeURLSecrets = expandWebAccelOnetimeUrlSecrets(d)
 	} else {
@@ -296,7 +297,7 @@ func resourceSakuraCloudWebAccelCreate(ctx context.Context, d *schema.ResourceDa
 		}
 	}
 
-	//logging
+	// logging
 	if hasLoggingConfig {
 		cleanUpSiteWithError := func(e error) diag.Diagnostics {
 			d.SetId("")
@@ -361,7 +362,7 @@ func resourceSakuraCloudWebAccelUpdate(ctx context.Context, d *schema.ResourceDa
 		"normalize_ae",
 	}
 	if d.HasChanges(siteUpdatingArguments...) {
-		//map origin params into the request
+		// map origin params into the request
 		reqUpd, err := expandWebAccelOriginParametersForUpdate(d)
 		if err != nil {
 			return diag.FromErr(err)
@@ -393,7 +394,7 @@ func resourceSakuraCloudWebAccelUpdate(ctx context.Context, d *schema.ResourceDa
 			}
 		}
 
-		//cors
+		// cors
 		if _, ok := d.GetOk("cors_rules"); ok {
 			corsRule, err := expandWebAccelCORSParameters(d)
 			if err != nil {
@@ -404,12 +405,11 @@ func resourceSakuraCloudWebAccelUpdate(ctx context.Context, d *schema.ResourceDa
 			reqUpd.CORSRules = &[]*webaccel.CORSRule{}
 		}
 
-		//do request
+		// do request
 		_, err = newOp.Update(ctx, siteID, reqUpd)
 		if err != nil {
 			return diag.FromErr(err)
 		}
-
 	}
 
 	if d.HasChange("logging") {
@@ -428,7 +428,6 @@ func resourceSakuraCloudWebAccelUpdate(ctx context.Context, d *schema.ResourceDa
 				return diag.FromErr(err)
 			}
 		}
-
 	}
 	return resourceSakuraCloudWebAccelRead(ctx, d, meta)
 }
@@ -457,37 +456,37 @@ func setWebAccelResourceData(d *schema.ResourceData, client *APIClient, data *we
 	return setWebAccelSiteResourceData(d, client, data)
 }
 func setWebAccelSiteResourceData(d *schema.ResourceData, client *APIClient, data *webaccel.Site) diag.Diagnostics {
-	d.Set("name", data.Name)
-	d.Set("domain_type", data.DomainType)
-	d.Set("subdomain", data.Subdomain)
-	d.Set("cname_record_value", data.Subdomain+".")
-	d.Set("txt_record_value", fmt.Sprintf("webaccel=%s", data.Subdomain))
+	d.Set("name", data.Name)                                              //nolint:errcheck,gosec
+	d.Set("domain_type", data.DomainType)                                 //nolint:errcheck,gosec
+	d.Set("subdomain", data.Subdomain)                                    //nolint:errcheck,gosec
+	d.Set("cname_record_value", data.Subdomain+".")                       //nolint:errcheck,gosec
+	d.Set("txt_record_value", fmt.Sprintf("webaccel=%s", data.Subdomain)) //nolint:errcheck,gosec
 	rp, err := mapWebAccelRequestProtocol(data)
 	if err != nil {
 		return diag.FromErr(err)
 	}
-	d.Set("request_protocol", rp)
+	d.Set("request_protocol", rp) //nolint:errcheck,gosec
 	if _, ok := d.GetOk("default_cache_ttl"); ok {
-		d.Set("default_cache_ttl", data.DefaultCacheTTL)
+		d.Set("default_cache_ttl", data.DefaultCacheTTL) //nolint:errcheck,gosec
 	}
 	originParams, err := flattenWebAccelOriginParameters(d, data)
 	if err != nil {
 		return diag.FromErr(err)
 	}
-	d.Set("origin_parameters", originParams)
+	d.Set("origin_parameters", originParams) //nolint:errcheck,gosec
 	cors, err := flattenWebAccelCorsRules(data.CORSRules)
 	if err != nil {
 		return diag.FromErr(err)
 	}
-	d.Set("cors_rules", cors)
+	d.Set("cors_rules", cors) //nolint:errcheck,gosec
 	if _, ok := d.GetOk("vary_support"); ok {
-		d.Set("vary_support", data.VarySupport == webaccel.VarySupportEnabled)
+		d.Set("vary_support", data.VarySupport == webaccel.VarySupportEnabled) //nolint:errcheck,gosec
 	}
 	if _, ok := d.GetOk("normalize_ae"); ok {
 		if ae, err := mapWebAccelNormalizeAE(data); err != nil {
 			return diag.FromErr(err)
 		} else {
-			d.Set("normalize_ae", ae)
+			d.Set("normalize_ae", ae) //nolint:errcheck,gosec
 		}
 	}
 
