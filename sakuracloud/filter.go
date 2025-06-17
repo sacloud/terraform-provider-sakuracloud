@@ -15,6 +15,7 @@
 package sakuracloud
 
 import (
+	"errors"
 	"os"
 	"strings"
 
@@ -127,13 +128,13 @@ func filterSchema(opt *filterSchemaOption) *schema.Schema {
 	}
 }
 
-var filterNoResultMessage = "Your query returned no results. Please change your filter or selectors and try again"
+var errFilterNoResult = errors.New("Your query returned no results. Please change your filter or selectors and try again")
 
 func filterNoResultErr() diag.Diagnostics {
 	if os.Getenv(resource.EnvTfAcc) != "" {
 		return nil
 	}
-	return diag.Errorf(filterNoResultMessage)
+	return diag.FromErr(errFilterNoResult)
 }
 
 type nameFilterable interface {
