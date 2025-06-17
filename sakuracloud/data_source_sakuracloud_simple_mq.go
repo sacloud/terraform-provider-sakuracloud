@@ -64,7 +64,7 @@ func dataSourceSakuraCloudSimpleMQ() *schema.Resource {
 
 func dataSourceSakuraCloudSimpleMQRead(ctx context.Context, d *schema.ResourceData, meta any) diag.Diagnostics {
 	name := d.Get("name").(string)
-	tags := d.Get("tags").(*schema.Set).List()
+	tags := expandTags(d)
 	if name == "" && len(tags) == 0 {
 		return diag.Errorf("name or tags required")
 	}
@@ -88,7 +88,7 @@ func dataSourceSakuraCloudSimpleMQRead(ctx context.Context, d *schema.ResourceDa
 	return setSimpleMQResourceData(d, data)
 }
 
-func filterSimpleMQByNameOrTags(qs []queue.CommonServiceItem, name string, tags []any) (*queue.CommonServiceItem, error) {
+func filterSimpleMQByNameOrTags(qs []queue.CommonServiceItem, name string, tags []string) (*queue.CommonServiceItem, error) {
 	match := slices.Collect(func(yield func(queue.CommonServiceItem) bool) {
 		for _, v := range qs {
 			if name != "" && name != simplemq.GetQueueName(&v) {
@@ -97,10 +97,6 @@ func filterSimpleMQByNameOrTags(qs []queue.CommonServiceItem, name string, tags 
 
 			tagsMatched := true
 			for _, tagToFind := range tags {
-				tagToFind, ok := tagToFind.(string)
-				if !ok {
-					continue
-				}
 				if !slices.Contains(v.Tags, tagToFind) {
 					tagsMatched = false
 					break

@@ -126,7 +126,7 @@ func TestFilterSimpleMQByNameOrTags(t *testing.T) {
 	testCases := []struct {
 		name      string
 		queueName string
-		tags      []any
+		tags      []string
 		want      *queue.CommonServiceItem
 		wantErr   bool
 	}{
@@ -137,23 +137,23 @@ func TestFilterSimpleMQByNameOrTags(t *testing.T) {
 		},
 		{
 			name: "found by tags",
-			tags: []any{"tag2"},
+			tags: []string{"tag2"},
 			want: &queues[1],
 		},
 		{
 			name:      "found by name & tags",
 			queueName: "test-queue2",
-			tags:      []any{"tag2"},
+			tags:      []string{"tag2"},
 			want:      &queues[1],
 		},
 		{
 			name:    "found multiple",
-			tags:    []any{"tag1"},
+			tags:    []string{"tag1"},
 			wantErr: true,
 		},
 		{
 			name:    "not found",
-			tags:    []any{"not-exist"},
+			tags:    []string{"not-exist"},
 			wantErr: true,
 		},
 	}
