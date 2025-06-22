@@ -204,7 +204,6 @@ func Provider() *schema.Provider {
 			"sakuracloud_simple_monitor":        resourceSakuraCloudSimpleMonitor(),
 			"sakuracloud_server":                resourceSakuraCloudServer(),
 			"sakuracloud_ssh_key":               resourceSakuraCloudSSHKey(),
-			"sakuracloud_ssh_key_gen":           resourceSakuraCloudSSHKeyGen(),
 			"sakuracloud_subnet":                resourceSakuraCloudSubnet(),
 			"sakuracloud_switch":                resourceSakuraCloudSwitch(),
 			"sakuracloud_vpc_router":            resourceSakuraCloudVPCRouter(),
