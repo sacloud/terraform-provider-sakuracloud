@@ -1,5 +1,12 @@
 # CHANGELOG
 
+## 2.28.0 (2025/06/23)
+
+- シンプルMQの追加 (#1256)
+- SSH公開鍵生成機能の取り下げ (#1262)
+- update golangci-lint to v2 (#1259)
+- Go 用のテンプレートパラメータのようなものが examples と docs に残っていたので修正 (#1264)
+
 ## 2.27.0 (2025/06/09)
 
 - resource_webaccel および resource_webaccel_activation を実装 (#1250)
