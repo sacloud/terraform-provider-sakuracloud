@@ -13,14 +13,14 @@ require (
 	github.com/sacloud/api-client-go v0.3.0
 	github.com/sacloud/apprun-api-go v0.3.0
 	github.com/sacloud/autoscaler v0.16.1
-	github.com/sacloud/iaas-api-go v1.15.0
-	github.com/sacloud/iaas-service-go v1.10.0
+	github.com/sacloud/iaas-api-go v1.16.0
+	github.com/sacloud/iaas-service-go v1.12.0
 	github.com/sacloud/iso9660wrap v0.0.0-20171031075302-eda21f77f6a8
 	github.com/sacloud/packages-go v0.0.11
 	github.com/sacloud/simplemq-api-go v0.1.3
 	github.com/sacloud/webaccel-api-go v1.3.0
 	github.com/stretchr/testify v1.10.0
-	golang.org/x/text v0.25.0
+	golang.org/x/text v0.26.0
 )
 
 require (
@@ -101,7 +101,7 @@ require (
 	github.com/sacloud/ftps v1.2.0 // indirect
 	github.com/sacloud/go-http v0.1.9 // indirect
 	github.com/sacloud/go-otelsetup v0.0.6 // indirect
-	github.com/sacloud/iaas-api-go/trace/otel v0.0.0-20231023015307-c774eaa8854f // indirect
+	github.com/sacloud/iaas-api-go/trace/otel v0.0.0-20250609045333-f334fa253de9 // indirect
 	github.com/segmentio/asm v1.2.0 // indirect
 	github.com/shivamMg/ppds v0.0.1 // indirect
 	github.com/twitchyliquid64/golang-asm v0.15.1 // indirect
@@ -125,9 +125,9 @@ require (
 	go.uber.org/ratelimit v0.3.1 // indirect
 	go.uber.org/zap v1.27.0 // indirect
 	golang.org/x/arch v0.8.0 // indirect
-	golang.org/x/crypto v0.38.0 // indirect
+	golang.org/x/crypto v0.39.0 // indirect
 	golang.org/x/exp v0.0.0-20230725093048-515e97ebf090 // indirect
-	golang.org/x/mod v0.24.0 // indirect
+	golang.org/x/mod v0.25.0 // indirect
 	golang.org/x/net v0.40.0 // indirect
 	golang.org/x/sync v0.14.0 // indirect
 	golang.org/x/sys v0.33.0 // indirect
