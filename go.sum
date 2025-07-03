@@ -53,6 +53,8 @@ github.com/felixge/httpsnoop v1.0.3 h1:s/nj+GCswXYzN5v2DpNMuMQYe+0DDwt5WVCU6CWBd
 github.com/felixge/httpsnoop v1.0.3/go.mod h1:m8KPJKqk1gH5J9DgRY2ASl2lWCfGKXixSwevea8zH2U=
 github.com/fsnotify/fsnotify v1.9.0 h1:2Ml+OJNzbYCTzsxtv8vKSFD9PbJjmhYF14k/jKC7S9k=
 github.com/fsnotify/fsnotify v1.9.0/go.mod h1:8jBTzvmWwFyi3Pb8djgCCO5IBqzKJ/Jwo8TRcHyHii0=
+github.com/g1eng/iaas-service-go v0.0.0-20250703032157-a92e6f0a1342 h1:zP99zGw1wp77+X+uAnUpZeBp5bfc64HWNZbxwtAXikw=
+github.com/g1eng/iaas-service-go v0.0.0-20250703032157-a92e6f0a1342/go.mod h1:CjsQdN1z4HenfKgEwK8+HGLTCVkmlyoRN2ivqyXJNB4=
 github.com/gabriel-vasile/mimetype v1.4.3 h1:in2uUcidCuFcDKtdcBxlR0rJ1+fsokWf+uqxgUFjbI0=
 github.com/gabriel-vasile/mimetype v1.4.3/go.mod h1:d8uq/6HKRL6CGdk+aubisF/M5GcPfT7nKyLpA0lbSSk=
 github.com/ghodss/yaml v1.0.0 h1:wQHKEahhL6wmXdzwWG11gIVCkOv05bNOh+Rxn0yngAk=
@@ -243,8 +245,6 @@ github.com/sacloud/iaas-api-go v1.16.0 h1:JUj7f5yHSSakhy0N8qsZ0a5IYpbUgsv4x5rN8p
 github.com/sacloud/iaas-api-go v1.16.0/go.mod h1:8BTuDTCTT6Ie08544+q5hT3GMyTf2DDxzt/XMuwmhgk=
 github.com/sacloud/iaas-api-go/trace/otel v0.0.0-20250609045333-f334fa253de9 h1:N5mFrEAFr/U6n7fjViB4nMxK4sMrg9PaxnnkpXGfbro=
 github.com/sacloud/iaas-api-go/trace/otel v0.0.0-20250609045333-f334fa253de9/go.mod h1:R8ZSCUzvcR6mnLQDPqioU0s2xrBdKvE/8oT1mhE0c0o=
-github.com/sacloud/iaas-service-go v1.12.0 h1:NMgT+ysSyUWQ30QMjK2RhoQx026VRa558u1aWwJsmrU=
-github.com/sacloud/iaas-service-go v1.12.0/go.mod h1:CjsQdN1z4HenfKgEwK8+HGLTCVkmlyoRN2ivqyXJNB4=
 github.com/sacloud/iso9660wrap v0.0.0-20171031075302-eda21f77f6a8 h1:5piK7EELHKRxGqBjgVEHsdfsFwEzF/Kds/bMWLS6gCw=
 github.com/sacloud/iso9660wrap v0.0.0-20171031075302-eda21f77f6a8/go.mod h1:1jHHCa624cG5rODkWmourombJaNmkY9/SBHWhLJcg+w=
 github.com/sacloud/packages-go v0.0.11 h1:hrRWLmfPM9w7GBs6xb5/ue6pEMl8t1UuDKyR/KfteHo=

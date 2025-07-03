@@ -140,3 +140,5 @@ require (
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
+
+replace github.com/sacloud/iaas-service-go => github.com/g1eng/iaas-service-go v0.0.0-20250703032157-a92e6f0a1342

@@ -67,7 +67,9 @@ func expandDatabaseBuilder(d *schema.ResourceData, client *APIClient) *databaseB
 		BackupSetting:      expandDatabaseBackupSetting(d),
 		Parameters:         d.Get("parameters").(map[string]interface{}),
 		ReplicationSetting: &iaas.DatabaseReplicationSetting{},
-		VirtualIPAddress:   nic.virtualIpAddress,
+	}
+	if nic.virtualIpAddress != "" {
+		req.VirtualIPAddress = &nic.virtualIpAddress
 	}
 
 	if replicaUser != "" && replicaPassword != "" {
