@@ -89,6 +89,46 @@ func TestAccResourceSakuraCloudWebAccelCertificate_basic(t *testing.T) {
 	})
 }
 
+func TestAccResourceSakuraCloudWebAccelCertificate_LetsEncrypt(t *testing.T) {
+	envKeys := []string{
+		envWebAccelSiteName,
+	}
+	for _, k := range envKeys {
+		if os.Getenv(k) == "" {
+			t.Skipf("ENV %q is requilred. skip", k)
+			return
+		}
+	}
+
+	siteName := os.Getenv(envWebAccelSiteName)
+	regexpNotEmpty := regexp.MustCompile(".+")
+	resource.Test(t, resource.TestCase{
+		PreCheck:          func() { testAccPreCheck(t) },
+		ProviderFactories: testAccProviderFactories,
+		CheckDestroy: func(*terraform.State) error {
+			return nil
+		},
+		Steps: []resource.TestStep{
+			{
+				Config: testAccCheckSakuraCloudWebAccelCertificateFreeCertConfig(siteName, true),
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestMatchResourceAttr("sakuracloud_webaccel_certificate.foobar", "id", regexpNotEmpty),
+					resource.TestMatchResourceAttr("sakuracloud_webaccel_certificate.foobar", "site_id", regexpNotEmpty),
+					resource.TestCheckResourceAttr("sakuracloud_webaccel_certificate.foobar", "lets_encrypt", "true"),
+				),
+			},
+			{
+				Config: testAccCheckSakuraCloudWebAccelCertificateFreeCertConfig(siteName, false),
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestMatchResourceAttr("sakuracloud_webaccel_certificate.foobar", "id", regexpNotEmpty),
+					resource.TestMatchResourceAttr("sakuracloud_webaccel_certificate.foobar", "site_id", regexpNotEmpty),
+					resource.TestCheckResourceAttr("sakuracloud_webaccel_certificate.foobar", "lets_encrypt", "true"),
+				),
+			},
+		},
+	})
+}
+
 func testAccCheckSakuraCloudWebAccelCertificateConfig(siteName, crt, key string) string {
 	tmpl := `
 data sakuracloud_webaccel "site" {
@@ -101,4 +141,21 @@ resource sakuracloud_webaccel_certificate "foobar" {
 }
 `
 	return fmt.Sprintf(tmpl, siteName, crt, key)
+}
+
+func testAccCheckSakuraCloudWebAccelCertificateFreeCertConfig(siteName string, enabled bool) string {
+	tmpl := `
+data sakuracloud_webaccel "site" {
+  name = "%s"
+}
+resource sakuracloud_webaccel_certificate "foobar" {
+  site_id      = data.sakuracloud_webaccel.site.id
+  lets_encrypt = %s
+}
+`
+	if enabled {
+		return fmt.Sprintf(tmpl, siteName, "true")
+	} else {
+		return fmt.Sprintf(tmpl, siteName, "false")
+	}
 }
