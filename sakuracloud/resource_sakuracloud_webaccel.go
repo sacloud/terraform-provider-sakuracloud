@@ -17,7 +17,6 @@ package sakuracloud
 import (
 	"context"
 	"fmt"
-
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
@@ -125,6 +124,27 @@ func resourceSakuraCloudWebAccel() *schema.Resource {
 							Type:        schema.TypeBool,
 							Optional:    true,
 							Description: "whether the document indexing for the bucket is enabled or not: optional for origin.type = `bucket`",
+						},
+					},
+				},
+			},
+			"origin_guard_token": {
+				Type:        schema.TypeSet,
+				Optional:    true,
+				Description: "origin guard token to protect the origin resource",
+				Elem: &schema.Resource{
+					Schema: map[string]*schema.Schema{
+						"token": {
+							Type:        schema.TypeString,
+							Computed:    true,
+							Description: "origin guard token value",
+							Sensitive:   true,
+						},
+						"rotate": {
+							Type:        schema.TypeBool,
+							Optional:    true,
+							Description: "whether or not rotate the origin guard token immediately",
+							Default:     false,
 						},
 					},
 				},
@@ -297,12 +317,12 @@ func resourceSakuraCloudWebAccelCreate(ctx context.Context, d *schema.ResourceDa
 		}
 	}
 
+	cleanUpSiteWithError := func(e error) diag.Diagnostics {
+		d.SetId("")
+		return diag.FromErr(e)
+	}
 	// logging
 	if hasLoggingConfig {
-		cleanUpSiteWithError := func(e error) diag.Diagnostics {
-			d.SetId("")
-			return diag.FromErr(e)
-		}
 		cfg, err := expandLoggingParameters(d)
 		if err != nil {
 			return cleanUpSiteWithError(err)
@@ -311,6 +331,22 @@ func resourceSakuraCloudWebAccelCreate(ctx context.Context, d *schema.ResourceDa
 		if err != nil {
 			return cleanUpSiteWithError(err)
 		}
+	}
+
+	// FIXME: 処理を外部に切り出すこと
+	if _, ok := d.GetOk("origin_guard_token"); ok {
+		originGuardTokenAttr := make(map[string]interface{})
+		// TODO: Create 処理では `rotate` argument を許容しない。
+		if _, hasOriginGuardToken := d.GetOk("origin_guard_token"); hasOriginGuardToken {
+			res, err := newOp.CreateOriginGuardToken(ctx, res.ID)
+			// オリジンガードトークンの発行に失敗した場合、サイトそのものを削除
+			if err != nil {
+				return cleanUpSiteWithError(err)
+			}
+			originGuardTokenAttr["token"] = res.OriginGuardToken
+		}
+		// FIXME: オリジンガードトークンがReadできないことを前提とする処理。不自然なので今のところReadにまとめる。
+		d.Set("origin_guard_token", []interface{}{originGuardTokenAttr})
 	}
 
 	d.SetId(res.ID)
@@ -429,6 +465,35 @@ func resourceSakuraCloudWebAccelUpdate(ctx context.Context, d *schema.ResourceDa
 			}
 		}
 	}
+
+	// FIXME: 処理を外部に切り出すこと
+	if d.HasChange("origin_guard_token") {
+		originGuardTokenAttr := make(map[string]interface{})
+		if _, hasOriginGuardToken := d.GetOk("origin_guard_token"); hasOriginGuardToken {
+			if d.HasChange("rotate") {
+				if isRotating, hasRotateField := d.GetOk("rotate"); hasRotateField {
+					originGuardTokenAttr["token"] = isRotating.(bool)
+					// NOTE: rotate=true の際にのみ次期トークンを発行し、
+					// 直後にCreateOriginGuardTokenを呼んで新規トークンを即時適用する。
+					if isRotating.(bool) {
+						_, err := newOp.CreateNextOriginGuardToken(ctx, siteID)
+						if err != nil {
+							d.SetId("")
+							return diag.FromErr(err)
+						}
+					}
+				}
+			}
+			res, err := newOp.CreateOriginGuardToken(ctx, siteID)
+			if err != nil {
+				d.SetId("")
+				return diag.FromErr(err)
+			}
+			originGuardTokenAttr["token"] = res.OriginGuardToken
+		}
+		d.Set("origin_guard_token", originGuardTokenAttr)
+	}
+
 	return resourceSakuraCloudWebAccelRead(ctx, d, meta)
 }
 
