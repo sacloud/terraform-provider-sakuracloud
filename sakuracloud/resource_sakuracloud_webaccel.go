@@ -332,24 +332,24 @@ func resourceSakuraCloudWebAccelCreate(ctx context.Context, d *schema.ResourceDa
 			return cleanUpSiteWithError(err)
 		}
 	}
+	d.SetId(res.ID)
 
-	// FIXME: 処理を外部に切り出すこと
+	// いずれかの処理が失敗した場合、サイトの作成を中断し、サイトを削除する
 	if _, ok := d.GetOk("origin_guard_token"); ok {
-		originGuardTokenAttr := make(map[string]interface{})
-		// TODO: Create 処理では `rotate` argument を許容しない。
-		if _, hasOriginGuardToken := d.GetOk("origin_guard_token"); hasOriginGuardToken {
-			res, err := newOp.CreateOriginGuardToken(ctx, res.ID)
-			// オリジンガードトークンの発行に失敗した場合、サイトそのものを削除
-			if err != nil {
-				return cleanUpSiteWithError(err)
-			}
-			originGuardTokenAttr["token"] = res.OriginGuardToken
+		attr, err := mapFromSet(d, "origin_guard_token")
+		if err != nil {
+			return cleanUpSiteWithError(err)
 		}
-		// FIXME: オリジンガードトークンがReadできないことを前提とする処理。不自然なので今のところReadにまとめる。
-		d.Set("origin_guard_token", []interface{}{originGuardTokenAttr})
+		// Note: Create 処理では `rotate` argument を許容しない。
+		if v, ok := attr.GetOk("rotate"); ok && v.(bool) {
+			return cleanUpSiteWithError(fmt.Errorf("origin guard token cannot be rotated at its first creation"))
+		}
+		err = setOriginGuardTokenParameters(d, ctx, newOp)
+		if err != nil {
+			return cleanUpSiteWithError(err)
+		}
 	}
 
-	d.SetId(res.ID)
 	return resourceSakuraCloudWebAccelRead(ctx, d, meta)
 }
 
@@ -466,32 +466,12 @@ func resourceSakuraCloudWebAccelUpdate(ctx context.Context, d *schema.ResourceDa
 		}
 	}
 
-	// FIXME: 処理を外部に切り出すこと
+	//FIXME: テンプレートでrotateの値を変更した場合、適用後に差分が発生する。
 	if d.HasChange("origin_guard_token") {
-		originGuardTokenAttr := make(map[string]interface{})
-		if _, hasOriginGuardToken := d.GetOk("origin_guard_token"); hasOriginGuardToken {
-			if d.HasChange("rotate") {
-				if isRotating, hasRotateField := d.GetOk("rotate"); hasRotateField {
-					originGuardTokenAttr["token"] = isRotating.(bool)
-					// NOTE: rotate=true の際にのみ次期トークンを発行し、
-					// 直後にCreateOriginGuardTokenを呼んで新規トークンを即時適用する。
-					if isRotating.(bool) {
-						_, err := newOp.CreateNextOriginGuardToken(ctx, siteID)
-						if err != nil {
-							d.SetId("")
-							return diag.FromErr(err)
-						}
-					}
-				}
-			}
-			res, err := newOp.CreateOriginGuardToken(ctx, siteID)
-			if err != nil {
-				d.SetId("")
-				return diag.FromErr(err)
-			}
-			originGuardTokenAttr["token"] = res.OriginGuardToken
+		err = setOriginGuardTokenParameters(d, ctx, newOp)
+		if err != nil {
+			return diag.FromErr(err)
 		}
-		d.Set("origin_guard_token", originGuardTokenAttr)
 	}
 
 	return resourceSakuraCloudWebAccelRead(ctx, d, meta)
@@ -520,6 +500,31 @@ func setWebAccelResourceData(d *schema.ResourceData, client *APIClient, data *we
 	}
 	return setWebAccelSiteResourceData(d, client, data)
 }
+
+// setOriginGuardTokenParameters オリジンガードトークンを新規作成or更新して、値を`ResourceData`に代入する。
+// 第1引数の`ResourceData`には事前にIDを設定しておくこと。
+func setOriginGuardTokenParameters(d *schema.ResourceData, ctx context.Context, op webaccel.API) error {
+	originGuardTokenAttr := make(map[string]interface{})
+	if d.HasChange("rotate") {
+		if isRotating, hasRotateField := d.GetOk("rotate"); hasRotateField && isRotating.(bool) {
+			originGuardTokenAttr["rotate"] = true
+			// NOTE: rotate=true の際にのみ次期トークンを発行し、
+			// 直後にCreateOriginGuardTokenを呼んで新規トークンを即時適用する。
+			_, err := op.CreateNextOriginGuardToken(ctx, d.Id())
+			if err != nil {
+				return err
+			}
+		}
+	}
+	res, err := op.CreateOriginGuardToken(ctx, d.Id())
+	if err != nil {
+		return err
+	}
+	originGuardTokenAttr["token"] = res.OriginGuardToken
+	d.Set("origin_guard_token", []interface{}{originGuardTokenAttr}) //nolint:errcheck,gosec
+	return nil
+}
+
 func setWebAccelSiteResourceData(d *schema.ResourceData, client *APIClient, data *webaccel.Site) diag.Diagnostics {
 	d.Set("name", data.Name)                                              //nolint:errcheck,gosec
 	d.Set("domain_type", data.DomainType)                                 //nolint:errcheck,gosec
