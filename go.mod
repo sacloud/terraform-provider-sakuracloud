@@ -10,14 +10,14 @@ require (
 	github.com/hashicorp/terraform-plugin-mux v0.10.0
 	github.com/hashicorp/terraform-plugin-sdk/v2 v2.27.0
 	github.com/mitchellh/go-homedir v1.1.0
-	github.com/sacloud/api-client-go v0.3.0
+	github.com/sacloud/api-client-go v0.3.2
 	github.com/sacloud/apprun-api-go v0.3.0
 	github.com/sacloud/autoscaler v0.16.1
 	github.com/sacloud/iaas-api-go v1.16.0
 	github.com/sacloud/iaas-service-go v1.12.0
 	github.com/sacloud/iso9660wrap v0.0.0-20171031075302-eda21f77f6a8
 	github.com/sacloud/packages-go v0.0.11
-	github.com/sacloud/simplemq-api-go v0.1.3
+	github.com/sacloud/simplemq-api-go v0.2.0
 	github.com/sacloud/webaccel-api-go v1.3.0
 	github.com/stretchr/testify v1.10.0
 	golang.org/x/text v0.26.0
@@ -65,7 +65,7 @@ require (
 	github.com/hashicorp/go-cleanhttp v0.5.2 // indirect
 	github.com/hashicorp/go-hclog v1.6.3 // indirect
 	github.com/hashicorp/go-plugin v1.5.2 // indirect
-	github.com/hashicorp/go-retryablehttp v0.7.7 // indirect
+	github.com/hashicorp/go-retryablehttp v0.7.8 // indirect
 	github.com/hashicorp/go-uuid v1.0.3 // indirect
 	github.com/hashicorp/go-version v1.6.0 // indirect
 	github.com/hashicorp/hc-install v0.6.4 // indirect

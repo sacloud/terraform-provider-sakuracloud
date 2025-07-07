@@ -21,6 +21,7 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
+	api "github.com/sacloud/api-client-go"
 	"github.com/sacloud/simplemq-api-go"
 	"github.com/sacloud/simplemq-api-go/apis/v1/queue"
 	"github.com/sacloud/terraform-provider-sakuracloud/internal/desc"
@@ -104,10 +105,12 @@ func resourceSakuraCloudSimpleMQRead(ctx context.Context, d *schema.ResourceData
 	}
 	queueOp := simplemq.NewQueueOp(client.simplemqClient)
 
-	mq, err := queueOp.Get(ctx, d.Id())
+	mq, err := queueOp.Read(ctx, d.Id())
 	if err != nil {
-		// TODO: simplemq-api-goで404 NotFoundかどうかのエラー判定ができるようになったら、404の時のみ`d.SetId("")`を呼ぶようにする
-		// ref: https://github.com/sacloud/terraform-provider-sakuracloud/pull/1256#discussion_r2141220479
+		if api.IsNotFoundError(err) {
+			d.SetId("")
+			return nil
+		}
 		return diag.Errorf("could not read SimpleMQ[%s] queue: %s", d.Id(), err)
 	}
 
@@ -121,7 +124,7 @@ func resourceSakuraCloudSimpleMQUpdate(ctx context.Context, d *schema.ResourceDa
 	}
 	queueOp := simplemq.NewQueueOp(client.simplemqClient)
 
-	mq, err := queueOp.Get(ctx, d.Id())
+	mq, err := queueOp.Read(ctx, d.Id())
 	if err != nil {
 		return diag.Errorf("could not read SimpleMQ[%s] queue: %s", d.Id(), err)
 	}
@@ -140,10 +143,12 @@ func resourceSakuraCloudSimpleMQDelete(ctx context.Context, d *schema.ResourceDa
 	}
 	queueOp := simplemq.NewQueueOp(client.simplemqClient)
 
-	mq, err := queueOp.Get(ctx, d.Id())
+	mq, err := queueOp.Read(ctx, d.Id())
 	if err != nil {
-		// TODO: simplemq-api-goで404 NotFoundかどうかのエラー判定ができるようになったら、404の時のみ`d.SetId("")`を呼ぶようにする
-		// ref: https://github.com/sacloud/terraform-provider-sakuracloud/pull/1256#discussion_r2141220479
+		if api.IsNotFoundError(err) {
+			d.SetId("")
+			return nil
+		}
 		return diag.Errorf("could not read SimpleMQ[%s] queue: %s", d.Id(), err)
 	}
 
