@@ -128,6 +128,8 @@ github.com/hashicorp/go-plugin v1.5.2 h1:aWv8eimFqWlsEiMrYZdPYl+FdHaBJSN4AWwGWfT
 github.com/hashicorp/go-plugin v1.5.2/go.mod h1:w1sAEES3g3PuV/RzUrgow20W2uErMly84hhD3um1WL4=
 github.com/hashicorp/go-retryablehttp v0.7.7 h1:C8hUCYzor8PIfXHa4UrZkU4VvK8o9ISHxT2Q8+VepXU=
 github.com/hashicorp/go-retryablehttp v0.7.7/go.mod h1:pkQpWZeYWskR+D1tR2O5OcBFOxfA7DoAO6xtkuQnHTk=
+github.com/hashicorp/go-retryablehttp v0.7.8 h1:ylXZWnqa7Lhqpk0L1P1LzDtGcCR0rPVUrx/c8Unxc48=
+github.com/hashicorp/go-retryablehttp v0.7.8/go.mod h1:rjiScheydd+CxvumBsIrFKlx3iS0jrZ7LvzFGFmuKbw=
 github.com/hashicorp/go-uuid v1.0.0/go.mod h1:6SBZvOh/SIDV7/2o3Jml5SYk/TvGqwFJ/bN7x4byOro=
 github.com/hashicorp/go-uuid v1.0.3 h1:2gKiV6YVmrJ1i2CKKa9obLvRieoRGviZFL26PcT/Co8=
 github.com/hashicorp/go-uuid v1.0.3/go.mod h1:6SBZvOh/SIDV7/2o3Jml5SYk/TvGqwFJ/bN7x4byOro=
@@ -231,6 +233,8 @@ github.com/rogpeppe/go-internal v1.13.1 h1:KvO1DLK/DRN07sQ1LQKScxyZJuNnedQ5/wKSR
 github.com/rogpeppe/go-internal v1.13.1/go.mod h1:uMEvuHeurkdAXX61udpOXGD/AzZDWNMNyH2VO9fmH0o=
 github.com/sacloud/api-client-go v0.3.0 h1:NLA2BpZ5welAXBPxgmXSCjgn/k0ShDB0x5kmUHl7TJ4=
 github.com/sacloud/api-client-go v0.3.0/go.mod h1:v8ke3pxVQ9TCWEbMkfbLX8NMeGiPpE+uDwlgcUWfMgM=
+github.com/sacloud/api-client-go v0.3.2 h1:INbdSpQbyGN9Ai4hQ+Gbv3UQcgtRPG2tJrOmqT7HGl0=
+github.com/sacloud/api-client-go v0.3.2/go.mod h1:0p3ukcWYXRCc2AUWTl1aA+3sXLvurvvDqhRaLZRLBwo=
 github.com/sacloud/apprun-api-go v0.3.0 h1:KOV6NLDE97RZrB9cyFpAHZdHdPovdZAQB6970aHJSpM=
 github.com/sacloud/apprun-api-go v0.3.0/go.mod h1:exDPXQMJIShaelI5LtXI3Ns7HwRLnYI8QuGFMd+pESM=
 github.com/sacloud/autoscaler v0.16.1 h1:W13gjBwRvYKw4bi4BZjFUUJNHMMARy45cq/YY6Mg2bE=
@@ -251,6 +255,8 @@ github.com/sacloud/packages-go v0.0.11 h1:hrRWLmfPM9w7GBs6xb5/ue6pEMl8t1UuDKyR/K
 github.com/sacloud/packages-go v0.0.11/go.mod h1:XNF5MCTWcHo9NiqWnYctVbASSSZR3ZOmmQORIzcurJ8=
 github.com/sacloud/simplemq-api-go v0.1.3 h1:MQnLYC91PjA0aKpShK+17tgWLQ99bXZNI2dAUXd+d4Q=
 github.com/sacloud/simplemq-api-go v0.1.3/go.mod h1:dtX2aGFcL4AJ5pN1yKukdII0uOe3FjjwdW3xYfyKCZE=
+github.com/sacloud/simplemq-api-go v0.2.0 h1:mXds9QMX3ICm3USNxx1//2Ae9pLpdffycHzrvKlHYfs=
+github.com/sacloud/simplemq-api-go v0.2.0/go.mod h1:AcGQQXuiMsMqgnzomrArqUYoijcSVZwnDx61At2Hvqc=
 github.com/sacloud/webaccel-api-go v1.3.0 h1:qu8QycooO64dkHdWPRdUn3eUf9BWpLASoh9uUo7oWZs=
 github.com/sacloud/webaccel-api-go v1.3.0/go.mod h1:5R914VqVeXIR320MwZYlSouFXgm/mvtY3YQ3SYSPWcU=
 github.com/segmentio/asm v1.2.0 h1:9BQrFxC+YOHJlTlHGkTrFWf59nbL3XnCoFLTwDCI7ys=

@@ -84,7 +84,7 @@ func testCheckSakuraCloudSimpleMQDestroy(s *terraform.State) error {
 			continue
 		}
 
-		_, err := queueOp.Get(context.Background(), rs.Primary.ID)
+		_, err := queueOp.Read(context.Background(), rs.Primary.ID)
 		if err == nil {
 			return fmt.Errorf("still exists SimpleMQ: %s", rs.Primary.ID)
 		}
@@ -107,7 +107,7 @@ func testCheckSakuraCloudSimpleMQExists(n string, queue *queue.CommonServiceItem
 		client := testAccProvider.Meta().(*APIClient)
 		queueOp := simplemq.NewQueueOp(client.simplemqClient)
 
-		foundMQ, err := queueOp.Get(context.Background(), rs.Primary.ID)
+		foundMQ, err := queueOp.Read(context.Background(), rs.Primary.ID)
 		if err != nil {
 			return err
 		}
