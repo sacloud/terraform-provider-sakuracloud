@@ -99,29 +99,31 @@ func resourceSakuraCloudWebAccelCertificateCreate(ctx context.Context, d *schema
 
 	// NOTE: `lets_encrypt` argument は `certificate_chain`,`private_key`と相互に排他的。
 	// スキーマレベルでこれらの引数の競合を検出・防止する。
+	_, hasCertChain := d.GetOk("certificate_chain")
+	_, hasPrivKey := d.GetOk("private_key")
 
-	// FIXME: 条件分岐を部分的に外側に切り出すなどして、可読性を向上させること。
-	if _, ok := d.GetOk("certificate_chain"); ok {
-		if _, ok = d.GetOk("private_key"); ok {
-			res, err := webaccel.NewOp(client.webaccelClient).CreateCertificate(ctx, siteID, &webaccel.CreateOrUpdateCertificateRequest{
-				CertificateChain: d.Get("certificate_chain").(string),
-				Key:              d.Get("private_key").(string),
-			})
-			if err != nil {
-				return diag.FromErr(err)
-			}
-
-			d.SetId(res.Current.SiteID)
-		} else {
-			return diag.Errorf("certificate_chain and private_key must be specified together")
-		}
-	} else if _, ok := d.GetOk("private_key"); ok {
-		return diag.Errorf("certificate_chain and private_key must be specified together")
-	} else if _, ok := d.GetOk("lets_encrypt"); ok {
-		err = webaccel.NewOp(client.webaccelClient).CreateAutoCertUpdate(ctx, siteID)
+	if hasCertChain && hasPrivKey {
+		//FIXME: 動作未検証
+		res, err := webaccel.NewOp(client.webaccelClient).CreateCertificate(ctx, siteID, &webaccel.CreateOrUpdateCertificateRequest{
+			CertificateChain: d.Get("certificate_chain").(string),
+			Key:              d.Get("private_key").(string),
+		})
 		if err != nil {
 			return diag.FromErr(err)
 		}
+
+		d.SetId(res.Current.SiteID)
+	} else if hasCertChain || hasPrivKey {
+		//FIXME: 動作未検証
+		return diag.Errorf("certificate_chain and private_key must be specified together")
+	} else {
+		if v, ok := d.GetOk("lets_encrypt"); ok && v.(bool) {
+			err = webaccel.NewOp(client.webaccelClient).CreateAutoCertUpdate(ctx, siteID)
+			if err != nil {
+				return diag.FromErr(err)
+			}
+		}
+		d.SetId(siteID)
 	}
 	return resourceSakuraCloudWebAccelCertificateRead(ctx, d, meta)
 }
@@ -135,7 +137,8 @@ func resourceSakuraCloudWebAccelCertificateRead(ctx context.Context, d *schema.R
 	siteID := d.Id()
 
 	if v, ok := d.GetOk("lets_encrypt"); ok {
-		// Note: Let'sEncrypt の有効化状態を取得する処理がwebaccel-api-goに存在しないため、便宜的にテンプレート上の状態を無条件でResourceDataに代入する。
+		// Note: Let'sEncrypt の有効化状態を取得する処理がwebaccel-api-goに存在しない。
+		// そのため、現時点では便宜的にテンプレート上の状態をそのままResourceDataに代入する。
 		// [詳細] https://github.com/sacloud/webaccel-api-go/issues/70
 		return setWebAccelCertificateLetsEncryptResourceData(d, siteID, v.(bool))
 	} else {
@@ -163,7 +166,18 @@ func resourceSakuraCloudWebAccelCertificateUpdate(ctx context.Context, d *schema
 	}
 	siteID := d.Id()
 
+	//FIXME: `lets_encrypt`フラグの値が更新されると、正常に処理が完了しない。
+	if v, hasLetsEncrypt := d.GetOk("lets_encrypt"); hasLetsEncrypt {
+		if v.(bool) {
+			err = webaccel.NewOp(client.webaccelClient).CreateAutoCertUpdate(ctx, siteID)
+		} else {
+			err = webaccel.NewOp(client.webaccelClient).DeleteAutoCertUpdate(ctx, siteID)
+		}
+		//d.Set("lets_encrypt", v) // nolint
+		//d.SetId(siteID)
+	}
 	if d.HasChanges("certificate_chain", "private_key") {
+		//FIXME: 動作未検証
 		res, err := webaccel.NewOp(client.webaccelClient).UpdateCertificate(ctx, siteID, &webaccel.CreateOrUpdateCertificateRequest{
 			CertificateChain: d.Get("certificate_chain").(string),
 			Key:              d.Get("private_key").(string),
@@ -172,12 +186,6 @@ func resourceSakuraCloudWebAccelCertificateUpdate(ctx context.Context, d *schema
 			return diag.FromErr(err)
 		}
 		d.SetId(res.Current.SiteID)
-	} else if d.HasChange("lets_encrypt") {
-		if v := d.Get("lets_encrypt").(bool); v {
-			err = webaccel.NewOp(client.webaccelClient).CreateAutoCertUpdate(ctx, siteID)
-		} else {
-			err = webaccel.NewOp(client.webaccelClient).DeleteAutoCertUpdate(ctx, siteID)
-		}
 	}
 
 	return resourceSakuraCloudWebAccelCertificateRead(ctx, d, meta)
@@ -190,10 +198,16 @@ func resourceSakuraCloudWebAccelCertificateDelete(ctx context.Context, d *schema
 	}
 	siteID := d.Get("site_id").(string)
 
-	if err := webaccel.NewOp(client.webaccelClient).DeleteCertificate(ctx, siteID); err != nil {
+	if hasLetsEncryptCert, isLetsEncrypt := d.GetOk("lets_encrypt"); isLetsEncrypt {
+		if hasLetsEncryptCert.(bool) {
+			err = webaccel.NewOp(client.webaccelClient).DeleteAutoCertUpdate(ctx, siteID)
+			if err != nil {
+				return diag.Errorf("deleting SakuraCloud WebAccelCert[%s] (Let's Encrypt) is failed: %s", d.Id(), err)
+			}
+		}
+	} else if err := webaccel.NewOp(client.webaccelClient).DeleteCertificate(ctx, siteID); err != nil {
 		return diag.Errorf("deleting SakuraCloud WebAccelCert[%s] is failed: %s", d.Id(), err)
 	}
-
 	d.SetId("")
 	return nil
 }
@@ -217,6 +231,7 @@ func setWebAccelCertificateResourceData(d *schema.ResourceData, client *APIClien
 
 func setWebAccelCertificateLetsEncryptResourceData(d *schema.ResourceData, siteId string, isEnabled bool) diag.Diagnostics {
 	d.Set("site_id", siteId)         //nolint
+	d.Set("dns_names", []string{})   //nolint
 	d.Set("lets_encrypt", isEnabled) //nolint
 	return nil
 }

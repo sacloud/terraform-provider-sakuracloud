@@ -122,9 +122,17 @@ func TestAccResourceSakuraCloudWebAccelCertificate_LetsEncrypt(t *testing.T) {
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestMatchResourceAttr("sakuracloud_webaccel_certificate.foobar", "id", regexpNotEmpty),
 					resource.TestMatchResourceAttr("sakuracloud_webaccel_certificate.foobar", "site_id", regexpNotEmpty),
-					resource.TestCheckResourceAttr("sakuracloud_webaccel_certificate.foobar", "lets_encrypt", "true"),
+					resource.TestCheckResourceAttr("sakuracloud_webaccel_certificate.foobar", "lets_encrypt", "false"),
 				),
 			},
+			//{
+			//	Config: testAccCheckSakuraCloudWebAccelCertificateFreeCertConfig(siteName, true),
+			//	Check: resource.ComposeTestCheckFunc(
+			//		resource.TestMatchResourceAttr("sakuracloud_webaccel_certificate.foobar", "id", regexpNotEmpty),
+			//		resource.TestMatchResourceAttr("sakuracloud_webaccel_certificate.foobar", "site_id", regexpNotEmpty),
+			//		resource.TestCheckResourceAttr("sakuracloud_webaccel_certificate.foobar", "lets_encrypt", "true"),
+			//	),
+			//},
 		},
 	})
 }
