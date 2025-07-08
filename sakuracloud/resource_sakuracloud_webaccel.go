@@ -466,7 +466,6 @@ func resourceSakuraCloudWebAccelUpdate(ctx context.Context, d *schema.ResourceDa
 		}
 	}
 
-	//FIXME: テンプレートでrotateの値を変更した場合、適用後に差分が発生する。
 	if d.HasChange("origin_guard_token") {
 		err = setOriginGuardTokenParameters(d, ctx, newOp)
 		if err != nil {
@@ -505,17 +504,24 @@ func setWebAccelResourceData(d *schema.ResourceData, client *APIClient, data *we
 // 第1引数の`ResourceData`には事前にIDを設定しておくこと。
 func setOriginGuardTokenParameters(d *schema.ResourceData, ctx context.Context, op webaccel.API) error {
 	originGuardTokenAttr := make(map[string]interface{})
-	if d.HasChange("rotate") {
-		if isRotating, hasRotateField := d.GetOk("rotate"); hasRotateField && isRotating.(bool) {
-			originGuardTokenAttr["rotate"] = true
-			// NOTE: rotate=true の際にのみ次期トークンを発行し、
-			// 直後にCreateOriginGuardTokenを呼んで新規トークンを即時適用する。
-			_, err := op.CreateNextOriginGuardToken(ctx, d.Id())
-			if err != nil {
-				return err
-			}
+	param, err := mapFromSet(d, "origin_guard_token")
+	if err != nil {
+		return err
+	}
+
+	//Note: スキーマ定義で`rotate`フィールドの値が存在することを保証している。
+	isRotating := param.Get("rotate").(bool)
+
+	originGuardTokenAttr["rotate"] = isRotating
+	if isRotating {
+		// NOTE: rotate=true の際にのみ次期トークンを発行し、
+		// 直後にCreateOriginGuardTokenを呼んで新規トークンを即時適用する。
+		_, err = op.CreateNextOriginGuardToken(ctx, d.Id())
+		if err != nil {
+			return err
 		}
 	}
+
 	res, err := op.CreateOriginGuardToken(ctx, d.Id())
 	if err != nil {
 		return err

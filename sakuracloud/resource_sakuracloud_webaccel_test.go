@@ -333,11 +333,8 @@ func TestAccSakuraCloudResourceWebAccel_WebOriginWithOriginGuard(t *testing.T) {
 	}
 
 	siteName := "your-site-name"
-	// domainName := os.Getenv(envWebAccelDomainName)
 	origin := os.Getenv(envWebAccelOrigin)
 	regexpNotEmpty := regexp.MustCompile(".+")
-	//FIXME: ローテーション処理でトークンが変更されることを検証(できればする)
-	//tmpTokenValue := ""
 
 	resource.Test(t, resource.TestCase{
 		PreCheck:          func() { testAccPreCheck(t) },
@@ -500,7 +497,7 @@ resource sakuracloud_webaccel "foobar" {
 }
 `
 	if hasRotateField {
-		return fmt.Sprintf(tmpl, siteName, origin, origin, "rotate = true")
+		return fmt.Sprintf(tmpl, siteName, origin, origin, "\n    rotate = true\n")
 	} else {
 		return fmt.Sprintf(tmpl, siteName, origin, origin, "")
 	}
