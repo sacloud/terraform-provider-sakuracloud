@@ -12,7 +12,7 @@ require (
 	github.com/mitchellh/go-homedir v1.1.0
 	github.com/sacloud/api-client-go v0.3.2
 	github.com/sacloud/apprun-api-go v0.3.0
-	github.com/sacloud/autoscaler v0.16.1
+	github.com/sacloud/autoscaler v0.16.2
 	github.com/sacloud/iaas-api-go v1.16.0
 	github.com/sacloud/iaas-service-go v1.12.1
 	github.com/sacloud/iso9660wrap v0.0.0-20171031075302-eda21f77f6a8
