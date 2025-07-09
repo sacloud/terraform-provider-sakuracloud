@@ -122,6 +122,8 @@ func resourceSakuraCloudWebAccelCertificateCreate(ctx context.Context, d *schema
 			if err != nil {
 				return diag.FromErr(err)
 			}
+		} else {
+			return diag.Errorf("lets_encrypt must be true for the creation")
 		}
 		d.SetId(siteID)
 	}
@@ -166,16 +168,6 @@ func resourceSakuraCloudWebAccelCertificateUpdate(ctx context.Context, d *schema
 	}
 	siteID := d.Id()
 
-	//FIXME: `lets_encrypt`フラグの値が更新されると、正常に処理が完了しない。
-	if v, hasLetsEncrypt := d.GetOk("lets_encrypt"); hasLetsEncrypt {
-		if v.(bool) {
-			err = webaccel.NewOp(client.webaccelClient).CreateAutoCertUpdate(ctx, siteID)
-		} else {
-			err = webaccel.NewOp(client.webaccelClient).DeleteAutoCertUpdate(ctx, siteID)
-		}
-		//d.Set("lets_encrypt", v) // nolint
-		//d.SetId(siteID)
-	}
 	if d.HasChanges("certificate_chain", "private_key") {
 		//FIXME: 動作未検証
 		res, err := webaccel.NewOp(client.webaccelClient).UpdateCertificate(ctx, siteID, &webaccel.CreateOrUpdateCertificateRequest{
@@ -186,6 +178,16 @@ func resourceSakuraCloudWebAccelCertificateUpdate(ctx context.Context, d *schema
 			return diag.FromErr(err)
 		}
 		d.SetId(res.Current.SiteID)
+	} else {
+		//NOTE: `lets_encrypt`フラグは変更をサポートしない。
+		// テンプレート上でl`true`->`false`に変更をしてapplyした場合、エラーは返さず、Update後の差分を残す。
+		if v, hasLetsEncrypt := d.GetOk("lets_encrypt"); hasLetsEncrypt {
+			if !v.(bool) {
+				return diag.Errorf("LetsEncrypt must not be false, delete it to disable the feature")
+			}
+		} else {
+			return diag.Errorf("LetsEncrypt must not be false, delete it to disable the feature")
+		}
 	}
 
 	return resourceSakuraCloudWebAccelCertificateRead(ctx, d, meta)
