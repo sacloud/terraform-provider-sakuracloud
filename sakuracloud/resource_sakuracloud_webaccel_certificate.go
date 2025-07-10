@@ -32,8 +32,9 @@ func resourceSakuraCloudWebAccelCertificate() *schema.Resource {
 		DeleteContext: resourceSakuraCloudWebAccelCertificateDelete,
 		Schema: map[string]*schema.Schema{
 			"site_id": {
-				Type:     schema.TypeString,
-				Required: true,
+				Type:      schema.TypeString,
+				Required:  true,
+				Sensitive: true,
 			},
 			"certificate_chain": {
 				Type:      schema.TypeString,
@@ -46,33 +47,40 @@ func resourceSakuraCloudWebAccelCertificate() *schema.Resource {
 				Sensitive: true,
 			},
 			"serial_number": {
-				Type:     schema.TypeString,
-				Computed: true,
+				Type:      schema.TypeString,
+				Computed:  true,
+				Sensitive: true,
 			},
 			"not_before": {
-				Type:     schema.TypeString,
-				Computed: true,
+				Type:      schema.TypeString,
+				Computed:  true,
+				Sensitive: true,
 			},
 			"not_after": {
-				Type:     schema.TypeString,
-				Computed: true,
+				Type:      schema.TypeString,
+				Computed:  true,
+				Sensitive: true,
 			},
 			"issuer_common_name": {
-				Type:     schema.TypeString,
-				Computed: true,
+				Type:      schema.TypeString,
+				Computed:  true,
+				Sensitive: true,
 			},
 			"subject_common_name": {
-				Type:     schema.TypeString,
-				Computed: true,
+				Type:      schema.TypeString,
+				Computed:  true,
+				Sensitive: true,
 			},
 			"dns_names": {
-				Type:     schema.TypeList,
-				Elem:     &schema.Schema{Type: schema.TypeString},
-				Computed: true,
+				Type:      schema.TypeList,
+				Elem:      &schema.Schema{Type: schema.TypeString, Sensitive: true},
+				Computed:  true,
+				Sensitive: true,
 			},
 			"sha256_fingerprint": {
-				Type:     schema.TypeString,
-				Computed: true,
+				Type:      schema.TypeString,
+				Computed:  true,
+				Sensitive: true,
 			},
 		},
 	}

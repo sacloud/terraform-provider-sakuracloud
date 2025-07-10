@@ -45,20 +45,26 @@ func resourceSakuraCloudVPCRouter() *schema.Resource {
 		},
 
 		Schema: map[string]*schema.Schema{
-			"name": schemaResourceName(resourceName),
-			"plan": schemaResourcePlan(resourceName, "standard", types.VPCRouterPlanStrings),
+			"name": func() *schema.Schema { s := schemaResourceName(resourceName); s.Sensitive = true; return s }(),
+			"plan": func() *schema.Schema {
+				s := schemaResourcePlan(resourceName, "standard", types.VPCRouterPlanStrings)
+				s.Sensitive = true
+				return s
+			}(),
 			"version": {
 				Type:        schema.TypeInt,
 				Optional:    true,
 				Description: "The version of the VPC Router",
 				Default:     2,
 				ForceNew:    true,
+				Sensitive:   true,
 			},
 			"public_network_interface": {
-				Type:     schema.TypeList,
-				Optional: true, // only required when `plan` is not `standard`
-				MinItems: 1,
-				MaxItems: 1,
+				Type:      schema.TypeList,
+				Optional:  true, // only required when `plan` is not `standard`
+				MinItems:  1,
+				MaxItems:  1,
+				Sensitive: true,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
 						"switch_id": {
@@ -67,12 +73,14 @@ func resourceSakuraCloudVPCRouter() *schema.Resource {
 							Optional:         true,
 							ValidateDiagFunc: validation.ToDiagFunc(validateSakuracloudIDType),
 							Description:      "The id of the switch to connect. This is only required when when `plan` is not `standard`",
+							Sensitive:        true,
 						},
 						"vip": {
 							Type:        schema.TypeString,
 							ForceNew:    true,
 							Optional:    true,
 							Description: "The virtual IP address of the VPC Router. This is only required when `plan` is not `standard`",
+							Sensitive:   true,
 						},
 						"ip_addresses": {
 							Type:        schema.TypeList,
@@ -80,21 +88,24 @@ func resourceSakuraCloudVPCRouter() *schema.Resource {
 							Optional:    true,
 							MinItems:    2,
 							MaxItems:    2,
-							Elem:        &schema.Schema{Type: schema.TypeString},
+							Elem:        &schema.Schema{Type: schema.TypeString, Sensitive: true},
 							Description: "The list of the IP address to assign to the VPC Router. This is required only one value when `plan` is `standard`, two values otherwise",
+							Sensitive:   true,
 						},
 						"vrid": {
 							Type:        schema.TypeInt,
 							ForceNew:    true,
 							Optional:    true,
 							Description: "The Virtual Router Identifier. This is only required when `plan` is not `standard`",
+							Sensitive:   true,
 						},
 						"aliases": {
 							Type:        schema.TypeList,
 							Optional:    true,
-							Elem:        &schema.Schema{Type: schema.TypeString},
+							Elem:        &schema.Schema{Type: schema.TypeString, Sensitive: true},
 							MaxItems:    19,
 							Description: "A list of ip alias to assign to the VPC Router. This can only be specified if `plan` is not `standard`",
+							Sensitive:   true,
 						},
 					},
 				},
@@ -103,18 +114,21 @@ func resourceSakuraCloudVPCRouter() *schema.Resource {
 				Type:        schema.TypeString,
 				Optional:    true,
 				Description: "The ip address of the syslog host to which the VPC Router sends logs",
+				Sensitive:   true,
 			},
 			"internet_connection": {
 				Type:        schema.TypeBool,
 				Optional:    true,
 				Default:     true,
 				Description: "The flag to enable connecting to the Internet from the VPC Router",
+				Sensitive:   true,
 			},
 			"private_network_interface": {
 				Type:        schema.TypeList,
 				Optional:    true,
 				MaxItems:    7,
 				Description: "A list of additional network interface setting. This doesn't include primary network interface setting",
+				Sensitive:   true,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
 						"index": {
@@ -122,38 +136,44 @@ func resourceSakuraCloudVPCRouter() *schema.Resource {
 							Required:         true,
 							ValidateDiagFunc: validation.ToDiagFunc(validation.IntBetween(1, 7)),
 							Description:      desc.Sprintf("The index of the network interface. %s", desc.Range(1, 7)),
+							Sensitive:        true,
 						},
 						"switch_id": {
 							Type:             schema.TypeString,
 							Required:         true,
 							ValidateDiagFunc: validation.ToDiagFunc(validateSakuracloudIDType),
 							Description:      "The id of the connected switch",
+							Sensitive:        true,
 						},
 						"vip": {
 							Type:        schema.TypeString,
 							Optional:    true,
 							Description: "The virtual IP address to assign to the network interface. This is only required when `plan` is not `standard`",
+							Sensitive:   true,
 						},
 						"ip_addresses": {
 							Type:        schema.TypeList,
 							Required:    true,
-							Elem:        &schema.Schema{Type: schema.TypeString},
+							Elem:        &schema.Schema{Type: schema.TypeString, Sensitive: true},
 							MinItems:    1,
 							MaxItems:    2,
 							Description: "A list of ip address to assign to the network interface. This is required only one value when `plan` is `standard`, two values otherwise",
+							Sensitive:   true,
 						},
 						"netmask": {
 							Type:             schema.TypeInt,
 							Required:         true,
 							ValidateDiagFunc: validation.ToDiagFunc(validation.IntBetween(16, 29)),
 							Description:      "The bit length of the subnet to assign to the network interface",
+							Sensitive:        true,
 						},
 					},
 				},
 			},
 			"dhcp_server": {
-				Type:     schema.TypeList,
-				Optional: true,
+				Type:      schema.TypeList,
+				Optional:  true,
+				Sensitive: true,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
 						"interface_index": {
@@ -164,50 +184,58 @@ func resourceSakuraCloudVPCRouter() *schema.Resource {
 								"The index of the network interface on which to enable the DHCP service. %s",
 								desc.Range(1, 7),
 							),
+							Sensitive: true,
 						},
 						"range_start": {
 							Type:             schema.TypeString,
 							Required:         true,
 							ValidateDiagFunc: validateIPv4Address(),
 							Description:      "The start value of IP address range to assign to DHCP client",
+							Sensitive:        true,
 						},
 						"range_stop": {
 							Type:             schema.TypeString,
 							Required:         true,
 							ValidateDiagFunc: validateIPv4Address(),
 							Description:      "The end value of IP address range to assign to DHCP client",
+							Sensitive:        true,
 						},
 						"dns_servers": {
 							Type:        schema.TypeList,
 							Optional:    true,
-							Elem:        &schema.Schema{Type: schema.TypeString},
+							Elem:        &schema.Schema{Type: schema.TypeString, Sensitive: true},
 							Description: "A list of IP address of DNS server to assign to DHCP client",
+							Sensitive:   true,
 						},
 					},
 				},
 			},
 			"dhcp_static_mapping": {
-				Type:     schema.TypeList,
-				Optional: true,
+				Type:      schema.TypeList,
+				Optional:  true,
+				Sensitive: true,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
 						"ip_address": {
 							Type:        schema.TypeString,
 							Required:    true,
 							Description: "The static IP address to assign to DHCP client",
+							Sensitive:   true,
 						},
 						"mac_address": {
 							Type:        schema.TypeString,
 							Required:    true,
 							Description: "The source MAC address of static mapping",
+							Sensitive:   true,
 						},
 					},
 				},
 			},
 			"dns_forwarding": {
-				Type:     schema.TypeList,
-				Optional: true,
-				MaxItems: 1,
+				Type:      schema.TypeList,
+				Optional:  true,
+				MaxItems:  1,
+				Sensitive: true,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
 						"interface_index": {
@@ -218,19 +246,22 @@ func resourceSakuraCloudVPCRouter() *schema.Resource {
 								"The index of the network interface on which to enable the DNS forwarding service. %s",
 								desc.Range(1, 7),
 							),
+							Sensitive: true,
 						},
 						"dns_servers": {
 							Type:        schema.TypeList,
 							Optional:    true,
-							Elem:        &schema.Schema{Type: schema.TypeString},
+							Elem:        &schema.Schema{Type: schema.TypeString, Sensitive: true},
 							Description: "A list of IP address of DNS server to forward to",
+							Sensitive:   true,
 						},
 					},
 				},
 			},
 			"firewall": {
-				Type:     schema.TypeList,
-				Optional: true,
+				Type:      schema.TypeList,
+				Optional:  true,
+				Sensitive: true,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
 						"interface_index": {
@@ -241,6 +272,7 @@ func resourceSakuraCloudVPCRouter() *schema.Resource {
 								"The index of the network interface on which to enable filtering. %s",
 								desc.Range(0, 7),
 							),
+							Sensitive: true,
 						},
 						"direction": {
 							Type:             schema.TypeString,
@@ -250,10 +282,12 @@ func resourceSakuraCloudVPCRouter() *schema.Resource {
 								"The direction to apply the firewall. This must be one of [%s]",
 								[]string{"send", "receive"},
 							),
+							Sensitive: true,
 						},
 						"expression": {
-							Type:     schema.TypeList,
-							Required: true,
+							Type:      schema.TypeList,
+							Required:  true,
+							Sensitive: true,
 							Elem: &schema.Resource{
 								Schema: map[string]*schema.Schema{
 									"protocol": {
@@ -264,42 +298,50 @@ func resourceSakuraCloudVPCRouter() *schema.Resource {
 											"The protocol used for filtering. This must be one of [%s]",
 											types.VPCRouterFirewallProtocolStrings,
 										),
+										Sensitive: true,
 									},
 									"source_network": {
 										Type:        schema.TypeString,
 										Optional:    true,
 										Description: "A source IP address or CIDR block used for filtering (e.g. `192.0.2.1`, `192.0.2.0/24`)",
+										Sensitive:   true,
 									},
 									"source_port": {
 										Type:        schema.TypeString,
 										Optional:    true,
 										Description: "A source port number or port range used for filtering (e.g. `1024`, `1024-2048`). This is only used when `protocol` is `tcp` or `udp`",
+										Sensitive:   true,
 									},
 									"destination_network": {
 										Type:        schema.TypeString,
 										Optional:    true,
 										Description: "A destination IP address or CIDR block used for filtering (e.g. `192.0.2.1`, `192.0.2.0/24`)",
+										Sensitive:   true,
 									},
 									"destination_port": {
 										Type:        schema.TypeString,
 										Optional:    true,
 										Description: "A destination port number or port range used for filtering (e.g. `1024`, `1024-2048`). This is only used when `protocol` is `tcp` or `udp`",
+										Sensitive:   true,
 									},
 									"allow": {
 										Type:        schema.TypeBool,
 										Required:    true,
 										Description: "The flag to allow the packet through the filter",
+										Sensitive:   true,
 									},
 									"logging": {
 										Type:        schema.TypeBool,
 										Optional:    true,
 										Description: "The flag to enable packet logging when matching the expression",
+										Sensitive:   true,
 									},
 									"description": {
 										Type:             schema.TypeString,
 										Optional:         true,
 										ValidateDiagFunc: isValidLengthBetween(0, 512),
 										Description:      desc.Sprintf("The description of the expression. %s", desc.Length(0, 512)),
+										Sensitive:        true,
 									},
 								},
 							},
@@ -308,9 +350,10 @@ func resourceSakuraCloudVPCRouter() *schema.Resource {
 				},
 			},
 			"l2tp": {
-				Type:     schema.TypeList,
-				Optional: true,
-				MaxItems: 1,
+				Type:      schema.TypeList,
+				Optional:  true,
+				MaxItems:  1,
+				Sensitive: true,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
 						"pre_shared_secret": {
@@ -325,19 +368,22 @@ func resourceSakuraCloudVPCRouter() *schema.Resource {
 							Required:         true,
 							ValidateDiagFunc: validateIPv4Address(),
 							Description:      "The start value of IP address range to assign to L2TP/IPsec client",
+							Sensitive:        true,
 						},
 						"range_stop": {
 							Type:             schema.TypeString,
 							Required:         true,
 							ValidateDiagFunc: validateIPv4Address(),
 							Description:      "The end value of IP address range to assign to L2TP/IPsec client",
+							Sensitive:        true,
 						},
 					},
 				},
 			},
 			"port_forwarding": {
-				Type:     schema.TypeList,
-				Optional: true,
+				Type:      schema.TypeList,
+				Optional:  true,
+				Sensitive: true,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
 						"protocol": {
@@ -348,38 +394,44 @@ func resourceSakuraCloudVPCRouter() *schema.Resource {
 								"The protocol used for port forwarding. This must be one of [%s]",
 								[]string{"tcp", "udp"},
 							),
+							Sensitive: true,
 						},
 						"public_port": {
 							Type:             schema.TypeInt,
 							Required:         true,
 							ValidateDiagFunc: validation.ToDiagFunc(validation.IntBetween(1, 65535)),
 							Description:      "The source port number of the port forwarding. This must be a port number on a public network",
+							Sensitive:        true,
 						},
 						"private_ip": {
 							Type:             schema.TypeString,
 							Required:         true,
 							ValidateDiagFunc: validateIPv4Address(),
 							Description:      "The destination ip address of the port forwarding",
+							Sensitive:        true,
 						},
 						"private_port": {
 							Type:             schema.TypeInt,
 							Required:         true,
 							ValidateDiagFunc: validation.ToDiagFunc(validation.IntBetween(1, 65535)),
 							Description:      "The destination port number of the port forwarding. This will be a port number on a private network",
+							Sensitive:        true,
 						},
 						"description": {
 							Type:             schema.TypeString,
 							Optional:         true,
 							ValidateDiagFunc: isValidLengthBetween(0, 512),
 							Description:      desc.Sprintf("The description of the port forwarding. %s", desc.Length(0, 512)),
+							Sensitive:        true,
 						},
 					},
 				},
 			},
 			"pptp": {
-				Type:     schema.TypeList,
-				Optional: true,
-				MaxItems: 1,
+				Type:      schema.TypeList,
+				Optional:  true,
+				MaxItems:  1,
+				Sensitive: true,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
 						"range_start": {
@@ -387,51 +439,60 @@ func resourceSakuraCloudVPCRouter() *schema.Resource {
 							Required:         true,
 							ValidateDiagFunc: validateIPv4Address(),
 							Description:      "The start value of IP address range to assign to PPTP client",
+							Sensitive:        true,
 						},
 						"range_stop": {
 							Type:             schema.TypeString,
 							Required:         true,
 							ValidateDiagFunc: validateIPv4Address(),
 							Description:      "The end value of IP address range to assign to PPTP client",
+							Sensitive:        true,
 						},
 					},
 				},
 			},
 			"wire_guard": {
-				Type:     schema.TypeList,
-				Optional: true,
-				MaxItems: 1,
+				Type:      schema.TypeList,
+				Optional:  true,
+				MaxItems:  1,
+				Sensitive: true,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
 						"ip_address": {
 							Type:        schema.TypeString,
 							Required:    true,
 							Description: "The IP address for WireGuard server. This must be formatted with xxx.xxx.xxx.xxx/nn",
+							Sensitive:   true,
 						},
 						"public_key": {
 							Type:        schema.TypeString,
 							Computed:    true,
 							Description: "the public key of the WireGuard server",
+							Sensitive:   true,
 						},
 						"peer": {
-							Type:     schema.TypeList,
-							Optional: true,
+							Type:      schema.TypeList,
+							Optional:  true,
+							Sensitive: true,
 							Elem: &schema.Resource{
 								Schema: map[string]*schema.Schema{
 									"name": {
 										Type:        schema.TypeString,
 										Required:    true,
 										Description: "the of the peer",
+										Sensitive:   true,
 									},
 									"ip_address": {
 										Type:        schema.TypeString,
 										Required:    true,
 										Description: "The IP address for peer",
+										Sensitive:   true,
 									},
 									"public_key": {
 										Type:        schema.TypeString,
 										Required:    true,
 										Description: "the public key of the WireGuard client",
+										Sensitive:   true,
 									},
 								},
 							},
@@ -440,19 +501,22 @@ func resourceSakuraCloudVPCRouter() *schema.Resource {
 				},
 			},
 			"site_to_site_vpn": {
-				Type:     schema.TypeList,
-				Optional: true,
+				Type:      schema.TypeList,
+				Optional:  true,
+				Sensitive: true,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
 						"peer": {
 							Type:        schema.TypeString,
 							Required:    true,
 							Description: "The IP address of the opposing appliance connected to the VPC Router",
+							Sensitive:   true,
 						},
 						"remote_id": {
 							Type:        schema.TypeString,
 							Required:    true,
 							Description: "The id of the opposing appliance connected to the VPC Router. This is typically set same as value of `peer`",
+							Sensitive:   true,
 						},
 						"pre_shared_secret": {
 							Type:             schema.TypeString,
@@ -465,15 +529,17 @@ func resourceSakuraCloudVPCRouter() *schema.Resource {
 							Type:        schema.TypeSet,
 							Set:         schema.HashString,
 							Required:    true,
-							Elem:        &schema.Schema{Type: schema.TypeString},
+							Elem:        &schema.Schema{Type: schema.TypeString, Sensitive: true},
 							Description: "A list of CIDR block of VPN connected networks",
+							Sensitive:   true,
 						},
 						"local_prefix": {
 							Type:        schema.TypeSet,
 							Set:         schema.HashString,
 							Required:    true,
-							Elem:        &schema.Schema{Type: schema.TypeString},
+							Elem:        &schema.Schema{Type: schema.TypeString, Sensitive: true},
 							Description: "A list of CIDR block of the network under the VPC Router",
+							Sensitive:   true,
 						},
 					},
 				},
@@ -572,8 +638,9 @@ func resourceSakuraCloudVPCRouter() *schema.Resource {
 				},
 			},
 			"static_nat": {
-				Type:     schema.TypeList,
-				Optional: true,
+				Type:      schema.TypeList,
+				Optional:  true,
+				Sensitive: true,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
 						"public_ip": {
@@ -581,46 +648,53 @@ func resourceSakuraCloudVPCRouter() *schema.Resource {
 							Required:         true,
 							ValidateDiagFunc: validateIPv4Address(),
 							Description:      "The public IP address used for the static NAT",
+							Sensitive:        true,
 						},
 						"private_ip": {
 							Type:             schema.TypeString,
 							Required:         true,
 							ValidateDiagFunc: validateIPv4Address(),
 							Description:      "The private IP address used for the static NAT",
+							Sensitive:        true,
 						},
 						"description": {
 							Type:             schema.TypeString,
 							Optional:         true,
 							ValidateDiagFunc: isValidLengthBetween(0, 512),
 							Description:      desc.Sprintf("The description of the static nat. %s", desc.Length(0, 512)),
+							Sensitive:        true,
 						},
 					},
 				},
 			},
 			"static_route": {
-				Type:     schema.TypeList,
-				Optional: true,
+				Type:      schema.TypeList,
+				Optional:  true,
+				Sensitive: true,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
 						"prefix": {
 							Type:        schema.TypeString,
 							Required:    true,
 							Description: "The CIDR block of destination",
+							Sensitive:   true,
 						},
 						"next_hop": {
 							Type:             schema.TypeString,
 							Required:         true,
 							ValidateDiagFunc: validateIPv4Address(),
 							Description:      "The IP address of the next hop",
+							Sensitive:        true,
 						},
 					},
 				},
 			},
 			"scheduled_maintenance": {
-				Type:     schema.TypeList,
-				Optional: true,
-				Computed: true,
-				MaxItems: 1,
+				Type:      schema.TypeList,
+				Optional:  true,
+				Computed:  true,
+				MaxItems:  1,
+				Sensitive: true,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
 						"day_of_week": {
@@ -631,6 +705,7 @@ func resourceSakuraCloudVPCRouter() *schema.Resource {
 								"The value must be in [%s]",
 								types.DaysOfTheWeekStrings,
 							),
+							Sensitive: true,
 						},
 						"hour": {
 							Type:             schema.TypeInt,
@@ -638,14 +713,16 @@ func resourceSakuraCloudVPCRouter() *schema.Resource {
 							Default:          3,
 							ValidateDiagFunc: validation.ToDiagFunc(validation.IntBetween(0, 23)),
 							Description:      "The time to start maintenance",
+							Sensitive:        true,
 						},
 					},
 				},
 			},
 			"user": {
-				Type:     schema.TypeList,
-				Optional: true,
-				MaxItems: 100,
+				Type:      schema.TypeList,
+				Optional:  true,
+				MaxItems:  100,
+				Sensitive: true,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
 						"name": {
@@ -653,6 +730,7 @@ func resourceSakuraCloudVPCRouter() *schema.Resource {
 							Required:         true,
 							ValidateDiagFunc: isValidLengthBetween(1, 20),
 							Description:      "The user name used to authenticate remote access",
+							Sensitive:        true,
 						},
 						"password": {
 							Type:             schema.TypeString,
@@ -664,19 +742,21 @@ func resourceSakuraCloudVPCRouter() *schema.Resource {
 					},
 				},
 			},
-			"icon_id":     schemaResourceIconID(resourceName),
-			"description": schemaResourceDescription(resourceName),
-			"tags":        schemaResourceTags(resourceName),
-			"zone":        schemaResourceZone(resourceName),
+			"icon_id":     func() *schema.Schema { s := schemaResourceIconID(resourceName); s.Sensitive = true; return s }(),
+			"description": func() *schema.Schema { s := schemaResourceDescription(resourceName); s.Sensitive = true; return s }(),
+			"tags":        func() *schema.Schema { s := schemaResourceTags(resourceName); s.Sensitive = true; return s }(),
+			"zone":        func() *schema.Schema { s := schemaResourceZone(resourceName); s.Sensitive = true; return s }(),
 			"public_ip": {
 				Type:        schema.TypeString,
 				Computed:    true,
 				Description: "The public ip address of the VPC Router",
+				Sensitive:   true,
 			},
 			"public_netmask": {
 				Type:        schema.TypeInt,
 				Computed:    true,
 				Description: "The bit length of the subnet to assign to the public network interface",
+				Sensitive:   true,
 			},
 		},
 	}

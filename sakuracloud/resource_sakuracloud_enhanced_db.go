@@ -42,12 +42,13 @@ func resourceSakuraCloudEnhancedDB() *schema.Resource {
 		},
 
 		Schema: map[string]*schema.Schema{
-			"name": schemaResourceName(resourceName),
+			"name": func() *schema.Schema { s := schemaResourceName(resourceName); s.Sensitive = true; return s }(),
 			"database_name": {
 				Type:        schema.TypeString,
 				Required:    true,
 				ForceNew:    true,
 				Description: "The name of database",
+				Sensitive:   true,
 			},
 			"database_type": {
 				Type:             schema.TypeString,
@@ -58,6 +59,7 @@ func resourceSakuraCloudEnhancedDB() *schema.Resource {
 					"The type of database. This must be one of [%s]",
 					types.EnhancedDBTypeStrings,
 				),
+				Sensitive: true,
 			},
 			"region": {
 				Type:             schema.TypeString,
@@ -68,6 +70,7 @@ func resourceSakuraCloudEnhancedDB() *schema.Resource {
 					"The name of region that the database is in. This must be one of [%s]",
 					types.EnhancedDBRegionStrings,
 				),
+				Sensitive: true,
 			},
 			"password": {
 				Type:        schema.TypeString,
@@ -77,23 +80,26 @@ func resourceSakuraCloudEnhancedDB() *schema.Resource {
 			},
 			"allowed_networks": {
 				Type:        schema.TypeList,
-				Elem:        &schema.Schema{Type: schema.TypeString},
+				Elem:        &schema.Schema{Type: schema.TypeString, Sensitive: true},
 				Optional:    true,
 				Description: desc.Sprintf("A list of CIDR blocks allowed to connect"),
+				Sensitive:   true,
 			},
 			"hostname": {
 				Type:        schema.TypeString,
 				Computed:    true,
 				Description: "The name of database host. This will be built from `database_name` + `tidb-is1.db.sakurausercontent.com`",
+				Sensitive:   true,
 			},
 			"max_connections": {
 				Type:        schema.TypeInt,
 				Computed:    true,
 				Description: "The value of max connections setting",
+				Sensitive:   true,
 			},
-			"icon_id":     schemaResourceIconID(resourceName),
-			"description": schemaResourceDescription(resourceName),
-			"tags":        schemaResourceTags(resourceName),
+			"icon_id":     func() *schema.Schema { s := schemaResourceIconID(resourceName); s.Sensitive = true; return s }(),
+			"description": func() *schema.Schema { s := schemaResourceDescription(resourceName); s.Sensitive = true; return s }(),
+			"tags":        func() *schema.Schema { s := schemaResourceTags(resourceName); s.Sensitive = true; return s }(),
 		},
 
 		DeprecationMessage: "sakuracloud_enhanced_db is an experimental resource. Please note that you will need to update the tfstate manually if the resource schema is changed.",

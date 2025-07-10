@@ -49,7 +49,7 @@ func resourceSakuraCloudArchive() *schema.Resource {
 		},
 
 		Schema: map[string]*schema.Schema{
-			"name": schemaResourceName(resourceName),
+			"name": func() *schema.Schema { s := schemaResourceName(resourceName); s.Sensitive = true; return s }(),
 			"size": {
 				Type:             schema.TypeInt,
 				Optional:         true,
@@ -58,12 +58,14 @@ func resourceSakuraCloudArchive() *schema.Resource {
 				ValidateDiagFunc: validation.ToDiagFunc(validation.IntInSlice(types.ArchiveSizes)),
 				Description:      desc.Sprintf("The size of %s in GiB. This must be one of [%s]", resourceName, types.ArchiveSizes),
 				ConflictsWith:    []string{"source_disk_id", "source_archive_id", "source_shared_key", "source_archive_zone"},
+				Sensitive:        true,
 			},
 			"archive_file": {
 				Type:        schema.TypeString,
 				Optional:    true,
 				ForceNew:    true,
 				Description: "The file path to upload to the SakuraCloud",
+				Sensitive:   true,
 			},
 			"hash": {
 				Type:        schema.TypeString,
@@ -71,6 +73,7 @@ func resourceSakuraCloudArchive() *schema.Resource {
 				Computed:    true,
 				ForceNew:    true,
 				Description: "The md5 checksum calculated from the base64 encoded file body",
+				Sensitive:   true,
 			},
 			"source_archive_id": {
 				Type:             schema.TypeString,
@@ -82,6 +85,7 @@ func resourceSakuraCloudArchive() *schema.Resource {
 					"The id of the source archive. %s",
 					desc.Conflicts("source_disk_id"),
 				),
+				Sensitive: true,
 			},
 			"source_archive_zone": {
 				Type:          schema.TypeString,
@@ -89,6 +93,7 @@ func resourceSakuraCloudArchive() *schema.Resource {
 				Optional:      true,
 				ConflictsWith: []string{"source_shared_key", "source_disk_id", "size"},
 				Description:   "The share key of source shared archive",
+				Sensitive:     true,
 			},
 			"source_disk_id": {
 				Type:             schema.TypeString,
@@ -100,6 +105,7 @@ func resourceSakuraCloudArchive() *schema.Resource {
 					"The id of the source disk. %s",
 					desc.Conflicts("source_archive_id"),
 				),
+				Sensitive: true,
 			},
 			"source_shared_key": {
 				Type:             schema.TypeString,
@@ -110,10 +116,10 @@ func resourceSakuraCloudArchive() *schema.Resource {
 				ValidateDiagFunc: validation.ToDiagFunc(validateSourceSharedKey),
 				Description:      "The share key of source shared archive",
 			},
-			"icon_id":     schemaResourceIconID(resourceName),
-			"description": schemaResourceDescription(resourceName),
-			"tags":        schemaResourceTags(resourceName),
-			"zone":        schemaResourceZone(resourceName),
+			"icon_id":     func() *schema.Schema { s := schemaResourceIconID(resourceName); s.Sensitive = true; return s }(),
+			"description": func() *schema.Schema { s := schemaResourceDescription(resourceName); s.Sensitive = true; return s }(),
+			"tags":        func() *schema.Schema { s := schemaResourceTags(resourceName); s.Sensitive = true; return s }(),
+			"zone":        func() *schema.Schema { s := schemaResourceZone(resourceName); s.Sensitive = true; return s }(),
 		},
 	}
 }

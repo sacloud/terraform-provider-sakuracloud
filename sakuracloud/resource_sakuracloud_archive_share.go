@@ -45,6 +45,7 @@ func resourceSakuraCloudArchiveShare() *schema.Resource {
 				Required:         true,
 				ValidateDiagFunc: validation.ToDiagFunc(validateSakuracloudIDType),
 				Description:      "The id of the archive",
+				Sensitive:        true,
 			},
 			"share_key": {
 				Type:        schema.TypeString,
@@ -52,7 +53,7 @@ func resourceSakuraCloudArchiveShare() *schema.Resource {
 				Sensitive:   true,
 				Description: "The key to use sharing the Archive",
 			},
-			"zone": schemaResourceZone(resourceName),
+			"zone": func() *schema.Schema { s := schemaResourceZone(resourceName); s.Sensitive = true; return s }(),
 		},
 	}
 }

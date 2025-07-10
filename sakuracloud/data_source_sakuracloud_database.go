@@ -31,8 +31,8 @@ func dataSourceSakuraCloudDatabase() *schema.Resource {
 		ReadContext: dataSourceSakuraCloudDatabaseRead,
 
 		Schema: map[string]*schema.Schema{
-			filterAttrName: filterSchema(&filterSchemaOption{}),
-			"name":         schemaDataSourceName(resourceName),
+			filterAttrName: func() *schema.Schema { s := filterSchema(&filterSchemaOption{}); s.Sensitive = true; return s }(),
+			"name":         func() *schema.Schema { s := schemaDataSourceName(resourceName); s.Sensitive = true; return s }(),
 			"database_type": {
 				Type:     schema.TypeString,
 				Computed: true,
@@ -40,17 +40,24 @@ func dataSourceSakuraCloudDatabase() *schema.Resource {
 					"The type of the database. This will be one of [%s]",
 					types.RDBMSTypeStrings,
 				),
+				Sensitive: true,
 			},
 			"database_version": {
 				Type:        schema.TypeString,
 				Computed:    true,
 				Description: "The version of the database",
+				Sensitive:   true,
 			},
-			"plan": schemaDataSourcePlan(resourceName, types.DatabasePlanStrings),
+			"plan": func() *schema.Schema {
+				s := schemaDataSourcePlan(resourceName, types.DatabasePlanStrings)
+				s.Sensitive = true
+				return s
+			}(),
 			"username": {
 				Type:        schema.TypeString,
 				Computed:    true,
 				Description: "The name of default user on the database",
+				Sensitive:   true,
 			},
 			"password": {
 				Type:        schema.TypeString,
@@ -62,6 +69,7 @@ func dataSourceSakuraCloudDatabase() *schema.Resource {
 				Type:        schema.TypeString,
 				Computed:    true,
 				Description: "The name of user that processing a replication",
+				Sensitive:   true,
 			},
 			"replica_password": {
 				Type:        schema.TypeString,
@@ -70,14 +78,15 @@ func dataSourceSakuraCloudDatabase() *schema.Resource {
 				Description: "The password of user that processing a replication",
 			},
 			"network_interface": {
-				Type:     schema.TypeList,
-				Computed: true,
+				Type:      schema.TypeList,
+				Computed:  true,
+				Sensitive: true,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
-						"switch_id":     schemaDataSourceSwitchID(resourceName),
-						"ip_address":    schemaDataSourceIPAddress(resourceName),
-						"netmask":       schemaDataSourceNetMask(resourceName),
-						"gateway":       schemaDataSourceGateway(resourceName),
+						"switch_id":     func() *schema.Schema { s := schemaDataSourceSwitchID(resourceName); s.Sensitive = true; return s }(),
+						"ip_address":    func() *schema.Schema { s := schemaDataSourceIPAddress(resourceName); s.Sensitive = true; return s }(),
+						"netmask":       func() *schema.Schema { s := schemaDataSourceNetMask(resourceName); s.Sensitive = true; return s }(),
+						"gateway":       func() *schema.Schema { s := schemaDataSourceGateway(resourceName); s.Sensitive = true; return s }(),
 						"port":          schemaDataSourcePort(),
 						"source_ranges": schemaDataSourceSourceRanges(resourceName),
 					},

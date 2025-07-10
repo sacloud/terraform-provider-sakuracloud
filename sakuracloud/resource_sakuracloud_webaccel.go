@@ -34,80 +34,93 @@ func resourceSakuraCloudWebAccel() *schema.Resource {
 			StateContext: schema.ImportStatePassthroughContext,
 		},
 		Schema: map[string]*schema.Schema{
-			"name": schemaResourceName("web accelerator"),
+			"name": func() *schema.Schema { s := schemaResourceName("web accelerator"); s.Sensitive = true; return s }(),
 			"domain_type": {
 				Type:         schema.TypeString,
 				Required:     true,
 				ValidateFunc: validation.StringInSlice([]string{"subdomain", "own_domain"}, false),
 				Description:  "domain type of the site: one of `subdomain` or `own_domain`",
+				Sensitive:    true,
 			},
 			"subdomain": {
 				Type:        schema.TypeString,
 				Computed:    true,
 				Description: "subdomain of the site",
+				Sensitive:   true,
 			},
 			"cname_record_value": {
-				Type:     schema.TypeString,
-				Computed: true,
+				Type:      schema.TypeString,
+				Computed:  true,
+				Sensitive: true,
 			},
 			"txt_record_value": {
-				Type:     schema.TypeString,
-				Computed: true,
+				Type:      schema.TypeString,
+				Computed:  true,
+				Sensitive: true,
 			},
 			"domain": {
 				Type:        schema.TypeString,
 				Optional:    true,
 				Description: "domain name of the site: required for domain_type = `own_domain`",
+				Sensitive:   true,
 			},
 			"request_protocol": {
 				Type:         schema.TypeString,
 				Required:     true,
 				ValidateFunc: validation.StringInSlice([]string{"http+https", "https", "https-redirect"}, false),
 				Description:  "request protocol of the site: one of `http+https`, `https` or `https-redirect",
+				Sensitive:    true,
 			},
 			"origin_parameters": {
 				Type:        schema.TypeSet,
 				Required:    true,
 				Description: "origin parameters of the site",
+				Sensitive:   true,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
 						"type": {
 							Type:        schema.TypeString,
 							Required:    true,
 							Description: "origin type of the site: one of `web` or `bucket`",
+							Sensitive:   true,
 						},
 						"origin": {
 							Type:        schema.TypeString,
 							Optional:    true,
 							Description: "origin hostname or IP address: required for origin.type = `web`",
+							Sensitive:   true,
 						},
 						"protocol": {
 							Type:         schema.TypeString,
 							Optional:     true,
 							ValidateFunc: validation.StringInSlice([]string{"http", "https"}, false),
 							Description:  "request protocol for the origin host: required for origin.type = `web`",
+							Sensitive:    true,
 						},
 						"host_header": {
 							Type:        schema.TypeString,
 							Optional:    true,
 							Description: "host header to the origin : optional for origin.type = `web`",
+							Sensitive:   true,
 						},
 						"s3_endpoint": {
-							Type:     schema.TypeString,
-							Optional: true,
-							// without protocol scheme
+							Type:             schema.TypeString,
+							Optional:         true,
 							ValidateDiagFunc: validateHostName(),
 							Description:      "S3 endpoint: required for origin.type = `bucket`",
+							Sensitive:        true,
 						},
 						"s3_region": {
 							Type:        schema.TypeString,
 							Optional:    true,
 							Description: "S3 region: required for origin.type = `bucket`",
+							Sensitive:   true,
 						},
 						"s3_bucket_name": {
 							Type:        schema.TypeString,
 							Optional:    true,
 							Description: "S3 bucket name: required for origin.type = `bucket`",
+							Sensitive:   true,
 						},
 						"s3_access_key_id": {
 							Type:        schema.TypeString,
@@ -125,6 +138,7 @@ func resourceSakuraCloudWebAccel() *schema.Resource {
 							Type:        schema.TypeBool,
 							Optional:    true,
 							Description: "whether the document indexing for the bucket is enabled or not: optional for origin.type = `bucket`",
+							Sensitive:   true,
 						},
 					},
 				},
@@ -133,18 +147,21 @@ func resourceSakuraCloudWebAccel() *schema.Resource {
 				Type:        schema.TypeSet,
 				Optional:    true,
 				Description: "CORS rules of the site",
+				Sensitive:   true,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
 						"allow_all": {
 							Type:        schema.TypeBool,
 							Description: "whether the site permits cross origin requests for all or not",
 							Optional:    true,
+							Sensitive:   true,
 						},
 						"allowed_origins": {
 							Type:        schema.TypeList,
-							Elem:        &schema.Schema{Type: schema.TypeString},
+							Elem:        &schema.Schema{Type: schema.TypeString, Sensitive: true},
 							Description: "list of allowed origins for CORS",
 							Optional:    true,
+							Sensitive:   true,
 						},
 					},
 				},
@@ -153,17 +170,20 @@ func resourceSakuraCloudWebAccel() *schema.Resource {
 				Type:        schema.TypeSet,
 				Optional:    true,
 				Description: "logging configuration of the site",
+				Sensitive:   true,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
 						"enabled": {
 							Type:        schema.TypeBool,
 							Required:    true,
 							Description: "whether the site logging is enabled or not",
+							Sensitive:   true,
 						},
 						"s3_bucket_name": {
 							Type:        schema.TypeString,
 							Required:    true,
 							Description: "logging bucket name",
+							Sensitive:   true,
 						},
 						"s3_access_key_id": {
 							Type:        schema.TypeString,
@@ -185,24 +205,27 @@ func resourceSakuraCloudWebAccel() *schema.Resource {
 				Optional:    true,
 				Type:        schema.TypeList,
 				Sensitive:   true,
-				Elem:        &schema.Schema{Type: schema.TypeString},
+				Elem:        &schema.Schema{Type: schema.TypeString, Sensitive: true},
 			},
 			"vary_support": {
 				Type:        schema.TypeBool,
 				Description: "whether the site recognizes the Vary header or not",
 				Optional:    true,
+				Sensitive:   true,
 			},
 			"default_cache_ttl": {
 				Type:         schema.TypeInt,
 				Description:  "the default cache TTL of the site",
 				ValidateFunc: validation.IntBetween(-1, 604800),
 				Optional:     true,
+				Sensitive:    true,
 			},
 			"normalize_ae": {
 				Type:         schema.TypeString,
 				Description:  "accept-encoding normalization: one of `gzip` or br+gzip",
 				ValidateFunc: validation.StringInSlice([]string{"gzip", "br+gzip"}, false),
 				Optional:     true,
+				Sensitive:    true,
 			},
 		},
 	}

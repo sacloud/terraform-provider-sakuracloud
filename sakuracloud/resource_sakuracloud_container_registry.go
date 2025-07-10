@@ -41,7 +41,7 @@ func resourceSakuraCloudContainerRegistry() *schema.Resource {
 		},
 
 		Schema: map[string]*schema.Schema{
-			"name": schemaResourceName(resourceName),
+			"name": func() *schema.Schema { s := schemaResourceName(resourceName); s.Sensitive = true; return s }(),
 			"access_level": {
 				Type:             schema.TypeString,
 				Required:         true,
@@ -50,11 +50,13 @@ func resourceSakuraCloudContainerRegistry() *schema.Resource {
 					"The level of access that allow to users. This must be one of [%s]",
 					types.ContainerRegistryAccessLevelStrings,
 				),
+				Sensitive: true,
 			},
 			"virtual_domain": {
 				Type:        schema.TypeString,
 				Optional:    true,
 				Description: "The alias for accessing the container registry",
+				Sensitive:   true,
 			},
 			"subdomain_label": {
 				Type:             schema.TypeString,
@@ -65,24 +67,28 @@ func resourceSakuraCloudContainerRegistry() *schema.Resource {
 					"The label at the lowest of the FQDN used when be accessed from users. %s",
 					desc.Length(1, 64),
 				),
+				Sensitive: true,
 			},
 			"fqdn": {
 				Type:        schema.TypeString,
 				Computed:    true,
 				Description: "The FQDN for accessing the Container Registry. FQDN is built from `subdomain_label` + `.sakuracr.jp`",
+				Sensitive:   true,
 			},
-			"icon_id":     schemaResourceIconID(resourceName),
-			"description": schemaResourceDescription(resourceName),
-			"tags":        schemaResourceTags(resourceName),
+			"icon_id":     func() *schema.Schema { s := schemaResourceIconID(resourceName); s.Sensitive = true; return s }(),
+			"description": func() *schema.Schema { s := schemaResourceDescription(resourceName); s.Sensitive = true; return s }(),
+			"tags":        func() *schema.Schema { s := schemaResourceTags(resourceName); s.Sensitive = true; return s }(),
 			"user": {
-				Type:     schema.TypeList,
-				Optional: true,
+				Type:      schema.TypeList,
+				Optional:  true,
+				Sensitive: true,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
 						"name": {
 							Type:        schema.TypeString,
 							Required:    true,
 							Description: "The user name used to authenticate remote access",
+							Sensitive:   true,
 						},
 						"password": {
 							Type:        schema.TypeString,
@@ -98,6 +104,7 @@ func resourceSakuraCloudContainerRegistry() *schema.Resource {
 								"The level of access that allow to the user. This must be one of [%s]",
 								types.ContainerRegistryPermissionStrings,
 							),
+							Sensitive: true,
 						},
 					},
 				},

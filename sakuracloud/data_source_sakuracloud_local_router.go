@@ -28,27 +28,31 @@ func dataSourceSakuraCloudLocalRouter() *schema.Resource {
 		ReadContext: dataSourceSakuraCloudLocalRouterRead,
 
 		Schema: map[string]*schema.Schema{
-			filterAttrName: filterSchema(&filterSchemaOption{}),
-			"name":         schemaDataSourceName(resourceName),
+			filterAttrName: func() *schema.Schema { s := filterSchema(&filterSchemaOption{}); s.Sensitive = true; return s }(),
+			"name":         func() *schema.Schema { s := schemaDataSourceName(resourceName); s.Sensitive = true; return s }(),
 			"switch": {
-				Type:     schema.TypeList,
-				Computed: true,
+				Type:      schema.TypeList,
+				Computed:  true,
+				Sensitive: true,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
 						"code": {
 							Type:        schema.TypeString,
 							Computed:    true,
 							Description: "The resource ID of the Switch",
+							Sensitive:   true,
 						},
 						"category": {
 							Type:        schema.TypeString,
 							Computed:    true,
 							Description: "The category name of connected services (e.g. `cloud`, `vps`)",
+							Sensitive:   true,
 						},
 						"zone_id": {
 							Type:        schema.TypeString,
 							Computed:    true,
 							Description: "The id of the Zone",
+							Sensitive:   true,
 						},
 					},
 				},
