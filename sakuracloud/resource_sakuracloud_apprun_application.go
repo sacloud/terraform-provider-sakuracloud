@@ -48,26 +48,31 @@ func resourceSakuraCloudApprunApplication() *schema.Resource {
 				Type:        schema.TypeString,
 				Required:    true,
 				Description: "The name of application",
+				Sensitive:   true,
 			},
 			"timeout_seconds": {
 				Type:        schema.TypeInt,
 				Required:    true,
 				Description: "The time limit between accessing the application's public URL, starting the instance, and receiving a response",
+				Sensitive:   true,
 			},
 			"port": {
 				Type:        schema.TypeInt,
 				Required:    true,
 				Description: "The port number where the application listens for requests",
+				Sensitive:   true,
 			},
 			"min_scale": {
 				Type:        schema.TypeInt,
 				Required:    true,
 				Description: "The minimum number of scales for the entire application",
+				Sensitive:   true,
 			},
 			"max_scale": {
 				Type:        schema.TypeInt,
 				Required:    true,
 				Description: "The maximum number of scales for the entire application",
+				Sensitive:   true,
 			},
 			"components": {
 				Type:        schema.TypeList,
@@ -80,6 +85,7 @@ func resourceSakuraCloudApprunApplication() *schema.Resource {
 							Required:    true,
 							Description: "The component name",
 							ForceNew:    true,
+							Sensitive:   true,
 						},
 						"max_cpu": {
 							Type:             schema.TypeString,
@@ -89,6 +95,7 @@ func resourceSakuraCloudApprunApplication() *schema.Resource {
 								"The maximum number of CPUs for a component. The values in the list must be in [%s]",
 								apprun.ApplicationMaxCPUs,
 							),
+							Sensitive: true,
 						},
 						"max_memory": {
 							Type:             schema.TypeString,
@@ -98,34 +105,40 @@ func resourceSakuraCloudApprunApplication() *schema.Resource {
 								"The maximum memory of component. The values in the list must be in [%s]",
 								apprun.ApplicationMaxMemories,
 							),
+							Sensitive: true,
 						},
 						"deploy_source": {
 							Type:        schema.TypeList,
 							Required:    true,
 							MaxItems:    1,
 							Description: "The sources that make up the component",
+							Sensitive:   true,
 							Elem: &schema.Resource{
 								Schema: map[string]*schema.Schema{
 									"container_registry": {
-										Type:     schema.TypeList,
-										Optional: true,
-										MaxItems: 1,
+										Type:      schema.TypeList,
+										Optional:  true,
+										MaxItems:  1,
+										Sensitive: true,
 										Elem: &schema.Resource{
 											Schema: map[string]*schema.Schema{
 												"image": {
 													Type:        schema.TypeString,
 													Required:    true,
 													Description: "The container image name",
+													Sensitive:   true,
 												},
 												"server": {
 													Type:        schema.TypeString,
 													Optional:    true,
 													Description: "The container registry server name",
+													Sensitive:   true,
 												},
 												"username": {
 													Type:        schema.TypeString,
 													Optional:    true,
 													Description: "The container registry credentials",
+													Sensitive:   true,
 												},
 												"password": {
 													Type:        schema.TypeString,
@@ -143,12 +156,14 @@ func resourceSakuraCloudApprunApplication() *schema.Resource {
 							Type:        schema.TypeSet,
 							Optional:    true,
 							Description: "The environment variables passed to components",
+							Sensitive:   true,
 							Elem: &schema.Resource{
 								Schema: map[string]*schema.Schema{
 									"key": {
 										Type:        schema.TypeString,
 										Optional:    true,
 										Description: "The environment variable name",
+										Sensitive:   true,
 									},
 									"value": {
 										Type:        schema.TypeString,
@@ -171,38 +186,45 @@ func resourceSakuraCloudApprunApplication() *schema.Resource {
 							Optional:    true,
 							MaxItems:    1,
 							Description: "The component probe settings",
+							Sensitive:   true,
 							Elem: &schema.Resource{
 								Schema: map[string]*schema.Schema{
 									"http_get": {
-										Type:     schema.TypeList,
-										Required: true,
-										MaxItems: 1,
+										Type:      schema.TypeList,
+										Required:  true,
+										MaxItems:  1,
+										Sensitive: true,
 										Elem: &schema.Resource{
 											Schema: map[string]*schema.Schema{
 												"path": {
 													Type:        schema.TypeString,
 													Required:    true,
 													Description: "The path to access HTTP server to check probes",
+													Sensitive:   true,
 												},
 												"port": {
 													Type:        schema.TypeInt,
 													Required:    true,
 													Description: "The port number for accessing HTTP server and checking probes",
+													Sensitive:   true,
 												},
 												"headers": {
-													Type:     schema.TypeList,
-													Optional: true,
+													Type:      schema.TypeList,
+													Optional:  true,
+													Sensitive: true,
 													Elem: &schema.Resource{
 														Schema: map[string]*schema.Schema{
 															"name": {
 																Type:        schema.TypeString,
 																Optional:    true,
 																Description: "The header field name",
+																Sensitive:   true,
 															},
 															"value": {
 																Type:        schema.TypeString,
 																Optional:    true,
 																Description: "The header field value",
+																Sensitive:   true,
 															},
 														},
 													},

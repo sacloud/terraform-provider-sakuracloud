@@ -30,38 +30,48 @@ func dataSourceSakuraCloudProxyLB() *schema.Resource {
 		ReadContext: dataSourceSakuraCloudProxyLBRead,
 
 		Schema: map[string]*schema.Schema{
-			filterAttrName: filterSchema(&filterSchemaOption{}),
-			"name":         schemaDataSourceName(resourceName),
-			"plan":         schemaDataSourceIntPlan(resourceName, types.ProxyLBPlanValues),
+			filterAttrName: func() *schema.Schema { s := filterSchema(&filterSchemaOption{}); s.Sensitive = true; return s }(),
+			"name":         func() *schema.Schema { s := schemaDataSourceName(resourceName); s.Sensitive = true; return s }(),
+			"plan": func() *schema.Schema {
+				s := schemaDataSourceIntPlan(resourceName, types.ProxyLBPlanValues)
+				s.Sensitive = true
+				return s
+			}(),
 			"vip_failover": {
 				Type:        schema.TypeBool,
 				Computed:    true,
 				Description: "The flag to enable VIP fail-over",
+				Sensitive:   true,
 			},
 			"sticky_session": {
 				Type:        schema.TypeBool,
 				Computed:    true,
 				Description: "The flag to enable sticky session",
+				Sensitive:   true,
 			},
 			"gzip": {
 				Type:        schema.TypeBool,
 				Computed:    true,
 				Description: "The flag to enable gzip compression",
+				Sensitive:   true,
 			},
 			"backend_http_keep_alive": {
 				Type:        schema.TypeString,
 				Computed:    true,
 				Description: "Mode of http keep-alive with backend",
+				Sensitive:   true,
 			},
 			"proxy_protocol": {
 				Type:        schema.TypeBool,
 				Computed:    true,
 				Description: "The flag to enable proxy protocol v2",
+				Sensitive:   true,
 			},
 			"timeout": {
 				Type:        schema.TypeInt,
 				Computed:    true,
 				Description: "The timeout duration in seconds",
+				Sensitive:   true,
 			},
 			"region": {
 				Type:     schema.TypeString,
@@ -70,10 +80,12 @@ func dataSourceSakuraCloudProxyLB() *schema.Resource {
 					"The name of region that the proxy LB is in. This will be one of [%s]",
 					types.ProxyLBRegionStrings,
 				),
+				Sensitive: true,
 			},
 			"syslog": {
-				Type:     schema.TypeList,
-				Computed: true,
+				Type:      schema.TypeList,
+				Computed:  true,
+				Sensitive: true,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
 						"server": {

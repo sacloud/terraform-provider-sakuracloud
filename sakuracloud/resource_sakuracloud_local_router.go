@@ -44,38 +44,43 @@ func resourceSakuraCloudLocalRouter() *schema.Resource {
 		},
 
 		Schema: map[string]*schema.Schema{
-			"name": schemaResourceName(resourceName),
+			"name": func() *schema.Schema { s := schemaResourceName(resourceName); s.Sensitive = true; return s }(),
 			"switch": {
-				Type:     schema.TypeList,
-				MaxItems: 1,
-				MinItems: 1,
-				Required: true,
+				Type:      schema.TypeList,
+				MaxItems:  1,
+				MinItems:  1,
+				Required:  true,
+				Sensitive: true,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
 						"code": {
 							Type:        schema.TypeString,
 							Required:    true,
 							Description: "The resource ID of the Switch",
+							Sensitive:   true,
 						},
 						"category": {
 							Type:        schema.TypeString,
 							Optional:    true,
 							Default:     "cloud",
 							Description: "The category name of connected services (e.g. `cloud`, `vps`)",
+							Sensitive:   true,
 						},
 						"zone_id": {
 							Type:        schema.TypeString,
 							Required:    true,
 							Description: "The id of the Zone",
+							Sensitive:   true,
 						},
 					},
 				},
 			},
 			"network_interface": {
-				Type:     schema.TypeList,
-				Required: true,
-				MinItems: 1,
-				MaxItems: 1,
+				Type:      schema.TypeList,
+				Required:  true,
+				MinItems:  1,
+				MaxItems:  1,
+				Sensitive: true,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
 						"vip": {
@@ -83,14 +88,16 @@ func resourceSakuraCloudLocalRouter() *schema.Resource {
 							Required:         true,
 							ValidateDiagFunc: validation.ToDiagFunc(validation.IsIPv4Address),
 							Description:      "The virtual IP address",
+							Sensitive:        true,
 						},
 						"ip_addresses": {
 							Type:        schema.TypeList,
 							Required:    true,
 							MinItems:    2,
 							MaxItems:    2,
-							Elem:        &schema.Schema{Type: schema.TypeString},
+							Elem:        &schema.Schema{Type: schema.TypeString, Sensitive: true},
 							Description: desc.Sprintf("A list of IP address to assign to the %s. ", resourceName),
+							Sensitive:   true,
 						},
 						"netmask": {
 							Type:             schema.TypeInt,
@@ -100,18 +107,21 @@ func resourceSakuraCloudLocalRouter() *schema.Resource {
 								"The bit length of the subnet assigned to the %s. %s", resourceName,
 								desc.Range(8, 29),
 							),
+							Sensitive: true,
 						},
 						"vrid": {
 							Type:        schema.TypeInt,
 							Required:    true,
 							Description: "The Virtual Router Identifier",
+							Sensitive:   true,
 						},
 					},
 				},
 			},
 			"peer": {
-				Type:     schema.TypeList,
-				Optional: true,
+				Type:      schema.TypeList,
+				Optional:  true,
+				Sensitive: true,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
 						"peer_id": {
@@ -119,6 +129,7 @@ func resourceSakuraCloudLocalRouter() *schema.Resource {
 							Required:         true,
 							ValidateDiagFunc: validation.ToDiagFunc(validateSakuracloudIDType),
 							Description:      "The ID of the peer LocalRouter",
+							Sensitive:        true,
 						},
 						"secret_key": {
 							Type:        schema.TypeString,
@@ -131,38 +142,43 @@ func resourceSakuraCloudLocalRouter() *schema.Resource {
 							Optional:    true,
 							Default:     true,
 							Description: "The flag to enable the LocalRouter",
+							Sensitive:   true,
 						},
-						"description": schemaResourceDescription(resourceName),
+						"description": func() *schema.Schema { s := schemaResourceDescription(resourceName); s.Sensitive = true; return s }(),
 					},
 				},
 			},
 			"static_route": {
-				Type:     schema.TypeList,
-				Optional: true,
+				Type:      schema.TypeList,
+				Optional:  true,
+				Sensitive: true,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
 						"prefix": {
 							Type:        schema.TypeString,
 							Required:    true,
 							Description: "The CIDR block of destination",
+							Sensitive:   true,
 						},
 						"next_hop": {
 							Type:             schema.TypeString,
 							Required:         true,
 							ValidateDiagFunc: validation.ToDiagFunc(validation.IsIPv4Address),
 							Description:      "The IP address of the next hop",
+							Sensitive:        true,
 						},
 					},
 				},
 			},
-			"icon_id":     schemaResourceIconID(resourceName),
-			"description": schemaResourceDescription(resourceName),
-			"tags":        schemaResourceTags(resourceName),
+			"icon_id":     func() *schema.Schema { s := schemaResourceIconID(resourceName); s.Sensitive = true; return s }(),
+			"description": func() *schema.Schema { s := schemaResourceDescription(resourceName); s.Sensitive = true; return s }(),
+			"tags":        func() *schema.Schema { s := schemaResourceTags(resourceName); s.Sensitive = true; return s }(),
 			"secret_keys": {
 				Type:        schema.TypeList,
-				Elem:        &schema.Schema{Type: schema.TypeString},
+				Elem:        &schema.Schema{Type: schema.TypeString, Sensitive: true},
 				Computed:    true,
 				Description: "A list of secret key used for peering from other LocalRouters",
+				Sensitive:   true,
 			},
 		},
 	}

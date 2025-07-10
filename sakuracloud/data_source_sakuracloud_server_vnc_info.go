@@ -36,16 +36,19 @@ func dataSourceSakuraCloudServerVNCInfo() *schema.Resource {
 				Required:         true,
 				ValidateDiagFunc: validation.ToDiagFunc(validateSakuracloudIDType),
 				Description:      "The id of the Server",
+				Sensitive:        true,
 			},
 			"host": {
 				Type:        schema.TypeString,
 				Computed:    true,
 				Description: "The host name for connecting by VNC",
+				Sensitive:   true,
 			},
 			"port": {
 				Type:        schema.TypeInt,
 				Computed:    true,
 				Description: "The port number for connecting by VNC",
+				Sensitive:   true,
 			},
 			"password": {
 				Type:        schema.TypeString,
@@ -53,7 +56,11 @@ func dataSourceSakuraCloudServerVNCInfo() *schema.Resource {
 				Sensitive:   true,
 				Description: "The password for connecting by VNC",
 			},
-			"zone": schemaDataSourceZone("Server VNC Information"),
+			"zone": func() *schema.Schema {
+				s := schemaDataSourceZone("Server VNC Information")
+				s.Sensitive = true
+				return s
+			}(),
 		},
 	}
 }

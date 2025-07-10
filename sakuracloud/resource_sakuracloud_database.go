@@ -46,7 +46,7 @@ func resourceSakuraCloudDatabase() *schema.Resource {
 		},
 
 		Schema: map[string]*schema.Schema{
-			"name": schemaResourceName(resourceName),
+			"name": func() *schema.Schema { s := schemaResourceName(resourceName); s.Sensitive = true; return s }(),
 			"database_type": {
 				Type:             schema.TypeString,
 				Optional:         true,
@@ -65,13 +65,18 @@ func resourceSakuraCloudDatabase() *schema.Resource {
 				ForceNew:    true,
 				Description: "The version of the database",
 			},
-			"plan": schemaResourcePlan(resourceName, "10g", types.DatabasePlanStrings),
+			"plan": func() *schema.Schema {
+				s := schemaResourcePlan(resourceName, "10g", types.DatabasePlanStrings)
+				s.Sensitive = true
+				return s
+			}(),
 			"username": {
 				Type:             schema.TypeString,
 				ForceNew:         true,
 				Required:         true,
 				ValidateDiagFunc: isValidLengthBetween(3, 20),
 				Description:      desc.Sprintf("The name of default user on the database. %s", desc.Length(3, 20)),
+				Sensitive:        true,
 			},
 			"password": {
 				Type:        schema.TypeString,
@@ -84,6 +89,7 @@ func resourceSakuraCloudDatabase() *schema.Resource {
 				Optional:    true,
 				Default:     "replica",
 				Description: "The name of user that processing a replication",
+				Sensitive:   true,
 			},
 			"replica_password": {
 				Type:        schema.TypeString,
@@ -92,18 +98,20 @@ func resourceSakuraCloudDatabase() *schema.Resource {
 				Description: "The password of user that processing a replication",
 			},
 			"network_interface": {
-				Type:     schema.TypeList,
-				Required: true,
-				MinItems: 1,
-				MaxItems: 1,
+				Type:      schema.TypeList,
+				Required:  true,
+				MinItems:  1,
+				MaxItems:  1,
+				Sensitive: true,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
-						"switch_id": schemaResourceSwitchID(resourceName),
+						"switch_id": func() *schema.Schema { s := schemaResourceSwitchID(resourceName); s.Sensitive = true; return s }(),
 						"ip_address": {
 							Type:        schema.TypeString,
 							ForceNew:    true,
 							Required:    true,
 							Description: desc.Sprintf("The IP address to assign to the %s", resourceName),
+							Sensitive:   true,
 						},
 						"netmask": {
 							Type:             schema.TypeInt,
@@ -115,12 +123,14 @@ func resourceSakuraCloudDatabase() *schema.Resource {
 								resourceName,
 								desc.Range(8, 29),
 							),
+							Sensitive: true,
 						},
 						"gateway": {
 							Type:        schema.TypeString,
 							ForceNew:    true,
 							Required:    true,
 							Description: desc.Sprintf("The IP address of the gateway used by %s", resourceName),
+							Sensitive:   true,
 						},
 						"port": {
 							Type:             schema.TypeInt,
@@ -131,41 +141,46 @@ func resourceSakuraCloudDatabase() *schema.Resource {
 								"The number of the listening port. %s",
 								desc.Range(1024, 65535),
 							),
+							Sensitive: true,
 						},
 						"source_ranges": {
 							Type:     schema.TypeList,
 							Optional: true,
-							Elem:     &schema.Schema{Type: schema.TypeString},
+							Elem:     &schema.Schema{Type: schema.TypeString, Sensitive: true},
 							Description: desc.Sprintf(
 								"The range of source IP addresses that allow to access to the %s via network",
 								resourceName,
 							),
+							Sensitive: true,
 						},
 					},
 				},
 			},
 			"backup": {
-				Type:     schema.TypeList,
-				Optional: true,
-				MinItems: 1,
-				MaxItems: 1,
+				Type:      schema.TypeList,
+				Optional:  true,
+				MinItems:  1,
+				MaxItems:  1,
+				Sensitive: true,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
 						"weekdays": {
 							Type:     schema.TypeSet,
 							Optional: true,
-							Elem:     &schema.Schema{Type: schema.TypeString},
+							Elem:     &schema.Schema{Type: schema.TypeString, Sensitive: true},
 							Set:      schema.HashString,
 							Description: desc.Sprintf(
 								"A list of weekdays to backed up. The values in the list must be in [%s]",
 								types.DaysOfTheWeekStrings,
 							),
+							Sensitive: true,
 						},
 						"time": {
 							Type:             schema.TypeString,
 							Optional:         true,
 							ValidateDiagFunc: validateBackupTime(),
 							Description:      "The time to take backup. This must be formatted with `HH:mm`",
+							Sensitive:        true,
 						},
 					},
 				},
@@ -173,10 +188,12 @@ func resourceSakuraCloudDatabase() *schema.Resource {
 			"parameters": {
 				Type: schema.TypeMap,
 				Elem: &schema.Schema{
-					Type: schema.TypeString,
+					Type:      schema.TypeString,
+					Sensitive: true,
 				},
 				Optional:    true,
 				Description: "The map for setting RDBMS-specific parameters. Valid keys can be found with the `usacloud database list-parameters` command",
+				Sensitive:   true,
 			},
 			"icon_id":     schemaResourceIconID(resourceName),
 			"description": schemaResourceDescription(resourceName),

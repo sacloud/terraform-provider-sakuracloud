@@ -46,12 +46,13 @@ func resourceSakuraCloudSIM() *schema.Resource {
 		},
 
 		Schema: map[string]*schema.Schema{
-			"name": schemaResourceName(resourceName),
+			"name": func() *schema.Schema { s := schemaResourceName(resourceName); s.Sensitive = true; return s }(),
 			"iccid": {
 				Type:        schema.TypeString,
 				Required:    true,
 				ForceNew:    true,
 				Description: "ICCID(Integrated Circuit Card ID) assigned to the SIM",
+				Sensitive:   true,
 			},
 			"passcode": {
 				Type:        schema.TypeString,
@@ -64,11 +65,12 @@ func resourceSakuraCloudSIM() *schema.Resource {
 				Type:        schema.TypeString,
 				Optional:    true,
 				Description: "The id of the device to restrict devices that can use the SIM",
+				Sensitive:   true,
 			},
 			"carrier": {
 				Type:     schema.TypeSet,
 				Required: true,
-				Elem:     &schema.Schema{Type: schema.TypeString},
+				Elem:     &schema.Schema{Type: schema.TypeString, Sensitive: true},
 				Set:      schema.HashString,
 				MinItems: 1,
 				MaxItems: 3,
@@ -76,6 +78,7 @@ func resourceSakuraCloudSIM() *schema.Resource {
 					"A list of a communication company. Each element must be one of %s",
 					types.SIMOperatorShortNames(),
 				),
+				Sensitive: true,
 			},
 			"enabled": {
 				Type:        schema.TypeBool,
@@ -83,18 +86,20 @@ func resourceSakuraCloudSIM() *schema.Resource {
 				Default:     true,
 				Description: "The flag to enable the SIM",
 			},
-			"icon_id":     schemaResourceIconID(resourceName),
-			"description": schemaResourceDescription(resourceName),
-			"tags":        schemaResourceTags(resourceName),
+			"icon_id":     func() *schema.Schema { s := schemaResourceIconID(resourceName); s.Sensitive = true; return s }(),
+			"description": func() *schema.Schema { s := schemaResourceDescription(resourceName); s.Sensitive = true; return s }(),
+			"tags":        func() *schema.Schema { s := schemaResourceTags(resourceName); s.Sensitive = true; return s }(),
 			"mobile_gateway_id": {
 				Type:        schema.TypeString,
 				Computed:    true,
 				Description: "The id of the MobileGateway which the SIM is assigned",
+				Sensitive:   true,
 			},
 			"ip_address": {
 				Type:        schema.TypeString,
 				Computed:    true,
 				Description: "The IP address assigned to the SIM",
+				Sensitive:   true,
 			},
 		},
 	}

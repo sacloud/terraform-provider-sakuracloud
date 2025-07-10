@@ -31,52 +31,63 @@ func dataSourceSakuraCloudVPCRouter() *schema.Resource {
 
 		Schema: map[string]*schema.Schema{
 			filterAttrName: filterSchema(&filterSchemaOption{}),
-			"name":         schemaDataSourceSwitchID(resourceName),
-			"plan":         schemaDataSourcePlan(resourceName, types.VPCRouterPlanStrings),
+			"name":         func() *schema.Schema { s := schemaDataSourceSwitchID(resourceName); s.Sensitive = true; return s }(),
+			"plan": func() *schema.Schema {
+				s := schemaDataSourcePlan(resourceName, types.VPCRouterPlanStrings)
+				s.Sensitive = true
+				return s
+			}(),
 			"version": {
 				Type:        schema.TypeInt,
 				Computed:    true,
 				Description: "The version of the VPC Router",
+				Sensitive:   true,
 			},
 			"public_network_interface": {
 				Type:        schema.TypeList,
 				Computed:    true,
 				Description: "A list of additional network interface setting. This doesn't include primary network interface setting",
+				Sensitive:   true,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
-						"switch_id": schemaDataSourceSwitchID(resourceName),
+						"switch_id": func() *schema.Schema { s := schemaDataSourceSwitchID(resourceName); s.Sensitive = true; return s }(),
 						"vip": {
 							Type:        schema.TypeString,
 							Computed:    true,
 							Description: "The virtual IP address of the VPC Router. This is only used when `plan` is not `standard`",
+							Sensitive:   true,
 						},
 						"ip_addresses": {
 							Type:        schema.TypeList,
-							Elem:        &schema.Schema{Type: schema.TypeString},
+							Elem:        &schema.Schema{Type: schema.TypeString, Sensitive: true},
 							Computed:    true,
 							Description: "The list of the IP address assigned to the VPC Router. This will be only one value when `plan` is `standard`, two values otherwise",
+							Sensitive:   true,
 						},
-						"vrid": {
+						"vrid": &schema.Schema{
 							Type:        schema.TypeInt,
 							Computed:    true,
 							Description: "The Virtual Router Identifier. This is only used when `plan` is not `standard`",
+							Sensitive:   true,
 						},
-						"aliases": {
+						"aliases": &schema.Schema{
 							Type:        schema.TypeList,
 							Computed:    true,
-							Elem:        &schema.Schema{Type: schema.TypeString},
+							Elem:        &schema.Schema{Type: schema.TypeString, Sensitive: true},
 							Description: "A list of ip alias assigned to the VPC Router. This is only used when `plan` is not `standard`",
+							Sensitive:   true,
 						},
 					},
 				},
 			},
-			"icon_id":     schemaDataSourceIconID(resourceName),
-			"description": schemaDataSourceDescription(resourceName),
-			"tags":        schemaDataSourceTags(resourceName),
-			"public_ip": {
+			"icon_id":     func() *schema.Schema { s := schemaDataSourceIconID(resourceName); s.Sensitive = true; return s }(),
+			"description": func() *schema.Schema { s := schemaDataSourceDescription(resourceName); s.Sensitive = true; return s }(),
+			"tags":        func() *schema.Schema { s := schemaDataSourceTags(resourceName); s.Sensitive = true; return s }(),
+			"public_ip": &schema.Schema{
 				Type:        schema.TypeString,
 				Computed:    true,
 				Description: "The public ip address of the VPC Router",
+				Sensitive:   true,
 			},
 			"public_netmask": {
 				Type:        schema.TypeInt,

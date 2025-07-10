@@ -33,6 +33,7 @@ func dataSourceSakuraCloudApprunApplication() *schema.Resource {
 				Type:        schema.TypeString,
 				Required:    true,
 				Description: "The name of application",
+				Sensitive:   true,
 			},
 
 			// computed fields
@@ -40,42 +41,50 @@ func dataSourceSakuraCloudApprunApplication() *schema.Resource {
 				Type:        schema.TypeInt,
 				Computed:    true,
 				Description: "The time limit between accessing the application's public URL, starting the instance, and receiving a response",
+				Sensitive:   true,
 			},
 			"port": {
 				Type:        schema.TypeInt,
 				Computed:    true,
 				Description: "The port number where the application listens for requests",
+				Sensitive:   true,
 			},
 			"min_scale": {
 				Type:        schema.TypeInt,
 				Computed:    true,
 				Description: "The minimum number of scales for the entire application",
+				Sensitive:   true,
 			},
 			"max_scale": {
 				Type:        schema.TypeInt,
 				Computed:    true,
 				Description: "The maximum number of scales for the entire application",
+				Sensitive:   true,
 			},
 			"components": {
 				Type:        schema.TypeList,
 				Computed:    true,
 				Description: "The application component information",
+				Sensitive:   true,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
 						"name": {
 							Type:        schema.TypeString,
 							Computed:    true,
 							Description: "The component name",
+							Sensitive:   true,
 						},
 						"max_cpu": {
 							Type:        schema.TypeString,
 							Computed:    true,
 							Description: "The maximum number of CPUs for a component",
+							Sensitive:   true,
 						},
 						"max_memory": {
 							Type:        schema.TypeString,
 							Computed:    true,
 							Description: "The maximum memory of component",
+							Sensitive:   true,
 						},
 						"deploy_source": {
 							Type:        schema.TypeList,
