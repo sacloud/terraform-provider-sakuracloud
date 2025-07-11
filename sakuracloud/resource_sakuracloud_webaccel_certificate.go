@@ -102,7 +102,8 @@ func resourceSakuraCloudWebAccelCertificateCreate(ctx context.Context, d *schema
 	_, hasCertChain := d.GetOk("certificate_chain")
 	_, hasPrivKey := d.GetOk("private_key")
 
-	if hasCertChain && hasPrivKey {
+	switch {
+	case hasCertChain && hasPrivKey:
 		res, err := webaccel.NewOp(client.webaccelClient).CreateCertificate(ctx, siteID, &webaccel.CreateOrUpdateCertificateRequest{
 			CertificateChain: d.Get("certificate_chain").(string),
 			Key:              d.Get("private_key").(string),
@@ -112,9 +113,9 @@ func resourceSakuraCloudWebAccelCertificateCreate(ctx context.Context, d *schema
 		}
 
 		d.SetId(res.Current.SiteID)
-	} else if hasCertChain || hasPrivKey {
+	case hasCertChain || hasPrivKey:
 		return diag.Errorf("certificate_chain and private_key must be specified together")
-	} else {
+	default:
 		if v, ok := d.GetOk("lets_encrypt"); ok && v.(bool) {
 			err = webaccel.NewOp(client.webaccelClient).CreateAutoCertUpdate(ctx, siteID)
 			if err != nil {
