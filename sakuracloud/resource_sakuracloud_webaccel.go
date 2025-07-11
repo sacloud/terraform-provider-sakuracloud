@@ -504,6 +504,14 @@ func setWebAccelResourceData(d *schema.ResourceData, client *APIClient, data *we
 // setOriginGuardTokenParameters オリジンガードトークンを新規作成or更新して、値を`ResourceData`に代入する。
 // 第1引数の`ResourceData`には事前にIDを設定しておくこと。
 func setOriginGuardTokenParameters(d *schema.ResourceData, ctx context.Context, op webaccel.API) error {
+	if _, ok := d.GetOk("origin_guard_token"); !ok {
+		err := op.DeleteOriginGuardToken(ctx, d.Id())
+		if err != nil {
+			return err
+		}
+		d.Set("origin_guard_token", nil) // nolint:errcheck,gosec
+		return nil
+	}
 	originGuardTokenAttr := make(map[string]interface{})
 	param, err := mapFromSet(d, "origin_guard_token")
 	if err != nil {

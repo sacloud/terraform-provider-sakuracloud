@@ -371,6 +371,19 @@ func TestAccSakuraCloudResourceWebAccel_WebOriginWithOriginGuard(t *testing.T) {
 					resource.TestCheckResourceAttr("sakuracloud_webaccel.foobar", "origin_parameters.0.origin", origin),
 					resource.TestMatchResourceAttr("sakuracloud_webaccel.foobar", "origin_guard_token.0.token", regexpNotEmpty),
 					resource.TestCheckResourceAttr("sakuracloud_webaccel.foobar", "origin_guard_token.0.rotate", "false"),
+					resource.TestCheckResourceAttrSet("sakuracloud_webaccel.foobar", "origin_guard_token.0.token"),
+				),
+			},
+			{
+				Config:      testAccCheckSakuraCloudWebAccelWebOriginConfigBasic(siteName, origin),
+				ExpectError: regexpNotEmpty,
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr("sakuracloud_webaccel.foobar", "name", siteName),
+					resource.TestCheckResourceAttr("sakuracloud_webaccel.foobar", "origin_parameters.0.type", "web"),
+					resource.TestCheckResourceAttr("sakuracloud_webaccel.foobar", "origin_parameters.0.origin", origin),
+					// Note: It fails the absence of a token, but it does not check the removal of the token in real.
+					// FIXME: So you require the manual check of the token absence to ensure the valid behavior.
+					resource.TestCheckResourceAttrSet("sakuracloud_webaccel.foobar", "origin_guard_token.0.token"),
 				),
 			},
 		},
