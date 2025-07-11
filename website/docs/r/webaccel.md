@@ -24,6 +24,7 @@ resource "sakuracloud_webaccel" "foobar" {
     origin   = "docs.usacloud.jp"
     protocol = "https"
   }
+  origin_guard_token {}
   logging {
     s3_bucket_name = "example-bucket"
     s3_access_key_id = "xxxxxxxxxxxxxxx"
@@ -74,6 +75,12 @@ An `origin_parameters` block supports following parameters:
 
 ---
 
+An `origin_guard_token` block supports following parameters:
+
+* `rotate` - Whether the origin guard token is immediately rotated or not. false by default.
+
+---
+
 A `logging` block supports following parameters:
 
 * `s3_bucket_name` - The bucket name for the log destination. In present, a bucket on the sakura object storage is supported.
@@ -96,16 +103,23 @@ A `logging` block supports following parameters:
 
 An `origin_parameters` block provides following attributes:
 
-* `type` - (Required) The origin type. Either of `web` or `bucket`.
-* `origin` - (Required) The origin hostname or IPv4 address.
-* `protocol` - (Required) Origin access protocol. Either of `http` or `https`.
-* `host_header` - (Optional) HTTP Host header for the origin access.
-* `s3_endpoint` - (Required) S3 endpoint without protocol scheme. Specify `s3.isk01.sakurastorage.jp` for the sakura object storage.
-* `s3_region` - (Required) S3 region. Specify `jp-north-1` for the sakura object storage.
+* `type` - The origin type. Either of `web` or `bucket`.
+* `origin` - The origin hostname or IPv4 address.
+* `protocol` - Origin access protocol. Either of `http` or `https`.
+* `host_header` - HTTP Host header for the origin access.
+* `s3_endpoint` - S3 endpoint without protocol scheme. Specify `s3.isk01.sakurastorage.jp` for the sakura object storage.
+* `s3_region` - S3 region. Specify `jp-north-1` for the sakura object storage.
 * `s3_bucket_name` - The origin bucket name. Bucket prefix is not supported at now.
 * `s3_access_key_id` - The S3 access key ID for the bucket.
 * `s3_secret_access_key` - The S3 secret access key for the bucket.
-* `s3_doc_index` - (Optional) Whether the document indexing is enabled or not. `false` by default.
+* `s3_doc_index` - Whether the document indexing is enabled or not. `false` by default.
+
+---
+
+An `origin_guard_token` block provides following attributes:
+
+* `token` - The origin guard token value
+* `rotate` - Whether the origin guard token is immediately rotated or not, for the applying the template 
 
 ---
 

@@ -319,6 +319,77 @@ func TestAccSakuraCloudResourceWebAccel_Logging(t *testing.T) {
 	})
 }
 
+func TestAccSakuraCloudResourceWebAccel_WebOriginWithOriginGuard(t *testing.T) {
+	skipIfFakeModeEnabled(t)
+
+	envKeys := []string{
+		envWebAccelOrigin,
+	}
+	for _, k := range envKeys {
+		if os.Getenv(k) == "" {
+			t.Skipf("ENV %q is requilred. skip", k)
+			return
+		}
+	}
+
+	siteName := "your-site-name"
+	origin := os.Getenv(envWebAccelOrigin)
+	regexpNotEmpty := regexp.MustCompile(".+")
+
+	resource.Test(t, resource.TestCase{
+		PreCheck:          func() { testAccPreCheck(t) },
+		ProviderFactories: testAccProviderFactories,
+		CheckDestroy: func(*terraform.State) error {
+			return nil
+		},
+		Steps: []resource.TestStep{
+			{
+				Config: testAccCheckSakuraCloudWebAccelWebOriginConfigWithOriginGuard(siteName, origin, false),
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr("sakuracloud_webaccel.foobar", "name", siteName),
+					resource.TestCheckResourceAttr("sakuracloud_webaccel.foobar", "origin_parameters.0.type", "web"),
+					resource.TestCheckResourceAttr("sakuracloud_webaccel.foobar", "origin_parameters.0.origin", origin),
+					resource.TestMatchResourceAttr("sakuracloud_webaccel.foobar", "origin_guard_token.0.token", regexpNotEmpty),
+					resource.TestCheckResourceAttr("sakuracloud_webaccel.foobar", "origin_guard_token.0.rotate", "false"),
+				),
+			},
+			{
+				Config: testAccCheckSakuraCloudWebAccelWebOriginConfigWithOriginGuard(siteName, origin, true),
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr("sakuracloud_webaccel.foobar", "name", siteName),
+					resource.TestCheckResourceAttr("sakuracloud_webaccel.foobar", "origin_parameters.0.type", "web"),
+					resource.TestCheckResourceAttr("sakuracloud_webaccel.foobar", "origin_parameters.0.origin", origin),
+					resource.TestMatchResourceAttr("sakuracloud_webaccel.foobar", "origin_guard_token.0.token", regexpNotEmpty),
+					resource.TestCheckResourceAttr("sakuracloud_webaccel.foobar", "origin_guard_token.0.rotate", "true"),
+				),
+			},
+			{
+				Config: testAccCheckSakuraCloudWebAccelWebOriginConfigWithOriginGuard(siteName, origin, false),
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr("sakuracloud_webaccel.foobar", "name", siteName),
+					resource.TestCheckResourceAttr("sakuracloud_webaccel.foobar", "origin_parameters.0.type", "web"),
+					resource.TestCheckResourceAttr("sakuracloud_webaccel.foobar", "origin_parameters.0.origin", origin),
+					resource.TestMatchResourceAttr("sakuracloud_webaccel.foobar", "origin_guard_token.0.token", regexpNotEmpty),
+					resource.TestCheckResourceAttr("sakuracloud_webaccel.foobar", "origin_guard_token.0.rotate", "false"),
+					resource.TestCheckResourceAttrSet("sakuracloud_webaccel.foobar", "origin_guard_token.0.token"),
+				),
+			},
+			{
+				Config:      testAccCheckSakuraCloudWebAccelWebOriginConfigBasic(siteName, origin),
+				ExpectError: regexpNotEmpty,
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr("sakuracloud_webaccel.foobar", "name", siteName),
+					resource.TestCheckResourceAttr("sakuracloud_webaccel.foobar", "origin_parameters.0.type", "web"),
+					resource.TestCheckResourceAttr("sakuracloud_webaccel.foobar", "origin_parameters.0.origin", origin),
+					// Note: It fails the absence of a token, but it does not check the removal of the token in real.
+					// FIXME: So you require the manual check of the token absence to ensure the valid behavior.
+					resource.TestCheckResourceAttrSet("sakuracloud_webaccel.foobar", "origin_guard_token.0.token"),
+				),
+			},
+		},
+	})
+}
+
 func TestAccSakuraCloudResourceWebAccel_InvalidConfigurations(t *testing.T) {
 	if os.Getenv(envWebAccelOrigin) == "" {
 		t.Skipf("ENV %q is requilred. skip", envWebAccelOrigin)
@@ -418,6 +489,31 @@ resource sakuracloud_webaccel "foobar" {
 }
 `
 	return fmt.Sprintf(tmpl, siteName, origin, origin)
+}
+
+func testAccCheckSakuraCloudWebAccelWebOriginConfigWithOriginGuard(siteName string, origin string, hasRotateField bool) string {
+	tmpl := `
+resource sakuracloud_webaccel "foobar" {
+  name = "%s"
+  domain_type = "subdomain"
+  request_protocol = "https-redirect"
+  origin_parameters {
+    type = "web"
+    origin = "%s"
+    host_header = "%s"
+    protocol = "https"
+  }
+  origin_guard_token {%s}
+  vary_support = true
+  default_cache_ttl = 3600
+  normalize_ae = "br+gzip"
+}
+`
+	if hasRotateField {
+		return fmt.Sprintf(tmpl, siteName, origin, origin, "\n    rotate = true\n")
+	} else {
+		return fmt.Sprintf(tmpl, siteName, origin, origin, "")
+	}
 }
 
 func testAccCheckSakuraCloudWebAccelBucketOriginConfig(siteName string, s3Endpoint string, region string, bucketName string, accessKey string, accessSecret string) string {
