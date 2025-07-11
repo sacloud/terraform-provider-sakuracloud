@@ -52,7 +52,8 @@ func expandKMSCreateKey(d *schema.ResourceData) (kms.CreateKey, error) {
 
 func expandKMSUpdateKey(d *schema.ResourceData, before *kms.Key) kms.Key {
 	req := kms.Key{
-		Name: d.Get("name").(string),
+		Name:      d.Get("name").(string),
+		KeyOrigin: kms.KeyOriginEnum(d.Get("key_origin").(string)),
 	}
 
 	if _, ok := d.GetOk("tags"); ok {

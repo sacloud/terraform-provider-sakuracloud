@@ -16,7 +16,6 @@ package sakuracloud
 
 import (
 	"context"
-	"errors"
 	"time"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
@@ -57,11 +56,7 @@ func resourceSakuraCloudKMS() *schema.Resource {
 				Optional: true,
 				Default:  "generated",
 				ValidateDiagFunc: validateWithCustomFunc(func(v string) error {
-					if v == "generated" || v == "imported" {
-						return nil
-					} else {
-						return errors.New("key_origin must be 'generated' or 'imported'")
-					}
+					return v1.KeyOriginEnum(v).Validate()
 				}),
 				Description: "Key origin of the KMS key. 'generated' or 'imported'. Default is 'generated'.",
 			},
@@ -69,6 +64,7 @@ func resourceSakuraCloudKMS() *schema.Resource {
 				Type:        schema.TypeString,
 				Optional:    true,
 				Description: "Plain key for imported KMS key. Required when `key_origin` is 'imported'.",
+				Sensitive:   true,
 			},
 			"description": schemaResourceDescription(resourceName),
 			"tags":        schemaResourceTags(resourceName),
