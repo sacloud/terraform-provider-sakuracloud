@@ -336,6 +336,8 @@ func TestAccSakuraCloudResourceWebAccel_WebOriginWithOriginGuard(t *testing.T) {
 	origin := os.Getenv(envWebAccelOrigin)
 	regexpNotEmpty := regexp.MustCompile(".+")
 
+	var tokenValue string
+
 	resource.Test(t, resource.TestCase{
 		PreCheck:          func() { testAccPreCheck(t) },
 		ProviderFactories: testAccProviderFactories,
@@ -349,8 +351,18 @@ func TestAccSakuraCloudResourceWebAccel_WebOriginWithOriginGuard(t *testing.T) {
 					resource.TestCheckResourceAttr("sakuracloud_webaccel.foobar", "name", siteName),
 					resource.TestCheckResourceAttr("sakuracloud_webaccel.foobar", "origin_parameters.0.type", "web"),
 					resource.TestCheckResourceAttr("sakuracloud_webaccel.foobar", "origin_parameters.0.origin", origin),
-					resource.TestMatchResourceAttr("sakuracloud_webaccel.foobar", "origin_guard_token.0.token", regexpNotEmpty),
 					resource.TestCheckResourceAttr("sakuracloud_webaccel.foobar", "origin_guard_token.0.rotate", "false"),
+					resource.ComposeTestCheckFunc(func(s *terraform.State) error {
+						rs, ok := s.RootModule().Resources["sakuracloud_webaccel.foobar"]
+						if !ok {
+							return fmt.Errorf("resource not found: sakuracloud_webaccel.foobar")
+						}
+						tokenValue = rs.Primary.Attributes["origin_guard_token.0.token"]
+						if tokenValue == "" {
+							return fmt.Errorf("origin_guard_token.token should not be empty")
+						}
+						return nil
+					}),
 				),
 			},
 			{
@@ -359,8 +371,21 @@ func TestAccSakuraCloudResourceWebAccel_WebOriginWithOriginGuard(t *testing.T) {
 					resource.TestCheckResourceAttr("sakuracloud_webaccel.foobar", "name", siteName),
 					resource.TestCheckResourceAttr("sakuracloud_webaccel.foobar", "origin_parameters.0.type", "web"),
 					resource.TestCheckResourceAttr("sakuracloud_webaccel.foobar", "origin_parameters.0.origin", origin),
-					resource.TestMatchResourceAttr("sakuracloud_webaccel.foobar", "origin_guard_token.0.token", regexpNotEmpty),
 					resource.TestCheckResourceAttr("sakuracloud_webaccel.foobar", "origin_guard_token.0.rotate", "true"),
+					resource.ComposeTestCheckFunc(func(s *terraform.State) error {
+						rs, ok := s.RootModule().Resources["sakuracloud_webaccel.foobar"]
+						if !ok {
+							return fmt.Errorf("resource not found: sakuracloud_webaccel.foobar")
+						}
+						newToken := rs.Primary.Attributes["origin_guard_token.0.token"]
+						if newToken == "" {
+							return fmt.Errorf("origin_guard_token should not be empty")
+						} else if tokenValue == newToken {
+							return fmt.Errorf("origin_guard_token should be rotated with `rotate=true`")
+						}
+						tokenValue = newToken
+						return nil
+					}),
 				),
 			},
 			{
@@ -369,9 +394,21 @@ func TestAccSakuraCloudResourceWebAccel_WebOriginWithOriginGuard(t *testing.T) {
 					resource.TestCheckResourceAttr("sakuracloud_webaccel.foobar", "name", siteName),
 					resource.TestCheckResourceAttr("sakuracloud_webaccel.foobar", "origin_parameters.0.type", "web"),
 					resource.TestCheckResourceAttr("sakuracloud_webaccel.foobar", "origin_parameters.0.origin", origin),
-					resource.TestMatchResourceAttr("sakuracloud_webaccel.foobar", "origin_guard_token.0.token", regexpNotEmpty),
 					resource.TestCheckResourceAttr("sakuracloud_webaccel.foobar", "origin_guard_token.0.rotate", "false"),
-					resource.TestCheckResourceAttrSet("sakuracloud_webaccel.foobar", "origin_guard_token.0.token"),
+					resource.ComposeTestCheckFunc(func(s *terraform.State) error {
+						rs, ok := s.RootModule().Resources["sakuracloud_webaccel.foobar"]
+						if !ok {
+							return fmt.Errorf("resource not found: sakuracloud_webaccel.foobar")
+						}
+						newToken := rs.Primary.Attributes["origin_guard_token.0.token"]
+						if newToken == "" {
+							return fmt.Errorf("origin_guard_token.token should not be empty")
+						} else if tokenValue != newToken {
+							return fmt.Errorf("origin_guard_token should not be rotated with `rotate=false`")
+						}
+						tokenValue = newToken
+						return nil
+					}),
 				),
 			},
 			{
@@ -381,9 +418,21 @@ func TestAccSakuraCloudResourceWebAccel_WebOriginWithOriginGuard(t *testing.T) {
 					resource.TestCheckResourceAttr("sakuracloud_webaccel.foobar", "name", siteName),
 					resource.TestCheckResourceAttr("sakuracloud_webaccel.foobar", "origin_parameters.0.type", "web"),
 					resource.TestCheckResourceAttr("sakuracloud_webaccel.foobar", "origin_parameters.0.origin", origin),
-					// Note: It fails the absence of a token, but it does not check the removal of the token in real.
-					// FIXME: So you require the manual check of the token absence to ensure the valid behavior.
-					resource.TestCheckResourceAttrSet("sakuracloud_webaccel.foobar", "origin_guard_token.0.token"),
+					resource.ComposeTestCheckFunc(func(s *terraform.State) error {
+						rs, ok := s.RootModule().Resources["sakuracloud_webaccel.foobar"]
+						if !ok {
+							return fmt.Errorf("resource not found: sakuracloud_webaccel.foobar")
+						}
+						_, isExist := rs.Primary.Attributes["origin_guard_token.0.token"]
+						if isExist {
+							return fmt.Errorf("origin_guard_token.token should be empty after its removal from the template")
+						}
+						_, isExist = rs.Primary.Attributes["origin_guard_token"]
+						if isExist {
+							return fmt.Errorf("origin_guard_token should be empty after its removal from the template")
+						}
+						return nil
+					}),
 				),
 			},
 		},

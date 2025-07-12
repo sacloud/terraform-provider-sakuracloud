@@ -468,9 +468,20 @@ func resourceSakuraCloudWebAccelUpdate(ctx context.Context, d *schema.ResourceDa
 	}
 
 	if d.HasChange("origin_guard_token") {
-		err = setOriginGuardTokenParameters(d, ctx, newOp)
+		attr, err := mapFromSet(d, "origin_guard_token")
 		if err != nil {
 			return diag.FromErr(err)
+		}
+		if attr.Get("rotate").(bool) {
+			err = setOriginGuardTokenParameters(d, ctx, newOp)
+			if err != nil {
+				return diag.FromErr(err)
+			}
+		} else {
+			err = setOriginGuardTokenParameters(d, ctx, nil)
+			if err != nil {
+				return diag.FromErr(err)
+			}
 		}
 	}
 
@@ -503,16 +514,19 @@ func setWebAccelResourceData(d *schema.ResourceData, client *APIClient, data *we
 
 // setOriginGuardTokenParameters オリジンガードトークンを新規作成or更新して、値を`ResourceData`に代入する。
 // 第1引数の`ResourceData`には事前にIDを設定しておくこと。
+// rotate=false への切り戻しなど、APIコールを実施したくない場合は、opにnilを代入する。
 func setOriginGuardTokenParameters(d *schema.ResourceData, ctx context.Context, op webaccel.API) error {
 	if _, ok := d.GetOk("origin_guard_token"); !ok {
 		err := op.DeleteOriginGuardToken(ctx, d.Id())
 		if err != nil {
 			return err
 		}
-		d.Set("origin_guard_token", nil) // nolint:errcheck,gosec
+		d.Set("origin_guard_token", nil) //nolint:errcheck,gosec
 		return nil
 	}
+
 	originGuardTokenAttr := make(map[string]interface{})
+
 	param, err := mapFromSet(d, "origin_guard_token")
 	if err != nil {
 		return err
@@ -520,9 +534,26 @@ func setOriginGuardTokenParameters(d *schema.ResourceData, ctx context.Context, 
 
 	//Note: スキーマ定義で`rotate`フィールドの値が存在することを保証している。
 	isRotating := param.Get("rotate").(bool)
-
 	originGuardTokenAttr["rotate"] = isRotating
-	if isRotating {
+	createToken := func() error {
+		res, err := op.CreateOriginGuardToken(ctx, d.Id())
+		if err != nil {
+			return err
+		}
+		originGuardTokenAttr["token"] = res.OriginGuardToken
+		d.Set("origin_guard_token", []interface{}{originGuardTokenAttr}) //nolint:errcheck,gosec
+		return nil
+	}
+	if op == nil {
+		old, _ := d.GetChange("origin_guard_token")
+		oldState, ok := old.(*schema.Set).List()[0].(map[string]interface{})
+		if !ok {
+			return fmt.Errorf("can't map origin_guard_token set to the state map")
+		}
+		originGuardTokenAttr["token"] = oldState["token"].(string)
+		d.Set("origin_guard_token", []interface{}{originGuardTokenAttr}) //nolint:errcheck,gosec
+		return nil
+	} else if isRotating {
 		// NOTE: rotate=true の際にのみ次期トークンを発行し、
 		// 直後にCreateOriginGuardTokenを呼んで新規トークンを即時適用する。
 		_, err = op.CreateNextOriginGuardToken(ctx, d.Id())
@@ -530,14 +561,7 @@ func setOriginGuardTokenParameters(d *schema.ResourceData, ctx context.Context, 
 			return err
 		}
 	}
-
-	res, err := op.CreateOriginGuardToken(ctx, d.Id())
-	if err != nil {
-		return err
-	}
-	originGuardTokenAttr["token"] = res.OriginGuardToken
-	d.Set("origin_guard_token", []interface{}{originGuardTokenAttr}) //nolint:errcheck,gosec
-	return nil
+	return createToken()
 }
 
 func setWebAccelSiteResourceData(d *schema.ResourceData, client *APIClient, data *webaccel.Site) diag.Diagnostics {
