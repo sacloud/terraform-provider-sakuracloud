@@ -151,8 +151,8 @@ func resourceSakuraCloudSecretManagerDelete(ctx context.Context, d *schema.Resou
 
 func setSecretManagerVaultResourceData(d *schema.ResourceData, data *v1.Vault) diag.Diagnostics {
 	d.SetId(data.ID)
-	d.Set("name", data.Name)                   //nolint:errcheck,gosec
-	d.Set("kms_key_id", string(data.KmsKeyID)) //nolint:errcheck,gosec
+	d.Set("name", data.Name)           //nolint:errcheck,gosec
+	d.Set("kms_key_id", data.KmsKeyID) //nolint:errcheck,gosec
 	if data.Description.IsSet() {
 		d.Set("description", data.Description.Value) //nolint:errcheck,gosec
 	}

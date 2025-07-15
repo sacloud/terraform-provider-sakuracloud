@@ -115,6 +115,7 @@ func testCheckSakuraCloudSecretManagerExists(n string, vault *v1.Vault) resource
 	}
 }
 
+//nolint:gosec
 var testAccSakuraCloudSecretManager_basic = `
 resource "sakuracloud_kms" "foobar" {
   name        = "{{ .arg0 }}"
@@ -128,11 +129,10 @@ resource "sakuracloud_secretmanager" "foobar" {
   tags        = ["tag1", "tag2"]
   kms_key_id  = sakuracloud_kms.foobar.id
 
-  depends_on = [
-    sakuracloud_kms.foobar
-  ]
+  depends_on = [sakuracloud_kms.foobar]
 }`
 
+//nolint:gosec
 var testAccSakuraCloudSecretManager_update = `
 resource "sakuracloud_kms" "foobar" {
   name        = "{{ .arg0 }}"
@@ -146,7 +146,5 @@ resource "sakuracloud_secretmanager" "foobar" {
   tags        = ["tag1-upd"]
   kms_key_id  = sakuracloud_kms.foobar.id
 
-  depends_on = [
-    sakuracloud_kms.foobar
-  ]
+  depends_on = [sakuracloud_kms.foobar]
 }`

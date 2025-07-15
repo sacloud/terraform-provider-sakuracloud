@@ -44,7 +44,7 @@ func TestAccSakuraCloudDataSourceSecretManager_basic(t *testing.T) {
 					resource.TestCheckResourceAttr(resourceName, "tags.0", "tag1"),
 					resource.TestCheckResourceAttr(resourceName, "tags.1", "tag2"),
 					// 綺麗に動的にkms_key_idをテストで取得する方法があればコメントアウト
-					//resource.TestCheckResourceAttr(resourceName, "kms_key_id", vault.KmsKeyID),
+					// resource.TestCheckResourceAttr(resourceName, "kms_key_id", vault.KmsKeyID),
 				),
 			},
 			{
@@ -57,13 +57,14 @@ func TestAccSakuraCloudDataSourceSecretManager_basic(t *testing.T) {
 					resource.TestCheckResourceAttr(resourceName, "tags.#", "2"),
 					resource.TestCheckResourceAttr(resourceName, "tags.0", "tag1"),
 					resource.TestCheckResourceAttr(resourceName, "tags.1", "tag2"),
-					//resource.TestCheckResourceAttr(resourceName, "kms_key_id", vault.KmsKeyID),
+					// resource.TestCheckResourceAttr(resourceName, "kms_key_id", vault.KmsKeyID),
 				),
 			},
 		},
 	})
 }
 
+//nolint:gosec
 var testAccSakuraCloudDataSourceSecretManager_byName = `
 resource "sakuracloud_kms" "foobar" {
   name        = "{{ .arg0 }}"
@@ -77,19 +78,16 @@ resource "sakuracloud_secretmanager" "foobar" {
   tags        = ["tag1", "tag2"]
   kms_key_id  = sakuracloud_kms.foobar.id
 
-  depends_on = [
-    sakuracloud_kms.foobar
-  ]
+  depends_on = [sakuracloud_kms.foobar]
 }
 
 data "sakuracloud_secretmanager" "foobar" {
   name = "{{ .arg0 }}"
 
-  depends_on = [
-    sakuracloud_secretmanager.foobar
-  ]
+  depends_on = [sakuracloud_secretmanager.foobar]
 }`
 
+//nolint:gosec
 var testAccSakuraCloudDataSourceSecretManager_byResourceId = `
 resource "sakuracloud_kms" "foobar" {
   name        = "{{ .arg0 }}"
@@ -103,17 +101,13 @@ resource "sakuracloud_secretmanager" "foobar" {
   tags        = ["tag1", "tag2"]
   kms_key_id  = sakuracloud_kms.foobar.id
 
-  depends_on = [
-    sakuracloud_kms.foobar
-  ]
+  depends_on = [sakuracloud_kms.foobar]
 }
 
 data "sakuracloud_secretmanager" "foobar" {
   resource_id = sakuracloud_secretmanager.foobar.id
 
-  depends_on = [
-    sakuracloud_secretmanager.foobar
-  ]
+  depends_on = [sakuracloud_secretmanager.foobar]
 }`
 
 func TestFilterSecretManagerByName(t *testing.T) {
