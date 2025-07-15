@@ -252,6 +252,8 @@ github.com/sacloud/kms-api-go v0.2.2 h1:1vd9p6NL+TEzsi7TsGFZpPPNhyBSBerrHxHwU4Eo
 github.com/sacloud/kms-api-go v0.2.2/go.mod h1:j9bKKlwb0Aj2WDaU2pCX1Fsm84wii6YJQ/ym4dxPwzM=
 github.com/sacloud/packages-go v0.0.11 h1:hrRWLmfPM9w7GBs6xb5/ue6pEMl8t1UuDKyR/KfteHo=
 github.com/sacloud/packages-go v0.0.11/go.mod h1:XNF5MCTWcHo9NiqWnYctVbASSSZR3ZOmmQORIzcurJ8=
+github.com/sacloud/secretmanager-api-go v0.2.1 h1:Tb9wNyI31PHFYdEV8QGwLS4O3UOaarf41Zvh0AYl01U=
+github.com/sacloud/secretmanager-api-go v0.2.1/go.mod h1:d1+sjwvTVwjuAdYdtbzWYJ+cenBGG5MiGuX2nJLt0hE=
 github.com/sacloud/simplemq-api-go v0.2.0 h1:mXds9QMX3ICm3USNxx1//2Ae9pLpdffycHzrvKlHYfs=
 github.com/sacloud/simplemq-api-go v0.2.0/go.mod h1:AcGQQXuiMsMqgnzomrArqUYoijcSVZwnDx61At2Hvqc=
 github.com/sacloud/webaccel-api-go v1.3.0 h1:qu8QycooO64dkHdWPRdUn3eUf9BWpLASoh9uUo7oWZs=
