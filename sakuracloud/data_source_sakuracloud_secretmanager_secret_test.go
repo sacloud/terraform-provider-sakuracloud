@@ -46,6 +46,7 @@ func TestAccSakuraCloudDataSourceSecretManagerSecret_basic(t *testing.T) {
 	})
 }
 
+//nolint:gosec
 var testAccSakuraCloudDataSourceSecretManagerSecret_byName = `
 resource "sakuracloud_kms" "foobar" {
   name        = "{{ .arg0 }}"

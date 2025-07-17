@@ -15,7 +15,7 @@ Get information about an existing SecretManager secret.
 ```hcl
 data "sakuracloud_secretmanager_secret" "foobar" {
   name     = "foobar"
-  vault_id = "secretmanager-vault-id" # e.g. sakuracloud_secretmanage.foobar.id
+  vault_id = "secretmanager-resource-id" # e.g. sakuracloud_secretmanage.foobar.id
 }
 ```
 

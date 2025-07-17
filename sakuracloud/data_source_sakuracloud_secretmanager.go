@@ -47,25 +47,21 @@ func dataSourceSakuraCloudSecretManager() *schema.Resource {
 			"kms_key_id": {
 				Type:        schema.TypeString,
 				Computed:    true,
-				Description: "KMS key ID for the SecretManager vault",
+				Description: "KMS key id for the SecretManager vault",
 			},
 		},
 	}
 }
 
 func dataSourceSakuraCloudSecretManagerRead(ctx context.Context, d *schema.ResourceData, meta any) diag.Diagnostics {
-	name := d.Get("name").(string)
-	id := d.Get("resource_id").(string)
-	if name == "" && id == "" {
-		return diag.Errorf("name or resource_id required")
-	}
-
 	client, _, err := sakuraCloudClient(d, meta)
 	if err != nil {
 		return diag.FromErr(err)
 	}
 	vaultOp := sm.NewVaultOp(client.secretmanagerClient)
 
+	name := d.Get("name").(string)
+	id := d.Get("resource_id").(string)
 	var vault *v1.Vault
 	if name != "" {
 		vaults, err := vaultOp.List(ctx)

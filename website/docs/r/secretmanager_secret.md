@@ -15,7 +15,7 @@ Manages a SakuraCloud SecretManager secret.
 ```hcl
 resource "sakuracloud_secretmanager_secret" "foobar" {
   name     = "foobar"
-  vault_id = "secretmanager-vault-id" # e.g. sakuracloud_secretmanager.foobar.id
+  vault_id = "secretmanager-resource-id" # e.g. sakuracloud_secretmanager.foobar.id
   value    = "Secret value!"
 }
 ```
