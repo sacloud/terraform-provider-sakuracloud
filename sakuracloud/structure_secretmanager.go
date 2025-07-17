@@ -48,3 +48,12 @@ func expandSecretManagerUpdateVault(d *schema.ResourceData, before *sm.Vault) sm
 
 	return req
 }
+
+func expandSecretManagerCreateSecret(d *schema.ResourceData) sm.CreateSecret {
+	req := sm.CreateSecret{
+		Name:  d.Get("name").(string),
+		Value: d.Get("value").(string),
+	}
+
+	return req
+}
