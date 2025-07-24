@@ -16,6 +16,7 @@ package sakuracloud
 
 import (
 	"fmt"
+	"github.com/sacloud/packages-go/testutil"
 	"os"
 	"regexp"
 	"testing"
@@ -32,19 +33,13 @@ const (
 )
 
 func TestAccResourceSakuraCloudWebAccelCertificate_basic(t *testing.T) {
-	envKeys := []string{
+	testutil.PreCheckEnvsFunc(
 		envWebAccelSiteName,
 		envWebAccelCertificateCrt,
 		envWebAccelCertificateKey,
 		envWebAccelCertificateCrtUpd,
 		envWebAccelCertificateKeyUpd,
-	}
-	for _, k := range envKeys {
-		if os.Getenv(k) == "" {
-			t.Skipf("ENV %q is requilred. skip", k)
-			return
-		}
-	}
+	)(t)
 
 	siteName := os.Getenv(envWebAccelSiteName)
 	crt := os.Getenv(envWebAccelCertificateCrt)
@@ -90,15 +85,9 @@ func TestAccResourceSakuraCloudWebAccelCertificate_basic(t *testing.T) {
 }
 
 func TestAccResourceSakuraCloudWebAccelCertificate_LetsEncrypt(t *testing.T) {
-	envKeys := []string{
-		envWebAccelSiteName,
-	}
-	for _, k := range envKeys {
-		if os.Getenv(k) == "" {
-			t.Skipf("ENV %q is requilred. skip", k)
-			return
-		}
-	}
+	skipIfFakeModeEnabled(t)
+
+	testutil.PreCheckEnvsFunc(envWebAccelSiteName)(t)
 
 	siteName := os.Getenv(envWebAccelSiteName)
 	regexpNotEmpty := regexp.MustCompile(".+")
@@ -138,17 +127,11 @@ func TestAccResourceSakuraCloudWebAccelCertificate_LetsEncrypt(t *testing.T) {
 }
 
 func TestAccResourceSakuraCloudWebAccelCertificate_InvalidConfigs(t *testing.T) {
-	envKeys := []string{
+	testutil.PreCheckEnvsFunc(
 		envWebAccelSiteName,
 		envWebAccelCertificateCrt,
 		envWebAccelCertificateKey,
-	}
-	for _, k := range envKeys {
-		if os.Getenv(k) == "" {
-			t.Skipf("ENV %q is requilred. skip", k)
-			return
-		}
-	}
+	)(t)
 
 	crt := os.Getenv(envWebAccelCertificateCrt)
 	key := os.Getenv(envWebAccelCertificateKey)

@@ -16,6 +16,7 @@ package sakuracloud
 
 import (
 	"fmt"
+	"github.com/sacloud/packages-go/testutil"
 	"os"
 	"regexp"
 	"strings"
@@ -28,15 +29,7 @@ import (
 func TestAccSakuraCloudResourceWebAccel_WebOrigin(t *testing.T) {
 	skipIfFakeModeEnabled(t)
 
-	envKeys := []string{
-		envWebAccelOrigin,
-	}
-	for _, k := range envKeys {
-		if os.Getenv(k) == "" {
-			t.Skipf("ENV %q is requilred. skip", k)
-			return
-		}
-	}
+	testutil.PreCheckEnvsFunc(envWebAccelOrigin)(t)
 
 	siteName := "your-site-name"
 	// domainName := os.Getenv(envWebAccelDomainName)
@@ -69,15 +62,7 @@ func TestAccSakuraCloudResourceWebAccel_WebOrigin(t *testing.T) {
 func TestAccSakuraCloudResourceWebAccel_WebOriginWithOneTimeUrlSecrets(t *testing.T) {
 	skipIfFakeModeEnabled(t)
 
-	envKeys := []string{
-		envWebAccelOrigin,
-	}
-	for _, k := range envKeys {
-		if os.Getenv(k) == "" {
-			t.Skipf("ENV %q is requilred. skip", k)
-			return
-		}
-	}
+	testutil.PreCheckEnvsFunc(envWebAccelOrigin)(t)
 
 	siteName := "your-site-name"
 	origin := os.Getenv(envWebAccelOrigin)
@@ -105,15 +90,7 @@ func TestAccSakuraCloudResourceWebAccel_WebOriginWithOneTimeUrlSecrets(t *testin
 func TestAccSakuraCloudResourceWebAccel_WebOriginWithCORS(t *testing.T) {
 	skipIfFakeModeEnabled(t)
 
-	envKeys := []string{
-		envWebAccelOrigin,
-	}
-	for _, k := range envKeys {
-		if os.Getenv(k) == "" {
-			t.Skipf("ENV %q is requilred. skip", k)
-			return
-		}
-	}
+	testutil.PreCheckEnvsFunc(envWebAccelOrigin)(t)
 
 	siteName := "your-site-name"
 	// domainName := os.Getenv(envWebAccelDomainName)
@@ -145,20 +122,14 @@ func TestAccSakuraCloudResourceWebAccel_WebOriginWithCORS(t *testing.T) {
 func TestAccSakuraCloudResourceWebAccel_Update(t *testing.T) {
 	skipIfFakeModeEnabled(t)
 
-	envKeys := []string{
+	testutil.PreCheckEnvsFunc(
 		envWebAccelOrigin,
 		envObjectStorageEndpoint,
 		envObjectStorageRegion,
 		envObjectStorageBucketName,
 		envObjectStorageAccessKeyId,
 		envObjectStorageSecretAccessKey,
-	}
-	for _, k := range envKeys {
-		if os.Getenv(k) == "" {
-			t.Skipf("ENV %q is requilred. skip", k)
-			return
-		}
-	}
+	)(t)
 
 	siteName := "your-site-name"
 	// domainName := os.Getenv(envWebAccelDomainName)
@@ -228,20 +199,14 @@ func TestAccSakuraCloudResourceWebAccel_Update(t *testing.T) {
 func TestAccSakuraCloudResourceWebAccel_BucketOrigin(t *testing.T) {
 	skipIfFakeModeEnabled(t)
 
-	envKeys := []string{
+	testutil.PreCheckEnvsFunc(
 		envWebAccelOrigin,
 		envObjectStorageEndpoint,
 		envObjectStorageRegion,
 		envObjectStorageBucketName,
 		envObjectStorageAccessKeyId,
 		envObjectStorageSecretAccessKey,
-	}
-	for _, k := range envKeys {
-		if os.Getenv(k) == "" {
-			t.Skipf("ENV %q is requilred. skip", k)
-			return
-		}
-	}
+	)(t)
 
 	siteName := "your-site-name"
 	// domainName := os.Getenv(envWebAccelDomainName)
@@ -278,18 +243,12 @@ func TestAccSakuraCloudResourceWebAccel_BucketOrigin(t *testing.T) {
 func TestAccSakuraCloudResourceWebAccel_Logging(t *testing.T) {
 	skipIfFakeModeEnabled(t)
 
-	envKeys := []string{
+	testutil.PreCheckEnvsFunc(
 		envWebAccelOrigin,
 		envObjectStorageBucketName,
 		envObjectStorageAccessKeyId,
 		envObjectStorageSecretAccessKey,
-	}
-	for _, k := range envKeys {
-		if os.Getenv(k) == "" {
-			t.Skipf("ENV %q is requilred. skip", k)
-			return
-		}
-	}
+	)(t)
 
 	siteName := "your-site-name"
 	// domainName := os.Getenv(envWebAccelDomainName)
@@ -322,15 +281,7 @@ func TestAccSakuraCloudResourceWebAccel_Logging(t *testing.T) {
 func TestAccSakuraCloudResourceWebAccel_WebOriginWithOriginGuard(t *testing.T) {
 	skipIfFakeModeEnabled(t)
 
-	envKeys := []string{
-		envWebAccelOrigin,
-	}
-	for _, k := range envKeys {
-		if os.Getenv(k) == "" {
-			t.Skipf("ENV %q is requilred. skip", k)
-			return
-		}
-	}
+	testutil.PreCheckEnvsFunc(envWebAccelOrigin)(t)
 
 	siteName := "your-site-name"
 	origin := os.Getenv(envWebAccelOrigin)
@@ -440,10 +391,8 @@ func TestAccSakuraCloudResourceWebAccel_WebOriginWithOriginGuard(t *testing.T) {
 }
 
 func TestAccSakuraCloudResourceWebAccel_InvalidConfigurations(t *testing.T) {
-	if os.Getenv(envWebAccelOrigin) == "" {
-		t.Skipf("ENV %q is requilred. skip", envWebAccelOrigin)
-		return
-	}
+	testutil.PreCheckEnvsFunc(envWebAccelOrigin)(t)
+
 	origin := os.Getenv(envWebAccelOrigin)
 	for name, tc := range testAccCheckSakuraCloudWebAccelInvalidConfigs(origin) {
 		t.Logf("test for invalid configuration: %s", name)
