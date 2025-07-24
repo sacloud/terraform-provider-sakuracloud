@@ -119,7 +119,7 @@ An `origin_parameters` block provides following attributes:
 An `origin_guard_token` block provides following attributes:
 
 * `token` - The origin guard token value
-* `rotate` - Whether the origin guard token is immediately rotated or not, for the applying the template 
+* `rotate` - Whether the origin guard token is immediately rotated or not. It must not be `true` for the creation. `false` by default.
 
 ---
 
