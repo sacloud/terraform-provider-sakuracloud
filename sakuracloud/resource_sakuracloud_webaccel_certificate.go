@@ -200,7 +200,7 @@ func resourceSakuraCloudWebAccelCertificateDelete(ctx context.Context, d *schema
 	siteID := d.Get("site_id").(string)
 
 	// Note: テンプレートが`lets_encrypt=false`に変更されている場合には、削除処理が失敗する
-	if _, isLetsEncrypt := d.GetOk("lets_encrypt"); isLetsEncrypt {
+	if _, hasLetsEncrypt := d.GetOk("lets_encrypt"); hasLetsEncrypt {
 		err = webaccel.NewOp(client.webaccelClient).DeleteAutoCertUpdate(ctx, siteID)
 		if err != nil {
 			return diag.Errorf("deleting SakuraCloud WebAccelCert[%s] (Let's Encrypt) is failed: %s", d.Id(), err)

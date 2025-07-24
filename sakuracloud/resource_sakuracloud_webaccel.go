@@ -323,6 +323,7 @@ func resourceSakuraCloudWebAccelCreate(ctx context.Context, d *schema.ResourceDa
 		return diag.FromErr(e)
 	}
 	// logging
+	// Note: これ以降、いずれかの処理が失敗した場合にはサイトの作成を中断し、サイトを削除する
 	if hasLoggingConfig {
 		cfg, err := expandLoggingParameters(d)
 		if err != nil {
@@ -335,7 +336,7 @@ func resourceSakuraCloudWebAccelCreate(ctx context.Context, d *schema.ResourceDa
 	}
 	d.SetId(res.ID)
 
-	// いずれかの処理が失敗した場合、サイトの作成を中断し、サイトを削除する
+	// origin_guard_token
 	if _, ok := d.GetOk("origin_guard_token"); ok {
 		attr, err := mapFromSet(d, "origin_guard_token")
 		if err != nil {
@@ -514,7 +515,7 @@ func setWebAccelResourceData(d *schema.ResourceData, client *APIClient, data *we
 
 // setOriginGuardTokenParameters オリジンガードトークンを新規作成or更新して、値を`ResourceData`に代入する。
 // 第1引数の`ResourceData`には事前にIDを設定しておくこと。
-// rotate=false への切り戻しなど、APIコールを実施したくない場合は、opにnilを代入する。
+// rotate=true から false への切り戻しなど、APIコールを実施したくない場合は、opにnilを代入する。
 func setOriginGuardTokenParameters(d *schema.ResourceData, ctx context.Context, op webaccel.API) error {
 	if _, ok := d.GetOk("origin_guard_token"); !ok {
 		err := op.DeleteOriginGuardToken(ctx, d.Id())
