@@ -1,6 +1,6 @@
 ---
 layout: "sakuracloud"
-page_title: "SakuraCloud: sakuracloud_kms"
+page_title: "SakuraCloud: sakuracloud_secret_manager_secret"
 subcategory: "Global"
 description: |-
   Manages a SakuraCloud SecretManager secret.
@@ -13,9 +13,9 @@ Manages a SakuraCloud SecretManager secret.
 ## Example Usage
 
 ```hcl
-resource "sakuracloud_secretmanager_secret" "foobar" {
+resource "sakuracloud_secret_manager_secret" "foobar" {
   name     = "foobar"
-  vault_id = "secretmanager-resource-id" # e.g. sakuracloud_secretmanager.foobar.id
+  vault_id = "secret_manager-resource-id" # e.g. sakuracloud_secret_manager.foobar.id
   value    = "Secret value!"
 }
 ```

@@ -30,7 +30,7 @@ import (
 func TestAccSakuraCloudSecretManagerSecret_basic(t *testing.T) {
 	skipIfFakeModeEnabled(t)
 
-	resourceName := "sakuracloud_secretmanager_secret.foobar"
+	resourceName := "sakuracloud_secret_manager_secret.foobar"
 	rand := randomName()
 
 	var secret v1.Secret
@@ -67,7 +67,7 @@ func testCheckSakuraCloudSecretManagerSecretDestroy(s *terraform.State) error {
 	ctx := context.Background()
 
 	for _, rs := range s.RootModule().Resources {
-		if rs.Type != "sakuracloud_secretmanager_secret" {
+		if rs.Type != "sakuracloud_secret_manager_secret" {
 			continue
 		}
 		if rs.Primary.ID == "" {
@@ -122,7 +122,7 @@ resource "sakuracloud_kms" "foobar" {
   description = "description"
 }
 
-resource "sakuracloud_secretmanager" "foobar" {
+resource "sakuracloud_secret_manager" "foobar" {
   name        = "{{ .arg0 }}"
   description = "description"
   kms_key_id  = sakuracloud_kms.foobar.id
@@ -130,12 +130,12 @@ resource "sakuracloud_secretmanager" "foobar" {
   depends_on = [sakuracloud_kms.foobar]
 }
 
-resource "sakuracloud_secretmanager_secret" "foobar" {
+resource "sakuracloud_secret_manager_secret" "foobar" {
   name     = "{{ .arg0 }}"
   value    = "value1"
-  vault_id = sakuracloud_secretmanager.foobar.id
+  vault_id = sakuracloud_secret_manager.foobar.id
 
-  depends_on = [sakuracloud_secretmanager.foobar]
+  depends_on = [sakuracloud_secret_manager.foobar]
 }`
 
 //nolint:gosec
@@ -145,7 +145,7 @@ resource "sakuracloud_kms" "foobar" {
   description = "description"
 }
 
-resource "sakuracloud_secretmanager" "foobar" {
+resource "sakuracloud_secret_manager" "foobar" {
   name        = "{{ .arg0 }}"
   description = "description"
   kms_key_id  = sakuracloud_kms.foobar.id
@@ -153,10 +153,10 @@ resource "sakuracloud_secretmanager" "foobar" {
   depends_on = [sakuracloud_kms.foobar]
 }
 
-resource "sakuracloud_secretmanager_secret" "foobar" {
+resource "sakuracloud_secret_manager_secret" "foobar" {
   name     = "{{ .arg0 }}"
   value    = "value2"
-  vault_id = sakuracloud_secretmanager.foobar.id
+  vault_id = sakuracloud_secret_manager.foobar.id
 
-  depends_on = [sakuracloud_secretmanager.foobar]
+  depends_on = [sakuracloud_secret_manager.foobar]
 }`

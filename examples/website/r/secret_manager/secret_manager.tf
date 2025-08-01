@@ -1,4 +1,4 @@
-resource "sakuracloud_secretmanager" "foobar" {
+resource "sakuracloud_secret_manager" "foobar" {
   name        = "foobar"
   description = "description"
   tags        = ["tag1", "tag2"]

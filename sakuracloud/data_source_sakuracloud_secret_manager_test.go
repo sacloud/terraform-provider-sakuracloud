@@ -25,7 +25,7 @@ import (
 func TestAccSakuraCloudDataSourceSecretManager_basic(t *testing.T) {
 	skipIfFakeModeEnabled(t)
 
-	resourceName := "data.sakuracloud_secretmanager.foobar"
+	resourceName := "data.sakuracloud_secret_manager.foobar"
 	rand := randomName()
 
 	var vault v1.Vault
@@ -36,7 +36,7 @@ func TestAccSakuraCloudDataSourceSecretManager_basic(t *testing.T) {
 			{
 				Config: buildConfigWithArgs(testAccSakuraCloudDataSourceSecretManager_byName, rand),
 				Check: resource.ComposeTestCheckFunc(
-					testCheckSakuraCloudSecretManagerExists("sakuracloud_secretmanager.foobar", &vault),
+					testCheckSakuraCloudSecretManagerExists("sakuracloud_secret_manager.foobar", &vault),
 					testCheckSakuraCloudDataSourceExists(resourceName),
 					resource.TestCheckResourceAttr(resourceName, "name", rand),
 					resource.TestCheckResourceAttr(resourceName, "description", "description"),
@@ -50,7 +50,7 @@ func TestAccSakuraCloudDataSourceSecretManager_basic(t *testing.T) {
 			{
 				Config: buildConfigWithArgs(testAccSakuraCloudDataSourceSecretManager_byResourceId, rand),
 				Check: resource.ComposeTestCheckFunc(
-					testCheckSakuraCloudSecretManagerExists("sakuracloud_secretmanager.foobar", &vault),
+					testCheckSakuraCloudSecretManagerExists("sakuracloud_secret_manager.foobar", &vault),
 					testCheckSakuraCloudDataSourceExists(resourceName),
 					resource.TestCheckResourceAttr(resourceName, "name", rand),
 					resource.TestCheckResourceAttr(resourceName, "description", "description"),
@@ -72,7 +72,7 @@ resource "sakuracloud_kms" "foobar" {
   tags        = ["tag1", "tag2"]
 }
 
-resource "sakuracloud_secretmanager" "foobar" {
+resource "sakuracloud_secret_manager" "foobar" {
   name        = "{{ .arg0 }}"
   description = "description"
   tags        = ["tag1", "tag2"]
@@ -81,10 +81,10 @@ resource "sakuracloud_secretmanager" "foobar" {
   depends_on = [sakuracloud_kms.foobar]
 }
 
-data "sakuracloud_secretmanager" "foobar" {
+data "sakuracloud_secret_manager" "foobar" {
   name = "{{ .arg0 }}"
 
-  depends_on = [sakuracloud_secretmanager.foobar]
+  depends_on = [sakuracloud_secret_manager.foobar]
 }`
 
 //nolint:gosec
@@ -95,7 +95,7 @@ resource "sakuracloud_kms" "foobar" {
   tags        = ["tag1", "tag2"]
 }
 
-resource "sakuracloud_secretmanager" "foobar" {
+resource "sakuracloud_secret_manager" "foobar" {
   name        = "{{ .arg0 }}"
   description = "description"
   tags        = ["tag1", "tag2"]
@@ -104,10 +104,10 @@ resource "sakuracloud_secretmanager" "foobar" {
   depends_on = [sakuracloud_kms.foobar]
 }
 
-data "sakuracloud_secretmanager" "foobar" {
-  resource_id = sakuracloud_secretmanager.foobar.id
+data "sakuracloud_secret_manager" "foobar" {
+  resource_id = sakuracloud_secret_manager.foobar.id
 
-  depends_on = [sakuracloud_secretmanager.foobar]
+  depends_on = [sakuracloud_secret_manager.foobar]
 }`
 
 func TestFilterSecretManagerByName(t *testing.T) {

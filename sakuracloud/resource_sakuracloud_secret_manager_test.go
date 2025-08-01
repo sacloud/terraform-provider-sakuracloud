@@ -29,7 +29,7 @@ import (
 func TestAccSakuraCloudSecretManager_basic(t *testing.T) {
 	skipIfFakeModeEnabled(t)
 
-	resourceName := "sakuracloud_secretmanager.foobar"
+	resourceName := "sakuracloud_secret_manager.foobar"
 	rand := randomName()
 
 	var vault v1.Vault
@@ -71,7 +71,7 @@ func testCheckSakuraCloudSecretManagerDestroy(s *terraform.State) error {
 	vaultOp := sm.NewVaultOp(client.secretmanagerClient)
 
 	for _, rs := range s.RootModule().Resources {
-		if rs.Type != "sakuracloud_secretmanager" {
+		if rs.Type != "sakuracloud_secret_manager" {
 			continue
 		}
 		if rs.Primary.ID == "" {
@@ -123,7 +123,7 @@ resource "sakuracloud_kms" "foobar" {
   tags        = ["tag1", "tag2"]
 }
 
-resource "sakuracloud_secretmanager" "foobar" {
+resource "sakuracloud_secret_manager" "foobar" {
   name        = "{{ .arg0 }}"
   description = "description"
   tags        = ["tag1", "tag2"]
@@ -140,7 +140,7 @@ resource "sakuracloud_kms" "foobar" {
   tags        = ["tag1", "tag2"]
 }
 
-resource "sakuracloud_secretmanager" "foobar" {
+resource "sakuracloud_secret_manager" "foobar" {
   name        = "{{ .arg0 }}"
   description = "description-updated"
   tags        = ["tag1-upd"]

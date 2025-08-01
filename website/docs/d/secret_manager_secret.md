@@ -1,21 +1,21 @@
 ---
 layout: "sakuracloud"
-page_title: "SakuraCloud: sakuracloud_secretmanager"
+page_title: "SakuraCloud: sakuracloud_secret_manager"
 subcategory: "Global"
 description: |-
   Get information about an existing SecretManager secret.
 ---
 
-# Data Source: sakuracloud_secretmanager
+# Data Source: sakuracloud_secret_manager
 
 Get information about an existing SecretManager secret.
 
 ## Example Usage
 
 ```hcl
-data "sakuracloud_secretmanager_secret" "foobar" {
+data "sakuracloud_secret_manager_secret" "foobar" {
   name     = "foobar"
-  vault_id = "secretmanager-resource-id" # e.g. sakuracloud_secretmanage.foobar.id
+  vault_id = "secret_manager-resource-id" # e.g. sakuracloud_secret_manager.foobar.id
 }
 ```
 
