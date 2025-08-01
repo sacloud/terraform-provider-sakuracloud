@@ -56,7 +56,7 @@ func dataSourceSakuraCloudContainerRegistry() *schema.Resource {
 				Description: "The FQDN for accessing the container registry. FQDN is built from `subdomain_label` + `.sakuracr.jp`",
 			},
 			"user": {
-				Type:     schema.TypeList,
+				Type:     schema.TypeSet,
 				Computed: true,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
@@ -75,6 +75,13 @@ func dataSourceSakuraCloudContainerRegistry() *schema.Resource {
 						},
 					},
 				},
+				Set: schema.HashResource(&schema.Resource{
+					Schema: map[string]*schema.Schema{
+						"name": {
+							Type: schema.TypeString,
+						},
+					},
+				}),
 			},
 			"icon_id":     schemaDataSourceIconID(resourceName),
 			"description": schemaDataSourceDescription(resourceName),

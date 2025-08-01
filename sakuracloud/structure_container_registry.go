@@ -38,7 +38,7 @@ func expandContainerRegistryBuilder(d *schema.ResourceData, client *APIClient, s
 
 func expandContainerRegistryUsers(d *schema.ResourceData) []*registryBuilder.User {
 	var results []*registryBuilder.User
-	users := d.Get("user").([]interface{})
+	users := d.Get("user").(*schema.Set).List()
 	for _, raw := range users {
 		d := mapToResourceData(raw.(map[string]interface{}))
 		results = append(results, &registryBuilder.User{
