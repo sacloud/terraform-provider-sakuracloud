@@ -75,7 +75,7 @@ func resourceSakuraCloudContainerRegistry() *schema.Resource {
 			"description": schemaResourceDescription(resourceName),
 			"tags":        schemaResourceTags(resourceName),
 			"user": {
-				Type:     schema.TypeList,
+				Type:     schema.TypeSet,
 				Optional: true,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
@@ -101,6 +101,13 @@ func resourceSakuraCloudContainerRegistry() *schema.Resource {
 						},
 					},
 				},
+				Set: schema.HashResource(&schema.Resource{
+					Schema: map[string]*schema.Schema{
+						"name": {
+							Type: schema.TypeString,
+						},
+					},
+				}),
 			},
 		},
 	}
