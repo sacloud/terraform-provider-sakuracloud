@@ -103,6 +103,7 @@ require (
 	github.com/sacloud/go-http v0.1.9 // indirect
 	github.com/sacloud/go-otelsetup v0.0.6 // indirect
 	github.com/sacloud/iaas-api-go/trace/otel v0.0.0-20250609045333-f334fa253de9 // indirect
+	github.com/sacloud/secretmanager-api-go v0.2.1 // indirect
 	github.com/segmentio/asm v1.2.0 // indirect
 	github.com/shivamMg/ppds v0.0.1 // indirect
 	github.com/twitchyliquid64/golang-asm v0.15.1 // indirect
