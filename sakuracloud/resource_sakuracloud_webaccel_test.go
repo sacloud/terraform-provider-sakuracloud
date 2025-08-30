@@ -66,6 +66,48 @@ func TestAccSakuraCloudResourceWebAccel_WebOrigin(t *testing.T) {
 	})
 }
 
+func TestAccSakuraCloudResourceWebAccel_OwnDomain(t *testing.T) {
+	skipIfFakeModeEnabled(t)
+
+	envKeys := []string{
+		envWebAccelOrigin,
+		envWebAccelDomainName,
+	}
+	for _, k := range envKeys {
+		if os.Getenv(k) == "" {
+			t.Skipf("ENV %q is requilred. skip", k)
+			return
+		}
+	}
+
+	siteName := "your-site-name"
+	origin := os.Getenv(envWebAccelOrigin)
+	domainName := os.Getenv(envWebAccelDomainName)
+
+	resource.Test(t, resource.TestCase{
+		PreCheck:          func() { testAccPreCheck(t) },
+		ProviderFactories: testAccProviderFactories,
+		CheckDestroy: func(*terraform.State) error {
+			return nil
+		},
+		Steps: []resource.TestStep{
+			{
+				Config: testAccCheckSakuraCloudWebAccelOwnDomainConfig(siteName, origin, domainName),
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr("sakuracloud_webaccel.foobar", "name", siteName),
+					resource.TestCheckResourceAttr("sakuracloud_webaccel.foobar", "domain_type", "own_domain"),
+					resource.TestCheckResourceAttr("sakuracloud_webaccel.foobar", "domain", domainName),
+					resource.TestCheckResourceAttr("sakuracloud_webaccel.foobar", "request_protocol", "http+https"),
+					resource.TestCheckResourceAttr("sakuracloud_webaccel.foobar", "origin_parameters.0.type", "web"),
+					resource.TestCheckResourceAttr("sakuracloud_webaccel.foobar", "origin_parameters.0.origin", origin),
+					resource.TestCheckResourceAttr("sakuracloud_webaccel.foobar", "origin_parameters.0.host_header", origin),
+					resource.TestCheckResourceAttr("sakuracloud_webaccel.foobar", "origin_parameters.0.protocol", "https"),
+				),
+			},
+		},
+	})
+}
+
 func TestAccSakuraCloudResourceWebAccel_WebOriginWithOneTimeUrlSecrets(t *testing.T) {
 	skipIfFakeModeEnabled(t)
 
@@ -367,6 +409,24 @@ resource sakuracloud_webaccel "foobar" {
 	return fmt.Sprintf(tmpl, siteName, origin, origin)
 }
 
+func testAccCheckSakuraCloudWebAccelOwnDomainConfig(siteName string, origin string, domain string) string {
+	tmpl := `
+resource sakuracloud_webaccel "foobar" {
+  name = "%s"
+  domain_type = "own_domain"
+  domain = "%s"
+  request_protocol = "http+https"
+  origin_parameters {
+    type = "web"
+    origin = "%s"
+    host_header = "%s"
+    protocol = "https"
+  }
+}
+`
+	return fmt.Sprintf(tmpl, siteName, domain, origin, origin)
+}
+
 func testAccCheckSakuraCloudWebAccelWebOriginConfigWithOneTimeUrlSecrets(siteName string, origin string) string {
 	tmpl := `
 resource sakuracloud_webaccel "foobar" {
@@ -654,6 +714,23 @@ resource sakuracloud_webaccel "foobar" {
 }
 `
 
+	confOwnDomainWithoutDomain := `
+resource sakuracloud_webaccel "foobar" {
+  name = "dummy"
+  domain_type = "own_domain"
+  request_protocol = "https-redirect"
+  origin_parameters {
+    type = "web"
+    origin = "%s"
+    host_header = "dummy.example.com"
+    protocol = "https"
+  }
+  vary_support = true
+  default_cache_ttl = 3600
+  normalize_ae = "br+gzip"
+}
+`
+
 	valid := `
 	resource sakuracloud_webaccel "foobar" {
 	name = "dummy"
@@ -688,6 +765,7 @@ resource sakuracloud_webaccel "foobar" {
 		"invalid-compression":                      confInvalidNormalizeAE,
 		"missing-logging-bucket-secret":            confMissingLoggingParameters,
 		"invalid-cors-configuration":               confInvalidCorsConfiguration,
+		"own-domain-without-domain":                confOwnDomainWithoutDomain,
 		"valid":                                    valid,
 	}
 	for k, v := range tt {
