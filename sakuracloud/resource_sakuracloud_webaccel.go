@@ -228,6 +228,10 @@ func resourceSakuraCloudWebAccelCreate(ctx context.Context, d *schema.ResourceDa
 	req.Name = d.Get("name").(string)
 	req.DomainType = d.Get("domain_type").(string)
 
+	if domain, ok := d.GetOk("domain"); ok {
+		req.Domain = domain.(string)
+	}
+
 	if _, ok := d.GetOk("request_protocol"); ok {
 		req.RequestProtocol, err = expandWebAccelRequestProtocol(d)
 		if err != nil {
@@ -458,6 +462,7 @@ func setWebAccelResourceData(d *schema.ResourceData, client *APIClient, data *we
 func setWebAccelSiteResourceData(d *schema.ResourceData, client *APIClient, data *webaccel.Site) diag.Diagnostics {
 	d.Set("name", data.Name)                                              //nolint:errcheck,gosec
 	d.Set("domain_type", data.DomainType)                                 //nolint:errcheck,gosec
+	d.Set("domain", data.Domain)                                          //nolint:errcheck,gosec
 	d.Set("subdomain", data.Subdomain)                                    //nolint:errcheck,gosec
 	d.Set("cname_record_value", data.Subdomain+".")                       //nolint:errcheck,gosec
 	d.Set("txt_record_value", fmt.Sprintf("webaccel=%s", data.Subdomain)) //nolint:errcheck,gosec
