@@ -65,6 +65,7 @@ type Config struct {
 	Zone                string
 	Zones               []string
 	DefaultZone         string
+	ExplicitZone        bool
 	TraceMode           string
 	FakeMode            string
 	FakeStorePath       string
@@ -103,6 +104,8 @@ func (c *APIClient) checkReferencedOption() query.CheckReferencedOption {
 	}
 }
 
+// providers.goでは環境変数とtfファイルを考慮した値を設定してくれててProfileは見てないので、こちらで明示的にProfileの値を設定する必要がある
+// 優先度は 環境変数 (providers.go) < プロファイル (ここ) < tfファイル (providers.go)
 func (c *Config) loadFromProfile() error {
 	if c.Profile == "" {
 		c.Profile = profile.DefaultProfileName
@@ -122,7 +125,7 @@ func (c *Config) loadFromProfile() error {
 	if c.AccessTokenSecret == "" {
 		c.AccessTokenSecret = pcv.AccessTokenSecret
 	}
-	if (c.Zone == "" || c.Zone == defaults.Zone) && pcv.Zone != "" {
+	if !c.ExplicitZone && (c.Zone == "" || c.Zone == defaults.Zone) && pcv.Zone != "" {
 		c.Zone = pcv.Zone
 	}
 
