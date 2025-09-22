@@ -180,8 +180,10 @@ func TestAccSakuraCloudApprunApplication_withEnvUpdate(t *testing.T) {
 					testCheckSakuraCloudApprunApplicationExists(resourceName, &application),
 					testCheckSakuraCloudApprunApplicationAttributes(&application),
 					resource.TestCheckResourceAttr(resourceName, "name", rand),
+					resource.TestCheckResourceAttr(resourceName, "components.0.env.#", "2"),
 					// Update
-					resource.TestCheckResourceAttr(resourceName, "components.0.env.0.key", "key-updated"),
+					resource.TestCheckResourceAttr(resourceName, "components.0.env.0.key", "key"),
+					resource.TestCheckResourceAttr(resourceName, "components.0.env.0.value", "value-updated"),
 					// Remove&Add
 					resource.TestCheckResourceAttr(resourceName, "components.0.env.1.key", "key3"),
 					resource.TestCheckResourceAttr(resourceName, "components.0.env.1.value", "value3"),
