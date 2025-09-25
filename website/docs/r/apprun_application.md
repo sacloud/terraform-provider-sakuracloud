@@ -63,6 +63,14 @@ resource "sakuracloud_apprun_application" "foobar" {
     version_index = 0
     percent       = 100
   }
+  
+  packet_filter {
+	enabled = true
+	settings {
+	  from_ip               = "192.0.2.0"
+      from_ip_prefix_length = "24"
+	}
+  }
 }
 ```
 
@@ -75,7 +83,7 @@ resource "sakuracloud_apprun_application" "foobar" {
 * `max_scale` - (Required) The maximum number of scales for the entire application.
 * `components` - (Required) The application component information.
 * `traffics` - (Optional) The application traffic.
-
+* `packet_filter` - (Optional) The packet filter for the application.
 
 ---
 
@@ -140,18 +148,27 @@ A `traffics` block supports the following:
 * `version_index` - (Required) The application version index.
 * `percent` - (Required) The percentage of traffic dispersion.
 
+---
+
+A `packet_filter` block supports the following:
+
+* `enabled` - (Required) Whether the packet filter is enabled.
+* `settings` - (Optional) The list of packet filter rule. Up to 5 `settings` blocks can be specified (`MaxItems: 5`).
+
+---
+
+A `settings` block supports the following:
+
+* `from_ip` - (Required) The source IP address of the rule.
+* `from_ip_prefix_length` - (Required) The prefix length (CIDR notation) of the `from_ip` address, indicating the network size.
 
 ### Timeouts
 
 The `timeouts` block allows you to specify [timeouts](https://www.terraform.io/docs/configuration/resources.html#operation-timeouts) for certain actions:
 
 * `create` - (Defaults to 5 minutes) Used when creating the AppRun Application
-
-
 * `update` - (Defaults to 5 minutes) Used when updating the AppRun Application
-
 * `delete` - (Defaults to 20 minutes) Used when deleting AppRun Application
-
 
 
 ## Attribute Reference

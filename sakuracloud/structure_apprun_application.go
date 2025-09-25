@@ -97,7 +97,7 @@ func expandApprunApplicationComponentsForUpdate(d *schema.ResourceData) *[]v1.Pa
 	return &components
 }
 
-func expandApprunApplicationComponents(d *schema.ResourceData) *[]v1.PostApplicationBodyComponent {
+func expandApprunApplicationComponents(d *schema.ResourceData) []v1.PostApplicationBodyComponent {
 	var components []v1.PostApplicationBodyComponent
 	for _, component := range d.Get("components").([]interface{}) {
 		c := component.(map[string]interface{})
@@ -170,21 +170,24 @@ func expandApprunApplicationComponents(d *schema.ResourceData) *[]v1.PostApplica
 		})
 	}
 
-	return &components
+	return components
 }
 
-func expandApprunApplicationTraffics(d *schema.ResourceData, versions *[]v1.Version) (*[]v1.Traffic, error) {
+func expandApprunApplicationTraffics(d *schema.ResourceData, versions []v1.Version) (*[]v1.Traffic, error) {
 	// resourceにtraffics listが存在しない場合
 	if len(d.Get("traffics").([]interface{})) == 0 {
 		defaultIsLatestVersion := true
 		defaultPercent := 100
 
-		return &[]v1.Traffic{
-			{
-				IsLatestVersion: &defaultIsLatestVersion,
-				Percent:         &defaultPercent,
-			},
-		}, nil
+		t := &v1.Traffic{}
+		if err := t.FromTrafficWithLatestVersion(v1.TrafficWithLatestVersion{
+			IsLatestVersion: defaultIsLatestVersion,
+			Percent:         defaultPercent,
+		}); err != nil {
+			return nil, err
+		}
+
+		return &[]v1.Traffic{*t}, nil
 	}
 
 	var traffics []v1.Traffic
@@ -193,24 +196,55 @@ func expandApprunApplicationTraffics(d *schema.ResourceData, versions *[]v1.Vers
 
 		percent := t["percent"].(int)
 		version_index := t["version_index"].(int)
-		if len(*versions) <= version_index {
+		if len(versions) <= version_index {
 			return nil, fmt.Errorf("index out of range, version_index: %d", version_index)
 		}
 
-		version := (*versions)[version_index]
-		traffics = append(traffics, v1.Traffic{
-			Percent:     &percent,
+		version := (versions)[version_index]
+		tr := &v1.Traffic{}
+		if err := tr.FromTrafficWithVersionName(v1.TrafficWithVersionName{
+			Percent:     percent,
 			VersionName: version.Name,
-		})
+		}); err != nil {
+			return nil, err
+		}
+		traffics = append(traffics, *tr)
 	}
 
 	return &traffics, nil
 }
 
+func expandApprunPacketFilter(d *schema.ResourceData) *v1.PatchPacketFilter {
+	enabled := false
+	ret := &v1.PatchPacketFilter{
+		IsEnabled: &enabled,
+	}
+	for _, pf := range d.Get("packet_filter").([]interface{}) {
+		p := pf.(map[string]interface{})
+
+		enabled = p["enabled"].(bool)
+		var settings []v1.PacketFilterSetting
+		for _, s := range p["settings"].([]interface{}) {
+			setting := s.(map[string]interface{})
+			fromIP := setting["from_ip"].(string)
+			fromIPPrefixLength := setting["from_ip_prefix_length"].(int)
+
+			settings = append(settings, v1.PacketFilterSetting{
+				FromIp:             fromIP,
+				FromIpPrefixLength: fromIPPrefixLength,
+			})
+		}
+
+		ret.IsEnabled = &enabled
+		ret.Settings = &settings
+	}
+	return ret
+}
+
 func flattenApprunApplicationComponents(d *schema.ResourceData, application *v1.Application, includePassword bool) []interface{} {
 	var results []interface{}
 
-	for _, c := range *application.Components {
+	for _, c := range application.Components {
 		result := map[string]interface{}{
 			"name":       c.Name,
 			"max_cpu":    c.MaxCpu,
@@ -236,7 +270,7 @@ func flattenApprunApplicationComponents(d *schema.ResourceData, application *v1.
 			// この場合resourceにpasswordの定義があると、resourceを変更していなくてもterraform planでdiffが出てしまう。
 			// この対策として、passwordのみschema.ResourceDataからデータを参照してセットするようにする。
 			var password string
-			for _, exComponent := range *expandApprunApplicationComponents(d) {
+			for _, exComponent := range expandApprunApplicationComponents(d) {
 				if exComponent.Name == c.Name && exComponent.DeploySource.ContainerRegistry != nil && exComponent.DeploySource.ContainerRegistry.Password != nil {
 					password = *exComponent.DeploySource.ContainerRegistry.Password
 				}
@@ -308,20 +342,49 @@ func flattenApprunApplicationProbeHttpGetHeaders(component *v1.HandlerApplicatio
 	return results
 }
 
-func flattenApprunApplicationTraffics(traffics *[]v1.Traffic, versions *[]v1.Version) []interface{} {
+func flattenApprunApplicationTraffics(traffics []v1.Traffic, versions []v1.Version) []interface{} {
 	var results []interface{}
 
-	for _, traffic := range *traffics {
-		for i, version := range *versions {
-			if *traffic.VersionName == *version.Name {
+	for _, traffic := range traffics {
+		withVersion, err := traffic.AsTrafficWithVersionName()
+		if err != nil {
+			continue
+		}
+
+		for i, version := range versions {
+			if withVersion.VersionName == version.Name {
 				results = append(results, map[string]interface{}{
 					"version_index": i,
-					"percent":       traffic.Percent,
+					"percent":       withVersion.Percent,
 				})
 				continue
 			}
 		}
 	}
 
+	return results
+}
+
+func flattenApprunPacketFilter(packetFilter *v1.HandlerGetPacketFilter) []interface{} {
+	if packetFilter == nil {
+		return []interface{}{}
+	}
+
+	return []interface{}{
+		map[string]interface{}{
+			"enabled":  packetFilter.IsEnabled,
+			"settings": flattenApprunPacketFilterSettings(packetFilter.Settings),
+		},
+	}
+}
+
+func flattenApprunPacketFilterSettings(settings []v1.PacketFilterSetting) []interface{} {
+	var results []interface{}
+	for _, s := range settings {
+		results = append(results, map[string]interface{}{
+			"from_ip":               s.FromIp,
+			"from_ip_prefix_length": s.FromIpPrefixLength,
+		})
+	}
 	return results
 }
