@@ -149,6 +149,50 @@ func TestAccSakuraCloudApprunApplication_withEnv(t *testing.T) {
 	})
 }
 
+func TestAccSakuraCloudApprunApplication_withEnvUpdate(t *testing.T) {
+	skipIfFakeModeEnabled(t)
+
+	resourceName := "sakuracloud_apprun_application.foobar"
+	rand := randomName()
+
+	var application v1.Application
+	resource.Test(t, resource.TestCase{
+		PreCheck:          func() { testAccPreCheck(t) },
+		ProviderFactories: testAccProviderFactories,
+		CheckDestroy:      testCheckSakuraCloudApprunApplicationDestroy,
+		Steps: []resource.TestStep{
+			{
+				Config: buildConfigWithArgs(testAccSakuraCloudApprunApplication_withEnv, rand),
+				Check: resource.ComposeTestCheckFunc(
+					testCheckSakuraCloudApprunApplicationExists(resourceName, &application),
+					testCheckSakuraCloudApprunApplicationAttributes(&application),
+					resource.TestCheckResourceAttr(resourceName, "components.0.env.#", "2"),
+					resource.TestCheckResourceAttr(resourceName, "components.0.env.0.key", "key"),
+					resource.TestCheckResourceAttr(resourceName, "components.0.env.0.value", "value"),
+					resource.TestCheckResourceAttr(resourceName, "components.0.env.1.key", "key2"),
+					resource.TestCheckResourceAttr(resourceName, "components.0.env.1.value", "value2"),
+					resource.TestCheckNoResourceAttr(resourceName, "components.0.env.2"),
+				),
+			},
+			{
+				Config: buildConfigWithArgs(testAccSakuraCloudApprunApplication_withEnvUpdate, rand),
+				Check: resource.ComposeTestCheckFunc(
+					testCheckSakuraCloudApprunApplicationExists(resourceName, &application),
+					testCheckSakuraCloudApprunApplicationAttributes(&application),
+					resource.TestCheckResourceAttr(resourceName, "name", rand),
+					resource.TestCheckResourceAttr(resourceName, "components.0.env.#", "2"),
+					// Update
+					resource.TestCheckResourceAttr(resourceName, "components.0.env.0.key", "key"),
+					resource.TestCheckResourceAttr(resourceName, "components.0.env.0.value", "value-updated"),
+					// Remove&Add
+					resource.TestCheckResourceAttr(resourceName, "components.0.env.1.key", "key3"),
+					resource.TestCheckResourceAttr(resourceName, "components.0.env.1.value", "value3"),
+				),
+			},
+		},
+	})
+}
+
 func TestAccSakuraCloudApprunApplication_withProbe(t *testing.T) {
 	skipIfFakeModeEnabled(t)
 
@@ -356,6 +400,58 @@ func TestAccImportSakuraCloudApprunApplication_withCRUser(t *testing.T) {
 	})
 }
 
+func TestAccImportSakuraCloudApprunApplication_withEnv(t *testing.T) {
+	skipIfFakeModeEnabled(t)
+
+	rand := randomName()
+	checkFn := func(s []*terraform.InstanceState) error {
+		if len(s) != 1 {
+			return fmt.Errorf("expected 1 state: %#v", s)
+		}
+		expects := map[string]string{
+			"name":                    rand,
+			"timeout_seconds":         "90",
+			"port":                    "80",
+			"min_scale":               "0",
+			"max_scale":               "1",
+			"components.0.name":       "compo1",
+			"components.0.max_cpu":    "0.1",
+			"components.0.max_memory": "256Mi",
+			"components.0.deploy_source.0.container_registry.0.image": "apprun-test.sakuracr.jp/test1:latest",
+			"components.0.env.#":       "2",
+			"components.0.env.0.key":   "key",
+			"components.0.env.0.value": "value",
+			"components.0.env.1.key":   "key2",
+			"components.0.env.1.value": "value2",
+		}
+
+		return compareStateMulti(s[0], expects)
+	}
+
+	resourceName := "sakuracloud_apprun_application.foobar"
+
+	resource.Test(t, resource.TestCase{
+		PreCheck:          func() { testAccPreCheck(t) },
+		ProviderFactories: testAccProviderFactories,
+		CheckDestroy:      testCheckSakuraCloudApprunApplicationDestroy,
+		Steps: []resource.TestStep{
+			{
+				Config: buildConfigWithArgs(testAccSakuraCloudApprunApplication_withEnv, rand),
+			},
+			{
+				ResourceName:      resourceName,
+				ImportState:       true,
+				ImportStateCheck:  checkFn,
+				ImportStateVerify: true,
+				ImportStateVerifyIgnore: []string{
+					"status",
+					"public_url",
+				},
+			},
+		},
+	})
+}
+
 func testCheckSakuraCloudApprunApplicationExists(n string, application *v1.Application) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
 		rs, ok := s.RootModule().Resources[n]
@@ -511,6 +607,41 @@ resource "sakuracloud_apprun_application" "foobar" {
     env {
       key   = "key2"
       value = "value2"
+    }
+  }
+}
+`
+
+const testAccSakuraCloudApprunApplication_withEnvUpdate = `
+resource "sakuracloud_apprun_application" "foobar" {
+  name            = "{{ .arg0 }}"
+  timeout_seconds = 90
+  port            = 80
+  min_scale       = 0
+  max_scale       = 1
+  components {
+    name       = "compo1"
+    max_cpu    = "0.1"
+    max_memory = "256Mi"
+    deploy_source {
+      container_registry {
+        image    = "apprun-test.sakuracr.jp/test1:latest"
+      }
+    }
+		// Updated
+    env {
+      key   = "key"
+      value = "value-updated"
+    }
+		// Removed
+    // env {
+    //   key   = "key2"
+    //   value = "value2"
+    // }
+		// Added
+    env {
+      key   = "key3"
+      value = "value3"
     }
   }
 }

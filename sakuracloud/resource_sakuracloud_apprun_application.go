@@ -163,6 +163,9 @@ func resourceSakuraCloudApprunApplication() *schema.Resource {
 									"key": {
 										Type: schema.TypeString,
 									},
+									"value": {
+										Type: schema.TypeString,
+									},
 								},
 							}),
 						},
