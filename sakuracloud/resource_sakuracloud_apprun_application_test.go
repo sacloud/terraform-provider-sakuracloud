@@ -346,7 +346,11 @@ func TestAccSakuraCloudApprunApplication_withPacketFilter(t *testing.T) {
 					resource.TestCheckResourceAttr(resourceName, "name", rand),
 					resource.TestCheckResourceAttr(resourceName, "packet_filter.#", "1"),
 					resource.TestCheckResourceAttr(resourceName, "packet_filter.0.enabled", "false"),
-					resource.TestCheckResourceAttr(resourceName, "packet_filter.0.settings.#", "0"),
+					resource.TestCheckResourceAttr(resourceName, "packet_filter.0.settings.#", "2"),
+					resource.TestCheckResourceAttr(resourceName, "packet_filter.0.settings.0.from_ip", "192.0.2.0"),
+					resource.TestCheckResourceAttr(resourceName, "packet_filter.0.settings.0.from_ip_prefix_length", "28"),
+					resource.TestCheckResourceAttr(resourceName, "packet_filter.0.settings.1.from_ip", "192.0.2.128"),
+					resource.TestCheckResourceAttr(resourceName, "packet_filter.0.settings.1.from_ip_prefix_length", "28"),
 				),
 			},
 		},
@@ -886,6 +890,14 @@ resource "sakuracloud_apprun_application" "foobar" {
   }
   packet_filter {
 	enabled = false
+	settings {
+	  from_ip               = "192.0.2.0"
+      from_ip_prefix_length = "28"
+	}
+	settings {
+	  from_ip               = "192.0.2.128"
+      from_ip_prefix_length = "28"
+	}
   }
 }
 `

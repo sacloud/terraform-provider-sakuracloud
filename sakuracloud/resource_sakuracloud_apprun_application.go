@@ -252,8 +252,7 @@ func resourceSakuraCloudApprunApplication() *schema.Resource {
 						},
 						"settings": {
 							Type:        schema.TypeList,
-							Optional:    true,
-							Computed:    true,
+							Required:    true,
 							MaxItems:    5,
 							Description: "The list of packet filter rule",
 							Elem: &schema.Resource{

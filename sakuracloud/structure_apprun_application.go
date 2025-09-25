@@ -223,22 +223,20 @@ func expandApprunPacketFilter(d *schema.ResourceData) *v1.PatchPacketFilter {
 		p := pf.(map[string]interface{})
 
 		enabled = p["enabled"].(bool)
-		if enabled {
-			var settings []v1.PacketFilterSetting
-			for _, s := range p["settings"].([]interface{}) {
-				setting := s.(map[string]interface{})
-				fromIP := setting["from_ip"].(string)
-				fromIPPrefixLength := setting["from_ip_prefix_length"].(int)
+		var settings []v1.PacketFilterSetting
+		for _, s := range p["settings"].([]interface{}) {
+			setting := s.(map[string]interface{})
+			fromIP := setting["from_ip"].(string)
+			fromIPPrefixLength := setting["from_ip_prefix_length"].(int)
 
-				settings = append(settings, v1.PacketFilterSetting{
-					FromIp:             fromIP,
-					FromIpPrefixLength: fromIPPrefixLength,
-				})
-			}
-
-			ret.IsEnabled = &enabled
-			ret.Settings = &settings
+			settings = append(settings, v1.PacketFilterSetting{
+				FromIp:             fromIP,
+				FromIpPrefixLength: fromIPPrefixLength,
+			})
 		}
+
+		ret.IsEnabled = &enabled
+		ret.Settings = &settings
 	}
 	return ret
 }
@@ -372,15 +370,10 @@ func flattenApprunPacketFilter(packetFilter *v1.HandlerGetPacketFilter) []interf
 		return []interface{}{}
 	}
 
-	var settings []interface{}
-	if packetFilter.IsEnabled {
-		settings = flattenApprunPacketFilterSettings(packetFilter.Settings)
-	}
-
 	return []interface{}{
 		map[string]interface{}{
 			"enabled":  packetFilter.IsEnabled,
-			"settings": settings,
+			"settings": flattenApprunPacketFilterSettings(packetFilter.Settings),
 		},
 	}
 }
