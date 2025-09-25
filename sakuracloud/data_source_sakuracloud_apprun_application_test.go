@@ -146,6 +146,32 @@ func TestAccSakuraCloudDataSourceApprunApplication_withTraffic(t *testing.T) {
 	})
 }
 
+func TestAccSakuraCloudDataSourceApprunApplication_withPacketFilter(t *testing.T) {
+	skipIfFakeModeEnabled(t)
+
+	resourceName := "data.sakuracloud_apprun_application.foobar"
+	rand := randomName()
+
+	resource.Test(t, resource.TestCase{
+		PreCheck:          func() { testAccPreCheck(t) },
+		ProviderFactories: testAccProviderFactories,
+		Steps: []resource.TestStep{
+			{
+				Config: buildConfigWithArgs(testAccSakuraCloudDataSourceApprunApplication_withPacketFilter, rand),
+				Check: resource.ComposeTestCheckFunc(
+					testCheckSakuraCloudDataSourceExists(resourceName),
+					resource.TestCheckResourceAttr(resourceName, "name", rand),
+					resource.TestCheckResourceAttr(resourceName, "packet_filter.#", "1"),
+					resource.TestCheckResourceAttr(resourceName, "packet_filter.0.enabled", "true"),
+					resource.TestCheckResourceAttr(resourceName, "packet_filter.0.settings.#", "1"),
+					resource.TestCheckResourceAttr(resourceName, "packet_filter.0.settings.0.from_ip", "192.0.2.0"),
+					resource.TestCheckResourceAttr(resourceName, "packet_filter.0.settings.0.from_ip_prefix_length", "24"),
+				),
+			},
+		},
+	})
+}
+
 var testAccSakuraCloudDataSourceApprunApplication_basic = `
 resource "sakuracloud_apprun_application" "foobar" {
   name            = "{{ .arg0 }}"
@@ -255,6 +281,37 @@ resource "sakuracloud_apprun_application" "foobar" {
   traffics {
     version_index = 0
     percent       = 100
+  }
+}
+
+data "sakuracloud_apprun_application" "foobar" {
+  name = sakuracloud_apprun_application.foobar.name
+}
+`
+
+var testAccSakuraCloudDataSourceApprunApplication_withPacketFilter = `
+resource "sakuracloud_apprun_application" "foobar" {
+  name            = "{{ .arg0 }}"
+  timeout_seconds = 90
+  port            = 80
+  min_scale       = 0
+  max_scale       = 1
+  components {
+    name       = "compo1"
+    max_cpu    = "0.1"
+    max_memory = "256Mi"
+    deploy_source {
+      container_registry {
+        image    = "apprun-test.sakuracr.jp/test1:latest"
+      }
+    }
+  }
+  packet_filter {
+	enabled = true
+	settings {
+	  from_ip               = "192.0.2.0"
+      from_ip_prefix_length = "24"
+	}
   }
 }
 

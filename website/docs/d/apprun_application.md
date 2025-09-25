@@ -24,7 +24,7 @@ Get information about an existing AppRun Application.
 * `components` - The application component information.
 * `public_url` - The public URL.
 * `status` - The application status.
-
+* `packet_filter` - The packet filter for the application.
 
 ---
 
@@ -78,3 +78,18 @@ A `headers` block supports the following:
 
 * `name` - The header field name.
 * `value` - The header field value.
+ 
+---
+
+A `packet_filter` block exports the following:
+
+* `enabled` - Whether the packet filter is enabled.
+* `settings` - The list of packet filter rule.
+
+---
+
+A `settings` block exports the following:
+
+* `from_ip` - The source IP address of the rule.
+* `from_ip_prefix_length` - The prefix length (CIDR notation) of the `from_ip` address, indicating the network size.
+

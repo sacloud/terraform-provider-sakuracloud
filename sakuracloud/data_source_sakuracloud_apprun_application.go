@@ -198,6 +198,38 @@ func dataSourceSakuraCloudApprunApplication() *schema.Resource {
 					},
 				},
 			},
+			"packet_filter": {
+				Type:        schema.TypeList,
+				Computed:    true,
+				Description: "The packet filter for the application",
+				Elem: &schema.Resource{
+					Schema: map[string]*schema.Schema{
+						"enabled": {
+							Type:     schema.TypeBool,
+							Computed: true,
+						},
+						"settings": {
+							Type:        schema.TypeList,
+							Computed:    true,
+							Description: "The list of packet filter rule",
+							Elem: &schema.Resource{
+								Schema: map[string]*schema.Schema{
+									"from_ip": {
+										Type:        schema.TypeString,
+										Computed:    true,
+										Description: "The source IP address of the rule",
+									},
+									"from_ip_prefix_length": {
+										Type:        schema.TypeInt,
+										Computed:    true,
+										Description: "The prefix length (CIDR notation) of the from_ip address, indicating the network size",
+									},
+								},
+							},
+						},
+					},
+				},
+			},
 			"status": {
 				Type:        schema.TypeString,
 				Computed:    true,
@@ -228,14 +260,14 @@ func dataSourceSakuraCloudApprunApplicationRead(ctx context.Context, d *schema.R
 	if err != nil {
 		return diag.Errorf("could not find SakuraCloud AppRun resource: %s", err)
 	}
-	if apps == nil || len(*apps.Data) == 0 {
+	if apps == nil || len(apps.Data) == 0 {
 		return filterNoResultErr()
 	}
 
 	var data *v1.Application
-	for _, d := range *apps.Data {
-		if *d.Name == name {
-			a, err := appOp.Read(ctx, *d.Id)
+	for _, d := range apps.Data {
+		if d.Name == name {
+			a, err := appOp.Read(ctx, d.Id)
 			if err != nil {
 				return diag.FromErr(err)
 			}
@@ -247,15 +279,22 @@ func dataSourceSakuraCloudApprunApplicationRead(ctx context.Context, d *schema.R
 		return filterNoResultErr()
 	}
 
-	d.SetId(*data.Id)
-	d.Set("name", *data.Name)                                               //nolint:errcheck,gosec
-	d.Set("timeout_seconds", *data.TimeoutSeconds)                          //nolint:errcheck,gosec
-	d.Set("port", *data.Port)                                               //nolint:errcheck,gosec
-	d.Set("min_scale", *data.MinScale)                                      //nolint:errcheck,gosec
-	d.Set("max_scale", *data.MaxScale)                                      //nolint:errcheck,gosec
+	pfOp := apprun.NewPacketFilterOp(client.apprunClient)
+	pf, err := pfOp.Read(ctx, data.Id)
+	if err != nil {
+		return diag.Errorf("could not read SakuraCloud AppRun Application's PacketFilter resource: %s", err)
+	}
+
+	d.SetId(data.Id)
+	d.Set("name", data.Name)                                                //nolint:errcheck,gosec
+	d.Set("timeout_seconds", data.TimeoutSeconds)                           //nolint:errcheck,gosec
+	d.Set("port", data.Port)                                                //nolint:errcheck,gosec
+	d.Set("min_scale", data.MinScale)                                       //nolint:errcheck,gosec
+	d.Set("max_scale", data.MaxScale)                                       //nolint:errcheck,gosec
 	d.Set("components", flattenApprunApplicationComponents(d, data, false)) //nolint:errcheck,gosec
-	d.Set("status", *data.Status)                                           //nolint:errcheck,gosec
-	d.Set("public_url", *data.PublicUrl)                                    //nolint:errcheck,gosec
+	d.Set("status", data.Status)                                            //nolint:errcheck,gosec
+	d.Set("public_url", data.PublicUrl)                                     //nolint:errcheck,gosec
+	d.Set("packet_filter", flattenApprunPacketFilter(pf))                   //nolint:errcheck,gosec
 
 	return nil
 }

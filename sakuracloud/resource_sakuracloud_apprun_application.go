@@ -238,6 +238,42 @@ func resourceSakuraCloudApprunApplication() *schema.Resource {
 					},
 				},
 			},
+			"packet_filter": {
+				Type:        schema.TypeList,
+				Optional:    true,
+				Computed:    true,
+				MaxItems:    1,
+				Description: "The packet filter for the application",
+				Elem: &schema.Resource{
+					Schema: map[string]*schema.Schema{
+						"enabled": {
+							Type:     schema.TypeBool,
+							Required: true,
+						},
+						"settings": {
+							Type:        schema.TypeList,
+							Optional:    true,
+							Computed:    true,
+							MaxItems:    5,
+							Description: "The list of packet filter rule",
+							Elem: &schema.Resource{
+								Schema: map[string]*schema.Schema{
+									"from_ip": {
+										Type:        schema.TypeString,
+										Required:    true,
+										Description: "The source IP address of the rule",
+									},
+									"from_ip_prefix_length": {
+										Type:        schema.TypeInt,
+										Required:    true,
+										Description: "The prefix length (CIDR notation) of the from_ip address, indicating the network size",
+									},
+								},
+							},
+						},
+					},
+				},
+			},
 			"status": {
 				Type:        schema.TypeString,
 				Computed:    true,
@@ -267,15 +303,20 @@ func resourceSakuraCloudApprunApplicationCreate(ctx context.Context, d *schema.R
 		Port:           d.Get("port").(int),
 		MinScale:       d.Get("min_scale").(int),
 		MaxScale:       d.Get("max_scale").(int),
-		Components:     *expandApprunApplicationComponents(d),
+		Components:     expandApprunApplicationComponents(d),
 	}
 	result, err := appOp.Create(ctx, &params)
 	if err != nil {
 		return diag.FromErr(err)
 	}
 
+	pfOp := apprun.NewPacketFilterOp(client.apprunClient)
+	if _, err := pfOp.Update(ctx, result.Id, expandApprunPacketFilter(d)); err != nil {
+		return diag.FromErr(err)
+	}
+
 	// 内部的にVersions/Traffics APIを利用してトラフィック分散の状態も変更する
-	versions, err := getVersions(ctx, d, meta, *result.Id)
+	versions, err := getVersions(ctx, d, meta, result.Id)
 	if err != nil {
 		return diag.FromErr(err)
 	}
@@ -286,12 +327,12 @@ func resourceSakuraCloudApprunApplicationCreate(ctx context.Context, d *schema.R
 		return diag.FromErr(err)
 	}
 
-	_, err = trafficOp.Update(ctx, *result.Id, traffics)
+	_, err = trafficOp.Update(ctx, result.Id, traffics)
 	if err != nil {
 		return diag.FromErr(err)
 	}
 
-	d.SetId(*result.Id)
+	d.SetId(result.Id)
 	return resourceSakuraCloudApprunApplicationRead(ctx, d, meta)
 }
 
@@ -308,14 +349,14 @@ func resourceSakuraCloudApprunApplicationRead(ctx context.Context, d *schema.Res
 	application, err := appOp.Read(ctx, d.Id())
 	if err != nil {
 		if e, ok := err.(*v1.ModelDefaultError); ok {
-			if e.Detail.Code != nil && *e.Detail.Code == 404 {
+			if e.Detail.Code == 404 {
 				d.SetId("")
 				return nil
 			}
 		}
 		return diag.Errorf("could not read SakuraCloud Apprun Application[%s]: %s", d.Id(), err)
 	}
-	d.SetId(*application.Id)
+	d.SetId(application.Id)
 
 	versions, err := getVersions(ctx, d, meta, d.Id())
 	if err != nil {
@@ -328,7 +369,13 @@ func resourceSakuraCloudApprunApplicationRead(ctx context.Context, d *schema.Res
 		return diag.Errorf("could not read SakuraCloud Apprun Application Traffics[%s]: %s", d.Id(), err)
 	}
 
-	return setApprunApplicationResourceData(d, application, traffics.Data, versions)
+	pfOp := apprun.NewPacketFilterOp(client.apprunClient)
+	pf, err := pfOp.Read(ctx, application.Id)
+	if err != nil {
+		return diag.FromErr(err)
+	}
+
+	return setApprunApplicationResourceData(d, application, traffics.Data, versions, pf)
 }
 
 // NOTE: all_traffic_availableについては未対応
@@ -356,8 +403,13 @@ func resourceSakuraCloudApprunApplicationUpdate(ctx context.Context, d *schema.R
 		MaxScale:       &patchedMaxScale,
 		Components:     expandApprunApplicationComponentsForUpdate(d),
 	}
-	result, err := appOp.Update(ctx, *application.Id, &params)
+	result, err := appOp.Update(ctx, application.Id, &params)
 	if err != nil {
+		return diag.FromErr(err)
+	}
+
+	pfOp := apprun.NewPacketFilterOp(client.apprunClient)
+	if _, err := pfOp.Update(ctx, result.Id, expandApprunPacketFilter(d)); err != nil {
 		return diag.FromErr(err)
 	}
 
@@ -378,7 +430,7 @@ func resourceSakuraCloudApprunApplicationUpdate(ctx context.Context, d *schema.R
 		return diag.FromErr(err)
 	}
 
-	d.SetId(*result.Id)
+	d.SetId(result.Id)
 	return resourceSakuraCloudApprunApplicationRead(ctx, d, meta)
 }
 
@@ -394,13 +446,13 @@ func resourceSakuraCloudApprunApplicationDelete(ctx context.Context, d *schema.R
 		return diag.Errorf("could not read SakuraCloud Apprun Application[%s]: %s", d.Id(), err)
 	}
 
-	if err := appOp.Delete(ctx, *application.Id); err != nil {
-		return diag.Errorf("deleting SakuraCloud Apprun Application[%s] is failed: %s", *application.Id, err)
+	if err := appOp.Delete(ctx, application.Id); err != nil {
+		return diag.Errorf("deleting SakuraCloud Apprun Application[%s] is failed: %s", application.Id, err)
 	}
 	return nil
 }
 
-func setApprunApplicationResourceData(d *schema.ResourceData, application *v1.Application, traffics *[]v1.Traffic, versions *[]v1.Version) diag.Diagnostics {
+func setApprunApplicationResourceData(d *schema.ResourceData, application *v1.Application, traffics []v1.Traffic, versions []v1.Version, pf *v1.HandlerGetPacketFilter) diag.Diagnostics {
 	d.Set("name", application.Name)                                               //nolint:errcheck,gosec
 	d.Set("timeout_seconds", application.TimeoutSeconds)                          //nolint:errcheck,gosec
 	d.Set("port", application.Port)                                               //nolint:errcheck,gosec
@@ -408,8 +460,9 @@ func setApprunApplicationResourceData(d *schema.ResourceData, application *v1.Ap
 	d.Set("max_scale", application.MaxScale)                                      //nolint:errcheck,gosec
 	d.Set("components", flattenApprunApplicationComponents(d, application, true)) //nolint:errcheck,gosec
 	d.Set("traffics", flattenApprunApplicationTraffics(traffics, versions))       //nolint:errcheck,gosec
-	d.Set("status", *application.Status)                                          //nolint:errcheck,gosec
-	d.Set("public_url", *application.PublicUrl)                                   //nolint:errcheck,gosec
+	d.Set("packet_filter", flattenApprunPacketFilter(pf))                         //nolint:errcheck,gosec
+	d.Set("status", application.Status)                                           //nolint:errcheck,gosec
+	d.Set("public_url", application.PublicUrl)                                    //nolint:errcheck,gosec
 
 	return nil
 }
@@ -422,7 +475,7 @@ func validateApprunApplicationMaxMemory() schema.SchemaValidateDiagFunc {
 	return validation.ToDiagFunc(validation.StringInSlice(apprun.ApplicationMaxMemories, false))
 }
 
-func getVersions(ctx context.Context, d *schema.ResourceData, meta interface{}, applicationId string) (*[]v1.Version, error) {
+func getVersions(ctx context.Context, d *schema.ResourceData, meta interface{}, applicationId string) ([]v1.Version, error) {
 	var versions []v1.Version
 
 	client, _, err := sakuraCloudClient(d, meta)
@@ -442,15 +495,15 @@ func getVersions(ctx context.Context, d *schema.ResourceData, meta interface{}, 
 		if err != nil {
 			return nil, err
 		}
-		if len(*vs.Data) == 0 {
+		if len(vs.Data) == 0 {
 			break
 		}
 
-		versions = append(versions, *vs.Data...)
+		versions = append(versions, vs.Data...)
 		pageNum++
 	}
 
-	return &versions, nil
+	return versions, nil
 }
 
 // NOTE: AppRunは初回利用時に一度のみユーザーの作成を必要とする。
