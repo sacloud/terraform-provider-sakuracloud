@@ -28,7 +28,7 @@ import (
 
 const (
 	envICCID    = "SAKURACLOUD_SIM_ICCID"
-	envPasscode = "SAKURACLOUD_SIM_PASSCODE"
+	envPasscode = "SAKURACLOUD_SIM_PASSCODE" //nolint:gosec
 	envIMEI     = "SAKURACLOUD_SIM_IMEI"
 )
 

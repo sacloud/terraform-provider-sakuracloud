@@ -46,9 +46,64 @@ func dataSourceSakuraCloudWebAccel() *schema.Resource {
 				Type:     schema.TypeString,
 				Computed: true,
 			},
+			//TODO: `origin_parameters.origin`フィールドと等価であるため、将来的に廃止を検討する。
 			"origin": {
 				Type:     schema.TypeString,
 				Computed: true,
+			},
+			"request_protocol": {
+				Type:     schema.TypeString,
+				Computed: true,
+			},
+			"origin_parameters": {
+				Type:     schema.TypeSet,
+				Computed: true,
+				Elem: &schema.Resource{
+					Schema: map[string]*schema.Schema{
+						"type": {
+							Type:     schema.TypeString,
+							Computed: true,
+						},
+						"origin": {
+							Type:     schema.TypeString,
+							Computed: true,
+						},
+						"protocol": {
+							Type:     schema.TypeString,
+							Computed: true,
+						},
+						"host_header": {
+							Type:     schema.TypeString,
+							Computed: true,
+						},
+						"s3_endpoint": {
+							Type:     schema.TypeString,
+							Computed: true,
+						},
+						"s3_region": {
+							Type:     schema.TypeString,
+							Computed: true,
+						},
+						"s3_bucket_name": {
+							Type:     schema.TypeString,
+							Computed: true,
+						},
+						//NOTE: blank value
+						"s3_access_key_id": {
+							Type:     schema.TypeString,
+							Computed: true,
+						},
+						//NOTE: blank value
+						"s3_secret_access_key": {
+							Type:     schema.TypeString,
+							Computed: true,
+						},
+						"s3_doc_index": {
+							Type:     schema.TypeBool,
+							Computed: true,
+						},
+					},
+				},
 			},
 			"subdomain": {
 				Type:     schema.TypeString,
@@ -78,11 +133,79 @@ func dataSourceSakuraCloudWebAccel() *schema.Resource {
 				Type:     schema.TypeString,
 				Computed: true,
 			},
+			"logging": {
+				Type:        schema.TypeSet,
+				Computed:    true,
+				Description: "logging configuration of the site",
+				Elem: &schema.Resource{
+					Schema: map[string]*schema.Schema{
+						"enabled": {
+							Type:        schema.TypeBool,
+							Computed:    true,
+							Description: "whether the site logging is enabled or not",
+						},
+						"s3_bucket_name": {
+							Type:        schema.TypeString,
+							Computed:    true,
+							Description: "logging bucket name",
+						},
+						"s3_access_key_id": {
+							Type:        schema.TypeString,
+							Computed:    true,
+							Sensitive:   true,
+							Description: "S3 access key ID",
+						},
+						"s3_secret_access_key": {
+							Type:        schema.TypeString,
+							Computed:    true,
+							Sensitive:   true,
+							Description: "S3 secret access key",
+						},
+					},
+				},
+			},
+			"default_cache_ttl": {
+				Type:     schema.TypeInt,
+				Computed: true,
+			},
+			"vary_support": {
+				Type:     schema.TypeBool,
+				Computed: true,
+			},
+			"cors_rules": {
+				Type:     schema.TypeSet,
+				Computed: true,
+				Elem: &schema.Resource{
+					Schema: map[string]*schema.Schema{
+						"allow_all": {
+							Type:     schema.TypeBool,
+							Computed: true,
+						},
+						"allowed_origins": {
+							Type:     schema.TypeList,
+							Computed: true,
+							Elem:     &schema.Schema{Type: schema.TypeString},
+						},
+					},
+				},
+			},
+			"normalize_ae": {
+				Type:     schema.TypeString,
+				Computed: true,
+			},
 		},
 	}
 }
 
 func dataSourceSakuraCloudWebAccelRead(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
+	err := dataSourceSakuraCloudWebAccelSiteRead(ctx, d, meta)
+	if err != nil {
+		return err
+	}
+	return dataSourceSakuraCloudWebAccelLogUploadConfigRead(ctx, d, meta)
+}
+
+func dataSourceSakuraCloudWebAccelSiteRead(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	name := d.Get("name").(string)
 	domain := d.Get("domain").(string)
 	if name == "" && domain == "" {
@@ -115,17 +238,60 @@ func dataSourceSakuraCloudWebAccelRead(ctx context.Context, d *schema.ResourceDa
 	}
 
 	d.SetId(data.ID)
-	d.Set("name", data.Name)
-	d.Set("domain", data.Domain)
-	d.Set("site_id", data.ID)
-	d.Set("origin", data.Origin)
-	d.Set("subdomain", data.Subdomain)
-	d.Set("domain_type", data.DomainType)
-	d.Set("has_certificate", data.HasCertificate)
-	d.Set("host_header", data.HostHeader)
-	d.Set("status", data.Status)
+	d.Set("name", data.Name)     //nolint:errcheck,gosec
+	d.Set("domain", data.Domain) //nolint:errcheck,gosec
+	d.Set("site_id", data.ID)    //nolint:errcheck,gosec
 
-	d.Set("cname_record_value", data.Subdomain+".")
-	d.Set("txt_record_value", fmt.Sprintf("webaccel=%s", data.Subdomain))
+	//TODO: `origin_parameters.origin`フィールドと等価であるため、将来的に廃止を検討する。
+	d.Set("origin", data.Origin) //nolint:errcheck,gosec
+
+	d.Set("subdomain", data.Subdomain)    //nolint:errcheck,gosec
+	d.Set("domain_type", data.DomainType) //nolint:errcheck,gosec
+	rp, err := mapWebAccelRequestProtocol(data)
+	if err != nil {
+		return diag.FromErr(err)
+	}
+	d.Set("request_protocol", rp)                 //nolint:errcheck,gosec
+	d.Set("has_certificate", data.HasCertificate) //nolint:errcheck,gosec
+
+	//TODO: `origin_parameters.host_header`フィールドと等価であるため、将来的に廃止を検討する。
+	d.Set("host_header", data.HostHeader) //nolint:errcheck,gosec
+	d.Set("status", data.Status)          //nolint:errcheck,gosec
+	originParams, err := flattenWebAccelOriginParameters(d, data)
+	if err != nil {
+		return diag.FromErr(err)
+	}
+	d.Set("origin_parameters", originParams) //nolint:errcheck,gosec
+	cors, err := flattenWebAccelCorsRules(data.CORSRules)
+	if err != nil {
+		return diag.FromErr(err)
+	}
+	d.Set("cors_rules", cors)                                              //nolint:errcheck,gosec
+	d.Set("cname_record_value", data.Subdomain+".")                        //nolint:errcheck,gosec
+	d.Set("txt_record_value", fmt.Sprintf("webaccel=%s", data.Subdomain))  //nolint:errcheck,gosec
+	d.Set("vary_support", data.VarySupport == webaccel.VarySupportEnabled) //nolint:errcheck,gosec
+	ae, err := mapWebAccelNormalizeAE(data)
+	if err != nil {
+		return diag.FromErr(err)
+	}
+	d.Set("normalize_ae", ae) //nolint:errcheck,gosec
+	return nil
+}
+
+// TODO: plan to enhance acceptance tests for the function
+func dataSourceSakuraCloudWebAccelLogUploadConfigRead(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
+	siteId := d.Id()
+	client, _, err := sakuraCloudClient(d, meta)
+	if err != nil {
+		return diag.FromErr(err)
+	}
+	webAccelOp := webaccel.NewOp(client.webaccelClient)
+	logCfg, err := webAccelOp.ReadLogUploadConfig(ctx, siteId)
+	logCfg.AccessKeyID = ""
+	logCfg.SecretAccessKey = ""
+	if err != nil {
+		return diag.FromErr(err)
+	}
+	d.Set("logging", flattenWebAccelLogUploadConfigData(logCfg)) //nolint:errcheck,gosec
 	return nil
 }

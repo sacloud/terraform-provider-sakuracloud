@@ -75,7 +75,7 @@ func resourceSakuraCloudContainerRegistry() *schema.Resource {
 			"description": schemaResourceDescription(resourceName),
 			"tags":        schemaResourceTags(resourceName),
 			"user": {
-				Type:     schema.TypeList,
+				Type:     schema.TypeSet,
 				Optional: true,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
@@ -101,6 +101,13 @@ func resourceSakuraCloudContainerRegistry() *schema.Resource {
 						},
 					},
 				},
+				Set: schema.HashResource(&schema.Resource{
+					Schema: map[string]*schema.Schema{
+						"name": {
+							Type: schema.TypeString,
+						},
+					},
+				}),
 			},
 		},
 	}
@@ -195,13 +202,13 @@ func setContainerRegistryResourceData(ctx context.Context, d *schema.ResourceDat
 		return diag.FromErr(err)
 	}
 
-	d.Set("name", data.Name)                         // nolint
-	d.Set("access_level", data.AccessLevel.String()) // nolint
-	d.Set("virtual_domain", data.VirtualDomain)      // nolint
-	d.Set("subdomain_label", data.SubDomainLabel)    // nolint
-	d.Set("fqdn", data.FQDN)                         // nolint
-	d.Set("icon_id", data.IconID.String())           // nolint
-	d.Set("description", data.Description)           // nolint
+	d.Set("name", data.Name)                         //nolint
+	d.Set("access_level", data.AccessLevel.String()) //nolint
+	d.Set("virtual_domain", data.VirtualDomain)      //nolint
+	d.Set("subdomain_label", data.SubDomainLabel)    //nolint
+	d.Set("fqdn", data.FQDN)                         //nolint
+	d.Set("icon_id", data.IconID.String())           //nolint
+	d.Set("description", data.Description)           //nolint
 
 	if err := d.Set("user", flattenContainerRegistryUsers(d, users.Users, includePassword)); err != nil {
 		return diag.FromErr(err)

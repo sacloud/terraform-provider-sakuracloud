@@ -193,7 +193,7 @@ func (p *TemplateParameter) Link() string {
 }
 
 func (p *TemplateParameter) ShortName() string {
-	return strings.Replace(p.Name, p.ProviderName+"_", "", -1)
+	return strings.ReplaceAll(p.Name, p.ProviderName+"_", "")
 }
 
 func (p *TemplateParameter) IsProvider() bool {

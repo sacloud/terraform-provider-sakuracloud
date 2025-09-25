@@ -161,8 +161,8 @@ func resourceSakuraCloudIPv4PtrDelete(ctx context.Context, d *schema.ResourceDat
 }
 
 func setIPv4PtrResourceData(d *schema.ResourceData, client *APIClient, data *iaas.IPAddress) diag.Diagnostics {
-	d.Set("ip_address", data.IPAddress) // nolint
-	d.Set("hostname", data.HostName)    // nolint
-	d.Set("zone", getZone(d, client))   // nolint
+	d.Set("ip_address", data.IPAddress) //nolint
+	d.Set("hostname", data.HostName)    //nolint
+	d.Set("zone", getZone(d, client))   //nolint
 	return nil
 }

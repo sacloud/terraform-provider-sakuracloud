@@ -149,10 +149,10 @@ func resourceSakuraCloudNoteDelete(ctx context.Context, d *schema.ResourceData, 
 }
 
 func setNoteResourceData(ctx context.Context, d *schema.ResourceData, client *APIClient, data *iaas.Note) diag.Diagnostics {
-	d.Set("name", data.Name)               // nolint
-	d.Set("content", data.Content)         // nolint
-	d.Set("class", data.Class)             // nolint
-	d.Set("icon_id", data.IconID.String()) // nolint
-	d.Set("description", data.Description) // nolint
+	d.Set("name", data.Name)               //nolint
+	d.Set("content", data.Content)         //nolint
+	d.Set("class", data.Class)             //nolint
+	d.Set("icon_id", data.IconID.String()) //nolint
+	d.Set("description", data.Description) //nolint
 	return diag.FromErr(d.Set("tags", flattenTags(data.Tags)))
 }

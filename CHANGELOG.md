@@ -1,5 +1,39 @@
 # CHANGELOG
 
+## 2.29.1 (2025/09/02)
+
+- webaccelリソースでのDomainが設定されておらずエラーになる問題の修正 (#1278)
+
+## 2.29.0 (2025/08/04)
+
+- KMSの追加 (#1272)
+- シークレットマネージャの追加 (#1273)
+- コンテナレジストリでユーザの順番に依存してプランが変わってしまう問題の修正 (#1275)
+
+## 2.28.1 (2025/07/08)
+
+- SSH公開鍵が反映されない問題を修正 (#1269)
+- ディスク修正機能のパスワードポリシー変更を適用 (#1268)
+- シンプルMQのクライアントを更新してエラーハンドリングの改善 (#1265)
+
+## 2.28.0 (2025/06/23)
+
+- シンプルMQの追加 (#1256)
+- SSH公開鍵生成機能の取り下げ (#1262)
+- update golangci-lint to v2 (#1259)
+- Go 用のテンプレートパラメータのようなものが examples と docs に残っていたので修正 (#1264)
+
+## 2.27.0 (2025/06/09)
+
+- resource_webaccel および resource_webaccel_activation を実装 (#1250)
+- go: bump golang.org/x/net from 0.33.0 to 0.38.0 (#1242)
+- iaas-api-go v1.15.0 (#1245)
+- Update GitHub Actions matrix to use Ubuntu 24.04 (#1244)
+- sakuracloud_apprun_application: set ForceNew: true for name (#1235)
+- go: bump golang.org/x/net from 0.25.0 to 0.33.0 (#1230)
+- go: bump github.com/sacloud/autoscaler from 0.15.5 to 0.16.1 (#1197)
+- update: iaas-api-go v1.14.0 (#1229)
+
 ## 2.26.1 (2025/02/13)
 
 - ContainerRegistry:beta #1225

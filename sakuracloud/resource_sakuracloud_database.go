@@ -295,11 +295,11 @@ func setDatabaseResourceData(ctx context.Context, d *schema.ResourceData, client
 		return diag.Errorf("got unexpected state: Database[%d].Availability is failed", data.ID)
 	}
 
-	d.Set("database_type", flattenDatabaseType(data))    // nolint
-	d.Set("database_version", data.Conf.DatabaseVersion) // nolint
+	d.Set("database_type", flattenDatabaseType(data))    //nolint
+	d.Set("database_version", data.Conf.DatabaseVersion) //nolint
 	if data.ReplicationSetting != nil {
-		d.Set("replica_user", data.CommonSetting.ReplicaUser)         // nolint
-		d.Set("replica_password", data.CommonSetting.ReplicaPassword) // nolint
+		d.Set("replica_user", data.CommonSetting.ReplicaUser)         //nolint
+		d.Set("replica_password", data.CommonSetting.ReplicaPassword) //nolint
 	}
 	if err := d.Set("backup", flattenDatabaseBackupSetting(data)); err != nil {
 		return diag.FromErr(err)
@@ -307,16 +307,16 @@ func setDatabaseResourceData(ctx context.Context, d *schema.ResourceData, client
 	if err := d.Set("tags", flattenDatabaseTags(data)); err != nil {
 		return diag.FromErr(err)
 	}
-	d.Set("name", data.Name)                              // nolint
-	d.Set("username", data.CommonSetting.DefaultUser)     // nolint
-	d.Set("password", data.CommonSetting.UserPassword)    // nolint
-	d.Set("plan", types.DatabasePlanNameMap[data.PlanID]) // nolint
+	d.Set("name", data.Name)                              //nolint
+	d.Set("username", data.CommonSetting.DefaultUser)     //nolint
+	d.Set("password", data.CommonSetting.UserPassword)    //nolint
+	d.Set("plan", types.DatabasePlanNameMap[data.PlanID]) //nolint
 	if err := d.Set("network_interface", flattenDatabaseNetworkInterface(data)); err != nil {
 		return diag.FromErr(err)
 	}
-	d.Set("icon_id", data.IconID.String()) // nolint
-	d.Set("description", data.Description) // nolint
-	d.Set("zone", getZone(d, client))      // nolint
+	d.Set("icon_id", data.IconID.String()) //nolint
+	d.Set("description", data.Description) //nolint
+	d.Set("zone", getZone(d, client))      //nolint
 
 	parameters, err := iaas.NewDatabaseOp(client).GetParameter(ctx, zone, data.ID)
 	if err != nil {

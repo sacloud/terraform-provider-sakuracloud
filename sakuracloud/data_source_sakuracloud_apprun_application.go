@@ -248,14 +248,14 @@ func dataSourceSakuraCloudApprunApplicationRead(ctx context.Context, d *schema.R
 	}
 
 	d.SetId(*data.Id)
-	d.Set("name", *data.Name)
-	d.Set("timeout_seconds", *data.TimeoutSeconds)
-	d.Set("port", *data.Port)
-	d.Set("min_scale", *data.MinScale)
-	d.Set("max_scale", *data.MaxScale)
-	d.Set("components", flattenApprunApplicationComponents(d, data, false))
-	d.Set("status", *data.Status)
-	d.Set("public_url", *data.PublicUrl)
+	d.Set("name", *data.Name)                                               //nolint:errcheck,gosec
+	d.Set("timeout_seconds", *data.TimeoutSeconds)                          //nolint:errcheck,gosec
+	d.Set("port", *data.Port)                                               //nolint:errcheck,gosec
+	d.Set("min_scale", *data.MinScale)                                      //nolint:errcheck,gosec
+	d.Set("max_scale", *data.MaxScale)                                      //nolint:errcheck,gosec
+	d.Set("components", flattenApprunApplicationComponents(d, data, false)) //nolint:errcheck,gosec
+	d.Set("status", *data.Status)                                           //nolint:errcheck,gosec
+	d.Set("public_url", *data.PublicUrl)                                    //nolint:errcheck,gosec
 
 	return nil
 }

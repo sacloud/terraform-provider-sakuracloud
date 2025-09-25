@@ -213,16 +213,16 @@ func setSubnetResourceData(_ context.Context, d *schema.ResourceData, client *AP
 		addrs = append(addrs, ip.IPAddress)
 	}
 
-	d.Set("switch_id", data.SwitchID.String())                                   // nolint
-	d.Set("internet_id", data.InternetID.String())                               // nolint
-	d.Set("netmask", data.NetworkMaskLen)                                        // nolint
-	d.Set("next_hop", data.NextHop)                                              // nolint
-	d.Set("network_address", data.NetworkAddress)                                // nolint
-	d.Set("min_ip_address", data.IPAddresses[0].IPAddress)                       // nolint
-	d.Set("max_ip_address", data.IPAddresses[len(data.IPAddresses)-1].IPAddress) // nolint
+	d.Set("switch_id", data.SwitchID.String())                                   //nolint
+	d.Set("internet_id", data.InternetID.String())                               //nolint
+	d.Set("netmask", data.NetworkMaskLen)                                        //nolint
+	d.Set("next_hop", data.NextHop)                                              //nolint
+	d.Set("network_address", data.NetworkAddress)                                //nolint
+	d.Set("min_ip_address", data.IPAddresses[0].IPAddress)                       //nolint
+	d.Set("max_ip_address", data.IPAddresses[len(data.IPAddresses)-1].IPAddress) //nolint
 	if err := d.Set("ip_addresses", addrs); err != nil {
 		return diag.FromErr(err)
 	}
-	d.Set("zone", getZone(d, client)) // nolint
+	d.Set("zone", getZone(d, client)) //nolint
 	return nil
 }

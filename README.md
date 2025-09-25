@@ -20,7 +20,7 @@ terraform {
 
       # We recommend pinning to the specific version of the SakuraCloud Provider you're using
       # since new versions are released frequently
-      version = "2.26.1"
+      version = "2.29.1"
       #version = "~> 2"
     }
   }
@@ -36,7 +36,7 @@ provider "sakuracloud" {
 variable password {}
 
 data "sakuracloud_archive" "ubuntu" {
-  os_type = "ubuntu2004"
+  os_type = "ubuntu"
 }
 
 resource "sakuracloud_disk" "example" {

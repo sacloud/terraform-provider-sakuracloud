@@ -433,8 +433,7 @@ func resourceSakuraCloudCertificateAuthorityDelete(ctx context.Context, d *schem
 		return diag.FromErr(err)
 	}
 	for _, server := range servers.CertificateAuthority {
-		switch server.IssueState {
-		case "available":
+		if server.IssueState == "available" {
 			if err := caOp.RevokeServer(ctx, ca.ID, server.ID); err != nil {
 				return diag.FromErr(err)
 			}
@@ -450,9 +449,9 @@ func resourceSakuraCloudCertificateAuthorityDelete(ctx context.Context, d *schem
 }
 
 func setCertificateAuthorityResourceData(ctx context.Context, d *schema.ResourceData, client *APIClient, data *caBuilder.CertificateAuthority) diag.Diagnostics {
-	d.Set("name", data.Name)               // nolint
-	d.Set("icon_id", data.IconID.String()) // nolint
-	d.Set("description", data.Description) // nolint
+	d.Set("name", data.Name)               //nolint
+	d.Set("icon_id", data.IconID.String()) //nolint
+	d.Set("description", data.Description) //nolint
 	if err := d.Set("tags", flattenTags(data.Tags)); err != nil {
 		return diag.FromErr(err)
 	}
@@ -460,11 +459,11 @@ func setCertificateAuthorityResourceData(ctx context.Context, d *schema.Resource
 		return diag.FromErr(err)
 	}
 
-	d.Set("certificate", data.Detail.CertificateData.CertificatePEM)                                                          // nolint
-	d.Set("serial_number", data.Detail.CertificateData.SerialNumber)                                                          // nolint
-	d.Set("not_before", data.Detail.CertificateData.NotBefore.Format(time.RFC3339))                                           // nolint
-	d.Set("not_after", data.Detail.CertificateData.NotAfter.Format(time.RFC3339))                                             // nolint
-	d.Set("crl_url", fmt.Sprintf("https://pki.elab.sakura.ad.jp/public/ca/%s.crl", data.Detail.CertificateData.SerialNumber)) // nolint
+	d.Set("certificate", data.Detail.CertificateData.CertificatePEM)                                                          //nolint
+	d.Set("serial_number", data.Detail.CertificateData.SerialNumber)                                                          //nolint
+	d.Set("not_before", data.Detail.CertificateData.NotBefore.Format(time.RFC3339))                                           //nolint
+	d.Set("not_after", data.Detail.CertificateData.NotAfter.Format(time.RFC3339))                                             //nolint
+	d.Set("crl_url", fmt.Sprintf("https://pki.elab.sakura.ad.jp/public/ca/%s.crl", data.Detail.CertificateData.SerialNumber)) //nolint
 
 	if err := d.Set("client", flattenCertificateAuthorityClients(d, data.Clients)); err != nil {
 		return diag.FromErr(err)

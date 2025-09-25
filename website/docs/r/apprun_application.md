@@ -68,7 +68,7 @@ resource "sakuracloud_apprun_application" "foobar" {
 
 ## Argument Reference
 
-* `name` - (Required) The name of application.
+* `name` - (Required) The name of application. Changing this forces a new resource to be created.
 * `timeout_seconds` - (Required) The time limit between accessing the application's public URL, starting the instance, and receiving a response.
 * `port` - (Required) The port number where the application listens for requests.
 * `min_scale` - (Required) The minimum number of scales for the entire application.

@@ -164,15 +164,15 @@ func validateSourceSharedKey(v interface{}, k string) ([]string, []error) {
 
 func validateAutoScaleConfig(v interface{}, k string) ([]string, []error) {
 	var ws []string
-	var errors []error
+	var errs []error
 
 	value := v.(string)
 	config := autoScaler.Config{}
 	err := yaml.UnmarshalWithOptions([]byte(value), &config, yaml.Strict())
 	if err != nil {
-		errors = append(errors, fmt.Errorf(yaml.FormatError(err, false, true)))
+		errs = append(errs, errors.New(yaml.FormatError(err, false, true)))
 	}
-	return ws, errors
+	return ws, errs
 }
 
 func validateHostName() schema.SchemaValidateDiagFunc {
@@ -236,5 +236,19 @@ func isValidLengthBetween(minVal, maxVal int) schema.SchemaValidateDiagFunc {
 		}
 
 		return warnings, errors
+	})
+}
+
+func validateWithCustomFunc[T any](validator func(v T) error) schema.SchemaValidateDiagFunc {
+	return validation.ToDiagFunc(func(i any, k string) ([]string, []error) {
+		v, ok := i.(T)
+		if !ok {
+			return nil, []error{fmt.Errorf("expected type of %s to be %T", k, v)}
+		}
+
+		if err := validator(v); err != nil {
+			return nil, []error{fmt.Errorf("invalid value for %s: %v", k, err)}
+		}
+		return nil, nil
 	})
 }

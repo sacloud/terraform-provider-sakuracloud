@@ -114,7 +114,7 @@ func expandDiskEditNotes(d resourceValueGettable) []*iaas.DiskEditNote {
 			notes = append(notes, &iaas.DiskEditNote{ID: id})
 		}
 	}
-	if values, ok := d.GetOk("note"); ok { // nolint
+	if values, ok := d.GetOk("note"); ok {
 		for _, value := range values.([]interface{}) {
 			d = mapToResourceData(value.(map[string]interface{}))
 			notes = append(notes, &iaas.DiskEditNote{

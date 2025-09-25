@@ -163,15 +163,15 @@ func setWebAccelCertificateResourceData(d *schema.ResourceData, client *APIClien
 	notBefore := time.Unix(data.NotBefore/1000, 0).Format(time.RFC3339)
 	notAfter := time.Unix(data.NotAfter/1000, 0).Format(time.RFC3339)
 
-	d.Set("site_id", data.SiteID)                         // nolint
-	d.Set("serial_number", data.SerialNumber)             // nolint
-	d.Set("not_before", notBefore)                        // nolint
-	d.Set("not_after", notAfter)                          // nolint
-	d.Set("issuer_common_name", data.Issuer.CommonName)   // nolint
-	d.Set("subject_common_name", data.Subject.CommonName) // nolint
+	d.Set("site_id", data.SiteID)                         //nolint
+	d.Set("serial_number", data.SerialNumber)             //nolint
+	d.Set("not_before", notBefore)                        //nolint
+	d.Set("not_after", notAfter)                          //nolint
+	d.Set("issuer_common_name", data.Issuer.CommonName)   //nolint
+	d.Set("subject_common_name", data.Subject.CommonName) //nolint
 	if err := d.Set("dns_names", data.DNSNames); err != nil {
 		return diag.FromErr(err)
 	}
-	d.Set("sha256_fingerprint", data.SHA256Fingerprint) // nolint
+	d.Set("sha256_fingerprint", data.SHA256Fingerprint) //nolint
 	return nil
 }

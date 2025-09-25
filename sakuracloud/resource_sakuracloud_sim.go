@@ -206,13 +206,13 @@ func setSIMResourceData(ctx context.Context, d *schema.ResourceData, client *API
 		return diag.Errorf("reading SIM[%s] NetworkOperator is failed: %s", data.ID, err)
 	}
 
-	d.Set("name", data.Name)               // nolint
-	d.Set("icon_id", data.IconID.String()) // nolint
-	d.Set("description", data.Description) // nolint
-	d.Set("iccid", data.ICCID)             // nolint
+	d.Set("name", data.Name)               //nolint
+	d.Set("icon_id", data.IconID.String()) //nolint
+	d.Set("description", data.Description) //nolint
+	d.Set("iccid", data.ICCID)             //nolint
 	if data.Info != nil {
-		d.Set("ip_address", data.Info.IP)                // nolint
-		d.Set("mobile_gateway_id", data.Info.SIMGroupID) // nolint
+		d.Set("ip_address", data.Info.IP)                //nolint
+		d.Set("mobile_gateway_id", data.Info.SIMGroupID) //nolint
 	}
 	if err := d.Set("carrier", flattenSIMCarrier(carrierInfo)); err != nil {
 		return diag.FromErr(err)

@@ -24,11 +24,11 @@ import (
 )
 
 func UploadFile(ctx context.Context, user, pass, host, file string) error {
-	f, err := os.Open(file)
+	f, err := os.Open(filepath.Clean(file))
 	if err != nil {
 		return fmt.Errorf("opening file[%s] failed: %s", file, err)
 	}
-	defer f.Close() // nolint
+	defer f.Close() //nolint
 
 	compCh := make(chan struct{})
 	errCh := make(chan error)
@@ -45,7 +45,7 @@ func UploadFile(ctx context.Context, user, pass, host, file string) error {
 
 	select {
 	case <-ctx.Done():
-		f.Close() // nolint
+		f.Close() //nolint
 		return ctx.Err()
 	case err := <-errCh:
 		return err

@@ -230,10 +230,6 @@ var definitions = map[string]definition{
 		displayName: "SSH Key",
 		category:    CategoryMisc,
 	},
-	"sakuracloud_ssh_key_gen": {
-		displayName: "SSH Key Gen",
-		category:    CategoryMisc,
-	},
 	"sakuracloud_subnet": {
 		displayName: "Subnet",
 		category:    CategoryNetworking,

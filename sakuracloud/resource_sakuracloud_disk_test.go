@@ -275,7 +275,7 @@ func TestAccImportSakuraCloudDisk_basic(t *testing.T) {
 
 var testAccSakuraCloudDisk_basic = `
 data "sakuracloud_archive" "ubuntu" {
-  os_type = "ubuntu2004"
+  os_type = "ubuntu"
 }
 resource "sakuracloud_disk" "foobar" {
   name              = "{{ .arg0 }}"
@@ -298,7 +298,7 @@ resource "sakuracloud_icon" "foobar" {
 
 var testAccSakuraCloudDisk_upadte = `
 data "sakuracloud_archive" "ubuntu" {
-  os_type = "ubuntu2004"
+  os_type = "ubuntu"
 }
 resource "sakuracloud_disk" "foobar" {
   name              = "{{ .arg0 }}-upd"
@@ -314,7 +314,7 @@ resource "sakuracloud_disk" "foobar" {
 
 var testAccSakuraCloudDisk_with_Server = `
 data "sakuracloud_archive" "ubuntu" {
-  os_type = "ubuntu2004"
+  os_type = "ubuntu"
 }
 
 resource "sakuracloud_disk" "foobar" {
@@ -341,7 +341,7 @@ resource sakuracloud_server "foobar" {
 
 var testAccSakuraCloudDisk_with_Server_update = `
 data "sakuracloud_archive" "ubuntu" {
-  os_type = "ubuntu2004"
+  os_type = "ubuntu"
 }
 
 resource "sakuracloud_disk" "foobar" {

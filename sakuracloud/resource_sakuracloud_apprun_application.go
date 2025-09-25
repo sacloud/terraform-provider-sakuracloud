@@ -79,6 +79,7 @@ func resourceSakuraCloudApprunApplication() *schema.Resource {
 							Type:        schema.TypeString,
 							Required:    true,
 							Description: "The component name",
+							ForceNew:    true,
 						},
 						"max_cpu": {
 							Type:             schema.TypeString,
@@ -344,13 +345,11 @@ func resourceSakuraCloudApprunApplicationUpdate(ctx context.Context, d *schema.R
 		return diag.Errorf("could not read SakuraCloud Apprun Application[%s]: %s", d.Id(), err)
 	}
 
-	patchedName := d.Get("name").(string)
 	patchedTimeoutSeconds := d.Get("timeout_seconds").(int)
 	patchedPort := d.Get("port").(int)
 	patchedMinScale := d.Get("min_scale").(int)
 	patchedMaxScale := d.Get("max_scale").(int)
 	params := v1.PatchApplicationBody{
-		Name:           &patchedName,
 		TimeoutSeconds: &patchedTimeoutSeconds,
 		Port:           &patchedPort,
 		MinScale:       &patchedMinScale,
@@ -402,15 +401,15 @@ func resourceSakuraCloudApprunApplicationDelete(ctx context.Context, d *schema.R
 }
 
 func setApprunApplicationResourceData(d *schema.ResourceData, application *v1.Application, traffics *[]v1.Traffic, versions *[]v1.Version) diag.Diagnostics {
-	d.Set("name", application.Name)
-	d.Set("timeout_seconds", application.TimeoutSeconds)
-	d.Set("port", application.Port)
-	d.Set("min_scale", application.MinScale)
-	d.Set("max_scale", application.MaxScale)
-	d.Set("components", flattenApprunApplicationComponents(d, application, true))
-	d.Set("traffics", flattenApprunApplicationTraffics(traffics, versions))
-	d.Set("status", *application.Status)
-	d.Set("public_url", *application.PublicUrl)
+	d.Set("name", application.Name)                                               //nolint:errcheck,gosec
+	d.Set("timeout_seconds", application.TimeoutSeconds)                          //nolint:errcheck,gosec
+	d.Set("port", application.Port)                                               //nolint:errcheck,gosec
+	d.Set("min_scale", application.MinScale)                                      //nolint:errcheck,gosec
+	d.Set("max_scale", application.MaxScale)                                      //nolint:errcheck,gosec
+	d.Set("components", flattenApprunApplicationComponents(d, application, true)) //nolint:errcheck,gosec
+	d.Set("traffics", flattenApprunApplicationTraffics(traffics, versions))       //nolint:errcheck,gosec
+	d.Set("status", *application.Status)                                          //nolint:errcheck,gosec
+	d.Set("public_url", *application.PublicUrl)                                   //nolint:errcheck,gosec
 
 	return nil
 }

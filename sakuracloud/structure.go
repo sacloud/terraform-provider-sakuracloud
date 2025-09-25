@@ -16,12 +16,13 @@ package sakuracloud
 
 import (
 	"bytes"
-	"crypto/md5"
+	"crypto/md5" //nolint:gosec
 	"encoding/base64"
 	"encoding/hex"
 	"fmt"
 	"io"
 	"os"
+	"path/filepath"
 	"strconv"
 	"strings"
 
@@ -137,6 +138,21 @@ func mapFromFirstElement(d resourceValueGettable, key string) resourceValueGetta
 		}
 	}
 	return nil
+}
+
+func mapFromSet(d resourceValueGettable, key string) (resourceValueGettable, error) {
+	if v, ok := d.GetOk(key); ok {
+		set, ok := v.(*schema.Set)
+		if !ok {
+			return nil, fmt.Errorf("expected set, found %T", v)
+		}
+		if len(set.List()) == 0 {
+			//NOTE: 空のSetを許容しない
+			panic("invalid state: empty list")
+		}
+		return mapToResourceData(set.List()[0].(map[string]interface{})), nil
+	}
+	return nil, fmt.Errorf("no such field %q", key)
 }
 
 func sakuraCloudClient(d resourceValueGettable, meta interface{}) (*APIClient, string, error) {
@@ -377,21 +393,21 @@ func expandHomeDir(path string) (string, error) {
 }
 
 func md5CheckSumFromFile(path string) (string, error) {
-	f, err := os.Open(path)
+	f, err := os.Open(filepath.Clean(path))
 	if err != nil {
 		return "", fmt.Errorf("opening file[%s] is failed: %s", path, err)
 	}
-	defer f.Close() // nolint
+	defer f.Close() //nolint
 
 	b := base64.NewEncoder(base64.StdEncoding, f)
-	defer b.Close() // nolint
+	defer b.Close() //nolint
 
 	var buf bytes.Buffer
 	if _, err := io.Copy(&buf, f); err != nil {
 		return "", fmt.Errorf("encoding to base64 from file[%s] is failed: %s", path, err)
 	}
 
-	h := md5.New()
+	h := md5.New() //nolint:gosec
 	if _, err := io.Copy(h, &buf); err != nil {
 		return "", fmt.Errorf("calculating md5 from file[%s] is failed: %s", path, err)
 	}

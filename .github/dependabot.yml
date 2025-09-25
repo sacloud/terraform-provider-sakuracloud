@@ -8,6 +8,8 @@ updates:
       time: "00:00"
     commit-message:
       prefix: "ci:"
+    cooldown:
+      default-days: 7
 
   - package-ecosystem: gomod
     directory: /
@@ -16,3 +18,5 @@ updates:
       time: "00:00"
     commit-message:
       prefix: "go:"
+    cooldown:
+      default-days: 7

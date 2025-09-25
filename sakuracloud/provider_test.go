@@ -35,7 +35,7 @@ var (
 
 func init() {
 	if v := os.Getenv("SAKURACLOUD_TEST_ZONE"); v != "" {
-		os.Setenv("SAKURACLOUD_ZONE", v)
+		os.Setenv("SAKURACLOUD_ZONE", v) //nolint:errcheck,gosec
 	}
 	testAccProvider = Provider()
 	testAccProviderFactories = map[string]func() (*schema.Provider, error){
@@ -79,14 +79,14 @@ func testAccPreCheck(t *testing.T) {
 	}
 
 	if v := os.Getenv("SAKURACLOUD_ZONE"); v == "" {
-		os.Setenv("SAKURACLOUD_ZONE", testDefaultTargetZone)
+		os.Setenv("SAKURACLOUD_ZONE", testDefaultTargetZone) //nolint:errcheck,gosec
 	}
 
 	if v := os.Getenv("SAKURACLOUD_RETRY_MAX"); v == "" {
-		os.Setenv("SAKURACLOUD_RETRY_MAX", testDefaultAPIRetryMax)
+		os.Setenv("SAKURACLOUD_RETRY_MAX", testDefaultAPIRetryMax) //nolint:errcheck,gosec
 	}
 
 	if v := os.Getenv("SAKURACLOUD_RATE_LIMIT"); v == "" {
-		os.Setenv("SAKURACLOUD_RATE_LIMIT", testDefaultAPIRateLimit)
+		os.Setenv("SAKURACLOUD_RATE_LIMIT", testDefaultAPIRateLimit) //nolint:errcheck,gosec
 	}
 }
