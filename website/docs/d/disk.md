@@ -56,3 +56,4 @@ A `condition` block supports the following:
 * `source_disk_id` - The id of the source disk.
 * `tags` - Any tags assigned to the Disk.
 * `encryption_algorithm` - The disk encryption algorithm. This must be one of [`none`/`aes256_xts`].
+* `kms_key_id` - ID of the KMS key for encryption.

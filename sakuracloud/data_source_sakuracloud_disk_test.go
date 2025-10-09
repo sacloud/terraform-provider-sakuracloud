@@ -21,6 +21,8 @@ import (
 )
 
 func TestAccSakuraCloudDataSourceDisk_basic(t *testing.T) {
+	skipIfFakeModeEnabled(t) // KMSを利用するためacctestでのみ実施したい
+
 	resourceName := "data.sakuracloud_disk.foobar"
 	rand := randomName()
 
@@ -41,6 +43,11 @@ func TestAccSakuraCloudDataSourceDisk_basic(t *testing.T) {
 					resource.TestCheckResourceAttr(resourceName, "tags.0", "tag1"),
 					resource.TestCheckResourceAttr(resourceName, "tags.1", "tag2"),
 					resource.TestCheckResourceAttr(resourceName, "tags.2", "tag3"),
+					resource.TestCheckResourceAttr(resourceName, "encryption_algorithm", "aes256_xts"),
+					resource.TestCheckResourceAttrPair(
+						resourceName, "kms_key_id",
+						"sakuracloud_kms.foobar", "id",
+					),
 				),
 			},
 		},
@@ -52,6 +59,16 @@ resource "sakuracloud_disk" "foobar"{
   name        = "{{ .arg0 }}"
   tags        = ["tag1", "tag2", "tag3"]
   description = "description"
+
+  encryption_algorithm = "aes256_xts"
+  kms_key_id           = sakuracloud_kms.foobar.id
+}
+
+
+resource "sakuracloud_kms" "foobar" {
+  name        = "{{ .arg0 }}"
+  description = "description"
+  tags        = ["tag1", "tag2"]
 }
 
 data "sakuracloud_disk" "foobar" {

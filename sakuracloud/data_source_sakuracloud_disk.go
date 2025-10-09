@@ -50,6 +50,11 @@ func dataSourceSakuraCloudDisk() *schema.Resource {
 					types.DiskEncryptionAlgorithmStrings,
 				),
 			},
+			"kms_key_id": {
+				Type:        schema.TypeString,
+				Computed:    true,
+				Description: "ID of the KMS key for encryption",
+			},
 			"source_archive_id": {
 				Type:        schema.TypeString,
 				Computed:    true,
