@@ -107,6 +107,13 @@ func resourceSakuraCloudDisk() *schema.Resource {
 					types.DiskEncryptionAlgorithmStrings,
 				),
 			},
+			"kms_key_id": {
+				Type:             schema.TypeString,
+				ForceNew:         true,
+				Optional:         true,
+				ValidateDiagFunc: validation.ToDiagFunc(validateSakuracloudIDType),
+				Description:      "ID of the KMS key for encryption",
+			},
 		},
 	}
 }
@@ -121,7 +128,7 @@ func resourceSakuraCloudDiskCreate(ctx context.Context, d *schema.ResourceData, 
 	diskBuilder := &setup.RetryableSetup{
 		IsWaitForCopy: true,
 		Create: func(ctx context.Context, zone string) (accessor.ID, error) {
-			return diskOp.Create(ctx, zone, expandDiskCreateRequest(d), expandSakuraCloudIDs(d, "distant_from"))
+			return diskOp.Create(ctx, zone, expandDiskCreateRequest(d), expandSakuraCloudIDs(d, "distant_from"), expandSakuraCloudID(d, "kms_key_id"))
 		},
 		Read: func(ctx context.Context, zone string, id types.ID) (interface{}, error) {
 			return diskOp.Read(ctx, zone, id)
@@ -241,5 +248,6 @@ func setDiskResourceData(ctx context.Context, d *schema.ResourceData, client *AP
 	d.Set("server_id", data.ServerID.String())                       //nolint:errcheck,gosec
 	d.Set("zone", getZone(d, client))                                //nolint:errcheck,gosec
 	d.Set("encryption_algorithm", data.EncryptionAlgorithm.String()) //nolint:errcheck,gosec
+	d.Set("kms_key_id", data.KMSKeyID.String())                      //nolint:errcheck,gosec
 	return diag.FromErr(d.Set("tags", flattenTags(data.Tags)))
 }
