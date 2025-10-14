@@ -87,9 +87,18 @@ resource "sakuracloud_disk" "foobar" {
 * `memory` - (Optional) The size of memory in GiB. Default:`1`.
 * `cpu_model` - (Optional) The model of CPU.
 * `gpu` - (Optional) The number of GPUs.
+* `gpu_model` - (Optional) The model of GPU.
 * `network_interface` - (Optional) One or more `network_interface` blocks as defined below.
 * `interface_driver` - (Optional) The driver name of network interface. This must be one of [`virtio`/`e1000`]. Default:`virtio`.
 * `private_host_id` - (Optional) The id of the PrivateHost which the Server is assigned.
+
+The values that can be specified for `commitment`, `core`, `memory`, `cpu_model`, `gpu`, and `gpu_model` can be found with the following command.
+
+```bash
+usacloud iaas server-plan list --zone is1a
+```
+
+Note: This command requires usacloud v1.17 or later.
 
 ---
 
