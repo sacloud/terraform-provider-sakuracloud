@@ -12,9 +12,9 @@ require (
 	github.com/mitchellh/go-homedir v1.1.0
 	github.com/sacloud/api-client-go v0.3.3
 	github.com/sacloud/apprun-api-go v0.4.0
-	github.com/sacloud/autoscaler v0.18.0
-	github.com/sacloud/iaas-api-go v1.18.0
-	github.com/sacloud/iaas-service-go v1.15.0
+	github.com/sacloud/autoscaler v0.18.2
+	github.com/sacloud/iaas-api-go v1.19.0
+	github.com/sacloud/iaas-service-go v1.16.0
 	github.com/sacloud/iso9660wrap v0.0.0-20171031075302-eda21f77f6a8
 	github.com/sacloud/kms-api-go v0.2.2
 	github.com/sacloud/packages-go v0.0.11
@@ -105,7 +105,7 @@ require (
 	github.com/sacloud/ftps v1.2.0 // indirect
 	github.com/sacloud/go-http v0.1.9 // indirect
 	github.com/sacloud/go-otelsetup v0.5.0 // indirect
-	github.com/sacloud/iaas-api-go/trace/otel v0.0.0-20251009020050-69c86de02c33 // indirect
+	github.com/sacloud/iaas-api-go/trace/otel v0.0.0-20251010070341-75d9482919ec // indirect
 	github.com/segmentio/asm v1.2.0 // indirect
 	github.com/shivamMg/ppds v0.0.1 // indirect
 	github.com/twitchyliquid64/golang-asm v0.15.1 // indirect

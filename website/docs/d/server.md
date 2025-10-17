@@ -54,6 +54,7 @@ A `condition` block supports the following:
 * `dns_servers` - A list of IP address of DNS server in the zone.
 * `gateway` - The IP address of the gateway used by Server.
 * `gpu` - The number of GPUs.
+* `gpu_model` - The model of GPU.
 * `hostname` - The hostname of the Server.
 * `icon_id` - The icon id attached to the Server.
 * `interface_driver` - The driver name of network interface. This will be one of [`virtio`/`e1000`].

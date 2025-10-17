@@ -207,12 +207,10 @@ func TestAccSakuraCloudServer_planChangeByOutsideOfTerraform(t *testing.T) {
 						updated, err := plans.ChangeServerPlan(
 							context.Background(), client, step1.Zone.Name, step1.ID,
 							&iaas.ServerChangePlanRequest{
-								CPU:                  1,
-								MemoryMB:             1 * size.GiB,
-								GPU:                  0,
-								ServerPlanCPUModel:   "",
-								ServerPlanGeneration: types.PlanGenerations.Default,
-								ServerPlanCommitment: types.Commitments.Standard,
+								CPU:        1,
+								MemoryMB:   1 * size.GiB,
+								Generation: types.PlanGenerations.Default,
+								Commitment: types.Commitments.Standard,
 							})
 						if err != nil {
 							return err
@@ -474,6 +472,32 @@ func TestAccSakuraCloudServer_withAMDPlan(t *testing.T) {
 					resource.TestCheckResourceAttr(resourceName, "memory", "120"),
 					resource.TestCheckResourceAttr(resourceName, "cpu_model", "amd_epyc_7713p"),
 					resource.TestCheckResourceAttr(resourceName, "commitment", "dedicatedcpu"),
+				),
+			},
+		},
+	})
+}
+
+func TestAccSakuraCloudServer_withKoukaryokuVRT(t *testing.T) {
+	skipIfEnvIsNotSet(t, "SAKURACLOUD_ENABLE_KOUKARYOKU_VRT")
+
+	resourceName := "sakuracloud_server.foobar"
+	rand := randomName()
+
+	var server iaas.Server
+	resource.Test(t, resource.TestCase{
+		PreCheck:          func() { testAccPreCheck(t) },
+		ProviderFactories: testAccProviderFactories,
+		CheckDestroy:      testCheckSakuraCloudServerDestroy,
+		Steps: []resource.TestStep{
+			{
+				Config: buildConfigWithArgs(testAccSakuraCloudServer__withKoukaryokuVRT, rand),
+				Check: resource.ComposeTestCheckFunc(
+					testCheckSakuraCloudServerExists(resourceName, &server),
+					resource.TestCheckResourceAttr(resourceName, "core", "4"),
+					resource.TestCheckResourceAttr(resourceName, "memory", "56"),
+					resource.TestCheckResourceAttr(resourceName, "gpu", "1"),
+					resource.TestCheckResourceAttr(resourceName, "gpu_model", "nvidia_v100_32gbvram"),
 				),
 			},
 		},
@@ -1181,6 +1205,21 @@ resource "sakuracloud_server" "foobar" {
   memory     = 120
   cpu_model  = "amd_epyc_7713p"
   commitment = "dedicatedcpu"
+
+  force_shutdown = true
+}
+`
+
+const testAccSakuraCloudServer__withKoukaryokuVRT = `
+resource "sakuracloud_server" "foobar" {
+  zone = "is1a"
+
+  name       = "{{ .arg0 }}"
+  core       = 4
+  memory     = 56
+  
+  gpu = 1
+  gpu_model = "nvidia_v100_32gbvram"
 
   force_shutdown = true
 }

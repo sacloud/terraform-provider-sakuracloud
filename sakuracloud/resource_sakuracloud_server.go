@@ -65,6 +65,14 @@ func resourceSakuraCloudServer() *schema.Resource {
 				Optional:    true,
 				Description: "The number of GPUs",
 			},
+			"gpu_model": {
+				Type:     schema.TypeString,
+				Optional: true,
+				Computed: true,
+				Description: desc.Sprintf(
+					"The model of gpu",
+				),
+			},
 			"cpu_model": {
 				Type:     schema.TypeString,
 				Optional: true,
@@ -436,12 +444,13 @@ func setServerResourceData(ctx context.Context, d *schema.ResourceData, client *
 		d.SetConnInfo(connInfo)
 	}
 
-	d.Set("name", data.Name)                                //nolint
-	d.Set("core", data.CPU)                                 //nolint
-	d.Set("memory", data.GetMemoryGB())                     //nolint
-	d.Set("gpu", data.GPU)                                  //nolint
-	d.Set("cpu_model", data.ServerPlanCPUModel)             //nolint
-	d.Set("commitment", data.ServerPlanCommitment.String()) //nolint
+	d.Set("name", data.Name)                      //nolint
+	d.Set("core", data.CPU)                       //nolint
+	d.Set("memory", data.GetMemoryGB())           //nolint
+	d.Set("gpu", data.GPU)                        //nolint
+	d.Set("gpu_model", data.GPUModel)             //nolint
+	d.Set("cpu_model", data.CPUModel)             //nolint
+	d.Set("commitment", data.Commitment.String()) //nolint
 	if err := d.Set("disks", flattenServerConnectedDiskIDs(data)); err != nil {
 		return diag.FromErr(err)
 	}

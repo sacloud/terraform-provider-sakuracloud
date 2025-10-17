@@ -37,6 +37,7 @@ func expandServerBuilder(ctx context.Context, zone string, d *schema.ResourceDat
 		CPU:             d.Get("core").(int),
 		MemoryGB:        d.Get("memory").(int),
 		GPU:             d.Get("gpu").(int),
+		GPUModel:        d.Get("gpu_model").(string),
 		CPUModel:        d.Get("cpu_model").(string),
 		Commitment:      types.ECommitment(d.Get("commitment").(string)),
 		Generation:      types.PlanGenerations.Default,
