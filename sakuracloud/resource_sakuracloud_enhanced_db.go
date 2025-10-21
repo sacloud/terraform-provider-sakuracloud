@@ -34,6 +34,9 @@ func resourceSakuraCloudEnhancedDB() *schema.Resource {
 		ReadContext:   resourceSakuraCloudEnhancedDBRead,
 		UpdateContext: resourceSakuraCloudEnhancedDBUpdate,
 		DeleteContext: resourceSakuraCloudEnhancedDBDelete,
+		Importer: &schema.ResourceImporter{
+			StateContext: schema.ImportStatePassthroughContext,
+		},
 
 		Timeouts: &schema.ResourceTimeout{
 			Create: schema.DefaultTimeout(5 * time.Minute),

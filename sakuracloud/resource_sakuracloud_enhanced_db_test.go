@@ -91,6 +91,62 @@ func TestAccSakuraCloudEnhancedDB_basic(t *testing.T) {
 	})
 }
 
+func TestAccImportSakuraCloudEnhancedDB_basic(t *testing.T) {
+	if isFakeModeEnabled() {
+		t.Skip()
+	}
+
+	rand := randomName()
+	databaseName := acctest.RandStringFromCharSet(10, acctest.CharSetAlpha)
+	password := randomPassword()
+
+	checkFn := func(s []*terraform.InstanceState) error {
+		if len(s) != 1 {
+			return fmt.Errorf("expected 1 state: %#v", s)
+		}
+		expects := map[string]string{
+			"name":               rand,
+			"description":        "description",
+			"tags.#":             "2",
+			"tags.0":             "tag1",
+			"tags.1":             "tag2",
+			"database_name":      databaseName,
+			"allowed_networks.#": "1",
+			"allowed_networks.0": "192.0.2.1/32",
+			"database_type":      "tidb",
+			"region":             "is1",
+			"max_connections":    "50",
+			"hostname":           databaseName + ".tidb-is1.db.sakurausercontent.com",
+		}
+
+		if err := compareStateMulti(s[0], expects); err != nil {
+			return err
+		}
+		return stateNotEmptyMulti(s[0], "icon_id")
+	}
+
+	resourceName := "sakuracloud_enhanced_db.foobar"
+	resource.Test(t, resource.TestCase{
+		PreCheck:          func() { testAccPreCheck(t) },
+		ProviderFactories: testAccProviderFactories,
+		CheckDestroy:      testCheckSakuraCloudEnhancedDBDestroy,
+		Steps: []resource.TestStep{
+			{
+				Config: buildConfigWithArgs(testAccSakuraCloudEnhancedDB_basic, rand, databaseName, password),
+			},
+			{
+				ResourceName:      resourceName,
+				ImportState:       true,
+				ImportStateCheck:  checkFn,
+				ImportStateVerify: true,
+				ImportStateVerifyIgnore: []string{
+					"password",
+				},
+			},
+		},
+	})
+}
+
 func testCheckSakuraCloudEnhancedDBExists(n string, auto_backup *iaas.EnhancedDB) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
 		rs, ok := s.RootModule().Resources[n]
