@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## 2.31.2 (2025/11/06)
+
+- iaas-service-go v1.18.1 (#1294)
+- iaas-service-go v1.17.0 - update ostype (#1293)
+
 ## 2.31.1 (2025/10/21)
 
 - エンハンスドDB: Import対応 (#1292)
