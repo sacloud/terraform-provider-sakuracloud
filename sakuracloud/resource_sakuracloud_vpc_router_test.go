@@ -57,6 +57,7 @@ func TestAccSakuraCloudVPCRouter_basic(t *testing.T) {
 						resourceName, "icon_id",
 						"sakuracloud_icon.foobar", "id",
 					),
+					resource.TestCheckResourceAttr(resourceName, "monitoring_suite.0.enabled", "true"),
 				),
 			},
 			{
@@ -75,6 +76,7 @@ func TestAccSakuraCloudVPCRouter_basic(t *testing.T) {
 					resource.TestCheckResourceAttr(resourceName, "icon_id", ""),
 					resource.TestCheckResourceAttrSet(resourceName, "public_ip"),
 					resource.TestCheckResourceAttrSet(resourceName, "public_netmask"),
+					resource.TestCheckResourceAttr(resourceName, "monitoring_suite.0.enabled", "false"),
 				),
 			},
 		},
@@ -274,6 +276,10 @@ resource "sakuracloud_vpc_router" "foobar" {
   tags                = ["tag1", "tag2"]
   icon_id             = sakuracloud_icon.foobar.id
   internet_connection = true
+
+  monitoring_suite {
+    enabled = true
+  }
 }
 
 resource "sakuracloud_icon" "foobar" {
@@ -289,6 +295,10 @@ resource "sakuracloud_vpc_router" "foobar" {
   tags                = ["tag1-upd", "tag2-upd"]
   syslog_host         = "192.168.0.2"
   internet_connection = false
+
+  monitoring_suite {
+    enabled = false
+  }
 }`
 
 var testAccSakuraCloudVPCRouter_complete = `

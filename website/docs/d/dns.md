@@ -48,10 +48,17 @@ A `condition` block supports the following:
 * `description` - The description of the DNS.
 * `dns_servers` - A list of IP address of DNS server that manage this zone.
 * `icon_id` - The icon id attached to the DNS.
+* `monitoring_suite` - A list of `monitoring_suite` blocks as defined below.
 * `record` - A list of `record` blocks as defined below.
 * `tags` - Any tags assigned to the DNS.
 * `zone` - The name of managed domain.
 
+
+---
+
+A `monitoring_suite` block exports the following:
+
+* `enabled` - Enable sending signals to Monitoring Suite.
 
 ---
 

@@ -43,6 +43,10 @@ resource "sakuracloud_simple_monitor" "foobar" {
   notify_email_html    = true
   notify_slack_enabled = true
   notify_slack_webhook = "https://hooks.slack.com/services/xxx/xxx/xxx"
+  
+  monitoring_suite {
+    enabled = true
+  }
 }
 ```
 
@@ -55,6 +59,13 @@ resource "sakuracloud_simple_monitor" "foobar" {
 * `retry_interval` - (Optional) The interval in seconds between retries. This must be in the range [`10`-`3600`].
 * `timeout` - (Optional) The timeout in seconds for monitoring. This must be in the range [`10`-`30`].  
 * `enabled` - (Optional) The flag to enable monitoring by the simple monitor. Default:`true`.
+* `monitoring_suite` - (Optional) An `monitoring_suite` block as defined below.
+
+---
+
+A `monitoring_suite` block supports the following:
+
+* `enabled` - (Optional) Enable sending signals to Monitoring Suite.
 
 ---
 

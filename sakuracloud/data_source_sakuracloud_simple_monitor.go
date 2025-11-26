@@ -197,6 +197,19 @@ func dataSourceSakuraCloudSimpleMonitor() *schema.Resource {
 				Computed:    true,
 				Description: "The flag to enable monitoring by the simple monitor",
 			},
+			"monitoring_suite": {
+				Type:     schema.TypeList,
+				Computed: true,
+				Elem: &schema.Resource{
+					Schema: map[string]*schema.Schema{
+						"enabled": {
+							Type:        schema.TypeBool,
+							Computed:    true,
+							Description: "Enable sending signals to Monitoring Suite",
+						},
+					},
+				},
+			},
 		},
 	}
 }

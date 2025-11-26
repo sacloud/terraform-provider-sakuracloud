@@ -27,6 +27,9 @@ resource "sakuracloud_dns" "foobar" {
     type  = "A"
     value = "192.168.11.2"
   }
+  monitoring_suite {
+    enabled = true
+  }
 }
 ```
 
@@ -34,6 +37,13 @@ resource "sakuracloud_dns" "foobar" {
 
 * `zone` - (Required) The target zone. (e.g. `example.com`). Changing this forces a new resource to be created.
 * `record` - (Optional) One or more `record` blocks as defined below.
+* `monitoring_suite` - (Optional) An `monitoring_suite` block as defined below.
+
+---
+
+A `monitoring_suite` block supports the following:
+
+* `enabled` - (Optional) Enable sending signals to Monitoring Suite.
 
 ---
 

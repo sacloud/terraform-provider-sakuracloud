@@ -70,6 +70,18 @@ func expandGSLBServers(d resourceValueGettable) []*iaas.GSLBServer {
 	return servers
 }
 
+func flattenGSLBMonitoringSuite(data *iaas.GSLB) []any {
+	enabled := false
+	if data.MonitoringSuiteLog != nil {
+		enabled = data.MonitoringSuiteLog.Enabled
+	}
+	return []any{
+		map[string]any{
+			"enabled": enabled,
+		},
+	}
+}
+
 func flattenGSLBHealthCheck(data *iaas.GSLB) []interface{} {
 	// health_check
 	healthCheck := map[string]interface{}{}
@@ -104,6 +116,16 @@ func flattenGSLBServer(s *iaas.GSLBServer) interface{} {
 	return v
 }
 
+func expandGSLBMonitoringSuiteLogEnabled(d resourceValueGettable) *iaas.MonitoringSuiteLog {
+	enabled := false
+	if ms, ok := getListFromResource(d, "monitoring_suite"); ok && len(ms) == 1 {
+		values := mapToResourceData(ms[0].(map[string]interface{}))
+		enabled = values.Get("enabled").(bool)
+	}
+
+	return &iaas.MonitoringSuiteLog{Enabled: enabled}
+}
+
 func expandGSLBServer(d resourceValueGettable) *iaas.GSLBServer {
 	return &iaas.GSLBServer{
 		IPAddress: d.Get("ip_address").(string),
@@ -119,6 +141,7 @@ func expandGSLBCreateRequest(d *schema.ResourceData) *iaas.GSLBCreateRequest {
 		Weighted:           types.StringFlag(d.Get("weighted").(bool)),
 		SorryServer:        d.Get("sorry_server").(string),
 		DestinationServers: expandGSLBServers(d),
+		MonitoringSuiteLog: expandGSLBMonitoringSuiteLogEnabled(d),
 		Name:               d.Get("name").(string),
 		Description:        d.Get("description").(string),
 		Tags:               expandTags(d),
@@ -137,6 +160,7 @@ func expandGSLBUpdateRequest(d *schema.ResourceData, gslb *iaas.GSLB) *iaas.GSLB
 		Weighted:           types.StringFlag(d.Get("weighted").(bool)),
 		SorryServer:        d.Get("sorry_server").(string),
 		DestinationServers: expandGSLBServers(d),
+		MonitoringSuiteLog: expandGSLBMonitoringSuiteLogEnabled(d),
 		SettingsHash:       gslb.SettingsHash,
 	}
 }

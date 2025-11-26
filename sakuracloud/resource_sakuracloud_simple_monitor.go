@@ -248,6 +248,22 @@ func resourceSakuraCloudSimpleMonitor() *schema.Resource {
 				Default:     true,
 				Description: "The flag to enable monitoring by the simple monitor",
 			},
+			"monitoring_suite": {
+				Type:     schema.TypeList,
+				Optional: true,
+				Computed: true,
+				MaxItems: 1,
+				Elem: &schema.Resource{
+					Schema: map[string]*schema.Schema{
+						"enabled": {
+							Type:        schema.TypeBool,
+							Optional:    true,
+							Computed:    true,
+							Description: "Enable sending signals to Monitoring Suite",
+						},
+					},
+				},
+			},
 		},
 	}
 }
@@ -347,6 +363,9 @@ func setSimpleMonitorResourceData(ctx context.Context, d *schema.ResourceData, c
 	d.Set("notify_slack_webhook", data.SlackWebhooksURL)               //nolint
 	d.Set("notify_interval", flattenSimpleMonitorNotifyInterval(data)) //nolint
 	if err := d.Set("health_check", flattenSimpleMonitorHealthCheck(data)); err != nil {
+		return diag.FromErr(err)
+	}
+	if err := d.Set("monitoring_suite", flattenSimpleMonitorMonitoringSuite(data)); err != nil {
 		return diag.FromErr(err)
 	}
 	return diag.FromErr(d.Set("tags", flattenTags(data.Tags)))

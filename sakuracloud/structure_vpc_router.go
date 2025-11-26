@@ -236,6 +236,7 @@ func expandVPCRouterSettings(d resourceValueGettable) *builder.RouterSetting {
 		StaticRoute:               expandVPCRouterStaticRouteList(d),
 		SyslogHost:                d.Get("syslog_host").(string),
 		ScheduledMaintenance:      expandVPCRouterScheduledMaintenance(d),
+		MonitoringSuite:           expandVPCRouterMonitoringSuitEnabled(d),
 	}
 }
 
@@ -816,4 +817,26 @@ func flattenVPCRouterScheduledMaintenance(vpcRouter *iaas.VPCRouter) []interface
 		})
 	}
 	return values
+}
+
+func expandVPCRouterMonitoringSuitEnabled(d resourceValueGettable) *iaas.MonitoringSuite {
+	enabled := false
+	if ms, ok := getListFromResource(d, "monitoring_suite"); ok && len(ms) == 1 {
+		values := mapToResourceData(ms[0].(map[string]interface{}))
+		enabled = values.Get("enabled").(bool)
+	}
+
+	return &iaas.MonitoringSuite{Enabled: enabled}
+}
+
+func flattenVPCRouterMonitoringSuite(data *iaas.VPCRouter) []any {
+	enabled := false
+	if data.Settings != nil && data.Settings.MonitoringSuite != nil {
+		enabled = data.Settings.MonitoringSuite.Enabled
+	}
+	return []any{
+		map[string]any{
+			"enabled": enabled,
+		},
+	}
 }

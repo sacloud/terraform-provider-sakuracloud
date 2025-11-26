@@ -664,6 +664,22 @@ func resourceSakuraCloudVPCRouter() *schema.Resource {
 					},
 				},
 			},
+			"monitoring_suite": {
+				Type:     schema.TypeList,
+				Optional: true,
+				Computed: true,
+				MaxItems: 1,
+				Elem: &schema.Resource{
+					Schema: map[string]*schema.Schema{
+						"enabled": {
+							Type:        schema.TypeBool,
+							Optional:    true,
+							Computed:    true,
+							Description: "Enable sending signals to Monitoring Suite",
+						},
+					},
+				},
+			},
 			"icon_id":     schemaResourceIconID(resourceName),
 			"description": schemaResourceDescription(resourceName),
 			"tags":        schemaResourceTags(resourceName),
@@ -865,6 +881,9 @@ func setVPCRouterResourceData(ctx context.Context, d *schema.ResourceData, zone 
 		return diag.FromErr(err)
 	}
 	if err := d.Set("scheduled_maintenance", flattenVPCRouterScheduledMaintenance(data)); err != nil {
+		return diag.FromErr(err)
+	}
+	if err := d.Set("monitoring_suite", flattenVPCRouterMonitoringSuite(data)); err != nil {
 		return diag.FromErr(err)
 	}
 	d.Set("zone", getZone(d, client)) //nolint

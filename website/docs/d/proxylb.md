@@ -52,6 +52,8 @@ A `condition` block supports the following:
 * `gzip` - The flag to enable gzip compression.
 * `health_check` - A list of `health_check` blocks as defined below.
 * `icon_id` - The icon id attached to the ProxyLB.
+* `letsencrypt` - A list of `letsencrypt` blocks as defined below.
+* `monitoring_suite` - A list of `monitoring_suite` blocks as defined below.
 * `name` - The name of the ProxyLB.
 * `plan` - The plan name of the ProxyLB. This will be one of [`100`/`500`/`1000`/`5000`/`10000`/`50000`/`100000`/`400000`].
 * `proxy_networks` - A list of CIDR block used by the ProxyLB to access the server.
@@ -114,6 +116,20 @@ A `health_check` block exports the following:
 * `path` - The path used when checking by HTTP.
 * `port` - The port number used when checking by TCP.
 * `protocol` - The protocol used for health checks. This will be one of [`http`/`tcp`].
+
+---
+
+A `letsencrypt` block exports the following:
+
+* `common_name` - The common name of the certificate.
+* `enabled` - The flag to accept the current Let's Encrypt terms of service(see: https://letsencrypt.org/repository/). This must be set `true` explicitly.
+* `subject_alt_names` - The subject alternative names of the certificate.
+
+---
+
+A `monitoring_suite` block exports the following:
+
+* `enabled` - Enable sending signals to Monitoring Suite.
 
 ---
 

@@ -29,4 +29,8 @@ resource "sakuracloud_simple_monitor" "foobar" {
   notify_email_html    = true
   notify_slack_enabled = true
   notify_slack_webhook = "https://hooks.slack.com/services/xxx/xxx/xxx"
+
+  monitoring_suite {
+    enabled = true
+  }
 }
