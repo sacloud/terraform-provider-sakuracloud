@@ -16,6 +16,7 @@ package sakuracloud
 
 import (
 	"fmt"
+	"github.com/sacloud/packages-go/testutil"
 	"os"
 	"regexp"
 	"strings"
@@ -28,15 +29,7 @@ import (
 func TestAccSakuraCloudResourceWebAccel_WebOrigin(t *testing.T) {
 	skipIfFakeModeEnabled(t)
 
-	envKeys := []string{
-		envWebAccelOrigin,
-	}
-	for _, k := range envKeys {
-		if os.Getenv(k) == "" {
-			t.Skipf("ENV %q is requilred. skip", k)
-			return
-		}
-	}
+	testutil.PreCheckEnvsFunc(envWebAccelOrigin)(t)
 
 	siteName := "your-site-name"
 	// domainName := os.Getenv(envWebAccelDomainName)
@@ -111,15 +104,7 @@ func TestAccSakuraCloudResourceWebAccel_OwnDomain(t *testing.T) {
 func TestAccSakuraCloudResourceWebAccel_WebOriginWithOneTimeUrlSecrets(t *testing.T) {
 	skipIfFakeModeEnabled(t)
 
-	envKeys := []string{
-		envWebAccelOrigin,
-	}
-	for _, k := range envKeys {
-		if os.Getenv(k) == "" {
-			t.Skipf("ENV %q is requilred. skip", k)
-			return
-		}
-	}
+	testutil.PreCheckEnvsFunc(envWebAccelOrigin)(t)
 
 	siteName := "your-site-name"
 	origin := os.Getenv(envWebAccelOrigin)
@@ -147,15 +132,7 @@ func TestAccSakuraCloudResourceWebAccel_WebOriginWithOneTimeUrlSecrets(t *testin
 func TestAccSakuraCloudResourceWebAccel_WebOriginWithCORS(t *testing.T) {
 	skipIfFakeModeEnabled(t)
 
-	envKeys := []string{
-		envWebAccelOrigin,
-	}
-	for _, k := range envKeys {
-		if os.Getenv(k) == "" {
-			t.Skipf("ENV %q is requilred. skip", k)
-			return
-		}
-	}
+	testutil.PreCheckEnvsFunc(envWebAccelOrigin)(t)
 
 	siteName := "your-site-name"
 	// domainName := os.Getenv(envWebAccelDomainName)
@@ -187,20 +164,14 @@ func TestAccSakuraCloudResourceWebAccel_WebOriginWithCORS(t *testing.T) {
 func TestAccSakuraCloudResourceWebAccel_Update(t *testing.T) {
 	skipIfFakeModeEnabled(t)
 
-	envKeys := []string{
+	testutil.PreCheckEnvsFunc(
 		envWebAccelOrigin,
 		envObjectStorageEndpoint,
 		envObjectStorageRegion,
 		envObjectStorageBucketName,
 		envObjectStorageAccessKeyId,
 		envObjectStorageSecretAccessKey,
-	}
-	for _, k := range envKeys {
-		if os.Getenv(k) == "" {
-			t.Skipf("ENV %q is requilred. skip", k)
-			return
-		}
-	}
+	)(t)
 
 	siteName := "your-site-name"
 	// domainName := os.Getenv(envWebAccelDomainName)
@@ -270,20 +241,14 @@ func TestAccSakuraCloudResourceWebAccel_Update(t *testing.T) {
 func TestAccSakuraCloudResourceWebAccel_BucketOrigin(t *testing.T) {
 	skipIfFakeModeEnabled(t)
 
-	envKeys := []string{
+	testutil.PreCheckEnvsFunc(
 		envWebAccelOrigin,
 		envObjectStorageEndpoint,
 		envObjectStorageRegion,
 		envObjectStorageBucketName,
 		envObjectStorageAccessKeyId,
 		envObjectStorageSecretAccessKey,
-	}
-	for _, k := range envKeys {
-		if os.Getenv(k) == "" {
-			t.Skipf("ENV %q is requilred. skip", k)
-			return
-		}
-	}
+	)(t)
 
 	siteName := "your-site-name"
 	// domainName := os.Getenv(envWebAccelDomainName)
@@ -320,18 +285,12 @@ func TestAccSakuraCloudResourceWebAccel_BucketOrigin(t *testing.T) {
 func TestAccSakuraCloudResourceWebAccel_Logging(t *testing.T) {
 	skipIfFakeModeEnabled(t)
 
-	envKeys := []string{
+	testutil.PreCheckEnvsFunc(
 		envWebAccelOrigin,
 		envObjectStorageBucketName,
 		envObjectStorageAccessKeyId,
 		envObjectStorageSecretAccessKey,
-	}
-	for _, k := range envKeys {
-		if os.Getenv(k) == "" {
-			t.Skipf("ENV %q is requilred. skip", k)
-			return
-		}
-	}
+	)(t)
 
 	siteName := "your-site-name"
 	// domainName := os.Getenv(envWebAccelDomainName)
@@ -361,11 +320,121 @@ func TestAccSakuraCloudResourceWebAccel_Logging(t *testing.T) {
 	})
 }
 
+func TestAccSakuraCloudResourceWebAccel_WebOriginWithOriginGuard(t *testing.T) {
+	skipIfFakeModeEnabled(t)
+
+	testutil.PreCheckEnvsFunc(envWebAccelOrigin)(t)
+
+	siteName := "your-site-name"
+	origin := os.Getenv(envWebAccelOrigin)
+	regexpNotEmpty := regexp.MustCompile(".+")
+
+	var tokenValue string
+
+	resource.Test(t, resource.TestCase{
+		PreCheck:          func() { testAccPreCheck(t) },
+		ProviderFactories: testAccProviderFactories,
+		CheckDestroy: func(*terraform.State) error {
+			return nil
+		},
+		Steps: []resource.TestStep{
+			{
+				Config: testAccCheckSakuraCloudWebAccelWebOriginConfigWithOriginGuard(siteName, origin, false),
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr("sakuracloud_webaccel.foobar", "name", siteName),
+					resource.TestCheckResourceAttr("sakuracloud_webaccel.foobar", "origin_parameters.0.type", "web"),
+					resource.TestCheckResourceAttr("sakuracloud_webaccel.foobar", "origin_parameters.0.origin", origin),
+					resource.TestCheckResourceAttr("sakuracloud_webaccel.foobar", "origin_guard_token.0.rotate", "false"),
+					resource.ComposeTestCheckFunc(func(s *terraform.State) error {
+						rs, ok := s.RootModule().Resources["sakuracloud_webaccel.foobar"]
+						if !ok {
+							return fmt.Errorf("resource not found: sakuracloud_webaccel.foobar")
+						}
+						tokenValue = rs.Primary.Attributes["origin_guard_token.0.token"]
+						if tokenValue == "" {
+							return fmt.Errorf("origin_guard_token.token should not be empty")
+						}
+						return nil
+					}),
+				),
+			},
+			{
+				Config: testAccCheckSakuraCloudWebAccelWebOriginConfigWithOriginGuard(siteName, origin, true),
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr("sakuracloud_webaccel.foobar", "name", siteName),
+					resource.TestCheckResourceAttr("sakuracloud_webaccel.foobar", "origin_parameters.0.type", "web"),
+					resource.TestCheckResourceAttr("sakuracloud_webaccel.foobar", "origin_parameters.0.origin", origin),
+					resource.TestCheckResourceAttr("sakuracloud_webaccel.foobar", "origin_guard_token.0.rotate", "true"),
+					resource.ComposeTestCheckFunc(func(s *terraform.State) error {
+						rs, ok := s.RootModule().Resources["sakuracloud_webaccel.foobar"]
+						if !ok {
+							return fmt.Errorf("resource not found: sakuracloud_webaccel.foobar")
+						}
+						newToken := rs.Primary.Attributes["origin_guard_token.0.token"]
+						if newToken == "" {
+							return fmt.Errorf("origin_guard_token should not be empty")
+						} else if tokenValue == newToken {
+							return fmt.Errorf("origin_guard_token should be rotated with `rotate=true`")
+						}
+						tokenValue = newToken
+						return nil
+					}),
+				),
+			},
+			{
+				Config: testAccCheckSakuraCloudWebAccelWebOriginConfigWithOriginGuard(siteName, origin, false),
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr("sakuracloud_webaccel.foobar", "name", siteName),
+					resource.TestCheckResourceAttr("sakuracloud_webaccel.foobar", "origin_parameters.0.type", "web"),
+					resource.TestCheckResourceAttr("sakuracloud_webaccel.foobar", "origin_parameters.0.origin", origin),
+					resource.TestCheckResourceAttr("sakuracloud_webaccel.foobar", "origin_guard_token.0.rotate", "false"),
+					resource.ComposeTestCheckFunc(func(s *terraform.State) error {
+						rs, ok := s.RootModule().Resources["sakuracloud_webaccel.foobar"]
+						if !ok {
+							return fmt.Errorf("resource not found: sakuracloud_webaccel.foobar")
+						}
+						newToken := rs.Primary.Attributes["origin_guard_token.0.token"]
+						if newToken == "" {
+							return fmt.Errorf("origin_guard_token.token should not be empty")
+						} else if tokenValue != newToken {
+							return fmt.Errorf("origin_guard_token should not be rotated with `rotate=false`")
+						}
+						tokenValue = newToken
+						return nil
+					}),
+				),
+			},
+			{
+				Config:      testAccCheckSakuraCloudWebAccelWebOriginConfigBasic(siteName, origin),
+				ExpectError: regexpNotEmpty,
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr("sakuracloud_webaccel.foobar", "name", siteName),
+					resource.TestCheckResourceAttr("sakuracloud_webaccel.foobar", "origin_parameters.0.type", "web"),
+					resource.TestCheckResourceAttr("sakuracloud_webaccel.foobar", "origin_parameters.0.origin", origin),
+					resource.ComposeTestCheckFunc(func(s *terraform.State) error {
+						rs, ok := s.RootModule().Resources["sakuracloud_webaccel.foobar"]
+						if !ok {
+							return fmt.Errorf("resource not found: sakuracloud_webaccel.foobar")
+						}
+						_, isExist := rs.Primary.Attributes["origin_guard_token.0.token"]
+						if isExist {
+							return fmt.Errorf("origin_guard_token.token should be empty after its removal from the template")
+						}
+						_, isExist = rs.Primary.Attributes["origin_guard_token"]
+						if isExist {
+							return fmt.Errorf("origin_guard_token should be empty after its removal from the template")
+						}
+						return nil
+					}),
+				),
+			},
+		},
+	})
+}
+
 func TestAccSakuraCloudResourceWebAccel_InvalidConfigurations(t *testing.T) {
-	if os.Getenv(envWebAccelOrigin) == "" {
-		t.Skipf("ENV %q is requilred. skip", envWebAccelOrigin)
-		return
-	}
+	testutil.PreCheckEnvsFunc(envWebAccelOrigin)(t)
+
 	origin := os.Getenv(envWebAccelOrigin)
 	for name, tc := range testAccCheckSakuraCloudWebAccelInvalidConfigs(origin) {
 		t.Logf("test for invalid configuration: %s", name)
@@ -478,6 +547,31 @@ resource sakuracloud_webaccel "foobar" {
 }
 `
 	return fmt.Sprintf(tmpl, siteName, origin, origin)
+}
+
+func testAccCheckSakuraCloudWebAccelWebOriginConfigWithOriginGuard(siteName string, origin string, hasRotateField bool) string {
+	tmpl := `
+resource sakuracloud_webaccel "foobar" {
+  name = "%s"
+  domain_type = "subdomain"
+  request_protocol = "https-redirect"
+  origin_parameters {
+    type = "web"
+    origin = "%s"
+    host_header = "%s"
+    protocol = "https"
+  }
+  origin_guard_token {%s}
+  vary_support = true
+  default_cache_ttl = 3600
+  normalize_ae = "br+gzip"
+}
+`
+	if hasRotateField {
+		return fmt.Sprintf(tmpl, siteName, origin, origin, "\n    rotate = true\n")
+	} else {
+		return fmt.Sprintf(tmpl, siteName, origin, origin, "")
+	}
 }
 
 func testAccCheckSakuraCloudWebAccelBucketOriginConfig(siteName string, s3Endpoint string, region string, bucketName string, accessKey string, accessSecret string) string {
