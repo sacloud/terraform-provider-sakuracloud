@@ -117,6 +117,7 @@ func TestAccSakuraCloudProxyLB_basic(t *testing.T) {
 						resourceName, "icon_id",
 						"sakuracloud_icon.foobar", "id",
 					),
+					resource.TestCheckResourceAttr(resourceName, "monitoring_suite.0.enabled", "true"),
 				),
 			},
 			{
@@ -173,6 +174,7 @@ func TestAccSakuraCloudProxyLB_basic(t *testing.T) {
 						resourceName, "server.0.ip_address",
 						"sakuracloud_server.foobar", "ip_address",
 					),
+					resource.TestCheckResourceAttr(resourceName, "monitoring_suite.0.enabled", "false"),
 				),
 			},
 		},
@@ -240,31 +242,32 @@ func TestAccImportSakuraCloudProxyLB_basic(t *testing.T) {
 			return fmt.Errorf("expected 1 state: %#v", s)
 		}
 		expects := map[string]string{
-			"name":                      rand,
-			"vip_failover":              "true",
-			"sticky_session":            "true",
-			"timeout":                   "10",
-			"region":                    "is1",
-			"health_check.0.protocol":   "tcp",
-			"health_check.0.delay_loop": "20",
-			"description":               "description",
-			"tags.0":                    "tag1",
-			"tags.1":                    "tag2",
-			"bind_port.0.proxy_mode":    "https",
-			"bind_port.0.port":          "443",
-			"server.#":                  "2",
-			"server.0.ip_address":       ip0,
-			"server.0.port":             "80",
-			"server.0.enabled":          "true",
-			"server.1.ip_address":       ip1,
-			"server.1.port":             "80",
-			"server.1.enabled":          "true",
-			"server.1.group":            "group1",
-			"rule.0.action":             "forward",
-			"rule.0.host":               "www.usacloud.jp",
-			"rule.0.source_ips":         "192.0.2.1,192.0.2.2",
-			"rule.0.path":               "/",
-			"rule.0.group":              "group1",
+			"name":                       rand,
+			"vip_failover":               "true",
+			"sticky_session":             "true",
+			"timeout":                    "10",
+			"region":                     "is1",
+			"health_check.0.protocol":    "tcp",
+			"health_check.0.delay_loop":  "20",
+			"description":                "description",
+			"tags.0":                     "tag1",
+			"tags.1":                     "tag2",
+			"bind_port.0.proxy_mode":     "https",
+			"bind_port.0.port":           "443",
+			"server.#":                   "2",
+			"server.0.ip_address":        ip0,
+			"server.0.port":              "80",
+			"server.0.enabled":           "true",
+			"server.1.ip_address":        ip1,
+			"server.1.port":              "80",
+			"server.1.enabled":           "true",
+			"server.1.group":             "group1",
+			"rule.0.action":              "forward",
+			"rule.0.host":                "www.usacloud.jp",
+			"rule.0.source_ips":          "192.0.2.1,192.0.2.2",
+			"rule.0.path":                "/",
+			"rule.0.group":               "group1",
+			"monitoring_suite.0.enabled": "true",
 		}
 
 		if err := compareStateMulti(s[0], expects); err != nil {
@@ -352,6 +355,10 @@ resource "sakuracloud_proxylb" "foobar" {
     request_header_value_not_match = "true"
   }
 
+  monitoring_suite {
+    enabled = true
+  }
+
   description = "description"
   tags        = ["tag1", "tag2"]
   icon_id     = sakuracloud_icon.foobar.id
@@ -419,6 +426,10 @@ resource "sakuracloud_proxylb" "foobar" {
     redirect_location    = "https://redirect.usacloud.jp"
   }
 
+  monitoring_suite {
+    enabled = false
+  }
+
   description = "description-upd"
   tags        = ["tag1-upd", "tag2-upd"]
 }
@@ -463,6 +474,9 @@ resource "sakuracloud_proxylb" "foobar" {
     path                 = "/"
     source_ips           = "192.0.2.1,192.0.2.2"
     group                = "group1"
+  }
+  monitoring_suite {
+    enabled = true
   }
 
   description = "description"

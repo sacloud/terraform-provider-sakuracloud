@@ -45,6 +45,7 @@ func TestAccSakuraCloudDataSourceGSLB_basic(t *testing.T) {
 					resource.TestCheckResourceAttr(resourceName, "tags.0", "tag1"),
 					resource.TestCheckResourceAttr(resourceName, "tags.1", "tag2"),
 					resource.TestCheckResourceAttr(resourceName, "tags.2", "tag3"),
+					resource.TestCheckResourceAttr(resourceName, "monitoring_suite.0.enabled", "true"),
 				),
 			},
 		},
@@ -65,6 +66,9 @@ resource "sakuracloud_gslb" "foobar" {
   sorry_server = "8.8.8.8"
   description  = "description"
   tags         = ["tag1", "tag2", "tag3"]
+  monitoring_suite {
+	enabled = true
+  }
 }
 
 data "sakuracloud_gslb" "foobar" {

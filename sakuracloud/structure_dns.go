@@ -25,11 +25,12 @@ import (
 
 func expandDNSCreateRequest(d *schema.ResourceData) *iaas.DNSCreateRequest {
 	return &iaas.DNSCreateRequest{
-		Name:        d.Get("zone").(string),
-		Description: d.Get("description").(string),
-		Tags:        expandTags(d),
-		IconID:      expandSakuraCloudID(d, "icon_id"),
-		Records:     expandDNSRecords(d, "record"),
+		Name:               d.Get("zone").(string),
+		Description:        d.Get("description").(string),
+		Tags:               expandTags(d),
+		IconID:             expandSakuraCloudID(d, "icon_id"),
+		Records:            expandDNSRecords(d, "record"),
+		MonitoringSuiteLog: expandDNSMonitoringSuiteLogEnabled(d),
 	}
 }
 
@@ -39,10 +40,23 @@ func expandDNSUpdateRequest(d *schema.ResourceData, dns *iaas.DNS) *iaas.DNSUpda
 		records = expandDNSRecords(d, "record")
 	}
 	return &iaas.DNSUpdateRequest{
-		Description: d.Get("description").(string),
-		Tags:        expandTags(d),
-		IconID:      expandSakuraCloudID(d, "icon_id"),
-		Records:     records,
+		Description:        d.Get("description").(string),
+		Tags:               expandTags(d),
+		IconID:             expandSakuraCloudID(d, "icon_id"),
+		Records:            records,
+		MonitoringSuiteLog: expandDNSMonitoringSuiteLogEnabled(d),
+	}
+}
+
+func flattenDNSMonitoringSuite(data *iaas.DNS) []any {
+	enabled := false
+	if data.MonitoringSuiteLog != nil {
+		enabled = data.MonitoringSuiteLog.Enabled
+	}
+	return []any{
+		map[string]any{
+			"enabled": enabled,
+		},
 	}
 }
 
@@ -82,6 +96,16 @@ func flattenDNSRecord(record *iaas.DNSRecord) map[string]interface{} {
 	}
 
 	return r
+}
+
+func expandDNSMonitoringSuiteLogEnabled(d resourceValueGettable) *iaas.MonitoringSuiteLog {
+	enabled := false
+	if ms, ok := getListFromResource(d, "monitoring_suite"); ok && len(ms) == 1 {
+		values := mapToResourceData(ms[0].(map[string]interface{}))
+		enabled = values.Get("enabled").(bool)
+	}
+
+	return &iaas.MonitoringSuiteLog{Enabled: enabled}
 }
 
 func expandDNSRecords(d resourceValueGettable, key string) []*iaas.DNSRecord {

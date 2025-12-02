@@ -62,6 +62,7 @@ func TestAccSakuraCloudGSLB_basic(t *testing.T) {
 						resourceName, "icon_id",
 						"sakuracloud_icon.foobar", "id",
 					),
+					resource.TestCheckResourceAttr(resourceName, "monitoring_suite.0.enabled", "true"),
 				),
 			},
 			{
@@ -85,6 +86,7 @@ func TestAccSakuraCloudGSLB_basic(t *testing.T) {
 					resource.TestCheckResourceAttr(resourceName, "server.1.weight", "3"),
 					resource.TestCheckResourceAttr(resourceName, "server.1.enabled", "false"),
 					resource.TestCheckResourceAttr(resourceName, "icon_id", ""),
+					resource.TestCheckResourceAttr(resourceName, "monitoring_suite.0.enabled", "false"),
 				),
 			},
 			{
@@ -102,6 +104,7 @@ func TestAccSakuraCloudGSLB_basic(t *testing.T) {
 					resource.TestCheckResourceAttr(resourceName, "health_check.0.delay_loop", "20"),
 					resource.TestCheckResourceAttr(resourceName, "health_check.0.host_header", "usacloud.jp-upd"),
 					resource.TestCheckResourceAttr(resourceName, "server.#", "0"),
+					resource.TestCheckResourceAttr(resourceName, "monitoring_suite.0.enabled", "false"),
 				),
 			},
 		},
@@ -234,6 +237,11 @@ resource "sakuracloud_gslb" "foobar" {
   description = "description"
   tags        = ["tag1", "tag2"]
   icon_id     = sakuracloud_icon.foobar.id
+
+  monitoring_suite {
+    enabled = true
+  }
+
 }
 
 resource "sakuracloud_icon" "foobar" {
@@ -266,6 +274,11 @@ resource "sakuracloud_gslb" "foobar" {
   sorry_server = "8.8.4.4"
   description  = "description-upd"
   tags         = ["tag1-upd", "tag2-upd"]
+
+  monitoring_suite {
+    enabled = false
+  }
+
 }`
 
 var testAccSakuraCloudGSLB_serverDeleted = `
@@ -282,4 +295,8 @@ resource "sakuracloud_gslb" "foobar" {
   sorry_server = "8.8.4.4"
   description  = "description-upd"
   tags         = ["tag1-upd", "tag2-upd"]
+
+  monitoring_suite {
+    enabled = false
+  }
 }`

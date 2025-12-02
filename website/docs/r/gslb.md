@@ -37,6 +37,10 @@ resource "sakuracloud_gslb" "foobar" {
     weight     = 1
     enabled    = true
   }
+  
+  monitoring_suite {
+    enabled = true
+  }
 
   description = "description"
   tags        = ["tag1", "tag2"]
@@ -50,7 +54,8 @@ resource "sakuracloud_gslb" "foobar" {
 * `server` - (Optional) One or more `server` blocks as defined below.
 * `weighted` - (Optional) The flag to enable weighted load-balancing.
 * `sorry_server` - (Optional) The IP address of the SorryServer. This will be used when all servers are down.
-
+* `monitoring_suite` - (Optional) An `monitoring_suite` block as defined below.
+* 
 ---
 
 A `health_check` block supports the following:
@@ -69,6 +74,13 @@ A `server` block supports the following:
 * `ip_address` - (Required) The IP address of the server.
 * `enabled` - (Optional) The flag to enable as destination of load balancing.
 * `weight` - (Optional) The weight used when weighted load balancing is enabled. This must be in the range [`1`-`10000`].
+ 
+---
+
+A `monitoring_suite` block supports the following:
+
+* `enabled` - (Optional) Enable sending signals to Monitoring Suite.
+
 
 #### Common Arguments
 

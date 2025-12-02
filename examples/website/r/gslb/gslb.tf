@@ -22,6 +22,10 @@ resource "sakuracloud_gslb" "foobar" {
     enabled    = true
   }
 
+  monitoring_suite {
+    enabled = true
+  }
+
   description = "description"
   tags        = ["tag1", "tag2"]
 }

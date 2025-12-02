@@ -193,6 +193,7 @@ func resourceSakuraCloudProxyLBACMECreate(ctx context.Context, d *schema.Resourc
 		BackendHttpKeepAlive: proxyLB.BackendHttpKeepAlive,
 		ProxyProtocol:        proxyLB.ProxyProtocol,
 		Syslog:               proxyLB.Syslog,
+		MonitoringSuiteLog:   proxyLB.MonitoringSuiteLog,
 		SettingsHash:         proxyLB.SettingsHash,
 	})
 	if err != nil {
@@ -264,6 +265,7 @@ func resourceSakuraCloudProxyLBACMEDelete(ctx context.Context, d *schema.Resourc
 		BackendHttpKeepAlive: proxyLB.BackendHttpKeepAlive,
 		ProxyProtocol:        proxyLB.ProxyProtocol,
 		Syslog:               proxyLB.Syslog,
+		MonitoringSuiteLog:   proxyLB.MonitoringSuiteLog,
 		SettingsHash:         proxyLB.SettingsHash,
 	})
 	if err != nil {

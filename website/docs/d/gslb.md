@@ -49,6 +49,7 @@ A `condition` block supports the following:
 * `fqdn` - The FQDN for accessing to the GSLB. This is typically used as value of CNAME record.
 * `health_check` - A list of `health_check` blocks as defined below.
 * `icon_id` - The icon id attached to the GSLB.
+* `monitoring_suite` - A list of `monitoring_suite` blocks as defined below.
 * `name` - The name of the GSLB.
 * `server` - A list of `server` blocks as defined below.
 * `sorry_server` - The IP address of the SorryServer. This will be used when all servers are down.
@@ -66,6 +67,12 @@ A `health_check` block exports the following:
 * `port` - The port number used when checking by TCP/HTTP/HTTPS.
 * `protocol` - The protocol used for health checks. This will be one of [`http`/`https`/`tcp`/`ping`].
 * `status` - The response-code to expect when checking by HTTP/HTTPS.
+
+---
+
+A `monitoring_suite` block exports the following:
+
+* `enabled` - Enable sending signals to Monitoring Suite.
 
 ---
 

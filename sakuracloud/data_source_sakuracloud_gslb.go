@@ -114,6 +114,19 @@ func dataSourceSakuraCloudGSLB() *schema.Resource {
 					},
 				},
 			},
+			"monitoring_suite": {
+				Type:     schema.TypeList,
+				Computed: true,
+				Elem: &schema.Resource{
+					Schema: map[string]*schema.Schema{
+						"enabled": {
+							Type:        schema.TypeBool,
+							Computed:    true,
+							Description: "Enable sending signals to Monitoring Suite",
+						},
+					},
+				},
+			},
 		},
 	}
 }

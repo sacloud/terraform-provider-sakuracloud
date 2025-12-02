@@ -53,6 +53,7 @@ A `condition` block supports the following:
 * `icon_id` - The icon id attached to the VPCRouter.
 * `internet_connection` - The flag to enable connecting to the Internet from the VPC Router.
 * `l2tp` - A list of `l2tp` blocks as defined below.
+* `monitoring_suite` - A list of `monitoring_suite` blocks as defined below.
 * `name` - The id of the switch connected from the VPCRouter.
 * `plan` - The plan name of the VPCRouter. This will be one of [`standard`/`premium`/`highspec`/`highspec4000`].
 * `port_forwarding` - A list of `port_forwarding` blocks as defined below. This represents a `Reverse NAT`.
@@ -124,6 +125,12 @@ A `l2tp` block exports the following:
 * `pre_shared_secret` - The pre shared secret for L2TP/IPsec.
 * `range_start` - The start value of IP address range to assign to L2TP/IPsec client.
 * `range_stop` - The end value of IP address range to assign to L2TP/IPsec client.
+
+---
+
+A `monitoring_suite` block exports the following:
+
+* `enabled` - Enable sending signals to Monitoring Suite.
 
 ---
 

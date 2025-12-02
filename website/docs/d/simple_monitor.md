@@ -51,6 +51,7 @@ A `condition` block supports the following:
 * `health_check` - A list of `health_check` blocks as defined below.
 * `icon_id` - The icon id attached to the SimpleMonitor.
 * `max_check_attempts` - The number of retry.
+* `monitoring_suite` - A list of `monitoring_suite` blocks as defined below.
 * `notify_email_enabled` - The flag to enable notification by email.
 * `notify_email_html` - The flag to enable HTML format instead of text format.
 * `notify_interval` - The interval in hours between notification.
@@ -83,4 +84,11 @@ A `health_check` block exports the following:
 * `status` - The response-code to expect when checking by HTTP/HTTPS.
 * `username` - The user name for basic auth used when checking by HTTP/HTTPS.
 * `verify_sni` - The flag to enable hostname verification for SNI.
+
+---
+
+A `monitoring_suite` block exports the following:
+
+* `enabled` - Enable sending signals to Monitoring Suite.
+
 

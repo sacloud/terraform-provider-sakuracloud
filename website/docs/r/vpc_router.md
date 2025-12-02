@@ -160,6 +160,10 @@ resource "sakuracloud_vpc_router" "premium" {
     day_of_week = "tue"
     hour        = 1
   }
+  
+  monitoring_suite {
+    enabled = true
+  }
 }
 
 resource "sakuracloud_internet" "foobar" {
@@ -178,7 +182,14 @@ resource sakuracloud_switch "foobar" {
 * `plan` - (Optional) The plan name of the VPCRouter. This must be one of [`standard`/`premium`/`highspec`/`highspec4000`]. Changing this forces a new resource to be created. Default:`standard`.
 * `version` - (Optional) The version of the VPC Router. Changing this forces a new resource to be created. Default:`2`.
 * `syslog_host` - (Optional) The ip address of the syslog host to which the VPC Router sends logs.
+* `monitoring_suite` - (Optional) An `monitoring_suite` block as defined below.
 
+---
+
+A `monitoring_suite` block supports the following:
+
+* `enabled` - (Optional) Enable sending signals to Monitoring Suite.
+ 
 #### Network
 
 * `public_network_interface` - (Optional) An `public_network_interface` block as defined below. This block is required when `plan` is not `standard`.

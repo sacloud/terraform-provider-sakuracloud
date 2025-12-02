@@ -34,6 +34,7 @@ func expandSimpleMonitorCreateRequest(d *schema.ResourceData) *iaas.SimpleMonito
 		NotifySlackEnabled: types.StringFlag(d.Get("notify_slack_enabled").(bool)),
 		SlackWebhooksURL:   d.Get("notify_slack_webhook").(string),
 		NotifyInterval:     expandSimpleMonitorNotifyInterval(d),
+		MonitoringSuiteLog: expandSimpleMonitorMonitoringSuiteLogEnabled(d),
 		Description:        d.Get("description").(string),
 		Tags:               expandTags(d),
 		IconID:             expandSakuraCloudID(d, "icon_id"),
@@ -53,6 +54,7 @@ func expandSimpleMonitorUpdateRequest(d *schema.ResourceData) *iaas.SimpleMonito
 		NotifySlackEnabled: types.StringFlag(d.Get("notify_slack_enabled").(bool)),
 		SlackWebhooksURL:   d.Get("notify_slack_webhook").(string),
 		NotifyInterval:     expandSimpleMonitorNotifyInterval(d),
+		MonitoringSuiteLog: expandSimpleMonitorMonitoringSuiteLogEnabled(d),
 		Description:        d.Get("description").(string),
 		Tags:               expandTags(d),
 		IconID:             expandSakuraCloudID(d, "icon_id"),
@@ -61,6 +63,18 @@ func expandSimpleMonitorUpdateRequest(d *schema.ResourceData) *iaas.SimpleMonito
 
 func expandSimpleMonitorNotifyInterval(d *schema.ResourceData) int {
 	return d.Get("notify_interval").(int) * 60 * 60 // hours => seconds
+}
+
+func flattenSimpleMonitorMonitoringSuite(data *iaas.SimpleMonitor) []any {
+	enabled := false
+	if data.MonitoringSuiteLog != nil {
+		enabled = data.MonitoringSuiteLog.Enabled
+	}
+	return []any{
+		map[string]any{
+			"enabled": enabled,
+		},
+	}
 }
 
 func flattenSimpleMonitorNotifyInterval(simpleMonitor *iaas.SimpleMonitor) int {
@@ -116,6 +130,16 @@ func flattenSimpleMonitorHealthCheck(simpleMonitor *iaas.SimpleMonitor) []interf
 	healthCheck["remaining_days"] = days
 	healthCheck["protocol"] = hc.Protocol
 	return []interface{}{healthCheck}
+}
+
+func expandSimpleMonitorMonitoringSuiteLogEnabled(d resourceValueGettable) *iaas.MonitoringSuiteLog {
+	enabled := false
+	if ms, ok := getListFromResource(d, "monitoring_suite"); ok && len(ms) == 1 {
+		values := mapToResourceData(ms[0].(map[string]interface{}))
+		enabled = values.Get("enabled").(bool)
+	}
+
+	return &iaas.MonitoringSuiteLog{Enabled: enabled}
 }
 
 func expandSimpleMonitorHealthCheck(d resourceValueGettable) *iaas.SimpleMonitorHealthCheck {

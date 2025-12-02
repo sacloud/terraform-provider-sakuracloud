@@ -35,6 +35,7 @@ func expandProxyLBCreateRequest(d *schema.ResourceData) *iaas.ProxyLBCreateReque
 		ProxyProtocol:        expandProxyLBProxyProtocol(d),
 		Syslog:               expandProxyLBSyslog(d),
 		Timeout:              expandProxyLBTimeout(d),
+		MonitoringSuiteLog:   expandProxyLBMonitoringSuiteLogEnabled(d),
 		UseVIPFailover:       d.Get("vip_failover").(bool),
 		Region:               types.EProxyLBRegion(d.Get("region").(string)),
 		Name:                 d.Get("name").(string),
@@ -58,10 +59,23 @@ func expandProxyLBUpdateRequest(d *schema.ResourceData) *iaas.ProxyLBUpdateReque
 		ProxyProtocol:        expandProxyLBProxyProtocol(d),
 		Syslog:               expandProxyLBSyslog(d),
 		Timeout:              expandProxyLBTimeout(d),
+		MonitoringSuiteLog:   expandProxyLBMonitoringSuiteLogEnabled(d),
 		Name:                 d.Get("name").(string),
 		Description:          d.Get("description").(string),
 		Tags:                 expandTags(d),
 		IconID:               expandSakuraCloudID(d, "icon_id"),
+	}
+}
+
+func flattenProxyLBMonitoringSuite(data *iaas.ProxyLB) []any {
+	enabled := false
+	if data.MonitoringSuiteLog != nil {
+		enabled = data.MonitoringSuiteLog.Enabled
+	}
+	return []any{
+		map[string]any{
+			"enabled": enabled,
+		},
 	}
 }
 
@@ -224,6 +238,16 @@ func flattenProxyLBTimeout(proxyLB *iaas.ProxyLB) int {
 		return proxyLB.Timeout.InactiveSec
 	}
 	return 0
+}
+
+func expandProxyLBMonitoringSuiteLogEnabled(d resourceValueGettable) *iaas.MonitoringSuiteLog {
+	enabled := false
+	if ms, ok := getListFromResource(d, "monitoring_suite"); ok && len(ms) == 1 {
+		values := mapToResourceData(ms[0].(map[string]interface{}))
+		enabled = values.Get("enabled").(bool)
+	}
+
+	return &iaas.MonitoringSuiteLog{Enabled: enabled}
 }
 
 func expandProxyLBStickySession(d resourceValueGettable) *iaas.ProxyLBStickySession {

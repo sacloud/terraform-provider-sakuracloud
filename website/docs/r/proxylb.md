@@ -84,6 +84,10 @@ resource "sakuracloud_proxylb" "foobar" {
     request_header_value_ignore_case  = "true"
     request_header_value_not_match    = "true"
   }
+  
+  monitoring_suite {
+    enabled = true
+  }
 
   description = "description"
   tags        = ["tag1", "tag2"]
@@ -104,6 +108,7 @@ resource sakuracloud_server "foobar" {
 * `plan` - (Optional) The plan name of the ProxyLB. This must be one of [`100`/`500`/`1000`/`5000`/`10000`/`50000`/`100000`]. Default:`100`.
 * `region` - (Optional) The name of region that the proxy LB is in. This must be one of [`tk1`/`is1`/`anycast`]. Changing this forces a new resource to be created. Default:`is1`.
 * `timeout` - (Optional) The timeout duration in seconds. Default:`10`.
+* `monitoring_suite` - (Optional) An `monitoring_suite` block as defined below.
 
 #### Certificate
 
@@ -208,6 +213,12 @@ A `syslog` block supports the following:
 
 * `port` - (Optional) The number of syslog port.
 * `server` - (Optional) The address of syslog server.
+
+---
+
+A `monitoring_suite` block supports the following:
+
+* `enabled` - (Optional) Enable sending signals to Monitoring Suite.
 
 #### Common Arguments
 

@@ -138,6 +138,22 @@ func resourceSakuraCloudGSLB() *schema.Resource {
 					},
 				},
 			},
+			"monitoring_suite": {
+				Type:     schema.TypeList,
+				Optional: true,
+				Computed: true,
+				MaxItems: 1,
+				Elem: &schema.Resource{
+					Schema: map[string]*schema.Schema{
+						"enabled": {
+							Type:        schema.TypeBool,
+							Optional:    true,
+							Computed:    true,
+							Description: "Enable sending signals to Monitoring Suite",
+						},
+					},
+				},
+			},
 			"icon_id":     schemaResourceIconID(resourceName),
 			"description": schemaResourceDescription(resourceName),
 			"tags":        schemaResourceTags(resourceName),
@@ -233,6 +249,9 @@ func setGSLBResourceData(ctx context.Context, d *schema.ResourceData, client *AP
 		return diag.FromErr(err)
 	}
 	if err := d.Set("server", flattenGSLBServers(data)); err != nil {
+		return diag.FromErr(err)
+	}
+	if err := d.Set("monitoring_suite", flattenGSLBMonitoringSuite(data)); err != nil {
 		return diag.FromErr(err)
 	}
 	return diag.FromErr(d.Set("tags", flattenTags(data.Tags)))
