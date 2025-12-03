@@ -77,6 +77,6 @@ resource "sakuracloud_server" "example" {
 
 ## License
 
- `terraform-proivder-sakuracloud` Copyright (C) 2016-2023 terraform-provider-sakuraclou authors.
+ `terraform-provider-sakuracloud` Copyright (C) 2016-2023 terraform-provider-sakuracloud authors.
 
   This project is published under [Apache 2.0 License](LICENSE).
