@@ -1,5 +1,16 @@
 # CHANGELOG
 
+## 2.32.0 (2025/12/04)
+
+- fix typo in README.md (#1300)
+- e2e: replace placeholder SSH public key with a valid formatted key(#1301)
+- ci: bump actions/setup-go from 5.5.0 to 6.1.0 (#1298)
+- ci: bump actions/checkout from 5.0.0 to 6.0.0 (#1297)
+- go: bump golang.org/x/crypto from 0.43.0 to 0.45.0 (#1295)
+- go: bump github.com/quic-go/quic-go from 0.54.0 to 0.54.1(#1290)
+- feat: monitoring_suite - dns,gslb,proxylb,simple_monitor,vpc_router (#1296)
+- go: bump github.com/cloudflare/circl from 1.3.7 to 1.6.1(#1260)
+ 
 ## 2.31.2 (2025/11/06)
 
 - iaas-service-go v1.18.1 (#1294)
