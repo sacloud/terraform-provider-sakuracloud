@@ -20,7 +20,6 @@ import (
 	"log"
 
 	"github.com/hashicorp/terraform-plugin-go/tfprotov5/tf5server"
-	"github.com/hashicorp/terraform-plugin-mux/tf5muxserver"
 	"github.com/sacloud/terraform-provider-sakuracloud/sakuracloud"
 )
 
@@ -29,11 +28,6 @@ func main() {
 	flag.Parse()
 
 	serverFactory, err := sakuracloud.ProtoV5ProviderServerFactory(context.Background())
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	muxServer, err := tf5muxserver.NewMuxServer(context.Background(), serverFactory)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -49,7 +43,7 @@ func main() {
 
 	err = tf5server.Serve(
 		"registry.terraform.io/sacloud/sakuracloud",
-		muxServer.ProviderServer,
+		serverFactory,
 		serveOpts...,
 	)
 
