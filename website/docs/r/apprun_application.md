@@ -21,8 +21,8 @@ resource "sakuracloud_apprun_application" "foobar" {
   max_scale       = 1
   components {
     name       = "foobar"
-    max_cpu    = "0.1"
-    max_memory = "256Mi"
+    max_cpu    = "0.5"
+    max_memory = "1Gi"
     deploy_source {
       container_registry {
         image    = "foorbar.sakuracr.jp/foorbar:latest"
@@ -90,8 +90,8 @@ resource "sakuracloud_apprun_application" "foobar" {
 A `components` block supports the following:
 
 * `name` - (Required) The component name.
-* `max_cpu` - (Required) The maximum number of CPUs for a component. The values in the list must be in [`0.1`/`0.2`/`0.3`/`0.4`/`0.5`/`0.6`/`0.7`/`0.8`/`0.9`/`1`].
-* `max_memory` - (Required) The maximum memory of component. The values in the list must be in [`256Mi`/`512Mi`/`1Gi`/`2Gi`].
+* `max_cpu` - (Required) The maximum number of CPUs for a component. The values in the list must be in [`0.5`/`1`/`2`].
+* `max_memory` - (Required) The maximum memory of component. The values in the list must be in [`1Gi`/`2Gi`/`4Gi`].
 * `deploy_source` - (Required) The sources that make up the component.
 * `env` - (Optional) The environment variables passed to components.
 * `probe` - (Optional) The component probe settings.
