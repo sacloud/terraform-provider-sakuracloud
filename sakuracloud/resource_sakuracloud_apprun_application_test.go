@@ -50,8 +50,8 @@ func TestAccSakuraCloudApprunApplication_basic(t *testing.T) {
 					resource.TestCheckResourceAttr(resourceName, "min_scale", "0"),
 					resource.TestCheckResourceAttr(resourceName, "max_scale", "1"),
 					resource.TestCheckResourceAttr(resourceName, "components.0.name", "compo1"),
-					resource.TestCheckResourceAttr(resourceName, "components.0.max_cpu", "0.1"),
-					resource.TestCheckResourceAttr(resourceName, "components.0.max_memory", "256Mi"),
+					resource.TestCheckResourceAttr(resourceName, "components.0.max_cpu", "0.5"),
+					resource.TestCheckResourceAttr(resourceName, "components.0.max_memory", "1Gi"),
 					resource.TestCheckResourceAttr(resourceName, "components.0.deploy_source.0.container_registry.0.image", "apprun-test.sakuracr.jp/test1:latest"),
 					resource.TestMatchResourceAttr(resourceName, "status", regexp.MustCompile(".+")),
 					resource.TestMatchResourceAttr(resourceName, "public_url", regexp.MustCompile(".+")),
@@ -68,8 +68,8 @@ func TestAccSakuraCloudApprunApplication_basic(t *testing.T) {
 					resource.TestCheckResourceAttr(resourceName, "min_scale", "0"),
 					resource.TestCheckResourceAttr(resourceName, "max_scale", "2"),
 					resource.TestCheckResourceAttr(resourceName, "components.0.name", "compo1"),
-					resource.TestCheckResourceAttr(resourceName, "components.0.max_cpu", "0.2"),
-					resource.TestCheckResourceAttr(resourceName, "components.0.max_memory", "512Mi"),
+					resource.TestCheckResourceAttr(resourceName, "components.0.max_cpu", "1"),
+					resource.TestCheckResourceAttr(resourceName, "components.0.max_memory", "2Gi"),
 					resource.TestCheckResourceAttr(resourceName, "components.0.deploy_source.0.container_registry.0.image", "apprun-test.sakuracr.jp/test1:tag1"),
 				),
 			},
@@ -100,8 +100,8 @@ func TestAccSakuraCloudApprunApplication_withCRUser(t *testing.T) {
 					resource.TestCheckResourceAttr(resourceName, "min_scale", "0"),
 					resource.TestCheckResourceAttr(resourceName, "max_scale", "1"),
 					resource.TestCheckResourceAttr(resourceName, "components.0.name", "compo1"),
-					resource.TestCheckResourceAttr(resourceName, "components.0.max_cpu", "0.1"),
-					resource.TestCheckResourceAttr(resourceName, "components.0.max_memory", "256Mi"),
+					resource.TestCheckResourceAttr(resourceName, "components.0.max_cpu", "0.5"),
+					resource.TestCheckResourceAttr(resourceName, "components.0.max_memory", "1Gi"),
 					resource.TestCheckResourceAttr(resourceName, "components.0.deploy_source.0.container_registry.0.image", "apprun-test.sakuracr.jp/test1:latest"),
 					resource.TestCheckResourceAttr(resourceName, "components.0.deploy_source.0.container_registry.0.server", "apprun-test.sakuracr.jp"),
 					resource.TestCheckResourceAttr(resourceName, "components.0.deploy_source.0.container_registry.0.username", "user"),
@@ -135,8 +135,8 @@ func TestAccSakuraCloudApprunApplication_withEnv(t *testing.T) {
 					resource.TestCheckResourceAttr(resourceName, "min_scale", "0"),
 					resource.TestCheckResourceAttr(resourceName, "max_scale", "1"),
 					resource.TestCheckResourceAttr(resourceName, "components.0.name", "compo1"),
-					resource.TestCheckResourceAttr(resourceName, "components.0.max_cpu", "0.1"),
-					resource.TestCheckResourceAttr(resourceName, "components.0.max_memory", "256Mi"),
+					resource.TestCheckResourceAttr(resourceName, "components.0.max_cpu", "0.5"),
+					resource.TestCheckResourceAttr(resourceName, "components.0.max_memory", "1Gi"),
 					resource.TestCheckResourceAttr(resourceName, "components.0.deploy_source.0.container_registry.0.image", "apprun-test.sakuracr.jp/test1:latest"),
 					resource.TestCheckResourceAttr(resourceName, "components.0.env.#", "2"),
 					resource.TestCheckResourceAttr(resourceName, "components.0.env.0.key", "key"),
@@ -216,8 +216,8 @@ func TestAccSakuraCloudApprunApplication_withProbe(t *testing.T) {
 					resource.TestCheckResourceAttr(resourceName, "min_scale", "0"),
 					resource.TestCheckResourceAttr(resourceName, "max_scale", "1"),
 					resource.TestCheckResourceAttr(resourceName, "components.0.name", "compo1"),
-					resource.TestCheckResourceAttr(resourceName, "components.0.max_cpu", "0.1"),
-					resource.TestCheckResourceAttr(resourceName, "components.0.max_memory", "256Mi"),
+					resource.TestCheckResourceAttr(resourceName, "components.0.max_cpu", "0.5"),
+					resource.TestCheckResourceAttr(resourceName, "components.0.max_memory", "1Gi"),
 					resource.TestCheckResourceAttr(resourceName, "components.0.deploy_source.0.container_registry.0.image", "apprun-test.sakuracr.jp/test1:latest"),
 					resource.TestCheckResourceAttr(resourceName, "components.0.probe.0.http_get.0.path", "/"),
 					resource.TestCheckResourceAttr(resourceName, "components.0.probe.0.http_get.0.port", "80"),
@@ -234,8 +234,8 @@ func TestAccSakuraCloudApprunApplication_withProbe(t *testing.T) {
 					resource.TestCheckResourceAttr(resourceName, "min_scale", "0"),
 					resource.TestCheckResourceAttr(resourceName, "max_scale", "1"),
 					resource.TestCheckResourceAttr(resourceName, "components.0.name", "compo1"),
-					resource.TestCheckResourceAttr(resourceName, "components.0.max_cpu", "0.1"),
-					resource.TestCheckResourceAttr(resourceName, "components.0.max_memory", "256Mi"),
+					resource.TestCheckResourceAttr(resourceName, "components.0.max_cpu", "0.5"),
+					resource.TestCheckResourceAttr(resourceName, "components.0.max_memory", "1Gi"),
 					resource.TestCheckResourceAttr(resourceName, "components.0.deploy_source.0.container_registry.0.image", "apprun-test.sakuracr.jp/test1:latest"),
 					resource.TestCheckResourceAttr(resourceName, "components.0.probe.0.http_get.0.path", "/"),
 					resource.TestCheckResourceAttr(resourceName, "components.0.probe.0.http_get.0.port", "80"),
@@ -272,8 +272,8 @@ func TestAccSakuraCloudApprunApplication_withTraffic(t *testing.T) {
 					resource.TestCheckResourceAttr(resourceName, "min_scale", "0"),
 					resource.TestCheckResourceAttr(resourceName, "max_scale", "1"),
 					resource.TestCheckResourceAttr(resourceName, "components.0.name", "compo1"),
-					resource.TestCheckResourceAttr(resourceName, "components.0.max_cpu", "0.1"),
-					resource.TestCheckResourceAttr(resourceName, "components.0.max_memory", "256Mi"),
+					resource.TestCheckResourceAttr(resourceName, "components.0.max_cpu", "0.5"),
+					resource.TestCheckResourceAttr(resourceName, "components.0.max_memory", "1Gi"),
 					resource.TestCheckResourceAttr(resourceName, "components.0.deploy_source.0.container_registry.0.image", "apprun-test.sakuracr.jp/test1:latest"),
 					resource.TestCheckResourceAttr(resourceName, "traffics.0.version_index", "0"),
 					resource.TestCheckResourceAttr(resourceName, "traffics.0.percent", "100"),
@@ -290,8 +290,8 @@ func TestAccSakuraCloudApprunApplication_withTraffic(t *testing.T) {
 					resource.TestCheckResourceAttr(resourceName, "min_scale", "0"),
 					resource.TestCheckResourceAttr(resourceName, "max_scale", "1"),
 					resource.TestCheckResourceAttr(resourceName, "components.0.name", "compo1"),
-					resource.TestCheckResourceAttr(resourceName, "components.0.max_cpu", "0.1"),
-					resource.TestCheckResourceAttr(resourceName, "components.0.max_memory", "256Mi"),
+					resource.TestCheckResourceAttr(resourceName, "components.0.max_cpu", "0.5"),
+					resource.TestCheckResourceAttr(resourceName, "components.0.max_memory", "1Gi"),
 					resource.TestCheckResourceAttr(resourceName, "components.0.deploy_source.0.container_registry.0.image", "apprun-test.sakuracr.jp/test1:latest"),
 					resource.TestCheckResourceAttr(resourceName, "traffics.0.version_index", "0"),
 					resource.TestCheckResourceAttr(resourceName, "traffics.0.percent", "1"),
@@ -372,8 +372,8 @@ func TestAccImportSakuraCloudApprunApplication_basic(t *testing.T) {
 			"min_scale":               "0",
 			"max_scale":               "1",
 			"components.0.name":       "compo1",
-			"components.0.max_cpu":    "0.1",
-			"components.0.max_memory": "256Mi",
+			"components.0.max_cpu":    "0.5",
+			"components.0.max_memory": "1Gi",
 			"components.0.deploy_source.0.container_registry.0.image": "apprun-test.sakuracr.jp/test1:latest",
 		}
 
@@ -419,8 +419,8 @@ func TestAccImportSakuraCloudApprunApplication_withCRUser(t *testing.T) {
 			"min_scale":               "0",
 			"max_scale":               "1",
 			"components.0.name":       "compo1",
-			"components.0.max_cpu":    "0.1",
-			"components.0.max_memory": "256Mi",
+			"components.0.max_cpu":    "0.5",
+			"components.0.max_memory": "1Gi",
 			"components.0.deploy_source.0.container_registry.0.image":    "apprun-test.sakuracr.jp/test1:latest",
 			"components.0.deploy_source.0.container_registry.0.username": "user",
 			"components.0.deploy_source.0.container_registry.0.password": "",
@@ -469,8 +469,8 @@ func TestAccImportSakuraCloudApprunApplication_withEnv(t *testing.T) {
 			"min_scale":               "0",
 			"max_scale":               "1",
 			"components.0.name":       "compo1",
-			"components.0.max_cpu":    "0.1",
-			"components.0.max_memory": "256Mi",
+			"components.0.max_cpu":    "0.5",
+			"components.0.max_memory": "1Gi",
 			"components.0.deploy_source.0.container_registry.0.image": "apprun-test.sakuracr.jp/test1:latest",
 			"components.0.env.#":       "2",
 			"components.0.env.0.key":   "key",
@@ -580,8 +580,8 @@ resource "sakuracloud_apprun_application" "foobar" {
   max_scale       = 1
   components {
     name       = "compo1"
-    max_cpu    = "0.1"
-    max_memory = "256Mi"
+    max_cpu    = "0.5"
+    max_memory = "1Gi"
     deploy_source {
       container_registry {
         image    = "apprun-test.sakuracr.jp/test1:latest"
@@ -600,8 +600,8 @@ resource "sakuracloud_apprun_application" "foobar" {
   max_scale       = 2
   components {
     name       = "compo1"
-    max_cpu    = "0.2"
-    max_memory = "512Mi"
+    max_cpu    = "1"
+    max_memory = "2Gi"
     deploy_source {
       container_registry {
         image    = "apprun-test.sakuracr.jp/test1:tag1"
@@ -620,8 +620,8 @@ resource "sakuracloud_apprun_application" "foobar" {
   max_scale       = 1
   components {
     name       = "compo1"
-    max_cpu    = "0.1"
-    max_memory = "256Mi"
+    max_cpu    = "0.5"
+    max_memory = "1Gi"
     deploy_source {
       container_registry {
         image    = "apprun-test.sakuracr.jp/test1:latest"
@@ -643,8 +643,8 @@ resource "sakuracloud_apprun_application" "foobar" {
   max_scale       = 1
   components {
     name       = "compo1"
-    max_cpu    = "0.1"
-    max_memory = "256Mi"
+    max_cpu    = "0.5"
+    max_memory = "1Gi"
     deploy_source {
       container_registry {
         image    = "apprun-test.sakuracr.jp/test1:latest"
@@ -675,8 +675,8 @@ resource "sakuracloud_apprun_application" "foobar" {
   max_scale       = 1
   components {
     name       = "compo1"
-    max_cpu    = "0.1"
-    max_memory = "256Mi"
+    max_cpu    = "0.5"
+    max_memory = "1Gi"
     deploy_source {
       container_registry {
         image    = "apprun-test.sakuracr.jp/test1:latest"
@@ -710,8 +710,8 @@ resource "sakuracloud_apprun_application" "foobar" {
   max_scale       = 1
   components {
     name       = "compo1"
-    max_cpu    = "0.1"
-    max_memory = "256Mi"
+    max_cpu    = "0.5"
+    max_memory = "1Gi"
     deploy_source {
       container_registry {
         image    = "apprun-test.sakuracr.jp/test1:latest"
@@ -736,8 +736,8 @@ resource "sakuracloud_apprun_application" "foobar" {
   max_scale       = 1
   components {
     name       = "compo1"
-    max_cpu    = "0.1"
-    max_memory = "256Mi"
+    max_cpu    = "0.5"
+    max_memory = "1Gi"
     deploy_source {
       container_registry {
         image    = "apprun-test.sakuracr.jp/test1:latest"
@@ -770,8 +770,8 @@ resource "sakuracloud_apprun_application" "foobar" {
   max_scale       = 1
   components {
     name       = "compo1"
-    max_cpu    = "0.1"
-    max_memory = "256Mi"
+    max_cpu    = "0.5"
+    max_memory = "1Gi"
     deploy_source {
       container_registry {
         image    = "apprun-test.sakuracr.jp/test1:latest"
@@ -794,8 +794,8 @@ resource "sakuracloud_apprun_application" "foobar" {
   max_scale       = 1
   components {
     name       = "compo1"
-    max_cpu    = "0.1"
-    max_memory = "256Mi"
+    max_cpu    = "0.5"
+    max_memory = "1Gi"
     deploy_source {
       container_registry {
         image    = "apprun-test.sakuracr.jp/test1:latest"
@@ -822,8 +822,8 @@ resource "sakuracloud_apprun_application" "foobar" {
   max_scale       = 1
   components {
     name       = "compo1"
-    max_cpu    = "0.1"
-    max_memory = "256Mi"
+    max_cpu    = "0.5"
+    max_memory = "1Gi"
     deploy_source {
       container_registry {
         image    = "apprun-test.sakuracr.jp/test1:latest"
@@ -849,8 +849,8 @@ resource "sakuracloud_apprun_application" "foobar" {
   max_scale       = 1
   components {
     name       = "compo1"
-    max_cpu    = "0.1"
-    max_memory = "256Mi"
+    max_cpu    = "0.5"
+    max_memory = "1Gi"
     deploy_source {
       container_registry {
         image    = "apprun-test.sakuracr.jp/test1:latest"
@@ -880,8 +880,8 @@ resource "sakuracloud_apprun_application" "foobar" {
   max_scale       = 1
   components {
     name       = "compo1"
-    max_cpu    = "0.1"
-    max_memory = "256Mi"
+    max_cpu    = "0.5"
+    max_memory = "1Gi"
     deploy_source {
       container_registry {
         image    = "apprun-test.sakuracr.jp/test1:latest"
