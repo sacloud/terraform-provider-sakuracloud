@@ -17,7 +17,7 @@ require (
 	github.com/sacloud/iaas-service-go v1.19.0
 	github.com/sacloud/iso9660wrap v0.0.0-20171031075302-eda21f77f6a8
 	github.com/sacloud/kms-api-go v0.2.2
-	github.com/sacloud/packages-go v0.0.11
+	github.com/sacloud/packages-go v0.0.12
 	github.com/sacloud/secretmanager-api-go v0.2.1
 	github.com/sacloud/simplemq-api-go v0.2.0
 	github.com/sacloud/webaccel-api-go v1.3.0
