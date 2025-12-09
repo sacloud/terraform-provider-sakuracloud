@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## 2.33.0 (2025/12/09)
+
+- go 1.25 (#1309) 
+- use tf5server directly (#1303)
+- sakuracloud_apprun_application: API v1.2.0 (#1302)
+
 ## 2.32.0 (2025/12/04)
 
 - fix typo in README.md (#1300)

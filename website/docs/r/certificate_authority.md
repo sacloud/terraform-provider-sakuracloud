@@ -21,7 +21,7 @@ Manages a SakuraCloud sakuracloud_certificate_authority.
 #    }
 #    sakuracloud = {
 #      source  = "sacloud/sakuracloud"
-#      version = "2.32.0"
+#      version = "2.33.0"
 #    }
 #  }
 #}
