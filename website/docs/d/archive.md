@@ -21,9 +21,9 @@ data "sakuracloud_archive" "foobar" {
 
 * `filter` - (Optional) One or more values used for filtering, as defined below.
 * `os_type` - (Optional) The criteria used to filter SakuraCloud archives. This must be one of following:  
-  - **AlmaLinux**: [`almalinux`/`almalinux10`/`almalinux9`]
-  - **RockyLinux**: [`rockylinux`/`rockylinux10`/`rockylinux9`]
-  - **MIRACLE LINUX**[`miracle`/`miraclelinux`/`miracle8`/`miraclelinux8`/`miracle9`/`miraclelinux9`]
+  - **AlmaLinux**: [`almalinux`/`almalinux10`/`almalinux9`/`almalinux8`]
+  - **RockyLinux**: [`rockylinux`/`rockylinux10`/`rockylinux9`/`rockylinux8`]
+  - **MIRACLE LINUX**[`miracle`/`miraclelinux`/`miracle9`/`miraclelinux9`/`miracle8`/`miraclelinux8`]
   - **Ubuntu**: [`ubuntu`/`ubuntu2404`/`ubuntu2204`]
   - **Debian**: [`debian`/`debian12`/`debian11`]
   - **Kusanagi**: `kusanagi`  

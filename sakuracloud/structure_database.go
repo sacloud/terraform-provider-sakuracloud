@@ -60,8 +60,11 @@ func expandDatabaseBuilder(d *schema.ResourceData, client *APIClient) *databaseB
 		IconID:             expandSakuraCloudID(d, "icon_id"),
 		Client:             databaseBuilder.NewAPIClient(client),
 		BackupSetting:      expandDatabaseBackupSetting(d),
+		Backupv2Setting:    expandDatabaseBackupv2Setting(d),
 		Parameters:         d.Get("parameters").(map[string]interface{}),
 		ReplicationSetting: &iaas.DatabaseReplicationSetting{},
+		MonitoringSuite:    expandDatabaseMonitoringSuitEnabled(d),
+		Disk:               expandDatabaseDisk(d),
 	}
 
 	if replicaUser != "" && replicaPassword != "" {
@@ -129,6 +132,7 @@ func expandDatabaseReadReplicaBuilder(ctx context.Context, d *schema.ResourceDat
 			Password:    masterDB.ReplicationSetting.Password,
 			ApplianceID: masterDB.ID,
 		},
+		Disk:   expandDatabaseDisk(d),
 		Client: databaseBuilder.NewAPIClient(client),
 	}, nil
 }
@@ -152,11 +156,26 @@ func expandDatabaseBackupSetting(d resourceValueGettable) *iaas.DatabaseSettingB
 	if d != nil {
 		backupTime := d.Get("time").(string)
 		backupWeekdays := expandBackupWeekdays(d, "weekdays")
-		if backupTime != "" && len(backupWeekdays) > 0 {
-			return &iaas.DatabaseSettingBackup{
-				Time:      backupTime,
-				DayOfWeek: backupWeekdays,
-			}
+		return &iaas.DatabaseSettingBackup{
+			Time:      backupTime,
+			DayOfWeek: backupWeekdays,
+			Rotate:    8,
+		}
+	}
+	return nil
+}
+
+func expandDatabaseBackupv2Setting(d resourceValueGettable) *iaas.DatabaseSettingBackupv2 {
+	d = mapFromFirstElement(d, "continuous_backup")
+	if d != nil {
+		backupTime := d.Get("time").(string)
+		backupWeekdays := expandBackupWeekdays(d, "weekdays")
+		connect := d.Get("connect").(string)
+		return &iaas.DatabaseSettingBackupv2{
+			Time:      backupTime,
+			DayOfWeek: backupWeekdays,
+			Connect:   connect,
+			Rotate:    8,
 		}
 	}
 	return nil
@@ -167,6 +186,18 @@ func flattenDatabaseBackupSetting(db *iaas.Database) []interface{} {
 		setting := map[string]interface{}{
 			"time":     db.BackupSetting.Time,
 			"weekdays": flattenBackupWeekdays(db.BackupSetting.DayOfWeek),
+		}
+		return []interface{}{setting}
+	}
+	return nil
+}
+
+func flattenDatabaseBackupv2Setting(db *iaas.Database) []interface{} {
+	if db.Backupv2Setting != nil {
+		setting := map[string]interface{}{
+			"time":     db.Backupv2Setting.Time,
+			"weekdays": flattenBackupWeekdays(db.Backupv2Setting.DayOfWeek),
+			"connect":  db.Backupv2Setting.Connect,
 		}
 		return []interface{}{setting}
 	}
@@ -218,6 +249,55 @@ func flattenDatabaseReadReplicaNetworkInterface(db *iaas.Database) []interface{}
 			"source_ranges": db.CommonSetting.SourceNetwork,
 			"gateway":       db.DefaultRoute,
 			"ip_address":    db.IPAddresses[0],
+		},
+	}
+}
+
+func expandDatabaseMonitoringSuitEnabled(d resourceValueGettable) *iaas.MonitoringSuite {
+	enabled := false
+	if ms, ok := getListFromResource(d, "monitoring_suite"); ok && len(ms) == 1 {
+		values := mapToResourceData(ms[0].(map[string]interface{}))
+		enabled = values.Get("enabled").(bool)
+	}
+
+	return &iaas.MonitoringSuite{Enabled: enabled}
+}
+
+func flattenDatabaseMonitoringSuite(data *iaas.Database) []any {
+	enabled := false
+	if data.MonitoringSuite != nil {
+		enabled = data.MonitoringSuite.Enabled
+	}
+	return []any{
+		map[string]any{
+			"enabled": enabled,
+		},
+	}
+}
+
+func expandDatabaseDisk(d resourceValueGettable) *iaas.DatabaseDisk {
+	d = mapFromFirstElement(d, "disk")
+	if d != nil {
+		return &iaas.DatabaseDisk{
+			EncryptionAlgorithm: types.EDiskEncryptionAlgorithm(d.Get("encryption_algorithm").(string)),
+			EncryptionKeyID:     types.StringID(d.Get("kms_key_id").(string)),
+		}
+	}
+	return nil
+}
+
+func flattenDatabaseDisk(data *iaas.Database) []any {
+	var keyID types.ID
+	algorithm := types.DiskEncryptionAlgorithms.None
+
+	if data.Disk != nil {
+		algorithm = data.Disk.EncryptionAlgorithm
+		keyID = data.Disk.EncryptionKeyID
+	}
+	return []any{
+		map[string]any{
+			"encryption_algorithm": algorithm.String(),
+			"kms_key_id":           keyID.String(),
 		},
 	}
 }

@@ -23,6 +23,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
 	"github.com/sacloud/iaas-api-go"
 	"github.com/sacloud/iaas-api-go/helper/power"
+	"github.com/sacloud/iaas-api-go/types"
 	"github.com/sacloud/terraform-provider-sakuracloud/internal/desc"
 )
 
@@ -100,6 +101,35 @@ func resourceSakuraCloudDatabaseReadReplica() *schema.Resource {
 								"The range of source IP addresses that allow to access to the %s via network",
 								resourceName,
 							),
+						},
+					},
+				},
+			},
+			"disk": {
+				Type:     schema.TypeList,
+				ForceNew: true,
+				Optional: true,
+				Computed: true,
+				MaxItems: 1,
+				Elem: &schema.Resource{
+					Schema: map[string]*schema.Schema{
+						"encryption_algorithm": {
+							Type:             schema.TypeString,
+							ForceNew:         true,
+							Optional:         true,
+							Default:          types.DiskEncryptionAlgorithms.None,
+							ValidateDiagFunc: validation.ToDiagFunc(validation.StringInSlice(types.DiskEncryptionAlgorithmStrings, false)),
+							Description: desc.Sprintf(
+								"The disk encryption algorithm. This must be one of [%s]",
+								types.DiskEncryptionAlgorithmStrings,
+							),
+						},
+						"kms_key_id": {
+							Type:             schema.TypeString,
+							ForceNew:         true,
+							Optional:         true,
+							ValidateDiagFunc: validation.ToDiagFunc(validateSakuracloudIDType),
+							Description:      "ID of the KMS key for encryption",
 						},
 					},
 				},
@@ -231,6 +261,9 @@ func setDatabaseReadReplicaResourceData(ctx context.Context, d *schema.ResourceD
 	d.Set("master_id", data.ReplicationSetting.ApplianceID.String()) //nolint
 	d.Set("name", data.Name)                                         //nolint
 	if err := d.Set("network_interface", flattenDatabaseReadReplicaNetworkInterface(data)); err != nil {
+		return diag.FromErr(err)
+	}
+	if err := d.Set("disk", flattenDatabaseDisk(data)); err != nil {
 		return diag.FromErr(err)
 	}
 	d.Set("icon_id", data.IconID.String()) //nolint

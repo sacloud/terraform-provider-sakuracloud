@@ -26,7 +26,7 @@ resource "sakuracloud_disk" "foobar" {
   #distant_from      = ["111111111111"]
   
   #encryption_algorithm = "aes256_xts"
-  #kms_key_id           = sakuracloud_kms_key.foobar.id
+  #kms_key_id           = sakuracloud_kms.foobar.id
 
   description = "description"
   tags        = ["tag1", "tag2"]

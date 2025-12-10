@@ -50,6 +50,11 @@ func TestAccSakuraCloudDatabaseReplica_basic(t *testing.T) {
 					resource.TestCheckResourceAttr(resourceName, "network_interface.0.ip_address", "192.168.151.111"),
 					resource.TestCheckResourceAttr(resourceName, "network_interface.0.netmask", "24"),
 					resource.TestCheckResourceAttr(resourceName, "network_interface.0.gateway", "192.168.151.1"),
+					resource.TestCheckResourceAttr(resourceName, "disk.0.encryption_algorithm", "aes256_xts"),
+					resource.TestCheckResourceAttrPair(
+						resourceName, "disk.0.kms_key_id",
+						"sakuracloud_kms.foobar", "id",
+					),
 					resource.TestCheckResourceAttrPair(
 						resourceName, "icon_id",
 						"sakuracloud_icon.foobar", "id",
@@ -67,6 +72,11 @@ func TestAccSakuraCloudDatabaseReplica_basic(t *testing.T) {
 					resource.TestCheckResourceAttr(resourceName, "network_interface.0.ip_address", "192.168.151.111"),
 					resource.TestCheckResourceAttr(resourceName, "network_interface.0.netmask", "24"),
 					resource.TestCheckResourceAttr(resourceName, "network_interface.0.gateway", "192.168.151.1"),
+					resource.TestCheckResourceAttr(resourceName, "disk.0.encryption_algorithm", "aes256_xts"),
+					resource.TestCheckResourceAttrPair(
+						resourceName, "disk.0.kms_key_id",
+						"sakuracloud_kms.foobar", "id",
+					),
 					resource.TestCheckResourceAttr(resourceName, "icon_id", ""),
 				),
 			},
@@ -88,6 +98,7 @@ func TestAccImportSakuraCloudDatabaseReadReplica_basic(t *testing.T) {
 			"network_interface.0.ip_address": "192.168.152.111",
 			"network_interface.0.netmask":    "24",
 			"network_interface.0.gateway":    "192.168.152.1",
+			"disk.0.encryption_algorithm":    "aes256_xts",
 			"tags.0":                         "tag1",
 			"tags.1":                         "tag2",
 		}
@@ -95,7 +106,7 @@ func TestAccImportSakuraCloudDatabaseReadReplica_basic(t *testing.T) {
 		if err := compareStateMulti(s[0], expects); err != nil {
 			return err
 		}
-		return stateNotEmptyMulti(s[0], "icon_id", "network_interface.0.switch_id", "master_id")
+		return stateNotEmptyMulti(s[0], "icon_id", "network_interface.0.switch_id", "master_id", "disk.0.kms_key_id")
 	}
 
 	resourceName := "sakuracloud_database_read_replica.foobar"
@@ -150,6 +161,11 @@ const testAccSakuraCloudDatabaseReplica_basic = `
 resource "sakuracloud_switch" "foobar" {
     name = "{{ .arg0 }}"
 }
+
+resource "sakuracloud_kms" "foobar" {
+  name = "{{ .arg0 }}"
+}
+
 resource "sakuracloud_database" "foobar" {
   database_type = "postgres"
   plan          = "10g"
@@ -175,6 +191,10 @@ resource "sakuracloud_database_read_replica" "foobar" {
   network_interface {
     ip_address   = "192.168.151.111"
   }
+  disk {
+    encryption_algorithm = "aes256_xts"
+    kms_key_id           = sakuracloud_kms.foobar.id
+  }
   name         = "{{ .arg0 }}"
   description  = "description"
   tags         = ["tag1" , "tag2"]
@@ -189,6 +209,10 @@ resource "sakuracloud_icon" "foobar" {
 
 const testAccSakuraCloudDatabaseReplica_update = `
 resource "sakuracloud_switch" "foobar" {
+  name = "{{ .arg0 }}"
+}
+
+resource "sakuracloud_kms" "foobar" {
   name = "{{ .arg0 }}"
 }
 
@@ -216,6 +240,10 @@ resource "sakuracloud_database_read_replica" "foobar" {
   network_interface {
     ip_address   = "192.168.151.111"
   }
+  disk {
+    encryption_algorithm = "aes256_xts"
+    kms_key_id           = sakuracloud_kms.foobar.id
+  }
   name         = "{{ .arg0 }}-upd"
   description  = "description-upd"
   tags         = ["tag1-upd" , "tag2-upd"]
@@ -225,6 +253,11 @@ const testAccSakuraCloudDatabaseReplica_import = `
 resource "sakuracloud_switch" "foobar" {
     name = "{{ .arg0 }}"
 }
+
+resource "sakuracloud_kms" "foobar" {
+  name = "{{ .arg0 }}"
+}
+
 resource "sakuracloud_database" "foobar" {
   database_type = "postgres"
   plan          = "10g"
@@ -249,6 +282,10 @@ resource "sakuracloud_database_read_replica" "foobar" {
   master_id    = sakuracloud_database.foobar.id
   network_interface {
     ip_address   = "192.168.152.111"
+  }
+  disk {
+    encryption_algorithm = "aes256_xts"
+    kms_key_id           = sakuracloud_kms.foobar.id
   }
   name         = "{{ .arg0 }}"
   description  = "description"
