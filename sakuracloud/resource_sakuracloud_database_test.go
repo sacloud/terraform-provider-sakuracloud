@@ -115,7 +115,7 @@ func TestAccSakuraCloudDatabase_basic(t *testing.T) {
 	})
 }
 
-func TestAccSakuraCloudDatabase_withCotinuousBackup(t *testing.T) {
+func TestAccSakuraCloudDatabase_withContinuousBackup(t *testing.T) {
 	resourceName := "sakuracloud_database.foobar"
 	rand := randomName()
 	password := randomPassword()
@@ -136,9 +136,9 @@ func TestAccSakuraCloudDatabase_withCotinuousBackup(t *testing.T) {
 					testCheckSakuraCloudDatabaseExists(resourceName, &database),
 					resource.TestCheckResourceAttr(resourceName, "name", rand),
 					resource.TestCheckResourceAttr(resourceName, "continuous_backup.0.time", "01:30"),
-					resource.TestCheckResourceAttr(resourceName, "continuous_backup.0.weekdays.#", "2"),
-					resource.TestCheckResourceAttr(resourceName, "continuous_backup.0.weekdays.0", "mon"),
-					resource.TestCheckResourceAttr(resourceName, "continuous_backup.0.weekdays.1", "tue"),
+					resource.TestCheckResourceAttr(resourceName, "continuous_backup.0.days_of_week.#", "2"),
+					resource.TestCheckResourceAttr(resourceName, "continuous_backup.0.days_of_week.0", "mon"),
+					resource.TestCheckResourceAttr(resourceName, "continuous_backup.0.days_of_week.1", "tue"),
 					resource.TestCheckResourceAttr(resourceName, "continuous_backup.0.connect", "nfs://192.168.11.111/export"),
 				),
 			},
@@ -469,9 +469,9 @@ resource "sakuracloud_database" "foobar" {
   }
 
   continuous_backup {
-    weekdays = ["mon", "tue"]
-    time     = "01:30"
-    connect  = "nfs://${sakuracloud_nfs.foobar.network_interface[0].ip_address}/export"
+    days_of_week = ["mon", "tue"]
+    time         = "01:30"
+    connect      = "nfs://${sakuracloud_nfs.foobar.network_interface[0].ip_address}/export"
   }
 }
 `

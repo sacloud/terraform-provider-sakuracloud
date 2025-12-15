@@ -111,7 +111,7 @@ func dataSourceSakuraCloudDatabase() *schema.Resource {
 				Computed: true,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
-						"weekdays": {
+						"days_of_week": {
 							Type:     schema.TypeSet,
 							Computed: true,
 							Elem:     &schema.Schema{Type: schema.TypeString},

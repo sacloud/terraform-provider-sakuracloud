@@ -184,7 +184,7 @@ func resourceSakuraCloudDatabase() *schema.Resource {
 				Description: "This field can only be specified when `database_version` is provided",
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
-						"weekdays": {
+						"days_of_week": {
 							Type:     schema.TypeSet,
 							Required: true,
 							Elem:     &schema.Schema{Type: schema.TypeString},

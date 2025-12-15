@@ -43,9 +43,9 @@ resource "sakuracloud_database" "foobar" {
 
   # continuous_backupを指定するときはdatabase_versionが必須
   # continuous_backup {
-  #   weekdays = ["mon", "tue"]
-  #   time     = "01:30"
-  #   connect  = "nfs://${sakuracloud_nfs.foobar.network_interface[0].ip_address}/export"
+  #   days_of_week = ["mon", "tue"]
+  #   time         = "01:30"
+  #   connect      = "nfs://${sakuracloud_nfs.foobar.network_interface[0].ip_address}/export"
   # }
 
   parameters = {
@@ -145,7 +145,7 @@ A `continuous_backup` block supports the following:
 
 * `connect` - (Required) NFS server address for storing backups (e.g., `nfs://192.0.2.1/export`).
 * `time` - (Required) The time to take backup. This must be formatted with `HH:mm`.
-* `weekdays` - (Required) A list of weekdays to backed up. The values in the list must be in [`sun`/`mon`/`tue`/`wed`/`thu`/`fri`/`sat`].
+* `days_of_week` - (Required) A list of weekdays to backed up. The values in the list must be in [`sun`/`mon`/`tue`/`wed`/`thu`/`fri`/`sat`].
 
 
 #### RDBMS Parameters

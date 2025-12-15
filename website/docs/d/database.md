@@ -77,7 +77,7 @@ A `continuous_backup` block exports the following:
 
 * `connect` - NFS server address for storing backups (e.g., `nfs://192.0.2.1/export`).
 * `time` - The time to take backup. This must be formatted with `HH:mm`.
-* `weekdays` - The list of name of weekday that doing backup. This will be in [`sun`/`mon`/`tue`/`wed`/`thu`/`fri`/`sat`].
+* `days_of_week` - The list of name of weekday that doing backup. This will be in [`sun`/`mon`/`tue`/`wed`/`thu`/`fri`/`sat`].
 
 ---
 

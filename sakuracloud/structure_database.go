@@ -169,7 +169,7 @@ func expandDatabaseBackupv2Setting(d resourceValueGettable) *iaas.DatabaseSettin
 	d = mapFromFirstElement(d, "continuous_backup")
 	if d != nil {
 		backupTime := d.Get("time").(string)
-		backupWeekdays := expandBackupWeekdays(d, "weekdays")
+		backupWeekdays := expandBackupWeekdays(d, "days_of_week")
 		connect := d.Get("connect").(string)
 		return &iaas.DatabaseSettingBackupv2{
 			Time:      backupTime,
@@ -195,9 +195,9 @@ func flattenDatabaseBackupSetting(db *iaas.Database) []interface{} {
 func flattenDatabaseBackupv2Setting(db *iaas.Database) []interface{} {
 	if db.Backupv2Setting != nil {
 		setting := map[string]interface{}{
-			"time":     db.Backupv2Setting.Time,
-			"weekdays": flattenBackupWeekdays(db.Backupv2Setting.DayOfWeek),
-			"connect":  db.Backupv2Setting.Connect,
+			"time":         db.Backupv2Setting.Time,
+			"days_of_week": flattenBackupWeekdays(db.Backupv2Setting.DayOfWeek),
+			"connect":      db.Backupv2Setting.Connect,
 		}
 		return []interface{}{setting}
 	}

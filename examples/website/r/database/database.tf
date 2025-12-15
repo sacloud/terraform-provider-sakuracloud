@@ -28,9 +28,9 @@ resource "sakuracloud_database" "foobar" {
 
   # continuous_backupを指定するときはdatabase_versionが必須
   # continuous_backup {
-  #   weekdays = ["mon", "tue"]
-  #   time     = "01:30"
-  #   connect  = "nfs://${sakuracloud_nfs.foobar.network_interface[0].ip_address}/export"
+  #   days_of_week = ["mon", "tue"]
+  #   time         = "01:30"
+  #   connect      = "nfs://${sakuracloud_nfs.foobar.network_interface[0].ip_address}/export"
   # }
 
   parameters = {
