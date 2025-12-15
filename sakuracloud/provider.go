@@ -34,25 +34,25 @@ func Provider() *schema.Provider {
 			"profile": {
 				Type:        schema.TypeString,
 				Optional:    true,
-				DefaultFunc: schema.EnvDefaultFunc("SAKURACLOUD_PROFILE", profile.DefaultProfileName),
+				DefaultFunc: schema.MultiEnvDefaultFunc([]string{"SAKURA_PROFILE", "SAKURACLOUD_PROFILE"}, profile.DefaultProfileName),
 				Description: "The profile name of your SakuraCloud account. Default:`default`",
 			},
 			"token": {
 				Type:        schema.TypeString,
 				Optional:    true,
-				DefaultFunc: schema.EnvDefaultFunc("SAKURACLOUD_ACCESS_TOKEN", nil),
+				DefaultFunc: schema.MultiEnvDefaultFunc([]string{"SAKURA_ACCESS_TOKEN", "SAKURACLOUD_ACCESS_TOKEN"}, nil),
 				Description: "The API token of your SakuraCloud account. It must be provided, but it can also be sourced from the `SAKURACLOUD_ACCESS_TOKEN` environment variables, or via a shared credentials file if `profile` is specified",
 			},
 			"secret": {
 				Type:        schema.TypeString,
 				Optional:    true,
-				DefaultFunc: schema.EnvDefaultFunc("SAKURACLOUD_ACCESS_TOKEN_SECRET", nil),
+				DefaultFunc: schema.MultiEnvDefaultFunc([]string{"SAKURA_ACCESS_TOKEN_SECRET", "SAKURACLOUD_ACCESS_TOKEN_SECRET"}, nil),
 				Description: "The API secret of your SakuraCloud account. It must be provided, but it can also be sourced from the `SAKURACLOUD_ACCESS_TOKEN_SECRET` environment variables, or via a shared credentials file if `profile` is specified",
 			},
 			"zone": {
 				Type:        schema.TypeString,
 				Optional:    true,
-				DefaultFunc: schema.MultiEnvDefaultFunc([]string{"SAKURACLOUD_ZONE"}, defaults.Zone),
+				DefaultFunc: schema.MultiEnvDefaultFunc([]string{"SAKURA_ZONE", "SAKURACLOUD_ZONE"}, defaults.Zone),
 				Description: "The name of zone to use as default. It must be provided, but it can also be sourced from the `SAKURACLOUD_ZONE` environment variables, or via a shared credentials file if `profile` is specified",
 			},
 			"zones": {
@@ -64,44 +64,44 @@ func Provider() *schema.Provider {
 			"default_zone": {
 				Type:        schema.TypeString,
 				Optional:    true,
-				DefaultFunc: schema.MultiEnvDefaultFunc([]string{"SAKURACLOUD_DEFAULT_ZONE"}, nil),
+				DefaultFunc: schema.MultiEnvDefaultFunc([]string{"SAKURA_DEFAULT_ZONE", "SAKURACLOUD_DEFAULT_ZONE"}, nil),
 				Description: "The name of zone to use as default for global resources. It must be provided, but it can also be sourced from the `SAKURACLOUD_DEFAULT_ZONE` environment variables, or via a shared credentials file if `profile` is specified",
 			},
 			"accept_language": {
 				Type:        schema.TypeString,
 				Optional:    true,
-				DefaultFunc: schema.MultiEnvDefaultFunc([]string{"SAKURACLOUD_ACCEPT_LANGUAGE"}, ""),
+				DefaultFunc: schema.MultiEnvDefaultFunc([]string{"SAKURA_ACCEPT_LANGUAGE", "SAKURACLOUD_ACCEPT_LANGUAGE"}, ""),
 				Description: "The value of AcceptLanguage header used when calling SakuraCloud API. It can also be sourced from the `SAKURACLOUD_ACCEPT_LANGUAGE` environment variables, or via a shared credentials file if `profile` is specified",
 			},
 			"api_root_url": {
 				Type:        schema.TypeString,
 				Optional:    true,
-				DefaultFunc: schema.MultiEnvDefaultFunc([]string{"SAKURACLOUD_API_ROOT_URL"}, ""),
+				DefaultFunc: schema.MultiEnvDefaultFunc([]string{"SAKURA_API_ROOT_URL", "SAKURACLOUD_API_ROOT_URL"}, ""),
 				Description: "The root URL of SakuraCloud API. It can also be sourced from the `SAKURACLOUD_API_ROOT_URL` environment variables, or via a shared credentials file if `profile` is specified. Default:`https://secure.sakura.ad.jp/cloud/zone`",
 			},
 			"retry_max": {
 				Type:             schema.TypeInt,
 				Optional:         true,
-				DefaultFunc:      schema.MultiEnvDefaultFunc([]string{"SAKURACLOUD_RETRY_MAX"}, defaults.RetryMax),
+				DefaultFunc:      schema.MultiEnvDefaultFunc([]string{"SAKURA_RETRY_MAX", "SAKURACLOUD_RETRY_MAX"}, defaults.RetryMax),
 				ValidateDiagFunc: validation.ToDiagFunc(validation.IntBetween(0, 100)),
 				Description:      "The maximum number of API call retries used when SakuraCloud API returns status code `423` or `503`. It can also be sourced from the `SAKURACLOUD_RETRY_MAX` environment variables, or via a shared credentials file if `profile` is specified. Default:`100`",
 			},
 			"retry_wait_max": {
 				Type:        schema.TypeInt,
 				Optional:    true,
-				DefaultFunc: schema.MultiEnvDefaultFunc([]string{"SAKURACLOUD_RETRY_WAIT_MAX"}, 0),
+				DefaultFunc: schema.MultiEnvDefaultFunc([]string{"SAKURA_RETRY_WAIT_MAX", "SAKURACLOUD_RETRY_WAIT_MAX"}, 0),
 				Description: "The maximum wait interval(in seconds) for retrying API call used when SakuraCloud API returns status code `423` or `503`.  It can also be sourced from the `SAKURACLOUD_RETRY_WAIT_MAX` environment variables, or via a shared credentials file if `profile` is specified",
 			},
 			"retry_wait_min": {
 				Type:        schema.TypeInt,
 				Optional:    true,
-				DefaultFunc: schema.MultiEnvDefaultFunc([]string{"SAKURACLOUD_RETRY_WAIT_MIN"}, 0),
+				DefaultFunc: schema.MultiEnvDefaultFunc([]string{"SAKURA_RETRY_WAIT_MIN", "SAKURACLOUD_RETRY_WAIT_MIN"}, 0),
 				Description: "The minimum wait interval(in seconds) for retrying API call used when SakuraCloud API returns status code `423` or `503`. It can also be sourced from the `SAKURACLOUD_RETRY_WAIT_MIN` environment variables, or via a shared credentials file if `profile` is specified",
 			},
 			"api_request_timeout": {
 				Type:        schema.TypeInt,
 				Optional:    true,
-				DefaultFunc: schema.MultiEnvDefaultFunc([]string{"SAKURACLOUD_API_REQUEST_TIMEOUT"}, defaults.APIRequestTimeout),
+				DefaultFunc: schema.MultiEnvDefaultFunc([]string{"SAKURA_API_REQUEST_TIMEOUT", "SAKURACLOUD_API_REQUEST_TIMEOUT"}, defaults.APIRequestTimeout),
 				Description: desc.Sprintf(
 					"The timeout seconds for each SakuraCloud API call. It can also be sourced from the `SAKURACLOUD_API_REQUEST_TIMEOUT` environment variables, or via a shared credentials file if `profile` is specified. Default:`%d`",
 					defaults.APIRequestTimeout,
@@ -110,7 +110,7 @@ func Provider() *schema.Provider {
 			"api_request_rate_limit": {
 				Type:             schema.TypeInt,
 				Optional:         true,
-				DefaultFunc:      schema.MultiEnvDefaultFunc([]string{"SAKURACLOUD_RATE_LIMIT"}, defaults.APIRequestRateLimit),
+				DefaultFunc:      schema.MultiEnvDefaultFunc([]string{"SAKURA_RATE_LIMIT", "SAKURACLOUD_RATE_LIMIT"}, defaults.APIRequestRateLimit),
 				ValidateDiagFunc: validation.ToDiagFunc(validation.IntBetween(1, 10)),
 				Description: desc.Sprintf(
 					"The maximum number of SakuraCloud API calls per second. It can also be sourced from the `SAKURACLOUD_RATE_LIMIT` environment variables, or via a shared credentials file if `profile` is specified. Default:`%d`",
@@ -120,7 +120,7 @@ func Provider() *schema.Provider {
 			"trace": {
 				Type:        schema.TypeString,
 				Optional:    true,
-				DefaultFunc: schema.MultiEnvDefaultFunc([]string{"SAKURACLOUD_TRACE", "SAKURACLOUD_TRACE_MODE"}, ""),
+				DefaultFunc: schema.MultiEnvDefaultFunc([]string{"SAKURA_TRACE", "SAKURACLOUD_TRACE", "SAKURACLOUD_TRACE_MODE"}, ""),
 				Description: "The flag to enable output trace log. It can also be sourced from the `SAKURACLOUD_TRACE` environment variables, or via a shared credentials file if `profile` is specified",
 			},
 			"fake_mode": {

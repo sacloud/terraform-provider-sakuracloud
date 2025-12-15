@@ -17,10 +17,14 @@ package sakuracloud
 import (
 	"context"
 	"os"
+	"reflect"
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-go/tfprotov5"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
+	"github.com/sacloud/api-client-go/profile"
+	"github.com/sacloud/packages-go/envvar"
+	"github.com/sacloud/terraform-provider-sakuracloud/internal/defaults"
 )
 
 var testAccProviderFactories map[string]func() (*schema.Provider, error)
@@ -58,35 +62,178 @@ func TestProvider(t *testing.T) {
 	}
 }
 
+func TestProviderSchema(t *testing.T) {
+	provider := Provider()
+
+	tests := []struct {
+		fieldName  string
+		oldEnvName string
+		oldEnvVal  string
+		newEnvName string
+		newEnvVal  string
+		defaultVal string
+	}{
+		{
+			fieldName:  "profile",
+			oldEnvName: "SAKURACLOUD_PROFILE",
+			oldEnvVal:  "foo",
+			newEnvName: "SAKURA_PROFILE",
+			newEnvVal:  "bar",
+			defaultVal: profile.DefaultProfileName,
+		},
+		{
+			fieldName:  "token",
+			oldEnvName: "SAKURACLOUD_ACCESS_TOKEN",
+			oldEnvVal:  "foo",
+			newEnvName: "SAKURA_ACCESS_TOKEN",
+			newEnvVal:  "bar",
+		},
+		{
+			fieldName:  "secret",
+			oldEnvName: "SAKURACLOUD_ACCESS_TOKEN_SECRET",
+			oldEnvVal:  "foo",
+			newEnvName: "SAKURA_ACCESS_TOKEN_SECRET",
+			newEnvVal:  "bar",
+		},
+		{
+			fieldName:  "zone",
+			oldEnvName: "SAKURACLOUD_ZONE",
+			oldEnvVal:  "foo",
+			newEnvName: "SAKURA_ZONE",
+			newEnvVal:  "bar",
+			defaultVal: defaults.Zone,
+		},
+		{
+			fieldName:  "default_zone",
+			oldEnvName: "SAKURACLOUD_DEFAULT_ZONE",
+			oldEnvVal:  "foo",
+			newEnvName: "SAKURA_DEFAULT_ZONE",
+			newEnvVal:  "bar",
+		},
+		{
+			fieldName:  "accept_language",
+			oldEnvName: "SAKURACLOUD_ACCEPT_LANGUAGE",
+			oldEnvVal:  "foo",
+			newEnvName: "SAKURA_ACCEPT_LANGUAGE",
+			newEnvVal:  "bar",
+		},
+		{
+			fieldName:  "api_root_url",
+			oldEnvName: "SAKURACLOUD_API_ROOT_URL",
+			oldEnvVal:  "foo",
+			newEnvName: "SAKURA_API_ROOT_URL",
+			newEnvVal:  "bar",
+		},
+	}
+	for _, tt := range tests {
+		cleanup := func() {
+			os.Unsetenv(tt.oldEnvName) //nolint:errcheck
+			os.Unsetenv(tt.newEnvName) //nolint:errcheck
+		}
+
+		field, ok := provider.Schema[tt.fieldName]
+		if !ok {
+			t.Fatalf("field %s not found in provider schema", tt.fieldName)
+		}
+
+		t.Run("only old env is set", func(t *testing.T) {
+			cleanup()
+
+			if err := os.Setenv(tt.oldEnvName, tt.oldEnvVal); err != nil {
+				t.Fatalf("setting env failed: %s", err)
+			}
+
+			value, err := field.DefaultValue()
+			if err != nil {
+				t.Fatal(err)
+			}
+			if !reflect.DeepEqual(value, tt.oldEnvVal) {
+				t.Errorf("expected %v, got %v", tt.oldEnvVal, value)
+			}
+		})
+		t.Run("only new env is set", func(t *testing.T) {
+			cleanup()
+
+			if err := os.Setenv(tt.newEnvName, tt.newEnvVal); err != nil {
+				t.Fatalf("setting env failed: %s", err)
+			}
+
+			value, err := field.DefaultValue()
+			if err != nil {
+				t.Fatal(err)
+			}
+			if !reflect.DeepEqual(value, tt.newEnvVal) {
+				t.Errorf("expected %v, got %v", tt.newEnvVal, value)
+			}
+		})
+		t.Run("both of old and new are set", func(t *testing.T) {
+			cleanup()
+
+			if err := os.Setenv(tt.oldEnvName, tt.oldEnvVal); err != nil {
+				t.Fatalf("setting env failed: %s", err)
+			}
+			if err := os.Setenv(tt.newEnvName, tt.newEnvVal); err != nil {
+				t.Fatalf("setting env failed: %s", err)
+			}
+
+			value, err := field.DefaultValue()
+			if err != nil {
+				t.Fatal(err)
+			}
+			if !reflect.DeepEqual(value, tt.newEnvVal) {
+				t.Errorf("expected %v, got %v", tt.newEnvVal, value)
+			}
+		})
+		t.Run("both of old and new are empty", func(t *testing.T) {
+			cleanup()
+
+			value, err := field.DefaultValue()
+			if err != nil {
+				t.Fatal(err)
+			}
+
+			if value == nil {
+				value = ""
+			}
+
+			if !reflect.DeepEqual(value, tt.defaultVal) {
+				t.Errorf("expected %v, got %v", tt.newEnvVal, value)
+			}
+		})
+	}
+}
+
 func testAccPreCheck(t *testing.T) {
-	requiredEnvs := []string{
-		"SAKURACLOUD_ACCESS_TOKEN",
-		"SAKURACLOUD_ACCESS_TOKEN_SECRET",
+	requiredEnvs := [][]string{
+		{"SAKURA_ACCESS_TOKEN", "SAKURACLOUD_ACCESS_TOKEN"},
+		{"SAKURA_ACCESS_TOKEN_SECRET", "SAKURACLOUD_ACCESS_TOKEN_SECRET"},
 	}
 
 	if isFakeModeEnabled() {
-		for _, env := range requiredEnvs {
-			if err := os.Setenv(env, "dummy"); err != nil {
-				t.Fatalf("setting up dummy environment variables is failed: %s", err)
+		for _, envs := range requiredEnvs {
+			for _, env := range envs {
+				if err := os.Setenv(env, "dummy"); err != nil {
+					t.Fatalf("setting up dummy environment variables is failed: %s", err)
+				}
 			}
 		}
 	} else {
-		for _, env := range requiredEnvs {
-			if v := os.Getenv(env); v == "" {
-				t.Fatalf("%s must be set for acceptance tests", env)
+		for _, envs := range requiredEnvs {
+			if v := envvar.StringFromEnvMulti(envs, ""); v == "" {
+				t.Fatalf("%s must be set for acceptance tests", envs)
 			}
 		}
 	}
 
-	if v := os.Getenv("SAKURACLOUD_ZONE"); v == "" {
-		os.Setenv("SAKURACLOUD_ZONE", testDefaultTargetZone) //nolint:errcheck,gosec
+	if v := envvar.StringFromEnvMulti([]string{"SAKURA_ZONE", "SAKURACLOUD_ZONE"}, ""); v == "" {
+		os.Setenv("SAKURAD_ZONE", testDefaultTargetZone) //nolint:errcheck,gosec
 	}
 
-	if v := os.Getenv("SAKURACLOUD_RETRY_MAX"); v == "" {
-		os.Setenv("SAKURACLOUD_RETRY_MAX", testDefaultAPIRetryMax) //nolint:errcheck,gosec
+	if v := envvar.StringFromEnvMulti([]string{"SAKURA_RETRY_MAX", "SAKURACLOUD_RETRY_MAX"}, ""); v == "" {
+		os.Setenv("SAKURA_RETRY_MAX", testDefaultAPIRetryMax) //nolint:errcheck,gosec
 	}
 
-	if v := os.Getenv("SAKURACLOUD_RATE_LIMIT"); v == "" {
-		os.Setenv("SAKURACLOUD_RATE_LIMIT", testDefaultAPIRateLimit) //nolint:errcheck,gosec
+	if v := envvar.StringFromEnvMulti([]string{"SAKURA_RATE_LIMIT", "SAKURACLOUD_RATE_LIMIT"}, ""); v == "" {
+		os.Setenv("SAKURA_RATE_LIMIT", testDefaultAPIRateLimit) //nolint:errcheck,gosec
 	}
 }
