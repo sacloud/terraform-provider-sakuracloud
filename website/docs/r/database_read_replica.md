@@ -13,14 +13,25 @@ Manages a SakuraCloud Database Read Replica.
 ## Example Usage
 
 ```hcl
+resource "sakuracloud_kms" "foobar" {
+  name = "foobar"
+}
+
 resource "sakuracloud_database_read_replica" "foobar" {
-  master_id    = data.sakuracloud_database.master.id
+  master_id   = data.sakuracloud_database.master.id
+
   network_interface {
-    ip_address   = "192.168.11.111"
+    ip_address  = "192.168.11.111"
   }
-  name         = "foobar"
-  description  = "description"
-  tags         = ["tag1", "tag2"]
+
+  disk {
+    encryption_algorithm = "aes256_xts"
+    kms_key_id           = sakuracloud_kms.foobar.id
+  }
+
+  name        = "foobar"
+  description = "description"
+  tags        = ["tag1", "tag2"]
 }
 
 data sakuracloud_database "master" {
@@ -28,12 +39,24 @@ data sakuracloud_database "master" {
     names = ["master-database-name"]
   }
 }
+
 ```
 
 ## Argument Reference
 
 * `name` - (Required) The name of the read-replica database. The length of this value must be in the range [`1`-`64`].
 * `master_id` - (Required) The id of the replication master database. Changing this forces a new resource to be created.
+
+#### Disk
+
+* `disk` - (Optional) A `disk` block as defined below. Changing this forces a new resource to be created.
+
+---
+
+A `disk` block supports the following:
+
+* `encryption_algorithm` - (Optional) The disk encryption algorithm. This must be one of [`none`/`aes256_xts`].
+* `kms_key_id` - (Optional) ID of the KMS key for encryption.
 
 #### Network
 

@@ -47,15 +47,18 @@ A `condition` block supports the following:
 
 * `id` - The id of the Database.
 * `backup` - A list of `backup` blocks as defined below.
+* `continuous_backup` - A list of `continuous_backup` blocks as defined below.
 * `database_type` - The type of the database. This will be one of [`mariadb`/`postgres`].
+* `database_version` - The version of the database.
 * `description` - The description of the Database.
+* `disk` - A list of `disk` blocks as defined below.
 * `icon_id` - The icon id attached to the Database.
+* `monitoring_suite` - A list of `monitoring_suite` blocks as defined below.
 * `name` - The name of the Database.
 * `network_interface` - A list of `network_interface` blocks as defined below.
 * `parameters` - The map for setting RDBMS-specific parameters. Valid keys can be found with the `usacloud database list-parameters` command.
 * `password` - The password of default user on the database.
 * `plan` - The plan name of the Database. This will be one of [`10g`/`30g`/`90g`/`240g`/`500g`/`1t`].
-* `port` - The number of the listening port.
 * `replica_password` - The password of user that processing a replication.
 * `replica_user` - The name of user that processing a replication.
 * `tags` - Any tags assigned to the Database.
@@ -67,6 +70,27 @@ A `backup` block exports the following:
 
 * `time` - The time to take backup. This will be formatted with `HH:mm`.
 * `weekdays` - The list of name of weekday that doing backup. This will be in [`sun`/`mon`/`tue`/`wed`/`thu`/`fri`/`sat`].
+
+---
+
+A `continuous_backup` block exports the following:
+
+* `connect` - NFS server address for storing backups (e.g., `nfs://192.0.2.1/export`).
+* `time` - The time to take backup. This must be formatted with `HH:mm`.
+* `days_of_week` - The list of name of weekday that doing backup. This will be in [`sun`/`mon`/`tue`/`wed`/`thu`/`fri`/`sat`].
+
+---
+
+A `disk` block exports the following:
+
+* `encryption_algorithm` - The disk encryption algorithm. This must be one of [`none`/`aes256_xts`].
+* `kms_key_id` - ID of the KMS key for encryption.
+
+---
+
+A `monitoring_suite` block exports the following:
+
+* `enabled` - Enable sending signals to Monitoring Suite.
 
 ---
 

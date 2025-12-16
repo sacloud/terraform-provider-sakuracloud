@@ -106,6 +106,68 @@ func dataSourceSakuraCloudDatabase() *schema.Resource {
 					},
 				},
 			},
+			"continuous_backup": {
+				Type:     schema.TypeList,
+				Computed: true,
+				Elem: &schema.Resource{
+					Schema: map[string]*schema.Schema{
+						"days_of_week": {
+							Type:     schema.TypeSet,
+							Computed: true,
+							Elem:     &schema.Schema{Type: schema.TypeString},
+							Set:      schema.HashString,
+							Description: desc.Sprintf(
+								"The list of name of weekday that doing backup. This will be in [%s]",
+								types.DaysOfTheWeekStrings,
+							),
+						},
+						"time": {
+							Type:        schema.TypeString,
+							Computed:    true,
+							Description: "The time to take backup. This must be formatted with `HH:mm`",
+						},
+						"connect": {
+							Type:        schema.TypeString,
+							Computed:    true,
+							Description: "NFS server address for storing backups (e.g., `nfs://192.0.2.1/export`)",
+						},
+					},
+				},
+			},
+			"monitoring_suite": {
+				Type:     schema.TypeList,
+				Computed: true,
+				Elem: &schema.Resource{
+					Schema: map[string]*schema.Schema{
+						"enabled": {
+							Type:        schema.TypeBool,
+							Computed:    true,
+							Description: "Enable sending signals to Monitoring Suite",
+						},
+					},
+				},
+			},
+			"disk": {
+				Type:     schema.TypeList,
+				Computed: true,
+				Elem: &schema.Resource{
+					Schema: map[string]*schema.Schema{
+						"encryption_algorithm": {
+							Type:     schema.TypeString,
+							Computed: true,
+							Description: desc.Sprintf(
+								"The disk encryption algorithm. This must be one of [%s]",
+								types.DiskEncryptionAlgorithmStrings,
+							),
+						},
+						"kms_key_id": {
+							Type:        schema.TypeString,
+							Computed:    true,
+							Description: "ID of the KMS key for encryption",
+						},
+					},
+				},
+			},
 			"parameters": {
 				Type: schema.TypeMap,
 				Elem: &schema.Schema{

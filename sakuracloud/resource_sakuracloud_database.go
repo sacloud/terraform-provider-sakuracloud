@@ -149,11 +149,14 @@ func resourceSakuraCloudDatabase() *schema.Resource {
 				Optional: true,
 				MinItems: 1,
 				MaxItems: 1,
+				ConflictsWith: []string{
+					"continuous_backup",
+				},
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
 						"weekdays": {
 							Type:     schema.TypeSet,
-							Optional: true,
+							Required: true,
 							Elem:     &schema.Schema{Type: schema.TypeString},
 							Set:      schema.HashString,
 							Description: desc.Sprintf(
@@ -163,9 +166,89 @@ func resourceSakuraCloudDatabase() *schema.Resource {
 						},
 						"time": {
 							Type:             schema.TypeString,
-							Optional:         true,
+							Required:         true,
 							ValidateDiagFunc: validateBackupTime(),
 							Description:      "The time to take backup. This must be formatted with `HH:mm`",
+						},
+					},
+				},
+			},
+			"continuous_backup": {
+				Type:     schema.TypeList,
+				Optional: true,
+				MinItems: 1,
+				MaxItems: 1,
+				ConflictsWith: []string{
+					"backup",
+				},
+				Description: "This field can only be specified when `database_version` is provided",
+				Elem: &schema.Resource{
+					Schema: map[string]*schema.Schema{
+						"days_of_week": {
+							Type:     schema.TypeSet,
+							Required: true,
+							Elem:     &schema.Schema{Type: schema.TypeString},
+							Set:      schema.HashString,
+							Description: desc.Sprintf(
+								"A list of weekdays to backed up. The values in the list must be in [%s]",
+								types.DaysOfTheWeekStrings,
+							),
+						},
+						"time": {
+							Type:             schema.TypeString,
+							Required:         true,
+							ValidateDiagFunc: validateBackupTime(),
+							Description:      "The time to take backup. This must be formatted with `HH:mm`",
+						},
+						"connect": {
+							Type:        schema.TypeString,
+							Required:    true,
+							Description: "NFS server address for storing backups (e.g., `nfs://192.0.2.1/export`)",
+						},
+					},
+				},
+			},
+			"monitoring_suite": {
+				Type:     schema.TypeList,
+				Optional: true,
+				Computed: true,
+				MaxItems: 1,
+				Elem: &schema.Resource{
+					Schema: map[string]*schema.Schema{
+						"enabled": {
+							Type:        schema.TypeBool,
+							Optional:    true,
+							Computed:    true,
+							Description: "Enable sending signals to Monitoring Suite",
+						},
+					},
+				},
+			},
+			"disk": {
+				Type:     schema.TypeList,
+				ForceNew: true,
+				Optional: true,
+				Computed: true,
+				MaxItems: 1,
+				Elem: &schema.Resource{
+					Schema: map[string]*schema.Schema{
+						"encryption_algorithm": {
+							Type:             schema.TypeString,
+							ForceNew:         true,
+							Optional:         true,
+							Default:          types.DiskEncryptionAlgorithms.None,
+							ValidateDiagFunc: validation.ToDiagFunc(validation.StringInSlice(types.DiskEncryptionAlgorithmStrings, false)),
+							Description: desc.Sprintf(
+								"The disk encryption algorithm. This must be one of [%s]",
+								types.DiskEncryptionAlgorithmStrings,
+							),
+						},
+						"kms_key_id": {
+							Type:             schema.TypeString,
+							ForceNew:         true,
+							Optional:         true,
+							ValidateDiagFunc: validation.ToDiagFunc(validateSakuracloudIDType),
+							Description:      "ID of the KMS key for encryption",
 						},
 					},
 				},
@@ -304,6 +387,18 @@ func setDatabaseResourceData(ctx context.Context, d *schema.ResourceData, client
 	if err := d.Set("backup", flattenDatabaseBackupSetting(data)); err != nil {
 		return diag.FromErr(err)
 	}
+	if err := d.Set("continuous_backup", flattenDatabaseBackupv2Setting(data)); err != nil {
+		return diag.FromErr(err)
+	}
+
+	if err := d.Set("monitoring_suite", flattenDatabaseMonitoringSuite(data)); err != nil {
+		return diag.FromErr(err)
+	}
+
+	if err := d.Set("disk", flattenDatabaseDisk(data)); err != nil {
+		return diag.FromErr(err)
+	}
+
 	if err := d.Set("tags", flattenDatabaseTags(data)); err != nil {
 		return diag.FromErr(err)
 	}
