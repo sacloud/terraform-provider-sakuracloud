@@ -22,7 +22,6 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-go/tfprotov5"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
-	"github.com/sacloud/api-client-go/profile"
 	"github.com/sacloud/packages-go/envvar"
 	"github.com/sacloud/terraform-provider-sakuracloud/internal/defaults"
 )
@@ -79,7 +78,7 @@ func TestProviderSchema(t *testing.T) {
 			oldEnvVal:  "foo",
 			newEnvName: "SAKURA_PROFILE",
 			newEnvVal:  "bar",
-			defaultVal: profile.DefaultProfileName,
+			defaultVal: "",
 		},
 		{
 			fieldName:  "token",
