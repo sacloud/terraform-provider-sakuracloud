@@ -105,7 +105,11 @@ func (c *APIClient) checkReferencedOption() query.CheckReferencedOption {
 
 func (c *Config) loadFromProfile() error {
 	if c.Profile == "" {
-		c.Profile = profile.DefaultProfileName
+		current, err := profile.CurrentName()
+		if err != nil {
+			return fmt.Errorf("loading current profile name failed")
+		}
+		c.Profile = current
 	}
 	if c.Profile != profile.DefaultProfileName {
 		log.Printf("[DEBUG] using profile %q", c.Profile)

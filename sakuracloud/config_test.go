@@ -92,14 +92,15 @@ func TestConfig_NewClient_loadFromProfile(t *testing.T) {
 	// プロファイル指定あり 通常
 
 	cases := []struct {
-		scenario string
-		in       *Config
-		profiles map[string]*profile.ConfigValue
-		expect   *Config
-		err      error
+		scenario       string
+		in             *Config
+		profiles       map[string]*profile.ConfigValue
+		expect         *Config
+		currentProfile string
+		err            error
 	}{
 		{
-			scenario: "ProfileName is not specified and Profile is not exists",
+			scenario: "If profileName is not specified and profile is not exists, use default values",
 			in: &Config{
 				Profile:             "",
 				Zone:                defaults.Zone,
@@ -116,6 +117,65 @@ func TestConfig_NewClient_loadFromProfile(t *testing.T) {
 				RetryMax:            defaults.RetryMax,
 				APIRequestTimeout:   defaults.APIRequestTimeout,
 				APIRequestRateLimit: defaults.APIRequestRateLimit,
+			},
+		},
+		{
+			scenario: "If no profile is specified and a current profile exists, it is loaded from the current profile",
+			in: &Config{
+				Profile: "",
+			},
+			profiles: map[string]*profile.ConfigValue{
+				"default": defaultProfile,
+				"test":    testProfile,
+			},
+			currentProfile: "test",
+			expect: &Config{
+				Profile:             "test",
+				AccessToken:         testProfile.AccessToken,
+				AccessTokenSecret:   testProfile.AccessTokenSecret,
+				Zone:                testProfile.Zone,
+				Zones:               testProfile.Zones,
+				TraceMode:           testProfile.TraceMode,
+				FakeMode:            "",
+				FakeStorePath:       testProfile.FakeStorePath,
+				AcceptLanguage:      testProfile.AcceptLanguage,
+				APIRootURL:          testProfile.APIRootURL,
+				RetryMax:            testProfile.RetryMax,
+				RetryWaitMin:        testProfile.RetryWaitMin,
+				RetryWaitMax:        testProfile.RetryWaitMax,
+				APIRequestTimeout:   testProfile.HTTPRequestTimeout,
+				APIRequestRateLimit: testProfile.HTTPRequestRateLimit,
+			},
+		},
+		{
+			scenario: "Values in the config are not overridden by the profile",
+			in: &Config{
+				Profile:           "",
+				AccessToken:       "token",
+				AccessTokenSecret: "secret",
+				Zone:              "is1c",
+			},
+			profiles: map[string]*profile.ConfigValue{
+				"default": defaultProfile,
+				"test":    testProfile,
+			},
+			currentProfile: "test",
+			expect: &Config{
+				Profile:             "test",
+				AccessToken:         "token",
+				AccessTokenSecret:   "secret",
+				Zone:                "is1c",
+				Zones:               testProfile.Zones,
+				TraceMode:           testProfile.TraceMode,
+				FakeMode:            "",
+				FakeStorePath:       testProfile.FakeStorePath,
+				AcceptLanguage:      testProfile.AcceptLanguage,
+				APIRootURL:          testProfile.APIRootURL,
+				RetryMax:            testProfile.RetryMax,
+				RetryWaitMin:        testProfile.RetryWaitMin,
+				RetryWaitMax:        testProfile.RetryWaitMax,
+				APIRequestTimeout:   testProfile.HTTPRequestTimeout,
+				APIRequestRateLimit: testProfile.HTTPRequestRateLimit,
 			},
 		},
 		{
@@ -269,6 +329,14 @@ func TestConfig_NewClient_loadFromProfile(t *testing.T) {
 				if err := profile.Save(profileName, profileValue); err != nil {
 					t.Fatal(err)
 				}
+			}
+
+			currentProfile := tt.currentProfile
+			if tt.currentProfile == "" {
+				currentProfile = profile.DefaultProfileName
+			}
+			if err := profile.SetCurrentName(currentProfile); err != nil {
+				t.Fatal(err)
 			}
 
 			err := tt.in.loadFromProfile()

@@ -20,7 +20,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
-	"github.com/sacloud/api-client-go/profile"
 	"github.com/sacloud/packages-go/envvar"
 	"github.com/sacloud/packages-go/mutexkv"
 	"github.com/sacloud/terraform-provider-sakuracloud/internal/defaults"
@@ -34,19 +33,19 @@ func Provider() *schema.Provider {
 			"profile": {
 				Type:        schema.TypeString,
 				Optional:    true,
-				DefaultFunc: schema.MultiEnvDefaultFunc([]string{"SAKURA_PROFILE", "SAKURACLOUD_PROFILE"}, profile.DefaultProfileName),
-				Description: "The profile name of your SakuraCloud account. Default:`default`",
+				DefaultFunc: schema.MultiEnvDefaultFunc([]string{"SAKURA_PROFILE", "SAKURACLOUD_PROFILE"}, ""),
+				Description: "The profile name of your SakuraCloud account. Use the current profile when this field is empty and a current profile is specified in usacloud profile",
 			},
 			"token": {
 				Type:        schema.TypeString,
 				Optional:    true,
-				DefaultFunc: schema.MultiEnvDefaultFunc([]string{"SAKURA_ACCESS_TOKEN", "SAKURACLOUD_ACCESS_TOKEN"}, nil),
+				DefaultFunc: schema.MultiEnvDefaultFunc([]string{"SAKURA_ACCESS_TOKEN", "SAKURACLOUD_ACCESS_TOKEN"}, ""),
 				Description: "The API token of your SakuraCloud account. It must be provided, but it can also be sourced from the `SAKURACLOUD_ACCESS_TOKEN` environment variables, or via a shared credentials file if `profile` is specified",
 			},
 			"secret": {
 				Type:        schema.TypeString,
 				Optional:    true,
-				DefaultFunc: schema.MultiEnvDefaultFunc([]string{"SAKURA_ACCESS_TOKEN_SECRET", "SAKURACLOUD_ACCESS_TOKEN_SECRET"}, nil),
+				DefaultFunc: schema.MultiEnvDefaultFunc([]string{"SAKURA_ACCESS_TOKEN_SECRET", "SAKURACLOUD_ACCESS_TOKEN_SECRET"}, ""),
 				Description: "The API secret of your SakuraCloud account. It must be provided, but it can also be sourced from the `SAKURACLOUD_ACCESS_TOKEN_SECRET` environment variables, or via a shared credentials file if `profile` is specified",
 			},
 			"zone": {
@@ -64,7 +63,7 @@ func Provider() *schema.Provider {
 			"default_zone": {
 				Type:        schema.TypeString,
 				Optional:    true,
-				DefaultFunc: schema.MultiEnvDefaultFunc([]string{"SAKURA_DEFAULT_ZONE", "SAKURACLOUD_DEFAULT_ZONE"}, nil),
+				DefaultFunc: schema.MultiEnvDefaultFunc([]string{"SAKURA_DEFAULT_ZONE", "SAKURACLOUD_DEFAULT_ZONE"}, ""),
 				Description: "The name of zone to use as default for global resources. It must be provided, but it can also be sourced from the `SAKURACLOUD_DEFAULT_ZONE` environment variables, or via a shared credentials file if `profile` is specified",
 			},
 			"accept_language": {
