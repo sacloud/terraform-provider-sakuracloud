@@ -3,7 +3,7 @@ module github.com/sacloud/terraform-provider-sakuracloud
 go 1.25
 
 require (
-	github.com/goccy/go-yaml v1.18.0
+	github.com/goccy/go-yaml v1.19.1
 	github.com/hashicorp/go-cty v1.5.0
 	github.com/hashicorp/go-multierror v1.1.1
 	github.com/hashicorp/terraform-plugin-go v0.29.0
