@@ -61,7 +61,7 @@ func TestAccSakuraCloudAutoScale_basic(t *testing.T) {
 						"sakuracloud_icon.foobar", "id",
 					),
 					resource.TestCheckResourceAttr(resourceName, "zones.#", "1"),
-					resource.TestCheckResourceAttr(resourceName, "zones.0", "is1b"),
+					resource.TestCheckResourceAttr(resourceName, "zones.0", "is1c"),
 
 					resource.TestCheckResourceAttr(resourceName, "cpu_threshold_scaling.#", "1"),
 					resource.TestCheckResourceAttr(resourceName, "cpu_threshold_scaling.0.server_prefix", rand),
@@ -84,7 +84,7 @@ func TestAccSakuraCloudAutoScale_basic(t *testing.T) {
 					resource.TestCheckResourceAttr(resourceName, "icon_id", ""),
 
 					resource.TestCheckResourceAttr(resourceName, "zones.#", "1"),
-					resource.TestCheckResourceAttr(resourceName, "zones.0", "is1b"),
+					resource.TestCheckResourceAttr(resourceName, "zones.0", "is1c"),
 
 					resource.TestCheckResourceAttr(resourceName, "cpu_threshold_scaling.#", "1"),
 					resource.TestCheckResourceAttr(resourceName, "cpu_threshold_scaling.0.server_prefix", rand),
@@ -253,7 +253,7 @@ func TestAccImportSakuraCloudAutoScale_basic(t *testing.T) {
 			"description":                           "description",
 			"tags.0":                                "tag1",
 			"tags.1":                                "tag2",
-			"zones.0":                               "is1b",
+			"zones.0":                               "is1c",
 			"api_key_id":                            apiKeyId,
 			"cpu_threshold_scaling.0.server_prefix": rand,
 			"cpu_threshold_scaling.0.up":            "80",
@@ -295,7 +295,7 @@ var testAccSakuraCloudAutoScale_basic = `
 resource "sakuracloud_server" "foobar" {
   name = "{{ .arg0 }}"
   force_shutdown = true
-  zone = "is1b"
+  zone = "is1c"
 }
 
 resource "sakuracloud_auto_scale" "foobar" {
@@ -304,19 +304,20 @@ resource "sakuracloud_auto_scale" "foobar" {
   tags           = ["tag1", "tag2"]
   icon_id        = sakuracloud_icon.foobar.id
 
-  zones  = ["is1b"]
+  zones  = ["is1c"]
   config = yamlencode({
     resources: [{
       type: "Server",
       selector: {
         names: [sakuracloud_server.foobar.name],
-        zones: ["is1b"],
+        zones: ["is1c"],
       },
       shutdown_force: true,
     }],
   })
   api_key_id = "{{ .arg1 }}"
 
+  trigger_type = "cpu"
   cpu_threshold_scaling {
     server_prefix = "{{ .arg0 }}"
 
@@ -336,7 +337,7 @@ var testAccSakuraCloudAutoScale_encodedConfig = `"resources":
     "names":
     - "{{ .arg0 }}"
     "zones":
-    - "is1b"
+    - "is1c"
   "shutdown_force": true
   "type": "Server"
 `
@@ -345,7 +346,7 @@ var testAccSakuraCloudAutoScale_update = `
 resource "sakuracloud_server" "foobar" {
   name = "{{ .arg0 }}"
   force_shutdown = true
-  zone = "is1b"
+  zone = "is1c"
 }
 
 resource "sakuracloud_auto_scale" "foobar" {
@@ -353,13 +354,13 @@ resource "sakuracloud_auto_scale" "foobar" {
   description    = "description-upd"
   tags           = ["tag1-upd", "tag2-upd"]
 
-  zones  = ["is1b"]
+  zones  = ["is1c"]
   config = yamlencode({
     resources: [{
       type: "Server",
       selector: {
         names: [sakuracloud_server.foobar.name],
-        zones: ["is1b"],
+        zones: ["is1c"],
       },
       shutdown_force: true,
     }],
@@ -373,6 +374,7 @@ resource "sakuracloud_auto_scale" "foobar" {
 
   api_key_id = "{{ .arg1 }}"
 
+  trigger_type = "cpu"
   cpu_threshold_scaling {
     server_prefix = "{{ .arg0 }}"
 
@@ -391,7 +393,7 @@ var testAccSakuraCloudAutoScale_encodedConfig_update = `"autoscaler":
     "names":
     - "{{ .arg0 }}"
     "zones":
-    - "is1b"
+    - "is1c"
   "shutdown_force": true
   "type": "Server"
 `
@@ -399,19 +401,19 @@ var testAccSakuraCloudAutoScale_encodedConfig_update = `"autoscaler":
 var testAccSakuraCloudAutoScale_withRouter = `
 resource "sakuracloud_internet" "foobar" {
   name = "{{ .arg0 }}"
-  zone = "is1b"
+  zone = "is1c"
 }
 
 resource "sakuracloud_auto_scale" "foobar" {
   name           = "{{ .arg0 }}"
 
-  zones  = ["is1b"]
+  zones  = ["is1c"]
   config = yamlencode({
     resources: [{
       type: "Router",
       selector: {
         names: [sakuracloud_internet.foobar.name],
-        zones: ["is1b"],
+        zones: ["is1c"],
       },
     }],
   })
@@ -431,7 +433,7 @@ var testAccSakuraCloudAutoScale_encodedConfigWithRouter = `"resources":
     "names":
     - "{{ .arg0 }}"
     "zones":
-    - "is1b"
+    - "is1c"
   "type": "Router"
 `
 
@@ -439,19 +441,19 @@ var testAccSakuraCloudAutoScale_withScheduleTrigger = `
 resource "sakuracloud_server" "foobar" {
   name = "{{ .arg0 }}"
   force_shutdown = true
-  zone = "is1b"
+  zone = "is1c"
 }
 
 resource "sakuracloud_auto_scale" "foobar" {
   name           = "{{ .arg0 }}"
 
-  zones  = ["is1b"]
+  zones  = ["is1c"]
   config = yamlencode({
     resources: [{
       type: "Server",
       selector: {
         names: [sakuracloud_server.foobar.name],
-        zones: ["is1b"],
+        zones: ["is1c"],
       },
       shutdown_force: true,
     }],
