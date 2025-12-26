@@ -9,6 +9,14 @@
 - Documentation(ja): https://docs.usacloud.jp/terraform
 - Discord: https://discord.gg/yUEDN8hbMf
 
+> [!IMPORTANT]
+> さくらのクラウド向けTerraformプロバイダーはv3が最新となります。  
+> v2はメンテナンスモードに移行しており、新規の機能追加や大きな変更はまずv3で行われます。  
+> これからさくらのクラウド向けTerraformプロバイダーを利用される場合はv3をご利用ください。  
+> 
+> 詳細は以下のクラウドニュースを参照してください。  
+> https://cloud.sakura.ad.jp/news/2025/12/25/terraform-provider-sakura-v3/  
+
 ## Usage Example
 
 ```hcl
