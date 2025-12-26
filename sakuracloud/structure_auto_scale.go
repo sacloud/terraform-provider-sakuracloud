@@ -108,6 +108,14 @@ func expandAutoScaleDaysOfWeek(d resourceValueGettable) []types.EDayOfTheWeek {
 	return vs
 }
 
+func flattenAutoScaleDaysOfWeek(daysOfWeek []types.EDayOfTheWeek) *schema.Set {
+	set := &schema.Set{F: schema.HashString}
+	for _, w := range daysOfWeek {
+		set.Add(w.String())
+	}
+	return set
+}
+
 func flattenAutoScaleCPUThresholdScaling(v *iaas.AutoScaleCPUThresholdScaling) []interface{} {
 	if v != nil {
 		return []interface{}{
@@ -132,4 +140,19 @@ func flattenAutoScaleRouterThresholdScaling(v *iaas.AutoScaleRouterThresholdScal
 		}
 	}
 	return []interface{}{}
+}
+
+func flattenAutoScaleScheduleScaling(vs []*iaas.AutoScaleScheduleScaling) []interface{} {
+	var ret []any
+	for _, v := range vs {
+		ret = append(ret,
+			map[string]interface{}{
+				"action":       v.Action,
+				"hour":         v.Hour,
+				"minute":       v.Minute,
+				"days_of_week": flattenAutoScaleDaysOfWeek(v.DayOfWeek),
+			},
+		)
+	}
+	return ret
 }
