@@ -71,12 +71,12 @@ func resourceSakuraCloudAutoScale() *schema.Resource {
 			},
 			"trigger_type": {
 				Type:             schema.TypeString,
-				Optional:         true,
-				Computed:         true,
+				Required:         true,
+				ForceNew:         true,
 				ValidateDiagFunc: validation.ToDiagFunc(validation.StringInSlice([]string{"cpu", "router", "schedule"}, false)),
 				Description: desc.Sprintf(
 					"This must be one of [%s]",
-					[]string{"cpu", "router", "schedule"},
+					[]string{"cpu", "router", "schedule", "none"},
 				),
 			},
 			"router_threshold_scaling": {
@@ -275,6 +275,9 @@ func setAutoScaleResourceData(d *schema.ResourceData, client *APIClient, data *i
 		return diag.FromErr(err)
 	}
 	if err := d.Set("router_threshold_scaling", flattenAutoScaleRouterThresholdScaling(data.RouterThresholdScaling)); err != nil {
+		return diag.FromErr(err)
+	}
+	if err := d.Set("schedule_scaling", flattenAutoScaleScheduleScaling(data.ScheduleScaling)); err != nil {
 		return diag.FromErr(err)
 	}
 

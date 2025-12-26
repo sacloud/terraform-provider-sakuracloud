@@ -39,6 +39,7 @@ resource "sakuracloud_auto_scale" "foobar" {
   # APIキーのID
   api_key_id = local.api_key_id
 
+  trigger_type = "cpu"
   # しきい値
   cpu_threshold_scaling {
     # 監視対象のサーバ名のプリフィックス
@@ -69,7 +70,7 @@ resource "sakuracloud_server" "foobar" {
 * `router_threshold_scaling` - (Optional) A `router_threshold_scaling` block as defined below.
 * `schedule_scaling` - (Optional) One or more `schedule_scaling` blocks as defined below.
 * `tags` - (Optional) Any tags to assign to the AutoScale.
-* `trigger_type` - (Optional) This must be one of [`cpu`/`router`/`schedule`].
+* `trigger_type` - (Required) This must be one of [`cpu`/`router`/`schedule`/`none`].
 * `zones` - (Required) List of zone names where monitored resources are located.
 
 ---
