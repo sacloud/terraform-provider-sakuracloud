@@ -18,12 +18,12 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"os"
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
 	"github.com/sacloud/iaas-api-go"
+	"github.com/sacloud/packages-go/envvar"
 )
 
 func TestAccSakuraCloudLoadBalancer_basic(t *testing.T) {
@@ -218,7 +218,7 @@ func TestAccImportSakuraCloudLoadBalancer_basic(t *testing.T) {
 			"description":                        "description",
 			"tags.0":                             "tag1",
 			"tags.1":                             "tag2",
-			"zone":                               os.Getenv("SAKURACLOUD_ZONE"),
+			"zone":                               envvar.StringFromEnv("SAKURACLOUD_ZONE", "is1b"),
 		}
 
 		if err := compareStateMulti(s[0], expects); err != nil {

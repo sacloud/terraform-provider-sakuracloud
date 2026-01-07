@@ -25,6 +25,10 @@ import (
 )
 
 func TestAccSakuraCloudDatabaseReplica_basic(t *testing.T) {
+	if isFakeModeEnabled() {
+		t.Skip()
+	}
+
 	resourceName := "sakuracloud_database_read_replica.foobar"
 	rand := randomName()
 	password := randomPassword()
@@ -85,6 +89,10 @@ func TestAccSakuraCloudDatabaseReplica_basic(t *testing.T) {
 }
 
 func TestAccImportSakuraCloudDatabaseReadReplica_basic(t *testing.T) {
+	if isFakeModeEnabled() {
+		t.Skip()
+	}
+
 	rand := randomName()
 	password := randomPassword()
 

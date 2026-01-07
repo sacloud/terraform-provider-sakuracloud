@@ -18,12 +18,12 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"os"
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
 	"github.com/sacloud/iaas-api-go"
+	"github.com/sacloud/packages-go/envvar"
 )
 
 func TestAccSakuraCloudLocalRouter_basic(t *testing.T) {
@@ -176,7 +176,7 @@ func TestAccImportSakuraCloudLocalRouter_basic(t *testing.T) {
 			"tags.0":                             "tag1",
 			"tags.1":                             "tag2",
 			"switch.0.category":                  "cloud",
-			"switch.0.zone_id":                   os.Getenv("SAKURACLOUD_ZONE"),
+			"switch.0.zone_id":                   envvar.StringFromEnv("SAKURACLOUD_ZONE", "is1b"),
 			"network_interface.0.vip":            "192.168.11.1",
 			"network_interface.0.ip_addresses.0": "192.168.11.11",
 			"network_interface.0.ip_addresses.1": "192.168.11.12",
