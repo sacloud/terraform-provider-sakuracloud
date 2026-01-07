@@ -18,12 +18,12 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"os"
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
 	"github.com/sacloud/iaas-api-go"
+	"github.com/sacloud/packages-go/envvar"
 )
 
 func TestAccSakuraCloudBridge_basic(t *testing.T) {
@@ -122,7 +122,7 @@ func TestAccImportSakuraCloudBridge_basic(t *testing.T) {
 		expects := map[string]string{
 			"name":        rand,
 			"description": "description",
-			"zone":        os.Getenv("SAKURACLOUD_ZONE"),
+			"zone":        envvar.StringFromEnv("SAKURACLOUD_ZONE", "is1b"),
 		}
 
 		return compareStateMulti(s[0], expects)

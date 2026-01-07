@@ -147,6 +147,10 @@ func TestAccSakuraCloudDatabase_withContinuousBackup(t *testing.T) {
 }
 
 func TestAccSakuraCloudDatabase_withDiskEncryption(t *testing.T) {
+	if isFakeModeEnabled() {
+		t.Skip()
+	}
+
 	resourceName := "sakuracloud_database.foobar"
 	rand := randomName()
 	password := randomPassword()
