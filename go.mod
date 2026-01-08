@@ -1,6 +1,6 @@
 module github.com/sacloud/terraform-provider-sakuracloud
 
-go 1.25
+go 1.25.5
 
 require (
 	github.com/goccy/go-yaml v1.18.0
@@ -13,8 +13,8 @@ require (
 	github.com/sacloud/api-client-go v0.3.4
 	github.com/sacloud/apprun-api-go v0.5.0
 	github.com/sacloud/autoscaler v0.19.1
-	github.com/sacloud/iaas-api-go v1.23.1
-	github.com/sacloud/iaas-service-go v1.20.1
+	github.com/sacloud/iaas-api-go v1.24.1
+	github.com/sacloud/iaas-service-go v1.21.0
 	github.com/sacloud/iso9660wrap v0.0.0-20171031075302-eda21f77f6a8
 	github.com/sacloud/kms-api-go v0.2.2
 	github.com/sacloud/packages-go v0.0.12
@@ -51,6 +51,8 @@ require (
 	github.com/go-playground/locales v0.14.1 // indirect
 	github.com/go-playground/universal-translator v0.18.1 // indirect
 	github.com/go-playground/validator/v10 v10.27.0 // indirect
+	github.com/gofrs/flock v0.13.0 // indirect
+	github.com/golang-jwt/jwt/v5 v5.3.0 // indirect
 	github.com/golang/protobuf v1.5.4 // indirect
 	github.com/google/go-cmp v0.7.0 // indirect
 	github.com/google/uuid v1.6.0 // indirect
@@ -68,7 +70,7 @@ require (
 	github.com/hashicorp/logutils v1.0.0 // indirect
 	github.com/hashicorp/terraform-exec v0.23.1 // indirect
 	github.com/hashicorp/terraform-json v0.27.1 // indirect
-	github.com/hashicorp/terraform-plugin-log v0.9.0 // indirect
+	github.com/hashicorp/terraform-plugin-log v0.10.0 // indirect
 	github.com/hashicorp/terraform-registry-address v0.4.0 // indirect
 	github.com/hashicorp/terraform-svchost v0.1.1 // indirect
 	github.com/hashicorp/yamux v0.1.2 // indirect
@@ -93,6 +95,7 @@ require (
 	github.com/sacloud/go-http v0.1.9 // indirect
 	github.com/sacloud/go-otelsetup v0.5.0 // indirect
 	github.com/sacloud/iaas-api-go/trace/otel v0.0.0-20251211022914-29d6f59abec9 // indirect
+	github.com/sacloud/saclient-go v0.2.4 // indirect
 	github.com/segmentio/asm v1.2.0 // indirect
 	github.com/shivamMg/ppds v0.0.1 // indirect
 	github.com/vmihailenco/msgpack v4.0.4+incompatible // indirect
