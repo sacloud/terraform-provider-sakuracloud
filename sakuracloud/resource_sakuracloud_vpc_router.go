@@ -877,7 +877,7 @@ func setVPCRouterResourceData(ctx context.Context, d *schema.ResourceData, zone 
 	if err := d.Set("static_route", flattenVPCRouterStaticRoutes(data)); err != nil {
 		return diag.FromErr(err)
 	}
-	if err := d.Set("user", flattenVPCRouterUsers(data)); err != nil {
+	if err := d.Set("user", flattenVPCRouterUsers(data, d)); err != nil {
 		return diag.FromErr(err)
 	}
 	if err := d.Set("scheduled_maintenance", flattenVPCRouterScheduledMaintenance(data)); err != nil {

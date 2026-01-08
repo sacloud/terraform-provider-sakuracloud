@@ -782,12 +782,19 @@ func expandVPCRouterUser(d resourceValueGettable) *iaas.VPCRouterRemoteAccessUse
 	}
 }
 
-func flattenVPCRouterUsers(vpcRouter *iaas.VPCRouter) []interface{} {
+func flattenVPCRouterUsers(vpcRouter *iaas.VPCRouter, d resourceValueGettable) []interface{} {
 	var users []interface{}
+	configUsers := expandVPCRouterUserList(d)
 	for _, u := range vpcRouter.Settings.RemoteAccessUsers {
+		password := ""
+		for _, cu := range configUsers {
+			if u.UserName == cu.UserName {
+				password = cu.Password
+			}
+		}
 		users = append(users, map[string]interface{}{
 			"name":     u.UserName,
-			"password": u.Password,
+			"password": password,
 		})
 	}
 	return users
