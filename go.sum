@@ -212,8 +212,8 @@ github.com/rogpeppe/go-internal v1.14.1 h1:UQB4HGPB6osV0SQTLymcB4TgvyWu6ZyliaW0t
 github.com/rogpeppe/go-internal v1.14.1/go.mod h1:MaRKkUm5W0goXpeCfT7UZI6fk/L7L7so1lCWt35ZSgc=
 github.com/sacloud/api-client-go v0.3.4 h1:2j8YAGk68qqS4gp52IDgUyRuYwkPHYY1jWsVEWTFVBs=
 github.com/sacloud/api-client-go v0.3.4/go.mod h1:axv150sa/th23rU1/EC5ZjNm2I8WyW7X2mkYNGoQKxs=
-github.com/sacloud/apprun-api-go v0.5.0 h1:bRznwoDv0rnyfttHULszA0YXAK0TjcfnRvR6HhYoiJg=
-github.com/sacloud/apprun-api-go v0.5.0/go.mod h1:O5w5SsHC12gKOScPdv4XDW0XCnNQuGuIBJLYRgEBdPM=
+github.com/sacloud/apprun-api-go v0.6.0 h1:8/HAu6Vw2a01dCIRkaqrXw/U27wsLy8vekTDfrUN5MM=
+github.com/sacloud/apprun-api-go v0.6.0/go.mod h1:H400OqgfgYclHSO8m5ihPEgUdWnPVinnVlAaMksXS14=
 github.com/sacloud/autoscaler v0.19.2 h1:SX2r2Z5BgJUc5Fdn4quR7KatxZhDkgoTB5tJrxcuxOo=
 github.com/sacloud/autoscaler v0.19.2/go.mod h1:jTeHzdZHrWd/2mYtgEyyFDTqHu0EbMPNDzwj7mdl0MA=
 github.com/sacloud/ftps v1.2.0 h1:7UlSWd7cnm1J+sANz7IiBV9ffVcS+4g6ZV5UHVVbvaw=
