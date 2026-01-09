@@ -381,8 +381,7 @@ func setDatabaseResourceData(ctx context.Context, d *schema.ResourceData, client
 	d.Set("database_type", flattenDatabaseType(data))    //nolint
 	d.Set("database_version", data.Conf.DatabaseVersion) //nolint
 	if data.ReplicationSetting != nil {
-		d.Set("replica_user", data.CommonSetting.ReplicaUser)         //nolint
-		d.Set("replica_password", data.CommonSetting.ReplicaPassword) //nolint
+		d.Set("replica_user", data.CommonSetting.ReplicaUser) //nolint
 	}
 	if err := d.Set("backup", flattenDatabaseBackupSetting(data)); err != nil {
 		return diag.FromErr(err)
@@ -404,7 +403,6 @@ func setDatabaseResourceData(ctx context.Context, d *schema.ResourceData, client
 	}
 	d.Set("name", data.Name)                              //nolint
 	d.Set("username", data.CommonSetting.DefaultUser)     //nolint
-	d.Set("password", data.CommonSetting.UserPassword)    //nolint
 	d.Set("plan", types.DatabasePlanNameMap[data.PlanID]) //nolint
 	if err := d.Set("network_interface", flattenDatabaseNetworkInterface(data)); err != nil {
 		return diag.FromErr(err)
