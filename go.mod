@@ -20,7 +20,7 @@ require (
 	github.com/sacloud/packages-go v0.0.12
 	github.com/sacloud/secretmanager-api-go v0.2.1
 	github.com/sacloud/simplemq-api-go v0.2.0
-	github.com/sacloud/webaccel-api-go v1.3.0
+	github.com/sacloud/webaccel-api-go v1.4.0
 	github.com/stretchr/testify v1.11.1
 	golang.org/x/text v0.32.0
 )
