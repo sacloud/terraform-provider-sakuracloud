@@ -18,7 +18,7 @@ require (
 	github.com/sacloud/iso9660wrap v0.0.0-20171031075302-eda21f77f6a8
 	github.com/sacloud/kms-api-go v0.2.2
 	github.com/sacloud/packages-go v0.0.12
-	github.com/sacloud/secretmanager-api-go v0.2.1
+	github.com/sacloud/secretmanager-api-go v0.3.0
 	github.com/sacloud/simplemq-api-go v0.2.0
 	github.com/sacloud/webaccel-api-go v1.4.0
 	github.com/stretchr/testify v1.11.1
