@@ -16,8 +16,9 @@ require (
 	github.com/sacloud/iaas-api-go v1.24.2
 	github.com/sacloud/iaas-service-go v1.21.1
 	github.com/sacloud/iso9660wrap v0.0.0-20171031075302-eda21f77f6a8
-	github.com/sacloud/kms-api-go v0.2.2
+	github.com/sacloud/kms-api-go v0.3.1
 	github.com/sacloud/packages-go v0.0.12
+	github.com/sacloud/saclient-go v0.2.6
 	github.com/sacloud/secretmanager-api-go v0.3.1
 	github.com/sacloud/simplemq-api-go v0.2.0
 	github.com/sacloud/webaccel-api-go v1.4.0
@@ -84,7 +85,7 @@ require (
 	github.com/mitchellh/reflectwalk v1.0.2 // indirect
 	github.com/munnerz/goautoneg v0.0.0-20191010083416-a7dc8b61c822 // indirect
 	github.com/oapi-codegen/runtime v1.1.2 // indirect
-	github.com/ogen-go/ogen v1.14.0 // indirect
+	github.com/ogen-go/ogen v1.15.1 // indirect
 	github.com/oklog/run v1.1.0 // indirect
 	github.com/pmezard/go-difflib v1.0.1-0.20181226105442-5d4384ee4fb2 // indirect
 	github.com/prometheus/client_golang v1.23.0 // indirect
@@ -95,7 +96,6 @@ require (
 	github.com/sacloud/go-http v0.1.9 // indirect
 	github.com/sacloud/go-otelsetup v0.5.0 // indirect
 	github.com/sacloud/iaas-api-go/trace/otel v0.0.0-20260108004835-a49c720256da // indirect
-	github.com/sacloud/saclient-go v0.2.6 // indirect
 	github.com/segmentio/asm v1.2.0 // indirect
 	github.com/shivamMg/ppds v0.0.1 // indirect
 	github.com/vmihailenco/msgpack v4.0.4+incompatible // indirect
@@ -104,14 +104,14 @@ require (
 	github.com/zclconf/go-cty v1.17.0 // indirect
 	go.opentelemetry.io/auto/sdk v1.1.0 // indirect
 	go.opentelemetry.io/contrib/instrumentation/net/http/httptrace/otelhttptrace v0.45.0 // indirect
-	go.opentelemetry.io/otel v1.37.0 // indirect
+	go.opentelemetry.io/otel v1.38.0 // indirect
 	go.opentelemetry.io/otel/exporters/otlp/otlpmetric/otlpmetricgrpc v1.37.0 // indirect
 	go.opentelemetry.io/otel/exporters/otlp/otlptrace v1.37.0 // indirect
 	go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc v1.37.0 // indirect
-	go.opentelemetry.io/otel/metric v1.37.0 // indirect
-	go.opentelemetry.io/otel/sdk v1.37.0 // indirect
-	go.opentelemetry.io/otel/sdk/metric v1.37.0 // indirect
-	go.opentelemetry.io/otel/trace v1.37.0 // indirect
+	go.opentelemetry.io/otel/metric v1.38.0 // indirect
+	go.opentelemetry.io/otel/sdk v1.38.0 // indirect
+	go.opentelemetry.io/otel/sdk/metric v1.38.0 // indirect
+	go.opentelemetry.io/otel/trace v1.38.0 // indirect
 	go.opentelemetry.io/proto/otlp v1.7.0 // indirect
 	go.uber.org/multierr v1.11.0 // indirect
 	go.uber.org/ratelimit v0.3.1 // indirect
