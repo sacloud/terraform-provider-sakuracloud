@@ -163,10 +163,10 @@ func setSimpleMQResourceData(d *schema.ResourceData, data *queue.CommonServiceIt
 	d.Set("name", simplemq.GetQueueName(data))                                  //nolint:errcheck,gosec
 	d.Set("visibility_timeout_seconds", data.Settings.VisibilityTimeoutSeconds) //nolint:errcheck,gosec
 	d.Set("expire_seconds", data.Settings.ExpireSeconds)                        //nolint:errcheck,gosec
-	if desc, ok := data.Description.Value.GetString(); ok {
+	if desc, ok := data.Description.Get(); ok {
 		d.Set("description", desc) //nolint:errcheck,gosec
 	}
-	if iconID, ok := data.Icon.Value.Icon1.ID.Get(); ok {
+	if iconID, ok := data.Icon.Value.ID.Get(); ok {
 		id, ok := iconID.GetString()
 		if !ok {
 			id = strconv.Itoa(iconID.Int)
