@@ -18,7 +18,6 @@ import (
 	"errors"
 	"fmt"
 	"log"
-	"net/http"
 	"os"
 	"reflect"
 	"sort"
@@ -34,6 +33,7 @@ import (
 	"github.com/sacloud/iaas-api-go/helper/query"
 	"github.com/sacloud/kms-api-go"
 	kmsapi "github.com/sacloud/kms-api-go/apis/v1"
+	"github.com/sacloud/saclient-go"
 	"github.com/sacloud/secretmanager-api-go"
 	smapi "github.com/sacloud/secretmanager-api-go/apis/v1"
 	"github.com/sacloud/simplemq-api-go"
@@ -214,7 +214,6 @@ func (c *Config) NewClient() (*APIClient, error) {
 		AccessToken:          c.AccessToken,
 		AccessTokenSecret:    c.AccessTokenSecret,
 		AcceptLanguage:       c.AcceptLanguage,
-		HttpClient:           http.DefaultClient,
 		HttpRequestTimeout:   c.APIRequestTimeout,
 		HttpRequestRateLimit: c.APIRequestRateLimit,
 		RetryMax:             c.RetryMax,
@@ -245,6 +244,11 @@ func (c *Config) NewClient() (*APIClient, error) {
 		vpcRouterWaitAfterCreateDuration = time.Millisecond
 	}
 
+	theClient := &saclient.Client{}
+	if err := theClient.CompatSettingsFromAPIClientOptions(callerOptions); err != nil {
+		return nil, err
+	}
+
 	simplemqClient, err := simplemq.NewQueueClient(client.WithOptions(callerOptions))
 	if err != nil {
 		return nil, err
@@ -253,7 +257,7 @@ func (c *Config) NewClient() (*APIClient, error) {
 	if err != nil {
 		return nil, err
 	}
-	secretmanagerClient, err := secretmanager.NewClient(client.WithOptions(callerOptions))
+	secretmanagerClient, err := secretmanager.NewClient(theClient)
 	if err != nil {
 		return nil, err
 	}
