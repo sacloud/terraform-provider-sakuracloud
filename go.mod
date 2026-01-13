@@ -20,7 +20,7 @@ require (
 	github.com/sacloud/packages-go v0.0.12
 	github.com/sacloud/saclient-go v0.2.6
 	github.com/sacloud/secretmanager-api-go v0.3.1
-	github.com/sacloud/simplemq-api-go v0.2.0
+	github.com/sacloud/simplemq-api-go v0.3.0
 	github.com/sacloud/webaccel-api-go v1.4.0
 	github.com/stretchr/testify v1.11.1
 	golang.org/x/text v0.32.0
@@ -45,7 +45,7 @@ require (
 	github.com/gabriel-vasile/mimetype v1.4.8 // indirect
 	github.com/ghodss/yaml v1.0.0 // indirect
 	github.com/go-faster/errors v0.7.1 // indirect
-	github.com/go-faster/jx v1.1.0 // indirect
+	github.com/go-faster/jx v1.2.0 // indirect
 	github.com/go-faster/yaml v0.4.6 // indirect
 	github.com/go-logr/logr v1.4.3 // indirect
 	github.com/go-logr/stdr v1.2.2 // indirect
@@ -85,7 +85,7 @@ require (
 	github.com/mitchellh/reflectwalk v1.0.2 // indirect
 	github.com/munnerz/goautoneg v0.0.0-20191010083416-a7dc8b61c822 // indirect
 	github.com/oapi-codegen/runtime v1.1.2 // indirect
-	github.com/ogen-go/ogen v1.15.1 // indirect
+	github.com/ogen-go/ogen v1.16.0 // indirect
 	github.com/oklog/run v1.1.0 // indirect
 	github.com/pmezard/go-difflib v1.0.1-0.20181226105442-5d4384ee4fb2 // indirect
 	github.com/prometheus/client_golang v1.23.0 // indirect
@@ -96,8 +96,9 @@ require (
 	github.com/sacloud/go-http v0.1.9 // indirect
 	github.com/sacloud/go-otelsetup v0.5.0 // indirect
 	github.com/sacloud/iaas-api-go/trace/otel v0.0.0-20260108004835-a49c720256da // indirect
-	github.com/segmentio/asm v1.2.0 // indirect
+	github.com/segmentio/asm v1.2.1 // indirect
 	github.com/shivamMg/ppds v0.0.1 // indirect
+	github.com/shopspring/decimal v1.4.0 // indirect
 	github.com/vmihailenco/msgpack v4.0.4+incompatible // indirect
 	github.com/vmihailenco/msgpack/v5 v5.4.1 // indirect
 	github.com/vmihailenco/tagparser/v2 v2.0.0 // indirect
