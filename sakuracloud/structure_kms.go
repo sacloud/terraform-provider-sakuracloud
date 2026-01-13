@@ -60,7 +60,7 @@ func expandKMSUpdateKey(d *schema.ResourceData, before *kms.Key) kms.Key {
 		req.Tags = expandTags(d)
 	}
 	if desc, ok := d.GetOk("description"); ok {
-		req.Description = kms.NewOptString(desc.(string))
+		req.Description = desc.(string)
 	}
 
 	return req

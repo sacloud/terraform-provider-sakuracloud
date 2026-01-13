@@ -87,7 +87,7 @@ func dataSourceSakuraCloudKMSRead(ctx context.Context, d *schema.ResourceData, m
 	return setKMSResourceData(d, key)
 }
 
-func filterKMSByName(keys v1.Keys, name string) (*v1.Key, error) {
+func filterKMSByName(keys []v1.Key, name string) (*v1.Key, error) {
 	match := slices.Collect(func(yield func(v1.Key) bool) {
 		for _, v := range keys {
 			if name != v.Name {
