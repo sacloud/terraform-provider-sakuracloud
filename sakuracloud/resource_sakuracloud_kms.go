@@ -92,7 +92,7 @@ func resourceSakuraCloudKMSCreate(ctx context.Context, d *schema.ResourceData, m
 	key := v1.Key{
 		ID:          createdKey.ID,
 		Name:        createdKey.Name,
-		Description: createdKey.Description,
+		Description: createdKey.Description.Value,
 		KeyOrigin:   createdKey.KeyOrigin,
 		Tags:        createdKey.Tags,
 	}
@@ -163,8 +163,6 @@ func setKMSResourceData(d *schema.ResourceData, data *v1.Key) diag.Diagnostics {
 	d.SetId(data.ID)
 	d.Set("name", data.Name)                    //nolint:errcheck,gosec
 	d.Set("key_origin", string(data.KeyOrigin)) //nolint:errcheck,gosec
-	if data.Description.IsSet() {
-		d.Set("description", data.Description.Value) //nolint:errcheck,gosec
-	}
+	d.Set("description", data.Description)      //nolint:errcheck,gosec
 	return diag.FromErr(d.Set("tags", flattenTags(data.Tags)))
 }
