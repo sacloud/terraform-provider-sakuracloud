@@ -240,8 +240,8 @@ github.com/sacloud/secretmanager-api-go v0.2.1 h1:Tb9wNyI31PHFYdEV8QGwLS4O3UOaar
 github.com/sacloud/secretmanager-api-go v0.2.1/go.mod h1:d1+sjwvTVwjuAdYdtbzWYJ+cenBGG5MiGuX2nJLt0hE=
 github.com/sacloud/simplemq-api-go v0.2.0 h1:mXds9QMX3ICm3USNxx1//2Ae9pLpdffycHzrvKlHYfs=
 github.com/sacloud/simplemq-api-go v0.2.0/go.mod h1:AcGQQXuiMsMqgnzomrArqUYoijcSVZwnDx61At2Hvqc=
-github.com/sacloud/webaccel-api-go v1.3.0 h1:qu8QycooO64dkHdWPRdUn3eUf9BWpLASoh9uUo7oWZs=
-github.com/sacloud/webaccel-api-go v1.3.0/go.mod h1:5R914VqVeXIR320MwZYlSouFXgm/mvtY3YQ3SYSPWcU=
+github.com/sacloud/webaccel-api-go v1.4.0 h1:XamkIET06ksp+SPdOwgvzo62UdctcMiqywxTPDL8SDY=
+github.com/sacloud/webaccel-api-go v1.4.0/go.mod h1:B+RmNF/RingJv01Wjkq/sEdbfTSwLCl4NdJPgsebycM=
 github.com/segmentio/asm v1.2.0 h1:9BQrFxC+YOHJlTlHGkTrFWf59nbL3XnCoFLTwDCI7ys=
 github.com/segmentio/asm v1.2.0/go.mod h1:BqMnlJP91P8d+4ibuonYZw9mfnzI9HfxselHZr5aAcs=
 github.com/sergi/go-diff v1.3.2-0.20230802210424-5b0b94c5c0d3 h1:n661drycOFuPLCN3Uc8sB6B/s6Z4t2xvBgU1htSHuq8=
