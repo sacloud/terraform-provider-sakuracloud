@@ -1,5 +1,23 @@
 # CHANGELOG
 
+## 2.34.0 (2026/01/13)
+
+- go: bump github.com/sacloud/simplemq-api-go from 0.2.0 to 0.3.0 (#1304)
+- go: bump github.com/sacloud/kms-api-go from 0.2.2 to 0.3.1 (#1325)
+- go: bump github.com/sacloud/secretmanager-api-go from 0.2.1 to 0.3.1 (#1328)
+- go: bump github.com/sacloud/webaccel-api-go from 1.3.0 to 1.4.0 (#1329)
+- Do not set passwords in state from API responses (#1327)
+- go: bump github.com/sacloud/apprun-api-go from 0.5.0 to 0.6.0 (#1324)
+- iaas-service-go v1.21.1 and autoscaler v0.19.2 (#1326)
+- Fix state handling and update schema for sakuracloud_auto_scale (#1319)
+- Fix failing tests with fake and skip unsupported cases (#1323)
+- docs: added important notice about v2 and v3 (#1320)
+- go: bump github.com/sacloud/api-client-go from 0.3.3 to 0.3.4 (#1317)
+- ci: bump actions/checkout from 6.0.0 to 6.0.1 (#1310)
+- Use current profile when no profile name is specified (#1315)
+- feat: SAKURA_* env vars (#1312)
+- feat: sakuracloud_database: continuous_backup, disk_encryption, monitoring_suite (#1311)
+
 ## 2.33.0 (2025/12/09)
 
 - go 1.25 (#1309) 
