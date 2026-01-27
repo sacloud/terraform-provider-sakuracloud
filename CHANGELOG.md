@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 2.34.1 (2026/01/27)
+
+- go: bump github.com/sacloud/saclient-go from 0.2.6 to 0.2.7 (#1336)
+
 ## 2.34.0 (2026/01/13)
 
 - go: bump github.com/sacloud/simplemq-api-go from 0.2.0 to 0.3.0 (#1304)
