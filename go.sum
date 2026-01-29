@@ -214,8 +214,8 @@ github.com/sacloud/api-client-go v0.3.4 h1:2j8YAGk68qqS4gp52IDgUyRuYwkPHYY1jWsVE
 github.com/sacloud/api-client-go v0.3.4/go.mod h1:axv150sa/th23rU1/EC5ZjNm2I8WyW7X2mkYNGoQKxs=
 github.com/sacloud/apprun-api-go v0.6.0 h1:8/HAu6Vw2a01dCIRkaqrXw/U27wsLy8vekTDfrUN5MM=
 github.com/sacloud/apprun-api-go v0.6.0/go.mod h1:H400OqgfgYclHSO8m5ihPEgUdWnPVinnVlAaMksXS14=
-github.com/sacloud/autoscaler v0.19.2 h1:SX2r2Z5BgJUc5Fdn4quR7KatxZhDkgoTB5tJrxcuxOo=
-github.com/sacloud/autoscaler v0.19.2/go.mod h1:jTeHzdZHrWd/2mYtgEyyFDTqHu0EbMPNDzwj7mdl0MA=
+github.com/sacloud/autoscaler v0.19.3 h1:FkBxc0mE8fvaWiOiz+TpFAT1TX8DRLXs8prsqaM2MF0=
+github.com/sacloud/autoscaler v0.19.3/go.mod h1:jTeHzdZHrWd/2mYtgEyyFDTqHu0EbMPNDzwj7mdl0MA=
 github.com/sacloud/ftps v1.2.0 h1:7UlSWd7cnm1J+sANz7IiBV9ffVcS+4g6ZV5UHVVbvaw=
 github.com/sacloud/ftps v1.2.0/go.mod h1:h4awhOi3PEyhKLj1FpXjoVV5yVkmRUU+d5L95EwX2JU=
 github.com/sacloud/go-http v0.1.9 h1:Xa5PY8/pb7XWhwG9nAeXSrYXPbtfBWqawgzxD5co3VE=
