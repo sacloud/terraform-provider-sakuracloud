@@ -11,11 +11,21 @@
 
 > [!IMPORTANT]
 > さくらのクラウド向けTerraformプロバイダーはv3が最新となります。  
+> v3: https://github.com/sacloud/terraform-provider-sakura
+> 
 > v2はメンテナンスモードに移行しており、新規の機能追加や大きな変更はまずv3で行われます。  
 > これからさくらのクラウド向けTerraformプロバイダーを利用される場合はv3をご利用ください。  
 > 
 > 詳細は以下のクラウドニュースを参照してください。  
-> https://cloud.sakura.ad.jp/news/2025/12/25/terraform-provider-sakura-v3/  
+> https://cloud.sakura.ad.jp/news/2025/12/25/terraform-provider-sakura-v3/
+
+バージョン情報:
+
+| バージョン                                                      | ステータス | 説明                  |
+|------------------------------------------------------------|-----------|---------------------|
+| [v3](https://github.com/sacloud/terraform-provider-sakura) | 現行バージョン | 最新の機能追加・変更はここで行われます |
+| v2                                                         | メンテナンスモード | 積極的な機能開発は行いません      |
+| v1                                                         | EOL | サポート終了              |
 
 ## Usage Example
 
