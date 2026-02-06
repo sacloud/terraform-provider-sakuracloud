@@ -170,7 +170,6 @@ A `health_check` block supports the following:
 * `delay_loop` - (Optional) The interval in seconds between checks. This must be in the range [`10`-`60`].
 * `host_header` - (Optional) The value of host header send when checking by HTTP.
 * `path` - (Optional) The path used when checking by HTTP.
-* `port` - (Optional) The port number used when checking by TCP.
 
 ---
 

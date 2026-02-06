@@ -222,11 +222,6 @@ func resourceSakuraCloudProxyLB() *schema.Resource {
 							Optional:    true,
 							Description: "The path used when checking by HTTP",
 						},
-						"port": {
-							Type:        schema.TypeInt,
-							Optional:    true,
-							Description: "The port number used when checking by TCP",
-						},
 					},
 				},
 			},
