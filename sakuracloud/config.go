@@ -249,7 +249,7 @@ func (c *Config) NewClient() (*APIClient, error) {
 		return nil, err
 	}
 
-	simplemqClient, err := simplemq.NewQueueClient(client.WithOptions(callerOptions))
+	simplemqClient, err := simplemq.NewQueueClient(theClient)
 	if err != nil {
 		return nil, err
 	}
