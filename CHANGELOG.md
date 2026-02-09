@@ -1,5 +1,20 @@
 # CHANGELOG
 
+## 2.34.2 (2026/02/10)
+
+- sakuracloud_nfs: improve error handling when plan is not found (#1344)
+- tests: restore environment variables after provider schema test (#1345)
+- proxylb: remove unused health_check.port field (#1339)
+- go: bump github.com/sacloud/saclient-go from 0.2.7 to 0.3.0 (#1342)
+- go: bump github.com/sacloud/api-client-go from 0.3.4 to 0.3.5 (#1343)
+- go: bump github.com/sacloud/simplemq-api-go from 0.3.0 to 0.4.0 (#1337)
+- go: bump github.com/sacloud/webaccel-api-go from 1.4.0 to 1.4.1 (#1331)
+- go: bump github.com/sacloud/autoscaler from 0.19.2 to 0.19.3 (#1332)
+- go: bump github.com/goccy/go-yaml from 1.18.0 to 1.19.2 (#1330)
+- go: bump golang.org/x/text from 0.32.0 to 0.33.0 (#1333)
+- ci: bump actions/setup-go from 6.1.0 to 6.2.0 (#1334)
+- ci: bump actions/checkout from 6.0.1 to 6.0.2 (#1335)
+
 ## 2.34.1 (2026/01/27)
 
 - go: bump github.com/sacloud/saclient-go from 0.2.6 to 0.2.7 (#1336)
