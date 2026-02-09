@@ -18,6 +18,7 @@ import (
 	"context"
 	"os"
 	"reflect"
+	"strings"
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-go/tfprotov5"
@@ -62,6 +63,15 @@ func TestProvider(t *testing.T) {
 }
 
 func TestProviderSchema(t *testing.T) {
+	origEnv := os.Environ()
+	t.Cleanup(func() {
+		os.Clearenv()
+		for _, kv := range origEnv {
+			parts := strings.SplitN(kv, "=", 2)
+			_ = os.Setenv(parts[0], parts[1])
+		}
+	})
+
 	provider := Provider()
 
 	tests := []struct {
