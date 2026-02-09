@@ -10,7 +10,7 @@ require (
 	github.com/hashicorp/terraform-plugin-mux v0.21.0
 	github.com/hashicorp/terraform-plugin-sdk/v2 v2.38.1
 	github.com/mitchellh/go-homedir v1.1.0
-	github.com/sacloud/api-client-go v0.3.4
+	github.com/sacloud/api-client-go v0.3.5
 	github.com/sacloud/apprun-api-go v0.6.0
 	github.com/sacloud/autoscaler v0.19.3
 	github.com/sacloud/iaas-api-go v1.24.2
