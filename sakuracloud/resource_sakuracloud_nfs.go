@@ -104,6 +104,9 @@ func resourceSakuraCloudNFSCreate(ctx context.Context, d *schema.ResourceData, m
 	if err != nil {
 		return diag.Errorf("finding NFS plans is failed: %s", err)
 	}
+	if planID.IsEmpty() {
+		return diag.Errorf("finding NFS plans is failed")
+	}
 
 	builder := &setup.RetryableSetup{
 		Create: func(ctx context.Context, zone string) (accessor.ID, error) {
