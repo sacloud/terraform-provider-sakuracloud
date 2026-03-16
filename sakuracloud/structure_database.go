@@ -129,7 +129,7 @@ func expandDatabaseReadReplicaBuilder(ctx context.Context, d *schema.ResourceDat
 			IPAddress:   masterDB.IPAddresses[0],
 			Port:        masterDB.CommonSetting.ServicePort,
 			User:        masterDB.ReplicationSetting.User,
-			Password:    d.Get("replica_user_password").(string),
+			Password:    d.Get("replica_password").(string),
 			ApplianceID: masterDB.ID,
 		},
 		Disk:   expandDatabaseDisk(d),
