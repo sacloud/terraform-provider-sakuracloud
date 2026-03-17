@@ -3,7 +3,8 @@ resource "sakuracloud_kms" "foobar" {
 }
 
 resource "sakuracloud_database_read_replica" "foobar" {
-  master_id   = data.sakuracloud_database.master.id
+  master_id             = data.sakuracloud_database.master.id
+  replica_password = "your-replica-password"
 
   network_interface {
     ip_address  = "192.168.11.111"

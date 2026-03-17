@@ -52,6 +52,12 @@ func resourceSakuraCloudDatabaseReadReplica() *schema.Resource {
 				ValidateDiagFunc: validation.ToDiagFunc(validateSakuracloudIDType),
 				Description:      "The id of the replication master database",
 			},
+			"replica_password": {
+				Type:        schema.TypeString,
+				Required:    true,
+				Sensitive:   true,
+				Description: "The password for the replication. This is write-only and won't be saved in state",
+			},
 			"name": schemaResourceName(resourceName),
 			"network_interface": {
 				Type:     schema.TypeList,

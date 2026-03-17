@@ -18,7 +18,8 @@ resource "sakuracloud_kms" "foobar" {
 }
 
 resource "sakuracloud_database_read_replica" "foobar" {
-  master_id   = data.sakuracloud_database.master.id
+  master_id             = data.sakuracloud_database.master.id
+  replica_password = "your-replica-password"
 
   network_interface {
     ip_address  = "192.168.11.111"
@@ -46,6 +47,7 @@ data sakuracloud_database "master" {
 
 * `name` - (Required) The name of the read-replica database. The length of this value must be in the range [`1`-`64`].
 * `master_id` - (Required) The id of the replication master database. Changing this forces a new resource to be created.
+* `replica_password` - (Required) The password for the replication. This is write-only and won't be saved in state.
 
 #### Disk
 

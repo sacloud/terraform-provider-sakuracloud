@@ -109,6 +109,7 @@ func TestAccImportSakuraCloudDatabaseReadReplica_basic(t *testing.T) {
 			"disk.0.encryption_algorithm":    "aes256_xts",
 			"tags.0":                         "tag1",
 			"tags.1":                         "tag2",
+			//"replica_password":          password,
 		}
 
 		if err := compareStateMulti(s[0], expects); err != nil {
@@ -137,6 +138,9 @@ func TestAccImportSakuraCloudDatabaseReadReplica_basic(t *testing.T) {
 				ImportState:       true,
 				ImportStateCheck:  checkFn,
 				ImportStateVerify: true,
+				ImportStateVerifyIgnore: []string{
+					"replica_password",
+				},
 			},
 		},
 	})
@@ -203,6 +207,8 @@ resource "sakuracloud_database_read_replica" "foobar" {
     encryption_algorithm = "aes256_xts"
     kms_key_id           = sakuracloud_kms.foobar.id
   }
+  replica_password = "{{ .arg1 }}"
+
   name         = "{{ .arg0 }}"
   description  = "description"
   tags         = ["tag1" , "tag2"]
@@ -244,7 +250,8 @@ resource "sakuracloud_database" "foobar" {
 }
 
 resource "sakuracloud_database_read_replica" "foobar" {
-  master_id    = sakuracloud_database.foobar.id
+  master_id             = sakuracloud_database.foobar.id
+  replica_password = "{{ .arg1 }}"
   network_interface {
     ip_address   = "192.168.151.111"
   }
@@ -287,7 +294,8 @@ resource "sakuracloud_database" "foobar" {
 }
 
 resource "sakuracloud_database_read_replica" "foobar" {
-  master_id    = sakuracloud_database.foobar.id
+  master_id             = sakuracloud_database.foobar.id
+  replica_password = "{{ .arg1 }}"
   network_interface {
     ip_address   = "192.168.152.111"
   }
