@@ -1,5 +1,18 @@
 # CHANGELOG
 
+## 2.35.0 (2026/03/18)
+
+- database_read_replica: マスターデータベースから読み取っていたreplication passwordの代わりに replica_user_password を使用するように変更 (#1355)
+- test: import state verificationでデータベースパスワードを無視するように修正 (#1358)
+- sacloud/simplemq-api-go v0.5.0 (#1357)
+- iaas-service-go v1.22.3 (#1356)
+- go: bump github.com/hashicorp/terraform-plugin-sdk/v2 (#1346)
+- go: bump golang.org/x/text from 0.33.0 to 0.34.0 (#1349)
+- go: bump github.com/cloudflare/circl from 1.6.1 to 1.6.3 (#1351)
+- ci: bump goreleaser/goreleaser-action from 6.4.0 to 7.0.0 (#1350)
+- ci: bump actions/setup-go from 6.2.0 to 6.3.0 (#1353)
+- ci: bump crazy-max/ghaction-import-gpg from 6.3.0 to 7.0.0 (#1354)
+
 ## 2.34.2 (2026/02/10)
 
 - sakuracloud_nfs: improve error handling when plan is not found (#1344)
