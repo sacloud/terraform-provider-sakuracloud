@@ -16,14 +16,12 @@ package sakuracloud
 
 import (
 	"context"
-	"errors"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
 	"github.com/sacloud/iaas-api-go"
 	"github.com/sacloud/iaas-api-go/search"
-	"github.com/sacloud/iaas-api-go/types"
 )
 
 func dataSourceSakuraCloudServerVNCInfo() *schema.Resource {
@@ -62,16 +60,6 @@ func dataSourceSakuraCloudServerVNCInfoRead(ctx context.Context, d *schema.Resou
 	client, zone, err := sakuraCloudClient(d, meta)
 	if err != nil {
 		return diag.FromErr(err)
-	}
-
-	// validate account
-	authOp := iaas.NewAuthStatusOp(client)
-	auth, err := authOp.Read(ctx)
-	if err != nil {
-		return diag.Errorf("could not read Authentication Status: %s", err)
-	}
-	if auth.Permission == types.Permissions.View {
-		return diag.FromErr(errors.New("current API key is only permitted to view"))
 	}
 
 	// validate zone
