@@ -235,7 +235,7 @@ func testAccPreCheck(t *testing.T) {
 	}
 
 	if v := envvar.StringFromEnvMulti([]string{"SAKURA_ZONE", "SAKURACLOUD_ZONE"}, ""); v == "" {
-		os.Setenv("SAKURAD_ZONE", testDefaultTargetZone) //nolint:errcheck,gosec
+		os.Setenv("SAKURA_ZONE", testDefaultTargetZone) //nolint:errcheck,gosec
 	}
 
 	if v := envvar.StringFromEnvMulti([]string{"SAKURA_RETRY_MAX", "SAKURACLOUD_RETRY_MAX"}, ""); v == "" {
