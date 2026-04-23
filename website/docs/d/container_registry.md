@@ -45,7 +45,7 @@ A `condition` block supports the following:
 ## Attribute Reference
 
 * `id` - The id of the Container Registry.
-* `access_level` - The level of access that allow to users. This will be one of [`readwrite`/`readonly`/`none`].
+* `access_level` - The level of access that allow to users. This will be one of [`readonly`/`none`].
 * `description` - The description of the ContainerRegistry.
 * `fqdn` - The FQDN for accessing the container registry. FQDN is built from `subdomain_label` + `.sakuracr.jp`.
 * `icon_id` - The icon id attached to the ContainerRegistry.

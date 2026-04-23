@@ -24,7 +24,7 @@ import (
 	"github.com/sacloud/iaas-api-go/types"
 )
 
-func expandNFSDiskPlanID(ctx context.Context, client *APIClient, d resourceValueGettable) (types.ID, error) {
+func expandNFSDiskPlanID(ctx context.Context, client *APIClient, zone string, d resourceValueGettable) (types.ID, error) {
 	var planID types.ID
 	planName := d.Get("plan").(string)
 	planID, ok := types.NFSPlanIDMap[planName]
@@ -33,11 +33,11 @@ func expandNFSDiskPlanID(ctx context.Context, client *APIClient, d resourceValue
 	}
 	size := d.Get("size").(int)
 
-	return query.FindNFSPlanID(ctx, iaas.NewNoteOp(client), planID, types.ENFSSize(size))
+	return query.FindNFSPlanID(ctx, iaas.NewNoteOp(client), zone, planID, types.ENFSSize(size))
 }
 
-func flattenNFSDiskPlan(ctx context.Context, client *APIClient, planID types.ID) (string, int, error) {
-	planInfo, err := query.GetNFSPlanInfo(ctx, iaas.NewNoteOp(client), planID)
+func flattenNFSDiskPlan(ctx context.Context, client *APIClient, zone string, planID types.ID) (string, int, error) {
+	planInfo, err := query.GetNFSPlanInfo(ctx, iaas.NewNoteOp(client), zone, planID)
 	if err != nil {
 		return "", 0, err
 	}

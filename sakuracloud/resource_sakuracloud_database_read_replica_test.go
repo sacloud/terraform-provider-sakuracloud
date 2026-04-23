@@ -109,7 +109,7 @@ func TestAccImportSakuraCloudDatabaseReadReplica_basic(t *testing.T) {
 			"disk.0.encryption_algorithm":    "aes256_xts",
 			"tags.0":                         "tag1",
 			"tags.1":                         "tag2",
-			//"replica_password":          password,
+			// "replica_password":          password,
 		}
 
 		if err := compareStateMulti(s[0], expects); err != nil {

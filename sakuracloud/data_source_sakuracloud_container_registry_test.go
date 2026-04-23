@@ -52,7 +52,7 @@ var testAccSakuraCloudDataSourceContainerRegistry_basic = `
 resource "sakuracloud_container_registry" "foobar" {
   name            = "{{ .arg0 }}"
   subdomain_label = "{{ .arg1 }}"
-  access_level    = "readwrite"
+  access_level    = "readonly"
 
   description = "description"
   tags        = ["tag1", "tag2"]

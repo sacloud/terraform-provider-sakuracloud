@@ -21,7 +21,7 @@ variable users {
 resource "sakuracloud_container_registry" "foobar" {
   name            = "foobar"
   subdomain_label = "your-subdomain-label"
-  access_level    = "readwrite" # this must be one of ["readwrite"/"readonly"/"none"]
+  access_level    = "readonly" # this must be one of ["readonly"/"none"]
 
   description = "description"
   tags        = ["tag1", "tag2"]
