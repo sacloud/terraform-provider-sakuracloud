@@ -1,5 +1,17 @@
 # CHANGELOG
 
+## 2.35.1 (2026/04/28)
+
+- server_vnc: drop permission validation from server vnc info data source (#1365)
+- use jlaffaye/ftp instead of sacloud/ftps (#1368)
+- chore: update Go to 1.26.2 and adapt to upstream API changes (#1369)
+- chore: bump apprun-api-go to v0.7.1 and update test registry URLs (#1372)
+- go: bump google.golang.org/grpc from 1.79.2 to 1.79.3 (#1363)
+- go: bump go.opentelemetry.io/otel/sdk from 1.42.0 to 1.43.0 (#1366)
+- ci: bump actions/setup-go from 6.3.0 to 6.4.0 (#1364)
+- ci: bump goreleaser/goreleaser-action from 7.0.0 to 7.1.0 (#1371)
+- fix: typo (#1367)
+
 ## 2.35.0 (2026/03/18)
 
 - database_read_replica: マスターデータベースから読み取っていたreplication passwordの代わりに replica_user_password を使用するように変更 (#1355)
