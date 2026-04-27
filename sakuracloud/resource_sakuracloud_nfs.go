@@ -100,7 +100,7 @@ func resourceSakuraCloudNFSCreate(ctx context.Context, d *schema.ResourceData, m
 	}
 
 	nfsOp := iaas.NewNFSOp(client)
-	planID, err := expandNFSDiskPlanID(ctx, client, d)
+	planID, err := expandNFSDiskPlanID(ctx, client, zone, d)
 	if err != nil {
 		return diag.Errorf("finding NFS plans is failed: %s", err)
 	}
@@ -211,7 +211,8 @@ func setNFSResourceData(ctx context.Context, d *schema.ResourceData, client *API
 		return diag.Errorf("got unexpected state: NFS[%d].Availability is failed", data.ID)
 	}
 
-	plan, size, err := flattenNFSDiskPlan(ctx, client, data.PlanID)
+	zone := getZone(d, client)
+	plan, size, err := flattenNFSDiskPlan(ctx, client, zone, data.PlanID)
 	if err != nil {
 		return diag.FromErr(err)
 	}
@@ -223,6 +224,6 @@ func setNFSResourceData(ctx context.Context, d *schema.ResourceData, client *API
 	d.Set("name", data.Name)               //nolint
 	d.Set("icon_id", data.IconID.String()) //nolint
 	d.Set("description", data.Description) //nolint
-	d.Set("zone", getZone(d, client))      //nolint
+	d.Set("zone", zone)                    //nolint
 	return diag.FromErr(d.Set("tags", flattenTags(data.Tags)))
 }

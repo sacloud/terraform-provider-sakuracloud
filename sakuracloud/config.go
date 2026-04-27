@@ -194,7 +194,6 @@ func (c *Config) NewClient() (*APIClient, error) {
 	ua := fmt.Sprintf("%s %s", tfUserAgent, providerUserAgent)
 	if add := os.Getenv(uaEnvVar); add != "" {
 		ua += " " + add
-		log.Printf("[DEBUG] Using modified User-Agent: %s", ua)
 	}
 
 	enableAPITrace := false

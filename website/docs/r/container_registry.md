@@ -36,7 +36,7 @@ variable users {
  resource "sakuracloud_container_registry" "foobar" {
    name            = "foobar"
    subdomain_label = "your-subdomain-label"
-   access_level    = "readwrite" # this must be one of ["readwrite"/"readonly"/"none"]
+   access_level    = "readonly" # this must be one of ["readonly"/"none"]
  
    description = "description"
    tags        = ["tag1", "tag2"]
@@ -54,7 +54,7 @@ variable users {
 ## Argument Reference
 
 * `name` - (Required) The name of the Container Registry. The length of this value must be in the range [`1`-`64`].
-* `access_level` - (Required) The level of access that allow to users. This must be one of [`readwrite`/`readonly`/`none`].
+* `access_level` - (Required) The level of access that allow to users. This must be one of [`readonly`/`none`].
 * `subdomain_label` - (Required) The label at the lowest of the FQDN used when be accessed from users. The length of this value must be in the range [`1`-`64`]. Changing this forces a new resource to be created.
 * `user` - (Optional) One or more `user` blocks as defined below.
 * `virtual_domain` - (Optional) The alias for accessing the container registry.

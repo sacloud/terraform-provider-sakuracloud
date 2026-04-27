@@ -16,7 +16,6 @@ package sakuracloud
 
 import (
 	"fmt"
-	"log"
 	"os"
 	"strings"
 )
@@ -30,7 +29,6 @@ func terraformUserAgent(version string) string {
 		add = strings.TrimSpace(add)
 		if len(add) > 0 {
 			ua += " " + add
-			log.Printf("[DEBUG] Using modified User-Agent: %s", ua)
 		}
 	}
 
