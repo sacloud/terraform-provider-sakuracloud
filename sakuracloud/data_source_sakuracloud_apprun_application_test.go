@@ -42,7 +42,7 @@ func TestAccSakuraCloudDataSourceApprunApplication_basic(t *testing.T) {
 					resource.TestCheckResourceAttr(resourceName, "components.0.name", "compo1"),
 					resource.TestCheckResourceAttr(resourceName, "components.0.max_cpu", "0.5"),
 					resource.TestCheckResourceAttr(resourceName, "components.0.max_memory", "1Gi"),
-					resource.TestCheckResourceAttr(resourceName, "components.0.deploy_source.0.container_registry.0.image", "apprun-test.sakuracr.jp/test1:latest"),
+					resource.TestCheckResourceAttr(resourceName, "components.0.deploy_source.0.container_registry.0.image", "sakura-oss-dev.sakuracr.jp/test:latest"),
 				),
 			},
 		},
@@ -71,8 +71,8 @@ func TestAccSakuraCloudDataSourceApprunApplication_withCRUser(t *testing.T) {
 					resource.TestCheckResourceAttr(resourceName, "components.0.name", "compo1"),
 					resource.TestCheckResourceAttr(resourceName, "components.0.max_cpu", "0.5"),
 					resource.TestCheckResourceAttr(resourceName, "components.0.max_memory", "1Gi"),
-					resource.TestCheckResourceAttr(resourceName, "components.0.deploy_source.0.container_registry.0.image", "apprun-test.sakuracr.jp/test1:latest"),
-					resource.TestCheckResourceAttr(resourceName, "components.0.deploy_source.0.container_registry.0.server", "apprun-test.sakuracr.jp"),
+					resource.TestCheckResourceAttr(resourceName, "components.0.deploy_source.0.container_registry.0.image", "sakura-oss-dev.sakuracr.jp/test:latest"),
+					resource.TestCheckResourceAttr(resourceName, "components.0.deploy_source.0.container_registry.0.server", "sakura-oss-dev.sakuracr.jp"),
 					resource.TestCheckResourceAttr(resourceName, "components.0.deploy_source.0.container_registry.0.username", "user"),
 				),
 			},
@@ -102,7 +102,7 @@ func TestAccSakuraCloudDataSourceApprunApplication_withProbe(t *testing.T) {
 					resource.TestCheckResourceAttr(resourceName, "components.0.name", "compo1"),
 					resource.TestCheckResourceAttr(resourceName, "components.0.max_cpu", "0.5"),
 					resource.TestCheckResourceAttr(resourceName, "components.0.max_memory", "1Gi"),
-					resource.TestCheckResourceAttr(resourceName, "components.0.deploy_source.0.container_registry.0.image", "apprun-test.sakuracr.jp/test1:latest"),
+					resource.TestCheckResourceAttr(resourceName, "components.0.deploy_source.0.container_registry.0.image", "sakura-oss-dev.sakuracr.jp/test:latest"),
 					resource.TestCheckResourceAttr(resourceName, "components.0.probe.0.http_get.0.path", "/"),
 					resource.TestCheckResourceAttr(resourceName, "components.0.probe.0.http_get.0.port", "80"),
 					resource.TestCheckResourceAttr(resourceName, "components.0.probe.0.http_get.0.headers.0.name", "name1"),
@@ -137,7 +137,7 @@ func TestAccSakuraCloudDataSourceApprunApplication_withTraffic(t *testing.T) {
 					resource.TestCheckResourceAttr(resourceName, "components.0.name", "compo1"),
 					resource.TestCheckResourceAttr(resourceName, "components.0.max_cpu", "0.5"),
 					resource.TestCheckResourceAttr(resourceName, "components.0.max_memory", "1Gi"),
-					resource.TestCheckResourceAttr(resourceName, "components.0.deploy_source.0.container_registry.0.image", "apprun-test.sakuracr.jp/test1:latest"),
+					resource.TestCheckResourceAttr(resourceName, "components.0.deploy_source.0.container_registry.0.image", "sakura-oss-dev.sakuracr.jp/test:latest"),
 					resource.TestCheckResourceAttr(resourceName, "traffics.0.version_index", "0"),
 					resource.TestCheckResourceAttr(resourceName, "traffics.0.percent", "100"),
 				),
@@ -185,7 +185,7 @@ resource "sakuracloud_apprun_application" "foobar" {
     max_memory = "1Gi"
     deploy_source {
       container_registry {
-        image    = "apprun-test.sakuracr.jp/test1:latest"
+        image    = "sakura-oss-dev.sakuracr.jp/test:latest"
       }
     }
   }
@@ -209,8 +209,8 @@ resource "sakuracloud_apprun_application" "foobar" {
     max_memory = "1Gi"
     deploy_source {
       container_registry {
-        image    = "apprun-test.sakuracr.jp/test1:latest"
-        server   = "apprun-test.sakuracr.jp"
+        image    = "sakura-oss-dev.sakuracr.jp/test:latest"
+        server   = "sakura-oss-dev.sakuracr.jp"
         username = "user"
         password = "password"
       }
@@ -236,7 +236,7 @@ resource "sakuracloud_apprun_application" "foobar" {
     max_memory = "1Gi"
     deploy_source {
       container_registry {
-        image    = "apprun-test.sakuracr.jp/test1:latest"
+        image    = "sakura-oss-dev.sakuracr.jp/test:latest"
       }
     }
     probe {
@@ -274,7 +274,7 @@ resource "sakuracloud_apprun_application" "foobar" {
     max_memory = "1Gi"
     deploy_source {
       container_registry {
-        image    = "apprun-test.sakuracr.jp/test1:latest"
+        image    = "sakura-oss-dev.sakuracr.jp/test:latest"
       }
     }
   }
@@ -302,7 +302,7 @@ resource "sakuracloud_apprun_application" "foobar" {
     max_memory = "1Gi"
     deploy_source {
       container_registry {
-        image    = "apprun-test.sakuracr.jp/test1:latest"
+        image    = "sakura-oss-dev.sakuracr.jp/test:latest"
       }
     }
   }
