@@ -12,7 +12,7 @@ require (
 	github.com/jlaffaye/ftp v0.2.0
 	github.com/mitchellh/go-homedir v1.1.0
 	github.com/sacloud/api-client-go v0.3.5
-	github.com/sacloud/apprun-api-go v0.6.0
+	github.com/sacloud/apprun-api-go v0.7.1
 	github.com/sacloud/autoscaler v0.19.3
 	github.com/sacloud/iaas-api-go v1.28.0
 	github.com/sacloud/iaas-service-go v1.23.0
