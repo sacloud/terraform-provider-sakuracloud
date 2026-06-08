@@ -308,6 +308,11 @@ func TestAccSakuraCloudLocalRouter_peering(t *testing.T) {
 				),
 			},
 			{
+				// 機密フィールド(secret_key)のRead時復元によりperpetual diffが出ないことを確認
+				Config:   buildConfigWithArgs(testAccSakuraCloudLocalRouter_peering, rand),
+				PlanOnly: true,
+			},
+			{
 				Config: buildConfigWithArgs(testAccSakuraCloudLocalRouter_peeringDisconnect, rand),
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttr(resourceName1, "peer.#", "0"),

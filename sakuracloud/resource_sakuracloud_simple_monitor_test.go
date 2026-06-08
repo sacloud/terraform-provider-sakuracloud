@@ -83,6 +83,11 @@ func TestAccSakuraCloudSimpleMonitor_basic(t *testing.T) {
 					resource.TestCheckResourceAttr(resourceName, "monitoring_suite.0.enabled", "false"),
 				),
 			},
+			{
+				// 機密フィールド(password)のRead時復元によりperpetual diffが出ないことを確認
+				Config:   buildConfigWithArgs(testAccSakuraCloudSimpleMonitor_update, zone, testAccSlackWebhook),
+				PlanOnly: true,
+			},
 		},
 	})
 }

@@ -216,5 +216,6 @@ func setArchiveResourceData(d *schema.ResourceData, client *APIClient, data *iaa
 	d.Set("zone", getZone(d, client))                               //nolint
 	d.Set("source_archive_id", d.Get("source_archive_id").(string)) //nolint
 	d.Set("source_disk_id", d.Get("source_disk_id").(string))       //nolint
+	d.Set("source_shared_key", d.Get("source_shared_key").(string)) //nolint:errcheck,gosec // 機密情報をAPIレスポンスから保存しないためconfig値を復元
 	return diag.FromErr(d.Set("tags", flattenTags(data.Tags)))
 }

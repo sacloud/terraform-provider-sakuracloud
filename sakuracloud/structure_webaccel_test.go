@@ -469,3 +469,91 @@ func TestExpandWebAccelCORSParameters(t *testing.T) {
 		})
 	}
 }
+
+func TestFlattenWebAccelLogUploadConfigData(t *testing.T) {
+	loggingSetHasher := func(_ interface{}) int { return 0 }
+	makeLoggingSet := func(m map[string]interface{}) *schema.Set {
+		return schema.NewSet(loggingSetHasher, []interface{}{m})
+	}
+
+	tt := []struct {
+		Name           string
+		InputData      *webaccel.LogUploadConfig
+		InputConfig    resourceValueGettable
+		ExpectedOutput []interface{}
+	}{
+		{
+			Name: "restores access key/secret from config when enabled",
+			InputData: &webaccel.LogUploadConfig{
+				Status: "enabled",
+				Bucket: "my-bucket",
+			},
+			InputConfig: &resourceMapValue{
+				value: map[string]interface{}{
+					"logging": makeLoggingSet(map[string]interface{}{
+						"s3_access_key_id":     "config-key-id",
+						"s3_secret_access_key": "config-secret",
+					}),
+				},
+			},
+			ExpectedOutput: []interface{}{
+				map[string]interface{}{
+					"enabled":              true,
+					"s3_bucket_name":       "my-bucket",
+					"s3_access_key_id":     "config-key-id",
+					"s3_secret_access_key": "config-secret",
+				},
+			},
+		},
+		{
+			Name: "restores access key/secret from config when disabled",
+			InputData: &webaccel.LogUploadConfig{
+				Status: "disabled",
+				Bucket: "my-bucket",
+			},
+			InputConfig: &resourceMapValue{
+				value: map[string]interface{}{
+					"logging": makeLoggingSet(map[string]interface{}{
+						"s3_access_key_id":     "config-key-id",
+						"s3_secret_access_key": "config-secret",
+					}),
+				},
+			},
+			ExpectedOutput: []interface{}{
+				map[string]interface{}{
+					"enabled":              false,
+					"s3_bucket_name":       "my-bucket",
+					"s3_access_key_id":     "config-key-id",
+					"s3_secret_access_key": "config-secret",
+				},
+			},
+		},
+		{
+			Name: "empty strings when no config present",
+			InputData: &webaccel.LogUploadConfig{
+				Status: "enabled",
+				Bucket: "my-bucket",
+			},
+			InputConfig: &resourceMapValue{
+				value: map[string]interface{}{},
+			},
+			ExpectedOutput: []interface{}{
+				map[string]interface{}{
+					"enabled":              true,
+					"s3_bucket_name":       "my-bucket",
+					"s3_access_key_id":     "",
+					"s3_secret_access_key": "",
+				},
+			},
+		},
+	}
+
+	for _, tc := range tt {
+		t.Run(tc.Name, func(t *testing.T) {
+			res := flattenWebAccelLogUploadConfigData(tc.InputData, tc.InputConfig)
+			if !reflect.DeepEqual(res, tc.ExpectedOutput) {
+				t.Fatalf("FAILED %s: got: %v\nwant: %v", tc.Name, res, tc.ExpectedOutput)
+			}
+		})
+	}
+}
