@@ -522,12 +522,17 @@ func expandVPCRouterL2TP(d resourceValueGettable) *iaas.VPCRouterL2TPIPsecServer
 	return nil
 }
 
-func flattenVPCRouterL2TP(vpcRouter *iaas.VPCRouter) []interface{} {
+func flattenVPCRouterL2TP(vpcRouter *iaas.VPCRouter, d resourceValueGettable) []interface{} {
 	var l2tp []interface{}
 	if vpcRouter.Settings.L2TPIPsecServerEnabled.Bool() {
 		s := vpcRouter.Settings.L2TPIPsecServer
+		preSharedSecret := ""
+		if values, ok := getListFromResource(d, "l2tp"); ok && len(values) > 0 {
+			l2tpData := mapToResourceData(values[0].(map[string]interface{}))
+			preSharedSecret = stringOrDefault(l2tpData, "pre_shared_secret")
+		}
 		l2tp = append(l2tp, map[string]interface{}{
-			"pre_shared_secret": s.PreSharedSecret,
+			"pre_shared_secret": preSharedSecret,
 			"range_start":       s.RangeStart,
 			"range_stop":        s.RangeStop,
 		})
@@ -687,14 +692,22 @@ func expandVPCRouterSiteToSiteParameterESP(d resourceValueGettable) *iaas.VPCRou
 	return nil
 }
 
-func flattenVPCRouterSiteToSiteConfig(vpcRouter *iaas.VPCRouter) []interface{} {
+func flattenVPCRouterSiteToSiteConfig(vpcRouter *iaas.VPCRouter, d resourceValueGettable) []interface{} {
 	var s2sSettings []interface{}
 	if vpcRouter.Settings.SiteToSiteIPsecVPN != nil {
+		configPreSharedSecrets := map[string]string{}
+		if values, ok := getListFromResource(d, "site_to_site_vpn"); ok {
+			for _, raw := range values {
+				v := mapToResourceData(raw.(map[string]interface{}))
+				configPreSharedSecrets[stringOrDefault(v, "peer")] = stringOrDefault(v, "pre_shared_secret")
+			}
+		}
 		for _, s := range vpcRouter.Settings.SiteToSiteIPsecVPN.Config {
+			preSharedSecret := configPreSharedSecrets[s.Peer]
 			s2sSettings = append(s2sSettings, map[string]interface{}{
 				"local_prefix":      stringListToSet(s.LocalPrefix),
 				"peer":              s.Peer,
-				"pre_shared_secret": s.PreSharedSecret,
+				"pre_shared_secret": preSharedSecret,
 				"remote_id":         s.RemoteID,
 				"routes":            stringListToSet(s.Routes),
 			})

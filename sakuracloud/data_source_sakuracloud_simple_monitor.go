@@ -106,6 +106,7 @@ func dataSourceSakuraCloudSimpleMonitor() *schema.Resource {
 						"password": {
 							Type:        schema.TypeString,
 							Computed:    true,
+							Sensitive:   true,
 							Description: "The password for basic auth used when checking by HTTP/HTTPS",
 						},
 						"port": {

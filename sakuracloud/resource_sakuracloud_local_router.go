@@ -280,7 +280,7 @@ func setLocalRouterResourceData(ctx context.Context, d *schema.ResourceData, cli
 	if err := d.Set("network_interface", flattenLocalRouterNetworkInterface(data)); err != nil {
 		return diag.FromErr(err)
 	}
-	if err := d.Set("peer", flattenLocalRouterPeers(data)); err != nil {
+	if err := d.Set("peer", flattenLocalRouterPeers(data, d)); err != nil {
 		return diag.FromErr(err)
 	}
 	if err := d.Set("static_route", flattenLocalRouterStaticRoutes(data)); err != nil {

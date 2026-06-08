@@ -304,7 +304,6 @@ func TestAccSakuraCloudLocalRouter_peering(t *testing.T) {
 				Config: buildConfigWithArgs(testAccSakuraCloudLocalRouter_peering, rand),
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttrPair(resourceName1, "id", resourceName2, "peer.0.peer_id"),
-					resource.TestCheckResourceAttrPair(resourceName1, "secret_keys.0", resourceName2, "peer.0.secret_key"),
 					resource.TestCheckResourceAttr(resourceName2, "peer.0.description", "description"),
 				),
 			},

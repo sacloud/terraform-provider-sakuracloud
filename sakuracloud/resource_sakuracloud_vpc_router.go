@@ -844,7 +844,7 @@ func setVPCRouterResourceData(ctx context.Context, d *schema.ResourceData, zone 
 	if err := d.Set("firewall", flattenVPCRouterFirewalls(data)); err != nil {
 		return diag.FromErr(err)
 	}
-	if err := d.Set("l2tp", flattenVPCRouterL2TP(data)); err != nil {
+	if err := d.Set("l2tp", flattenVPCRouterL2TP(data, d)); err != nil {
 		return diag.FromErr(err)
 	}
 	if err := d.Set("pptp", flattenVPCRouterPPTP(data)); err != nil {
@@ -865,7 +865,7 @@ func setVPCRouterResourceData(ctx context.Context, d *schema.ResourceData, zone 
 	if err := d.Set("port_forwarding", flattenVPCRouterPortForwardings(data)); err != nil {
 		return diag.FromErr(err)
 	}
-	if err := d.Set("site_to_site_vpn", flattenVPCRouterSiteToSiteConfig(data)); err != nil {
+	if err := d.Set("site_to_site_vpn", flattenVPCRouterSiteToSiteConfig(data, d)); err != nil {
 		return diag.FromErr(err)
 	}
 	if err := d.Set("site_to_site_vpn_parameter", flattenVPCRouterSiteToSiteParameter(data)); err != nil {

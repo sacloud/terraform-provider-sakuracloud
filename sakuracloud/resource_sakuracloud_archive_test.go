@@ -251,6 +251,7 @@ func TestAccImportSakuraCloudArchive_basic(t *testing.T) {
 				ImportStateVerifyIgnore: []string{
 					"archive_file",
 					"hash",
+					"source_shared_key",
 				},
 			},
 		},

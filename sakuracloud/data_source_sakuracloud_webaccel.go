@@ -292,6 +292,6 @@ func dataSourceSakuraCloudWebAccelLogUploadConfigRead(ctx context.Context, d *sc
 	if err != nil {
 		return diag.FromErr(err)
 	}
-	d.Set("logging", flattenWebAccelLogUploadConfigData(logCfg)) //nolint:errcheck,gosec
+	d.Set("logging", flattenWebAccelLogUploadConfigData(logCfg, d)) //nolint:errcheck,gosec
 	return nil
 }

@@ -86,9 +86,19 @@ func flattenSimpleMonitorNotifyInterval(simpleMonitor *iaas.SimpleMonitor) int {
 	return interval / 60 / 60
 }
 
-func flattenSimpleMonitorHealthCheck(simpleMonitor *iaas.SimpleMonitor) []interface{} {
+func flattenSimpleMonitorHealthCheck(simpleMonitor *iaas.SimpleMonitor, d resourceValueGettable) []interface{} {
 	healthCheck := map[string]interface{}{}
 	hc := simpleMonitor.HealthCheck
+
+	// Get password from config to avoid storing API response in state
+	var password string
+	if values, ok := getListFromResource(d, "health_check"); ok && len(values) > 0 {
+		conf := values[0].(map[string]interface{})
+		if v, ok := conf["password"].(string); ok {
+			password = v
+		}
+	}
+
 	switch hc.Protocol {
 	case types.SimpleMonitorProtocols.HTTP:
 		healthCheck["path"] = hc.Path
@@ -97,7 +107,7 @@ func flattenSimpleMonitorHealthCheck(simpleMonitor *iaas.SimpleMonitor) []interf
 		healthCheck["host_header"] = hc.Host
 		healthCheck["port"] = hc.Port.Int()
 		healthCheck["username"] = hc.BasicAuthUsername
-		healthCheck["password"] = hc.BasicAuthPassword
+		healthCheck["password"] = password
 	case types.SimpleMonitorProtocols.HTTPS:
 		healthCheck["path"] = hc.Path
 		healthCheck["status"] = hc.Status.Int()
@@ -106,7 +116,7 @@ func flattenSimpleMonitorHealthCheck(simpleMonitor *iaas.SimpleMonitor) []interf
 		healthCheck["port"] = hc.Port.Int()
 		healthCheck["sni"] = hc.SNI.Bool()
 		healthCheck["username"] = hc.BasicAuthUsername
-		healthCheck["password"] = hc.BasicAuthPassword
+		healthCheck["password"] = password
 		healthCheck["http2"] = hc.HTTP2
 	case types.SimpleMonitorProtocols.TCP, types.SimpleMonitorProtocols.SSH, types.SimpleMonitorProtocols.SMTP, types.SimpleMonitorProtocols.POP3:
 		healthCheck["port"] = hc.Port.Int()
