@@ -287,11 +287,17 @@ func dataSourceSakuraCloudWebAccelLogUploadConfigRead(ctx context.Context, d *sc
 	}
 	webAccelOp := webaccel.NewOp(client.webaccelClient)
 	logCfg, err := webAccelOp.ReadLogUploadConfig(ctx, siteId)
-	logCfg.AccessKeyID = ""
-	logCfg.SecretAccessKey = ""
 	if err != nil {
 		return diag.FromErr(err)
 	}
-	d.Set("logging", flattenWebAccelLogUploadConfigData(logCfg, d)) //nolint:errcheck,gosec
+	if logCfg == nil || logCfg.Bucket == "" {
+		d.Set("logging", nil) //nolint:errcheck,gosec
+		return nil
+	}
+	logCfg.AccessKeyID = ""
+	logCfg.SecretAccessKey = ""
+	// DataSourceではstateからの復元を抑止するため空の resourceValueGettable を渡す
+	emptyValue := &resourceMapValue{value: map[string]interface{}{}}
+	d.Set("logging", flattenWebAccelLogUploadConfigData(logCfg, emptyValue)) //nolint:errcheck,gosec
 	return nil
 }
