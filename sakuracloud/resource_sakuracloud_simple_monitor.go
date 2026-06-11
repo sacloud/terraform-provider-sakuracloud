@@ -140,6 +140,7 @@ func resourceSakuraCloudSimpleMonitor() *schema.Resource {
 						"password": {
 							Type:        schema.TypeString,
 							Optional:    true,
+							Sensitive:   true,
 							Description: "The password for basic auth used when checking by HTTP/HTTPS",
 						},
 						"port": {
@@ -362,7 +363,7 @@ func setSimpleMonitorResourceData(ctx context.Context, d *schema.ResourceData, c
 	d.Set("notify_slack_enabled", data.NotifySlackEnabled.Bool())      //nolint
 	d.Set("notify_slack_webhook", data.SlackWebhooksURL)               //nolint
 	d.Set("notify_interval", flattenSimpleMonitorNotifyInterval(data)) //nolint
-	if err := d.Set("health_check", flattenSimpleMonitorHealthCheck(data)); err != nil {
+	if err := d.Set("health_check", flattenSimpleMonitorHealthCheck(data, d)); err != nil {
 		return diag.FromErr(err)
 	}
 	if err := d.Set("monitoring_suite", flattenSimpleMonitorMonitoringSuite(data)); err != nil {

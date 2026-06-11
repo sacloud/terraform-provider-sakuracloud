@@ -162,6 +162,11 @@ func TestAccSakuraCloudArchive_fromShared(t *testing.T) {
 						"sakuracloud_archive_share.share", "share_key"),
 				),
 			},
+			{
+				// 機密フィールド(source_shared_key)のRead時復元によりperpetual diffが出ないことを確認
+				Config:   buildConfigWithArgs(testAccSakuraCloudArchive_fromShared, rand),
+				PlanOnly: true,
+			},
 		},
 	})
 }
@@ -251,6 +256,7 @@ func TestAccImportSakuraCloudArchive_basic(t *testing.T) {
 				ImportStateVerifyIgnore: []string{
 					"archive_file",
 					"hash",
+					"source_shared_key",
 				},
 			},
 		},

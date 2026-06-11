@@ -194,6 +194,11 @@ func TestAccSakuraCloudVPCRouter_Full(t *testing.T) {
 				),
 			},
 			{
+				// 機密フィールド(pre_shared_secret)のRead時復元によりperpetual diffが出ないことを確認
+				Config:   buildConfigWithArgs(testAccSakuraCloudVPCRouter_complete, rand),
+				PlanOnly: true,
+			},
+			{
 				Config: buildConfigWithArgs(testAccSakuraCloudVPCRouter_completeUpdate, rand),
 				Check: resource.ComposeTestCheckFunc(
 					testCheckSakuraCloudVPCRouterExists(resourceName, &vpcRouter),

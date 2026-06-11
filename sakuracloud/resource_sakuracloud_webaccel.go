@@ -499,7 +499,7 @@ func setWebAccelSiteResourceData(d *schema.ResourceData, client *APIClient, data
 }
 
 func setWebAccelResourceLogUploadConfigData(d *schema.ResourceData, client *APIClient, data *webaccel.LogUploadConfig) diag.Diagnostics {
-	err := d.Set("logging", flattenWebAccelLogUploadConfigData(data))
+	err := d.Set("logging", flattenWebAccelLogUploadConfigData(data, d))
 	if err != nil {
 		return diag.FromErr(err)
 	}

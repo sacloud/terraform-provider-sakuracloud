@@ -102,21 +102,29 @@ func expandLocalRouterPeers(d resourceValueGettable) []*iaas.LocalRouterPeer {
 	return results
 }
 
-func flattenLocalRouterPeers(data *iaas.LocalRouter) []interface{} {
+func flattenLocalRouterPeers(data *iaas.LocalRouter, d resourceValueGettable) []interface{} {
+	configPeers := map[string]string{}
+	if values, ok := getListFromResource(d, "peer"); ok {
+		for _, raw := range values {
+			v := mapToResourceData(raw.(map[string]interface{}))
+			configPeers[stringOrDefault(v, "peer_id")] = stringOrDefault(v, "secret_key")
+		}
+	}
+
 	var results []interface{}
 	for _, peer := range data.Peers {
-		results = append(results, flattenLocalRouterPeer(peer))
+		secretKey := ""
+		if v, ok := configPeers[peer.ID.String()]; ok {
+			secretKey = v
+		}
+		results = append(results, map[string]interface{}{
+			"peer_id":     peer.ID.String(),
+			"secret_key":  secretKey,
+			"enabled":     peer.Enabled,
+			"description": peer.Description,
+		})
 	}
 	return results
-}
-
-func flattenLocalRouterPeer(data *iaas.LocalRouterPeer) interface{} {
-	return map[string]interface{}{
-		"peer_id":     data.ID.String(),
-		"secret_key":  data.SecretKey,
-		"enabled":     data.Enabled,
-		"description": data.Description,
-	}
 }
 
 func expandLocalStaticRoutes(d resourceValueGettable) []*iaas.LocalRouterStaticRoute {

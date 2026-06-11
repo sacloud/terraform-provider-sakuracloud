@@ -107,7 +107,7 @@ func flattenWebAccelCorsRules(data []*webaccel.CORSRule) ([]interface{}, error) 
 	}
 }
 
-func flattenWebAccelLogUploadConfigData(data *webaccel.LogUploadConfig) []interface{} {
+func flattenWebAccelLogUploadConfigData(data *webaccel.LogUploadConfig, d resourceValueGettable) []interface{} {
 	loggingParams := make(map[string]interface{})
 	if data.Status == "enabled" {
 		loggingParams["enabled"] = true
@@ -115,8 +115,20 @@ func flattenWebAccelLogUploadConfigData(data *webaccel.LogUploadConfig) []interf
 		loggingParams["enabled"] = false
 	}
 	loggingParams["s3_bucket_name"] = data.Bucket
-	loggingParams["s3_access_key_id"] = data.AccessKeyID
-	loggingParams["s3_secret_access_key"] = data.SecretAccessKey
+
+	// NOTE: access key/secret cannot be fetched from remote reliably
+	presetLoggingParams, _ := mapFromSet(d, "logging")
+	if presetLoggingParams != nil {
+		if v, ok := presetLoggingParams.GetOk("s3_access_key_id"); ok {
+			loggingParams["s3_access_key_id"] = v.(string)
+		}
+		if v, ok := presetLoggingParams.GetOk("s3_secret_access_key"); ok {
+			loggingParams["s3_secret_access_key"] = v.(string)
+		}
+	} else {
+		loggingParams["s3_access_key_id"] = ""
+		loggingParams["s3_secret_access_key"] = ""
+	}
 	return []interface{}{loggingParams}
 }
 
