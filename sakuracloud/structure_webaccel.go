@@ -91,13 +91,9 @@ func flattenWebAccelCorsRules(data []*webaccel.CORSRule) ([]interface{}, error) 
 			return nil, nil
 		}
 		corsRuleParams := make(map[string]interface{})
-		switch {
-		case rule.AllowsAnyOrigin:
-			corsRuleParams["allow_all"] = rule.AllowsAnyOrigin
-		case len(rule.AllowedOrigins) > 0:
+		corsRuleParams["allow_all"] = rule.AllowsAnyOrigin
+		if len(rule.AllowedOrigins) > 0 {
 			corsRuleParams["allowed_origins"] = rule.AllowedOrigins
-		default:
-			corsRuleParams["allow_all"] = false
 		}
 		return []interface{}{corsRuleParams}, nil
 	default:
