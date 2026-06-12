@@ -465,7 +465,7 @@ func setWebAccelSiteResourceData(d *schema.ResourceData, client *APIClient, data
 	if data.DomainType == "own_domain" {
 		d.Set("domain", data.Domain) //nolint:errcheck,gosec
 	} else {
-		d.Set("domain", "") //nolint:errcheck,gosec
+		d.Set("domain", nil) //nolint:errcheck,gosec
 	}
 	d.Set("subdomain", data.Subdomain)                                    //nolint:errcheck,gosec
 	d.Set("cname_record_value", data.Subdomain+".")                       //nolint:errcheck,gosec
