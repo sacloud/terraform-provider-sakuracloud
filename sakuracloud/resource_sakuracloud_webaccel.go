@@ -460,10 +460,12 @@ func setWebAccelResourceData(d *schema.ResourceData, client *APIClient, data *we
 	return setWebAccelSiteResourceData(d, client, data)
 }
 func setWebAccelSiteResourceData(d *schema.ResourceData, client *APIClient, data *webaccel.Site) diag.Diagnostics {
-	d.Set("name", data.Name)                                              //nolint:errcheck,gosec
-	d.Set("domain_type", data.DomainType)                                 //nolint:errcheck,gosec
+	d.Set("name", data.Name)              //nolint:errcheck,gosec
+	d.Set("domain_type", data.DomainType) //nolint:errcheck,gosec
 	if data.DomainType == "own_domain" {
 		d.Set("domain", data.Domain) //nolint:errcheck,gosec
+	} else {
+		d.Set("domain", "") //nolint:errcheck,gosec
 	}
 	d.Set("subdomain", data.Subdomain)                                    //nolint:errcheck,gosec
 	d.Set("cname_record_value", data.Subdomain+".")                       //nolint:errcheck,gosec
