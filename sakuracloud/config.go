@@ -252,7 +252,7 @@ func (c *Config) NewClient() (*APIClient, error) {
 	if err != nil {
 		return nil, err
 	}
-	kmsClient, err := kms.NewClient(client.WithOptions(callerOptions))
+	kmsClient, err := kms.NewClient(theClient)
 	if err != nil {
 		return nil, err
 	}
