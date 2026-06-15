@@ -230,8 +230,8 @@ github.com/sacloud/iaas-service-go v1.23.0 h1:BLJUhjQRO+jbbwGB42SG0oeRdaBj2AGYYy
 github.com/sacloud/iaas-service-go v1.23.0/go.mod h1:oqh56R4n67fA5v2O0BRtkVF+LEng0IANlGwgCvBcQzM=
 github.com/sacloud/iso9660wrap v0.0.0-20171031075302-eda21f77f6a8 h1:5piK7EELHKRxGqBjgVEHsdfsFwEzF/Kds/bMWLS6gCw=
 github.com/sacloud/iso9660wrap v0.0.0-20171031075302-eda21f77f6a8/go.mod h1:1jHHCa624cG5rODkWmourombJaNmkY9/SBHWhLJcg+w=
-github.com/sacloud/kms-api-go v0.3.1 h1:3cFJksswx/k2V44l7xojrtk7XORNrO21rLtwINH1PJE=
-github.com/sacloud/kms-api-go v0.3.1/go.mod h1:rUegqSJE8NO2/urIt26kx+x9N7wdjsETyGJMmJtKj5k=
+github.com/sacloud/kms-api-go v0.4.0 h1:F1/Cw7W2h6B/HWsoPDI7xMZkzFKphfVTBOHYh6DT2bM=
+github.com/sacloud/kms-api-go v0.4.0/go.mod h1:OSJD0mlzdZQXJPLbhBlAIthwxHISjWXhy9gHvUxieC0=
 github.com/sacloud/packages-go v0.1.0 h1:rixWcvkVUI4kX6UYTFJbQgZIoBoNhN48MivHIu3aYq0=
 github.com/sacloud/packages-go v0.1.0/go.mod h1:ntmPnjF8+mGWNtxgBmO0CrLphUlmRkpy+DztjlECp8M=
 github.com/sacloud/saclient-go v0.3.7 h1:LAkOHStYxIKoypiaarhNOwm/JPuubgoKuOSXZWEerbc=
