@@ -346,6 +346,7 @@ func TestFlattenWebAccelCorsRules(t *testing.T) {
 			},
 			[]interface{}{
 				map[string]interface{}{
+					"allow_all":       false,
 					"allowed_origins": []string{"origin1", "origin2"},
 				},
 			},
