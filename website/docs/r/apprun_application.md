@@ -8,6 +8,8 @@ description: |-
 
 # sakuracloud_apprun_application
 
+~> **Deprecated:** This resource is deprecated. Use the `sakura_apprun_shared` resource in the `sakura` provider instead.
+
 Manages a SakuraCloud AppRun Application.
 
 ## Example Usage

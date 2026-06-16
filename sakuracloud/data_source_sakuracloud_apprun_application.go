@@ -25,7 +25,8 @@ import (
 
 func dataSourceSakuraCloudApprunApplication() *schema.Resource {
 	return &schema.Resource{
-		ReadContext: dataSourceSakuraCloudApprunApplicationRead,
+		DeprecationMessage: "The sakuracloud_apprun_application data source is deprecated. Use the sakura_apprun_shared resource in the sakura provider instead.",
+		ReadContext:        dataSourceSakuraCloudApprunApplicationRead,
 
 		Schema: map[string]*schema.Schema{
 			// input/condition
