@@ -29,10 +29,11 @@ import (
 
 func resourceSakuraCloudApprunApplication() *schema.Resource {
 	return &schema.Resource{
-		CreateContext: resourceSakuraCloudApprunApplicationCreate,
-		UpdateContext: resourceSakuraCloudApprunApplicationUpdate,
-		ReadContext:   resourceSakuraCloudApprunApplicationRead,
-		DeleteContext: resourceSakuraCloudApprunApplicationDelete,
+		DeprecationMessage: "The sakuracloud_apprun_application resource is deprecated. Use the sakura_apprun_shared resource in the sakura provider instead.",
+		CreateContext:      resourceSakuraCloudApprunApplicationCreate,
+		UpdateContext:      resourceSakuraCloudApprunApplicationUpdate,
+		ReadContext:        resourceSakuraCloudApprunApplicationRead,
+		DeleteContext:      resourceSakuraCloudApprunApplicationDelete,
 		Importer: &schema.ResourceImporter{
 			StateContext: schema.ImportStatePassthroughContext,
 		},

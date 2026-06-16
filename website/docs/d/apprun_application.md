@@ -8,6 +8,8 @@ description: |-
 
 # Data Source: sakuracloud_apprun_application
 
+~> **Deprecated:** This data source is deprecated. Use the `sakura_apprun_shared` resource in the `sakura` provider instead.
+
 Get information about an existing AppRun Application.
 
 ## Argument Reference
