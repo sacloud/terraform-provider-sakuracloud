@@ -14,17 +14,17 @@ require (
 	github.com/sacloud/api-client-go v0.3.5
 	github.com/sacloud/apprun-api-go v0.7.1
 	github.com/sacloud/autoscaler v0.19.3
-	github.com/sacloud/iaas-api-go v1.28.0
+	github.com/sacloud/iaas-api-go v1.29.1
 	github.com/sacloud/iaas-service-go v1.23.0
 	github.com/sacloud/iso9660wrap v0.0.0-20171031075302-eda21f77f6a8
 	github.com/sacloud/kms-api-go v0.4.0
 	github.com/sacloud/packages-go v0.1.0
-	github.com/sacloud/saclient-go v0.3.7
+	github.com/sacloud/saclient-go v0.4.0
 	github.com/sacloud/secretmanager-api-go v0.4.1
 	github.com/sacloud/simplemq-api-go v0.5.1
 	github.com/sacloud/webaccel-api-go v1.5.0
 	github.com/stretchr/testify v1.11.1
-	golang.org/x/text v0.36.0
+	golang.org/x/text v0.37.0
 )
 
 require (
@@ -42,7 +42,7 @@ require (
 	github.com/dlclark/regexp2 v1.11.5 // indirect
 	github.com/fatih/color v1.19.0 // indirect
 	github.com/fatih/structs v1.1.0 // indirect
-	github.com/fsnotify/fsnotify v1.9.0 // indirect
+	github.com/fsnotify/fsnotify v1.10.1 // indirect
 	github.com/gabriel-vasile/mimetype v1.4.13 // indirect
 	github.com/ghodss/yaml v1.0.0 // indirect
 	github.com/go-faster/errors v0.7.1 // indirect
@@ -117,13 +117,13 @@ require (
 	go.uber.org/multierr v1.11.0 // indirect
 	go.uber.org/ratelimit v0.3.1 // indirect
 	go.uber.org/zap v1.27.1 // indirect
-	golang.org/x/crypto v0.50.0 // indirect
+	golang.org/x/crypto v0.52.0 // indirect
 	golang.org/x/exp v0.0.0-20250506013437-ce4c2cf36ca6 // indirect
 	golang.org/x/mod v0.35.0 // indirect
-	golang.org/x/net v0.52.0 // indirect
+	golang.org/x/net v0.54.0 // indirect
 	golang.org/x/sync v0.20.0 // indirect
-	golang.org/x/sys v0.43.0 // indirect
-	golang.org/x/tools v0.43.0 // indirect
+	golang.org/x/sys v0.45.0 // indirect
+	golang.org/x/tools v0.44.0 // indirect
 	google.golang.org/appengine v1.6.8 // indirect
 	google.golang.org/genproto/googleapis/api v0.0.0-20251202230838-ff82c1b0f217 // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20251202230838-ff82c1b0f217 // indirect
