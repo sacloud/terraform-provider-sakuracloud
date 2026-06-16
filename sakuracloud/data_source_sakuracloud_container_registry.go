@@ -33,8 +33,9 @@ func dataSourceSakuraCloudContainerRegistry() *schema.Resource {
 			filterAttrName: filterSchema(&filterSchemaOption{}),
 			"name":         schemaDataSourceName(resourceName),
 			"access_level": {
-				Type:     schema.TypeString,
-				Computed: true,
+				Type:       schema.TypeString,
+				Computed:   true,
+				Deprecated: "The access_level field is deprecated. Future versions will not support public access settings, and this field will be removed.",
 				Description: desc.Sprintf(
 					"The level of access that allow to users. This will be one of [%s]",
 					types.ContainerRegistryAccessLevelStrings,

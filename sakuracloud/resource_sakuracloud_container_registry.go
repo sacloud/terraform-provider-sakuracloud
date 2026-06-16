@@ -44,8 +44,10 @@ func resourceSakuraCloudContainerRegistry() *schema.Resource {
 			"name": schemaResourceName(resourceName),
 			"access_level": {
 				Type:             schema.TypeString,
-				Required:         true,
+				Optional:         true,
+				Default:          types.ContainerRegistryAccessLevels.None.String(),
 				ValidateDiagFunc: validation.ToDiagFunc(validation.StringInSlice(types.ContainerRegistryAccessLevelStrings, false)),
+				Deprecated:       "The access_level field is deprecated. Future versions will not support public access settings, and this field will be removed.",
 				Description: desc.Sprintf(
 					"The level of access that allow to users. This must be one of [%s]",
 					types.ContainerRegistryAccessLevelStrings,
