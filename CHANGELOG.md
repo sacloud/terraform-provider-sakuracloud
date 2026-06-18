@@ -1,5 +1,25 @@
 # CHANGELOG
 
+## 2.36.0 (2026/06/18)
+
+- deprecate: mark container_registry access_level as deprecated (#1390)
+- deprecate: mark apprun_application resource and data source as deprecated (#1389)
+- refactor: avoid storing sensitive fields in state across multiple resources (#1380)
+- fix: prevent nil dereference and state restoration in webaccel data source (#1380)
+- fix: avoid perpetual diff for webaccel domain and cors_rules (#1383)
+- fix: update KMS client initialization for v0.4.0 (#1376)
+- go: bump terraform-plugin-sdk/v2 (#1392)
+- go: bump iaas-service-go from 1.23.0 to 1.25.1 (#1388)
+- go: bump autoscaler from 0.19.3 to 0.19.5 (#1386)
+- go: bump webaccel-api-go from 1.4.1 to 1.5.0 (#1374)
+- go: bump simplemq-api-go from 0.5.0 to 0.5.1 (#1373)
+- go: bump secretmanager-api-go from 0.3.1 to 0.4.1 (#1375)
+- go: bump kms-api-go from 0.3.1 to 0.4.0 (#1376)
+- go: bump jlaffaye/ftp from 0.2.0 to 0.2.1 (#1387)
+- go: bump golang.org/x/text from 0.37.0 to 0.38.0 (#1391)
+- ci: bump actions/checkout from 6.0.2 to 6.0.3 (#1381)
+- ci: bump goreleaser/goreleaser-action from 7.1.0 to 7.2.2 (#1379)
+
 ## 2.35.1 (2026/04/28)
 
 - server_vnc: drop permission validation from server vnc info data source (#1365)
