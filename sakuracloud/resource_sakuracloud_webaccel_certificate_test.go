@@ -16,6 +16,7 @@ package sakuracloud
 
 import (
 	"fmt"
+	"github.com/sacloud/packages-go/testutil"
 	"os"
 	"regexp"
 	"testing"
@@ -32,19 +33,13 @@ const (
 )
 
 func TestAccResourceSakuraCloudWebAccelCertificate_basic(t *testing.T) {
-	envKeys := []string{
+	testutil.PreCheckEnvsFunc(
 		envWebAccelSiteName,
 		envWebAccelCertificateCrt,
 		envWebAccelCertificateKey,
 		envWebAccelCertificateCrtUpd,
 		envWebAccelCertificateKeyUpd,
-	}
-	for _, k := range envKeys {
-		if os.Getenv(k) == "" {
-			t.Skipf("ENV %q is requilred. skip", k)
-			return
-		}
-	}
+	)(t)
 
 	siteName := os.Getenv(envWebAccelSiteName)
 	crt := os.Getenv(envWebAccelCertificateCrt)
@@ -89,6 +84,84 @@ func TestAccResourceSakuraCloudWebAccelCertificate_basic(t *testing.T) {
 	})
 }
 
+func TestAccResourceSakuraCloudWebAccelCertificate_LetsEncrypt(t *testing.T) {
+	skipIfFakeModeEnabled(t)
+
+	testutil.PreCheckEnvsFunc(envWebAccelSiteName)(t)
+
+	siteName := os.Getenv(envWebAccelSiteName)
+	regexpNotEmpty := regexp.MustCompile(".+")
+	resource.Test(t, resource.TestCase{
+		PreCheck:          func() { testAccPreCheck(t) },
+		ProviderFactories: testAccProviderFactories,
+		CheckDestroy: func(*terraform.State) error {
+			return nil
+		},
+		Steps: []resource.TestStep{
+			{
+				Config:      testAccCheckSakuraCloudWebAccelCertificateFreeCertConfig(siteName, false),
+				ExpectError: regexp.MustCompile("must be true for the creation"),
+				Destroy:     false,
+			},
+			{
+				Config: testAccCheckSakuraCloudWebAccelCertificateFreeCertConfig(siteName, true),
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestMatchResourceAttr("sakuracloud_webaccel_certificate.foobar", "id", regexpNotEmpty),
+					resource.TestMatchResourceAttr("sakuracloud_webaccel_certificate.foobar", "site_id", regexpNotEmpty),
+					resource.TestCheckResourceAttr("sakuracloud_webaccel_certificate.foobar", "lets_encrypt", "true"),
+				),
+				Destroy: false,
+			},
+			{
+				Config:      testAccCheckSakuraCloudWebAccelCertificateFreeCertConfig(siteName, false),
+				ExpectError: regexp.MustCompile("must not be false"),
+				Destroy:     false,
+			},
+			{
+				// リソースのクリーンアップを保証するためのステップ。実際には何もしない。
+				Config:  testAccCheckSakuraCloudWebAccelCertificateFreeCertConfig(siteName, true),
+				Destroy: true,
+			},
+		},
+	})
+}
+
+func TestAccResourceSakuraCloudWebAccelCertificate_InvalidConfigs(t *testing.T) {
+	testutil.PreCheckEnvsFunc(
+		envWebAccelSiteName,
+		envWebAccelCertificateCrt,
+		envWebAccelCertificateKey,
+	)(t)
+
+	crt := os.Getenv(envWebAccelCertificateCrt)
+	key := os.Getenv(envWebAccelCertificateKey)
+	siteName := os.Getenv(envWebAccelSiteName)
+
+	regexpNotEmpty := regexp.MustCompile(".+")
+
+	resource.Test(t, resource.TestCase{
+		PreCheck:          func() { testAccPreCheck(t) },
+		ProviderFactories: testAccProviderFactories,
+		CheckDestroy: func(*terraform.State) error {
+			return nil
+		},
+		Steps: []resource.TestStep{
+			{
+				Config:      testAccCheckSakuraCloudWebAccelCertificateWithoutPrivKeyConfig(siteName, crt),
+				ExpectError: regexpNotEmpty,
+			},
+			{
+				Config:      testAccCheckSakuraCloudWebAccelCertificateWithoutCertificateConfig(siteName, key),
+				ExpectError: regexpNotEmpty,
+			},
+			{
+				Config:      testAccCheckSakuraCloudWebAccelCertificateWithBlankConfig(siteName),
+				ExpectError: regexpNotEmpty,
+			},
+		},
+	})
+}
+
 func testAccCheckSakuraCloudWebAccelCertificateConfig(siteName, crt, key string) string {
 	tmpl := `
 data sakuracloud_webaccel "site" {
@@ -101,4 +174,59 @@ resource sakuracloud_webaccel_certificate "foobar" {
 }
 `
 	return fmt.Sprintf(tmpl, siteName, crt, key)
+}
+
+func testAccCheckSakuraCloudWebAccelCertificateFreeCertConfig(siteName string, enabled bool) string {
+	tmpl := `
+data sakuracloud_webaccel "site" {
+  name = "%s"
+}
+resource sakuracloud_webaccel_certificate "foobar" {
+  site_id      = data.sakuracloud_webaccel.site.id
+  lets_encrypt = %s
+}
+`
+	if enabled {
+		return fmt.Sprintf(tmpl, siteName, "true")
+	} else {
+		return fmt.Sprintf(tmpl, siteName, "false")
+	}
+}
+
+func testAccCheckSakuraCloudWebAccelCertificateWithoutPrivKeyConfig(siteName, crt string) string {
+	tmpl := `
+data sakuracloud_webaccel "site" {
+  name = "%s"
+}
+resource sakuracloud_webaccel_certificate "foobar" {
+  site_id      = data.sakuracloud_webaccel.site.id
+  certificate_chain = file("%s") 
+}
+`
+	return fmt.Sprintf(tmpl, siteName, crt)
+}
+
+func testAccCheckSakuraCloudWebAccelCertificateWithoutCertificateConfig(siteName, key string) string {
+	tmpl := `
+data sakuracloud_webaccel "site" {
+  name = "%s"
+}
+resource sakuracloud_webaccel_certificate "foobar" {
+  site_id      = data.sakuracloud_webaccel.site.id
+  private_key       = file("%s")
+}
+`
+	return fmt.Sprintf(tmpl, siteName, key)
+}
+
+func testAccCheckSakuraCloudWebAccelCertificateWithBlankConfig(siteName string) string {
+	tmpl := `
+data sakuracloud_webaccel "site" {
+  name = "%s"
+}
+resource sakuracloud_webaccel_certificate "foobar" {
+  site_id      = data.sakuracloud_webaccel.site.id
+}
+`
+	return fmt.Sprintf(tmpl, siteName)
 }

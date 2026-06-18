@@ -28,8 +28,9 @@ resource sakuracloud_webaccel_certificate "foobar" {
 
 ## Argument Reference
 
-* `certificate_chain` - (Required) .
-* `private_key` - (Required) .
+* `certificate_chain` - (Optional) Certificate chain for the site (mutually exclusive with `lets_encrypt`, used with `private_key`).
+* `private_key` - (Optional) Private key for the site (mutually exclusive with `lets_encrypt`, used with `certificate_chain`).
+* `lets_encrypt` - (Optional) `true` for enabling lets_encrypt certificate auto renewal  (mutually exclusive with `certificate_chain` or `private_key`).
 * `site_id` - (Required) .
 
 ## Attribute Reference
@@ -42,3 +43,4 @@ resource sakuracloud_webaccel_certificate "foobar" {
 * `serial_number` - .
 * `sha256_fingerprint` - .
 * `subject_common_name` - .
+* `lets_encrypt` - .

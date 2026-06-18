@@ -7,6 +7,7 @@ resource "sakuracloud_webaccel" "foobar" {
     origin   = "docs.usacloud.jp"
     protocol = "https"
   }
+  origin_guard_token {}
   onetime_url_secrets = [
     "abc-0x123456"
   ]

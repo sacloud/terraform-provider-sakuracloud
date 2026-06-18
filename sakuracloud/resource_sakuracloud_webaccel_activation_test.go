@@ -16,6 +16,7 @@ package sakuracloud
 
 import (
 	"fmt"
+	"github.com/sacloud/packages-go/testutil"
 	"os"
 	"testing"
 
@@ -24,15 +25,7 @@ import (
 )
 
 func TestAccResourceSakuraCloudWebAccelActivation_Basic(t *testing.T) {
-	envKeys := []string{
-		envWebAccelSiteName,
-	}
-	for _, k := range envKeys {
-		if os.Getenv(k) == "" {
-			t.Skipf("ENV %q is requilred. skip", k)
-			return
-		}
-	}
+	testutil.PreCheckEnvsFunc(envWebAccelSiteName)(t)
 
 	siteName := os.Getenv(envWebAccelSiteName)
 
@@ -54,15 +47,7 @@ func TestAccResourceSakuraCloudWebAccelActivation_Basic(t *testing.T) {
 }
 
 func TestAccResourceSakuraCloudWebAccelActivation_Update(t *testing.T) {
-	envKeys := []string{
-		envWebAccelSiteName,
-	}
-	for _, k := range envKeys {
-		if os.Getenv(k) == "" {
-			t.Skipf("ENV %q is requilred. skip", k)
-			return
-		}
-	}
+	testutil.PreCheckEnvsFunc(envWebAccelSiteName)(t)
 
 	siteName := os.Getenv(envWebAccelSiteName)
 
