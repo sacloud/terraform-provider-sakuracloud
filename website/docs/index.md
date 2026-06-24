@@ -12,10 +12,10 @@ The SakuraCloud Provider is used to interact with the many resources supported b
 ## Important Notice
 
 ~> **Important:** SakuraCloud Provider v2 maintenance will end on **December 31, 2026**.  
-> After January 2027, new features, bug fixes, and improvements to existing resources will **not** be provided in principle.  
-> Existing versions will not stop working immediately, but may be affected by future service changes.  
-> For continued stable operation, please consider migrating to [v3](https://github.com/sacloud/terraform-provider-sakura) (`sacloud/sakura`).  
-> See the [end-of-maintenance announcement](https://cloud.sakura.ad.jp/news/2026/06/23/terraform-provider-v2-end-of-maintenance/) and the [migration guide (ja)](https://knowledge.sakura.ad.jp/51008/) for details.
+> After January 2027, we will generally no longer provide new features, bug fixes, or improvements to existing resources.  
+> Existing versions will not stop working immediately, but they may be affected by future service changes.  
+> To ensure continued stable operation, please consider migrating to [v3](https://github.com/sacloud/terraform-provider-sakura) (`sacloud/sakura`).  
+> For details, see the [end-of-maintenance announcement](https://cloud.sakura.ad.jp/news/2026/06/23/terraform-provider-v2-end-of-maintenance/) and the [migration guide (Japanese only)](https://knowledge.sakura.ad.jp/51008/).
 
 ## Example Usage
 
