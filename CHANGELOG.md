@@ -1,8 +1,11 @@
 # CHANGELOG
 
-## 2.37.0 (2026/06/xx)
+## 2.36.1 (2026/06/26)
 
-- docs: update maintenance end notice on README and provider documentation
+- docs: announce v2 maintenance end and recommend v3 migration (#1395)
+- docs: refine English notice in provider documentation (#1395)
+- go: bump github.com/sacloud/iaas-api-go from 1.29.1 to 1.29.2 (#1396)
+- ci: bump actions/checkout from 6.0.3 to 7.0.0 (#1394)
 
 ## 2.36.0 (2026/06/18)
 
