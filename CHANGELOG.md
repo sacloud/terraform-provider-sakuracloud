@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 2.37.0 (2026/06/xx)
+
+- docs: update maintenance end notice on README and provider documentation
+
 ## 2.36.0 (2026/06/18)
 
 - deprecate: mark container_registry access_level as deprecated (#1390)
