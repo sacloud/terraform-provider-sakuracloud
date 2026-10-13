@@ -2,6 +2,8 @@ module github.com/sacloud/terraform-provider-sakuracloud
 
 go 1.26.2
 
+toolchain go1.27.2
+
 require (
 	github.com/goccy/go-yaml v1.19.2
 	github.com/hashicorp/go-cty v1.5.0
