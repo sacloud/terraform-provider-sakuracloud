@@ -1,5 +1,7 @@
 name: Tests
 on: [push, pull_request]
+permissions:
+  contents: read
 env:
   GOPROXY: https://proxy.golang.org
 jobs:
