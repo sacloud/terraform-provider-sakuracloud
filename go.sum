@@ -222,8 +222,8 @@ github.com/sacloud/go-http v0.1.9 h1:Xa5PY8/pb7XWhwG9nAeXSrYXPbtfBWqawgzxD5co3VE
 github.com/sacloud/go-http v0.1.9/go.mod h1:DpDG+MSyxYaBwPJ7l3aKLMzwYdTVtC5Bo63HActcgoE=
 github.com/sacloud/go-otelsetup v0.8.0 h1:JiZLvzQQ0jGEmvIBzW5VAGftWqcLcRBwiaaz7rP9gOI=
 github.com/sacloud/go-otelsetup v0.8.0/go.mod h1:rBq67f3gKM9NLdwgv+1O2y6Qu/29rMzpgz4Pecjc4FE=
-github.com/sacloud/iaas-api-go v1.29.2 h1:Q4et7ozhhG69+gR15Tgbu3s/WXcDvtwj4RW+YQqdcA4=
-github.com/sacloud/iaas-api-go v1.29.2/go.mod h1:oi3/OJxsBvqYf+BHPiEpigDVqrAklSIhsxVlPki5aPg=
+github.com/sacloud/iaas-api-go v1.29.3 h1:+R4nirSCVK8vQ1+iNO4CEKxEDStHwINo5ZjgDe1amVI=
+github.com/sacloud/iaas-api-go v1.29.3/go.mod h1:YKPEzTsGdfhxXKGXTn82+txJUDo8EgtaZEhuBFY4PyI=
 github.com/sacloud/iaas-api-go/trace/otel v0.0.0-20260108004835-a49c720256da h1:LclrnjTzdVnhFriws2ZLEWSZ4rUoVe2V8tSuYdkbXxA=
 github.com/sacloud/iaas-api-go/trace/otel v0.0.0-20260108004835-a49c720256da/go.mod h1:eWB6gHmmot5h4oS9ZWeO3ty1nbF+TmBeiusb43nJHpU=
 github.com/sacloud/iaas-service-go v1.25.1 h1:x6+uLcDW55xyMxufgqzIxZhIHC2HQsxauuEow4flP+s=

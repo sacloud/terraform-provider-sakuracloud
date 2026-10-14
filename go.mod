@@ -16,7 +16,7 @@ require (
 	github.com/sacloud/api-client-go v0.3.5
 	github.com/sacloud/apprun-api-go v0.7.1
 	github.com/sacloud/autoscaler v0.19.5
-	github.com/sacloud/iaas-api-go v1.29.2
+	github.com/sacloud/iaas-api-go v1.29.3
 	github.com/sacloud/iaas-service-go v1.25.1
 	github.com/sacloud/iso9660wrap v0.0.0-20171031075302-eda21f77f6a8
 	github.com/sacloud/kms-api-go v0.4.0
