@@ -230,8 +230,8 @@ github.com/sacloud/iso9660wrap v0.0.0-20171031075302-eda21f77f6a8 h1:5piK7EELHKR
 github.com/sacloud/iso9660wrap v0.0.0-20171031075302-eda21f77f6a8/go.mod h1:1jHHCa624cG5rODkWmourombJaNmkY9/SBHWhLJcg+w=
 github.com/sacloud/kms-api-go v0.4.1 h1:LqyhzHTVjTBwxJEmeoGWR960xswtY2V71io3f91j3es=
 github.com/sacloud/kms-api-go v0.4.1/go.mod h1:0V8Un99q2uRzJVoMKLdL9yCR338SYdGzpvHQE36lFXk=
-github.com/sacloud/packages-go v0.1.0 h1:rixWcvkVUI4kX6UYTFJbQgZIoBoNhN48MivHIu3aYq0=
-github.com/sacloud/packages-go v0.1.0/go.mod h1:ntmPnjF8+mGWNtxgBmO0CrLphUlmRkpy+DztjlECp8M=
+github.com/sacloud/packages-go v0.1.1 h1:hVVk6Dfo9UJFX7wkmhr7iS0r+hHg3c8dHDGCX1zf32k=
+github.com/sacloud/packages-go v0.1.1/go.mod h1:8Q8w/DqzhN3f7iCEEugdtArsoWu3CDy3MDk23tU8cT4=
 github.com/sacloud/saclient-go v0.4.0 h1:d4CqjKDU0muPVukZ2qGB9Me6ANEcMg73z5tIqXIyGWA=
 github.com/sacloud/saclient-go v0.4.0/go.mod h1:5CqxypkPgUW6qZxBGRdKX3I+mVx/OWbbFrrRm6LBNeE=
 github.com/sacloud/secretmanager-api-go v0.4.1 h1:uvQExqhbsdRmp5oTk9BNg9Vu2rzM2OaexFuEOKU9oJQ=
