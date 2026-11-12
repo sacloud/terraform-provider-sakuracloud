@@ -13,7 +13,7 @@ require (
 	github.com/hashicorp/terraform-plugin-sdk/v2 v2.40.1
 	github.com/jlaffaye/ftp v0.2.4
 	github.com/mitchellh/go-homedir v1.1.0
-	github.com/sacloud/api-client-go v0.3.5
+	github.com/sacloud/api-client-go v0.3.6
 	github.com/sacloud/apprun-api-go v0.7.1
 	github.com/sacloud/autoscaler v0.19.5
 	github.com/sacloud/iaas-api-go v1.29.3

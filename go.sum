@@ -210,8 +210,8 @@ github.com/prometheus/procfs v0.16.1 h1:hZ15bTNuirocR6u0JZ6BAHHmwS1p8B4P6MRqxtzM
 github.com/prometheus/procfs v0.16.1/go.mod h1:teAbpZRB1iIAJYREa1LsoWUXykVXA1KlTmWl8x/U+Is=
 github.com/rogpeppe/go-internal v1.14.1 h1:UQB4HGPB6osV0SQTLymcB4TgvyWu6ZyliaW0tI/otEQ=
 github.com/rogpeppe/go-internal v1.14.1/go.mod h1:MaRKkUm5W0goXpeCfT7UZI6fk/L7L7so1lCWt35ZSgc=
-github.com/sacloud/api-client-go v0.3.5 h1:0ALibvbC+6MBhN7t61k+RhguhiEQ8+NejqBjq1YpylM=
-github.com/sacloud/api-client-go v0.3.5/go.mod h1:akdcCOl6wszywa0YQ5X8cMnNgWTm+7N4EneODTdiH48=
+github.com/sacloud/api-client-go v0.3.6 h1:gFZJ61iBHCdE1rgJGmiVxlLpGdEP9Zaqym12ukKMdFI=
+github.com/sacloud/api-client-go v0.3.6/go.mod h1:NU9XlkzN1dGCzDRf6yr3R0h/f7/Yj3CZk1qCnmU4Fn8=
 github.com/sacloud/apprun-api-go v0.7.1 h1:Kc0Xa9sveiXFRYJ0e9NtRRj9AI36yG5RFuQYjDNJ4Qo=
 github.com/sacloud/apprun-api-go v0.7.1/go.mod h1:0vQhVsP/5QWui5yJsYjV7cf35tESEHdv84dGSt6qZuE=
 github.com/sacloud/autoscaler v0.19.5 h1:v9JyrXbDF7OONzUCsh/5QwVRJT71sHgBB2fE1mB9+ss=
